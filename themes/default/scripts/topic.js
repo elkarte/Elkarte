@@ -54,9 +54,13 @@ QuickModifyTopic.prototype.modify_topic = function (topic_id, first_msg_id)
 	{
 		// Same message then just return, otherwise drop out of this edit.
 		if (this.iCurTopicId === topic_id)
+		{
 			return;
+		}
 		else
+		{
 			this.modify_topic_cancel();
+		}
 	}
 
 	this.bInEditMode = true;
@@ -107,7 +111,9 @@ QuickModifyTopic.prototype.modify_topic_cancel = function ()
 
 	// Put back the hover text
 	if (this.oSavetipElem !== false)
+	{
 		this.oSavetipElem.innerHTML = this.sSavetip;
+	}
 
 	return false;
 };
@@ -118,7 +124,9 @@ QuickModifyTopic.prototype.set_hidden_topic_areas = function (set_style)
 	for (var i = 0; i < this.aHidePrefixes.length; i++)
 	{
 		if (document.getElementById(this.aHidePrefixes[i] + this.sCurMessageId.substr(4)) !== null)
+		{
 			document.getElementById(this.aHidePrefixes[i] + this.sCurMessageId.substr(4)).style.display = set_style;
+		}
 	}
 };
 
@@ -137,7 +145,9 @@ QuickModifyTopic.prototype.modify_topic_show_edit = function (subject)
 QuickModifyTopic.prototype.modify_topic_save = function (cur_session_id, cur_session_var)
 {
 	if (!this.bInEditMode)
+	{
 		return true;
+	}
 
 	var x = [];
 
@@ -170,7 +180,9 @@ QuickModifyTopic.prototype.modify_topic_done = function (XMLDoc)
 
 	// No subject or other error?
 	if (!subject || error)
+	{
 		return false;
+	}
 
 	this.modify_topic_hide_edit(subject.childNodes[0].nodeValue);
 	this.set_hidden_topic_areas('');
@@ -190,29 +202,37 @@ QuickModifyTopic.prototype.modify_topic_done = function (XMLDoc)
 QuickModifyTopic.prototype.modify_topic_hide_edit = function (subject)
 {
 	// Re-template the subject!
-	this.oCurSubjectDiv.innerHTML = '<a href="' + elk_scripturl + '?topic=' + this.iCurTopicId + '.0">' + subject + '<' +'/a>';
+	this.oCurSubjectDiv.innerHTML = '<a href="' + elk_scripturl + '?topic=' + this.iCurTopicId + '.0">' + subject + '<' + '/a>';
 };
 
 // keypress event ... like enter or escape
 QuickModifyTopic.prototype.modify_topic_keypress = function (oEvent)
 {
-	if (typeof(oEvent.keyCode) !== "undefined" && this.bInEditMode)
+	if (typeof (oEvent.keyCode) !== "undefined" && this.bInEditMode)
 	{
 		if (oEvent.keyCode === 27)
 		{
 			this.modify_topic_cancel();
-			if (typeof(oEvent.preventDefault) === "undefined")
+			if (typeof (oEvent.preventDefault) === "undefined")
+			{
 				oEvent.returnValue = false;
+			}
 			else
+			{
 				oEvent.preventDefault();
+			}
 		}
 		else if (oEvent.keyCode === 13)
 		{
 			this.modify_topic_save(elk_session_id, elk_session_var);
-			if (typeof(oEvent.preventDefault) === "undefined")
+			if (typeof (oEvent.preventDefault) === "undefined")
+			{
 				oEvent.returnValue = false;
+			}
 			else
+			{
 				oEvent.preventDefault();
+			}
 		}
 	}
 };
@@ -221,7 +241,9 @@ QuickModifyTopic.prototype.modify_topic_keypress = function (oEvent)
 QuickModifyTopic.prototype.modify_topic_click = function (oEvent)
 {
 	if (this.bInEditMode && !this.bMouseOnDiv)
+	{
 		this.modify_topic_save(elk_session_id, elk_session_var);
+	}
 };
 
 // Moved out of the editing div
@@ -251,7 +273,9 @@ function QuickReply(oOptions)
 
 	// If the initial state is to be collapsed, collapse it.
 	if (this.bCollapsed)
+	{
 		this.swap(true);
+	}
 }
 
 // When a user presses quote, put it in the quick reply box (if expanded).
@@ -268,15 +292,23 @@ QuickReply.prototype.quote = function (iMessageId, xDeprecated)
 
 	// Insert the quote
 	if (this.bIsFull)
+	{
 		insertQuoteFast(iMessageId);
+	}
 	else
+	{
 		getXMLDocument(elk_prepareScriptUrl(this.opt.sScriptUrl) + 'action=quotefast;quote=' + iMessageId + ';xml', this.onQuoteReceived);
+	}
 
 	// Move the view to the quick reply box.
 	if (navigator.appName === 'Microsoft Internet Explorer')
+	{
 		window.location.hash = this.opt.sJumpAnchor;
+	}
 	else
+	{
 		window.location.hash = '#' + this.opt.sJumpAnchor;
+	}
 
 	return false;
 };
@@ -302,38 +334,50 @@ QuickReply.prototype.swap = function (bInit, bSavestate)
 		bIsFull = this.opt.bIsFull;
 
 	// Default bInit to false and bSavestate to true
-	bInit = typeof(bInit) !== 'undefined';
-	bSavestate = typeof(bSavestate) === 'undefined';
+	bInit = typeof (bInit) !== 'undefined';
+	bSavestate = typeof (bSavestate) === 'undefined';
 
 	// Flip our current state if not responding to an initial loading
 	if (!bInit)
+	{
 		this.bCollapsed = !this.bCollapsed;
+	}
 
 	// Swap the class on the expcol image as needed
 	var sTargetClass = !this.bCollapsed ? this.opt.sClassCollapsed : this.opt.sClassExpanded;
 	if (oQuickReplyContainer.className !== sTargetClass)
+	{
 		oQuickReplyContainer.className = sTargetClass;
+	}
 
 	// And show the new title
 	oQuickReplyContainer.title = oQuickReplyContainer.title = this.bCollapsed ? this.opt.sTitleCollapsed : this.opt.sTitleExpanded;
 
 	// Show or hide away
 	if (this.bCollapsed)
+	{
 		$('#' + this.opt.sContainerId).slideUp();
+	}
 	else
 	{
 		$('#' + this.opt.sContainerId).slideDown();
 		if (bIsFull)
+		{
 			$('#' + sEditorId).resize();
+		}
 	}
 
 	// Using a cookie for guests?
 	if (bSavestate && 'oCookieOptions' in this.opt && this.opt.oCookieOptions.bUseCookie)
+	{
 		this.oCookie.set(this.opt.oCookieOptions.sCookieName, this.bCollapsed ? '1' : '0');
+	}
 
 	// Save the expand /collapse preference
 	if (!bInit && bSavestate && 'oThemeOptions' in this.opt && this.opt.oThemeOptions.bUseThemeSettings)
+	{
 		elk_setThemeOption(this.opt.oThemeOptions.sOptionName, this.bCollapsed ? '1' : '0', 'sThemeId' in this.opt.oThemeOptions ? this.opt.oThemeOptions.sThemeId : null, 'sAdditionalVars' in this.opt.oThemeOptions ? this.opt.oThemeOptions.sAdditionalVars : null);
+	}
 };
 
 /**
@@ -366,9 +410,9 @@ function QuickModify(oOptions)
 QuickModify.prototype.modifyMsg = function (iMessageId)
 {
 	// Removes the accesskeys from the quickreply inputs and saves them in an array to use them later
-	if (typeof(this.opt.sFormRemoveAccessKeys) !== 'undefined')
+	if (typeof (this.opt.sFormRemoveAccessKeys) !== 'undefined')
 	{
-		if (typeof(document.forms[this.opt.sFormRemoveAccessKeys]))
+		if (typeof (document.forms[this.opt.sFormRemoveAccessKeys]))
 		{
 			var aInputs = document.forms[this.opt.sFormRemoveAccessKeys].getElementsByTagName('input');
 			for (var i = 0; i < aInputs.length; i++)
@@ -384,7 +428,9 @@ QuickModify.prototype.modifyMsg = function (iMessageId)
 
 	// First cancel if there's another message still being edited.
 	if (this.bInEditMode)
+	{
 		this.modifyCancel();
+	}
 
 	// At least NOW we're in edit mode
 	this.bInEditMode = true;
@@ -411,12 +457,16 @@ QuickModify.prototype.onMessageReceived = function (XMLDoc)
 	{
 		this.oMsgIcon = document.getElementById('messageicon_' + this.sCurMessageId.replace("msg_", ""));
 		if (this.oMsgIcon !== null && getComputedStyle(this.oMsgIcon).getPropertyValue("display") === 'none')
+		{
 			this.oMsgIcon.style.display = 'inline';
+		}
 	}
 
 	// If this is not valid then simply give up.
 	if (!document.getElementById(this.sCurMessageId))
+	{
 		return this.modifyCancel();
+	}
 
 	// Replace the body part.
 	for (var i = 0; i < XMLDoc.getElementsByTagName("message")[0].childNodes.length; i++)
@@ -450,7 +500,7 @@ QuickModify.prototype.onMessageReceived = function (XMLDoc)
 		if (this.oCurInfoDiv !== null)
 		{
 			this.sInfoBuffer = this.oCurInfoDiv.innerHTML;
-			this.oCurInfoDiv.innerHTML =  this.opt.sTemplateSubjectEdit.replace(/%subject%/, sSubjectText).replace(/\{&dollarfix;\$\}/g, '$');
+			this.oCurInfoDiv.innerHTML = this.opt.sTemplateSubjectEdit.replace(/%subject%/, sSubjectText).replace(/\{&dollarfix;\$\}/g, '$');
 		}
 	}
 
@@ -489,21 +539,23 @@ QuickModify.prototype.modifyCancel = function ()
 		var oCurrentMsgIcon = document.getElementById('msg_icon_' + this.sCurMessageId.replace("msg_", ""));
 
 		if (oCurrentMsgIcon !== null && oCurrentMsgIcon.src.indexOf(this.opt.sIconHide) > 0)
+		{
 			this.oMsgIcon.style.display = 'none';
+		}
 	}
 
 	// No longer in edit mode, that's right.
 	this.bInEditMode = false;
 
 	// Let's put back the accesskeys to their original place
-	if (typeof(this.opt.sFormRemoveAccessKeys) !== 'undefined')
+	if (typeof (this.opt.sFormRemoveAccessKeys) !== 'undefined')
 	{
-		if (typeof(document.forms[this.opt.sFormRemoveAccessKeys]))
+		if (typeof (document.forms[this.opt.sFormRemoveAccessKeys]))
 		{
 			var aInputs = document.forms[this.opt.sFormRemoveAccessKeys].getElementsByTagName('input');
 			for (var i = 0; i < aInputs.length; i++)
 			{
-				if (typeof(this.aAccessKeys[aInputs[i].name]) !== 'undefined')
+				if (typeof (this.aAccessKeys[aInputs[i].name]) !== 'undefined')
 				{
 					aInputs[i].accessKey = this.aAccessKeys[aInputs[i].name];
 				}
@@ -523,19 +575,21 @@ QuickModify.prototype.modifySave = function (sSessionId, sSessionVar)
 
 	// We cannot save if we weren't in edit mode.
 	if (!this.bInEditMode)
+	{
 		return true;
+	}
 
 	this.bInEditMode = false;
 
 	// Let's put back the accesskeys to their original place
-	if (typeof(this.opt.sFormRemoveAccessKeys) !== 'undefined')
+	if (typeof (this.opt.sFormRemoveAccessKeys) !== 'undefined')
 	{
-		if (typeof(document.forms[this.opt.sFormRemoveAccessKeys]))
+		if (typeof (document.forms[this.opt.sFormRemoveAccessKeys]))
 		{
 			var aInputs = document.forms[this.opt.sFormRemoveAccessKeys].getElementsByTagName('input');
 			for (i = 0; i < aInputs.length; i++)
 			{
-				if (typeof(this.aAccessKeys[aInputs[i].name]) !== 'undefined')
+				if (typeof (this.aAccessKeys[aInputs[i].name]) !== 'undefined')
 				{
 					aInputs[i].accessKey = this.aAccessKeys[aInputs[i].name];
 				}
@@ -557,7 +611,9 @@ QuickModify.prototype.modifySave = function (sSessionId, sSessionVar)
 	x[x.length] = 'topic=' + parseInt(document.forms.quickModForm.elements.topic.value);
 	x[x.length] = 'msg=' + parseInt(document.forms.quickModForm.elements.msg.value);
 	if (uIds.length > 0)
+	{
 		x[x.length] = uIds.join("&");
+	}
 
 	// Send in the XMLhttp request and let's hope for the best.
 	ajax_indicator(true);
@@ -578,14 +634,16 @@ QuickModify.prototype.onModifyDone = function (XMLDoc)
 	if (!XMLDoc || !XMLDoc.getElementsByTagName('elk')[0])
 	{
 		// Mozilla will nicely tell us what's wrong.
-		if (typeof XMLDoc.childNodes !== 'undefined' &&  XMLDoc.childNodes.length > 0 && XMLDoc.firstChild.nodeName === 'parsererror')
+		if (typeof XMLDoc.childNodes !== 'undefined' && XMLDoc.childNodes.length > 0 && XMLDoc.firstChild.nodeName === 'parsererror')
 		{
 			oErrordiv = document.getElementById('error_box');
 			oErrordiv.innerHTML = XMLDoc.firstChild.textContent;
 			oErrordiv.style.display = '';
 		}
 		else
+		{
 			this.modifyCancel();
+		}
 		return;
 	}
 
@@ -603,7 +661,7 @@ QuickModify.prototype.onModifyDone = function (XMLDoc)
 		for (var i = 0; i < body.childNodes.length; i++)
 			bodyText += body.childNodes[i].nodeValue;
 
-		this.sMessageBuffer = this.opt.sTemplateBodyNormal.replace(/%body%/, bodyText.replace(/\$/g, '{&dollarfix;$}')).replace(/\{&dollarfix;\$\}/g,'$');
+		this.sMessageBuffer = this.opt.sTemplateBodyNormal.replace(/%body%/, bodyText.replace(/\$/g, '{&dollarfix;$}')).replace(/\{&dollarfix;\$\}/g, '$');
 		this.oCurMessageDiv.innerHTML = this.sMessageBuffer;
 
 		// Show new subject div, update in case it changed
@@ -632,25 +690,34 @@ QuickModify.prototype.onModifyDone = function (XMLDoc)
 		{
 			var oCurrentMsgIcon = document.getElementById('msg_icon_' + this.sCurMessageId.replace("msg_", ""));
 			if (oCurrentMsgIcon !== null && oCurrentMsgIcon.src.indexOf(this.opt.sIconHide) > 0)
+			{
 				this.oMsgIcon.style.display = 'none';
+			}
 		}
 
 		// Re embed any video links if the feature is available
 		if ($.isFunction($.fn.linkifyvideo))
+		{
 			$().linkifyvideo(oEmbedtext, this.sCurMessageId);
+		}
 
 		// Hello, Sweetie
-		$('#' + this.sCurMessageId + ' .spoilerheader').click(function(){
+		$('#' + this.sCurMessageId + ' .spoilerheader').click(function ()
+		{
 			$(this).next().children().slideToggle("fast");
 		});
 
 		// Re-Fix code blocks
 		if (typeof elk_codefix === 'function')
+		{
 			elk_codefix();
+		}
 
 		// And pretty the code
 		if (typeof prettyPrint === 'function')
+		{
 			prettyPrint();
+		}
 	}
 	else if (error)
 	{
@@ -658,9 +725,13 @@ QuickModify.prototype.onModifyDone = function (XMLDoc)
 		oErrordiv.innerHTML = error.childNodes[0].nodeValue;
 		oErrordiv.style.display = '';
 		if (error.getAttribute('in_body') === '1')
+		{
 			$(document.forms.quickModForm.message).addClass('border_error');
+		}
 		if (error.getAttribute('in_subject') === '1')
+		{
 			$(document.forms.quickModForm.subject).addClass('border_error');
+		}
 	}
 };
 
@@ -678,7 +749,7 @@ function InTopicModeration(oOptions)
 	this.init();
 }
 
-InTopicModeration.prototype.init = function()
+InTopicModeration.prototype.init = function ()
 {
 	// Add checkboxes to all the messages.
 	for (var i = 0, n = this.opt.aMessageIds.length; i < n; i++)
@@ -700,7 +771,7 @@ InTopicModeration.prototype.init = function()
 };
 
 // They clicked a checkbox in a message so we show the button options to them
-InTopicModeration.prototype.handleClick = function(oCheckbox)
+InTopicModeration.prototype.handleClick = function (oCheckbox)
 {
 	var oButtonStrip = document.getElementById(this.opt.sButtonStrip),
 		oButtonStripDisplay = document.getElementById(this.opt.sButtonStripDisplay);
@@ -708,8 +779,10 @@ InTopicModeration.prototype.handleClick = function(oCheckbox)
 	if (!this.bButtonsShown && this.opt.sButtonStripDisplay)
 	{
 		// Make sure it can go somewhere.
-		if (typeof(oButtonStripDisplay) === 'object' && oButtonStripDisplay !== null)
+		if (typeof (oButtonStripDisplay) === 'object' && oButtonStripDisplay !== null)
+		{
 			oButtonStripDisplay.style.display = "";
+		}
 		else
 		{
 			var oNewDiv = document.createElement('div'),
@@ -724,6 +797,7 @@ InTopicModeration.prototype.handleClick = function(oCheckbox)
 
 		// Add the 'remove selected items' button.
 		if (this.opt.bCanRemove)
+		{
 			elk_addButton(this.opt.sButtonStrip, this.opt.bUseImageButton, {
 				sId: 'remove_button',
 				sText: this.opt.sRemoveButtonLabel,
@@ -733,9 +807,11 @@ InTopicModeration.prototype.handleClick = function(oCheckbox)
 					['click', this.handleSubmit.bind(this, 'remove')]
 				]
 			});
+		}
 
 		// Add the 'restore selected items' button.
 		if (this.opt.bCanRestore)
+		{
 			elk_addButton(this.opt.sButtonStrip, this.opt.bUseImageButton, {
 				sId: 'restore_button',
 				sText: this.opt.sRestoreButtonLabel,
@@ -745,9 +821,11 @@ InTopicModeration.prototype.handleClick = function(oCheckbox)
 					['click', this.handleSubmit.bind(this, 'restore')]
 				]
 			});
+		}
 
 		// Add the 'split selected items' button.
 		if (this.opt.bCanSplit)
+		{
 			elk_addButton(this.opt.sButtonStrip, this.opt.bUseImageButton, {
 				sId: 'split_button',
 				sText: this.opt.sSplitButtonLabel,
@@ -757,6 +835,7 @@ InTopicModeration.prototype.handleClick = function(oCheckbox)
 					['click', this.handleSubmit.bind(this, 'split')]
 				]
 			});
+		}
 
 		// Adding these buttons once should be enough.
 		this.bButtonsShown = true;
@@ -819,27 +898,33 @@ InTopicModeration.prototype.handleSubmit = function (sSubmitType)
 	{
 		case 'remove':
 			if (!confirm(this.opt.sRemoveButtonConfirm))
+			{
 				return false;
+			}
 
 			oForm.action = oForm.action.replace(/;split_selection=1/, '');
 			oForm.action = oForm.action.replace(/;restore_selected=1/, '');
-		break;
+			break;
 
 		case 'restore':
 			if (!confirm(this.opt.sRestoreButtonConfirm))
+			{
 				return false;
+			}
 
 			oForm.action = oForm.action.replace(/;split_selection=1/, '');
 			oForm.action += ';restore_selected=1';
-		break;
+			break;
 
 		case 'split':
 			if (!confirm(this.opt.sRestoreButtonConfirm))
+			{
 				return false;
+			}
 
 			oForm.action = oForm.action.replace(/;restore_selected=1/, '');
 			oForm.action += ';split_selection=1';
-		break;
+			break;
 
 		default:
 			return false;
@@ -849,14 +934,14 @@ InTopicModeration.prototype.handleSubmit = function (sSubmitType)
 	return true;
 };
 
-
 /**
  * Expands an attachment thumbnail when its clicked
  *
  * @param {string} thumbID
  * @param {string} messageID
  */
-function expandThumbLB(thumbID, messageID) {
+function expandThumbLB(thumbID, messageID)
+{
 	var link = document.getElementById('link_' + thumbID),
 		siblings = $('a[data-lightboxmessage="' + messageID + '"]'),
 		navigation = [],
@@ -867,14 +952,17 @@ function expandThumbLB(thumbID, messageID) {
 		$elk_prev_icon = $('<span id="elk_lb_prev"></span>'),
 		$elk_lightbox = $('#elk_lightbox'),
 		$elk_lb_content = $('#elk_lb_content'),
-		ajaxIndicatorOn = function () {
+		ajaxIndicatorOn = function ()
+		{
 			$('<div id="lightbox-loading"><i class="icon icon-spin icon-xl i-spinner"></i><div>').appendTo($elk_lb_content);
 			$('html, body').addClass('elk_lb_no_scrolling');
 		},
-		ajaxIndicatorOff = function () {
+		ajaxIndicatorOff = function ()
+		{
 			$('#lightbox-loading').remove();
 		},
-		closeLightbox = function () {
+		closeLightbox = function ()
+		{
 			// Close the lightbox and remove handlers
 			$elk_expand_icon.off('click');
 			$elk_next_icon.off('click');
@@ -887,10 +975,12 @@ function expandThumbLB(thumbID, messageID) {
 			$(window).off('touchstart.lb');
 			$(window).off('touchmove.lb');
 		},
-		openLightbox = function () {
+		openLightbox = function ()
+		{
 			// Load and open an image in the lightbox
 			$('<img id="elk_lb_img" src="' + link.href + '">')
-				.on('load', function () {
+				.on('load', function ()
+				{
 					var screenWidth = (window.innerWidth ? window.innerWidth : $(window).width()) * (is_mobile ? 0.8 : 0.9),
 						screenHeight = (window.innerHeight ? window.innerHeight : $(window).height()) * 0.9;
 
@@ -900,28 +990,33 @@ function expandThumbLB(thumbID, messageID) {
 					});
 
 					$elk_lb_content.html($(this)).append($elk_expand_icon)
-					.append($elk_next_icon).append($elk_prev_icon);
+						.append($elk_next_icon).append($elk_prev_icon);
 
 					ajaxIndicatorOff();
 				})
-				.on('error', function () {
+				.on('error', function ()
+				{
 					// Perhaps a message, but for now make it look like we tried and failed
-					setTimeout(function () {
+					setTimeout(function ()
+					{
 						ajaxIndicatorOff();
 						closeLightbox();
 						window.location = link.href;
 					}, 1500);
 				});
 		},
-		nextNav = function () {
+		nextNav = function ()
+		{
 			// Get / Set the next image ID in the array (with wrap around)
 			thumbID = navigation[($.inArray(thumbID, navigation) + 1) % navigation.length];
 		},
-		prevNav = function () {
+		prevNav = function ()
+		{
 			// Get / Set the previous image ID in the array (with wrap around)
-			thumbID =  navigation[($.inArray(thumbID, navigation) - 1 + navigation.length) % navigation.length];
+			thumbID = navigation[($.inArray(thumbID, navigation) - 1 + navigation.length) % navigation.length];
 		},
-		navLightbox = function () {
+		navLightbox = function ()
+		{
 			// Navigate to the next image and show it in the lightbox
 			$elk_lb_content.html('').removeAttr('style').removeClass('expand');
 			ajaxIndicatorOn();
@@ -932,9 +1027,11 @@ function expandThumbLB(thumbID, messageID) {
 			openLightbox();
 			expandLightbox();
 		},
-		expandLightbox = function () {
+		expandLightbox = function ()
+		{
 			// Add an expand the image to full size when the expand icon is clicked
-			$elk_expand_icon.on('click', function () {
+			$elk_expand_icon.on('click', function ()
+			{
 				$('#elk_lb_content').addClass('expand').css({
 					'height': Math.floor(window.innerHeight * 0.95) + 'px',
 					'width': Math.floor(window.innerWidth * 0.9) + 'px',
@@ -945,13 +1042,15 @@ function expandThumbLB(thumbID, messageID) {
 				$(window).off('keydown.lb');
 				$(window).off('touchmove.lb');
 			});
-			$elk_next_icon.on('click', function (event) {
+			$elk_next_icon.on('click', function (event)
+			{
 				event.preventDefault();
 				event.stopPropagation();
 				nextNav();
 				navLightbox();
 			});
-			$elk_prev_icon.on('click', function (event) {
+			$elk_prev_icon.on('click', function (event)
+			{
 				event.preventDefault();
 				event.stopPropagation();
 				prevNav();
@@ -960,7 +1059,8 @@ function expandThumbLB(thumbID, messageID) {
 		};
 
 	// Create the lightbox container only if needed
-	if ($elk_lightbox.length <= 0) {
+	if ($elk_lightbox.length <= 0)
+	{
 		// For easy manipulation
 		$elk_lightbox = $('<div id="elk_lightbox"></div>');
 		$elk_lb_content = $('<div id="elk_lb_content"></div>');
@@ -969,12 +1069,14 @@ function expandThumbLB(thumbID, messageID) {
 	}
 
 	// Load the navigation array
-	siblings.each(function () {
+	siblings.each(function ()
+	{
 		navigation[navigation.length] = $(this).data('lightboximage');
 	});
 
 	// We should always have at least the thumbID
-	if (navigation.length === 0) {
+	if (navigation.length === 0)
+	{
 		navigation[navigation.length] = thumbID;
 	}
 
@@ -985,57 +1087,72 @@ function expandThumbLB(thumbID, messageID) {
 	expandLightbox();
 
 	// Click anywhere on the page (except the expand icon) to close the lightbox
-	$elk_lightbox.on('click', function (event) {
-		if (event.target.id !== $elk_expand_icon.attr('id')) {
+	$elk_lightbox.on('click', function (event)
+	{
+		if (event.target.id !== $elk_expand_icon.attr('id'))
+		{
 			event.preventDefault();
 			closeLightbox();
 		}
 	});
 
 	// Provide some keyboard navigation
-	$(window).on('keydown.lb', function (event) {
+	$(window).on('keydown.lb', function (event)
+	{
 		event.preventDefault();
 
 		// escape
-		if (event.keyCode === 27) {
+		if (event.keyCode === 27)
+		{
 			closeLightbox();
 		}
 
 		// left
-		if (event.keyCode === 37) {
+		if (event.keyCode === 37)
+		{
 			prevNav();
 			navLightbox();
 		}
 
 		// right
-		if (event.keyCode === 39) {
+		if (event.keyCode === 39)
+		{
 			nextNav();
 			navLightbox();
 		}
 	});
 
 	// Make the image size fluid as the browser window changes
-	$(window).on('resize.lb', function () {
+	$(window).on('resize.lb', function ()
+	{
 		// Account for either a normal or expanded view
 		var $_elk_lb_content = $('#elk_lb_content');
 
 		if ($_elk_lb_content.hasClass('expand'))
+		{
 			$_elk_lb_content.css({'height': window.innerHeight * 0.85, 'width': window.innerWidth * 0.9});
+		}
 		else
+		{
 			$('#elk_lb_img').css({'max-height': window.innerHeight * 0.9, 'max-width': window.innerWidth * 0.8});
+		}
 	});
 
 	// Swipe navigation start, record press x/y
-	$(window).on('touchstart.lb', function (event) {
+	$(window).on('touchstart.lb', function (event)
+	{
 		xDown = event.originalEvent.touches[0].clientX;
 		yDown = event.originalEvent.touches[0].clientY;
 	});
 
 	// Swipe navigation left / right detection
-	$(window).on('touchmove.lb', function(event) {
+	$(window).on('touchmove.lb', function (event)
+	{
 		// No known start point ?
 		if (!xDown || !yDown)
+		{
 			return;
+		}
 
 		// Where are we now
 		var xUp = event.originalEvent.touches[0].clientX,
@@ -1044,12 +1161,16 @@ function expandThumbLB(thumbID, messageID) {
 			yDiff = yDown - yUp;
 
 		// Moved enough to know what direction they are swiping
-		if (Math.abs(xDiff) > Math.abs(yDiff)) {
-			if (xDiff > 0) {
+		if (Math.abs(xDiff) > Math.abs(yDiff))
+		{
+			if (xDiff > 0)
+			{
 				// Swipe left
 				prevNav();
 				navLightbox();
-			} else {
+			}
+			else
+			{
 				// Swipe right
 				nextNav();
 				navLightbox();
@@ -1076,11 +1197,13 @@ function expandThumb(thumbID)
 		name = link.nextSibling;
 
 	// Some browsers will add empty text so loop to the next element node
-	while (name && name.nodeType !== 1) {
+	while (name && name.nodeType !== 1)
+	{
 		name = name.nextSibling;
 	}
 	var details = name.nextSibling;
-	while (details && details.nodeType !== 1) {
+	while (details && details.nodeType !== 1)
+	{
 		details = details.nextSibling;
 	}
 
@@ -1155,8 +1278,8 @@ function sendtopicOverlayDiv(desktopURL, sHeader, sIcon)
 		oPopup_body;
 
 	// TODO: Even if we weren't purging icons, this is still not the right icon for this.
-	sIcon = typeof(sIcon) === 'string' ? sIcon : 'i-envelope';
-	sHeader = typeof(sHeader) === 'string' ? sHeader : help_popup_heading_text;
+	sIcon = typeof (sIcon) === 'string' ? sIcon : 'i-envelope';
+	sHeader = typeof (sHeader) === 'string' ? sHeader : help_popup_heading_text;
 
 	// Load the send topic overlay div
 	$.ajax({
@@ -1164,11 +1287,13 @@ function sendtopicOverlayDiv(desktopURL, sHeader, sIcon)
 		type: "GET",
 		dataType: "html"
 	})
-	.done(function (data) {
+		.done(function (data)
+		{
 			var $base_obj = $('<div id="temp_help">').html(data).find('#send_topic'),
 				title = '';
 
-			$base_obj.find('h3').each(function () {
+			$base_obj.find('h3').each(function ()
+			{
 				title = $(this).text();
 				$(this).remove();
 			});
@@ -1177,7 +1302,11 @@ function sendtopicOverlayDiv(desktopURL, sHeader, sIcon)
 				url = $base_obj.find('form').attr('action');
 
 			// Create the div that we are going to load
-			var oContainer = new smc_Popup({heading: (title !== '' ? title : sHeader), content: sAjax_indicator, icon: sIcon});
+			var oContainer = new smc_Popup({
+				heading: (title !== '' ? title : sHeader),
+				content: sAjax_indicator,
+				icon: sIcon
+			});
 			oPopup_body = $('#' + oContainer.popup_id).find('.popup_content');
 			oPopup_body.html($base_obj.html());
 
@@ -1185,10 +1314,11 @@ function sendtopicOverlayDiv(desktopURL, sHeader, sIcon)
 			$('.popup_window').css({'width': '640px'});
 
 			sendtopicForm(oPopup_body, url, oContainer);
-	})
-	.fail(function (xhr, textStatus, errorThrown) {
+		})
+		.fail(function (xhr, textStatus, errorThrown)
+		{
 			oPopup_body.html(textStatus);
-	});
+		});
 
 	return false;
 }
@@ -1203,12 +1333,16 @@ function sendtopicOverlayDiv(desktopURL, sHeader, sIcon)
  */
 function addRequiredElem($this_form, classname, focused)
 {
-	if (typeof(focused) === 'undefined')
+	if (typeof (focused) === 'undefined')
+	{
 		focused = false;
+	}
 
 	$this_form.find('input[name="' + classname + '"]').after($('<span class="requiredfield" />').text(required_field).fadeIn());
-	$this_form.find('input[name="' + classname + '"]').keyup(function () {
-		$this_form.find('.' + classname + ' .requiredfield').fadeOut(function () {
+	$this_form.find('input[name="' + classname + '"]').keyup(function ()
+	{
+		$this_form.find('.' + classname + ' .requiredfield').fadeOut(function ()
+		{
 			$(this).remove();
 		});
 	});
@@ -1229,12 +1363,14 @@ function addRequiredElem($this_form, classname, focused)
  */
 function sendtopicForm(oPopup_body, url, oContainer)
 {
-	if (typeof(this_body) !== 'undefined')
+	if (typeof (this_body) !== 'undefined')
+	{
 		oPopup_body.html(this_body);
+	}
 
 	var $this_form = $(oPopup_body).find('form');
 
-	if (typeof(send_comment) !== 'undefined')
+	if (typeof (send_comment) !== 'undefined')
 	{
 		$this_form.find('input[name="comment"]').val(send_comment);
 		$this_form.find('input[name="y_name"]').val(sender_name);
@@ -1243,7 +1379,8 @@ function sendtopicForm(oPopup_body, url, oContainer)
 		$this_form.find('input[name="r_email"]').val(recipient_mail);
 	}
 
-	oPopup_body.find('input[name="send"]').on('click', function (event) {
+	oPopup_body.find('input[name="send"]').on('click', function (event)
+	{
 		event.preventDefault();
 
 		var data = $this_form.serialize() + '&send=1',
@@ -1280,7 +1417,9 @@ function sendtopicForm(oPopup_body, url, oContainer)
 
 		// Missing required elements, back we go
 		if (missing_elems)
+		{
 			return;
+		}
 
 		// Send it to the server to validate the input
 		$.ajax({
@@ -1288,66 +1427,72 @@ function sendtopicForm(oPopup_body, url, oContainer)
 			url: url + ';api',
 			data: data
 		})
-		.done(function (request) {
-			var oElement = $(request).find('elk')[0],
-				text = null;
-
-			// No errors in the response, lets say it sent.
-			if (oElement.getElementsByTagName('error').length === 0)
+			.done(function (request)
 			{
-				text = oElement.getElementsByTagName('text')[0].firstChild.nodeValue.removeEntities();
-				text += '<br /><br /><input type="submit" name="send" value="' + sendtopic_back + '" class="button_submit"/><input type="submit" name="cancel" value="' + sendtopic_close + '" class="button_submit"/>';
+				var oElement = $(request).find('elk')[0],
+					text = null;
 
-				oPopup_body.html(text);
-
-				// Setup the cancel button to end this entire process
-				oPopup_body.find('input[name="cancel"]').each(function () {
-					$(this).on('click', function (event) {
-						event.preventDefault();
-						oContainer.hide();
-					});
-				});
-			}
-			// Invalid data in the form, like a bad email etc, show the message text
-			else
-			{
-				if (oElement.getElementsByTagName('text').length !== 0)
+				// No errors in the response, lets say it sent.
+				if (oElement.getElementsByTagName('error').length === 0)
 				{
 					text = oElement.getElementsByTagName('text')[0].firstChild.nodeValue.removeEntities();
 					text += '<br /><br /><input type="submit" name="send" value="' + sendtopic_back + '" class="button_submit"/><input type="submit" name="cancel" value="' + sendtopic_close + '" class="button_submit"/>';
 
 					oPopup_body.html(text);
-					oPopup_body.find('input[name="send"]').each(function () {
-						$(this).on('click', function (event) {
-							event.preventDefault();
-							data = $(oPopup_body).find('form').serialize() + '&send=1';
-							sendtopicForm(oPopup_body, url, oContainer);
-						});
-					});
 
-					// Cancel means cancel
-					oPopup_body.find('input[name="cancel"]').each(function () {
-						$(this).on('click', function (event) {
+					// Setup the cancel button to end this entire process
+					oPopup_body.find('input[name="cancel"]').each(function ()
+					{
+						$(this).on('click', function (event)
+						{
 							event.preventDefault();
 							oContainer.hide();
 						});
 					});
 				}
-
-				if (oElement.getElementsByTagName('url').length !== 0)
+				// Invalid data in the form, like a bad email etc, show the message text
+				else
 				{
-					var url_redir = oElement.getElementsByTagName('url')[0].firstChild.nodeValue;
-					oPopup_body.html(sendtopic_error.replace('{href}', url_redir));
+					if (oElement.getElementsByTagName('text').length !== 0)
+					{
+						text = oElement.getElementsByTagName('text')[0].firstChild.nodeValue.removeEntities();
+						text += '<br /><br /><input type="submit" name="send" value="' + sendtopic_back + '" class="button_submit"/><input type="submit" name="cancel" value="' + sendtopic_close + '" class="button_submit"/>';
+
+						oPopup_body.html(text);
+						oPopup_body.find('input[name="send"]').each(function ()
+						{
+							$(this).on('click', function (event)
+							{
+								event.preventDefault();
+								data = $(oPopup_body).find('form').serialize() + '&send=1';
+								sendtopicForm(oPopup_body, url, oContainer);
+							});
+						});
+
+						// Cancel means cancel
+						oPopup_body.find('input[name="cancel"]').each(function ()
+						{
+							$(this).on('click', function (event)
+							{
+								event.preventDefault();
+								oContainer.hide();
+							});
+						});
+					}
+
+					if (oElement.getElementsByTagName('url').length !== 0)
+					{
+						var url_redir = oElement.getElementsByTagName('url')[0].firstChild.nodeValue;
+						oPopup_body.html(sendtopic_error.replace('{href}', url_redir));
+					}
 				}
-			}
-		})
-		.fail(function() {
-			oPopup_body.html(sendtopic_error.replace('{href}', url));
-		});
+			})
+			.fail(function ()
+			{
+				oPopup_body.html(sendtopic_error.replace('{href}', url));
+			});
 	});
 }
-
-
 
 /**
  * Used to split a topic.
@@ -1406,8 +1551,9 @@ function onTopicSplitReceived(XMLDoc)
 
 		// Remove it from the source list so we can insert it in the destination list
 		if (curAction === "remove")
+		{
 			curList.removeChild(document.getElementById(curSection + "_" + curId));
-		// Insert a message.
+		}// Insert a message.
 		else
 		{
 			// By default, insert the element at the end of the list.
@@ -1433,22 +1579,26 @@ function onTopicSplitReceived(XMLDoc)
 			newItem.id = curSection + "_" + curId;
 			newItem.innerHTML = '' +
 				'<div class="content">' +
-					'<div class="message_header">' +
-						'<a class="split_icon float' + (curSection === "selected" ? "left" : "right") + '" href="' + elk_prepareScriptUrl(elk_scripturl) + 'action=splittopics;sa=selectTopics;subname=' + topic_subject + ';topic=' + topic_id + '.' + not_selected_start + ';start2=' + selected_start + ';move=' + (curSection === "selected" ? "up" : "down") + ';msg=' + curId + '" onclick="return topicSplitselect(\'' + (curSection === "selected" ? 'up' : 'down') + '\', ' + curId + ');">' +
-							(curSection === "selected" ? left_arrow : right_arrow) +
-						'</a>' +
-						'<strong>' + curChange.getElementsByTagName("subject")[0].firstChild.nodeValue + '</strong> ' + txt_by + ' <strong>' + curChange.getElementsByTagName("poster")[0].firstChild.nodeValue + '</strong>' +
-						'<br />' +
-						'<em>' + curChange.getElementsByTagName("time")[0].firstChild.nodeValue + '</em>' +
-					'</div>' +
-					'<div class="post">' + curChange.getElementsByTagName("body")[0].firstChild.nodeValue + '</div>' +
+				'<div class="message_header">' +
+				'<a class="split_icon float' + (curSection === "selected" ? "left" : "right") + '" href="' + elk_prepareScriptUrl(elk_scripturl) + 'action=splittopics;sa=selectTopics;subname=' + topic_subject + ';topic=' + topic_id + '.' + not_selected_start + ';start2=' + selected_start + ';move=' + (curSection === "selected" ? "up" : "down") + ';msg=' + curId + '" onclick="return topicSplitselect(\'' + (curSection === "selected" ? 'up' : 'down') + '\', ' + curId + ');">' +
+				(curSection === "selected" ? left_arrow : right_arrow) +
+				'</a>' +
+				'<strong>' + curChange.getElementsByTagName("subject")[0].firstChild.nodeValue + '</strong> ' + txt_by + ' <strong>' + curChange.getElementsByTagName("poster")[0].firstChild.nodeValue + '</strong>' +
+				'<br />' +
+				'<em>' + curChange.getElementsByTagName("time")[0].firstChild.nodeValue + '</em>' +
+				'</div>' +
+				'<div class="post">' + curChange.getElementsByTagName("body")[0].firstChild.nodeValue + '</div>' +
 				'</div>';
 
 			// So, where do we insert it?
 			if (typeof sInsertBeforeId === "string")
+			{
 				curList.insertBefore(newItem, document.getElementById(sInsertBeforeId));
+			}
 			else
+			{
 				curList.appendChild(newItem);
+			}
 		}
 	}
 }

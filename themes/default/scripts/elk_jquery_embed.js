@@ -16,22 +16,24 @@
  * Currently works with youtube, vimeo and dailymotion
  *
  */
- (function($) {
+(function ($)
+{
 	'use strict';
 
 	/**
 	 * @param {object} oInstanceSettings holds the text strings to use in the html created
 	 * @param {int} msgid optional to only search for links in a specific id
 	 */
-	$.fn.linkifyvideo = function(oInstanceSettings, msgid) {
+	$.fn.linkifyvideo = function (oInstanceSettings, msgid)
+	{
 		var oDefaultsSettings = {
-			embed_limit : 25,
-			preview_image : '',
-			ctp_video : '',
-			hide_video : '',
-			youtube : '',
-			vimeo : '',
-			dailymotion : ''
+			embed_limit: 25,
+			preview_image: '',
+			ctp_video: '',
+			hide_video: '',
+			youtube: '',
+			vimeo: '',
+			dailymotion: ''
 		};
 
 		// Account for user options
@@ -42,7 +44,8 @@
 		 *
 		 * @param {string} source source string to use in the embed src call
 		 */
-		function getEmbed(source) {
+		function getEmbed(source)
+		{
 			return embed_html.replace('{src}', source);
 		}
 
@@ -53,7 +56,8 @@
 		 * @param {string} tag anchor tag we are replacing with the embed tag
 		 * @param {string} eURL the load or place source link
 		 */
-		function showFlash(tag, eURL) {
+		function showFlash(tag, eURL)
+		{
 			$(tag).replaceWith(getEmbed(eURL));
 		}
 
@@ -69,23 +73,26 @@
 		function getIMG(a, src, eURL, eURLa)
 		{
 			return $('<div class="elk_video"><a href="' + a.href + '"><img class="elk_previewvideo" alt="' + oSettings.preview_image + '" ' + 'title="' + oSettings.ctp_video + '" src="' + src + '"/></a></div>')
-			.dblclick(function(e) {
-				// double click loads the video but does not autoplay
-				e.preventDefault();
+				.dblclick(function (e)
+				{
+					// double click loads the video but does not autoplay
+					e.preventDefault();
 
-				// clear the single click event
-				clearTimeout(this.tagID);
-				showFlash(this, eURL);
-			})
-			.on('click', function(e) {
-				// single click to begin playing the video
-				e.preventDefault();
-				var tag = this;
+					// clear the single click event
+					clearTimeout(this.tagID);
+					showFlash(this, eURL);
+				})
+				.on('click', function (e)
+				{
+					// single click to begin playing the video
+					e.preventDefault();
+					var tag = this;
 
-				this.tagID = setTimeout(function() {
-					showFlash(tag, eURLa);
-				}, 200);
-			});
+					this.tagID = setTimeout(function ()
+					{
+						showFlash(tag, eURLa);
+					}, 200);
+				});
 		}
 
 		/**
@@ -99,12 +106,17 @@
 			var img = 'assets.vimeo.com/images/logo_vimeo_land.png';
 
 			$.getJSON('http://www.vimeo.com/api/v2/video/' + videoID + '.json?callback=?', {format: "json"},
-			function(data) {
-				if (typeof(data[0].thumbnail_large) !== "undefined")
-					callback(data[0].thumbnail_large);
-				else
-					callback(img);
-			});
+				function (data)
+				{
+					if (typeof (data[0].thumbnail_large) !== "undefined")
+					{
+						callback(data[0].thumbnail_large);
+					}
+					else
+					{
+						callback(img);
+					}
+				});
 		}
 
 		/**
@@ -118,11 +130,16 @@
 			var img = 'assets.vimeo.com/images/logo_vimeo_land.png';
 
 			$.getJSON('https://api.dailymotion.com/video/' + videoID + '?fields=thumbnail_480_url', {},
-				function(data) {
-					if (typeof(data.thumbnail_480_url) !== "undefined")
+				function (data)
+				{
+					if (typeof (data.thumbnail_480_url) !== "undefined")
+					{
 						callback(data.thumbnail_480_url);
+					}
 					else
+					{
 						callback(img);
+					}
 				}
 			);
 		}
@@ -147,10 +164,13 @@
 			handlers = {};
 
 		// Youtube and variants link handler
-		handlers['youtube.com'] = function(path, a, embed) {
+		handlers['youtube.com'] = function (path, a, embed)
+		{
 			var videoID = path.match(/\bv[=/]([^&#?$]+)/i) || path.match(/#p\/(?:a\/)?[uf]\/\d+\/([^?$]+)/i) || path.match(/(?:\/)([\w-]{11})/i);
 			if (!videoID || !(videoID = videoID[1]))
+			{
 				return;
+			}
 
 			// There are two types of YouTube timestamped links
 			// http://youtu.be/lLOE3fBZcUU?t=1m37s when you click share underneath the video
@@ -163,20 +183,26 @@
 				var startAtSeconds = 0;
 
 				// Hours
-				if (typeof(startAt[1]) !== 'undefined')
+				if (typeof (startAt[1]) !== 'undefined')
+				{
 					startAtSeconds += parseInt(startAt[1]) * 3600;
+				}
 				// Minutes
-				if (typeof(startAt[2]) !== 'undefined')
+				if (typeof (startAt[2]) !== 'undefined')
+				{
 					startAtSeconds += parseInt(startAt[2]) * 60;
+				}
 				// Seconds
-				if (typeof(startAt[3]) !== 'undefined')
+				if (typeof (startAt[3]) !== 'undefined')
+				{
 					startAtSeconds += parseInt(startAt[3]);
+				}
 
 				startAtPar = '&start=' + startAtSeconds.toString();
 			}
 
 			var embedURL = '//www.youtube.com/embed/' + videoID + '?rel=0' + startAtPar,
-				tag = embedOrIMG(embed, a, '//img.youtube.com/vi/' + videoID + '/0.jpg', embedURL, embedURL + '&autoplay=1' );
+				tag = embedOrIMG(embed, a, '//img.youtube.com/vi/' + videoID + '/0.jpg', embedURL, embedURL + '&autoplay=1');
 
 			return [oSettings.youtube, tag];
 		};
@@ -184,10 +210,13 @@
 		handlers['youtu.be'] = handlers['youtube.com'];
 
 		// Vimeo link handler
-		handlers['vimeo.com'] = function(path, a, embed) {
+		handlers['vimeo.com'] = function (path, a, embed)
+		{
 			var videoID = path.match(/^\/(\d+)/i);
 			if (!videoID || !(videoID = videoID[1]))
+			{
 				return;
+			}
 
 			var embedURL = '//player.vimeo.com/video/' + videoID,
 				tag = null,
@@ -197,7 +226,8 @@
 			if (!embed)
 			{
 				// We need to use a callback to get the thumbnail
-				getVimeoIMG(videoID, function(img) {
+				getVimeoIMG(videoID, function (img)
+				{
 					$(a).parent().next().find("img").attr("src", img);
 				});
 
@@ -205,16 +235,21 @@
 				tag = embedOrIMG(embed, a, img, embedURL, embedURL + '?autoplay=1');
 			}
 			else
+			{
 				tag = embedOrIMG(embed, a, img, embedURL, embedURL + '?autoplay=1');
+			}
 
 			return [oSettings.vimeo, tag];
 		};
 
 		// Dailymotion link handler
-		handlers['dailymotion.com'] = function(path, a, embed) {
+		handlers['dailymotion.com'] = function (path, a, embed)
+		{
 			var videoID = path.match(/^\/(?:video|swf)\/([a-z0-9]{1,18})/i);
 			if (!videoID || !(videoID = videoID[1]))
+			{
 				return;
+			}
 
 			var embedURL = '//dailymotion.com/embed/video/' + videoID,
 				tag = null,
@@ -224,7 +259,8 @@
 			if (!embed)
 			{
 				// We use a callback to get the thumbnail we want
-				getDailymotionIMG(videoID, function(img) {
+				getDailymotionIMG(videoID, function (img)
+				{
 					$(a).parent().next().find("img").attr("src", img);
 				});
 
@@ -232,27 +268,34 @@
 				tag = embedOrIMG(embed, a, img, embedURL, embedURL + '?related=0&autoplay=1');
 			}
 			else
+			{
 				tag = embedOrIMG(embed, a, img, embedURL + '?related=0', embedURL + '?related=0&autoplay=1');
+			}
 
 			return [oSettings.dailymotion, tag];
 		};
 
 		// Get the links in the id="msg_1234 divs.
 		var links = null;
-		if (typeof(msgid) !== "undefined" && msgid !== null)
+		if (typeof (msgid) !== "undefined" && msgid !== null)
+		{
 			links = $('#' + msgid + ' a');
+		}
 		else
+		{
 			links = $('[id^=msg_] a');
+		}
 
 		// Create the show/hide button
-		var showhideBtn = $('<a class="floatright" title="' + oSettings.hide_video + '"><img alt=">" src="' + elk_images_url + '/selected.png"></a>').on('click', function() {
-				var $img = $(this).find("img"),
-					$vid = $(this).parent().next();
+		var showhideBtn = $('<a class="floatright" title="' + oSettings.hide_video + '"><img alt=">" src="' + elk_images_url + '/selected.png"></a>').on('click', function ()
+		{
+			var $img = $(this).find("img"),
+				$vid = $(this).parent().next();
 
-				// Toggle slide the video and change the icon
-				$img.attr("src", elk_images_url + ($vid.is(":hidden") !== true ? "/selected_open.png" : "/selected.png"));
-				$vid.slideToggle();
-			});
+			// Toggle slide the video and change the icon
+			$img.attr("src", elk_images_url + ($vid.is(":hidden") !== true ? "/selected_open.png" : "/selected.png"));
+			$vid.slideToggle();
+		});
 
 		// Loop though each link old skool style for speed
 		for (var i = links.length - 1; i > -1; i--)
@@ -262,15 +305,21 @@
 
 			// Ignore in sentences
 			if (tag.previousSibling && tag.previousSibling.nodeName === '#text')
+			{
 				continue;
+			}
 
 			// Ignore in quotes and signatures
 			if ("bbc_quote;signature".indexOf(tag.parentNode.className) !== -1)
+			{
 				continue;
+			}
 
 			// No href or inner text not equal to href attr then we move along
 			if (tag.href === "" || tag.href.indexOf(text) !== 0)
+			{
 				continue;
+			}
 
 			// Get domain and validate we know how to handle it
 			var m = tag.href.match(domain_regex),
@@ -278,7 +327,7 @@
 				args = null;
 
 			// One of our video provider domains?
-			if (already_embedded < oSettings.embed_limit && m !== null && typeof(handlers[m[1]]) !== "undefined" && handlers[m[1]] !== null)
+			if (already_embedded < oSettings.embed_limit && m !== null && typeof (handlers[m[1]]) !== "undefined" && handlers[m[1]] !== null)
 			{
 				// Call the handler and get the tag to insert
 				handler = handlers[m[1]];

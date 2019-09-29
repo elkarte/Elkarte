@@ -4,7 +4,7 @@
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause (see accompanying LICENSE.txt file)
  *
  * This file contains code covered by:
- * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * copyright: 2011 Simple Machines (http://www.simplemachines.org)
  *
  * @version 2.0 dev
  */
@@ -24,21 +24,12 @@ var ua = navigator.userAgent.toLowerCase(),
 	is_safari = Object.prototype.toString.call(window.HTMLElement).indexOf('Constructor') > 0, // Safari 3+
 	is_chrome = !!window.chrome, // Chrome 1+, Opera 15+
 	is_ie = !!document.documentMode, // IE8+
-	is_webkit = ua.indexOf('applewebkit') !== -1;
+	is_webkit = ua.indexOf('applewebkit') !== -1,
 	is_osx = navigator.platform.toUpperCase().indexOf('MAC') >= 0,
 	is_mobile = navigator.userAgent.indexOf('Mobi') !== -1, // Common mobile including Mozilla, Safari, IE, Opera, Chrome
-	/*jshint -W030 */
+	/* jshint -W030 */
 	is_touch = 'ontouchstart' in window || window.DocumentTouch && document instanceof DocumentTouch;
-	/*jshint +W030 */
-
-// Versions of ie < 9 do not have this built in
-if (!('getElementsByClassName' in document))
-{
-	document.getElementsByClassName = function(className)
-	{
-		return $('.' + className);
-	};
-}
+	/* jshint +W030 */
 
 /**
  * Load an XML document using XMLHttpRequest.
@@ -50,19 +41,26 @@ if (!('getElementsByClassName' in document))
 function getXMLDocument(sUrl, funcCallback)
 {
 	var oMyDoc = new XMLHttpRequest(),
-		bAsync = typeof(funcCallback) !== 'undefined',
+		bAsync = typeof (funcCallback) !== 'undefined',
 		oCaller = this;
 
 	if (bAsync)
 	{
-		oMyDoc.onreadystatechange = function () {
+		oMyDoc.onreadystatechange = function ()
+		{
 			if (oMyDoc.readyState !== 4)
+			{
 				return;
+			}
 
 			if (oMyDoc.responseXML !== null && oMyDoc.status === 200)
+			{
 				funcCallback.call(oCaller, oMyDoc.responseXML);
+			}
 			else
+			{
 				funcCallback.call(oCaller, false);
+			}
 		};
 	}
 
@@ -84,22 +82,31 @@ function sendXMLDocument(sUrl, sContent, funcCallback)
 	var oSendDoc = new window.XMLHttpRequest(),
 		oCaller = this;
 
-	if (typeof(funcCallback) !== 'undefined')
+	if (typeof (funcCallback) !== 'undefined')
 	{
-		oSendDoc.onreadystatechange = function () {
+		oSendDoc.onreadystatechange = function ()
+		{
 			if (oSendDoc.readyState !== 4)
+			{
 				return;
+			}
 
 			if (oSendDoc.responseXML !== null && oSendDoc.status === 200)
+			{
 				funcCallback.call(oCaller, oSendDoc.responseXML);
+			}
 			else
+			{
 				funcCallback.call(oCaller, false);
+			}
 		};
 	}
 
 	oSendDoc.open('POST', sUrl, true);
 	if ('setRequestHeader' in oSendDoc)
+	{
 		oSendDoc.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+	}
 	oSendDoc.send(sContent);
 
 	return true;
@@ -118,7 +125,8 @@ function sendXMLDocument(sUrl, sContent, funcCallback)
  */
 String.prototype.php_strtr = function (sFrom, sTo)
 {
-	return this.replace(new RegExp('[' + sFrom + ']', 'g'), function (sMatch) {
+	return this.replace(new RegExp('[' + sFrom + ']', 'g'), function (sMatch)
+	{
 		return sTo.charAt(sFrom.indexOf(sMatch));
 	});
 };
@@ -129,7 +137,7 @@ String.prototype.php_strtr = function (sFrom, sTo)
  */
 String.prototype.php_strtolower = function ()
 {
-	return typeof(elk_iso_case_folding) === 'boolean' && elk_iso_case_folding === true ? this.php_strtr(
+	return typeof (elk_iso_case_folding) === 'boolean' && elk_iso_case_folding === true ? this.php_strtr(
 		'ABCDEFGHIJKLMNOPQRSTUVWXYZ\x8a\x8c\x8e\x9f\xc0\xc1\xc2\xc3\xc4\xc5\xc6\xc7\xc8\xc9\xca\xcb\xcc\xcd\xce\xcf\xd0\xd1\xd2\xd3\xd4\xd5\xd6\xd7\xd8\xd9\xda\xdb\xdc\xdd\xde',
 		'abcdefghijklmnopqrstuvwxyz\x9a\x9c\x9e\xff\xe0\xe1\xe2\xe3\xe4\xe5\xe6\xe7\xe8\xe9\xea\xeb\xec\xed\xee\xef\xf0\xf1\xf2\xf3\xf4\xf5\xf6\xf7\xf8\xf9\xfa\xfb\xfc\xfd\xfe'
 	) : this.php_strtr('ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz');
@@ -138,7 +146,7 @@ String.prototype.php_strtolower = function ()
 /**
  * Simulate php's urlencode function
  */
-String.prototype.php_urlencode = function()
+String.prototype.php_urlencode = function ()
 {
 	return encodeURIComponent(this).replace(/!/g, '%21').replace(/'/g, '%27').replace(/\(/g, '%28').replace(/\)/g, '%29').replace(/\*/g, '%2A').replace(/%20/g, '+');
 };
@@ -146,7 +154,7 @@ String.prototype.php_urlencode = function()
 /**
  * Simulate php htmlspecialchars function
  */
-String.prototype.php_htmlspecialchars = function()
+String.prototype.php_htmlspecialchars = function ()
 {
 	return this.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 };
@@ -154,7 +162,7 @@ String.prototype.php_htmlspecialchars = function()
 /**
  * Simulate php unhtmlspecialchars function
  */
-String.prototype.php_unhtmlspecialchars = function()
+String.prototype.php_unhtmlspecialchars = function ()
 {
 	return this.replace(/&quot;/g, '"').replace(/&gt;/g, '>').replace(/&lt;/g, '<').replace(/&amp;/g, '&');
 };
@@ -162,7 +170,7 @@ String.prototype.php_unhtmlspecialchars = function()
 /**
  * Simulate php addslashes function
  */
-String.prototype.php_addslashes = function()
+String.prototype.php_addslashes = function ()
 {
 	return this.replace(/\\/g, '\\\\').replace(/'/g, '\\\'');
 };
@@ -170,7 +178,7 @@ String.prototype.php_addslashes = function()
 /**
  * Callback function for the removeEntities function
  */
-String.prototype._replaceEntities = function(sInput, sDummy, sNum)
+String.prototype._replaceEntities = function (sInput, sDummy, sNum)
 {
 	return String.fromCharCode(parseInt(sNum));
 };
@@ -178,7 +186,7 @@ String.prototype._replaceEntities = function(sInput, sDummy, sNum)
 /**
  * Removes entities from a string and replaces them with a character code
  */
-String.prototype.removeEntities = function()
+String.prototype.removeEntities = function ()
 {
 	return this.replace(/&(amp;)?#(\d+);/g, this._replaceEntities);
 };
@@ -192,7 +200,8 @@ String.prototype.easyReplace = function (oReplacements)
 {
 	var sResult = this;
 
-	for (var sSearch in oReplacements) {
+	for (var sSearch in oReplacements)
+	{
 		sSearch = sSearch.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&');
 		sResult = sResult.replace(new RegExp('%' + sSearch + '%', 'g'), oReplacements[sSearch]);
 	}
@@ -209,9 +218,13 @@ String.prototype.easyReplace = function (oReplacements)
 function php_str_repeat(sString, iTime)
 {
 	if (iTime < 1)
+	{
 		return '';
+	}
 	else
+	{
 		return sString + php_str_repeat(sString, iTime - 1);
+	}
 }
 
 /**
@@ -231,7 +244,9 @@ function reqWin(desktopURL, alternateWidth, alternateHeight, noScrollbars)
 		alternateHeight = Math.min(alternateHeight, self.screen.availHeight * 0.8);
 	}
 	else
-		noScrollbars = typeof(noScrollbars) === 'boolean' && noScrollbars === true;
+	{
+		noScrollbars = typeof (noScrollbars) === 'boolean' && noScrollbars === true;
+	}
 
 	window.open(desktopURL, 'requested_popup', 'toolbar=no,location=no,status=no,menubar=no,scrollbars=' + (noScrollbars ? 'no' : 'yes') + ',width=' + (alternateWidth ? alternateWidth : 480) + ',height=' + (alternateHeight ? alternateHeight : 220) + ',resizable=no');
 
@@ -251,8 +266,8 @@ function reqOverlayDiv(desktopURL, sHeader, sIcon)
 	// Set up our div details
 	var sAjax_indicator = '<div class="centertext"><i class="icon icon-spin icon-big i-spinner"></i></div>';
 
-	sIcon = typeof(sIcon) === 'string' ? sIcon : 'i-help';
-	sHeader = typeof(sHeader) === 'string' ? sHeader : help_popup_heading_text;
+	sIcon = typeof (sIcon) === 'string' ? sIcon : 'i-help';
+	sHeader = typeof (sHeader) === 'string' ? sHeader : help_popup_heading_text;
 
 	// Create the div that we are going to load
 	var oContainer = new smc_Popup({heading: sHeader, content: sAjax_indicator, icon: sIcon}),
@@ -264,14 +279,16 @@ function reqOverlayDiv(desktopURL, sHeader, sIcon)
 		type: "GET",
 		dataType: "html"
 	})
-	.done(function (data, textStatus, xhr) {
-		var help_content = $('<div id="temp_help">').html(data).find('a[href$="self.close();"]').hide().prev('br').hide().parent().html();
+		.done(function (data, textStatus, xhr)
+		{
+			var help_content = $('<div id="temp_help">').html(data).find('a[href$="self.close();"]').hide().prev('br').hide().parent().html();
 
-		oPopup_body.html(help_content);
-	})
-	.fail(function (xhr, textStatus, errorThrown) {
-		oPopup_body.html(textStatus);
-	});
+			oPopup_body.html(help_content);
+		})
+		.fail(function (xhr, textStatus, errorThrown)
+		{
+			oPopup_body.html(textStatus);
+		});
 
 	return false;
 }
@@ -311,16 +328,25 @@ smc_Popup.prototype.show = function ()
 
 	// Trigger hide on escape or mouse click
 	var popup_instance = this;
-	$(document).mouseup(function (e) {
+	$(document).mouseup(function (e)
+	{
 		if ($('#' + popup_instance.popup_id).has(e.target).length === 0)
+		{
 			popup_instance.hide();
+		}
 	})
-	.keyup(function(e){
-		if (e.keyCode === 27)
-			popup_instance.hide();
-	});
+		.keyup(function (e)
+		{
+			if (e.keyCode === 27)
+			{
+				popup_instance.hide();
+			}
+		});
 
-	$('#' + this.popup_id).find('.hide_popup').on('click', function (){ return popup_instance.hide(); });
+	$('#' + this.popup_id).find('.hide_popup').on('click', function ()
+	{
+		return popup_instance.hide();
+	});
 
 	return false;
 };
@@ -328,7 +354,10 @@ smc_Popup.prototype.show = function ()
 // Hide the popup
 smc_Popup.prototype.hide = function ()
 {
-	$('#' + this.popup_id).fadeOut(300, function(){ $(this).remove(); });
+	$('#' + this.popup_id).fadeOut(300, function ()
+	{
+		$(this).remove();
+	});
 
 	return false;
 };
@@ -356,7 +385,9 @@ function replaceText(text, oTextHandle)
 			oTextHandle.focus();
 
 			if (is_opera && text.match(/\n/g) !== null)
+			{
 				goForward = text.match(/\n/g).length;
+			}
 
 			oTextHandle.setSelectionRange(begin.length + text.length + goForward, begin.length + text.length + goForward);
 		}
@@ -380,18 +411,26 @@ function isEmptyText(theField)
 	var theValue;
 
 	// Copy the value so changes can be made..
-	if (typeof(theField) === 'string')
+	if (typeof (theField) === 'string')
+	{
 		theValue = theField;
+	}
 	else
+	{
 		theValue = theField.value;
+	}
 
 	// Strip whitespace off the left side.
 	while (theValue.length > 0 && (theValue.charAt(0) === ' ' || theValue.charAt(0) === '\t'))
+	{
 		theValue = theValue.substring(1, theValue.length);
+	}
 
 	// Strip whitespace off the right side.
 	while (theValue.length > 0 && (theValue.charAt(theValue.length - 1) === ' ' || theValue.charAt(theValue.length - 1) === '\t'))
+	{
 		theValue = theValue.substring(0, theValue.length - 1);
+	}
 
 	return theValue === '';
 }
@@ -414,14 +453,19 @@ function submitThisOnce(oControl, bReadOnly)
 
 	// If in a second the form is not gone, there may be a problem somewhere
 	// (e.g. HTML5 required attribute), so release the textareas
-	window.setTimeout(function() {submitThisOnce(oControl, false);}, 1000);
+	window.setTimeout(function ()
+	{
+		submitThisOnce(oControl, false);
+	}, 1000);
 	return !elk_formSubmitted;
 }
 
 function getInnerHTML(oElement)
 {
 	if (oElement)
+	{
 		return oElement.innerHTML;
+	}
 }
 
 /**
@@ -433,7 +477,9 @@ function getInnerHTML(oElement)
 function setOuterHTML(oElement, sToValue)
 {
 	if ('outerHTML' in oElement)
+	{
 		oElement.outerHTML = sToValue;
+	}
 	else
 	{
 		var range = document.createRange();
@@ -452,7 +498,9 @@ function in_array(variable, theArray)
 {
 	for (var i in theArray)
 		if (theArray[i] == variable)
+		{
 			return true;
+		}
 
 	return false;
 }
@@ -467,7 +515,9 @@ function array_search(variable, theArray)
 {
 	for (var i in theArray)
 		if (theArray[i] == variable)
+		{
 			return i;
+		}
 
 	return null;
 }
@@ -508,7 +558,9 @@ function selectAllRadio(oInvertCheckbox, oForm, sMask, sValue)
 {
 	for (var i = 0; i < oForm.length; i++)
 		if (oForm[i].name !== undefined && oForm[i].name.substr(0, sMask.length) == sMask && oForm[i].value == sValue)
+		{
 			oForm[i].checked = true;
+		}
 }
 
 /**
@@ -523,11 +575,15 @@ function invertAll(oInvertCheckbox, oForm, sMask, bIgnoreDisabled)
 {
 	for (var i = 0; i < oForm.length; i++)
 	{
-		if (!('name' in oForm[i]) || (typeof(sMask) === 'string' && oForm[i].name.substr(0, sMask.length) !== sMask && oForm[i].id.substr(0, sMask.length) !== sMask))
+		if (!('name' in oForm[i]) || (typeof (sMask) === 'string' && oForm[i].name.substr(0, sMask.length) !== sMask && oForm[i].id.substr(0, sMask.length) !== sMask))
+		{
 			continue;
+		}
 
-		if (!oForm[i].disabled || (typeof(bIgnoreDisabled) === 'boolean' && bIgnoreDisabled))
+		if (!oForm[i].disabled || (typeof (bIgnoreDisabled) === 'boolean' && bIgnoreDisabled))
+		{
 			oForm[i].checked = oInvertCheckbox.checked;
+		}
 	}
 }
 
@@ -546,9 +602,16 @@ function elk_sessionKeepAlive()
 		lastKeepAliveCheck = curTime;
 	}
 
-	window.setTimeout(function() {elk_sessionKeepAlive();}, 1200000);
+	window.setTimeout(function ()
+	{
+		elk_sessionKeepAlive();
+	}, 1200000);
 }
-window.setTimeout(function() {elk_sessionKeepAlive();}, 1200000);
+
+window.setTimeout(function ()
+{
+	elk_sessionKeepAlive();
+}, 1200000);
 
 /**
  * Set a theme option through javascript. / ajax
@@ -560,8 +623,10 @@ window.setTimeout(function() {elk_sessionKeepAlive();}, 1200000);
  */
 function elk_setThemeOption(option, value, theme, additional_vars)
 {
-	if (additional_vars === null || typeof(additional_vars) === 'undefined')
+	if (additional_vars === null || typeof (additional_vars) === 'undefined')
+	{
 		additional_vars = '';
+	}
 
 	var tempImage = new Image();
 	tempImage.src = elk_prepareScriptUrl(elk_scripturl) + 'action=jsoption;var=' + option + ';val=' + value + ';' + elk_session_var + '=' + elk_session_id + additional_vars + (theme === null ? '' : '&th=' + theme) + ';time=' + (new Date().getTime());
@@ -577,12 +642,16 @@ function elk_setThemeOption(option, value, theme, additional_vars)
 function hashLoginPassword(doForm, cur_session_id, token)
 {
 	// Don't have our hash lib available?
-	if (typeof(hex_sha256) === 'undefined')
+	if (typeof (hex_sha256) === 'undefined')
+	{
 		return;
+	}
 
 	// Are they using an email address?
 	if (doForm.user.value.indexOf('@') !== -1)
+	{
 		return;
+	}
 
 	doForm.passwrd.autocomplete = 'off';
 
@@ -590,8 +659,10 @@ function hashLoginPassword(doForm, cur_session_id, token)
 	doForm.hash_passwrd.value = hex_sha256(doForm.user.value.php_strtolower() + doForm.passwrd.value);
 
 	// If the form also contains the old hash input fill it to smooth transitions
-	if ('old_hash_passwrd' in doForm && typeof(hex_sha1) !== 'undefined')
+	if ('old_hash_passwrd' in doForm && typeof (hex_sha1) !== 'undefined')
+	{
 		doForm.old_hash_passwrd.value = hex_sha1(hex_sha1(doForm.user.value.php_strtolower() + doForm.passwrd.value) + cur_session_id + (typeof token === 'undefined' ? '' : token));
+	}
 
 	doForm.passwrd.value = doForm.passwrd.value.replace(/./g, '*');
 }
@@ -607,8 +678,10 @@ function hashLoginPassword(doForm, cur_session_id, token)
 function hashAdminPassword(doForm, username, cur_session_id, token)
 {
 	// Missing sha256.js?
-	if (typeof(hex_sha256) === 'undefined')
+	if (typeof (hex_sha256) === 'undefined')
+	{
 		return;
+	}
 
 	doForm.admin_hash_pass.value = hex_sha256(username.php_strtolower() + doForm.admin_pass.value);
 	doForm.admin_pass.value = doForm.admin_pass.value.replace(/./g, '*');
@@ -625,8 +698,10 @@ function hashAdminPassword(doForm, username, cur_session_id, token)
 function hashModeratePassword(doForm, username, cur_session_id, token)
 {
 	// Missing sha256.js?
-	if (typeof(hex_sha256) === 'undefined')
+	if (typeof (hex_sha256) === 'undefined')
+	{
 		return;
+	}
 
 	doForm.moderate_hash_pass.value = hex_sha256(username.php_strtolower() + doForm.moderate_pass.value);
 	doForm.moderate_pass.value = doForm.moderate_pass.value.replace(/./g, '*');
@@ -640,7 +715,9 @@ function hashModeratePassword(doForm, username, cur_session_id, token)
 function smc_preCacheImage(sSrc)
 {
 	if (!('smc_aCachedImages' in window))
+	{
 		window.smc_aCachedImages = [];
+	}
 
 	if (!in_array(sSrc, window.smc_aCachedImages))
 	{
@@ -661,7 +738,7 @@ function smc_Cookie(oOptions)
 	this.init();
 }
 
-smc_Cookie.prototype.init = function()
+smc_Cookie.prototype.init = function ()
 {
 	if ('cookie' in document && document.cookie !== '')
 	{
@@ -674,12 +751,12 @@ smc_Cookie.prototype.init = function()
 	}
 };
 
-smc_Cookie.prototype.get = function(sKey)
+smc_Cookie.prototype.get = function (sKey)
 {
 	return sKey in this.oCookies ? this.oCookies[sKey] : null;
 };
 
-smc_Cookie.prototype.set = function(sKey, sValue)
+smc_Cookie.prototype.set = function (sKey, sValue)
 {
 	document.cookie = sKey + '=' + encodeURIComponent(sValue);
 };
@@ -705,14 +782,16 @@ function elk_Toggle(oOptions)
 }
 
 // Initialize the toggle class
-elk_Toggle.prototype.init = function()
+elk_Toggle.prototype.init = function ()
 {
 	var i = 0,
 		n = 0;
 
 	// The master switch can disable this toggle fully.
 	if ('bToggleEnabled' in this.opt && !this.opt.bToggleEnabled)
+	{
 		return;
+	}
 
 	// If cookies are enabled and they were set, override the initial state.
 	if ('oCookieOptions' in this.opt && this.opt.oCookieOptions.bUseCookie)
@@ -723,12 +802,16 @@ elk_Toggle.prototype.init = function()
 		// Check if the cookie is set.
 		var cookieValue = this.oCookie.get(this.opt.oCookieOptions.sCookieName);
 		if (cookieValue !== null)
+		{
 			this.opt.bCurrentlyCollapsed = cookieValue === '1';
+		}
 	}
 
 	// If the init state is set to be collapsed, collapse it.
 	if (this.opt.bCurrentlyCollapsed)
+	{
 		this.changeState(true, true);
+	}
 
 	// Initialize the images to be clickable.
 	if ('aSwapImages' in this.opt)
@@ -736,14 +819,20 @@ elk_Toggle.prototype.init = function()
 		for (i = 0, n = this.opt.aSwapImages.length; i < n; i++)
 		{
 			var oImage = document.getElementById(this.opt.aSwapImages[i].sId);
-			if (typeof(oImage) === 'object' && oImage !== null)
+			if (typeof (oImage) === 'object' && oImage !== null)
 			{
 				// Display the image in case it was hidden.
 				if (getComputedStyle(oImage).getPropertyValue("display") === 'none')
+				{
 					oImage.style.display = 'inline';
+				}
 
 				oImage.instanceRef = this;
-				oImage.onclick = function () {this.instanceRef.toggle();this.blur();};
+				oImage.onclick = function ()
+				{
+					this.instanceRef.toggle();
+					this.blur();
+				};
 				oImage.style.cursor = 'pointer';
 
 				// Pre-load the collapsed image.
@@ -757,15 +846,18 @@ elk_Toggle.prototype.init = function()
 		for (i = 0, n = this.opt.aSwapClasses.length; i < n; i++)
 		{
 			var oContainer = document.getElementById(this.opt.aSwapClasses[i].sId);
-			if (typeof(oContainer) === 'object' && oContainer !== null)
+			if (typeof (oContainer) === 'object' && oContainer !== null)
 			{
 				// Display the image in case it was hidden.
 				if (getComputedStyle(oContainer).getPropertyValue("display") === 'none')
+				{
 					oContainer.style.display = 'block';
+				}
 
 				oContainer.instanceRef = this;
 
-				oContainer.onclick = function () {
+				oContainer.onclick = function ()
+				{
 					this.instanceRef.toggle();
 					this.blur();
 				};
@@ -780,14 +872,17 @@ elk_Toggle.prototype.init = function()
 		for (i = 0, n = this.opt.aSwapLinks.length; i < n; i++)
 		{
 			var oLink = document.getElementById(this.opt.aSwapLinks[i].sId);
-			if (typeof(oLink) === 'object' && oLink !== null)
+			if (typeof (oLink) === 'object' && oLink !== null)
 			{
 				// Display the link in case it was hidden.
 				if (getComputedStyle(oLink).getPropertyValue("display") === 'none')
+				{
 					oLink.style.display = 'inline-block';
+				}
 
 				oLink.instanceRef = this;
-				oLink.onclick = function () {
+				oLink.onclick = function ()
+				{
 					this.instanceRef.toggle();
 					this.blur();
 					return false;
@@ -803,14 +898,14 @@ elk_Toggle.prototype.init = function()
  * @param {boolean} bCollapse
  * @param {boolean} [bInit]
  */
-elk_Toggle.prototype.changeState = function(bCollapse, bInit)
+elk_Toggle.prototype.changeState = function (bCollapse, bInit)
 {
 	var i = 0,
 		n = 0,
 		oContainer;
 
 	// Default bInit to false.
-	bInit = typeof(bInit) !== 'undefined';
+	bInit = typeof (bInit) !== 'undefined';
 
 	// Handle custom function hook before collapse.
 	if (!bInit && bCollapse && 'funcOnBeforeCollapse' in this.opt)
@@ -834,12 +929,14 @@ elk_Toggle.prototype.changeState = function(bCollapse, bInit)
 		for (i = 0, n = this.opt.aSwapImages.length; i < n; i++)
 		{
 			var oImage = document.getElementById(this.opt.aSwapImages[i].sId);
-			if (typeof(oImage) === 'object' && oImage !== null)
+			if (typeof (oImage) === 'object' && oImage !== null)
 			{
 				// Only (re)load the image if it's changed.
 				var sTargetSource = bCollapse ? this.opt.aSwapImages[i].srcCollapsed : this.opt.aSwapImages[i].srcExpanded;
 				if (oImage.src != sTargetSource)
+				{
 					oImage.src = sTargetSource;
+				}
 
 				oImage.alt = oImage.title = bCollapse ? this.opt.aSwapImages[i].altCollapsed : this.opt.aSwapImages[i].altExpanded;
 			}
@@ -851,12 +948,14 @@ elk_Toggle.prototype.changeState = function(bCollapse, bInit)
 		for (i = 0, n = this.opt.aSwapClasses.length; i < n; i++)
 		{
 			oContainer = document.getElementById(this.opt.aSwapClasses[i].sId);
-			if (typeof(oContainer) === 'object' && oContainer !== null)
+			if (typeof (oContainer) === 'object' && oContainer !== null)
 			{
 				// Only swap the class if the state changed
 				var sTargetClass = bCollapse ? this.opt.aSwapClasses[i].classCollapsed : this.opt.aSwapClasses[i].classExpanded;
 				if (oContainer.className !== sTargetClass)
+				{
 					oContainer.className = sTargetClass;
+				}
 
 				// And show the new title
 				oContainer.title = oContainer.title = bCollapse ? this.opt.aSwapClasses[i].titleCollapsed : this.opt.aSwapClasses[i].titleExpanded;
@@ -870,8 +969,10 @@ elk_Toggle.prototype.changeState = function(bCollapse, bInit)
 		for (i = 0, n = this.opt.aSwapLinks.length; i < n; i++)
 		{
 			var oLink = document.getElementById(this.opt.aSwapLinks[i].sId);
-			if (typeof(oLink) === 'object' && oLink !== null)
+			if (typeof (oLink) === 'object' && oLink !== null)
+			{
 				oLink.innerHTML = bCollapse ? this.opt.aSwapLinks[i].msgCollapsed : this.opt.aSwapLinks[i].msgExpanded;
+			}
 		}
 	}
 
@@ -879,15 +980,21 @@ elk_Toggle.prototype.changeState = function(bCollapse, bInit)
 	for (i = 0, n = this.opt.aSwappableContainers.length; i < n; i++)
 	{
 		if (this.opt.aSwappableContainers[i] === null)
+		{
 			continue;
+		}
 
 		oContainer = document.getElementById(this.opt.aSwappableContainers[i]);
-		if (typeof(oContainer) === 'object' && oContainer !== null)
+		if (typeof (oContainer) === 'object' && oContainer !== null)
 		{
 			if (bCollapse)
+			{
 				$(oContainer).slideUp();
+			}
 			else
+			{
 				$(oContainer).slideDown();
+			}
 		}
 	}
 
@@ -896,13 +1003,17 @@ elk_Toggle.prototype.changeState = function(bCollapse, bInit)
 
 	// Update the cookie, if desired.
 	if ('oCookieOptions' in this.opt && this.opt.oCookieOptions.bUseCookie)
+	{
 		this.oCookie.set(this.opt.oCookieOptions.sCookieName, this.bCollapsed ? '1' : '0');
+	}
 
 	if (!bInit && 'oThemeOptions' in this.opt && this.opt.oThemeOptions.bUseThemeSettings)
+	{
 		elk_setThemeOption(this.opt.oThemeOptions.sOptionName, this.bCollapsed ? '1' : '0', 'sThemeId' in this.opt.oThemeOptions ? this.opt.oThemeOptions.sThemeId : null, 'sAdditionalVars' in this.opt.oThemeOptions ? this.opt.oThemeOptions.sAdditionalVars : null);
+	}
 };
 
-elk_Toggle.prototype.toggle = function()
+elk_Toggle.prototype.toggle = function ()
 {
 	// Change the state by reversing the current state.
 	this.changeState(!this.bCollapsed);
@@ -920,7 +1031,7 @@ function ajax_indicator(turn_on)
 	{
 		ajax_indicator_ele = document.getElementById('ajax_in_progress');
 
-		if (ajax_indicator_ele === null && typeof(ajax_notification_text) !== null)
+		if (ajax_indicator_ele === null && typeof (ajax_notification_text) !== null)
 		{
 			create_ajax_indicator_ele();
 		}
@@ -950,7 +1061,7 @@ function create_ajax_indicator_ele()
 	var cancel_img = document.createElement('img');
 	cancel_img.src = elk_images_url + '/icons/quick_remove.png';
 
-	if (typeof(ajax_notification_cancel_text) !== 'undefined')
+	if (typeof (ajax_notification_cancel_text) !== 'undefined')
 	{
 		cancel_img.alt = ajax_notification_cancel_text;
 		cancel_img.title = ajax_notification_cancel_text;
@@ -979,32 +1090,36 @@ function createEventListener(oTarget)
 	{
 		if (oTarget.attachEvent)
 		{
-			oTarget.addEventListener = function (sEvent, funcHandler, bCapture) {
+			oTarget.addEventListener = function (sEvent, funcHandler, bCapture)
+			{
 				oTarget.attachEvent('on' + sEvent, funcHandler);
 			};
 
-			oTarget.removeEventListener = function (sEvent, funcHandler, bCapture) {
+			oTarget.removeEventListener = function (sEvent, funcHandler, bCapture)
+			{
 				oTarget.detachEvent('on' + sEvent, funcHandler);
 			};
 		}
 		else
 		{
-			oTarget.addEventListener = function (sEvent, funcHandler, bCapture) {
+			oTarget.addEventListener = function (sEvent, funcHandler, bCapture)
+			{
 				oTarget['on' + sEvent] = funcHandler;
 			};
 
-			oTarget.removeEventListener = function (sEvent, funcHandler, bCapture) {
+			oTarget.removeEventListener = function (sEvent, funcHandler, bCapture)
+			{
 				oTarget['on' + sEvent] = null;
 			};
 		}
 	}
 }
 
-
 /**
  * This function will retrieve the contents needed for the jump to boxes.
  */
-function grabJumpToContent() {
+function grabJumpToContent()
+{
 	getXMLDocument(elk_prepareScriptUrl(elk_scripturl) + 'action=xmlhttp;sa=jumpto;xml', onJumpReceived);
 
 	return false;
@@ -1015,7 +1130,8 @@ function grabJumpToContent() {
  *
  * @param {object} oXMLDoc
  */
-function onJumpReceived(oXMLDoc) {
+function onJumpReceived(oXMLDoc)
+{
 	var aBoardsAndCategories = [],
 		i,
 		n,
@@ -1058,6 +1174,7 @@ function onJumpReceived(oXMLDoc) {
  */
 // This'll contain all JumpTo objects on the page.
 var aJumpTo = [];
+
 function JumpTo(oJumpToOptions)
 {
 	this.opt = oJumpToOptions;
@@ -1067,16 +1184,20 @@ function JumpTo(oJumpToOptions)
 	createEventListener(this.dropdownList);
 
 	if (is_mobile && is_touch)
+	{
 		this.dropdownList.addEventListener('touchstart', grabJumpToContent);
+	}
 	else
+	{
 		this.dropdownList.addEventListener('mouseenter', grabJumpToContent);
+	}
 }
 
 // Remove all the options in the select. Method of the JumpTo class.
 JumpTo.prototype.removeAll = function ()
 {
 //	var dropdownList = document.getElementById(this.opt.sContainerId + '_select');
-for (var i = this.dropdownList.options.length; i > 0; i--)
+	for (var i = this.dropdownList.options.length; i > 0; i--)
 		this.dropdownList.remove(i - 1);
 };
 
@@ -1089,7 +1210,9 @@ JumpTo.prototype.showSelect = function ()
 		sChildLevelPrefix += this.opt.sBoardChildLevelIndicator;
 
 	if (sChildLevelPrefix !== '')
+	{
 		sChildLevelPrefix += this.opt.sBoardPrefix;
+	}
 
 	document.getElementById(this.opt.sContainerId).innerHTML = this.opt.sJumpToTemplate.replace(/%select_id%/, this.opt.sContainerId + '_select').replace(/%dropdown_list%/, '<select ' + (this.opt.bDisabled === true ? 'disabled="disabled" ' : '') + (this.opt.sClassName !== undefined ? 'class="' + this.opt.sClassName + '" ' : '') + 'name="' + (this.opt.sCustomName !== undefined ? this.opt.sCustomName : this.opt.sContainerId + '_select') + '" id="' + this.opt.sContainerId + '_select"><option value="' + (this.opt.bNoRedirect !== undefined && this.opt.bNoRedirect === true ? this.opt.iCurBoardId : '?board=' + this.opt.iCurBoardId + '.0') + '">' + sChildLevelPrefix + this.opt.sCurBoardName.removeEntities() + '</option></select>&nbsp;' + (this.opt.sGoButtonLabel !== undefined ? '<input type="button" class="button_submit" value="' + this.opt.sGoButtonLabel + '" onclick="window.location.href = \'' + elk_prepareScriptUrl(elk_scripturl) + 'board=' + this.opt.iCurBoardId + '.0\';" />' : ''));
 	this.dropdownList = document.getElementById(this.opt.sContainerId + '_select');
@@ -1101,9 +1224,13 @@ JumpTo.prototype.fillSelect = function (aBoardsAndCategories)
 	this.removeAll();
 
 	if (is_mobile && is_touch)
+	{
 		this.dropdownList.removeEventListener('touchstart', grabJumpToContent);
+	}
 	else
+	{
 		this.dropdownList.removeEventListener('mouseenter', grabJumpToContent);
+	}
 
 	// Create a document fragment that'll allowing inserting big parts at once.
 	var oListFragment = document.createDocumentFragment(),
@@ -1130,7 +1257,9 @@ JumpTo.prototype.fillSelect = function (aBoardsAndCategories)
 				sChildLevelPrefix += this.opt.sBoardChildLevelIndicator;
 
 			if (sChildLevelPrefix !== '')
+			{
 				sChildLevelPrefix += this.opt.sBoardPrefix;
+			}
 		}
 
 		oOption = document.createElement('option');
@@ -1138,7 +1267,9 @@ JumpTo.prototype.fillSelect = function (aBoardsAndCategories)
 		oText.innerHTML = sChildLevelPrefix + aBoardsAndCategories[i].name;
 
 		if (aBoardsAndCategories[i].id === this.opt.iCurBoardId)
+		{
 			oOption.selected = 'selected';
+		}
 
 		oOption.appendChild(oText);
 
@@ -1159,10 +1290,15 @@ JumpTo.prototype.fillSelect = function (aBoardsAndCategories)
 
 	// Add an onchange action
 	if (!this.opt.bNoRedirect)
-		this.dropdownList.onchange = function() {
+	{
+		this.dropdownList.onchange = function ()
+		{
 			if (this.selectedIndex > 0 && this.options[this.selectedIndex].value)
+			{
 				window.location.href = elk_scripturl + this.options[this.selectedIndex].value.substr(elk_scripturl.indexOf('?') === -1 || this.options[this.selectedIndex].value.substr(0, 1) !== '?' ? 0 : 1);
+			}
 		};
+	}
 
 	// Handle custom function hook before showing the new select.
 	if ('funcOnBeforeCollapse' in this.opt)
@@ -1205,6 +1341,7 @@ JumpTo.prototype.fillSelect = function (aBoardsAndCategories)
  */
 // A global array containing all IconList objects.
 var aIconLists = [];
+
 function IconList(oOptions)
 {
 	this.opt = oOptions;
@@ -1217,7 +1354,9 @@ function IconList(oOptions)
 
 	// Set a default Action
 	if (!('sAction' in this.opt) || this.opt.sAction === null)
+	{
 		this.opt.sAction = 'messageicons;board=' + this.opt.iBoardId;
+	}
 
 	this.initIcons();
 }
@@ -1227,7 +1366,9 @@ IconList.prototype.initIcons = function ()
 {
 	for (var i = document.images.length - 1, iPrefixLength = this.opt.sIconIdPrefix.length; i >= 0; i--)
 		if (document.images[i].id.substr(0, iPrefixLength) === this.opt.sIconIdPrefix)
+		{
 			setOuterHTML(document.images[i], '<div title="' + this.opt.sLabelIconList + '" onclick="' + this.opt.sBackReference + '.openPopup(this, ' + document.images[i].id.substr(iPrefixLength) + ')" onmouseover="' + this.opt.sBackReference + '.onBoxHover(this, true)" onmouseout="' + this.opt.sBackReference + '.onBoxHover(this, false)" style="background: ' + this.opt.sBoxBackground + '; cursor: pointer; padding: 2px; margin: 0 auto; vertical-align: top"><img src="' + document.images[i].src + '" alt="' + document.images[i].alt + '" id="' + document.images[i].id + '" style="vertical-align: top; margin: 0 auto; padding: 0 2px;" /></div>');
+		}
 };
 
 // Event for the mouse hovering over the original icon.
@@ -1271,7 +1412,9 @@ IconList.prototype.openPopup = function (oDiv, iMessageId)
 	this.oClickedIcon = oDiv;
 
 	if (this.bListLoaded)
+	{
 		this.oContainerDiv.style.display = 'block';
+	}
 
 	document.body.addEventListener('mousedown', this.onWindowMouseDown, false);
 };
@@ -1290,7 +1433,9 @@ IconList.prototype.onIconsReceived = function (oXMLDoc)
 	this.bListLoaded = true;
 
 	if (is_ie)
+	{
 		this.oContainerDiv.style.width = this.oContainerDiv.clientWidth + 'px';
+	}
 
 	ajax_indicator(false);
 };
@@ -1302,12 +1447,18 @@ IconList.prototype.onItemHover = function (oDiv, bMouseOver)
 	oDiv.style.border = bMouseOver ? this.opt.sItemBorderHover : this.opt.sItemBorder;
 
 	if (this.iCurTimeout !== 0)
+	{
 		window.clearTimeout(this.iCurTimeout);
+	}
 
 	if (bMouseOver)
+	{
 		this.onBoxHover(this.oClickedIcon, true);
+	}
 	else
+	{
 		this.iCurTimeout = window.setTimeout(this.opt.sBackReference + '.collapseList();', 500);
+	}
 };
 
 // Event handler for clicking on one of the icons.
@@ -1325,7 +1476,9 @@ IconList.prototype.onItemMouseDown = function (oDiv, sNewIcon)
 		if (oMessage.getElementsByTagName('error').length === 0)
 		{
 			if ((this.opt.bShowModify && oMessage.getElementsByTagName('modified').length !== 0) && (document.getElementById('modified_' + this.iCurMessageId) !== null))
+			{
 				document.getElementById('modified_' + this.iCurMessageId).innerHTML = oMessage.getElementsByTagName('modified')[0].childNodes[0].nodeValue;
+			}
 
 			this.oClickedIcon.getElementsByTagName('img')[0].src = oDiv.getElementsByTagName('img')[0].src;
 		}
@@ -1334,7 +1487,9 @@ IconList.prototype.onItemMouseDown = function (oDiv, sNewIcon)
 	{
 		this.oClickedIcon.getElementsByTagName('img')[0].src = oDiv.getElementsByTagName('img')[0].src;
 		if ('sLabelIconBox' in this.opt)
+		{
 			document.getElementById(this.opt.sLabelIconBox).value = sNewIcon;
+		}
 	}
 };
 
@@ -1350,7 +1505,7 @@ IconList.prototype.onWindowMouseDown = function ()
 };
 
 // Collapse the list of icons.
-IconList.prototype.collapseList = function()
+IconList.prototype.collapseList = function ()
 {
 	this.onBoxHover(this.oClickedIcon, false);
 	this.oContainerDiv.style.display = 'none';
@@ -1374,7 +1529,7 @@ function elk_itemPos(itemHandle)
 		itemX = itemHandle.offsetLeft;
 		itemY = itemHandle.offsetTop;
 
-		while (itemHandle.offsetParent && typeof(itemHandle.offsetParent) === 'object')
+		while (itemHandle.offsetParent && typeof (itemHandle.offsetParent) === 'object')
 		{
 			itemHandle = itemHandle.offsetParent;
 			itemX += itemHandle.offsetLeft;
@@ -1423,14 +1578,20 @@ function elkSelectText(oCurElement, bActOnElement)
 	var oCodeArea = null;
 
 	// The place we're looking for is one div up, and next door - if it's auto detect.
-	if (typeof(bActOnElement) === 'boolean' && bActOnElement)
+	if (typeof (bActOnElement) === 'boolean' && bActOnElement)
+	{
 		oCodeArea = document.getElementById(oCurElement);
+	}
 	else
+	{
 		oCodeArea = oCurElement.parentNode.nextSibling;
+	}
 
 	// Did not find it, bail
-	if (typeof(oCodeArea) !== 'object' || oCodeArea === null)
+	if (typeof (oCodeArea) !== 'object' || oCodeArea === null)
+	{
 		return false;
+	}
 
 	// Start off with internet explorer < 9.
 	if ('createTextRange' in document.body)
@@ -1445,9 +1606,9 @@ function elkSelectText(oCurElement, bActOnElement)
 		var oCurSelection = window.getSelection(),
 			curRange = document.createRange();
 
-			curRange.selectNodeContents(oCodeArea);
-			oCurSelection.removeAllRanges();
-			oCurSelection.addRange(curRange);
+		curRange.selectNodeContents(oCodeArea);
+		oCurSelection.removeAllRanges();
+		oCurSelection.addRange(curRange);
 	}
 
 	return false;
@@ -1460,26 +1621,34 @@ function elkSelectText(oCurElement, bActOnElement)
  * @param {Array.} aElementNames
  * @param {string} sMask
  */
-function smc_saveEntities(sFormName, aElementNames, sMask) {
+function smc_saveEntities(sFormName, aElementNames, sMask)
+{
 	var i = 0,
 		n = 0;
 
-	if (typeof(sMask) === 'string') {
-		for (i = 0, n = document.forms[sFormName].elements.length; i < n; i++) {
-			if (document.forms[sFormName].elements[i].id.substr(0, sMask.length) === sMask) {
+	if (typeof (sMask) === 'string')
+	{
+		for (i = 0, n = document.forms[sFormName].elements.length; i < n; i++)
+		{
+			if (document.forms[sFormName].elements[i].id.substr(0, sMask.length) === sMask)
+			{
 				aElementNames[aElementNames.length] = document.forms[sFormName].elements[i].name;
 			}
 		}
 	}
 
-	for (i = 0, n = aElementNames.length; i < n; i++) {
-		if (aElementNames[i] in document.forms[sFormName]) {
+	for (i = 0, n = aElementNames.length; i < n; i++)
+	{
+		if (aElementNames[i] in document.forms[sFormName])
+		{
 			// Handle the editor.
-			if (typeof post_box_name !== 'undefined' && aElementNames[i] === post_box_name && $editor_data[post_box_name] !== undefined) {
+			if (typeof post_box_name !== 'undefined' && aElementNames[i] === post_box_name && $editor_data[post_box_name] !== undefined)
+			{
 				document.forms[sFormName][aElementNames[i]].value = $editor_data[post_box_name].val().replace(/&#/g, '&#38;#');
 				$editor_data[post_box_name].val(document.forms[sFormName][aElementNames[i]].value);
 			}
-			else {
+			else
+			{
 				document.forms[sFormName][aElementNames[i]].value = document.forms[sFormName][aElementNames[i]].value.replace(/&#/g, '&#38;#');
 			}
 		}
@@ -1500,10 +1669,14 @@ function pollOptions()
 	{
 		document.forms[form_name].poll_hide[2].disabled = true;
 		if (document.forms[form_name].poll_hide[2].checked)
+		{
 			document.forms[form_name].poll_hide[1].checked = true;
+		}
 	}
 	else
+	{
 		document.forms[form_name].poll_hide[2].disabled = false;
+	}
 }
 
 /**
@@ -1515,7 +1688,7 @@ function pollOptions()
 function generateDays(offset)
 {
 	// Work around JavaScript's lack of support for default values...
-	offset = typeof(offset) !== 'undefined' ? offset : '';
+	offset = typeof (offset) !== 'undefined' ? offset : '';
 
 	var days = 0,
 		selected = 0,
@@ -1526,11 +1699,15 @@ function generateDays(offset)
 
 	monthLength[1] = 28;
 	if (yearElement.options[yearElement.selectedIndex].value % 4 === 0)
+	{
 		monthLength[1] = 29;
+	}
 
 	selected = dayElement.selectedIndex;
 	while (dayElement.options.length)
+	{
 		dayElement.options[0] = null;
+	}
 
 	days = monthLength[monthElement.value - 1];
 
@@ -1538,7 +1715,9 @@ function generateDays(offset)
 		dayElement.options[dayElement.length] = new Option(i, i);
 
 	if (selected < days)
+	{
 		dayElement.selectedIndex = selected;
+	}
 }
 
 /**
@@ -1558,7 +1737,9 @@ function toggleLinked(form)
 function initSearch()
 {
 	if (document.forms.searchform.search.value.indexOf("%u") !== -1)
+	{
 		document.forms.searchform.search.value = decodeURI(document.forms.searchform.search.value);
+	}
 }
 
 /**
@@ -1582,7 +1763,9 @@ function selectBoards(ids, aFormName, sInputName)
 		}
 	}
 	if (typeof aForm == 'undefined')
+	{
 		return;
+	}
 
 	for (i = 0; i < ids.length; i++)
 		toggle = toggle && aForm[sInputName + '[' + ids[i] + ']'].checked;
@@ -1600,14 +1783,16 @@ function selectBoards(ids, aFormName, sInputName)
  */
 function expandCollapse(id, icon, speed)
 {
-	var	oId = $('#' + id);
+	var oId = $('#' + id);
 
 	icon = icon || false;
 	speed = speed || 300;
 
 	// Change the icon on the box as well?
 	if (icon)
+	{
 		$('#' + icon).attr("src", elk_images_url + (oId.is(":hidden") !== true ? "/selected.png" : "/selected_open.png"));
+	}
 
 	// Open or collapse the content id
 	oId.slideToggle(speed);
@@ -1620,7 +1805,8 @@ function expandCollapse(id, icon, speed)
  */
 function initHighlightSelection(container_id)
 {
-	$('#' + container_id + ' [name="def_language"]').on('click', function (ev) {
+	$('#' + container_id + ' [name="def_language"]').on('click', function (ev)
+	{
 		$('#' + container_id + ' .standard_row').removeClass('highlight2');
 		$(this).parent().parent().addClass('highlight2');
 	});
@@ -1635,15 +1821,22 @@ function initHighlightSelection(container_id)
  */
 function doAutoSubmit(countdown, txt_message, formName)
 {
-	var formID = typeof(formName) !== 'undefined' ? formName : "autoSubmit";
+	var formID = typeof (formName) !== 'undefined' ? formName : "autoSubmit";
 
 	if (countdown === 0)
+	{
 		document.forms[formID].submit();
+	}
 	else if (countdown === -1)
+	{
 		return;
+	}
 
 	document.forms[formID].cont.value = txt_message + ' (' + countdown + ')';
 	countdown--;
 
-	setTimeout(function() {doAutoSubmit(countdown, txt_message, formID);}, 1000);
+	setTimeout(function ()
+	{
+		doAutoSubmit(countdown, txt_message, formID);
+	}, 1000);
 }

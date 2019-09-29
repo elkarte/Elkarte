@@ -4,7 +4,7 @@
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause (see accompanying LICENSE.txt file)
  *
  * This file contains code covered by:
- * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * copyright: 2011 Simple Machines (http://www.simplemachines.org)
  *
  * @version 2.0 dev
  */
@@ -31,7 +31,7 @@ function spellCheck(formName, fieldName, bFull)
 	// Register the name of the editing form for future reference.
 	spell_formname = formName;
 	spell_fieldname = fieldName;
-	spell_full = typeof(bFull) !== 'undefined' ? bFull : typeof($editor_data) !== 'undefined';
+	spell_full = typeof (bFull) !== 'undefined' ? bFull : typeof ($editor_data) !== 'undefined';
 
 	// This should match a word (most of the time).
 	var regexpWordMatch = /(?:<[^>]+>)|(?:\[[^ ][^\]]*])|(?:&[^; ]+;)|(?:[^0-9\s\]\[{};:“"”\\|,<.>\/?`~!@#$%^&*()_+=]+)/g;
@@ -54,25 +54,35 @@ function spellCheck(formName, fieldName, bFull)
 
 		// Strip the dashes and hyphens from the begin of the word.
 		while (in_array(aResult[0].charAt(iOffset1), aWordCharacters) && iOffset1 < iOffset2)
+		{
 			iOffset1++;
+		}
 
 		// Strip the dashes and hyphens from the end of the word.
 		while (in_array(aResult[0].charAt(iOffset2), aWordCharacters) && iOffset1 < iOffset2)
+		{
 			iOffset2--;
+		}
 
 		// I guess there's only dashes and hyphens in this word...
 		if (iOffset1 === iOffset2)
+		{
 			continue;
+		}
 
 		// Ignore code blocks.
 		if (aResult[0].substr(0, 5).toLowerCase() === '[code')
+		{
 			bInCode = true;
-		// Glad we're out of that code block!
+		}// Glad we're out of that code block!
 		else if (bInCode && aResult[0].substr(0, 7).toLowerCase() === '[/code]')
+		{
 			bInCode = false;
-		// Now let's get to business.
+		}// Now let's get to business.
 		else if (!bInCode && !in_array(aResult[0].charAt(0), ['[', '<']) && aResult[0].toUpperCase() !== aResult[0])
+		{
 			aWords[aWords.length] = aResult[0].substr(iOffset1, iOffset2 - iOffset1 + 1) + '|' + (iOffset1 + sText.substr(0, aResult.index).length) + '|' + (iOffset2 + sText.substr(0, aResult.index).length);
+		}
 	}
 
 	// Open the window...
@@ -125,7 +135,9 @@ function replaceWord()
 	// If this isn't the beginning of the string then get all of the string
 	// that is before the word we are replacing.
 	if (misps[wordindex].start !== 0)
+	{
 		strstart = mispstr.slice(0, misps[wordindex].start + offsetindex);
+	}
 
 	// Get the end of the string after the word we are replacing.
 	strend = mispstr.slice(misps[wordindex].end + 1 + offsetindex);
@@ -172,7 +184,9 @@ function replaceAll()
 		{
 			var strstart = "";
 			if (misps[idx].start !== 0)
+			{
 				strstart = mispstr.slice(0, misps[idx].start + localoffsetindex);
+			}
 
 			// Get the end of the string after the word we are replacing.
 			strend = mispstr.slice(misps[idx].end + 1 + localoffsetindex);
@@ -210,7 +224,9 @@ function highlightWord()
 	// If this isn't the beginning of the string then get all of the string
 	// that is before the word we are replacing.
 	if (misps[wordindex].start !== 0)
+	{
 		strstart = mispstr.slice(0, misps[wordindex].start + offsetindex);
+	}
 
 	// Get the end of the string after the word we are replacing.
 	strend = mispstr.slice(misps[wordindex].end + 1 + offsetindex);
@@ -239,7 +255,9 @@ function nextWord(ignoreall)
 {
 	// Push ignored word onto ignoredWords array.
 	if (ignoreall)
+	{
 		ignoredWords[misps[wordindex].word] = true;
+	}
 
 	// Update the index of all words we have processed...
 	// This must be done to accommodate the replaceAll function.
@@ -260,7 +278,9 @@ function nextWord(ignoreall)
 		divptr.innerHTML = htmlspecialchars(mispstr).replace(/_\|_/g, "<br />");
 
 		while (document.forms.spellingForm.suggestions.options.length > 0)
+		{
 			document.forms.spellingForm.suggestions.options[0] = null;
+		}
 
 		alert(txt.done);
 		document.forms.spellingForm.change.disabled = true;
@@ -273,7 +293,9 @@ function nextWord(ignoreall)
 
 		// Get a handle to the field we need to re-populate.
 		if (spell_full)
+		{
 			window.opener.spellCheckSetText(mispstr, spell_fieldname);
+		}
 		else
 		{
 			window.opener.document.forms[spell_formname][spell_fieldname].value = mispstr;
@@ -293,7 +315,9 @@ function nextWord(ignoreall)
 
 	// Clear out the suggestions box!
 	while (document.forms.spellingForm.suggestions.options.length > 0)
+	{
 		document.forms.spellingForm.suggestions.options[0] = null;
+	}
 
 	// Re-populate the suggestions box if there are any suggested spellings for the word.
 	if (misps[wordindex].suggestions.length)
@@ -313,7 +337,9 @@ function nextWord(ignoreall)
 	}
 
 	if (document.forms.spellingForm.suggestions.options.length === 0)
+	{
 		document.forms.spellingForm.changeto.value = "";
+	}
 
 	highlightWord();
 
@@ -368,7 +394,9 @@ function spellCheckSetText(text, editorID)
 	$editor_data[editorID].InsertText(text, true);
 
 	if (!$editor_data[editorID].inSourceMode)
+	{
 		$editor_data[editorID].toggleSourceMode();
+	}
 }
 
 /**
@@ -378,7 +406,9 @@ function spellCheckSetText(text, editorID)
 function spellCheckStart()
 {
 	if (!spellCheck)
+	{
 		return false;
+	}
 
 	$editor_data[post_box_name].storeLastState();
 

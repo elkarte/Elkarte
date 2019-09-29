@@ -15,10 +15,14 @@
 /**
  * Simply invoke the constructor by calling likePosts with init method
  */
-(function () {
-	function likePosts() {}
+(function ()
+{
+	function likePosts()
+	{
+	}
 
-	likePosts.prototype = function () {
+	likePosts.prototype = function ()
+	{
 		var oTxt = {},
 
 			/**
@@ -26,7 +30,8 @@
 			 * likePosts.prototype.init(params)
 			 * currently passing the text from php
 			 */
-			init = function (params) {
+			init = function (params)
+			{
 				oTxt = params.oTxt;
 			},
 
@@ -34,24 +39,32 @@
 			 * This is bound to a click event on the page like/unlike buttons
 			 * likePosts.prototype.likeUnlikePosts(event, messageID, topidID)
 			 */
-			likeUnlikePosts = function (e, mId, tId) {
+			likeUnlikePosts = function (e, mId, tId)
+			{
 				var messageId = parseInt(mId, 10),
 					topicId = parseInt(tId, 10),
 					subAction = '',
 					check = $(e.target).attr('class');
 
 				if (e.target.nodeName.toLowerCase() !== 'a')
+				{
 					return false;
+				}
 
 				// Set the subAction to what they are doing
-				if (check.indexOf('unlike_button') >= 0) {
+				if (check.indexOf('unlike_button') >= 0)
+				{
 					if (!confirm(likemsg_are_you_sure))
+					{
 						return;
+					}
 
 					subAction = 'unlikepost';
 				}
 				else
+				{
 					subAction = 'likepost';
+				}
 
 				// Need to know what we are liking of course
 				var values = {
@@ -61,15 +74,17 @@
 
 				// Make the ajax call to the likes system
 				$.ajax({
-						url: elk_scripturl + '?action=likes;sa=' + subAction + ';xml;api=json;' + elk_session_var + '=' + elk_session_id,
-						type: 'POST',
-						dataType: 'json',
-						data: values,
-						cache: false
-					})
-					.done(function (resp) {
+					url: elk_scripturl + '?action=likes;sa=' + subAction + ';xml;api=json;' + elk_session_var + '=' + elk_session_id,
+					type: 'POST',
+					dataType: 'json',
+					data: values,
+					cache: false
+				})
+					.done(function (resp)
+					{
 						// json response from the server says success?
-						if (resp.result === true) {
+						if (resp.result === true)
+						{
 							// Update the page with the new likes information
 							updateUi({
 								'elem': $(e.target),
@@ -81,9 +96,12 @@
 						}
 						// Some failure trying to process the request
 						else
+						{
 							handleError(resp);
+						}
 					})
-					.fail(function (err, textStatus, errorThrown) {
+					.fail(function (err, textStatus, errorThrown)
+					{
 						// Some failure sending the request, this generally means some html in
 						// the output from php error or access denied fatal errors etc
 						err.data = oTxt.error_occurred + ' : ' + errorThrown;
@@ -96,7 +114,8 @@
 			 *
 			 * @param {object} params object of new values from the ajax request
 			 */
-			updateUi = function (params) {
+			updateUi = function (params)
+			{
 				var currentClass = (params.action === 'unlikepost') ? 'unlike_button' : 'like_button',
 					nextClass = (params.action === 'unlikepost') ? 'like_button' : 'unlike_button';
 
@@ -107,7 +126,9 @@
 
 				// Update the count bubble if needed
 				if (params.count !== 0)
+				{
 					$(params.elem).html('<span class="likes_indicator">' + params.count + '</span>&nbsp;' + params.text);
+				}
 
 				// Changed the title text, update the tooltips
 				$("." + nextClass).SiteTooltip({
@@ -125,7 +146,8 @@
 			 *
 			 * @param {type} params
 			 */
-			handleError = function (params) {
+			handleError = function (params)
+			{
 				var str = '<div class="floating_error"><div class="error_heading">' + oTxt.likeHeadingError + '</div><p class="error_msg">' + params.data + '</p><p class="error_btn">' + oTxt.btnText + '</p></div>';
 
 				$('body').append(str);
@@ -152,10 +174,14 @@
 			 *
 			 * @param {type} e
 			 */
-			removeOverlay = function (e) {
-				if (typeof(e) === 'undefined')
+			removeOverlay = function (e)
+			{
+				if (typeof (e) === 'undefined')
+				{
 					return false;
-				else if ((e.type === 'keyup' && e.keyCode === 27) || e.type === 'click') {
+				}
+				else if ((e.type === 'keyup' && e.keyCode === 27) || e.type === 'click')
+				{
 					var $floating_error = $('.floating_error');
 					$floating_error.remove();
 					$floating_error.off('click');
@@ -178,9 +204,12 @@
 	 *
 	 * Simply invoke the constructor by calling likePostStats with init method
 	 */
-	function likePostStats() {}
+	function likePostStats()
+	{
+	}
 
-	likePostStats.prototype = function () {
+	likePostStats.prototype = function ()
+	{
 		var currentUrlFrag = null,
 			allowedUrls = {},
 			tabsVisitedCurrentSession = {},
@@ -188,7 +217,8 @@
 			txtStrings = {},
 
 			// Initialize, load in text strings, etc
-			init = function (params) {
+			init = function (params)
+			{
 				txtStrings = $.extend({}, params.txtStrings);
 				allowedUrls = {
 					'messagestats': {
@@ -212,40 +242,47 @@
 			},
 
 			// Show the ajax spinner
-			showSpinnerOverlay = function () {
+			showSpinnerOverlay = function ()
+			{
 				$('<div id="lp_preloader"><i class="icon icon-spin icon-xl i-spinner"></i><div>').appendTo('#like_post_stats_overlay');
 				$('#like_post_stats_overlay').show();
 			},
 
 			// Hide the ajax spinner
-			hideSpinnerOverlay = function () {
+			hideSpinnerOverlay = function ()
+			{
 				$('#lp_preloader').remove();
 				$('#like_post_stats_overlay').hide();
 			},
 
 			// Set the active stats tab
-			highlightActiveTab = function () {
+			highlightActiveTab = function ()
+			{
 				$('.like_post_stats_menu a').removeClass('active');
 				$('#' + currentUrlFrag).addClass('active');
 			},
 
 			// Check the url for a valid like stat tab, load data if its not been done yet
-			checkUrl = function (url) {
+			checkUrl = function (url)
+			{
 				// Busy doing something
 				showSpinnerOverlay();
 
 				// No tab sent, use the current hash
-				if (typeof(url) === 'undefined' || url === '') {
+				if (typeof (url) === 'undefined' || url === '')
+				{
 					var currentHref = window.location.href.split('#');
 
-					currentUrlFrag = (typeof(currentHref[1]) !== 'undefined') ? currentHref[1] : defaultHash;
+					currentUrlFrag = (typeof (currentHref[1]) !== 'undefined') ? currentHref[1] : defaultHash;
 				}
-				else {
+				else
+				{
 					currentUrlFrag = url;
 				}
 
 				// Ensure this is a valid hash value for our like tabs, otherwise set a default
-				if (allowedUrls.hasOwnProperty(currentUrlFrag) === false) {
+				if (allowedUrls.hasOwnProperty(currentUrlFrag) === false)
+				{
 					currentUrlFrag = defaultHash;
 				}
 
@@ -254,65 +291,77 @@
 				highlightActiveTab();
 
 				// If we have not loaded this tabs data, then fetch it
-				if (tabsVisitedCurrentSession.hasOwnProperty(currentUrlFrag) === false) {
+				if (tabsVisitedCurrentSession.hasOwnProperty(currentUrlFrag) === false)
+				{
 					getDataFromServer({
 						'url': currentUrlFrag,
 						'uiFunc': allowedUrls[currentUrlFrag].uiFunc
 					});
 				}
-				else {
+				else
+				{
 					allowedUrls[currentUrlFrag].uiFunc();
 				}
 			},
 
 			// Fetch the specific tab data via ajax from the server
-			getDataFromServer = function (params) {
+			getDataFromServer = function (params)
+			{
 				$('.like_post_stats_error').hide().html('');
 
 				// Make the ajax call to the likes system
 				$.ajax({
-						url: elk_scripturl + '?action=likes;sa=likestats;area=' + params.url + ';xml;api=json;',
-						type: 'POST',
-						dataType: 'json',
-						cache: false
-					})
-					.done(function (resp) {
-						if (typeof(resp.error) !== 'undefined' && resp.error !== '') {
+					url: elk_scripturl + '?action=likes;sa=likestats;area=' + params.url + ';xml;api=json;',
+					type: 'POST',
+					dataType: 'json',
+					cache: false
+				})
+					.done(function (resp)
+					{
+						if (typeof (resp.error) !== 'undefined' && resp.error !== '')
+						{
 							genericErrorMessage({
 								errorMsg: resp.error
 							});
 						}
-						else if (typeof(resp.data) !== 'undefined' && typeof(resp.data.noDataMessage) !== 'undefined' && resp.data.noDataMessage !== '') {
+						else if (typeof (resp.data) !== 'undefined' && typeof (resp.data.noDataMessage) !== 'undefined' && resp.data.noDataMessage !== '')
+						{
 							genericErrorMessage({
 								errorMsg: resp.data.noDataMessage
 							});
 						}
-						else if (resp.result === true) {
+						else if (resp.result === true)
+						{
 							tabsVisitedCurrentSession[currentUrlFrag] = resp.data;
 							params.uiFunc();
 						}
-						else {
+						else
+						{
 							genericErrorMessage(resp);
 						}
 					})
-					.fail(function (err, textStatus, errorThrown) {
+					.fail(function (err, textStatus, errorThrown)
+					{
 						// Some failure sending the request, this generally means some html in
 						// the output from php error or access denied fatal errors etc
 						// err.data = oTxt.error_occurred + ' : ' + errorThrown;
 						// handleError(err);
-						if ('console' in window) {
+						if ('console' in window)
+						{
 							window.console.info('fail:', textStatus, errorThrown.name);
 							window.console.info(err.responseText);
 						}
 					})
-					.always(function () {
+					.always(function ()
+					{
 						// All done
 						hideSpinnerOverlay();
 					});
 			},
 
 			// Show the most liked messages
-			showMessageStats = function () {
+			showMessageStats = function ()
+			{
 				var data = tabsVisitedCurrentSession[currentUrlFrag],
 					htmlContent = '',
 					messageUrl = '',
@@ -322,7 +371,8 @@
 				$like_post_message_data.html('');
 
 				// Build the new html to add to the page
-				for (var i = 0, len = data.length; i < len; i++) {
+				for (var i = 0, len = data.length; i < len; i++)
+				{
 					messageUrl = elk_scripturl + '?topic=' + data[i].id_topic + '.msg' + data[i].id_msg;
 
 					htmlContent += '' +
@@ -339,10 +389,11 @@
 						'   </div>' +
 						'   <div class="separator"></div>' +
 						'   <div class="well">' +
-						'       <p>' + txtStrings.usersWhoLiked.easyReplace({1 : data[i].member_liked_data.length}) + '</p>';
+						'       <p>' + txtStrings.usersWhoLiked.easyReplace({1: data[i].member_liked_data.length}) + '</p>';
 
 					// All the members that liked this masterpiece of internet jibba jabba
-					for (var j = 0, likerslen = data[i].member_liked_data.length; j < likerslen; j++) {
+					for (var j = 0, likerslen = data[i].member_liked_data.length; j < likerslen; j++)
+					{
 						htmlContent += '' +
 							'   <div class="like_stats_likers">' +
 							'       <a href="' + data[i].member_liked_data[j].href + '">' +
@@ -371,9 +422,10 @@
 			},
 
 			// The most liked Topics !
-			showTopicStats = function () {
+			showTopicStats = function ()
+			{
 				var data = tabsVisitedCurrentSession[currentUrlFrag],
-					topicUrl ='',
+					topicUrl = '',
 					msgUrl = '',
 					htmlContent = '',
 					expand_txt = [],
@@ -384,44 +436,49 @@
 				$like_post_topic_data.html('');
 
 				// For each of the top X topics, output the info
-				for (var i = 0, len = data.length; i < len; i++) {
+				for (var i = 0, len = data.length; i < len; i++)
+				{
 					topicUrl = elk_scripturl + '?topic=' + data[i].id_topic;
 
 					// Start with the topic info
 					htmlContent += '' +
 						'<div class="content forumposts">' +
-						'   <a class="largetext" href="' + topicUrl + '">' + data[i].msg_data[0].subject + '</a> ' + txtStrings.mostPopularTopicHeading1.easyReplace({1 : data[i].like_count}) +
-						'   <p class="panel_toggle secondary_header">'	+
+						'   <a class="largetext" href="' + topicUrl + '">' + data[i].msg_data[0].subject + '</a> ' + txtStrings.mostPopularTopicHeading1.easyReplace({1: data[i].like_count}) +
+						'   <p class="panel_toggle secondary_header">' +
 						'       <span class="topic_toggle">&nbsp' +
 						'           <span id="topic_toggle_img_' + i + '" class="chevricon i-chevron-up" title=""></span>' +
 						'       </span>' +
-						'       <a href="#" id="topic_toggle_link_' + i + '">' + txtStrings.mostPopularTopicSubHeading1.easyReplace({1 : data[i].msg_data.length, 2 : txtStrings.showPosts}) + '</a>' +
+						'       <a href="#" id="topic_toggle_link_' + i + '">' + txtStrings.mostPopularTopicSubHeading1.easyReplace({
+							1: data[i].msg_data.length,
+							2: txtStrings.showPosts
+						}) + '</a>' +
 						'   </p>' +
 						'   <div id="topic_container_' + i + '" class="hide">';
 
 					// Expand / collapse text strings for this area
 					collapse_txt[i] = txtStrings.mostPopularTopicSubHeading1.easyReplace({
-						1 : data[i].msg_data.length,
-						2 : txtStrings.showPosts
+						1: data[i].msg_data.length,
+						2: txtStrings.showPosts
 					});
 					expand_txt[i] = txtStrings.mostPopularTopicSubHeading1.easyReplace({
-						1 : data[i].msg_data.length,
-						2 : txtStrings.hidePosts
+						1: data[i].msg_data.length,
+						2: txtStrings.hidePosts
 					});
 
 					// Posts from the topic itself
-					for (var j = 0, topiclen =  data[i].msg_data.length; j < topiclen; j++) {
-						msgUrl = topicUrl + '.msg' +  data[i].msg_data[j].id_msg + '#msg' + data[i].msg_data[j].id_msg;
+					for (var j = 0, topiclen = data[i].msg_data.length; j < topiclen; j++)
+					{
+						msgUrl = topicUrl + '.msg' + data[i].msg_data[j].id_msg + '#msg' + data[i].msg_data[j].id_msg;
 
 						htmlContent += '' +
 							'   <div class="content forumposts">' +
 							'       <div class="topic_details">' +
-							'   	    <img class="like_stats_small_avatar" alt="" src="' + encodeURI( data[i].msg_data[j].member.avatar) + '"/>' +
+							'   	    <img class="like_stats_small_avatar" alt="" src="' + encodeURI(data[i].msg_data[j].member.avatar) + '"/>' +
 							'           <h5 class="like_stats_likers">' +
-							data[i].msg_data[j].member.name + ' : ' + txtStrings.postedAt + ' ' +  data[i].msg_data[j].html_time +
+							data[i].msg_data[j].member.name + ' : ' + txtStrings.postedAt + ' ' + data[i].msg_data[j].html_time +
 							'           </h5>' +
 							'       </div>' +
-							'       <div class="inner">' +  data[i].msg_data[j].body + '</div>' +
+							'       <div class="inner">' + data[i].msg_data[j].body + '</div>' +
 							'       <a class="linkbutton_right" href="' + msgUrl + '">' + txtStrings.readMore + '</a>' +
 							'       <div class="separator"></div>' +
 							'   </div>';
@@ -444,7 +501,8 @@
 			},
 
 			// The single most liked board, like ever
-			showBoardStats = function (response) {
+			showBoardStats = function (response)
+			{
 				var data = tabsVisitedCurrentSession[currentUrlFrag],
 					boardUrl = elk_scripturl + '?board=' + data.id_board,
 					$like_post_board_data = $('.like_post_board_data');
@@ -459,30 +517,31 @@
 					'       <a class="largetext" href="' + boardUrl + '">' + data.name + '</a> ' + txtStrings.mostPopularBoardHeading1 + ' ' + data.like_count + ' ' + txtStrings.genricHeading1 +
 					'   </p>' +
 					'   <p>' +
-							txtStrings.mostPopularBoardSubHeading1 + ' ' + data.num_topics + ' ' + txtStrings.mostPopularBoardSubHeading2 + ' ' + data.topics_liked + ' ' + txtStrings.mostPopularBoardSubHeading3 +
+					txtStrings.mostPopularBoardSubHeading1 + ' ' + data.num_topics + ' ' + txtStrings.mostPopularBoardSubHeading2 + ' ' + data.topics_liked + ' ' + txtStrings.mostPopularBoardSubHeading3 +
 					'   </p>' +
 					'   <p>' +
-							txtStrings.mostPopularBoardSubHeading4 + ' ' + data.num_posts + ' ' + txtStrings.mostPopularBoardSubHeading5 + ' ' + data.msgs_liked + ' ' + txtStrings.mostPopularBoardSubHeading6 +
+					txtStrings.mostPopularBoardSubHeading4 + ' ' + data.num_posts + ' ' + txtStrings.mostPopularBoardSubHeading5 + ' ' + data.msgs_liked + ' ' + txtStrings.mostPopularBoardSubHeading6 +
 					'   </p>' +
 					'</div>';
 
 				// And show some of the topics from it
-				for (var i = 0, len = data.topic_data.length; i < len; i++) {
+				for (var i = 0, len = data.topic_data.length; i < len; i++)
+				{
 					var topicUrl = elk_scripturl + '?topic=' + data.topic_data[i].id_topic;
 
 					htmlContent += '' +
-					'<div class="content forumposts">' +
-					'	<div class="topic_details">' +
-					'	    <img class="like_stats_small_avatar" alt="" src="' + encodeURI( data.topic_data[i].member.avatar) + '"/>' +
-					'       <h5 class="like_stats_likers">' +
-					'           <a href="' + data.topic_data[i].member.href + '">' +
-									data.topic_data[i].member.name +
-					'           </a> : ' + txtStrings.postedAt + ' ' + data.topic_data[i].html_time +
-					'       </h5>' +
-					'   </div>' +
-					'   <div class="inner">' + data.topic_data[i].body + '</div>' +
-					'   <a class="linkbutton floatright" href="' + topicUrl + '">' + txtStrings.readMore + '</a>' +
-					'</div>';
+						'<div class="content forumposts">' +
+						'	<div class="topic_details">' +
+						'	    <img class="like_stats_small_avatar" alt="" src="' + encodeURI(data.topic_data[i].member.avatar) + '"/>' +
+						'       <h5 class="like_stats_likers">' +
+						'           <a href="' + data.topic_data[i].member.href + '">' +
+						data.topic_data[i].member.name +
+						'           </a> : ' + txtStrings.postedAt + ' ' + data.topic_data[i].html_time +
+						'       </h5>' +
+						'   </div>' +
+						'   <div class="inner">' + data.topic_data[i].body + '</div>' +
+						'   <a class="linkbutton floatright" href="' + topicUrl + '">' + txtStrings.readMore + '</a>' +
+						'</div>';
 				}
 
 				// Load and show
@@ -494,7 +553,8 @@
 			},
 
 			// Data for all the narcissists out there !
-			showMostLikesReceivedUserStats = function (response) {
+			showMostLikesReceivedUserStats = function (response)
+			{
 				var data = tabsVisitedCurrentSession[currentUrlFrag],
 					msgUrl = '',
 					htmlContent = '',
@@ -506,7 +566,8 @@
 				$like_post_most_liked_user_data.html('').off();
 
 				// For each member returned
-				for (var i = 0, len = data.length; i < len; i++) {
+				for (var i = 0, len = data.length; i < len; i++)
+				{
 					// Start off with a bit about them and why they are great
 					htmlContent += '' +
 						'<div class="content forumposts">' +
@@ -528,26 +589,27 @@
 
 					// Expand / collapse text strings for this area
 					collapse_txt[i] = txtStrings.mostPopularUserHeading1.easyReplace({
-						1 : txtStrings.showPosts
+						1: txtStrings.showPosts
 					});
 					expand_txt[i] = txtStrings.mostPopularUserHeading1.easyReplace({
-						1 : txtStrings.hidePosts
+						1: txtStrings.hidePosts
 					});
 
-					for (var j = 0, msglen = data[i].post_data.length; j < msglen; j++) {
+					for (var j = 0, msglen = data[i].post_data.length; j < msglen; j++)
+					{
 						msgUrl = elk_scripturl + '?topic=' + data[i].post_data[j].id_topic + '.msg' + data[i].post_data[j].id_msg;
 
 						htmlContent += '' +
-						'       <div class="content forumposts">' +
-						'	        <div class="topic_details">' +
-						'                <h5 class="like_stats_likers">' +
-						txtStrings.postedAt + ' ' + data[i].post_data[j].html_time + ' - ' + data[i].post_data[j].like_count + ' ' + txtStrings.likesReceived +
-						'               </h5>' +
-						'           </div>' +
-						'          <div class="inner">' + data[i].post_data[j].body + '</div>' +
-						'          <a class="linkbutton_right" href="' + msgUrl + '">' + txtStrings.readMore + '</a>' +
-						'          <div class="separator"></div>' +
-						'       </div>';
+							'       <div class="content forumposts">' +
+							'	        <div class="topic_details">' +
+							'                <h5 class="like_stats_likers">' +
+							txtStrings.postedAt + ' ' + data[i].post_data[j].html_time + ' - ' + data[i].post_data[j].like_count + ' ' + txtStrings.likesReceived +
+							'               </h5>' +
+							'           </div>' +
+							'          <div class="inner">' + data[i].post_data[j].body + '</div>' +
+							'          <a class="linkbutton_right" href="' + msgUrl + '">' + txtStrings.readMore + '</a>' +
+							'          <div class="separator"></div>' +
+							'       </div>';
 					}
 
 					htmlContent += '' +
@@ -567,7 +629,8 @@
 			},
 
 			// Data for all the +1, me too, etc users as well
-			showMostLikesGivenUserStats = function (response) {
+			showMostLikesGivenUserStats = function (response)
+			{
 				var data = tabsVisitedCurrentSession[currentUrlFrag],
 					htmlContent = '',
 					msgUrl = '',
@@ -579,7 +642,8 @@
 				$like_post_most_likes_given_user_data.html('');
 
 				// For each member returned
-				for (var i = 0, len = data.length; i < len; i++) {
+				for (var i = 0, len = data.length; i < len; i++)
+				{
 					htmlContent += '' +
 						'<div class="content forumposts">' +
 						'   <div class="like_stats_avatar">' +
@@ -600,14 +664,15 @@
 
 					// Expand / collapse text strings for this area
 					collapse_txt[i] = txtStrings.mostLikeGivenUserHeading1.easyReplace({
-						1 : txtStrings.showPosts
+						1: txtStrings.showPosts
 					});
 					expand_txt[i] = txtStrings.mostLikeGivenUserHeading1.easyReplace({
-						1 : txtStrings.hidePosts
+						1: txtStrings.hidePosts
 					});
 
-					for (var j = 0, postlen = data[i].post_data.length; j < postlen; j++) {
-						 msgUrl = elk_scripturl + '?topic=' + data[i].post_data[j].id_topic + '.msg' + data[i].post_data[j].id_msg;
+					for (var j = 0, postlen = data[i].post_data.length; j < postlen; j++)
+					{
+						msgUrl = elk_scripturl + '?topic=' + data[i].post_data[j].id_topic + '.msg' + data[i].post_data[j].id_msg;
 
 						htmlContent += '' +
 							'   <div class="content forumposts">' +
@@ -639,8 +704,10 @@
 			},
 
 			// Attach the toggle class to each hidden div
-			createCollapsibleContent = function(count, expand_txt, collapse_txt, prefix) {
-				for (var section = 0; section < count; section++) {
+			createCollapsibleContent = function (count, expand_txt, collapse_txt, prefix)
+			{
+				for (var section = 0; section < count; section++)
+				{
 					new elk_Toggle({
 						bToggleEnabled: true,
 						bCurrentlyCollapsed: true,
@@ -667,7 +734,8 @@
 				}
 			},
 
-			genericErrorMessage = function (params) {
+			genericErrorMessage = function (params)
+			{
 				$('.like_post_stats_error').html(params.errorMsg).show();
 				hideSpinnerOverlay();
 			};
@@ -681,9 +749,12 @@
 	this.likePostStats = likePostStats;
 
 	// Setup the menu to act as ajax tabs
-	$(function() {
-		$(".like_post_stats_menu a").on("click", function (e) {
-			if (e) {
+	$(function ()
+	{
+		$(".like_post_stats_menu a").on("click", function (e)
+		{
+			if (e)
+			{
 				e.preventDefault();
 				e.stopPropagation();
 			}

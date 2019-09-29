@@ -4,7 +4,7 @@
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause (see accompanying LICENSE.txt file)
  *
  * This file contains code covered by:
- * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * copyright: 2011 Simple Machines (http://www.simplemachines.org)
  *
  * @version 2.0 dev
  */
@@ -13,13 +13,15 @@
  * This file contains javascript associated with the captcha visual verification stuffs.
  */
 
-(function($) {
-	$.fn.Elk_Captcha = function(options) {
+(function ($)
+{
+	$.fn.Elk_Captcha = function (options)
+	{
 		var settings = {
 			// By default the letter count is five.
-			'letterCount' : 5,
-			'uniqueID' : '',
-			'imageURL' : '',
+			'letterCount': 5,
+			'uniqueID': '',
+			'imageURL': '',
 			'refreshevent': 'click',
 			'playevent': 'click',
 			'admin': false
@@ -27,13 +29,15 @@
 
 		settings = $.extend(settings, options);
 
-		return this.each(function() {
+		return this.each(function ()
+		{
 			$this = $(this);
 
 			if ($this.data('type') == 'sound')
 			{
 				// Maybe a voice is here to spread light?
-				$this.on(settings.playevent, function(e) {
+				$this.on(settings.playevent, function (e)
+				{
 					e.preventDefault();
 
 					// Don't follow the link if the popup worked, which it would have done!
@@ -41,7 +45,9 @@
 					if (!popupFailed)
 					{
 						if (is_ie && e.cancelBubble)
+						{
 							e.cancelBubble = true;
+						}
 						else if (e.stopPropagation)
 						{
 							e.stopPropagation();
@@ -54,7 +60,8 @@
 			}
 			else
 			{
-				$this.on(settings.refreshevent, function(e) {
+				$this.on(settings.refreshevent, function (e)
+				{
 					e.preventDefault();
 
 					var uniqueID = settings.uniqueID ? '_' + settings.uniqueID : '',
@@ -84,4 +91,4 @@
 			}
 		});
 	};
-})( jQuery );
+})(jQuery);

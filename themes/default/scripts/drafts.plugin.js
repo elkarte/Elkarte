@@ -7,18 +7,19 @@
  */
 
 /**
- *
  * This file contains javascript associated with the drafts auto function as it
  * relates to an sceditor invocation
  */
 
-(function($, window, document) {
+(function ($, window, document)
+{
 	'use strict';
 
 	// Editor instance
 	var editor;
 
-	function Elk_Drafts(options) {
+	function Elk_Drafts(options)
+	{
 		// All the passed options and defaults are loaded to the opts object
 		this.opts = $.extend({}, this.defaults, options);
 
@@ -33,21 +34,28 @@
 	 * - updates the display to show we are saving
 	 * - loads the form data and makes the ajax request
 	 */
-	Elk_Drafts.prototype.draftSave = function() {
+	Elk_Drafts.prototype.draftSave = function ()
+	{
 		// No change since the last save, or form submitted
 		if (!this.opts._bCheckDraft || elk_formSubmitted || (typeof disableDrafts !== 'undefined' && disableDrafts))
+		{
 			return false;
+		}
 
 		// Still saving the last one or other?
 		if (this.opts._bInDraftMode === true)
+		{
 			this.draftCancel();
+		}
 
 		// Get the editor text, either from sceditor or from the quicktext textarea
 		var sPostdata = editor.val();
 
 		// Nothing to save?
 		if (isEmptyText(sPostdata))
+		{
 			return false;
+		}
 
 		// Flag that we are saving a draft
 		document.getElementById('throbber').style.display = 'inline';
@@ -74,22 +82,28 @@
 	 * - updates the display to show we are saving
 	 * - loads the form data and makes the ajax request
 	 */
-	Elk_Drafts.prototype.draftPMSave = function()
+	Elk_Drafts.prototype.draftPMSave = function ()
 	{
 		// No change since the last PM save, or elk is doing its thing
 		if (!this.opts._bCheckDraft || elk_formSubmitted)
+		{
 			return false;
+		}
 
 		// Still saving the last one or some other?
 		if (this.opts._bInDraftMode === true)
+		{
 			this.draftCancel();
+		}
 
 		// Get the editor data
 		var sPostdata = editor.val();
 
 		// Nothing to save
 		if (isEmptyText(sPostdata))
+		{
 			return false;
+		}
 
 		// Flag that we are saving the PM
 		document.getElementById('throbber').style.display = 'inline';
@@ -137,7 +151,7 @@
 	 * @param {string[]} post
 	 * @param {string} action
 	 */
-	Elk_Drafts.prototype.draftAjax = function(post, action)
+	Elk_Drafts.prototype.draftAjax = function (post, action)
 	{
 		// Send in the request to save the data
 		$.ajax({
@@ -147,32 +161,36 @@
 			data: post,
 			context: this
 		})
-		.done(function(data, textStatus, jqXHR) {
-			// If it is not valid then move on
-			if (textStatus === 'success' && $(data).find("draft").length !== 0)
+			.done(function (data, textStatus, jqXHR)
 			{
-				// Grab the returned draft id and saved time from the response
-				this.opts._sCurDraftId = $(data).find("draft").attr('id');
-				this.opts._sLastSaved = $(data).find("draft").text();
+				// If it is not valid then move on
+				if (textStatus === 'success' && $(data).find("draft").length !== 0)
+				{
+					// Grab the returned draft id and saved time from the response
+					this.opts._sCurDraftId = $(data).find("draft").attr('id');
+					this.opts._sLastSaved = $(data).find("draft").text();
 
-				// Update the form to show we finished, if the id is not set, then set it
-				document.getElementById(this.opts.sLastID).value = this.opts._sCurDraftId;
-				document.getElementById(this.opts.sLastNote).innerHTML = this.opts._sLastSaved;
+					// Update the form to show we finished, if the id is not set, then set it
+					document.getElementById(this.opts.sLastID).value = this.opts._sCurDraftId;
+					document.getElementById(this.opts.sLastNote).innerHTML = this.opts._sLastSaved;
 
-				// Hide the saved draft successbox in the event they pressed the save draft button at some point
-				var draft_section = document.getElementById('draft_section');
-				if (draft_section)
-					draft_section.style.display = 'none';
-			}
-		})
-		.always(function() {
-			// No matter what, we clear the saving indicator
-			this.opts._bInDraftMode = false;
-			document.getElementById('throbber').style.display = 'none';
+					// Hide the saved draft successbox in the event they pressed the save draft button at some point
+					var draft_section = document.getElementById('draft_section');
+					if (draft_section)
+					{
+						draft_section.style.display = 'none';
+					}
+				}
+			})
+			.always(function ()
+			{
+				// No matter what, we clear the saving indicator
+				this.opts._bInDraftMode = false;
+				document.getElementById('throbber').style.display = 'none';
 
-			// Set the flag off so we don't save again (until a keypress indicates they changed the text)
-			this.opts._bCheckDraft = false;
-		});
+				// Set the flag off so we don't save again (until a keypress indicates they changed the text)
+				this.opts._bCheckDraft = false;
+			});
 	};
 
 	/**
@@ -182,7 +200,7 @@
 	 *
 	 * @param {string} sField name of the form elements we are getting
 	 */
-	Elk_Drafts.prototype.draftGetRecipient = function(sField)
+	Elk_Drafts.prototype.draftGetRecipient = function (sField)
 	{
 		var oRecipient = document.forms.pmFolder.elements[sField],
 			aRecipient = [];
@@ -191,7 +209,9 @@
 		{
 			// Just one recipient
 			if ('value' in oRecipient)
+			{
 				aRecipient.push(parseInt(oRecipient.value));
+			}
 			else
 			{
 				// Or many !
@@ -206,7 +226,8 @@
 	/**
 	 * If another auto save came in with one still pending we cancel out
 	 */
-	Elk_Drafts.prototype.draftCancel = function() {
+	Elk_Drafts.prototype.draftCancel = function ()
+	{
 		this.opts._bInDraftMode = false;
 		document.getElementById('throbber').style.display = 'none';
 	};
@@ -214,16 +235,23 @@
 	/**
 	 * Starts the autosave timer for the current instance of the elk_draft object
 	 */
-	Elk_Drafts.prototype.startSaver = function() {
+	Elk_Drafts.prototype.startSaver = function ()
+	{
 		var oInstance = this;
 		if (this.opts.bPM)
-			this.opts._interval_id = setInterval(function() {
+		{
+			this.opts._interval_id = setInterval(function ()
+			{
 				oInstance.draftPMSave();
 			}, this.opts.iFreq);
+		}
 		else
-			this.opts._interval_id = setInterval(function() {
+		{
+			this.opts._interval_id = setInterval(function ()
+			{
 				oInstance.draftSave();
 			}, this.opts.iFreq);
+		}
 	};
 
 	/**
@@ -231,17 +259,20 @@
 	 *
 	 * - Used to prevent saving an auto draft on input button (post, save, etc)
 	 */
-	Elk_Drafts.prototype.formCheck = function() {
+	Elk_Drafts.prototype.formCheck = function ()
+	{
 		var oInstance = this,
 			formID = $('#' + this.opts.sTextareaID).closest("form").attr('id');
 
 		// Prevent autosave on post/save selection by mouse or keyboard
-		var $_form_submitt =  $('#' + formID + ' .button_submit');
-		$_form_submitt.on('mousedown', oInstance, function() {
+		var $_form_submitt = $('#' + formID + ' .button_submit');
+		$_form_submitt.on('mousedown', oInstance, function ()
+		{
 			oInstance.opts._bInDraftMode = true;
 		});
 
-		$_form_submitt.on('keydown', oInstance, function() {
+		$_form_submitt.on('keydown', oInstance, function ()
+		{
 			oInstance.opts._bInDraftMode = true;
 		});
 	};
@@ -292,14 +323,16 @@
 	 *  - Called from the editor as a plugin
 	 *  - Monitors events so we control the elk_draft autosaver (on/off/change)
 	 */
-	$.sceditor.plugins.draft = function() {
+	$.sceditor.plugins.draft = function ()
+	{
 		var base = this,
 			oDrafts;
 
 		/**
 		 * Initialize, called when sceditor starts and initializes plugins
 		 */
-		base.init = function() {
+		base.init = function ()
+		{
 			// Grab this instance for use use in oDrafts
 			editor = this;
 
@@ -310,16 +343,21 @@
 
 			// Start the autosave timer
 			if (oDrafts.opts.iFreq > 0)
+			{
 				oDrafts.startSaver();
+			}
 		};
 
 		/**
 		 * Used to ensure the autosave timer is running when the editor window
 		 * (wiz or source) re-gains focus
 		 */
-		base.signalFocusEvent = function() {
+		base.signalFocusEvent = function ()
+		{
 			if (oDrafts.opts._interval_id === "")
+			{
 				oDrafts.startSaver();
+			}
 		};
 
 		/**
@@ -327,20 +365,30 @@
 		 * - Turns off the autosave timer when the user moves the focus away
 		 * - Saves the current content before turning off the autosaver
 		 */
-		base.signalBlurEvent = function() {
+		base.signalBlurEvent = function ()
+		{
 			// If we are not already in a save action, save the draft
 			if (oDrafts.opts._bInDraftMode === true)
+			{
 				oDrafts.draftCancel();
-			else {
+			}
+			else
+			{
 				// Lets save the draft then
 				if (oDrafts.opts.bPM)
+				{
 					oDrafts.draftPMSave();
+				}
 				else
+				{
 					oDrafts.draftSave();
+				}
 
 				// Turn it off the autosave if we can, mark it as such
 				if (oDrafts.opts._interval_id !== "")
+				{
 					clearInterval(oDrafts.opts._interval_id);
+				}
 
 				oDrafts.opts._interval_id = "";
 			}
@@ -352,10 +400,13 @@
 		 * the editor loses focus, something is pasted/inserted and when the user
 		 * stops typing for 1.5s or press space/return
 		 */
-		base.signalValuechangedEvent = function(oEvent) {
+		base.signalValuechangedEvent = function (oEvent)
+		{
 			// Prevent autosave when using the tab key to navigate to the submit buttons
 			if (oEvent.keyCode === 9)
+			{
 				oDrafts.opts._bInDraftMode = true;
+			}
 
 			oDrafts.opts._bCheckDraft = true;
 		};
