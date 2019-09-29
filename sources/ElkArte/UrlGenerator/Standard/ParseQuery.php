@@ -16,6 +16,11 @@ namespace ElkArte\UrlGenerator\Standard;
 
 use ElkArte\UrlGenerator\AbstractParseQuery;
 
+/**
+ * Class ParseQuery
+ *
+ * @package ElkArte\UrlGenerator\Standard
+ */
 class ParseQuery extends AbstractParseQuery
 {
 	/**

@@ -13,10 +13,12 @@
 
 namespace ElkArte\Database\Mysqli;
 
+use ElkArte\Database\AbstractResult;
+
 /**
  * SQL database class, implements database class to control mysql functions
  */
-class Result extends \ElkArte\Database\AbstractResult
+class Result extends AbstractResult
 {
 	/**
 	 * {@inheritDoc}

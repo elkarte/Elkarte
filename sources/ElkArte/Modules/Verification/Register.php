@@ -8,7 +8,7 @@
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause (see accompanying LICENSE.txt file)
  *
  * This file contains code covered by:
- * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * copyright: 2011 Simple Machines (http://www.simplemachines.org)
  *
  * @version 2.0 dev
  *
@@ -16,17 +16,21 @@
 
 namespace ElkArte\Modules\Verification;
 
+use ElkArte\EventManager;
+use ElkArte\Modules\AbstractModule;
+use ElkArte\VerificationControls\VerificationControlsIntegrate;
+
 /**
  * Class \ElkArte\Modules\Verification\Register
  *
  * Adds Visual Verification controls to the Registration page.
  */
-class Register extends \ElkArte\Modules\AbstractModule
+class Register extends AbstractModule
 {
 	/**
 	 * {@inheritdoc }
 	 */
-	public static function hooks(\ElkArte\EventManager $eventsManager)
+	public static function hooks(EventManager $eventsManager)
 	{
 		global $modSettings;
 
@@ -61,12 +65,14 @@ class Register extends \ElkArte\Modules\AbstractModule
 			$verificationOptions = array(
 				'id' => 'register',
 			);
-			$context['visual_verification'] = \ElkArte\VerificationControls\VerificationControlsIntegrate::create($verificationOptions);
+			$context['visual_verification'] = VerificationControlsIntegrate::create($verificationOptions);
 			$context['visual_verification_id'] = $verificationOptions['id'];
 		}
 		// Otherwise we have nothing to show.
 		else
+		{
 			$context['visual_verification'] = false;
+		}
 	}
 
 	/**
@@ -83,12 +89,14 @@ class Register extends \ElkArte\Modules\AbstractModule
 		$verificationOptions = array(
 			'id' => 'register',
 		);
-		$context['visual_verification'] = \ElkArte\VerificationControls\VerificationControlsIntegrate::create($verificationOptions, true);
+		$context['visual_verification'] = VerificationControlsIntegrate::create($verificationOptions, true);
 
 		if (is_array($context['visual_verification']))
 		{
 			foreach ($context['visual_verification'] as $error)
+			{
 				$reg_errors->addError($error);
+			}
 		}
 	}
 
@@ -103,12 +111,14 @@ class Register extends \ElkArte\Modules\AbstractModule
 		$verificationOptions = array(
 			'id' => 'contactform',
 		);
-		$context['require_verification'] = \ElkArte\VerificationControls\VerificationControlsIntegrate::create($verificationOptions, true);
+		$context['require_verification'] = VerificationControlsIntegrate::create($verificationOptions, true);
 
 		if (is_array($context['require_verification']))
 		{
 			foreach ($context['require_verification'] as $error)
+			{
 				$context['errors'][] = $txt['error_' . $error];
+			}
 		}
 	}
 
@@ -122,7 +132,7 @@ class Register extends \ElkArte\Modules\AbstractModule
 		$verificationOptions = array(
 			'id' => 'contactform',
 		);
-		$context['require_verification'] = \ElkArte\VerificationControls\VerificationControlsIntegrate::create($verificationOptions);
+		$context['require_verification'] = VerificationControlsIntegrate::create($verificationOptions);
 		$context['visual_verification_id'] = $verificationOptions['id'];
 	}
 }

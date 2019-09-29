@@ -8,12 +8,13 @@
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause (see accompanying LICENSE.txt file)
  *
  * This file contains code covered by:
- * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * copyright: 2011 Simple Machines (http://www.simplemachines.org)
  *
  * @version 2.0 dev
  *
  */
 
+use ElkArte\Cache\Cache;
 use ElkArte\User;
 
 /**
@@ -35,7 +36,9 @@ function writeLog($force = false)
 		if ($topic)
 		{
 			if (isset($_SESSION['last_topic_id']) && $_SESSION['last_topic_id'] == $topic)
+			{
 				$force = false;
+			}
 			$_SESSION['last_topic_id'] = $topic;
 		}
 	}
@@ -49,7 +52,9 @@ function writeLog($force = false)
 
 	// Don't mark them as online more than every so often.
 	if (!empty($_SESSION['log_time']) && $_SESSION['log_time'] >= (time() - 8) && !$force)
+	{
 		return;
+	}
 
 	if (!empty($modSettings['who_enabled']))
 	{
@@ -57,18 +62,22 @@ function writeLog($force = false)
 
 		// In the case of a dlattach action, session_var may not be set.
 		if (!isset($context['session_var']))
+		{
 			$context['session_var'] = $_SESSION['session_var'];
+		}
 
 		unset($serialized['sesc'], $serialized[$context['session_var']]);
 		$serialized = serialize($serialized);
 	}
 	else
+	{
 		$serialized = '';
+	}
 
 	// Guests use 0, members use their session ID.
 	$session_id = User::$info->is_guest ? 'ip' . User::$info->ip : session_id();
 
-	$cache = \ElkArte\Cache\Cache::instance();
+	$cache = Cache::instance();
 
 	// Grab the last all-of-Elk-specific log_online deletion time.
 	$do_delete = $cache->get('log_online-update', 30) < time() - 30;
@@ -89,18 +98,24 @@ function writeLog($force = false)
 		updateLogOnline($session_id, $serialized);
 	}
 	else
+	{
 		$_SESSION['log_time'] = 0;
+	}
 
 	// Otherwise, we have to delete and insert.
 	if (empty($_SESSION['log_time']))
+	{
 		insertdeleteLogOnline($session_id, $serialized, $do_delete);
+	}
 
 	// Mark your session as being logged.
 	$_SESSION['log_time'] = time();
 
 	// Well, they are online now.
 	if (empty($_SESSION['timeOnlineUpdated']))
+	{
 		$_SESSION['timeOnlineUpdated'] = time();
+	}
 
 	// Set their login time, if not already done within the last minute.
 	if (ELK != 'SSI' && !empty(User::$info->last_login) && User::$info->last_login < time() - 60)
@@ -110,15 +125,17 @@ function writeLog($force = false)
 
 		// Don't count longer than 15 minutes.
 		if (time() - $_SESSION['timeOnlineUpdated'] > 60 * 15)
+		{
 			$_SESSION['timeOnlineUpdated'] = time();
+		}
 
-		\ElkArte\User::$settings->updateTotalTimeLoggedIn($_SESSION['timeOnlineUpdated']);
+		User::$settings->updateTotalTimeLoggedIn($_SESSION['timeOnlineUpdated']);
 		require_once(SUBSDIR . '/Members.subs.php');
-		updateMemberData(User::$info->id, array('last_login' => time(), 'member_ip' => User::$info->ip, 'member_ip2' => $req->ban_ip(), 'total_time_logged_in' => \ElkArte\User::$settings['total_time_logged_in']));
+		updateMemberData(User::$info->id, array('last_login' => time(), 'member_ip' => User::$info->ip, 'member_ip2' => $req->ban_ip(), 'total_time_logged_in' => User::$settings['total_time_logged_in']));
 
 		if ($cache->levelHigherThan(1))
 		{
-			$cache->put('user_settings-' . User::$info->id, \ElkArte\User::$settings->toArray(), 60);
+			$cache->put('user_settings-' . User::$info->id, User::$settings->toArray(), 60);
 		}
 
 		User::$info->total_time_logged_in += time() - $_SESSION['timeOnlineUpdated'];
@@ -157,8 +174,10 @@ function logLastDatabaseError()
 			// Oops. maybe we have no more disk space left, or some other troubles, troubles...
 			// Copy the file back and run for your life!
 			@copy(BOARDDIR . '/db_last_error_bak.txt', BOARDDIR . '/db_last_error.txt');
+
 			return false;
 		}
+
 		return true;
 	}
 
@@ -185,12 +204,18 @@ function trackStats($stats = array())
 	static $cache_stats = array();
 
 	if (empty($modSettings['trackStats']))
+	{
 		return false;
+	}
 
 	if (!empty($stats))
+	{
 		return $cache_stats = array_merge($cache_stats, $stats);
+	}
 	elseif (empty($cache_stats))
+	{
 		return false;
+	}
 
 	$setStringUpdate = array();
 	$insert_keys = array();
@@ -205,9 +230,13 @@ function trackStats($stats = array())
 		$setStringUpdate[] = $field . ' = ' . ($change === '+' ? $field . ' + 1' : '{int:' . $field . '}');
 
 		if ($change === '+')
+		{
 			$cache_stats[$field] = 1;
+		}
 		else
+		{
 			$update_parameters[$field] = $change;
+		}
 
 		$insert_keys[$field] = 'int';
 	}
@@ -228,22 +257,25 @@ function trackStats($stats = array())
  *
  * - You should use {@link logActions()} instead if you have multiple entries to add
  *
- * @example logAction('remove', array('starter' => $id_member_started));
- *
  * @param string $action The action to log
  * @param string[] $extra = array() An array of extra data
  * @param string $log_type options: 'moderate', 'admin', ...etc.
  *
  * @return int
+ * @example logAction('remove', array('starter' => $id_member_started));
+ *
  */
 function logAction($action, $extra = array(), $log_type = 'moderate')
 {
 	// Set up the array and pass through to logActions
-	return logActions(array(array(
-		'action' => $action,
-		'log_type' => $log_type,
-		'extra' => $extra,
-	)));
+	return logActions(array(
+						array(
+								'action' => $action,
+								'log_type' => $log_type,
+								'extra' => $extra,
+							)
+						)
+					);
 }
 
 /**
@@ -277,38 +309,52 @@ function logActions($logs)
 
 	// No point in doing anything, if the log isn't even enabled.
 	if (empty($modSettings['modlog_enabled']))
+	{
 		return false;
+	}
 
 	foreach ($logs as $log)
 	{
 		if (!isset($log_types[$log['log_type']]))
+		{
 			return false;
+		}
 
 		// Do we have something to log here, after all?
 		if (!is_array($log['extra']))
+		{
 			trigger_error('logActions(): data is not an array with action \'' . $log['action'] . '\'', E_USER_NOTICE);
+		}
 
 		// Pull out the parts we want to store separately, but also make sure that the data is proper
 		if (isset($log['extra']['topic']))
 		{
 			if (!is_numeric($log['extra']['topic']))
+			{
 				trigger_error('logActions(): data\'s topic is not a number', E_USER_NOTICE);
+			}
 
 			$topic_id = empty($log['extra']['topic']) ? 0 : (int) $log['extra']['topic'];
 			unset($log['extra']['topic']);
 		}
 		else
+		{
 			$topic_id = 0;
+		}
 
 		if (isset($log['extra']['message']))
 		{
 			if (!is_numeric($log['extra']['message']))
+			{
 				trigger_error('logActions(): data\'s message is not a number', E_USER_NOTICE);
+			}
 			$msg_id = empty($log['extra']['message']) ? 0 : (int) $log['extra']['message'];
 			unset($log['extra']['message']);
 		}
 		else
+		{
 			$msg_id = 0;
+		}
 
 		// @todo cache this?
 		// Is there an associated report on this?
@@ -324,23 +370,31 @@ function logActions($logs)
 		}
 
 		if (isset($log['extra']['member']) && !is_numeric($log['extra']['member']))
+		{
 			trigger_error('logActions(): data\'s member is not a number', E_USER_NOTICE);
+		}
 
 		if (isset($log['extra']['board']))
 		{
 			if (!is_numeric($log['extra']['board']))
+			{
 				trigger_error('logActions(): data\'s board is not a number', E_USER_NOTICE);
+			}
 
 			$board_id = empty($log['extra']['board']) ? 0 : (int) $log['extra']['board'];
 			unset($log['extra']['board']);
 		}
 		else
+		{
 			$board_id = 0;
+		}
 
 		if (isset($log['extra']['board_to']))
 		{
 			if (!is_numeric($log['extra']['board_to']))
+			{
 				trigger_error('logActions(): data\'s board_to is not a number', E_USER_NOTICE);
+			}
 
 			if (empty($board_id))
 			{
@@ -350,9 +404,13 @@ function logActions($logs)
 		}
 
 		if (isset($log['extra']['member_affected']))
+		{
 			$memID = $log['extra']['member_affected'];
+		}
 		else
+		{
 			$memID = User::$info->id;
+		}
 
 		$inserts[] = array(
 			time(), $log_types[$log['log_type']], $memID, User::$info->ip, $log['action'],

@@ -13,15 +13,18 @@
 
 namespace ElkArte\Controller;
 
+use ElkArte\AbstractController;
+
 /**
  * This class handles a part of the actions to mark boards, topics, or replies,
  * as read/unread.
  */
-class MarkRead extends \ElkArte\AbstractController
+class MarkRead extends AbstractController
 {
 	/**
 	 * String used to redirect user to the correct boards when marking unread
 	 * ajax-ively
+	 *
 	 * @var string
 	 */
 	private $_querystring_board_limits = '';
@@ -29,6 +32,7 @@ class MarkRead extends \ElkArte\AbstractController
 	/**
 	 * String used to remember user's sorting options when marking unread
 	 * ajax-ively
+	 *
 	 * @var string
 	 */
 	private $_querystring_sort_limits = '';
@@ -125,7 +129,9 @@ class MarkRead extends \ElkArte\AbstractController
 				return;
 			}
 			else
+			{
 				obExit(false);
+			}
 		}
 
 		$this->_dispatch();
@@ -150,7 +156,9 @@ class MarkRead extends \ElkArte\AbstractController
 		}
 		// No need to do anything, just die :'(
 		else
+		{
 			obExit(false);
+		}
 	}
 
 	/**
@@ -211,12 +219,16 @@ class MarkRead extends \ElkArte\AbstractController
 
 		$markRead = array();
 		foreach ($topics as $id_topic)
+		{
 			$markRead[] = array($this->user->id, (int) $id_topic, $modSettings['maxMsgID'], (int) !empty($logged_topics[$id_topic]));
+		}
 
 		markTopicsRead($markRead, true);
 
 		if (isset($_SESSION['topicseen_cache']))
+		{
 			$_SESSION['topicseen_cache'] = array();
+		}
 
 		return 'action=unreadreplies';
 	}
@@ -242,17 +254,25 @@ class MarkRead extends \ElkArte\AbstractController
 		{
 			// If they read the whole topic, go back to the beginning.
 			if ($topic_msg_id >= $topicinfo['id_last_msg'])
+			{
 				$earlyMsg = 0;
+			}
 			// If they want to mark the whole thing read, same.
 			elseif ($topic_msg_id <= $topicinfo['id_first_msg'])
+			{
 				$earlyMsg = 0;
+			}
 			// Otherwise, get the latest message before the named one.
 			else
+			{
 				$earlyMsg = previousMessage($topic_msg_id, $topic);
+			}
 		}
 		// Marking read from first page?  That's the whole topic.
 		elseif ($this->_req->query->start == 0)
+		{
 			$earlyMsg = 0;
+		}
 		else
 		{
 			list ($earlyMsg) = messageAt((int) $this->_req->query->start, $topic);
@@ -291,7 +311,9 @@ class MarkRead extends \ElkArte\AbstractController
 		}
 
 		if (!empty($board))
+		{
 			$boards[] = (int) $board;
+		}
 
 		if (isset($this->_req->query->children) && !empty($boards))
 		{
@@ -302,7 +324,9 @@ class MarkRead extends \ElkArte\AbstractController
 		$boards = array_keys(boardsPosts($boards, $categories));
 
 		if (empty($boards))
+		{
 			return '';
+		}
 
 		// Mark boards as read.
 		markBoardsRead($boards, isset($this->_req->query->unread), true);
@@ -310,7 +334,9 @@ class MarkRead extends \ElkArte\AbstractController
 		foreach ($boards as $b)
 		{
 			if (isset($_SESSION['topicseen_cache'][$b]))
+			{
 				$_SESSION['topicseen_cache'][$b] = array();
+			}
 		}
 
 		$this->_querystring_board_limits = $this->_req->getQuery('sa') === 'board' ? ['boards' => implode(',', $boards), 'start' => '%d'] : [];
@@ -340,19 +366,29 @@ class MarkRead extends \ElkArte\AbstractController
 			// Find all boards with the parents in the board list
 			$boards_to_add = accessibleBoards(null, $boards);
 			if (!empty($boards_to_add))
+			{
 				markBoardsRead($boards_to_add);
+			}
 
 			if (empty($board))
+			{
 				return '';
+			}
 			else
+			{
 				return 'board=' . $board . '.0';
+			}
 		}
 		else
 		{
 			if (empty($board_info['parent']))
+			{
 				return '';
+			}
 			else
+			{
 				return 'board=' . $board_info['parent'] . '.0';
+			}
 		}
 	}
 }

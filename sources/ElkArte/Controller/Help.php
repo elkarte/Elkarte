@@ -8,7 +8,7 @@
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause (see accompanying LICENSE.txt file)
  *
  * This file contains code covered by:
- * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * copyright: 2011 Simple Machines (http://www.simplemachines.org)
  *
  * @version 2.0 dev
  *
@@ -16,17 +16,22 @@
 
 namespace ElkArte\Controller;
 
+use ElkArte\AbstractController;
+use ElkArte\Exceptions\Exception;
+use ElkArte\Hooks;
+use ElkArte\Util;
+
 /**
  * Handles the help page and boxes
  */
-class Help extends \ElkArte\AbstractController
+class Help extends AbstractController
 {
 	/**
 	 * Pre Dispatch, called before other methods.  Loads integration hooks.
 	 */
 	public function pre_dispatch()
 	{
-		\ElkArte\Hooks::instance()->loadIntegrationsSettings();
+		Hooks::instance()->loadIntegrationsSettings();
 	}
 
 	/**
@@ -101,19 +106,25 @@ class Help extends \ElkArte\AbstractController
 		global $txt, $helptxt, $context;
 
 		if (!isset($this->_req->query->help) || !is_string($this->_req->query->help))
-			throw new \ElkArte\Exceptions\Exception('no_access', false);
+		{
+			throw new Exception('no_access', false);
+		}
 
 		if (!isset($helptxt))
+		{
 			$helptxt = array();
+		}
 
-		$help_str = \ElkArte\Util::htmlspecialchars($this->_req->query->help);
+		$help_str = Util::htmlspecialchars($this->_req->query->help);
 
 		// Load the admin help language file and template.
 		theme()->getTemplates()->loadLanguageFile('Help');
 
 		// Load permission specific help
 		if (substr($help_str, 0, 14) === 'permissionhelp')
+		{
 			theme()->getTemplates()->loadLanguageFile('ManagePermissions');
+		}
 
 		// Load our template
 		theme()->getTemplates()->load('Help');
@@ -135,12 +146,18 @@ class Help extends \ElkArte\AbstractController
 		foreach ($helps as $help)
 		{
 			if (isset($helptxt[$help]))
+			{
 				$context['help_text'] .= $helptxt[$help];
+			}
 			elseif (isset($txt[$help]))
+			{
 				$context['help_text'] .= $txt[$help];
+			}
 			else
 				// nothing :(
+			{
 				$context['help_text'] .= $help;
+			}
 		}
 
 		// Link to the forum URL, and include session id.

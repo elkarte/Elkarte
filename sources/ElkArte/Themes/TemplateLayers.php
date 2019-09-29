@@ -50,6 +50,21 @@ class TemplateLayers extends Priority
 	}
 
 	/**
+	 * Reverse the layers order
+	 *
+	 * @return array the reverse ordered layers
+	 */
+	public function reverseLayers()
+	{
+		if ($this->_sorted_entities === null)
+		{
+			$this->prepareContext();
+		}
+
+		return array_reverse($this->_sorted_entities);
+	}
+
+	/**
 	 * Prepares the layers so that they are usable by the template
 	 * The function sorts the layers according to the priority and saves the
 	 * result in $_sorted_entities
@@ -79,21 +94,6 @@ class TemplateLayers extends Priority
 		$this->_sorted_entities = array_keys($all_layers);
 
 		return $this->_sorted_entities;
-	}
-
-	/**
-	 * Reverse the layers order
-	 *
-	 * @return array the reverse ordered layers
-	 */
-	public function reverseLayers()
-	{
-		if ($this->_sorted_entities === null)
-		{
-			$this->prepareContext();
-		}
-
-		return array_reverse($this->_sorted_entities);
 	}
 
 	/**

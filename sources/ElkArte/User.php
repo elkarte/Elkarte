@@ -6,7 +6,7 @@
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause (see accompanying LICENSE.txt file)
  *
  * This file contains code covered by:
- * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * copyright: 2011 Simple Machines (http://www.simplemachines.org)
  *
  * @version 2.0 dev
  *
@@ -21,6 +21,22 @@ use ElkArte\Cache\Cache;
  */
 class User
 {
+	/**
+	 * Contains data regarding the user in a form that may be useful in the code
+	 * Basically the former $user_info
+	 *
+	 * @var \ElkArte\ValuesContainer
+	 */
+	public static $info = null;
+
+	/**
+	 * Contains the data read from the db.
+	 * Read-only by means of ValuesContainerReadOnly
+	 *
+	 * @var \ElkArte\ValuesContainerReadOnly
+	 */
+	public static $settings = null;
+
 	/**
 	 * The user object
 	 *
@@ -41,21 +57,6 @@ class User
 	 * @var string
 	 */
 	protected static $session_password = '';
-
-	/**
-	 * Contains data regarding the user in a form that may be useful in the code
-	 * Basically the former $user_info
-	 *
-	 * @var \ElkArte\ValuesContainer
-	 */
-	public static $info = null;
-
-	/**
-	 * Contains the data read from the db.
-	 * Read-only by means of ValuesContainerReadOnly
-	 * @var \ElkArte\ValuesContainerReadOnly
-	 */
-	public static $settings = null;
 
 	/**
 	 * Load all the important user information.
@@ -86,39 +87,15 @@ class User
 	}
 
 	/**
-	 * Reload all the important user information into the static variables
-	 * based on the \ElkArte\UserSettings object passed to it
-	 *
-	 * @param \ElkArte\UserSettingsLoader $user An user
-	 * @param bool $compat_mode if true sets the deprecated $user_info global
-	 */
-	public static function reloadByUser(UserSettingsLoader $user, $compat_mode = false)
-	{
-		self::$instance = $user;
-		self::$settings = self::$instance->getSettings();
-		self::$info = self::$instance->getInfo();
-		if ($compat_mode)
-		{
-			global $user_info;
-			$user_info = User::$info;
-		}
-	}
-
-	public static function logOutUser($compat_mode = false)
-	{
-		self::$instance->loadUserById(0, true, '');
-		self::reloadByUser(self::$instance, $compat_mode);
-	}
-
-	/**
 	 * Tests any hook set to integrate_verify_user to set users
 	 * according to alternative validations
+	 *
 	 * @event integrate_verify_user allow for integration to verify a user
 	 */
 	protected static function loadFromIntegration()
 	{
 		// Check first the integration, then the cookie, and last the session.
-		if (count($integration_ids = \ElkArte\Hooks::instance()->hook('integrate_verify_user')) > 0)
+		if (count($integration_ids = Hooks::instance()->hook('integrate_verify_user')) > 0)
 		{
 			foreach ($integration_ids as $integration_id)
 			{
@@ -126,15 +103,18 @@ class User
 				if ($integration_id > 0)
 				{
 					self::$id = $integration_id;
+
 					return true;
 				}
 			}
 		}
+
 		return false;
 	}
 
 	/**
 	 * Reads data from the cookie to load the user identity
+	 *
 	 * @param string $user_agent the Browser user agent, used to do some checkes
 	 *               based on the session data to reduce spamming and hacking
 	 */
@@ -162,6 +142,31 @@ class User
 			});
 
 			self::$id = !empty($id) && strlen(self::$session_password) === 64 && $login_span > time() ? (int) $id : 0;
+		}
+	}
+
+	public static function logOutUser($compat_mode = false)
+	{
+		self::$instance->loadUserById(0, true, '');
+		self::reloadByUser(self::$instance, $compat_mode);
+	}
+
+	/**
+	 * Reload all the important user information into the static variables
+	 * based on the \ElkArte\UserSettings object passed to it
+	 *
+	 * @param \ElkArte\UserSettingsLoader $user An user
+	 * @param bool $compat_mode if true sets the deprecated $user_info global
+	 */
+	public static function reloadByUser(UserSettingsLoader $user, $compat_mode = false)
+	{
+		self::$instance = $user;
+		self::$settings = self::$instance->getSettings();
+		self::$info = self::$instance->getInfo();
+		if ($compat_mode)
+		{
+			global $user_info;
+			$user_info = User::$info;
 		}
 	}
 }

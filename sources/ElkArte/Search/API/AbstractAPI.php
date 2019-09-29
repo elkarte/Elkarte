@@ -12,6 +12,9 @@
 
 namespace ElkArte\Search\API;
 
+use ElkArte\Search\SearchArray;
+use ElkArte\Search\WeightFactors;
+
 /**
  * Abstract class that defines the methods any search API shall implement
  * to properly work with ElkArte
@@ -22,126 +25,147 @@ abstract class AbstractAPI
 {
 	/**
 	 * This is the last version of ElkArte that this was tested on, to protect against API changes.
+	 *
 	 * @var string
 	 */
 	public $version_compatible;
 
 	/**
 	 * This won't work with versions of ElkArte less than this.
+	 *
 	 * @var string
 	 */
 	public $min_elk_version;
 
 	/**
 	 * Standard search is supported by default.
+	 *
 	 * @var boolean
 	 */
 	public $is_supported;
 
 	/**
 	 * Any word excluded from the search?
+	 *
 	 * @var array
 	 */
 	protected $_excludedWords = array();
 
 	/**
 	 * Number of hits
+	 *
 	 * @var int
 	 */
 	protected $_num_results = 0;
 
 	/**
 	 * What words are banned?
+	 *
 	 * @var array
 	 */
 	protected $bannedWords = array();
 
 	/**
 	 * What is the minimum word length?
+	 *
 	 * @var int
 	 */
 	protected $min_word_length = 3;
 
 	/**
 	 * All the search configurations
+	 *
 	 * @var \ElkArte\ValuesContainer
 	 */
 	protected $config = null;
 
 	/**
 	 * Parameters of the search
+	 *
 	 * @var null|\ElkArte\Search\SearchParams
 	 */
 	protected $_searchParams = null;
 
 	/**
 	 * The weights to associate to various areas for relevancy
+	 *
 	 * @var array
 	 */
 	protected $_weight_factors = array();
 
 	/**
 	 * Weighing factor each area, ie frequency, age, sticky, etc
+	 *
 	 * @var array
 	 */
 	protected $_weight = array();
 
 	/**
 	 * The sum of the _weight_factors, normally but not always 100
+	 *
 	 * @var int
 	 */
 	protected $_weight_total = 0;
 
 	/**
 	 * If we are creating a tmp db table
+	 *
 	 * @var bool
 	 */
 	protected $_createTemporary = true;
 
 	/**
 	 * Builds the array of words for use in the db query
+	 *
 	 * @var array
 	 */
 	protected $_searchWords = array();
 
 	/**
 	 * Phrases not to be found in the search results (-"some phrase")
+	 *
 	 * @var array
 	 */
 	protected $_excludedPhrases = array();
 
 	/**
 	 * Database instance
+	 *
 	 * @var \ElkArte\Database\QueryInterface
 	 */
 	protected $_db;
 
 	/**
 	 * Search db instance
+	 *
 	 * @var \ElkArte\Database\AbstractSearch
 	 */
 	protected $_db_search;
 
 	/**
 	 * Words excluded from indexes
+	 *
 	 * @var array
 	 */
 	protected $_excludedIndexWords = array();
 
 	/**
 	 * Words not be be found in the subject (-word)
+	 *
 	 * @var array
 	 */
 	protected $_excludedSubjectWords = array();
 
 	/**
 	 * Holds the words and phrases to be searched on
+	 *
 	 * @var \ElkArte\Search\SearchArray
 	 */
 	protected $_searchArray = null;
 
 	/**
 	 * What databases do we support? (In general.)
+	 *
 	 * @var array
 	 */
 	protected $supported_databases = array('MySQL', 'PostgreSQL');
@@ -207,7 +231,7 @@ abstract class AbstractAPI
 	 *
 	 * @param \ElkArte\Search\SearchArray $searchArray
 	 */
-	public function setSearchArray(\ElkArte\Search\SearchArray $searchArray)
+	public function setSearchArray(SearchArray $searchArray)
 	{
 		$this->_searchArray = $searchArray;
 	}
@@ -227,7 +251,7 @@ abstract class AbstractAPI
 	 *
 	 * @param \ElkArte\Search\WeightFactors $weights
 	 */
-	public function setWeightFactors(\ElkArte\Search\WeightFactors $weights)
+	public function setWeightFactors(WeightFactors $weights)
 	{
 		$this->_weight_factors = $weights->getFactors();
 

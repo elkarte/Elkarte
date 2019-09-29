@@ -7,7 +7,7 @@
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause (see accompanying LICENSE.txt file)
  *
  * This file contains code covered by:
- * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * copyright:    2011 Simple Machines (http://www.simplemachines.org)
  *
  * @version 2.0 dev
  *
@@ -113,7 +113,7 @@ class Codes
 
 	/**
 	 * An array of tag names, or not set.
-	 * If set, the enclosing tag *must* be one of the listed tags, or parsing won't	occur.
+	 * If set, the enclosing tag *must* be one of the listed tags, or parsing won't    occur.
 	 */
 	const ATTR_REQUIRE_PARENTS = 15;
 
@@ -263,12 +263,12 @@ class Codes
 	public function add(array $code)
 	{
 
-// 		$first_char = $code[self::ATTR_TAG][0];
+		// $first_char = $code[self::ATTR_TAG][0];
 
-// 		if (!isset($this->bbc[$first_char]))
-// 		{
-// 			$this->bbc[$first_char] = array();
-// 		}
+		// if (!isset($this->bbc[$first_char]))
+		// {
+		//		$this->bbc[$first_char] = array();
+		// }
 
 		$this->bbc[] = $code;
 	}
@@ -954,10 +954,10 @@ class Codes
 	}
 
 	/**
+	 * @return array
 	 * @todo besides the itemcodes (just add a arg $with_itemcodes), this way should be standard and saved like that.
 	 * Even, just remove the itemcodes when needed
 	 *
-	 * @return array
 	 */
 	public function getForParsing()
 	{
@@ -993,9 +993,9 @@ class Codes
 	/**
 	 * Returns the first letter of all valid bbc codes for the parser
 	 *
+	 * @return $this
 	 * @todo not used
 	 *
-	 * @return $this
 	 */
 	public function setParsingCodes()
 	{
@@ -1008,11 +1008,11 @@ class Codes
 	 * Return if the found code [X is possibly a valid one by checking
 	 * if we have a code that begins with X
 	 *
-	 * @todo not used
-	 *
 	 * @param $char
 	 *
 	 * @return bool
+	 * @todo not used
+	 *
 	 */
 	public function hasChar($char)
 	{
@@ -1022,11 +1022,11 @@ class Codes
 	/**
 	 * Get BCC codes by character start
 	 *
-	 * @todo not used
-	 *
 	 * @param $char
 	 *
 	 * @return mixed
+	 * @todo not used
+	 *
 	 */
 	public function getCodesByChar($char)
 	{

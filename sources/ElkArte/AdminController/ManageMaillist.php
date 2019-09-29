@@ -14,6 +14,19 @@
 
 namespace ElkArte\AdminController;
 
+use BBC\ParserWrapper;
+use ElkArte\AbstractController;
+use ElkArte\Action;
+use ElkArte\Cache\Cache;
+use ElkArte\Controller\Emailpost;
+use ElkArte\DataValidator;
+use ElkArte\EmailSettings;
+use ElkArte\EventManager;
+use ElkArte\Exceptions\Exception;
+use ElkArte\SettingsForm\SettingsForm;
+use ElkArte\User;
+use ElkArte\Util;
+
 /**
  * This class is the administration maillist controller.
  *
@@ -23,7 +36,7 @@ namespace ElkArte\AdminController;
  *
  * @package Maillist
  */
-class ManageMaillist extends \ElkArte\AbstractController
+class ManageMaillist extends AbstractController
 {
 	/**
 	 * Main dispatcher.
@@ -62,7 +75,7 @@ class ManageMaillist extends \ElkArte\AbstractController
 		);
 
 		// Action Controller
-		$action = new \ElkArte\Action('manage_maillist');
+		$action = new Action('manage_maillist');
 
 		// Help is needed in most places, so load it up front
 		require_once(SUBSDIR . '/Maillist.subs.php');
@@ -106,7 +119,9 @@ class ManageMaillist extends \ElkArte\AbstractController
 		// Set an id if none was supplied
 		$id = $this->_req->getQuery('e_id', 'intval', 0);
 		if (empty($id) || $id <= 0)
+		{
 			$id = 0;
+		}
 
 		createToken('admin-ml', 'get');
 
@@ -149,9 +164,13 @@ class ManageMaillist extends \ElkArte\AbstractController
 						'function' => function ($rowData) {
 							$error = $rowData['error_code'];
 							if ($error === 'error_pm_not_found')
+							{
 								return '<span class="error">' . $rowData['error'] . '<span>';
+							}
 							else
+							{
 								return $rowData['error'];
+							}
 						},
 					),
 					'sort' => array(
@@ -224,16 +243,24 @@ class ManageMaillist extends \ElkArte\AbstractController
 
 							// Do we have a type?
 							if (empty($rowData['type']))
+							{
 								return $txt['not_applicable'];
+							}
 							// Personal?
 							elseif ($rowData['type'] === 'p')
+							{
 								return $txt['personal_message'];
+							}
 							// New Topic?
 							elseif ($rowData['type'] === 'x')
+							{
 								return $txt['new_topic'];
+							}
 							// Ah a Reply then
 							else
+							{
 								return $txt['topic'] . ' ' . $txt['reply'];
+							}
 						},
 					),
 					'sort' => array(
@@ -254,9 +281,13 @@ class ManageMaillist extends \ElkArte\AbstractController
 							$security = $context['session_var'] . '=' . $context['session_id'] . ';' . $context['admin-ml_token_var'] . '=' . $context['admin-ml_token'];
 
 							if ($rowData['error_code'] === 'error_pm_not_found')
+							{
 								$commands[] = '<a href="?action=admin;area=maillist;sa=approve;item=' . $id . $security . '" onclick="return confirm(' . JavaScriptEscape($txt['pm_approve_warning']) . ') && submitThisOnce(this);"><i class="icon i-check" title="' . $txt['approve'] . '"></i></a>&nbsp;';
+							}
 							else
+							{
 								$commands[] = '<a href="?action=admin;area=maillist;sa=approve;item=' . $id . $security . '"><i class="icon i-check" title="' . $txt['approve'] . '"></i></a>&nbsp;';
+							}
 
 							$commands[] = '<a href="?action=admin;area=maillist;sa=delete;item=' . $id . $security . '" onclick="return confirm(' . JavaScriptEscape($txt['delete_warning']) . ') && submitThisOnce(this);" accesskey="d"><i class="icon i-delete" title="' . $txt['delete'] . '"></i></a><br />';
 							$commands[] = '<a href="?action=admin;area=maillist;sa=bounce;item=' . $id . $security . '"><i class="icon i-sign-out" title="' . $txt['bounce'] . '"></i></a>&nbsp;';
@@ -325,8 +356,8 @@ class ManageMaillist extends \ElkArte\AbstractController
 					$data = $temp_email[0]['body'];
 
 					// Read/parse this message for viewing
-					$controller = new \ElkArte\Controller\Emailpost(new \ElkArte\EventManager());
-					$controller->setUser(\ElkArte\User::$info);
+					$controller = new Emailpost(new EventManager());
+					$controller->setUser(User::$info);
 					$result = $controller->action_pbe_preview($data);
 					$text = isset($result['body']) ? $result['body'] : '';
 					$email_to = isset($result['to']) ? $result['to'] : '';
@@ -339,12 +370,16 @@ class ManageMaillist extends \ElkArte\AbstractController
 				}
 			}
 			else
+			{
 				$text = $txt['badid'];
+			}
 		}
 		else
+		{
 			$text = $txt['badid'];
+		}
 
-		$parser = \BBC\ParserWrapper::instance();
+		$parser = ParserWrapper::instance();
 
 		// Prep and show the template with what we found
 		$context['body'] = $parser->parseEmail($text);
@@ -375,10 +410,12 @@ class ManageMaillist extends \ElkArte\AbstractController
 
 		// Remove this entry
 		if (!empty($id))
+		{
 			maillist_delete_error_entry($id);
+		}
 
 		// Flush the cache
-		\ElkArte\Cache\Cache::instance()->remove('num_menu_errors');
+		Cache::instance()->remove('num_menu_errors');
 
 		// Back to the failed list we go
 		redirectexit('action=admin;area=maillist;sa=emaillist');
@@ -427,12 +464,14 @@ class ManageMaillist extends \ElkArte\AbstractController
 						$check_emails = array_pad(explode('=>', $temp_email[0]['from']), 2, '');
 
 						if (!empty($check_emails[1]))
+						{
 							$data = preg_replace('~(From: )(.*<)?(' . preg_quote(trim($check_emails[0])) . ')(>)?(\n)~i', '$1$2' . trim($check_emails[1]) . '$4$5', $data);
+						}
 					}
 
 					// Lets TRY AGAIN to make a post!
-					$controller = new \ElkArte\Controller\Emailpost(new \ElkArte\EventManager());
-					$controller->setUser(\ElkArte\User::$info);
+					$controller = new Emailpost(new EventManager());
+					$controller->setUser(User::$info);
 					$text = $controller->action_pbe_post($data, $force, $key);
 
 					// Assuming all went well, remove this entry and file since we are done.
@@ -441,22 +480,30 @@ class ManageMaillist extends \ElkArte\AbstractController
 						maillist_delete_error_entry($id);
 
 						// Flush the menu count cache
-						\ElkArte\Cache\Cache::instance()->remove('num_menu_errors');
+						Cache::instance()->remove('num_menu_errors');
 
 						$_SESSION['email_error'] = $txt['approved'];
 						$_SESSION['email_error_type'] = 1;
 					}
 					else
+					{
 						$_SESSION['email_error'] = $txt['error_approved'];
+					}
 				}
 				else
+				{
 					$_SESSION['email_error'] = $txt['cant_approve'];
+				}
 			}
 			else
+			{
 				$_SESSION['email_error'] = $txt['badid'];
+			}
 		}
 		else
+		{
 			$_SESSION['email_error'] = $txt['badid'];
+		}
 
 		// back to the list we go
 		redirectexit('action=admin;area=maillist;sa=emaillist');
@@ -531,10 +578,14 @@ class ManageMaillist extends \ElkArte\AbstractController
 				}
 			}
 			else
+			{
 				$context['settings_message'] = $txt['badid'];
+			}
 		}
 		else
+		{
 			$context['settings_message'] = $txt['badid'];
+		}
 
 		// Check if they are sending the notice
 		if (isset($this->_req->query->bounce) && isset($temp_email))
@@ -552,7 +603,9 @@ class ManageMaillist extends \ElkArte\AbstractController
 				$body = trim($this->_req->post->warn_body);
 
 				if (empty($body) || empty($subject))
+				{
 					$context['settings_message'] = $txt['bad_bounce'];
+				}
 				else
 				{
 					// Time for someone to get a we're so sorry message!
@@ -565,7 +618,7 @@ class ManageMaillist extends \ElkArte\AbstractController
 		// Prepare and show the template
 		createToken('admin-ml');
 		$context['warning_data'] = array('notify' => '', 'notify_subject' => '', 'notify_body' => '');
-		$context['body'] = isset($fullerrortext) ? \BBC\ParserWrapper::instance()->parseEmail($fullerrortext) : '';
+		$context['body'] = isset($fullerrortext) ? ParserWrapper::instance()->parseEmail($fullerrortext) : '';
 		$context['item'] = isset($this->_req->post->item) ? $this->_req->post->item : '';
 		$context['notice_to'] = $txt['to'] . ' ' . isset($temp_email[0]['from']) !== '' ? $temp_email[0]['from'] : '';
 		$context['page_title'] = $txt['bounce_title'];
@@ -883,7 +936,9 @@ class ManageMaillist extends \ElkArte\AbstractController
 			// Needs to be an int!
 			$id = (int) $this->_req->query->f_id;
 			if (empty($id) || $id <= 0)
-				throw new \ElkArte\Exceptions\Exception('error_no_id_filter');
+			{
+				throw new Exception('error_no_id_filter');
+			}
 
 			// Load it up and set it as the current values
 			$row = maillist_load_filter_parser($id, 'filter');
@@ -912,7 +967,7 @@ class ManageMaillist extends \ElkArte\AbstractController
 		}
 
 		// Initialize the form
-		$settingsForm = new \ElkArte\SettingsForm\SettingsForm(\ElkArte\SettingsForm\SettingsForm::DB_ADAPTER);
+		$settingsForm = new SettingsForm(SettingsForm::DB_ADAPTER);
 
 		// Initialize it with our settings
 		$config_vars = $this->_filtersSettings();
@@ -958,7 +1013,7 @@ class ManageMaillist extends \ElkArte\AbstractController
 				$config_vars[] = array('text', 'filter_style');
 				$this->_req->post->filter_style = 'filter';
 
-				\ElkArte\EmailSettings::saveTableSettings($config_vars, 'postby_emails_filters', $this->_req->post, array('id_filter'), $editId, $editName);
+				EmailSettings::saveTableSettings($config_vars, 'postby_emails_filters', $this->_req->post, array('id_filter'), $editId, $editName);
 				redirectexit('action=admin;area=maillist;sa=emailfilters;saved');
 			}
 		}
@@ -996,10 +1051,10 @@ class ManageMaillist extends \ElkArte\AbstractController
 		$config_vars = array(
 			array('text', 'filter_name', 25, 'subtext' => $txt['filter_name_desc']),
 			array('select', 'filter_type',
-				array(
-					'standard' => $txt['option_standard'],
-					'regex' => $txt['option_regex'],
-				),
+				  array(
+					  'standard' => $txt['option_standard'],
+					  'regex' => $txt['option_regex'],
+				  ),
 			),
 			array('large_text', 'filter_from', 4, 'subtext' => $txt['filter_from_desc']),
 			array('text', 'filter_to', 25, 'subtext' => $txt['filter_to_desc']),
@@ -1144,7 +1199,7 @@ class ManageMaillist extends \ElkArte\AbstractController
 					'value' => '
 						<input type="submit" name="addparser" value="' . $txt['add_parser'] . '" />
 						<a class="linkbutton" href="' . getUrl('admin', ['action' => 'admin', 'area' => 'maillist', 'sa' => 'sortparsers']) . '">' . $txt['sort_parser'] . '</a>',
-					),
+				),
 			),
 		);
 
@@ -1280,7 +1335,9 @@ class ManageMaillist extends \ElkArte\AbstractController
 			// Needs to be an int!
 			$id = (int) $this->_req->query->f_id;
 			if (empty($id) || $id < 0)
-				throw new \ElkArte\Exceptions\Exception('error_no_id_filter');
+			{
+				throw new Exception('error_no_id_filter');
+			}
 
 			// Load this filter so we can edit it
 			$row = maillist_load_filter_parser($id, 'parser');
@@ -1306,7 +1363,7 @@ class ManageMaillist extends \ElkArte\AbstractController
 		}
 
 		// Initialize the form
-		$settingsForm = new \ElkArte\SettingsForm\SettingsForm(\ElkArte\SettingsForm\SettingsForm::DB_ADAPTER);
+		$settingsForm = new SettingsForm(SettingsForm::DB_ADAPTER);
 
 		// Initialize it with our settings
 		$config_vars = $this->_parsersSettings();
@@ -1353,7 +1410,7 @@ class ManageMaillist extends \ElkArte\AbstractController
 				$this->_req->post->filter_style = 'parser';
 
 				// Save, log, show
-				\ElkArte\EmailSettings::saveTableSettings($config_vars, 'postby_emails_filters', $this->_req->post, array('id_filter'), $editId, $editName);
+				EmailSettings::saveTableSettings($config_vars, 'postby_emails_filters', $this->_req->post, array('id_filter'), $editId, $editName);
 				redirectexit('action=admin;area=maillist;sa=emailparser;saved');
 			}
 		}
@@ -1391,10 +1448,10 @@ class ManageMaillist extends \ElkArte\AbstractController
 		$config_vars = array(
 			array('text', 'filter_name', 25, 'subtext' => $txt['parser_name_desc']),
 			array('select', 'filter_type', 'subtext' => $txt['parser_type_desc'],
-				array(
-					'regex' => $txt['option_regex'],
-					'standard' => $txt['option_standard'],
-				),
+				  array(
+					  'regex' => $txt['option_regex'],
+					  'standard' => $txt['option_standard'],
+				  ),
 			),
 			array('large_text', 'filter_from', 4, 'subtext' => $txt['parser_from_desc']),
 		);
@@ -1432,7 +1489,9 @@ class ManageMaillist extends \ElkArte\AbstractController
 
 		// Be nice, show them we did something
 		if (isset($this->_req->query->saved))
+		{
 			$context['settings_message'] = $txt['saved'];
+		}
 
 		// Templates and language
 		theme()->getTemplates()->loadLanguageFile('Admin');
@@ -1441,7 +1500,7 @@ class ManageMaillist extends \ElkArte\AbstractController
 
 		// Load any existing email => board values used for new topic creation
 		$context['maillist_from_to_board'] = array();
-		$data = (!empty($modSettings['maillist_receiving_address'])) ? \ElkArte\Util::unserialize($modSettings['maillist_receiving_address']) : array();
+		$data = (!empty($modSettings['maillist_receiving_address'])) ? Util::unserialize($modSettings['maillist_receiving_address']) : array();
 		foreach ($data as $key => $addr)
 		{
 			$context['maillist_from_to_board'][$key] = array(
@@ -1452,7 +1511,7 @@ class ManageMaillist extends \ElkArte\AbstractController
 		}
 
 		// Initialize the maillist settings form
-		$settingsForm = new \ElkArte\SettingsForm\SettingsForm(\ElkArte\SettingsForm\SettingsForm::DB_ADAPTER);
+		$settingsForm = new SettingsForm(SettingsForm::DB_ADAPTER);
 
 		// Initialize it with our settings
 		$settingsForm->setConfigVars($this->_settings());
@@ -1469,12 +1528,18 @@ class ManageMaillist extends \ElkArte\AbstractController
 			$maillist_receiving_address = array();
 
 			// Basic checking of the email addresses
-			if (!\ElkArte\DataValidator::is_valid($this->_req->post, array('maillist_sitename_address' => 'valid_email'), array('maillist_sitename_address' => 'trim')))
+			if (!DataValidator::is_valid($this->_req->post, array('maillist_sitename_address' => 'valid_email'), array('maillist_sitename_address' => 'trim')))
+			{
 				$email_error = $this->_req->post->maillist_sitename_address;
-			if (!\ElkArte\DataValidator::is_valid($this->_req->post, array('maillist_sitename_help' => 'valid_email'), array('maillist_sitename_help' => 'trim')))
+			}
+			if (!DataValidator::is_valid($this->_req->post, array('maillist_sitename_help' => 'valid_email'), array('maillist_sitename_help' => 'trim')))
+			{
 				$email_error = $this->_req->post->maillist_sitename_help;
-			if (!\ElkArte\DataValidator::is_valid($this->_req->post, array('maillist_mail_from' => 'valid_email'), array('maillist_mail_from' => 'trim')))
+			}
+			if (!DataValidator::is_valid($this->_req->post, array('maillist_mail_from' => 'valid_email'), array('maillist_mail_from' => 'trim')))
+			{
 				$email_error = $this->_req->post->maillist_mail_from;
+			}
 
 			// Inbound email set up then we need to check for both valid email and valid board
 			if (!$email_error && !empty($this->_req->post->emailfrom))
@@ -1489,7 +1554,7 @@ class ManageMaillist extends \ElkArte\AbstractController
 				foreach ($addresstocheck as $key => $checkme)
 				{
 					// Valid email syntax
-					if (!\ElkArte\DataValidator::is_valid($addresstocheck, array($key => 'valid_email'), array($key => 'trim')))
+					if (!DataValidator::is_valid($addresstocheck, array($key => 'valid_email'), array($key => 'trim')))
 					{
 						$email_error = $checkme;
 						$context['error_type'] = 'notice';
@@ -1514,17 +1579,23 @@ class ManageMaillist extends \ElkArte\AbstractController
 
 			// Check and set any errors or give the go ahead to save
 			if ($email_error)
+			{
 				$context['settings_message'] = sprintf($txt['email_not_valid'], $email_error);
+			}
 			elseif ($board_error)
+			{
 				$context['settings_message'] = sprintf($txt['board_not_valid'], $board_error);
+			}
 			else
 			{
 				// Clear the moderation count cache
-				\ElkArte\Cache\Cache::instance()->remove('num_menu_errors');
+				Cache::instance()->remove('num_menu_errors');
 
 				// Should be off if mail posting is on, we ignore it anyway but this at least updates the ACP
 				if (!empty($this->_req->post->maillist_enabled))
+				{
 					updateSettings(array('disallow_sendBody' => ''));
+				}
 
 				updateSettings(array('maillist_receiving_address' => serialize($maillist_receiving_address)));
 				$settingsForm->setConfigValues((array) $this->_req->post);
@@ -1541,7 +1612,9 @@ class ManageMaillist extends \ElkArte\AbstractController
 
 		// Create the board selection list
 		foreach ($board_list as $board_id => $board_name)
+		{
 			$script .= $i++ . ': {id:' . $board_id . ', name:' . JavaScriptEscape($board_name) . '},';
+		}
 
 		theme()->addInlineJavascript('
 		var sEmailParent = \'add_more_email_placeholder\',
@@ -1571,66 +1644,70 @@ class ManageMaillist extends \ElkArte\AbstractController
 
 		// Define the menu
 		$config_vars = array(
-				array('desc', 'maillist_help'),
-				array('check', 'maillist_enabled'),
-				array('check', 'pbe_post_enabled'),
-				array('check', 'pbe_pm_enabled'),
-				array('check', 'pbe_no_mod_notices', 'subtext' => $txt['pbe_no_mod_notices_desc'], 'postinput' => $txt['recommended']),
-				array('check', 'pbe_bounce_detect', 'subtext' => $txt['pbe_bounce_detect_desc'], 'postinput' => $txt['experimental']),
-				array('check', 'pbe_bounce_record', 'subtext' => $txt['pbe_bounce_record_desc'], 'postinput' => $txt['experimental']),
+			array('desc', 'maillist_help'),
+			array('check', 'maillist_enabled'),
+			array('check', 'pbe_post_enabled'),
+			array('check', 'pbe_pm_enabled'),
+			array('check', 'pbe_no_mod_notices', 'subtext' => $txt['pbe_no_mod_notices_desc'], 'postinput' => $txt['recommended']),
+			array('check', 'pbe_bounce_detect', 'subtext' => $txt['pbe_bounce_detect_desc'], 'postinput' => $txt['experimental']),
+			array('check', 'pbe_bounce_record', 'subtext' => $txt['pbe_bounce_record_desc'], 'postinput' => $txt['experimental']),
 			array('title', 'maillist_outbound'),
-				array('desc', 'maillist_outbound_desc'),
-				array('check', 'maillist_group_mode'),
-				array('check', 'maillist_digest_enabled'),
-				array('text', 'maillist_sitename', 40, 'subtext' => $txt['maillist_sitename_desc'], 'postinput' => $txt['maillist_sitename_post']),
-				array('text', 'maillist_sitename_address', 40, 'subtext' => $txt['maillist_sitename_address_desc'], 'postinput' => $txt['maillist_sitename_address_post']),
-				array('text', 'maillist_mail_from', 40, 'subtext' => $txt['maillist_mail_from_desc'], 'postinput' => $txt['maillist_mail_from_post']),
-				array('text', 'maillist_sitename_help', 40, 'subtext' => $txt['maillist_sitename_help_desc'], 'postinput' => $txt['maillist_sitename_help_post']),
-				array('text', 'maillist_sitename_regards', 40, 'subtext' => $txt['maillist_sitename_regards_desc']),
+			array('desc', 'maillist_outbound_desc'),
+			array('check', 'maillist_group_mode'),
+			array('check', 'maillist_digest_enabled'),
+			array('text', 'maillist_sitename', 40, 'subtext' => $txt['maillist_sitename_desc'], 'postinput' => $txt['maillist_sitename_post']),
+			array('text', 'maillist_sitename_address', 40, 'subtext' => $txt['maillist_sitename_address_desc'], 'postinput' => $txt['maillist_sitename_address_post']),
+			array('text', 'maillist_mail_from', 40, 'subtext' => $txt['maillist_mail_from_desc'], 'postinput' => $txt['maillist_mail_from_post']),
+			array('text', 'maillist_sitename_help', 40, 'subtext' => $txt['maillist_sitename_help_desc'], 'postinput' => $txt['maillist_sitename_help_post']),
+			array('text', 'maillist_sitename_regards', 40, 'subtext' => $txt['maillist_sitename_regards_desc']),
 			array('title', 'maillist_inbound'),
-				array('desc', 'maillist_inbound_desc'),
-				array('check', 'maillist_newtopic_change'),
-				array('check', 'maillist_newtopic_needsapproval', 'subtext' => $txt['maillist_newtopic_needsapproval_desc'], 'postinput' => $txt['recommended']),
-				array('callback', 'maillist_receive_email_list'),
+			array('desc', 'maillist_inbound_desc'),
+			array('check', 'maillist_newtopic_change'),
+			array('check', 'maillist_newtopic_needsapproval', 'subtext' => $txt['maillist_newtopic_needsapproval_desc'], 'postinput' => $txt['recommended']),
+			array('callback', 'maillist_receive_email_list'),
 			array('title', 'misc'),
-				array('check', 'maillist_allow_attachments'),
-				array('int', 'maillist_key_active', 2, 'subtext' => $txt['maillist_key_active_desc']),
+			array('check', 'maillist_allow_attachments'),
+			array('int', 'maillist_key_active', 2, 'subtext' => $txt['maillist_key_active_desc']),
 			'',
-				array('text', 'maillist_leftover_remove', 40, 'subtext' => $txt['maillist_leftover_remove_desc']),
-				array('text', 'maillist_sig_keys', 40, 'subtext' => $txt['maillist_sig_keys_desc']),
-				array('int', 'maillist_short_line', 2, 'subtext' => $txt['maillist_short_line_desc']),
+			array('text', 'maillist_leftover_remove', 40, 'subtext' => $txt['maillist_leftover_remove_desc']),
+			array('text', 'maillist_sig_keys', 40, 'subtext' => $txt['maillist_sig_keys_desc']),
+			array('int', 'maillist_short_line', 2, 'subtext' => $txt['maillist_short_line_desc']),
 		);
 
 		// Imap?
 		if (!function_exists('imap_open'))
+		{
 			$config_vars = array_merge($config_vars,
 				array(
 					array('title', 'maillist_imap_missing'),
 				)
 			);
+		}
 		else
+		{
 			$config_vars = array_merge($config_vars,
 				array(
 					array('title', 'maillist_imap'),
 					array('desc', 'maillist_imap_reason'),
-						array('text', 'maillist_imap_host', 45, 'subtext' => $txt['maillist_imap_host_desc'], 'disabled' => !function_exists('imap_open')),
-						array('text', 'maillist_imap_mailbox', 20, 'postinput' => $txt['maillist_imap_mailbox_desc'], 'disabled' => !function_exists('imap_open')),
-						array('text', 'maillist_imap_uid', 20, 'postinput' => $txt['maillist_imap_uid_desc'], 'disabled' => !function_exists('imap_open')),
-						array('password', 'maillist_imap_pass', 20, 'postinput' => $txt['maillist_imap_pass_desc'], 'disabled' => !function_exists('imap_open')),
-						array('select', 'maillist_imap_connection',
-							array(
-								'imap' => $txt['maillist_imap_unsecure'],
-								'pop3' => $txt['maillist_pop3_unsecure'],
-								'imaptls' => $txt['maillist_imap_tls'],
-								'imapssl' => $txt['maillist_imap_ssl'],
-								'pop3tls' => $txt['maillist_pop3_tls'],
-								'pop3ssl' => $txt['maillist_pop3_ssl']
-							), 'postinput' => $txt['maillist_imap_connection_desc'], 'disabled' => !function_exists('imap_open'),
-						),
-						array('check', 'maillist_imap_delete', 20, 'subtext' => $txt['maillist_imap_delete_desc'], 'disabled' => !function_exists('imap_open')),
-						array('check', 'maillist_imap_cron', 20, 'subtext' => $txt['maillist_imap_cron_desc'], 'disabled' => !function_exists('imap_open')),
+					array('text', 'maillist_imap_host', 45, 'subtext' => $txt['maillist_imap_host_desc'], 'disabled' => !function_exists('imap_open')),
+					array('text', 'maillist_imap_mailbox', 20, 'postinput' => $txt['maillist_imap_mailbox_desc'], 'disabled' => !function_exists('imap_open')),
+					array('text', 'maillist_imap_uid', 20, 'postinput' => $txt['maillist_imap_uid_desc'], 'disabled' => !function_exists('imap_open')),
+					array('password', 'maillist_imap_pass', 20, 'postinput' => $txt['maillist_imap_pass_desc'], 'disabled' => !function_exists('imap_open')),
+					array('select', 'maillist_imap_connection',
+						  array(
+							  'imap' => $txt['maillist_imap_unsecure'],
+							  'pop3' => $txt['maillist_pop3_unsecure'],
+							  'imaptls' => $txt['maillist_imap_tls'],
+							  'imapssl' => $txt['maillist_imap_ssl'],
+							  'pop3tls' => $txt['maillist_pop3_tls'],
+							  'pop3ssl' => $txt['maillist_pop3_ssl']
+						  ), 'postinput' => $txt['maillist_imap_connection_desc'], 'disabled' => !function_exists('imap_open'),
+					),
+					array('check', 'maillist_imap_delete', 20, 'subtext' => $txt['maillist_imap_delete_desc'], 'disabled' => !function_exists('imap_open')),
+					array('check', 'maillist_imap_cron', 20, 'subtext' => $txt['maillist_imap_cron_desc'], 'disabled' => !function_exists('imap_open')),
 				)
 			);
+		}
 
 		call_integration_hook('integrate_modify_maillist_settings', array(&$config_vars));
 
@@ -1665,7 +1742,9 @@ class ManageMaillist extends \ElkArte\AbstractController
 
 		// Submitting a new one or editing an existing one then pass this request off
 		if (isset($this->_req->post->add) || isset($this->_req->post->save) || isset($this->_req->query->tid))
+		{
 			return $this->action_modify_bounce_templates();
+		}
 		// Deleting and existing one
 		elseif (isset($this->_req->post->delete) && !empty($this->_req->post->deltpl))
 		{
@@ -1803,7 +1882,9 @@ class ManageMaillist extends \ElkArte\AbstractController
 
 		// If it's an edit load it.
 		if ($context['is_edit'])
+		{
 			modLoadTemplate($context['id_template'], 'bnctpl');
+		}
 
 		// Wait, we are saving?
 		if (isset($this->_req->post->save))
@@ -1822,7 +1903,7 @@ class ManageMaillist extends \ElkArte\AbstractController
 			if (!empty($template_body) && !empty($template_title))
 			{
 				// Safety first.
-				$template_title = \ElkArte\Util::htmlspecialchars($template_title);
+				$template_title = Util::htmlspecialchars($template_title);
 
 				// Clean up BBC.
 				preparsecode($template_body);
@@ -1841,13 +1922,19 @@ class ManageMaillist extends \ElkArte\AbstractController
 
 					// If it wasn't visible and now is they've effectively added it.
 					if ($context['template_data']['personal'] && !$recipient_id)
+					{
 						logAction('add_bounce_template', array('template' => $template_title));
+					}
 					// Conversely if they made it personal it's a delete.
 					elseif (!$context['template_data']['personal'] && $recipient_id)
+					{
 						logAction('delete_bounce_template', array('template' => $template_title));
+					}
 					// Otherwise just an edit.
 					else
+					{
 						logAction('modify_bounce_template', array('template' => $template_title));
+					}
 				}
 				else
 				{
@@ -1866,10 +1953,14 @@ class ManageMaillist extends \ElkArte\AbstractController
 				$context['template_data']['personal'] = !empty($this->_req->post->make_personal);
 
 				if (empty($template_title))
+				{
 					$context['warning_errors'][] = $txt['ml_bounce_template_error_no_title'];
+				}
 
 				if (empty($template_body))
+				{
 					$context['warning_errors'][] = $txt['ml_bounce_template_error_no_body'];
+				}
 			}
 		}
 

@@ -8,7 +8,7 @@
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause (see accompanying LICENSE.txt file)
  *
  * This file contains code covered by:
- * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * copyright: 2011 Simple Machines (http://www.simplemachines.org)
  *
  * @version 2.0 dev
  *
@@ -16,19 +16,28 @@
 
 namespace ElkArte\Controller;
 
+use BBC\ParserWrapper;
+use ElkArte\AbstractController;
+use ElkArte\Cache\Cache;
+use ElkArte\Exceptions\Exception;
+use ElkArte\MembersList;
+use ElkArte\Util;
+
 /**
  * News Controller class
  */
-class News extends \ElkArte\AbstractController
+class News extends AbstractController
 {
 	/**
 	 * Holds news specific version board query for news feeds
+	 *
 	 * @var string
 	 */
 	private $_query_this_board = null;
 
 	/**
 	 * Holds the limit for the number of items to get
+	 *
 	 * @var int
 	 */
 	private $_limit;
@@ -69,7 +78,7 @@ class News extends \ElkArte\AbstractController
 	 *     * 'profile' for a member's profile.
 	 * - To display a member's profile, a user id has to be given. (;u=1) e.g. ?action=.xml;sa=profile;u=1;type=atom
 	 * - Outputs an feed based on the the 'type'
-	 * 	   * parameter is 'rss', 'rss2', 'rdf', 'atom'.
+	 *       * parameter is 'rss', 'rss2', 'rdf', 'atom'.
 	 * - Several sub action options are respected
 	 *     * limit=x - display the "x" most recent posts
 	 *     * board=y - display only the recent posts from board "y"
@@ -145,7 +154,7 @@ class News extends \ElkArte\AbstractController
 			$num_boards = count($boards_data);
 			if ($num_boards === 0)
 			{
-				throw new \ElkArte\Exceptions\Exception('no_board');
+				throw new Exception('no_board');
 			}
 
 			$total_posts = 0;
@@ -194,7 +203,9 @@ class News extends \ElkArte\AbstractController
 		// If format isn't set, or is wrong, rss2 is default
 		$xml_format = $this->_req->getQuery('type', 'trim', 'rss2');
 		if (!in_array($xml_format, array('rss', 'rss2', 'atom', 'rdf')))
+		{
 			$xml_format = 'rss2';
+		}
 
 		// List all the different types of data they can pull.
 		$subActions = array(
@@ -214,12 +225,14 @@ class News extends \ElkArte\AbstractController
 		foreach (array('board', 'boards', 'c') as $var)
 		{
 			if (isset($this->_req->query->{$var}))
+			{
 				$cachekey[] = $this->_req->query->{$var};
+			}
 		}
 
 		$cachekey = md5(serialize($cachekey) . (!empty($this->_query_this_board) ? $this->_query_this_board : ''));
 		$cache_t = microtime(true);
-		$cache = \ElkArte\Cache\Cache::instance();
+		$cache = Cache::instance();
 
 		// Get the associative array representing the xml.
 		if ($this->user->is_guest === false || $cache->levelHigherThan(2))
@@ -247,13 +260,21 @@ class News extends \ElkArte\AbstractController
 
 		// This is an xml file....
 		if (isset($this->_req->query->debug))
+		{
 			header('Content-Type: text/xml; charset=UTF-8');
+		}
 		elseif ($xml_format === 'rss' || $xml_format === 'rss2')
+		{
 			header('Content-Type: application/rss+xml; charset=UTF-8');
+		}
 		elseif ($xml_format === 'atom')
+		{
 			header('Content-Type: application/atom+xml; charset=UTF-8');
+		}
 		elseif ($xml_format === 'rdf')
+		{
 			header('Content-Type: ' . (isBrowser('ie') ? 'text/xml' : 'application/rdf+xml') . '; charset=UTF-8');
+		}
 
 		theme()->getTemplates()->load('Xml');
 		theme()->getLayers()->removeAll();
@@ -297,7 +318,9 @@ class News extends \ElkArte\AbstractController
 
 		// Not allowed, then you get nothing
 		if (!allowedTo('view_mlist'))
+		{
 			return array();
+		}
 
 		// Find the most recent members.
 		require_once(SUBSDIR . '/Members.subs.php');
@@ -310,6 +333,7 @@ class News extends \ElkArte\AbstractController
 		{
 			// Make the data look rss-ish.
 			if ($xml_format === 'rss' || $xml_format === 'rss2')
+			{
 				$data[] = array(
 					'title' => cdata_parse($member['real_name']),
 					'link' => $scripturl . '?action=profile;u=' . $member['id_member'],
@@ -317,12 +341,16 @@ class News extends \ElkArte\AbstractController
 					'pubDate' => gmdate('D, d M Y H:i:s \G\M\T', $member['date_registered']),
 					'guid' => $scripturl . '?action=profile;u=' . $member['id_member'],
 				);
+			}
 			elseif ($xml_format === 'rdf')
+			{
 				$data[] = array(
 					'title' => cdata_parse($member['real_name']),
 					'link' => $scripturl . '?action=profile;u=' . $member['id_member'],
 				);
+			}
 			elseif ($xml_format === 'atom')
+			{
 				$data[] = array(
 					'title' => cdata_parse($member['real_name']),
 					'link' => $scripturl . '?action=profile;u=' . $member['id_member'],
@@ -330,14 +358,17 @@ class News extends \ElkArte\AbstractController
 					'updated' => gmstrftime('%Y-%m-%dT%H:%M:%SZ', $member['last_login']),
 					'id' => $scripturl . '?action=profile;u=' . $member['id_member'],
 				);
+			}
 			// More logical format for the data, but harder to apply.
 			else
+			{
 				$data[] = array(
 					'name' => cdata_parse($member['real_name']),
 					'time' => htmlspecialchars(strip_tags(standardTime($member['date_registered'])), ENT_COMPAT, 'UTF-8'),
 					'id' => $member['id_member'],
 					'link' => $scripturl . '?action=profile;u=' . $member['id_member']
 				);
+			}
 		}
 
 		return $data;
@@ -360,13 +391,15 @@ class News extends \ElkArte\AbstractController
 
 		// Prepare it for the feed in the format chosen (rss, atom, etc)
 		$data = array();
-		$bbc_parser = \BBC\ParserWrapper::instance();
+		$bbc_parser = ParserWrapper::instance();
 
 		foreach ($results as $row)
 		{
 			// Limit the length of the message, if the option is set.
-			if (!empty($modSettings['xmlnews_maxlen']) && \ElkArte\Util::strlen(str_replace('<br />', "\n", $row['body'])) > $modSettings['xmlnews_maxlen'])
-				$row['body'] = strtr(\ElkArte\Util::shorten_text(str_replace('<br />', "\n", $row['body']), $modSettings['xmlnews_maxlen'], true), array("\n" => '<br />'));
+			if (!empty($modSettings['xmlnews_maxlen']) && Util::strlen(str_replace('<br />', "\n", $row['body'])) > $modSettings['xmlnews_maxlen'])
+			{
+				$row['body'] = strtr(Util::shorten_text(str_replace('<br />', "\n", $row['body']), $modSettings['xmlnews_maxlen'], true), array("\n" => '<br />'));
+			}
 
 			$row['body'] = $bbc_parser->parseMessage($row['body'], $row['smileys_enabled']);
 
@@ -426,7 +459,7 @@ class News extends \ElkArte\AbstractController
 			else
 			{
 				$data[] = array(
-				'time' => htmlspecialchars(strip_tags(standardTime($row['poster_time'])), ENT_COMPAT, 'UTF-8'),
+					'time' => htmlspecialchars(strip_tags(standardTime($row['poster_time'])), ENT_COMPAT, 'UTF-8'),
 					'id' => $row['id_topic'],
 					'subject' => cdata_parse($row['subject']),
 					'body' => cdata_parse($row['body']),
@@ -466,13 +499,15 @@ class News extends \ElkArte\AbstractController
 
 		// Loop on the results and prepare them in the format requested
 		$data = array();
-		$bbc_parser = \BBC\ParserWrapper::instance();
+		$bbc_parser = ParserWrapper::instance();
 
 		foreach ($results as $row)
 		{
 			// Limit the length of the message, if the option is set.
-			if (!empty($modSettings['xmlnews_maxlen']) && \ElkArte\Util::strlen(str_replace('<br />', "\n", $row['body'])) > $modSettings['xmlnews_maxlen'])
-				$row['body'] = strtr(\ElkArte\Util::shorten_text(str_replace('<br />', "\n", $row['body']), $modSettings['xmlnews_maxlen'], true), array("\n" => '<br />'));
+			if (!empty($modSettings['xmlnews_maxlen']) && Util::strlen(str_replace('<br />', "\n", $row['body'])) > $modSettings['xmlnews_maxlen'])
+			{
+				$row['body'] = strtr(Util::shorten_text(str_replace('<br />', "\n", $row['body']), $modSettings['xmlnews_maxlen'], true), array("\n" => '<br />'));
+			}
 
 			$row['body'] = $bbc_parser->parseMessage($row['body'], $row['smileys_enabled']);
 
@@ -530,7 +565,7 @@ class News extends \ElkArte\AbstractController
 			else
 			{
 				$data[] = array(
-				'time' => htmlspecialchars(strip_tags(standardTime($row['poster_time'])), ENT_COMPAT, 'UTF-8'),
+					'time' => htmlspecialchars(strip_tags(standardTime($row['poster_time'])), ENT_COMPAT, 'UTF-8'),
 					'id' => $row['id_msg'],
 					'subject' => cdata_parse($row['subject']),
 					'body' => cdata_parse($row['body']),
@@ -583,7 +618,7 @@ class News extends \ElkArte\AbstractController
 		$uid = (int) $this->_req->query->u;
 
 		// You must input a valid user....
-		if (\ElkArte\MembersList::load($uid) === false)
+		if (MembersList::load($uid) === false)
 		{
 			return array();
 		}
@@ -594,7 +629,7 @@ class News extends \ElkArte\AbstractController
 			return array();
 		}
 
-		$member = \ElkArte\MembersList::get($uid);
+		$member = MembersList::get($uid);
 		$member->loadContext();
 
 		// No feed data yet
@@ -603,21 +638,21 @@ class News extends \ElkArte\AbstractController
 		if ($xml_format === 'rss' || $xml_format === 'rss2')
 		{
 			$data = array(array(
-				'title' => cdata_parse($member['name']),
-				'link' => $scripturl . '?action=profile;u=' . $member['id'],
-				'description' => cdata_parse(isset($member['group']) ? $member['group'] : $member['post_group']),
-				'comments' => $scripturl . '?action=pm;sa=send;u=' . $member['id'],
-				'pubDate' => gmdate('D, d M Y H:i:s \G\M\T', $member->date_registered),
-				'guid' => $scripturl . '?action=profile;u=' . $member['id'],
-			));
+							  'title' => cdata_parse($member['name']),
+							  'link' => $scripturl . '?action=profile;u=' . $member['id'],
+							  'description' => cdata_parse(isset($member['group']) ? $member['group'] : $member['post_group']),
+							  'comments' => $scripturl . '?action=pm;sa=send;u=' . $member['id'],
+							  'pubDate' => gmdate('D, d M Y H:i:s \G\M\T', $member->date_registered),
+							  'guid' => $scripturl . '?action=profile;u=' . $member['id'],
+						  ));
 		}
 		elseif ($xml_format === 'rdf')
 		{
 			$data = array(array(
-				'title' => cdata_parse($member['name']),
-				'link' => $scripturl . '?action=profile;u=' . $member['id'],
-				'description' => cdata_parse(isset($member['group']) ? $member['group'] : $member['post_group']),
-			));
+							  'title' => cdata_parse($member['name']),
+							  'link' => $scripturl . '?action=profile;u=' . $member['id'],
+							  'description' => cdata_parse(isset($member['group']) ? $member['group'] : $member['post_group']),
+						  ));
 		}
 		elseif ($xml_format === 'atom')
 		{
@@ -651,35 +686,51 @@ class News extends \ElkArte\AbstractController
 
 			// Everything below here might not be set, and thus maybe shouldn't be displayed.
 			if ($member['avatar']['name'] != '')
+			{
 				$data['avatar'] = $member['avatar']['url'];
+			}
 
 			// If they are online, show an empty tag... no reason to put anything inside it.
 			if ($member['online']['is_online'])
+			{
 				$data['online'] = '';
+			}
 
 			if ($member['signature'] != '')
+			{
 				$data['signature'] = cdata_parse($member['signature']);
+			}
 
 			if ($member['title'] != '')
+			{
 				$data['title'] = cdata_parse($member['title']);
+			}
 
 			if ($member['website']['title'] != '')
+			{
 				$data['website'] = array(
 					'title' => cdata_parse($member['website']['title']),
 					'link' => $member['website']['url']
 				);
+			}
 
 			if ($member['group'] != '')
+			{
 				$data['position'] = cdata_parse($member['group']);
+			}
 
 			if (!empty($modSettings['karmaMode']))
+			{
 				$data['karma'] = array(
 					'good' => $member['karma']['good'],
 					'bad' => $member['karma']['bad']
 				);
+			}
 
 			if (in_array($member['show_email'], array('yes', 'yes_permission_override')))
+			{
 				$data['email'] = $member['email'];
+			}
 
 			if (!empty($member['birth_date']) && substr($member['birth_date'], 0, 4) !== '0000')
 			{
@@ -690,7 +741,7 @@ class News extends \ElkArte\AbstractController
 		}
 
 		// Save some memory.
-		\ElkArte\MembersList::unset($uid);
+		MembersList::unset($uid);
 
 		return $data;
 	}
@@ -709,7 +760,9 @@ function fix_possible_url($val)
 	global $scripturl;
 
 	if (substr($val, 0, strlen($scripturl)) != $scripturl)
+	{
 		return $val;
+	}
 
 	call_integration_hook('integrate_fix_url', array(&$val));
 
@@ -756,62 +809,82 @@ function cdata_parse($data, $ns = '', $override = null)
 
 	$cdata = '<![CDATA[';
 
-	for ($pos = 0, $n = \ElkArte\Util::strlen($data); $pos < $n; null)
+	for ($pos = 0, $n = Util::strlen($data); $pos < $n; null)
 	{
 		$positions = array(
-			\ElkArte\Util::strpos($data, '&', $pos),
-			\ElkArte\Util::strpos($data, ']', $pos),
+			Util::strpos($data, '&', $pos),
+			Util::strpos($data, ']', $pos),
 		);
 
 		if ($ns !== '')
-			$positions[] = \ElkArte\Util::strpos($data, '<', $pos);
+		{
+			$positions[] = Util::strpos($data, '<', $pos);
+		}
 
 		foreach ($positions as $k => $dummy)
 		{
 			if ($dummy === false)
+			{
 				unset($positions[$k]);
+			}
 		}
 
 		$old = $pos;
 		$pos = empty($positions) ? $n : min($positions);
 
 		if ($pos - $old > 0)
-			$cdata .= \ElkArte\Util::substr($data, $old, $pos - $old);
+		{
+			$cdata .= Util::substr($data, $old, $pos - $old);
+		}
 
 		if ($pos >= $n)
-			break;
-
-		if (\ElkArte\Util::substr($data, $pos, 1) === '<')
 		{
-			$pos2 = \ElkArte\Util::strpos($data, '>', $pos);
-			if ($pos2 === false)
-				$pos2 = $n;
+			break;
+		}
 
-			if (\ElkArte\Util::substr($data, $pos + 1, 1) === '/')
-				$cdata .= ']]></' . $ns . ':' . \ElkArte\Util::substr($data, $pos + 2, $pos2 - $pos - 1) . '<![CDATA[';
+		if (Util::substr($data, $pos, 1) === '<')
+		{
+			$pos2 = Util::strpos($data, '>', $pos);
+			if ($pos2 === false)
+			{
+				$pos2 = $n;
+			}
+
+			if (Util::substr($data, $pos + 1, 1) === '/')
+			{
+				$cdata .= ']]></' . $ns . ':' . Util::substr($data, $pos + 2, $pos2 - $pos - 1) . '<![CDATA[';
+			}
 			else
-				$cdata .= ']]><' . $ns . ':' . \ElkArte\Util::substr($data, $pos + 1, $pos2 - $pos) . '<![CDATA[';
+			{
+				$cdata .= ']]><' . $ns . ':' . Util::substr($data, $pos + 1, $pos2 - $pos) . '<![CDATA[';
+			}
 
 			$pos = $pos2 + 1;
 		}
-		elseif (\ElkArte\Util::substr($data, $pos, 1) === ']')
+		elseif (Util::substr($data, $pos, 1) === ']')
 		{
 			$cdata .= ']]>&#093;<![CDATA[';
 			$pos++;
 		}
-		elseif (\ElkArte\Util::substr($data, $pos, 1) === '&')
+		elseif (Util::substr($data, $pos, 1) === '&')
 		{
-			$pos2 = \ElkArte\Util::strpos($data, ';', $pos);
+			$pos2 = Util::strpos($data, ';', $pos);
 
 			if ($pos2 === false)
+			{
 				$pos2 = $n;
+			}
 
-			$ent = \ElkArte\Util::substr($data, $pos + 1, $pos2 - $pos - 1);
+			$ent = Util::substr($data, $pos + 1, $pos2 - $pos - 1);
 
-			if (\ElkArte\Util::substr($data, $pos + 1, 1) === '#')
-				$cdata .= ']]>' . \ElkArte\Util::substr($data, $pos, $pos2 - $pos + 1) . '<![CDATA[';
+			if (Util::substr($data, $pos + 1, 1) === '#')
+			{
+				$cdata .= ']]>' . Util::substr($data, $pos, $pos2 - $pos + 1) . '<![CDATA[';
+			}
 			elseif (in_array($ent, array('amp', 'lt', 'gt', 'quot')))
-				$cdata .= ']]>' . \ElkArte\Util::substr($data, $pos, $pos2 - $pos + 1) . '<![CDATA[';
+			{
+				$cdata .= ']]>' . Util::substr($data, $pos, $pos2 - $pos + 1) . '<![CDATA[';
+			}
 
 			$pos = $pos2 + 1;
 		}

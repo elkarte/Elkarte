@@ -55,102 +55,119 @@ class EmailParse
 {
 	/**
 	 * The full message section (headers, body, etc) we are working on
+	 *
 	 * @var string
 	 */
 	public $raw_message = null;
 
 	/**
 	 * Attachments found after the message
+	 *
 	 * @var string[]
 	 */
 	public $attachments = array();
 
 	/**
 	 * Attachments that we designated as inline with the text
+	 *
 	 * @var string[]
 	 */
 	public $inline_files = array();
 
 	/**
 	 * Parsed and decoded message body, may be plain text or html
+	 *
 	 * @var string
 	 */
 	public $body = null;
 
 	/**
 	 * Parsed and decoded message body, only plain text version
+	 *
 	 * @var string
 	 */
 	public $plain_body = null;
 
 	/**
 	 * All of the parsed message headers
+	 *
 	 * @var mixed[]
 	 */
 	public $headers = array();
 
 	/**
 	 * Full security key
+	 *
 	 * @var string
 	 */
 	public $message_key_id = null;
 
 	/**
 	 * Message hex-code
+	 *
 	 * @var string
 	 */
 	public $message_key = null;
 
 	/**
 	 * Message type of the key p, m or t
+	 *
 	 * @var string
 	 */
 	public $message_type = null;
 
 	/**
 	 * If an html was found in the message
+	 *
 	 * @var boolean
 	 */
 	public $html_found = false;
 
 	/**
 	 * If any positive spam headers were found in the message
+	 *
 	 * @var boolean
 	 */
 	public $spam_found = false;
 
 	/**
 	 * Message id of the key
+	 *
 	 * @var int
 	 */
 	public $message_id = null;
 
 	/**
 	 * Holds the return path as set in the email header
+	 *
 	 * @var string
 	 */
 	public $return_path = null;
 
 	/**
 	 * Holds the message subject
+	 *
 	 * @var string
 	 */
 	public $subject = null;
 
 	/**
 	 * Holds the email to from & cc emails and names
+	 *
 	 * @var mixed[]
 	 */
 	public $email = array();
 
 	/**
 	 * Holds the sending ip of the email
+	 *
 	 * @var string|boolean
 	 */
 	public $ip = false;
 
 	/**
 	 * If the file was converted to utf8
+	 *
 	 * @var boolean
 	 */
 	public $_converted_utf8 = false;
@@ -158,6 +175,7 @@ class EmailParse
 	/**
 	 * Whether the message is a DSN (Delivery Status Notification - aka "bounce"),
 	 * indicating failed delivery
+	 *
 	 * @var boolean
 	 */
 	public $_is_dsn = false;
@@ -165,39 +183,78 @@ class EmailParse
 	/**
 	 * Holds the field/value/type report codes from DSN messages
 	 * Accessible as [$field]['type'] and [$field]['value']
+	 *
 	 * @var mixed[]
 	 */
 	public $_dsn = null;
 
 	/**
 	 * Holds the current email address, to, from, cc
+	 *
 	 * @var string
 	 */
 	private $_email_address = null;
 
 	/**
 	 * Holds the current email name
+	 *
 	 * @var string
 	 */
 	private $_email_name = null;
 
 	/**
 	 * Holds each boundary section of the message
+	 *
 	 * @var string[]
 	 */
 	private $_boundary_section = array();
 
 	/**
 	 * The total number of boundary sections
+	 *
 	 * @var int
 	 */
 	private $_boundary_section_count = 0;
 
 	/**
 	 * The message header block
+	 *
 	 * @var string
 	 */
 	private $_header_block = null;
+
+	/**
+	 * Main email routine, calls the needed functions to parse the data so that
+	 * its available.
+	 *
+	 * What it does:
+	 *
+	 * - read/load data
+	 * - split headers from the body
+	 * - break header string in to individual header keys
+	 * - determine content type and character encoding
+	 * - convert message body's
+	 *
+	 * @param boolean $html - flag to determine if we are saving html or not
+	 * @param string $data - full header+message string
+	 * @param string $location - optional, used for debug
+	 * @throws \ElkArte\Exceptions\Exception
+	 */
+	public function read_email($html = false, $data = '', $location = '')
+	{
+		// Main, will read, split, parse, decode an email
+		$this->read_data($data, $location);
+
+		if ($this->raw_message !== '')
+		{
+			$this->_split_headers();
+			$this->_parse_headers();
+			$this->_parse_content_headers();
+			$this->_parse_body($html);
+			$this->load_subject();
+			$this->_is_dsn = $this->_check_dsn();
+		}
+	}
 
 	/**
 	 * Loads an email message from stdin, file or from a supplied string
@@ -284,39 +341,6 @@ class EmailParse
 	}
 
 	/**
-	 * Main email routine, calls the needed functions to parse the data so that
-	 * its available.
-	 *
-	 * What it does:
-	 *
-	 * - read/load data
-	 * - split headers from the body
-	 * - break header string in to individual header keys
-	 * - determine content type and character encoding
-	 * - convert message body's
-	 *
-	 * @param boolean $html - flag to determine if we are saving html or not
-	 * @param string $data - full header+message string
-	 * @param string $location - optional, used for debug
-	 * @throws \ElkArte\Exceptions\Exception
-	 */
-	public function read_email($html = false, $data = '', $location = '')
-	{
-		// Main, will read, split, parse, decode an email
-		$this->read_data($data, $location);
-
-		if ($this->raw_message !== '')
-		{
-			$this->_split_headers();
-			$this->_parse_headers();
-			$this->_parse_content_headers();
-			$this->_parse_body($html);
-			$this->load_subject();
-			$this->_is_dsn = $this->_check_dsn();
-		}
-	}
-
-	/**
 	 * Separate the email message headers from the message body
 	 *
 	 * The header is separated from the body by
@@ -384,6 +408,170 @@ class EmailParse
 				$this->headers[$header_key] .= ' ' . $this->_decode_header($header_value);
 			}
 		}
+	}
+
+	/**
+	 * Converts a header string to ascii/UTF8
+	 *
+	 * What it does:
+	 *
+	 * - Headers, mostly subject and names may be encoded as quoted printable or base64
+	 * to allow for non ascii characters in those fields.
+	 * - This encoding is separate from the message body encoding and must be
+	 * determined since this encoding is not directly specified by the headers themselves
+	 *
+	 * @param string $val
+	 * @param bool $strict
+	 * @return string
+	 */
+	private function _decode_header($val, $strict = false)
+	{
+		// Check if this header even needs to be decoded.
+		if (strpos($val, '=?') === false || strpos($val, '?=') === false)
+		{
+			return trim($val);
+		}
+
+		// If iconv mime is available just use it and be done
+		if (function_exists('iconv_mime_decode'))
+		{
+			return iconv_mime_decode($val, $strict ? 1 : 2, 'UTF-8');
+		}
+
+		// The RFC 2047-3 defines an encoded-word as a sequence of characters that
+		// begins with "=?", ends with "?=", and has two "?"s in between. After the first question mark
+		// is the name of the character encoding being used; after the second question mark
+		// is the manner in which it's being encoded into plain ASCII (Q=quoted printable, B=base64);
+		// and after the third question mark is the text itself.
+		// Subject: =?iso-8859-1?Q?=A1Hola,_se=F1or!?=
+		$matches = array();
+		if (preg_match_all('~(.*?)(=\?([^?]+)\?(Q|B)\?([^?]*)\?=)([^=\(]*)~i', $val, $matches))
+		{
+			$decoded = '';
+			for ($i = 0, $num = count($matches[4]); $i < $num; $i++)
+			{
+				// [1]leading text, [2]=? to ?=, [3]character set, [4]Q or B, [5]the encoded text [6]trailing text
+				$leading_text = $matches[1][$i];
+				$encoded_charset = $matches[3][$i];
+				$encoded_type = strtolower($matches[4][$i]);
+				$encoded_text = $matches[5][$i];
+				$trailing_text = $matches[6][$i];
+
+				if ($strict)
+				{
+					// Technically the encoded word can only be by itself or in a cname
+					$check = trim($leading_text);
+					if ($i === 0 && !empty($check) && $check[0] !== '(')
+					{
+						$decoded .= $matches[0][$i];
+						continue;
+					}
+				}
+
+				// Decode and convert our string
+				if ($encoded_type === 'q')
+				{
+					$decoded_text = $this->_decode_string(str_replace('_', ' ', $encoded_text), 'quoted-printable', $encoded_charset);
+				}
+				elseif ($encoded_type === 'b')
+				{
+					$decoded_text = $this->_decode_string($encoded_text, 'base64', $encoded_charset);
+				}
+
+				// Add back in anything after the closing ?=
+				if (!empty($encoded_text))
+				{
+					$decoded_text .= $trailing_text;
+				}
+
+				// Add back in the leading text to the now decoded value
+				if (!empty($leading_text))
+				{
+					$decoded_text = $leading_text . $decoded_text;
+				}
+
+				$decoded .= $decoded_text;
+			}
+			$val = $decoded;
+		}
+
+		return trim($val);
+	}
+
+	/**
+	 * Decodes base64 or quoted-printable strings
+	 * Converts from one character set to utf-8
+	 *
+	 * @param string $string
+	 * @param string $encoding
+	 * @param string $charset
+	 *
+	 * @return bool|null|string|string[]
+	 */
+	private function _decode_string($string, $encoding, $charset = '')
+	{
+		// Decode if its quoted printable or base64 encoded
+		if ($encoding === 'quoted-printable')
+		{
+			$string = quoted_printable_decode(preg_replace('~=\r?\n~', '', $string));
+		}
+		elseif ($encoding === 'base64')
+		{
+			$string = base64_decode($string);
+		}
+
+		// Convert this to utf-8 if needed.
+		if (!empty($charset) && $charset !== 'UTF-8')
+		{
+			$string = $this->_charset_convert($string, strtoupper($charset), 'UTF-8');
+		}
+
+		return $string;
+	}
+
+	/**
+	 * Pick the best possible function to convert a strings character set, if any exist
+	 *
+	 * @param string $string
+	 * @param string $from
+	 * @param string $to
+	 *
+	 * @return null|string|string[]
+	 */
+	private function _charset_convert($string, $from, $to)
+	{
+		// Lets assume we have one of the functions available to us
+		$this->_converted_utf8 = true;
+		$string_save = $string;
+
+		// Use iconv if its available
+		if (function_exists('iconv'))
+		{
+			$string = @iconv($from, $to . '//TRANSLIT//IGNORE', $string);
+		}
+
+		// No iconv or a false response from it
+		if (!function_exists('iconv') || ($string === false))
+		{
+			if (function_exists('mb_convert_encoding'))
+			{
+				// Replace unknown characters with a space
+				@ini_set('mbstring.substitute_character', '32');
+				$string = @mb_convert_encoding($string, $to, $from);
+			}
+			elseif (function_exists('recode_string'))
+			{
+				$string = @recode_string($from . '..' . $to, $string);
+			}
+			else
+			{
+				$this->_converted_utf8 = false;
+			}
+		}
+
+		unset($string_save);
+
+		return $string;
 	}
 
 	/**
@@ -540,6 +728,7 @@ class EmailParse
 				{
 					// No boundary's but presented as multipart?, then we must have a incomplete message
 					$this->body = '';
+
 					return;
 				}
 
@@ -658,6 +847,37 @@ class EmailParse
 	}
 
 	/**
+	 * Split up multipart messages and process each section separately
+	 * as its own email object
+	 *
+	 * @param string $boundary
+	 * @param boolean $html - flag to indicate html content
+	 */
+	private function _boundary_split($boundary, $html)
+	{
+		// Split this message up on its boundary sections
+		$parts = explode('--' . $boundary, $this->body);
+		foreach ($parts as $part)
+		{
+			$part = trim($part);
+
+			// Nothing?
+			if (empty($part))
+			{
+				continue;
+			}
+
+			// Parse this section just like its was a separate email
+			$this->_boundary_section[$this->_boundary_section_count] = new EmailParse();
+			$this->_boundary_section[$this->_boundary_section_count]->read_email($html, $part);
+
+			$this->plain_body .= $this->_boundary_section[$this->_boundary_section_count]->plain_body;
+
+			$this->_boundary_section_count++;
+		}
+	}
+
+	/**
 	 * If the boundary is a failed email response, set the DSN flag for the admin
 	 *
 	 * @param int $i The section being worked
@@ -738,125 +958,6 @@ class EmailParse
 	}
 
 	/**
-	 * Split up multipart messages and process each section separately
-	 * as its own email object
-	 *
-	 * @param string $boundary
-	 * @param boolean $html - flag to indicate html content
-	 */
-	private function _boundary_split($boundary, $html)
-	{
-		// Split this message up on its boundary sections
-		$parts = explode('--' . $boundary, $this->body);
-		foreach ($parts as $part)
-		{
-			$part = trim($part);
-
-			// Nothing?
-			if (empty($part))
-			{
-				continue;
-			}
-
-			// Parse this section just like its was a separate email
-			$this->_boundary_section[$this->_boundary_section_count] = new EmailParse();
-			$this->_boundary_section[$this->_boundary_section_count]->read_email($html, $part);
-
-			$this->plain_body .= $this->_boundary_section[$this->_boundary_section_count]->plain_body;
-
-			$this->_boundary_section_count++;
-		}
-	}
-
-	/**
-	 * Converts a header string to ascii/UTF8
-	 *
-	 * What it does:
-	 *
-	 * - Headers, mostly subject and names may be encoded as quoted printable or base64
-	 * to allow for non ascii characters in those fields.
-	 * - This encoding is separate from the message body encoding and must be
-	 * determined since this encoding is not directly specified by the headers themselves
-	 *
-	 * @param string $val
-	 * @param bool $strict
-	 * @return string
-	 */
-	private function _decode_header($val, $strict = false)
-	{
-		// Check if this header even needs to be decoded.
-		if (strpos($val, '=?') === false || strpos($val, '?=') === false)
-		{
-			return trim($val);
-		}
-
-		// If iconv mime is available just use it and be done
-		if (function_exists('iconv_mime_decode'))
-		{
-			return iconv_mime_decode($val, $strict ? 1 : 2, 'UTF-8');
-		}
-
-		// The RFC 2047-3 defines an encoded-word as a sequence of characters that
-		// begins with "=?", ends with "?=", and has two "?"s in between. After the first question mark
-		// is the name of the character encoding being used; after the second question mark
-		// is the manner in which it's being encoded into plain ASCII (Q=quoted printable, B=base64);
-		// and after the third question mark is the text itself.
-		// Subject: =?iso-8859-1?Q?=A1Hola,_se=F1or!?=
-		$matches = array();
-		if (preg_match_all('~(.*?)(=\?([^?]+)\?(Q|B)\?([^?]*)\?=)([^=\(]*)~i', $val, $matches))
-		{
-			$decoded = '';
-			for ($i = 0, $num = count($matches[4]); $i < $num; $i++)
-			{
-				// [1]leading text, [2]=? to ?=, [3]character set, [4]Q or B, [5]the encoded text [6]trailing text
-				$leading_text = $matches[1][$i];
-				$encoded_charset = $matches[3][$i];
-				$encoded_type = strtolower($matches[4][$i]);
-				$encoded_text = $matches[5][$i];
-				$trailing_text = $matches[6][$i];
-
-				if ($strict)
-				{
-					// Technically the encoded word can only be by itself or in a cname
-					$check = trim($leading_text);
-					if ($i === 0 && !empty($check) && $check[0] !== '(')
-					{
-						$decoded .= $matches[0][$i];
-						continue;
-					}
-				}
-
-				// Decode and convert our string
-				if ($encoded_type === 'q')
-				{
-					$decoded_text = $this->_decode_string(str_replace('_', ' ', $encoded_text), 'quoted-printable', $encoded_charset);
-				}
-				elseif ($encoded_type === 'b')
-				{
-					$decoded_text = $this->_decode_string($encoded_text, 'base64', $encoded_charset);
-				}
-
-				// Add back in anything after the closing ?=
-				if (!empty($encoded_text))
-				{
-					$decoded_text .= $trailing_text;
-				}
-
-				// Add back in the leading text to the now decoded value
-				if (!empty($leading_text))
-				{
-					$decoded_text = $leading_text . $decoded_text;
-				}
-
-				$decoded .= $decoded_text;
-			}
-			$val = $decoded;
-		}
-
-		return trim($val);
-	}
-
-	/**
 	 * Checks the body text to see if it may need to be further decoded
 	 *
 	 * What it does:
@@ -905,6 +1006,27 @@ class EmailParse
 		}
 
 		return $val;
+	}
+
+	/**
+	 * Returns the decoded subject of the email
+	 *
+	 * - Makes sure the subject header is set, if not sets it to ''
+	 *
+	 * @return string or null
+	 */
+	public function load_subject()
+	{
+		// Account for those no-subject emails
+		if (!isset($this->headers['subject']))
+		{
+			$this->headers['subject'] = '';
+		}
+
+		// Change it to a readable form ...
+		$this->subject = htmlspecialchars($this->_decode_header($this->headers['subject']), ENT_COMPAT, 'UTF-8');
+
+		return (string) $this->subject;
 	}
 
 	/**
@@ -977,27 +1099,6 @@ class EmailParse
 		}
 
 		return $this->return_path;
-	}
-
-	/**
-	 * Returns the decoded subject of the email
-	 *
-	 * - Makes sure the subject header is set, if not sets it to ''
-	 *
-	 * @return string or null
-	 */
-	public function load_subject()
-	{
-		// Account for those no-subject emails
-		if (!isset($this->headers['subject']))
-		{
-			$this->headers['subject'] = '';
-		}
-
-		// Change it to a readable form ...
-		$this->subject = htmlspecialchars($this->_decode_header($this->headers['subject']), ENT_COMPAT, 'UTF-8');
-
-		return (string) $this->subject;
 	}
 
 	/**
@@ -1077,6 +1178,23 @@ class EmailParse
 	}
 
 	/**
+	 * Loads found key details for use in other functions
+	 *
+	 * @param string[] $match from regex 1=>full, 2=>key, 3=>p|t|m, 4=>12345
+	 */
+	private function _load_key_details($match)
+	{
+		if (!empty($match[1]))
+		{
+			// 1=>7738c27ae6c431495ad26587f30e2121-m29557, 2=>7738c27ae6c431495ad26587f30e2121, 3=>m, 4=>29557
+			$this->message_key_id = $match[1];
+			$this->message_key = $match[2];
+			$this->message_type = $match[3];
+			$this->message_id = (int) $match[4];
+		}
+	}
+
+	/**
 	 * Searches the message body or the raw email in search of the key
 	 *
 	 * - Not found in the headers, so lets search the body for the [key]
@@ -1103,23 +1221,6 @@ class EmailParse
 		}
 
 		return $found_key;
-	}
-
-	/**
-	 * Loads found key details for use in other functions
-	 *
-	 * @param string[] $match from regex 1=>full, 2=>key, 3=>p|t|m, 4=>12345
-	 */
-	private function _load_key_details($match)
-	{
-		if (!empty($match[1]))
-		{
-			// 1=>7738c27ae6c431495ad26587f30e2121-m29557, 2=>7738c27ae6c431495ad26587f30e2121, 3=>m, 4=>29557
-			$this->message_key_id = $match[1];
-			$this->message_key = $match[2];
-			$this->message_type = $match[3];
-			$this->message_id = (int) $match[4];
-		}
 	}
 
 	/**
@@ -1172,102 +1273,6 @@ class EmailParse
 	}
 
 	/**
-	 * Finds the message sending ip and returns it
-	 *
-	 * - will look in various header fields where the ip may reside
-	 * - returns false if it can't find a valid IP4
-	 *
-	 * @return string|boolean on fail
-	 */
-	public function load_ip()
-	{
-		$this->ip = false;
-
-		// The sending IP can be useful in spam prevention and making a post
-		if (isset($this->headers['x-posted-by']))
-		{
-			$this->ip = $this->_parse_ip($this->headers['x-posted-by']);
-		}
-		elseif (isset($this->headers['x-originating-ip']))
-		{
-			$this->ip = $this->_parse_ip($this->headers['x-originating-ip']);
-		}
-		elseif (isset($this->headers['x-senderip']))
-		{
-			$this->ip = $this->_parse_ip($this->headers['x-senderip']);
-		}
-		elseif (isset($this->headers['x-mdremoteip']))
-		{
-			$this->ip = $this->_parse_ip($this->headers['x-mdremoteip']);
-		}
-		elseif (isset($this->headers['received']))
-		{
-			$this->ip = $this->_parse_ip($this->headers['received']);
-		}
-
-		return $this->ip;
-	}
-
-	/**
-	 * Finds if any spam headers have been positively set and returns that flag
-	 *
-	 * - will look in various header fields where the spam status may reside
-	 *
-	 * @return boolean on fail
-	 */
-	public function load_spam()
-	{
-		// SpamAssassin (and others like rspamd)
-		if (isset($this->headers['x-spam-flag']) && strtolower(substr($this->headers['x-spam-flag'], 0, 3)) === 'yes')
-		{
-			$this->spam_found = true;
-		}
-		// SpamStopper and other variants
-		elseif (isset($this->headers['x-spam-status']) && strtolower(substr($this->headers['x-spam-status'], 0, 3)) === 'yes')
-		{
-			$this->spam_found = true;
-		}
-		// j-chkmail --  hi = likely spam lo = suspect ...
-		elseif (isset($this->headers['x-j-chkmail-status']) && strtolower(substr($this->headers['x-j-chkmail-status'], 0, 2)) === 'hi')
-		{
-			$this->spam_found = true;
-		}
-		// Nucleus Mailscanner
-		elseif (isset($this->headers['x-nucleus-mailscanner']) && strtolower($this->headers['x-nucleus-mailscanner']) !== 'found to be clean')
-		{
-			$this->spam_found = true;
-		}
-
-		return $this->spam_found;
-	}
-
-	/**
-	 * Validates that the ip is a valid ip4 address
-	 *
-	 * @param string|null $string
-	 * @return string
-	 */
-	private function _parse_ip($string)
-	{
-		if (preg_match('~\[?(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})\]?~', $string, $matches) !== 1)
-		{
-			return '';
-		}
-
-		$string = trim($matches[0], '[] ');
-
-		// Validate it matches an ip4 standard
-		if (filter_var($string, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4) !== false)
-		{
-			return $string;
-		}
-		else
-		{
-			return '';
-		}
-	}
-
-	/**
 	 * Take an email address and parse out the email address and email name
 	 *
 	 * @param string $val
@@ -1317,78 +1322,98 @@ class EmailParse
 	}
 
 	/**
-	 * Decodes base64 or quoted-printable strings
-	 * Converts from one character set to utf-8
+	 * Finds the message sending ip and returns it
 	 *
-	 * @param string $string
-	 * @param string $encoding
-	 * @param string $charset
+	 * - will look in various header fields where the ip may reside
+	 * - returns false if it can't find a valid IP4
 	 *
-	 * @return bool|null|string|string[]
+	 * @return string|boolean on fail
 	 */
-	private function _decode_string($string, $encoding, $charset = '')
+	public function load_ip()
 	{
-		// Decode if its quoted printable or base64 encoded
-		if ($encoding === 'quoted-printable')
+		$this->ip = false;
+
+		// The sending IP can be useful in spam prevention and making a post
+		if (isset($this->headers['x-posted-by']))
 		{
-			$string = quoted_printable_decode(preg_replace('~=\r?\n~', '', $string));
+			$this->ip = $this->_parse_ip($this->headers['x-posted-by']);
 		}
-		elseif ($encoding === 'base64')
+		elseif (isset($this->headers['x-originating-ip']))
 		{
-			$string = base64_decode($string);
+			$this->ip = $this->_parse_ip($this->headers['x-originating-ip']);
+		}
+		elseif (isset($this->headers['x-senderip']))
+		{
+			$this->ip = $this->_parse_ip($this->headers['x-senderip']);
+		}
+		elseif (isset($this->headers['x-mdremoteip']))
+		{
+			$this->ip = $this->_parse_ip($this->headers['x-mdremoteip']);
+		}
+		elseif (isset($this->headers['received']))
+		{
+			$this->ip = $this->_parse_ip($this->headers['received']);
 		}
 
-		// Convert this to utf-8 if needed.
-		if (!empty($charset) && $charset !== 'UTF-8')
-		{
-			$string = $this->_charset_convert($string, strtoupper($charset), 'UTF-8');
-		}
-
-		return $string;
+		return $this->ip;
 	}
 
 	/**
-	 * Pick the best possible function to convert a strings character set, if any exist
+	 * Validates that the ip is a valid ip4 address
 	 *
-	 * @param string $string
-	 * @param string $from
-	 * @param string $to
-	 *
-	 * @return null|string|string[]
+	 * @param string|null $string
+	 * @return string
 	 */
-	private function _charset_convert($string, $from, $to)
+	private function _parse_ip($string)
 	{
-		// Lets assume we have one of the functions available to us
-		$this->_converted_utf8 = true;
-		$string_save = $string;
-
-		// Use iconv if its available
-		if (function_exists('iconv'))
+		if (preg_match('~\[?(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})\]?~', $string, $matches) !== 1)
 		{
-			$string = @iconv($from, $to . '//TRANSLIT//IGNORE', $string);
+			return '';
 		}
 
-		// No iconv or a false response from it
-		if (!function_exists('iconv') || ($string === false))
+		$string = trim($matches[0], '[] ');
+
+		// Validate it matches an ip4 standard
+		if (filter_var($string, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4) !== false)
 		{
-			if (function_exists('mb_convert_encoding'))
-			{
-				// Replace unknown characters with a space
-				@ini_set('mbstring.substitute_character', '32');
-				$string = @mb_convert_encoding($string, $to, $from);
-			}
-			elseif (function_exists('recode_string'))
-			{
-				$string = @recode_string($from . '..' . $to, $string);
-			}
-			else
-			{
-				$this->_converted_utf8 = false;
-			}
+			return $string;
+		}
+		else
+		{
+			return '';
+		}
+	}
+
+	/**
+	 * Finds if any spam headers have been positively set and returns that flag
+	 *
+	 * - will look in various header fields where the spam status may reside
+	 *
+	 * @return boolean on fail
+	 */
+	public function load_spam()
+	{
+		// SpamAssassin (and others like rspamd)
+		if (isset($this->headers['x-spam-flag']) && strtolower(substr($this->headers['x-spam-flag'], 0, 3)) === 'yes')
+		{
+			$this->spam_found = true;
+		}
+		// SpamStopper and other variants
+		elseif (isset($this->headers['x-spam-status']) && strtolower(substr($this->headers['x-spam-status'], 0, 3)) === 'yes')
+		{
+			$this->spam_found = true;
+		}
+		// j-chkmail --  hi = likely spam lo = suspect ...
+		elseif (isset($this->headers['x-j-chkmail-status']) && strtolower(substr($this->headers['x-j-chkmail-status'], 0, 2)) === 'hi')
+		{
+			$this->spam_found = true;
+		}
+		// Nucleus Mailscanner
+		elseif (isset($this->headers['x-nucleus-mailscanner']) && strtolower($this->headers['x-nucleus-mailscanner']) !== 'found to be clean')
+		{
+			$this->spam_found = true;
 		}
 
-		unset($string_save);
-
-		return $string;
+		return $this->spam_found;
 	}
 }

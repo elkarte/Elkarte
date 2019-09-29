@@ -8,7 +8,7 @@
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause (see accompanying LICENSE.txt file)
  *
  * This file contains code covered by:
- * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * copyright: 2011 Simple Machines (http://www.simplemachines.org)
  *
  * @version 2.0 dev
  *
@@ -16,10 +16,13 @@
 
 namespace ElkArte\Controller;
 
+use ElkArte\AbstractController;
+use ElkArte\Exceptions\Exception;
+
 /**
  * Handles the calculation of forum statistics
  */
-class Stats extends \ElkArte\AbstractController
+class Stats extends AbstractController
 {
 	/**
 	 * Entry point for this class.
@@ -55,7 +58,9 @@ class Stats extends \ElkArte\AbstractController
 
 		// Page disabled - redirect them out
 		if (empty($modSettings['trackStats']))
-			throw new \ElkArte\Exceptions\Exception('feature_disabled', true);
+		{
+			throw new Exception('feature_disabled', true);
+		}
 
 		// Expanding out the history summary
 		list($year, $month) = $this->_expandedStats();
@@ -73,7 +78,9 @@ class Stats extends \ElkArte\AbstractController
 
 			// Collapsing stats only needs adjustments of the session variables.
 			if (!empty($this->_req->query->collapse))
+			{
 				obExit(false);
+			}
 
 			$context['sub_template'] = 'stats';
 			getDailyStats('YEAR(date) = {int:year} AND MONTH(date) = {int:month}', array('year' => $year, 'month' => $month));
@@ -116,6 +123,45 @@ class Stats extends \ElkArte\AbstractController
 	}
 
 	/**
+	 * Sanitize and validate the year / month for expand / collapse stats
+	 *
+	 * @return array of year and month from expand / collapse link
+	 */
+	private function _expandedStats()
+	{
+		global $context;
+
+		$year = '';
+		$month = '';
+
+		if (!empty($this->_req->query->expand))
+		{
+			$context['robot_no_index'] = true;
+
+			$month = (int) substr($this->_req->query->expand, 4);
+			$year = (int) substr($this->_req->query->expand, 0, 4);
+			if ($year > 1900 && $year < 2200 && $month >= 1 && $month <= 12)
+			{
+				$_SESSION['expanded_stats'][$year][] = $month;
+			}
+		}
+		// Done looking at the details and want to fold it back up
+		elseif (!empty($this->_req->query->collapse))
+		{
+			$context['robot_no_index'] = true;
+
+			$month = (int) substr($this->_req->query->collapse, 4);
+			$year = (int) substr($this->_req->query->collapse, 0, 4);
+			if (!empty($_SESSION['expanded_stats'][$year]))
+			{
+				$_SESSION['expanded_stats'][$year] = array_diff($_SESSION['expanded_stats'][$year], array($month));
+			}
+		}
+
+		return array($year, $month);
+	}
+
+	/**
 	 * Load some general statistics of the forum
 	 */
 	public function loadGeneralStatistics()
@@ -148,9 +194,11 @@ class Stats extends \ElkArte\AbstractController
 		);
 
 		if (!empty($modSettings['hitStats']))
+		{
 			$context['general_statistics']['left'] += array(
 				'num_hits' => comma_format($averages['hits'], 0)
 			);
+		}
 
 		$context['general_statistics']['right'] = array(
 			'average_members' => comma_format(round($averages['registers'] / $total_days_up, 2)),
@@ -164,9 +212,11 @@ class Stats extends \ElkArte\AbstractController
 		);
 
 		if (!empty($modSettings['hitStats']))
+		{
 			$context['general_statistics']['right'] += array(
 				'average_hits' => comma_format(round($averages['hits'] / $total_days_up, 2)),
 			);
+		}
 	}
 
 	/**
@@ -226,12 +276,16 @@ class Stats extends \ElkArte\AbstractController
 
 			// Keep a list of collapsed years.
 			if (!$data['expanded'] && !$data['current_year'])
+			{
 				$context['collapsed_years'][] = $year;
+			}
 		}
 
 		// Want to expand out the yearly stats
 		if (empty($_SESSION['expanded_stats']))
+		{
 			return false;
+		}
 
 		$condition_text = array();
 		$condition_params = array();
@@ -247,45 +301,12 @@ class Stats extends \ElkArte\AbstractController
 
 		// No daily stats to even look at?
 		if (empty($condition_text))
+		{
 			return false;
+		}
 
 		getDailyStats(implode(' OR ', $condition_text), $condition_params);
 
 		return true;
-	}
-
-	/**
-	 * Sanitize and validate the year / month for expand / collapse stats
-	 *
-	 * @return array of year and month from expand / collapse link
-	 */
-	private function _expandedStats()
-	{
-		global $context;
-
-		$year = '';
-		$month = '';
-
-		if (!empty($this->_req->query->expand))
-		{
-			$context['robot_no_index'] = true;
-
-			$month = (int) substr($this->_req->query->expand, 4);
-			$year = (int) substr($this->_req->query->expand, 0, 4);
-			if ($year > 1900 && $year < 2200 && $month >= 1 && $month <= 12)
-				$_SESSION['expanded_stats'][$year][] = $month;
-		}
-		// Done looking at the details and want to fold it back up
-		elseif (!empty($this->_req->query->collapse))
-		{
-			$context['robot_no_index'] = true;
-
-			$month = (int) substr($this->_req->query->collapse, 4);
-			$year = (int) substr($this->_req->query->collapse, 0, 4);
-			if (!empty($_SESSION['expanded_stats'][$year]))
-				$_SESSION['expanded_stats'][$year] = array_diff($_SESSION['expanded_stats'][$year], array($month));
-		}
-
-		return array($year, $month);
 	}
 }

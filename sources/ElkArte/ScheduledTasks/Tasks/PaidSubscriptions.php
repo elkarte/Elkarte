@@ -8,7 +8,7 @@
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause (see accompanying LICENSE.txt file)
  *
  * This file contains code covered by:
- * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * copyright: 2011 Simple Machines (http://www.simplemachines.org)
  *
  * @version 2.0 dev
  *
@@ -105,6 +105,7 @@ class PaidSubscriptions implements ScheduledTaskInterface
 
 		// Mark the reminder as sent.
 		if (!empty($subs_reminded))
+		{
 			$db->query('', '
 				UPDATE {db_prefix}log_subscribed
 				SET reminder_sent = {int:reminder_sent}
@@ -114,6 +115,7 @@ class PaidSubscriptions implements ScheduledTaskInterface
 					'reminder_sent' => 1,
 				)
 			);
+		}
 
 		return true;
 	}

@@ -8,7 +8,7 @@
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause (see accompanying LICENSE.txt file)
  *
  * This file contains code covered by:
- * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * copyright: 2011 Simple Machines (http://www.simplemachines.org)
  *
  * @version 2.0 dev
  *
@@ -16,19 +16,24 @@
 
 namespace ElkArte\Modules\Poll;
 
+use ElkArte\EventManager;
+use ElkArte\Exceptions\Exception;
+use ElkArte\Modules\AbstractModule;
+use ElkArte\Util;
+
 /**
  * Class Poll_Post_Module
  *
  * This class contains all matter of things related to creating polls
  */
-class Post extends \ElkArte\Modules\AbstractModule
+class Post extends AbstractModule
 {
 	protected static $_make_poll = false;
 
 	/**
 	 * {@inheritdoc }
 	 */
-	public static function hooks(\ElkArte\EventManager $eventsManager)
+	public static function hooks(EventManager $eventsManager)
 	{
 		global $context, $modSettings;
 
@@ -57,7 +62,9 @@ class Post extends \ElkArte\Modules\AbstractModule
 			));
 		}
 		else
+		{
 			return $return;
+		}
 	}
 
 	/**
@@ -75,6 +82,19 @@ class Post extends \ElkArte\Modules\AbstractModule
 		{
 			$this->_unset_poll();
 		}
+	}
+
+	/**
+	 * Helper function to remove a poll, either by user choice or by catching naughty users
+	 */
+	protected function _unset_poll()
+	{
+		self::$_make_poll = false;
+
+		// deprecated since 1.1 - to be removed when sure it doesn't affect anything else
+		unset($_REQUEST['poll']);
+
+		return true;
 	}
 
 	/**
@@ -107,9 +127,13 @@ class Post extends \ElkArte\Modules\AbstractModule
 
 			// It's a new reply
 			if (empty($_REQUEST['msg']))
+			{
 				$context['can_add_poll'] = false;
+			}
 			else
+			{
 				$context['can_add_poll'] = (allowedTo('poll_add_any') || (!empty($_REQUEST['msg']) && $topic_attributes['id_first_msg'] == $_REQUEST['msg'] && allowedTo('poll_add_own'))) && $topic_attributes['id_poll'] <= 0;
+			}
 		}
 		else
 		{
@@ -128,13 +152,19 @@ class Post extends \ElkArte\Modules\AbstractModule
 		{
 			// New topic, new poll.
 			if (empty($topic))
+			{
 				isAllowedTo('poll_post');
+			}
 			// This is an old topic - but it is yours!  Can you add to it?
 			elseif ($this->user->id == $topic_attributes['id_member'] && !allowedTo('poll_add_any'))
+			{
 				isAllowedTo('poll_add_own');
+			}
 			// If you're not the owner, can you add to any poll?
 			else
+			{
 				isAllowedTo('poll_add_any');
+			}
 			$context['can_moderate_poll'] = true;
 
 			require_once(SUBSDIR . '/Members.subs.php');
@@ -154,6 +184,56 @@ class Post extends \ElkArte\Modules\AbstractModule
 		}
 
 		return true;
+	}
+
+	/**
+	 * Loads in context stuff related to polls
+	 */
+	protected function _preparePollContext()
+	{
+		global $context;
+
+		$context['poll']['question'] = isset($_REQUEST['question']) ? Util::htmlspecialchars(trim($_REQUEST['question'])) : '';
+
+		$context['poll']['choices'] = array();
+		$choice_id = 0;
+
+		$_POST['options'] = empty($_POST['options']) ? array() : htmlspecialchars__recursive($_POST['options']);
+		foreach ($_POST['options'] as $option)
+		{
+			if (trim($option) === '')
+			{
+				continue;
+			}
+
+			$context['poll']['choices'][] = array(
+				'id' => $choice_id++,
+				'number' => $choice_id,
+				'label' => $option,
+				'is_last' => false
+			);
+		}
+
+		// One empty option for those with js disabled...I know are few... :P
+		$context['poll']['choices'][] = array(
+			'id' => $choice_id++,
+			'number' => $choice_id,
+			'label' => '',
+			'is_last' => false
+		);
+
+		if (count($context['poll']['choices']) < 2)
+		{
+			$context['poll']['choices'][] = array(
+				'id' => $choice_id++,
+				'number' => $choice_id,
+				'label' => '',
+				'is_last' => false
+			);
+		}
+
+		$context['last_choice_id'] = $choice_id;
+		$context['poll']['choices'][count($context['poll']['choices']) - 1]['is_last'] = true;
 	}
 
 	/**
@@ -199,14 +279,16 @@ class Post extends \ElkArte\Modules\AbstractModule
 	{
 		// Sorry, multiple polls aren't allowed... yet.  You should stop giving me ideas :P.
 		if (isset($_REQUEST['poll']) && $topic_info['id_poll'] > 0)
+		{
 			$this->_unset_poll();
+		}
 	}
 
 	/**
 	 * Checks the poll conditions before we go to save
 	 *
 	 * @param \ElkArte\Errors\ErrorContext $post_errors
-	 * @param array        $topic_info
+	 * @param array $topic_info
 	 *
 	 * @throws \ElkArte\Exceptions\Exception no_access
 	 */
@@ -214,7 +296,9 @@ class Post extends \ElkArte\Modules\AbstractModule
 	{
 		// Validate the poll...
 		if (!empty($topic_info) && !isset($_REQUEST['msg']))
-			throw new \ElkArte\Exceptions\Exception('no_access', false);
+		{
+			throw new Exception('no_access', false);
+		}
 
 		// This is a new topic... so it's a new poll.
 		if (empty($topic_info))
@@ -243,14 +327,20 @@ class Post extends \ElkArte\Modules\AbstractModule
 		foreach ($_POST['options'] as $k => $option)
 		{
 			if ($option == '')
+			{
 				unset($_POST['options'][$k], $_POST['options'][$k]);
+			}
 		}
 
 		// What are you going to vote between with one choice?!?
 		if (count($_POST['options']) < 2)
+		{
 			$post_errors->addError('poll_few');
+		}
 		elseif (count($_POST['options']) > 256)
+		{
 			$post_errors->addError('poll_many');
+		}
 	}
 
 	/**
@@ -267,71 +357,10 @@ class Post extends \ElkArte\Modules\AbstractModule
 	}
 
 	/**
-	 * Loads in context stuff related to polls
-	 */
-	protected function _preparePollContext()
-	{
-		global $context;
-
-		$context['poll']['question'] = isset($_REQUEST['question']) ? \ElkArte\Util::htmlspecialchars(trim($_REQUEST['question'])) : '';
-
-		$context['poll']['choices'] = array();
-		$choice_id = 0;
-
-		$_POST['options'] = empty($_POST['options']) ? array() : htmlspecialchars__recursive($_POST['options']);
-		foreach ($_POST['options'] as $option)
-		{
-			if (trim($option) === '')
-				continue;
-
-			$context['poll']['choices'][] = array(
-				'id' => $choice_id++,
-				'number' => $choice_id,
-				'label' => $option,
-				'is_last' => false
-			);
-		}
-
-		// One empty option for those with js disabled...I know are few... :P
-		$context['poll']['choices'][] = array(
-			'id' => $choice_id++,
-			'number' => $choice_id,
-			'label' => '',
-			'is_last' => false
-		);
-
-		if (count($context['poll']['choices']) < 2)
-		{
-			$context['poll']['choices'][] = array(
-				'id' => $choice_id++,
-				'number' => $choice_id,
-				'label' => '',
-				'is_last' => false
-			);
-		}
-
-		$context['last_choice_id'] = $choice_id;
-		$context['poll']['choices'][count($context['poll']['choices']) - 1]['is_last'] = true;
-	}
-
-	/**
-	 * Helper function to remove a poll, either by user choice or by catching naughty users
-	 */
-	protected function _unset_poll()
-	{
-		self::$_make_poll = false;
-
-		// deprecated since 1.1 - to be removed when sure it doesn't affect anything else
-		unset($_REQUEST['poll']);
-
-		return true;
-	}
-
-	/**
 	 * Creates a poll based on an array (of POST'ed data)
 	 *
 	 * @param mixed[] $options
-	 * @param string  $user_name The username of the member that creates the poll
+	 * @param string $user_name The username of the member that creates the poll
 	 *
 	 * @return int - the id of the newly created poll
 	 * @throws \ElkArte\Exceptions\Exception poll_range_error
@@ -342,11 +371,17 @@ class Post extends \ElkArte\Modules\AbstractModule
 
 		// Make sure that the user has not entered a ridiculous number of options..
 		if (empty($options['poll_max_votes']) || $options['poll_max_votes'] <= 0)
+		{
 			$poll_max_votes = 1;
+		}
 		elseif ($options['poll_max_votes'] > count($options['options']))
+		{
 			$poll_max_votes = count($options['options']);
+		}
 		else
+		{
 			$poll_max_votes = (int) $options['poll_max_votes'];
+		}
 
 		$poll_expire = (int) $options['poll_expire'];
 		$poll_expire = $poll_expire > 9999 ? 9999 : ($poll_expire < 0 ? 0 : $poll_expire);
@@ -363,20 +398,26 @@ class Post extends \ElkArte\Modules\AbstractModule
 			$allowedVoteGroups = groupsAllowedTo('poll_vote', $board);
 
 			if (!in_array(-1, $allowedVoteGroups['allowed']))
+			{
 				$poll_guest_vote = 0;
+			}
 		}
 
 		// If the user tries to set the poll too far in advance, don't let them.
 		if (!empty($poll_expire) && $poll_expire < 1)
 			// @todo this fatal error should not be here
-			throw new \ElkArte\Exceptions\Exception('poll_range_error', false);
+		{
+			throw new Exception('poll_range_error', false);
+		}
 		// Don't allow them to select option 2 for hidden results if it's not time limited.
 		elseif (empty($poll_expire) && $poll_hide == 2)
+		{
 			$poll_hide = 1;
+		}
 
 		// Clean up the question and answers.
 		$question = htmlspecialchars($options['question'], ENT_COMPAT, 'UTF-8');
-		$question = \ElkArte\Util::substr($question, 0, 255);
+		$question = Util::substr($question, 0, 255);
 		$question = preg_replace('~&amp;#(\d{4,5}|[2-9]\d{2,4}|1[2-9]\d);~', '&#$1;', $question);
 		$poll_options = htmlspecialchars__recursive($options['options']);
 

@@ -13,7 +13,7 @@
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause (see accompanying LICENSE.txt file)
  *
  * This file contains code covered by:
- * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * copyright: 2011 Simple Machines (http://www.simplemachines.org)
  *
  * @version 2.0 dev
  *
@@ -21,13 +21,16 @@
 
 namespace ElkArte\AdminController;
 
+use ElkArte\AbstractController;
+use ElkArte\Exceptions\Exception;
+
 /**
  * "Report" Functions are responsible for generating data for reporting.
  *
  * - They are all called from action_index.
  * - Never access the context directly, but use the data handling functions to do so.
  */
-class Reports extends \ElkArte\AbstractController
+class Reports extends AbstractController
 {
 	/**
 	 * Handling function for generating reports.
@@ -82,6 +85,7 @@ class Reports extends \ElkArte\AbstractController
 
 		$is_first = 0;
 		foreach ($context['report_types'] as $k => $temp)
+		{
 			$context['report_types'][$k] = array(
 				'id' => $k,
 				'title' => isset($txt['gr_type_' . $k]) ? $txt['gr_type_' . $k] : $k,
@@ -89,6 +93,7 @@ class Reports extends \ElkArte\AbstractController
 				'function' => $temp,
 				'is_first' => $is_first++ === 0,
 			);
+		}
 
 		$report_type = !empty($this->_req->post->rt) ? $this->_req->post->rt : (!empty($this->_req->query->rt) ? $this->_req->query->rt : null);
 
@@ -96,6 +101,7 @@ class Reports extends \ElkArte\AbstractController
 		if (empty($report_type) || !isset($context['report_types'][$report_type]))
 		{
 			$context['sub_template'] = 'report_type';
+
 			return;
 		}
 
@@ -124,7 +130,9 @@ class Reports extends \ElkArte\AbstractController
 				$template_layers = theme()->getLayers();
 				$template_layers->removeAll();
 				foreach ($reportTemplates[$set_template]['layers'] as $layer)
+				{
 					$template_layers->add($layer);
+				}
 			}
 		}
 
@@ -197,7 +205,9 @@ class Reports extends \ElkArte\AbstractController
 		$all_groups = getBasicMembergroupData(array('all'), array(), null, false);
 		$groups = array(-1 => $txt['guest_title'], 0 => $txt['full_member']);
 		foreach ($all_groups as $row)
+		{
 			$groups[$row['id']] = empty($row['online_color']) ? $row['name'] : '<span style="color: ' . $row['online_color'] . '">' . $row['name'] . '</span>';
+		}
 
 		// All the fields we'll show.
 		$boardSettings = array(
@@ -214,7 +224,9 @@ class Reports extends \ElkArte\AbstractController
 		);
 
 		if (!empty($modSettings['deny_boards_access']))
+		{
 			$boardSettings['disallowed_groups'] = $txt['board_disallowed_groups'];
+		}
 
 		// Do it in columns, it's just easier.
 		setKeys('cols');
@@ -251,9 +263,13 @@ class Reports extends \ElkArte\AbstractController
 			foreach ($allowedGroups as $key => $group)
 			{
 				if (isset($groups[$group]))
+				{
 					$allowedGroups[$key] = $groups[$group];
+				}
 				else
+				{
 					unset($allowedGroups[$key]);
+				}
 			}
 
 			$boardData['groups'] = implode(', ', $allowedGroups);
@@ -264,9 +280,13 @@ class Reports extends \ElkArte\AbstractController
 				foreach ($disallowedGroups as $key => $group)
 				{
 					if (isset($groups[$group]))
+					{
 						$disallowedGroups[$key] = $groups[$group];
+					}
 					else
+					{
 						unset($disallowedGroups[$key]);
+					}
 				}
 
 				$boardData['disallowed_groups'] = implode(', ', $disallowedGroups);
@@ -303,42 +323,60 @@ class Reports extends \ElkArte\AbstractController
 		if (isset($this->_req->post->boards))
 		{
 			if (!is_array($this->_req->post->boards))
+			{
 				$query_boards['boards'] = array_map('intval', explode(',', $this->_req->post->boards));
+			}
 			else
+			{
 				$query_boards['boards'] = array_map('intval', $this->_req->post->boards);
+			}
 		}
 		else
+		{
 			$query_boards = 'all';
+		}
 
 		// Fetch the board names and profiles.
 		// This returns id_board, name, id_profile keys
 		$boards = fetchBoardsInfo($query_boards, array('sort_by' => 'id_board', 'selects' => 'permissions'));
 		$profiles = array();
 		foreach ($boards as $b)
+		{
 			$profiles[] = $b['id_profile'];
+		}
 
 		// Groups, next.
 		$query_groups = array();
 		if (isset($this->_req->post->groups))
 		{
 			if (!is_array($this->_req->post->groups))
+			{
 				$query_groups = array_map('intval', explode(',', $this->_req->post->groups));
+			}
 			else
+			{
 				$query_groups = array_map('intval', $this->_req->post->groups);
+			}
 
 			$group_clause = 'id_group IN ({array_int:groups})';
 		}
 		else
+		{
 			$group_clause = '1=1';
+		}
 
 		// Get all the possible membergroups, except admin!
 		require_once(SUBSDIR . '/Reports.subs.php');
 		$all_groups = allMembergroups($group_clause, $query_groups);
 
 		if (empty($query_groups) || in_array(-1, $query_groups) || in_array(0, $query_groups))
+		{
 			$member_groups = array('col' => '', -1 => $txt['membergroups_guests'], 0 => $txt['membergroups_members']) + $all_groups;
+		}
 		else
+		{
 			$member_groups = array('col' => '') + $all_groups;
+		}
 
 		// Make sure that every group is represented - plus in rows!
 		setKeys('rows', $member_groups);
@@ -351,8 +389,12 @@ class Reports extends \ElkArte\AbstractController
 		foreach ($boardPermissions as $row)
 		{
 			foreach ($boards as $id => $board)
+			{
 				if ($board['id_profile'] == $row['id_profile'])
+				{
 					$board_permissions[$id][$row['id_group']][$row['permission']] = $row['add_deny'];
+				}
+			}
 
 			// Make sure we get every permission.
 			if (!isset($permissions[$row['permission']]))
@@ -387,7 +429,9 @@ class Reports extends \ElkArte\AbstractController
 				{
 					// Don't overwrite the key column!
 					if ($id_group === 'col')
+					{
 						continue;
+					}
 
 					$group_permissions = isset($groups[$id_group]) ? $groups[$id_group] : array();
 
@@ -395,11 +439,17 @@ class Reports extends \ElkArte\AbstractController
 
 					// Now actually make the data for the group look right.
 					if (empty($curData[$id_group]))
+					{
 						$curData[$id_group] = '<span class="alert">' . $txt['board_perms_deny'] . '</span>';
+					}
 					elseif ($curData[$id_group] == 1)
+					{
 						$curData[$id_group] = '<span class="success">' . $txt['board_perms_allow'] . '</span>';
+					}
 					else
+					{
 						$curData[$id_group] = 'x';
+					}
 				}
 
 				// Now add the data for this permission.
@@ -453,7 +503,9 @@ class Reports extends \ElkArte\AbstractController
 
 		// Add on the boards!
 		foreach ($boards as $board)
+		{
 			$mgSettings['board_' . $board['id']] = $board['name'];
+		}
 
 		// Add all the membergroup settings, plus we'll be adding in columns!
 		setKeys('cols', $mgSettings);
@@ -480,7 +532,9 @@ class Reports extends \ElkArte\AbstractController
 
 			// Board permissions.
 			foreach ($boards as $board)
+			{
 				$group['board_' . $board['id']] = in_array($row['id_group'], $board['groups']) ? '<span class="success">' . $txt['board_perms_allow'] . '</span>' : (!empty($modSettings['deny_boards_access']) && in_array($row['id_group'], $board['deny_groups']) ? '<span class="error">' . $txt['board_perms_deny'] . '</span>' : 'x');
+			}
 
 			addData($group);
 		}
@@ -501,7 +555,9 @@ class Reports extends \ElkArte\AbstractController
 		if (isset($this->_req->post->groups))
 		{
 			if (!is_array($this->_req->post->groups))
+			{
 				$this->_req->post->groups = explode(',', $this->_req->post->groups);
+			}
 
 			$query_groups = array_diff(array_map('intval', $this->_req->post->groups), array(3));
 			$group_clause = 'id_group IN ({array_int:groups})';
@@ -517,9 +573,13 @@ class Reports extends \ElkArte\AbstractController
 		$all_groups = allMembergroups($group_clause, $query_groups);
 
 		if (!isset($this->_req->post->groups) || in_array(-1, $this->_req->post->groups) || in_array(0, $this->_req->post->groups))
+		{
 			$groups = array('col' => '', -1 => $txt['membergroups_guests'], 0 => $txt['membergroups_members']) + $all_groups;
+		}
 		else
+		{
 			$groups = array('col' => '') + $all_groups;
+		}
 
 		// Make sure that every group is represented!
 		setKeys('rows', $groups);
@@ -544,7 +604,9 @@ class Reports extends \ElkArte\AbstractController
 			{
 				// Send the data!
 				if ($lastPermission !== null)
+				{
 					addData($curData);
+				}
 
 				// Add the permission name in the left column.
 				$curData = array('col' => isset($txt['group_perms_name_' . $row['permission']]) ? $txt['group_perms_name_' . $row['permission']] : $row['permission']);
@@ -554,9 +616,13 @@ class Reports extends \ElkArte\AbstractController
 
 			// Good stuff - add the permission to the list!
 			if ($row['add_deny'])
+			{
 				$curData[$row['id_group']] = '<span class="success">' . $txt['board_perms_allow'] . '</span>';
+			}
 			else
+			{
 				$curData[$row['id_group']] = '<span class="alert">' . $txt['board_perms_deny'] . '</span>';
+			}
 		}
 
 		// Flush the last data!
@@ -586,8 +652,12 @@ class Reports extends \ElkArte\AbstractController
 		$boards_moderated = array();
 
 		foreach ($moderators as $id_member => $rows)
+		{
 			foreach ($rows as $row)
+			{
 				$boards_moderated[$id_member][] = $row['id_board'];
+			}
+		}
 
 		// Get a list of global moderators (i.e. members with moderation powers).
 		$global_mods = array_intersect(membersAllowedTo('moderate_board', 0), membersAllowedTo('approve_posts', 0), membersAllowedTo('remove_any', 0), membersAllowedTo('modify_any', 0));
@@ -600,13 +670,17 @@ class Reports extends \ElkArte\AbstractController
 
 		// This is a bit of a cop out - but we're protecting their forum, really!
 		if (count($allStaff) > 300)
-			throw new \ElkArte\Exceptions\Exception('report_error_too_many_staff');
+		{
+			throw new Exception('report_error_too_many_staff');
+		}
 
 		// Get all the possible membergroups!
 		$all_groups = getBasicMembergroupData(array('all'), array(), null, false);
 		$groups = array(0 => $txt['full_member']);
 		foreach ($all_groups as $row)
+		{
 			$groups[$row['id']] = empty($row['online_color']) ? $row['name'] : '<span style="color: ' . $row['online_color'] . '">' . $row['name'] . '</span>';
+		}
 
 		// All the fields we'll show.
 		$staffSettings = array(
@@ -639,18 +713,26 @@ class Reports extends \ElkArte\AbstractController
 
 			// What do they moderate?
 			if (in_array($row['id_member'], $global_mods))
+			{
 				$staffData['moderates'] = '<em>' . $txt['report_staff_all_boards'] . '</em>';
+			}
 			elseif (isset($boards_moderated[$row['id_member']]))
 			{
 				// Get the names
 				foreach ($boards_moderated[$row['id_member']] as $board)
+				{
 					if (isset($boards[$board]))
+					{
 						$staffData['moderates'][] = $boards[$board]['name'];
+					}
+				}
 
 				$staffData['moderates'] = implode(', ', $staffData['moderates']);
 			}
 			else
+			{
 				$staffData['moderates'] = '<em>' . $txt['report_staff_no_boards'] . '</em>';
+			}
 
 			// Next add the main data.
 			addData($staffData);
@@ -682,7 +764,9 @@ function newTable($title = '', $default_value = '', $shading = 'all', $width_nor
 
 	// Set the table count if needed.
 	if (empty($context['table_count']))
+	{
 		$context['table_count'] = 0;
+	}
 
 	// Create the table!
 	$context['tables'][$context['table_count']] = array(
@@ -735,15 +819,23 @@ function addData($inc_data, $custom_table = null)
 
 	// No tables? Create one even though we are probably already in a bad state!
 	if (empty($context['table_count']))
+	{
 		newTable();
+	}
 
 	// Specific table?
 	if ($custom_table !== null && !isset($context['tables'][$custom_table]))
+	{
 		return false;
+	}
 	elseif ($custom_table !== null)
+	{
 		$table = $custom_table;
+	}
 	else
+	{
 		$table = $context['current_table'];
+	}
 
 	// If we have keys, sanitise the data...
 	$data = array();
@@ -757,7 +849,9 @@ function addData($inc_data, $custom_table = null)
 			);
 			// Special "hack" the adding separators when doing data by column.
 			if (substr($key, 0, 5) === '#sep#')
+			{
 				$data[$key]['separator'] = true;
+			}
 		}
 	}
 	else
@@ -770,7 +864,9 @@ function addData($inc_data, $custom_table = null)
 			);
 
 			if (substr($key, 0, 5) === '#sep#')
+			{
 				$data[$key]['separator'] = true;
+			}
 		}
 	}
 
@@ -784,7 +880,9 @@ function addData($inc_data, $custom_table = null)
 	else
 	{
 		foreach ($data as $key => $item)
+		{
 			$context['tables'][$table]['data'][$key][] = $item;
+		}
 	}
 }
 
@@ -802,15 +900,23 @@ function addSeparator($title = '', $custom_table = null)
 
 	// No tables - return?
 	if (empty($context['table_count']))
+	{
 		return false;
+	}
 
 	// Specific table?
 	if ($custom_table !== null && !isset($context['tables'][$custom_table]))
+	{
 		return false;
+	}
 	elseif ($custom_table !== null)
+	{
 		$table = $custom_table;
+	}
 	else
+	{
 		$table = $context['current_table'];
+	}
 
 	// Plumb in the separator
 	$context['tables'][$table]['data'][] = array(
@@ -835,7 +941,9 @@ function finishTables()
 	global $context;
 
 	if (empty($context['tables']))
+	{
 		return;
+	}
 
 	// Loop through each table counting up some basic values, to help with the templating.
 	foreach ($context['tables'] as $id => $table)
@@ -847,11 +955,17 @@ function finishTables()
 
 		// Work out the rough width - for templates like the print template. Without this we might get funny tables.
 		if ($table['shading']['left'] && $table['width']['shaded'] !== 'auto' && $table['width']['normal'] !== 'auto')
+		{
 			$context['tables'][$id]['max_width'] = $table['width']['shaded'] + ($context['tables'][$id]['column_count'] - 1) * $table['width']['normal'];
+		}
 		elseif ($table['width']['normal'] !== 'auto')
+		{
 			$context['tables'][$id]['max_width'] = $context['tables'][$id]['column_count'] * $table['width']['normal'];
+		}
 		else
+		{
 			$context['tables'][$id]['max_width'] = 'auto';
+		}
 	}
 }
 

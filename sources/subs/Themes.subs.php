@@ -15,6 +15,7 @@
  */
 
 use ElkArte\User;
+use ElkArte\Util;
 
 /**
  * Retrieve all installed themes
@@ -42,11 +43,13 @@ function installedThemes()
 	while ($row = $db->fetch_assoc($request))
 	{
 		if (!isset($themes[$row['id_theme']]))
+		{
 			$themes[$row['id_theme']] = array(
 				'id' => $row['id_theme'],
 				'num_default_options' => 0,
 				'num_members' => 0,
 			);
+		}
 		$themes[$row['id_theme']][$row['variable']] = $row['value'];
 	}
 	$db->free_result($request);
@@ -101,8 +104,8 @@ function themeUrl($id_theme)
 		array(
 			'current_theme' => $id_theme,
 			'theme_url' => 'theme_url',
-			)
-		);
+		)
+	);
 
 	list ($theme_url) = $db->fetch_row($request);
 	$db->free_result($request);
@@ -139,8 +142,12 @@ function validateThemeName($indexes, $value_data)
 	{
 		// Find the right one.
 		foreach ($indexes as $index)
+		{
 			if (strpos($row['value'], $index) !== false)
+			{
 				$themes[$row['id_theme']] = $index;
+			}
+		}
 	}
 	$db->free_result($request);
 
@@ -172,7 +179,9 @@ function getBasicThemeInfos($themes)
 		)
 	);
 	while ($row = $db->fetch_assoc($request))
+	{
 		$themelist[$row['id_theme']] = $row['value'];
+	}
 
 	$db->free_result($request);
 
@@ -211,7 +220,9 @@ function getCustomThemes()
 		),
 	);
 	while ($row = $db->fetch_assoc($request))
+	{
 		$themes[$row['id_theme']][$row['variable']] = $row['value'];
+	}
 	$db->free_result($request);
 
 	return $themes;
@@ -232,10 +243,14 @@ function getThemesPathbyID($theme_list = array())
 
 	// Nothing passed then we use the defaults
 	if (empty($theme_list))
+	{
 		$theme_list = explode(',', $modSettings['knownThemes']);
+	}
 
 	if (!is_array($theme_list))
+	{
 		$theme_list = array($theme_list);
+	}
 
 	// Load up any themes we need the paths for
 	$request = $db->query('', '
@@ -252,7 +267,9 @@ function getThemesPathbyID($theme_list = array())
 	);
 	$theme_paths = array();
 	while ($row = $db->fetch_assoc($request))
+	{
 		$theme_paths[$row['id_theme']][$row['variable']] = $row['value'];
+	}
 	$db->free_result($request);
 
 	return $theme_paths;
@@ -284,11 +301,13 @@ function loadThemes($knownThemes)
 	);
 	$themes = array();
 	while ($row = $db->fetch_assoc($request))
+	{
 		$themes[] = array(
 			'id' => $row['id_theme'],
 			'name' => $row['name'],
 			'known' => in_array($row['id_theme'], $knownThemes),
 		);
+	}
 	$db->free_result($request);
 
 	return $themes;
@@ -316,7 +335,9 @@ function loadThemesAffected($id)
 	);
 	$themes = array();
 	while ($row = $db->fetch_row($request))
+	{
 		$themes = explode(',', $row[0]);
+	}
 	$db->free_result($request);
 
 	return $themes;
@@ -340,13 +361,17 @@ function get_file_listing($path, $relative)
 
 	// Is it even a directory?
 	if (!is_dir($path))
+	{
 		throw new \ElkArte\Exceptions\Exception('error_invalid_dir', 'critical');
+	}
 
 	// Read this directory's contents
 	$entries = array();
 	$dir = dir($path);
 	while ($entry = $dir->read())
+	{
 		$entries[] = $entry;
+	}
 	$dir->close();
 
 	// Sort it so it looks natural to the user
@@ -359,10 +384,13 @@ function get_file_listing($path, $relative)
 	{
 		// Skip all dot files, including .htaccess.
 		if (substr($entry, 0, 1) === '.' || $entry === 'CVS')
+		{
 			continue;
+		}
 
 		// A directory entry
 		if (is_dir($path . '/' . $entry))
+		{
 			$listing1[] = array(
 				'filename' => $entry,
 				'is_writable' => is_writable($path . '/' . $entry),
@@ -373,6 +401,7 @@ function get_file_listing($path, $relative)
 				'href' => $scripturl . '?action=admin;area=theme;th=' . $_GET['th'] . ';' . $context['session_var'] . '=' . $context['session_id'] . ';sa=browse;directory=' . $relative . $entry,
 				'size' => '',
 			);
+		}
 		// A file entry has some more checks
 		else
 		{
@@ -399,6 +428,7 @@ function get_file_listing($path, $relative)
 
 /**
  * Counts the theme options configured for guests
+ *
  * @return array
  */
 function countConfiguredGuestOptions()
@@ -417,10 +447,12 @@ function countConfiguredGuestOptions()
 		)
 	);
 	while ($row = $db->fetch_assoc($request))
+	{
 		$themes[] = $row;
+	}
 	$db->free_result($request);
 
-	return($themes);
+	return ($themes);
 }
 
 /**
@@ -461,11 +493,13 @@ function availableThemes($current_theme, $current_member)
 		while ($row = $db->fetch_assoc($request))
 		{
 			if (!isset($available_themes[$row['id_theme']]))
+			{
 				$available_themes[$row['id_theme']] = array(
 					'id' => $row['id_theme'],
 					'selected' => $current_theme == $row['id_theme'],
 					'num_users' => 0
 				);
+			}
 			$available_themes[$row['id_theme']][$row['variable']] = $row['value'];
 		}
 		$db->free_result($request);
@@ -480,28 +514,37 @@ function availableThemes($current_theme, $current_member)
 		$guest_theme = 0;
 	}
 	else
+	{
 		$guest_theme = $modSettings['theme_guests'];
+	}
 
 	$request = $db->query('', '
 		SELECT id_theme, COUNT(*) AS the_count
 		FROM {db_prefix}members
 		GROUP BY id_theme
 		ORDER BY id_theme DESC',
-		array(
-		)
+		array()
 	);
 	while ($row = $db->fetch_assoc($request))
 	{
 		// Figure out which theme it is they are REALLY using.
 		if (!empty($modSettings['knownThemes']) && !in_array($row['id_theme'], explode(',', $modSettings['knownThemes'])))
+		{
 			$row['id_theme'] = $guest_theme;
+		}
 		elseif (empty($modSettings['theme_allow']))
+		{
 			$row['id_theme'] = $guest_theme;
+		}
 
 		if (isset($available_themes[$row['id_theme']]))
+		{
 			$available_themes[$row['id_theme']]['num_users'] += $row['the_count'];
+		}
 		else
+		{
 			$available_themes[$guest_theme]['num_users'] += $row['the_count'];
+		}
 	}
 	$db->free_result($request);
 
@@ -521,7 +564,9 @@ function availableThemes($current_theme, $current_member)
 			)
 		);
 		while ($row = $db->fetch_assoc($request))
+		{
 			$variant_preferences[$row['id_theme']] = $row['value'];
+		}
 		$db->free_result($request);
 	}
 
@@ -533,16 +578,22 @@ function availableThemes($current_theme, $current_member)
 	{
 		// Don't try to load the forum or board default theme's data... it doesn't have any!
 		if ($id_theme == 0)
+		{
 			continue;
+		}
 
 		// The thumbnail needs the correct path.
 		$settings['images_url'] = &$theme_data['images_url'];
 		$theme_thumbnail_href = $theme_data['images_url'] . '/thumbnail.png';
 
 		if (file_exists($theme_data['theme_dir'] . '/languages/' . User::$info->language . '/Settings.' . User::$info->language . '.php'))
+		{
 			include($theme_data['theme_dir'] . '/languages/' . User::$info->language . '/Settings.' . User::$info->language . '.php');
+		}
 		elseif (file_exists($theme_data['theme_dir'] . '/languages/' . $language . '/Settings.' . $language . '.php'))
+		{
 			include($theme_data['theme_dir'] . '/languages/' . $language . '/Settings.' . $language . '.php');
+		}
 		else
 		{
 			$txt['theme_description'] = '';
@@ -570,14 +621,18 @@ function availableThemes($current_theme, $current_member)
 
 					$available_themes[$id_theme]['variants'] = array();
 					foreach ($settings['theme_variants'] as $variant)
+					{
 						$available_themes[$id_theme]['variants'][$variant] = array(
 							'label' => isset($txt['variant_' . $variant]) ? $txt['variant_' . $variant] : $variant,
 							'thumbnail' => !file_exists($theme_data['theme_dir'] . '/images/thumbnail.png') || file_exists($theme_data['theme_dir'] . '/images/thumbnail_' . $variant . '.png') ? $theme_data['images_url'] . '/thumbnail_' . $variant . '.png' : ($theme_data['images_url'] . '/thumbnail.png'),
 						);
+					}
 
 					$available_themes[$id_theme]['selected_variant'] = isset($_GET['vrt']) ? $_GET['vrt'] : (!empty($variant_preferences[$id_theme]) ? $variant_preferences[$id_theme] : (!empty($settings['default_variant']) ? $settings['default_variant'] : $settings['theme_variants'][0]));
 					if (!isset($available_themes[$id_theme]['variants'][$available_themes[$id_theme]['selected_variant']]['thumbnail']))
+					{
 						$available_themes[$id_theme]['selected_variant'] = $settings['theme_variants'][0];
+					}
 
 					$available_themes[$id_theme]['thumbnail_href'] = $available_themes[$id_theme]['variants'][$available_themes[$id_theme]['selected_variant']]['thumbnail'];
 
@@ -597,6 +652,7 @@ function availableThemes($current_theme, $current_member)
 
 /**
  * Counts the theme options configured for members
+ *
  * @return array
  */
 function countConfiguredMemberOptions()
@@ -615,7 +671,9 @@ function countConfiguredMemberOptions()
 		)
 	);
 	while ($row = $db->fetch_assoc($request))
+	{
 		$themes[] = $row;
+	}
 	$db->free_result($request);
 
 	return $themes;
@@ -645,39 +703,61 @@ function removeThemeOptions($theme, $membergroups, $old_settings = '')
 
 	// The default theme is 1 (id_theme = 1)
 	if ($theme === 'default')
+	{
 		$query_param = array('theme_operator' => '=', 'theme' => 1);
+	}
 	// All the themes that are not the default one (id_theme != 1)
 	// @todo 'non_default' would be more explicative, though it could be confused with the one in $membergroups
 	elseif ($theme === 'custom')
+	{
 		$query_param = array('theme_operator' => '!=', 'theme' => 1);
+	}
 	// If numeric means a specific theme
 	elseif (is_numeric($theme))
+	{
 		$query_param = array('theme_operator' => '=', 'theme' => (int) $theme);
+	}
 
 	// Guests means id_member = -1
 	if ($membergroups === 'guests')
+	{
 		$query_param += array('member_operator' => '=', 'member' => -1);
+	}
 	// Members means id_member > 0
 	elseif ($membergroups === 'members')
+	{
 		$query_param += array('member_operator' => '>', 'member' => 0);
+	}
 	// Non default settings id_member != 0 (that is different from id_member > 0)
 	elseif ($membergroups === 'non_default')
+	{
 		$query_param += array('member_operator' => '!=', 'member' => 0);
+	}
 	// all it's all
 	elseif ($membergroups === 'all')
+	{
 		$query_param += array('member_operator' => '', 'member' => 0);
+	}
 	// If it is a number, then it means a specific member (id_member = (int))
 	elseif (is_numeric($membergroups))
+	{
 		$query_param += array('member_operator' => '=', 'member' => (int) $membergroups);
+	}
 
 	// If array or string set up the query accordingly
 	if (is_array($old_settings))
+	{
 		$var = 'variable IN ({array_string:old_settings})';
+	}
 	elseif (!empty($old_settings))
+	{
 		$var = 'variable = {string:old_settings}';
+	}
 	// If empty then means any setting
 	else
+	{
 		$var = '1=1';
+	}
 
 	$db->query('', '
 		DELETE FROM {db_prefix}themes
@@ -747,7 +827,9 @@ function deleteTheme($id)
 
 	// Make sure we never ever delete the default theme!
 	if ($id === 1)
+	{
 		throw new \ElkArte\Exceptions\Exception('no_access', false);
+	}
 
 	$db->query('', '
 		DELETE FROM {db_prefix}themes
@@ -793,8 +875,7 @@ function nextTheme()
 	$result = $db->query('', '
 		SELECT MAX(id_theme)
 		FROM {db_prefix}themes',
-		array(
-		)
+		array()
 	);
 	list ($id_theme) = $db->fetch_row($result);
 	$db->free_result($result);
@@ -907,7 +988,9 @@ function loadThemeOptionsInto($theme, $memID = null, $options = array(), $variab
 		)
 	);
 	while ($row = $db->fetch_assoc($request))
+	{
 		$options[$row['variable']] = $row['value'];
+	}
 	$db->free_result($request);
 
 	return $options;
@@ -917,10 +1000,10 @@ function loadThemeOptionsInto($theme, $memID = null, $options = array(), $variab
  * Used when installing a theme that is based off an existing theme (an therefore is dependant on)
  * Returns based-on theme directory values needed by the install function in ManageThemes.controller
  *
- * @todo may be merged with something else?
  * @param string $based_on name of theme this is based on, will do a LIKE search
  * @param boolean $explicit_images Don't worry its not like it sounds !
  * @return mixed[]
+ * @todo may be merged with something else?
  */
 function loadBasedOnTheme($based_on, $explicit_images = false)
 {
@@ -968,7 +1051,7 @@ function write_theme_info($name, $version, $theme_dir, $theme_values)
 	$xml_info = '<' . '?xml version="1.0"?' . '>
 	<theme-info xmlns="http://www.elkarte.net/xml/theme-info" xmlns:elk="http://www.elkarte.net/">
 		<!-- For the id, always use something unique - put your name, a colon, and then the package name. -->
-		<id>elk:' . \ElkArte\Util::strtolower(str_replace(array(' '), '_', $name)) . '</id>
+		<id>elk:' . Util::strtolower(str_replace(array(' '), '_', $name)) . '</id>
 		<version>' . $version . '</version>
 		<!-- Theme name, used purely for aesthetics. -->
 		<name>' . $name . '</name>

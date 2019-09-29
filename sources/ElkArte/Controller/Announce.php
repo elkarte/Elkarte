@@ -8,7 +8,7 @@
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause (see accompanying LICENSE.txt file)
  *
  * This file contains code covered by:
- * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * copyright: 2011 Simple Machines (http://www.simplemachines.org)
  *
  * @version 2.0 dev
  *
@@ -16,10 +16,13 @@
 
 namespace ElkArte\Controller;
 
+use ElkArte\AbstractController;
+use ElkArte\Exceptions\Exception;
+
 /**
  * Used to handle announce topic functionality.
  */
-class Announce extends \ElkArte\AbstractController
+class Announce extends AbstractController
 {
 	/**
 	 * Set up the context for the announce topic function (action=announce).
@@ -42,7 +45,9 @@ class Announce extends \ElkArte\AbstractController
 
 		// You need to announce something
 		if (empty($topic))
-			throw new \ElkArte\Exceptions\Exception('topic_gone', false);
+		{
+			throw new Exception('topic_gone', false);
+		}
 
 		// Language files
 		theme()->getTemplates()->loadLanguageFile('Post');
@@ -82,7 +87,9 @@ class Announce extends \ElkArte\AbstractController
 		// Build a list of groups that can see this board
 		$groups = array_merge($board_info['groups'], array(1));
 		foreach ($groups as $id => $group)
+		{
 			$groups[$id] = (int) $group;
+		}
 
 		// Prepare for a group selection list in the template
 		$context['groups'] = getGroups($groups);
@@ -127,11 +134,15 @@ class Announce extends \ElkArte\AbstractController
 
 		// Check that at least one membergroup was selected (set from announce sub template)
 		if (empty($_who))
-			throw new \ElkArte\Exceptions\Exception('no_membergroup_selected');
+		{
+			throw new Exception('no_membergroup_selected');
+		}
 
 		// Make sure all membergroups are integers and can access the board of the announcement.
 		foreach ($_who as $id => $mg)
+		{
 			$who[$id] = in_array((int) $mg, $groups) ? (int) $mg : 0;
+		}
 
 		// Get the topic details that we are going to send
 		require_once(SUBSDIR . '/Topic.subs.php');
@@ -157,7 +168,9 @@ class Announce extends \ElkArte\AbstractController
 
 		// Have we allowed members to opt out of announcements?
 		if (!empty($modSettings['allow_disableAnnounce']))
+		{
 			$conditions['notify_announcements'] = 1;
+		}
 
 		$data = retrieveMemberData($conditions);
 
@@ -167,20 +180,30 @@ class Announce extends \ElkArte\AbstractController
 			logAction('announce_topic', array('topic' => $topic), 'user');
 
 			if (!empty($this->_req->post->move) && allowedTo('move_any'))
+			{
 				redirectexit('action=movetopic;topic=' . $topic . '.0' . (empty($this->_req->post->goback) ? '' : ';goback'));
+			}
 			elseif (!empty($this->_req->post->goback))
+			{
 				redirectexit('topic=' . $topic . '.new;boardseen#new', isBrowser('ie'));
+			}
 			else
+			{
 				redirectexit('board=' . $board . '.0');
+			}
 		}
 
 		$this->_send_announcement($data['member_info'], $topic_info);
 
 		// Provide an overall indication of progress, this is not strictly correct
 		if ($data['member_count'] < $conditions['limit'])
+		{
 			$context['percentage_done'] = 100;
+		}
 		else
+		{
 			$context['percentage_done'] = round(100 * $context['start'] / $modSettings['latestMember'], 1);
+		}
 
 		// Prepare for the template
 		$context['move'] = empty($this->_req->post->move) ? 0 : 1;
@@ -191,7 +214,9 @@ class Announce extends \ElkArte\AbstractController
 
 		// Go back to the correct language for the user ;)
 		if (!empty($modSettings['userLanguage']))
+		{
 			theme()->getTemplates()->loadLanguageFile('Post');
+		}
 	}
 
 	/**

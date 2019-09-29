@@ -9,7 +9,7 @@
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause (see accompanying LICENSE.txt file)
  *
  * This file contains code covered by:
- * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * copyright: 2011 Simple Machines (http://www.simplemachines.org)
  *
  * @version 2.0 dev
  *
@@ -28,24 +28,28 @@ class Custom extends Standard
 {
 	/**
 	 *This is the last version of ElkArte that this was tested on, to protect against API changes.
+	 *
 	 * @var string
 	 */
 	public $version_compatible = 'ElkArte 2.0 dev';
 
 	/**
 	 *This won't work with versions of ElkArte less than this.
+	 *
 	 * @var string
 	 */
 	public $min_elk_version = 'ElkArte 1.0 Beta';
 
 	/**
 	 * Is it supported?
+	 *
 	 * @var boolean
 	 */
 	public $is_supported = true;
 
 	/**
 	 * Index Settings
+	 *
 	 * @var array
 	 */
 	protected $indexSettings = array();
@@ -63,11 +67,14 @@ class Custom extends Standard
 		if (!in_array($this->_db->title(), $this->supported_databases))
 		{
 			$this->is_supported = false;
+
 			return;
 		}
 
 		if (empty($modSettings['search_custom_index_config']))
+		{
 			return;
+		}
 
 		$this->indexSettings = Util::unserialize($modSettings['search_custom_index_config']);
 
@@ -113,11 +120,15 @@ class Custom extends Standard
 		$subwords = text2words($word, $this->min_word_length, true);
 
 		if (empty($modSettings['search_force_index']))
+		{
 			$wordsSearch['words'][] = $word;
+		}
 
 		// Excluded phrases don't benefit from being split into subwords.
 		if (count($subwords) > 1 && $isExcluded)
+		{
 			return;
+		}
 		else
 		{
 			foreach ($subwords as $subword)
@@ -126,7 +137,9 @@ class Custom extends Standard
 				{
 					$wordsSearch['indexed_words'][] = $subword;
 					if ($isExcluded !== '')
+					{
 						$wordsExclude[] = $subword;
+					}
 				}
 			}
 		}
@@ -163,7 +176,9 @@ class Custom extends Standard
 		$query_params = $search_data['params'];
 
 		if ($query_params['id_search'])
+		{
 			$query_select['id_search'] = '{int:id_search}';
+		}
 
 		$count = 0;
 		foreach ($words['words'] as $regularWord)
@@ -173,15 +188,25 @@ class Custom extends Standard
 		}
 
 		if ($query_params['user_query'])
+		{
 			$query_where[] = '{raw:user_query}';
+		}
 		if ($query_params['board_query'])
+		{
 			$query_where[] = 'm.id_board {raw:board_query}';
+		}
 		if ($query_params['topic'])
+		{
 			$query_where[] = 'm.id_topic = {int:topic}';
+		}
 		if ($query_params['min_msg_id'])
+		{
 			$query_where[] = 'm.id_msg >= {int:min_msg_id}';
+		}
 		if ($query_params['max_msg_id'])
+		{
 			$query_where[] = 'm.id_msg <= {int:max_msg_id}';
+		}
 
 		$count = 0;
 		if (!empty($query_params['excluded_phrases']) && empty($modSettings['search_force_index']))
@@ -254,15 +279,19 @@ class Custom extends Standard
 
 		$inserts = array();
 		foreach (text2words($msgOptions['body'], $customIndexSettings['bytes_per_word'], true) as $word)
+		{
 			$inserts[] = array($word, $msgOptions['id']);
+		}
 
 		if (!empty($inserts))
+		{
 			$db->insert('ignore',
 				'{db_prefix}log_search_words',
 				array('id_word' => 'int', 'id_msg' => 'int'),
 				$inserts,
 				array('id_word', 'id_msg')
 			);
+		}
 	}
 
 	/**
@@ -312,7 +341,9 @@ class Custom extends Standard
 			{
 				$inserts = array();
 				foreach ($inserted_words as $word)
+				{
 					$inserts[] = array($word, $msgOptions['id']);
+				}
 				$db->insert('insert',
 					'{db_prefix}log_search_words',
 					array('id_word' => 'string', 'id_msg' => 'int'),

@@ -10,7 +10,7 @@
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause (see accompanying LICENSE.txt file)
  *
  * This file contains code covered by:
- * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * copyright: 2011 Simple Machines (http://www.simplemachines.org)
  *
  * @version 2.0 dev
  *
@@ -18,13 +18,23 @@
 
 namespace ElkArte\Controller;
 
+use BBC\ParserWrapper;
+use BBC\PreparseCode;
+use ElkArte\AbstractController;
+use ElkArte\Cache\Cache;
+use ElkArte\DataValidator;
 use ElkArte\Errors\ErrorContext;
 use ElkArte\Exceptions\ControllerRedirectException;
+use ElkArte\Exceptions\Exception;
+use ElkArte\Notifications;
+use ElkArte\NotificationsTask;
+use ElkArte\User;
+use ElkArte\Util;
 
 /**
  * Everything related to posting new replies and topics and modifications of them
  */
-class Post extends \ElkArte\AbstractController
+class Post extends AbstractController
 {
 	/** @var null|ErrorContext The post (messages) errors object */
 	protected $_post_errors = null;
@@ -38,7 +48,7 @@ class Post extends \ElkArte\AbstractController
 	/** @var string The message subject */
 	protected $_form_subject = '';
 
-	/** @var string The message  */
+	/** @var string The message */
 	protected $_form_message = '';
 
 	/** @var \BBC\PreparseCode */
@@ -52,7 +62,7 @@ class Post extends \ElkArte\AbstractController
 		$this->_post_errors = ErrorContext::context('post', 1);
 		$this->_template_layers = theme()->getLayers();
 
-		$this->preparse = \BBC\PreparseCode::instance($this->user->name);
+		$this->preparse = PreparseCode::instance($this->user->name);
 
 		require_once(SUBSDIR . '/Post.subs.php');
 		require_once(SUBSDIR . '/Messages.subs.php');
@@ -172,7 +182,9 @@ class Post extends \ElkArte\AbstractController
 
 		// You must be posting to *some* board.
 		if (empty($board) && !$context['make_event'])
-			throw new \ElkArte\Exceptions\Exception('no_board', false);
+		{
+			throw new Exception('no_board', false);
+		}
 
 		// All those wonderful modifiers and attachments
 		$this->_template_layers->add('additional_options', 200);
@@ -191,7 +203,9 @@ class Post extends \ElkArte\AbstractController
 		{
 			$topic = associatedTopic((int) $_REQUEST['msg']);
 			if (empty($topic))
+			{
 				unset($_REQUEST['msg'], $_POST['msg'], $_GET['msg']);
+			}
 		}
 
 		// Check if it's locked. It isn't locked if no topic is specified.
@@ -204,16 +218,22 @@ class Post extends \ElkArte\AbstractController
 			if (empty($_REQUEST['msg']))
 			{
 				if ($this->user->is_guest && !allowedTo('post_reply_any') && (!$modSettings['postmod_active'] || !allowedTo('post_unapproved_replies_any')))
+				{
 					is_not_guest();
+				}
 
 				// By default the reply will be approved...
 				$context['becomes_approved'] = true;
 				if ($this->_topic_attributes['id_member'] != $this->user->id)
 				{
 					if ($modSettings['postmod_active'] && allowedTo('post_unapproved_replies_any') && !allowedTo('post_reply_any'))
+					{
 						$context['becomes_approved'] = false;
+					}
 					else
+					{
 						isAllowedTo('post_reply_any');
+					}
 				}
 				elseif (!allowedTo('post_reply_any'))
 				{
@@ -256,9 +276,13 @@ class Post extends \ElkArte\AbstractController
 			if (empty($context['make_event']) || !empty($board))
 			{
 				if ($modSettings['postmod_active'] && !allowedTo('post_new') && allowedTo('post_unapproved_topics'))
+				{
 					$context['becomes_approved'] = false;
+				}
 				else
+				{
 					isAllowedTo('post_new');
+				}
 			}
 
 			$this->_topic_attributes['locked'] = 0;
@@ -287,7 +311,9 @@ class Post extends \ElkArte\AbstractController
 
 		// Don't allow a post if it's locked and you aren't all powerful.
 		if ($this->_topic_attributes['locked'] && !allowedTo('moderate_board'))
-			throw new \ElkArte\Exceptions\Exception('topic_locked', false);
+		{
+			throw new Exception('topic_locked', false);
+		}
 	}
 
 	protected function _generating_message()
@@ -304,9 +330,13 @@ class Post extends \ElkArte\AbstractController
 				if (!empty($context['new_replies']))
 				{
 					if ($context['new_replies'] == 1)
+					{
 						$txt['error_new_replies'] = isset($_GET['last_msg']) ? $txt['error_new_reply_reading'] : $txt['error_new_reply'];
+					}
 					else
+					{
 						$txt['error_new_replies'] = sprintf(isset($_GET['last_msg']) ? $txt['error_new_replies_reading'] : $txt['error_new_replies'], $context['new_replies']);
+					}
 
 					$this->_post_errors->addError('new_replies', 0);
 
@@ -332,13 +362,19 @@ class Post extends \ElkArte\AbstractController
 			else
 			{
 				if (!isset($_REQUEST['subject']))
+				{
 					$_REQUEST['subject'] = '';
+				}
 
 				if (!isset($_REQUEST['message']))
+				{
 					$_REQUEST['message'] = '';
+				}
 
 				if (!isset($_REQUEST['icon']))
+				{
 					$_REQUEST['icon'] = 'xx';
+				}
 
 				// They are previewing if they asked to preview (i.e. came from quick reply).
 				$really_previewing = !empty($_REQUEST['preview']) || isset($_REQUEST['xml']);
@@ -353,18 +389,20 @@ class Post extends \ElkArte\AbstractController
 			$context['can_announce'] &= $context['becomes_approved'];
 
 			// Set up the inputs for the form.
-			$this->_form_subject = strtr(\ElkArte\Util::htmlspecialchars($_REQUEST['subject']), array("\r" => '', "\n" => '', "\t" => ''));
-			$this->_form_message = \ElkArte\Util::htmlspecialchars($_REQUEST['message'], ENT_QUOTES, 'UTF-8', true);
+			$this->_form_subject = strtr(Util::htmlspecialchars($_REQUEST['subject']), array("\r" => '', "\n" => '', "\t" => ''));
+			$this->_form_message = Util::htmlspecialchars($_REQUEST['message'], ENT_QUOTES, 'UTF-8', true);
 
 			// Make sure the subject isn't too long - taking into account special characters.
-			if (\ElkArte\Util::strlen($this->_form_subject) > 100)
-				$this->_form_subject = \ElkArte\Util::substr($this->_form_subject, 0, 100);
+			if (Util::strlen($this->_form_subject) > 100)
+			{
+				$this->_form_subject = Util::substr($this->_form_subject, 0, 100);
+			}
 
 			// Are you... a guest?
 			if ($this->user->is_guest)
 			{
-				$context['name'] = !isset($_REQUEST['guestname']) ? '' : \ElkArte\Util::htmlspecialchars(trim($_REQUEST['guestname']));
-				$context['email'] = !isset($_REQUEST['email']) ? '' : \ElkArte\Util::htmlspecialchars(trim($_REQUEST['email']));
+				$context['name'] = !isset($_REQUEST['guestname']) ? '' : Util::htmlspecialchars(trim($_REQUEST['guestname']));
+				$context['email'] = !isset($_REQUEST['email']) ? '' : Util::htmlspecialchars(trim($_REQUEST['email']));
 				$this->user->name = $context['name'];
 			}
 
@@ -376,7 +414,7 @@ class Post extends \ElkArte\AbstractController
 				$this->preparse->preparsecode($this->_form_message, true);
 
 				// Do all bulletin board code thing on the message
-				$bbc_parser = \BBC\ParserWrapper::instance();
+				$bbc_parser = ParserWrapper::instance();
 				$this->preparse->preparsecode($context['preview_message']);
 				$context['preview_message'] = $bbc_parser->parseMessage($context['preview_message'], isset($_REQUEST['ns']) ? 0 : 1);
 				$context['preview_message'] = censor($context['preview_message']);
@@ -392,13 +430,19 @@ class Post extends \ElkArte\AbstractController
 				}
 
 				if ($context['preview_message'] === '')
+				{
 					$this->_post_errors->addError('no_message');
-				elseif (!empty($modSettings['max_messageLength']) && \ElkArte\Util::strlen($this->_form_message) > $modSettings['max_messageLength'])
+				}
+				elseif (!empty($modSettings['max_messageLength']) && Util::strlen($this->_form_message) > $modSettings['max_messageLength'])
+				{
 					$this->_post_errors->addError(array('long_message', array($modSettings['max_messageLength'])));
+				}
 
 				// Protect any CDATA blocks.
 				if (isset($_REQUEST['xml']))
+				{
 					$context['preview_message'] = strtr($context['preview_message'], array(']]>' => ']]]]><![CDATA[>'));
+				}
 			}
 
 			// Set up the checkboxes.
@@ -421,12 +465,18 @@ class Post extends \ElkArte\AbstractController
 				// The message they were trying to edit was most likely deleted.
 				// @todo Change this error message?
 				if ($message === false)
-					throw new \ElkArte\Exceptions\Exception('no_board', false);
+				{
+					throw new Exception('no_board', false);
+				}
 
 				$errors = checkMessagePermissions($message['message']);
 				if (!empty($errors))
+				{
 					foreach ($errors as $error)
+					{
 						$this->_post_errors->addError($error);
+					}
+				}
 
 				prepareMessageContext($message);
 			}
@@ -435,12 +485,18 @@ class Post extends \ElkArte\AbstractController
 				// @todo: sort out what kind of combinations are actually possible
 				// Posting a quoted reply?
 				if ((!empty($topic) && !empty($_REQUEST['quote'])) || (!empty($modSettings['enableFollowup']) && !empty($_REQUEST['followup'])))
+				{
 					$case = 2;
+				}
 				// Posting a reply without a quote?
 				elseif (!empty($topic) && empty($_REQUEST['quote']))
+				{
 					$case = 3;
+				}
 				else
+				{
 					$case = 4;
+				}
 
 				list ($this->_form_subject,) = getFormMsgSubject($case, $topic, $this->_topic_attributes['subject']);
 			}
@@ -457,14 +513,20 @@ class Post extends \ElkArte\AbstractController
 
 			// The message they were trying to edit was most likely deleted.
 			if ($message === false)
-				throw new \ElkArte\Exceptions\Exception('no_message', false);
+			{
+				throw new Exception('no_message', false);
+			}
 
 			// Trigger the prepare_editing event
 			$this->_events->trigger('prepare_editing', array('topic' => $topic, 'message' => &$message));
 
 			if (!empty($message['errors']))
+			{
 				foreach ($message['errors'] as $error)
+				{
 					$this->_post_errors->addError($error);
+				}
+			}
 
 			// Get the stuff ready for the form.
 			$this->_form_subject = $message['message']['subject'];
@@ -502,19 +564,27 @@ class Post extends \ElkArte\AbstractController
 			// @todo: sort out what kind of combinations are actually possible
 			// Posting a quoted reply?
 			if ((!empty($topic) && !empty($_REQUEST['quote'])) || (!empty($modSettings['enableFollowup']) && !empty($_REQUEST['followup'])))
+			{
 				$case = 2;
+			}
 			// Posting a reply without a quote?
 			elseif (!empty($topic) && empty($_REQUEST['quote']))
+			{
 				$case = 3;
+			}
 			else
+			{
 				$case = 4;
+			}
 
 			list ($this->_form_subject, $this->_form_message) = getFormMsgSubject($case, $topic, $this->_topic_attributes['subject']);
 		}
 
 		// Check whether this is a really old post being bumped...
 		if (!empty($topic) && !empty($modSettings['oldTopicDays']) && $this->_topic_attributes['last_post_time'] + $modSettings['oldTopicDays'] * 86400 < time() && empty($this->_topic_attributes['is_sticky']) && !isset($_REQUEST['subject']))
+		{
 			$this->_post_errors->addError(array('old_topic', array($modSettings['oldTopicDays'])), 0);
+		}
 	}
 
 	protected function _preparing_page()
@@ -532,13 +602,21 @@ class Post extends \ElkArte\AbstractController
 		if (empty($context['page_title']))
 		{
 			if (isset($_REQUEST['msg']))
+			{
 				$context['page_title'] = $txt['modify_msg'];
+			}
 			elseif (isset($_REQUEST['subject'], $context['preview_subject']))
+			{
 				$context['page_title'] = $txt['post_reply'];
+			}
 			elseif (empty($topic))
+			{
 				$context['page_title'] = $txt['start_new_topic'];
+			}
 			else
+			{
 				$context['page_title'] = $txt['post_reply'];
+			}
 		}
 
 		// Update the topic summary, needed to show new posts in a preview
@@ -547,9 +625,13 @@ class Post extends \ElkArte\AbstractController
 			$only_approved = $modSettings['postmod_active'] && !allowedTo('approve_posts');
 
 			if (isset($_REQUEST['xml']))
+			{
 				$limit = empty($context['new_replies']) ? 0 : (int) $context['new_replies'];
+			}
 			else
+			{
 				$limit = $modSettings['topicSummaryPosts'];
+			}
 
 			$before = isset($_REQUEST['msg']) ? array('before' => (int) $_REQUEST['msg']) : array();
 
@@ -562,13 +644,17 @@ class Post extends \ElkArte\AbstractController
 				$post['is_ignored'] = !empty($modSettings['enable_buddylist']) && in_array($post['id_poster'], $this->user->ignoreusers);
 
 				if (!empty($context['new_replies']))
+				{
 					$context['new_replies']--;
+				}
 			}
 		}
 
 		// Just ajax previewing then lets stop now
 		if (isset($_REQUEST['xml']))
+		{
 			obExit();
+		}
 
 		$context['subject'] = addcslashes($this->_form_subject, '"');
 		$context['message'] = str_replace(array('"', '<', '>', '&nbsp;'), array('&quot;', '&lt;', '&gt;', ' '), $this->_form_message);
@@ -586,7 +672,9 @@ class Post extends \ElkArte\AbstractController
 
 			// $context['icon'] is set when editing a message
 			if (!isset($context['icon']))
+			{
 				$context['icon'] = $context['icons'][0]['value'];
+			}
 			$found = false;
 			foreach ($context['icons'] as $icon)
 			{
@@ -668,12 +756,18 @@ class Post extends \ElkArte\AbstractController
 		if (empty($_POST) && empty($topic))
 		{
 			if (empty($_SERVER['CONTENT_LENGTH']))
+			{
 				redirectexit('action=post;board=' . $board . '.0');
+			}
 			else
-				throw new \ElkArte\Exceptions\Exception('post_upload_error', false);
+			{
+				throw new Exception('post_upload_error', false);
+			}
 		}
 		elseif (empty($_POST) && !empty($topic))
+		{
 			redirectexit('action=post;topic=' . $topic . '.0');
+		}
 
 		// No need!
 		$context['robot_no_index'] = true;
@@ -696,7 +790,9 @@ class Post extends \ElkArte\AbstractController
 
 		// Previewing? Go back to start.
 		if (isset($_REQUEST['preview']))
+		{
 			return $this->action_post();
+		}
 
 		require_once(SUBSDIR . '/Boards.subs.php');
 		theme()->getTemplates()->loadLanguageFile('Post');
@@ -714,11 +810,15 @@ class Post extends \ElkArte\AbstractController
 
 			// Though the topic should be there, it might have vanished.
 			if (empty($topic_info))
-				throw new \ElkArte\Exceptions\Exception('topic_doesnt_exist');
+			{
+				throw new Exception('topic_doesnt_exist');
+			}
 
 			// Did this topic suddenly move? Just checking...
 			if ($topic_info['id_board'] != $board)
-				throw new \ElkArte\Exceptions\Exception('not_a_topic');
+			{
+				throw new Exception('not_a_topic');
+			}
 		}
 
 		// Replying to a topic?
@@ -726,16 +826,22 @@ class Post extends \ElkArte\AbstractController
 		{
 			// Don't allow a post if it's locked.
 			if ($topic_info['locked'] != 0 && !allowedTo('moderate_board'))
-				throw new \ElkArte\Exceptions\Exception('topic_locked', false);
+			{
+				throw new Exception('topic_locked', false);
+			}
 
 			// Do the permissions and approval stuff...
 			$becomesApproved = true;
 			if ($topic_info['id_member_started'] != $this->user->id)
 			{
 				if ($modSettings['postmod_active'] && allowedTo('post_unapproved_replies_any') && !allowedTo('post_reply_any'))
+				{
 					$becomesApproved = false;
+				}
 				else
+				{
 					isAllowedTo('post_reply_any');
+				}
 			}
 			elseif (!allowedTo('post_reply_any'))
 			{
@@ -764,7 +870,9 @@ class Post extends \ElkArte\AbstractController
 
 			// So you wanna (un)sticky this...let's see.
 			if (isset($_POST['sticky']) && ($_POST['sticky'] == $topic_info['is_sticky'] || !allowedTo('make_sticky')))
+			{
 				unset($_POST['sticky']);
+			}
 
 			// Trigger the save_replying event
 			$this->_events->trigger('save_replying', array('topic_info' => &$topic_info));
@@ -792,9 +900,13 @@ class Post extends \ElkArte\AbstractController
 			// Do like, the permissions, for safety and stuff...
 			$becomesApproved = true;
 			if ($modSettings['postmod_active'] && !allowedTo('post_new') && allowedTo('post_unapproved_topics'))
+			{
 				$becomesApproved = false;
+			}
 			else
+			{
 				isAllowedTo('post_new');
+			}
 
 			// Trigger teh save new topic event
 			$this->_events->trigger('save_new_topic', array('becomesApproved' => &$becomesApproved));
@@ -805,7 +917,9 @@ class Post extends \ElkArte\AbstractController
 			}
 
 			if (isset($_POST['sticky']) && (empty($_POST['sticky']) || !allowedTo('make_sticky')))
+			{
 				unset($_POST['sticky']);
+			}
 
 			$posterIsGuest = $this->user->is_guest;
 		}
@@ -817,13 +931,17 @@ class Post extends \ElkArte\AbstractController
 			$msgInfo = basicMessageInfo($_REQUEST['msg'], true);
 
 			if (empty($msgInfo))
-				throw new \ElkArte\Exceptions\Exception('cant_find_messages', false);
+			{
+				throw new Exception('cant_find_messages', false);
+			}
 
 			// Trigger teh save_modify event
 			$this->_events->trigger('save_modify', array('msgInfo' => &$msgInfo));
 
 			if (!empty($topic_info['locked']) && !allowedTo('moderate_board'))
-				throw new \ElkArte\Exceptions\Exception('topic_locked', false);
+			{
+				throw new Exception('topic_locked', false);
+			}
 
 			if (isset($_POST['lock']))
 			{
@@ -832,16 +950,24 @@ class Post extends \ElkArte\AbstractController
 
 			// Change the sticky status of this topic?
 			if (isset($_POST['sticky']) && (!allowedTo('make_sticky') || $_POST['sticky'] == $topic_info['is_sticky']))
+			{
 				unset($_POST['sticky']);
+			}
 
 			if ($msgInfo['id_member'] == $this->user->id && !allowedTo('modify_any'))
 			{
 				if ((!$modSettings['postmod_active'] || $msgInfo['approved']) && !empty($modSettings['edit_disable_time']) && $msgInfo['poster_time'] + ($modSettings['edit_disable_time'] + 5) * 60 < time())
-					throw new \ElkArte\Exceptions\Exception('modify_post_time_passed', false);
+				{
+					throw new Exception('modify_post_time_passed', false);
+				}
 				elseif ($topic_info['id_member_started'] == $this->user->id && !allowedTo('modify_own'))
+				{
 					isAllowedTo('modify_replies');
+				}
 				else
+				{
 					isAllowedTo('modify_own');
+				}
 			}
 			elseif ($topic_info['id_member_started'] == $this->user->id && !allowedTo('modify_any'))
 			{
@@ -856,7 +982,9 @@ class Post extends \ElkArte\AbstractController
 
 				// Log it, assuming you're not modifying your own post.
 				if ($msgInfo['id_member'] != $this->user->id)
+				{
 					$moderationAction = true;
+				}
 			}
 
 			$posterIsGuest = empty($msgInfo['id_member']);
@@ -883,22 +1011,28 @@ class Post extends \ElkArte\AbstractController
 		// If the poster is a guest evaluate the legality of name and email.
 		if ($posterIsGuest)
 		{
-			$_POST['guestname'] = !isset($_POST['guestname']) ? '' : \ElkArte\Util::htmlspecialchars(trim($_POST['guestname']));
-			$_POST['email'] = !isset($_POST['email']) ? '' : \ElkArte\Util::htmlspecialchars(trim($_POST['email']));
+			$_POST['guestname'] = !isset($_POST['guestname']) ? '' : Util::htmlspecialchars(trim($_POST['guestname']));
+			$_POST['email'] = !isset($_POST['email']) ? '' : Util::htmlspecialchars(trim($_POST['email']));
 
 			if ($_POST['guestname'] == '' || $_POST['guestname'] == '_')
+			{
 				$this->_post_errors->addError('no_name');
+			}
 
-			if (\ElkArte\Util::strlen($_POST['guestname']) > 25)
+			if (Util::strlen($_POST['guestname']) > 25)
+			{
 				$this->_post_errors->addError('long_name');
+			}
 
 			if (empty($modSettings['guest_post_no_email']))
 			{
 				// Only check if they changed it!
 				if (!isset($msgInfo) || $msgInfo['poster_email'] !== $_POST['email'])
 				{
-					if (!allowedTo('moderate_forum') && !\ElkArte\DataValidator::is_valid($_POST, array('email' => 'valid_email|required'), array('email' => 'trim')))
+					if (!allowedTo('moderate_forum') && !DataValidator::is_valid($_POST, array('email' => 'valid_email|required'), array('email' => 'trim')))
+					{
 						empty($_POST['email']) ? $this->_post_errors->addError('no_email') : $this->_post_errors->addError('bad_email');
+					}
 				}
 
 				// Now make sure this email address is not banned from posting.
@@ -924,21 +1058,23 @@ class Post extends \ElkArte\AbstractController
 		}
 
 		// Check the subject and message.
-		if (!isset($_POST['subject']) || \ElkArte\Util::htmltrim(\ElkArte\Util::htmlspecialchars($_POST['subject'])) === '')
+		if (!isset($_POST['subject']) || Util::htmltrim(Util::htmlspecialchars($_POST['subject'])) === '')
+		{
 			$this->_post_errors->addError('no_subject');
+		}
 
-		if (!isset($_POST['message']) || \ElkArte\Util::htmltrim(\ElkArte\Util::htmlspecialchars($_POST['message'], ENT_QUOTES)) === '')
+		if (!isset($_POST['message']) || Util::htmltrim(Util::htmlspecialchars($_POST['message'], ENT_QUOTES)) === '')
 		{
 			$this->_post_errors->addError('no_message');
 		}
-		elseif (!empty($modSettings['max_messageLength']) && \ElkArte\Util::strlen($_POST['message']) > $modSettings['max_messageLength'])
+		elseif (!empty($modSettings['max_messageLength']) && Util::strlen($_POST['message']) > $modSettings['max_messageLength'])
 		{
 			$this->_post_errors->addError(array('long_message', array($modSettings['max_messageLength'])));
 		}
 		else
 		{
 			// Prepare the message a bit for some additional testing.
-			$_POST['message'] = \ElkArte\Util::htmlspecialchars($_POST['message'], ENT_QUOTES, 'UTF-8', true);
+			$_POST['message'] = Util::htmlspecialchars($_POST['message'], ENT_QUOTES, 'UTF-8', true);
 
 			// Preparse code. (Zef)
 			if ($this->user->is_guest)
@@ -948,11 +1084,13 @@ class Post extends \ElkArte\AbstractController
 
 			$this->preparse->preparsecode($_POST['message']);
 
-			$bbc_parser = \BBC\ParserWrapper::instance();
+			$bbc_parser = ParserWrapper::instance();
 
 			// Let's see if there's still some content left without the tags.
-			if (\ElkArte\Util::htmltrim(strip_tags($bbc_parser->parseMessage($_POST['message'], false), '<img>')) === '' && (!allowedTo('admin_forum') || strpos($_POST['message'], '[html]') === false))
+			if (Util::htmltrim(strip_tags($bbc_parser->parseMessage($_POST['message'], false), '<img>')) === '' && (!allowedTo('admin_forum') || strpos($_POST['message'], '[html]') === false))
+			{
 				$this->_post_errors->addError('no_message');
+			}
 		}
 
 		if ($posterIsGuest)
@@ -960,7 +1098,9 @@ class Post extends \ElkArte\AbstractController
 			// If user is a guest, make sure the chosen name isn't taken.
 			require_once(SUBSDIR . '/Members.subs.php');
 			if (isReservedName($_POST['guestname'], 0, true, false) && (!isset($msgInfo['poster_name']) || $_POST['guestname'] !== $msgInfo['poster_name']))
+			{
 				$this->_post_errors->addError('bad_name');
+			}
 		}
 		// If the user isn't a guest, get his or her name and email.
 		elseif (!isset($_REQUEST['msg']))
@@ -978,9 +1118,13 @@ class Post extends \ElkArte\AbstractController
 				$post_in_board = boardInfo($new_board);
 
 				if (!empty($post_in_board))
+				{
 					$this->_post_errors->addError(array('post_new_board', array($post_in_board['name'])));
+				}
 				else
+				{
 					$this->_post_errors->addError('post_new');
+				}
 			}
 		}
 
@@ -994,25 +1138,30 @@ class Post extends \ElkArte\AbstractController
 			);
 
 			$_REQUEST['preview'] = false;
+
 			return $this->action_post();
 		}
 
 		// Make sure the user isn't spamming the board.
 		if (!isset($_REQUEST['msg']))
+		{
 			spamProtection('post');
+		}
 
 		// At about this point, we're posting and that's that.
 		ignore_user_abort(true);
 		detectServer()->setTimeLimit(300);
 
 		// Add special html entities to the subject, name, and email.
-		$_POST['subject'] = strtr(\ElkArte\Util::htmlspecialchars($_POST['subject']), array("\r" => '', "\n" => '', "\t" => ''));
+		$_POST['subject'] = strtr(Util::htmlspecialchars($_POST['subject']), array("\r" => '', "\n" => '', "\t" => ''));
 		$_POST['guestname'] = htmlspecialchars($_POST['guestname'], ENT_COMPAT, 'UTF-8');
 		$_POST['email'] = htmlspecialchars($_POST['email'], ENT_COMPAT, 'UTF-8');
 
 		// At this point, we want to make sure the subject isn't too long.
-		if (\ElkArte\Util::strlen($_POST['subject']) > 100)
-			$_POST['subject'] = \ElkArte\Util::substr($_POST['subject'], 0, 100);
+		if (Util::strlen($_POST['subject']) > 100)
+		{
+			$_POST['subject'] = Util::substr($_POST['subject'], 0, 100);
+		}
 
 		// Creating a new topic?
 		$newTopic = empty($_REQUEST['msg']) && empty($topic);
@@ -1058,7 +1207,9 @@ class Post extends \ElkArte\AbstractController
 
 			// This will save some time...
 			if (empty($approve_has_changed))
+			{
 				unset($msgOptions['approved']);
+			}
 
 			modifyPost($msgOptions, $topicOptions, $posterOptions);
 		}
@@ -1081,7 +1232,9 @@ class Post extends \ElkArte\AbstractController
 			createPost($msgOptions, $topicOptions, $posterOptions);
 
 			if (isset($topicOptions['id']))
+			{
 				$topic = $topicOptions['id'];
+			}
 		}
 
 		// Trigger the after_save_post event
@@ -1095,10 +1248,14 @@ class Post extends \ElkArte\AbstractController
 
 			// Returning to the topic?
 			if (!empty($_REQUEST['goback']))
+			{
 				$board_list[] = $board;
+			}
 
 			if (!empty($board_list))
+			{
 				markBoardsRead($board_list, false, false);
+			}
 		}
 
 		// Turn notification on or off.
@@ -1113,13 +1270,19 @@ class Post extends \ElkArte\AbstractController
 
 		// Log an act of moderation - modifying.
 		if (!empty($moderationAction))
+		{
 			logAction('modify', array('topic' => $topic, 'message' => (int) $_REQUEST['msg'], 'member' => $msgInfo['id_member'], 'board' => $board));
+		}
 
 		if (isset($_POST['lock']) && $_POST['lock'] != 2)
+		{
 			logAction(empty($_POST['lock']) ? 'unlock' : 'lock', array('topic' => $topicOptions['id'], 'board' => $topicOptions['board']));
+		}
 
 		if (isset($_POST['sticky']))
+		{
 			logAction(empty($_POST['sticky']) ? 'unsticky' : 'sticky', array('topic' => $topicOptions['id'], 'board' => $topicOptions['board']));
+		}
 
 		// Notify any members who have notification turned on for this topic/board - only do this if it's going to be approved(!)
 		if ($becomesApproved)
@@ -1135,7 +1298,7 @@ class Post extends \ElkArte\AbstractController
 					'msg' => $msgOptions['id'],
 					'board' => $board,
 					'topic' => $topic,
-					'signature' => \ElkArte\User::$settings->signature(''),
+					'signature' => User::$settings->signature(''),
 				);
 				sendBoardNotifications($notifyData);
 			}
@@ -1143,29 +1306,108 @@ class Post extends \ElkArte\AbstractController
 			{
 				// Only send it to everyone if the topic is approved, otherwise just to the topic starter if they want it.
 				if ($topic_info['approved'])
+				{
 					sendNotifications($topic, 'reply');
+				}
 				else
+				{
 					sendNotifications($topic, 'reply', array(), $topic_info['id_member_started']);
+				}
 			}
 		}
 
 		if ($board_info['num_topics'] == 0)
-			\ElkArte\Cache\Cache::instance()->remove('board-' . $board);
+		{
+			Cache::instance()->remove('board-' . $board);
+		}
 
 		if (!empty($_POST['announce_topic']))
+		{
 			redirectexit('action=announce;sa=selectgroup;topic=' . $topic . (!empty($_POST['move']) && allowedTo('move_any') ? ';move' : '') . (empty($_REQUEST['goback']) ? '' : ';goback'));
+		}
 
 		if (!empty($_POST['move']) && allowedTo('move_any'))
+		{
 			redirectexit('action=movetopic;topic=' . $topic . '.0' . (empty($_REQUEST['goback']) ? '' : ';goback'));
+		}
 
 		// Return to post if the mod is on.
 		if (isset($_REQUEST['msg']) && !empty($_REQUEST['goback']))
+		{
 			redirectexit('topic=' . $topic . '.msg' . $_REQUEST['msg'] . '#msg' . $_REQUEST['msg'], isBrowser('ie'));
+		}
 		elseif (!empty($_REQUEST['goback']))
+		{
 			redirectexit('topic=' . $topic . '.new#new', isBrowser('ie'));
+		}
 		// Dut-dut-duh-duh-DUH-duh-dut-duh-duh!  *dances to the Final Fantasy Fanfare...*
 		else
+		{
 			redirectexit('board=' . $board . '.0');
+		}
+	}
+
+	/**
+	 * Toggle a post lock status
+	 *
+	 * @param int|null $lock
+	 * @param string|null $topic_info
+	 *
+	 * @return int|null
+	 */
+	protected function _checkLocked($lock, $topic_info = null)
+	{
+		// A new topic
+		if ($topic_info === null)
+		{
+			// New topics are by default not locked.
+			if (empty($lock))
+			{
+				return null;
+			}
+			// Besides, you need permission.
+			elseif (!allowedTo(array('lock_any', 'lock_own')))
+			{
+				return null;
+			}
+			// A moderator-lock (1) can override a user-lock (2).
+			else
+			{
+				return allowedTo('lock_any') ? 1 : 2;
+			}
+		}
+
+		// Nothing changes to the lock status.
+		if ((empty($lock) && empty($topic_info['locked'])) || (!empty($lock) && !empty($topic_info['locked'])))
+		{
+			return null;
+		}
+		// You're simply not allowed to (un)lock this.
+		elseif (!allowedTo(array('lock_any', 'lock_own')) || (!allowedTo('lock_any') && $this->user->id != $topic_info['id_member_started']))
+		{
+			return null;
+		}
+		// You're only allowed to lock your own topics.
+		elseif (!allowedTo('lock_any'))
+		{
+			// You're not allowed to break a moderator's lock.
+			if ($topic_info['locked'] == 1)
+			{
+				return null;
+			}
+			// Lock it with a soft lock or unlock it.
+			else
+			{
+				$lock = empty($lock) ? 0 : 2;
+			}
+		}
+		// You must be the moderator.
+		else
+		{
+			$lock = empty($lock) ? 0 : 1;
+		}
+
+		return $lock;
 	}
 
 	/**
@@ -1190,7 +1432,9 @@ class Post extends \ElkArte\AbstractController
 
 		$context['sub_template'] = 'quotefast';
 		if (!empty($row))
+		{
 			$can_view_post = $row['approved'] || ($row['id_member'] != 0 && $row['id_member'] == $this->user->id) || allowedTo('approve_posts', $row['id_board']);
+		}
 
 		if (!empty($can_view_post))
 		{
@@ -1225,7 +1469,7 @@ class Post extends \ElkArte\AbstractController
 			$context['quote']['text'] = strtr(un_htmlspecialchars($context['quote']['xml']), array('\'' => '\\\'', '\\' => '\\\\', "\n" => '\\n', '</script>' => '</\' + \'script>'));
 			$context['quote']['xml'] = strtr($context['quote']['xml'], array('&nbsp;' => '&#160;', '<' => '&lt;', '>' => '&gt;'));
 
-			$context['quote']['mozilla'] = strtr(\ElkArte\Util::htmlspecialchars($context['quote']['text']), array('&quot;' => '"'));
+			$context['quote']['mozilla'] = strtr(Util::htmlspecialchars($context['quote']['text']), array('&quot;' => '"'));
 		}
 		//@todo Needs a nicer interface.
 		// In case our message has been removed in the meantime.
@@ -1239,11 +1483,13 @@ class Post extends \ElkArte\AbstractController
 			);
 		}
 		else
+		{
 			$context['quote'] = array(
 				'xml' => '',
 				'mozilla' => '',
 				'text' => '',
 			);
+		}
 	}
 
 	/**
@@ -1257,47 +1503,65 @@ class Post extends \ElkArte\AbstractController
 
 		// We have to have a topic!
 		if (empty($topic))
+		{
 			obExit(false);
+		}
 
 		checkSession('get');
 
 		$row = getTopicInfoByMsg($topic, empty($_REQUEST['msg']) ? 0 : (int) $_REQUEST['msg']);
 
 		if (empty($row))
-			throw new \ElkArte\Exceptions\Exception('no_board', false);
+		{
+			throw new Exception('no_board', false);
+		}
 
 		// Change either body or subject requires permissions to modify messages.
 		if (isset($_POST['message']) || isset($_POST['subject']) || isset($_REQUEST['icon']))
 		{
 			if (!empty($row['locked']))
+			{
 				isAllowedTo('moderate_board');
+			}
 
 			if ($row['id_member'] == $this->user->id && !allowedTo('modify_any'))
 			{
 				if ((!$modSettings['postmod_active'] || $row['approved']) && !empty($modSettings['edit_disable_time']) && $row['poster_time'] + ($modSettings['edit_disable_time'] + 5) * 60 < time())
-					throw new \ElkArte\Exceptions\Exception('modify_post_time_passed', false);
+				{
+					throw new Exception('modify_post_time_passed', false);
+				}
 				elseif ($row['id_member_started'] == $this->user->id && !allowedTo('modify_own'))
+				{
 					isAllowedTo('modify_replies');
+				}
 				else
+				{
 					isAllowedTo('modify_own');
+				}
 			}
 			// Otherwise, they're locked out; someone who can modify the replies is needed.
 			elseif ($row['id_member_started'] == $this->user->id && !allowedTo('modify_any'))
+			{
 				isAllowedTo('modify_replies');
+			}
 			else
+			{
 				isAllowedTo('modify_any');
+			}
 
 			// Only log this action if it wasn't your message.
 			$moderationAction = $row['id_member'] != $this->user->id;
 		}
 
-		if (isset($_POST['subject']) && \ElkArte\Util::htmltrim(\ElkArte\Util::htmlspecialchars($_POST['subject'])) !== '')
+		if (isset($_POST['subject']) && Util::htmltrim(Util::htmlspecialchars($_POST['subject'])) !== '')
 		{
-			$_POST['subject'] = strtr(\ElkArte\Util::htmlspecialchars($_POST['subject']), array("\r" => '', "\n" => '', "\t" => ''));
+			$_POST['subject'] = strtr(Util::htmlspecialchars($_POST['subject']), array("\r" => '', "\n" => '', "\t" => ''));
 
 			// Maximum number of characters.
-			if (\ElkArte\Util::strlen($_POST['subject']) > 100)
-				$_POST['subject'] = \ElkArte\Util::substr($_POST['subject'], 0, 100);
+			if (Util::strlen($_POST['subject']) > 100)
+			{
+				$_POST['subject'] = Util::substr($_POST['subject'], 0, 100);
+			}
 		}
 		elseif (isset($_POST['subject']))
 		{
@@ -1307,24 +1571,24 @@ class Post extends \ElkArte\AbstractController
 
 		if (isset($_POST['message']))
 		{
-			if (\ElkArte\Util::htmltrim(\ElkArte\Util::htmlspecialchars($_POST['message'])) === '')
+			if (Util::htmltrim(Util::htmlspecialchars($_POST['message'])) === '')
 			{
 				$this->_post_errors->addError('no_message');
 				unset($_POST['message']);
 			}
-			elseif (!empty($modSettings['max_messageLength']) && \ElkArte\Util::strlen($_POST['message']) > $modSettings['max_messageLength'])
+			elseif (!empty($modSettings['max_messageLength']) && Util::strlen($_POST['message']) > $modSettings['max_messageLength'])
 			{
 				$this->_post_errors->addError(array('long_message', array($modSettings['max_messageLength'])));
 				unset($_POST['message']);
 			}
 			else
 			{
-				$_POST['message'] = \ElkArte\Util::htmlspecialchars($_POST['message'], ENT_QUOTES, 'UTF-8', true);
+				$_POST['message'] = Util::htmlspecialchars($_POST['message'], ENT_QUOTES, 'UTF-8', true);
 
 				$this->preparse->preparsecode($_POST['message']);
-				$bbc_parser = \BBC\ParserWrapper::instance();
+				$bbc_parser = ParserWrapper::instance();
 
-				if (\ElkArte\Util::htmltrim(strip_tags($bbc_parser->parseMessage($_POST['message'], false), '<img>')) === '')
+				if (Util::htmltrim(strip_tags($bbc_parser->parseMessage($_POST['message'], false), '<img>')) === '')
 				{
 					$this->_post_errors->addError('no_message');
 					unset($_POST['message']);
@@ -1338,7 +1602,9 @@ class Post extends \ElkArte\AbstractController
 		}
 
 		if (isset($_POST['sticky']) && !allowedTo('make_sticky'))
+		{
 			unset($_POST['sticky']);
+		}
 
 		if (!$this->_post_errors->hasErrors())
 		{
@@ -1356,14 +1622,16 @@ class Post extends \ElkArte\AbstractController
 					{
 						$_POST['message'] = str_replace('@' . $member['real_name'], '[member=' . $member['id_member'] . ']' . $member['real_name'] . '[/member]', $_POST['message'], $replacements);
 						if ($replacements > 0)
+						{
 							$actually_mentioned[] = $member['id_member'];
+						}
 					}
 				}
 
 				if (!empty($actually_mentioned))
 				{
-					$notifier = \ElkArte\Notifications::instance();
-					$notifier->add(new \ElkArte\NotificationsTask(
+					$notifier = Notifications::instance();
+					$notifier->add(new NotificationsTask(
 						'Mentionmem',
 						$row['id_msg'],
 						$row['id_member'],
@@ -1401,7 +1669,9 @@ class Post extends \ElkArte\AbstractController
 			}
 			// If nothing was changed there's no need to add an entry to the moderation log.
 			else
+			{
 				$moderationAction = false;
+			}
 
 			modifyPost($msgOptions, $topicOptions, $posterOptions);
 
@@ -1422,12 +1692,14 @@ class Post extends \ElkArte\AbstractController
 			}
 
 			if (!empty($moderationAction))
+			{
 				logAction('modify', array('topic' => $topic, 'message' => $row['id_msg'], 'member' => $row['id_member'], 'board' => $board));
+			}
 		}
 
 		if (isset($_REQUEST['xml']))
 		{
-			$bbc_parser = \BBC\ParserWrapper::instance();
+			$bbc_parser = ParserWrapper::instance();
 			$context['sub_template'] = 'modifydone';
 
 			if (!$this->_post_errors->hasErrors() && isset($msgOptions['subject']) && isset($msgOptions['body']))
@@ -1479,53 +1751,8 @@ class Post extends \ElkArte\AbstractController
 			}
 		}
 		else
+		{
 			obExit(false);
-	}
-
-	/**
-	 * Toggle a post lock status
-	 *
-	 * @param int|null $lock
-	 * @param string|null $topic_info
-	 *
-	 * @return int|null
-	 */
-	protected function _checkLocked($lock, $topic_info = null)
-	{
-		// A new topic
-		if ($topic_info === null)
-		{
-			// New topics are by default not locked.
-			if (empty($lock))
-				return null;
-			// Besides, you need permission.
-			elseif (!allowedTo(array('lock_any', 'lock_own')))
-				return null;
-			// A moderator-lock (1) can override a user-lock (2).
-			else
-				return allowedTo('lock_any') ? 1 : 2;
 		}
-
-		// Nothing changes to the lock status.
-		if ((empty($lock) && empty($topic_info['locked'])) || (!empty($lock) && !empty($topic_info['locked'])))
-			return null;
-		// You're simply not allowed to (un)lock this.
-		elseif (!allowedTo(array('lock_any', 'lock_own')) || (!allowedTo('lock_any') && $this->user->id != $topic_info['id_member_started']))
-			return null;
-		// You're only allowed to lock your own topics.
-		elseif (!allowedTo('lock_any'))
-		{
-			// You're not allowed to break a moderator's lock.
-			if ($topic_info['locked'] == 1)
-				return null;
-			// Lock it with a soft lock or unlock it.
-			else
-				$lock = empty($lock) ? 0 : 2;
-		}
-		// You must be the moderator.
-		else
-			$lock = empty($lock) ? 0 : 1;
-
-		return $lock;
 	}
 }

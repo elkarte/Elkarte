@@ -8,14 +8,17 @@
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause (see accompanying LICENSE.txt file)
  *
  * This file contains code covered by:
- * copyright:    2011 Simple Machines (http://www.simplemachines.org)
+ * copyright: 2011 Simple Machines (http://www.simplemachines.org)
  *
  * @version 2.0 dev
  *
  */
 
 namespace ElkArte\SettingsForm\SettingsFormAdapter;
+
 use BBC\ParserWrapper;
+use ElkArte\DataValidator;
+use ElkArte\Util;
 
 /**
  * Class Db
@@ -95,33 +98,69 @@ class Db extends Adapter
 	}
 
 	/**
-	 * Initialize inline permissions settings.
+	 * Simply create the config var label value
+	 *
+	 * @param array $configVar
 	 */
-	private function init_inline_permissions()
+	private function prepareLabel($configVar)
 	{
-		global $context;
+		global $txt;
 
-		$inlinePermissions = array_filter($this->configVars,
-			function ($configVar)
-			{
-				return isset($configVar[0]) && $configVar[0] === 'permissions';
-			}
-		);
-
-		if (empty($inlinePermissions))
+		// See if there are any labels that might fit?
+		if (isset($configVar['text_label']))
 		{
-			return;
+			$this->context[$configVar[1]]['label'] = $configVar['text_label'];
 		}
-
-		$permissionsForm = new InlinePermissions;
-		$permissionsForm->setExcludedGroups(isset($context['permissions_excluded']) ? $context['permissions_excluded'] : array());
-		$permissionsForm->setPermissions($inlinePermissions);
-		$permissionsForm->prepare();
+		elseif (isset($txt[$configVar[1]]))
+		{
+			$this->context[$configVar[1]]['label'] = $txt[$configVar[1]];
+		}
+		elseif (isset($txt['setting_' . $configVar[1]]))
+		{
+			$this->context[$configVar[1]]['label'] = $txt['setting_' . $configVar[1]];
+		}
+		elseif (isset($txt['groups_' . $configVar[1]]))
+		{
+			$this->context[$configVar[1]]['label'] = $txt['groups_' . $configVar[1]];
+		}
+		else
+		{
+			$this->context[$configVar[1]]['label'] = $configVar[1];
+		}
 	}
 
 	/**
 	 * @param mixed[] $configVar
-	 * @param string  $str
+	 */
+	private function handleSelect(array $configVar)
+	{
+		if (!empty($configVar[2]) && is_array($configVar[2]))
+		{
+			// If we allow multiple selections, we need to adjust a few things.
+			if ($configVar[0] === 'select' && !empty($configVar['multiple']))
+			{
+				$this->context[$configVar[1]]['name'] .= '[]';
+				$this->context[$configVar[1]]['value'] = !empty($this->context[$configVar[1]]['value']) ? Util::unserialize($this->context[$configVar[1]]['value']) : array();
+			}
+
+			// If it's associative
+			if (isset($configVar[2][0]) && is_array($configVar[2][0]))
+			{
+				$this->context[$configVar[1]]['data'] = $configVar[2];
+			}
+			else
+			{
+				foreach ($configVar[2] as $key => $item)
+				{
+					$this->context[$configVar[1]]['data'][] = array($key, $item);
+				}
+			}
+		}
+	}
+
+	/**
+	 * @param mixed[] $configVar
+	 * @param string $str
 	 *
 	 * @return string
 	 */
@@ -130,29 +169,14 @@ class Db extends Adapter
 		$known_rules = array(
 			'nohtml' => 'htmlspecialchars_decode[' . ENT_NOQUOTES . ']',
 		);
+
 		return $this->applyMasks($configVar, $str, $known_rules);
 	}
 
 	/**
 	 * @param mixed[] $configVar
-	 * @param string  $str
-	 *
-	 * @return string
-	 */
-	private function setMasks(array $configVar, $str)
-	{
-		$known_rules = array(
-			'nohtml' => '\\ElkArte\\Util::htmlspecialchars[' . ENT_QUOTES . ']',
-			'email' => 'valid_email',
-			'url' => 'valid_url',
-		);
-		return $this->applyMasks($configVar, $str, $known_rules);
-	}
-
-	/**
-	 * @param mixed[] $configVar
-	 * @param string  $str
-	 * @param array   $known_rules
+	 * @param string $str
+	 * @param array $known_rules
 	 *
 	 * @return string
 	 */
@@ -173,7 +197,7 @@ class Db extends Adapter
 			{
 				$rules[$configVar[1]] = implode('|', $rules[$configVar[1]]);
 
-				$validator = new \ElkArte\DataValidator();
+				$validator = new DataValidator();
 				$validator->sanitation_rules($rules);
 				$validator->validate(array($configVar[1] => $str));
 
@@ -182,35 +206,6 @@ class Db extends Adapter
 		}
 
 		return $str;
-	}
-
-	/**
-	 * @param mixed[] $configVar
-	 */
-	private function handleSelect(array $configVar)
-	{
-		if (!empty($configVar[2]) && is_array($configVar[2]))
-		{
-			// If we allow multiple selections, we need to adjust a few things.
-			if ($configVar[0] === 'select' && !empty($configVar['multiple']))
-			{
-				$this->context[$configVar[1]]['name'] .= '[]';
-				$this->context[$configVar[1]]['value'] = !empty($this->context[$configVar[1]]['value']) ? \ElkArte\Util::unserialize($this->context[$configVar[1]]['value']) : array();
-			}
-
-			// If it's associative
-			if (isset($configVar[2][0]) && is_array($configVar[2][0]))
-			{
-				$this->context[$configVar[1]]['data'] = $configVar[2];
-			}
-			else
-			{
-				foreach ($configVar[2] as $key => $item)
-				{
-					$this->context[$configVar[1]]['data'][] = array($key, $item);
-				}
-			}
-		}
 	}
 
 	/**
@@ -245,57 +240,27 @@ class Db extends Adapter
 	}
 
 	/**
-	 * @param string[] $var
-	 *
-	 * @return string
+	 * Initialize inline permissions settings.
 	 */
-	private function setBbcChoices($var)
+	private function init_inline_permissions()
 	{
-		$codes = ParserWrapper::instance()->getCodes();
-		$bbcTags = $codes->getTags();
+		global $context;
 
-		if (!isset($this->configValues[$var[1] . '_enabledTags']))
+		$inlinePermissions = array_filter($this->configVars,
+			function ($configVar) {
+				return isset($configVar[0]) && $configVar[0] === 'permissions';
+			}
+		);
+
+		if (empty($inlinePermissions))
 		{
-			$this->configValues[$var[1] . '_enabledTags'] = array();
-		}
-		elseif (!is_array($this->configValues[$var[1] . '_enabledTags']))
-		{
-			$this->configValues[$var[1] . '_enabledTags'] = array($this->configValues[$var[1] . '_enabledTags']);
+			return;
 		}
 
-		return implode(',', array_diff($bbcTags, $this->configValues[$var[1] . '_enabledTags']));
-	}
-
-	/**
-	 * Simply create the config var label value
-	 *
-	 * @param array $configVar
-	 */
-	private function prepareLabel($configVar)
-	{
-		global $txt;
-
-		// See if there are any labels that might fit?
-		if (isset($configVar['text_label']))
-		{
-			$this->context[$configVar[1]]['label'] = $configVar['text_label'];
-		}
-		elseif (isset($txt[$configVar[1]]))
-		{
-			$this->context[$configVar[1]]['label'] = $txt[$configVar[1]];
-		}
-		elseif (isset($txt['setting_' . $configVar[1]]))
-		{
-			$this->context[$configVar[1]]['label'] = $txt['setting_' . $configVar[1]];
-		}
-		elseif (isset($txt['groups_' . $configVar[1]]))
-		{
-			$this->context[$configVar[1]]['label'] = $txt['groups_' . $configVar[1]];
-		}
-		else
-		{
-			$this->context[$configVar[1]]['label'] = $configVar[1];
-		}
+		$permissionsForm = new InlinePermissions;
+		$permissionsForm->setExcludedGroups(isset($context['permissions_excluded']) ? $context['permissions_excluded'] : array());
+		$permissionsForm->setPermissions($inlinePermissions);
+		$permissionsForm->prepare();
 	}
 
 	/**
@@ -306,8 +271,7 @@ class Db extends Adapter
 		global $helptxt, $modSettings;
 
 		$bbcChoice = array_filter($this->configVars,
-			function ($configVar)
-			{
+			function ($configVar) {
 				return isset($configVar[0]) && $configVar[0] === 'bbc';
 			}
 		);
@@ -339,6 +303,44 @@ class Db extends Adapter
 				'all_selected' => $disabled,
 				'data' => $bbc_sections,
 			), $this->context[$configVar[1]]);
+		}
+	}
+
+	/**
+	 * Helper method for saving database settings.
+	 */
+	public function save()
+	{
+		list ($setArray) = $this->sanitizeVars();
+		$inlinePermissions = array();
+
+		foreach ($this->configVars as $var)
+		{
+			if (!isset($var[1]) || (!isset($this->configValues[$var[1]]) && $var[0] !== 'permissions'))
+			{
+				continue;
+			}
+			// Permissions?
+			elseif ($var[0] === 'permissions')
+			{
+				$inlinePermissions[] = $var;
+			}
+		}
+
+		if (!empty($setArray))
+		{
+			// Just in case we cached this.
+			$setArray['settings_updated'] = time();
+
+			updateSettings($setArray);
+		}
+
+		// If we have inline permissions we need to save them.
+		if (!empty($inlinePermissions) && allowedTo('manage_permissions'))
+		{
+			$permissionsForm = new InlinePermissions;
+			$permissionsForm->setPermissions($inlinePermissions);
+			$permissionsForm->save();
 		}
 	}
 
@@ -408,44 +410,46 @@ class Db extends Adapter
 					break;
 			}
 		}
+
 		return array($setArray, $setTypes);
 	}
 
 	/**
-	 * Helper method for saving database settings.
+	 * @param mixed[] $configVar
+	 * @param string $str
+	 *
+	 * @return string
 	 */
-	public function save()
+	private function setMasks(array $configVar, $str)
 	{
-		list ($setArray) = $this->sanitizeVars();
-		$inlinePermissions = array();
+		$known_rules = array(
+			'nohtml' => '\\ElkArte\\Util::htmlspecialchars[' . ENT_QUOTES . ']',
+			'email' => 'valid_email',
+			'url' => 'valid_url',
+		);
 
-		foreach ($this->configVars as $var)
+		return $this->applyMasks($configVar, $str, $known_rules);
+	}
+
+	/**
+	 * @param string[] $var
+	 *
+	 * @return string
+	 */
+	private function setBbcChoices($var)
+	{
+		$codes = ParserWrapper::instance()->getCodes();
+		$bbcTags = $codes->getTags();
+
+		if (!isset($this->configValues[$var[1] . '_enabledTags']))
 		{
-			if (!isset($var[1]) || (!isset($this->configValues[$var[1]]) && $var[0] !== 'permissions'))
-			{
-				continue;
-			}
-			// Permissions?
-			elseif ($var[0] === 'permissions')
-			{
-				$inlinePermissions[] = $var;
-			}
+			$this->configValues[$var[1] . '_enabledTags'] = array();
+		}
+		elseif (!is_array($this->configValues[$var[1] . '_enabledTags']))
+		{
+			$this->configValues[$var[1] . '_enabledTags'] = array($this->configValues[$var[1] . '_enabledTags']);
 		}
 
-		if (!empty($setArray))
-		{
-			// Just in case we cached this.
-			$setArray['settings_updated'] = time();
-
-			updateSettings($setArray);
-		}
-
-		// If we have inline permissions we need to save them.
-		if (!empty($inlinePermissions) && allowedTo('manage_permissions'))
-		{
-			$permissionsForm = new InlinePermissions;
-			$permissionsForm->setPermissions($inlinePermissions);
-			$permissionsForm->save();
-		}
+		return implode(',', array_diff($bbcTags, $this->configValues[$var[1] . '_enabledTags']));
 	}
 }

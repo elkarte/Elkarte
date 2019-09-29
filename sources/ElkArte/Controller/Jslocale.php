@@ -13,14 +13,20 @@
 
 namespace ElkArte\Controller;
 
+use ElkArte\AbstractController;
+use ElkArte\Agreement;
+use ElkArte\Exceptions\Exception;
+use ElkArte\PrivacyPolicy;
+
 /**
  * This file is called via ?action=jslocale;sa=sceditor to load in a list of
  * language strings for the editor
  */
-class Jslocale extends \ElkArte\AbstractController
+class Jslocale extends AbstractController
 {
 	/**
 	 * The content of the file to be returned
+	 *
 	 * @var string
 	 */
 	private $_file_data = null;
@@ -53,7 +59,9 @@ class Jslocale extends \ElkArte\AbstractController
 
 		// If we don't have any locale better avoid broken js
 		if (empty($txt['lang_locale']) || empty($editortxt))
+		{
 			die();
+		}
 
 		$this->_file_data = '(function ($) {
 		\'use strict\';
@@ -61,8 +69,10 @@ class Jslocale extends \ElkArte\AbstractController
 		$.sceditor.locale[' . JavaScriptEscape($txt['lang_locale']) . '] = {';
 
 		foreach ($editortxt as $key => $val)
+		{
 			$this->_file_data .= '
 			' . JavaScriptEscape($key) . ': ' . JavaScriptEscape($val) . ',';
+		}
 
 		$this->_file_data .= '
 			dateFormat: "day.month.year"
@@ -70,46 +80,6 @@ class Jslocale extends \ElkArte\AbstractController
 	})(jQuery);';
 
 		$this->_sendFile();
-	}
-
-	public function action_agreement_api()
-	{
-		global $context, $modSettings;
-
-		$langs = getLanguages();
-		$lang = $this->_req->post->lang;
-
-		theme()->getLayers()->removeAll();
-		theme()->getTemplates()->load('Json');
-		$context['sub_template'] = 'send_json';
-		$context['require_agreement'] = !empty($modSettings['requireAgreement']);
-
-		if (isset($langs[$lang]))
-		{
-			// If you have to agree to the agreement, it needs to be fetched from the file.
-			$agreement = new \ElkArte\Agreement($lang);
-			if (!empty($modSettings['requirePrivacypolicy']))
-			{
-				$privacypol = new \ElkArte\PrivacyPolicy($lang);
-			}
-			$context['json_data'] = array('agreement' => '', 'privacypol' => '');
-			try
-			{
-				$context['json_data']['agreement'] = $agreement->getParsedText();
-				if (!empty($modSettings['requirePrivacypolicy']))
-				{
-					$context['json_data']['privacypol'] = $privacypol->getParsedText();
-				}
-			}
-			catch (\ElkArte\Exceptions\Exception $e)
-			{
-				$context['json_data'] = $e->getMessage();
-			}
-		}
-		else
-		{
-			$context['json_data'] = '';
-		}
 	}
 
 	/**
@@ -122,7 +92,9 @@ class Jslocale extends \ElkArte\AbstractController
 		global $modSettings;
 
 		if (!empty($language_file))
+		{
 			theme()->getTemplates()->loadLanguageFile($language_file);
+		}
 
 		theme()->getLayers()->removeAll();
 
@@ -142,5 +114,45 @@ class Jslocale extends \ElkArte\AbstractController
 
 		// And terminate
 		obExit(false);
+	}
+
+	public function action_agreement_api()
+	{
+		global $context, $modSettings;
+
+		$langs = getLanguages();
+		$lang = $this->_req->post->lang;
+
+		theme()->getLayers()->removeAll();
+		theme()->getTemplates()->load('Json');
+		$context['sub_template'] = 'send_json';
+		$context['require_agreement'] = !empty($modSettings['requireAgreement']);
+
+		if (isset($langs[$lang]))
+		{
+			// If you have to agree to the agreement, it needs to be fetched from the file.
+			$agreement = new Agreement($lang);
+			if (!empty($modSettings['requirePrivacypolicy']))
+			{
+				$privacypol = new PrivacyPolicy($lang);
+			}
+			$context['json_data'] = array('agreement' => '', 'privacypol' => '');
+			try
+			{
+				$context['json_data']['agreement'] = $agreement->getParsedText();
+				if (!empty($modSettings['requirePrivacypolicy']))
+				{
+					$context['json_data']['privacypol'] = $privacypol->getParsedText();
+				}
+			}
+			catch (Exception $e)
+			{
+				$context['json_data'] = $e->getMessage();
+			}
+		}
+		else
+		{
+			$context['json_data'] = '';
+		}
 	}
 }

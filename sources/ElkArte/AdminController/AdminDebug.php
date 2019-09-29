@@ -8,7 +8,7 @@
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause (see accompanying LICENSE.txt file)
  *
  * This file contains code covered by:
- * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * copyright: 2011 Simple Machines (http://www.simplemachines.org)
  *
  * @version 2.0 dev
  *
@@ -16,10 +16,14 @@
 
 namespace ElkArte\AdminController;
 
+use ElkArte\AbstractController;
+use ElkArte\Debug;
+use ElkArte\Exceptions\Exception;
+
 /**
  * Admin class for interfacing with the debug function viewquery
  */
-class AdminDebug extends \ElkArte\AbstractController
+class AdminDebug extends AbstractController
 {
 	/**
 	 * {@inheritdoc }
@@ -57,12 +61,14 @@ class AdminDebug extends \ElkArte\AbstractController
 
 		// We should have debug mode enabled, as well as something to display!
 		if ($db_show_debug !== true || !isset($this->_req->session->debug))
-			throw new \ElkArte\Exceptions\Exception('no_access', false);
+		{
+			throw new Exception('no_access', false);
+		}
 
 		// Don't allow except for administrators.
 		isAllowedTo('admin_forum');
 
-		$debug = \ElkArte\Debug::instance();
+		$debug = Debug::instance();
 
 		// If we're just hiding/showing, do it now.
 		if (isset($this->_req->query->sa) && $this->_req->query->sa === 'hide')
@@ -70,9 +76,13 @@ class AdminDebug extends \ElkArte\AbstractController
 			$debug->toggleViewQueries();
 
 			if (strpos($this->_req->session->old_url, 'action=viewquery') !== false)
+			{
 				redirectexit();
+			}
 			else
+			{
 				redirectexit($this->_req->session->old_url);
+			}
 		}
 
 		// Looking at a specific query?

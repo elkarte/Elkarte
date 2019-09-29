@@ -6,7 +6,7 @@
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause (see accompanying LICENSE.txt file)
  *
  * This file contains code covered by:
- * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * copyright: 2011 Simple Machines (http://www.simplemachines.org)
  *
  * @version 2.0 dev
  *
@@ -161,56 +161,6 @@ class MemberLoader
 	}
 
 	/**
-	 * Loads users data from a member name
-	 *
-	 * @param string|string[] $name Single name or list of names to load
-	 * @param string $set The data to load (see the constants SET_*)
-	 * @return bool|int[] The ids of the members loaded
-	 */
-	public function loadByName($name, $set = MemberLoader::SET_NORMAL)
-	{
-		// Can't just look for no users :P.
-		if (empty($name))
-		{
-			return false;
-		}
-
-		$this->set = $set;
-		$users = array_unique((array) $name);
-		$this->loaded_ids = [];
-
-		$this->loadByCondition('{column_case_insensitive:mem.member_name}' . (count($users) === 1 ? ' = {string_case_insensitive:users}' : ' IN ({array_string_case_insensitive:users})'), $users);
-
-		$this->loadModerators();
-
-		return $this->loaded_ids;
-	}
-
-	/**
-	 * Loads a guest member (i.e. some standard data for guests)
-	 */
-	public function loadGuest()
-	{
-		global $txt;
-
-		if (isset($this->loaded_members[0]))
-		{
-			return;
-		}
-
-		$this->loaded_members[0] = new Member([
-			'id' => 0,
-			'name' => $txt['guest_title'],
-			'group' => $txt['guest_title'],
-			'href' => '',
-			'link' => $txt['guest_title'],
-			'email' => $txt['guest_title'],
-			'is_guest' => true
-		], $this->set, $this->bbc_parser);
-		$this->users_list->add($this->loaded_members[0], 0);
-	}
-
-	/**
 	 * Retrieve \ElkArte\Member objects from the cache
 	 *
 	 * @param int|int[] $users Single id or list of ids to load
@@ -244,68 +194,8 @@ class MemberLoader
 				$this->loaded_members[$data['data']['id_member']] = $member;
 			}
 		}
+
 		return $to_load;
-	}
-
-	/**
-	 * Stored \ElkArte\Member objects in the cache
-	 *
-	 * @param int[] $new_loaded_ids Ids of members that have been loaded
-	 */
-	protected function storeInCache($new_loaded_ids)
-	{
-		if ($this->useCache)
-		{
-			foreach ($new_loaded_ids as $id)
-			{
-				$this->cache->put('member_data-' . $this->set . '-' . $id, $this->users_list->getByid($id)->toArray(), 240);
-			}
-		}
-	}
-
-	/**
-	 * Loads moderators data into the \ElkArte\Member objects
-	 */
-	protected function loadModerators()
-	{
-		global $board_info;
-
-		if (empty($this->loaded_ids) || $this->options['load_moderators'] === false || $this->set === MemberLoader::SET_NORMAL)
-		{
-			return;
-		}
-
-		$temp_mods = array_intersect($this->loaded_ids, array_keys($board_info['moderators']));
-		if (count($temp_mods) !== 0)
-		{
-			$group_info = array();
-			if ($this->cache->getVar($group_info, 'moderator_group_info', 480) === false)
-			{
-				require_once(SUBSDIR . '/Membergroups.subs.php');
-				$group_info = membergroupById(3, true);
-
-				$this->cache->put('moderator_group_info', $group_info, 480);
-			}
-
-			foreach ($temp_mods as $id)
-			{
-				// By popular demand, don't show admins or global moderators as moderators.
-				if ($this->loaded_members[$id]['id_group'] != 1 && $this->loaded_members[$id]['id_group'] != 2)
-				{
-					$this->loaded_members[$id]['member_group'] = $group_info['group_name'];
-				}
-
-				// If the Moderator group has no color or icons, but their group does... don't overwrite.
-				if (!empty($group_info['icons']))
-				{
-					$this->loaded_members[$id]['icons'] = $group_info['icons'];
-				}
-				if (!empty($group_info['online_color']))
-				{
-					$this->loaded_members[$id]['member_group_color'] = $group_info['online_color'];
-				}
-			}
-		}
 	}
 
 	/**
@@ -428,5 +318,116 @@ class MemberLoader
 			$this->users_list->appendTo($val, 'options', $id, $this->options['display_fields']);
 		}
 		$request->free_result();
+	}
+
+	/**
+	 * Stored \ElkArte\Member objects in the cache
+	 *
+	 * @param int[] $new_loaded_ids Ids of members that have been loaded
+	 */
+	protected function storeInCache($new_loaded_ids)
+	{
+		if ($this->useCache)
+		{
+			foreach ($new_loaded_ids as $id)
+			{
+				$this->cache->put('member_data-' . $this->set . '-' . $id, $this->users_list->getByid($id)->toArray(), 240);
+			}
+		}
+	}
+
+	/**
+	 * Loads moderators data into the \ElkArte\Member objects
+	 */
+	protected function loadModerators()
+	{
+		global $board_info;
+
+		if (empty($this->loaded_ids) || $this->options['load_moderators'] === false || $this->set === MemberLoader::SET_NORMAL)
+		{
+			return;
+		}
+
+		$temp_mods = array_intersect($this->loaded_ids, array_keys($board_info['moderators']));
+		if (count($temp_mods) !== 0)
+		{
+			$group_info = array();
+			if ($this->cache->getVar($group_info, 'moderator_group_info', 480) === false)
+			{
+				require_once(SUBSDIR . '/Membergroups.subs.php');
+				$group_info = membergroupById(3, true);
+
+				$this->cache->put('moderator_group_info', $group_info, 480);
+			}
+
+			foreach ($temp_mods as $id)
+			{
+				// By popular demand, don't show admins or global moderators as moderators.
+				if ($this->loaded_members[$id]['id_group'] != 1 && $this->loaded_members[$id]['id_group'] != 2)
+				{
+					$this->loaded_members[$id]['member_group'] = $group_info['group_name'];
+				}
+
+				// If the Moderator group has no color or icons, but their group does... don't overwrite.
+				if (!empty($group_info['icons']))
+				{
+					$this->loaded_members[$id]['icons'] = $group_info['icons'];
+				}
+				if (!empty($group_info['online_color']))
+				{
+					$this->loaded_members[$id]['member_group_color'] = $group_info['online_color'];
+				}
+			}
+		}
+	}
+
+	/**
+	 * Loads users data from a member name
+	 *
+	 * @param string|string[] $name Single name or list of names to load
+	 * @param string $set The data to load (see the constants SET_*)
+	 * @return bool|int[] The ids of the members loaded
+	 */
+	public function loadByName($name, $set = MemberLoader::SET_NORMAL)
+	{
+		// Can't just look for no users :P.
+		if (empty($name))
+		{
+			return false;
+		}
+
+		$this->set = $set;
+		$users = array_unique((array) $name);
+		$this->loaded_ids = [];
+
+		$this->loadByCondition('{column_case_insensitive:mem.member_name}' . (count($users) === 1 ? ' = {string_case_insensitive:users}' : ' IN ({array_string_case_insensitive:users})'), $users);
+
+		$this->loadModerators();
+
+		return $this->loaded_ids;
+	}
+
+	/**
+	 * Loads a guest member (i.e. some standard data for guests)
+	 */
+	public function loadGuest()
+	{
+		global $txt;
+
+		if (isset($this->loaded_members[0]))
+		{
+			return;
+		}
+
+		$this->loaded_members[0] = new Member([
+			'id' => 0,
+			'name' => $txt['guest_title'],
+			'group' => $txt['guest_title'],
+			'href' => '',
+			'link' => $txt['guest_title'],
+			'email' => $txt['guest_title'],
+			'is_guest' => true
+		], $this->set, $this->bbc_parser);
+		$this->users_list->add($this->loaded_members[0], 0);
 	}
 }

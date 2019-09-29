@@ -6,7 +6,7 @@
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause (see accompanying LICENSE.txt file)
  *
  * This file contains code covered by:
- * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * copyright: 2011 Simple Machines (http://www.simplemachines.org)
  *
  * @version 2.0 dev
  *
@@ -25,6 +25,7 @@ class MembersList
 {
 	/**
 	 * List of all the members already loaded
+	 *
 	 * @var \ElkArte\Member[]
 	 */
 	protected static $members = [];
@@ -32,15 +33,24 @@ class MembersList
 	/**
 	 * Instance of \ElkArte\MemberLoader used to actually get the data out of
 	 * the database and ready in an \ElkArte\Member object
+	 *
 	 * @var \ElkArte\MemberLoader
 	 */
 	protected static $loader = null;
 
 	/**
 	 * Instance of this very class
+	 *
 	 * @var \ElkArte\MembersList
 	 */
 	protected static $instance = null;
+
+	/**
+	 * Protected construct to avoid external access
+	 */
+	protected function __construct()
+	{
+	}
 
 	/**
 	 * Initialize the loader and the instance of this class
@@ -104,10 +114,30 @@ class MembersList
 	{
 		$member = self::$instance->getById($id);
 
-		return $member !== false ? $member : new class() extends ValuesContainer {
+		return $member !== false ? $member : new class() extends ValuesContainer
+		{
 			public function loadContext($display_custom_fields = false)
-			{}
+			{
+			}
 		};
+	}
+
+	/**
+	 * Returns the \ElkArte\Member object of the requested (numeric) $id
+	 *
+	 * @param int $id id of the member
+	 * @return bool|\ElkArte\ValuesContainer
+	 */
+	public function getById($id)
+	{
+		if (isset(self::$members[$id]))
+		{
+			return self::$members[$id];
+		}
+		else
+		{
+			return false;
+		}
 	}
 
 	/**
@@ -135,24 +165,6 @@ class MembersList
 	}
 
 	/**
-	 * Returns the \ElkArte\Member object of the requested (numeric) $id
-	 *
-	 * @param int $id id of the member
-	 * @return bool|\ElkArte\ValuesContainer
-	 */
-	public function getById($id)
-	{
-		if (isset(self::$members[$id]))
-		{
-			return self::$members[$id];
-		}
-		else
-		{
-			return false;
-		}
-	}
-
-	/**
 	 * Adds data to a certain member's object.
 	 *
 	 * @param mixed[] $data The data to append
@@ -163,12 +175,5 @@ class MembersList
 	public function appendTo($data, $type, $id, $display_fields = [])
 	{
 		self::$members[$id]->append($type, $data, $display_fields);
-	}
-
-	/**
-	 * Protected construct to avoid external access
-	 */
-	protected function __construct()
-	{
 	}
 }

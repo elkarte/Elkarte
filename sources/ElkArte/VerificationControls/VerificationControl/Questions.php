@@ -9,7 +9,7 @@
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause (see accompanying LICENSE.txt file)
  *
  * This file contains code covered by:
- * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * copyright: 2011 Simple Machines (http://www.simplemachines.org)
  *
  * @version 2.0 dev
  *
@@ -17,7 +17,12 @@
 
 namespace ElkArte\VerificationControls\VerificationControl;
 
+use BBC\ParserWrapper;
+use ElkArte\Cache\Cache;
+use ElkArte\Exceptions\Exception;
 use ElkArte\User;
+use ElkArte\Util;
+use ElkArte\ValuesContainer;
 
 /**
  * Class to manage, prepare, show, and validate question -> answer verifications
@@ -33,6 +38,7 @@ class Questions implements ControlInterface
 
 	/**
 	 * array holding all of the available question id
+	 *
 	 * @var int[]
 	 */
 	private $_questionIDs = null;
@@ -83,7 +89,7 @@ class Questions implements ControlInterface
 		{
 			$this->_options = $verificationOptions;
 		}
-		$this->_filter = new \ElkArte\ValuesContainer();
+		$this->_filter = new ValuesContainer();
 	}
 
 	/**
@@ -140,12 +146,43 @@ class Questions implements ControlInterface
 	}
 
 	/**
+	 * Updates the cache of questions IDs
+	 */
+	private function _refreshQuestionsCache()
+	{
+		global $modSettings;
+
+		$db = database();
+		$cache = Cache::instance();
+
+		if (!$cache->getVar($modSettings['question_id_cache'], 'verificationQuestionIds', 300) || !$modSettings['question_id_cache'])
+		{
+			$request = $db->query('', '
+				SELECT 
+					id_question, language
+				FROM {db_prefix}antispam_questions',
+				array()
+			);
+			$modSettings['question_id_cache'] = array();
+			while ($row = $db->fetch_assoc($request))
+			{
+				$modSettings['question_id_cache'][$row['language']][] = $row['id_question'];
+			}
+			$db->free_result($request);
+
+			$cache->put('verificationQuestionIds', $modSettings['question_id_cache'], 300);
+		}
+	}
+
+	/**
 	 * {@inheritdoc }
 	 */
 	public function createTest($sessionVal, $refresh = true)
 	{
 		if (empty($this->_number_questions))
+		{
 			return;
+		}
 
 		// Getting some new questions?
 		if ($refresh)
@@ -185,12 +222,12 @@ class Questions implements ControlInterface
 		theme()->getTemplates()->load('VerificationControls');
 
 		$sessionVal['q'] = array();
-		$this->_filter = new \ElkArte\ValuesContainer(array('type' => 'id_question', 'value' => $this->_questionIDs));
+		$this->_filter = new ValuesContainer(array('type' => 'id_question', 'value' => $this->_questionIDs));
 
 		$questions = $this->_loadAntispamQuestions();
 		$asked_questions = array();
 
-		$parser = \BBC\ParserWrapper::instance();
+		$parser = ParserWrapper::instance();
 
 		foreach ($questions as $row)
 		{
@@ -199,7 +236,7 @@ class Questions implements ControlInterface
 				'q' => $parser->parseVerificationControls($row['question']),
 				'is_error' => !empty($this->_incorrectQuestions) && in_array($row['id_question'], $this->_incorrectQuestions),
 				// Remember a previous submission?
-				'a' => isset($_REQUEST[$this->_options['id'] . '_vv'], $_REQUEST[$this->_options['id'] . '_vv']['q'], $_REQUEST[$this->_options['id'] . '_vv']['q'][$row['id_question']]) ? \ElkArte\Util::htmlspecialchars($_REQUEST[$this->_options['id'] . '_vv']['q'][$row['id_question']]) : '',
+				'a' => isset($_REQUEST[$this->_options['id'] . '_vv'], $_REQUEST[$this->_options['id'] . '_vv']['q'], $_REQUEST[$this->_options['id'] . '_vv']['q'][$row['id_question']]) ? Util::htmlspecialchars($_REQUEST[$this->_options['id'] . '_vv']['q'][$row['id_question']]) : '',
 			);
 			$sessionVal['q'][] = $row['id_question'];
 		}
@@ -211,13 +248,54 @@ class Questions implements ControlInterface
 	}
 
 	/**
+	 * Loads all the available antispam questions, or a subset based on a filter
+	 *
+	 * @return array
+	 */
+	private function _loadAntispamQuestions()
+	{
+		$db = database();
+
+		$available_filters = new ValuesContainer(array(
+			'language' => '
+			WHERE language = {string:current_filter}',
+			'id_question' => '
+			WHERE id_question IN ({array_int:current_filter})',
+		));
+		$condition = (string) $available_filters[$this->_filter['type']];
+
+		// Load any question and answers!
+		$question_answers = array();
+		$request = $db->query('', '
+			SELECT 
+				id_question, question, answer, language
+			FROM {db_prefix}antispam_questions' . $condition,
+			array(
+				'current_filter' => $this->_filter['value'],
+			)
+		);
+		while ($row = $db->fetch_assoc($request))
+		{
+			$question_answers[$row['id_question']] = array(
+				'id_question' => $row['id_question'],
+				'question' => $row['question'],
+				'answer' => Util::unserialize($row['answer']),
+				'language' => $row['language'],
+			);
+		}
+		$db->free_result($request);
+
+		return $question_answers;
+	}
+
+	/**
 	 * {@inheritdoc }
 	 */
 	public function doTest($sessionVal)
 	{
 		if ($this->_number_questions && (!isset($sessionVal['q']) || !isset($_REQUEST[$this->_options['id'] . '_vv']['q'])))
 		{
-			throw new \ElkArte\Exceptions\Exception('no_access', false);
+			throw new Exception('no_access', false);
 		}
 
 		if (!$this->_verifyAnswers($sessionVal))
@@ -226,6 +304,35 @@ class Questions implements ControlInterface
 		}
 
 		return true;
+	}
+
+	/**
+	 * Checks if an the answers to anti-spam questions are correct
+	 *
+	 * @return boolean
+	 */
+	private function _verifyAnswers($sessionVal)
+	{
+		$this->_filter = new ValuesContainer(array('type' => 'id_question', 'value' => $sessionVal['q']));
+		// Get the answers and see if they are all right!
+		$questions = $this->_loadAntispamQuestions();
+		$this->_incorrectQuestions = array();
+		foreach ($questions as $row)
+		{
+			// Everything lowercase
+			$answers = array();
+			foreach ($row['answer'] as $answer)
+			{
+				$answers[] = Util::strtolower($answer);
+			}
+
+			if (!isset($_REQUEST[$this->_options['id'] . '_vv']['q'][$row['id_question']]) || trim($_REQUEST[$this->_options['id'] . '_vv']['q'][$row['id_question']]) == '' || !in_array(trim(Util::htmlspecialchars(Util::strtolower($_REQUEST[$this->_options['id'] . '_vv']['q'][$row['id_question']]))), $answers))
+			{
+				$this->_incorrectQuestions[] = $row['id_question'];
+			}
+		}
+
+		return empty($this->_incorrectQuestions);
 	}
 
 	/**
@@ -246,7 +353,7 @@ class Questions implements ControlInterface
 		// Load any question and answers!
 		if (isset($_GET['language']))
 		{
-			$this->_filter = new \ElkArte\ValuesContainer(array(
+			$this->_filter = new ValuesContainer(array(
 				'type' => 'language',
 				'value' => $_GET['language'],
 			));
@@ -282,9 +389,9 @@ class Questions implements ControlInterface
 		return array(
 			// Clever Thomas, who is looking sheepy now? Not I, the mighty sword swinger did say.
 			array('title', 'setup_verification_questions'),
-				array('desc', 'setup_verification_questions_desc'),
-				array('int', 'qa_verification_number', 'postinput' => $txt['setting_qa_verification_number_desc']),
-				array('callback', 'question_answer_list'),
+			array('desc', 'setup_verification_questions_desc'),
+			array('int', 'qa_verification_number', 'postinput' => $txt['setting_qa_verification_number_desc']),
+			array('callback', 'question_answer_list'),
 		);
 	}
 
@@ -306,16 +413,18 @@ class Questions implements ControlInterface
 
 		foreach ($save_question as $id => $question)
 		{
-			$question = trim(\ElkArte\Util::htmlspecialchars($question, ENT_COMPAT));
+			$question = trim(Util::htmlspecialchars($question, ENT_COMPAT));
 			$answers = array();
 			$question_lang = isset($save_language[$id]) && isset($languages[$save_language[$id]]) ? $save_language[$id] : $language;
 			if (!empty($save_answer[$id]))
 			{
 				foreach ($save_answer[$id] as $answer)
 				{
-					$answer = trim(\ElkArte\Util::strtolower(\ElkArte\Util::htmlspecialchars($answer, ENT_COMPAT)));
+					$answer = trim(Util::strtolower(Util::htmlspecialchars($answer, ENT_COMPAT)));
 					if ($answer !== '')
+					{
 						$answers[] = $answer;
+					}
 				}
 			}
 
@@ -355,99 +464,6 @@ class Questions implements ControlInterface
 		}
 
 		return $count_questions;
-	}
-
-	/**
-	 * Checks if an the answers to anti-spam questions are correct
-	 *
-	 * @return boolean
-	 */
-	private function _verifyAnswers($sessionVal)
-	{
-		$this->_filter = new \ElkArte\ValuesContainer(array('type' => 'id_question', 'value' => $sessionVal['q']));
-		// Get the answers and see if they are all right!
-		$questions = $this->_loadAntispamQuestions();
-		$this->_incorrectQuestions = array();
-		foreach ($questions as $row)
-		{
-			// Everything lowercase
-			$answers = array();
-			foreach ($row['answer'] as $answer)
-				$answers[] = \ElkArte\Util::strtolower($answer);
-
-			if (!isset($_REQUEST[$this->_options['id'] . '_vv']['q'][$row['id_question']]) || trim($_REQUEST[$this->_options['id'] . '_vv']['q'][$row['id_question']]) == '' || !in_array(trim(\ElkArte\Util::htmlspecialchars(\ElkArte\Util::strtolower($_REQUEST[$this->_options['id'] . '_vv']['q'][$row['id_question']]))), $answers))
-				$this->_incorrectQuestions[] = $row['id_question'];
-		}
-
-		return empty($this->_incorrectQuestions);
-	}
-
-	/**
-	 * Updates the cache of questions IDs
-	 */
-	private function _refreshQuestionsCache()
-	{
-		global $modSettings;
-
-		$db = database();
-		$cache = \ElkArte\Cache\Cache::instance();
-
-		if (!$cache->getVar($modSettings['question_id_cache'], 'verificationQuestionIds', 300) || !$modSettings['question_id_cache'])
-		{
-			$request = $db->query('', '
-				SELECT 
-					id_question, language
-				FROM {db_prefix}antispam_questions',
-				array()
-			);
-			$modSettings['question_id_cache'] = array();
-			while ($row = $db->fetch_assoc($request))
-				$modSettings['question_id_cache'][$row['language']][] = $row['id_question'];
-			$db->free_result($request);
-
-			$cache->put('verificationQuestionIds', $modSettings['question_id_cache'], 300);
-		}
-	}
-
-	/**
-	 * Loads all the available antispam questions, or a subset based on a filter
-	 *
-	 * @return array
-	 */
-	private function _loadAntispamQuestions()
-	{
-		$db = database();
-
-		$available_filters = new \ElkArte\ValuesContainer(array(
-			'language' => '
-			WHERE language = {string:current_filter}',
-			'id_question' => '
-			WHERE id_question IN ({array_int:current_filter})',
-		));
-		$condition = (string) $available_filters[$this->_filter['type']];
-
-		// Load any question and answers!
-		$question_answers = array();
-		$request = $db->query('', '
-			SELECT 
-				id_question, question, answer, language
-			FROM {db_prefix}antispam_questions' . $condition,
-			array(
-				'current_filter' => $this->_filter['value'],
-			)
-		);
-		while ($row = $db->fetch_assoc($request))
-		{
-			$question_answers[$row['id_question']] = array(
-				'id_question' => $row['id_question'],
-				'question' => $row['question'],
-				'answer' => \ElkArte\Util::unserialize($row['answer']),
-				'language' => $row['language'],
-			);
-		}
-		$db->free_result($request);
-
-		return $question_answers;
 	}
 
 	/**

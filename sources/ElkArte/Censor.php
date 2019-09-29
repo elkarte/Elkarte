@@ -9,7 +9,7 @@
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause (see accompanying LICENSE.txt file)
  *
  * This file contains code covered by:
- * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * copyright: 2011 Simple Machines (http://www.simplemachines.org)
  *
  * @version 2.0 dev
  *
@@ -22,17 +22,17 @@ namespace ElkArte;
  */
 class Censor
 {
-	const WHOLE_WORD        = 'censorWholeWord';
-	const IGNORE_CASE       = 'censorIgnoreCase';
-	const SHOW_NO_CENSORED  = 'show_no_censored';
+	const WHOLE_WORD = 'censorWholeWord';
+	const IGNORE_CASE = 'censorIgnoreCase';
+	const SHOW_NO_CENSORED = 'show_no_censored';
 	const ALLOW_NO_CENSORED = 'allow_no_censored';
 
 	protected $vulgar = array();
 	protected $proper = array();
 	protected $options = array(
-		self::WHOLE_WORD        => false,
-		self::IGNORE_CASE       => false,
-		self::SHOW_NO_CENSORED  => false,
+		self::WHOLE_WORD => false,
+		self::IGNORE_CASE => false,
+		self::SHOW_NO_CENSORED => false,
 		self::ALLOW_NO_CENSORED => false,
 	);
 
@@ -115,9 +115,9 @@ class Censor
 	/**
 	 * Check if we should be censoring.
 	 *
+	 * @return bool
 	 * @todo replace with inline checking at some point
 	 *
-	 * @return bool
 	 */
 	public function doCensor()
 	{

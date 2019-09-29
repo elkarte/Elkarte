@@ -8,7 +8,7 @@
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause (see accompanying LICENSE.txt file)
  *
  * This file contains code covered by:
- * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * copyright: 2011 Simple Machines (http://www.simplemachines.org)
  *
  * @version 2.0 dev
  *
@@ -16,7 +16,11 @@
 
 namespace ElkArte\Controller;
 
+use ElkArte\AbstractController;
+use ElkArte\Action;
 use ElkArte\Errors\AttachmentErrorContext;
+use ElkArte\Exceptions\Exception;
+use ElkArte\Graphics\Image;
 
 /**
  *
@@ -28,7 +32,7 @@ use ElkArte\Errors\AttachmentErrorContext;
  *
  * @package Attachments
  */
-class Attachment extends \ElkArte\AbstractController
+class Attachment extends AbstractController
 {
 	/**
 	 * {@inheritdoc }
@@ -80,7 +84,7 @@ class Attachment extends \ElkArte\AbstractController
 		);
 
 		// Setup the action handler
-		$action = new \ElkArte\Action('attachments');
+		$action = new Action('attachments');
 		$subAction = $action->initialize($subActions, 'dlattach');
 
 		// Call the action
@@ -112,6 +116,7 @@ class Attachment extends \ElkArte\AbstractController
 		if (checkSession('request', '', false) != '')
 		{
 			$context['json_data'] = array('result' => false, 'data' => $txt['session_timeout_file_upload']);
+
 			return false;
 		}
 
@@ -165,7 +170,9 @@ class Attachment extends \ElkArte\AbstractController
 		}
 		// Could not find the files you claimed to have sent
 		else
+		{
 			$context['json_data'] = array('result' => false, 'data' => $txt['no_files_uploaded']);
+		}
 	}
 
 	/**
@@ -242,36 +249,6 @@ class Attachment extends \ElkArte\AbstractController
 	}
 
 	/**
-	 * Generates a language image based on text for display.
-	 *
-	 * @param null|string $text
-	 * @throws \ElkArte\Exceptions\Exception
-	 */
-	public function action_no_attach($text = null)
-	{
-		global $txt;
-
-		if ($text === null)
-		{
-			theme()->getTemplates()->loadLanguageFile('Errors');
-			$text = $txt['attachment_not_found'];
-		}
-
-		$this->_send_headers('no_image', 'no_image', 'image/png', false, 'inline', 'no_image.png', true, false);
-
-		$img = new \ElkArte\Graphics\Image();
-		$img = $img->generateTextImage($text, 200);
-
-		if ($img === false)
-		{
-			throw new \ElkArte\Exceptions\Exception('no_access', false);
-		}
-
-		echo $img;
-		obExit(false);
-	}
-
-	/**
 	 * Downloads an attachment or avatar, and increments the download count.
 	 *
 	 * What it does:
@@ -303,6 +280,7 @@ class Attachment extends \ElkArte\AbstractController
 		if (isset($this->_req->query->attach) && strpos($this->_req->query->attach, 'post_tmp_' . $this->user->id . '_') !== false)
 		{
 			$this->action_tmpattach();
+
 			return;
 		}
 		else
@@ -400,7 +378,9 @@ class Attachment extends \ElkArte\AbstractController
 
 		// If it isn't yet approved, do they have permission to view it?
 		if (!$is_approved && ($id_member == 0 || $this->user->id !== $id_member) && ($attachment_type == 0 || $attachment_type == 3))
+		{
 			isAllowedTo('approve_posts', $id_board);
+		}
 
 		// Update the download counter (unless it's a thumbnail or an avatar).
 		if (!empty($id_attach) && empty($is_avatar) || $attachment_type != 3)
@@ -429,7 +409,9 @@ class Attachment extends \ElkArte\AbstractController
 		{
 			$mime_type = '';
 			if (isset($this->_req->query->image))
+			{
 				unset($this->_req->query->image);
+			}
 		}
 
 		$this->_send_headers($filename, $eTag, $mime_type, $use_compression, $disposition, $real_filename, $do_cache);
@@ -439,17 +421,23 @@ class Attachment extends \ElkArte\AbstractController
 		{
 			$req = request();
 			if (strpos($req->user_agent(), 'Windows') !== false)
+			{
 				$callback = function ($buffer) {
 					return preg_replace('~[\r]?\n~', "\r\n", $buffer);
 				};
+			}
 			elseif (strpos($req->user_agent(), 'Mac') !== false)
+			{
 				$callback = function ($buffer) {
 					return preg_replace('~[\r]?\n~', "\r", $buffer);
 				};
+			}
 			else
+			{
 				$callback = function ($buffer) {
 					return preg_replace('~[\r]?\n~', "\n", $buffer);
 				};
+			}
 		}
 
 		// Since we don't do output compression for files this large...
@@ -457,15 +445,21 @@ class Attachment extends \ElkArte\AbstractController
 		{
 			// Forcibly end any output buffering going on.
 			while (ob_get_level() > 0)
+			{
 				@ob_end_clean();
+			}
 
 			$fp = fopen($filename, 'rb');
 			while (!feof($fp))
 			{
 				if (isset($callback))
+				{
 					echo $callback(fread($fp, 8192));
+				}
 				else
+				{
 					echo fread($fp, 8192);
+				}
 
 				flush();
 			}
@@ -481,95 +475,32 @@ class Attachment extends \ElkArte\AbstractController
 	}
 
 	/**
-	 * Simplified version of action_dlattach to send out thumbnails while creating
-	 * or editing a message.
+	 * Generates a language image based on text for display.
+	 *
+	 * @param null|string $text
+	 * @throws \ElkArte\Exceptions\Exception
 	 */
-	public function action_tmpattach()
+	public function action_no_attach($text = null)
 	{
-		global $modSettings, $topic;
+		global $txt;
 
-		// Make sure some attachment was requested!
-		if (!isset($this->_req->query->attach))
+		if ($text === null)
 		{
-			return $this->action_no_attach();
+			theme()->getTemplates()->loadLanguageFile('Errors');
+			$text = $txt['attachment_not_found'];
 		}
 
-		// We need to do some work on attachments and avatars.
-		require_once(SUBSDIR . '/Attachments.subs.php');
+		$this->_send_headers('no_image', 'no_image', 'image/png', false, 'inline', 'no_image.png', true, false);
 
-		try
+		$img = new Image();
+		$img = $img->generateTextImage($text, 200);
+
+		if ($img === false)
 		{
-			if (empty($topic) || (string) (int) $this->_req->query->attach !== (string) $this->_req->query->attach)
-			{
-				$attach_data = getTempAttachById($this->_req->query->attach);
-				$file_ext = pathinfo($attach_data['name'], PATHINFO_EXTENSION);
-				$filename = $attach_data['tmp_name'];
-				$id_attach = $attach_data['attachid'];
-				$real_filename = $attach_data['name'];
-				$mime_type = $attach_data['type'];
-			}
-			else
-			{
-				$id_attach = $this->_req->getQuery('attach', 'intval', -1);
-
-				isAllowedTo('view_attachments');
-				$attachment = getAttachmentFromTopic($id_attach, $topic);
-
-				if (empty($attachment))
-				{
-					return $this->action_no_attach();
-				}
-
-				list ($id_folder, $real_filename, $file_hash, $file_ext, $id_attach, $attachment_type, $mime_type, $is_approved, $id_member) = $attachment;
-
-				// If it isn't yet approved, do they have permission to view it?
-				if (!$is_approved && ($id_member == 0 || $this->user->id !== $id_member) && ($attachment_type == 0 || $attachment_type == 3))
-					isAllowedTo('approve_posts');
-
-				$filename = getAttachmentFilename($real_filename, $id_attach, $id_folder, false, $file_hash);
-			}
-		}
-		catch (\Exception $e)
-		{
-			throw new \ElkArte\Exceptions\Exception($e->getMessage(), false);
-		}
-		$resize = true;
-
-		// Return mime type ala mimetype extension
-		if (substr(get_finfo_mime($filename), 0, 5) !== 'image')
-		{
-			$checkMime = returnMimeThumb($file_ext);
-			$mime_type = 'image/png';
-			$resize = false;
-			$filename = $checkMime;
+			throw new Exception('no_access', false);
 		}
 
-		$eTag = '"' . substr($id_attach . $real_filename . filemtime($filename), 0, 64) . '"';
-		$compressible_files = array('txt', 'html', 'htm', 'js', 'doc', 'docx', 'rtf', 'css', 'php', 'log', 'xml', 'sql', 'c', 'java');
-		$use_compression = !empty($modSettings['enableCompressedOutput']) && @filesize($filename) <= 4194304 && in_array($file_ext, $compressible_files);
-		$do_cache = !(!isset($this->_req->query->image) && getValidMimeImageType($file_ext) !== '');
-
-		$this->_send_headers($filename, $eTag, $mime_type, $use_compression, 'inline', $real_filename, $do_cache);
-
-		if ($resize)
-		{
-			// Create a thumbnail image and write it directly to the screen
-			$image = new \ElkArte\Graphics\Image();
-			$image->createThumbnail($filename, 100, 100, null);
-		}
-		else
-		{
-			if (!$use_compression)
-			{
-				header('Content-Length: ' . filesize($filename));
-			}
-
-			if (@readfile($filename) === null)
-			{
-				echo file_get_contents($filename);
-			}
-		}
-
+		echo $img;
 		obExit(false);
 	}
 
@@ -644,13 +575,21 @@ class Attachment extends \ElkArte\AbstractController
 
 		// Different browsers like different standards...
 		if (isBrowser('firefox'))
+		{
 			header('Content-Disposition: ' . $disposition . '; filename*=UTF-8\'\'' . rawurlencode(preg_replace_callback('~&#(\d{3,8});~', 'fixchar__callback', $real_filename)));
+		}
 		elseif (isBrowser('opera'))
+		{
 			header('Content-Disposition: ' . $disposition . '; filename="' . preg_replace_callback('~&#(\d{3,8});~', 'fixchar__callback', $real_filename) . '"');
+		}
 		elseif (isBrowser('ie'))
+		{
 			header('Content-Disposition: ' . $disposition . '; filename="' . urlencode(preg_replace_callback('~&#(\d{3,8});~', 'fixchar__callback', $real_filename)) . '"');
+		}
 		else
+		{
 			header('Content-Disposition: ' . $disposition . '; filename="' . $real_filename . '"');
+		}
 
 		// If this has an "image extension" - but isn't actually an image - then ensure it isn't cached cause of silly IE.
 		if ($do_cache)
@@ -665,5 +604,100 @@ class Attachment extends \ElkArte\AbstractController
 
 		// Try to buy some time...
 		detectServer()->setTimeLimit(600);
+	}
+
+	/**
+	 * Simplified version of action_dlattach to send out thumbnails while creating
+	 * or editing a message.
+	 */
+	public function action_tmpattach()
+	{
+		global $modSettings, $topic;
+
+		// Make sure some attachment was requested!
+		if (!isset($this->_req->query->attach))
+		{
+			return $this->action_no_attach();
+		}
+
+		// We need to do some work on attachments and avatars.
+		require_once(SUBSDIR . '/Attachments.subs.php');
+
+		try
+		{
+			if (empty($topic) || (string) (int) $this->_req->query->attach !== (string) $this->_req->query->attach)
+			{
+				$attach_data = getTempAttachById($this->_req->query->attach);
+				$file_ext = pathinfo($attach_data['name'], PATHINFO_EXTENSION);
+				$filename = $attach_data['tmp_name'];
+				$id_attach = $attach_data['attachid'];
+				$real_filename = $attach_data['name'];
+				$mime_type = $attach_data['type'];
+			}
+			else
+			{
+				$id_attach = $this->_req->getQuery('attach', 'intval', -1);
+
+				isAllowedTo('view_attachments');
+				$attachment = getAttachmentFromTopic($id_attach, $topic);
+
+				if (empty($attachment))
+				{
+					return $this->action_no_attach();
+				}
+
+				list ($id_folder, $real_filename, $file_hash, $file_ext, $id_attach, $attachment_type, $mime_type, $is_approved, $id_member) = $attachment;
+
+				// If it isn't yet approved, do they have permission to view it?
+				if (!$is_approved && ($id_member == 0 || $this->user->id !== $id_member) && ($attachment_type == 0 || $attachment_type == 3))
+				{
+					isAllowedTo('approve_posts');
+				}
+
+				$filename = getAttachmentFilename($real_filename, $id_attach, $id_folder, false, $file_hash);
+			}
+		}
+		catch (\Exception $e)
+		{
+			throw new Exception($e->getMessage(), false);
+		}
+		$resize = true;
+
+		// Return mime type ala mimetype extension
+		if (substr(get_finfo_mime($filename), 0, 5) !== 'image')
+		{
+			$checkMime = returnMimeThumb($file_ext);
+			$mime_type = 'image/png';
+			$resize = false;
+			$filename = $checkMime;
+		}
+
+		$eTag = '"' . substr($id_attach . $real_filename . filemtime($filename), 0, 64) . '"';
+		$compressible_files = array('txt', 'html', 'htm', 'js', 'doc', 'docx', 'rtf', 'css', 'php', 'log', 'xml', 'sql', 'c', 'java');
+		$use_compression = !empty($modSettings['enableCompressedOutput']) && @filesize($filename) <= 4194304 && in_array($file_ext, $compressible_files);
+		$do_cache = !(!isset($this->_req->query->image) && getValidMimeImageType($file_ext) !== '');
+
+		$this->_send_headers($filename, $eTag, $mime_type, $use_compression, 'inline', $real_filename, $do_cache);
+
+		if ($resize)
+		{
+			// Create a thumbnail image and write it directly to the screen
+			$image = new Image();
+			$image->createThumbnail($filename, 100, 100, null);
+		}
+		else
+		{
+			if (!$use_compression)
+			{
+				header('Content-Length: ' . filesize($filename));
+			}
+
+			if (@readfile($filename) === null)
+			{
+				echo file_get_contents($filename);
+			}
+		}
+
+		obExit(false);
 	}
 }

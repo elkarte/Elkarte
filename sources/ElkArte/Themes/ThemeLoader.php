@@ -14,7 +14,11 @@
 namespace ElkArte\Themes;
 
 use ElkArte\Cache\Cache;
+use ElkArte\ext\Composer\Autoload\ClassLoader;
+use ElkArte\Hooks;
+use ElkArte\HttpReq;
 use ElkArte\User;
+use ElkArte\Util;
 
 /**
  * Class ThemeLoader
@@ -22,13 +26,284 @@ use ElkArte\User;
 class ThemeLoader
 {
 	/**@var mixed|\ElkArte\ValuesContainer */
- 	public $user;
+	public $user;
 
- 	/** @var int The id of the theme being used */
+	/** @var int The id of the theme being used */
 	private $id;
 
 	/** @var Theme The current theme. */
 	private $theme;
+
+	/**
+	 * Load a theme, by ID.
+	 *
+	 * What it does:
+	 * - identify the theme to be loaded.
+	 * - validate that the theme is valid and that the user has permission to use it
+	 * - load the users theme settings and site settings into $options.
+	 * - prepares the list of folders to search for template loading.
+	 * - identify what smiley set to use.
+	 * - sets up $context['user']
+	 * - detects the users browser and sets a mobile friendly environment if needed
+	 * - loads default JS variables for use in every theme
+	 * - loads default JS scripts for use in every theme
+	 *
+	 * @param int $id_theme = 0
+	 * @param bool $initialize = true
+	 */
+	public function __construct($id_theme = 0, $initialize = true)
+	{
+		global $txt, $scripturl, $mbname, $modSettings;
+		global $context, $settings, $options;
+
+		$this->user = User::$info;
+		$this->id = $id_theme;
+		$this->initTheme();
+
+		if (!$initialize)
+		{
+			return;
+		}
+
+		$this->loadThemeUrls();
+
+		loadUserContext();
+
+		// Set up some additional interface preference context
+		if (!empty($options['admin_preferences']))
+		{
+			$context['admin_preferences'] = serializeToJson($options['admin_preferences'], function ($array_form) {
+				global $context;
+
+				$context['admin_preferences'] = $array_form;
+				require_once(SUBSDIR . '/Admin.subs.php');
+				updateAdminPreferences();
+			});
+		}
+		else
+		{
+			$context['admin_preferences'] = [];
+		}
+
+		if ($this->user->is_guest === false)
+		{
+			if (!empty($options['minmax_preferences']))
+			{
+				$context['minmax_preferences'] = serializeToJson($options['minmax_preferences'], function ($array_form) {
+					global $settings;
+
+					// Update the option.
+					require_once(SUBSDIR . '/Themes.subs.php');
+					updateThemeOptions([
+						$settings['theme_id'],
+						User::$info->id,
+						'minmax_preferences',
+						json_encode($array_form),
+					]);
+				});
+			}
+			else
+			{
+				$context['minmax_preferences'] = [];
+			}
+		}
+		// Guest may have collapsed the header, check the cookie to prevent collapse jumping
+		elseif ($this->user->is_guest && isset($_COOKIE['upshrink']))
+		{
+			$context['minmax_preferences'] = ['upshrink' => $_COOKIE['upshrink']];
+		}
+
+		$this->loadThemeContext();
+
+		// @todo These really don't belong here since they are more general than the theme.
+		$context['forum_name'] = $mbname;
+		$context['forum_name_html_safe'] = $context['forum_name'];
+
+		// Set some permission related settings.
+		if ($this->user->is_guest && !empty($modSettings['enableVBStyleLogin']))
+		{
+			$context['show_login_bar'] = true;
+			$context['theme_header_callbacks'][] = 'login_bar';
+			loadJavascriptFile('sha256.js', ['defer' => true]);
+		}
+
+		// This determines the server... not used in many places, except for login fixing.
+		detectServer();
+
+		// Detect the browser. This is separated out because it's also used in attachment downloads
+		detectBrowser();
+
+		// Set the top level linktree up.
+		array_unshift($context['linktree'], [
+			'url' => $scripturl,
+			'name' => $context['forum_name'],
+		]);
+
+		// Just some mobile-friendly settings
+		if ($context['browser_body_id'] == 'mobile')
+		{
+			// Disable the preview text.
+			$modSettings['message_index_preview'] = 0;
+			// Force the usage of click menu instead of a hover menu.
+			$options['use_click_menu'] = 1;
+			// No space left for a sidebar
+			$options['use_sidebar_menu'] = false;
+			// Disable the search dropdown.
+			$modSettings['search_dropdown'] = false;
+		}
+
+		if (!isset($txt))
+		{
+			$txt = [];
+		}
+
+		// Defaults in case of odd things
+		$settings['avatars_on_indexes'] = 0;
+
+		// Initialize the theme.
+		$settings = array_merge($settings, $this->theme->getSettings());
+
+		// Load the basic layers
+		$this->theme->loadDefaultLayers();
+
+		// Call initialization theme integration functions.
+		call_integration_hook('integrate_init_theme', [$this->id, &$settings]);
+
+		// Guests may still need a name.
+		if ($context['user']['is_guest'] && empty($context['user']['name']))
+		{
+			$context['user']['name'] = $txt['guest_title'];
+		}
+
+		// Any theme-related strings that need to be loaded?
+		if (!empty($settings['require_theme_strings']))
+		{
+			$this->theme->getTemplates()->loadLanguageFile('ThemeStrings', '', false);
+		}
+
+		// We allow theme variants, because we're cool.
+		if (!empty($settings['theme_variants']))
+		{
+			$this->theme->loadThemeVariant();
+		}
+
+		// A bit lonely maybe, though I think it should be set up *after* the theme variants detection
+		$context['header_logo_url_html_safe'] =
+			empty($settings['header_logo_url']) ? $settings['images_url'] . '/' . $context['theme_variant_url'] . 'logo_elk.png' : Util::htmlspecialchars($settings['header_logo_url']);
+
+		// Allow overriding the board wide time/number formats.
+		if (empty(User::$settings['time_format']) && !empty($txt['time_format']))
+		{
+			$this->user->time_format = $txt['time_format'];
+		}
+
+		if (isset($settings['use_default_images']) && $settings['use_default_images'] == 'always')
+		{
+			$settings['theme_url'] = $settings['default_theme_url'];
+			$settings['images_url'] = $settings['default_images_url'];
+			$settings['theme_dir'] = $settings['default_theme_dir'];
+		}
+
+		// Make a special URL for the language.
+		$settings['lang_images_url'] =
+			$settings['images_url'] . '/' . (!empty($txt['image_lang']) ? $txt['image_lang'] : $this->user->language);
+
+		// RTL languages require an additional stylesheet.
+		if ($context['right_to_left'])
+		{
+			loadCSSFile('rtl.css');
+		}
+
+		if (!empty($context['theme_variant']) && $context['right_to_left'])
+		{
+			loadCSSFile($context['theme_variant'] . '/rtl' . $context['theme_variant'] . '.css');
+		}
+
+		if (!empty($modSettings['xmlnews_enable']) && (!empty($modSettings['allow_guestAccess']) || $context['user']['is_logged']))
+		{
+			$context['newsfeed_urls'] = [
+				'rss' => $scripturl . '?action=.xml;type=rss2;limit=' . (!empty($modSettings['xmlnews_limit']) ? $modSettings['xmlnews_limit'] : 5),
+				'atom' => $scripturl . '?action=.xml;type=atom;limit=' . (!empty($modSettings['xmlnews_limit']) ? $modSettings['xmlnews_limit'] : 5),
+			];
+		}
+
+		if (!empty($_SESSION['agreement_accepted']))
+		{
+			$_SESSION['agreement_accepted'] = null;
+			$context['accepted_agreement'] = array(
+				'errors' => array(
+					'accepted_agreement' => $txt['agreement_accepted']
+				)
+			);
+		}
+
+		if (!empty($_SESSION['privacypolicy_accepted']))
+		{
+			$_SESSION['privacypolicy_accepted'] = null;
+			$context['accepted_agreement'] = array(
+				'errors' => array(
+					'accepted_privacy_policy' => $txt['privacypolicy_accepted']
+				)
+			);
+		}
+
+		$this->theme->loadThemeJavascript();
+
+		Hooks::instance()->newPath(['$themedir' => $settings['theme_dir']]);
+
+		// Any files to include at this point?
+		call_integration_include_hook('integrate_theme_include');
+
+		// Call load theme integration functions.
+		call_integration_hook('integrate_load_theme');
+
+		// We are ready to go.
+		$context['theme_loaded'] = true;
+	}
+
+	/**
+	 * Initialize a theme for use
+	 */
+	private function initTheme()
+	{
+		global $settings, $options, $context;
+
+		// Validate / fetch the themes id
+		$this->getThemeId();
+
+		// Need to know who we are loading the theme for
+		$member = empty($this->user->id) ? -1 : $this->user->id;
+
+		// Load in the theme variables for them
+		$themeData = $this->getThemeData($member);
+		$settings = $themeData[0];
+		$options = $themeData[$member];
+
+		$settings['theme_id'] = $this->id;
+		$settings['actual_theme_url'] = $settings['theme_url'];
+		$settings['actual_images_url'] = $settings['images_url'];
+		$settings['actual_theme_dir'] = $settings['theme_dir'];
+
+		// Set the name of the default theme to something PHP will recognize.
+		$themeName = basename($settings['theme_dir']) === 'default'
+			? 'DefaultTheme'
+			: ucfirst(basename($settings['theme_dir']));
+
+		// The require should not be necessary, but I guess it's better to stay on the safe side.
+		require_once(EXTDIR . '/ClassLoader.php');
+		$loader = new ClassLoader();
+		$loader->setPsr4('ElkArte\\Themes\\' . $themeName . '\\', $themeData[0]['default_theme_dir']);
+		$loader->register();
+
+		// Setup the theme file.
+		require_once($settings['theme_dir'] . '/Theme.php');
+		$class = 'ElkArte\\Themes\\' . $themeName . '\\Theme';
+		$this->theme = new $class($this->id, User::$info);
+		$context['theme_instance'] = $this->theme;
+
+		// Reload the templates
+		$this->theme->getTemplates()->reloadDirectories($settings);
+	}
 
 	/**
 	 * Resolves the ID of a theme.
@@ -74,7 +349,7 @@ class ThemeLoader
 	 */
 	private function _chooseTheme()
 	{
-		$_req = \ElkArte\HttpReq::instance();
+		$_req = HttpReq::instance();
 
 		// The theme was previously set by th (ACP)
 		if (!empty($this->id) && !empty($_req->is_set('th')))
@@ -143,7 +418,7 @@ class ThemeLoader
 			$flag = true;
 		}
 		// Or do we just have the system wide theme settings cached
-		elseif ($cache->getVar($temp, 'theme_settings-' . $this->id,90)
+		elseif ($cache->getVar($temp, 'theme_settings-' . $this->id, 90)
 			&& time() - 60 > $modSettings['settings_updated']
 		)
 		{
@@ -252,287 +527,6 @@ class ThemeLoader
 		}
 
 		return $themeData;
-	}
-
-	/**
-	 * Initialize a theme for use
-	 */
-	private function initTheme()
-	{
-		global $settings, $options, $context;
-
-		// Validate / fetch the themes id
-		$this->getThemeId();
-
-		// Need to know who we are loading the theme for
-		$member = empty($this->user->id) ? -1 : $this->user->id;
-
-		// Load in the theme variables for them
-		$themeData = $this->getThemeData($member);
-		$settings = $themeData[0];
-		$options = $themeData[$member];
-
-		$settings['theme_id'] = $this->id;
-		$settings['actual_theme_url'] = $settings['theme_url'];
-		$settings['actual_images_url'] = $settings['images_url'];
-		$settings['actual_theme_dir'] = $settings['theme_dir'];
-
-		// Set the name of the default theme to something PHP will recognize.
-		$themeName = basename($settings['theme_dir']) === 'default'
-			? 'DefaultTheme'
-			: ucfirst(basename($settings['theme_dir']));
-
-		// The require should not be necessary, but I guess it's better to stay on the safe side.
-		require_once(EXTDIR . '/ClassLoader.php');
-		$loader = new \ElkArte\ext\Composer\Autoload\ClassLoader();
-		$loader->setPsr4('ElkArte\\Themes\\' . $themeName . '\\', $themeData[0]['default_theme_dir']);
-		$loader->register();
-
-		// Setup the theme file.
-		require_once($settings['theme_dir'] . '/Theme.php');
-		$class = 'ElkArte\\Themes\\' . $themeName . '\\Theme';
-		$this->theme = new $class($this->id, \ElkArte\User::$info);
-		$context['theme_instance'] = $this->theme;
-
-		// Reload the templates
-		$this->theme->getTemplates()->reloadDirectories($settings);
-	}
-
-	/**
-	 * @return Theme the current theme
-	 */
-	public function getTheme()
-	{
-		return $this->theme;
-	}
-
-	/**
-	 * Load a theme, by ID.
-	 *
-	 * What it does:
-	 * - identify the theme to be loaded.
-	 * - validate that the theme is valid and that the user has permission to use it
-	 * - load the users theme settings and site settings into $options.
-	 * - prepares the list of folders to search for template loading.
-	 * - identify what smiley set to use.
-	 * - sets up $context['user']
-	 * - detects the users browser and sets a mobile friendly environment if needed
-	 * - loads default JS variables for use in every theme
-	 * - loads default JS scripts for use in every theme
-	 *
-	 * @param int  $id_theme   = 0
-	 * @param bool $initialize = true
-	 */
-	public function __construct($id_theme = 0, $initialize = true)
-	{
-		global $txt, $scripturl, $mbname, $modSettings;
-		global $context, $settings, $options;
-
-		$this->user = User::$info;
-		$this->id = $id_theme;
-		$this->initTheme();
-
-		if (!$initialize)
-		{
-			return;
-		}
-
-		$this->loadThemeUrls();
-
-		loadUserContext();
-
-		// Set up some additional interface preference context
-		if (!empty($options['admin_preferences']))
-		{
-			$context['admin_preferences'] = serializeToJson($options['admin_preferences'], function ($array_form)
-			{
-				global $context;
-
-				$context['admin_preferences'] = $array_form;
-				require_once(SUBSDIR . '/Admin.subs.php');
-				updateAdminPreferences();
-			});
-		}
-		else
-		{
-			$context['admin_preferences'] = [];
-		}
-
-		if ($this->user->is_guest === false)
-		{
-			if (!empty($options['minmax_preferences']))
-			{
-				$context['minmax_preferences'] = serializeToJson($options['minmax_preferences'], function ($array_form)
-				{
-					global $settings;
-
-					// Update the option.
-					require_once(SUBSDIR . '/Themes.subs.php');
-					updateThemeOptions([
-						$settings['theme_id'],
-						\ElkArte\User::$info->id,
-						'minmax_preferences',
-						json_encode($array_form),
-					]);
-				});
-			}
-			else
-			{
-				$context['minmax_preferences'] = [];
-			}
-		}
-		// Guest may have collapsed the header, check the cookie to prevent collapse jumping
-		elseif ($this->user->is_guest && isset($_COOKIE['upshrink']))
-		{
-			$context['minmax_preferences'] = ['upshrink' => $_COOKIE['upshrink']];
-		}
-
-		$this->loadThemeContext();
-
-		// @todo These really don't belong here since they are more general than the theme.
-		$context['forum_name'] = $mbname;
-		$context['forum_name_html_safe'] = $context['forum_name'];
-
-		// Set some permission related settings.
-		if ($this->user->is_guest && !empty($modSettings['enableVBStyleLogin']))
-		{
-			$context['show_login_bar'] = true;
-			$context['theme_header_callbacks'][] = 'login_bar';
-			loadJavascriptFile('sha256.js', ['defer' => true]);
-		}
-
-		// This determines the server... not used in many places, except for login fixing.
-		detectServer();
-
-		// Detect the browser. This is separated out because it's also used in attachment downloads
-		detectBrowser();
-
-		// Set the top level linktree up.
-		array_unshift($context['linktree'], [
-			'url' => $scripturl,
-			'name' => $context['forum_name'],
-		]);
-
-		// Just some mobile-friendly settings
-		if ($context['browser_body_id'] == 'mobile')
-		{
-			// Disable the preview text.
-			$modSettings['message_index_preview'] = 0;
-			// Force the usage of click menu instead of a hover menu.
-			$options['use_click_menu'] = 1;
-			// No space left for a sidebar
-			$options['use_sidebar_menu'] = false;
-			// Disable the search dropdown.
-			$modSettings['search_dropdown'] = false;
-		}
-
-		if (!isset($txt))
-		{
-			$txt = [];
-		}
-
-		// Defaults in case of odd things
-		$settings['avatars_on_indexes'] = 0;
-
-		// Initialize the theme.
-		$settings = array_merge($settings, $this->theme->getSettings());
-
-		// Load the basic layers
-		$this->theme->loadDefaultLayers();
-
-		// Call initialization theme integration functions.
-		call_integration_hook('integrate_init_theme', [$this->id, &$settings]);
-
-		// Guests may still need a name.
-		if ($context['user']['is_guest'] && empty($context['user']['name']))
-		{
-			$context['user']['name'] = $txt['guest_title'];
-		}
-
-		// Any theme-related strings that need to be loaded?
-		if (!empty($settings['require_theme_strings']))
-		{
-			$this->theme->getTemplates()->loadLanguageFile('ThemeStrings', '', false);
-		}
-
-		// We allow theme variants, because we're cool.
-		if (!empty($settings['theme_variants']))
-		{
-			$this->theme->loadThemeVariant();
-		}
-
-		// A bit lonely maybe, though I think it should be set up *after* the theme variants detection
-		$context['header_logo_url_html_safe'] =
-			empty($settings['header_logo_url']) ? $settings['images_url'] . '/' . $context['theme_variant_url'] . 'logo_elk.png' : \ElkArte\Util::htmlspecialchars($settings['header_logo_url']);
-
-		// Allow overriding the board wide time/number formats.
-		if (empty(\ElkArte\User::$settings['time_format']) && !empty($txt['time_format']))
-		{
-			$this->user->time_format = $txt['time_format'];
-		}
-
-		if (isset($settings['use_default_images']) && $settings['use_default_images'] == 'always')
-		{
-			$settings['theme_url'] = $settings['default_theme_url'];
-			$settings['images_url'] = $settings['default_images_url'];
-			$settings['theme_dir'] = $settings['default_theme_dir'];
-		}
-
-		// Make a special URL for the language.
-		$settings['lang_images_url'] =
-			$settings['images_url'] . '/' . (!empty($txt['image_lang']) ? $txt['image_lang'] : $this->user->language);
-
-		// RTL languages require an additional stylesheet.
-		if ($context['right_to_left'])
-		{
-			loadCSSFile('rtl.css');
-		}
-
-		if (!empty($context['theme_variant']) && $context['right_to_left'])
-		{
-			loadCSSFile($context['theme_variant'] . '/rtl' . $context['theme_variant'] . '.css');
-		}
-
-		if (!empty($modSettings['xmlnews_enable']) && (!empty($modSettings['allow_guestAccess']) || $context['user']['is_logged']))
-		{
-			$context['newsfeed_urls'] = [
-				'rss' => $scripturl . '?action=.xml;type=rss2;limit=' . (!empty($modSettings['xmlnews_limit']) ? $modSettings['xmlnews_limit'] : 5),
-				'atom' => $scripturl . '?action=.xml;type=atom;limit=' . (!empty($modSettings['xmlnews_limit']) ? $modSettings['xmlnews_limit'] : 5),
-			];
-		}
-
-		if (!empty($_SESSION['agreement_accepted']))
-		{
-			$_SESSION['agreement_accepted'] = null;
-			$context['accepted_agreement'] = array(
-				'errors' => array(
-					'accepted_agreement' => $txt['agreement_accepted']
-				)
-			);
-		}
-
-		if (!empty($_SESSION['privacypolicy_accepted']))
-		{
-			$_SESSION['privacypolicy_accepted'] = null;
-			$context['accepted_agreement'] = array(
-				'errors' => array(
-					'accepted_privacy_policy' => $txt['privacypolicy_accepted']
-				)
-			);
-		}
-
-		$this->theme->loadThemeJavascript();
-
-		\ElkArte\Hooks::instance()->newPath(['$themedir' => $settings['theme_dir']]);
-
-		// Any files to include at this point?
-		call_integration_include_hook('integrate_theme_include');
-
-		// Call load theme integration functions.
-		call_integration_hook('integrate_load_theme');
-
-		// We are ready to go.
-		$context['theme_loaded'] = true;
 	}
 
 	/**
@@ -653,7 +647,9 @@ class ThemeLoader
 		}
 
 		foreach ($context['linktree'] as $k => $dummy)
+		{
 			$context['linktree'][$k]['url'] = strtr($dummy['url'], array($oldurl => $boardurl));
+		}
 	}
 
 	/**
@@ -699,5 +695,13 @@ class ThemeLoader
 
 		// This allows sticking some HTML on the page output - useful for controls.
 		$context['insert_after_template'] = '';
+	}
+
+	/**
+	 * @return Theme the current theme
+	 */
+	public function getTheme()
+	{
+		return $this->theme;
 	}
 }

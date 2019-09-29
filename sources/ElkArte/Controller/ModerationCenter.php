@@ -8,7 +8,7 @@
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause (see accompanying LICENSE.txt file)
  *
  * This file contains code covered by:
- * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * copyright: 2011 Simple Machines (http://www.simplemachines.org)
  *
  * @version 2.0 dev
  *
@@ -16,13 +16,23 @@
 
 namespace ElkArte\Controller;
 
+use BBC\ParserWrapper;
+use ElkArte\AbstractController;
+use ElkArte\Action;
+use ElkArte\Cache\Cache;
+use ElkArte\Exceptions\Exception;
+use ElkArte\MessagesDelete;
+use ElkArte\User;
+use ElkArte\Util;
+
 /**
  * Provides overview of moderation items to the team
  */
-class ModerationCenter extends \ElkArte\AbstractController
+class ModerationCenter extends AbstractController
 {
 	/**
 	 * Holds function array to pass to callMenu to call the right moderation area
+	 *
 	 * @var array
 	 */
 	private $_mod_include_data;
@@ -39,7 +49,9 @@ class ModerationCenter extends \ElkArte\AbstractController
 
 		// Now call the menu action.
 		if (isset($this->_mod_include_data['file']))
+		{
 			require_once($this->_mod_include_data['file']);
+		}
 
 		callMenu($this->_mod_include_data);
 	}
@@ -277,7 +289,9 @@ class ModerationCenter extends \ElkArte\AbstractController
 
 		// We got something - didn't we? DIDN'T WE!
 		if ($mod_include_data === false)
-			throw new \ElkArte\Exceptions\Exception('no_access', false);
+		{
+			throw new Exception('no_access', false);
+		}
 
 		// Retain the ID information in case required by a subaction.
 		$context['moderation_menu_id'] = $context['max_menu_id'];
@@ -297,16 +311,20 @@ class ModerationCenter extends \ElkArte\AbstractController
 		);
 
 		if (isset($mod_include_data['current_area']) && $mod_include_data['current_area'] != 'index')
+		{
 			$context['linktree'][] = array(
 				'url' => $scripturl . '?action=moderate;area=' . $mod_include_data['current_area'],
 				'name' => $mod_include_data['label'],
 			);
+		}
 
 		if (!empty($mod_include_data['current_subsection']) && $mod_include_data['subsections'][$mod_include_data['current_subsection']][0] !== $mod_include_data['label'])
+		{
 			$context['linktree'][] = array(
 				'url' => $scripturl . '?action=moderate;area=' . $mod_include_data['current_area'] . ';sa=' . $mod_include_data['current_subsection'],
 				'name' => $mod_include_data['subsections'][$mod_include_data['current_subsection']][0],
 			);
+		}
 
 		// Finally, store this, so that if we're called from the class, it can use it.
 		$this->_mod_include_data = $mod_include_data;
@@ -338,20 +356,24 @@ class ModerationCenter extends \ElkArte\AbstractController
 		}
 
 		if ($context['can_moderate_groups'])
+		{
 			$valid_blocks['g'] = 'groupRequests';
+		}
 
 		if ($context['can_moderate_boards'])
+		{
 			$valid_blocks['w'] = 'watchedUsers';
+		}
 
 		$valid_blocks['n'] = 'latestNews';
 
-		if (empty(\ElkArte\User::$settings['mod_prefs']))
+		if (empty(User::$settings['mod_prefs']))
 		{
 			$user_blocks = 'n' . ($context['can_moderate_boards'] ? 'wra' : '') . ($context['can_moderate_groups'] ? 'g' : '');
 		}
 		else
 		{
-			list (, $user_blocks) = explode('|', \ElkArte\User::$settings['mod_prefs']);
+			list (, $user_blocks) = explode('|', User::$settings['mod_prefs']);
 		}
 
 		$user_blocks = str_split($user_blocks);
@@ -364,7 +386,9 @@ class ModerationCenter extends \ElkArte\AbstractController
 				$block = 'block_' . $block;
 
 				if (method_exists($this, $block))
+				{
 					$context['mod_blocks'][] = $this->{$block}();
+				}
 			}
 		}
 	}
@@ -396,11 +420,13 @@ class ModerationCenter extends \ElkArte\AbstractController
 
 		// legit?
 		if (empty($notice) || !$context['can_moderate_boards'])
-			throw new \ElkArte\Exceptions\Exception('no_access', false);
+		{
+			throw new Exception('no_access', false);
+		}
 
 		list ($context['notice_body'], $context['notice_subject']) = $notice;
 
-		$parser = \BBC\ParserWrapper::instance();
+		$parser = ParserWrapper::instance();
 
 		$context['notice_body'] = $parser->parseNotice($context['notice_body']);
 		$context['page_title'] = $txt['show_notice'];
@@ -435,11 +461,15 @@ class ModerationCenter extends \ElkArte\AbstractController
 
 		// This comes under the umbrella of moderating posts.
 		if ($this->user->mod_cache['bq'] === '0=1')
+		{
 			isAllowedTo('moderate_forum');
+		}
 
 		// Are they wanting to view a particular report?
 		if (!empty($this->_req->query->report))
+		{
 			return $this->action_modReport();
+		}
 
 		// This should not be needed...
 		$show_pms = false;
@@ -468,9 +498,13 @@ class ModerationCenter extends \ElkArte\AbstractController
 
 			// Update the report...
 			if (isset($this->_req->query->ignore))
+			{
 				updateReportsStatus($rid, 'ignore', (int) $this->_req->query->ignore);
+			}
 			elseif (isset($this->_req->query->close))
+			{
 				updateReportsStatus($rid, 'close', (int) $this->_req->query->close);
+			}
 
 			// Time to update.
 			updateSettings(array('last_mod_report_action' => time()));
@@ -503,7 +537,7 @@ class ModerationCenter extends \ElkArte\AbstractController
 		$context['reports'] = getModReports($context['view_closed'], $context['start'], 10, $show_pms);
 		$report_ids = array_keys($context['reports']);
 		$report_boards_ids = array();
-		$bbc_parser = \BBC\ParserWrapper::instance();
+		$bbc_parser = ParserWrapper::instance();
 		foreach ($context['reports'] as $row)
 		{
 			$context['reports'][$row['id_report']] = array(
@@ -557,8 +591,12 @@ class ModerationCenter extends \ElkArte\AbstractController
 
 			// Add the board name to the report array
 			foreach ($context['reports'] as $id_report => $report)
+			{
 				if (!empty($board_names[$report['board']]))
+				{
 					$context['reports'][$id_report]['board_name'] = $board_names[$report['board']]['board_name'];
+				}
+			}
 		}
 
 		// Now get all the people who reported it.
@@ -568,6 +606,7 @@ class ModerationCenter extends \ElkArte\AbstractController
 			foreach ($comments as $id_rep => $rows)
 			{
 				foreach ($rows as $row)
+				{
 					$context['reports'][$id_rep]['comments'][] = array(
 						'id' => $row['id_comment'],
 						'message' => $row['comment'],
@@ -582,215 +621,9 @@ class ModerationCenter extends \ElkArte\AbstractController
 							'href' => $row['id_member'] ? $scripturl . '?action=profile;u=' . $row['id_member'] : '',
 						),
 					);
-			}
-		}
-	}
-
-	/**
-	 * Change moderation preferences.
-	 */
-	public function action_moderationSettings()
-	{
-		global $context, $txt;
-
-		// Some useful context stuff.
-		theme()->getTemplates()->load('ModerationCenter');
-		$context['page_title'] = $txt['mc_settings'];
-		$context['sub_template'] = 'moderation_settings';
-		$context[$context['moderation_menu_name']]['tab_data'] = array(
-			'title' => $txt['mc_prefs_title'],
-			'help' => '',
-			'description' => $txt['mc_prefs_desc']
-		);
-
-		// What blocks can this user see?
-		$context['homepage_blocks'] = array(
-			'n' => $txt['mc_prefs_latest_news'],
-			'p' => $txt['mc_notes'],
-		);
-
-		if ($context['can_moderate_groups'])
-			$context['homepage_blocks']['g'] = $txt['mc_group_requests'];
-
-		if ($context['can_moderate_boards'])
-		{
-			$context['homepage_blocks']['r'] = $txt['mc_reported_posts'];
-			$context['homepage_blocks']['w'] = $txt['mc_watched_users'];
-			$context['homepage_blocks']['a'] = $txt['mc_required'];
-		}
-
-		// Does the user have any settings yet?
-		if (empty(\ElkArte\User::$settings['mod_prefs']))
-		{
-			$mod_blocks = 'np' . ($context['can_moderate_boards'] ? 'wra' : '') . ($context['can_moderate_groups'] ? 'g' : '');
-			$pref_binary = 5;
-			$show_reports = 1;
-		}
-		else
-		{
-			list ($show_reports, $mod_blocks, $pref_binary) = explode('|', \ElkArte\User::$settings['mod_prefs']);
-		}
-
-		// Are we saving?
-		if (isset($this->_req->post->save))
-		{
-			checkSession('post');
-			validateToken('mod-set');
-
-			/* Current format of mod_prefs is:
-				x|ABCD|yyy
-
-				WHERE:
-					x = Show report count on forum header.
-					ABCD = Block indexes to show on moderation main page.
-					yyy = Integer with the following bit status:
-						- yyy & 1 = Always notify on reports.
-						- yyy & 2 = Notify on reports for moderators only.
-						- yyy & 4 = Notify about posts awaiting approval.
-			*/
-
-			// Do blocks first!
-			$mod_blocks = '';
-			if (!empty($this->_req->post->mod_homepage))
-				foreach ($this->_req->post->mod_homepage as $k => $v)
-				{
-					// Make sure they can add this...
-					if (isset($context['homepage_blocks'][$k]))
-						$mod_blocks .= $k;
 				}
-
-			// Now check other options!
-			$pref_binary = 0;
-
-			if ($context['can_moderate_approvals'] && !empty($this->_req->post->mod_notify_approval))
-				$pref_binary |= 4;
-
-			if ($context['can_moderate_boards'])
-			{
-				if (!empty($this->_req->post->mod_notify_report))
-					$pref_binary |= ($this->_req->post->mod_notify_report == 2 ? 1 : 2);
-
-				$show_reports = !empty($this->_req->post->mod_show_reports) ? 1 : 0;
-			}
-
-			// Put it all together.
-			$mod_prefs = $show_reports . '|' . $mod_blocks . '|' . $pref_binary;
-			require_once(SUBSDIR . '/Members.subs.php');
-			updateMemberData($this->user->id, array('mod_prefs' => $mod_prefs));
-		}
-
-		// What blocks does the user currently have selected?
-		$context['mod_settings'] = array(
-			'show_reports' => $show_reports,
-			'notify_report' => $pref_binary & 2 ? 1 : ($pref_binary & 1 ? 2 : 0),
-			'notify_approval' => $pref_binary & 4,
-			'user_blocks' => str_split($mod_blocks),
-		);
-
-		createToken('mod-set');
-	}
-
-	/**
-	 * Edit a warning template.
-	 *
-	 * @uses template_warn_template()
-	 */
-	public function action_modifyWarningTemplate()
-	{
-		global $context, $txt;
-
-		require_once(SUBSDIR . '/Moderation.subs.php');
-		loadJavascriptFile('admin.js', array(), 'admin_scripts');
-
-		$context['id_template'] = $this->_req->getQuery('tid', 'intval', 0);
-		$context['is_edit'] = $context['id_template'];
-
-		// Standard template things.
-		$context['page_title'] = $context['is_edit'] ? $txt['mc_warning_template_modify'] : $txt['mc_warning_template_add'];
-		$context['sub_template'] = 'warn_template';
-		$context[$context['moderation_menu_name']]['current_subsection'] = 'templates';
-
-		// Defaults.
-		$context['template_data'] = array(
-			'title' => '',
-			'body' => $txt['mc_warning_template_body_default'],
-			'personal' => false,
-			'can_edit_personal' => true,
-		);
-
-		// If it's an edit load it.
-		if ($context['is_edit'])
-			modLoadTemplate($context['id_template']);
-
-		// Wait, we are saving?
-		if (isset($this->_req->post->save))
-		{
-			checkSession('post');
-			validateToken('mod-wt');
-
-			// To check the BBC is pretty good...
-			require_once(SUBSDIR . '/Post.subs.php');
-
-			// Bit of cleaning!
-			$template_body = trim($this->_req->post->template_body);
-			$template_title = trim($this->_req->post->template_title);
-
-			// Need something in both boxes.
-			if (!empty($template_body) && !empty($template_title))
-			{
-				// Safety first.
-				$template_title = \ElkArte\Util::htmlspecialchars($template_title);
-
-				// Clean up BBC.
-				preparsecode($template_body);
-
-				// But put line breaks back!
-				$template_body = strtr($template_body, array('<br />' => "\n"));
-
-				// Is this personal?
-				$recipient_id = !empty($this->_req->post->make_personal) ? $this->user->id : 0;
-
-				// If we are this far it's save time.
-				if ($context['is_edit'])
-				{
-					// Simple update...
-					modAddUpdateTemplate($recipient_id, $template_title, $template_body, $context['id_template']);
-
-					// If it wasn't visible and now is they've effectively added it.
-					if ($context['template_data']['personal'] && !$recipient_id)
-						logAction('add_warn_template', array('template' => $template_title));
-					// Conversely if they made it personal it's a delete.
-					elseif (!$context['template_data']['personal'] && $recipient_id)
-						logAction('delete_warn_template', array('template' => $template_title));
-					// Otherwise just an edit.
-					else
-						logAction('modify_warn_template', array('template' => $template_title));
-				}
-				else
-				{
-					modAddUpdateTemplate($recipient_id, $template_title, $template_body, $context['id_template'], false);
-					logAction('add_warn_template', array('template' => $template_title));
-				}
-
-				// Get out of town...
-				redirectexit('action=moderate;area=warnings;sa=templates');
-			}
-			else
-			{
-				$context['warning_errors'] = array();
-				$context['template_data']['title'] = !empty($template_title) ? $template_title : '';
-				$context['template_data']['body'] = !empty($template_body) ? $template_body : $txt['mc_warning_template_body_default'];
-				$context['template_data']['personal'] = !empty($this->_req->post->make_personal);
-
-				if (empty($template_title))
-					$context['warning_errors'][] = $txt['mc_warning_template_error_no_title'];
-
-				if (empty($template_body))
-					$context['warning_errors'][] = $txt['mc_warning_template_error_no_body'];
 			}
 		}
-
-		createToken('mod-wt');
 	}
 
 	/**
@@ -805,7 +638,9 @@ class ModerationCenter extends \ElkArte\AbstractController
 		// Have to at least give us something
 		$report = $this->_req->getQuery('report', 'intval', 0);
 		if (empty($report))
-			throw new \ElkArte\Exceptions\Exception('mc_no_modreport_specified');
+		{
+			throw new Exception('mc_no_modreport_specified');
+		}
 
 		// This should not be needed...
 		$show_pms = false;
@@ -820,7 +655,9 @@ class ModerationCenter extends \ElkArte\AbstractController
 
 		// So did we find anything?
 		if ($row === false)
-			throw new \ElkArte\Exceptions\Exception('mc_no_modreport_found');
+		{
+			throw new Exception('mc_no_modreport_found');
+		}
 
 		// Woohoo we found a report and they can see it!  Bad news is we have more work to do
 		// If they are adding a comment then... add a comment.
@@ -828,7 +665,7 @@ class ModerationCenter extends \ElkArte\AbstractController
 		{
 			checkSession();
 
-			$newComment = trim(\ElkArte\Util::htmlspecialchars($this->_req->post->mod_comment));
+			$newComment = trim(Util::htmlspecialchars($this->_req->post->mod_comment));
 
 			// In it goes.
 			if (!empty($newComment))
@@ -840,7 +677,7 @@ class ModerationCenter extends \ElkArte\AbstractController
 			}
 		}
 
-		$bbc_parser = \BBC\ParserWrapper::instance();
+		$bbc_parser = ParserWrapper::instance();
 
 		$context['report'] = array(
 			'id' => $row['id_report'],
@@ -1009,7 +846,9 @@ class ModerationCenter extends \ElkArte\AbstractController
 
 		// Make sure to get the correct tab selected.
 		if ($context['report']['closed'])
+		{
 			$context[$context['moderation_menu_name']]['current_subsection'] = 'closed';
+		}
 
 		// Finally we are done :P
 		theme()->getTemplates()->load('ModerationCenter');
@@ -1027,6 +866,120 @@ class ModerationCenter extends \ElkArte\AbstractController
 		}
 
 		$context['sub_template'] = 'viewmodreport';
+	}
+
+	/**
+	 * Change moderation preferences.
+	 */
+	public function action_moderationSettings()
+	{
+		global $context, $txt;
+
+		// Some useful context stuff.
+		theme()->getTemplates()->load('ModerationCenter');
+		$context['page_title'] = $txt['mc_settings'];
+		$context['sub_template'] = 'moderation_settings';
+		$context[$context['moderation_menu_name']]['tab_data'] = array(
+			'title' => $txt['mc_prefs_title'],
+			'help' => '',
+			'description' => $txt['mc_prefs_desc']
+		);
+
+		// What blocks can this user see?
+		$context['homepage_blocks'] = array(
+			'n' => $txt['mc_prefs_latest_news'],
+			'p' => $txt['mc_notes'],
+		);
+
+		if ($context['can_moderate_groups'])
+		{
+			$context['homepage_blocks']['g'] = $txt['mc_group_requests'];
+		}
+
+		if ($context['can_moderate_boards'])
+		{
+			$context['homepage_blocks']['r'] = $txt['mc_reported_posts'];
+			$context['homepage_blocks']['w'] = $txt['mc_watched_users'];
+			$context['homepage_blocks']['a'] = $txt['mc_required'];
+		}
+
+		// Does the user have any settings yet?
+		if (empty(User::$settings['mod_prefs']))
+		{
+			$mod_blocks = 'np' . ($context['can_moderate_boards'] ? 'wra' : '') . ($context['can_moderate_groups'] ? 'g' : '');
+			$pref_binary = 5;
+			$show_reports = 1;
+		}
+		else
+		{
+			list ($show_reports, $mod_blocks, $pref_binary) = explode('|', User::$settings['mod_prefs']);
+		}
+
+		// Are we saving?
+		if (isset($this->_req->post->save))
+		{
+			checkSession('post');
+			validateToken('mod-set');
+
+			/* Current format of mod_prefs is:
+				x|ABCD|yyy
+
+				WHERE:
+					x = Show report count on forum header.
+					ABCD = Block indexes to show on moderation main page.
+					yyy = Integer with the following bit status:
+						- yyy & 1 = Always notify on reports.
+						- yyy & 2 = Notify on reports for moderators only.
+						- yyy & 4 = Notify about posts awaiting approval.
+			*/
+
+			// Do blocks first!
+			$mod_blocks = '';
+			if (!empty($this->_req->post->mod_homepage))
+			{
+				foreach ($this->_req->post->mod_homepage as $k => $v)
+				{
+					// Make sure they can add this...
+					if (isset($context['homepage_blocks'][$k]))
+					{
+						$mod_blocks .= $k;
+					}
+				}
+			}
+
+			// Now check other options!
+			$pref_binary = 0;
+
+			if ($context['can_moderate_approvals'] && !empty($this->_req->post->mod_notify_approval))
+			{
+				$pref_binary |= 4;
+			}
+
+			if ($context['can_moderate_boards'])
+			{
+				if (!empty($this->_req->post->mod_notify_report))
+				{
+					$pref_binary |= ($this->_req->post->mod_notify_report == 2 ? 1 : 2);
+				}
+
+				$show_reports = !empty($this->_req->post->mod_show_reports) ? 1 : 0;
+			}
+
+			// Put it all together.
+			$mod_prefs = $show_reports . '|' . $mod_blocks . '|' . $pref_binary;
+			require_once(SUBSDIR . '/Members.subs.php');
+			updateMemberData($this->user->id, array('mod_prefs' => $mod_prefs));
+		}
+
+		// What blocks does the user currently have selected?
+		$context['mod_settings'] = array(
+			'show_reports' => $show_reports,
+			'notify_report' => $pref_binary & 2 ? 1 : ($pref_binary & 1 ? 2 : 0),
+			'notify_approval' => $pref_binary & 4,
+			'user_blocks' => str_split($mod_blocks),
+		);
+
+		createToken('mod-set');
 	}
 
 	/**
@@ -1061,17 +1014,23 @@ class ModerationCenter extends \ElkArte\AbstractController
 			// Clicked on remove or using checkboxes to multi delete
 			$toDelete = array();
 			if (isset($this->_req->query->delete))
+			{
 				$toDelete[] = (int) $this->_req->query->delete;
+			}
 			else
+			{
 				$toDelete = array_map('intval', $this->_req->post->delete);
+			}
 
 			if (!empty($toDelete))
 			{
-				$remover = new \ElkArte\MessagesDelete($modSettings['recycle_enable'], $modSettings['recycle_board']);
+				$remover = new MessagesDelete($modSettings['recycle_enable'], $modSettings['recycle_board']);
 
 				// If they don't have permission we'll let it error - either way no chance of a security slip here!
 				foreach ($toDelete as $did)
+				{
 					$remover->removeMessage($did);
+				}
 			}
 		}
 
@@ -1088,12 +1047,18 @@ class ModerationCenter extends \ElkArte\AbstractController
 			$delete_boards = boardsAllowedTo('delete_any');
 
 			if ($approve_boards == array(0))
+			{
 				$approve_query = '';
+			}
 			elseif (!empty($approve_boards))
+			{
 				$approve_query = ' AND m.id_board IN (' . implode(',', $approve_boards) . ')';
+			}
 			// Nada, zip, etc...
 			else
+			{
 				$approve_query = ' AND 1=0';
+			}
 		}
 
 		// This is all the information required for a watched user listing.
@@ -1205,9 +1170,13 @@ class ModerationCenter extends \ElkArte\AbstractController
 							global $scripturl;
 
 							if ($member['last_post_id'])
+							{
 								return '<a href="' . $scripturl . '?msg=' . $member['last_post_id'] . '">' . $member['last_post'] . '</a>';
+							}
 							else
+							{
 								return $member['last_post'];
+							}
 						},
 					),
 				),
@@ -1222,11 +1191,11 @@ class ModerationCenter extends \ElkArte\AbstractController
 			),
 			'additional_rows' => array(
 				$context['view_posts'] ?
-				array(
-					'position' => 'below_table_data',
-					'value' => '
+					array(
+						'position' => 'below_table_data',
+						'value' => '
 						<input type="submit" name="delete_selected" value="' . $txt['quickmod_delete_selected'] . '" class="right_submit" />',
-				) : array(),
+					) : array(),
 			),
 		);
 
@@ -1249,6 +1218,72 @@ class ModerationCenter extends \ElkArte\AbstractController
 
 		$context['sub_template'] = 'show_list';
 		$context['default_list'] = 'watch_user_list';
+	}
+
+	/**
+	 * Callback for createList().
+	 *
+	 * @param int $start The item to start with (for pagination purposes)
+	 * @param int $items_per_page The number of items to show per page
+	 * @param string $sort A string indicating how to sort the results
+	 * @param string $approve_query
+	 * @param int[] $delete_boards
+	 *
+	 * @return array
+	 * @uses watchedUserPosts()
+	 *
+	 */
+	public function list_getWatchedUserPosts($start, $items_per_page, $sort, $approve_query, $delete_boards)
+	{
+		// Watched users posts
+		return watchedUserPosts($start, $items_per_page, $approve_query, $delete_boards);
+	}
+
+	/**
+	 * Callback for createList() used in watched users
+	 *
+	 * @param int $start The item to start with (for pagination purposes)
+	 * @param int $items_per_page The number of items to show per page
+	 * @param string $sort A string indicating how to sort the results
+	 *
+	 * @return array
+	 * @uses watchedUsers()
+	 *
+	 */
+	public function list_getWatchedUsers($start, $items_per_page, $sort)
+	{
+		// Find all our watched users
+		return watchedUsers($start, $items_per_page, $sort);
+	}
+
+	/**
+	 * Callback for createList().
+	 *
+	 * @param string $approve_query
+	 *
+	 * @return int
+	 * @uses watchedUserPostsCount()
+	 *
+	 */
+	public function list_getWatchedUserPostsCount($approve_query)
+	{
+		global $modSettings;
+
+		return watchedUserPostsCount($approve_query, $modSettings['warning_watch']);
+	}
+
+	/**
+	 * Callback for createList() for watched users
+	 *
+	 * - returns count
+	 *
+	 * @uses watchedUserCount()
+	 */
+	public function list_getWatchedUserCount()
+	{
+		global $modSettings;
+
+		return watchedUserCount($modSettings['warning_watch']);
 	}
 
 	/**
@@ -1282,14 +1317,22 @@ class ModerationCenter extends \ElkArte\AbstractController
 		$context['url_start'] = '?action=moderate;area=warnings;sa=log;sort=' . $context['order'];
 
 		if (!isset($search_params['string']) || (!empty($this->_req->post->search) && $search_params['string'] !== $this->_req->post->search))
+		{
 			$search_params_string = empty($this->_req->post->search) ? '' : $this->_req->post->search;
+		}
 		else
+		{
 			$search_params_string = $search_params['string'];
+		}
 
 		if (isset($this->_req->post->search_type) || empty($search_params['type']) || !isset($searchTypes[$search_params['type']]))
+		{
 			$search_params_type = isset($this->_req->post->search_type) && isset($searchTypes[$this->_req->post->search_type]) ? $this->_req->post->search_type : (isset($searchTypes[$context['order']]) ? $context['order'] : 'member');
+		}
 		else
+		{
 			$search_params_type = $search_params['type'];
+		}
 
 		$search_params_column = $searchTypes[$search_params_type]['sql'];
 		$search_params = array(
@@ -1384,8 +1427,11 @@ class ModerationCenter extends \ElkArte\AbstractController
 
 							// If a notice was sent, provide a link to it
 							if (!empty($warning['id_notice']))
+							{
 								$output .= '
 									<a href="' . $scripturl . '?action=moderate;area=notice;nid=' . $warning['id_notice'] . '" onclick="window.open(this.href, \'\', \'scrollbars=yes,resizable=yes,width=480,height=320\');return false;" target="_blank" class="new_win" title="' . $txt['profile_warning_previous_notice'] . '"><i class="icon icon-small i-search" title"' . $txt['profile_warning_previous_notice'] . '"></i></a>';
+							}
+
 							return $output;
 						},
 					),
@@ -1414,7 +1460,7 @@ class ModerationCenter extends \ElkArte\AbstractController
 					'position' => 'below_table_data',
 					'value' => '
 						' . $txt['modlog_search'] . ' (' . $txt['modlog_by'] . ': ' . $context['search']['label'] . ')
-						<input type="text" name="search" size="18" value="' . \ElkArte\Util::htmlspecialchars($context['search']['string']) . '" class="input_text" />
+						<input type="text" name="search" size="18" value="' . Util::htmlspecialchars($context['search']['string']) . '" class="input_text" />
 						<input type="submit" name="is_search" value="' . $txt['modlog_go'] . '" />',
 				),
 			),
@@ -1425,6 +1471,43 @@ class ModerationCenter extends \ElkArte\AbstractController
 
 		$context['sub_template'] = 'show_list';
 		$context['default_list'] = 'warning_list';
+	}
+
+	/**
+	 * Callback for createList()
+	 *
+	 * - Used to get all issued warnings in the system
+	 *
+	 * @param int $start The item to start with (for pagination purposes)
+	 * @param int $items_per_page The number of items to show per page
+	 * @param string $sort A string indicating how to sort the results
+	 * @param string $query_string
+	 * @param mixed[] $query_params
+	 *
+	 * @return array
+	 * @uses warnings() function in moderation.subs
+	 *
+	 */
+	public function list_getWarnings($start, $items_per_page, $sort, $query_string, $query_params)
+	{
+		return warnings($start, $items_per_page, $sort, $query_string, $query_params);
+	}
+
+	/**
+	 * Callback for createList()
+	 *
+	 * - Get the total count of all current warnings
+	 *
+	 * @param string $query_string
+	 * @param mixed[] $query_params
+	 *
+	 * @return int
+	 * @uses warningCount() function in moderation.subs
+	 *
+	 */
+	public function list_getWarningCount($query_string, $query_params)
+	{
+		return warningCount($query_string, $query_params);
 	}
 
 	/**
@@ -1443,6 +1526,7 @@ class ModerationCenter extends \ElkArte\AbstractController
 		if (isset($this->_req->post->add))
 		{
 			$this->action_modifyWarningTemplate();
+
 			return true;
 		}
 		// Deleting and existing one
@@ -1555,6 +1639,152 @@ class ModerationCenter extends \ElkArte\AbstractController
 	}
 
 	/**
+	 * Edit a warning template.
+	 *
+	 * @uses template_warn_template()
+	 */
+	public function action_modifyWarningTemplate()
+	{
+		global $context, $txt;
+
+		require_once(SUBSDIR . '/Moderation.subs.php');
+		loadJavascriptFile('admin.js', array(), 'admin_scripts');
+
+		$context['id_template'] = $this->_req->getQuery('tid', 'intval', 0);
+		$context['is_edit'] = $context['id_template'];
+
+		// Standard template things.
+		$context['page_title'] = $context['is_edit'] ? $txt['mc_warning_template_modify'] : $txt['mc_warning_template_add'];
+		$context['sub_template'] = 'warn_template';
+		$context[$context['moderation_menu_name']]['current_subsection'] = 'templates';
+
+		// Defaults.
+		$context['template_data'] = array(
+			'title' => '',
+			'body' => $txt['mc_warning_template_body_default'],
+			'personal' => false,
+			'can_edit_personal' => true,
+		);
+
+		// If it's an edit load it.
+		if ($context['is_edit'])
+		{
+			modLoadTemplate($context['id_template']);
+		}
+
+		// Wait, we are saving?
+		if (isset($this->_req->post->save))
+		{
+			checkSession('post');
+			validateToken('mod-wt');
+
+			// To check the BBC is pretty good...
+			require_once(SUBSDIR . '/Post.subs.php');
+
+			// Bit of cleaning!
+			$template_body = trim($this->_req->post->template_body);
+			$template_title = trim($this->_req->post->template_title);
+
+			// Need something in both boxes.
+			if (!empty($template_body) && !empty($template_title))
+			{
+				// Safety first.
+				$template_title = Util::htmlspecialchars($template_title);
+
+				// Clean up BBC.
+				preparsecode($template_body);
+
+				// But put line breaks back!
+				$template_body = strtr($template_body, array('<br />' => "\n"));
+
+				// Is this personal?
+				$recipient_id = !empty($this->_req->post->make_personal) ? $this->user->id : 0;
+
+				// If we are this far it's save time.
+				if ($context['is_edit'])
+				{
+					// Simple update...
+					modAddUpdateTemplate($recipient_id, $template_title, $template_body, $context['id_template']);
+
+					// If it wasn't visible and now is they've effectively added it.
+					if ($context['template_data']['personal'] && !$recipient_id)
+					{
+						logAction('add_warn_template', array('template' => $template_title));
+					}
+					// Conversely if they made it personal it's a delete.
+					elseif (!$context['template_data']['personal'] && $recipient_id)
+					{
+						logAction('delete_warn_template', array('template' => $template_title));
+					}
+					// Otherwise just an edit.
+					else
+					{
+						logAction('modify_warn_template', array('template' => $template_title));
+					}
+				}
+				else
+				{
+					modAddUpdateTemplate($recipient_id, $template_title, $template_body, $context['id_template'], false);
+					logAction('add_warn_template', array('template' => $template_title));
+				}
+
+				// Get out of town...
+				redirectexit('action=moderate;area=warnings;sa=templates');
+			}
+			else
+			{
+				$context['warning_errors'] = array();
+				$context['template_data']['title'] = !empty($template_title) ? $template_title : '';
+				$context['template_data']['body'] = !empty($template_body) ? $template_body : $txt['mc_warning_template_body_default'];
+				$context['template_data']['personal'] = !empty($this->_req->post->make_personal);
+
+				if (empty($template_title))
+				{
+					$context['warning_errors'][] = $txt['mc_warning_template_error_no_title'];
+				}
+
+				if (empty($template_body))
+				{
+					$context['warning_errors'][] = $txt['mc_warning_template_error_no_body'];
+				}
+			}
+		}
+
+		createToken('mod-wt');
+	}
+
+	/**
+	 * Callback for createList() to get all the templates of a type from the system
+	 *
+	 * @param int $start The item to start with (for pagination purposes)
+	 * @param int $items_per_page The number of items to show per page
+	 * @param string $sort A string indicating how to sort the results
+	 * @param string $template_type type of template to load
+	 *
+	 * @return array
+	 * @uses warningTemplates()
+	 *
+	 */
+	public function list_getWarningTemplates($start, $items_per_page, $sort, $template_type = 'warntpl')
+	{
+		return warningTemplates($start, $items_per_page, $sort, $template_type);
+	}
+
+	/**
+	 * Callback for createList() to get the number of templates of a type in the system
+	 *
+	 * @param string $template_type
+	 *
+	 * @return
+	 * @uses warningTemplateCount()
+	 *
+	 */
+	public function list_getWarningTemplateCount($template_type = 'warntpl')
+	{
+		return warningTemplateCount($template_type);
+	}
+
+	/**
 	 * Entry point for viewing warning related stuff.
 	 */
 	public function action_viewWarnings()
@@ -1578,144 +1808,10 @@ class ModerationCenter extends \ElkArte\AbstractController
 		);
 
 		// Call the right function.
-		$action = new \ElkArte\Action('moderation_center');
+		$action = new Action('moderation_center');
 		$subAction = $action->initialize($subActions, 'log');
 		$context['sub_action'] = $subAction;
 		$action->dispatch($subAction);
-	}
-
-	/**
-	 * Callback for createList() for watched users
-	 *
-	 * - returns count
-	 *
-	 * @uses watchedUserCount()
-	 */
-	public function list_getWatchedUserCount()
-	{
-		global $modSettings;
-
-		return watchedUserCount($modSettings['warning_watch']);
-	}
-
-	/**
-	 * Callback for createList() used in watched users
-	 *
-	 * @uses watchedUsers()
-	 *
-	 * @param int $start The item to start with (for pagination purposes)
-	 * @param int $items_per_page The number of items to show per page
-	 * @param string $sort A string indicating how to sort the results
-	 *
-	 * @return array
-	 */
-	public function list_getWatchedUsers($start, $items_per_page, $sort)
-	{
-		// Find all our watched users
-		return watchedUsers($start, $items_per_page, $sort);
-	}
-
-	/**
-	 * Callback for createList().
-	 *
-	 * @uses watchedUserPostsCount()
-	 *
-	 * @param string $approve_query
-	 *
-	 * @return int
-	 */
-	public function list_getWatchedUserPostsCount($approve_query)
-	{
-		global $modSettings;
-
-		return watchedUserPostsCount($approve_query, $modSettings['warning_watch']);
-	}
-
-	/**
-	 * Callback for createList().
-	 *
-	 * @uses watchedUserPosts()
-	 *
-	 * @param int $start The item to start with (for pagination purposes)
-	 * @param int $items_per_page The number of items to show per page
-	 * @param string $sort A string indicating how to sort the results
-	 * @param string $approve_query
-	 * @param int[] $delete_boards
-	 *
-	 * @return array
-	 */
-	public function list_getWatchedUserPosts($start, $items_per_page, $sort, $approve_query, $delete_boards)
-	{
-		// Watched users posts
-		return watchedUserPosts($start, $items_per_page, $approve_query, $delete_boards);
-	}
-
-	/**
-	 * Callback for createList() to get all the templates of a type from the system
-	 *
-	 * @uses warningTemplates()
-	 *
-	 * @param int $start The item to start with (for pagination purposes)
-	 * @param int $items_per_page The number of items to show per page
-	 * @param string $sort A string indicating how to sort the results
-	 * @param string $template_type type of template to load
-	 *
-	 * @return array
-	 */
-	public function list_getWarningTemplates($start, $items_per_page, $sort, $template_type = 'warntpl')
-	{
-		return warningTemplates($start, $items_per_page, $sort, $template_type);
-	}
-
-	/**
-	 * Callback for createList() to get the number of templates of a type in the system
-	 *
-	 * @uses warningTemplateCount()
-	 *
-	 * @param string $template_type
-	 *
-	 * @return
-	 */
-	public function list_getWarningTemplateCount($template_type = 'warntpl')
-	{
-		return warningTemplateCount($template_type);
-	}
-
-	/**
-	 * Callback for createList()
-	 *
-	 * - Used to get all issued warnings in the system
-	 *
-	 * @uses warnings() function in moderation.subs
-	 *
-	 * @param int $start The item to start with (for pagination purposes)
-	 * @param int $items_per_page The number of items to show per page
-	 * @param string $sort A string indicating how to sort the results
-	 * @param string $query_string
-	 * @param mixed[] $query_params
-	 *
-	 * @return array
-	 */
-	public function list_getWarnings($start, $items_per_page, $sort, $query_string, $query_params)
-	{
-		return warnings($start, $items_per_page, $sort, $query_string, $query_params);
-	}
-
-	/**
-	 * Callback for createList()
-	 *
-	 * - Get the total count of all current warnings
-	 *
-	 * @uses warningCount() function in moderation.subs
-	 *
-	 * @param string $query_string
-	 * @param mixed[] $query_params
-	 *
-	 * @return int
-	 */
-	public function list_getWarningCount($query_string, $query_params)
-	{
-		return warningCount($query_string, $query_params);
 	}
 
 	/**
@@ -1789,7 +1885,7 @@ class ModerationCenter extends \ElkArte\AbstractController
 		$mod_totals = loadModeratorMenuCounts();
 
 		// This blocks total is only these fields
-		$context['mc_required'] = $mod_totals['attachments'] + $mod_totals['emailmod'] + $mod_totals['topics'] + $mod_totals['posts'] + $mod_totals['memberreq'] + $mod_totals['groupreq'] + + $mod_totals['reports'];
+		$context['mc_required'] = $mod_totals['attachments'] + $mod_totals['emailmod'] + $mod_totals['topics'] + $mod_totals['posts'] + $mod_totals['memberreq'] + $mod_totals['groupreq'] + +$mod_totals['reports'];
 		unset($mod_totals['postmod'], $mod_totals['pt_total'], $mod_totals['mg_total'], $mod_totals['grand_total']);
 		$context['required'] = $mod_totals;
 
@@ -1820,7 +1916,7 @@ class ModerationCenter extends \ElkArte\AbstractController
 		{
 			checkSession();
 
-			$new_note = \ElkArte\Util::htmlspecialchars(trim($this->_req->post->new_note));
+			$new_note = Util::htmlspecialchars(trim($this->_req->post->new_note));
 
 			// Make sure they actually entered something.
 			if (!empty($new_note) && $new_note !== $txt['mc_click_add_note'])
@@ -1829,8 +1925,8 @@ class ModerationCenter extends \ElkArte\AbstractController
 				addModeratorNote($this->user->id, $this->user->name, $new_note);
 
 				// Clear the cache.
-				\ElkArte\Cache\Cache::instance()->remove('moderator_notes');
-				\ElkArte\Cache\Cache::instance()->remove('moderator_notes_total');
+				Cache::instance()->remove('moderator_notes');
+				Cache::instance()->remove('moderator_notes_total');
 			}
 
 			// Redirect otherwise people can resubmit.
@@ -1849,8 +1945,8 @@ class ModerationCenter extends \ElkArte\AbstractController
 			removeModeratorNote($id_delete);
 
 			// Clear the cache.
-			\ElkArte\Cache\Cache::instance()->remove('moderator_notes');
-			\ElkArte\Cache\Cache::instance()->remove('moderator_notes_total');
+			Cache::instance()->remove('moderator_notes');
+			Cache::instance()->remove('moderator_notes_total');
 
 			redirectexit('action=moderate');
 		}
@@ -1866,7 +1962,7 @@ class ModerationCenter extends \ElkArte\AbstractController
 		$context['page_index'] = constructPageIndex($scripturl . '?action=moderate;area=index;notes', $this->_req->query->start, $moderator_notes_total, 10);
 		$context['start'] = $this->_req->query->start;
 
-		$bbc_parser = \BBC\ParserWrapper::instance();
+		$bbc_parser = ParserWrapper::instance();
 
 		$context['notes'] = array();
 		foreach ($moderator_notes as $note)
@@ -1895,7 +1991,9 @@ class ModerationCenter extends \ElkArte\AbstractController
 		global $context, $scripturl;
 
 		if ($this->user->mod_cache['bq'] === '0=1')
+		{
 			return 'reported_posts_block';
+		}
 
 		$context['reported_posts'] = array();
 

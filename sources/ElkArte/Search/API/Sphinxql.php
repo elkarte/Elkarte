@@ -9,7 +9,7 @@
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause (see accompanying LICENSE.txt file)
  *
  * This file contains code covered by:
- * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * copyright: 2011 Simple Machines (http://www.simplemachines.org)
  *
  * @version 2.0 dev
  *
@@ -20,6 +20,7 @@ namespace ElkArte\Search\API;
 use ElkArte\Cache\Cache;
 use ElkArte\Errors\Errors;
 use ElkArte\User;
+use ElkArte\Util;
 
 /**
  * SearchAPI-Sphinxql.class.php, SphinxQL API,
@@ -36,36 +37,42 @@ class Sphinxql extends AbstractAPI
 {
 	/**
 	 * This is the last version of ElkArte that this was tested on, to protect against API changes.
+	 *
 	 * @var string
 	 */
 	public $version_compatible = 'ElkArte 2.0 dev';
 
 	/**
 	 * This won't work with versions of ElkArte less than this.
+	 *
 	 * @var string
 	 */
 	public $min_elk_version = 'ElkArte 1.0 Beta 1';
 
 	/**
 	 * Is it supported?
+	 *
 	 * @var boolean
 	 */
 	public $is_supported = true;
 
 	/**
 	 * What words are banned?
+	 *
 	 * @var array
 	 */
 	protected $bannedWords = array();
 
 	/**
 	 * What is the minimum word length?
+	 *
 	 * @var int
 	 */
 	protected $min_word_length = 4;
 
 	/**
 	 * What databases are supported?
+	 *
 	 * @var array
 	 */
 	protected $supported_databases = array('MySQL');
@@ -302,11 +309,6 @@ class Sphinxql extends AbstractAPI
 		return $topics;
 	}
 
-	public function useWordIndex()
-	{
-		return false;
-	}
-
 	/**
 	 * Constructs a binary mode query to pass back to sphinx
 	 *
@@ -422,7 +424,7 @@ class Sphinxql extends AbstractAPI
 		$string = html_entity_decode($string, ENT_QUOTES, 'UTF-8');
 
 		// Lowercase string
-		$string = \ElkArte\Util::strtolower($string);
+		$string = Util::strtolower($string);
 
 		// Fix numbers so they search easier (phone numbers, SSN, dates, etc)
 		$string = preg_replace('~([[:digit:]]+)\pP+(?=[[:digit:]])~u', '', $string);
@@ -431,5 +433,10 @@ class Sphinxql extends AbstractAPI
 		$string = preg_replace('~[^\pL\pN]+~u', ' ', $string);
 
 		return $string;
+	}
+
+	public function useWordIndex()
+	{
+		return false;
 	}
 }

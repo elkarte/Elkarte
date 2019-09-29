@@ -12,12 +12,12 @@
 
 namespace ElkArte\Errors;
 
-use ElkArte\Themes\TemplateLayers;
+use ElkArte\AbstractModel;
 
 /**
  * Class to handle all forum errors and exceptions
  */
-class Log extends \ElkArte\AbstractModel
+class Log extends AbstractModel
 {
 	/**
 	 * Delete all or some of the errors in the error log.

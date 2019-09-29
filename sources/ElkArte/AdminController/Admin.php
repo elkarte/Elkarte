@@ -8,13 +8,22 @@
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause (see accompanying LICENSE.txt file)
  *
  * This file contains code covered by:
- * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * copyright: 2011 Simple Machines (http://www.simplemachines.org)
  *
  * @version 2.0 dev
  *
  */
 
 namespace ElkArte\AdminController;
+
+use ElkArte\AbstractController;
+use ElkArte\Action;
+use ElkArte\AdminSettingsSearch;
+use ElkArte\EventManager;
+use ElkArte\Exceptions\Exception;
+use ElkArte\Hooks;
+use ElkArte\User;
+use ElkArte\XmlArray;
 
 /**
  * Admin controller class.
@@ -26,14 +35,13 @@ namespace ElkArte\AdminController;
  *
  * @package Admin
  */
-
-class Admin extends \ElkArte\AbstractController
+class Admin extends AbstractController
 {
 	/**
 	 * @var string[] areas to find current installed status and installed version
 	 */
 	private $_checkFor = array('gd', 'imagick', 'db_server', 'php', 'server',
-							  'zend', 'apc', 'memcache', 'memcached', 'xcache', 'opcache');
+							   'zend', 'apc', 'memcache', 'memcached', 'xcache', 'opcache');
 
 	/**
 	 * Pre Dispatch, called before other methods.
@@ -42,7 +50,7 @@ class Admin extends \ElkArte\AbstractController
 	 */
 	public function pre_dispatch()
 	{
-		\ElkArte\Hooks::instance()->loadIntegrationsSettings();
+		Hooks::instance()->loadIntegrationsSettings();
 	}
 
 	/**
@@ -83,7 +91,9 @@ class Admin extends \ElkArte\AbstractController
 
 		// Now - finally - call the right place!
 		if (isset($admin_include_data['file']))
+		{
 			require_once($admin_include_data['file']);
+		}
 
 		callMenu($admin_include_data);
 	}
@@ -288,7 +298,7 @@ class Admin extends \ElkArte\AbstractController
 						'class' => 'admin_img_languages',
 						'subsections' => array(
 							'edit' => array($txt['language_edit']),
-// 							'add' => array($txt['language_add']),
+							// 'add' => array($txt['language_add']),
 							'settings' => array($txt['language_settings']),
 						),
 					),
@@ -584,7 +594,7 @@ class Admin extends \ElkArte\AbstractController
 		// Nothing valid?
 		if ($admin_include_data === false)
 		{
-			throw new \ElkArte\Exceptions\Exception('no_access', false);
+			throw new Exception('no_access', false);
 		}
 
 		// Make a note of the Unique ID for this menu.
@@ -613,16 +623,20 @@ class Admin extends \ElkArte\AbstractController
 		);
 
 		if (isset($admin_include_data['current_area']) && $admin_include_data['current_area'] != 'index')
+		{
 			$context['linktree'][] = array(
 				'url' => getUrl('admin', ['action' => 'admin', 'area' => $admin_include_data['current_area'], '{session_data}']),
 				'name' => $admin_include_data['label'],
 			);
+		}
 
 		if (!empty($admin_include_data['current_subsection']) && $admin_include_data['subsections'][$admin_include_data['current_subsection']][0] != $admin_include_data['label'])
+		{
 			$context['linktree'][] = array(
 				'url' => getUrl('admin', ['action' => 'admin', 'area' => $admin_include_data['current_area'], 'sa' => $admin_include_data['current_subsection'], '{session_data}']),
 				'name' => $admin_include_data['subsections'][$admin_include_data['current_subsection']][0],
 			);
+		}
 	}
 
 	/**
@@ -745,7 +759,7 @@ class Admin extends \ElkArte\AbstractController
 	 * - Sets up an array of applicable sub-actions (search types) and the function that goes with each
 	 * - Search type specified by "search_type" request variable (either from a
 	 * form or from the query string) Defaults to 'internal'
-	 * 	Calls the appropriate sub action based on the search_type
+	 * - Calls the appropriate sub action based on the search_type
 	 */
 	public function action_search()
 	{
@@ -759,7 +773,7 @@ class Admin extends \ElkArte\AbstractController
 		);
 
 		// Set the subaction
-		$action = new \ElkArte\Action('admin_search');
+		$action = new Action('admin_search');
 		$subAction = $action->initialize($subActions, 'internal');
 
 		// Keep track of what the admin wants in terms of advanced or not
@@ -780,9 +794,13 @@ class Admin extends \ElkArte\AbstractController
 
 		// You did remember to enter something to search for, otherwise its easy
 		if ($context['search_term'] === '')
+		{
 			$context['search_results'] = array();
+		}
 		else
+		{
 			$action->dispatch($subAction);
+		}
 	}
 
 	/**
@@ -875,7 +893,7 @@ class Admin extends \ElkArte\AbstractController
 		// Go through all the search data trying to find this text!
 		$search_term = strtolower(un_htmlspecialchars($context['search_term']));
 
-		$search = new \ElkArte\AdminSettingsSearch($language_files, $include_files, $settings_search);
+		$search = new AdminSettingsSearch($language_files, $include_files, $settings_search);
 		$search->initSearch($context['admin_menu_name'], array(
 			array('COPPA', 'area=regcenter;sa=settings'),
 			array('CAPTCHA', 'area=securitysettings;sa=spam'),
@@ -900,8 +918,8 @@ class Admin extends \ElkArte\AbstractController
 		$this->_req->post->membername = un_htmlspecialchars($context['search_term']);
 		$this->_req->post->types = '';
 
-		$managemembers = new ManageMembers(new \ElkArte\EventManager());
-		$managemembers->setUser(\ElkArte\User::$info);
+		$managemembers = new ManageMembers(new EventManager());
+		$managemembers->setUser(User::$info);
 		$managemembers->pre_dispatch();
 		$managemembers->action_index();
 	}
@@ -927,7 +945,9 @@ class Admin extends \ElkArte\AbstractController
 
 		// Encode the search data.
 		foreach ($postVars as $k => $v)
+		{
 			$postVars[$k] = urlencode($v);
+		}
 
 		// This is what we will send.
 		$postVars = implode('+', $postVars);
@@ -940,7 +960,9 @@ class Admin extends \ElkArte\AbstractController
 
 		// If we didn't get any xml back we are in trouble - perhaps the doc site is overloaded?
 		if (!$search_results || preg_match('~<' . '\?xml\sversion="\d+\.\d+"\?' . '>\s*(<api>.+?</api>)~is', $search_results, $matches) !== 1)
-			throw new \ElkArte\Exceptions\Exception('cannot_connect_doc_site');
+		{
+			throw new Exception('cannot_connect_doc_site');
+		}
 
 		$search_results = !empty($matches[1]) ? $matches[1] : '';
 
@@ -948,12 +970,12 @@ class Admin extends \ElkArte\AbstractController
 		$context['search_results'] = array();
 
 		// Get the results loaded into an array for processing!
-		$results = new \ElkArte\XmlArray($search_results, false);
+		$results = new XmlArray($search_results, false);
 
 		// Move through the api layer.
 		if (!$results->exists('api'))
 		{
-			throw new \ElkArte\Exceptions\Exception('cannot_connect_doc_site');
+			throw new Exception('cannot_connect_doc_site');
 		}
 
 		// Are there actually some results?

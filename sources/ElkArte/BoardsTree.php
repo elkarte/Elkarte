@@ -9,7 +9,7 @@
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause (see accompanying LICENSE.txt file)
  *
  * This file contains code covered by:
- * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * copyright: 2011 Simple Machines (http://www.simplemachines.org)
  *
  * @version 2.0 dev
  *
@@ -17,6 +17,14 @@
 
 namespace ElkArte;
 
+use ElkArte\Cache\Cache;
+use ElkArte\Database\QueryInterface;
+
+/**
+ * Class BoardsTree
+ *
+ * @package ElkArte
+ */
 class BoardsTree
 {
 	protected $cat_tree = [];
@@ -24,7 +32,7 @@ class BoardsTree
 	protected $boardList = [];
 	protected $db = null;
 
-	public function __construct(\ElkArte\Database\QueryInterface $db)
+	public function __construct(QueryInterface $db)
 	{
 		$this->db = $db;
 
@@ -59,8 +67,7 @@ class BoardsTree
 				LEFT JOIN {db_prefix}boards AS b ON (b.id_cat = c.id_cat)' . (!empty($query['join']) ?
 				$query['join'] : '') . '
 			ORDER BY c.cat_order, b.child_level, b.board_order',
-			array(
-			)
+			array()
 		);
 		$this->cat_tree = array();
 		$this->boards = array();
@@ -87,7 +94,9 @@ class BoardsTree
 			if (!empty($row['id_board']))
 			{
 				if ($row['child_level'] != $curLevel)
+				{
 					$prevBoard = 0;
+				}
 
 				$this->boards[$row['id_board']] = array(
 					'id' => $row['id_board'],
@@ -124,7 +133,9 @@ class BoardsTree
 				{
 					// Parent doesn't exist!
 					if (!isset($this->boards[$row['id_parent']]['tree']))
+					{
 						throw new \ElkArte\Exceptions\Exception('no_valid_parent', false, array($row['board_name']));
+					}
 
 					// Wrong childlevel...we can silently fix this...
 					if ($this->boards[$row['id_parent']]['tree']['node']['level'] != $row['child_level'] - 1)
@@ -183,6 +194,23 @@ class BoardsTree
 			$this->boardList[$catID][] = $id;
 			$this->boardList[$catID] = array_merge($this->boardList[$catID], $this->allChildsOf($id));
 		}
+	}
+
+	public function allChildsOf($board_id)
+	{
+		if (empty($this->boards[$board_id]['tree']['children']))
+		{
+			return [];
+		}
+
+		$boardsList = [];
+		foreach ($this->boards[$board_id]['tree']['children'] as $id => $node)
+		{
+			$boardsList[] = $id;
+			$boardsList = array_merge($boardsList, $this->allChildsOf($id));
+		}
+
+		return $boardsList;
 	}
 
 	public function getBoardList()
@@ -247,55 +275,6 @@ class BoardsTree
 	}
 
 	/**
-	 * Put all boards in the right order and sorts the records of the boards table.
-	 *
-	 * - Used by modifyBoard(), deleteBoards(), modifyCategory(), and deleteCategories() functions
-	 */
-	public function reorderBoards()
-	{
-		$update_query = '';
-		$update_params = [];
-
-		// Set the board order for each category.
-		$board_order = 0;
-		foreach ($this->cat_tree as $catID => $dummy)
-		{
-			foreach ($this->boardList[$catID] as $boardID)
-			{
-				if ($this->boards[$boardID]['order'] != ++$board_order)
-				{
-					$update_query .= sprintf(
-						'
-					WHEN {int:selected_board%1$d} THEN {int:new_order%1$d}',
-						$boardID
-					);
-
-					$update_params = array_merge(
-						$update_params,
-						[
-							'new_order' . $boardID => $board_order,
-							'selected_board' . $boardID => $boardID,
-						]
-					);
-				}
-			}
-		}
-
-		if (empty($update_query))
-		{
-			return;
-		}
-
-		$this->db->query('',
-			'UPDATE {db_prefix}boards
-				SET
-					board_order = CASE id_board ' . $update_query . '
-						END',
-			$update_params
-		);
-	}
-
-	/**
 	 * Returns whether the sub-board id is actually a child of the parent (recursive).
 	 *
 	 * @param int $child The ID of the child board
@@ -319,51 +298,6 @@ class BoardsTree
 	}
 
 	/**
-	 * Fixes the children of a board by setting their child_levels to new values.
-	 *
-	 * - Used when a board is deleted or moved, to affect its children.
-	 *
-	 * @param int $parent
-	 * @param int $newLevel
-	 * @param int $newParent
-	 */
-	function fixChildren($parent, $newLevel, $newParent)
-	{
-		// Grab all children of $parent...
-		$children = $this->db->fetchQuery('
-			SELECT id_board
-			FROM {db_prefix}boards
-			WHERE id_parent = {int:parent_board}',
-			array(
-				'parent_board' => $parent,
-			)
-		)->fetch_callback(
-			function ($row)
-			{
-				return $row['id_board'];
-			}
-		);
-
-		// ...and set it to a new parent and child_level.
-		$this->db->query('', '
-			UPDATE {db_prefix}boards
-			SET id_parent = {int:new_parent}, child_level = {int:new_child_level}
-			WHERE id_parent = {int:parent_board}',
-			array(
-				'new_parent' => $newParent,
-				'new_child_level' => $newLevel,
-				'parent_board' => $parent,
-			)
-		);
-
-		// Recursively fix the children of the children.
-		foreach ($children as $child)
-		{
-			$this->fixChildren($child, $newLevel + 1, $child);
-		}
-	}
-
-	/**
 	 * Remove one or more boards.
 	 *
 	 * - Allows to move the children of the board before deleting it
@@ -381,7 +315,9 @@ class BoardsTree
 	{
 		// No boards to delete? Return!
 		if (empty($boards_to_remove))
+		{
 			return;
+		}
 
 		call_integration_hook('integrate_delete_board', array($boards_to_remove, &$moveChildrenTo));
 
@@ -501,7 +437,7 @@ class BoardsTree
 		updateSettings(array('settings_updated' => time()));
 
 		// Clean the cache as well.
-		\ElkArte\Cache\Cache::instance()->clean('data');
+		Cache::instance()->clean('data');
 
 		// Let's do some serious logging.
 		foreach ($boards_to_remove as $id_board)
@@ -512,20 +448,96 @@ class BoardsTree
 		$this->reorderBoards();
 	}
 
-	public function allChildsOf($board_id)
+	/**
+	 * Fixes the children of a board by setting their child_levels to new values.
+	 *
+	 * - Used when a board is deleted or moved, to affect its children.
+	 *
+	 * @param int $parent
+	 * @param int $newLevel
+	 * @param int $newParent
+	 */
+	function fixChildren($parent, $newLevel, $newParent)
 	{
-		if (empty($this->boards[$board_id]['tree']['children']))
+		// Grab all children of $parent...
+		$children = $this->db->fetchQuery('
+			SELECT id_board
+			FROM {db_prefix}boards
+			WHERE id_parent = {int:parent_board}',
+			array(
+				'parent_board' => $parent,
+			)
+		)->fetch_callback(
+			function ($row) {
+				return $row['id_board'];
+			}
+		);
+
+		// ...and set it to a new parent and child_level.
+		$this->db->query('', '
+			UPDATE {db_prefix}boards
+			SET id_parent = {int:new_parent}, child_level = {int:new_child_level}
+			WHERE id_parent = {int:parent_board}',
+			array(
+				'new_parent' => $newParent,
+				'new_child_level' => $newLevel,
+				'parent_board' => $parent,
+			)
+		);
+
+		// Recursively fix the children of the children.
+		foreach ($children as $child)
 		{
-			return [];
+			$this->fixChildren($child, $newLevel + 1, $child);
+		}
+	}
+
+	/**
+	 * Put all boards in the right order and sorts the records of the boards table.
+	 *
+	 * - Used by modifyBoard(), deleteBoards(), modifyCategory(), and deleteCategories() functions
+	 */
+	public function reorderBoards()
+	{
+		$update_query = '';
+		$update_params = [];
+
+		// Set the board order for each category.
+		$board_order = 0;
+		foreach ($this->cat_tree as $catID => $dummy)
+		{
+			foreach ($this->boardList[$catID] as $boardID)
+			{
+				if ($this->boards[$boardID]['order'] != ++$board_order)
+				{
+					$update_query .= sprintf(
+						'
+					WHEN {int:selected_board%1$d} THEN {int:new_order%1$d}',
+						$boardID
+					);
+
+					$update_params = array_merge(
+						$update_params,
+						[
+							'new_order' . $boardID => $board_order,
+							'selected_board' . $boardID => $boardID,
+						]
+					);
+				}
+			}
 		}
 
-		$boardsList = [];
-		foreach ($this->boards[$board_id]['tree']['children'] as $id => $node)
+		if (empty($update_query))
 		{
-			$boardsList[] = $id;
-			$boardsList = array_merge($boardsList, $this->allChildsOf($id));
+			return;
 		}
 
-		return $boardsList;
+		$this->db->query('',
+			'UPDATE {db_prefix}boards
+				SET
+					board_order = CASE id_board ' . $update_query . '
+						END',
+			$update_params
+		);
 	}
 }

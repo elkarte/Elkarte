@@ -14,8 +14,8 @@
 /**
  * Remove old karma from the log
  *
- * @package Karma
  * @param int $karmaWaitTime
+ * @package Karma
  */
 function clearKarma($karmaWaitTime)
 {
@@ -35,12 +35,12 @@ function clearKarma($karmaWaitTime)
 /**
  * Last action this user has done
  *
- * @package Karma
- *
  * @param int $id_executor
  * @param int $id_target
  *
  * @return null
+ * @package Karma
+ *
  */
 function lastActionOn($id_executor, $id_target)
 {
@@ -59,7 +59,9 @@ function lastActionOn($id_executor, $id_target)
 		)
 	);
 	if ($db->num_rows($request) > 0)
+	{
 		list ($action) = $db->fetch_row($request);
+	}
 	$db->free_result($request);
 
 	return isset($action) ? $action : null;
@@ -68,10 +70,10 @@ function lastActionOn($id_executor, $id_target)
 /**
  * Add a karma action, from executor to target.
  *
- * @package Karma
  * @param int $id_executor
  * @param int $id_target
  * @param int $direction - options: -1 or 1
+ * @package Karma
  */
 function addKarma($id_executor, $id_target, $direction)
 {
@@ -93,10 +95,10 @@ function addKarma($id_executor, $id_target, $direction)
 /**
  * Update a former karma action from executor to target.
  *
- * @package Karma
  * @param int $id_executor
  * @param int $id_target
  * @param int $direction - options: -1 or 1
+ * @package Karma
  */
 function updateKarma($id_executor, $id_target, $direction)
 {
@@ -119,7 +121,11 @@ function updateKarma($id_executor, $id_target, $direction)
 	// It was recently changed the OTHER way... so... reverse it!
 	require_once(SUBSDIR . '/Members.subs.php');
 	if ($direction == 1)
+	{
 		updateMemberData($_REQUEST['uid'], array('karma_good' => '+', 'karma_bad' => '-'));
+	}
 	else
+	{
 		updateMemberData($_REQUEST['uid'], array('karma_bad' => '+', 'karma_good' => '-'));
+	}
 }

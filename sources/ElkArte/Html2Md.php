@@ -20,54 +20,63 @@ class Html2Md
 {
 	/**
 	 * The value that will hold our dom object
+	 *
 	 * @var object
 	 */
 	public $doc;
 
 	/**
 	 * The value that will hold if we are using the internal or external parser
+	 *
 	 * @var boolean
 	 */
 	private $_parser;
 
 	/**
 	 * Line end character
+	 *
 	 * @var string
 	 */
 	public $line_end = "\n";
 
 	/**
 	 * Line break character
+	 *
 	 * @var string
 	 */
 	public $line_break = "\n\n";
 
 	/**
 	 * Wordwrap output, set to 0 to skip wrapping
+	 *
 	 * @var int
 	 */
 	public $body_width = 76;
 
 	/**
 	 * Strip remaining tags, set to false to leave them in
+	 *
 	 * @var boolean
 	 */
 	public $strip_tags = true;
 
 	/**
 	 * Regex to run on plain text to prevent markdown from erroneously converting
+	 *
 	 * @var string[]
 	 */
 	private $_textEscapeRegex = array();
 
 	/**
 	 * The passed html string to convert
+	 *
 	 * @var string
 	 */
 	public $html;
 
 	/**
 	 * The markdown equivalent to the  html string
+	 *
 	 * @var string
 	 */
 	public $markdown;
@@ -1176,7 +1185,7 @@ class Html2Md
 		$this->markdown = preg_replace_callback('/[^\(\/\]]((https?):\/\/|www\.)[-\p{L}0-9+&@#\/%?=~_|!:,.;]*[\p{L}0-9+&@#\/%=~_|]/iu',
 			function ($matches) {
 				return $this->_plaintxt_callback($matches);
-		}, $this->markdown);
+			}, $this->markdown);
 	}
 
 	/**

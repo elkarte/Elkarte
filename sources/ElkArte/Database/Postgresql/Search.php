@@ -13,10 +13,12 @@
 
 namespace ElkArte\Database\Postgresql;
 
+use ElkArte\Database\AbstractSearch;
+
 /**
  * PostgreSQL implementation of DbSearch
  */
-class Search extends \ElkArte\Database\AbstractSearch
+class Search extends AbstractSearch
 {
 	/**
 	 * Everything starts here... more or less

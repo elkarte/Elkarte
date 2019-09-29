@@ -70,15 +70,21 @@ function messageIndexTopics($id_board, $id_member, $start, $items_per_page, $sor
 		)
 	);
 	while ($row = $db->fetch_assoc($request))
+	{
 		$topics[$row['id_topic']] = [];
+	}
 	$db->free_result($request);
 
 	// -1 means preview the whole body
 	if ($indexOptions['previews'] === -1)
+	{
 		$indexOptions['custom_selects'] = array_merge($indexOptions['custom_selects'], array('ml.body AS last_body', 'mf.body AS first_body'));
+	}
 	// Default: a SUBSTRING
 	elseif (!empty($indexOptions['previews']))
+	{
 		$indexOptions['custom_selects'] = array_merge($indexOptions['custom_selects'], array('SUBSTRING(ml.body, 1, ' . ($indexOptions['previews'] + 256) . ') AS last_body', 'SUBSTRING(mf.body, 1, ' . ($indexOptions['previews'] + 256) . ') AS first_body'));
+	}
 
 	if (!empty($indexOptions['include_avatars']))
 	{
@@ -113,7 +119,7 @@ function messageIndexTopics($id_board, $id_member, $start, $items_per_page, $sor
 				LEFT JOIN {db_prefix}members AS memf ON (memf.id_member = mf.id_member)' . ($id_member == 0 ? '' : '
 				LEFT JOIN {db_prefix}log_topics AS lt ON (lt.id_topic = t.id_topic AND lt.id_member = {int:current_member})
 				LEFT JOIN {db_prefix}log_mark_read AS lmr ON (lmr.id_board = {int:current_board} AND lmr.id_member = {int:current_member})') .
-				(!empty($indexOptions['custom_joins']) ? implode("\n\t\t\t\t", $indexOptions['custom_joins']) : '') . '
+			(!empty($indexOptions['custom_joins']) ? implode("\n\t\t\t\t", $indexOptions['custom_joins']) : '') . '
 			WHERE t.id_topic IN ({array_int:topic_list})',
 			array(
 				'current_board' => $id_board,
@@ -124,7 +130,9 @@ function messageIndexTopics($id_board, $id_member, $start, $items_per_page, $sor
 
 		// Now we fill the above array, maintaining index asssociation.
 		while ($row = $db->fetch_assoc($request))
+		{
 			$topics[$row['id_topic']] = $row;
+		}
 
 		$db->free_result($request);
 	}
@@ -181,7 +189,9 @@ function topicsParticipation($id_member, $topic_ids)
 		)
 	);
 	while ($row = $db->fetch_assoc($result))
+	{
 		$topics[] = $row;
+	}
 
 	$db->free_result($result);
 

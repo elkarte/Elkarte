@@ -6,7 +6,7 @@
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause (see accompanying LICENSE.txt file)
  *
  * This file contains code covered by:
- * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * copyright: 2011 Simple Machines (http://www.simplemachines.org)
  *
  * @version 2.0 dev
  *
@@ -17,7 +17,7 @@ namespace ElkArte;
 /**
  * This class holds all the data belonging to a certain member.
  */
-class UserInfo extends \ElkArte\ValuesContainer
+class UserInfo extends ValuesContainer
 {
 	public function isFirstLogin()
 	{

@@ -17,13 +17,13 @@ use ElkArte\User;
  * Count the mentions of the current user
  * callback for createList in action_list of \ElkArte\Controller\Mentions
  *
- * @package Mentions
- *
  * @param bool $all : if true counts all the mentions, otherwise only the unread
  * @param string[]|string $type : the type of the mention can be a string or an array of strings.
  * @param string|null $id_member : the id of the member the counts are for, defaults to user_info['id']
  *
  * @return mixed
+ * @package Mentions
+ *
  */
 function countUserMentions($all = false, $type = '', $id_member = null)
 {
@@ -33,7 +33,9 @@ function countUserMentions($all = false, $type = '', $id_member = null)
 	$id_member = $id_member === null ? User::$info->id : (int) $id_member;
 
 	if (isset($counts[$id_member]))
+	{
 		return $counts[$id_member];
+	}
 
 	$request = $db->query('', '
 		SELECT 
@@ -68,8 +70,6 @@ function countUserMentions($all = false, $type = '', $id_member = null)
  * Retrieve all the info to render the mentions page for the current user
  * callback for createList in action_list of \ElkArte\Controller\Mentions
  *
- * @package Mentions
- *
  * @param int $start Query starts sending results from here
  * @param int $limit Number of mentions returned
  * @param string $sort Sorting
@@ -77,6 +77,8 @@ function countUserMentions($all = false, $type = '', $id_member = null)
  * @param string[]|string $type : the type of the mention can be a string or an array of strings.
  *
  * @return array
+ * @package Mentions
+ *
  */
 function getUserMentions($start, $limit, $sort, $all = false, $type = '')
 {
@@ -112,9 +114,9 @@ function getUserMentions($start, $limit, $sort, $all = false, $type = '')
 			'sort' => $sort,
 		)
 	)->fetch_callback(
-		function ($row)
-		{
+		function ($row) {
 			$row['avatar'] = determineAvatar($row);
+
 			return $row;
 		}
 	);
@@ -125,11 +127,11 @@ function getUserMentions($start, $limit, $sort, $all = false, $type = '')
  *
  * Doesn't check permissions, access, anything. It just deletes everything.
  *
- * @package Mentions
- *
  * @param int[] $id_mentions the mention ids
  *
  * @return bool
+ * @package Mentions
+ *
  */
 function removeMentions($id_mentions)
 {
@@ -158,9 +160,9 @@ function removeMentions($id_mentions)
  *
  * - This is used to turn mentions on when a message is approved
  *
- * @package Mentions
  * @param int[] $msgs array of messages that you want to toggle
  * @param bool $approved direction of the toggle read / unread
+ * @package Mentions
  */
 function toggleMentionsApproval($msgs, $approved)
 {
@@ -186,8 +188,7 @@ function toggleMentionsApproval($msgs, $approved)
 			'messages' => $msgs,
 		)
 	)->fetch_callback(
-		function ($row) use ($status)
-		{
+		function ($row) use ($status) {
 			updateMentionMenuCount($status, $row['id_member']);
 		}
 	);
@@ -199,9 +200,9 @@ function toggleMentionsApproval($msgs, $approved)
  * - if off is restored to visible,
  * - if on is switched to invisible for all the users
  *
- * @package Mentions
  * @param string $type type of the mention that you want to toggle
  * @param bool $enable if true enables the mentions, otherwise disables them
+ * @package Mentions
  */
 function toggleMentionsVisibility($type, $enable)
 {
@@ -237,9 +238,9 @@ function toggleMentionsVisibility($type, $enable)
 /**
  * Toggles a bunch of mentions accessibility on/off
  *
- * @package Mentions
  * @param int[] $mentions an array of mention id
  * @param bool $access if true make the mentions accessible (if visible and other things), otherwise marks them as inaccessible
+ * @package Mentions
  */
 function toggleMentionsAccessibility($mentions, $access)
 {
@@ -262,13 +263,13 @@ function toggleMentionsAccessibility($mentions, $access)
  *
  * - Called from the validation class
  *
- * @package Mentions
- *
  * @param string $field
  * @param mixed[] $input
  * @param string|null $validation_parameters
  *
  * @return array|void
+ * @package Mentions
+ *
  */
 function validate_ownmention($field, $input, $validation_parameters = null)
 {
@@ -291,10 +292,10 @@ function validate_ownmention($field, $input, $validation_parameters = null)
 /**
  * Provided a mentions id and a member id, checks if the mentions belongs to that user
  *
- * @package Mentions
  * @param integer $id_mention the id of an existing mention
  * @param integer $id_member id of a member
  * @return bool true if the mention belongs to the member, false otherwise
+ * @package Mentions
  */
 function findMemberMention($id_mention, $id_member)
 {
@@ -320,9 +321,9 @@ function findMemberMention($id_mention, $id_member)
 /**
  * Updates the mention count as a result of an action, read, new, delete, etc
  *
- * @package Mentions
  * @param int|null $status
  * @param int $member_id
+ * @package Mentions
  */
 function updateMentionMenuCount($status, $member_id)
 {
@@ -330,21 +331,27 @@ function updateMentionMenuCount($status, $member_id)
 
 	// If its new add to our menu count
 	if ($status === 0)
+	{
 		updateMemberData($member_id, array('mentions' => '+'));
+	}
 	// Mark as read we decrease the count
 	elseif ($status === 1)
+	{
 		updateMemberData($member_id, array('mentions' => '-'));
+	}
 	// Deleting or un-approving may have been read or not, so a count is required
 	else
+	{
 		countUserMentions(false, '', $member_id);
+	}
 }
 
 /**
  * Retrieves the time the last notification of a certain member was added.
  *
- * @package Mentions
  * @param int $id_member
  * @return int A timestamp (log_time)
+ * @package Mentions
  */
 function getTimeLastMention($id_member)
 {
@@ -372,10 +379,10 @@ function getTimeLastMention($id_member)
 /**
  * Counts all the notifications received by a certain member after a certain time.
  *
- * @package Mentions
  * @param int $id_member
  * @param int $timestamp
  * @return int Number of new mentions
+ * @package Mentions
  */
 function getNewMentions($id_member, $timestamp)
 {

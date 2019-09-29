@@ -8,7 +8,7 @@
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause (see accompanying LICENSE.txt file)
  *
  * This file contains code covered by:
- * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * copyright: 2011 Simple Machines (http://www.simplemachines.org)
  *
  * @version 2.0 dev
  *
@@ -38,14 +38,18 @@ class Payment implements PaymentInterface
 
 		// Is it even on?
 		if (empty($modSettings['2co_id']) || empty($modSettings['2co_password']))
+		{
 			return false;
+		}
 
 		// Is it a 2co hash?
 		if (empty($_POST['x_MD5_Hash']))
+		{
 			return false;
+		}
 
 		// Do we have an invoice number?
-		 return !empty($_POST['x_invoice_num']);
+		return !empty($_POST['x_invoice_num']);
 	}
 
 	/**
@@ -59,14 +63,18 @@ class Payment implements PaymentInterface
 
 		// Is this the right hash?
 		if (empty($modSettings['2co_password']) || $_POST['x_MD5_Hash'] !== strtoupper(md5($modSettings['2co_password'] . $modSettings['2co_id'] . $_POST['x_trans_id'] . $_POST['x_amount'])))
+		{
 			generateSubscriptionError($txt['2co_password_wrong']);
+		}
 
 		// Verify the currency
 		list (, $currency) = explode(':', $_POST['x_invoice_num']);
 
 		// Verify the currency!
 		if (strtolower($currency) != $modSettings['currency_code'])
+		{
 			exit;
+		}
 
 		// Return the ID_SUB/ID_MEMBER
 		return explode('+', $_POST['x_invoice_num']);

@@ -8,13 +8,15 @@
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause (see accompanying LICENSE.txt file)
  *
  * This file contains code covered by:
- * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * copyright: 2011 Simple Machines (http://www.simplemachines.org)
  *
  * @version 2.0 dev
  *
  */
 
+use ElkArte\Cache\Cache;
 use ElkArte\User;
+use ElkArte\Util;
 
 /**
  * Get all birthdays within the given time range.
@@ -24,10 +26,10 @@ use ElkArte\User;
  * - finds all the birthdays in the specified range of days.
  * - works with birthdays set for no year, or any other year, and respects month and year boundaries.
  *
- * @package Calendar
  * @param string $low_date inclusive, YYYY-MM-DD
  * @param string $high_date inclusive, YYYY-MM-DD
  * @return mixed[] days, each of which an array of birthday information for the context
+ * @package Calendar
  */
 function getBirthdayRange($low_date, $high_date)
 {
@@ -66,9 +68,13 @@ function getBirthdayRange($low_date, $high_date)
 	while ($row = $db->fetch_assoc($result))
 	{
 		if ($year_low != $year_high)
+		{
 			$age_year = substr($row['birthdate'], 5) < substr($high_date, 5) ? $year_high : $year_low;
+		}
 		else
+		{
 			$age_year = $year_low;
+		}
 
 		$bday[$age_year . substr($row['birthdate'], 4)][] = array(
 			'id' => $row['id_member'],
@@ -81,7 +87,9 @@ function getBirthdayRange($low_date, $high_date)
 
 	// Set is_last, so the themes know when to stop placing separators.
 	foreach ($bday as $mday => $array)
+	{
 		$bday[$mday][count($array) - 1]['is_last'] = true;
+	}
 
 	return $bday;
 }
@@ -96,12 +104,12 @@ function getBirthdayRange($low_date, $high_date)
  * - censors the posted event titles.
  * - uses the current user's permissions if use_permissions is true, otherwise it does nothing "permission specific"
  *
- * @package Calendar
  * @param string $low_date
  * @param string $high_date
  * @param bool $use_permissions = true
  * @param integer|null $limit
  * @return array contextual information if use_permissions is true, and an array of the data needed to build that otherwise
+ * @package Calendar
  */
 function getEventRange($low_date, $high_date, $use_permissions = true, $limit = null)
 {
@@ -139,7 +147,9 @@ function getEventRange($low_date, $high_date, $use_permissions = true, $limit = 
 	{
 		// If the attached topic is not approved then for the moment pretend it doesn't exist
 		if (!empty($row['id_first_msg']) && $modSettings['postmod_active'] && !$row['approved'])
+		{
 			continue;
+		}
 
 		// Force a censor of the title - as often these are used by others.
 		$row['title'] = censor($row['title'], $use_permissions ? false : true);
@@ -155,7 +165,9 @@ function getEventRange($low_date, $high_date, $use_permissions = true, $limit = 
 			// Attempt to avoid DST problems.
 			// @todo Resolve this properly at some point.
 			if (strftime('%Y-%m-%d', $date) == $lastDate)
+			{
 				$date += 3601;
+			}
 			$lastDate = strftime('%Y-%m-%d', $date);
 			$href = getUrl('topic', ['topic' => $row['id_topic'], 'start' => '0', 'subject' => $row['subject']]);
 
@@ -216,7 +228,9 @@ function getEventRange($low_date, $high_date, $use_permissions = true, $limit = 
 	if ($use_permissions)
 	{
 		foreach ($events as $mday => $array)
+		{
 			$events[$mday][count($array) - 1]['is_last'] = true;
+		}
 	}
 
 	return $events;
@@ -225,10 +239,10 @@ function getEventRange($low_date, $high_date, $use_permissions = true, $limit = 
 /**
  * Get all holidays within the given time range.
  *
- * @package Calendar
  * @param string $low_date YYYY-MM-DD
  * @param string $high_date YYYY-MM-DD
  * @return array an array of days, which are all arrays of holiday names.
+ * @package Calendar
  */
 function getHolidayRange($low_date, $high_date)
 {
@@ -236,10 +250,14 @@ function getHolidayRange($low_date, $high_date)
 
 	// Get the lowest and highest dates for "all years".
 	if (substr($low_date, 0, 4) != substr($high_date, 0, 4))
+	{
 		$allyear_part = 'event_date BETWEEN {date:all_year_low} AND {date:all_year_dec}
 			OR event_date BETWEEN {date:all_year_jan} AND {date:all_year_high}';
+	}
 	else
+	{
 		$allyear_part = 'event_date BETWEEN {date:all_year_low} AND {date:all_year_high}';
+	}
 
 	// Find some holidays... ;).
 	$result = $db->query('', '
@@ -260,9 +278,13 @@ function getHolidayRange($low_date, $high_date)
 	while ($row = $db->fetch_assoc($result))
 	{
 		if (substr($low_date, 0, 4) != substr($high_date, 0, 4))
+		{
 			$event_year = substr($row['event_date'], 5) < substr($high_date, 5) ? substr($high_date, 0, 4) : substr($low_date, 0, 4);
+		}
 		else
+		{
 			$event_year = substr($low_date, 0, 4);
+		}
 
 		$holidays[$event_year . substr($row['event_date'], 4)][] = $row['title'];
 	}
@@ -293,9 +315,13 @@ function canLinkEvent()
 
 	// No board?  No topic?!?
 	if (empty($board))
+	{
 		throw new \ElkArte\Exceptions\Exception('missing_board_id', false);
+	}
 	if (empty($topic))
+	{
 		throw new \ElkArte\Exceptions\Exception('missing_topic_id', false);
+	}
 
 	// Administrator, Moderator, or owner.  Period.
 	if (!allowedTo('admin_forum') && !allowedTo('moderate_board'))
@@ -306,11 +332,15 @@ function canLinkEvent()
 		{
 			// Not the owner of the topic.
 			if ($row['id_member_started'] != User::$info->id)
+			{
 				throw new \ElkArte\Exceptions\Exception('not_your_topic', 'user');
+			}
 		}
 		// Topic/Board doesn't exist.....
 		else
+		{
 			throw new \ElkArte\Exceptions\Exception('calendar_no_topic', 'general');
+		}
 	}
 }
 
@@ -335,11 +365,11 @@ function getTodayInfo()
 /**
  * Provides information (link, month, year) about the previous and next month.
  *
- * @package Calendar
  * @param int $month
  * @param int $year
  * @param mixed[] $calendarOptions
  * @return array containing all the information needed to show a calendar grid for the given month
+ * @package Calendar
  */
 function getCalendarGrid($month, $year, $calendarOptions)
 {
@@ -395,13 +425,17 @@ function getCalendarGrid($month, $year, $calendarOptions)
 	{
 		$nShift -= $calendarOptions['start_day'];
 		if ($nShift < 0)
+		{
 			$nShift = 7 + $nShift;
+		}
 	}
 
 	// Number of rows required to fit the month.
 	$nRows = floor(($month_info['last_day']['day_of_month'] + $nShift) / 7);
 	if (($month_info['last_day']['day_of_month'] + $nShift) % 7)
+	{
 		$nRows++;
+	}
 
 	// Fetch the arrays for birthdays, posted events, and holidays.
 	$bday = $calendarOptions['show_birthdays'] ? getBirthdayRange($month_info['first_day']['date'], $month_info['last_day']['date']) : array();
@@ -415,7 +449,9 @@ function getCalendarGrid($month, $year, $calendarOptions)
 		$calendarGrid['week_days'][] = $count;
 		$count++;
 		if ($count == 7)
+		{
 			$count = 0;
+		}
 	}
 
 	// An adjustment value to apply to all calculated week numbers.
@@ -426,7 +462,9 @@ function getCalendarGrid($month, $year, $calendarOptions)
 		// a Sunday, then there is a partial week at the start of the year
 		// that needs to be accounted for.
 		if ($calendarOptions['start_day'] === 0)
+		{
 			$nWeekAdjust = $month_info['first_day_of_year'] === 0 ? 0 : 1;
+		}
 		// If we are viewing the weeks, with a starting date other than Sunday,
 		// then things get complicated! Basically, as PHP is calculating the
 		// weeks with a Sunday starting date, we need to take this into account
@@ -435,17 +473,23 @@ function getCalendarGrid($month, $year, $calendarOptions)
 		// two, as some of this will get undone quite quickly by the statement
 		// below.
 		else
+		{
 			$nWeekAdjust = $calendarOptions['start_day'] > $month_info['first_day_of_year'] && $month_info['first_day_of_year'] !== 0 ? 2 : 1;
+		}
 
 		// If our week starts on a day greater than the day the month starts
 		// on, then our week numbers will be one too high. So we need to
 		// reduce it by one - all these thoughts of offsets makes my head
 		// hurt...
 		if ($month_info['first_day']['day_of_week'] < $calendarOptions['start_day'] || $month_info['first_day_of_year'] > 4)
+		{
 			$nWeekAdjust--;
+		}
 	}
 	else
+	{
 		$nWeekAdjust = 0;
+	}
 
 	// Iterate through each week.
 	$calendarGrid['weeks'] = array();
@@ -459,7 +503,9 @@ function getCalendarGrid($month, $year, $calendarOptions)
 
 		// Handle the dreaded "week 53", it can happen, but only once in a blue moon ;)
 		if ($calendarGrid['weeks'][$nRow]['number'] == 53 && $nShift != 4 && $month_info['first_day_of_next_year'] < 4)
+		{
 			$calendarGrid['weeks'][$nRow]['number'] = 1;
+		}
 
 		// And figure out all the days.
 		for ($nCol = 0; $nCol < 7; $nCol++)
@@ -467,7 +513,9 @@ function getCalendarGrid($month, $year, $calendarOptions)
 			$nDay = ($nRow * 7) + $nCol - $nShift + 1;
 
 			if ($nDay < 1 || $nDay > $month_info['last_day']['day_of_month'])
+			{
 				$nDay = 0;
+			}
 
 			$date = sprintf('%04d-%02d-%02d', $year, $month, $nDay);
 
@@ -493,12 +541,12 @@ function getCalendarGrid($month, $year, $calendarOptions)
 /**
  * Returns the information needed to show a calendar for the given week.
  *
- * @package Calendar
  * @param int $month
  * @param int $year
  * @param int $day
  * @param mixed[] $calendarOptions
  * @return array
+ * @package Calendar
  */
 function getCalendarWeek($month, $year, $day, $calendarOptions)
 {
@@ -515,7 +563,9 @@ function getCalendarWeek($month, $year, $day, $calendarOptions)
 		// Here we offset accordingly to get things to the real start of a week.
 		$date_diff = $day_of_week - $calendarOptions['start_day'];
 		if ($date_diff < 0)
+		{
 			$date_diff += 7;
+		}
 		$new_timestamp = mktime(0, 0, 0, $month, $day, $year) - $date_diff * 86400;
 		$day = (int) strftime('%d', $new_timestamp);
 		$month = (int) strftime('%m', $new_timestamp);
@@ -561,15 +611,21 @@ function getCalendarWeek($month, $year, $day, $calendarOptions)
 
 		// All this is as getCalendarGrid.
 		if ($calendarOptions['start_day'] === 0)
+		{
 			$nWeekAdjust = $first_day_of_year === 0 && $first_day_of_year > 3 ? 0 : 1;
+		}
 		else
+		{
 			$nWeekAdjust = $calendarOptions['start_day'] > $first_day_of_year && $first_day_of_year !== 0 ? 2 : 1;
+		}
 
 		$calendarGrid['week_number'] = (int) strftime('%U', mktime(0, 0, 0, $month, $day, $year)) + $nWeekAdjust;
 
 		// If this crosses a year boundary and includes january it should be week one.
 		if ((int) strftime('%Y', $curTimestamp + 518400) != $year && $calendarGrid['week_number'] > 53 && $first_day_of_next_year < 5)
+		{
 			$calendarGrid['week_number'] = 1;
+		}
 	}
 
 	// This holds all the main data - there is at least one month!
@@ -615,7 +671,7 @@ function getCalendarWeek($month, $year, $day, $calendarOptions)
 
 	// Set the previous and the next week's links.
 	$calendarGrid['previous_week']['href'] = getUrl('action', ['action' => 'calendar', 'viewweek', 'year' => $calendarGrid['previous_week']['year'], 'month' => $calendarGrid['previous_week']['month'], 'day' => $calendarGrid['previous_week']['day']]);
-	$calendarGrid['next_week']['href'] = getUrl('action', ['action' => 'calendar', 'viewweek' ,'year' => $calendarGrid['next_week']['year'], 'month' => $calendarGrid['next_week']['month'], 'day' => $calendarGrid['next_week']['day']]);
+	$calendarGrid['next_week']['href'] = getUrl('action', ['action' => 'calendar', 'viewweek', 'year' => $calendarGrid['next_week']['year'], 'month' => $calendarGrid['next_week']['month'], 'day' => $calendarGrid['next_week']['day']]);
 
 	return $calendarGrid;
 }
@@ -629,9 +685,9 @@ function getCalendarWeek($month, $year, $day, $calendarOptions)
  * - widens the search range by an extra 24 hours to support time offset shifts.
  * - used by the cache_getRecentEvents function to get the information needed to calculate the events taking the users time offset into account.
  *
- * @package Calendar
  * @param int $days_to_index
  * @return array
+ * @package Calendar
  */
 function cache_getOffsetIndependentEvents($days_to_index)
 {
@@ -656,14 +712,14 @@ function cache_getOffsetIndependentEvents($days_to_index)
  * - Called from the BoardIndex to display the current day's events on the board index
  * - used by the board index and SSI to show the upcoming events.
  *
- * @package Calendar
  * @param mixed[] $eventOptions
  * @return array
+ * @package Calendar
  */
 function cache_getRecentEvents($eventOptions)
 {
 	// With the 'static' cached data we can calculate the user-specific data.
-	$cached_data = \ElkArte\Cache\Cache::instance()->quick_get('calendar_index', 'subs/Calendar.subs.php', 'cache_getOffsetIndependentEvents', array($eventOptions['num_days_shown']));
+	$cached_data = Cache::instance()->quick_get('calendar_index', 'subs/Calendar.subs.php', 'cache_getOffsetIndependentEvents', array($eventOptions['num_days_shown']));
 
 	// Get the information about today (from user perspective).
 	$today = getTodayInfo();
@@ -684,7 +740,9 @@ function cache_getRecentEvents($eventOptions)
 	for ($i = $now; $i < $now + $days_for_index; $i += 86400)
 	{
 		if (isset($cached_data['holidays'][strftime('%Y-%m-%d', $i)]))
+		{
 			$return_data['calendar_holidays'] = array_merge($return_data['calendar_holidays'], $cached_data['holidays'][strftime('%Y-%m-%d', $i)]);
+		}
 	}
 
 	// Happy Birthday, guys and gals!
@@ -694,7 +752,9 @@ function cache_getRecentEvents($eventOptions)
 		if (isset($cached_data['birthdays'][$loop_date]))
 		{
 			foreach ($cached_data['birthdays'][$loop_date] as $index => $dummy)
+			{
 				$cached_data['birthdays'][strftime('%Y-%m-%d', $i)][$index]['is_today'] = $loop_date === $today['date'];
+			}
 			$return_data['calendar_birthdays'] = array_merge($return_data['calendar_birthdays'], $cached_data['birthdays'][$loop_date]);
 		}
 	}
@@ -707,7 +767,9 @@ function cache_getRecentEvents($eventOptions)
 
 		// No events today? Check the next day.
 		if (empty($cached_data['events'][$loop_date]))
+		{
 			continue;
+		}
 
 		// Loop through all events to add a few last-minute values.
 		foreach ($cached_data['events'][$loop_date] as $ev => $event)
@@ -722,7 +784,9 @@ function cache_getRecentEvents($eventOptions)
 				continue;
 			}
 			else
+			{
 				$duplicates[$this_event['topic'] . $this_event['title']] = true;
+			}
 
 			// Might be set to true afterwards, depending on the permissions.
 			$this_event['can_edit'] = false;
@@ -731,20 +795,26 @@ function cache_getRecentEvents($eventOptions)
 		}
 
 		if (!empty($cached_data['events'][$loop_date]))
+		{
 			$return_data['calendar_events'] = array_merge($return_data['calendar_events'], $cached_data['events'][$loop_date]);
+		}
 	}
 
 	// Mark the last item so that a list separator can be used in the template.
 	for ($i = 0, $n = count($return_data['calendar_birthdays']); $i < $n; $i++)
+	{
 		$return_data['calendar_birthdays'][$i]['is_last'] = !isset($return_data['calendar_birthdays'][$i + 1]);
+	}
 	for ($i = 0, $n = count($return_data['calendar_events']); $i < $n; $i++)
+	{
 		$return_data['calendar_events'][$i]['is_last'] = !isset($return_data['calendar_events'][$i + 1]);
+	}
 
 	return array(
 		'data' => $return_data,
 		'expires' => time() + 3600,
 		'refresh_eval' => 'return \'' . strftime('%Y%m%d', forum_time(false)) . '\' != strftime(\'%Y%m%d\', forum_time(false)) || (!empty($modSettings[\'calendar_updated\']) && ' . time() . ' < $modSettings[\'calendar_updated\']);',
-		'post_retri_eval' =>  '
+		'post_retri_eval' => '
 			require_once(SUBSDIR . \'/Calendar.subs.php\');
 			return cache_getRecentEvents_post_retri_eval($cache_block, $params);',
 	);
@@ -753,9 +823,9 @@ function cache_getRecentEvents($eventOptions)
 /**
  * Refines the data retrieved from the cache for the cache_getRecentEvents function.
  *
- * @package Calendar
  * @param mixed[] $cache_block
  * @param mixed[] $params
+ * @package Calendar
  */
 function cache_getRecentEvents_post_retri_eval(&$cache_block, $params)
 {
@@ -810,9 +880,9 @@ function cache_getRecentEvents_post_retri_eval(&$cache_block, $params)
 /**
  * Get the event's poster.
  *
- * @package Calendar
  * @param int $event_id
  * @return int|bool the id of the poster or false if the event was not found
+ * @package Calendar
  */
 function getEventPoster($event_id)
 {
@@ -831,7 +901,9 @@ function getEventPoster($event_id)
 
 	// No results, return false.
 	if ($db->num_rows($request) === 0)
+	{
 		return false;
+	}
 
 	// Grab the results and return.
 	list ($poster) = $db->fetch_row($request);
@@ -850,15 +922,15 @@ function getEventPoster($event_id)
  * - allows to either set a time span (in days) or an end_date.
  * - does not check any permissions of any sort.
  *
- * @package Calendar
  * @param mixed[] $eventOptions
+ * @package Calendar
  */
 function insertEvent(&$eventOptions)
 {
 	$db = database();
 
 	// Add special chars to the title.
-	$eventOptions['title'] = \ElkArte\Util::htmlspecialchars($eventOptions['title'], ENT_QUOTES);
+	$eventOptions['title'] = Util::htmlspecialchars($eventOptions['title'], ENT_QUOTES);
 
 	// Add some sanity checking to the span.
 	$eventOptions['span'] = isset($eventOptions['span']) && $eventOptions['span'] > 0 ? (int) $eventOptions['span'] : 0;
@@ -868,11 +940,15 @@ function insertEvent(&$eventOptions)
 	$month = '';
 	$day = '';
 	if (($num_results = sscanf($eventOptions['start_date'], '%d-%d-%d', $year, $month, $day)) !== 3)
+	{
 		trigger_error('insertEvent(): invalid start date format given', E_USER_ERROR);
+	}
 
 	// Set the end date (if not yet given)
 	if (!isset($eventOptions['end_date']))
+	{
 		$eventOptions['end_date'] = strftime('%Y-%m-%d', mktime(0, 0, 0, $month, $day, $year) + $eventOptions['span'] * 86400);
+	}
 
 	// If no topic and board are given, they are not linked to a topic.
 	$eventOptions['id_board'] = isset($eventOptions['id_board']) ? (int) $eventOptions['id_board'] : 0;
@@ -912,30 +988,34 @@ function insertEvent(&$eventOptions)
  * - allows to either set a time span (in days) or an end_date.
  * - does not check any permissions of any sort.
  *
- * @package Calendar
  * @param int $event_id
  * @param mixed[] $eventOptions
+ * @package Calendar
  */
 function modifyEvent($event_id, &$eventOptions)
 {
 	$db = database();
 
 	// Properly sanitize the title.
-	$eventOptions['title'] = \ElkArte\Util::htmlspecialchars($eventOptions['title'], ENT_QUOTES);
+	$eventOptions['title'] = Util::htmlspecialchars($eventOptions['title'], ENT_QUOTES);
 
 	// Scan the start date for validity and get its components.
 	$year = '';
 	$month = '';
 	$day = '';
 	if (($num_results = sscanf($eventOptions['start_date'], '%d-%d-%d', $year, $month, $day)) !== 3)
+	{
 		trigger_error('modifyEvent(): invalid start date format given', E_USER_ERROR);
+	}
 
 	// Default span to 0 days.
 	$eventOptions['span'] = isset($eventOptions['span']) ? (int) $eventOptions['span'] : 0;
 
 	// Set the end date to the start date + span (if the end date wasn't already given).
 	if (!isset($eventOptions['end_date']))
+	{
 		$eventOptions['end_date'] = strftime('%Y-%m-%d', mktime(0, 0, 0, $month, $day, $year) + $eventOptions['span'] * 86400);
+	}
 
 	$event_columns = array(
 		'start_date' => 'start_date = {date:start_date}',
@@ -951,11 +1031,17 @@ function modifyEvent($event_id, &$eventOptions)
 
 	$to_update = array();
 	foreach ($event_columns as $key => $value)
+	{
 		if (isset($eventOptions[$key]))
+		{
 			$to_update[] = $value;
+		}
+	}
 
 	if (empty($to_update))
+	{
 		return;
+	}
 
 	$db->query('', '
 		UPDATE {db_prefix}calendar
@@ -975,8 +1061,8 @@ function modifyEvent($event_id, &$eventOptions)
  *
  * - does no permission checks.
  *
- * @package Calendar
  * @param int $event_id
+ * @package Calendar
  */
 function removeEvent($event_id)
 {
@@ -1000,10 +1086,10 @@ function removeEvent($event_id)
 /**
  * Gets all the events properties
  *
- * @package Calendar
  * @param int $event_id
  * @param bool $calendar_only
  * @return mixed[]|bool
+ * @package Calendar
  */
 function getEventProperties($event_id, $calendar_only = false)
 {
@@ -1029,13 +1115,17 @@ function getEventProperties($event_id, $calendar_only = false)
 
 	// If nothing returned, we are in poo, poo.
 	if ($db->num_rows($request) === 0)
+	{
 		return false;
+	}
 
 	$row = $db->fetch_assoc($request);
 	$db->free_result($request);
 
 	if ($calendar_only)
+	{
 		$return_value = $row;
+	}
 	else
 	{
 		$return_value = array(
@@ -1067,11 +1157,11 @@ function getEventProperties($event_id, $calendar_only = false)
 /**
  * Fetch and event that may be linked to a topic
  *
- * @package Calendar
- *
  * @param int $id_topic
  *
  * @return array
+ * @package Calendar
+ *
  */
 function eventInfoForTopic($id_topic)
 {
@@ -1093,11 +1183,11 @@ function eventInfoForTopic($id_topic)
 /**
  * Gets all of the holidays for the listing
  *
- * @package Calendar
  * @param int $start The item to start with (for pagination purposes)
- * @param int $items_per_page  The number of items to show per page
+ * @param int $items_per_page The number of items to show per page
  * @param string $sort A string indicating how to sort the results
  * @return array
+ * @package Calendar
  */
 function list_getHolidays($start, $items_per_page, $sort)
 {
@@ -1117,8 +1207,8 @@ function list_getHolidays($start, $items_per_page, $sort)
 /**
  * Helper function to get the total number of holidays
  *
- * @package Calendar
  * @return int
+ * @package Calendar
  */
 function list_getNumHolidays()
 {
@@ -1127,8 +1217,7 @@ function list_getNumHolidays()
 	$request = $db->query('', '
 		SELECT COUNT(*)
 		FROM {db_prefix}calendar_holidays',
-		array(
-		)
+		array()
 	);
 	list ($num_items) = $db->fetch_row($request);
 	$db->free_result($request);
@@ -1139,15 +1228,17 @@ function list_getNumHolidays()
 /**
  * Remove a holiday from the calendar.
  *
- * @package Calendar
  * @param int|int[] $holiday_ids An array of ids for holidays.
+ * @package Calendar
  */
 function removeHolidays($holiday_ids)
 {
 	$db = database();
 
 	if (!is_array($holiday_ids))
+	{
 		$holiday_ids = array($holiday_ids);
+	}
 
 	$db->query('', '
 		DELETE FROM {db_prefix}calendar_holidays
@@ -1165,10 +1256,10 @@ function removeHolidays($holiday_ids)
 /**
  * Updates a calendar holiday
  *
- * @package Calendar
  * @param int $holiday
  * @param int $date
  * @param string $title
+ * @package Calendar
  */
 function editHoliday($holiday, $date, $title)
 {
@@ -1193,9 +1284,9 @@ function editHoliday($holiday, $date, $title)
 /**
  * Insert a new holiday
  *
- * @package Calendar
  * @param int $date
  * @param string $title
+ * @package Calendar
  */
 function insertHoliday($date, $title)
 {
@@ -1220,9 +1311,9 @@ function insertHoliday($date, $title)
 /**
  * Get a specific holiday
  *
- * @package Calendar
  * @param int $id_holiday
  * @return array
+ * @package Calendar
  */
 function getHoliday($id_holiday)
 {
@@ -1233,11 +1324,12 @@ function getHoliday($id_holiday)
 		FROM {db_prefix}calendar_holidays
 		WHERE id_holiday = {int:selected_holiday}
 		LIMIT 1',
-			array(
-				'selected_holiday' => $id_holiday,
-			)
-		);
+		array(
+			'selected_holiday' => $id_holiday,
+		)
+	);
 	while ($row = $db->fetch_assoc($request))
+	{
 		$holiday = array(
 			'id' => $row['id_holiday'],
 			'day' => $row['day'],
@@ -1245,6 +1337,7 @@ function getHoliday($id_holiday)
 			'year' => $row['year'] <= 4 ? 0 : $row['year'],
 			'title' => $row['title']
 		);
+	}
 	$db->free_result($request);
 
 	return $holiday;
@@ -1274,7 +1367,9 @@ function build_ical_content($event)
 	foreach ($title as $id => $line)
 	{
 		if ($id != 0)
+		{
 			$title[$id] = ' ' . $title[$id];
+		}
 		$title[$id] .= "\n";
 	}
 
@@ -1303,11 +1398,15 @@ function build_ical_content($event)
 
 	// more than one day
 	if ($event['span'] > 1)
+	{
 		$filecontents .= 'DTEND;VALUE=DATE:' . $dateend . "\n";
+	}
 
 	// event has changed? advance the sequence for this UID
 	if ($event['sequence'] > 0)
+	{
 		$filecontents .= 'SEQUENCE:' . $event['sequence'] . "\n";
+	}
 
 	$filecontents .= 'SUMMARY:' . implode('', $title);
 	$filecontents .= 'UID:' . $event['eventid'] . '@' . str_replace(' ', '-', $mbname) . "\n";

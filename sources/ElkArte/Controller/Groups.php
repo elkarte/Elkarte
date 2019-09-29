@@ -9,7 +9,7 @@
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause (see accompanying LICENSE.txt file)
  *
  * This file contains code covered by:
- * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * copyright: 2011 Simple Machines (http://www.simplemachines.org)
  *
  * @version 2.0 dev
  *
@@ -17,12 +17,17 @@
 
 namespace ElkArte\Controller;
 
+use ElkArte\AbstractController;
+use ElkArte\Action;
+use ElkArte\EventManager;
+use ElkArte\Exceptions\Exception;
 use ElkArte\User;
+use ElkArte\Util;
 
 /**
  * Shows group access and allows for add/remove group members
  */
-class Groups extends \ElkArte\AbstractController
+class Groups extends AbstractController
 {
 	/**
 	 * Set up templates and pre-requisites for any request processed by this class.
@@ -43,8 +48,8 @@ class Groups extends \ElkArte\AbstractController
 		if (User::$info->canMod(true) || allowedTo('manage_membergroups'))
 		{
 			$this->_req->query->area = $this->_req->getQuery('sa') === 'requests' ? 'groups' : 'viewgroups';
-			$controller = new ModerationCenter(new \ElkArte\EventManager());
-			$controller->setUser(\ElkArte\User::$info);
+			$controller = new ModerationCenter(new EventManager());
+			$controller->setUser(User::$info);
 			$controller->pre_dispatch();
 			$controller->prepareModcenter();
 		}
@@ -78,7 +83,7 @@ class Groups extends \ElkArte\AbstractController
 		);
 
 		// I don't think we know what to do... throw dies?
-		$action = new \ElkArte\Action('groups');
+		$action = new Action('groups');
 		$subAction = $action->initialize($subActions, 'list');
 		$context['sub_action'] = $subAction;
 		$action->dispatch($subAction);
@@ -140,7 +145,9 @@ class Groups extends \ElkArte\AbstractController
 						'function' => function ($rowData) use ($base_type, $base_params) {
 							// Since the moderator group has no explicit members, no link is needed.
 							if ($rowData['id_group'] == 3)
+							{
 								$group_name = $rowData['group_name'];
+							}
 							else
 							{
 								$url = getUrl($base_type, array_merge($base_params, ['group' => $rowData['id_group']]));
@@ -174,9 +181,13 @@ class Groups extends \ElkArte\AbstractController
 							global $settings;
 
 							if (!empty($rowData['icons'][0]) && !empty($rowData['icons'][1]))
+							{
 								return str_repeat('<img src="' . $settings['images_url'] . '/group_icons/' . $rowData['icons'][1] . '" alt="*" />', $rowData['icons'][0]);
+							}
 							else
+							{
 								return '';
+							}
 						},
 					),
 					'sort' => array(
@@ -254,7 +265,9 @@ class Groups extends \ElkArte\AbstractController
 
 		// No browsing of guests, membergroup 0 or moderators or non-existing groups.
 		if ($context['group'] === false || in_array($current_group, array(-1, 0, 3)))
-			throw new \ElkArte\Exceptions\Exception('membergroup_does_not_exist', false);
+		{
+			throw new Exception('membergroup_does_not_exist', false);
+		}
 
 		$context['group']['id'] = $context['group']['id_group'];
 		$context['group']['name'] = $context['group']['group_name'];
@@ -287,19 +300,27 @@ class Groups extends \ElkArte\AbstractController
 			);
 
 			if ($this->user->id == $id_member && $context['group']['group_type'] != 1)
+			{
 				$context['group']['can_moderate'] = true;
+			}
 		}
 
 		// If this group is hidden then it can only "exist" if the user can moderate it!
 		if ($context['group']['hidden'] && !$context['group']['can_moderate'])
-			throw new \ElkArte\Exceptions\Exception('membergroup_does_not_exist', false);
+		{
+			throw new Exception('membergroup_does_not_exist', false);
+		}
 
 		// You can only assign membership if you are the moderator and/or can manage groups!
 		if (!$context['group']['can_moderate'])
+		{
 			$context['group']['assignable'] = 0;
+		}
 		// Non-admins cannot assign admins.
 		elseif ($context['group']['id'] == 1 && !allowedTo('admin_forum'))
+		{
 			$context['group']['assignable'] = 0;
+		}
 
 		// Removing member from group?
 		if (isset($this->_req->post->remove)
@@ -327,15 +348,17 @@ class Groups extends \ElkArte\AbstractController
 			$member_parameters = array('not_in_group' => $current_group);
 
 			// Get all the members to be added... taking into account names can be quoted ;)
-			$toAdd = strtr(\ElkArte\Util::htmlspecialchars($this->_req->post->toAdd, ENT_QUOTES), array('&quot;' => '"'));
+			$toAdd = strtr(Util::htmlspecialchars($this->_req->post->toAdd, ENT_QUOTES), array('&quot;' => '"'));
 			preg_match_all('~"([^"]+)"~', $toAdd, $matches);
 			$member_names = array_unique(array_merge($matches[1], explode(',', preg_replace('~"[^"]+"~', '', $toAdd))));
 
 			foreach ($member_names as $index => $member_name)
 			{
-				$member_names[$index] = trim(\ElkArte\Util::strtolower($member_names[$index]));
+				$member_names[$index] = trim(Util::strtolower($member_names[$index]));
 				if ($member_names[$index] === '')
+				{
 					unset($member_names[$index]);
+				}
 			}
 
 			// Any members passed by ID?
@@ -345,7 +368,9 @@ class Groups extends \ElkArte\AbstractController
 				foreach ($this->_req->post->member_add as $id)
 				{
 					if ($id > 0)
+					{
 						$member_ids[] = (int) $id;
+					}
 				}
 			}
 
@@ -368,7 +393,9 @@ class Groups extends \ElkArte\AbstractController
 
 			// Do the updates...
 			if (!empty($members))
+			{
 				addMembersToGroup($members, $current_group, $context['group']['hidden'] ? 'only_additional' : 'auto', true);
+			}
 		}
 
 		// Sort out the sorting!
@@ -395,9 +422,13 @@ class Groups extends \ElkArte\AbstractController
 
 		// The where on the query is interesting. Non-moderators should only see people who are in this group as primary.
 		if ($context['group']['can_moderate'])
+		{
 			$where = $context['group']['is_post_group'] ? 'in_post_group' : 'in_group';
+		}
 		else
+		{
 			$where = $context['group']['is_post_group'] ? 'in_post_group' : 'in_group_no_add';
+		}
 
 		// Count members of the group.
 		$context['total_members'] = countMembersBy($where, array($where => $current_group));
@@ -405,7 +436,7 @@ class Groups extends \ElkArte\AbstractController
 
 		// Create the page index.
 		$context['page_index'] = constructPageIndex(
-		getUrl($context['group']['can_moderate'] ? 'moderate' : 'group', ['action' => $context['group']['can_moderate'] ? 'moderate' : 'groups', 'area' => $context['group']['can_moderate'] ? 'viewgroups' : '', 'sa' => 'members', 'group' => $current_group, 'sort' => $context['sort_by'], isset($this->_req->query->desc) ? 'desc' : '']), $this->_req->query->start, $context['total_members'], $modSettings['defaultMaxMembers']);
+			getUrl($context['group']['can_moderate'] ? 'moderate' : 'group', ['action' => $context['group']['can_moderate'] ? 'moderate' : 'groups', 'area' => $context['group']['can_moderate'] ? 'viewgroups' : '', 'sa' => 'members', 'group' => $current_group, 'sort' => $context['sort_by'], isset($this->_req->query->desc) ? 'desc' : '']), $this->_req->query->start, $context['total_members'], $modSettings['defaultMaxMembers']);
 
 		// Fetch the members that meet the where criteria
 		$context['members'] = membersBy($where, array($where => $current_group, 'order' => $querySort), true);
@@ -415,7 +446,9 @@ class Groups extends \ElkArte\AbstractController
 
 			// Italicize the online note if they aren't activated.
 			if ($row['is_activated'] % 10 !== 1)
+			{
 				$last_online = '<em title="' . $txt['not_activated'] . '">' . $last_online . '</em>';
+			}
 
 			$context['members'][$id] = array(
 				'id' => $row['id_member'],
@@ -431,7 +464,9 @@ class Groups extends \ElkArte\AbstractController
 		}
 
 		if (!empty($context['group']['assignable']))
+		{
 			loadJavascriptFile('suggest.js', array('defer' => true));
+		}
 
 		// Select the template.
 		$context['sub_template'] = 'group_members';
@@ -455,7 +490,9 @@ class Groups extends \ElkArte\AbstractController
 
 		// Verify we can be here.
 		if ($this->user->mod_cache['gq'] == '0=1')
+		{
 			isAllowedTo('manage_membergroups');
+		}
 
 		// Normally, we act normally...
 		$where = $this->user->mod_cache['gq'] == '1=1' || $this->user->mod_cache['gq'] == '0=1' ? $this->user->mod_cache['gq'] : 'lgr.' . $this->user->mod_cache['gq'];
@@ -515,8 +552,12 @@ class Groups extends \ElkArte\AbstractController
 						{
 							// Sanity check!
 							foreach ($groups['add'] as $key => $value)
+							{
 								if ($value == 0 || trim($value) === '')
+								{
 									unset($groups['add'][$key]);
+								}
+							}
 
 							assignGroupsToMember($id, $groups['primary'], $groups['add']);
 						}
@@ -547,7 +588,9 @@ class Groups extends \ElkArte\AbstractController
 							);
 
 							if (!empty($custom_reason))
+							{
 								$replacements['REASON'] = $custom_reason;
+							}
 
 							$emaildata = loadEmailTemplate(empty($custom_reason) ? 'mc_group_reject' : 'mc_group_reject_reason', $replacements, $email['language']);
 

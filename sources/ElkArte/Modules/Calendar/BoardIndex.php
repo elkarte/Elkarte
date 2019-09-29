@@ -8,7 +8,7 @@
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause (see accompanying LICENSE.txt file)
  *
  * This file contains code covered by:
- * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * copyright: 2011 Simple Machines (http://www.simplemachines.org)
  *
  * @version 2.0 dev
  *
@@ -16,15 +16,19 @@
 
 namespace ElkArte\Modules\Calendar;
 
+use ElkArte\Cache\Cache;
+use ElkArte\EventManager;
+use ElkArte\Modules\AbstractModule;
+
 /**
  * This class's task is to show the upcoming events in the BoardIndex.
  */
-class BoardIndex extends \ElkArte\Modules\AbstractModule
+class BoardIndex extends AbstractModule
 {
 	/**
 	 * {@inheritdoc }
 	 */
-	public static function hooks(\ElkArte\EventManager $eventsManager)
+	public static function hooks(EventManager $eventsManager)
 	{
 		// Load the calendar?
 		if (allowedTo('calendar_view'))
@@ -53,7 +57,7 @@ class BoardIndex extends \ElkArte\Modules\AbstractModule
 			'num_days_shown' => empty($modSettings['cal_days_for_index']) || $modSettings['cal_days_for_index'] < 1 ? 1 : $modSettings['cal_days_for_index'],
 		);
 
-		$context += \ElkArte\Cache\Cache::instance()->quick_get('calendar_index_offset_' . ($this->user->time_offset + $modSettings['time_offset']), 'subs/Calendar.subs.php', 'cache_getRecentEvents', array($eventOptions));
+		$context += Cache::instance()->quick_get('calendar_index_offset_' . ($this->user->time_offset + $modSettings['time_offset']), 'subs/Calendar.subs.php', 'cache_getRecentEvents', array($eventOptions));
 
 		// Whether one or multiple days are shown on the board index.
 		$context['calendar_only_today'] = $modSettings['cal_days_for_index'] == 1;
@@ -72,7 +76,9 @@ class BoardIndex extends \ElkArte\Modules\AbstractModule
 		global $context;
 
 		if (empty($context['calendar_holidays']) && empty($context['calendar_birthdays']) && empty($context['calendar_events']))
+		{
 			return;
+		}
 
 		$callbacks = elk_array_insert($callbacks, 'recent_posts', array('show_events'), 'after', false);
 	}

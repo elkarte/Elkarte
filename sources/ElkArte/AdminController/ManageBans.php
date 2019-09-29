@@ -13,7 +13,11 @@
 
 namespace ElkArte\AdminController;
 
+use ElkArte\AbstractController;
+use ElkArte\Action;
 use ElkArte\Errors\ErrorContext;
+use ElkArte\Exceptions\Exception;
+use ElkArte\Util;
 
 /**
  * This class controls execution for admin actions in the bans area
@@ -21,7 +25,7 @@ use ElkArte\Errors\ErrorContext;
  *
  * @package Bans
  */
-class ManageBans extends \ElkArte\AbstractController
+class ManageBans extends AbstractController
 {
 	/**
 	 * Ban center. The main entrance point for all ban center functions.
@@ -54,7 +58,7 @@ class ManageBans extends \ElkArte\AbstractController
 		);
 
 		// Start up the controller
-		$action = new \ElkArte\Action('manage_bans');
+		$action = new Action('manage_bans');
 
 		// Default the sub-action to 'view ban list'.
 		$subAction = $this->_req->getQuery('sa', 'strval', 'list');
@@ -209,6 +213,7 @@ class ManageBans extends \ElkArte\AbstractController
 					'data' => array(
 						'function' => function ($rowData) {
 							global $context;
+
 							return standardTime($rowData['ban_time'], empty($context['ban_time_format']) ? true : $context['ban_time_format']);
 						},
 					),
@@ -227,15 +232,21 @@ class ManageBans extends \ElkArte\AbstractController
 
 							// This ban never expires...whahaha.
 							if ($rowData['expire_time'] === null)
+							{
 								return $txt['never'];
+							}
 
 							// This ban has already expired.
 							elseif ($rowData['expire_time'] < time())
+							{
 								return sprintf('<span class="error">%1$s</span>', $txt['ban_expired']);
+							}
 
 							// Still need to wait a few days for this ban to expire.
 							else
+							{
 								return sprintf('%1$d&nbsp;%2$s', ceil(($rowData['expire_time'] - time()) / (60 * 60 * 24)), $txt['ban_days']);
+							}
 						},
 					),
 					'sort' => array(
@@ -323,7 +334,9 @@ class ManageBans extends \ElkArte\AbstractController
 
 		// Saving a new or edited ban?
 		if ((isset($this->_req->post->add_ban) || isset($this->_req->post->modify_ban) || isset($this->_req->post->remove_selection)) && !$ban_errors->hasErrors())
+		{
 			$this->action_edit2();
+		}
 
 		$ban_group_id = isset($context['ban']['id']) ? $context['ban']['id'] : $this->_req->getQuery('bg', 'intval', 0);
 
@@ -375,11 +388,17 @@ class ManageBans extends \ElkArte\AbstractController
 									global $txt;
 
 									if (in_array($ban_item['type'], array('ip', 'hostname', 'email')))
+									{
 										return '<strong>' . $txt[$ban_item['type']] . ':</strong>&nbsp;' . $ban_item[$ban_item['type']];
+									}
 									elseif ($ban_item['type'] == 'user')
+									{
 										return '<strong>' . $txt['username'] . ':</strong>&nbsp;' . $ban_item['user']['link'];
+									}
 									else
+									{
 										return '<strong>' . $txt['unknown'] . ':</strong>&nbsp;' . $ban_item['no_bantype_selected'];
+									}
 								},
 							),
 						),
@@ -488,7 +507,9 @@ class ManageBans extends \ElkArte\AbstractController
 
 						// Would be nice if we could also ban the hostname.
 						if ((preg_match('/^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$/', $context['ban_suggestions']['main_ip']) == 1 || isValidIPv6($context['ban_suggestions']['main_ip'])) && empty($modSettings['disableHostnameLookup']))
+						{
 							$context['ban_suggestions']['hostname'] = host_from_ip($context['ban_suggestions']['main_ip']);
+						}
 
 						$context['ban_suggestions']['other_ips'] = banLoadAdditionalIPs($context['ban_suggestions']['member']['id']);
 					}
@@ -515,6 +536,112 @@ class ManageBans extends \ElkArte\AbstractController
 	}
 
 	/**
+	 * This function handles submitted forms that add, modify or remove ban triggers.
+	 */
+	public function action_edit2()
+	{
+		global $context;
+
+		require_once(SUBSDIR . '/Bans.subs.php');
+
+		// Check with security first
+		checkSession();
+		validateToken('admin-bet');
+
+		$ban_errors = ErrorContext::context('ban', 1);
+
+		// Adding or editing a ban group
+		if (isset($this->_req->post->add_ban) || isset($this->_req->post->modify_ban))
+		{
+			$ban_info = array();
+
+			// Let's collect all the information we need
+			$ban_info['id'] = $this->_req->getQuery('bg', 'intval', 0);
+			if (empty($ban_info['id']))
+			{
+				$ban_info['id'] = $this->_req->getPost('bg', 'intval', 0);
+			}
+			$ban_info['is_new'] = empty($ban_info['id']);
+			$ban_info['expire_date'] = $this->_req->getPost('expire_date', 'intval', 0);
+			$ban_info['expiration'] = array(
+				'status' => isset($this->_req->post->expiration) && in_array($this->_req->post->expiration, array('never', 'one_day', 'expired')) ? $this->_req->post->expiration : 'never',
+				'days' => $ban_info['expire_date'],
+			);
+			$ban_info['db_expiration'] = $ban_info['expiration']['status'] == 'never' ? 'NULL' : ($ban_info['expiration']['status'] == 'one_day' ? time() + 24 * 60 * 60 * $ban_info['expire_date'] : 0);
+			$ban_info['full_ban'] = empty($this->_req->post->full_ban) ? 0 : 1;
+			$ban_info['reason'] = $this->_req->getPost('reason', '\\ElkArte\\Util::htmlspecialchars[ENT_QUOTES]', '');
+			$ban_info['name'] = $this->_req->getPost('ban_name', '\\ElkArte\\Util::htmlspecialchars[ENT_QUOTES]', '');
+			$ban_info['notes'] = $this->_req->getPost('notes', '\\ElkArte\\Util::htmlspecialchars[ENT_QUOTES]', '');
+			$ban_info['notes'] = str_replace(array("\r", "\n", '  '), array('', '<br />', '&nbsp; '), $ban_info['notes']);
+			$ban_info['cannot']['access'] = empty($ban_info['full_ban']) ? 0 : 1;
+			$ban_info['cannot']['post'] = !empty($ban_info['full_ban']) || empty($this->_req->post->cannot_post) ? 0 : 1;
+			$ban_info['cannot']['register'] = !empty($ban_info['full_ban']) || empty($this->_req->post->cannot_register) ? 0 : 1;
+			$ban_info['cannot']['login'] = !empty($ban_info['full_ban']) || empty($this->_req->post->cannot_login) ? 0 : 1;
+
+			$ban_group_id = empty($ban_info['id']) ? insertBanGroup($ban_info) : updateBanGroup($ban_info);
+
+			if ($ban_group_id !== false)
+			{
+				$ban_info['id'] = $ban_group_id;
+				$ban_info['is_new'] = false;
+			}
+
+			$context['ban'] = $ban_info;
+		}
+
+		// Update the triggers associated with this ban
+		if (isset($this->_req->post->ban_suggestions, $ban_info['id']))
+		{
+			$saved_triggers = saveTriggers((array) $this->_req->post, $ban_info['id'], $this->_req->getQuery('u', 'intval', 0), $this->_req->getQuery('bi', 'intval', 0));
+			$context['ban_suggestions']['saved_triggers'] = $saved_triggers;
+		}
+
+		// Something went wrong somewhere, ban info or triggers, ... Oh well, let's go back.
+		if ($ban_errors->hasErrors())
+		{
+			$context['ban_suggestions'] = !empty($saved_triggers) ? $saved_triggers : '';
+			$context['ban']['from_user'] = true;
+
+			// They may have entered a name not using the member select box
+			if (isset($this->_req->query->u))
+			{
+				$context['ban_suggestions'] = array_merge($context['ban_suggestions'], getMemberData((int) $this->_req->query->u));
+			}
+			elseif (isset($this->_req->query->user))
+			{
+				$context['ban']['from_user'] = false;
+				$context['use_autosuggest'] = true;
+				$context['ban_suggestions']['member']['name'] = $this->_req->query->user;
+			}
+
+			// Not strictly necessary, but it's nice
+			if (!empty($context['ban_suggestions']['member']['id']))
+			{
+				$context['ban_suggestions']['other_ips'] = banLoadAdditionalIPs($context['ban_suggestions']['member']['id']);
+			}
+
+			return $this->action_edit();
+		}
+
+		if (isset($this->_req->post->ban_items))
+		{
+			$ban_group_id = $this->_req->getQuery('bg', 'intval', 0);
+			$ban_items = array_map('intval', $this->_req->post->ban_items);
+
+			removeBanTriggers($ban_items, $ban_group_id);
+		}
+
+		// Register the last modified date.
+		updateSettings(array('banLastUpdated' => time()));
+
+		// Update the member table to represent the new ban situation.
+		updateBanMembers();
+
+		// Go back to an appropriate spot
+		redirectexit('action=admin;area=ban;sa=' . (isset($this->_req->post->add_ban) ? 'list' : 'edit;bg=' . (isset($ban_group_id) ? $ban_group_id : 0)));
+	}
+
+	/**
 	 * This handles the listing of ban log entries, and allows their deletion.
 	 *
 	 * What it does:
@@ -538,7 +665,9 @@ class ManageBans extends \ElkArte\AbstractController
 
 			// 'Delete all entries' button was pressed.
 			if (!empty($this->_req->post->removeAll))
+			{
 				removeBanLogs();
+			}
 			// 'Delete selection' button was pressed.
 			else
 			{
@@ -552,7 +681,7 @@ class ManageBans extends \ElkArte\AbstractController
 			'id' => 'ban_log',
 			'title' => $txt['ban_log'],
 			'items_per_page' => 30,
-			'base_href' => $context['admin_area'] == 'ban' ?  getUrl('admin', ['action' => 'admin', 'area' => 'ban', 'sa' => 'log']) : getUrl('admin', ['action' => 'admin', 'area' => 'logs', 'sa' => 'banlog']),
+			'base_href' => $context['admin_area'] == 'ban' ? getUrl('admin', ['action' => 'admin', 'area' => 'ban', 'sa' => 'log']) : getUrl('admin', ['action' => 'admin', 'area' => 'logs', 'sa' => 'banlog']),
 			'default_sort_col' => 'date',
 			'get_items' => array(
 				'function' => 'list_getBanLogEntries',
@@ -665,108 +794,6 @@ class ManageBans extends \ElkArte\AbstractController
 	}
 
 	/**
-	 * This function handles submitted forms that add, modify or remove ban triggers.
-	 */
-	public function action_edit2()
-	{
-		global $context;
-
-		require_once(SUBSDIR . '/Bans.subs.php');
-
-		// Check with security first
-		checkSession();
-		validateToken('admin-bet');
-
-		$ban_errors = ErrorContext::context('ban', 1);
-
-		// Adding or editing a ban group
-		if (isset($this->_req->post->add_ban) || isset($this->_req->post->modify_ban))
-		{
-			$ban_info = array();
-
-			// Let's collect all the information we need
-			$ban_info['id'] = $this->_req->getQuery('bg', 'intval', 0);
-			if (empty($ban_info['id']))
-			{
-				$ban_info['id'] = $this->_req->getPost('bg', 'intval', 0);
-			}
-			$ban_info['is_new'] = empty($ban_info['id']);
-			$ban_info['expire_date'] = $this->_req->getPost('expire_date', 'intval', 0);
-			$ban_info['expiration'] = array(
-				'status' => isset($this->_req->post->expiration) && in_array($this->_req->post->expiration, array('never', 'one_day', 'expired')) ? $this->_req->post->expiration : 'never',
-				'days' => $ban_info['expire_date'],
-			);
-			$ban_info['db_expiration'] = $ban_info['expiration']['status'] == 'never' ? 'NULL' : ($ban_info['expiration']['status'] == 'one_day' ? time() + 24 * 60 * 60 * $ban_info['expire_date'] : 0);
-			$ban_info['full_ban'] = empty($this->_req->post->full_ban) ? 0 : 1;
-			$ban_info['reason'] = $this->_req->getPost('reason', '\\ElkArte\\Util::htmlspecialchars[ENT_QUOTES]', '');
-			$ban_info['name'] = $this->_req->getPost('ban_name', '\\ElkArte\\Util::htmlspecialchars[ENT_QUOTES]', '');
-			$ban_info['notes'] = $this->_req->getPost('notes', '\\ElkArte\\Util::htmlspecialchars[ENT_QUOTES]', '');
-			$ban_info['notes'] = str_replace(array("\r", "\n", '  '), array('', '<br />', '&nbsp; '), $ban_info['notes']);
-			$ban_info['cannot']['access'] = empty($ban_info['full_ban']) ? 0 : 1;
-			$ban_info['cannot']['post'] = !empty($ban_info['full_ban']) || empty($this->_req->post->cannot_post) ? 0 : 1;
-			$ban_info['cannot']['register'] = !empty($ban_info['full_ban']) || empty($this->_req->post->cannot_register) ? 0 : 1;
-			$ban_info['cannot']['login'] = !empty($ban_info['full_ban']) || empty($this->_req->post->cannot_login) ? 0 : 1;
-
-			$ban_group_id = empty($ban_info['id']) ? insertBanGroup($ban_info) : updateBanGroup($ban_info);
-
-			if ($ban_group_id !== false)
-			{
-				$ban_info['id'] = $ban_group_id;
-				$ban_info['is_new'] = false;
-			}
-
-			$context['ban'] = $ban_info;
-		}
-
-		// Update the triggers associated with this ban
-		if (isset($this->_req->post->ban_suggestions, $ban_info['id']))
-		{
-			$saved_triggers = saveTriggers((array) $this->_req->post, $ban_info['id'], $this->_req->getQuery('u', 'intval', 0), $this->_req->getQuery('bi', 'intval', 0));
-			$context['ban_suggestions']['saved_triggers'] = $saved_triggers;
-		}
-
-		// Something went wrong somewhere, ban info or triggers, ... Oh well, let's go back.
-		if ($ban_errors->hasErrors())
-		{
-			$context['ban_suggestions'] = !empty($saved_triggers) ? $saved_triggers : '';
-			$context['ban']['from_user'] = true;
-
-			// They may have entered a name not using the member select box
-			if (isset($this->_req->query->u))
-				$context['ban_suggestions'] = array_merge($context['ban_suggestions'], getMemberData((int) $this->_req->query->u));
-			elseif (isset($this->_req->query->user))
-			{
-				$context['ban']['from_user'] = false;
-				$context['use_autosuggest'] = true;
-				$context['ban_suggestions']['member']['name'] = $this->_req->query->user;
-			}
-
-			// Not strictly necessary, but it's nice
-			if (!empty($context['ban_suggestions']['member']['id']))
-				$context['ban_suggestions']['other_ips'] = banLoadAdditionalIPs($context['ban_suggestions']['member']['id']);
-
-			return $this->action_edit();
-		}
-
-		if (isset($this->_req->post->ban_items))
-		{
-			$ban_group_id = $this->_req->getQuery('bg', 'intval', 0);
-			$ban_items = array_map('intval', $this->_req->post->ban_items);
-
-			removeBanTriggers($ban_items, $ban_group_id);
-		}
-
-		// Register the last modified date.
-		updateSettings(array('banLastUpdated' => time()));
-
-		// Update the member table to represent the new ban situation.
-		updateBanMembers();
-
-		// Go back to an appropriate spot
-		redirectexit('action=admin;area=ban;sa=' . (isset($this->_req->post->add_ban) ? 'list' : 'edit;bg=' . (isset($ban_group_id) ? $ban_group_id : 0)));
-	}
-
-	/**
 	 * This function handles the ins and outs of the screen for adding new ban
 	 * triggers or modifying existing ones.
 	 *
@@ -790,7 +817,9 @@ class ManageBans extends \ElkArte\AbstractController
 		$ban_id = $this->_req->get('bi', 'intval', 0);
 
 		if (empty($ban_group))
-			throw new \ElkArte\Exceptions\Exception('ban_not_found', false);
+		{
+			throw new Exception('ban_not_found', false);
+		}
 
 		// Adding a new trigger
 		if (isset($this->_req->post->add_new_trigger) && !empty($this->_req->post->ban_suggestions))
@@ -807,7 +836,9 @@ class ManageBans extends \ElkArte\AbstractController
 			$dummy['ban_suggestions'] = (array) array_shift($this->_req->post->ban_suggestions);
 			saveTriggers($dummy, $ban_group, 0, $ban_id);
 			if (!empty($this->_req->post->ban_suggestions))
+			{
 				saveTriggers((array) $this->_req->post, $ban_group);
+			}
 
 			redirectexit('action=admin;area=ban;sa=edit' . (!empty($ban_group) ? ';bg=' . $ban_group : ''));
 		}
@@ -848,7 +879,9 @@ class ManageBans extends \ElkArte\AbstractController
 		{
 			$ban_row = banDetails($ban_id, $ban_group);
 			if (empty($ban_row))
-				throw new \ElkArte\Exceptions\Exception('ban_not_found', false);
+			{
+				throw new Exception('ban_not_found', false);
+			}
 			$row = $ban_row[$ban_id];
 
 			// Load it up for the template
@@ -912,7 +945,9 @@ class ManageBans extends \ElkArte\AbstractController
 
 			// Rehabilitate some members.
 			if ($this->_req->query->entity == 'member')
+			{
 				updateBanMembers();
+			}
 
 			// Make sure the ban cache is refreshed.
 			updateSettings(array('banLastUpdated' => time()));
@@ -1065,7 +1100,7 @@ class ManageBans extends \ElkArte\AbstractController
 		{
 			$listOptions['columns']['banned_entity']['data'] = array(
 				'function' => function ($rowData) {
-					return strtr(\ElkArte\Util::htmlspecialchars($rowData['hostname']), array('%' => '*'));
+					return strtr(Util::htmlspecialchars($rowData['hostname']), array('%' => '*'));
 				},
 			);
 			$listOptions['columns']['banned_entity']['sort'] = array(
@@ -1077,7 +1112,7 @@ class ManageBans extends \ElkArte\AbstractController
 		{
 			$listOptions['columns']['banned_entity']['data'] = array(
 				'function' => function ($rowData) {
-					return strtr(\ElkArte\Util::htmlspecialchars($rowData['email_address']), array('%' => '*'));
+					return strtr(Util::htmlspecialchars($rowData['email_address']), array('%' => '*'));
 				},
 			);
 			$listOptions['columns']['banned_entity']['sort'] = array(

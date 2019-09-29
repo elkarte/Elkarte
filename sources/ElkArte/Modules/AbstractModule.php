@@ -14,6 +14,9 @@
 
 namespace ElkArte\Modules;
 
+use ElkArte\HttpReq;
+use ElkArte\UserInfo;
+
 /**
  * Interface ModuleInterface
  *
@@ -26,9 +29,10 @@ abstract class AbstractModule implements ModuleInterface
 
 	/**
 	 * AbstractModule constructor.
+	 *
 	 * @param \ElkArte\HttpReq $req
 	 */
-	public function __construct(\ElkArte\HttpReq $req, \ElkArte\UserInfo $user)
+	public function __construct(HttpReq $req, UserInfo $user)
 	{
 		$this->_req = $req;
 		$this->user = $user;

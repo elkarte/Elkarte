@@ -12,6 +12,7 @@
  *
  */
 
+use BBC\ParserWrapper;
 use ElkArte\User;
 
 /**
@@ -146,7 +147,9 @@ function pollInfo($id_poll, $ignore_permissions = true)
 		$boardsAllowed = boardsAllowedTo('poll_view');
 
 		if (empty($boardsAllowed))
+		{
 			return false;
+		}
 	}
 
 	// Read info from the db
@@ -173,7 +176,9 @@ function pollInfo($id_poll, $ignore_permissions = true)
 	$db->free_result($request);
 
 	if (empty($poll_info))
+	{
 		return false;
+	}
 
 	$request = $db->query('', '
 		SELECT COUNT(DISTINCT id_member) AS total
@@ -224,7 +229,9 @@ function pollInfoForTopic($topicID)
 
 	// The topic must exist
 	if ($db->num_rows($request) == 0)
+	{
 		return false;
+	}
 
 	// Get the poll information.
 	$pollinfo = $db->fetch_assoc($request);
@@ -259,10 +266,14 @@ function topicFromPoll($pollID)
 
 	// The topic must exist
 	if ($db->num_rows($request) == 0)
+	{
 		$topicID = false;
+	}
 	// Get the poll information.
 	else
+	{
 		list ($topicID, $boardID) = $db->fetch_row($request);
+	}
 
 	$db->free_result($request);
 
@@ -376,7 +387,9 @@ function createPoll($question, $id_member, $poster_name, $max_votes = 1, $hide_r
 	$id_poll = $db->insert_id('{db_prefix}polls', 'id_poll');
 
 	if (!empty($options))
+	{
 		addPollOptions($id_poll, $options);
+	}
 
 	call_integration_hook('integrate_poll_add_edit', array($id_poll, false));
 
@@ -432,7 +445,9 @@ function addPollOptions($id_poll, array $options)
 
 	$pollOptions = array();
 	foreach ($options as $i => $option)
+	{
 		$pollOptions[] = array($id_poll, $i, $option);
+	}
 
 	$db->insert('insert',
 		'{db_prefix}poll_choices',
@@ -471,6 +486,7 @@ function modifyPollOption($options)
 	$db = database();
 
 	foreach ($options as $option)
+	{
 		$db->query('', '
 			UPDATE {db_prefix}poll_choices
 			SET label = {string:option_name}
@@ -482,6 +498,7 @@ function modifyPollOption($options)
 				'option_name' => $option[2],
 			)
 		);
+	}
 }
 
 /**
@@ -541,7 +558,9 @@ function pollStarters($id_topic)
 	$pollStarters = array();
 
 	if ($db->num_rows($request) != 0)
+	{
 		$pollStarters = $db->fetch_row($request);
+	}
 
 	$db->free_result($request);
 
@@ -706,7 +725,9 @@ function determineVote($id_member, $id_poll)
 		)
 	);
 	while ($choice = $db->fetch_row($request))
+	{
 		$pollOptions[] = $choice[0];
+	}
 	$db->free_result($request);
 
 	return $pollOptions;
@@ -715,13 +736,14 @@ function determineVote($id_member, $id_poll)
 /**
  * Get some basic details from a poll
  *
- * @deprecated since 2.0 - use pollInfoForTopic instead
  * @param int $id_topic
  * @return string[]|bool
+ * @deprecated since 2.0 - use pollInfoForTopic instead
  */
 function pollStatus($id_topic)
 {
 	\ElkArte\Errors\Errors::instance()->log_deprecated('pollStatus()', 'pollInfoForTopic()');
+
 	return pollInfoForTopic($id_topic);
 }
 
@@ -806,7 +828,9 @@ function getPollStarter($id_topic)
 		)
 	);
 	if ($db->num_rows($request) == 0)
+	{
 		throw new \ElkArte\Exceptions\Exception('no_board');
+	}
 	$bcinfo = $db->fetch_assoc($request);
 	$db->free_result($request);
 
@@ -850,7 +874,9 @@ function loadPollContext($poll_id)
 			{
 				$guestvoted = explode(',', $guestvoted);
 				if ($guestvoted[0] == $poll_id)
+				{
 					break;
+				}
 			}
 
 			// Has the poll been reset since guest voted?
@@ -859,9 +885,13 @@ function loadPollContext($poll_id)
 				// Remove the poll info from the cookie to allow guest to vote again
 				unset($guestinfo[$i]);
 				if (!empty($guestinfo))
+				{
 					$_COOKIE['guest_poll_vote'] = ';' . implode(';', $guestinfo);
+				}
 				else
+				{
 					unset($_COOKIE['guest_poll_vote']);
+				}
 			}
 			else
 			{
@@ -878,7 +908,7 @@ function loadPollContext($poll_id)
 		}
 	}
 
-	$bbc_parser = \BBC\ParserWrapper::instance();
+	$bbc_parser = ParserWrapper::instance();
 
 	// Set up the basic poll information.
 	$starter_href = getUrl('profile', ['action' => 'profile', 'u' => $pollinfo['id_member'], 'name' => $pollinfo['poster_name']]);

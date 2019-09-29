@@ -9,7 +9,7 @@
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause (see accompanying LICENSE.txt file)
  *
  * This file contains code covered by:
- * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * copyright: 2011 Simple Machines (http://www.simplemachines.org)
  *
  * @version 2.0 dev
  *
@@ -17,12 +17,18 @@
 
 namespace ElkArte\AdminController;
 
+use ElkArte\AbstractController;
+use ElkArte\Action;
+use ElkArte\Search\SearchApiWrapper;
+use ElkArte\SettingsForm\SettingsForm;
+use ElkArte\Util;
+
 /**
  * ManageSearch controller admin class.
  *
  * @package Search
  */
-class ManageSearch extends \ElkArte\AbstractController
+class ManageSearch extends AbstractController
 {
 	/**
 	 * Main entry point for the admin search settings screen.
@@ -60,7 +66,7 @@ class ManageSearch extends \ElkArte\AbstractController
 		);
 
 		// Control for actions
-		$action = new \ElkArte\Action('manage_search');
+		$action = new Action('manage_search');
 
 		// Create the tabs for the template.
 		$context[$context['admin_menu_name']]['tab_data'] = array(
@@ -105,7 +111,7 @@ class ManageSearch extends \ElkArte\AbstractController
 		global $txt, $context, $scripturl, $modSettings;
 
 		// Initialize the form
-		$settingsForm = new \ElkArte\SettingsForm\SettingsForm(\ElkArte\SettingsForm\SettingsForm::DB_ADAPTER);
+		$settingsForm = new SettingsForm(SettingsForm::DB_ADAPTER);
 
 		// Initialize it with our settings
 		$settingsForm->setConfigVars($this->_settings());
@@ -116,7 +122,7 @@ class ManageSearch extends \ElkArte\AbstractController
 		$context['search_engines'] = array();
 		if (!empty($modSettings['additional_search_engines']))
 		{
-			$context['search_engines'] = \ElkArte\Util::unserialize($modSettings['additional_search_engines']);
+			$context['search_engines'] = Util::unserialize($modSettings['additional_search_engines']);
 		}
 
 		for ($count = 0; $count < 3; $count++)
@@ -148,9 +154,9 @@ class ManageSearch extends \ElkArte\AbstractController
 				if (!empty($searchengine) && !empty($url) && filter_var($url, FILTER_VALIDATE_URL))
 				{
 					$new_engines[] = array(
-						'name' => trim(\ElkArte\Util::htmlspecialchars($searchengine, ENT_COMPAT)),
+						'name' => trim(Util::htmlspecialchars($searchengine, ENT_COMPAT)),
 						'url' => $url,
-						'separator' => trim(\ElkArte\Util::htmlspecialchars(!empty($this->_req->post->engine_separator[$id]) ? $this->_req->post->engine_separator[$id] : '+', ENT_COMPAT)),
+						'separator' => trim(Util::htmlspecialchars(!empty($this->_req->post->engine_separator[$id]) ? $this->_req->post->engine_separator[$id] : '+', ENT_COMPAT)),
 					);
 				}
 			}
@@ -195,7 +201,7 @@ class ManageSearch extends \ElkArte\AbstractController
 		);
 
 		// Perhaps the search method wants to add some settings?
-		$searchAPI = new \ElkArte\Search\SearchApiWrapper(!empty($modSettings['search_index']) ? $modSettings['search_index'] : '');
+		$searchAPI = new SearchApiWrapper(!empty($modSettings['search_index']) ? $modSettings['search_index'] : '');
 		$searchAPI->searchSettings($config_vars);
 
 		// Add new settings with a nice hook, makes them available for admin settings search as well
@@ -410,6 +416,51 @@ class ManageSearch extends \ElkArte\AbstractController
 	}
 
 	/**
+	 * Get the installed Search API implementations.
+	 *
+	 * - This function checks for patterns in comments on top of the Search-API files!
+	 * - It loads the search API classes if identified.
+	 * - This function is used by action_edit to list all installed API implementations.
+	 */
+	private function loadSearchAPIs()
+	{
+		global $txt, $scripturl;
+
+		$apis = array();
+		try
+		{
+			$files = new \GlobIterator(SUBSDIR . '/Search/API/*.php', \FilesystemIterator::SKIP_DOTS);
+			foreach ($files as $file)
+			{
+				if ($file->isFile())
+				{
+					$index_name = $file->getBasename('.php');
+					$common_name = strtolower($index_name);
+
+					if ($common_name === 'searchapi')
+					{
+						continue;
+					}
+
+					$apis[$index_name] = array(
+						'filename' => $file->getFilename(),
+						'setting_index' => $index_name,
+						'has_template' => in_array($common_name, array('custom', 'fulltext', 'standard')),
+						'label' => $index_name && isset($txt['search_index_' . $common_name]) ? str_replace('{managesearch_url}', $scripturl . '?action=admin;area=managesearch;sa=manage' . $common_name, $txt['search_index_' . $common_name]) : '',
+						'desc' => $index_name && isset($txt['search_index_' . $common_name . '_desc']) ? str_replace('{managesearch_url}', $scripturl . '?action=admin;area=managesearch;sa=manage' . $common_name, $txt['search_index_' . $common_name . '_desc']) : '',
+					);
+				}
+			}
+		}
+		catch (\UnexpectedValueException $e)
+		{
+			// @todo for now just passthrough
+		}
+
+		return $apis;
+	}
+
+	/**
 	 * Create a custom search index for the messages table.
 	 *
 	 * What it does:
@@ -454,7 +505,7 @@ class ManageSearch extends \ElkArte\AbstractController
 		// Resume building an index that was not completed
 		if (isset($this->_req->query->resume) && !empty($modSettings['search_custom_index_resume']))
 		{
-			$context['index_settings'] = \ElkArte\Util::unserialize($modSettings['search_custom_index_resume']);
+			$context['index_settings'] = Util::unserialize($modSettings['search_custom_index_resume']);
 			$context['start'] = (int) $context['index_settings']['resume_at'];
 			unset($context['index_settings']['resume_at']);
 			$context['step'] = 1;
@@ -653,50 +704,5 @@ class ManageSearch extends \ElkArte\AbstractController
 			'sphinxql_searchd_port' => (int) $this->_req->post->sphinxql_searchd_port,
 			'sphinx_max_results' => (int) $this->_req->post->sphinx_max_results,
 		));
-	}
-
-	/**
-	 * Get the installed Search API implementations.
-	 *
-	 * - This function checks for patterns in comments on top of the Search-API files!
-	 * - It loads the search API classes if identified.
-	 * - This function is used by action_edit to list all installed API implementations.
-	 */
-	private function loadSearchAPIs()
-	{
-		global $txt, $scripturl;
-
-		$apis = array();
-		try
-		{
-			$files = new \GlobIterator(SUBSDIR . '/Search/API/*.php', \FilesystemIterator::SKIP_DOTS);
-			foreach ($files as $file)
-			{
-				if ($file->isFile())
-				{
-					$index_name = $file->getBasename('.php');
-					$common_name = strtolower($index_name);
-
-					if ($common_name === 'searchapi')
-					{
-						continue;
-					}
-
-					$apis[$index_name] = array(
-						'filename' => $file->getFilename(),
-						'setting_index' => $index_name,
-						'has_template' => in_array($common_name, array('custom', 'fulltext', 'standard')),
-						'label' => $index_name && isset($txt['search_index_' . $common_name]) ? str_replace('{managesearch_url}', $scripturl . '?action=admin;area=managesearch;sa=manage' . $common_name, $txt['search_index_' . $common_name]) : '',
-						'desc' => $index_name && isset($txt['search_index_' . $common_name . '_desc']) ? str_replace('{managesearch_url}', $scripturl . '?action=admin;area=managesearch;sa=manage' . $common_name, $txt['search_index_' . $common_name . '_desc']) : '',
-					);
-				}
-			}
-		}
-		catch (\UnexpectedValueException $e)
-		{
-			// @todo for now just passthrough
-		}
-
-		return $apis;
 	}
 }

@@ -13,7 +13,10 @@
 
 namespace ElkArte\Mentions\MentionType\Event;
 
-use ElkArte\Mentions\MentionType\Event\AbstractMentionBoardAccess;
+use ElkArte\DataValidator;
+use ElkArte\Mentions\Mentioning;
+use ElkArte\Notifications;
+use ElkArte\NotificationsTask;
 
 /**
  * Class MentionmemMention
@@ -59,6 +62,16 @@ class Mentionmem extends AbstractMentionBoardAccess
 	}
 
 	/**
+	 * {@inheritdoc }
+	 */
+	public static function getModules($modules)
+	{
+		$modules['mentions'] = array('post', 'display');
+
+		return $modules;
+	}
+
+	/**
 	 * Listener attached to the prepare_context event of the Display controller
 	 * used to mark a mention as read.
 	 *
@@ -71,7 +84,7 @@ class Mentionmem extends AbstractMentionBoardAccess
 		// Mark the mention as read if requested
 		if (isset($_REQUEST['mentionread']) && !empty($virtual_msg))
 		{
-			$mentions = new \ElkArte\Mentions\Mentioning(database(), $this->user, new \ElkArte\DataValidator(), $modSettings['enabled_mentions']);
+			$mentions = new Mentioning(database(), $this->user, new DataValidator(), $modSettings['enabled_mentions']);
 			$mentions->markread((int) $_REQUEST['item']);
 		}
 
@@ -164,8 +177,8 @@ class Mentionmem extends AbstractMentionBoardAccess
 	{
 		if (!empty($this->_actually_mentioned))
 		{
-			$notifier = \ElkArte\Notifications::instance();
-			$notifier->add(new \ElkArte\NotificationsTask(
+			$notifier = Notifications::instance();
+			$notifier->add(new NotificationsTask(
 				'mentionmem',
 				$msgOptions['id'],
 				$posterOptions['id'],
@@ -174,15 +187,5 @@ class Mentionmem extends AbstractMentionBoardAccess
 					: 'unapproved')
 			));
 		}
-	}
-
-	/**
-	 * {@inheritdoc }
-	 */
-	public static function getModules($modules)
-	{
-		$modules['mentions'] = array('post', 'display');
-
-		return $modules;
 	}
 }

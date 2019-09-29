@@ -65,17 +65,6 @@ class Gd2 extends AbstractManipulator
 	}
 
 	/**
-	 * Cleanup when done
-	 */
-	public function __destruct()
-	{
-		if (is_resource($this->_image))
-		{
-			imagedestroy($this->_image);
-		}
-	}
-
-	/**
 	 * Loads a image file into the image engine for processing
 	 *
 	 * @return bool|mixed
@@ -485,5 +474,16 @@ class Gd2 extends AbstractManipulator
 		$this->__destruct();
 
 		return $result ? $image : false;
+	}
+
+	/**
+	 * Cleanup when done
+	 */
+	public function __destruct()
+	{
+		if (is_resource($this->_image))
+		{
+			imagedestroy($this->_image);
+		}
 	}
 }

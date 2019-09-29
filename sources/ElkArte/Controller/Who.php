@@ -9,7 +9,7 @@
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause (see accompanying LICENSE.txt file)
  *
  * This file contains code covered by:
- * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * copyright: 2011 Simple Machines (http://www.simplemachines.org)
  *
  * @version 2.0 dev
  *
@@ -17,11 +17,16 @@
 
 namespace ElkArte\Controller;
 
+use ElkArte\AbstractController;
+use ElkArte\Exceptions\Exception;
+use ElkArte\MembersList;
+use ElkArte\Util;
+
 /**
  * I woke up in a Soho doorway A policeman knew my name He said "You can go sleep at home
  * tonight If you can get up and walk away"
  */
-class Who extends \ElkArte\AbstractController
+class Who extends AbstractController
 {
 	/**
 	 * Default action of this class
@@ -45,7 +50,7 @@ class Who extends \ElkArte\AbstractController
 	 * - It is accessed via ?action=who.
 	 *
 	 * @uses  template_whos_online() sub-template in Who.template
-	 * @uses Who language file.
+	 * @uses  Who language file.
 	 */
 	public function action_who()
 	{
@@ -56,7 +61,9 @@ class Who extends \ElkArte\AbstractController
 
 		// You can't do anything if this is off.
 		if (empty($modSettings['who_enabled']))
-			throw new \ElkArte\Exceptions\Exception('who_off', false);
+		{
+			throw new Exception('who_off', false);
+		}
 
 		// Load the 'Who' template.
 		theme()->getTemplates()->load('Who');
@@ -94,7 +101,9 @@ class Who extends \ElkArte\AbstractController
 			$context['show_methods']['spiders'] = $txt['who_show_spiders_only'];
 		}
 		elseif (empty($modSettings['show_spider_online']) && isset($_SESSION['who_online_filter']) && $_SESSION['who_online_filter'] === 'spiders')
+		{
 			unset($_SESSION['who_online_filter']);
+		}
 
 		// Does the user prefer a different sort direction?
 		if (isset($this->_req->query->sort) && isset($sort_methods[$this->_req->query->sort]))
@@ -119,11 +128,15 @@ class Who extends \ElkArte\AbstractController
 
 		$conditions = array();
 		if (!allowedTo('moderate_forum'))
+		{
 			$conditions[] = '(COALESCE(mem.show_online, 1) = 1)';
+		}
 
 		// Fallback to top filter?
 		if (isset($this->_req->post->submit_top, $this->_req->post->show_top))
+		{
 			$this->_req->post->show = $this->_req->post->show_top;
+		}
 
 		// Does the user wish to apply a filter?
 		if (isset($this->_req->post->show) && isset($show_methods[$this->_req->post->show]))
@@ -138,7 +151,9 @@ class Who extends \ElkArte\AbstractController
 			$conditions[] = $show_methods[$_SESSION['who_online_filter']];
 		}
 		else
+		{
 			$context['show_by'] = $_SESSION['who_online_filter'] = 'all';
+		}
 
 		require_once(SUBSDIR . '/Members.subs.php');
 		$totalMembers = countMembersOnline($conditions);
@@ -159,9 +174,11 @@ class Who extends \ElkArte\AbstractController
 
 		foreach ($members as $row)
 		{
-			$actions = \ElkArte\Util::unserialize($row['url']);
+			$actions = Util::unserialize($row['url']);
 			if ($actions === false)
+			{
 				continue;
+			}
 
 			// Send the information to the template.
 			$context['members'][$row['session']] = array(
@@ -182,8 +199,8 @@ class Who extends \ElkArte\AbstractController
 		}
 
 		// Load the user data for these members (and the guests).
-		\ElkArte\MembersList::load($member_ids);
-		\ElkArte\MembersList::loadGuest();
+		MembersList::load($member_ids);
+		MembersList::loadGuest();
 
 		// Are we showing spiders?
 		$spiderContext = array();
@@ -215,13 +232,13 @@ class Who extends \ElkArte\AbstractController
 
 		foreach ($context['members'] as $i => $member)
 		{
-			$member_context = \ElkArte\MembersList::get($member['id']);
+			$member_context = MembersList::get($member['id']);
 
 			// The following happens when $member['id'] is not found among the loaded for any reason
 			// in such cases we load a guest dummy
 			if ($member_context->isEmpty())
 			{
-				$member_context = \ElkArte\MembersList::get(0);
+				$member_context = MembersList::get(0);
 			}
 			else
 			{

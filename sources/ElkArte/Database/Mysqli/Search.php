@@ -13,10 +13,12 @@
 
 namespace ElkArte\Database\Mysqli;
 
+use ElkArte\Database\AbstractSearch;
+
 /**
  * MySQL implementation of DbSearch
  */
-class Search extends \ElkArte\Database\AbstractSearch
+class Search extends AbstractSearch
 {
 	/**
 	 * Everything starts here... more or less
@@ -80,6 +82,7 @@ class Search extends \ElkArte\Database\AbstractSearch
 
 		// Now check the custom index table, if it exists at all.
 		if (preg_match('~^`(.+?)`\.(.+?)$~', $db_prefix, $match) !== 0)
+		{
 			$request = $this->_db->query('', '
 				SHOW TABLE STATUS
 				FROM {string:database_name}
@@ -89,7 +92,9 @@ class Search extends \ElkArte\Database\AbstractSearch
 					'table_name' => str_replace('_', '\_', $match[2]) . 'log_search_words',
 				)
 			);
+		}
 		else
+		{
 			$request = $this->_db->query('', '
 				SHOW TABLE STATUS
 				LIKE {string:table_name}',
@@ -97,6 +102,7 @@ class Search extends \ElkArte\Database\AbstractSearch
 					'table_name' => str_replace('_', '\_', $db_prefix) . 'log_search_words',
 				)
 			);
+		}
 
 		if ($request !== false && $this->_db->num_rows($request) == 1)
 		{

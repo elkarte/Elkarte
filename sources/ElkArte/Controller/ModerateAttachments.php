@@ -8,7 +8,7 @@
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause (see accompanying LICENSE.txt file)
  *
  * This file contains code covered by:
- * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * copyright: 2011 Simple Machines (http://www.simplemachines.org)
  *
  * @version 2.0 dev
  *
@@ -16,9 +16,13 @@
 
 namespace ElkArte\Controller;
 
+use ElkArte\AbstractController;
+use ElkArte\Cache\Cache;
+use ElkArte\Exceptions\Exception;
+
 /**
  */
-class ModerateAttachments extends \ElkArte\AbstractController
+class ModerateAttachments extends AbstractController
 {
 	/**
 	 * Forward to attachments approval method is the only responsibility
@@ -57,10 +61,14 @@ class ModerateAttachments extends \ElkArte\AbstractController
 			$attachments = attachmentsOfMessage($id_msg);
 		}
 		elseif (!empty($this->_req->query->aid))
+		{
 			$attachments[] = (int) $this->_req->query->aid;
+		}
 
 		if (empty($attachments))
-			throw new \ElkArte\Exceptions\Exception('no_access', false);
+		{
+			throw new Exception('no_access', false);
+		}
 
 		// @todo nb: this requires permission to approve posts, not manage attachments
 		// Now we have some ID's cleaned and ready to approve, but first - let's check we have permission!
@@ -87,7 +95,9 @@ class ModerateAttachments extends \ElkArte\AbstractController
 		$redirect = 'topic=' . $attach_home['id_topic'] . '.msg' . $attach_home['id_msg'] . '#msg' . $attach_home['id_msg'];
 
 		if (empty($attachments))
-			throw new \ElkArte\Exceptions\Exception('no_access', false);
+		{
+			throw new Exception('no_access', false);
+		}
 
 		// Finally, we are there. Follow through!
 		if ($is_approve)
@@ -96,10 +106,12 @@ class ModerateAttachments extends \ElkArte\AbstractController
 			approveAttachments($attachments);
 		}
 		else
+		{
 			removeAttachments(array('id_attach' => $attachments, 'do_logging' => true));
+		}
 
 		// We approved or removed, either way we reset those numbers
-		\ElkArte\Cache\Cache::instance()->remove('num_menu_errors');
+		Cache::instance()->remove('num_menu_errors');
 
 		// Return to the topic....
 		redirectexit($redirect);

@@ -13,12 +13,14 @@
 
 namespace ElkArte\Mentions;
 
+use ElkArte\AbstractModel;
+
 /**
  * Takes care of validating and inserting mention notifications in the database
  *
  * @package Mentions
  */
-class Mentioning extends \ElkArte\AbstractModel
+class Mentioning extends AbstractModel
 {
 	/**
 	 * Value assumed by a new mention
@@ -115,19 +117,25 @@ class Mentioning extends \ElkArte\AbstractModel
 
 		// Common checks to determine if we can go on
 		if (!$this->_isValid())
+		{
 			return array();
+		}
 
 		// Cleanup, validate and remove the invalid values (0 and $this->user->id)
 		$id_targets = array_diff(array_map('intval', array_unique($this->_validator->uid)), array(0, $this->user->id));
 
 		if (empty($id_targets))
+		{
 			return array();
+		}
 
 		$actually_mentioned = $mention_obj->insert($this->user->id, $id_targets, $this->_validator->msg, $this->_validator->log_time, $this->_data['status']);
 
 		// Update the member mention count
 		foreach ($actually_mentioned as $id_target)
+		{
 			$this->_updateMenuCount($this->_data['status'], $id_target);
+		}
 
 		return $actually_mentioned;
 	}
@@ -152,15 +160,90 @@ class Mentioning extends \ElkArte\AbstractModel
 			);
 
 			if (isset($data['id_member_from']))
+			{
 				$_data['id_member_from'] = $data['id_member_from'];
+			}
 
 			if (isset($data['log_time']))
+			{
 				$_data['log_time'] = $data['log_time'];
+			}
 		}
 		else
+		{
 			$_data = $data;
+		}
 
 		return $_data;
+	}
+
+	/**
+	 * Check if the user can do what he is supposed to do, and validates the input.
+	 */
+	protected function _isValid()
+	{
+		$sanitization = array(
+			'type' => 'trim',
+			'msg' => 'intval',
+		);
+
+		$validation = array(
+			'type' => 'required|contains[' . implode(',', $this->_known_mentions) . ']',
+			'uid' => 'isarray',
+		);
+
+		// Any optional fields we need to check?
+		if (isset($this->_data['id_member_from']))
+		{
+			$sanitization['id_member_from'] = 'intval';
+			$validation['id_member_from'] = 'required|notequal[0]';
+		}
+		if (isset($this->_data['log_time']))
+		{
+			$sanitization['log_time'] = 'intval';
+			$validation['log_time'] = 'required|notequal[0]';
+		}
+
+		$this->_validator->sanitation_rules($sanitization);
+		$this->_validator->validation_rules($validation);
+
+		if (!$this->_validator->validate($this->_data))
+		{
+			return false;
+		}
+
+		// If everything is fine, let's prepare for the fun!
+		theme()->getTemplates()->loadLanguageFile('Mentions');
+
+		return true;
+	}
+
+	/**
+	 * Updates the mention count as a result of an action, read, new, delete, etc
+	 *
+	 * @param int $status
+	 * @param int $member_id
+	 * @package Mentions
+	 */
+	protected function _updateMenuCount($status, $member_id)
+	{
+		require_once(SUBSDIR . '/Members.subs.php');
+
+		// If its new add to our menu count
+		if ($status === 0)
+		{
+			updateMemberData($member_id, array('mentions' => '+'));
+		}
+		// Mark as read we decrease the count
+		elseif ($status === 1)
+		{
+			updateMemberData($member_id, array('mentions' => '-'));
+		}
+		// Deleting or un-approving may have been read or not, so a count is required
+		else
+		{
+			countUserMentions(false, '', $member_id);
+		}
 	}
 
 	/**
@@ -204,6 +287,7 @@ class Mentioning extends \ElkArte\AbstractModel
 					break;
 			}
 		}
+
 		return false;
 	}
 
@@ -233,48 +317,12 @@ class Mentioning extends \ElkArte\AbstractModel
 		foreach ($mention_ids as $id)
 		{
 			if ($this->_validator->validate(array('id_mention' => $id, 'mark' => $action)))
+			{
 				$own[] = $id;
+			}
 		}
 
 		return $own;
-	}
-
-	/**
-	 * Check if the user can do what he is supposed to do, and validates the input.
-	 */
-	protected function _isValid()
-	{
-		$sanitization = array(
-			'type' => 'trim',
-			'msg' => 'intval',
-		);
-		$validation = array(
-			'type' => 'required|contains[' . implode(',', $this->_known_mentions) . ']',
-			'uid' => 'isarray',
-		);
-
-		// Any optional fields we need to check?
-		if (isset($this->_data['id_member_from']))
-		{
-			$sanitization['id_member_from'] = 'intval';
-			$validation['id_member_from'] = 'required|notequal[0]';
-		}
-		if (isset($this->_data['log_time']))
-		{
-			$sanitization['log_time'] = 'intval';
-			$validation['log_time'] = 'required|notequal[0]';
-		}
-
-		$this->_validator->sanitation_rules($sanitization);
-		$this->_validator->validation_rules($validation);
-
-		if (!$this->_validator->validate($this->_data))
-			return false;
-
-		// If everything is fine, let's prepare for the fun!
-		theme()->getTemplates()->loadLanguageFile('Mentions');
-
-		return true;
 	}
 
 	/**
@@ -284,10 +332,11 @@ class Mentioning extends \ElkArte\AbstractModel
 	 * - note that delete is a "soft-delete" because otherwise anyway we have to remember
 	 * - when a user was already mentioned for a certain message (e.g. in case of editing)
 	 *
-	 * @package Mentions
 	 * @param int|int[] $id_mentions the mention id in the db
 	 * @param string $status status to update, 'new', 'read', 'deleted', 'unapproved'
 	 * @return bool if successfully changed or not
+	 * @package Mentions
+	 * @throws \ElkArte\Exceptions\Exception
 	 */
 	protected function _changeStatus($id_mentions, $status = 'read')
 	{
@@ -309,27 +358,5 @@ class Mentioning extends \ElkArte\AbstractModel
 		}
 
 		return $success;
-	}
-
-	/**
-	 * Updates the mention count as a result of an action, read, new, delete, etc
-	 *
-	 * @package Mentions
-	 * @param int $status
-	 * @param int $member_id
-	 */
-	protected function _updateMenuCount($status, $member_id)
-	{
-		require_once(SUBSDIR . '/Members.subs.php');
-
-		// If its new add to our menu count
-		if ($status === 0)
-			updateMemberData($member_id, array('mentions' => '+'));
-		// Mark as read we decrease the count
-		elseif ($status === 1)
-			updateMemberData($member_id, array('mentions' => '-'));
-		// Deleting or un-approving may have been read or not, so a count is required
-		else
-			countUserMentions(false, '', $member_id);
 	}
 }

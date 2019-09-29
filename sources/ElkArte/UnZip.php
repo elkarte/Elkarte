@@ -32,90 +32,105 @@ class UnZip
 {
 	/**
 	 * Holds the return array of files processed
+	 *
 	 * @var mixed[]
 	 */
 	protected $return = array();
 
 	/**
 	 * Holds the data found in the end of central directory record
+	 *
 	 * @var mixed[]
 	 */
 	protected $_zip_info = array();
 
 	/**
 	 * Holds the information from the central directory for each file in the archive
+	 *
 	 * @var mixed[]
 	 */
 	protected $_files_info = array();
 
 	/**
 	 * Hold the current file we are processing
+	 *
 	 * @var mixed[]
 	 */
 	protected $_file_info = array();
 
 	/**
 	 * Holds the current filename of the above
+	 *
 	 * @var string
 	 */
 	protected $_filename = '';
 
 	/**
 	 * Contains the central record string
+	 *
 	 * @var string
 	 */
 	protected $_data_cdr = '';
 
 	/**
 	 * If the file passes or fails crc check
+	 *
 	 * @var boolean
 	 */
 	protected $_crc_check = false;
 
 	/**
 	 * If we are going to write out the files processed
+	 *
 	 * @var boolean
 	 */
 	protected $_write_this = false;
 
 	/**
 	 * If we will skip a file we found
+	 *
 	 * @var boolean
 	 */
 	protected $_skip = false;
 
 	/**
 	 * If we found a file that was requested ($files_to_extract)
+	 *
 	 * @var boolean
 	 */
 	protected $_found = false;
 
 	/**
 	 * Array of file names we want to extract from the archive
+	 *
 	 * @var null|string[]
 	 */
 	protected $files_to_extract;
 
 	/**
 	 * Holds the data string passed to the function
+	 *
 	 * @var string
 	 */
 	protected $data;
 
 	/**
 	 * Location to write the files.
+	 *
 	 * @var string
 	 */
 	protected $destination;
 
 	/**
 	 * If we are looking for a single specific file
+	 *
 	 * @var boolean|string
 	 */
 	protected $single_file;
 
 	/**
 	 * If we can overwrite a file with the same name in the destination
+	 *
 	 * @var boolean
 	 */
 	protected $overwrite;
@@ -405,6 +420,39 @@ class UnZip
 	}
 
 	/**
+	 * Does what it says, determines if we are writing this file or not
+	 */
+	private function _determine_write_this()
+	{
+		// If this is a file, and it doesn't exist.... happy days!
+		if (substr($this->_filename, -1) !== '/' && !file_exists($this->destination . '/' . $this->_filename))
+		{
+			$this->_write_this = true;
+		}
+		// If the file exists, we may not want to overwrite it.
+		elseif (substr($this->_filename, -1) !== '/')
+		{
+			$this->_write_this = $this->overwrite;
+		}
+		// This is a directory, so we're gonna want to create it. (probably...)
+		elseif ($this->destination !== null && !$this->single_file)
+		{
+			// Just a little accident prevention, don't mind me.
+			$this->_filename = strtr($this->_filename, array('../' => '', '/..' => ''));
+
+			if (!file_exists($this->destination . '/' . $this->_filename))
+			{
+				mktree($this->destination . '/' . $this->_filename, 0777);
+			}
+			$this->_write_this = false;
+		}
+		else
+		{
+			$this->_write_this = false;
+		}
+	}
+
+	/**
 	 * Reads the local header, [local file header + file data + data_descriptor]
 	 *
 	 * What it does:
@@ -440,35 +488,49 @@ class UnZip
 	}
 
 	/**
-	 * Does what it says, determines if we are writing this file or not
+	 * Alters processing based on the general purpose flag bits
+	 *
+	 * What it does:
+	 *
+	 * - If bit 1 is set the file is protected, so it returns an empty one
+	 * - If bit 3 is set then the data descriptor is read and processed
+	 *
+	 * The data descriptor, if it exists, is structured as
+	 * - Local header signature: 4 bytes, optional (0x08074b50)
+	 * - CRC-32: 4 bytes
+	 * - Compressed size: 4 bytes
+	 * - Uncompressed size: 4 bytes
+	 *
+	 * This descriptor exists only if bit 3 of the general purpose bit flag is set.
+	 * It is byte aligned and immediately follows the last byte of compressed data.
+	 * This descriptor is used only when it was not possible to seek in the output zip
+	 * file, e.g., when the output zip file was standard output or a non seekable device.
 	 */
-	private function _determine_write_this()
+	private function _check_general_purpose_flag()
 	{
-		// If this is a file, and it doesn't exist.... happy days!
-		if (substr($this->_filename, -1) !== '/' && !file_exists($this->destination . '/' . $this->_filename))
+		// If bit 1 is set the file is encrypted so empty it instead of writing out gibberish
+		if (($this->_file_info['general_purpose'] & 0x0001) !== 0)
 		{
-			$this->_write_this = true;
+			$this->_file_info['data'] = '';
 		}
-		// If the file exists, we may not want to overwrite it.
-		elseif (substr($this->_filename, -1) !== '/')
-		{
-			$this->_write_this = $this->overwrite;
-		}
-		// This is a directory, so we're gonna want to create it. (probably...)
-		elseif ($this->destination !== null && !$this->single_file)
-		{
-			// Just a little accident prevention, don't mind me.
-			$this->_filename = strtr($this->_filename, array('../' => '', '/..' => ''));
 
-			if (!file_exists($this->destination . '/' . $this->_filename))
-			{
-				mktree($this->destination . '/' . $this->_filename, 0777);
-			}
-			$this->_write_this = false;
-		}
-		else
+		// See if bit 3 is set
+		if (($this->_file_info['general_purpose'] & 0x0008) !== 0)
 		{
-			$this->_write_this = false;
+			// Grab the 16 bytes after the compressed data
+			$general_purpose = substr($this->_file_info['data'], 30 + $this->_file_info['filename_length'] + $this->_file_info['extra_field_length'] + $this->_file_info['compressed_size'], 16);
+
+			// The spec allows for an optional header in the general purpose record
+			if (substr($general_purpose, 0, 4) === "\x50\x4b\x07\x08")
+			{
+				$general_purpose = substr($general_purpose, 4);
+			}
+
+			// These values should be what's in the CDR record per spec
+			$general_purpose_data = unpack('Vcrc/Vcompressed_size/Vsize', $general_purpose);
+			$this->_file_info['crc'] = empty($this->_file_info['crc']) ? $general_purpose_data['crc'] : $this->_file_info['crc'];
+			$this->_file_info['compressed_size'] = $general_purpose_data['compressed_size'];
+			$this->_file_info['size'] = $general_purpose_data['size'];
 		}
 	}
 
@@ -518,53 +580,6 @@ class UnZip
 		elseif (!$this->_skip && $this->_found === false && $this->_check_crc())
 		{
 			package_put_contents($this->destination . '/' . $this->_filename, $this->_file_info['data']);
-		}
-	}
-
-	/**
-	 * Alters processing based on the general purpose flag bits
-	 *
-	 * What it does:
-	 *
-	 * - If bit 1 is set the file is protected, so it returns an empty one
-	 * - If bit 3 is set then the data descriptor is read and processed
-	 *
-	 * The data descriptor, if it exists, is structured as
-	 * - Local header signature: 4 bytes, optional (0x08074b50)
-	 * - CRC-32: 4 bytes
-	 * - Compressed size: 4 bytes
-	 * - Uncompressed size: 4 bytes
-	 *
-	 * This descriptor exists only if bit 3 of the general purpose bit flag is set.
-	 * It is byte aligned and immediately follows the last byte of compressed data.
-	 * This descriptor is used only when it was not possible to seek in the output zip
-	 * file, e.g., when the output zip file was standard output or a non seekable device.
-	 */
-	private function _check_general_purpose_flag()
-	{
-		// If bit 1 is set the file is encrypted so empty it instead of writing out gibberish
-		if (($this->_file_info['general_purpose'] & 0x0001) !== 0)
-		{
-			$this->_file_info['data'] = '';
-		}
-
-		// See if bit 3 is set
-		if (($this->_file_info['general_purpose'] & 0x0008) !== 0)
-		{
-			// Grab the 16 bytes after the compressed data
-			$general_purpose = substr($this->_file_info['data'], 30 + $this->_file_info['filename_length'] + $this->_file_info['extra_field_length'] + $this->_file_info['compressed_size'], 16);
-
-			// The spec allows for an optional header in the general purpose record
-			if (substr($general_purpose, 0, 4) === "\x50\x4b\x07\x08")
-			{
-				$general_purpose = substr($general_purpose, 4);
-			}
-
-			// These values should be what's in the CDR record per spec
-			$general_purpose_data = unpack('Vcrc/Vcompressed_size/Vsize', $general_purpose);
-			$this->_file_info['crc'] = empty($this->_file_info['crc']) ? $general_purpose_data['crc'] : $this->_file_info['crc'];
-			$this->_file_info['compressed_size'] = $general_purpose_data['compressed_size'];
-			$this->_file_info['size'] = $general_purpose_data['size'];
 		}
 	}
 

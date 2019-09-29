@@ -32,54 +32,63 @@ class Html2BBC
 {
 	/**
 	 * The value that will hold our dom object
+	 *
 	 * @var object
 	 */
 	public $doc;
 
 	/**
 	 * The value that will hold if we are using the internal or external parser
+	 *
 	 * @var boolean
 	 */
 	private $_parser;
 
 	/**
 	 * Line end character
+	 *
 	 * @var string
 	 */
 	public $line_end = "\n";
 
 	/**
 	 * Line break character
+	 *
 	 * @var string
 	 */
 	public $line_break = '[br]';
 
 	/**
 	 * Font numbers to pt size
+	 *
 	 * @var string[]
 	 */
 	public $sizes_equivalence = array(1 => '8pt', '10pt', '12pt', '14pt', '18pt', '24pt', '36pt');
 
 	/**
 	 * Holds block elements, its intentionally not complete and is used to prevent adding extra br's
+	 *
 	 * @var string[]
 	 */
 	public $block_elements = array('p', 'div', 'ol', 'ul', 'pre', 'table', 'blockquote', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6');
 
 	/**
 	 * Used to strip newlines inside of 'p' and 'div' elements
+	 *
 	 * @var boolean|null
 	 */
 	public $strip_newlines = null;
 
 	/**
 	 * Holds any html tags that would normally be convert to bbc but are instead skipped
+	 *
 	 * @var string[]
 	 */
 	protected $_skip_tags = array();
 
 	/**
 	 * Holds any style attributes that would normally be convert to bbc but are instead skipped
+	 *
 	 * @var string[]
 	 */
 	protected $_skip_style = array();
@@ -128,10 +137,14 @@ class Html2BBC
 	{
 		// If its not an array, make it one
 		if (!is_array($tags))
+		{
 			$tags = array($tags);
+		}
 
 		if (!empty($tags))
+		{
 			$this->_skip_tags = $tags;
+		}
 	}
 
 	/**
@@ -143,10 +156,14 @@ class Html2BBC
 	{
 		// If its not an array, make it one
 		if (!is_array($styles))
+		{
 			$styles = array($styles);
+		}
 
 		if (!empty($styles))
+		{
 			$this->_skip_style = $styles;
+		}
 	}
 
 	/**
@@ -169,7 +186,9 @@ class Html2BBC
 		{
 			// Using the internal DOM methods we need to do a little extra work
 			if (preg_match('~<body>(.*)</body>~s', $bbc, $body))
+			{
 				$bbc = $body[1];
+			}
 		}
 
 		// Remove comment blocks
@@ -215,12 +234,16 @@ class Html2BBC
 		while ($parent)
 		{
 			if (is_null($parent))
+			{
 				return false;
+			}
 
 			// Anywhere nested inside a code block we don't render tags
 			$tag = $parser ? $parent->nodeName : $parent->nodeName();
 			if ($tag === 'code')
+			{
 				return true;
+			}
 
 			// Back out another level, until we are done
 			$parent = $parser ? $parent->parentNode : $parent->parentNode();
@@ -237,7 +260,9 @@ class Html2BBC
 	private function _convert_childNodes($node)
 	{
 		if (empty($node) || self::_has_parent_code($node, $this->_parser))
+		{
 			return;
+		}
 
 		// Keep traversing till we are at the base of this node
 		if ($node->hasChildNodes())
@@ -279,7 +304,9 @@ class Html2BBC
 
 		// Skipping over this tag?
 		if (in_array($tag, $this->_skip_tags))
+		{
 			$tag = '';
+		}
 
 		// Based on the current tag, determine how to convert
 		switch ($tag)
@@ -424,7 +451,9 @@ class Html2BBC
 				$node->parentNode->replaceChild($bbc_node, $node);
 			}
 			else
+			{
 				$node->outertext = $bbc;
+			}
 		}
 	}
 
@@ -468,16 +497,24 @@ class Html2BBC
 
 		// An anchor link
 		if (empty($href) && !empty($id))
+		{
 			$bbc = '[anchor=' . $id . ']' . $value . '[/anchor]';
+		}
 		elseif (!empty($href) && $href[0] === '#')
+		{
 			$bbc = '[url=' . $href . ']' . $value . '[/url]';
+		}
 		// Maybe an email link
 		elseif (substr($href, 0, 7) === 'mailto:')
 		{
 			if ($href !== 'mailto:' . (isset($modSettings['maillist_sitename_address']) ? $modSettings['maillist_sitename_address'] : ''))
+			{
 				$href = substr($href, 7);
+			}
 			else
+			{
 				$href = '';
+			}
 
 			$bbc = !empty($value) ? '[email=' . $href . ']' . $value . '[/email]' : '[email]' . $href . '[/email]';
 		}
@@ -495,9 +532,13 @@ class Html2BBC
 				$baseURL = (isset($parsedURL['scheme']) ? $parsedURL['scheme'] : 'http') . '://' . $parsedURL['host'] . (empty($parsedURL['port']) ? '' : ':' . $parsedURL['port']);
 
 				if (substr($href, 0, 1) === '/')
+				{
 					$href = $baseURL . $href;
+				}
 				else
+				{
 					$href = $baseURL . (empty($parsedURL['path']) ? '/' : preg_replace('~/(?:index\\.php)?$~', '', $parsedURL['path'])) . '/' . $href;
+				}
 			}
 
 			$bbc = !empty($value) ? '[url=' . $href . ']' . $value . '[/url]' : '[url]' . $href . '[/url]';
@@ -524,7 +565,9 @@ class Html2BBC
 		$value = $this->_get_value($node);
 
 		if ($dir === 'rtl' || $dir === 'ltr')
+		{
 			$bbc = '[bdo=' . $dir . ']' . $value . '[/bdo]';
+		}
 
 		return $bbc;
 	}
@@ -553,13 +596,19 @@ class Html2BBC
 
 			// Remove any leading and trailing blank lines
 			if (empty($first_line))
+			{
 				array_shift($lines);
+			}
 			if (empty($last_line))
+			{
 				array_pop($lines);
+			}
 
 			// Convert what remains
 			foreach ($lines as $line)
+			{
 				$bbc .= $line . $this->line_end;
+			}
 
 			$bbc = rtrim($bbc, $this->line_end);
 		}
@@ -599,9 +648,13 @@ class Html2BBC
 			$blocks[0] = '[size=' . $size . ']' . $blocks[0] . '[/size]';
 		}
 		if (!empty($face))
-			$blocks[0]  = '[font=' . strtolower($face) . ']' . $blocks[0] . '[/font]';
+		{
+			$blocks[0] = '[font=' . strtolower($face) . ']' . $blocks[0] . '[/font]';
+		}
 		if (!empty($color))
-			$blocks[0]  = '[color=' . strtolower($color) . ']' . $blocks[0] . '[/color]';
+		{
+			$blocks[0] = '[color=' . strtolower($color) . ']' . $blocks[0] . '[/color]';
+		}
 
 		return implode('', $blocks);
 	}
@@ -649,11 +702,17 @@ class Html2BBC
 
 		// Do the basic things first, title/alt
 		if (!empty($title) && empty($alt))
+		{
 			$bbc = '[img alt=' . $title . ']' . $src . '[/img]';
+		}
 		elseif (!empty($alt))
+		{
 			$bbc = '[img alt=' . $alt . ']' . $src . '[/img]';
+		}
 		else
+		{
 			$bbc = '[img]' . $src . '[/img]';
+		}
 
 		// If the tag has a style attribute
 		if (!empty($style))
@@ -678,14 +737,20 @@ class Html2BBC
 		if (empty($size))
 		{
 			if (!empty($width))
+			{
 				$size .= 'width=' . $width . ' ';
+			}
 
 			if (!empty($height))
+			{
 				$size .= 'height=' . $height;
+			}
 		}
 
 		if (!empty($size))
+		{
 			$bbc = str_replace('[img', '[img ' . $size, $bbc);
+		}
 
 		return $bbc;
 	}
@@ -716,7 +781,9 @@ class Html2BBC
 			{
 				// Skip any inline styles as needed
 				if (in_array($tag, $this->_skip_style))
+				{
 					continue;
+				}
 
 				// Well this can be as long, complete and exhaustive as we want :P
 				switch ($tag)
@@ -724,27 +791,39 @@ class Html2BBC
 					case 'font-family':
 						// Only get the first font if there's a list
 						if (strpos($value, ',') !== false)
+						{
 							$value = substr($value, 0, strpos($value, ','));
+						}
 						$bbc = '[font=' . strtr($value, array("'" => '')) . ']' . $bbc . '[/font]';
 						break;
 					case 'font-weight':
 						if ($value === 'bold' || $value === 'bolder' || $value == '700' || $value == '600')
+						{
 							$bbc = '[b]' . $bbc . '[/b]';
+						}
 						break;
 					case 'font-style':
 						if ($value == 'italic')
+						{
 							$bbc = '[i]' . $bbc . '[/i]';
+						}
 						break;
 					case 'text-decoration':
 						if ($value == 'underline')
+						{
 							$bbc = '[u]' . $bbc . '[/u]';
+						}
 						elseif ($value == 'line-through')
+						{
 							$bbc = '[s]' . $bbc . '[/s]';
+						}
 						break;
 					case 'font-size':
 						// Account for formatting issues, decimal in the wrong spot
 						if (preg_match('~(\d+)\.\d+(p[xt])~i', $value, $dec_matches) === 1)
+						{
 							$value = $dec_matches[1] . $dec_matches[2];
+						}
 						$bbc = '[size=' . $value . ']' . $bbc . '[/size]';
 						break;
 					case 'color':
@@ -755,11 +834,17 @@ class Html2BBC
 					case 'text-align':
 					case 'align':
 						if ($value === 'right')
+						{
 							$bbc = '[right]' . $value . '[/right]';
+						}
 						elseif ($value === 'left')
+						{
 							$bbc = '[left]' . $value . '[/left]';
+						}
 						elseif ($value === 'center')
+						{
 							$bbc = '[center]' . $value . '[/center]';
+						}
 						break;
 				}
 			}
@@ -790,11 +875,17 @@ class Html2BBC
 		{
 			$align = trim($align, '"');
 			if ($align === 'right')
+			{
 				$value = '[right]' . $value . '[/right]';
+			}
 			elseif ($align === 'left')
+			{
 				$value = '[left]' . $value . '[/left]';
+			}
 			elseif ($align === 'center')
+			{
 				$value = '[center]' . $value . '[/center]';
+			}
 		}
 
 		// And are we spanning more than one col here?
@@ -814,12 +905,18 @@ class Html2BBC
 	private function _get_value($node)
 	{
 		if ($node === null)
+		{
 			return '';
+		}
 
 		if ($this->_parser)
+		{
 			return $node->nodeValue;
+		}
 		else
+		{
 			return $node->innertext;
+		}
 	}
 
 	/**
@@ -832,12 +929,18 @@ class Html2BBC
 	private function _get_name($node)
 	{
 		if ($node === null)
+		{
 			return '';
+		}
 
 		if ($this->_parser)
+		{
 			return $node->nodeName;
+		}
 		else
+		{
 			return $node->nodeName();
+		}
 	}
 
 	/**
@@ -858,7 +961,9 @@ class Html2BBC
 			return preg_replace('@^<' . $tag . '[^>]*>|</' . $tag . '>$@', '', $html);
 		}
 		else
+		{
 			return $node->innertext;
+		}
 	}
 
 	/**

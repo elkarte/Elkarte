@@ -9,13 +9,15 @@
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause (see accompanying LICENSE.txt file)
  *
  * This file contains code covered by:
- * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * copyright: 2011 Simple Machines (http://www.simplemachines.org)
  *
  * @version 2.0 dev
  *
  */
 
 namespace ElkArte\MessagesCallback;
+
+use ElkArte\MembersList;
 
 /**
  * DisplayRenderer
@@ -54,7 +56,7 @@ class DisplayRenderer extends Renderer
 		global $settings, $context;
 
 		$id_member = $this->_this_message[$this->_idx_mapper->id_member];
-		$this_member = \ElkArte\MembersList::get($id_member);
+		$this_member = MembersList::get($id_member);
 		$this_member->loadContext();
 
 		$this_member['ip'] = $this->_this_message['poster_ip'] ?? '';
@@ -103,7 +105,9 @@ class DisplayRenderer extends Renderer
 		);
 
 		if (!empty($output['modified']['name']))
+		{
 			$output['modified']['last_edit_text'] = sprintf($txt['last_edit_by'], $output['modified']['time'], $output['modified']['name'], standardTime($output['modified']['timestamp']));
+		}
 
 		if (!empty($output['member']['karma']['allow']))
 		{

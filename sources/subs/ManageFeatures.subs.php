@@ -9,11 +9,13 @@
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause (see accompanying LICENSE.txt file)
  *
  * This file contains code covered by:
- * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * copyright: 2011 Simple Machines (http://www.simplemachines.org)
  *
  * @version 2.0 dev
  *
  */
+
+use ElkArte\Util;
 
 /**
  * Loads the signature from 50 members per request
@@ -93,7 +95,9 @@ function updateAllSignatures($applied_sigs)
 		$update_sigs = getSignatureFromMembers($applied_sigs);
 
 		if (empty($update_sigs))
+		{
 			$done = true;
+		}
 
 		foreach ($update_sigs as $row)
 		{
@@ -102,7 +106,9 @@ function updateAllSignatures($applied_sigs)
 
 			// Max characters...
 			if (!empty($sig_limits[1]))
-				$sig = \ElkArte\Util::substr($sig, 0, $sig_limits[1]);
+			{
+				$sig = Util::substr($sig, 0, $sig_limits[1]);
+			}
 
 			// Max lines...
 			if (!empty($sig_limits[2]))
@@ -115,7 +121,9 @@ function updateAllSignatures($applied_sigs)
 					{
 						$count++;
 						if ($count >= $sig_limits[2])
+						{
 							$sig = substr($sig, 0, $i) . strtr(substr($sig, $i), array("\n" => ' '));
+						}
 					}
 				}
 			}
@@ -139,16 +147,26 @@ function updateAllSignatures($applied_sigs)
 
 					// Attempt to allow all sizes of abuse, so to speak.
 					if ($matches[2][$ind] == 'px' && $size > $sig_limits[7])
+					{
 						$limit_broke = $sig_limits[7] . 'px';
+					}
 					elseif ($matches[2][$ind] == 'pt' && $size > ($sig_limits[7] * 0.75))
+					{
 						$limit_broke = ((int) $sig_limits[7] * 0.75) . 'pt';
+					}
 					elseif ($matches[2][$ind] == 'em' && $size > ((float) $sig_limits[7] / 16))
+					{
 						$limit_broke = ((float) $sig_limits[7] / 16) . 'em';
+					}
 					elseif ($matches[2][$ind] != 'px' && $matches[2][$ind] != 'pt' && $matches[2][$ind] != 'em' && $sig_limits[7] < 18)
+					{
 						$limit_broke = 'large';
+					}
 
 					if ($limit_broke)
+					{
 						$sig = str_replace($matches[0][$ind], '[size=' . $sig_limits[7] . 'px', $sig);
+					}
 				}
 			}
 
@@ -213,14 +231,18 @@ function updateAllSignatures($applied_sigs)
 								}
 							}
 							else
+							{
 								$replaces[$image] = '';
+							}
 
 							continue;
 						}
 
 						// Does it have predefined restraints? Width first.
 						if ($matches[6][$key])
+						{
 							$matches[2][$key] = $matches[6][$key];
+						}
 
 						if ($matches[2][$key] && $sig_limits[5] && $matches[2][$key] > $sig_limits[5])
 						{
@@ -228,17 +250,23 @@ function updateAllSignatures($applied_sigs)
 							$matches[4][$key] *= $width / $matches[2][$key];
 						}
 						elseif ($matches[2][$key])
+						{
 							$width = $matches[2][$key];
+						}
 
 						// ... and height.
 						if ($matches[4][$key] && $sig_limits[6] && $matches[4][$key] > $sig_limits[6])
 						{
 							$height = $sig_limits[6];
 							if ($width != -1)
+							{
 								$width *= $height / $matches[4][$key];
+							}
 						}
 						elseif ($matches[4][$key])
+						{
 							$height = $matches[4][$key];
+						}
 
 						// If the dimensions are still not fixed - we need to check the actual image.
 						if (($width == -1 && $sig_limits[5]) || ($height == -1 && $sig_limits[6]))
@@ -261,24 +289,32 @@ function updateAllSignatures($applied_sigs)
 								{
 									$height = $sig_limits[6];
 									if ($width == -1)
+									{
 										$width = $sizes[0];
+									}
 									$width *= $height / $sizes[1];
 								}
 								elseif ($width != -1)
+								{
 									$height = $sizes[1];
+								}
 							}
 						}
 
 						// Did we come up with some changes? If so remake the string.
 						if ($width != -1 || $height != -1)
+						{
 							$replaces[$image] = '[img' . ($width != -1 ? ' width=' . round($width) : '') . ($height != -1 ? ' height=' . round($height) : '') . ']' . $matches[7][$key] . '[/img]';
+						}
 
 						// Record that we got one.
 						$image_count_holder[$image] = isset($image_count_holder[$image]) ? $image_count_holder[$image] + 1 : 1;
 					}
 
 					if (!empty($replaces))
+					{
 						$sig = str_replace(array_keys($replaces), array_values($replaces), $sig);
+					}
 				}
 			}
 
@@ -292,14 +328,18 @@ function updateAllSignatures($applied_sigs)
 			$sig = strtr($sig, array("\n" => '<br />'));
 			call_integration_hook('integrate_apply_signature_settings', array(&$sig, $sig_limits, $disabledTags));
 			if ($sig != $row['signature'])
+			{
 				$changes[$row['id_member']] = $sig;
+			}
 		}
 
 		// Do we need to delete what we have?
 		if (!empty($changes))
 		{
 			foreach ($changes as $id => $sig)
+			{
 				updateSignature($id, $sig);
+			}
 		}
 
 		$applied_sigs += 50;
@@ -337,6 +377,7 @@ function list_getProfileFields($start, $items_per_page, $sort, $standardFields)
 		$registration_fields = isset($modSettings['registration_fields']) ? explode(',', $modSettings['registration_fields']) : array();
 
 		foreach ($standard_fields as $field)
+		{
 			$list[] = array(
 				'id' => $field,
 				'label' => isset($txt['standard_profile_field_' . $field]) ? $txt['standard_profile_field_' . $field] : (isset($txt[$field]) ? $txt[$field] : $field),
@@ -344,6 +385,7 @@ function list_getProfileFields($start, $items_per_page, $sort, $standardFields)
 				'on_register' => in_array($field, $registration_fields) && !in_array($field, $fields_no_registration),
 				'can_show_register' => !in_array($field, $fields_no_registration),
 			);
+		}
 	}
 	else
 	{
@@ -380,8 +422,7 @@ function list_getProfileFieldSize()
 	$request = $db->query('', '
 		SELECT COUNT(*)
 		FROM {db_prefix}custom_fields',
-		array(
-		)
+		array()
 	);
 
 	list ($numProfileFields) = $db->fetch_row($request);
@@ -445,7 +486,7 @@ function getProfileField($id_field)
 	}
 	$db->free_result($request);
 
-	return($field);
+	return ($field);
 }
 
 /**
@@ -473,10 +514,14 @@ function ensureUniqueProfileField($colname, $initial_colname, $unique = false)
 			)
 		);
 		if ($db->num_rows($request) == 0)
+		{
 			$unique = true;
+		}
 		else
+		{
 			$colname = $initial_colname . $i;
-			$db->free_result($request);
+		}
+		$db->free_result($request);
 	}
 
 	return $unique;
@@ -708,8 +753,7 @@ function updateDisplayCache()
 			'not_admin_only' => 3,
 		)
 	)->fetch_callback(
-		function ($row)
-		{
+		function ($row) {
 			return array(
 				'colname' => strtr($row['col_name'], array('|' => '', ';' => '')),
 				'title' => strtr($row['field_name'], array('|' => '', ';' => '')),
@@ -736,8 +780,7 @@ function loadAllCustomFields()
 		SELECT
 			col_name, field_name, bbc
 		FROM {db_prefix}custom_fields',
-		array(
-		)
+		array()
 	);
 	$custom_field_titles = array();
 	while ($row = $db->fetch_assoc($request))
@@ -764,7 +807,7 @@ function loadAllCustomFields()
  */
 function getNotificationTypes()
 {
-	$glob = new \GlobIterator(SOURCEDIR . '/ElkArte/Mentions/MentionType/Notification/*Mention.php', \FilesystemIterator::SKIP_DOTS);
+	$glob = new GlobIterator(SOURCEDIR . '/ElkArte/Mentions/MentionType/Notification/*Mention.php', FilesystemIterator::SKIP_DOTS);
 	$types = array();
 
 	// For each file found, call its getType method
@@ -821,10 +864,10 @@ function getFrontPageControllers()
 
 	$classes = array();
 
-	$glob = new \GlobIterator(CONTROLLERDIR . '/*.controller.php', \FilesystemIterator::SKIP_DOTS);
+	$glob = new GlobIterator(CONTROLLERDIR . '/*.controller.php', FilesystemIterator::SKIP_DOTS);
 	$classes += scanFileSystemForControllers($glob);
 
-	$glob = new \GlobIterator(ADDONSDIR . '/*/controllers/*.controller.php', \FilesystemIterator::SKIP_DOTS);
+	$glob = new GlobIterator(ADDONSDIR . '/*/controllers/*.controller.php', FilesystemIterator::SKIP_DOTS);
 	$classes += scanFileSystemForControllers($glob, '\\ElkArte\\Addon\\');
 
 	$config_vars = array(array('select', 'front_page', $classes));
@@ -834,7 +877,9 @@ function getFrontPageControllers()
 	{
 		$options = $class_name::frontPageOptions();
 		if (!empty($options))
+		{
 			$config_vars = array_merge($config_vars, $options);
+		}
 	}
 
 	return $config_vars;
@@ -880,13 +925,13 @@ function scanFileSystemForControllers($iterator, $namespace = '')
 /**
  * Just pause the signature applying thing.
  *
- * @todo Move to subs file
- * @todo Merge with other pause functions?
- *    pausePermsSave(), pauseAttachmentMaintenance(), pauseRepairProcess()
- *
  * @param int $applied_sigs
  * @param int $sig_start
  * @throws \ElkArte\Exceptions\Exception
+ * @todo Merge with other pause functions?
+ *    pausePermsSave(), pauseAttachmentMaintenance(), pauseRepairProcess()
+ *
+ * @todo Move to subs file
  */
 function pauseSignatureApplySettings($applied_sigs, $sig_start)
 {
@@ -897,7 +942,9 @@ function pauseSignatureApplySettings($applied_sigs, $sig_start)
 
 	// Have we exhausted all the time we allowed?
 	if (time() - array_sum(explode(' ', $sig_start)) < 3)
+	{
 		return;
+	}
 
 	$context['continue_get_data'] = '?action=admin;area=featuresettings;sa=sig;apply;step=' . $applied_sigs . ';' . $context['session_var'] . '=' . $context['session_id'];
 	$context['page_title'] = $txt['not_done_title'];

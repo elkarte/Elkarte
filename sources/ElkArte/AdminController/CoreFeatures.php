@@ -8,13 +8,19 @@
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause (see accompanying LICENSE.txt file)
  *
  * This file contains code covered by:
- * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * copyright: 2011 Simple Machines (http://www.simplemachines.org)
  *
  * @version 2.0 dev
  *
  */
 
 namespace ElkArte\AdminController;
+
+use ElkArte\AbstractController;
+use ElkArte\Cache\Cache;
+use ElkArte\Hooks;
+use FilesystemIterator;
+use GlobIterator;
 
 /**
  * This class takes care of the Core Features admin screen.
@@ -27,7 +33,7 @@ namespace ElkArte\AdminController;
  *
  * @package CoreFeatures
  */
-class CoreFeatures extends \ElkArte\AbstractController
+class CoreFeatures extends AbstractController
 {
 	/**
 	 * Default handler.
@@ -77,15 +83,21 @@ class CoreFeatures extends \ElkArte\AbstractController
 				$tokenValidation = validateToken('admin-core', 'post', false);
 
 				if (empty($tokenValidation))
+				{
 					return 'token_verify_fail';
+				}
 			}
 			else
+			{
 				validateToken('admin-core');
+			}
 
 			$this->_save_core_features($core_features);
 
 			if (!isset($this->_req->query->xml))
+			{
 				redirectexit('action=admin;area=corefeatures;' . $context['session_var'] . '=' . $context['session_id']);
+			}
 		}
 
 		// Put them in context.
@@ -97,11 +109,15 @@ class CoreFeatures extends \ElkArte\AbstractController
 
 		// Don't show them this twice!
 		if ($context['is_new_install'])
+		{
 			updateSettings(array('admin_features' => ''));
+		}
 
 		// sub_template is already generic_xml and the token is created somewhere else
 		if (isset($this->_req->query->xml))
+		{
 			return true;
+		}
 
 		$context['sub_template'] = 'core_features';
 		$context['page_title'] = $txt['core_settings_title'];
@@ -138,13 +154,17 @@ class CoreFeatures extends \ElkArte\AbstractController
 				'save_callback' => 'custom_profiles_toggle_callback',
 				'setting_callback' => function ($value) {
 					if (!$value)
+					{
 						return array(
 							'disabled_profile_fields' => '',
 							'registration_fields' => '',
 							'displayFields' => '',
 						);
+					}
 					else
+					{
 						return array();
+					}
 				},
 			),
 			// k = karma.
@@ -172,9 +192,13 @@ class CoreFeatures extends \ElkArte\AbstractController
 					$current = !empty($modSettings['enabled_mentions']) ? explode(',', $modSettings['enabled_mentions']) : array();
 
 					if (!empty($value))
+					{
 						return array('enabled_mentions' => implode(',', array_merge($current, array('likemsg', 'rlikemsg'))));
+					}
 					else
+					{
 						return array('enabled_mentions' => implode(',', array_diff($current, array('likemsg', 'rlikemsg'))));
+					}
 				},
 			),
 			// ml = moderation log.
@@ -207,7 +231,9 @@ class CoreFeatures extends \ElkArte\AbstractController
 						return array('warning_moderate' => 0);
 					}
 					else
+					{
 						return array();
+					}
 				},
 			),
 			// ps = Paid Subscriptions.
@@ -247,9 +273,12 @@ class CoreFeatures extends \ElkArte\AbstractController
 						);
 					}
 					else
+					{
 						$returnSettings = array();
+					}
 
 					$returnSettings['warning_settings'] = $warning_settings;
+
 					return $returnSettings;
 				},
 			),
@@ -262,7 +291,9 @@ class CoreFeatures extends \ElkArte\AbstractController
 				'setting_callback' => function ($value) {
 					// Turn off the spider group if disabling.
 					if (!$value)
+					{
 						return array('spider_group' => 0, 'show_spider_online' => 0);
+					}
 				},
 				'on_save' => function () {
 					require_once(SUBSDIR . '/SearchEngines.subs.php');
@@ -287,7 +318,7 @@ class CoreFeatures extends \ElkArte\AbstractController
 	protected function _getModulesConfig(&$core_features)
 	{
 		// Find appropriately named core feature files in the admin directory
-		$glob = new \GlobIterator(ADMINDIR . '/Manage*Module.php', \FilesystemIterator::SKIP_DOTS);
+		$glob = new GlobIterator(ADMINDIR . '/Manage*Module.php', FilesystemIterator::SKIP_DOTS);
 
 		foreach ($glob as $file)
 		{
@@ -298,7 +329,7 @@ class CoreFeatures extends \ElkArte\AbstractController
 			}
 		}
 
-		$integrations = \ElkArte\Hooks::instance()->discoverIntegrations(ADDONSDIR);
+		$integrations = Hooks::instance()->discoverIntegrations(ADDONSDIR);
 
 		foreach ($integrations as $integration)
 		{
@@ -325,28 +356,6 @@ class CoreFeatures extends \ElkArte\AbstractController
 	}
 
 	/**
-	 * Return the array of core features in the format expected by search.
-	 *
-	 * - Callback for admin internal search.
-	 *
-	 * @return mixed[] array in a config_var format
-	 */
-	public function config_vars()
-	{
-		global $txt;
-
-		$return_data = array();
-
-		$core_features = $this->settings();
-
-		// Convert this to a format that admin search will understand
-		foreach ($core_features as $id => $data)
-			$return_data[] = array('switch', isset($data['title']) ? $data['title'] : $txt['core_settings_item_' . $id]);
-
-		return $return_data;
-	}
-
-	/**
 	 * This function makes sure the requested subaction does exists, if it
 	 * doesn't, it sets a default action.
 	 *
@@ -368,9 +377,13 @@ class CoreFeatures extends \ElkArte\AbstractController
 
 		// By default do the basic settings.
 		if (isset($this->_req->query->sa, $subActions[$this->_req->query->sa]))
+		{
 			$context['sub_action'] = $this->_req->query->sa;
+		}
 		elseif (!empty($defaultAction))
+		{
 			$context['sub_action'] = $defaultAction;
+		}
 		else
 		{
 			$temp = array_keys($subActions);
@@ -397,7 +410,9 @@ class CoreFeatures extends \ElkArte\AbstractController
 
 			// Enabled?
 			if (!empty($feature_id))
+			{
 				$setting_changes['admin_features'][] = $id;
+			}
 
 			// Setting values to change?
 			if (isset($feature['settings']))
@@ -405,7 +420,9 @@ class CoreFeatures extends \ElkArte\AbstractController
 				foreach ($feature['settings'] as $key => $value)
 				{
 					if (empty($feature_id) || (!empty($feature_id) && ($value < 2 || empty($modSettings[$key]))))
+					{
 						$setting_changes[$key] = !empty($feature_id) ? $value : !$value;
+					}
 				}
 			}
 
@@ -414,12 +431,16 @@ class CoreFeatures extends \ElkArte\AbstractController
 			{
 				$returned_settings = $feature['setting_callback'](!empty($feature_id));
 				if (!empty($returned_settings))
+				{
 					$setting_changes = array_merge($setting_changes, $returned_settings);
+				}
 			}
 
 			// Standard save callback?
 			if (isset($feature['on_save']))
+			{
 				$feature['on_save']();
+			}
 		}
 
 		// Make sure this one setting is a string!
@@ -431,7 +452,7 @@ class CoreFeatures extends \ElkArte\AbstractController
 		// This is needed to let menus appear if cache > 2
 		if ($modSettings['cache_enable'] > 2)
 		{
-			\ElkArte\Cache\Cache::instance()->clean('data');
+			Cache::instance()->clean('data');
 		}
 
 		// Any post save things?
@@ -477,5 +498,29 @@ class CoreFeatures extends \ElkArte\AbstractController
 		});
 
 		return $features;
+	}
+
+	/**
+	 * Return the array of core features in the format expected by search.
+	 *
+	 * - Callback for admin internal search.
+	 *
+	 * @return mixed[] array in a config_var format
+	 */
+	public function config_vars()
+	{
+		global $txt;
+
+		$return_data = array();
+
+		$core_features = $this->settings();
+
+		// Convert this to a format that admin search will understand
+		foreach ($core_features as $id => $data)
+		{
+			$return_data[] = array('switch', isset($data['title']) ? $data['title'] : $txt['core_settings_item_' . $id]);
+		}
+
+		return $return_data;
 	}
 }

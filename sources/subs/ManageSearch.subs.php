@@ -8,7 +8,7 @@
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause (see accompanying LICENSE.txt file)
  *
  * This file contains code covered by:
- * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * copyright: 2011 Simple Machines (http://www.simplemachines.org)
  *
  * @version 2.0 dev
  *
@@ -124,7 +124,9 @@ function createSphinxConfig()
 
 	// Set up to output a file to the users browser
 	while (ob_get_level() > 0)
+	{
 		@ob_end_clean();
+	}
 
 	header('Content-Encoding: none');
 	header('Pragma: no-cache');
@@ -279,10 +281,10 @@ searchd
 /**
  * Drop one or more indexes from a table and adds them back if specified
  *
- * @package Search
  * @param string $table
  * @param string[]|string $indexes
  * @param boolean $add
+ * @package Search
  */
 function alterFullTextIndex($table, $indexes, $add = false)
 {
@@ -317,14 +319,14 @@ function alterFullTextIndex($table, $indexes, $add = false)
 /**
  * Creates a custom search index
  *
- * @package Search
- *
  * @param int $start
  * @param int $messages_per_batch
  * @param string $column_size_definition
  * @param mixed[] $index_settings array containing specifics of what to create e.g. bytes per word
  *
  * @return array
+ * @package Search
+ *
  */
 function createSearchIndex($start, $messages_per_batch, $column_size_definition, $index_settings)
 {
@@ -343,11 +345,15 @@ function createSearchIndex($start, $messages_per_batch, $column_size_definition,
 
 		// Temporarily switch back to not using a search index.
 		if (!empty($modSettings['search_index']) && $modSettings['search_index'] === 'custom')
+		{
 			updateSettings(array('search_index' => ''));
+		}
 
 		// Don't let simultaneous processes be updating the search index.
 		if (!empty($modSettings['search_custom_index_config']))
+		{
 			updateSettings(array('search_custom_index_config' => ''));
+		}
 	}
 
 	$num_messages = array(
@@ -364,7 +370,9 @@ function createSearchIndex($start, $messages_per_batch, $column_size_definition,
 		)
 	);
 	while ($row = $db->fetch_assoc($request))
+	{
 		$num_messages[empty($row['todo']) ? 'done' : 'todo'] = $row['num_messages'];
+	}
 
 	// Done with indexing the messages, on to the next step
 	if (empty($num_messages['todo']))
@@ -405,7 +413,9 @@ function createSearchIndex($start, $messages_per_batch, $column_size_definition,
 
 				$number_processed++;
 				foreach (text2words($row['body'], $index_settings['bytes_per_word'], true) as $id_word)
+				{
 					$inserts[] = array($id_word, $row['id_msg']);
+				}
 			}
 			$num_messages['done'] += $number_processed;
 			$num_messages['todo'] -= $number_processed;
@@ -414,12 +424,14 @@ function createSearchIndex($start, $messages_per_batch, $column_size_definition,
 			$start += $forced_break ? $number_processed : $messages_per_batch;
 
 			if (!empty($inserts))
+			{
 				$db->insert('ignore',
 					'{db_prefix}log_search_words',
 					array('id_word' => 'int', 'id_msg' => 'int'),
 					$inserts,
 					array('id_word', 'id_msg')
 				);
+			}
 
 			// Done then set up for the next step, set up for the next loop.
 			if ($num_messages['todo'] === 0)
@@ -429,7 +441,9 @@ function createSearchIndex($start, $messages_per_batch, $column_size_definition,
 				break;
 			}
 			else
+			{
 				updateSettings(array('search_custom_index_resume' => serialize(array_merge($index_settings, array('resume_at' => $start)))));
+			}
 		}
 
 		// Since there are still steps to go, 80% is the maximum here.
@@ -442,12 +456,12 @@ function createSearchIndex($start, $messages_per_batch, $column_size_definition,
 /**
  * Removes common stop words from the index as they inhibit search performance
  *
- * @package Search
- *
  * @param int $start
  * @param mixed[] $column_definition
  *
  * @return array
+ * @package Search
+ *
  */
 function removeCommonWordsFromIndex($start, $column_definition)
 {
@@ -475,12 +489,15 @@ function removeCommonWordsFromIndex($start, $column_definition)
 			)
 		);
 		while ($row = $db->fetch_assoc($request))
+		{
 			$stop_words[] = $row['id_word'];
+		}
 		$db->free_result($request);
 
 		updateSettings(array('search_stopwords' => implode(',', $stop_words)));
 
 		if (!empty($stop_words))
+		{
 			$db->query('', '
 				DELETE FROM {db_prefix}log_search_words
 				WHERE id_word in ({array_int:stop_words})',
@@ -488,6 +505,7 @@ function removeCommonWordsFromIndex($start, $column_definition)
 					'stop_words' => $stop_words,
 				)
 			);
+		}
 
 		$start += $column_definition['step_size'];
 		if ($start > $column_definition['max_size'])

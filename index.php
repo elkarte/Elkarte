@@ -10,7 +10,7 @@
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause (see accompanying LICENSE.txt file)
  *
  * This file contains code covered by:
- * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * copyright: 2011 Simple Machines (http://www.simplemachines.org)
  *
  * @version 2.0 dev
  *
@@ -22,14 +22,18 @@ new Bootstrap(false);
 
 // Turn on output buffering if it isn't already on (via php.ini for example)
 if (!ob_get_level())
+{
 	ob_start();
+}
 
 // Before we get carried away, are we doing a scheduled task? If so save CPU cycles by jumping out!
 if (isset($_GET['scheduled']))
 {
 	// Don't make people wait on us if we can help it.
 	if (function_exists('fastcgi_finish_request'))
+	{
 		fastcgi_finish_request();
+	}
 
 	$controller = new \ElkArte\Controller\ScheduledTasks(new \ElkArte\EventManager());
 	$controller->action_autotask();
@@ -40,7 +44,9 @@ if (!empty($modSettings['enableCompressedOutput']) && !headers_sent())
 {
 	// If zlib is being used, turn off output compression.
 	if (detectServer()->outPutCompressionEnabled())
+	{
 		$modSettings['enableCompressedOutput'] = 0;
+	}
 	else
 	{
 		@ob_end_clean();
@@ -126,7 +132,9 @@ function elk_main()
 
 			// Track forum statistics and hits...?
 			if (!empty($modSettings['hitStats']))
+			{
 				trackStats(array('hits' => '+'));
+			}
 		}
 
 		// Show where we came from, and go

@@ -12,12 +12,14 @@
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause (see accompanying LICENSE.txt file)
  *
  * This file contains code covered by:
- * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * copyright: 2011 Simple Machines (http://www.simplemachines.org)
  *
  * @version 2.0 dev
  *
  */
 
+use ElkArte\Cache\Cache;
+use ElkArte\MembersList;
 use ElkArte\User;
 
 /**
@@ -32,8 +34,7 @@ function onlineCount()
 	$result = $db->query('', '
 		SELECT COUNT(*)
 		FROM {db_prefix}log_online',
-		array(
-		)
+		array()
 	);
 	list ($users_online) = $db->fetch_row($result);
 	$db->free_result($result);
@@ -57,8 +58,7 @@ function getAverages()
 			SUM(posts) AS posts, SUM(topics) AS topics, SUM(registers) AS registers,
 			SUM(most_on) AS most_on, MIN(date) AS date, SUM(hits) AS hits, SUM(email) AS email
 		FROM {db_prefix}log_activity',
-		array(
-		)
+		array()
 	);
 	$row = $db->fetch_assoc($result);
 	$db->free_result($result);
@@ -78,8 +78,7 @@ function numCategories()
 	$result = $db->query('', '
 		SELECT COUNT(*)
 		FROM {db_prefix}categories',
-		array(
-		)
+		array()
 	);
 	list ($num_categories) = $db->fetch_row($result);
 	$db->free_result($result);
@@ -128,10 +127,14 @@ function topPosters($limit = null)
 
 	// If there is a default setting, let's not retrieve something bigger
 	if (isset($modSettings['stats_limit']))
+	{
 		$limit = empty($limit) ? $modSettings['stats_limit'] : ($limit < $modSettings['stats_limit'] ? $limit : $modSettings['stats_limit']);
+	}
 	// Otherwise, fingers crossed and let's grab what is asked
 	else
+	{
 		$limit = empty($limit) ? 10 : $limit;
+	}
 
 	// Make the query to the the x number of top posters
 	$members_result = $db->query('', '
@@ -159,7 +162,9 @@ function topPosters($limit = null)
 			'link' => '<a href="' . $href . '">' . $row_members['real_name'] . '</a>'
 		);
 		if ($max_num_posts < $row_members['posts'])
+		{
 			$max_num_posts = $row_members['posts'];
+		}
 	}
 	$db->free_result($members_result);
 
@@ -190,10 +195,14 @@ function topBoards($limit = null, $read_status = false)
 
 	// If there is a default setting, let's not retrieve something bigger
 	if (isset($modSettings['stats_limit']))
+	{
 		$limit = empty($limit) ? $modSettings['stats_limit'] : ($limit < $modSettings['stats_limit'] ? $limit : $modSettings['stats_limit']);
+	}
 	// Otherwise, fingers crossed and let's grab what is asked
 	else
+	{
 		$limit = empty($limit) ? 10 : $limit;
+	}
 
 	$boards_result = $db->query('', '
 		SELECT b.id_board, b.name, b.num_posts, b.num_topics' . ($read_status ? ',' . (User::$info->is_guest === false ? ' 1 AS is_read' : '
@@ -227,10 +236,14 @@ function topBoards($limit = null, $read_status = false)
 			'link' => '<a href="' . $href . '">' . $row_board['name'] . '</a>'
 		);
 		if ($read_status)
+		{
 			$top_boards[$row_board['id_board']]['is_read'] = !empty($row_board['is_read']);
+		}
 
 		if ($max_num_posts < $row_board['num_posts'])
+		{
 			$max_num_posts = $row_board['num_posts'];
+		}
 	}
 	$db->free_result($boards_result);
 
@@ -278,7 +291,9 @@ function topTopicReplies($limit = 10)
 	);
 	$topic_ids = array();
 	while ($row = $db->fetch_row($request))
+	{
 		$topic_ids[$row[0]] = $row[1];
+	}
 	$db->free_result($request);
 	arsort($topic_ids);
 	$topic_ids = array_slice($topic_ids, 0, $limit, true);
@@ -335,10 +350,14 @@ function topTopicViews($limit = null)
 
 	// If there is a default setting, let's not retrieve something bigger
 	if (isset($modSettings['stats_limit']))
+	{
 		$limit = empty($limit) ? $modSettings['stats_limit'] : ($limit < $modSettings['stats_limit'] ? $limit : $modSettings['stats_limit']);
+	}
 	// Otherwise, fingers crossed and let's grab what is asked
 	else
+	{
 		$limit = empty($limit) ? 10 : $limit;
+	}
 
 	// Large forums may need a bit more prodding...
 	if ($modSettings['totalMessages'] > 100000)
@@ -355,11 +374,15 @@ function topTopicViews($limit = null)
 		);
 		$topic_ids = array();
 		while ($row = $db->fetch_assoc($request))
+		{
 			$topic_ids[] = $row['id_topic'];
+		}
 		$db->free_result($request);
 	}
 	else
+	{
 		$topic_ids = array();
+	}
 
 	$topic_view_result = $db->query('', '
 		SELECT m.subject, t.num_views, t.num_replies, t.id_board, t.id_topic, b.name
@@ -403,7 +426,9 @@ function topTopicViews($limit = null)
 		);
 
 		if ($max_num_views < $row_topic_views['num_views'])
+		{
 			$max_num_views = $row_topic_views['num_views'];
+		}
 	}
 	$db->free_result($topic_view_result);
 
@@ -433,7 +458,7 @@ function topTopicStarter()
 	$top_starters = array();
 
 	// Try to cache this when possible, because it's a little unavoidably slow.
-	if (!\ElkArte\Cache\Cache::instance()->getVar($members, 'stats_top_starters', 360) || empty($members))
+	if (!Cache::instance()->getVar($members, 'stats_top_starters', 360) || empty($members))
 	{
 		$request = $db->query('', '
 			SELECT id_member_started, COUNT(*) AS hits
@@ -445,17 +470,21 @@ function topTopicStarter()
 			)
 		);
 		while ($row = $db->fetch_row($request))
+		{
 			$members[$row[0]] = $row[1];
+		}
 		$db->free_result($request);
 		arsort($members);
 		$members = array_slice($members, 0, $modSettings['stats_limit'] ?? 10, true);
 
-		\ElkArte\Cache\Cache::instance()->put('stats_top_starters', $members, 360);
+		Cache::instance()->put('stats_top_starters', $members, 360);
 	}
 	$max_num_topics = max($members);
 
 	if (empty($members))
+	{
 		$members = array(0 => 0);
+	}
 
 	// Find the top starters of topics
 	$members_result = $db->query('7', '
@@ -506,7 +535,7 @@ function topTimeOnline()
 	$max_members = isset($modSettings['stats_limit']) ? $modSettings['stats_limit'] : 10;
 
 	// Do we have something cached that will help speed this up?
-	$temp = \ElkArte\Cache\Cache::instance()->get('stats_total_time_members', 600);
+	$temp = Cache::instance()->get('stats_total_time_members', 600);
 
 	// Get the member data, sorted by total time logged in
 	$members_result = $db->query('', '
@@ -527,7 +556,9 @@ function topTimeOnline()
 	{
 		$temp2[] = (int) $row_members['id_member'];
 		if (count($top_time_online) >= $max_members)
+		{
 			continue;
+		}
 
 		// Figure out the days, hours and minutes.
 		$timeDays = floor($row_members['total_time_logged_in'] / 86400);
@@ -536,10 +567,14 @@ function topTimeOnline()
 		// Figure out which things to show... (days, hours, minutes, etc.)
 		$timelogged = '';
 		if ($timeDays > 0)
+		{
 			$timelogged .= $timeDays . $txt['totalTimeLogged5'];
+		}
 
 		if ($timeHours > 0)
+		{
 			$timelogged .= $timeHours . $txt['totalTimeLogged6'];
+		}
 
 		$timelogged .= floor(($row_members['total_time_logged_in'] % 3600) / 60) . $txt['totalTimeLogged7'];
 
@@ -563,11 +598,15 @@ function topTimeOnline()
 
 	// As always percentages are next
 	foreach ($top_time_online as $i => $member)
+	{
 		$top_time_online[$i]['time_percent'] = round(($member['seconds_online'] * 100) / $max_time_online);
+	}
 
 	// Cache the ones we found for a bit, just so we don't have to look again.
 	if ($temp !== $temp2)
-		\ElkArte\Cache\Cache::instance()->put('stats_total_time_members', $temp2, 600);
+	{
+		Cache::instance()->put('stats_total_time_members', $temp2, 600);
+	}
 
 	return $top_time_online;
 }
@@ -597,6 +636,7 @@ function monthlyActivity()
 		$expanded = !empty($_SESSION['expanded_stats'][$row_months['stats_year']]) && in_array($row_months['stats_month'], $_SESSION['expanded_stats'][$row_months['stats_year']]);
 
 		if (!isset($context['yearly'][$row_months['stats_year']]))
+		{
 			$context['yearly'][$row_months['stats_year']] = array(
 				'year' => $row_months['stats_year'],
 				'new_topics' => 0,
@@ -609,6 +649,7 @@ function monthlyActivity()
 				'expanded' => false,
 				'current_year' => $row_months['stats_year'] == date('Y'),
 			);
+		}
 
 		$href = getUrl('action', ['action' => 'stats', ($expanded ? 'collapse' : 'expand') => $id_month]) . '#m' . $id_month;
 		$context['yearly'][$row_months['stats_year']]['months'][(int) $row_months['stats_month']] = array(
@@ -666,6 +707,7 @@ function getDailyStats($condition_string, $condition_parameters = array())
 		$condition_parameters
 	);
 	while ($row_days = $db->fetch_assoc($days_result))
+	{
 		$context['yearly'][$row_days['stats_year']]['months'][(int) $row_days['stats_month']]['days'][] = array(
 			'day' => sprintf('%02d', $row_days['stats_day']),
 			'month' => sprintf('%02d', $row_days['stats_month']),
@@ -676,6 +718,7 @@ function getDailyStats($condition_string, $condition_parameters = array())
 			'most_members_online' => comma_format($row_days['most_on']),
 			'hits' => comma_format($row_days['hits'])
 		);
+	}
 	$db->free_result($days_result);
 }
 
@@ -810,7 +853,7 @@ function UserStatsMostPostedBoard($memID, $limit = 10)
 	while ($row = $db->fetch_assoc($result))
 	{
 		$href = getUrl('board', ['board' => $row['id_board'], 'start' => '0', 'name' => $row['name']]);
-		$posts = \ElkArte\MembersList::get($memID)->posts;
+		$posts = MembersList::get($memID)->posts;
 		// Build the board details that this member is responsible for
 		$popular_boards[$row['id_board']] = array(
 			'id' => $row['id_board'],
@@ -924,7 +967,9 @@ function UserStatsPostingTime($memID)
 		$hour = (int) standardTime($poster_time, '%H');
 
 		if (!isset($hours[$hour]))
+		{
 			$hours[$hour] = 0;
+		}
 
 		$hours[$hour]++;
 	}

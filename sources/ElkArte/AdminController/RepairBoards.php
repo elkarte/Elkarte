@@ -8,7 +8,7 @@
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause (see accompanying LICENSE.txt file)
  *
  * This file contains code covered by:
- * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * copyright: 2011 Simple Machines (http://www.simplemachines.org)
  *
  * @version 2.0 dev
  *
@@ -16,11 +16,13 @@
 
 namespace ElkArte\AdminController;
 
+use ElkArte\AbstractController;
+
 /**
  * Repair boards controller handles a special admin action:
  * boards and categories attempt to repair, from maintenance.
  */
-class RepairBoards extends \ElkArte\AbstractController
+class RepairBoards extends AbstractController
 {
 	/**
 	 * Default method.
@@ -72,7 +74,9 @@ class RepairBoards extends \ElkArte\AbstractController
 
 		// Start displaying errors without fixing them.
 		if (isset($this->_req->query->fixErrors))
+		{
 			checkSession('get');
+		}
 
 		// Giant if/else. The first displays the forum errors if a variable is not set and asks
 		// if you would like to continue, the other fixes the errors.
@@ -96,7 +100,9 @@ class RepairBoards extends \ElkArte\AbstractController
 				$_SESSION['repairboards_to_fix2'] = null;
 
 				if (empty($context['repair_errors']))
+				{
 					$context['repair_errors'][] = '???';
+				}
 			}
 		}
 		else

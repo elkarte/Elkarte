@@ -9,7 +9,7 @@
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause (see accompanying LICENSE.txt file)
  *
  * This file contains code covered by:
- * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * copyright: 2011 Simple Machines (http://www.simplemachines.org)
  *
  * @version 2.0 dev
  *
@@ -17,6 +17,7 @@
 
 namespace ElkArte\VerificationControls;
 
+use ElkArte\Errors\ErrorContext;
 use ElkArte\Sessions\SessionIndex;
 
 /**
@@ -53,7 +54,7 @@ class VerificationControlsIntegrate
 	 * Create a anti-bot verification control?
 	 *
 	 * @param mixed[] $verificationOptions
-	 * @param bool    $do_test = false If we are validating the input to a verification control
+	 * @param bool $do_test = false If we are validating the input to a verification control
 	 *
 	 * @return array|bool
 	 * @throws \ElkArte\Exceptions\Exception no_access
@@ -77,7 +78,7 @@ class VerificationControlsIntegrate
 
 		if (!isset($all_instances[$verificationOptions['id']]))
 		{
-			$all_instances[$verificationOptions['id']] = new \ElkArte\VerificationControls\VerificationControls($sessionVal, $modSettings, $verificationOptions, $isNew, $force_refresh);
+			$all_instances[$verificationOptions['id']] = new VerificationControls($sessionVal, $modSettings, $verificationOptions, $isNew, $force_refresh);
 		}
 
 		$instances = &$all_instances[$verificationOptions['id']];
@@ -92,7 +93,7 @@ class VerificationControlsIntegrate
 			return true;
 		}
 
-		$verification_errors = \ElkArte\Errors\ErrorContext::context($verificationOptions['id']);
+		$verification_errors = ErrorContext::context($verificationOptions['id']);
 
 		// Start with any testing.
 		if ($do_test)

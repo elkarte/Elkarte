@@ -7,7 +7,7 @@
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause (see accompanying LICENSE.txt file)
  *
  * This file contains code covered by:
- * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * copyright: 2011 Simple Machines (http://www.simplemachines.org)
  *
  * @version 2.0 dev
  *
@@ -24,23 +24,23 @@ namespace BBC;
  */
 class Autolink
 {
-	/** @var Codes  */
+	/** @var Codes */
 	protected $bbc;
-	/** @var bool  */
+	/** @var bool */
 	protected $url_enabled;
-	/** @var bool  */
+	/** @var bool */
 	protected $email_enabled;
-	/** @var bool  */
+	/** @var bool */
 	protected $possible_link;
-	/** @var bool  */
+	/** @var bool */
 	protected $possible_email;
-	/** @var array of search regex for urls  */
+	/** @var array of search regex for urls */
 	protected $search;
-	/** @var array of bbc url coded links  */
+	/** @var array of bbc url coded links */
 	protected $replace;
-	/** @var array of search regex for email  */
+	/** @var array of search regex for email */
 	protected $email_search;
-	/** @var array of bbc email coded links  */
+	/** @var array of bbc email coded links */
 	protected $email_replace;
 
 	/**
@@ -180,6 +180,7 @@ class Autolink
 
 	/**
 	 * Validates if the data contains email address that need to be parsed
+	 *
 	 * @param string $data
 	 *
 	 * @return bool

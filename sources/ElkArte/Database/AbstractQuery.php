@@ -9,13 +9,17 @@
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause (see accompanying LICENSE.txt file)
  *
  * This file contains code covered by:
- * copyright:    2011 Simple Machines (http://www.simplemachines.org)
+ * copyright: 2011 Simple Machines (http://www.simplemachines.org)
  *
  * @version 2.0 dev
  *
  */
 
 namespace ElkArte\Database;
+
+use ElkArte\Debug;
+use ElkArte\Errors\Errors;
+use ElkArte\Exceptions\Exception;
 
 /**
  * Abstract database class, implements database to control functions
@@ -24,24 +28,28 @@ abstract class AbstractQuery implements QueryInterface
 {
 	/**
 	 * Current connection to the database
+	 *
 	 * @var \ElkArte\Database\ConnectionInterface
 	 */
 	protected $connection = null;
 
 	/**
 	 * Number of queries run (may include queries from $_SESSION if is a redirect)
+	 *
 	 * @var int
 	 */
 	protected $_query_count = 0;
 
 	/**
 	 * The way to skip a database error
+	 *
 	 * @var boolean
 	 */
 	protected $_skip_error = false;
 
 	/**
 	 * The tables prefix
+	 *
 	 * @var string
 	 */
 	protected $_db_prefix = '';
@@ -49,6 +57,7 @@ abstract class AbstractQuery implements QueryInterface
 	/**
 	 * String to match visible boards.
 	 * By default set to a false, so that unless it is set, nothing is returned.
+	 *
 	 * @var string
 	 */
 	protected $query_see_board = '1!=1';
@@ -56,6 +65,7 @@ abstract class AbstractQuery implements QueryInterface
 	/**
 	 * String to match boards the user want to see.
 	 * By default set to a false, so that unless it is set, nothing is returned.
+	 *
 	 * @var string
 	 */
 	protected $query_wanna_see_board = '1!=1';
@@ -63,12 +73,14 @@ abstract class AbstractQuery implements QueryInterface
 	/**
 	 * MySQL supports unbuffered queries, this remembers if we are running an
 	 * unbuffered or not
+	 *
 	 * @var boolean
 	 */
 	protected $_unbuffered = false;
 
 	/**
 	 * This holds the "values" used in the replacement__callback method
+	 *
 	 * @var array
 	 */
 	protected $_db_callback_values = array();
@@ -76,6 +88,7 @@ abstract class AbstractQuery implements QueryInterface
 	/**
 	 * Temporary variable to support the migration to the new db-layer
 	 * Ideally to be removed before 2.0 shipment
+	 *
 	 * @var \ElkArte\Database\AbstractResult
 	 */
 	protected $result = null;
@@ -83,6 +96,7 @@ abstract class AbstractQuery implements QueryInterface
 	/**
 	 * Comments that are allowed in a query are preg_removed.
 	 * These replacements happen in the query checks.
+	 *
 	 * @var string[]
 	 */
 	protected $allowed_comments = [
@@ -102,12 +116,14 @@ abstract class AbstractQuery implements QueryInterface
 
 	/**
 	 * Holds some values (time, file, line, delta) to debug performancs of the queries.
+	 *
 	 * @var mixed[]
 	 */
 	protected $db_cache = [];
 
 	/**
 	 * The debug object.
+	 *
 	 * @var \ElkArte\Debug
 	 */
 	protected $_debug = null;
@@ -128,14 +144,9 @@ abstract class AbstractQuery implements QueryInterface
 		// Debugging.
 		if ($db_show_debug === true)
 		{
-			$this->_debug = \ElkArte\Debug::instance();
+			$this->_debug = Debug::instance();
 		}
 	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	abstract public function query($identifier, $db_string, $db_values = array());
 
 	/**
 	 * {@inheritDoc}
@@ -168,6 +179,30 @@ abstract class AbstractQuery implements QueryInterface
 	}
 
 	/**
+	 * {@inheritDoc}
+	 */
+	public function quote($db_string, $db_values)
+	{
+		// Only bother if there's something to replace.
+		if (strpos($db_string, '{') !== false)
+		{
+			// This is needed by the callback function.
+			$this->_db_callback_values = $db_values;
+
+			// Do the quoting and escaping
+			$db_string = preg_replace_callback('~{([a-z_]+)(?::([\.a-zA-Z0-9_-]+))?}~',
+				function ($matches) {
+					return $this->replacement__callback($matches);
+				}, $db_string);
+
+			// Clear this variables.
+			$this->_db_callback_values = array();
+		}
+
+		return $db_string;
+	}
+
+	/**
 	 * Callback for preg_replace_callback on the query.
 	 * It allows to replace on the fly a few pre-defined strings, for
 	 * convenience ('query_see_board', 'query_wanna_see_board'), with
@@ -185,7 +220,7 @@ abstract class AbstractQuery implements QueryInterface
 		// Connection gone???  This should *never* happen at this point, yet it does :'(
 		if (!$this->validConnection())
 		{
-			\ElkArte\Errors\Errors::instance()->display_db_error('ElkArte\\Database\\AbstractQuery::replacement__callback');
+			Errors::instance()->display_db_error('ElkArte\\Database\\AbstractQuery::replacement__callback');
 		}
 
 		switch ($matches[1])
@@ -246,66 +281,78 @@ abstract class AbstractQuery implements QueryInterface
 	}
 
 	/**
+	 * Finds out if the connection is still valid.
+	 *
+	 * @return bool
+	 */
+	public function validConnection()
+	{
+		return (bool) $this->connection;
+	}
+
+	/**
+	 * Casts the column to LOWER(column_name) for replacement__callback.
+	 *
+	 * @param mixed $replacement
+	 * @return string
+	 */
+	protected function _replaceColumnCaseInsensitive($replacement)
+	{
+		return 'LOWER(' . $replacement . ')';
+	}
+
+	/**
 	 * {@inheritDoc}
 	 */
-	public function quote($db_string, $db_values)
+	public function error_backtrace($error_message, $log_message = '', $error_type = false, $file = null, $line = null)
 	{
-		// Only bother if there's something to replace.
-		if (strpos($db_string, '{') !== false)
+		if (empty($log_message))
 		{
-			// This is needed by the callback function.
-			$this->_db_callback_values = $db_values;
-
-			// Do the quoting and escaping
-			$db_string = preg_replace_callback('~{([a-z_]+)(?::([\.a-zA-Z0-9_-]+))?}~',
-				function ($matches) {
-					return $this->replacement__callback($matches);
-				}, $db_string);
-
-			// Clear this variables.
-			$this->_db_callback_values = array();
+			$log_message = $error_message;
 		}
 
-		return $db_string;
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	public function fetchQuery($db_string, $db_values = array())
-	{
-		return $this->query('', $db_string, $db_values);
-	}
-
-	/**
-	 * This function combines the keys and values of the data passed to db::insert.
-	 *
-	 * @param integer[] $keys
-	 * @param mixed[] $values
-	 * @return mixed[]
-	 */
-	protected function _array_combine($keys, $values)
-	{
-		$is_numeric = array_filter(array_keys($values), 'is_numeric');
-
-		if (!empty($is_numeric))
+		foreach (debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS) as $step)
 		{
-			return array_combine($keys, $values);
+			// Found it?
+			if (!method_exists($this, $step['function']) && !in_array(substr($step['function'], 0, 7), array('elk_db_', 'preg_re', 'db_erro', 'call_us')))
+			{
+				$log_message .= '<br />Function: ' . $step['function'];
+				break;
+			}
+
+			if (isset($step['line']))
+			{
+				$file = $step['file'];
+				$line = $step['line'];
+			}
+		}
+
+		// A special case - we want the file and line numbers for debugging.
+		if ($error_type == 'return')
+		{
+			return array($file, $line);
+		}
+
+		// Is always a critical error.
+		if (class_exists('\\ElkArte\\Errors\\Errors'))
+		{
+			Errors::instance()->log_error($log_message, 'critical', $file, $line);
+		}
+
+		if (class_exists('\\ElkArte\\Exceptions\\Exception'))
+		{
+			throw new Exception([false, $error_message], false);
+		}
+		elseif ($error_type)
+		{
+			trigger_error($error_message . ($line !== null ? '<em>(' . basename($file) . '-' . $line . ')</em>' : ''), $error_type);
 		}
 		else
 		{
-			$combined = array();
-			foreach ($keys as $key)
-			{
-				if (isset($values[$key]))
-				{
-					$combined[$key] = $values[$key];
-				}
-			}
-
-			// @todo should throw an E_WARNING if count($combined) != count($keys)
-			return $combined;
+			trigger_error($error_message . ($line !== null ? '<em>(' . basename($file) . '-' . $line . ')</em>' : ''));
 		}
+
+		return array('', '');
 	}
 
 	/**
@@ -324,6 +371,49 @@ abstract class AbstractQuery implements QueryInterface
 		}
 
 		return (string) (int) $replacement;
+	}
+
+	/**
+	 * Casts values to string for replacement__callback.
+	 *
+	 * @param mixed $replacement
+	 * @return string
+	 */
+	protected function _replaceString($replacement)
+	{
+		return sprintf('\'%1$s\'', $this->escape_string($replacement));
+	}
+
+	/**
+	 * Escape string for the database input
+	 *
+	 * @param string $string
+	 *
+	 * @return string
+	 */
+	abstract public function escape_string($string);
+
+	/**
+	 * Casts values to string for replacement__callback and in the DBMS that
+	 * require this solution makes it so that the comparison will be case sensitive.
+	 *
+	 * @param mixed $replacement
+	 * @return string
+	 */
+	protected function _replaceStringCaseSensitive($replacement)
+	{
+		return $this->_replaceString($replacement);
+	}
+
+	/**
+	 * Casts values to LOWER(string) for replacement__callback.
+	 *
+	 * @param mixed $replacement
+	 * @return string
+	 */
+	protected function _replaceStringCaseInsensitive($replacement)
+	{
+		return 'LOWER(' . $this->_replaceString($replacement) . ')';
 	}
 
 	/**
@@ -359,51 +449,6 @@ abstract class AbstractQuery implements QueryInterface
 		{
 			$this->error_backtrace('Wrong value type sent to the database. Array of integers expected. (' . $identifier . ')', '', E_USER_ERROR, __FILE__, __LINE__);
 		}
-	}
-
-	/**
-	 * Casts values to string for replacement__callback.
-	 *
-	 * @param mixed $replacement
-	 * @return string
-	 */
-	protected function _replaceString($replacement)
-	{
-		return sprintf('\'%1$s\'', $this->escape_string($replacement));
-	}
-
-	/**
-	 * Casts values to string for replacement__callback and in the DBMS that
-	 * require this solution makes it so that the comparison will be case sensitive.
-	 *
-	 * @param mixed $replacement
-	 * @return string
-	 */
-	protected function _replaceStringCaseSensitive($replacement)
-	{
-		return $this->_replaceString($replacement);
-	}
-
-	/**
-	 * Casts values to LOWER(string) for replacement__callback.
-	 *
-	 * @param mixed $replacement
-	 * @return string
-	 */
-	protected function _replaceStringCaseInsensitive($replacement)
-	{
-		return 'LOWER(' . $this->_replaceString($replacement) . ')';
-	}
-
-	/**
-	 * Casts the column to LOWER(column_name) for replacement__callback.
-	 *
-	 * @param mixed $replacement
-	 * @return string
-	 */
-	protected function _replaceColumnCaseInsensitive($replacement)
-	{
-		return 'LOWER(' . $replacement . ')';
 	}
 
 	/**
@@ -523,169 +568,17 @@ abstract class AbstractQuery implements QueryInterface
 	}
 
 	/**
-	 * Checks for "illegal characters" and runs replacement__callback if not
-	 * overriden.
-	 * In case of problems, the method can ends up dying.
-	 *
-	 * @param string $db_string
-	 * @param mixed $db_values
-	 * @return string
-	 * @throws \ElkArte\Exceptions\Exception
+	 * {@inheritDoc}
 	 */
-	protected function _prepareQuery($db_string, $db_values)
+	public function fetchQuery($db_string, $db_values = array())
 	{
-		global $modSettings;
-
-		if (empty($modSettings['disableQueryCheck']) && strpos($db_string, '\'') !== false && empty($db_values['security_override']))
-		{
-			$this->error_backtrace('Hacking attempt...', 'Illegal character (\') used in query...', true, __FILE__, __LINE__);
-		}
-
-		if (empty($db_values['security_override']) && (!empty($db_values) || strpos($db_string, '{db_prefix}') !== false))
-		{
-			// Store these values for use in the callback function.
-			$this->_db_callback_values = $db_values;
-
-			// Inject the values passed to this function.
-			$count = -1;
-			while (($count > 0 && isset($db_values['recursive'])) || $count === -1)
-			{
-				$db_string = preg_replace_callback('~{([a-z_]+)(?::([\.a-zA-Z0-9_-]+))?}~',
-					function ($matches) {
-						return $this->replacement__callback($matches);
-					}, $db_string, -1, $count);
-			}
-
-			// No need for them any longer.
-			$this->_db_callback_values = array();
-		}
-
-		return $db_string;
+		return $this->query('', $db_string, $db_values);
 	}
 
 	/**
-	 * Tracks the initial status (time, file/line, query) for performance evaluation.
-	 *
-	 * @param string $db_string
-	 * @throws \ElkArte\Exceptions\Exception
+	 * {@inheritDoc}
 	 */
-	protected function _preQueryDebug($db_string)
-	{
-		global $db_show_debug, $time_start;
-
-		// Debugging.
-		if ($db_show_debug === true)
-		{
-			// Get the file and line number this function was called.
-			list ($file, $line) = $this->error_backtrace('', '', 'return', __FILE__, __LINE__);
-
-			if (!empty($_SESSION['debug_redirect']))
-			{
-				$this->_debug->merge_db($_SESSION['debug_redirect']);
-				// @todo this may be off by 1
-				$this->_query_count += count($_SESSION['debug_redirect']);
-				$_SESSION['debug_redirect'] = array();
-			}
-
-			// Don't overload it.
-			$st = microtime(true);
-			$this->db_cache = [];
-			$this->db_cache['q'] = $this->_query_count < 50 ? $db_string : '...';
-			$this->db_cache['f'] = $file;
-			$this->db_cache['l'] = $line;
-			$this->db_cache['s'] = $st - $time_start;
-			$this->db_cache['st'] = $st;
-		}
-	}
-
-	/**
-	 * Closes up the tracking and stores everything in the debug class.
-	 */
-	protected function _postQueryDebug()
-	{
-		global $db_show_debug;
-
-		if ($db_show_debug === true)
-		{
-			$this->db_cache['t'] = microtime(true) - $this->db_cache['st'];
-			$this->_debug->db_query($this->db_cache);
-			$this->db_cache = [];
-		}
-	}
-
-	/**
-	 * Checks the query doesn't have nasty stuff in it.
-	 * In case of problems, the method can ends up dying.
-	 *
-	 * @param string $db_string
-	 * @param string $escape_char
-	 * @throws \ElkArte\Exceptions\Exception
-	 */
-	protected function _doSanityCheck($db_string, $escape_char)
-	{
-		global $modSettings;
-
-		// First, we clean strings out of the query, reduce whitespace, lowercase, and trim - so we can check it over.
-		$clean = '';
-		if (empty($modSettings['disableQueryCheck']))
-		{
-			$old_pos = 0;
-			$pos = -1;
-			while (true)
-			{
-				$pos = strpos($db_string, '\'', $pos + 1);
-				if ($pos === false)
-				{
-					break;
-				}
-				$clean .= substr($db_string, $old_pos, $pos - $old_pos);
-
-				while (true)
-				{
-					$pos1 = strpos($db_string, '\'', $pos + 1);
-					$pos2 = strpos($db_string, $escape_char, $pos + 1);
-
-					if ($pos1 === false)
-					{
-						break;
-					}
-					elseif ($pos2 === false || $pos2 > $pos1)
-					{
-						$pos = $pos1;
-						break;
-					}
-
-					$pos = $pos2 + 1;
-				}
-
-				$clean .= ' %s ';
-				$old_pos = $pos + 1;
-			}
-
-			$clean .= substr($db_string, $old_pos);
-			$clean = trim(strtolower(preg_replace($this->allowed_comments['from'], $this->allowed_comments['to'], $clean)));
-
-			// Comments?  We don't use comments in our queries, we leave 'em outside!
-			if (strpos($clean, '/*') > 2 || strpos($clean, '--') !== false || strpos($clean, ';') !== false)
-			{
-				$fail = true;
-			}
-			// Trying to change passwords, slow us down, or something?
-			elseif (strpos($clean, 'sleep') !== false && preg_match('~(^|[^a-z])sleep($|[^[_a-z])~s', $clean) != 0)
-			{
-				$fail = true;
-			}
-			elseif (strpos($clean, 'benchmark') !== false && preg_match('~(^|[^a-z])benchmark($|[^[a-z])~s', $clean) != 0)
-			{
-				$fail = true;
-			}
-
-			if (!empty($fail) && class_exists('\\ElkArte\\Errors\\Errors'))
-			{
-				$this->error_backtrace('Hacking attempt...', 'Hacking attempt...' . "\n" . $db_string, E_USER_ERROR, __FILE__, __LINE__);
-			}
-		}
-	}
+	abstract public function query($identifier, $db_string, $db_values = array());
 
 	/**
 	 * {@inheritDoc}
@@ -696,60 +589,6 @@ abstract class AbstractQuery implements QueryInterface
 	 * {@inheritDoc}
 	 */
 	abstract public function insert($method = 'replace', $table, $columns, $data, $keys, $disable_trans = false);
-
-	/**
-	 * {@inheritDoc}
-	 */
-	public function error_backtrace($error_message, $log_message = '', $error_type = false, $file = null, $line = null)
-	{
-		if (empty($log_message))
-		{
-			$log_message = $error_message;
-		}
-
-		foreach (debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS) as $step)
-		{
-			// Found it?
-			if (!method_exists($this, $step['function']) && !in_array(substr($step['function'], 0, 7), array('elk_db_', 'preg_re', 'db_erro', 'call_us')))
-			{
-				$log_message .= '<br />Function: ' . $step['function'];
-				break;
-			}
-
-			if (isset($step['line']))
-			{
-				$file = $step['file'];
-				$line = $step['line'];
-			}
-		}
-
-		// A special case - we want the file and line numbers for debugging.
-		if ($error_type == 'return')
-		{
-			return array($file, $line);
-		}
-
-		// Is always a critical error.
-		if (class_exists('\\ElkArte\\Errors\\Errors'))
-		{
-			\ElkArte\Errors\Errors::instance()->log_error($log_message, 'critical', $file, $line);
-		}
-
-		if (class_exists('\\ElkArte\\Exceptions\\Exception'))
-		{
-			throw new \ElkArte\Exceptions\Exception([false, $error_message], false);
-		}
-		elseif ($error_type)
-		{
-			trigger_error($error_message . ($line !== null ? '<em>(' . basename($file) . '-' . $line . ')</em>' : ''), $error_type);
-		}
-		else
-		{
-			trigger_error($error_message . ($line !== null ? '<em>(' . basename($file) . '-' . $line . ')</em>' : ''));
-		}
-
-		return array('', '');
-	}
 
 	/**
 	 * {@inheritDoc}
@@ -808,16 +647,6 @@ abstract class AbstractQuery implements QueryInterface
 	}
 
 	/**
-	 * Finds out if the connection is still valid.
-	 *
-	 * @return bool
-	 */
-	public function validConnection()
-	{
-		return (bool) $this->connection;
-	}
-
-	/**
 	 *  Get the version number.
 	 *
 	 * @return string - the version
@@ -831,15 +660,6 @@ abstract class AbstractQuery implements QueryInterface
 	 * @return string
 	 */
 	abstract public function server_info();
-
-	/**
-	 * Escape string for the database input
-	 *
-	 * @param string $string
-	 *
-	 * @return string
-	 */
-	abstract public function escape_string($string);
 
 	/**
 	 * Whether the database system is case sensitive.
@@ -1010,4 +830,200 @@ abstract class AbstractQuery implements QueryInterface
 	 * @deprecated since 2.0
 	 */
 	abstract public function list_tables($db_name_str = false, $filter = false);
+
+	/**
+	 * This function combines the keys and values of the data passed to db::insert.
+	 *
+	 * @param integer[] $keys
+	 * @param mixed[] $values
+	 * @return mixed[]
+	 */
+	protected function _array_combine($keys, $values)
+	{
+		$is_numeric = array_filter(array_keys($values), 'is_numeric');
+
+		if (!empty($is_numeric))
+		{
+			return array_combine($keys, $values);
+		}
+		else
+		{
+			$combined = array();
+			foreach ($keys as $key)
+			{
+				if (isset($values[$key]))
+				{
+					$combined[$key] = $values[$key];
+				}
+			}
+
+			// @todo should throw an E_WARNING if count($combined) != count($keys)
+			return $combined;
+		}
+	}
+
+	/**
+	 * Checks for "illegal characters" and runs replacement__callback if not
+	 * overriden.
+	 * In case of problems, the method can ends up dying.
+	 *
+	 * @param string $db_string
+	 * @param mixed $db_values
+	 * @return string
+	 * @throws \ElkArte\Exceptions\Exception
+	 */
+	protected function _prepareQuery($db_string, $db_values)
+	{
+		global $modSettings;
+
+		if (empty($modSettings['disableQueryCheck']) && strpos($db_string, '\'') !== false && empty($db_values['security_override']))
+		{
+			$this->error_backtrace('Hacking attempt...', 'Illegal character (\') used in query...', true, __FILE__, __LINE__);
+		}
+
+		if (empty($db_values['security_override']) && (!empty($db_values) || strpos($db_string, '{db_prefix}') !== false))
+		{
+			// Store these values for use in the callback function.
+			$this->_db_callback_values = $db_values;
+
+			// Inject the values passed to this function.
+			$count = -1;
+			while (($count > 0 && isset($db_values['recursive'])) || $count === -1)
+			{
+				$db_string = preg_replace_callback('~{([a-z_]+)(?::([\.a-zA-Z0-9_-]+))?}~',
+					function ($matches) {
+						return $this->replacement__callback($matches);
+					}, $db_string, -1, $count);
+			}
+
+			// No need for them any longer.
+			$this->_db_callback_values = array();
+		}
+
+		return $db_string;
+	}
+
+	/**
+	 * Tracks the initial status (time, file/line, query) for performance evaluation.
+	 *
+	 * @param string $db_string
+	 * @throws \ElkArte\Exceptions\Exception
+	 */
+	protected function _preQueryDebug($db_string)
+	{
+		global $db_show_debug, $time_start;
+
+		// Debugging.
+		if ($db_show_debug === true)
+		{
+			// Get the file and line number this function was called.
+			list ($file, $line) = $this->error_backtrace('', '', 'return', __FILE__, __LINE__);
+
+			if (!empty($_SESSION['debug_redirect']))
+			{
+				$this->_debug->merge_db($_SESSION['debug_redirect']);
+				// @todo this may be off by 1
+				$this->_query_count += count($_SESSION['debug_redirect']);
+				$_SESSION['debug_redirect'] = array();
+			}
+
+			// Don't overload it.
+			$st = microtime(true);
+			$this->db_cache = [];
+			$this->db_cache['q'] = $this->_query_count < 50 ? $db_string : '...';
+			$this->db_cache['f'] = $file;
+			$this->db_cache['l'] = $line;
+			$this->db_cache['s'] = $st - $time_start;
+			$this->db_cache['st'] = $st;
+		}
+	}
+
+	/**
+	 * Closes up the tracking and stores everything in the debug class.
+	 */
+	protected function _postQueryDebug()
+	{
+		global $db_show_debug;
+
+		if ($db_show_debug === true)
+		{
+			$this->db_cache['t'] = microtime(true) - $this->db_cache['st'];
+			$this->_debug->db_query($this->db_cache);
+			$this->db_cache = [];
+		}
+	}
+
+	/**
+	 * Checks the query doesn't have nasty stuff in it.
+	 * In case of problems, the method can ends up dying.
+	 *
+	 * @param string $db_string
+	 * @param string $escape_char
+	 * @throws \ElkArte\Exceptions\Exception
+	 */
+	protected function _doSanityCheck($db_string, $escape_char)
+	{
+		global $modSettings;
+
+		// First, we clean strings out of the query, reduce whitespace, lowercase, and trim - so we can check it over.
+		$clean = '';
+		if (empty($modSettings['disableQueryCheck']))
+		{
+			$old_pos = 0;
+			$pos = -1;
+			while (true)
+			{
+				$pos = strpos($db_string, '\'', $pos + 1);
+				if ($pos === false)
+				{
+					break;
+				}
+				$clean .= substr($db_string, $old_pos, $pos - $old_pos);
+
+				while (true)
+				{
+					$pos1 = strpos($db_string, '\'', $pos + 1);
+					$pos2 = strpos($db_string, $escape_char, $pos + 1);
+
+					if ($pos1 === false)
+					{
+						break;
+					}
+					elseif ($pos2 === false || $pos2 > $pos1)
+					{
+						$pos = $pos1;
+						break;
+					}
+
+					$pos = $pos2 + 1;
+				}
+
+				$clean .= ' %s ';
+				$old_pos = $pos + 1;
+			}
+
+			$clean .= substr($db_string, $old_pos);
+			$clean = trim(strtolower(preg_replace($this->allowed_comments['from'], $this->allowed_comments['to'], $clean)));
+
+			// Comments?  We don't use comments in our queries, we leave 'em outside!
+			if (strpos($clean, '/*') > 2 || strpos($clean, '--') !== false || strpos($clean, ';') !== false)
+			{
+				$fail = true;
+			}
+			// Trying to change passwords, slow us down, or something?
+			elseif (strpos($clean, 'sleep') !== false && preg_match('~(^|[^a-z])sleep($|[^[_a-z])~s', $clean) != 0)
+			{
+				$fail = true;
+			}
+			elseif (strpos($clean, 'benchmark') !== false && preg_match('~(^|[^a-z])benchmark($|[^[a-z])~s', $clean) != 0)
+			{
+				$fail = true;
+			}
+
+			if (!empty($fail) && class_exists('\\ElkArte\\Errors\\Errors'))
+			{
+				$this->error_backtrace('Hacking attempt...', 'Hacking attempt...' . "\n" . $db_string, E_USER_ERROR, __FILE__, __LINE__);
+			}
+		}
+	}
 }

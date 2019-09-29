@@ -13,12 +13,15 @@
 
 namespace ElkArte\Modules\Mentions;
 
+use ElkArte\EventManager;
+use ElkArte\Modules\AbstractModule;
+
 /**
  * Class \ElkArte\Modules\Mentions\AbstractMentions
  *
  * @package Mentions
  */
-abstract class AbstractMentions extends \ElkArte\Modules\AbstractModule
+abstract class AbstractMentions extends AbstractModule
 {
 	/**
 	 * Based on the $action returns the enabled mention types to register to the
@@ -28,7 +31,7 @@ abstract class AbstractMentions extends \ElkArte\Modules\AbstractModule
 	 * @param \ElkArte\EventManager $eventsManager
 	 * @global $modSettings
 	 */
-	protected static function registerHooks($action, \ElkArte\EventManager $eventsManager)
+	protected static function registerHooks($action, EventManager $eventsManager)
 	{
 		global $modSettings;
 

@@ -8,7 +8,7 @@
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause (see accompanying LICENSE.txt file)
  *
  * This file contains code covered by:
- * copyright:    2011 Simple Machines (http://www.simplemachines.org)
+ * copyright: 2011 Simple Machines (http://www.simplemachines.org)
  *
  * @version 2.0 dev
  *
@@ -16,11 +16,14 @@
 
 namespace ElkArte\Controller;
 
+use ElkArte\AbstractController;
+use ElkArte\Util;
+
 /**
  *
  * Handles the initialization pspell and spellchecker processing
  */
-class Spellcheck extends \ElkArte\AbstractController
+class Spellcheck extends AbstractController
 {
 	/**
 	 * Known words that pspell will not now
@@ -45,6 +48,7 @@ class Spellcheck extends \ElkArte\AbstractController
 
 	/**
 	 * List of words that will be spell checked, word|offset_begin|offset_end
+	 *
 	 * @var string[]
 	 */
 	private $_alphas;
@@ -132,7 +136,7 @@ class Spellcheck extends \ElkArte\AbstractController
 			$check_word = explode('|', $alpha);
 
 			// If the word is a known word, or spelled right...
-			if (in_array(\ElkArte\Util::strtolower($check_word[0]), $this->known_words) || pspell_check($this->pspell_link, $check_word[0]) || !isset($check_word[2]))
+			if (in_array(Util::strtolower($check_word[0]), $this->known_words) || pspell_check($this->pspell_link, $check_word[0]) || !isset($check_word[2]))
 			{
 				continue;
 			}

@@ -8,7 +8,7 @@
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause (see accompanying LICENSE.txt file)
  *
  * This file contains code covered by:
- * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * copyright: 2011 Simple Machines (http://www.simplemachines.org)
  *
  * @version 2.0 dev
  *
@@ -16,31 +16,39 @@
 
 namespace ElkArte\Controller;
 
+use ElkArte\AbstractController;
+use ElkArte\Exceptions\Exception;
+use ElkArte\Util;
+
 /**
  * Move Topic Controller
  */
-class MoveTopic extends \ElkArte\AbstractController
+class MoveTopic extends AbstractController
 {
 	/**
 	 * The id of the topic being manipulated
+	 *
 	 * @var int
 	 */
 	private $_topic;
 
 	/**
 	 * Information about the topic being moved
+	 *
 	 * @var array
 	 */
 	private $_topic_info;
 
 	/**
 	 * Information about the board where the topic resides
+	 *
 	 * @var array
 	 */
 	private $_board_info;
 
 	/**
 	 * Board that will receive the topic
+	 *
 	 * @var int
 	 */
 	private $_toboard;
@@ -92,7 +100,9 @@ class MoveTopic extends \ElkArte\AbstractController
 
 		// No boards?
 		if (empty($context['categories']) || $context['num_boards'] == 1)
-			throw new \ElkArte\Exceptions\Exception('moveto_noboards', false);
+		{
+			throw new Exception('moveto_noboards', false);
+		}
 
 		// Already used the function, let's set the selected board back to the last
 		$last_moved_to = isset($_SESSION['move_to_topic']['move_to']) && $_SESSION['move_to_topic']['move_to'] != $context['current_board'] ? (int) $_SESSION['move_to_topic']['move_to'] : 0;
@@ -114,65 +124,44 @@ class MoveTopic extends \ElkArte\AbstractController
 	}
 
 	/**
-	 * Executes the actual move of a topic.
+	 * Validates that the member can access the topic
 	 *
 	 * What it does:
 	 *
-	 * - It is called on the submit of action_movetopic.
-	 * - This function logs that topics have been moved in the moderation log.
-	 * - Upon successful completion redirects to message index.
-	 * - Accessed via ?action=movetopic2.
-	 *
-	 * @uses subs/Post.subs.php.
+	 * - Checks that a topic is supplied
+	 * - Validates the topic information can be loaded
+	 * - If the topic is not approved yet, must have approve permissions to move it
+	 * - If the member is the topic starter requires the move_own permission, otherwise the move_any permission.
 	 */
-	public function action_movetopic2()
+	private function _check_access()
 	{
-		global $board;
+		global $modSettings;
 
-		$this->_check_access_2();
+		if (empty($this->_topic))
+		{
+			throw new Exception('no_access', false);
+		}
 
-		checkSession();
-		require_once(SUBSDIR . '/Post.subs.php');
-		require_once(SUBSDIR . '/Boards.subs.php');
+		// Retrieve the basic topic information for whats being moved
+		require_once(SUBSDIR . '/Topic.subs.php');
+		$this->_topic_info = getTopicInfo($this->_topic, 'message');
 
-		// The destination board must be numeric.
-		$this->_toboard = (int) $this->_req->post->toboard;
+		if (empty($this->_topic_info))
+		{
+			throw new Exception('topic_gone', false);
+		}
 
-		// Make sure they can see the board they are trying to move to (and get whether posts count in the target board).
-		$this->_board_info = boardInfo($this->_toboard, $this->_topic);
-		if (empty($this->_board_info))
-			throw new \ElkArte\Exceptions\Exception('no_board');
+		// Can they see it - if not approved?
+		if ($modSettings['postmod_active'] && !$this->_topic_info['approved'])
+		{
+			isAllowedTo('approve_posts');
+		}
 
-		// Remember this for later.
-		$_SESSION['move_to_topic'] = array(
-			'move_to' => $this->_toboard
-		);
-
-		// Rename the topic if needed
-		$this->_rename_topic();
-
-		// Create a link to this in the old board.
-		$this->_post_redirect();
-
-		// Account for boards that count posts and those that don't
-		$this->_count_update();
-
-		// Do the move (includes statistics update needed for the redirect topic).
-		moveTopics($this->_topic, $this->_toboard);
-
-		// Log that they moved this topic.
-		if (!allowedTo('move_own') || $this->_topic_info['id_member_started'] != $this->user->id)
-			logAction('move', array('topic' => $this->_topic, 'board_from' => $board, 'board_to' => $this->_toboard));
-
-		// Notify people that this topic has been moved?
-		require_once(SUBSDIR . '/Notification.subs.php');
-		sendNotifications($this->_topic, 'move');
-
-		// Why not go back to the original board in case they want to keep moving?
-		if (!isset($this->_req->post->goback))
-			redirectexit('board=' . $board . '.0');
-		else
-			redirectexit('topic=' . $this->_topic . '.0');
+		// Are they allowed to actually move any topics or even their own?
+		if (!allowedTo('move_any') && ($this->_topic_info['id_member_started'] == $this->user->id && !allowedTo('move_own')))
+		{
+			throw new Exception('cannot_move_any', false);
+		}
 	}
 
 	/**
@@ -221,36 +210,73 @@ class MoveTopic extends \ElkArte\AbstractController
 	}
 
 	/**
-	 * Validates that the member can access the topic
+	 * Executes the actual move of a topic.
 	 *
 	 * What it does:
 	 *
-	 * - Checks that a topic is supplied
-	 * - Validates the topic information can be loaded
-	 * - If the topic is not approved yet, must have approve permissions to move it
-	 * - If the member is the topic starter requires the move_own permission, otherwise the move_any permission.
+	 * - It is called on the submit of action_movetopic.
+	 * - This function logs that topics have been moved in the moderation log.
+	 * - Upon successful completion redirects to message index.
+	 * - Accessed via ?action=movetopic2.
+	 *
+	 * @uses subs/Post.subs.php.
 	 */
-	private function _check_access()
+	public function action_movetopic2()
 	{
-		global $modSettings;
+		global $board;
 
-		if (empty($this->_topic))
-			throw new \ElkArte\Exceptions\Exception('no_access', false);
+		$this->_check_access_2();
 
-		// Retrieve the basic topic information for whats being moved
-		require_once(SUBSDIR . '/Topic.subs.php');
-		$this->_topic_info = getTopicInfo($this->_topic, 'message');
+		checkSession();
+		require_once(SUBSDIR . '/Post.subs.php');
+		require_once(SUBSDIR . '/Boards.subs.php');
 
-		if (empty($this->_topic_info))
-			throw new \ElkArte\Exceptions\Exception('topic_gone', false);
+		// The destination board must be numeric.
+		$this->_toboard = (int) $this->_req->post->toboard;
 
-		// Can they see it - if not approved?
-		if ($modSettings['postmod_active'] && !$this->_topic_info['approved'])
-			isAllowedTo('approve_posts');
+		// Make sure they can see the board they are trying to move to (and get whether posts count in the target board).
+		$this->_board_info = boardInfo($this->_toboard, $this->_topic);
+		if (empty($this->_board_info))
+		{
+			throw new Exception('no_board');
+		}
 
-		// Are they allowed to actually move any topics or even their own?
-		if (!allowedTo('move_any') && ($this->_topic_info['id_member_started'] == $this->user->id && !allowedTo('move_own')))
-			throw new \ElkArte\Exceptions\Exception('cannot_move_any', false);
+		// Remember this for later.
+		$_SESSION['move_to_topic'] = array(
+			'move_to' => $this->_toboard
+		);
+
+		// Rename the topic if needed
+		$this->_rename_topic();
+
+		// Create a link to this in the old board.
+		$this->_post_redirect();
+
+		// Account for boards that count posts and those that don't
+		$this->_count_update();
+
+		// Do the move (includes statistics update needed for the redirect topic).
+		moveTopics($this->_topic, $this->_toboard);
+
+		// Log that they moved this topic.
+		if (!allowedTo('move_own') || $this->_topic_info['id_member_started'] != $this->user->id)
+		{
+			logAction('move', array('topic' => $this->_topic, 'board_from' => $board, 'board_to' => $this->_toboard));
+		}
+
+		// Notify people that this topic has been moved?
+		require_once(SUBSDIR . '/Notification.subs.php');
+		sendNotifications($this->_topic, 'move');
+
+		// Why not go back to the original board in case they want to keep moving?
+		if (!isset($this->_req->post->goback))
+		{
+			redirectexit('board=' . $board . '.0');
+		}
+		else
+		{
+			redirectexit('topic=' . $this->_topic . '.0');
+		}
 	}
 
 	/**
@@ -271,15 +297,21 @@ class MoveTopic extends \ElkArte\AbstractController
 		global $board;
 
 		if (empty($this->_topic))
-			throw new \ElkArte\Exceptions\Exception('no_access', false);
+		{
+			throw new Exception('no_access', false);
+		}
 
 		// You can't choose to have a redirection topic and not provide a reason.
 		if (isset($this->_req->post->postRedirect) && $this->_req->getPost('reason', 'trim', '') === '')
-			throw new \ElkArte\Exceptions\Exception('movetopic_no_reason', false);
+		{
+			throw new Exception('movetopic_no_reason', false);
+		}
 
 		// You have to tell us were you are moving to
 		if (!isset($this->_req->post->toboard))
-			throw new \ElkArte\Exceptions\Exception('movetopic_no_board', false);
+		{
+			throw new Exception('movetopic_no_board', false);
+		}
 
 		// We will need this
 		require_once(SUBSDIR . '/Topic.subs.php');
@@ -296,7 +328,9 @@ class MoveTopic extends \ElkArte\AbstractController
 
 		// Not approved then you need approval permissions to move it as well
 		if (!$this->_topic_info['approved'])
+		{
 			isAllowedTo('approve_posts');
+		}
 
 		// Can they move topics on this board?
 		if (!allowedTo('move_any'))
@@ -329,11 +363,13 @@ class MoveTopic extends \ElkArte\AbstractController
 		// Rename the topic...
 		if (isset($this->_req->post->reset_subject, $this->_req->post->custom_subject) && $this->_req->post->custom_subject != '')
 		{
-			$custom_subject = strtr(\ElkArte\Util::htmltrim(\ElkArte\Util::htmlspecialchars($this->_req->post->custom_subject)), array("\r" => '', "\n" => '', "\t" => ''));
+			$custom_subject = strtr(Util::htmltrim(Util::htmlspecialchars($this->_req->post->custom_subject)), array("\r" => '', "\n" => '', "\t" => ''));
 
 			// Keep checking the length.
-			if (\ElkArte\Util::strlen($custom_subject) > 100)
-				$custom_subject = \ElkArte\Util::substr($custom_subject, 0, 100);
+			if (Util::strlen($custom_subject) > 100)
+			{
+				$custom_subject = Util::substr($custom_subject, 0, 100);
+			}
 
 			// If it's still valid move onwards and upwards.
 			if ($custom_subject !== '')
@@ -347,7 +383,9 @@ class MoveTopic extends \ElkArte\AbstractController
 					topicSubject($this->_topic_info, $custom_subject, $context['response_prefix'], $all_messages);
 				}
 				else
+				{
 					topicSubject($this->_topic_info, $custom_subject);
+				}
 
 				// Fix the subject cache.
 				require_once(SUBSDIR . '/Messages.subs.php');
@@ -377,7 +415,7 @@ class MoveTopic extends \ElkArte\AbstractController
 				theme()->getTemplates()->loadLanguageFile('index', $language);
 			}
 
-			$reason = \ElkArte\Util::htmlspecialchars($this->_req->post->reason, ENT_QUOTES);
+			$reason = Util::htmlspecialchars($this->_req->post->reason, ENT_QUOTES);
 			preparsecode($reason);
 
 			// Add a URL onto the message.
@@ -440,10 +478,14 @@ class MoveTopic extends \ElkArte\AbstractController
 			{
 				// The board we're moving from counted posts, but not to.
 				if (empty($board_from['count_posts']))
+				{
 					updateMemberData($id_member, array('posts' => 'posts - ' . $posts));
+				}
 				// The reverse: from didn't, to did.
 				else
+				{
 					updateMemberData($id_member, array('posts' => 'posts + ' . $posts));
+				}
 			}
 		}
 	}

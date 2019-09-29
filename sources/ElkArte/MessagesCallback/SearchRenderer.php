@@ -9,7 +9,7 @@
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause (see accompanying LICENSE.txt file)
  *
  * This file contains code covered by:
- * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * copyright: 2011 Simple Machines (http://www.simplemachines.org)
  *
  * @version 2.0 dev
  *
@@ -17,8 +17,11 @@
 
 namespace ElkArte\MessagesCallback;
 
-use \ElkArte\MessagesCallback\BodyParser\BodyParserInterface;
-use \ElkArte\ValuesContainer;
+use ElkArte\MembersList;
+use ElkArte\MessagesCallback\BodyParser\BodyParserInterface;
+use ElkArte\TopicUtil;
+use ElkArte\Util;
+use ElkArte\ValuesContainer;
 
 /**
  * SearchRenderer
@@ -77,7 +80,7 @@ class SearchRenderer extends Renderer
 	 */
 	protected function _adjustAllMembers($member_context)
 	{
-		$member = \ElkArte\MembersList::get($this->_this_message['id_member']);
+		$member = MembersList::get($this->_this_message['id_member']);
 		$member['ip'] = $this->_this_message['poster_ip'];
 
 		$this->_this_message['first_subject'] = censor($this->_this_message['first_subject']);
@@ -97,7 +100,7 @@ class SearchRenderer extends Renderer
 		// Do we have quote tag enabled?
 		$quote_enabled = empty($modSettings['disabledBBC']) || !in_array('quote', explode(',', $modSettings['disabledBBC']));
 
-		$output_pre = \ElkArte\TopicUtil::prepareContext(array($this->_this_message))[$this->_this_message['id_topic']];
+		$output_pre = TopicUtil::prepareContext(array($this->_this_message))[$this->_this_message['id_topic']];
 
 		$output = array_merge($context['topics'][$this->_this_message['id_msg']], $output_pre);
 
@@ -159,7 +162,7 @@ class SearchRenderer extends Renderer
 			// Fix the international characters in the keyword too.
 			$query = un_htmlspecialchars($query);
 			$query = trim($query, '\*+');
-			$query = strtr(\ElkArte\Util::htmlspecialchars($query), array('\\\'' => '\''));
+			$query = strtr(Util::htmlspecialchars($query), array('\\\'' => '\''));
 
 			$body_highlighted = preg_replace_callback('/((<[^>]*)|' . preg_quote(strtr($query, array('\'' => '&#039;')), '/') . ')/iu',
 				function ($matches) {
@@ -168,7 +171,7 @@ class SearchRenderer extends Renderer
 			$subject_highlighted = preg_replace('/(' . preg_quote($query, '/') . ')/iu', '<strong class="highlight">$1</strong>', $subject_highlighted);
 		}
 
-		$member = \ElkArte\MembersList::get($this->_this_message['id_member']);
+		$member = MembersList::get($this->_this_message['id_member']);
 		$output['matches'][] = array(
 			'id' => $this->_this_message['id_msg'],
 			'attachment' => loadAttachmentContext($this->_this_message['id_msg']),

@@ -9,7 +9,7 @@
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause (see accompanying LICENSE.txt file)
  *
  * This file contains code covered by:
- * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * copyright: 2011 Simple Machines (http://www.simplemachines.org)
  *
  * @version 2.0 dev
  *
@@ -17,11 +17,17 @@
 
 namespace ElkArte\Controller;
 
+use BBC\ParserWrapper;
+use ElkArte\AbstractController;
+use ElkArte\BoardsList;
+use ElkArte\EventManager;
 use ElkArte\FrontpageInterface;
+use ElkArte\TopicUtil;
+use ElkArte\User;
 
 /**
  */
-class MessageIndex extends \ElkArte\AbstractController implements FrontpageInterface
+class MessageIndex extends AbstractController implements FrontpageInterface
 {
 	/**
 	 * {@inheritdoc}
@@ -63,6 +69,27 @@ class MessageIndex extends \ElkArte\AbstractController implements FrontpageInter
 	}
 
 	/**
+	 * Return the board listing for use in this class
+	 *
+	 * @return string[] list of boards with key = id and value = cat + name
+	 * @uses getBoardList()
+	 */
+	protected static function _getBoardsList()
+	{
+		// Load the boards list.
+		require_once(SUBSDIR . '/Boards.subs.php');
+		$boards_list = getBoardList(array('override_permissions' => true, 'not_redirection' => true), true);
+
+		$boards = array();
+		foreach ($boards_list as $board)
+		{
+			$boards[$board['id_board']] = $board['cat_name'] . ' - ' . $board['board_name'];
+		}
+
+		return $boards;
+	}
+
+	/**
 	 * {@inheritdoc}
 	 */
 	public static function validateFrontPageOptions($post)
@@ -81,27 +108,6 @@ class MessageIndex extends \ElkArte\AbstractController implements FrontpageInter
 	}
 
 	/**
-	 * Return the board listing for use in this class
-	 *
-	 * @uses getBoardList()
-	 * @return string[] list of boards with key = id and value = cat + name
-	 */
-	protected static function _getBoardsList()
-	{
-		// Load the boards list.
-		require_once(SUBSDIR . '/Boards.subs.php');
-		$boards_list = getBoardList(array('override_permissions' => true, 'not_redirection' => true), true);
-
-		$boards = array();
-		foreach ($boards_list as $board)
-		{
-			$boards[$board['id_board']] = $board['cat_name'] . ' - ' . $board['board_name'];
-		}
-
-		return $boards;
-	}
-
-	/**
 	 * Dispatches forward to message index handler.
 	 *
 	 * @see \ElkArte\AbstractController::action_index()
@@ -109,21 +115,6 @@ class MessageIndex extends \ElkArte\AbstractController implements FrontpageInter
 	public function action_index()
 	{
 		// Forward to message index, it's not like we know much more :P
-		$this->action_messageindex();
-	}
-
-	/**
-	 * Show the list of topics in this board, along with any sub-boards.
-	 *
-	 * @uses template_topic_listing() sub template of the MessageIndex template
-	 */
-	public function action_messageindex_fp()
-	{
-		global $modSettings, $board;
-
-		$board = $modSettings['message_index_frontpage'];
-		loadBoard();
-
 		$this->action_messageindex();
 	}
 
@@ -150,7 +141,7 @@ class MessageIndex extends \ElkArte\AbstractController implements FrontpageInter
 		theme()->getTemplates()->load('MessageIndex');
 		loadJavascriptFile('topic.js');
 
-		$bbc = \BBC\ParserWrapper::instance();
+		$bbc = ParserWrapper::instance();
 
 		$context['name'] = $board_info['name'];
 		$context['sub_template'] = 'topic_listing';
@@ -171,7 +162,9 @@ class MessageIndex extends \ElkArte\AbstractController implements FrontpageInter
 		{
 			// Don't index a sort result etc.
 			if (!in_array($k, array('board', 'start', $session_name)))
+			{
 				$context['robot_no_index'] = true;
+			}
 		}
 
 		if (!empty($this->_req->query->start) && (!is_numeric($this->_req->query->start) || $this->_req->query->start % $context['messages_per_page'] !== 0))
@@ -257,7 +250,9 @@ class MessageIndex extends \ElkArte\AbstractController implements FrontpageInter
 				$board_list[] = $board;
 			}
 			else
+			{
 				$board_list = array($board);
+			}
 
 			// Mark boards as read. Boards alone, no need for topics.
 			markBoardsRead($board_list, false, false);
@@ -284,7 +279,9 @@ class MessageIndex extends \ElkArte\AbstractController implements FrontpageInter
 			$context['is_marked_notify'] = resetSentBoardNotification($this->user->id, $board);
 		}
 		else
+		{
 			$context['is_marked_notify'] = false;
+		}
 
 		// 'Print' the header and board info.
 		$context['page_title'] = strip_tags($board_info['name']);
@@ -304,7 +301,7 @@ class MessageIndex extends \ElkArte\AbstractController implements FrontpageInter
 			'set_latest_post' => false,
 			'countChildPosts' => !empty($modSettings['countChildPosts']),
 		);
-		$boardlist = new \ElkArte\BoardsList($boardIndexOptions);
+		$boardlist = new BoardsList($boardIndexOptions);
 		$context['boards'] = $boardlist->getBoards();
 
 		// Nosey, nosey - who's viewing this board?
@@ -365,7 +362,9 @@ class MessageIndex extends \ElkArte\AbstractController implements FrontpageInter
 			$start = $board_info['total_topics'] < $start + $maxindex + 1 ? 0 : $board_info['total_topics'] - $start - $maxindex;
 		}
 		else
+		{
 			$fake_ascending = false;
+		}
 
 		$context['topics'] = array();
 
@@ -383,14 +382,16 @@ class MessageIndex extends \ElkArte\AbstractController implements FrontpageInter
 
 		$topics_info = messageIndexTopics($board, $this->user->id, $start, $maxindex, $context['sort_by'], $sort_column, $indexOptions);
 
-		$context['topics'] = \ElkArte\TopicUtil::prepareContext($topics_info, false, !empty($modSettings['preview_characters']) ? $modSettings['preview_characters'] : 128);
+		$context['topics'] = TopicUtil::prepareContext($topics_info, false, !empty($modSettings['preview_characters']) ? $modSettings['preview_characters'] : 128);
 
 		// Allow addons to add to the $context['topics']
 		call_integration_hook('integrate_messageindex_listing', array($topics_info));
 
 		// Fix the sequence of topics if they were retrieved in the wrong order. (for speed reasons...)
 		if ($fake_ascending)
+		{
 			$context['topics'] = array_reverse($context['topics'], true);
+		}
 
 		$topic_ids = array_keys($context['topics']);
 
@@ -445,10 +446,14 @@ class MessageIndex extends \ElkArte\AbstractController implements FrontpageInter
 
 			// Can we use quick moderation checkboxes?
 			if ($options['display_quick_mod'] == 1)
+			{
 				$context['can_quick_mod'] = $context['user']['is_logged'] || $context['can_approve'] || $context['can_remove'] || $context['can_lock'] || $context['can_sticky'] || $context['can_move'] || $context['can_merge'] || $context['can_restore'];
+			}
 			// Or the icons?
 			else
+			{
 				$context['can_quick_mod'] = $context['can_remove'] || $context['can_lock'] || $context['can_sticky'] || $context['can_move'];
+			}
 		}
 
 		if (!empty($context['can_quick_mod']) && $options['display_quick_mod'] == 1)
@@ -458,7 +463,9 @@ class MessageIndex extends \ElkArte\AbstractController implements FrontpageInter
 		}
 
 		if (!empty($context['boards']) && $context['start'] == 0)
+		{
 			$template_layers->add('display_child_boards');
+		}
 
 		// If there are children, but no topics and no ability to post topics...
 		$context['no_topic_listing'] = !empty($context['boards']) && empty($context['topics']) && !$context['can_post_new'];
@@ -478,6 +485,7 @@ class MessageIndex extends \ElkArte\AbstractController implements FrontpageInter
 
 		// They can only mark read if they are logged in and it's enabled!
 		if ($this->user->is_guest === false && $settings['show_mark_read'])
+		{
 			$context['normal_buttons']['markread'] = array(
 				'text' => 'mark_read_short',
 				'image' => 'markread.png',
@@ -485,9 +493,25 @@ class MessageIndex extends \ElkArte\AbstractController implements FrontpageInter
 				'url' => $scripturl . '?action=markasread;sa=board;board=' . $context['current_board'] . '.0;' . $context['session_var'] . '=' . $context['session_id'],
 				'custom' => 'onclick="return markboardreadButton(this);"'
 			);
+		}
 
 		// Allow adding new buttons easily.
 		call_integration_hook('integrate_messageindex_buttons');
+	}
+
+	/**
+	 * Show the list of topics in this board, along with any sub-boards.
+	 *
+	 * @uses template_topic_listing() sub template of the MessageIndex template
+	 */
+	public function action_messageindex_fp()
+	{
+		global $modSettings, $board;
+
+		$board = $modSettings['message_index_frontpage'];
+		loadBoard();
+
+		$this->action_messageindex();
 	}
 
 	/**
@@ -504,10 +528,14 @@ class MessageIndex extends \ElkArte\AbstractController implements FrontpageInter
 
 		// Lets go straight to the restore area.
 		if ($this->_req->getPost('qaction') === 'restore' && !empty($this->_req->post->topics))
+		{
 			redirectexit('action=restoretopic;topics=' . implode(',', $this->_req->post->topics) . ';' . $context['session_var'] . '=' . $context['session_id']);
+		}
 
 		if (isset($_SESSION['topicseen_cache']))
+		{
 			$_SESSION['topicseen_cache'] = array();
+		}
 
 		// This is going to be needed to send off the notifications and for updateLastMessages().
 		require_once(SUBSDIR . '/Post.subs.php');
@@ -584,24 +612,31 @@ class MessageIndex extends \ElkArte\AbstractController implements FrontpageInter
 		{
 			// If the action isn't valid, just quit now.
 			if (empty($this->_req->post->qaction) || !in_array($this->_req->post->qaction, $possibleActions))
+			{
 				redirectexit($redirect_url);
+			}
 
 			// Merge requires all topics as one parameter and can be done at once.
 			if ($this->_req->post->qaction === 'merge')
 			{
 				// Merge requires at least two topics.
 				if (empty($this->_req->post->topics) || count($this->_req->post->topics) < 2)
+				{
 					redirectexit($redirect_url);
+				}
 
-				$controller = new MergeTopics(new \ElkArte\EventManager());
-				$controller->setUser(\ElkArte\User::$info);
+				$controller = new MergeTopics(new EventManager());
+				$controller->setUser(User::$info);
 				$controller->pre_dispatch();
+
 				return $controller->action_mergeExecute($this->_req->post->topics);
 			}
 
 			// Just convert to the other method, to make it easier.
 			foreach ($this->_req->post->topics as $topic)
+			{
 				$actions[(int) $topic] = $this->_req->post->qaction;
+			}
 		}
 		else
 		{
@@ -610,7 +645,9 @@ class MessageIndex extends \ElkArte\AbstractController implements FrontpageInter
 
 		// Weird... how'd you get here?
 		if (empty($actions))
+		{
 			redirectexit($redirect_url);
+		}
 
 		// Validate each action.
 		$all_actions = array();
@@ -618,7 +655,9 @@ class MessageIndex extends \ElkArte\AbstractController implements FrontpageInter
 		foreach ($actions as $topic => $action)
 		{
 			if (in_array($action, $possibleActions))
+			{
 				$all_actions[(int) $topic] = $action;
+			}
 		}
 
 		$stickyCache = array();
@@ -637,7 +676,9 @@ class MessageIndex extends \ElkArte\AbstractController implements FrontpageInter
 				if (!empty($board))
 				{
 					if ($row['id_board'] != $board || ($modSettings['postmod_active'] && !$row['approved'] && !allowedTo('approve_posts')))
+					{
 						continue;
+					}
 				}
 				else
 				{

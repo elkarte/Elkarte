@@ -24,115 +24,65 @@ namespace ElkArte;
 final class Request
 {
 	/**
-	 * Remote IP, if we can know it easily (as found in $_SERVER['REMOTE_ADDR'])
-	 * @var string
-	 */
-	private $_client_ip;
-
-	/**
-	 * Secondary IP, a double-check for the most accurate client IP we can get
-	 * @var string
-	 */
-	private $_ban_ip;
-
-	/**
-	 * HTTP or HTTPS scheme
-	 * @var string
-	 */
-	private $_scheme;
-
-	/**
-	 * User agent
-	 * @var string
-	 */
-	private $_user_agent;
-
-	/**
-	 * Whether the request is an XmlHttpRequest
-	 * @var bool
-	 */
-	private $_xml;
-
-	/**
-	 * Web server software
-	 * @var string
-	 */
-	private $_server_software;
-
-	/**
-	 * This is the pattern of a local (or unknown) IP address in both IPv4 and IPv6
-	 * @var string
-	 */
-	private $_local_ip_pattern = '((0|10|172\.(1[6-9]|2[0-9]|3[01])|192\.168|255|127)\.|unknown|::1|fe80::|fc00::)';
-
-	/**
-	 * Local copy of the server query string
-	 * @var string
-	 */
-	private $_server_query_string;
-
-	/**
-	 * Creates the global and method internal
-	 * @var string
-	 */
-	private $_scripturl;
-
-	/**
 	 * Sole private Request instance
+	 *
 	 * @var Request
 	 */
 	private static $_req = null;
-
 	/**
-	 * Retrieves client IP
-	 */
-	public function client_ip()
-	{
-		return $this->_client_ip;
-	}
-
-	/**
-	 * Return a secondary IP, result of a deeper check for the IP
+	 * Remote IP, if we can know it easily (as found in $_SERVER['REMOTE_ADDR'])
 	 *
-	 * - It can be identical with client IP (and many times it will be).
-	 * - If the secondary IP is empty, then the client IP is returned
+	 * @var string
 	 */
-	public function ban_ip()
-	{
-		return !empty($this->_ban_ip) ? $this->_ban_ip : $this->client_ip();
-	}
-
+	private $_client_ip;
 	/**
-	 * Return the HTTP scheme
+	 * Secondary IP, a double-check for the most accurate client IP we can get
+	 *
+	 * @var string
 	 */
-	public function scheme()
-	{
-		return $this->_scheme;
-	}
-
+	private $_ban_ip;
 	/**
-	 * Return the user agent
+	 * HTTP or HTTPS scheme
+	 *
+	 * @var string
 	 */
-	public function user_agent()
-	{
-		return $this->_user_agent;
-	}
-
+	private $_scheme;
 	/**
-	 * Returns whether the request is XML
+	 * User agent
+	 *
+	 * @var string
 	 */
-	public function is_xml()
-	{
-		return $this->_xml;
-	}
-
+	private $_user_agent;
 	/**
-	 * Returns server software (or empty string if it wasn't set for PHP)
+	 * Whether the request is an XmlHttpRequest
+	 *
+	 * @var bool
 	 */
-	public function server_software()
-	{
-		return $this->_server_software;
-	}
+	private $_xml;
+	/**
+	 * Web server software
+	 *
+	 * @var string
+	 */
+	private $_server_software;
+	/**
+	 * This is the pattern of a local (or unknown) IP address in both IPv4 and IPv6
+	 *
+	 * @var string
+	 */
+	private $_local_ip_pattern = '((0|10|172\.(1[6-9]|2[0-9]|3[01])|192\.168|255|127)\.|unknown|::1|fe80::|fc00::)';
+	/**
+	 * Local copy of the server query string
+	 *
+	 * @var string
+	 */
+	private $_server_query_string;
+	/**
+	 * Creates the global and method internal
+	 *
+	 * @var string
+	 */
+	private $_scripturl;
 
 	/**
 	 * Private constructor.
@@ -187,14 +137,20 @@ final class Request
 			// Just in case we have a legacy IPv4 address.
 			// @ TODO: Convert to IPv6.
 			if (filter_var($this->_client_ip, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4) === false)
+			{
 				$this->_client_ip = 'unknown';
+			}
 		}
 		else
+		{
 			$this->_client_ip = $_SERVER['REMOTE_ADDR'];
+		}
 
 		// Final check
 		if ($this->_client_ip == 'unknown')
+		{
 			$this->_client_ip = '';
+		}
 	}
 
 	/**
@@ -210,20 +166,28 @@ final class Request
 		{
 			// Check the first forwarded for as the block - only switch if it's better that way.
 			if (strtok($_SERVER['HTTP_X_FORWARDED_FOR'], '.') !== strtok($_SERVER['HTTP_CLIENT_IP'], '.')
-					&& '.' . strtok($_SERVER['HTTP_X_FORWARDED_FOR'], '.') == strrchr($_SERVER['HTTP_CLIENT_IP'], '.')
-					&& (preg_match('~^((0|10|172\.(1[6-9]|2\d|3[01])|192\.168|255|127)\.|unknown)~', $_SERVER['HTTP_X_FORWARDED_FOR']) == 0 || preg_match('~^((0|10|172\.(1[6-9]|2\d|3[01])|192\.168|255|127)\.|unknown)~', $this->_client_ip) != 0))
+				&& '.' . strtok($_SERVER['HTTP_X_FORWARDED_FOR'], '.') == strrchr($_SERVER['HTTP_CLIENT_IP'], '.')
+				&& (preg_match('~^((0|10|172\.(1[6-9]|2\d|3[01])|192\.168|255|127)\.|unknown)~', $_SERVER['HTTP_X_FORWARDED_FOR']) == 0 || preg_match('~^((0|10|172\.(1[6-9]|2\d|3[01])|192\.168|255|127)\.|unknown)~', $this->_client_ip) != 0))
+			{
 				$this->_ban_ip = implode('.', array_reverse(explode('.', $_SERVER['HTTP_CLIENT_IP'])));
+			}
 			else
+			{
 				$this->_ban_ip = $_SERVER['HTTP_CLIENT_IP'];
+			}
 		}
 
 		if (!empty($_SERVER['HTTP_CLIENT_IP']) && (preg_match('~^' . $this->_local_ip_pattern . '~', $_SERVER['HTTP_CLIENT_IP']) == 0 || preg_match('~^' . $this->_local_ip_pattern . '~', $this->_client_ip) != 0))
 		{
 			// Since they are in different blocks, it's probably reversed.
 			if (strtok($this->_client_ip, '.') !== strtok($_SERVER['HTTP_CLIENT_IP'], '.'))
+			{
 				$this->_ban_ip = implode('.', array_reverse(explode('.', $_SERVER['HTTP_CLIENT_IP'])));
+			}
 			else
+			{
 				$this->_ban_ip = $_SERVER['HTTP_CLIENT_IP'];
+			}
 		}
 		elseif (!empty($_SERVER['HTTP_X_FORWARDED_FOR']))
 		{
@@ -237,7 +201,9 @@ final class Request
 				{
 					// Make sure it's in a valid range...
 					if (preg_match('~^' . $this->_local_ip_pattern . '~', $ip) != 0 && preg_match('~^' . $this->_local_ip_pattern . '~', $this->_client_ip) == 0)
+					{
 						continue;
+					}
 
 					// Otherwise, we've got an IP!
 					$this->_ban_ip = trim($ip);
@@ -246,114 +212,82 @@ final class Request
 			}
 			// Otherwise just use the only one.
 			elseif (preg_match('~^' . $this->_local_ip_pattern . '~', $_SERVER['HTTP_X_FORWARDED_FOR']) == 0 || preg_match('~^' . $this->_local_ip_pattern . '~', $this->_client_ip) != 0)
+			{
 				$this->_ban_ip = $_SERVER['HTTP_X_FORWARDED_FOR'];
+			}
 		}
 
 		// Some final checking.
 		if (filter_var($this->_ban_ip, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4) === false && !isValidIPv6($this->_ban_ip))
+		{
 			$this->_ban_ip = '';
-	}
-
-	/**
-	 * Parse the $_REQUEST, for always necessary data, such as 'action', 'board', 'topic', 'start'.
-	 * Also figures out if this is an xml request.
-	 *
-	 * - Parse the request for our dear globals, I know they're in there somewhere...
-	 */
-	public function parseRequest()
-	{
-		global $board, $topic;
-
-		// Look for $board first
-		$board = $this->_checkBoard();
-
-		// Look for $topic
-		$topic = $this->_checkTopic();
-
-		// There should be a $_REQUEST['start'], some at least.  If you need to default to other than 0, use $_GET['start'].
-		if (empty($_REQUEST['start']) || $_REQUEST['start'] < 0 || (int) $_REQUEST['start'] > 2147473647)
-			$_REQUEST['start'] = 0;
-
-		// The action needs to be a string, too.
-		if (isset($_REQUEST['action']))
-			$_REQUEST['action'] = (string) $_REQUEST['action'];
-
-		if (isset($_GET['action']))
-			$_GET['action'] = (string) $_GET['action'];
-
-		$this->_xml = (isset($_SERVER['X_REQUESTED_WITH']) && $_SERVER['X_REQUESTED_WITH'] == 'XMLHttpRequest') || isset($_REQUEST['xml']);
-	}
-
-	/**
-	 * Finds and returns the board numeric if its been requested
-	 *
-	 * - helper function for parseRequest
-	 */
-	private function _checkBoard()
-	{
-		if (isset($_REQUEST['board']))
-		{
-			// Make sure it's a string (not an array, say)
-			$_REQUEST['board'] = (string) $_REQUEST['board'];
-
-			// If we have ?board=3/10, that's... board=3, start=10! (old, compatible links.)
-			if (strpos($_REQUEST['board'], '/') !== false)
-				list ($_REQUEST['board'], $_REQUEST['start']) = explode('/', $_REQUEST['board']);
-			// Or perhaps we have... ?board=1.0...
-			elseif (strpos($_REQUEST['board'], '.') !== false)
-				list ($_REQUEST['board'], $_REQUEST['start']) = explode('.', $_REQUEST['board']);
-
-			// $board and $_REQUEST['start'] are always numbers.
-			$board = (int) $_REQUEST['board'];
-			$_REQUEST['start'] = isset($_REQUEST['start']) ? (int) $_REQUEST['start'] : 0;
-
-			// This is for "Who's Online" because it might come via POST - and it should be an int here.
-			$_GET['board'] = $board;
 		}
-		// None? We still need *something*, and it'd better be a number
-		else
-			$board = 0;
-
-		return $board;
 	}
 
 	/**
-	 * Finds and returns the topic numeric if its been requested
+	 * Retrieve easily the sole instance of this class.
 	 *
-	 * - helper function for parseRequest
+	 * @return Request
 	 */
-	private function _checkTopic()
+	public static function instance()
 	{
-		// Look for threadid, old YaBB SE links have those. Just read it as a topic.
-		if (isset($_REQUEST['threadid']) && !isset($_REQUEST['topic']))
-			$_REQUEST['topic'] = $_REQUEST['threadid'];
-
-		if (isset($_REQUEST['topic']))
+		if (self::$_req === null)
 		{
-			// Make sure it's a string (not an array, say)
-			$_REQUEST['topic'] = (string) $_REQUEST['topic'];
-
-			// It might come as ?topic=1/15, from an old, SMF beta style link
-			if (strpos($_REQUEST['topic'], '/') !== false)
-				list ($_REQUEST['topic'], $_REQUEST['start']) = explode('/', $_REQUEST['topic']);
-			// Or it might come as ?topic=1.15.
-			elseif (strpos($_REQUEST['topic'], '.') !== false)
-				list ($_REQUEST['topic'], $_REQUEST['start']) = explode('.', $_REQUEST['topic']);
-
-			// $topic and $_REQUEST['start'] are numbers, numbers I say.
-			$topic = (int) $_REQUEST['topic'];
-
-			// @todo in Display $_REQUEST['start'] is not always a number
-			$_REQUEST['start'] = isset($_REQUEST['start']) && preg_match('~^((from|msg)?\d+|new)$~', $_REQUEST['start']) ? $_REQUEST['start'] : 0;
-
-			// Now make sure the online log gets the right number.
-			$_GET['topic'] = $topic;
+			self::$_req = new Request();
 		}
-		// No topic? Well, set something, and that something is 0.
-		else
-			$topic = 0;
 
-		return $topic;
+		return self::$_req;
+	}
+
+	/**
+	 * Return a secondary IP, result of a deeper check for the IP
+	 *
+	 * - It can be identical with client IP (and many times it will be).
+	 * - If the secondary IP is empty, then the client IP is returned
+	 */
+	public function ban_ip()
+	{
+		return !empty($this->_ban_ip) ? $this->_ban_ip : $this->client_ip();
+	}
+
+	/**
+	 * Retrieves client IP
+	 */
+	public function client_ip()
+	{
+		return $this->_client_ip;
+	}
+
+	/**
+	 * Return the HTTP scheme
+	 */
+	public function scheme()
+	{
+		return $this->_scheme;
+	}
+
+	/**
+	 * Return the user agent
+	 */
+	public function user_agent()
+	{
+		return $this->_user_agent;
+	}
+
+	/**
+	 * Returns whether the request is XML
+	 */
+	public function is_xml()
+	{
+		return $this->_xml;
+	}
+
+	/**
+	 * Returns server software (or empty string if it wasn't set for PHP)
+	 */
+	public function server_software()
+	{
+		return $this->_server_software;
 	}
 
 	/**
@@ -391,11 +325,17 @@ final class Request
 
 		// Make sure we know the URL of the current request.
 		if (empty($_SERVER['REQUEST_URI']))
+		{
 			$_SERVER['REQUEST_URL'] = $this->_scripturl . (!empty($this->_server_query_string) ? '?' . $this->_server_query_string : '');
+		}
 		elseif (preg_match('~^([^/]+//[^/]+)~', $this->_scripturl, $match) == 1)
+		{
 			$_SERVER['REQUEST_URL'] = $match[1] . $_SERVER['REQUEST_URI'];
+		}
 		else
+		{
 			$_SERVER['REQUEST_URL'] = $_SERVER['REQUEST_URI'];
+		}
 	}
 
 	/**
@@ -419,7 +359,9 @@ final class Request
 
 		// Get the correct query string.  It may be in an environment variable...
 		if (!isset($_SERVER['QUERY_STRING']))
+		{
 			$_SERVER['QUERY_STRING'] = getenv('QUERY_STRING');
+		}
 
 		// It seems that sticking a URL after the query string is mighty common, well, it's evil - don't.
 		if (strpos($_SERVER['QUERY_STRING'], 'http') === 0)
@@ -442,20 +384,26 @@ final class Request
 	private function _checkNumericKeys()
 	{
 		if (isset($_REQUEST['GLOBALS']) || isset($_COOKIE['GLOBALS']))
+		{
 			throw new Exceptions\Exception('Invalid request variable.', false);
+		}
 
 		// Same goes for numeric keys.
 		foreach (array_merge(array_keys($_POST), array_keys($_GET), array_keys($_FILES)) as $key)
 		{
 			if (is_numeric($key))
+			{
 				throw new Exceptions\Exception('Numeric request keys are invalid.', false);
+			}
 		}
 
 		// Numeric keys in cookies are less of a problem. Just unset those.
 		foreach ($_COOKIE as $key => $value)
 		{
 			if (is_numeric($key))
+			{
 				unset($_COOKIE[$key]);
+			}
 		}
 	}
 
@@ -476,7 +424,9 @@ final class Request
 
 			// Some german webmailers need a decoded string, so let's decode the string for sa=activate and action=reminder
 			if (strpos($this->_server_query_string, 'activate') !== false || strpos($this->_server_query_string, 'reminder') !== false)
+			{
 				$this->_server_query_string = urldecode($this->_server_query_string);
+			}
 
 			$this->_server_query_string = $parser->parse($this->_server_query_string);
 			// Replace ';' with '&' and '&something&' with '&something=&'.  (this is done for compatibility...)
@@ -499,7 +449,9 @@ final class Request
 					{
 						list ($key, $val) = array_pad(explode('=', $temp[$i], 2), 2, '');
 						if (!isset($_GET[$key]))
+						{
 							$_GET[$key] = $val;
+						}
 					}
 				}
 
@@ -523,9 +475,13 @@ final class Request
 		{
 			// Remove the .html, assuming there is one.
 			if (substr($_SERVER['REQUEST_URI'], strrpos($_SERVER['REQUEST_URI'], '.'), 4) === '.htm')
+			{
 				$request = substr($_SERVER['REQUEST_URI'], 0, strrpos($_SERVER['REQUEST_URI'], '.'));
+			}
 			else
+			{
 				$request = $_SERVER['REQUEST_URI'];
+			}
 
 			// Replace 'index.php/a,b,c/d/e,f' with 'a=b,c&d=&e=f' and parse it into $_GET.
 			if (strpos($request, basename($this->_scripturl) . '/') !== false)
@@ -537,15 +493,124 @@ final class Request
 	}
 
 	/**
-	 * Retrieve easily the sole instance of this class.
+	 * Parse the $_REQUEST, for always necessary data, such as 'action', 'board', 'topic', 'start'.
+	 * Also figures out if this is an xml request.
 	 *
-	 * @return Request
+	 * - Parse the request for our dear globals, I know they're in there somewhere...
 	 */
-	public static function instance()
+	public function parseRequest()
 	{
-		if (self::$_req === null)
-			self::$_req = new Request();
+		global $board, $topic;
 
-		return self::$_req;
+		// Look for $board first
+		$board = $this->_checkBoard();
+
+		// Look for $topic
+		$topic = $this->_checkTopic();
+
+		// There should be a $_REQUEST['start'], some at least.  If you need to default to other than 0, use $_GET['start'].
+		if (empty($_REQUEST['start']) || $_REQUEST['start'] < 0 || (int) $_REQUEST['start'] > 2147473647)
+		{
+			$_REQUEST['start'] = 0;
+		}
+
+		// The action needs to be a string, too.
+		if (isset($_REQUEST['action']))
+		{
+			$_REQUEST['action'] = (string) $_REQUEST['action'];
+		}
+
+		if (isset($_GET['action']))
+		{
+			$_GET['action'] = (string) $_GET['action'];
+		}
+
+		$this->_xml = (isset($_SERVER['X_REQUESTED_WITH']) && $_SERVER['X_REQUESTED_WITH'] == 'XMLHttpRequest') || isset($_REQUEST['xml']);
+	}
+
+	/**
+	 * Finds and returns the board numeric if its been requested
+	 *
+	 * - helper function for parseRequest
+	 */
+	private function _checkBoard()
+	{
+		if (isset($_REQUEST['board']))
+		{
+			// Make sure it's a string (not an array, say)
+			$_REQUEST['board'] = (string) $_REQUEST['board'];
+
+			// If we have ?board=3/10, that's... board=3, start=10! (old, compatible links.)
+			if (strpos($_REQUEST['board'], '/') !== false)
+			{
+				list ($_REQUEST['board'], $_REQUEST['start']) = explode('/', $_REQUEST['board']);
+			}
+			// Or perhaps we have... ?board=1.0...
+			elseif (strpos($_REQUEST['board'], '.') !== false)
+			{
+				list ($_REQUEST['board'], $_REQUEST['start']) = explode('.', $_REQUEST['board']);
+			}
+
+			// $board and $_REQUEST['start'] are always numbers.
+			$board = (int) $_REQUEST['board'];
+			$_REQUEST['start'] = isset($_REQUEST['start']) ? (int) $_REQUEST['start'] : 0;
+
+			// This is for "Who's Online" because it might come via POST - and it should be an int here.
+			$_GET['board'] = $board;
+		}
+		// None? We still need *something*, and it'd better be a number
+		else
+		{
+			$board = 0;
+		}
+
+		return $board;
+	}
+
+	/**
+	 * Finds and returns the topic numeric if its been requested
+	 *
+	 * - helper function for parseRequest
+	 */
+	private function _checkTopic()
+	{
+		// Look for threadid, old YaBB SE links have those. Just read it as a topic.
+		if (isset($_REQUEST['threadid']) && !isset($_REQUEST['topic']))
+		{
+			$_REQUEST['topic'] = $_REQUEST['threadid'];
+		}
+
+		if (isset($_REQUEST['topic']))
+		{
+			// Make sure it's a string (not an array, say)
+			$_REQUEST['topic'] = (string) $_REQUEST['topic'];
+
+			// It might come as ?topic=1/15, from an old, SMF beta style link
+			if (strpos($_REQUEST['topic'], '/') !== false)
+			{
+				list ($_REQUEST['topic'], $_REQUEST['start']) = explode('/', $_REQUEST['topic']);
+			}
+			// Or it might come as ?topic=1.15.
+			elseif (strpos($_REQUEST['topic'], '.') !== false)
+			{
+				list ($_REQUEST['topic'], $_REQUEST['start']) = explode('.', $_REQUEST['topic']);
+			}
+
+			// $topic and $_REQUEST['start'] are numbers, numbers I say.
+			$topic = (int) $_REQUEST['topic'];
+
+			// @todo in Display $_REQUEST['start'] is not always a number
+			$_REQUEST['start'] = isset($_REQUEST['start']) && preg_match('~^((from|msg)?\d+|new)$~', $_REQUEST['start']) ? $_REQUEST['start'] : 0;
+
+			// Now make sure the online log gets the right number.
+			$_GET['topic'] = $topic;
+		}
+		// No topic? Well, set something, and that something is 0.
+		else
+		{
+			$topic = 0;
+		}
+
+		return $topic;
 	}
 }

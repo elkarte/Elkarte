@@ -9,7 +9,7 @@
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause (see accompanying LICENSE.txt file)
  *
  * This file contains code covered by:
- * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * copyright: 2011 Simple Machines (http://www.simplemachines.org)
  *
  * @version 2.0 dev
  *
@@ -17,7 +17,14 @@
 
 namespace ElkArte\AdminController;
 
+use ElkArte\AbstractController;
+use ElkArte\Action;
+use ElkArte\Agreement;
 use ElkArte\Errors\ErrorContext;
+use ElkArte\Exceptions\Exception;
+use ElkArte\PrivacyPolicy;
+use ElkArte\SettingsForm\SettingsForm;
+use ElkArte\TokenHash;
 use ElkArte\Util;
 
 /**
@@ -30,7 +37,7 @@ use ElkArte\Util;
  *
  * @package Registration
  */
-class ManageRegistration extends \ElkArte\AbstractController
+class ManageRegistration extends AbstractController
 {
 	/**
 	 * Entrance point for the registration center, it checks permissions and forwards
@@ -42,7 +49,7 @@ class ManageRegistration extends \ElkArte\AbstractController
 	 * @event integrate_sa_manage_registrations add new registration sub actions
 	 * @uses Login language file
 	 * @uses Register template.
-	 * @see \ElkArte\AbstractController::action_index()
+	 * @see  \ElkArte\AbstractController::action_index()
 	 */
 	public function action_index()
 	{
@@ -82,7 +89,7 @@ class ManageRegistration extends \ElkArte\AbstractController
 		);
 
 		// Action controller
-		$action = new \ElkArte\Action('manage_registrations');
+		$action = new Action('manage_registrations');
 
 		// Next create the tabs for the template.
 		$context[$context['admin_menu_name']]['tab_data'] = array(
@@ -139,13 +146,17 @@ class ManageRegistration extends \ElkArte\AbstractController
 
 			// @todo move this to a filter/sanitation class
 			foreach ($this->_req->post as $key => $value)
+			{
 				if (!is_array($value))
+				{
 					$this->_req->post[$key] = htmltrim__recursive(str_replace(array("\n", "\r"), '', $value));
+				}
+			}
 
 			// Generate a password
 			if (empty($this->_req->post->password) || !is_string($this->_req->post->password) || trim($this->_req->post->password) === '')
 			{
-				$tokenizer = new \ElkArte\TokenHash();
+				$tokenizer = new TokenHash();
 				$password = $tokenizer->generate_hash(14);
 			}
 			else
@@ -179,7 +190,7 @@ class ManageRegistration extends \ElkArte\AbstractController
 			$error_severity = $reg_errors->hasErrors(1) && !$this->user->is_admin ? 1 : null;
 			foreach ($reg_errors->prepareErrors($error_severity) as $error)
 			{
-				throw new \ElkArte\Exceptions\Exception($error, $error_severity === null ? false : 'general');
+				throw new Exception($error, $error_severity === null ? false : 'general');
 			}
 
 			if (!empty($memberID))
@@ -275,7 +286,7 @@ class ManageRegistration extends \ElkArte\AbstractController
 		}
 
 		$context['warning'] = '';
-		$agreement = new \ElkArte\Agreement($context['current_agreement']);
+		$agreement = new Agreement($context['current_agreement']);
 
 		if (isset($this->_req->post->save) && isset($this->_req->post->agreement))
 		{
@@ -299,7 +310,7 @@ class ManageRegistration extends \ElkArte\AbstractController
 			updateSettings(array('requireAgreement' => !empty($this->_req->post->requireAgreement), 'checkboxAgreement' => !empty($this->_req->post->checkboxAgreement)));
 		}
 
-		$context['agreement'] = \ElkArte\Util::htmlspecialchars($agreement->getPlainText(false));
+		$context['agreement'] = Util::htmlspecialchars($agreement->getPlainText(false));
 
 		$context['warning'] .= $agreement->isWritable() ? '' : $txt['agreement_not_writable'];
 		$context['require_agreement'] = !empty($modSettings['requireAgreement']);
@@ -355,7 +366,7 @@ class ManageRegistration extends \ElkArte\AbstractController
 		}
 
 		$context['warning'] = '';
-		$privacypol = new \ElkArte\PrivacyPolicy($context['current_agreement']);
+		$privacypol = new PrivacyPolicy($context['current_agreement']);
 
 		if (isset($this->_req->post->save) && isset($this->_req->post->agreement))
 		{
@@ -452,7 +463,7 @@ class ManageRegistration extends \ElkArte\AbstractController
 		global $txt, $context, $scripturl, $modSettings;
 
 		// Initialize the form
-		$settingsForm = new \ElkArte\SettingsForm\SettingsForm(\ElkArte\SettingsForm\SettingsForm::DB_ADAPTER);
+		$settingsForm = new SettingsForm(SettingsForm::DB_ADAPTER);
 
 		// Initialize it with our settings
 		$settingsForm->setConfigVars($this->_settings());
@@ -467,7 +478,9 @@ class ManageRegistration extends \ElkArte\AbstractController
 
 			// Are there some contacts missing?
 			if (!empty($this->_req->post->coppaAge) && !empty($this->_req->post->coppaType) && empty($this->_req->post->coppaPost) && empty($this->_req->post->coppaFax))
-				throw new \ElkArte\Exceptions\Exception('admin_setting_coppa_require_contact');
+			{
+				throw new Exception('admin_setting_coppa_require_contact');
+			}
 
 			// Post needs to take into account line breaks.
 			$this->_req->post->coppaPost = str_replace("\n", '<br />', empty($this->_req->post->coppaPost) ? '' : $this->_req->post->coppaPost);

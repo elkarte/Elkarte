@@ -59,59 +59,9 @@ class Memcache extends AbstractCacheMethod
 	/**
 	 * {@inheritdoc}
 	 */
-	public function exists($key)
+	public function isAvailable()
 	{
-		$this->get($key);
-
-		return !$this->is_miss;
-	}
-
-	/**
-	 * {@inheritdoc}
-	 */
-	public function put($key, $value, $ttl = 120)
-	{
-		if (!$this->_is_running)
-		{
-			return false;
-		}
-
-		if ($value === null)
-		{
-			$this->obj->delete($key);
-		}
-
-		$this->obj->set($key, $value, MEMCACHE_COMPRESSED, $ttl);
-	}
-
-	/**
-	 * {@inheritdoc}
-	 */
-	public function get($key, $ttl = 120)
-	{
-		if (!$this->_is_running)
-		{
-			return false;
-		}
-
-		$result = $this->obj->get($key);
-		$this->is_miss = $result === null || $result === false;
-
-		return $result;
-	}
-
-	/**
-	 * {@inheritdoc}
-	 */
-	public function clean($type = '')
-	{
-		if (!$this->_is_running)
-		{
-			return false;
-		}
-
-		// Clear it out, really invalidate whats there
-		$this->obj->flush();
+		return class_exists('\\Memcache');
 	}
 
 	/**
@@ -155,11 +105,23 @@ class Memcache extends AbstractCacheMethod
 	}
 
 	/**
+	 * If this should be done as a persistent connection
+	 *
+	 * @return boolean
+	 */
+	private function _is_persist()
+	{
+		global $db_persist;
+
+		return !empty($db_persist);
+	}
+
+	/**
 	 * Set a few server specific options.  Could be done as part of setServer
 	 * but left here for convenience
 	 *
 	 * @param string $server
-	 * @param int    $port
+	 * @param int $port
 	 */
 	protected function setOptions($server, $port)
 	{
@@ -170,9 +132,59 @@ class Memcache extends AbstractCacheMethod
 	/**
 	 * {@inheritdoc}
 	 */
-	public function isAvailable()
+	public function exists($key)
 	{
-		return class_exists('\\Memcache');
+		$this->get($key);
+
+		return !$this->is_miss;
+	}
+
+	/**
+	 * {@inheritdoc}
+	 */
+	public function get($key, $ttl = 120)
+	{
+		if (!$this->_is_running)
+		{
+			return false;
+		}
+
+		$result = $this->obj->get($key);
+		$this->is_miss = $result === null || $result === false;
+
+		return $result;
+	}
+
+	/**
+	 * {@inheritdoc}
+	 */
+	public function put($key, $value, $ttl = 120)
+	{
+		if (!$this->_is_running)
+		{
+			return false;
+		}
+
+		if ($value === null)
+		{
+			$this->obj->delete($key);
+		}
+
+		$this->obj->set($key, $value, MEMCACHE_COMPRESSED, $ttl);
+	}
+
+	/**
+	 * {@inheritdoc}
+	 */
+	public function clean($type = '')
+	{
+		if (!$this->_is_running)
+		{
+			return false;
+		}
+
+		// Clear it out, really invalidate whats there
+		$this->obj->flush();
 	}
 
 	/**
@@ -212,17 +224,5 @@ class Memcache extends AbstractCacheMethod
 		}
 
 		$config_vars[] = $var;
-	}
-
-	/**
-	 * If this should be done as a persistent connection
-	 *
-	 * @return boolean
-	 */
-	private function _is_persist()
-	{
-		global $db_persist;
-
-		return !empty($db_persist);
 	}
 }

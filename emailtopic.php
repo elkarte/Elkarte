@@ -21,7 +21,9 @@
 
 // Only work for a pipe and direct calling
 if (!defined('STDIN'))
+{
 	return;
+}
 
 // Any output here is not good, it will be bounced as email
 error_reporting(0);

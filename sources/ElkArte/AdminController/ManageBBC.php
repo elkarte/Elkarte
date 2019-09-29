@@ -13,12 +13,17 @@
 
 namespace ElkArte\AdminController;
 
+use BBC\ParserWrapper;
+use ElkArte\AbstractController;
+use ElkArte\Action;
+use ElkArte\SettingsForm\SettingsForm;
+
 /**
  * ManageBBC controller handles administration options for BBC tags.
  *
  * @package BBC
  */
-class ManageBBC extends \ElkArte\AbstractController
+class ManageBBC extends AbstractController
 {
 	/**
 	 * The BBC admin area
@@ -44,7 +49,7 @@ class ManageBBC extends \ElkArte\AbstractController
 		);
 
 		// Set up
-		$action = new \ElkArte\Action('manage_bbc');
+		$action = new Action('manage_bbc');
 
 		// Only one option I'm afraid, but integrate_sa_manage_bbc can add more
 		$subAction = $action->initialize($subActions, 'display');
@@ -68,7 +73,7 @@ class ManageBBC extends \ElkArte\AbstractController
 		global $context, $txt, $modSettings;
 
 		// Initialize the form
-		$settingsForm = new \ElkArte\SettingsForm\SettingsForm(\ElkArte\SettingsForm\SettingsForm::DB_ADAPTER);
+		$settingsForm = new SettingsForm(SettingsForm::DB_ADAPTER);
 
 		// Initialize it with our settings
 		$settingsForm->setConfigVars($this->_settings());
@@ -86,13 +91,17 @@ class ManageBBC extends \ElkArte\AbstractController
 			checkSession();
 
 			// Security: make a pass through all tags and fix them as necessary
-			$codes = \BBC\ParserWrapper::instance()->getCodes();
+			$codes = ParserWrapper::instance()->getCodes();
 			$bbcTags = $codes->getTags();
 
 			if (!isset($this->_req->post->disabledBBC_enabledTags))
+			{
 				$this->_req->post->disabledBBC_enabledTags = array();
+			}
 			elseif (!is_array($this->_req->post->disabledBBC_enabledTags))
+			{
 				$this->_req->post->disabledBBC_enabledTags = array($this->_req->post->disabledBBC_enabledTags);
+			}
 
 			// Work out what is actually disabled!
 			$this->_req->post->disabledBBC = implode(',', array_diff($bbcTags, $this->_req->post->disabledBBC_enabledTags));
@@ -125,12 +134,12 @@ class ManageBBC extends \ElkArte\AbstractController
 	private function _settings()
 	{
 		$config_vars = array(
-				array('check', 'enableBBC'),
-				array('check', 'enableBBC', 0, 'onchange' => 'toggleBBCDisabled(\'disabledBBC\', !this.checked);'),
-				array('check', 'enablePostHTML'),
-				array('check', 'autoLinkUrls'),
+			array('check', 'enableBBC'),
+			array('check', 'enableBBC', 0, 'onchange' => 'toggleBBCDisabled(\'disabledBBC\', !this.checked);'),
+			array('check', 'enablePostHTML'),
+			array('check', 'autoLinkUrls'),
 			'',
-				array('bbc', 'disabledBBC'),
+			array('bbc', 'disabledBBC'),
 		);
 
 		// Add new settings with a nice hook, makes them available for admin settings search as well

@@ -13,7 +13,7 @@
 
 namespace ElkArte\Mentions\MentionType\Event;
 
-use ElkArte\Mentions\MentionType\Event\AbstractMentionMessage;
+use ElkArte\Util;
 
 /**
  * Class AbstractMentionBoardAccess
@@ -32,21 +32,31 @@ abstract class AbstractMentionBoardAccess extends AbstractMentionMessage
 		{
 			// To ensure it is not done twice
 			if (empty(static::$_type) || $row['mention_type'] != static::$_type)
+			{
 				continue;
+			}
 
 			// These things are associated to messages and require permission checks
 			if (empty($row['id_board']))
+			{
 				$unset_keys[] = $key;
+			}
 			else
+			{
 				$boards[$key] = $row['id_board'];
+			}
 
 			$mentions[$key]['message'] = $this->_replaceMsg($row);
 		}
 
 		if (!empty($boards))
+		{
 			return $this->_validateAccess($boards, $mentions, $unset_keys);
+		}
 		else
+		{
 			return false;
+		}
 	}
 
 	/**
@@ -84,13 +94,19 @@ abstract class AbstractMentionBoardAccess extends AbstractMentionMessage
 		if (!empty($unset_keys))
 		{
 			$removed = true;
-			foreach ($unset_keys as  $key)
+			foreach ($unset_keys as $key)
+			{
 				unset($mentions[$key]);
+			}
 
 			if (!empty($modSettings['user_access_mentions']))
-				$modSettings['user_access_mentions'] = \ElkArte\Util::unserialize($modSettings['user_access_mentions']);
+			{
+				$modSettings['user_access_mentions'] = Util::unserialize($modSettings['user_access_mentions']);
+			}
 			else
+			{
 				$modSettings['user_access_mentions'] = array();
+			}
 
 			$modSettings['user_access_mentions'][$this->user->id] = 0;
 			updateSettings(array('user_access_mentions' => serialize($modSettings['user_access_mentions'])));

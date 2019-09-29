@@ -8,7 +8,7 @@
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause (see accompanying LICENSE.txt file)
  *
  * This file contains code covered by:
- * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * copyright: 2011 Simple Machines (http://www.simplemachines.org)
  *
  * @version 2.0 dev
  *
@@ -16,58 +16,72 @@
 
 namespace ElkArte\AdminController;
 
+use ElkArte\AbstractController;
+use ElkArte\Action;
+use ElkArte\Exceptions\Exception;
+use ElkArte\SettingsForm\SettingsForm;
+use ElkArte\Util;
+
 /**
  * This is the attachments and avatars controller class.
  * It is doing the job of attachments and avatars maintenance and management.
  *
  * @package Attachments
  */
-class ManageAttachments extends \ElkArte\AbstractController
+class ManageAttachments extends AbstractController
 {
 	/**
 	 * Loop counter for paused attachment maintenance actions
+	 *
 	 * @var int
 	 */
 	public $step;
 
 	/**
 	 * substep counter for paused attachment maintenance actions
+	 *
 	 * @var int
 	 */
 	public $substep;
 
 	/**
 	 * Substep at the beginning of a maintenance loop
+	 *
 	 * @var int
 	 */
 	public $starting_substep;
 
 	/**
 	 * Current directory key being processed
+	 *
 	 * @var int
 	 */
 	public $current_dir;
 
 	/**
 	 * Current base directory key being processed
+	 *
 	 * @var int
 	 */
 	public $current_base_dir;
 
 	/**
 	 * Used during transfer of files
+	 *
 	 * @var string
 	 */
 	public $from;
 
 	/**
 	 * Type of attachment management in use
+	 *
 	 * @var string
 	 */
 	public $auto;
 
 	/**
 	 * Destination when transferring attachments
+	 *
 	 * @var string
 	 */
 	public $to;
@@ -93,7 +107,7 @@ class ManageAttachments extends \ElkArte\AbstractController
 	 * @uses Admin language file.
 	 * @uses template layer 'manage_files' for showing the tab bar.
 	 *
-	 * @see \ElkArte\AbstractController::action_index()
+	 * @see  \ElkArte\AbstractController::action_index()
 	 */
 	public function action_index()
 	{
@@ -124,7 +138,7 @@ class ManageAttachments extends \ElkArte\AbstractController
 		);
 
 		// Get ready for some action
-		$action = new \ElkArte\Action('manage_attachments');
+		$action = new Action('manage_attachments');
 
 		// Default page title is good.
 		$context['page_title'] = $txt['attachments_avatars'];
@@ -158,7 +172,7 @@ class ManageAttachments extends \ElkArte\AbstractController
 		global $modSettings, $context;
 
 		// initialize the form
-		$settingsForm = new \ElkArte\SettingsForm\SettingsForm(\ElkArte\SettingsForm\SettingsForm::DB_ADAPTER);
+		$settingsForm = new SettingsForm(SettingsForm::DB_ADAPTER);
 
 		// Initialize settings
 		$settingsForm->setConfigVars($this->_settings());
@@ -192,7 +206,9 @@ class ManageAttachments extends \ElkArte\AbstractController
 				|| !empty($this->_req->post->use_subdirectories_for_attachments))
 			{
 				if (!empty($this->_req->post->attachmentUploadDir) && file_exists($modSettings['attachmentUploadDir']) && $modSettings['attachmentUploadDir'] !== $this->_req->post->attachmentUploadDir)
+				{
 					rename($modSettings['attachmentUploadDir'], $this->_req->post->attachmentUploadDir);
+				}
 
 				$modSettings['attachmentUploadDir'] = array(1 => $this->_req->post->attachmentUploadDir);
 				$this->_req->post->attachmentUploadDir = serialize($modSettings['attachmentUploadDir']);
@@ -203,15 +219,21 @@ class ManageAttachments extends \ElkArte\AbstractController
 			{
 				// Make sure we have a base directory defined
 				if (isset($this->_req->post->use_subdirectories_for_attachments) && empty($this->_req->post->basedirectory_for_attachments))
+				{
 					$this->_req->post->basedirectory_for_attachments = (!empty($modSettings['basedirectory_for_attachments']) ? ($modSettings['basedirectory_for_attachments']) : BOARDDIR);
+				}
 
 				if (!empty($modSettings['attachment_basedirectories']))
 				{
 					if (!is_array($modSettings['attachment_basedirectories']))
-						$modSettings['attachment_basedirectories'] = \ElkArte\Util::unserialize($modSettings['attachment_basedirectories']);
+					{
+						$modSettings['attachment_basedirectories'] = Util::unserialize($modSettings['attachment_basedirectories']);
+					}
 				}
 				else
+				{
 					$modSettings['attachment_basedirectories'] = array();
+				}
 
 				if (!empty($this->_req->post->basedirectory_for_attachments) && !in_array($this->_req->post->basedirectory_for_attachments, $modSettings['attachment_basedirectories']))
 				{
@@ -220,7 +242,9 @@ class ManageAttachments extends \ElkArte\AbstractController
 					if (!in_array($this->_req->post->basedirectory_for_attachments, $modSettings['attachmentUploadDir']))
 					{
 						if (!automanage_attachments_create_directory($this->_req->post->basedirectory_for_attachments))
+						{
 							$this->_req->post->basedirectory_for_attachments = $modSettings['basedirectory_for_attachments'];
+						}
 					}
 
 					if (!in_array($this->_req->post->basedirectory_for_attachments, $modSettings['attachment_basedirectories']))
@@ -260,23 +284,31 @@ class ManageAttachments extends \ElkArte\AbstractController
 		global $modSettings, $txt, $context;
 
 		// Get the current attachment directory.
-		$modSettings['attachmentUploadDir'] = \ElkArte\Util::unserialize($modSettings['attachmentUploadDir']);
+		$modSettings['attachmentUploadDir'] = Util::unserialize($modSettings['attachmentUploadDir']);
 		$context['attachmentUploadDir'] = $modSettings['attachmentUploadDir'][$modSettings['currentAttachmentUploadDir']];
 
 		// First time here?
 		if (empty($modSettings['attachment_basedirectories']) && $modSettings['currentAttachmentUploadDir'] == 1 && (is_array($modSettings['attachmentUploadDir']) && count($modSettings['attachmentUploadDir']) == 1))
+		{
 			$modSettings['attachmentUploadDir'] = $modSettings['attachmentUploadDir'][1];
+		}
 
 		// If not set, show a default path for the base directory
 		if (!isset($this->_req->query->save) && empty($modSettings['basedirectory_for_attachments']))
+		{
 			$modSettings['basedirectory_for_attachments'] = $context['attachmentUploadDir'];
+		}
 
 		$context['valid_upload_dir'] = is_dir($context['attachmentUploadDir']) && is_writable($context['attachmentUploadDir']);
 
 		if (!empty($modSettings['automanage_attachments']))
+		{
 			$context['valid_basedirectory'] = !empty($modSettings['basedirectory_for_attachments']) && is_writable($modSettings['basedirectory_for_attachments']);
+		}
 		else
+		{
 			$context['valid_basedirectory'] = true;
+		}
 
 		// A bit of razzle dazzle with the $txt strings. :)
 		$txt['basedirectory_for_attachments_warning'] = str_replace('{attach_repair_url}', getUrl('admin', ['action' => 'admin', 'area' => 'manageattachments', 'sa' => 'attachpaths']), $txt['basedirectory_for_attachments_warning']);
@@ -302,56 +334,56 @@ class ManageAttachments extends \ElkArte\AbstractController
 
 		$config_vars = array(
 			array('title', 'attachment_manager_settings'),
-				// Are attachments enabled?
-				array('select', 'attachmentEnable', array($txt['attachmentEnable_deactivate'], $txt['attachmentEnable_enable_all'], $txt['attachmentEnable_disable_new'])),
+			// Are attachments enabled?
+			array('select', 'attachmentEnable', array($txt['attachmentEnable_deactivate'], $txt['attachmentEnable_enable_all'], $txt['attachmentEnable_disable_new'])),
 			'',
-				// Extension checks etc.
-				array('check', 'attachmentRecodeLineEndings'),
+			// Extension checks etc.
+			array('check', 'attachmentRecodeLineEndings'),
 			'',
-				// Directory and size limits.
-				array('select', 'automanage_attachments', array(0 => $txt['attachments_normal'], 1 => $txt['attachments_auto_space'], 2 => $txt['attachments_auto_years'], 3 => $txt['attachments_auto_months'], 4 => $txt['attachments_auto_16'])),
-				array('check', 'use_subdirectories_for_attachments', 'subtext' => $txt['use_subdirectories_for_attachments_note']),
-				(empty($modSettings['attachment_basedirectories'])
-					? array('text', 'basedirectory_for_attachments', 40,)
-					: array('var_message', 'basedirectory_for_attachments', 'message' => 'basedirectory_for_attachments_path', 'invalid' => empty($context['valid_basedirectory']), 'text_label' => (!empty($context['valid_basedirectory'])
-						? $txt['basedirectory_for_attachments_current']
-						: $txt['basedirectory_for_attachments_warning']))
-				),
-				empty($modSettings['attachment_basedirectories']) && $modSettings['currentAttachmentUploadDir'] == 1 && (is_array($modSettings['attachmentUploadDir']) && count($modSettings['attachmentUploadDir']) === 1)
-					? array('text', 'attachmentUploadDir', 'postinput' => $txt['attachmentUploadDir_multiple_configure'], 40, 'invalid' => !$context['valid_upload_dir'])
-					: array('var_message', 'attach_current_directory', 'postinput' => $txt['attachmentUploadDir_multiple_configure'], 'message' => 'attachment_path', 'invalid' => empty($context['valid_upload_dir']), 'text_label' => (!empty($context['valid_upload_dir'])
-						? $txt['attach_current_dir']
-						: $txt['attach_current_dir_warning'])
-				),
-				array('int', 'attachmentDirFileLimit', 'subtext' => $txt['zero_for_no_limit'], 6),
-				array('int', 'attachmentDirSizeLimit', 'subtext' => $txt['zero_for_no_limit'], 6, 'postinput' => $txt['kilobyte']),
+			// Directory and size limits.
+			array('select', 'automanage_attachments', array(0 => $txt['attachments_normal'], 1 => $txt['attachments_auto_space'], 2 => $txt['attachments_auto_years'], 3 => $txt['attachments_auto_months'], 4 => $txt['attachments_auto_16'])),
+			array('check', 'use_subdirectories_for_attachments', 'subtext' => $txt['use_subdirectories_for_attachments_note']),
+			(empty($modSettings['attachment_basedirectories'])
+				? array('text', 'basedirectory_for_attachments', 40,)
+				: array('var_message', 'basedirectory_for_attachments', 'message' => 'basedirectory_for_attachments_path', 'invalid' => empty($context['valid_basedirectory']), 'text_label' => (!empty($context['valid_basedirectory'])
+					? $txt['basedirectory_for_attachments_current']
+					: $txt['basedirectory_for_attachments_warning']))
+			),
+			empty($modSettings['attachment_basedirectories']) && $modSettings['currentAttachmentUploadDir'] == 1 && (is_array($modSettings['attachmentUploadDir']) && count($modSettings['attachmentUploadDir']) === 1)
+				? array('text', 'attachmentUploadDir', 'postinput' => $txt['attachmentUploadDir_multiple_configure'], 40, 'invalid' => !$context['valid_upload_dir'])
+				: array('var_message', 'attach_current_directory', 'postinput' => $txt['attachmentUploadDir_multiple_configure'], 'message' => 'attachment_path', 'invalid' => empty($context['valid_upload_dir']), 'text_label' => (!empty($context['valid_upload_dir'])
+				? $txt['attach_current_dir']
+				: $txt['attach_current_dir_warning'])
+			),
+			array('int', 'attachmentDirFileLimit', 'subtext' => $txt['zero_for_no_limit'], 6),
+			array('int', 'attachmentDirSizeLimit', 'subtext' => $txt['zero_for_no_limit'], 6, 'postinput' => $txt['kilobyte']),
 			'',
-				// Posting limits
-				array('warning', empty($testPM) ? 'attachment_postsize_warning' : ''),
-				array('int', 'attachmentPostLimit', 'subtext' => $txt['zero_for_no_limit'], 6, 'postinput' => $txt['kilobyte']),
-				array('warning', empty($testUM) ? 'attachment_filesize_warning' : ''),
-				array('int', 'attachmentSizeLimit', 'subtext' => $txt['zero_for_no_limit'], 6, 'postinput' => $txt['kilobyte']),
-				array('int', 'attachmentNumPerPostLimit', 'subtext' => $txt['zero_for_no_limit'], 6),
-				array('check', 'attachment_autorotate', 'postinput' => empty($testImgRotate) ? $txt['attachment_autorotate_na'] : ''),
+			// Posting limits
+			array('warning', empty($testPM) ? 'attachment_postsize_warning' : ''),
+			array('int', 'attachmentPostLimit', 'subtext' => $txt['zero_for_no_limit'], 6, 'postinput' => $txt['kilobyte']),
+			array('warning', empty($testUM) ? 'attachment_filesize_warning' : ''),
+			array('int', 'attachmentSizeLimit', 'subtext' => $txt['zero_for_no_limit'], 6, 'postinput' => $txt['kilobyte']),
+			array('int', 'attachmentNumPerPostLimit', 'subtext' => $txt['zero_for_no_limit'], 6),
+			array('check', 'attachment_autorotate', 'postinput' => empty($testImgRotate) ? $txt['attachment_autorotate_na'] : ''),
 			// Security Items
 			array('title', 'attachment_security_settings'),
-				// Extension checks etc.
-				array('check', 'attachmentCheckExtensions'),
-				array('text', 'attachmentExtensions', 40),
+			// Extension checks etc.
+			array('check', 'attachmentCheckExtensions'),
+			array('text', 'attachmentExtensions', 40),
 			'',
-				// Image checks.
-				array('warning', empty($testImg) ? 'attachment_img_enc_warning' : ''),
-				array('check', 'attachment_image_reencode'),
+			// Image checks.
+			array('warning', empty($testImg) ? 'attachment_img_enc_warning' : ''),
+			array('check', 'attachment_image_reencode'),
 			// Thumbnail settings.
 			array('title', 'attachment_thumbnail_settings'),
-				array('check', 'attachmentShowImages'),
-				array('check', 'attachmentThumbnails'),
-				array('check', 'attachment_thumb_png'),
-				array('text', 'attachmentThumbWidth', 6),
-				array('text', 'attachmentThumbHeight', 6),
+			array('check', 'attachmentShowImages'),
+			array('check', 'attachmentThumbnails'),
+			array('check', 'attachment_thumb_png'),
+			array('text', 'attachmentThumbWidth', 6),
+			array('text', 'attachmentThumbHeight', 6),
 			'',
-				array('int', 'max_image_width', 'subtext' => $txt['zero_for_no_limit']),
-				array('int', 'max_image_height', 'subtext' => $txt['zero_for_no_limit']),
+			array('int', 'max_image_width', 'subtext' => $txt['zero_for_no_limit']),
+			array('int', 'max_image_height', 'subtext' => $txt['zero_for_no_limit']),
 		);
 
 		// Add new settings with a nice hook, makes them available for admin settings search as well
@@ -376,7 +408,7 @@ class ManageAttachments extends \ElkArte\AbstractController
 	 * - Allows sorting by name, date, size and member.
 	 * - Paginates results.
 	 *
-	 *  @uses the 'browse' sub template
+	 * @uses the 'browse' sub template
 	 */
 	public function action_browse()
 	{
@@ -437,13 +469,17 @@ class ManageAttachments extends \ElkArte\AbstractController
 
 							// Show a popup on click if it's a picture and we know its dimensions.
 							if (!empty($rowData['width']) && !empty($rowData['height']))
+							{
 								$link .= sprintf(' onclick="return reqWin(this.href' . ($rowData['attachment_type'] == 1 ? '' : ' + \';image\'') . ', %1$d, %2$d, true);"', $rowData['width'] + 20, $rowData['height'] + 20);
+							}
 
 							$link .= sprintf('>%1$s</a>', preg_replace('~&amp;#(\\\\d{1,7}|x[0-9a-fA-F]{1,6});~', '&#\\\\1;', htmlspecialchars($rowData['filename'], ENT_COMPAT, 'UTF-8')));
 
 							// Show the dimensions.
 							if (!empty($rowData['width']) && !empty($rowData['height']))
+							{
 								$link .= sprintf(' <span class="smalltext">%1$dx%2$d</span>', $rowData['width'], $rowData['height']);
+							}
 
 							return $link;
 						},
@@ -477,11 +513,14 @@ class ManageAttachments extends \ElkArte\AbstractController
 						'function' => function ($rowData) {
 							// In case of an attachment, return the poster of the attachment.
 							if (empty($rowData['id_member']))
+							{
 								return htmlspecialchars($rowData['poster_name'], ENT_COMPAT, 'UTF-8');
-
+							}
 							// Otherwise it must be an avatar, return the link to the owner of it.
 							else
+							{
 								return '<a href="' . getUrl('profile', ['action' => 'profile', 'u' => (int) $rowData['id_member'], 'name' => $rowData['poster_name']]) . '">' . $rowData['poster_name'] . '</a>';
+							}
 						},
 					),
 					'sort' => array(
@@ -503,10 +542,12 @@ class ManageAttachments extends \ElkArte\AbstractController
 
 							// Add a link to the topic in case of an attachment.
 							if ($context['browse_type'] !== 'avatars')
+							{
 								$date .= '<br />' . $txt['in'] . ' <a href="' . getUrl('topic', ['topic' => (int) $rowData['id_topic'], 'start' => 'msg' . (int) $rowData['id_msg'], 'subject' => $rowData['subject']]) . '#msg' . (int) $rowData['id_msg'] . '">' . $rowData['subject'] . '</a>';
+							}
 
 							return $date;
-							},
+						},
 					),
 					'sort' => array(
 						'default' => $context['browse_type'] === 'avatars' ? 'mem.last_login' : 'm.id_msg',
@@ -618,17 +659,22 @@ class ManageAttachments extends \ElkArte\AbstractController
 
 		// If they specified a limit only....
 		if (!empty($modSettings['attachmentDirSizeLimit']))
+		{
 			$context['attachment_space'] = comma_format(max($modSettings['attachmentDirSizeLimit'] - $current_dir['size'], 0), 2);
-		$context['attachment_current_size'] = byte_format($current_dir['size']);
+		}
 
 		if (!empty($modSettings['attachmentDirFileLimit']))
+		{
 			$context['attachment_files'] = comma_format(max($modSettings['attachmentDirFileLimit'] - $current_dir['files'], 0), 0);
-		$context['attachment_current_files'] = comma_format($current_dir['files'], 0);
+		}
 
+		$context['attachment_current_size'] = byte_format($current_dir['size']);
+		$context['attachment_current_files'] = comma_format($current_dir['files'], 0);
 		$context['attach_multiple_dirs'] = count($attach_dirs) > 1;
 		$context['attach_dirs'] = $attach_dirs;
-		$context['base_dirs'] = !empty($modSettings['attachment_basedirectories']) ? \ElkArte\Util::unserialize($modSettings['attachment_basedirectories']) : array();
+		$context['base_dirs'] = !empty($modSettings['attachment_basedirectories']) ? Util::unserialize($modSettings['attachment_basedirectories']) : array();
 		$context['checked'] = $this->_req->getSession('checked', true);
+
 		if (!empty($this->_req->session->results))
 		{
 			$context['results'] = implode('<br />', $this->_req->session->results);
@@ -653,7 +699,9 @@ class ManageAttachments extends \ElkArte\AbstractController
 
 			// Guess that didn't work?
 			if (!is_writable($modSettings['custom_avatar_dir']))
-				throw new \ElkArte\Exceptions\Exception('attachments_no_write', 'critical');
+			{
+				throw new Exception('attachments_no_write', 'critical');
+			}
 		}
 
 		// Finally move the attachments..
@@ -667,6 +715,7 @@ class ManageAttachments extends \ElkArte\AbstractController
 	 *
 	 * - Called from the maintenance screen by ?action=admin;area=manageattachments;sa=byAge.
 	 * - It optionally adds a certain text to the messages the attachments were removed from.
+	 *
 	 * @todo refactor this silly superglobals use...
 	 */
 	public function action_byAge()
@@ -683,7 +732,9 @@ class ManageAttachments extends \ElkArte\AbstractController
 
 			// Update the messages to reflect the change.
 			if (!empty($messages) && !empty($this->_req->post->notice))
+			{
 				setRemovalNotice($messages, $this->_req->post->notice);
+			}
 		}
 		else
 		{
@@ -709,7 +760,9 @@ class ManageAttachments extends \ElkArte\AbstractController
 
 		// And make a note on the post.
 		if (!empty($messages) && !empty($this->_req->post->notice))
+		{
 			setRemovalNotice($messages, $this->_req->post->notice);
+		}
 
 		redirectexit('action=admin;area=manageattachments;sa=maintenance');
 	}
@@ -730,10 +783,14 @@ class ManageAttachments extends \ElkArte\AbstractController
 			// There must be a quicker way to pass this safety test??
 			$attachments = array();
 			foreach ($this->_req->post->remove as $removeID => $dummy)
+			{
 				$attachments[] = (int) $removeID;
+			}
 
 			if ($this->_req->query->type == 'avatars' && !empty($attachments))
+			{
 				removeAttachments(array('id_attach' => $attachments));
+			}
 			elseif (!empty($attachments))
 			{
 				$messages = removeAttachments(array('id_attach' => $attachments), 'messages', true);
@@ -769,7 +826,9 @@ class ManageAttachments extends \ElkArte\AbstractController
 
 		// Add the notice on the end of the changed messages.
 		if (!empty($messages))
+		{
 			setRemovalNotice($messages, $notice);
+		}
 
 		redirectexit('action=admin;area=manageattachments;sa=maintenance');
 	}
@@ -799,7 +858,9 @@ class ManageAttachments extends \ElkArte\AbstractController
 
 		// If we choose cancel, redirect right back.
 		if (isset($this->_req->post->cancel))
+		{
 			redirectexit('action=admin;area=manageattachments;sa=maintenance');
+		}
 
 		// Try give us a while to sort this out...
 		detectServer()->setTimeLimit(600);
@@ -818,10 +879,14 @@ class ManageAttachments extends \ElkArte\AbstractController
 			{
 				// Nothing?
 				if (empty($this->_req->post->to_fix))
+				{
 					redirectexit('action=admin;area=manageattachments;sa=maintenance');
+				}
 
 				foreach ($this->_req->post->to_fix as $key => $value)
+				{
 					$_SESSION['attachments_to_fix'][] = $value;
+				}
 			}
 		}
 
@@ -891,7 +956,9 @@ class ManageAttachments extends \ElkArte\AbstractController
 				$repair_errors = repairAttachmentData($this->substep, $fix_errors, $to_fix);
 
 				foreach ($repair_errors as $key => $value)
+				{
 					$context['repair_errors'][$key] += $value;
+				}
 
 				$this->_pauseAttachmentMaintenance($to_fix, $thumbnails);
 			}
@@ -943,7 +1010,9 @@ class ManageAttachments extends \ElkArte\AbstractController
 		{
 			// Just use the current path for temp files.
 			if (!is_array($modSettings['attachmentUploadDir']))
-				$modSettings['attachmentUploadDir'] = \ElkArte\Util::unserialize($modSettings['attachmentUploadDir']);
+			{
+				$modSettings['attachmentUploadDir'] = Util::unserialize($modSettings['attachmentUploadDir']);
+			}
 
 			$attach_dirs = $modSettings['attachmentUploadDir'];
 			$current_check = 0;
@@ -958,7 +1027,9 @@ class ManageAttachments extends \ElkArte\AbstractController
 					foreach ($files as $file)
 					{
 						if ($file->getFilename() === '.htaccess')
+						{
 							continue;
+						}
 
 						if ($files_checked <= $current_check)
 						{
@@ -967,7 +1038,9 @@ class ManageAttachments extends \ElkArte\AbstractController
 							{
 								// Temp file is more than 5 hours old!
 								if ($file->getMTime() < time() - 18000)
+								{
 									@unlink($file->getPathname());
+								}
 							}
 							// That should be an attachment, let's check if we have it in the database
 							elseif (strpos($file->getFilename(), '_') !== false)
@@ -978,25 +1051,35 @@ class ManageAttachments extends \ElkArte\AbstractController
 									if (!validateAttachID($attachID))
 									{
 										if ($fix_errors && in_array('files_without_attachment', $to_fix))
+										{
 											@unlink($file->getPathname());
+										}
 										else
+										{
 											$context['repair_errors']['files_without_attachment']++;
+										}
 									}
 								}
 							}
 							elseif ($file->getFilename() !== 'index.php' && !$file->isDir())
 							{
 								if ($fix_errors && in_array('files_without_attachment', $to_fix))
+								{
 									@unlink($file->getPathname());
+								}
 								else
+								{
 									$context['repair_errors']['files_without_attachment']++;
+								}
 							}
 						}
 						$current_check++;
 						$this->substep = (int) $current_check;
 
 						if ($current_check - $files_checked >= $max_checks)
+						{
 							$this->_pauseAttachmentMaintenance($to_fix);
+						}
 					}
 				}
 				catch (\UnexpectedValueException $e)
@@ -1029,6 +1112,62 @@ class ManageAttachments extends \ElkArte\AbstractController
 	}
 
 	/**
+	 * Function called in-between each round of attachments and avatar repairs.
+	 *
+	 * What it does:
+	 *
+	 * - Called by repairAttachments().
+	 * - If repairAttachments() has more steps added, this function needs updated!
+	 *
+	 * @param mixed[] $to_fix attachments to fix
+	 * @param int $max_substep = 0
+	 * @throws \ElkArte\Exceptions\Exception
+	 * @todo Move to ManageAttachments.subs.php
+	 * @package Attachments
+	 */
+	private function _pauseAttachmentMaintenance($to_fix, $max_substep = 0)
+	{
+		global $context, $txt, $time_start;
+
+		// Try get more time...
+		detectServer()->setTimeLimit(600);
+
+		// Have we already used our maximum time?
+		if (microtime(true) - $time_start < 3 || $this->starting_substep == $this->substep)
+		{
+			return;
+		}
+
+		$context['continue_get_data'] = '?action=admin;area=manageattachments;sa=repair' . (isset($this->_req->query->fixErrors) ? ';fixErrors' : '') . ';step=' . $this->step . ';substep=' . $this->substep . ';' . $context['session_var'] . '=' . $context['session_id'];
+		$context['page_title'] = $txt['not_done_title'];
+		$context['continue_post_data'] = '';
+		$context['continue_countdown'] = '2';
+		$context['sub_template'] = 'not_done';
+
+		// Specific stuff to not break this template!
+		$context[$context['admin_menu_name']]['current_subsection'] = 'maintenance';
+
+		// Change these two if more steps are added!
+		if (empty($max_substep))
+		{
+			$context['continue_percent'] = round(($this->step * 100) / 25);
+		}
+		else
+		{
+			$context['continue_percent'] = round(($this->step * 100 + ($this->substep * 100) / $max_substep) / 25);
+		}
+
+		// Never more than 100%!
+		$context['continue_percent'] = min($context['continue_percent'], 100);
+
+		// Save the needed information for the next look
+		$_SESSION['attachments_to_fix'] = $to_fix;
+		$_SESSION['attachments_to_fix2'] = $context['repair_errors'];
+
+		obExit();
+	}
+
+	/**
 	 * This function lists and allows updating of multiple attachments paths.
 	 */
 	public function action_attachpaths()
@@ -1037,12 +1176,18 @@ class ManageAttachments extends \ElkArte\AbstractController
 
 		// Since this needs to be done eventually.
 		if (!is_array($modSettings['attachmentUploadDir']))
-			$modSettings['attachmentUploadDir'] = \ElkArte\Util::unserialize($modSettings['attachmentUploadDir']);
+		{
+			$modSettings['attachmentUploadDir'] = Util::unserialize($modSettings['attachmentUploadDir']);
+		}
 
 		if (!isset($modSettings['attachment_basedirectories']))
+		{
 			$modSettings['attachment_basedirectories'] = array();
+		}
 		elseif (!is_array($modSettings['attachment_basedirectories']))
-			$modSettings['attachment_basedirectories'] = \ElkArte\Util::unserialize($modSettings['attachment_basedirectories']);
+		{
+			$modSettings['attachment_basedirectories'] = Util::unserialize($modSettings['attachment_basedirectories']);
+		}
 
 		$errors = array();
 
@@ -1058,20 +1203,26 @@ class ManageAttachments extends \ElkArte\AbstractController
 			$themes = installedThemes();
 			$reserved_dirs = array(BOARDDIR, SOURCEDIR, SUBSDIR, CONTROLLERDIR, CACHEDIR, EXTDIR, LANGUAGEDIR, ADMINDIR);
 			foreach ($themes as $theme)
+			{
 				$reserved_dirs[] = $theme['theme_dir'];
+			}
 
 			foreach ($this->_req->post->dirs as $id => $path)
 			{
 				$error = '';
 				$id = (int) $id;
 				if ($id < 1)
+				{
 					continue;
+				}
 
 				$real_path = rtrim(trim($path), DIRECTORY_SEPARATOR);
 
 				// If it doesn't look like a directory, probably is not a directory
 				if (preg_match('~[/\\\\]~', $real_path) !== 1)
+				{
 					$real_path = realpath(BOARDDIR . DIRECTORY_SEPARATOR . ltrim($real_path, DIRECTORY_SEPARATOR));
+				}
 
 				// Hmm, a new path maybe?
 				if (!array_key_exists($id, $modSettings['attachmentUploadDir']))
@@ -1092,9 +1243,13 @@ class ManageAttachments extends \ElkArte\AbstractController
 
 					// OK, so let's try to create it then.
 					if (automanage_attachments_create_directory($path))
+					{
 						$this->current_dir = $modSettings['currentAttachmentUploadDir'];
+					}
 					else
+					{
 						$errors[] = $path . ': ' . $txt[$context['dir_creation_error']];
+					}
 				}
 
 				// Changing a directory name?
@@ -1124,7 +1279,7 @@ class ManageAttachments extends \ElkArte\AbstractController
 							'attachment_basedirectories' => serialize($modSettings['attachment_basedirectories']),
 							'basedirectory_for_attachments' => $base,
 						));
-						$modSettings['attachment_basedirectories'] = \ElkArte\Util::unserialize($modSettings['attachment_basedirectories']);
+						$modSettings['attachment_basedirectories'] = Util::unserialize($modSettings['attachment_basedirectories']);
 					}
 				}
 
@@ -1134,10 +1289,14 @@ class ManageAttachments extends \ElkArte\AbstractController
 
 					// It's not a good idea to delete the current directory.
 					if ($id == (!empty($this->current_dir) ? $this->current_dir : $modSettings['currentAttachmentUploadDir']))
+					{
 						$errors[] = $real_path . ': ' . $txt['attach_dir_is_current'];
+					}
 					// Or the current base directory
 					elseif (!empty($modSettings['basedirectory_for_attachments']) && $modSettings['basedirectory_for_attachments'] === $modSettings['attachmentUploadDir'][$id])
+					{
 						$errors[] = $real_path . ': ' . $txt['attach_dir_is_current_bd'];
+					}
 					else
 					{
 						// Let's not try to delete a path with files in it.
@@ -1148,15 +1307,21 @@ class ManageAttachments extends \ElkArte\AbstractController
 						{
 							// Count any sub-folders.
 							foreach ($modSettings['attachmentUploadDir'] as $sub)
+							{
 								if (strpos($sub, $real_path . DIRECTORY_SEPARATOR) !== false)
+								{
 									$num_attach++;
+								}
+							}
 						}
 
 						// It's safe to delete. So try to delete the folder also
 						if ($num_attach == 0)
 						{
 							if (is_dir($real_path))
+							{
 								$doit = true;
+							}
 							elseif (is_dir(BOARDDIR . DIRECTORY_SEPARATOR . $real_path))
 							{
 								$doit = true;
@@ -1168,7 +1333,9 @@ class ManageAttachments extends \ElkArte\AbstractController
 								unlink($real_path . '/.htaccess');
 								unlink($real_path . '/index.php');
 								if (!@rmdir($real_path))
+								{
 									$error = $real_path . ': ' . $txt['attach_dir_no_delete'];
+								}
 							}
 
 							// Remove it from the base directory list.
@@ -1176,16 +1343,22 @@ class ManageAttachments extends \ElkArte\AbstractController
 							{
 								unset($modSettings['attachment_basedirectories'][$id]);
 								updateSettings(array('attachment_basedirectories' => serialize($modSettings['attachment_basedirectories'])));
-								$modSettings['attachment_basedirectories'] = \ElkArte\Util::unserialize($modSettings['attachment_basedirectories']);
+								$modSettings['attachment_basedirectories'] = Util::unserialize($modSettings['attachment_basedirectories']);
 							}
 						}
 						else
+						{
 							$error = $real_path . ': ' . $txt['attach_dir_no_remove'];
+						}
 
 						if (empty($error))
+						{
 							continue;
+						}
 						else
+						{
 							$errors[] = $error;
+						}
 					}
 				}
 
@@ -1194,22 +1367,30 @@ class ManageAttachments extends \ElkArte\AbstractController
 
 			// We need to make sure the current directory is right.
 			if (empty($this->current_dir) && !empty($modSettings['currentAttachmentUploadDir']))
+			{
 				$this->current_dir = $modSettings['currentAttachmentUploadDir'];
+			}
 
 			// Find the current directory if there's no value carried,
 			if (empty($this->current_dir) || empty($new_dirs[$this->current_dir]))
 			{
 				if (array_key_exists($modSettings['currentAttachmentUploadDir'], $modSettings['attachmentUploadDir']))
+				{
 					$this->current_dir = $modSettings['currentAttachmentUploadDir'];
+				}
 				else
+				{
 					$this->current_dir = max(array_keys($modSettings['attachmentUploadDir']));
+				}
 			}
 
 			// If the user wishes to go back, update the last_dir array
 			if ($this->current_dir !== $modSettings['currentAttachmentUploadDir'] && !empty($modSettings['last_attachments_directory']) && (isset($modSettings['last_attachments_directory'][$this->current_dir]) || isset($modSettings['last_attachments_directory'][0])))
 			{
 				if (!is_array($modSettings['last_attachments_directory']))
-					$modSettings['last_attachments_directory'] = \ElkArte\Util::unserialize($modSettings['last_attachments_directory']);
+				{
+					$modSettings['last_attachments_directory'] = Util::unserialize($modSettings['last_attachments_directory']);
+				}
 
 				$num = substr(strrchr($modSettings['attachmentUploadDir'][$this->current_dir], '_'), 1);
 				if (is_numeric($num))
@@ -1218,6 +1399,7 @@ class ManageAttachments extends \ElkArte\AbstractController
 					$bid = -1;
 					$use_subdirectories_for_attachments = 0;
 					if (!empty($modSettings['attachment_basedirectories']))
+					{
 						foreach ($modSettings['attachment_basedirectories'] as $bid => $base)
 						{
 							if (strpos($modSettings['attachmentUploadDir'][$this->current_dir], $base . DIRECTORY_SEPARATOR) !== false)
@@ -1226,9 +1408,12 @@ class ManageAttachments extends \ElkArte\AbstractController
 								break;
 							}
 						}
+					}
 
 					if ($use_subdirectories_for_attachments == 0 && strpos($modSettings['attachmentUploadDir'][$this->current_dir], BOARDDIR . DIRECTORY_SEPARATOR) !== false)
+					{
 						$bid = 0;
+					}
 
 					$modSettings['last_attachments_directory'][$bid] = (int) $num;
 					$modSettings['basedirectory_for_attachments'] = !empty($modSettings['basedirectory_for_attachments']) ? $modSettings['basedirectory_for_attachments'] : '';
@@ -1248,7 +1433,9 @@ class ManageAttachments extends \ElkArte\AbstractController
 				foreach ($new_dirs as $id => $dir)
 				{
 					if ($id != 1)
+					{
 						updateAttachmentIdFolder($id, 1);
+					}
 
 					$update = array(
 						'currentAttachmentUploadDir' => 1,
@@ -1266,10 +1453,14 @@ class ManageAttachments extends \ElkArte\AbstractController
 			}
 
 			if (!empty($update))
+			{
 				updateSettings($update);
+			}
 
 			if (!empty($errors))
+			{
 				$_SESSION['errors']['dir'] = $errors;
+			}
 
 			redirectexit('action=admin;area=manageattachments;sa=attachpaths;' . $context['session_var'] . '=' . $context['session_id']);
 		}
@@ -1284,9 +1475,11 @@ class ManageAttachments extends \ElkArte\AbstractController
 			if (empty($this->_req->post->new_base_dir) && !empty($this->current_base_dir))
 			{
 				if ($modSettings['basedirectory_for_attachments'] !== $modSettings['attachmentUploadDir'][$this->current_base_dir])
+				{
 					$update = (array(
 						'basedirectory_for_attachments' => $modSettings['attachmentUploadDir'][$this->current_base_dir],
 					));
+				}
 			}
 
 			if (isset($this->_req->post->base_dir))
@@ -1334,12 +1527,16 @@ class ManageAttachments extends \ElkArte\AbstractController
 				if (!in_array($this->_req->post->new_base_dir, $modSettings['attachmentUploadDir']))
 				{
 					if (!automanage_attachments_create_directory($this->_req->post->new_base_dir))
+					{
 						$errors[] = $this->_req->post->new_base_dir . ': ' . $txt['attach_dir_base_no_create'];
+					}
 				}
 
 				$modSettings['currentAttachmentUploadDir'] = array_search($this->_req->post->new_base_dir, $modSettings['attachmentUploadDir']);
 				if (!in_array($this->_req->post->new_base_dir, $modSettings['attachment_basedirectories']))
+				{
 					$modSettings['attachment_basedirectories'][$modSettings['currentAttachmentUploadDir']] = $this->_req->post->new_base_dir;
+				}
 				ksort($modSettings['attachment_basedirectories']);
 
 				$update = (array(
@@ -1350,10 +1547,14 @@ class ManageAttachments extends \ElkArte\AbstractController
 			}
 
 			if (!empty($errors))
+			{
 				$_SESSION['errors']['base'] = $errors;
+			}
 
 			if (!empty($update))
+			{
 				updateSettings($update);
+			}
 
 			redirectexit('action=admin;area=manageattachments;sa=attachpaths;' . $context['session_var'] . '=' . $context['session_id']);
 		}
@@ -1364,12 +1565,20 @@ class ManageAttachments extends \ElkArte\AbstractController
 			{
 				$errors = array();
 				if (!empty($this->_req->session->errors['dir']))
+				{
 					foreach ($this->_req->session->errors['dir'] as $error)
-						$errors['dir'][] = \ElkArte\Util::htmlspecialchars($error, ENT_QUOTES);
+					{
+						$errors['dir'][] = Util::htmlspecialchars($error, ENT_QUOTES);
+					}
+				}
 
 				if (!empty($this->_req->session->errors['base']))
+				{
 					foreach ($this->_req->session->errors['base'] as $error)
-						$errors['base'][] = \ElkArte\Util::htmlspecialchars($error, ENT_QUOTES);
+					{
+						$errors['base'][] = Util::htmlspecialchars($error, ENT_QUOTES);
+					}
+				}
 			}
 			unset($_SESSION['errors'], $this->_req->session->errors);
 		}
@@ -1554,11 +1763,15 @@ class ManageAttachments extends \ElkArte\AbstractController
 		checkSession();
 
 		// The list(s) of directory's that are available.
-		$modSettings['attachmentUploadDir'] = \ElkArte\Util::unserialize($modSettings['attachmentUploadDir']);
+		$modSettings['attachmentUploadDir'] = Util::unserialize($modSettings['attachmentUploadDir']);
 		if (!empty($modSettings['attachment_basedirectories']))
-			$modSettings['attachment_basedirectories'] = \ElkArte\Util::unserialize($modSettings['attachment_basedirectories']);
+		{
+			$modSettings['attachment_basedirectories'] = Util::unserialize($modSettings['attachment_basedirectories']);
+		}
 		else
+		{
 			$modSettings['basedirectory_for_attachments'] = array();
+		}
 
 		// Clean the inputs
 		$this->from = $this->_req->getPost('from', 'intval');
@@ -1578,11 +1791,15 @@ class ManageAttachments extends \ElkArte\AbstractController
 
 		// Need to know where we are moving things from
 		if (empty($this->from) || (empty($this->auto) && empty($this->to)))
+		{
 			$results[] = $txt['attachment_transfer_no_dir'];
+		}
 
 		// Same location, that's easy
 		if ($this->from === $this->to)
+		{
 			$results[] = $txt['attachment_transfer_same_dir'];
+		}
 
 		// No errors so determine how many we may have to move
 		if (empty($results))
@@ -1592,7 +1809,9 @@ class ManageAttachments extends \ElkArte\AbstractController
 			$total_progress -= $start;
 
 			if ($total_progress < 1)
+			{
 				$results[] = $txt['attachment_transfer_no_find'];
+			}
 		}
 
 		// Nothing to move (no files in source or below the max limit)
@@ -1613,7 +1832,9 @@ class ManageAttachments extends \ElkArte\AbstractController
 			}
 			// Or to a specified directory
 			else
+			{
 				$new_dir = $this->to;
+			}
 
 			$modSettings['currentAttachmentUploadDir'] = $new_dir;
 			$break = false;
@@ -1636,13 +1857,17 @@ class ManageAttachments extends \ElkArte\AbstractController
 				if ($tomove_count === 0)
 				{
 					if (empty($current_progress))
+					{
 						$results[] = $txt['attachment_transfer_no_find'];
+					}
 					break;
 				}
 
 				// No more to move after this batch then set the finished flag.
 				if ($tomove_count < $limit)
+				{
 					$break = true;
+				}
 
 				// Move them
 				$moved = array();
@@ -1668,7 +1893,9 @@ class ManageAttachments extends \ElkArte\AbstractController
 
 								$results[] = sprintf($txt['attachments_transfered'], $total_moved, $modSettings['attachmentUploadDir'][$new_dir]);
 								if (!empty($total_not_moved))
+								{
 									$results[] = sprintf($txt['attachments_not_transfered'], $total_not_moved);
+								}
 
 								$dir_files = 0;
 								$total_moved = 0;
@@ -1695,12 +1922,16 @@ class ManageAttachments extends \ElkArte\AbstractController
 						$moved[] = $row['id_attach'];
 					}
 					else
+					{
 						$total_not_moved++;
+					}
 				}
 
 				// Update the database to reflect the new file location
 				if (!empty($moved))
+				{
 					moveAttachments($moved, $new_dir);
+				}
 
 				$new_dir = $modSettings['currentAttachmentUploadDir'];
 
@@ -1725,64 +1956,18 @@ class ManageAttachments extends \ElkArte\AbstractController
 
 			$results[] = sprintf($txt['attachments_transfered'], $total_moved, $modSettings['attachmentUploadDir'][$new_dir]);
 			if (!empty($total_not_moved))
+			{
 				$results[] = sprintf($txt['attachments_not_transfered'], $total_not_moved);
+			}
 		}
 
 		// All done, time to clean up
 		$_SESSION['results'] = $results;
 		if (file_exists(BOARDDIR . '/progress.php'))
+		{
 			unlink(BOARDDIR . '/progress.php');
+		}
 
 		redirectexit('action=admin;area=manageattachments;sa=maintenance#transfer');
-	}
-
-	/**
-	 * Function called in-between each round of attachments and avatar repairs.
-	 *
-	 * What it does:
-	 *
-	 * - Called by repairAttachments().
-	 * - If repairAttachments() has more steps added, this function needs updated!
-	 *
-	 * @package Attachments
-	 * @param mixed[] $to_fix attachments to fix
-	 * @param int $max_substep = 0
-	 * @todo Move to ManageAttachments.subs.php
-	 * @throws \ElkArte\Exceptions\Exception
-	 */
-	private function _pauseAttachmentMaintenance($to_fix, $max_substep = 0)
-	{
-		global $context, $txt, $time_start;
-
-		// Try get more time...
-		detectServer()->setTimeLimit(600);
-
-		// Have we already used our maximum time?
-		if (microtime(true) - $time_start < 3 || $this->starting_substep == $this->substep)
-			return;
-
-		$context['continue_get_data'] = '?action=admin;area=manageattachments;sa=repair' . (isset($this->_req->query->fixErrors) ? ';fixErrors' : '') . ';step=' . $this->step . ';substep=' . $this->substep . ';' . $context['session_var'] . '=' . $context['session_id'];
-		$context['page_title'] = $txt['not_done_title'];
-		$context['continue_post_data'] = '';
-		$context['continue_countdown'] = '2';
-		$context['sub_template'] = 'not_done';
-
-		// Specific stuff to not break this template!
-		$context[$context['admin_menu_name']]['current_subsection'] = 'maintenance';
-
-		// Change these two if more steps are added!
-		if (empty($max_substep))
-			$context['continue_percent'] = round(($this->step * 100) / 25);
-		else
-			$context['continue_percent'] = round(($this->step * 100 + ($this->substep * 100) / $max_substep) / 25);
-
-		// Never more than 100%!
-		$context['continue_percent'] = min($context['continue_percent'], 100);
-
-		// Save the needed information for the next look
-		$_SESSION['attachments_to_fix'] = $to_fix;
-		$_SESSION['attachments_to_fix2'] = $context['repair_errors'];
-
-		obExit();
 	}
 }

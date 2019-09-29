@@ -8,13 +8,15 @@
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause (see accompanying LICENSE.txt file)
  *
  * This file contains code covered by:
- * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * copyright: 2011 Simple Machines (http://www.simplemachines.org)
  *
  * @version 2.0 dev
  *
  */
 
 namespace ElkArte\ScheduledTasks\Tasks;
+
+use ElkArte\Util;
 
 /**
  * Class DailyDigest - Send out a daily email of all subscribed topics, to members.
@@ -59,7 +61,9 @@ class DailyDigest implements ScheduledTaskInterface
 		// If the maillist function is on then so is the enhanced digest
 		$maillist = !empty($modSettings['maillist_enabled']) && !empty($modSettings['pbe_digest_enabled']);
 		if ($maillist)
+		{
 			require_once(SUBSDIR . '/Emailpost.subs.php');
+		}
 
 		$is_weekly = !empty($is_weekly) ? 1 : 0;
 
@@ -100,21 +104,29 @@ class DailyDigest implements ScheduledTaskInterface
 			// Store this useful data!
 			$boards[$row['id_board']] = $row['id_board'];
 			if ($row['id_topic'])
+			{
 				$notify['topics'][$row['id_topic']][] = $row['id_member'];
+			}
 			else
+			{
 				$notify['boards'][$row['id_board']][] = $row['id_member'];
+			}
 		}
 		$db->free_result($request);
 
 		if (empty($boards))
+		{
 			return true;
+		}
 
 		// Just get the board names.
 		require_once(SUBSDIR . '/Boards.subs.php');
 		$boards = fetchBoardsInfo(array('boards' => $boards), array('override_permissions' => true));
 
 		if (empty($boards))
+		{
 			return true;
+		}
 
 		// Get the actual topics...
 		$request = $db->query('', '
@@ -140,11 +152,13 @@ class DailyDigest implements ScheduledTaskInterface
 		while ($row = $db->fetch_assoc($request))
 		{
 			if (!isset($types[$row['note_type']][$row['id_board']]))
+			{
 				$types[$row['note_type']][$row['id_board']] = array(
 					'lines' => array(),
 					'name' => un_htmlspecialchars($row['board_name']),
 					'id' => $row['id_board'],
 				);
+			}
 
 			// A reply has been made
 			if ($row['note_type'] === 'reply')
@@ -181,18 +195,20 @@ class DailyDigest implements ScheduledTaskInterface
 				{
 					// Convert to markdown markup e.g. text ;)
 					pbe_prepare_text($row['body']);
-					$row['body'] = \ElkArte\Util::shorten_text($row['body'], !empty($modSettings['digest_preview_length']) ? $modSettings['digest_preview_length'] : 375, true);
+					$row['body'] = Util::shorten_text($row['body'], !empty($modSettings['digest_preview_length']) ? $modSettings['digest_preview_length'] : 375, true);
 					$row['body'] = preg_replace("~\n~s", "\n  ", $row['body']);
 				}
 
 				// Topics are simple since we are only concerned with the first post
 				if (!isset($types[$row['note_type']][$row['id_board']]['lines'][$row['id_topic']]))
+				{
 					$types[$row['note_type']][$row['id_board']]['lines'][$row['id_topic']] = array(
 						'id' => $row['id_topic'],
 						'link' => $scripturl . '?topic=' . $row['id_topic'] . '.new;topicseen#new',
 						'subject' => un_htmlspecialchars($row['subject']),
 						'body' => $row['body'],
 					);
+				}
 			}
 			elseif ($maillist && empty($modSettings['pbe_no_mod_notices']))
 			{
@@ -209,15 +225,21 @@ class DailyDigest implements ScheduledTaskInterface
 			$types[$row['note_type']][$row['id_board']]['lines'][$row['id_topic']]['members'] = array();
 
 			if (!empty($notify['topics'][$row['id_topic']]))
+			{
 				$types[$row['note_type']][$row['id_board']]['lines'][$row['id_topic']]['members'] = array_merge($types[$row['note_type']][$row['id_board']]['lines'][$row['id_topic']]['members'], $notify['topics'][$row['id_topic']]);
+			}
 
 			if (!empty($notify['boards'][$row['id_board']]))
+			{
 				$types[$row['note_type']][$row['id_board']]['lines'][$row['id_topic']]['members'] = array_merge($types[$row['note_type']][$row['id_board']]['lines'][$row['id_topic']]['members'], $notify['boards'][$row['id_board']]);
+			}
 		}
 		$db->free_result($request);
 
 		if (empty($types))
+		{
 			return true;
+		}
 
 		// Fix the last reply message so its suitable for previewing
 		if ($maillist)
@@ -229,7 +251,7 @@ class DailyDigest implements ScheduledTaskInterface
 					// Replace the body array with the appropriate preview message
 					$body = $types['reply'][$id]['lines'][$topic['id']]['body_text'];
 					pbe_prepare_text($body);
-					$body = \ElkArte\Util::shorten_text($body, !empty($modSettings['digest_preview_length']) ? $modSettings['digest_preview_length'] : 375, true);
+					$body = Util::shorten_text($body, !empty($modSettings['digest_preview_length']) ? $modSettings['digest_preview_length'] : 375, true);
 					$body = preg_replace("~\n~s", "\n  ", $body);
 					$types['reply'][$id]['lines'][$topic['id']]['body'] = $body;
 
@@ -304,13 +326,17 @@ class DailyDigest implements ScheduledTaskInterface
 
 							$email['body'] .= "\n" . sprintf($langtxt[$lang]['topic_lines'], $topic['subject'], $board['name']);
 							if ($maillist)
+							{
 								$email['body'] .= $langtxt[$lang]['preview'] . $topic['body'] . $langtxt[$lang]['see_full'] . $topic['link'] . "\n";
+							}
 						}
 					}
 				}
 
 				if ($titled)
+				{
 					$email['body'] .= "\n";
+				}
 			}
 
 			// What about replies?
@@ -335,13 +361,17 @@ class DailyDigest implements ScheduledTaskInterface
 
 							$email['body'] .= "\n" . ($topic['count'] === 1 ? sprintf($langtxt[$lang]['replies_one'], $topic['subject']) : sprintf($langtxt[$lang]['replies_many'], $topic['count'], $topic['subject']));
 							if ($maillist)
+							{
 								$email['body'] .= $langtxt[$lang]['reply_preview'] . $topic['body'] . $langtxt[$lang]['unread_reply_link'] . $topic['link'] . "\n";
+							}
 						}
 					}
 				}
 
 				if ($titled)
+				{
 					$email['body'] .= "\n";
+				}
 			}
 
 			// Finally, moderation actions!
@@ -349,7 +379,9 @@ class DailyDigest implements ScheduledTaskInterface
 			foreach ($types as $note_type => $type)
 			{
 				if ($note_type === 'topic' || $note_type === 'reply')
+				{
 					continue;
+				}
 
 				foreach ($type as $id => $board)
 				{
@@ -370,7 +402,9 @@ class DailyDigest implements ScheduledTaskInterface
 			}
 
 			if ($titled)
+			{
 				$email['body'] .= "\n";
+			}
 
 			// Then just say our goodbyes!
 			$email['body'] .= "\n\n" . $langtxt[$lang]['bye'];
@@ -381,7 +415,9 @@ class DailyDigest implements ScheduledTaskInterface
 
 		// Using the queue, do a final flush before we say that's all folks
 		if (!empty($modSettings['mail_queue']))
+		{
 			AddMailQueue(true);
+		}
 
 		// Clean up...
 		if ($is_weekly)

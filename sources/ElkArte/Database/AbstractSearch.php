@@ -20,18 +20,21 @@ abstract class AbstractSearch implements SearchInterface
 {
 	/**
 	 * The database object
+	 *
 	 * @var \ElkArte\Database\QueryInterface
 	 */
 	protected $_db = null;
 
 	/**
 	 * The supported search methods
+	 *
 	 * @var string[]
 	 */
 	protected $_supported_types = array();
 
 	/**
 	 * The way to skip a database error
+	 *
 	 * @var boolean
 	 */
 	protected $_skip_error = false;
@@ -115,6 +118,7 @@ abstract class AbstractSearch implements SearchInterface
 	public function createTemporaryTable($name, $columns, $indexes)
 	{
 		$db_table = db_table();
+
 		return $db_table->create_table($name, $columns, $indexes, array(
 			'temporary' => true,
 			'if_exists' => 'force_drop'

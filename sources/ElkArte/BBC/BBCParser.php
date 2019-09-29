@@ -7,7 +7,7 @@
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause (see accompanying LICENSE.txt file)
  *
  * This file contains code covered by:
- * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * copyright: 2011 Simple Machines (http://www.simplemachines.org)
  *
  * @version 2.0 dev
  *
@@ -27,37 +27,37 @@ class BBCParser
 	/** The max number of iterations to perform while solving for out of order attributes */
 	const MAX_PERMUTE_ITERATIONS = 5040;
 
-	/** @var string  */
+	/** @var string */
 	protected $message;
-	/** @var Codes  */
+	/** @var Codes */
 	protected $bbc;
-	/** @var array  */
+	/** @var array */
 	protected $bbc_codes;
-	/** @var array  */
+	/** @var array */
 	protected $item_codes;
-	/** @var array  */
+	/** @var array */
 	protected $tags;
 	/** @var int parser position in message */
 	protected $pos;
-	/** @var int  */
+	/** @var int */
 	protected $pos1;
-	/** @var int  */
+	/** @var int */
 	protected $pos2;
-	/** @var int  */
+	/** @var int */
 	protected $pos3;
-	/** @var int  */
+	/** @var int */
 	protected $last_pos;
-	/** @var bool  */
+	/** @var bool */
 	protected $do_smileys = true;
-	/** @var array  */
+	/** @var array */
 	protected $open_tags = array();
 	/** @var string|null This is the actual tag that's open */
 	protected $inside_tag;
-	/** @var Autolink|null  */
+	/** @var Autolink|null */
 	protected $autolinker;
-	/** @var bool  */
+	/** @var bool */
 	protected $possible_html;
-	/** @var HtmlParser|null  */
+	/** @var HtmlParser|null */
 	protected $html_parser;
 	/** @var bool if we can cache the message or not (some tags disallow caching) */
 	protected $can_cache = true;
@@ -65,15 +65,15 @@ class BBCParser
 	protected $num_footnotes = 0;
 	/** @var string used to mark smiles in a message */
 	protected $smiley_marker = "\r";
-	/** @var int  */
+	/** @var int */
 	protected $lastAutoPos = 0;
 	/** @var array content fo the footnotes */
 	protected $fn_content = array();
-	/** @var array  */
+	/** @var array */
 	protected $tag_possible = array();
-	/** @var int  */
+	/** @var int */
 	protected $fn_count = 0;
-	/** @var int  */
+	/** @var int */
 	protected $fn_num = 0;
 
 	/**
@@ -377,6 +377,7 @@ class BBCParser
 		if (!$this->hasOpenTags() && (empty($tag) || $tag[Codes::ATTR_TAG] !== $look_for))
 		{
 			$this->open_tags = $to_close;
+
 			return;
 		}
 		elseif (!empty($to_close) && $tag[Codes::ATTR_TAG] !== $look_for)
@@ -738,7 +739,9 @@ class BBCParser
 	protected function handleItemCode()
 	{
 		if (!isset($this->item_codes[$this->message[$this->pos + 1]]))
+		{
 			return;
+		}
 
 		$tag = $this->item_codes[$this->message[$this->pos + 1]];
 
@@ -1203,7 +1206,9 @@ class BBCParser
 		$this->fn_count = $fn_total;
 
 		// Replace our footnote text with a [1] link, save the text for use at the end of the message
-		$this->message = preg_replace_callback('~(%fn%(.*?)%fn%)~is', function (array $matches) {return $this->footnoteCallback($matches);}, $this->message);
+		$this->message = preg_replace_callback('~(%fn%(.*?)%fn%)~is', function (array $matches) {
+			return $this->footnoteCallback($matches);
+		}, $this->message);
 		$fn_total += $this->fn_num;
 
 		// If we have footnotes, add them in at the end of the message
@@ -1331,7 +1336,9 @@ class BBCParser
 			$control_order[$index] = $index;
 
 			if ($this->tag_possible['optionals'][$index])
+			{
 				$control_order[$index] = $index + $this->tag_possible['regex_size'];
+			}
 		}
 
 		array_multisort($control_order, SORT_ASC, $this->tag_possible['regex_cache']);
@@ -1362,9 +1369,13 @@ class BBCParser
 			if ($optional)
 			{
 				if ($param_exists)
+				{
 					$this->tag_possible['optionals'][$index] = false;
+				}
 				else
+				{
 					$this->tag_possible['regex_cache'][$index] .= '?';
+				}
 			}
 		}
 	}

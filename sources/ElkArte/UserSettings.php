@@ -6,7 +6,7 @@
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause (see accompanying LICENSE.txt file)
  *
  * This file contains code covered by:
- * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * copyright: 2011 Simple Machines (http://www.simplemachines.org)
  *
  * @version 2.0 dev
  *
@@ -17,7 +17,7 @@ namespace ElkArte;
 /**
  * This class holds all the data belonging to a certain member.
  */
-class UserSettings extends \ElkArte\ValuesContainerReadOnly
+class UserSettings extends ValuesContainerReadOnly
 {
 	/**
 	 * Sets last_login to the current time
@@ -37,7 +37,7 @@ class UserSettings extends \ElkArte\ValuesContainerReadOnly
 	{
 		$this->data['passwd'] = $password;
 
-		$tokenizer = new \ElkArte\TokenHash();
+		$tokenizer = new TokenHash();
 		$this->data['password_salt'] = $tokenizer->generate_hash(UserSettingsLoader::HASH_LENGTH);
 	}
 
@@ -61,9 +61,10 @@ class UserSettings extends \ElkArte\ValuesContainerReadOnly
 		// Correct password, but they've got no salt; fix it!
 		if ($this->data['password_salt'] === '' || $force)
 		{
-			$tokenizer = new \ElkArte\TokenHash();
+			$tokenizer = new TokenHash();
 
 			$this->data['password_salt'] = $tokenizer->generate_hash(UserSettingsLoader::HASH_LENGTH);
+
 			return true;
 		}
 
@@ -92,7 +93,7 @@ class UserSettings extends \ElkArte\ValuesContainerReadOnly
 		// If the password is not already 64 characters, lets make it a (SHA-256)
 		if (strlen($password) !== 64)
 		{
-			$password = hash('sha256', \ElkArte\Util::strtolower($this->member_name) . un_htmlspecialchars($password));
+			$password = hash('sha256', Util::strtolower($this->member_name) . un_htmlspecialchars($password));
 		}
 
 		$passhash = password_hash($password, PASSWORD_BCRYPT, ['cost' => 10]);
@@ -127,7 +128,7 @@ class UserSettings extends \ElkArte\ValuesContainerReadOnly
 		// If the password is not 64 characters, lets make it a (SHA-256)
 		if (strlen($password) !== 64)
 		{
-			$password = hash('sha256', \ElkArte\Util::strtolower($this->member_name) . un_htmlspecialchars($password));
+			$password = hash('sha256', Util::strtolower($this->member_name) . un_htmlspecialchars($password));
 		}
 
 		return (bool) password_verify($password, $this->passwd);

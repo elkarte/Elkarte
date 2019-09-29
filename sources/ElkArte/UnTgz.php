@@ -32,90 +32,105 @@ class UnTgz
 {
 	/**
 	 * Holds the return array of files processed
+	 *
 	 * @var mixed[]
 	 */
 	protected $return = array();
 
 	/**
 	 * Holds the data found in each tar file header block
+	 *
 	 * @var mixed[]
 	 */
 	protected $_current = array();
 
 	/**
 	 * Holds the file pointer, generally to the 512 block we are working on
+	 *
 	 * @var int
 	 */
 	protected $_offset = 0;
 
 	/**
 	 * If the file passes or fails crc check
+	 *
 	 * @var boolean
 	 */
 	protected $_crc_check = false;
 
 	/**
 	 * The current crc value of the data
+	 *
 	 * @var string|int
 	 */
 	protected $_crc;
 
 	/**
 	 * The claimed size of the data in the tarball
+	 *
 	 * @var int
 	 */
 	protected $_size;
 
 	/**
 	 * If we are going to write out the files processed
+	 *
 	 * @var boolean
 	 */
 	protected $_write_this = false;
 
 	/**
 	 * If we will skip a file we found
+	 *
 	 * @var boolean
 	 */
 	protected $_skip = false;
 
 	/**
 	 * If we found a file that was requested ($files_to_extract)
+	 *
 	 * @var boolean
 	 */
 	protected $_found = false;
 
 	/**
 	 * Current file header we are working on
+	 *
 	 * @var mixed[]|string
 	 */
 	protected $_header = array();
 
 	/**
 	 * Array of file names we want to extract from the archive
+	 *
 	 * @var null|string[]
 	 */
 	protected $files_to_extract;
 
 	/**
 	 * Holds the data string passed to the function
+	 *
 	 * @var string
 	 */
 	protected $data;
 
 	/**
 	 * Location to write the files.
+	 *
 	 * @var string
 	 */
 	protected $destination;
 
 	/**
 	 * If we are looking for a single specific file
+	 *
 	 * @var boolean|string
 	 */
 	protected $single_file;
 
 	/**
 	 * If we can overwrite a file with the same name in the destination
+	 *
 	 * @var boolean
 	 */
 	protected $overwrite;
@@ -323,6 +338,18 @@ class UnTgz
 	}
 
 	/**
+	 * Checks the saved vs calculated crc values
+	 */
+	private function _check_crc()
+	{
+		// Make sure we have unsigned crc padded hex.
+		$crc_uncompressed = hash('crc32b', $this->data);
+		$this->_crc = str_pad(dechex($this->_crc), 8, '0', STR_PAD_LEFT);
+
+		return $this->data !== false && $this->_crc === $crc_uncompressed;
+	}
+
+	/**
 	 * Does the work of un tarballing the now ungzip'ed tar file
 	 *
 	 * What it does
@@ -500,18 +527,6 @@ class UnTgz
 		{
 			package_put_contents($this->destination . '/' . $this->_current['filename'], $this->_current['data']);
 		}
-	}
-
-	/**
-	 * Checks the saved vs calculated crc values
-	 */
-	private function _check_crc()
-	{
-		// Make sure we have unsigned crc padded hex.
-		$crc_uncompressed = hash('crc32b', $this->data);
-		$this->_crc = str_pad(dechex($this->_crc), 8, '0', STR_PAD_LEFT);
-
-		return $this->data !== false && $this->_crc === $crc_uncompressed;
 	}
 
 	/**

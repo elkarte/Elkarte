@@ -13,8 +13,11 @@
 
 namespace ElkArte;
 
-use ElkArte\User;
-
+/**
+ * Class UserNotificationIntegrate
+ *
+ * @package ElkArte
+ */
 class UserNotificationIntegrate
 {
 	/**
@@ -25,7 +28,9 @@ class UserNotificationIntegrate
 		global $modSettings;
 
 		if (empty($modSettings['usernotif_favicon_enable']) && empty($modSettings['usernotif_desktop_enable']))
+		{
 			return array();
+		}
 
 		// $hook, $function, $file
 		return array(

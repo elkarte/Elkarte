@@ -8,7 +8,7 @@
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause (see accompanying LICENSE.txt file)
  *
  * This file contains code covered by:
- * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * copyright: 2011 Simple Machines (http://www.simplemachines.org)
  *
  * @version 2.0 dev
  *
@@ -16,10 +16,12 @@
 
 namespace ElkArte\Database\Mysqli;
 
+use ElkArte\Database\AbstractDump;
+
 /**
  * SQL database class, implements database class to control mysql functions
  */
-	class Dump extends \ElkArte\Database\AbstractDump
+class Dump extends AbstractDump
 {
 	/**
 	 * {@inheritDoc}
@@ -55,7 +57,9 @@ namespace ElkArte\Database\Mysqli;
 			{
 				// Make a special case of auto-timestamp.
 				if ($row['Default'] == 'CURRENT_TIMESTAMP')
+				{
 					$schema_create .= ' /*!40102 NOT NULL default CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP */';
+				}
 				// Text shouldn't have a default.
 				elseif ($row['Default'] !== null)
 				{
@@ -91,13 +95,19 @@ namespace ElkArte\Database\Mysqli;
 
 			// Is this the first column in the index?
 			if (empty($indexes[$row['Key_name']]))
+			{
 				$indexes[$row['Key_name']] = array();
+			}
 
 			// A sub part, like only indexing 15 characters of a varchar.
 			if (!empty($row['Sub_part']))
+			{
 				$indexes[$row['Key_name']][$row['Seq_in_index']] = '`' . $row['Column_name'] . '`(' . $row['Sub_part'] . ')';
+			}
 			else
+			{
 				$indexes[$row['Key_name']][$row['Seq_in_index']] = '`' . $row['Column_name'] . '`';
+			}
 		}
 		$result->free_result();
 
@@ -173,7 +183,7 @@ namespace ElkArte\Database\Mysqli;
 			array(
 				'backup_table' => $backup_table,
 				'table' => $table
-		));
+			));
 		// If this failed, we go old school.
 		if ($result->hasResults())
 		{
@@ -188,7 +198,9 @@ namespace ElkArte\Database\Mysqli;
 
 			// Old school or no school?
 			if ($request)
+			{
 				return $request;
+			}
 		}
 
 		// At this point, the quick method failed.
@@ -214,7 +226,9 @@ namespace ElkArte\Database\Mysqli;
 		{
 			// Get the name of the auto_increment column.
 			if (strpos($l, 'auto_increment'))
+			{
 				$auto_inc = trim($l);
+			}
 
 			// For the engine type, see if we can work out what it is.
 			if (strpos($l, 'ENGINE') !== false || strpos($l, 'TYPE') !== false)
@@ -223,21 +237,31 @@ namespace ElkArte\Database\Mysqli;
 				preg_match('~(ENGINE|TYPE)=(\w+)(\sDEFAULT)?(\sCHARSET=(\w+))?(\sCOLLATE=(\w+))?~', $l, $match);
 
 				if (!empty($match[1]))
+				{
 					$engine = $match[1];
+				}
 
 				if (!empty($match[2]))
+				{
 					$engine = $match[2];
+				}
 
 				if (!empty($match[5]))
+				{
 					$charset = $match[5];
+				}
 
 				if (!empty($match[7]))
+				{
 					$collate = $match[7];
+				}
 			}
 
 			// Skip everything but keys...
 			if (strpos($l, 'KEY') === false)
+			{
 				unset($create[$k]);
+			}
 		}
 
 		$create = !empty($create) ? '(
@@ -262,7 +286,9 @@ namespace ElkArte\Database\Mysqli;
 		if ($auto_inc !== '')
 		{
 			if (preg_match('~\`(.+?)\`\s~', $auto_inc, $match) != 0 && substr($auto_inc, -1, 1) === ',')
+			{
 				$auto_inc = substr($auto_inc, 0, -1);
+			}
 
 			$this->_db->query('', '
 				ALTER TABLE {raw:backup_table}
@@ -309,7 +335,9 @@ namespace ElkArte\Database\Mysqli;
 		$num_rows = $result->num_rows();
 
 		if ($num_rows == 0)
+		{
 			return '';
+		}
 
 		if ($new_table)
 		{
@@ -330,11 +358,17 @@ namespace ElkArte\Database\Mysqli;
 			{
 				// Try to figure out the type of each field. (NULL, number, or 'string'.)
 				if (!isset($item))
+				{
 					$field_list[] = 'NULL';
+				}
 				elseif (is_numeric($item) && (int) $item == $item)
+				{
 					$field_list[] = $item;
+				}
 				else
+				{
 					$field_list[] = '\'' . $this->escape_string($item) . '\'';
+				}
 			}
 
 			$data .= '(' . implode(', ', $field_list) . '),' . $crlf . "\t";

@@ -9,7 +9,7 @@
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause (see accompanying LICENSE.txt file)
  *
  * This file contains code covered by:
- * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * copyright: 2011 Simple Machines (http://www.simplemachines.org)
  *
  * @version 2.0 dev
  *
@@ -17,10 +17,13 @@
 
 namespace ElkArte\Controller;
 
+use ElkArte\AbstractController;
+use ElkArte\Exceptions\Exception;
+
 /**
  * Functions that turn on and off various member notifications
  */
-class Notify extends \ElkArte\AbstractController
+class Notify extends AbstractController
 {
 	/**
 	 * Pre Dispatch, called before other methods, used to load common needs.
@@ -65,7 +68,9 @@ class Notify extends \ElkArte\AbstractController
 
 		// Make sure the topic has been specified.
 		if (empty($topic))
-			throw new \ElkArte\Exceptions\Exception('not_a_topic', false);
+		{
+			throw new Exception('not_a_topic', false);
+		}
 
 		// What do we do?  Better ask if they didn't say..
 		if (empty($this->_req->query->sa))
@@ -95,6 +100,17 @@ class Notify extends \ElkArte\AbstractController
 		redirectexit('topic=' . $topic . '.' . $this->_req->query->start);
 
 		return true;
+	}
+
+	/**
+	 * Toggle a topic notification on/off
+	 */
+	private function _toggle_topic_notification()
+	{
+		global $topic;
+
+		// Attempt to turn notifications on/off.
+		setTopicNotification($this->user->id, $topic, $this->_req->query->sa === 'on');
 	}
 
 	/**
@@ -143,6 +159,7 @@ class Notify extends \ElkArte\AbstractController
 				'error' => 1,
 				'url' => $scripturl . '?action=notify;sa=' . ($this->_req->query->sa === 'on' ? 'on' : 'off') . ';topic=' . $topic . '.' . $this->_req->query->start . ';' . $context['session_var'] . '=' . $context['session_id'],
 			);
+
 			return;
 		}
 
@@ -154,17 +171,6 @@ class Notify extends \ElkArte\AbstractController
 			'url' => $scripturl . '?action=notify;sa=' . ($this->_req->query->sa === 'on' ? 'off' : 'on') . ';topic=' . $topic . '.' . $this->_req->query->start . ';' . $context['session_var'] . '=' . $context['session_id'] . ';api',
 			'confirm' => $this->_req->query->sa === 'on' ? $txt['notification_disable_topic'] : $txt['notification_enable_topic']
 		);
-	}
-
-	/**
-	 * Toggle a topic notification on/off
-	 */
-	private function _toggle_topic_notification()
-	{
-		global $topic;
-
-		// Attempt to turn notifications on/off.
-		setTopicNotification($this->user->id, $topic, $this->_req->query->sa === 'on');
 	}
 
 	/**
@@ -190,7 +196,9 @@ class Notify extends \ElkArte\AbstractController
 
 		// You have to specify a board to turn notifications on!
 		if (empty($board))
-			throw new \ElkArte\Exceptions\Exception('no_board', false);
+		{
+			throw new Exception('no_board', false);
+		}
 
 		// No subaction: find out what to do.
 		if (empty($this->_req->query->sa))
@@ -220,6 +228,20 @@ class Notify extends \ElkArte\AbstractController
 
 		// Back to the board!
 		redirectexit('board=' . $board . '.' . $this->_req->query->start);
+	}
+
+	/**
+	 * Toggle a board notification on/off
+	 */
+	private function _toggle_board_notification()
+	{
+		global $board;
+
+		// Our board functions are here
+		require_once(SUBSDIR . '/Boards.subs.php');
+
+		// Turn notification on/off for this board.
+		setBoardNotification($this->user->id, $board, $this->_req->query->sa === 'on');
 	}
 
 	/**
@@ -283,20 +305,6 @@ class Notify extends \ElkArte\AbstractController
 	}
 
 	/**
-	 * Toggle a board notification on/off
-	 */
-	private function _toggle_board_notification()
-	{
-		global $board;
-
-		// Our board functions are here
-		require_once(SUBSDIR . '/Boards.subs.php');
-
-		// Turn notification on/off for this board.
-		setBoardNotification($this->user->id, $board, $this->_req->query->sa === 'on');
-	}
-
-	/**
 	 * Turn off/on unread replies subscription for a topic
 	 *
 	 * What it does:
@@ -323,6 +331,16 @@ class Notify extends \ElkArte\AbstractController
 
 		// Back to the topic.
 		redirectexit('topic=' . $topic . '.' . $this->_req->query->start);
+	}
+
+	/**
+	 * Toggle a watch topic on/off
+	 */
+	private function _toggle_topic_watch()
+	{
+		global $topic;
+
+		setTopicWatch($this->user->id, $topic, $this->_req->query->sa === 'on');
 	}
 
 	/**
@@ -381,15 +399,5 @@ class Notify extends \ElkArte\AbstractController
 			'text' => $this->_req->query->sa === 'on' ? $txt['watch'] : $txt['unwatch'],
 			'url' => $scripturl . '?action=unwatchtopic;topic=' . $context['current_topic'] . '.' . $this->_req->query->start . ';sa=' . ($this->_req->query->sa === 'on' ? 'off' : 'on') . ';' . $context['session_var'] . '=' . $context['session_id'] . ';api' . (isset($_REQUEST['json']) ? ';json' : ''),
 		);
-	}
-
-	/**
-	 * Toggle a watch topic on/off
-	 */
-	private function _toggle_topic_watch()
-	{
-		global $topic;
-
-		setTopicWatch($this->user->id, $topic, $this->_req->query->sa === 'on');
 	}
 }

@@ -8,7 +8,7 @@
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause (see accompanying LICENSE.txt file)
  *
  * This file contains code covered by:
- * copyright:    2011 Simple Machines (http://www.simplemachines.org)
+ * copyright: 2011 Simple Machines (http://www.simplemachines.org)
  *
  * @version 2.0 dev
  *
@@ -16,7 +16,7 @@
 
 namespace ElkArte\Errors;
 
-use \ElkArte\Exceptions\Exception;
+use ElkArte\Exceptions\Exception;
 use ErrorException;
 use Throwable;
 
@@ -27,20 +27,16 @@ use Throwable;
  */
 final class ErrorHandler extends Errors
 {
-	/** @var int Mask for errors that are fatal and will halt */
-	protected $fatalErrors = E_ERROR | E_USER_ERROR | E_COMPILE_ERROR | E_CORE_ERROR | E_PARSE;
-
-	/** @var string The error string from $e->getMessage() */
-	private $error_string;
-
-	/** @var int The level of error from $e->getCode */
-	private $error_level;
-
-	/** @var string Common name for the error: Error, Waning, Notice */
-	private $error_name;
-
 	/** @var boolean Set this to TRUE to let PHP handle errors/warnings/notices. */
 	const USE_DEFAULT = false;
+	/** @var int Mask for errors that are fatal and will halt */
+	protected $fatalErrors = E_ERROR | E_USER_ERROR | E_COMPILE_ERROR | E_CORE_ERROR | E_PARSE;
+	/** @var string The error string from $e->getMessage() */
+	private $error_string;
+	/** @var int The level of error from $e->getCode */
+	private $error_level;
+	/** @var string Common name for the error: Error, Waning, Notice */
+	private $error_name;
 
 	/**
 	 * Good ol' constructor
@@ -51,52 +47,13 @@ final class ErrorHandler extends Errors
 
 		// Register the class handlers to the PHP handler functions
 		set_error_handler(function ($error_level, $error_string, $file, $line) {
-      		return $this->error_handler($error_level, $error_string, $file, $line);
-  		});
+			return $this->error_handler($error_level, $error_string, $file, $line);
+		});
 		set_exception_handler(function (Throwable $e) {
-      		$this->exception_handler($e);
-      		return;
-  		});
-	}
+			$this->exception_handler($e);
 
-	/**
-	 * Determine the error name (or type) for display.
-	 *
-	 * @param int $error_level
-	 * @param bool $isException
-	 *
-	 * @return string
-	 */
-	private function set_error_name(int $error_level, bool $isException): string
-	{
-		switch ($error_level)
-		{
-			case E_USER_ERROR:
-				$type = 'Fatal Error';
-				break;
-			case E_USER_WARNING:
-			case E_WARNING:
-				$type = 'Warning';
-				break;
-			case E_USER_NOTICE:
-			case E_NOTICE:
-			case E_STRICT:
-				$type = 'Notice';
-				break;
-			case E_RECOVERABLE_ERROR:
-				$type = 'Catchable';
-				break;
-			default:
-				$type = 'Unknown Error';
-				break;
-		}
-
-		if ($isException)
-		{
-			$type = 'Exception';
-		}
-
-		return $type;
+			return;
+		});
 	}
 
 	/**
@@ -197,30 +154,43 @@ final class ErrorHandler extends Errors
 	}
 
 	/**
-	 * Display debug information, shows exceptions / errors similar to standard
-	 * PHP error output.
+	 * Determine the error name (or type) for display.
 	 *
-	 * @param string $message
+	 * @param int $error_level
+	 * @param bool $isException
+	 *
+	 * @return string
 	 */
-	private function _displayDebug(string $message): void
+	private function set_error_name(int $error_level, bool $isException): string
 	{
-		global $db_show_debug;
-
-		if ($db_show_debug === true)
+		switch ($error_level)
 		{
-			// Commonly, undefined indexes will occur inside attributes; try to show them anyway!
-			if ($this->error_level % 255 !== E_ERROR)
-			{
-				$temporary = ob_get_contents();
-				if (substr($temporary, -2) === '="')
-				{
-					echo '"';
-				}
-			}
-
-			// Debugging!  This should look like a PHP error message.
-			echo '<br /><strong>', $this->error_name, '</strong>: ' . $this->error_string . '<ol>' . $message . '</ol>';
+			case E_USER_ERROR:
+				$type = 'Fatal Error';
+				break;
+			case E_USER_WARNING:
+			case E_WARNING:
+				$type = 'Warning';
+				break;
+			case E_USER_NOTICE:
+			case E_NOTICE:
+			case E_STRICT:
+				$type = 'Notice';
+				break;
+			case E_RECOVERABLE_ERROR:
+				$type = 'Catchable';
+				break;
+			default:
+				$type = 'Unknown Error';
+				break;
 		}
+
+		if ($isException)
+		{
+			$type = 'Exception';
+		}
+
+		return $type;
 	}
 
 	/**
@@ -328,5 +298,32 @@ MSG;
 		}
 
 		return $args;
+	}
+
+	/**
+	 * Display debug information, shows exceptions / errors similar to standard
+	 * PHP error output.
+	 *
+	 * @param string $message
+	 */
+	private function _displayDebug(string $message): void
+	{
+		global $db_show_debug;
+
+		if ($db_show_debug === true)
+		{
+			// Commonly, undefined indexes will occur inside attributes; try to show them anyway!
+			if ($this->error_level % 255 !== E_ERROR)
+			{
+				$temporary = ob_get_contents();
+				if (substr($temporary, -2) === '="')
+				{
+					echo '"';
+				}
+			}
+
+			// Debugging!  This should look like a PHP error message.
+			echo '<br /><strong>', $this->error_name, '</strong>: ' . $this->error_string . '<ol>' . $message . '</ol>';
+		}
 	}
 }

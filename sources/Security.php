@@ -9,14 +9,18 @@
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause (see accompanying LICENSE.txt file)
  *
  * This file contains code covered by:
- * copyright:    2011 Simple Machines (http://www.simplemachines.org)
+ * copyright: 2011 Simple Machines (http://www.simplemachines.org)
  *
  * @version 2.0 dev
  *
  */
 
+use ElkArte\Controller\Auth;
+use ElkArte\EventManager;
+use ElkArte\OpenID;
+use ElkArte\TokenHash;
 use ElkArte\User;
-use ElkArte\UserSettingsLoader;
+use ElkArte\Util;
 
 /**
  * Check if the user is who he/she says he is.
@@ -123,7 +127,7 @@ function validateSession($type = 'admin')
 	// OpenID?
 	if (!empty(User::$settings['openid_uri']))
 	{
-		$openID = new \ElkArte\OpenID();
+		$openID = new OpenID();
 		$openID->revalidate();
 
 		$_SESSION[$type . '_time'] = time();
@@ -444,7 +448,7 @@ function is_not_banned($forceCheck = false)
 		// We don't wanna see you!
 		if (User::$info->is_guest === false)
 		{
-			$controller = new \ElkArte\Controller\Auth(new \ElkArte\EventManager());
+			$controller = new Auth(new EventManager());
 			$controller->setUser(User::$info);
 			$controller->action_logout(true, false);
 		}
@@ -486,7 +490,7 @@ function is_not_banned($forceCheck = false)
 		writeLog(true);
 
 		// Log them out
-		$controller = new \ElkArte\Controller\Auth(new \ElkArte\EventManager());
+		$controller = new Auth(new EventManager());
 		$controller->setUser(User::$info);
 		$controller->action_logout(true, false);
 
@@ -619,6 +623,7 @@ function banPermissions()
  * @param int[] $ban_ids = array()
  * @param string|null $email = null
  * @package Bans
+ * @throws \ElkArte\Exceptions\Exception
  */
 function log_ban($ban_ids = array(), $email = null)
 {
@@ -850,7 +855,7 @@ function checkSession($type = 'post', $from_action = '', $is_fatal = true)
 		{
 			$error = 'verify_url_fail';
 			$log_error = true;
-			$sprintf = array(\ElkArte\Util::htmlspecialchars($referrer_url));
+			$sprintf = array(Util::htmlspecialchars($referrer_url));
 		}
 	}
 
@@ -859,7 +864,7 @@ function checkSession($type = 'post', $from_action = '', $is_fatal = true)
 	{
 		$error = 'verify_url_fail';
 		$log_error = true;
-		$sprintf = array(\ElkArte\Util::htmlspecialchars($referrer_url));
+		$sprintf = array(Util::htmlspecialchars($referrer_url));
 	}
 
 	// Everything is ok, return an empty string.
@@ -908,7 +913,7 @@ function createToken($action, $type = 'post')
 	global $context;
 
 	// Generate a new token token_var pair
-	$tokenizer = new \ElkArte\TokenHash();
+	$tokenizer = new TokenHash();
 	$token_var = $tokenizer->generate_hash(rand(7, 12));
 	$token = $tokenizer->generate_hash(32);
 
@@ -959,10 +964,8 @@ function validateToken($action, $type = 'post', $reset = true, $fatal = true)
 
 			return $return;
 		}
-		else
-		{
-			return '';
-		}
+
+		return '';
 	}
 
 	if (!isset($_SESSION['token'][$token_index]))
@@ -1081,7 +1084,7 @@ function checkSubmitOnce($action, $is_fatal = false)
 	// Register a form number and store it in the session stack. (use this on the page that has the form.)
 	if ($action === 'register')
 	{
-		$tokenizer = new \ElkArte\TokenHash();
+		$tokenizer = new TokenHash();
 		$context['form_sequence_number'] = '';
 		while (empty($context['form_sequence_number']) || in_array($context['form_sequence_number'], $_SESSION['forms']))
 		{
@@ -1186,7 +1189,8 @@ function allowedTo($permission, $boards = null)
 	}
 
 	$request = $db->query('', '
-		SELECT MIN(bp.add_deny) AS add_deny
+		SELECT 
+			MIN(bp.add_deny) AS add_deny
 		FROM {db_prefix}boards AS b
 			INNER JOIN {db_prefix}board_permissions AS bp ON (bp.id_profile = b.id_profile)
 			LEFT JOIN {db_prefix}moderators AS mods ON (mods.id_board = b.id_board AND mods.id_member = {int:current_member})
@@ -1338,14 +1342,15 @@ function boardsAllowedTo($permissions, $check_access = true, $simple = true)
 	$groups = array_diff(User::$info->groups, array(3));
 
 	$request = $db->query('', '
-		SELECT b.id_board, bp.add_deny' . ($simple ? '' : ', bp.permission') . '
+		SELECT 
+			b.id_board, bp.add_deny' . ($simple ? '' : ', bp.permission') . '
 		FROM {db_prefix}board_permissions AS bp
 			INNER JOIN {db_prefix}boards AS b ON (b.id_profile = bp.id_profile)
 			LEFT JOIN {db_prefix}moderators AS mods ON (mods.id_board = b.id_board AND mods.id_member = {int:current_member})
 		WHERE bp.id_group IN ({array_int:group_list}, {int:moderator_group})
 			AND bp.permission IN ({array_string:permissions})
 			AND (mods.id_member IS NOT NULL OR bp.id_group != {int:moderator_group})' .
-			($check_access ? ' AND {query_see_board}' : ''),
+		($check_access ? ' AND {query_see_board}' : ''),
 		array(
 			'current_member' => User::$info->id,
 			'group_list' => $groups,
@@ -1711,6 +1716,7 @@ function loadBadBehavior()
 	global $modSettings;
 
 	$bb2_results = false;
+
 	// Bad Behavior Enabled?
 	if (!empty($modSettings['badbehavior_enabled']))
 	{

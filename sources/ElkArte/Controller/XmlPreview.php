@@ -12,10 +12,15 @@
 
 namespace ElkArte\Controller;
 
+use BBC\ParserWrapper;
+use ElkArte\AbstractController;
+use ElkArte\Action;
+use ElkArte\Util;
+
 /**
  * Handles requests for previews of an item, in an ajax enabled template.
  */
-class XmlPreview extends \ElkArte\AbstractController
+class XmlPreview extends AbstractController
 {
 	/**
 	 * {@inheritdoc }
@@ -44,11 +49,13 @@ class XmlPreview extends \ElkArte\AbstractController
 		);
 
 		// Valid action?
-		$action = new \ElkArte\Action('xml_preview');
+		$action = new Action('xml_preview');
 		$subAction = $action->initialize($subActions, 'invalid', 'item');
 
 		if ($subAction === 'invalid')
+		{
 			return;
+		}
 
 		// Set up the template and default sub-template.
 		theme()->getTemplates()->load('Xml');
@@ -71,13 +78,17 @@ class XmlPreview extends \ElkArte\AbstractController
 		require_once(SUBSDIR . '/Post.subs.php');
 
 		$errors = array();
-		$news = !isset($this->_req->post->news) ? '' : \ElkArte\Util::htmlspecialchars($this->_req->post->news, ENT_QUOTES);
+		$news = !isset($this->_req->post->news) ? '' : Util::htmlspecialchars($this->_req->post->news, ENT_QUOTES);
 		if (empty($news))
+		{
 			$errors[] = array('value' => 'no_news');
+		}
 		else
+		{
 			preparsecode($news);
+		}
 
-		$bbc_parser = \BBC\ParserWrapper::instance();
+		$bbc_parser = ParserWrapper::instance();
 
 		// Return the xml response to the template
 		$context['xml_data'] = array(
@@ -115,9 +126,13 @@ class XmlPreview extends \ElkArte\AbstractController
 
 		// Let them know about any mistakes
 		if (empty($this->_req->post->subject))
+		{
 			$context['post_error']['errors'][] = $txt['error_no_subject'];
+		}
 		if (empty($this->_req->post->message))
+		{
 			$context['post_error']['errors'][] = $txt['error_no_message'];
+		}
 
 		prepareMailingForPreview();
 
@@ -151,16 +166,18 @@ class XmlPreview extends \ElkArte\AbstractController
 			$member = getBasicMemberData($user, array('preferences' => true));
 
 			$member['signature'] = censor($member['signature']);
-			$bbc_parser = \BBC\ParserWrapper::instance();
+			$bbc_parser = ParserWrapper::instance();
 			$member['signature'] = $bbc_parser->parseSignature($member['signature'], true);
 
 			// And now what they want it to be
-			$preview_signature = !empty($this->_req->post->signature) ? \ElkArte\Util::htmlspecialchars($this->_req->post->signature) : '';
+			$preview_signature = !empty($this->_req->post->signature) ? Util::htmlspecialchars($this->_req->post->signature) : '';
 			$validation = profileValidateSignature($preview_signature);
 
 			// An odd check for errors to be sure
 			if ($validation !== true && $validation !== false)
+			{
 				$errors[] = array('value' => $txt['profile_error_' . $validation], 'attributes' => array('type' => 'error'));
+			}
 
 			preparsecode($preview_signature);
 			$preview_signature = censor($preview_signature);
@@ -170,12 +187,18 @@ class XmlPreview extends \ElkArte\AbstractController
 		elseif (!$can_change)
 		{
 			if ($is_owner)
+			{
 				$errors[] = array('value' => $txt['cannot_profile_extra_own'], 'attributes' => array('type' => 'error'));
+			}
 			else
+			{
 				$errors[] = array('value' => $txt['cannot_profile_extra_any'], 'attributes' => array('type' => 'error'));
+			}
 		}
 		else
+		{
 			$errors[] = array('value' => $txt['no_user_selected'], 'attributes' => array('type' => 'error'));
+		}
 
 		// Return the response for the template
 		$context['xml_data']['signatures'] = array(
@@ -184,29 +207,35 @@ class XmlPreview extends \ElkArte\AbstractController
 		);
 
 		if (isset($member['signature']))
+		{
 			$context['xml_data']['signatures']['children'][] = array(
 				'value' => $member['signature'],
 				'attributes' => array('type' => 'current'),
 			);
+		}
 
 		if (isset($preview_signature))
+		{
 			$context['xml_data']['signatures']['children'][] = array(
 				'value' => $preview_signature,
 				'attributes' => array('type' => 'preview'),
 			);
+		}
 
 		if (!empty($errors))
+		{
 			$context['xml_data']['errors'] = array(
 				'identifier' => 'error',
 				'children' => array_merge(
-						array(
 					array(
-						'value' => $txt['profile_errors_occurred'],
-						'attributes' => array('type' => 'errors_occurred'),
-					),
-						), $errors
+						array(
+							'value' => $txt['profile_errors_occurred'],
+							'attributes' => array('type' => 'errors_occurred'),
+						),
+					), $errors
 				),
 			);
+		}
 	}
 
 	/**
@@ -226,18 +255,24 @@ class XmlPreview extends \ElkArte\AbstractController
 		if (allowedTo('issue_warning'))
 		{
 			$warning_body = !empty($this->_req->post->body) ? trim(censor($this->_req->post->body)) : '';
-			$context['preview_subject'] = !empty($this->_req->post->title) ? trim(\ElkArte\Util::htmlspecialchars($this->_req->post->title)) : '';
+			$context['preview_subject'] = !empty($this->_req->post->title) ? trim(Util::htmlspecialchars($this->_req->post->title)) : '';
 			if (isset($this->_req->post->issuing))
 			{
 				if (empty($this->_req->post->title) || empty($this->_req->post->body))
+				{
 					$context['post_error']['errors'][] = $txt['warning_notify_blank'];
+				}
 			}
 			else
 			{
 				if (empty($this->_req->post->title))
+				{
 					$context['post_error']['errors'][] = $txt['mc_warning_template_error_no_title'];
+				}
 				if (empty($this->_req->post->body))
+				{
 					$context['post_error']['errors'][] = $txt['mc_warning_template_error_no_body'];
+				}
 
 				// Add in few replacements.
 				/**
@@ -267,13 +302,15 @@ class XmlPreview extends \ElkArte\AbstractController
 			if (!empty($this->_req->post->body))
 			{
 				preparsecode($warning_body);
-				$bbc_parser = \BBC\ParserWrapper::instance();
+				$bbc_parser = ParserWrapper::instance();
 				$warning_body = $bbc_parser->parseNotice($warning_body);
 			}
 			$context['preview_message'] = $warning_body;
 		}
 		else
+		{
 			$context['post_error']['errors'][] = array('value' => $txt['cannot_issue_warning'], 'attributes' => array('type' => 'error'));
+		}
 
 		$context['sub_template'] = 'generic_preview';
 	}
@@ -295,20 +332,26 @@ class XmlPreview extends \ElkArte\AbstractController
 		if (allowedTo('approve_emails'))
 		{
 			$body = !empty($this->_req->post->body) ? trim(censor($this->_req->post->body)) : '';
-			$context['preview_subject'] = !empty($this->_req->post->title) ? trim(\ElkArte\Util::htmlspecialchars($this->_req->post->title)) : '';
+			$context['preview_subject'] = !empty($this->_req->post->title) ? trim(Util::htmlspecialchars($this->_req->post->title)) : '';
 
 			if (isset($this->_req->post->issuing))
 			{
 				if (empty($this->_req->post->title) || empty($this->_req->post->body))
+				{
 					$context['post_error']['errors'][] = $txt['warning_notify_blank'];
+				}
 			}
 			else
 			{
 				if (empty($this->_req->post->title))
+				{
 					$context['post_error']['errors'][] = $txt['mc_warning_template_error_no_title'];
+				}
 
 				if (empty($this->_req->post->body))
+				{
 					$context['post_error']['errors'][] = $txt['mc_warning_template_error_no_body'];
+				}
 
 				// Add in few replacements.
 				/**
@@ -342,7 +385,7 @@ class XmlPreview extends \ElkArte\AbstractController
 			if (!empty($this->_req->post->body))
 			{
 				preparsecode($body);
-				$bbc_parser = \BBC\ParserWrapper::instance();
+				$bbc_parser = ParserWrapper::instance();
 				$body = $bbc_parser->parseEmail($body);
 			}
 

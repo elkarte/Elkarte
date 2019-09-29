@@ -8,11 +8,13 @@
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause (see accompanying LICENSE.txt file)
  *
  * This file contains code covered by:
- * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * copyright: 2011 Simple Machines (http://www.simplemachines.org)
  *
  * @version 2.0 dev
  *
  */
+
+use ElkArte\Util;
 
 /**
  * Dumps the database.
@@ -38,7 +40,9 @@ function DumpDatabase2()
 
 	// You can't dump nothing!
 	if (!isset($_REQUEST['struct']) && !isset($_REQUEST['data']))
+	{
 		$_REQUEST['data'] = true;
+	}
 
 	// Attempt to stop from dying...
 	detectServer()->setTimeLimit(600);
@@ -71,10 +75,14 @@ function DumpDatabase2()
 	{
 		// Get rid of the gzipping already being done.
 		if (!empty($modSettings['enableCompressedOutput']))
+		{
 			@ob_end_clean();
+		}
 		// If we can, clean anything already sent from the output buffer...
 		elseif (ob_get_length() != 0)
+		{
 			ob_clean();
+		}
 
 		// Tell the client to save this file, even though it's text.
 		header('Content-Type: ' . (isBrowser('ie') || isBrowser('opera') ? 'application/octetstream' : 'application/octet-stream'));
@@ -125,11 +133,15 @@ function DumpDatabase2()
 		}
 		else
 			// This is needed to speedup things later
+		{
 			$database->table_sql($tableName);
+		}
 
 		// How about the data?
 		if (!isset($_REQUEST['data']) || substr($tableName, -10) === 'log_errors')
+		{
 			continue;
+		}
 
 		$first_round = true;
 		$close_table = false;
@@ -138,11 +150,15 @@ function DumpDatabase2()
 		while ($get_rows = $database->insert_sql($tableName, $first_round))
 		{
 			if (empty($get_rows))
+			{
 				break;
+			}
 
 			// Time is what we need here!
 			if (function_exists('apache_reset_timeout'))
+			{
 				@apache_reset_timeout();
+			}
 			elseif (!empty($time_limit) && (((int) $start_time + (int) $time_limit - 20) > time()))
 			{
 				$start_time = time();
@@ -162,7 +178,7 @@ function DumpDatabase2()
 			}
 			$db_chunks .=
 				$get_rows;
-			$current_used_memory += \ElkArte\Util::strlen($db_chunks);
+			$current_used_memory += Util::strlen($db_chunks);
 
 			$db_backup .= $db_chunks;
 			unset($db_chunks);
@@ -181,8 +197,10 @@ function DumpDatabase2()
 
 		// No rows to get - skip it.
 		if ($close_table)
+		{
 			$db_backup .=
-			'-- --------------------------------------------------------' . $crlf;
+				'-- --------------------------------------------------------' . $crlf;
+		}
 	}
 
 	// write the last line

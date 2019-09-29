@@ -13,22 +13,90 @@
 
 namespace ElkArte\Controller;
 
+use ElkArte\AbstractController;
+use ElkArte\EmailParse;
+
 /**
  * Handles items pertaining to posting or PM an item that was received by email
  *
  * @package Maillist
  */
-class Emailpost extends \ElkArte\AbstractController
+class Emailpost extends AbstractController
 {
 	/**
 	 * Default entry point, it forwards to a worker method,
 	 * if we ever get here.
+	 *
 	 * @see \ElkArte\AbstractController::action_index()
 	 */
 	public function action_index()
 	{
 		// By default we go to preview
 		$this->action_pbe_preview();
+	}
+
+	/**
+	 * Used to preview a failed email from the ACP
+	 *
+	 * What it does:
+	 *
+	 * - Called from ManageMaillist.controller, which checks topic/message permission for viewing
+	 * - Calls pbe_load_text to prepare text for the preview
+	 * - Returns an array of values for use in the template
+	 *
+	 * @param string $data raw email string, including headers
+	 * @return string[]|boolean
+	 * @throws \ElkArte\Exceptions\Exception
+	 */
+	public function action_pbe_preview($data = '')
+	{
+		global $txt, $modSettings;
+
+		// Our mail parser and our main subs
+		require_once(SUBSDIR . '/Emailpost.subs.php');
+
+		// Init
+		$pbe = array();
+		theme()->getTemplates()->loadLanguageFile('Maillist');
+
+		// Load the email parser and get some data to work with
+		$email_message = new EmailParse();
+		$email_message->read_data($data, BOARDDIR);
+		if (empty($email_message->raw_message))
+		{
+			return false;
+		}
+
+		// Ask for an html version (if available) and some needed details
+		$email_message->read_email(true, $email_message->raw_message);
+		$html = $email_message->html_found;
+		$email_message->load_address();
+		$email_message->load_key();
+
+		// Convert to BBC and Format for the preview
+		$text = pbe_load_text($html, $email_message, $pbe);
+
+		// If there are attachments, just get the count
+		$attachment_count = 0;
+		if (!empty($email_message->attachments) && !empty($modSettings['maillist_allow_attachments']) && !empty($modSettings['attachmentEnable']) && $modSettings['attachmentEnable'] == 1)
+		{
+			if ($email_message->message_type === 'p')
+			{
+				$text .= "\n\n" . $txt['error_no_pm_attach'] . "\n";
+			}
+			else
+			{
+				$attachment_count = count($email_message->attachments);
+			}
+		}
+
+		if ($attachment_count !== 0)
+		{
+			$text .= "\n\n" . sprintf($txt['email_attachments'], $attachment_count);
+		}
+
+		// Return the parsed and formatted body and who it was sent to for the template
+		return array('body' => $text, 'to' => implode(' & ', $email_message->email['to']) . (!empty($email_message->email['cc']) ? ', ' . implode(' & ', $email_message->email['cc']) : ''));
 	}
 
 	/**
@@ -57,7 +125,9 @@ class Emailpost extends \ElkArte\AbstractController
 
 		// The function is not even on ...
 		if (empty($modSettings['maillist_enabled']))
+		{
 			return false;
+		}
 
 		// Our mail parser and our main subs
 		require_once(SUBSDIR . '/Emailpost.subs.php');
@@ -67,10 +137,12 @@ class Emailpost extends \ElkArte\AbstractController
 		detectServer()->setMemoryLimit('128M');
 
 		// Load the email parser and get some data to work with
-		$email_message = new \ElkArte\EmailParse();
+		$email_message = new EmailParse();
 		$email_message->read_data($data, BOARDDIR);
 		if (empty($email_message->raw_message))
+		{
 			return false;
+		}
 
 		// Ask for an html version (if available) and some needed details
 		$email_message->read_email(true, $email_message->raw_message);
@@ -104,11 +176,15 @@ class Emailpost extends \ElkArte\AbstractController
 
 		// If the feature is on but the post/pm function is not enabled, just log the message.
 		if (empty($modSettings['pbe_post_enabled']) && empty($modSettings['pbe_pm_enabled']))
+		{
 			return pbe_emailError('error_email_notenabled', $email_message);
+		}
 
 		// Spam I am?
 		if ($email_message->load_spam() && !$force)
+		{
 			return pbe_emailError('error_found_spam', $email_message);
+		}
 
 		// Load the user from the database based on the sending email address
 		$email_message->email['from'] = !empty($email_message->email['from']) ? strtolower($email_message->email['from']) : '';
@@ -116,11 +192,15 @@ class Emailpost extends \ElkArte\AbstractController
 
 		// Can't find this email in our database, a non-user, a spammer, a looser, a poser or even worse?
 		if (empty($pbe))
+		{
 			return pbe_emailError('error_not_find_member', $email_message);
+		}
 
 		// Find the message security key, without it we are not going anywhere ever
 		if (empty($email_message->message_key_id))
+		{
 			return pbe_emailError('error_missing_key', $email_message);
+		}
 
 		require_once(SUBSDIR . '/Emailpost.subs.php');
 		// Good we have a key, who was it sent to?
@@ -129,11 +209,15 @@ class Emailpost extends \ElkArte\AbstractController
 		// Can't find this key in the database, either
 		// a) spam attempt or b) replying with an expired/consumed key
 		if (empty($key_owner) && !$force)
+		{
 			return pbe_emailError('error_' . ($email_message->message_type === 'p' ? 'pm_' : '') . 'not_find_entry', $email_message);
+		}
 
 		// The key received was not sent to this member ... how we love those email aggregators
 		if (strtolower($key_owner) !== $email_message->email['from'] && !$force)
+		{
 			return pbe_emailError('error_key_sender_match', $email_message);
+		}
 
 		// In maintenance mode, just log it for now
 		if (!empty($maintenance) && $maintenance !== 2 && !$pbe['user_info']['is_admin'] && $this->user->is_admin === false)
@@ -150,7 +234,9 @@ class Emailpost extends \ElkArte\AbstractController
 			// Load the message/topic details
 			$topic_info = query_load_message($email_message->message_type, $email_message->message_id, $pbe);
 			if (empty($topic_info))
+			{
 				return pbe_emailError('error_topic_gone', $email_message);
+			}
 
 			// Load board permissions
 			query_load_permissions('board', $pbe, $topic_info);
@@ -175,7 +261,9 @@ class Emailpost extends \ElkArte\AbstractController
 
 		// Load in the correct Re: for the language
 		if ($language === $pbe['user_info']['language'])
+		{
 			$pbe['response_prefix'] = $txt['response_prefix'];
+		}
 		else
 		{
 			theme()->getTemplates()->loadLanguageFile('index', $language, false);
@@ -193,16 +281,21 @@ class Emailpost extends \ElkArte\AbstractController
 			if (trim($subject) !== trim($current_subject))
 			{
 				$board_info = query_load_board_details($topic_info['id_board'], $pbe);
+
 				return pbe_create_topic($pbe, $email_message, $board_info);
 			}
 		}
 
 		// Time to make a Post or a PM, first up topic and message replies
 		if ($email_message->message_type === 't' || $email_message->message_type === 'm')
+		{
 			$result = pbe_create_post($pbe, $email_message, $topic_info);
+		}
 		// Must be a PM then
 		elseif ($email_message->message_type === 'p')
+		{
 			$result = pbe_create_pm($pbe, $email_message, $pm_info);
+		}
 
 		if (!empty($result))
 		{
@@ -237,7 +330,9 @@ class Emailpost extends \ElkArte\AbstractController
 
 		// The function is not even on ...
 		if (empty($modSettings['maillist_enabled']))
+		{
 			return false;
+		}
 
 		// Our mail parser and our main subs
 		require_once(SUBSDIR . '/Emailpost.subs.php');
@@ -247,10 +342,12 @@ class Emailpost extends \ElkArte\AbstractController
 		detectServer()->setMemoryLimit('256M');
 
 		// Get the data from one of our sources
-		$email_message = new \ElkArte\EmailParse();
+		$email_message = new EmailParse();
 		$email_message->read_data($data, BOARDDIR);
 		if (empty($email_message->raw_message))
+		{
 			return false;
+		}
 
 		// Parse the header and some needed details
 		$email_message->read_email(true, $email_message->raw_message);
@@ -291,7 +388,9 @@ class Emailpost extends \ElkArte\AbstractController
 
 		// If the feature is on but the post/pm function is not enabled, just log the message.
 		if (empty($modSettings['pbe_post_enabled']))
+		{
 			return pbe_emailError('error_email_notenabled', $email_message);
+		}
 
 		// Load the user from the database based on the sending email address
 		$email_message->email['from'] = !empty($email_message->email['from']) ? strtolower($email_message->email['from']) : '';
@@ -299,20 +398,28 @@ class Emailpost extends \ElkArte\AbstractController
 
 		// Can't find this email as one of our users?
 		if (empty($pbe))
+		{
 			return pbe_emailError('error_not_find_member', $email_message);
+		}
 
 		// Getting hammy with it?
 		if ($email_message->load_spam())
+		{
 			return pbe_emailError('error_found_spam', $email_message);
+		}
 
 		// The board that this email address corresponds to
 		$board_number = pbe_find_board_number($email_message);
 		if (empty($board_number))
+		{
 			return pbe_emailError('error_not_find_board', $email_message);
+		}
 
 		// In maintenance mode so just save it for the moderators to deal with
 		if (!empty($maintenance) && $maintenance !== 2 && !$pbe['user_info']['is_admin'] && $this->user->is_admin === false)
+		{
 			return pbe_emailError('error_in_maintenance_mode', $email_message);
+		}
 
 		// Any additional spam / security checking
 		call_integration_hook('integrate_mailist_checks_before', array($email_message, $pbe));
@@ -320,7 +427,9 @@ class Emailpost extends \ElkArte\AbstractController
 		// To post a NEW topic, we need some board details for where it goes
 		$board_info = query_load_board_details($board_number, $pbe);
 		if (empty($board_info))
+		{
 			return pbe_emailError('error_board_gone', $email_message);
+		}
 
 		// Load up this users permissions for that board
 		query_load_permissions('board', $pbe, $board_info);
@@ -330,61 +439,5 @@ class Emailpost extends \ElkArte\AbstractController
 
 		// Create the topic, send notifications
 		return pbe_create_topic($pbe, $email_message, $board_info);
-	}
-
-	/**
-	 * Used to preview a failed email from the ACP
-	 *
-	 * What it does:
-	 *
-	 * - Called from ManageMaillist.controller, which checks topic/message permission for viewing
-	 * - Calls pbe_load_text to prepare text for the preview
-	 * - Returns an array of values for use in the template
-	 *
-	 * @param string $data raw email string, including headers
-	 * @return string[]|boolean
-	 * @throws \ElkArte\Exceptions\Exception
-	 */
-	public function action_pbe_preview($data = '')
-	{
-		global $txt, $modSettings;
-
-		// Our mail parser and our main subs
-		require_once(SUBSDIR . '/Emailpost.subs.php');
-
-		// Init
-		$pbe = array();
-		theme()->getTemplates()->loadLanguageFile('Maillist');
-
-		// Load the email parser and get some data to work with
-		$email_message = new \ElkArte\EmailParse();
-		$email_message->read_data($data, BOARDDIR);
-		if (empty($email_message->raw_message))
-			return false;
-
-		// Ask for an html version (if available) and some needed details
-		$email_message->read_email(true, $email_message->raw_message);
-		$html = $email_message->html_found;
-		$email_message->load_address();
-		$email_message->load_key();
-
-		// Convert to BBC and Format for the preview
-		$text = pbe_load_text($html, $email_message, $pbe);
-
-		// If there are attachments, just get the count
-		$attachment_count = 0;
-		if (!empty($email_message->attachments) && !empty($modSettings['maillist_allow_attachments']) && !empty($modSettings['attachmentEnable']) && $modSettings['attachmentEnable'] == 1)
-		{
-			if ($email_message->message_type === 'p')
-				$text .= "\n\n" . $txt['error_no_pm_attach'] . "\n";
-			else
-				$attachment_count = count($email_message->attachments);
-		}
-
-		if ($attachment_count !== 0)
-			$text .= "\n\n" . sprintf($txt['email_attachments'], $attachment_count);
-
-		// Return the parsed and formatted body and who it was sent to for the template
-		return array('body' => $text, 'to' => implode(' & ', $email_message->email['to']) . (!empty($email_message->email['cc']) ? ', ' . implode(' & ', $email_message->email['cc']) : ''));
 	}
 }

@@ -8,7 +8,7 @@
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause (see accompanying LICENSE.txt file)
  *
  * This file contains code covered by:
- * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * copyright: 2011 Simple Machines (http://www.simplemachines.org)
  *
  * @version 2.0 dev
  *
@@ -27,36 +27,42 @@ class Fulltext extends Standard
 {
 	/**
 	 * This is the last version of ElkArte that this was tested on, to protect against API changes.
+	 *
 	 * @var string
 	 */
 	public $version_compatible = 'ElkArte 2.0 dev';
 
 	/**
 	 * This won't work with versions of ElkArte less than this.
+	 *
 	 * @var string
 	 */
 	public $min_elk_version = 'ElkArte 1.0';
 
 	/**
 	 * Is it supported?
+	 *
 	 * @var boolean
 	 */
 	public $is_supported = true;
 
 	/**
 	 * What words are banned?
+	 *
 	 * @var array
 	 */
 	protected $bannedWords = array();
 
 	/**
 	 * What is the minimum word length?
+	 *
 	 * @var int
 	 */
 	protected $min_word_length = 4;
 
 	/**
 	 * What databases support the fulltext index?
+	 *
 	 * @var array
 	 */
 	protected $supported_databases = array('MySQL');
@@ -281,7 +287,9 @@ class Fulltext extends Standard
 			$words['indexed_words'] = array_diff($words['indexed_words'], $words['complex_words']);
 
 			foreach ($words['indexed_words'] as $fulltextWord)
+			{
 				$query_params['boolean_match'] .= (in_array($fulltextWord, $query_params['excluded_index_words']) ? '-' : '+') . $fulltextWord . ' ';
+			}
 			$query_params['boolean_match'] = substr($query_params['boolean_match'], 0, -1);
 
 			// If we have bool terms to search, add them in

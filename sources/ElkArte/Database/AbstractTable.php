@@ -24,18 +24,21 @@ abstract class AbstractTable
 {
 	/**
 	 * We need a way to interact with the database
+	 *
 	 * @var \ElkArte\Database\QueryInterface
 	 */
 	protected $_db = null;
 
 	/**
 	 * The forum tables prefix
+	 *
 	 * @var string
 	 */
 	protected $_db_prefix = null;
 
 	/**
 	 * Array of table names we don't allow to be removed by addons.
+	 *
 	 * @var array
 	 */
 	protected $_reservedTables = null;
@@ -59,15 +62,15 @@ abstract class AbstractTable
 
 		// We won't do any remove on these
 		$this->_reservedTables = array('admin_info_files', 'approval_queue', 'attachments', 'ban_groups', 'ban_items',
-			'board_permissions', 'boards', 'calendar', 'calendar_holidays', 'categories', 'collapsed_categories',
-			'custom_fields', 'group_moderators', 'log_actions', 'log_activity', 'log_banned', 'log_boards',
-			'log_digest', 'log_errors', 'log_floodcontrol', 'log_group_requests', 'log_karma', 'log_mark_read',
-			'log_notify', 'log_online', 'log_packages', 'log_polls', 'log_reported', 'log_reported_comments',
-			'log_scheduled_tasks', 'log_search_messages', 'log_search_results', 'log_search_subjects',
-			'log_search_topics', 'log_topics', 'mail_queue', 'membergroups', 'members', 'message_icons',
-			'messages', 'moderators', 'package_servers', 'permission_profiles', 'permissions', 'personal_messages',
-			'pm_recipients', 'poll_choices', 'polls', 'scheduled_tasks', 'sessions', 'settings', 'smileys',
-			'themes', 'topics');
+									   'board_permissions', 'boards', 'calendar', 'calendar_holidays', 'categories', 'collapsed_categories',
+									   'custom_fields', 'group_moderators', 'log_actions', 'log_activity', 'log_banned', 'log_boards',
+									   'log_digest', 'log_errors', 'log_floodcontrol', 'log_group_requests', 'log_karma', 'log_mark_read',
+									   'log_notify', 'log_online', 'log_packages', 'log_polls', 'log_reported', 'log_reported_comments',
+									   'log_scheduled_tasks', 'log_search_messages', 'log_search_results', 'log_search_subjects',
+									   'log_search_topics', 'log_topics', 'mail_queue', 'membergroups', 'members', 'message_icons',
+									   'messages', 'moderators', 'package_servers', 'permission_profiles', 'permissions', 'personal_messages',
+									   'pm_recipients', 'poll_choices', 'polls', 'scheduled_tasks', 'sessions', 'settings', 'smileys',
+									   'themes', 'topics');
 
 		foreach ($this->_reservedTables as $k => $table_name)
 		{
@@ -112,8 +115,8 @@ abstract class AbstractTable
 	 *                  'if_exists' => 'ignore',
 	 *                  'temporary' => false,
 	 *                )
-	 * @throws \ElkArte\Exceptions\Exception
 	 * @return bool
+	 * @throws \ElkArte\Exceptions\Exception
 	 */
 	public function create_table($table_name, $columns, $indexes = array(), $parameters = array())
 	{
@@ -128,7 +131,9 @@ abstract class AbstractTable
 
 		// First - no way do we touch our tables.
 		if (in_array(strtolower($table_name), $this->_reservedTables))
+		{
 			return false;
+		}
 
 		// Log that we'll want to remove this on uninstall.
 		$this->_package_log[] = array('remove_table', $table_name);
@@ -171,7 +176,9 @@ abstract class AbstractTable
 
 		// No trailing commas!
 		if (substr($table_query, -1) === ',')
+		{
 			$table_query = substr($table_query, 0, -1);
+		}
 
 		$table_query .= $this->_close_table_query($parameters['temporary']);
 
@@ -197,12 +204,26 @@ abstract class AbstractTable
 	abstract protected function _real_prefix();
 
 	/**
-	 * Adds the closing "touch" to the CREATE TABLE query
+	 * Drop a table.
 	 *
-	 * @param bool $temporary - If the table is temporary
-	 * @return string
+	 * @param string $table_name
+	 * @param bool $force If forcing the drop or not. Useful in case of temporary
+	 *                    tables that may not be detected as existing.
 	 */
-	abstract protected function _close_table_query($temporary);
+	abstract public function drop_table($table_name, $force = false);
+
+	/**
+	 * Checks if a table exists
+	 *
+	 * @param string $table_name
+	 * @return bool
+	 */
+	public function table_exists($table_name)
+	{
+		$filter = $this->_db->list_tables(false, $table_name);
+
+		return !empty($filter);
+	}
 
 	/**
 	 * It is mean to parse the indexes array of a create_table function
@@ -215,6 +236,14 @@ abstract class AbstractTable
 	abstract protected function _create_query_indexes($indexes, $table_name);
 
 	/**
+	 * Adds the closing "touch" to the CREATE TABLE query
+	 *
+	 * @param bool $temporary - If the table is temporary
+	 * @return string
+	 */
+	abstract protected function _close_table_query($temporary);
+
+	/**
 	 * In certain cases it is necessary to create the indexes of a
 	 * newly created table with new queries after the table has been created.
 	 *
@@ -225,24 +254,6 @@ abstract class AbstractTable
 	{
 		return;
 	}
-
-	/**
-	 * Clean the indexes strings (e.g. PostgreSQL doesn't support max length)
-	 *
-	 * @param string[] $columns
-	 */
-	protected function _clean_indexes($columns)
-	{
-		return $columns;
-	}
-	/**
-	 * Drop a table.
-	 *
-	 * @param string $table_name
-	 * @param bool $force If forcing the drop or not. Useful in case of temporary
-	 *                    tables that may not be detected as existing.
-	 */
-	abstract public function drop_table($table_name, $force = false);
 
 	/**
 	 * This function adds a column.
@@ -302,26 +313,6 @@ abstract class AbstractTable
 	abstract public function calculate_type($type_name, $type_size = null, $reverse = false);
 
 	/**
-	 * Return column information for a table.
-	 *
-	 * @param string $table_name
-	 * @param bool $detail
-	 * @param mixed[] $parameters default array()
-	 * @return mixed
-	 */
-	abstract public function list_columns($table_name, $detail = false, $parameters = array());
-
-	/**
-	 * Get index information.
-	 *
-	 * @param string $table_name
-	 * @param bool $detail
-	 * @param mixed[] $parameters
-	 * @return mixed
-	 */
-	abstract public function list_indexes($table_name, $detail = false, $parameters = array());
-
-	/**
 	 * Optimize a table
 	 *
 	 * @param string $table - the table to be optimized
@@ -330,20 +321,23 @@ abstract class AbstractTable
 	abstract public function optimize($table);
 
 	/**
-	 * A very simple wrapper around the ALTER TABLE SQL statement.
+	 * Return a copy of this instance package log
+	 */
+	public function package_log()
+	{
+		return $this->_package_log;
+	}
+
+	/**
+	 * Checks if a column exists in a table
 	 *
 	 * @param string $table_name
-	 * @param string $statement
+	 * @param string $column_name
+	 * @return bool
 	 */
-	protected function _alter_table($table_name, $statement)
+	public function column_exists($table_name, $column_name)
 	{
-		return $this->_db->query('', '
-			ALTER TABLE ' . $table_name . '
-			' . $statement,
-			array(
-				'security_override' => true,
-			)
-		);
+		return $this->_get_column_info($table_name, $column_name) !== false;
 	}
 
 	/**
@@ -369,36 +363,14 @@ abstract class AbstractTable
 	}
 
 	/**
-	 * Return a copy of this instance package log
-	 */
-	public function package_log()
-	{
-		return $this->_package_log;
-	}
-
-	/**
-	 * Checks if a table exists
+	 * Return column information for a table.
 	 *
 	 * @param string $table_name
-	 * @return bool
+	 * @param bool $detail
+	 * @param mixed[] $parameters default array()
+	 * @return mixed
 	 */
-	public function table_exists($table_name)
-	{
-		$filter = $this->_db->list_tables(false, $table_name);
-		return !empty($filter);
-	}
-
-	/**
-	 * Checks if a column exists in a table
-	 *
-	 * @param string $table_name
-	 * @param string $column_name
-	 * @return bool
-	 */
-	public function column_exists($table_name, $column_name)
-	{
-		return $this->_get_column_info($table_name, $column_name) !== false;
-	}
+	abstract public function list_columns($table_name, $detail = false, $parameters = array());
 
 	/**
 	 * Resturns name, columns and indexes of a table
@@ -414,6 +386,43 @@ abstract class AbstractTable
 			'name' => $table_name,
 			'columns' => $this->list_columns($table_name, true),
 			'indexes' => $this->list_indexes($table_name, true),
+		);
+	}
+
+	/**
+	 * Get index information.
+	 *
+	 * @param string $table_name
+	 * @param bool $detail
+	 * @param mixed[] $parameters
+	 * @return mixed
+	 */
+	abstract public function list_indexes($table_name, $detail = false, $parameters = array());
+
+	/**
+	 * Clean the indexes strings (e.g. PostgreSQL doesn't support max length)
+	 *
+	 * @param string[] $columns
+	 */
+	protected function _clean_indexes($columns)
+	{
+		return $columns;
+	}
+
+	/**
+	 * A very simple wrapper around the ALTER TABLE SQL statement.
+	 *
+	 * @param string $table_name
+	 * @param string $statement
+	 */
+	protected function _alter_table($table_name, $statement)
+	{
+		return $this->_db->query('', '
+			ALTER TABLE ' . $table_name . '
+			' . $statement,
+			array(
+				'security_override' => true,
+			)
 		);
 	}
 }

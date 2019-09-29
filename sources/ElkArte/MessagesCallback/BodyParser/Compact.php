@@ -9,13 +9,16 @@
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause (see accompanying LICENSE.txt file)
  *
  * This file contains code covered by:
- * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * copyright: 2011 Simple Machines (http://www.simplemachines.org)
  *
  * @version 2.0 dev
  *
  */
 
 namespace ElkArte\MessagesCallback\BodyParser;
+
+use BBC\ParserWrapper;
+use ElkArte\Util;
 
 /**
  * Compact
@@ -26,24 +29,28 @@ class Compact implements BodyParserInterface
 {
 	/**
 	 * An array of words that can be highlighted in the message (somehow)
+	 *
 	 * @var string[]
 	 */
 	protected $_searchArray = array();
 
 	/**
 	 * If there is something to highlight or not
+	 *
 	 * @var bool
 	 */
 	protected $_highlight = false;
 
 	/**
 	 * The BBCode parser
+	 *
 	 * @var Object
 	 */
 	protected $_bbc_parser = null;
 
 	/**
 	 * If highlight should happen on whole rods or part of them
+	 *
 	 * @var bool
 	 */
 	protected $_use_partial_words = false;
@@ -56,7 +63,7 @@ class Compact implements BodyParserInterface
 		$this->_searchArray = $highlight;
 		$this->_use_partial_words = $use_partial_words;
 		$this->_highlight = !empty($highlight);
-		$this->_bbc_parser = \BBC\ParserWrapper::instance();
+		$this->_bbc_parser = ParserWrapper::instance();
 	}
 
 	/**
@@ -80,11 +87,11 @@ class Compact implements BodyParserInterface
 		$body = $this->_bbc_parser->parseMessage($body, $smileys_enabled);
 		$body = strip_tags(strtr($body, array('</div>' => '<br />', '</li>' => '<br />')), '<br>');
 
-		if (\ElkArte\Util::strlen($body) > $charLimit)
+		if (Util::strlen($body) > $charLimit)
 		{
 			if (!$this->_highlight)
 			{
-				$body = \ElkArte\Util::substr($body, 0, $charLimit) . '<strong>...</strong>';
+				$body = Util::substr($body, 0, $charLimit) . '<strong>...</strong>';
 			}
 			else
 			{
@@ -95,7 +102,9 @@ class Compact implements BodyParserInterface
 					$keyword = un_htmlspecialchars($keyword);
 					$keyword = preg_replace_callback('~(&amp;#(\d{1,7}|x[0-9a-fA-F]{1,6});)~', 'entity_fix__callback', strtr($keyword, array('\\\'' => '\'', '&' => '&amp;')));
 					if (preg_match('~[\'\.,/@%&;:(){}\[\]_\-+\\\\]$~', $keyword) != 0 || preg_match('~^[\'\.,/@%&;:(){}\[\]_\-+\\\\]~', $keyword) != 0)
+					{
 						$force_partial_word = true;
+					}
 					$matchString .= strtr(preg_quote($keyword, '/'), array('\*' => '.+?')) . '|';
 				}
 				$matchString = un_htmlspecialchars(substr($matchString, 0, -1));
@@ -103,9 +112,13 @@ class Compact implements BodyParserInterface
 				$body = un_htmlspecialchars(strtr($body, array('&nbsp;' => ' ', '<br />' => "\n", '&#91;' => '[', '&#93;' => ']', '&#58;' => ':', '&#64;' => '@')));
 
 				if ($this->_use_partial_words || $force_partial_word)
+				{
 					preg_match_all('/([^\s\W]{' . $charLimit . '}[\s\W]|[\s\W].{0,' . $charLimit . '}?|^)(' . $matchString . ')(.{0,' . $charLimit . '}[\s\W]|[^\s\W]{0,' . $charLimit . '})/isu', $body, $matches);
+				}
 				else
+				{
 					preg_match_all('/([^\s\W]{' . $charLimit . '}[\s\W]|[\s\W].{0,' . $charLimit . '}?[\s\W]|^)(' . $matchString . ')([\s\W].{0,' . $charLimit . '}[\s\W]|[\s\W][^\s\W]{0,' . $charLimit . '})/isu', $body, $matches);
+				}
 
 				$body = '';
 				foreach ($matches[0] as $match)
@@ -118,6 +131,7 @@ class Compact implements BodyParserInterface
 			// Re-fix the international characters.
 			$body = preg_replace_callback('~(&amp;#(\d{1,7}|x[0-9a-fA-F]{1,6});)~', 'entity_fix__callback', $body);
 		}
+
 		return $body;
 	}
 }

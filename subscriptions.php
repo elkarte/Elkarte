@@ -9,7 +9,7 @@
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause (see accompanying LICENSE.txt file)
  *
  * This file contains code covered by:
- * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * copyright: 2011 Simple Machines (http://www.simplemachines.org)
  *
  * @version 2.0 dev
  *
@@ -17,7 +17,9 @@
 
 // Start things rolling by getting the forum alive...
 if (!file_exists(dirname(__FILE__) . '/bootstrap.php'))
+{
 	die('Unable to initialize');
+}
 
 global $ssi_guest_access;
 
@@ -43,18 +45,22 @@ if (empty($_POST))
 
 // I assume we're even active?
 if (empty($modSettings['paid_enabled']))
+{
 	exit;
+}
 
 // If we have some custom people who find out about problems load them here.
 $notify_users = array();
 if (!empty($modSettings['paid_email_to']))
 {
 	foreach (explode(',', $modSettings['paid_email_to']) as $email)
+	{
 		$notify_users[] = array(
 			'email' => $email,
 			'name' => $txt['who_member'],
 			'id' => 0,
 		);
+	}
 }
 
 $db = database();
@@ -102,7 +108,8 @@ if (empty($member_info))
 
 // Get the subscription details.
 $request = $db->query('', '
-	SELECT cost, length, name
+	SELECT 
+		cost, length, name
 	FROM {db_prefix}subscriptions
 	WHERE id_subscribe = {int:current_subscription}',
 	array(
@@ -121,7 +128,8 @@ $db->free_result($request);
 
 // We wish to check the pending payments to make sure we are expecting this.
 $request = $db->query('', '
-	SELECT id_sublog, id_subscribe, payments_pending, pending_details, end_time
+	SELECT 
+		id_sublog, id_subscribe, payments_pending, pending_details, end_time
 	FROM {db_prefix}log_subscribed
 	WHERE id_subscribe = {int:current_subscription}
 		AND id_member = {int:current_member}
@@ -179,7 +187,9 @@ elseif ($gatewayClass->isPayment() || $gatewayClass->isSubscription())
 		{
 			unset($real_details[$id]);
 			if ($detail[3] == 'payback' && $subscription_info['payments_pending'])
+			{
 				$subscription_info['payments_pending']--;
+			}
 			break;
 		}
 
@@ -197,9 +207,13 @@ elseif ($gatewayClass->isPayment() || $gatewayClass->isSubscription())
 		foreach ($cost as $duration => $value)
 		{
 			if ($duration == 'fixed')
+			{
 				continue;
+			}
 			elseif ((float) $value == (float) $total_cost)
+			{
 				$found_duration = strtoupper(substr($duration, 0, 1));
+			}
 		}
 
 		// If we have the duration then we're done.
@@ -242,7 +256,9 @@ elseif ($gatewayClass->isPayment() || $gatewayClass->isSubscription())
 elseif ($gatewayClass->isCancellation())
 {
 	if (method_exists($gatewayClass, 'processCancelation'))
+	{
 		$gatewayClass->processCancelation($subscription_id, $member_id, $subscription_info);
+	}
 }
 else
 {
@@ -283,7 +299,9 @@ function generateSubscriptionError($text, $notify_users = [])
 	if (!empty($_POST))
 	{
 		foreach ($_POST as $key => $val)
+		{
 			$text .= '<br />' . \ElkArte\Util::htmlspecialchars($key) . ': ' . \ElkArte\Util::htmlspecialchars($val);
+		}
 	}
 
 	// Then just log and die.

@@ -13,12 +13,21 @@
 
 namespace ElkArte\Controller;
 
+use ElkArte\AbstractController;
+use ElkArte\Action;
+use ElkArte\AdminController\CoreFeatures;
+use ElkArte\BoardsTree;
+use ElkArte\Cache\Cache;
+use ElkArte\EventManager;
+use ElkArte\Exceptions\Exception;
+use ElkArte\User;
+
 /**
  *
  * Receives XMLhttp requests of various types such as
  * jump to, message and group icons, core features, drag and drop ordering
  */
-class Xml extends \ElkArte\AbstractController
+class Xml extends AbstractController
 {
 	/**
 	 * {@inheritdoc }
@@ -50,12 +59,14 @@ class Xml extends \ElkArte\AbstractController
 		);
 
 		// Easy adding of xml sub actions with integrate_xmlhttp
-		$action = new \ElkArte\Action('xmlhttp');
+		$action = new Action('xmlhttp');
 		$subAction = $action->initialize($subActions);
 
 		// Act a bit special for XML, probably never see it anyway :P
 		if (empty($subAction))
-			throw new \ElkArte\Exceptions\Exception('no_access', false);
+		{
+			throw new Exception('no_access', false);
+		}
 
 		// Off we go then, (it will check permissions)
 		$action->dispatch($subAction);
@@ -119,7 +130,9 @@ class Xml extends \ElkArte\AbstractController
 		foreach ($files as $file)
 		{
 			if ($file->getFilename() === 'blank.png')
+			{
 				continue;
+			}
 
 			if (in_array(strtolower($file->getExtension()), $allowedTypes))
 			{
@@ -161,8 +174,8 @@ class Xml extends \ElkArte\AbstractController
 		$validation = validateSession();
 		if ($validation === true)
 		{
-			$controller = new \ElkArte\AdminController\CoreFeatures(new \ElkArte\EventManager());
-			$controller->setUser(\ElkArte\User::$info);
+			$controller = new CoreFeatures(new EventManager());
+			$controller->setUser(User::$info);
 			$controller->pre_dispatch();
 			$result = $controller->action_index();
 
@@ -194,15 +207,21 @@ class Xml extends \ElkArte\AbstractController
 					);
 				}
 				else
+				{
 					$errors[] = array('value' => $txt['feature_no_exists']);
+				}
 			}
 			// Some problem loading in the core feature set
 			else
+			{
 				$errors[] = array('value' => $txt[$result]);
+			}
 		}
 		// Failed session validation I'm afraid
 		else
+		{
 			$errors[] = array('value' => isset($txt[$validation]) ? $txt[$validation] : $txt['error_occurred']);
+		}
 
 		// Return the response to the calling program
 		$context['sub_template'] = 'generic_xml';
@@ -217,8 +236,8 @@ class Xml extends \ElkArte\AbstractController
 			'messages' => array(
 				'identifier' => 'message',
 				'children' => array(array(
-					'value' => $message
-				)),
+										'value' => $message
+									)),
 			),
 			'tokens' => array(
 				'identifier' => 'token',
@@ -270,9 +289,13 @@ class Xml extends \ElkArte\AbstractController
 
 				// With the replace set
 				if (!empty($replace))
+				{
 					updateProfileFieldOrder($replace);
+				}
 				else
+				{
 					$errors[] = array('value' => $txt['no_sortable_items']);
+				}
 			}
 
 			$order[] = array(
@@ -283,10 +306,14 @@ class Xml extends \ElkArte\AbstractController
 		else
 		{
 			if (!empty($validation_session))
+			{
 				$errors[] = array('value' => $txt[$validation_session]);
+			}
 
 			if (empty($validation_token))
+			{
 				$errors[] = array('value' => $txt['token_verify_fail']);
+			}
 		}
 
 		// New generic token for use
@@ -362,7 +389,9 @@ class Xml extends \ElkArte\AbstractController
 					list ($category, $board, $childof) = explode(',', $id);
 
 					if ($board == -1)
+					{
 						continue;
+					}
 
 					$board_tree[] = array(
 						'category' => $category,
@@ -373,7 +402,9 @@ class Xml extends \ElkArte\AbstractController
 
 					// Keep track of where the moved board is in the sort stack
 					if ($board == $board_moved)
+					{
 						$moved_key = $list_order;
+					}
 
 					$list_order++;
 				}
@@ -393,15 +424,19 @@ class Xml extends \ElkArte\AbstractController
 						}
 						// Don't go to another parent tree
 						elseif ($board_tree[$i]['parent'] == 0)
+						{
 							break;
+						}
 					}
 					// Don't go to another category
 					else
+					{
 						break;
+					}
 				}
 
 				// Retrieve the current saved state
-				$boardTree = new \ElkArte\BoardsTree(database());
+				$boardTree = new BoardsTree(database());
 
 				$boardOptions = array();
 				$board_current = $boardTree->getBoardById($board_moved);
@@ -438,19 +473,27 @@ class Xml extends \ElkArte\AbstractController
 
 				// If we have figured out what to do
 				if (!empty($boardOptions))
+				{
 					modifyBoard($board_moved, $boardOptions);
+				}
 				else
+				{
 					$errors[] = array('value' => $txt['mboards_board_error']);
+				}
 			}
 		}
 		// Failed validation, extra work for you I'm afraid
 		else
 		{
 			if (!empty($validation_session))
+			{
 				$errors[] = array('value' => $txt[$validation_session]);
+			}
 
 			if (empty($validation_token))
+			{
 				$errors[] = array('value' => $txt['token_verify_fail']);
+			}
 		}
 
 		// New generic token for use
@@ -547,7 +590,9 @@ class Xml extends \ElkArte\AbstractController
 
 						// Keep track of where the moved smiley is in the sort stack
 						if ($smile_id == $smile_moved)
+						{
 							$moved_key = $list_order;
+						}
 
 						$list_order++;
 					}
@@ -563,7 +608,9 @@ class Xml extends \ElkArte\AbstractController
 					{
 						$possible_after = getSmiley($smiley_tree[$moved_key - 1]);
 						if ($possible_after['row'] == $smiley['row'] && $possible_after['location'] == $smiley['location'])
+						{
 							$smiley = getSmileyPosition($smiley['location'], $smiley_tree[$moved_key - 1]);
+						}
 					}
 
 					// Empty means getSmileyPosition failed and so do we
@@ -588,29 +635,39 @@ class Xml extends \ElkArte\AbstractController
 
 								// Make sure the smiley order is always sequential.
 								foreach ($smiley_row as $order_id => $smiley)
+								{
 									if ($order_id != $smiley['order'])
+									{
 										updateSmileyOrder($smiley['id'], $order_id);
+									}
+								}
 							}
 						}
 
 						// Clear the cache, its stale now
-						\ElkArte\Cache\Cache::instance()->remove('parsing_smileys');
-						\ElkArte\Cache\Cache::instance()->remove('posting_smileys');
+						Cache::instance()->remove('parsing_smileys');
+						Cache::instance()->remove('posting_smileys');
 						$order[] = array('value' => $txt['smileys_moved_done']);
 					}
 				}
 			}
 			else
+			{
 				$errors[] = array('value' => $txt['smileys_moved_fail']);
+			}
 		}
 		// Failed validation :'(
 		else
 		{
 			if (!empty($validation_session))
+			{
 				$errors[] = array('value' => $txt[$validation_session]);
+			}
 
 			if (empty($validation_token))
+			{
 				$errors[] = array('value' => $txt['token_verify_fail']);
+			}
 		}
 
 		// New generic token for use
@@ -684,9 +741,13 @@ class Xml extends \ElkArte\AbstractController
 
 				// With the replace set
 				if (!empty($replace))
+				{
 					updateParserFilterOrder($replace, $filters);
+				}
 				else
+				{
 					$errors[] = array('value' => $txt['no_sortable_items']);
+				}
 			}
 
 			$order[] = array(
@@ -697,10 +758,14 @@ class Xml extends \ElkArte\AbstractController
 		else
 		{
 			if (!empty($validation_session))
+			{
 				$errors[] = array('value' => $txt[$validation_session]);
+			}
 
 			if (empty($validation_token))
+			{
 				$errors[] = array('value' => $txt['token_verify_fail']);
+			}
 		}
 
 		// New generic token for use
@@ -769,17 +834,19 @@ class Xml extends \ElkArte\AbstractController
 				// The field ids arrive in 1-n view order, so we simply build an update array
 				foreach ($this->_req->post->list_message_icon_list as $id)
 				{
-						$iconInsert[] = array($id, $message_icons[$id]['board_id'], $message_icons[$id]['title'], $message_icons[$id]['filename'], $view_order);
-						$view_order++;
+					$iconInsert[] = array($id, $message_icons[$id]['board_id'], $message_icons[$id]['title'], $message_icons[$id]['filename'], $view_order);
+					$view_order++;
 				}
 
- 				// With the replace set
+				// With the replace set
 				if (!empty($iconInsert))
 				{
 					updateMessageIcon($iconInsert);
 				}
 				else
+				{
 					$errors[] = array('value' => $txt['no_sortable_items']);
+				}
 			}
 
 			$order[] = array(
@@ -790,10 +857,14 @@ class Xml extends \ElkArte\AbstractController
 		else
 		{
 			if (!empty($validation_session))
+			{
 				$errors[] = array('value' => $txt[$validation_session]);
+			}
 
 			if (empty($validation_token))
+			{
 				$errors[] = array('value' => $txt['token_verify_fail']);
+			}
 		}
 
 		// New generic token for use

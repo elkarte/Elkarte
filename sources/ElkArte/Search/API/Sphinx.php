@@ -9,7 +9,7 @@
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause (see accompanying LICENSE.txt file)
  *
  * This file contains code covered by:
- * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * copyright: 2011 Simple Machines (http://www.simplemachines.org)
  *
  * @version 2.0 dev
  *
@@ -36,36 +36,42 @@ class Sphinx extends AbstractAPI
 {
 	/**
 	 * This is the last version of ElkArte that this was tested on, to protect against API changes.
+	 *
 	 * @var string
 	 */
 	public $version_compatible = 'ElkArte 2.0 dev';
 
 	/**
 	 * This won't work with versions of ElkArte less than this.
+	 *
 	 * @var string
 	 */
 	public $min_elk_version = 'ElkArte 1.0 Beta 1';
 
 	/**
 	 * Is it supported?
+	 *
 	 * @var boolean
 	 */
 	public $is_supported = true;
 
 	/**
 	 * What words are banned?
+	 *
 	 * @var array
 	 */
 	protected $bannedWords = array();
 
 	/**
 	 * What is the minimum word length?
+	 *
 	 * @var int
 	 */
 	protected $min_word_length = 4;
 
 	/**
 	 * What databases are supported?
+	 *
 	 * @var array
 	 */
 	protected $supported_databases = array('MySQL');
@@ -310,11 +316,6 @@ class Sphinx extends AbstractAPI
 		return $topics;
 	}
 
-	public function useWordIndex()
-	{
-		return false;
-	}
-
 	/**
 	 * Clean up a search word/phrase/term for Sphinx.
 	 *
@@ -342,5 +343,10 @@ class Sphinx extends AbstractAPI
 		$sphinx_term = str_replace('\"', '"', $sphinx_term);
 
 		return $sphinx_term;
+	}
+
+	public function useWordIndex()
+	{
+		return false;
 	}
 }

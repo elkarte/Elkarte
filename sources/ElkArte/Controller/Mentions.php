@@ -13,12 +13,17 @@
 
 namespace ElkArte\Controller;
 
+use ElkArte\AbstractController;
+use ElkArte\DataValidator;
+use ElkArte\Exceptions\Exception;
+use ElkArte\Mentions\Mentioning;
+
 /**
  * as liking a post, adding a buddy, @ calling a member in a post
  *
  * @package Mentions
  */
-class Mentions extends \ElkArte\AbstractController
+class Mentions extends AbstractController
 {
 	/**
 	 * Will hold all available mention types
@@ -84,7 +89,7 @@ class Mentions extends \ElkArte\AbstractController
 	protected $_all = false;
 
 	/**
-		 *
+	 *
 	 * @param \ElkArte\EventManager $eventManager
 	 */
 	public function __construct($eventManager)
@@ -92,21 +97,6 @@ class Mentions extends \ElkArte\AbstractController
 		$this->_known_sorting = array('id_member_from', 'type', 'log_time');
 
 		parent::__construct($eventManager);
-	}
-
-	/**
-	 * Determines the enabled mention types.
-	 *
-	 * @return string[]
-	 */
-	protected function _findMentionTypes()
-	{
-		global $modSettings;
-
-		if (empty($modSettings['enabled_mentions']))
-			return array();
-
-		return array_filter(array_unique(explode(',', $modSettings['enabled_mentions'])));
 	}
 
 	/**
@@ -119,9 +109,28 @@ class Mentions extends \ElkArte\AbstractController
 
 		// I'm not sure this is needed, though better have it. :P
 		if (empty($modSettings['mentions_enabled']))
-			throw new \ElkArte\Exceptions\Exception('no_access', false);
+		{
+			throw new Exception('no_access', false);
+		}
 
 		$this->_known_mentions = $this->_findMentionTypes();
+	}
+
+	/**
+	 * Determines the enabled mention types.
+	 *
+	 * @return string[]
+	 */
+	protected function _findMentionTypes()
+	{
+		global $modSettings;
+
+		if (empty($modSettings['enabled_mentions']))
+		{
+			return array();
+		}
+
+		return array_filter(array_unique(explode(',', $modSettings['enabled_mentions'])));
 	}
 
 	/**
@@ -139,6 +148,55 @@ class Mentions extends \ElkArte\AbstractController
 			// default action to execute
 			$this->action_list();
 		}
+	}
+
+	/**
+	 * Fetches number of notifications and number of recently added ones for use
+	 * in favicon and desktop notifications.
+	 *
+	 * @todo probably should be placed somewhere else.
+	 */
+	public function action_fetch()
+	{
+		global $context, $txt, $modSettings;
+
+		if (empty($modSettings['usernotif_favicon_enable']) && empty($modSettings['usernotif_desktop_enable']))
+		{
+			die();
+		}
+
+		theme()->getTemplates()->load('Json');
+		$context['sub_template'] = 'send_json';
+		$template_layers = theme()->getLayers();
+		$template_layers->removeAll();
+		require_once(SUBSDIR . '/Mentions.subs.php');
+
+		$lastsent = $this->_req->getQuery('lastsent', 'intval', 0);
+		if (empty($lastsent) && !empty($this->_req->session->notifications_lastseen))
+		{
+			$lastsent = (int) $this->_req->session->notifications_lastseen;
+		}
+
+		// We only know AJAX for this particular action
+		$context['json_data'] = array(
+			'timelast' => getTimeLastMention($this->user->id)
+		);
+
+		if (!empty($modSettings['usernotif_favicon_enable']))
+		{
+			$context['json_data']['mentions'] = (int) $this->user->mentions;
+		}
+
+		if (!empty($modSettings['usernotif_desktop_enable']))
+		{
+			$context['json_data']['desktop_notifications'] = array(
+				'new_from_last' => getNewMentions($this->user->id, $lastsent),
+				'title' => sprintf($txt['forum_notification'], $context['forum_name']),
+			);
+			$context['json_data']['desktop_notifications']['message'] = sprintf($txt[$lastsent == 0 ? 'unread_notifications' : 'new_from_last_notifications'], $context['json_data']['desktop_notifications']['new_from_last']);
+		}
+
+		$_SESSION['notifications_lastseen'] = $context['json_data']['timelast'];
 	}
 
 	/**
@@ -299,57 +357,25 @@ class Mentions extends \ElkArte\AbstractController
 		);
 
 		if (!empty($this->_type))
+		{
 			$context['linktree'][] = array(
 				'url' => $scripturl . '?action=mentions;type=' . $this->_type,
 				'name' => $txt['mentions_type_' . $this->_type],
 			);
+		}
 	}
 
 	/**
-	 * Fetches number of notifications and number of recently added ones for use
-	 * in favicon and desktop notifications.
-	 *
-	 * @todo probably should be placed somewhere else.
+	 * Builds the link back so you return to the right list of mentions
 	 */
-	public function action_fetch()
+	protected function _buildUrl()
 	{
-		global $context, $txt, $modSettings;
+		$this->_all = $this->_req->getQuery('all') !== null;
+		$this->_sort = in_array($this->_req->getQuery('sort', 'trim'), $this->_known_sorting) ? $this->_req->getQuery('sort', 'trim') : $this->_default_sort;
+		$this->_type = in_array($this->_req->getQuery('type', 'trim'), $this->_known_mentions) ? $this->_req->getQuery('type', 'trim') : '';
+		$this->_page = $this->_req->getQuery('start', 'trim', '');
 
-		if (empty($modSettings['usernotif_favicon_enable']) && empty($modSettings['usernotif_desktop_enable']))
-			die();
-
-		theme()->getTemplates()->load('Json');
-		$context['sub_template'] = 'send_json';
-		$template_layers = theme()->getLayers();
-		$template_layers->removeAll();
-		require_once(SUBSDIR . '/Mentions.subs.php');
-
-		$lastsent = $this->_req->getQuery('lastsent', 'intval', 0);
-		if (empty($lastsent) && !empty($this->_req->session->notifications_lastseen))
-		{
-			$lastsent = (int) $this->_req->session->notifications_lastseen;
-		}
-
-		// We only know AJAX for this particular action
-		$context['json_data'] = array(
-			'timelast' => getTimeLastMention($this->user->id)
-		);
-
-		if (!empty($modSettings['usernotif_favicon_enable']))
-		{
-			$context['json_data']['mentions'] = (int) $this->user->mentions;
-		}
-
-		if (!empty($modSettings['usernotif_desktop_enable']))
-		{
-			$context['json_data']['desktop_notifications'] = array(
-				'new_from_last' => getNewMentions($this->user->id, $lastsent),
-				'title' => sprintf($txt['forum_notification'], $context['forum_name']),
-			);
-			$context['json_data']['desktop_notifications']['message'] = sprintf($txt[$lastsent == 0 ? 'unread_notifications' : 'new_from_last_notifications'], $context['json_data']['desktop_notifications']['new_from_last']);
-		}
-
-		$_SESSION['notifications_lastseen'] = $context['json_data']['timelast'];
+		$this->_url_param = ($this->_all ? ';all' : '') . (!empty($this->_type) ? ';type=' . $this->_type : '') . ($this->_req->getQuery('start') !== null ? ';start=' . $this->_req->getQuery('start') : '');
 	}
 
 	/**
@@ -364,6 +390,57 @@ class Mentions extends \ElkArte\AbstractController
 	public function list_getMentionCount($all, $type)
 	{
 		return countUserMentions($all, $type);
+	}
+
+	/**
+	 * Did you read the mention? Then let's move it to the graveyard.
+	 * Used in Display.controller.php, it may be merged to action_updatestatus
+	 * though that would require to add an optional parameter to avoid the redirect
+	 */
+	public function action_markread()
+	{
+		global $modSettings;
+
+		checkSession('request');
+
+		$this->_buildUrl();
+
+		$id_mention = $this->_req->getQuery('item', 'intval', 0);
+		$mentioning = new Mentioning(database(), $this->user, new DataValidator, $modSettings['enabled_mentions']);
+		$mentioning->updateStatus($id_mention, 'read');
+	}
+
+	/**
+	 * Updating the status from the listing?
+	 */
+	public function action_updatestatus()
+	{
+		global $modSettings;
+
+		checkSession('request');
+
+		$mentioning = new Mentioning(database(), $this->user, new DataValidator, $modSettings['enabled_mentions']);
+
+		$id_mention = $this->_req->getQuery('item', 'intval', 0);
+		$mark = $this->_req->getQuery('mark');
+
+		$this->_buildUrl();
+
+		switch ($mark)
+		{
+			case 'read':
+			case 'unread':
+			case 'delete':
+				$mentioning->updateStatus($id_mention, $mark);
+				break;
+			case 'readall':
+				theme()->getTemplates()->loadLanguageFile('Mentions');
+				$mentions = $this->list_loadMentions((int) $this->_page, $this->_items_per_page, $this->_sort, $this->_all, $this->_type);
+				$mentioning->markread($mentions);
+				break;
+		}
+
+		redirectexit('action=mentions;sa=list' . $this->_url_param);
 	}
 
 	/**
@@ -397,22 +474,30 @@ class Mentions extends \ElkArte\AbstractController
 			foreach ($possible_mentions as $mention)
 			{
 				if (count($mentions) < $limit)
+				{
 					$mentions[] = $mention;
+				}
 				else
+				{
 					break;
+				}
 			}
 			$round++;
 
 			// If nothing has been removed OR there are not enough
 			if (count($mentions) !== $count_possible || count($mentions) === $limit || ($totalMentions - $start < $limit))
+			{
 				break;
+			}
 
 			// Let's start a bit further into the list
 			$start += $limit;
 		}
 
 		if ($round !== 0)
+		{
 			countUserMentions();
+		}
 
 		return $mentions;
 	}
@@ -436,69 +521,5 @@ class Mentions extends \ElkArte\AbstractController
 		}
 
 		$this->_registerEvent('view_mentions', 'view', $to_register);
-	}
-
-	/**
-	 * Did you read the mention? Then let's move it to the graveyard.
-	 * Used in Display.controller.php, it may be merged to action_updatestatus
-	 * though that would require to add an optional parameter to avoid the redirect
-	 */
-	public function action_markread()
-	{
-		global $modSettings;
-
-		checkSession('request');
-
-		$this->_buildUrl();
-
-		$id_mention = $this->_req->getQuery('item', 'intval', 0);
-		$mentioning = new \ElkArte\Mentions\Mentioning(database(), $this->user, new \ElkArte\DataValidator, $modSettings['enabled_mentions']);
-		$mentioning->updateStatus($id_mention, 'read');
-	}
-
-	/**
-	 * Updating the status from the listing?
-	 */
-	public function action_updatestatus()
-	{
-		global $modSettings;
-
-		checkSession('request');
-
-		$mentioning = new \ElkArte\Mentions\Mentioning(database(), $this->user, new \ElkArte\DataValidator, $modSettings['enabled_mentions']);
-
-		$id_mention = $this->_req->getQuery('item', 'intval', 0);
-		$mark = $this->_req->getQuery('mark');
-
-		$this->_buildUrl();
-
-		switch ($mark)
-		{
-			case 'read':
-			case 'unread':
-			case 'delete':
-				$mentioning->updateStatus($id_mention, $mark);
-				break;
-			case 'readall':
-				theme()->getTemplates()->loadLanguageFile('Mentions');
-				$mentions = $this->list_loadMentions((int) $this->_page, $this->_items_per_page, $this->_sort, $this->_all, $this->_type);
-				$mentioning->markread($mentions);
-				break;
-		}
-
-		redirectexit('action=mentions;sa=list' . $this->_url_param);
-	}
-
-	/**
-	 * Builds the link back so you return to the right list of mentions
-	 */
-	protected function _buildUrl()
-	{
-		$this->_all = $this->_req->getQuery('all') !== null;
-		$this->_sort = in_array($this->_req->getQuery('sort', 'trim'), $this->_known_sorting) ? $this->_req->getQuery('sort', 'trim') : $this->_default_sort;
-		$this->_type = in_array($this->_req->getQuery('type', 'trim'), $this->_known_mentions) ? $this->_req->getQuery('type', 'trim') : '';
-		$this->_page = $this->_req->getQuery('start', 'trim', '');
-
-		$this->_url_param = ($this->_all ? ';all' : '') . (!empty($this->_type) ? ';type=' . $this->_type : '') . ($this->_req->getQuery('start') !== null ? ';start=' . $this->_req->getQuery('start') : '');
 	}
 }

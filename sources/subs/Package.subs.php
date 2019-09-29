@@ -8,11 +8,20 @@
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause (see accompanying LICENSE.txt file)
  *
  * This file contains code covered by:
- * copyright:    2011 Simple Machines (http://www.simplemachines.org)
+ * copyright: 2011 Simple Machines (http://www.simplemachines.org)
  *
  * @version 2.0 dev
  *
  */
+
+use ElkArte\Http\CurlFetchWebdata;
+use ElkArte\Http\FsockFetchWebdata;
+use ElkArte\Http\FtpConnection;
+use ElkArte\Http\StreamFetchWebdata;
+use ElkArte\UnTgz;
+use ElkArte\UnZip;
+use ElkArte\Util;
+use ElkArte\XmlArray;
 
 /**
  * Reads a .tar.gz file, filename, in and extracts file(s) from it.
@@ -24,8 +33,8 @@
  * @param bool $overwrite = false
  * @param string[]|null $files_to_extract = null
  * @return array|boolean
- * @package Packages
  * @throws \ElkArte\Exceptions\Exception
+ * @package Packages
  */
 function read_tgz_file($gzfilename, $destination, $single_file = false, $overwrite = false, $files_to_extract = null)
 {
@@ -83,7 +92,7 @@ function read_tgz_file($gzfilename, $destination, $single_file = false, $overwri
  */
 function read_tgz_data($data, $destination, $single_file = false, $overwrite = false, $files_to_extract = null)
 {
-	$untgz = new \ElkArte\UnTgz($data, $destination, $single_file, $overwrite, $files_to_extract);
+	$untgz = new UnTgz($data, $destination, $single_file, $overwrite, $files_to_extract);
 
 	// Choose the right method for the file
 	if ($untgz->check_valid_tgz())
@@ -114,7 +123,7 @@ function read_tgz_data($data, $destination, $single_file = false, $overwrite = f
  */
 function read_zip_data($data, $destination, $single_file = false, $overwrite = false, $files_to_extract = null)
 {
-	$unzip = new \ElkArte\UnZip($data, $destination, $single_file, $overwrite, $files_to_extract);
+	$unzip = new UnZip($data, $destination, $single_file, $overwrite, $files_to_extract);
 
 	return $unzip->read_zip_data();
 }
@@ -283,7 +292,7 @@ function getPackageInfo($gzfilename)
 	}
 
 	// Parse package-info.xml into an \ElkArte\XmlArray.
-	$packageInfo = new \ElkArte\XmlArray($packageInfo);
+	$packageInfo = new XmlArray($packageInfo);
 
 	// @todo Error message of some sort?
 	if (!$packageInfo->exists('package-info[0]'))
@@ -451,7 +460,7 @@ function create_chmod_control($chmodFiles = array(), $chmodOptions = array(), $r
 	// If we have some FTP information already, then let's assume it was required and try to get ourselves connected.
 	if (!empty($_SESSION['pack_ftp']['connected']))
 	{
-		$package_ftp = new \ElkArte\Http\FtpConnection($_SESSION['pack_ftp']['server'], $_SESSION['pack_ftp']['port'], $_SESSION['pack_ftp']['username'], package_crypt($_SESSION['pack_ftp']['password']));
+		$package_ftp = new FtpConnection($_SESSION['pack_ftp']['server'], $_SESSION['pack_ftp']['port'], $_SESSION['pack_ftp']['username'], package_crypt($_SESSION['pack_ftp']['password']));
 
 		// Check for a valid connection
 		if ($package_ftp->error !== false)
@@ -463,7 +472,7 @@ function create_chmod_control($chmodFiles = array(), $chmodOptions = array(), $r
 	// Just got a submission did we?
 	if (isset($_POST['ftp_username'], $_POST['ftp_password']) && (empty($package_ftp) || ($package_ftp->error !== false)))
 	{
-		$ftp = new \ElkArte\Http\FtpConnection($_POST['ftp_server'], $_POST['ftp_port'], $_POST['ftp_username'], $_POST['ftp_password']);
+		$ftp = new FtpConnection($_POST['ftp_server'], $_POST['ftp_port'], $_POST['ftp_username'], $_POST['ftp_password']);
 
 		// We're connected, jolly good!
 		if ($ftp->error === false)
@@ -538,7 +547,7 @@ function create_chmod_control($chmodFiles = array(), $chmodOptions = array(), $r
 		{
 			if (!isset($ftp))
 			{
-				$ftp = new \ElkArte\Http\FtpConnection(null);
+				$ftp = new FtpConnection(null);
 			}
 			elseif ($ftp->error !== false && !isset($ftp_error))
 			{
@@ -759,7 +768,7 @@ function packageRequireFTP($destination_url, $files = null, $return = false)
 	}
 	elseif (isset($_SESSION['pack_ftp']))
 	{
-		$package_ftp = new \ElkArte\Http\FtpConnection($_SESSION['pack_ftp']['server'], $_SESSION['pack_ftp']['port'], $_SESSION['pack_ftp']['username'], package_crypt($_SESSION['pack_ftp']['password']));
+		$package_ftp = new FtpConnection($_SESSION['pack_ftp']['server'], $_SESSION['pack_ftp']['port'], $_SESSION['pack_ftp']['username'], package_crypt($_SESSION['pack_ftp']['password']));
 
 		if ($files === null)
 		{
@@ -808,7 +817,7 @@ function packageRequireFTP($destination_url, $files = null, $return = false)
 	elseif (isset($_POST['ftp_username']))
 	{
 		// Attempt to make a new FTP connection
-		$ftp = new \ElkArte\Http\FtpConnection($_POST['ftp_server'], $_POST['ftp_port'], $_POST['ftp_username'], $_POST['ftp_password']);
+		$ftp = new FtpConnection($_POST['ftp_server'], $_POST['ftp_port'], $_POST['ftp_username'], $_POST['ftp_password']);
 
 		if ($ftp->error === false)
 		{
@@ -825,7 +834,7 @@ function packageRequireFTP($destination_url, $files = null, $return = false)
 	{
 		if (!isset($ftp))
 		{
-			$ftp = new \ElkArte\Http\FtpConnection(null);
+			$ftp = new FtpConnection(null);
 		}
 		elseif ($ftp->error !== false && !isset($ftp_error))
 		{
@@ -1723,7 +1732,7 @@ function deltree($dir, $delete_dir = true)
 	// Read all the files in the directory
 	try
 	{
-		$entrynames = new \FilesystemIterator($dir, \FilesystemIterator::SKIP_DOTS);
+		$entrynames = new FilesystemIterator($dir, FilesystemIterator::SKIP_DOTS);
 		foreach ($entrynames as $entryname)
 		{
 			// Recursively dive in to each directory looking for files to delete
@@ -2034,7 +2043,7 @@ function parseModification($file, $testing = true, $undo = false, $theme_paths =
 
 	detectServer()->setTimeLimit(600);
 
-	$xml = new \ElkArte\XmlArray(strtr($file, array("\r" => '')));
+	$xml = new XmlArray(strtr($file, array("\r" => '')));
 	$actions = array();
 	$everything_found = true;
 
@@ -2872,10 +2881,10 @@ function package_create_backup($id = 'backup')
 	{
 		foreach ($dirs as $dir => $dest)
 		{
-			$iter = new \RecursiveIteratorIterator(
-				new \RecursiveDirectoryIterator($dir, \RecursiveDirectoryIterator::SKIP_DOTS),
-				\RecursiveIteratorIterator::CHILD_FIRST,
-				\RecursiveIteratorIterator::CATCH_GET_CHILD // Ignore "Permission denied"
+			$iter = new RecursiveIteratorIterator(
+				new RecursiveDirectoryIterator($dir, RecursiveDirectoryIterator::SKIP_DOTS),
+				RecursiveIteratorIterator::CHILD_FIRST,
+				RecursiveIteratorIterator::CATCH_GET_CHILD // Ignore "Permission denied"
 			);
 
 			foreach ($iter as $entry => $dir)
@@ -2977,7 +2986,7 @@ function fetch_web_data($url, $post_data = '', $keep_alive = false, $redirection
 	elseif ($match[1] === 'ftp')
 	{
 		// Establish a connection and attempt to enable passive mode.
-		$ftp = new \ElkArte\Http\FtpConnection(($match[2] ? 'ssl://' : '') . $match[3], empty($match[5]) ? 21 : $match[5], 'anonymous', $webmaster_email);
+		$ftp = new FtpConnection(($match[2] ? 'ssl://' : '') . $match[3], empty($match[5]) ? 21 : $match[5], 'anonymous', $webmaster_email);
 		if ($ftp->error !== false || !$ftp->passive())
 		{
 			return false;
@@ -3013,15 +3022,15 @@ function fetch_web_data($url, $post_data = '', $keep_alive = false, $redirection
 		// Choose the fastest and most robust way
 		if (function_exists('curl_init'))
 		{
-			$fetch_data = new \ElkArte\Http\CurlFetchWebdata(array(), $redirection_level);
+			$fetch_data = new CurlFetchWebdata(array(), $redirection_level);
 		}
 		elseif (empty(ini_get('allow_url_fopen')))
 		{
-			$fetch_data = new \ElkArte\Http\StreamFetchWebdata(array(), $redirection_level, $keep_alive);
+			$fetch_data = new StreamFetchWebdata(array(), $redirection_level, $keep_alive);
 		}
 		else
 		{
-			$fetch_data = new \ElkArte\Http\FsockFetchWebdata(array(), $redirection_level, $keep_alive);
+			$fetch_data = new FsockFetchWebdata(array(), $redirection_level, $keep_alive);
 		}
 
 		// no errors and a 200 result, then we have a good dataset, well we at least have data ;)
@@ -3088,7 +3097,7 @@ function isPackageInstalled($id, $install_id = null)
 		$result = array(
 			'old_themes' => explode(',', $row['themes_installed']),
 			'old_version' => $row['version'],
-			'db_changes' => empty($row['db_changes']) ? array() : \ElkArte\Util::unserialize($row['db_changes']),
+			'db_changes' => empty($row['db_changes']) ? array() : Util::unserialize($row['db_changes']),
 			'package_id' => $row['package_id'],
 			'install_state' => $row['install_state'],
 		);
@@ -3225,7 +3234,7 @@ function isAuthorizedServer($remote_url)
 	global $modSettings;
 
 	// Know addon servers
-	$servers = \ElkArte\Util::unserialize($modSettings['authorized_package_servers']);
+	$servers = Util::unserialize($modSettings['authorized_package_servers']);
 	if (empty($servers))
 	{
 		return false;

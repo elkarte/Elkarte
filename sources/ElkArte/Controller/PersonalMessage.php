@@ -18,8 +18,22 @@
 
 namespace ElkArte\Controller;
 
+use BBC\ParserWrapper;
+use ElkArte\AbstractController;
+use ElkArte\Action;
+use ElkArte\Cache\Cache;
 use ElkArte\Errors\ErrorContext;
+use ElkArte\EventManager;
 use ElkArte\Exceptions\ControllerRedirectException;
+use ElkArte\Exceptions\Exception;
+use ElkArte\Exceptions\PmErrorException;
+use ElkArte\MembersList;
+use ElkArte\MessagesCallback\BodyParser\Normal;
+use ElkArte\MessagesCallback\PmRenderer;
+use ElkArte\User;
+use ElkArte\Util;
+use ElkArte\ValuesContainer;
+use ElkArte\VerificationControls\VerificationControlsIntegrate;
 
 /**
  * Class PersonalMessage
@@ -27,18 +41,20 @@ use ElkArte\Exceptions\ControllerRedirectException;
  *
  * @package ElkArte\Controller
  */
-class PersonalMessage extends \ElkArte\AbstractController
+class PersonalMessage extends AbstractController
 {
 	/**
 	 * $_search_params will carry all settings that differ from the default
 	 * search parameters. That way, the URLs involved in a search page will
 	 * be kept as short as possible.
+	 *
 	 * @var array
 	 */
 	private $_search_params = array();
 
 	/**
 	 * $_searchq_parameters will carry all the values needed by S_search_params
+	 *
 	 * @var array
 	 */
 	private $_searchq_parameters = array();
@@ -86,7 +102,7 @@ class PersonalMessage extends \ElkArte\AbstractController
 		}
 
 		// Load the label counts data.
-		if (\ElkArte\User::$settings['new_pm'] || !\ElkArte\Cache\Cache::instance()->getVar($context['labels'], 'labelCounts:' . $this->user->id, 720))
+		if (User::$settings['new_pm'] || !Cache::instance()->getVar($context['labels'], 'labelCounts:' . $this->user->id, 720))
 		{
 			$this->_loadLabels();
 
@@ -95,7 +111,7 @@ class PersonalMessage extends \ElkArte\AbstractController
 		}
 
 		// Now we have the labels, and assuming we have unsorted mail, apply our rules!
-		if (\ElkArte\User::$settings['new_pm'])
+		if (User::$settings['new_pm'])
 		{
 			// Apply our rules to the new PM's
 			applyRules();
@@ -126,7 +142,7 @@ class PersonalMessage extends \ElkArte\AbstractController
 		);
 
 		// Preferences...
-		$context['display_mode'] = \ElkArte\User::$settings['pm_prefs'] & 3;
+		$context['display_mode'] = User::$settings['pm_prefs'] & 3;
 	}
 
 	/**
@@ -160,7 +176,7 @@ class PersonalMessage extends \ElkArte\AbstractController
 	{
 		global $context, $txt;
 
-		$context['labels'] = explode(',', \ElkArte\User::$settings['message_labels']);
+		$context['labels'] = explode(',', User::$settings['message_labels']);
 
 		foreach ($context['labels'] as $id_label => $label_name)
 		{
@@ -215,7 +231,7 @@ class PersonalMessage extends \ElkArte\AbstractController
 		);
 
 		// Set up our action array
-		$action = new \ElkArte\Action('pm_index');
+		$action = new Action('pm_index');
 
 		// Known action, go to it, otherwise the inbox for you
 		$subAction = $action->initialize($subActions, 'inbox');
@@ -367,7 +383,7 @@ class PersonalMessage extends \ElkArte\AbstractController
 		// No menu means no access.
 		if (!$pm_include_data && ($this->user->is_guest === false || validateSession() !== true))
 		{
-			throw new \ElkArte\Exceptions\Exception('no_access', false);
+			throw new Exception('no_access', false);
 		}
 
 		// Make a note of the Unique ID for this menu.
@@ -409,7 +425,7 @@ class PersonalMessage extends \ElkArte\AbstractController
 		{
 			$context['display_mode'] = $context['display_mode'] > 1 ? 0 : $context['display_mode'] + 1;
 			require_once(SUBSDIR . '/Members.subs.php');
-			updateMemberData($this->user->id, array('pm_prefs' => (\ElkArte\User::$settings['pm_prefs'] & 252) | $context['display_mode']));
+			updateMemberData($this->user->id, array('pm_prefs' => (User::$settings['pm_prefs'] & 252) | $context['display_mode']));
 		}
 
 		// Make sure the starting location is valid.
@@ -508,7 +524,7 @@ class PersonalMessage extends \ElkArte\AbstractController
 			// Make sure you have access to this PM.
 			if (!isAccessiblePM($pmID, $context['folder'] === 'sent' ? 'outbox' : 'inbox'))
 			{
-				throw new \ElkArte\Exceptions\Exception('no_access', false);
+				throw new Exception('no_access', false);
 			}
 
 			$context['current_pm'] = $pmID;
@@ -536,7 +552,7 @@ class PersonalMessage extends \ElkArte\AbstractController
 
 			if (!isAccessiblePM($pmsg, $context['folder'] === 'sent' ? 'outbox' : 'inbox'))
 			{
-				throw new \ElkArte\Exceptions\Exception('no_access', false);
+				throw new Exception('no_access', false);
 			}
 		}
 
@@ -567,7 +583,7 @@ class PersonalMessage extends \ElkArte\AbstractController
 		// Make sure that we have been given a correct head pm id if we are in conversation mode
 		if ($context['display_mode'] == 2 && !empty($pmID) && $pmID != $lastData['id'])
 		{
-			throw new \ElkArte\Exceptions\Exception('no_access', false);
+			throw new Exception('no_access', false);
 		}
 
 		// If loadPMs returned results, lets show the pm subject list
@@ -618,7 +634,7 @@ class PersonalMessage extends \ElkArte\AbstractController
 			$posters = array_unique($posters);
 			if (!empty($posters))
 			{
-				\ElkArte\MembersList::load($posters);
+				MembersList::load($posters);
 			}
 
 			// If we're on grouped/restricted view get a restricted list of messages.
@@ -627,7 +643,9 @@ class PersonalMessage extends \ElkArte\AbstractController
 				// Get the order right.
 				$orderBy = array();
 				foreach (array_reverse($pms) as $pm)
+				{
 					$orderBy[] = 'pm.id_pm = ' . $pm;
+				}
 
 				// Separate query for these bits, the callback will use it as required
 				$subjects_request = loadPMSubjectRequest($pms, $orderBy);
@@ -650,10 +668,10 @@ class PersonalMessage extends \ElkArte\AbstractController
 		}
 
 		// Initialize the subject and message render callbacks
-		$bodyParser = new \ElkArte\MessagesCallback\BodyParser\Normal(array(), false);
-		$opt = new \ElkArte\ValuesContainer(['recipients' => $recipients]);
-		$renderer = new \ElkArte\MessagesCallback\PmRenderer($messages_request, $this->user, $bodyParser, $opt);
-		$subject_renderer = new \ElkArte\MessagesCallback\PmRenderer($subjects_request, $this->user, $bodyParser, $opt);
+		$bodyParser = new Normal(array(), false);
+		$opt = new ValuesContainer(['recipients' => $recipients]);
+		$renderer = new PmRenderer($messages_request, $this->user, $bodyParser, $opt);
+		$subject_renderer = new PmRenderer($subjects_request, $this->user, $bodyParser, $opt);
 
 		// Subject and Message
 		$context['get_pmessage'] = array($renderer, 'getContext');
@@ -754,7 +772,7 @@ class PersonalMessage extends \ElkArte\AbstractController
 
 			if (!empty($pmCount) && $pmCount >= $modSettings['pm_posts_per_hour'])
 			{
-				throw new \ElkArte\Exceptions\Exception('pm_too_many_per_hour', true, array($modSettings['pm_posts_per_hour']));
+				throw new Exception('pm_too_many_per_hour', true, array($modSettings['pm_posts_per_hour']));
 			}
 		}
 
@@ -762,7 +780,7 @@ class PersonalMessage extends \ElkArte\AbstractController
 		{
 			$this->_events->trigger('before_set_context', array('pmsg' => isset($this->_req->query->pmsg) ? $this->_req->query->pmsg : (isset($this->_req->query->quote) ? $this->_req->query->quote : 0)));
 		}
-		catch (\ElkArte\Exceptions\PmErrorException $e)
+		catch (PmErrorException $e)
 		{
 			return $this->messagePostError($e->namedRecipientList, $e->recipientList, $e->msgOptions);
 		}
@@ -775,7 +793,7 @@ class PersonalMessage extends \ElkArte\AbstractController
 			// Make sure this is accessible (not deleted)
 			if (!isAccessiblePM($pmsg))
 			{
-				throw new \ElkArte\Exceptions\Exception('no_access', false);
+				throw new Exception('no_access', false);
 			}
 
 			// Validate that this is one has been received?
@@ -785,7 +803,7 @@ class PersonalMessage extends \ElkArte\AbstractController
 			$row_quoted = loadPMQuote($pmsg, $isReceived);
 			if ($row_quoted === false)
 			{
-				throw new \ElkArte\Exceptions\Exception('pm_not_yours', false);
+				throw new Exception('pm_not_yours', false);
 			}
 
 			// Censor the message.
@@ -801,7 +819,7 @@ class PersonalMessage extends \ElkArte\AbstractController
 			$form_subject = $row_quoted['subject'];
 
 			// Add 'Re: ' to it....
-			if ($context['reply'] && trim($context['response_prefix']) !== '' && \ElkArte\Util::strpos($form_subject, trim($context['response_prefix'])) !== 0)
+			if ($context['reply'] && trim($context['response_prefix']) !== '' && Util::strpos($form_subject, trim($context['response_prefix'])) !== 0)
 			{
 				$form_subject = $context['response_prefix'] . $form_subject;
 			}
@@ -828,7 +846,7 @@ class PersonalMessage extends \ElkArte\AbstractController
 			}
 
 			// Do the BBC thang on the message.
-			$bbc_parser = \BBC\ParserWrapper::instance();
+			$bbc_parser = ParserWrapper::instance();
 			$row_quoted['body'] = $bbc_parser->parsePM($row_quoted['body']);
 
 			// Set up the quoted message array.
@@ -902,7 +920,9 @@ class PersonalMessage extends \ElkArte\AbstractController
 			// Get a literal name list in case the user has JavaScript disabled.
 			$names = array();
 			foreach ($context['recipients']['to'] as $to)
+			{
 				$names[] = $to['name'];
+			}
 			$context['to_value'] = empty($names) ? '' : '&quot;' . implode('&quot;, &quot;', $names) . '&quot;';
 		}
 		else
@@ -945,320 +965,6 @@ class PersonalMessage extends \ElkArte\AbstractController
 
 		// Register this form and get a sequence number in $context.
 		checkSubmitOnce('register');
-	}
-
-	/**
-	 * Send a personal message.
-	 */
-	public function action_send2()
-	{
-		global $txt, $context, $modSettings;
-
-		// All the helpers we need
-		require_once(SUBSDIR . '/Auth.subs.php');
-		require_once(SUBSDIR . '/Post.subs.php');
-
-		theme()->getTemplates()->loadLanguageFile('PersonalMessage', '', false);
-
-		// Extract out the spam settings - it saves database space!
-		list ($modSettings['max_pm_recipients'], $modSettings['pm_posts_verification'], $modSettings['pm_posts_per_hour']) = explode(',', $modSettings['pm_spam_settings']);
-
-		// Initialize the errors we're about to make.
-		$post_errors = ErrorContext::context('pm', 1);
-
-		// Check whether we've gone over the limit of messages we can send per hour - fatal error if fails!
-		if (!empty($modSettings['pm_posts_per_hour'])
-			&& !allowedTo(array('admin_forum', 'moderate_forum', 'send_mail'))
-			&& $this->user->mod_cache['bq'] === '0=1'
-			&& $this->user->mod_cache['gq'] === '0=1'
-		)
-		{
-			// How many have they sent this last hour?
-			$pmCount = pmCount($this->user->id, 3600);
-
-			if (!empty($pmCount) && $pmCount >= $modSettings['pm_posts_per_hour'])
-			{
-				if (!isset($this->_req->query->xml))
-				{
-					throw new \ElkArte\Exceptions\Exception('pm_too_many_per_hour', true, array($modSettings['pm_posts_per_hour']));
-				}
-				else
-				{
-					$post_errors->addError('pm_too_many_per_hour');
-				}
-			}
-		}
-
-		// If your session timed out, show an error, but do allow to re-submit.
-		if (!isset($this->_req->query->xml) && checkSession('post', '', false) != '')
-		{
-			$post_errors->addError('session_timeout');
-		}
-
-		$this->_req->post->subject = isset($this->_req->post->subject) ? strtr(\ElkArte\Util::htmltrim($this->_req->post->subject), array("\r" => '', "\n" => '', "\t" => '')) : '';
-		$this->_req->post->to = $this->_req->getPost('to', 'trim', empty($this->_req->query->to) ? '' : $this->_req->query->to);
-		$this->_req->post->bcc = $this->_req->getPost('bcc', 'trim', empty($this->_req->query->bcc) ? '' : $this->_req->query->bcc);
-
-		// Route the input from the 'u' parameter to the 'to'-list.
-		if (!empty($this->_req->post->u))
-		{
-			$this->_req->post->recipient_to = explode(',', $this->_req->post->u);
-		}
-
-		$bbc_parser = \BBC\ParserWrapper::instance();
-
-		// Construct the list of recipients.
-		$recipientList = array();
-		$namedRecipientList = array();
-		$namesNotFound = array();
-		foreach (array('to', 'bcc') as $recipientType)
-		{
-			// First, let's see if there's user ID's given.
-			$recipientList[$recipientType] = array();
-			$type = 'recipient_' . $recipientType;
-			if (!empty($this->_req->post->{$type}) && is_array($this->_req->post->{$type}))
-			{
-				$recipientList[$recipientType] = array_map('intval', $this->_req->post->{$type});
-			}
-
-			// Are there also literal names set?
-			if (!empty($this->_req->post->{$recipientType}))
-			{
-				// We're going to take out the "s anyway ;).
-				$recipientString = strtr($this->_req->post->{$recipientType}, array('\\"' => '"'));
-
-				preg_match_all('~"([^"]+)"~', $recipientString, $matches);
-				$namedRecipientList[$recipientType] = array_unique(array_merge($matches[1], explode(',', preg_replace('~"[^"]+"~', '', $recipientString))));
-
-				// Clean any literal names entered
-				foreach ($namedRecipientList[$recipientType] as $index => $recipient)
-				{
-					if (strlen(trim($recipient)) > 0)
-					{
-						$namedRecipientList[$recipientType][$index] = \ElkArte\Util::htmlspecialchars(\ElkArte\Util::strtolower(trim($recipient)));
-					}
-					else
-					{
-						unset($namedRecipientList[$recipientType][$index]);
-					}
-				}
-
-				// Now see if we can resolve the entered name to an actual user
-				if (!empty($namedRecipientList[$recipientType]))
-				{
-					$foundMembers = findMembers($namedRecipientList[$recipientType]);
-
-					// Assume all are not found, until proven otherwise.
-					$namesNotFound[$recipientType] = $namedRecipientList[$recipientType];
-
-					// Make sure we only have each member listed once, in case they did not use the select list
-					foreach ($foundMembers as $member)
-					{
-						$testNames = array(
-							\ElkArte\Util::strtolower($member['username']),
-							\ElkArte\Util::strtolower($member['name']),
-							\ElkArte\Util::strtolower($member['email']),
-						);
-
-						if (count(array_intersect($testNames, $namedRecipientList[$recipientType])) !== 0)
-						{
-							$recipientList[$recipientType][] = $member['id'];
-
-							// Get rid of this username, since we found it.
-							$namesNotFound[$recipientType] = array_diff($namesNotFound[$recipientType], $testNames);
-						}
-					}
-				}
-			}
-
-			// Selected a recipient to be deleted? Remove them now.
-			if (!empty($this->_req->post->delete_recipient))
-			{
-				$recipientList[$recipientType] = array_diff($recipientList[$recipientType], array((int) $this->_req->post->delete_recipient));
-			}
-
-			// Make sure we don't include the same name twice
-			$recipientList[$recipientType] = array_unique($recipientList[$recipientType]);
-		}
-
-		// Are we changing the recipients some how?
-		$is_recipient_change = !empty($this->_req->post->delete_recipient) || !empty($this->_req->post->to_submit) || !empty($this->_req->post->bcc_submit);
-
-		// Check if there's at least one recipient.
-		if (empty($recipientList['to']) && empty($recipientList['bcc']))
-		{
-			$post_errors->addError('no_to');
-		}
-
-		// Make sure that we remove the members who did get it from the screen.
-		if (!$is_recipient_change)
-		{
-			foreach (array_keys($recipientList) as $recipientType)
-			{
-				if (!empty($namesNotFound[$recipientType]))
-				{
-					$post_errors->addError('bad_' . $recipientType);
-
-					// Since we already have a post error, remove the previous one.
-					$post_errors->removeError('no_to');
-
-					foreach ($namesNotFound[$recipientType] as $name)
-						$context['send_log']['failed'][] = sprintf($txt['pm_error_user_not_found'], $name);
-				}
-			}
-		}
-
-		// Did they make any mistakes like no subject or message?
-		if ($this->_req->post->subject === '')
-		{
-			$post_errors->addError('no_subject');
-		}
-
-		if (!isset($this->_req->post->message) || $this->_req->post->message === '')
-		{
-			$post_errors->addError('no_message');
-		}
-		elseif (!empty($modSettings['max_messageLength']) && \ElkArte\Util::strlen($this->_req->post->message) > $modSettings['max_messageLength'])
-		{
-			$post_errors->addError('long_message');
-		}
-		else
-		{
-			// Preparse the message.
-			$message = $this->_req->post->message;
-			preparsecode($message);
-
-			// Make sure there's still some content left without the tags.
-			if (\ElkArte\Util::htmltrim(strip_tags($bbc_parser->parsePM(\ElkArte\Util::htmlspecialchars($message, ENT_QUOTES)), '<img>')) === '' && (!allowedTo('admin_forum') || strpos($message, '[html]') === false))
-			{
-				$post_errors->addError('no_message');
-			}
-		}
-
-		// If they made any errors, give them a chance to make amends.
-		if ($post_errors->hasErrors() && !$is_recipient_change && !isset($this->_req->query->preview) && !isset($this->_req->query->xml))
-		{
-			$this->messagePostError($namedRecipientList, $recipientList);
-
-			return false;
-		}
-
-		// Want to take a second glance before you send?
-		if (isset($this->_req->query->preview))
-		{
-			// Set everything up to be displayed.
-			$context['preview_subject'] = \ElkArte\Util::htmlspecialchars($this->_req->post->subject);
-			$context['preview_message'] = \ElkArte\Util::htmlspecialchars($this->_req->post->message, ENT_QUOTES, 'UTF-8', true);
-			preparsecode($context['preview_message'], true);
-
-			// Parse out the BBC if it is enabled.
-			$context['preview_message'] = $bbc_parser->parsePM($context['preview_message']);
-
-			// Censor, as always.
-			$context['preview_subject'] = censor($context['preview_subject']);
-			$context['preview_message'] = censor($context['preview_message']);
-
-			// Set a descriptive title.
-			$context['page_title'] = $txt['preview'] . ' - ' . $context['preview_subject'];
-
-			// Pretend they messed up but don't ignore if they really did :P.
-			$this->messagePostError($namedRecipientList, $recipientList);
-
-			return false;
-		}
-		// Adding a recipient cause javascript ain't working?
-		elseif ($is_recipient_change)
-		{
-			// Maybe we couldn't find one?
-			foreach ($namesNotFound as $recipientType => $names)
-			{
-				$post_errors->addError('bad_' . $recipientType);
-				foreach ($names as $name)
-					$context['send_log']['failed'][] = sprintf($txt['pm_error_user_not_found'], $name);
-			}
-
-			$this->messagePostError($namedRecipientList, $recipientList);
-			return true;
-		}
-
-		try
-		{
-			$this->_events->trigger('before_sending', array('namedRecipientList' => $namedRecipientList, 'recipientList' => $recipientList, 'namesNotFound' => $namesNotFound, 'post_errors' => $post_errors));
-		}
-		catch (ControllerRedirectException $e)
-		{
-			return $this->messagePostError($namedRecipientList, $recipientList);
-		}
-
-		// Safety net, it may be a module may just add to the list of errors without actually throw the error
-		if ($post_errors->hasErrors() && !isset($this->_req->query->preview) && !isset($this->_req->query->xml))
-		{
-			$this->messagePostError($namedRecipientList, $recipientList);
-
-			return false;
-		}
-
-		// Before we send the PM, let's make sure we don't have an abuse of numbers.
-		if (!empty($modSettings['max_pm_recipients']) && count($recipientList['to']) + count($recipientList['bcc']) > $modSettings['max_pm_recipients'] && !allowedTo(array('moderate_forum', 'send_mail', 'admin_forum')))
-		{
-			$context['send_log'] = array(
-				'sent' => array(),
-				'failed' => array(sprintf($txt['pm_too_many_recipients'], $modSettings['max_pm_recipients'])),
-			);
-
-			$this->messagePostError($namedRecipientList, $recipientList);
-			return false;
-		}
-
-		// Protect from message spamming.
-		spamProtection('pm');
-
-		// Prevent double submission of this form.
-		checkSubmitOnce('check');
-
-		// Finally do the actual sending of the PM.
-		if (!empty($recipientList['to']) || !empty($recipientList['bcc']))
-		{
-			$context['send_log'] = sendpm($recipientList, $this->_req->post->subject, $this->_req->post->message, true, null, !empty($this->_req->post->pm_head) ? (int) $this->_req->post->pm_head : 0);
-		}
-		else
-		{
-			$context['send_log'] = array(
-				'sent' => array(),
-				'failed' => array()
-			);
-		}
-
-		// Mark the message as "replied to".
-		if (!empty($context['send_log']['sent']) && !empty($this->_req->post->replied_to) && $this->_req->getQuery('f') === 'inbox')
-		{
-			require_once(SUBSDIR . '/PersonalMessage.subs.php');
-			setPMRepliedStatus($this->user->id, (int) $this->_req->post->replied_to);
-		}
-
-		$failed = !empty($context['send_log']['failed']);
-		$this->_events->trigger('message_sent', array('failed' => $failed));
-
-		// If one or more of the recipients were invalid, go back to the post screen with the failed usernames.
-		if ($failed)
-		{
-			$this->messagePostError($namesNotFound, array(
-				'to' => array_intersect($recipientList['to'], $context['send_log']['failed']),
-				'bcc' => array_intersect($recipientList['bcc'], $context['send_log']['failed'])
-			));
-
-			return false;
-		}
-		// Message sent successfully?
-		else
-		{
-			$context['current_label_redirect'] .= ';done=sent';
-		}
-
-		// Go back to the where they sent from, if possible...
-		redirectexit($context['current_label_redirect']);
-
-		return true;
 	}
 
 	/**
@@ -1320,8 +1026,8 @@ class PersonalMessage extends \ElkArte\AbstractController
 		}
 		else
 		{
-			$context['subject'] = isset($this->_req->post->subject) ? \ElkArte\Util::htmlspecialchars($this->_req->post->subject) : '';
-			$context['message'] = isset($this->_req->post->message) ? str_replace(array('  '), array('&nbsp; '), \ElkArte\Util::htmlspecialchars($this->_req->post->message, ENT_QUOTES, 'UTF-8', true)) : '';
+			$context['subject'] = isset($this->_req->post->subject) ? Util::htmlspecialchars($this->_req->post->subject) : '';
+			$context['message'] = isset($this->_req->post->message) ? str_replace(array('  '), array('&nbsp; '), Util::htmlspecialchars($this->_req->post->message, ENT_QUOTES, 'UTF-8', true)) : '';
 			$context['reply'] = !empty($this->_req->post->replied_to);
 		}
 
@@ -1335,7 +1041,7 @@ class PersonalMessage extends \ElkArte\AbstractController
 			{
 				if (!isset($this->_req->query->xml))
 				{
-					throw new \ElkArte\Exceptions\Exception('pm_not_yours', false);
+					throw new Exception('pm_not_yours', false);
 				}
 				else
 				{
@@ -1346,7 +1052,7 @@ class PersonalMessage extends \ElkArte\AbstractController
 			{
 				$row_quoted['subject'] = censor($row_quoted['subject']);
 				$row_quoted['body'] = censor($row_quoted['body']);
-				$bbc_parser = \BBC\ParserWrapper::instance();
+				$bbc_parser = ParserWrapper::instance();
 
 				$context['quoted_message'] = array(
 					'id' => $row_quoted['id_pm'],
@@ -1407,7 +1113,7 @@ class PersonalMessage extends \ElkArte\AbstractController
 			$verificationOptions = array(
 				'id' => 'pm',
 			);
-			$context['require_verification'] = \ElkArte\VerificationControls\VerificationControlsIntegrate::create($verificationOptions);
+			$context['require_verification'] = VerificationControlsIntegrate::create($verificationOptions);
 			$context['visual_verification_id'] = $verificationOptions['id'];
 		}
 
@@ -1419,6 +1125,326 @@ class PersonalMessage extends \ElkArte\AbstractController
 
 		// Acquire a new form sequence number.
 		checkSubmitOnce('register');
+	}
+
+	/**
+	 * Send a personal message.
+	 */
+	public function action_send2()
+	{
+		global $txt, $context, $modSettings;
+
+		// All the helpers we need
+		require_once(SUBSDIR . '/Auth.subs.php');
+		require_once(SUBSDIR . '/Post.subs.php');
+
+		theme()->getTemplates()->loadLanguageFile('PersonalMessage', '', false);
+
+		// Extract out the spam settings - it saves database space!
+		list ($modSettings['max_pm_recipients'], $modSettings['pm_posts_verification'], $modSettings['pm_posts_per_hour']) = explode(',', $modSettings['pm_spam_settings']);
+
+		// Initialize the errors we're about to make.
+		$post_errors = ErrorContext::context('pm', 1);
+
+		// Check whether we've gone over the limit of messages we can send per hour - fatal error if fails!
+		if (!empty($modSettings['pm_posts_per_hour'])
+			&& !allowedTo(array('admin_forum', 'moderate_forum', 'send_mail'))
+			&& $this->user->mod_cache['bq'] === '0=1'
+			&& $this->user->mod_cache['gq'] === '0=1'
+		)
+		{
+			// How many have they sent this last hour?
+			$pmCount = pmCount($this->user->id, 3600);
+
+			if (!empty($pmCount) && $pmCount >= $modSettings['pm_posts_per_hour'])
+			{
+				if (!isset($this->_req->query->xml))
+				{
+					throw new Exception('pm_too_many_per_hour', true, array($modSettings['pm_posts_per_hour']));
+				}
+				else
+				{
+					$post_errors->addError('pm_too_many_per_hour');
+				}
+			}
+		}
+
+		// If your session timed out, show an error, but do allow to re-submit.
+		if (!isset($this->_req->query->xml) && checkSession('post', '', false) != '')
+		{
+			$post_errors->addError('session_timeout');
+		}
+
+		$this->_req->post->subject = isset($this->_req->post->subject) ? strtr(Util::htmltrim($this->_req->post->subject), array("\r" => '', "\n" => '', "\t" => '')) : '';
+		$this->_req->post->to = $this->_req->getPost('to', 'trim', empty($this->_req->query->to) ? '' : $this->_req->query->to);
+		$this->_req->post->bcc = $this->_req->getPost('bcc', 'trim', empty($this->_req->query->bcc) ? '' : $this->_req->query->bcc);
+
+		// Route the input from the 'u' parameter to the 'to'-list.
+		if (!empty($this->_req->post->u))
+		{
+			$this->_req->post->recipient_to = explode(',', $this->_req->post->u);
+		}
+
+		$bbc_parser = ParserWrapper::instance();
+
+		// Construct the list of recipients.
+		$recipientList = array();
+		$namedRecipientList = array();
+		$namesNotFound = array();
+		foreach (array('to', 'bcc') as $recipientType)
+		{
+			// First, let's see if there's user ID's given.
+			$recipientList[$recipientType] = array();
+			$type = 'recipient_' . $recipientType;
+			if (!empty($this->_req->post->{$type}) && is_array($this->_req->post->{$type}))
+			{
+				$recipientList[$recipientType] = array_map('intval', $this->_req->post->{$type});
+			}
+
+			// Are there also literal names set?
+			if (!empty($this->_req->post->{$recipientType}))
+			{
+				// We're going to take out the "s anyway ;).
+				$recipientString = strtr($this->_req->post->{$recipientType}, array('\\"' => '"'));
+
+				preg_match_all('~"([^"]+)"~', $recipientString, $matches);
+				$namedRecipientList[$recipientType] = array_unique(array_merge($matches[1], explode(',', preg_replace('~"[^"]+"~', '', $recipientString))));
+
+				// Clean any literal names entered
+				foreach ($namedRecipientList[$recipientType] as $index => $recipient)
+				{
+					if (strlen(trim($recipient)) > 0)
+					{
+						$namedRecipientList[$recipientType][$index] = Util::htmlspecialchars(Util::strtolower(trim($recipient)));
+					}
+					else
+					{
+						unset($namedRecipientList[$recipientType][$index]);
+					}
+				}
+
+				// Now see if we can resolve the entered name to an actual user
+				if (!empty($namedRecipientList[$recipientType]))
+				{
+					$foundMembers = findMembers($namedRecipientList[$recipientType]);
+
+					// Assume all are not found, until proven otherwise.
+					$namesNotFound[$recipientType] = $namedRecipientList[$recipientType];
+
+					// Make sure we only have each member listed once, in case they did not use the select list
+					foreach ($foundMembers as $member)
+					{
+						$testNames = array(
+							Util::strtolower($member['username']),
+							Util::strtolower($member['name']),
+							Util::strtolower($member['email']),
+						);
+
+						if (count(array_intersect($testNames, $namedRecipientList[$recipientType])) !== 0)
+						{
+							$recipientList[$recipientType][] = $member['id'];
+
+							// Get rid of this username, since we found it.
+							$namesNotFound[$recipientType] = array_diff($namesNotFound[$recipientType], $testNames);
+						}
+					}
+				}
+			}
+
+			// Selected a recipient to be deleted? Remove them now.
+			if (!empty($this->_req->post->delete_recipient))
+			{
+				$recipientList[$recipientType] = array_diff($recipientList[$recipientType], array((int) $this->_req->post->delete_recipient));
+			}
+
+			// Make sure we don't include the same name twice
+			$recipientList[$recipientType] = array_unique($recipientList[$recipientType]);
+		}
+
+		// Are we changing the recipients some how?
+		$is_recipient_change = !empty($this->_req->post->delete_recipient) || !empty($this->_req->post->to_submit) || !empty($this->_req->post->bcc_submit);
+
+		// Check if there's at least one recipient.
+		if (empty($recipientList['to']) && empty($recipientList['bcc']))
+		{
+			$post_errors->addError('no_to');
+		}
+
+		// Make sure that we remove the members who did get it from the screen.
+		if (!$is_recipient_change)
+		{
+			foreach (array_keys($recipientList) as $recipientType)
+			{
+				if (!empty($namesNotFound[$recipientType]))
+				{
+					$post_errors->addError('bad_' . $recipientType);
+
+					// Since we already have a post error, remove the previous one.
+					$post_errors->removeError('no_to');
+
+					foreach ($namesNotFound[$recipientType] as $name)
+					{
+						$context['send_log']['failed'][] = sprintf($txt['pm_error_user_not_found'], $name);
+					}
+				}
+			}
+		}
+
+		// Did they make any mistakes like no subject or message?
+		if ($this->_req->post->subject === '')
+		{
+			$post_errors->addError('no_subject');
+		}
+
+		if (!isset($this->_req->post->message) || $this->_req->post->message === '')
+		{
+			$post_errors->addError('no_message');
+		}
+		elseif (!empty($modSettings['max_messageLength']) && Util::strlen($this->_req->post->message) > $modSettings['max_messageLength'])
+		{
+			$post_errors->addError('long_message');
+		}
+		else
+		{
+			// Preparse the message.
+			$message = $this->_req->post->message;
+			preparsecode($message);
+
+			// Make sure there's still some content left without the tags.
+			if (Util::htmltrim(strip_tags($bbc_parser->parsePM(Util::htmlspecialchars($message, ENT_QUOTES)), '<img>')) === '' && (!allowedTo('admin_forum') || strpos($message, '[html]') === false))
+			{
+				$post_errors->addError('no_message');
+			}
+		}
+
+		// If they made any errors, give them a chance to make amends.
+		if ($post_errors->hasErrors() && !$is_recipient_change && !isset($this->_req->query->preview) && !isset($this->_req->query->xml))
+		{
+			$this->messagePostError($namedRecipientList, $recipientList);
+
+			return false;
+		}
+
+		// Want to take a second glance before you send?
+		if (isset($this->_req->query->preview))
+		{
+			// Set everything up to be displayed.
+			$context['preview_subject'] = Util::htmlspecialchars($this->_req->post->subject);
+			$context['preview_message'] = Util::htmlspecialchars($this->_req->post->message, ENT_QUOTES, 'UTF-8', true);
+			preparsecode($context['preview_message'], true);
+
+			// Parse out the BBC if it is enabled.
+			$context['preview_message'] = $bbc_parser->parsePM($context['preview_message']);
+
+			// Censor, as always.
+			$context['preview_subject'] = censor($context['preview_subject']);
+			$context['preview_message'] = censor($context['preview_message']);
+
+			// Set a descriptive title.
+			$context['page_title'] = $txt['preview'] . ' - ' . $context['preview_subject'];
+
+			// Pretend they messed up but don't ignore if they really did :P.
+			$this->messagePostError($namedRecipientList, $recipientList);
+
+			return false;
+		}
+		// Adding a recipient cause javascript ain't working?
+		elseif ($is_recipient_change)
+		{
+			// Maybe we couldn't find one?
+			foreach ($namesNotFound as $recipientType => $names)
+			{
+				$post_errors->addError('bad_' . $recipientType);
+				foreach ($names as $name)
+				{
+					$context['send_log']['failed'][] = sprintf($txt['pm_error_user_not_found'], $name);
+				}
+			}
+
+			$this->messagePostError($namedRecipientList, $recipientList);
+
+			return true;
+		}
+
+		try
+		{
+			$this->_events->trigger('before_sending', array('namedRecipientList' => $namedRecipientList, 'recipientList' => $recipientList, 'namesNotFound' => $namesNotFound, 'post_errors' => $post_errors));
+		}
+		catch (ControllerRedirectException $e)
+		{
+			return $this->messagePostError($namedRecipientList, $recipientList);
+		}
+
+		// Safety net, it may be a module may just add to the list of errors without actually throw the error
+		if ($post_errors->hasErrors() && !isset($this->_req->query->preview) && !isset($this->_req->query->xml))
+		{
+			$this->messagePostError($namedRecipientList, $recipientList);
+
+			return false;
+		}
+
+		// Before we send the PM, let's make sure we don't have an abuse of numbers.
+		if (!empty($modSettings['max_pm_recipients']) && count($recipientList['to']) + count($recipientList['bcc']) > $modSettings['max_pm_recipients'] && !allowedTo(array('moderate_forum', 'send_mail', 'admin_forum')))
+		{
+			$context['send_log'] = array(
+				'sent' => array(),
+				'failed' => array(sprintf($txt['pm_too_many_recipients'], $modSettings['max_pm_recipients'])),
+			);
+
+			$this->messagePostError($namedRecipientList, $recipientList);
+
+			return false;
+		}
+
+		// Protect from message spamming.
+		spamProtection('pm');
+
+		// Prevent double submission of this form.
+		checkSubmitOnce('check');
+
+		// Finally do the actual sending of the PM.
+		if (!empty($recipientList['to']) || !empty($recipientList['bcc']))
+		{
+			$context['send_log'] = sendpm($recipientList, $this->_req->post->subject, $this->_req->post->message, true, null, !empty($this->_req->post->pm_head) ? (int) $this->_req->post->pm_head : 0);
+		}
+		else
+		{
+			$context['send_log'] = array(
+				'sent' => array(),
+				'failed' => array()
+			);
+		}
+
+		// Mark the message as "replied to".
+		if (!empty($context['send_log']['sent']) && !empty($this->_req->post->replied_to) && $this->_req->getQuery('f') === 'inbox')
+		{
+			require_once(SUBSDIR . '/PersonalMessage.subs.php');
+			setPMRepliedStatus($this->user->id, (int) $this->_req->post->replied_to);
+		}
+
+		$failed = !empty($context['send_log']['failed']);
+		$this->_events->trigger('message_sent', array('failed' => $failed));
+
+		// If one or more of the recipients were invalid, go back to the post screen with the failed usernames.
+		if ($failed)
+		{
+			$this->messagePostError($namesNotFound, array(
+				'to' => array_intersect($recipientList['to'], $context['send_log']['failed']),
+				'bcc' => array_intersect($recipientList['bcc'], $context['send_log']['failed'])
+			));
+
+			return false;
+		}
+		// Message sent successfully?
+		else
+		{
+			$context['current_label_redirect'] .= ';done=sent';
+		}
+
+		// Go back to the where they sent from, if possible...
+		redirectexit($context['current_label_redirect']);
+
+		return true;
 	}
 
 	/**
@@ -1445,12 +1471,16 @@ class PersonalMessage extends \ElkArte\AbstractController
 		{
 			$pm_actions = array();
 			foreach ($this->_req->post->pms as $pm)
+			{
 				$pm_actions[(int) $pm] = $pm_action;
+			}
 		}
 
 		// No messages to action then bug out
 		if (empty($pm_actions))
+		{
 			redirectexit($context['current_label_redirect']);
+		}
 
 		// If we are in conversation, we may need to apply this to every message in that conversation.
 		if ($context['display_mode'] == 2 && isset($this->_req->query->conversation))
@@ -1514,7 +1544,7 @@ class PersonalMessage extends \ElkArte\AbstractController
 			// Any errors?
 			if (!empty($updateErrors))
 			{
-				throw new \ElkArte\Exceptions\Exception('labels_too_many', true, array($updateErrors));
+				throw new Exception('labels_too_many', true, array($updateErrors));
 			}
 		}
 
@@ -1642,11 +1672,11 @@ class PersonalMessage extends \ElkArte\AbstractController
 			// Adding a new label?
 			if (isset($this->_req->post->add))
 			{
-				$this->_req->post->label = strtr(\ElkArte\Util::htmlspecialchars(trim($this->_req->post->label)), array(',' => '&#044;'));
+				$this->_req->post->label = strtr(Util::htmlspecialchars(trim($this->_req->post->label)), array(',' => '&#044;'));
 
-				if (\ElkArte\Util::strlen($this->_req->post->label) > 30)
+				if (Util::strlen($this->_req->post->label) > 30)
 				{
-					$this->_req->post->label = \ElkArte\Util::substr($this->_req->post->label, 0, 30);
+					$this->_req->post->label = Util::substr($this->_req->post->label, 0, 30);
 				}
 				if ($this->_req->post->label !== '')
 				{
@@ -1683,12 +1713,12 @@ class PersonalMessage extends \ElkArte\AbstractController
 					elseif (isset($this->_req->post->label_name[$id]))
 					{
 						// Prepare the label name
-						$this->_req->post->label_name[$id] = trim(strtr(\ElkArte\Util::htmlspecialchars($this->_req->post->label_name[$id]), array(',' => '&#044;')));
+						$this->_req->post->label_name[$id] = trim(strtr(Util::htmlspecialchars($this->_req->post->label_name[$id]), array(',' => '&#044;')));
 
 						// Has to fit in the database as well
-						if (\ElkArte\Util::strlen($this->_req->post->label_name[$id]) > 30)
+						if (Util::strlen($this->_req->post->label_name[$id]) > 30)
 						{
-							$this->_req->post->label_name[$id] = \ElkArte\Util::substr($this->_req->post->label_name[$id], 0, 30);
+							$this->_req->post->label_name[$id] = Util::substr($this->_req->post->label_name[$id], 0, 30);
 						}
 
 						if ($this->_req->post->label_name[$id] != '')
@@ -1721,7 +1751,9 @@ class PersonalMessage extends \ElkArte\AbstractController
 				if (!empty($new_labels))
 				{
 					for ($i = max($searchArray) + 1, $n = max(array_keys($new_labels)); $i <= $n; $i++)
+					{
 						$searchArray[] = $i;
+					}
 				}
 
 				updateLabelsToPM($searchArray, $new_labels, $this->user->id);
@@ -1759,11 +1791,13 @@ class PersonalMessage extends \ElkArte\AbstractController
 
 				// Update/delete as appropriate.
 				foreach ($rule_changes as $k => $id)
+				{
 					if (!empty($context['rules'][$id]['actions']))
 					{
 						updatePMRuleAction($id, $this->user->id, $context['rules'][$id]['actions']);
 						unset($rule_changes[$k]);
 					}
+				}
 
 				// Anything left here means it's lost all actions...
 				if (!empty($rule_changes))
@@ -1773,7 +1807,7 @@ class PersonalMessage extends \ElkArte\AbstractController
 			}
 
 			// Make sure we're not caching this!
-			\ElkArte\Cache\Cache::instance()->remove('labelCounts:' . $this->user->id);
+			Cache::instance()->remove('labelCounts:' . $this->user->id);
 
 			// To make the changes appear right away, redirect.
 			redirectexit('action=pm;sa=manlabels');
@@ -1794,8 +1828,8 @@ class PersonalMessage extends \ElkArte\AbstractController
 		require_once(SUBSDIR . '/Profile.subs.php');
 
 		// Load the member data for editing
-		\ElkArte\MembersList::load($this->user->id, false, 'profile');
-		$cur_profile = \ElkArte\MembersList::get($this->user->id);
+		MembersList::load($this->user->id, false, 'profile');
+		$cur_profile = MembersList::get($this->user->id);
 
 		// Load up the profile template, its where PM settings are located
 		theme()->getTemplates()->loadLanguageFile('Profile');
@@ -1838,14 +1872,14 @@ class PersonalMessage extends \ElkArte\AbstractController
 			}
 
 			// Invalidate any cached data and reload so we show the saved values
-			\ElkArte\Cache\Cache::instance()->remove('member_data-profile-' . $this->user->id);
-			\ElkArte\MembersList::load($this->user->id, false, 'profile');
-			$cur_profile = \ElkArte\MembersList::get($this->user->id);
+			Cache::instance()->remove('member_data-profile-' . $this->user->id);
+			MembersList::load($this->user->id, false, 'profile');
+			$cur_profile = MembersList::get($this->user->id);
 		}
 
 		// Load up the fields.
-		$controller = new ProfileOptions(new \ElkArte\EventManager());
-		$controller->setUser(\ElkArte\User::$info);
+		$controller = new ProfileOptions(new EventManager());
+		$controller->setUser(User::$info);
 		$controller->pre_dispatch();
 		$controller->action_pmprefs();
 	}
@@ -1868,14 +1902,14 @@ class PersonalMessage extends \ElkArte\AbstractController
 		// Check that this feature is even enabled!
 		if (empty($modSettings['enableReportPM']) || empty($this->_req->query->pmsg))
 		{
-			throw new \ElkArte\Exceptions\Exception('no_access', false);
+			throw new Exception('no_access', false);
 		}
 
 		$pmsg = $this->_req->getQuery('pmsg', 'intval', $this->_req->getPost('pmsg', 'intval', 0));
 
 		if (!isAccessiblePM($pmsg, 'inbox'))
 		{
-			throw new \ElkArte\Exceptions\Exception('no_access', false);
+			throw new Exception('no_access', false);
 		}
 
 		$context['pm_id'] = $pmsg;
@@ -1888,11 +1922,11 @@ class PersonalMessage extends \ElkArte\AbstractController
 		// If we're here, just send the user to the template, with a few useful context bits.
 		if (isset($this->_req->post->report))
 		{
-			$poster_comment = strtr(\ElkArte\Util::htmlspecialchars($this->_req->post->reason), array("\r" => '', "\t" => ''));
+			$poster_comment = strtr(Util::htmlspecialchars($this->_req->post->reason), array("\r" => '', "\t" => ''));
 
-			if (\ElkArte\Util::strlen($poster_comment) > 254)
+			if (Util::strlen($poster_comment) > 254)
 			{
-				throw new \ElkArte\Exceptions\Exception('post_too_long', false);
+				throw new Exception('post_too_long', false);
 			}
 
 			// Check the session before proceeding any further!
@@ -1922,7 +1956,9 @@ class PersonalMessage extends \ElkArte\AbstractController
 			$recipients = array();
 			$temp = loadPMRecipientsAll($context['pm_id'], true);
 			foreach ($temp as $recipient)
+			{
 				$recipients[] = $recipient['link'];
+			}
 
 			// Now let's get out and loop through the admins.
 			$admins = admins(isset($this->_req->post->id_admin) ? (int) $this->_req->post->id_admin : 0);
@@ -1930,7 +1966,7 @@ class PersonalMessage extends \ElkArte\AbstractController
 			// Maybe we shouldn't advertise this?
 			if (empty($admins))
 			{
-				throw new \ElkArte\Exceptions\Exception('no_access', false);
+				throw new Exception('no_access', false);
 			}
 
 			$memberFromName = un_htmlspecialchars($memberFromName);
@@ -1959,7 +1995,7 @@ class PersonalMessage extends \ElkArte\AbstractController
 
 					// Plonk it in the array ;)
 					$messagesToSend[$cur_language] = array(
-						'subject' => (\ElkArte\Util::strpos($subject, $txt['pm_report_pm_subject']) === false ? $txt['pm_report_pm_subject'] : '') . un_htmlspecialchars($subject),
+						'subject' => (Util::strpos($subject, $txt['pm_report_pm_subject']) === false ? $txt['pm_report_pm_subject'] : '') . un_htmlspecialchars($subject),
 						'body' => $report_body,
 						'recipients' => array(
 							'to' => array(),
@@ -1974,7 +2010,9 @@ class PersonalMessage extends \ElkArte\AbstractController
 
 			// Send a different email for each language.
 			foreach ($messagesToSend as $lang => $message)
+			{
 				sendpm($message['recipients'], $message['subject'], $message['body']);
+			}
 
 			// Give the user their own language back!
 			if (!empty($modSettings['userLanguage']))
@@ -2093,17 +2131,21 @@ class PersonalMessage extends \ElkArte\AbstractController
 
 				// Need to get member names!
 				foreach ($context['rule']['criteria'] as $k => $criteria)
+				{
 					if ($criteria['t'] === 'mid' && !empty($criteria['v']))
 					{
 						$members[(int) $criteria['v']] = $k;
 					}
+				}
 
 				if (!empty($members))
 				{
 					require_once(SUBSDIR . '/Members.subs.php');
 					$result = getBasicMemberData(array_keys($members));
 					foreach ($result as $row)
+					{
 						$context['rule']['criteria'][$members[$row['id_member']]]['v'] = $row['member_name'];
+					}
 				}
 			}
 			else
@@ -2127,16 +2169,16 @@ class PersonalMessage extends \ElkArte\AbstractController
 			$context['rid'] = isset($this->_req->query->rid) && isset($context['rules'][$this->_req->query->rid]) ? (int) $this->_req->query->rid : 0;
 
 			// Name is easy!
-			$ruleName = \ElkArte\Util::htmlspecialchars(trim($this->_req->post->rule_name));
+			$ruleName = Util::htmlspecialchars(trim($this->_req->post->rule_name));
 			if (empty($ruleName))
 			{
-				throw new \ElkArte\Exceptions\Exception('pm_rule_no_name', false);
+				throw new Exception('pm_rule_no_name', false);
 			}
 
 			// Sanity check...
 			if (empty($this->_req->post->ruletype) || empty($this->_req->post->acttype))
 			{
-				throw new \ElkArte\Exceptions\Exception('pm_rule_no_criteria', false);
+				throw new Exception('pm_rule_no_criteria', false);
 			}
 
 			// Let's do the criteria first - it's also hardest!
@@ -2176,7 +2218,7 @@ class PersonalMessage extends \ElkArte\AbstractController
 				}
 				elseif (in_array($type, array('sub', 'msg')) && trim($this->_req->post->ruledef[$ind]) !== '')
 				{
-					$criteria[] = array('t' => $type, 'v' => \ElkArte\Util::htmlspecialchars(trim($this->_req->post->ruledef[$ind])));
+					$criteria[] = array('t' => $type, 'v' => Util::htmlspecialchars(trim($this->_req->post->ruledef[$ind])));
 				}
 			}
 
@@ -2205,7 +2247,7 @@ class PersonalMessage extends \ElkArte\AbstractController
 
 			if (empty($criteria) || (empty($actions) && !$doDelete))
 			{
-				throw new \ElkArte\Exceptions\Exception('pm_rule_no_criteria', false);
+				throw new Exception('pm_rule_no_criteria', false);
 			}
 
 			// What are we storing?
@@ -2230,7 +2272,9 @@ class PersonalMessage extends \ElkArte\AbstractController
 			checkSession('post');
 			$toDelete = array();
 			foreach ($this->_req->post->delrule as $k => $v)
+			{
 				$toDelete[] = (int) $k;
+			}
 
 			if (!empty($toDelete))
 			{
@@ -2258,7 +2302,7 @@ class PersonalMessage extends \ElkArte\AbstractController
 		// Make sure the server is able to do this right now
 		if (!empty($modSettings['loadavg_search']) && $modSettings['current_load'] >= $modSettings['loadavg_search'])
 		{
-			throw new \ElkArte\Exceptions\Exception('loadavg_search_disabled', false);
+			throw new Exception('loadavg_search_disabled', false);
 		}
 
 		// Some useful general permissions.
@@ -2300,7 +2344,7 @@ class PersonalMessage extends \ElkArte\AbstractController
 		$stripped_query = preg_replace('~(?:[\x0B\0\x{A0}\t\r\s\n(){}\\[\\]<>!@$%^*.,:+=`\~\?/\\\\]+|&(?:amp|lt|gt|quot);)+~u', ' ', $this->_search_params['search']);
 
 		// Make the query lower case since it will case insensitive anyway.
-		$stripped_query = un_htmlspecialchars(\ElkArte\Util::strtolower($stripped_query));
+		$stripped_query = un_htmlspecialchars(Util::strtolower($stripped_query));
 
 		// Extract phrase parts first (e.g. some words "this is a phrase" some more words.)
 		preg_match_all('/(?:^|\s)([-]?)"([^"]+)"(?:$|\s)/', $stripped_query, $matches, PREG_PATTERN_ORDER);
@@ -2308,7 +2352,7 @@ class PersonalMessage extends \ElkArte\AbstractController
 
 		// Remove the phrase parts and extract the words.
 		$wordArray = preg_replace('~(?:^|\s)(?:[-]?)"(?:[^"]+)"(?:$|\s)~u', ' ', $this->_search_params['search']);
-		$wordArray = explode(' ', \ElkArte\Util::htmlspecialchars(un_htmlspecialchars($wordArray), ENT_QUOTES));
+		$wordArray = explode(' ', Util::htmlspecialchars(un_htmlspecialchars($wordArray), ENT_QUOTES));
 
 		// A minus sign in front of a word excludes the word.... so...
 		$excludedWords = array();
@@ -2360,7 +2404,7 @@ class PersonalMessage extends \ElkArte\AbstractController
 
 			if (isset($searchArray[$index]))
 			{
-				$searchArray[$index] = \ElkArte\Util::strtolower(trim($value));
+				$searchArray[$index] = Util::strtolower(trim($value));
 
 				if ($searchArray[$index] === '')
 				{
@@ -2369,7 +2413,7 @@ class PersonalMessage extends \ElkArte\AbstractController
 				else
 				{
 					// Sort out entities first.
-					$searchArray[$index] = \ElkArte\Util::htmlspecialchars($searchArray[$index]);
+					$searchArray[$index] = Util::htmlspecialchars($searchArray[$index]);
 				}
 			}
 		}
@@ -2389,12 +2433,12 @@ class PersonalMessage extends \ElkArte\AbstractController
 		$context['search_params'] = $this->_search_params;
 		if (isset($context['search_params']['search']))
 		{
-			$context['search_params']['search'] = \ElkArte\Util::htmlspecialchars($context['search_params']['search']);
+			$context['search_params']['search'] = Util::htmlspecialchars($context['search_params']['search']);
 		}
 
 		if (isset($context['search_params']['userspec']))
 		{
-			$context['search_params']['userspec'] = \ElkArte\Util::htmlspecialchars($context['search_params']['userspec']);
+			$context['search_params']['userspec'] = Util::htmlspecialchars($context['search_params']['userspec']);
 		}
 
 		// Now we have all the parameters, combine them together for pagination and the like...
@@ -2445,6 +2489,7 @@ class PersonalMessage extends \ElkArte\AbstractController
 			$this->_req->post->params = $context['params'];
 
 			$this->action_search();
+
 			return false;
 		}
 
@@ -2464,7 +2509,7 @@ class PersonalMessage extends \ElkArte\AbstractController
 		$posters = array_unique($posters);
 		if (!empty($posters))
 		{
-			\ElkArte\MembersList::load($posters);
+			MembersList::load($posters);
 		}
 
 		// Sort out the page index.
@@ -2484,14 +2529,14 @@ class PersonalMessage extends \ElkArte\AbstractController
 			// Prepare for the callback!
 			$search_results = loadPMSearchResults($foundMessages, $this->_search_params);
 			$counter = 0;
-			$bbc_parser = \BBC\ParserWrapper::instance();
+			$bbc_parser = ParserWrapper::instance();
 			foreach ($search_results as $row)
 			{
 				// If there's no subject, use the default.
 				$row['subject'] = $row['subject'] === '' ? $txt['no_subject'] : $row['subject'];
 
 				// Load this posters context info, if its not there then fill in the essentials...
-				$member = \ElkArte\MembersList::get($row['id_member_from']);
+				$member = MembersList::get($row['id_member_from']);
 				$member->loadContext(true);
 				if (!$member->isEmpty())
 				{
@@ -2519,12 +2564,12 @@ class PersonalMessage extends \ElkArte\AbstractController
 					// Fix the international characters in the keyword too.
 					$query = un_htmlspecialchars($query);
 					$query = trim($query, '\*+');
-					$query = strtr(\ElkArte\Util::htmlspecialchars($query), array('\\\'' => '\''));
+					$query = strtr(Util::htmlspecialchars($query), array('\\\'' => '\''));
 
 					$body_highlighted = preg_replace_callback('/((<[^>]*)|' . preg_quote(strtr($query, array('\'' => '&#039;')), '/') . ')/iu',
 						function ($matches) {
 							return $this->_highlighted_callback($matches);
-					}, $row['body']);
+						}, $row['body']);
 					$subject_highlighted = preg_replace('/(' . preg_quote($query, '/') . ')/iu', '<strong class="highlight">$1</strong>', $row['subject']);
 				}
 
@@ -2558,6 +2603,179 @@ class PersonalMessage extends \ElkArte\AbstractController
 			'url' => $scripturl . '?action=pm;sa=search',
 			'name' => $txt['pm_search_bar_title'],
 		);
+	}
+
+	/**
+	 * Extract search params from a string
+	 *
+	 * What it does:
+	 *
+	 * - When paging search results, reads and decodes the passed parameters
+	 * - Places what it finds back in search_params
+	 */
+	private function _searchParamsFromString()
+	{
+		$this->_search_params = array();
+
+		if (isset($this->_req->query->params) || isset($this->_req->post->params))
+		{
+			// Feed it
+			$temp_params = isset($this->_req->query->params) ? $this->_req->query->params : $this->_req->post->params;
+
+			// Decode and replace the uri safe characters we added
+			$temp_params = base64_decode(str_replace(array('-', '_', '.'), array('+', '/', '='), $temp_params));
+
+			$temp_params = explode('|"|', $temp_params);
+			foreach ($temp_params as $i => $data)
+			{
+				list ($k, $v) = array_pad(explode('|\'|', $data), 2, '');
+				$this->_search_params[$k] = $v;
+			}
+		}
+
+		return $this->_search_params;
+	}
+
+	/**
+	 * Sets the search params for the query
+	 *
+	 * What it does:
+	 *
+	 * - Uses existing ones if coming from pagination or uses those passed from the search pm form
+	 * - Validates passed params are valid
+	 */
+	private function _prepareSearchParams()
+	{
+		// Store whether simple search was used (needed if the user wants to do another query).
+		if (!isset($this->_search_params['advanced']))
+		{
+			$this->_search_params['advanced'] = empty($this->_req->post->advanced) ? 0 : 1;
+		}
+
+		// 1 => 'allwords' (default, don't set as param),  2 => 'anywords'.
+		if (!empty($this->_search_params['searchtype']) || (!empty($this->_req->post->searchtype) && $this->_req->post->searchtype == 2))
+		{
+			$this->_search_params['searchtype'] = 2;
+		}
+
+		// Minimum age of messages. Default to zero (don't set param in that case).
+		if (!empty($this->_search_params['minage']) || (!empty($this->_req->post->minage) && $this->_req->post->minage > 0))
+		{
+			$this->_search_params['minage'] = !empty($this->_search_params['minage']) ? (int) $this->_search_params['minage'] : (int) $this->_req->post->minage;
+		}
+
+		// Maximum age of messages. Default to infinite (9999 days: param not set).
+		if (!empty($this->_search_params['maxage']) || (!empty($this->_req->post->maxage) && $this->_req->post->maxage < 9999))
+		{
+			$this->_search_params['maxage'] = !empty($this->_search_params['maxage']) ? (int) $this->_search_params['maxage'] : (int) $this->_req->post->maxage;
+		}
+
+		// Default the user name to a wildcard matching every user (*).
+		if (!empty($this->_search_params['userspec']) || (!empty($this->_req->post->userspec) && $this->_req->post->userspec != '*'))
+		{
+			$this->_search_params['userspec'] = isset($this->_search_params['userspec']) ? $this->_search_params['userspec'] : $this->_req->post->userspec;
+		}
+
+		// Search modifiers
+		$this->_search_params['subject_only'] = !empty($this->_search_params['subject_only']) || !empty($this->_req->post->subject_only);
+		$this->_search_params['show_complete'] = !empty($this->_search_params['show_complete']) || !empty($this->_req->post->show_complete);
+		$this->_search_params['sent_only'] = !empty($this->_search_params['sent_only']) || !empty($this->_req->post->sent_only);
+	}
+
+	/**
+	 * Handles the parameters when searching on specific users
+	 *
+	 * What it does:
+	 *
+	 * - Returns the user query for use in the main search query
+	 * - Sets the parameters for use in the query
+	 *
+	 * @return string
+	 */
+	private function _setUserQuery()
+	{
+		global $context;
+
+		// Hardcoded variables that can be tweaked if required.
+		$maxMembersToSearch = 500;
+
+		// Init to not be searching based on members
+		$userQuery = '';
+
+		// If there's no specific user, then don't mention it in the main query.
+		if (!empty($this->_search_params['userspec']))
+		{
+			// Set up so we can search by user name, wildcards, like, etc
+			$userString = strtr(Util::htmlspecialchars($this->_search_params['userspec'], ENT_QUOTES), array('&quot;' => '"'));
+			$userString = strtr($userString, array('%' => '\%', '_' => '\_', '*' => '%', '?' => '_'));
+
+			preg_match_all('~"([^"]+)"~', $userString, $matches);
+			$possible_users = array_merge($matches[1], explode(',', preg_replace('~"[^"]+"~', '', $userString)));
+
+			// Who matches those criteria?
+			require_once(SUBSDIR . '/Members.subs.php');
+			$members = membersBy('member_names', array('member_names' => $possible_users));
+
+			foreach ($possible_users as $key => $possible_user)
+			{
+				$this->_searchq_parameters['guest_user_name_implode_' . $key] = '{string_case_insensitive:' . $possible_user . '}';
+			}
+
+			// Simply do nothing if there are too many members matching the criteria.
+			if (count($members) > $maxMembersToSearch)
+			{
+				$userQuery = '';
+			}
+			elseif (count($members) === 0)
+			{
+				if ($context['folder'] === 'inbox')
+				{
+					$uq = array();
+					$name = '{column_case_insensitive:pm.from_name}';
+					foreach (array_keys($possible_users) as $key)
+					{
+						$uq[] = 'AND pm.id_member_from = 0 AND (' . $name . ' LIKE {string:guest_user_name_implode_' . $key . '})';
+					}
+					$userQuery = implode(' ', $uq);
+					$this->_searchq_parameters['pm_from_name'] = $name;
+				}
+				else
+				{
+					$userQuery = '';
+				}
+			}
+			else
+			{
+				$memberlist = array();
+				foreach ($members as $id)
+				{
+					$memberlist[] = $id;
+				}
+
+				// Use the name as as sent from or sent to
+				if ($context['folder'] === 'inbox')
+				{
+					$uq = array();
+					$name = '{column_case_insensitive:pm.from_name}';
+
+					foreach (array_keys($possible_users) as $key)
+					{
+						$uq[] = 'AND (pm.id_member_from IN ({array_int:member_list}) OR (pm.id_member_from = 0 AND (' . $name . ' LIKE {string:guest_user_name_implode_' . $key . '})))';
+					}
+
+					$userQuery = implode(' ', $uq);
+				}
+				else
+				{
+					$userQuery = 'AND (pmr.id_member IN ({array_int:member_list}))';
+				}
+
+				$this->_searchq_parameters['pm_from_name'] = '{column_case_insensitive:pm.from_name}';
+				$this->_searchq_parameters['member_list'] = $memberlist;
+			}
+		}
+
+		return $userQuery;
 	}
 
 	/**
@@ -2631,182 +2849,15 @@ class PersonalMessage extends \ElkArte\AbstractController
 
 				$labelStatements = array();
 				foreach ($this->_req->post->searchlabel as $label)
+				{
 					$labelStatements[] = $db->quote('FIND_IN_SET({string:label}, pmr.labels) != 0', array('label' => $label,));
+				}
 
 				$this->_searchq_parameters ['label_implode'] = '(' . implode(' OR ', $labelStatements) . ')';
 			}
 		}
 
 		return $labelQuery;
-	}
-
-	/**
-	 * Handles the parameters when searching on specific users
-	 *
-	 * What it does:
-	 *
-	 * - Returns the user query for use in the main search query
-	 * - Sets the parameters for use in the query
-	 *
-	 * @return string
-	 */
-	private function _setUserQuery()
-	{
-		global $context;
-
-		// Hardcoded variables that can be tweaked if required.
-		$maxMembersToSearch = 500;
-
-		// Init to not be searching based on members
-		$userQuery = '';
-
-		// If there's no specific user, then don't mention it in the main query.
-		if (!empty($this->_search_params['userspec']))
-		{
-			// Set up so we can search by user name, wildcards, like, etc
-			$userString = strtr(\ElkArte\Util::htmlspecialchars($this->_search_params['userspec'], ENT_QUOTES), array('&quot;' => '"'));
-			$userString = strtr($userString, array('%' => '\%', '_' => '\_', '*' => '%', '?' => '_'));
-
-			preg_match_all('~"([^"]+)"~', $userString, $matches);
-			$possible_users = array_merge($matches[1], explode(',', preg_replace('~"[^"]+"~', '', $userString)));
-
-			// Who matches those criteria?
-			require_once(SUBSDIR . '/Members.subs.php');
-			$members = membersBy('member_names', array('member_names' => $possible_users));
-
-			foreach ($possible_users as $key => $possible_user)
-			{
-				$this->_searchq_parameters['guest_user_name_implode_' . $key] = '{string_case_insensitive:' . $possible_user . '}';
-			}
-
-			// Simply do nothing if there are too many members matching the criteria.
-			if (count($members) > $maxMembersToSearch)
-			{
-				$userQuery = '';
-			}
-			elseif (count($members) === 0)
-			{
-				if ($context['folder'] === 'inbox')
-				{
-					$uq = array();
-					$name = '{column_case_insensitive:pm.from_name}';
-					foreach (array_keys($possible_users) as $key)
-					{
-						$uq[] = 'AND pm.id_member_from = 0 AND (' . $name . ' LIKE {string:guest_user_name_implode_' . $key . '})';
-					}
-					$userQuery = implode(' ', $uq);
-					$this->_searchq_parameters['pm_from_name'] = $name;
-				}
-				else
-				{
-					$userQuery = '';
-				}
-			}
-			else
-			{
-				$memberlist = array();
-				foreach ($members as $id)
-					$memberlist[] = $id;
-
-				// Use the name as as sent from or sent to
-				if ($context['folder'] === 'inbox')
-				{
-					$uq = array();
-					$name = '{column_case_insensitive:pm.from_name}';
-
-					foreach (array_keys($possible_users) as $key)
-						$uq[] = 'AND (pm.id_member_from IN ({array_int:member_list}) OR (pm.id_member_from = 0 AND (' . $name . ' LIKE {string:guest_user_name_implode_' . $key . '})))';
-
-					$userQuery = implode(' ', $uq);
-				}
-				else
-				{
-					$userQuery = 'AND (pmr.id_member IN ({array_int:member_list}))';
-				}
-
-				$this->_searchq_parameters['pm_from_name'] = '{column_case_insensitive:pm.from_name}';
-				$this->_searchq_parameters['member_list'] = $memberlist;
-			}
-		}
-
-		return $userQuery;
-	}
-
-	/**
-	 * Sets the search params for the query
-	 *
-	 * What it does:
-	 *
-	 * - Uses existing ones if coming from pagination or uses those passed from the search pm form
-	 * - Validates passed params are valid
-	 */
-	private function _prepareSearchParams()
-	{
-		// Store whether simple search was used (needed if the user wants to do another query).
-		if (!isset($this->_search_params['advanced']))
-		{
-			$this->_search_params['advanced'] = empty($this->_req->post->advanced) ? 0 : 1;
-		}
-
-		// 1 => 'allwords' (default, don't set as param),  2 => 'anywords'.
-		if (!empty($this->_search_params['searchtype']) || (!empty($this->_req->post->searchtype) && $this->_req->post->searchtype == 2))
-		{
-			$this->_search_params['searchtype'] = 2;
-		}
-
-		// Minimum age of messages. Default to zero (don't set param in that case).
-		if (!empty($this->_search_params['minage']) || (!empty($this->_req->post->minage) && $this->_req->post->minage > 0))
-		{
-			$this->_search_params['minage'] = !empty($this->_search_params['minage']) ? (int) $this->_search_params['minage'] : (int) $this->_req->post->minage;
-		}
-
-		// Maximum age of messages. Default to infinite (9999 days: param not set).
-		if (!empty($this->_search_params['maxage']) || (!empty($this->_req->post->maxage) && $this->_req->post->maxage < 9999))
-		{
-			$this->_search_params['maxage'] = !empty($this->_search_params['maxage']) ? (int) $this->_search_params['maxage'] : (int) $this->_req->post->maxage;
-		}
-
-		// Default the user name to a wildcard matching every user (*).
-		if (!empty($this->_search_params['userspec']) || (!empty($this->_req->post->userspec) && $this->_req->post->userspec != '*'))
-		{
-			$this->_search_params['userspec'] = isset($this->_search_params['userspec']) ? $this->_search_params['userspec'] : $this->_req->post->userspec;
-		}
-
-		// Search modifiers
-		$this->_search_params['subject_only'] = !empty($this->_search_params['subject_only']) || !empty($this->_req->post->subject_only);
-		$this->_search_params['show_complete'] = !empty($this->_search_params['show_complete']) || !empty($this->_req->post->show_complete);
-		$this->_search_params['sent_only'] = !empty($this->_search_params['sent_only']) || !empty($this->_req->post->sent_only);
-	}
-
-	/**
-	 * Extract search params from a string
-	 *
-	 * What it does:
-	 *
-	 * - When paging search results, reads and decodes the passed parameters
-	 * - Places what it finds back in search_params
-	 */
-	private function _searchParamsFromString()
-	{
-		$this->_search_params = array();
-
-		if (isset($this->_req->query->params) || isset($this->_req->post->params))
-		{
-			// Feed it
-			$temp_params = isset($this->_req->query->params) ? $this->_req->query->params : $this->_req->post->params;
-
-			// Decode and replace the uri safe characters we added
-			$temp_params = base64_decode(str_replace(array('-', '_', '.'), array('+', '/', '='), $temp_params));
-
-			$temp_params = explode('|"|', $temp_params);
-			foreach ($temp_params as $i => $data)
-			{
-				list ($k, $v) = array_pad(explode('|\'|', $data), 2, '');
-				$this->_search_params[$k] = $v;
-			}
-		}
-
-		return $this->_search_params;
 	}
 
 	/**
@@ -2820,7 +2871,9 @@ class PersonalMessage extends \ElkArte\AbstractController
 
 		// Now we have all the parameters, combine them together for pagination and the like...
 		foreach ($this->_search_params as $k => $v)
+		{
 			$encoded[] = $k . '|\'|' . $v;
+		}
 
 		// Base64 encode, then replace +/= with uri safe ones that can be reverted
 		$encoded = str_replace(array('+', '/', '='), array('-', '_', '.'), base64_encode(implode('|"|', $encoded)));
@@ -2922,6 +2975,20 @@ class PersonalMessage extends \ElkArte\AbstractController
 	}
 
 	/**
+	 * Used to highlight body text with strings that match the search term
+	 *
+	 * - Callback function used in $body_highlighted
+	 *
+	 * @param string[] $matches
+	 *
+	 * @return string
+	 */
+	private function _highlighted_callback($matches)
+	{
+		return isset($matches[2]) && $matches[2] == $matches[1] ? stripslashes($matches[1]) : '<strong class="highlight">' . $matches[1] . '</strong>';
+	}
+
+	/**
 	 * Allows the user to mark a personal message as unread so they remember to come back to it
 	 */
 	public function action_markunread()
@@ -2939,7 +3006,7 @@ class PersonalMessage extends \ElkArte\AbstractController
 			// Make sure this is accessible, should be of course
 			if (!isAccessiblePM($pmsg, 'inbox'))
 			{
-				throw new \ElkArte\Exceptions\Exception('no_access', false);
+				throw new Exception('no_access', false);
 			}
 
 			// Well then, you get to hear about it all over again
@@ -2948,19 +3015,5 @@ class PersonalMessage extends \ElkArte\AbstractController
 
 		// Back to the folder.
 		redirectexit($context['current_label_redirect']);
-	}
-
-	/**
-	 * Used to highlight body text with strings that match the search term
-	 *
-	 * - Callback function used in $body_highlighted
-	 *
-	 * @param string[] $matches
-	 *
-	 * @return string
-	 */
-	private function _highlighted_callback($matches)
-	{
-		return isset($matches[2]) && $matches[2] == $matches[1] ? stripslashes($matches[1]) : '<strong class="highlight">' . $matches[1] . '</strong>';
 	}
 }

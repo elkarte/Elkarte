@@ -13,6 +13,11 @@
 
 namespace ElkArte\UrlGenerator\Queryless;
 
+/**
+ * Class Board
+ *
+ * @package ElkArte\UrlGenerator\Queryless
+ */
 class Board extends Standard
 {
 	/**

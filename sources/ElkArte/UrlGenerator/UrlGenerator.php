@@ -15,28 +15,37 @@
 
 namespace ElkArte\UrlGenerator;
 
+/**
+ * Class UrlGenerator
+ *
+ * @package ElkArte\UrlGenerator
+ */
 class UrlGenerator
 {
 	/**
 	 * Configuration parameters (for the moment script url and replacements)
+	 *
 	 * @var array
 	 */
 	protected $_config = array();
 
 	/**
 	 * All the objects that create the queries
+	 *
 	 * @var array
 	 */
 	protected $_generators = array();
 
 	/**
 	 * Searching for in replacements
+	 *
 	 * @var array
 	 */
 	protected $_search = array();
 
 	/**
 	 * replacing with in replacements
+	 *
 	 * @var array
 	 */
 	protected $_replace = array();
@@ -55,31 +64,6 @@ class UrlGenerator
 
 		$this->register('Standard');
 		$this->updateReplacements($this->_config['replacements']);
-	}
-
-	/**
-	 * Instantiate and return the query parser.
-	 *
-	 * @return \ElkArte\UrlGenerator\AbstractParseQuery
-	 */
-	public function getParser()
-	{
-		$class = '\\ElkArte\\UrlGenerator\\' . $this->_config['generator'] . '\\ParseQuery';
-
-		return new $class();
-	}
-
-	/**
-	 * Adds new replacements to the stack.
-	 *
-	 * @param string[] $replacements
-	 */
-	public function updateReplacements($replacements)
-	{
-		$this->_config['replacements'] = array_merge($this->_config['replacements'], $replacements);
-
-		$this->_search = array_keys($this->_config['replacements']);
-		$this->_replace = array_values($this->_config['replacements']);
 	}
 
 	/**
@@ -121,6 +105,31 @@ class UrlGenerator
 				$this->_generators[$type] = $generator;
 			}
 		}
+	}
+
+	/**
+	 * Adds new replacements to the stack.
+	 *
+	 * @param string[] $replacements
+	 */
+	public function updateReplacements($replacements)
+	{
+		$this->_config['replacements'] = array_merge($this->_config['replacements'], $replacements);
+
+		$this->_search = array_keys($this->_config['replacements']);
+		$this->_replace = array_values($this->_config['replacements']);
+	}
+
+	/**
+	 * Instantiate and return the query parser.
+	 *
+	 * @return \ElkArte\UrlGenerator\AbstractParseQuery
+	 */
+	public function getParser()
+	{
+		$class = '\\ElkArte\\UrlGenerator\\' . $this->_config['generator'] . '\\ParseQuery';
+
+		return new $class();
 	}
 
 	/**

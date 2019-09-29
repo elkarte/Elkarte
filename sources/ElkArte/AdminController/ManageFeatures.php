@@ -8,7 +8,7 @@
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause (see accompanying LICENSE.txt file)
  *
  * This file contains code covered by:
- * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * copyright: 2011 Simple Machines (http://www.simplemachines.org)
  *
  * @version 2.0 dev
  *
@@ -16,13 +16,21 @@
 
 namespace ElkArte\AdminController;
 
+use BBC\ParserWrapper;
+use ElkArte\AbstractController;
+use ElkArte\Action;
+use ElkArte\Exceptions\Exception;
+use ElkArte\Notifications;
+use ElkArte\SettingsForm\SettingsForm;
+use ElkArte\Util;
+
 /**
  * Manage features and options administration page.
  *
  * This controller handles the pages which allow the admin
  * to see and change the basic feature settings of their site.
  */
-class ManageFeatures extends \ElkArte\AbstractController
+class ManageFeatures extends AbstractController
 {
 	/**
 	 * Pre Dispatch, called before other methods.
@@ -37,7 +45,7 @@ class ManageFeatures extends \ElkArte\AbstractController
 	 * This function passes control through to the relevant tab.
 	 *
 	 * @event integrate_sa_modify_features Use to add new Configuration tabs
-	 * @see \ElkArte\AbstractController::action_index()
+	 * @see  \ElkArte\AbstractController::action_index()
 	 * @uses Help, ManageSettings languages
 	 * @uses sub_template show_settings
 	 */
@@ -103,7 +111,7 @@ class ManageFeatures extends \ElkArte\AbstractController
 		);
 
 		// Set up the action control
-		$action = new \ElkArte\Action('modify_features');
+		$action = new Action('modify_features');
 
 		// Load up all the tabs...
 		$context[$context['admin_menu_name']]['tab_data'] = array(
@@ -111,16 +119,11 @@ class ManageFeatures extends \ElkArte\AbstractController
 			'help' => 'featuresettings',
 			'description' => sprintf($txt['modSettings_desc'], getUrl('admin', ['action' => 'admin', 'area' => 'theme', 'sa' => 'list', 'th' => $settings['theme_id'], '{session_data}'])),
 			'tabs' => array(
-				'basic' => array(
-				),
-				'layout' => array(
-				),
-				'pmsettings' => array(
-				),
-				'karma' => array(
-				),
-				'likes' => array(
-				),
+				'basic' => array(),
+				'layout' => array(),
+				'pmsettings' => array(),
+				'karma' => array(),
+				'likes' => array(),
 				'mention' => array(
 					'description' => $txt['mentions_settings_desc'],
 				),
@@ -157,7 +160,7 @@ class ManageFeatures extends \ElkArte\AbstractController
 		global $txt, $context;
 
 		// Initialize the form
-		$settingsForm = new \ElkArte\SettingsForm\SettingsForm(\ElkArte\SettingsForm\SettingsForm::DB_ADAPTER);
+		$settingsForm = new SettingsForm(SettingsForm::DB_ADAPTER);
 
 		// Initialize it with our settings
 		$settingsForm->setConfigVars($this->_basicSettings());
@@ -169,7 +172,9 @@ class ManageFeatures extends \ElkArte\AbstractController
 
 			// Prevent absurd boundaries here - make it a day tops.
 			if (isset($this->_req->post->lastActive))
+			{
 				$this->_req->post->lastActive = min((int) $this->_req->post->lastActive, 1440);
+			}
 
 			call_integration_hook('integrate_save_basic_settings');
 
@@ -191,6 +196,7 @@ class ManageFeatures extends \ElkArte\AbstractController
 				'success' => $clean_hives_result,
 				'response' => $clean_hives_result ? $txt['clean_hives_sucess'] : $txt['clean_hives_failed']
 			);
+
 			return;
 		}
 
@@ -201,6 +207,70 @@ class ManageFeatures extends \ElkArte\AbstractController
 		theme()->addInlineJavascript('showhideJqueryOptions();', true);
 
 		$settingsForm->prepare();
+	}
+
+	/**
+	 * Return basic feature settings.
+	 *
+	 * @event integrate_modify_basic_settings Adds to General features and Options
+	 */
+	private function _basicSettings()
+	{
+		global $txt;
+
+		$config_vars = array(
+			// Basic stuff, titles, permissions...
+			array('check', 'allow_guestAccess'),
+			array('check', 'enable_buddylist'),
+			array('check', 'allow_editDisplayName'),
+			array('check', 'allow_hideOnline'),
+			array('check', 'titlesEnable'),
+			'',
+			// Javascript and CSS options
+			array('select', 'jquery_source', array('auto' => $txt['jquery_auto'], 'local' => $txt['jquery_local'], 'cdn' => $txt['jquery_cdn'])),
+			array('check', 'jquery_default', 'onchange' => 'showhideJqueryOptions();'),
+			array('text', 'jquery_version', 'postinput' => $txt['jquery_custom_after']),
+			array('check', 'jqueryui_default', 'onchange' => 'showhideJqueryOptions();'),
+			array('text', 'jqueryui_version', 'postinput' => $txt['jqueryui_custom_after']),
+			array('check', 'minify_css_js', 'postinput' => '<a href="#" id="clean_hives" class="linkbutton">' . $txt['clean_hives'] . '</a>'),
+			'',
+			// Number formatting, timezones.
+			array('text', 'time_format'),
+			array('float', 'time_offset', 'subtext' => $txt['setting_time_offset_note'], 6, 'postinput' => $txt['hours']),
+			'default_timezone' => array('select', 'default_timezone', array()),
+			'',
+			// Who's online?
+			array('check', 'who_enabled'),
+			array('int', 'lastActive', 6, 'postinput' => $txt['minutes']),
+			'',
+			// Statistics.
+			array('check', 'trackStats'),
+			array('check', 'hitStats'),
+			'',
+			// Option-ish things... miscellaneous sorta.
+			array('check', 'allow_disableAnnounce'),
+			array('check', 'disallow_sendBody'),
+			array('select', 'enable_contactform', array('disabled' => $txt['contact_form_disabled'], 'registration' => $txt['contact_form_registration'], 'menu' => $txt['contact_form_menu'])),
+		);
+
+		// Get all the time zones.
+		$all_zones = timezone_identifiers_list();
+		if ($all_zones === false)
+		{
+			unset($config_vars['default_timezone']);
+		}
+		else
+		{
+			// Make sure we set the value to the same as the printed value.
+			foreach ($all_zones as $zone)
+			{
+				$config_vars['default_timezone'][2][$zone] = $zone;
+			}
+		}
+
+		call_integration_hook('integrate_modify_basic_settings', array(&$config_vars));
+
+		return $config_vars;
 	}
 
 	/**
@@ -215,7 +285,7 @@ class ManageFeatures extends \ElkArte\AbstractController
 		global $txt, $context, $modSettings;
 
 		// Initialize the form
-		$settingsForm = new \ElkArte\SettingsForm\SettingsForm(\ElkArte\SettingsForm\SettingsForm::DB_ADAPTER);
+		$settingsForm = new SettingsForm(SettingsForm::DB_ADAPTER);
 
 		// Initialize it with our settings
 		$settingsForm->setConfigVars($this->_layoutSettings());
@@ -227,10 +297,9 @@ class ManageFeatures extends \ElkArte\AbstractController
 			if (!empty($this->_req->post->front_page))
 			{
 				$front_page = (string) $this->_req->post->front_page;
-				if (
-					is_callable(array($modSettings['front_page'], 'validateFrontPageOptions'))
-					&& !$front_page::validateFrontPageOptions($this->_req->post)
-				) {
+				if (is_callable(array($modSettings['front_page'], 'validateFrontPageOptions'))
+					&& !$front_page::validateFrontPageOptions($this->_req->post))
+				{
 					$this->_req->post->front_page = '';
 				}
 			}
@@ -253,6 +322,41 @@ class ManageFeatures extends \ElkArte\AbstractController
 	}
 
 	/**
+	 * Return layout settings.
+	 *
+	 * @event integrate_modify_layout_settings Adds options to Configuration->Layout
+	 */
+	private function _layoutSettings()
+	{
+		global $txt;
+
+		$config_vars = array_merge(getFrontPageControllers(), array(
+			'',
+			// Pagination stuff.
+			array('check', 'compactTopicPagesEnable'),
+			array('int', 'compactTopicPagesContiguous', 'subtext' => str_replace(' ', '&nbsp;', '"3" ' . $txt['to_display'] . ': <strong>1 ... 4 [5] 6 ... 9</strong>') . '<br />' . str_replace(' ', '&nbsp;', '"5" ' . $txt['to_display'] . ': <strong>1 ... 3 4 [5] 6 7 ... 9</strong>')),
+			array('int', 'defaultMaxMembers'),
+			array('check', 'displayMemberNames'),
+			'',
+			// Stuff that just is everywhere - today, search, online, etc.
+			array('select', 'todayMod', array($txt['today_disabled'], $txt['today_only'], $txt['yesterday_today'], $txt['relative_time'])),
+			array('check', 'onlineEnable'),
+			array('check', 'enableVBStyleLogin'),
+			'',
+			// Automagic image resizing.
+			array('int', 'max_image_width', 'subtext' => $txt['zero_for_no_limit']),
+			array('int', 'max_image_height', 'subtext' => $txt['zero_for_no_limit']),
+			'',
+			// This is like debugging sorta.
+			array('check', 'timeLoadPageEnable'),
+		));
+
+		call_integration_hook('integrate_modify_layout_settings', array(&$config_vars));
+
+		return $config_vars;
+	}
+
+	/**
 	 * Display configuration settings page for karma settings.
 	 *
 	 * - Accessed from ?action=admin;area=featuresettings;sa=karma;
@@ -264,7 +368,7 @@ class ManageFeatures extends \ElkArte\AbstractController
 		global $txt, $context;
 
 		// Initialize the form
-		$settingsForm = new \ElkArte\SettingsForm\SettingsForm(\ElkArte\SettingsForm\SettingsForm::DB_ADAPTER);
+		$settingsForm = new SettingsForm(SettingsForm::DB_ADAPTER);
 
 		// Initialize it with our settings
 		$settingsForm->setConfigVars($this->_karmaSettings());
@@ -288,6 +392,36 @@ class ManageFeatures extends \ElkArte\AbstractController
 	}
 
 	/**
+	 * Return karma settings.
+	 *
+	 * @event integrate_modify_karma_settings Adds to Configuration->Karma
+	 */
+	private function _karmaSettings()
+	{
+		global $txt;
+
+		$config_vars = array(
+			// Karma - On or off?
+			array('select', 'karmaMode', explode('|', $txt['karma_options'])),
+			'',
+			// Who can do it.... and who is restricted by time limits?
+			array('int', 'karmaMinPosts', 6, 'postinput' => $txt['manageposts_posts']),
+			array('float', 'karmaWaitTime', 6, 'postinput' => $txt['hours']),
+			array('check', 'karmaTimeRestrictAdmins'),
+			array('check', 'karmaDisableSmite'),
+			'',
+			// What does it look like?  [smite]?
+			array('text', 'karmaLabel'),
+			array('text', 'karmaApplaudLabel', 'mask' => 'nohtml'),
+			array('text', 'karmaSmiteLabel', 'mask' => 'nohtml'),
+		);
+
+		call_integration_hook('integrate_modify_karma_settings', array(&$config_vars));
+
+		return $config_vars;
+	}
+
+	/**
 	 * Display configuration settings page for likes settings.
 	 *
 	 * - Accessed from ?action=admin;area=featuresettings;sa=likes;
@@ -299,7 +433,7 @@ class ManageFeatures extends \ElkArte\AbstractController
 		global $txt, $context;
 
 		// Initialize the form
-		$settingsForm = new \ElkArte\SettingsForm\SettingsForm(\ElkArte\SettingsForm\SettingsForm::DB_ADAPTER);
+		$settingsForm = new SettingsForm(SettingsForm::DB_ADAPTER);
 
 		// Initialize it with our settings
 		$settingsForm->setConfigVars($this->_likesSettings());
@@ -323,6 +457,34 @@ class ManageFeatures extends \ElkArte\AbstractController
 	}
 
 	/**
+	 * Return likes settings.
+	 *
+	 * @event integrate_modify_likes_settings Adds to Configuration->Likes
+	 */
+	private function _likesSettings()
+	{
+		global $txt;
+
+		$config_vars = array(
+			// Likes - On or off?
+			array('check', 'likes_enabled'),
+			'',
+			// Who can do it.... and who is restricted by count limits?
+			array('int', 'likeMinPosts', 6, 'postinput' => $txt['manageposts_posts']),
+			array('int', 'likeWaitTime', 6, 'postinput' => $txt['minutes']),
+			array('int', 'likeWaitCount', 6),
+			array('check', 'likeRestrictAdmins'),
+			array('check', 'likeAllowSelf'),
+			'',
+			array('int', 'likeDisplayLimit', 6)
+		);
+
+		call_integration_hook('integrate_modify_likes_settings', array(&$config_vars));
+
+		return $config_vars;
+	}
+
+	/**
 	 * Initializes the mentions settings admin page.
 	 *
 	 * - Accessed from ?action=admin;area=featuresettings;sa=mention;
@@ -336,7 +498,7 @@ class ManageFeatures extends \ElkArte\AbstractController
 		theme()->getTemplates()->loadLanguageFile('Mentions');
 
 		// Instantiate the form
-		$settingsForm = new \ElkArte\SettingsForm\SettingsForm(\ElkArte\SettingsForm\SettingsForm::DB_ADAPTER);
+		$settingsForm = new SettingsForm(SettingsForm::DB_ADAPTER);
 
 		// Initialize it with our settings
 		$settingsForm->setConfigVars($this->_notificationsSettings());
@@ -417,7 +579,9 @@ class ManageFeatures extends \ElkArte\AbstractController
 
 					// Something like enableModule('mentions', array('post', 'display');
 					foreach ($modules as $key => $val)
+					{
 						$function($key, $val);
+					}
 				}
 			}
 
@@ -433,6 +597,46 @@ class ManageFeatures extends \ElkArte\AbstractController
 	}
 
 	/**
+	 * Return mentions settings.
+	 *
+	 * @event integrate_modify_mention_settings Adds to Configuration->Mentions
+	 */
+	private function _notificationsSettings()
+	{
+		global $txt, $modSettings;
+
+		theme()->getTemplates()->loadLanguageFile('Profile');
+		theme()->getTemplates()->loadLanguageFile('UserNotifications');
+
+		// The mentions settings
+		$config_vars = array(
+			array('title', 'mentions_settings'),
+			array('check', 'mentions_enabled'),
+		);
+
+		$notification_methods = Notifications::instance()->getNotifiers();
+		$notification_types = getNotificationTypes();
+		$current_settings = unserialize($modSettings['notification_methods']);
+
+		foreach ($notification_types as $title)
+		{
+			$config_vars[] = array('title', 'setting_' . $title);
+
+			foreach ($notification_methods as $method)
+			{
+				$text_label = $method === 'notification' ? $txt['setting_notify_enable_this'] : $txt['notify_' . $method];
+
+				$config_vars[] = array('check', 'notifications[' . $title . '][' . $method . ']', 'text_label' => $text_label);
+				$modSettings['notifications[' . $title . '][' . $method . ']'] = !empty($current_settings[$title][$method]);
+			}
+		}
+
+		call_integration_hook('integrate_modify_mention_settings', array(&$config_vars));
+
+		return $config_vars;
+	}
+
+	/**
 	 * Display configuration settings for signatures on forum.
 	 *
 	 * - Accessed from ?action=admin;area=featuresettings;sa=sig;
@@ -444,7 +648,7 @@ class ManageFeatures extends \ElkArte\AbstractController
 		global $context, $txt, $modSettings;
 
 		// Initialize the form
-		$settingsForm = new \ElkArte\SettingsForm\SettingsForm(\ElkArte\SettingsForm\SettingsForm::DB_ADAPTER);
+		$settingsForm = new SettingsForm(SettingsForm::DB_ADAPTER);
 
 		// Initialize it with our settings
 		$settingsForm->setConfigVars($this->_signatureSettings());
@@ -494,7 +698,9 @@ class ManageFeatures extends \ElkArte\AbstractController
 
 		// Temporarily make each setting a modSetting!
 		foreach ($context['signature_settings'] as $key => $value)
+		{
 			$modSettings['signature_' . $key] = $value;
+		}
 
 		// Make sure we check the right tags!
 		$modSettings['bbc_disabled_signature_bbc'] = $disabledTags;
@@ -505,21 +711,29 @@ class ManageFeatures extends \ElkArte\AbstractController
 			checkSession();
 
 			// Clean up the tag stuff!
-			$codes = \BBC\ParserWrapper::instance()->getCodes();
+			$codes = ParserWrapper::instance()->getCodes();
 			$bbcTags = $codes->getTags();
 
 			if (!isset($this->_req->post->signature_bbc_enabledTags))
+			{
 				$this->_req->post->signature_bbc_enabledTags = array();
+			}
 			elseif (!is_array($this->_req->post->signature_bbc_enabledTags))
+			{
 				$this->_req->post->signature_bbc_enabledTags = array($this->_req->post->signature_bbc_enabledTags);
+			}
 
 			$sig_limits = array();
 			foreach ($context['signature_settings'] as $key => $value)
 			{
 				if ($key == 'allow_smileys')
+				{
 					continue;
+				}
 				elseif ($key == 'max_smileys' && empty($this->_req->post->signature_allow_smileys))
+				{
 					$sig_limits[] = -1;
+				}
 				else
 				{
 					$current_key = $this->_req->getPost('signature_' . $key, 'intval');
@@ -546,6 +760,55 @@ class ManageFeatures extends \ElkArte\AbstractController
 		$context['settings_message'] = !empty($settings_applied) ? $txt['signature_settings_applied'] : sprintf($txt['signature_settings_warning'], getUrl('admin', ['action' => 'admin', 'area' => 'featuresettings', 'sa' => 'sig', 'apply', '{session_data}']));
 
 		$settingsForm->prepare();
+	}
+
+	/**
+	 * Return signature settings.
+	 *
+	 * - Used in admin center search and settings form
+	 *
+	 * @event integrate_modify_signature_settings Adds options to Signature Settings
+	 */
+	private function _signatureSettings()
+	{
+		global $txt;
+
+		$config_vars = array(
+			// Are signatures even enabled?
+			array('check', 'signature_enable'),
+			'',
+			// Tweaking settings!
+			array('int', 'signature_max_length', 'subtext' => $txt['zero_for_no_limit']),
+			array('int', 'signature_max_lines', 'subtext' => $txt['zero_for_no_limit']),
+			array('int', 'signature_max_font_size', 'subtext' => $txt['zero_for_no_limit']),
+			array('check', 'signature_allow_smileys', 'onclick' => 'document.getElementById(\'signature_max_smileys\').disabled = !this.checked;'),
+			array('int', 'signature_max_smileys', 'subtext' => $txt['zero_for_no_limit']),
+			array('select', 'signature_repetition_guests',
+				  array(
+					  $txt['signature_always'],
+					  $txt['signature_onlyfirst'],
+					  $txt['signature_never'],
+				  ),
+			),
+			array('select', 'signature_repetition_members',
+				  array(
+					  $txt['signature_always'],
+					  $txt['signature_onlyfirst'],
+					  $txt['signature_never'],
+				  ),
+			),
+			'',
+			// Image settings.
+			array('int', 'signature_max_images', 'subtext' => $txt['signature_max_images_note']),
+			array('int', 'signature_max_image_width', 'subtext' => $txt['zero_for_no_limit']),
+			array('int', 'signature_max_image_height', 'subtext' => $txt['zero_for_no_limit']),
+			'',
+			array('bbc', 'signature_bbc'),
+		);
+
+		call_integration_hook('integrate_modify_signature_settings', array(&$config_vars));
+
+		return $config_vars;
 	}
 
 	/**
@@ -601,7 +864,9 @@ class ManageFeatures extends \ElkArte\AbstractController
 				foreach ($this->_req->post->reg as $value)
 				{
 					if (in_array($value, $standard_fields) && !isset($disable_fields[$value]))
+					{
 						$reg_fields[] = $value;
+					}
 				}
 			}
 
@@ -609,7 +874,9 @@ class ManageFeatures extends \ElkArte\AbstractController
 			$changes['registration_fields'] = empty($reg_fields) ? '' : implode(',', $reg_fields);
 
 			if (!empty($changes))
+			{
 				updateSettings($changes);
+			}
 		}
 
 		createToken('admin-scp');
@@ -644,6 +911,7 @@ class ManageFeatures extends \ElkArte\AbstractController
 						'function' => function ($rowData) {
 							$isChecked = $rowData['disabled'] ? '' : ' checked="checked"';
 							$onClickHandler = $rowData['can_show_register'] ? sprintf('onclick="document.getElementById(\'reg_%1$s\').disabled = !this.checked;"', $rowData['id']) : '';
+
 							return sprintf('<input type="checkbox" name="active[]" id="active_%1$s" value="%1$s" class="input_check" %2$s %3$s />', $rowData['id'], $isChecked, $onClickHandler);
 						},
 						'style' => 'width: 20%;',
@@ -659,6 +927,7 @@ class ManageFeatures extends \ElkArte\AbstractController
 						'function' => function ($rowData) {
 							$isChecked = $rowData['on_register'] && !$rowData['disabled'] ? ' checked="checked"' : '';
 							$isDisabled = $rowData['can_show_register'] ? '' : ' disabled="disabled"';
+
 							return sprintf('<input type="checkbox" name="reg[]" id="reg_%1$s" value="%1$s" class="input_check" %2$s %3$s />', $rowData['id'], $isChecked, $isDisabled);
 						},
 						'style' => 'width: 20%;',
@@ -737,6 +1006,7 @@ class ManageFeatures extends \ElkArte\AbstractController
 							global $txt;
 
 							$textKey = sprintf('custom_profile_type_%1$s', $rowData['field_type']);
+
 							return isset($txt[$textKey]) ? $txt[$textKey] : $textKey;
 						},
 						'style' => 'width: 10%;',
@@ -754,6 +1024,7 @@ class ManageFeatures extends \ElkArte\AbstractController
 					'data' => array(
 						'function' => function ($rowData) {
 							$isChecked = $rowData['active'] ? ' checked="checked"' : '';
+
 							return sprintf('<input type="checkbox" name="cust[]" id="cust_%1$s" value="%1$s" class="input_check"%2$s />', $rowData['id_field'], $isChecked);
 						},
 						'style' => 'width: 8%;',
@@ -867,7 +1138,9 @@ class ManageFeatures extends \ElkArte\AbstractController
 			theme()->getTemplates()->loadLanguageFile('Errors');
 
 			if (isset($txt['custom_option_' . $this->_req->query->msg]))
+			{
 				$context['custom_option__error'] = $txt['custom_option_' . $this->_req->query->msg];
+			}
 		}
 
 		// Load the profile language for section names.
@@ -921,9 +1194,12 @@ class ManageFeatures extends \ElkArte\AbstractController
 
 			// Enable and disable custom fields as required.
 			$enabled = array(0);
-			if (isset($this->_req->post->cust) && is_array($this->_req->post->cust)) {
+			if (isset($this->_req->post->cust) && is_array($this->_req->post->cust))
+			{
 				foreach ($this->_req->post->cust as $id)
+				{
 					$enabled[] = (int) $id;
+				}
 			}
 
 			updateRenamedProfileStatus($enabled);
@@ -936,11 +1212,15 @@ class ManageFeatures extends \ElkArte\AbstractController
 
 			// Everyone needs a name - even the (bracket) unknown...
 			if (trim($this->_req->post->field_name) === '')
+			{
 				redirectexit('action=admin;area=featuresettings;sa=profileedit;fid=' . $this->_req->query->fid . ';msg=need_name');
+			}
 
 			// Regex you say?  Do a very basic test to see if the pattern is valid
 			if (!empty($this->_req->post->regex) && @preg_match($this->_req->post->regex, 'dummy') === false)
+			{
 				redirectexit('action=admin;area=featuresettings;sa=profileedit;fid=' . $this->_req->query->fid . ';msg=regex_error');
+			}
 
 			$this->_req->post->field_name = $this->_req->getPost('field_name', '\\ElkArte\\Util::htmlspecialchars');
 			$this->_req->post->field_desc = $this->_req->getPost('field_desc', '\\ElkArte\\Util::htmlspecialchars');
@@ -961,7 +1241,9 @@ class ManageFeatures extends \ElkArte\AbstractController
 			// Some masking stuff...
 			$mask = $this->_req->getPost('mask', 'strval', '');
 			if ($mask == 'regex' && isset($this->_req->post->regex))
+			{
 				$mask .= $this->_req->post->regex;
+			}
 
 			$field_length = $this->_req->getPost('max_length', 'intval', 255);
 			$enclose = $this->_req->getPost('enclose', 'strval', '');
@@ -986,12 +1268,14 @@ class ManageFeatures extends \ElkArte\AbstractController
 						foreach ($this->_req->post->select_option as $k => $v)
 						{
 							// Clean, clean, clean...
-							$v = \ElkArte\Util::htmlspecialchars($v);
+							$v = Util::htmlspecialchars($v);
 							$v = strtr($v, array(',' => ''));
 
 							// Nada, zip, etc...
 							if (trim($v) === '')
+							{
 								continue;
+							}
 
 							// Otherwise, save it boy.
 							$field_options .= $v . ',';
@@ -1007,7 +1291,9 @@ class ManageFeatures extends \ElkArte\AbstractController
 						}
 
 						if (isset($_POST['default_select']) && $_POST['default_select'] == 'no_default')
+						{
 							$default = 'no_default';
+						}
 
 						$field_options = substr($field_options, 0, -1);
 					}
@@ -1016,27 +1302,29 @@ class ManageFeatures extends \ElkArte\AbstractController
 					$default = isset($this->_req->post->default_value) ? $this->_req->post->default_value : '';
 			}
 
-			// Text area by default has dimensions
-//			if ($this->_req->post->field_type == 'textarea')
-//				$default = (int) $this->_req->post->rows . ',' . (int) $this->_req->post->cols;
-
 			// Come up with the unique name?
 			if (empty($context['fid']))
 			{
-				$colname = \ElkArte\Util::substr(strtr($this->_req->post->field_name, array(' ' => '')), 0, 6);
+				$colname = Util::substr(strtr($this->_req->post->field_name, array(' ' => '')), 0, 6);
 				preg_match('~([\w\d_-]+)~', $colname, $matches);
 
 				// If there is nothing to the name, then let's start our own - for foreign languages etc.
 				if (isset($matches[1]))
+				{
 					$colname = $initial_colname = 'cust_' . strtolower($matches[1]);
+				}
 				else
+				{
 					$colname = $initial_colname = 'cust_' . mt_rand(1, 999999);
+				}
 
 				$unique = ensureUniqueProfileField($colname, $initial_colname);
 
 				// Still not a unique column name? Leave it up to the user, then.
 				if (!$unique)
-					throw new \ElkArte\Exceptions\Exception('custom_option_not_unique');
+				{
+					throw new Exception('custom_option_not_unique');
+				}
 
 				// And create a new field
 				$new_field = array(
@@ -1084,7 +1372,9 @@ class ManageFeatures extends \ElkArte\AbstractController
 					foreach ($context['field']['options'] as $k => $option)
 					{
 						if (trim($option) === '')
+						{
 							continue;
+						}
 
 						// Still exists?
 						if (in_array($option, $newOptions))
@@ -1099,7 +1389,9 @@ class ManageFeatures extends \ElkArte\AbstractController
 					{
 						// Just been renamed?
 						if (!in_array($k, $takenKeys) && !empty($newOptions[$k]))
+						{
 							updateRenamedProfileField($k, $newOptions, $context['field']['colname'], $option);
+						}
 					}
 				}
 				// @todo Maybe we should adjust based on new text length limits?
@@ -1132,7 +1424,9 @@ class ManageFeatures extends \ElkArte\AbstractController
 
 				// Just clean up any old selects - these are a pain!
 				if (($this->_req->post->field_type == 'select' || $this->_req->post->field_type == 'radio') && !empty($newOptions))
+				{
 					deleteOldProfileFieldSelects($newOptions, $context['field']['colname']);
+				}
 			}
 		}
 		// Deleting?
@@ -1171,7 +1465,7 @@ class ManageFeatures extends \ElkArte\AbstractController
 		global $txt, $context;
 
 		// Initialize the form
-		$settingsForm = new \ElkArte\SettingsForm\SettingsForm(\ElkArte\SettingsForm\SettingsForm::DB_ADAPTER);
+		$settingsForm = new SettingsForm(SettingsForm::DB_ADAPTER);
 
 		// Initialize it with our settings
 		$settingsForm->setConfigVars($this->_pmSettings());
@@ -1190,7 +1484,9 @@ class ManageFeatures extends \ElkArte\AbstractController
 			foreach ($context['pm_limits'] as $group_id => $group)
 			{
 				if (isset($this->_req->post->group[$group_id]) && $this->_req->post->group[$group_id] != $group['max_messages'])
+				{
 					updateMembergroupProperties(array('current_group' => $group_id, 'max_messages' => $this->_req->post->group[$group_id]));
+				}
 			}
 
 			call_integration_hook('integrate_save_pmsettings_settings');
@@ -1204,296 +1500,6 @@ class ManageFeatures extends \ElkArte\AbstractController
 		$context['settings_title'] = $txt['personal_messages'];
 
 		$settingsForm->prepare();
-	}
-
-	/**
-	 * Return basic feature settings.
-	 *
-	 * @event integrate_modify_basic_settings Adds to General features and Options
-	 */
-	private function _basicSettings()
-	{
-		global $txt;
-
-		$config_vars = array(
-				// Basic stuff, titles, permissions...
-				array('check', 'allow_guestAccess'),
-				array('check', 'enable_buddylist'),
-				array('check', 'allow_editDisplayName'),
-				array('check', 'allow_hideOnline'),
-				array('check', 'titlesEnable'),
-			'',
-				// Javascript and CSS options
-				array('select', 'jquery_source', array('auto' => $txt['jquery_auto'], 'local' => $txt['jquery_local'], 'cdn' => $txt['jquery_cdn'])),
-				array('check', 'jquery_default', 'onchange' => 'showhideJqueryOptions();'),
-				array('text', 'jquery_version', 'postinput' => $txt['jquery_custom_after']),
-				array('check', 'jqueryui_default', 'onchange' => 'showhideJqueryOptions();'),
-				array('text', 'jqueryui_version', 'postinput' => $txt['jqueryui_custom_after']),
-				array('check', 'minify_css_js', 'postinput' => '<a href="#" id="clean_hives" class="linkbutton">' . $txt['clean_hives'] . '</a>'),
-			'',
-				// Number formatting, timezones.
-				array('text', 'time_format'),
-				array('float', 'time_offset', 'subtext' => $txt['setting_time_offset_note'], 6, 'postinput' => $txt['hours']),
-				'default_timezone' => array('select', 'default_timezone', array()),
-			'',
-				// Who's online?
-				array('check', 'who_enabled'),
-				array('int', 'lastActive', 6, 'postinput' => $txt['minutes']),
-			'',
-				// Statistics.
-				array('check', 'trackStats'),
-				array('check', 'hitStats'),
-			'',
-				// Option-ish things... miscellaneous sorta.
-				array('check', 'allow_disableAnnounce'),
-				array('check', 'disallow_sendBody'),
-				array('select', 'enable_contactform', array('disabled' => $txt['contact_form_disabled'], 'registration' => $txt['contact_form_registration'], 'menu' => $txt['contact_form_menu'])),
-		);
-
-		// Get all the time zones.
-		$all_zones = timezone_identifiers_list();
-		if ($all_zones === false)
-			unset($config_vars['default_timezone']);
-		else
-		{
-			// Make sure we set the value to the same as the printed value.
-			foreach ($all_zones as $zone)
-				$config_vars['default_timezone'][2][$zone] = $zone;
-		}
-
-		call_integration_hook('integrate_modify_basic_settings', array(&$config_vars));
-
-		return $config_vars;
-	}
-
-	/**
-	 * Public method to return the basic settings, used for admin search
-	 */
-	public function basicSettings_search()
-	{
-		return $this->_basicSettings();
-	}
-
-	/**
-	 * Return layout settings.
-	 *
-	 * @event integrate_modify_layout_settings Adds options to Configuration->Layout
-	 */
-	private function _layoutSettings()
-	{
-		global $txt;
-
-		$config_vars = array_merge(getFrontPageControllers(), array(
-			'',
-				// Pagination stuff.
-				array('check', 'compactTopicPagesEnable'),
-				array('int', 'compactTopicPagesContiguous', 'subtext' => str_replace(' ', '&nbsp;', '"3" ' . $txt['to_display'] . ': <strong>1 ... 4 [5] 6 ... 9</strong>') . '<br />' . str_replace(' ', '&nbsp;', '"5" ' . $txt['to_display'] . ': <strong>1 ... 3 4 [5] 6 7 ... 9</strong>')),
-				array('int', 'defaultMaxMembers'),
-				array('check', 'displayMemberNames'),
-			'',
-				// Stuff that just is everywhere - today, search, online, etc.
-				array('select', 'todayMod', array($txt['today_disabled'], $txt['today_only'], $txt['yesterday_today'], $txt['relative_time'])),
-				array('check', 'onlineEnable'),
-				array('check', 'enableVBStyleLogin'),
-			'',
-				// Automagic image resizing.
-				array('int', 'max_image_width', 'subtext' => $txt['zero_for_no_limit']),
-				array('int', 'max_image_height', 'subtext' => $txt['zero_for_no_limit']),
-			'',
-				// This is like debugging sorta.
-				array('check', 'timeLoadPageEnable'),
-		));
-
-		call_integration_hook('integrate_modify_layout_settings', array(&$config_vars));
-
-		return $config_vars;
-	}
-
-	/**
-	 * Public method to return the layout settings, used for admin search
-	 */
-	public function layoutSettings_search()
-	{
-		return $this->_layoutSettings();
-	}
-
-	/**
-	 * Return karma settings.
-	 *
-	 * @event integrate_modify_karma_settings Adds to Configuration->Karma
-	 */
-	private function _karmaSettings()
-	{
-		global $txt;
-
-		$config_vars = array(
-				// Karma - On or off?
-				array('select', 'karmaMode', explode('|', $txt['karma_options'])),
-			'',
-				// Who can do it.... and who is restricted by time limits?
-				array('int', 'karmaMinPosts', 6, 'postinput' => $txt['manageposts_posts']),
-				array('float', 'karmaWaitTime', 6, 'postinput' => $txt['hours']),
-				array('check', 'karmaTimeRestrictAdmins'),
-				array('check', 'karmaDisableSmite'),
-			'',
-				// What does it look like?  [smite]?
-				array('text', 'karmaLabel'),
-				array('text', 'karmaApplaudLabel', 'mask' => 'nohtml'),
-				array('text', 'karmaSmiteLabel', 'mask' => 'nohtml'),
-		);
-
-		call_integration_hook('integrate_modify_karma_settings', array(&$config_vars));
-
-		return $config_vars;
-	}
-
-	/**
-	 * Public method to return the karma settings, used for admin search
-	 */
-	public function karmaSettings_search()
-	{
-		return $this->_karmaSettings();
-	}
-
-	/**
-	 * Return likes settings.
-	 *
-	 * @event integrate_modify_likes_settings Adds to Configuration->Likes
-	 */
-	private function _likesSettings()
-	{
-		global $txt;
-
-		$config_vars = array(
-				// Likes - On or off?
-				array('check', 'likes_enabled'),
-			'',
-				// Who can do it.... and who is restricted by count limits?
-				array('int', 'likeMinPosts', 6, 'postinput' => $txt['manageposts_posts']),
-				array('int', 'likeWaitTime', 6, 'postinput' => $txt['minutes']),
-				array('int', 'likeWaitCount', 6),
-				array('check', 'likeRestrictAdmins'),
-				array('check', 'likeAllowSelf'),
-			'',
-				array('int', 'likeDisplayLimit', 6)
-		);
-
-		call_integration_hook('integrate_modify_likes_settings', array(&$config_vars));
-
-		return $config_vars;
-	}
-
-	/**
-	 * Public method to return the likes settings, used for admin search
-	 */
-	public function likesSettings_search()
-	{
-		return $this->_likesSettings();
-	}
-
-	/**
-	 * Return mentions settings.
-	 *
-	 * @event integrate_modify_mention_settings Adds to Configuration->Mentions
-	 */
-	private function _notificationsSettings()
-	{
-		global $txt, $modSettings;
-
-		theme()->getTemplates()->loadLanguageFile('Profile');
-		theme()->getTemplates()->loadLanguageFile('UserNotifications');
-
-		// The mentions settings
-		$config_vars = array(
-			array('title', 'mentions_settings'),
-			array('check', 'mentions_enabled'),
-		);
-
-		$notification_methods = \ElkArte\Notifications::instance()->getNotifiers();
-		$notification_types = getNotificationTypes();
-		$current_settings = unserialize($modSettings['notification_methods']);
-
-		foreach ($notification_types as $title)
-		{
-			$config_vars[] = array('title', 'setting_' . $title);
-
-			foreach ($notification_methods as $method)
-			{
-				$text_label = $method === 'notification' ? $txt['setting_notify_enable_this'] : $txt['notify_' . $method];
-
-				$config_vars[] = array('check', 'notifications[' . $title . '][' . $method . ']', 'text_label' => $text_label);
-				$modSettings['notifications[' . $title . '][' . $method . ']'] = !empty($current_settings[$title][$method]);
-			}
-		}
-
-		call_integration_hook('integrate_modify_mention_settings', array(&$config_vars));
-
-		return $config_vars;
-	}
-
-	/**
-	 * Public method to return the mention settings, used for admin search
-	 */
-	public function mentionSettings_search()
-	{
-		return $this->_notificationsSettings();
-	}
-
-	/**
-	 * Return signature settings.
-	 *
-	 * - Used in admin center search and settings form
-	 *
-	 * @event integrate_modify_signature_settings Adds options to Signature Settings
-	 */
-	private function _signatureSettings()
-	{
-		global $txt;
-
-		$config_vars = array(
-				// Are signatures even enabled?
-				array('check', 'signature_enable'),
-			'',
-				// Tweaking settings!
-				array('int', 'signature_max_length', 'subtext' => $txt['zero_for_no_limit']),
-				array('int', 'signature_max_lines', 'subtext' => $txt['zero_for_no_limit']),
-				array('int', 'signature_max_font_size', 'subtext' => $txt['zero_for_no_limit']),
-				array('check', 'signature_allow_smileys', 'onclick' => 'document.getElementById(\'signature_max_smileys\').disabled = !this.checked;'),
-				array('int', 'signature_max_smileys', 'subtext' => $txt['zero_for_no_limit']),
-				array('select', 'signature_repetition_guests',
-					array(
-						$txt['signature_always'],
-						$txt['signature_onlyfirst'],
-						$txt['signature_never'],
-					),
-				),
-				array('select', 'signature_repetition_members',
-					array(
-						$txt['signature_always'],
-						$txt['signature_onlyfirst'],
-						$txt['signature_never'],
-					),
-				),
-			'',
-				// Image settings.
-				array('int', 'signature_max_images', 'subtext' => $txt['signature_max_images_note']),
-				array('int', 'signature_max_image_width', 'subtext' => $txt['zero_for_no_limit']),
-				array('int', 'signature_max_image_height', 'subtext' => $txt['zero_for_no_limit']),
-			'',
-				array('bbc', 'signature_bbc'),
-		);
-
-		call_integration_hook('integrate_modify_signature_settings', array(&$config_vars));
-
-		return $config_vars;
-	}
-
-	/**
-	 * Public method to return the signature settings, used for admin search
-	 */
-	public function signatureSettings_search()
-	{
-		return $this->_signatureSettings();
 	}
 
 	/**
@@ -1514,16 +1520,64 @@ class ManageFeatures extends \ElkArte\AbstractController
 			array('permissions', 'pm_send'),
 			// PM Settings
 			array('title', 'antispam_PM'),
-				'pm1' => array('int', 'max_pm_recipients', 'postinput' => $txt['max_pm_recipients_note']),
-				'pm2' => array('int', 'pm_posts_verification', 'postinput' => $txt['pm_posts_verification_note']),
-				'pm3' => array('int', 'pm_posts_per_hour', 'postinput' => $txt['pm_posts_per_hour_note']),
+			'pm1' => array('int', 'max_pm_recipients', 'postinput' => $txt['max_pm_recipients_note']),
+			'pm2' => array('int', 'pm_posts_verification', 'postinput' => $txt['pm_posts_verification_note']),
+			'pm3' => array('int', 'pm_posts_per_hour', 'postinput' => $txt['pm_posts_per_hour_note']),
 			array('title', 'membergroups_max_messages'),
-				array('desc', 'membergroups_max_messages_desc'),
-				array('callback', 'pm_limits'),
+			array('desc', 'membergroups_max_messages_desc'),
+			array('callback', 'pm_limits'),
 		);
 
 		call_integration_hook('integrate_modify_pmsettings_settings', array(&$config_vars));
 
 		return $config_vars;
+	}
+
+	/**
+	 * Public method to return the basic settings, used for admin search
+	 */
+	public function basicSettings_search()
+	{
+		return $this->_basicSettings();
+	}
+
+	/**
+	 * Public method to return the layout settings, used for admin search
+	 */
+	public function layoutSettings_search()
+	{
+		return $this->_layoutSettings();
+	}
+
+	/**
+	 * Public method to return the karma settings, used for admin search
+	 */
+	public function karmaSettings_search()
+	{
+		return $this->_karmaSettings();
+	}
+
+	/**
+	 * Public method to return the likes settings, used for admin search
+	 */
+	public function likesSettings_search()
+	{
+		return $this->_likesSettings();
+	}
+
+	/**
+	 * Public method to return the mention settings, used for admin search
+	 */
+	public function mentionSettings_search()
+	{
+		return $this->_notificationsSettings();
+	}
+
+	/**
+	 * Public method to return the signature settings, used for admin search
+	 */
+	public function signatureSettings_search()
+	{
+		return $this->_signatureSettings();
 	}
 }

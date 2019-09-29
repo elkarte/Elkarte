@@ -13,11 +13,13 @@
 
 namespace ElkArte\Controller;
 
+use ElkArte\AbstractController;
+
 /**
  * This controllers action handlers are automatically called.
  * It handles execution of scheduled tasks, mail queue scheduling included.
  */
-class ScheduledTasks extends \ElkArte\AbstractController
+class ScheduledTasks extends AbstractController
 {
 	/**
 	 * Default method for the class, just forwards to autotask
@@ -44,7 +46,9 @@ class ScheduledTasks extends \ElkArte\AbstractController
 
 		// The mail queue is also called from here.
 		if ($this->_req->getQuery('scheduled') === 'mailq')
+		{
 			$this->action_reducemailqueue();
+		}
 		else
 		{
 			call_integration_include_hook('integrate_autotask_include');
@@ -58,15 +62,21 @@ class ScheduledTasks extends \ElkArte\AbstractController
 
 			// If there was none, update with defaults
 			if ($nextTime === false)
+			{
 				updateSettings(array('next_task_time' => time() + 86400));
+			}
 			else
+			{
 				updateSettings(array('next_task_time' => $nextTime));
+			}
 		}
 
 		// Return, if we're not explicitly called.
 		// @todo remove?
 		if (!isset($this->_req->query->scheduled))
+		{
 			return true;
+		}
 
 		// Finally, send some bland image
 		dieGif(true);

@@ -13,6 +13,11 @@
 
 namespace ElkArte\Controller;
 
+use BBC\ParserWrapper;
+use ElkArte\Exceptions\Exception;
+use ElkArte\MembersList;
+use ElkArte\Util;
+
 /**
  * Draft controller.
  * This class handles requests that allow for the saving,
@@ -40,6 +45,14 @@ class Draft extends Post
 	}
 
 	/**
+	 * @override
+	 */
+	public function action_post()
+	{
+		$this->action_index();
+	}
+
+	/**
 	 * Default method, just forwards, if we ever get here.
 	 *
 	 * @see \ElkArte\AbstractController::action_index()
@@ -48,30 +61,6 @@ class Draft extends Post
 	{
 		// Where do you want to go today? :P
 		$this->action_showProfileDrafts();
-	}
-
-	/**
-	 * @override
-		 */
-	public function action_post()
-	{
-		$this->action_index();
-	}
-
-	/**
-	 * @override
-		 */
-	public function action_post2()
-	{
-		$this->action_index();
-	}
-
-	/**
-	 * @override
-		 */
-	public function action_save()
-	{
-		$this->action_index();
 	}
 
 	/**
@@ -91,7 +80,7 @@ class Draft extends Post
 		// Safe is safe.
 		if ($this->_memID !== $this->user->id)
 		{
-			throw new \ElkArte\Exceptions\Exception('no_access', false);
+			throw new Exception('no_access', false);
 		}
 
 		require_once(SUBSDIR . '/Drafts.subs.php');
@@ -102,12 +91,14 @@ class Draft extends Post
 
 		// If just deleting a draft, do it and then redirect back.
 		if (!empty($this->_req->query->delete) || !empty($this->_req->post->delete))
+		{
 			$this->_action_delete('action=profile;u=' . $this->_memID . ';area=showdrafts;start=' . $context['start']);
+		}
 
 		// Get things started
 		$msgCount = draftsCount($this->_memID, 0);
 		$maxIndex = (int) $modSettings['defaultMaxMessages'];
-		$name = \ElkArte\MembersList::get($this->_memID)->real_name;
+		$name = MembersList::get($this->_memID)->real_name;
 
 		// Make sure the starting place makes sense and construct our friend the page index.
 		$context['page_index'] = constructPageIndex(getUrl('profile', ['action' => 'profile', 'area' => 'showdrafts', 'u' => $this->_memID, 'name' => $name]), $context['start'], $msgCount, $maxIndex);
@@ -168,7 +159,9 @@ class Draft extends Post
 
 		// If the drafts were retrieved in reverse order, get them right again.
 		if ($reverse)
+		{
 			$context['drafts'] = array_reverse($context['drafts'], true);
+		}
 
 		// Menu tab
 		$context[$context['profile_menu_name']]['tab_data'] = array(
@@ -178,107 +171,6 @@ class Draft extends Post
 		);
 
 		$context['sub_template'] = 'showDrafts';
-	}
-
-	/**
-	 * Show all PM drafts of the current user
-	 *
-	 * What it does:
-	 *
-	 * - Allows for the deleting and loading/editing of PM drafts
-	 *
-	 * @uses the showPMDrafts template
-	 */
-	public function action_showPMDrafts()
-	{
-		global $txt, $modSettings, $context;
-
-		require_once(SUBSDIR . '/Drafts.subs.php');
-
-		// Quick check how we got here.
-		if ($this->_memID !== $this->user->id)
-		{
-			// empty($modSettings['drafts_enabled']) || empty($modSettings['drafts_pm_enabled']))
-			throw new \ElkArte\Exceptions\Exception('no_access', false);
-		}
-
-		// Set up what we will need
-		$context['start'] = $this->_req->getQuery('start', 'intval', 0);
-
-		// If just deleting a draft, do it and then redirect back.
-		if (!empty($this->_req->query->delete) || !empty($this->_req->post->delete))
-		{
-			return $this->_action_delete('action=pm;sa=showpmdrafts;start=' . $context['start']);
-		}
-
-		// Perhaps a draft was selected for editing? if so pass this off
-		if (!empty($this->_req->query->id_draft) && !empty($context['drafts_pm_save']))
-		{
-			checkSession('get');
-			redirectexit('action=pm;sa=send;id_draft=' . $this->_req->getQuery('id_draft', 'intval'));
-		}
-
-		// Get the count of applicable drafts
-		$msgCount = draftsCount($this->_memID, 1);
-		$maxIndex = (int) $modSettings['defaultMaxMessages'];
-
-		// Make sure the starting place makes sense and construct our friend the page index.
-		$context['page_index'] = constructPageIndex(getUrl('action', ['action' => 'pm', 'sa' => 'showpmdrafts']), $context['start'], $msgCount, $maxIndex);
-		$context['current_page'] = $context['start'] / $maxIndex;
-
-		list ($maxIndex, $reverse, $limit, $order) = $this->_query_limits($msgCount, $maxIndex);
-		$user_drafts = load_user_drafts($this->_memID, 1, false, $order, $limit);
-
-		// Start counting at the number of the first message displayed.
-		$counter = $reverse ? $context['start'] + $maxIndex + 1 : $context['start'];
-		$context['posts'] = array();
-		foreach ($user_drafts as $row)
-		{
-			$this->_prepare_body_subject($row['body'], $row['subject'], $txt['no_subject'], true);
-
-			// Have they provided who this will go to?
-			$recipients = array(
-				'to' => array(),
-				'bcc' => array(),
-			);
-			$recipient_ids = (!empty($row['to_list'])) ? \ElkArte\Util::unserialize($row['to_list']) : array();
-
-			// Get nice names to show the user, the id's are not that great to see!
-			if (!empty($recipient_ids['to']) || !empty($recipient_ids['bcc']))
-			{
-				$recipient_ids['to'] = array_map('intval', $recipient_ids['to']);
-				$recipient_ids['bcc'] = array_map('intval', $recipient_ids['bcc']);
-				$allRecipients = array_merge($recipient_ids['to'], $recipient_ids['bcc']);
-				$recipients = draftsRecipients($allRecipients, $recipient_ids);
-			}
-
-			// Add the items to the array for template use
-			$context['drafts'][$counter += $reverse ? -1 : 1] = array(
-				'body' => $row['body'],
-				'counter' => $counter,
-				'alternate' => $counter % 2,
-				'subject' => $row['subject'],
-				'time' => standardTime($row['poster_time']),
-				'html_time' => htmlTime($row['poster_time']),
-				'timestamp' => forum_time(true, $row['poster_time']),
-				'id_draft' => $row['id_draft'],
-				'recipients' => $recipients,
-				'age' => floor((time() - $row['poster_time']) / 86400),
-				'remaining' => (!empty($modSettings['drafts_keep_days']) ? floor($modSettings['drafts_keep_days'] - ((time() - $row['poster_time']) / 86400)) : 0),
-			);
-		}
-
-		// If the drafts were retrieved in reverse order, then put them in the right order again.
-		if ($reverse)
-			$context['drafts'] = array_reverse($context['drafts'], true);
-
-		// Off to the template we go
-		$context['page_title'] = $txt['drafts'];
-		$context['sub_template'] = 'showPMDrafts';
-		$context['linktree'][] = array(
-			'url' => getUrl('action', ['action' => 'pm', 'sa' => 'showpmdrafts']),
-			'name' => $txt['drafts'],
-		);
 	}
 
 	/**
@@ -306,7 +198,9 @@ class Draft extends Post
 		}
 
 		if (!empty($toDelete))
+		{
 			deleteDrafts($toDelete, $this->_memID);
+		}
 
 		redirectexit($redirect);
 	}
@@ -356,7 +250,7 @@ class Draft extends Post
 			$body = '';
 		}
 
-		$subject = \ElkArte\Util::htmltrim($subject);
+		$subject = Util::htmltrim($subject);
 		if (empty($subject))
 		{
 			$subject = $default_subject;
@@ -367,7 +261,126 @@ class Draft extends Post
 		$subject = censor($subject);
 
 		// BBC-ilize the message.
-		$parser = \BBC\ParserWrapper::instance();
+		$parser = ParserWrapper::instance();
 		$body = $parser->parseMessage($body, $smiley_enabled);
+	}
+
+	/**
+	 * @override
+	 */
+	public function action_post2()
+	{
+		$this->action_index();
+	}
+
+	/**
+	 * @override
+	 */
+	public function action_save()
+	{
+		$this->action_index();
+	}
+
+	/**
+	 * Show all PM drafts of the current user
+	 *
+	 * What it does:
+	 *
+	 * - Allows for the deleting and loading/editing of PM drafts
+	 *
+	 * @uses the showPMDrafts template
+	 */
+	public function action_showPMDrafts()
+	{
+		global $txt, $modSettings, $context;
+
+		require_once(SUBSDIR . '/Drafts.subs.php');
+
+		// Quick check how we got here.
+		if ($this->_memID !== $this->user->id)
+		{
+			// empty($modSettings['drafts_enabled']) || empty($modSettings['drafts_pm_enabled']))
+			throw new Exception('no_access', false);
+		}
+
+		// Set up what we will need
+		$context['start'] = $this->_req->getQuery('start', 'intval', 0);
+
+		// If just deleting a draft, do it and then redirect back.
+		if (!empty($this->_req->query->delete) || !empty($this->_req->post->delete))
+		{
+			return $this->_action_delete('action=pm;sa=showpmdrafts;start=' . $context['start']);
+		}
+
+		// Perhaps a draft was selected for editing? if so pass this off
+		if (!empty($this->_req->query->id_draft) && !empty($context['drafts_pm_save']))
+		{
+			checkSession('get');
+			redirectexit('action=pm;sa=send;id_draft=' . $this->_req->getQuery('id_draft', 'intval'));
+		}
+
+		// Get the count of applicable drafts
+		$msgCount = draftsCount($this->_memID, 1);
+		$maxIndex = (int) $modSettings['defaultMaxMessages'];
+
+		// Make sure the starting place makes sense and construct our friend the page index.
+		$context['page_index'] = constructPageIndex(getUrl('action', ['action' => 'pm', 'sa' => 'showpmdrafts']), $context['start'], $msgCount, $maxIndex);
+		$context['current_page'] = $context['start'] / $maxIndex;
+
+		list ($maxIndex, $reverse, $limit, $order) = $this->_query_limits($msgCount, $maxIndex);
+		$user_drafts = load_user_drafts($this->_memID, 1, false, $order, $limit);
+
+		// Start counting at the number of the first message displayed.
+		$counter = $reverse ? $context['start'] + $maxIndex + 1 : $context['start'];
+		$context['posts'] = array();
+		foreach ($user_drafts as $row)
+		{
+			$this->_prepare_body_subject($row['body'], $row['subject'], $txt['no_subject'], true);
+
+			// Have they provided who this will go to?
+			$recipients = array(
+				'to' => array(),
+				'bcc' => array(),
+			);
+			$recipient_ids = (!empty($row['to_list'])) ? Util::unserialize($row['to_list']) : array();
+
+			// Get nice names to show the user, the id's are not that great to see!
+			if (!empty($recipient_ids['to']) || !empty($recipient_ids['bcc']))
+			{
+				$recipient_ids['to'] = array_map('intval', $recipient_ids['to']);
+				$recipient_ids['bcc'] = array_map('intval', $recipient_ids['bcc']);
+				$allRecipients = array_merge($recipient_ids['to'], $recipient_ids['bcc']);
+				$recipients = draftsRecipients($allRecipients, $recipient_ids);
+			}
+
+			// Add the items to the array for template use
+			$context['drafts'][$counter += $reverse ? -1 : 1] = array(
+				'body' => $row['body'],
+				'counter' => $counter,
+				'alternate' => $counter % 2,
+				'subject' => $row['subject'],
+				'time' => standardTime($row['poster_time']),
+				'html_time' => htmlTime($row['poster_time']),
+				'timestamp' => forum_time(true, $row['poster_time']),
+				'id_draft' => $row['id_draft'],
+				'recipients' => $recipients,
+				'age' => floor((time() - $row['poster_time']) / 86400),
+				'remaining' => (!empty($modSettings['drafts_keep_days']) ? floor($modSettings['drafts_keep_days'] - ((time() - $row['poster_time']) / 86400)) : 0),
+			);
+		}
+
+		// If the drafts were retrieved in reverse order, then put them in the right order again.
+		if ($reverse)
+		{
+			$context['drafts'] = array_reverse($context['drafts'], true);
+		}
+
+		// Off to the template we go
+		$context['page_title'] = $txt['drafts'];
+		$context['sub_template'] = 'showPMDrafts';
+		$context['linktree'][] = array(
+			'url' => getUrl('action', ['action' => 'pm', 'sa' => 'showpmdrafts']),
+			'name' => $txt['drafts'],
+		);
 	}
 }

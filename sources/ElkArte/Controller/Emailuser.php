@@ -9,7 +9,7 @@
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause (see accompanying LICENSE.txt file)
  *
  * This file contains code covered by:
- * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * copyright: 2011 Simple Machines (http://www.simplemachines.org)
  *
  * @version 2.0 dev
  *
@@ -17,12 +17,17 @@
 
 namespace ElkArte\Controller;
 
+use ElkArte\AbstractController;
+use ElkArte\DataValidator;
 use ElkArte\Errors\ErrorContext;
+use ElkArte\Exceptions\Exception;
+use ElkArte\Util;
+use ElkArte\VerificationControls\VerificationControlsIntegrate;
 
 /**
  * Allows for sending topics via email
  */
-class Emailuser extends \ElkArte\AbstractController
+class Emailuser extends AbstractController
 {
 	/**
 	 * This function initializes or sets up the necessary, for the other actions
@@ -69,16 +74,22 @@ class Emailuser extends \ElkArte\AbstractController
 
 		// We need at least a topic... go away if you don't have one.
 		if (empty($topic))
-			throw new \ElkArte\Exceptions\Exception('not_a_topic', false);
+		{
+			throw new Exception('not_a_topic', false);
+		}
 
 		require_once(SUBSDIR . '/Topic.subs.php');
 		$row = getTopicInfo($topic, 'message');
 		if (empty($row))
-			throw new \ElkArte\Exceptions\Exception('not_a_topic', false);
+		{
+			throw new Exception('not_a_topic', false);
+		}
 
 		// Can't send topic if its unapproved and using post moderation.
 		if ($modSettings['postmod_active'] && !$row['approved'])
-			throw new \ElkArte\Exceptions\Exception('not_approved_topic', false);
+		{
+			throw new Exception('not_approved_topic', false);
+		}
 
 		// Censor the subject....
 		$row['subject'] = censor($row['subject']);
@@ -99,101 +110,12 @@ class Emailuser extends \ElkArte\AbstractController
 
 		$result = $this->_sendTopic($row);
 		if ($result !== true)
+		{
 			$context['sendtopic_error'] = $result;
+		}
 
 		// Back to the topic!
 		redirectexit('topic=' . $topic . '.0');
-	}
-
-	/**
-	 * Like action_sendtopic, but done via ajax from an API request
-	 * @uses Xml Template generic_xml_buttons sub template
-	 */
-	public function action_sendtopic_api()
-	{
-		global $topic, $modSettings, $txt, $context;
-
-		theme()->getTemplates()->load('Xml');
-
-		theme()->getLayers()->removeAll();
-		$context['sub_template'] = 'generic_xml_buttons';
-
-		if (empty($this->_req->post->send))
-			die();
-
-		// We need at least a topic... go away if you don't have one.
-		// Guests can't mark things.
-		if (empty($topic))
-		{
-			theme()->getTemplates()->loadLanguageFile('Errors');
-			$context['xml_data'] = array(
-				'error' => 1,
-				'text' => $txt['not_a_topic']
-			);
-			return;
-		}
-
-		// Is the session valid?
-		if (checkSession('post', '', false))
-		{
-			theme()->getTemplates()->loadLanguageFile('Errors');
-			$context['xml_data'] = array(
-				'error' => 1,
-				'url' => getUrl('action', ['action' => 'emailuser', 'sa' => 'sendtopic', 'topic' => $topic . '.0']),
-			);
-			return;
-		}
-
-		require_once(SUBSDIR . '/Topic.subs.php');
-
-		$row = getTopicInfo($topic, 'message');
-		if (empty($row))
-		{
-			theme()->getTemplates()->loadLanguageFile('Errors');
-			$context['xml_data'] = array(
-				'error' => 1,
-				'text' => $txt['not_a_topic']
-			);
-			return;
-		}
-
-		// Can't send topic if its unapproved and using post moderation.
-		if ($modSettings['postmod_active'] && !$row['approved'])
-		{
-			theme()->getTemplates()->loadLanguageFile('Errors');
-			$context['xml_data'] = array(
-				'error' => 1,
-				'text' => $txt['not_approved_topic']
-			);
-			return;
-		}
-
-		$is_spam = spamProtection('sendtopic', false);
-		if ($is_spam !== false)
-		{
-			theme()->getTemplates()->loadLanguageFile('Errors');
-			$context['xml_data'] = array(
-				'error' => 1,
-				'text' => sprintf($txt['sendtopic_WaitTime_broken'], $is_spam)
-			);
-			return;
-		}
-
-		// Censor the subject....
-		$row['subject'] = censor($row['subject']);
-
-		// Actually send it off
-		$result = $this->_sendTopic($row);
-		if ($result !== true)
-		{
-			theme()->getTemplates()->loadLanguageFile('Errors');
-			$context['xml_data'] = $result;
-			return;
-		}
-
-		$context['xml_data'] = array(
-			'text' => $txt['topic_sent'],
-		);
 	}
 
 	/**
@@ -213,7 +135,7 @@ class Emailuser extends \ElkArte\AbstractController
 		require_once(SUBSDIR . '/Mail.subs.php');
 
 		// Time to check and clean what was placed in the form
-		$validator = new \ElkArte\DataValidator();
+		$validator = new DataValidator();
 		$validator->sanitation_rules(array(
 			'y_name' => 'trim',
 			'r_name' => 'trim'
@@ -273,6 +195,106 @@ class Emailuser extends \ElkArte\AbstractController
 	}
 
 	/**
+	 * Like action_sendtopic, but done via ajax from an API request
+	 *
+	 * @uses Xml Template generic_xml_buttons sub template
+	 */
+	public function action_sendtopic_api()
+	{
+		global $topic, $modSettings, $txt, $context;
+
+		theme()->getTemplates()->load('Xml');
+
+		theme()->getLayers()->removeAll();
+		$context['sub_template'] = 'generic_xml_buttons';
+
+		if (empty($this->_req->post->send))
+		{
+			die();
+		}
+
+		// We need at least a topic... go away if you don't have one.
+		// Guests can't mark things.
+		if (empty($topic))
+		{
+			theme()->getTemplates()->loadLanguageFile('Errors');
+			$context['xml_data'] = array(
+				'error' => 1,
+				'text' => $txt['not_a_topic']
+			);
+
+			return;
+		}
+
+		// Is the session valid?
+		if (checkSession('post', '', false))
+		{
+			theme()->getTemplates()->loadLanguageFile('Errors');
+			$context['xml_data'] = array(
+				'error' => 1,
+				'url' => getUrl('action', ['action' => 'emailuser', 'sa' => 'sendtopic', 'topic' => $topic . '.0']),
+			);
+
+			return;
+		}
+
+		require_once(SUBSDIR . '/Topic.subs.php');
+
+		$row = getTopicInfo($topic, 'message');
+		if (empty($row))
+		{
+			theme()->getTemplates()->loadLanguageFile('Errors');
+			$context['xml_data'] = array(
+				'error' => 1,
+				'text' => $txt['not_a_topic']
+			);
+
+			return;
+		}
+
+		// Can't send topic if its unapproved and using post moderation.
+		if ($modSettings['postmod_active'] && !$row['approved'])
+		{
+			theme()->getTemplates()->loadLanguageFile('Errors');
+			$context['xml_data'] = array(
+				'error' => 1,
+				'text' => $txt['not_approved_topic']
+			);
+
+			return;
+		}
+
+		$is_spam = spamProtection('sendtopic', false);
+		if ($is_spam !== false)
+		{
+			theme()->getTemplates()->loadLanguageFile('Errors');
+			$context['xml_data'] = array(
+				'error' => 1,
+				'text' => sprintf($txt['sendtopic_WaitTime_broken'], $is_spam)
+			);
+
+			return;
+		}
+
+		// Censor the subject....
+		$row['subject'] = censor($row['subject']);
+
+		// Actually send it off
+		$result = $this->_sendTopic($row);
+		if ($result !== true)
+		{
+			theme()->getTemplates()->loadLanguageFile('Errors');
+			$context['xml_data'] = $result;
+
+			return;
+		}
+
+		$context['xml_data'] = array(
+			'text' => $txt['topic_sent'],
+		);
+	}
+
+	/**
 	 * Allow a user to send an email.
 	 *
 	 * - Send an email to the user - allow the sender to write the message.
@@ -287,7 +309,7 @@ class Emailuser extends \ElkArte\AbstractController
 		// Can the user even see this information?
 		if ($this->user->is_guest)
 		{
-			throw new \ElkArte\Exceptions\Exception('no_access', false);
+			throw new Exception('no_access', false);
 		}
 
 		isAllowedTo('send_email_to_members');
@@ -317,17 +339,23 @@ class Emailuser extends \ElkArte\AbstractController
 
 		// Are you sure you got the address or any data?
 		if (empty($row['email_address']) || empty($row))
-			throw new \ElkArte\Exceptions\Exception('cant_find_user_email');
+		{
+			throw new Exception('cant_find_user_email');
+		}
 
 		// Can they actually do this?
 		$context['show_email_address'] = showEmailAddress(!empty($row['hide_email']), $row['id_member']);
 		if ($context['show_email_address'] === 'no')
-			throw new \ElkArte\Exceptions\Exception('no_access', false);
+		{
+			throw new Exception('no_access', false);
+		}
 
 		// Does the user want to be contacted at all by you?
 		require_once(SUBSDIR . '/Members.subs.php');
 		if (!canContact($row['id_member']))
-			throw new \ElkArte\Exceptions\Exception('no_access', false);
+		{
+			throw new Exception('no_access', false);
+		}
 
 		// Setup the context!
 		$context['recipient'] = array(
@@ -356,7 +384,7 @@ class Emailuser extends \ElkArte\AbstractController
 			require_once(SUBSDIR . '/Mail.subs.php');
 
 			// We will need to do some data checking
-			$validator = new \ElkArte\DataValidator();
+			$validator = new DataValidator();
 			$validator->sanitation_rules(array(
 				'y_name' => 'trim',
 				'email_body' => 'trim',
@@ -387,6 +415,7 @@ class Emailuser extends \ElkArte\AbstractController
 						'type' => 'minor',
 						'title' => $txt['validation_failure'],
 					);
+
 					return;
 				}
 
@@ -408,6 +437,7 @@ class Emailuser extends \ElkArte\AbstractController
 					'type' => 'minor',
 					'title' => $txt['validation_failure'],
 				);
+
 				return;
 			}
 
@@ -425,11 +455,17 @@ class Emailuser extends \ElkArte\AbstractController
 
 			// Now work out where to go!
 			if (!empty($uid))
+			{
 				redirectexit('action=profile;u=' . $uid);
+			}
 			elseif (!empty($mid))
+			{
 				redirectexit('msg=' . $mid);
+			}
 			else
+			{
 				redirectexit();
+			}
 		}
 	}
 
@@ -463,17 +499,23 @@ class Emailuser extends \ElkArte\AbstractController
 
 		// If they're posting, it should be processed by action_reporttm2.
 		if ((isset($this->_req->post->{$context['session_var']}) || isset($this->_req->post->save)) && !$report_errors->hasErrors())
+		{
 			$this->action_reporttm2();
+		}
 
 		// We need a message ID to check!
 		if (empty($this->_req->query->msg) && empty($this->_req->post->msg))
-			throw new \ElkArte\Exceptions\Exception('no_access', false);
+		{
+			throw new Exception('no_access', false);
+		}
 
 		// Check the message's ID - don't want anyone reporting a post that does not exist
 		require_once(SUBSDIR . '/Messages.subs.php');
 		$message_id = $this->_req->getPost('msg', 'intval', isset($this->_req->query->msg) ? (int) $this->_req->query->msg : 0);
 		if (basicMessageInfo($message_id, true, true) === false)
-			throw new \ElkArte\Exceptions\Exception('no_board', false);
+		{
+			throw new Exception('no_board', false);
+		}
 
 		// Do we need to show the visual verification image?
 		$context['require_verification'] = $this->user->is_guest && !empty($modSettings['guests_report_require_captcha']);
@@ -482,7 +524,7 @@ class Emailuser extends \ElkArte\AbstractController
 			$verificationOptions = array(
 				'id' => 'report',
 			);
-			$context['require_verification'] = \ElkArte\VerificationControls\VerificationControlsIntegrate::create($verificationOptions);
+			$context['require_verification'] = VerificationControlsIntegrate::create($verificationOptions);
 			$context['visual_verification_id'] = $verificationOptions['id'];
 		}
 
@@ -544,21 +586,29 @@ class Emailuser extends \ElkArte\AbstractController
 
 		// Check their session.
 		if (checkSession('post', '', false) != '')
+		{
 			$report_errors->addError('session_timeout');
+		}
 
 		// Make sure we have a comment and it's clean.
 		if ($this->_req->getPost('comment', '\\ElkArte\\Util::htmltrim', '') === '')
+		{
 			$report_errors->addError('no_comment');
-		$poster_comment = strtr(\ElkArte\Util::htmlspecialchars($this->_req->post->comment), array("\r" => '', "\t" => ''));
+		}
+		$poster_comment = strtr(Util::htmlspecialchars($this->_req->post->comment), array("\r" => '', "\t" => ''));
 
-		if (\ElkArte\Util::strlen($poster_comment) > 254)
+		if (Util::strlen($poster_comment) > 254)
+		{
 			$report_errors->addError('post_too_long');
+		}
 
 		// Guests need to provide their address!
 		if ($this->user->is_guest)
 		{
-			if (!\ElkArte\DataValidator::is_valid($this->_req->post, array('email' => 'valid_email'), array('email' => 'trim')))
+			if (!DataValidator::is_valid($this->_req->post, array('email' => 'valid_email'), array('email' => 'trim')))
+			{
 				empty($this->_req->post->email) ? $report_errors->addError('no_email') : $report_errors->addError('bad_email');
+			}
 
 			isBannedEmail($this->_req->post->email, 'cannot_post', sprintf($txt['you_are_post_banned'], $txt['guest_title']));
 
@@ -571,12 +621,14 @@ class Emailuser extends \ElkArte\AbstractController
 			$verificationOptions = array(
 				'id' => 'report',
 			);
-			$context['require_verification'] = \ElkArte\VerificationControls\VerificationControlsIntegrate::create($verificationOptions, true);
+			$context['require_verification'] = VerificationControlsIntegrate::create($verificationOptions, true);
 
 			if (is_array($context['require_verification']))
 			{
 				foreach ($context['require_verification'] as $error)
+				{
 					$report_errors->addError($error, 0);
+				}
 			}
 		}
 
@@ -584,6 +636,7 @@ class Emailuser extends \ElkArte\AbstractController
 		if ($report_errors->hasErrors())
 		{
 			$this->action_reporttm();
+
 			return true;
 		}
 
@@ -592,7 +645,9 @@ class Emailuser extends \ElkArte\AbstractController
 		$message = posterDetails($msg_id, $topic);
 
 		if (empty($message))
-			throw new \ElkArte\Exceptions\Exception('no_board', false);
+		{
+			throw new Exception('no_board', false);
+		}
 
 		$poster_name = un_htmlspecialchars($message['real_name']) . ($message['real_name'] !== $message['poster_name'] ? ' (' . $message['poster_name'] . ')' : '');
 		$reporterName = un_htmlspecialchars($this->user->name) . ($this->user->name !== $this->user->username && $this->user->username != '' ? ' (' . $this->user->username . ')' : '');
@@ -606,12 +661,16 @@ class Emailuser extends \ElkArte\AbstractController
 		foreach ($result as $row)
 		{
 			if ($row['notify_types'] != 4)
+			{
 				$mod_to_notify[] = $row;
+			}
 		}
 
 		// Check that moderators do exist!
 		if (empty($mod_to_notify))
-			throw new \ElkArte\Exceptions\Exception('no_mods', false);
+		{
+			throw new Exception('no_mods', false);
+		}
 
 		// If we get here, I believe we should make a record of this, for historical significance, yabber.
 		if (empty($modSettings['disable_log_report']))
@@ -622,7 +681,9 @@ class Emailuser extends \ElkArte\AbstractController
 
 			// If we're just going to ignore these, then who gives a monkeys...
 			if ($id_report === false)
+			{
 				redirectexit('topic=' . $topic . '.msg' . $msg_id . '#msg' . $msg_id);
+			}
 		}
 
 		// Find out who the real moderators are - for mod preferences.
@@ -635,9 +696,11 @@ class Emailuser extends \ElkArte\AbstractController
 			// Maybe they don't want to know?!
 			if (!empty($row['mod_prefs']))
 			{
-				list (,, $pref_binary) = explode('|', $row['mod_prefs']);
+				list (, , $pref_binary) = explode('|', $row['mod_prefs']);
 				if (!($pref_binary & 1) && (!($pref_binary & 2) || !in_array($row['id_member'], $real_mods)))
+				{
 					continue;
+				}
 			}
 
 			$replacements = array(

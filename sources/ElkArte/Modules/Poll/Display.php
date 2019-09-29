@@ -8,7 +8,7 @@
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause (see accompanying LICENSE.txt file)
  *
  * This file contains code covered by:
- * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * copyright: 2011 Simple Machines (http://www.simplemachines.org)
  *
  * @version 2.0 dev
  *
@@ -16,19 +16,24 @@
 
 namespace ElkArte\Modules\Poll;
 
+use ElkArte\EventManager;
+use ElkArte\Modules\AbstractModule;
+
 /**
  * Class Poll_Display_Module
  */
-class Display extends \ElkArte\Modules\AbstractModule
+class Display extends AbstractModule
 {
 	/**
 	 * If polls are enabled
+	 *
 	 * @var bool
 	 */
 	protected static $_enabled = false;
 
 	/**
 	 * Poll id to work with
+	 *
 	 * @var int
 	 */
 	protected $_id_poll = 0;
@@ -36,7 +41,7 @@ class Display extends \ElkArte\Modules\AbstractModule
 	/**
 	 * {@inheritdoc }
 	 */
-	public static function hooks(\ElkArte\EventManager $eventsManager)
+	public static function hooks(EventManager $eventsManager)
 	{
 		global $modSettings;
 
@@ -68,7 +73,9 @@ class Display extends \ElkArte\Modules\AbstractModule
 			'can_remove_poll' => 'poll_remove',
 		);
 		foreach ($anyown_permissions as $contextual => $perm)
+		{
 			$context[$contextual] = allowedTo($perm . '_any') || ($context['user']['started'] && allowedTo($perm . '_own'));
+		}
 
 		$context['can_add_poll'] &= self::$_enabled && $topicinfo['id_poll'] <= 0;
 		$context['can_remove_poll'] &= self::$_enabled && $topicinfo['id_poll'] > 0;

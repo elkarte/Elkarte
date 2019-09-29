@@ -63,14 +63,6 @@ class Imagick extends AbstractManipulator
 		return class_exists('\Imagick', false);
 	}
 
-	public function __destruct()
-	{
-		if ($this->_image)
-		{
-			$this->_image->clear();
-		}
-	}
-
 	/**
 	 * Loads a image file into the image engine for processing
 	 *
@@ -115,6 +107,7 @@ class Imagick extends AbstractManipulator
 	 * Loads an image from a web address into the image engine for processing
 	 *
 	 * @return bool|mixed
+	 * @throws \ImagickException
 	 */
 	public function createImageFromWeb()
 	{
@@ -366,6 +359,7 @@ class Imagick extends AbstractManipulator
 	 * @param string $format Type of the image (valid types are png, jpeg, gif)
 	 *
 	 * @return boolean|string The image or false on error
+	 * @throws \ImagickException
 	 */
 	public function generateTextImage($text, $width = 100, $height = 75, $format = 'png')
 	{
@@ -405,6 +399,14 @@ class Imagick extends AbstractManipulator
 		catch (\Exception $e)
 		{
 			return false;
+		}
+	}
+
+	public function __destruct()
+	{
+		if ($this->_image)
+		{
+			$this->_image->clear();
 		}
 	}
 }

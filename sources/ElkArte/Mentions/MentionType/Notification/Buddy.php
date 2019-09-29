@@ -13,8 +13,6 @@
 
 namespace ElkArte\Mentions\MentionType\Notification;
 
-use ElkArte\Mentions\MentionType\Notification\AbstractMentionMessage;
-
 /**
  * Class BuddyMention
  *

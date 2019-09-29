@@ -30,54 +30,63 @@ class HttpReq
 {
 	/**
 	 * The returned POST values
+	 *
 	 * @var object
 	 */
 	public $post;
 
 	/**
 	 * The compiled post values (json and cleaned from request)
+	 *
 	 * @var array
 	 */
 	private $_derived_post;
 
 	/**
 	 * The returned GET values
+	 *
 	 * @var object
 	 */
 	public $query;
 
 	/**
 	 * The returned COOKIE values
+	 *
 	 * @var object
 	 */
 	public $cookie;
 
 	/**
 	 * The returned SESSION values
+	 *
 	 * @var object
 	 */
 	public $session;
 
 	/**
 	 * The returned SERVER values
+	 *
 	 * @var object
 	 */
 	public $server;
 
 	/**
 	 * Sole private \ElkArte\HttpReq instance
+	 *
 	 * @var \ElkArte\HttpReq
 	 */
 	private static $_req = null;
 
 	/**
 	 * Used to hold processed (sanitised) values
+	 *
 	 * @var array
 	 */
 	private $_param;
 
 	/**
 	 * holds instance of the validator
+	 *
 	 * @var \ElkArte\DataValidator
 	 */
 	protected $_dataValidator;
@@ -329,11 +338,17 @@ class HttpReq
 	public function getCookie($name = '', $default = null)
 	{
 		if (isset($this->cookie->{$name}))
+		{
 			return $this->cookie->{$name};
+		}
 		elseif ($default !== null)
+		{
 			return $default;
+		}
 		else
+		{
 			return null;
+		}
 	}
 
 	/**
@@ -349,11 +364,17 @@ class HttpReq
 	public function getSession($name = '', $default = null)
 	{
 		if (isset($this->session->{$name}))
+		{
 			return $this->session->{$name};
+		}
 		elseif ($default !== null)
+		{
 			return $default;
+		}
 		else
+		{
 			return null;
+		}
 	}
 
 	/**
@@ -368,7 +389,9 @@ class HttpReq
 	{
 		// No rules, then return the current value
 		if ($sanitize === null)
+		{
 			return $this->_param[$name];
+		}
 
 		// To the validator
 		$this->_dataValidator->validation_rules(array());
@@ -393,7 +416,9 @@ class HttpReq
 	public static function instance()
 	{
 		if (self::$_req === null)
+		{
 			self::$_req = new HttpReq();
+		}
 
 		return self::$_req;
 	}

@@ -13,6 +13,8 @@
 
 namespace ElkArte\Modules\Mentions;
 
+use ElkArte\EventManager;
+
 /**
  * Class \ElkArte\Modules\Mentions\Display
  *
@@ -23,7 +25,7 @@ class Display extends AbstractMentions
 	/**
 	 * {@inheritdoc }
 	 */
-	public static function hooks(\ElkArte\EventManager $eventsManager)
+	public static function hooks(EventManager $eventsManager)
 	{
 		self::registerHooks('display', $eventsManager);
 

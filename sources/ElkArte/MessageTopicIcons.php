@@ -23,30 +23,35 @@ class MessageTopicIcons extends ValuesContainer
 
 	/**
 	 * Whether to check if the icon exists in the expected location
+	 *
 	 * @var bool
 	 */
 	protected $_check = false;
 
 	/**
 	 * Theme directory path
+	 *
 	 * @var string
 	 */
 	protected $_theme_dir = '';
 
 	/**
 	 * Default icon code
+	 *
 	 * @var string
 	 */
 	protected $_default_icon = 'xx';
 
 	/**
 	 * Icons that are default with ElkArte
+	 *
 	 * @var array
 	 */
 	protected $_stable_icons = array();
 
 	/**
 	 * Icons to load in addition to the default
+	 *
 	 * @var array
 	 */
 	protected $_custom_icons = array();
@@ -79,24 +84,6 @@ class MessageTopicIcons extends ValuesContainer
 		$this->_stable_icons = array_merge($this->_stable_icons, $custom_icons);
 
 		$this->_loadIcons();
-	}
-
-	/**
-	 * Return the icon specified by idx, or the default icon for invalid names
-	 *
-	 * @param int|string $idx
-	 *
-	 * @return string
-	 */
-	public function __get($idx)
-	{
-		// Not a standard topic icon
-		if (!isset($this->data[$idx]))
-		{
-			$this->_setUrl($idx);
-		}
-
-		return $this->data[$idx];
 	}
 
 	/**
@@ -153,12 +140,30 @@ class MessageTopicIcons extends ValuesContainer
 		if ($this->_check)
 		{
 			$this->data[$icon] = $settings[file_exists($this->_theme_dir . '/images/post/' . $icon . '.png')
-				 ? self::IMAGE_URL
-				 : self::DEFAULT_URL] . '/post/' . $icon . '.png';
+					? self::IMAGE_URL
+					: self::DEFAULT_URL] . '/post/' . $icon . '.png';
 		}
 		else
 		{
 			$this->data[$icon] = $settings[self::IMAGE_URL] . '/post/' . $icon . '.png';
 		}
+	}
+
+	/**
+	 * Return the icon specified by idx, or the default icon for invalid names
+	 *
+	 * @param int|string $idx
+	 *
+	 * @return string
+	 */
+	public function __get($idx)
+	{
+		// Not a standard topic icon
+		if (!isset($this->data[$idx]))
+		{
+			$this->_setUrl($idx);
+		}
+
+		return $this->data[$idx];
 	}
 }

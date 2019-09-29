@@ -8,7 +8,7 @@
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause (see accompanying LICENSE.txt file)
  *
  * This file contains code covered by:
- * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * copyright: 2011 Simple Machines (http://www.simplemachines.org)
  *
  * @version 2.0 dev
  *
@@ -16,13 +16,17 @@
 
 namespace ElkArte\AdminController;
 
+use ElkArte\AbstractController;
+use ElkArte\Action;
+use ElkArte\Exceptions\Exception;
+
 /**
  * ManageScheduledTasks admin Controller: handles the scheduled task pages
  * which allow to see and edit and run the systems scheduled tasks
  *
  * @package ScheduledTasks
  */
-class ManageScheduledTasks extends \ElkArte\AbstractController
+class ManageScheduledTasks extends AbstractController
 {
 	/**
 	 * Scheduled tasks management dispatcher.
@@ -35,7 +39,7 @@ class ManageScheduledTasks extends \ElkArte\AbstractController
 	 * @uses ManageScheduledTasks template file
 	 * @uses ManageScheduledTasks language file
 	 *
-	 * @see \ElkArte\AbstractController::action_index()
+	 * @see  \ElkArte\AbstractController::action_index()
 	 */
 	public function action_index()
 	{
@@ -51,7 +55,7 @@ class ManageScheduledTasks extends \ElkArte\AbstractController
 		);
 
 		// Control those actions
-		$action = new \ElkArte\Action('manage_scheduled_tasks');
+		$action = new Action('manage_scheduled_tasks');
 
 		// Now for the lovely tabs. That we all love.
 		$context[$context['admin_menu_name']]['tab_data'] = array(
@@ -108,7 +112,9 @@ class ManageScheduledTasks extends \ElkArte\AbstractController
 			foreach ($this->_req->post->enable_task as $id => $enabled)
 			{
 				if ($enabled)
+				{
 					$enablers[] = (int) $id;
+				}
 			}
 
 			// Do the update!
@@ -124,7 +130,9 @@ class ManageScheduledTasks extends \ElkArte\AbstractController
 			// Lets figure out which ones they want to run.
 			$tasks = array();
 			foreach ($this->_req->post->run_task as $task => $dummy)
+			{
 				$tasks[] = (int) $task;
+			}
 
 			// Load up the tasks.
 			$nextTasks = loadTasks($tasks);
@@ -133,11 +141,15 @@ class ManageScheduledTasks extends \ElkArte\AbstractController
 			ignore_user_abort(true);
 
 			foreach ($nextTasks as $task_id => $taskname)
+			{
 				run_this_task($task_id, $taskname);
+			}
 
 			// Things go as expected?  If not save the error in session
 			if (!empty($context['scheduled_errors']))
+			{
 				$_SESSION['st_error'] = $context['scheduled_errors'];
+			}
 
 			redirectexit('action=admin;area=scheduledtasks;done');
 		}
@@ -254,6 +266,15 @@ class ManageScheduledTasks extends \ElkArte\AbstractController
 	}
 
 	/**
+	 * Callback function for createList() in action_tasks().
+	 *
+	 */
+	public function list_getScheduledTasks()
+	{
+		return scheduledTasks();
+	}
+
+	/**
 	 * Function for editing a task.
 	 *
 	 * @uses ManageScheduledTasks template, edit_scheduled_tasks sub-template
@@ -273,7 +294,9 @@ class ManageScheduledTasks extends \ElkArte\AbstractController
 
 		// Cleaning...
 		if (!isset($this->_req->query->tid))
-			throw new \ElkArte\Exceptions\Exception('no_access', false);
+		{
+			throw new Exception('no_access', false);
+		}
 		$this->_req->query->tid = (int) $this->_req->query->tid;
 
 		// Saving?
@@ -287,9 +310,13 @@ class ManageScheduledTasks extends \ElkArte\AbstractController
 
 			// If a half is empty then assume zero offset!
 			if (!isset($matches[2]) || $matches[2] > 59)
+			{
 				$matches[2] = 0;
+			}
 			if (!isset($matches[1]) || $matches[1] > 23)
+			{
 				$matches[1] = 0;
+			}
 
 			// Now the offset is easy; easy peasy - except we need to offset by a few hours...
 			$offset = $matches[1] * 3600 + $matches[2] * 60 - date('Z');
@@ -300,7 +327,9 @@ class ManageScheduledTasks extends \ElkArte\AbstractController
 
 			// Don't allow one minute intervals.
 			if ($interval == 1 && $unit === 'm')
+			{
 				$interval = 2;
+			}
 
 			// Is it disabled?
 			$disabled = !isset($this->_req->post->enabled) ? 1 : 0;
@@ -444,15 +473,6 @@ class ManageScheduledTasks extends \ElkArte\AbstractController
 		// Make it all look tify.
 		$context[$context['admin_menu_name']]['current_subsection'] = 'tasklog';
 		$context['page_title'] = $txt['scheduled_log'];
-	}
-
-	/**
-	 * Callback function for createList() in action_tasks().
-	 *
-	 */
-	public function list_getScheduledTasks()
-	{
-		return scheduledTasks();
 	}
 
 	/**

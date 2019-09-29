@@ -8,7 +8,7 @@
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause (see accompanying LICENSE.txt file)
  *
  * This file contains code covered by:
- * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * copyright: 2011 Simple Machines (http://www.simplemachines.org)
  *
  * @version 2.0 dev
  *
@@ -16,55 +16,67 @@
 
 namespace ElkArte\Controller;
 
+use ElkArte\AbstractController;
+use ElkArte\Exceptions\Exception;
+use ElkArte\FrontpageInterface;
+
 /**
  * Retrieve information about recent posts
  */
-class Recent extends \ElkArte\AbstractController implements \ElkArte\FrontpageInterface
+class Recent extends AbstractController implements FrontpageInterface
 {
 	/**
 	 * The object that will retrieve the data
+	 *
 	 * @var \ElkArte\Recent
 	 */
 	private $_grabber;
 
 	/**
 	 * Sets range to query
+	 *
 	 * @var int[]
 	 */
 	private $_maxMsgID;
 
 	/**
 	 * The url for the recent action
+	 *
 	 * @var string
 	 */
 	private $_base_url;
 
 	/**
 	 * The number of posts found
+	 *
 	 * @var int
 	 */
 	private $_total_posts;
 
 	/**
 	 * The starting place for pagination
+	 *
 	 * @var
 	 */
 	private $_start;
 
 	/**
 	 * The permissions own/any for use in the query
+	 *
 	 * @var array
 	 */
 	private $_permissions = array();
 
 	/**
 	 * Pass to pageindex, to use "url.page" instead of "url;start=page"
+	 *
 	 * @var bool
 	 */
 	private $_flex_start = false;
 
 	/**
 	 * Number of posts per page
+	 *
 	 * @var int
 	 */
 	private $_num_per_page = 10;
@@ -150,24 +162,6 @@ class Recent extends \ElkArte\AbstractController implements \ElkArte\FrontpageIn
 	}
 
 	/**
-	 * Intended entry point for recent controller class.
-	 *
-	 * @see Action_Controller::action_index()
-	 */
-	public function action_recent_front()
-	{
-		global $modSettings;
-
-		if (isset($modSettings['recent_frontpage']))
-		{
-			$this->_num_per_page = $modSettings['recent_frontpage'];
-		}
-
-		// Figure out what action to do, thinking, thinking ...
-		$this->action_recent();
-	}
-
-	/**
 	 * Find the ten most recent posts.
 	 *
 	 * Accessed by action=recent.
@@ -184,19 +178,29 @@ class Recent extends \ElkArte\AbstractController implements \ElkArte\FrontpageIn
 
 		// Recent posts by category id's
 		if (!empty($this->_req->query->c) && empty($board))
+		{
 			$categories = $this->_recentPostsCategory();
+		}
 		// Or recent posts by board id's?
 		elseif (!empty($this->_req->query->boards))
+		{
 			$this->_recentPostsBoards();
+		}
 		// Or just the recent posts for a specific board
 		elseif (!empty($board))
+		{
 			$this->_recentPostsBoard();
+		}
 		// All the recent posts across boards and categories it is then
 		else
+		{
 			$this->_recentPostsAll();
+		}
 
 		if (!empty($this->_maxMsgID))
+		{
 			$this->_grabber->setEarliestMsg(max(0, $modSettings['maxMsgID'] - $this->_maxMsgID[0] - $this->_start * $this->_maxMsgID[1]));
+		}
 
 		// Set up the pageindex
 		$context['page_index'] = constructPageIndex($this->_base_url, $this->_start, min(100, $this->_total_posts), $this->_num_per_page, !empty($this->_flex_start));
@@ -251,73 +255,6 @@ class Recent extends \ElkArte\AbstractController implements \ElkArte\FrontpageIn
 	}
 
 	/**
-	 * Create the buttons that are available for this post
-	 *
-	 * @param $post
-	 * @return array
-	 */
-	private function _addButtons($post)
-	{
-		global $context, $txt, $scripturl;
-
-		$txt_like_post = '<li></li>';
-
-		// Can they like/unlike this post?
-		if ($post['can_like'] || $post['can_unlike'])
-		{
-			$txt_like_post = '
-				<li class="listlevel1' . (!empty($post['like_counter']) ? ' liked"' : '"') . '>
-					<a class="linklevel1 ' . ($post['can_unlike'] ? 'unlike_button' : 'like_button') . '" href="javascript:void(0)" title="' . (!empty($post['like_counter']) ? $txt['liked_by'] . ' ' . implode(', ', $context['likes'][$post['id']]['member']) : '') . '" onclick="likePosts.prototype.likeUnlikePosts(event,' . $post['id'] . ', ' . $post['topic'] . '); return false;">' .
-						(!empty($post['like_counter']) ? '<span class="likes_indicator">' . $post['like_counter'] . '</span>&nbsp;' . $txt['likes'] : $txt['like_post']) . '
-					</a>
-				</li>';
-		}
-		// Or just view the count
-		elseif (!empty($post['like_counter']))
-		{
-			$txt_like_post = '
-				<li class="listlevel1 liked">
-					<a href="javascript:void(0)" title="' . $txt['liked_by'] . ' ' . implode(', ', $context['likes'][$post['id']]['member']) . '" class="linklevel1 likes_button">
-						<span class="likes_indicator">' . $post['like_counter'] . '</span>&nbsp;' . $txt['likes'] . '
-					</a>
-				</li>';
-		}
-
-		return  array(
-			// How about... even... remove it entirely?!
-			'remove' => array(
-				'href' => $scripturl . '?action=deletemsg;msg=' . $post['id'] . ';topic=' . $post['topic'] . ';recent;' . $context['session_var'] . '=' . $context['session_id'],
-				'text' => $txt['remove'],
-				'test' => 'can_delete',
-				'custom' => 'onclick="return confirm(' . JavaScriptEscape($txt['remove_message'] . '?') . ');"',
-			),
-			// Can we request notification of topics?
-			'notify' => array(
-				'href' => $scripturl . '?action=notify;topic=' . $post['topic'] . '.' . $post['start'],
-				'text' => $txt['notify'],
-				'test' => 'can_mark_notify',
-			),
-			// If they *can* reply?
-			'reply' => array(
-				'href' => $scripturl . '?action=post;topic=' . $post['topic'] . '.' . $post['start'],
-				'text' => $txt['reply'],
-				'test' => 'can_reply',
-			),
-			// If they *can* quote?
-			'quote' => array(
-				'href' => $scripturl . '?action=post;topic=' . $post['topic'] . '.' . $post['start'] . ';quote=' . $post['id'],
-				'text' => $txt['quote'],
-				'test' => 'can_quote',
-			),
-			// If they *can* like?
-			'like' => array(
-				'override' => $txt_like_post,
-				'test' => 'can_like',
-			),
-		);
-	}
-
-	/**
 	 * Set up for getting recent posts on a category basis
 	 */
 	private function _recentPostsCategory()
@@ -332,7 +269,9 @@ class Recent extends \ElkArte\AbstractController implements \ElkArte\FrontpageIn
 			$name = categoryName($categories[0]);
 
 			if (empty($name))
-				throw new \ElkArte\Exceptions\Exception('no_access', false);
+			{
+				throw new Exception('no_access', false);
+			}
 
 			$context['linktree'][] = array(
 				'url' => getUrl('action', $modSettings['default_forum_action']) . '#c' . $categories[0],
@@ -346,14 +285,18 @@ class Recent extends \ElkArte\AbstractController implements \ElkArte\FrontpageIn
 		$boards = array_keys($boards_posts);
 
 		if (empty($boards))
-			throw new \ElkArte\Exceptions\Exception('error_no_boards_selected');
+		{
+			throw new Exception('error_no_boards_selected');
+		}
 
 		// The query for getting the messages
 		$this->_grabber->setBoards($boards);
 
 		// If this category has a significant number of posts in it...
 		if ($this->_total_posts > 100 && $this->_total_posts > $modSettings['totalMessages'] / 15)
+		{
 			$this->_maxMsgID = array(400, 7);
+		}
 
 		$this->_base_url = $scripturl . '?action=recent;c=' . implode(',', $categories);
 
@@ -377,7 +320,7 @@ class Recent extends \ElkArte\AbstractController implements \ElkArte\FrontpageIn
 		// No boards, your request ends here
 		if (empty($boards))
 		{
-			throw new \ElkArte\Exceptions\Exception('error_no_boards_selected');
+			throw new Exception('error_no_boards_selected');
 		}
 
 		// Build the query for finding the messages
@@ -406,7 +349,9 @@ class Recent extends \ElkArte\AbstractController implements \ElkArte\FrontpageIn
 
 		// If this board has a significant number of posts in it...
 		if ($this->_total_posts > 80 && $this->_total_posts > $modSettings['totalMessages'] / $this->_num_per_page)
+		{
 			$this->_maxMsgID = array(600, 10);
+		}
 
 		$this->_base_url = $scripturl . '?action=recent;board=' . $board . '.%1$d';
 		$this->_flex_start = true;
@@ -488,5 +433,90 @@ class Recent extends \ElkArte\AbstractController implements \ElkArte\FrontpageIn
 					}
 				});
 			});', true);
+	}
+
+	/**
+	 * Create the buttons that are available for this post
+	 *
+	 * @param $post
+	 * @return array
+	 */
+	private function _addButtons($post)
+	{
+		global $context, $txt, $scripturl;
+
+		$txt_like_post = '<li></li>';
+
+		// Can they like/unlike this post?
+		if ($post['can_like'] || $post['can_unlike'])
+		{
+			$txt_like_post = '
+				<li class="listlevel1' . (!empty($post['like_counter']) ? ' liked"' : '"') . '>
+					<a class="linklevel1 ' . ($post['can_unlike'] ? 'unlike_button' : 'like_button') . '" href="javascript:void(0)" title="' . (!empty($post['like_counter']) ? $txt['liked_by'] . ' ' . implode(', ', $context['likes'][$post['id']]['member']) : '') . '" onclick="likePosts.prototype.likeUnlikePosts(event,' . $post['id'] . ', ' . $post['topic'] . '); return false;">' .
+				(!empty($post['like_counter']) ? '<span class="likes_indicator">' . $post['like_counter'] . '</span>&nbsp;' . $txt['likes'] : $txt['like_post']) . '
+					</a>
+				</li>';
+		}
+		// Or just view the count
+		elseif (!empty($post['like_counter']))
+		{
+			$txt_like_post = '
+				<li class="listlevel1 liked">
+					<a href="javascript:void(0)" title="' . $txt['liked_by'] . ' ' . implode(', ', $context['likes'][$post['id']]['member']) . '" class="linklevel1 likes_button">
+						<span class="likes_indicator">' . $post['like_counter'] . '</span>&nbsp;' . $txt['likes'] . '
+					</a>
+				</li>';
+		}
+
+		return array(
+			// How about... even... remove it entirely?!
+			'remove' => array(
+				'href' => $scripturl . '?action=deletemsg;msg=' . $post['id'] . ';topic=' . $post['topic'] . ';recent;' . $context['session_var'] . '=' . $context['session_id'],
+				'text' => $txt['remove'],
+				'test' => 'can_delete',
+				'custom' => 'onclick="return confirm(' . JavaScriptEscape($txt['remove_message'] . '?') . ');"',
+			),
+			// Can we request notification of topics?
+			'notify' => array(
+				'href' => $scripturl . '?action=notify;topic=' . $post['topic'] . '.' . $post['start'],
+				'text' => $txt['notify'],
+				'test' => 'can_mark_notify',
+			),
+			// If they *can* reply?
+			'reply' => array(
+				'href' => $scripturl . '?action=post;topic=' . $post['topic'] . '.' . $post['start'],
+				'text' => $txt['reply'],
+				'test' => 'can_reply',
+			),
+			// If they *can* quote?
+			'quote' => array(
+				'href' => $scripturl . '?action=post;topic=' . $post['topic'] . '.' . $post['start'] . ';quote=' . $post['id'],
+				'text' => $txt['quote'],
+				'test' => 'can_quote',
+			),
+			// If they *can* like?
+			'like' => array(
+				'override' => $txt_like_post,
+				'test' => 'can_like',
+			),
+		);
+	}
+
+	/**
+	 * Intended entry point for recent controller class.
+	 *
+	 * @see Action_Controller::action_index()
+	 */
+	public function action_recent_front()
+	{
+		global $modSettings;
+
+		if (isset($modSettings['recent_frontpage']))
+		{
+			$this->_num_per_page = $modSettings['recent_frontpage'];
+		}
+
+		// Figure out what action to do, thinking, thinking ...
+		$this->action_recent();
 	}
 }

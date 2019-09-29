@@ -8,7 +8,7 @@
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause (see accompanying LICENSE.txt file)
  *
  * This file contains code covered by:
- * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * copyright: 2011 Simple Machines (http://www.simplemachines.org)
  *
  * @version 2.0 dev
  *
@@ -46,18 +46,21 @@ class GenericList
 	 * 'get_count'
 	 *   'file'
 	 *   'function'
+	 *
 	 * @var array
 	 */
 	protected $listOptions = array();
 
 	/**
 	 * Instance of \ElkArte\HttpReq
+	 *
 	 * @var \ElkArte\HttpReq
 	 */
 	protected $req;
 
 	/**
 	 * Will hold the created $context
+	 *
 	 * @var array
 	 */
 	protected $context = array();
@@ -124,30 +127,6 @@ class GenericList
 	}
 
 	/**
-	 * Prepare the template by loading context
-	 * variables for each setting.
-	 */
-	protected function prepareContext()
-	{
-		global $context;
-
-		$context[$this->listOptions['id']] = $this->context;
-
-		// Let's set some default that could be useful to avoid repetitions
-		if (!isset($context['sub_template']))
-		{
-			if (function_exists('template_' . $this->listOptions['id']))
-				$context['sub_template'] = $this->listOptions['id'];
-			else
-			{
-				$context['sub_template'] = 'show_list';
-				if (!isset($context['default_list']))
-					$context['default_list'] = $this->listOptions['id'];
-			}
-		}
-	}
-
-	/**
 	 * Make the list.
 	 * The list will be populated in $context.
 	 */
@@ -184,7 +163,7 @@ class GenericList
 
 			if (isset($this->listOptions['columns'][$sortReq], $this->listOptions['columns'][$sortReq]['sort']))
 			{
-					$this->context['sort'] = array(
+				$this->context['sort'] = array(
 					'id' => $sortReq,
 					'desc' => isset($_REQUEST[$this->descVar]) && isset($this->listOptions['columns'][$sortReq]['sort']['reverse']),
 				);
@@ -220,7 +199,9 @@ class GenericList
 		{
 			// First get an impression of how many items to expect.
 			if (isset($this->listOptions['get_count']['file']))
+			{
 				require_once($this->listOptions['get_count']['file']);
+			}
 
 			$this->context['total_num_items'] = call_user_func_array($this->listOptions['get_count']['function'], empty($this->listOptions['get_count']['params']) ? array() : $this->listOptions['get_count']['params']);
 
@@ -230,7 +211,9 @@ class GenericList
 
 			// Then create a page index.
 			if ($this->context['total_num_items'] > $this->context['items_per_page'])
+			{
 				$this->context['page_index'] = constructPageIndex($this->listOptions['base_href'] . (empty($this->context['sort']) ? '' : ';' . $this->sortVar . '=' . $this->context['sort']['id'] . ($this->context['sort']['desc'] ? ';' . $this->descVar : '')) . ($this->context['start_var_name'] != 'start' ? ';' . $this->context['start_var_name'] . '=%1$d' : ''), $this->context['start'], $this->context['total_num_items'], $this->context['items_per_page'], $this->context['start_var_name'] != 'start');
+			}
 		}
 	}
 
@@ -273,7 +256,9 @@ class GenericList
 
 		// Get the file with the function for the item list.
 		if (isset($this->listOptions['get_items']['file']))
+		{
 			require_once($this->listOptions['get_items']['file']);
+		}
 
 		// Call the function and include which items we want and in what order.
 		$this->listItems = call_user_func_array($this->listOptions['get_items']['function'], array_merge(array($this->context['start'], $this->context['items_per_page'], $this->sort), empty($this->listOptions['get_items']['params']) ? array() : $this->listOptions['get_items']['params']));
@@ -304,46 +289,68 @@ class GenericList
 
 				// A value straight from the database?
 				if (isset($column['data']['db']))
+				{
 					$cur_data['value'] = $list_item[$column['data']['db']];
+				}
 				// Take the value from the database and make it HTML safe.
 				elseif (isset($column['data']['db_htmlsafe']))
+				{
 					$cur_data['value'] = htmlspecialchars($list_item[$column['data']['db_htmlsafe']], ENT_COMPAT, 'UTF-8');
+				}
 				// Using sprintf is probably the most readable way of injecting data.
 				elseif (isset($column['data']['sprintf']))
 				{
 					$params = array();
 					foreach ($column['data']['sprintf']['params'] as $sprintf_param => $htmlsafe)
+					{
 						$params[] = $htmlsafe ? htmlspecialchars($list_item[$sprintf_param], ENT_COMPAT, 'UTF-8') : $list_item[$sprintf_param];
+					}
 					$cur_data['value'] = vsprintf($column['data']['sprintf']['format'], $params);
 				}
 				// The most flexible way probably is applying a custom function.
 				elseif (isset($column['data']['function']))
+				{
 					$cur_data['value'] = $column['data']['function']($list_item);
+				}
 				// A literal value.
 				elseif (isset($column['data']['value']))
+				{
 					$cur_data['value'] = $column['data']['value'];
+				}
 				// Empty value.
 				else
+				{
 					$cur_data['value'] = '';
+				}
 
 				// Allow for basic formatting.
 				if (!empty($column['data']['comma_format']))
+				{
 					$cur_data['value'] = comma_format($cur_data['value']);
+				}
 				elseif (!empty($column['data']['timeformat']))
 				{
 					// Maybe we need a relative time?
 					if ($column['data']['timeformat'] == 'html_time')
+					{
 						$cur_data['value'] = htmlTime($cur_data['value']);
+					}
 					else
+					{
 						$cur_data['value'] = standardTime($cur_data['value']);
+					}
 				}
 				// Set a style class for this column?
 				if (isset($column['data']['class']))
+				{
 					$cur_data['class'] = $column['data']['class'];
+				}
 
 				// Fully customized styling for the cells in this column only.
 				if (isset($column['data']['style']))
+				{
 					$cur_data['style'] = $column['data']['style'];
+				}
 
 				// Add the data cell properties to the current row.
 				$cur_row[$column_id] = $cur_data;
@@ -355,10 +362,14 @@ class GenericList
 			if (isset($this->listOptions['data_check']))
 			{
 				if (isset($this->listOptions['data_check']['class']))
+				{
 					$this->context['rows'][$item_id]['class'] = ' ' . $this->listOptions['data_check']['class']($list_item);
+				}
 
 				if (isset($this->listOptions['data_check']['style']))
+				{
 					$this->context['rows'][$item_id]['style'] = ' style="' . $this->listOptions['data_check']['style']($list_item) . '"';
+				}
 			}
 
 			// Insert the row into the list.
@@ -378,7 +389,9 @@ class GenericList
 
 			// And the icon is optional for the title
 			if (isset($this->listOptions['icon']))
+			{
 				$this->context['icon'] = $this->listOptions['icon'];
+			}
 		}
 	}
 
@@ -397,18 +410,24 @@ class GenericList
 			$this->context['form'] = $this->listOptions['form'];
 
 			if (!isset($this->context['form']['hidden_fields']))
+			{
 				$this->context['form']['hidden_fields'] = array();
+			}
 
 			// Always add a session check field.
 			$this->context['form']['hidden_fields'][$context['session_var']] = $context['session_id'];
 
 			// Will this do a token check?
 			if (isset($this->listOptions['form']['token']))
+			{
 				$this->context['form']['hidden_fields'][$context[$this->listOptions['form']['token'] . '_token_var']] = $context[$this->listOptions['form']['token'] . '_token'];
+			}
 
 			// Include the starting page as hidden field?
 			if (!empty($this->context['form']['include_start']) && !empty($this->context['start']))
+			{
 				$this->context['form']['hidden_fields'][$this->context['start_var_name']] = $this->context['start'];
+			}
 
 			// If sorting needs to be the same after submitting, add the parameter.
 			if (!empty($this->context['form']['include_sort']) && !empty($this->context['sort']))
@@ -416,7 +435,9 @@ class GenericList
 				$this->context['form']['hidden_fields']['sort'] = $this->context['sort']['id'];
 
 				if ($this->context['sort']['desc'])
+				{
 					$this->context['form']['hidden_fields']['desc'] = 1;
+				}
 			}
 		}
 	}
@@ -447,10 +468,14 @@ class GenericList
 			foreach ($this->listOptions['additional_rows'] as $row)
 			{
 				if (empty($row))
+				{
 					continue;
+				}
 
 				if (!isset($this->context['additional_rows'][$row['position']]))
+				{
 					$this->context['additional_rows'][$row['position']] = array();
+				}
 
 				$this->context['additional_rows'][$row['position']][] = $row;
 			}
@@ -463,7 +488,9 @@ class GenericList
 	protected function prepareJavascript()
 	{
 		if (isset($this->listOptions['javascript']))
+		{
 			theme()->addInlineJavascript($this->listOptions['javascript'], true);
+		}
 	}
 
 	/**
@@ -474,9 +501,39 @@ class GenericList
 		if (isset($this->listOptions['list_menu']))
 		{
 			if (!isset($this->listOptions['list_menu']['position']))
+			{
 				$this->listOptions['list_menu']['position'] = 'left';
+			}
 
 			$this->context['list_menu'] = $this->listOptions['list_menu'];
+		}
+	}
+
+	/**
+	 * Prepare the template by loading context
+	 * variables for each setting.
+	 */
+	protected function prepareContext()
+	{
+		global $context;
+
+		$context[$this->listOptions['id']] = $this->context;
+
+		// Let's set some default that could be useful to avoid repetitions
+		if (!isset($context['sub_template']))
+		{
+			if (function_exists('template_' . $this->listOptions['id']))
+			{
+				$context['sub_template'] = $this->listOptions['id'];
+			}
+			else
+			{
+				$context['sub_template'] = 'show_list';
+				if (!isset($context['default_list']))
+				{
+					$context['default_list'] = $this->listOptions['id'];
+				}
+			}
 		}
 	}
 }

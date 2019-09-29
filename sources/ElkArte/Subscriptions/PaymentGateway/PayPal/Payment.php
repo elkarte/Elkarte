@@ -8,7 +8,7 @@
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause (see accompanying LICENSE.txt file)
  *
  * This file contains code covered by:
- * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * copyright: 2011 Simple Machines (http://www.simplemachines.org)
  *
  * @version 2.0 dev
  *
@@ -27,18 +27,21 @@ class Payment implements PaymentInterface
 {
 	/**
 	 * Holds the IPN response data
+	 *
 	 * @var string|mixed[]
 	 */
 	private $return_data;
 
 	/**
 	 * Data to send to paypal IPN
+	 *
 	 * @var string
 	 */
 	private $requestString;
 
 	/**
 	 * If this is a test sandbox run or not
+	 *
 	 * @var bool
 	 */
 	private $paidsubsTest;
@@ -165,150 +168,6 @@ class Payment implements PaymentInterface
 	}
 
 	/**
-	 * Is this a refund?
-	 *
-	 * @return boolean
-	 */
-	public function isRefund()
-	{
-		return (($_POST['payment_status'] === 'Refunded' || $_POST['payment_status'] === 'Reversed' || $_POST['txn_type'] === 'Refunded' || ($_POST['txn_type'] === 'reversal' && $_POST['payment_status'] === 'Completed')));
-	}
-
-	/**
-	 * Is this a subscription?
-	 *
-	 * @return boolean
-	 */
-	public function isSubscription()
-	{
-		return (substr($_POST['txn_type'], 0, 14) === 'subscr_payment' && $_POST['payment_status'] === 'Completed');
-	}
-
-	/**
-	 * Is this a normal payment?
-	 *
-	 * @return boolean
-	 */
-	public function isPayment()
-	{
-		return ($_POST['payment_status'] === 'Completed' && $_POST['txn_type'] === 'web_accept');
-	}
-
-	/**
-	 * Is this a cancellation?
-	 *
-	 * @return boolean
-	 */
-	public function isCancellation()
-	{
-		// subscr_cancel: This IPN response (txn_type) is sent only when the subscriber cancels his/her
-		// current subscription or the merchant cancels the subscribers subscription. In this event according
-		// to Paypal rules the subscr_eot (End of Term) IPN response is NEVER sent, and it is up to you to
-		// keep the subscription of the subscriber active for remaining days of subscription should they cancel
-		// their subscription in the middle of the subscription period.
-		//
-		// subscr_eot: This IPN response (txn_type) is sent ONLY when the subscription ends naturally/expires
-		//
-		return (substr($_POST['txn_type'], 0, 13) === 'subscr_cancel' || substr($_POST['txn_type'], 0, 10) === 'subscr_eot');
-	}
-
-	/**
-	 * How much was paid?
-	 *
-	 * @return float
-	 */
-	public function getCost()
-	{
-		return (isset($_POST['tax']) ? $_POST['tax'] : 0) + $_POST['mc_gross'];
-	}
-
-	/**
-	 * Record the transaction reference and exit
-	 *
-	 * @param int $subscription_id
-	 */
-	public function close($subscription_id)
-	{
-		$db = database();
-
-		// If it's a subscription record the reference.
-		if ($_POST['txn_type'] == 'subscr_payment' && !empty($_POST['subscr_id']))
-		{
-			$db->query('', '
-				UPDATE {db_prefix}log_subscribed
-				SET vendor_ref = {string:vendor_ref}
-				WHERE id_sublog = {int:current_subscription}',
-				array(
-					'current_subscription' => $subscription_id,
-					'vendor_ref' => $_POST['subscr_id'],
-				)
-			);
-		}
-
-		exit();
-	}
-
-	/**
-	 * A private function to find out the subscription details.
-	 *
-	 * @return false|null
-	 */
-	private function _findSubscription()
-	{
-		$db = database();
-
-		// Assume we have this?
-		if (empty($_POST['subscr_id']))
-		{
-			return false;
-		}
-
-		// Do we have this in the database?
-		$request = $db->query('', '
-			SELECT
-				id_member, id_subscribe
-			FROM {db_prefix}log_subscribed
-			WHERE vendor_ref = {string:vendor_ref}
-			LIMIT 1',
-			array(
-				'vendor_ref' => $_POST['subscr_id'],
-			)
-		);
-		// No joy?
-		if ($db->num_rows($request) == 0)
-		{
-			// Can we identify them by email?
-			if (!empty($_POST['payer_email']))
-			{
-				$db->free_result($request);
-				$request = $db->query('', '
-					SELECT
-						ls.id_member, ls.id_subscribe
-					FROM {db_prefix}log_subscribed AS ls
-						INNER JOIN {db_prefix}members AS mem ON (mem.id_member = ls.id_member)
-					WHERE mem.email_address = {string:payer_email}
-					LIMIT 1',
-					array(
-						'payer_email' => $_POST['payer_email'],
-					)
-				);
-				if ($db->num_rows($request) === 0)
-				{
-					return false;
-				}
-			}
-			else
-			{
-				return false;
-			}
-		}
-
-		list ($member_id, $subscription_id) = $db->fetch_row($request);
-		$_POST['item_number'] = $member_id . '+' . $subscription_id;
-		$db->free_result($request);
-	}
-
-	/**
 	 * Makes the request to paypal and returns the response
 	 * Attempts curl first and if not available fsockopen
 	 */
@@ -410,5 +269,149 @@ class Payment implements PaymentInterface
 
 		// Clean up.
 		fclose($fp);
+	}
+
+	/**
+	 * Is this a subscription?
+	 *
+	 * @return boolean
+	 */
+	public function isSubscription()
+	{
+		return (substr($_POST['txn_type'], 0, 14) === 'subscr_payment' && $_POST['payment_status'] === 'Completed');
+	}
+
+	/**
+	 * A private function to find out the subscription details.
+	 *
+	 * @return false|null
+	 */
+	private function _findSubscription()
+	{
+		$db = database();
+
+		// Assume we have this?
+		if (empty($_POST['subscr_id']))
+		{
+			return false;
+		}
+
+		// Do we have this in the database?
+		$request = $db->query('', '
+			SELECT
+				id_member, id_subscribe
+			FROM {db_prefix}log_subscribed
+			WHERE vendor_ref = {string:vendor_ref}
+			LIMIT 1',
+			array(
+				'vendor_ref' => $_POST['subscr_id'],
+			)
+		);
+		// No joy?
+		if ($db->num_rows($request) == 0)
+		{
+			// Can we identify them by email?
+			if (!empty($_POST['payer_email']))
+			{
+				$db->free_result($request);
+				$request = $db->query('', '
+					SELECT
+						ls.id_member, ls.id_subscribe
+					FROM {db_prefix}log_subscribed AS ls
+						INNER JOIN {db_prefix}members AS mem ON (mem.id_member = ls.id_member)
+					WHERE mem.email_address = {string:payer_email}
+					LIMIT 1',
+					array(
+						'payer_email' => $_POST['payer_email'],
+					)
+				);
+				if ($db->num_rows($request) === 0)
+				{
+					return false;
+				}
+			}
+			else
+			{
+				return false;
+			}
+		}
+
+		list ($member_id, $subscription_id) = $db->fetch_row($request);
+		$_POST['item_number'] = $member_id . '+' . $subscription_id;
+		$db->free_result($request);
+	}
+
+	/**
+	 * Is this a refund?
+	 *
+	 * @return boolean
+	 */
+	public function isRefund()
+	{
+		return (($_POST['payment_status'] === 'Refunded' || $_POST['payment_status'] === 'Reversed' || $_POST['txn_type'] === 'Refunded' || ($_POST['txn_type'] === 'reversal' && $_POST['payment_status'] === 'Completed')));
+	}
+
+	/**
+	 * Is this a normal payment?
+	 *
+	 * @return boolean
+	 */
+	public function isPayment()
+	{
+		return ($_POST['payment_status'] === 'Completed' && $_POST['txn_type'] === 'web_accept');
+	}
+
+	/**
+	 * Is this a cancellation?
+	 *
+	 * @return boolean
+	 */
+	public function isCancellation()
+	{
+		// subscr_cancel: This IPN response (txn_type) is sent only when the subscriber cancels his/her
+		// current subscription or the merchant cancels the subscribers subscription. In this event according
+		// to Paypal rules the subscr_eot (End of Term) IPN response is NEVER sent, and it is up to you to
+		// keep the subscription of the subscriber active for remaining days of subscription should they cancel
+		// their subscription in the middle of the subscription period.
+		//
+		// subscr_eot: This IPN response (txn_type) is sent ONLY when the subscription ends naturally/expires
+		//
+		return (substr($_POST['txn_type'], 0, 13) === 'subscr_cancel' || substr($_POST['txn_type'], 0, 10) === 'subscr_eot');
+	}
+
+	/**
+	 * How much was paid?
+	 *
+	 * @return float
+	 */
+	public function getCost()
+	{
+		return (isset($_POST['tax']) ? $_POST['tax'] : 0) + $_POST['mc_gross'];
+	}
+
+	/**
+	 * Record the transaction reference and exit
+	 *
+	 * @param int $subscription_id
+	 */
+	public function close($subscription_id)
+	{
+		$db = database();
+
+		// If it's a subscription record the reference.
+		if ($_POST['txn_type'] == 'subscr_payment' && !empty($_POST['subscr_id']))
+		{
+			$db->query('', '
+				UPDATE {db_prefix}log_subscribed
+				SET vendor_ref = {string:vendor_ref}
+				WHERE id_sublog = {int:current_subscription}',
+				array(
+					'current_subscription' => $subscription_id,
+					'vendor_ref' => $_POST['subscr_id'],
+				)
+			);
+		}
+
+		exit();
 	}
 }

@@ -8,7 +8,7 @@
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause (see accompanying LICENSE.txt file)
  *
  * This file contains code covered by:
- * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * copyright: 2011 Simple Machines (http://www.simplemachines.org)
  *
  * @version 2.0 dev
  *
@@ -16,71 +16,73 @@
 
 namespace ElkArte\Search;
 
+use ElkArte\Exceptions\Exception;
 use ElkArte\User;
+use ElkArte\Util;
+use ElkArte\ValuesContainer;
 
 /**
  * Actually do the searches
  */
-class SearchParams extends \ElkArte\ValuesContainer
+class SearchParams extends ValuesContainer
 {
 	/**
-	 * $_search_params will carry all settings that differ from the default search parameters.
-	 *
-	 * That way, the URLs involved in a search page will be kept as short as possible.
-	 * @var string[]
-	 */
-	protected $_search_params = array();
-
-	/**
-	 * $_search_params will carry all settings that differ from the default search parameters.
-	 *
-	 * That way, the URLs involved in a search page will be kept as short as possible.
-	 * @var string
-	 */
-	protected $_search_string = '';
-
-	/**
 	 * the db query for members
+	 *
 	 * @var string
 	 */
 	public $_userQuery = '';
-
 	/**
 	 * The db query for brd's
+	 *
 	 * @var string
 	 */
 	public $_boardQuery = '';
-
 	/**
 	 * Needed to calculate relevance
+	 *
 	 * @var int
 	 */
 	public $_minMsg = 0;
-
 	/**
 	 * The minimum message id we will search, needed to calculate relevance
+	 *
 	 * @var int
 	 */
 	public $_minMsgID = 0;
-
 	/**
 	 * The maximum message ID we will search, needed to calculate relevance
+	 *
 	 * @var int
 	 */
 	public $_maxMsgID = 0;
-
 	/**
 	 * Message "age" via ID, given bounds, needed to calculate relevance
+	 *
 	 * @var int
 	 */
 	public $_recentMsg = 0;
-
 	/**
 	 *
 	 * @var int[]
 	 */
 	public $_memberlist = [];
-
+	/**
+	 * $_search_params will carry all settings that differ from the default search parameters.
+	 *
+	 * That way, the URLs involved in a search page will be kept as short as possible.
+	 *
+	 * @var string[]
+	 */
+	protected $_search_params = array();
+	/**
+	 * $_search_params will carry all settings that differ from the default search parameters.
+	 *
+	 * That way, the URLs involved in a search page will be kept as short as possible.
+	 *
+	 * @var string
+	 */
+	protected $_search_string = '';
 	/**
 	 *
 	 * @var null|Object
@@ -90,9 +92,9 @@ class SearchParams extends \ElkArte\ValuesContainer
 	/**
 	 * Constructor
 	 *
+	 * @param string $string - the string containing encoded search params
 	 * @package Search
 	 *
-	 * @param string $string - the string containing encoded search params
 	 */
 	public function __construct($string)
 	{
@@ -100,55 +102,6 @@ class SearchParams extends \ElkArte\ValuesContainer
 		$this->_search_string = $string;
 		$this->prepare();
 		$this->data = &$this->_search_params;
-	}
-
-	/**
-	 * Encodes search params ($this->_search_params) in an URL-compatible way
-	 *
-	 * @param array $search build param index with specific search term (did you mean?)
-	 *
-	 * @return string - the encoded string to be appended to the URL
-	 */
-	public function compileURL($search = array())
-	{
-		$temp_params = $this->_search_params;
-		$encoded = array();
-
-		if (!empty($search))
-		{
-			$temp_params['search'] = implode(' ', $search);
-		}
-
-		// *** Encode all search params
-		// All search params have been checked, let's compile them to a single string... made less simple by PHP 4.3.9 and below.
-		if (isset($temp_params['brd']))
-		{
-			$temp_params['brd'] = implode(',', $temp_params['brd']);
-		}
-
-		foreach ($temp_params as $k => $v)
-			$encoded[] = $k . '|\'|' . $v;
-
-		if (!empty($encoded))
-		{
-			// Due to old IE's 2083 character limit, we have to compress long search strings
-			$params = @gzcompress(implode('|"|', $encoded));
-
-			// Gzcompress failed, use try non-gz
-			if (empty($params))
-			{
-				$params = implode('|"|', $encoded);
-			}
-
-			// Base64 encode, then replace +/= with uri safe ones that can be reverted
-			$encoded = str_replace(array('+', '/', '='), array('-', '_', '.'), base64_encode($params));
-		}
-		else
-		{
-			$encoded = '';
-		}
-
-		return $encoded;
 	}
 
 	/**
@@ -176,13 +129,64 @@ class SearchParams extends \ElkArte\ValuesContainer
 	}
 
 	/**
+	 * Encodes search params ($this->_search_params) in an URL-compatible way
+	 *
+	 * @param array $search build param index with specific search term (did you mean?)
+	 *
+	 * @return string - the encoded string to be appended to the URL
+	 */
+	public function compileURL($search = array())
+	{
+		$temp_params = $this->_search_params;
+		$encoded = array();
+
+		if (!empty($search))
+		{
+			$temp_params['search'] = implode(' ', $search);
+		}
+
+		// *** Encode all search params
+		// All search params have been checked, let's compile them to a single string... made less simple by PHP 4.3.9 and below.
+		if (isset($temp_params['brd']))
+		{
+			$temp_params['brd'] = implode(',', $temp_params['brd']);
+		}
+
+		foreach ($temp_params as $k => $v)
+		{
+			$encoded[] = $k . '|\'|' . $v;
+		}
+
+		if (!empty($encoded))
+		{
+			// Due to old IE's 2083 character limit, we have to compress long search strings
+			$params = @gzcompress(implode('|"|', $encoded));
+
+			// Gzcompress failed, use try non-gz
+			if (empty($params))
+			{
+				$params = implode('|"|', $encoded);
+			}
+
+			// Base64 encode, then replace +/= with uri safe ones that can be reverted
+			$encoded = str_replace(array('+', '/', '='), array('-', '_', '.'), base64_encode($params));
+		}
+		else
+		{
+			$encoded = '';
+		}
+
+		return $encoded;
+	}
+
+	/**
 	 * Merge search params extracted with SearchParams::prepare
 	 * with those present in the $param array (usually $_REQUEST['params'])
 	 *
 	 * @param mixed[] $params - An array of search parameters
-	 * @param int     $recentPercentage - A coefficient to calculate the lowest
+	 * @param int $recentPercentage - A coefficient to calculate the lowest
 	 *                message id to start search from
-	 * @param int     $maxMembersToSearch - The maximum number of members to consider
+	 * @param int $maxMembersToSearch - The maximum number of members to consider
 	 *                when multiple are found
 	 *
 	 * @throws \ElkArte\Exceptions\Exception topic_gone
@@ -263,7 +267,7 @@ class SearchParams extends \ElkArte\ValuesContainer
 		}
 		else
 		{
-			$userString = strtr(\ElkArte\Util::htmlspecialchars($this->_search_params['userspec'], ENT_QUOTES), array('&quot;' => '"'));
+			$userString = strtr(Util::htmlspecialchars($this->_search_params['userspec'], ENT_QUOTES), array('&quot;' => '"'));
 			$userString = strtr($userString, array('%' => '\%', '_' => '\_', '*' => '%', '?' => '_'));
 
 			preg_match_all('~"([^"]+)"~', $userString, $matches);
@@ -281,12 +285,14 @@ class SearchParams extends \ElkArte\ValuesContainer
 			// Create a list of database-escaped search names.
 			$realNameMatches = array();
 			foreach ($possible_users as $possible_user)
+			{
 				$realNameMatches[] = $this->_db->quote(
 					'{string:possible_user}',
 					array(
 						'possible_user' => $possible_user
 					)
 				);
+			}
 
 			// Retrieve a list of possible members.
 			$request = $this->_db->query('', '
@@ -379,7 +385,7 @@ class SearchParams extends \ElkArte\ValuesContainer
 
 			if ($this->_db->num_rows($request) == 0)
 			{
-				throw new \ElkArte\Exceptions\Exception('topic_gone', false);
+				throw new Exception('topic_gone', false);
 			}
 
 			$this->_search_params['brd'] = array();
@@ -406,7 +412,9 @@ class SearchParams extends \ElkArte\ValuesContainer
 		if (count($this->_search_params['brd']) !== 0)
 		{
 			foreach ($this->_search_params['brd'] as $k => $v)
+			{
 				$this->_search_params['brd'][$k] = (int) $v;
+			}
 
 			// If we've selected all boards, this parameter can be left empty.
 			require_once(SUBSDIR . '/Boards.subs.php');

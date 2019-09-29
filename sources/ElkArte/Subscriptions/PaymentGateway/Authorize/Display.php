@@ -8,7 +8,7 @@
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause (see accompanying LICENSE.txt file)
  *
  * This file contains code covered by:
- * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * copyright: 2011 Simple Machines (http://www.simplemachines.org)
  *
  * @version 2.0 dev
  *
@@ -27,6 +27,7 @@ class Display implements DisplayInterface
 {
 	/**
 	 * Title of this payment gateway
+	 *
 	 * @var string
 	 */
 	public $title = 'Authorize.net | Credit Card';
@@ -116,6 +117,7 @@ class Display implements DisplayInterface
 	private function _md5_hmac($key, $data)
 	{
 		$key = str_pad(strlen($key) <= 64 ? $key : pack('H*', md5($key)), 64, chr(0x00));
+
 		return md5(($key ^ str_repeat(chr(0x5c), 64)) . pack('H*', md5(($key ^ str_repeat(chr(0x36), 64)) . $data)));
 	}
 }

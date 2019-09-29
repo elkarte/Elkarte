@@ -8,8 +8,8 @@
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause (see accompanying LICENSE.txt file)
  *
  * This file contains code covered by:
- * copyright:	2011 Simple Machines (http://www.simplemachines.org)
- * copyright:	2004-2011, GreyWyvern - All rights reserved.
+ * copyright: 2011 Simple Machines (http://www.simplemachines.org)
+ * copyright:    2004-2011, GreyWyvern - All rights reserved.
  *
  * @version 2.0 dev
  *
@@ -17,7 +17,11 @@
 
 namespace ElkArte\Database\Mysqli;
 
+use ElkArte\Cache\Cache;
 use ElkArte\Database\AbstractQuery;
+use ElkArte\Errors\Errors;
+use ElkArte\Exceptions\Exception;
+use ElkArte\ValuesContainer;
 
 /**
  * SQL database class, implements database class to control mysql functions
@@ -30,139 +34,6 @@ class Query extends AbstractQuery
 	public function fix_prefix($db_prefix, $db_name)
 	{
 		return is_numeric(substr($db_prefix, 0, 1)) ? $db_name . '.' . $db_prefix : '`' . $db_name . '`.' . $db_prefix;
- 	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	public function query($identifier, $db_string, $db_values = array())
-	{
-		// One more query....
-		$this->_query_count++;
-
-		// Use "ORDER BY null" to prevent Mysql doing filesorts for Group By clauses without an Order By
-		if (strpos($db_string, 'GROUP BY') !== false && strpos($db_string, 'ORDER BY') === false && strpos($db_string, 'INSERT INTO') === false)
-		{
-			// Add before LIMIT
-			if ($pos = strpos($db_string, 'LIMIT '))
-				$db_string = substr($db_string, 0, $pos) . "\t\t\tORDER BY null\n" . substr($db_string, $pos, strlen($db_string));
-			else
-				// Append it.
-				$db_string .= "\n\t\t\tORDER BY null";
-		}
-
-		$db_string = $this->_prepareQuery($db_string, $db_values);
-
-		// Debugging.
-		$this->_preQueryDebug($db_string);
-
-		$this->_doSanityCheck($db_string, '\\');
-
-		if (!$this->_unbuffered)
-			$ret = @mysqli_query($this->connection, $db_string);
-		else
-			$ret = @mysqli_query($this->connection, $db_string, MYSQLI_USE_RESULT);
-
-		if ($ret === false && !$this->_skip_error)
-		{
-			$ret = $this->error($db_string);
-		}
-
-		// Revert not to skip errors
-		if ($this->_skip_error)
-		{
-			$this->_skip_error = false;
-		}
-
-		// Debugging.
-		$this->_postQueryDebug();
-
-		$this->result = new Result($ret,
-			new \ElkArte\ValuesContainer([
-				'connection' => $this->connection
-			])
-		);
-
-		return $this->result;
-	}
-
-	/**
-	 * Checks if the string contains any 4byte chars and if so,
-	 * converts them into HTML entities.
-	 *
-	 * This is necessary because MySQL utf8 doesn't know how to store such
-	 * characters and would generate an error any time one is used.
-	 * The 4byte chars are used by emoji
-	 *
-	 * @param string $string
-	 * @return string
-	 */
-	protected function _clean_4byte_chars($string)
-	{
-		global $modSettings;
-
-		if (!empty($modSettings['using_utf8mb4']))
-			return $string;
-
-		$result = $string;
-		$ord = array_map('ord', str_split($string));
-
-		// If we are in the 4-byte range
-		if (max($ord) >= 240)
-		{
-			// Byte length
-			$length = strlen($string);
-			$result = '';
-
-			// Look for a 4byte marker
-			for ($i = 0; $i < $length; $i++)
-			{
-				// The first byte of a 4-byte character encoding starts with the bytes 0xF0-0xF4 (240 <-> 244)
-				// but look all the way to 247 for safe measure
-				$ord1 = $ord[$i];
-				if ($ord1 >= 240 && $ord1 <= 247)
-				{
-					// Replace it with the corresponding html entity
-					$entity = $this->_uniord(chr($ord[$i]) . chr($ord[$i + 1]) . chr($ord[$i + 2]) . chr($ord[$i + 3]));
-					if ($entity === false)
-						$result .= "\xEF\xBF\xBD";
-					else
-						$result .= '&#x' . dechex($entity) . ';';
-					$i += 3;
-				}
-				else
-					$result .= $string[$i];
-			}
-		}
-
-		return $result;
-	}
-
-	/**
-	 * Converts a 4byte char into the corresponding HTML entity code.
-	 *
-	 * This function is derived from:
-	 * http://www.greywyvern.com/code/php/utf8_html.phps
-	 *
-	 * @param string $c
-	 * @return integer|false
-	 */
-	protected function _uniord($c)
-	{
-		if (ord($c[0]) >= 0 && ord($c[0]) <= 127)
-			return ord($c[0]);
-		if (ord($c[0]) >= 192 && ord($c[0]) <= 223)
-			return (ord($c[0]) - 192) * 64 + (ord($c[1]) - 128);
-		if (ord($c[0]) >= 224 && ord($c[0]) <= 239)
-			return (ord($c[0]) - 224) * 4096 + (ord($c[1]) - 128) * 64 + (ord($c[2]) - 128);
-		if (ord($c[0]) >= 240 && ord($c[0]) <= 247)
-			return (ord($c[0]) - 240) * 262144 + (ord($c[1]) - 128) * 4096 + (ord($c[2]) - 128) * 64 + (ord($c[3]) - 128);
-		if (ord($c[0]) >= 248 && ord($c[0]) <= 251)
-			return (ord($c[0]) - 248) * 16777216 + (ord($c[1]) - 128) * 262144 + (ord($c[2]) - 128) * 4096 + (ord($c[3]) - 128) * 64 + (ord($c[4]) - 128);
-		if (ord($c[0]) >= 252 && ord($c[0]) <= 253)
-			return (ord($c[0]) - 252) * 1073741824 + (ord($c[1]) - 128) * 16777216 + (ord($c[2]) - 128) * 262144 + (ord($c[3]) - 128) * 4096 + (ord($c[4]) - 128) * 64 + (ord($c[5]) - 128);
-		if (ord($c[0]) >= 254 && ord($c[0]) <= 255)
-			return false;
 	}
 
 	/**
@@ -206,6 +77,140 @@ class Query extends AbstractQuery
 	/**
 	 * {@inheritDoc}
 	 */
+	public function insert($method = 'replace', $table, $columns, $data, $keys, $disable_trans = false)
+	{
+		// With nothing to insert, simply return.
+		if (empty($data))
+		{
+			return;
+		}
+
+		// Inserting data as a single row can be done as a single array.
+		if (!is_array($data[array_rand($data)]))
+		{
+			$data = array($data);
+		}
+
+		// Replace the prefix holder with the actual prefix.
+		$table = str_replace('{db_prefix}', $this->_db_prefix, $table);
+
+		// Create the mold for a single row insert.
+		$insertData = '(';
+		foreach ($columns as $columnName => $type)
+		{
+			// Are we restricting the length?
+			if (strpos($type, 'string-') !== false)
+			{
+				$insertData .= sprintf('SUBSTRING({string:%1$s}, 1, ' . substr($type, 7) . '), ', $columnName);
+			}
+			else
+			{
+				$insertData .= sprintf('{%1$s:%2$s}, ', $type, $columnName);
+			}
+		}
+		$insertData = substr($insertData, 0, -2) . ')';
+
+		// Create an array consisting of only the columns.
+		$indexed_columns = array_keys($columns);
+
+		// Here's where the variables are injected to the query.
+		$insertRows = array();
+		foreach ($data as $dataRow)
+		{
+			$insertRows[] = $this->quote($insertData, $this->_array_combine($indexed_columns, $dataRow));
+		}
+
+		// Determine the method of insertion.
+		$queryTitle = $method === 'replace' ? 'REPLACE' : ($method === 'ignore' ? 'INSERT IGNORE' : 'INSERT');
+
+		$skip_error = $table === $this->_db_prefix . 'log_errors';
+		$this->_skip_error = $skip_error;
+		// Do the insert.
+		$ret = $this->query('', '
+			' . $queryTitle . ' INTO ' . $table . '(`' . implode('`, `', $indexed_columns) . '`)
+			VALUES
+				' . implode(',
+				', $insertRows),
+			array(
+				'security_override' => true,
+			)
+		);
+
+		$this->result = new Result(
+			is_object($ret) ? $ret->getResultObject() : $ret,
+			new ValuesContainer([
+				'connection' => $this->connection
+			])
+		);
+
+		return $this->result;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public function query($identifier, $db_string, $db_values = array())
+	{
+		// One more query....
+		$this->_query_count++;
+
+		// Use "ORDER BY null" to prevent Mysql doing filesorts for Group By clauses without an Order By
+		if (strpos($db_string, 'GROUP BY') !== false && strpos($db_string, 'ORDER BY') === false && strpos($db_string, 'INSERT INTO') === false)
+		{
+			// Add before LIMIT
+			if ($pos = strpos($db_string, 'LIMIT '))
+			{
+				$db_string = substr($db_string, 0, $pos) . "\t\t\tORDER BY null\n" . substr($db_string, $pos, strlen($db_string));
+			}
+			else
+				// Append it.
+			{
+				$db_string .= "\n\t\t\tORDER BY null";
+			}
+		}
+
+		$db_string = $this->_prepareQuery($db_string, $db_values);
+
+		// Debugging.
+		$this->_preQueryDebug($db_string);
+
+		$this->_doSanityCheck($db_string, '\\');
+
+		if (!$this->_unbuffered)
+		{
+			$ret = @mysqli_query($this->connection, $db_string);
+		}
+		else
+		{
+			$ret = @mysqli_query($this->connection, $db_string, MYSQLI_USE_RESULT);
+		}
+
+		if ($ret === false && !$this->_skip_error)
+		{
+			$ret = $this->error($db_string);
+		}
+
+		// Revert not to skip errors
+		if ($this->_skip_error)
+		{
+			$this->_skip_error = false;
+		}
+
+		// Debugging.
+		$this->_postQueryDebug();
+
+		$this->result = new Result($ret,
+			new ValuesContainer([
+				'connection' => $this->connection
+			])
+		);
+
+		return $this->result;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
 	public function error($db_string)
 	{
 		global $txt, $context, $webmaster_email, $modSettings, $db_persist;
@@ -242,7 +247,7 @@ class Query extends AbstractQuery
 				// Let the admin know there is a command denied issue
 				if (class_exists('Errors'))
 				{
-					\ElkArte\Errors\Errors::instance()->log_error($txt['database_error'] . ': ' . $query_error . (!empty($modSettings['enableErrorQueryLogging']) ? "\n\n$db_string" : ''), 'database', $file, $line);
+					Errors::instance()->log_error($txt['database_error'] . ': ' . $query_error . (!empty($modSettings['enableErrorQueryLogging']) ? "\n\n$db_string" : ''), 'database', $file, $line);
 				}
 
 				return false;
@@ -252,7 +257,7 @@ class Query extends AbstractQuery
 		// Log the error.
 		if ($query_errno != 1213 && $query_errno != 1205 && class_exists('Errors'))
 		{
-			\ElkArte\Errors\Errors::instance()->log_error($txt['database_error'] . ': ' . $query_error . (!empty($modSettings['enableErrorQueryLogging']) ? "\n\n$db_string" : ''), 'database', $file, $line);
+			Errors::instance()->log_error($txt['database_error'] . ': ' . $query_error . (!empty($modSettings['enableErrorQueryLogging']) ? "\n\n$db_string" : ''), 'database', $file, $line);
 		}
 
 		// Database error auto fixing ;).
@@ -265,8 +270,10 @@ class Query extends AbstractQuery
 			$modSettings['cache_enable'] = '1';
 			$temp = null;
 
-			if (\ElkArte\Cache\Cache::instance()->getVar($temp, 'db_last_error', 600))
+			if (Cache::instance()->getVar($temp, 'db_last_error', 600))
+			{
 				$db_last_error = max($db_last_error, $temp);
+			}
 
 			if ($db_last_error < time() - 3600 * 24 * 3)
 			{
@@ -283,7 +290,9 @@ class Query extends AbstractQuery
 						{
 							// Now, it's still theoretically possible this could be an injection.  So backtick it!
 							if (trim($table) !== '')
+							{
 								$fix_tables[] = '`' . strtr(trim($table), array('`' => '')) . '`';
+							}
 						}
 					}
 
@@ -293,7 +302,9 @@ class Query extends AbstractQuery
 				elseif ($query_errno == 1016)
 				{
 					if (preg_match('~\'([^\.\']+)~', $query_error, $match) != 0)
+					{
 						$fix_tables = array('`' . $match[1] . '`');
+					}
 				}
 				// Indexes crashed.  Should be easy to fix!
 				elseif ($query_errno == 1034 || $query_errno == 1035)
@@ -312,9 +323,11 @@ class Query extends AbstractQuery
 				require_once(SUBSDIR . '/Mail.subs.php');
 
 				// Make a note of the REPAIR...
-				\ElkArte\Cache\Cache::instance()->put('db_last_error', time(), 600);
-				if (!\ElkArte\Cache\Cache::instance()->getVar($temp, 'db_last_error', 600))
+				Cache::instance()->put('db_last_error', time(), 600);
+				if (!Cache::instance()->getVar($temp, 'db_last_error', 600))
+				{
 					updateDbLastError(time());
+				}
 
 				// Attempt to find and repair the broken table.
 				foreach ($fix_tables as $table)
@@ -336,7 +349,9 @@ class Query extends AbstractQuery
 				}
 			}
 			else
+			{
 				$modSettings['cache_enable'] = $old_cache;
+			}
 
 			// Check for the "lost connection" or "deadlock found" errors - and try it just one more time.
 			if (in_array($query_errno, array(1205, 1213, 2006, 2013)))
@@ -346,11 +361,15 @@ class Query extends AbstractQuery
 				{
 					// Are we in SSI mode?  If so try that username and password first
 					if (ELK == 'SSI' && !empty($ssi_db_user) && !empty($ssi_db_passwd))
+					{
 						$new_connection = @mysqli_connect((!empty($db_persist) ? 'p:' : '') . $db_server, $ssi_db_user, $ssi_db_passwd, $db_name);
+					}
 
 					// Fall back to the regular username and password if need be
 					if (!$new_connection)
+					{
 						$new_connection = @mysqli_connect((!empty($db_persist) ? 'p:' : '') . $db_server, $db_user, $db_passwd, $db_name);
+					}
 				}
 
 				if ($new_connection)
@@ -380,11 +399,15 @@ class Query extends AbstractQuery
 			elseif ($query_errno == 1030 && (strpos($query_error, ' -1 ') !== false || strpos($query_error, ' 28 ') !== false || strpos($query_error, ' 12 ') !== false))
 			{
 				if (!isset($txt))
+				{
 					$query_error .= ' - check database storage space.';
+				}
 				else
 				{
 					if (!isset($txt['mysql_error_space']))
+					{
 						theme()->getTemplates()->loadLanguageFile('Errors');
+					}
 
 					$query_error .= !isset($txt['mysql_error_space']) ? ' - check database storage space.' : $txt['mysql_error_space'];
 				}
@@ -393,88 +416,34 @@ class Query extends AbstractQuery
 
 		// Nothing's defined yet... just die with it.
 		if (empty($context) || empty($txt))
+		{
 			die($query_error);
+		}
 
 		// Show an error message, if possible.
 		$context['error_title'] = $txt['database_error'];
 		if (allowedTo('admin_forum'))
+		{
 			$message = nl2br($query_error) . '<br />' . $txt['file'] . ': ' . $file . '<br />' . $txt['line'] . ': ' . $line;
+		}
 		else
+		{
 			$message = $txt['try_again'];
+		}
 
 		// Add database version that we know of, for the admin to know. (and ask for support)
 		if (allowedTo('admin_forum'))
+		{
 			$message .= '<br /><br />' . sprintf($txt['database_error_versions'], $modSettings['elkVersion']);
+		}
 
 		if (allowedTo('admin_forum') && $db_show_debug === true)
+		{
 			$message .= '<br /><br />' . nl2br($db_string);
+		}
 
 		// It's already been logged... don't log it again.
-		throw new \ElkArte\Exceptions\Exception($message, false);
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	public function insert($method = 'replace', $table, $columns, $data, $keys, $disable_trans = false)
-	{
-		// With nothing to insert, simply return.
-		if (empty($data))
-			return;
-
-		// Inserting data as a single row can be done as a single array.
-		if (!is_array($data[array_rand($data)]))
-			$data = array($data);
-
-		// Replace the prefix holder with the actual prefix.
-		$table = str_replace('{db_prefix}', $this->_db_prefix, $table);
-
-		// Create the mold for a single row insert.
-		$insertData = '(';
-		foreach ($columns as $columnName => $type)
-		{
-			// Are we restricting the length?
-			if (strpos($type, 'string-') !== false)
-				$insertData .= sprintf('SUBSTRING({string:%1$s}, 1, ' . substr($type, 7) . '), ', $columnName);
-			else
-				$insertData .= sprintf('{%1$s:%2$s}, ', $type, $columnName);
-		}
-		$insertData = substr($insertData, 0, -2) . ')';
-
-		// Create an array consisting of only the columns.
-		$indexed_columns = array_keys($columns);
-
-		// Here's where the variables are injected to the query.
-		$insertRows = array();
-		foreach ($data as $dataRow)
-		{
-			$insertRows[] = $this->quote($insertData, $this->_array_combine($indexed_columns, $dataRow));
-		}
-
-		// Determine the method of insertion.
-		$queryTitle = $method === 'replace' ? 'REPLACE' : ($method === 'ignore' ? 'INSERT IGNORE' : 'INSERT');
-
-		$skip_error = $table === $this->_db_prefix . 'log_errors';
-		$this->_skip_error = $skip_error;
-		// Do the insert.
-		$ret = $this->query('', '
-			' . $queryTitle . ' INTO ' . $table . '(`' . implode('`, `', $indexed_columns) . '`)
-			VALUES
-				' . implode(',
-				', $insertRows),
-			array(
-				'security_override' => true,
-			)
-		);
-
-		$this->result = new Result(
-			is_object($ret) ? $ret->getResultObject() : $ret,
-			new \ElkArte\ValuesContainer([
-				'connection' => $this->connection
-			])
-		);
-
-		return $this->result;
+		throw new Exception($message, false);
 	}
 
 	/**
@@ -504,8 +473,7 @@ class Query extends AbstractQuery
 	{
 		$request = $this->query('', '
 			SELECT VERSION()',
-			array(
-			)
+			array()
 		);
 		list ($ver) = $this->fetch_row($request);
 		$this->free_result($request);
@@ -540,6 +508,107 @@ class Query extends AbstractQuery
 	}
 
 	/**
+	 * Checks if the string contains any 4byte chars and if so,
+	 * converts them into HTML entities.
+	 *
+	 * This is necessary because MySQL utf8 doesn't know how to store such
+	 * characters and would generate an error any time one is used.
+	 * The 4byte chars are used by emoji
+	 *
+	 * @param string $string
+	 * @return string
+	 */
+	protected function _clean_4byte_chars($string)
+	{
+		global $modSettings;
+
+		if (!empty($modSettings['using_utf8mb4']))
+		{
+			return $string;
+		}
+
+		$result = $string;
+		$ord = array_map('ord', str_split($string));
+
+		// If we are in the 4-byte range
+		if (max($ord) >= 240)
+		{
+			// Byte length
+			$length = strlen($string);
+			$result = '';
+
+			// Look for a 4byte marker
+			for ($i = 0; $i < $length; $i++)
+			{
+				// The first byte of a 4-byte character encoding starts with the bytes 0xF0-0xF4 (240 <-> 244)
+				// but look all the way to 247 for safe measure
+				$ord1 = $ord[$i];
+				if ($ord1 >= 240 && $ord1 <= 247)
+				{
+					// Replace it with the corresponding html entity
+					$entity = $this->_uniord(chr($ord[$i]) . chr($ord[$i + 1]) . chr($ord[$i + 2]) . chr($ord[$i + 3]));
+					if ($entity === false)
+					{
+						$result .= "\xEF\xBF\xBD";
+					}
+					else
+					{
+						$result .= '&#x' . dechex($entity) . ';';
+					}
+					$i += 3;
+				}
+				else
+				{
+					$result .= $string[$i];
+				}
+			}
+		}
+
+		return $result;
+	}
+
+	/**
+	 * Converts a 4byte char into the corresponding HTML entity code.
+	 *
+	 * This function is derived from:
+	 * http://www.greywyvern.com/code/php/utf8_html.phps
+	 *
+	 * @param string $c
+	 * @return integer|false
+	 */
+	protected function _uniord($c)
+	{
+		if (ord($c[0]) >= 0 && ord($c[0]) <= 127)
+		{
+			return ord($c[0]);
+		}
+		if (ord($c[0]) >= 192 && ord($c[0]) <= 223)
+		{
+			return (ord($c[0]) - 192) * 64 + (ord($c[1]) - 128);
+		}
+		if (ord($c[0]) >= 224 && ord($c[0]) <= 239)
+		{
+			return (ord($c[0]) - 224) * 4096 + (ord($c[1]) - 128) * 64 + (ord($c[2]) - 128);
+		}
+		if (ord($c[0]) >= 240 && ord($c[0]) <= 247)
+		{
+			return (ord($c[0]) - 240) * 262144 + (ord($c[1]) - 128) * 4096 + (ord($c[2]) - 128) * 64 + (ord($c[3]) - 128);
+		}
+		if (ord($c[0]) >= 248 && ord($c[0]) <= 251)
+		{
+			return (ord($c[0]) - 248) * 16777216 + (ord($c[1]) - 128) * 262144 + (ord($c[2]) - 128) * 4096 + (ord($c[3]) - 128) * 64 + (ord($c[4]) - 128);
+		}
+		if (ord($c[0]) >= 252 && ord($c[0]) <= 253)
+		{
+			return (ord($c[0]) - 252) * 1073741824 + (ord($c[1]) - 128) * 16777216 + (ord($c[2]) - 128) * 262144 + (ord($c[3]) - 128) * 4096 + (ord($c[4]) - 128) * 64 + (ord($c[5]) - 128);
+		}
+		if (ord($c[0]) >= 254 && ord($c[0]) <= 255)
+		{
+			return false;
+		}
+	}
+
+	/**
 	 * {@inheritDoc}
 	 */
 	public function server_info()
@@ -554,8 +623,7 @@ class Query extends AbstractQuery
 	{
 		$request = $this->query('', '
 			SELECT VERSION()',
-			array(
-			)
+			array()
 		);
 		list ($ver) = $this->fetch_row($request);
 		$this->free_result($request);
@@ -577,6 +645,24 @@ class Query extends AbstractQuery
 	public function validConnection()
 	{
 		return is_object($this->connection);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public function list_tables($db_name_str = false, $filter = false)
+	{
+		$dump = new Dump($this);
+
+		return $dump->list_tables($db_name_str, $filter);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public function supportMediumtext()
+	{
+		return true;
 	}
 
 	/**
@@ -604,22 +690,5 @@ class Query extends AbstractQuery
 	protected function _replaceColumnCaseInsensitive($replacement)
 	{
 		return $replacement;
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	public function list_tables($db_name_str = false, $filter = false)
-	{
-		$dump = new Dump($this);
-		return $dump->list_tables($db_name_str, $filter);
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	public function supportMediumtext()
-	{
-		return true;
 	}
 }

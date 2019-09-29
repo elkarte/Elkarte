@@ -8,7 +8,7 @@
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause (see accompanying LICENSE.txt file)
  *
  * This file contains code covered by:
- * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * copyright: 2011 Simple Machines (http://www.simplemachines.org)
  *
  * @version 2.0 dev
  *
@@ -22,7 +22,9 @@
 function detectServerLoad()
 {
 	if (stristr(PHP_OS, 'win'))
+	{
 		return false;
+	}
 
 	$cores = detectServerCores();
 
@@ -30,6 +32,7 @@ function detectServerLoad()
 	if (function_exists('sys_getloadavg'))
 	{
 		$sys_load = sys_getloadavg();
+
 		return $sys_load[0] / $cores;
 	}
 	// Maybe someone has a custom compile
@@ -38,9 +41,13 @@ function detectServerLoad()
 		$load_average = @file_get_contents('/proc/loadavg');
 
 		if (!empty($load_average) && preg_match('~^([^ ]+?) ([^ ]+?) ([^ ]+)~', $load_average, $matches) != 0)
+		{
 			return (float) $matches[1] / $cores;
+		}
 		elseif (($load_average = @`uptime`) !== null && preg_match('~load average[s]?: (\d+\.\d+), (\d+\.\d+), (\d+\.\d+)~i', $load_average, $matches) != 0)
+		{
 			return (float) $matches[1] / $cores;
+		}
 
 		return false;
 	}
@@ -61,7 +68,9 @@ function detectServerCores()
 	{
 		$cores = preg_match_all('~^physical id~m', $cores, $matches);
 		if (!empty($cores))
+		{
 			return (int) $cores;
+		}
 	}
 
 	return 1;

@@ -9,7 +9,7 @@
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause (see accompanying LICENSE.txt file)
  *
  * This file contains code covered by:
- * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * copyright: 2011 Simple Machines (http://www.simplemachines.org)
  *
  * @version 2.0 dev
  *
@@ -17,7 +17,7 @@
 
 namespace ElkArte;
 
-use \ElkArte\User;
+use BBC\ParserWrapper;
 
 /**
  * This class fetches all the stuff needed to build a list of boards
@@ -26,66 +26,77 @@ class BoardsList
 {
 	/**
 	 * All the options
+	 *
 	 * @var mixed[]
 	 */
 	private $_options = array();
 
 	/**
 	 * Some data regarding the current user
+	 *
 	 * @var mixed[]
 	 */
 	private $_user = array();
 
 	/**
 	 * Holds the info about the latest post of the series
+	 *
 	 * @var mixed[]
 	 */
 	private $_latest_post = array();
 
 	/**
 	 * Remembers boards to easily scan the array to add moderators later
+	 *
 	 * @var int[]
 	 */
 	private $_boards = array();
 
 	/**
 	 * An array containing all the data of the categories and boards requested
+	 *
 	 * @var mixed[]
 	 */
 	private $_categories = array();
 
 	/**
 	 * The category/board that is being processed "now"
+	 *
 	 * @var mixed[]
 	 */
 	private $_current_boards = array();
 
 	/**
 	 * The url where to find images
+	 *
 	 * @var string
 	 */
 	private $_images_url = '';
 
 	/**
 	 * A string with session data to be user in urls
+	 *
 	 * @var string
 	 */
 	private $_session_url = '';
 
 	/**
 	 * Cut the subject at this number of chars
+	 *
 	 * @var int
 	 */
 	private $_subject_length = 24;
 
 	/**
 	 * The id of the recycle board (0 for none or not enabled)
+	 *
 	 * @var int
 	 */
 	private $_recycle_board = 0;
 
 	/**
 	 * The database!
+	 *
 	 * @var object
 	 */
 	private $_db = null;
@@ -128,16 +139,24 @@ class BoardsList
 
 		// Start with an empty array.
 		if ($this->_options['include_categories'])
+		{
 			$this->_categories = array();
+		}
 		else
+		{
 			$this->_current_boards = array();
+		}
 
 		// For performance, track the latest post while going through the boards.
 		if (!empty($this->_options['set_latest_post']))
+		{
 			$this->_latest_post = array('timestamp' => 0);
+		}
 
 		if (!empty($modSettings['recycle_enable']))
+		{
 			$this->_recycle_board = $modSettings['recycle_board'];
+		}
 	}
 
 	/**
@@ -193,7 +212,7 @@ class BoardsList
 			return $a['board_order'] <=> $b['board_order'];
 		});
 
-		$bbc_parser = \BBC\ParserWrapper::instance();
+		$bbc_parser = ParserWrapper::instance();
 
 		// Run through the categories and boards (or only boards)....
 		foreach ($result_boards as $row_board)
@@ -229,14 +248,18 @@ class BoardsList
 
 				// If this board has new posts in it (and isn't the recycle bin!) then the category is new.
 				if ($this->_recycle_board != $row_board['id_board'])
+				{
 					$this->_categories[$row_board['id_cat']]['new'] |= empty($row_board['is_read']) && $row_board['poster_name'] != '';
+				}
 
 				// Avoid showing category unread link where it only has redirection boards.
 				$this->_categories[$row_board['id_cat']]['show_unread'] = !empty($this->_categories[$row_board['id_cat']]['show_unread']) ? 1 : !$row_board['is_redirect'];
 
 				// Collapsed category - don't do any of this.
 				if ($this->_categories[$row_board['id_cat']]['is_collapsed'])
+				{
 					continue;
+				}
 
 				// Let's save some typing.  Climbing the array might be slower, anyhow.
 				$this->_current_boards = &$this->_categories[$row_board['id_cat']]['boards'];
@@ -313,19 +336,25 @@ class BoardsList
 			{
 				// @todo why this is not initialized outside the loop?
 				if (!isset($parent_map))
+				{
 					$parent_map = array();
+				}
 
 				if (!isset($parent_map[$row_board['id_parent']]))
+				{
 					foreach ($this->_current_boards as $id => $board)
 					{
 						if (!isset($board['children'][$row_board['id_parent']]))
+						{
 							continue;
+						}
 
 						$parent_map[$row_board['id_parent']] = array(&$this->_current_boards[$id], &$this->_current_boards[$id]['children'][$row_board['id_parent']]);
 						$parent_map[$row_board['id_board']] = array(&$this->_current_boards[$id], &$this->_current_boards[$id]['children'][$row_board['id_parent']]);
 
 						break;
 					}
+				}
 
 				if (isset($parent_map[$row_board['id_parent']]) && !$row_board['is_redirect'])
 				{
@@ -341,7 +370,9 @@ class BoardsList
 			}
 			// Found a child of a child - skip.
 			else
+			{
 				continue;
+			}
 
 			// Prepare the subject, and make sure it's not too long.
 			$row_board['subject'] = censor($row_board['subject']);
@@ -365,7 +396,9 @@ class BoardsList
 			);
 
 			if ($this->_options['avatars_on_indexes'])
+			{
 				$this_last_post['member']['avatar'] = determineAvatar($row_board);
+			}
 
 			// Provide the href and link.
 			if ($row_board['subject'] != '')
@@ -387,7 +420,9 @@ class BoardsList
 
 			// Set the last post in the parent board.
 			if ($row_board['id_parent'] == $this->_options['parent_id'] || ($isChild && !empty($row_board['poster_time']) && $this->_current_boards[$row_board['id_parent']]['last_post']['timestamp'] < forum_time(true, $row_board['poster_time'])))
+			{
 				$this->_current_boards[$isChild ? $row_board['id_parent'] : $row_board['id_board']]['last_post'] = $this_last_post;
+			}
 			// Just in the child...?
 			if ($isChild)
 			{
@@ -398,34 +433,27 @@ class BoardsList
 			}
 			// No last post for this board?  It's not new then, is it..?
 			elseif ($row_board['poster_name'] == '')
+			{
 				$this->_current_boards[$row_board['id_board']]['new'] = false;
+			}
 
 			// Determine a global most recent topic.
 			if ($this->_options['set_latest_post'] && !empty($row_board['poster_time']) && $row_board['poster_time'] > $this->_latest_post['timestamp'] && !$ignoreThisBoard)
+			{
 				$this->_latest_post = &$this->_current_boards[$isChild ? $row_board['id_parent'] : $row_board['id_board']]['last_post'];
+			}
 		}
 
 		if ($this->_options['get_moderators'] && !empty($this->_boards))
+		{
 			$this->_getBoardModerators();
+		}
 
 		usort($this->_categories, function ($a, $b) {
 			return $a['order'] <=> $b['order'];
 		});
 
 		return $this->_options['include_categories'] ? $this->_categories : $this->_current_boards;
-	}
-
-	/**
-	 * Returns the array containing the "latest post" information
-	 *
-	 * @return array
-	 */
-	public function getLatestPost()
-	{
-		if (empty($this->_latest_post) || empty($this->_latest_post['link']))
-			return array();
-		else
-			return $this->_latest_post;
 	}
 
 	/**
@@ -457,7 +485,9 @@ class BoardsList
 		foreach ($mod_cached as $row_mods)
 		{
 			if ($this->_options['include_categories'])
+			{
 				$this->_current_boards = &$this->_categories[$this->_boards[$row_mods['id_board']]]['boards'];
+			}
 
 			$href = getUrl('profile', ['action' => 'profile', 'u' => $row_mods['id_moderator'], 'name' => $row_mods['mod_real_name']]);
 			$this->_current_boards[$row_mods['id_board']]['moderators'][$row_mods['id_moderator']] = array(
@@ -467,6 +497,23 @@ class BoardsList
 				'link' => '<a href="' . $href . '" title="' . $txt['board_moderator'] . '">' . $row_mods['mod_real_name'] . '</a>'
 			);
 			$this->_current_boards[$row_mods['id_board']]['link_moderators'][] = '<a href="' . $href . '" title="' . $txt['board_moderator'] . '">' . $row_mods['mod_real_name'] . '</a>';
+		}
+	}
+
+	/**
+	 * Returns the array containing the "latest post" information
+	 *
+	 * @return array
+	 */
+	public function getLatestPost()
+	{
+		if (empty($this->_latest_post) || empty($this->_latest_post['link']))
+		{
+			return array();
+		}
+		else
+		{
+			return $this->_latest_post;
 		}
 	}
 }

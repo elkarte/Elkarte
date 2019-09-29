@@ -8,7 +8,7 @@
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause (see accompanying LICENSE.txt file)
  *
  * This file contains code covered by:
- * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * copyright: 2011 Simple Machines (http://www.simplemachines.org)
  *
  * @version 2.0 dev
  *
@@ -16,19 +16,22 @@
 
 namespace ElkArte\Modules\Verification;
 
+use ElkArte\EventManager;
+use ElkArte\Modules\AbstractModule;
 use ElkArte\User;
+use ElkArte\VerificationControls\VerificationControlsIntegrate;
 
 /**
  * Class \ElkArte\Modules\Verification\Post
  *
  * Adds Visual Verification controls to the Post page for those that need it.
  */
-class Post extends \ElkArte\Modules\AbstractModule
+class Post extends AbstractModule
 {
 	/**
 	 * {@inheritDoc}
 	 */
-	public static function hooks(\ElkArte\EventManager $eventsManager)
+	public static function hooks(EventManager $eventsManager)
 	{
 		global $modSettings;
 
@@ -41,7 +44,9 @@ class Post extends \ElkArte\Modules\AbstractModule
 			);
 		}
 		else
+		{
 			return array();
+		}
 	}
 
 	/**
@@ -58,12 +63,14 @@ class Post extends \ElkArte\Modules\AbstractModule
 		$verificationOptions = array(
 			'id' => 'post',
 		);
-		$context['require_verification'] = \ElkArte\VerificationControls\VerificationControlsIntegrate::create($verificationOptions);
+		$context['require_verification'] = VerificationControlsIntegrate::create($verificationOptions);
 		$context['visual_verification_id'] = $verificationOptions['id'];
 
 		// If they came from quick reply, and have to enter verification details, give them some notice.
 		if (!empty($_REQUEST['from_qr']) && $context['require_verification'] !== false)
+		{
 			$_post_errors->addError('need_qr_verification');
+		}
 	}
 
 	/**
@@ -80,12 +87,14 @@ class Post extends \ElkArte\Modules\AbstractModule
 		$verificationOptions = array(
 			'id' => 'post',
 		);
-		$context['require_verification'] = \ElkArte\VerificationControls\VerificationControlsIntegrate::create($verificationOptions, true);
+		$context['require_verification'] = VerificationControlsIntegrate::create($verificationOptions, true);
 
 		if (is_array($context['require_verification']))
 		{
 			foreach ($context['require_verification'] as $verification_error)
+			{
 				$_post_errors->addError($verification_error);
+			}
 		}
 	}
 }

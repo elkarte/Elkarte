@@ -13,6 +13,8 @@
 
 namespace ElkArte;
 
+use BBC\ParserWrapper;
+
 /**
  * Class Agreement
  *
@@ -159,7 +161,7 @@ class Agreement
 	 */
 	public function getParsedText($fallback = true)
 	{
-		$bbc_parser = \BBC\ParserWrapper::instance();
+		$bbc_parser = ParserWrapper::instance();
 
 		return $bbc_parser->parseAgreement($this->getPlainText($fallback));
 	}

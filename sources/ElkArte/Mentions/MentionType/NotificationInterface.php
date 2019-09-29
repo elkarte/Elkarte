@@ -13,6 +13,8 @@
 
 namespace ElkArte\Mentions\MentionType;
 
+use ElkArte\NotificationsTask;
+
 /**
  * Interface \ElkArte\Mentions\MentionType\NotificationInterface
  */
@@ -52,7 +54,7 @@ interface NotificationInterface
 	 *
 	 * @param \ElkArte\NotificationsTask $task
 	 */
-	public function setTask(\ElkArte\NotificationsTask $task);
+	public function setTask(NotificationsTask $task);
 
 	/**
 	 * Used when sending an immediate email to get the last message id (email id)
@@ -66,7 +68,6 @@ interface NotificationInterface
 	 * Inserts a new mention into the database.
 	 * Checks if the mention already exists (in any status) to prevent any duplicates
 	 *
-	 * @package Mentions
 	 * @param int $member_from the id of the member mentioning
 	 * @param int[] $members_to an array of ids of the members mentioned
 	 * @param int $target the id of the target involved in the mention
@@ -75,6 +76,7 @@ interface NotificationInterface
 	 * @param bool|null $is_accessible optional if the mention is accessible to the user
 	 *
 	 * @return int[] An array of members id
+	 * @package Mentions
 	 */
 	public function insert($member_from, $members_to, $target, $time = null, $status = null, $is_accessible = null);
 }

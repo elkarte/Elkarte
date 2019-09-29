@@ -8,7 +8,7 @@
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause (see accompanying LICENSE.txt file)
  *
  * This file contains code covered by:
- * copyright:    2011 Simple Machines (http://www.simplemachines.org)
+ * copyright: 2011 Simple Machines (http://www.simplemachines.org)
  *
  * @version 2.0 dev
  *
@@ -38,6 +38,7 @@ class PreparseCode
 
 	/**
 	 * PreparseCode constructor.
+	 *
 	 * @param string $user_name
 	 */
 	protected function __construct($user_name)
@@ -73,7 +74,9 @@ class PreparseCode
 		$this->message = preg_replace('~&amp;#(\d{4,5}|[2-9]\d{2,4}|1[2-9]\d);~', '&#$1;', $this->message);
 
 		// Clean up after nobbc ;).
-		$this->message = preg_replace_callback('~\[nobbc\](.+?)\[/nobbc\]~i', function ($matches) {return $this->_preparsecode_nobbc_callback($matches);}, $this->message);
+		$this->message = preg_replace_callback('~\[nobbc\](.+?)\[/nobbc\]~i', function ($matches) {
+			return $this->_preparsecode_nobbc_callback($matches);
+		}, $this->message);
 
 		// Remove \r's... they're evil!
 		$this->message = strtr($this->message, array("\r" => ''));
@@ -229,7 +232,8 @@ class PreparseCode
 		// Token generator
 		$tokenizer = new \ElkArte\TokenHash();
 
-		foreach ($parts as $i => $part) {
+		foreach ($parts as $i => $part)
+		{
 			// It goes 0 = outside, 1 = begin tag, 2 = inside, 3 = close tag, repeat.
 			if ($i % 4 === 0 && isset($parts[$i + 3]))
 			{
@@ -329,11 +333,11 @@ class PreparseCode
 	 *
 	 * - Used by fixTags, fixes a specific tag's links.
 	 *
-	 * @param string   $myTag - the tag
+	 * @param string $myTag - the tag
 	 * @param string[] $protocols - http, https or ftp
-	 * @param bool     $embeddedUrl = false - whether it *can* be set to something
-	 * @param bool     $hasEqualSign = false, whether it *is* set to something
-	 * @param bool     $hasExtra = false - whether it can have extra cruft after the begin tag.
+	 * @param bool $embeddedUrl = false - whether it *can* be set to something
+	 * @param bool $hasEqualSign = false, whether it *is* set to something
+	 * @param bool $hasExtra = false - whether it can have extra cruft after the begin tag.
 	 */
 	private function _fixTag($myTag, $protocols, $embeddedUrl = false, $hasEqualSign = false, $hasExtra = false)
 	{

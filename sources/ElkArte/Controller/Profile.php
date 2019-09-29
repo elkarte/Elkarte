@@ -10,7 +10,7 @@
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause (see accompanying LICENSE.txt file)
  *
  * This file contains code covered by:
- * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * copyright: 2011 Simple Machines (http://www.simplemachines.org)
  *
  * @version 2.0 dev
  *
@@ -18,49 +18,63 @@
 
 namespace ElkArte\Controller;
 
+use ElkArte\AbstractController;
+use ElkArte\Cache\Cache;
+use ElkArte\EventManager;
+use ElkArte\Exceptions\Exception;
+use ElkArte\MembersList;
+use ElkArte\User;
+
 /**
  * Has the job of showing and editing people's profiles.
  */
-class Profile extends \ElkArte\AbstractController
+class Profile extends AbstractController
 {
 	/**
 	 * If the save was successful or not
+	 *
 	 * @var boolean
 	 */
 	private $_completed_save = false;
 
 	/**
 	 * If this was a request to save an update
+	 *
 	 * @var null
 	 */
 	private $_saving = null;
 
 	/**
 	 * What it says, on completion
+	 *
 	 * @var bool
 	 */
 	private $_force_redirect;
 
 	/**
 	 * Holds the output of createMenu for the profile areas
+	 *
 	 * @var array|boolean
 	 */
 	private $_profile_include_data;
 
 	/**
 	 * The current area chosen from the menu
+	 *
 	 * @var string
 	 */
 	private $_current_area;
 
 	/**
 	 * Member id for the history being viewed
+	 *
 	 * @var int
 	 */
 	private $_memID = 0;
 
 	/**
 	 * The \ElkArte\Member object is stored here to avoid some global
+	 *
 	 * @var \ElkArte\Member
 	 */
 	private $_profile = null;
@@ -75,8 +89,8 @@ class Profile extends \ElkArte\AbstractController
 		require_once(SUBSDIR . '/Profile.subs.php');
 
 		$this->_memID = currentMemberID();
-		\ElkArte\MembersList::load($this->_memID, false, 'profile');
-		$this->_profile = \ElkArte\MembersList::get($this->_memID);
+		MembersList::load($this->_memID, false, 'profile');
+		$this->_profile = MembersList::get($this->_memID);
 	}
 
 	/**
@@ -92,7 +106,9 @@ class Profile extends \ElkArte\AbstractController
 
 		// Don't reload this as we may have processed error strings.
 		if (empty($post_errors))
+		{
 			theme()->getTemplates()->loadLanguageFile('Profile');
+		}
 
 		theme()->getTemplates()->load('Profile');
 
@@ -115,19 +131,27 @@ class Profile extends \ElkArte\AbstractController
 
 		// Is there an updated message to show?
 		if (isset($this->_req->query->updated))
+		{
 			$context['profile_updated'] = $txt['profile_updated_own'];
+		}
 
 		// If it said no permissions that meant it wasn't valid!
 		if ($this->_profile_include_data && empty($this->_profile_include_data['permission']))
+		{
 			$this->_profile_include_data['enabled'] = false;
+		}
 
 		// No menu and guest? A warm welcome to register
 		if (!$this->_profile_include_data && $this->user->is_guest)
+		{
 			is_not_guest();
+		}
 
 		// No menu means no access at all.
 		if (!$this->_profile_include_data || (isset($this->_profile_include_data['enabled']) && $this->_profile_include_data['enabled'] === false))
-			throw new \ElkArte\Exceptions\Exception('no_access', false);
+		{
+			throw new Exception('no_access', false);
+		}
 
 		// Make a note of the Unique ID for this menu.
 		$context['profile_menu_id'] = $context['max_menu_id'];
@@ -152,7 +176,9 @@ class Profile extends \ElkArte\AbstractController
 
 		// Permissions for good measure.
 		if (!empty($this->_profile_include_data['permission']))
+		{
 			isAllowedTo($this->_profile_include_data['permission'][$context['user']['is_owner'] ? 'own' : 'any']);
+		}
 
 		// Session validation and/or Token Checks
 		$this->_check_access();
@@ -177,23 +203,33 @@ class Profile extends \ElkArte\AbstractController
 		{
 			// Set all the errors so the template knows what went wrong.
 			foreach ($post_errors as $error_type)
+			{
 				$context['modify_error'][$error_type] = true;
+			}
 		}
 		// If it's you then we should redirect upon save.
 		elseif (!empty($profile_vars) && $context['user']['is_owner'] && !$context['do_preview'])
+		{
 			redirectexit('action=profile;area=' . $this->_current_area . ';updated');
+		}
 		elseif (!empty($this->_force_redirect))
+		{
 			redirectexit('action=profile' . ($context['user']['is_owner'] ? '' : ';u=' . $this->_memID) . ';area=' . $this->_current_area);
+		}
 
 		// Let go to the right place
 		if (isset($this->_profile_include_data['file']))
+		{
 			require_once($this->_profile_include_data['file']);
+		}
 
 		callMenu($this->_profile_include_data);
 
 		// Set the page title if it's not already set...
 		if (!isset($context['page_title']))
+		{
 			$context['page_title'] = $txt['profile'] . (isset($txt[$this->_current_area]) ? ' - ' . $txt[$this->_current_area] : '');
+		}
 	}
 
 	/**
@@ -600,7 +636,7 @@ class Profile extends \ElkArte\AbstractController
 
 		// All the subactions that require a user password in order to validate.
 		$check_password = $context['user']['is_owner'] && !empty($this->_profile_include_data['password']);
-		$context['require_password'] = $check_password && empty(\ElkArte\User::$settings['openid_uri']);
+		$context['require_password'] = $check_password && empty(User::$settings['openid_uri']);
 
 		// These will get populated soon!
 		$post_errors = array();
@@ -625,15 +661,15 @@ class Profile extends \ElkArte\AbstractController
 			// Now call the sub-action function...
 			if ($this->_current_area === 'activateaccount' && empty($post_errors))
 			{
-				$controller = new ProfileAccount(new \ElkArte\EventManager());
-				$controller->setUser(\ElkArte\User::$info);
+				$controller = new ProfileAccount(new EventManager());
+				$controller->setUser(User::$info);
 				$controller->pre_dispatch();
 				$controller->action_activateaccount();
 			}
 			elseif ($this->_current_area === 'deleteaccount' && empty($post_errors))
 			{
-				$controller = new ProfileAccount(new \ElkArte\EventManager());
-				$controller->setUser(\ElkArte\User::$info);
+				$controller = new ProfileAccount(new EventManager());
+				$controller->setUser(User::$info);
 				$controller->pre_dispatch();
 				$controller->action_deleteaccount2();
 
@@ -642,8 +678,8 @@ class Profile extends \ElkArte\AbstractController
 			}
 			elseif ($this->_current_area === 'groupmembership' && empty($post_errors))
 			{
-				$controller = new ProfileOptions(new \ElkArte\EventManager());
-				$controller->setUser(\ElkArte\User::$info);
+				$controller = new ProfileOptions(new EventManager());
+				$controller->setUser(User::$info);
 				$controller->pre_dispatch();
 				$msg = $controller->action_groupMembership2();
 
@@ -653,8 +689,8 @@ class Profile extends \ElkArte\AbstractController
 			// Authentication changes?
 			elseif ($this->_current_area === 'authentication')
 			{
-				$controller = new ProfileOptions(new \ElkArte\EventManager());
-				$controller->setUser(\ElkArte\User::$info);
+				$controller = new ProfileOptions(new EventManager());
+				$controller->setUser(User::$info);
 				$controller->pre_dispatch();
 				$controller->action_authentication(true);
 			}
@@ -745,14 +781,16 @@ class Profile extends \ElkArte\AbstractController
 				if (!empty($context['profile_execute_on_save']))
 				{
 					foreach ($context['profile_execute_on_save'] as $saveFunc)
+					{
 						$saveFunc();
+					}
 				}
 
 				// Let them know it worked!
 				$context['profile_updated'] = $context['user']['is_owner'] ? $txt['profile_updated_own'] : sprintf($txt['profile_updated_else'], $this->_profile['member_name']);
 
 				// Invalidate any cached data.
-				\ElkArte\Cache\Cache::instance()->remove('member_data-profile-' . $this->_memID);
+				Cache::instance()->remove('member_data-profile-' . $this->_memID);
 			}
 		}
 	}
@@ -770,7 +808,7 @@ class Profile extends \ElkArte\AbstractController
 		if ($check_password)
 		{
 			// If we're using OpenID try to re-validate.
-			if (!empty(\ElkArte\User::$settings['openid_uri']))
+			if (!empty(User::$settings['openid_uri']))
 			{
 				$openID = new \ElkArte\OpenID();
 				$openID->revalidate();

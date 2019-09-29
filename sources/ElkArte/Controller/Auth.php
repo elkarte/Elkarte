@@ -9,7 +9,7 @@
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause (see accompanying LICENSE.txt file)
  *
  * This file contains code covered by:
- * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * copyright: 2011 Simple Machines (http://www.simplemachines.org)
  *
  * @version 2.0 dev
  *
@@ -17,14 +17,20 @@
 
 namespace ElkArte\Controller;
 
+use ElkArte\AbstractController;
+use ElkArte\Cache\Cache;
+use ElkArte\Errors\Errors;
+use ElkArte\Exceptions\Exception;
 use ElkArte\User;
+use ElkArte\UserSettingsLoader;
+use ElkArte\Util;
 
 /**
  * Deals with logging in and out members, and the validation of them
  *
  * @package Authorization
  */
-class Auth extends \ElkArte\AbstractController
+class Auth extends AbstractController
 {
 	/**
 	 * {@inheritdoc }
@@ -55,7 +61,7 @@ class Auth extends \ElkArte\AbstractController
 	 *  - It caches the referring URL in $_SESSION['login_url'].
 	 *  - It is accessed from ?action=login.
 	 *
-	 *  @uses Login template and language file with the login sub-template.
+	 * @uses Login template and language file with the login sub-template.
 	 */
 	public function action_login()
 	{
@@ -75,7 +81,7 @@ class Auth extends \ElkArte\AbstractController
 
 		// Get the template ready.... not really much else to do.
 		$context['page_title'] = $txt['login'];
-		$_REQUEST['u'] = isset($_REQUEST['u']) ? \ElkArte\Util::htmlspecialchars($_REQUEST['u']) : '';
+		$_REQUEST['u'] = isset($_REQUEST['u']) ? Util::htmlspecialchars($_REQUEST['u']) : '';
 		$context['default_username'] = &$_REQUEST['u'];
 		$context['using_openid'] = isset($_GET['openid']);
 		$context['default_password'] = '';
@@ -89,9 +95,13 @@ class Auth extends \ElkArte\AbstractController
 
 		// Set the login URL - will be used when the login process is done (but careful not to send us to an attachment).
 		if (isset($_SESSION['old_url']) && validLoginUrl($_SESSION['old_url'], true))
+		{
 			$_SESSION['login_url'] = $_SESSION['old_url'];
+		}
 		else
+		{
 			unset($_SESSION['login_url']);
+		}
 
 		// Create a one time token.
 		createToken('login');
@@ -131,17 +141,25 @@ class Auth extends \ElkArte\AbstractController
 
 		// Set the login_url if it's not already set (but careful not to send us to an attachment).
 		if (empty($_SESSION['login_url']) && isset($_SESSION['old_url']) && validLoginUrl($_SESSION['old_url'], true))
+		{
 			$_SESSION['login_url'] = $_SESSION['old_url'];
+		}
 
 		// Been guessing a lot, haven't we?
 		if (isset($_SESSION['failed_login']) && $_SESSION['failed_login'] >= $modSettings['failed_login_threshold'] * 3)
-			throw new \ElkArte\Exceptions\Exception('login_threshold_fail', 'critical');
+		{
+			throw new Exception('login_threshold_fail', 'critical');
+		}
 
 		// Set up the cookie length.  (if it's invalid, just fall through and use the default.)
 		if (isset($_POST['cookieneverexp']) || (!empty($_POST['cookielength']) && $_POST['cookielength'] == -1))
+		{
 			$modSettings['cookieTime'] = 3153600;
+		}
 		elseif (!empty($_POST['cookielength']) && ($_POST['cookielength'] >= 1 && $_POST['cookielength'] <= 525600))
+		{
 			$modSettings['cookieTime'] = (int) $_POST['cookielength'];
+		}
 
 		theme()->getTemplates()->loadLanguageFile('Login');
 
@@ -169,10 +187,13 @@ class Auth extends \ElkArte\AbstractController
 			$open_id = new \ElkArte\OpenID();
 
 			if (($open_id->validate($_POST['openid_identifier'])) !== 'no_data')
+			{
 				return $open_id;
+			}
 			else
 			{
 				$context['login_errors'] = array($txt['openid_not_found']);
+
 				return false;
 			}
 		}
@@ -181,18 +202,22 @@ class Auth extends \ElkArte\AbstractController
 		if (!isset($_POST['user']) || $_POST['user'] === '')
 		{
 			$context['login_errors'] = array($txt['need_username']);
+
 			return false;
 		}
 
 		// No one needs a username that long, plus we only support 80 chars in the db
-		if (\ElkArte\Util::strlen($_POST['user']) > 80)
-			$_POST['user'] = \ElkArte\Util::substr($_POST['user'], 0, 80);
+		if (Util::strlen($_POST['user']) > 80)
+		{
+			$_POST['user'] = Util::substr($_POST['user'], 0, 80);
+		}
 
 		// Can't use a password > 64 characters sorry, to long and only good for a DoS attack
 		// Plus we expect a 64 character one from SHA-256
 		if ((isset($_POST['passwrd']) && strlen($_POST['passwrd']) > 64) || (isset($_POST['hash_passwrd']) && strlen($_POST['hash_passwrd']) > 64))
 		{
 			$context['login_errors'] = array($txt['improper_password']);
+
 			return false;
 		}
 
@@ -200,6 +225,7 @@ class Auth extends \ElkArte\AbstractController
 		if ((!isset($_POST['passwrd']) || $_POST['passwrd'] === '') && (!isset($_POST['hash_passwrd']) || strlen($_POST['hash_passwrd']) !== 64))
 		{
 			$context['login_errors'] = array($txt['no_password']);
+
 			return false;
 		}
 
@@ -207,6 +233,7 @@ class Auth extends \ElkArte\AbstractController
 		if (preg_match('~[<>&"\'=\\\]~', preg_replace('~(&#(\\d{1,7}|x[0-9a-fA-F]{1,6});)~', '', $_POST['user'])) != 0)
 		{
 			$context['login_errors'] = array($txt['error_invalid_characters_username']);
+
 			return false;
 		}
 
@@ -215,16 +242,17 @@ class Auth extends \ElkArte\AbstractController
 		{
 			$context['login_errors'] = array($txt['login_hash_error']);
 			$context['disable_login_hashing'] = true;
+
 			return false;
 		}
 
 		// Find them... if we can
 		$member_found = loadExistingMember($_POST['user']);
 		$db = database();
-		$cache = \ElkArte\Cache\Cache::instance();
+		$cache = Cache::instance();
 		$req = request();
 
-		$user = new \ElkArte\UserSettingsLoader($db, $cache, $req);
+		$user = new UserSettingsLoader($db, $cache, $req);
 		$user->loadUserById($member_found['id_member'], true, '');
 		$user_setting = $user->getSettings();
 
@@ -232,6 +260,7 @@ class Auth extends \ElkArte\AbstractController
 		if (!empty($modSettings['enableOTP']) && !empty($user_setting['enable_otp']) && empty($_POST['otp_token']))
 		{
 			$context['login_errors'] = array($txt['otp_required']);
+
 			return false;
 		}
 
@@ -245,12 +274,14 @@ class Auth extends \ElkArte\AbstractController
 			if (!$checkResult)
 			{
 				$context['login_errors'] = array($txt['invalid_otptoken']);
+
 				return false;
 			}
 			// OTP already used? Sorry, but this is a ONE TIME password..
 			if ($user_setting['otp_used'] === $_POST['otp_token'])
 			{
 				$context['login_errors'] = array($txt['otp_used']);
+
 				return false;
 			}
 		}
@@ -259,6 +290,7 @@ class Auth extends \ElkArte\AbstractController
 		if (empty($member_found))
 		{
 			$context['login_errors'] = array($txt['username_no_exist']);
+
 			return false;
 		}
 
@@ -298,7 +330,7 @@ class Auth extends \ElkArte\AbstractController
 				}
 				else
 				{
-					\ElkArte\Errors\Errors::instance()->log_error($txt['incorrect_password'] . ' - <span class="remove">' . $user_setting['member_name'] . '</span>', 'user');
+					Errors::instance()->log_error($txt['incorrect_password'] . ' - <span class="remove">' . $user_setting['member_name'] . '</span>', 'user');
 
 					// Wrong password, lets enable plain text responses in case form hashing is causing problems
 					$context['disable_login_hashing'] = true;
@@ -343,14 +375,17 @@ class Auth extends \ElkArte\AbstractController
 
 				// Hmm... don't remember it, do you?  Here, try the password reminder ;).
 				if ($_SESSION['failed_login'] >= $modSettings['failed_login_threshold'])
+				{
 					redirectexit('action=reminder');
+				}
 				// We'll give you another chance...
 				else
 				{
 					// Log an error so we know that it didn't go well in the error log.
-					\ElkArte\Errors\Errors::instance()->log_error($txt['incorrect_password'] . ' - <span class="remove">' . $user_setting['member_name'] . '</span>', 'user');
+					Errors::instance()->log_error($txt['incorrect_password'] . ' - <span class="remove">' . $user_setting['member_name'] . '</span>', 'user');
 
 					$context['login_errors'] = array($txt['incorrect_password']);
+
 					return false;
 				}
 			}
@@ -385,6 +420,137 @@ class Auth extends \ElkArte\AbstractController
 		}
 
 		return false;
+	}
+
+	/**
+	 * Loads other possible password hash / crypts using the post data
+	 *
+	 * What it does:
+	 *
+	 * - Used when a board is converted to see if the user credentials and a 3rd
+	 * party hash satisfy whats in the db passwd field
+	 *
+	 * @param string $member_name
+	 * @param string $passwrd
+	 * @param string $password_salt
+	 *
+	 * @return array
+	 */
+	private function _other_passwords($posted_password, $member_name, $passwrd, $password_salt)
+	{
+		global $modSettings;
+
+		// What kind of data are we dealing with
+		$pw_strlen = strlen($passwrd);
+
+		// Start off with none, that's safe
+		$other_passwords = array();
+
+		// None of the below cases will be used most of the time (because the salt is normally set.)
+		if (!empty($modSettings['enable_password_conversion']) && $password_salt === '')
+		{
+			// YaBB SE, Discus, MD5 (used a lot), SHA-1 (used some), SMF 1.0.x, IkonBoard, and none at all.
+			$other_passwords[] = crypt($posted_password, substr($posted_password, 0, 2));
+			$other_passwords[] = crypt($posted_password, substr($passwrd, 0, 2));
+			$other_passwords[] = md5($posted_password);
+			$other_passwords[] = sha1($posted_password);
+			$other_passwords[] = md5_hmac($posted_password, strtolower($member_name));
+			$other_passwords[] = md5($posted_password . strtolower($member_name));
+			$other_passwords[] = md5(md5($posted_password));
+			$other_passwords[] = $posted_password;
+
+			// This one is a strange one... MyPHP, crypt() on the MD5 hash.
+			$other_passwords[] = crypt(md5($posted_password), md5($posted_password));
+
+			// SHA-256
+			if ($pw_strlen === 64)
+			{
+				// Snitz style
+				$other_passwords[] = bin2hex(hash('sha256', $posted_password));
+
+				// Normal SHA-256
+				$other_passwords[] = hash('sha256', $posted_password);
+			}
+
+			// phpBB3 users new hashing.  We now support it as well ;).
+			$other_passwords[] = phpBB3_password_check($posted_password, $passwrd);
+
+			// APBoard 2 Login Method.
+			$other_passwords[] = md5(crypt($posted_password, 'CRYPT_MD5'));
+
+			// Xenforo 1.2+
+			$other_passwords[] = crypt($posted_password, $passwrd);
+		}
+		// The hash should be 40 if it's SHA-1, so we're safe with more here too.
+		elseif (!empty($modSettings['enable_password_conversion']) && $pw_strlen === 32)
+		{
+			// vBulletin 3 style hashing?  Let's welcome them with open arms \o/.
+			$other_passwords[] = md5(md5($posted_password) . stripslashes($password_salt));
+
+			// Hmm.. p'raps it's Invision 2 style?
+			$other_passwords[] = md5(md5($password_salt) . md5($posted_password));
+
+			// Some common md5 ones.
+			$other_passwords[] = md5($password_salt . $posted_password);
+			$other_passwords[] = md5($posted_password . $password_salt);
+		}
+		// The hash is 40 characters, lets try some SHA-1 style auth
+		elseif ($pw_strlen === 40)
+		{
+			// Maybe they are using a hash from before our password upgrade
+			$other_passwords[] = sha1(strtolower($member_name) . un_htmlspecialchars($posted_password));
+			$other_passwords[] = sha1($passwrd . $_SESSION['session_value']);
+
+			if (!empty($modSettings['enable_password_conversion']))
+			{
+				// BurningBoard3 style of hashing.
+				$other_passwords[] = sha1($password_salt . sha1($password_salt . sha1($posted_password)));
+
+				// PunBB 1.4 and later
+				$other_passwords[] = sha1($password_salt . sha1($posted_password));
+			}
+
+			// Perhaps we converted from a non UTF-8 db and have a valid password being hashed differently.
+			if (!empty($modSettings['previousCharacterSet']) && $modSettings['previousCharacterSet'] != 'utf8')
+			{
+				// Try iconv first, for no particular reason.
+				if (function_exists('iconv'))
+				{
+					$other_passwords['iconv'] = sha1(strtolower(iconv('UTF-8', $modSettings['previousCharacterSet'], $member_name)) . un_htmlspecialchars(iconv('UTF-8', $modSettings['previousCharacterSet'], $posted_password)));
+				}
+
+				// Say it aint so, iconv failed!
+				if (empty($other_passwords['iconv']) && function_exists('mb_convert_encoding'))
+				{
+					$other_passwords[] = sha1(strtolower(mb_convert_encoding($member_name, 'UTF-8', $modSettings['previousCharacterSet'])) . un_htmlspecialchars(mb_convert_encoding($posted_password, 'UTF-8', $modSettings['previousCharacterSet'])));
+				}
+			}
+		}
+		// SHA-256 will be 64 characters long, lets check some of these possibilities
+		elseif (!empty($modSettings['enable_password_conversion']) && $pw_strlen === 64)
+		{
+			// PHP-Fusion7
+			$other_passwords[] = hash_hmac('sha256', $posted_password, $password_salt);
+
+			// Plain SHA-256?
+			$other_passwords[] = hash('sha256', $posted_password . $password_salt);
+
+			// Xenforo?
+			$other_passwords[] = sha1(sha1($posted_password) . $password_salt);
+			$other_passwords[] = hash('sha256', (hash('sha256', ($posted_password) . $password_salt)));
+		}
+
+		// ElkArte's sha1 function can give a funny result on Linux (Not our fault!). If we've now got the real one let the old one be valid!
+		if (stripos(PHP_OS, 'win') !== 0)
+		{
+			require_once(SUBSDIR . '/Compat.subs.php');
+			$other_passwords[] = sha1_smf(strtolower($member_name) . un_htmlspecialchars($posted_password));
+		}
+
+		// Allows mods to easily extend the $other_passwords array
+		call_integration_hook('integrate_other_passwords', array(&$other_passwords));
+
+		return $other_passwords;
 	}
 
 	/**
@@ -499,7 +665,9 @@ class Auth extends \ElkArte\AbstractController
 
 		// Never redirect to an attachment
 		if (validLoginUrl($_SERVER['REQUEST_URL']))
+		{
 			$_SESSION['login_url'] = $_SERVER['REQUEST_URL'];
+		}
 
 		$context['sub_template'] = 'kick_guest';
 		$context['page_title'] = $txt['login'];
@@ -546,7 +714,7 @@ class Auth extends \ElkArte\AbstractController
 			// Strike!  You're outta there!
 			if ($_GET['member'] != $this->user->id)
 			{
-				throw new \ElkArte\Exceptions\Exception('login_cookie_error', false);
+				throw new Exception('login_cookie_error', false);
 			}
 
 			$this->user->can_mod = User::$info->canMod($modSettings['postmod_active']);
@@ -573,133 +741,6 @@ class Auth extends \ElkArte\AbstractController
 	{
 		dieGif();
 	}
-
-	/**
-	 * Loads other possible password hash / crypts using the post data
-	 *
-	 * What it does:
-	 *
-	 * - Used when a board is converted to see if the user credentials and a 3rd
-	 * party hash satisfy whats in the db passwd field
-	 *
-	 * @param string $member_name
-	 * @param string $passwrd
-	 * @param string $password_salt
-	 *
-	 * @return array
-	 */
-	private function _other_passwords($posted_password, $member_name, $passwrd, $password_salt)
-	{
-		global $modSettings;
-
-		// What kind of data are we dealing with
-		$pw_strlen = strlen($passwrd);
-
-		// Start off with none, that's safe
-		$other_passwords = array();
-
-		// None of the below cases will be used most of the time (because the salt is normally set.)
-		if (!empty($modSettings['enable_password_conversion']) && $password_salt === '')
-		{
-			// YaBB SE, Discus, MD5 (used a lot), SHA-1 (used some), SMF 1.0.x, IkonBoard, and none at all.
-			$other_passwords[] = crypt($posted_password, substr($posted_password, 0, 2));
-			$other_passwords[] = crypt($posted_password, substr($passwrd, 0, 2));
-			$other_passwords[] = md5($posted_password);
-			$other_passwords[] = sha1($posted_password);
-			$other_passwords[] = md5_hmac($posted_password, strtolower($member_name));
-			$other_passwords[] = md5($posted_password . strtolower($member_name));
-			$other_passwords[] = md5(md5($posted_password));
-			$other_passwords[] = $posted_password;
-
-			// This one is a strange one... MyPHP, crypt() on the MD5 hash.
-			$other_passwords[] = crypt(md5($posted_password), md5($posted_password));
-
-			// SHA-256
-			if ($pw_strlen === 64)
-			{
-				// Snitz style
-				$other_passwords[] = bin2hex(hash('sha256', $posted_password));
-
-				// Normal SHA-256
-				$other_passwords[] = hash('sha256', $posted_password);
-			}
-
-			// phpBB3 users new hashing.  We now support it as well ;).
-			$other_passwords[] = phpBB3_password_check($posted_password, $passwrd);
-
-			// APBoard 2 Login Method.
-			$other_passwords[] = md5(crypt($posted_password, 'CRYPT_MD5'));
-
-			// Xenforo 1.2+
-			$other_passwords[] = crypt($posted_password, $passwrd);
-		}
-		// The hash should be 40 if it's SHA-1, so we're safe with more here too.
-		elseif (!empty($modSettings['enable_password_conversion']) && $pw_strlen === 32)
-		{
-			// vBulletin 3 style hashing?  Let's welcome them with open arms \o/.
-			$other_passwords[] = md5(md5($posted_password) . stripslashes($password_salt));
-
-			// Hmm.. p'raps it's Invision 2 style?
-			$other_passwords[] = md5(md5($password_salt) . md5($posted_password));
-
-			// Some common md5 ones.
-			$other_passwords[] = md5($password_salt . $posted_password);
-			$other_passwords[] = md5($posted_password . $password_salt);
-		}
-		// The hash is 40 characters, lets try some SHA-1 style auth
-		elseif ($pw_strlen === 40)
-		{
-			// Maybe they are using a hash from before our password upgrade
-			$other_passwords[] = sha1(strtolower($member_name) . un_htmlspecialchars($posted_password));
-			$other_passwords[] = sha1($passwrd . $_SESSION['session_value']);
-
-			if (!empty($modSettings['enable_password_conversion']))
-			{
-				// BurningBoard3 style of hashing.
-				$other_passwords[] = sha1($password_salt . sha1($password_salt . sha1($posted_password)));
-
-				// PunBB 1.4 and later
-				$other_passwords[] = sha1($password_salt . sha1($posted_password));
-			}
-
-			// Perhaps we converted from a non UTF-8 db and have a valid password being hashed differently.
-			if (!empty($modSettings['previousCharacterSet']) && $modSettings['previousCharacterSet'] != 'utf8')
-			{
-				// Try iconv first, for no particular reason.
-				if (function_exists('iconv'))
-					$other_passwords['iconv'] = sha1(strtolower(iconv('UTF-8', $modSettings['previousCharacterSet'], $member_name)) . un_htmlspecialchars(iconv('UTF-8', $modSettings['previousCharacterSet'], $posted_password)));
-
-				// Say it aint so, iconv failed!
-				if (empty($other_passwords['iconv']) && function_exists('mb_convert_encoding'))
-					$other_passwords[] = sha1(strtolower(mb_convert_encoding($member_name, 'UTF-8', $modSettings['previousCharacterSet'])) . un_htmlspecialchars(mb_convert_encoding($posted_password, 'UTF-8', $modSettings['previousCharacterSet'])));
-			}
-		}
-		// SHA-256 will be 64 characters long, lets check some of these possibilities
-		elseif (!empty($modSettings['enable_password_conversion']) && $pw_strlen === 64)
-		{
-			// PHP-Fusion7
-			$other_passwords[] = hash_hmac('sha256', $posted_password, $password_salt);
-
-			// Plain SHA-256?
-			$other_passwords[] = hash('sha256', $posted_password . $password_salt);
-
-			// Xenforo?
-			$other_passwords[] = sha1(sha1($posted_password) . $password_salt);
-			$other_passwords[] = hash('sha256', (hash('sha256', ($posted_password) . $password_salt)));
-		}
-
-		// ElkArte's sha1 function can give a funny result on Linux (Not our fault!). If we've now got the real one let the old one be valid!
-		if (stripos(PHP_OS, 'win') !== 0)
-		{
-			require_once(SUBSDIR . '/Compat.subs.php');
-			$other_passwords[] = sha1_smf(strtolower($member_name) . un_htmlspecialchars($posted_password));
-		}
-
-		// Allows mods to easily extend the $other_passwords array
-		call_integration_hook('integrate_other_passwords', array(&$other_passwords));
-
-		return $other_passwords;
-	}
 }
 
 /**
@@ -722,7 +763,9 @@ function checkActivation()
 	global $context, $txt, $modSettings;
 
 	if (!isset($context['login_errors']))
+	{
 		$context['login_errors'] = array();
+	}
 
 	// What is the true activation status of this account?
 	$activation_status = User::$settings->getActivationStatus();
@@ -731,12 +774,13 @@ function checkActivation()
 	if ($activation_status == 5)
 	{
 		$context['login_errors'][] = $txt['coppa_no_concent'] . ' <a href="' . getUrl('action', ['action' => 'register', 'sa' => 'coppa', 'member' => User::$settings['id_member']]) . '">' . $txt['coppa_need_more_details'] . '</a>';
+
 		return false;
 	}
 	// Awaiting approval still?
 	elseif ($activation_status == 3)
 	{
-		throw new \ElkArte\Exceptions\Exception('still_awaiting_approval', 'user');
+		throw new Exception('still_awaiting_approval', 'user');
 	}
 	// Awaiting deletion, changed their mind?
 	elseif ($activation_status == 4)
@@ -752,17 +796,20 @@ function checkActivation()
 			$context['disable_login_hashing'] = true;
 			$context['login_errors'][] = $txt['awaiting_delete_account'];
 			$context['login_show_undelete'] = true;
+
 			return false;
 		}
 	}
 	// Standard activation?
 	elseif ($activation_status != 1)
 	{
-		\ElkArte\Errors\Errors::instance()->log_error($txt['activate_not_completed1'] . ' - <span class="remove">' . User::$settings['member_name'] . '</span>', false);
+		Errors::instance()->log_error($txt['activate_not_completed1'] . ' - <span class="remove">' . User::$settings['member_name'] . '</span>', false);
 
 		$context['login_errors'][] = $txt['activate_not_completed1'] . ' <a class="linkbutton" href="' . getUrl('action', ['action' => 'register', 'sa' => 'activate', 'resend', 'u' => User::$settings['id_member']]) . '">' . $txt['activate_not_completed2'] . '</a>';
+
 		return false;
 	}
+
 	return true;
 }
 
@@ -774,10 +821,10 @@ function checkActivation()
  *
  * @param \ElkArte\UserSettingsLoader $user
  *
- * @package Authorization
  * @throws \ElkArte\Exceptions\Exception
+ * @package Authorization
  */
-function doLogin(\ElkArte\UserSettingsLoader $user)
+function doLogin(UserSettingsLoader $user)
 {
 	global $maintenance, $modSettings, $context;
 
@@ -840,42 +887,51 @@ function doLogin(\ElkArte\UserSettingsLoader $user)
 
 	// Log this entry, only if we have it enabled.
 	if (!empty($modSettings['loginHistoryDays']))
+	{
 		logLoginHistory(User::$info->id, User::$info->ip, User::$info->ip2);
+	}
 
 	// Just log you back out if it's in maintenance mode and you AREN'T an admin.
 	if (empty($maintenance) || allowedTo('admin_forum'))
+	{
 		redirectexit('action=auth;sa=check;member=' . User::$info->id, detectServer()->is('needs_login_fix'));
+	}
 	else
+	{
 		redirectexit('action=logout;' . $context['session_var'] . '=' . $context['session_id'], detectServer()->is('needs_login_fix'));
+	}
 }
 
 /**
  * MD5 Encryption used for older passwords. (SMF 1.0.x/YaBB SE 1.5.x hashing)
  *
- * @package Authorization
  * @param string $data
  * @param string $key
  * @return string the HMAC MD5 of data with key
+ * @package Authorization
  */
 function md5_hmac($data, $key)
 {
 	$key = str_pad(strlen($key) <= 64 ? $key : pack('H*', md5($key)), 64, chr(0x00));
+
 	return md5(($key ^ str_repeat(chr(0x5c), 64)) . pack('H*', md5(($key ^ str_repeat(chr(0x36), 64)) . $data)));
 }
 
 /**
  * Custom encryption for phpBB3 based passwords.
  *
- * @package Authorization
  * @param string $passwd
  * @param string $passwd_hash
  * @return string
+ * @package Authorization
  */
 function phpBB3_password_check($passwd, $passwd_hash)
 {
 	// Too long or too short?
 	if (strlen($passwd_hash) !== 34)
+	{
 		return false;
+	}
 
 	// Range of characters allowed.
 	$range = './0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz';
@@ -887,7 +943,9 @@ function phpBB3_password_check($passwd, $passwd_hash)
 
 	$hash = md5($salt . $passwd, true);
 	for (; $count !== 0; --$count)
+	{
 		$hash = md5($hash . $passwd, true);
+	}
 
 	$output = substr($passwd_hash, 0, 12);
 	$i = 0;
@@ -897,20 +955,28 @@ function phpBB3_password_check($passwd, $passwd_hash)
 		$output .= $range[$value & 0x3f];
 
 		if ($i < 16)
+		{
 			$value |= ord($hash[$i]) << 8;
+		}
 
 		$output .= $range[($value >> 6) & 0x3f];
 
 		if ($i++ >= 16)
+		{
 			break;
+		}
 
 		if ($i < 16)
+		{
 			$value |= ord($hash[$i]) << 16;
+		}
 
 		$output .= $range[($value >> 12) & 0x3f];
 
 		if ($i++ >= 16)
+		{
 			break;
+		}
 
 		$output .= $range[($value >> 18) & 0x3f];
 	}

@@ -8,7 +8,7 @@
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause (see accompanying LICENSE.txt file)
  *
  * This file contains code covered by:
- * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * copyright: 2011 Simple Machines (http://www.simplemachines.org)
  *
  * @version 2.0 dev
  *
@@ -38,6 +38,20 @@ use ElkArte\User;
 class BrowserDetector
 {
 	/**
+	 * User agent
+	 *
+	 * @var string
+	 */
+	protected $_ua = null;
+
+	/**
+	 * Body id
+	 *
+	 * @var string
+	 */
+	protected $_body_id = null;
+
+	/**
 	 * Holds all browsers information. Its contents will be placed into $context['browser'].
 	 *
 	 * @var array
@@ -57,20 +71,6 @@ class BrowserDetector
 	 * @var boolean
 	 */
 	private $_is_tablet = null;
-
-	/**
-	 * User agent
-	 *
-	 * @var string
-	 */
-	protected $_ua = null;
-
-	/**
-	 * Body id
-	 *
-	 * @var string
-	 */
-	protected $_body_id = null;
 
 	/**
 	 * The main method of this class, you know the one that does the job: detect the thing.
@@ -96,16 +96,24 @@ class BrowserDetector
 
 		// One at a time, one at a time, and in this order too
 		if ($this->isOpera())
+		{
 			$this->_setupOpera();
+		}
 		// Them webkits need to be set up too
 		elseif ($this->isWebkit())
+		{
 			$this->_setupWebkit();
+		}
 		// We may have work to do on Firefox...
 		elseif ($this->isFirefox())
+		{
 			$this->_setupFirefox();
+		}
 		// Old friend, old frenemy
 		elseif ($this->isIe())
+		{
 			$this->_setupIe();
+		}
 
 		// Just a few mobile checks
 		$this->isOperaMini();
@@ -128,23 +136,33 @@ class BrowserDetector
 	public function isOpera()
 	{
 		if (!isset($this->_browsers['is_opera']))
+		{
 			$this->_browsers['is_opera'] = strpos($this->_ua, 'Opera') !== false;
+		}
 
 		return $this->_browsers['is_opera'];
 	}
 
 	/**
-	 * Determine if the browser is IE or not
+	 * More Opera checks if we are opera <15
 	 *
-	 * @return boolean true if the browser is IE otherwise false
+	 * What it does:
+	 *
+	 * - checks for the version of Opera in use
+	 * - uses checks for 10 first and falls through to <9
 	 */
-	public function isIe()
+	private function _setupOpera()
 	{
-		// I'm IE, Yes I'm the real IE; All you other IEs are just imitating.
-		if (!isset($this->_browsers['is_ie']))
-			$this->_browsers['is_ie'] = !$this->isOpera() && !$this->isGecko() && !$this->isWebTv() && (preg_match('~Trident/\d+~', $this->_ua) === 1 || preg_match('~MSIE \d+~', $this->_ua) === 1);
-
-		return $this->_browsers['is_ie'];
+		// Opera 10+ uses the version tag at the end of the string
+		if (preg_match('~\sVersion/(\d+)\.\d+(?:\s*|$)~', $this->_ua, $match))
+		{
+			$this->_browsers['is_opera' . (int) $match[1]] = true;
+		}
+		// Opera pre 10 is supposed to uses the Opera tag alone, as do some spoofers
+		elseif (preg_match('~Opera[ /](\d+)(?!\.[89])~', $this->_ua, $match))
+		{
+			$this->_browsers['is_opera' . (int) $match[1]] = true;
+		}
 	}
 
 	/**
@@ -155,116 +173,11 @@ class BrowserDetector
 	public function isWebkit()
 	{
 		if (!isset($this->_browsers['is_webkit']))
-			$this->_browsers['is_webkit'] = strpos($this->_ua, 'AppleWebKit') !== false;
-
-		return $this->_browsers['is_webkit'];
-	}
-
-	/**
-	 * Determine if the browser is Firefox or one of its variants
-	 *
-	 * @return boolean true if the browser is Firefox otherwise false
-	 */
-	public function isFirefox()
-	{
-		if (!isset($this->_browsers['is_firefox']))
-			$this->_browsers['is_firefox'] = preg_match('~(?:Firefox|Ice[wW]easel|IceCat|Shiretoko|Minefield)/~', $this->_ua) === 1 && $this->isGecko();
-
-		return $this->_browsers['is_firefox'];
-	}
-
-	/**
-	 * Determine if the browser is WebTv or not
-	 *
-	 * @return boolean true if the browser is WebTv otherwise false
-	 */
-	public function isWebTv()
-	{
-		if (!isset($this->_browsers['is_web_tv']))
-			$this->_browsers['is_web_tv'] = strpos($this->_ua, 'WebTV') !== false;
-
-		return $this->_browsers['is_web_tv'];
-	}
-
-	/**
-	 * Determine if the browser is konqueror or not
-	 *
-	 * @return boolean true if the browser is konqueror otherwise false
-	 */
-	public function isKonqueror()
-	{
-		if (!isset($this->_browsers['is_konqueror']))
-			$this->_browsers['is_konqueror'] = strpos($this->_ua, 'Konqueror') !== false;
-
-		return $this->_browsers['is_konqueror'];
-	}
-
-	/**
-	 * Determine if the browser is Gecko or not
-	 *
-	 * @return boolean true if the browser is Gecko otherwise false
-	 */
-	public function isGecko()
-	{
-		if (!isset($this->_browsers['is_gecko']))
-			$this->_browsers['is_gecko'] = strpos($this->_ua, 'Gecko') !== false && strpos($this->_ua, 'like Gecko') === false && !$this->isWebkit() && !$this->isKonqueror();
-
-		return $this->_browsers['is_gecko'];
-	}
-
-	/**
-	 * Determine if the browser is OperaMini or not
-	 *
-	 * @return boolean true if the browser is OperaMini otherwise false
-	 */
-	public function isOperaMini()
-	{
-		if (!isset($this->_browsers['is_opera_mini']))
-			$this->_browsers['is_opera_mini'] = (isset($_SERVER['HTTP_X_OPERAMINI_PHONE_UA']) || stripos($this->_ua, 'opera mini') !== false);
-		if ($this->_browsers['is_opera_mini'])
-			$this->_is_mobile = true;
-
-		return $this->_browsers['is_opera_mini'];
-	}
-
-	/**
-	 * Determine if the browser is OperaMobi or not
-	 *
-	 * @return boolean true if the browser is OperaMobi otherwise false
-	 */
-	public function isOperaMobi()
-	{
-		if (!isset($this->_browsers['is_opera_mobi']))
-			$this->_browsers['is_opera_mobi'] = stripos($this->_ua, 'opera mobi') !== false;
-		if ($this->_browsers['is_opera_mobi'])
-			$this->_is_mobile = true;
-
-		return $this->_browsers['is_opera_mini'];
-	}
-
-	/**
-	 * Determine if the browser is possibly a robot or not
-	 *
-	 * @return boolean true if the browser is possibly a robot otherwise false
-	 */
-	public function isPossibleRobot()
-	{
-		// Be you robot or human?
-		if (!isset($this->_browsers['possibly_robot']))
 		{
-			if (User::$info->possibly_robot) {
-				// This isn't meant to be reliable, it's just meant to catch most bots to prevent PHPSESSID from showing up.
-				$this->_browsers['possibly_robot'] = !empty(User::$info->possibly_robot);
-
-				// Robots shouldn't be logging in or registering.  So, they aren't a bot.  Better to be wrong than sorry (or people won't be able to log in!), anyway.
-				if ((isset($_REQUEST['action']) && in_array($_REQUEST['action'], array('login', 'login2', 'register'))) || User::$info->is_guest === false)
-					$this->_browsers['possibly_robot'] = false;
-			}
-			else
-				$this->_browsers['possibly_robot'] = false;
+			$this->_browsers['is_webkit'] = strpos($this->_ua, 'AppleWebKit') !== false;
 		}
 
-		return $this->_browsers['possibly_robot'];
+		return $this->_browsers['is_webkit'];
 	}
 
 	/**
@@ -287,12 +200,16 @@ class BrowserDetector
 
 		// blackberry, playbook, iphone, nokia, android and ipods set a mobile flag
 		if ($this->_browsers['is_iphone'] || $this->_browsers['is_blackberry'] || $this->_browsers['is_android'] || $this->_browsers['is_nokia'])
+		{
 			$this->_is_mobile = true;
+		}
 
 		// iPad and droid tablets get a tablet flag
 		$this->_browsers['is_android_tablet'] = $this->_browsers['is_android'] && strpos($this->_ua, 'Mobile') === false;
 		if ($this->_browsers['is_ipad'] || $this->_browsers['is_android_tablet'])
+		{
 			$this->_is_tablet = true;
+		}
 
 		// Prevent some repetition here
 		$_chrome = strpos($this->_ua, 'Chrome');
@@ -318,28 +235,144 @@ class BrowserDetector
 		if ($this->_browsers['is_chrome'])
 		{
 			if (preg_match('~chrome[/](\d\d?[.])~i', $this->_ua, $match) === 1)
+			{
 				$this->_browsers['is_chrome' . (int) $match[1]] = true;
+			}
 		}
 		elseif ($this->_browsers['is_edge'])
 		{
 			$this->_browsers['is_webkit'] = false;
 			if (preg_match('~edge[/](\d\d?[.])~i', $this->_ua, $match) === 1)
+			{
 				$this->_browsers['is_edge' . (int) $match[1]] = true;
+			}
 		}
 		elseif ($this->_browsers['is_safari'])
 		{
 			if (preg_match('~version/?(.*)safari.*~i', $this->_ua, $match) === 1)
+			{
 				$this->_browsers['is_safari' . (int) trim($match[1])] = true;
+			}
 		}
 		elseif ($this->_browsers['is_opera'])
 		{
 			if (preg_match('~OPR[/](\d\d?[.])~i', $this->_ua, $match) === 1)
+			{
 				$this->_browsers['is_opera' . (int) trim($match[1])] = true;
+			}
 
 			// Since opera >= 15 wants to look like chrome, set the body to do just that
 			if (trim($match[1]) >= 15)
+			{
 				$this->_browsers['is_chrome'] = true;
+			}
 		}
+	}
+
+	/**
+	 * Determine if the browser is Firefox or one of its variants
+	 *
+	 * @return boolean true if the browser is Firefox otherwise false
+	 */
+	public function isFirefox()
+	{
+		if (!isset($this->_browsers['is_firefox']))
+		{
+			$this->_browsers['is_firefox'] = preg_match('~(?:Firefox|Ice[wW]easel|IceCat|Shiretoko|Minefield)/~', $this->_ua) === 1 && $this->isGecko();
+		}
+
+		return $this->_browsers['is_firefox'];
+	}
+
+	/**
+	 * Determine if the browser is Gecko or not
+	 *
+	 * @return boolean true if the browser is Gecko otherwise false
+	 */
+	public function isGecko()
+	{
+		if (!isset($this->_browsers['is_gecko']))
+		{
+			$this->_browsers['is_gecko'] = strpos($this->_ua, 'Gecko') !== false && strpos($this->_ua, 'like Gecko') === false && !$this->isWebkit() && !$this->isKonqueror();
+		}
+
+		return $this->_browsers['is_gecko'];
+	}
+
+	/**
+	 * Determine if the browser is konqueror or not
+	 *
+	 * @return boolean true if the browser is konqueror otherwise false
+	 */
+	public function isKonqueror()
+	{
+		if (!isset($this->_browsers['is_konqueror']))
+		{
+			$this->_browsers['is_konqueror'] = strpos($this->_ua, 'Konqueror') !== false;
+		}
+
+		return $this->_browsers['is_konqueror'];
+	}
+
+	/**
+	 * Additional firefox checks.
+	 *
+	 * What it does:
+	 *
+	 * - Gets the version of the FF browser in use
+	 * - Considers all FF variants as FF including IceWeasel, IceCat, Shiretoko and Minefiled
+	 */
+	private function _setupFirefox()
+	{
+		if (preg_match('~(?:Firefox|Ice[wW]easel|IceCat|Shiretoko|Minefield)[\/ \(]([^ ;\)]+)~', $this->_ua, $match) === 1)
+		{
+			$this->_browsers['is_firefox' . (int) $match[1]] = true;
+		}
+
+		// Firefox mobile
+		if (strpos($this->_ua, 'Android; Mobile;') !== false)
+		{
+			$this->_browsers['is_android'] = true;
+			$this->_is_mobile = true;
+		}
+		// Tablets as well
+		elseif (strpos($this->_ua, 'Android; Tablet;') !== false)
+		{
+			$this->_browsers['is_android'] = true;
+			$this->_browsers['is_android_tablet'] = true;
+			$this->_is_tablet = true;
+		}
+	}
+
+	/**
+	 * Determine if the browser is IE or not
+	 *
+	 * @return boolean true if the browser is IE otherwise false
+	 */
+	public function isIe()
+	{
+		// I'm IE, Yes I'm the real IE; All you other IEs are just imitating.
+		if (!isset($this->_browsers['is_ie']))
+		{
+			$this->_browsers['is_ie'] = !$this->isOpera() && !$this->isGecko() && !$this->isWebTv() && (preg_match('~Trident/\d+~', $this->_ua) === 1 || preg_match('~MSIE \d+~', $this->_ua) === 1);
+		}
+
+		return $this->_browsers['is_ie'];
+	}
+
+	/**
+	 * Determine if the browser is WebTv or not
+	 *
+	 * @return boolean true if the browser is WebTv otherwise false
+	 */
+	public function isWebTv()
+	{
+		if (!isset($this->_browsers['is_web_tv']))
+		{
+			$this->_browsers['is_web_tv'] = strpos($this->_ua, 'WebTV') !== false;
+		}
+
+		return $this->_browsers['is_web_tv'];
 	}
 
 	/**
@@ -371,7 +404,9 @@ class BrowserDetector
 
 			// If trident is set, see the (if any) msie tag in the user agent matches ... if not its in some compatibility view
 			if (isset($msie_match[1]) && ($msie_match[1] < $trident_match[1] + 4))
+			{
 				$this->_browsers['is_ie_compat_view'] = true;
+			}
 		}
 
 		// IE mobile, ... shucks why not
@@ -390,49 +425,71 @@ class BrowserDetector
 	}
 
 	/**
-	 * Additional firefox checks.
+	 * Determine if the browser is OperaMini or not
 	 *
-	 * What it does:
-	 *
-	 * - Gets the version of the FF browser in use
-	 * - Considers all FF variants as FF including IceWeasel, IceCat, Shiretoko and Minefiled
+	 * @return boolean true if the browser is OperaMini otherwise false
 	 */
-	private function _setupFirefox()
+	public function isOperaMini()
 	{
-		if (preg_match('~(?:Firefox|Ice[wW]easel|IceCat|Shiretoko|Minefield)[\/ \(]([^ ;\)]+)~', $this->_ua, $match) === 1)
-			$this->_browsers['is_firefox' . (int) $match[1]] = true;
-
-		// Firefox mobile
-		if (strpos($this->_ua, 'Android; Mobile;') !== false)
+		if (!isset($this->_browsers['is_opera_mini']))
 		{
-			$this->_browsers['is_android'] = true;
+			$this->_browsers['is_opera_mini'] = (isset($_SERVER['HTTP_X_OPERAMINI_PHONE_UA']) || stripos($this->_ua, 'opera mini') !== false);
+		}
+		if ($this->_browsers['is_opera_mini'])
+		{
 			$this->_is_mobile = true;
 		}
-		// Tablets as well
-		elseif (strpos($this->_ua, 'Android; Tablet;') !== false)
-		{
-			$this->_browsers['is_android'] = true;
-			$this->_browsers['is_android_tablet'] = true;
-			$this->_is_tablet = true;
-		}
+
+		return $this->_browsers['is_opera_mini'];
 	}
 
 	/**
-	 * More Opera checks if we are opera <15
+	 * Determine if the browser is OperaMobi or not
 	 *
-	 * What it does:
-	 *
-	 * - checks for the version of Opera in use
-	 * - uses checks for 10 first and falls through to <9
+	 * @return boolean true if the browser is OperaMobi otherwise false
 	 */
-	private function _setupOpera()
+	public function isOperaMobi()
 	{
-		// Opera 10+ uses the version tag at the end of the string
-		if (preg_match('~\sVersion/(\d+)\.\d+(?:\s*|$)~', $this->_ua, $match))
-			$this->_browsers['is_opera' . (int) $match[1]] = true;
-		// Opera pre 10 is supposed to uses the Opera tag alone, as do some spoofers
-		elseif (preg_match('~Opera[ /](\d+)(?!\.[89])~', $this->_ua, $match))
-			$this->_browsers['is_opera' . (int) $match[1]] = true;
+		if (!isset($this->_browsers['is_opera_mobi']))
+		{
+			$this->_browsers['is_opera_mobi'] = stripos($this->_ua, 'opera mobi') !== false;
+		}
+		if ($this->_browsers['is_opera_mobi'])
+		{
+			$this->_is_mobile = true;
+		}
+
+		return $this->_browsers['is_opera_mini'];
+	}
+
+	/**
+	 * Determine if the browser is possibly a robot or not
+	 *
+	 * @return boolean true if the browser is possibly a robot otherwise false
+	 */
+	public function isPossibleRobot()
+	{
+		// Be you robot or human?
+		if (!isset($this->_browsers['possibly_robot']))
+		{
+			if (User::$info->possibly_robot)
+			{
+				// This isn't meant to be reliable, it's just meant to catch most bots to prevent PHPSESSID from showing up.
+				$this->_browsers['possibly_robot'] = !empty(User::$info->possibly_robot);
+
+				// Robots shouldn't be logging in or registering.  So, they aren't a bot.  Better to be wrong than sorry (or people won't be able to log in!), anyway.
+				if ((isset($_REQUEST['action']) && in_array($_REQUEST['action'], array('login', 'login2', 'register'))) || User::$info->is_guest === false)
+				{
+					$this->_browsers['possibly_robot'] = false;
+				}
+			}
+			else
+			{
+				$this->_browsers['possibly_robot'] = false;
+			}
+		}
+
+		return $this->_browsers['possibly_robot'];
 	}
 
 	/**

@@ -8,7 +8,7 @@
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause (see accompanying LICENSE.txt file)
  *
  * This file contains code covered by:
- * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * copyright: 2011 Simple Machines (http://www.simplemachines.org)
  *
  * @version 2.0 dev
  *
@@ -16,13 +16,19 @@
 
 namespace ElkArte\Controller;
 
+use ElkArte\AbstractController;
+use ElkArte\Action;
+use ElkArte\Cache\Cache;
+use ElkArte\Util;
+
 /**
  * Handles post moderation actions. (approvals, unapproved)
  */
-class PostModeration extends \ElkArte\AbstractController
+class PostModeration extends AbstractController
 {
 	/**
 	 * Holds any passed brd values, used for filtering and the like
+	 *
 	 * @var array|null
 	 */
 	private $_brd = null;
@@ -32,7 +38,7 @@ class PostModeration extends \ElkArte\AbstractController
 	 *
 	 * @uses ModerationCenter.template
 	 * @uses ModerationCenter language file
-	 * @see \ElkArte\AbstractController::action_index()
+	 * @see  \ElkArte\AbstractController::action_index()
 	 */
 	public function action_index()
 	{
@@ -49,7 +55,7 @@ class PostModeration extends \ElkArte\AbstractController
 		);
 
 		// Pick something valid...
-		$action = new \ElkArte\Action('post_moderation');
+		$action = new Action('post_moderation');
 		$subAction = $action->initialize($subActions, 'replies');
 		$action->dispatch($subAction);
 	}
@@ -79,12 +85,18 @@ class PostModeration extends \ElkArte\AbstractController
 		}
 
 		if ($approve_boards == array(0))
+		{
 			$approve_query = '';
+		}
 		elseif (!empty($approve_boards))
+		{
 			$approve_query = ' AND m.id_board IN (' . implode(',', $approve_boards) . ')';
+		}
 		// Nada, zip, etc...
 		else
+		{
 			$approve_query = ' AND 1=0';
+		}
 
 		// We also need to know where we can delete topics and/or replies to.
 		if ($context['current_view'] === 'topics')
@@ -105,19 +117,29 @@ class PostModeration extends \ElkArte\AbstractController
 
 		// Check if we have something to do?
 		if (isset($this->_req->query->approve))
+		{
 			$toAction[] = (int) $this->_req->query->approve;
+		}
 		// Just a deletion?
 		elseif (isset($this->_req->query->delete))
+		{
 			$toAction[] = (int) $this->_req->query->delete;
+		}
 		// Lots of approvals?
 		elseif (isset($this->_req->post->item))
+		{
 			$toAction = array_map('intval', $this->_req->post->item);
+		}
 
 		// What are we actually doing.
 		if (isset($this->_req->query->approve) || (isset($this->_req->post->do) && $this->_req->post->do === 'approve'))
+		{
 			$curAction = 'approve';
+		}
 		elseif (isset($this->_req->query->delete) || (isset($this->_req->post->do) && $this->_req->post->do === 'delete'))
+		{
 			$curAction = 'delete';
+		}
 
 		// Right, so we have something to do?
 		if (!empty($toAction) && isset($curAction))
@@ -153,25 +175,35 @@ class PostModeration extends \ElkArte\AbstractController
 			{
 				// If it's not within what our view is ignore it...
 				if (($row['id_msg'] == $row['id_first_msg'] && $context['current_view'] !== 'topics') || ($row['id_msg'] != $row['id_first_msg'] && $context['current_view'] !== 'replies'))
+				{
 					continue;
+				}
 
 				$can_add = false;
 
 				// If we're approving this is simple.
 				if ($curAction === 'approve' && ($any_array == array(0) || in_array($row['id_board'], $any_array)))
+				{
 					$can_add = true;
+				}
 				// Delete requires more permission checks...
 				elseif ($curAction === 'delete')
 				{
 					// Own post is easy!
 					if ($row['id_member'] == $this->user->id && ($delete_own_boards == array(0) || in_array($row['id_board'], $delete_own_boards)))
+					{
 						$can_add = true;
+					}
 					// Is it a reply to their own topic?
 					elseif ($row['id_member'] == $row['id_member_started'] && $row['id_msg'] != $row['id_first_msg'] && ($delete_own_replies == array(0) || in_array($row['id_board'], $delete_own_replies)))
+					{
 						$can_add = true;
+					}
 					// Someone else's?
 					elseif ($row['id_member'] != $this->user->id && ($delete_any_boards == array(0) || in_array($row['id_board'], $delete_any_boards)))
+					{
 						$can_add = true;
+					}
 				}
 
 				if ($can_add)
@@ -192,11 +224,15 @@ class PostModeration extends \ElkArte\AbstractController
 			if (!empty($toAction))
 			{
 				if ($curAction === 'approve')
+				{
 					approveMessages($toAction, $details, $context['current_view']);
+				}
 				else
+				{
 					removeMessages($toAction, $details, $context['current_view']);
+				}
 
-				\ElkArte\Cache\Cache::instance()->remove('num_menu_errors');
+				Cache::instance()->remove('num_menu_errors');
 			}
 		}
 
@@ -242,15 +278,15 @@ class PostModeration extends \ElkArte\AbstractController
 					'name' => 'item',
 					'value' => $item['id'],
 				),
-					'approve' => array(
-						'href' => $scripturl . '?action=moderate;area=postmod;sa=' . $context['current_view'] . ';start=' . $context['start'] . ';' . $context['session_var'] . '=' . $context['session_id'] . ';approve=' . $item['id'],
-						'text' => $txt['approve'],
-					),
-					'unapprove' => array(
-						'href' => $scripturl . '?action=moderate;area=postmod;sa=' . $context['current_view'] . ';start=' . $context['start'] . ';' . $context['session_var'] . '=' . $context['session_id'] . ';delete=' . $item['id'],
-						'text' => $txt['remove'],
-						'test' => 'can_delete',
-					),
+				'approve' => array(
+					'href' => $scripturl . '?action=moderate;area=postmod;sa=' . $context['current_view'] . ';start=' . $context['start'] . ';' . $context['session_var'] . '=' . $context['session_id'] . ';approve=' . $item['id'],
+					'text' => $txt['approve'],
+				),
+				'unapprove' => array(
+					'href' => $scripturl . '?action=moderate;area=postmod;sa=' . $context['current_view'] . ';start=' . $context['start'] . ';' . $context['session_var'] . '=' . $context['session_id'] . ';delete=' . $item['id'],
+					'text' => $txt['remove'],
+					'test' => 'can_delete',
+				),
 			);
 
 			$context['unapproved_items'][$key]['tests'] = array(
@@ -274,29 +310,45 @@ class PostModeration extends \ElkArte\AbstractController
 		$approve_boards = !empty($this->user->mod_cache['ap']) ? $this->user->mod_cache['ap'] : boardsAllowedTo('approve_posts');
 
 		if ($approve_boards == array(0))
+		{
 			$approve_query = '';
+		}
 		elseif (!empty($approve_boards))
+		{
 			$approve_query = ' AND m.id_board IN (' . implode(',', $approve_boards) . ')';
+		}
 		else
+		{
 			$approve_query = ' AND 0';
+		}
 
 		// Get together the array of things to act on, if any.
 		$attachments = array();
 		if (isset($this->_req->query->approve))
+		{
 			$attachments[] = (int) $this->_req->query->approve;
+		}
 		elseif (isset($this->_req->query->delete))
+		{
 			$attachments[] = (int) $this->_req->query->delete;
+		}
 		elseif (isset($this->_req->post->item))
 		{
 			foreach ($this->_req->post->item as $item)
+			{
 				$attachments[] = (int) $item;
+			}
 		}
 
 		// Are we approving or deleting?
 		if (isset($this->_req->query->approve) || (isset($this->_req->post->do) && $this->_req->post->do === 'approve'))
+		{
 			$curAction = 'approve';
+		}
 		elseif (isset($this->_req->query->delete) || (isset($this->_req->post->do) && $this->_req->post->do === 'delete'))
+		{
 			$curAction = 'delete';
+		}
 
 		// Something to do, let's do it!
 		if (!empty($attachments) && isset($curAction))
@@ -313,11 +365,15 @@ class PostModeration extends \ElkArte\AbstractController
 			if (!empty($attachments))
 			{
 				if ($curAction === 'approve')
+				{
 					approveAttachments($attachments);
+				}
 				else
+				{
 					removeAttachments(array('id_attach' => $attachments, 'do_logging' => true));
+				}
 
-				\ElkArte\Cache\Cache::instance()->remove('num_menu_errors');
+				Cache::instance()->remove('num_menu_errors');
 			}
 		}
 
@@ -404,7 +460,7 @@ class PostModeration extends \ElkArte\AbstractController
 						'function' => function ($data) {
 							global $modSettings;
 
-							return '<a href="' . $data['message']['href'] . '">' . \ElkArte\Util::shorten_text($data['message']['subject'], !empty($modSettings['subject_length']) ? $modSettings['subject_length'] : 24) . '</a>';
+							return '<a href="' . $data['message']['href'] . '">' . Util::shorten_text($data['message']['subject'], !empty($modSettings['subject_length']) ? $modSettings['subject_length'] : 24) . '</a>';
 						},
 						'class' => 'smalltext',
 						'style' => 'width:15em;',
@@ -489,16 +545,20 @@ class PostModeration extends \ElkArte\AbstractController
 
 		// If it's the first in a topic then the whole topic gets approved!
 		if ($message_info['id_first_msg'] == $current_msg)
+		{
 			approveTopics($topic, !$message_info['approved'], $message_info['id_member_started'] != $this->user->id);
+		}
 		else
 		{
 			approvePosts($current_msg, !$message_info['approved']);
 
 			if ($message_info['id_member'] != $this->user->id)
+			{
 				logAction(($message_info['approved'] ? 'un' : '') . 'approve', array('topic' => $topic, 'subject' => $message_info['subject'], 'member' => $message_info['id_member'], 'board' => $board));
+			}
 		}
 
-		\ElkArte\Cache\Cache::instance()->remove('num_menu_errors');
+		Cache::instance()->remove('num_menu_errors');
 
 		redirectexit('topic=' . $topic . '.msg' . $current_msg . '#msg' . $current_msg);
 	}

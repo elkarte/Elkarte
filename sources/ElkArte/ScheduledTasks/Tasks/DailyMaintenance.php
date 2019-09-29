@@ -8,13 +8,16 @@
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause (see accompanying LICENSE.txt file)
  *
  * This file contains code covered by:
- * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * copyright: 2011 Simple Machines (http://www.simplemachines.org)
  *
  * @version 2.0 dev
  *
  */
 
 namespace ElkArte\ScheduledTasks\Tasks;
+
+use ElkArte\Cache\Cache;
+use ElkArte\OpenID;
 
 /**
  * Class Daily_Maintenance - This function does daily cleaning up:
@@ -44,10 +47,10 @@ class DailyMaintenance implements ScheduledTaskInterface
 		$db = database();
 
 		// First clean out the cache.
-		\ElkArte\Cache\Cache::instance()->clean('data');
+		Cache::instance()->clean('data');
 
 		// If warning decrement is enabled and we have people who have not had a new warning in 24 hours, lower their warning level.
-		list (,, $modSettings['warning_decrement']) = explode(',', $modSettings['warning_settings']);
+		list (, , $modSettings['warning_decrement']) = explode(',', $modSettings['warning_settings']);
 		if ($modSettings['warning_decrement'])
 		{
 			// Find every member who has a warning level...
@@ -61,7 +64,9 @@ class DailyMaintenance implements ScheduledTaskInterface
 			);
 			$members = array();
 			while ($row = $db->fetch_assoc($request))
+			{
 				$members[$row['id_member']] = $row['warning'];
+			}
 			$db->free_result($request);
 
 			// Have some members to check?
@@ -84,10 +89,12 @@ class DailyMaintenance implements ScheduledTaskInterface
 				{
 					// More than 24 hours ago?
 					if ($row['last_warning'] <= time() - 86400)
+					{
 						$member_changes[] = array(
 							'id' => $row['id_recipient'],
 							'warning' => $members[$row['id_recipient']] >= $modSettings['warning_decrement'] ? $members[$row['id_recipient']] - $modSettings['warning_decrement'] : 0,
 						);
+					}
 				}
 				$db->free_result($request);
 
@@ -96,7 +103,9 @@ class DailyMaintenance implements ScheduledTaskInterface
 				{
 					require_once(SUBSDIR . '/Members.subs.php');
 					foreach ($member_changes as $change)
+					{
 						updateMemberData($change['id'], array('warning' => $change['warning']));
+					}
 				}
 			}
 		}
@@ -112,11 +121,13 @@ class DailyMaintenance implements ScheduledTaskInterface
 		// Regenerate the Diffie-Hellman keys if OpenID is enabled.
 		if (!empty($modSettings['enableOpenID']))
 		{
-			$openID = new \ElkArte\OpenID();
+			$openID = new OpenID();
 			$openID->setup_DH(true);
 		}
 		elseif (!empty($modSettings['dh_keys']))
+		{
 			removeSettings('dh_keys');
+		}
 
 		// Clean up some old login history information.
 		$db->query('', '
@@ -124,7 +135,7 @@ class DailyMaintenance implements ScheduledTaskInterface
 			WHERE time > {int:oldLogins}',
 			array(
 				'oldLogins' => !empty($modSettings['loginHistoryDays']) ? 60 * 60 * $modSettings['loginHistoryDays'] : 108000,
-		));
+			));
 
 		// Log we've done it...
 		return true;

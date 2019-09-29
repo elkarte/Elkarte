@@ -11,6 +11,7 @@
  * @version 2.0 dev
  *
  */
+
 namespace ElkArte;
 
 /**
@@ -24,18 +25,21 @@ class TokenHash
 {
 	/**
 	 * Available characters for private salt
+	 *
 	 * @var string
 	 */
 	private $itoa64;
 
 	/**
 	 * Random digits for initial seeding
+	 *
 	 * @var string
 	 */
 	private $random_state = '';
 
 	/**
 	 * Random salt to feed crypt
+	 *
 	 * @var string
 	 */
 	private $_salt = '';

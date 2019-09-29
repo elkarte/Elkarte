@@ -8,7 +8,7 @@
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause (see accompanying LICENSE.txt file)
  *
  * This file contains code covered by:
- * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * copyright: 2011 Simple Machines (http://www.simplemachines.org)
  *
  * @version 2.0 dev
  *
@@ -16,17 +16,20 @@
 
 namespace ElkArte\Modules\Drafts;
 
+use ElkArte\EventManager;
+use ElkArte\Modules\AbstractModule;
+
 /**
  * Class \ElkArte\Modules\Drafts\Admin
  *
  * Events and functions for post based drafts
  */
-class Admin extends \ElkArte\Modules\AbstractModule
+class Admin extends AbstractModule
 {
 	/**
 	 * {@inheritdoc}
 	 */
-	public static function hooks(\ElkArte\EventManager $eventsManager)
+	public static function hooks(EventManager $eventsManager)
 	{
 		return array(
 			array('addMenu', array('\\ElkArte\\Modules\\Drafts\\Admin', 'addMenu'), array()),

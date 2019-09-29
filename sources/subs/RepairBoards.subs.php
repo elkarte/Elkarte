@@ -11,11 +11,13 @@
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause (see accompanying LICENSE.txt file)
  *
  * This file contains code covered by:
- * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * copyright: 2011 Simple Machines (http://www.simplemachines.org)
  *
  * @version 2.0 dev
  *
  */
+
+use ElkArte\Debug;
 
 /**
  * Load up all the tests we might want to do ;)
@@ -343,7 +345,9 @@ function loadForumTests()
 
 				// Not really a problem?
 				if ($row['myid_first_msg'] == $row['myid_first_msg'] && $row['myid_first_msg'] == $row['myid_first_msg'] && $row['approved'] == $row['firstmsg_approved'])
+				{
 					return false;
+				}
 
 				$memberStartedID = getMsgMemberID($row['myid_first_msg']);
 				$memberUpdatedID = getMsgMemberID($row['myid_last_msg']);
@@ -361,14 +365,22 @@ function loadForumTests()
 
 				// A pretend error?
 				if ($row['myid_first_msg'] == $row['myid_first_msg'] && $row['myid_first_msg'] == $row['myid_first_msg'] && $row['approved'] == $row['firstmsg_approved'])
+				{
 					return false;
+				}
 
 				if ($row['id_first_msg'] != $row['myid_first_msg'])
+				{
 					$context['repair_errors'][] = sprintf($txt['repair_stats_topics_1'], $row['id_topic'], $row['id_first_msg']);
+				}
 				if ($row['id_last_msg'] != $row['myid_last_msg'])
+				{
 					$context['repair_errors'][] = sprintf($txt['repair_stats_topics_2'], $row['id_topic'], $row['id_last_msg']);
+				}
 				if ($row['approved'] != $row['firstmsg_approved'])
+				{
 					$context['repair_errors'][] = sprintf($txt['repair_stats_topics_5'], $row['id_topic']);
+				}
 
 				return true;
 			},
@@ -396,7 +408,9 @@ function loadForumTests()
 
 				// Not really a problem?
 				if ($row['my_num_replies'] == $row['num_replies'])
+				{
 					return false;
+				}
 
 				require_once(SUBSDIR . '/Topic.subs.php');
 				setTopicAttribute($row['id_topic'], array(
@@ -408,10 +422,14 @@ function loadForumTests()
 
 				// Just joking?
 				if ($row['my_num_replies'] == $row['num_replies'])
+				{
 					return false;
+				}
 
 				if ($row['num_replies'] != $row['my_num_replies'])
+				{
 					$context['repair_errors'][] = sprintf($txt['repair_stats_topics_3'], $row['id_topic'], $row['num_replies']);
+				}
 
 				return true;
 			},
@@ -978,7 +996,9 @@ function loadForumTests()
 				while ($row = $db->fetch_assoc($result))
 				{
 					foreach (text2words($row['subject']) as $word)
+					{
 						$inserts[] = array($word, $row['id_topic']);
+					}
 					if (count($inserts) > 500)
 					{
 						$db->insert('ignore',
@@ -993,12 +1013,14 @@ function loadForumTests()
 				}
 
 				if (!empty($inserts))
+				{
 					$db->insert('ignore',
 						'{db_prefix}log_search_subjects',
 						array('word' => 'string', 'id_topic' => 'int'),
 						$inserts,
 						array('word', 'id_topic')
 					);
+				}
 			},
 			'message_function' => function ($row) {
 				global $txt, $context;
@@ -1006,6 +1028,7 @@ function loadForumTests()
 				if (count(text2words($row['subject'])) != 0)
 				{
 					$context['repair_errors'][] = sprintf($txt['repair_missing_cached_subject'], $row['id_topic']);
+
 					return true;
 				}
 
@@ -1366,11 +1389,15 @@ function pauseRepairProcess($to_fix, $current_step_description, $max_substep = 0
 
 	// Errr, wait.  How much time has this taken already?
 	if (!$force && microtime(true) - $time_start < 3000)
+	{
 		return;
+	}
 
 	// Restore the query cache if interested.
 	if ($db_show_debug === true)
-		\ElkArte\Debug::instance()->on();
+	{
+		Debug::instance()->on();
+	}
 
 	$context['continue_get_data'] = '?action=admin;area=repairboards' . (isset($_GET['fixErrors']) ? ';fixErrors' : '') . ';step=' . $_GET['step'] . ';substep=' . $_GET['substep'] . ';' . $context['session_var'] . '=' . $context['session_id'];
 	$context['page_title'] = $txt['not_done_title'];
@@ -1380,9 +1407,13 @@ function pauseRepairProcess($to_fix, $current_step_description, $max_substep = 0
 
 	// Change these two if more steps are added!
 	if (empty($max_substep))
+	{
 		$context['continue_percent'] = round(($_GET['step'] * 100) / $context['total_steps']);
+	}
 	else
+	{
 		$context['continue_percent'] = round((($_GET['step'] + ($_GET['substep'] / $max_substep)) * 100) / $context['total_steps']);
+	}
 
 	// Never more than 100%!
 	$context['continue_percent'] = min($context['continue_percent'], 100);
@@ -1426,7 +1457,9 @@ function findForumErrors($do_fix = false)
 
 	// Don't allow the cache to get too full.
 	if ($db_show_debug === true)
-		\ElkArte\Debug::instance()->off();
+	{
+		Debug::instance()->off();
+	}
 
 	// Will want this.
 	$errorTests = loadForumTests();
@@ -1442,7 +1475,9 @@ function findForumErrors($do_fix = false)
 
 		// Already done this?
 		if ($_GET['step'] > $current_step)
+		{
 			continue;
+		}
 
 		// If we're fixing it but it ain't broke why try?
 		if ($do_fix && !in_array($error_type, $to_fix))
@@ -1457,8 +1492,7 @@ function findForumErrors($do_fix = false)
 			$step_size = isset($test['substeps']['step_size']) ? $test['substeps']['step_size'] : 100;
 			$request = $db->query('',
 				$test['substeps']['step_max'],
-				array(
-				)
+				array()
 			);
 			list ($step_max) = $db->fetch_row($request);
 
@@ -1472,26 +1506,35 @@ function findForumErrors($do_fix = false)
 		{
 			// Make sure there's at least one ID to test.
 			if (isset($test['substeps']) && empty($step_max))
+			{
 				break;
+			}
 
 			// What is the testing query (Changes if we are testing or fixing)
 			if (!$do_fix)
+			{
 				$test_query = 'check_query';
+			}
 			else
+			{
 				$test_query = isset($test['fix_query']) ? 'fix_query' : 'check_query';
+			}
 
 			// Do the test...
 			$request = $db->query('',
 				isset($test['substeps']) ? strtr($test[$test_query], array('{STEP_LOW}' => $_GET['substep'], '{STEP_HIGH}' => $_GET['substep'] + $step_size - 1)) : $test[$test_query],
-				array(
-				)
+				array()
 			);
 
 			// Does it need a fix?
 			if (!empty($test['check_type']) && $test['check_type'] == 'count')
+			{
 				list ($needs_fix) = $db->fetch_row($request);
+			}
 			else
+			{
 				$needs_fix = $db->num_rows($request);
+			}
 
 			$total_queries++;
 
@@ -1504,7 +1547,9 @@ function findForumErrors($do_fix = false)
 					$found_errors = true;
 
 					if (isset($test['message']))
+					{
 						$context['repair_errors'][] = $txt[$test['message']];
+					}
 
 					// One per row!
 					elseif (isset($test['messages']))
@@ -1515,9 +1560,13 @@ function findForumErrors($do_fix = false)
 							foreach ($variables as $k => $v)
 							{
 								if ($k == 0 && isset($txt[$v]))
+								{
 									$variables[$k] = $txt[$v];
+								}
 								elseif ($k > 0 && isset($row[$v]))
+								{
 									$variables[$k] = $row[$v];
+								}
 							}
 							$context['repair_errors'][] = call_user_func_array('sprintf', $variables);
 						}
@@ -1529,12 +1578,16 @@ function findForumErrors($do_fix = false)
 						// Find out if there are actually errors.
 						$found_errors = false;
 						while ($row = $db->fetch_assoc($request))
+						{
 							$found_errors |= $test['message_function']($row);
+						}
 					}
 
 					// Actually have something to fix?
 					if ($found_errors)
+					{
 						$to_fix[] = $error_type;
+					}
 				}
 
 				// We want to fix, we need to fix - so work out what exactly to do!
@@ -1545,7 +1598,9 @@ function findForumErrors($do_fix = false)
 					{
 						$ids = array();
 						while ($row = $db->fetch_assoc($request))
+						{
 							$ids[] = $row[$test['fix_collect']['index']];
+						}
 						if (!empty($ids))
 						{
 							// Fix it!
@@ -1555,29 +1610,38 @@ function findForumErrors($do_fix = false)
 
 					// Simply executing a fix it query?
 					elseif (isset($test['fix_it_query']))
+					{
 						$db->query('',
 							$test['fix_it_query'],
-							array(
-							)
+							array()
 						);
+					}
 
 					// Do we have some processing to do?
 					elseif (isset($test['fix_processing']))
 					{
 						while ($row = $db->fetch_assoc($request))
+						{
 							$test['fix_processing']($row);
+						}
 					}
 
 					// What about the full set of processing?
 					elseif (isset($test['fix_full_processing']))
+					{
 						$test['fix_full_processing']($request);
+					}
 
 					// Do we have other things we need to fix as a result?
 					if (!empty($test['force_fix']))
 					{
 						foreach ($test['force_fix'] as $item)
+						{
 							if (!in_array($item, $to_fix))
+							{
 								$to_fix[] = $item;
+							}
+						}
 					}
 				}
 			}
@@ -1595,14 +1659,20 @@ function findForumErrors($do_fix = false)
 					pauseRepairProcess($to_fix, $error_type, $step_max);
 				}
 				else
+				{
 					$done = true;
+				}
 			}
 			else
+			{
 				$done = true;
+			}
 
 			// Don't allow more than 1000 queries at a time.
 			if ($total_queries >= 1000)
+			{
 				pauseRepairProcess($to_fix, $error_type, $step_max, true);
+			}
 		}
 
 		// Keep going.
@@ -1616,7 +1686,9 @@ function findForumErrors($do_fix = false)
 		{
 			$key = array_search($error_type, $to_fix);
 			if ($key !== false && isset($to_fix[$key]))
+			{
 				unset($to_fix[$key]);
+			}
 		}
 
 		// Are we done?

@@ -8,13 +8,15 @@
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause (see accompanying LICENSE.txt file)
  *
  * This file contains code covered by:
- * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * copyright: 2011 Simple Machines (http://www.simplemachines.org)
  *
  * @version 2.0 dev
  *
  */
 
+use BBC\ParserWrapper;
 use ElkArte\User;
+use ElkArte\Util;
 
 /**
  * Get the latest posts of a forum.
@@ -40,7 +42,7 @@ function getLastPosts($latestPostOptions)
 			INNER JOIN {db_prefix}boards AS b ON (b.id_board = t.id_board)
 			LEFT JOIN {db_prefix}members AS mem ON (mem.id_member = m.id_member)
 		WHERE m.id_msg >= {int:likely_max_msg}' .
-			(!empty($modSettings['recycle_enable']) && $modSettings['recycle_board'] > 0 ? '
+		(!empty($modSettings['recycle_enable']) && $modSettings['recycle_board'] > 0 ? '
 			AND b.id_board != {int:recycle_board}' : '') . '
 			AND {query_wanna_see_board}' . ($modSettings['postmod_active'] ? '
 			AND t.approved = {int:is_approved}
@@ -55,7 +57,7 @@ function getLastPosts($latestPostOptions)
 	);
 
 	$posts = array();
-	$bbc_parser = \BBC\ParserWrapper::instance();
+	$bbc_parser = ParserWrapper::instance();
 
 	while ($row = $db->fetch_assoc($request))
 	{
@@ -64,7 +66,7 @@ function getLastPosts($latestPostOptions)
 		$row['body'] = censor($row['body']);
 
 		$row['body'] = strip_tags(strtr($bbc_parser->parseMessage($row['body'], $row['smileys_enabled']), array('<br />' => '&#10;')));
-		$row['body'] = \ElkArte\Util::shorten_text($row['body'], !empty($modSettings['lastpost_preview_characters']) ? $modSettings['lastpost_preview_characters'] : 128, true);
+		$row['body'] = Util::shorten_text($row['body'], !empty($modSettings['lastpost_preview_characters']) ? $modSettings['lastpost_preview_characters'] : 128, true);
 
 		$board_href = getUrl('board', ['board' => $row['id_board'], 'start' => '0', 'name' => $row['board_name']]);
 		$poster_href = getUrl('profile', ['action' => 'profile', 'u' => $row['id_member'], 'name' => $row['poster_name']]);
@@ -85,7 +87,7 @@ function getLastPosts($latestPostOptions)
 				'link' => empty($row['id_member']) ? $row['poster_name'] : '<a href="' . $poster_href . '">' . $row['poster_name'] . '</a>'
 			),
 			'subject' => $row['subject'],
-			'short_subject' => \ElkArte\Util::shorten_text($row['subject'], $modSettings['subject_length']),
+			'short_subject' => Util::shorten_text($row['subject'], $modSettings['subject_length']),
 			'preview' => $row['body'],
 			'time' => standardTime($row['poster_time']),
 			'html_time' => htmlTime($row['poster_time']),
@@ -139,7 +141,7 @@ function prepareRecentPosts($messages, $start)
 	$counter = $start + 1;
 	$posts = array();
 	$board_ids = array('own' => array(), 'any' => array());
-	$bbc_parser = \BBC\ParserWrapper::instance();
+	$bbc_parser = ParserWrapper::instance();
 	foreach ($messages as $row)
 	{
 		// Censor everything.
@@ -201,7 +203,9 @@ function prepareRecentPosts($messages, $start)
 		);
 
 		if (User::$info->id == $row['first_id_member'])
+		{
 			$board_ids['own'][$row['id_board']][] = $row['id_msg'];
+		}
 		$board_ids['any'][$row['id_board']][] = $row['id_msg'];
 	}
 
@@ -249,12 +253,16 @@ function earliest_msg()
 
 	// This is needed in case of topics marked unread.
 	if (empty($earliest_msg))
+	{
 		$earliest_msg = 0;
+	}
 	else
 	{
 		// Using caching, when possible, to ignore the below slow query.
 		if (isset($_SESSION['cached_log_time']) && $_SESSION['cached_log_time'][0] + 45 > time())
+		{
 			$earliest_msg2 = $_SESSION['cached_log_time'][1];
+		}
 		else
 		{
 			// This query is pretty slow, but it's needed to ensure nothing crucial is ignored.
@@ -271,7 +279,9 @@ function earliest_msg()
 
 			// In theory this could be zero, if the first ever post is unread, so fudge it ;)
 			if ($earliest_msg2 == 0)
+			{
 				$earliest_msg2 = -1;
+			}
 
 			$_SESSION['cached_log_time'] = array(time(), $earliest_msg2);
 		}
@@ -334,7 +344,7 @@ function getLastTopics($latestTopicOptions)
 			LEFT JOIN {db_prefix}log_topics AS lt ON (lt.id_topic = t.id_topic AND lt.id_member = {int:current_member})
 			LEFT JOIN {db_prefix}log_mark_read AS lmr ON (lmr.id_board = t.id_board AND lmr.id_member = {int:current_member})') . '
 		WHERE ml.id_msg >= {int:likely_max_msg}' .
-			(!empty($modSettings['recycle_enable']) && $modSettings['recycle_board'] > 0 ? '
+		(!empty($modSettings['recycle_enable']) && $modSettings['recycle_board'] > 0 ? '
 			AND b.id_board != {int:recycle_board}' : '') . '
 			AND {query_wanna_see_board}' . ($modSettings['postmod_active'] ? '
 			AND t.approved = {int:is_approved}' : '') . '
@@ -344,13 +354,13 @@ function getLastTopics($latestTopicOptions)
 			'likely_max_msg' => max(0, $modSettings['maxMsgID'] - 50 * $latestTopicOptions['number_posts']),
 			'recycle_board' => $modSettings['recycle_board'],
 			'is_approved' => 1,
-			'num_msgs' =>  $latestTopicOptions['number_posts'],
-			'current_member' =>  $latestTopicOptions['id_member'],
+			'num_msgs' => $latestTopicOptions['number_posts'],
+			'current_member' => $latestTopicOptions['id_member'],
 		)
 	);
 
 	$posts = array();
-	$bbc_parser = \BBC\ParserWrapper::instance();
+	$bbc_parser = ParserWrapper::instance();
 
 	while ($row = $db->fetch_assoc($request))
 	{
@@ -359,7 +369,7 @@ function getLastTopics($latestTopicOptions)
 		$row['body'] = censor($row['body']);
 
 		$row['body'] = strip_tags(strtr($bbc_parser->parseMessage($row['body'], $row['smileys_enabled']), array('<br />' => '&#10;')));
-		$row['body'] = \ElkArte\Util::shorten_text($row['body'], !empty($modSettings['lastpost_preview_characters']) ? $modSettings['lastpost_preview_characters'] : 128, true);
+		$row['body'] = Util::shorten_text($row['body'], !empty($modSettings['lastpost_preview_characters']) ? $modSettings['lastpost_preview_characters'] : 128, true);
 
 		$board_href = getUrl('board', ['board' => $row['id_board'], 'start' => '0', 'name' => $row['board_name']]);
 		$poster_href = getUrl('profile', ['action' => 'profile', 'u' => $row['id_member'], 'name' => $row['poster_name']]);
@@ -380,7 +390,7 @@ function getLastTopics($latestTopicOptions)
 				'link' => empty($row['id_member']) ? $row['poster_name'] : '<a href="' . $poster_href . '">' . $row['poster_name'] . '</a>'
 			),
 			'subject' => $row['subject'],
-			'short_subject' => \ElkArte\Util::shorten_text($row['subject'], $modSettings['subject_length']),
+			'short_subject' => Util::shorten_text($row['subject'], $modSettings['subject_length']),
 			'preview' => $row['body'],
 			'time' => standardTime($row['poster_time']),
 			'html_time' => htmlTime($row['poster_time']),

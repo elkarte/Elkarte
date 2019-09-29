@@ -13,7 +13,10 @@
 
 namespace ElkArte\Mentions\MentionType\Event;
 
-use ElkArte\Mentions\MentionType\Event\AbstractMentionBoardAccess;
+use ElkArte\DataValidator;
+use ElkArte\Mentions\Mentioning;
+use ElkArte\Notifications;
+use ElkArte\NotificationsTask;
 
 /**
  * Class QuotedmemMention
@@ -43,6 +46,16 @@ class Quotedmem extends AbstractMentionBoardAccess
 	}
 
 	/**
+	 * {@inheritdoc }
+	 */
+	public static function getModules($modules)
+	{
+		$modules['mentions'] = array('post', 'display');
+
+		return $modules;
+	}
+
+	/**
 	 * Listener attached to the prepare_context event of the Display controller
 	 * used to mark a mention as read.
 	 *
@@ -55,7 +68,7 @@ class Quotedmem extends AbstractMentionBoardAccess
 		// Mark the mention as read if requested
 		if (isset($_REQUEST['mentionread']) && !empty($virtual_msg))
 		{
-			$mentions = new \ElkArte\Mentions\Mentioning(database(), $this->user, new \ElkArte\DataValidator(), $modSettings['enabled_mentions']);
+			$mentions = new Mentioning(database(), $this->user, new DataValidator(), $modSettings['enabled_mentions']);
 			$mentions->markread((int) $_REQUEST['item']);
 		}
 	}
@@ -93,8 +106,8 @@ class Quotedmem extends AbstractMentionBoardAccess
 
 		if (!empty($members_id))
 		{
-			$notifier = \ElkArte\Notifications::instance();
-			$notifier->add(new \ElkArte\NotificationsTask(
+			$notifier = Notifications::instance();
+			$notifier->add(new NotificationsTask(
 				'quotedmem',
 				$msg_id,
 				$posterOptions['id'],
@@ -112,28 +125,28 @@ class Quotedmem extends AbstractMentionBoardAccess
 	 */
 	protected function _findQuotedMembers($text)
 	{
-/*
-The following bbcode is for testing, to be moved to a test when ready.
+		/*
+		The following bbcode is for testing, to be moved to a test when ready.
 
-[quote author=emanuele date=1430141592 link=msg=972]
-[quote author=lele]test[/quote]
-[/quote]
+		[quote author=emanuele date=1430141592 link=msg=972]
+		[quote author=lele]test[/quote]
+		[/quote]
 
-[quote author=lele non nested]test[/quote]
+		[quote author=lele non nested]test[/quote]
 
-[quote author=lele full date=1430141592 link=msg=972]test[/quote]
+		[quote author=lele full date=1430141592 link=msg=972]test[/quote]
 
 
-[quote author=emanuele date=1430141592 link=msg=972]
-[quote author=lele multi1]
-[quote author=lele multi2]
-[quote author=lele multi3]
-[quote author=lele]test[/quote]
-[/quote]
-[/quote]
-[/quote]
-[/quote]
-*/
+		[quote author=emanuele date=1430141592 link=msg=972]
+		[quote author=lele multi1]
+		[quote author=lele multi2]
+		[quote author=lele multi3]
+		[quote author=lele]test[/quote]
+		[/quote]
+		[/quote]
+		[/quote]
+		[/quote]
+		*/
 		if (strpos($text, '[quote ') !== false)
 		{
 			$quoted = array();
@@ -166,15 +179,5 @@ The following bbcode is for testing, to be moved to a test when ready.
 		{
 			return false;
 		}
-	}
-
-	/**
-	 * {@inheritdoc }
-	 */
-	public static function getModules($modules)
-	{
-		$modules['mentions'] = array('post', 'display');
-
-		return $modules;
 	}
 }

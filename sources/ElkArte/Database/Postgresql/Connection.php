@@ -13,10 +13,12 @@
 
 namespace ElkArte\Database\Postgresql;
 
+use ElkArte\Database\ConnectionInterface;
+
 /**
  * SQL database class, implements database class to control mysql functions
  */
-class Connection implements \ElkArte\Database\ConnectionInterface
+class Connection implements ConnectionInterface
 {
 	/**
 	 * {@inheritDoc}

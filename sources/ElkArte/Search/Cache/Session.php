@@ -15,6 +15,11 @@ namespace ElkArte\Search\Cache;
 
 use ElkArte\Sessions\SessionIndex;
 
+/**
+ * Class Session
+ *
+ * @package ElkArte\Search\Cache
+ */
 class Session
 {
 	protected $_id_search = 0;
@@ -39,11 +44,6 @@ class Session
 		));
 	}
 
-	public function getId()
-	{
-		return $this->_id_search;
-	}
-
 	public function increaseId($pointer = 0)
 	{
 		$this->_id_search = (int) $pointer;
@@ -57,14 +57,14 @@ class Session
 		return $this->getId();
 	}
 
+	public function getId()
+	{
+		return $this->_id_search;
+	}
+
 	public function existsWithParams($params)
 	{
 		return $this->_params === $params;
-	}
-
-	public function setNumResults($num_results = 0)
-	{
-		$this->_num_results = (int) $num_results;
 	}
 
 	/**
@@ -75,5 +75,10 @@ class Session
 	public function getNumResults()
 	{
 		return $this->_num_results;
+	}
+
+	public function setNumResults($num_results = 0)
+	{
+		$this->_num_results = (int) $num_results;
 	}
 }

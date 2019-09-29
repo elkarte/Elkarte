@@ -8,13 +8,15 @@
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause (see accompanying LICENSE.txt file)
  *
  * This file contains code covered by:
- * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * copyright: 2011 Simple Machines (http://www.simplemachines.org)
  *
  * @version 2.0 dev
  *
  */
 
+use ElkArte\Cache\Cache;
 use ElkArte\User;
+use ElkArte\Util;
 
 /**
  * Retrieve a list and several other statistics of the users currently online.
@@ -23,9 +25,9 @@ use ElkArte\User;
  * - Also returns the membergroups of the users that are currently online.
  * - (optionally) hides members that chose to hide their online presence.
  *
- * @package Members
  * @param mixed[] $membersOnlineOptions
  * @return array
+ * @package Members
  */
 function getMembersOnlineStats($membersOnlineOptions)
 {
@@ -52,13 +54,17 @@ function getMembersOnlineStats($membersOnlineOptions)
 
 	// Not allowed sort method? Bang! Error!
 	elseif (!in_array($membersOnlineOptions['sort'], $allowed_sort_options))
+	{
 		trigger_error('Sort method for getMembersOnlineStats() function is not allowed', E_USER_NOTICE);
+	}
 
 	// Get it from the cache and send it back.
 	$temp = array();
-	$cache = \ElkArte\Cache\Cache::instance();
+	$cache = Cache::instance();
 	if ($cache->levelHigherThan(1) && $cache->getVar($temp, 'membersOnlineStats-' . $membersOnlineOptions['sort'], 240))
+	{
 		return filter_members_online($temp, empty($membersOnlineOptions['reverse_sort']) ? 'ksort' : 'krsort');
+	}
 
 	// Initialize the array that'll be returned later on.
 	$membersOnlineStats = array(
@@ -76,7 +82,9 @@ function getMembersOnlineStats($membersOnlineOptions)
 	$spiders = array();
 	$spider_finds = array();
 	if (!empty($modSettings['show_spider_online']) && ($modSettings['show_spider_online'] < 3 || allowedTo('admin_forum')) && !empty($modSettings['spider_name_cache']))
-		$spiders = \ElkArte\Util::unserialize($modSettings['spider_name_cache']);
+	{
+		$spiders = Util::unserialize($modSettings['spider_name_cache']);
+	}
 
 	// Load the users online right now.
 	$request = $db->query('', '
@@ -146,11 +154,13 @@ function getMembersOnlineStats($membersOnlineOptions)
 
 		// Store all distinct (primary) membergroups that are shown.
 		if (!isset($membersOnlineStats['online_groups'][$row['id_group']]))
+		{
 			$membersOnlineStats['online_groups'][$row['id_group']] = array(
 				'id' => $row['id_group'],
 				'name' => $row['group_name'],
 				'color' => $row['online_color']
 			);
+		}
 	}
 	$db->free_result($request);
 
@@ -179,7 +189,7 @@ function getMembersOnlineStats($membersOnlineOptions)
 	// Hidden and non-hidden members make up all online members.
 	$membersOnlineStats['num_users_online'] = count($membersOnlineStats['users_online']) + $membersOnlineStats['num_users_hidden'] - (isset($modSettings['show_spider_online']) && $modSettings['show_spider_online'] > 1 ? count($spider_finds) : 0);
 
-	\ElkArte\Cache\Cache::instance()->put('membersOnlineStats-' . $membersOnlineOptions['sort'], $membersOnlineStats, 240);
+	Cache::instance()->put('membersOnlineStats-' . $membersOnlineOptions['sort'], $membersOnlineStats, 240);
 
 	return filter_members_online($membersOnlineStats, empty($membersOnlineOptions['reverse_sort']) ? 'ksort' : 'krsort');
 }
@@ -189,10 +199,10 @@ function getMembersOnlineStats($membersOnlineOptions)
  * Needed mainly for when the cache is enabled and online users have to be
  * filtered out based on permissions.
  *
- * @package Members
  * @param mixed[] $membersOnlineStats
  * @param string $sortFunction
  * @return mixed[]
+ * @package Members
  */
 function filter_members_online($membersOnlineStats, $sortFunction)
 {
@@ -227,8 +237,8 @@ function filter_members_online($membersOnlineStats, $sortFunction)
 /**
  * Check if the number of users online is a record and store it.
  *
- * @package Members
  * @param int $total_users_online
+ * @package Members
  */
 function trackStatsUsersOnline($total_users_online)
 {
@@ -240,10 +250,12 @@ function trackStatsUsersOnline($total_users_online)
 
 	// More members on now than ever were?  Update it!
 	if (!isset($modSettings['mostOnline']) || $total_users_online >= $modSettings['mostOnline'])
+	{
 		$settingsToUpdate = array(
 			'mostOnline' => $total_users_online,
 			'mostDate' => time()
 		);
+	}
 
 	$date = strftime('%Y-%m-%d', forum_time(false));
 
@@ -276,7 +288,9 @@ function trackStatsUsersOnline($total_users_online)
 			list ($modSettings['mostOnlineToday']) = $db->fetch_row($request);
 
 			if ($total_users_online > $modSettings['mostOnlineToday'])
+			{
 				trackStats(array('most_on' => $total_users_online));
+			}
 
 			$total_users_online = max($total_users_online, $modSettings['mostOnlineToday']);
 		}
@@ -294,5 +308,7 @@ function trackStatsUsersOnline($total_users_online)
 	}
 
 	if (!empty($settingsToUpdate))
+	{
 		updateSettings($settingsToUpdate);
+	}
 }

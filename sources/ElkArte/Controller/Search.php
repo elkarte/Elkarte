@@ -8,7 +8,7 @@
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause (see accompanying LICENSE.txt file)
  *
  * This file contains code covered by:
- * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * copyright: 2011 Simple Machines (http://www.simplemachines.org)
  *
  * @version 2.0 dev
  *
@@ -16,21 +16,36 @@
 
 namespace ElkArte\Controller;
 
+use ElkArte\AbstractController;
+use ElkArte\Cache\Cache;
+use ElkArte\MembersList;
+use ElkArte\MessagesCallback\BodyParser\Normal;
+use ElkArte\MessagesCallback\SearchRenderer;
+use ElkArte\MessageTopicIcons;
+use ElkArte\Search\SearchApiWrapper;
+use ElkArte\Search\SearchParams;
+use ElkArte\Search\WeightFactors;
+use ElkArte\Util;
+use ElkArte\ValuesContainer;
+use ElkArte\VerificationControls\VerificationControlsIntegrate;
+
 /**
  * Handle all of the searching for the site
  *
  * @package Search
  */
-class Search extends \ElkArte\AbstractController
+class Search extends AbstractController
 {
 	/**
 	 * Holds the search object
+	 *
 	 * @var \ElkArte\Search\Search
 	 */
 	protected $_search = null;
 
 	/**
 	 * The class that takes care of rendering the message icons (\ElkArte\MessageTopicIcons)
+	 *
 	 * @var null|\ElkArte\MessageTopicIcons
 	 */
 	protected $_icon_sources = null;
@@ -109,7 +124,9 @@ class Search extends \ElkArte\AbstractController
 
 		// Is the load average too high to allow searching just now?
 		if (!empty($modSettings['loadavg_search']) && $modSettings['current_load'] >= $modSettings['loadavg_search'])
+		{
 			throw new \ElkArte\Exceptions\Exception('loadavg_search_disabled', false);
+		}
 
 		theme()->getTemplates()->loadLanguageFile('Search');
 
@@ -141,30 +158,42 @@ class Search extends \ElkArte\AbstractController
 				'id' => 'search',
 			);
 
-			$context['require_verification'] = \ElkArte\VerificationControls\VerificationControlsIntegrate::create($verificationOptions);
+			$context['require_verification'] = VerificationControlsIntegrate::create($verificationOptions);
 			$context['visual_verification_id'] = $verificationOptions['id'];
 		}
 
 		// If you got back from search;sa=results by using the linktree, you get your original search parameters back.
 		if ($this->_search === null && isset($_REQUEST['params']))
 		{
-			$search_params = new \ElkArte\Search\SearchParams($_REQUEST['params'] ?? '');
+			$search_params = new SearchParams($_REQUEST['params'] ?? '');
 
 			$context['search_params'] = $search_params->get();
 		}
 
 		if (isset($_REQUEST['search']))
+		{
 			$context['search_params']['search'] = un_htmlspecialchars($_REQUEST['search']);
+		}
 		if (isset($context['search_params']['search']))
-			$context['search_params']['search'] = \ElkArte\Util::htmlspecialchars($context['search_params']['search']);
+		{
+			$context['search_params']['search'] = Util::htmlspecialchars($context['search_params']['search']);
+		}
 		if (isset($context['search_params']['userspec']))
+		{
 			$context['search_params']['userspec'] = htmlspecialchars($context['search_params']['userspec'], ENT_COMPAT, 'UTF-8');
+		}
 		if (!empty($context['search_params']['searchtype']))
+		{
 			$context['search_params']['searchtype'] = 2;
+		}
 		if (!empty($context['search_params']['minage']))
+		{
 			$context['search_params']['minage'] = (int) $context['search_params']['minage'];
+		}
 		if (!empty($context['search_params']['maxage']))
+		{
 			$context['search_params']['maxage'] = (int) $context['search_params']['maxage'];
+		}
 
 		$context['search_params']['show_complete'] = !empty($context['search_params']['show_complete']);
 		$context['search_params']['subject_only'] = !empty($context['search_params']['subject_only']);
@@ -177,10 +206,14 @@ class Search extends \ElkArte\AbstractController
 			foreach ($context['search_errors'] as $search_error => $dummy)
 			{
 				if ($search_error === 'messages')
+				{
 					continue;
+				}
 
 				if ($search_error === 'string_too_long')
+				{
 					$txt['error_string_too_long'] = sprintf($txt['error_string_too_long'], $context['search_string_limit']);
+				}
 
 				$context['search_errors']['messages'][] = $txt['error_' . $search_error];
 			}
@@ -195,7 +228,9 @@ class Search extends \ElkArte\AbstractController
 			$context['boards_in_category'][$cat] = count($category['boards']);
 			$category['child_ids'] = array_keys($category['boards']);
 			foreach ($category['boards'] as &$board)
+			{
 				$board['selected'] = (empty($context['search_params']['brd']) && (empty($modSettings['recycle_enable']) || $board['id'] != $modSettings['recycle_board']) && !in_array($board['id'], $this->user->ignoreboards)) || (!empty($context['search_params']['brd']) && in_array($board['id'], $context['search_params']['brd']));
+			}
 		}
 
 		if (!empty($_REQUEST['topic']))
@@ -223,9 +258,42 @@ class Search extends \ElkArte\AbstractController
 
 		// Start guest off collapsed
 		if ($context['user']['is_guest'] && !isset($context['minmax_preferences']['asearch']))
+		{
 			$context['minmax_preferences']['asearch'] = 1;
+		}
 
 		call_integration_hook('integrate_search');
+	}
+
+	/**
+	 * Fills the empty spaces in an array with the default values for search params
+	 *
+	 * @param mixed[] $array
+	 *
+	 * @return mixed[]
+	 */
+	private function _fill_default_search_params($array)
+	{
+		$default = array(
+			'search' => '',
+			'userspec' => '*',
+			'searchtype' => 0,
+			'show_complete' => 0,
+			'subject_only' => 0,
+			'minage' => 0,
+			'maxage' => 9999,
+			'sort' => 'relevance',
+		);
+
+		$array = array_merge($default, $array);
+		if (empty($array['userspec']))
+		{
+			$array['userspec'] = '*';
+		}
+		$array['show_complete'] = (int) $array['show_complete'];
+		$array['subject_only'] = (int) $array['subject_only'];
+
+		return $array;
 	}
 
 	/**
@@ -267,17 +335,21 @@ class Search extends \ElkArte\AbstractController
 
 		theme()->getTemplates()->loadLanguageFile('Search');
 		if (!isset($_REQUEST['xml']))
+		{
 			theme()->getTemplates()->load('Search');
+		}
 		// If we're doing XML we need to use the results template regardless really.
 		else
+		{
 			$context['sub_template'] = 'results';
+		}
 
 		// Are you allowed?
 		isAllowedTo('search_posts');
 
 		$this->_search = new \ElkArte\Search\Search();
-		$this->_search->setWeights(new \ElkArte\Search\WeightFactors($modSettings, $this->user->is_admin));
-		$search_params = new \ElkArte\Search\SearchParams($_REQUEST['params'] ?? '');
+		$this->_search->setWeights(new WeightFactors($modSettings, $this->user->is_admin));
+		$search_params = new SearchParams($_REQUEST['params'] ?? '');
 		$search_params->merge($_REQUEST, $recentPercentage, $maxMembersToSearch);
 		$this->_search->setParams($search_params, !empty($modSettings['search_simple_fulltext']));
 
@@ -285,10 +357,14 @@ class Search extends \ElkArte\AbstractController
 
 		// Nothing??
 		if ($this->_search->param('search') === false || $this->_search->param('search') === '')
+		{
 			$context['search_errors']['invalid_search_string'] = true;
+		}
 		// Too long?
-		elseif (\ElkArte\Util::strlen($this->_search->param('search')) > $context['search_string_limit'])
+		elseif (Util::strlen($this->_search->param('search')) > $context['search_string_limit'])
+		{
 			$context['search_errors']['string_too_long'] = true;
+		}
 
 		// Build the search array
 		// $modSettings ['search_simple_fulltext'] is an hidden setting that will
@@ -302,13 +378,19 @@ class Search extends \ElkArte\AbstractController
 		if (empty($searchArray))
 		{
 			if (!empty($context['search_ignored']))
+			{
 				$context['search_errors']['search_string_small_words'] = true;
+			}
 			else
+			{
 				$context['search_errors']['invalid_search_string' . ($this->_search->foundBlackListedWords() ? '_blacklist' : '')] = true;
+			}
 
 			// Don't allow duplicate error messages if one string is too short.
 			if (isset($context['search_errors']['search_string_small_words'], $context['search_errors']['invalid_search_string']))
+			{
 				unset($context['search_errors']['invalid_search_string']);
+			}
 		}
 
 		// *** Spell checking?
@@ -323,13 +405,21 @@ class Search extends \ElkArte\AbstractController
 		// Let the user adjust the search query, should they wish?
 		$context['search_params'] = (array) $this->_search->getSearchParams(true);
 		if (isset($context['search_params']['search']))
-			$context['search_params']['search'] = \ElkArte\Util::htmlspecialchars($context['search_params']['search']);
+		{
+			$context['search_params']['search'] = Util::htmlspecialchars($context['search_params']['search']);
+		}
 		if (isset($context['search_params']['userspec']))
-			$context['search_params']['userspec'] = \ElkArte\Util::htmlspecialchars($context['search_params']['userspec']);
+		{
+			$context['search_params']['userspec'] = Util::htmlspecialchars($context['search_params']['userspec']);
+		}
 		if (empty($context['search_params']['minage']))
+		{
 			$context['search_params']['minage'] = 0;
+		}
 		if (empty($context['search_params']['maxage']))
+		{
 			$context['search_params']['maxage'] = 9999;
+		}
 
 		$context['search_params'] = $this->_fill_default_search_params($context['search_params']);
 
@@ -350,37 +440,44 @@ class Search extends \ElkArte\AbstractController
 
 		// Start guest off collapsed
 		if ($context['user']['is_guest'] && !isset($context['minmax_preferences']['asearch']))
+		{
 			$context['minmax_preferences']['asearch'] = 1;
+		}
 
 		// *** A last error check
 		call_integration_hook('integrate_search_errors');
 
 		// One or more search errors? Go back to the first search screen.
 		if (!empty($context['search_errors']))
+		{
 			return $this->action_search();
+		}
 
 		// Spam me not, Spam-a-lot?
 		if (empty($_SESSION['last_ss']) || $_SESSION['last_ss'] !== $this->_search->param('search'))
+		{
 			spamProtection('search');
+		}
 
 		// Store the last search string to allow pages of results to be browsed.
 		$_SESSION['last_ss'] = $this->_search->param('search');
 
 		try
 		{
-			$search_config = new \ElkArte\ValuesContainer(array(
+			$search_config = new ValuesContainer(array(
 				'humungousTopicPosts' => $humungousTopicPosts,
 				'maxMessageResults' => $maxMessageResults,
 				'search_index' => !empty($modSettings['search_index']) ? $modSettings['search_index'] : '',
 				'banned_words' => empty($modSettings['search_banned_words']) ? array() : explode(',', $modSettings['search_banned_words']),
 			));
 			$context['topics'] = $this->_search->searchQuery(
-				new \ElkArte\Search\SearchApiWrapper($search_config, $this->_search->getSearchParams())
+				new SearchApiWrapper($search_config, $this->_search->getSearchParams())
 			);
 		}
 		catch (\Exception $e)
 		{
 			$context['search_errors'][$e->getMessage()] = true;
+
 			return $this->action_search();
 		}
 
@@ -409,7 +506,7 @@ class Search extends \ElkArte\AbstractController
 
 			if (!empty($posters))
 			{
-				\ElkArte\MembersList::load(array_unique($posters));
+				MembersList::load(array_unique($posters));
 			}
 
 			// Get the messages out for the callback - select enough that it can be made to look just like Display.
@@ -417,7 +514,9 @@ class Search extends \ElkArte\AbstractController
 
 			// If there are no results that means the things in the cache got deleted, so pretend we have no topics anymore.
 			if ($this->_search->noMessages($messages_request))
+			{
 				$context['topics'] = array();
+			}
 
 			$this->_prepareParticipants(!empty($modSettings['enableParticipation']), (int) $this->user->id);
 		}
@@ -426,22 +525,22 @@ class Search extends \ElkArte\AbstractController
 		$context['page_index'] = constructPageIndex($scripturl . '?action=search;sa=results;params=' . $context['params'], $_REQUEST['start'], $this->_search->getNumResults(), $modSettings['search_results_per_page'], false);
 
 		// Consider the search complete!
-		\ElkArte\Cache\Cache::instance()->remove('search_start:' . ($this->user->is_guest ? $this->user->ip : $this->user->id));
+		Cache::instance()->remove('search_start:' . ($this->user->is_guest ? $this->user->ip : $this->user->id));
 
 		$context['sub_template'] = 'results';
 		$context['page_title'] = $txt['search_results'];
 
-		$this->_icon_sources = new \ElkArte\MessageTopicIcons(!empty($modSettings['messageIconChecks_enable']), $settings['theme_dir']);
+		$this->_icon_sources = new MessageTopicIcons(!empty($modSettings['messageIconChecks_enable']), $settings['theme_dir']);
 
 		// Set the callback.  (do you REALIZE how much memory all the messages would take?!?)
 		// This will be called from the template.
-		$bodyParser = new \ElkArte\MessagesCallback\BodyParser\Normal($this->_search->getSearchArray(), empty($modSettings['search_method']));
-		$opt = new \ElkArte\ValuesContainer([
+		$bodyParser = new Normal($this->_search->getSearchArray(), empty($modSettings['search_method']));
+		$opt = new ValuesContainer([
 			'icon_sources' => $this->_icon_sources,
 			'show_signatures' => false,
 			'boards_can' => $boards_can,
 		]);
-		$renderer = new \ElkArte\MessagesCallback\SearchRenderer($messages_request, $this->user, $bodyParser, $opt);
+		$renderer = new SearchRenderer($messages_request, $this->user, $bodyParser, $opt);
 		$renderer->setParticipants($this->_participants);
 
 		$context['topic_starter_id'] = 0;
@@ -451,37 +550,6 @@ class Search extends \ElkArte\AbstractController
 			'label' => addslashes(un_htmlspecialchars($txt['jump_to'])),
 			'board_name' => addslashes(un_htmlspecialchars($txt['select_destination'])),
 		);
-	}
-
-	protected function _controlVerifications()
-	{
-		global $modSettings, $context;
-
-		// Do we have captcha enabled?
-		if ($this->user->is_guest && !empty($modSettings['search_enable_captcha']) && empty($_SESSION['ss_vv_passed']) && (empty($_SESSION['last_ss']) || $_SESSION['last_ss'] !== $this->_search->param('search')))
-		{
-			// If we come from another search box tone down the error...
-			if (!isset($_REQUEST['search_vv']))
-			{
-				$context['search_errors']['need_verification_code'] = true;
-			}
-			else
-			{
-				$verificationOptions = array(
-					'id' => 'search',
-				);
-				$context['require_verification'] = \ElkArte\VerificationControls\VerificationControlsIntegrate::create($verificationOptions, true);
-
-				if (is_array($context['require_verification']))
-				{
-					foreach ($context['require_verification'] as $error)
-						$context['search_errors'][$error] = true;
-				}
-				// Don't keep asking for it - they've proven themselves worthy.
-				else
-					$_SESSION['ss_vv_passed'] = true;
-			}
-		}
 	}
 
 	/**
@@ -524,20 +592,20 @@ class Search extends \ElkArte\AbstractController
 			if (preg_match('~^\w+$~', $word) === 0)
 			{
 				$did_you_mean['search'][] = '"' . $word . '"';
-				$did_you_mean['display'][] = '&quot;' . \ElkArte\Util::htmlspecialchars($word) . '&quot;';
+				$did_you_mean['display'][] = '&quot;' . Util::htmlspecialchars($word) . '&quot;';
 				continue;
 			}
 			// For some strange reason spell check can crash PHP on decimals.
 			elseif (preg_match('~\d~', $word) === 1)
 			{
 				$did_you_mean['search'][] = $word;
-				$did_you_mean['display'][] = \ElkArte\Util::htmlspecialchars($word);
+				$did_you_mean['display'][] = Util::htmlspecialchars($word);
 				continue;
 			}
 			elseif (pspell_check($pspell_link, $word))
 			{
 				$did_you_mean['search'][] = $word;
-				$did_you_mean['display'][] = \ElkArte\Util::htmlspecialchars($word);
+				$did_you_mean['display'][] = Util::htmlspecialchars($word);
 				continue;
 			}
 
@@ -545,7 +613,7 @@ class Search extends \ElkArte\AbstractController
 			foreach ($suggestions as $i => $s)
 			{
 				// Search is case insensitive.
-				if (\ElkArte\Util::strtolower($s) === \ElkArte\Util::strtolower($word))
+				if (Util::strtolower($s) === Util::strtolower($word))
 				{
 					unset($suggestions[$i]);
 				}
@@ -561,13 +629,13 @@ class Search extends \ElkArte\AbstractController
 			{
 				$suggestions = array_values($suggestions);
 				$did_you_mean['search'][] = $suggestions[0];
-				$did_you_mean['display'][] = str_replace('{word}', \ElkArte\Util::htmlspecialchars($suggestions[0]), $display_highlight);
+				$did_you_mean['display'][] = str_replace('{word}', Util::htmlspecialchars($suggestions[0]), $display_highlight);
 				$found_misspelling = true;
 			}
 			else
 			{
 				$did_you_mean['search'][] = $word;
-				$did_you_mean['display'][] = \ElkArte\Util::htmlspecialchars($word);
+				$did_you_mean['display'][] = Util::htmlspecialchars($word);
 			}
 		}
 
@@ -580,12 +648,12 @@ class Search extends \ElkArte\AbstractController
 				if (preg_match('~^\w+$~', $word) == 0)
 				{
 					$temp_excluded['search'][] = '-"' . $word . '"';
-					$temp_excluded['display'][] = '-&quot;' . \ElkArte\Util::htmlspecialchars($word) . '&quot;';
+					$temp_excluded['display'][] = '-&quot;' . Util::htmlspecialchars($word) . '&quot;';
 				}
 				else
 				{
 					$temp_excluded['search'][] = '-' . $word;
-					$temp_excluded['display'][] = '-' . \ElkArte\Util::htmlspecialchars($word);
+					$temp_excluded['display'][] = '-' . Util::htmlspecialchars($word);
 				}
 			}
 
@@ -595,6 +663,41 @@ class Search extends \ElkArte\AbstractController
 			// Provide the potential correct spelling term in the param
 			$suggestion_param = $this->_search->compileURLparams($did_you_mean['search']);
 			$suggestion_display = implode(' ', $did_you_mean['display']);
+		}
+	}
+
+	protected function _controlVerifications()
+	{
+		global $modSettings, $context;
+
+		// Do we have captcha enabled?
+		if ($this->user->is_guest && !empty($modSettings['search_enable_captcha']) && empty($_SESSION['ss_vv_passed']) && (empty($_SESSION['last_ss']) || $_SESSION['last_ss'] !== $this->_search->param('search')))
+		{
+			// If we come from another search box tone down the error...
+			if (!isset($_REQUEST['search_vv']))
+			{
+				$context['search_errors']['need_verification_code'] = true;
+			}
+			else
+			{
+				$verificationOptions = array(
+					'id' => 'search',
+				);
+				$context['require_verification'] = VerificationControlsIntegrate::create($verificationOptions, true);
+
+				if (is_array($context['require_verification']))
+				{
+					foreach ($context['require_verification'] as $error)
+					{
+						$context['search_errors'][$error] = true;
+					}
+				}
+				// Don't keep asking for it - they've proven themselves worthy.
+				else
+				{
+					$_SESSION['ss_vv_passed'] = true;
+				}
+			}
 		}
 	}
 
@@ -609,38 +712,9 @@ class Search extends \ElkArte\AbstractController
 			$topics_participated_in = topicsParticipation($user_id, array_keys($this->_participants));
 
 			foreach ($topics_participated_in as $topic)
+			{
 				$this->_participants[$topic['id_topic']] = true;
+			}
 		}
-	}
-
-	/**
-	 * Fills the empty spaces in an array with the default values for search params
-	 *
-	 * @param mixed[] $array
-	 *
-	 * @return mixed[]
-	 */
-	private function _fill_default_search_params($array)
-	{
-		$default = array(
-			'search' => '',
-			'userspec' => '*',
-			'searchtype' => 0,
-			'show_complete' => 0,
-			'subject_only' => 0,
-			'minage' => 0,
-			'maxage' => 9999,
-			'sort' => 'relevance',
-		);
-
-		$array = array_merge($default, $array);
-		if (empty($array['userspec']))
-		{
-			$array['userspec'] = '*';
-		}
-		$array['show_complete'] = (int) $array['show_complete'];
-		$array['subject_only'] = (int) $array['subject_only'];
-
-		return $array;
 	}
 }

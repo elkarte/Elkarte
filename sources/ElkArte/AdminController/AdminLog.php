@@ -13,6 +13,10 @@
 
 namespace ElkArte\AdminController;
 
+use ElkArte\AbstractController;
+use ElkArte\Action;
+use ElkArte\SettingsForm\SettingsForm;
+
 /**
  * Admin logs controller.
  *
@@ -23,7 +27,7 @@ namespace ElkArte\AdminController;
  *
  * @package AdminLog
  */
-class AdminLog extends \ElkArte\AbstractController
+class AdminLog extends AbstractController
 {
 	/**
 	 * This method decides which log to load.
@@ -102,10 +106,12 @@ class AdminLog extends \ElkArte\AbstractController
 
 		// If it's not got a sa set it must have come here for first time, pretend error log should be reversed.
 		if (!isset($this->_req->query->sa))
+		{
 			$this->_req->query->desc = true;
+		}
 
 		// Set up the action control
-		$action = new \ElkArte\Action('manage_logs');
+		$action = new Action('manage_logs');
 
 		// By default do the basic settings, call integrate_sa_manage_logs
 		$subAction = $action->initialize($subActions, 'errorlog');
@@ -131,7 +137,7 @@ class AdminLog extends \ElkArte\AbstractController
 
 		$context['page_title'] = $txt['pruning_title'];
 
-		$settingsForm = new \ElkArte\SettingsForm\SettingsForm(\ElkArte\SettingsForm\SettingsForm::DB_ADAPTER);
+		$settingsForm = new SettingsForm(SettingsForm::DB_ADAPTER);
 
 		// Initialize settings
 		$config_vars = $this->_settings();
@@ -154,14 +160,18 @@ class AdminLog extends \ElkArte\AbstractController
 				foreach ($config_vars as $index => $dummy)
 				{
 					if (!is_array($dummy) || $index == 'pruningOptions')
+					{
 						continue;
+					}
 
 					$vals[] = empty($this->_req->post->{$dummy[1]}) || $this->_req->post->{$dummy[1]} < 0 ? 0 : $this->_req->getPost($dummy[1], 'intval');
 				}
 				$_POST['pruningOptions'] = implode(',', $vals);
 			}
 			else
+			{
 				$_POST['pruningOptions'] = '';
+			}
 
 			$settingsForm->setConfigVars($savevar);
 			$settingsForm->setConfigValues((array) $_POST);
@@ -175,9 +185,13 @@ class AdminLog extends \ElkArte\AbstractController
 
 		// Get the actual values
 		if (!empty($modSettings['pruningOptions']))
+		{
 			list ($modSettings['pruneErrorLog'], $modSettings['pruneModLog'], $modSettings['pruneBanLog'], $modSettings['pruneReportLog'], $modSettings['pruneScheduledTaskLog'], $modSettings['pruneBadbehaviorLog'], $modSettings['pruneSpiderHitLog']) = array_pad(explode(',', $modSettings['pruningOptions']), 7, 0);
+		}
 		else
+		{
 			$modSettings['pruneErrorLog'] = $modSettings['pruneModLog'] = $modSettings['pruneBanLog'] = $modSettings['pruneReportLog'] = $modSettings['pruneScheduledTaskLog'] = $modSettings['pruneBadbehaviorLog'] = $modSettings['pruneSpiderHitLog'] = 0;
+		}
 
 		$settingsForm->prepare();
 	}
@@ -193,7 +207,7 @@ class AdminLog extends \ElkArte\AbstractController
 			// Even do the pruning?
 			// The array indexes are there so we can remove/change them before saving.
 			'pruningOptions' => array('check', 'pruningOptions'),
-		'',
+			'',
 			// Various logs that could be pruned.
 			array('int', 'pruneErrorLog', 'postinput' => $txt['days_word'], 'subtext' => $txt['zero_to_disable']), // Error log.
 			array('int', 'pruneModLog', 'postinput' => $txt['days_word'], 'subtext' => $txt['zero_to_disable']), // Moderation log.

@@ -9,13 +9,16 @@
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause (see accompanying LICENSE.txt file)
  *
  * This file contains code covered by:
- * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * copyright: 2011 Simple Machines (http://www.simplemachines.org)
  *
  * @version 2.0 dev
  *
  */
 
 namespace ElkArte\VerificationControls;
+
+use ElkArte\Exceptions\Exception;
+use ElkArte\Sessions\SessionIndex;
 
 /**
  * Class VerificationControls
@@ -43,7 +46,7 @@ class VerificationControls
 	 * @param bool $isNew If the control was initialized before
 	 * @param bool $force_refresh If the controls should be re-initialized
 	 */
-	public function __construct(\ElkArte\Sessions\SessionIndex $sessionVal, $settings = array(), $verificationOptions = array(), $isNew = false, $force_refresh = false)
+	public function __construct(SessionIndex $sessionVal, $settings = array(), $verificationOptions = array(), $isNew = false, $force_refresh = false)
 	{
 		if (empty($settings['known_verifications']))
 		{
@@ -155,7 +158,7 @@ class VerificationControls
 		// This cannot happen!
 		if (!isset($this->_sessionVal['count']))
 		{
-			throw new \ElkArte\Exceptions\Exception('no_access', false);
+			throw new Exception('no_access', false);
 		}
 
 		foreach ($this->_verification_instances as $instance)

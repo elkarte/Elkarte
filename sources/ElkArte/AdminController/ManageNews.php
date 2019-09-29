@@ -8,7 +8,7 @@
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause (see accompanying LICENSE.txt file)
  *
  * This file contains code covered by:
- * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * copyright: 2011 Simple Machines (http://www.simplemachines.org)
  *
  * @version 2.0 dev
  *
@@ -16,21 +16,28 @@
 
 namespace ElkArte\AdminController;
 
+use ElkArte\AbstractController;
+use ElkArte\Action;
+use ElkArte\SettingsForm\SettingsForm;
+use ElkArte\Util;
+
 /**
  * ManageNews controller, for news administration screens.
  *
  * @package News
  */
-class ManageNews extends \ElkArte\AbstractController
+class ManageNews extends AbstractController
 {
 	/**
 	 * Members specifically being included in a newsletter
+	 *
 	 * @var array
 	 */
 	protected $_members = array();
 
 	/**
 	 * Members specifically being excluded from a newsletter
+	 *
 	 * @var array
 	 */
 	protected $_exclude_members = array();
@@ -79,7 +86,7 @@ class ManageNews extends \ElkArte\AbstractController
 		);
 
 		// Action control
-		$action = new \ElkArte\Action('manage_news');
+		$action = new Action('manage_news');
 
 		// Create the tabs for the template.
 		$context[$context['admin_menu_name']]['tab_data'] = array(
@@ -87,8 +94,7 @@ class ManageNews extends \ElkArte\AbstractController
 			'help' => 'edit_news',
 			'description' => $txt['admin_news_desc'],
 			'tabs' => array(
-				'editnews' => array(
-				),
+				'editnews' => array(),
 				'mailingmembers' => array(
 					'description' => $txt['news_mailing_desc'],
 				),
@@ -107,7 +113,9 @@ class ManageNews extends \ElkArte\AbstractController
 
 		// Force the right area...
 		if (substr($subAction, 0, 7) === 'mailing')
+		{
 			$context[$context['admin_menu_name']]['current_subsection'] = 'mailingmembers';
+		}
 
 		// Call the right function for this sub-action.
 		$action->dispatch($subAction);
@@ -142,8 +150,12 @@ class ManageNews extends \ElkArte\AbstractController
 
 			// Remove the items that were selected.
 			foreach ($temp_news as $i => $news)
+			{
 				if (in_array($i, $this->_req->post->remove))
+				{
 					unset($temp_news[$i]);
+				}
+			}
 
 			// Update the database.
 			updateSettings(array('news' => implode("\n", $temp_news)));
@@ -158,10 +170,12 @@ class ManageNews extends \ElkArte\AbstractController
 			foreach ($this->_req->post->news as $i => $news)
 			{
 				if (trim($news) === '')
+				{
 					unset($this->_req->post->news[$i]);
+				}
 				else
 				{
-					$this->_req->post->news[$i] = \ElkArte\Util::htmlspecialchars($this->_req->post->news[$i], ENT_QUOTES);
+					$this->_req->post->news[$i] = Util::htmlspecialchars($this->_req->post->news[$i], ENT_QUOTES);
 					preparsecode($this->_req->post->news[$i]);
 				}
 			}
@@ -217,9 +231,13 @@ class ManageNews extends \ElkArte\AbstractController
 					'data' => array(
 						'function' => function ($news) {
 							if (is_numeric($news['id']))
+							{
 								return '<input type="checkbox" name="remove[]" value="' . $news['id'] . '" class="input_check" />';
+							}
 							else
+							{
 								return '';
+							}
 						},
 						'class' => 'centertext',
 					),
@@ -298,20 +316,28 @@ class ManageNews extends \ElkArte\AbstractController
 		// All of the members in post based and member based groups
 		$pg = array();
 		foreach ($allgroups['postgroups'] as $postgroup)
+		{
 			$pg[] = $postgroup['id'];
+		}
 
 		$mg = array();
 		foreach ($allgroups['membergroups'] as $membergroup)
+		{
 			$mg[] = $membergroup['id'];
+		}
 
 		// How many are in each group
 		$mem_groups = membersInGroups($pg, $mg, true, true);
 		foreach ($mem_groups as $id_group => $member_count)
 		{
 			if (isset($groups[$id_group]['member_count']))
+			{
 				$groups[$id_group]['member_count'] += $member_count;
+			}
 			else
+			{
 				$groups[$id_group]['member_count'] = $member_count;
+			}
 		}
 
 		// Generate the include and exclude group select lists for the template
@@ -327,7 +353,9 @@ class ManageNews extends \ElkArte\AbstractController
 		);
 
 		foreach ($groups as $group)
+		{
 			$groups[$group['id']]['status'] = 'off';
+		}
 
 		$context['exclude_groups'] = array(
 			'select_group' => $txt['admin_newsletters_exclude_groups'],
@@ -390,6 +418,7 @@ class ManageNews extends \ElkArte\AbstractController
 			$context['send_html'] = $this->_req->getPost('send_html', 'isset', false);
 
 			prepareMailingForPreview();
+
 			return null;
 		}
 
@@ -418,9 +447,13 @@ class ManageNews extends \ElkArte\AbstractController
 			foreach ($mods as $row)
 			{
 				if (in_array(3, $context['recipients']))
+				{
 					$context['recipients']['exclude_members'][] = $row;
+				}
 				else
+				{
 					$context['recipients']['members'][] = $row;
+				}
 			}
 		}
 
@@ -442,33 +475,6 @@ class ManageNews extends \ElkArte\AbstractController
 	}
 
 	/**
-	 * Members may have been chosen via autoselection pulldown for both Add or Exclude
-	 * this will process them and combine them to any manually added ones.
-	 */
-	private function _toAddOrExclude()
-	{
-		// Members selected (via auto select) to specifically get the newsletter
-		if (isset($this->_req->post->member_list) && is_array($this->_req->post->member_list))
-		{
-			$members = array();
-			foreach ($this->_req->post->member_list as $member_id)
-				$members[] = (int) $member_id;
-
-			$this->_members = array_unique(array_merge($this->_members, $members));
-		}
-
-		// Members selected (via auto select) to specifically not get the newsletter
-		if (isset($this->_req->post->exclude_member_list) && is_array($this->_req->post->exclude_member_list))
-		{
-			$members = array();
-			foreach ($this->_req->post->exclude_member_list as $member_id)
-				$members[] = (int) $member_id;
-
-			$this->_exclude_members = array_unique(array_merge($this->_exclude_members, $members));
-		}
-	}
-
-	/**
 	 * If they did not use auto select function on the include/exclude members then
 	 * we need to look them up from the supplied "one","two" string
 	 */
@@ -476,10 +482,14 @@ class ManageNews extends \ElkArte\AbstractController
 	{
 		$toClean = array();
 		if (!empty($this->_req->post->members))
+		{
 			$toClean['_members'] = 'members';
+		}
 
 		if (!empty($this->_req->post->exclude_members))
+		{
 			$toClean['_exclude_members'] = 'exclude_members';
+		}
 
 		// Manual entries found?
 		if (!empty($toClean))
@@ -498,14 +508,49 @@ class ManageNews extends \ElkArte\AbstractController
 				foreach ($temp as $index => $member)
 				{
 					if (strlen(trim($member)) > 0)
-						$temp[$index] = \ElkArte\Util::htmlspecialchars(\ElkArte\Util::strtolower(trim($member)));
+					{
+						$temp[$index] = Util::htmlspecialchars(Util::strtolower(trim($member)));
+					}
 					else
+					{
 						unset($temp[$index]);
+					}
 				}
 
 				// Find the members
 				$this->{$key} = array_keys(findMembers($temp));
 			}
+		}
+	}
+
+	/**
+	 * Members may have been chosen via autoselection pulldown for both Add or Exclude
+	 * this will process them and combine them to any manually added ones.
+	 */
+	private function _toAddOrExclude()
+	{
+		// Members selected (via auto select) to specifically get the newsletter
+		if (isset($this->_req->post->member_list) && is_array($this->_req->post->member_list))
+		{
+			$members = array();
+			foreach ($this->_req->post->member_list as $member_id)
+			{
+				$members[] = (int) $member_id;
+			}
+
+			$this->_members = array_unique(array_merge($this->_members, $members));
+		}
+
+		// Members selected (via auto select) to specifically not get the newsletter
+		if (isset($this->_req->post->exclude_member_list) && is_array($this->_req->post->exclude_member_list))
+		{
+			$members = array();
+			foreach ($this->_req->post->exclude_member_list as $member_id)
+			{
+				$members[] = (int) $member_id;
+			}
+
+			$this->_exclude_members = array_unique(array_merge($this->_exclude_members, $members));
 		}
 	}
 
@@ -519,12 +564,12 @@ class ManageNews extends \ElkArte\AbstractController
 	 * - Redirects to itself when more batches need to be sent.
 	 * - Redirects to ?action=admin after everything has been sent.
 	 *
-	 * @uses the ManageNews template and email_members_send sub template.
-	 *
 	 * @param bool $clean_only = false; if set, it will only clean the variables, put them in context, then return.
 	 *
 	 * @return null|void
 	 * @throws \ElkArte\Exceptions\Exception
+	 * @uses the ManageNews template and email_members_send sub template.
+	 *
 	 */
 	public function action_mailingsend($clean_only = false)
 	{
@@ -535,6 +580,7 @@ class ManageNews extends \ElkArte\AbstractController
 		{
 			$context['sub_template'] = 'email_members_succeeded';
 			theme()->getTemplates()->load('ManageNews');
+
 			return null;
 		}
 
@@ -542,6 +588,7 @@ class ManageNews extends \ElkArte\AbstractController
 		if (isset($this->_req->post->preview))
 		{
 			$context['preview'] = true;
+
 			return $this->action_mailingcompose();
 		}
 
@@ -551,7 +598,9 @@ class ManageNews extends \ElkArte\AbstractController
 
 		// If by PM's I suggest we half the above number.
 		if (!empty($this->_req->post->send_pm))
+		{
 			$num_at_once /= 2;
+		}
 
 		checkSession();
 
@@ -580,7 +629,9 @@ class ManageNews extends \ElkArte\AbstractController
 			foreach ($members as $member)
 			{
 				if ($member >= $context['start'])
+				{
 					$context['recipients']['exclude_members'][] = (int) $member;
+				}
 			}
 		}
 
@@ -591,7 +642,9 @@ class ManageNews extends \ElkArte\AbstractController
 			foreach ($members as $member)
 			{
 				if ($member >= $context['start'])
+				{
 					$context['recipients']['members'][] = (int) $member;
+				}
 			}
 		}
 
@@ -601,13 +654,17 @@ class ManageNews extends \ElkArte\AbstractController
 			if (is_array($this->_req->post->groups))
 			{
 				foreach ($this->_req->post->groups as $group => $dummy)
+				{
 					$context['recipients']['groups'][] = (int) $group;
+				}
 			}
 			elseif (trim($this->_req->post->groups) !== '')
 			{
 				$groups = explode(',', $this->_req->post->groups);
 				foreach ($groups as $group)
+				{
 					$context['recipients']['groups'][] = (int) $group;
+				}
 			}
 		}
 
@@ -617,13 +674,17 @@ class ManageNews extends \ElkArte\AbstractController
 			if (is_array($this->_req->post->exclude_groups))
 			{
 				foreach ($this->_req->post->exclude_groups as $group => $dummy)
+				{
 					$context['recipients']['exclude_groups'][] = (int) $group;
+				}
 			}
 			elseif (trim($this->_req->post->exclude_groups) !== '')
 			{
 				$groups = explode(',', $this->_req->post->exclude_groups);
 				foreach ($groups as $group)
+				{
 					$context['recipients']['exclude_groups'][] = (int) $group;
+				}
 			}
 		}
 
@@ -635,18 +696,24 @@ class ManageNews extends \ElkArte\AbstractController
 			{
 				$curmem = trim($curmem);
 				if ($curmem !== '')
+				{
 					$context['recipients']['emails'][$curmem] = $curmem;
+				}
 			}
 		}
 
 		// If we're only cleaning drop out here.
 		if ($clean_only)
+		{
 			return null;
+		}
 
 		// Some functions we will need
 		require_once(SUBSDIR . '/Mail.subs.php');
 		if ($context['send_pm'])
+		{
 			require_once(SUBSDIR . '/PersonalMessage.subs.php');
+		}
 
 		// We are relying too much on writing to superglobals...
 		$base_subject = $this->_req->getPost('subject', 'strval', '');
@@ -661,21 +728,28 @@ class ManageNews extends \ElkArte\AbstractController
 		{
 			// Prepare the message for HTML.
 			if (!empty($context['parse_html']))
+			{
 				$base_message = str_replace(array("\n", '  '), array('<br />' . "\n", '&nbsp; '), $base_message);
+			}
 
 			// This is here to prevent spam filters from tagging this as spam.
 			if (preg_match('~\<html~i', $base_message) == 0)
 			{
 				if (preg_match('~\<body~i', $base_message) == 0)
+				{
 					$base_message = '<html><head><title>' . $base_subject . '</title></head>' . "\n" . '<body>' . $base_message . '</body></html>';
+				}
 				else
+				{
 					$base_message = '<html>' . $base_message . '</html>';
+				}
 			}
 		}
 
 		if (empty($base_message) || empty($base_subject))
 		{
 			$context['preview'] = true;
+
 			return $this->action_mailingcompose();
 		}
 
@@ -725,14 +799,18 @@ class ManageNews extends \ElkArte\AbstractController
 		{
 			// Done as many as we can?
 			if ($i >= $num_at_once)
+			{
 				break;
+			}
 
 			// Don't sent it twice!
 			unset($context['recipients']['emails'][$k]);
 
 			// Dammit - can't PM emails!
 			if ($context['send_pm'])
+			{
 				continue;
+			}
 
 			$to_member = array(
 				$email,
@@ -770,7 +848,9 @@ class ManageNews extends \ElkArte\AbstractController
 				}
 
 				if (!empty($queryBuild))
+				{
 					$sendQuery .= implode(' OR ', $queryBuild);
+				}
 			}
 
 			if (!empty($context['recipients']['members']))
@@ -783,11 +863,15 @@ class ManageNews extends \ElkArte\AbstractController
 
 			// If we've not got a query then we must be done!
 			if ($sendQuery === '()')
+			{
 				redirectexit('action=admin');
+			}
 
 			// Anything to exclude?
 			if (!empty($context['recipients']['exclude_groups']) && in_array(0, $context['recipients']['exclude_groups']))
+			{
 				$sendQuery .= ' AND mem.id_group != {int:regular_group}';
+			}
 
 			if (!empty($context['recipients']['exclude_members']))
 			{
@@ -797,7 +881,9 @@ class ManageNews extends \ElkArte\AbstractController
 
 			// Force them to have it?
 			if (empty($context['email_force']))
+			{
 				$sendQuery .= ' AND mem.notify_announcements = {int:notify_announcements}';
+			}
 
 			require_once(SUBSDIR . '/News.subs.php');
 
@@ -810,16 +896,22 @@ class ManageNews extends \ElkArte\AbstractController
 
 				// What groups are we looking at here?
 				if (empty($row['additional_groups']))
+				{
 					$groups = array($row['id_group'], $row['id_post_group']);
+				}
 				else
+				{
 					$groups = array_merge(
 						array($row['id_group'], $row['id_post_group']),
 						explode(',', $row['additional_groups'])
 					);
+				}
 
 				// Excluded groups?
 				if (array_intersect($groups, $context['recipients']['exclude_groups']) !== [])
+				{
 					continue;
+				}
 
 				// We might need this
 				$cleanMemberName = empty($context['send_html']) || $context['send_pm'] ? un_htmlspecialchars($row['real_name']) : $row['real_name'];
@@ -843,18 +935,26 @@ class ManageNews extends \ElkArte\AbstractController
 
 				// Send the actual email - or a PM!
 				if (!$context['send_pm'])
+				{
 					sendmail($row['email_address'], $subject, $message, null, null, !empty($context['send_html']), 5);
+				}
 				else
+				{
 					sendpm(array('to' => array($row['id_member']), 'bcc' => array()), $subject, $message);
+				}
 			}
 		}
 
 		// If used our batch assume we still have a member.
 		if ($i >= $num_at_once)
+		{
 			$last_id_member = $context['start'];
+		}
 		// Or we didn't have one in range?
 		elseif (empty($last_id_member) && $context['start'] + $num_at_once < $context['max_id_member'])
+		{
 			$last_id_member = $context['start'] + $num_at_once;
+		}
 		// If we have no id_member then we're done.
 		elseif (empty($last_id_member) && empty($context['recipients']['emails']))
 		{
@@ -890,7 +990,7 @@ class ManageNews extends \ElkArte\AbstractController
 		global $context, $txt, $scripturl;
 
 		// Initialize the form
-		$settingsForm = new \ElkArte\SettingsForm\SettingsForm(\ElkArte\SettingsForm\SettingsForm::DB_ADAPTER);
+		$settingsForm = new SettingsForm(SettingsForm::DB_ADAPTER);
 
 		// Initialize it with our settings
 		$settingsForm->setConfigVars($this->_settings());
@@ -931,14 +1031,14 @@ class ManageNews extends \ElkArte\AbstractController
 
 		$config_vars = array(
 			array('title', 'settings'),
-				// Inline permissions.
-				array('permissions', 'edit_news', 'help' => ''),
-				array('permissions', 'send_mail'),
+			// Inline permissions.
+			array('permissions', 'edit_news', 'help' => ''),
+			array('permissions', 'send_mail'),
 			'',
-				// Just the remaining settings.
-				array('check', 'xmlnews_enable', 'onclick' => 'document.getElementById(\'xmlnews_maxlen\').disabled = !this.checked;document.getElementById(\'xmlnews_limit\').disabled = !this.checked;'),
-				array('int', 'xmlnews_maxlen', 'subtext' => $txt['xmlnews_maxlen_note'], 10),
-				array('int', 'xmlnews_limit', 'subtext' => $txt['xmlnews_limit_note'], 10),
+			// Just the remaining settings.
+			array('check', 'xmlnews_enable', 'onclick' => 'document.getElementById(\'xmlnews_maxlen\').disabled = !this.checked;document.getElementById(\'xmlnews_limit\').disabled = !this.checked;'),
+			array('int', 'xmlnews_maxlen', 'subtext' => $txt['xmlnews_maxlen_note'], 10),
+			array('int', 'xmlnews_limit', 'subtext' => $txt['xmlnews_limit_note'], 10),
 		);
 
 		// Add new settings with a nice hook, makes them available for admin settings search as well

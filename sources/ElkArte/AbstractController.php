@@ -23,24 +23,28 @@ abstract class AbstractController
 {
 	/**
 	 * The event manager.
+	 *
 	 * @var object
 	 */
 	protected $_events = null;
 
 	/**
 	 * The current hook.
+	 *
 	 * @var string
 	 */
 	protected $_hook = '';
 
 	/**
 	 * Holds instance of \ElkArte\HttpReq object
+	 *
 	 * @var \ElkArte\HttpReq
 	 */
 	protected $_req;
 
 	/**
 	 * Holds instance of \ElkArte\User::$info object
+	 *
 	 * @var \ElkArte\ValuesContainer
 	 */
 	protected $user;
@@ -57,15 +61,6 @@ abstract class AbstractController
 	}
 
 	/**
-	 * Sets the $this->user property to the current user
-	 * @param \ElkArte\ValuesContainer $user
-	 */
-	public function setUser($user)
-	{
-		$this->user = $user;
-	}
-
-	/**
 	 * Standard method to add an "home" button when using a custom action
 	 * as forum index.
 	 *
@@ -77,12 +72,12 @@ abstract class AbstractController
 
 		$buttons = array_merge(array(
 			'base' => array(
-			'title' => $txt['home'],
-			'href' => $scripturl,
-			'data-icon' => 'i-home',
-			'show' => true,
-			'action_hook' => true,
-		)), $buttons);
+				'title' => $txt['home'],
+				'href' => $scripturl,
+				'data-icon' => 'i-home',
+				'show' => true,
+				'action_hook' => true,
+			)), $buttons);
 
 		$buttons['home']['href'] = getUrl('action', $modSettings['default_forum_action']);
 		$buttons['home']['data-icon'] = 'i-comment-blank';
@@ -104,6 +99,42 @@ abstract class AbstractController
 		{
 			$current_action = 'home';
 		}
+	}
+
+	/**
+	 * Tells if the controller can be displayed as front page.
+	 *
+	 * @return boolean
+	 */
+	public static function canFrontPage()
+	{
+		return in_array('ElkArte\\FrontpageInterface', class_implements(get_called_class()));
+	}
+
+	/**
+	 * {@inheritdoc }
+	 */
+	public static function frontPageOptions()
+	{
+		return array();
+	}
+
+	/**
+	 * {@inheritdoc }
+	 */
+	public static function validateFrontPageOptions($post)
+	{
+		return true;
+	}
+
+	/**
+	 * Sets the $this->user property to the current user
+	 *
+	 * @param \ElkArte\ValuesContainer $user
+	 */
+	public function setUser($user)
+	{
+		$this->user = $user;
 	}
 
 	/**
@@ -143,48 +174,6 @@ abstract class AbstractController
 	}
 
 	/**
-	 * Tells if the controller can be displayed as front page.
-	 *
-	 * @return boolean
-	 */
-	public static function canFrontPage()
-	{
-		return in_array('ElkArte\\FrontpageInterface', class_implements(get_called_class()));
-	}
-
-	/**
-	 * {@inheritdoc }
-	 */
-	public static function frontPageOptions()
-	{
-		return array();
-	}
-
-	/**
-	 * {@inheritdoc }
-	 */
-	public static function validateFrontPageOptions($post)
-	{
-		return true;
-	}
-
-	/**
-	 * Initialize the event manager for the controller
-	 *
-	 * Uses the \ElkArte\Controller\XXX name to define the set of event hooks to load
-	 */
-	protected function _initEventManager()
-	{
-		// Find any module classes associated with this controller
-		$classes = $this->_loadModules();
-
-		// Register any module classes => events we found
-		$this->_events->registerClasses($classes);
-
-		$this->_events->setSource($this);
-	}
-
-	/**
 	 * Public function to return the controllers generic hook name
 	 */
 	public function getHook()
@@ -211,6 +200,22 @@ abstract class AbstractController
 		$module_class = end($module_class);
 
 		return ucfirst($module_class);
+	}
+
+	/**
+	 * Initialize the event manager for the controller
+	 *
+	 * Uses the \ElkArte\Controller\XXX name to define the set of event hooks to load
+	 */
+	protected function _initEventManager()
+	{
+		// Find any module classes associated with this controller
+		$classes = $this->_loadModules();
+
+		// Register any module classes => events we found
+		$this->_events->registerClasses($classes);
+
+		$this->_events->setSource($this);
 	}
 
 	/**

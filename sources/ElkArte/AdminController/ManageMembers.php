@@ -8,7 +8,7 @@
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause (see accompanying LICENSE.txt file)
  *
  * This file contains code covered by:
- * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * copyright: 2011 Simple Machines (http://www.simplemachines.org)
  *
  * @version 2.0 dev
  *
@@ -16,22 +16,30 @@
 
 namespace ElkArte\AdminController;
 
+use ElkArte\AbstractController;
+use ElkArte\Action;
+use ElkArte\Cache\Cache;
+use ElkArte\User;
+use ElkArte\Util;
+
 /**
  * ManageMembers controller deals with members administration, approval,
  * admin-visible list and search in it.
  *
  * @package Members
  */
-class ManageMembers extends \ElkArte\AbstractController
+class ManageMembers extends AbstractController
 {
 	/**
 	 * Holds various setting conditions for the current action
+	 *
 	 * @var array
 	 */
 	protected $conditions;
 
 	/**
 	 * Holds the members that the action is being applied to
+	 *
 	 * @var int[]
 	 */
 	protected $member_info;
@@ -48,7 +56,7 @@ class ManageMembers extends \ElkArte\AbstractController
 	 * @event integrate_manage_members used to add subactions and tabs
 	 * @uses ManageMembers template
 	 * @uses ManageMembers language file.
-	 * @see \ElkArte\AbstractController::action_index()
+	 * @see  \ElkArte\AbstractController::action_index()
 	 */
 	public function action_index()
 	{
@@ -82,7 +90,7 @@ class ManageMembers extends \ElkArte\AbstractController
 		);
 
 		// Prepare our action control
-		$action = new \ElkArte\Action();
+		$action = new Action();
 
 		// Default to sub action 'all', needed for the tabs array below
 		$subAction = $action->initialize($subActions, 'all');
@@ -97,9 +105,13 @@ class ManageMembers extends \ElkArte\AbstractController
 		foreach ($context['activation_numbers'] as $activation_type => $total_members)
 		{
 			if (in_array($activation_type, array(0, 2)))
+			{
 				$context['awaiting_activation'] += $total_members;
+			}
 			elseif (in_array($activation_type, array(3, 4, 5)))
+			{
 				$context['awaiting_approval'] += $total_members;
+			}
 		}
 
 		// For the page header... do we show activation?
@@ -158,7 +170,9 @@ class ManageMembers extends \ElkArte\AbstractController
 		if (!$context['show_approve'] && ($subAction !== 'browse' || $this->_req->query->type !== 'approve'))
 		{
 			if (!$context['show_activate'] && ($subAction !== 'browse' || $this->_req->query->type !== 'activate'))
+			{
 				$context['tabs']['search']['is_last'] = true;
+			}
 			unset($context['tabs']['approve']);
 		}
 
@@ -191,7 +205,9 @@ class ManageMembers extends \ElkArte\AbstractController
 
 		// Are we performing a mass action?
 		if (isset($this->_req->post->maction_on_members, $this->_req->post->maction) && !empty($this->_req->post->members))
+		{
 			$this->_multiMembersAction();
+		}
 
 		// Check input after a member search has been submitted.
 		if ($context['sub_action'] === 'query')
@@ -265,14 +281,18 @@ class ManageMembers extends \ElkArte\AbstractController
 
 			$search_params = array();
 			if ($context['sub_action'] === 'query' && !empty($this->_req->query->params) && empty($this->_req->post->types))
+			{
 				$search_params = @json_decode(base64_decode($this->_req->query->params), true);
+			}
 			elseif (!empty($this->_req->post))
 			{
 				$search_params['types'] = $this->_req->post->types;
 				foreach ($params as $param_name => $param_info)
 				{
 					if (isset($this->_req->post->{$param_name}))
+					{
 						$search_params[$param_name] = $this->_req->post->{$param_name};
+					}
 				}
 			}
 
@@ -286,17 +306,23 @@ class ManageMembers extends \ElkArte\AbstractController
 			{
 				// Not filled in?
 				if (!isset($search_params[$param_name]) || $search_params[$param_name] === '')
+				{
 					continue;
+				}
 
 				// Make sure numeric values are really numeric.
 				if (in_array($param_info['type'], array('int', 'age')))
+				{
 					$search_params[$param_name] = (int) $search_params[$param_name];
+				}
 				// Date values have to match the specified format.
 				elseif ($param_info['type'] === 'date')
 				{
 					// Check if this date format is valid.
 					if (preg_match('/^\d{4}-\d{1,2}-\d{1,2}$/', $search_params[$param_name]) == 0)
+					{
 						continue;
+					}
 
 					$search_params[$param_name] = strtotime($search_params[$param_name]);
 				}
@@ -306,7 +332,9 @@ class ManageMembers extends \ElkArte\AbstractController
 				{
 					// Default to '=', just in case...
 					if (empty($range_trans[$search_params['types'][$param_name]]))
+					{
 						$search_params['types'][$param_name] = '=';
+					}
 
 					// Handle special case 'age'.
 					if ($param_info['type'] === 'age')
@@ -336,14 +364,18 @@ class ManageMembers extends \ElkArte\AbstractController
 						$query_parts[] = $param_info['db_fields'][0] . ' > ' . $search_params[$param_name] . ' AND ' . $param_info['db_fields'][0] . ' < ' . ($search_params[$param_name] + 86400);
 					}
 					else
+					{
 						$query_parts[] = $param_info['db_fields'][0] . ' ' . $range_trans[$search_params['types'][$param_name]] . ' ' . $search_params[$param_name];
+					}
 				}
 				// Checkboxes.
 				elseif ($param_info['type'] === 'checkbox')
 				{
 					// Each checkbox or no checkbox at all is checked -> ignore.
 					if (!is_array($search_params[$param_name]) || count($search_params[$param_name]) === 0 || count($search_params[$param_name]) === count($param_info['values']))
+					{
 						continue;
+					}
 
 					$query_parts[] = ($param_info['db_fields'][0]) . ' IN ({array_string:' . $param_name . '_check})';
 					$where_params[$param_name . '_check'] = $search_params[$param_name];
@@ -351,7 +383,7 @@ class ManageMembers extends \ElkArte\AbstractController
 				else
 				{
 					// Replace the wildcard characters ('*' and '?') into MySQL ones.
-					$parameter = strtolower(strtr(\ElkArte\Util::htmlspecialchars($search_params[$param_name], ENT_QUOTES), array('%' => '\%', '_' => '\_', '*' => '%', '?' => '_')));
+					$parameter = strtolower(strtr(Util::htmlspecialchars($search_params[$param_name], ENT_QUOTES), array('%' => '\%', '_' => '\_', '*' => '%', '?' => '_')));
 
 					$query_parts[] = '({column_case_insensitive:' . implode(' LIKE {string_case_insensitive:' . $param_name . '_normal} OR {column_case_insensitive:', $param_info['db_fields']) . '} LIKE {string_case_insensitive:' . $param_name . '_normal})';
 
@@ -371,15 +403,19 @@ class ManageMembers extends \ElkArte\AbstractController
 
 			// Additional membergroups (these are only relevant if not all primary groups where selected!).
 			if (!empty($search_params['membergroups'][2]) && (empty($search_params['membergroups'][1]) || count($context['membergroups']) !== count($search_params['membergroups'][1])))
+			{
 				foreach ($search_params['membergroups'][2] as $mg)
 				{
 					$mg_query_parts[] = 'FIND_IN_SET({int:add_group_' . $mg . '}, mem.additional_groups) != 0';
 					$where_params['add_group_' . $mg] = $mg;
 				}
+			}
 
 			// Combine the one or two membergroup parts into one query part linked with an OR.
 			if (!empty($mg_query_parts))
+			{
 				$query_parts[] = '(' . implode(' OR ', $mg_query_parts) . ')';
+			}
 
 			// Get all selected post count related membergroups.
 			if (!empty($search_params['postgroups']) && count($search_params['postgroups']) !== count($context['postgroups']))
@@ -393,7 +429,9 @@ class ManageMembers extends \ElkArte\AbstractController
 				AND ', $query_parts);
 		}
 		else
+		{
 			$search_url_params = null;
+		}
 
 		// Construct the additional URL part with the query info in it.
 		$context['params_url'] = $context['sub_action'] === 'query' ? ';sa=query;params=' . $search_url_params : '';
@@ -521,7 +559,9 @@ class ManageMembers extends \ElkArte\AbstractController
 
 							// Show it in italics if they're not activated...
 							if ($rowData['is_activated'] % 10 !== 1)
+							{
 								$difference = sprintf('<em title="%1$s">%2$s</em>', $txt['not_activated'], $difference);
+							}
 
 							return $difference;
 						},
@@ -550,7 +590,7 @@ class ManageMembers extends \ElkArte\AbstractController
 					),
 					'data' => array(
 						'function' => function ($rowData) {
-							return '<input type="checkbox" name="members[]" value="' . $rowData['id_member'] . '" class="input_check" ' . ($rowData['id_member'] === \ElkArte\User::$info->id || $rowData['id_group'] == 1 || in_array(1, explode(',', $rowData['additional_groups'])) ? 'disabled="disabled"' : '') . ' />';
+							return '<input type="checkbox" name="members[]" value="' . $rowData['id_member'] . '" class="input_check" ' . ($rowData['id_member'] === User::$info->id || $rowData['id_group'] == 1 || in_array(1, explode(',', $rowData['additional_groups'])) ? 'disabled="disabled"' : '') . ' />';
 						},
 						'class' => 'centertext',
 					),
@@ -572,7 +612,9 @@ class ManageMembers extends \ElkArte\AbstractController
 
 		// Without enough permissions, don't show 'delete members' checkboxes.
 		if (!allowedTo('profile_remove_any'))
+		{
 			unset($listOptions['cols']['check'], $listOptions['form'], $listOptions['additional_rows']);
+		}
 
 		createList($listOptions);
 
@@ -600,7 +642,9 @@ class ManageMembers extends \ElkArte\AbstractController
 		{
 			// Don't delete yourself, idiot.
 			if ($this->_req->post->maction === 'delete' && $value == $this->user->id)
+			{
 				continue;
+			}
 
 			$members[] = (int) $value;
 		}
@@ -608,7 +652,9 @@ class ManageMembers extends \ElkArte\AbstractController
 
 		// No members, nothing to do.
 		if (empty($members))
+		{
 			return;
+		}
 
 		// Are we performing a delete?
 		if ($this->_req->post->maction === 'delete' && allowedTo('profile_remove_any'))
@@ -632,9 +678,13 @@ class ManageMembers extends \ElkArte\AbstractController
 
 					// Change all the selected members' group.
 					if ($this->_req->post->new_membergroup != -1)
+					{
 						addMembersToGroup($members, $this->_req->post->new_membergroup, $type, true);
+					}
 					else
+					{
 						removeMembersFromGroups($members, null, true);
+					}
 				}
 			}
 		}
@@ -664,11 +714,17 @@ class ManageMembers extends \ElkArte\AbstractController
 			$suggestions = array();
 
 			if ($ban_email)
+			{
 				$suggestions[] = 'email';
+			}
 			if ($ban_name)
+			{
 				$suggestions[] = 'user';
+			}
 			if ($ban_ips)
+			{
 				$suggestions[] = 'main_ip';
+			}
 
 			$members_data = getBasicMemberData($members, array('moderation' => true));
 			foreach ($members_data as $member)
@@ -682,6 +738,35 @@ class ManageMembers extends \ElkArte\AbstractController
 				), $ban_group_id, $ban_name ? $member['id_member'] : 0);
 			}
 		}
+	}
+
+	/**
+	 * Prepares the list of groups to be used in the dropdown for "mass actions".
+	 *
+	 * @return mixed[]
+	 */
+	protected function _getGroups()
+	{
+		global $txt;
+
+		require_once(SUBSDIR . '/Membergroups.subs.php');
+
+		$member_groups = getGroupsList();
+
+		// Better remove admin membergroup...and set it to a "remove all"
+		$member_groups[1] = array(
+			'id' => -1,
+			'name' => $txt['remove_groups'],
+			'is_primary' => 0,
+		);
+		// no primary is tricky...
+		$member_groups[0] = array(
+			'id' => 0,
+			'name' => '',
+			'is_primary' => 1,
+		);
+
+		return $member_groups;
 	}
 
 	/**
@@ -735,7 +820,9 @@ class ManageMembers extends \ElkArte\AbstractController
 		$context['browse_type'] = isset($this->_req->query->type) ? $this->_req->query->type : (!empty($modSettings['registration_method']) && $modSettings['registration_method'] == 1 ? 'activate' : 'approve');
 
 		if (isset($context['tabs'][$context['browse_type']]))
+		{
 			$context['tabs'][$context['browse_type']]['is_selected'] = true;
+		}
 
 		// Allowed filters are those we can have, in theory.
 		$context['allowed_filters'] = $context['browse_type'] === 'approve' ? array(3, 4, 5) : array(0, 2);
@@ -747,12 +834,14 @@ class ManageMembers extends \ElkArte\AbstractController
 		{
 			// We have some of these...
 			if (in_array($type, $context['allowed_filters']) && $amount > 0)
+			{
 				$context['available_filters'][] = array(
 					'type' => $type,
 					'amount' => $amount,
 					'desc' => isset($txt['admin_browse_filter_type_' . $type]) ? $txt['admin_browse_filter_type_' . $type] : '?',
 					'selected' => $type === $context['current_filter']
 				);
+			}
 		}
 
 		// If the filter was not sent, set it to whatever has people in it!
@@ -776,7 +865,9 @@ class ManageMembers extends \ElkArte\AbstractController
 
 		// Are we showing duplicate information?
 		if (isset($this->_req->query->showdupes))
+		{
 			$_SESSION['showdupes'] = (int) $this->_req->query->showdupes;
+		}
 		$context['show_duplicates'] = !empty($_SESSION['showdupes']);
 
 		// Determine which actions we should allow on this page.
@@ -784,11 +875,14 @@ class ManageMembers extends \ElkArte\AbstractController
 		{
 			// If we are approving deleted accounts we have a slightly different list... actually a mirror ;)
 			if ($context['current_filter'] == 4)
+			{
 				$context['allowed_actions'] = array(
 					'reject' => $txt['admin_browse_w_approve_deletion'],
 					'ok' => $txt['admin_browse_w_reject'],
 				);
+			}
 			else
+			{
 				$context['allowed_actions'] = array(
 					'ok' => $txt['admin_browse_w_approve'],
 					'okemail' => $txt['admin_browse_w_approve'] . ' ' . $txt['admin_browse_w_email'],
@@ -796,8 +890,10 @@ class ManageMembers extends \ElkArte\AbstractController
 					'reject' => $txt['admin_browse_w_reject'],
 					'rejectemail' => $txt['admin_browse_w_reject'] . ' ' . $txt['admin_browse_w_email'],
 				);
+			}
 		}
 		elseif ($context['browse_type'] === 'activate')
+		{
 			$context['allowed_actions'] = array(
 				'ok' => $txt['admin_browse_w_activate'],
 				'okemail' => $txt['admin_browse_w_activate'] . ' ' . $txt['admin_browse_w_email'],
@@ -805,6 +901,7 @@ class ManageMembers extends \ElkArte\AbstractController
 				'deleteemail' => $txt['admin_browse_w_delete'] . ' ' . $txt['admin_browse_w_email'],
 				'remind' => $txt['admin_browse_w_remind'] . ' ' . $txt['admin_browse_w_email'],
 			);
+		}
 
 		// Create an option list for actions allowed to be done with selected members.
 		$allowed_actions = '
@@ -812,8 +909,10 @@ class ManageMembers extends \ElkArte\AbstractController
 				<option value="" disabled="disabled">' . str_repeat('&#8212;', strlen($txt['admin_browse_with_selected'])) . '</option>';
 
 		foreach ($context['allowed_actions'] as $key => $desc)
+		{
 			$allowed_actions .= '
 				<option value="' . $key . '">' . '&#10148;&nbsp;' . $desc . '</option>';
+		}
 
 		// Setup the Javascript function for selecting an action for the list.
 		$javascript = '
@@ -826,13 +925,16 @@ class ManageMembers extends \ElkArte\AbstractController
 
 		// We have special messages for approving deletion of accounts - it's surprisingly logical - honest.
 		if ($context['current_filter'] == 4)
+		{
 			$javascript .= '
 				if (document.forms.postForm.todo.value.indexOf("reject") != -1)
 					message = "' . $txt['admin_browse_w_delete'] . '";
 				else
 					message = "' . $txt['admin_browse_w_reject'] . '";';
+		}
 		// Otherwise a nice standard message.
 		else
+		{
 			$javascript .= '
 				if (document.forms.postForm.todo.value.indexOf("delete") != -1)
 					message = "' . $txt['admin_browse_w_delete'] . '";
@@ -842,6 +944,7 @@ class ManageMembers extends \ElkArte\AbstractController
 					message = "' . $txt['admin_browse_w_remind'] . '";
 				else
 					message = "' . ($context['browse_type'] === 'approve' ? $txt['admin_browse_w_approve'] : $txt['admin_browse_w_activate']) . '";';
+		}
 		$javascript .= '
 				if (confirm(message + " ' . $txt['admin_browse_warn'] . '"))
 					document.forms.postForm.submit();
@@ -975,10 +1078,15 @@ class ManageMembers extends \ElkArte\AbstractController
 							foreach ($rowData['duplicate_members'] as $member)
 							{
 								if ($member['id'])
+								{
 									$member_links[] = '<a href="' . $scripturl . '?action=profile;u=' . $member['id'] . '" ' . (!empty($member['is_banned']) ? 'class="alert"' : '') . '>' . $member['name'] . '</a>';
+								}
 								else
+								{
 									$member_links[] = $member['name'] . ' (' . $txt['guest'] . ')';
+								}
 							}
+
 							return implode(', ', $member_links);
 						},
 						'class' => 'smalltext',
@@ -1030,13 +1138,19 @@ class ManageMembers extends \ElkArte\AbstractController
 
 		// Pick what column to actually include if we're showing duplicates.
 		if ($context['show_duplicates'])
+		{
 			unset($listOptions['columns']['email']);
+		}
 		else
+		{
 			unset($listOptions['columns']['duplicates']);
+		}
 
 		// Only show hostname on duplicates as it takes a lot of time.
 		if (!$context['show_duplicates'] || !empty($modSettings['disableHostnameLookup']))
+		{
 			unset($listOptions['columns']['hostname']);
+		}
 
 		// Is there any need to show filters?
 		if (isset($context['available_filters']))
@@ -1047,11 +1161,13 @@ class ManageMembers extends \ElkArte\AbstractController
 			);
 
 			foreach ($context['available_filters'] as $filter)
+			{
 				$listOptions['list_menu']['links'][] = array(
 					'is_selected' => $filter['selected'],
 					'href' => $scripturl . '?action=admin;area=viewmembers;sa=browse;type=' . $context['browse_type'] . ';filter=' . $filter['type'],
 					'label' => $filter['desc'] . ' - ' . $filter['amount'] . ' ' . ($filter['amount'] == 1 ? $txt['user'] : $txt['users'])
 				);
+			}
 		}
 
 		// Now that we have all the options, create the list.
@@ -1089,26 +1205,36 @@ class ManageMembers extends \ElkArte\AbstractController
 
 		// If we are applying a filter do just that - then redirect.
 		if (isset($this->_req->post->filter) && $this->_req->post->filter !== $this->_req->post->orig_filter)
+		{
 			redirectexit('action=admin;area=viewmembers;sa=browse;type=' . $this->_req->query->type . ';sort=' . $this->_req->sort . ';filter=' . $this->_req->post->filter . ';start=' . $this->_req->start);
+		}
 
 		// Nothing to do?
 		if (!isset($this->_req->post->todoAction) && !isset($this->_req->post->time_passed))
+		{
 			redirectexit('action=admin;area=viewmembers;sa=browse;type=' . $this->_req->query->type . ';sort=' . $this->_req->sort . ';filter=' . $current_filter . ';start=' . $this->_req->start);
+		}
 
 		// Are we dealing with members who have been waiting for > set amount of time?
 		if (isset($this->_req->post->time_passed))
+		{
 			$this->conditions['time_before'] = time() - 86400 * (int) $this->_req->post->time_passed;
+		}
 		// Coming from checkboxes - validate the members passed through to us.
 		else
 		{
 			$this->conditions['members'] = array();
 			foreach ($this->_req->post->todoAction as $id)
+			{
 				$this->conditions['members'][] = (int) $id;
+			}
 		}
 
 		$data = retrieveMemberData($this->conditions);
 		if ($data['member_count'] == 0)
+		{
 			redirectexit('action=admin;area=viewmembers;sa=browse;type=' . $this->_req->post->type . ';sort=' . $this->_req->sort . ';filter=' . $current_filter . ';start=' . $this->_req->start);
+		}
 
 		$this->member_info = $data['member_info'];
 		$this->conditions['members'] = $data['members'];
@@ -1147,12 +1273,16 @@ class ManageMembers extends \ElkArte\AbstractController
 			$log_action = $this->_req->post->todo === 'remind' ? 'remind_member' : 'approve_member';
 
 			foreach ($this->member_info as $member)
+			{
 				logAction($log_action, array('member' => $member['id']), 'admin');
+			}
 		}
 
 		// Although updateMemberStats *may* catch this, best to do it manually just in case (Doesn't always sort out unapprovedMembers).
 		if (in_array($current_filter, array(3, 4)))
+		{
 			updateSettings(array('unapprovedMembers' => ($modSettings['unapprovedMembers'] > $data['member_count'] ? $modSettings['unapprovedMembers'] - $data['member_count'] : 0)));
+		}
 
 		// Update the member's stats. (but, we know the member didn't change their name.)
 		require_once(SUBSDIR . '/Members.subs.php');
@@ -1166,78 +1296,6 @@ class ManageMembers extends \ElkArte\AbstractController
 		}
 
 		redirectexit('action=admin;area=viewmembers;sa=browse;type=' . $this->_req->query->type . ';sort=' . $this->_req->sort . ';filter=' . $current_filter . ';start=' . $this->_req->start);
-	}
-
-	/**
-	 * Remind a set of members that they have an activation email waiting
-	 */
-	private function _remindMember()
-	{
-		global $scripturl;
-
-		require_once(SUBSDIR . '/Auth.subs.php');
-
-		foreach ($this->member_info as $member)
-		{
-			$this->conditions['selected_member'] = $member['id'];
-			$this->conditions['validation_code'] = generateValidationCode(14);
-
-			enforceReactivation($this->conditions);
-
-			$replacements = array(
-				'USERNAME' => $member['name'],
-				'ACTIVATIONLINK' => $scripturl . '?action=register;sa=activate;u=' . $member['id'] . ';code=' . $this->conditions['validation_code'],
-				'ACTIVATIONLINKWITHOUTCODE' => $scripturl . '?action=register;sa=activate;u=' . $member['id'],
-				'ACTIVATIONCODE' => $this->conditions['validation_code'],
-			);
-
-			$emaildata = loadEmailTemplate('admin_approve_remind', $replacements, $member['language']);
-			sendmail($member['email'], $emaildata['subject'], $emaildata['body'], null, null, false, 1);
-		}
-	}
-
-	/**
-	 * Remove a set of member applications
-	 */
-	private function _deleteMember()
-	{
-		deleteMembers($this->conditions['members']);
-
-		// Send email telling them they aren't welcome?
-		if ($this->_req->post->todo === 'deleteemail')
-		{
-			foreach ($this->member_info as $member)
-			{
-				$replacements = array(
-					'USERNAME' => $member['name'],
-				);
-
-				$emaildata = loadEmailTemplate('admin_approve_delete', $replacements, $member['language']);
-				sendmail($member['email'], $emaildata['subject'], $emaildata['body'], null, null, false, 1);
-			}
-		}
-	}
-
-	/**
-	 * Reject a set a member applications, maybe even tell them
-	 */
-	private function _rejectMember()
-	{
-		deleteMembers($this->conditions['members']);
-
-		// Send email telling them they aren't welcome?
-		if ($this->_req->post->todo === 'rejectemail')
-		{
-			foreach ($this->member_info as $member)
-			{
-				$replacements = array(
-					'USERNAME' => $member['name'],
-				);
-
-				$emaildata = loadEmailTemplate('admin_approve_reject', $replacements, $member['language']);
-				sendmail($member['email'], $emaildata['subject'], $emaildata['body'], null, null, false, 1);
-			}
-		}
 	}
 
 	/**
@@ -1268,7 +1326,7 @@ class ManageMembers extends \ElkArte\AbstractController
 		}
 
 		// Update the menu action cache so its forced to refresh
-		\ElkArte\Cache\Cache::instance()->remove('num_menu_errors');
+		Cache::instance()->remove('num_menu_errors');
 	}
 
 	/**
@@ -1304,31 +1362,74 @@ class ManageMembers extends \ElkArte\AbstractController
 	}
 
 	/**
-	 * Prepares the list of groups to be used in the dropdown for "mass actions".
-	 *
-	 * @return mixed[]
+	 * Reject a set a member applications, maybe even tell them
 	 */
-	protected function _getGroups()
+	private function _rejectMember()
 	{
-		global $txt;
+		deleteMembers($this->conditions['members']);
 
-		require_once(SUBSDIR . '/Membergroups.subs.php');
+		// Send email telling them they aren't welcome?
+		if ($this->_req->post->todo === 'rejectemail')
+		{
+			foreach ($this->member_info as $member)
+			{
+				$replacements = array(
+					'USERNAME' => $member['name'],
+				);
 
-		$member_groups = getGroupsList();
+				$emaildata = loadEmailTemplate('admin_approve_reject', $replacements, $member['language']);
+				sendmail($member['email'], $emaildata['subject'], $emaildata['body'], null, null, false, 1);
+			}
+		}
+	}
 
-		// Better remove admin membergroup...and set it to a "remove all"
-		$member_groups[1] = array(
-			'id' => -1,
-			'name' => $txt['remove_groups'],
-			'is_primary' => 0,
-		);
-		// no primary is tricky...
-		$member_groups[0] = array(
-			'id' => 0,
-			'name' => '',
-			'is_primary' => 1,
-		);
+	/**
+	 * Remove a set of member applications
+	 */
+	private function _deleteMember()
+	{
+		deleteMembers($this->conditions['members']);
 
-		return $member_groups;
+		// Send email telling them they aren't welcome?
+		if ($this->_req->post->todo === 'deleteemail')
+		{
+			foreach ($this->member_info as $member)
+			{
+				$replacements = array(
+					'USERNAME' => $member['name'],
+				);
+
+				$emaildata = loadEmailTemplate('admin_approve_delete', $replacements, $member['language']);
+				sendmail($member['email'], $emaildata['subject'], $emaildata['body'], null, null, false, 1);
+			}
+		}
+	}
+
+	/**
+	 * Remind a set of members that they have an activation email waiting
+	 */
+	private function _remindMember()
+	{
+		global $scripturl;
+
+		require_once(SUBSDIR . '/Auth.subs.php');
+
+		foreach ($this->member_info as $member)
+		{
+			$this->conditions['selected_member'] = $member['id'];
+			$this->conditions['validation_code'] = generateValidationCode(14);
+
+			enforceReactivation($this->conditions);
+
+			$replacements = array(
+				'USERNAME' => $member['name'],
+				'ACTIVATIONLINK' => $scripturl . '?action=register;sa=activate;u=' . $member['id'] . ';code=' . $this->conditions['validation_code'],
+				'ACTIVATIONLINKWITHOUTCODE' => $scripturl . '?action=register;sa=activate;u=' . $member['id'],
+				'ACTIVATIONCODE' => $this->conditions['validation_code'],
+			);
+
+			$emaildata = loadEmailTemplate('admin_approve_remind', $replacements, $member['language']);
+			sendmail($member['email'], $emaildata['subject'], $emaildata['body'], null, null, false, 1);
+		}
 	}
 }

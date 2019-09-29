@@ -8,7 +8,7 @@
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause (see accompanying LICENSE.txt file)
  *
  * This file contains code covered by:
- * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * copyright: 2011 Simple Machines (http://www.simplemachines.org)
  *
  * @version 2.0 dev
  *
@@ -16,29 +16,35 @@
 
 namespace ElkArte\Modules\Drafts;
 
+use ElkArte\EventManager;
+use ElkArte\Modules\AbstractModule;
+
 /**
  * Class \ElkArte\Modules\Drafts\Profile
  *
  * Handles adding the show drafts area to the user profile
  */
-class Profile extends \ElkArte\Modules\AbstractModule
+class Profile extends AbstractModule
 {
 	/**
 	 * {@inheritdoc }
 	 */
-	public static function hooks(\ElkArte\EventManager $eventsManager)
+	public static function hooks(EventManager $eventsManager)
 	{
 		global $modSettings;
 
 		if (!empty($modSettings['drafts_enabled']) && !empty($modSettings['drafts_post_enabled']))
 		{
 			add_integration_function('integrate_profile_areas', '\\ElkArte\\Modules\\Drafts\\Profile::integrate_profile_areas', '', false);
+
 			return array(
 				array('pre_load', array('\\ElkArte\\Modules\\Drafts\\Profile', 'pre_load'), array('post_errors')),
 			);
 		}
 		else
+		{
 			return array();
+		}
 	}
 
 	/**
@@ -71,6 +77,8 @@ class Profile extends \ElkArte\Modules\AbstractModule
 	public function pre_load($post_errors)
 	{
 		if (empty($post_errors))
+		{
 			theme()->getTemplates()->loadLanguageFile('Drafts');
+		}
 	}
 }

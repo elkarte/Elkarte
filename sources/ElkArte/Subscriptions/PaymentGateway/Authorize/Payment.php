@@ -8,7 +8,7 @@
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause (see accompanying LICENSE.txt file)
  *
  * This file contains code covered by:
- * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * copyright: 2011 Simple Machines (http://www.simplemachines.org)
  *
  * @version 2.0 dev
  *
@@ -38,15 +38,21 @@ class Payment implements PaymentInterface
 
 		// Is it even on?
 		if (empty($modSettings['authorize_id']) || empty($modSettings['authorize_transid']))
+		{
 			return false;
+		}
 
 		// We got a hash?
 		if (empty($_POST['x_MD5_Hash']))
+		{
 			return false;
+		}
 
 		// Do we have an invoice number?
 		if (empty($_POST['x_invoice_num']))
+		{
 			return false;
+		}
 
 		// And a response?
 		return !empty($_POST['x_response_code']);
@@ -63,18 +69,24 @@ class Payment implements PaymentInterface
 
 		// Is this the right hash?
 		if ($_POST['x_MD5_Hash'] != strtoupper(md5($modSettings['authorize_id'] . $_POST['x_trans_id'] . $_POST['x_amount'])))
+		{
 			exit;
+		}
 
 		// Can't exist if it doesn't contain anything.
 		if (empty($_POST['x_invoice_num']))
+		{
 			exit;
+		}
 
 		// Verify the currency
 		$currency = $_POST['x_currency_code'];
 
 		// Verify the currency!
 		if (strtolower($currency) != $modSettings['currency_code'])
+		{
 			exit;
+		}
 
 		// Return the ID_SUB/ID_MEMBER
 		return explode('+', $_POST['x_invoice_num']);

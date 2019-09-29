@@ -9,11 +9,14 @@
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause (see accompanying LICENSE.txt file)
  *
  * This file contains code covered by:
- * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * copyright: 2011 Simple Machines (http://www.simplemachines.org)
  *
  * @version 2.0 dev
  *
  */
+
+use ElkArte\Request;
+use ElkArte\Util;
 
 /**
  * Clean the request variables - add html entities to GET.
@@ -31,7 +34,7 @@
 function cleanRequest()
 {
 	// Make sure REMOTE_ADDR, other IPs, and the like are parsed
-	$req = \ElkArte\Request::instance();
+	$req = Request::instance();
 
 	$parser = initUrlGenerator()->getParser();
 
@@ -67,14 +70,18 @@ function convertIPv6toInts($ip)
 
 	// Check if we have done this already.
 	if (isset($expanded[$ip]))
+	{
 		return $expanded[$ip];
+	}
 
 	// Expand the IP out.
 	$expanded_ip = explode(':', expandIPv6($ip));
 
 	$new_ip = array();
 	foreach ($expanded_ip as $int)
+	{
 		$new_ip[] = hexdec($int);
+	}
 
 	// Save this in case of repeated use.
 	$expanded[$ip] = $new_ip;
@@ -96,7 +103,9 @@ function expandIPv6($addr, $strict_check = true)
 
 	// Check if we have done this already.
 	if (isset($converted[$addr]))
+	{
 		return $converted[$addr];
+	}
 
 	// Check if there are segments missing, insert if necessary.
 	if (strpos($addr, '::') !== false)
@@ -122,17 +131,25 @@ function expandIPv6($addr, $strict_check = true)
 
 		$limit = count($part[0]) + count($part[1]);
 		for ($i = 0; $i < (8 - $limit); $i++)
+		{
 			array_push($missing, '0000');
+		}
 
 		$part = array_merge($part[0], $missing, $part[1]);
 	}
 	else
+	{
 		$part = explode(':', $addr);
+	}
 
 	// Pad each segment until it has 4 digits.
 	foreach ($part as &$p)
+	{
 		while (strlen($p) < 4)
+		{
 			$p = '0' . $p;
+		}
+	}
 
 	unset($p);
 
@@ -144,9 +161,11 @@ function expandIPv6($addr, $strict_check = true)
 
 	// Quick check to make sure the length is as expected.
 	if (!$strict_check || strlen($result) === 39)
+	{
 		return $result;
-	else
-		return false;
+	}
+
+	return false;
 }
 
 /**
@@ -167,11 +186,15 @@ function expandIPv6($addr, $strict_check = true)
 function htmlspecialchars__recursive($var, $level = 0)
 {
 	if (!is_array($var))
-		return \ElkArte\Util::htmlspecialchars($var, ENT_QUOTES);
+	{
+		return Util::htmlspecialchars($var, ENT_QUOTES);
+	}
 
 	// Add the htmlspecialchars to every element.
 	foreach ($var as $k => $v)
+	{
 		$var[$k] = $level > 25 ? null : htmlspecialchars__recursive($v, $level + 1);
+	}
 
 	return $var;
 }
@@ -196,11 +219,15 @@ function htmltrim__recursive($var, $level = 0)
 {
 	// Remove spaces (32), tabs (9), returns (13, 10, and 11), nulls (0), and hard spaces. (160)
 	if (!is_array($var))
-		return \ElkArte\Util::htmltrim($var);
+	{
+		return Util::htmltrim($var);
+	}
 
 	// Go through all the elements and remove the whitespace.
 	foreach ($var as $k => $v)
+	{
 		$var[$k] = $level > 25 ? null : htmltrim__recursive($v, $level + 1);
+	}
 
 	return $var;
 }
@@ -235,17 +262,17 @@ function JavaScriptEscape($string)
 	global $scripturl;
 
 	return '\'' . strtr($string, array(
-		"\r" => '',
-		"\n" => '\\n',
-		"\t" => '\\t',
-		'\\' => '\\\\',
-		'\'' => '\\\'',
-		'</' => '<\' + \'/',
-		'<script' => '<scri\'+\'pt',
-		'<body>' => '<bo\'+\'dy>',
-		'<a href' => '<a hr\'+\'ef',
-		$scripturl => '\' + elk_scripturl + \'',
-	)) . '\'';
+			"\r" => '',
+			"\n" => '\\n',
+			"\t" => '\\t',
+			'\\' => '\\\\',
+			'\'' => '\\\'',
+			'</' => '<\' + \'/',
+			'<script' => '<scri\'+\'pt',
+			'<body>' => '<bo\'+\'dy>',
+			'<a href' => '<a hr\'+\'ef',
+			$scripturl => '\' + elk_scripturl + \'',
+		)) . '\'';
 }
 
 /**
@@ -269,15 +296,21 @@ function ob_sessrewrite($buffer)
 
 	// If $scripturl is set to nothing, or the SID is not defined (SSI?) just quit.
 	if ($scripturl == '' || !defined('SID'))
+	{
 		return $buffer;
+	}
 
 	// Do nothing if the session is cookied, or they are a crawler - guests are caught by redirectexit().
 	if (empty($_COOKIE) && SID != '' && !isBrowser('possibly_robot'))
+	{
 		$buffer = preg_replace('/(?<!<link rel="canonical" href=)"' . preg_quote($scripturl, '/') . '(?!\?' . preg_quote(SID, '/') . ')\\??/', '"' . $scripturl . '?' . SID . '&amp;', $buffer);
+	}
 
 	// Debugging templates, are we?
 	elseif (isset($_GET['debug']))
+	{
 		$buffer = preg_replace('/(?<!<link rel="canonical" href=)"' . preg_quote($scripturl, '/') . '\\??/', '"' . $scripturl . '?debug;', $buffer);
+	}
 
 	// Return the changed buffer.
 	return $buffer;
@@ -295,7 +328,9 @@ function buffer_callback($matches)
 	global $scripturl;
 
 	if (!isBrowser('possibly_robot') && empty($_COOKIE) && defined('SID') && SID != '')
+	{
 		return '"' . $scripturl . '/' . strtr($matches[1], '&;=', '//,') . '.html?' . SID . (isset($matches[2]) ? $matches[2] : '') . '"';
-	else
-		return '"' . $scripturl . '/' . strtr($matches[1], '&;=', '//,') . '.html' . (isset($matches[2]) ? $matches[2] : '') . '"';
+	}
+
+	return '"' . $scripturl . '/' . strtr($matches[1], '&;=', '//,') . '.html' . (isset($matches[2]) ? $matches[2] : '') . '"';
 }

@@ -8,7 +8,7 @@
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause (see accompanying LICENSE.txt file)
  *
  * This file contains code covered by:
- * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * copyright: 2011 Simple Machines (http://www.simplemachines.org)
  *
  * @version 2.0 dev
  *
@@ -23,6 +23,7 @@ class AdminSettingsSearch
 {
 	/**
 	 * All the settings we have found
+	 *
 	 * @var array
 	 */
 	protected $_search_data;
@@ -30,12 +31,14 @@ class AdminSettingsSearch
 	/**
 	 * Sections are supposed to be stored in a menu,
 	 * and the menu is in $context['menu_name']
+	 *
 	 * @var string
 	 */
 	protected $_menu_name;
 
 	/**
 	 * An array of settings used in the search
+	 *
 	 * @var string[]
 	 */
 	protected $_settings = array();
@@ -68,6 +71,133 @@ class AdminSettingsSearch
 	}
 
 	/**
+	 * Includes a set of files.
+	 *
+	 * @param string[] $include_files - array of file names (without extension),
+	 *                  it's possible to specify an array of arrays instead of an
+	 *                  array of strings, in that case the index 0 is the
+	 *                  directory of the file, while the 1 is the file name.
+	 *                  If a directory is not specified it will default to
+	 *                  the value of the constant ADMINDIR
+	 *                  e.g.
+	 *                  $include_files = array(
+	 *                    'file_name.controller',
+	 *                    'file_name2.controller',
+	 *                    array(
+	 *                      'dir_name'
+	 *                      'file_name3.controller'
+	 *                    )
+	 *                  )
+	 */
+	protected function _include_files($include_files)
+	{
+		foreach ($include_files as $file)
+		{
+			if (is_array($file))
+			{
+				$dir = $file[0];
+				$file = $file[1];
+			}
+			else
+			{
+				$dir = ADMINDIR;
+			}
+
+			require_once($dir . '/' . $file . '.php');
+		}
+	}
+
+	/**
+	 * Loads all the settings
+	 *
+	 * @param mixed[] $settings_search - An array that defines where to look
+	 *                for settings. The structure is:
+	 *                array(
+	 *                  method name
+	 *                  url
+	 *                  controller name
+	 *                )
+	 *
+	 * @return array
+	 * @todo move to subs?
+	 */
+	private function _load_settings($settings_search)
+	{
+		$settings = array();
+
+		foreach ($settings_search as $setting_area)
+		{
+			// Get a list of their variables.
+			if (isset($setting_area[2]))
+			{
+				// an OOP controller: get the settings from the settings method.
+				$controller = new $setting_area[2](new EventManager());
+				$controller->setUser(User::$info);
+				$controller->pre_dispatch();
+				$config_vars = $controller->{$setting_area[0]}();
+			}
+			else
+			{
+				// a good ole' procedural controller: get the settings from the function.
+				$config_vars = $setting_area[0](true);
+			}
+
+			foreach ($config_vars as $var)
+			{
+				if (!empty($var[1]) && !in_array($var[0], array('permissions', 'callback', 'message', 'warning', 'title', 'desc')))
+				{
+					$settings[] = array($this->_get_label($var), $setting_area[1], 'named_link' => $var[1]);
+				}
+			}
+		}
+
+		return $settings;
+	}
+
+	/**
+	 * Checks if any configuration settings have label text that should be
+	 * included in the search
+	 *
+	 * @param $var
+	 *
+	 * @return string
+	 */
+	private function _get_label($var)
+	{
+		global $txt;
+
+		// See if there are any labels that might fit?
+		if (isset($var[2]) && in_array($var[2], array('file', 'db')))
+		{
+			$var[1] = $var[0];
+		}
+
+		// See if there are any labels that might fit?
+		if (isset($var['text_label']))
+		{
+			$return = $var['text_label'];
+		}
+		elseif (isset($txt[$var[1]]))
+		{
+			$return = $txt[$var[1]];
+		}
+		elseif (isset($txt['setting_' . $var[1]]))
+		{
+			$return = $txt['setting_' . $var[1]];
+		}
+		elseif (isset($txt['groups_' . $var[1]]))
+		{
+			$return = $txt['groups_' . $var[1]];
+		}
+		else
+		{
+			$return = $var[1];
+		}
+
+		return $return;
+	}
+
+	/**
 	 * Initialize the search populating the array to search in
 	 *
 	 * @param string $menu_name - The name of the menu to look into
@@ -90,6 +220,37 @@ class AdminSettingsSearch
 				$this->_settings
 			),
 		);
+	}
+
+	/**
+	 * Loads all the admin sections
+	 */
+	private function _load_search_sections()
+	{
+		global $context;
+
+		$sections = array();
+
+		// Go through the admin menu structure trying to find suitably named areas!
+		foreach ($context[$this->_menu_name]['sections'] as $section)
+		{
+			foreach ($section['areas'] as $menu_key => $menu_item)
+			{
+				$sections[] = array($menu_item['label'], 'area=' . $menu_key);
+				if (!empty($menu_item['subsections']))
+				{
+					foreach ($menu_item['subsections'] as $key => $sublabel)
+					{
+						if (isset($sublabel['label']))
+						{
+							$sections[] = array($sublabel['label'], 'area=' . $menu_key . ';sa=' . $key);
+						}
+					}
+				}
+			}
+		}
+
+		return $sections;
 	}
 
 	/**
@@ -177,163 +338,5 @@ class AdminSettingsSearch
 		}
 
 		return $return;
-	}
-
-	/**
-	 * Includes a set of files.
-	 *
-	 * @param string[] $include_files - array of file names (without extension),
-	 *                  it's possible to specify an array of arrays instead of an
-	 *                  array of strings, in that case the index 0 is the
-	 *                  directory of the file, while the 1 is the file name.
-	 *                  If a directory is not specified it will default to
-	 *                  the value of the constant ADMINDIR
-	 *                  e.g.
-	 *                  $include_files = array(
-	 *                    'file_name.controller',
-	 *                    'file_name2.controller',
-	 *                    array(
-	 *                      'dir_name'
-	 *                      'file_name3.controller'
-	 *                    )
-	 *                  )
-	 */
-	protected function _include_files($include_files)
-	{
-		foreach ($include_files as $file)
-		{
-			if (is_array($file))
-			{
-				$dir = $file[0];
-				$file = $file[1];
-			}
-			else
-			{
-				$dir = ADMINDIR;
-			}
-
-			require_once($dir . '/' . $file . '.php');
-		}
-	}
-
-	/**
-	 * Loads all the settings
-	 *
-	 * @param mixed[] $settings_search - An array that defines where to look
-	 *                for settings. The structure is:
-	 *                array(
-	 *                  method name
-	 *                  url
-	 *                  controller name
-	 *                )
-	 *
-	 * @todo move to subs?
-	 * @return array
-	 */
-	private function _load_settings($settings_search)
-	{
-		$settings = array();
-
-		foreach ($settings_search as $setting_area)
-		{
-			// Get a list of their variables.
-			if (isset($setting_area[2]))
-			{
-				// an OOP controller: get the settings from the settings method.
-				$controller = new $setting_area[2](new EventManager());
-				$controller->setUser(\ElkArte\User::$info);
-				$controller->pre_dispatch();
-				$config_vars = $controller->{$setting_area[0]}();
-			}
-			else
-			{
-				// a good ole' procedural controller: get the settings from the function.
-				$config_vars = $setting_area[0](true);
-			}
-
-			foreach ($config_vars as $var)
-			{
-				if (!empty($var[1]) && !in_array($var[0], array('permissions', 'callback', 'message', 'warning', 'title', 'desc')))
-				{
-					$settings[] = array($this->_get_label($var), $setting_area[1], 'named_link' => $var[1]);
-				}
-			}
-		}
-
-		return $settings;
-	}
-
-	/**
-	 * Checks if any configuration settings have label text that should be
-	 * included in the search
-	 *
-	 * @param $var
-	 *
-	 * @return string
-	 */
-	private function _get_label($var)
-	{
-		global $txt;
-
-		// See if there are any labels that might fit?
-		if (isset($var[2]) && in_array($var[2], array('file', 'db')))
-		{
-			$var[1] = $var[0];
-		}
-
-		// See if there are any labels that might fit?
-		if (isset($var['text_label']))
-		{
-			$return = $var['text_label'];
-		}
-		elseif (isset($txt[$var[1]]))
-		{
-			$return = $txt[$var[1]];
-		}
-		elseif (isset($txt['setting_' . $var[1]]))
-		{
-			$return = $txt['setting_' . $var[1]];
-		}
-		elseif (isset($txt['groups_' . $var[1]]))
-		{
-			$return = $txt['groups_' . $var[1]];
-		}
-		else
-		{
-			$return = $var[1];
-		}
-
-		return $return;
-	}
-
-	/**
-	 * Loads all the admin sections
-	 */
-	private function _load_search_sections()
-	{
-		global $context;
-
-		$sections = array();
-
-		// Go through the admin menu structure trying to find suitably named areas!
-		foreach ($context[$this->_menu_name]['sections'] as $section)
-		{
-			foreach ($section['areas'] as $menu_key => $menu_item)
-			{
-				$sections[] = array($menu_item['label'], 'area=' . $menu_key);
-				if (!empty($menu_item['subsections']))
-				{
-					foreach ($menu_item['subsections'] as $key => $sublabel)
-					{
-						if (isset($sublabel['label']))
-						{
-							$sections[] = array($sublabel['label'], 'area=' . $menu_key . ';sa=' . $key);
-						}
-					}
-				}
-			}
-		}
-
-		return $sections;
 	}
 }

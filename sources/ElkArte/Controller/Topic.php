@@ -11,7 +11,7 @@
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause (see accompanying LICENSE.txt file)
  *
  * This file contains code covered by:
- * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * copyright: 2011 Simple Machines (http://www.simplemachines.org)
  *
  * @version 2.0 dev
  *
@@ -19,10 +19,13 @@
 
 namespace ElkArte\Controller;
 
+use ElkArte\AbstractController;
+use ElkArte\Exceptions\Exception;
+
 /**
  * Handles various topic actions, lock/unlock, sticky (pin) /unsticky (unpin), printing
  */
-class Topic extends \ElkArte\AbstractController
+class Topic extends AbstractController
 {
 	/**
 	 * Entry point for this class (by default).
@@ -42,9 +45,13 @@ class Topic extends \ElkArte\AbstractController
 
 		// Without anything it throws an error, so redirect somewhere
 		if (!empty($topic))
+		{
 			redirectexit('topic=' . $topic . '.0');
+		}
 		else
+		{
 			redirectexit();
+		}
 	}
 
 	/**
@@ -64,7 +71,9 @@ class Topic extends \ElkArte\AbstractController
 
 		// Just quit if there's no topic to lock.
 		if (empty($topic))
-			throw new \ElkArte\Exceptions\Exception('not_a_topic', false);
+		{
+			throw new Exception('not_a_topic', false);
+		}
 
 		checkSession('get');
 
@@ -79,29 +88,43 @@ class Topic extends \ElkArte\AbstractController
 		$user_lock = !allowedTo('lock_any');
 
 		if ($user_lock && $starter == $this->user->id)
+		{
 			isAllowedTo('lock_own');
+		}
 		else
+		{
 			isAllowedTo('lock_any');
+		}
 
 		// Locking with high privileges.
 		if ($locked == '0' && !$user_lock)
+		{
 			$locked = '1';
+		}
 		// Locking with low privileges.
 		elseif ($locked == '0')
+		{
 			$locked = '2';
+		}
 		// Unlocking - make sure you don't unlock what you can't.
 		elseif ($locked == '2' || ($locked == '1' && !$user_lock))
+		{
 			$locked = '0';
+		}
 		// You cannot unlock this!
 		else
-			throw new \ElkArte\Exceptions\Exception('locked_by_admin', 'user');
+		{
+			throw new Exception('locked_by_admin', 'user');
+		}
 
 		// Lock the topic!
 		setTopicAttribute($topic, array('locked' => $locked));
 
 		// If they are allowed a "moderator" permission, log it in the moderator log.
 		if (!$user_lock)
+		{
 			logAction($locked !== '' ? 'lock' : 'unlock', array('topic' => $topic, 'board' => $board));
+		}
 
 		// Notify people that this topic has been locked?
 		sendNotifications($topic, empty($locked) ? 'unlock' : 'lock');
@@ -131,7 +154,9 @@ class Topic extends \ElkArte\AbstractController
 
 		// You can't sticky a board or something!
 		if (empty($topic))
-			throw new \ElkArte\Exceptions\Exception('not_a_topic', false);
+		{
+			throw new Exception('not_a_topic', false);
+		}
 
 		checkSession('get');
 
@@ -153,7 +178,9 @@ class Topic extends \ElkArte\AbstractController
 
 		// Notify people that this topic has been stickied?
 		if (empty($is_sticky))
+		{
 			sendNotifications($topic, 'sticky');
+		}
 
 		// Take them back to the now stickied topic.
 		redirectexit('topic=' . $topic . '.' . $this->_req->post->start);
@@ -176,14 +203,16 @@ class Topic extends \ElkArte\AbstractController
 
 		// Redirect to the boardindex if no valid topic id is provided.
 		if (empty($topic))
+		{
 			redirectexit();
+		}
 
 		// Its not enabled, give them the boot
 		if (!empty($modSettings['disable_print_topic']))
 		{
 			unset($this->_req->query->action);
 			$context['theme_loaded'] = false;
-			throw new \ElkArte\Exceptions\Exception('feature_disabled', false);
+			throw new Exception('feature_disabled', false);
 		}
 
 		// Clean out the template layers
@@ -196,7 +225,9 @@ class Topic extends \ElkArte\AbstractController
 
 		// Redirect to the boardindex if no valid topic id is provided.
 		if (empty($topicinfo))
+		{
 			redirectexit();
+		}
 
 		$context['user']['started'] = $this->user->id == $topicinfo['id_member'] && $this->user->is_guest === false;
 
@@ -233,7 +264,9 @@ class Topic extends \ElkArte\AbstractController
 		$posts_id = array_keys($context['posts']);
 
 		if (!isset($context['topic_subject']))
+		{
 			$context['topic_subject'] = $context['posts'][min($posts_id)]['subject'];
+		}
 
 		// Fetch attachments so we can print them if asked, enabled and allowed
 		if (isset($this->_req->query->images) && !empty($modSettings['attachmentEnable']) && allowedTo('view_attachments'))

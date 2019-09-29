@@ -111,12 +111,14 @@ class SiteCombiner
 
 	/**
 	 * Location of the closure compiler
+	 *
 	 * @var string
 	 */
 	private $_url = 'http://closure-compiler.appspot.com/compile';
 
 	/**
 	 * Base post header to send to the closure compiler
+	 *
 	 * @var string
 	 */
 	private $_post_header = 'output_info=compiled_code&output_format=text&compilation_level=SIMPLE_OPTIMIZATIONS';
@@ -157,6 +159,7 @@ class SiteCombiner
 		{
 			// Anything is spare
 			$this->_addSpare($files);
+
 			return false;
 		}
 
@@ -174,7 +177,9 @@ class SiteCombiner
 
 		// Nothing to do, then we are done
 		if (count($this->_combine_files) === 0)
+		{
 			return true;
+		}
 
 		// Create the archive name
 		$this->_buildName('.js');
@@ -219,6 +224,7 @@ class SiteCombiner
 		{
 			// Anything is spare
 			$this->_addSpare($files);
+
 			return false;
 		}
 
@@ -234,7 +240,9 @@ class SiteCombiner
 
 		// Nothing to do so return
 		if (count($this->_combine_files) === 0)
+		{
 			return true;
+		}
 
 		// Create the css archive name
 		$this->_buildName('.css');
@@ -309,6 +317,7 @@ class SiteCombiner
 		{
 			$return &= @unlink($file->getPathname());
 		}
+
 		return $return;
 	}
 
@@ -375,6 +384,7 @@ class SiteCombiner
 
 			return true;
 		}
+
 		return false;
 	}
 
@@ -391,7 +401,9 @@ class SiteCombiner
 		foreach ($this->_combine_files as $file)
 		{
 			if ($file['filemtime'] > $filemtime)
+			{
 				return true;
+			}
 		}
 
 		return false;
@@ -408,7 +420,9 @@ class SiteCombiner
 
 		// Create this groups archive name
 		foreach ($this->_combine_files as $file)
+		{
 			$this->_archive_filenames .= $file['basename'] . ' ';
+		}
 
 		// Add in the actual theme url to make the sha1 unique to this hive
 		$this->_archive_filenames = $settings['actual_theme_url'] . '/' . trim($this->_archive_filenames);
@@ -418,7 +432,9 @@ class SiteCombiner
 
 		// Create a unique cache stale for this hive ?x12345
 		if (!empty($this->_stales))
+		{
 			$this->_archive_stale = '?x' . hash('crc32b', implode(' ', $this->_stales));
+		}
 	}
 
 	/**
@@ -463,9 +479,13 @@ class SiteCombiner
 
 			// Add the file to the correct array for processing
 			if ($file['minimized'] === false)
+			{
 				$_cache[] = $tempfile;
+			}
 			else
+			{
 				$_min_cache[] = $tempfile;
+			}
 		}
 
 		// Build out our combined file strings
@@ -481,7 +501,9 @@ class SiteCombiner
 	{
 		// Add in the file header if available
 		if (!empty($this->_archive_header))
+		{
 			$this->_minified_cache = $this->_archive_header . $this->_minified_cache;
+		}
 
 		// First the plain text version
 		file_put_contents($this->_archive_dir . '/' . $this->_archive_name, $this->_minified_cache, LOCK_EX);
@@ -518,7 +540,9 @@ class SiteCombiner
 			// To prevent a stack overflow segmentation fault, which silently kills Apache, we need to limit
 			// recursion on windows.  This may cause JSqueeze to fail, but at least its then catchable.
 			if (detectServer()->is('windows'))
+			{
 				@ini_set('pcre.recursion_limit', '524');
+			}
 
 			require_once(EXTDIR . '/JSqueeze.php');
 			$jsqueeze = new \Patchwork\JSqueeze;
@@ -527,7 +551,9 @@ class SiteCombiner
 
 		// If we still have no data, then try the post js_code method to the closure compiler
 		if ($fetch_data === false || trim($fetch_data) === '')
+		{
 			$fetch_data = $this->_closure_js_code();
+		}
 
 		// If we have nothing to return, use the original data
 		$fetch_data = ($fetch_data === false || trim($fetch_data) === '') ? $this->_cache : $fetch_data;
@@ -552,7 +578,9 @@ class SiteCombiner
 		foreach ($this->_combine_files as $file)
 		{
 			if ($file['minimized'] === false)
+			{
 				$post_data .= '&code_url=' . urlencode($file['url'] . '/scripts/' . $file['basename'] . $this->_archive_stale);
+			}
 		}
 
 		return fetch_web_data($this->_url, $this->_post_header . $post_data);
@@ -577,7 +605,9 @@ class SiteCombiner
 		}
 		// Simply to much data for a single post so break it down in to as few as possible
 		else
+		{
 			$fetch_data = $this->_closure_js_code_chunks();
+		}
 
 		return $fetch_data;
 	}

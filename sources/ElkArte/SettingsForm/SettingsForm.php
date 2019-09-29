@@ -8,7 +8,7 @@
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause (see accompanying LICENSE.txt file)
  *
  * This file contains code covered by:
- * copyright:    2011 Simple Machines (http://www.simplemachines.org)
+ * copyright: 2011 Simple Machines (http://www.simplemachines.org)
  *
  * @version 2.0 dev
  *
@@ -77,6 +77,16 @@ class SettingsForm
 	private $adapter;
 
 	/**
+	 * @param string|null $adapter Will default to the file adapter if none is specified.
+	 */
+	public function __construct($adapter = null)
+	{
+		$fqcn = $adapter ?: self::FILE_ADAPTER;
+
+		$this->adapter = new $fqcn;
+	}
+
+	/**
 	 * @return array
 	 */
 	public function getConfigVars()
@@ -106,16 +116,6 @@ class SettingsForm
 	public function setConfigValues(array $configValues)
 	{
 		$this->adapter->setConfigValues($configValues);
-	}
-
-	/**
-	 * @param string|null $adapter Will default to the file adapter if none is specified.
-	 */
-	public function __construct($adapter = null)
-	{
-		$fqcn = $adapter ?: self::FILE_ADAPTER;
-
-		$this->adapter = new $fqcn;
 	}
 
 	/**

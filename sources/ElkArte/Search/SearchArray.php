@@ -8,7 +8,7 @@
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause (see accompanying LICENSE.txt file)
  *
  * This file contains code covered by:
- * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * copyright: 2011 Simple Machines (http://www.simplemachines.org)
  *
  * @version 2.0 dev
  *
@@ -16,59 +16,61 @@
 
 namespace ElkArte\Search;
 
+use ElkArte\Util;
+
 /**
  * Actually do the searches
  */
 class SearchArray
 {
 	/**
-	 * Words not be be found in the search results (-word)
-	 * @var array
-	 */
-	private $_excludedWords = array();
-
-	/**
-	 * Simplify the fulltext search
-	 * @var bool
-	 */
-	private $_search_simple_fulltext = false;
-
-	/**
-	 * If we are performing a boolean or simple search
-	 * @var bool
-	 */
-	private $_no_regexp = false;
-
-	/**
-	 * Holds the words and phrases to be searched on
-	 * @var array
-	 */
-	private $_searchArray = array();
-
-	/**
-	 * Words we do not search due to length or common terms
-	 * @var array
-	 */
-	private $_blacklisted_words = array();
-
-	/**
-	 * If search words were found on the blacklist
-	 * @var bool
-	 */
-	private $_foundBlackListedWords = false;
-
-	/**
-	 * Holds words that will not be search on to inform the user they were skipped
-	 * @var array
-	 */
-	private $_ignored = array();
-
-	/**
 	 * $_search_params will carry all settings that differ from the default search parameters.
 	 *
 	 * That way, the URLs involved in a search page will be kept as short as possible.
 	 */
 	protected $_search_string = array();
+	/**
+	 * Words not be be found in the search results (-word)
+	 *
+	 * @var array
+	 */
+	private $_excludedWords = array();
+	/**
+	 * Simplify the fulltext search
+	 *
+	 * @var bool
+	 */
+	private $_search_simple_fulltext = false;
+	/**
+	 * If we are performing a boolean or simple search
+	 *
+	 * @var bool
+	 */
+	private $_no_regexp = false;
+	/**
+	 * Holds the words and phrases to be searched on
+	 *
+	 * @var array
+	 */
+	private $_searchArray = array();
+	/**
+	 * Words we do not search due to length or common terms
+	 *
+	 * @var array
+	 */
+	private $_blacklisted_words = array();
+	/**
+	 * If search words were found on the blacklist
+	 *
+	 * @var bool
+	 */
+	private $_foundBlackListedWords = false;
+	/**
+	 * Holds words that will not be search on to inform the user they were skipped
+	 *
+	 * @var array
+	 */
+	private $_ignored = array();
 
 	/**
 	 * Usual constructor that does what any constructor does.
@@ -96,7 +98,7 @@ class SearchArray
 		$stripped_query = preg_replace('~(?:[\x0B\0\x{A0}\t\r\s\n(){}\\[\\]<>!@$%^*.,:+=`\~\?/\\\\]+|&(?:amp|lt|gt|quot);)+~u', ' ', $this->_search_string);
 
 		// Make the query lower case. It's gonna be case insensitive anyway.
-		$stripped_query = un_htmlspecialchars(\ElkArte\Util::strtolower($stripped_query));
+		$stripped_query = un_htmlspecialchars(Util::strtolower($stripped_query));
 
 		// This option will do fulltext searching in the most basic way.
 		if ($this->_search_simple_fulltext)
@@ -112,7 +114,7 @@ class SearchArray
 
 		// Remove the phrase parts and extract the words.
 		$wordArray = preg_replace('~(?:^|\s)(?:[-]?)"(?:[^"]+)"(?:$|\s)~u', ' ', $this->_search_string);
-		$wordArray = explode(' ', \ElkArte\Util::htmlspecialchars(un_htmlspecialchars($wordArray), ENT_QUOTES));
+		$wordArray = explode(' ', Util::htmlspecialchars(un_htmlspecialchars($wordArray), ENT_QUOTES));
 
 		// A minus sign in front of a word excludes the word.... so...
 		// .. first, we check for things like -"some words", but not "-some words".
@@ -139,7 +141,7 @@ class SearchArray
 				unset($this->_searchArray[$index]);
 			}
 			// Don't allow very, very short words.
-			elseif (\ElkArte\Util::strlen($value) < 2)
+			elseif (Util::strlen($value) < 2)
 			{
 				$this->_ignored[] = $value;
 				unset($this->_searchArray[$index]);
@@ -149,31 +151,6 @@ class SearchArray
 		$this->_searchArray = array_slice(array_unique($this->_searchArray), 0, 10);
 
 		return $this->_searchArray;
-	}
-
-	public function getSearchArray()
-	{
-		return $this->_searchArray;
-	}
-
-	public function getExcludedWords()
-	{
-		return $this->_excludedWords;
-	}
-
-	public function getNoRegexp()
-	{
-		return $this->_no_regexp;
-	}
-
-	public function foundBlackListedWords()
-	{
-		return $this->_foundBlackListedWords;
-	}
-
-	public function getIgnored()
-	{
-		return $this->_ignored;
 	}
 
 	/**
@@ -231,5 +208,30 @@ class SearchArray
 		}
 
 		return $wordArray;
+	}
+
+	public function getSearchArray()
+	{
+		return $this->_searchArray;
+	}
+
+	public function getExcludedWords()
+	{
+		return $this->_excludedWords;
+	}
+
+	public function getNoRegexp()
+	{
+		return $this->_no_regexp;
+	}
+
+	public function foundBlackListedWords()
+	{
+		return $this->_foundBlackListedWords;
+	}
+
+	public function getIgnored()
+	{
+		return $this->_ignored;
 	}
 }

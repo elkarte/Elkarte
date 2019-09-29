@@ -20,13 +20,13 @@ class DraftsIntegrate
 {
 	/**
 	 * Registers hooks as needed for the drafts function to work
+	 *
 	 * @return array
 	 */
 	public static function register()
 	{
 		// $hook, $function, $file
-		return array(
-		);
+		return array();
 	}
 
 	/**

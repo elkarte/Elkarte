@@ -8,7 +8,7 @@
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause (see accompanying LICENSE.txt file)
  *
  * This file contains code covered by:
- * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * copyright: 2011 Simple Machines (http://www.simplemachines.org)
  *
  * @version 2.0 dev
  *
@@ -16,11 +16,17 @@
 
 namespace ElkArte\Controller;
 
+use ElkArte\AbstractController;
+use ElkArte\Action;
+use ElkArte\Exceptions\Exception;
+use ElkArte\Notifications;
+use ElkArte\NotificationsTask;
+
 /**
  * Members Controller class.
  * Allows for the adding or removing of buddies
  */
-class Members extends \ElkArte\AbstractController
+class Members extends AbstractController
 {
 	/**
 	 * Forwards to an action method.
@@ -38,7 +44,7 @@ class Members extends \ElkArte\AbstractController
 		);
 
 		// I don't think we know what to do... throw dies?
-		$action = new \ElkArte\Action('members');
+		$action = new Action('members');
 		$subAction = $action->initialize($subActions, 'none');
 		$context['sub_action'] = $subAction;
 		$action->dispatch($subAction);
@@ -62,7 +68,9 @@ class Members extends \ElkArte\AbstractController
 
 		// You have to give a user
 		if (empty($user))
-			throw new \ElkArte\Exceptions\Exception('no_access', false);
+		{
+			throw new Exception('no_access', false);
+		}
 
 		call_integration_hook('integrate_add_buddies', array($this->user->id, &$user));
 
@@ -74,8 +82,8 @@ class Members extends \ElkArte\AbstractController
 			// Do we want a mention for our newly added buddy?
 			if (!empty($modSettings['mentions_enabled']) && !empty($modSettings['mentions_buddy']))
 			{
-				$notifier = \ElkArte\Notifications::instance();
-				$notifier->add(new \ElkArte\NotificationsTask(
+				$notifier = Notifications::instance();
+				$notifier->add(new NotificationsTask(
 					'buddy',
 					$user,
 					$this->user->id,
@@ -110,7 +118,9 @@ class Members extends \ElkArte\AbstractController
 
 		// You have to give a user
 		if (empty($user))
-			throw new \ElkArte\Exceptions\Exception('no_access', false);
+		{
+			throw new Exception('no_access', false);
+		}
 
 		// Remove this user, assuming we can find them
 		if (in_array($user, $this->user->buddies))

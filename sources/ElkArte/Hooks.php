@@ -9,7 +9,7 @@
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause (see accompanying LICENSE.txt file)
  *
  * This file contains code covered by:
- * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * copyright: 2011 Simple Machines (http://www.simplemachines.org)
  *
  * @version 2.0 dev
  *
@@ -24,24 +24,28 @@ final class Hooks
 {
 	/**
 	 * The instance of the class
+	 *
 	 * @var Hooks
 	 */
 	private static $_instance = null;
 
 	/**
 	 * Holds our standard path replacement array
+	 *
 	 * @var array
 	 */
 	protected $_path_replacements = array();
 
 	/**
 	 * Holds the database instance
+	 *
 	 * @var null|\ElkArte\Database\QueryInterface
 	 */
 	protected $_db = null;
 
 	/**
 	 * If holds instance of debug class
+	 *
 	 * @var object|null
 	 */
 	protected $_debug = null;
@@ -68,7 +72,9 @@ final class Hooks
 		$this->_debug = $debug;
 
 		if ($paths !== null)
+		{
 			$this->newPath($paths);
+		}
 	}
 
 	/**
@@ -99,16 +105,22 @@ final class Hooks
 		global $modSettings;
 
 		if ($this->_debug !== null)
+		{
 			$this->_debug->add('hooks', $hook);
+		}
 
 		$results = array();
 		if (empty($modSettings[$hook]))
+		{
 			return $results;
+		}
 
 		// Loop through each function.
 		$functions = $this->_prepare_hooks($modSettings[$hook]);
 		foreach ($functions as $function => $call)
+		{
 			$results[$function] = call_user_func_array($call, $parameters);
+		}
 
 		return $results;
 	}
@@ -131,25 +143,35 @@ final class Hooks
 			$function = trim($function);
 
 			if (strpos($function, '|') !== false)
+			{
 				list ($call, $file) = explode('|', $function);
+			}
 			else
+			{
 				$call = $function;
+			}
 
 			// OOP static method
 			if (strpos($call, '::') !== false)
+			{
 				$call = explode('::', $call);
+			}
 
 			if (!empty($file))
 			{
 				$absPath = strtr(trim($file), $this->_path_replacements);
 
 				if (file_exists($absPath))
+				{
 					require_once($absPath);
+				}
 			}
 
 			// Is it valid?
 			if (is_callable($call))
+			{
 				$returns[$function] = $call;
+			}
 		}
 
 		return $returns;
@@ -165,7 +187,9 @@ final class Hooks
 		global $modSettings;
 
 		if ($this->_debug !== null)
+		{
 			$this->_debug->add('hooks', $hook);
+		}
 
 		// Any file to include?
 		if (!empty($modSettings[$hook]))
@@ -176,7 +200,9 @@ final class Hooks
 				$include = strtr(trim($include), $this->_path_replacements);
 
 				if (file_exists($include))
+				{
 					require_once($include);
+				}
 			}
 		}
 	}
@@ -189,15 +215,21 @@ final class Hooks
 		global $modSettings;
 
 		if ($this->_debug !== null)
+		{
 			$this->_debug->add('hooks', 'integrate_buffer');
+		}
 
 		if (empty($modSettings['integrate_buffer']))
+		{
 			return;
+		}
 
 		$buffers = $this->_prepare_hooks($modSettings['integrate_buffer']);
 
 		foreach ($buffers as $call)
+		{
 			ob_start($call);
+		}
 	}
 
 	/**
@@ -218,14 +250,18 @@ final class Hooks
 
 		// Is it going to be permanent?
 		if ($permanent)
+		{
 			$this->_store($hook, $integration_call);
+		}
 
 		// Make current function list usable.
 		$functions = empty($modSettings[$hook]) ? array() : explode(',', $modSettings[$hook]);
 
 		// Do nothing, if it's already there.
 		if (in_array($integration_call, $functions))
+		{
 			return;
+		}
 
 		$functions[] = $integration_call;
 		$modSettings[$hook] = implode(',', $functions);
@@ -245,10 +281,14 @@ final class Hooks
 				$hooks = $class::register();
 
 				if (empty($hooks))
+				{
 					continue;
+				}
 
 				foreach ($hooks as $hook)
+				{
 					$this->add($hook[0], $hook[1], isset($hook[2]) ? $hook[2] : '', false);
+				}
 			}
 		}
 	}
@@ -267,10 +307,14 @@ final class Hooks
 				$hooks = $class::settingsRegister();
 
 				if (empty($hooks))
+				{
 					continue;
+				}
 
 				foreach ($hooks as $hook)
+				{
 					$this->add($hook[0], $hook[1], isset($hook[2]) ? $hook[2] : '', false);
+				}
 			}
 		}
 	}
@@ -304,8 +348,11 @@ final class Hooks
 
 			// Already have the integration compose file, then use it, otherwise create one
 			if (file_exists($composer_file))
+			{
 				$composer_data = json_decode(file_get_contents($composer_file));
+			}
 			else
+			{
 				$composer_data = json_decode('{
     "name": "' . $name . '",
     "description": "' . $name . '",
@@ -343,6 +390,7 @@ final class Hooks
         "setting_url": ""
     }
 }');
+			}
 
 			$names[] = array(
 				'id' => $name,
@@ -436,12 +484,16 @@ final class Hooks
 		{
 			$current_functions = explode(',', $current_functions);
 			if (in_array($integration_call, $current_functions))
+			{
 				return;
+			}
 
 			$permanent_functions = array_merge($current_functions, array($integration_call));
 		}
 		else
+		{
 			$permanent_functions = array($integration_call);
+		}
 
 		updateSettings(array($hook => implode(',', $permanent_functions)));
 	}
@@ -486,7 +538,9 @@ final class Hooks
 			{
 				updateSettings(array($hook => implode(',', array_diff($current_functions, array($integration_call)))));
 				if (empty($modSettings[$hook]))
+				{
 					removeSettings($hook);
+				}
 			}
 		}
 
@@ -495,7 +549,9 @@ final class Hooks
 
 		// You can only remove it if it's available.
 		if (!in_array($integration_call, $functions))
+		{
 			return;
+		}
 
 		$functions = array_diff($functions, array($integration_call));
 		$modSettings[$hook] = implode(',', $functions);
@@ -511,10 +567,14 @@ final class Hooks
 	public static function init($db = null, $debug = null, $paths = null)
 	{
 		if ($db === null)
+		{
 			$db = database();
+		}
 
 		if ($debug === null)
+		{
 			$debug = Debug::instance();
+		}
 
 		self::$_instance = new Hooks($db, $debug, $paths);
 	}
@@ -531,9 +591,13 @@ final class Hooks
 	public static function instance($db = null, $debug = null, $paths = null)
 	{
 		if (self::$_instance === null)
+		{
 			self::init($db, $debug, $paths);
+		}
 		elseif ($paths !== null)
+		{
 			self::$_instance->newPath($paths);
+		}
 
 		return self::$_instance;
 	}

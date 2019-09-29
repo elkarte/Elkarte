@@ -7,7 +7,7 @@
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause (see accompanying LICENSE.txt file)
  *
  * This file contains code covered by:
- * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * copyright: 2011 Simple Machines (http://www.simplemachines.org)
  *
  * @version 2.0 dev
  *
@@ -87,6 +87,7 @@ class SmileyParser
 	public function setPath($path)
 	{
 		$this->path = htmlspecialchars($path);
+
 		return $this;
 	}
 
@@ -253,8 +254,7 @@ class SmileyParser
 				ORDER BY LENGTH(code) DESC',
 				[]
 			)->fetch_callback(
-				function ($row) use (&$smileysfrom, &$smileysto, &$smileysdescs)
-				{
+				function ($row) use (&$smileysfrom, &$smileysto, &$smileysdescs) {
 					$smileysfrom[] = $row['code'];
 					$smileysto[] = htmlspecialchars($row['filename']);
 					$smileysdescs[] = $row['description'];

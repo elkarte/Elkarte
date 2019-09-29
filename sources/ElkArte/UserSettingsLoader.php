@@ -8,7 +8,7 @@
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause (see accompanying LICENSE.txt file)
  *
  * This file contains code covered by:
- * copyright:    2011 Simple Machines (http://www.simplemachines.org)
+ * copyright: 2011 Simple Machines (http://www.simplemachines.org)
  *
  * @version 2.0 dev
  *
@@ -16,8 +16,7 @@
 
 namespace ElkArte;
 
-use ElkArte\UserInfo;
-use ElkArte\UserSettings;
+use ElkArte\Exceptions\Exception;
 
 /**
  * This class holds all the data belonging to a certain member.
@@ -25,20 +24,17 @@ use ElkArte\UserSettings;
 class UserSettingsLoader
 {
 	/**
-	 * @var mixed|string
-	 */
-	public $member_name;
-
-	/**
 	 * @var int
 	 */
 	const HASH_LENGTH = 4;
-
 	/**
 	 * @var int
 	 */
 	const BAN_OFFSET = 10;
-
+	/**
+	 * @var mixed|string
+	 */
+	public $member_name;
 	/**
 	 * The user id
 	 *
@@ -145,235 +141,92 @@ class UserSettingsLoader
 			$user_info = $this->initGuest();
 		}
 
-		\ElkArte\Hooks::instance()->hook('integrate_user_info', [$user_info]);
+		Hooks::instance()->hook('integrate_user_info', [$user_info]);
 
 		$this->compileInfo($user_info);
 	}
 
 	/**
-	 * Repeat the hashing of the password, either because it was not previously
-	 * hashed or because it needs a new one
+	 * Loads the data of a certain member from the database
 	 *
-	 * @param string $password
-	 */
-	public function rehashPassword($password)
-	{
-		$this->settings->rehashPassword($password);
-	}
-
-	/**
-	 * Checks the provided password is the same as the one in the database.
-	 *
-	 * @param string $password
-	 * @return bool
-	 */
-	public function validatePassword($password)
-	{
-		return $this->settings->validatePassword($password);
-	}
-
-	/**
-	 * Check activation status of the current user.
-	 *
-	 * What it does:
-	 * is_activated value key is as follows:
-	 * - > 10 Banned with activation status as value - 10
-	 * - 5 = Awaiting COPPA consent
-	 * - 4 = Awaiting Deletion approval
-	 * - 3 = Awaiting Admin approval
-	 * - 2 = Awaiting reactivation from email change
-	 * - 1 = Approved and active
-	 * - 0 = Not active
-	 *
-	 * @param bool $undelete - whether the current request is to revert the
-	 *                         request to delete the account or not
-	 *
-	 * @return bool
+	 * @param bool $already_verified
+	 * @param string $session_password
 	 * @throws \ElkArte\Exceptions\Exception
 	 */
-	public function checkActivation($undelete)
+	protected function loadUserData($already_verified, $session_password)
 	{
-		global $context, $txt, $modSettings;
+		$user_settings = [];
 
-		if (!isset($context['login_errors']))
+		// Is the member data cached?
+		if ($this->cache->levelLowerThan(2) || $this->cache->getVar($user_settings, 'user_settings-' . $this->id, 60) === false)
 		{
-			$context['login_errors'] = array();
-		}
+			$this_user = $this->db->fetchQuery('
+				SELECT mem.*, COALESCE(a.id_attach, 0) AS id_attach, a.filename, a.attachment_type
+				FROM {db_prefix}members AS mem
+					LEFT JOIN {db_prefix}attachments AS a ON (a.id_member = {int:id_member})
+				WHERE mem.id_member = {int:id_member}
+				LIMIT 1',
+				array(
+					'id_member' => $this->id,
+				)
+			);
 
-		// What is the true activation status of this account?
-		$activation_status = $this->settings->getActivationStatus();
+			$user_settings = $this_user->fetch_assoc();
+			$this_user->free_result();
 
-		// Check if the account is activated - COPPA first...
-		if ($activation_status == 5)
-		{
-			$context['login_errors'][] = $txt['coppa_no_concent'] . ' <a href="' . getUrl('action', ['action' => 'register', 'sa' => 'coppa', 'member' => $this->settings['id_member']]) . '">' . $txt['coppa_need_more_details'] . '</a>';
-
-			return false;
-		}
-
-		// Awaiting approval still?
-		if ($activation_status == 3)
-		{
-			throw new \ElkArte\Exceptions\Exception('still_awaiting_approval', 'user');
-		}
-
-		// Awaiting deletion, changed their mind?
-		if ($activation_status == 4)
-		{
-			if ($undelete)
+			if ($this->cache->levelHigherThan(1))
 			{
-				require_once(SUBSDIR . '/Members.subs.php');
-				updateMemberData($this->settings['id_member'], array('is_activated' => 1));
-				updateSettings(array('unapprovedMembers' => ($modSettings['unapprovedMembers'] > 0 ? $modSettings['unapprovedMembers'] - 1 : 0)));
+				$this->cache->put('user_settings-' . $this->id, $user_settings, 60);
+			}
+		}
 
-				return true;
+		// Did we find 'im?  If not, junk it.
+		if (!empty($user_settings))
+		{
+			// Make the ID specifically an integer
+			$user_settings['id_member'] = (int) ($user_settings['id_member'] ?? 0);
+
+			// As much as the password should be right, we can assume the integration set things up.
+			if (!empty($already_verified) && $already_verified)
+			{
+				$check = true;
+			}
+			// SHA-256 passwords should be 64 characters long.
+			elseif (strlen($session_password) === 64)
+			{
+				$check = hash('sha256', ($user_settings['passwd'] . $user_settings['password_salt'])) === $session_password;
+			}
+			else
+			{
+				$check = false;
 			}
 
-			$context['disable_login_hashing'] = true;
-			$context['login_errors'][] = $txt['awaiting_delete_account'];
-			$context['login_show_undelete'] = true;
-
-			return false;
+			// Wrong password or not activated - either way, you're going nowhere.
+			$this->id = $check && ($user_settings['is_activated'] == 1 || $user_settings['is_activated'] == 11) ? $user_settings['id_member'] : 0;
 		}
-
-		// Standard activation?
-		if ($activation_status != 1)
-		{
-			\ElkArte\Errors\Errors::instance()->log_error($txt['activate_not_completed1'] . ' - <span class="remove">' . $this->settings['member_name'] . '</span>', false);
-
-			$context['login_errors'][] = $txt['activate_not_completed1'] . ' <a class="linkbutton" href="' . getUrl('action', ['action' => 'register', 'sa' => 'activate', 'resend', 'u' => $this->settings['id_member']]) . '">' . $txt['activate_not_completed2'] . '</a>';
-
-			return false;
-		}
-
-		return true;
-	}
-
-	/**
-	 * Fills up the $this->info variable
-	 *
-	 * @param mixed[] $user_info
-	 */
-	protected function compileInfo($user_info)
-	{
-		global $modSettings;
-
-		// Set up the $user_info array.
-		$user_info += array(
-			'id' => $this->id,
-			'username' => $this->member_name,
-			'name' => $this->settings->real_name(''),
-			'email' => $this->settings->email_address(''),
-			'passwd' => $this->settings->passwd(''),
-			'language' => $this->getLanguage(),
-			'is_guest' => (bool) $this->id == 0,
-			'is_admin' => (bool) in_array(1, $user_info['groups']),
-			'is_mod' => false,
-			'theme' => (int) $this->settings->id_theme,
-			'last_login' => (int) $this->settings->last_login,
-			'ip' => $this->req->client_ip(),
-			'ip2' => $this->req->ban_ip(),
-			'posts' => (int) $this->settings->posts,
-			'time_format' => $this->settings->getEmpty('time_format', $modSettings['time_format']),
-			'time_offset' => (int) $this->settings->time_offset,
-			'avatar' => $this->buildAvatarArray(),
-			'smiley_set' => determineSmileySet($this->settings->smiley_set(''), $modSettings['smiley_sets_known']),
-			'messages' => (int) $this->settings->personal_messages,
-			'mentions' => max(0, (int) $this->settings->mentions),
-			'unread_messages' => (int) $this->settings->unread_messages,
-			'total_time_logged_in' => (int) $this->settings->total_time_logged_in,
-			'buddies' => !empty($modSettings['enable_buddylist']) ? explode(',', (string) $this->settings->buddy_list) : [],
-			'ignoreboards' => explode(',', (string) $this->settings->ignore_boards),
-			'ignoreusers' => explode(',', (string) $this->settings->pm_ignore_list),
-			'warning' => (int) $this->settings->warning,
-			'permissions' => [],
-		);
-		$user_info['groups'] = array_unique($user_info['groups']);
-
-		// Make sure that the last item in the ignore boards array is valid.  If the list was too long it could have an ending comma that could cause problems.
-		if (!empty($user_info['ignoreboards']) && empty($user_info['ignoreboards'][$tmp = count($user_info['ignoreboards']) - 1]))
-		{
-			unset($user_info['ignoreboards'][$tmp]);
-		}
-
-		// Just build this here, it makes it easier to change/use - administrators can see all boards.
-		if ($user_info['is_admin'])
-		{
-			$user_info['query_see_board'] = '1=1';
-		}
-		// Otherwise just the groups in $user_info['groups'].
 		else
 		{
-			$user_info['query_see_board'] = '((FIND_IN_SET(' . implode(', b.member_groups) != 0 OR FIND_IN_SET(', $user_info['groups']) . ', b.member_groups) != 0)' . (!empty($modSettings['deny_boards_access']) ? ' AND (FIND_IN_SET(' . implode(', b.deny_member_groups) = 0 AND FIND_IN_SET(', $user_info['groups']) . ', b.deny_member_groups) = 0)' : '') . (isset($user_info['mod_cache']) ? ' OR ' . $user_info['mod_cache']['mq'] : '') . ')';
+			$this->id = 0;
+			$user_settings = null;
 		}
 
-		$this->db->setSeeBoard($user_info['query_see_board']);
+		$this->initSettings($user_settings);
 
-		// Build the list of boards they WANT to see.
-		// This will take the place of query_see_boards in certain spots, so it better include the boards they can see also
-
-		// If they aren't ignoring any boards then they want to see all the boards they can see
-		if (empty($user_info['ignoreboards']))
+		// If we no longer have the member maybe they're being all hackey, stop brute force!
+		if (empty($this->id))
 		{
-			$user_info['query_wanna_see_board'] = $user_info['query_see_board'];
+			validatePasswordFlood($this->settings->id_member($this->id), $this->settings->passwd_flood(false), $this->id != 0);
 		}
-		// Ok I guess they don't want to see all the boards
-		else
-		{
-			$user_info['query_wanna_see_board'] = '(' . $user_info['query_see_board'] . ' AND b.id_board NOT IN (' . implode(',', $user_info['ignoreboards']) . '))';
-		}
-		$this->db->setWannaSeeBoard($user_info['query_wanna_see_board']);
-
-		$this->info = new UserInfo($user_info);
 	}
 
 	/**
-	 * Prepares the data of the avatar (path, url, etc.)
+	 * Prepares the $this->settings property
 	 *
-	 * @return mixed[]
+	 * @param mixed[] $user_settings
 	 */
-	protected function buildAvatarArray()
+	protected function initSettings($user_settings)
 	{
-		return array_merge([
-			'url' => $this->settings->avatar(''),
-			'filename' => $this->settings->getEmpty('filename', ''),
-			'custom_dir' => $this->settings['attachment_type'] == 1,
-			'id_attach' => (int) $this->settings->id_attach
-		], determineAvatar($this->settings));
-	}
-
-	/**
-	 * Determines the language to be used.
-	 * Checks the current user setting, the $_GET['language'], the session and $modSettings
-	 *
-	 * @param mixed[] $user_info
-	 *
-	 * @return string
-	 */
-	protected function getLanguage()
-	{
-		global $modSettings, $language;
-
-		$user_lang = $this->settings->getEmpty('lngfile', $language);
-
-		// Do we have any languages to validate this?
-		if (!empty($modSettings['userLanguage']) && (!empty($_GET['language']) || !empty($_SESSION['language'])))
-		{
-			$languages = getLanguages();
-
-			// Allow the user to change their language if its valid.
-			if (!empty($modSettings['userLanguage']) && !empty($_GET['language']) && isset($languages[strtr($_GET['language'], './\\:', '____')]))
-			{
-				$user_lang = strtr($_GET['language'], './\\:', '____');
-				$_SESSION['language'] = $user_lang;
-			}
-			elseif (!empty($modSettings['userLanguage']) && !empty($_SESSION['language']) && isset($languages[strtr($_SESSION['language'], './\\:', '____')]))
-			{
-				$user_lang = strtr($_SESSION['language'], './\\:', '____');
-			}
-		}
-
-		return $user_lang;
+		$this->settings = new UserSettings($user_settings);
 	}
 
 	/**
@@ -455,16 +308,6 @@ class UserSettingsLoader
 	}
 
 	/**
-	 * Prepares the $this->settings property
-	 *
-	 * @param mixed[] $user_settings
-	 */
-	protected function initSettings($user_settings)
-	{
-		$this->settings = new UserSettings($user_settings);
-	}
-
-	/**
 	 * Initialize the data necessary to "load" a guest
 	 *
 	 * @return mixed[]
@@ -514,75 +357,228 @@ class UserSettingsLoader
 	}
 
 	/**
-	 * Loads the data of a certain member from the database
+	 * Fills up the $this->info variable
 	 *
-	 * @param bool $already_verified
-	 * @param string $session_password
-	 * @throws \ElkArte\Exceptions\Exception
+	 * @param mixed[] $user_info
 	 */
-	protected function loadUserData($already_verified, $session_password)
+	protected function compileInfo($user_info)
 	{
-		$user_settings = [];
+		global $modSettings;
 
-		// Is the member data cached?
-		if ($this->cache->levelLowerThan(2) || $this->cache->getVar($user_settings, 'user_settings-' . $this->id, 60) === false)
+		// Set up the $user_info array.
+		$user_info += array(
+			'id' => $this->id,
+			'username' => $this->member_name,
+			'name' => $this->settings->real_name(''),
+			'email' => $this->settings->email_address(''),
+			'passwd' => $this->settings->passwd(''),
+			'language' => $this->getLanguage(),
+			'is_guest' => (bool) $this->id == 0,
+			'is_admin' => (bool) in_array(1, $user_info['groups']),
+			'is_mod' => false,
+			'theme' => (int) $this->settings->id_theme,
+			'last_login' => (int) $this->settings->last_login,
+			'ip' => $this->req->client_ip(),
+			'ip2' => $this->req->ban_ip(),
+			'posts' => (int) $this->settings->posts,
+			'time_format' => $this->settings->getEmpty('time_format', $modSettings['time_format']),
+			'time_offset' => (int) $this->settings->time_offset,
+			'avatar' => $this->buildAvatarArray(),
+			'smiley_set' => determineSmileySet($this->settings->smiley_set(''), $modSettings['smiley_sets_known']),
+			'messages' => (int) $this->settings->personal_messages,
+			'mentions' => max(0, (int) $this->settings->mentions),
+			'unread_messages' => (int) $this->settings->unread_messages,
+			'total_time_logged_in' => (int) $this->settings->total_time_logged_in,
+			'buddies' => !empty($modSettings['enable_buddylist']) ? explode(',', (string) $this->settings->buddy_list) : [],
+			'ignoreboards' => explode(',', (string) $this->settings->ignore_boards),
+			'ignoreusers' => explode(',', (string) $this->settings->pm_ignore_list),
+			'warning' => (int) $this->settings->warning,
+			'permissions' => [],
+		);
+		$user_info['groups'] = array_unique($user_info['groups']);
+
+		// Make sure that the last item in the ignore boards array is valid.  If the list was too long it could have an ending comma that could cause problems.
+		if (!empty($user_info['ignoreboards']) && empty($user_info['ignoreboards'][$tmp = count($user_info['ignoreboards']) - 1]))
 		{
-			$this_user = $this->db->fetchQuery('
-				SELECT mem.*, COALESCE(a.id_attach, 0) AS id_attach, a.filename, a.attachment_type
-				FROM {db_prefix}members AS mem
-					LEFT JOIN {db_prefix}attachments AS a ON (a.id_member = {int:id_member})
-				WHERE mem.id_member = {int:id_member}
-				LIMIT 1',
-				array(
-					'id_member' => $this->id,
-				)
-			);
-
-			$user_settings = $this_user->fetch_assoc();
-			$this_user->free_result();
-
-			if ($this->cache->levelHigherThan(1))
-			{
-				$this->cache->put('user_settings-' . $this->id, $user_settings, 60);
-			}
+			unset($user_info['ignoreboards'][$tmp]);
 		}
 
-		// Did we find 'im?  If not, junk it.
-		if (!empty($user_settings))
+		// Just build this here, it makes it easier to change/use - administrators can see all boards.
+		if ($user_info['is_admin'])
 		{
-			// Make the ID specifically an integer
-			$user_settings['id_member'] = (int) ($user_settings['id_member'] ?? 0);
-
-			// As much as the password should be right, we can assume the integration set things up.
-			if (!empty($already_verified) && $already_verified)
-			{
-				$check = true;
-			}
-			// SHA-256 passwords should be 64 characters long.
-			elseif (strlen($session_password) === 64)
-			{
-				$check = hash('sha256', ($user_settings['passwd'] . $user_settings['password_salt'])) === $session_password;
-			}
-			else
-			{
-				$check = false;
-			}
-
-			// Wrong password or not activated - either way, you're going nowhere.
-			$this->id = $check && ($user_settings['is_activated'] == 1 || $user_settings['is_activated'] == 11) ? $user_settings['id_member'] : 0;
+			$user_info['query_see_board'] = '1=1';
 		}
+		// Otherwise just the groups in $user_info['groups'].
 		else
 		{
-			$this->id = 0;
-			$user_settings = null;
+			$user_info['query_see_board'] = '((FIND_IN_SET(' . implode(', b.member_groups) != 0 OR FIND_IN_SET(', $user_info['groups']) . ', b.member_groups) != 0)' . (!empty($modSettings['deny_boards_access']) ? ' AND (FIND_IN_SET(' . implode(', b.deny_member_groups) = 0 AND FIND_IN_SET(', $user_info['groups']) . ', b.deny_member_groups) = 0)' : '') . (isset($user_info['mod_cache']) ? ' OR ' . $user_info['mod_cache']['mq'] : '') . ')';
 		}
 
-		$this->initSettings($user_settings);
+		$this->db->setSeeBoard($user_info['query_see_board']);
 
-		// If we no longer have the member maybe they're being all hackey, stop brute force!
-		if (empty($this->id))
+		// Build the list of boards they WANT to see.
+		// This will take the place of query_see_boards in certain spots, so it better include the boards they can see also
+
+		// If they aren't ignoring any boards then they want to see all the boards they can see
+		if (empty($user_info['ignoreboards']))
 		{
-			validatePasswordFlood($this->settings->id_member($this->id), $this->settings->passwd_flood(false), $this->id != 0);
+			$user_info['query_wanna_see_board'] = $user_info['query_see_board'];
 		}
+		// Ok I guess they don't want to see all the boards
+		else
+		{
+			$user_info['query_wanna_see_board'] = '(' . $user_info['query_see_board'] . ' AND b.id_board NOT IN (' . implode(',', $user_info['ignoreboards']) . '))';
+		}
+		$this->db->setWannaSeeBoard($user_info['query_wanna_see_board']);
+
+		$this->info = new UserInfo($user_info);
+	}
+
+	/**
+	 * Determines the language to be used.
+	 * Checks the current user setting, the $_GET['language'], the session and $modSettings
+	 *
+	 * @param mixed[] $user_info
+	 *
+	 * @return string
+	 */
+	protected function getLanguage()
+	{
+		global $modSettings, $language;
+
+		$user_lang = $this->settings->getEmpty('lngfile', $language);
+
+		// Do we have any languages to validate this?
+		if (!empty($modSettings['userLanguage']) && (!empty($_GET['language']) || !empty($_SESSION['language'])))
+		{
+			$languages = getLanguages();
+
+			// Allow the user to change their language if its valid.
+			if (!empty($modSettings['userLanguage']) && !empty($_GET['language']) && isset($languages[strtr($_GET['language'], './\\:', '____')]))
+			{
+				$user_lang = strtr($_GET['language'], './\\:', '____');
+				$_SESSION['language'] = $user_lang;
+			}
+			elseif (!empty($modSettings['userLanguage']) && !empty($_SESSION['language']) && isset($languages[strtr($_SESSION['language'], './\\:', '____')]))
+			{
+				$user_lang = strtr($_SESSION['language'], './\\:', '____');
+			}
+		}
+
+		return $user_lang;
+	}
+
+	/**
+	 * Prepares the data of the avatar (path, url, etc.)
+	 *
+	 * @return mixed[]
+	 */
+	protected function buildAvatarArray()
+	{
+		return array_merge([
+			'url' => $this->settings->avatar(''),
+			'filename' => $this->settings->getEmpty('filename', ''),
+			'custom_dir' => $this->settings['attachment_type'] == 1,
+			'id_attach' => (int) $this->settings->id_attach
+		], determineAvatar($this->settings));
+	}
+
+	/**
+	 * Repeat the hashing of the password, either because it was not previously
+	 * hashed or because it needs a new one
+	 *
+	 * @param string $password
+	 */
+	public function rehashPassword($password)
+	{
+		$this->settings->rehashPassword($password);
+	}
+
+	/**
+	 * Checks the provided password is the same as the one in the database.
+	 *
+	 * @param string $password
+	 * @return bool
+	 */
+	public function validatePassword($password)
+	{
+		return $this->settings->validatePassword($password);
+	}
+
+	/**
+	 * Check activation status of the current user.
+	 *
+	 * What it does:
+	 * is_activated value key is as follows:
+	 * - > 10 Banned with activation status as value - 10
+	 * - 5 = Awaiting COPPA consent
+	 * - 4 = Awaiting Deletion approval
+	 * - 3 = Awaiting Admin approval
+	 * - 2 = Awaiting reactivation from email change
+	 * - 1 = Approved and active
+	 * - 0 = Not active
+	 *
+	 * @param bool $undelete - whether the current request is to revert the
+	 *                         request to delete the account or not
+	 *
+	 * @return bool
+	 * @throws \ElkArte\Exceptions\Exception
+	 */
+	public function checkActivation($undelete)
+	{
+		global $context, $txt, $modSettings;
+
+		if (!isset($context['login_errors']))
+		{
+			$context['login_errors'] = array();
+		}
+
+		// What is the true activation status of this account?
+		$activation_status = $this->settings->getActivationStatus();
+
+		// Check if the account is activated - COPPA first...
+		if ($activation_status == 5)
+		{
+			$context['login_errors'][] = $txt['coppa_no_concent'] . ' <a href="' . getUrl('action', ['action' => 'register', 'sa' => 'coppa', 'member' => $this->settings['id_member']]) . '">' . $txt['coppa_need_more_details'] . '</a>';
+
+			return false;
+		}
+
+		// Awaiting approval still?
+		if ($activation_status == 3)
+		{
+			throw new Exception('still_awaiting_approval', 'user');
+		}
+
+		// Awaiting deletion, changed their mind?
+		if ($activation_status == 4)
+		{
+			if ($undelete)
+			{
+				require_once(SUBSDIR . '/Members.subs.php');
+				updateMemberData($this->settings['id_member'], array('is_activated' => 1));
+				updateSettings(array('unapprovedMembers' => ($modSettings['unapprovedMembers'] > 0 ? $modSettings['unapprovedMembers'] - 1 : 0)));
+
+				return true;
+			}
+
+			$context['disable_login_hashing'] = true;
+			$context['login_errors'][] = $txt['awaiting_delete_account'];
+			$context['login_show_undelete'] = true;
+
+			return false;
+		}
+
+		// Standard activation?
+		if ($activation_status != 1)
+		{
+			\ElkArte\Errors\Errors::instance()->log_error($txt['activate_not_completed1'] . ' - <span class="remove">' . $this->settings['member_name'] . '</span>', false);
+
+			$context['login_errors'][] = $txt['activate_not_completed1'] . ' <a class="linkbutton" href="' . getUrl('action', ['action' => 'register', 'sa' => 'activate', 'resend', 'u' => $this->settings['id_member']]) . '">' . $txt['activate_not_completed2'] . '</a>';
+
+			return false;
+		}
+
+		return true;
 	}
 }

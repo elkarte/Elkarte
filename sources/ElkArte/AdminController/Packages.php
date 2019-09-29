@@ -8,13 +8,24 @@
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause (see accompanying LICENSE.txt file)
  *
  * This file contains code covered by:
- * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * copyright: 2011 Simple Machines (http://www.simplemachines.org)
  *
  * @version 2.0 dev
  *
  */
 
 namespace ElkArte\AdminController;
+
+use BBC\ParserWrapper;
+use ElkArte\AbstractController;
+use ElkArte\Action;
+use ElkArte\Cache\Cache;
+use ElkArte\EventManager;
+use ElkArte\Exceptions\Exception;
+use ElkArte\Http\FtpConnection;
+use ElkArte\PackagesFilterIterator;
+use ElkArte\User;
+use ElkArte\Util;
 
 /**
  * This class is the administration package manager controller.
@@ -23,55 +34,56 @@ namespace ElkArte\AdminController;
  *
  * @package Packages
  */
-class Packages extends \ElkArte\AbstractController
+class Packages extends AbstractController
 {
 	/**
-	 * listing of files in a packages
-	 * @var array|boolean
-	 */
-	private $_extracted_files;
-
-	/**
-	 * Filename of the package
-	 * @var string
-	 */
-	private $_filename;
-
-	/**
-	 * Base path of the package
-	 * @var string
-	 */
-	private $_base_path;
-
-	/**
-	 * If this is an un-install pass or not
-	 * @var boolean
-	 */
-	private $_uninstalling;
-
-	/**
-	 * If the package is installed, previously or not
-	 * @var boolean
-	 */
-	private $_is_installed;
-
-	/**
 	 * The id from the DB or an installed package
+	 *
 	 * @var int
 	 */
 	public $install_id;
-
 	/**
 	 * Array of installed theme paths
+	 *
 	 * @var string[]
 	 */
 	public $theme_paths;
-
 	/**
 	 * Array of files / directories that require permissions
+	 *
 	 * @var array
 	 */
 	public $chmod_files;
+	/**
+	 * listing of files in a packages
+	 *
+	 * @var array|boolean
+	 */
+	private $_extracted_files;
+	/**
+	 * Filename of the package
+	 *
+	 * @var string
+	 */
+	private $_filename;
+	/**
+	 * Base path of the package
+	 *
+	 * @var string
+	 */
+	private $_base_path;
+	/**
+	 * If this is an un-install pass or not
+	 *
+	 * @var boolean
+	 */
+	private $_uninstalling;
+	/**
+	 * If the package is installed, previously or not
+	 *
+	 * @var boolean
+	 */
+	private $_is_installed;
 
 	/**
 	 * Pre Dispatch, called before other methods.
@@ -128,15 +140,14 @@ class Packages extends \ElkArte\AbstractController
 		);
 
 		// Set up action/subaction stuff.
-		$action = new \ElkArte\Action('packages');
+		$action = new Action('packages');
 
 		// Set up some tabs...
 		$context[$context['admin_menu_name']]['tab_data'] = array(
 			'title' => $txt['package_manager'],
 			'description' => $txt['package_manager_desc'],
 			'tabs' => array(
-				'browse' => array(
-				),
+				'browse' => array(),
 				'installed' => array(
 					'description' => $txt['installed_packages_desc'],
 				),
@@ -177,7 +188,9 @@ class Packages extends \ElkArte\AbstractController
 		// You have to specify a file!!
 		$file = $this->_req->getQuery('package', 'trim');
 		if (empty($file))
+		{
 			redirectexit('action=admin;area=packages');
+		}
 
 		// What are we trying to do
 		$this->_filename = (string) preg_replace('~[\.]+~', '.', $file);
@@ -185,7 +198,9 @@ class Packages extends \ElkArte\AbstractController
 
 		// If we can't find the file, our install ends here
 		if (!file_exists(BOARDDIR . '/packages/' . $this->_filename))
-			throw new \ElkArte\Exceptions\Exception('package_no_file', false);
+		{
+			throw new Exception('package_no_file', false);
+		}
 
 		// Do we have an existing id, for uninstalls and the like.
 		$this->install_id = $this->_req->getQuery('pid', 'intval', 0);
@@ -198,9 +213,13 @@ class Packages extends \ElkArte\AbstractController
 
 		// Make sure our temp directory exists and is empty.
 		if (file_exists(BOARDDIR . '/packages/temp'))
+		{
 			deltree(BOARDDIR . '/packages/temp', false);
+		}
 		else
+		{
 			$this->_create_temp_dir();
+		}
 
 		// Extract the files in to the temp so we can get things like the readme, etc.
 		$this->_extract_files_temp();
@@ -211,7 +230,9 @@ class Packages extends \ElkArte\AbstractController
 		// Get the package info...
 		$packageInfo = getPackageInfo($this->_filename);
 		if (!is_array($packageInfo))
-			throw new \ElkArte\Exceptions\Exception($packageInfo);
+		{
+			throw new Exception($packageInfo);
+		}
 
 		$packageInfo['filename'] = $this->_filename;
 
@@ -223,17 +244,25 @@ class Packages extends \ElkArte\AbstractController
 
 		$context['database_changes'] = array();
 		if (isset($packageInfo['uninstall']['database']))
+		{
 			$context['database_changes'][] = $txt['execute_database_changes'] . ' - ' . $packageInfo['uninstall']['database'];
+		}
 		elseif (!empty($package_installed['db_changes']))
 		{
 			foreach ($package_installed['db_changes'] as $change)
 			{
 				if (isset($change[2]) && isset($txt['package_db_' . $change[0]]))
+				{
 					$context['database_changes'][] = sprintf($txt['package_db_' . $change[0]], $change[1], $change[2]);
+				}
 				elseif (isset($txt['package_db_' . $change[0]]))
+				{
 					$context['database_changes'][] = sprintf($txt['package_db_' . $change[0]], $change[1]);
+				}
 				else
+				{
 					$context['database_changes'][] = $change[0] . '-' . $change[1] . (isset($change[2]) ? '-' . $change[2] : '');
+				}
 			}
 		}
 
@@ -244,11 +273,13 @@ class Packages extends \ElkArte\AbstractController
 
 		// No actions found, return so we can display an error
 		if (empty($actions))
+		{
 			redirectexit('action=admin;area=packages');
+		}
 
 		// Now prepare things for the template using the package actions class
-		$pka = new PackageActions(new \ElkArte\EventManager());
-		$pka->setUser(\ElkArte\User::$info);
+		$pka = new PackageActions(new EventManager());
+		$pka->setUser(User::$info);
 		$pka->test_init($actions, $this->_uninstalling, $this->_base_path, $this->theme_paths);
 
 		$context['has_failure'] = $pka->has_failure;
@@ -278,7 +309,9 @@ class Packages extends \ElkArte\AbstractController
 
 		// Clear the temp directory
 		if (file_exists(BOARDDIR . '/packages/temp'))
+		{
 			deltree(BOARDDIR . '/packages/temp');
+		}
 
 		// Will we need chmod permissions to pull this off
 		$this->chmod_files = !empty($pka->chmod_files) ? $pka->chmod_files : array();
@@ -293,80 +326,32 @@ class Packages extends \ElkArte\AbstractController
 	}
 
 	/**
-	 * Determines the availability / validity of installing a package in any of the installed themes
-	 * @param array $themeFinds
+	 * Creates the packages temp directory
+	 *
+	 * - First trys as 755, failing moves to 777
+	 * - Will try with FTP permissions for cases where the web server credentials
+	 * do not have create directory permissions
 	 */
-	private function _multi_theme($themeFinds)
+	private function _create_temp_dir()
 	{
-		global $settings, $txt, $context;
+		global $context, $scripturl;
 
-		if (!empty($themeFinds['candidates']))
+		// Make the temp directory
+		if (!mktree(BOARDDIR . '/packages/temp', 0755))
 		{
-			foreach ($themeFinds['candidates'] as $action_data)
+			// 755 did not work, try 777?
+			deltree(BOARDDIR . '/packages/temp', false);
+			if (!mktree(BOARDDIR . '/packages/temp', 0777))
 			{
-				// Get the part of the file we'll be dealing with.
-				preg_match('~^\$(languagedir|languages_dir|imagesdir|themedir)(\\|/)*(.+)*~i', $action_data['unparsed_destination'], $matches);
+				// That did not work either, we need additional permissions
+				deltree(BOARDDIR . '/packages/temp', false);
+				create_chmod_control(array(BOARDDIR . '/packages/temp/delme.tmp'), array('destination_url' => $scripturl . '?action=admin;area=packages;sa=' . $this->_req->query->sa . ';package=' . $context['filename'], 'crash_on_error' => true));
 
-				if ($matches[1] === 'imagesdir')
-					$path = '/' . basename($settings['default_images_url']);
-				elseif ($matches[1] === 'languagedir' || $matches[1] === 'languages_dir')
-					$path = '/languages';
-				else
-					$path = '';
-
-				if (!empty($matches[3]))
-					$path .= $matches[3];
-
-				if (!$this->_uninstalling)
-					$path .= '/' . basename($action_data['filename']);
-
-				// Loop through each custom theme to note it's candidacy!
-				foreach ($this->theme_paths as $id => $theme_data)
+				// No temp directory was able to be made, that's fatal
+				deltree(BOARDDIR . '/packages/temp', false);
+				if (!mktree(BOARDDIR . '/packages/temp', 0777))
 				{
-					if (isset($theme_data['theme_dir']) && $id != 1)
-					{
-						$real_path = $theme_data['theme_dir'] . $path;
-
-						// Confirm that we don't already have this dealt with by another entry.
-						if (!in_array(strtolower(strtr($real_path, array('\\' => '/'))), $themeFinds['other_themes']))
-						{
-							// Check if we will need to chmod this.
-							if (!mktree(dirname($real_path), false))
-							{
-								$temp = dirname($real_path);
-								while (!file_exists($temp) && strlen($temp) > 1)
-									$temp = dirname($temp);
-
-								$this->chmod_files[] = $temp;
-							}
-
-							if ($action_data['type'] === 'require-dir' && !is_writable($real_path) && (file_exists($real_path) || !is_writable(dirname($real_path))))
-								$this->chmod_files[] = $real_path;
-
-							if (!isset($context['theme_actions'][$id]))
-								$context['theme_actions'][$id] = array(
-									'name' => $theme_data['name'],
-									'actions' => array(),
-								);
-
-							if ($this->_uninstalling)
-								$context['theme_actions'][$id]['actions'][] = array(
-									'type' => $txt['package_delete'] . ' ' . ($action_data['type'] === 'require-dir' ? $txt['package_tree'] : $txt['package_file']),
-									'action' => strtr($real_path, array('\\' => '/', BOARDDIR => '.')),
-									'description' => '',
-									'value' => base64_encode(json_encode(array('type' => $action_data['type'], 'orig' => $action_data['filename'], 'future' => $real_path, 'id' => $id))),
-									'not_mod' => true,
-								);
-							else
-								$context['theme_actions'][$id]['actions'][] = array(
-									'type' => $txt['package_extract'] . ' ' . ($action_data['type'] === 'require-dir' ? $txt['package_tree'] : $txt['package_file']),
-									'action' => strtr($real_path, array('\\' => '/', BOARDDIR => '.')),
-									'description' => '',
-									'value' => base64_encode(json_encode(array('type' => $action_data['type'], 'orig' => $action_data['destination'], 'future' => $real_path, 'id' => $id))),
-									'not_mod' => true,
-								);
-						}
-					}
+					throw new Exception('package_cant_download', false);
 				}
 			}
 		}
@@ -400,7 +385,9 @@ class Packages extends \ElkArte\AbstractController
 			}
 
 			if (!isset($this->_base_path))
+			{
 				$this->_base_path = '';
+			}
 		}
 		// Perhaps its a directory then, assumed to be extracted
 		elseif (!empty($this->_filename) && is_dir(BOARDDIR . '/packages/' . $this->_filename))
@@ -414,7 +401,9 @@ class Packages extends \ElkArte\AbstractController
 		}
 		// Well we don't know what it is then, so we stop
 		else
-			throw new \ElkArte\Exceptions\Exception('no_access', false);
+		{
+			throw new Exception('no_access', false);
+		}
 	}
 
 	/**
@@ -422,8 +411,8 @@ class Packages extends \ElkArte\AbstractController
 	 * Actions are defined by parsePackageInfo
 	 * Sets the is_installed flag
 	 *
-	 * @param array   $package_installed
-	 * @param array   $packageInfo Details for the package being tested/installed, set by getPackageInfo
+	 * @param array $package_installed
+	 * @param array $packageInfo Details for the package being tested/installed, set by getPackageInfo
 	 * @param boolean $testing passed to parsePackageInfo, true for test install, false for real install
 	 *
 	 * @return array
@@ -442,7 +431,7 @@ class Packages extends \ElkArte\AbstractController
 			if (!isset($package_installed['old_version']))
 			{
 				deltree(BOARDDIR . '/packages/temp');
-				throw new \ElkArte\Exceptions\Exception('package_cant_uninstall', false);
+				throw new Exception('package_cant_uninstall', false);
 			}
 
 			$actions = parsePackageInfo($packageInfo['xml'], $testing, 'uninstall');
@@ -451,7 +440,7 @@ class Packages extends \ElkArte\AbstractController
 			if (empty($actions))
 			{
 				deltree(BOARDDIR . '/packages/temp');
-				throw new \ElkArte\Exceptions\Exception('package_uninstall_cannot', false);
+				throw new Exception('package_uninstall_cannot', false);
 			}
 
 			// Can't edit the custom themes it's edited if you're uninstalling, they must be removed.
@@ -461,7 +450,9 @@ class Packages extends \ElkArte\AbstractController
 			foreach ($this->theme_paths as $id => $data)
 			{
 				if ($id != 1 && !in_array($id, $package_installed['old_themes']))
+				{
 					unset($this->theme_paths[$id]);
+				}
 			}
 		}
 		// Or is it already installed and you want to upgrade
@@ -472,53 +463,132 @@ class Packages extends \ElkArte\AbstractController
 
 			// There was no upgrade....
 			if (empty($actions))
+			{
 				$this->_is_installed = true;
+			}
 			else
 			{
 				// Otherwise they can only upgrade themes from the first time around.
 				foreach ($this->theme_paths as $id => $data)
 				{
 					if ($id != 1 && !in_array($id, $package_installed['old_themes']))
+					{
 						unset($this->theme_paths[$id]);
+					}
 				}
 			}
 		}
 		// Simply already installed
 		elseif (isset($package_installed['old_version']) && $package_installed['old_version'] == $packageInfo['version'])
+		{
 			$this->_is_installed = true;
+		}
 
 		if (!isset($package_installed['old_version']) || $this->_is_installed)
+		{
 			$actions = parsePackageInfo($packageInfo['xml'], $testing, 'install');
+		}
 
 		return $actions;
 	}
 
 	/**
-	 * Creates the packages temp directory
+	 * Determines the availability / validity of installing a package in any of the installed themes
 	 *
-	 * - First trys as 755, failing moves to 777
-	 * - Will try with FTP permissions for cases where the web server credentials
-	 * do not have create directory permissions
+	 * @param array $themeFinds
 	 */
-	private function _create_temp_dir()
+	private function _multi_theme($themeFinds)
 	{
-		global $context, $scripturl;
+		global $settings, $txt, $context;
 
-		// Make the temp directory
-		if (!mktree(BOARDDIR . '/packages/temp', 0755))
+		if (!empty($themeFinds['candidates']))
 		{
-			// 755 did not work, try 777?
-			deltree(BOARDDIR . '/packages/temp', false);
-			if (!mktree(BOARDDIR . '/packages/temp', 0777))
+			foreach ($themeFinds['candidates'] as $action_data)
 			{
-				// That did not work either, we need additional permissions
-				deltree(BOARDDIR . '/packages/temp', false);
-				create_chmod_control(array(BOARDDIR . '/packages/temp/delme.tmp'), array('destination_url' => $scripturl . '?action=admin;area=packages;sa=' . $this->_req->query->sa . ';package=' . $context['filename'], 'crash_on_error' => true));
+				// Get the part of the file we'll be dealing with.
+				preg_match('~^\$(languagedir|languages_dir|imagesdir|themedir)(\\|/)*(.+)*~i', $action_data['unparsed_destination'], $matches);
 
-				// No temp directory was able to be made, that's fatal
-				deltree(BOARDDIR . '/packages/temp', false);
-				if (!mktree(BOARDDIR . '/packages/temp', 0777))
-					throw new \ElkArte\Exceptions\Exception('package_cant_download', false);
+				if ($matches[1] === 'imagesdir')
+				{
+					$path = '/' . basename($settings['default_images_url']);
+				}
+				elseif ($matches[1] === 'languagedir' || $matches[1] === 'languages_dir')
+				{
+					$path = '/languages';
+				}
+				else
+				{
+					$path = '';
+				}
+
+				if (!empty($matches[3]))
+				{
+					$path .= $matches[3];
+				}
+
+				if (!$this->_uninstalling)
+				{
+					$path .= '/' . basename($action_data['filename']);
+				}
+
+				// Loop through each custom theme to note it's candidacy!
+				foreach ($this->theme_paths as $id => $theme_data)
+				{
+					if (isset($theme_data['theme_dir']) && $id != 1)
+					{
+						$real_path = $theme_data['theme_dir'] . $path;
+
+						// Confirm that we don't already have this dealt with by another entry.
+						if (!in_array(strtolower(strtr($real_path, array('\\' => '/'))), $themeFinds['other_themes']))
+						{
+							// Check if we will need to chmod this.
+							if (!mktree(dirname($real_path), false))
+							{
+								$temp = dirname($real_path);
+								while (!file_exists($temp) && strlen($temp) > 1)
+								{
+									$temp = dirname($temp);
+								}
+
+								$this->chmod_files[] = $temp;
+							}
+
+							if ($action_data['type'] === 'require-dir' && !is_writable($real_path) && (file_exists($real_path) || !is_writable(dirname($real_path))))
+							{
+								$this->chmod_files[] = $real_path;
+							}
+
+							if (!isset($context['theme_actions'][$id]))
+							{
+								$context['theme_actions'][$id] = array(
+									'name' => $theme_data['name'],
+									'actions' => array(),
+								);
+							}
+
+							if ($this->_uninstalling)
+							{
+								$context['theme_actions'][$id]['actions'][] = array(
+									'type' => $txt['package_delete'] . ' ' . ($action_data['type'] === 'require-dir' ? $txt['package_tree'] : $txt['package_file']),
+									'action' => strtr($real_path, array('\\' => '/', BOARDDIR => '.')),
+									'description' => '',
+									'value' => base64_encode(json_encode(array('type' => $action_data['type'], 'orig' => $action_data['filename'], 'future' => $real_path, 'id' => $id))),
+									'not_mod' => true,
+								);
+							}
+							else
+							{
+								$context['theme_actions'][$id]['actions'][] = array(
+									'type' => $txt['package_extract'] . ' ' . ($action_data['type'] === 'require-dir' ? $txt['package_tree'] : $txt['package_file']),
+									'action' => strtr($real_path, array('\\' => '/', BOARDDIR => '.')),
+									'description' => '',
+									'value' => base64_encode(json_encode(array('type' => $action_data['type'], 'orig' => $action_data['destination'], 'future' => $real_path, 'id' => $id))),
+									'not_mod' => true,
+								);
+							}
+						}
+					}
+				}
 			}
 		}
 	}
@@ -537,11 +607,15 @@ class Packages extends \ElkArte\AbstractController
 		// If there's no package file, what are we installing?
 		$this->_filename = $this->_req->getQuery('package', 'trim');
 		if (empty($this->_filename))
+		{
 			redirectexit('action=admin;area=packages');
+		}
 
 		// And if the file does not exist there is a problem
 		if (!file_exists(BOARDDIR . '/packages/' . $this->_filename))
-			throw new \ElkArte\Exceptions\Exception('package_no_file', false);
+		{
+			throw new Exception('package_no_file', false);
+		}
 
 		// If this is an uninstall, we'll have an id.
 		$this->install_id = $this->_req->getQuery('pid', 'intval', 0);
@@ -557,9 +631,13 @@ class Packages extends \ElkArte\AbstractController
 
 		// Make sure temp directory exists and is empty!
 		if (file_exists(BOARDDIR . '/packages/temp'))
+		{
 			deltree(BOARDDIR . '/packages/temp', false);
+		}
 		else
+		{
 			$this->_create_temp_dir();
+		}
 
 		// Let the unpacker do the work.
 		$this->_extract_files_temp();
@@ -570,8 +648,12 @@ class Packages extends \ElkArte\AbstractController
 		if (!empty($this->_req->post->custom_theme))
 		{
 			foreach ($this->_req->post->custom_theme as $tid)
+			{
 				if (in_array($tid, $known_themes))
+				{
 					$custom_themes[] = (int) $tid;
+				}
+			}
 		}
 
 		// Now load up the paths of the themes that we need to know about.
@@ -589,11 +671,15 @@ class Packages extends \ElkArte\AbstractController
 			foreach ($this->_req->post->theme_changes as $change)
 			{
 				if (empty($change))
+				{
 					continue;
+				}
 
 				$theme_data = json_decode(base64_decode($change), true);
 				if (empty($theme_data['type']))
+				{
 					continue;
+				}
 
 				$themes_installed[] = $theme_data['id'];
 				$context['theme_copies'][$theme_data['type']][$theme_data['orig']][] = $theme_data['future'];
@@ -603,7 +689,9 @@ class Packages extends \ElkArte\AbstractController
 		// Get the package info...
 		$packageInfo = getPackageInfo($this->_filename);
 		if (!is_array($packageInfo))
-			throw new \ElkArte\Exceptions\Exception($packageInfo);
+		{
+			throw new Exception($packageInfo);
+		}
 
 		$packageInfo['filename'] = $this->_filename;
 
@@ -647,8 +735,8 @@ class Packages extends \ElkArte\AbstractController
 		if (!empty($install_log))
 		{
 			// @todo Make a log of any errors that occurred and output them?
-			$pka = new PackageActions(new \ElkArte\EventManager());
-			$pka->setUser(\ElkArte\User::$info);
+			$pka = new PackageActions(new EventManager());
+			$pka->setUser(User::$info);
 			$pka->install_init($install_log, $this->_uninstalling, $this->_base_path, $this->theme_paths, $themes_installed);
 			$failed_steps = $pka->failed_steps;
 			$themes_installed = $pka->themes_installed;
@@ -667,7 +755,9 @@ class Packages extends \ElkArte\AbstractController
 			if (!empty($package_check['install_state']))
 			{
 				if ($this->_uninstalling)
+				{
 					setPackageState($package_check['package_id'], $this->install_id);
+				}
 				else
 				{
 					// not uninstalling so must be an upgrade
@@ -683,9 +773,13 @@ class Packages extends \ElkArte\AbstractController
 				$table_log = $table_installer->package_log();
 
 				if (!empty($old_db_changes))
+				{
 					$db_package_log = empty($table_log) ? $old_db_changes : array_merge($old_db_changes, $table_log);
+				}
 				else
+				{
 					$db_package_log = $table_log;
+				}
 
 				// If there are some database changes we might want to remove then filter them out.
 				if (!empty($db_package_log))
@@ -696,15 +790,21 @@ class Packages extends \ElkArte\AbstractController
 					foreach ($db_package_log as $k => $log)
 					{
 						if ($log[0] === 'remove_table')
+						{
 							$tables[] = $log[1];
+						}
 						elseif (in_array($log[1], $tables))
+						{
 							unset($db_package_log[$k]);
+						}
 					}
 
 					$package_installed['db_changes'] = serialize($db_package_log);
 				}
 				else
+				{
 					$package_installed['db_changes'] = '';
+				}
 
 				// What themes did we actually install?
 				$themes_installed = array_unique($themes_installed);
@@ -729,42 +829,34 @@ class Packages extends \ElkArte\AbstractController
 			foreach ($package_installed['db_changes'] as $change)
 			{
 				if ($change[0] === 'remove_table' && isset($change[1]))
+				{
 					$table_installer->drop_table($change[1]);
+				}
 				elseif ($change[0] === 'remove_column' && isset($change[2]))
+				{
 					$table_installer->remove_column($change[1], $change[2]);
+				}
 				elseif ($change[0] === 'remove_index' && isset($change[2]))
+				{
 					$table_installer->remove_index($change[1], $change[2]);
+				}
 			}
 		}
 
 		// Clean house... get rid of the evidence ;).
 		if (file_exists(BOARDDIR . '/packages/temp'))
+		{
 			deltree(BOARDDIR . '/packages/temp');
+		}
 
 		// Log what we just did.
-		logAction($this->_uninstalling ? 'uninstall_package' : (!empty($is_upgrade) ? 'upgrade_package' : 'install_package'), array('package' => \ElkArte\Util::htmlspecialchars($packageInfo['name']), 'version' => \ElkArte\Util::htmlspecialchars($packageInfo['version'])), 'admin');
+		logAction($this->_uninstalling ? 'uninstall_package' : (!empty($is_upgrade) ? 'upgrade_package' : 'install_package'), array('package' => Util::htmlspecialchars($packageInfo['name']), 'version' => Util::htmlspecialchars($packageInfo['version'])), 'admin');
 
 		// Just in case, let's clear the whole cache to avoid anything going up the swanny.
-		\ElkArte\Cache\Cache::instance()->clean();
+		Cache::instance()->clean();
 
 		// Restore file permissions?
 		create_chmod_control(array(), array(), true);
-	}
-
-	/**
-	 * Table sorting function used in usort
-	 *
-	 * @param string[] $a
-	 * @param string[] $b
-	 *
-	 * @return int
-	 */
-	private function _sort_table_first($a, $b)
-	{
-		if ($a[0] === $b[0])
-			return 0;
-
-		return $a[0] === 'remove_table' ? -1 : 1;
 	}
 
 	/**
@@ -776,7 +868,9 @@ class Packages extends \ElkArte\AbstractController
 
 		// No package?  Show him or her the door.
 		if (!isset($this->_req->query->package) || $this->_req->query->package == '')
+		{
 			redirectexit('action=admin;area=packages');
+		}
 
 		$context['linktree'][] = array(
 			'url' => $scripturl . '?action=admin;area=packages;sa=list;package=' . $this->_req->query->package,
@@ -790,9 +884,13 @@ class Packages extends \ElkArte\AbstractController
 
 		// Let the unpacker do the work.
 		if (is_file(BOARDDIR . '/packages/' . $context['filename']))
+		{
 			$context['files'] = read_tgz_file(BOARDDIR . '/packages/' . $context['filename'], null);
+		}
 		elseif (is_dir(BOARDDIR . '/packages/' . $context['filename']))
+		{
 			$context['files'] = listtree(BOARDDIR . '/packages/' . $context['filename']);
+		}
 	}
 
 	/**
@@ -804,11 +902,15 @@ class Packages extends \ElkArte\AbstractController
 
 		// No package?  Show him or her the door.
 		if (!isset($this->_req->query->package) || $this->_req->query->package == '')
+		{
 			redirectexit('action=admin;area=packages');
+		}
 
 		// No file?  Show him or her the door.
 		if (!isset($this->_req->query->file) || $this->_req->query->file == '')
+		{
 			redirectexit('action=admin;area=packages');
+		}
 
 		$this->_req->query->package = preg_replace('~[\.]+~', '.', strtr($this->_req->query->package, array('/' => '_', '\\' => '_')));
 		$this->_req->query->file = preg_replace('~[\.]+~', '.', $this->_req->query->file);
@@ -816,9 +918,13 @@ class Packages extends \ElkArte\AbstractController
 		if (isset($this->_req->query->raw))
 		{
 			if (is_file(BOARDDIR . '/packages/' . $this->_req->query->package))
+			{
 				echo read_tgz_file(BOARDDIR . '/packages/' . $this->_req->query->package, $this->_req->query->file, true);
+			}
 			elseif (is_dir(BOARDDIR . '/packages/' . $this->_req->query->package))
+			{
 				echo file_get_contents(BOARDDIR . '/packages/' . $this->_req->query->package . '/' . $this->_req->query->file);
+			}
 
 			obExit(false);
 		}
@@ -836,13 +942,19 @@ class Packages extends \ElkArte\AbstractController
 
 		// Let the unpacker do the work.... but make sure we handle images properly.
 		if (in_array(strtolower(strrchr($this->_req->query->file, '.')), array('.bmp', '.gif', '.jpeg', '.jpg', '.png')))
+		{
 			$context['filedata'] = '<img src="' . $scripturl . '?action=admin;area=packages;sa=examine;package=' . $this->_req->query->package . ';file=' . $this->_req->query->file . ';raw" alt="' . $this->_req->query->file . '" />';
+		}
 		else
 		{
 			if (is_file(BOARDDIR . '/packages/' . $this->_req->query->package))
+			{
 				$context['filedata'] = htmlspecialchars(read_tgz_file(BOARDDIR . '/packages/' . $this->_req->query->package, $this->_req->query->file, true));
+			}
 			elseif (is_dir(BOARDDIR . '/packages/' . $this->_req->query->package))
+			{
 				$context['filedata'] = htmlspecialchars(file_get_contents(BOARDDIR . '/packages/' . $this->_req->query->package . '/' . $this->_req->query->file));
+			}
 		}
 	}
 
@@ -877,7 +989,9 @@ class Packages extends \ElkArte\AbstractController
 
 		// Ack, don't allow deletion of arbitrary files here, could become a security hole somehow!
 		if (!isset($this->_req->query->package) || $this->_req->query->package === 'index.php' || $this->_req->query->package === 'installed.list' || $this->_req->query->package === 'backups')
+		{
 			redirectexit('action=admin;area=packages;sa=browse');
+		}
 		$this->_req->query->package = preg_replace('~[\.]+~', '.', strtr($this->_req->query->package, array('/' => '_', '\\' => '_')));
 
 		// Can't delete what's not there.
@@ -888,7 +1002,9 @@ class Packages extends \ElkArte\AbstractController
 			create_chmod_control(array(BOARDDIR . '/packages/' . $this->_req->query->package), array('destination_url' => $scripturl . '?action=admin;area=packages;sa=remove;package=' . $this->_req->query->package, 'crash_on_error' => true));
 
 			if (is_dir(BOARDDIR . '/packages/' . $this->_req->query->package))
+			{
 				deltree(BOARDDIR . '/packages/' . $this->_req->query->package);
+			}
 			else
 			{
 				@chmod(BOARDDIR . '/packages/' . $this->_req->query->package, 0777);
@@ -937,11 +1053,13 @@ class Packages extends \ElkArte\AbstractController
 							'style' => 'width: 25%;',
 						),
 						'data' => array(
-							'function' => function ($package_md5) use ($type)  {
+							'function' => function ($package_md5) use ($type) {
 								global $context;
 
 								if (isset($context['available_' . $type . ''][$package_md5]))
+								{
 									return $context['available_' . $type . ''][$package_md5]['name'];
+								}
 
 								return '';
 							},
@@ -957,11 +1075,13 @@ class Packages extends \ElkArte\AbstractController
 							'style' => 'width: 25%;',
 						),
 						'data' => array(
-							'function' => function ($package_md5) use ($type)  {
+							'function' => function ($package_md5) use ($type) {
 								global $context;
 
 								if (isset($context['available_' . $type . ''][$package_md5]))
+								{
 									return $context['available_' . $type . ''][$package_md5]['version'];
+								}
 
 								return '';
 							},
@@ -980,33 +1100,45 @@ class Packages extends \ElkArte\AbstractController
 								global $context, $scripturl, $txt;
 
 								if (!isset($context['available_' . $type . ''][$package_md5]))
+								{
 									return '';
+								}
 
 								// Rewrite shortcut
 								$package = $context['available_' . $type . ''][$package_md5];
 								$return = '';
 
 								if ($package['can_uninstall'])
+								{
 									$return = '
 										<a class="linkbutton" href="' . $scripturl . '?action=admin;area=packages;sa=uninstall;package=' . $package['filename'] . ';pid=' . $package['installed_id'] . '">' . $txt['uninstall'] . '</a>';
+								}
 								elseif ($package['can_emulate_uninstall'])
+								{
 									$return = '
 										<a class="linkbutton" href="' . $scripturl . '?action=admin;area=packages;sa=uninstall;ve=' . $package['can_emulate_uninstall'] . ';package=' . $package['filename'] . ';pid=' . $package['installed_id'] . '">' . $txt['package_emulate_uninstall'] . ' ' . $package['can_emulate_uninstall'] . '</a>';
+								}
 								elseif ($package['can_upgrade'])
+								{
 									$return = '
 										<a class="linkbutton" href="' . $scripturl . '?action=admin;area=packages;sa=install;package=' . $package['filename'] . '">' . $txt['package_upgrade'] . '</a>';
+								}
 								elseif ($package['can_install'])
+								{
 									$return = '
 										<a class="linkbutton" href="' . $scripturl . '?action=admin;area=packages;sa=install;package=' . $package['filename'] . '">' . $txt['install_mod'] . '</a>';
+								}
 								elseif ($package['can_emulate_install'])
+								{
 									$return = '
 										<a class="linkbutton" href="' . $scripturl . '?action=admin;area=packages;sa=install;ve=' . $package['can_emulate_install'] . ';package=' . $package['filename'] . '">' . $txt['package_emulate_install'] . ' ' . $package['can_emulate_install'] . '</a>';
+								}
 
 								return $return . '
 										<a class="linkbutton" href="' . $scripturl . '?action=admin;area=packages;sa=list;package=' . $package['filename'] . '">' . $txt['list_files'] . '</a>
 										<a class="linkbutton" href="' . $scripturl . '?action=admin;area=packages;sa=remove;package=' . $package['filename'] . ';' . $context['session_var'] . '=' . $context['session_id'] . '"' . ($package['is_installed'] && $package['is_current']
-											? ' onclick="return confirm(\'' . $txt['package_delete_bad'] . '\');"'
-											: '') . '>' . $txt['package_delete'] . '</a>';
+										? ' onclick="return confirm(\'' . $txt['package_delete_bad'] . '\');"'
+										: '') . '>' . $txt['package_delete'] . '</a>';
 							},
 							'class' => 'righttext',
 						),
@@ -1088,9 +1220,13 @@ class Packages extends \ElkArte\AbstractController
 		}
 
 		if (preg_match('~^/home\d*/([^/]+?)/public_html~', $this->_req->server->DOCUMENT_ROOT, $match))
+		{
 			$default_username = $match[1];
+		}
 		else
+		{
 			$default_username = '';
+		}
 
 		$context['page_title'] = $txt['package_settings'];
 		$context['sub_template'] = 'install_options';
@@ -1113,7 +1249,9 @@ class Packages extends \ElkArte\AbstractController
 
 		// We need to know the operation key for the search and replace?
 		if (!isset($this->_req->query->operation_key, $this->_req->query->filename) && !is_numeric($this->_req->query->operation_key))
-			throw new \ElkArte\Exceptions\Exception('operation_invalid', 'general');
+		{
+			throw new Exception('operation_invalid', 'general');
+		}
 
 		// Load the required file.
 		require_once(SUBSDIR . '/Themes.subs.php');
@@ -1141,7 +1279,9 @@ class Packages extends \ElkArte\AbstractController
 			}
 
 			if (!isset($context['base_path']))
+			{
 				$context['base_path'] = '';
+			}
 		}
 		elseif (is_dir(BOARDDIR . '/packages/' . $context['filename']))
 		{
@@ -1163,7 +1303,9 @@ class Packages extends \ElkArte\AbstractController
 				foreach ($theme_paths as $id => $data)
 				{
 					if ($id != 1 && !in_array($id, $old_themes))
+					{
 						unset($theme_paths[$id]);
+					}
 				}
 			}
 		}
@@ -1179,7 +1321,7 @@ class Packages extends \ElkArte\AbstractController
 
 		// Let's do some formatting...
 		$operation_text = $context['operations']['position'] === 'replace' ? 'operation_replace' : ($context['operations']['position'] === 'before' ? 'operation_after' : 'operation_before');
-		$bbc_parser = \BBC\ParserWrapper::instance();
+		$bbc_parser = ParserWrapper::instance();
 		$context['operations']['search'] = $bbc_parser->parsePackage('[code=' . $txt['operation_find'] . ']' . ($context['operations']['position'] === 'end' ? '?&gt;' : $context['operations']['search']) . '[/code]');
 		$context['operations']['replace'] = $bbc_parser->parsePackage('[code=' . $txt[$operation_text] . ']' . $context['operations']['replace'] . '[/code]');
 
@@ -1202,7 +1344,7 @@ class Packages extends \ElkArte\AbstractController
 		if (isset($this->_req->query->restore))
 		{
 			create_chmod_control(array(), array(), true);
-			throw new \ElkArte\Exceptions\Exception('no_access', false);
+			throw new Exception('no_access', false);
 		}
 
 		// This is a time and memory eating ...
@@ -1214,7 +1356,7 @@ class Packages extends \ElkArte\AbstractController
 
 		if (empty($package_ftp) && !isset($this->_req->post->skip_ftp))
 		{
-			$ftp = new \ElkArte\Http\FtpConnection(null);
+			$ftp = new FtpConnection(null);
 			list ($username, $detect_path) = $ftp->detect_path(BOARDDIR);
 
 			$context['package_ftp'] = array(
@@ -1226,7 +1368,9 @@ class Packages extends \ElkArte\AbstractController
 			);
 		}
 		else
+		{
 			$context['ftp_connected'] = true;
+		}
 
 		// Define the template.
 		$context['page_title'] = $txt['package_file_perms'];
@@ -1356,14 +1500,18 @@ class Packages extends \ElkArte\AbstractController
 			unset($context['file_tree'][strtr(BOARDDIR, array('\\' => '/'))]['contents']['attachments']);
 
 			if (!is_array($modSettings['attachmentUploadDir']))
-				$modSettings['attachmentUploadDir'] = \ElkArte\Util::unserialize($modSettings['attachmentUploadDir']);
+			{
+				$modSettings['attachmentUploadDir'] = Util::unserialize($modSettings['attachmentUploadDir']);
+			}
 
 			// @todo Should we suggest non-current directories be read only?
 			foreach ($modSettings['attachmentUploadDir'] as $dir)
+			{
 				$context['file_tree'][strtr($dir, array('\\' => '/'))] = array(
 					'type' => 'dir',
 					'writable_on' => 'restrictive',
 				);
+			}
 		}
 		elseif (substr($modSettings['attachmentUploadDir'], 0, strlen(BOARDDIR)) != BOARDDIR)
 		{
@@ -1408,7 +1556,9 @@ class Packages extends \ElkArte\AbstractController
 		{
 			// Skip the default
 			if ($id == 1)
+			{
 				continue;
+			}
 
 			if (substr(strtolower(strtr($theme['theme_dir'], array('\\' => '/'))), 0, strlen(BOARDDIR) + 7) === strtolower(strtr(BOARDDIR, array('\\' => '/')) . '/themes'))
 			{
@@ -1440,30 +1590,40 @@ class Packages extends \ElkArte\AbstractController
 
 		// If we're submitting then let's move on to another function to keep things cleaner..
 		if (isset($this->_req->post->action_changes))
+		{
 			return $this->action_perms_save();
+		}
 
 		$context['look_for'] = array();
 
 		// Are we looking for a particular tree - normally an expansion?
 		if (!empty($this->_req->query->find))
+		{
 			$context['look_for'][] = base64_decode($this->_req->query->find);
+		}
 
 		// Only that tree?
 		$context['only_find'] = isset($this->_req->query->xml) && !empty($this->_req->query->onlyfind) ? $this->_req->query->onlyfind : '';
 		if ($context['only_find'])
+		{
 			$context['look_for'][] = $context['only_find'];
+		}
 
 		// Have we got a load of back-catalogue trees to expand from a submit etc?
 		if (!empty($this->_req->query->back_look))
 		{
 			$potententialTrees = json_decode(base64_decode($this->_req->query->back_look), true);
 			foreach ($potententialTrees as $tree)
+			{
 				$context['look_for'][] = $tree;
+			}
 		}
 
 		// ... maybe posted?
 		if (!empty($this->_req->post->back_look))
+		{
 			$context['look_for'] = array_merge($context['look_for'], $this->_req->post->back_look);
+		}
 
 		$context['back_look_data'] = base64_encode(json_encode(array_slice($context['look_for'], 0, 15)));
 
@@ -1505,7 +1665,9 @@ class Packages extends \ElkArte\AbstractController
 				);
 			}
 			else
+			{
 				unset($context['file_tree'][$path]);
+			}
 		}
 
 		// Is this actually xml?
@@ -1532,7 +1694,9 @@ class Packages extends \ElkArte\AbstractController
 
 		// Skipping use of FTP?
 		if (empty($package_ftp))
+		{
 			$context['skip_ftp'] = true;
+		}
 
 		// We'll start off in a good place, security. Make sure that if we're dealing with individual files that they seem in the right place.
 		if ($context['method'] === 'individual')
@@ -1543,7 +1707,9 @@ class Packages extends \ElkArte\AbstractController
 
 			// Continuing?
 			if (isset($this->_req->post->toProcess))
+			{
 				$this->_req->post->permStatus = json_decode(base64_decode($this->_req->post->toProcess), true);
+			}
 
 			if (isset($this->_req->post->permStatus))
 			{
@@ -1553,22 +1719,34 @@ class Packages extends \ElkArte\AbstractController
 				{
 					// Nothing to see here?
 					if ($status === 'no_change')
+					{
 						continue;
+					}
 
 					$legal = false;
 					foreach ($legal_roots as $root)
+					{
 						if (substr($path, 0, strlen($root)) == $root)
+						{
 							$legal = true;
+						}
+					}
 
 					if (!$legal)
+					{
 						continue;
+					}
 
 					// Check it exists.
 					if (!file_exists($path))
+					{
 						continue;
+					}
 
 					if ($status === 'custom')
+					{
 						$validate_custom = true;
+					}
 
 					// Now add it.
 					$context['to_process'][$path] = $status;
@@ -1579,16 +1757,22 @@ class Packages extends \ElkArte\AbstractController
 				if ($validate_custom)
 				{
 					if (!preg_match('~^[4567][4567][4567]$~', $context['custom_value']))
-						throw new \ElkArte\Exceptions\Exception($txt['chmod_value_invalid']);
+					{
+						throw new Exception($txt['chmod_value_invalid']);
+					}
 				}
 
 				// Nothing to do?
 				if (empty($context['to_process']))
+				{
 					redirectexit('action=admin;area=packages;sa=perms' . (!empty($context['back_look_data']) ? ';back_look=' . base64_encode(json_encode($context['back_look_data'])) : '') . ';' . $context['session_var'] . '=' . $context['session_id']);
+				}
 			}
 			// Should never get here,
 			else
-				throw new \ElkArte\Exceptions\Exception('no_access', false);
+			{
+				throw new Exception('no_access', false);
+			}
 
 			// Setup the custom value.
 			$custom_value = octdec('0' . $context['custom_value']);
@@ -1597,7 +1781,9 @@ class Packages extends \ElkArte\AbstractController
 			foreach ($context['to_process'] as $path => $status)
 			{
 				if (in_array($status, array('execute', 'writable', 'read')))
+				{
 					package_chmod($path, $status);
+				}
 				elseif ($status === 'custom' && !empty($custom_value))
 				{
 					// Use FTP if we have it.
@@ -1607,7 +1793,9 @@ class Packages extends \ElkArte\AbstractController
 						$package_ftp->chmod($ftp_file, $custom_value);
 					}
 					else
+					{
 						@chmod($path, $custom_value);
+					}
 				}
 
 				// This fish is fried...
@@ -1615,7 +1803,9 @@ class Packages extends \ElkArte\AbstractController
 
 				// See if we're out of time?
 				if (time() - array_sum(explode(' ', $time_start)) > $timeout_limit)
+				{
 					pausePermsSave();
+				}
 			}
 		}
 		// If predefined this is a little different.
@@ -1646,13 +1836,19 @@ class Packages extends \ElkArte\AbstractController
 				$context['special_files'] = array();
 
 				foreach ($context['file_tree'] as $path => $data)
+				{
 					$this->build_special_files__recursive($path, $data);
+				}
 			}
 			// Free doesn't need special files.
 			elseif ($context['predefined_type'] === 'free')
+			{
 				$context['special_files'] = array();
+			}
 			else
+			{
 				$context['special_files'] = json_decode(base64_decode($this->_req->post->specialFiles), true);
+			}
 
 			// Now we definitely know where we are, we need to go through again doing the chmod!
 			foreach ($context['directory_list'] as $path => $dummy)
@@ -1708,31 +1904,14 @@ class Packages extends \ElkArte\AbstractController
 
 				// See if we're out of time?
 				if (time() - array_sum(explode(' ', $time_start)) > $timeout_limit)
+				{
 					pausePermsSave();
+				}
 			}
 		}
 
 		// If we're here we are done!
 		redirectexit('action=admin;area=packages;sa=perms' . (!empty($context['back_look_data']) ? ';back_look=' . base64_encode(json_encode($context['back_look_data'])) : '') . ';' . $context['session_var'] . '=' . $context['session_id']);
-	}
-
-	/**
-	 * Builds a list of special files recursively for a given path
-	 *
-	 * @param string $path
-	 * @param mixed[] $data
-	 */
-	public function build_special_files__recursive($path, &$data)
-	{
-		global $context;
-
-		if (!empty($data['writable_on']))
-			if ($context['predefined_type'] === 'standard' || $data['writable_on'] === 'restrictive')
-				$context['special_files'][$path] = 1;
-
-		if (!empty($data['contents']))
-			foreach ($data['contents'] as $name => $contents)
-				$this->build_special_files__recursive($path . '/' . $name, $contents);
 	}
 
 	/**
@@ -1774,6 +1953,33 @@ class Packages extends \ElkArte\AbstractController
 	}
 
 	/**
+	 * Builds a list of special files recursively for a given path
+	 *
+	 * @param string $path
+	 * @param mixed[] $data
+	 */
+	public function build_special_files__recursive($path, &$data)
+	{
+		global $context;
+
+		if (!empty($data['writable_on']))
+		{
+			if ($context['predefined_type'] === 'standard' || $data['writable_on'] === 'restrictive')
+			{
+				$context['special_files'][$path] = 1;
+			}
+		}
+
+		if (!empty($data['contents']))
+		{
+			foreach ($data['contents'] as $name => $contents)
+			{
+				$this->build_special_files__recursive($path . '/' . $name, $contents);
+			}
+		}
+	}
+
+	/**
 	 * Get a listing of all the packages
 	 *
 	 * - Determines if the package is a ddon, smiley, avatar, language or unknown package
@@ -1795,23 +2001,33 @@ class Packages extends \ElkArte\AbstractController
 
 		// Start things up
 		if (!isset($packages[$params]))
+		{
 			$packages[$params] = array();
+		}
 
 		// We need the packages directory to be writable for this.
 		if (!@is_writable(BOARDDIR . '/packages'))
+		{
 			create_chmod_control(array(BOARDDIR . '/packages'), array('destination_url' => $scripturl . '?action=admin;area=packages', 'crash_on_error' => true));
+		}
 
 		list ($the_brand, $the_version) = explode(' ', FORUM_VERSION, 2);
 
 		// Here we have a little code to help those who class themselves as something of gods, version emulation ;)
 		if (isset($this->_req->query->version_emulate) && strtr($this->_req->query->version_emulate, array($the_brand => '')) == $the_version)
+		{
 			unset($_SESSION['version_emulate']);
+		}
 		elseif (isset($this->_req->query->version_emulate))
 		{
 			if (($this->_req->query->version_emulate === 0 || $this->_req->query->version_emulate === FORUM_VERSION) && isset($this->_req->session->version_emulate))
+			{
 				unset($_SESSION['version_emulate']);
+			}
 			elseif ($this->_req->query->version_emulate !== 0)
+			{
 				$_SESSION['version_emulate'] = strtr($this->_req->query->version_emulate, array('-' => ' ', '+' => ' ', $the_brand . ' ' => ''));
+			}
 		}
 
 		if (!empty($_SESSION['version_emulate']))
@@ -1821,7 +2037,9 @@ class Packages extends \ElkArte\AbstractController
 		}
 
 		if (isset($_SESSION['single_version_emulate']))
+		{
 			unset($_SESSION['single_version_emulate']);
+		}
 
 		if (empty($instadds))
 		{
@@ -1830,10 +2048,12 @@ class Packages extends \ElkArte\AbstractController
 
 			// Look through the list of installed mods...
 			foreach ($instadds as $installed_add)
+			{
 				$installed_adds[$installed_add['package_id']] = array(
 					'id' => $installed_add['id'],
 					'version' => $installed_add['version'],
 				);
+			}
 
 			// Get a list of all the ids installed, so the latest packages won't include already installed ones.
 			$context['installed_adds'] = array_keys($installed_adds);
@@ -1858,13 +2078,17 @@ class Packages extends \ElkArte\AbstractController
 		}
 
 		if (empty($packages))
+		{
 			foreach ($context['package_types'] as $type)
+			{
 				$packages[$type] = array();
+			}
+		}
 
 		try
 		{
 			$dir = new \FilesystemIterator(BOARDDIR . '/packages', \FilesystemIterator::SKIP_DOTS);
-			$filtered_dir = new \ElkArte\PackagesFilterIterator($dir);
+			$filtered_dir = new PackagesFilterIterator($dir);
 
 			$dirs = array();
 			$sort_id = array(
@@ -1877,32 +2101,44 @@ class Packages extends \ElkArte\AbstractController
 			foreach ($filtered_dir as $package)
 			{
 				foreach ($context['package_types'] as $type)
+				{
 					if (isset($context['available_' . $type][md5($package->getFilename())]))
+					{
 						continue 2;
+					}
+				}
 
 				// Skip directories or files that are named the same.
 				if ($package->isDir())
 				{
 					if (in_array($package, $dirs))
+					{
 						continue;
+					}
 					$dirs[] = $package;
 				}
 				elseif (substr(strtolower($package->getFilename()), -7) === '.tar.gz')
 				{
 					if (in_array(substr($package, 0, -7), $dirs))
+					{
 						continue;
+					}
 					$dirs[] = substr($package, 0, -7);
 				}
 				elseif (strtolower($package->getExtension()) === 'zip' || strtolower($package->getExtension()) === 'tgz')
 				{
 					if (in_array(substr($package->getBasename(), 0, -4), $dirs))
+					{
 						continue;
+					}
 					$dirs[] = substr($package->getBasename(), 0, -4);
 				}
 
 				$packageInfo = getPackageInfo($package->getFilename());
 				if (!is_array($packageInfo))
+				{
 					continue;
+				}
 
 				if (!empty($packageInfo))
 				{
@@ -1955,11 +2191,13 @@ class Packages extends \ElkArte\AbstractController
 						{
 							// Even if it is for this ElkArte, is it for the installed version of the mod?
 							if (!$upgrade->exists('@for') || matchPackageVersion($the_version, $upgrade->fetch('@for')))
+							{
 								if (!$upgrade->exists('@from') || matchPackageVersion($installed_adds[$packageInfo['id']]['version'], $upgrade->fetch('@from')))
 								{
 									$packageInfo['can_upgrade'] = true;
 									break;
 								}
+							}
 						}
 					}
 					// Note that it has to be the current version to be uninstallable.  Shucks.
@@ -2046,24 +2284,46 @@ class Packages extends \ElkArte\AbstractController
 		}
 
 		if (isset($this->_req->query->desc))
+		{
 			krsort($packages[$params]);
+		}
 		else
+		{
 			ksort($packages[$params]);
+		}
 
 		return $packages[$params];
+	}
+
+	/**
+	 * Table sorting function used in usort
+	 *
+	 * @param string[] $a
+	 * @param string[] $b
+	 *
+	 * @return int
+	 */
+	private function _sort_table_first($a, $b)
+	{
+		if ($a[0] === $b[0])
+		{
+			return 0;
+		}
+
+		return $a[0] === 'remove_table' ? -1 : 1;
 	}
 }
 
 /**
  * Checks the permissions of all the areas that will be affected by the package
  *
- * @package Packages
- *
- * @param string  $path
+ * @param string $path
  * @param mixed[] $data
- * @param int     $level
+ * @param int $level
  *
  * @throws \ElkArte\Exceptions\Exception no_access
+ * @package Packages
+ *
  */
 function fetchPerms__recursive($path, &$data, $level)
 {
@@ -2073,21 +2333,29 @@ function fetchPerms__recursive($path, &$data, $level)
 	foreach ($context['look_for'] as $possiblePath)
 	{
 		if (substr($possiblePath, 0, strlen($path)) === $path)
+		{
 			$isLikelyPath = true;
+		}
 	}
 
 	// Is this where we stop?
 	if (isset($_GET['xml']) && !empty($context['look_for']) && !$isLikelyPath)
+	{
 		return;
+	}
 	elseif ($level > $context['default_level'] && !$isLikelyPath)
+	{
 		return;
+	}
 
 	// Are we actually interested in saving this data?
 	$save_data = empty($context['only_find']) || $context['only_find'] == $path;
 
 	// @todo Shouldn't happen - but better error message?
 	if (!is_dir($path))
-		throw new \ElkArte\Exceptions\Exception('no_access', false);
+	{
+		throw new Exception('no_access', false);
+	}
 
 	// This is where we put stuff we've found for sorting.
 	$foundData = array(
@@ -2105,10 +2373,14 @@ function fetchPerms__recursive($path, &$data, $level)
 			{
 				// Are we listing PHP files in this directory?
 				if ($save_data && !empty($data['list_contents']) && $entry->getExtension() === 'php')
+				{
 					$foundData['files'][$entry->getFilename()] = true;
+				}
 				// A file we were looking for.
 				elseif ($save_data && isset($data['contents'][$entry->getFilename()]))
+				{
 					$foundData['files'][$entry->getFilename()] = true;
+				}
 			}
 			// It's a directory - we're interested one way or another, probably...
 			elseif ($entry->isDir())
@@ -2136,7 +2408,9 @@ function fetchPerms__recursive($path, &$data, $level)
 				}
 				// Maybe it is a folder we are not descending into.
 				elseif (isset($data['contents'][$entry->getFilename()]))
+				{
 					$foundData['folders'][$entry->getFilename()] = true;
+				}
 				// Otherwise we stop here.
 			}
 		}
@@ -2152,7 +2426,9 @@ function fetchPerms__recursive($path, &$data, $level)
 
 	// Nothing to see here?
 	if (!$save_data)
+	{
 		return;
+	}
 
 	// Now actually add the data, starting with the folders.
 	foreach ($foundData['folders'] as $folder => $type)
@@ -2164,7 +2440,9 @@ function fetchPerms__recursive($path, &$data, $level)
 			),
 		);
 		if ($type !== true)
+		{
 			$additional_data['type'] = $type;
+		}
 
 		// If there's an offset ignore any folders in XML mode.
 		if (isset($_GET['xml']) && $context['file_offset'] == 0)
@@ -2198,11 +2476,15 @@ function fetchPerms__recursive($path, &$data, $level)
 
 		// Have we reached our offset?
 		if ($context['file_offset'] > $counter)
+		{
 			continue;
+		}
 
 		// Gone too far?
 		if ($counter > ($context['file_offset'] + $context['file_limit']))
+		{
 			break;
+		}
 
 		$additional_data = array(
 			'perms' => array(

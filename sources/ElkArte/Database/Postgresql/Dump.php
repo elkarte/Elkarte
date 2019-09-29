@@ -8,7 +8,7 @@
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause (see accompanying LICENSE.txt file)
  *
  * This file contains code covered by:
- * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * copyright: 2011 Simple Machines (http://www.simplemachines.org)
  *
  * @version 2.0 dev
  *
@@ -16,10 +16,12 @@
 
 namespace ElkArte\Database\Postgresql;
 
+use ElkArte\Database\AbstractDump;
+
 /**
  * PostgreSQL database class, implements database class to control postgre functions
  */
-class Dump extends \ElkArte\Database\AbstractDump
+class Dump extends AbstractDump
 {
 	/**
 	 * {@inheritDoc}
@@ -49,12 +51,18 @@ class Dump extends \ElkArte\Database\AbstractDump
 		while ($row = $result->fetch_assoc())
 		{
 			if ($row['data_type'] == 'character varying')
+			{
 				$row['data_type'] = 'varchar';
+			}
 			elseif ($row['data_type'] == 'character')
+			{
 				$row['data_type'] = 'char';
+			}
 
 			if ($row['character_maximum_length'])
+			{
 				$row['data_type'] .= '(' . $row['character_maximum_length'] . ')';
+			}
 
 			// Make the CREATE for this column.
 			$schema_create .= ' "' . $row['column_name'] . '" ' . $row['data_type'] . ($row['is_nullable'] != 'YES' ? ' NOT NULL' : '');
@@ -107,12 +115,16 @@ class Dump extends \ElkArte\Database\AbstractDump
 			if ($row['is_primary'])
 			{
 				if (preg_match('~\(([^\)]+?)\)~i', $row['inddef'], $matches) == 0)
+				{
 					continue;
+				}
 
 				$index_create .= $crlf . 'ALTER TABLE ' . $tableName . ' ADD PRIMARY KEY ("' . $matches[1] . '");';
 			}
 			else
+			{
 				$index_create .= $crlf . $row['inddef'] . ';';
+			}
 		}
 		$result->free_result();
 
@@ -140,7 +152,9 @@ class Dump extends \ElkArte\Database\AbstractDump
 		);
 		$tables = array();
 		while ($row = $request->fetch_row())
+		{
 			$tables[] = $row[0];
+		}
 		$request->free_result();
 
 		return $tables;
@@ -211,7 +225,9 @@ class Dump extends \ElkArte\Database\AbstractDump
 		$num_rows = $result->num_rows();
 
 		if ($num_rows == 0)
+		{
 			return '';
+		}
 
 		if ($new_table)
 		{
@@ -232,11 +248,17 @@ class Dump extends \ElkArte\Database\AbstractDump
 			{
 				// Try to figure out the type of each field. (NULL, number, or 'string'.)
 				if (!isset($item))
+				{
 					$field_list[] = 'NULL';
+				}
 				elseif (is_numeric($item) && (int) $item == $item)
+				{
 					$field_list[] = $item;
+				}
 				else
+				{
 					$field_list[] = '\'' . $this->_db->escape_string($item) . '\'';
+				}
 			}
 
 			// 'Insert' the data.

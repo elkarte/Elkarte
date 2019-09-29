@@ -8,13 +8,16 @@
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause (see accompanying LICENSE.txt file)
  *
  * This file contains code covered by:
- * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * copyright: 2011 Simple Machines (http://www.simplemachines.org)
  *
  * @version 2.0 dev
  *
  */
 
+use BBC\ParserWrapper;
+use ElkArte\Cache\Cache;
 use ElkArte\User;
+use ElkArte\Util;
 
 /**
  * How many open reports do we have?
@@ -76,7 +79,7 @@ function recountOpenReports($flush = true, $count_pms = false)
 
 	if ($flush)
 	{
-		\ElkArte\Cache\Cache::instance()->remove('num_menu_errors');
+		Cache::instance()->remove('num_menu_errors');
 	}
 
 	return $open_reports;
@@ -98,7 +101,9 @@ function recountUnapprovedPosts($approve_query = null)
 	$db = database();
 
 	if ($approve_query === null)
+	{
 		return array('posts' => 0, 'topics' => 0);
+	}
 
 	// Any unapproved posts?
 	$request = $db->query('', '
@@ -133,6 +138,7 @@ function recountUnapprovedPosts($approve_query = null)
 
 	$context['total_unapproved_topics'] = $unapproved_topics;
 	$context['total_unapproved_posts'] = $unapproved_posts;
+
 	return array('posts' => $unapproved_posts, 'topics' => $unapproved_topics);
 }
 
@@ -150,7 +156,9 @@ function recountFailedEmails($approve_query = null)
 	$db = database();
 
 	if ($approve_query === null)
+	{
 		return 0;
+	}
 
 	$request = $db->query('', '
 		SELECT COUNT(*)
@@ -159,13 +167,13 @@ function recountFailedEmails($approve_query = null)
 		WHERE {query_see_board}
 			' . $approve_query . '
 			OR m.id_board = -1',
-		array(
-		)
+		array()
 	);
 	list ($failed_emails) = $db->fetch_row($request);
 	$db->free_result($request);
 
 	$context['failed_emails'] = $failed_emails;
+
 	return $failed_emails;
 }
 
@@ -265,20 +273,28 @@ function loadModeratorMenuCounts($brd = null)
 
 	// Work out the query
 	if ($approve_boards == array(0))
+	{
 		$approve_query = '';
+	}
 	elseif (!empty($approve_boards))
+	{
 		$approve_query = ' AND m.id_board IN (' . implode(',', $approve_boards) . ')';
+	}
 	else
+	{
 		$approve_query = ' AND 1=0';
+	}
 
 	// Set up the cache key for this permissions level
 	$cache_key = md5(User::$info->query_see_board . $approve_query . User::$info->mod_cache['bq'] . User::$info->mod_cache['gq'] . User::$info->mod_cache['mq'] . (int) allowedTo('approve_emails') . '_' . (int) allowedTo('moderate_forum'));
 
 	if (isset($menu_errors[$cache_key]))
+	{
 		return $menu_errors[$cache_key];
+	}
 
 	// If its been cached, guess what, that's right use it!
-	$temp = \ElkArte\Cache\Cache::instance()->get('num_menu_errors', 900);
+	$temp = Cache::instance()->get('num_menu_errors', 900);
 
 	if ($temp === null || !isset($temp[$cache_key]))
 	{
@@ -327,11 +343,15 @@ function loadModeratorMenuCounts($brd = null)
 
 		// Email failures that require attention
 		if (!empty($modSettings['maillist_enabled']) && allowedTo('approve_emails'))
+		{
 			$menu_errors[$cache_key]['emailmod'] = recountFailedEmails($approve_query);
+		}
 
 		// Group requests
 		if (!empty(User::$info->mod_cache) && User::$info->mod_cache['gq'] != '0=1')
+		{
 			$menu_errors[$cache_key]['groupreq'] = count(groupRequests());
+		}
 
 		// Member requests
 		if (allowedTo('moderate_forum') && ((!empty($modSettings['registration_method']) && $modSettings['registration_method'] == 2) || !empty($modSettings['approveAccountDeletion'])))
@@ -344,7 +364,9 @@ function loadModeratorMenuCounts($brd = null)
 			foreach ($activation_numbers as $activation_type => $total_members)
 			{
 				if (in_array($activation_type, array(3, 4, 5)))
+				{
 					$awaiting_activation += $total_members;
+				}
 			}
 			$menu_errors[$cache_key]['memberreq'] = $awaiting_activation;
 		}
@@ -359,10 +381,12 @@ function loadModeratorMenuCounts($brd = null)
 		$menu_errors = is_array($temp) ? array_merge($temp, $menu_errors) : $menu_errors;
 
 		// Store it away for a while, not like this should change that often
-		\ElkArte\Cache\Cache::instance()->put('num_menu_errors', $menu_errors, 900);
+		Cache::instance()->put('num_menu_errors', $menu_errors, 900);
 	}
 	else
+	{
 		$menu_errors = $temp === null ? array() : $temp;
+	}
 
 	return $menu_errors[$cache_key];
 }
@@ -385,7 +409,7 @@ function logWarningNotice($subject, $body)
 			'subject' => 'string-255', 'body' => 'string-65534',
 		),
 		array(
-			\ElkArte\Util::htmlspecialchars($subject), \ElkArte\Util::htmlspecialchars($body),
+			Util::htmlspecialchars($subject), Util::htmlspecialchars($body),
 		),
 		array('id_notice')
 	);
@@ -448,7 +472,9 @@ function removeWarningTemplate($id_tpl, $template_type = 'warntpl')
 		)
 	);
 	while ($row = $db->fetch_assoc($request))
+	{
 		logAction('delete_warn_template', array('template' => $row['recipient_name']));
+	}
 	$db->free_result($request);
 
 	// Do the deletes.
@@ -509,7 +535,7 @@ function warningTemplates($start, $items_per_page, $sort, $template_type = 'warn
 			'html_time' => htmlTime($row['log_time']),
 			'timestamp' => forum_time(true, $row['log_time']),
 			'title' => $row['template_title'],
-			'body' => \ElkArte\Util::htmlspecialchars($row['body']),
+			'body' => Util::htmlspecialchars($row['body']),
 		);
 	}
 	$db->free_result($request);
@@ -661,7 +687,7 @@ function modLoadTemplate($id_template, $template_type = 'warntpl')
 	{
 		$context['template_data'] = array(
 			'title' => $row['template_title'],
-			'body' => \ElkArte\Util::htmlspecialchars($row['body']),
+			'body' => Util::htmlspecialchars($row['body']),
 			'personal' => $row['id_recipient'],
 			'can_edit_personal' => $row['id_member'] == User::$info->id,
 		);
@@ -691,8 +717,8 @@ function modAddUpdateTemplate($recipient_id, $template_title, $template_body, $i
 			SET id_recipient = {int:personal}, recipient_name = {string:title}, body = {string:body}
 			WHERE id_comment = {int:id}
 				AND comment_type = {string:comment_type}
-				AND (id_recipient = {int:generic} OR id_recipient = {int:current_member})'.
-				($recipient_id ? ' AND id_member = {int:current_member}' : ''),
+				AND (id_recipient = {int:generic} OR id_recipient = {int:current_member})' .
+			($recipient_id ? ' AND id_member = {int:current_member}' : ''),
 			array(
 				'personal' => $recipient_id,
 				'title' => $template_title,
@@ -753,9 +779,13 @@ function modReportDetails($id_report, $show_pms = false)
 
 	// So did we find anything?
 	if (!$db->num_rows($request))
+	{
 		$row = false;
+	}
 	else
+	{
 		$row = $db->fetch_assoc($request);
+	}
 
 	$db->free_result($request);
 
@@ -770,14 +800,14 @@ function modReportDetails($id_report, $show_pms = false)
  * @param int $limit the number of reports
  * @param bool $show_pms
  *
- * @todo move to createList?
  * @return array
+ * @todo move to createList?
  */
 function getModReports($status = 0, $start = 0, $limit = 10, $show_pms = false)
 {
 	$db = database();
 
-		$request = $db->query('', '
+	$request = $db->query('', '
 			SELECT lr.id_report, lr.id_msg, lr.id_topic, lr.id_board, lr.id_member, lr.subject, lr.body,
 				lr.time_started, lr.time_updated, lr.num_reports, lr.closed, lr.ignore_all,
 				COALESCE(mem.real_name, lr.membername) AS author_name, COALESCE(mem.id_member, 0) AS id_author
@@ -788,17 +818,19 @@ function getModReports($status = 0, $start = 0, $limit = 10, $show_pms = false)
 				AND ' . (User::$info->mod_cache['bq'] == '1=1' || User::$info->mod_cache['bq'] == '0=1' ? User::$info->mod_cache['bq'] : 'lr.' . User::$info->mod_cache['bq']) . '
 			ORDER BY lr.time_updated DESC
 			LIMIT {int:start}, {int:limit}',
-			array(
-				'view_closed' => $status,
-				'start' => $start,
-				'limit' => $limit,
-				'rep_type' => $show_pms ? array('pm') : array('msg'),
-			)
-		);
+		array(
+			'view_closed' => $status,
+			'start' => $start,
+			'limit' => $limit,
+			'rep_type' => $show_pms ? array('pm') : array('msg'),
+		)
+	);
 
 	$reports = array();
 	while ($row = $db->fetch_assoc($request))
+	{
 		$reports[$row['id_report']] = $row;
+	}
 	$db->free_result($request);
 
 	return $reports;
@@ -830,7 +862,9 @@ function getReportsUserComments($id_reports)
 
 	$comments = array();
 	while ($row = $db->fetch_assoc($request))
+	{
 		$comments[$row['id_report']][] = $row;
+	}
 
 	$db->free_result($request);
 
@@ -856,14 +890,16 @@ function getReportModeratorsComments($id_report)
 			WHERE lc.id_notice = {int:id_report}
 				AND lc.comment_type = {string:reportc}',
 		array(
-				'id_report' => $id_report,
-				'reportc' => 'reportc',
+			'id_report' => $id_report,
+			'reportc' => 'reportc',
 		)
 	);
 
 	$comments = array();
 	while ($row = $db->fetch_assoc($request))
+	{
 		$comments[] = $row;
+	}
 
 	$db->free_result($request);
 
@@ -889,14 +925,16 @@ function approveAllUnapproved()
 	);
 	$msgs = array();
 	while ($row = $db->fetch_row($request))
+	{
 		$msgs[] = $row[0];
+	}
 	$db->free_result($request);
 
 	if (!empty($msgs))
 	{
 		require_once(SUBSDIR . '/Post.subs.php');
 		approvePosts($msgs);
-		\ElkArte\Cache\Cache::instance()->remove('num_menu_errors');
+		Cache::instance()->remove('num_menu_errors');
 	}
 
 	// Now do attachments
@@ -910,14 +948,16 @@ function approveAllUnapproved()
 	);
 	$attaches = array();
 	while ($row = $db->fetch_row($request))
+	{
 		$attaches[] = $row[0];
+	}
 	$db->free_result($request);
 
 	if (!empty($attaches))
 	{
 		require_once(SUBSDIR . '/ManageAttachments.subs.php');
 		approveAttachments($attaches);
-		\ElkArte\Cache\Cache::instance()->remove('num_menu_errors');
+		Cache::instance()->remove('num_menu_errors');
 	}
 }
 
@@ -1008,7 +1048,9 @@ function watchedUsers($start, $items_per_page, $sort)
 		);
 		$latest_posts = array();
 		while ($row = $db->fetch_assoc($request))
+		{
 			$latest_posts[$row['id_member']] = $row['last_post_id'];
+		}
 
 		if (!empty($latest_posts))
 		{
@@ -1077,7 +1119,7 @@ function watchedUserPostsCount($approve_query, $warning_watch)
 			WHERE mem.warning >= {int:warning_watch}
 				AND {query_see_board}' . (!empty($modSettings['recycle_enable']) && $modSettings['recycle_board'] > 0 ? '
 				AND b.id_board != {int:recycle}' : '') .
-				$approve_query,
+		$approve_query,
 		array(
 			'warning_watch' => $warning_watch,
 			'recycle' => $modSettings['recycle_board'],
@@ -1115,7 +1157,7 @@ function watchedUserPosts($start, $items_per_page, $approve_query, $delete_board
 		WHERE mem.warning >= {int:warning_watch}
 			AND {query_see_board}' . (!empty($modSettings['recycle_enable']) && $modSettings['recycle_board'] > 0 ? '
 			AND b.id_board != {int:recycle}' : '') .
-			$approve_query . '
+		$approve_query . '
 		ORDER BY m.id_msg DESC
 		LIMIT ' . $start . ', ' . $items_per_page,
 		array(
@@ -1125,7 +1167,7 @@ function watchedUserPosts($start, $items_per_page, $approve_query, $delete_board
 	);
 
 	$member_posts = array();
-	$bbc_parser = \BBC\ParserWrapper::instance();
+	$bbc_parser = ParserWrapper::instance();
 
 	while ($row = $db->fetch_assoc($request))
 	{
@@ -1176,8 +1218,7 @@ function groupRequests()
 		WHERE ' . (User::$info->mod_cache['gq'] == '1=1' || User::$info->mod_cache['gq'] == '0=1' ? User::$info->mod_cache['gq'] : 'lgr.' . User::$info->mod_cache['gq']) . '
 		ORDER BY lgr.id_request DESC
 		LIMIT 10',
-		array(
-		)
+		array()
 	);
 	for ($i = 0; $row = $db->fetch_assoc($request); $i++)
 	{
@@ -1213,7 +1254,7 @@ function basicWatchedUsers()
 	$db = database();
 
 	$watched_users = array();
-	if (!\ElkArte\Cache\Cache::instance()->getVar($watched_users, 'recent_user_watches', 240))
+	if (!Cache::instance()->getVar($watched_users, 'recent_user_watches', 240))
 	{
 		$modSettings['warning_watch'] = empty($modSettings['warning_watch']) ? 1 : $modSettings['warning_watch'];
 		$request = $db->query('', '
@@ -1228,10 +1269,12 @@ function basicWatchedUsers()
 			)
 		);
 		while ($row = $db->fetch_assoc($request))
+		{
 			$watched_users[] = $row;
+		}
 		$db->free_result($request);
 
-		\ElkArte\Cache\Cache::instance()->put('recent_user_watches', $watched_users, 240);
+		Cache::instance()->put('recent_user_watches', $watched_users, 240);
 	}
 
 	return $watched_users;
@@ -1252,7 +1295,7 @@ function reportedPosts($show_pms = false)
 	$cachekey = md5(serialize(User::$info->mod_cache['bq']));
 
 	$reported_posts = array();
-	if (!\ElkArte\Cache\Cache::instance()->getVar($reported_posts, 'reported_posts_' . $cachekey, 90))
+	if (!Cache::instance()->getVar($reported_posts, 'reported_posts_' . $cachekey, 90))
 	{
 		$reported_posts = array();
 		// By George, that means we in a position to get the reports, jolly good.
@@ -1282,7 +1325,7 @@ function reportedPosts($show_pms = false)
 		$db->free_result($request);
 
 		// Cache it.
-		\ElkArte\Cache\Cache::instance()->put('reported_posts_' . $cachekey, $reported_posts, 90);
+		Cache::instance()->put('reported_posts_' . $cachekey, $reported_posts, 90);
 	}
 
 	return $reported_posts;
@@ -1319,7 +1362,7 @@ function countModeratorNotes()
 	$db = database();
 
 	$moderator_notes_total = 0;
-	if (!\ElkArte\Cache\Cache::instance()->getVar($moderator_notes_total, 'moderator_notes_total', 240))
+	if (!Cache::instance()->getVar($moderator_notes_total, 'moderator_notes_total', 240))
 	{
 		$request = $db->query('', '
 			SELECT
@@ -1334,7 +1377,7 @@ function countModeratorNotes()
 		list ($moderator_notes_total) = $db->fetch_row($request);
 		$db->free_result($request);
 
-		\ElkArte\Cache\Cache::instance()->put('moderator_notes_total', $moderator_notes_total, 240);
+		Cache::instance()->put('moderator_notes_total', $moderator_notes_total, 240);
 	}
 
 	return $moderator_notes_total;
@@ -1403,7 +1446,7 @@ function moderatorNotes($offset)
 
 	// Grab the current notes.
 	// We can only use the cache for the first page of notes.
-	if ($offset != 0 || !\ElkArte\Cache\Cache::instance()->getVar($moderator_notes, 'moderator_notes', 240))
+	if ($offset != 0 || !Cache::instance()->getVar($moderator_notes, 'moderator_notes', 240))
 	{
 		$request = $db->query('', '
 			SELECT COALESCE(mem.id_member, 0) AS id_member, COALESCE(mem.real_name, lc.member_name) AS member_name,
@@ -1420,11 +1463,15 @@ function moderatorNotes($offset)
 		);
 		$moderator_notes = array();
 		while ($row = $db->fetch_assoc($request))
+		{
 			$moderator_notes[] = $row;
+		}
 		$db->free_result($request);
 
 		if ($offset == 0)
-			\ElkArte\Cache\Cache::instance()->put('moderator_notes', $moderator_notes, 240);
+		{
+			Cache::instance()->put('moderator_notes', $moderator_notes, 240);
+		}
 	}
 
 	return $moderator_notes;
@@ -1451,12 +1498,14 @@ function moderatorNotice($id_notice)
 		)
 	);
 	if ($db->num_rows($request) == 0)
+	{
 		return array();
+	}
 	list ($notice_body, $notice_subject) = $db->fetch_row($request);
 	$db->free_result($request);
 
 	// Make it look nice
-	$bbc_parser = \BBC\ParserWrapper::instance();
+	$bbc_parser = ParserWrapper::instance();
 	$notice_body = $bbc_parser->parseNotice($notice_body);
 
 	return array($notice_body, $notice_subject);
@@ -1540,21 +1589,29 @@ function getUnapprovedPosts($approve_query, $current_view, $boards_allowed, $sta
 	);
 
 	$unapproved_items = array();
-	$bbc_parser = \BBC\ParserWrapper::instance();
+	$bbc_parser = ParserWrapper::instance();
 
 	for ($i = 1; $row = $db->fetch_assoc($request); $i++)
 	{
 		// Can delete is complicated, let's solve it first... is it their own post?
 		if ($row['id_member'] == User::$info->id && ($boards_allowed['delete_own_boards'] == array(0) || in_array($row['id_board'], $boards_allowed['delete_own_boards'])))
+		{
 			$can_delete = true;
+		}
 		// Is it a reply to their own topic?
 		elseif ($row['id_member'] == $row['id_member_started'] && $row['id_msg'] != $row['id_first_msg'] && ($boards_allowed['delete_own_replies'] == array(0) || in_array($row['id_board'], $boards_allowed['delete_own_replies'])))
+		{
 			$can_delete = true;
+		}
 		// Someone else's?
 		elseif ($row['id_member'] != User::$info->id && ($boards_allowed['delete_any_boards'] == array(0) || in_array($row['id_board'], $boards_allowed['delete_any_boards'])))
+		{
 			$can_delete = true;
+		}
 		else
+		{
 			$can_delete = false;
+		}
 
 		$unapproved_items[] = array(
 			'id' => $row['id_msg'],

@@ -13,6 +13,11 @@
 
 namespace ElkArte\UrlGenerator\Semantic;
 
+/**
+ * Class Topic
+ *
+ * @package ElkArte\UrlGenerator\Semantic
+ */
 class Topic extends Standard
 {
 	/**

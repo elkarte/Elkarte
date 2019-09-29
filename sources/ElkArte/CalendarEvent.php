@@ -8,7 +8,7 @@
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause (see accompanying LICENSE.txt file)
  *
  * This file contains code covered by:
- * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * copyright: 2011 Simple Machines (http://www.simplemachines.org)
  *
  * @version 2.0 dev
  *
@@ -42,8 +42,8 @@ class CalendarEvent
 	 *
 	 * @param null|int $event_id Obviously the id of the event.
 	 *                  If null or -1 the event is considered new
-	 *                  @see \ElkArte\CalendarEvent::isNew
 	 * @param mixed[] $settings An array of settings ($modSettings is the current one)
+	 * @see \ElkArte\CalendarEvent::isNew
 	 */
 	public function __construct($event_id, $settings = array())
 	{
@@ -72,9 +72,13 @@ class CalendarEvent
 		{
 			// Make sure it's turned on and not some fool trying to trick it.
 			if (empty($this->_settings['cal_allowspan']))
+			{
 				throw new Exceptions\Exception('no_span', false);
+			}
 			if ($event['span'] < 1 || $event['span'] > $this->_settings['cal_maxspan'])
+			{
 				throw new Exceptions\Exception('invalid_days_numb', false);
+			}
 		}
 
 
@@ -83,34 +87,54 @@ class CalendarEvent
 		{
 			// No month?  No year?
 			if (!isset($event['month']))
+			{
 				throw new Exceptions\Exception('event_month_missing', false);
+			}
 			if (!isset($event['year']))
+			{
 				throw new Exceptions\Exception('event_year_missing', false);
+			}
 
 			// Check the month and year...
 			if ($event['month'] < 1 || $event['month'] > 12)
+			{
 				throw new Exceptions\Exception('invalid_month', false);
+			}
 			if ($event['year'] < $this->_settings['cal_minyear'] || $event['year'] > date('Y') + $this->_settings['cal_limityear'])
+			{
 				throw new Exceptions\Exception('invalid_year', false);
+			}
 
 			// No day?
 			if (!isset($event['day']))
+			{
 				throw new Exceptions\Exception('event_day_missing', false);
+			}
 
 			if (!isset($event['evtitle']) && !isset($event['subject']))
+			{
 				throw new Exceptions\Exception('event_title_missing', false);
+			}
 			elseif (!isset($event['evtitle']))
+			{
 				$event['evtitle'] = $event['subject'];
+			}
 
 			// Bad day?
 			if (!checkdate($event['month'], $event['day'], $event['year']))
+			{
 				throw new Exceptions\Exception('invalid_date', false);
+			}
 
 			// No title?
 			if (Util::htmltrim($event['evtitle']) === '')
+			{
 				throw new Exceptions\Exception('no_event_title', false);
+			}
 			if (Util::strlen($event['evtitle']) > 100)
+			{
 				$event['evtitle'] = Util::substr($event['evtitle'], 0, 100);
+			}
 			$event['evtitle'] = str_replace(';', '', $event['evtitle']);
 		}
 
@@ -156,19 +180,29 @@ class CalendarEvent
 	{
 		// There could be already a topic you are not allowed to modify
 		if (!allowedTo('post_new') && empty($this->_settings['disableNoPostingCalendarEdits']))
+		{
 			$eventProperties = getEventProperties($this->_event_id, true);
+		}
 
 		$id_board = isset($eventProperties['id_board']) ? $eventProperties['id_board'] : (isset($options['id_board']) ? $options['board'] : 0);
 		$id_topic = isset($eventProperties['id_topic']) ? $eventProperties['id_topic'] : (isset($options['id_topic']) ? $options['topic'] : 0);
 
 		if (empty($this->_settings['cal_allowspan']))
+		{
 			$span = 0;
+		}
 		elseif (empty($options['span']) || $options['span'] == 1)
+		{
 			$span = 0;
+		}
 		elseif (empty($this->_settings['cal_maxspan']) || $options['span'] > $this->_settings['cal_maxspan'])
+		{
 			$span = 0;
+		}
 		else
+		{
 			$span = min((int) $this->_settings['cal_maxspan'], (int) $options['span'] - 1);
+		}
 
 		$eventOptions = array(
 			'title' => Util::substr($options['evtitle'], 0, 100),
@@ -187,7 +221,7 @@ class CalendarEvent
 	 *
 	 * @param array $options The options may come from a form. Used to set
 	 *              some of the defaults in case of new events.
-	 * @param int   $member_id - the id of the member saving the event
+	 * @param int $member_id - the id of the member saving the event
 	 *
 	 * @return mixed[] The event structure.
 	 * @throws \ElkArte\Exceptions\Exception no_access
@@ -220,7 +254,9 @@ class CalendarEvent
 			$event = getEventProperties($this->_event_id);
 
 			if ($event === false)
+			{
 				throw new Exceptions\Exception('no_access', false);
+			}
 
 			// If it has a board, then they should be editing it within the topic.
 			if (!empty($event['topic']['id']) && !empty($event['topic']['first_msg']))
@@ -232,9 +268,13 @@ class CalendarEvent
 
 			// Make sure the user is allowed to edit this event.
 			if ($event['member'] != $member_id)
+			{
 				isAllowedTo('calendar_edit_any');
+			}
 			elseif (!allowedTo('calendar_edit_any'))
+			{
 				isAllowedTo('calendar_edit_own');
+			}
 		}
 
 		return $event;
@@ -242,6 +282,7 @@ class CalendarEvent
 
 	/**
 	 * Determines if the current calendar event is new or not.
+	 *
 	 * @return bool
 	 */
 	public function isNew()

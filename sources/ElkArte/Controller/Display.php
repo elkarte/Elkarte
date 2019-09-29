@@ -8,7 +8,7 @@
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause (see accompanying LICENSE.txt file)
  *
  * This file contains code covered by:
- * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * copyright: 2011 Simple Machines (http://www.simplemachines.org)
  *
  * @version 2.0 dev
  *
@@ -16,26 +16,38 @@
 
 namespace ElkArte\Controller;
 
+use ElkArte\AbstractController;
+use ElkArte\Exceptions\Exception;
+use ElkArte\MembersList;
+use ElkArte\MessagesCallback\BodyParser\Normal;
+use ElkArte\MessagesCallback\DisplayRenderer;
+use ElkArte\MessagesDelete;
+use ElkArte\MessageTopicIcons;
+use ElkArte\ValuesContainer;
+
 /**
  * This controller is the most important and probably most accessed of all.
  * It controls topic display, with all related.
  */
-class Display extends \ElkArte\AbstractController
+class Display extends AbstractController
 {
 	/**
 	 * The template layers object
+	 *
 	 * @var null|object
 	 */
 	protected $_template_layers = null;
 
 	/**
 	 * The message id when in the form msg123
+	 *
 	 * @var int
 	 */
 	protected $_virtual_msg = 0;
 
 	/**
 	 * The class that takes care of rendering the message icons (\ElkArte\MessageTopicIcons)
+	 *
 	 * @var null|\ElkArte\MessageTopicIcons
 	 */
 	protected $_icon_sources = null;
@@ -49,6 +61,7 @@ class Display extends \ElkArte\AbstractController
 
 	/**
 	 * Start viewing the topics from ... (page, all, other)
+	 *
 	 * @var int|string
 	 */
 	private $_start;
@@ -60,27 +73,6 @@ class Display extends \ElkArte\AbstractController
 	{
 		// what to do... display things!
 		$this->action_display();
-	}
-
-	/**
-	 * If we are in a topic and don't have permission to approve it then duck out now.
-	 * This is an abuse of the method, but it's easier that way.
-	 *
-	 * @param string $action the function name of the current action
-	 *
-	 * @return bool
-	 * @throws \ElkArte\Exceptions\Exception not_a_topic
-	 */
-	public function trackStats($action = '')
-	{
-		global $topic, $board_info;
-
-		if (!empty($topic) && empty($board_info['cur_topic_approved']) && !allowedTo('approve_posts') && ($this->user->id != $board_info['cur_topic_starter'] || $this->user->is_guest))
-		{
-			throw new \ElkArte\Exceptions\Exception('not_a_topic', false);
-		}
-
-		return parent::trackStats($action);
 	}
 
 	/**
@@ -106,7 +98,9 @@ class Display extends \ElkArte\AbstractController
 
 		// What are you gonna display if these are empty?!
 		if (empty($topic))
-			throw new \ElkArte\Exceptions\Exception('no_board', false);
+		{
+			throw new Exception('no_board', false);
+		}
 
 		// Load the template
 		theme()->getTemplates()->load('Display');
@@ -131,13 +125,17 @@ class Display extends \ElkArte\AbstractController
 			foreach ($this->_req->query as $k => $v)
 			{
 				if (!in_array($k, array('topic', 'board', 'start', session_name())))
+				{
 					$context['robot_no_index'] = true;
+				}
 			}
 		}
 
 		$this->_start = $this->_req->getQuery('start');
 		if (!empty($this->_start) && (!is_numeric($this->_start) || $this->_start % $context['messages_per_page'] !== 0))
+		{
 			$context['robot_no_index'] = true;
+		}
 
 		// Find the previous or next topic.  Make a fuss if there are no more.
 		if ($this->_req->getQuery('prev_next') === 'prev' || $this->_req->getQuery('prev_next') === 'next')
@@ -176,7 +174,9 @@ class Display extends \ElkArte\AbstractController
 		// Load the topic details
 		$topicinfo = getTopicInfo($topic_parameters, 'all', $topic_selects, $topic_tables);
 		if (empty($topicinfo))
-			throw new \ElkArte\Exceptions\Exception('not_a_topic', false);
+		{
+			throw new Exception('not_a_topic', false);
+		}
 
 		// Is this a moved topic that we are redirecting to?
 		if (!empty($topicinfo['id_redirect_topic']) && !isset($this->_req->query->noredir))
@@ -208,7 +208,9 @@ class Display extends \ElkArte\AbstractController
 
 		// Add up unapproved replies to get real number of replies...
 		if ($modSettings['postmod_active'] && allowedTo('approve_posts'))
+		{
 			$context['real_num_replies'] += $topicinfo['unapproved_posts'] - ($topicinfo['approved'] ? 0 : 1);
+		}
 
 		// If this topic has unapproved posts, we need to work out how many posts the user can see, for page indexing.
 		if (!$includeUnapproved && $topicinfo['unapproved_posts'] && $this->user->is_guest === false)
@@ -218,9 +220,13 @@ class Display extends \ElkArte\AbstractController
 			$total_visible_posts = $context['num_replies'] + $myUnapprovedPosts + ($topicinfo['approved'] ? 1 : 0);
 		}
 		elseif ($this->user->is_guest)
+		{
 			$total_visible_posts = $context['num_replies'] + ($topicinfo['approved'] ? 1 : 0);
+		}
 		else
+		{
 			$total_visible_posts = $context['num_replies'] + $topicinfo['unapproved_posts'] + ($topicinfo['approved'] ? 1 : 0);
+		}
 
 		// When was the last time this topic was replied to?  Should we warn them about it?
 		if (!empty($modSettings['oldTopicDays']))
@@ -229,7 +235,9 @@ class Display extends \ElkArte\AbstractController
 			$context['oldTopicError'] = $mgsOptions['poster_time'] + $modSettings['oldTopicDays'] * 86400 < time() && empty($topicinfo['is_sticky']);
 		}
 		else
+		{
 			$context['oldTopicError'] = false;
+		}
 
 		// The start isn't a number; it's information about what to do, where to go.
 		if (!is_numeric($this->_start))
@@ -255,7 +263,9 @@ class Display extends \ElkArte\AbstractController
 			{
 				$timestamp = (int) substr($this->_start, 4);
 				if ($timestamp === 0)
+				{
 					$this->_start = 0;
+				}
 				else
 				{
 					// Find the number of messages posted before said time...
@@ -268,9 +278,13 @@ class Display extends \ElkArte\AbstractController
 			{
 				$this->_virtual_msg = (int) substr($this->_start, 3);
 				if (!$topicinfo['unapproved_posts'] && $this->_virtual_msg >= $topicinfo['id_last_msg'])
+				{
 					$context['start_from'] = $total_visible_posts - 1;
+				}
 				elseif (!$topicinfo['unapproved_posts'] && $this->_virtual_msg <= $topicinfo['id_first_msg'])
+				{
 					$context['start_from'] = 0;
+				}
 				else
 				{
 					$only_approved = $modSettings['postmod_active'] && $topicinfo['unapproved_posts'] && !allowedTo('approve_posts');
@@ -294,7 +308,9 @@ class Display extends \ElkArte\AbstractController
 		// Check if spellchecking is both enabled and actually working. (for quick reply.)
 		$context['show_spellchecking'] = !empty($modSettings['enableSpellChecking']) && function_exists('pspell_new');
 		if ($context['show_spellchecking'])
+		{
 			loadJavascriptFile('spellcheck.js', array('defer' => true));
+		}
 
 		// Are we showing signatures - or disabled fields?
 		$context['signature_enabled'] = substr($modSettings['signature_settings'], 0, 1) == 1;
@@ -313,7 +329,9 @@ class Display extends \ElkArte\AbstractController
 		// Did we report a post to a moderator just now?
 		$context['report_sent'] = isset($this->_req->query->reportsent);
 		if ($context['report_sent'])
+		{
 			$this->_template_layers->add('report_sent');
+		}
 
 		// Let's get nosey, who is viewing this topic?
 		if (!empty($settings['display_who_viewing']))
@@ -325,10 +343,14 @@ class Display extends \ElkArte\AbstractController
 		// If all is set, but not allowed... just unset it.
 		$can_show_all = !empty($modSettings['enableAllMessages']) && $total_visible_posts > $context['messages_per_page'] && $total_visible_posts < $modSettings['enableAllMessages'];
 		if (isset($this->_req->query->all) && !$can_show_all)
+		{
 			unset($this->_req->query->all);
+		}
 		// Otherwise, it must be allowed... so pretend start was -1.
 		elseif (isset($this->_req->query->all))
+		{
 			$this->_start = -1;
+		}
 
 		// Construct the page index, allowing for the .START method...
 		$context['page_index'] = constructPageIndex(getUrl('topic', ['topic' => $topicinfo['id_topic'], 'start' => '%1$d', 'subject' => $topicinfo['subject']]), $this->_start, $total_visible_posts, $context['messages_per_page'], true, array('all' => $can_show_all, 'all_selected' => isset($this->_req->query->all)));
@@ -424,14 +446,18 @@ class Display extends \ElkArte\AbstractController
 
 			$mark_at_msg = max($messages);
 			if ($mark_at_msg >= $topicinfo['id_last_msg'])
+			{
 				$mark_at_msg = $modSettings['maxMsgID'];
+			}
 			if ($mark_at_msg >= $topicinfo['new_from'])
 			{
 				markTopicsRead(array($this->user->id, $topicinfo['id_topic'], $mark_at_msg, $topicinfo['unwatched']), $topicinfo['new_from'] !== 0);
 				$numNewTopics = getUnreadCountSince($board, empty($_SESSION['id_msg_last_visit']) ? 0 : $_SESSION['id_msg_last_visit']);
 
 				if (empty($numNewTopics))
+				{
 					$boardseen = true;
+				}
 			}
 
 			updateReadNotificationsFor($topicinfo['id_topic'], $board);
@@ -453,7 +479,9 @@ class Display extends \ElkArte\AbstractController
 
 			// Fetch attachments.
 			if (!empty($modSettings['attachmentEnable']) && allowedTo('view_attachments'))
+			{
 				$attachments = getAttachments($messages, $includeUnapproved, 'filter_accessible_attachment', $all_posters);
+			}
 
 			$msg_parameters = array(
 				'message_list' => $messages,
@@ -466,7 +494,7 @@ class Display extends \ElkArte\AbstractController
 			// What?  It's not like it *couldn't* be only guests in this topic...
 			if (!empty($posters))
 			{
-				\ElkArte\MembersList::load($posters);
+				MembersList::load($posters);
 			}
 
 			// Load in the likes for this group of messages
@@ -507,7 +535,9 @@ class Display extends \ElkArte\AbstractController
 
 			// Go to the last message if the given time is beyond the time of the last message.
 			if (isset($context['start_from']) && $context['start_from'] >= $topicinfo['num_replies'])
+			{
 				$context['start_from'] = $topicinfo['num_replies'];
+			}
 
 			// Since the anchor information is needed on the top of the page we load these variables beforehand.
 			$context['first_message'] = isset($messages[$firstIndex]) ? $messages[$firstIndex] : $messages[0];
@@ -528,7 +558,7 @@ class Display extends \ElkArte\AbstractController
 		list ($sig_limits) = explode(':', $modSettings['signature_settings']);
 		$signature_settings = explode(',', $sig_limits);
 
-		$this->_icon_sources = new \ElkArte\MessageTopicIcons(!empty($modSettings['messageIconChecks_enable']), $settings['theme_dir']);
+		$this->_icon_sources = new MessageTopicIcons(!empty($modSettings['messageIconChecks_enable']), $settings['theme_dir']);
 		if ($this->user->is_guest)
 		{
 			$this->_show_signatures = !empty($signature_settings[8]) ? (int) $signature_settings[8] : 0;
@@ -540,12 +570,12 @@ class Display extends \ElkArte\AbstractController
 
 		// Set the callback.  (do you REALIZE how much memory all the messages would take?!?)
 		// This will be called from the template.
-		$bodyParser = new \ElkArte\MessagesCallback\BodyParser\Normal(array(), false);
-		$opt = new \ElkArte\ValuesContainer([
+		$bodyParser = new Normal(array(), false);
+		$opt = new ValuesContainer([
 			'icon_sources' => $this->_icon_sources,
 			'show_signatures' => $this->_show_signatures,
 		]);
-		$renderer = new \ElkArte\MessagesCallback\DisplayRenderer($messages_request, $this->user, $bodyParser, $opt);
+		$renderer = new DisplayRenderer($messages_request, $this->user, $bodyParser, $opt);
 
 		$context['get_message'] = array($renderer, 'getContext');
 
@@ -567,7 +597,9 @@ class Display extends \ElkArte\AbstractController
 			'can_restore_msg' => 'move_any',
 		);
 		foreach ($common_permissions as $contextual => $perm)
+		{
 			$context[$contextual] = allowedTo($perm);
+		}
 
 		// Permissions with _any/_own versions.  $context[YYY] => ZZZ_any/_own.
 		$anyown_permissions = array(
@@ -578,7 +610,9 @@ class Display extends \ElkArte\AbstractController
 			'can_reply_unapproved' => 'post_unapproved_replies',
 		);
 		foreach ($anyown_permissions as $contextual => $perm)
+		{
 			$context[$contextual] = allowedTo($perm . '_any') || ($context['user']['started'] && allowedTo($perm . '_own'));
+		}
 
 		// Cleanup all the permissions with extra stuff...
 		$context['can_mark_notify'] &= !$context['user']['is_guest'];
@@ -770,13 +804,36 @@ class Display extends \ElkArte\AbstractController
 
 		// Quick reply & modify enabled?
 		if ($context['can_reply'] && !empty($options['display_quick_reply']))
+		{
 			$this->_template_layers->add('quickreply');
+		}
 
 		$this->_template_layers->add('pages_and_buttons');
 
 		// Allow adding new buttons easily.
 		call_integration_hook('integrate_display_buttons');
 		call_integration_hook('integrate_mod_buttons');
+	}
+
+	/**
+	 * If we are in a topic and don't have permission to approve it then duck out now.
+	 * This is an abuse of the method, but it's easier that way.
+	 *
+	 * @param string $action the function name of the current action
+	 *
+	 * @return bool
+	 * @throws \ElkArte\Exceptions\Exception not_a_topic
+	 */
+	public function trackStats($action = '')
+	{
+		global $topic, $board_info;
+
+		if (!empty($topic) && empty($board_info['cur_topic_approved']) && !allowedTo('approve_posts') && ($this->user->id != $board_info['cur_topic_starter'] || $this->user->is_guest))
+		{
+			throw new Exception('not_a_topic', false);
+		}
+
+		return parent::trackStats($action);
 	}
 
 	/**
@@ -794,13 +851,17 @@ class Display extends \ElkArte\AbstractController
 		require_once(SUBSDIR . '/Messages.subs.php');
 
 		if (empty($this->_req->post->msgs))
+		{
 			redirectexit('topic=' . $topic . '.' . $this->_req->getQuery('start', 'intval'));
+		}
 
 		$messages = array_map('intval', $this->_req->post->msgs);
 
 		// We are restoring messages. We handle this in another place.
 		if (isset($this->_req->query->restore_selected))
+		{
 			redirectexit('action=restoretopic;msgs=' . implode(',', $messages) . ';' . $context['session_var'] . '=' . $context['session_id']);
+		}
 
 		if (isset($this->_req->query->split_selection))
 		{
@@ -815,16 +876,24 @@ class Display extends \ElkArte\AbstractController
 
 		// Allowed to delete any message?
 		if (allowedTo('delete_any'))
+		{
 			$allowed_all = true;
+		}
 		// Allowed to delete replies to their messages?
 		elseif (allowedTo('delete_replies'))
+		{
 			$allowed_all = $topic_info['id_member_started'] == $this->user->id;
+		}
 		else
+		{
 			$allowed_all = false;
+		}
 
 		// Make sure they're allowed to delete their own messages, if not any.
 		if (!$allowed_all)
+		{
 			isAllowedTo('delete_own');
+		}
 
 		// Allowed to remove which messages?
 		$messages = determineRemovableMessages($topic, $messages, $allowed_all);
@@ -832,17 +901,21 @@ class Display extends \ElkArte\AbstractController
 		// Get the first message in the topic - because you can't delete that!
 		$first_message = $topic_info['id_first_msg'];
 		$last_message = $topic_info['id_last_msg'];
-		$remover = new \ElkArte\MessagesDelete($modSettings['recycle_enable'], $modSettings['recycle_board']);
+		$remover = new MessagesDelete($modSettings['recycle_enable'], $modSettings['recycle_board']);
 
 		// Delete all the messages we know they can delete. ($messages)
 		foreach ($messages as $message => $info)
 		{
 			// Just skip the first message - if it's not the last.
 			if ($message == $first_message && $message != $last_message)
+			{
 				continue;
+			}
 			// If the first message is going then don't bother going back to the topic as we're effectively deleting it.
 			elseif ($message == $first_message)
+			{
 				$topicGone = true;
+			}
 
 			$remover->removeMessage($message);
 		}

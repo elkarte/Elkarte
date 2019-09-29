@@ -8,11 +8,14 @@
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause (see accompanying LICENSE.txt file)
  *
  * This file contains code covered by:
- * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * copyright: 2011 Simple Machines (http://www.simplemachines.org)
  *
  * @version 2.0 dev
  *
  */
+
+use BBC\ParserWrapper;
+use ElkArte\MembersList;
 
 /**
  * Reads the custom profile fields table and gets all items that were defined
@@ -64,15 +67,19 @@ function ml_CustomProfile()
 		{
 			// Build the sort queries.
 			if ($row['field_type'] != 'check')
+			{
 				$context['custom_profile_fields']['columns'][$curField]['sort'] = array(
 					'down' => 'LENGTH(cfd' . $curField . '.value) > 0 ASC, COALESCE(cfd' . $curField . '.value, 1=1) DESC, cfd' . $curField . '.value DESC',
 					'up' => 'LENGTH(cfd' . $curField . '.value) > 0 DESC, COALESCE(cfd' . $curField . '.value, 1=1) ASC, cfd' . $curField . '.value ASC'
 				);
+			}
 			else
+			{
 				$context['custom_profile_fields']['columns'][$curField]['sort'] = array(
 					'down' => 'cfd' . $curField . '.value DESC',
 					'up' => 'cfd' . $curField . '.value ASC'
 				);
+			}
 
 			// Build the join and parameters for the sort query
 			$context['custom_profile_fields']['join'] = 'LEFT JOIN {db_prefix}custom_fields_data AS cfd' . $curField . ' ON (cfd' . $curField . '.variable = {string:cfd' . $curField . '} AND cfd' . $curField . '.id_member = mem.id_member)';
@@ -294,11 +301,13 @@ function ml_findSearchableCustomFields()
 	);
 	$context['custom_search_fields'] = array();
 	while ($row = $db->fetch_assoc($request))
+	{
 		$context['custom_search_fields'][$row['col_name']] = array(
 			'colname' => $row['col_name'],
 			'name' => $row['field_name'],
 			'desc' => $row['field_desc'],
 		);
+	}
 	$db->free_result($request);
 }
 
@@ -318,29 +327,32 @@ function printMemberListRows($request)
 	$result = $db->query('', '
 		SELECT MAX(posts)
 		FROM {db_prefix}members',
-		array(
-		)
+		array()
 	);
 	list ($most_posts) = $db->fetch_row($result);
 	$db->free_result($result);
 
 	// Avoid division by zero...
 	if ($most_posts == 0)
+	{
 		$most_posts = 1;
+	}
 
 	$members = array();
 	while ($row = $db->fetch_assoc($request))
+	{
 		$members[] = $row['id_member'];
+	}
 
 	// Load all the members for display.
-	\ElkArte\MembersList::load($members);
+	MembersList::load($members);
 
-	$bbc_parser = \BBC\ParserWrapper::instance();
+	$bbc_parser = ParserWrapper::instance();
 
 	$context['members'] = array();
 	foreach ($members as $member)
 	{
-		$member_context = \ElkArte\MembersList::get($member);
+		$member_context = MembersList::get($member);
 		$member_context->loadContext(true);
 		if ($member_context->isEmpty())
 		{

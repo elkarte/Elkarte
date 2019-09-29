@@ -49,6 +49,20 @@ class AttachmentErrorContext
 	private $_active_attach = null;
 
 	/**
+	 * Find and return Attachment_ErrorContext instance if it exists,
+	 * or create it if it doesn't exist
+	 */
+	public static function context()
+	{
+		if (self::$_context === null)
+		{
+			self::$_context = new self();
+		}
+
+		return self::$_context;
+	}
+
+	/**
 	 * Add attachment
 	 *
 	 * - Automatically activate the attachments added
@@ -258,11 +272,6 @@ class AttachmentErrorContext
 		return $returns;
 	}
 
-	public function getName()
-	{
-		return 'attach_error_title';
-	}
-
 	/**
 	 * Return the type of the error
 	 */
@@ -271,17 +280,8 @@ class AttachmentErrorContext
 		return 1;
 	}
 
-	/**
-	 * Find and return Attachment_ErrorContext instance if it exists,
-	 * or create it if it doesn't exist
-	 */
-	public static function context()
+	public function getName()
 	{
-		if (self::$_context === null)
-		{
-			self::$_context = new self();
-		}
-
-		return self::$_context;
+		return 'attach_error_title';
 	}
 }
