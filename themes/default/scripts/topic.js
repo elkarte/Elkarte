@@ -87,7 +87,7 @@ QuickModifyTopic.prototype.onDocReceived_modify_topic = function (XMLDoc)
 	this.sBuffSubject = this.oCurSubjectDiv.innerHTML;
 
 	// Hide the tooltip text, don't want them for this element during the edit
-	if ($.isFunction($.fn.SiteTooltip))
+	if (typeof $.fn.SiteTooltip === 'function')
 	{
 		this.oSavetipElem = this.oCurSubjectDiv.nextSibling;
 		this.sSavetip = this.oSavetipElem.innerHTML;
@@ -189,7 +189,7 @@ QuickModifyTopic.prototype.modify_topic_done = function (XMLDoc)
 	this.bInEditMode = false;
 
 	// Redo tooltips if they are on since we just pulled the rug out on this one
-	if ($.isFunction($.fn.SiteTooltip))
+	if (typeof $.fn.SiteTooltip === 'function')
 	{
 		this.oSavetipElem.innerHTML = this.sSavetip;
 		$('.preview').SiteTooltip();
@@ -360,10 +360,11 @@ QuickReply.prototype.swap = function (bInit, bSavestate)
 	}
 	else
 	{
+		console.log(bIsFull);
 		$('#' + this.opt.sContainerId).slideDown();
 		if (bIsFull)
 		{
-			$('#' + sEditorId).resize();
+			$('#' + sEditorId).trigger('resize');
 		}
 	}
 
@@ -696,13 +697,13 @@ QuickModify.prototype.onModifyDone = function (XMLDoc)
 		}
 
 		// Re embed any video links if the feature is available
-		if ($.isFunction($.fn.linkifyvideo))
+		if (typeof $.fn.linkifyvideo === 'function')
 		{
 			$().linkifyvideo(oEmbedtext, this.sCurMessageId);
 		}
 
 		// Hello, Sweetie
-		$('#' + this.sCurMessageId + ' .spoilerheader').click(function ()
+		$('#' + this.sCurMessageId + ' .spoilerheader').on('click', function ()
 		{
 			$(this).next().children().slideToggle("fast");
 		});
@@ -1102,20 +1103,20 @@ function expandThumbLB(thumbID, messageID)
 		event.preventDefault();
 
 		// escape
-		if (event.keyCode === 27)
+		if (event.which === 27)
 		{
 			closeLightbox();
 		}
 
 		// left
-		if (event.keyCode === 37)
+		if (event.which === 37)
 		{
 			prevNav();
 			navLightbox();
 		}
 
 		// right
-		if (event.keyCode === 39)
+		if (event.which === 39)
 		{
 			nextNav();
 			navLightbox();

@@ -301,7 +301,7 @@ function template_bounce_template()
 	</form>
 	<script>
 		$(function() {
-			$("#preview_button").click(function() {
+			$("#preview_button").on("click", function() {
 				return ajax_getEmailTemplatePreview();
 			});
 		});

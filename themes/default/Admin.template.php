@@ -797,7 +797,7 @@ function template_edit_censored()
 	</div>
 	<script>
 		$(function() {
-			$("#preview_button").click(function() {
+			$("#preview_button").on("click", function() {
 				return ajax_getCensorPreview();
 			});
 		});

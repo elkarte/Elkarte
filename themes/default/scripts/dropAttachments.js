@@ -690,7 +690,7 @@
 
 			// Rather click and select?
 			$input = obj.find('#attachment_click');
-			$input.change(function (e)
+			$input.on('change', function (e)
 			{
 				e.preventDefault();
 				var files = $(this)[0].files;

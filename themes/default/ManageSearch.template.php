@@ -247,7 +247,7 @@ function template_select_search_method()
 	<script>
 		showhideSearchMethod();
 
-		$("#search_index").find("input").change(function() {
+		$("#search_index").find("input").on("change", function() {
 			showhideSearchMethod();
 		});
    </script>';

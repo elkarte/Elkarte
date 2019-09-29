@@ -133,7 +133,7 @@ String.prototype.php_strtr = function (sFrom, sTo)
 
 /**
  * Simulate PHP's strtolower (in SOME cases PHP uses ISO-8859-1 case folding).
- * @returns {String.prototype@call;php_strtr}
+ * @returns {string}
  */
 String.prototype.php_strtolower = function ()
 {
@@ -328,16 +328,15 @@ smc_Popup.prototype.show = function ()
 
 	// Trigger hide on escape or mouse click
 	var popup_instance = this;
-	$(document).mouseup(function (e)
+	$(document).on('mouseup', function (e)
 	{
 		if ($('#' + popup_instance.popup_id).has(e.target).length === 0)
 		{
 			popup_instance.hide();
 		}
-	})
-		.keyup(function (e)
+	}).on('keyup', function (e)
 		{
-			if (e.keyCode === 27)
+			if (e.which === 27)
 			{
 				popup_instance.hide();
 			}

@@ -338,7 +338,6 @@
 
 			// Init the draft instance, load in the options
 			oDrafts = new Elk_Drafts(this.opts.draftOptions);
-			oDrafts.opts.bPM = oDrafts.opts.bPM ? true : false;
 			oDrafts.base = base;
 
 			// Start the autosave timer

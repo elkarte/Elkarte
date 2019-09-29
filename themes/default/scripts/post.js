@@ -389,7 +389,7 @@ function onDocSent(XMLDoc)
 	$('html, body').animate({scrollTop: $('#preview_section').offset().top}, 'slow');
 
 	// Preview video links if the feature is available
-	if ($.isFunction($.fn.linkifyvideo))
+	if (typeof $.fn.linkifyvideo === 'function')
 	{
 		$().linkifyvideo(oEmbedtext, 'preview_body');
 	}

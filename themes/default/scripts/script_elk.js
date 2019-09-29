@@ -1535,7 +1535,7 @@ function loadAddNewPoll(button, id_board, form_name)
 		var $_pollicon = $('#icon');
 		if ($_pollicon.val() === 'xx')
 		{
-			$_pollicon.val('poll').change();
+			$_pollicon.val('poll').trigger('change');
 		}
 
 		// Add poll to the form action
@@ -1563,7 +1563,7 @@ function loadAddNewPoll(button, id_board, form_name)
 
 		if ($_icon.val() === 'poll')
 		{
-			$_icon.val('xx').change();
+			$_icon.val('xx').trigger('change');
 		}
 
 		// Remove poll to the form action
@@ -1825,7 +1825,7 @@ var ElkNotifier = new ElkNotifications();
 						});
 						if (firstLi == false)
 						{
-							$(this).click();
+							$(this).trigger('click');
 							firstLi = true;
 						}
 					});

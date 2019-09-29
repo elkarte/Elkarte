@@ -81,8 +81,7 @@ elk_AdminIndex.prototype.loadAdminIndex = function ()
 elk_AdminIndex.prototype.setAnnouncement = function (announcement)
 {
 	var oElem = document.getElementById(this.opt.sAnnouncementContainerId),
-		sMessages = this.init_news ? oElem.innerHTML : '',
-		sMessage = '';
+		sMessages = this.init_news ? oElem.innerHTML : '';
 
 	sMessage = this.opt.sAnnouncementMessageTemplate.replace('%href%', announcement.html_url).replace('%subject%', announcement.name).replace('%time%', announcement.published_at.replace(/[TZ]/g, ' ')).replace('%message%', announcement.body).replace(/\n/g, '<br />').replace(/\r/g, '');
 
@@ -1124,7 +1123,7 @@ function select_in_category(operation, brd_list)
  */
 $(function ()
 {
-	$('#cache_accelerator').change(function ()
+	$('#cache_accelerator').on('change', function ()
 	{
 		// Hide all the settings
 		$('#cache_accelerator').find('option').each(function ()
@@ -1136,7 +1135,7 @@ $(function ()
 		$('[id^=' + $(this).val() + '_]').show();
 	})
 	// Trigger a change action so that the form is properly initialized
-		.change();
+	.trigger('change');
 });
 
 /**
@@ -1528,7 +1527,7 @@ function initEditProfileBoards()
 			$target = $('#edit_board_' + board_id),
 			$select = $('<select />')
 				.attr('name', 'boardprofile[' + board_id + ']')
-				.change(function ()
+				.on('change', function ()
 				{
 					$(this).find('option:selected').each(function ()
 					{
@@ -1557,7 +1556,7 @@ function initEditProfileBoards()
 		});
 
 		$target.replaceWith($select);
-		$select.change();
+		$select.trigger('change');
 
 		$('.edit_all_board_profiles').replaceWith($('<input type="submit" class="right_submit" />')
 			.attr('name', 'save_changes')
@@ -1927,7 +1926,7 @@ function ajax_getEmailTemplatePreview()
 					errors;
 
 				// Build the error string
-				errors = $(request).find('error').each(function ()
+				$(request).find('error').each(function ()
 				{
 					errors_html += $(this).text() + '<br />';
 				});
@@ -1992,7 +1991,7 @@ $(function ()
 {
 	var $headers = $("#mention").find("input[id^='notifications'][id$='[notification]']");
 
-	$headers.change(function ()
+	$headers.on('change', function ()
 	{
 		var $top = $(this).closest('dl'),
 			$hparent = $(this).parent();
@@ -2020,7 +2019,7 @@ $(function ()
 		$hparent.prev().show();
 	});
 
-	$headers.change();
+	$headers.trigger('change');
 });
 
 /**
@@ -2097,7 +2096,7 @@ $(function ()
 	}
 
 	// Attach our action to the core features power button
-	$(".core_features_img").click(function ()
+	$(".core_features_img").on('click', function ()
 	{
 		var cc = $(this),
 			cf = $(this).attr("id").substring(7),

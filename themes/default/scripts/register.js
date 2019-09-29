@@ -502,9 +502,9 @@ function onCheckChange()
 
 (function ($)
 {
-	$(document).ready(function ()
+	$(function ()
 	{
-		$('#agreement_lang').change(function ()
+		$('#agreement_lang').on('change', function ()
 		{
 			$.ajax({
 				type: "POST",

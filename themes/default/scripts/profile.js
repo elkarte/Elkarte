@@ -16,14 +16,14 @@
 $(function ()
 {
 	// Profile options changing karma
-	$('#karma_good, #karma_bad').keyup(function ()
+	$('#karma_good, #karma_bad').on('keyup', function ()
 	{
 		var good = parseInt($('#karma_good').val()),
 			bad = parseInt($('#karma_bad').val());
 
 		$('#karmaTotal').text((isNaN(good) ? 0 : good) - (isNaN(bad) ? 0 : bad));
 	});
-	$('.toggle_notify').change(function ()
+	$('.toggle_notify').on('change', function ()
 	{
 		if (this.checked)
 		{
@@ -33,7 +33,7 @@ $(function ()
 		{
 			$('#' + this.id + '_method').fadeOut('fast');
 		}
-	}).change();
+	}).trigger('change');
 });
 
 /**
@@ -478,7 +478,7 @@ function initWarnSlider(sliderID, levelID, levels)
 	}).slider("value", $_levelID.val());
 
 	// Just in case someone wants to type, let's keep the two in synch
-	$_levelID.keyup(function ()
+	$_levelID.on('keyup', function ()
 	{
 		var val = Math.max(0, Math.min(100, $(this).val()));
 

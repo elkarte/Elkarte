@@ -637,7 +637,7 @@ function template_warn_template()
 
 	<script>
 		$(function() {
-			$("#preview_button").click(function() {
+			$("#preview_button").on("click", function() {
 				return ajax_getTemplatePreview();
 			});
 		});

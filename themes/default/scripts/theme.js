@@ -82,7 +82,7 @@ $(function ()
 	{
 		if ($(this).data('collapsed'))
 		{
-			$(this).click();
+			$(this).trigger('click');
 		}
 	});
 

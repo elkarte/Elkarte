@@ -73,7 +73,7 @@
 		function getIMG(a, src, eURL, eURLa)
 		{
 			return $('<div class="elk_video"><a href="' + a.href + '"><img class="elk_previewvideo" alt="' + oSettings.preview_image + '" ' + 'title="' + oSettings.ctp_video + '" src="' + src + '"/></a></div>')
-				.dblclick(function (e)
+				.on('dblclick', function (e)
 				{
 					// double click loads the video but does not autoplay
 					e.preventDefault();
@@ -108,7 +108,7 @@
 			$.getJSON('http://www.vimeo.com/api/v2/video/' + videoID + '.json?callback=?', {format: "json"},
 				function (data)
 				{
-					if (typeof (data[0].thumbnail_large) !== "undefined")
+					if (typeof data[0].thumbnail_large !== "undefined")
 					{
 						callback(data[0].thumbnail_large);
 					}
@@ -132,7 +132,7 @@
 			$.getJSON('https://api.dailymotion.com/video/' + videoID + '?fields=thumbnail_480_url', {},
 				function (data)
 				{
-					if (typeof (data.thumbnail_480_url) !== "undefined")
+					if (typeof data.thumbnail_480_url !== "undefined")
 					{
 						callback(data.thumbnail_480_url);
 					}
@@ -183,17 +183,17 @@
 				var startAtSeconds = 0;
 
 				// Hours
-				if (typeof (startAt[1]) !== 'undefined')
+				if (typeof startAt[1] !== 'undefined')
 				{
 					startAtSeconds += parseInt(startAt[1]) * 3600;
 				}
 				// Minutes
-				if (typeof (startAt[2]) !== 'undefined')
+				if (typeof startAt[2] !== 'undefined')
 				{
 					startAtSeconds += parseInt(startAt[2]) * 60;
 				}
 				// Seconds
-				if (typeof (startAt[3]) !== 'undefined')
+				if (typeof startAt[3] !== 'undefined')
 				{
 					startAtSeconds += parseInt(startAt[3]);
 				}
@@ -277,7 +277,8 @@
 
 		// Get the links in the id="msg_1234 divs.
 		var links = null;
-		if (typeof (msgid) !== "undefined" && msgid !== null)
+
+		if (typeof msgid !== "undefined" && msgid !== null)
 		{
 			links = $('#' + msgid + ' a');
 		}
@@ -327,7 +328,7 @@
 				args = null;
 
 			// One of our video provider domains?
-			if (already_embedded < oSettings.embed_limit && m !== null && typeof (handlers[m[1]]) !== "undefined" && handlers[m[1]] !== null)
+			if (already_embedded < oSettings.embed_limit && m !== null && typeof handlers[m[1]] !== "undefined" && handlers[m[1]] !== null)
 			{
 				// Call the handler and get the tag to insert
 				handler = handlers[m[1]];
