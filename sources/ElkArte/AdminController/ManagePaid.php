@@ -697,12 +697,10 @@ class ManagePaid extends AbstractController
 				{
 					removeSubscription($context['sub_id'], $subscription_status['id_member']);
 				}
-
 				elseif ($status == 1 && $subscription_status['old_status'] != 1)
 				{
 					addSubscription($context['sub_id'], $subscription_status['id_member'], 0, $starttime, $endtime);
 				}
-
 				else
 				{
 					$item = array(

@@ -696,7 +696,8 @@ function rebuildModCache()
 	if ($group_query == '0=1')
 	{
 		$groups = $db->fetchQuery('
-			SELECT id_group
+			SELECT 
+				id_group
 			FROM {db_prefix}group_moderators
 			WHERE id_member = {int:current_member}',
 			array(
@@ -822,7 +823,8 @@ function findUser($where, $where_params, $fatal = true)
 
 	// Find the user!
 	$request = $db->query('', '
-		SELECT id_member, real_name, member_name, email_address, is_activated, validation_code, lngfile, openid_uri, secret_question, passwd
+		SELECT 
+			id_member, real_name, member_name, email_address, is_activated, validation_code, lngfile, openid_uri, secret_question, passwd
 		FROM {db_prefix}members
 		WHERE ' . $where . '
 		LIMIT 1',
@@ -835,7 +837,8 @@ function findUser($where, $where_params, $fatal = true)
 		$db->free_result($request);
 
 		$request = $db->query('', '
-			SELECT id_member, real_name, member_name, email_address, is_activated, validation_code, lngfile, openid_uri, secret_question
+			SELECT 
+				id_member, real_name, member_name, email_address, is_activated, validation_code, lngfile, openid_uri, secret_question
 			FROM {db_prefix}members
 			WHERE email_address = {string:email_address}
 			LIMIT 1',
@@ -847,10 +850,8 @@ function findUser($where, $where_params, $fatal = true)
 			{
 				throw new \ElkArte\Exceptions\Exception('no_user_with_email', false);
 			}
-			else
-			{
-				return false;
-			}
+
+			return false;
 		}
 	}
 
@@ -873,7 +874,8 @@ function userByEmail($email, $username = null)
 	$db = database();
 
 	$request = $db->query('', '
-		SELECT id_member
+		SELECT 
+			id_member
 		FROM {db_prefix}members
 		WHERE email_address = {string:email_address}' . ($username === null ? '' : '
 			OR email_address = {string:username}') . '
@@ -921,7 +923,8 @@ function loadExistingMember($name, $is_id = false)
 	if ($is_id)
 	{
 		$request = $db->query('', '
-			SELECT passwd, id_member, id_group, lngfile, is_activated, email_address, additional_groups, member_name, password_salt,
+			SELECT 
+				passwd, id_member, id_group, lngfile, is_activated, email_address, additional_groups, member_name, password_salt,
 				openid_uri, passwd_flood, otp_secret, enable_otp, otp_used
 			FROM {db_prefix}members
 			WHERE id_member = {int:id_member}
@@ -935,7 +938,8 @@ function loadExistingMember($name, $is_id = false)
 	{
 		// Try to find the user, assuming a member_name was passed...
 		$request = $db->query('', '
-			SELECT passwd, id_member, id_group, lngfile, is_activated, email_address, additional_groups, member_name, password_salt,
+			SELECT 
+				passwd, id_member, id_group, lngfile, is_activated, email_address, additional_groups, member_name, password_salt,
 				openid_uri, passwd_flood, otp_secret, enable_otp, otp_used
 			FROM {db_prefix}members
 			WHERE {column_case_insensitive:member_name} = {string_case_insensitive:user_name}
@@ -950,8 +954,9 @@ function loadExistingMember($name, $is_id = false)
 			$db->free_result($request);
 
 			$request = $db->query('', '
-				SELECT passwd, id_member, id_group, lngfile, is_activated, email_address, additional_groups, member_name, password_salt, openid_uri,
-				passwd_flood, otp_secret, enable_otp, otp_used
+				SELECT 
+					passwd, id_member, id_group, lngfile, is_activated, email_address, additional_groups, member_name, password_salt, openid_uri,
+					passwd_flood, otp_secret, enable_otp, otp_used
 				FROM {db_prefix}members
 				WHERE email_address = {string:user_name}
 				LIMIT 1',

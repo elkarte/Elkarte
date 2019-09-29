@@ -27,6 +27,7 @@ use ElkArte\Util;
  * @param bool $unread = false
  * @param bool $resetTopics = false
  * @package Boards
+ * @throws \ElkArte\Exceptions\Exception
  */
 function markBoardsRead($boards, $unread = false, $resetTopics = false)
 {
@@ -646,6 +647,7 @@ function createBoard($boardOptions)
  *                additional data like the number of boards
  * @return array An array of boards sorted according to the normal boards order
  * @package Boards
+ * @throws \ElkArte\Exceptions\Exception
  */
 function getBoardList($boardListOptions = array(), $simple = false)
 {
@@ -716,7 +718,6 @@ function getBoardList($boardListOptions = array(), $simple = false)
 	{
 		$where[] = '{query_wanna_see_board}';
 	}
-
 	elseif (empty($boardListOptions['override_permissions']))
 	{
 		$where[] = '{query_see_board}';

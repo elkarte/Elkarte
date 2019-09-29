@@ -1026,7 +1026,6 @@ function updateLastMessages($setboards, $id_msg = 0)
 				'boards' => array($id)
 			);
 		}
-
 		else
 		{
 			$board_updates[$msg . '-' . $lastModified[$id]]['boards'][] = $id;
