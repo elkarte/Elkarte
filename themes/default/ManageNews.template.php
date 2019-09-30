@@ -6,7 +6,7 @@
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause (see accompanying LICENSE.txt file)
  *
  * This file contains code covered by:
- * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * copyright: 2011 Simple Machines (http://www.simplemachines.org)
  *
  * @version 2.0 dev
  *
@@ -270,8 +270,10 @@ function template_email_members_compose()
 			</div>';
 
 	foreach ($context['recipients'] as $key => $values)
+	{
 		echo '
 			<input type="hidden" name="', $key, '" value="', implode(($key == 'emails' ? ';' : ','), $values), '" />';
+	}
 
 	// The vars used to preview a newsletter without loading a new page, used by post.js previewControl()
 	theme()->addInlineJavascript('
@@ -333,8 +335,10 @@ function template_email_members_send()
 
 	// All the things we must remember!
 	foreach ($context['recipients'] as $key => $values)
+	{
 		echo '
 					<input type="hidden" name="', $key, '" value="', implode(($key == 'emails' ? ';' : ','), $values), '" />';
+	}
 
 	echo '
 				</div>

@@ -6,7 +6,7 @@
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause (see accompanying LICENSE.txt file)
  *
  * This file contains code covered by:
- * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * copyright: 2011 Simple Machines (http://www.simplemachines.org)
  *
  * @version 2.0 dev
  *
@@ -48,10 +48,12 @@ function template_recent()
 	template_pagesection();
 
 	if (!empty($context['using_relative_time']))
+	{
 		echo '
 		<script>
 			$(\'.topic_latest\').addClass(\'relative\');
 		</script>';
+	}
 }
 
 /**
@@ -68,11 +70,13 @@ function template_unread()
 		template_pagesection('recent_buttons', 'right');
 
 		if ($context['showCheckboxes'])
+		{
 			echo '
 					<form id="quickModForm" action="', $scripturl, '?action=quickmod" method="post" accept-charset="UTF-8" name="quickModForm">
 						<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
 						<input type="hidden" name="qaction" value="markread" />
 						<input type="hidden" name="redirect_url" value="', $context['querystring_board_limits'], '" />';
+		}
 
 		echo '
 						<h2 class="category_header" id="unread_header">
@@ -82,10 +86,12 @@ function template_unread()
 
 		// Show a "select all" box for quick moderation?
 		if ($context['showCheckboxes'])
+		{
 			echo '
 							<li class="listlevel1 quickmod_select_all">
 								<input type="checkbox" onclick="invertAll(this, document.getElementById(\'quickModForm\'), \'topics[]\');" />
 							</li>';
+		}
 
 		$current_header = $context['topics_headers'][$context['sort_by']];
 		echo '
@@ -98,10 +104,12 @@ function template_unread()
 								<ul class="menulevel2" id="sortby">';
 
 		foreach ($context['topics_headers'] as $key => $value)
+		{
 			echo '
 									<li class="listlevel2 sort_by_item" id="sort_by_item_', $key, '">
 										<a href="', $value['url'], '" class="linklevel2">', $txt[$key], ' ', $value['sort_dir_img'], '</a>
 									</li>';
+		}
 
 		echo '
 								</ul>
@@ -113,16 +121,24 @@ function template_unread()
 		{
 			// Calculate the color class of the topic.
 			if ($topic['is_sticky'] && $topic['is_locked'])
+			{
 				$color_class = 'locked_row sticky_row';
+			}
 			// Sticky topics should get a different color, too.
 			elseif ($topic['is_sticky'])
+			{
 				$color_class = 'sticky_row';
+			}
 			// Locked topics get special treatment as well.
 			elseif ($topic['is_locked'])
+			{
 				$color_class = 'locked_row';
+			}
 			// Last, but not least: regular topics.
 			else
+			{
 				$color_class = 'basic_row';
+			}
 
 			echo '
 							<li class="', $color_class, '">
@@ -130,8 +146,10 @@ function template_unread()
 									<p class="topic_icons', isset($message_icon_sprite[$topic['first_post']['icon']]) ? ' topicicon i-' . $topic['first_post']['icon'] : '', '">';
 
 			if (!isset($message_icon_sprite[$topic['first_post']['icon']]))
+			{
 				echo '
 										<img src="', $topic['first_post']['icon_url'], '" alt="" />';
+			}
 
 			echo '
 										', $topic['is_posted_in'] ? '<span class="fred topicicon i-profile"></span>' : '', '
@@ -163,10 +181,12 @@ function template_unread()
 								</div>';
 
 			if ($context['showCheckboxes'])
+			{
 				echo '
 								<p class="topic_moderation" >
 									<input type="checkbox" name="topics[]" value="', $topic['id'], '" />
 								</p>';
+			}
 
 			echo '
 							</li>';
@@ -176,10 +196,13 @@ function template_unread()
 						</ul>';
 
 		if ($context['showCheckboxes'])
+		{
 			echo '
 					</form>';
+		}
 	}
 	else
+	{
 		echo '
 					<div class="forum_category">
 						<h2 class="category_header">
@@ -189,6 +212,7 @@ function template_unread()
 							', $context['showing_all_topics'] ? '<strong>' . $txt['find_no_results'] . '</strong>' : $txt['unread_topics_visit_none'], '
 						</div>
 					</div>';
+	}
 }
 
 function template_unread_below()
@@ -205,10 +229,12 @@ function template_unread_below()
 		template_basicicons_legend();
 
 		if (!empty($context['using_relative_time']))
+		{
 			echo '
 			<script>
 				$(\'.topic_latest\').addClass(\'relative\');
 			</script>';
+		}
 
 		echo '
 		</div>';

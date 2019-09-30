@@ -22,7 +22,9 @@ function template_list_groups_collapsible($group = 'default_groups_list')
 	$all_selected = true;
 
 	if (!isset($current_group_list['id']))
+	{
 		$current_group_list['id'] = $group;
+	}
 
 	echo '
 		<fieldset id="', $current_group_list['id'], '">
@@ -65,15 +67,19 @@ function template_select_boards($name, $label = '', $extra = '', $all = false)
 	global $context, $txt;
 
 	if (!empty($label))
+	{
 		echo '
 	<label for="', $name, '">', $label, ' </label>';
+	}
 
 	echo '
 	<select name="', $name, '" id="', $name, '" ', $extra, ' >';
 
 	if ($all)
+	{
 		echo '
 		<option value="">', $txt['icons_edit_icons_all_boards'], '</option>';
+	}
 
 	foreach ($context['categories'] as $category)
 	{
@@ -81,8 +87,10 @@ function template_select_boards($name, $label = '', $extra = '', $all = false)
 		<optgroup label="', $category['name'], '">';
 
 		foreach ($category['boards'] as $board)
+		{
 			echo '
 			<option value="', $board['id'], '"', !empty($board['selected']) ? ' selected="selected"' : '', !empty($context['current_board']) && $board['id'] == $context['current_board'] && $context['boards_current_disabled'] ? ' disabled="disabled"' : '', '>', $board['child_level'] > 0 ? str_repeat('&#8195;', $board['child_level'] - 1) . '&#8195;&#10148;' : '', $board['name'], '</option>';
+		}
 		echo '
 		</optgroup>';
 	}

@@ -6,7 +6,7 @@
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause (see accompanying LICENSE.txt file)
  *
  * This file contains code covered by:
- * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * copyright: 2011 Simple Machines (http://www.simplemachines.org)
  *
  * @version 2.0 dev
  *
@@ -31,8 +31,10 @@ function template_whos_selection_above()
 				<select name="show_top" id="show_top" onchange="document.forms.whoFilter.show.value = this.value; document.forms.whoFilter.submit();">';
 
 	foreach ($context['show_methods'] as $value => $label)
+	{
 		$extra .= '
 					<option value="' . $value . '" ' . ($value == $context['show_by'] ? ' selected="selected"' : '') . '>' . $label . '</option>';
+	}
 
 	$extra .= '
 				</select>
@@ -92,10 +94,12 @@ function template_whos_online()
 
 	// No members?
 	if (empty($context['members']))
+	{
 		echo '
 				<div class="well centertext">
 					', $txt['who_no_online_' . ($context['show_by'] == 'guests' || $context['show_by'] == 'spiders' ? $context['show_by'] : 'members')], '
 				</div>';
+	}
 
 	echo '
 			</div>';
@@ -113,8 +117,10 @@ function template_whos_selection_below()
 				<select name="show" id="show" onchange="document.forms.whoFilter.submit();">';
 
 	foreach ($context['show_methods'] as $value => $label)
+	{
 		$extra .= '
 					<option value="' . $value . '" ' . ($value == $context['show_by'] ? ' selected="selected"' : '') . '>' . $label . '</option>';
+	}
 
 	$extra .= '
 				</select>
@@ -145,14 +151,18 @@ function template_credits()
 	foreach ($context['credits'] as $section)
 	{
 		if (isset($section['pretext']))
+		{
 			echo '
 		<div class="content">
 			', $section['pretext'], '
 		</div>';
+		}
 
 		if (isset($section['title']))
+		{
 			echo '
 			<h2 class="category_header">', $section['title'], '</h2>';
+		}
 
 		echo '
 		<div class="content">
@@ -161,15 +171,19 @@ function template_credits()
 		foreach ($section['groups'] as $group)
 		{
 			if (isset($group['title']))
+			{
 				echo '
 				<dt>
 					<strong>', $group['title'], '</strong>
 				</dt>
 				<dd>';
+			}
 
 			// Try to make this read nicely.
 			if (count($group['members']) <= 2)
+			{
 				echo implode(' ' . $txt['credits_and'] . ' ', $group['members']);
+			}
 			else
 			{
 				$last_peep = array_pop($group['members']);
@@ -184,8 +198,10 @@ function template_credits()
 			</dl>';
 
 		if (isset($section['posttext']))
+		{
 			echo '
 			<p><em>', $section['posttext'], '</em></p>';
+		}
 
 		echo '
 		</div>';
@@ -199,6 +215,7 @@ function template_credits()
 		<div class="content">';
 
 		foreach ($context['credits_software_graphics'] as $section => $credits)
+		{
 			echo '
 			<dl>
 				<dt>
@@ -206,6 +223,7 @@ function template_credits()
 				</dt>
 				<dd>', implode('</dd><dd>', $credits), '</dd>
 			</dl>';
+		}
 
 		echo '
 		</div>';

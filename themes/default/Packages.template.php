@@ -6,7 +6,7 @@
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause (see accompanying LICENSE.txt file)
  *
  * This file contains code covered by:
- * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * copyright: 2011 Simple Machines (http://www.simplemachines.org)
  *
  * @version 2.0 dev
  *
@@ -26,11 +26,13 @@ function template_view_package()
 		<div class="information">';
 
 	if ($context['is_installed'])
+	{
 		echo '
 			<strong>', $txt['package_installed_warning1'], '</strong><br />
 			<br />
 			', $txt['package_installed_warning2'], '<br />
 			<br />';
+	}
 
 	echo $txt['package_installed_warning3'], '
 		</div>';
@@ -57,8 +59,10 @@ function template_view_package()
 					<select name="readme_language" id="readme_language" onchange="if (this.options[this.selectedIndex].value) window.location.href = elk_prepareScriptUrl(elk_scripturl + \'', '?action=admin;area=packages;sa=', $context['uninstalling'] ? 'uninstall' : 'install', ';package=', $context['filename'], ';readme=\' + this.options[this.selectedIndex].value + \';license=\' + get_selected(\'license_language\'));">';
 
 		foreach ($context['readmes'] as $a => $b)
+		{
 			echo '
 						<option value="', $b, '"', $a === 'selected' ? ' selected="selected"' : '', '>', $b == 'default' ? $txt['package_readme_default'] : ucfirst($b), '</option>';
+		}
 
 		echo '
 					</select>
@@ -78,8 +82,10 @@ function template_view_package()
 					<select name="license_language" id="license_language" onchange="if (this.options[this.selectedIndex].value) window.location.href = elk_prepareScriptUrl(elk_scripturl + \'', '?action=admin;area=packages;sa=install', ';package=', $context['filename'], ';license=\' + this.options[this.selectedIndex].value + \';readme=\' + get_selected(\'readme_language\'));">';
 
 		foreach ($context['licenses'] as $a => $b)
+		{
 			echo '
 						<option value="', $b, '"', $a === 'selected' ? ' selected="selected"' : '', '>', $b == 'default' ? $txt['package_license_default'] : ucfirst($b), '</option>';
+		}
 
 		echo '
 					</select>
@@ -89,8 +95,11 @@ function template_view_package()
 	}
 
 	if (!empty($context['post_url']))
+	{
 		echo '
 		<form action="', $context['post_url'], '" onsubmit="submitonce(this);" method="post" accept-charset="UTF-8">';
+	}
+
 	echo '
 			<h2 class="category_header">
 				', $context['uninstalling'] ? $txt['package_uninstall_actions'] : $txt['package_install_actions'], ' &quot;', $context['package_name'], '&quot;
@@ -107,8 +116,10 @@ function template_view_package()
 					<ul>';
 
 		foreach ($context['database_changes'] as $change)
+		{
 			echo '
 						<li>', $change, '</li>';
+		}
 
 		echo '
 					</ul>
@@ -120,12 +131,14 @@ function template_view_package()
 			<div class="information">';
 
 	if (empty($context['actions']) && empty($context['database_changes']))
+	{
 		echo '
 				<br />
 				<div class="errorbox">
 					', $txt['corrupt_compatible'], '
 				</div>
 			</div>';
+	}
 	else
 	{
 		echo '
@@ -233,8 +246,10 @@ function template_view_package()
 						<td class="centertext">';
 
 				if (!empty($context['themes_locked']))
+				{
 					echo '
 							<input type="hidden" name="custom_theme[]" value="', $id, '" />';
+				}
 
 				echo '
 							<input type="checkbox" name="custom_theme[]" id="custom_theme_', $id, '" value="', $id, '" onclick="', (!empty($theme['has_failure']) ? 'if (this.form.custom_theme_' . $id . '.checked && !confirm(\'' . $txt['package_theme_failure_warning'] . '\')) return false;' : ''), 'invertAll(this, this.form, \'dummy_theme_', $id, '\', true);" ', !empty($context['themes_locked']) ? 'disabled="disabled" checked="checked"' : '', '/>
@@ -324,10 +339,13 @@ function template_view_package()
 	}
 
 	if (!empty($context['post_url']))
+	{
 		echo '
 			<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />', (isset($context['form_sequence_number']) && !$context['ftp_needed']) ? '
 			<input type="hidden" name="seqnum" value="' . $context['form_sequence_number'] . '" />' : '', '
 		</form>';
+	}
+
 	echo '
 	</div>';
 
@@ -381,6 +399,7 @@ function template_view_package()
 
 	// And a bit more for database changes.
 	if ($context['uninstalling'] && !empty($context['database_changes']))
+	{
 		echo '
 	<script>
 		var database_changes_area = document.getElementById(\'db_changes_div\'),
@@ -388,6 +407,7 @@ function template_view_package()
 
 		database_changes_area.style.display = "none";
 	</script>';
+	}
 }
 
 /**
@@ -414,11 +434,15 @@ function template_extract_package()
 	<div id="admincenter">';
 
 	if (empty($context['redirect_url']))
+	{
 		echo '
 			<h2 class="category_header">', ($context['uninstalling'] ? $txt['uninstall'] : $txt['extracting']), '</h2>', ($context['uninstalling'] ? '' : '<div class="information">' . $txt['package_installed_extract'] . '</div>');
+	}
 	else
+	{
 		echo '
 			<h2 class="category_header">', $txt['package_installed_redirecting'], '</h2>';
+	}
 
 	echo '
 		<div class="generic_list_wrapper">
@@ -432,23 +456,33 @@ function template_extract_package()
 				<a href="', $context['redirect_url'], '">', $txt['package_installed_redirect_go_now'], '</a> | <a href="', $scripturl, '?action=admin;area=packages;sa=browse">', $txt['package_installed_redirect_cancel'], '</a>';
 	}
 	elseif ($context['uninstalling'])
+	{
 		echo '
 				', $txt['package_uninstall_done'];
+	}
 	elseif ($context['install_finished'])
 	{
 		if ($context['extract_type'] == 'avatar')
+		{
 			echo '
 				', $txt['avatars_extracted'];
+		}
 		elseif ($context['extract_type'] == 'language')
+		{
 			echo '
 				', $txt['language_extracted'];
+		}
 		else
+		{
 			echo '
 				', $txt['package_installed_done'];
+		}
 	}
 	else
+	{
 		echo '
 				', $txt['corrupt_compatible'];
+	}
 
 	echo '
 			</div>
@@ -480,8 +514,11 @@ function template_list()
 			<ol>';
 
 	foreach ($context['files'] as $fileinfo)
+	{
 		echo '
 				<li><a href="', $scripturl, '?action=admin;area=packages;sa=examine;package=', $context['filename'], ';file=', $fileinfo['filename'], '" title="', $txt['view'], '">', $fileinfo['filename'], '</a> (', $fileinfo['formatted_size'], ')</li>';
+	}
+
 	echo '
 			</ol>
 			<br />
@@ -529,8 +566,10 @@ function template_browse()
 	}
 
 	if (!$adds_available)
+	{
 		echo '
 		<div class="infobox">', $context['sub_action'] == 'browse' ? $txt['no_packages'] : $txt['no_adds_installed'], '</div>';
+	}
 
 	echo '
 	</div>';
@@ -599,7 +638,9 @@ function template_control_chmod()
 
 	// Nothing to do? Brilliant!
 	if (empty($context['package_ftp']))
+	{
 		return false;
+	}
 
 	if (empty($context['package_ftp']['form_elements_only']))
 	{
@@ -610,9 +651,13 @@ function template_control_chmod()
 					<ul style="display: inline;">';
 
 		if (!empty($context['notwritable_files']))
+		{
 			foreach ($context['notwritable_files'] as $file)
+			{
 				echo '
 						<li>', $file, '</li>';
+			}
+		}
 
 		echo '
 					</ul>
@@ -625,8 +670,10 @@ function template_control_chmod()
 				</div>';
 
 	if (!empty($context['package_ftp']['destination']))
+	{
 		echo '
 				<form action="', $context['package_ftp']['destination'], '" method="post" accept-charset="UTF-8">';
+	}
 
 	echo '
 					<fieldset>
@@ -660,23 +707,29 @@ function template_control_chmod()
 					</fieldset>';
 
 	if (empty($context['package_ftp']['form_elements_only']))
+	{
 		echo '
 					<div class="submitbutton">
 						<span id="test_ftp_placeholder_full"></span>
 						<input type="submit" value="', $txt['package_proceed'], '" class="right_submit" />
 					</div>';
+	}
 
 	if (!empty($context['package_ftp']['destination']))
+	{
 		echo '
 					<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
 				</form>';
+	}
 
 	// Hide the details of the list.
 	if (empty($context['package_ftp']['form_elements_only']))
+	{
 		echo '
 		<script>
 			document.getElementById(\'need_writable_list\').style.display = \'none\';
 		</script>';
+	}
 
 	// Set up to generate the FTP test button.
 	echo '
@@ -793,8 +846,10 @@ function template_file_permissions()
 					<td class="grid30"><strong>';
 
 		if (!empty($dir['type']) && ($dir['type'] == 'dir' || $dir['type'] == 'dir_recursive'))
+		{
 			echo '
 						<img src="', $settings['default_images_url'], '/board.png" alt="*" />';
+		}
 
 		echo '
 						', $name, '</strong>
@@ -812,7 +867,9 @@ function template_file_permissions()
 			';
 
 		if (!empty($dir['contents']))
+		{
 			template_permission_show_contents($name, $dir['contents'], 1);
+		}
 	}
 
 	echo '
@@ -847,12 +904,14 @@ function template_file_permissions()
 
 	// Likely to need FTP?
 	if (empty($context['ftp_connected']))
+	{
 		echo '
 			<p>
 				', $txt['package_file_perms_ftp_details'], ':
 			</p>
 			', template_control_chmod(), '
 			<div class="information">', $txt['package_file_perms_ftp_retain'], '</div>';
+	}
 
 	echo '
 			<div class="submitbutton">
@@ -864,19 +923,22 @@ function template_file_permissions()
 
 	// Any looks fors we've already done?
 	foreach ($context['look_for'] as $path)
+	{
 		echo '
 			<input type="hidden" name="back_look[]" value="', $path, '" />';
+	}
+
 	echo '
 	</form>';
 }
 
 /**
- * @todo
- *
  * @param string $ident
  * @param array $contents
  * @param int $level
  * @param boolean $has_more
+ * @todo
+ *
  */
 function template_permission_show_contents($ident, $contents, $level, $has_more = false)
 {
@@ -908,8 +970,10 @@ function template_permission_show_contents($ident, $contents, $level, $has_more 
 						', (!empty($dir['type']) && $dir['type'] == 'dir_recursive') || !empty($dir['list_contents']) ? '<a id="link_' . $cur_ident . '" href="' . $scripturl . '?action=admin;area=packages;sa=perms;find=' . base64_encode($ident . '/' . $name) . ';back_look=' . $context['back_look_data'] . ';' . $context['session_var'] . '=' . $context['session_id'] . '#fol_' . $cur_ident . '" onclick="return expandFolder(\'' . $cur_ident . '\', \'' . addcslashes($ident . '/' . $name, "'\\") . '\');">' : '';
 
 			if (!empty($dir['type']) && ($dir['type'] == 'dir' || $dir['type'] == 'dir_recursive'))
+			{
 				echo '
 						<img src="', $settings['default_images_url'], '/board.png" alt="*" />';
+			}
 
 			echo '
 						', $name, '
@@ -930,12 +994,15 @@ function template_permission_show_contents($ident, $contents, $level, $has_more 
 				</tr>';
 
 			if (!empty($dir['contents']))
+			{
 				template_permission_show_contents($ident . '/' . $name, $dir['contents'], $level + 1, !empty($dir['more_files']));
+			}
 		}
 	}
 
 	// We have more files to show?
 	if ($has_more)
+	{
 		echo '
 	<tr id="content_', $js_ident, '_more">
 		<td class="smalltext" style="width: 40%;">', str_repeat('&nbsp;', $level * 5), '
@@ -943,6 +1010,7 @@ function template_permission_show_contents($ident, $contents, $level, $has_more 
 		</td>
 		<td colspan="6"></td>
 	</tr>';
+	}
 
 	if ($drawn_div)
 	{
@@ -951,10 +1019,13 @@ function template_permission_show_contents($ident, $contents, $level, $has_more 
 		foreach ($context['look_for'] as $tree)
 		{
 			if (substr($tree, 0, strlen($ident)) == $ident)
+			{
 				$isFound = true;
+			}
 		}
 
 		if ($level > 1 && !$isFound)
+		{
 			echo '
 		</tbody>
 		</table><script>
@@ -965,6 +1036,7 @@ function template_permission_show_contents($ident, $contents, $level, $has_more 
 			<tr class="hide">
 				<td colspan="7"></td>
 			</tr>';
+		}
 	}
 }
 
@@ -983,10 +1055,12 @@ function template_pause_action_permissions()
 		<h2 class="category_header">', $txt['package_file_perms_applying'], '</h2>';
 
 	if (!empty($context['skip_ftp']))
+	{
 		echo '
 		<div class="errorbox">
 			', $txt['package_file_perms_skipping_ftp'], '
 		</div>';
+	}
 
 	// First progress bar for the number of directories we are working
 	echo '
@@ -1019,27 +1093,35 @@ function template_pause_action_permissions()
 
 	// Put out the right hidden data.
 	if ($context['method'] === 'individual')
+	{
 		echo '
 					<input type="hidden" name="custom_value" value="', $context['custom_value'], '" />
 					<input type="hidden" name="totalItems" value="', $context['total_items'], '" />
 					<input type="hidden" name="toProcess" value="', base64_encode(json_encode($context['to_process'])), '" />';
+	}
 	else
+	{
 		echo '
 					<input type="hidden" name="predefined" value="', $context['predefined_type'], '" />
 					<input type="hidden" name="fileOffset" value="', $context['file_offset'], '" />
 					<input type="hidden" name="totalItems" value="', $context['total_items'], '" />
 					<input type="hidden" name="dirList" value="', base64_encode(json_encode($context['directory_list'])), '" />
 					<input type="hidden" name="specialFiles" value="', base64_encode(json_encode($context['special_files'])), '" />';
+	}
 
 	// Are we not using FTP for whatever reason.
 	if (!empty($context['skip_ftp']))
+	{
 		echo '
 					<input type="hidden" name="skip_ftp" value="1" />';
+	}
 
 	// Retain state.
 	foreach ($context['back_look_data'] as $path)
+	{
 		echo '
 					<input type="hidden" name="back_look[]" value="', $path, '" />';
+	}
 
 	// Standard fields
 	echo '

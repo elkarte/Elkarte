@@ -6,7 +6,7 @@
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause (see accompanying LICENSE.txt file)
  *
  * This file contains code covered by:
- * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * copyright: 2011 Simple Machines (http://www.simplemachines.org)
  *
  * @version 2.0 dev
  *
@@ -122,6 +122,7 @@ function template_set_password()
 					</dd>';
 
 	if (!empty($modSettings['enableOTP']))
+	{
 		echo '
 					<dt>
 						<label for="otp">', $txt['disable_otp'], ':</label>
@@ -129,6 +130,7 @@ function template_set_password()
 					<dd>
 						<input id="otp" type="checkbox"  name="otp" />
 					</dd>';
+	}
 
 	echo '
 				</dl>
@@ -181,6 +183,7 @@ function template_ask()
 					</dd>';
 
 	if ($context['account_type'] === 'password')
+	{
 		echo '
 					<dt>
 						<label for="elk_autov_pwmain">', $txt['choose_pass'], ':</label>
@@ -200,6 +203,7 @@ function template_ask()
 							<i id="elk_autov_pwverify_img" class="icon i-check" alt="*"></i>
 						</span>
 					</dd>';
+	}
 
 	echo '
 				</dl>
@@ -214,6 +218,7 @@ function template_ask()
 	</form>';
 
 	if ($context['account_type'] === 'password')
+	{
 		echo '
 <script>
 	var regTextStrings = {
@@ -226,4 +231,5 @@ function template_ask()
 
 	var verificationHandle = new elkRegister("creator", ', empty($modSettings['password_strength']) ? 0 : $modSettings['password_strength'], ', regTextStrings);
 </script>';
+	}
 }

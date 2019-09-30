@@ -6,7 +6,7 @@
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause (see accompanying LICENSE.txt file)
  *
  * This file contains code covered by:
- * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * copyright: 2011 Simple Machines (http://www.simplemachines.org)
  *
  * @version 2.0 dev
  *
@@ -257,8 +257,10 @@ function template_edit_profile_field()
 					<input type="submit" name="save" value="', $txt['save'], '" />';
 
 	if ($context['fid'])
+	{
 		echo '
 					<input type="submit" name="delete" value="', $txt['delete'], '" onclick="return confirm(\'', $txt['custom_edit_delete_sure'], '\');" />';
+	}
 
 	echo '
 					<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />

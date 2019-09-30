@@ -22,6 +22,7 @@ function template_PersonalMessage_init()
 
 /**
  * This is the main sidebar for the personal messages section.
+ *
  * @todo - Started markup clean up in this template. More stuffz to check later.
  */
 function template_pm_above()
@@ -40,6 +41,7 @@ function template_pm_above()
 
 	// Show the capacity bar, if available. @todo - This needs work.
 	if (!empty($context['limit_bar']))
+	{
 		echo '
 						<h2 class="category_header">
 							<span class="floatleft">', $txt['pm_capacity'], ':</span>
@@ -48,17 +50,22 @@ function template_pm_above()
 							</span>
 							<span class="floatright', $context['limit_bar']['percent'] > 90 ? ' alert' : '', '">', $context['limit_bar']['text'], '</span>
 						</h2>';
+	}
 
 	// Message sent? Show a small indication.
 	if (isset($context['pm_sent']))
+	{
 		echo '
 						<div class="successbox">
 							', $txt['pm_sent'], '
 						</div>';
+	}
 
 	if (!empty($context['pm_form_url']))
+	{
 		echo '
 						<form action="', $context['pm_form_url'], '" method="post" accept-charset="UTF-8" name="pmFolder">';
+	}
 }
 
 /**
@@ -109,8 +116,10 @@ function template_folder()
 
 		// Showing the sidebar posting area?
 		if (empty($options['hide_poster_area']))
+		{
 			echo '
 							<ul class="poster">', template_build_poster_div($message), '</ul>';
+		}
 
 		echo '
 							<div class="postarea', empty($options['hide_poster_area']) ? '' : '2', '">
@@ -126,24 +135,32 @@ function template_folder()
 
 		// People it was sent directly to....
 		if (!empty($message['recipients']['to']))
+		{
 			echo
 			implode(', ', $message['recipients']['to']);
+		}
 		// Otherwise, we're just going to say "some people"...
 		elseif ($context['folder'] != 'sent')
+		{
 			echo
 			'(', $txt['pm_undisclosed_recipients'], ')';
+		}
 
 		echo '
 										<strong> ', $txt['on'], ': </strong>', $message['time'];
 
 		// If we're in the sent items folder, show who it was sent to besides the "To:" people.
 		if (!empty($message['recipients']['bcc']))
+		{
 			echo '
 										<br /><strong> ', $txt['pm_bcc'], ': </strong>', implode(', ', $message['recipients']['bcc']);
+		}
 
 		if (!empty($message['is_replied_to']))
+		{
 			echo '
 										<br />', $txt['pm_is_replied_to'];
+		}
 
 		echo '
 									</h5>
@@ -159,10 +176,12 @@ function template_folder()
 
 		// Showing all then give a remove item checkbox
 		if (empty($context['display_mode']))
+		{
 			echo '
 									<li class="listlevel1 quickmod_check">
 										<input type="checkbox" name="pms[]" id="deletedisplay', $message['id'], '" value="', $message['id'], '" onclick="document.getElementById(\'deletelisting', $message['id'], '\').checked = this.checked;" />
 									</li>';
+		}
 
 		// Maybe there is something...more :P (this is the more button)
 		if (!empty($context['additional_pm_drop_buttons']))
@@ -173,10 +192,12 @@ function template_folder()
 										<ul class="menulevel2">';
 
 			foreach ($context['additional_pm_drop_buttons'] as $key => $button)
+			{
 				echo '
 											<li class="listlevel2">
 												<a href="' . $button['href'] . '" class="linklevel2 ', $key, '">' . $button['text'] . '</a>
 											</li>';
+			}
 
 			echo '
 										</ul>
@@ -197,9 +218,11 @@ function template_folder()
 			{
 				// Is there than more than one recipient you can reply to?
 				if ($message['number_recipients'] > 1)
+				{
 					echo '
 									<li class="listlevel1">
 										<a href="', $scripturl, '?action=pm;sa=send;f=', $context['folder'], $context['current_label_id'] != -1 ? ';l=' . $context['current_label_id'] : '', ';pmsg=', $message['id'], ';quote;u=all" class="linklevel1 reply_all_button">', $txt['reply_to_all'], '</a></li>';
+				}
 
 				echo '
 									<li class="listlevel1">
@@ -211,20 +234,24 @@ function template_folder()
 			}
 			// This is for "forwarding" - even if the member is gone.
 			else
+			{
 				echo '
 									<li class="listlevel1">
 										<a href="', $scripturl, '?action=pm;sa=send;f=', $context['folder'], $context['current_label_id'] != -1 ? ';l=' . $context['current_label_id'] : '', ';pmsg=', $message['id'], ';quote" class="linklevel1 quote_button">', $txt['reply_quote'], '</a>
 									</li>';
+			}
 		}
 
 		// Anything else added by mods for example?
 		if (!empty($context['additional_quick_pm_buttons']))
 		{
 			foreach ($context['additional_quick_pm_buttons'] as $key => $button)
+			{
 				echo '
 									<li class="listlevel1">
 										<a href="' . $button['href'] . '" class="linklevel1 ', $key, '">' . $button['text'] . '</a>
 									</li>';
+			}
 		}
 
 		echo '
@@ -253,8 +280,10 @@ function template_folder()
 					foreach ($context['labels'] as $label)
 					{
 						if (!isset($message['labels'][$label['id']]))
+						{
 							echo '
 										<option value="', $label['id'], '">&nbsp;', $label['name'], '</option>';
+						}
 					}
 				}
 
@@ -265,8 +294,10 @@ function template_folder()
 										<option value="" disabled="disabled">', $txt['pm_msg_label_remove'], ':</option>';
 
 					foreach ($message['labels'] as $label)
+					{
 						echo '
 										<option value="', $label['id'], '">&nbsp;', $label['name'], '</option>';
+					}
 				}
 
 				echo '
@@ -288,7 +319,9 @@ function template_folder()
 			foreach ($message['member']['custom_fields'] as $custom)
 			{
 				if ($custom['placement'] != 2 || empty($custom['value']))
+				{
 					continue;
+				}
 
 				if (!$shown)
 				{
@@ -303,15 +336,19 @@ function template_folder()
 			}
 
 			if ($shown)
+			{
 				echo '
 									</ul>
 								</div>';
+			}
 		}
 
 		// Show the member's signature?
 		if (!empty($message['member']['signature']) && empty($options['show_no_signatures']) && $context['signature_enabled'])
+		{
 			echo '
 								<div class="signature">', $message['member']['signature'], '</div>';
+		}
 
 		echo '
 							</div>
@@ -332,9 +369,13 @@ function template_pm_pages_and_buttons_above()
 
 	// Show a few buttons if we are in conversation mode and outputting the first message.
 	if ($context['display_mode'] == 2)
+	{
 		template_pagesection('conversation_buttons', 'right', array('page_index' => false));
+	}
 	else
+	{
 		template_pagesection();
+	}
 }
 
 /**
@@ -345,10 +386,14 @@ function template_pm_pages_and_buttons_below()
 	global $context, $txt;
 
 	if (empty($context['display_mode']))
+	{
 		template_pagesection(false, '', array('extra' => '<input type="submit" name="del_selected" value="' . $txt['quickmod_delete_selected'] . '" style="font-weight: normal;" onclick="if (!confirm(\'' . $txt['delete_selected_confirm'] . '\')) return false;" class="right_submit" />'));
+	}
 	// Show a few buttons if we are in conversation mode and outputting the first message.
 	elseif ($context['display_mode'] == 2 && isset($context['conversation_buttons']))
+	{
 		template_pagesection('conversation_buttons', 'right', array('page_index' => false));
+	}
 }
 
 /**
@@ -378,7 +423,9 @@ function template_subject_list_below()
 
 	// Individual messages = button list!
 	if ($context['display_mode'] == 1)
+	{
 		template_subject_list();
+	}
 }
 
 /**
@@ -420,10 +467,12 @@ function template_subject_list()
 						<tbody>';
 
 	if (!$context['show_delete'])
+	{
 		echo '
 							<tr class="standard_row">
 								<td colspan="5">', $txt['pm_alert_none'], '</td>
 							</tr>';
+	}
 
 	// Use the query callback to get the subject list
 	$controller = $context['get_psubject'][0];
@@ -492,8 +541,10 @@ function template_subject_list()
 			foreach ($context['labels'] as $label)
 			{
 				if ($label['id'] != $context['current_label_id'])
+				{
 					$extra .= '
 								<option value="add_' . $label['id'] . '">&#10148;&nbsp;' . $label['name'] . '</option>';
+				}
 			}
 
 			$extra .= '
@@ -536,8 +587,10 @@ function template_search()
 
 	// Any search errors we need to let them know about
 	if (!empty($context['search_errors']))
+	{
 		echo '
 		<p class="errorbox">', implode('<br />', $context['search_errors']['messages']), '</p>';
+	}
 
 	// Start with showing the basic search input box
 	echo '
@@ -621,11 +674,13 @@ function template_search()
 				<ul id="searchLabelsExpand">';
 
 		foreach ($context['search_labels'] as $label)
+		{
 			echo '
 					<li>
 						<label for="searchlabel_', $label['id'], '"><input type="checkbox" id="searchlabel_', $label['id'], '" name="searchlabel[', $label['id'], ']" value="', $label['id'], '" ', $label['checked'] ? 'checked="checked"' : '', ' />
 						', $label['name'], '</label>
 					</li>';
+		}
 
 		echo '
 				</ul>
@@ -725,13 +780,18 @@ function template_search_results()
 
 	// Was anything even found?
 	if (!empty($context['personal_messages']))
+	{
 		template_pagesection();
+	}
 	else
+	{
 		echo '
 			<div class="well">', $txt['find_no_results'], '</div>';
+	}
 
 	// Showing complete results?
 	if (empty($context['search_params']['show_complete']))
+	{
 		echo '
 			<table class="table_grid">
 				<thead>
@@ -742,9 +802,12 @@ function template_search_results()
 					</tr>
 				</thead>
 				<tbody>';
+	}
 	else
+	{
 		echo '
 			<ul class="forumposts topic_listing search_results_posts">';
+	}
 
 	// Print each message out...
 	foreach ($context['personal_messages'] as $message)
@@ -761,10 +824,14 @@ function template_search_results()
 			// Show the recipients.
 			// @todo This doesn't deal with the sent item searching quite right for bcc.
 			if (!empty($message['recipients']['to']))
+			{
 				echo implode(', ', $message['recipients']['to']);
+			}
 			// Otherwise, we're just going to say "some people"...
 			elseif ($context['folder'] !== 'sent')
+			{
 				echo '(', $txt['pm_undisclosed_recipients'], ')';
+			}
 
 			echo '
 						</span>
@@ -780,13 +847,17 @@ function template_search_results()
 
 				// You can only reply if they are not a guest...
 				if (!$message['member']['is_guest'])
+				{
 					echo '
 						<li class="listlevel1"><a class="linklevel1 reply_button" href="', $scripturl, '?action=pm;sa=send;f=', $context['folder'], $context['current_label_id'] != -1 ? ';l=' . $context['current_label_id'] : '', ';pmsg=', $message['id'], ';u=', $message['member']['id'], '">', $txt['reply'], '</a></li>
 						<li class="listlevel1"><a class="linklevel1 quote_button" href="', $scripturl, '?action=pm;sa=send;f=', $context['folder'], $context['current_label_id'] != -1 ? ';l=' . $context['current_label_id'] : '', ';pmsg=', $message['id'], ';quote;u=', $context['folder'] == 'sent' ? '' : $message['member']['id'], '">', $txt['quote'], '</a></li>';
+				}
 				// This is for "forwarding" - even if the member is gone.
 				else
+				{
 					echo '
 						<li class="listlevel1"><a class="linklevel1 quote_button" href="', $scripturl, '?action=pm;sa=send;f=', $context['folder'], $context['current_label_id'] != -1 ? ';l=' . $context['current_label_id'] : '', ';pmsg=', $message['id'], ';quote">', $txt['quote'], '</a></li>';
+				}
 				echo '
 					</ul>';
 			}
@@ -808,16 +879,22 @@ function template_search_results()
 	}
 
 	if (!empty($context['search_params']['show_complete']))
+	{
 		echo '
 			</ul>';
+	}
 	else
+	{
 		echo '
 				</tbody>
 			</table>';
+	}
 
 	// If we have results show a page index
 	if (!empty($context['personal_messages']))
+	{
 		template_pagesection();
+	}
 
 	echo '
 		</div>';
@@ -840,14 +917,22 @@ function template_send()
 				<div class="content">';
 
 		if (!empty($context['send_log']['sent']))
+		{
 			foreach ($context['send_log']['sent'] as $log_entry)
+			{
 				echo '
 					<span class="error">', $log_entry, '</span><br />';
+			}
+		}
 
 		if (!empty($context['send_log']['failed']))
+		{
 			foreach ($context['send_log']['failed'] as $log_entry)
+			{
 				echo '
 					<span class="error">', $log_entry, '</span><br />';
+			}
+		}
 
 		echo '
 				</div>
@@ -880,10 +965,12 @@ function template_send()
 	template_show_error('post_error');
 
 	if (!empty($modSettings['drafts_pm_enabled']))
+	{
 		echo '
 				<div id="draft_section" class="successbox', isset($context['draft_saved']) ? '"' : ' hide"', '>',
 					sprintf($txt['draft_pm_saved'], $scripturl . '?action=pm;sa=showpmdrafts'), '
 				</div>';
+	}
 
 	echo '
 				<dl id="post_header">';
@@ -936,11 +1023,13 @@ function template_send()
 
 	// Require an image to be typed to save spamming?
 	if (!empty($context['require_verification']))
+	{
 		template_verification_controls($context['visual_verification_id'], '
 				<div class="post_verification">
 					<strong>' . $txt['pm_visual_verification_label'] . ':</strong>
 					', '
 				</div>');
+	}
 
 	// Send, Preview, spellchecker buttons.
 	echo '
@@ -968,9 +1057,11 @@ function template_send()
 						<dd><strong>', $txt['draft_saved_on'], '</strong></dd>';
 
 		foreach ($context['drafts'] as $draft)
+		{
 			echo '
 						<dt>', $draft['link'], '</dt>
 						<dd>', $draft['poster_time'], '</dd>';
+		}
 
 		echo '
 					</dl>
@@ -993,6 +1084,7 @@ function template_send()
 
 	// Code for showing and hiding drafts
 	if (!empty($context['drafts']))
+	{
 		theme()->addInlineJavascript('
 		var oSwapDraftOptions = new elk_Toggle({
 			bToggleEnabled: true,
@@ -1024,9 +1116,11 @@ function template_send()
 				sAdditionalVars: \';minmax_key=pmdraft\'
 			},
 		});', true);
+	}
 
 	// Show the message you're replying to.
 	if ($context['reply'])
+	{
 		echo '
 
 	<div class="forumposts">
@@ -1040,6 +1134,7 @@ function template_send()
 			', $context['quoted_message']['body'], '
 		</div>
 	</div>';
+	}
 
 	echo '
 		<script>
@@ -1051,22 +1146,26 @@ function template_send()
 				aToRecipients: [';
 
 	foreach ($context['recipients']['to'] as $i => $member)
+	{
 		echo '
 					{
 						sItemId: ', JavaScriptEscape($member['id']), ',
 						sItemName: ', JavaScriptEscape($member['name']), '
 					}', $i == count($context['recipients']['to']) - 1 ? '' : ',';
+	}
 
 	echo '
 				],
 				aBccRecipients: [';
 
 	foreach ($context['recipients']['bcc'] as $i => $member)
+	{
 		echo '
 					{
 						sItemId: ', JavaScriptEscape($member['id']), ',
 						sItemName: ', JavaScriptEscape($member['name']), '
 					}', $i == count($context['recipients']['bcc']) - 1 ? '' : ',';
+	}
 
 	echo '
 				],
@@ -1142,8 +1241,10 @@ function template_labels()
 				<th style="width: 4%;">';
 
 	if (count($context['labels']) > 2)
+	{
 		echo '
 					<input type="checkbox" onclick="invertAll(this, this.form);" />';
+	}
 
 	echo '
 				</th>
@@ -1152,16 +1253,20 @@ function template_labels()
 		<tbody>';
 
 	if (count($context['labels']) < 2)
+	{
 		echo '
 			<tr>
 				<td colspan="2" class="centertext">', $txt['pm_labels_no_exist'], '</td>
 			</tr>';
+	}
 	else
 	{
 		foreach ($context['labels'] as $label)
 		{
 			if ($label['id'] == -1)
+			{
 				continue;
+			}
 
 			echo '
 			<tr>
@@ -1180,11 +1285,13 @@ function template_labels()
 		</table>';
 
 	if (!count($context['labels']) < 2)
+	{
 		echo '
 		<div class="submitbutton">
 			<input type="submit" name="save" value="', $txt['save'], '" />
 			<input type="submit" name="delete" value="', $txt['quickmod_delete_selected'], '" onclick="return confirm(\'', $txt['pm_labels_delete'], '\');" />
 		</div>';
+	}
 
 	echo '
 		<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
@@ -1279,8 +1386,10 @@ function template_rules()
 				<th style="width: 4%;">';
 
 	if (!empty($context['rules']))
+	{
 		echo '
 					<input type="checkbox" onclick="invertAll(this, this.form);" />';
+	}
 
 	echo '
 				</th>
@@ -1289,12 +1398,14 @@ function template_rules()
 		<tbody>';
 
 	if (empty($context['rules']))
+	{
 		echo '
 			<tr>
 				<td colspan="2" class="centertext">
 					', $txt['pm_rules_none'], '
 				</td>
 			</tr>';
+	}
 
 	foreach ($context['rules'] as $rule)
 	{
@@ -1316,13 +1427,17 @@ function template_rules()
 			<a class="linkbutton" href="', $scripturl, '?action=pm;sa=manrules;add;rid=0">', $txt['pm_add_rule'], '</a>';
 
 	if (!empty($context['rules']))
+	{
 		echo '
 			<a class="linkbutton" href="', $scripturl, '?action=pm;sa=manrules;apply;', $context['session_var'], '=', $context['session_id'], '" onclick="return confirm(\'', $txt['pm_js_apply_rules_confirm'], '\');">', $txt['pm_apply_rules'], '</a>';
+	}
 
 	if (!empty($context['rules']))
+	{
 		echo '
 			<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
 			<input type="submit" name="delselected" value="', $txt['pm_delete_selected_rule'], '" onclick="return confirm(\'', $txt['pm_js_delete_rule_confirm'], '\');" />';
+	}
 
 	echo '
 		</div>
@@ -1357,19 +1472,25 @@ function template_add_rule()
 	foreach ($context['rule']['criteria'] as $k => $criteria)
 	{
 		if (!$isFirst && $criteria['t'] == '')
+		{
 			echo '
 				<div id="removeonjs1">';
+		}
 		elseif (!$isFirst)
+		{
 			echo '
 				<br />';
+		}
 
 		echo '
 					<select class="criteria" name="ruletype[', $k, ']" id="ruletype', $k, '" data-optnum="', $k, '">
 						<option value="">', $txt['pm_rule_criteria_pick'], ':</option>';
 
 		foreach ($context['known_rules'] as $rule)
+		{
 			echo '
 						<option value="', $rule, '" ', $criteria['t'] == $rule ? 'selected="selected"' : '', '>', $txt['pm_rule_' . $rule], '</option>';
+		}
 
 		echo '
 					</select>
@@ -1381,8 +1502,10 @@ function template_add_rule()
 							<option value="">', $txt['pm_rule_sel_group'], '</option>';
 
 		foreach ($context['groups'] as $id => $group)
+		{
 			echo '
 							<option value="', $id, '" ', $criteria['t'] == 'gid' && $criteria['v'] == $id ? 'selected="selected"' : '', '>', $group, '</option>';
+		}
 
 		echo '
 						</select>
@@ -1390,10 +1513,14 @@ function template_add_rule()
 
 		// If this is the dummy we add a means to hide for non js users.
 		if ($isFirst)
+		{
 			$isFirst = false;
+		}
 		elseif ($criteria['t'] == '')
+		{
 			echo '
 				</div>';
+		}
 	}
 
 	echo '
@@ -1418,11 +1545,15 @@ function template_add_rule()
 	foreach ($context['rule']['actions'] as $k => $action)
 	{
 		if (!$isFirst && $action['t'] == '')
+		{
 			echo '
 				<div id="removeonjs2">';
+		}
 		elseif (!$isFirst)
+		{
 			echo '
 				<br />';
+		}
 
 		echo '
 					<select name="acttype[', $k, ']" id="acttype', $k, '" data-actnum="', $k, '">
@@ -1435,19 +1566,27 @@ function template_add_rule()
 							<option value="">', $txt['pm_rule_sel_label'], '</option>';
 
 		foreach ($context['labels'] as $label)
+		{
 			if ($label['id'] != -1)
+			{
 				echo '
 							<option value="', ($label['id'] + 1), '" ', $action['t'] == 'lab' && $action['v'] == $label['id'] ? 'selected="selected"' : '', '>', $label['name'], '</option>';
+			}
+		}
 
 		echo '
 						</select>
 					</span>';
 
 		if ($isFirst)
+		{
 			$isFirst = false;
+		}
 		elseif ($action['t'] == '')
+		{
 			echo '
 				</div>';
+		}
 	}
 
 	echo '
@@ -1472,9 +1611,11 @@ function template_add_rule()
 
 	// If this isn't a new rule and we have JS enabled remove the JS compatibility stuff.
 	if ($context['rid'])
+	{
 		echo '
 			document.getElementById("removeonjs1").className = "hide";
 			document.getElementById("removeonjs2").className = "hide";';
+	}
 
 	echo '
 			document.getElementById("addonjs1").style.display = "";
@@ -1499,10 +1640,12 @@ function template_showPMDrafts()
 
 	// No drafts? Just show an informative message.
 	if (empty($context['drafts']))
+	{
 		echo '
 		<div class="information centertext">
 			', $txt['draft_none'], '
 		</div>';
+	}
 	else
 	{
 		// For every draft to be displayed, give it its own div, and show the important details of the draft.

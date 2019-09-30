@@ -6,7 +6,7 @@
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause (see accompanying LICENSE.txt file)
  *
  * This file contains code covered by:
- * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * copyright: 2011 Simple Machines (http://www.simplemachines.org)
  *
  * @version 2.0 dev
  *
@@ -28,13 +28,17 @@ function template_verification_controls($verify_id, $before = '', $after = '')
 	$i = 0;
 
 	if ($verify_context['render'])
+	{
 		echo $before;
+	}
 
 	// Loop through each item to show them.
 	foreach ($verify_context['test'] as $key => $verification)
 	{
 		if (empty($verification['values']) || empty($verification['template']))
+		{
 			continue;
+		}
 
 		echo '
 			<div id="verification_control_', $i, '" class="verification_control">';
@@ -48,7 +52,9 @@ function template_verification_controls($verify_id, $before = '', $after = '')
 	}
 
 	if ($verify_context['render'])
+	{
 		echo $after;
+	}
 }
 
 /**
@@ -62,11 +68,13 @@ function template_verification_control_questions($verify_id, $verify_context)
 	global $context;
 
 	foreach ($verify_context as $question)
+	{
 		echo '
 				<div class="verificationquestion">
 					<label for="', $verify_id, '_vv[q][', $question['id'], ']">', $question['q'], ':</label>
 					<input type="text" id="', $verify_id, '_vv[q][', $question['id'], ']" name="', $verify_id, '_vv[q][', $question['id'], ']" size="30" value="', $question['a'], '" ', $question['is_error'] ? ' class="border_error"' : '', ' tabindex="', $context['tabindex']++, '" class="input_text" />
 				</div>';
+	}
 }
 
 /**

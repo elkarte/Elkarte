@@ -6,7 +6,7 @@
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause (see accompanying LICENSE.txt file)
  *
  * This file contains code covered by:
- * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * copyright: 2011 Simple Machines (http://www.simplemachines.org)
  *
  * @version 2.0 dev
  *
@@ -65,6 +65,7 @@ function template_ask()
 					</fieldset>';
 
 	if (!empty($context['can_move']))
+	{
 		echo '
 					<p>
 						<label for="move_new_topic">
@@ -74,6 +75,7 @@ function template_ask()
 							document.getElementById(\'board_list\').style.display = \'none\';
 						</script>
 					</p>';
+	}
 
 	echo '
 					<div class="submitbutton">
@@ -131,6 +133,7 @@ function template_select()
 				<ul id="messages_not_selected" class="split_messages smalltext">';
 
 	foreach ($context['not_selected']['messages'] as $message)
+	{
 		echo '
 					<li id="not_selected_', $message['id'], '">
 						<div class="content">
@@ -142,6 +145,7 @@ function template_select()
 							<div class="post">', $message['body'], '</div>
 						</div>
 					</li>';
+	}
 
 	echo '
 					<li class="dummy"></li>
@@ -159,6 +163,7 @@ function template_select()
 	if (!empty($context['selected']['messages']))
 	{
 		foreach ($context['selected']['messages'] as $message)
+		{
 			echo '
 					<li id="selected_', $message['id'], '">
 						<div class="content">
@@ -170,6 +175,7 @@ function template_select()
 							<div class="post">', $message['body'], '</div>
 						</div>
 					</li>';
+		}
 	}
 
 	echo '

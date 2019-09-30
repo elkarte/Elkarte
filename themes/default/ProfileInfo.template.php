@@ -6,7 +6,7 @@
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause (see accompanying LICENSE.txt file)
  *
  * This file contains code covered by:
- * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * copyright: 2011 Simple Machines (http://www.simplemachines.org)
  *
  * @version 2.0 dev
  *
@@ -67,7 +67,9 @@ function template_action_summary()
 		foreach ($tabs as $tab)
 		{
 			if (isset($context['summarytabs'][$tab]['href']))
+			{
 				continue;
+			}
 
 			// Start a tab
 			$tab_num++;
@@ -129,10 +131,12 @@ function template_action_showPosts()
 
 	// No posts? Just end the table with a informative message.
 	if (empty($context['posts']))
+	{
 		echo '
 				<div class="content">
 					', $context['is_topics'] ? $txt['show_topics_none'] : $txt['show_posts_none'], '
 				</div>';
+	}
 	else
 	{
 		// For every post to be displayed, give it its own div, and show the important details of the post.
@@ -143,11 +147,13 @@ function template_action_showPosts()
 			$post['class'] = 'content';
 
 			if (!$post['approved'])
+			{
 				$post['body'] = '
 						<div class="approve_post">
 							<em>' . $txt['post_awaiting_approval'] . '</em>
 						</div>' . '
 					' . $post['body'];
+			}
 
 			template_simple_message($post);
 		}
@@ -190,8 +196,10 @@ function template_action_showPermissions()
 				<div class="content smalltext">', $txt['showPermissions_restricted_boards_desc'], ':<br />';
 
 			foreach ($context['no_access_boards'] as $no_access_board)
+			{
 				echo '
 					', $no_access_board['name'], $no_access_board['is_last'] ? '' : ', ';
+			}
 
 			echo '
 				</div>';
@@ -224,11 +232,15 @@ function template_action_showPermissions()
 								<td class="smalltext">';
 
 				if ($permission['is_denied'])
+				{
 					echo '
 									<span class="alert">', $txt['showPermissions_denied'], ':&nbsp;', implode(', ', $permission['groups']['denied']), '</span>';
+				}
 				else
+				{
 					echo '
 									', $txt['showPermissions_given'], ':&nbsp;', implode(', ', $permission['groups']['allowed']);
+				}
 
 				echo '
 								</td>
@@ -241,8 +253,10 @@ function template_action_showPermissions()
 				</div><br />';
 		}
 		else
+		{
 			echo '
 			<p class="description">', $txt['showPermissions_none_general'], '</p>';
+		}
 
 		// Board permission section.
 		echo '
@@ -254,13 +268,17 @@ function template_action_showPermissions()
 							<option value="0"', $context['board'] == 0 ? ' selected="selected"' : '', '>', $txt['showPermissions_global'], '&nbsp;</option>';
 
 		if (!empty($context['boards']))
+		{
 			echo '
 							<option value="" disabled="disabled">', str_repeat('&#8212;', strlen($txt['showPermissions_global'])), '</option>';
+		}
 
 		// Fill the box with any local permission boards.
 		foreach ($context['boards'] as $board)
+		{
 			echo '
 							<option value="', $board['id'], '"', $board['selected'] ? ' selected="selected"' : '', '>', $board['name'], ' (', $board['profile_name'], ')</option>';
+		}
 
 		echo '
 						</select>
@@ -289,11 +307,15 @@ function template_action_showPermissions()
 							<td class="smalltext">';
 
 				if ($permission['is_denied'])
+				{
 					echo '
 								<span class="alert">', $txt['showPermissions_denied'], ':&nbsp;', implode(', ', $permission['groups']['denied']), '</span>';
+				}
 				else
+				{
 					echo '
 								', $txt['showPermissions_given'], ': &nbsp;', implode(', ', $permission['groups']['allowed']);
+				}
 
 				echo '
 							</td>
@@ -305,8 +327,10 @@ function template_action_showPermissions()
 				</table>';
 		}
 		else
+		{
 			echo '
 			<p class="description">', $txt['showPermissions_none_board'], '</p>';
+		}
 
 		echo '
 			</div>
@@ -352,8 +376,10 @@ function template_action_statPanel()
 
 	// If they haven't post at all, don't draw the graph.
 	if (empty($context['posts_by_time']))
+	{
 		echo '
 				<span class="centertext">', $txt['statPanel_noPosts'], '</span>';
+	}
 	// Otherwise do!
 	else
 	{
@@ -393,8 +419,10 @@ function template_action_statPanel()
 				<div class="content content_noframe">';
 
 	if (empty($context['popular_boards']))
+	{
 		echo '
 					<span class="centertext">', $txt['statPanel_noPosts'], '</span>';
+	}
 
 	else
 	{
@@ -404,12 +432,12 @@ function template_action_statPanel()
 		// Draw a bar for every board.
 		foreach ($context['popular_boards'] as $board)
 		{
-			$position = intval(((int) $board['posts_percent'] / 5)) * 20;
+			$position = -1 * intval(((int) $board['posts_percent'] / 5)) * 20;
 
 			echo '
 						<dt>', $board['link'], '</dt>
 						<dd>
-							<div class="profile_pie" style="background-position: -', $position, 'px 0;" title="', sprintf($txt['statPanel_topBoards_memberposts'], $board['posts'], $board['total_posts_member'], $board['posts_percent']), '">
+							<div class="profile_pie" style="background-position: ', $position, 'px 0;" title="', sprintf($txt['statPanel_topBoards_memberposts'], $board['posts'], $board['total_posts_member'], $board['posts_percent']), '">
 								', sprintf($txt['statPanel_topBoards_memberposts'], $board['posts'], $board['total_posts_member'], $board['posts_percent']), '
 							</div>
 							<span>', empty($context['hide_num_posts']) ? $board['posts'] : '', '</span>
@@ -430,8 +458,10 @@ function template_action_statPanel()
 				<div class="content content_noframe">';
 
 	if (empty($context['board_activity']))
+	{
 		echo '
 					<span>', $txt['statPanel_noPosts'], '</span>';
+	}
 	else
 	{
 		echo '
@@ -440,12 +470,12 @@ function template_action_statPanel()
 		// Draw a bar for every board.
 		foreach ($context['board_activity'] as $activity)
 		{
-			$position = intval(((int) $activity['percent'] / 5)) * 20;
+			$position = -1 * intval(((int) $activity['percent'] / 5)) * 20;
 
 			echo '
 						<dt>', $activity['link'], '</dt>
 						<dd>
-							<div class="profile_pie" style="background-position: -', $position, 'px 0;" title="', sprintf($txt['statPanel_topBoards_posts'], $activity['posts'], $activity['total_posts'], $activity['posts_percent']), '">
+							<div class="profile_pie" style="background-position: ', $position, 'px 0;" title="', sprintf($txt['statPanel_topBoards_posts'], $activity['posts'], $activity['total_posts'], $activity['posts_percent']), '">
 								', sprintf($txt['statPanel_topBoards_posts'], $activity['posts'], $activity['total_posts'], $activity['posts_percent']), '
 							</div>
 							<span>', $activity['percent'], '%</span>
@@ -497,6 +527,7 @@ function template_viewWarning()
 
 	// There's some impact of this?
 	if (!empty($context['level_effects'][$context['current_level']]))
+	{
 		echo '
 				<dt>
 					<strong>', $txt['profile_viewwarning_impact'], ':</strong>
@@ -504,6 +535,7 @@ function template_viewWarning()
 				<dd>
 					', $context['level_effects'][$context['current_level']], '
 				</dd>';
+	}
 
 	echo '
 			</dl>
@@ -544,37 +576,49 @@ function template_profile_block_summary()
 
 	// The username if allowed
 	if ($context['user']['is_owner'] || $context['user']['is_admin'])
+	{
 		echo '
 						<dt>', $txt['username'], ':</dt>
 						<dd>', $context['member']['username'], '</dd>';
+	}
 
 	// Some posts stats for fun
 	if (!isset($context['disabled_fields']['posts']))
+	{
 		echo '
 						<dt>', $txt['profile_posts'], ':</dt>
 						<dd>', $context['member']['posts'], ' (', $context['member']['posts_per_day'], ' ', $txt['posts_per_day'], ')</dd>';
+	}
 
 	// Title?
 	if (!empty($modSettings['titlesEnable']) && !empty($context['member']['title']))
+	{
 		echo '
 						<dt>', $txt['custom_title'], ':</dt>
 						<dd>', $context['member']['title'], '</dd>';
+	}
 
 	// If karma is enabled show the members karma.
 	if ($modSettings['karmaMode'] == '1')
+	{
 		echo '
 						<dt>', $modSettings['karmaLabel'], '</dt>
 						<dd>', ($context['member']['karma']['good'] - $context['member']['karma']['bad']), '</dd>';
+	}
 	elseif ($modSettings['karmaMode'] == '2')
+	{
 		echo '
 						<dt>', $modSettings['karmaLabel'], '</dt>
 						<dd>+', $context['member']['karma']['good'], '/-', $context['member']['karma']['bad'], '</dd>';
+	}
 
 	// What do they like?
 	if (!empty($modSettings['likes_enabled']))
+	{
 		echo '
 						<dt>', $txt['likes'], ': </dt>
 						<dd>', $txt['likes_profile_given'], ': ', $context['member']['likes']['given'], ' / ', $txt['likes_profile_received'], ': ', $context['member']['likes']['received'], '</dd>';
+	}
 
 	// Some links to this users fine work
 	echo '
@@ -584,9 +628,12 @@ function template_profile_block_summary()
 							<br />';
 
 	if ($context['user']['is_owner'] && !empty($modSettings['drafts_enabled']))
+	{
 		echo '
 							<a href="', getUrl('profile', ['action' => 'profile', 'area' => 'showdrafts', 'u' => $context['member']['id'], 'name' => $context['member']['name']]), '">', $txt['drafts_show'], '</a>
 							<br />';
+	}
+
 	echo '
 							<a href="', getUrl('profile', ['action' => 'profile', 'area' => 'statistics', 'u' => $context['member']['id'], 'name' => $context['member']['name']]), '">', $txt['statPanel'], '</a>
 						</dd>';
@@ -634,21 +681,27 @@ function template_profile_block_user_info()
 	if ($context['can_see_ip'])
 	{
 		if (!empty($context['member']['ip']))
+		{
 			echo '
 						<dt>', $txt['ip'], ':</dt>
 						<dd><a href="', $scripturl, '?action=profile;area=history;sa=ip;searchip=', $context['member']['ip'], ';u=', $context['member']['id'], '">', $context['member']['ip'], '</a></dd>';
+		}
 
 		if (empty($modSettings['disableHostnameLookup']) && !empty($context['member']['ip']))
+		{
 			echo '
 						<dt>', $txt['hostname'], ':</dt>
 						<dd>', $context['member']['hostname'], '</dd>';
+		}
 	}
 
 	// Users language
 	if (!empty($modSettings['userLanguage']) && !empty($context['member']['language']))
+	{
 		echo '
 						<dt>', $txt['language'], ':</dt>
 						<dd>', $context['member']['language'], '</dd>';
+	}
 
 	// And their time settings
 	echo '
@@ -657,9 +710,11 @@ function template_profile_block_user_info()
 
 	// What are they up to?
 	if (!isset($context['disabled_fields']['action']) && !empty($context['member']['action']))
+	{
 		echo '
 						<dt>', $txt['profile_action'], ':</dt>
 						<dd>', $context['member']['action'], '</dd>';
+	}
 
 	// nuff about them, lets get back to me!
 	echo '
@@ -768,14 +823,18 @@ function template_profile_block_contact()
 		}
 
 		if (!empty($cf_show))
+		{
 			echo '
 				</ul>';
+		}
 	}
 
 	// No way to contact this member at all ... welcome home freak!
 	if ($ci_empty === true)
+	{
 		echo
 		$txt['profile_contact_no'];
+	}
 
 	echo '
 			</div>
@@ -806,7 +865,9 @@ function template_profile_block_other_info()
 		foreach ($context['custom_fields'] as $field)
 		{
 			if ($field['placement'] != 2 || empty($field['output_html']))
+			{
 				continue;
+			}
 
 			if (empty($shown))
 			{
@@ -839,10 +900,14 @@ function template_profile_block_other_info()
 	}
 
 	if (empty($shown))
+	{
 		echo $txt['profile_signature_no'];
+	}
 	else
+	{
 		echo '
 				</dl>';
+	}
 
 	// Done with this block
 	echo '
@@ -888,12 +953,16 @@ function template_profile_block_user_customprofileinfo()
 		}
 
 		if (!empty($shown))
+		{
 			echo '
 				</dl>';
+		}
 	}
 
 	if (empty($shown))
+	{
 		echo $txt['profile_additonal_no'];
+	}
 
 	echo '
 			</div>
@@ -932,8 +1001,10 @@ function template_profile_block_moderation()
 
 			// Can we provide information on what this means?
 			if (!empty($context['warning_status']))
+			{
 				echo '
 					<span class="smalltext">(', $context['warning_status'], ')</span>';
+			}
 
 			echo '
 					</dd>
@@ -948,10 +1019,12 @@ function template_profile_block_moderation()
 
 			// If the person looking at the summary has permission, and the account isn't activated, give the viewer the ability to do it themselves.
 			if (!empty($context['activate_message']))
+			{
 				echo '
 					<dt class="clear">
 						<span class="alert">', $context['activate_message'], '</span>&nbsp;(<a href="' . $context['activate_url'] . '"', ($context['activate_type'] == 4 ? ' onclick="return confirm(\'' . $txt['profileConfirm'] . '\');"' : ''), '>', $context['activate_link_text'], '</a>)
 					</dt>';
+			}
 
 			// If the current member is banned, show a message and possibly a link to the ban.
 			if (!empty($context['member']['bans']))
@@ -965,9 +1038,11 @@ function template_profile_block_moderation()
 						<strong>', $txt['user_banned_by_following'], ':</strong>';
 
 				foreach ($context['member']['bans'] as $ban)
+				{
 					echo '
 						<br />
 						<span class="smalltext">', $ban['explanation'], '</span>';
+				}
 
 				echo '
 					</dd>';
@@ -1124,10 +1199,12 @@ function template_profile_block_attachments()
 	}
 	// No data for this member
 	else
+	{
 		echo '
 		<div class="infobox">
 			', $txt['profile_attachments_no'], '
 		</div>';
+	}
 
 	// All done
 	echo '
@@ -1162,6 +1239,7 @@ function template_profile_block_posts()
 			</tr>';
 
 		foreach ($context['posts'] as $post)
+		{
 			echo '
 			<tr>
 				<td class="recentpost">', $post['body'], '</td>
@@ -1169,13 +1247,16 @@ function template_profile_block_posts()
 				<td class="recentsubject">', $post['link'], '</td>
 				<td class="recenttime">', $post['time'], '</td>
 			</tr>';
+		}
 	}
 	// No data for this member
 	else
+	{
 		echo '
 			<tr>
 				<td class="norecent">', (isset($context['loadaverage']) ? $txt['profile_loadavg'] : $txt['profile_posts_no']), '</td>
 			</tr>';
+	}
 
 	// All done
 	echo '
@@ -1210,19 +1291,23 @@ function template_profile_block_topics()
 			</tr>';
 
 		foreach ($context['topics'] as $post)
+		{
 			echo '
 			<tr>
 				<td class="recenttopic">', $post['link'], '</td>
 				<td class="recentboard">', $post['board']['link'], '</td>
 				<td class="recenttime">', $post['time'], '</td>
 			</tr>';
+		}
 	}
 	// No data for this member
 	else
+	{
 		echo '
 			<tr>
 				<td class="norecent">', $txt['profile_topics_no'], '</td>
 			</tr>';
+	}
 
 	// All done
 	echo '

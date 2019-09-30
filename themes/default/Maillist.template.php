@@ -68,12 +68,14 @@ function template_bounce_email()
 			// Otherwise see what we can do...';
 
 	foreach ($context['bounce_templates'] as $k => $type)
+	{
 		echo '
 			if (index == ', $k, ')
 			{
 				document.getElementById(\'warn_body\').value = "', strtr($type['body'], array('"' => "'", "\n" => '\\n', "\r" => '')), '";
 				document.getElementById(\'warn_sub\').value = "', strtr($type['subject'], array('"' => "'", "\n" => '\\n', "\r" => '')), '";
 			}';
+	}
 
 	echo '
 		}
@@ -88,8 +90,10 @@ function template_bounce_email()
 
 	// Any special messages?
 	if (!empty($context['settings_message']))
+	{
 		echo '
 			<div class="successbox">', $context['settings_message'], '</div>';
+	}
 
 	// The main body
 	echo '
@@ -121,8 +125,10 @@ function template_bounce_email()
 						<option value="-1" disabled="disabled">', str_repeat('&#8212;', strlen($txt['bounce_notify_template'])), '</option>';
 
 	foreach ($context['bounce_templates'] as $id_template => $template)
+	{
 		echo '
 							<option value="', $id_template, '">&#10148;&nbsp;', $template['title'], '</option>';
+	}
 
 	echo '
 					</select>
@@ -186,8 +192,10 @@ function template_callback_maillist_receive_email_list()
 				<select class="input_select" name="boardto[', $data['id'], ']" >';
 
 		foreach ($context['boards'] as $board_id => $board_name)
+		{
 			echo '
 					<option value="', $board_id, '"', (($data['boardto'] == $board_id) ? ' selected="selected"' : ''), '>', $board_name, '</option>';
+		}
 
 		echo '
 				</select>
@@ -207,8 +215,10 @@ function template_callback_maillist_receive_email_list()
 				<select name="boardto[', $count, ']" >';
 
 			foreach ($context['boards'] as $board_id => $board_name)
+			{
 				echo '
 					<option value="', $board_id, '">', $board_name, '</option>';
+			}
 
 			echo '
 				</select>
@@ -282,6 +292,7 @@ function template_bounce_template()
 			</dl>';
 
 	if ($context['template_data']['can_edit_personal'])
+	{
 		echo '
 			<input type="checkbox" name="make_personal" id="make_personal" ', $context['template_data']['personal'] ? 'checked="checked"' : '', ' />
 				<label for="make_personal">
@@ -289,6 +300,7 @@ function template_bounce_template()
 				</label>
 				<br />
 				<span class="smalltext">', $txt['ml_bounce_template_personal_desc'], '</span>';
+	}
 
 	echo '
 			<div class="submitbutton">

@@ -6,7 +6,7 @@
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause (see accompanying LICENSE.txt file)
  *
  * This file contains code covered by:
- * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * copyright: 2011 Simple Machines (http://www.simplemachines.org)
  *
  * @version 2.0 dev
  *
@@ -28,12 +28,14 @@ function template_modify_weights()
 			</h2>';
 
 	if (!empty($modSettings['search_index']) && (stripos($modSettings['search_index'], 'sphinx') === 0))
+	{
 		echo '
 			<div class="content">
 				<div class="infobox">',
 					$txt['search_weights_sphinx'], '
 				</div>
 			</div>';
+	}
 
 	echo '
 			<div class="content">
@@ -133,6 +135,7 @@ function template_select_search_method()
 
 			';
 	if (!empty($context['table_info']))
+	{
 		echo '
 					<dt>
 						<label>', $txt['search_method_messages_table_space'], ':</label>
@@ -146,6 +149,7 @@ function template_select_search_method()
 					<dd>
 						', $context['table_info']['index_length'], '
 					</dd>';
+	}
 
 	echo '
 				</dl>
@@ -170,15 +174,21 @@ function template_select_search_method()
 							<p>';
 
 		if (empty($context['fulltext_index']) && empty($context['cannot_create_fulltext']))
+		{
 			echo '
 								<strong>', $txt['search_index_label'], ':</strong> ', $txt['search_method_no_index_exists'], ' <a class="linkbutton" href="', $scripturl, '?action=admin;area=managesearch;sa=createfulltext;', $context['session_var'], '=', $context['session_id'], ';', $context['admin-msm_token_var'], '=', $context['admin-msm_token'], '">', $txt['search_method_fulltext_create'], '</a>';
+		}
 		elseif (empty($context['fulltext_index']) && !empty($context['cannot_create_fulltext']))
+		{
 			echo '
 								<strong>', $txt['search_index_label'], ':</strong> ', $txt['search_method_fulltext_cannot_create'];
+		}
 		else
+		{
 			echo '
 								<strong>', $txt['search_index_label'], ':</strong> ', $txt['search_method_index_already_exists'], ' <a class="linkbutton" href="', $scripturl, '?action=admin;area=managesearch;sa=removefulltext;', $context['session_var'], '=', $context['session_id'], ';', $context['admin-msm_token_var'], '=', $context['admin-msm_token'], '">', $txt['search_method_fulltext_remove'], '</a><br />
 								<strong>', $txt['search_index_size'], ':</strong> ', $context['table_info']['fulltext_length'];
+		}
 
 		echo '
 							</p>
@@ -194,16 +204,22 @@ function template_select_search_method()
 							<p>';
 
 	if ($context['custom_index'])
+	{
 		echo '
 								<strong>', $txt['search_index_label'], ':</strong> ', $txt['search_method_index_already_exists'], ' <a class="linkbutton" href="', $scripturl, '?action=admin;area=managesearch;sa=removecustom;', $context['session_var'], '=', $context['session_id'], ';', $context['admin-msm_token_var'], '=', $context['admin-msm_token'], '">', $txt['search_index_custom_remove'], '</a><br />
 								<strong>', $txt['search_index_size'], ':</strong> ', $context['table_info']['custom_index_length'];
+	}
 	elseif ($context['partial_custom_index'])
+	{
 		echo '
 								<strong>', $txt['search_index_label'], ':</strong> ', $txt['search_method_index_partial'], ' <a class="linkbutton" href="', $scripturl, '?action=admin;area=managesearch;sa=removecustom;', $context['session_var'], '=', $context['session_id'], ';', $context['admin-msm_token_var'], '=', $context['admin-msm_token'], '">', $txt['search_index_custom_remove'], '</a> <a class="linkbutton" href="', $scripturl, '?action=admin;area=managesearch;sa=createmsgindex;resume;', $context['session_var'], '=', $context['session_id'], ';', $context['admin-msm_token_var'], '=', $context['admin-msm_token'], '">', $txt['search_index_custom_resume'], '</a><br />
 								<strong>', $txt['search_index_size'], ':</strong> ', $context['table_info']['custom_index_length'];
+	}
 	else
+	{
 		echo '
 								<strong>', $txt['search_index_label'], ':</strong> ', $txt['search_method_no_index_exists'], ' <a class="linkbutton" href="', $scripturl, '?action=admin;area=managesearch;sa=createmsgindex">', $txt['search_index_create_custom'], '</a>';
+	}
 
 	echo '
 							</p>
@@ -213,7 +229,9 @@ function template_select_search_method()
 	foreach ($context['search_apis'] as $api)
 	{
 		if (empty($api['label']) || $api['has_template'])
+		{
 			continue;
+		}
 
 		echo '
 						<dt>
@@ -222,10 +240,12 @@ function template_select_search_method()
 						</dt>';
 
 		if ($api['desc'])
+		{
 			echo '
 						<dd>
 							<p>', $api['desc'], '</p>
 						</dd>';
+		}
 	}
 
 	echo '

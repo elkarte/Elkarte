@@ -6,7 +6,7 @@
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause (see accompanying LICENSE.txt file)
  *
  * This file contains code covered by:
- * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * copyright: 2011 Simple Machines (http://www.simplemachines.org)
  *
  * @version 2.0 dev
  *
@@ -33,10 +33,12 @@ function template_announce()
 				<ul>';
 
 	foreach ($context['groups'] as $group)
+	{
 		echo '
 					<li>
 						<label for="who_', $group['id'], '"><input type="checkbox" name="who[', $group['id'], ']" id="who_', $group['id'], '" value="', $group['id'], '" checked="checked" /> ', $group['name'], '</label> <em>(', $group['member_count'], ')</em>
 					</li>';
+	}
 
 	echo '
 					<li>

@@ -6,7 +6,7 @@
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause (see accompanying LICENSE.txt file)
  *
  * This file contains code covered by:
- * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * copyright:    2011 Simple Machines (http://www.simplemachines.org)
  *
  * @version 2.0 dev
  *
@@ -24,13 +24,17 @@ function template_servers()
 		<h2 class="category_header">', $txt['package_servers'], '</h2>';
 
 	if (!empty($context['package_ftp']['error']))
+	{
 		echo '
 			<div class="errorbox">
 				', $context['package_ftp']['error'], '
 			</div>';
+	}
 
 	if ($context['package_download_broken'])
+	{
 		template_ftp_form_required();
+	}
 
 	echo '
 		<div class="content">
@@ -39,6 +43,7 @@ function template_servers()
 				<ul class="package_servers">';
 
 	foreach ($context['servers'] as $server)
+	{
 		echo '
 					<li class="flow_auto">
 						<strong>' . $server['name'] . '</strong>
@@ -47,6 +52,7 @@ function template_servers()
 							&nbsp;<a class="linkbutton" href="' . $scripturl . '?action=admin;area=packageservers;sa=remove;server=' . $server['id'] . ';', $context['session_var'], '=', $context['session_id'], '">' . $txt['delete'] . '</a>
 						</span>
 					</li>';
+	}
 
 	echo '
 				</ul>
@@ -135,10 +141,12 @@ function template_package_list()
 
 	// No packages, as yet.
 	if (empty($context['package_list']))
+	{
 		echo '
 				<ul>
 					<li>', $txt['no_packages'], '</li>
 				</ul>';
+	}
 	// List out the packages...
 	else
 	{
@@ -155,8 +163,10 @@ function template_package_list()
 						</p>';
 
 			if (!empty($packageSection['text']))
+			{
 				echo '
 						<div class="content">', $packageSection['text'], '</div>';
+			}
 
 			// List of addons available in this section
 			echo '
@@ -177,31 +187,40 @@ function template_package_list()
 					sprintf($txt['package_update'], '<i class="icon i-fail" title="' . $txt['package_installed_old'] . '"></i>', $txt['package_installed']);
 				}
 				// Installed but nothing newer is available
-				else if ($package['is_installed'])
-				{
-					echo '
-							<span class="package_id">', $package['name'], '</span>&nbsp;',
-					sprintf($txt['package_current'], '<i class="icon i-check" title="' . $txt['package_installed_current'] . '"></i>', $txt['package_installed']);
-				}
-				// Downloaded, but there is a more recent version available
-				else if ($package['is_downloaded'] && $package['is_newer'])
-				{
-					echo '
-							<span class="package_id">', $package['name'], '</span>&nbsp;<a class="linkbutton" href="', $package['download']['href'], '">', $txt['download'], '</a>&nbsp;',
-					sprintf($txt['package_update'], '<i class="icon i-warning" title="' . $txt['package_installed_old'] . '"></i>', $txt['package_downloaded']);
-				}
-				// Downloaded, and its current
-				else if ($package['is_downloaded'])
-				{
-					echo '
-							<span class="package_id">', $package['name'], '</span>&nbsp;',
-					sprintf($txt['package_current'], '<i class="icon i-check" title="' . $txt['package_installed_current'] . '"></i>', $txt['package_downloaded']);
-				}
-				// Not downloaded or installed
 				else
 				{
-					echo '
+					if ($package['is_installed'])
+					{
+						echo '
+							<span class="package_id">', $package['name'], '</span>&nbsp;',
+						sprintf($txt['package_current'], '<i class="icon i-check" title="' . $txt['package_installed_current'] . '"></i>', $txt['package_installed']);
+					}
+					// Downloaded, but there is a more recent version available
+					else
+					{
+						if ($package['is_downloaded'] && $package['is_newer'])
+						{
+							echo '
+							<span class="package_id">', $package['name'], '</span>&nbsp;<a class="linkbutton" href="', $package['download']['href'], '">', $txt['download'], '</a>&nbsp;',
+							sprintf($txt['package_update'], '<i class="icon i-warning" title="' . $txt['package_installed_old'] . '"></i>', $txt['package_downloaded']);
+						}
+						// Downloaded, and its current
+						else
+						{
+							if ($package['is_downloaded'])
+							{
+								echo '
+							<span class="package_id">', $package['name'], '</span>&nbsp;',
+								sprintf($txt['package_current'], '<i class="icon i-check" title="' . $txt['package_installed_current'] . '"></i>', $txt['package_downloaded']);
+							}
+							// Not downloaded or installed
+							else
+							{
+								echo '
 							<span class="package_id">', $package['name'], '</span>&nbsp;<a class="linkbutton" href="', $package['download']['href'], '">', $txt['download'], '</a>';
+							}
+						}
+					}
 				}
 
 				echo '
@@ -209,28 +228,38 @@ function template_package_list()
 
 				// Show the addon type?
 				if ($package['type'] != '')
+				{
 					echo '
 								<li>', $txt['package_type'], ':&nbsp; ', \ElkArte\Util::ucwords(\ElkArte\Util::strtolower($package['type'])), '</li>';
+				}
 
 				// Show the version number?
 				if ($package['version'] != '')
+				{
 					echo '
 								<li>', $txt['mod_version'], ':&nbsp; ', $package['version'], '</li>';
+				}
 
 				// Show the last date?
 				if ($package['date'] != '')
+				{
 					echo '
 								<li>', $txt['mod_date'], ':&nbsp; ', $package['date'], '</li>';
+				}
 
 				// How 'bout the author?
 				if (!empty($package['author']))
+				{
 					echo '
 								<li>', $txt['mod_author'], ':&nbsp; ', $package['author'], '</li>';
+				}
 
 				// Nothing but hooks ?
 				if ($package['hooks'] != '' && in_array($package['hooks'], array('yes', 'true')))
+				{
 					echo '
 								<li>', $txt['mod_hooks'], ' <i class="icon i-check"></i></li>';
+				}
 
 				// Location of file: http://someplace/.
 				echo '
@@ -240,13 +269,17 @@ function template_package_list()
 
 				// Location of issues?
 				if (!empty($package['server']['bugs']))
+				{
 					echo '
 										<li><i class="icon i-bug"></i> ', $txt['bug_location'], ':&nbsp; <a href="', $package['server']['bugs'], '">', $package['server']['bugs'], '</a></li>';
+				}
 
 				// Location of support?
 				if (!empty($package['server']['support']))
+				{
 					echo '
 										<li><i class="icon i-support"></i> ', $txt['support_location'], ':&nbsp; <a href="', $package['server']['support'], '">', $package['server']['support'], '</a></li>';
+				}
 
 				// Description: bleh bleh!
 				echo '
@@ -379,10 +412,12 @@ function template_upload()
 	global $context, $txt, $scripturl;
 
 	if (!empty($context['package_ftp']['error']))
+	{
 		echo '
 	<div class="errorbox">
 		', $context['package_ftp']['error'], '
 	</div>';
+	}
 
 	echo '
 	<div id="admin_form_wrapper">

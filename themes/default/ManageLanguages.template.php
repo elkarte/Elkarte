@@ -6,7 +6,7 @@
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause (see accompanying LICENSE.txt file)
  *
  * This file contains code covered by:
- * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * copyright: 2011 Simple Machines (http://www.simplemachines.org)
  *
  * @version 2.0 dev
  *
@@ -29,15 +29,18 @@ function template_download_language()
 			', $context['install_complete'], '
 		</div>
 	</div>';
+
 		return;
 	}
 
 	// An error?
 	if (!empty($context['error_message']))
+	{
 		echo '
 	<div class="errorbox">
 		', $context['error_message'], '
 	</div>';
+	}
 
 	// Provide something of an introduction...
 	echo '
@@ -146,8 +149,10 @@ function template_download_language()
 				aSwappableContainers: [';
 
 		foreach ($group as $file)
+		{
 			echo '
 					', JavaScriptEscape($theme . '-' . ($count++)), ',';
+		}
 
 		echo '
 					null
@@ -258,8 +263,10 @@ function template_modify_language_entries()
 						<option value="-1">', $theme['name'], '</option>';
 
 		foreach ($theme['files'] as $file)
+		{
 			echo '
 						<option value="', $id_theme, '+', $file['id'], '"', $file['selected'] ? ' selected="selected"' : '', '> =&gt; ', $file['name'], '</option>';
+		}
 	}
 
 	echo '
@@ -273,10 +280,12 @@ function template_modify_language_entries()
 	// Is it not writable?
 	// Show an error.
 	if (!empty($context['entries_not_writable_message']))
+	{
 		echo '
 			<div class="errorbox">
 				', $context['entries_not_writable_message'], '
 			</div>';
+	}
 
 	// Already have some file entries?
 	if (!empty($context['file_entries']))

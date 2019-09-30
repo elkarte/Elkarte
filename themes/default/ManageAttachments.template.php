@@ -6,7 +6,7 @@
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause (see accompanying LICENSE.txt file)
  *
  * This file contains code covered by:
- * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * copyright: 2011 Simple Machines (http://www.simplemachines.org)
  *
  * @version 2.0 dev
  *
@@ -97,8 +97,10 @@ function template_maintenance()
 
 	// Any results to show
 	if (!empty($context['results']))
+	{
 		echo '
 		<div class="successbox">', $context['results'], '</div>';
+	}
 
 	// Lots-o-options
 	echo '
@@ -114,8 +116,10 @@ function template_maintenance()
 							<option value="0">', $txt['attachment_transfer_select'], '</option>';
 
 	foreach ($context['attach_dirs'] as $id => $dir)
+	{
 		echo '
 								<option value="', $id, '">', $dir, '</option>';
+	}
 
 	echo '
 						</select>
@@ -129,12 +133,18 @@ function template_maintenance()
 							<option value="-1">', $txt['attachment_transfer_forum_root'], '</option>';
 
 	if (!empty($context['base_dirs']))
+	{
 		foreach ($context['base_dirs'] as $id => $dir)
+		{
 			echo '
 							<option value="', $id, '">', $dir, '</option>';
+		}
+	}
 	else
+	{
 		echo '
 							<option value="0" disabled="disabled">', $txt['attachment_transfer_no_base'], '</option>';
+	}
 
 	echo '
 						</select>
@@ -147,8 +157,10 @@ function template_maintenance()
 							<option value="0">', $txt['attachment_transfer_select'], '</option>';
 
 	foreach ($context['attach_dirs'] as $id => $dir)
+	{
 		echo '
 							<option value="', $id, '">', $dir, '</option>';
+	}
 
 	echo '
 						</select>
@@ -156,6 +168,7 @@ function template_maintenance()
 
 	// If there are directory limits to impose, give the option to enforce it
 	if (!empty($modSettings['attachmentDirFileLimit']))
+	{
 		echo '
 					<dt>
 						<a href="' . $scripturl . '?action=quickhelp;help=attachment_transfer_empty" onclick="return reqOverlayDiv(this.href);" class="helpicon i-help"><s>' . $txt['help'] . '</s></a>', $txt['attachment_transfer_empty'], '
@@ -163,6 +176,7 @@ function template_maintenance()
 					<dd>
 						<input type="checkbox" name="empty_it"', $context['checked'] ? ' checked="checked"' : '', ' />
 					</dd>';
+	}
 
 	echo '
 				</dl>
@@ -234,10 +248,12 @@ function template_attachment_repair()
 		foreach ($context['repair_errors'] as $error => $number)
 		{
 			if (!empty($number))
+			{
 				echo '
 			<input type="checkbox" name="to_fix[]" id="', $error, '" value="', $error, '" />
 			<label for="', $error, '">', sprintf($txt['attach_repair_' . $error], $number), '</label>
 			<br />';
+			}
 		}
 
 		echo '
@@ -258,7 +274,9 @@ function template_attach_paths()
 	global $modSettings;
 
 	if (!empty($modSettings['attachment_basedirectories']))
+	{
 		template_show_list('base_paths');
+	}
 
 	template_show_list('attach_paths');
 }

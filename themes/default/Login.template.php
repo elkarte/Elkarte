@@ -6,7 +6,7 @@
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause (see accompanying LICENSE.txt file)
  *
  * This file contains code covered by:
- * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * copyright: 2011 Simple Machines (http://www.simplemachines.org)
  *
  * @version 2.0 dev
  *
@@ -29,13 +29,17 @@ function template_login()
 
 	// Did they make a mistake last time?
 	if (!empty($context['login_errors']))
+	{
 		echo '
 					<p class="errorbox">', implode('<br />', $context['login_errors']), '</p>';
+	}
 
 	// Or perhaps there's some special description for this time?
 	if (isset($context['description']))
+	{
 		echo '
 					<p class="description">', $context['description'], '</p>';
+	}
 
 	// Now just get the basic information - username, password, etc.
 	echo '
@@ -54,13 +58,16 @@ function template_login()
 						</dd>';
 
 	if (!empty($modSettings['enableOTP']))
+	{
 		echo '
 						<dt>', $txt['otp_token'], '</dt>
 						<dd>
 							<input type="password" name="otp_token" id="otp_token" value="', $context['default_password'], '" size="30" class="input_password" placeholder="', $txt['otp_token'], '" />
 						</dd>';
+	}
 
 	if (!empty($modSettings['enableOpenID']))
+	{
 		echo '
 					</dl>
 					<p><strong>&mdash;', $txt['or'], '&mdash;</strong></p>
@@ -73,6 +80,7 @@ function template_login()
 						</dd>
 					</dl>
 					<hr />';
+	}
 
 	echo '
 					<dl>
@@ -91,6 +99,7 @@ function template_login()
 
 	// If they have deleted their account, give them a chance to change their mind.
 	if (isset($context['login_show_undelete']))
+	{
 		echo '
 						<dt class="alert">
 							<label for="undelete">', $txt['undelete_account'], ':</label>
@@ -98,6 +107,7 @@ function template_login()
 						<dd>
 							<input type="checkbox" name="undelete" id="undelete" />
 						</dd>';
+	}
 
 	echo '
 					</dl>
@@ -139,9 +149,13 @@ function template_kick_guest()
 				', empty($context['kick_message']) ? $txt['only_members_can_access'] : $context['kick_message'], '<br />';
 
 	if ($context['can_register'])
+	{
 		echo sprintf($txt['login_below_or_register'], $scripturl . '?action=register', $context['forum_name_html_safe']);
+	}
 	else
+	{
 		echo $txt['login_below'];
+	}
 
 	// And now the login information.
 	echo '
@@ -165,13 +179,16 @@ function template_kick_guest()
 					</dd>';
 
 	if (!empty($modSettings['enableOTP']))
+	{
 		echo '
 						<dt>', $txt['otp_token'], '</dt>
 						<dd>
 							<input type="password" name="otp_token" id="otp_token" value="', $context['default_password'], '" size="30" class="input_password" placeholder="', $txt['otp_token'], '" />
 						</dd>';
+	}
 
 	if (!empty($modSettings['enableOpenID']))
+	{
 		echo '
 				</dl>
 				<p><strong>&mdash;', $txt['or'], '&mdash;</strong></p>
@@ -185,6 +202,7 @@ function template_kick_guest()
 				</dl>
 				<hr />
 				<dl>';
+	}
 
 	echo '
 					<dt>
@@ -288,8 +306,10 @@ function template_admin_login()
 		<div class="well centertext">';
 
 	if (!empty($context['incorrect_password']))
+	{
 		echo '
 			<div class="errorbox">', $txt['admin_incorrect_password'], '</div>';
+	}
 
 	echo '
 			<label for="', $context['sessionCheckType'], '_pass">', $txt['password'], ':</label>
@@ -331,6 +351,7 @@ function template_retry_activate()
 
 	// You didn't even have an ID?
 	if (empty($context['member_id']))
+	{
 		echo '
 					<dt>
 						<label for="user">', $txt['invalid_activation_username'], ':</label>
@@ -338,6 +359,7 @@ function template_retry_activate()
 					<dd>
 						<input type="text" name="user" id="user" size="30" class="input_text" />
 					</dd>';
+	}
 
 	echo '
 					<dt>
@@ -390,6 +412,7 @@ function template_resend()
 					</dd>';
 
 	if ($context['can_activate'])
+	{
 		echo '
 					<dt>
 						<label for="code">', $txt['invalid_activation_retry'], ':</label>
@@ -398,6 +421,7 @@ function template_resend()
 					<dd>
 						<input type="text" name="code" id="code" size="30" class="input_text" />
 					</dd>';
+	}
 
 	echo '
 				</dl>

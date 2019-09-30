@@ -6,7 +6,7 @@
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause (see accompanying LICENSE.txt file)
  *
  * This file contains code covered by:
- * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * copyright: 2011 Simple Machines (http://www.simplemachines.org)
  *
  * @version 2.0 dev
  *
@@ -25,11 +25,13 @@ function template_modify_subscription()
 			<h2 class="category_header">', $txt['paid_' . $context['action_type'] . '_subscription'], '</h2>';
 
 	if (!empty($context['disable_groups']))
+	{
 		echo '
 			<div class="warningbox">
 				', $txt['paid_mod_edit_note'], '
 			</div>
 			';
+	}
 
 	echo '
 			<div class="content">
@@ -70,8 +72,10 @@ function template_modify_subscription()
 
 	// Put each group into the box.
 	foreach ($context['groups'] as $groups)
+	{
 		echo '
 							<option value="', $groups['id'], '" ', $context['sub']['prim_group'] == $groups['id'] ? 'selected="selected"' : '', '>', $groups['name'], '</option>';
+	}
 
 	echo '
 						</select>
@@ -83,8 +87,10 @@ function template_modify_subscription()
 
 	// Put a checkbox in for each group
 	foreach ($context['groups'] as $groups)
+	{
 		echo '
 						<input type="checkbox" id="addgroup_', $groups['id'], '" name="addgroup[', $groups['id'], ']"', in_array($groups['id'], $context['sub']['add_groups']) ? ' checked="checked"' : '', ' ', !empty($context['disable_groups']) ? ' disabled="disabled"' : '', ' />&nbsp;<label for="addgroup_', $groups['id'], '" class="smalltext">', $groups['name'], '</label><br />';
+	}
 
 	echo '
 					</dd>
@@ -238,6 +244,7 @@ function template_modify_user_subscription()
 
 	// Do we need a username?
 	if ($context['action_type'] == 'add')
+	{
 		echo '
 					<dt>
 						<label for="name_control">', $txt['paid_username'], ':</label><br />
@@ -246,6 +253,7 @@ function template_modify_user_subscription()
 					<dd>
 						<input type="text" name="name" id="name_control" value="', $context['sub']['username'], '" size="30" class="input_text" />
 					</dd>';
+	}
 
 	echo '
 					<dt>
@@ -264,8 +272,10 @@ function template_modify_user_subscription()
 
 	// Show a list of all the years we allow...
 	for ($year = 2010; $year <= 2030; $year++)
+	{
 		echo '
 						<option value="', $year, '"', $year == $context['sub']['start']['year'] ? ' selected="selected"' : '', '>', $year, '</option>';
+	}
 
 	echo '
 					</select>&nbsp;
@@ -274,8 +284,10 @@ function template_modify_user_subscription()
 
 	// There are 12 months per year - ensure that they all get listed.
 	for ($month = 1; $month <= 12; $month++)
+	{
 		echo '
 						<option value="', $month, '"', $month == $context['sub']['start']['month'] ? ' selected="selected"' : '', '>', $txt['months'][$month], '</option>';
+	}
 
 	echo '
 					</select>&nbsp;
@@ -284,8 +296,10 @@ function template_modify_user_subscription()
 
 	// This prints out all the days in the current month - this changes dynamically as we switch months.
 	for ($day = 1; $day <= $context['sub']['start']['last_day']; $day++)
+	{
 		echo '
 						<option value="', $day, '"', $day == $context['sub']['start']['day'] ? ' selected="selected"' : '', '>', $day, '</option>';
+	}
 
 	echo '
 					</select>
@@ -299,8 +313,10 @@ function template_modify_user_subscription()
 
 	// Show a list of all the years we allow...
 	for ($year = 2010; $year <= 2030; $year++)
+	{
 		echo '
 						<option value="', $year, '"', $year == $context['sub']['end']['year'] ? ' selected="selected"' : '', '>', $year, '</option>';
+	}
 
 	echo '
 					</select>&nbsp;
@@ -309,8 +325,10 @@ function template_modify_user_subscription()
 
 	// There are 12 months per year - ensure that they all get listed.
 	for ($month = 1; $month <= 12; $month++)
+	{
 		echo '
 						<option value="', $month, '"', $month == $context['sub']['end']['month'] ? ' selected="selected"' : '', '>', $txt['months'][$month], '</option>';
+	}
 
 	echo '
 					</select>&nbsp;
@@ -319,8 +337,10 @@ function template_modify_user_subscription()
 
 	// This prints out all the days in the current month - this changes dynamically as we switch months.
 	for ($day = 1; $day <= $context['sub']['end']['last_day']; $day++)
+	{
 		echo '
 						<option value="', $day, '"', $day == $context['sub']['end']['day'] ? ' selected="selected"' : '', '>', $day, '</option>';
+	}
 
 	echo '
 					</select>
@@ -408,7 +428,9 @@ function template_user_subscription()
 		{
 			// Ignore the inactive ones...
 			if (empty($subscription['active']))
+			{
 				continue;
+			}
 
 			echo '
 			<h2 class="category_header">', $subscription['name'], '</h2>
@@ -417,10 +439,12 @@ function template_user_subscription()
 				<p class="content">', $subscription['desc'], '</p>';
 
 			if (!$subscription['flexible'])
+			{
 				echo '
 				<div>
 					<strong>', $txt['paid_duration'], ':</strong> ', $subscription['length'], '
 				</div>';
+			}
 
 			if ($context['user']['is_owner'])
 			{
@@ -434,22 +458,28 @@ function template_user_subscription()
 
 					// Print out the costs for this one.
 					foreach ($subscription['costs'] as $duration => $value)
+					{
 						echo '
 					<option value="', $duration, '">', sprintf($modSettings['paid_currency_symbol'], $value), '/', $txt[$duration], '</option>';
+					}
 
 					echo '
 				</select>';
 				}
 				else
+				{
 					echo '
 				', sprintf($modSettings['paid_currency_symbol'], $subscription['costs']['fixed']);
+				}
 
 				echo '
 				<input type="submit" name="sub_id[', $subscription['id'], ']" value="', $txt['paid_order'], '" class="right_submit" />';
 			}
 			else
+			{
 				echo '
 				<a class="linkbutton" href="', $scripturl, '?action=admin;area=paidsubscribe;sa=modifyuser;sid=', $subscription['id'], ';uid=', $context['member']['id'], (empty($context['current'][$subscription['id']]) ? '' : ';lid=' . $context['current'][$subscription['id']]['id']), '">', empty($context['current'][$subscription['id']]) ? $txt['paid_admin_add'] : $txt['paid_edit_subscription'], '</a>';
+			}
 
 			echo '
 			</div>';
@@ -475,16 +505,19 @@ function template_user_subscription()
 				<tbody>';
 
 	if (empty($context['current']))
+	{
 		echo '
 					<tr>
 						<td class="centertext" colspan="4">
 							', $txt['paid_none_ordered'], '
 						</td>
 					</tr>';
+	}
 
 	foreach ($context['current'] as $sub)
 	{
 		if (!$sub['hide'])
+		{
 			echo '
 					<tr>
 						<td>
@@ -497,6 +530,7 @@ function template_user_subscription()
 							', $sub['end'], '
 						</td>
 					</tr>';
+		}
 	}
 	echo '
 				</tbody>
@@ -545,8 +579,10 @@ function template_choose_payment()
 			<form id="', $gateway['id'], '" action="', $gateway['form'], '" method="post">';
 
 		foreach ($gateway['hidden'] as $name => $value)
+		{
 			echo '
 				<input type="hidden" id="', $gateway['id'], '_', $name, '" name="', $name, '" value="', $value, '" />';
+		}
 
 		echo '
 				<div class="submitbutton">

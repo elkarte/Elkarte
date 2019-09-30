@@ -6,7 +6,7 @@
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause (see accompanying LICENSE.txt file)
  *
  * This file contains code covered by:
- * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * copyright: 2011 Simple Machines (http://www.simplemachines.org)
  *
  * @version 2.0 dev
  *
@@ -65,8 +65,10 @@ function template_memberlist()
 			<span class="floatleft">', $txt['members_list'], '</span>';
 
 	if (!empty($context['letter_links']))
+	{
 		echo '
 				<span class="floatright letter_links">', $context['letter_links'], '</span>';
+	}
 
 	echo '
 		</h2>
@@ -92,16 +94,20 @@ function template_memberlist()
 
 		// This is a selected column, so underline it or some such.
 		if ($column['selected'])
+		{
 			echo '
 					<div class="' . $column['class'] . '">
 						<a href="' . $column['href'] . '">' . $column['label'] . '<i class="icon icon-small i-sort-' . $sorticon . '-' . $context['sort_direction'] . '"></i></a>
 					</div>';
+		}
 		// This is just some column... show the link and be done with it.
 		else
+		{
 			echo '
 					<div class="' . $column['class'] . '">
 						', $column['link'], '
 					</div>';
+		}
 	}
 
 	echo '
@@ -140,8 +146,10 @@ function template_memberlist()
 						echo template_member_email($member);
 					}
 					else
+					{
 						echo '
 					', $member[$column];
+					}
 
 					echo '
 					</div>';
@@ -166,12 +174,14 @@ function template_memberlist()
 	}
 	// No members?
 	else
+	{
 		echo '
 			</ul>
 		</div>
 		<div class="infobox">
 			', $txt['search_no_results'], '
 		</div>';
+	}
 }
 
 /**

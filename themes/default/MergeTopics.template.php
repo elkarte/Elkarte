@@ -6,7 +6,7 @@
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause (see accompanying LICENSE.txt file)
  *
  * This file contains code covered by:
- * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * copyright: 2011 Simple Machines (http://www.simplemachines.org)
  *
  * @version 2.0 dev
  *
@@ -81,8 +81,10 @@ function template_merge()
 							<select name="targetboard" onchange="this.form.submit();">';
 
 		foreach ($context['boards'] as $board)
+		{
 			echo '
 									<option value="', $board['id'], '"', $board['id'] == $context['target_board'] ? ' selected="selected"' : '', '>', $board['category'], ' - ', $board['name'], '</option>';
+		}
 
 		echo '
 							</select>
@@ -117,6 +119,7 @@ function template_merge()
 				<ul class="merge_topics">';
 
 	foreach ($context['topics'] as $topic)
+	{
 		echo '
 					<li>
 						<a class="linkbutton" href="', $scripturl, '?action=mergetopics;sa=options;board=', $context['current_board'], '.0;from=', $context['origin_topic'], ';to=', $topic['id'], ';', $context['session_var'], '=', $context['session_id'], '">
@@ -124,6 +127,7 @@ function template_merge()
 						</a>&nbsp;
 						<a href="', $scripturl, '?topic=', $topic['id'], '.0" target="_blank" class="new_win">', $topic['subject'], '</a> ', sprintf($txt['topic_started_by'], $topic['poster']['link']), '
 					</li>';
+	}
 
 	echo '
 				</ul>
@@ -155,6 +159,7 @@ function template_merge_extra_options()
 				<tbody>';
 
 	foreach ($context['topics'] as $topic)
+	{
 		echo '
 					<tr>
 						<td class="centertext">
@@ -175,6 +180,7 @@ function template_merge_extra_options()
 							<input type="checkbox" name="notifications[]" value="' . $topic['id'] . '" checked="checked" />
 						</td>
 					</tr>';
+	}
 
 	echo '
 				</tbody>
@@ -187,8 +193,10 @@ function template_merge_extra_options()
 					<select name="subject" onchange="this.form.custom_subject.style.display = (this.options[this.selectedIndex].value != 0) ? \'none\': \'block\' ;">';
 
 	foreach ($context['topics'] as $topic)
+	{
 		echo '
 						<option value="', $topic['id'], '"' . ($topic['selected'] ? ' selected="selected"' : '') . '>', $topic['subject'], '</option>';
+	}
 
 	echo '
 						<option value="0">', $txt['merge_custom_subject'], ':</option>
@@ -220,10 +228,12 @@ function template_merge_extra_options()
 						<ul>';
 
 		foreach ($context['polls'] as $poll)
+		{
 			echo '
 							<li>
 								<input type="radio" id="poll', $poll['id'], '" name="poll" value="', $poll['id'], '"', $poll['selected'] ? ' checked="checked"' : '', ' /> <label for="poll', $poll['id'], '">', $poll['question'], '</label> (', $txt['topic'], ': <a href="', $scripturl, '?topic=', $poll['topic']['id'], '.0" target="_blank" class="new_win">', $poll['topic']['subject'], '</a>)
 							</li>';
+		}
 
 		echo '
 							<li>

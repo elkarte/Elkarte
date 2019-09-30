@@ -6,7 +6,7 @@
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause (see accompanying LICENSE.txt file)
  *
  * This file contains code covered by:
- * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * copyright: 2011 Simple Machines (http://www.simplemachines.org)
  *
  * @version 2.0 dev
  *
@@ -108,11 +108,15 @@ function template_print_above()
 
 	// Which option is set, text or text&images
 	if (!empty($context['viewing_attach']))
+	{
 		echo '
 			<a href="', $context['view_attach_mode']['text'], '">', $txt['print_page_text'], '</a> | <strong><a href="', $context['view_attach_mode']['images'], '">', $txt['print_page_images'], '</a></strong>';
+	}
 	else
+	{
 		echo '
 			<strong><a href="', $context['view_attach_mode']['text'], '">', $txt['print_page_text'], '</a></strong> | <a href="', $context['view_attach_mode']['images'], '">', $txt['print_page_images'], '</a>';
+	}
 
 	echo '
 		</div>
@@ -136,10 +140,12 @@ function template_print_poll_above()
 
 		$print_options = 1;
 		foreach ($context['poll']['options'] as $option)
+		{
 			echo '
 					<div class="', $option['voted_this'] ? 'voted' : '', '">', $txt['option'], ' ', $print_options++, ': <strong>', $option['option'], '</strong>
 						', $context['allow_poll_view'] ? $txt['votes'] . ': ' . $option['votes'] . '' : '', '
 					</div>';
+		}
 
 		echo '
 			</div>';
@@ -170,8 +176,10 @@ function template_print_page()
 				<hr />';
 
 			foreach ($context['printattach'][$post['id_msg']] as $attach)
+			{
 				echo '
 					<img style="width:' . $attach['width'] . 'px; height:' . $attach['height'] . 'px;" src="', $scripturl . '?action=dlattach;topic=' . $topic . '.0;attach=' . $attach['id_attach'] . '" alt="" />';
+			}
 		}
 
 		echo '
@@ -192,11 +200,15 @@ function template_print_below()
 
 	// Show the text / image links
 	if (!empty($context['viewing_attach']))
+	{
 		echo '
 			<a href="', $context['view_attach_mode']['text'], '">', $txt['print_page_text'], '</a> | <strong><a href="', $context['view_attach_mode']['images'], '">', $txt['print_page_images'], '</a></strong>';
+	}
 	else
+	{
 		echo '
 			<strong><a href="', $context['view_attach_mode']['text'], '">', $txt['print_page_text'], '</a></strong> | <a href="', $context['view_attach_mode']['images'], '">', $txt['print_page_images'], '</a>';
+	}
 
 	echo '
 		</div>

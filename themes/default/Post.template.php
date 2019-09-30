@@ -418,7 +418,9 @@ function template_add_new_attachments()
 										txt_more_attachments_error = "', $txt['more_attachments_error'], '",
 										txt_more_attachments = "', $txt['more_attachments'], '",
 										txt_clean_attach = "', $txt['clean_attach'], '";
-								</script>
+								</script>';
+
+			echo '
 							</dd>
 							<dd class="smalltext drop_attachments_no_js" id="moreAttachments"><a href="#" onclick="addAttachment(); return false;">(', $txt['more_attachments'], ')</a></dd>';
 		}
@@ -880,7 +882,9 @@ function template_spellcheck()
 		<script src="', $settings['default_theme_url'], '/scripts/script.js"></script>
 		<script>
 			', $context['spell_js'], '
-		</script>
+		</script>';
+
+	echo '
 	</head>
 	<body onload="nextWord(false);">
 		<form action="#" method="post" accept-charset="UTF-8" name="spellingForm" id="spellingForm" onsubmit="return false;" style="margin: 0;">
