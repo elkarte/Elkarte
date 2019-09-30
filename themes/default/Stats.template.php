@@ -6,7 +6,7 @@
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause (see accompanying LICENSE.txt file)
  *
  * This file contains code covered by:
- * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * copyright: 2011 Simple Machines (http://www.simplemachines.org)
  *
  * @version 2.0 dev
  *
@@ -72,9 +72,13 @@ function template_general_statistics()
 		if (is_array($value))
 		{
 			if (isset($settings[$key]))
+			{
 				$value = strtr($settings[$key], $value);
+			}
 			else
+			{
 				continue;
+			}
 		}
 
 		echo '
@@ -91,9 +95,13 @@ function template_general_statistics()
 		if (is_array($value))
 		{
 			if (isset($settings[$key]))
+			{
 				$value = strtr($settings[$key], $value);
+			}
 			else
+			{
 				continue;
+			}
 		}
 
 		echo '
@@ -261,8 +269,10 @@ function template_forum_history()
 						<th class="history_head">', $txt['most_online'], '</th>';
 
 		if (!empty($modSettings['hitStats']))
+		{
 			echo '
 						<th class="history_head">', $txt['page_views'], '</th>';
+		}
 
 		echo '
 					</tr>
@@ -282,8 +292,10 @@ function template_forum_history()
 						<th>', $year['most_members_online'], '</th>';
 
 			if (!empty($modSettings['hitStats']))
+			{
 				echo '
 						<th>', $year['hits'], '</th>';
+			}
 
 			echo '
 					</tr>';
@@ -301,8 +313,10 @@ function template_forum_history()
 						<th>', $month['most_members_online'], '</th>';
 
 				if (!empty($modSettings['hitStats']))
+				{
 					echo '
 						<th>', $month['hits'], '</th>';
+				}
 
 				echo '
 					</tr>';
@@ -320,8 +334,10 @@ function template_forum_history()
 						<td>', $day['most_members_online'], '</td>';
 
 						if (!empty($modSettings['hitStats']))
+						{
 							echo '
 						<td>', $day['hits'], '</td>';
+						}
 
 						echo '
 					</tr>';

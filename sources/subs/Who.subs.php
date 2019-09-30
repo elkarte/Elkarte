@@ -11,7 +11,9 @@
  *
  */
 
+use ElkArte\Cache\Cache;
 use ElkArte\User;
+use ElkArte\Util;
 
 /**
  * Checks, who is viewing a topic or board
@@ -27,7 +29,9 @@ function viewers($id, $session, $type = 'topic')
 
 	// Make sure we have a default value
 	if (!in_array($type, array('topic', 'board')))
+	{
 		$type = 'topic';
+	}
 
 	$viewers = array();
 	$request = $db->query('', '
@@ -83,17 +87,25 @@ function formatViewers($id, $type)
 		$href = getUrl('profile', ['action' => 'profile', 'u' => $viewer['id_member'], 'name' => $viewer['real_name']]);
 		// it's a member. We format them with links 'n stuff.
 		if (!empty($viewer['online_color']))
+		{
 			$link = '<a href="' . $href . '" style="color: ' . $viewer['online_color'] . ';">' . $viewer['real_name'] . '</a>';
+		}
 		else
+		{
 			$link = '<a href="' . $href . '">' . $viewer['real_name'] . '</a>';
+		}
 
 		$is_buddy = in_array($viewer['id_member'], User::$info->buddies);
 		if ($is_buddy)
+		{
 			$link = '<strong>' . $link . '</strong>';
+		}
 
 		// fill the summary list
 		if (!empty($viewer['show_online']) || allowedTo('moderate_forum'))
+		{
 			$context['view_members_list'][$viewer['log_time'] . $viewer['member_name']] = empty($viewer['show_online']) ? '<em>' . $link . '</em>' : $link;
+		}
 
 		// fill the detailed list
 		$context['view_members'][$viewer['log_time'] . $viewer['member_name']] = array(
@@ -109,7 +121,9 @@ function formatViewers($id, $type)
 
 		// add the hidden members to the count (and don't show them in the template)
 		if (empty($viewer['show_online']))
+		{
 			$context['view_num_hidden']++;
+		}
 	}
 
 	// Sort them out.
@@ -131,7 +145,7 @@ function addonsCredits()
 
 	$db = database();
 
-	$cache = \ElkArte\Cache\Cache::instance();
+	$cache = Cache::instance();
 	$credits = array();
 	if (!$cache->getVar($credits, 'addons_credits', 86400))
 	{
@@ -152,12 +166,12 @@ function addonsCredits()
 		);
 		while ($row = $db->fetch_assoc($request))
 		{
-			$credit_info = \ElkArte\Util::unserialize($row['credits']);
+			$credit_info = Util::unserialize($row['credits']);
 
-			$copyright = empty($credit_info['copyright']) ? '' : $txt['credits_copyright'] . ' &copy; ' . \ElkArte\Util::htmlspecialchars($credit_info['copyright']);
-			$license = empty($credit_info['license']) ? '' : $txt['credits_license'] . ': ' . \ElkArte\Util::htmlspecialchars($credit_info['license']);
+			$copyright = empty($credit_info['copyright']) ? '' : $txt['credits_copyright'] . ' &copy; ' . Util::htmlspecialchars($credit_info['copyright']);
+			$license = empty($credit_info['license']) ? '' : $txt['credits_license'] . ': ' . Util::htmlspecialchars($credit_info['license']);
 			$version = $txt['credits_version'] . '' . $row['version'];
-			$title = (empty($credit_info['title']) ? $row['name'] : \ElkArte\Util::htmlspecialchars($credit_info['title'])) . ': ' . $version;
+			$title = (empty($credit_info['title']) ? $row['name'] : Util::htmlspecialchars($credit_info['title'])) . ': ' . $version;
 
 			// Build this one out and stash it away
 			$name = empty($credit_info['url']) ? $title : '<a href="' . $credit_info['url'] . '">' . $title . '</a>';
@@ -246,7 +260,7 @@ function determineActions($urls, $preferred_prefix = false)
 	foreach ($url_list as $k => $url)
 	{
 		// Get the request parameters..
-		$actions = \ElkArte\Util::unserialize($url[0]);
+		$actions = Util::unserialize($url[0]);
 		if ($actions === false)
 		{
 			continue;
@@ -382,7 +396,9 @@ function determineActions($urls, $preferred_prefix = false)
 			}
 			// Viewable only by administrators.. (if it starts with whoadmin, it's admin only!)
 			elseif (allowedTo('moderate_forum') && isset($txt['whoadmin_' . $actions['action']]))
+			{
 				$data[$k] = $txt['whoadmin_' . $actions['action']];
+			}
 			// Viewable by permission level.
 			elseif (isset($allowedActions[$actions['action']]))
 			{
@@ -560,7 +576,7 @@ function prepareCreditsData()
 			'<a href="http://jqueryui.com/">JQuery UI</a> | &copy; jQuery Foundation and other contributors | Licensed under <a href="http://opensource.org/licenses/MIT">The MIT License (MIT)</a>',
 			'<a href="https://github.com/tchwork/jsqueeze">Jsqueeze</a> &copy Nicolas Grekas| Licensed under <a href="http://www.apache.org/licenses/LICENSE-2.0">Apache License, Version 2.0</a>',
 			'<a href="https://github.com/mailcheck">MailCheck</a> | &copy; Received Inc | Licensed under <a href="http://opensource.org/licenses/MIT">The MIT License (MIT)</a>',
-			'<a href="https://github.com/michelf/php-markdown">PHP Markdown Lib</a> | &copy; Michel Fortin | Licensed under <a href="https://github.com/michelf/php-markdown/blob/lib/License.md">BSD-style open source</a>', '<a href="http://www.openwall.com/phpass/">PH Pass</a> | Author: Solar Designer | Placed in the public domain</a>',
+			'<a href="https://github.com/michelf/php-markdown">PHP Markdown Lib</a> | &copy; Michel Fortin | Licensed under <a href="https://github.com/michelf/php-markdown/blob/lib/License.md">BSD-style open source</a>',
 			'<a href="http://www.sceditor.com/">SCEditor</a> | &copy; Sam Clarke | Licensed under <a href="http://opensource.org/licenses/MIT">The MIT License (MIT)</a>',
 			'<a href="http://sourceforge.net/projects/simplehtmldom/">Simple HTML DOM</a> | Licensed under <a href="http://opensource.org/licenses/MIT">The MIT License (MIT)</a>',
 			'<a href="http://www.simplemachines.org/">Simple Machines</a> | &copy; Simple Machines | Licensed under <a href="http://www.simplemachines.org/about/smf/license.php">The BSD License</a>',
@@ -580,5 +596,6 @@ function prepareCreditsData()
 
 	// Copyright information
 	$credits['copyrights']['elkarte'] = '&copy; 2012 - 2017 ElkArte Forum contributors';
+
 	return $credits;
 }

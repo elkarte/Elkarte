@@ -8,11 +8,14 @@
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause (see accompanying LICENSE.txt file)
  *
  * This file contains code covered by:
- * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * copyright: 2011 Simple Machines (http://www.simplemachines.org)
  *
  * @version 2.0 dev
  *
  */
+
+use BBC\ParserWrapper;
+use ElkArte\Util;
 
 /**
  * Get the number of user errors.
@@ -27,7 +30,8 @@ function getUserErrorCount($where, $where_vars = array())
 	$db = database();
 
 	$request = $db->query('', '
-		SELECT COUNT(*) AS error_count
+		SELECT 
+			COUNT(*) AS error_count
 		FROM {db_prefix}log_errors
 		WHERE ' . $where,
 		$where_vars
@@ -42,7 +46,7 @@ function getUserErrorCount($where, $where_vars = array())
  * Callback for createList in action_trackip() and action_trackactivity()
  *
  * @param int $start The item to start with (for pagination purposes)
- * @param int $items_per_page  The number of items to show per page
+ * @param int $items_per_page The number of items to show per page
  * @param string $sort A string indicating how to sort the results
  * @param string $where
  * @param mixed[] $where_vars array of values used in the where statement
@@ -70,6 +74,7 @@ function getUserErrors($start, $items_per_page, $sort, $where, $where_vars = arr
 	);
 	$error_messages = array();
 	while ($row = $db->fetch_assoc($request))
+	{
 		$error_messages[] = array(
 			'ip' => $row['ip'],
 			'member_link' => $row['id_member'] > 0 ? '<a href="' . $scripturl . '?action=profile;u=' . $row['id_member'] . '">' . $row['display_name'] . '</a>' : $row['display_name'],
@@ -79,6 +84,7 @@ function getUserErrors($start, $items_per_page, $sort, $where, $where_vars = arr
 			'html_time' => htmlTime($row['log_time']),
 			'timestamp' => forum_time(true, $row['log_time']),
 		);
+	}
 	$db->free_result($request);
 
 	return $error_messages;
@@ -96,7 +102,8 @@ function getIPMessageCount($where, $where_vars = array())
 	$db = database();
 
 	$request = $db->query('', '
-		SELECT COUNT(*) AS message_count
+		SELECT 
+			COUNT(*) AS message_count
 		FROM {db_prefix}messages AS m
 			INNER JOIN {db_prefix}boards AS b ON (b.id_board = m.id_board)
 		WHERE {query_see_board} AND ' . $where,
@@ -112,7 +119,7 @@ function getIPMessageCount($where, $where_vars = array())
  * Callback for createList() in TrackIP()
  *
  * @param int $start The item to start with (for pagination purposes)
- * @param int $items_per_page  The number of items to show per page
+ * @param int $items_per_page The number of items to show per page
  * @param string $sort A string indicating how to sort the results
  * @param string $where
  * @param mixed[] $where_vars array of values used in the where statement
@@ -140,6 +147,7 @@ function getIPMessages($start, $items_per_page, $sort, $where, $where_vars = arr
 	);
 	$messages = array();
 	while ($row = $db->fetch_assoc($request))
+	{
 		$messages[] = array(
 			'ip' => $row['poster_ip'],
 			'member_link' => empty($row['id_member']) ? $row['display_name'] : '<a href="' . $scripturl . '?action=profile;u=' . $row['id_member'] . '">' . $row['display_name'] . '</a>',
@@ -154,6 +162,7 @@ function getIPMessages($start, $items_per_page, $sort, $where, $where_vars = arr
 			'html_time' => htmlTime($row['poster_time']),
 			'timestamp' => forum_time(true, $row['poster_time'])
 		);
+	}
 	$db->free_result($request);
 
 	return $messages;
@@ -174,7 +183,8 @@ function getLoginCount($where, $where_vars = array())
 	$db = database();
 
 	$request = $db->query('', '
-		SELECT COUNT(*) AS message_count
+		SELECT 
+			COUNT(*) AS message_count
 		FROM {db_prefix}member_logins
 		WHERE ' . $where,
 		array(
@@ -202,7 +212,8 @@ function getLogins($where, $where_vars = array())
 	$db = database();
 
 	$request = $db->query('', '
-		SELECT time, ip, ip2
+		SELECT 
+			time, ip, ip2
 		FROM {db_prefix}member_logins
 		WHERE ' . $where . '
 		ORDER BY time DESC',
@@ -212,6 +223,7 @@ function getLogins($where, $where_vars = array())
 	);
 	$logins = array();
 	while ($row = $db->fetch_assoc($request))
+	{
 		$logins[] = array(
 			'time' => standardTime($row['time']),
 			'html_time' => htmlTime($row['time']),
@@ -219,6 +231,7 @@ function getLogins($where, $where_vars = array())
 			'ip' => $row['ip'],
 			'ip2' => $row['ip2'],
 		);
+	}
 	$db->free_result($request);
 
 	return $logins;
@@ -235,7 +248,8 @@ function getProfileEditCount($memID)
 	$db = database();
 
 	$request = $db->query('', '
-		SELECT COUNT(*) AS edit_count
+		SELECT 
+			COUNT(*) AS edit_count
 		FROM {db_prefix}log_actions
 		WHERE id_log = {int:log_type}
 			AND id_member = {int:owner}',
@@ -256,7 +270,7 @@ function getProfileEditCount($memID)
  * Callback function for createList in trackEdits().
  *
  * @param int $start The item to start with (for pagination purposes)
- * @param int $items_per_page  The number of items to show per page
+ * @param int $items_per_page The number of items to show per page
  * @param string $sort A string indicating how to sort the results
  * @param int $memID
  * @return mixed[] array of profile edits
@@ -283,26 +297,36 @@ function getProfileEdits($start, $items_per_page, $sort, $memID)
 	);
 	$edits = array();
 	$members = array();
-	$bbc_parser = \BBC\ParserWrapper::instance();
+	$bbc_parser = ParserWrapper::instance();
 	while ($row = $db->fetch_assoc($request))
 	{
-		$extra = \ElkArte\Util::unserialize($row['extra']);
+		$extra = Util::unserialize($row['extra']);
 		if (!empty($extra['applicator']))
+		{
 			$members[] = $extra['applicator'];
+		}
 
 		// Work out what the name of the action is.
 		if (isset($txt['trackEdit_action_' . $row['action']]))
+		{
 			$action_text = $txt['trackEdit_action_' . $row['action']];
+		}
 		elseif (isset($txt[$row['action']]))
+		{
 			$action_text = $txt[$row['action']];
+		}
 		// Custom field?
 		elseif (isset($context['custom_field_titles'][$row['action']]))
+		{
 			$action_text = $context['custom_field_titles'][$row['action']]['title'];
+		}
 		else
+		{
 			$action_text = $row['action'];
+		}
 
 		// Parse BBC?
-		$parse_bbc = isset($context['custom_field_titles'][$row['action']]) && $context['custom_field_titles'][$row['action']]['parse_bbc'] ? true : false;
+		$parse_bbc = isset($context['custom_field_titles'][$row['action']]) && $context['custom_field_titles'][$row['action']]['parse_bbc'];
 
 		$edits[] = array(
 			'id' => $row['id_action'],
@@ -328,12 +352,16 @@ function getProfileEdits($start, $items_per_page, $sort, $memID)
 
 		$members = array();
 		foreach ($result as $row)
+		{
 			$members[$row['id_member']] = $row['real_name'];
+		}
 
 		foreach ($edits as $key => $value)
 		{
 			if (isset($members[$value['id_member']]))
+			{
 				$edits[$key]['member_link'] = '<a href="' . $scripturl . '?action=profile;u=' . $value['id_member'] . '">' . $members[$value['id_member']] . '</a>';
+			}
 		}
 	}
 

@@ -9,7 +9,7 @@
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause (see accompanying LICENSE.txt file)
  *
  * This file contains code covered by:
- * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * copyright: 2011 Simple Machines (http://www.simplemachines.org)
  *
  * @version 2.0 dev
  *
@@ -17,10 +17,17 @@
 
 namespace ElkArte\Controller;
 
+use ElkArte\AbstractController;
+use ElkArte\CalendarEvent;
+use ElkArte\EventManager;
+use ElkArte\Exceptions\Exception;
+use ElkArte\User;
+use ElkArte\Util;
+
 /**
  * Displays the calendar for the site and provides for its navigation
  */
-class Calendar extends \ElkArte\AbstractController
+class Calendar extends AbstractController
 {
 	/**
 	 * Default action handler for requests on the calendar
@@ -57,7 +64,9 @@ class Calendar extends \ElkArte\AbstractController
 
 		// You can't do anything if the calendar is off.
 		if (empty($modSettings['cal_enabled']))
-			throw new \ElkArte\Exceptions\Exception('calendar_off', false);
+		{
+			throw new Exception('calendar_off', false);
+		}
 
 		// Set the page title to mention the calendar ;).
 		$context['page_title'] = $txt['calendar'];
@@ -70,7 +79,9 @@ class Calendar extends \ElkArte\AbstractController
 
 		// Don't let search engines index weekly calendar pages.
 		if ($context['view_week'])
+		{
 			$context['robot_no_index'] = true;
+		}
 
 		// Get the current day of month...
 		require_once(SUBSDIR . '/Calendar.subs.php');
@@ -85,16 +96,22 @@ class Calendar extends \ElkArte\AbstractController
 
 		// Make sure the year and month are in valid ranges.
 		if ($curPage['month'] < 1 || $curPage['month'] > 12)
-			throw new \ElkArte\Exceptions\Exception('invalid_month', false);
+		{
+			throw new Exception('invalid_month', false);
+		}
 
 		if ($curPage['year'] < $context['cal_minyear'] || $curPage['year'] > $context['cal_maxyear'])
-			throw new \ElkArte\Exceptions\Exception('invalid_year', false);
+		{
+			throw new Exception('invalid_year', false);
+		}
 
 		// If we have a day clean that too.
 		if ($context['view_week'])
 		{
 			if ($curPage['day'] > 31 || !mktime(0, 0, 0, $curPage['month'], $curPage['day'], $curPage['year']))
-				throw new \ElkArte\Exceptions\Exception('invalid_day', false);
+			{
+				throw new Exception('invalid_day', false);
+			}
 		}
 
 		// Load all the context information needed to show the calendar grid.
@@ -112,9 +129,13 @@ class Calendar extends \ElkArte\AbstractController
 
 		// Load up the main view.
 		if ($context['view_week'])
+		{
 			$context['calendar_grid_main'] = getCalendarWeek($curPage['month'], $curPage['year'], $curPage['day'], $calendarOptions);
+		}
 		else
+		{
 			$context['calendar_grid_main'] = getCalendarGrid($curPage['month'], $curPage['year'], $calendarOptions);
+		}
 
 		// Load up the previous and next months.
 		$calendarOptions['show_birthdays'] = $calendarOptions['show_events'] = $calendarOptions['show_holidays'] = false;
@@ -126,11 +147,15 @@ class Calendar extends \ElkArte\AbstractController
 
 		// Only show previous month if it isn't pre-January of the min-year
 		if ($context['calendar_grid_current']['previous_calendar']['year'] > $context['cal_minyear'] || $curPage['month'] != 1)
+		{
 			$context['calendar_grid_prev'] = getCalendarGrid($context['calendar_grid_current']['previous_calendar']['month'], $context['calendar_grid_current']['previous_calendar']['year'], $calendarOptions);
+		}
 
 		// Only show next month if it isn't post-December of the max-year
 		if ($context['calendar_grid_current']['next_calendar']['year'] < $context['cal_maxyear'] || $curPage['month'] != 12)
+		{
 			$context['calendar_grid_next'] = getCalendarGrid($context['calendar_grid_current']['next_calendar']['month'], $context['calendar_grid_current']['next_calendar']['year'], $calendarOptions);
+		}
 
 		// Basic template stuff.
 		$context['can_post'] = allowedTo('calendar_post');
@@ -211,10 +236,11 @@ class Calendar extends \ElkArte\AbstractController
 		if (empty($modSettings['cal_allow_unlinked']) && empty($event_id))
 		{
 			$_REQUEST['calendar'] = 1;
+
 			return $this->_returnToPost();
 		}
 
-		$event = new \ElkArte\CalendarEvent($event_id, $modSettings);
+		$event = new CalendarEvent($event_id, $modSettings);
 
 		$context['event'] = $event->load($_REQUEST, $this->user->id);
 
@@ -223,7 +249,9 @@ class Calendar extends \ElkArte\AbstractController
 			// Get list of boards that can be posted in.
 			$boards = boardsAllowedTo('post_new');
 			if (empty($boards))
-				throw new \ElkArte\Exceptions\Exception('cannot_post_new', 'permission');
+			{
+				throw new Exception('cannot_post_new', 'permission');
+			}
 
 			// Load the list of boards and categories in the context.
 			require_once(SUBSDIR . '/Boards.subs.php');
@@ -249,7 +277,7 @@ class Calendar extends \ElkArte\AbstractController
 
 	/**
 	 * Takes care of the saving process.
-		 */
+	 */
 	public function action_save()
 	{
 		global $modSettings;
@@ -259,7 +287,7 @@ class Calendar extends \ElkArte\AbstractController
 		// Cast this for safety...
 		$event_id = $this->_req->get('eventid', 'intval');
 
-		$event = new \ElkArte\CalendarEvent($event_id, $modSettings);
+		$event = new CalendarEvent($event_id, $modSettings);
 
 		// Validate the post...
 		$save_data = array();
@@ -269,7 +297,7 @@ class Calendar extends \ElkArte\AbstractController
 			{
 				$save_data = $event->validate($_POST);
 			}
-			catch (\ElkArte\Exceptions\Exception $e)
+			catch (Exception $e)
 			{
 				// @todo This should really integrate into $post_errors.
 				$e->fatalLangError();
@@ -278,12 +306,15 @@ class Calendar extends \ElkArte\AbstractController
 
 		// If you're not allowed to edit any events, you have to be the poster.
 		if (!$event->isNew() && !allowedTo('calendar_edit_any'))
+		{
 			isAllowedTo('calendar_edit_' . ($event->isStarter($this->user->id) ? 'own' : 'any'));
+		}
 
 		// New - and directing?
 		if ($event->isNew() && isset($_POST['link_to_board']))
 		{
 			$_REQUEST['calendar'] = 1;
+
 			return $this->_returnToPost();
 		}
 
@@ -316,8 +347,8 @@ class Calendar extends \ElkArte\AbstractController
 	 */
 	protected function _returnToPost()
 	{
-		$controller = new Post(new \ElkArte\EventManager());
-		$controller->setUser(\ElkArte\User::$info);
+		$controller = new Post(new EventManager());
+		$controller->setUser(User::$info);
 		$hook = $controller->getHook();
 		$controller->pre_dispatch();
 		$function_name = 'action_post';
@@ -351,11 +382,15 @@ class Calendar extends \ElkArte\AbstractController
 
 		// You can't export if the calendar export feature is off.
 		if (empty($modSettings['cal_export']))
-			throw new \ElkArte\Exceptions\Exception('calendar_export_off', false);
+		{
+			throw new Exception('calendar_export_off', false);
+		}
 
 		// Goes without saying that this is required.
 		if (!isset($_REQUEST['eventid']))
-			throw new \ElkArte\Exceptions\Exception('no_access', false);
+		{
+			throw new Exception('no_access', false);
+		}
 
 		// This is kinda wanted.
 		require_once(SUBSDIR . '/Calendar.subs.php');
@@ -364,7 +399,9 @@ class Calendar extends \ElkArte\AbstractController
 		$event = getEventProperties($_REQUEST['eventid']);
 
 		if ($event === false)
-			throw new \ElkArte\Exceptions\Exception('no_access', false);
+		{
+			throw new Exception('no_access', false);
+		}
 
 		$filecontents = build_ical_content($event);
 
@@ -380,7 +417,9 @@ class Calendar extends \ElkArte\AbstractController
 		header('Connection: close');
 		header('Content-Disposition: attachment; filename="' . $event['title'] . '.ics"');
 		if (empty($modSettings['enableCompressedOutput']))
-			header('Content-Length: ' . \ElkArte\Util::strlen($filecontents));
+		{
+			header('Content-Length: ' . Util::strlen($filecontents));
+		}
 
 		// This is a calendar item!
 		header('Content-Type: text/calendar');

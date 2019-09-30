@@ -8,7 +8,7 @@
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause (see accompanying LICENSE.txt file)
  *
  * This file contains code covered by:
- * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * copyright: 2011 Simple Machines (http://www.simplemachines.org)
  *
  * @version 2.0 dev
  *
@@ -23,6 +23,15 @@ namespace ElkArte;
  */
 class Server extends \ArrayObject
 {
+	/** @var mixed */
+	public $SERVER_SOFTWARE;
+
+	/** @var mixed */
+	public $HTTPS;
+
+	/** @var mixed */
+	public $SERVER_PORT;
+
 	/**
 	 * Server constructor.
 	 *
@@ -59,7 +68,9 @@ class Server extends \ArrayObject
 
 		// Should we account for how much is currently being used?
 		if ($in_use)
+		{
 			$memory_needed += memory_get_usage();
+		}
 
 		// If more is needed, request it
 		if ($memory_current < $memory_needed)
@@ -120,7 +131,9 @@ class Server extends \ArrayObject
 
 		// Don't let apache close the connection
 		if ($server_reset && function_exists('apache_reset_timeout'))
+		{
 			@apache_reset_timeout();
+		}
 
 		return ini_get('max_execution_time');
 	}

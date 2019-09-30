@@ -24,16 +24,18 @@
  */
 function elk_codefix()
 {
-	$('.bbc_code').each(function()
+	$('.bbc_code').each(function ()
 	{
 		var $this = $(this);
 
 		// If it has a scroll bar, allow the user to resize it vertically
-		if ($this.get(0).scrollHeight > $this.innerHeight()) {
+		if ($this.get(0).scrollHeight > $this.innerHeight())
+		{
 			$this.css('height', $this.height());
 			$this.css('max-height', 'none');
 		}
-		else {
+		else
+		{
 			$this.css('resize', 'none');
 		}
 	});
@@ -54,57 +56,77 @@ function toggleButtonAJAX(btn, confirmation_msg_variable, onSuccessCallback)
 		context: document.body,
 		beforeSend: ajax_indicator(true)
 	})
-	.done(function(request) {
-		if (request === '')
-			return;
-
-		var oElement = $(request).find('elk')[0];
-
-		// No errors
-		if (oElement.getElementsByTagName('error').length === 0)
+		.done(function (request)
 		{
-			var text = oElement.getElementsByTagName('text'),
-				url = oElement.getElementsByTagName('url'),
-				confirm_elem = oElement.getElementsByTagName('confirm');
+			if (request === '')
+			{
+				return;
+			}
 
-			// Update the page so button/link/confirm/etc reflect the new on or off status
-			if (confirm_elem.length === 1)
-				var confirm_text = confirm_elem[0].firstChild.nodeValue.removeEntities();
+			var oElement = $(request).find('elk')[0];
 
-			$('.' + btn.className.replace(/(list|link)level\d/g, '').trim()).each(function() {
-				// @todo: the span should be moved somewhere in themes.js?
-				if (text.length === 1)
-					$(this).html('<span>' + text[0].firstChild.nodeValue.removeEntities() + '</span>');
+			// No errors
+			if (oElement.getElementsByTagName('error').length === 0)
+			{
+				var text = oElement.getElementsByTagName('text'),
+					url = oElement.getElementsByTagName('url'),
+					confirm_elem = oElement.getElementsByTagName('confirm');
 
-				if (url.length === 1)
-					$(this).attr('href', url[0].firstChild.nodeValue.removeEntities());
+				// Update the page so button/link/confirm/etc reflect the new on or off status
+				if (confirm_elem.length === 1)
+				{
+					var confirm_text = confirm_elem[0].firstChild.nodeValue.removeEntities();
+				}
 
-				// Replaces the confirmation var text with the new one from the response to allow swapping on/off
-				// @todo this appears to be the start of a confirmation dialog... needs finished.
-				if (typeof (confirm_text) !== 'undefined')
-					confirmation_msg_variable = confirm_text.replace(/[\\']/g, '\\$&');
-			});
-		}
-		else
+				$('.' + btn.className.replace(/(list|link)level\d/g, '').trim()).each(function ()
+				{
+					// @todo: the span should be moved somewhere in themes.js?
+					if (text.length === 1)
+					{
+						$(this).html('<span>' + text[0].firstChild.nodeValue.removeEntities() + '</span>');
+					}
+
+					if (url.length === 1)
+					{
+						$(this).attr('href', url[0].firstChild.nodeValue.removeEntities());
+					}
+
+					// Replaces the confirmation var text with the new one from the response to allow swapping on/off
+					// @todo this appears to be the start of a confirmation dialog... needs finished.
+					if (typeof (confirm_text) !== 'undefined')
+					{
+						confirmation_msg_variable = confirm_text.replace(/[\\']/g, '\\$&');
+					}
+				});
+			}
+			else
+			{
+				// Error returned from the called function, show an alert
+				if (oElement.getElementsByTagName('text').length !== 0)
+				{
+					alert(oElement.getElementsByTagName('text')[0].firstChild.nodeValue.removeEntities());
+				}
+
+				if (oElement.getElementsByTagName('url').length !== 0)
+				{
+					window.location.href = oElement.getElementsByTagName('url')[0].firstChild.nodeValue;
+				}
+			}
+
+			if (typeof (onSuccessCallback) !== 'undefined')
+			{
+				onSuccessCallback(btn, request, oElement.getElementsByTagName('error'));
+			}
+		})
+		.fail(function ()
 		{
-			// Error returned from the called function, show an alert
-			if (oElement.getElementsByTagName('text').length !== 0)
-				alert(oElement.getElementsByTagName('text')[0].firstChild.nodeValue.removeEntities());
-
-			if (oElement.getElementsByTagName('url').length !== 0)
-				window.location.href = oElement.getElementsByTagName('url')[0].firstChild.nodeValue;
-		}
-
-		if (typeof (onSuccessCallback) !== 'undefined')
-			onSuccessCallback(btn, request, oElement.getElementsByTagName('error'));
-	})
-	.fail(function() {
-		// ajax failure code
-	})
-	.always(function() {
-		// turn off the indicator
-		ajax_indicator(false);
-	});
+			// ajax failure code
+		})
+		.always(function ()
+		{
+			// turn off the indicator
+			ajax_indicator(false);
+		});
 
 	return false;
 }
@@ -130,10 +152,13 @@ function toggleHeaderAJAX(btn, container_id)
 		url: btn.href + ';xml;api',
 		context: document.body,
 		beforeSend: ajax_indicator(true)
-		})
-		.done(function(request) {
+	})
+		.done(function (request)
+		{
 			if (request === '')
+			{
 				return;
+			}
 
 			var oElement = $(request).find('elk')[0];
 
@@ -147,15 +172,21 @@ function toggleHeaderAJAX(btn, container_id)
 				$('#' + container_id + ' .topic_listing').remove();
 				$('#' + container_id + ' .topic_sorting').remove();
 				if (text_elem.length === 1)
+				{
 					$('#' + container_id + ' #unread_header').html(text_elem[0].firstChild.nodeValue.removeEntities());
+				}
 				if (body_elem.length === 1)
+				{
 					$(body_template.replace('{body}', body_elem[0].firstChild.nodeValue.removeEntities())).insertAfter('#unread_header');
+				}
 			}
 		})
-		.fail(function() {
+		.fail(function ()
+		{
 			// ajax failure code
 		})
-		.always(function() {
+		.always(function ()
+		{
 			// turn off the indicator
 			ajax_indicator(false);
 		});
@@ -169,19 +200,28 @@ function toggleHeaderAJAX(btn, container_id)
 function notifyButton(btn)
 {
 	if (typeof (notification_topic_notice) !== 'undefined' && !confirm(notification_topic_notice))
+	{
 		return false;
+	}
 
-	return toggleButtonAJAX(btn, 'notification_topic_notice', function(btn, request, errors) {
+	return toggleButtonAJAX(btn, 'notification_topic_notice', function (btn, request, errors)
+	{
 		var toggle = 0;
 
 		if (errors.length > 0)
+		{
 			return;
+		}
 
 		// This is a "turn notifications on"
 		if (btn.href.indexOf('sa=on') !== -1)
+		{
 			toggle = 1;
+		}
 		else
+		{
 			toggle = 0;
+		}
 
 		$("input[name='notify']").val(toggle);
 	});
@@ -195,7 +235,9 @@ function notifyButton(btn)
 function notifyboardButton(btn)
 {
 	if (typeof (notification_board_notice) !== 'undefined' && !confirm(notification_board_notice))
+	{
 		return false;
+	}
 
 	toggleButtonAJAX(btn, 'notification_board_notice');
 	return false;
@@ -250,7 +292,8 @@ function markallreadButton(btn)
 	$('.new_posts').remove();
 
 	// Turn the board icon class to off
-	$('.board_icon').each(function() {
+	$('.board_icon').each(function ()
+	{
 		$(this).removeClass('i-board-new i-board-sub').addClass('i-board-off');
 	});
 
@@ -280,12 +323,14 @@ function markunreadButton(btn)
  * This function changes the relative time around the page real-timeish
  */
 var relative_time_refresh = 0;
+
 function updateRelativeTime()
 {
 	// In any other case no more than one hour
 	relative_time_refresh = 3600000;
 
-	$('time').each(function() {
+	$('time').each(function ()
+	{
 		var oRelativeTime = new relativeTime($(this).data('timestamp') * 1000, oRttime.referenceTime),
 			time_text = '';
 
@@ -333,7 +378,10 @@ function updateRelativeTime()
 	});
 	oRttime.referenceTime += relative_time_refresh;
 
-	setTimeout(function() {updateRelativeTime();}, relative_time_refresh);
+	setTimeout(function ()
+	{
+		updateRelativeTime();
+	}, relative_time_refresh);
 }
 
 /**
@@ -356,7 +404,9 @@ function relativeTime(sFrom, sTo)
 		this.dateTo = new Date(sToSplit[0], --sToSplit[1], sToSplit[2], sToSplit[3], sToSplit[4]);
 	}
 	else
+	{
 		this.dateTo = new Date(sTo);
+	}
 
 	if (parseInt(sFrom) == 'NaN')
 	{
@@ -364,14 +414,16 @@ function relativeTime(sFrom, sTo)
 		this.dateFrom = new Date(sFromSplit[0], --sFromSplit[1], sFromSplit[2], sFromSplit[3], sFromSplit[4]);
 	}
 	else
+	{
 		this.dateFrom = new Date(sFrom);
+	}
 
 	this.time_text = '';
 	this.past_time = (this.dateTo - this.dateFrom) / 1000;
 	this.deltaTime = 0;
 }
 
-relativeTime.prototype.seconds = function()
+relativeTime.prototype.seconds = function ()
 {
 	// Within the first 60 seconds it is just now.
 	if (this.past_time < 60)
@@ -383,7 +435,7 @@ relativeTime.prototype.seconds = function()
 	return false;
 };
 
-relativeTime.prototype.minutes = function()
+relativeTime.prototype.minutes = function ()
 {
 	// Within the first hour?
 	if (this.past_time >= 60 && Math.round(this.past_time / 60) < 60)
@@ -395,7 +447,7 @@ relativeTime.prototype.minutes = function()
 	return false;
 };
 
-relativeTime.prototype.hours = function()
+relativeTime.prototype.hours = function ()
 {
 	// Some hours but less than a day?
 	if (Math.round(this.past_time / 60) >= 60 && Math.round(this.past_time / 3600) < 24)
@@ -407,7 +459,7 @@ relativeTime.prototype.hours = function()
 	return false;
 };
 
-relativeTime.prototype.days = function()
+relativeTime.prototype.days = function ()
 {
 	// Some days ago but less than a week?
 	if (Math.round(this.past_time / 3600) >= 24 && Math.round(this.past_time / (24 * 3600)) < 7)
@@ -419,7 +471,7 @@ relativeTime.prototype.days = function()
 	return false;
 };
 
-relativeTime.prototype.weeks = function()
+relativeTime.prototype.weeks = function ()
 {
 	// Weeks ago but less than a month?
 	if (Math.round(this.past_time / (24 * 3600)) >= 7 && Math.round(this.past_time / (24 * 3600)) < 30)
@@ -431,7 +483,7 @@ relativeTime.prototype.weeks = function()
 	return false;
 };
 
-relativeTime.prototype.months = function()
+relativeTime.prototype.months = function ()
 {
 	// Months ago but less than a year?
 	if (Math.round(this.past_time / (24 * 3600)) >= 30 && Math.round(this.past_time / (30 * 24 * 3600)) < 12)
@@ -443,7 +495,7 @@ relativeTime.prototype.months = function()
 	return false;
 };
 
-relativeTime.prototype.years = function()
+relativeTime.prototype.years = function ()
 {
 	// Oha, we've passed at least a year?
 	if (Math.round(this.past_time / (30 * 24 * 3600)) >= 12)
@@ -511,26 +563,33 @@ function revalidateMentions(sForm, sInput)
 			// lead to confusing semantics.
 			//
 			// First check if all those in the list are really mentioned
-			$(mentions).find('input').each(function (idx, elem) {
+			$(mentions).find('input').each(function (idx, elem)
+			{
 				var name = $(elem).data('name'),
 					next_char,
 					prev_char,
 					index = body.indexOf(name);
 
 				// It is undefined coming from a preview
-				if (typeof(name) !== 'undefined')
+				if (typeof (name) !== 'undefined')
 				{
 					if (index === -1)
+					{
 						$(elem).remove();
+					}
 					else
 					{
 						next_char = body.charAt(index + name.length);
 						prev_char = body.charAt(index - 1);
 
 						if (next_char !== '' && next_char.search(boundaries_pattern) !== 0)
+						{
 							$(elem).remove();
+						}
 						else if (prev_char !== '' && prev_char.search(boundaries_pattern) !== 0)
+						{
 							$(elem).remove();
+						}
 					}
 				}
 			});
@@ -541,12 +600,15 @@ function revalidateMentions(sForm, sInput)
 
 				for (var l = 0, ncount = names.length; l < ncount; l++)
 				{
-					if(checkWordOccurrence(body, names[l].name)) {
+					if (checkWordOccurrence(body, names[l].name))
+					{
 						pos = body.indexOf(' @' + names[l].name);
 
 						// If there is something like "{space}@username" AND the following char is a space or a punctuation mark
 						if (pos !== -1 && body.charAt(pos + 2 + names[l].name.length + 1).search(boundaries_pattern) === 0)
+						{
 							mentions.append($('<input type="hidden" name="uid[]" />').val(names[l].id));
+						}
 					}
 				}
 			}
@@ -561,8 +623,9 @@ function revalidateMentions(sForm, sInput)
  * @param word to match
  */
 
-function checkWordOccurrence(paragraph, word){
-  return new RegExp( '\\b' + word + '\\b', 'i').test(paragraph);
+function checkWordOccurrence(paragraph, word)
+{
+	return new RegExp('\\b' + word + '\\b', 'i').test(paragraph);
 }
 
 /**
@@ -573,15 +636,20 @@ function checkWordOccurrence(paragraph, word){
  * @param {object} oOptions only set when called from the plugin, contains those options
  */
 var all_elk_mentions = [];
+
 function add_elk_mention(selector, oOptions)
 {
 	// Global does not exist, hummm
 	if (all_elk_mentions.hasOwnProperty(selector))
+	{
 		return;
+	}
 
 	// No options means its attached to the plain text box
 	if (typeof oOptions === 'undefined')
+	{
 		oOptions = {};
+	}
 	oOptions.selector = selector;
 
 	// Add it to the stack
@@ -596,9 +664,11 @@ function add_elk_mention(selector, oOptions)
  *
  * @param {object} $
  */
-(function($) {
+(function ($)
+{
 	'use strict';
-	$.fn.elkSortable = function(oInstanceSettings) {
+	$.fn.elkSortable = function (oInstanceSettings)
+	{
 		$.fn.elkSortable.oDefaultsSettings = {
 			opacity: 0.7,
 			cursor: 'move',
@@ -645,7 +715,8 @@ function add_elk_mention(selector, oOptions)
 			tolerance: oSettings.tolerance,
 			delay: oSettings.delay,
 			scroll: oSettings.scroll,
-			helper: function(e, ui) {
+			helper: function (e, ui)
+			{
 				// Fist create a helper container
 				var $originals = ui.children(),
 					$helper = ui.clone(),
@@ -653,14 +724,17 @@ function add_elk_mention(selector, oOptions)
 
 				// Replace the helper elements with spans, normally this is a <td> -> <span>
 				// Done to make this container agnostic.
-				$helper.children().each(function() {
-					$(this).replaceWith(function(){
+				$helper.children().each(function ()
+				{
+					$(this).replaceWith(function ()
+					{
 						return $("<span />", {html: $(this).html()});
 					});
 				});
 
 				// Set the width of each helper cell span to be the width of the original cells
-				$helper.children().each(function(index) {
+				$helper.children().each(function (index)
+				{
 					// Set helper cell sizes to match the original sizes
 					return $(this).width($originals.eq(index).width()).css('display', 'inline-block');
 				});
@@ -672,7 +746,8 @@ function add_elk_mention(selector, oOptions)
 				$clone.hide();
 
 				// Append the clone element to the actual container we are working in and show it
-				setTimeout(function() {
+				setTimeout(function ()
+				{
 					$clone.appendTo(ui.parent());
 					$clone.show();
 				}, 1);
@@ -680,7 +755,8 @@ function add_elk_mention(selector, oOptions)
 				// The above append process allows page scrolls to work while dragging the clone element
 				return $clone;
 			},
-			update: function(e, ui) {
+			update: function (e, ui)
+			{
 				// Called when an element is dropped in a new location
 				var postdata = '',
 					moved = ui.item.attr('id'),
@@ -689,13 +765,16 @@ function add_elk_mention(selector, oOptions)
 
 				// Calling a pre processing function?
 				if (oSettings.preprocess !== '')
+				{
 					window[oSettings.preprocess]();
+				}
 
 				// How to post the sorted data
 				if (oSettings.setorder === 'inorder')
 				{
 					// This will get the order in 1-n as shown on the screen
-					$(oSettings.tag).find('li').each(function() {
+					$(oSettings.tag).find('li').each(function ()
+					{
 						var aid = $(this).attr('id').split('_');
 						order.push({name: aid[0] + '[]', value: aid[1]});
 					});
@@ -704,12 +783,17 @@ function add_elk_mention(selector, oOptions)
 				// Get all id's in all the sortable containers
 				else
 				{
-					$(oSettings.tag).each(function() {
+					$(oSettings.tag).each(function ()
+					{
 						// Serialize will be 1-n of each nesting / connector
 						if (postdata === "")
+						{
 							postdata += $(this).sortable(oSettings.setorder);
+						}
 						else
+						{
 							postdata += "&" + $(this).sortable(oSettings.setorder);
+						}
 					});
 				}
 
@@ -720,7 +804,9 @@ function add_elk_mention(selector, oOptions)
 				postdata += '&received=' + receiver;
 
 				if (oSettings.token !== '')
+				{
 					postdata += '&' + oSettings.token.token_var + '=' + oSettings.token.token_id;
+				}
 
 				// And with the post data prepared, lets make the ajax request
 				$.ajax({
@@ -729,57 +815,66 @@ function add_elk_mention(selector, oOptions)
 					dataType: "xml",
 					data: postdata
 				})
-				.fail(function(jqXHR, textStatus, errorThrown) {
-					oSettings.infobar.isError();
-					oSettings.infobar.changeText(textStatus).showBar();
-					// Reset the interface?
-					if (oSettings.href !== '')
-						setTimeout(function() {
-							window.location.href = elk_scripturl + oSettings.href;
-						}, 1000);
-				})
-				.done(function(data, textStatus, jqXHR) {
-					var $_errorContent = $('#errorContent'),
-						$_errorContainer = $('#errorContainer');
+					.fail(function (jqXHR, textStatus, errorThrown)
+					{
+						oSettings.infobar.isError();
+						oSettings.infobar.changeText(textStatus).showBar();
+						// Reset the interface?
+						if (oSettings.href !== '')
+						{
+							setTimeout(function ()
+							{
+								window.location.href = elk_scripturl + oSettings.href;
+							}, 1000);
+						}
+					})
+					.done(function (data, textStatus, jqXHR)
+					{
+						var $_errorContent = $('#errorContent'),
+							$_errorContainer = $('#errorContainer');
 
-					if ($(data).find("error").length !== 0)
+						if ($(data).find("error").length !== 0)
+						{
+							// Errors get a modal dialog box and redirect on close
+							$_errorContainer.append('<p id="errorContent"></p>');
+							$_errorContent.html($(data).find("error").text());
+							$_errorContent.dialog({
+								autoOpen: true,
+								title: oSettings.title,
+								modal: true,
+								close: function (event, ui)
+								{
+									// Redirecting due to the error, that's a good idea
+									if (oSettings.href !== '')
+									{
+										window.location.href = elk_scripturl + oSettings.href;
+									}
+								}
+							});
+						}
+						else if ($(data).find("elk").length !== 0)
+						{
+							// Valid responses get the unobtrusive slider
+							oSettings.infobar.isSuccess();
+							oSettings.infobar.changeText($(data).find('elk > orders > order').text()).showBar();
+						}
+						else
+						{
+							// Something "other" happened ...
+							$_errorContainer.append('<p id="errorContent"></p>');
+							$_errorContent.html(oSettings.error + ' : ' + textStatus);
+							$_errorContent.dialog({autoOpen: true, title: oSettings.title, modal: true});
+						}
+					})
+					.always(function (data, textStatus, jqXHR)
 					{
-						// Errors get a modal dialog box and redirect on close
-						$_errorContainer.append('<p id="errorContent"></p>');
-						$_errorContent.html($(data).find("error").text());
-						$_errorContent.dialog({
-							autoOpen: true,
-							title: oSettings.title,
-							modal: true,
-							close: function(event, ui) {
-								// Redirecting due to the error, that's a good idea
-								if (oSettings.href !== '')
-									window.location.href = elk_scripturl + oSettings.href;
-							}
-						});
-					}
-					else if ($(data).find("elk").length !== 0)
-					{
-						// Valid responses get the unobtrusive slider
-						oSettings.infobar.isSuccess();
-						oSettings.infobar.changeText($(data).find('elk > orders > order').text()).showBar();
-					}
-					else
-					{
-						// Something "other" happened ...
-						$_errorContainer.append('<p id="errorContent"></p>');
-						$_errorContent.html(oSettings.error + ' : ' + textStatus);
-						$_errorContent.dialog({autoOpen: true, title: oSettings.title, modal: true});
-					}
-				})
-				.always(function(data, textStatus, jqXHR) {
-					if ($(data).find("elk > tokens > token").length !== 0)
-					{
-						// Reset the token
-						oSettings.token.token_id = $(data).find("tokens").find('[type="token"]').text();
-						oSettings.token.token_var = $(data).find("tokens").find('[type="token_var"]').text();
-					}
-				});
+						if ($(data).find("elk > tokens > token").length !== 0)
+						{
+							// Reset the token
+							oSettings.token.token_id = $(data).find("tokens").find('[type="token"]').text();
+							oSettings.token.token_var = $(data).find("tokens").find('[type="token_var"]').text();
+						}
+					});
 			}
 		});
 	};
@@ -790,9 +885,11 @@ function add_elk_mention(selector, oOptions)
  * Sets the id of all 'li' elements to cat#,board#,childof# for use in the
  * $_POST back to the xmlcontroller
  */
-function setBoardIds() {
+function setBoardIds()
+{
 	// For each category of board
-	$("[id^=category_]").each(function() {
+	$("[id^=category_]").each(function ()
+	{
 		var cat = $(this).attr('id').split('category_'),
 			uls = $(this).find("ul");
 
@@ -801,22 +898,28 @@ function setBoardIds() {
 		{
 			// A single empty ul in a category, this can happen when a cat is dragged empty
 			if ($(uls).find("li").length === 0)
+			{
 				$(uls).append('<li id="cbp_' + cat + ',-1,-1"></li>');
-			// Otherwise the li's need a child ul so we have a "child-of" drop zone
+			}// Otherwise the li's need a child ul so we have a "child-of" drop zone
 			else
+			{
 				$(uls).find("li:not(:has(ul))").append('<ul class="nolist elk_droppings"></ul>');
+			}
 		}
 		// All others normally
 		else
+		{
 			$(uls).find("li:not(:has(ul))").append('<ul class="nolist elk_droppings"></ul>');
+		}
 
 		// Next make find all the ul's in this category that have children, update the
 		// id's with information that indicates the 1-n and parent/child info
-		$(this).find('ul:parent').each(function(i, ul) {
+		$(this).find('ul:parent').each(function (i, ul)
+		{
 
 			// Get the (li) parent of this ul
 			var parentList = $(this).parent('li').attr('id'),
-					pli = 0;
+				pli = 0;
 
 			// No parent, then its a base node 0, else its a child-of this node
 			if (typeof (parentList) !== "undefined")
@@ -826,7 +929,8 @@ function setBoardIds() {
 			}
 
 			// Now for each li in this ul
-			$(this).find('li').each(function(i, el) {
+			$(this).find('li').each(function (i, el)
+			{
 				var currentList = $(el).attr('id');
 				var myid = currentList.split(",");
 
@@ -839,14 +943,10 @@ function setBoardIds() {
 	});
 }
 
-/**
- * Expands the ... of the page indexes
- *
- * @todo not exactly a plugin and still very bound to the theme structure
- *
- */
-;(function($) {
-	$.fn.expand_pages = function() {
+(function ($)
+{
+	$.fn.expand_pages = function ()
+	{
 		// Used when the user clicks on the ... to expand instead of just a hover expand
 		function expand_pages($element)
 		{
@@ -881,25 +981,30 @@ function setBoardIds() {
 				bElem.attr('href', baseurl.replace('%1$d', i - perPage)).text(i / perPage);
 				// @todo Functions declared within loops referencing an outer scoped variable may
 				// lead to confusing semantics.
-				boxModelClone.find('a').each(function() {
+				boxModelClone.find('a').each(function ()
+				{
 					$(this).replaceWith(bElem[0]);
 				});
 				$baseAppend.after(boxModelClone);
 
 				// This is needed just to remember where to attach the new expand
 				if (typeof first === 'undefined')
+				{
 					first = boxModelClone;
+				}
 			}
 			$baseAppend.remove();
 
 			if (oldLastPage > 0)
 			{
 				// This is to remove any hover_expand
-				expandModel.find('#expanded_pages_container').each(function() {
+				expandModel.find('#expanded_pages_container').each(function ()
+				{
 					$(this).remove();
 				});
 
-				expandModel.on('click', function(e) {
+				expandModel.on('click', function (e)
+				{
 					var $zhis = $(this);
 					e.preventDefault();
 
@@ -907,19 +1012,21 @@ function setBoardIds() {
 
 					$zhis.off('mouseenter focus');
 				})
-				.on('mouseenter focus', function() {
-					hover_expand($(this));
-				})
-				.data('perpage', perPage)
-				.data('firstpage', lastPage)
-				.data('lastpage', oldLastPage)
-				.data('baseurl', rawBaseurl);
+					.on('mouseenter focus', function ()
+					{
+						hover_expand($(this));
+					})
+					.data('perpage', perPage)
+					.data('firstpage', lastPage)
+					.data('lastpage', oldLastPage)
+					.data('baseurl', rawBaseurl);
 
 				first.after(expandModel);
 			}
 		}
 
-		this.attr('tabindex', 0).on('click', function(e) {
+		this.attr('tabindex', 0).on('click', function (e)
+		{
 			var $zhis = $(this);
 			e.preventDefault();
 
@@ -939,9 +1046,11 @@ function setBoardIds() {
  *
  * @param {type} $
  */
-(function($) {
+(function ($)
+{
 	'use strict';
-	$.fn.SiteTooltip = function(oInstanceSettings) {
+	$.fn.SiteTooltip = function (oInstanceSettings)
+	{
 		$.fn.SiteTooltip.oDefaultsSettings = {
 			followMouse: 1,
 			hoverIntent: {sensitivity: 10, interval: 650, timeout: 50},
@@ -958,21 +1067,23 @@ function setBoardIds() {
 		var oSettings = $.extend({}, $.fn.SiteTooltip.oDefaultsSettings, oInstanceSettings || {});
 
 		// Move passed selector titles to a hidden span, then remove the selector title to prevent any default browser actions
-		$(this).each(function()
+		$(this).each(function ()
 		{
 			var sTitle = $('<span class="' + oSettings.tooltipSwapClass + '">' + this.title + '</span>').hide();
 			$(this).append(sTitle).attr('title', '');
 		});
 
 		// Determine where we are going to place the tooltip, while trying to keep it on screen
-		var positionTooltip = function(event)
+		var positionTooltip = function (event)
 		{
 			var iPosx = 0,
 				iPosy = 0,
 				$_tip = $('#' + oSettings.tooltipID);
 
 			if (!event)
+			{
 				event = window.event;
+			}
 
 			if (event.pageX || event.pageY)
 			{
@@ -987,11 +1098,11 @@ function setBoardIds() {
 
 			// Position of the tooltip top left corner and its size
 			var oPosition = {
-					x: iPosx + oSettings.positionLeft,
-					y: iPosy + oSettings.positionTop,
-					w: $_tip.width(),
-					h: $_tip.height()
-				};
+				x: iPosx + oSettings.positionLeft,
+				y: iPosy + oSettings.positionTop,
+				w: $_tip.width(),
+				h: $_tip.height()
+			};
 
 			// Display limits and window scroll position
 			var oLimits = {
@@ -1021,15 +1132,18 @@ function setBoardIds() {
 		};
 
 		// Used to show a tooltip
-		var showTooltip = function() {
+		var showTooltip = function ()
+		{
 			$('#' + oSettings.tooltipID + ' #' + oSettings.tooltipTextID).slideDown(150);
 		};
 
 		// Used to hide a tooltip
-		var hideTooltip = function() {
+		var hideTooltip = function ()
+		{
 			var $_tip = $('#' + oSettings.tooltipID);
 
-			$_tip.fadeOut(175, function() {
+			$_tip.fadeOut(175, function ()
+			{
 				$(this).trigger("unload").remove();
 			});
 		};
@@ -1041,7 +1155,7 @@ function setBoardIds() {
 		}
 
 		// For all of the elements that match the selector on the page, lets set up some actions
-		return this.each(function()
+		return this.each(function ()
 		{
 			// If we find hoverIntent then use it
 			if ($.fn.hoverIntent)
@@ -1073,9 +1187,13 @@ function setBoardIds() {
 					var ttContent = $('#' + oSettings.tooltipTextID);
 
 					if (oSettings.tooltipContent === 'html')
+					{
 						ttContent.html($(this).children('.' + oSettings.tooltipSwapClass).html());
+					}
 					else
+					{
 						ttContent.text($(this).children('.' + oSettings.tooltipSwapClass).text());
+					}
 
 					// Show then position or it may position off screen
 					showTooltip();
@@ -1095,7 +1213,8 @@ function setBoardIds() {
 			// Create the tip move with the cursor
 			if (oSettings.followMouse)
 			{
-				$(this).on("mousemove", function(event) {
+				$(this).on("mousemove", function (event)
+				{
 					positionTooltip(event);
 
 					return false;
@@ -1103,7 +1222,8 @@ function setBoardIds() {
 			}
 
 			// Clear the tip on a click
-			$(this).on("click", function() {
+			$(this).on("click", function ()
+			{
 				hideTooltip(this);
 				return true;
 			});
@@ -1118,6 +1238,7 @@ function setBoardIds() {
  * @returns {errorbox_handler}
  */
 var error_txts = {};
+
 function errorbox_handler(oOptions)
 {
 	this.opt = oOptions;
@@ -1130,12 +1251,16 @@ function errorbox_handler(oOptions)
 /**
  * @todo this code works well almost only with the editor I think.
  */
-errorbox_handler.prototype.init = function()
+errorbox_handler.prototype.init = function ()
 {
 	if (this.opt.check_id !== undefined)
+	{
 		this.oChecks_on = $(document.getElementById(this.opt.check_id));
+	}
 	else if (this.opt.selector !== undefined)
+	{
 		this.oChecks_on = this.opt.selector;
+	}
 	else if (this.opt.editor !== undefined)
 	{
 		this.oChecks_on = eval(this.opt.editor); // jshint ignore:line
@@ -1145,7 +1270,9 @@ errorbox_handler.prototype.init = function()
 	this.oErrorHandle.instanceRef = this;
 
 	if (this.oError_box === null)
+	{
 		this.oError_box = $(document.getElementById(this.opt.error_box_id));
+	}
 
 	if (this.evaluate === false)
 	{
@@ -1155,27 +1282,33 @@ errorbox_handler.prototype.init = function()
 	else
 	{
 		var current_error_handler = this.opt.self;
-		$(function() {
+		$(function ()
+		{
 			var current_error = eval(current_error_handler); // jshint ignore:line
-			$editor_data[current_error.opt.editor_id].addEvent(current_error.opt.editor_id, 'keyup', function() {
+			$editor_data[current_error.opt.editor_id].addEvent(current_error.opt.editor_id, 'keyup', function ()
+			{
 				current_error.checkErrors();
 			});
 		});
 	}
 };
 
-errorbox_handler.prototype.boxVal = function()
+errorbox_handler.prototype.boxVal = function ()
 {
 	if (this.evaluate === false)
+	{
 		return this.oChecks_on.val();
+	}
 	else
+	{
 		return this.oChecks_on();
+	}
 };
 
 /**
  * Runs the field checks as defined by the object instance
  */
-errorbox_handler.prototype.checkErrors = function()
+errorbox_handler.prototype.checkErrors = function ()
 {
 	var num = this.opt.error_checks.length;
 
@@ -1189,9 +1322,13 @@ errorbox_handler.prototype.checkErrors = function()
 
 			// Run the efunction check on this field, then add or remove any errors
 			if (this.opt.error_checks[i].efunction(this.boxVal()))
+			{
 				this.addError($elem, this.opt.error_checks[i].code);
+			}
 			else
+			{
 				this.removeError(this.oError_box, $elem);
+			}
 		}
 
 		this.oError_box.attr("class", "errorbox");
@@ -1199,9 +1336,13 @@ errorbox_handler.prototype.checkErrors = function()
 
 	// Hide show the error box based on if we have any errors
 	if (this.oError_box.find("li").length === 0)
+	{
 		this.oError_box.slideUp();
+	}
 	else
+	{
 		this.oError_box.slideDown();
+	}
 };
 
 /**
@@ -1210,13 +1351,15 @@ errorbox_handler.prototype.checkErrors = function()
  * @param {type} error_elem
  * @param {type} error_code
  */
-errorbox_handler.prototype.addError = function(error_elem, error_code)
+errorbox_handler.prototype.addError = function (error_elem, error_code)
 {
 	if (error_elem.length === 0)
 	{
 		// First error, then set up the list for insertion
 		if ($.trim(this.oError_box.children("#" + this.opt.error_box_id + "_list").html()) === '')
+		{
 			this.oError_box.append("<ul id='" + this.opt.error_box_id + "_list'></ul>");
+		}
 
 		// Add the error it and show it
 		$(document.getElementById(this.opt.error_box_id + "_list")).append("<li style=\"display:none;\" id='" + this.opt.error_box_id + "_" + error_code + "' class='error'>" + error_txts[error_code] + "</li>");
@@ -1230,16 +1373,19 @@ errorbox_handler.prototype.addError = function(error_elem, error_code)
  * @param {type} error_box
  * @param {type} error_elem
  */
-errorbox_handler.prototype.removeError = function(error_box, error_elem)
+errorbox_handler.prototype.removeError = function (error_box, error_elem)
 {
 	if (error_elem.length !== 0)
 	{
-		error_elem.slideUp(function() {
+		error_elem.slideUp(function ()
+		{
 			error_elem.remove();
 
 			// No errors at all then close the box
 			if (error_box.find("li").length === 0)
+			{
 				error_box.slideUp();
+			}
 		});
 	}
 };
@@ -1282,9 +1428,13 @@ function addAnotherOption(parent, oDtName, oDdName, oData)
 
 	// If we have data for this field make it a select
 	if (oData === '')
+	{
 		newInput = document.createElement('input');
+	}
 	else
+	{
 		newInput = document.createElement('select');
+	}
 
 	newInput.name = oDdName.name;
 	newInput.type = oDdName.type;
@@ -1327,7 +1477,9 @@ function toggle_mlsearch_opt()
 
 	// If the box is already visible just forget about it
 	if ($_mlsearch.is(':visible'))
+	{
 		return;
+	}
 
 	// Time to show the droppy
 	$_mlsearch.fadeIn('fast');
@@ -1336,7 +1488,8 @@ function toggle_mlsearch_opt()
 	$('body').on('click', mlsearch_opt_hide);
 
 	// Except clicking on the box itself or into the search text input
-	$('#mlsearch_options, #mlsearch_input').off('click', mlsearch_opt_hide).on('click', function(ev) {
+	$('#mlsearch_options, #mlsearch_input').off('click', mlsearch_opt_hide).on('click', function (ev)
+	{
 		ev.stopPropagation();
 	});
 }
@@ -1364,7 +1517,9 @@ function mlsearch_opt_hide()
 function loadAddNewPoll(button, id_board, form_name)
 {
 	if (typeof id_board === 'undefined')
+	{
 		return true;
+	}
 
 	// Find the form and add poll to the url
 	var $form = $('#post_header').closest("form"),
@@ -1379,7 +1534,9 @@ function loadAddNewPoll(button, id_board, form_name)
 		// but only if the currently selected is the default one
 		var $_pollicon = $('#icon');
 		if ($_pollicon.val() === 'xx')
-			$_pollicon.val('poll').change();
+		{
+			$_pollicon.val('poll').trigger('change');
+		}
 
 		// Add poll to the form action
 		$form.attr('action', $form.attr('action') + ';poll');
@@ -1387,9 +1544,12 @@ function loadAddNewPoll(button, id_board, form_name)
 		// If the form already exists...just show it back and go out
 		if ($('#poll_main').length > 0)
 		{
-			$_poll_main_option.find('input').each(function() {
+			$_poll_main_option.find('input').each(function ()
+			{
 				if ($(this).data('required') === 'required')
+				{
 					$(this).attr('required', 'required');
+				}
 			});
 
 			$_poll_main_option.toggle();
@@ -1402,12 +1562,15 @@ function loadAddNewPoll(button, id_board, form_name)
 		var $_icon = $('#icon');
 
 		if ($_icon.val() === 'poll')
-			$_icon.val('xx').change();
+		{
+			$_icon.val('xx').trigger('change');
+		}
 
 		// Remove poll to the form action
 		$form.attr('action', $form.attr('action').replace(';poll', ''));
 
-		$_poll_main_option.hide().find('input').each(function() {
+		$_poll_main_option.hide().find('input').each(function ()
+		{
 			if ($(this).attr('required') === 'required')
 			{
 				$(this).data('required', 'required');
@@ -1427,35 +1590,40 @@ function loadAddNewPoll(button, id_board, form_name)
 		dataType: "html",
 		beforeSend: ajax_indicator(true)
 	})
-	.done(function (data, textStatus, xhr) {
-		// Find the highest tabindex already present
-		var max_tabIndex = 0;
-		for (var i = 0, n = document.forms[form_name].elements.length; i < n; i++)
-			max_tabIndex = Math.max(max_tabIndex, document.forms[form_name].elements[i].tabIndex);
+		.done(function (data, textStatus, xhr)
+		{
+			// Find the highest tabindex already present
+			var max_tabIndex = 0;
+			for (var i = 0, n = document.forms[form_name].elements.length; i < n; i++)
+				max_tabIndex = Math.max(max_tabIndex, document.forms[form_name].elements[i].tabIndex);
 
-		// Inject the html
-		$('#post_header').after(data);
+			// Inject the html
+			$('#post_header').after(data);
 
-		$('#poll_main input, #poll_options input').each(function () {
-			$(this).attr('tabindex', ++max_tabIndex);
-		});
-
-		// Repeated collapse/expand of fieldsets as above
-		$('#poll_main legend, #poll_options legend').on('click', function() {
-			$(this).siblings().slideToggle("fast");
-			$(this).parent().toggleClass("collapsed");
-		}).each(function () {
-			if ($(this).data('collapsed'))
+			$('#poll_main input, #poll_options input').each(function ()
 			{
-				$(this).siblings().css({display: "none"});
+				$(this).attr('tabindex', ++max_tabIndex);
+			});
+
+			// Repeated collapse/expand of fieldsets as above
+			$('#poll_main legend, #poll_options legend').on('click', function ()
+			{
+				$(this).siblings().slideToggle("fast");
 				$(this).parent().toggleClass("collapsed");
-			}
+			}).each(function ()
+			{
+				if ($(this).data('collapsed'))
+				{
+					$(this).siblings().css({display: "none"});
+					$(this).parent().toggleClass("collapsed");
+				}
+			});
+		})
+		.always(function ()
+		{
+			// turn off the indicator
+			ajax_indicator(false);
 		});
-	})
-	.always(function() {
-		// turn off the indicator
-		ajax_indicator(false);
-	});
 
 	return false;
 }
@@ -1466,12 +1634,14 @@ function loadAddNewPoll(button, id_board, form_name)
  */
 function disableAutoComplete()
 {
-	window.onload = function() {
+	window.onload = function ()
+	{
 		// Turn off autocomplete for these elements
 		$("input[type=email], input[type=password], .input_text, .input_clear").attr("autocomplete", "off");
 
 		// Chrome will fill out the form even with autocomplete off, so we need to empty the value as well.
-		setTimeout(function() {
+		setTimeout(function ()
+		{
 			$("input[type=password], .input_clear").val(" ").val("");
 		}, 1);
 	};
@@ -1481,8 +1651,10 @@ function disableAutoComplete()
  * A system to collect notifications from a single AJAX call and redistribute them
  * among notifiers
  */
-(function() {
-	var ElkNotifications = (function(opt) {
+(function ()
+{
+	var ElkNotifications = (function (opt)
+	{
 		'use strict';
 
 		opt = (opt) ? opt : {};
@@ -1490,45 +1662,56 @@ function disableAutoComplete()
 			start = true,
 			lastTime = 0;
 
-		var init = function(opt) {
+		var init = function (opt)
+		{
 			if (typeof opt.delay === 'undefined')
 			{
 				start = false;
 				opt.delay = 15000;
 			}
 
-			setTimeout(function() {
+			setTimeout(function ()
+			{
 				fetch();
 			}, opt.delay);
 		};
 
-		var add = function(notif) {
+		var add = function (notif)
+		{
 			_notifiers.push(notif);
 		};
 
-		var send = function(request) {
-			for (var i = 0; i < _notifiers.length; i++) {
+		var send = function (request)
+		{
+			for (var i = 0; i < _notifiers.length; i++)
+			{
 				_notifiers[i].send(request);
 			}
 		};
 
-		var fetch = function() {
+		var fetch = function ()
+		{
 			if (_notifiers.length === 0)
+			{
 				return;
+			}
 
 			$.ajax({
 				url: elk_scripturl + "?action=mentions;sa=fetch;api=json;lastsent=" + lastTime
 			})
-			.done(function(request) {
-				if (request !== "") {
-					send(request);
-					lastTime = request.timelast;
-				}
+				.done(function (request)
+				{
+					if (request !== "")
+					{
+						send(request);
+						lastTime = request.timelast;
+					}
 
-				setTimeout(function() {
-					fetch();
-				}, opt.delay);
-			});
+					setTimeout(function ()
+					{
+						fetch();
+					}, opt.delay);
+				});
 		};
 
 		init(opt);
@@ -1538,17 +1721,21 @@ function disableAutoComplete()
 	});
 
 	// AMD / RequireJS
-	if ( typeof define !== 'undefined' && define.amd) {
-		define([], function() {
+	if (typeof define !== 'undefined' && define.amd)
+	{
+		define([], function ()
+		{
 			return ElkNotifications;
 		});
 	}
 	// CommonJS
-	else if ( typeof module !== 'undefined' && module.exports) {
+	else if (typeof module !== 'undefined' && module.exports)
+	{
 		module.exports = ElkNotifications;
 	}
 	// included directly via <script> tag
-	else {
+	else
+	{
 		this.ElkNotifications = ElkNotifications;
 	}
 
@@ -1559,8 +1746,10 @@ var ElkNotifier = new ElkNotifications();
 /**
  * Initialize the inline attachments posting interface
  */
-(function () {
-	var ElkInlineAttachments = (function (selector, editor, opt) {
+(function ()
+{
+	var ElkInlineAttachments = (function (selector, editor, opt)
+	{
 		'use strict';
 
 		opt = $.extend({
@@ -1571,8 +1760,11 @@ var ElkNotifier = new ElkNotifications();
 		}, opt);
 
 		var listAttachs = [],
-			init = function (opt) {},
-			addInterface = function ($before, attachId) {
+			init = function (opt)
+			{
+			},
+			addInterface = function ($before, attachId)
+			{
 				var $trigger, $container = $('<div class="container" />'), $over;
 
 				if (typeof opt.trigger !== 'undefined')
@@ -1590,7 +1782,8 @@ var ElkNotifier = new ElkNotifications();
 				}
 
 				$container.append($trigger);
-				$trigger.on('click', function (e) {
+				$trigger.on('click', function (e)
+				{
 					e.preventDefault();
 
 					if ($over != undefined)
@@ -1601,21 +1794,25 @@ var ElkNotifier = new ElkNotifications();
 
 					$over = $(opt.template).hide();
 					var firstLi = false,
-					    $tabs = $over.find("ul[data-group='tabs'] li");
+						$tabs = $over.find("ul[data-group='tabs'] li");
 					/*
 					 * Behaviours (onSomething)
 					 */
-					$tabs.each(function(k, v) {
-						$(this).on('click', function(e) {
+					$tabs.each(function (k, v)
+					{
+						$(this).on('click', function (e)
+						{
 							e.preventDefault();
 							e.stopPropagation();
 
-							$tabs.each(function(k, v) {
+							$tabs.each(function (k, v)
+							{
 								$(this).removeClass('active');
 							});
 							var toShow = $(this).data('tab');
 							$(this).addClass('active');
-							$over.find('.container').each(function(k, v) {
+							$over.find('.container').each(function (k, v)
+							{
 								if ($(this).data('visual') == toShow)
 								{
 									$(this).show();
@@ -1628,25 +1825,30 @@ var ElkNotifier = new ElkNotifications();
 						});
 						if (firstLi == false)
 						{
-							$(this).click();
+							$(this).trigger('click');
 							firstLi = true;
 						}
 					});
-					$over.find("input[data-size='thumb']").on('change', function(e) {
+					$over.find("input[data-size='thumb']").on('change', function (e)
+					{
 						$over.find('.customsize').slideUp();
 					});
-					$over.find("input[data-size='full']").on('change', function(e) {
+					$over.find("input[data-size='full']").on('change', function (e)
+					{
 						$over.find('.customsize').slideUp();
 					});
-					$over.find("input[data-size='cust']").on('change', function(e) {
+					$over.find("input[data-size='cust']").on('change', function (e)
+					{
 						$over.find('.customsize').slideDown();
 					});
-					$over.find(".range").on('input', function () {
+					$over.find(".range").on('input', function ()
+					{
 						var val = $(this).val();
 						$over.find(".visualizesize").val(val + 'px');
 					}).trigger('input');
 
-					$over.find('.button').on('click', function() {
+					$over.find('.button').on('click', function ()
+					{
 						var ila_text = '[attach';
 						if ($over.find("input[data-size='thumb']").is(':checked'))
 						{
@@ -1666,13 +1868,14 @@ var ElkNotifier = new ElkNotifications();
 							ila_text = ila_text + ' type=image';
 						}
 
-						$over.find(".container[data-visual='align'] input").each(function (k, v) {
+						$over.find(".container[data-visual='align'] input").each(function (k, v)
+						{
 							if ($(this).is(':checked'))
 							{
 								if ($(this).data('align') != 'none')
 								{
 									ila_text = ila_text + ' align=' + $(this).data('align');
-									return;
+
 								}
 							}
 						});
@@ -1683,21 +1886,26 @@ var ElkNotifier = new ElkNotifications();
 					});
 					// Prevents removing the element to disappear when clicking on
 					// anything because of the click.ila_insert event
-					$over.find('*').on('click', function(e) {
+					$over.find('*').on('click', function (e)
+					{
 						e.stopPropagation();
 					});
 
 					/*
 					 * Initialization
 					 */
-					$over.find('.container label:first-child input').each(function(k, v) {
+					$over.find('.container label:first-child input').each(function (k, v)
+					{
 						$(this).change().prop('checked', true);
 					});
 
 					$container.append($over);
-					$over.fadeIn(function() {
-						$(document).on('click.ila_insert', function() {
-							$over.fadeOut(function() {
+					$over.fadeIn(function ()
+					{
+						$(document).on('click.ila_insert', function ()
+						{
+							$over.fadeOut(function ()
+							{
 								$over.remove();
 								$over = undefined;
 							});
@@ -1710,19 +1918,24 @@ var ElkNotifier = new ElkNotifications();
 				$before.after($container);
 				listAttachs.push($trigger);
 			},
-			removeAttach = function (attachId) {
+			removeAttach = function (attachId)
+			{
 				var tmpList = [],
 					i;
 
-				for (i = 0; i < listAttachs.length; i++) {
+				for (i = 0; i < listAttachs.length; i++)
+				{
 					if (listAttachs[i].data('attachid') == attachId)
+					{
 						break;
+					}
 
 					tmpList.push(listAttachs[i]);
 				}
 
 				i++;
-				for (; i < listAttachs.length; i++) {
+				for (; i < listAttachs.length; i++)
+				{
 					tmpList.push(listAttachs[i]);
 				}
 
@@ -1738,17 +1951,21 @@ var ElkNotifier = new ElkNotifications();
 	});
 
 	// AMD / RequireJS
-	if (typeof define !== 'undefined' && define.amd) {
-		define([], function () {
+	if (typeof define !== 'undefined' && define.amd)
+	{
+		define([], function ()
+		{
 			return ElkInlineAttachments;
 		});
 	}
 	// CommonJS
-	else if (typeof module !== 'undefined' && module.exports) {
+	else if (typeof module !== 'undefined' && module.exports)
+	{
 		module.exports = ElkInlineAttachments;
 	}
 	// included directly via <script> tag
-	else {
+	else
+	{
 		this.ElkInlineAttachments = ElkInlineAttachments;
 	}
 })();
@@ -1756,8 +1973,10 @@ var ElkNotifier = new ElkNotifications();
 /**
  * Initialize the ajax info-bar
  */
-(function () {
-	var ElkInfoBar = (function (elem_id, opt) {
+(function ()
+{
+	var ElkInfoBar = (function (elem_id, opt)
+	{
 		'use strict';
 
 		opt = $.extend({
@@ -1770,9 +1989,11 @@ var ElkNotifier = new ElkNotifications();
 
 		var $elem = $('#' + elem_id),
 			time_out = null,
-			init = function (elem_id, opt) {
+			init = function (elem_id, opt)
+			{
 				clearTimeout(time_out);
-				if ($elem.length === 0) {
+				if ($elem.length === 0)
+				{
 					$elem = $('<div id="' + elem_id + '" class="' + opt.class + ' hide" />');
 					$('body').append($elem);
 					$elem.attr('id', elem_id);
@@ -1780,40 +2001,48 @@ var ElkNotifier = new ElkNotifications();
 					$elem.text(opt.text);
 				}
 			},
-			changeText = function (text) {
+			changeText = function (text)
+			{
 				clearTimeout(time_out);
 				$elem.html(text);
 				return this;
 			},
-			addClass = function (aClass) {
+			addClass = function (aClass)
+			{
 				$elem.addClass(aClass);
 				return this;
 			},
-			removeClass = function (aClass) {
+			removeClass = function (aClass)
+			{
 				$elem.removeClass(aClass);
 				return this;
 			},
-			showBar = function() {
+			showBar = function ()
+			{
 				clearTimeout(time_out);
 				$elem.fadeIn();
 
 				if (opt.hide_delay !== 0)
 				{
-					time_out = setTimeout(function() {
+					time_out = setTimeout(function ()
+					{
 						hide();
 					}, opt.hide_delay);
 				}
 				return this;
 			},
-			isError = function() {
+			isError = function ()
+			{
 				removeClass(opt.success_class);
 				addClass(opt.error_class);
 			},
-			isSuccess = function() {
+			isSuccess = function ()
+			{
 				removeClass(opt.error_class);
 				addClass(opt.success_class);
 			},
-			hide = function () {
+			hide = function ()
+			{
 				clearTimeout(time_out);
 				$elem.slideUp();
 				return this;
@@ -1834,17 +2063,21 @@ var ElkNotifier = new ElkNotifications();
 	});
 
 	// AMD / RequireJS
-	if (typeof define !== 'undefined' && define.amd) {
-		define([], function () {
+	if (typeof define !== 'undefined' && define.amd)
+	{
+		define([], function ()
+		{
 			return ElkInfoBar;
 		});
 	}
 	// CommonJS
-	else if (typeof module !== 'undefined' && module.exports) {
+	else if (typeof module !== 'undefined' && module.exports)
+	{
 		module.exports = ElkInfoBar;
 	}
 	// included directly via <script> tag
-	else {
+	else
+	{
 		this.ElkInfoBar = ElkInfoBar;
 	}
 })();

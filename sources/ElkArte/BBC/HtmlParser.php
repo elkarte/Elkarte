@@ -7,7 +7,7 @@
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause (see accompanying LICENSE.txt file)
  *
  * This file contains code covered by:
- * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * copyright: 2011 Simple Machines (http://www.simplemachines.org)
  *
  * @version 2.0 dev
  *
@@ -22,6 +22,10 @@ namespace BBC;
  */
 class HtmlParser
 {
+	/** @var int width of the image */
+	public $image_width;
+	/** @var int height of the image */
+	public $image_height;
 	/** @var array tags that are stand alone */
 	protected $empty_tags = array('br', 'hr');
 	/** @var array tags we will allow */
@@ -127,7 +131,7 @@ class HtmlParser
 			// Stray open tags, close them all!
 			if ($diff > 0)
 			{
-				$data = $data . str_repeat('</' . $tag . '>', $diff);
+				$data .= str_repeat('</' . $tag . '>', $diff);
 			}
 		}
 
@@ -184,7 +188,9 @@ class HtmlParser
 					$replaces[$matches[0][$match]] = '[img width=' . $width . ' height=' . $height . $alt . ']' . $imgtag . '[/img]';
 				}
 				else
+				{
 					$replaces[$matches[0][$match]] = '[img' . $alt . ']' . $imgtag . '[/img]';
+				}
 			}
 
 			$data = strtr($data, $replaces);

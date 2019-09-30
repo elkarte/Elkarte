@@ -6,7 +6,7 @@
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause (see accompanying LICENSE.txt file)
  *
  * This file contains code covered by:
- * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * copyright: 2011 Simple Machines (http://www.simplemachines.org)
  *
  * @version 2.0 dev
  *
@@ -38,8 +38,10 @@ function template_editBuddies()
 				<th scope="col">', $txt['status'], '</th>';
 
 	if ($context['can_send_email'])
+	{
 		echo '
 				<th scope="col">', $txt['email'], '</th>';
+	}
 
 	echo '
 				<th scope="col">', $txt['profile_contact'], '</th>
@@ -48,12 +50,14 @@ function template_editBuddies()
 
 	// If they don't have any buddies don't list them!
 	if (empty($context['buddies']))
+	{
 		echo '
 			<tr>
 				<td colspan="5" class="centertext">
 					<strong>', $txt['no_buddies'], '</strong>
 				</td>
 			</tr>';
+	}
 
 	// Now loop through each buddy showing info on each.
 	foreach ($context['buddies'] as $buddy)
@@ -66,8 +70,10 @@ function template_editBuddies()
 				</td>';
 
 		if ($context['can_send_email'])
+		{
 			echo '
 				<td>', template_member_email($buddy), '</td>';
+		}
 
 		//  Any custom profile (with icon) fields to show
 		$im = array();
@@ -75,8 +81,12 @@ function template_editBuddies()
 		{
 
 			foreach ($buddy['custom_fields'] as $key => $cpf)
+			{
 				if ($cpf['placement'] == 1)
+				{
 					$im[] = $cpf['value'];
+				}
+			}
 		}
 
 		echo '
@@ -110,8 +120,10 @@ function template_editBuddies()
 				</dl>';
 
 	if (!empty($context['token_check']))
+	{
 		echo '
 				<input type="hidden" name="', $context[$context['token_check'] . '_token_var'], '" value="', $context[$context['token_check'] . '_token'], '" />';
+	}
 
 	echo '
 				<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
@@ -150,8 +162,10 @@ function template_editIgnoreList()
 				<th scope="col">', $txt['status'], '</th>';
 
 	if ($context['can_send_email'])
+	{
 		echo '
 				<th scope="col">', $txt['email'], '</th>';
+	}
 
 	echo '
 				<th scope="col"></th>
@@ -159,12 +173,14 @@ function template_editIgnoreList()
 
 	// If they don't have anyone on their ignore list, don't list it!
 	if (empty($context['ignore_list']))
+	{
 		echo '
 			<tr>
 				<td colspan="4" class="centertext">
 					<strong>', $txt['no_ignore'], '</strong>
 				</td>
 			</tr>';
+	}
 
 	// Now loop through each buddy showing info on each.
 	foreach ($context['ignore_list'] as $member)
@@ -177,8 +193,10 @@ function template_editIgnoreList()
 				</td>';
 
 		if ($context['can_send_email'])
+		{
 			echo '
 				<td>', template_member_email($member), '</td>';
+		}
 
 		echo '
 				<td class="righttext">
@@ -209,8 +227,10 @@ function template_editIgnoreList()
 				</dl>';
 
 	if (!empty($context['token_check']))
+	{
 		echo '
 				<input type="hidden" name="', $context[$context['token_check'] . '_token_var'], '" value="', $context[$context['token_check'] . '_token'], '" />';
+	}
 
 	echo '
 				<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
@@ -246,31 +266,41 @@ function template_edit_options()
 
 	// Don't say "Profile" if this isn't the profile...
 	if (!empty($context['profile_header_text']))
+	{
 		echo '
 				', $context['profile_header_text'];
+	}
 	else
+	{
 		echo '
 				', $txt['profile'];
+	}
 
 	echo '
 			</h2>';
 
 	// Have we some description?
 	if ($context['page_desc'])
+	{
 		echo '
 			<p class="description">', $context['page_desc'], '</p>';
+	}
 
 	echo '
 			<div class="content">';
 
 	// Any bits at the start?
 	if (!empty($context['profile_prehtml']))
+	{
 		echo '
 				<div>', $context['profile_prehtml'], '</div>';
+	}
 
 	if (!empty($context['profile_fields']))
+	{
 		echo '
 				<dl>';
+	}
 
 	// Start the big old loop 'of love.
 	$lastItem = 'hr';
@@ -278,7 +308,9 @@ function template_edit_options()
 	{
 		// We add a little hack to be sure we never get more than one hr in a row!
 		if ($lastItem === 'hr' && $field['type'] === 'hr')
+		{
 			continue;
+		}
 
 		$lastItem = $field['type'];
 		if ($field['type'] === 'hr')
@@ -304,8 +336,10 @@ function template_edit_options()
 
 			// Does it have any subtext to show?
 			if (!empty($field['subtext']))
+			{
 				echo '
 						<p class="smalltext">', $field['subtext'], '</p>';
+			}
 
 			echo '
 					</dt>
@@ -313,28 +347,38 @@ function template_edit_options()
 
 			// Want to put something in front of the box?
 			if (!empty($field['preinput']))
+			{
 				echo '
 						', $field['preinput'];
+			}
 
 			// What type of data are we showing?
 			if ($field['type'] === 'label')
+			{
 				echo '
 						', $field['value'];
+			}
 
 			// Maybe it's a text box - very likely!
 			elseif (in_array($field['type'], array('int', 'float', 'text', 'password')))
+			{
 				echo '
 						<input type="', $field['type'] == 'password' ? 'password' : 'text', '" name="', $key, '" id="', $key, '" size="', empty($field['size']) ? 30 : $field['size'], '" value="', $field['value'], '" ', $field['input_attr'], ' class="input_', $field['type'] == 'password' ? 'password' : 'text', '" />';
+			}
 
 			// Maybe it's an html5 input
 			elseif (in_array($field['type'], array('url', 'search', 'date', 'email', 'color')))
+			{
 				echo '
 						<input type="', $field['type'], '" name="', $key, '" id="', $key, '" size="', empty($field['size']) ? 30 : $field['size'], '" value="', $field['value'], '" ', $field['input_attr'], ' class="input_', $field['type'] == 'password' ? 'password' : 'text', '" />';
+			}
 
 			// You "checking" me out? ;)
 			elseif ($field['type'] === 'check')
+			{
 				echo '
 						<input type="hidden" name="', $key, '" value="0" /><input type="checkbox" name="', $key, '" id="', $key, '" ', !empty($field['value']) ? ' checked="checked"' : '', ' value="1" ', $field['input_attr'], ' />';
+			}
 
 			// Always fun - select boxes!
 			elseif ($field['type'] === 'select')
@@ -359,9 +403,13 @@ function template_edit_options()
 
 					// Assuming we now have some!
 					if (is_array($field['options']))
+					{
 						foreach ($field['options'] as $value => $name)
+						{
 							echo '
 							<option value="', $value, '" ', $value == $field['value'] ? 'selected="selected"' : '', '>', $name, '</option>';
+						}
+					}
 				}
 
 				echo '
@@ -370,8 +418,10 @@ function template_edit_options()
 
 			// Something to end with?
 			if (!empty($field['postinput']))
+			{
 				echo '
 						', $field['postinput'];
+			}
 
 			echo '
 					</dd>';
@@ -379,15 +429,19 @@ function template_edit_options()
 	}
 
 	if (!empty($context['profile_fields']))
+	{
 		echo '
 				</dl>';
+	}
 
 	// Are there any custom profile fields - if so print them!
 	if (!empty($context['custom_fields']))
 	{
 		if ($lastItem !== 'hr')
+		{
 			echo '
 				<hr class="clear" />';
+		}
 
 		echo '
 				<dl>';
@@ -410,8 +464,10 @@ function template_edit_options()
 
 	// Any closing HTML?
 	if (!empty($context['profile_posthtml']))
+	{
 		echo '
 				<div>', $context['profile_posthtml'], '</div>';
+	}
 
 	// Only show the password box if it's actually needed.
 	template_profile_save();
@@ -428,6 +484,7 @@ function template_edit_options()
 
 	// If this part requires a password, make sure to give a warning.
 	if ($context['require_password'])
+	{
 		echo '
 				// Did you forget to type your password?
 				if (document.forms.creator.oldpasswrd.value === "")
@@ -435,11 +492,14 @@ function template_edit_options()
 					alert("', $txt['required_security_reasons'], '");
 					return false;
 				}';
+	}
 
 	// Any onsubmit javascript?
 	if (!empty($context['profile_onsubmit_javascript']))
+	{
 		echo '
 				', $context['profile_onsubmit_javascript'];
+	}
 
 	echo '
 			}
@@ -447,11 +507,13 @@ function template_edit_options()
 
 	// Any final spellchecking stuff?
 	if (!empty($context['show_spellchecking']))
+	{
 		echo '
 		<form name="spell_form" id="spell_form" method="post" accept-charset="UTF-8" target="spellWindow" action="', $scripturl, '?action=spellcheck">
 			<input type="hidden" id="spellstring" name="spellstring" value="" />
 			<input type="hidden" id="fulleditor" name="fulleditor" value="" />
 		</form>';
+	}
 }
 
 /**
@@ -490,8 +552,10 @@ function template_profile_pm_settings()
 									<option value="1"', !empty($context['send_email']) && ($context['send_email'] == 1 || (empty($modSettings['enable_buddylist']) && $context['send_email'] > 1)) ? ' selected="selected"' : '', '>', $txt['email_notify_always'], '</option>';
 
 	if (!empty($modSettings['enable_buddylist']))
+	{
 		echo '
 										<option value="2"', !empty($context['send_email']) && $context['send_email'] > 1 ? ' selected="selected"' : '', '>', $txt['email_notify_buddies'], '</option>';
+	}
 
 	echo '
 								</select>
@@ -559,6 +623,7 @@ function template_profile_theme_settings()
 							</dd>';
 
 	if ($context['allow_no_censored'])
+	{
 		echo '
 							<dt>
 								<label for="show_no_censored">', $txt['show_no_censored'], '</label>
@@ -567,6 +632,7 @@ function template_profile_theme_settings()
 								<input type="hidden" name="default_options[show_no_censored]" value="0" />
 								<input type="checkbox" name="default_options[show_no_censored]" id="show_no_censored" value="1"' . (!empty($context['member']['options']['show_no_censored']) ? ' checked="checked"' : '') . ' />
 							</dd>';
+	}
 
 	echo '
 							<dt>
@@ -621,6 +687,7 @@ function template_profile_theme_settings()
 	}
 
 	if (!empty($modSettings['cal_enabled']))
+	{
 		echo '
 							<dt>
 								<label for="calendar_start_day">', $txt['calendar_start_day'], '</label>
@@ -632,8 +699,10 @@ function template_profile_theme_settings()
 									<option value="6"', !empty($context['member']['options']['calendar_start_day']) && $context['member']['options']['calendar_start_day'] == 6 ? ' selected="selected"' : '', '>', $txt['days'][6], '</option>
 								</select>
 								</dd>';
+	}
 
 	if (!empty($modSettings['drafts_enabled']) && !empty($modSettings['drafts_autosave_enabled']))
+	{
 		echo '
 							<dt>
 								<label for="drafts_autosave_enabled">', $txt['drafts_autosave_enabled'], '</label>
@@ -642,6 +711,7 @@ function template_profile_theme_settings()
 								<input type="hidden" name="default_options[drafts_autosave_enabled]" value="0" />
 								<label for="drafts_autosave_enabled"><input type="checkbox" name="default_options[drafts_autosave_enabled]" id="drafts_autosave_enabled" value="1"', !empty($context['member']['options']['drafts_autosave_enabled']) ? ' checked="checked"' : '', ' /></label>
 							</dd>';
+	}
 
 	echo '
 							<dt>
@@ -716,6 +786,7 @@ function template_action_notification()
 
 	// Allow notification on announcements to be disabled?
 	if (!empty($modSettings['allow_disableAnnounce']))
+	{
 		echo '
 					<dt>
 						<label for="notify_announcements">', $txt['notify_important_email'], '</label>
@@ -724,6 +795,7 @@ function template_action_notification()
 						<input type="hidden" name="notify_announcements" value="0" />
 						<input type="checkbox" id="notify_announcements" name="notify_announcements"', !empty($context['member']['notify_announcements']) ? ' checked="checked"' : '', ' />
 					</dd>';
+	}
 
 	// Auto notification when you reply / start a topic?
 	echo '
@@ -738,6 +810,7 @@ function template_action_notification()
 
 	// Can the body of the post be sent, PBE will ensure it can
 	if (empty($modSettings['disallow_sendBody']))
+	{
 		echo '
 					<dt>
 						<label for="notify_send_body">', $txt['notify_send_body' . (!empty($modSettings['maillist_enabled']) ? '_pbe' : '')], '</label>
@@ -747,6 +820,7 @@ function template_action_notification()
 						<input type="checkbox" id="notify_send_body" name="notify_send_body"', !empty($context['member']['notify_send_body']) ? ' checked="checked"' : '', ' />
 						', (!empty($modSettings['maillist_enabled']) ? $txt['notify_send_body_pbe_post'] : ''), '
 					</dd>';
+	}
 
 	// How often do you want to hear from us, instant, daily, weekly?
 	echo '
@@ -820,10 +894,12 @@ function template_groupMembership()
 
 	// Do we have an update message?
 	if (!empty($context['update_message']))
+	{
 		echo '
 			<div class="successbox">
 				', $context['update_message'], '
 			</div>';
+	}
 
 	// Requesting membership to a group?
 	if (!empty($context['group_request']))
@@ -859,10 +935,12 @@ function template_groupMembership()
 					<tr  id="primdiv_', $group['id'], '">';
 
 			if ($context['can_edit_primary'])
+			{
 				echo '
 						<td>
 							<input type="radio" name="primary" id="primary_', $group['id'], '" value="', $group['id'], '" ', $group['is_primary'] ? 'checked="checked" ' : '', $group['can_be_primary'] ? '' : 'disabled="disabled" ', ' />
 						</td>';
+			}
 
 			echo '
 						<td>
@@ -874,8 +952,10 @@ function template_groupMembership()
 
 			// Can they leave their group?
 			if ($group['can_leave'])
+			{
 				echo '
 							<a class="linkbutton" href="' . $scripturl . '?action=profile;save;u=' . $context['id_member'] . ';area=groupmembership;' . $context['session_var'] . '=' . $context['session_id'] . ';gid=' . $group['id'] . ';', $context[$context['token_check'] . '_token_var'], '=', $context[$context['token_check'] . '_token'], '">' . $txt['leave_group'] . '</a>';
+			}
 			echo '
 						</td>
 					</tr>';
@@ -886,10 +966,12 @@ function template_groupMembership()
 			</table>';
 
 		if ($context['can_edit_primary'])
+		{
 			echo '
 			<div class="submitbutton">
 				<input type="submit" value="', $txt['make_primary'], '" />
 			</div>';
+		}
 
 		// Any groups they can join?
 		if (!empty($context['groups']['available']))
@@ -917,14 +999,20 @@ function template_groupMembership()
 						<td class="lefttext">';
 
 				if ($group['type'] == 3)
+				{
 					echo '
 							<a class="linkbutton_right" href="', $scripturl, '?action=profile;save;u=', $context['id_member'], ';area=groupmembership;', $context['session_var'], '=', $context['session_id'], ';gid=', $group['id'], ';', $context[$context['token_check'] . '_token_var'], '=', $context[$context['token_check'] . '_token'], '">', $txt['join_group'], '</a>';
+				}
 				elseif ($group['type'] == 2 && $group['pending'])
+				{
 					echo '
 							', $txt['approval_pending'];
+				}
 				elseif ($group['type'] == 2)
+				{
 					echo '
 							<a class="linkbutton_right" href="', $scripturl, '?action=profile;u=', $context['id_member'], ';area=groupmembership;request=', $group['id'], ';', $context['session_var'], '=', $context['session_id'], '">', $txt['request_group'], '</a>';
+				}
 // @todo
 //				<input type="hidden" name="', $context[$context['token_check'] . '_token_var'], '" value="', $context[$context['token_check'] . '_token'], '" />';
 
@@ -945,16 +1033,20 @@ function template_groupMembership()
 				prevDiv = "";';
 
 		if (isset($context['groups']['member'][$context['primary_group']]))
+		{
 			echo '
 			initHighlightSelection("primdiv_' . $context['primary_group'] . '");';
+		}
 
 		echo '
 		</script>';
 	}
 
 	if (!empty($context['token_check']))
+	{
 		echo '
 				<input type="hidden" name="', $context[$context['token_check'] . '_token_var'], '" value="', $context[$context['token_check'] . '_token'], '" />';
+	}
 
 	echo '
 				<input type="hidden" name="save" value="save" />
@@ -1008,11 +1100,15 @@ function template_profile_group_manage()
 
 	// Fill the select box with all primary membergroups that can be assigned to a member.
 	foreach ($context['member_groups'] as $member_group)
+	{
 		if (!empty($member_group['can_be_primary']))
+		{
 			echo '
 									<option value="', $member_group['id'], '"', $member_group['is_primary'] ? ' selected="selected"' : '', '>
 										', $member_group['name'], '
 									</option>';
+		}
+	}
 
 	echo '
 								</select>
@@ -1028,11 +1124,15 @@ function template_profile_group_manage()
 
 	// For each membergroup show a checkbox so members can be assigned to more than one group.
 	foreach ($context['member_groups'] as $member_group)
+	{
 		if ($member_group['can_be_additional'])
+		{
 			echo '
 										<li>
 											<label for="additional_groups-', $member_group['id'], '"><input type="checkbox" name="additional_groups[]" value="', $member_group['id'], '" id="additional_groups-', $member_group['id'], '"', $member_group['is_additional'] ? ' checked="checked"' : '', ' /> ', $member_group['name'], '</label>
 										</li>';
+		}
+	}
 
 	echo '
 									</ul>
@@ -1090,20 +1190,28 @@ function template_profile_signature_modify()
 
 	// If there is a limit at all!
 	if (!empty($context['signature_limits']['max_length']))
+	{
 		echo '
 								<p class="smalltext">', sprintf($txt['max_sig_characters'], $context['signature_limits']['max_length']), ' <span id="signatureLeft">', $context['signature_limits']['max_length'], '</span></p>';
+	}
 
 	if ($context['show_spellchecking'])
+	{
 		echo '
 								<input type="button" value="', $txt['spell_check'], '" onclick="spellCheck(\'creator\', \'signature\', false);"  tabindex="', $context['tabindex']++, '" class="right_submit" />';
+	}
 
 	if (!empty($context['show_preview_button']))
+	{
 		echo '
 								<input type="submit" name="preview_signature" id="preview_button" value="', $txt['preview_signature'], '"  tabindex="', $context['tabindex']++, '" class="right_submit" />';
+	}
 
 	if ($context['signature_warning'])
+	{
 		echo '
 								<span class="smalltext">', $context['signature_warning'], '</span>';
+	}
 
 	// Some javascript used to count how many characters have been used so far in the signature.
 	echo '
@@ -1176,8 +1284,11 @@ function template_profile_avatar_select()
 
 		// This lists all the file categories.
 		foreach ($context['avatars'] as $avatar)
+		{
 			echo '
 											<option value="', $avatar['filename'] . ($avatar['is_dir'] ? '/' : ''), '"', ($avatar['checked'] ? ' selected="selected"' : ''), '>', $avatar['name'], '</option>';
+		}
+
 		echo '
 										</select>
 									</div>
@@ -1283,8 +1394,10 @@ function template_profile_timeformat_modify()
 
 	// Help the user by showing a list of common time formats.
 	foreach ($context['easy_timeformats'] as $time_format)
+	{
 		echo '
 									<option value="', $time_format['format'], '"', $time_format['format'] == $context['member']['time_format'] ? ' selected="selected"' : '', '>', $time_format['title'], '</option>';
+	}
 
 	echo '
 								</select>
@@ -1341,8 +1454,10 @@ function template_profile_smiley_pick()
 								<select name="smiley_set" id="smiley_set" onchange="document.getElementById(\'smileypr\').src = this.selectedIndex == 0 ? \'', $settings['images_url'], '/blank.png\' : \'', $modSettings['smileys_url'], '/\' + (this.selectedIndex != 1 ? this.options[this.selectedIndex].value : \'', !empty($settings['smiley_sets_default']) ? $settings['smiley_sets_default'] : $modSettings['smiley_sets_default'], '\') + \'/smiley.gif\';">';
 
 	foreach ($context['smiley_sets'] as $set)
+	{
 		echo '
 									<option value="', $set['id'], '"', $set['selected'] ? ' selected="selected"' : '', '>', $set['name'], '</option>';
+	}
 
 	echo '
 								</select>

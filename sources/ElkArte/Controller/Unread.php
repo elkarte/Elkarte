@@ -8,7 +8,7 @@
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause (see accompanying LICENSE.txt file)
  *
  * This file contains code covered by:
- * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * copyright: 2011 Simple Machines (http://www.simplemachines.org)
  *
  * @version 2.0 dev
  *
@@ -16,13 +16,17 @@
 
 namespace ElkArte\Controller;
 
+use ElkArte\AbstractController;
+use ElkArte\Exceptions\Exception;
+
 /**
  * Handles the finding of Unread posts and replies
  */
-class Unread extends \ElkArte\AbstractController
+class Unread extends AbstractController
 {
 	/**
 	 * The board ids we are marking
+	 *
 	 * @var array
 	 */
 	private $_boards = array();
@@ -34,12 +38,14 @@ class Unread extends \ElkArte\AbstractController
 
 	/**
 	 * Number of topics
+	 *
 	 * @var int
 	 */
 	private $_num_topics = 0;
 
 	/**
 	 * The action being performed
+	 *
 	 * @var string
 	 */
 	private $_action = 'unread';
@@ -56,6 +62,7 @@ class Unread extends \ElkArte\AbstractController
 
 	/**
 	 * The object that will retrieve the data
+	 *
 	 * @var Unread
 	 */
 	private $_grabber = null;
@@ -112,7 +119,7 @@ class Unread extends \ElkArte\AbstractController
 		$this->_wanted_boards();
 		$this->_sorting_conditions();
 
-		if (!empty($this->_req->query->c) && is_array($this->_req->query->c) && count($this->_req->query->c) == 1)
+		if (!empty($this->_req->query->c) && is_array($this->_req->query->c) && count($this->_req->query->c) === 1)
 		{
 			require_once(SUBSDIR . '/Categories.subs.php');
 			$name = categoryName((int) $this->_req->query->c[0]);
@@ -150,6 +157,156 @@ class Unread extends \ElkArte\AbstractController
 			{
 				$this->_grabber->bodyPreview($modSettings['preview_characters']);
 			}
+		}
+	}
+
+	/**
+	 * Validates the server can perform the required operation given its current loading
+	 */
+	private function _checkServerLoad()
+	{
+		global $context, $modSettings;
+
+		// Check for any server load issues
+		if ($context['showing_all_topics'] && !empty($modSettings['loadavg_allunread']) && $modSettings['current_load'] >= $modSettings['loadavg_allunread'])
+		{
+			throw new Exception('loadavg_allunread_disabled', false);
+		}
+		elseif ($this->_action_unreadreplies && !empty($modSettings['loadavg_unreadreplies']) && $modSettings['current_load'] >= $modSettings['loadavg_unreadreplies'])
+		{
+			throw new Exception('loadavg_unreadreplies_disabled', false);
+		}
+		elseif (!$context['showing_all_topics'] && $this->_action_unread && !empty($modSettings['loadavg_unread']) && $modSettings['current_load'] >= $modSettings['loadavg_unread'])
+		{
+			throw new Exception('loadavg_unread_disabled', false);
+		}
+	}
+
+	/**
+	 * Finds out the boards the user want.
+	 */
+	private function _wanted_boards()
+	{
+		global $board, $context;
+
+		if (isset($this->_req->query->children) && (!empty($board) || !empty($this->_req->query->boards)))
+		{
+			$this->_boards = array();
+
+			if (!empty($this->_req->query->boards))
+			{
+				$this->_boards = array_map('intval', explode(',', $this->_req->query->boards));
+			}
+
+			if (!empty($board))
+			{
+				$this->_boards[] = (int) $board;
+			}
+
+			// The easiest thing is to just get all the boards they can see,
+			// but since we've specified the top of tree we ignore some of them
+			$this->_boards = addChildBoards($this->_boards);
+
+			$context['querystring_board_limits'] = ';boards=' . implode(',', $this->_boards) . ';start=%d';
+		}
+		elseif (!empty($board))
+		{
+			$this->_boards = array($board);
+			$context['querystring_board_limits'] = ';board=' . $board . '.%1$d';
+		}
+		elseif (!empty($this->_req->query->boards))
+		{
+			$selected_boards = array_map('intval', explode(',', $this->_req->query->boards));
+
+			$this->_boards = accessibleBoards($selected_boards);
+
+			$context['querystring_board_limits'] = ';boards=' . implode(',', $this->_boards) . ';start=%1$d';
+		}
+		elseif (!empty($this->_req->query->c))
+		{
+			$categories = array_map('intval', explode(',', $this->_req->query->c));
+
+			$this->_boards = array_keys(boardsPosts(array(), $categories, $this->_action_unread));
+
+			$context['querystring_board_limits'] = ';c=' . $this->_req->query->c . ';start=%1$d';
+
+			$this->_req->query->c = explode(',', $this->_req->query->c);
+		}
+		else
+		{
+			$see_board = $this->_action_unreadreplies ? 'query_see_board' : 'query_wanna_see_board';
+
+			// Don't bother to show deleted posts!
+			$this->_boards = wantedBoards($see_board);
+
+			$context['querystring_board_limits'] = ';start=%1$d';
+			$context['no_board_limits'] = true;
+		}
+
+		if (empty($this->_boards))
+		{
+			throw new Exception('error_no_boards_selected');
+		}
+		else
+		{
+			$this->_grabber->setBoards($this->_boards);
+		}
+	}
+
+	/**
+	 * Set up the array for the sorting dropdown.
+	 */
+	private function _sorting_conditions()
+	{
+		global $context, $txt, $scripturl;
+
+		$sort_methods = array(
+			'subject' => 'ms.subject',
+			'starter' => 'COALESCE(mems.real_name, ms.poster_name)',
+			'replies' => 't.num_replies',
+			'views' => 't.num_views',
+			'first_post' => 't.id_topic',
+			'last_post' => 't.id_last_msg'
+		);
+
+		// The default is the most logical: newest first.
+		if (!isset($this->_req->query->sort) || !isset($sort_methods[$this->_req->query->sort]))
+		{
+			$context['sort_by'] = 'last_post';
+			$ascending = isset($this->_req->query->asc);
+
+			$context['querystring_sort_limits'] = $ascending ? ';asc' : '';
+		}
+		// But, for other methods the default sort is ascending.
+		else
+		{
+			$context['sort_by'] = $this->_req->query->sort;
+			$ascending = !isset($this->_req->query->desc);
+
+			$context['querystring_sort_limits'] = ';sort=' . $context['sort_by'] . ($ascending ? '' : ';desc');
+		}
+
+		$this->_grabber->setSorting($sort_methods[$context['sort_by']], $ascending);
+
+		$context['sort_direction'] = $ascending ? 'up' : 'down';
+		$context['sort_title'] = $ascending ? $txt['sort_desc'] : $txt['sort_asc'];
+
+		// Trick
+		$txt['starter'] = $txt['started_by'];
+
+		foreach ($sort_methods as $key => $val)
+		{
+			switch ($key)
+			{
+				case 'subject':
+				case 'starter':
+					$sorticon = 'alpha';
+					break;
+				default:
+					$sorticon = 'numeric';
+			}
+
+			$context['topics_headers'][$key] = array('url' => $scripturl . '?action=' . $this->_action . ($context['showing_all_topics'] ? ';all' : '') . sprintf($context['querystring_board_limits'], $this->_req->query->start) . ';sort=' . $key . ($context['sort_by'] == $key && $context['sort_direction'] === 'up' ? ';desc' : ''), 'sort_dir_img' => $context['sort_by'] == $key ? '<i class="icon icon-small i-sort-' . $sorticon . '-' . $context['sort_direction'] . '" title="' . $context['sort_title'] . '"></i>' : '',);
 		}
 	}
 
@@ -296,134 +453,6 @@ class Unread extends \ElkArte\AbstractController
 	}
 
 	/**
-	 * Finds out the boards the user want.
-	 */
-	private function _wanted_boards()
-	{
-		global $board, $context;
-
-		if (isset($this->_req->query->children) && (!empty($board) || !empty($this->_req->query->boards)))
-		{
-			$this->_boards = array();
-
-			if (!empty($this->_req->query->boards))
-			{
-				$this->_boards = array_map('intval', explode(',', $this->_req->query->boards));
-			}
-
-			if (!empty($board))
-			{
-				$this->_boards[] = (int) $board;
-			}
-
-			// The easiest thing is to just get all the boards they can see,
-			// but since we've specified the top of tree we ignore some of them
-			$this->_boards = addChildBoards($this->_boards);
-
-			$context['querystring_board_limits'] = ';boards=' . implode(',', $this->_boards) . ';start=%d';
-		}
-		elseif (!empty($board))
-		{
-			$this->_boards = array($board);
-			$context['querystring_board_limits'] = ';board=' . $board . '.%1$d';
-		}
-		elseif (!empty($this->_req->query->boards))
-		{
-			$selected_boards = array_map('intval', explode(',', $this->_req->query->boards));
-
-			$this->_boards = accessibleBoards($selected_boards);
-
-			$context['querystring_board_limits'] = ';boards=' . implode(',', $this->_boards) . ';start=%1$d';
-		}
-		elseif (!empty($this->_req->query->c))
-		{
-			$categories = array_map('intval', explode(',', $this->_req->query->c));
-
-			$this->_boards = array_keys(boardsPosts(array(), $categories, $this->_action_unread));
-
-			$context['querystring_board_limits'] = ';c=' . $this->_req->query->c . ';start=%1$d';
-
-			$this->_req->query->c = explode(',', $this->_req->query->c);
-		}
-		else
-		{
-			$see_board = $this->_action_unreadreplies ? 'query_see_board' : 'query_wanna_see_board';
-
-			// Don't bother to show deleted posts!
-			$this->_boards = wantedBoards($see_board);
-
-			$context['querystring_board_limits'] = ';start=%1$d';
-			$context['no_board_limits'] = true;
-		}
-
-		if (empty($this->_boards))
-		{
-			throw new \ElkArte\Exceptions\Exception('error_no_boards_selected');
-		}
-		else
-		{
-			$this->_grabber->setBoards($this->_boards);
-		}
-	}
-
-	/**
-	 * Set up the array for the sorting dropdown.
-	 */
-	private function _sorting_conditions()
-	{
-		global $context, $txt, $scripturl;
-
-		$sort_methods = array(
-			'subject' => 'ms.subject',
-			'starter' => 'COALESCE(mems.real_name, ms.poster_name)',
-			'replies' => 't.num_replies',
-			'views' => 't.num_views',
-			'first_post' => 't.id_topic',
-			'last_post' => 't.id_last_msg'
-		);
-
-		// The default is the most logical: newest first.
-		if (!isset($this->_req->query->sort) || !isset($sort_methods[$this->_req->query->sort]))
-		{
-			$context['sort_by'] = 'last_post';
-			$ascending = isset($this->_req->query->asc);
-
-			$context['querystring_sort_limits'] = $ascending ? ';asc' : '';
-		}
-		// But, for other methods the default sort is ascending.
-		else
-		{
-			$context['sort_by'] = $this->_req->query->sort;
-			$ascending = !isset($this->_req->query->desc);
-
-			$context['querystring_sort_limits'] = ';sort=' . $context['sort_by'] . ($ascending ? '' : ';desc');
-		}
-
-		$this->_grabber->setSorting($sort_methods[$context['sort_by']], $ascending);
-
-		$context['sort_direction'] = $ascending ? 'up' : 'down';
-		$context['sort_title'] = $ascending ? $txt['sort_desc'] : $txt['sort_asc'];
-
-		// Trick
-		$txt['starter'] = $txt['started_by'];
-
-		foreach ($sort_methods as $key => $val)
-		{
-			switch ($key)
-			{
-				case 'subject':
-				case 'starter':
-					$sorticon = 'alpha';
-					break;
-				default:
-					$sorticon = 'numeric';
-			}
-
-			$context['topics_headers'][$key] = array('url' => $scripturl . '?action=' . $this->_action . ($context['showing_all_topics'] ? ';all' : '') . sprintf($context['querystring_board_limits'], $this->_req->query->start) . ';sort=' . $key . ($context['sort_by'] == $key && $context['sort_direction'] === 'up' ? ';desc' : ''), 'sort_dir_img' => $context['sort_by'] == $key ? '<i class="icon icon-small i-sort-' . $sorticon . '-' . $context['sort_direction'] . '" title="' . $context['sort_title'] . '"></i>' : '',);
-		}
-	}
-
-	/**
 	 * Some common things done at the end of each action.
 	 */
 	private function _exiting_unread()
@@ -564,27 +593,5 @@ class Unread extends \ElkArte\AbstractController
 		call_integration_hook('integrate_recent_buttons', array(&$recent_buttons));
 
 		return $recent_buttons;
-	}
-
-	/**
-	 * Validates the server can perform the required operation given its current loading
-	 */
-	private function _checkServerLoad()
-	{
-		global $context, $modSettings;
-
-		// Check for any server load issues
-		if ($context['showing_all_topics'] && !empty($modSettings['loadavg_allunread']) && $modSettings['current_load'] >= $modSettings['loadavg_allunread'])
-		{
-			throw new \ElkArte\Exceptions\Exception('loadavg_allunread_disabled', false);
-		}
-		elseif ($this->_action_unreadreplies && !empty($modSettings['loadavg_unreadreplies']) && $modSettings['current_load'] >= $modSettings['loadavg_unreadreplies'])
-		{
-			throw new \ElkArte\Exceptions\Exception('loadavg_unreadreplies_disabled', false);
-		}
-		elseif (!$context['showing_all_topics'] && $this->_action_unread && !empty($modSettings['loadavg_unread']) && $modSettings['current_load'] >= $modSettings['loadavg_unread'])
-		{
-			throw new \ElkArte\Exceptions\Exception('loadavg_unread_disabled', false);
-		}
 	}
 }

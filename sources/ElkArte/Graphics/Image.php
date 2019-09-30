@@ -17,6 +17,8 @@
 
 namespace ElkArte\Graphics;
 
+use ElkArte\Exceptions\Exception;
+
 /**
  * Class Image
  *
@@ -75,15 +77,6 @@ class Image
 	}
 
 	/**
-	 * Clears the image object
-	 */
-	public function __destruct()
-	{
-		$this->_manipulator->__destruct();
-		$this->_image_loaded = false;
-	}
-
-	/**
 	 * Determine and set what image library we will use
 	 *
 	 * @throws \Exception
@@ -91,7 +84,7 @@ class Image
 	protected function setManipulator()
 	{
 		// Later this could become an array of "manipulators" (or not) and remove the hard-coded IM/GD requirements
-		if ($this->_force_gd === false && Imagick::canUse())
+		if (!$this->_force_gd && Imagick::canUse())
 		{
 			$this->_manipulator = new Imagick($this->_fileName);
 		}
@@ -142,128 +135,13 @@ class Image
 
 	/**
 	 * Return if the source is actually a web address vs local file
+	 *
 	 * @param $source
 	 * @return bool
 	 */
 	public function isWebAddress($source)
 	{
 		return substr($source, 0, 7) === 'http://' || substr($this->_fileName, 0, 8) === 'https://';
-	}
-
-	/**
-	 * Save the image object to a file.
-	 *
-	 * @param string $file_name name to save the image to
-	 * @param int $preferred_format what format to save the image
-	 * @param int $quality some formats require we provide a compression quality
-	 *
-	 * @return bool
-	 */
-	public function saveImage($file_name = '', $preferred_format = IMAGETYPE_JPEG, $quality = 85)
-	{
-		$success = $this->_manipulator->output($file_name, $preferred_format, $quality);
-		$this->__destruct();
-
-		return $success;
-	}
-
-	/**
-	 * Return or set (via getimagesize or getimagesizefromstring) some image details such
-	 * as size and mime type
-	 *
-	 * @param string $source
-	 *
-	 * @return array
-	 */
-	public function getSize($source)
-	{
-		if (empty($this->_manipulator->sizes) || $source !== $this->_fileName)
-		{
-			$this->setSource($source);
-			$this->_manipulator->getSize();
-		}
-
-		return $this->_manipulator->sizes;
-	}
-
-	/**
-	 * Resize an image from a remote location or a local file.
-	 *
-	 * What it does:
-	 *
-	 * - Resize an image, proportionally, to fit withing WxH limits
-	 * - The file would have the format preferred_format if possible,
-	 * otherwise the default format is jpeg.
-	 * - Optionally removes exif header data to make a smaller image
-	 *
-	 * @param int $max_width The maximum allowed width
-	 * @param int $max_height The maximum allowed height
-	 * @param bool $force_resize Always resize the image (force scale up)
-	 * @param bool $strip Allow IM to remove exif data as GD always will
-	 *
-	 * @return boolean Whether the thumbnail creation was successful.
-	 */
-	public function resizeImage($max_width, $max_height, $strip = false, $force_resize = true)
-	{
-		// Nothing to do without GD or IM or an Image
-		if ($this->_manipulator === null)
-		{
-			return false;
-		}
-
-		try
-		{
-			return $this->_manipulator->resizeImage($max_width, $max_height, $strip, $force_resize);
-		}
-		catch (\Exception $e)
-		{
-			return false;
-		}
-	}
-
-	/**
-	 * Finds the orientation flag of the image as defined by its EXIF data
-	 *
-	 * @return int
-	 */
-	public function getOrientation()
-	{
-		return $this->_manipulator->getOrientation();
-	}
-
-	/**
-	 * Calls functions to correct an images orientation based on the EXIF orientation flag
-	 *
-	 * @return bool
-	 * @throws \Exception
-	 */
-	public function autoRotateImage()
-	{
-		$this->getOrientation();
-
-		// For now we only process jpeg images, so check that we have one
-		if (!isset($this->_manipulator->sizes[2]))
-		{
-			$this->_manipulator->getSize();
-		}
-
-		// Not a jpeg or not rotated, done!
-		if ($this->_manipulator->sizes[2] !== 2 || $this->_manipulator->orientation <= 1)
-		{
-			return false;
-		}
-
-		try
-		{
-			$this->_manipulator->autoRotateImage();
-		}
-		catch (\Exception $e)
-		{
-			// Nice try
-			return false;
-		}
-
-		return true;
 	}
 
 	/**
@@ -362,6 +240,112 @@ class Image
 	}
 
 	/**
+	 * Calls functions to correct an images orientation based on the EXIF orientation flag
+	 *
+	 * @return bool
+	 * @throws \Exception
+	 */
+	public function autoRotateImage()
+	{
+		$this->getOrientation();
+
+		// For now we only process jpeg images, so check that we have one
+		if (!isset($this->_manipulator->sizes[2]))
+		{
+			$this->_manipulator->getSize();
+		}
+
+		// Not a jpeg or not rotated, done!
+		if ($this->_manipulator->sizes[2] !== 2 || $this->_manipulator->orientation <= 1)
+		{
+			return false;
+		}
+
+		try
+		{
+			$this->_manipulator->autoRotateImage();
+		}
+		catch (\Exception $e)
+		{
+			// Nice try
+			return false;
+		}
+
+		return true;
+	}
+
+	/**
+	 * Finds the orientation flag of the image as defined by its EXIF data
+	 *
+	 * @return int
+	 */
+	public function getOrientation()
+	{
+		return $this->_manipulator->getOrientation();
+	}
+
+	/**
+	 * Resize an image from a remote location or a local file.
+	 *
+	 * What it does:
+	 *
+	 * - Resize an image, proportionally, to fit withing WxH limits
+	 * - The file would have the format preferred_format if possible,
+	 * otherwise the default format is jpeg.
+	 * - Optionally removes exif header data to make a smaller image
+	 *
+	 * @param int $max_width The maximum allowed width
+	 * @param int $max_height The maximum allowed height
+	 * @param bool $force_resize Always resize the image (force scale up)
+	 * @param bool $strip Allow IM to remove exif data as GD always will
+	 *
+	 * @return boolean Whether the thumbnail creation was successful.
+	 */
+	public function resizeImage($max_width, $max_height, $strip = false, $force_resize = true)
+	{
+		// Nothing to do without GD or IM or an Image
+		if ($this->_manipulator === null)
+		{
+			return false;
+		}
+
+		try
+		{
+			return $this->_manipulator->resizeImage($max_width, $max_height, $strip, $force_resize);
+		}
+		catch (\Exception $e)
+		{
+			return false;
+		}
+	}
+
+	/**
+	 * Save the image object to a file.
+	 *
+	 * @param string $file_name name to save the image to
+	 * @param int $preferred_format what format to save the image
+	 * @param int $quality some formats require we provide a compression quality
+	 *
+	 * @return bool
+	 */
+	public function saveImage($file_name = '', $preferred_format = IMAGETYPE_JPEG, $quality = 85)
+	{
+		$success = $this->_manipulator->output($file_name, $preferred_format, $quality);
+		$this->__destruct();
+
+		return $success;
+	}
+
+	/**
+	 * Clears the image object
+	 */
+	public function __destruct()
+	{
+		$this->_manipulator->__destruct();
+		$this->_image_loaded = false;
+	}
+
+	/**
 	 * Used to re-encodes an image to a specified image format
 	 *
 	 * What it does:
@@ -397,6 +381,25 @@ class Image
 	}
 
 	/**
+	 * Return or set (via getimagesize or getimagesizefromstring) some image details such
+	 * as size and mime type
+	 *
+	 * @param string $source
+	 *
+	 * @return array
+	 */
+	public function getSize($source)
+	{
+		if (empty($this->_manipulator->sizes) || $source !== $this->_fileName)
+		{
+			$this->setSource($source);
+			$this->_manipulator->getSize();
+		}
+
+		return $this->_manipulator->sizes;
+	}
+
+	/**
 	 * Searches through the file to see if there's potentially harmful content.
 	 *
 	 * What it does:
@@ -415,7 +418,7 @@ class Image
 		if ($fp === false)
 		{
 			theme()->getTemplates()->loadLanguageFile('Post');
-			throw new \ElkArte\Exceptions\Exception('attach_timeout');
+			throw new Exception('attach_timeout');
 		}
 
 		$prev_chunk = '';

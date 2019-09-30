@@ -108,12 +108,14 @@ interface CacheMethodInterface
 
 	/**
 	 * Check if the last result was a miss
+	 *
 	 * @return bool
 	 */
 	public function isMiss();
 
 	/**
 	 * Remove a item from the cache
+	 *
 	 * @param string $key
 	 * @return void
 	 */

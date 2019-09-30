@@ -8,18 +8,19 @@
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause (see accompanying LICENSE.txt file)
  *
  * This file contains code covered by:
- * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * copyright: 2011 Simple Machines (http://www.simplemachines.org)
  *
  * @version 2.0 dev
  *
  */
 
+use ElkArte\Cache\Cache;
+use ElkArte\Cache\CacheMethod\AbstractCacheMethod;
+
 /**
  * Try to retrieve a cache entry. On failure, call the appropriate function.
  * This callback is sent as $file to include, and $function to call, with
  * $params parameters.
- *
- * @deprecated since 2.0
  *
  * @param string $key cache entry key
  * @param string $file file to include
@@ -28,11 +29,14 @@
  * @param int $level = 1
  *
  * @return mixed
+ * @deprecated since 2.0
+ *
  */
 function cache_quick_get($key, $file, $function, $params, $level = 1)
 {
 	\ElkArte\Errors\Errors::instance()->log_deprecated('cache_quick_get()', '\\ElkArte\\Cache\\Cache::instance()->quick_get');
-	return \ElkArte\Cache\Cache::instance()->quick_get($key, $file, $function, $params, $level);
+
+	return Cache::instance()->quick_get($key, $file, $function, $params, $level);
 }
 
 /**
@@ -45,16 +49,16 @@ function cache_quick_get($key, $file, $function, $params, $level = 1)
  *     APC: http://www.php.net/apc
  *     Zend: http://files.zend.com/help/Zend-Platform/zend_cache_functions.htm
  *
- * @deprecated since 2.0
- *
  * @param string $key
  * @param string|int|mixed[]|null $value
  * @param int $ttl = 120
+ * @deprecated since 2.0
+ *
  */
 function cache_put_data($key, $value, $ttl = 120)
 {
 	\ElkArte\Errors\Errors::instance()->log_deprecated('cache_put_data()', '\\ElkArte\\Cache\\Cache::instance()->put');
-	\ElkArte\Cache\Cache::instance()->put($key, $value, $ttl);
+	Cache::instance()->put($key, $value, $ttl);
 }
 
 /**
@@ -63,17 +67,18 @@ function cache_put_data($key, $value, $ttl = 120)
  * - It may often "miss", so shouldn't be depended on.
  * - It supports the same as \ElkArte\Cache\Cache::instance()->put().
  *
- * @deprecated since 2.0
- *
  * @param string $key
  * @param int $ttl = 120
  *
  * @return bool|null
+ * @deprecated since 2.0
+ *
  */
 function cache_get_data($key, $ttl = 120)
 {
 	\ElkArte\Errors\Errors::instance()->log_deprecated('cache_get_data()', '\\ElkArte\\Cache\\Cache::instance()->get');
-	return \ElkArte\Cache\Cache::instance()->get($key, $ttl);
+
+	return Cache::instance()->get($key, $ttl);
 }
 
 /**
@@ -86,22 +91,22 @@ function cache_get_data($key, $ttl = 120)
  *  - If no type is specified will perform a complete cache clearing
  * For cache engines that do not distinguish on types, a full cache flush will be done
  *
+ * @param string $type = ''
  * @deprecated since 2.0
  *
- * @param string $type = ''
  */
 function clean_cache($type = '')
 {
 	\ElkArte\Errors\Errors::instance()->log_deprecated('clean_cache()', '\\ElkArte\\Cache\\Cache::instance()->clean');
-	\ElkArte\Cache\Cache::instance()->clean($type);
+	Cache::instance()->clean($type);
 }
 
 /**
  * Finds all the caching engines available and loads some details depending on
  * parameters.
  *
- * - Caching engines must follow the naming convention of XyzCache.class.php and
- * have a class name of Xyz_Cache
+ * - Caching engines must follow the naming convention of CacheName.php and
+ * have a class name of CacheName that extends AbstractCacheMethod
  *
  * @param bool $supported_only If true, for each engine supported by the server
  *             an array with 'title' and 'version' is returned.
@@ -114,20 +119,24 @@ function loadCacheEngines($supported_only = true)
 {
 	$engines = array();
 
-	$classes = new \GlobIterator(SUBSDIR . '/CacheMethod/*.php', \FilesystemIterator::SKIP_DOTS);
+	$classes = new GlobIterator(SOURCEDIR . '/ElkArte/Cache/CacheMethod/*.php', FilesystemIterator::SKIP_DOTS);
 
 	foreach ($classes as $file_path)
 	{
 		// Get the engine name from the file name
 		$parts = explode('.', $file_path->getBasename());
 		$engine_name = $parts[0];
+		if (in_array($engine_name, ['AbstractCacheMethod', 'CacheMethodInterface.php']))
+		{
+		   	continue;
+		}
 		$class = '\\ElkArte\\Cache\\CacheMethod\\' . $parts[0];
 
 		// Validate the class name exists
 		if (class_exists($class))
 		{
 			$obj = new $class(array());
-			if ($obj instanceof \ElkArte\Cache\CacheMethod\AbstractCacheMethod)
+			if ($obj instanceof AbstractCacheMethod)
 			{
 				if ($supported_only && $obj->isAvailable())
 				{

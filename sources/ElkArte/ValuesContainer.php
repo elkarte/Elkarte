@@ -62,9 +62,11 @@ class ValuesContainer implements \ArrayAccess
 	public function __get($key)
 	{
 		if (isset($this->data[$key]))
+		{
 			return $this->data[$key];
-		else
-			return null;
+		}
+
+		return null;
 	}
 
 	/**
@@ -80,10 +82,8 @@ class ValuesContainer implements \ArrayAccess
 		{
 			return $this->data[$key];
 		}
-		else
-		{
-			return $default;
-		}
+
+		return $default;
 	}
 
 	/**
@@ -99,17 +99,13 @@ class ValuesContainer implements \ArrayAccess
 		{
 			return $this->data[$key];
 		}
-		else
+
+		if (isset($args[0]))
 		{
-			if (isset($args[0]))
-			{
-				return $args[0];
-			}
-			else
-			{
-				return null;
-			}
+			return $args[0];
 		}
+
+		return null;
 	}
 
 	/**

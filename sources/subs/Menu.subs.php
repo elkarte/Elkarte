@@ -8,12 +8,14 @@
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause (see accompanying LICENSE.txt file)
  *
  * This file contains code covered by:
- * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * copyright: 2011 Simple Machines (http://www.simplemachines.org)
  *
  * @version 2.0 dev
  *
  */
 
+use ElkArte\EventManager;
+use ElkArte\HttpReq;
 use ElkArte\User;
 
 /**
@@ -21,7 +23,7 @@ use ElkArte\User;
  *
  * @param mixed[] $menuData the menu array
  *  - Possible indexes:
- * 	- Menu name with named indexes as follows:
+ *    - Menu name with named indexes as follows:
  *     - string $title       => Section title
  *     - bool $enabled       => Is the section enabled / shown
  *     - array $areas        => Array of areas within this menu section, see below
@@ -66,7 +68,7 @@ function createMenu($menuData, $menuOptions = array())
 {
 	global $context, $settings, $options, $txt, $scripturl;
 
-	$_req = \ElkArte\HttpReq::instance();
+	$_req = HttpReq::instance();
 
 	// Work out where we should get our images from.
 	$context['menu_image_path'] = file_exists($settings['theme_dir'] . '/images/admin/change_menu.png') ? $settings['images_url'] . '/admin' : $settings['default_images_url'] . '/admin';
@@ -80,24 +82,34 @@ function createMenu($menuData, $menuOptions = array())
 
 	// Allow extend *any* menu with a single hook
 	if (!empty($menuOptions['hook']))
+	{
 		call_integration_hook('integrate_' . $menuOptions['hook'] . '_areas', array(&$menuData, &$menuOptions));
+	}
 
 	// What is the general action of this menu (i.e. $scripturl?action=XXXX.
 	$menu_context['current_action'] = isset($menuOptions['action']) ? $menuOptions['action'] : $context['current_action'];
 
 	// What is the current area selected?
 	if (isset($menuOptions['current_area']) || isset($_req->query->area))
+	{
 		$menu_context['current_area'] = isset($menuOptions['current_area']) ? $menuOptions['current_area'] : $_req->query->area;
+	}
 
 	// Build a list of additional parameters that should go in the URL.
 	$menu_context['extra_parameters'] = '';
 	if (!empty($menuOptions['extra_url_parameters']))
+	{
 		foreach ($menuOptions['extra_url_parameters'] as $key => $value)
+		{
 			$menu_context['extra_parameters'] .= ';' . $key . '=' . $value;
+		}
+	}
 
 	// Only include the session ID in the URL if it's strictly necessary.
 	if (empty($menuOptions['disable_url_session_check']))
+	{
 		$menu_context['extra_parameters'] .= ';' . $context['session_var'] . '=' . $context['session_id'];
+	}
 
 	$include_data = array();
 	// This is necessary only in profile (at least for the core), but we do it always because it's easier
@@ -108,7 +120,9 @@ function createMenu($menuData, $menuOptions = array())
 	{
 		// Is this enabled?
 		if ((isset($section['enabled']) && $section['enabled'] == false))
+		{
 			continue;
+		}
 		// Has permission check?
 		if (isset($section['permission']))
 		{
@@ -116,10 +130,14 @@ function createMenu($menuData, $menuOptions = array())
 			if (is_array($section['permission']) && isset($section['permission']['own'], $section['permission']['any']))
 			{
 				if (empty($section['permission'][$permission_set]) || !allowedTo($section['permission'][$permission_set]))
+				{
 					continue;
+				}
 			}
 			elseif (!allowedTo($section['permission']))
+			{
 				continue;
+			}
 		}
 
 		// Now we cycle through the sections to pick the right area.
@@ -135,10 +153,14 @@ function createMenu($menuData, $menuOptions = array())
 					if (is_array($area['permission']) && isset($area['permission']['own'], $area['permission']['any']))
 					{
 						if (empty($area['permission'][$permission_set]) || !allowedTo($area['permission'][$permission_set]))
+						{
 							continue;
+						}
 					}
 					elseif (!allowedTo($area['permission']))
+					{
 						continue;
+					}
 				}
 
 				// Add it to the context... if it has some form of name!
@@ -146,7 +168,9 @@ function createMenu($menuData, $menuOptions = array())
 				{
 					// We may want to include a file, let's find out the path
 					if (!empty($area['file']))
-							$area['file'] = (!empty($area['dir']) ? $area['dir'] : (!empty($menuOptions['default_include_dir']) ? $menuOptions['default_include_dir'] : CONTROLLERDIR)) . '/' . $area['file'];
+					{
+						$area['file'] = (!empty($area['dir']) ? $area['dir'] : (!empty($menuOptions['default_include_dir']) ? $menuOptions['default_include_dir'] : CONTROLLERDIR)) . '/' . $area['file'];
+					}
 
 					// If we haven't got an area then the first valid one is our choice.
 					if (!isset($menu_context['current_area']))
@@ -162,27 +186,37 @@ function createMenu($menuData, $menuOptions = array())
 						if (!isset($menu_context['sections'][$section_id]))
 						{
 							if (isset($menuOptions['counters'], $section['counter']) && !empty($menuOptions['counters'][$section['counter']]))
+							{
 								$section['title'] .= sprintf($settings['menu_numeric_notice'][0], $menuOptions['counters'][$section['counter']]);
+							}
 
 							$menu_context['sections'][$section_id]['title'] = $section['title'];
 						}
 
 						$menu_context['sections'][$section_id]['areas'][$area_id] = array('label' => isset($area['label']) ? $area['label'] : $txt[$area_id]);
 						if (isset($menuOptions['counters'], $area['counter']) && !empty($menuOptions['counters'][$area['counter']]))
+						{
 							$menu_context['sections'][$section_id]['areas'][$area_id]['label'] .= sprintf($settings['menu_numeric_notice'][1], $menuOptions['counters'][$area['counter']]);
+						}
 
 						// We'll need the ID as well...
 						$menu_context['sections'][$section_id]['id'] = $section_id;
 
 						// Does it have a custom URL?
 						if (isset($area['custom_url']))
+						{
 							$menu_context['sections'][$section_id]['areas'][$area_id]['url'] = $area['custom_url'];
+						}
 
 						// Does this area have its own icon?
 						if (isset($area['icon']))
+						{
 							$menu_context['sections'][$section_id]['areas'][$area_id]['icon'] = '<img ' . (isset($area['class']) ? 'class="' . $area['class'] . '" ' : 'style="background: none"') . ' src="' . $context['menu_image_path'] . '/' . $area['icon'] . '" alt="" />&nbsp;&nbsp;';
+						}
 						else
+						{
 							$menu_context['sections'][$section_id]['areas'][$area_id]['icon'] = '';
+						}
 
 						// Did it have subsections?
 						if (!empty($area['subsections']))
@@ -194,33 +228,47 @@ function createMenu($menuData, $menuOptions = array())
 								if ((empty($sub[1]) || allowedTo($sub[1])) && (!isset($sub['enabled']) || !empty($sub['enabled'])))
 								{
 									if ($first_sa === null)
+									{
 										$first_sa = $sa;
+									}
 
 									$menu_context['sections'][$section_id]['areas'][$area_id]['subsections'][$sa] = array('label' => $sub[0]);
 									if (isset($menuOptions['counters'], $sub['counter']) && !empty($menuOptions['counters'][$sub['counter']]))
+									{
 										$menu_context['sections'][$section_id]['areas'][$area_id]['subsections'][$sa]['label'] .= sprintf($settings['menu_numeric_notice'][2], $menuOptions['counters'][$sub['counter']]);
+									}
 
 									// Custom URL?
 									if (isset($sub['url']))
+									{
 										$menu_context['sections'][$section_id]['areas'][$area_id]['subsections'][$sa]['url'] = $sub['url'];
+									}
 
 									// A bit complicated - but is this set?
 									if ($menu_context['current_area'] == $area_id)
 									{
 										// Save which is the first...
 										if (empty($first_sa))
+										{
 											$first_sa = $sa;
+										}
 
 										// Is this the current subsection?
-										if (isset($_req->query->sa) && $_req->query->sa == $sa)
+										if (isset($_req->query->sa) && $_req->query->sa === $sa)
+										{
 											$menu_context['current_subsection'] = $sa;
+										}
 
 										elseif (isset($sub['active']) && isset($_req->query->sa) && in_array($_req->query->sa, $sub['active']))
+										{
 											$menu_context['current_subsection'] = $sa;
+										}
 
 										// Otherwise is it the default?
 										elseif (!isset($menu_context['current_subsection']) && !empty($sub[2]))
+										{
 											$menu_context['current_subsection'] = $sa;
+										}
 									}
 
 									// Let's assume this is the last, for now.
@@ -228,7 +276,9 @@ function createMenu($menuData, $menuOptions = array())
 								}
 								// Mark it as disabled...
 								else
+								{
 									$menu_context['sections'][$section_id]['areas'][$area_id]['subsections'][$sa]['disabled'] = true;
+								}
 							}
 
 							// Set which one is first, last and selected in the group.
@@ -238,7 +288,9 @@ function createMenu($menuData, $menuOptions = array())
 								$menu_context['sections'][$section_id]['areas'][$area_id]['subsections'][$context['right_to_left'] ? $first_sa : $last_sa]['is_last'] = true;
 
 								if ($menu_context['current_area'] == $area_id && !isset($menu_context['current_subsection']))
+								{
 									$menu_context['current_subsection'] = $first_sa;
+								}
 							}
 						}
 					}
@@ -284,9 +336,12 @@ function createMenu($menuData, $menuOptions = array())
 		$menu_context['sections'][$menu_context['current_section']]['selected'] = true;
 		$menu_context['sections'][$menu_context['current_section']]['areas'][$menu_context['current_area']]['selected'] = true;
 		if (!empty($menu_context['sections'][$menu_context['current_section']]['areas'][$menu_context['current_area']]['subsections'][$context['current_subaction']]))
+		{
 			$menu_context['sections'][$menu_context['current_section']]['areas'][$menu_context['current_area']]['subsections'][$context['current_subaction']]['selected'] = true;
+		}
 
 		foreach ($menu_context['sections'] as $section_id => $section)
+		{
 			foreach ($section['areas'] as $area_id => $area)
 			{
 				if (!isset($menu_context['sections'][$section_id]['url']))
@@ -295,11 +350,14 @@ function createMenu($menuData, $menuOptions = array())
 					break;
 				}
 			}
+		}
 	}
 
 	// If we didn't find the area we were looking for go to a default one.
 	if (isset($backup_area) && empty($found_section))
+	{
 		$menu_context['current_area'] = $backup_area;
+	}
 
 	// If still no data then return - nothing to show!
 	if (empty($menu_context['sections']))
@@ -307,7 +365,9 @@ function createMenu($menuData, $menuOptions = array())
 		// Never happened!
 		$context['max_menu_id']--;
 		if ($context['max_menu_id'] == 0)
+		{
 			unset($context['max_menu_id']);
+		}
 
 		return false;
 	}
@@ -319,7 +379,9 @@ function createMenu($menuData, $menuOptions = array())
 		$menu_context['can_toggle_drop_down'] = User::$info->is_guest === false && isset($settings['theme_version']) && $settings['theme_version'] >= 2.0;
 	}
 	else
+	{
 		$menu_context['can_toggle_drop_down'] = !empty($menuOptions['can_toggle_drop_down']);
+	}
 
 	// Almost there - load the template and add to the template layers.
 	theme()->getTemplates()->load(isset($menuOptions['template_name']) ? $menuOptions['template_name'] : 'GenericMenu');
@@ -328,7 +390,9 @@ function createMenu($menuData, $menuOptions = array())
 
 	// Check we had something - for sanity sake.
 	if (empty($include_data))
+	{
 		return false;
+	}
 
 	// Finally - return information on the selected item.
 	$include_data += array(
@@ -351,9 +415,11 @@ function destroyMenu($menu_id = 'last')
 {
 	global $context;
 
-	$menu_name = $menu_id == 'last' && isset($context['max_menu_id']) && isset($context['menu_data_' . $context['max_menu_id']]) ? 'menu_data_' . $context['max_menu_id'] : 'menu_data_' . $menu_id;
+	$menu_name = $menu_id === 'last' && isset($context['max_menu_id']) && isset($context['menu_data_' . $context['max_menu_id']]) ? 'menu_data_' . $context['max_menu_id'] : 'menu_data_' . $menu_id;
 	if (!isset($context[$menu_name]))
+	{
 		return false;
+	}
 
 	theme()->getLayers()->remove($context[$menu_name]['layer_name']);
 
@@ -378,7 +444,7 @@ function callMenu($selectedMenu)
 	{
 		// 'controller' => '\\ElkArte\\AdminController\\ManageAttachments'
 		// 'function' => 'action_avatars'
-		$controller = new $selectedMenu['controller'](new \ElkArte\EventManager());
+		$controller = new $selectedMenu['controller'](new EventManager());
 		$controller->setUser(User::$info);
 
 		// always set up the environment

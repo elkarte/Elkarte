@@ -1,8 +1,7 @@
 <?php
 
 /**
- * This file contains those functions specific to the various verification controls
- * used to challenge users, and hopefully robots as well.
+ * This file contains those functions specific to the cached search results in session
  *
  * @package   ElkArte Forum
  * @copyright ElkArte Forum contributors
@@ -16,6 +15,11 @@ namespace ElkArte\Search\Cache;
 
 use ElkArte\Sessions\SessionIndex;
 
+/**
+ * Class Session
+ *
+ * @package ElkArte\Search\Cache
+ */
 class Session
 {
 	protected $_id_search = 0;
@@ -40,11 +44,6 @@ class Session
 		));
 	}
 
-	public function getId()
-	{
-		return $this->_id_search;
-	}
-
 	public function increaseId($pointer = 0)
 	{
 		$this->_id_search = (int) $pointer;
@@ -58,14 +57,14 @@ class Session
 		return $this->getId();
 	}
 
-	public function existsWithParams($params)
+	public function getId()
 	{
-		return $this->_params == $params;
+		return $this->_id_search;
 	}
 
-	public function setNumResults($num_results = 0)
+	public function existsWithParams($params)
 	{
-		$this->_num_results = (int) $num_results;
+		return $this->_params === $params;
 	}
 
 	/**
@@ -76,5 +75,10 @@ class Session
 	public function getNumResults()
 	{
 		return $this->_num_results;
+	}
+
+	public function setNumResults($num_results = 0)
+	{
+		$this->_num_results = (int) $num_results;
 	}
 }

@@ -15,6 +15,11 @@
 
 namespace ElkArte;
 
+/**
+ * Class UserNotification
+ *
+ * @package ElkArte
+ */
 class UserNotification extends AbstractModel
 {
 	/**
@@ -40,14 +45,14 @@ class UserNotification extends AbstractModel
 	);
 
 	/**
-	 * Construct, just load the language file.
+	 * Construct, Load the language file and make db/user info available to the class
 	 *
 	 * @param \ElkArte\Database\QueryInterface $db
 	 * @param \ElkArte\UserInfo|null $user
 	 */
 	public function __construct($db, $user)
 	{
-		parent::__construct();
+		parent::__construct($db, $user);
 		theme()->getTemplates()->loadLanguageFile('UserNotifications');
 	}
 
@@ -105,6 +110,20 @@ class UserNotification extends AbstractModel
 	}
 
 	/**
+	 * Validates if a setting exists.
+	 *
+	 * @param string $key modSettings key
+	 *
+	 * @return bool
+	 * @todo Really needed?
+	 *
+	 */
+	protected function settingExists($key)
+	{
+		return isset($this->_modSettings[$key]) && $this->_modSettings[$key] !== '';
+	}
+
+	/**
 	 * Prepares the javascript for desktop notifications.
 	 */
 	protected function _addDesktopNotifications()
@@ -119,20 +138,6 @@ class UserNotification extends AbstractModel
 	}
 
 	/**
-	 * Validates if a setting exists.
-	 *
-	 * @todo Really needed?
-	 *
-	 * @param string $key modSettings key
-	 *
-	 * @return bool
-	 */
-	protected function settingExists($key)
-	{
-		return isset($this->_modSettings[$key]) && $this->_modSettings[$key] !== '';
-	}
-
-	/**
 	 * Returns the configurations for the feature.
 	 *
 	 * @return mixed[]
@@ -143,10 +148,14 @@ class UserNotification extends AbstractModel
 
 		$types = array();
 		foreach ($this->_valid_types as $val)
+		{
 			$types[$val] = $txt['usernotif_favicon_shape_' . $val];
+		}
 		$positions = array();
 		foreach ($this->_valid_positions as $val)
+		{
 			$positions[$val] = $txt['usernotif_favicon_' . $val];
+		}
 
 		$config_vars = array(
 			array('title', 'usernotif_title'),
@@ -193,9 +202,13 @@ class UserNotification extends AbstractModel
 		{
 			$validation_errors = $validator->validation_errors($key);
 			if (empty($validation_errors))
+			{
 				$post[$key] = $validator->{$key};
+			}
 			else
+			{
 				$post[$key] = !empty($post[$key]) && isset($this->_modSettings[$key]) ? $this->_modSettings[$key] : '';
+			}
 		}
 
 		return $post;

@@ -8,7 +8,7 @@
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause (see accompanying LICENSE.txt file)
  *
  * This file contains code covered by:
- * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * copyright: 2011 Simple Machines (http://www.simplemachines.org)
  *
  * @version 2.0 dev
  *
@@ -16,111 +16,121 @@
 
 namespace ElkArte\AdminController;
 
+use BBC\ParserWrapper;
+use ElkArte\AbstractController;
+use ElkArte\Action;
+use ElkArte\HttpReq;
+use ElkArte\Util;
+
 /**
  * Coordinates the processing for all known package actions
  *
  * @package Packages
  */
-class PackageActions extends \ElkArte\AbstractController
+class PackageActions extends AbstractController
 {
 	/**
-	 * Passed actions from parsePackageInfo
-	 * @var array
-	 */
-	protected $_passed_actions;
-
-	/**
-	 * Passed base path value for the package location within the temp directory
-	 * @var string
-	 */
-	protected $_base_path;
-
-	/**
-	 * Passed value to indicate if this is an install or uninstall pass
-	 * @var boolean
-	 */
-	protected $_uninstalling;
-
-	/**
-	 * Passed array of theme paths
-	 * @var array
-	 */
-	protected $_theme_paths;
-
-	/**
 	 * Passed and updated array of themes to install in
+	 *
 	 * @var array
 	 */
 	public $themes_installed = array();
-
 	/**
 	 * Current action step of the passed actions
+	 *
 	 * @var array
 	 */
 	public $thisAction = array();
-
 	/**
 	 * Holds the files that will need to be chmod'ed for the package to install
+	 *
 	 * @var array
 	 */
 	public $chmod_files = array();
-
 	/**
 	 * The actions that must be completed to install a package
+	 *
 	 * @var array
 	 */
 	public $ourActions = array();
-
 	/**
 	 * If any of the steps will fail to complete
+	 *
 	 * @var boolean
 	 */
 	public $has_failure = false;
-
 	/**
 	 * Details of what the failure entails
+	 *
 	 * @var string
 	 */
 	public $failure_details;
-
 	/**
 	 * Available during the install phase, holds what when wrong and where
+	 *
 	 * @var array
 	 */
 	public $failed_steps = array();
-
 	/**
 	 * Other themes found that this addon can be installed in
+	 *
 	 * @var array
 	 */
 	public $themeFinds;
-
 	/**
 	 * Created during install for use in addPackageLog
+	 *
 	 * @var array
 	 */
 	public $credits_tag = array();
-
+	/**
+	 * Passed actions from parsePackageInfo
+	 *
+	 * @var array
+	 */
+	protected $_passed_actions;
+	/**
+	 * Passed base path value for the package location within the temp directory
+	 *
+	 * @var string
+	 */
+	protected $_base_path;
+	/**
+	 * Passed value to indicate if this is an install or uninstall pass
+	 *
+	 * @var boolean
+	 */
+	protected $_uninstalling;
+	/**
+	 * Passed array of theme paths
+	 *
+	 * @var array
+	 */
+	protected $_theme_paths;
 	/**
 	 * Failed counter
+	 *
 	 * @var int
 	 */
 	private $_failed_count = 0;
 
 	/**
 	 * Current action step of the passed actions
+	 *
 	 * @var array
 	 */
 	private $_action;
 
 	/**
 	 * Current check for a modification add/replace failure for the file being changed
+	 *
 	 * @var boolean
 	 */
 	private $_failure;
 
 	/**
 	 * Holds the last section of the file name
+	 *
 	 * @var string
 	 */
 	private $_actual_filename;
@@ -163,28 +173,6 @@ class PackageActions extends \ElkArte\AbstractController
 	}
 
 	/**
-	 * Called from the packages.controller as part of the "install" phase
-	 *
-	 * @param array $actions set of actions as defined by parsePackageInfo
-	 * @param boolean $uninstalling Yea or Nay
-	 * @param string $base_path base path for the package within the temp directory
-	 * @param array $theme_paths
-	 * @param array $themes_installed
-	 */
-	public function install_init($actions, $uninstalling, $base_path, $theme_paths, $themes_installed)
-	{
-		// Pass the vars
-		$this->_passed_actions = $actions;
-		$this->_uninstalling = $uninstalling;
-		$this->_base_path = $base_path;
-		$this->_theme_paths = $theme_paths;
-		$this->themes_installed = $themes_installed;
-
-		// Give installation a chance
-		$this->action_install();
-	}
-
-	/**
 	 * "controller" for the test install actions
 	 */
 	public function action_test()
@@ -220,7 +208,7 @@ class PackageActions extends \ElkArte\AbstractController
 		);
 
 		// Set up action/subaction stuff.
-		$action = new \ElkArte\Action('package_actions_test');
+		$action = new Action('package_actions_test');
 
 		foreach ($this->_passed_actions as $this->_action)
 		{
@@ -244,6 +232,117 @@ class PackageActions extends \ElkArte\AbstractController
 	}
 
 	/**
+	 * Test install loop collector
+	 */
+	private function _action_our_actions()
+	{
+		global $txt;
+
+		// Now prepare things for the template.
+		if (empty($this->thisAction))
+		{
+			return;
+		}
+
+		if (isset($this->_action['filename']))
+		{
+			if ($this->_uninstalling)
+			{
+				$file = in_array($this->_action['type'], array('remove-dir', 'remove-file')) ? $this->_action['filename'] : BOARDDIR . '/packages/temp/' . $this->_base_path . $this->_action['filename'];
+			}
+			else
+			{
+				$file = BOARDDIR . '/packages/temp/' . $this->_base_path . $this->_action['filename'];
+			}
+
+			if (!file_exists($file) && ($this->thisAction['type'] !== 'Create Tree' && $this->thisAction['type'] !== 'Create File'))
+			{
+				$this->has_failure = true;
+
+				$this->thisAction += array(
+					'description' => $txt['package_action_error'],
+					'failed' => true,
+				);
+			}
+		}
+
+		// @todo None given?
+		if (empty($this->thisAction['description']))
+		{
+			$this->thisAction['description'] = isset($this->_action['description']) ? $this->_action['description'] : '';
+		}
+
+		$this->ourActions[] = $this->thisAction;
+	}
+
+	/**
+	 * Called from the packages.controller as part of the "install" phase
+	 *
+	 * @param array $actions set of actions as defined by parsePackageInfo
+	 * @param boolean $uninstalling Yea or Nay
+	 * @param string $base_path base path for the package within the temp directory
+	 * @param array $theme_paths
+	 * @param array $themes_installed
+	 */
+	public function install_init($actions, $uninstalling, $base_path, $theme_paths, $themes_installed)
+	{
+		// Pass the vars
+		$this->_passed_actions = $actions;
+		$this->_uninstalling = $uninstalling;
+		$this->_base_path = $base_path;
+		$this->_theme_paths = $theme_paths;
+		$this->themes_installed = $themes_installed;
+
+		// Give installation a chance
+		$this->action_install();
+	}
+
+	/**
+	 * Called when we are actually installing an addon
+	 */
+	public function action_install()
+	{
+		// Admins-only!
+		isAllowedTo('admin_forum');
+
+		// Generic subs for this controller
+		require_once(SUBSDIR . '/Package.subs.php');
+
+		// Here is what we need to do!
+		$subActions = array(
+			'redirect' => array($this, 'action_redirect2'),
+			'modification' => array($this, 'action_modification2'),
+			'code' => array($this, 'action_code2'),
+			'database' => array($this, 'action_database2'),
+			'hook' => array($this, 'action_hook2'),
+			'credits' => array($this, 'action_credits2'),
+			'skip' => array($this, 'action_skip'),
+		);
+
+		// No failures yet
+		$this->_failed_count = 0;
+		$this->failed_steps = array();
+
+		// Set up action/subaction stuff.
+		$action = new Action('package_actions_install');
+
+		foreach ($this->_passed_actions as $this->_action)
+		{
+			$this->_failed_count++;
+
+			// Work out exactly who it is we are calling. call integrate_sa_packages
+			if (!array_key_exists($this->_action['type'], $subActions))
+			{
+				continue;
+			}
+			$subAction = $action->initialize($subActions, $this->_action['type'], '');
+
+			// Lets just do it!
+			$action->dispatch($subAction);
+		}
+	}
+
+	/**
 	 * Chmod action requested, add it to the list
 	 */
 	public function action_chmod()
@@ -261,16 +360,22 @@ class PackageActions extends \ElkArte\AbstractController
 		$type = 'package_' . $this->_action['type'];
 
 		if (file_exists(BOARDDIR . '/packages/temp/' . $this->_base_path . $this->_action['filename']))
+		{
 			$context[$type] = htmlspecialchars(trim(file_get_contents(BOARDDIR . '/packages/temp/' . $this->_base_path . $this->_action['filename']), "\n\r"), ENT_COMPAT, 'UTF-8');
+		}
 		elseif (file_exists($this->_action['filename']))
+		{
 			$context[$type] = htmlspecialchars(trim(file_get_contents($this->_action['filename']), "\n\r"), ENT_COMPAT, 'UTF-8');
+		}
 		elseif (file_exists(BOARDDIR . '/packages/temp/' . $this->_action['filename']))
+		{
 			$context[$type] = htmlspecialchars(trim(file_get_contents(BOARDDIR . '/packages/temp/' . $this->_action['filename']), "\n\r"), ENT_COMPAT, 'UTF-8');
+		}
 
 		// Fancy or plain
 		if (!empty($this->_action['parse_bbc']))
 		{
-			$bbc_parser = \BBC\ParserWrapper::instance();
+			$bbc_parser = ParserWrapper::instance();
 
 			require_once(SUBSDIR . '/Post.subs.php');
 			preparsecode($context[$type]);
@@ -278,7 +383,9 @@ class PackageActions extends \ElkArte\AbstractController
 			$context[$type] = $bbc_parser->parsePackage($context[$type]);
 		}
 		else
+		{
 			$context[$type] = nl2br($context[$type]);
+		}
 	}
 
 	/**
@@ -307,9 +414,13 @@ class PackageActions extends \ElkArte\AbstractController
 		$this->has_failure = true;
 
 		if (isset($this->_action['error_msg']) && isset($this->_action['error_var']))
+		{
 			$this->failure_details = sprintf($txt['package_will_fail_' . $this->_action['error_msg']], $this->_action['error_var']);
+		}
 		elseif (isset($this->_action['error_msg']))
+		{
 			$this->failure_details = isset($txt['package_will_fail_' . $this->_action['error_msg']]) ? $txt['package_will_fail_' . $this->_action['error_msg']] : $this->_action['error_msg'];
+		}
 	}
 
 	/**
@@ -328,7 +439,7 @@ class PackageActions extends \ElkArte\AbstractController
 			$this->has_failure = true;
 			$this->ourActions[] = array(
 				'type' => $txt['execute_modification'],
-				'action' => \ElkArte\Util::htmlspecialchars(strtr($this->_action['filename'], array(BOARDDIR => '.'))),
+				'action' => Util::htmlspecialchars(strtr($this->_action['filename'], array(BOARDDIR => '.'))),
 				'description' => $txt['package_action_error'],
 				'failed' => true,
 			);
@@ -338,7 +449,9 @@ class PackageActions extends \ElkArte\AbstractController
 			$mod_actions = parseModification(@file_get_contents(BOARDDIR . '/packages/temp/' . $this->_base_path . $this->_action['filename']), true, $this->_action['reverse'], $this->_theme_paths);
 
 			if (count($mod_actions) === 1 && isset($mod_actions[0]) && $mod_actions[0]['type'] === 'error' && $mod_actions[0]['filename'] === '-')
+			{
 				$mod_actions[0]['filename'] = $this->_action['filename'];
+			}
 
 			foreach ($mod_actions as $key => $mod_action)
 			{
@@ -356,7 +469,7 @@ class PackageActions extends \ElkArte\AbstractController
 				{
 					$summary = array(
 						'type' => $txt['execute_modification'],
-						'action' => \ElkArte\Util::htmlspecialchars(strtr($mod_action['filename'], array(BOARDDIR => '.'))),
+						'action' => Util::htmlspecialchars(strtr($mod_action['filename'], array(BOARDDIR => '.'))),
 						'description' => $mod_action['failed'] ? $txt['package_action_failure'] : $txt['package_action_success'],
 						'position' => $mod_action['position'],
 						'operation_key' => $operation_key,
@@ -366,11 +479,15 @@ class PackageActions extends \ElkArte\AbstractController
 					);
 
 					if (empty($mod_action['is_custom']))
+					{
 						$this->ourActions[$this->_actual_filename]['operations'][] = $summary;
+					}
 
 					// Themes are under the saved type.
 					if (isset($mod_action['is_custom']) && isset($context['theme_actions'][$mod_action['is_custom']]))
+					{
 						$context['theme_actions'][$mod_action['is_custom']]['actions'][$this->_actual_filename]['operations'][] = $summary;
+					}
 				}
 			}
 		}
@@ -386,11 +503,17 @@ class PackageActions extends \ElkArte\AbstractController
 	{
 		// Lets get the last section of the file name.
 		if (isset($mod_action['filename']) && substr($mod_action['filename'], -13) !== '.template.php')
+		{
 			$this->_actual_filename = strtolower(substr(strrchr($mod_action['filename'], '/'), 1) . '||' . $this->_action['filename']);
+		}
 		elseif (isset($mod_action['filename']) && preg_match('~([\w]*)/([\w]*)\.template\.php$~', $mod_action['filename'], $matches))
+		{
 			$this->_actual_filename = strtolower($matches[1] . '/' . $matches[2] . '.template.php||' . $this->_action['filename']);
+		}
 		else
+		{
 			$this->_actual_filename = $key;
+		}
 	}
 
 	/**
@@ -409,7 +532,9 @@ class PackageActions extends \ElkArte\AbstractController
 				break;
 			case 'failure':
 				if (empty($mod_action['is_custom']))
+				{
 					$this->has_failure = true;
+				}
 
 				$this->_failure = true;
 				break;
@@ -420,17 +545,21 @@ class PackageActions extends \ElkArte\AbstractController
 				if (!empty($mod_action['is_custom']))
 				{
 					if (!isset($context['theme_actions'][$mod_action['is_custom']]))
+					{
 						$context['theme_actions'][$mod_action['is_custom']] = array(
 							'name' => $this->_theme_paths[$mod_action['is_custom']]['name'],
 							'actions' => array(),
 							'has_failure' => $this->_failure,
 						);
+					}
 					else
+					{
 						$context['theme_actions'][$mod_action['is_custom']]['has_failure'] |= $this->_failure;
+					}
 
 					$context['theme_actions'][$mod_action['is_custom']]['actions'][$this->_actual_filename] = array(
 						'type' => $txt['execute_modification'],
-						'action' => \ElkArte\Util::htmlspecialchars(strtr($mod_action['filename'], array(BOARDDIR => '.'))),
+						'action' => Util::htmlspecialchars(strtr($mod_action['filename'], array(BOARDDIR => '.'))),
 						'description' => $this->_failure ? $txt['package_action_failure'] : $txt['package_action_success'],
 						'failed' => $this->_failure,
 					);
@@ -439,7 +568,7 @@ class PackageActions extends \ElkArte\AbstractController
 				{
 					$this->ourActions[$this->_actual_filename] = array(
 						'type' => $txt['execute_modification'],
-						'action' => \ElkArte\Util::htmlspecialchars(strtr($mod_action['filename'], array(BOARDDIR => '.'))),
+						'action' => Util::htmlspecialchars(strtr($mod_action['filename'], array(BOARDDIR => '.'))),
 						'description' => $this->_failure ? $txt['package_action_failure'] : $txt['package_action_success'],
 						'failed' => $this->_failure,
 					);
@@ -453,7 +582,7 @@ class PackageActions extends \ElkArte\AbstractController
 			case 'skipping':
 				$this->ourActions[$this->_actual_filename] = array(
 					'type' => $txt['execute_modification'],
-					'action' => \ElkArte\Util::htmlspecialchars(strtr($mod_action['filename'], array(BOARDDIR => '.'))),
+					'action' => Util::htmlspecialchars(strtr($mod_action['filename'], array(BOARDDIR => '.'))),
 					'description' => $txt['package_action_skipping']
 				);
 				break;
@@ -463,7 +592,7 @@ class PackageActions extends \ElkArte\AbstractController
 					$this->has_failure = true;
 					$this->ourActions[$this->_actual_filename] = array(
 						'type' => $txt['execute_modification'],
-						'action' => \ElkArte\Util::htmlspecialchars(strtr($mod_action['filename'], array(BOARDDIR => '.'))),
+						'action' => Util::htmlspecialchars(strtr($mod_action['filename'], array(BOARDDIR => '.'))),
 						'description' => $txt['package_action_missing'],
 						'failed' => true,
 					);
@@ -472,7 +601,7 @@ class PackageActions extends \ElkArte\AbstractController
 			case 'error':
 				$this->ourActions[$this->_actual_filename] = array(
 					'type' => $txt['execute_modification'],
-					'action' => \ElkArte\Util::htmlspecialchars(strtr($mod_action['filename'], array(BOARDDIR => '.'))),
+					'action' => Util::htmlspecialchars(strtr($mod_action['filename'], array(BOARDDIR => '.'))),
 					'description' => $txt['package_action_error'],
 					'failed' => true,
 				);
@@ -492,7 +621,7 @@ class PackageActions extends \ElkArte\AbstractController
 
 		$this->thisAction = array(
 			'type' => $txt['execute_code'],
-			'action' => \ElkArte\Util::htmlspecialchars($this->_action['filename']),
+			'action' => Util::htmlspecialchars($this->_action['filename']),
 		);
 	}
 
@@ -508,7 +637,7 @@ class PackageActions extends \ElkArte\AbstractController
 
 		$this->thisAction = array(
 			'type' => $txt['execute_database_changes'],
-			'action' => \ElkArte\Util::htmlspecialchars($this->_action['filename']),
+			'action' => Util::htmlspecialchars($this->_action['filename']),
 		);
 	}
 
@@ -522,7 +651,7 @@ class PackageActions extends \ElkArte\AbstractController
 
 		$this->thisAction = array(
 			'type' => $txt['package_create'] . ' ' . ($this->_action['type'] === 'create-dir' ? $txt['package_tree'] : $txt['package_file']),
-			'action' => \ElkArte\Util::htmlspecialchars(strtr($this->_action['destination'], array(BOARDDIR => '.')))
+			'action' => Util::htmlspecialchars(strtr($this->_action['destination'], array(BOARDDIR => '.')))
 		);
 	}
 
@@ -536,11 +665,13 @@ class PackageActions extends \ElkArte\AbstractController
 		$this->_action['description'] = !isset($this->_action['hook'], $this->_action['function']) ? $txt['package_action_failure'] : $txt['package_action_success'];
 
 		if (!isset($this->_action['hook'], $this->_action['function']))
+		{
 			$this->has_failure = true;
+		}
 
 		$this->thisAction = array(
 			'type' => $this->_action['reverse'] ? $txt['execute_hook_remove'] : $txt['execute_hook_add'],
-			'action' => sprintf($txt['execute_hook_action'], \ElkArte\Util::htmlspecialchars($this->_action['hook'])),
+			'action' => sprintf($txt['execute_hook_action'], Util::htmlspecialchars($this->_action['hook'])),
 		);
 	}
 
@@ -553,7 +684,7 @@ class PackageActions extends \ElkArte\AbstractController
 
 		$this->thisAction = array(
 			'type' => $txt['execute_credits_add'],
-			'action' => sprintf($txt['execute_credits_action'], \ElkArte\Util::htmlspecialchars($this->_action['title'])),
+			'action' => sprintf($txt['execute_credits_action'], Util::htmlspecialchars($this->_action['title'])),
 		);
 	}
 
@@ -569,7 +700,9 @@ class PackageActions extends \ElkArte\AbstractController
 
 		// Package missing required values?
 		if (!isset($this->_action['id']))
+		{
 			$this->has_failure = true;
+		}
 		else
 		{
 			// See if this dependency is installed
@@ -600,46 +733,14 @@ class PackageActions extends \ElkArte\AbstractController
 		// Do this one...
 		$this->thisAction = array(
 			'type' => $txt['package_extract'] . ' ' . ($this->_action['type'] === 'require-dir' ? $txt['package_tree'] : $txt['package_file']),
-			'action' => \ElkArte\Util::htmlspecialchars(strtr($this->_action['destination'], array(BOARDDIR => '.')))
+			'action' => Util::htmlspecialchars(strtr($this->_action['destination'], array(BOARDDIR => '.')))
 		);
 
 		// Could this be theme related?
 		if (!empty($this->_action['unparsed_destination']))
+		{
 			$this->_check_theme_actions($this->_action['unparsed_destination']);
-	}
-
-	/**
-	 * Move an entire directory or a single file.
-	 * <move-dir />
-	 * <move-file />
-	 */
-	public function action_move_dir_file()
-	{
-		global $txt;
-
-		$this->thisAction = array(
-			'type' => $txt['package_move'] . ' ' . ($this->_action['type'] === 'move-dir' ? $txt['package_tree'] : $txt['package_file']),
-			'action' => \ElkArte\Util::htmlspecialchars(strtr($this->_action['source'], array(BOARDDIR => '.'))) . ' => ' . \ElkArte\Util::htmlspecialchars(strtr($this->_action['destination'], array(BOARDDIR => '.')))
-		);
-	}
-
-	/**
-	 * Remove a directory and all its file or remove a single file
-	 * <remove-dir />
-	 * <remove-file />
-	 */
-	public function action_remove_dir_file()
-	{
-		global $txt;
-
-		$this->thisAction = array(
-			'type' => $txt['package_delete'] . ' ' . ($this->_action['type'] === 'remove-dir' ? $txt['package_tree'] : $txt['package_file']),
-			'action' => \ElkArte\Util::htmlspecialchars(strtr($this->_action['filename'], array(BOARDDIR => '.')))
-		);
-
-		// Could this be theme related?
-		if (!empty($this->_action['unparsed_filename']))
-			$this->_check_theme_actions($this->_action['unparsed_filename'], true);
+		}
 	}
 
 	/**
@@ -657,102 +758,67 @@ class PackageActions extends \ElkArte\AbstractController
 
 			// Need to set it?
 			if ($set_destination)
+			{
 				$this->_action['unparsed_destination'] = $this->_action['unparsed_filename'];
+			}
 
 			// If it's not auto do we think we have something we can act upon?
 			if ($theme_action !== 'auto' && !in_array($matches[1], array('languagedir', 'languages_dir', 'imagesdir', 'themedir')))
+			{
 				$theme_action = '';
+			}
 			// ... or if it's auto do we even want to do anything?
 			elseif ($theme_action === 'auto' && $matches[1] !== 'imagesdir')
+			{
 				$theme_action = '';
+			}
 
 			// So, we still want to do something?
 			if ($theme_action != '')
+			{
 				$this->themeFinds['candidates'][] = $this->_action;
+			}
 			// Otherwise is this is going into another theme record it.
 			elseif ($matches[1] === 'themes_dir')
+			{
 				$this->themeFinds['other_themes'][] = strtolower(strtr(parse_path($destination), array('\\' => '/')) . '/' . basename($this->_action['filename']));
+			}
 		}
 	}
 
 	/**
-	 * Test install loop collector
+	 * Move an entire directory or a single file.
+	 * <move-dir />
+	 * <move-file />
 	 */
-	private function _action_our_actions()
+	public function action_move_dir_file()
 	{
 		global $txt;
 
-		// Now prepare things for the template.
-		if (empty($this->thisAction))
-			return;
-
-		if (isset($this->_action['filename']))
-		{
-			if ($this->_uninstalling)
-				$file = in_array($this->_action['type'], array('remove-dir', 'remove-file')) ? $this->_action['filename'] : BOARDDIR . '/packages/temp/' . $this->_base_path . $this->_action['filename'];
-			else
-				$file = BOARDDIR . '/packages/temp/' . $this->_base_path . $this->_action['filename'];
-
-			if (!file_exists($file) && ($this->thisAction['type'] !== 'Create Tree' && $this->thisAction['type'] !== 'Create File'))
-			{
-				$this->has_failure = true;
-
-				$this->thisAction += array(
-					'description' => $txt['package_action_error'],
-					'failed' => true,
-				);
-			}
-		}
-
-		// @todo None given?
-		if (empty($this->thisAction['description']))
-			$this->thisAction['description'] = isset($this->_action['description']) ? $this->_action['description'] : '';
-
-		$this->ourActions[] = $this->thisAction;
+		$this->thisAction = array(
+			'type' => $txt['package_move'] . ' ' . ($this->_action['type'] === 'move-dir' ? $txt['package_tree'] : $txt['package_file']),
+			'action' => Util::htmlspecialchars(strtr($this->_action['source'], array(BOARDDIR => '.'))) . ' => ' . Util::htmlspecialchars(strtr($this->_action['destination'], array(BOARDDIR => '.')))
+		);
 	}
 
 	/**
-	 * Called when we are actually installing an addon
+	 * Remove a directory and all its file or remove a single file
+	 * <remove-dir />
+	 * <remove-file />
 	 */
-	public function action_install()
+	public function action_remove_dir_file()
 	{
-		// Admins-only!
-		isAllowedTo('admin_forum');
+		global $txt;
 
-		// Generic subs for this controller
-		require_once(SUBSDIR . '/Package.subs.php');
-
-		// Here is what we need to do!
-		$subActions = array(
-			'redirect' => array($this, 'action_redirect2'),
-			'modification' => array($this, 'action_modification2'),
-			'code' => array($this, 'action_code2'),
-			'database' => array($this, 'action_database2'),
-			'hook' => array($this, 'action_hook2'),
-			'credits' => array($this, 'action_credits2'),
-			'skip' => array($this, 'action_skip'),
+		$this->thisAction = array(
+			'type' => $txt['package_delete'] . ' ' . ($this->_action['type'] === 'remove-dir' ? $txt['package_tree'] : $txt['package_file']),
+			'action' => Util::htmlspecialchars(strtr($this->_action['filename'], array(BOARDDIR => '.')))
 		);
 
-		// No failures yet
-		$this->_failed_count = 0;
-		$this->failed_steps = array();
-
-		// Set up action/subaction stuff.
-		$action = new \ElkArte\Action('package_actions_install');
-
-		foreach ($this->_passed_actions as $this->_action)
+		// Could this be theme related?
+		if (!empty($this->_action['unparsed_filename']))
 		{
-			$this->_failed_count++;
-
-			// Work out exactly who it is we are calling. call integrate_sa_packages
-			if (!array_key_exists($this->_action['type'], $subActions))
-			{
-				continue;
-			}
-			$subAction = $action->initialize($subActions, $this->_action['type'], '');
-
-			// Lets just do it!
-			$action->dispatch($subAction);
+			$this->_check_theme_actions($this->_action['unparsed_filename'], true);
 		}
 	}
 
@@ -770,16 +836,20 @@ class PackageActions extends \ElkArte\AbstractController
 			foreach ($mod_actions as $key => $action)
 			{
 				if ($this->_action['type'] === 'failure')
+				{
 					$this->failed_steps[] = array(
 						'file' => $action['filename'],
 						'large_step' => $this->_failed_count,
 						'sub_step' => $key,
 						'theme' => 1,
 					);
+				}
 
 				// Gather the themes we installed into.
 				if (!empty($this->_action['is_custom']))
+				{
 					$this->themes_installed[] = $this->_action['is_custom'];
+				}
 			}
 		}
 	}
@@ -796,7 +866,9 @@ class PackageActions extends \ElkArte\AbstractController
 
 			// Now include the file and be done with it ;).
 			if (file_exists(BOARDDIR . '/packages/temp/' . $this->_base_path . $this->_action['filename']))
+			{
 				require(BOARDDIR . '/packages/temp/' . $this->_base_path . $this->_action['filename']);
+			}
 		}
 	}
 
@@ -825,9 +897,13 @@ class PackageActions extends \ElkArte\AbstractController
 		if (isset($this->_action['hook'], $this->_action['function']))
 		{
 			if ($this->_action['reverse'])
+			{
 				remove_integration_function($this->_action['hook'], $this->_action['function'], $this->_action['include_file']);
+			}
 			else
+			{
 				add_integration_function($this->_action['hook'], $this->_action['function'], $this->_action['include_file']);
+			}
 		}
 	}
 
@@ -837,14 +913,16 @@ class PackageActions extends \ElkArte\AbstractController
 	public function action_database2()
 	{
 		// Only do the database changes on uninstall if requested.
-		if (!empty($this->_action['filename']) && (!$this->_uninstalling || !empty(\ElkArte\HttpReq::instance()->post->do_db_changes)))
+		if (!empty($this->_action['filename']) && (!$this->_uninstalling || !empty(HttpReq::instance()->post->do_db_changes)))
 		{
 			// These can also be there for database changes.
 			global $context;
 
 			// Let the file work its magic ;)
 			if (file_exists(BOARDDIR . '/packages/temp/' . $this->_base_path . $this->_action['filename']))
+			{
 				require(BOARDDIR . '/packages/temp/' . $this->_base_path . $this->_action['filename']);
+			}
 		}
 	}
 

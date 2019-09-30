@@ -9,13 +9,17 @@
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause (see accompanying LICENSE.txt file)
  *
  * This file contains code covered by:
- * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * copyright: 2011 Simple Machines (http://www.simplemachines.org)
  *
  * @version 2.0 dev
  *
  */
 
 namespace ElkArte\Search\API;
+
+use ElkArte\Cache\Cache;
+use ElkArte\Errors\Errors;
+use Elkarte\User;
 
 /**
  * SearchAPI-Sphinx.class.php, Sphinx API,
@@ -32,36 +36,42 @@ class Sphinx extends AbstractAPI
 {
 	/**
 	 * This is the last version of ElkArte that this was tested on, to protect against API changes.
+	 *
 	 * @var string
 	 */
 	public $version_compatible = 'ElkArte 2.0 dev';
 
 	/**
 	 * This won't work with versions of ElkArte less than this.
+	 *
 	 * @var string
 	 */
 	public $min_elk_version = 'ElkArte 1.0 Beta 1';
 
 	/**
 	 * Is it supported?
+	 *
 	 * @var boolean
 	 */
 	public $is_supported = true;
 
 	/**
 	 * What words are banned?
+	 *
 	 * @var array
 	 */
 	protected $bannedWords = array();
 
 	/**
 	 * What is the minimum word length?
+	 *
 	 * @var int
 	 */
 	protected $min_word_length = 4;
 
 	/**
 	 * What databases are supported?
+	 *
 	 * @var array
 	 */
 	protected $supported_databases = array('MySQL');
@@ -71,6 +81,8 @@ class Sphinx extends AbstractAPI
 	 */
 	public function __construct($config, $searchParams)
 	{
+		parent::__construct($config, $searchParams);
+
 		// Is this database supported?
 		if (!in_array($this->_db->title(), $this->supported_databases))
 		{
@@ -78,8 +90,6 @@ class Sphinx extends AbstractAPI
 
 			return;
 		}
-
-		parent::__construct($config, $searchParams);
 	}
 
 	/**
@@ -89,7 +99,7 @@ class Sphinx extends AbstractAPI
 	{
 		global $modSettings;
 
-		return !(empty($modSettings['sphinx_searchd_server']) || empty($modSettings['sphinx_searchd_port']));
+		return !empty($modSettings['sphinx_searchd_server']) && !empty($modSettings['sphinx_searchd_port']);
 	}
 
 	/**
@@ -126,7 +136,7 @@ class Sphinx extends AbstractAPI
 
 		$fulltextWord = count($subwords) === 1 ? $word : '"' . $word . '"';
 		$wordsSearch['indexed_words'][] = $fulltextWord;
-		if ($isExcluded)
+		if ($isExcluded !== '')
 		{
 			$wordsExclude[] = $fulltextWord;
 		}
@@ -147,9 +157,10 @@ class Sphinx extends AbstractAPI
 		// Only request the results if they haven't been cached yet.
 		$cached_results = array();
 		$cache_key = 'search_results_' . md5(User::$info->query_see_board . '_' . $context['params']);
-		if (!\ElkArte\Cache\Cache::instance()->getVar($cached_results, $cache_key))
+		if (!Cache::instance()->getVar($cached_results, $cache_key))
 		{
-			// The API communicating with the search daemon.
+			// The API communicating with the search daemon, this file is part of Sphinix and not distributed
+			// Elkarte
 			require_once(SOURCEDIR . '/sphinxapi.php');
 
 			// Create an instance of the sphinx client and set a few options.
@@ -216,7 +227,7 @@ class Sphinx extends AbstractAPI
 
 			// If no search terms are left after comparing against excluded words (i.e. "test -test" or "test last -test -last"),
 			// sending that to Sphinx would result in a fatal error
-			if (!count(array_diff($inc_words, $excluded_words)))
+			if (count(array_diff($inc_words, $excluded_words)) === 0)
 			{
 				// Instead, fail gracefully (return "no results")
 				return 0;
@@ -257,10 +268,10 @@ class Sphinx extends AbstractAPI
 				// Just log the error.
 				if ($mySphinx->GetLastError())
 				{
-					\ElkArte\Errors\Errors::instance()->log_error($mySphinx->GetLastError());
+					Errors::instance()->log_error($mySphinx->GetLastError());
 				}
 
-				\ElkArte\Errors\Errors::instance()->fatal_lang_error('error_no_search_daemon');
+				Errors::instance()->fatal_lang_error('error_no_search_daemon');
 			}
 
 			// Get the relevant information from the search results.
@@ -283,7 +294,7 @@ class Sphinx extends AbstractAPI
 			}
 
 			// Store the search results in the cache.
-			\ElkArte\Cache\Cache::instance()->put($cache_key, $cached_results, 600);
+			Cache::instance()->put($cache_key, $cached_results, 600);
 		}
 
 		$participants = array();
@@ -305,11 +316,6 @@ class Sphinx extends AbstractAPI
 		return $topics;
 	}
 
-	public function useWordIndex()
-	{
-		return false;
-	}
-
 	/**
 	 * Clean up a search word/phrase/term for Sphinx.
 	 *
@@ -324,7 +330,7 @@ class Sphinx extends AbstractAPI
 		$sphinx_term = preg_replace('/""+/', '"', $sphinx_term);
 
 		// Unmatched (i.e. odd number of) quotation marks also cause fatal errors, so handle them
-		if (substr_count($sphinx_term, '"') % 2)
+		if (substr_count($sphinx_term, '"') % 2 !== 0)
 		{
 			// Using preg_replace since it supports limiting the number of replacements
 			$sphinx_term = preg_replace('/"/', '', $sphinx_term, 1);
@@ -337,5 +343,10 @@ class Sphinx extends AbstractAPI
 		$sphinx_term = str_replace('\"', '"', $sphinx_term);
 
 		return $sphinx_term;
+	}
+
+	public function useWordIndex()
+	{
+		return false;
 	}
 }

@@ -10,7 +10,7 @@
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause (see accompanying LICENSE.txt file)
  *
  * This file contains code covered by:
- * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * copyright: 2011 Simple Machines (http://www.simplemachines.org)
  *
  * @version 2.0 dev
  *
@@ -18,26 +18,441 @@
 
 namespace ElkArte\Controller;
 
+use ElkArte\AbstractController;
+use ElkArte\Action;
+use ElkArte\Exceptions\Exception;
+use ElkArte\MembersList;
+use ElkArte\Util;
+
 /**
  *
  * - Does the job of showing and editing people's profiles.
  * - Interface to buddy list, ignore list, notifications, authentication options, forum profile
  * account settings, etc
  */
-class ProfileOptions extends \ElkArte\AbstractController
+class ProfileOptions extends AbstractController
 {
 
 	/**
 	 * Member id for the profile being viewed
+	 *
 	 * @var int
 	 */
 	private $_memID = 0;
 
 	/**
 	 * The \ElkArte\Member object is stored here to avoid some global
+	 *
 	 * @var \ElkArte\Member
 	 */
 	private $_profile = null;
+
+	/**
+	 * Called before all other methods when coming from the dispatcher or
+	 * action class.
+	 *
+	 * - If you initiate the class outside of those methods, call this method.
+	 * or setup the class yourself else a horrible fate awaits you
+	 */
+	public function pre_dispatch()
+	{
+		$this->_memID = currentMemberID();
+		$this->_profile = MembersList::get($this->_memID);
+	}
+
+	/**
+	 * Default method, if another action is not called by the menu.
+	 *
+	 * @see \ElkArte\AbstractController::action_index()
+	 */
+	public function action_index()
+	{
+		// action_account() is the first to do
+		// these subactions are mostly routed to from the profile
+		// menu though.
+	}
+
+	/**
+	 * Show all the users buddies, as well as a add/delete interface.
+	 */
+	public function action_editBuddyIgnoreLists()
+	{
+		global $context, $txt, $modSettings;
+
+		// Do a quick check to ensure people aren't getting here illegally!
+		if (!$context['user']['is_owner'] || empty($modSettings['enable_buddylist']))
+		{
+			throw new Exception('no_access', false);
+		}
+
+		theme()->getTemplates()->load('ProfileOptions');
+
+		// Can we email the user direct?
+		$context['can_moderate_forum'] = allowedTo('moderate_forum');
+		$context['can_send_email'] = allowedTo('send_email_to_members');
+
+		$subActions = array(
+			'buddies' => array($this, 'action_editBuddies'),
+			'ignore' => array($this, 'action_editIgnoreList'),
+		);
+
+		// Set a subaction
+		$action = new Action('buddy_actions');
+		$subAction = $action->initialize($subActions, 'buddies');
+
+		// Create the tabs for the template.
+		$context[$context['profile_menu_name']]['tab_data'] = array(
+			'title' => $txt['editBuddyIgnoreLists'],
+			'description' => $txt['buddy_ignore_desc'],
+			'class' => 'profile',
+			'tabs' => array(
+				'buddies' => array(),
+				'ignore' => array(),
+			),
+		);
+
+		// Pass on to the actual function.
+		$action->dispatch($subAction);
+	}
+
+	/**
+	 * Show all the users buddies, as well as a add/delete interface.
+	 *
+	 * @uses template_editBuddies()
+	 */
+	public function action_editBuddies()
+	{
+		global $context;
+
+		theme()->getTemplates()->load('ProfileOptions');
+
+		// We want to view what we're doing :P
+		$context['sub_template'] = 'editBuddies';
+
+		// Use suggest to find the right buddies
+		loadJavascriptFile('suggest.js', array('defer' => true));
+
+		// For making changes!
+		$buddiesArray = explode(',', $this->_profile['buddy_list']);
+		foreach ($buddiesArray as $k => $dummy)
+		{
+			if ($dummy === '')
+			{
+				unset($buddiesArray[$k]);
+			}
+		}
+
+		// Removing a buddy?
+		if (isset($this->_req->query->remove))
+		{
+			checkSession('get');
+
+			call_integration_hook('integrate_remove_buddy', array($this->_memID));
+
+			// Heh, I'm lazy, do it the easy way...
+			foreach ($buddiesArray as $key => $buddy)
+			{
+				if ($buddy == (int) $this->_req->query->remove)
+				{
+					unset($buddiesArray[$key]);
+				}
+			}
+
+			// Make the changes.
+			$this->_profile['buddy_list'] = implode(',', $buddiesArray);
+			require_once(SUBSDIR . '/Members.subs.php');
+			updateMemberData($this->_memID, array('buddy_list' => $this->_profile['buddy_list']));
+
+			// Redirect off the page because we don't like all this ugly query stuff to stick in the history.
+			redirectexit('action=profile;area=lists;sa=buddies;u=' . $this->_memID);
+		}
+		// Or adding a new one
+		elseif (isset($this->_req->post->new_buddy))
+		{
+			checkSession();
+
+			// Prepare the string for extraction...
+			$new_buddy = strtr(Util::htmlspecialchars($this->_req->post->new_buddy, ENT_QUOTES), array('&quot;' => '"'));
+			preg_match_all('~"([^"]+)"~', $new_buddy, $matches);
+			$new_buddies = array_unique(array_merge($matches[1], explode(',', preg_replace('~"[^"]+"~', '', $new_buddy))));
+
+			foreach ($new_buddies as $k => $dummy)
+			{
+				$new_buddies[$k] = strtr(trim($new_buddies[$k]), array('\'' => '&#039;'));
+
+				if ($new_buddies[$k] === '' || in_array($new_buddies[$k], array($this->_profile['member_name'], $this->_profile['real_name'])))
+				{
+					unset($new_buddies[$k]);
+				}
+			}
+
+			call_integration_hook('integrate_add_buddies', array($this->_memID, &$new_buddies));
+
+			if (!empty($new_buddies))
+			{
+				// Now find out the id_member of the buddy.
+				require_once(SUBSDIR . '/ProfileOptions.subs.php');
+				$new_buddiesArray = getBuddiesID($new_buddies);
+				$old_buddiesArray = explode(',', $this->_profile['buddy_list']);
+
+				// Now update the current users buddy list.
+				$this->_profile['buddy_list'] = implode(',', array_filter(array_unique(array_merge($new_buddiesArray, $old_buddiesArray))));
+
+				require_once(SUBSDIR . '/Members.subs.php');
+				updateMemberData($this->_memID, array('buddy_list' => $this->_profile['buddy_list']));
+			}
+
+			// Back to the buddy list!
+			redirectexit('action=profile;area=lists;sa=buddies;u=' . $this->_memID);
+		}
+
+		// Get all the users "buddies"...
+		$buddies = array();
+
+		if (!empty($buddiesArray))
+		{
+			require_once(SUBSDIR . '/Members.subs.php');
+			$result = getBasicMemberData($buddiesArray, array('sort' => 'real_name', 'limit' => substr_count($this->_profile['buddy_list'], ',') + 1));
+			foreach ($result as $row)
+			{
+				$buddies[] = $row['id_member'];
+			}
+		}
+
+		$context['buddy_count'] = count($buddies);
+
+		// Load all the members up.
+		MembersList::load($buddies, false, 'profile');
+
+		// Setup the context for each buddy.
+		$context['buddies'] = array();
+		foreach ($buddies as $buddy)
+		{
+			$context['buddies'][$buddy] = MembersList::get($buddy);
+			$context['buddies'][$buddy]->loadContext();
+		}
+
+		call_integration_hook('integrate_view_buddies', array($this->_memID));
+	}
+
+	/**
+	 * Allows the user to view their ignore list,
+	 *
+	 * - Provides the option to manage members on it.
+	 */
+	public function action_editIgnoreList()
+	{
+		global $context;
+
+		theme()->getTemplates()->load('ProfileOptions');
+
+		// We want to view what we're doing :P
+		$context['sub_template'] = 'editIgnoreList';
+		loadJavascriptFile('suggest.js', array('defer' => true));
+
+		// For making changes!
+		$ignoreArray = explode(',', $this->_profile['pm_ignore_list']);
+		foreach ($ignoreArray as $k => $dummy)
+		{
+			if ($dummy === '')
+			{
+				unset($ignoreArray[$k]);
+			}
+		}
+
+		// Removing a member from the ignore list?
+		if (isset($this->_req->query->remove))
+		{
+			checkSession('get');
+
+			// Heh, I'm lazy, do it the easy way...
+			foreach ($ignoreArray as $key => $id_remove)
+			{
+				if ($id_remove == (int) $this->_req->query->remove)
+				{
+					unset($ignoreArray[$key]);
+				}
+			}
+
+			// Make the changes.
+			$this->_profile['pm_ignore_list'] = implode(',', $ignoreArray);
+			require_once(SUBSDIR . '/Members.subs.php');
+			updateMemberData($this->_memID, array('pm_ignore_list' => $this->_profile['pm_ignore_list']));
+
+			// Redirect off the page because we don't like all this ugly query stuff to stick in the history.
+			redirectexit('action=profile;area=lists;sa=ignore;u=' . $this->_memID);
+		}
+		elseif (isset($this->_req->post->new_ignore))
+		{
+			checkSession();
+
+			// Prepare the string for extraction...
+			$new_ignore = strtr(Util::htmlspecialchars($this->_req->post->new_ignore, ENT_QUOTES), array('&quot;' => '"'));
+			preg_match_all('~"([^"]+)"~', $new_ignore, $matches);
+			$new_entries = array_unique(array_merge($matches[1], explode(',', preg_replace('~"[^"]+"~', '', $new_ignore))));
+
+			foreach ($new_entries as $k => $dummy)
+			{
+				$new_entries[$k] = strtr(trim($new_entries[$k]), array('\'' => '&#039;'));
+
+				if ($new_entries[$k] === '' || in_array($new_entries[$k], array($this->_profile['member_name'], $this->_profile['real_name'])))
+				{
+					unset($new_entries[$k]);
+				}
+			}
+
+			if (!empty($new_entries))
+			{
+				// Now find out the id_member for the members in question.
+				require_once(SUBSDIR . '/ProfileOptions.subs.php');
+				$ignoreArray = array_merge($ignoreArray, getBuddiesID($new_entries, false));
+
+				// Now update the current users buddy list.
+				$this->_profile['pm_ignore_list'] = implode(',', $ignoreArray);
+				require_once(SUBSDIR . '/Members.subs.php');
+				updateMemberData($this->_memID, array('pm_ignore_list' => $this->_profile['pm_ignore_list']));
+			}
+
+			// Back to the list of pitiful people!
+			redirectexit('action=profile;area=lists;sa=ignore;u=' . $this->_memID);
+		}
+
+		// Initialise the list of members we're ignoring.
+		$ignored = array();
+
+		if (!empty($ignoreArray))
+		{
+			require_once(SUBSDIR . '/Members.subs.php');
+			$result = getBasicMemberData($ignoreArray, array('sort' => 'real_name', 'limit' => substr_count($this->_profile['pm_ignore_list'], ',') + 1));
+			foreach ($result as $row)
+			{
+				$ignored[] = $row['id_member'];
+			}
+		}
+
+		$context['ignore_count'] = count($ignored);
+
+		// Load all the members up.
+		MembersList::load($ignored, false, 'profile');
+
+		// Setup the context for each buddy.
+		$context['ignore_list'] = array();
+		foreach ($ignored as $ignore_member)
+		{
+			$context['ignore_list'][$ignore_member] = MembersList::get($ignore_member);
+			$context['ignore_list'][$ignore_member]->loadContext();
+		}
+	}
+
+	/**
+	 * Allows the user to see or change their account info.
+	 */
+	public function action_account()
+	{
+		global $modSettings, $context, $txt;
+
+		theme()->getTemplates()->load('ProfileOptions');
+		$this->loadThemeOptions();
+
+		if (allowedTo(array('profile_identity_own', 'profile_identity_any')))
+		{
+			loadCustomFields($this->_memID, 'account');
+		}
+
+		$context['sub_template'] = 'edit_options';
+		$context['page_desc'] = $txt['account_info'];
+
+		if (!empty($modSettings['enableOTP']))
+		{
+			$fields = self::getFields('account_otp');
+			setupProfileContext($fields['fields'], $fields['hook']);
+
+			loadJavascriptFile('qrcode.js');
+			theme()->addInlineJavascript('
+				var secret = document.getElementById("otp_secret").value;
+
+				if (secret)
+				{
+					var qrcode = new QRCode("qrcode", {
+						text: "otpauth://totp/' . $context['forum_name'] . '?secret=" + secret,
+						width: 100,
+						height: 100,
+						colorDark : "#000000",
+						colorLight : "#ffffff",
+					});
+				}
+
+				/**
+				* Generate a secret key for Google Authenticator
+				*/
+				function generateSecret() {
+					var text = "",
+						possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZ234567",
+						qr = document.getElementById("qrcode");
+
+					for (var i = 0; i < 16; i++)
+						text += possible.charAt(Math.floor(Math.random() * possible.length));
+
+					document.getElementById("otp_secret").value = text;
+
+					while (qr.firstChild) {
+						qr.removeChild(qr.firstChild);
+					}
+
+					var qrcode = new QRCode("qrcode", {
+						text: "otpauth://totp/' . $context['forum_name'] . '?secret=" + text,
+						width: 100,
+						height: 100,
+						colorDark: "#000000",
+						colorLight: "#ffffff",
+					});
+				}', true);
+		}
+		else
+		{
+			$fields = self::getFields('account');
+		}
+		setupProfileContext($fields['fields'], $fields['hook']);
+	}
+
+	/**
+	 * Load the options for an user.
+	 */
+	public function loadThemeOptions()
+	{
+		global $context, $options, $cur_profile;
+
+		if (isset($this->_req->post->default_options))
+		{
+			$this->_req->post->options = isset($this->_req->post->options) ? $this->_req->post->options + $this->_req->post->default_options : $this->_req->post->default_options;
+		}
+
+		if ($context['user']['is_owner'])
+		{
+			$context['member']['options'] = $options;
+
+			if (isset($this->_req->post->options) && is_array($this->_req->post->options))
+			{
+				foreach ($this->_req->post->options as $k => $v)
+				{
+					$context['member']['options'][$k] = $v;
+				}
+			}
+		}
+		else
+		{
+			require_once(SUBSDIR . '/Themes.subs.php');
+			$context['member']['options'] = loadThemeOptionsInto(array(1, (int) $cur_profile['id_theme']), array(-1, $this->_memID), $context['member']['options']);
+
+			if (isset($this->_req->post->options))
+			{
+				foreach ($this->_req->post->options as $var => $val)
+				{
+					$context['member']['options'][$var] = $val;
+				}
+			}
+		}
+	}
 
 	/**
 	 * Returns the profile fields for a given area
@@ -114,355 +529,6 @@ class ProfileOptions extends \ElkArte\AbstractController
 	}
 
 	/**
-	 * Called before all other methods when coming from the dispatcher or
-	 * action class.
-	 *
-	 * - If you initiate the class outside of those methods, call this method.
-	 * or setup the class yourself else a horrible fate awaits you
-	 */
-	public function pre_dispatch()
-	{
-		$this->_memID = currentMemberID();
-		$this->_profile = \ElkArte\MembersList::get($this->_memID);
-	}
-
-	/**
-	 * Default method, if another action is not called by the menu.
-	 *
-	 * @see \ElkArte\AbstractController::action_index()
-	 */
-	public function action_index()
-	{
-		// action_account() is the first to do
-		// these subactions are mostly routed to from the profile
-		// menu though.
-	}
-
-	/**
-	 * Show all the users buddies, as well as a add/delete interface.
-	 */
-	public function action_editBuddyIgnoreLists()
-	{
-		global $context, $txt, $modSettings;
-
-		// Do a quick check to ensure people aren't getting here illegally!
-		if (!$context['user']['is_owner'] || empty($modSettings['enable_buddylist']))
-			throw new \ElkArte\Exceptions\Exception('no_access', false);
-
-		theme()->getTemplates()->load('ProfileOptions');
-
-		// Can we email the user direct?
-		$context['can_moderate_forum'] = allowedTo('moderate_forum');
-		$context['can_send_email'] = allowedTo('send_email_to_members');
-
-		$subActions = array(
-			'buddies' => array($this, 'action_editBuddies'),
-			'ignore' => array($this, 'action_editIgnoreList'),
-		);
-
-		// Set a subaction
-		$action = new \ElkArte\Action('buddy_actions');
-		$subAction = $action->initialize($subActions, 'buddies');
-
-		// Create the tabs for the template.
-		$context[$context['profile_menu_name']]['tab_data'] = array(
-			'title' => $txt['editBuddyIgnoreLists'],
-			'description' => $txt['buddy_ignore_desc'],
-			'class' => 'profile',
-			'tabs' => array(
-				'buddies' => array(),
-				'ignore' => array(),
-			),
-		);
-
-		// Pass on to the actual function.
-		$action->dispatch($subAction);
-	}
-
-	/**
-	 * Show all the users buddies, as well as a add/delete interface.
-	 *
-	 * @uses template_editBuddies()
-	 */
-	public function action_editBuddies()
-	{
-		global $context;
-
-		theme()->getTemplates()->load('ProfileOptions');
-
-		// We want to view what we're doing :P
-		$context['sub_template'] = 'editBuddies';
-
-		// Use suggest to find the right buddies
-		loadJavascriptFile('suggest.js', array('defer' => true));
-
-		// For making changes!
-		$buddiesArray = explode(',', $this->_profile['buddy_list']);
-		foreach ($buddiesArray as $k => $dummy)
-		{
-			if ($dummy === '')
-				unset($buddiesArray[$k]);
-		}
-
-		// Removing a buddy?
-		if (isset($this->_req->query->remove))
-		{
-			checkSession('get');
-
-			call_integration_hook('integrate_remove_buddy', array($this->_memID));
-
-			// Heh, I'm lazy, do it the easy way...
-			foreach ($buddiesArray as $key => $buddy)
-			{
-				if ($buddy == (int) $this->_req->query->remove)
-					unset($buddiesArray[$key]);
-			}
-
-			// Make the changes.
-			$this->_profile['buddy_list'] = implode(',', $buddiesArray);
-			require_once(SUBSDIR . '/Members.subs.php');
-			updateMemberData($this->_memID, array('buddy_list' => $this->_profile['buddy_list']));
-
-			// Redirect off the page because we don't like all this ugly query stuff to stick in the history.
-			redirectexit('action=profile;area=lists;sa=buddies;u=' . $this->_memID);
-		}
-		// Or adding a new one
-		elseif (isset($this->_req->post->new_buddy))
-		{
-			checkSession();
-
-			// Prepare the string for extraction...
-			$new_buddy = strtr(\ElkArte\Util::htmlspecialchars($this->_req->post->new_buddy, ENT_QUOTES), array('&quot;' => '"'));
-			preg_match_all('~"([^"]+)"~', $new_buddy, $matches);
-			$new_buddies = array_unique(array_merge($matches[1], explode(',', preg_replace('~"[^"]+"~', '', $new_buddy))));
-
-			foreach ($new_buddies as $k => $dummy)
-			{
-				$new_buddies[$k] = strtr(trim($new_buddies[$k]), array('\'' => '&#039;'));
-
-				if (strlen($new_buddies[$k]) == 0 || in_array($new_buddies[$k], array($this->_profile['member_name'], $this->_profile['real_name'])))
-					unset($new_buddies[$k]);
-			}
-
-			call_integration_hook('integrate_add_buddies', array($this->_memID, &$new_buddies));
-
-			if (!empty($new_buddies))
-			{
-				// Now find out the id_member of the buddy.
-				require_once(SUBSDIR . '/ProfileOptions.subs.php');
-				$new_buddiesArray = getBuddiesID($new_buddies);
-				$old_buddiesArray = explode(',', $this->_profile['buddy_list']);
-
-				// Now update the current users buddy list.
-				$this->_profile['buddy_list'] = implode(',', array_filter(array_unique(array_merge($new_buddiesArray, $old_buddiesArray))));
-
-				require_once(SUBSDIR . '/Members.subs.php');
-				updateMemberData($this->_memID, array('buddy_list' => $this->_profile['buddy_list']));
-			}
-
-			// Back to the buddy list!
-			redirectexit('action=profile;area=lists;sa=buddies;u=' . $this->_memID);
-		}
-
-		// Get all the users "buddies"...
-		$buddies = array();
-
-		if (!empty($buddiesArray))
-		{
-			require_once(SUBSDIR . '/Members.subs.php');
-			$result = getBasicMemberData($buddiesArray, array('sort' => 'real_name', 'limit' => substr_count($this->_profile['buddy_list'], ',') + 1));
-			foreach ($result as $row)
-				$buddies[] = $row['id_member'];
-		}
-
-		$context['buddy_count'] = count($buddies);
-
-		// Load all the members up.
-		\ElkArte\MembersList::load($buddies, false, 'profile');
-
-		// Setup the context for each buddy.
-		$context['buddies'] = array();
-		foreach ($buddies as $buddy)
-		{
-			$context['buddies'][$buddy] = \ElkArte\MembersList::get($buddy);
-			$context['buddies'][$buddy]->loadContext();
-		}
-
-		call_integration_hook('integrate_view_buddies', array($this->_memID));
-	}
-
-	/**
-	 * Allows the user to view their ignore list,
-	 *
-	 * - Provides the option to manage members on it.
-	 */
-	public function action_editIgnoreList()
-	{
-		global $context;
-
-		theme()->getTemplates()->load('ProfileOptions');
-
-		// We want to view what we're doing :P
-		$context['sub_template'] = 'editIgnoreList';
-		loadJavascriptFile('suggest.js', array('defer' => true));
-
-		// For making changes!
-		$ignoreArray = explode(',', $this->_profile['pm_ignore_list']);
-		foreach ($ignoreArray as $k => $dummy)
-		{
-			if ($dummy === '')
-				unset($ignoreArray[$k]);
-		}
-
-		// Removing a member from the ignore list?
-		if (isset($this->_req->query->remove))
-		{
-			checkSession('get');
-
-			// Heh, I'm lazy, do it the easy way...
-			foreach ($ignoreArray as $key => $id_remove)
-			{
-				if ($id_remove == (int) $this->_req->query->remove)
-					unset($ignoreArray[$key]);
-			}
-
-			// Make the changes.
-			$this->_profile['pm_ignore_list'] = implode(',', $ignoreArray);
-			require_once(SUBSDIR . '/Members.subs.php');
-			updateMemberData($this->_memID, array('pm_ignore_list' => $this->_profile['pm_ignore_list']));
-
-			// Redirect off the page because we don't like all this ugly query stuff to stick in the history.
-			redirectexit('action=profile;area=lists;sa=ignore;u=' . $this->_memID);
-		}
-		elseif (isset($this->_req->post->new_ignore))
-		{
-			checkSession();
-
-			// Prepare the string for extraction...
-			$new_ignore = strtr(\ElkArte\Util::htmlspecialchars($this->_req->post->new_ignore, ENT_QUOTES), array('&quot;' => '"'));
-			preg_match_all('~"([^"]+)"~', $new_ignore, $matches);
-			$new_entries = array_unique(array_merge($matches[1], explode(',', preg_replace('~"[^"]+"~', '', $new_ignore))));
-
-			foreach ($new_entries as $k => $dummy)
-			{
-				$new_entries[$k] = strtr(trim($new_entries[$k]), array('\'' => '&#039;'));
-
-				if (strlen($new_entries[$k]) == 0 || in_array($new_entries[$k], array($this->_profile['member_name'], $this->_profile['real_name'])))
-					unset($new_entries[$k]);
-			}
-
-			if (!empty($new_entries))
-			{
-				// Now find out the id_member for the members in question.
-				require_once(SUBSDIR . '/ProfileOptions.subs.php');
-				$ignoreArray = array_merge($ignoreArray, getBuddiesID($new_entries, false));
-
-				// Now update the current users buddy list.
-				$this->_profile['pm_ignore_list'] = implode(',', $ignoreArray);
-				require_once(SUBSDIR . '/Members.subs.php');
-				updateMemberData($this->_memID, array('pm_ignore_list' => $this->_profile['pm_ignore_list']));
-			}
-
-			// Back to the list of pitiful people!
-			redirectexit('action=profile;area=lists;sa=ignore;u=' . $this->_memID);
-		}
-
-		// Initialise the list of members we're ignoring.
-		$ignored = array();
-
-		if (!empty($ignoreArray))
-		{
-			require_once(SUBSDIR . '/Members.subs.php');
-			$result = getBasicMemberData($ignoreArray, array('sort' => 'real_name', 'limit' => substr_count($this->_profile['pm_ignore_list'], ',') + 1));
-			foreach ($result as $row)
-				$ignored[] = $row['id_member'];
-		}
-
-		$context['ignore_count'] = count($ignored);
-
-		// Load all the members up.
-		\ElkArte\MembersList::load($ignored, false, 'profile');
-
-		// Setup the context for each buddy.
-		$context['ignore_list'] = array();
-		foreach ($ignored as $ignore_member)
-		{
-			$context['ignore_list'][$ignore_member] = \ElkArte\MembersList::get($ignore_member);
-			$context['ignore_list'][$ignore_member]->loadContext();
-		}
-	}
-
-	/**
-	 * Allows the user to see or change their account info.
-	 */
-	public function action_account()
-	{
-		global $modSettings, $context, $txt;
-
-		theme()->getTemplates()->load('ProfileOptions');
-		$this->loadThemeOptions();
-
-		if (allowedTo(array('profile_identity_own', 'profile_identity_any')))
-			loadCustomFields($this->_memID, 'account');
-
-		$context['sub_template'] = 'edit_options';
-		$context['page_desc'] = $txt['account_info'];
-
-		if (!empty($modSettings['enableOTP']))
-		{
-			$fields = self::getFields('account_otp');
-			setupProfileContext($fields['fields'], $fields['hook']);
-
-			loadJavascriptFile('qrcode.js');
-			theme()->addInlineJavascript('
-				var secret = document.getElementById("otp_secret").value;
-
-				if (secret)
-				{
-					var qrcode = new QRCode("qrcode", {
-						text: "otpauth://totp/' . $context['forum_name'] . '?secret=" + secret,
-						width: 100,
-						height: 100,
-						colorDark : "#000000",
-						colorLight : "#ffffff",
-					});
-				}
-
-				/**
-				* Generate a secret key for Google Authenticator
-				*/
-				function generateSecret() {
-					var text = "",
-						possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZ234567",
-						qr = document.getElementById("qrcode");
-
-					for (var i = 0; i < 16; i++)
-						text += possible.charAt(Math.floor(Math.random() * possible.length));
-
-					document.getElementById("otp_secret").value = text;
-
-					while (qr.firstChild) {
-						qr.removeChild(qr.firstChild);
-					}
-
-					var qrcode = new QRCode("qrcode", {
-						text: "otpauth://totp/' . $context['forum_name'] . '?secret=" + text,
-						width: 100,
-						height: 100,
-						colorDark: "#000000",
-						colorLight: "#ffffff",
-					});
-				}', true);
-		}
-		else
-		{
-			$fields = self::getFields('account');
-		}
-		setupProfileContext($fields['fields'], $fields['hook']);
-	}
-
-
-	/**
 	 * Allow the user to change the forum options in their profile.
 	 */
 	public function action_forumProfile()
@@ -473,7 +539,9 @@ class ProfileOptions extends \ElkArte\AbstractController
 		$this->loadThemeOptions();
 
 		if (allowedTo(array('profile_extra_own', 'profile_extra_any')))
+		{
 			loadCustomFields($this->_memID, 'forumprofile');
+		}
 
 		$context['sub_template'] = 'edit_options';
 		$context['page_desc'] = replaceBasicActionUrl($txt['forumProfile_info']);
@@ -513,7 +581,9 @@ class ProfileOptions extends \ElkArte\AbstractController
 		$this->loadThemeOptions();
 
 		if (allowedTo(array('profile_extra_own', 'profile_extra_any')))
+		{
 			loadCustomFields($this->_memID, 'theme');
+		}
 
 		theme()->getTemplates()->load('ProfileOptions');
 
@@ -548,10 +618,14 @@ class ProfileOptions extends \ElkArte\AbstractController
 			{
 				// Didn't enter anything?
 				if ($this->_req->post->passwrd1 === '')
+				{
 					$post_errors[] = 'no_password';
+				}
 				// Do the two entries for the password even match?
-				elseif (!isset($this->_req->post->passwrd2) || $this->_req->post->passwrd1 != $this->_req->post->passwrd2)
+				elseif (!isset($this->_req->post->passwrd2) || $this->_req->post->passwrd1 !== $this->_req->post->passwrd2)
+				{
 					$post_errors[] = 'bad_new_password';
+				}
 				// Is it valid?
 				else
 				{
@@ -560,7 +634,9 @@ class ProfileOptions extends \ElkArte\AbstractController
 
 					// Were there errors?
 					if ($passwordErrors !== null)
+					{
 						$post_errors[] = 'password_' . $passwordErrors;
+					}
 				}
 
 				if (empty($post_errors))
@@ -582,7 +658,9 @@ class ProfileOptions extends \ElkArte\AbstractController
 						redirectexit('action=profile;area=authentication;updated');
 					}
 					else
+					{
 						redirectexit('action=profile;u=' . $this->_memID);
+					}
 				}
 
 				return true;
@@ -596,7 +674,9 @@ class ProfileOptions extends \ElkArte\AbstractController
 				$this->_req->post->openid_identifier = $openID->canonize($this->_req->post->openid_identifier);
 
 				if (memberExists($this->_req->post->openid_identifier))
+				{
 					$post_errors[] = 'openid_in_use';
+				}
 				elseif (empty($post_errors))
 				{
 					// Authenticate using the new OpenID URI first to make sure they didn't make a mistake.
@@ -606,7 +686,9 @@ class ProfileOptions extends \ElkArte\AbstractController
 						$openID->validate($this->_req->post->openid_identifier, false, null, 'change_uri');
 					}
 					else
+					{
 						updateMemberData($this->_memID, array('openid_uri' => $this->_req->post->openid_identifier));
+					}
 				}
 			}
 		}
@@ -643,7 +725,9 @@ class ProfileOptions extends \ElkArte\AbstractController
 			'base_href' => $scripturl . '?action=profile;u=' . $this->_memID . ';area=notification',
 			'default_sort_col' => 'board_name',
 			'get_items' => array(
-				'function' => array($this, 'list_getBoardNotifications'),
+				'function' => function ($start, $items_per_page, $sort, $memID) {
+					return $this->list_getBoardNotifications($start, $items_per_page, $sort, $memID);
+				},
 				'params' => array(
 					$this->_memID,
 				),
@@ -661,7 +745,9 @@ class ProfileOptions extends \ElkArte\AbstractController
 							$link = $board['link'];
 
 							if ($board['new'])
+							{
 								$link .= ' <a href="' . $board['href'] . '"><span class="new_posts">' . $txt['new'] . '</span></a>';
+							}
 
 							return $link;
 						},
@@ -728,13 +814,17 @@ class ProfileOptions extends \ElkArte\AbstractController
 			'base_href' => $scripturl . '?action=profile;u=' . $this->_memID . ';area=notification',
 			'default_sort_col' => 'last_post',
 			'get_items' => array(
-				'function' => array($this, 'list_getTopicNotifications'),
+				'function' => function ($start, $items_per_page, $sort, $memID) {
+					return $this->list_getTopicNotifications($start, $items_per_page, $sort, $memID);
+				},
 				'params' => array(
 					$this->_memID,
 				),
 			),
 			'get_count' => array(
-				'function' => array($this, 'list_getTopicNotificationCount'),
+				'function' => function ($memID) {
+					return $this->list_getTopicNotificationCount($memID);
+				},
 				'params' => array(
 					$this->_memID,
 				),
@@ -752,7 +842,9 @@ class ProfileOptions extends \ElkArte\AbstractController
 							$link = $topic['link'];
 
 							if ($topic['new'])
+							{
 								$link .= ' <a href="' . $topic['new_href'] . '"><span class="new_posts">' . $txt['new'] . '</span></a>';
+							}
 
 							$link .= '<br /><span class="smalltext"><em>' . $txt['in'] . ' ' . $topic['board_link'] . '</em></span>';
 
@@ -780,7 +872,7 @@ class ProfileOptions extends \ElkArte\AbstractController
 				'last_post' => array(
 					'header' => array(
 						'value' => $txt['last_post'],
-							'class' => 'lefttext',
+						'class' => 'lefttext',
 					),
 					'data' => array(
 						'sprintf' => array(
@@ -850,22 +942,26 @@ class ProfileOptions extends \ElkArte\AbstractController
 	/**
 	 * Callback for createList() in action_notification()
 	 *
-	 * - Retrieve topic notifications count.
+	 * @param int $start The item to start with (for pagination purposes)
+	 * @param int $items_per_page The number of items to show per page
 	 *
-	 * @param int $memID id_member the id of the member who's notifications we are loading
-	 * @return integer
+	 * @param string $sort A string indicating how to sort the results
+	 * @param int $memID id_member
+	 *
+	 * @return mixed[] array of board notifications
+	 * @uses template_ignoreboards()
 	 */
-	public function list_getTopicNotificationCount($memID)
+	public function list_getBoardNotifications($start, $items_per_page, $sort, $memID)
 	{
-		// Topic notifications count, for the list
-		return topicNotificationCount($memID);
+		// Return boards you see and their notification status for the list
+		return boardNotifications($sort, $memID);
 	}
 
 	/**
 	 * Callback for createList() in action_notification()
 	 *
 	 * @param int $start The item to start with (for pagination purposes)
-	 * @param int $items_per_page  The number of items to show per page
+	 * @param int $items_per_page The number of items to show per page
 	 * @param string $sort A string indicating how to sort the results
 	 * @param int $memID id_member
 	 * @return mixed array of topic notifications
@@ -879,19 +975,15 @@ class ProfileOptions extends \ElkArte\AbstractController
 	/**
 	 * Callback for createList() in action_notification()
 	 *
-	 * @uses template_ignoreboards()
-	 * @param int $start The item to start with (for pagination purposes)
-	 * @param int $items_per_page  The number of items to show per page
+	 * - Retrieve topic notifications count.
 	 *
-	 * @param string $sort A string indicating how to sort the results
-	 * @param int $memID id_member
-	 *
-	 * @return mixed[] array of board notifications
+	 * @param int $memID id_member the id of the member who's notifications we are loading
+	 * @return integer
 	 */
-	public function list_getBoardNotifications($start, $items_per_page, $sort, $memID)
+	public function list_getTopicNotificationCount($memID)
 	{
-		// Return boards you see and their notification status for the list
-		return boardNotifications($sort, $memID);
+		// Topic notifications count, for the list
+		return topicNotificationCount($memID);
 	}
 
 	/**
@@ -904,7 +996,9 @@ class ProfileOptions extends \ElkArte\AbstractController
 
 		// Have the admins enabled this option?
 		if (empty($modSettings['allow_ignore_boards']))
-			throw new \ElkArte\Exceptions\Exception('ignoreboards_disallowed', 'user');
+		{
+			throw new Exception('ignoreboards_disallowed', 'user');
+		}
 
 		theme()->getTemplates()->load('ProfileOptions');
 
@@ -947,7 +1041,9 @@ class ProfileOptions extends \ElkArte\AbstractController
 
 		// Ensure the query doesn't croak!
 		if (empty($groups))
+		{
 			$groups = array(0);
+		}
 
 		// Just to be sure...
 		$groups = array_map('intval', $groups);
@@ -962,14 +1058,16 @@ class ProfileOptions extends \ElkArte\AbstractController
 			'name' => $txt['regular_members'],
 			'desc' => $txt['regular_members_desc'],
 			'type' => 0,
-			'is_primary' => $context['primary_group'] == 0 ? true : false,
+			'is_primary' => $context['primary_group'] == 0,
 			'can_be_primary' => true,
 			'can_leave' => 0,
 		);
 
 		// No changing primary one unless you have enough groups!
 		if (count($context['groups']['member']) < 2)
+		{
 			$context['can_edit_primary'] = false;
+		}
 
 		// In the special case that someone is requesting membership of a group, setup some special context vars.
 		if (isset($this->_req->query->request)
@@ -992,12 +1090,16 @@ class ProfileOptions extends \ElkArte\AbstractController
 
 		// Let's be extra cautious...
 		if (!$context['user']['is_owner'] || empty($modSettings['show_group_membership']))
+		{
 			isAllowedTo('manage_membergroups');
+		}
 
 		$group_id = $this->_req->getPost('gid', 'intval', $this->_req->getQuery('gid', 'intval', null));
 
 		if (!isset($group_id) && !isset($this->_req->post->primary))
-			throw new \ElkArte\Exceptions\Exception('no_access', false);
+		{
+			throw new Exception('no_access', false);
+		}
 
 		// GID may be from a link or a form
 		checkSession(isset($this->_req->query->gid) ? 'get' : 'post');
@@ -1015,18 +1117,22 @@ class ProfileOptions extends \ElkArte\AbstractController
 
 		// One way or another, we have a target group in mind...
 		$group_id = isset($group_id) ? $group_id : (int) $this->_req->post->primary;
-		$foundTarget = $changeType === 'primary' && $group_id == 0 ? true : false;
+		$foundTarget = $changeType === 'primary' && $group_id == 0;
 
 		// Sanity check!!
 		if ($group_id == 1)
+		{
 			isAllowedTo('admin_forum');
+		}
 
 		// What ever we are doing, we need to determine if changing primary is possible!
 		$groups_details = membergroupsById(array($group_id, $this->_profile['id_group']), 0, true);
 
 		// Protected groups require proper permissions!
 		if ($group_id != 1 && $groups_details[$group_id]['group_type'] == 1)
+		{
 			isAllowedTo('admin_forum');
+		}
 
 		foreach ($groups_details as $key => $row)
 		{
@@ -1038,34 +1144,50 @@ class ProfileOptions extends \ElkArte\AbstractController
 
 				// Does the group type match what we're doing - are we trying to request a non-requestable group?
 				if ($changeType === 'request' && $row['group_type'] != 2)
-					throw new \ElkArte\Exceptions\Exception('no_access', false);
+				{
+					throw new Exception('no_access', false);
+				}
 				// What about leaving a requestable group we are not a member of?
 				elseif ($changeType === 'free' && $row['group_type'] == 2 && $this->_profile['id_group'] != $row['id_group'] && !isset($addGroups[$row['id_group']]))
-					throw new \ElkArte\Exceptions\Exception('no_access', false);
+				{
+					throw new Exception('no_access', false);
+				}
 				elseif ($changeType === 'free' && $row['group_type'] != 3 && $row['group_type'] != 2)
-					throw new \ElkArte\Exceptions\Exception('no_access', false);
+				{
+					throw new Exception('no_access', false);
+				}
 
 				// We can't change the primary group if this is hidden!
 				if ($row['hidden'] == 2)
+				{
 					$canChangePrimary = false;
+				}
 			}
 
 			// If this is their old primary, can we change it?
 			if ($row['id_group'] == $this->_profile['id_group'] && ($row['group_type'] > 1 || $context['can_manage_membergroups']) && $canChangePrimary !== false)
+			{
 				$canChangePrimary = true;
+			}
 
 			// If we are not doing a force primary move, don't do it automatically if current primary is not 0.
 			if ($changeType != 'primary' && $this->_profile['id_group'] != 0)
+			{
 				$canChangePrimary = false;
+			}
 
 			// If this is the one we are acting on, can we even act?
 			if ((!$context['can_manage_protected'] && $row['group_type'] == 1) || (!$context['can_manage_membergroups'] && $row['group_type'] == 0))
+			{
 				$canChangePrimary = false;
+			}
 		}
 
 		// Didn't find the target?
 		if (!$foundTarget)
-			throw new \ElkArte\Exceptions\Exception('no_access', false);
+		{
+			throw new Exception('no_access', false);
+		}
 
 		// Final security check, don't allow users to promote themselves to admin.
 		require_once(SUBSDIR . '/ProfileOptions.subs.php');
@@ -1073,14 +1195,18 @@ class ProfileOptions extends \ElkArte\AbstractController
 		{
 			$disallow = checkMembergroupChange($group_id);
 			if ($disallow)
+			{
 				isAllowedTo('admin_forum');
+			}
 		}
 
 		// If we're requesting, add the note then return.
 		if ($changeType === 'request')
 		{
 			if (logMembergroupRequest($group_id, $this->_memID))
-				throw new \ElkArte\Exceptions\Exception('profile_error_already_requested_group');
+			{
+				throw new Exception('profile_error_already_requested_group');
+			}
 
 			// Send an email to all group moderators etc.
 			require_once(SUBSDIR . '/Mail.subs.php');
@@ -1104,14 +1230,18 @@ class ProfileOptions extends \ElkArte\AbstractController
 				foreach ($members as $member)
 				{
 					if ($member['notify_types'] != 4)
+					{
 						continue;
+					}
 
 					// Check whether they are interested.
 					if (!empty($member['mod_prefs']))
 					{
-						list (,, $pref_binary) = explode('|', $member['mod_prefs']);
+						list (, , $pref_binary) = explode('|', $member['mod_prefs']);
 						if (!($pref_binary & 4))
+						{
 							continue;
+						}
 					}
 
 					$replacements = array(
@@ -1136,9 +1266,13 @@ class ProfileOptions extends \ElkArte\AbstractController
 			if ($this->_profile['id_group'] == $group_id || isset($addGroups[$group_id]))
 			{
 				if ($this->_profile['id_group'] == $group_id)
+				{
 					$newPrimary = 0;
+				}
 				else
+				{
 					unset($addGroups[$group_id]);
+				}
 			}
 			// ... if not, must be joining.
 			else
@@ -1147,21 +1281,29 @@ class ProfileOptions extends \ElkArte\AbstractController
 				if ($canChangePrimary)
 				{
 					if ($this->_profile['id_group'] != 0)
+					{
 						$addGroups[$this->_profile['id_group']] = -1;
+					}
 					$newPrimary = $group_id;
 				}
 				// Otherwise it's an additional group...
 				else
+				{
 					$addGroups[$group_id] = -1;
+				}
 			}
 		}
 		// Finally, we must be setting the primary.
 		elseif ($canChangePrimary)
 		{
 			if ($this->_profile['id_group'] != 0)
+			{
 				$addGroups[$this->_profile['id_group']] = -1;
+			}
 			if (isset($addGroups[$group_id]))
+			{
 				unset($addGroups[$group_id]);
+			}
 			$newPrimary = $group_id;
 		}
 
@@ -1169,52 +1311,25 @@ class ProfileOptions extends \ElkArte\AbstractController
 		foreach ($addGroups as $id => $dummy)
 		{
 			if (empty($id))
+			{
 				unset($addGroups[$id]);
+			}
 		}
 		$addGroups = implode(',', array_flip($addGroups));
 
 		// Ensure that we don't cache permissions if the group is changing.
 		if ($context['user']['is_owner'])
+		{
 			$_SESSION['mc']['time'] = 0;
+		}
 		else
+		{
 			updateSettings(array('settings_updated' => time()));
+		}
 
 		require_once(SUBSDIR . '/Members.subs.php');
 		updateMemberData($this->_memID, array('id_group' => $newPrimary, 'additional_groups' => $addGroups));
 
 		return $changeType;
-	}
-
-	/**
-	 * Load the options for an user.
-	 */
-	public function loadThemeOptions()
-	{
-		global $context, $options, $cur_profile;
-
-		if (isset($this->_req->post->default_options))
-			$this->_req->post->options = isset($this->_req->post->options) ? $this->_req->post->options + $this->_req->post->default_options : $this->_req->post->default_options;
-
-		if ($context['user']['is_owner'])
-		{
-			$context['member']['options'] = $options;
-
-			if (isset($this->_req->post->options) && is_array($this->_req->post->options))
-			{
-				foreach ($this->_req->post->options as $k => $v)
-					$context['member']['options'][$k] = $v;
-			}
-		}
-		else
-		{
-			require_once(SUBSDIR . '/Themes.subs.php');
-			$context['member']['options'] = loadThemeOptionsInto(array(1, (int) $cur_profile['id_theme']), array(-1, $this->_memID), $context['member']['options']);
-
-			if (isset($this->_req->post->options))
-			{
-				foreach ($this->_req->post->options as $var => $val)
-					$context['member']['options'][$var] = $val;
-			}
-		}
 	}
 }

@@ -6,7 +6,7 @@
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause (see accompanying LICENSE.txt file)
  *
  * This file contains code covered by:
- * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * copyright: 2011 Simple Machines (http://www.simplemachines.org)
  *
  * @version 2.0 dev
  *
@@ -27,8 +27,10 @@ function template_ban_edit()
 			</h2>';
 
 	if ($context['ban']['is_new'])
+	{
 		echo '
 			<div class="information">', $txt['ban_add_notes'], '</div>';
+	}
 
 	// If there were errors creating the ban, show them.
 	template_show_error('ban_errors');
@@ -44,6 +46,7 @@ function template_ban_edit()
 					</dd>';
 
 	if (isset($context['ban']['reason']))
+	{
 		echo '
 				<dt>
 					<label for="reason">', $txt['ban_reason'], ':</label><br />
@@ -52,8 +55,10 @@ function template_ban_edit()
 				<dd>
 					<textarea name="reason" id="reason" cols="40" rows="3" class="ban_text">', $context['ban']['reason'], '</textarea>
 				</dd>';
+	}
 
 	if (isset($context['ban']['notes']))
+	{
 		echo '
 				<dt>
 					<label for="ban_notes">', $txt['ban_notes'], ':</label><br />
@@ -62,6 +67,7 @@ function template_ban_edit()
 				<dd>
 					<textarea name="notes" id="ban_notes" cols="40" rows="3" class="ban_text">', $context['ban']['notes'], '</textarea>
 				</dd>';
+	}
 
 	echo '
 				</dl>
@@ -101,6 +107,7 @@ function template_ban_edit()
 						</dd>';
 
 		if (empty($modSettings['disableHostnameLookup']))
+		{
 			echo '
 						<dt>
 							<input type="checkbox" name="ban_suggestions[]" id="hostname_check" value="hostname" ', !empty($context['ban_suggestions']['hostname']) ? 'checked="checked" ' : '', '/>
@@ -109,6 +116,7 @@ function template_ban_edit()
 						<dd>
 							<input type="text" name="hostname" value="', $context['ban_suggestions']['hostname'], '" size="44" onfocus="document.getElementById(\'hostname_check\').checked = true;" class="input_text" />
 						</dd>';
+		}
 
 		echo '
 						<dt>
@@ -139,6 +147,7 @@ function template_ban_edit()
 
 					$count = 0;
 					foreach ($ban_ips as $ip)
+					{
 						echo '
 						<dt>
 							<input type="checkbox" id="suggestions_', $key, '_', $count, '" name="ban_suggestions[', $key, '][]" ', !empty($context['ban_suggestions']['saved_triggers'][$key]) && in_array($ip, $context['ban_suggestions']['saved_triggers'][$key]) ? 'checked="checked" ' : '', 'value="', $ip, '" />
@@ -146,6 +155,7 @@ function template_ban_edit()
 						<dd>
 							<label for="suggestions_', $key, '_', ($count++), '">', $ip, '</label>
 						</dd>';
+					}
 
 					echo '
 					</dl>';
@@ -182,6 +192,7 @@ function template_ban_edit()
 
 	// Auto suggest only needed for adding new bans, not editing
 	if (!empty($context['use_autosuggest']))
+	{
 		echo '
 	<script>
 		new smc_AutoSuggest({
@@ -196,6 +207,7 @@ function template_ban_edit()
 
 		oAddMemberSuggest.registerCallback(\'onBeforeUpdate\', \'onUpdateName\');
 	</script>';
+	}
 }
 
 /**
@@ -226,6 +238,7 @@ function template_ban_edit_trigger()
 						</dd>';
 
 	if (empty($modSettings['disableHostnameLookup']))
+	{
 		echo '
 						<dt>
 							<input type="checkbox" name="ban_suggestions[]" id="hostname_check" value="hostname" ', $context['ban_trigger']['hostname']['selected'] ? 'checked="checked" ' : '', '/>
@@ -234,6 +247,7 @@ function template_ban_edit_trigger()
 						<dd>
 							<input type="text" name="hostname" value="', $context['ban_trigger']['hostname']['value'], '" size="44" onfocus="document.getElementById(\'hostname_check\').checked = true;" class="input_text" />
 						</dd>';
+	}
 
 	echo '
 						<dt>

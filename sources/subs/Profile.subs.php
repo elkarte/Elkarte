@@ -8,13 +8,21 @@
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause (see accompanying LICENSE.txt file)
  *
  * This file contains code covered by:
- * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * copyright: 2011 Simple Machines (http://www.simplemachines.org)
  *
  * @version 2.0 dev
  *
  */
 
+use BBC\ParserWrapper;
+use ElkArte\Cache\Cache;
+use ElkArte\DataValidator;
+use ElkArte\Errors\ErrorContext;
+use ElkArte\Graphics\Image;
+use ElkArte\MembersList;
+use ElkArte\Notifications;
 use ElkArte\User;
+use ElkArte\Util;
 
 /**
  * Find the ID of the "current" member
@@ -31,22 +39,24 @@ function currentMemberID($fatal = true, $reload_id = false)
 
 	// If we already know who we're dealing with
 	if (isset($memID) && !$reload_id)
-		return $memID;
+	{
+		return (int) $memID;
+	}
 
 	// Did we get the user by name...
 	if (isset($_REQUEST['user']))
 	{
-		$memberResult = \ElkArte\MembersList::load($_REQUEST['user'], true, 'profile');
+		$memberResult = MembersList::load($_REQUEST['user'], true, 'profile');
 	}
 	// ... or by id_member?
 	elseif (!empty($_REQUEST['u']))
 	{
-		$memberResult = \ElkArte\MembersList::load((int) $_REQUEST['u'], false, 'profile');
+		$memberResult = MembersList::load((int) $_REQUEST['u'], false, 'profile');
 	}
 	// If it was just ?action=profile, edit your own profile.
 	else
 	{
-		$memberResult = \ElkArte\MembersList::load(User::$info->id, false, 'profile');
+		$memberResult = MembersList::load(User::$info->id, false, 'profile');
 	}
 
 	// Check if \ElkArte\MembersList::load() has returned a valid result.
@@ -56,15 +66,19 @@ function currentMemberID($fatal = true, $reload_id = false)
 		is_not_guest('', $fatal);
 
 		if ($fatal)
+		{
 			throw new \ElkArte\Exceptions\Exception('not_a_user', false);
+		}
 		else
+		{
 			return false;
+		}
 	}
 
 	// If all went well, we have a valid member ID!
 	list ($memID) = $memberResult;
 
-	return $memID;
+	return (int) $memID;
 }
 
 /**
@@ -78,15 +92,21 @@ function setupProfileContext($fields, $hook = '')
 	global $profile_fields, $context, $cur_profile, $txt;
 
 	if (!empty($hook))
+	{
 		call_integration_hook('integrate_' . $hook . '_profile_fields', array(&$fields));
+	}
 
 	// Make sure we have this!
 	loadProfileFields(true);
 
 	// First check for any linked sets.
 	foreach ($profile_fields as $key => $field)
+	{
 		if (isset($field['link_with']) && in_array($field['link_with'], $fields))
+		{
 			$fields[] = $key;
+		}
+	}
 
 	// Some default bits.
 	$context['profile_prehtml'] = '';
@@ -104,17 +124,23 @@ function setupProfileContext($fields, $hook = '')
 
 			// Does it have a preload and does that preload succeed?
 			if (isset($cur_field['preload']) && !$cur_field['preload']())
+			{
 				continue;
+			}
 
 			// If this is anything but complex we need to do more cleaning!
 			if ($cur_field['type'] !== 'callback' && $cur_field['type'] !== 'hidden')
 			{
 				if (!isset($cur_field['label']))
+				{
 					$cur_field['label'] = isset($txt[$field]) ? $txt[$field] : $field;
+				}
 
 				// Everything has a value!
 				if (!isset($cur_field['value']))
+				{
 					$cur_field['value'] = isset($cur_profile[$field]) ? $cur_profile[$field] : '';
+				}
 
 				// Any input attributes?
 				$cur_field['input_attr'] = !empty($cur_field['input_attr']) ? implode(',', $cur_field['input_attr']) : '';
@@ -122,21 +148,33 @@ function setupProfileContext($fields, $hook = '')
 
 			// Was there an error with this field on posting?
 			if (isset($context['post_errors'][$field]))
+			{
 				$cur_field['is_error'] = true;
+			}
 
 			// Any javascript stuff?
 			if (!empty($cur_field['js_submit']))
+			{
 				$context['profile_onsubmit_javascript'] .= $cur_field['js_submit'];
+			}
 			if (!empty($cur_field['js']))
+			{
 				theme()->addInlineJavascript($cur_field['js']);
+			}
 			if (!empty($cur_field['js_load']))
+			{
 				loadJavascriptFile($cur_field['js_load']);
+			}
 
 			// Any template stuff?
 			if (!empty($cur_field['prehtml']))
+			{
 				$context['profile_prehtml'] .= $cur_field['prehtml'];
+			}
 			if (!empty($cur_field['posthtml']))
+			{
 				$context['profile_posthtml'] .= $cur_field['posthtml'];
+			}
 
 			// Finally put it into context?
 			if ($cur_field['type'] !== 'hidden')
@@ -210,17 +248,17 @@ function loadCustomFields($memID, $area = 'summary', array $custom_fields = arra
 	);
 	$context['custom_fields'] = array();
 	$context['custom_fields_required'] = false;
-	$bbc_parser = \BBC\ParserWrapper::instance();
+	$bbc_parser = ParserWrapper::instance();
 	while ($row = $db->fetch_assoc($request))
 	{
 		// Shortcut.
-		$options = \ElkArte\MembersList::get($memID)->options;
+		$options = MembersList::get($memID)->options;
 		$value = isset($options[$row['col_name']]) ? $options[$row['col_name']] : $row['default_value'];
 
 		// If this was submitted already then make the value the posted version.
 		if (!empty($custom_fields) && isset($custom_fields[$row['col_name']]))
 		{
-			$value = \ElkArte\Util::htmlspecialchars($custom_fields[$row['col_name']]);
+			$value = Util::htmlspecialchars($custom_fields[$row['col_name']]);
 			if (in_array($row['field_type'], array('select', 'radio')))
 			{
 				$options = explode(',', $row['field_options']);
@@ -288,10 +326,14 @@ function loadCustomFields($memID, $area = 'summary', array $custom_fields = arra
 
 		// Parse BBCode
 		if ($row['bbc'])
+		{
 			$output_html = $bbc_parser->parseCustomFields($output_html);
+		}
 		// Allow for newlines at least
 		elseif ($row['field_type'] === 'textarea')
+		{
 			$output_html = strtr($output_html, array("\n" => '<br />'));
+		}
 
 		// Enclosing the user input within some other text?
 		if (!empty($row['enclose']) && !empty($output_html))
@@ -347,7 +389,9 @@ function loadProfileFields($force_reload = false)
 
 	// Don't load this twice!
 	if (!empty($profile_fields) && !$force_reload)
+	{
 		return;
+	}
 
 	/**
 	 * This horrific array defines all the profile fields in the whole world!
@@ -427,16 +471,23 @@ function loadProfileFields($force_reload = false)
 				if (isset($_POST['bday2'], $_POST['bday3']) && $value > 0 && $_POST['bday2'] > 0)
 				{
 					// Set to blank?
-					if ((int) $_POST['bday3'] == 1 && (int) $_POST['bday2'] == 1 && (int) $value == 1)
+					if ((int) $_POST['bday3'] === 1 && (int) $_POST['bday2'] === 1 && (int) $value === 1)
+					{
 						$value = '0001-01-01';
+					}
 					else
+					{
 						$value = checkdate($value, $_POST['bday2'], $_POST['bday3'] < 4 ? 4 : $_POST['bday3']) ? sprintf('%04d-%02d-%02d', $_POST['bday3'] < 4 ? 4 : $_POST['bday3'], $_POST['bday1'], $_POST['bday2']) : '0001-01-01';
+					}
 				}
 				else
+				{
 					$value = '0001-01-01';
+				}
 
 				$profile_vars['birthdate'] = $value;
 				$cur_profile['birthdate'] = $value;
+
 				return false;
 			},
 		),
@@ -451,11 +502,13 @@ function loadProfileFields($force_reload = false)
 				if (preg_match('/(\d{4})[\-\., ](\d{2})[\-\., ](\d{2})/', $value, $dates) === 1)
 				{
 					$value = checkdate($dates[2], $dates[3], $dates[1] < 4 ? 4 : $dates[1]) ? sprintf('%04d-%02d-%02d', $dates[1] < 4 ? 4 : $dates[1], $dates[2], $dates[3]) : '0001-01-01';
+
 					return true;
 				}
 				else
 				{
 					$value = empty($cur_profile['birthdate']) ? '0001-01-01' : $cur_profile['birthdate'];
+
 					return false;
 				}
 			},
@@ -473,13 +526,18 @@ function loadProfileFields($force_reload = false)
 				if (($value = strtotime($value)) === -1)
 				{
 					$value = $cur_profile['date_registered'];
+
 					return $txt['invalid_registration'] . ' ' . strftime('%d %b %Y ' . (strpos(User::$info->time_format, '%H') !== false ? '%I:%M:%S %p' : '%H:%M:%S'), forum_time(false));
 				}
 				// As long as it doesn't equal "N/A"...
 				elseif ($value != $txt['not_applicable'] && $value != strtotime(strftime('%Y-%m-%d', $cur_profile['date_registered'] + (User::$info->time_offset + $modSettings['time_offset']) * 3600)))
-					$value = $value - (User::$info->time_offset + $modSettings['time_offset']) * 3600;
+				{
+					$value -= (User::$info->time_offset + $modSettings['time_offset']) * 3600;
+				}
 				else
+				{
 					$value = $cur_profile['date_registered'];
+				}
 
 				return true;
 			},
@@ -493,8 +551,10 @@ function loadProfileFields($force_reload = false)
 			'input_validate' => function (&$value) {
 				global $context, $old_profile, $profile_vars, $modSettings;
 
-				if (strtolower($value) == strtolower($old_profile['email_address']))
+				if (strtolower($value) === strtolower($old_profile['email_address']))
+				{
 					return false;
+				}
 
 				$isValid = profileValidateEmail($value, $context['id_member']);
 
@@ -514,7 +574,7 @@ function loadProfileFields($force_reload = false)
 		),
 		'hide_email' => array(
 			'type' => 'check',
-			'value' => empty($cur_profile['hide_email']) ? true : false,
+			'value' => empty($cur_profile['hide_email']),
 			'label' => $txt['allow_user_email'],
 			'permission' => 'profile_identity',
 			'input_validate' => function (&$value) {
@@ -559,10 +619,12 @@ function loadProfileFields($force_reload = false)
 					'id' => $cur_profile['id_theme'],
 					'name' => empty($cur_profile['id_theme']) ? $txt['theme_forum_default'] : $name
 				);
+
 				return true;
 			},
 			'input_validate' => function (&$value) {
 				$value = (int) $value;
+
 				return true;
 			},
 		),
@@ -580,6 +642,7 @@ function loadProfileFields($force_reload = false)
 					$profile_vars['karma_bad'] = $_POST['karma_bad'] != '' ? (int) $_POST['karma_bad'] : 0;
 					$cur_profile['karma_bad'] = $_POST['karma_bad'] != '' ? (int) $_POST['karma_bad'] : 0;
 				}
+
 				return true;
 			},
 			'preload' => function () {
@@ -611,12 +674,16 @@ function loadProfileFields($force_reload = false)
 				if (isset($context['profile_languages'][$value]))
 				{
 					if ($context['user']['is_owner'] && empty($context['password_auth_failed']))
+					{
 						$_SESSION['language'] = $value;
+					}
+
 					return true;
 				}
 				else
 				{
 					$value = $cur_profile['lngfile'];
+
 					return false;
 				}
 			},
@@ -651,23 +718,28 @@ function loadProfileFields($force_reload = false)
 					}
 					elseif ($value !== null)
 					{
-						$errors = \ElkArte\Errors\ErrorContext::context('change_username', 0);
+						$errors = ErrorContext::context('change_username', 0);
 
 						validateUsername($context['id_member'], $value, 'change_username');
 
 						// No errors we can proceed normally
 						if (!$errors->hasErrors())
+						{
 							updateMemberData($context['id_member'], array('member_name' => $value));
+						}
 						else
 						{
 							// If there are "important" errors and you are not an admin: log the first error
 							// Otherwise grab all of them and do not log anything
 							$error_severity = $errors->hasErrors(1) && User::$info->is_admin === false ? 1 : null;
 							foreach ($errors->prepareErrors($error_severity) as $error)
+							{
 								throw new \ElkArte\Exceptions\Exception($error, $error_severity === null ? false : 'general');
+							}
 						}
 					}
 				}
+
 				return false;
 			},
 		),
@@ -686,11 +758,15 @@ function loadProfileFields($force_reload = false)
 
 				// If we didn't try it then ignore it!
 				if ($value == '')
+				{
 					return false;
+				}
 
 				// Do the two entries for the password even match?
-				if (!isset($_POST['passwrd2']) || $value != $_POST['passwrd2'])
+				if (!isset($_POST['passwrd2']) || $value !== $_POST['passwrd2'])
+				{
 					return 'bad_new_password';
+				}
 
 				// Let's get the validation function into play...
 				require_once(SUBSDIR . '/Auth.subs.php');
@@ -698,11 +774,14 @@ function loadProfileFields($force_reload = false)
 
 				// Were there errors?
 				if ($passwordErrors !== null)
+				{
 					return 'password_' . $passwordErrors;
+				}
 
 				// Set up the new password variable... ready for storage.
 				require_once(SUBSDIR . '/Auth.subs.php');
 				$value = validateLoginPassword($value, '', $cur_profile['member_name'], true);
+
 				return true;
 			},
 		),
@@ -717,7 +796,7 @@ function loadProfileFields($force_reload = false)
 		),
 		'enable_otp' => array(
 			'type' => 'check',
-			'value' => empty($cur_profile['enable_otp']) ? false : true,
+			'value' => !empty($cur_profile['enable_otp']),
 			'subtext' => $txt['otp_enabled_help'],
 			'label' => $txt['otp_enabled'],
 			'permission' => 'profile_identity',
@@ -787,9 +866,14 @@ function loadProfileFields($force_reload = false)
 			'permission' => 'moderate_forum',
 			'input_validate' => function (&$value) {
 				if (!is_numeric($value))
+				{
 					return 'digits_only';
+				}
 				else
+				{
 					$value = $value != '' ? strtr($value, array(',' => '', '.' => '', ' ' => '')) : 0;
+				}
+
 				return true;
 			},
 		),
@@ -806,16 +890,23 @@ function loadProfileFields($force_reload = false)
 
 				$value = trim(preg_replace('~[\s]~u', ' ', $value));
 
-				if (trim($value) == '')
+				if (trim($value) === '')
+				{
 					return 'no_name';
-				elseif (\ElkArte\Util::strlen($value) > 60)
+				}
+				elseif (Util::strlen($value) > 60)
+				{
 					return 'name_too_long';
+				}
 				elseif ($cur_profile['real_name'] != $value)
 				{
 					require_once(SUBSDIR . '/Members.subs.php');
 					if (isReservedName($value, $context['id_member']))
+					{
 						return 'name_taken';
+					}
 				}
+
 				return true;
 			},
 		),
@@ -851,11 +942,13 @@ function loadProfileFields($force_reload = false)
 					else
 					{
 						$value = $member['secret_answer'];
+
 						// We have to tell the code is an error otherwise an empty value will go into the db
 						return false;
 					}
 				}
 				$value = $value != '' ? md5($value) : '';
+
 				return true;
 			},
 		),
@@ -881,7 +974,9 @@ function loadProfileFields($force_reload = false)
 			'preload' => function () {
 				global $modSettings, $context, $txt, $cur_profile;
 
-				$context['member']['smiley_set']['id'] = empty($cur_profile['smiley_set']) ? '' : $cur_profile['smiley_set'];
+				$smiley_set = ['id' => '', 'name' => ''];
+
+				$smiley_set['id'] = empty($cur_profile['smiley_set']) ? '' : $cur_profile['smiley_set'];
 				$context['smiley_sets'] = explode(',', 'none,,' . $modSettings['smiley_sets_known']);
 				$set_names = explode("\n", $txt['smileys_none'] . "\n" . $txt['smileys_forum_board_default'] . "\n" . $modSettings['smiley_sets_names']);
 				foreach ($context['smiley_sets'] as $i => $set)
@@ -889,12 +984,20 @@ function loadProfileFields($force_reload = false)
 					$context['smiley_sets'][$i] = array(
 						'id' => htmlspecialchars($set, ENT_COMPAT, 'UTF-8'),
 						'name' => htmlspecialchars($set_names[$i], ENT_COMPAT, 'UTF-8'),
-						'selected' => $set == $context['member']['smiley_set']['id']
+						'selected' => $set == $smiley_set['id']
 					);
 
 					if ($context['smiley_sets'][$i]['selected'])
-						$context['member']['smiley_set']['name'] = $set_names[$i];
+					{
+						$smiley_set['name'] = $set_names[$i];
+					}
 				}
+
+				$context['member']['smiley_set'] = [
+					'id' => $smiley_set['id'],
+					'name' => $smiley_set['name']
+				];
+
 				return true;
 			},
 			'input_validate' => function (&$value) {
@@ -902,7 +1005,10 @@ function loadProfileFields($force_reload = false)
 
 				$smiley_sets = explode(',', $modSettings['smiley_sets_known']);
 				if (!in_array($value, $smiley_sets) && $value !== 'none')
+				{
 					$value = '';
+				}
+
 				return true;
 			},
 		),
@@ -920,7 +1026,9 @@ function loadProfileFields($force_reload = false)
 				// Can they disable censoring?
 				$context['allow_no_censored'] = false;
 				if (User::$info->is_admin || $context['user']['is_owner'])
+				{
 					$context['allow_no_censored'] = allowedTo('disable_censor');
+				}
 
 				return true;
 			},
@@ -945,6 +1053,7 @@ function loadProfileFields($force_reload = false)
 				$context['current_forum_time'] = standardTime(time() - User::$info->time_offset * 3600, false);
 				$context['current_forum_time_js'] = strftime('%Y,' . ((int) strftime('%m', time() + $modSettings['time_offset'] * 3600) - 1) . ',%d,%H,%M,%S', time() + $modSettings['time_offset'] * 3600);
 				$context['current_forum_time_hour'] = (int) strftime('%H', forum_time(false));
+
 				return true;
 			},
 		),
@@ -956,6 +1065,7 @@ function loadProfileFields($force_reload = false)
 				global $context, $cur_profile;
 
 				$context['member']['time_offset'] = $cur_profile['time_offset'];
+
 				return true;
 			},
 			'input_validate' => function (&$value) {
@@ -963,7 +1073,9 @@ function loadProfileFields($force_reload = false)
 				$value = (float) strtr($value, ',', '.');
 
 				if ($value < -23.5 || $value > 23.5)
+				{
 					return 'bad_offset';
+				}
 
 				return true;
 			},
@@ -977,8 +1089,10 @@ function loadProfileFields($force_reload = false)
 			'permission' => 'profile_title',
 			'enabled' => !empty($modSettings['titlesEnable']),
 			'input_validate' => function (&$value) {
-				if (\ElkArte\Util::strlen($value) > 50)
+				if (Util::strlen($value) > 50)
+				{
 					return 'user_title_too_long';
+				}
 
 				return true;
 			},
@@ -1002,7 +1116,10 @@ function loadProfileFields($force_reload = false)
 
 				$value = addProtocol($value, array('http://', 'https://', 'ftp://', 'ftps://'));
 				if (strlen($value) < 8)
+				{
 					$value = '';
+				}
+
 				return true;
 			},
 			'link_with' => 'website',
@@ -1021,15 +1138,21 @@ function loadProfileFields($force_reload = false)
 	{
 		// Do we have permission to do this?
 		if (isset($field['permission']) && !allowedTo(($context['user']['is_owner'] ? array($field['permission'] . '_own', $field['permission'] . '_any') : $field['permission'] . '_any')) && !allowedTo($field['permission']))
+		{
 			unset($profile_fields[$key]);
+		}
 
 		// Is it enabled?
 		if (isset($field['enabled']) && !$field['enabled'])
+		{
 			unset($profile_fields[$key]);
+		}
 
 		// Is it specifically disabled?
 		if (in_array($key, $disabled_fields) || (isset($field['link_with']) && in_array($field['link_with'], $disabled_fields)))
+		{
 			unset($profile_fields[$key]);
+		}
 	}
 }
 
@@ -1045,7 +1168,9 @@ function saveProfileFields($fields, $hook)
 	global $profile_fields, $profile_vars, $context, $old_profile, $post_errors, $cur_profile;
 
 	if (!empty($hook))
+	{
 		call_integration_hook('integrate_' . $hook . '_profile_fields', array(&$fields));
+	}
 
 	// Load them up.
 	loadProfileFields();
@@ -1057,7 +1182,9 @@ function saveProfileFields($fields, $hook)
 	// - by default just to reload their settings
 	$context['profile_execute_on_save'] = array();
 	if ($context['user']['is_owner'])
+	{
 		$context['profile_execute_on_save']['reload_user'] = 'profileReloadUser';
+	}
 
 	// Assume we log nothing.
 	$context['log_changes'] = array();
@@ -1073,7 +1200,9 @@ function saveProfileFields($fields, $hook)
 		$field = $profile_fields[$key];
 
 		if (!isset($_POST[$key]) || !empty($field['is_dummy']) || (isset($_POST['preview_signature']) && $key === 'signature'))
+		{
 			continue;
+		}
 
 		// What gets updated?
 		$db_key = isset($field['save_key']) ? $field['save_key'] : $key;
@@ -1104,11 +1233,17 @@ function saveProfileFields($fields, $hook)
 
 		// Finally, clean up certain types.
 		if ($field['cast_type'] === 'int')
+		{
 			$_POST[$key] = (int) $_POST[$key];
+		}
 		elseif ($field['cast_type'] === 'float')
+		{
 			$_POST[$key] = (float) $_POST[$key];
+		}
 		elseif ($field['cast_type'] === 'check')
+		{
 			$_POST[$key] = !empty($_POST[$key]) ? 1 : 0;
+		}
 
 		// If we got here we're doing OK.
 		if ($field['type'] !== 'hidden' && (!isset($old_profile[$key]) || $_POST[$key] != $old_profile[$key]))
@@ -1121,10 +1256,12 @@ function saveProfileFields($fields, $hook)
 
 			// Are we logging it?
 			if (!empty($field['log_change']) && isset($old_profile[$key]))
+			{
 				$context['log_changes'][$key] = array(
 					'previous' => $old_profile[$key],
 					'new' => $_POST[$key],
 				);
+			}
 		}
 
 		// Logging group changes are a bit different...
@@ -1158,9 +1295,13 @@ function saveProfileFields($fields, $hook)
 					foreach ($groups as $id => $group)
 					{
 						if (isset($context['member_groups'][$group]))
+						{
 							$additional_groups[$type][$id] = $context['member_groups'][$group]['name'];
+						}
 						else
+						{
 							unset($additional_groups[$type][$id]);
+						}
 					}
 					$additional_groups[$type] = implode(', ', $additional_groups[$type]);
 				}
@@ -1172,15 +1313,21 @@ function saveProfileFields($fields, $hook)
 
 	// @todo Temporary
 	if ($context['user']['is_owner'])
+	{
 		$changeOther = allowedTo(array('profile_extra_any', 'profile_extra_own'));
+	}
 	else
+	{
 		$changeOther = allowedTo('profile_extra_any');
+	}
 
 	if ($changeOther && empty($post_errors))
 	{
 		makeThemeChanges($context['id_member'], isset($_POST['id_theme']) ? (int) $_POST['id_theme'] : $old_profile['id_theme']);
 		if (!empty($_REQUEST['sa']))
+		{
 			makeCustomFieldChanges($context['id_member'], $_REQUEST['sa'], false);
+		}
 	}
 
 	// Free memory!
@@ -1202,10 +1349,14 @@ function profileValidateEmail($email, $memID = 0)
 	// Check the name and email for validity.
 	$check = array();
 	$check['email'] = strtr($email, array('&#039;' => '\''));
-	if (\ElkArte\DataValidator::is_valid($check, array('email' => 'valid_email|required'), array('email' => 'trim')))
+	if (DataValidator::is_valid($check, array('email' => 'valid_email|required'), array('email' => 'trim')))
+	{
 		$email = $check['email'];
+	}
 	else
+	{
 		return empty($check['email']) ? 'no_email' : 'bad_email';
+	}
 
 	// Email addresses should be and stay unique.
 	$request = $db->query('', '
@@ -1237,13 +1388,17 @@ function saveProfileChanges(&$profile_vars, $memID)
 	global $context;
 
 	// These make life easier....
-	$old_id_theme = \ElkArte\MembersList::get($memID)->id_theme;
+	$old_id_theme = MembersList::get($memID)->id_theme;
 
 	// Permissions...
 	if ($context['user']['is_owner'])
+	{
 		$changeOther = allowedTo(array('profile_extra_any', 'profile_extra_own'));
+	}
 	else
+	{
 		$changeOther = allowedTo('profile_extra_any');
+	}
 
 	// Arrays of all the changes - makes things easier.
 	$profile_bools = array(
@@ -1256,8 +1411,7 @@ function saveProfileChanges(&$profile_vars, $memID)
 		'notify_types',
 	);
 
-	$profile_floats = array(
-	);
+	$profile_floats = array();
 
 	$profile_strings = array(
 		'buddy_list',
@@ -1267,7 +1421,9 @@ function saveProfileChanges(&$profile_vars, $memID)
 	call_integration_hook('integrate_save_profile_changes', array(&$profile_bools, &$profile_ints, &$profile_floats, &$profile_strings));
 
 	if (isset($_POST['sa']) && $_POST['sa'] === 'ignoreboards' && empty($_POST['ignore_brd']))
+	{
 		$_POST['ignore_brd'] = array();
+	}
 
 	// Whatever it is set to is a dirty filthy thing.  Kinda like our minds.
 	unset($_POST['ignore_boards']);
@@ -1275,15 +1431,21 @@ function saveProfileChanges(&$profile_vars, $memID)
 	if (isset($_POST['ignore_brd']))
 	{
 		if (!is_array($_POST['ignore_brd']))
+		{
 			$_POST['ignore_brd'] = array($_POST['ignore_brd']);
+		}
 
 		foreach ($_POST['ignore_brd'] as $k => $d)
 		{
 			$d = (int) $d;
-			if ($d != 0)
+			if ($d !== 0)
+			{
 				$_POST['ignore_brd'][$k] = $d;
+			}
 			else
+			{
 				unset($_POST['ignore_brd'][$k]);
+			}
 		}
 		$_POST['ignore_boards'] = implode(',', $_POST['ignore_brd']);
 		unset($_POST['ignore_brd']);
@@ -1295,20 +1457,38 @@ function saveProfileChanges(&$profile_vars, $memID)
 		makeThemeChanges($memID, isset($_POST['id_theme']) ? (int) $_POST['id_theme'] : $old_id_theme);
 		makeNotificationChanges($memID);
 		if (!empty($_REQUEST['sa']))
+		{
 			makeCustomFieldChanges($memID, $_REQUEST['sa'], false);
+		}
 
 		foreach ($profile_bools as $var)
+		{
 			if (isset($_POST[$var]))
+			{
 				$profile_vars[$var] = empty($_POST[$var]) ? '0' : '1';
+			}
+		}
 		foreach ($profile_ints as $var)
+		{
 			if (isset($_POST[$var]))
+			{
 				$profile_vars[$var] = $_POST[$var] != '' ? (int) $_POST[$var] : '';
+			}
+		}
 		foreach ($profile_floats as $var)
+		{
 			if (isset($_POST[$var]))
+			{
 				$profile_vars[$var] = (float) $_POST[$var];
+			}
+		}
 		foreach ($profile_strings as $var)
+		{
 			if (isset($_POST[$var]))
+			{
 				$profile_vars[$var] = $_POST[$var];
+			}
+		}
 	}
 }
 
@@ -1346,12 +1526,15 @@ function makeThemeChanges($memID, $id_theme)
 	);
 
 	// Can't change reserved vars.
-	if ((isset($_POST['options']) && count(array_intersect(array_keys($_POST['options']), $reservedVars)) != 0) || (isset($_POST['default_options']) && count(array_intersect(array_keys($_POST['default_options']), $reservedVars)) != 0))
+	if ((isset($_POST['options']) && count(array_intersect(array_keys($_POST['options']), $reservedVars)) !== 0) || (isset($_POST['default_options']) && count(array_intersect(array_keys($_POST['default_options']), $reservedVars)) !== 0))
+	{
 		throw new \ElkArte\Exceptions\Exception('no_access', false);
+	}
 
 	// Don't allow any overriding of custom fields with default or non-default options.
 	$request = $db->query('', '
-		SELECT col_name
+		SELECT 
+			col_name
 		FROM {db_prefix}custom_fields
 		WHERE active = {int:is_active}',
 		array(
@@ -1360,7 +1543,9 @@ function makeThemeChanges($memID, $id_theme)
 	);
 	$custom_fields = array();
 	while ($row = $db->fetch_assoc($request))
+	{
 		$custom_fields[] = $row['col_name'];
+	}
 	$db->free_result($request);
 
 	// These are the theme changes...
@@ -1370,14 +1555,20 @@ function makeThemeChanges($memID, $id_theme)
 		foreach ($_POST['options'] as $opt => $val)
 		{
 			if (in_array($opt, $custom_fields))
+			{
 				continue;
+			}
 
 			// These need to be controlled.
 			if ($opt === 'topics_per_page' || $opt === 'messages_per_page')
+			{
 				$val = max(0, min($val, 50));
+			}
 			// We don't set this per theme anymore.
 			elseif ($opt === 'allow_no_censored')
+			{
 				continue;
+			}
 
 			$themeSetArray[] = array($id_theme, $memID, $opt, is_array($val) ? implode(',', $val) : $val);
 		}
@@ -1389,14 +1580,20 @@ function makeThemeChanges($memID, $id_theme)
 		foreach ($_POST['default_options'] as $opt => $val)
 		{
 			if (in_array($opt, $custom_fields))
+			{
 				continue;
+			}
 
 			// These need to be controlled.
 			if ($opt === 'topics_per_page' || $opt === 'messages_per_page')
+			{
 				$val = max(0, min($val, 50));
+			}
 			// Only let admins and owners change the censor.
 			elseif ($opt === 'allow_no_censored' && User::$info->is_admin && !$context['user']['is_owner'])
+			{
 				continue;
+			}
 
 			$themeSetArray[] = array(1, $memID, $opt, is_array($val) ? implode(',', $val) : $val);
 			$erase_options[] = $opt;
@@ -1408,14 +1605,20 @@ function makeThemeChanges($memID, $id_theme)
 	{
 		require_once(SUBSDIR . '/Themes.subs.php');
 		if (!empty($themeSetArray))
+		{
 			updateThemeOptions($themeSetArray);
+		}
 
 		if (!empty($erase_options))
+		{
 			removeThemeOptions('custom', $memID, $erase_options);
+		}
 
 		$themes = explode(',', $modSettings['knownThemes']);
 		foreach ($themes as $t)
-			\ElkArte\Cache\Cache::instance()->remove('theme_settings-' . $t . ':' . $memID);
+		{
+			Cache::instance()->remove('theme_settings-' . $t . ':' . $memID);
+		}
 	}
 }
 
@@ -1438,7 +1641,9 @@ function makeNotificationChanges($memID)
 				$to_save[$mention] = (int) $_POST['notify'][$mention]['method'];
 			}
 			else
+			{
 				$to_save[$mention] = 0;
+			}
 		}
 		saveUserNotificationsPreferences($memID, $to_save);
 	}
@@ -1447,11 +1652,15 @@ function makeNotificationChanges($memID)
 	if (isset($_POST['edit_notify_boards']))
 	{
 		if (!isset($_POST['notify_boards']))
+		{
 			$_POST['notify_boards'] = array();
+		}
 
 		// Make sure only integers are added/deleted.
 		foreach ($_POST['notify_boards'] as $index => $id)
+		{
 			$_POST['notify_boards'][$index] = (int) $id;
+		}
 
 		// id_board = 0 is reserved for topic notifications only
 		$notification_wanted = array_diff($_POST['notify_boards'], array(0));
@@ -1469,12 +1678,15 @@ function makeNotificationChanges($memID)
 		);
 		$notification_current = array();
 		while ($row = $db->fetch_assoc($request))
+		{
 			$notification_current[] = $row['id_board'];
+		}
 		$db->free_result($request);
 
 		// And remove what they no longer want
 		$notification_deletes = array_diff($notification_current, $notification_wanted);
 		if (!empty($notification_deletes))
+		{
 			$db->query('', '
 				DELETE FROM {db_prefix}log_notify
 				WHERE id_board IN ({array_int:board_list})
@@ -1484,19 +1696,24 @@ function makeNotificationChanges($memID)
 					'selected_member' => $memID,
 				)
 			);
+		}
 
 		// Now add in what they do want
 		$notification_inserts = array();
 		foreach ($notification_wanted as $id)
+		{
 			$notification_inserts[] = array($memID, $id);
+		}
 
 		if (!empty($notification_inserts))
+		{
 			$db->insert('ignore',
 				'{db_prefix}log_notify',
 				array('id_member' => 'int', 'id_board' => 'int'),
 				$notification_inserts,
 				array('id_member', 'id_board')
 			);
+		}
 	}
 
 	// We are editing topic notifications......
@@ -1504,7 +1721,9 @@ function makeNotificationChanges($memID)
 	{
 		$edit_notify_topics = array();
 		foreach ($_POST['notify_topics'] as $index => $id)
+		{
 			$edit_notify_topics[$index] = (int) $id;
+		}
 
 		// Make sure there are no zeros left.
 		$edit_notify_topics = array_diff($edit_notify_topics, array(0));
@@ -1535,13 +1754,16 @@ function makeCustomFieldChanges($memID, $area, $sanitize = true)
 	$db = database();
 
 	if ($sanitize && isset($_POST['customfield']))
+	{
 		$_POST['customfield'] = htmlspecialchars__recursive($_POST['customfield']);
+	}
 
 	$where = $area === 'register' ? 'show_reg != 0' : 'show_profile = {string:area}';
 
 	// Load the fields we are saving too - make sure we save valid data (etc).
 	$request = $db->query('', '
-		SELECT col_name, field_name, field_desc, field_type, field_length, field_options, default_value, show_reg, mask, private
+		SELECT 
+			col_name, field_name, field_desc, field_type, field_length, field_options, default_value, show_reg, mask, private
 		FROM {db_prefix}custom_fields
 		WHERE ' . $where . '
 			AND active = {int:is_active}',
@@ -1561,11 +1783,15 @@ function makeCustomFieldChanges($memID, $area, $sanitize = true)
 			- The area isn't registration, and if it is that the field is not supposed to be shown there.
 		*/
 		if ($row['private'] != 0 && !allowedTo('admin_forum') && ($memID != User::$info->id || $row['private'] != 2) && ($area !== 'register' || $row['show_reg'] == 0))
+		{
 			continue;
+		}
 
 		// Validate the user data.
 		if ($row['field_type'] === 'check')
+		{
 			$value = isset($_POST['customfield'][$row['col_name']]) ? 1 : 0;
+		}
 		elseif (in_array($row['field_type'], array('radio', 'select')))
 		{
 			$value = $row['default_value'];
@@ -1592,7 +1818,7 @@ function makeCustomFieldChanges($memID, $area, $sanitize = true)
 				switch ($is_valid)
 				{
 					case 'custom_field_too_long':
-						$value = \ElkArte\Util::substr($value, 0, $row['field_length']);
+						$value = Util::substr($value, 0, $row['field_length']);
 						break;
 					case 'custom_field_invalid_email':
 					case 'custom_field_inproper_format':
@@ -1602,10 +1828,12 @@ function makeCustomFieldChanges($memID, $area, $sanitize = true)
 			}
 
 			if ($row['mask'] === 'number')
+			{
 				$value = (int) $value;
+			}
 		}
 
-		$options = \ElkArte\MembersList::get($memID)->options;
+		$options = MembersList::get($memID)->options;
 		// Did it change or has it been set?
 		if ((!isset($options[$row['col_name']]) && !empty($value)) || (isset($options[$row['col_name']]) && $options[$row['col_name']] !== $value))
 		{
@@ -1647,7 +1875,9 @@ function makeCustomFieldChanges($memID, $area, $sanitize = true)
 		);
 
 		if (!empty($log_changes) && !empty($modSettings['modlog_enabled']))
+		{
 			logActions($log_changes);
+		}
 	}
 }
 
@@ -1666,19 +1896,27 @@ function makeCustomFieldChanges($memID, $area, $sanitize = true)
 function isCustomFieldValid($field, $value)
 {
 	// Is it too long?
-	if ($field['field_length'] && $field['field_length'] < \ElkArte\Util::strlen($value))
+	if ($field['field_length'] && $field['field_length'] < Util::strlen($value))
+	{
 		return 'custom_field_too_long';
+	}
 
 	// Any masks to apply?
 	if ($field['field_type'] === 'text' && !empty($field['mask']) && $field['mask'] !== 'none')
 	{
 		// @todo We never error on this - just ignore it at the moment...
 		if ($field['mask'] === 'email' && !isValidEmail($value))
+		{
 			return 'custom_field_invalid_email';
+		}
 		elseif ($field['mask'] === 'number' && preg_match('~[^\d]~', $value))
+		{
 			return 'custom_field_not_number';
+		}
 		elseif (substr($field['mask'], 0, 5) === 'regex' && trim($value) !== '' && preg_match(substr($field['mask'], 5), $value) === 0)
+		{
 			return 'custom_field_inproper_format';
+		}
 	}
 
 	return true;
@@ -1695,7 +1933,9 @@ function profileSendActivation()
 
 	// Shouldn't happen but just in case.
 	if (empty($profile_vars['email_address']))
+	{
 		return;
+	}
 
 	$replacements = array(
 		'ACTIVATIONLINK' => $scripturl . '?action=register;sa=activate;u=' . $context['id_member'] . ';code=' . $old_profile['validation_code'],
@@ -1714,12 +1954,14 @@ function profileSendActivation()
 	$_SESSION['login_' . $cookiename] = serialize(array(0, '', 0));
 
 	if (isset($_COOKIE[$cookiename]))
+	{
 		$_COOKIE[$cookiename] = '';
+	}
 
 	loadUserSettings();
 
-	\ElkArte\User::$info['is_logged'] = $context['user']['is_logged'] = false;
-	\ElkArte\User::$info['is_guest'] = $context['user']['is_guest'] = true;
+	User::$info['is_logged'] = $context['user']['is_logged'] = false;
+	User::$info['is_guest'] = $context['user']['is_guest'] = true;
 
 	// Send them to the done-with-registration-login screen.
 	theme()->getTemplates()->load('Register');
@@ -1735,6 +1977,7 @@ function profileSendActivation()
 
 /**
  * Load key signature context data.
+ *
  * @return boolean
  */
 function profileLoadSignatureData()
@@ -1760,16 +2003,24 @@ function profileLoadSignatureData()
 	// Warning message for signature image limits?
 	$context['signature_warning'] = '';
 	if ($context['signature_limits']['max_image_width'] && $context['signature_limits']['max_image_height'])
+	{
 		$context['signature_warning'] = sprintf($txt['profile_error_signature_max_image_size'], $context['signature_limits']['max_image_width'], $context['signature_limits']['max_image_height']);
+	}
 	elseif ($context['signature_limits']['max_image_width'] || $context['signature_limits']['max_image_height'])
+	{
 		$context['signature_warning'] = sprintf($txt['profile_error_signature_max_image_' . ($context['signature_limits']['max_image_width'] ? 'width' : 'height')], $context['signature_limits'][$context['signature_limits']['max_image_width'] ? 'max_image_width' : 'max_image_height']);
+	}
 
 	$context['show_spellchecking'] = !empty($modSettings['enableSpellChecking']) && function_exists('pspell_new');
 	if ($context['show_spellchecking'])
+	{
 		loadJavascriptFile('spellcheck.js', array('defer' => true));
+	}
 
 	if (empty($context['do_preview']))
+	{
 		$context['member']['signature'] = empty($cur_profile['signature']) ? '' : str_replace(array('<br />', '<', '>', '"', '\''), array("\n", '&lt;', '&gt;', '&quot;', '&#039;'), $cur_profile['signature']);
+	}
 	else
 	{
 		$signature = !empty($_POST['signature']) ? $_POST['signature'] : '';
@@ -1782,12 +2033,14 @@ function profileLoadSignatureData()
 
 		$context['post_errors'][] = 'signature_not_yet_saved';
 		if ($validation !== true && $validation !== false)
+		{
 			$context['post_errors'][] = $validation;
+		}
 
 		$context['member']['signature'] = censor($context['member']['signature']);
 		$context['member']['current_signature'] = $context['member']['signature'];
 		$signature = censor($signature);
-		$bbc_parser = \BBC\ParserWrapper::instance();
+		$bbc_parser = ParserWrapper::instance();
 		$context['member']['signature_preview'] = $bbc_parser->parseSignature($signature, true);
 		$context['member']['signature'] = $_POST['signature'];
 	}
@@ -1811,9 +2064,13 @@ function profileLoadAvatarData()
 
 	// @todo Temporary
 	if ($context['user']['is_owner'])
+	{
 		$allowedChange = allowedTo('profile_set_avatar') && allowedTo(array('profile_extra_any', 'profile_extra_own'));
+	}
 	else
+	{
 		$allowedChange = allowedTo('profile_set_avatar') && allowedTo('profile_extra_any');
+	}
 
 	// Default context.
 	$context['member']['avatar'] += array(
@@ -1822,9 +2079,9 @@ function profileLoadAvatarData()
 		'id_attach' => $cur_profile['id_attach'],
 		'filename' => $cur_profile['filename'],
 		'allow_server_stored' => !empty($modSettings['avatar_stored_enabled']) && $allowedChange,
-		'allow_upload' =>  !empty($modSettings['avatar_upload_enabled']) && $allowedChange,
-		'allow_external' =>  !empty($modSettings['avatar_external_enabled']) && $allowedChange,
-		'allow_gravatar' =>  !empty($modSettings['avatar_gravatar_enabled']) && $allowedChange,
+		'allow_upload' => !empty($modSettings['avatar_upload_enabled']) && $allowedChange,
+		'allow_external' => !empty($modSettings['avatar_external_enabled']) && $allowedChange,
+		'allow_gravatar' => !empty($modSettings['avatar_gravatar_enabled']) && $allowedChange,
 	);
 
 	if ($cur_profile['avatar']['name'] === '' && $cur_profile['id_attach'] > 0 && $context['member']['avatar']['allow_upload'])
@@ -1888,6 +2145,7 @@ function profileLoadAvatarData()
 
 	// Second level selected avatar...
 	$context['avatar_selected'] = substr(strrchr($context['member']['avatar']['server_pic'], '/'), 1);
+
 	return true;
 }
 
@@ -1910,7 +2168,9 @@ function profileLoadGroups()
 	{
 		// Registered member was already taken care before
 		if ($id_group == 0)
+		{
 			continue;
+		}
 
 		$context['member_groups'][$id_group]['is_primary'] = $cur_profile['id_group'] == $id_group;
 		$context['member_groups'][$id_group]['is_additional'] = in_array($id_group, $curGroups);
@@ -1918,7 +2178,7 @@ function profileLoadGroups()
 		$context['member_groups'][$id_group]['can_be_primary'] = $row['hidden'] != 2;
 	}
 
-	$context['member']['group_id'] = \ElkArte\User::$settings['id_group'];
+	$context['member']['group_id'] = User::$settings['id_group'];
 
 	return true;
 }
@@ -1937,12 +2197,14 @@ function profileLoadLanguages()
 
 	// Setup our languages.
 	foreach ($languages as $lang)
+	{
 		$context['profile_languages'][$lang['filename']] = $lang['name'];
+	}
 
 	ksort($context['profile_languages']);
 
 	// Return whether we should proceed with this.
-	return count($context['profile_languages']) > 1 ? true : false;
+	return count($context['profile_languages']) > 1;
 }
 
 /**
@@ -1956,7 +2218,7 @@ function profileReloadUser()
 	if (isset($_POST['passwrd2']) && $_POST['passwrd2'] != '')
 	{
 		require_once(SUBSDIR . '/Auth.subs.php');
-		setLoginCookie(60 * $modSettings['cookieTime'], $context['id_member'], hash('sha256', \ElkArte\Util::strtolower($cur_profile['member_name']) . un_htmlspecialchars($_POST['passwrd2']) . $cur_profile['password_salt']));
+		setLoginCookie(60 * $modSettings['cookieTime'], $context['id_member'], hash('sha256', Util::strtolower($cur_profile['member_name']) . un_htmlspecialchars($_POST['passwrd2']) . $cur_profile['password_salt']));
 	}
 
 	loadUserSettings();
@@ -1990,6 +2252,7 @@ function profileValidateSignature(&$value)
 		if (!empty($sig_limits[2]) && substr_count($unparsed_signature, "\n") >= $sig_limits[2])
 		{
 			$txt['profile_error_signature_max_lines'] = sprintf($txt['profile_error_signature_max_lines'], $sig_limits[2]);
+
 			return 'signature_max_lines';
 		}
 
@@ -1997,22 +2260,26 @@ function profileValidateSignature(&$value)
 		if (!empty($sig_limits[3]) && (substr_count(strtolower($unparsed_signature), '[img') + substr_count(strtolower($unparsed_signature), '<img')) > $sig_limits[3])
 		{
 			$txt['profile_error_signature_max_image_count'] = sprintf($txt['profile_error_signature_max_image_count'], $sig_limits[3]);
+
 			return 'signature_max_image_count';
 		}
 
 		// What about too many smileys!
 		$smiley_parsed = $unparsed_signature;
-		$wrapper = \BBC\ParserWrapper::instance();
+		$wrapper = ParserWrapper::instance();
 		$parser = $wrapper->getSmileyParser();
 		$parser->setEnabled($GLOBALS['user_info']['smiley_set'] !== 'none' && trim($smiley_parsed) !== '');
 		$smiley_parsed = $parser->parseBlock($smiley_parsed);
 
 		$smiley_count = substr_count(strtolower($smiley_parsed), '<img') - substr_count(strtolower($unparsed_signature), '<img');
 		if (!empty($sig_limits[4]) && $sig_limits[4] == -1 && $smiley_count > 0)
+		{
 			return 'signature_allow_smileys';
+		}
 		elseif (!empty($sig_limits[4]) && $sig_limits[4] > 0 && $smiley_count > $sig_limits[4])
 		{
 			$txt['profile_error_signature_max_smileys'] = sprintf($txt['profile_error_signature_max_smileys'], $sig_limits[4]);
+
 			return 'signature_max_smileys';
 		}
 
@@ -2035,17 +2302,26 @@ function profileValidateSignature(&$value)
 
 				// Attempt to allow all sizes of abuse, so to speak.
 				if ($matches[2][$ind] === 'px' && $size > $sig_limits[7])
+				{
 					$limit_broke = $sig_limits[7] . 'px';
+				}
 				elseif ($matches[2][$ind] === 'pt' && $size > ($sig_limits[7] * 0.75))
+				{
 					$limit_broke = ((int) $sig_limits[7] * 0.75) . 'pt';
+				}
 				elseif ($matches[2][$ind] === 'em' && $size > ((float) $sig_limits[7] / 14))
+				{
 					$limit_broke = ((float) $sig_limits[7] / 14) . 'em';
+				}
 				elseif ($matches[2][$ind] !== 'px' && $matches[2][$ind] !== 'pt' && $matches[2][$ind] !== 'em' && $sig_limits[7] < 18)
+				{
 					$limit_broke = 'large';
+				}
 
 				if ($limit_broke)
 				{
 					$txt['profile_error_signature_max_font_size'] = sprintf($txt['profile_error_signature_max_font_size'], $limit_broke);
+
 					return 'signature_max_font_size';
 				}
 			}
@@ -2088,25 +2364,33 @@ function profileValidateSignature(&$value)
 
 					// Does it have predefined restraints? Width first.
 					if ($matches[6][$key])
+					{
 						$matches[2][$key] = $matches[6][$key];
+					}
 
 					if ($matches[2][$key] && $sig_limits[5] && $matches[2][$key] > $sig_limits[5])
 					{
 						$width = $sig_limits[5];
-						$matches[4][$key] = $matches[4][$key] * ($width / $matches[2][$key]);
+						$matches[4][$key] *= $width / $matches[2][$key];
 					}
 					elseif ($matches[2][$key])
+					{
 						$width = $matches[2][$key];
+					}
 
 					// ... and height.
 					if ($matches[4][$key] && $sig_limits[6] && $matches[4][$key] > $sig_limits[6])
 					{
 						$height = $sig_limits[6];
 						if ($width != -1)
-							$width = $width * ($height / $matches[4][$key]);
+						{
+							$width *= $height / $matches[4][$key];
+						}
 					}
 					elseif ($matches[4][$key])
+					{
 						$height = $matches[4][$key];
+					}
 
 					// If the dimensions are still not fixed - we need to check the actual image.
 					if (($width == -1 && $sig_limits[5]) || ($height == -1 && $sig_limits[6]))
@@ -2119,7 +2403,7 @@ function profileValidateSignature(&$value)
 							if ($sizes[0] > $sig_limits[5] && $sig_limits[5])
 							{
 								$width = $sig_limits[5];
-								$sizes[1] = $sizes[1] * ($width / $sizes[0]);
+								$sizes[1] *= $width / $sizes[0];
 							}
 
 							// Too high?
@@ -2127,21 +2411,29 @@ function profileValidateSignature(&$value)
 							{
 								$height = $sig_limits[6];
 								if ($width == -1)
+								{
 									$width = $sizes[0];
-								$width = $width * ($height / $sizes[1]);
+								}
+								$width *= $height / $sizes[1];
 							}
 							elseif ($width != -1)
+							{
 								$height = $sizes[1];
+							}
 						}
 					}
 
 					// Did we come up with some changes? If so remake the string.
 					if ($width != -1 || $height != -1)
+					{
 						$replaces[$image] = '[img' . ($width != -1 ? ' width=' . round($width) : '') . ($height != -1 ? ' height=' . round($height) : '') . ']' . $matches[7][$key] . '[/img]';
+					}
 				}
 
 				if (!empty($replaces))
+				{
 					$value = str_replace(array_keys($replaces), array_values($replaces), $value);
+				}
 			}
 		}
 
@@ -2157,6 +2449,7 @@ function profileValidateSignature(&$value)
 			{
 				$disabledTags = array_unique($disabledTags);
 				$txt['profile_error_signature_disabled_bbc'] = sprintf($txt['profile_error_signature_disabled_bbc'], implode(', ', $disabledTags));
+
 				return 'signature_disabled_bbc';
 			}
 		}
@@ -2165,10 +2458,11 @@ function profileValidateSignature(&$value)
 	preparsecode($value);
 
 	// Too long?
-	if (!allowedTo('admin_forum') && !empty($sig_limits[1]) && \ElkArte\Util::strlen(str_replace('<br />', "\n", $value)) > $sig_limits[1])
+	if (!allowedTo('admin_forum') && !empty($sig_limits[1]) && Util::strlen(str_replace('<br />', "\n", $value)) > $sig_limits[1])
 	{
 		$_POST['signature'] = trim(htmlspecialchars(str_replace('<br />', "\n", $value), ENT_QUOTES, 'UTF-8'));
 		$txt['profile_error_signature_max_length'] = sprintf($txt['profile_error_signature_max_length'], $sig_limits[1]);
+
 		return 'signature_max_length';
 	}
 
@@ -2178,12 +2472,12 @@ function profileValidateSignature(&$value)
 /**
  * The avatar is incredibly complicated, what with the options... and what not.
  *
- * @todo argh, the avatar here. Take this out of here!
- *
  * @param mixed[] $value
  *
  * @return false|string
  * @throws \ElkArte\Exceptions\Exception attachments_no_write, attach_timeout
+ * @todo argh, the avatar here. Take this out of here!
+ *
  */
 function profileSaveAvatarData(&$value)
 {
@@ -2193,7 +2487,9 @@ function profileSaveAvatarData(&$value)
 
 	$memID = $context['id_member'];
 	if (empty($memID) && !empty($context['password_auth_failed']))
+	{
 		return false;
+	}
 
 	// We need to know where we're going to be putting it..
 	require_once(SUBSDIR . '/Attachments.subs.php');
@@ -2208,7 +2504,9 @@ function profileSaveAvatarData(&$value)
 	{
 		theme()->getTemplates()->loadLanguageFile('Post');
 		if (!is_writable($uploadDir))
+		{
 			throw new \ElkArte\Exceptions\Exception('attachments_no_write', 'critical');
+		}
 
 		require_once(SUBSDIR . '/Package.subs.php');
 
@@ -2275,10 +2573,14 @@ function profileSaveAvatarData(&$value)
 		$profile_vars['avatar'] = str_replace(' ', '%20', preg_replace('~action(?:=|%3d)(?!dlattach)~i', 'action-', $_POST['userpicpersonal']));
 
 		if (preg_match('~^https?:///?$~i', $profile_vars['avatar']) === 1)
+		{
 			$profile_vars['avatar'] = '';
+		}
 		// Trying to make us do something we'll regret?
 		elseif ((!$valid_http && !$valid_https) || ($valid_http && detectServer()->supportsSSL()))
+		{
 			return 'bad_avatar';
+		}
 		// Should we check dimensions?
 		elseif (!empty($modSettings['avatar_max_height']) || !empty($modSettings['avatar_max_width']))
 		{
@@ -2289,7 +2591,9 @@ function profileSaveAvatarData(&$value)
 			{
 				// Houston, we have a problem. The avatar is too large!!
 				if ($modSettings['avatar_action_too_large'] === 'option_refuse')
+				{
 					return 'bad_avatar';
+				}
 				elseif ($modSettings['avatar_action_too_large'] === 'option_download_and_resize')
 				{
 					// @todo remove this if appropriate
@@ -2302,7 +2606,9 @@ function profileSaveAvatarData(&$value)
 						$cur_profile['attachment_type'] = $modSettings['new_avatar_data']['type'];
 					}
 					else
+					{
 						return 'bad_avatar';
+					}
 				}
 			}
 		}
@@ -2335,6 +2641,7 @@ function profileSaveAvatarData(&$value)
 			if ($sizes === false)
 			{
 				@unlink($_FILES['attachment']['tmp_name']);
+
 				return 'bad_avatar';
 			}
 			// Check whether the image is too large.
@@ -2351,6 +2658,7 @@ function profileSaveAvatarData(&$value)
 					{
 						// Something went wrong, so lets delete this offender
 						@unlink($_FILES['attachment']['tmp_name']);
+
 						return 'bad_avatar';
 					}
 
@@ -2364,10 +2672,11 @@ function profileSaveAvatarData(&$value)
 					// Attempt to chmod it.
 					@chmod($_FILES['attachment']['tmp_name'], 0644);
 
-					$image = new \ElkArte\Graphics\Image($_FILES['attachment']['tmp_name']);
+					$image = new Image($_FILES['attachment']['tmp_name']);
 					if (!$image->reencodeImage($_FILES['attachment']['tmp_name']))
 					{
 						@unlink($_FILES['attachment']['tmp_name']);
+
 						return 'bad_avatar';
 					}
 
@@ -2377,6 +2686,7 @@ function profileSaveAvatarData(&$value)
 					{
 						// Something went wrong, so lets delete this offender
 						@unlink($_FILES['attachment']['tmp_name']);
+
 						return 'bad_avatar5';
 					}
 
@@ -2388,18 +2698,19 @@ function profileSaveAvatarData(&$value)
 				else
 				{
 					@unlink($_FILES['attachment']['tmp_name']);
+
 					return 'bad_avatar';
 				}
 			}
 			elseif (is_array($sizes))
 			{
 				// Now try to find an infection.
-				$image = new \ElkArte\Graphics\Image($_FILES['attachment']['tmp_name']);
+				$image = new Image($_FILES['attachment']['tmp_name']);
 				$size = $image->getSize($_FILES['attachment']['tmp_name']);
 				$valid_mime = getValidMimeImageType($size[2]);
 				if ($valid_mime !== '')
 				{
-					if ($image->checkImageContents($_FILES['attachment']['tmp_name']) === false)
+					if (!$image->checkImageContents($_FILES['attachment']['tmp_name']))
 					{
 						// It's bad. Try to re-encode the contents?
 						if (empty($modSettings['avatar_reencode']) || (!$image->reencodeImage($_FILES['attachment']['tmp_name'])))
@@ -2460,14 +2771,20 @@ function profileSaveAvatarData(&$value)
 
 			// Delete any temporary file.
 			if (file_exists($_FILES['attachment']['tmp_name']))
+			{
 				@unlink($_FILES['attachment']['tmp_name']);
+			}
 		}
 		// Selected the upload avatar option and had one already uploaded before or didn't upload one.
 		else
+		{
 			$profile_vars['avatar'] = '';
+		}
 	}
 	else
+	{
 		$profile_vars['avatar'] = '';
+	}
 
 	// Setup the profile variables so it shows things right on display!
 	$cur_profile['avatar'] = $profile_vars['avatar'];
@@ -2502,7 +2819,9 @@ function profileSaveGroups(&$value)
 		);
 		$protected_groups = array(1);
 		while ($row = $db->fetch_assoc($request))
+		{
 			$protected_groups[] = $row['id_group'];
+		}
 		$db->free_result($request);
 
 		$protected_groups = array_unique($protected_groups);
@@ -2510,10 +2829,14 @@ function profileSaveGroups(&$value)
 
 	// The account page allows the change of your id_group - but not to a protected group!
 	if (empty($protected_groups) || count(array_intersect(array((int) $value, $old_profile['id_group']), $protected_groups)) == 0)
+	{
 		$value = (int) $value;
+	}
 	// ... otherwise it's the old group sir.
 	else
+	{
 		$value = $old_profile['id_group'];
+	}
 
 	// Find the additional membergroups (if any)
 	if (isset($_POST['additional_groups']) && is_array($_POST['additional_groups']))
@@ -2523,7 +2846,9 @@ function profileSaveGroups(&$value)
 		{
 			$group_id = (int) $group_id;
 			if (!empty($group_id) && (empty($protected_groups) || !in_array($group_id, $protected_groups)))
+			{
 				$additional_groups[] = $group_id;
+			}
 		}
 
 		// Put the protected groups back in there if you don't have permission to take them away.
@@ -2531,7 +2856,9 @@ function profileSaveGroups(&$value)
 		foreach ($old_additional_groups as $group_id)
 		{
 			if (!empty($protected_groups) && in_array($group_id, $protected_groups))
+			{
 				$additional_groups[] = $group_id;
+			}
 		}
 
 		if (implode(',', $additional_groups) !== $old_profile['additional_groups'])
@@ -2564,7 +2891,9 @@ function profileSaveGroups(&$value)
 			$db->free_result($request);
 
 			if (empty($another))
+			{
 				throw new \ElkArte\Exceptions\Exception('at_least_one_admin', 'critical');
+			}
 		}
 	}
 
@@ -2572,9 +2901,13 @@ function profileSaveGroups(&$value)
 	if ($value != $old_profile['id_group'] || isset($profile_vars['additional_groups']))
 	{
 		if ($context['user']['is_owner'])
+		{
 			$_SESSION['mc']['time'] = 0;
+		}
 		else
+		{
 			updateSettings(array('settings_updated' => time()));
+		}
 	}
 
 	return true;
@@ -2596,7 +2929,8 @@ function list_getUserWarnings($start, $items_per_page, $sort, $memID)
 	$db = database();
 
 	$request = $db->query('', '
-		SELECT COALESCE(mem.id_member, 0) AS id_member, COALESCE(mem.real_name, lc.member_name) AS member_name,
+		SELECT 
+			COALESCE(mem.id_member, 0) AS id_member, COALESCE(mem.real_name, lc.member_name) AS member_name,
 			lc.log_time, lc.body, lc.counter, lc.id_notice
 		FROM {db_prefix}log_comments AS lc
 			LEFT JOIN {db_prefix}members AS mem ON (mem.id_member = lc.id_member)
@@ -2642,7 +2976,8 @@ function list_getUserWarningCount($memID)
 	$db = database();
 
 	$request = $db->query('', '
-		SELECT COUNT(*)
+		SELECT 
+			COUNT(*)
 		FROM {db_prefix}log_comments
 		WHERE id_recipient = {int:selected_member}
 			AND comment_type = {string:warning}',
@@ -2677,12 +3012,15 @@ function profileLoadAttachments($start, $items_per_page, $sort, $boardsAllowed, 
 	$db = database();
 
 	if ($exclude_boards === null && !empty($modSettings['recycle_enable']) && $modSettings['recycle_board'] > 0)
+	{
 		$exclude_boards = array($modSettings['recycle_board']);
+	}
 
 	// Retrieve some attachments.
 	$request = $db->query('', '
-		SELECT a.id_attach, a.id_msg, a.filename, a.downloads, a.approved, a.fileext, a.width, a.height, ' .
-			(empty($modSettings['attachmentShowImages']) || empty($modSettings['attachmentThumbnails']) ? '' : ' COALESCE(thumb.id_attach, 0) AS id_thumb, thumb.width AS thumb_width, thumb.height AS thumb_height, ') . '
+		SELECT
+		 	a.id_attach, a.id_msg, a.filename, a.downloads, a.approved, a.fileext, a.width, a.height, ' .
+		(empty($modSettings['attachmentShowImages']) || empty($modSettings['attachmentThumbnails']) ? '' : ' COALESCE(thumb.id_attach, 0) AS id_thumb, thumb.width AS thumb_width, thumb.height AS thumb_height, ') . '
 			m.id_msg, m.id_topic, m.id_board, m.poster_time, m.subject, b.name
 		FROM {db_prefix}attachments AS a' . (empty($modSettings['attachmentShowImages']) || empty($modSettings['attachmentThumbnails']) ? '' : '
 			LEFT JOIN {db_prefix}attachments AS thumb ON (thumb.id_attach = a.id_thumb)') . '
@@ -2716,11 +3054,11 @@ function profileLoadAttachments($start, $items_per_page, $sort, $boardsAllowed, 
 		$row['subject'] = censor($row['subject']);
 		if (!$row['approved'])
 		{
-			$row['filename'] = str_replace(array('{attachment_link}', '{txt_awaiting}'), array('<a href="' . getUrl('attach', ['action' => 'dlattach', 'attach' => $row['id_attach'], 'name' => $row['filename'], 'topic' => $row['id_topic'], 'subject' => $row['subject'] ]) . '">' . $row['filename'] . '</a>', $txt['awaiting_approval']), $settings['attachments_awaiting_approval']);
+			$row['filename'] = str_replace(array('{attachment_link}', '{txt_awaiting}'), array('<a href="' . getUrl('attach', ['action' => 'dlattach', 'attach' => $row['id_attach'], 'name' => $row['filename'], 'topic' => $row['id_topic'], 'subject' => $row['subject']]) . '">' . $row['filename'] . '</a>', $txt['awaiting_approval']), $settings['attachments_awaiting_approval']);
 		}
 		else
 		{
-			$row['filename'] = '<a href="' . getUrl('attach', ['action' => 'dlattach', 'attach' => $row['id_attach'], 'name' => $row['filename'], 'topic' => $row['id_topic'], 'subject' => $row['subject']])  . '">' . $row['filename'] . '</a>';
+			$row['filename'] = '<a href="' . getUrl('attach', ['action' => 'dlattach', 'attach' => $row['id_attach'], 'name' => $row['filename'], 'topic' => $row['id_topic'], 'subject' => $row['subject']]) . '">' . $row['filename'] . '</a>';
 		}
 
 		$attachments[] = array(
@@ -2763,7 +3101,8 @@ function getNumAttachments($boardsAllowed, $memID)
 
 	// Get the total number of attachments they have posted.
 	$request = $db->query('', '
-		SELECT COUNT(*)
+		SELECT 
+			COUNT(*)
 		FROM {db_prefix}attachments AS a
 			INNER JOIN {db_prefix}messages AS m ON (m.id_msg = a.id_msg)
 			INNER JOIN {db_prefix}boards AS b ON (b.id_board = m.id_board AND {query_see_board})
@@ -2805,7 +3144,8 @@ function getUnwatchedBy($start, $items_per_page, $sort, $memID)
 
 	// Get the list of topics we can see
 	$request = $db->query('', '
-		SELECT lt.id_topic
+		SELECT
+		 	lt.id_topic
 		FROM {db_prefix}log_topics AS lt
 			LEFT JOIN {db_prefix}topics AS t ON (lt.id_topic = t.id_topic)
 			LEFT JOIN {db_prefix}boards AS b ON (t.id_board = b.id_board)
@@ -2825,7 +3165,9 @@ function getUnwatchedBy($start, $items_per_page, $sort, $memID)
 	);
 	$topics = array();
 	while ($row = $db->fetch_assoc($request))
+	{
 		$topics[] = $row['id_topic'];
+	}
 	$db->free_result($request);
 
 	// Any topics found?
@@ -2833,7 +3175,8 @@ function getUnwatchedBy($start, $items_per_page, $sort, $memID)
 	if (!empty($topics))
 	{
 		$request = $db->query('', '
-			SELECT mf.subject, mf.poster_time as started_on, COALESCE(memf.real_name, mf.poster_name) as started_by, ml.poster_time as last_post_on, COALESCE(meml.real_name, ml.poster_name) as last_post_by, t.id_topic
+			SELECT 
+				mf.subject, mf.poster_time as started_on, COALESCE(memf.real_name, mf.poster_name) as started_by, ml.poster_time as last_post_on, COALESCE(meml.real_name, ml.poster_name) as last_post_by, t.id_topic
 			FROM {db_prefix}topics AS t
 				INNER JOIN {db_prefix}messages AS ml ON (ml.id_msg = t.id_last_msg)
 				INNER JOIN {db_prefix}messages AS mf ON (mf.id_msg = t.id_first_msg)
@@ -2845,7 +3188,9 @@ function getUnwatchedBy($start, $items_per_page, $sort, $memID)
 			)
 		);
 		while ($row = $db->fetch_assoc($request))
+		{
 			$topicsInfo[] = $row;
+		}
 		$db->free_result($request);
 	}
 
@@ -2864,7 +3209,8 @@ function getNumUnwatchedBy($memID)
 
 	// Get the total number of attachments they have posted.
 	$request = $db->query('', '
-		SELECT COUNT(*)
+		SELECT
+		 	COUNT(*)
 		FROM {db_prefix}log_topics AS lt
 		LEFT JOIN {db_prefix}topics AS t ON (lt.id_topic = t.id_topic)
 		LEFT JOIN {db_prefix}boards AS b ON (t.id_board = b.id_board)
@@ -2899,7 +3245,8 @@ function count_user_posts($memID, $board = null)
 	$is_owner = $memID == User::$info->id;
 
 	$request = $db->query('', '
-		SELECT COUNT(*)
+		SELECT 
+			COUNT(*)
 		FROM {db_prefix}messages AS m' . (User::$info->query_see_board === '1=1' ? '' : '
 			INNER JOIN {db_prefix}boards AS b ON (b.id_board = m.id_board AND {query_see_board})') . '
 		WHERE m.id_member = {int:current_member}' . (!empty($board) ? '
@@ -2936,7 +3283,8 @@ function count_user_topics($memID, $board = null)
 	$is_owner = $memID == User::$info->id;
 
 	$request = $db->query('', '
-		SELECT COUNT(*)
+		SELECT 
+			COUNT(*)
 		FROM {db_prefix}topics AS t' . (User::$info->query_see_board === '1=1' ? '' : '
 			INNER JOIN {db_prefix}boards AS b ON (b.id_board = t.id_board AND {query_see_board})') . '
 		WHERE t.id_member_started = {int:current_member}' . (!empty($board) ? '
@@ -2975,7 +3323,8 @@ function findMinMaxUserMessage($memID, $board = null)
 	$is_owner = $memID == User::$info->id;
 
 	$request = $db->query('', '
-		SELECT MIN(id_msg), MAX(id_msg)
+		SELECT 
+			MIN(id_msg), MAX(id_msg)
 		FROM {db_prefix}messages AS m
 		WHERE m.id_member = {int:current_member}' . (!empty($board) ? '
 			AND m.id_board = {int:board}' : '') . (!$modSettings['postmod_active'] || $is_owner ? '' : '
@@ -3012,7 +3361,8 @@ function findMinMaxUserTopic($memID, $board = null)
 	$is_owner = $memID == User::$info->id;
 
 	$request = $db->query('', '
-		SELECT MIN(id_topic), MAX(id_topic)
+		SELECT 
+			MIN(id_topic), MAX(id_topic)
 		FROM {db_prefix}topics AS t
 		WHERE t.id_member_started = {int:current_member}' . (!empty($board) ? '
 			AND t.id_board = {int:board}' : '') . (!$modSettings['postmod_active'] || $is_owner ? '' : '
@@ -3083,14 +3433,20 @@ function load_user_posts($memID, $start, $count, $range_limit = '', $reverse = f
 
 		// Did we get what we wanted, if so stop looking
 		if ($db->num_rows($request) === $count || empty($range_limit))
+		{
 			break;
+		}
 		else
+		{
 			$range_limit = '';
+		}
 	}
 
 	// Place them in the post array
 	while ($row = $db->fetch_assoc($request))
+	{
 		$user_posts[] = $row;
+	}
 	$db->free_result($request);
 
 	return $user_posts;
@@ -3150,14 +3506,20 @@ function load_user_topics($memID, $start, $count, $range_limit = '', $reverse = 
 
 		// Did we get what we wanted, if so stop looking
 		if ($db->num_rows($request) === $count || empty($range_limit))
+		{
 			break;
+		}
 		else
+		{
 			$range_limit = '';
+		}
 	}
 
 	// Place them in the topic array
 	while ($row = $db->fetch_assoc($request))
+	{
 		$user_topics[] = $row;
+	}
 	$db->free_result($request);
 
 	return $user_topics;
@@ -3179,7 +3541,8 @@ function getMemberGeneralPermissions($curGroups)
 
 	// Get all general permissions.
 	$request = $db->query('', '
-		SELECT p.permission, p.add_deny, mg.group_name, p.id_group
+		SELECT 
+			p.permission, p.add_deny, mg.group_name, p.id_group
 		FROM {db_prefix}permissions AS p
 			LEFT JOIN {db_prefix}membergroups AS mg ON (mg.id_group = p.id_group)
 		WHERE p.id_group IN ({array_int:group_list})
@@ -3194,13 +3557,19 @@ function getMemberGeneralPermissions($curGroups)
 	{
 		// We don't know about this permission, it doesn't exist :P.
 		if (!isset($txt['permissionname_' . $row['permission']]))
+		{
 			continue;
+		}
 
 		// Permissions that end with _own or _any consist of two parts.
 		if (in_array(substr($row['permission'], -4), array('_own', '_any')) && isset($txt['permissionname_' . substr($row['permission'], 0, -4)]))
+		{
 			$name = $txt['permissionname_' . substr($row['permission'], 0, -4)] . ' - ' . $txt['permissionname_' . $row['permission']];
+		}
 		else
+		{
 			$name = $txt['permissionname_' . $row['permission']];
+		}
 
 		// Add this permission if it doesn't exist yet.
 		if (!isset($general_permission[$row['permission']]))
@@ -3269,16 +3638,23 @@ function getMemberBoardPermissions($memID, $curGroups, $board = null)
 	{
 		// We don't know about this permission, it doesn't exist :P.
 		if (!isset($txt['permissionname_' . $row['permission']]))
+		{
 			continue;
+		}
 
 		// The name of the permission using the format 'permission name' - 'own/any topic/event/etc.'.
 		if (in_array(substr($row['permission'], -4), array('_own', '_any')) && isset($txt['permissionname_' . substr($row['permission'], 0, -4)]))
+		{
 			$name = $txt['permissionname_' . substr($row['permission'], 0, -4)] . ' - ' . $txt['permissionname_' . $row['permission']];
+		}
 		else
+		{
 			$name = $txt['permissionname_' . $row['permission']];
+		}
 
 		// Create the structure for this permission.
 		if (!isset($board_permission[$row['permission']]))
+		{
 			$board_permission[$row['permission']] = array(
 				'id' => $row['permission'],
 				'groups' => array(
@@ -3289,6 +3665,7 @@ function getMemberBoardPermissions($memID, $curGroups, $board = null)
 				'is_denied' => false,
 				'is_global' => empty($board),
 			);
+		}
 
 		$board_permission[$row['permission']]['groups'][empty($row['add_deny']) ? 'denied' : 'allowed'][$row['id_group']] = $row['id_group'] == 0 ? $txt['membergroups_members'] : $row['group_name'];
 		$board_permission[$row['permission']]['is_denied'] |= empty($row['add_deny']);
@@ -3310,7 +3687,7 @@ function getMembersIPs($memID)
 	global $modSettings;
 
 	$db = database();
-	$member = \ElkArte\MembersList::get($memID);
+	$member = MembersList::get($memID);
 
 	// @todo cache this
 	// If this is a big forum, or a large posting user, let's limit the search.
@@ -3340,7 +3717,8 @@ function getMembersIPs($memID)
 	// @todo cache this
 	// Get all IP addresses this user has used for his messages.
 	$request = $db->query('', '
-		SELECT poster_ip
+		SELECT 
+			poster_ip
 		FROM {db_prefix}messages
 		WHERE id_member = {int:current_member} ' . (isset($min_msg_member) ? '
 			AND id_msg >= {int:min_msg_member} AND id_msg <= {int:max_msg_member}' : '') . '
@@ -3351,15 +3729,17 @@ function getMembersIPs($memID)
 			'max_msg_member' => !empty($max_msg_member) ? $max_msg_member : 0,
 		)
 	);
-
 	while ($row = $db->fetch_assoc($request))
+	{
 		$ips[] = $row['poster_ip'];
+	}
 
 	$db->free_result($request);
 
 	// Now also get the IP addresses from the error messages.
 	$request = $db->query('', '
-		SELECT COUNT(*) AS error_count, ip
+		SELECT 
+			COUNT(*) AS error_count, ip
 		FROM {db_prefix}log_errors
 		WHERE id_member = {int:current_member}
 		GROUP BY ip',
@@ -3371,7 +3751,9 @@ function getMembersIPs($memID)
 	$error_ips = array();
 
 	while ($row = $db->fetch_assoc($request))
+	{
 		$error_ips[] = $row['ip'];
+	}
 
 	$db->free_result($request);
 
@@ -3396,7 +3778,8 @@ function getMembersInRange($ips, $memID)
 
 	// Get member ID's which are in messages...
 	$request = $db->query('', '
-		SELECT mem.id_member
+		SELECT 
+			mem.id_member
 		FROM {db_prefix}messages AS m
 			INNER JOIN {db_prefix}members AS mem ON (mem.id_member = m.id_member)
 		WHERE m.poster_ip IN ({array_string:ip_list})
@@ -3409,12 +3792,15 @@ function getMembersInRange($ips, $memID)
 	);
 
 	while ($row = $db->fetch_assoc($request))
+	{
 		$message_members[] = $row['id_member'];
+	}
 	$db->free_result($request);
 
 	// And then get the member ID's belong to other users
 	$request = $db->query('', '
-		SELECT id_member
+		SELECT 
+			id_member
 		FROM {db_prefix}members
 		WHERE id_member != {int:current_member}
 			AND member_ip IN ({array_string:ip_list})',
@@ -3424,7 +3810,9 @@ function getMembersInRange($ips, $memID)
 		)
 	);
 	while ($row = $db->fetch_assoc($request))
+	{
 		$message_members[] = $row['id_member'];
+	}
 	$db->free_result($request);
 
 	// Once the IDs are all combined, let's clean them up
@@ -3456,11 +3844,13 @@ function getMemberNotificationsProfile($member_id)
 	global $modSettings;
 
 	if (empty($modSettings['enabled_mentions']))
+	{
 		return array();
+	}
 
 	require_once(SUBSDIR . '/Notification.subs.php');
 
-	$mention_methods = \ElkArte\Notifications::instance()->getNotifiers();
+	$mention_methods = Notifications::instance()->getNotifiers();
 	$enabled_mentions = explode(',', $modSettings['enabled_mentions']);
 	$user_preferences = getUsersNotificationsPreferences($enabled_mentions, $member_id);
 	$mention_types = array();
@@ -3474,11 +3864,15 @@ function getMemberNotificationsProfile($member_id)
 		{
 			$notif[$key] = array('id' => $val, 'enabled' => $user_preferences[$member_id][$type] === $key);
 			if ($user_preferences[$member_id][$type] > 0)
+			{
 				$type_on = true;
+			}
 		}
 
 		if (!empty($notif))
+		{
 			$mention_types[$type] = array('data' => $notif, 'enabled' => $type_on);
+		}
 	}
 
 	return $mention_types;

@@ -8,7 +8,7 @@
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause (see accompanying LICENSE.txt file)
  *
  * This file contains code covered by:
- * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * copyright: 2011 Simple Machines (http://www.simplemachines.org)
  *
  * @version 2.0 dev
  *
@@ -16,31 +16,39 @@
 
 namespace ElkArte\Controller;
 
+use ElkArte\AbstractController;
+use ElkArte\Exceptions\Exception;
+use ElkArte\Util;
+
 /**
  * Move Topic Controller
  */
-class MoveTopic extends \ElkArte\AbstractController
+class MoveTopic extends AbstractController
 {
 	/**
 	 * The id of the topic being manipulated
+	 *
 	 * @var int
 	 */
 	private $_topic;
 
 	/**
 	 * Information about the topic being moved
+	 *
 	 * @var array
 	 */
 	private $_topic_info;
 
 	/**
 	 * Information about the board where the topic resides
+	 *
 	 * @var array
 	 */
 	private $_board_info;
 
 	/**
 	 * Board that will receive the topic
+	 *
 	 * @var int
 	 */
 	private $_toboard;
@@ -92,7 +100,9 @@ class MoveTopic extends \ElkArte\AbstractController
 
 		// No boards?
 		if (empty($context['categories']) || $context['num_boards'] == 1)
-			throw new \ElkArte\Exceptions\Exception('moveto_noboards', false);
+		{
+			throw new Exception('moveto_noboards', false);
+		}
 
 		// Already used the function, let's set the selected board back to the last
 		$last_moved_to = isset($_SESSION['move_to_topic']['move_to']) && $_SESSION['move_to_topic']['move_to'] != $context['current_board'] ? (int) $_SESSION['move_to_topic']['move_to'] : 0;
@@ -111,6 +121,92 @@ class MoveTopic extends \ElkArte\AbstractController
 		// Set up for the template
 		theme()->getTemplates()->load('MoveTopic');
 		$this->_prep_template();
+	}
+
+	/**
+	 * Validates that the member can access the topic
+	 *
+	 * What it does:
+	 *
+	 * - Checks that a topic is supplied
+	 * - Validates the topic information can be loaded
+	 * - If the topic is not approved yet, must have approve permissions to move it
+	 * - If the member is the topic starter requires the move_own permission, otherwise the move_any permission.
+	 */
+	private function _check_access()
+	{
+		global $modSettings;
+
+		if (empty($this->_topic))
+		{
+			throw new Exception('no_access', false);
+		}
+
+		// Retrieve the basic topic information for whats being moved
+		require_once(SUBSDIR . '/Topic.subs.php');
+		$this->_topic_info = getTopicInfo($this->_topic, 'message');
+
+		if (empty($this->_topic_info))
+		{
+			throw new Exception('topic_gone', false);
+		}
+
+		// Can they see it - if not approved?
+		if ($modSettings['postmod_active'] && !$this->_topic_info['approved'])
+		{
+			isAllowedTo('approve_posts');
+		}
+
+		// Are they allowed to actually move any topics or even their own?
+		if (!allowedTo('move_any') && ($this->_topic_info['id_member_started'] == $this->user->id && !allowedTo('move_own')))
+		{
+			throw new Exception('cannot_move_any', false);
+		}
+	}
+
+	/**
+	 * Prepares the content for use in the move topic template
+	 */
+	private function _prep_template()
+	{
+		global $context, $txt, $scripturl, $language, $board;
+
+		$context['is_approved'] = $this->_topic_info['approved'];
+		$context['subject'] = $this->_topic_info['subject'];
+		$context['redirect_topic'] = isset($_SESSION['move_to_topic']['redirect_topic']) ? (int) $_SESSION['move_to_topic']['redirect_topic'] : 0;
+		$context['redirect_expires'] = isset($_SESSION['move_to_topic']['redirect_expires']) ? (int) $_SESSION['move_to_topic']['redirect_expires'] : 0;
+		$context['page_title'] = $txt['move_topic'];
+		$context['sub_template'] = 'move_topic';
+
+		// Breadcrumbs
+		$context['linktree'][] = array(
+			'url' => $scripturl . '?topic=' . $this->_topic . '.0',
+			'name' => $context['subject'],
+		);
+		$context['linktree'][] = array(
+			'url' => '#',
+			'name' => $txt['move_topic'],
+		);
+
+		$context['back_to_topic'] = isset($this->_req->post->goback);
+
+		// Ugly !
+		if ($this->user->language !== $language)
+		{
+			theme()->getTemplates()->loadLanguageFile('index', $language);
+			$temp = $txt['movetopic_default'];
+			theme()->getTemplates()->loadLanguageFile('index');
+			$txt['movetopic_default'] = $temp;
+		}
+
+		// We will need this
+		if (isset($this->_req->query->current_board))
+		{
+			moveTopicConcurrence((int) $this->_req->query->current_board, $board, $this->_topic);
+		}
+
+		// Register this form and get a sequence number in $context.
+		checkSubmitOnce('register');
 	}
 
 	/**
@@ -141,7 +237,9 @@ class MoveTopic extends \ElkArte\AbstractController
 		// Make sure they can see the board they are trying to move to (and get whether posts count in the target board).
 		$this->_board_info = boardInfo($this->_toboard, $this->_topic);
 		if (empty($this->_board_info))
-			throw new \ElkArte\Exceptions\Exception('no_board');
+		{
+			throw new Exception('no_board');
+		}
 
 		// Remember this for later.
 		$_SESSION['move_to_topic'] = array(
@@ -162,7 +260,9 @@ class MoveTopic extends \ElkArte\AbstractController
 
 		// Log that they moved this topic.
 		if (!allowedTo('move_own') || $this->_topic_info['id_member_started'] != $this->user->id)
+		{
 			logAction('move', array('topic' => $this->_topic, 'board_from' => $board, 'board_to' => $this->_toboard));
+		}
 
 		// Notify people that this topic has been moved?
 		require_once(SUBSDIR . '/Notification.subs.php');
@@ -170,87 +270,13 @@ class MoveTopic extends \ElkArte\AbstractController
 
 		// Why not go back to the original board in case they want to keep moving?
 		if (!isset($this->_req->post->goback))
+		{
 			redirectexit('board=' . $board . '.0');
+		}
 		else
+		{
 			redirectexit('topic=' . $this->_topic . '.0');
-	}
-
-	/**
-	 * Prepares the content for use in the move topic template
-	 */
-	private function _prep_template()
-	{
-		global $context, $txt, $scripturl, $language, $board;
-
-		$context['is_approved'] = $this->_topic_info['approved'];
-		$context['subject'] = $this->_topic_info['subject'];
-		$context['redirect_topic'] = isset($_SESSION['move_to_topic']['redirect_topic']) ? (int) $_SESSION['move_to_topic']['redirect_topic'] : 0;
-		$context['redirect_expires'] = isset($_SESSION['move_to_topic']['redirect_expires']) ? (int) $_SESSION['move_to_topic']['redirect_expires'] : 0;
-		$context['page_title'] = $txt['move_topic'];
-		$context['sub_template'] = 'move_topic';
-
-		// Breadcrumbs
-		$context['linktree'][] = array(
-			'url' => $scripturl . '?topic=' . $this->_topic . '.0',
-			'name' => $context['subject'],
-		);
-		$context['linktree'][] = array(
-			'url' => '#',
-			'name' => $txt['move_topic'],
-		);
-
-		$context['back_to_topic'] = isset($this->_req->post->goback);
-
-		// Ugly !
-		if ($this->user->language != $language)
-		{
-			theme()->getTemplates()->loadLanguageFile('index', $language);
-			$temp = $txt['movetopic_default'];
-			theme()->getTemplates()->loadLanguageFile('index');
-			$txt['movetopic_default'] = $temp;
 		}
-
-		// We will need this
-		if (isset($this->_req->query->current_board))
-		{
-			moveTopicConcurrence((int) $this->_req->query->current_board, $board, $this->_topic);
-		}
-
-		// Register this form and get a sequence number in $context.
-		checkSubmitOnce('register');
-	}
-
-	/**
-	 * Validates that the member can access the topic
-	 *
-	 * What it does:
-	 *
-	 * - Checks that a topic is supplied
-	 * - Validates the topic information can be loaded
-	 * - If the topic is not approved yet, must have approve permissions to move it
-	 * - If the member is the topic starter requires the move_own permission, otherwise the move_any permission.
-	 */
-	private function _check_access()
-	{
-		global $modSettings;
-
-		if (empty($this->_topic))
-			throw new \ElkArte\Exceptions\Exception('no_access', false);
-
-		// Retrieve the basic topic information for whats being moved
-		require_once(SUBSDIR . '/Topic.subs.php');
-		$this->_topic_info = getTopicInfo($this->_topic, 'message');
-
-		if (empty($this->_topic_info))
-			throw new \ElkArte\Exceptions\Exception('topic_gone', false);
-
-		// Can they see it - if not approved?
-		if ($modSettings['postmod_active'] && !$this->_topic_info['approved'])
-			isAllowedTo('approve_posts');
-
-		// Are they allowed to actually move any topics or even their own?
-		if (!allowedTo('move_any') && ($this->_topic_info['id_member_started'] == $this->user->id && !allowedTo('move_own')))
-			throw new \ElkArte\Exceptions\Exception('cannot_move_any', false);
 	}
 
 	/**
@@ -271,15 +297,21 @@ class MoveTopic extends \ElkArte\AbstractController
 		global $board;
 
 		if (empty($this->_topic))
-			throw new \ElkArte\Exceptions\Exception('no_access', false);
+		{
+			throw new Exception('no_access', false);
+		}
 
 		// You can't choose to have a redirection topic and not provide a reason.
 		if (isset($this->_req->post->postRedirect) && $this->_req->getPost('reason', 'trim', '') === '')
-			throw new \ElkArte\Exceptions\Exception('movetopic_no_reason', false);
+		{
+			throw new Exception('movetopic_no_reason', false);
+		}
 
 		// You have to tell us were you are moving to
 		if (!isset($this->_req->post->toboard))
-			throw new \ElkArte\Exceptions\Exception('movetopic_no_board', false);
+		{
+			throw new Exception('movetopic_no_board', false);
+		}
 
 		// We will need this
 		require_once(SUBSDIR . '/Topic.subs.php');
@@ -296,7 +328,9 @@ class MoveTopic extends \ElkArte\AbstractController
 
 		// Not approved then you need approval permissions to move it as well
 		if (!$this->_topic_info['approved'])
+		{
 			isAllowedTo('approve_posts');
+		}
 
 		// Can they move topics on this board?
 		if (!allowedTo('move_any'))
@@ -329,14 +363,16 @@ class MoveTopic extends \ElkArte\AbstractController
 		// Rename the topic...
 		if (isset($this->_req->post->reset_subject, $this->_req->post->custom_subject) && $this->_req->post->custom_subject != '')
 		{
-			$custom_subject = strtr(\ElkArte\Util::htmltrim(\ElkArte\Util::htmlspecialchars($this->_req->post->custom_subject)), array("\r" => '', "\n" => '', "\t" => ''));
+			$custom_subject = strtr(Util::htmltrim(Util::htmlspecialchars($this->_req->post->custom_subject)), array("\r" => '', "\n" => '', "\t" => ''));
 
 			// Keep checking the length.
-			if (\ElkArte\Util::strlen($custom_subject) > 100)
-				$custom_subject = \ElkArte\Util::substr($custom_subject, 0, 100);
+			if (Util::strlen($custom_subject) > 100)
+			{
+				$custom_subject = Util::substr($custom_subject, 0, 100);
+			}
 
 			// If it's still valid move onwards and upwards.
-			if ($custom_subject != '')
+			if ($custom_subject !== '')
 			{
 				$all_messages = isset($this->_req->post->enforce_subject);
 				if ($all_messages)
@@ -347,7 +383,9 @@ class MoveTopic extends \ElkArte\AbstractController
 					topicSubject($this->_topic_info, $custom_subject, $context['response_prefix'], $all_messages);
 				}
 				else
+				{
 					topicSubject($this->_topic_info, $custom_subject);
+				}
 
 				// Fix the subject cache.
 				require_once(SUBSDIR . '/Messages.subs.php');
@@ -372,12 +410,12 @@ class MoveTopic extends \ElkArte\AbstractController
 		if (isset($this->_req->post->postRedirect))
 		{
 			// Should be in the boardwide language.
-			if ($this->user->language != $language)
+			if ($this->user->language !== $language)
 			{
 				theme()->getTemplates()->loadLanguageFile('index', $language);
 			}
 
-			$reason = \ElkArte\Util::htmlspecialchars($this->_req->post->reason, ENT_QUOTES);
+			$reason = Util::htmlspecialchars($this->_req->post->reason, ENT_QUOTES);
 			preparsecode($reason);
 
 			// Add a URL onto the message.
@@ -440,10 +478,14 @@ class MoveTopic extends \ElkArte\AbstractController
 			{
 				// The board we're moving from counted posts, but not to.
 				if (empty($board_from['count_posts']))
+				{
 					updateMemberData($id_member, array('posts' => 'posts - ' . $posts));
+				}
 				// The reverse: from didn't, to did.
 				else
+				{
 					updateMemberData($id_member, array('posts' => 'posts + ' . $posts));
+				}
 			}
 		}
 	}

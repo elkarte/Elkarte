@@ -8,13 +8,18 @@
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause (see accompanying LICENSE.txt file)
  *
  * This file contains code covered by:
- * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * copyright: 2011 Simple Machines (http://www.simplemachines.org)
  *
  * @version 2.0 dev
  *
  */
 
 namespace ElkArte\AdminController;
+
+use ElkArte\AbstractController;
+use ElkArte\Action;
+use ElkArte\SettingsForm\SettingsForm;
+use ElkArte\Util;
 
 /**
  * This class is the administration mailing controller.
@@ -26,7 +31,7 @@ namespace ElkArte\AdminController;
  *
  * @package Mail
  */
-class ManageMail extends \ElkArte\AbstractController
+class ManageMail extends AbstractController
 {
 	/**
 	 * Main dispatcher.
@@ -34,7 +39,7 @@ class ManageMail extends \ElkArte\AbstractController
 	 * - This function checks permissions and passes control through to the relevant section.
 	 *
 	 * @event integrate_sa_manage_mail Used to add more sub actions
-	 * @see \ElkArte\AbstractController::action_index()
+	 * @see  \ElkArte\AbstractController::action_index()
 	 * @uses Help and MangeMail language files
 	 */
 	public function action_index()
@@ -51,7 +56,7 @@ class ManageMail extends \ElkArte\AbstractController
 		);
 
 		// Action control
-		$action = new \ElkArte\Action('manage_mail');
+		$action = new Action('manage_mail');
 
 		// Load up all the tabs...
 		$context[$context['admin_menu_name']]['tab_data'] = array(
@@ -69,6 +74,229 @@ class ManageMail extends \ElkArte\AbstractController
 
 		// Call the right function for this sub-action.
 		$action->dispatch($subAction);
+	}
+
+	/**
+	 * Allows to view and modify the mail settings.
+	 *
+	 * @event integrate_save_mail_settings
+	 * @uses show_settings sub template
+	 */
+	public function action_mailSettings_display()
+	{
+		global $txt, $context, $txtBirthdayEmails;
+
+		// Some important context stuff
+		$context['page_title'] = $txt['mail_settings'];
+		$context['sub_template'] = 'show_settings';
+
+		// Initialize the form
+		$settingsForm = new SettingsForm(SettingsForm::DB_ADAPTER);
+
+		// Initialize it with our settings
+		$config_vars = $this->_settings();
+		$settingsForm->setConfigVars($config_vars);
+
+		// Piece of redundant code, for the javascript
+		$processedBirthdayEmails = array();
+		foreach ($txtBirthdayEmails as $key => $value)
+		{
+			$index = substr($key, 0, strrpos($key, '_'));
+			$element = substr($key, strrpos($key, '_') + 1);
+			$processedBirthdayEmails[$index][$element] = $value;
+		}
+
+		// Saving?
+		if (isset($this->_req->query->save))
+		{
+			// Make the SMTP password a little harder to see in a backup etc.
+			if (!empty($this->_req->post->smtp_password[1]))
+			{
+				$this->_req->post->smtp_password[0] = base64_encode($this->_req->post->smtp_password[0]);
+				$this->_req->post->smtp_password[1] = base64_encode($this->_req->post->smtp_password[1]);
+			}
+			checkSession();
+
+			// We don't want to save the subject and body previews.
+			unset($config_vars['birthday_subject'], $config_vars['birthday_body']);
+			$settingsForm->setConfigVars($config_vars);
+			call_integration_hook('integrate_save_mail_settings');
+
+			// You can not send more per page load than you can per minute
+			if (!empty($this->_req->post->mail_batch_size))
+			{
+				$this->_req->post->mail_batch_size = min((int) $this->_req->post->mail_batch_size, (int) $this->_req->post->mail_period_limit);
+			}
+
+			$settingsForm->setConfigValues((array) $this->_req->post);
+			$settingsForm->save();
+			redirectexit('action=admin;area=mailqueue;sa=settings');
+		}
+
+		$context['post_url'] = getUrl('admin', ['action' => 'admin', 'area' => 'mailqueue', 'sa' => 'settings', 'save']);
+		$context['settings_title'] = $txt['mailqueue_settings'];
+
+		// Prepare the config form
+		$settingsForm->prepare();
+
+		// Build a little JS so the birthday mail can be seen
+		$javascript = '
+			var bDay = {';
+
+		$i = 0;
+		foreach ($processedBirthdayEmails as $index => $email)
+		{
+			$is_last = ++$i === count($processedBirthdayEmails);
+			$javascript .= '
+				' . $index . ': {
+				subject: ' . JavaScriptEscape($email['subject']) . ',
+				body: ' . JavaScriptEscape(nl2br($email['body'])) . '
+			}' . (!$is_last ? ',' : '');
+		}
+
+		theme()->addInlineJavascript($javascript . '
+		};
+		function fetch_birthday_preview()
+		{
+			var index = document.getElementById(\'birthday_email\').value;
+
+			document.getElementById(\'birthday_subject\').innerHTML = bDay[index].subject;
+			document.getElementById(\'birthday_body\').innerHTML = bDay[index].body;
+		}', true);
+	}
+
+	/**
+	 * Retrieve and return mail administration settings.
+	 *
+	 * @event integrate_modify_mail_settings Add new settings
+	 */
+	private function _settings()
+	{
+		global $txt, $modSettings, $txtBirthdayEmails;
+
+		// We need $txtBirthdayEmails
+		theme()->getTemplates()->loadLanguageFile('EmailTemplates');
+
+		$body = $txtBirthdayEmails[(empty($modSettings['birthday_email']) ? 'happy_birthday' : $modSettings['birthday_email']) . '_body'];
+		$subject = $txtBirthdayEmails[(empty($modSettings['birthday_email']) ? 'happy_birthday' : $modSettings['birthday_email']) . '_subject'];
+
+		$emails = array();
+		$processedBirthdayEmails = array();
+		foreach ($txtBirthdayEmails as $key => $value)
+		{
+			$index = substr($key, 0, strrpos($key, '_'));
+			$element = substr($key, strrpos($key, '_') + 1);
+			$processedBirthdayEmails[$index][$element] = $value;
+		}
+		foreach ($processedBirthdayEmails as $index => $dummy)
+		{
+			$emails[$index] = $index;
+		}
+
+		$config_vars = array(
+			// Mail queue stuff, this rocks ;)
+			array('check', 'mail_queue'),
+			array('int', 'mail_period_limit'),
+			array('int', 'mail_batch_size'),
+			'',
+			// SMTP stuff.
+			array('select', 'mail_type', array($txt['mail_type_default'], 'SMTP')),
+			array('text', 'smtp_host'),
+			array('text', 'smtp_port'),
+			array('check', 'smtp_starttls'),
+			array('text', 'smtp_username'),
+			array('password', 'smtp_password'),
+			'',
+			array('select', 'birthday_email', $emails, 'value' => array('subject' => $subject, 'body' => $body), 'javascript' => 'onchange="fetch_birthday_preview()"'),
+			'birthday_subject' => array('var_message', 'birthday_subject', 'message' => $processedBirthdayEmails[empty($modSettings['birthday_email']) ? 'happy_birthday' : $modSettings['birthday_email']]['subject'], 'disabled' => true, 'size' => strlen($subject) + 3),
+			'birthday_body' => array('var_message', 'birthday_body', 'message' => nl2br($body), 'disabled' => true, 'size' => ceil(strlen($body) / 25)),
+		);
+
+		// Add new settings with a nice hook, makes them available for admin settings search as well
+		call_integration_hook('integrate_modify_mail_settings', array(&$config_vars));
+
+		return $config_vars;
+	}
+
+	/**
+	 * Return the form settings for use in admin search
+	 */
+	public function settings_search()
+	{
+		return $this->_settings();
+	}
+
+	/**
+	 * This function clears the mail queue of all emails, and at the end redirects to browse.
+	 *
+	 * - Note force clearing the queue may cause a site to exceed hosting mail limit quotas
+	 * - Some hosts simple loose these excess emails, others queue them server side, up to a limit
+	 */
+	public function action_clear()
+	{
+		global $modSettings;
+
+		checkSession('get');
+
+		// This is certainly needed!
+		require_once(SUBSDIR . '/Mail.subs.php');
+
+		// Set a number to send each loop
+		$number_to_send = empty($modSettings['mail_period_limit']) ? 25 : $modSettings['mail_period_limit'];
+
+		// If we don't yet have the total to clear, find it.
+		$all_emails = isset($this->_req->query->te) ? (int) $this->_req->query->te : list_getMailQueueSize();
+
+		// If we don't know how many we sent, it must be because... we didn't send any!
+		$sent_emails = isset($this->_req->query->sent) ? (int) $this->_req->query->sent : 0;
+
+		// Send this batch, then go for a short break...
+		while (reduceMailQueue($number_to_send, true, true) === true)
+		{
+			// Sent another batch
+			$sent_emails += $number_to_send;
+			$this->_pauseMailQueueClear($all_emails, $sent_emails);
+		}
+
+		return $this->action_browse();
+	}
+
+	/**
+	 * Used for pausing the mail queue.
+	 *
+	 * @param int $all_emails total emails to be sent
+	 * @param int $sent_emails number of emails sent so far
+	 * @throws \ElkArte\Exceptions\Exception
+	 */
+	private function _pauseMailQueueClear($all_emails, $sent_emails)
+	{
+		global $context, $txt, $time_start;
+
+		// Try get more time...
+		detectServer()->setTimeLimit(600);
+
+		// Have we already used our maximum time?
+		if (time() - array_sum(explode(' ', $time_start)) < 5)
+		{
+			return;
+		}
+
+		$context['continue_get_data'] = '?action=admin;area=mailqueue;sa=clear;te=' . $all_emails . ';sent=' . $sent_emails . ';' . $context['session_var'] . '=' . $context['session_id'];
+		$context['page_title'] = $txt['not_done_title'];
+		$context['continue_post_data'] = '';
+		$context['continue_countdown'] = '10';
+		$context['sub_template'] = 'not_done';
+
+		// Keep browse selected.
+		$context['selected'] = 'browse';
+
+		// What percent through are we?
+		$context['continue_percent'] = round(($sent_emails / $all_emails) * 100, 1);
+
+		// Never more than 100%!
+		$context['continue_percent'] = min($context['continue_percent'], 100);
+
+		obExit();
 	}
 
 	/**
@@ -117,7 +345,7 @@ class ManageMail extends \ElkArte\AbstractController
 					),
 					'data' => array(
 						'function' => function ($rowData) {
-							return \ElkArte\Util::shorten_text(\ElkArte\Util::htmlspecialchars($rowData['subject'], 50));
+							return Util::shorten_text(Util::htmlspecialchars($rowData['subject'], 50));
 						},
 						'class' => 'smalltext',
 					),
@@ -209,222 +437,5 @@ class ManageMail extends \ElkArte\AbstractController
 		);
 
 		createList($listOptions);
-	}
-
-	/**
-	 * Allows to view and modify the mail settings.
-	 *
-	 * @event integrate_save_mail_settings
-	 * @uses show_settings sub template
-	 */
-	public function action_mailSettings_display()
-	{
-		global $txt, $context, $txtBirthdayEmails;
-
-		// Some important context stuff
-		$context['page_title'] = $txt['mail_settings'];
-		$context['sub_template'] = 'show_settings';
-
-		// Initialize the form
-		$settingsForm = new \ElkArte\SettingsForm\SettingsForm(\ElkArte\SettingsForm\SettingsForm::DB_ADAPTER);
-
-		// Initialize it with our settings
-		$config_vars = $this->_settings();
-		$settingsForm->setConfigVars($config_vars);
-
-		// Piece of redundant code, for the javascript
-		$processedBirthdayEmails = array();
-		foreach ($txtBirthdayEmails as $key => $value)
-		{
-			$index = substr($key, 0, strrpos($key, '_'));
-			$element = substr($key, strrpos($key, '_') + 1);
-			$processedBirthdayEmails[$index][$element] = $value;
-		}
-
-		// Saving?
-		if (isset($this->_req->query->save))
-		{
-			// Make the SMTP password a little harder to see in a backup etc.
-			if (!empty($this->_req->post->smtp_password[1]))
-			{
-				$this->_req->post->smtp_password[0] = base64_encode($this->_req->post->smtp_password[0]);
-				$this->_req->post->smtp_password[1] = base64_encode($this->_req->post->smtp_password[1]);
-			}
-			checkSession();
-
-			// We don't want to save the subject and body previews.
-			unset($config_vars['birthday_subject'], $config_vars['birthday_body']);
-			$settingsForm->setConfigVars($config_vars);
-			call_integration_hook('integrate_save_mail_settings');
-
-			// You can not send more per page load than you can per minute
-			if (!empty($this->_req->post->mail_batch_size))
-				$this->_req->post->mail_batch_size = min((int) $this->_req->post->mail_batch_size, (int) $this->_req->post->mail_period_limit);
-
-			$settingsForm->setConfigValues((array) $this->_req->post);
-			$settingsForm->save();
-			redirectexit('action=admin;area=mailqueue;sa=settings');
-		}
-
-		$context['post_url'] = getUrl('admin', ['action' => 'admin', 'area' => 'mailqueue', 'sa' => 'settings', 'save']);
-		$context['settings_title'] = $txt['mailqueue_settings'];
-
-		// Prepare the config form
-		$settingsForm->prepare();
-
-		// Build a little JS so the birthday mail can be seen
-		$javascript = '
-			var bDay = {';
-
-		$i = 0;
-		foreach ($processedBirthdayEmails as $index => $email)
-		{
-			$is_last = ++$i == count($processedBirthdayEmails);
-			$javascript .= '
-				' . $index . ': {
-				subject: ' . JavaScriptEscape($email['subject']) . ',
-				body: ' . JavaScriptEscape(nl2br($email['body'])) . '
-			}' . (!$is_last ? ',' : '');
-		}
-
-		theme()->addInlineJavascript($javascript . '
-		};
-		function fetch_birthday_preview()
-		{
-			var index = document.getElementById(\'birthday_email\').value;
-
-			document.getElementById(\'birthday_subject\').innerHTML = bDay[index].subject;
-			document.getElementById(\'birthday_body\').innerHTML = bDay[index].body;
-		}', true);
-	}
-
-	/**
-	 * Retrieve and return mail administration settings.
-	 *
-	 * @event integrate_modify_mail_settings Add new settings
-	 */
-	private function _settings()
-	{
-		global $txt, $modSettings, $txtBirthdayEmails;
-
-		// We need $txtBirthdayEmails
-		theme()->getTemplates()->loadLanguageFile('EmailTemplates');
-
-		$body = $txtBirthdayEmails[(empty($modSettings['birthday_email']) ? 'happy_birthday' : $modSettings['birthday_email']) . '_body'];
-		$subject = $txtBirthdayEmails[(empty($modSettings['birthday_email']) ? 'happy_birthday' : $modSettings['birthday_email']) . '_subject'];
-
-		$emails = array();
-		$processedBirthdayEmails = array();
-		foreach ($txtBirthdayEmails as $key => $value)
-		{
-			$index = substr($key, 0, strrpos($key, '_'));
-			$element = substr($key, strrpos($key, '_') + 1);
-			$processedBirthdayEmails[$index][$element] = $value;
-		}
-		foreach ($processedBirthdayEmails as $index => $dummy)
-			$emails[$index] = $index;
-
-		$config_vars = array(
-				// Mail queue stuff, this rocks ;)
-				array('check', 'mail_queue'),
-				array('int', 'mail_period_limit'),
-				array('int', 'mail_batch_size'),
-			'',
-				// SMTP stuff.
-				array('select', 'mail_type', array($txt['mail_type_default'], 'SMTP')),
-				array('text', 'smtp_host'),
-				array('text', 'smtp_port'),
-				array('check', 'smtp_starttls'),
-				array('text', 'smtp_username'),
-				array('password', 'smtp_password'),
-			'',
-				array('select', 'birthday_email', $emails, 'value' => array('subject' => $subject, 'body' => $body), 'javascript' => 'onchange="fetch_birthday_preview()"'),
-				'birthday_subject' => array('var_message', 'birthday_subject', 'message' => $processedBirthdayEmails[empty($modSettings['birthday_email']) ? 'happy_birthday' : $modSettings['birthday_email']]['subject'], 'disabled' => true, 'size' => strlen($subject) + 3),
-				'birthday_body' => array('var_message', 'birthday_body', 'message' => nl2br($body), 'disabled' => true, 'size' => ceil(strlen($body) / 25)),
-		);
-
-		// Add new settings with a nice hook, makes them available for admin settings search as well
-		call_integration_hook('integrate_modify_mail_settings', array(&$config_vars));
-
-		return $config_vars;
-	}
-
-	/**
-	 * Return the form settings for use in admin search
-	 */
-	public function settings_search()
-	{
-		return $this->_settings();
-	}
-
-	/**
-	 * This function clears the mail queue of all emails, and at the end redirects to browse.
-	 *
-	 * - Note force clearing the queue may cause a site to exceed hosting mail limit quotas
-	 * - Some hosts simple loose these excess emails, others queue them server side, up to a limit
-	 */
-	public function action_clear()
-	{
-		global $modSettings;
-
-		checkSession('get');
-
-		// This is certainly needed!
-		require_once(SUBSDIR . '/Mail.subs.php');
-
-		// Set a number to send each loop
-		$number_to_send = empty($modSettings['mail_period_limit']) ? 25 : $modSettings['mail_period_limit'];
-
-		// If we don't yet have the total to clear, find it.
-		$all_emails = isset($this->_req->query->te) ? (int) $this->_req->query->te : list_getMailQueueSize();
-
-		// If we don't know how many we sent, it must be because... we didn't send any!
-		$sent_emails = isset($this->_req->query->sent) ? (int) $this->_req->query->sent : 0;
-
-		// Send this batch, then go for a short break...
-		while (reduceMailQueue($number_to_send, true, true) === true)
-		{
-			// Sent another batch
-			$sent_emails += $number_to_send;
-			$this->_pauseMailQueueClear($all_emails, $sent_emails);
-		}
-
-		return $this->action_browse();
-	}
-
-	/**
-	 * Used for pausing the mail queue.
-	 *
-	 * @param int $all_emails total emails to be sent
-	 * @param int $sent_emails number of emails sent so far
-	 * @throws \ElkArte\Exceptions\Exception
-	 */
-	private function _pauseMailQueueClear($all_emails, $sent_emails)
-	{
-		global $context, $txt, $time_start;
-
-		// Try get more time...
-		detectServer()->setTimeLimit(600);
-
-		// Have we already used our maximum time?
-		if (time() - array_sum(explode(' ', $time_start)) < 5)
-			return;
-
-		$context['continue_get_data'] = '?action=admin;area=mailqueue;sa=clear;te=' . $all_emails . ';sent=' . $sent_emails . ';' . $context['session_var'] . '=' . $context['session_id'];
-		$context['page_title'] = $txt['not_done_title'];
-		$context['continue_post_data'] = '';
-		$context['continue_countdown'] = '10';
-		$context['sub_template'] = 'not_done';
-
-		// Keep browse selected.
-		$context['selected'] = 'browse';
-
-		// What percent through are we?
-		$context['continue_percent'] = round(($sent_emails / $all_emails) * 100, 1);
-
-		// Never more than 100%!
-		$context['continue_percent'] = min($context['continue_percent'], 100);
-
-		obExit();
 	}
 }

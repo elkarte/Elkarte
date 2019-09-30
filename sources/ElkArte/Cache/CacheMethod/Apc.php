@@ -45,30 +45,8 @@ class Apc extends AbstractCacheMethod
 	public function exists($key)
 	{
 		$this->get($key);
-		return !$this->is_miss;
-	}
 
-	/**
-	 * {@inheritdoc}
-	 */
-	public function put($key, $value, $ttl = 120)
-	{
-		$prefixedKey = $this->getprefixedKey($key);
-		// An extended key is needed to counteract a bug in APC.
-		if ($this->apcu)
-		{
-			if ($value === null)
-				apcu_delete($prefixedKey);
-			else
-				apcu_store($prefixedKey, $value, $ttl);
-		}
-		else
-		{
-			if ($value === null)
-				apc_delete($prefixedKey);
-			else
-				apc_store($prefixedKey, $value, $ttl);
-		}
+		return !$this->is_miss;
 	}
 
 	/**
@@ -78,21 +56,52 @@ class Apc extends AbstractCacheMethod
 	{
 		$prefixedKey = $this->getprefixedKey($key);
 		$success = false;
-		if ($this->apcu)
-			$result = apcu_fetch($prefixedKey, $success);
-		else
-			$result = apc_fetch($prefixedKey, $success);
+		$result = $this->apcu ? apcu_fetch($prefixedKey, $success) : apc_fetch($prefixedKey, $success);
 		$this->is_miss = !$success;
 
 		/*
-		 * Let's be conssistent, yes? All other cache methods
+		 * Let's be consistent, yes? All other cache methods
 		 * supported by ElkArte return null on failure to grab
 		 * the specified cache entry.
 		 */
 		if ($this->is_miss)
+		{
 			return;
+		}
 
 		return $result;
+	}
+
+	/**
+	 * {@inheritdoc}
+	 */
+	public function put($key, $value, $ttl = 120)
+	{
+		$prefixedKey = $this->getprefixedKey($key);
+
+		// An extended key is needed to counteract a bug in APC.
+		if ($this->apcu)
+		{
+			if ($value === null)
+			{
+				apcu_delete($prefixedKey);
+			}
+			else
+			{
+				apcu_store($prefixedKey, $value, $ttl);
+			}
+		}
+		else
+		{
+			if ($value === null)
+			{
+				apc_delete($prefixedKey);
+			}
+			else
+			{
+				apc_store($prefixedKey, $value, $ttl);
+			}
+		}
 	}
 
 	/**
@@ -101,7 +110,9 @@ class Apc extends AbstractCacheMethod
 	public function clean($type = '')
 	{
 		if ($this->apcu)
+		{
 			apcu_clear_cache();
+		}
 		// If passed a type, clear that type out
 		elseif ($type === '' || $type === 'data')
 		{
@@ -109,7 +120,9 @@ class Apc extends AbstractCacheMethod
 			apc_clear_cache('system');
 		}
 		elseif ($type === 'user')
+		{
 			apc_clear_cache('user');
+		}
 	}
 
 	/**

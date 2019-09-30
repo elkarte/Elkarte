@@ -32,90 +32,105 @@ class UnTgz
 {
 	/**
 	 * Holds the return array of files processed
+	 *
 	 * @var mixed[]
 	 */
 	protected $return = array();
 
 	/**
 	 * Holds the data found in each tar file header block
+	 *
 	 * @var mixed[]
 	 */
 	protected $_current = array();
 
 	/**
 	 * Holds the file pointer, generally to the 512 block we are working on
+	 *
 	 * @var int
 	 */
 	protected $_offset = 0;
 
 	/**
 	 * If the file passes or fails crc check
+	 *
 	 * @var boolean
 	 */
 	protected $_crc_check = false;
 
 	/**
 	 * The current crc value of the data
+	 *
 	 * @var string|int
 	 */
 	protected $_crc;
 
 	/**
 	 * The claimed size of the data in the tarball
+	 *
 	 * @var int
 	 */
 	protected $_size;
 
 	/**
 	 * If we are going to write out the files processed
+	 *
 	 * @var boolean
 	 */
 	protected $_write_this = false;
 
 	/**
 	 * If we will skip a file we found
+	 *
 	 * @var boolean
 	 */
 	protected $_skip = false;
 
 	/**
 	 * If we found a file that was requested ($files_to_extract)
+	 *
 	 * @var boolean
 	 */
 	protected $_found = false;
 
 	/**
 	 * Current file header we are working on
+	 *
 	 * @var mixed[]|string
 	 */
 	protected $_header = array();
 
 	/**
 	 * Array of file names we want to extract from the archive
+	 *
 	 * @var null|string[]
 	 */
 	protected $files_to_extract;
 
 	/**
 	 * Holds the data string passed to the function
+	 *
 	 * @var string
 	 */
 	protected $data;
 
 	/**
 	 * Location to write the files.
+	 *
 	 * @var string
 	 */
 	protected $destination;
 
 	/**
 	 * If we are looking for a single specific file
+	 *
 	 * @var boolean|string
 	 */
 	protected $single_file;
 
 	/**
 	 * If we can overwrite a file with the same name in the destination
+	 *
 	 * @var boolean
 	 */
 	protected $overwrite;
@@ -123,10 +138,10 @@ class UnTgz
 	/**
 	 * Class initialization, passes variables, loads dependencies
 	 *
-	 * @param string        $data
-	 * @param string        $destination
-	 * @param bool|string   $single_file
-	 * @param bool          $overwrite
+	 * @param string $data
+	 * @param string $destination
+	 * @param bool|string $single_file
+	 * @param bool $overwrite
 	 * @param null|string[] $files_to_extract
 	 *
 	 * @throws \ElkArte\Exceptions\Exception package_no_zlib
@@ -142,7 +157,9 @@ class UnTgz
 
 		// This class sorta needs gzinflate!
 		if (!function_exists('gzinflate'))
+		{
 			throw new Exceptions\Exception('package_no_zlib', 'critical');
+		}
 
 		// Make sure we have this loaded.
 		theme()->getTemplates()->loadLanguageFile('Packages');
@@ -153,43 +170,59 @@ class UnTgz
 		// The destination needs exist and be writable or we are doomed
 		umask(0);
 		if ($this->destination !== null && !file_exists($this->destination) && !$this->single_file)
+		{
 			mktree($this->destination, 0777);
+		}
 	}
 
 	/**
 	 * Class controller, calls the ungzip / untar functions in required order
 	 *
-	 * @return boolean|array
+	 * @return boolean|mixed[]
 	 */
 	public function read_tgz_data()
 	{
 		// Snif test that this is a .tgz tar.gz file
-		if (empty($this->_header) && $this->check_valid_tgz() === false)
+		if (empty($this->_header) && !$this->check_valid_tgz())
+		{
 			return false;
+		}
 
 		// The tgz information for this archive
 		if ($this->_read_header_tgz() === false)
+		{
 			return false;
+		}
 
 		// With the offset found, read and deflate the archive data
 		if ($this->_ungzip_data() === false)
+		{
 			return false;
+		}
 
 		// With the archive data in hand, we need to un tarball it
 		$this->_process_files();
 
 		// Looking for a single file and this is it
 		if ($this->_found && $this->single_file)
+		{
 			return $this->_crc_check ? $this->_found : false;
+		}
 
 		// Wanted many files then we need to clean up
 		if ($this->destination !== null && !$this->single_file)
+		{
 			package_flush_cache();
+		}
 
 		if ($this->single_file)
+		{
 			return false;
+		}
 		else
+		{
 			return $this->return;
+		}
 	}
 
 	/**
@@ -201,7 +234,9 @@ class UnTgz
 	{
 		// No signature?
 		if (strlen($this->data) < 10)
+		{
 			return false;
+		}
 
 		// Unpack the 10 byte signature so we can see what we have
 		$this->_header = unpack('H2a/H2b/Ct/Cf/Vmtime/Cxtra/Cos', substr($this->data, 0, 10));
@@ -234,7 +269,9 @@ class UnTgz
 	{
 		// Compression method needs to be 8 = deflate!
 		if ($this->_header['t'] !== 8)
+		{
 			return false;
+		}
 
 		// Each bit of this byte represents a processing flag as follows
 		// 0 fTEXT, 1 fHCRC, 2 fEXTRA, 3 fNAME, 4 fCOMMENT, 5 fENCRYPT, 6-7 reserved
@@ -244,33 +281,39 @@ class UnTgz
 		$this->_offset = 10;
 
 		// fEXTRA flag set we simply skip over its entry and the length of its data
-		if ($flags & 4)
+		if (($flags & 4) !== 0)
 		{
 			$xlen = unpack('vxlen', substr($this->data, $this->_offset, 2));
 			$this->_offset += $xlen['xlen'] + 2;
 		}
 
 		// Read the filename, its zero terminated
-		if ($flags & 8)
+		if (($flags & 8) !== 0)
 		{
 			$this->_header['filename'] = '';
 			while ($this->data[$this->_offset] !== "\0")
+			{
 				$this->_header['filename'] .= $this->data[$this->_offset++];
+			}
 			$this->_offset++;
 		}
 
 		// Read the comment, its also zero terminated
-		if ($flags & 16)
+		if (($flags & 16) !== 0)
 		{
 			$this->_header['comment'] = '';
 			while ($this->data[$this->_offset] !== "\0")
+			{
 				$this->_header['comment'] .= $this->data[$this->_offset++];
+			}
 			$this->_offset++;
 		}
 
 		// "Read" the header CRC $crc16 = unpack('vcrc16', substr($data, $this->_offset, 2));
-		if ($flags & 2)
+		if (($flags & 2) !== 0)
+		{
 			$this->_offset += 2;
+		}
 	}
 
 	/**
@@ -289,7 +332,21 @@ class UnTgz
 
 		// Check the crc and the data size
 		if (!$this->_check_crc() || (strlen($this->data) !== $check['isize']))
+		{
 			return false;
+		}
+	}
+
+	/**
+	 * Checks the saved vs calculated crc values
+	 */
+	private function _check_crc()
+	{
+		// Make sure we have unsigned crc padded hex.
+		$crc_uncompressed = hash('crc32b', $this->data);
+		$this->_crc = str_pad(dechex($this->_crc), 8, '0', STR_PAD_LEFT);
+
+		return $this->data !== false && $this->_crc === $crc_uncompressed;
 	}
 
 	/**
@@ -318,7 +375,9 @@ class UnTgz
 
 			// If its a directory, lets make sure it ends in a /
 			if ($this->_current['type'] == 5 && substr($this->_current['filename'], -1) !== '/')
+			{
 				$this->_current['filename'] .= '/';
+			}
 
 			// Figure out what we will do with the data once we have it
 			$this->_determine_write_this();
@@ -334,10 +393,14 @@ class UnTgz
 				$this->_write_this_file();
 
 				if ($this->_skip)
+				{
 					continue;
+				}
 
 				if ($this->_found)
+				{
 					return;
+				}
 			}
 
 			if (substr($this->_current['filename'], -1) !== '/')
@@ -389,10 +452,7 @@ class UnTgz
 		// Clean the header fields, convert octal to decimal as needed
 		foreach ($this->_current as $key => $value)
 		{
-			if (in_array($key, $octdec))
-				$this->_current[$key] = octdec(trim($value));
-			else
-				$this->_current[$key] = trim($value);
+			$this->_current[$key] = in_array($key, $octdec) ? octdec(trim($value)) : trim($value);
 		}
 	}
 
@@ -403,10 +463,14 @@ class UnTgz
 	{
 		// Not a directory and doesn't exist already...
 		if (substr($this->_current['filename'], -1) !== '/' && !file_exists($this->destination . '/' . $this->_current['filename']))
+		{
 			$this->_write_this = true;
+		}
 		// File exists... check if it is newer.
 		elseif (substr($this->_current['filename'], -1) !== '/')
+		{
 			$this->_write_this = $this->overwrite || filemtime($this->destination . '/' . $this->_current['filename']) < $this->_current['mtime'];
+		}
 		// Folder... create.
 		elseif ($this->destination !== null && !$this->single_file)
 		{
@@ -414,11 +478,15 @@ class UnTgz
 			$this->_current['filename'] = strtr($this->_current['filename'], array('../' => '', '/..' => ''));
 
 			if (!file_exists($this->destination . '/' . $this->_current['filename']))
+			{
 				mktree($this->destination . '/' . $this->_current['filename'], 0777);
+			}
 			$this->_write_this = false;
 		}
 		else
+		{
 			$this->_write_this = false;
+		}
 	}
 
 	/**
@@ -434,33 +502,31 @@ class UnTgz
 
 		// A directory may need to be created
 		if (strpos($this->_current['filename'], '/') !== false && !$this->single_file)
+		{
 			mktree($this->destination . '/' . dirname($this->_current['filename']), 0777);
+		}
 
 		// Is this the file we're looking for?
 		if ($this->single_file && ($this->destination === $this->_current['filename'] || $this->destination === '*/' . basename($this->_current['filename'])))
+		{
 			$this->_found = $this->_current['data'];
+		}
 		// If we're looking for another file, keep going.
 		elseif ($this->single_file)
+		{
 			$this->_skip = true;
+		}
 		// Looking for restricted files?
 		elseif ($this->files_to_extract !== null && !in_array($this->_current['filename'], $this->files_to_extract))
+		{
 			$this->_skip = true;
+		}
 
 		// Write it out then
-		if ($this->_check_header_crc() && $this->_skip === false && $this->_found === false)
+		if ($this->_check_header_crc() && !$this->_skip && $this->_found === false)
+		{
 			package_put_contents($this->destination . '/' . $this->_current['filename'], $this->_current['data']);
-	}
-
-	/**
-	 * Checks the saved vs calculated crc values
-	 */
-	private function _check_crc()
-	{
-		// Make sure we have unsigned crc padded hex.
-		$crc_uncompressed = hash('crc32b', $this->data);
-		$this->_crc = str_pad(dechex($this->_crc), 8, '0', STR_PAD_LEFT);
-
-		return !($this->data === false || ($this->_crc !== $crc_uncompressed));
+		}
 	}
 
 	/**
@@ -472,9 +538,13 @@ class UnTgz
 
 		// Build the checksum for this header and make sure it matches what it claims
 		for ($i = 0; $i < 148; $i++)
+		{
 			$this->_crc += ord($this->_header[$i]);
+		}
 		for ($i = 156; $i < 512; $i++)
+		{
 			$this->_crc += ord($this->_header[$i]);
+		}
 
 		$this->_crc_check = $this->_current['checksum'] === $this->_crc;
 

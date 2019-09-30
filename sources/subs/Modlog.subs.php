@@ -8,11 +8,13 @@
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause (see accompanying LICENSE.txt file)
  *
  * This file contains code covered by:
- * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * copyright: 2011 Simple Machines (http://www.simplemachines.org)
  *
  * @version 2.0 dev
  *
  */
+
+use ElkArte\Util;
 
 /**
  * Get the number of mod log entries.
@@ -39,7 +41,7 @@ function list_getModLogEntryCount($query_string = '', $query_params = array(), $
 			LEFT JOIN {db_prefix}topics AS t ON (t.id_topic = lm.id_topic)
 		WHERE id_log = {int:log_type}
 			AND {raw:modlog_query}'
-			. (!empty($query_string) ? '
+		. (!empty($query_string) ? '
 				AND ' . $query_string : ''),
 		array_merge($query_params, array(
 			'reg_group_id' => 0,
@@ -76,7 +78,9 @@ function list_getModLogEntries($start, $items_per_page, $sort, $query_string = '
 
 	// Do a little bit of self protection.
 	if (!isset($context['hoursdisable']))
+	{
 		$context['hoursdisable'] = 24;
+	}
 
 	// Can they see the IP address?
 	$seeIP = allowedTo('moderate_forum');
@@ -93,7 +97,7 @@ function list_getModLogEntries($start, $items_per_page, $sort, $query_string = '
 			LEFT JOIN {db_prefix}topics AS t ON (t.id_topic = lm.id_topic)
 			WHERE id_log = {int:log_type}
 				AND {raw:modlog_query}'
-			. (!empty($query_string) ? '
+		. (!empty($query_string) ? '
 				AND ' . $query_string : '') . '
 		ORDER BY ' . $sort . '
 		LIMIT ' . $start . ', ' . $items_per_page,
@@ -112,7 +116,7 @@ function list_getModLogEntries($start, $items_per_page, $sort, $query_string = '
 	$entries = array();
 	while ($row = $db->fetch_assoc($result))
 	{
-		$row['extra'] = \ElkArte\Util::unserialize($row['extra']);
+		$row['extra'] = Util::unserialize($row['extra']);
 
 		// Corrupt?
 		$row['extra'] = is_array($row['extra']) ? $row['extra'] : array();
@@ -121,28 +125,42 @@ function list_getModLogEntries($start, $items_per_page, $sort, $query_string = '
 		if (!empty($row['id_board']))
 		{
 			if ($row['action'] == 'move')
+			{
 				$row['extra']['board_to'] = $row['id_board'];
+			}
 			else
+			{
 				$row['extra']['board'] = $row['id_board'];
+			}
 		}
 
 		if (!empty($row['id_topic']))
+		{
 			$row['extra']['topic'] = $row['id_topic'];
+		}
 		if (!empty($row['id_msg']))
+		{
 			$row['extra']['message'] = $row['id_msg'];
+		}
 
 		// Is this associated with a topic?
 		if (isset($row['extra']['topic']))
+		{
 			$topics[(int) $row['extra']['topic']][] = $row['id_action'];
+		}
 		if (isset($row['extra']['new_topic']))
+		{
 			$topics[(int) $row['extra']['new_topic']][] = $row['id_action'];
+		}
 
 		// How about a member?
 		if (isset($row['extra']['member']))
 		{
 			// Guests don't have names!
 			if (empty($row['extra']['member']))
+			{
 				$row['extra']['member'] = $txt['modlog_parameter_guest'];
+			}
 			else
 			{
 				// Try to find it...
@@ -152,40 +170,66 @@ function list_getModLogEntries($start, $items_per_page, $sort, $query_string = '
 
 		// Associated with a board?
 		if (isset($row['extra']['board_to']))
+		{
 			$boards[(int) $row['extra']['board_to']][] = $row['id_action'];
+		}
 		if (isset($row['extra']['board_from']))
+		{
 			$boards[(int) $row['extra']['board_from']][] = $row['id_action'];
+		}
 		if (isset($row['extra']['board']))
+		{
 			$boards[(int) $row['extra']['board']][] = $row['id_action'];
+		}
 
 		// A message?
 		if (isset($row['extra']['message']))
+		{
 			$messages[(int) $row['extra']['message']][] = $row['id_action'];
+		}
 
 		// IP Info?
 		if (isset($row['extra']['ip_range']))
+		{
 			if ($seeIP)
+			{
 				$row['extra']['ip_range'] = '<a href="' . $scripturl . '?action=trackip;searchip=' . $row['extra']['ip_range'] . '">' . $row['extra']['ip_range'] . '</a>';
+			}
 			else
+			{
 				$row['extra']['ip_range'] = $txt['logged'];
+			}
+		}
 
 		// Email?
 		if (isset($row['extra']['email']))
+		{
 			$row['extra']['email'] = '<a href="mailto:' . $row['extra']['email'] . '">' . $row['extra']['email'] . '</a>';
+		}
 
 		// Bans are complex.
 		if ($row['action'] == 'ban')
 		{
 			if (!isset($row['extra']['new']) || $row['extra']['new'] == 1)
+			{
 				$row['action_text'] = $txt['modlog_ac_ban'];
+			}
 			elseif ($row['extra']['new'] == 0)
+			{
 				$row['action_text'] = $txt['modlog_ac_ban_update'];
+			}
 			else
+			{
 				$row['action_text'] = $txt['modlog_ac_ban_remove'];
+			}
 
 			foreach (array('member', 'email', 'ip_range', 'hostname') as $type)
+			{
 				if (isset($row['extra'][$type]))
+				{
 					$row['action_text'] .= $txt['modlog_ac_ban_trigger_' . $type];
+				}
+			}
 		}
 
 		// The array to go to the template. Note here that action is set to a "default" value of the action doesn't match anything in the descriptions. Allows easy adding of logging events with basic details.
@@ -216,11 +260,17 @@ function list_getModLogEntries($start, $items_per_page, $sort, $query_string = '
 			{
 				// Make the board number into a link - dealing with moving too.
 				if (isset($entries[$action]['extra']['board_to']) && $entries[$action]['extra']['board_to'] == $row['id_board'])
+				{
 					$entries[$action]['extra']['board_to'] = '<a href="' . $scripturl . '?board=' . $row['id_board'] . '.0">' . $row['name'] . '</a>';
+				}
 				elseif (isset($entries[$action]['extra']['board_from']) && $entries[$action]['extra']['board_from'] == $row['id_board'])
+				{
 					$entries[$action]['extra']['board_from'] = '<a href="' . $scripturl . '?board=' . $row['id_board'] . '.0">' . $row['name'] . '</a>';
+				}
 				elseif (isset($entries[$action]['extra']['board']) && $entries[$action]['extra']['board'] == $row['id_board'])
+				{
 					$entries[$action]['extra']['board'] = '<a href="' . $scripturl . '?board=' . $row['id_board'] . '.0">' . $row['name'] . '</a>';
+				}
 			}
 		}
 	}
@@ -253,9 +303,13 @@ function list_getModLogEntries($start, $items_per_page, $sort, $query_string = '
 
 				// Make the topic number into a link - dealing with splitting too.
 				if (isset($this_action['extra']['topic']) && $this_action['extra']['topic'] == $row['id_topic'])
+				{
 					$this_action['extra']['topic'] = '<a href="' . $scripturl . '?topic=' . $row['id_topic'] . '.' . (isset($this_action['extra']['message']) ? 'msg' . $this_action['extra']['message'] . '#msg' . $this_action['extra']['message'] : '0') . '">' . $row['subject'] . '</a>';
+				}
 				elseif (isset($this_action['extra']['new_topic']) && $this_action['extra']['new_topic'] == $row['id_topic'])
+				{
 					$this_action['extra']['new_topic'] = '<a href="' . $scripturl . '?topic=' . $row['id_topic'] . '.' . (isset($this_action['extra']['message']) ? 'msg' . $this_action['extra']['message'] . '#msg' . $this_action['extra']['message'] : '0') . '">' . $row['subject'] . '</a>';
+				}
 			}
 		}
 		$db->free_result($request);
@@ -288,7 +342,9 @@ function list_getModLogEntries($start, $items_per_page, $sort, $query_string = '
 
 				// Make the message number into a link.
 				if (isset($this_action['extra']['message']) && $this_action['extra']['message'] == $row['id_msg'])
+				{
 					$this_action['extra']['message'] = '<a href="' . $scripturl . '?msg=' . $row['id_msg'] . '">' . $row['subject'] . '</a>';
+				}
 			}
 		}
 		$db->free_result($request);
@@ -325,15 +381,23 @@ function list_getModLogEntries($start, $items_per_page, $sort, $query_string = '
 	{
 		// Make any message info links so its easier to go find that message.
 		if (isset($entry['extra']['message']) && (empty($entry['message']) || empty($entry['message']['id'])))
+		{
 			$entries[$k]['extra']['message'] = '<a href="' . $scripturl . '?msg=' . $entry['extra']['message'] . '">' . $entry['extra']['message'] . '</a>';
+		}
 
 		// Mark up any deleted members, topics and boards.
 		foreach (array('board', 'board_from', 'board_to', 'member', 'topic', 'new_topic') as $type)
+		{
 			if (!empty($entry['extra'][$type]) && is_numeric($entry['extra'][$type]))
+			{
 				$entries[$k]['extra'][$type] = sprintf($txt['modlog_id'], $entry['extra'][$type]);
+			}
+		}
 
 		if (empty($entries[$k]['action_text']))
+		{
 			$entries[$k]['action_text'] = isset($txt['modlog_ac_' . $entry['action']]) ? $txt['modlog_ac_' . $entry['action']] : $entry['action'];
+		}
 
 		$callback->key = $k;
 		$entries[$k]['action_text'] = preg_replace_callback('~\{([A-Za-z\d_]+)\}~i', array($callback, 'callback'), $entries[$k]['action_text']);
@@ -364,9 +428,13 @@ class ModLogEntriesReplacement
 	public function callback($matches)
 	{
 		if (isset($this->entries[$this->key]['extra'][$matches[1]]))
+		{
 			return $this->entries[$this->key]['extra'][$matches[1]];
+		}
 		else
+		{
 			return '';
+		}
 	}
 }
 

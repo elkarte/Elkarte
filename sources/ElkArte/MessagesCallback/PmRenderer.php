@@ -9,7 +9,7 @@
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause (see accompanying LICENSE.txt file)
  *
  * This file contains code covered by:
- * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * copyright: 2011 Simple Machines (http://www.simplemachines.org)
  *
  * @version 2.0 dev
  *
@@ -17,8 +17,8 @@
 
 namespace ElkArte\MessagesCallback;
 
-use \ElkArte\MessagesCallback\BodyParser\BodyParserInterface;
-use \ElkArte\ValuesContainer;
+use ElkArte\MessagesCallback\BodyParser\BodyParserInterface;
+use ElkArte\ValuesContainer;
 
 /**
  * PmRenderer
@@ -33,6 +33,7 @@ class PmRenderer extends Renderer
 
 	/**
 	 * Array of selected personal messages
+	 *
 	 * @var int[]
 	 */
 	protected $_temp_pm_selected = null;
@@ -40,9 +41,9 @@ class PmRenderer extends Renderer
 	/**
 	 * {@inheritdoc }
 	 */
-	public function __construct($request, BodyParserInterface $bodyParser, ValuesContainer $opt = null)
+	public function __construct($request, $user, BodyParserInterface $bodyParser, ValuesContainer $opt = null)
 	{
-		parent::__construct($request, $bodyParser, $opt);
+		parent::__construct($request, $user, $bodyParser, $opt);
 		$this->_idx_mapper = new ValuesContainer([
 			'id_msg' => 'id_pm',
 			'id_member' => 'id_member_from',
@@ -103,7 +104,7 @@ class PmRenderer extends Renderer
 			'recipients' => $this->_options->recipients[$id_pm],
 			'number_recipients' => count($this->_options->recipients[$id_pm]['to']),
 			'labels' => &$context['message_labels'][$id_pm],
-			'fully_labeled' => count($context['message_labels'][$id_pm]) == count($context['labels']),
+			'fully_labeled' => count($context['message_labels'][$id_pm]) === count($context['labels']),
 			'is_replied_to' => &$context['message_replied'][$id_pm],
 			'is_unread' => &$context['message_unread'][$id_pm],
 			'is_selected' => !empty($this->_temp_pm_selected) && in_array($id_pm, $this->_temp_pm_selected),

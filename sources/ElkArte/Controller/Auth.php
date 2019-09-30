@@ -9,7 +9,7 @@
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause (see accompanying LICENSE.txt file)
  *
  * This file contains code covered by:
- * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * copyright: 2011 Simple Machines (http://www.simplemachines.org)
  *
  * @version 2.0 dev
  *
@@ -17,12 +17,20 @@
 
 namespace ElkArte\Controller;
 
+use ElkArte\AbstractController;
+use ElkArte\Cache\Cache;
+use ElkArte\Errors\Errors;
+use ElkArte\Exceptions\Exception;
+use ElkArte\User;
+use ElkArte\UserSettingsLoader;
+use ElkArte\Util;
+
 /**
  * Deals with logging in and out members, and the validation of them
  *
  * @package Authorization
  */
-class Auth extends \ElkArte\AbstractController
+class Auth extends AbstractController
 {
 	/**
 	 * {@inheritdoc }
@@ -53,7 +61,7 @@ class Auth extends \ElkArte\AbstractController
 	 *  - It caches the referring URL in $_SESSION['login_url'].
 	 *  - It is accessed from ?action=login.
 	 *
-	 *  @uses Login template and language file with the login sub-template.
+	 * @uses Login template and language file with the login sub-template.
 	 */
 	public function action_login()
 	{
@@ -73,7 +81,7 @@ class Auth extends \ElkArte\AbstractController
 
 		// Get the template ready.... not really much else to do.
 		$context['page_title'] = $txt['login'];
-		$_REQUEST['u'] = isset($_REQUEST['u']) ? \ElkArte\Util::htmlspecialchars($_REQUEST['u']) : '';
+		$_REQUEST['u'] = isset($_REQUEST['u']) ? Util::htmlspecialchars($_REQUEST['u']) : '';
 		$context['default_username'] = &$_REQUEST['u'];
 		$context['using_openid'] = isset($_GET['openid']);
 		$context['default_password'] = '';
@@ -87,9 +95,13 @@ class Auth extends \ElkArte\AbstractController
 
 		// Set the login URL - will be used when the login process is done (but careful not to send us to an attachment).
 		if (isset($_SESSION['old_url']) && validLoginUrl($_SESSION['old_url'], true))
+		{
 			$_SESSION['login_url'] = $_SESSION['old_url'];
+		}
 		else
+		{
 			unset($_SESSION['login_url']);
+		}
 
 		// Create a one time token.
 		createToken('login');
@@ -117,7 +129,7 @@ class Auth extends \ElkArte\AbstractController
 		require_once(SUBSDIR . '/Auth.subs.php');
 
 		// Beyond this point you are assumed to be a guest trying to login.
-		if (empty(\ElkArte\User::$info->is_guest))
+		if (empty(User::$info->is_guest))
 		{
 			redirectexit();
 		}
@@ -129,17 +141,25 @@ class Auth extends \ElkArte\AbstractController
 
 		// Set the login_url if it's not already set (but careful not to send us to an attachment).
 		if (empty($_SESSION['login_url']) && isset($_SESSION['old_url']) && validLoginUrl($_SESSION['old_url'], true))
+		{
 			$_SESSION['login_url'] = $_SESSION['old_url'];
+		}
 
 		// Been guessing a lot, haven't we?
 		if (isset($_SESSION['failed_login']) && $_SESSION['failed_login'] >= $modSettings['failed_login_threshold'] * 3)
-			throw new \ElkArte\Exceptions\Exception('login_threshold_fail', 'critical');
+		{
+			throw new Exception('login_threshold_fail', 'critical');
+		}
 
 		// Set up the cookie length.  (if it's invalid, just fall through and use the default.)
 		if (isset($_POST['cookieneverexp']) || (!empty($_POST['cookielength']) && $_POST['cookielength'] == -1))
+		{
 			$modSettings['cookieTime'] = 3153600;
+		}
 		elseif (!empty($_POST['cookielength']) && ($_POST['cookielength'] >= 1 && $_POST['cookielength'] <= 525600))
+		{
 			$modSettings['cookieTime'] = (int) $_POST['cookielength'];
+		}
 
 		theme()->getTemplates()->loadLanguageFile('Login');
 
@@ -167,10 +187,13 @@ class Auth extends \ElkArte\AbstractController
 			$open_id = new \ElkArte\OpenID();
 
 			if (($open_id->validate($_POST['openid_identifier'])) !== 'no_data')
+			{
 				return $open_id;
+			}
 			else
 			{
 				$context['login_errors'] = array($txt['openid_not_found']);
+
 				return false;
 			}
 		}
@@ -179,25 +202,30 @@ class Auth extends \ElkArte\AbstractController
 		if (!isset($_POST['user']) || $_POST['user'] === '')
 		{
 			$context['login_errors'] = array($txt['need_username']);
+
 			return false;
 		}
 
 		// No one needs a username that long, plus we only support 80 chars in the db
-		if (\ElkArte\Util::strlen($_POST['user']) > 80)
-			$_POST['user'] = \ElkArte\Util::substr($_POST['user'], 0, 80);
+		if (Util::strlen($_POST['user']) > 80)
+		{
+			$_POST['user'] = Util::substr($_POST['user'], 0, 80);
+		}
 
 		// Can't use a password > 64 characters sorry, to long and only good for a DoS attack
 		// Plus we expect a 64 character one from SHA-256
 		if ((isset($_POST['passwrd']) && strlen($_POST['passwrd']) > 64) || (isset($_POST['hash_passwrd']) && strlen($_POST['hash_passwrd']) > 64))
 		{
 			$context['login_errors'] = array($txt['improper_password']);
+
 			return false;
 		}
 
 		// Hmm... maybe 'admin' will login with no password. Uhh... NO!
-		if ((!isset($_POST['passwrd']) || $_POST['passwrd'] === '') && (!isset($_POST['hash_passwrd']) || strlen($_POST['hash_passwrd']) != 64))
+		if ((!isset($_POST['passwrd']) || $_POST['passwrd'] === '') && (!isset($_POST['hash_passwrd']) || strlen($_POST['hash_passwrd']) !== 64))
 		{
 			$context['login_errors'] = array($txt['no_password']);
+
 			return false;
 		}
 
@@ -205,24 +233,26 @@ class Auth extends \ElkArte\AbstractController
 		if (preg_match('~[<>&"\'=\\\]~', preg_replace('~(&#(\\d{1,7}|x[0-9a-fA-F]{1,6});)~', '', $_POST['user'])) != 0)
 		{
 			$context['login_errors'] = array($txt['error_invalid_characters_username']);
+
 			return false;
 		}
 
 		// Are we using any sort of integration to validate the login?
-		if (in_array('retry', call_integration_hook('integrate_validate_login', array($_POST['user'], isset($_POST['hash_passwrd']) && strlen($_POST['hash_passwrd']) == 40 ? $_POST['hash_passwrd'] : null, $modSettings['cookieTime'])), true))
+		if (in_array('retry', call_integration_hook('integrate_validate_login', array($_POST['user'], isset($_POST['hash_passwrd']) && strlen($_POST['hash_passwrd']) === 40 ? $_POST['hash_passwrd'] : null, $modSettings['cookieTime'])), true))
 		{
 			$context['login_errors'] = array($txt['login_hash_error']);
 			$context['disable_login_hashing'] = true;
+
 			return false;
 		}
 
 		// Find them... if we can
 		$member_found = loadExistingMember($_POST['user']);
 		$db = database();
-		$cache = \ElkArte\Cache\Cache::instance();
+		$cache = Cache::instance();
 		$req = request();
 
-		$user = new \ElkArte\UserSettingsLoader($db, $cache, $req);
+		$user = new UserSettingsLoader($db, $cache, $req);
 		$user->loadUserById($member_found['id_member'], true, '');
 		$user_setting = $user->getSettings();
 
@@ -230,6 +260,7 @@ class Auth extends \ElkArte\AbstractController
 		if (!empty($modSettings['enableOTP']) && !empty($user_setting['enable_otp']) && empty($_POST['otp_token']))
 		{
 			$context['login_errors'] = array($txt['otp_required']);
+
 			return false;
 		}
 
@@ -243,12 +274,14 @@ class Auth extends \ElkArte\AbstractController
 			if (!$checkResult)
 			{
 				$context['login_errors'] = array($txt['invalid_otptoken']);
+
 				return false;
 			}
 			// OTP already used? Sorry, but this is a ONE TIME password..
-			if ($user_setting['otp_used'] == $_POST['otp_token'])
+			if ($user_setting['otp_used'] === $_POST['otp_token'])
 			{
 				$context['login_errors'] = array($txt['otp_used']);
+
 				return false;
 			}
 		}
@@ -257,6 +290,7 @@ class Auth extends \ElkArte\AbstractController
 		if (empty($member_found))
 		{
 			$context['login_errors'] = array($txt['username_no_exist']);
+
 			return false;
 		}
 
@@ -267,7 +301,7 @@ class Auth extends \ElkArte\AbstractController
 			$valid_password = $user->validatePassword($_POST['hash_passwrd']);
 
 			// Let them in
-			if ($valid_password === true)
+			if ($valid_password)
 			{
 				$sha_passwd = $_POST['hash_passwrd'];
 			}
@@ -277,7 +311,7 @@ class Auth extends \ElkArte\AbstractController
 				// Old password passed, turn off hashing and ask for it again so we can update the db to something more secure.
 				$context['login_errors'] = array($txt['login_hash_error']);
 				$context['disable_login_hashing'] = true;
-				\ElkArte\User::logOutUser(true);
+				User::logOutUser(true);
 
 				return false;
 			}
@@ -296,12 +330,12 @@ class Auth extends \ElkArte\AbstractController
 				}
 				else
 				{
-					\ElkArte\Errors\Errors::instance()->log_error($txt['incorrect_password'] . ' - <span class="remove">' . $user_setting['member_name'] . '</span>', 'user');
+					Errors::instance()->log_error($txt['incorrect_password'] . ' - <span class="remove">' . $user_setting['member_name'] . '</span>', 'user');
 
 					// Wrong password, lets enable plain text responses in case form hashing is causing problems
 					$context['disable_login_hashing'] = true;
 					$context['login_errors'] = array($txt['incorrect_password']);
-					\ElkArte\User::logOutUser(true);
+					User::logOutUser(true);
 
 					return false;
 				}
@@ -316,7 +350,7 @@ class Auth extends \ElkArte\AbstractController
 		}
 
 		// Bad password!  Thought you could fool the database?!
-		if ($valid_password === false)
+		if (!$valid_password)
 		{
 			// Let's be cautious, no hacking please. thanx.
 			validatePasswordFlood($user_setting['id_member'], $user_setting['passwd_flood']);
@@ -341,14 +375,17 @@ class Auth extends \ElkArte\AbstractController
 
 				// Hmm... don't remember it, do you?  Here, try the password reminder ;).
 				if ($_SESSION['failed_login'] >= $modSettings['failed_login_threshold'])
+				{
 					redirectexit('action=reminder');
+				}
 				// We'll give you another chance...
 				else
 				{
 					// Log an error so we know that it didn't go well in the error log.
-					\ElkArte\Errors\Errors::instance()->log_error($txt['incorrect_password'] . ' - <span class="remove">' . $user_setting['member_name'] . '</span>', 'user');
+					Errors::instance()->log_error($txt['incorrect_password'] . ' - <span class="remove">' . $user_setting['member_name'] . '</span>', 'user');
 
 					$context['login_errors'] = array($txt['incorrect_password']);
+
 					return false;
 				}
 			}
@@ -383,201 +420,6 @@ class Auth extends \ElkArte\AbstractController
 		}
 
 		return false;
-	}
-
-	/**
-	 * Logs the current user out of their account.
-	 *
-	 * What it does:
-	 *
-	 * - It requires that the session hash is sent as well, to prevent automatic logouts by images or javascript.
-	 * - It redirects back to $_SESSION['logout_url'], if it exists.
-	 * - It is accessed via ?action=logout;session_var=...
-	 *
-	 * @param boolean $internal if true, it doesn't check the session
-	 * @param boolean $redirect if true, redirect to the board index
-	 * @throws \ElkArte\Exceptions\Exception
-	 */
-	public function action_logout($internal = false, $redirect = true)
-	{
-		// Make sure they aren't being auto-logged out.
-		if (!$internal)
-		{
-			checkSession('get');
-		}
-
-		require_once(SUBSDIR . '/Auth.subs.php');
-
-		if (isset($_SESSION['pack_ftp']))
-		{
-			$_SESSION['pack_ftp'] = null;
-		}
-
-		// They cannot be open ID verified any longer.
-		if (isset($_SESSION['openid']))
-		{
-			unset($_SESSION['openid']);
-		}
-
-		// It won't be first login anymore.
-		unset($_SESSION['first_login']);
-
-		// Just ensure they aren't a guest!
-		if (empty(\ElkArte\User::$info['is_guest']))
-		{
-			// Pass the logout information to integrations.
-			call_integration_hook('integrate_logout', array(\ElkArte\User::$settings['member_name']));
-
-			// If you log out, you aren't online anymore :P.
-			require_once(SUBSDIR . '/Logging.subs.php');
-			logOnline(\ElkArte\User::$info['id'], false);
-		}
-
-		// Logout? Let's kill the admin/moderate/other sessions, too.
-		$types = array('admin', 'moderate');
-		call_integration_hook('integrate_validateSession', array(&$types));
-		foreach ($types as $type)
-		{
-			unset($_SESSION[$type . '_time']);
-		}
-
-		$_SESSION['log_time'] = 0;
-
-		// Empty the cookie! (set it in the past, and for id_member = 0)
-		setLoginCookie(-3600, 0);
-
-		// And some other housekeeping while we're at it.
-		session_destroy();
-		if (!empty(\ElkArte\User::$info['id']))
-		{
-			\ElkArte\User::$settings->fixSalt(true);
-			require_once(SUBSDIR . '/Members.subs.php');
-			updateMemberData(\ElkArte\User::$info['id'], array('password_salt' => \ElkArte\User::$settings['password_salt']));
-		}
-
-		// Off to the merry board index we go!
-		if ($redirect)
-		{
-			if (empty($_SESSION['logout_url']))
-			{
-				redirectexit('', detectServer()->is('needs_login_fix'));
-			}
-			elseif (!empty($_SESSION['logout_url']) && (substr($_SESSION['logout_url'], 0, 7) !== 'http://' && substr($_SESSION['logout_url'], 0, 8) !== 'https://'))
-			{
-				unset($_SESSION['logout_url']);
-				redirectexit();
-			}
-			else
-			{
-				$temp = $_SESSION['logout_url'];
-				unset($_SESSION['logout_url']);
-
-				redirectexit($temp, detectServer()->is('needs_login_fix'));
-			}
-		}
-	}
-
-	/**
-	 * Throws guests out to the login screen when guest access is off.
-	 *
-	 * What it does:
-	 *
-	 * - It sets $_SESSION['login_url'] to $_SERVER['REQUEST_URL'].
-	 *
-	 * @uses 'kick_guest' sub template found in Login.template.php.
-	 */
-	public function action_kickguest()
-	{
-		global $txt, $context;
-
-		theme()->getTemplates()->loadLanguageFile('Login');
-		theme()->getTemplates()->load('Login');
-		loadJavascriptFile('sha256.js', array('defer' => true));
-		createToken('login');
-
-		// Never redirect to an attachment
-		if (validLoginUrl($_SERVER['REQUEST_URL']))
-			$_SESSION['login_url'] = $_SERVER['REQUEST_URL'];
-
-		$context['sub_template'] = 'kick_guest';
-		$context['page_title'] = $txt['login'];
-		$context['default_password'] = '';
-	}
-
-	/**
-	 * Display a message about the forum being in maintenance mode.
-	 *
-	 * What it does:
-	 *
-	 * - Displays a login screen with sub template 'maintenance'.
-	 * - It sends a 503 header, so search engines don't index while we're in maintenance mode.
-	 */
-	public function action_maintenance_mode()
-	{
-		global $txt, $mtitle, $mmessage, $context;
-
-		theme()->getTemplates()->loadLanguageFile('Login');
-		theme()->getTemplates()->load('Login');
-		loadJavascriptFile('sha256.js', array('defer' => true));
-		createToken('login');
-
-		// Send a 503 header, so search engines don't bother indexing while we're in maintenance mode.
-		header('HTTP/1.1 503 Service Temporarily Unavailable');
-
-		// Basic template stuff..
-		$context['sub_template'] = 'maintenance';
-		$context['title'] = &$mtitle;
-		$context['description'] = un_htmlspecialchars($mmessage);
-		$context['page_title'] = $txt['maintain_mode'];
-	}
-
-	/**
-	 * Double check the cookie.
-	 */
-	public function action_check()
-	{
-		global $modSettings;
-
-		// Only our members, please.
-		if ($this->user->is_guest === false)
-		{
-			// Strike!  You're outta there!
-			if ($_GET['member'] != $this->user->id)
-			{
-				throw new \ElkArte\Exceptions\Exception('login_cookie_error', false);
-			}
-
-			$this->user->can_mod = User::$info->canMod($modSettings['postmod_active']);
-			if ($this->user->can_mod && isset(\ElkArte\User::$settings['openid_uri']) && empty(\ElkArte\User::$settings['openid_uri']))
-			{
-				$_SESSION['moderate_time'] = time();
-				unset($_SESSION['just_registered']);
-			}
-
-			// Some whitelisting for login_url...
-			if (empty($_SESSION['login_url']) || validLoginUrl($_SESSION['login_url']) === false)
-			{
-				$temp = '';
-			}
-			else
-			{
-				// Best not to clutter the session data too much...
-				$temp = $_SESSION['login_url'];
-			}
-			unset($_SESSION['login_url']);
-			redirectexit($temp);
-		}
-
-		// It'll never get here... until it does :P
-		redirectexit();
-	}
-
-	/**
-	 * Ping the server to keep the session alive and not let it disappear.
-	 */
-	public function action_keepalive()
-	{
-		dieGif();
 	}
 
 	/**
@@ -673,11 +515,15 @@ class Auth extends \ElkArte\AbstractController
 			{
 				// Try iconv first, for no particular reason.
 				if (function_exists('iconv'))
+				{
 					$other_passwords['iconv'] = sha1(strtolower(iconv('UTF-8', $modSettings['previousCharacterSet'], $member_name)) . un_htmlspecialchars(iconv('UTF-8', $modSettings['previousCharacterSet'], $posted_password)));
+				}
 
 				// Say it aint so, iconv failed!
 				if (empty($other_passwords['iconv']) && function_exists('mb_convert_encoding'))
+				{
 					$other_passwords[] = sha1(strtolower(mb_convert_encoding($member_name, 'UTF-8', $modSettings['previousCharacterSet'])) . un_htmlspecialchars(mb_convert_encoding($posted_password, 'UTF-8', $modSettings['previousCharacterSet'])));
+				}
 			}
 		}
 		// SHA-256 will be 64 characters long, lets check some of these possibilities
@@ -706,6 +552,195 @@ class Auth extends \ElkArte\AbstractController
 
 		return $other_passwords;
 	}
+
+	/**
+	 * Logs the current user out of their account.
+	 *
+	 * What it does:
+	 *
+	 * - It requires that the session hash is sent as well, to prevent automatic logouts by images or javascript.
+	 * - It redirects back to $_SESSION['logout_url'], if it exists.
+	 * - It is accessed via ?action=logout;session_var=...
+	 *
+	 * @param boolean $internal if true, it doesn't check the session
+	 * @param boolean $redirect if true, redirect to the board index
+	 * @throws \ElkArte\Exceptions\Exception
+	 */
+	public function action_logout($internal = false, $redirect = true)
+	{
+		// Make sure they aren't being auto-logged out.
+		if (!$internal)
+		{
+			checkSession('get');
+		}
+
+		require_once(SUBSDIR . '/Auth.subs.php');
+
+		if (isset($_SESSION['pack_ftp']))
+		{
+			$_SESSION['pack_ftp'] = null;
+		}
+
+		// They cannot be open ID verified any longer.
+		if (isset($_SESSION['openid']))
+		{
+			unset($_SESSION['openid']);
+		}
+
+		// It won't be first login anymore.
+		unset($_SESSION['first_login']);
+
+		// Just ensure they aren't a guest!
+		if (empty(User::$info['is_guest']))
+		{
+			// Pass the logout information to integrations.
+			call_integration_hook('integrate_logout', array(User::$settings['member_name']));
+
+			// If you log out, you aren't online anymore :P.
+			require_once(SUBSDIR . '/Logging.subs.php');
+			logOnline(User::$info['id'], false);
+		}
+
+		// Logout? Let's kill the admin/moderate/other sessions, too.
+		$types = array('admin', 'moderate');
+		call_integration_hook('integrate_validateSession', array(&$types));
+		foreach ($types as $type)
+		{
+			unset($_SESSION[$type . '_time']);
+		}
+
+		$_SESSION['log_time'] = 0;
+
+		// Empty the cookie! (set it in the past, and for id_member = 0)
+		setLoginCookie(-3600, 0);
+
+		// And some other housekeeping while we're at it.
+		session_destroy();
+		if (!empty(User::$info['id']))
+		{
+			User::$settings->fixSalt(true);
+			require_once(SUBSDIR . '/Members.subs.php');
+			updateMemberData(User::$info['id'], array('password_salt' => User::$settings['password_salt']));
+		}
+
+		// Off to the merry board index we go!
+		if ($redirect)
+		{
+			if (empty($_SESSION['logout_url']))
+			{
+				redirectexit('', detectServer()->is('needs_login_fix'));
+			}
+			elseif (!empty($_SESSION['logout_url']) && (substr($_SESSION['logout_url'], 0, 7) !== 'http://' && substr($_SESSION['logout_url'], 0, 8) !== 'https://'))
+			{
+				unset($_SESSION['logout_url']);
+				redirectexit();
+			}
+			else
+			{
+				$temp = $_SESSION['logout_url'];
+				unset($_SESSION['logout_url']);
+
+				redirectexit($temp, detectServer()->is('needs_login_fix'));
+			}
+		}
+	}
+
+	/**
+	 * Throws guests out to the login screen when guest access is off.
+	 *
+	 * What it does:
+	 *
+	 * - It sets $_SESSION['login_url'] to $_SERVER['REQUEST_URL'].
+	 *
+	 * @uses 'kick_guest' sub template found in Login.template.php.
+	 */
+	public function action_kickguest()
+	{
+		global $txt, $context;
+
+		theme()->getTemplates()->loadLanguageFile('Login');
+		theme()->getTemplates()->load('Login');
+		loadJavascriptFile('sha256.js', array('defer' => true));
+		createToken('login');
+
+		// Never redirect to an attachment
+		if (validLoginUrl($_SERVER['REQUEST_URL']))
+		{
+			$_SESSION['login_url'] = $_SERVER['REQUEST_URL'];
+		}
+
+		$context['sub_template'] = 'kick_guest';
+		$context['page_title'] = $txt['login'];
+		$context['default_password'] = '';
+	}
+
+	/**
+	 * Display a message about the forum being in maintenance mode.
+	 *
+	 * What it does:
+	 *
+	 * - Displays a login screen with sub template 'maintenance'.
+	 * - It sends a 503 header, so search engines don't index while we're in maintenance mode.
+	 */
+	public function action_maintenance_mode()
+	{
+		global $txt, $mtitle, $mmessage, $context;
+
+		theme()->getTemplates()->loadLanguageFile('Login');
+		theme()->getTemplates()->load('Login');
+		loadJavascriptFile('sha256.js', array('defer' => true));
+		createToken('login');
+
+		// Send a 503 header, so search engines don't bother indexing while we're in maintenance mode.
+		header('HTTP/1.1 503 Service Temporarily Unavailable');
+
+		// Basic template stuff..
+		$context['sub_template'] = 'maintenance';
+		$context['title'] = &$mtitle;
+		$context['description'] = un_htmlspecialchars($mmessage);
+		$context['page_title'] = $txt['maintain_mode'];
+	}
+
+	/**
+	 * Double check the cookie.
+	 */
+	public function action_check()
+	{
+		global $modSettings;
+
+		// Only our members, please.
+		if ($this->user->is_guest === false)
+		{
+			// Strike!  You're outta there!
+			if ($_GET['member'] != $this->user->id)
+			{
+				throw new Exception('login_cookie_error', false);
+			}
+
+			$this->user->can_mod = User::$info->canMod($modSettings['postmod_active']);
+			if ($this->user->can_mod && isset(User::$settings['openid_uri']) && empty(User::$settings['openid_uri']))
+			{
+				$_SESSION['moderate_time'] = time();
+				unset($_SESSION['just_registered']);
+			}
+
+			// Some whitelisting for login_url...
+			$temp = empty($_SESSION['login_url']) || validLoginUrl($_SESSION['login_url']) === false ? '' : $_SESSION['login_url'];
+			unset($_SESSION['login_url']);
+			redirectexit($temp);
+		}
+
+		// It'll never get here... until it does :P
+		redirectexit();
+	}
+
+	/**
+	 * Ping the server to keep the session alive and not let it disappear.
+	 */
+	public function action_keepalive()
+	{
+		dieGif();
+	}
 }
 
 /**
@@ -728,21 +763,24 @@ function checkActivation()
 	global $context, $txt, $modSettings;
 
 	if (!isset($context['login_errors']))
+	{
 		$context['login_errors'] = array();
+	}
 
 	// What is the true activation status of this account?
-	$activation_status = \ElkArte\User::$settings->getActivationStatus();
+	$activation_status = User::$settings->getActivationStatus();
 
 	// Check if the account is activated - COPPA first...
 	if ($activation_status == 5)
 	{
-		$context['login_errors'][] = $txt['coppa_no_concent'] . ' <a href="' . getUrl('action', ['action' => 'register', 'sa' => 'coppa', 'member' => \ElkArte\User::$settings['id_member']]) . '">' . $txt['coppa_need_more_details'] . '</a>';
+		$context['login_errors'][] = $txt['coppa_no_concent'] . ' <a href="' . getUrl('action', ['action' => 'register', 'sa' => 'coppa', 'member' => User::$settings['id_member']]) . '">' . $txt['coppa_need_more_details'] . '</a>';
+
 		return false;
 	}
 	// Awaiting approval still?
 	elseif ($activation_status == 3)
 	{
-		throw new \ElkArte\Exceptions\Exception('still_awaiting_approval', 'user');
+		throw new Exception('still_awaiting_approval', 'user');
 	}
 	// Awaiting deletion, changed their mind?
 	elseif ($activation_status == 4)
@@ -750,7 +788,7 @@ function checkActivation()
 		if (isset($_REQUEST['undelete']))
 		{
 			require_once(SUBSDIR . '/Members.subs.php');
-			updateMemberData(\ElkArte\User::$settings['id_member'], array('is_activated' => 1));
+			updateMemberData(User::$settings['id_member'], array('is_activated' => 1));
 			updateSettings(array('unapprovedMembers' => ($modSettings['unapprovedMembers'] > 0 ? $modSettings['unapprovedMembers'] - 1 : 0)));
 		}
 		else
@@ -758,17 +796,20 @@ function checkActivation()
 			$context['disable_login_hashing'] = true;
 			$context['login_errors'][] = $txt['awaiting_delete_account'];
 			$context['login_show_undelete'] = true;
+
 			return false;
 		}
 	}
 	// Standard activation?
 	elseif ($activation_status != 1)
 	{
-		\ElkArte\Errors\Errors::instance()->log_error($txt['activate_not_completed1'] . ' - <span class="remove">' . \ElkArte\User::$settings['member_name'] . '</span>', false);
+		Errors::instance()->log_error($txt['activate_not_completed1'] . ' - <span class="remove">' . User::$settings['member_name'] . '</span>', false);
 
-		$context['login_errors'][] = $txt['activate_not_completed1'] . ' <a class="linkbutton" href="' . getUrl('action', ['action' => 'register', 'sa' => 'activate', 'resend', 'u' => \ElkArte\User::$settings['id_member']]) . '">' . $txt['activate_not_completed2'] . '</a>';
+		$context['login_errors'][] = $txt['activate_not_completed1'] . ' <a class="linkbutton" href="' . getUrl('action', ['action' => 'register', 'sa' => 'activate', 'resend', 'u' => User::$settings['id_member']]) . '">' . $txt['activate_not_completed2'] . '</a>';
+
 		return false;
 	}
+
 	return true;
 }
 
@@ -780,22 +821,23 @@ function checkActivation()
  *
  * @param \ElkArte\UserSettingsLoader $user
  *
+ * @throws \ElkArte\Exceptions\Exception
  * @package Authorization
  */
-function doLogin(\ElkArte\UserSettingsLoader $user)
+function doLogin(UserSettingsLoader $user)
 {
 	global $maintenance, $modSettings, $context;
 
 	// Load authentication stuffs.
 	require_once(SUBSDIR . '/Auth.subs.php');
 
-	\ElkArte\User::reloadByUser($user, true);
+	User::reloadByUser($user, true);
 
 	// Call login integration functions.
-	call_integration_hook('integrate_login', array(\ElkArte\User::$settings['member_name'], isset($_POST['hash_passwrd']) && strlen($_POST['hash_passwrd']) == 64 ? $_POST['hash_passwrd'] : null, $modSettings['cookieTime']));
+	call_integration_hook('integrate_login', array(User::$settings['member_name'], isset($_POST['hash_passwrd']) && strlen($_POST['hash_passwrd']) === 64 ? $_POST['hash_passwrd'] : null, $modSettings['cookieTime']));
 
 	// Bam!  Cookie set.  A session too, just in case.
-	setLoginCookie(60 * $modSettings['cookieTime'], \ElkArte\User::$settings['id_member'], hash('sha256', (\ElkArte\User::$settings['passwd'] . \ElkArte\User::$settings['password_salt'])));
+	setLoginCookie(60 * $modSettings['cookieTime'], User::$settings['id_member'], hash('sha256', (User::$settings['passwd'] . User::$settings['password_salt'])));
 
 	// Reset the login threshold.
 	if (isset($_SESSION['failed_login']))
@@ -807,7 +849,7 @@ function doLogin(\ElkArte\UserSettingsLoader $user)
 	is_not_banned(true);
 
 	// An administrator, set up the login so they don't have to type it again.
-	if (\ElkArte\User::$info['is_admin'] && isset(\ElkArte\User::$settings['openid_uri']) && empty(\ElkArte\User::$settings['openid_uri']))
+	if (User::$info->is_admin && isset(User::$settings->openid_uri) && empty(User::$settings->openid_uri))
 	{
 		// Let's validate if they really want..
 		if (!empty($modSettings['auto_admin_session']) && $modSettings['auto_admin_session'] == 1)
@@ -822,7 +864,7 @@ function doLogin(\ElkArte\UserSettingsLoader $user)
 	unset($_SESSION['language'], $_SESSION['id_theme']);
 
 	// We want to know if this is first login
-	if (\ElkArte\User::$info->isFirstLogin())
+	if (User::$info->isFirstLogin())
 	{
 		$_SESSION['first_login'] = true;
 	}
@@ -836,51 +878,60 @@ function doLogin(\ElkArte\UserSettingsLoader $user)
 
 	// You've logged in, haven't you?
 	require_once(SUBSDIR . '/Members.subs.php');
-	updateMemberData($this->user->id, array('last_login' => time(), 'member_ip' => $this->user->ip, 'member_ip2' => $req->ban_ip()));
+	updateMemberData(User::$info->id, array('last_login' => time(), 'member_ip' => User::$info->ip, 'member_ip2' => $req->ban_ip()));
 
 	// Get rid of the online entry for that old guest....
 	require_once(SUBSDIR . '/Logging.subs.php');
-	deleteOnline('ip' . $this->user->ip);
+	deleteOnline('ip' . User::$info->ip);
 	$_SESSION['log_time'] = 0;
 
 	// Log this entry, only if we have it enabled.
 	if (!empty($modSettings['loginHistoryDays']))
-		logLoginHistory($this->user->id, $this->user->ip, $this->user->ip2);
+	{
+		logLoginHistory(User::$info->id, User::$info->ip, User::$info->ip2);
+	}
 
 	// Just log you back out if it's in maintenance mode and you AREN'T an admin.
 	if (empty($maintenance) || allowedTo('admin_forum'))
-		redirectexit('action=auth;sa=check;member=' . $this->user->id, detectServer()->is('needs_login_fix'));
+	{
+		redirectexit('action=auth;sa=check;member=' . User::$info->id, detectServer()->is('needs_login_fix'));
+	}
 	else
+	{
 		redirectexit('action=logout;' . $context['session_var'] . '=' . $context['session_id'], detectServer()->is('needs_login_fix'));
+	}
 }
 
 /**
  * MD5 Encryption used for older passwords. (SMF 1.0.x/YaBB SE 1.5.x hashing)
  *
- * @package Authorization
  * @param string $data
  * @param string $key
  * @return string the HMAC MD5 of data with key
+ * @package Authorization
  */
 function md5_hmac($data, $key)
 {
 	$key = str_pad(strlen($key) <= 64 ? $key : pack('H*', md5($key)), 64, chr(0x00));
+
 	return md5(($key ^ str_repeat(chr(0x5c), 64)) . pack('H*', md5(($key ^ str_repeat(chr(0x36), 64)) . $data)));
 }
 
 /**
  * Custom encryption for phpBB3 based passwords.
  *
- * @package Authorization
  * @param string $passwd
  * @param string $passwd_hash
  * @return string
+ * @package Authorization
  */
 function phpBB3_password_check($passwd, $passwd_hash)
 {
 	// Too long or too short?
-	if (strlen($passwd_hash) != 34)
+	if (strlen($passwd_hash) !== 34)
+	{
 		return false;
+	}
 
 	// Range of characters allowed.
 	$range = './0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz';
@@ -891,8 +942,10 @@ function phpBB3_password_check($passwd, $passwd_hash)
 	$salt = substr($passwd_hash, 4, 8);
 
 	$hash = md5($salt . $passwd, true);
-	for (; $count != 0; --$count)
+	for (; $count !== 0; --$count)
+	{
 		$hash = md5($hash . $passwd, true);
+	}
 
 	$output = substr($passwd_hash, 0, 12);
 	$i = 0;
@@ -902,20 +955,28 @@ function phpBB3_password_check($passwd, $passwd_hash)
 		$output .= $range[$value & 0x3f];
 
 		if ($i < 16)
+		{
 			$value |= ord($hash[$i]) << 8;
+		}
 
 		$output .= $range[($value >> 6) & 0x3f];
 
 		if ($i++ >= 16)
+		{
 			break;
+		}
 
 		if ($i < 16)
+		{
 			$value |= ord($hash[$i]) << 16;
+		}
 
 		$output .= $range[($value >> 12) & 0x3f];
 
 		if ($i++ >= 16)
+		{
 			break;
+		}
 
 		$output .= $range[($value >> 18) & 0x3f];
 	}

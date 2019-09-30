@@ -13,8 +13,9 @@
 
 namespace ElkArte\Mentions\MentionType\Notification;
 
-use ElkArte\Mentions\MentionType\NotificationInterface;
 use ElkArte\Database\QueryInterface;
+use ElkArte\Mentions\MentionType\NotificationInterface;
+use ElkArte\NotificationsTask;
 use ElkArte\UserInfo;
 
 /**
@@ -83,7 +84,7 @@ abstract class AbstractMentionMessage implements NotificationInterface
 	/**
 	 * {@inheritdoc }
 	 */
-	public function setTask(\ElkArte\NotificationsTask $task)
+	public function setTask(NotificationsTask $task)
 	{
 		$this->_task = $task;
 	}
@@ -121,7 +122,9 @@ abstract class AbstractMentionMessage implements NotificationInterface
 		);
 		$existing = array();
 		while ($row = $this->_db->fetch_assoc($request))
+		{
 			$existing[] = $row['id_member'];
+		}
 		$this->_db->free_result($request);
 
 		$actually_mentioned = array();
@@ -178,7 +181,7 @@ abstract class AbstractMentionMessage implements NotificationInterface
 	 * @return mixed[]
 	 * @throws \ElkArte\Exceptions\Exception
 	 */
-	protected function _getNotificationStrings($template, $keys, $members, \ElkArte\NotificationsTask $task, $lang_files = array(), $replacements = array())
+	protected function _getNotificationStrings($template, $keys, $members, NotificationsTask $task, $lang_files = array(), $replacements = array())
 	{
 		$members_data = $task->getMembersData();
 
@@ -250,7 +253,9 @@ abstract class AbstractMentionMessage implements NotificationInterface
 		if (!empty($lang_files) && $lang !== $this->user->language)
 		{
 			foreach ($lang_files as $file)
+			{
 				theme()->getTemplates()->loadLanguageFile($file);
+			}
 		}
 
 		return $langtxt;

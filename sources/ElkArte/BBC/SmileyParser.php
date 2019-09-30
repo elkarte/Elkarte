@@ -7,7 +7,7 @@
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause (see accompanying LICENSE.txt file)
  *
  * This file contains code covered by:
- * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * copyright: 2011 Simple Machines (http://www.simplemachines.org)
  *
  * @version 2.0 dev
  *
@@ -87,6 +87,7 @@ class SmileyParser
 	public function setPath($path)
 	{
 		$this->path = htmlspecialchars($path);
+
 		return $this;
 	}
 
@@ -113,7 +114,10 @@ class SmileyParser
 		}
 
 		// Replace away!
-		return preg_replace_callback($this->search, array($this, 'parser_callback'), $message);
+		return preg_replace_callback($this->search,
+			function (array $matches) {
+				return $this->parser_callback($matches);
+			}, $message);
 	}
 
 	/**
@@ -172,15 +176,14 @@ class SmileyParser
 
 		$replace = array(':' => '&#58;', '(' => '&#40;', ')' => '&#41;', '$' => '&#36;', '[' => '&#091;');
 
-		for ($i = 0, $n = count($smileysfrom); $i < $n; $i++)
+		foreach ($smileysfrom as $i => $smileysfrom_i)
 		{
-			$specialChars = htmlspecialchars($smileysfrom[$i], ENT_QUOTES);
+			$specialChars = htmlspecialchars($smileysfrom_i, ENT_QUOTES);
 			$smileyCode = '<img src="' . $this->path . $smileysto[$i] . '" alt="' . strtr($specialChars, $replace) . '" title="' . strtr(htmlspecialchars($smileysdescs[$i]), $replace) . '" class="smiley" />';
+			$this->replace[$smileysfrom_i] = $smileyCode;
 
-			$this->replace[$smileysfrom[$i]] = $smileyCode;
-
-			$searchParts[] = preg_quote($smileysfrom[$i], '~');
-			if ($smileysfrom[$i] != $specialChars)
+			$searchParts[] = preg_quote($smileysfrom_i, '~');
+			if ($smileysfrom_i != $specialChars)
 			{
 				$this->replace[$specialChars] = $smileyCode;
 				$searchParts[] = preg_quote($specialChars, '~');
@@ -251,8 +254,7 @@ class SmileyParser
 				ORDER BY LENGTH(code) DESC',
 				[]
 			)->fetch_callback(
-				function ($row) use (&$smileysfrom, &$smileysto, &$smileysdescs)
-				{
+				function ($row) use (&$smileysfrom, &$smileysto, &$smileysdescs) {
 					$smileysfrom[] = $row['code'];
 					$smileysto[] = htmlspecialchars($row['filename']);
 					$smileysdescs[] = $row['description'];

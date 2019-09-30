@@ -23,18 +23,21 @@ abstract class AbstractModel
 {
 	/**
 	 * The database object
+	 *
 	 * @var \ElkArte\Database\QueryInterface
 	 */
 	protected $_db = null;
 
 	/**
 	 * The current user data
+	 *
 	 * @var \ElkArte\UserInfo
 	 */
 	protected $user = null;
 
 	/**
 	 * The modSettings
+	 *
 	 * @var object
 	 */
 	protected $_modSettings = array();

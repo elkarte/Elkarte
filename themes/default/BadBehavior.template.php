@@ -27,12 +27,14 @@ function template_badbehavior_log()
 			<table id="error_log" class="table_grid">';
 
 	if ($context['has_filter'])
+	{
 		echo '
 				<tr>
 					<td colspan="3">
 						<strong>&nbsp;&nbsp;', $txt['badbehaviorlog_applying_filter'], ':</strong> ', $context['filter']['entity'], ' ', $context['filter']['value']['html'], '&nbsp;&nbsp;[<a href="', $scripturl, '?action=admin;area=logs;sa=badbehaviorlog', $context['sort_direction'] == 'down' ? ';desc' : '', '">', $txt['badbehaviorlog_clear_filter'], '</a>]
 					</td>
 				</tr>';
+	}
 
 	// The checkall box
 	echo '
@@ -45,10 +47,12 @@ function template_badbehavior_log()
 
 	// No log entries, then show a message
 	if (count($context['bb_entries']) == 0)
+	{
 		echo '
 				<tr>
 					<td class="centertext" colspan="2">', $txt['badbehaviorlog_no_entries_found'], '</td>
 				</tr>';
+	}
 
 	// We have some log entries, maybe even some spammers
 	$i = 0;
@@ -77,8 +81,10 @@ function template_badbehavior_log()
 						<div class="error_type">';
 
 		if ($entries['member']['session'] !== '')
+		{
 			echo '
 							<a href="', $scripturl, '?action=admin;area=logs;sa=badbehaviorlog', $context['sort_direction'] == 'down' ? ';desc' : '', ';filter=session;value=', $entries['member']['session'], '" title="', $txt['badbehaviorlog_apply_filter'], ': ', $txt['badbehaviorlog_filter_only_session'], '"><i class="icon icon-small i-search" title="', $txt['badbehaviorlog_apply_filter'], ': ', $txt['badbehaviorlog_filter_only_session'], '"></i></a>', $entries['member']['session'], '<br />';
+		}
 
 		echo '
 							<a href="', $scripturl, '?action=admin;area=logs;sa=badbehaviorlog', $context['sort_direction'] == 'down' ? ';desc' : '', ';filter=valid;value=', $entries['valid']['code'], '" title="', $txt['badbehaviorlog_apply_filter'], ': ', $txt['badbehaviorlog_filter_only_type'], '"><i class="icon icon-small i-search" title="', $txt['badbehaviorlog_apply_filter'], ': ', $txt['badbehaviorlog_filter_only_type'], '"></i></a>', $txt['badbehaviorlog_error_valid_response'], ': ', $entries['valid']['response'], '<br />
@@ -121,8 +127,10 @@ function template_badbehavior_log()
 					<input type="submit" name="delall" value="', $context['has_filter'] ? $txt['badbehaviorlog_remove_filtered_results'] : $txt['remove_all'], '" onclick="return confirm(\'', $context['has_filter'] ? $txt['badbehaviorlog_remove_filtered_results_confirm'] : $txt['badbehaviorlog_sure_remove'], '\');" />';
 
 	if ($context['sort_direction'] == 'down')
+	{
 		echo '
 					<input type="hidden" name="desc" value="1" />';
+	}
 
 	echo '
 					<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
@@ -281,6 +289,7 @@ function template_callback_badbehavior_add_useragent()
 
 	// If we have none, then lets show a blank one.
 	if (empty($context['badbehavior_useragent_wl']))
+	{
 		echo '
 			<dt>
 				<input type="text" name="badbehavior_useragent_wl_desc[]" class="input_text" />
@@ -288,6 +297,7 @@ function template_callback_badbehavior_add_useragent()
 			<dd>
 				<input type="text" name="badbehavior_useragent_wl[]" class="input_text" />
 			</dd>';
+	}
 
 	// And a link so they can add more
 	echo '

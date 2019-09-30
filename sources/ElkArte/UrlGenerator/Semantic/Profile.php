@@ -13,6 +13,11 @@
 
 namespace ElkArte\UrlGenerator\Semantic;
 
+/**
+ * Class Profile
+ *
+ * @package ElkArte\UrlGenerator\Semantic
+ */
 class Profile extends Standard
 {
 	/**

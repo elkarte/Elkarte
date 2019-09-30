@@ -6,7 +6,7 @@
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause (see accompanying LICENSE.txt file)
  *
  * This file contains code covered by:
- * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * copyright: 2011 Simple Machines (http://www.simplemachines.org)
  *
  * @version 2.0 dev
  *
@@ -40,6 +40,7 @@ function template_core_features()
 
 	// Loop through all the shiny features.
 	foreach ($context['features'] as $id => $feature)
+	{
 		echo '
 			<div class="features">
 				<img class="features_image" src="', $feature['image'], '" alt="', $feature['title'], '" />
@@ -51,6 +52,7 @@ function template_core_features()
 				<p>', $feature['desc'], '</p>
 				<hr />
 			</div>';
+	}
 
 	echo '
 			<div class="righttext">

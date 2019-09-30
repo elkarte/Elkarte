@@ -6,7 +6,7 @@
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause (see accompanying LICENSE.txt file)
  *
  * This file contains code covered by:
- * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * copyright: 2011 Simple Machines (http://www.simplemachines.org)
  *
  * @version 2.0 dev
  *
@@ -115,6 +115,7 @@ function template_custom_email()
 
 	// Can the user see the persons email?
 	if ($context['can_view_recipient_email'])
+	{
 		echo '
 					<dt>
 						<strong>', $txt['sendtopic_receiver_email'], ':</strong>
@@ -125,9 +126,11 @@ function template_custom_email()
 				</dl>
 				<hr />
 				<dl class="settings send_mail">';
+	}
 
 	// If it's a guest we need their details.
 	if ($context['user']['is_guest'])
+	{
 		echo '
 					<dt>
 						<label for="y_name">', $txt['sendtopic_sender_name'], ':</label>
@@ -142,8 +145,10 @@ function template_custom_email()
 					<dd>
 						<input type="text" id="y_mail" name="y_email" size="24" maxlength="50" value="', $context['user']['email'], '" class="input_text" />
 					</dt>';
+	}
 	// Otherwise show the user that we know their email.
 	else
+	{
 		echo '
 					<dt>
 						<strong>', $txt['sendtopic_sender_email'], ':</strong><br />
@@ -152,6 +157,7 @@ function template_custom_email()
 					<dd>
 						<em>', $context['user']['email'], '</em>
 					</dd>';
+	}
 
 	echo '
 					<dt>
@@ -173,8 +179,10 @@ function template_custom_email()
 
 
 	foreach ($context['form_hidden_vars'] as $key => $value)
+	{
 		echo '
 					<input type="hidden" name="', $key, '" value="', $value, '" />';
+	}
 
 	echo '
 					<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />

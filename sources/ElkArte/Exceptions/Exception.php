@@ -59,6 +59,36 @@ class Exception extends \Exception
 	}
 
 	/**
+	 * Loads the language file specified in \ElkArte\Exceptions\Exception::parseMessage()
+	 * and replaces the index received in the constructor.
+	 *
+	 * @param string|string[] $message
+	 *
+	 * @return string The index or the message.
+	 */
+	protected function loadMessage($message)
+	{
+		global $txt;
+
+		try
+		{
+			list ($msg, $lang) = $this->parseMessage($message);
+			if ($lang !== false)
+			{
+				theme()->getTemplates()->loadLanguageFile($lang);
+			}
+		}
+		catch (\Exception $e)
+		{
+			E::instance()->display_minimal_error($message);
+		}
+
+		$this->logMessage($message, $lang);
+
+		return !isset($txt[$msg]) ? $msg : (empty($this->sprintf) ? $txt[$msg] : vsprintf($txt[$msg], $this->sprintf));
+	}
+
+	/**
 	 * Cleans up the message param passed to the constructor.
 	 *
 	 * @param string|string[] $message Can be several different thing:
@@ -103,37 +133,6 @@ class Exception extends \Exception
 		}
 
 		return array($msg, $language);
-	}
-
-	/**
-	 * Loads the language file specified in \ElkArte\Exceptions\Exception::parseMessage()
-	 * and replaces the index received in the constructor.
-	 *
-	 * @param string|string[] $message
-	 *
-	 * @return string The index or the message.
-	 */
-	protected function loadMessage($message)
-	{
-		global $txt;
-
-		try
-		{
-			list ($msg, $lang) = $this->parseMessage($message);
-			if ($lang !== false)
-			{
-				theme()->getTemplates()->loadLanguageFile($lang);
-			}
-		}
-		catch (\Exception $e)
-		{
-			E::instance()->display_minimal_error($message);
-		}
-
-		$this->logMessage($message, $lang);
-		$msg = !isset($txt[$msg]) ? $msg : (empty($this->sprintf) ? $txt[$msg] : vsprintf($txt[$msg], $this->sprintf));
-
-		return $msg;
 	}
 
 	/**

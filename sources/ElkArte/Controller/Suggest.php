@@ -8,7 +8,7 @@
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause (see accompanying LICENSE.txt file)
  *
  * This file contains code covered by:
- * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * copyright: 2011 Simple Machines (http://www.simplemachines.org)
  *
  * @version 2.0 dev
  *
@@ -16,10 +16,12 @@
 
 namespace ElkArte\Controller;
 
+use ElkArte\AbstractController;
+
 /**
  * Suggest Controller
  */
-class Suggest extends \ElkArte\AbstractController
+class Suggest extends AbstractController
 {
 	/**
 	 * {@inheritdoc }
@@ -83,7 +85,9 @@ class Suggest extends \ElkArte\AbstractController
 
 			// Do we have a file to include?
 			if (!empty($currentSearch['file']) && file_exists($currentSearch['file']))
+			{
 				require_once($currentSearch['file']);
+			}
 
 			// If it is a class, let's instantiate it
 			if (!empty($currentSearch['class']) && class_exists($currentSearch['class']))
@@ -102,7 +106,9 @@ class Suggest extends \ElkArte\AbstractController
 
 			// If we have data, return it
 			if (!empty($context['xml_data']))
+			{
 				$context['sub_template'] = 'generic_xml';
+			}
 		}
 	}
 }

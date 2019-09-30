@@ -8,15 +8,13 @@
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause (see accompanying LICENSE.txt file)
  *
  * This file contains code covered by:
- * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * copyright: 2011 Simple Machines (http://www.simplemachines.org)
  *
  * @version 2.0 dev
  *
  */
 
 namespace ElkArte;
-
-use ElkArte\User;
 
 /**
  * This class has functions to handle merging of two or more topics
@@ -123,6 +121,130 @@ class TopicsMerge
 	}
 
 	/**
+	 * Grabs all the details of the topics involved in the merge process and loads
+	 * then in $this->topic_data
+	 */
+	protected function _loadTopicDetails()
+	{
+		global $scripturl, $modSettings;
+
+		// Joy of all joys, make sure they're not pi**ing about with unapproved topics they can't see :P
+		if ($modSettings['postmod_active'])
+		{
+			$can_approve_boards = !empty(User::$info->mod_cache['ap']) ? User::$info->mod_cache['ap'] : boardsAllowedTo('approve_posts');
+		}
+
+		// Get info about the topics and polls that will be merged.
+		$request = $this->_db->query('', '
+			SELECT
+				t.id_topic, t.id_board, b.id_cat, t.id_poll, t.num_views, t.is_sticky, t.approved, t.num_replies, t.unapproved_posts,
+				m1.subject, m1.poster_time AS time_started, COALESCE(mem1.id_member, 0) AS id_member_started, COALESCE(mem1.real_name, m1.poster_name) AS name_started,
+				m2.poster_time AS time_updated, COALESCE(mem2.id_member, 0) AS id_member_updated, COALESCE(mem2.real_name, m2.poster_name) AS name_updated
+			FROM {db_prefix}topics AS t
+				INNER JOIN {db_prefix}messages AS m1 ON (m1.id_msg = t.id_first_msg)
+				INNER JOIN {db_prefix}messages AS m2 ON (m2.id_msg = t.id_last_msg)
+				LEFT JOIN {db_prefix}members AS mem1 ON (mem1.id_member = m1.id_member)
+				LEFT JOIN {db_prefix}members AS mem2 ON (mem2.id_member = m2.id_member)
+				LEFT JOIN {db_prefix}boards AS b ON (b.id_board = t.id_board)
+			WHERE t.id_topic IN ({array_int:topic_list})
+			ORDER BY t.id_first_msg
+			LIMIT {int:limit}',
+			array(
+				'topic_list' => $this->_topics,
+				'limit' => count($this->_topics),
+			)
+		);
+		if ($this->_db->num_rows($request) < 2)
+		{
+			$this->_db->free_result($request);
+
+			$this->_errors[] = array('no_topic_id', true);
+
+			return false;
+		}
+		while ($row = $this->_db->fetch_assoc($request))
+		{
+			// Make a note for the board counts...
+			if (!isset($this->_boardTotals[$row['id_board']]))
+			{
+				$this->_boardTotals[$row['id_board']] = array(
+					'num_posts' => 0,
+					'num_topics' => 0,
+					'unapproved_posts' => 0,
+					'unapproved_topics' => 0
+				);
+			}
+
+			// We can't see unapproved topics here?
+			if ($modSettings['postmod_active'] && !$row['approved'] && $can_approve_boards != array(0) && in_array($row['id_board'], $can_approve_boards))
+			{
+				continue;
+			}
+			elseif (!$row['approved'])
+			{
+				$this->_boardTotals[$row['id_board']]['unapproved_topics']++;
+			}
+			else
+			{
+				$this->_boardTotals[$row['id_board']]['num_topics']++;
+			}
+
+			$this->_boardTotals[$row['id_board']]['unapproved_posts'] += $row['unapproved_posts'];
+			$this->_boardTotals[$row['id_board']]['num_posts'] += $row['num_replies'] + ($row['approved'] ? 1 : 0);
+
+			$this->topic_data[$row['id_topic']] = array(
+				'id' => $row['id_topic'],
+				'board' => $row['id_board'],
+				'poll' => $row['id_poll'],
+				'num_views' => $row['num_views'],
+				'subject' => $row['subject'],
+				'started' => array(
+					'time' => standardTime($row['time_started']),
+					'html_time' => htmlTime($row['time_started']),
+					'timestamp' => forum_time(true, $row['time_started']),
+					'href' => empty($row['id_member_started']) ? '' : $scripturl . '?action=profile;u=' . $row['id_member_started'],
+					'link' => empty($row['id_member_started']) ? $row['name_started'] : '<a href="' . $scripturl . '?action=profile;u=' . $row['id_member_started'] . '">' . $row['name_started'] . '</a>'
+				),
+				'updated' => array(
+					'time' => standardTime($row['time_updated']),
+					'html_time' => htmlTime($row['time_updated']),
+					'timestamp' => forum_time(true, $row['time_updated']),
+					'href' => empty($row['id_member_updated']) ? '' : $scripturl . '?action=profile;u=' . $row['id_member_updated'],
+					'link' => empty($row['id_member_updated']) ? $row['name_updated'] : '<a href="' . $scripturl . '?action=profile;u=' . $row['id_member_updated'] . '">' . $row['name_updated'] . '</a>'
+				)
+			);
+			$this->_num_views += $row['num_views'];
+			$this->boards[] = $row['id_board'];
+
+			// If there's no poll, id_poll == 0...
+			if ($row['id_poll'] > 0)
+			{
+				$this->_polls[] = $row['id_poll'];
+			}
+
+			// Store the id_topic with the lowest id_first_msg.
+			if (empty($this->firstTopic))
+			{
+				$this->firstTopic = $row['id_topic'];
+				$this->firstBoard = $row['id_board'];
+			}
+
+			$this->_is_sticky = max($this->_is_sticky, $row['is_sticky']);
+		}
+		$this->_db->free_result($request);
+
+		$this->boards = array_map('intval', array_values(array_unique($this->boards)));
+
+		// If we didn't get any topics then they've been messing with unapproved stuff.
+		if (empty($this->topic_data))
+		{
+			$this->_errors[] = array('no_topic_id', true);
+		}
+
+		return true;
+	}
+
+	/**
 	 * If errors occurred while working
 	 *
 	 * @return bool
@@ -210,14 +332,16 @@ class TopicsMerge
 		if (!in_array($target_board, $details['accessible_boards']))
 		{
 			$this->_errors[] = array('no_board', true);
+
 			return false;
 		}
 
 		// Determine which poll will survive and which polls won't.
-		$target_poll = count($this->_polls) > 1 ? (int) $details['poll'] : (count($this->_polls) == 1 ? $this->_polls[0] : 0);
+		$target_poll = count($this->_polls) > 1 ? (int) $details['poll'] : (count($this->_polls) === 1 ? $this->_polls[0] : 0);
 		if ($target_poll > 0 && !in_array($target_poll, $this->_polls))
 		{
 			$this->_errors[] = array('no_access', false);
+
 			return false;
 		}
 
@@ -230,18 +354,26 @@ class TopicsMerge
 
 			// Keep checking the length.
 			if (Util::strlen($target_subject) > 100)
+			{
 				$target_subject = Util::substr($target_subject, 0, 100);
+			}
 
 			// Nothing left - odd but pick the first topics subject.
-			if ($target_subject == '')
+			if ($target_subject === '')
+			{
 				$target_subject = $this->topic_data[$this->firstTopic]['subject'];
+			}
 		}
 		// A subject was selected from the list.
 		elseif (!empty($this->topic_data[(int) $details['subject']]['subject']))
+		{
 			$target_subject = $this->topic_data[(int) $details['subject']]['subject'];
+		}
 		// Nothing worked? Just take the subject of the first message.
 		else
+		{
 			$target_subject = $this->topic_data[$this->firstTopic]['subject'];
+		}
 
 		// Get the first and last message and the number of messages....
 		$request = $this->_db->query('', '
@@ -304,9 +436,13 @@ class TopicsMerge
 
 		// Fix the topic count stuff depending on what the new one counts as.
 		if ($topic_approved)
+		{
 			$this->_boardTotals[$target_board]['num_topics']--;
+		}
 		else
+		{
 			$this->_boardTotals[$target_board]['unapproved_topics']--;
+		}
 
 		$this->_boardTotals[$target_board]['unapproved_posts'] -= $num_unapproved;
 		$this->_boardTotals[$target_board]['num_posts'] -= $topic_approved ? $num_replies + 1 : $num_replies;
@@ -329,7 +465,9 @@ class TopicsMerge
 
 		// First and last message are the same, so only row was returned.
 		if ($member_updated === null)
+		{
 			$member_updated = $member_started;
+		}
 
 		$this->_db->free_result($request);
 
@@ -387,7 +525,9 @@ class TopicsMerge
 
 		// Cycle through each board...
 		foreach ($this->_boardTotals as $id_board => $stats)
+		{
 			decrementBoard($id_board, $stats);
+		}
 
 		// Determine the board the final topic resides in
 		$topic_info = getTopicInfo($id_topic);
@@ -413,119 +553,5 @@ class TopicsMerge
 		// If there's a search index that needs updating, update it...
 		$searchAPI = new Search\SearchApiWrapper(!empty($modSettings['search_index']) ? $modSettings['search_index'] : '');
 		$searchAPI->topicMerge($id_topic, $this->_topics, $affected_msgs, empty($enforce_subject) ? null : array($response_prefix, $target_subject));
-	}
-
-	/**
-	 * Grabs all the details of the topics involved in the merge process and loads
-	 * then in $this->topic_data
-	 */
-	protected function _loadTopicDetails()
-	{
-		global $scripturl, $modSettings;
-
-		// Joy of all joys, make sure they're not pi**ing about with unapproved topics they can't see :P
-		if ($modSettings['postmod_active'])
-			$can_approve_boards = !empty(User::$info->mod_cache['ap']) ? User::$info->mod_cache['ap'] : boardsAllowedTo('approve_posts');
-
-		// Get info about the topics and polls that will be merged.
-		$request = $this->_db->query('', '
-			SELECT
-				t.id_topic, t.id_board, b.id_cat, t.id_poll, t.num_views, t.is_sticky, t.approved, t.num_replies, t.unapproved_posts,
-				m1.subject, m1.poster_time AS time_started, COALESCE(mem1.id_member, 0) AS id_member_started, COALESCE(mem1.real_name, m1.poster_name) AS name_started,
-				m2.poster_time AS time_updated, COALESCE(mem2.id_member, 0) AS id_member_updated, COALESCE(mem2.real_name, m2.poster_name) AS name_updated
-			FROM {db_prefix}topics AS t
-				INNER JOIN {db_prefix}messages AS m1 ON (m1.id_msg = t.id_first_msg)
-				INNER JOIN {db_prefix}messages AS m2 ON (m2.id_msg = t.id_last_msg)
-				LEFT JOIN {db_prefix}members AS mem1 ON (mem1.id_member = m1.id_member)
-				LEFT JOIN {db_prefix}members AS mem2 ON (mem2.id_member = m2.id_member)
-				LEFT JOIN {db_prefix}boards AS b ON (b.id_board = t.id_board)
-			WHERE t.id_topic IN ({array_int:topic_list})
-			ORDER BY t.id_first_msg
-			LIMIT {int:limit}',
-			array(
-				'topic_list' => $this->_topics,
-				'limit' => count($this->_topics),
-			)
-		);
-		if ($this->_db->num_rows($request) < 2)
-		{
-			$this->_db->free_result($request);
-
-			$this->_errors[] = array('no_topic_id', true);
-
-			return false;
-		}
-		while ($row = $this->_db->fetch_assoc($request))
-		{
-			// Make a note for the board counts...
-			if (!isset($this->_boardTotals[$row['id_board']]))
-			{
-				$this->_boardTotals[$row['id_board']] = array(
-					'num_posts' => 0,
-					'num_topics' => 0,
-					'unapproved_posts' => 0,
-					'unapproved_topics' => 0
-				);
-			}
-
-			// We can't see unapproved topics here?
-			if ($modSettings['postmod_active'] && !$row['approved'] && $can_approve_boards != array(0) && in_array($row['id_board'], $can_approve_boards))
-				continue;
-			elseif (!$row['approved'])
-				$this->_boardTotals[$row['id_board']]['unapproved_topics']++;
-			else
-				$this->_boardTotals[$row['id_board']]['num_topics']++;
-
-			$this->_boardTotals[$row['id_board']]['unapproved_posts'] += $row['unapproved_posts'];
-			$this->_boardTotals[$row['id_board']]['num_posts'] += $row['num_replies'] + ($row['approved'] ? 1 : 0);
-
-			$this->topic_data[$row['id_topic']] = array(
-				'id' => $row['id_topic'],
-				'board' => $row['id_board'],
-				'poll' => $row['id_poll'],
-				'num_views' => $row['num_views'],
-				'subject' => $row['subject'],
-				'started' => array(
-					'time' => standardTime($row['time_started']),
-					'html_time' => htmlTime($row['time_started']),
-					'timestamp' => forum_time(true, $row['time_started']),
-					'href' => empty($row['id_member_started']) ? '' : $scripturl . '?action=profile;u=' . $row['id_member_started'],
-					'link' => empty($row['id_member_started']) ? $row['name_started'] : '<a href="' . $scripturl . '?action=profile;u=' . $row['id_member_started'] . '">' . $row['name_started'] . '</a>'
-				),
-				'updated' => array(
-					'time' => standardTime($row['time_updated']),
-					'html_time' => htmlTime($row['time_updated']),
-					'timestamp' => forum_time(true, $row['time_updated']),
-					'href' => empty($row['id_member_updated']) ? '' : $scripturl . '?action=profile;u=' . $row['id_member_updated'],
-					'link' => empty($row['id_member_updated']) ? $row['name_updated'] : '<a href="' . $scripturl . '?action=profile;u=' . $row['id_member_updated'] . '">' . $row['name_updated'] . '</a>'
-				)
-			);
-			$this->_num_views += $row['num_views'];
-			$this->boards[] = $row['id_board'];
-
-			// If there's no poll, id_poll == 0...
-			if ($row['id_poll'] > 0)
-				$this->_polls[] = $row['id_poll'];
-
-			// Store the id_topic with the lowest id_first_msg.
-			if (empty($this->firstTopic))
-			{
-				$this->firstTopic = $row['id_topic'];
-				$this->firstBoard = $row['id_board'];
-			}
-
-			$this->_is_sticky = max($this->_is_sticky, $row['is_sticky']);
-		}
-		$this->_db->free_result($request);
-
-		$this->boards = array_map('intval', array_values(array_unique($this->boards)));
-
-		// If we didn't get any topics then they've been messing with unapproved stuff.
-		if (empty($this->topic_data))
-		{
-			$this->_errors[] = array('no_topic_id', true);
-		}
-
-		return true;
 	}
 }

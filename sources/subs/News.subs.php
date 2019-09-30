@@ -8,17 +8,19 @@
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause (see accompanying LICENSE.txt file)
  *
  * This file contains code covered by:
- * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * copyright: 2011 Simple Machines (http://www.simplemachines.org)
  *
  * @version 2.0 dev
  *
  */
 
+use BBC\ParserWrapper;
+
 /**
  * Prepares an array of the forum news items
  *
- * @package News
  * @return array
+ * @package News
  */
 function getNews()
 {
@@ -26,15 +28,17 @@ function getNews()
 
 	$admin_current_news = array();
 
-	$bbc_parser = \BBC\ParserWrapper::instance();
+	$bbc_parser = ParserWrapper::instance();
 
 	// Ready the current news.
 	foreach (explode("\n", $modSettings['news']) as $id => $line)
+	{
 		$admin_current_news[$id] = array(
 			'id' => $id,
 			'unparsed' => un_preparsecode($line),
 			'parsed' => preg_replace('~<([/]?)form[^>]*?[>]*>~i', '<em class="smalltext">&lt;$1form&gt;</em>', $bbc_parser->parseNews($line)),
 		);
+	}
 
 	$admin_current_news['last'] = array(
 		'id' => 'last',
@@ -51,8 +55,8 @@ function getNews()
  * - Use their Username and email to find them.
  * - Only get the ones that can't login to turn off notification.
  *
- * @package News
  * @return array
+ * @package News
  */
 function excludeBannedMembers()
 {
@@ -74,7 +78,9 @@ function excludeBannedMembers()
 		)
 	);
 	while ($row = $db->fetch_assoc($request))
+	{
 		$excludes[] = $row['id_member'];
+	}
 	$db->free_result($request);
 
 	$request = $db->query('', '
@@ -110,7 +116,9 @@ function excludeBannedMembers()
 			$condition_array_params
 		);
 		while ($row = $db->fetch_assoc($request))
+		{
 			$excludes[] = $row['id_member'];
+		}
 		$db->free_result($request);
 	}
 
@@ -120,8 +128,8 @@ function excludeBannedMembers()
 /**
  * Get a list of our local board moderators.
  *
- * @package News
  * @return array
+ * @package News
  */
 function getModerators()
 {
@@ -139,7 +147,9 @@ function getModerators()
 		)
 	);
 	while ($row = $db->fetch_assoc($request))
+	{
 		$mods[] = $row['identifier'];
+	}
 	$db->free_result($request);
 
 	return $mods;
@@ -148,13 +158,13 @@ function getModerators()
 /**
  * Lists our newsletter recipients, step by step.
  *
- * @package News
  * @param string $sendQuery
  * @param mixed[] $sendParams
  * @param int $start
  * @param int $increment
  * @param int $counter
  * @return array
+ * @package News
  */
 function getNewsletterRecipients($sendQuery, $sendParams, $start, $increment, $counter)
 {
@@ -181,7 +191,9 @@ function getNewsletterRecipients($sendQuery, $sendParams, $start, $increment, $c
 		))
 	);
 	while ($row = $db->fetch_assoc($result))
+	{
 		$recipients[] = $row;
+	}
 	$db->free_result($result);
 
 	return $recipients;
@@ -194,13 +206,13 @@ function getNewsletterRecipients($sendQuery, $sendParams, $start, $increment, $c
  * - can be seen by this user.
  * - are actually the latest posts.
  *
- * @package News
- *
  * @param string $query_this_board passed to query, assumed raw and inserted as such
  * @param int $board
  * @param int $limit
  *
  * @return array
+ * @package News
+ *
  */
 function getXMLNews($query_this_board, $board, $limit)
 {
@@ -225,7 +237,7 @@ function getXMLNews($query_this_board, $board, $limit)
 				INNER JOIN {db_prefix}messages AS m ON (m.id_msg = t.id_first_msg)
 				INNER JOIN {db_prefix}boards AS b ON (b.id_board = t.id_board)
 				LEFT JOIN {db_prefix}members AS mem ON (mem.id_member = m.id_member)
-			WHERE ' .  $query_this_board . (empty($optimize_msg) ? '' : '
+			WHERE ' . $query_this_board . (empty($optimize_msg) ? '' : '
 				AND {raw:optimize_msg}') . (empty($board) ? '' : '
 				AND t.id_board = {int:current_board}') . ($modSettings['postmod_active'] ? '
 				AND t.approved = {int:is_approved}' : '') . '
@@ -244,19 +256,27 @@ function getXMLNews($query_this_board, $board, $limit)
 			$db->free_result($request);
 
 			if (empty($_REQUEST['boards']) && empty($board))
+			{
 				unset($context['optimize_msg']['lowest']);
+			}
 			else
+			{
 				$context['optimize_msg']['lowest'] = 'm.id_msg >= t.id_first_msg';
+			}
 
 			$context['optimize_msg']['highest'] = 'm.id_msg <= t.id_last_msg';
 			$loops++;
 		}
 		else
+		{
 			$done = true;
+		}
 	}
 	$data = array();
 	while ($row = $db->fetch_assoc($request))
+	{
 		$data[] = $row;
+	}
 
 	$db->free_result($request);
 
@@ -266,13 +286,13 @@ function getXMLNews($query_this_board, $board, $limit)
 /**
  * Get the recent topics to display.
  *
- * @package News
- *
  * @param string $query_this_board passed to query, assumed raw and inserted as such
  * @param int $board
  * @param int $limit
  *
  * @return array
+ * @package News
+ *
  */
 function getXMLRecent($query_this_board, $board, $limit)
 {
@@ -309,23 +329,33 @@ function getXMLRecent($query_this_board, $board, $limit)
 			$db->free_result($request);
 
 			if (empty($_REQUEST['boards']) && empty($board))
+			{
 				unset($context['optimize_msg']['lowest']);
+			}
 			else
-				$context['optimize_msg']['lowest'] = $loops ? 'm.id_msg >= t.id_first_msg' : 'm.id_msg >= (t.id_last_msg - t.id_first_msg) / 2';
+			{
+				$context['optimize_msg']['lowest'] = $loops !== 0 ? 'm.id_msg >= t.id_first_msg' : 'm.id_msg >= (t.id_last_msg - t.id_first_msg) / 2';
+			}
 
 			$loops++;
 		}
 		else
+		{
 			$done = true;
+		}
 	}
 	$messages = array();
 	while ($row = $db->fetch_assoc($request))
+	{
 		$messages[] = $row['id_msg'];
+	}
 	$db->free_result($request);
 
 	// No messages found, then return nothing
 	if (empty($messages))
+	{
 		return array();
+	}
 
 	// Find the most recent posts from our message list that this user can see.
 	$request = $db->query('', '
@@ -353,7 +383,9 @@ function getXMLRecent($query_this_board, $board, $limit)
 	);
 	$data = array();
 	while ($row = $db->fetch_assoc($request))
+	{
 		$data[] = $row;
+	}
 
 	$db->free_result($request);
 

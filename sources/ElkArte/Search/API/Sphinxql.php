@@ -9,7 +9,7 @@
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause (see accompanying LICENSE.txt file)
  *
  * This file contains code covered by:
- * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * copyright: 2011 Simple Machines (http://www.simplemachines.org)
  *
  * @version 2.0 dev
  *
@@ -17,7 +17,10 @@
 
 namespace ElkArte\Search\API;
 
+use ElkArte\Cache\Cache;
+use ElkArte\Errors\Errors;
 use ElkArte\User;
+use ElkArte\Util;
 
 /**
  * SearchAPI-Sphinxql.class.php, SphinxQL API,
@@ -34,36 +37,42 @@ class Sphinxql extends AbstractAPI
 {
 	/**
 	 * This is the last version of ElkArte that this was tested on, to protect against API changes.
+	 *
 	 * @var string
 	 */
 	public $version_compatible = 'ElkArte 2.0 dev';
 
 	/**
 	 * This won't work with versions of ElkArte less than this.
+	 *
 	 * @var string
 	 */
 	public $min_elk_version = 'ElkArte 1.0 Beta 1';
 
 	/**
 	 * Is it supported?
+	 *
 	 * @var boolean
 	 */
 	public $is_supported = true;
 
 	/**
 	 * What words are banned?
+	 *
 	 * @var array
 	 */
 	protected $bannedWords = array();
 
 	/**
 	 * What is the minimum word length?
+	 *
 	 * @var int
 	 */
 	protected $min_word_length = 4;
 
 	/**
 	 * What databases are supported?
+	 *
 	 * @var array
 	 */
 	protected $supported_databases = array('MySQL');
@@ -73,6 +82,8 @@ class Sphinxql extends AbstractAPI
 	 */
 	public function __construct($config, $searchParams)
 	{
+		parent::__construct($config, $searchParams);
+
 		// Is this database supported?
 		if (!in_array($this->_db->title(), $this->supported_databases))
 		{
@@ -80,8 +91,6 @@ class Sphinxql extends AbstractAPI
 
 			return;
 		}
-
-		parent::__construct($config, $searchParams);
 	}
 
 	/**
@@ -91,7 +100,7 @@ class Sphinxql extends AbstractAPI
 	{
 		global $modSettings;
 
-		return !(empty($modSettings['sphinx_searchd_server']) || empty($modSettings['sphinxql_searchd_port']));
+		return !empty($modSettings['sphinx_searchd_server']) && !empty($modSettings['sphinxql_searchd_port']);
 	}
 
 	/**
@@ -128,7 +137,7 @@ class Sphinxql extends AbstractAPI
 
 		$fulltextWord = count($subwords) === 1 ? $word : '"' . $word . '"';
 		$wordsSearch['indexed_words'][] = $fulltextWord;
-		if ($isExcluded)
+		if ($isExcluded !== '')
 		{
 			$wordsExclude[] = $fulltextWord;
 		}
@@ -144,7 +153,7 @@ class Sphinxql extends AbstractAPI
 		// Only request the results if they haven't been cached yet.
 		$cached_results = array();
 		$cache_key = 'searchql_results_' . md5(User::$info->query_see_board . '_' . $context['params']);
-		if (!\ElkArte\Cache\Cache::instance()->getVar($cached_results, $cache_key))
+		if (!Cache::instance()->getVar($cached_results, $cache_key))
 		{
 			// Create an instance of the sphinx client and set a few options.
 			$mySphinx = @mysqli_connect(($modSettings['sphinx_searchd_server'] === 'localhost' ? '127.0.0.1' : $modSettings['sphinx_searchd_server']), '', '', '', (int) $modSettings['sphinxql_searchd_port']);
@@ -152,7 +161,7 @@ class Sphinxql extends AbstractAPI
 			// No connection, daemon not running?  log the error
 			if ($mySphinx === false)
 			{
-				\ElkArte\Errors\Errors::instance()->fatal_lang_error('error_no_search_daemon');
+				Errors::instance()->fatal_lang_error('error_no_search_daemon');
 			}
 
 			// Compile different options for our query
@@ -235,12 +244,12 @@ class Sphinxql extends AbstractAPI
 			if ($request === false)
 			{
 				// Just log the error.
-				if (mysqli_error($mySphinx))
+				if (mysqli_error($mySphinx) !== '')
 				{
-					\ElkArte\Errors\Errors::instance()->log_error(mysqli_error($mySphinx));
+					Errors::instance()->log_error(mysqli_error($mySphinx));
 				}
 
-				\ElkArte\Errors\Errors::instance()->fatal_lang_error('error_no_search_daemon');
+				Errors::instance()->fatal_lang_error('error_no_search_daemon');
 			}
 
 			// Get the relevant information from the search results.
@@ -249,7 +258,7 @@ class Sphinxql extends AbstractAPI
 				'matches' => array(),
 			);
 
-			if (mysqli_num_rows($request) != 0)
+			if (mysqli_num_rows($request) !== 0)
 			{
 				while ($match = mysqli_fetch_assoc($request))
 				{
@@ -278,7 +287,7 @@ class Sphinxql extends AbstractAPI
 			$cached_results['num_results'] = count($cached_results['matches']);
 
 			// Store the search results in the cache.
-			\ElkArte\Cache\Cache::instance()->put($cache_key, $cached_results, 600);
+			Cache::instance()->put($cache_key, $cached_results, 600);
 		}
 
 		$participants = array();
@@ -298,11 +307,6 @@ class Sphinxql extends AbstractAPI
 		$this->_num_results = $cached_results['num_results'];
 
 		return $topics;
-	}
-
-	public function useWordIndex()
-	{
-		return false;
 	}
 
 	/**
@@ -388,7 +392,7 @@ class Sphinxql extends AbstractAPI
 		}
 
 		// Let's make sure they're not canceling each other out
-		if (!count(array_diff($keywords['include'], $keywords['exclude'])))
+		if (count(array_diff($keywords['include'], $keywords['exclude'])) === 0)
 		{
 			return '';
 		}
@@ -420,7 +424,7 @@ class Sphinxql extends AbstractAPI
 		$string = html_entity_decode($string, ENT_QUOTES, 'UTF-8');
 
 		// Lowercase string
-		$string = \ElkArte\Util::strtolower($string);
+		$string = Util::strtolower($string);
 
 		// Fix numbers so they search easier (phone numbers, SSN, dates, etc)
 		$string = preg_replace('~([[:digit:]]+)\pP+(?=[[:digit:]])~u', '', $string);
@@ -429,5 +433,10 @@ class Sphinxql extends AbstractAPI
 		$string = preg_replace('~[^\pL\pN]+~u', ' ', $string);
 
 		return $string;
+	}
+
+	public function useWordIndex()
+	{
+		return false;
 	}
 }

@@ -60,22 +60,18 @@ class NotificationsTask extends ValuesContainer
 		);
 
 		if (!isset($this->data['source_data']['status']))
+		{
 			$this->data['source_data']['status'] = 'new';
+		}
 
 		if (isset($this->data['source_data']['id_members']))
+		{
 			$this->setMembers($this->data['source_data']['id_members']);
+		}
 		else
+		{
 			$this->setMembers(array());
-	}
-
-	/**
-	 * Returns the array of member that have to receive the notification.
-	 *
-	 * @return int[] An array of member id
-	 */
-	public function getMembers()
-	{
-		return $this->data['source_data']['id_members'];
+		}
 	}
 
 	/**
@@ -102,6 +98,16 @@ class NotificationsTask extends ValuesContainer
 		}
 
 		return $this->_members_data;
+	}
+
+	/**
+	 * Returns the array of member that have to receive the notification.
+	 *
+	 * @return int[] An array of member id
+	 */
+	public function getMembers()
+	{
+		return $this->data['source_data']['id_members'];
 	}
 
 	/**

@@ -26,18 +26,21 @@ class Action
 {
 	/**
 	 * All the subactions we understand
+	 *
 	 * @var array
 	 */
 	protected $_subActions = [];
 
 	/**
 	 * The default subAction.
+	 *
 	 * @var string
 	 */
 	protected $_default;
 
 	/**
 	 * An (unique) id that triggers a hook
+	 *
 	 * @var string
 	 */
 	protected $_name;
@@ -48,8 +51,8 @@ class Action
 	/**
 	 * Constructor!
 	 *
-	 * @param string  $name Hook name
-	 * @param \ElkArte\HttpReq $req  Access to post/get data
+	 * @param string $name Hook name
+	 * @param \ElkArte\HttpReq $req Access to post/get data
 	 */
 	public function __construct(string $name = '', HttpReq $req = null)
 	{
@@ -60,7 +63,7 @@ class Action
 	/**
 	 * Initialize the instance with an array of sub-actions.
 	 *
-	 * @param array  $subActions    array of known subactions
+	 * @param array $subActions array of known subactions
 	 *
 	 *                              The accepted array format is:
 	 *                              'sub_action name' => 'function name',
@@ -88,8 +91,8 @@ class Action
 	 *
 	 *                              If `enabled` is not present, it is aassumed to be true.
 	 *
-	 * @param string $default       default action if unknown sa is requested
-	 * @param string $requestParam  key to check HTTP GET value, defaults to `sa`
+	 * @param string $default default action if unknown sa is requested
+	 * @param string $requestParam key to check HTTP GET value, defaults to `sa`
 	 *
 	 * @event  integrate_sa_ the name specified in the constructor is appended to this
 	 *
@@ -104,8 +107,7 @@ class Action
 
 		$this->_subActions = array_filter(
 			$subActions,
-			function ($subAction)
-			{
+			function ($subAction) {
 				return
 					!isset($subAction['enabled'])
 					|| isset($subAction['enabled'])
@@ -152,7 +154,7 @@ class Action
 			{
 				// Pointer to a controller to load
 				$controller = new $subAction['controller'](new EventManager());
-				$controller->setUser(\ElkArte\User::$info);
+				$controller->setUser(User::$info);
 
 				// always set up the environment
 				$controller->pre_dispatch();

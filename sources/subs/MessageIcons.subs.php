@@ -8,7 +8,7 @@
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause (see accompanying LICENSE.txt file)
  *
  * This file contains code covered by:
- * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * copyright: 2011 Simple Machines (http://www.simplemachines.org)
  *
  * @version 2.0 dev
  *
@@ -23,7 +23,9 @@ function fetchMessageIconsDetails()
 	static $icons;
 
 	if (isset($icons))
+	{
 		return $icons;
+	}
 
 	$db = database();
 
@@ -35,8 +37,7 @@ function fetchMessageIconsDetails()
 			LEFT JOIN {db_prefix}boards AS b ON (b.id_board = m.id_board)
 		WHERE ({query_see_board} OR b.id_board IS NULL)
 		ORDER BY m.icon_order',
-		array(
-		)
+		array()
 	);
 	$last_icon = 0;
 	$trueOrder = 0;

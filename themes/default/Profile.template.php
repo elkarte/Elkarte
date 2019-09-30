@@ -6,7 +6,7 @@
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause (see accompanying LICENSE.txt file)
  *
  * This file contains code covered by:
- * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * copyright: 2011 Simple Machines (http://www.simplemachines.org)
  *
  * @version 2.0 dev
  *
@@ -29,17 +29,21 @@ function template_profile_above()
 
 	// Prevent browssers from auto completing fields when viewing/editing other members profiles
 	if (!$context['user']['is_owner'])
+	{
 		theme()->addInlineJavascript('disableAutoComplete();', true);
+	}
 
 	// If an error occurred while trying to save previously, give the user a clue!
 	template_error_message();
 
 	// If the profile was update successfully, let the user know this.
 	if (!empty($context['profile_updated']))
+	{
 		echo '
 					<div class="successbox">
 						', $context['profile_updated'], '
 					</div>';
+	}
 }
 
 /**
@@ -50,7 +54,9 @@ function template_showDrafts()
 	global $context, $settings, $txt;
 
 	if (!empty($context['drafts']))
+	{
 		template_pagesection();
+	}
 
 	echo '
 		<div id="recentposts" class="profile_center">
@@ -64,10 +70,12 @@ function template_showDrafts()
 
 	// No drafts? Just show an informative message.
 	if (empty($context['drafts']))
+	{
 		echo '
 			<div class="information centertext">
 				', $txt['draft_none'], '
 			</div>';
+	}
 	else
 	{
 		// For every draft to be displayed show the important details.
@@ -76,10 +84,14 @@ function template_showDrafts()
 			$draft['title'] = '<strong>' . $draft['board']['link'] . ' / ' . $draft['topic']['link'] . '</strong>&nbsp;&nbsp;';
 
 			if (!empty($draft['sticky']))
+			{
 				$draft['title'] .= '<img src="' . $settings['images_url'] . '/icons/quick_sticky.png" alt="' . $txt['sticky_topic'] . '" title="' . $txt['sticky_topic'] . '" />';
+			}
 
 			if (!empty($draft['locked']))
+			{
 				$draft['title'] .= '<img src="' . $settings['images_url'] . '/icons/quick_lock.png" alt="' . $txt['locked_topic'] . '" title="' . $txt['locked_topic'] . '" />';
+			}
 
 			$draft['date'] = '&#171; <strong>' . $txt['draft_saved_on'] . ':</strong> ' . ($draft['age'] > 0 ? sprintf($txt['draft_days_ago'], $draft['age']) : $draft['time']) . (!empty($draft['remaining']) ? ', ' . sprintf($txt['draft_retain'], $draft['remaining']) : '') . ' &#187;';
 			$draft['class'] = 'content';
@@ -113,6 +125,7 @@ function template_profile_save()
 
 	// Only show the password box if it's actually needed.
 	if ($context['require_password'])
+	{
 		echo '
 					<dl class="clear">
 						<dt>
@@ -123,21 +136,28 @@ function template_profile_save()
 							<input type="password" id="oldpasswrd" name="oldpasswrd" size="20" class="input_password" placeholder="', $txt['current_password'], '" />
 						</dd>
 					</dl>';
+	}
 
 	echo '
 					<div class="submitbutton">';
 
 	if (!empty($context['token_check']))
+	{
 		echo '
 						<input type="hidden" name="', $context[$context['token_check'] . '_token_var'], '" value="', $context[$context['token_check'] . '_token'], '" />';
+	}
 
 	// The button shouldn't say "Change profile" unless we're changing the profile...
 	if (!empty($context['submit_button_text']))
+	{
 		echo '
 						<input type="submit" name="save" value="', $context['submit_button_text'], '" />';
+	}
 	else
+	{
 		echo '
 						<input type="submit" name="save" value="', $txt['change_profile'], '" />';
+	}
 
 	echo '
 						<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
@@ -164,8 +184,10 @@ function template_error_message()
 
 		// Cycle through each error and display an error message.
 		foreach ($context['post_errors'] as $error)
+		{
 			echo '
 				<li>', isset($txt['profile_error_' . $error]) ? $txt['profile_error_' . $error] : $error, '</li>';
+		}
 
 		echo '
 			</ul>';
@@ -195,6 +217,10 @@ function template_load_warning_variables()
 	// Work out the starting color.
 	$context['current_color'] = $context['colors'][0];
 	foreach ($context['colors'] as $limit => $color)
+	{
 		if ($context['member']['warning'] >= $limit)
+		{
 			$context['current_color'] = $color;
+		}
+	}
 }

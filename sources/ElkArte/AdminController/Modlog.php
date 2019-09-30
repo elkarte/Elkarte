@@ -8,7 +8,7 @@
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause (see accompanying LICENSE.txt file)
  *
  * This file contains code covered by:
- * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * copyright: 2011 Simple Machines (http://www.simplemachines.org)
  *
  * @version 2.0 dev
  *
@@ -16,12 +16,15 @@
 
 namespace ElkArte\AdminController;
 
+use ElkArte\AbstractController;
+use ElkArte\Util;
+
 /**
  * Admin and moderation log controller.
  * Depending on permissions, this class will display and allow to act on the log
  * for administrators or for moderators.
  */
-class Modlog extends \ElkArte\AbstractController
+class Modlog extends AbstractController
 {
 	/**
 	 * Default method for this controller.
@@ -54,13 +57,19 @@ class Modlog extends \ElkArte\AbstractController
 
 		// Trying to view the admin log, lets check you can.
 		if ($context['log_type'] == 3)
+		{
 			isAllowedTo('admin_forum');
+		}
 
 		// These change dependant on whether we are viewing the moderation or admin log.
 		if ($context['log_type'] == 3 || $this->_req->query->action === 'admin')
+		{
 			$context['url_start'] = '?action=admin;area=logs;sa=' . ($context['log_type'] == 3 ? 'adminlog' : 'modlog') . ';type=' . $context['log_type'];
+		}
 		else
+		{
 			$context['url_start'] = '?action=moderate;area=modlog;type=' . $context['log_type'];
+		}
 
 		$context['can_delete'] = allowedTo('admin_forum');
 
@@ -107,14 +116,22 @@ class Modlog extends \ElkArte\AbstractController
 		$context['order'] = isset($this->_req->query->sort) && isset($searchTypes[$this->_req->query->sort]) ? $this->_req->query->sort : 'member';
 
 		if (!isset($search_params['string']) || (!empty($this->_req->post->search) && $search_params['string'] != $this->_req->post->search))
+		{
 			$search_params_string = $this->_req->getPost('search', 'trim', '');
+		}
 		else
+		{
 			$search_params_string = $search_params['string'];
+		}
 
 		if (isset($this->_req->post->search_type) || empty($search_params['type']) || !isset($searchTypes[$search_params['type']]))
+		{
 			$search_params_type = isset($this->_req->post->search_type) && isset($searchTypes[$this->_req->post->search_type]) ? $this->_req->query->search_type : $context['order'];
+		}
 		else
+		{
 			$search_params_type = $search_params['type'];
+		}
 
 		$search_params_column = $searchTypes[$search_params_type]['sql'];
 		$search_params = array(
@@ -137,7 +154,9 @@ class Modlog extends \ElkArte\AbstractController
 			$regex = '';
 			$search = explode(' ', $search_params['string']);
 			foreach ($search as $word)
+			{
 				$regex .= '(?=[\w\s]*' . $word . ')';
+			}
 
 			// For the moment they can only search for ONE action!
 			foreach ($txt as $key => $text)
@@ -159,7 +178,9 @@ class Modlog extends \ElkArte\AbstractController
 			'base_href' => $scripturl . $context['url_start'],
 			'default_sort_col' => 'time',
 			'get_items' => array(
-				'function' => array($this, 'getModLogEntries'),
+				'function' => function ($start, $items_per_page, $sort, $query_string, $query_params, $log_type) {
+					return $this->getModLogEntries($start, $items_per_page, $sort, $query_string, $query_params, $log_type);
+				},
 				'params' => array(
 					(!empty($search_params['string']) ? ' INSTR({raw:sql_type}, {string:search_string})' : ''),
 					array('sql_type' => $search_params_column, 'search_string' => $search_params['string']),
@@ -167,7 +188,9 @@ class Modlog extends \ElkArte\AbstractController
 				),
 			),
 			'get_count' => array(
-				'function' => array($this, 'getModLogEntryCount'),
+				'function' => function ($query_string, $query_params, $log_type) {
+					return $this->getModLogEntryCount($query_string, $query_params, $log_type);
+				},
 				'params' => array(
 					(!empty($search_params['string']) ? ' INSTR({raw:sql_type}, {string:search_string})' : ''),
 					array('sql_type' => $search_params_column, 'search_string' => $search_params['string']),
@@ -274,7 +297,7 @@ class Modlog extends \ElkArte\AbstractController
 					'position' => 'below_table_data',
 					'value' => '
 						' . $txt['modlog_search'] . ' (' . $txt['modlog_by'] . ': ' . $context['search']['label'] . ')
-						<input type="text" name="search" size="18" value="' . \ElkArte\Util::htmlspecialchars($context['search']['string']) . '" class="input_text" />
+						<input type="text" name="search" size="18" value="' . Util::htmlspecialchars($context['search']['string']) . '" class="input_text" />
 						<input type="submit" name="is_search" value="' . $txt['modlog_go'] . '" />
 						' . ($context['can_delete'] ? '|&nbsp;
 						<input type="submit" name="remove" value="' . $txt['modlog_remove'] . '" onclick="return confirm(\'' . $txt['modlog_remove_selected_confirm'] . '\');" />

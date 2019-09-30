@@ -8,7 +8,7 @@
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause (see accompanying LICENSE.txt file)
  *
  * This file contains code covered by:
- * copyright:    2011 Simple Machines (http://www.simplemachines.org)
+ * copyright: 2011 Simple Machines (http://www.simplemachines.org)
  *
  * @version 2.0 dev
  *
@@ -16,29 +16,37 @@
 
 namespace ElkArte\Modules\Drafts;
 
+use ElkArte\EventManager;
 use ElkArte\Exceptions\ControllerRedirectException;
+use ElkArte\Exceptions\PmErrorException;
+use ElkArte\Modules\AbstractModule;
+use ElkArte\Util;
+use ElkArte\ValuesContainer;
 
 /**
  * Class \ElkArte\Modules\Drafts\PersonalMessage
  *
  * Prepares the draft functions for the personal message page
  */
-class PersonalMessage extends \ElkArte\Modules\AbstractModule
+class PersonalMessage extends AbstractModule
 {
 	/**
 	 * Autosave enabled
+	 *
 	 * @var bool
 	 */
 	protected static $_autosave_enabled = false;
 
 	/**
 	 * How often to autosave if enabled
+	 *
 	 * @var int
 	 */
 	protected static $_autosave_frequency = 30000;
 
 	/**
 	 * Subject length
+	 *
 	 * @var int
 	 */
 	protected static $_subject_length = 24;
@@ -58,7 +66,7 @@ class PersonalMessage extends \ElkArte\Modules\AbstractModule
 	 *
 	 * {@inheritdoc}
 	 */
-	public static function hooks(\ElkArte\EventManager $eventsManager)
+	public static function hooks(EventManager $eventsManager)
 	{
 		global $modSettings, $context;
 
@@ -150,7 +158,7 @@ class PersonalMessage extends \ElkArte\Modules\AbstractModule
 			if (isset($_REQUEST['id_draft']) && empty($_POST['subject']) && empty($_POST['message']))
 			{
 				$this->_loadDraft($this->user->id, (int) $_REQUEST['id_draft']);
-				throw new \ElkArte\Exceptions\PmErrorException($this->_loaded_draft->to_list, $this->_loaded_draft);
+				throw new PmErrorException($this->_loaded_draft->to_list, $this->_loaded_draft);
 			}
 			else
 			{
@@ -186,7 +194,7 @@ class PersonalMessage extends \ElkArte\Modules\AbstractModule
 		require_once(SUBSDIR . '/Drafts.subs.php');
 
 		// Load the draft and add it to a object container
-		$this->_loaded_draft = new \ElkArte\ValuesContainer(loadDraft($id_draft, 1, true, true));
+		$this->_loaded_draft = new ValuesContainer(loadDraft($id_draft, 1, true, true));
 	}
 
 	/**
@@ -228,7 +236,7 @@ class PersonalMessage extends \ElkArte\Modules\AbstractModule
 		{
 			$short_subject = empty($draft['subject'])
 				? $txt['drafts_none']
-				: \ElkArte\Util::shorten_text(stripslashes($draft['subject']), self::$_subject_length);
+				: Util::shorten_text(stripslashes($draft['subject']), self::$_subject_length);
 			$context['drafts'][] = array(
 				'subject' => censor($short_subject),
 				'poster_time' => standardTime($draft['poster_time']),
@@ -339,8 +347,8 @@ class PersonalMessage extends \ElkArte\Modules\AbstractModule
 				$draft = array(
 					'id_pm_draft' => empty($_POST['id_pm_draft']) ? 0 : (int) $_POST['id_pm_draft'],
 					'reply_id' => empty($_POST['replied_to']) ? 0 : (int) $_POST['replied_to'],
-					'body' => \ElkArte\Util::htmlspecialchars($_POST['message'], ENT_QUOTES, 'UTF-8', true),
-					'subject' => strtr(\ElkArte\Util::htmlspecialchars($_POST['subject']), array("\r" => '', "\n" => '', "\t" => '')),
+					'body' => Util::htmlspecialchars($_POST['message'], ENT_QUOTES, 'UTF-8', true),
+					'subject' => strtr(Util::htmlspecialchars($_POST['subject']), array("\r" => '', "\n" => '', "\t" => '')),
 					'id_member' => $this->user->id,
 					'is_usersaved' => (int) empty($_REQUEST['autosave']),
 				);

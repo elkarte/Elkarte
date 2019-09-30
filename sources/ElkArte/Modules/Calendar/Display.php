@@ -8,7 +8,7 @@
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause (see accompanying LICENSE.txt file)
  *
  * This file contains code covered by:
- * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * copyright: 2011 Simple Machines (http://www.simplemachines.org)
  *
  * @version 2.0 dev
  *
@@ -16,17 +16,20 @@
 
 namespace ElkArte\Modules\Calendar;
 
+use ElkArte\EventManager;
+use ElkArte\Modules\AbstractModule;
+
 /**
  * We like to show events associated to the topics.
  *
  * @package Calendar
  */
-class Display extends \ElkArte\Modules\AbstractModule
+class Display extends AbstractModule
 {
 	/**
 	 * {@inheritdoc }
 	 */
-	public static function hooks(\ElkArte\EventManager $eventsManager)
+	public static function hooks(EventManager $eventsManager)
 	{
 		global $context, $modSettings;
 
@@ -35,11 +38,15 @@ class Display extends \ElkArte\Modules\AbstractModule
 		add_integration_function('integrate_mod_buttons', '\\ElkArte\\Modules\\Calendar\\Display::integrate_mod_buttons', '', false);
 
 		if (!empty($modSettings['cal_showInTopic']))
+		{
 			return array(
 				array('topicinfo', array('\\ElkArte\\Modules\\Calendar\\Display', 'topicinfo'), array('topicinfo', 'topic')),
 			);
+		}
 		else
+		{
 			return array();
+		}
 	}
 
 	/**
@@ -72,9 +79,13 @@ class Display extends \ElkArte\Modules\AbstractModule
 
 			// First, try create a better time format, ignoring the "time" elements.
 			if (preg_match('~%[AaBbCcDdeGghjmuYy](?:[^%]*%[AaBbCcDdeGghjmuYy])*~', $this->user->time_format, $matches) == 0 || empty($matches[0]))
+			{
 				$date_string = $this->user->time_format;
+			}
 			else
+			{
 				$date_string = $matches[0];
+			}
 
 			// Get event information for this topic.
 			$events = eventInfoForTopic($topic);
@@ -95,9 +106,9 @@ class Display extends \ElkArte\Modules\AbstractModule
 					'modify_href' => $scripturl . '?action=post;msg=' . $topicinfo['id_first_msg'] . ';topic=' . $topic . '.0;calendar;eventid=' . $event['id_event'] . ';' . $context['session_var'] . '=' . $context['session_id'],
 					'can_export' => allowedTo('calendar_edit_any') || ($event['id_member'] == $this->user->id && allowedTo('calendar_edit_own')),
 					'export_href' => $scripturl . '?action=calendar;sa=ical;eventid=' . $event['id_event'] . ';' . $context['session_var'] . '=' . $context['session_id'],
-				'start_date' => standardTime($start_date, $date_string, 'none'),
+					'start_date' => standardTime($start_date, $date_string, 'none'),
 					'start_timestamp' => $start_date,
-				'end_date' => standardTime($end_date, $date_string, 'none'),
+					'end_date' => standardTime($end_date, $date_string, 'none'),
 					'end_timestamp' => $end_date,
 					'is_last' => false
 				);

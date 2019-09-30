@@ -73,6 +73,7 @@ final class ParserWrapper
 		if (!empty($modSettings['bbc']) && $modSettings['current_load'] >= $modSettings['bbc'])
 		{
 			$context['disabled_parse_bbc'] = true;
+
 			return false;
 		}
 
@@ -101,6 +102,7 @@ final class ParserWrapper
 	public function enableSmileys($toggle)
 	{
 		$this->smileys_enabled = (bool) $toggle;
+
 		return $this;
 	}
 
@@ -125,7 +127,7 @@ final class ParserWrapper
 			call_integration_hook('integrate_' . $area . '_' . $parser_type . '_parser', array(&$parser, $this));
 
 			// If not, use the default one
-			if ($parser === false)
+			if (!$parser)
 			{
 				$parser = call_user_func(array($this, 'get' . ucfirst($parser_type) . 'Parser'), $area);
 			}

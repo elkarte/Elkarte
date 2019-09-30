@@ -36,20 +36,20 @@ class Zend extends AbstractCacheMethod
 	/**
 	 * {@inheritdoc}
 	 */
-	public function put($key, $value, $ttl = 120)
-	{
-		zend_shm_cache_store($this->getprefixedKey($key), $value, $ttl);
-	}
-
-	/**
-	 * {@inheritdoc}
-	 */
 	public function get($key, $ttl = 120)
 	{
 		$result = zend_shm_cache_fetch($this->getprefixedKey($key));
 		$this->is_miss = $result === null;
 
 		return $result;
+	}
+
+	/**
+	 * {@inheritdoc}
+	 */
+	public function put($key, $value, $ttl = 120)
+	{
+		zend_shm_cache_store($this->getprefixedKey($key), $value, $ttl);
 	}
 
 	/**

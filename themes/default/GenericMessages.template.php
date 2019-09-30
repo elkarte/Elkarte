@@ -6,7 +6,7 @@
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause (see accompanying LICENSE.txt file)
  *
  * This file contains code covered by:
- * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * copyright: 2011 Simple Machines (http://www.simplemachines.org)
  *
  * @version 2.0 dev
  *
@@ -32,15 +32,19 @@ function template_build_poster_div($message, $ignoring = false)
 
 	// Show a link to the member's profile.
 	if (!empty($message['member']['id']))
+	{
 		$poster_div .= '
 								<a class="linklevel1 name" href="' . $message['member']['href'] . '">
 									' . $message['member']['name'] . '
 								</a>';
+	}
 	else
+	{
 		$poster_div .= '
 								<a class="linklevel1 name">
 									' . $message['member']['name'] . '
 								</a>';
+	}
 
 	// The member info dropdown starts here.
 	$poster_div .= '
@@ -51,33 +55,45 @@ function template_build_poster_div($message, $ignoring = false)
 	{
 		// Show the post group if and only if they have no other group or the option is on, and they are in a post group.
 		if ((empty($settings['hide_post_group']) || $message['member']['group'] == '') && $message['member']['post_group'] != '')
+		{
 			$poster_div .= '
 									<li class="listlevel2 postgroup">' . $message['member']['post_group'] . '</li>';
+		}
 
 		// Show how many posts they have made.
 		if (!isset($context['disabled_fields']['posts']))
+		{
 			$poster_div .= '
 									<li class="listlevel2 postcount">' . $txt['member_postcount'] . ': ' . $message['member']['posts'] . '</li>';
+		}
 
 		if (!isset($context['disabled_fields']['date_registered']))
+		{
 			$poster_div .= '
 									<li class="listlevel2 registered">' . $txt['date_joined'] . ': ' . standardTime($message['member']['registered_raw'], $txt['date_joined_format']) . '</li>';
+		}
 
 		// Is karma display enabled?  Total or +/-?
 		if ($modSettings['karmaMode'] == '1')
+		{
 			$poster_div .= '
 									<li class="listlevel2 karma">' . $modSettings['karmaLabel'] . ' ' . ($message['member']['karma']['good'] - $message['member']['karma']['bad']) . '</li>';
+		}
 		elseif ($modSettings['karmaMode'] == '2')
+		{
 			$poster_div .= '
 									<li class="listlevel2 karma">' . $modSettings['karmaLabel'] . ' +' . $message['member']['karma']['good'] . '/-' . $message['member']['karma']['bad'] . '</li>';
+		}
 
 		// Is this user allowed to modify this member's karma?
 		if ($message['member']['karma']['allow'])
+		{
 			$poster_div .= '
 									<li class="listlevel2 karma_allow">
 										<a class="linklevel2" href="' . $message['member']['karma']['applaud_url'] . '">' . $modSettings['karmaApplaudLabel'] . '</a>' .
 										(empty($modSettings['karmaDisableSmite']) ? '<a class="linklevel2" href="' . $message['member']['karma']['smite_url'] . '">' . $modSettings['karmaSmiteLabel'] . '</a>' : '') . '
 									</li>';
+		}
 
 		// Any custom fields to show as or above icons?
 		if (!empty($message['member']['custom_fields']))
@@ -97,7 +113,9 @@ function template_build_poster_div($message, $ignoring = false)
 			foreach ($message['member']['custom_fields'] as $custom)
 			{
 				if ($custom['placement'] != 1 || empty($custom['value']))
+				{
 					continue;
+				}
 
 				if (empty($shown))
 				{
@@ -112,9 +130,11 @@ function template_build_poster_div($message, $ignoring = false)
 			}
 
 			if ($shown)
+			{
 				$poster_div .= '
 										</ol>
 									</li>';
+			}
 		}
 
 		// Show the website and email address buttons.
@@ -126,13 +146,17 @@ function template_build_poster_div($message, $ignoring = false)
 
 			// Don't show an icon if they haven't specified a website.
 			if ($message['member']['website']['url'] != '' && !isset($context['disabled_fields']['website']))
+			{
 				$poster_div .= '
 											<li class="cf_icon"><a href="' . $message['member']['website']['url'] . '" title="' . $message['member']['website']['title'] . '" target="_blank" class="new_win">' . ($settings['use_image_buttons'] ? '<i class="icon i-website" title="' . $message['member']['website']['title'] . '"></i>' : $txt['www']) . '</a></li>';
+			}
 
 			// Don't show the email address if they want it hidden.
 			if ($context['can_send_email'])
+			{
 				$poster_div .= '
 											<li>' . template_msg_email($message['id'], $message['member']) . '</li>';
+			}
 
 			$poster_div .= '
 										</ol>
@@ -145,15 +169,19 @@ function template_build_poster_div($message, $ignoring = false)
 			foreach ($message['member']['custom_fields'] as $custom)
 			{
 				if (empty($custom['placement']) || empty($custom['value']))
+				{
 					$poster_div .= '
 									<li class="listlevel2 custom">' . $custom['title'] . ': ' . $custom['value'] . '</li>';
+				}
 			}
 		}
 	}
 	// Otherwise, show the guest's email.
 	elseif (!empty($message['member']['email']) && $context['can_send_email'])
+	{
 		$poster_div .= '
 									<li class="listlevel2 email">' . template_msg_email($message['id']) . '</li>';
+	}
 
 	// Stuff for the staff to wallop them with.
 	$poster_div .= '
@@ -168,8 +196,10 @@ function template_build_poster_div($message, $ignoring = false)
 
 		// Do they have a warning in place?
 		if ($message['member']['can_see_warning'] && !empty($options['hide_poster_area']))
+		{
 			$poster_div .= '
 										<a class="linklevel2" href="' . $scripturl . '?action=profile;area=issuewarning;u=' . $message['member']['id'] . '"><i class="warnicon i-warning-' . $message['member']['warning_status'] . '" title="' . $txt['user_warn_' . $message['member']['warning_status']] . '"></i><span class="warn_' . $message['member']['warning_status'] . '">' . $txt['warn_' . $message['member']['warning_status']] . '</span></a>';
+		}
 
 		$poster_div .= '
 									</li>';
@@ -177,28 +207,36 @@ function template_build_poster_div($message, $ignoring = false)
 
 	// Show the IP to this user for this post - because you can moderate?
 	if (!empty($context['can_moderate_forum']) && !empty($message['member']['ip']))
+	{
 		$poster_div .= '
 									<li class="listlevel2 poster_ip">
 										<a class="linklevel2 help" title="' . $message['member']['ip'] . '" href="' . $scripturl . '?action=' . (!empty($message['member']['is_guest']) ? 'trackip' : 'profile;area=history;sa=ip;u=' . $message['member']['id'] . ';searchip=' . $message['member']['ip']) . '">' . $message['member']['ip'] . '</a>
 										<a class="helpicon i-help" href="' . $scripturl . '?action=quickhelp;help=see_admin_ip" onclick="return reqOverlayDiv(this.href);"></a>
 									</li>';
+	}
 	// Or, should we show it because this is you?
 	elseif ($message['can_see_ip'] && !empty($message['member']['ip']))
+	{
 		$poster_div .= '
 									<li class="listlevel2 poster_ip">
 										<a class="linklevel2 help" title="' . $message['member']['ip'] . '" href="#" onclick="return false;">' . $message['member']['ip'] . '</a>
 										<a class="linklevel2 helpicon i-help"  title="' . $message['member']['ip'] . '" href="' . $scripturl . '?action=quickhelp;help=see_member_ip" onclick="return reqOverlayDiv(this.href);"><s>' . $txt['help'] . '</s></a>
 									</li>';
+	}
 	// Okay, are you at least logged in?  Then we can show something about why IPs are logged...
 	elseif (!$context['user']['is_guest'])
+	{
 		$poster_div .= '
 									<li class="listlevel2 poster_ip">
 										<a class="linklevel2 helpicon i-help" href="' . $scripturl . '?action=quickhelp;help=see_member_ip" onclick="return reqOverlayDiv(this.href);"><s>' . $txt['help'] . '</s></a>' . $txt['logged'] . '
 									</li>';
+	}
 	// Otherwise, you see NOTHING!
 	else
+	{
 		$poster_div .= '
 									<li class="listlevel2 poster_ip">' . $txt['logged'] . '</li>';
+	}
 
 	// Done with the detail information about the poster.
 	$poster_div .= '
@@ -209,27 +247,35 @@ function template_build_poster_div($message, $ignoring = false)
 	if (empty($options['hide_poster_area']) && !$ignoring)
 	{
 		if (!empty($settings['show_user_images']) && empty($options['show_no_avatars']) && !empty($message['member']['avatar']['image']))
+		{
 			$poster_div .= '
 							<li class="listlevel1 poster_avatar">
 								<a class="linklevel1" href="' . $message['member']['href'] . '">
 									' . $message['member']['avatar']['image'] . '
 								</a>
 							</li>';
+		}
 
 		// Show the post group icons, but not for guests.
 		if (!$message['member']['is_guest'])
+		{
 			$poster_div .= '
 							<li class="listlevel1 icons">' . $message['member']['group_icons'] . '</li>';
+		}
 
 		// Show the member's primary group (like 'Administrator') if they have one.
 		if (!empty($message['member']['group']))
+		{
 			$poster_div .= '
 							<li class="listlevel1 membergroup">' . $message['member']['group'] . '</li>';
+		}
 
 		// Show the member's custom title, if they have one.
 		if (!empty($message['member']['title']))
+		{
 			$poster_div .= '
 							<li class="listlevel1 title">' . $message['member']['title'] . '</li>';
+		}
 
 		// Show online and offline buttons? PHP could do with a little bit of cleaning up here for brevity, but it works.
 		// The plan is to make these buttons act sensibly, and link to your own inbox in your own posts (with new PM notification).
@@ -246,19 +292,27 @@ function template_build_poster_div($message, $ignoring = false)
 		elseif ($context['can_send_pm'] && !$message['is_message_author'] && !$message['member']['is_guest'])
 		{
 			if (!empty($modSettings['onlineEnable']))
+			{
 				$poster_div .= '
 							<li class="listlevel1 poster_online"><a class="linklevel1" href="' . $scripturl . '?action=pm;sa=send;u=' . $message['member']['id'] . '" title="' . $message['member']['online']['member_online_text'] . '">' . $txt['send_message'] . ' ' . template_member_online($message['member'], false) . '</a></li>';
+			}
 			else
+			{
 				$poster_div .= '
 							<li class="listlevel1 poster_online"><a class="linklevel1" href="' . $scripturl . '?action=pm;sa=send;u=' . $message['member']['id'] . '">' . $txt['send_message'] . ' </a></li>';
+			}
 		}
 		// Not allowed to send a PM, online status disabled and not from a guest.
 		elseif (!$context['can_send_pm'] && !empty($modSettings['onlineEnable']) && !$message['member']['is_guest'])
 
 			// Are we showing the warning status?
+		{
 			if (!$message['member']['is_guest'] && $message['member']['can_see_warning'])
+			{
 				$poster_div .= '
 							<li class="listlevel1 warning">' . ($context['can_issue_warning'] ? '<a class="linklevel1" href="' . $scripturl . '?action=profile;area=issuewarning;u=' . $message['member']['id'] . '">' : '') . '<i class="warnicon i-warning-' . $message['member']['warning_status'] . '.png" title="' . $txt['user_warn_' . $message['member']['warning_status']] . '"></i>' . ($context['can_issue_warning'] ? '</a>' : '') . '<span class="warn_' . $message['member']['warning_status'] . '">' . $txt['warn_' . $message['member']['warning_status']] . '</span></li>';
+			}
+		}
 	}
 
 	return $poster_div;
@@ -294,7 +348,9 @@ function template_simple_message($msg)
 				</section>';
 
 	if (!empty($msg['buttons']))
+	{
 		template_quickbutton_strip($msg['buttons'], !empty($msg['tests']) ? $msg['tests'] : array());
+	}
 
 	echo '
 			</article>';

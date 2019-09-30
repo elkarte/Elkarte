@@ -6,7 +6,7 @@
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause (see accompanying LICENSE.txt file)
  *
  * This file contains code covered by:
- * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * copyright: 2011 Simple Machines (http://www.simplemachines.org)
  *
  * @version 2.0 dev
  *
@@ -68,7 +68,9 @@ function template_error_log()
 
 	$error_types = array();
 	foreach ($context['error_types'] as $type => $details)
+	{
 		$error_types[] = ($details['is_selected'] ? '<img src="' . $settings['images_url'] . '/selected.png" alt="" /> ' : '') . '<a href="' . $details['url'] . '" ' . ($details['is_selected'] ? 'class="selected"' : '') . ' title="' . $details['description'] . '">' . $details['label'] . '</a>';
+	}
 
 	echo '
 						', implode('&nbsp;|&nbsp;', $error_types), '
@@ -76,12 +78,14 @@ function template_error_log()
 				</tr>';
 
 	if ($context['has_filter'])
+	{
 		echo '
 				<tr>
 					<td colspan="3">
 						<strong>&nbsp;&nbsp;', $txt['applying_filter'], ':</strong> ', $context['filter']['entity'], ' ', $context['filter']['value']['html'], '&nbsp;&nbsp;[<a href="', $scripturl, '?action=admin;area=logs;sa=errorlog', $context['sort_direction'] == 'down' ? ';desc' : '', '">', $txt['clear_filter'], '</a>]
 					</td>
 				</tr>';
+	}
 
 	echo '
 				<tr class="secondary_header">
@@ -93,10 +97,12 @@ function template_error_log()
 
 	// No errors, then show a message
 	if (count($context['errors']) == 0)
+	{
 		echo '
 				<tr>
 					<td class="centertext" colspan="3">', $txt['errlog_no_entries'], '</td>
 				</tr>';
+	}
 
 	// We have some errors, show them...
 	foreach ($context['errors'] as $error)
@@ -118,12 +124,14 @@ function template_error_log()
 						</div>';
 
 		if (!empty($error['file']))
+		{
 			echo '
 						<div>
 							<a class="scope" href="', $scripturl, '?action=admin;area=logs;sa=errorlog', $context['sort_direction'] == 'down' ? ';desc' : '', ';filter=file;value=', $error['file']['search'], '" title="', $txt['apply_filter'], ': ', $txt['filter_only_file'], '" class="nosel icon i-search"></a>
 							', $txt['file'], ': ', $error['file']['link'], '<br />
 							', $txt['line'], ': ', $error['file']['line'], '
 						</div>';
+		}
 
 		echo '
 					</td>
@@ -142,11 +150,13 @@ function template_error_log()
 						</div>';
 
 		if ($error['member']['session'] != '')
+		{
 			echo '
 						<div>
 							<a href="', $scripturl, '?action=admin;area=logs;sa=errorlog', $context['sort_direction'] == 'down' ? ';desc' : '', ';filter=session;value=', $error['member']['session'], '" title="', $txt['apply_filter'], ': ', $txt['filter_only_session'], '" class="nosel icon i-search"></a>
 							', $error['member']['session'], '
 						</div>';
+		}
 
 		echo '
 					</td>
@@ -176,8 +186,10 @@ function template_error_log()
 					<input type="submit" name="delall" value="', $context['has_filter'] ? $txt['remove_filtered_results'] : $txt['remove_all'], '" onclick="return confirm(\'', $context['has_filter'] ? $txt['remove_filtered_results_confirm'] : $txt['sure_about_errorlog_remove'], '\');" />';
 
 	if ($context['sort_direction'] == 'down')
+	{
 		echo '
 					<input type="hidden" name="desc" value="1" />';
+	}
 
 	echo '
 					<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
@@ -244,7 +256,9 @@ function template_attachment_errors()
 		<div class="content">';
 
 	foreach ($context['attachment_error_keys'] as $key)
+	{
 		template_show_error($key);
+	}
 
 	echo '
 		</div>

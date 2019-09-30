@@ -8,7 +8,7 @@
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause (see accompanying LICENSE.txt file)
  *
  * This file contains code covered by:
- * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * copyright: 2011 Simple Machines (http://www.simplemachines.org)
  *
  * @version 2.0 dev
  *
@@ -16,19 +16,23 @@
 
 namespace ElkArte\Controller;
 
+use ElkArte\AbstractController;
+use ElkArte\Exceptions\Exception;
+use ElkArte\Hooks;
+
 /**
  * Can give good or bad karma so watch out!
  *
  * @package Karma
  */
-class Karma extends \ElkArte\AbstractController
+class Karma extends AbstractController
 {
 	/**
 	 * Pre Dispatch, called before other methods.  Loads integration hooks.
 	 */
 	public function pre_dispatch()
 	{
-		\ElkArte\Hooks::instance()->loadIntegrationsSettings();
+		Hooks::instance()->loadIntegrationsSettings();
 	}
 
 	/**
@@ -66,25 +70,58 @@ class Karma extends \ElkArte\AbstractController
 	}
 
 	/**
-	 * Smite a user.
+	 * Makes sure that a user can perform the karma action
+	 *
+	 * @param int $id_target
+	 *
+	 * @return int
+	 * @throws \ElkArte\Exceptions\Exception feature_disabled
 	 */
-	public function action_smite()
+	private function _prepare_karma($id_target)
 	{
 		global $modSettings;
 
-		// Sometimes the community needs to chill
-		if (!empty($modSettings['karmaDisableSmite']))
-			$this->_redirect_karma();
+		// If the mod is disabled, show an error.
+		if (empty($modSettings['karmaMode']))
+		{
+			throw new Exception('feature_disabled', true);
+		}
 
-		// The user ID _must_ be a number, no matter what.
-		$id_target = $this->_req->getQuery('uid', 'intval', 0);
+		// If you're a guest or can't do this, blow you off...
+		is_not_guest();
+		isAllowedTo('karma_edit');
 
-		// Start off with no change in karma.
-		$action = $this->_prepare_karma($id_target);
+		checkSession('get');
 
-		// Give em a wack and run away
-		$this->_give_karma($this->user->id, $this->_req->query->uid, $action, -1);
-		$this->_redirect_karma();
+		// We hold karma here.
+		require_once(SUBSDIR . '/Karma.subs.php');
+
+		// If you don't have enough posts, tough luck.
+		// @todo Should this be dropped in favor of post group permissions?
+		// Should this apply to the member you are smiting/applauding?
+		if ($this->user->is_admin === false && $this->user->posts < $modSettings['karmaMinPosts'])
+		{
+			throw new Exception('not_enough_posts_karma', true, array($modSettings['karmaMinPosts']));
+		}
+
+		// And you can't modify your own, punk! (use the profile if you need to.)
+		if (empty($id_target) || $id_target == $this->user->id)
+		{
+			throw new Exception('cant_change_own_karma', false);
+		}
+
+		// Delete any older items from the log so we can get the go ahead or not
+		clearKarma($modSettings['karmaWaitTime']);
+
+		// Not an administrator... or one who is restricted as well.
+		$action = 0;
+		if (!empty($modSettings['karmaTimeRestrictAdmins']) || !allowedTo('moderate_forum'))
+		{
+			// Find out if this user has done this recently...
+			$action = lastActionOn($this->user->id, $id_target);
+		}
+
+		return $action;
 	}
 
 	/**
@@ -103,64 +140,19 @@ class Karma extends \ElkArte\AbstractController
 
 		// They haven't, not before now, anyhow.
 		if (empty($action) || empty($modSettings['karmaWaitTime']))
+		{
 			addKarma($id_executor, $id_target, $dir);
+		}
 		else
 		{
 			// If you are gonna try to repeat.... don't allow it.
-			if ($action == $dir)
-				throw new \ElkArte\Exceptions\Exception('karma_wait_time', false, array($modSettings['karmaWaitTime'], ($modSettings['karmaWaitTime'] == 1 ? strtolower($txt['hour']) : $txt['hours'])));
+			if ($action === $dir)
+			{
+				throw new Exception('karma_wait_time', false, array($modSettings['karmaWaitTime'], ($modSettings['karmaWaitTime'] == 1 ? strtolower($txt['hour']) : $txt['hours'])));
+			}
 
 			updateKarma($id_executor, $id_target, $dir);
 		}
-	}
-
-	/**
-	 * Makes sure that a user can perform the karma action
-	 *
-	 * @param int $id_target
-	 *
-	 * @return int
-	 * @throws \ElkArte\Exceptions\Exception feature_disabled
-	 */
-	private function _prepare_karma($id_target)
-	{
-		global $modSettings;
-
-		// If the mod is disabled, show an error.
-		if (empty($modSettings['karmaMode']))
-			throw new \ElkArte\Exceptions\Exception('feature_disabled', true);
-
-		// If you're a guest or can't do this, blow you off...
-		is_not_guest();
-		isAllowedTo('karma_edit');
-
-		checkSession('get');
-
-		// We hold karma here.
-		require_once(SUBSDIR . '/Karma.subs.php');
-
-		// If you don't have enough posts, tough luck.
-		// @todo Should this be dropped in favor of post group permissions?
-		// Should this apply to the member you are smiting/applauding?
-		if ($this->user->is_admin === false && $this->user->posts < $modSettings['karmaMinPosts'])
-			throw new \ElkArte\Exceptions\Exception('not_enough_posts_karma', true, array($modSettings['karmaMinPosts']));
-
-		// And you can't modify your own, punk! (use the profile if you need to.)
-		if (empty($id_target) || $id_target == $this->user->id)
-			throw new \ElkArte\Exceptions\Exception('cant_change_own_karma', false);
-
-		// Delete any older items from the log so we can get the go ahead or not
-		clearKarma($modSettings['karmaWaitTime']);
-
-		// Not an administrator... or one who is restricted as well.
-		$action = 0;
-		if (!empty($modSettings['karmaTimeRestrictAdmins']) || !allowedTo('moderate_forum'))
-		{
-			// Find out if this user has done this recently...
-			$action = lastActionOn($this->user->id, $id_target);
-		}
-
-		return $action;
 	}
 
 	/**
@@ -173,10 +165,14 @@ class Karma extends \ElkArte\AbstractController
 
 		// Figure out where to go back to.... the topic?
 		if (!empty($topic))
+		{
 			redirectexit('topic=' . $topic . '.' . $this->_req->start . '#msg' . $this->_req->get('m', 'intval'));
+		}
 		// Hrm... maybe a personal message?
 		elseif (isset($_REQUEST['f']))
+		{
 			redirectexit('action=pm;f=' . $_REQUEST['f'] . ';start=' . $this->_req->start . (isset($_REQUEST['l']) ? ';l=' . $this->_req->get('l', 'intval') : '') . (isset($_REQUEST['pm']) ? '#' . $this->_req->get('pm', 'intval') : ''));
+		}
 		// JavaScript as a last resort.
 		else
 		{
@@ -193,5 +189,29 @@ class Karma extends \ElkArte\AbstractController
 
 			obExit(false);
 		}
+	}
+
+	/**
+	 * Smite a user.
+	 */
+	public function action_smite()
+	{
+		global $modSettings;
+
+		// Sometimes the community needs to chill
+		if (!empty($modSettings['karmaDisableSmite']))
+		{
+			$this->_redirect_karma();
+		}
+
+		// The user ID _must_ be a number, no matter what.
+		$id_target = $this->_req->getQuery('uid', 'intval', 0);
+
+		// Start off with no change in karma.
+		$action = $this->_prepare_karma($id_target);
+
+		// Give em a wack and run away
+		$this->_give_karma($this->user->id, $this->_req->query->uid, $action, -1);
+		$this->_redirect_karma();
 	}
 }

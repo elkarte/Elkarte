@@ -9,7 +9,7 @@
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause (see accompanying LICENSE.txt file)
  *
  * This file contains code covered by:
- * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * copyright: 2011 Simple Machines (http://www.simplemachines.org)
  *
  * @version 2.0 dev
  *
@@ -26,6 +26,7 @@ abstract class AbstractResult
 {
 	/**
 	 * Result object
+	 *
 	 * @var resource
 	 */
 	protected $result = null;
@@ -37,6 +38,7 @@ abstract class AbstractResult
 
 	/**
 	 * Constructor.
+	 *
 	 * @param $result
 	 * @param null $details
 	 */
@@ -56,6 +58,11 @@ abstract class AbstractResult
 			$this->free_result();
 		}
 	}
+
+	/**
+	 * Free the resultset.
+	 */
+	abstract public function free_result();
 
 	/**
 	 * Returns the result object as obtained from the query function
@@ -81,11 +88,6 @@ abstract class AbstractResult
 	abstract public function affected_rows();
 
 	/**
-	 * Fetch next result as association.
-	 */
-	abstract public function fetch_assoc();
-
-	/**
 	 * Fetch a row from the result set given as parameter.
 	 */
 	abstract public function fetch_row();
@@ -94,11 +96,6 @@ abstract class AbstractResult
 	 * Fetch all the results at once.
 	 */
 	abstract public function fetch_all();
-
-	/**
-	 * Free the resultset.
-	 */
-	abstract public function free_result();
 
 	/**
 	 * Get the number of rows in the result.
@@ -158,4 +155,9 @@ abstract class AbstractResult
 
 		return $results;
 	}
+
+	/**
+	 * Fetch next result as association.
+	 */
+	abstract public function fetch_assoc();
 }

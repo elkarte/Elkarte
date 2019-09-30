@@ -10,13 +10,19 @@
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause (see accompanying LICENSE.txt file)
  *
  * This file contains code covered by:
- * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * copyright: 2011 Simple Machines (http://www.simplemachines.org)
  *
  * @version 2.0 dev
  *
  */
 
 namespace ElkArte\AdminController;
+
+use ElkArte\AbstractController;
+use ElkArte\Action;
+use ElkArte\Exceptions\Exception;
+use ElkArte\SettingsForm\SettingsForm;
+use ElkArte\User;
 
 /**
  * ManageServer administration pages controller.
@@ -25,7 +31,7 @@ namespace ElkArte\AdminController;
  * database settings, cache, general forum settings, and others.
  * It sends the data for display, and it allows the admin to change it.
  */
-class ManageServer extends \ElkArte\AbstractController
+class ManageServer extends AbstractController
 {
 	/**
 	 * This is the main dispatcher. Sets up all the available sub-actions, all the tabs and selects
@@ -38,7 +44,7 @@ class ManageServer extends \ElkArte\AbstractController
 	 *
 	 * @event integrate_sa_server_settings
 	 * @uses edit_settings adminIndex.
-	 * @see \ElkArte\AbstractController::action_index()
+	 * @see  \ElkArte\AbstractController::action_index()
 	 */
 	public function action_index()
 	{
@@ -60,7 +66,7 @@ class ManageServer extends \ElkArte\AbstractController
 			'phpinfo' => array($this, 'action_phpinfo', 'permission' => 'admin_forum'),
 		);
 
-		$action = new \ElkArte\Action('server_settings');
+		$action = new Action('server_settings');
 
 		// Load up all the tabs...
 		$context[$context['admin_menu_name']]['tab_data'] = array(
@@ -124,7 +130,7 @@ class ManageServer extends \ElkArte\AbstractController
 		global $scripturl, $context, $txt;
 
 		// Initialize the form
-		$settingsForm = new \ElkArte\SettingsForm\SettingsForm(\ElkArte\SettingsForm\SettingsForm::FILE_ADAPTER);
+		$settingsForm = new SettingsForm(SettingsForm::FILE_ADAPTER);
 
 		// Initialize it with our settings
 		$settingsForm->setConfigVars($this->_generalSettings());
@@ -148,6 +154,36 @@ class ManageServer extends \ElkArte\AbstractController
 	}
 
 	/**
+	 * This function returns all general settings.
+	 *
+	 * @event integrate_modify_general_settings
+	 */
+	private function _generalSettings()
+	{
+		global $txt;
+
+		// initialize configuration
+		$config_vars = array(
+			array('mbname', $txt['admin_title'], 'file', 'text', 30),
+			'',
+			array('maintenance', $txt['admin_maintain'], 'file', 'check'),
+			array('mtitle', $txt['maintenance_subject'], 'file', 'text', 36),
+			array('mmessage', $txt['maintenance_message'], 'file', 'large_text', 6),
+			'',
+			array('webmaster_email', $txt['admin_webmaster_email'], 'file', 'text', 30),
+			'',
+			array('enableCompressedOutput', $txt['enableCompressedOutput'], 'db', 'check', null, 'enableCompressedOutput'),
+			array('disableHostnameLookup', $txt['disableHostnameLookup'], 'db', 'check', null, 'disableHostnameLookup'),
+			array('url_format', $txt['url_format'], 'file', 'select', array('standard' => $txt['url_format_standard'], 'semantic' => $txt['url_format_semantic'], 'queryless' => $txt['url_format_queryless'])),
+		);
+
+		// Notify the integration
+		call_integration_hook('integrate_modify_general_settings', array(&$config_vars));
+
+		return $config_vars;
+	}
+
+	/**
 	 * Basic database and paths settings - database name, host, etc.
 	 *
 	 * This method handles the display, allows to edit, and saves the results
@@ -168,7 +204,7 @@ class ManageServer extends \ElkArte\AbstractController
 		global $scripturl, $context, $txt;
 
 		// Initialize the form
-		$settingsForm = new \ElkArte\SettingsForm\SettingsForm(\ElkArte\SettingsForm\SettingsForm::FILE_ADAPTER);
+		$settingsForm = new SettingsForm(SettingsForm::FILE_ADAPTER);
 
 		// Initialize it with our settings
 		$settingsForm->setConfigVars($this->_databaseSettings());
@@ -193,6 +229,42 @@ class ManageServer extends \ElkArte\AbstractController
 	}
 
 	/**
+	 * This function returns database settings.
+	 *
+	 * @event integrate_modify_database_settings
+	 */
+	private function _databaseSettings()
+	{
+		global $txt;
+
+		// initialize settings
+		$config_vars = array(
+			array('db_server', $txt['database_server'], 'file', 'text'),
+			array('db_user', $txt['database_user'], 'file', 'text'),
+			array('db_passwd', $txt['database_password'], 'file', 'password'),
+			array('db_name', $txt['database_name'], 'file', 'text'),
+			array('db_prefix', $txt['database_prefix'], 'file', 'text'),
+			array('db_persist', $txt['db_persist'], 'file', 'check', null, 'db_persist'),
+			array('db_error_send', $txt['db_error_send'], 'file', 'check'),
+			array('ssi_db_user', $txt['ssi_db_user'], 'file', 'text', null, 'ssi_db_user'),
+			array('ssi_db_passwd', $txt['ssi_db_passwd'], 'file', 'password'),
+			'',
+			array('autoFixDatabase', $txt['autoFixDatabase'], 'db', 'check', false, 'autoFixDatabase'),
+			array('autoOptMaxOnline', $txt['autoOptMaxOnline'], 'subtext' => $txt['zero_for_no_limit'], 'db', 'int'),
+			'',
+			array('boardurl', $txt['admin_url'], 'file', 'text', 36),
+			array('boarddir', $txt['boarddir'], 'file', 'text', 36),
+			array('sourcedir', $txt['sourcesdir'], 'file', 'text', 36),
+			array('cachedir', $txt['cachedir'], 'file', 'text', 36),
+		);
+
+		// Notify the integration
+		call_integration_hook('integrate_modify_database_settings', array(&$config_vars));
+
+		return $config_vars;
+	}
+
+	/**
 	 * Modify cookies settings.
 	 *
 	 * This method handles the display, allows to edit, and saves the result
@@ -205,7 +277,7 @@ class ManageServer extends \ElkArte\AbstractController
 		global $context, $scripturl, $txt, $modSettings, $cookiename, $boardurl;
 
 		// Initialize the form
-		$settingsForm = new \ElkArte\SettingsForm\SettingsForm(\ElkArte\SettingsForm\SettingsForm::FILE_ADAPTER);
+		$settingsForm = new SettingsForm(SettingsForm::FILE_ADAPTER);
 
 		// Initialize it with our settings
 		$settingsForm->setConfigVars($this->_cookieSettings());
@@ -220,16 +292,20 @@ class ManageServer extends \ElkArte\AbstractController
 
 			// Its either local or global cookies
 			if (!empty($this->_req->post->localCookies) && empty($this->_req->post->globalCookies))
+			{
 				unset($this->_req->post->globalCookies);
+			}
 
 			if (!empty($this->_req->post->globalCookiesDomain) && strpos($boardurl, $this->_req->post->globalCookiesDomain) === false)
-				throw new \ElkArte\Exceptions\Exception('invalid_cookie_domain', false);
+			{
+				throw new Exception('invalid_cookie_domain', false);
+			}
 
 			$settingsForm->setConfigValues((array) $this->_req->post);
 			$settingsForm->save();
 
 			// If the cookie name was changed, reset the cookie.
-			if ($cookiename != $this->_req->post->cookiename)
+			if ($cookiename !== $this->_req->post->cookiename)
 			{
 				require_once(SUBSDIR . '/Auth.subs.php');
 
@@ -240,7 +316,7 @@ class ManageServer extends \ElkArte\AbstractController
 
 				// Set the new one.
 				$cookiename = $this->_req->post->cookiename;
-				setLoginCookie(60 * $modSettings['cookieTime'], \ElkArte\User::$settings['id_member'], hash('sha256', \ElkArte\User::$settings['passwd'] . \ElkArte\User::$settings['password_salt']));
+				setLoginCookie(60 * $modSettings['cookieTime'], (int) User::$settings['id_member'], hash('sha256', User::$settings['passwd'] . User::$settings['password_salt']));
 
 				redirectexit('action=admin;area=serversettings;sa=cookie;' . $context['session_var'] . '=' . $original_session_id, detectServer()->is('needs_login_fix'));
 			}
@@ -262,6 +338,39 @@ class ManageServer extends \ElkArte\AbstractController
 	}
 
 	/**
+	 * This little function returns all cookie settings.
+	 *
+	 * @event integrate_modify_cookie_settings
+	 */
+	private function _cookieSettings()
+	{
+		global $txt;
+
+		// Define the variables we want to edit or show in the cookie form.
+		$config_vars = array(
+			// Cookies...
+			array('cookiename', $txt['cookie_name'], 'file', 'text', 20),
+			array('cookieTime', $txt['cookieTime'], 'db', 'int', 'postinput' => $txt['minutes']),
+			array('localCookies', $txt['localCookies'], 'subtext' => $txt['localCookies_note'], 'db', 'check', false, 'localCookies'),
+			array('globalCookies', $txt['globalCookies'], 'subtext' => $txt['globalCookies_note'], 'db', 'check', false, 'globalCookies'),
+			array('globalCookiesDomain', $txt['globalCookiesDomain'], 'subtext' => $txt['globalCookiesDomain_note'], 'db', 'text', false, 'globalCookiesDomain'),
+			array('secureCookies', $txt['secureCookies'], 'subtext' => $txt['secureCookies_note'], 'db', 'check', false, 'secureCookies', 'disabled' => !isset($this->_req->server->HTTPS) || !(strtolower($this->_req->server->HTTPS) === 'on' || strtolower($this->_req->server->HTTPS) == '1')),
+			array('httponlyCookies', $txt['httponlyCookies'], 'subtext' => $txt['httponlyCookies_note'], 'db', 'check', false, 'httponlyCookies'),
+			'',
+			// Sessions
+			array('databaseSession_enable', $txt['databaseSession_enable'], 'db', 'check', false, 'databaseSession_enable'),
+			array('databaseSession_loose', $txt['databaseSession_loose'], 'db', 'check', false, 'databaseSession_loose'),
+			array('databaseSession_lifetime', $txt['databaseSession_lifetime'], 'db', 'int', false, 'databaseSession_lifetime', 'postinput' => $txt['seconds']),
+		);
+
+		// Notify the integration
+		call_integration_hook('integrate_modify_cookie_settings', array(&$config_vars));
+
+		// Set them vars for our settings form
+		return $config_vars;
+	}
+
+	/**
 	 * Cache settings editing and submission.
 	 *
 	 * This method handles the display, allows to edit, and saves the result
@@ -274,7 +383,7 @@ class ManageServer extends \ElkArte\AbstractController
 		global $context, $scripturl, $txt;
 
 		// Initialize the form
-		$settingsForm = new \ElkArte\SettingsForm\SettingsForm(\ElkArte\SettingsForm\SettingsForm::FILE_ADAPTER);
+		$settingsForm = new SettingsForm(SettingsForm::FILE_ADAPTER);
 
 		// Initialize it with our settings
 		$settingsForm->setConfigVars($this->_cacheSettings());
@@ -318,235 +427,6 @@ class ManageServer extends \ElkArte\AbstractController
 	}
 
 	/**
-	 * Allows to edit load management settings.
-	 *
-	 * This method handles the display, allows to edit, and saves the result
-	 * for the _loadavgSettings form.
-	 *
-	 * @event integrate_loadavg_settings
-	 * @event integrate_save_loadavg_settings
-	 */
-	public function action_loadavgSettings_display()
-	{
-		global $txt, $scripturl, $context;
-
-		// Initialize the form
-		$settingsForm = new \ElkArte\SettingsForm\SettingsForm(\ElkArte\SettingsForm\SettingsForm::DB_ADAPTER);
-
-		// Initialize it with our settings
-		$settingsForm->setConfigVars($this->_loadavgSettings());
-
-		call_integration_hook('integrate_loadavg_settings');
-
-		$context['post_url'] = $scripturl . '?action=admin;area=serversettings;sa=loads;save';
-		$context['settings_title'] = $txt['loadavg_settings'];
-
-		// Saving?
-		if (isset($this->_req->query->save))
-		{
-			// Stupidity is not allowed.
-			foreach ($this->_req->post as $key => $value)
-			{
-				if (strpos($key, 'loadavg') === 0 || $key === 'loadavg_enable')
-					continue;
-				elseif ($key === 'loadavg_auto_opt' && $value <= 1)
-					$this->_req->post->loadavg_auto_opt = '1.0';
-				elseif ($key === 'loadavg_forum' && $value < 10)
-					$this->_req->post->loadavg_forum = '10.0';
-				elseif ($value < 2)
-					$this->_req->{$key} = '2.0';
-			}
-
-			call_integration_hook('integrate_save_loadavg_settings');
-
-			$settingsForm->setConfigValues((array) $this->_req->post);
-			$settingsForm->save();
-			redirectexit('action=admin;area=serversettings;sa=loads;' . $context['session_var'] . '=' . $context['session_id']);
-		}
-
-		createToken('admin-ssc');
-		createToken('admin-dbsc');
-		$settingsForm->prepare();
-	}
-
-	/**
-	 * Allows us to see the servers php settings
-	 *
-	 * What it does:
-	 *
-	 * - loads the settings into an array for display in a template
-	 * - drops cookie values just in case
-	 *
-	 * @uses sub-template php_info
-	 */
-	public function action_phpinfo()
-	{
-		global $context, $txt;
-
-		$category = $txt['phpinfo_settings'];
-		$pinfo = array();
-
-		// Get the data
-		ob_start();
-		phpinfo();
-
-		// We only want it for its body, pigs that we are
-		$info_lines = preg_replace('~^.*<body>(.*)</body>.*$~', '$1', ob_get_contents());
-		$info_lines = explode("\n", strip_tags($info_lines, '<tr><td><h2>'));
-		@ob_end_clean();
-
-		// Remove things that could be considered sensitive
-		$remove = '_COOKIE|Cookie|_GET|_REQUEST|REQUEST_URI|QUERY_STRING|REQUEST_URL|HTTP_REFERER';
-
-		// Put all of it into an array
-		foreach ($info_lines as $line)
-		{
-			if (preg_match('~(' . $remove . ')~', $line))
-				continue;
-
-			// New category?
-			if (strpos($line, '<h2>') !== false)
-				$category = preg_match('~<h2>(.*)</h2>~', $line, $title) ? $title[1] : $category;
-
-			// Load it as setting => value or the old setting local master
-			if (preg_match('~<tr><td[^>]+>([^<]*)</td><td[^>]+>([^<]*)</td></tr>~', $line, $val))
-				$pinfo[$category][$val[1]] = $val[2];
-			elseif (preg_match('~<tr><td[^>]+>([^<]*)</td><td[^>]+>([^<]*)</td><td[^>]+>([^<]*)</td></tr>~', $line, $val))
-				$pinfo[$category][$val[1]] = array($txt['phpinfo_localsettings'] => $val[2], $txt['phpinfo_defaultsettings'] => $val[3]);
-		}
-
-		// Load it in to context and display it
-		$context['pinfo'] = $pinfo;
-		$context['page_title'] = $txt['admin_server_settings'];
-		$context['sub_template'] = 'php_info';
-
-		return;
-	}
-
-	/**
-	 * This function returns all general settings.
-	 *
-	 * @event integrate_modify_general_settings
-	 */
-	private function _generalSettings()
-	{
-		global $txt;
-
-		// initialize configuration
-		$config_vars = array(
-				array('mbname', $txt['admin_title'], 'file', 'text', 30),
-			'',
-				array('maintenance', $txt['admin_maintain'], 'file', 'check'),
-				array('mtitle', $txt['maintenance_subject'], 'file', 'text', 36),
-				array('mmessage', $txt['maintenance_message'], 'file', 'large_text', 6),
-			'',
-				array('webmaster_email', $txt['admin_webmaster_email'], 'file', 'text', 30),
-			'',
-				array('enableCompressedOutput', $txt['enableCompressedOutput'], 'db', 'check', null, 'enableCompressedOutput'),
-				array('disableHostnameLookup', $txt['disableHostnameLookup'], 'db', 'check', null, 'disableHostnameLookup'),
-				array('url_format', $txt['url_format'], 'file', 'select', array('standard' => $txt['url_format_standard'], 'semantic' => $txt['url_format_semantic'], 'queryless' => $txt['url_format_queryless'])),
-		);
-
-		// Notify the integration
-		call_integration_hook('integrate_modify_general_settings', array(&$config_vars));
-
-		return $config_vars;
-	}
-
-	/**
-	 * Return the search settings for use in admin search
-	 */
-	public function generalSettings_search()
-	{
-		return $this->_generalSettings();
-	}
-
-	/**
-	 * This function returns database settings.
-	 *
-	 * @event integrate_modify_database_settings
-	 */
-	private function _databaseSettings()
-	{
-		global $txt;
-
-		// initialize settings
-		$config_vars = array(
-				array('db_server', $txt['database_server'], 'file', 'text'),
-				array('db_user', $txt['database_user'], 'file', 'text'),
-				array('db_passwd', $txt['database_password'], 'file', 'password'),
-				array('db_name', $txt['database_name'], 'file', 'text'),
-				array('db_prefix', $txt['database_prefix'], 'file', 'text'),
-				array('db_persist', $txt['db_persist'], 'file', 'check', null, 'db_persist'),
-				array('db_error_send', $txt['db_error_send'], 'file', 'check'),
-				array('ssi_db_user', $txt['ssi_db_user'], 'file', 'text', null, 'ssi_db_user'),
-				array('ssi_db_passwd', $txt['ssi_db_passwd'], 'file', 'password'),
-			'',
-				array('autoFixDatabase', $txt['autoFixDatabase'], 'db', 'check', false, 'autoFixDatabase'),
-				array('autoOptMaxOnline', $txt['autoOptMaxOnline'], 'subtext' => $txt['zero_for_no_limit'], 'db', 'int'),
-			'',
-				array('boardurl', $txt['admin_url'], 'file', 'text', 36),
-				array('boarddir', $txt['boarddir'], 'file', 'text', 36),
-				array('sourcedir', $txt['sourcesdir'], 'file', 'text', 36),
-				array('cachedir', $txt['cachedir'], 'file', 'text', 36),
-		);
-
-		// Notify the integration
-		call_integration_hook('integrate_modify_database_settings', array(&$config_vars));
-
-		return $config_vars;
-	}
-
-	/**
-	 * Return the search settings for use in admin search
-	 */
-	public function databaseSettings_search()
-	{
-		return $this->_databaseSettings();
-	}
-
-	/**
-	 * This little function returns all cookie settings.
-	 *
-	 * @event integrate_modify_cookie_settings
-	 */
-	private function _cookieSettings()
-	{
-		global $txt;
-
-		// Define the variables we want to edit or show in the cookie form.
-		$config_vars = array(
-				// Cookies...
-				array('cookiename', $txt['cookie_name'], 'file', 'text', 20),
-				array('cookieTime', $txt['cookieTime'], 'db', 'int', 'postinput' => $txt['minutes']),
-				array('localCookies', $txt['localCookies'], 'subtext' => $txt['localCookies_note'], 'db', 'check', false, 'localCookies'),
-				array('globalCookies', $txt['globalCookies'], 'subtext' => $txt['globalCookies_note'], 'db', 'check', false, 'globalCookies'),
-				array('globalCookiesDomain', $txt['globalCookiesDomain'], 'subtext' => $txt['globalCookiesDomain_note'], 'db', 'text', false, 'globalCookiesDomain'),
-				array('secureCookies', $txt['secureCookies'], 'subtext' => $txt['secureCookies_note'], 'db', 'check', false, 'secureCookies', 'disabled' => !isset($this->_req->server->HTTPS) || !(strtolower($this->_req->server->HTTPS) === 'on' || strtolower($this->_req->server->HTTPS) == '1')),
-				array('httponlyCookies', $txt['httponlyCookies'], 'subtext' => $txt['httponlyCookies_note'], 'db', 'check', false, 'httponlyCookies'),
-			'',
-				// Sessions
-				array('databaseSession_enable', $txt['databaseSession_enable'], 'db', 'check', false, 'databaseSession_enable'),
-				array('databaseSession_loose', $txt['databaseSession_loose'], 'db', 'check', false, 'databaseSession_loose'),
-				array('databaseSession_lifetime', $txt['databaseSession_lifetime'], 'db', 'int', false, 'databaseSession_lifetime', 'postinput' => $txt['seconds']),
-		);
-
-		// Notify the integration
-		call_integration_hook('integrate_modify_cookie_settings', array(&$config_vars));
-
-		// Set them vars for our settings form
-		return $config_vars;
-	}
-
-	/**
-	 * Return the search settings for use in admin search
-	 */
-	public function cookieSettings_search()
-	{
-		return $this->_cookieSettings();
-	}
-
-	/**
 	 * This little function returns all cache settings.
 	 *
 	 * @event integrate_modify_cache_settings
@@ -566,7 +446,9 @@ class ManageServer extends \ElkArte\AbstractController
 			$detected_names[] = $value->title();
 
 			if (!empty($value->isAvailable()))
+			{
 				$detected_supported[$key] = $value->title();
+			}
 		}
 
 		$txt['caching_information'] = str_replace('{supported_accelerators}', '<i>' . implode(', ', $detected_names) . '</i><br />', $txt['caching_information']);
@@ -598,11 +480,63 @@ class ManageServer extends \ElkArte\AbstractController
 	}
 
 	/**
-	 * Return the search settings for use in admin search
+	 * Allows to edit load management settings.
+	 *
+	 * This method handles the display, allows to edit, and saves the result
+	 * for the _loadavgSettings form.
+	 *
+	 * @event integrate_loadavg_settings
+	 * @event integrate_save_loadavg_settings
 	 */
-	public function cacheSettings_search()
+	public function action_loadavgSettings_display()
 	{
-		return $this->_cacheSettings();
+		global $txt, $scripturl, $context;
+
+		// Initialize the form
+		$settingsForm = new SettingsForm(SettingsForm::DB_ADAPTER);
+
+		// Initialize it with our settings
+		$settingsForm->setConfigVars($this->_loadavgSettings());
+
+		call_integration_hook('integrate_loadavg_settings');
+
+		$context['post_url'] = $scripturl . '?action=admin;area=serversettings;sa=loads;save';
+		$context['settings_title'] = $txt['loadavg_settings'];
+
+		// Saving?
+		if (isset($this->_req->query->save))
+		{
+			// Stupidity is not allowed.
+			foreach ($this->_req->post as $key => $value)
+			{
+				if (strpos($key, 'loadavg') === 0 || $key === 'loadavg_enable')
+				{
+					continue;
+				}
+				elseif ($key === 'loadavg_auto_opt' && $value <= 1)
+				{
+					$this->_req->post->loadavg_auto_opt = '1.0';
+				}
+				elseif ($key === 'loadavg_forum' && $value < 10)
+				{
+					$this->_req->post->loadavg_forum = '10.0';
+				}
+				elseif ($value < 2)
+				{
+					$this->_req->{$key} = '2.0';
+				}
+			}
+
+			call_integration_hook('integrate_save_loadavg_settings');
+
+			$settingsForm->setConfigValues((array) $this->_req->post);
+			$settingsForm->save();
+			redirectexit('action=admin;area=serversettings;sa=loads;' . $context['session_var'] . '=' . $context['session_id']);
+		}
+
+		createToken('admin-ssc');
+		createToken('admin-dbsc');
+		$settingsForm->prepare();
 	}
 
 	/**
@@ -620,7 +554,9 @@ class ManageServer extends \ElkArte\AbstractController
 
 		// Don't say you're using that win-thing, no cookies for you :P
 		if (stripos(PHP_OS, 'win') === 0)
+		{
 			$context['settings_message'] = $txt['loadavg_disabled_windows'];
+		}
 		else
 		{
 			require_once(SUBSDIR . '/Server.subs.php');
@@ -662,6 +598,100 @@ class ManageServer extends \ElkArte\AbstractController
 		call_integration_hook('integrate_modify_loadavg_settings', array(&$config_vars));
 
 		return $config_vars;
+	}
+
+	/**
+	 * Allows us to see the servers php settings
+	 *
+	 * What it does:
+	 *
+	 * - loads the settings into an array for display in a template
+	 * - drops cookie values just in case
+	 *
+	 * @uses sub-template php_info
+	 */
+	public function action_phpinfo()
+	{
+		global $context, $txt;
+
+		$category = $txt['phpinfo_settings'];
+		$pinfo = array();
+
+		// Get the data
+		ob_start();
+		phpinfo();
+
+		// We only want it for its body, pigs that we are
+		$info_lines = preg_replace('~^.*<body>(.*)</body>.*$~', '$1', ob_get_contents());
+		$info_lines = explode("\n", strip_tags($info_lines, '<tr><td><h2>'));
+		@ob_end_clean();
+
+		// Remove things that could be considered sensitive
+		$remove = '_COOKIE|Cookie|_GET|_REQUEST|REQUEST_URI|QUERY_STRING|REQUEST_URL|HTTP_REFERER';
+
+		// Put all of it into an array
+		foreach ($info_lines as $line)
+		{
+			if (preg_match('~(' . $remove . ')~', $line))
+			{
+				continue;
+			}
+
+			// New category?
+			if (strpos($line, '<h2>') !== false)
+			{
+				$category = preg_match('~<h2>(.*)</h2>~', $line, $title) ? $title[1] : $category;
+			}
+
+			// Load it as setting => value or the old setting local master
+			if (preg_match('~<tr><td[^>]+>([^<]*)</td><td[^>]+>([^<]*)</td></tr>~', $line, $val))
+			{
+				$pinfo[$category][$val[1]] = $val[2];
+			}
+			elseif (preg_match('~<tr><td[^>]+>([^<]*)</td><td[^>]+>([^<]*)</td><td[^>]+>([^<]*)</td></tr>~', $line, $val))
+			{
+				$pinfo[$category][$val[1]] = array($txt['phpinfo_localsettings'] => $val[2], $txt['phpinfo_defaultsettings'] => $val[3]);
+			}
+		}
+
+		// Load it in to context and display it
+		$context['pinfo'] = $pinfo;
+		$context['page_title'] = $txt['admin_server_settings'];
+		$context['sub_template'] = 'php_info';
+
+		return;
+	}
+
+	/**
+	 * Return the search settings for use in admin search
+	 */
+	public function generalSettings_search()
+	{
+		return $this->_generalSettings();
+	}
+
+	/**
+	 * Return the search settings for use in admin search
+	 */
+	public function databaseSettings_search()
+	{
+		return $this->_databaseSettings();
+	}
+
+	/**
+	 * Return the search settings for use in admin search
+	 */
+	public function cookieSettings_search()
+	{
+		return $this->_cookieSettings();
+	}
+
+	/**
+	 * Return the search settings for use in admin search
+	 */
+	public function cacheSettings_search()
+	{
+		return $this->_cacheSettings();
 	}
 
 	/**

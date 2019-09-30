@@ -8,7 +8,7 @@
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause (see accompanying LICENSE.txt file)
  *
  * This file contains code covered by:
- * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * copyright: 2011 Simple Machines (http://www.simplemachines.org)
  *
  * @version 2.0 dev
  *
@@ -34,7 +34,9 @@ function smileyExists($smileys)
 		)
 	);
 	while ($row = $db->fetch_assoc($request))
+	{
 		$found[] = $row['filename'];
+	}
 	$db->free_result($request);
 
 	return $found;
@@ -62,7 +64,9 @@ function validateDuplicateSmiley($code, $current = null)
 		)
 	);
 	if ($db->num_rows($request) > 0)
+	{
 		return true;
+	}
 	$db->free_result($request);
 
 	return false;
@@ -201,7 +205,9 @@ function getSmiley($id)
 		)
 	);
 	if ($db->num_rows($request) != 1)
+	{
 		throw new \ElkArte\Exceptions\Exception('smiley_not_found');
+	}
 	$current_smiley = $db->fetch_assoc($request);
 	$db->free_result($request);
 
@@ -387,7 +393,8 @@ function isSmileySetInstalled($set)
 			'current_package' => $set,
 		)
 	);
-	return !($db->num_rows($request) > 0);
+
+	return $db->num_rows($request) <= 0;
 }
 
 /**
@@ -419,6 +426,7 @@ function logPackageInstall($param)
 
 /**
  * Get the last smiley_order from the first smileys row.
+ *
  * @return string
  */
 function getMaxSmileyOrder()
@@ -476,20 +484,28 @@ function list_getSmileySets($start, $items_per_page, $sort)
 	$sort_flag = strpos($sort, 'DESC') === false ? SORT_ASC : SORT_DESC;
 
 	if (substr($sort, 0, 4) === 'name')
+	{
 		array_multisort($cols['name'], $sort_flag, SORT_REGULAR, $cols['path'], $cols['selected'], $cols['id']);
+	}
 	elseif (substr($sort, 0, 4) === 'path')
+	{
 		array_multisort($cols['path'], $sort_flag, SORT_REGULAR, $cols['name'], $cols['selected'], $cols['id']);
+	}
 	else
+	{
 		array_multisort($cols['selected'], $sort_flag, SORT_REGULAR, $cols['path'], $cols['name'], $cols['id']);
+	}
 
 	$smiley_sets = array();
 	foreach ($cols['id'] as $i => $id)
+	{
 		$smiley_sets[] = array(
 			'id' => $id,
 			'path' => $cols['path'][$i],
 			'name' => $cols['name'][$i],
 			'selected' => $cols['path'][$i] == $modSettings['smiley_sets_default']
 		);
+	}
 
 	return $smiley_sets;
 }
@@ -522,12 +538,13 @@ function list_getSmileys($start, $items_per_page, $sort)
 		FROM {db_prefix}smileys
 		ORDER BY ' . $sort . '
 		LIMIT ' . $start . ', ' . $items_per_page,
-		array(
-		)
+		array()
 	);
 	$smileys = array();
 	while ($row = $db->fetch_assoc($request))
+	{
 		$smileys[] = $row;
+	}
 	$db->free_result($request);
 
 	return $smileys;
@@ -543,8 +560,7 @@ function list_getNumSmileys()
 	$request = $db->query('', '
 		SELECT COUNT(*)
 		FROM {db_prefix}smileys',
-		array(
-		)
+		array()
 	);
 	list ($numSmileys) = $db->fetch_row($request);
 	$db->free_result($request);

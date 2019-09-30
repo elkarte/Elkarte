@@ -8,7 +8,7 @@
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause (see accompanying LICENSE.txt file)
  *
  * This file contains code covered by:
- * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * copyright: 2011 Simple Machines (http://www.simplemachines.org)
  *
  * @version 2.0 dev
  *
@@ -16,16 +16,17 @@
  *
  */
 
+use ElkArte\Cache\Cache;
 use ElkArte\User;
 
 /**
  * Get a list of versions that are currently installed on the server.
  *
- * @package Admin
- *
  * @param string[] $checkFor
  *
  * @return array
+ * @package Admin
+ *
  */
 function getServerVersions($checkFor)
 {
@@ -57,7 +58,9 @@ function getServerVersions($checkFor)
 	{
 		$conn = $db->connection();
 		if (empty($conn))
+		{
 			trigger_error('getServerVersions(): you need to be connected to the database in order to get its server version', E_USER_NOTICE);
+		}
 		else
 		{
 			$versions['db_server'] = array('title' => sprintf($txt['support_versions_db'], $db->title()), 'version' => '');
@@ -70,19 +73,25 @@ function getServerVersions($checkFor)
 	foreach ($cache_engines as $name => $details)
 	{
 		if (in_array($name, $checkFor))
+		{
 			$versions[$name] = $details;
+		}
 	}
 
 	if (in_array('opcache', $checkFor) && extension_loaded('Zend OPcache'))
 	{
 		$opcache_config = @opcache_get_configuration();
 		if (!empty($opcache_config['directives']['opcache.enable']))
+		{
 			$versions['opcache'] = array('title' => $opcache_config['version']['opcache_product_name'], 'version' => $opcache_config['version']['version']);
+		}
 	}
 
 	// PHP Version
 	if (in_array('php', $checkFor))
+	{
 		$versions['php'] = array('title' => 'PHP', 'version' => PHP_VERSION . ' (' . php_sapi_name() . ')', 'more' => '?action=admin;area=serversettings;sa=phpinfo');
+	}
 
 	// Server info
 	if (in_array('server', $checkFor))
@@ -95,7 +104,9 @@ function getServerVersions($checkFor)
 		require_once(SUBSDIR . '/Server.subs.php');
 		$loading = detectServerLoad();
 		if ($loading !== false)
+		{
 			$versions['server_load'] = array('title' => $txt['loadavg'], 'version' => $loading);
+		}
 	}
 
 	return $versions;
@@ -131,7 +142,9 @@ function getQuickAdminTasks()
 	foreach ($quick_admin_tasks as $task)
 	{
 		if (!empty($task[0]) && !allowedTo($task[0]))
+		{
 			continue;
+		}
 
 		$available_admin_tasks[] = array(
 			'href' => $scripturl . '?action=admin;area=' . $task[1],
@@ -143,7 +156,7 @@ function getQuickAdminTasks()
 		);
 	}
 
-	if (count($available_admin_tasks) % 2 == 1)
+	if (count($available_admin_tasks) % 2 === 1)
 	{
 		$available_admin_tasks[] = array(
 			'href' => '',
@@ -154,7 +167,7 @@ function getQuickAdminTasks()
 		);
 		$available_admin_tasks[count($available_admin_tasks) - 2]['is_last'] = true;
 	}
-	elseif (count($available_admin_tasks) != 0)
+	elseif (count($available_admin_tasks) !== 0)
 	{
 		$available_admin_tasks[count($available_admin_tasks) - 1]['is_last'] = true;
 		$available_admin_tasks[count($available_admin_tasks) - 2]['is_last'] = true;
@@ -189,9 +202,9 @@ function getQuickAdminTasks()
  *   language files found in the default theme directory (grouped by language).
  * - options include include_ssi, include_subscriptions, sort_results
  *
- * @package Admin
  * @param mixed[] $versionOptions associative array of options
  * @return array
+ * @package Admin
  */
 function getFileVersions(&$versionOptions)
 {
@@ -213,17 +226,19 @@ function getFileVersions(&$versionOptions)
 
 	// Find the version in SSI.php's file header.
 	if (!empty($versionOptions['include_ssi']) && file_exists(BOARDDIR . '/SSI.php'))
+	{
 		readFileVersions($version_info, array('file_versions' => BOARDDIR), 'SSI.php');
+	}
 
 	// Do the paid subscriptions handler?
 	if (!empty($versionOptions['include_subscriptions']))
 	{
 		foreach (array(
-			'subscriptions.php',
-			'bootstrap.php',
-			'email_imap_cron.php',
-			'emailpost.php',
-			'emailtopic.php') as $file)
+					 'subscriptions.php',
+					 'bootstrap.php',
+					 'email_imap_cron.php',
+					 'emailpost.php',
+					 'emailtopic.php') as $file)
 		{
 			if (file_exists(BOARDDIR . '/' . $file))
 			{
@@ -258,7 +273,9 @@ function getFileVersions(&$versionOptions)
 	// Load all the files in the default template directory - and the current theme if applicable.
 	$directories = array('default_template_versions' => $settings['default_theme_dir']);
 	if ($settings['theme_id'] != 1)
+	{
 		$directories += array('template_versions' => $settings['theme_dir']);
+	}
 	readFileVersions($version_info, $directories, 'template.php');
 	readFileVersions($version_info, $directories, 'Theme.php');
 
@@ -267,8 +284,10 @@ function getFileVersions(&$versionOptions)
 	$this_dir = dir($lang_dir);
 	while ($path = $this_dir->read())
 	{
-		if ($path == '.' || $path == '..')
+		if ($path === '.' || $path === '..')
+		{
 			continue;
+		}
 
 		if (is_dir($lang_dir . '/' . $path))
 		{
@@ -277,7 +296,7 @@ function getFileVersions(&$versionOptions)
 			$this_lang = dir($this_lang_path);
 			while ($entry = $this_lang->read())
 			{
-				if (substr($entry, -4) == '.php' && $entry != 'index.php' && !is_dir($this_lang_path . '/' . $entry))
+				if (substr($entry, -4) === '.php' && $entry !== 'index.php' && !is_dir($this_lang_path . '/' . $entry))
 				{
 					if (!is_writable($this_lang_path . '/' . $entry))
 					{
@@ -291,10 +310,14 @@ function getFileVersions(&$versionOptions)
 
 					// Look for the version comment in the file header.
 					if (preg_match('~(?://|/\*)\s*Version:\s+(.+?);\s*' . preg_quote($name, '~') . '(?:[\s]{2}|\*/)~i', $header, $match) == 1)
+					{
 						$version_info['default_language_versions'][$language][$name] = $match[1];
+					}
 					// It wasn't found, but the file was... show a '??'.
 					else
+					{
 						$version_info['default_language_versions'][$language][$name] = '??';
+					}
 				}
 			}
 		}
@@ -315,7 +338,9 @@ function getFileVersions(&$versionOptions)
 
 		// For languages sort each language too.
 		foreach ($version_info['default_language_versions'] as $language => $dummy)
+		{
 			ksort($version_info['default_language_versions'][$language]);
+		}
 	}
 
 	return $version_info;
@@ -339,17 +364,17 @@ function readFileVersions(&$version_info, $directories, $pattern, $recursive = f
 
 	foreach ($directories as $type => $dirname)
 	{
-		if ($recursive === true)
+		if ($recursive)
 		{
-			$iter = new \RecursiveIteratorIterator(
-				new \RecursiveDirectoryIterator($dirname, \RecursiveDirectoryIterator::SKIP_DOTS),
-				\RecursiveIteratorIterator::CHILD_FIRST,
-				\RecursiveIteratorIterator::CATCH_GET_CHILD // Ignore "Permission denied"
+			$iter = new RecursiveIteratorIterator(
+				new RecursiveDirectoryIterator($dirname, RecursiveDirectoryIterator::SKIP_DOTS),
+				RecursiveIteratorIterator::CHILD_FIRST,
+				RecursiveIteratorIterator::CATCH_GET_CHILD // Ignore "Permission denied"
 			);
 		}
 		else
 		{
-			$iter = new \IteratorIterator(new \FilesystemIterator($dirname));
+			$iter = new IteratorIterator(new FilesystemIterator($dirname));
 		}
 
 		foreach ($iter as $dir)
@@ -360,7 +385,7 @@ function readFileVersions(&$version_info, $directories, $pattern, $recursive = f
 			}
 			$entry = $dir->getFilename();
 
-			if (substr($entry, $ext_offset) == $pattern)
+			if (substr($entry, $ext_offset) === $pattern)
 			{
 				if ($dir->isWritable() === false)
 				{
@@ -369,21 +394,9 @@ function readFileVersions(&$version_info, $directories, $pattern, $recursive = f
 				// Read the first 768 bytes from the file.... enough for the header.
 				$header = file_get_contents($dir->getPathname(), false, null, 0, 768);
 
-				if ($recursive === true)
-				{
-					$entry_key = $dir->getPathname();
-				}
-				else
-				{
-					$entry_key = $entry;
-				}
+				$entry_key = $recursive ? $dir->getPathname() : $entry;
 
-				// Look for the version comment in the file header.
-				if (preg_match($version_regex, $header, $match) == 1)
-					$version_info[$type][$entry_key] = $match[1];
-				// It wasn't found, but the file was... show a $unknown_version.
-				else
-					$version_info[$type][$entry_key] = $unknown_version;
+				$version_info[$type][$entry_key] = preg_match($version_regex, $header, $match) == 1 ? $match[1] : $unknown_version;
 			}
 		}
 	}
@@ -398,9 +411,9 @@ function readFileVersions(&$version_info, $directories, $pattern, $recursive = f
  * which can occur during a db error
  * - If it fails Settings.php will assume 0
  *
- * @package Admin
  * @param int $time
  *
+ * @package Admin
  * @todo seems a duplicate of Logging.php => logLastDatabaseError
  */
 function updateDbLastError($time)
@@ -435,7 +448,7 @@ function updateAdminPreferences()
 	updateThemeOptions(array(1, User::$info->id, 'admin_preferences', $options['admin_preferences']));
 
 	// Make sure we invalidate any cache.
-	\ElkArte\Cache\Cache::instance()->put('theme_settings-' . $settings['theme_id'] . ':' . User::$info->id, null, 0);
+	Cache::instance()->put('theme_settings-' . $settings['theme_id'] . ':' . User::$info->id, null, 0);
 }
 
 /**
@@ -447,11 +460,11 @@ function updateAdminPreferences()
  * - It uses the email template and replacements passed in the parameters.
  * - It sends them an email.
  *
- * @package Admin
  * @param string $template
  * @param mixed[] $replacements
  * @param int[] $additional_recipients
  * @throws \ElkArte\Exceptions\Exception
+ * @package Admin
  */
 function emailAdmins($template, $replacements = array(), $additional_recipients = array())
 {
@@ -490,8 +503,7 @@ function emailAdmins($template, $replacements = array(), $additional_recipients 
 			'group_array_implode' => implode(', additional_groups) != 0 OR FIND_IN_SET(', $groups),
 		)
 	)->fetch_callback(
-		function ($row) use($replacements, $modSettings, $language, $template)
-		{
+		function ($row) use ($replacements, $modSettings, $language, $template) {
 			// Stick their particulars in the replacement data.
 			$replacements['IDMEMBER'] = $row['id_member'];
 			$replacements['REALNAME'] = $row['member_name'];
@@ -514,7 +526,9 @@ function emailAdmins($template, $replacements = array(), $additional_recipients 
 		foreach ($additional_recipients as $recipient)
 		{
 			if (in_array($recipient['email'], $emails_sent))
+			{
 				continue;
+			}
 
 			$replacements['IDMEMBER'] = $recipient['id'];
 			$replacements['REALNAME'] = $recipient['name'];
@@ -533,9 +547,9 @@ function emailAdmins($template, $replacements = array(), $additional_recipients 
  * Callback used in the core features page when the custom profiles
  * are enabled or disabled.
  *
- * @package Admin
  * @param bool $value the "new" status of the profile fields
  * (true => enabled, false => disabled)
+ * @package Admin
  */
 function custom_profiles_toggle_callback($value)
 {
@@ -561,9 +575,9 @@ function custom_profiles_toggle_callback($value)
  * Callback used in the core features page when the paid subscriptions
  * are enabled or disabled.
  *
- * @package Admin
  * @param bool $value the "new" status of the paid subscriptions
  * (true => enabled, false => disabled)
+ * @package Admin
  */
 function subscriptions_toggle_callback($value)
 {
@@ -572,16 +586,18 @@ function subscriptions_toggle_callback($value)
 
 	// Should we calculate next trigger?
 	if ($value)
+	{
 		calculateNextTrigger('paid_subscriptions');
+	}
 }
 
 /**
  * Callback used in the core features page when the post-by-email feature
  * is enabled or disabled.
  *
- * @package Admin
  * @param bool $value the "new" status of the post-by-email
  * (true => enabled, false => disabled)
+ * @package Admin
  */
 function postbyemail_toggle_callback($value)
 {
@@ -590,16 +606,18 @@ function postbyemail_toggle_callback($value)
 
 	// Should we calculate next trigger?
 	if ($value)
+	{
 		calculateNextTrigger('maillist_fetch_IMAP');
+	}
 }
 
 /**
  * Enables a certain module on a set of controllers
  *
- * @package Admin
  * @param string $module the name of the module (e.g. drafts)
  * @param string[] $controllers list of controllers on which the module is
  *                 activated
+ * @package Admin
  */
 function enableModules($module, $controllers)
 {
@@ -608,9 +626,13 @@ function enableModules($module, $controllers)
 	foreach ((array) $controllers as $controller)
 	{
 		if (!empty($modSettings['modules_' . $controller]))
+		{
 			$existing = explode(',', $modSettings['modules_' . $controller]);
+		}
 		else
+		{
 			$existing = array();
+		}
 
 		$existing[] = $module;
 		$existing = array_filter(array_unique($existing));
@@ -621,10 +643,10 @@ function enableModules($module, $controllers)
 /**
  * Disable a certain module on a set of controllers
  *
- * @package Admin
  * @param string $module the name of the module (e.g. drafts)
  * @param string[] $controllers list of controllers on which the module is
  *                 activated
+ * @package Admin
  */
 function disableModules($module, $controllers)
 {
@@ -633,9 +655,13 @@ function disableModules($module, $controllers)
 	foreach ((array) $controllers as $controller)
 	{
 		if (!empty($modSettings['modules_' . $controller]))
+		{
 			$existing = explode(',', $modSettings['modules_' . $controller]);
+		}
 		else
+		{
 			$existing = array();
+		}
 
 		$existing = array_diff($existing, (array) $module);
 		updateSettings(array('modules_' . $controller => implode(',', $existing)));
@@ -658,7 +684,9 @@ function isModuleEnabled($module)
 		{
 			$modules = explode(',', $val);
 			if (in_array($module, $modules))
+			{
 				return true;
+			}
 		}
 	}
 

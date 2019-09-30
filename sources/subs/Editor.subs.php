@@ -9,11 +9,13 @@
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause (see accompanying LICENSE.txt file)
  *
  * This file contains code covered by:
- * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * copyright: 2011 Simple Machines (http://www.simplemachines.org)
  *
  * @version 2.0 dev
  *
  */
+
+use ElkArte\Cache\Cache;
 
 /**
  * Retrieves a list of message icons.
@@ -61,7 +63,7 @@ function getMessageIcons($board_id)
 	else
 	{
 		$icons = array();
-		if (!\ElkArte\Cache\Cache::instance()->getVar($icons, 'posting_icons-' . $board_id, 480))
+		if (!Cache::instance()->getVar($icons, 'posting_icons-' . $board_id, 480))
 		{
 			$icon_data = $db->fetchQuery('
 				SELECT 
@@ -84,7 +86,7 @@ function getMessageIcons($board_id)
 				);
 			}
 
-			\ElkArte\Cache\Cache::instance()->put('posting_icons-' . $board_id, $icons, 480);
+			Cache::instance()->put('posting_icons-' . $board_id, $icons, 480);
 		}
 	}
 
@@ -138,7 +140,9 @@ function create_control_richedit($editorOptions)
 		theme()->getTemplates()->load('GenericControls');
 		loadCSSFile('jquery.sceditor.css');
 		if (!empty($context['theme_variant']) && file_exists($settings['theme_dir'] . '/css/' . $context['theme_variant'] . '/jquery.sceditor.elk' . $context['theme_variant'] . '.css'))
+		{
 			loadCSSFile($context['theme_variant'] . '/jquery.sceditor.elk' . $context['theme_variant'] . '.css');
+		}
 
 		// JS makes the editor go round
 		loadJavascriptFile(array('jquery.sceditor.bbcode.min.js', 'jquery.sceditor.elkarte.js', 'post.js', 'splittag.plugin.js', 'undo.plugin.min.js', 'dropAttachments.js'));
@@ -152,15 +156,21 @@ function create_control_richedit($editorOptions)
 		);
 		// Editor language file
 		if (!empty($txt['lang_locale']))
+		{
 			loadJavascriptFile($scripturl . '?action=jslocale;sa=sceditor', array('defer' => true), 'sceditor_language');
+		}
 
 		// Mentions?
 		if (!empty($context['mentions_enabled']))
+		{
 			loadJavascriptFile(array('jquery.atwho.min.js', 'jquery.caret.min.js', 'mentioning.plugin.js'));
+		}
 
 		// Our not so concise shortcut line
 		if (!isset($context['shortcuts_text']))
+		{
 			$context['shortcuts_text'] = $txt['shortcuts' . (isBrowser('is_firefox') ? '_firefox' : '')];
+		}
 
 		// Spellcheck?
 		$context['show_spellchecking'] = !empty($modSettings['enableSpellChecking']) && function_exists('pspell_new');
@@ -168,11 +178,13 @@ function create_control_richedit($editorOptions)
 		{
 			// Some hidden information is needed in order to make spell check work.
 			if (!isset($_REQUEST['xml']))
+			{
 				$context['insert_after_template'] .= '
 		<form name="spell_form" id="spell_form" method="post" accept-charset="UTF-8" target="spellWindow" action="' . $scripturl . '?action=spellcheck">
 			<input type="hidden" id="spellstring" name="spellstring" value="" />
 			<input type="hidden" id="fulleditor" name="fulleditor" value="" />
 		</form>';
+			}
 			loadJavascriptFile('spellcheck.js', array('defer' => true));
 		}
 	}
@@ -243,7 +255,9 @@ function create_control_richedit($editorOptions)
 		// Generate a list of buttons that shouldn't be shown
 		$disabled_tags = array();
 		if (!empty($modSettings['disabledBBC']))
+		{
 			$disabled_tags = explode(',', $modSettings['disabledBBC']);
+		}
 
 		// Map codes to tags
 		$translate_tags_to_code = array('b' => 'bold', 'i' => 'italic', 'u' => 'underline', 's' => 'strike', 'img' => 'image', 'url' => 'link', 'sup' => 'superscript', 'sub' => 'subscript', 'hr' => 'horizontalrule');
@@ -258,7 +272,9 @@ function create_control_richedit($editorOptions)
 				$context['disabled_tags']['orderedlist'] = true;
 			}
 			elseif (isset($translate_tags_to_code[$tag]))
+			{
 				$context['disabled_tags'][$translate_tags_to_code[$tag]] = true;
+			}
 
 			// Tag is the same as the code, like font, color, size etc
 			$context['disabled_tags'][trim($tag)] = true;
@@ -269,7 +285,9 @@ function create_control_richedit($editorOptions)
 		foreach ($bbc_tags as $row => $tagRow)
 		{
 			if (!isset($context['bbc_toolbar'][$row]))
+			{
 				$context['bbc_toolbar'][$row] = array();
+			}
 
 			$tagsRow = array();
 
@@ -280,17 +298,23 @@ function create_control_richedit($editorOptions)
 				{
 					// Just add this code in the existing grouping
 					if (!isset($context['disabled_tags'][$tag]))
+					{
 						$tagsRow[] = $tag;
+					}
 				}
 
 				// If the row is not empty, and the last added tag is not a space, add a space.
 				if (!empty($tagsRow) && $tagsRow[count($tagsRow) - 1] !== 'space')
+				{
 					$tagsRow[] = 'space';
+				}
 			}
 
 			// Build that beautiful button row
 			if (!empty($tagsRow))
+			{
 				$context['bbc_toolbar'][$row][] = implode(',', $tagsRow);
+			}
 		}
 	}
 
@@ -405,18 +429,16 @@ function create_control_richedit($editorOptions)
 		elseif ($context['smiley_enabled'])
 		{
 			$temp = array();
-			if (!\ElkArte\Cache\Cache::instance()->getVar($temp, 'posting_smileys', 480))
+			if (!Cache::instance()->getVar($temp, 'posting_smileys', 480))
 			{
 				$db->fetchQuery('
 					SELECT code, filename, description, smiley_row, hidden
 					FROM {db_prefix}smileys
 					WHERE hidden IN (0, 2)
 					ORDER BY smiley_row, smiley_order',
-					array(
-					)
+					array()
 				)->fetch_callback(
-					function ($row)
-					{
+					function ($row) {
 						global $context;
 
 						$row['filename'] = htmlspecialchars($row['filename'], ENT_COMPAT, 'UTF-8');
@@ -436,17 +458,23 @@ function create_control_richedit($editorOptions)
 					}
 
 					if ($last_row !== null)
+					{
 						$context['smileys'][$section][$last_row]['isLast'] = true;
+					}
 				}
 
-				\ElkArte\Cache\Cache::instance()->put('posting_smileys', $context['smileys'], 480);
+				Cache::instance()->put('posting_smileys', $context['smileys'], 480);
 			}
 			else
+			{
 				$context['smileys'] = $temp;
+			}
 
 			// The smiley popup may take advantage of Jquery UI ....
 			if (!empty($context['smileys']['popup']))
+			{
 				$modSettings['jquery_include_ui'] = true;
+			}
 		}
 	}
 

@@ -8,7 +8,7 @@
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause (see accompanying LICENSE.txt file)
  *
  * This file contains code covered by:
- * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * copyright: 2011 Simple Machines (http://www.simplemachines.org)
  *
  * @version 2.0 dev
  *
@@ -16,12 +16,19 @@
 
 namespace ElkArte\AdminController;
 
+use ElkArte\AbstractController;
+use ElkArte\Action;
+use ElkArte\DataValidator;
+use ElkArte\Exceptions\Exception;
+use ElkArte\Permissions;
+use ElkArte\SettingsForm\SettingsForm;
+
 /**
  * ManageMembergroups controller, administration page for membergroups.
  *
  * @package Membergroups
  */
-class ManageMembergroups extends \ElkArte\AbstractController
+class ManageMembergroups extends AbstractController
 {
 	/**
 	 * Main dispatcher, the en\trance point for all 'Manage Membergroup' actions.
@@ -36,7 +43,7 @@ class ManageMembergroups extends \ElkArte\AbstractController
 	 * @event integrate_sa_manage_membergroups Used to add more sub actions
 	 * @uses ManageMembergroups template.
 	 * @uses ManageMembers language file.
-	 * @see \ElkArte\AbstractController::action_index()
+	 * @see  \ElkArte\AbstractController::action_index()
 	 */
 	public function action_index()
 	{
@@ -64,7 +71,7 @@ class ManageMembergroups extends \ElkArte\AbstractController
 				'function' => 'action_list',
 				'permission' => 'manage_membergroups'),
 			'members' => array(
-				'controller' => '\\ElkArte\\AdminController\\Groups',
+				'controller' => '\\ElkArte\\Controller\\Groups',
 				'function' => 'action_index',
 				'permission' => 'manage_membergroups'),
 			'settings' => array(
@@ -73,7 +80,7 @@ class ManageMembergroups extends \ElkArte\AbstractController
 				'permission' => 'admin_forum'),
 		);
 
-		$action = new \ElkArte\Action('manage_membergroups');
+		$action = new Action('manage_membergroups');
 
 		// Setup the admin tabs.
 		$context[$context['admin_menu_name']]['tab_data'] = array(
@@ -143,7 +150,9 @@ class ManageMembergroups extends \ElkArte\AbstractController
 
 							// Since the moderator group has no explicit members, no link is needed.
 							if ($rowData['id_group'] == 3)
+							{
 								$group_name = $rowData['group_name'];
+							}
 							else
 							{
 								$group_name = sprintf('<a href="%1$s?action=admin;area=membergroups;sa=members;group=%2$d">%3$s</a>', $scripturl, $rowData['id_group'], $rowData['group_name_color']);
@@ -151,9 +160,13 @@ class ManageMembergroups extends \ElkArte\AbstractController
 
 							// Add a help option for moderator and administrator.
 							if ($rowData['id_group'] == 1)
+							{
 								$group_name .= sprintf(' (<a href="%1$s?action=quickhelp;help=membergroup_administrator" onclick="return reqOverlayDiv(this.href);" class="helpicon i-help"></a>)', $scripturl);
+							}
 							elseif ($rowData['id_group'] == 3)
+							{
 								$group_name .= sprintf(' (<a href="%1$s?action=quickhelp;help=membergroup_moderator" onclick="return reqOverlayDiv(this.href);" class="helpicon i-help"></a>)', $scripturl);
+							}
 
 							return $group_name;
 						},
@@ -172,9 +185,13 @@ class ManageMembergroups extends \ElkArte\AbstractController
 							global $settings;
 
 							if (!empty($rowData['icons'][0]) && !empty($rowData['icons'][1]))
+							{
 								return str_repeat('<img src="' . $settings['images_url'] . '/group_icons/' . $rowData['icons'][1] . '" alt="*" />', $rowData['icons'][0]);
+							}
 							else
+							{
 								return '';
+							}
 						},
 					),
 					'sort' => array(
@@ -270,9 +287,13 @@ class ManageMembergroups extends \ElkArte\AbstractController
 							global $settings;
 
 							if (!empty($rowData['icons'][0]) && !empty($rowData['icons'][1]))
+							{
 								return str_repeat('<img src="' . $settings['images_url'] . '/group_icons/' . $rowData['icons'][1] . '" alt="*" />', $rowData['icons'][0]);
+							}
 							else
+							{
 								return '';
+							}
 						},
 					),
 					'sort' => array(
@@ -350,7 +371,7 @@ class ManageMembergroups extends \ElkArte\AbstractController
 		require_once(SUBSDIR . '/Membergroups.subs.php');
 
 		// A form was submitted, we can start adding.
-		if (isset($this->_req->post->group_name) && trim($this->_req->post->group_name) != '')
+		if (isset($this->_req->post->group_name) && trim($this->_req->post->group_name) !== '')
 		{
 			checkSession();
 			validateToken('admin-mmg');
@@ -361,7 +382,7 @@ class ManageMembergroups extends \ElkArte\AbstractController
 			// @todo Check for members with same name too?
 
 			// Don't allow copying of a real privileged person!
-			$permissionsObject = new \ElkArte\Permissions;
+			$permissionsObject = new Permissions;
 			$illegal_permissions = $permissionsObject->getIllegalPermissions();
 			$minposts = !empty($this->_req->post->min_posts) ? (int) $this->_req->post->min_posts : '-1';
 
@@ -378,7 +399,9 @@ class ManageMembergroups extends \ElkArte\AbstractController
 
 			// You cannot set permissions for post groups if they are disabled.
 			if ($postCountBasedGroup && empty($modSettings['permission_enable_postgroups']))
+			{
 				$this->_req->post->perm_type = '';
+			}
 
 			if ($this->_req->post->perm_type == 'predefined')
 			{
@@ -398,7 +421,9 @@ class ManageMembergroups extends \ElkArte\AbstractController
 
 					// Keep protected groups ... well, protected!
 					if ($copy_type['group_type'] == 1)
-						throw new \ElkArte\Exceptions\Exception('membergroup_does_not_exist');
+					{
+						throw new Exception('membergroup_does_not_exist');
+					}
 				}
 
 				// Don't allow copying of a real privileged person!
@@ -407,11 +432,15 @@ class ManageMembergroups extends \ElkArte\AbstractController
 
 				// Also get some membergroup information if we're copying and not copying from guests...
 				if ($copy_id > 0 && $this->_req->post->perm_type == 'copy')
+				{
 					updateCopiedGroup($id_group, $copy_id);
+				}
 
 				// If inheriting say so...
 				elseif ($this->_req->post->perm_type == 'inherit')
+				{
 					updateInheritedGroup($id_group, $copy_id);
+				}
 			}
 
 			// Make sure all boards selected are stored in a proper array.
@@ -421,18 +450,24 @@ class ManageMembergroups extends \ElkArte\AbstractController
 			$changed_boards['deny'] = array();
 			$changed_boards['ignore'] = array();
 			foreach ($accesses as $group_id => $action)
+			{
 				$changed_boards[$action][] = (int) $group_id;
+			}
 
 			foreach (array('allow', 'deny') as $board_action)
 			{
 				// Only do this if they have special access requirements.
 				if (!empty($changed_boards[$board_action]))
+				{
 					assignGroupToBoards($id_group, $changed_boards, $board_action);
+				}
 			}
 
 			// If this is joinable then set it to show group membership in people's profiles.
 			if (empty($modSettings['show_group_membership']) && $group_type > 1)
+			{
 				updateSettings(array('show_group_membership' => 1));
+			}
 
 			// Rebuild the group cache.
 			updateSettings(array(
@@ -454,7 +489,9 @@ class ManageMembergroups extends \ElkArte\AbstractController
 		$context['allow_protected'] = allowedTo('admin_forum');
 
 		if (!empty($modSettings['deny_boards_access']))
+		{
 			theme()->getTemplates()->loadLanguageFile('ManagePermissions');
+		}
 
 		$context['groups'] = getBasicMembergroupData(array('globalmod'), array(), 'min_posts, id_group != {int:global_mod_group}, group_name');
 
@@ -463,7 +500,9 @@ class ManageMembergroups extends \ElkArte\AbstractController
 
 		// Include a list of boards per category for easy toggling.
 		foreach ($context['categories'] as $category)
+		{
 			$context['categories'][$category['id']]['child_ids'] = array_keys($category['boards']);
+		}
 
 		createToken('admin-mmg');
 	}
@@ -513,17 +552,23 @@ class ManageMembergroups extends \ElkArte\AbstractController
 		$current_group = array();
 
 		if (!empty($modSettings['deny_boards_access']))
+		{
 			theme()->getTemplates()->loadLanguageFile('ManagePermissions');
+		}
 
 		require_once(SUBSDIR . '/Membergroups.subs.php');
 
 		// Make sure this group is editable.
 		if (!empty($current_group_id))
+		{
 			$current_group = membergroupById($current_group_id);
+		}
 
 		// Now, do we have a valid id?
 		if (!allowedTo('admin_forum') && !empty($current_group_id) && $current_group['group_type'] == 1)
-			throw new \ElkArte\Exceptions\Exception('membergroup_does_not_exist', false);
+		{
+			throw new Exception('membergroup_does_not_exist', false);
+		}
 
 		// The delete this membergroup button was pressed.
 		if (isset($this->_req->post->delete))
@@ -532,7 +577,9 @@ class ManageMembergroups extends \ElkArte\AbstractController
 			validateToken('admin-mmg');
 
 			if (empty($current_group_id))
-				throw new \ElkArte\Exceptions\Exception('membergroup_does_not_exist', false);
+			{
+				throw new Exception('membergroup_does_not_exist', false);
+			}
 
 			// Let's delete the group
 			deleteMembergroups($current_group['id_group']);
@@ -547,14 +594,16 @@ class ManageMembergroups extends \ElkArte\AbstractController
 			validateToken('admin-mmg');
 
 			if (empty($current_group_id))
-				throw new \ElkArte\Exceptions\Exception('membergroup_does_not_exist', false);
+			{
+				throw new Exception('membergroup_does_not_exist', false);
+			}
 
 			// Empty values will be replaced by validator values where they exist
 			$empty_post = array('max_messages' => null, 'min_posts' => null, 'group_type' => null, 'group_desc' => '',
-				'group_name' => '', 'group_hidden' => null, 'group_inherit' => null, 'icon_count' => null,
-				'icon_image' => '', 'online_color' => '', 'boardaccess' => null);
+								'group_name' => '', 'group_hidden' => null, 'group_inherit' => null, 'icon_count' => null,
+								'icon_image' => '', 'online_color' => '', 'boardaccess' => null);
 
-			$validator = new \ElkArte\DataValidator();
+			$validator = new DataValidator();
 
 			// Cleanup the inputs! :D
 			$validator->sanitation_rules(array(
@@ -633,27 +682,33 @@ class ManageMembergroups extends \ElkArte\AbstractController
 
 					// Add the membergroup to all boards that hadn't been set yet.
 					if (!empty($changed_boards[$board_action]))
+					{
 						assignGroupToBoards($current_group['id_group'], $changed_boards, $board_action);
+					}
 				}
 			}
 
 			// Remove everyone from this group!
 			if ($min_posts != -1)
+			{
 				detachDeletedGroupFromMembers($current_group['id_group']);
+			}
 			elseif ($current_group['id_group'] != 3)
 			{
 				// Making it a hidden group? If so remove everyone with it as primary group (Actually, just make them additional).
 				if ($our_post['group_hidden'] == 2)
+				{
 					setGroupToHidden($current_group['id_group']);
+				}
 
 				// Either way, let's check our "show group membership" setting is correct.
 				validateShowGroupMembership();
 			}
 
 			// Do we need to set inherited permissions?
-			if ($group_inherit != -2 && $group_inherit != $this->_req->post->old_inherit)
+			if ($group_inherit !== -2 && $group_inherit !== $this->_req->post->old_inherit)
 			{
-				$permissionsObject = new \ElkArte\Permissions;
+				$permissionsObject = new Permissions;
 				$permissionsObject->updateChild($group_inherit);
 			}
 
@@ -669,23 +724,21 @@ class ManageMembergroups extends \ElkArte\AbstractController
 					$moderator_string = strtr(preg_replace('~&amp;#(\d{4,5}|[2-9]\d{2,4}|1[2-9]\d);~', '&#$1;', htmlspecialchars($moderator_string, ENT_QUOTES, 'UTF-8')), array('&quot;' => '"'));
 					preg_match_all('~"([^"]+)"~', $moderator_string, $matches);
 					$moderators = array_merge($matches[1], explode(',', preg_replace('~"[^"]+"~', '', $moderator_string)));
-					for ($k = 0, $n = count($moderators); $k < $n; $k++)
-					{
-						$moderators[$k] = trim($moderators[$k]);
-
-						if (strlen($moderators[$k]) == 0)
-							unset($moderators[$k]);
-					}
+					$moderators = array_filter(array_map('trim', $moderators));
 
 					// Find all the id_member's for the member_name's in the list.
 					if (!empty($moderators))
+					{
 						$group_moderators = getIDMemberFromGroupModerators($moderators);
+					}
 				}
 				else
 				{
 					$moderators = array();
 					foreach ($this->_req->post->moderator_list as $moderator)
+					{
 						$moderators[] = (int) $moderator;
+					}
 
 					$group_moderators = array();
 					if (!empty($moderators))
@@ -693,13 +746,17 @@ class ManageMembergroups extends \ElkArte\AbstractController
 						require_once(SUBSDIR . '/Members.subs.php');
 						$members = getBasicMemberData($moderators);
 						foreach ($members as $member)
+						{
 							$group_moderators[] = $member['id_member'];
+						}
 					}
 				}
 
 				// Found some?
 				if (!empty($group_moderators))
+				{
 					assignGroupModerators($current_group['id_group'], $group_moderators);
+				}
 			}
 
 			// There might have been some post group changes.
@@ -721,7 +778,9 @@ class ManageMembergroups extends \ElkArte\AbstractController
 		$row = membergroupById($current_group['id_group'], true);
 
 		if (empty($row) || (!allowedTo('admin_forum') && $row['group_type'] == 1))
-			throw new \ElkArte\Exceptions\Exception('membergroup_does_not_exist', false);
+		{
+			throw new Exception('membergroup_does_not_exist', false);
+		}
 
 		$row['icons'] = explode('#', $row['icons']);
 
@@ -749,7 +808,9 @@ class ManageMembergroups extends \ElkArte\AbstractController
 		$context['group']['moderator_list'] = empty($context['group']['moderators']) ? '' : '&quot;' . implode('&quot;, &quot;', $context['group']['moderators']) . '&quot;';
 
 		if (!empty($context['group']['moderators']))
+		{
 			list ($context['group']['last_moderator_id']) = array_slice(array_keys($context['group']['moderators']), -1);
+		}
 
 		// Get a list of boards this membergroup is allowed to see.
 		$context['boards'] = array();
@@ -760,7 +821,9 @@ class ManageMembergroups extends \ElkArte\AbstractController
 
 			// Include a list of boards per category for easy toggling.
 			foreach ($context['categories'] as $category)
+			{
 				$context['categories'][$category['id']]['child_ids'] = array_keys($category['boards']);
+			}
 		}
 
 		// Finally, get all the groups this could be inherited off.
@@ -773,7 +836,9 @@ class ManageMembergroups extends \ElkArte\AbstractController
 
 		// Use the autosuggest script when needed
 		if ($context['group']['id'] != 3 && $context['group']['id'] != 4)
+		{
 			loadJavascriptFile('suggest.js', array('defer' => true));
+		}
 
 		createToken('admin-mmg');
 	}
@@ -799,7 +864,7 @@ class ManageMembergroups extends \ElkArte\AbstractController
 
 		// initialize the form
 		// Instantiate the form
-		$settingsForm = new \ElkArte\SettingsForm\SettingsForm(\ElkArte\SettingsForm\SettingsForm::DB_ADAPTER);
+		$settingsForm = new SettingsForm(SettingsForm::DB_ADAPTER);
 
 		// Initialize it with our settings
 		$settingsForm->setConfigVars($this->_settings());

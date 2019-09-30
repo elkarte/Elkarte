@@ -8,7 +8,7 @@
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause (see accompanying LICENSE.txt file)
  *
  * This file contains code covered by:
- * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * copyright: 2011 Simple Machines (http://www.simplemachines.org)
  *
  * @version 2.0 dev
  *
@@ -70,7 +70,9 @@ class WeeklyMaintenance implements ScheduledTaskInterface
 		if (!empty($modSettings['pruningOptions']))
 		{
 			if (!empty($modSettings['pruningOptions']) && strpos($modSettings['pruningOptions'], ',') !== false)
+			{
 				list ($modSettings['pruneErrorLog'], $modSettings['pruneModLog'], $modSettings['pruneBanLog'], $modSettings['pruneReportLog'], $modSettings['pruneScheduledTaskLog'], $modSettings['pruneSpiderHitLog']) = explode(',', $modSettings['pruningOptions']);
+			}
 
 			if (!empty($modSettings['pruneErrorLog']))
 			{
@@ -148,7 +150,9 @@ class WeeklyMaintenance implements ScheduledTaskInterface
 					)
 				);
 				while ($row = $db->fetch_row($result))
+				{
 					$reports[] = $row[0];
+				}
 				$db->free_result($result);
 
 				if (!empty($reports))

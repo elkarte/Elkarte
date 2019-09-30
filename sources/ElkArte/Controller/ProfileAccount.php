@@ -8,7 +8,7 @@
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause (see accompanying LICENSE.txt file)
  *
  * This file contains code covered by:
- * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * copyright: 2011 Simple Machines (http://www.simplemachines.org)
  *
  * @version 2.0 dev
  *
@@ -16,25 +16,35 @@
 
 namespace ElkArte\Controller;
 
+use BBC\ParserWrapper;
+use ElkArte\AbstractController;
+use ElkArte\EventManager;
+use ElkArte\Exceptions\Exception;
+use ElkArte\MembersList;
+use ElkArte\User;
+
 /**
  * Processes user warnings, account activation and account deletion
  */
-class ProfileAccount extends \ElkArte\AbstractController
+class ProfileAccount extends AbstractController
 {
 	/**
 	 * Member id for the account being worked on
+	 *
 	 * @var int
 	 */
 	private $_memID = 0;
 
 	/**
 	 * The \ElkArte\Member object is stored here to avoid some global
+	 *
 	 * @var \ElkArte\Member
 	 */
 	private $_profile = null;
 
 	/**
 	 * Holds any errors that were generated when issuing a warning
+	 *
 	 * @var array
 	 */
 	private $_issueErrors = array();
@@ -46,7 +56,7 @@ class ProfileAccount extends \ElkArte\AbstractController
 	public function pre_dispatch()
 	{
 		$this->_memID = currentMemberID();
-		$this->_profile = \ElkArte\MembersList::get($this->_memID);
+		$this->_profile = MembersList::get($this->_memID);
 	}
 
 	/**
@@ -91,7 +101,7 @@ class ProfileAccount extends \ElkArte\AbstractController
 			|| ($context['user']['is_owner'] && !$cur_profile['warning'])
 			|| !allowedTo('issue_warning'))
 		{
-			throw new \ElkArte\Exceptions\Exception('no_access', false);
+			throw new Exception('no_access', false);
 		}
 
 		// Get the base (errors related) stuff done.
@@ -139,7 +149,9 @@ class ProfileAccount extends \ElkArte\AbstractController
 			// Fill in the suite of errors.
 			$context['post_errors'] = array();
 			foreach ($this->_issueErrors as $error)
+			{
 				$context['post_errors'][] = $txt[$error];
+			}
 		}
 
 		$context['page_title'] = $txt['profile_issue_warning'];
@@ -164,7 +176,9 @@ class ProfileAccount extends \ElkArte\AbstractController
 		foreach ($context['level_effects'] as $limit => $dummy)
 		{
 			if ($context['member']['warning'] >= $limit)
+			{
 				$context['current_level'] = $limit;
+			}
 		}
 
 		// Build a listing to view the previous warnings for this user
@@ -180,7 +194,9 @@ class ProfileAccount extends \ElkArte\AbstractController
 			$message = basicMessageInfo($warning_for_message);
 
 			if (!empty($message))
+			{
 				$warned_message_subject = $message['subject'];
+			}
 		}
 
 		require_once(SUBSDIR . '/Maillist.subs.php');
@@ -193,7 +209,9 @@ class ProfileAccount extends \ElkArte\AbstractController
 		{
 			// If we're not warning for a message skip any that are.
 			if ($warning_for_message === false && strpos($row['body'], '{MESSAGE}') !== false)
+			{
 				continue;
+			}
 
 			$context['notification_templates'][] = array(
 				'title' => $row['title'],
@@ -212,6 +230,7 @@ class ProfileAccount extends \ElkArte\AbstractController
 
 		// Replace all the common variables in the templates.
 		foreach ($context['notification_templates'] as $k => $name)
+		{
 			$context['notification_templates'][$k]['body'] = strtr($name['body'],
 				array(
 					'{MEMBER}' => un_htmlspecialchars($context['member']['name']),
@@ -220,165 +239,6 @@ class ProfileAccount extends \ElkArte\AbstractController
 					'{FORUMNAME}' => $mbname,
 					'{REGARDS}' => replaceBasicActionUrl($txt['regards_team'])
 				)
-			);
-	}
-
-	/**
-	 * Creates the listing of issued warnings
-	 */
-	private function _create_issued_warnings_list()
-	{
-		global $txt, $scripturl, $modSettings;
-
-		$listOptions = array(
-			'id' => 'issued_warnings',
-			'title' => $txt['profile_viewwarning_previous_warnings'],
-			'items_per_page' => $modSettings['defaultMaxMessages'],
-			'no_items_label' => $txt['profile_viewwarning_no_warnings'],
-			'base_href' => $scripturl . '?action=profile;area=issuewarning;sa=user;u=' . $this->_memID,
-			'default_sort_col' => 'log_time',
-			'get_items' => array(
-				'function' => array($this, 'list_getUserWarnings'),
-			),
-			'get_count' => array(
-				'function' => array($this, 'list_getUserWarningCount'),
-			),
-			'columns' => array(
-				'issued_by' => array(
-					'header' => array(
-						'value' => $txt['profile_warning_previous_issued'],
-						'class' => 'grid20',
-					),
-					'data' => array(
-						'function' => function ($warning)
-						{
-							return $warning['issuer']['link'];
-						},
-					),
-					'sort' => array(
-						'default' => 'lc.member_name DESC',
-						'reverse' => 'lc.member_name',
-					),
-				),
-				'log_time' => array(
-					'header' => array(
-						'value' => $txt['profile_warning_previous_time'],
-						'class' => 'grid30',
-					),
-					'data' => array(
-						'db' => 'time',
-					),
-					'sort' => array(
-						'default' => 'lc.log_time DESC',
-						'reverse' => 'lc.log_time',
-					),
-				),
-				'reason' => array(
-					'header' => array(
-						'value' => $txt['profile_warning_previous_reason'],
-					),
-					'data' => array(
-						'function' => function ($warning)
-						{
-							global $scripturl, $txt;
-
-							$ret = '
-							<div class="floatleft">
-								' . $warning['reason'] . '
-							</div>';
-
-							// If a notice was sent, provide a way to view it
-							if (!empty($warning['id_notice']))
-							{
-								$ret .= '
-							<div class="floatright">
-								<a href="' . $scripturl . '?action=moderate;area=notice;nid=' . $warning['id_notice'] . '" onclick="window.open(this.href, \'\', \'scrollbars=yes,resizable=yes,width=400,height=250\');return false;" target="_blank" class="new_win" title="' . $txt['profile_warning_previous_notice'] . '"><i class="icon icon-small i-search"></i></a>
-							</div>';
-							}
-
-							return $ret;
-
-						},
-					),
-				),
-				'level' => array(
-					'header' => array(
-						'value' => $txt['profile_warning_previous_level'],
-						'class' => 'grid8',
-					),
-					'data' => array(
-						'db' => 'counter',
-					),
-					'sort' => array(
-						'default' => 'lc.counter DESC',
-						'reverse' => 'lc.counter',
-					),
-				),
-			),
-		);
-
-		// Create the list for viewing.
-		createList($listOptions);
-	}
-
-	/**
-	 * Simply returns the total count of warnings
-	 * Callback for createList().
-	 *
-	 * @return int
-	 */
-	public function list_getUserWarningCount()
-	{
-		return list_getUserWarningCount($this->_memID);
-	}
-
-	/**
-	 * Callback for createList(). Called by action_hooks
-	 *
-	 * @param int $start The item to start with (for pagination purposes)
-	 * @param int $items_per_page The number of items to show per page
-	 * @param string $sort A string indicating how to sort the results
-	 *
-	 * @return array
-	 */
-	public function list_getUserWarnings($start, $items_per_page, $sort)
-	{
-		return list_getUserWarnings($start, $items_per_page, $sort, $this->_memID);
-	}
-
-	/**
-	 * Prepares a warning preview
-	 */
-	private function _preview_warning()
-	{
-		global $context;
-
-		if (isset($this->_req->post->preview))
-		{
-			$warning_body = !empty($this->_req->post->warn_body) ? trim(censor($this->_req->post->warn_body)) : '';
-
-			if (empty($this->_req->post->warn_sub) || empty($this->_req->post->warn_body))
-			{
-				$this->_issueErrors[] = 'warning_notify_blank';
-			}
-
-			if (!empty($this->_req->post->warn_body))
-			{
-				require_once(SUBSDIR . '/Post.subs.php');
-
-				$bbc_parser = \BBC\ParserWrapper::instance();
-				preparsecode($warning_body);
-				$warning_body = $bbc_parser->parseNotice($warning_body);
-			}
-
-			// Try to remember some bits.
-			$context['preview_subject'] = $this->_req->getPost('warn_sub', 'trim|\\ElkArte\\Util::htmlspecialchars', '');
-			$context['warning_data'] = array(
-				'reason' => $this->_req->post->warn_reason,
-				'notify' => !empty($this->_req->post->warn_notify),
-				'notify_subject' => $this->_req->getPost('warn_sub', 'trim', ''),
-				'notify_body' => $this->_req->getPost('warn_body', 'trim', ''),
-				'body_preview' => $warning_body,
 			);
 		}
 	}
@@ -509,6 +369,168 @@ class ProfileAccount extends \ElkArte\AbstractController
 	}
 
 	/**
+	 * Prepares a warning preview
+	 */
+	private function _preview_warning()
+	{
+		global $context;
+
+		if (isset($this->_req->post->preview))
+		{
+			$warning_body = !empty($this->_req->post->warn_body) ? trim(censor($this->_req->post->warn_body)) : '';
+
+			if (empty($this->_req->post->warn_sub) || empty($this->_req->post->warn_body))
+			{
+				$this->_issueErrors[] = 'warning_notify_blank';
+			}
+
+			if (!empty($this->_req->post->warn_body))
+			{
+				require_once(SUBSDIR . '/Post.subs.php');
+
+				$bbc_parser = ParserWrapper::instance();
+				preparsecode($warning_body);
+				$warning_body = $bbc_parser->parseNotice($warning_body);
+			}
+
+			// Try to remember some bits.
+			$context['preview_subject'] = $this->_req->getPost('warn_sub', 'trim|\\ElkArte\\Util::htmlspecialchars', '');
+			$context['warning_data'] = array(
+				'reason' => $this->_req->post->warn_reason,
+				'notify' => !empty($this->_req->post->warn_notify),
+				'notify_subject' => $this->_req->getPost('warn_sub', 'trim', ''),
+				'notify_body' => $this->_req->getPost('warn_body', 'trim', ''),
+				'body_preview' => $warning_body,
+			);
+		}
+	}
+
+	/**
+	 * Creates the listing of issued warnings
+	 */
+	private function _create_issued_warnings_list()
+	{
+		global $txt, $scripturl, $modSettings;
+
+		$listOptions = array(
+			'id' => 'issued_warnings',
+			'title' => $txt['profile_viewwarning_previous_warnings'],
+			'items_per_page' => $modSettings['defaultMaxMessages'],
+			'no_items_label' => $txt['profile_viewwarning_no_warnings'],
+			'base_href' => $scripturl . '?action=profile;area=issuewarning;sa=user;u=' . $this->_memID,
+			'default_sort_col' => 'log_time',
+			'get_items' => array(
+				'function' => function ($start, $items_per_page, $sort) {
+					return $this->list_getUserWarnings($start, $items_per_page, $sort);
+				},
+			),
+			'get_count' => array(
+				'function' => function () {
+					return $this->list_getUserWarningCount();
+				},
+			),
+			'columns' => array(
+				'issued_by' => array(
+					'header' => array(
+						'value' => $txt['profile_warning_previous_issued'],
+						'class' => 'grid20',
+					),
+					'data' => array(
+						'function' => function ($warning) {
+							return $warning['issuer']['link'];
+						},
+					),
+					'sort' => array(
+						'default' => 'lc.member_name DESC',
+						'reverse' => 'lc.member_name',
+					),
+				),
+				'log_time' => array(
+					'header' => array(
+						'value' => $txt['profile_warning_previous_time'],
+						'class' => 'grid30',
+					),
+					'data' => array(
+						'db' => 'time',
+					),
+					'sort' => array(
+						'default' => 'lc.log_time DESC',
+						'reverse' => 'lc.log_time',
+					),
+				),
+				'reason' => array(
+					'header' => array(
+						'value' => $txt['profile_warning_previous_reason'],
+					),
+					'data' => array(
+						'function' => function ($warning) {
+							global $scripturl, $txt;
+
+							$ret = '
+							<div class="floatleft">
+								' . $warning['reason'] . '
+							</div>';
+
+							// If a notice was sent, provide a way to view it
+							if (!empty($warning['id_notice']))
+							{
+								$ret .= '
+							<div class="floatright">
+								<a href="' . $scripturl . '?action=moderate;area=notice;nid=' . $warning['id_notice'] . '" onclick="window.open(this.href, \'\', \'scrollbars=yes,resizable=yes,width=400,height=250\');return false;" target="_blank" class="new_win" title="' . $txt['profile_warning_previous_notice'] . '"><i class="icon icon-small i-search"></i></a>
+							</div>';
+							}
+
+							return $ret;
+
+						},
+					),
+				),
+				'level' => array(
+					'header' => array(
+						'value' => $txt['profile_warning_previous_level'],
+						'class' => 'grid8',
+					),
+					'data' => array(
+						'db' => 'counter',
+					),
+					'sort' => array(
+						'default' => 'lc.counter DESC',
+						'reverse' => 'lc.counter',
+					),
+				),
+			),
+		);
+
+		// Create the list for viewing.
+		createList($listOptions);
+	}
+
+	/**
+	 * Callback for createList(). Called by action_hooks
+	 *
+	 * @param int $start The item to start with (for pagination purposes)
+	 * @param int $items_per_page The number of items to show per page
+	 * @param string $sort A string indicating how to sort the results
+	 *
+	 * @return array
+	 */
+	public function list_getUserWarnings($start, $items_per_page, $sort)
+	{
+		return list_getUserWarnings($start, $items_per_page, $sort, $this->_memID);
+	}
+
+	/**
+	 * Simply returns the total count of warnings
+	 * Callback for createList().
+	 *
+	 * @return int
+	 */
+	public function list_getUserWarningCount()
+	{
+		return list_getUserWarningCount($this->_memID);
+	}
+
+	/**
 	 * Present a screen to make sure the user wants to be deleted.
 	 */
 	public function action_deleteaccount()
@@ -516,9 +538,13 @@ class ProfileAccount extends \ElkArte\AbstractController
 		global $txt, $context, $modSettings, $cur_profile;
 
 		if (!$context['user']['is_owner'])
+		{
 			isAllowedTo('profile_remove_any');
+		}
 		elseif (!allowedTo('profile_remove_any'))
+		{
 			isAllowedTo('profile_remove_own');
+		}
 
 		// Permissions for removing stuff...
 		$context['can_delete_posts'] = !$context['user']['is_owner'] && allowedTo('moderate_forum');
@@ -557,7 +583,7 @@ class ProfileAccount extends \ElkArte\AbstractController
 		// Check we got here as we should have!
 		if ($cur_profile->id_member != $this->_profile->id_member)
 		{
-			throw new \ElkArte\Exceptions\Exception('no_access', false);
+			throw new Exception('no_access', false);
 		}
 
 		// This file is needed for our utility functions.
@@ -572,7 +598,9 @@ class ProfileAccount extends \ElkArte\AbstractController
 			$another = isAnotherAdmin($this->_memID);
 
 			if (empty($another))
-				throw new \ElkArte\Exceptions\Exception('at_least_one_admin', 'critical');
+			{
+				throw new Exception('at_least_one_admin', 'critical');
+			}
 		}
 
 		// Do you have permission to delete others profiles, or is that your profile you wanna delete?
@@ -605,7 +633,9 @@ class ProfileAccount extends \ElkArte\AbstractController
 
 			// Only delete this poor member's account if they are actually being booted out of camp.
 			if (isset($this->_req->post->deleteAccount))
+			{
 				deleteMembers($this->_memID);
+			}
 		}
 		// Do they need approval to delete?
 		elseif (!empty($modSettings['approveAccountDeletion']) && !allowedTo('moderate_forum'))
@@ -622,8 +652,8 @@ class ProfileAccount extends \ElkArte\AbstractController
 		{
 			deleteMembers($this->_memID);
 
-			$controller = new Auth(new \ElkArte\EventManager());
-			$controller->setUser(\ElkArte\User::$info);
+			$controller = new Auth(new EventManager());
+			$controller->setUser(User::$info);
 			$controller->action_logout(true);
 
 			redirectexit();
@@ -662,7 +692,9 @@ class ProfileAccount extends \ElkArte\AbstractController
 
 			// If we are doing approval, update the stats for the member just in case.
 			if (in_array($this->_profile['is_activated'], array(3, 4, 13, 14)))
+			{
 				updateSettings(array('unapprovedMembers' => ($modSettings['unapprovedMembers'] > 1 ? $modSettings['unapprovedMembers'] - 1 : 0)));
+			}
 
 			// Make sure we update the stats too.
 			require_once(SUBSDIR . '/Members.subs.php');

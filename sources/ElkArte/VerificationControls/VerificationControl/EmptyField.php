@@ -9,7 +9,7 @@
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause (see accompanying LICENSE.txt file)
  *
  * This file contains code covered by:
- * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * copyright: 2011 Simple Machines (http://www.simplemachines.org)
  *
  * @version 2.0 dev
  *
@@ -70,12 +70,14 @@ class EmptyField implements ControlInterface
 
 	/**
 	 * Array of terms used in building the field name
+	 *
 	 * @var string[]
 	 */
 	private $_terms = array('gadget', 'device', 'uid', 'gid', 'guid', 'uuid', 'unique', 'identifier', 'bb2');
 
 	/**
 	 * Secondary array used to build out the field name
+	 *
 	 * @var string[]
 	 */
 	private $_second_terms = array('hash', 'cipher', 'code', 'key', 'unlock', 'bit', 'value', 'screener');
@@ -88,7 +90,9 @@ class EmptyField implements ControlInterface
 	public function __construct($verificationOptions = null)
 	{
 		if (!empty($verificationOptions))
+		{
 			$this->_options = $verificationOptions;
+		}
 	}
 
 	/**
@@ -107,7 +111,9 @@ class EmptyField implements ControlInterface
 		}
 
 		if ($isNew || $force_refresh)
+		{
 			$this->createTest($sessionVal, $force_refresh);
+		}
 
 		return $this->_empty_field;
 	}
@@ -118,7 +124,9 @@ class EmptyField implements ControlInterface
 	public function createTest($sessionVal, $refresh = true)
 	{
 		if (!$this->_empty_field)
+		{
 			return;
+		}
 
 		// Building a field with a believable name that will be inserted lives in the template.
 		if ($refresh || !isset($sessionVal['empty_field']))
@@ -158,6 +166,14 @@ class EmptyField implements ControlInterface
 	}
 
 	/**
+	 * Test the field, easy, its on, its is set and it is empty
+	 */
+	private function _verifyField($sessionVal)
+	{
+		return $this->_empty_field && !empty($sessionVal['empty_field']) && empty($_REQUEST[$sessionVal['empty_field']]);
+	}
+
+	/**
 	 * {@inheritdoc }
 	 */
 	public function doTest($sessionVal)
@@ -165,7 +181,9 @@ class EmptyField implements ControlInterface
 		$this->_tested = true;
 
 		if (!$this->_verifyField($sessionVal))
+		{
 			return 'wrong_verification_answer';
+		}
 
 		return true;
 	}
@@ -176,14 +194,6 @@ class EmptyField implements ControlInterface
 	public function hasVisibleTemplate()
 	{
 		return false;
-	}
-
-	/**
-	 * Test the field, easy, its on, its is set and it is empty
-	 */
-	private function _verifyField($sessionVal)
-	{
-		return $this->_empty_field && !empty($sessionVal['empty_field']) && empty($_REQUEST[$sessionVal['empty_field']]);
 	}
 
 	/**

@@ -12,13 +12,15 @@
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause (see accompanying LICENSE.txt file)
  *
  * This file contains code covered by:
- * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * copyright: 2011 Simple Machines (http://www.simplemachines.org)
  *
  * @version 2.0 dev
  *
  */
 
+use ElkArte\Cache\Cache;
 use ElkArte\User;
+use ElkArte\Util;
 
 /**
  * Loads information about the users personal message limit.
@@ -34,7 +36,7 @@ function loadMessageLimit()
 	{
 		$message_limit = 0;
 	}
-	elseif (!\ElkArte\Cache\Cache::instance()->getVar($message_limit, 'msgLimit:' . User::$info->id, 360))
+	elseif (!Cache::instance()->getVar($message_limit, 'msgLimit:' . User::$info->id, 360))
 	{
 		$request = $db->query('', '
 			SELECT
@@ -51,7 +53,7 @@ function loadMessageLimit()
 		$message_limit = $minMessage == 0 ? 0 : $maxMessage;
 
 		// Save us doing it again!
-		\ElkArte\Cache\Cache::instance()->put('msgLimit:' . User::$info->id, $message_limit, 360);
+		Cache::instance()->put('msgLimit:' . User::$info->id, $message_limit, 360);
 	}
 
 	return $message_limit;
@@ -62,8 +64,8 @@ function loadMessageLimit()
  *
  * @param $labels mixed[] array of labels that we are calculating the message count
  *
- * @package PersonalMessage
  * @return mixed[]
+ * @package PersonalMessage
  */
 function loadPMLabels($labels)
 {
@@ -100,7 +102,7 @@ function loadPMLabels($labels)
 	$db->free_result($result);
 
 	// Store it please!
-	\ElkArte\Cache\Cache::instance()->put('labelCounts:' . User::$info->id, $labels, 720);
+	Cache::instance()->put('labelCounts:' . User::$info->id, $labels, 720);
 
 	return $labels;
 }
@@ -108,11 +110,11 @@ function loadPMLabels($labels)
 /**
  * Get the number of PMs.
  *
- * @package PersonalMessage
  * @param bool $descending
  * @param int|null $pmID
  * @param string $labelQuery
  * @return int
+ * @package PersonalMessage
  */
 function getPMCount($descending = false, $pmID = null, $labelQuery = '')
 {
@@ -164,10 +166,10 @@ function getPMCount($descending = false, $pmID = null, $labelQuery = '')
 /**
  * Delete the specified personal messages.
  *
- * @package PersonalMessage
  * @param int[]|null $personal_messages array of pm ids
  * @param string|null $folder = null
  * @param int|int[]|null $owner = null
+ * @package PersonalMessage
  */
 function deleteMessages($personal_messages, $folder = null, $owner = null)
 {
@@ -189,16 +191,22 @@ function deleteMessages($personal_messages, $folder = null, $owner = null)
 	if ($personal_messages !== null)
 	{
 		if (empty($personal_messages) || !is_array($personal_messages))
+		{
 			return;
+		}
 
 		foreach ($personal_messages as $index => $delete_id)
+		{
 			$personal_messages[$index] = (int) $delete_id;
+		}
 
 		$where = '
 				AND id_pm IN ({array_int:pm_list})';
 	}
 	else
+	{
 		$where = '';
+	}
 
 	if ($folder == 'sent' || $folder === null)
 	{
@@ -289,7 +297,9 @@ function deleteMessages($personal_messages, $folder = null, $owner = null)
 	);
 	$remove_pms = array();
 	while ($row = $db->fetch_assoc($request))
+	{
 		$remove_pms[] = $row['sender'];
+	}
 	$db->free_result($request);
 
 	if (!empty($remove_pms))
@@ -312,16 +322,16 @@ function deleteMessages($personal_messages, $folder = null, $owner = null)
 	}
 
 	// Any cached numbers may be wrong now.
-	\ElkArte\Cache\Cache::instance()->put('labelCounts:' . User::$info->id, null, 720);
+	Cache::instance()->put('labelCounts:' . User::$info->id, null, 720);
 }
 
 /**
  * Mark the specified personal messages read.
  *
- * @package PersonalMessage
  * @param int[]|int|null $personal_messages null or array of pm ids
  * @param string|null $label = null, if label is set, only marks messages with that label
  * @param int|null $owner = null, if owner is set, marks messages owned by that member id
+ * @package PersonalMessage
  */
 function markMessages($personal_messages = null, $label = null, $owner = null)
 {
@@ -353,14 +363,16 @@ function markMessages($personal_messages = null, $label = null, $owner = null)
 
 	// If something wasn't marked as read, get the number of unread messages remaining.
 	if ($db->affected_rows() > 0)
+	{
 		updatePMMenuCounts($owner);
+	}
 }
 
 /**
  * Mark the specified personal messages as unread.
  *
- * @package PersonalMessage
  * @param int|int[] $personal_messages
+ * @package PersonalMessage
  */
 function markMessagesUnread($personal_messages)
 {
@@ -403,8 +415,8 @@ function markMessagesUnread($personal_messages)
  *
  * - Updates the per label totals as well as the overall total
  *
- * @package PersonalMessage
  * @param int $owner
+ * @package PersonalMessage
  */
 function updatePMMenuCounts($owner)
 {
@@ -445,12 +457,14 @@ function updatePMMenuCounts($owner)
 
 		$this_labels = explode(',', $row['labels']);
 		foreach ($this_labels as $this_label)
+		{
 			$context['labels'][(int) $this_label]['unread_messages'] += $row['num'];
+		}
 	}
 	$db->free_result($result);
 
 	// Need to store all this.
-	\ElkArte\Cache\Cache::instance()->put('labelCounts:' . $owner, $context['labels'], 720);
+	Cache::instance()->put('labelCounts:' . $owner, $context['labels'], 720);
 	require_once(SUBSDIR . '/Members.subs.php');
 	updateMemberData($owner, array('unread_messages' => $total_unread));
 
@@ -464,10 +478,10 @@ function updatePMMenuCounts($owner)
 /**
  * Check if the PM is available to the current user.
  *
- * @package PersonalMessage
  * @param int $pmID
  * @param string $validFor
  * @return boolean|null
+ * @package PersonalMessage
  */
 function isAccessiblePM($pmID, $validFor = 'in_or_outbox')
 {
@@ -490,6 +504,7 @@ function isAccessiblePM($pmID, $validFor = 'in_or_outbox')
 	if ($db->num_rows($request) === 0)
 	{
 		$db->free_result($request);
+
 		return false;
 	}
 	$validationResult = $db->fetch_assoc($request);
@@ -515,7 +530,6 @@ function isAccessiblePM($pmID, $validFor = 'in_or_outbox')
  * Sends a personal message from the specified person to the specified people
  * ($from defaults to the user)
  *
- * @package PersonalMessage
  * @param mixed[] $recipients - an array containing the arrays 'to' and 'bcc', both containing id_member's.
  * @param string $subject - should have no slashes and no html entities
  * @param string $message - should have no slashes and no html entities
@@ -524,6 +538,7 @@ function isAccessiblePM($pmID, $validFor = 'in_or_outbox')
  * @param int $pm_head - the ID of the chain being replied to - if any.
  * @return mixed[] an array with log entries telling how many recipients were successful and which recipients it failed to send to.
  * @throws \ElkArte\Exceptions\Exception
+ * @package PersonalMessage
  */
 function sendpm($recipients, $subject, $message, $store_outbox = true, $from = null, $pm_head = 0)
 {
@@ -562,15 +577,19 @@ function sendpm($recipients, $subject, $message, $store_outbox = true, $from = n
 	call_integration_hook('integrate_personal_message', array(&$recipients, &$from, &$subject, &$message));
 
 	// This is the one that will go in their inbox.
-	$htmlmessage = \ElkArte\Util::htmlspecialchars($message, ENT_QUOTES, 'UTF-8', true);
+	$htmlmessage = Util::htmlspecialchars($message, ENT_QUOTES, 'UTF-8', true);
 	preparsecode($htmlmessage);
-	$htmlsubject = strtr(\ElkArte\Util::htmlspecialchars($subject), array("\r" => '', "\n" => '', "\t" => ''));
-	if (\ElkArte\Util::strlen($htmlsubject) > 100)
-		$htmlsubject = \ElkArte\Util::substr($htmlsubject, 0, 100);
+	$htmlsubject = strtr(Util::htmlspecialchars($subject), array("\r" => '', "\n" => '', "\t" => ''));
+	if (Util::strlen($htmlsubject) > 100)
+	{
+		$htmlsubject = Util::substr($htmlsubject, 0, 100);
+	}
 
 	// Make sure is an array
 	if (!is_array($recipients))
+	{
 		$recipients = array($recipients);
+	}
 
 	// Get a list of usernames and convert them to IDs.
 	$usernames = array();
@@ -580,7 +599,7 @@ function sendpm($recipients, $subject, $message, $store_outbox = true, $from = n
 		{
 			if (!is_numeric($recipients[$rec_type][$id]))
 			{
-				$recipients[$rec_type][$id] = \ElkArte\Util::strtolower(trim(preg_replace('/[<>&"\'=\\\]/', '', $recipients[$rec_type][$id])));
+				$recipients[$rec_type][$id] = Util::strtolower(trim(preg_replace('/[<>&"\'=\\\]/', '', $recipients[$rec_type][$id])));
 				$usernames[$recipients[$rec_type][$id]] = 0;
 			}
 		}
@@ -599,9 +618,9 @@ function sendpm($recipients, $subject, $message, $store_outbox = true, $from = n
 		);
 		while ($row = $db->fetch_assoc($request))
 		{
-			if (isset($usernames[\ElkArte\Util::strtolower($row['member_name'])]))
+			if (isset($usernames[Util::strtolower($row['member_name'])]))
 			{
-				$usernames[\ElkArte\Util::strtolower($row['member_name'])] = $row['id_member'];
+				$usernames[Util::strtolower($row['member_name'])] = $row['id_member'];
 			}
 		}
 		$db->free_result($request);
@@ -612,7 +631,9 @@ function sendpm($recipients, $subject, $message, $store_outbox = true, $from = n
 			foreach ($rec as $id => $member)
 			{
 				if (is_numeric($recipients[$rec_type][$id]))
+				{
 					continue;
+				}
 
 				if (!empty($usernames[$member]))
 				{
@@ -652,14 +673,16 @@ function sendpm($recipients, $subject, $message, $store_outbox = true, $from = n
 	// Check whether we have to apply anything...
 	while ($row = $db->fetch_assoc($request))
 	{
-		$criteria = \ElkArte\Util::unserialize($row['criteria']);
+		$criteria = Util::unserialize($row['criteria']);
 
 		// Note we don't check the buddy status, cause deletion from buddy = madness!
 		$delete = false;
 		foreach ($criteria as $criterium)
 		{
 			if (($criterium['t'] == 'mid' && $criterium['v'] == $from['id']) || ($criterium['t'] == 'gid' && in_array($criterium['v'], User::$info->groups)) || ($criterium['t'] == 'sub' && strpos($subject, $criterium['v']) !== false) || ($criterium['t'] == 'msg' && strpos($message, $criterium['v']) !== false))
+			{
 				$delete = true;
+			}
 			// If we're adding and one criteria don't match then we stop!
 			elseif (!$row['is_or'])
 			{
@@ -668,7 +691,9 @@ function sendpm($recipients, $subject, $message, $store_outbox = true, $from = n
 			}
 		}
 		if ($delete)
+		{
 			$deletes[$row['id_member']] = 1;
+		}
 	}
 	$db->free_result($request);
 
@@ -680,11 +705,12 @@ function sendpm($recipients, $subject, $message, $store_outbox = true, $from = n
 			SELECT
 				id_group, max_messages
 			FROM {db_prefix}membergroups',
-			array(
-			)
+			array()
 		);
 		while ($row = $db->fetch_assoc($request))
+		{
 			$message_limit_cache[$row['id_group']] = $row['max_messages'];
+		}
 		$db->free_result($request);
 	}
 
@@ -705,15 +731,21 @@ function sendpm($recipients, $subject, $message, $store_outbox = true, $from = n
 	while ($row = $db->fetch_assoc($request))
 	{
 		if (empty($row['add_deny']))
+		{
 			$disallowed_groups[] = $row['id_group'];
+		}
 		else
+		{
 			$allowed_groups[] = $row['id_group'];
+		}
 	}
 
 	$db->free_result($request);
 
 	if (empty($modSettings['permission_enable_deny']))
+	{
 		$disallowed_groups = array();
+	}
 
 	$request = $db->query('', '
 		SELECT
@@ -742,7 +774,9 @@ function sendpm($recipients, $subject, $message, $store_outbox = true, $from = n
 	{
 		// Don't do anything for members to be deleted!
 		if (isset($deletes[$row['id_member']]))
+		{
 			continue;
+		}
 
 		// We need to know this members groups.
 		$groups = explode(',', $row['additional_groups']);
@@ -757,7 +791,9 @@ function sendpm($recipients, $subject, $message, $store_outbox = true, $from = n
 			foreach ($groups as $id)
 			{
 				if (isset($message_limit_cache[$id]) && $message_limit != 0 && $message_limit < $message_limit_cache[$id])
+				{
 					$message_limit = $message_limit_cache[$id];
+				}
 			}
 
 			if ($message_limit > 0 && $message_limit <= $row['personal_messages'])
@@ -794,7 +830,9 @@ function sendpm($recipients, $subject, $message, $store_outbox = true, $from = n
 
 		// Send a notification, if enabled - taking the buddy list into account.
 		if (!empty($row['email_address']) && ($row['pm_email_notify'] == 1 || ($row['pm_email_notify'] > 1 && (!empty($modSettings['enable_buddylist']) && $row['is_buddy']))) && $row['is_activated'] == 1)
+		{
 			$notifications[empty($row['lngfile']) || empty($modSettings['userLanguage']) ? $language : $row['lngfile']][] = $row['email_address'];
+		}
 
 		$log['sent'][$row['id_member']] = sprintf(isset($txt['pm_successfully_sent']) ? $txt['pm_successfully_sent'] : '', $row['real_name']);
 	}
@@ -802,11 +840,15 @@ function sendpm($recipients, $subject, $message, $store_outbox = true, $from = n
 
 	// Only 'send' the message if there are any recipients left.
 	if (empty($all_to))
+	{
 		return $log;
+	}
 
 	// Track the pm count for our stats
 	if (!empty($modSettings['trackStats']))
+	{
 		trackStats(array('pm' => '+'));
+	}
 
 	// Insert the message itself and then grab the last insert id.
 	$db->insert('',
@@ -829,6 +871,7 @@ function sendpm($recipients, $subject, $message, $store_outbox = true, $from = n
 	{
 		// If this is new we need to set it part of it's own conversation.
 		if (empty($pm_head))
+		{
 			$db->query('', '
 				UPDATE {db_prefix}personal_messages
 				SET id_pm_head = {int:id_pm_head}
@@ -837,6 +880,7 @@ function sendpm($recipients, $subject, $message, $store_outbox = true, $from = n
 					'id_pm_head' => $id_pm,
 				)
 			);
+		}
 
 		// Some people think manually deleting personal_messages is fun... it's not. We protect against it though :)
 		$db->query('', '
@@ -852,7 +896,9 @@ function sendpm($recipients, $subject, $message, $store_outbox = true, $from = n
 		{
 			$insertRows[] = array($id_pm, $to, in_array($to, $recipients['bcc']) ? 1 : 0, isset($deletes[$to]) ? 1 : 0, 1);
 			if (!in_array($to, $recipients['bcc']))
+			{
 				$to_list[] = $to;
+			}
 		}
 
 		$db->insert('insert',
@@ -885,7 +931,9 @@ function sendpm($recipients, $subject, $message, $store_outbox = true, $from = n
 		require_once(SUBSDIR . '/Members.subs.php');
 		$result = getBasicMemberData($to_list);
 		foreach ($result as $row)
+		{
 			$to_names[] = un_htmlspecialchars($row['real_name']);
+		}
 	}
 
 	$replacements = array(
@@ -934,7 +982,9 @@ function sendpm($recipients, $subject, $message, $store_outbox = true, $from = n
 	foreach ($all_to as $k => $id)
 	{
 		if (isset($deletes[$id]))
+		{
 			unset($all_to[$k]);
+		}
 	}
 
 	if (!empty($all_to))
@@ -959,12 +1009,12 @@ function sendpm($recipients, $subject, $message, $store_outbox = true, $from = n
  * - 'label_query' - query by labels
  * - 'start' - start id, if any
  *
- * @package PersonalMessage
- *
  * @param mixed[] $pm_options options for loading
  * @param int $id_member id member
  *
  * @return array
+ * @package PersonalMessage
+ *
  */
 function loadPMs($pm_options, $id_member)
 {
@@ -1005,7 +1055,9 @@ function loadPMs($pm_options, $id_member)
 			);
 			$sub_pms = array();
 			while ($row = $db->fetch_assoc($sub_request))
+			{
 				$sub_pms[$row['id_pm_head']] = $row['sort_param'];
+			}
 			$db->free_result($sub_request);
 
 			// Now we use those results in the next query
@@ -1098,7 +1150,9 @@ function loadPMs($pm_options, $id_member)
 		if (!isset($recipients[$row['id_pm']]))
 		{
 			if (isset($row['id_member_from']))
+			{
 				$posters[$row['id_pm']] = $row['id_member_from'];
+			}
 
 			$pms[$row['id_pm']] = $row['id_pm'];
 
@@ -1110,10 +1164,12 @@ function loadPMs($pm_options, $id_member)
 
 		// Keep track of the last message so we know what the head is without another query!
 		if ((empty($pm_options['pmid']) && (empty($options['view_newest_pm_first']) || !isset($lastData))) || empty($lastData) || (!empty($pm_options['pmid']) && $pm_options['pmid'] == $row['id_pm']))
+		{
 			$lastData = array(
 				'id' => $row['id_pm'],
 				'head' => $row['id_pm_head'],
 			);
+		}
 	}
 	$db->free_result($request);
 
@@ -1123,12 +1179,12 @@ function loadPMs($pm_options, $id_member)
 /**
  * How many PMs have you sent lately?
  *
- * @package PersonalMessage
- *
  * @param int $id_member id member
  * @param int $time time interval (in seconds)
  *
  * @return
+ * @package PersonalMessage
+ *
  */
 function pmCount($id_member, $time)
 {
@@ -1157,8 +1213,8 @@ function pmCount($id_member, $time)
  *
  * - If all_messages is set will, clearly, do it to all!
  *
- * @package PersonalMessage
  * @param bool $all_messages = false
+ * @package PersonalMessage
  */
 function applyRules($all_messages = false)
 {
@@ -1171,7 +1227,9 @@ function applyRules($all_messages = false)
 
 	// No rules?
 	if (empty($context['rules']))
+	{
 		return;
+	}
 
 	// Just unread ones?
 	$ruleQuery = $all_messages ? '' : ' AND pmr.is_new = 1';
@@ -1203,7 +1261,9 @@ function applyRules($all_messages = false)
 			foreach ($rule['criteria'] as $criterium)
 			{
 				if (($criterium['t'] == 'mid' && $criterium['v'] == $row['id_member_from']) || ($criterium['t'] == 'gid' && $criterium['v'] == $row['id_group']) || ($criterium['t'] == 'sub' && strpos($row['subject'], $criterium['v']) !== false) || ($criterium['t'] == 'msg' && strpos($row['body'], $criterium['v']) !== false))
+				{
 					$match = true;
+				}
 				// If we're adding and one criteria don't match then we stop!
 				elseif ($rule['logic'] == 'and')
 				{
@@ -1216,7 +1276,9 @@ function applyRules($all_messages = false)
 			if ($match)
 			{
 				if ($rule['delete'])
+				{
 					$actions['deletes'][] = $row['id_pm'];
+				}
 				else
 				{
 					foreach ($rule['actions'] as $ruleAction)
@@ -1225,7 +1287,9 @@ function applyRules($all_messages = false)
 						{
 							// Get a basic pot started!
 							if (!isset($actions['labels'][$row['id_pm']]))
+							{
 								$actions['labels'][$row['id_pm']] = empty($row['labels']) ? array() : explode(',', $row['labels']);
+							}
 
 							$actions['labels'][$row['id_pm']][] = $ruleAction['v'];
 						}
@@ -1238,7 +1302,9 @@ function applyRules($all_messages = false)
 
 	// Deletes are easy!
 	if (!empty($actions['deletes']))
+	{
 		deleteMessages($actions['deletes']);
+	}
 
 	// Re-label?
 	if (!empty($actions['labels']))
@@ -1248,8 +1314,12 @@ function applyRules($all_messages = false)
 			// Quickly check each label is valid!
 			$realLabels = array();
 			foreach ($context['labels'] as $label)
+			{
 				if (in_array($label['id'], $labels) && ($label['id'] != -1 || empty($options['pm_remove_inbox_label'])))
+				{
 					$realLabels[] = $label['id'];
+				}
+			}
 
 			$db->query('', '
 				UPDATE {db_prefix}pm_recipients
@@ -1269,8 +1339,8 @@ function applyRules($all_messages = false)
 /**
  * Load up all the rules for the current user.
  *
- * @package PersonalMessage
  * @param bool $reload = false
+ * @package PersonalMessage
  */
 function loadRules($reload = false)
 {
@@ -1279,7 +1349,9 @@ function loadRules($reload = false)
 	$db = database();
 
 	if (isset($context['rules']) && !$reload)
+	{
 		return;
+	}
 
 	// This is just a simple list of "all" known rules
 	$context['known_rules'] = array(
@@ -1311,14 +1383,16 @@ function loadRules($reload = false)
 		$context['rules'][$row['id_rule']] = array(
 			'id' => $row['id_rule'],
 			'name' => $row['rule_name'],
-			'criteria' => \ElkArte\Util::unserialize($row['criteria']),
-			'actions' => \ElkArte\Util::unserialize($row['actions']),
+			'criteria' => Util::unserialize($row['criteria']),
+			'actions' => Util::unserialize($row['actions']),
 			'delete' => $row['delete_pm'],
 			'logic' => $row['is_or'] ? 'or' : 'and',
 		);
 
 		if ($row['delete_pm'])
+		{
 			$context['rules'][$row['id_rule']]['actions'][] = array('t' => 'del', 'v' => 1);
+		}
 	}
 	$db->free_result($request);
 }
@@ -1326,9 +1400,9 @@ function loadRules($reload = false)
 /**
  * Update PM recipient when they receive or read a new PM
  *
- * @package PersonalMessage
  * @param int $id_member
  * @param boolean $new = false
+ * @package PersonalMessage
  */
 function toggleNewPM($id_member, $new = false)
 {
@@ -1349,11 +1423,11 @@ function toggleNewPM($id_member, $new = false)
 /**
  * Load the PM limits for each group or for a specified group
  *
- * @package PersonalMessage
- *
  * @param int|bool $id_group (optional) the id of a membergroup
  *
  * @return array
+ * @package PersonalMessage
+ *
  */
 function loadPMLimits($id_group = false)
 {
@@ -1374,7 +1448,9 @@ function loadPMLimits($id_group = false)
 	while ($row = $db->fetch_assoc($request))
 	{
 		if ($row['id_group'] != 1)
+		{
 			$groups[$row['id_group']] = $row;
+		}
 	}
 	$db->free_result($request);
 
@@ -1384,11 +1460,11 @@ function loadPMLimits($id_group = false)
 /**
  * Retrieve the discussion one or more PMs belong to
  *
- * @package PersonalMessage
- *
  * @param int[] $id_pms
  *
  * @return array
+ * @package PersonalMessage
+ *
  */
 function getDiscussions($id_pms)
 {
@@ -1405,7 +1481,9 @@ function getDiscussions($id_pms)
 	);
 	$pm_heads = array();
 	while ($row = $db->fetch_assoc($request))
+	{
 		$pm_heads[$row['id_pm_head']] = $row['id_pm'];
+	}
 	$db->free_result($request);
 
 	return $pm_heads;
@@ -1414,11 +1492,11 @@ function getDiscussions($id_pms)
 /**
  * Return all the PMs belonging to one or more discussions
  *
- * @package PersonalMessage
- *
  * @param int[] $pm_heads array of pm id head nodes
  *
  * @return array
+ * @package PersonalMessage
+ *
  */
 function getPmsFromDiscussion($pm_heads)
 {
@@ -1436,7 +1514,9 @@ function getPmsFromDiscussion($pm_heads)
 	);
 	// Copy the action from the single to PM to the others.
 	while ($row = $db->fetch_assoc($request))
+	{
 		$pms[$row['id_pm']] = $row['id_pm_head'];
+	}
 	$db->free_result($request);
 
 	return $pms;
@@ -1445,11 +1525,11 @@ function getPmsFromDiscussion($pm_heads)
 /**
  * Determines the PMs which need an updated label.
  *
- * @package PersonalMessage
  * @param mixed[] $to_label
  * @param string[] $label_type
  * @param int $user_id
  * @return integer|null
+ * @package PersonalMessage
  */
 function changePMLabels($to_label, $label_type, $user_id)
 {
@@ -1480,33 +1560,43 @@ function changePMLabels($to_label, $label_type, $user_id)
 		$id_label = array_search($to_label[$row['id_pm']], $labels);
 
 		if ($id_label !== false && $label_type[$row['id_pm']] !== 'add')
+		{
 			unset($labels[$id_label]);
+		}
 		elseif ($label_type[$row['id_pm']] !== 'rem')
+		{
 			$labels[] = $to_label[$row['id_pm']];
+		}
 
 		if (!empty($options['pm_remove_inbox_label']) && $to_label[$row['id_pm']] != '-1' && ($key = array_search('-1', $labels)) !== false)
+		{
 			unset($labels[$key]);
+		}
 
 		$set = implode(',', array_unique($labels));
 		if ($set == '')
+		{
 			$set = '-1';
+		}
 
 		$to_update[$row['id_pm']] = $set;
 	}
 	$db->free_result($request);
 
 	if (!empty($to_update))
+	{
 		return updatePMLabels($to_update, $user_id);
+	}
 }
 
 /**
  * Detects personal messages which need a new label.
  *
- * @package PersonalMessage
  * @param mixed[] $searchArray
  * @param mixed[] $new_labels
  * @param int $user_id
  * @return integer|null
+ * @package PersonalMessage
  */
 function updateLabelsToPM($searchArray, $new_labels, $user_id)
 {
@@ -1535,30 +1625,38 @@ function updateLabelsToPM($searchArray, $new_labels, $user_id)
 			if (in_array($value, $searchArray))
 			{
 				if (isset($new_labels[$value]))
+				{
 					$toChange[$key] = $new_labels[$value];
+				}
 				else
+				{
 					unset($toChange[$key]);
+				}
 			}
 		}
 
 		if (empty($toChange))
+		{
 			$toChange[] = '-1';
+		}
 
 		$to_update[$row['id_pm']] = implode(',', array_unique($toChange));
 	}
 	$db->free_result($request);
 
 	if (!empty($to_update))
+	{
 		return updatePMLabels($to_update, $user_id);
+	}
 }
 
 /**
  * Updates PMs with their new label.
  *
- * @package PersonalMessage
  * @param mixed[] $to_update
  * @param int $user_id
  * @return int
+ * @package PersonalMessage
  */
 function updatePMLabels($to_update, $user_id)
 {
@@ -1597,10 +1695,10 @@ function updatePMLabels($to_update, $user_id)
 /**
  * Gets PMs older than a specific date.
  *
- * @package PersonalMessage
  * @param int $user_id the user's id.
  * @param int $time timestamp with a specific date
  * @return array
+ * @package PersonalMessage
  */
 function getPMsOlderThan($user_id, $time)
 {
@@ -1624,7 +1722,9 @@ function getPMsOlderThan($user_id, $time)
 		)
 	);
 	while ($row = $db->fetch_row($request))
+	{
 		$pm_ids[] = $row[0];
+	}
 	$db->free_result($request);
 
 	// This is the inbox
@@ -1643,7 +1743,9 @@ function getPMsOlderThan($user_id, $time)
 		)
 	);
 	while ($row = $db->fetch_row($request))
+	{
 		$pm_ids[] = $row[0];
+	}
 	$db->free_result($request);
 
 	return $pm_ids;
@@ -1652,9 +1754,9 @@ function getPMsOlderThan($user_id, $time)
 /**
  * Used to delete PM rules from the given member.
  *
- * @package PersonalMessage
  * @param int $id_member
  * @param int[] $rule_changes
+ * @package PersonalMessage
  */
 function deletePMRules($id_member, $rule_changes)
 {
@@ -1674,10 +1776,10 @@ function deletePMRules($id_member, $rule_changes)
 /**
  * Updates a personal messaging rule action for the given member.
  *
- * @package PersonalMessage
  * @param int $id_rule
  * @param int $id_member
  * @param mixed[] $actions
+ * @package PersonalMessage
  */
 function updatePMRuleAction($id_rule, $id_member, $actions)
 {
@@ -1699,13 +1801,13 @@ function updatePMRuleAction($id_rule, $id_member, $actions)
 /**
  * Add a new PM rule to the database.
  *
- * @package PersonalMessage
  * @param int $id_member
  * @param string $ruleName
  * @param string $criteria
  * @param string $actions
  * @param int $doDelete
  * @param int $isOr
+ * @package PersonalMessage
  */
 function addPMRule($id_member, $ruleName, $criteria, $actions, $doDelete, $isOr)
 {
@@ -1727,7 +1829,6 @@ function addPMRule($id_member, $ruleName, $criteria, $actions, $doDelete, $isOr)
 /**
  * Updates a personal messaging rule for the given member.
  *
- * @package PersonalMessage
  * @param int $id_member
  * @param int $id_rule
  * @param string $ruleName
@@ -1735,6 +1836,7 @@ function addPMRule($id_member, $ruleName, $criteria, $actions, $doDelete, $isOr)
  * @param string $actions
  * @param int $doDelete
  * @param int $isOr
+ * @package PersonalMessage
  */
 function updatePMRule($id_member, $id_rule, $ruleName, $criteria, $actions, $doDelete, $isOr)
 {
@@ -1761,9 +1863,9 @@ function updatePMRule($id_member, $id_rule, $ruleName, $criteria, $actions, $doD
 /**
  * Used to set a replied status for a given PM.
  *
- * @package PersonalMessage
  * @param int $id_member
  * @param int $replied_to
+ * @package PersonalMessage
  */
 function setPMRepliedStatus($id_member, $replied_to)
 {
@@ -1786,13 +1888,13 @@ function setPMRepliedStatus($id_member, $replied_to)
  *
  * - Used to load the conversation view of a PM
  *
- * @package PersonalMessage
- *
  * @param int $head id of the head pm of the conversation
  * @param mixed[] $recipients
  * @param string $folder the current folder we are working in
  *
  * @return array
+ * @package PersonalMessage
+ *
  */
 function loadConversationList($head, &$recipients, $folder = '')
 {
@@ -1819,15 +1921,21 @@ function loadConversationList($head, &$recipients, $folder = '')
 	{
 		// This is, frankly, a joke. We will put in a workaround for people sending to themselves - yawn!
 		if ($folder == 'sent' && $row['id_member_from'] == User::$info->id && $row['deleted_by_sender'] == 1)
+		{
 			continue;
+		}
 		elseif (($row['id_member'] == User::$info->id) && $row['deleted'] == 1)
+		{
 			continue;
+		}
 
 		if (!isset($recipients[$row['id_pm']]))
+		{
 			$recipients[$row['id_pm']] = array(
 				'to' => array(),
 				'bcc' => array()
 			);
+		}
 
 		$display_pms[] = $row['id_pm'];
 		$posters[$row['id_pm']] = $row['id_member_from'];
@@ -1843,11 +1951,11 @@ function loadConversationList($head, &$recipients, $folder = '')
  * - Returns array of keys with the head id and value details of the the newest
  * unread message.
  *
- * @package PersonalMessage
- *
  * @param int[] $pms array of pm ids to search
  *
  * @return array
+ * @package PersonalMessage
+ *
  */
 function loadConversationUnreadStatus($pms)
 {
@@ -1855,7 +1963,9 @@ function loadConversationUnreadStatus($pms)
 
 	// Make it an array if its not
 	if (!is_array($pms))
+	{
 		$pms = array($pms);
+	}
 
 	// Find the heads for this group of PM's
 	$request = $db->query('', '
@@ -1869,7 +1979,9 @@ function loadConversationUnreadStatus($pms)
 	);
 	$head_pms = array();
 	while ($row = $db->fetch_assoc($request))
+	{
 		$head_pms[$row['id_pm_head']] = $row['id_pm'];
+	}
 	$db->free_result($request);
 
 	// Find any unread PM's this member has under these head pm id's
@@ -1909,14 +2021,14 @@ function loadConversationUnreadStatus($pms)
  * - Tracks any message labels in use
  * - If optional search parameter is set to true will return message first label, useful for linking
  *
- * @package PersonalMessage
- *
  * @param int[] $all_pms
  * @param mixed[] $recipients
  * @param string $folder
  * @param boolean $search
  *
  * @return array
+ * @package PersonalMessage
+ *
  */
 function loadPMRecipientInfo($all_pms, &$recipients, $folder = '', $search = false)
 {
@@ -1949,7 +2061,9 @@ function loadPMRecipientInfo($all_pms, &$recipients, $folder = '', $search = fal
 	{
 		// Sent folder recipients
 		if ($folder === 'sent' || empty($row['bcc']))
+		{
 			$recipients[$row['id_pm']][empty($row['bcc']) ? 'to' : 'bcc'][] = empty($row['id_member_to']) ? $txt['guest_title'] : '<a href="' . $scripturl . '?action=profile;u=' . $row['id_member_to'] . '">' . $row['to_name'] . '</a>';
+		}
 
 		// Don't include bcc-recipients if its your inbox, you're not supposed to know :P
 		if ($row['id_member_to'] == User::$info->id && $folder !== 'sent')
@@ -1963,11 +2077,15 @@ function loadPMRecipientInfo($all_pms, &$recipients, $folder = '', $search = fal
 			foreach ($row['labels'] as $v)
 			{
 				if (isset($context['labels'][(int) $v]))
+				{
 					$message_labels[$row['id_pm']][(int) $v] = array('id' => $v, 'name' => $context['labels'][(int) $v]['name']);
+				}
 
 				// Here we find the first label on a message - used for linking to posts
 				if ($search && (!isset($message_first_label[$row['id_pm']]) && !in_array('-1', $row['labels'])))
+				{
 					$message_first_label[$row['id_pm']] = (int) $v;
+				}
 			}
 		}
 	}
@@ -1981,10 +2099,10 @@ function loadPMRecipientInfo($all_pms, &$recipients, $folder = '', $search = fal
  *
  * - That function uses these query results and handles the free_result action as well.
  *
- * @package PersonalMessage
  * @param int[] $pms array of PM ids to fetch
  * @param string[] $orderBy raw query defining how to order the results
  * @return bool|resource
+ * @package PersonalMessage
  */
 function loadPMSubjectRequest($pms, $orderBy)
 {
@@ -2017,7 +2135,6 @@ function loadPMSubjectRequest($pms, $orderBy)
  *
  * - That function uses these query results and handles the free_result action as well.
  *
- * @package PersonalMessage
  * @param int[] $display_pms list of PM's to fetch
  * @param string $sort_by_query raw query used in the sorting option
  * @param string $sort_by used to signal when addition joins are needed
@@ -2025,6 +2142,7 @@ function loadPMSubjectRequest($pms, $orderBy)
  * @param int|string $display_mode how are they being viewed, all, conversation, etc
  * @param string $folder current pm folder
  * @return bool|resource
+ * @package PersonalMessage
  */
 function loadPMMessageRequest($display_pms, $sort_by_query, $sort_by, $descending, $display_mode = '', $folder = '')
 {
@@ -2054,11 +2172,11 @@ function loadPMMessageRequest($display_pms, $sort_by_query, $sort_by, $descendin
 /**
  * Simple function to validate that a PM was sent to the current user
  *
- * @package PersonalMessage
- *
  * @param int $pmsg id of the pm we are checking
  *
  * @return bool
+ * @package PersonalMessage
+ *
  */
 function checkPMReceived($pmsg)
 {
@@ -2085,12 +2203,12 @@ function checkPMReceived($pmsg)
 /**
  * Loads a pm by ID for use as a quoted pm in a new message
  *
- * @package PersonalMessage
- *
  * @param int $pmsg
  * @param boolean $isReceived
  *
  * @return bool
+ * @package PersonalMessage
+ *
  */
 function loadPMQuote($pmsg, $isReceived)
 {
@@ -2126,12 +2244,12 @@ function loadPMQuote($pmsg, $isReceived)
  *
  * - Will optionally count the number of bcc recipients and return that count
  *
- * @package PersonalMessage
- *
  * @param int $pmsg
  * @param boolean $bcc_count
  *
  * @return array
+ * @package PersonalMessage
+ *
  */
 function loadPMRecipientsAll($pmsg, $bcc_count = false)
 {
@@ -2159,7 +2277,9 @@ function loadPMRecipientsAll($pmsg, $bcc_count = false)
 	{
 		// If it's hidden we still don't reveal their names
 		if ($bcc_count && $row['bcc'])
+		{
 			$hidden_recipients++;
+		}
 
 		$recipients[] = array(
 			'id' => $row['id_member'],
@@ -2170,11 +2290,13 @@ function loadPMRecipientsAll($pmsg, $bcc_count = false)
 
 	// If bcc count was requested, we return the number of bcc members, but not the names
 	if ($bcc_count)
+	{
 		$recipients[] = array(
 			'id' => 'bcc',
 			'name' => sprintf($txt['pm_report_pm_hidden'], $hidden_recipients),
 			'link' => sprintf($txt['pm_report_pm_hidden'], $hidden_recipients)
 		);
+	}
 
 	$db->free_result($request);
 
@@ -2186,12 +2308,12 @@ function loadPMRecipientsAll($pmsg, $bcc_count = false)
  *
  * - Supplied ID must have been sent to the user id requesting it and it must not have been deleted
  *
- * @package PersonalMessage
- *
  * @param int $pm_id
  *
  * @return
  * @throws \ElkArte\Exceptions\Exception no_access
+ * @package PersonalMessage
+ *
  */
 function loadPersonalMessage($pm_id)
 {
@@ -2218,7 +2340,9 @@ function loadPersonalMessage($pm_id)
 	);
 	// Can only be a hacker here!
 	if ($db->num_rows($request) == 0)
+	{
 		throw new \ElkArte\Exceptions\Exception('no_access', false);
+	}
 	$pm_details = $db->fetch_row($request);
 	$db->free_result($request);
 
@@ -2228,13 +2352,13 @@ function loadPersonalMessage($pm_id)
 /**
  * Finds the number of results that a search would produce
  *
- * @package PersonalMessage
  * @param string $userQuery raw query, used if we are searching for specific users
  * @param string $labelQuery raw query, used if we are searching only specific labels
  * @param string $timeQuery raw query, used if we are limiting results to time periods
  * @param string $searchQuery raw query, the actual thing you are searching for in the subject and/or body
  * @param mixed[] $searchq_parameters value parameters used in the above query
  * @return integer
+ * @package PersonalMessage
  */
 function numPMSeachResults($userQuery, $labelQuery, $timeQuery, $searchQuery, $searchq_parameters)
 {
@@ -2269,8 +2393,6 @@ function numPMSeachResults($userQuery, $labelQuery, $timeQuery, $searchQuery, $s
 /**
  * Gets all the matching message ids, senders and head pm nodes, using standard search only (No caching and the like!)
  *
- * @package PersonalMessage
- *
  * @param string $userQuery raw query, used if we are searching for specific users
  * @param string $labelQuery raw query, used if we are searching only specific labels
  * @param string $timeQuery raw query, used if we are limiting results to time periods
@@ -2279,6 +2401,8 @@ function numPMSeachResults($userQuery, $labelQuery, $timeQuery, $searchQuery, $s
  * @param mixed[] $search_params additional search parameters, like sort and direction
  *
  * @return array
+ * @package PersonalMessage
+ *
  */
 function loadPMSearchMessages($userQuery, $labelQuery, $timeQuery, $searchQuery, $searchq_parameters, $search_params)
 {
@@ -2323,12 +2447,12 @@ function loadPMSearchMessages($userQuery, $labelQuery, $timeQuery, $searchQuery,
  * When we are in conversation view, we need to find the base head pm of the
  * conversation.  This will set the root head id to each of the node heads
  *
- * @package PersonalMessage
- *
  * @param int[] $head_pms array of pm ids that were found in the id_pm_head col
  * during the initial search
  *
  * @return array
+ * @package PersonalMessage
+ *
  */
 function loadPMSearchHeads($head_pms)
 {
@@ -2353,7 +2477,9 @@ function loadPMSearchHeads($head_pms)
 	);
 	$real_pm_ids = array();
 	while ($row = $db->fetch_assoc($request))
+	{
 		$real_pm_ids[$row['id_pm_head']] = $row['id_pm'];
+	}
 	$db->free_result($request);
 
 	return $real_pm_ids;
@@ -2362,12 +2488,12 @@ function loadPMSearchHeads($head_pms)
 /**
  * Loads the actual details of the PM's that were found during the search stage
  *
- * @package PersonalMessage
- *
  * @param int[] $foundMessages array of found message id's
  * @param mixed[] $search_params as specified in the form, here used for sorting
  *
  * @return array
+ * @package PersonalMessage
+ *
  */
 function loadPMSearchResults($foundMessages, $search_params)
 {
@@ -2387,7 +2513,9 @@ function loadPMSearchResults($foundMessages, $search_params)
 	);
 	$search_results = array();
 	while ($row = $db->fetch_assoc($request))
+	{
 		$search_results[] = $row;
+	}
 	$db->free_result($request);
 
 	return $search_results;

@@ -169,6 +169,7 @@ interface QueryInterface
 
 	/**
 	 * Get the name (title) of the database system.
+	 *
 	 * @return string
 	 */
 	public function title();

@@ -10,7 +10,7 @@
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause (see accompanying LICENSE.txt file)
  *
  * This file contains code covered by:
- * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * copyright: 2011 Simple Machines (http://www.simplemachines.org)
  *
  * @version 2.0 dev
  *
@@ -27,14 +27,18 @@ function sha1_smf($str)
 {
 	// If we have mhash loaded in, use it instead!
 	if (function_exists('mhash') && defined('MHASH_SHA1'))
+	{
 		return bin2hex(mhash(MHASH_SHA1, $str));
+	}
 
 	$nblk = (strlen($str) + 8 >> 6) + 1;
 	$blks = array_pad(array(), $nblk * 16, 0);
 
 	$str_len = strlen($str);
 	for ($i = 0; $i < $str_len; $i++)
+	{
 		$blks[$i >> 2] |= ord($str{$i}) << (24 - ($i % 4) * 8);
+	}
 
 	$blks[$i >> 2] |= 0x80 << (24 - ($i % 4) * 8);
 
@@ -72,9 +76,13 @@ function sha1_core($x, $len)
 		for ($j = 0; $j < 80; $j++)
 		{
 			if ($j < 16)
+			{
 				$w[$j] = isset($x[$i + $j]) ? $x[$i + $j] : 0;
+			}
 			else
+			{
 				$w[$j] = sha1_rol($w[$j - 3] ^ $w[$j - 8] ^ $w[$j - 14] ^ $w[$j - 16], 1);
+			}
 
 			$t = sha1_rol($a, 5) + sha1_ft($j, $b, $c, $d) + $e + $w[$j] + sha1_kt($j);
 			$e = $d;
@@ -107,11 +115,17 @@ function sha1_core($x, $len)
 function sha1_ft($t, $b, $c, $d)
 {
 	if ($t < 20)
+	{
 		return ($b & $c) | ((~$b) & $d);
+	}
 	if ($t < 40)
+	{
 		return $b ^ $c ^ $d;
+	}
 	if ($t < 60)
+	{
 		return ($b & $c) | ($b & $d) | ($c & $d);
+	}
 
 	return $b ^ $c ^ $d;
 }
@@ -140,9 +154,13 @@ function sha1_rol($num, $cnt)
 {
 	// Unfortunately, PHP uses unsigned 32-bit longs only.  So we have to kludge it a bit.
 	if ($num & 0x80000000)
+	{
 		$a = ($num >> 1 & 0x7fffffff) >> (31 - $cnt);
+	}
 	else
+	{
 		$a = $num >> (32 - $cnt);
+	}
 
 	return ($num << $cnt) | $a;
 }

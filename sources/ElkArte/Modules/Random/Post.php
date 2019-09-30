@@ -13,17 +13,20 @@
 
 namespace ElkArte\Modules\Random;
 
+use ElkArte\EventManager;
+use ElkArte\Modules\AbstractModule;
+
 /**
  * Class \ElkArte\Modules\Random\Post
  *
  * Collection of small items not requiring a separate module
  */
-class Post extends \ElkArte\Modules\AbstractModule
+class Post extends AbstractModule
 {
 	/**
 	 * {@inheritDoc}
 	 */
-	public static function hooks(\ElkArte\EventManager $eventsManager)
+	public static function hooks(EventManager $eventsManager)
 	{
 		global $modSettings;
 
@@ -49,13 +52,17 @@ class Post extends \ElkArte\Modules\AbstractModule
 	public static function followup_create_topic($msgOptions, $topicOptions, $posterOptions)
 	{
 		if (!empty($_REQUEST['followup']))
+		{
 			$original_post = (int) $_REQUEST['followup'];
+		}
 
 		require_once(SUBSDIR . '/FollowUps.subs.php');
 
 		// Time to update the original message with a pointer to the new one
 		if (!empty($original_post) && canAccessMessage($original_post))
+		{
 			linkMessages($original_post, $topicOptions['id']);
+		}
 	}
 
 	/**

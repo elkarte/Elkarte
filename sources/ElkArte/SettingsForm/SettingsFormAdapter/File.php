@@ -8,13 +8,15 @@
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause (see accompanying LICENSE.txt file)
  *
  * This file contains code covered by:
- * copyright:    2011 Simple Machines (http://www.simplemachines.org)
+ * copyright: 2011 Simple Machines (http://www.simplemachines.org)
  *
  * @version 2.0 dev
  *
  */
 
 namespace ElkArte\SettingsForm\SettingsFormAdapter;
+
+use ElkArte\Util;
 
 /**
  * Class File
@@ -108,7 +110,7 @@ class File extends Db
 					if (in_array($varname, $safe_strings))
 					{
 						$new_setting['mask'] = 'nohtml';
-						$value = strtr($value, array(\ElkArte\Util::htmlspecialchars('<br />') => "\n"));
+						$value = strtr($value, array(Util::htmlspecialchars('<br />') => "\n"));
 					}
 					$modSettings[$configVar[0]] = $value;
 				}
@@ -168,70 +170,6 @@ class File extends Db
 	}
 
 	/**
-	 * Find and save the new database-based settings, if any
-	 */
-	private function _extractDbVars()
-	{
-		// Now loop through the remaining (database-based) settings.
-		$this->configVars = array_map(
-			function ($configVar)
-			{
-				// We just saved the file-based settings, so skip their definitions.
-				if (!is_array($configVar) || $configVar[2] === 'file')
-				{
-					return '';
-				}
-
-				// Rewrite the definition a bit.
-				if (is_array($configVar) && $configVar[2] === 'db')
-				{
-					return array($configVar[3], $configVar[0]);
-				}
-				else
-				{
-					// This is a regular config var requiring no special treatment.
-					return $configVar;
-				}
-			}, $this->configVars
-		);
-
-		// Save the new database-based settings, if any.
-		parent::save();
-	}
-
-	/**
-	 * Fix the cookie name by removing invalid characters
-	 */
-	private function _fixCookieName()
-	{
-		// Fix the darn stupid cookiename! (more may not be allowed, but these for sure!)
-		if (isset($this->configValues['cookiename']))
-		{
-			$this->configValues['cookiename'] = preg_replace('~[,;\s\.$]+~u', '', $this->configValues['cookiename']);
-		}
-	}
-
-	/**
-	 * Fix the forum's URL if necessary so that it is a valid root url
-	 */
-	private function _fixBoardUrl()
-	{
-		if (isset($this->configValues['boardurl']))
-		{
-			if (substr($this->configValues['boardurl'], -10) === '/index.php')
-			{
-				$this->configValues['boardurl'] = substr($this->configValues['boardurl'], 0, -10);
-			}
-			elseif (substr($this->configValues['boardurl'], -1) === '/')
-			{
-				$this->configValues['boardurl'] = substr($this->configValues['boardurl'], 0, -1);
-			}
-
-			$this->configValues['boardurl'] = addProtocol($this->configValues['boardurl'], array('http://', 'https://', 'file://'));
-		}
-	}
-
-	/**
 	 * For all known configuration values, ensures they are properly cast / escaped
 	 */
 	private function _cleanSettings()
@@ -286,7 +224,7 @@ class File extends Db
 		// Now sort everything into a big array, and figure out arrays and etc.
 		foreach ($config_passwords as $configVar)
 		{
-			if (isset($this->configValues[$configVar][1]) && $this->configValues[$configVar][0] == $this->configValues[$configVar][1])
+			if (isset($this->configValues[$configVar][1]) && $this->configValues[$configVar][0] === $this->configValues[$configVar][1])
 			{
 				$this->new_settings[$configVar] = '\'' . addcslashes($this->configValues[$configVar][0], '\'\\') . '\'';
 			}
@@ -299,7 +237,7 @@ class File extends Db
 			{
 				if (in_array($configVar, $safe_strings))
 				{
-					$this->new_settings[$configVar] = '\'' . addcslashes(\ElkArte\Util::htmlspecialchars(strtr($this->configValues[$configVar], array("\n" => '<br />', "\r" => '')), ENT_QUOTES), '\'\\') . '\'';
+					$this->new_settings[$configVar] = '\'' . addcslashes(Util::htmlspecialchars(strtr($this->configValues[$configVar], array("\n" => '<br />', "\r" => '')), ENT_QUOTES), '\'\\') . '\'';
 				}
 				else
 				{
@@ -329,9 +267,41 @@ class File extends Db
 	}
 
 	/**
+	 * Fix the cookie name by removing invalid characters
+	 */
+	private function _fixCookieName()
+	{
+		// Fix the darn stupid cookiename! (more may not be allowed, but these for sure!)
+		if (isset($this->configValues['cookiename']))
+		{
+			$this->configValues['cookiename'] = preg_replace('~[,;\s\.$]+~u', '', $this->configValues['cookiename']);
+		}
+	}
+
+	/**
+	 * Fix the forum's URL if necessary so that it is a valid root url
+	 */
+	private function _fixBoardUrl()
+	{
+		if (isset($this->configValues['boardurl']))
+		{
+			if (substr($this->configValues['boardurl'], -10) === '/index.php')
+			{
+				$this->configValues['boardurl'] = substr($this->configValues['boardurl'], 0, -10);
+			}
+			elseif (substr($this->configValues['boardurl'], -1) === '/')
+			{
+				$this->configValues['boardurl'] = substr($this->configValues['boardurl'], 0, -1);
+			}
+
+			$this->configValues['boardurl'] = addProtocol($this->configValues['boardurl'], array('http://', 'https://', 'file://'));
+		}
+	}
+
+	/**
 	 * Recursively checks if a value exists in an array
 	 *
-	 * @param string  $needle
+	 * @param string $needle
 	 * @param mixed[] $haystack
 	 *
 	 * @return boolean
@@ -410,7 +380,7 @@ class File extends Db
 		// Still more variables to go?  Then lets add them at the end.
 		if (!empty($this->new_settings))
 		{
-			if (trim($this->settingsArray[$end]) === '?' . '>')
+			if (trim($this->settingsArray[$end]) === '?>')
 			{
 				$this->settingsArray[$end++] = '';
 			}
@@ -506,5 +476,36 @@ class File extends Db
 				opcache_invalidate(BOARDDIR . '/Settings.php');
 			}
 		}
+	}
+
+	/**
+	 * Find and save the new database-based settings, if any
+	 */
+	private function _extractDbVars()
+	{
+		// Now loop through the remaining (database-based) settings.
+		$this->configVars = array_map(
+			function ($configVar) {
+				// We just saved the file-based settings, so skip their definitions.
+				if (!is_array($configVar) || $configVar[2] === 'file')
+				{
+					return '';
+				}
+
+				// Rewrite the definition a bit.
+				if (is_array($configVar) && $configVar[2] === 'db')
+				{
+					return array($configVar[3], $configVar[0]);
+				}
+				else
+				{
+					// This is a regular config var requiring no special treatment.
+					return $configVar;
+				}
+			}, $this->configVars
+		);
+
+		// Save the new database-based settings, if any.
+		parent::save();
 	}
 }

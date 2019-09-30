@@ -13,6 +13,8 @@
 
 namespace ElkArte;
 
+use BBC\ParserWrapper;
+
 /**
  * Class Agreement
  *
@@ -71,7 +73,7 @@ class Agreement
 	public function __construct($language, $backup_dir = null)
 	{
 		$this->_language = strtr($language, array('.' => ''));
-		if ($backup_dir === null || file_exists($backup_dir) === false)
+		if ($backup_dir === null || !file_exists($backup_dir))
 		{
 			$backup_dir = BOARDDIR . '/packages/backups/' . $this->_backupdir_name;
 		}
@@ -91,7 +93,7 @@ class Agreement
 	public function save($text, $update_backup = false)
 	{
 		$backup_id = '';
-		if ($update_backup === true)
+		if ($update_backup)
 		{
 			$backup_id = $this->storeBackup();
 		}
@@ -112,7 +114,7 @@ class Agreement
 	public function storeBackup()
 	{
 		$backup_id = $this->_backupId();
-		if ($this->_createBackup($backup_id) === false)
+		if (!$this->_createBackup($backup_id))
 		{
 			$backup_id = false;
 		}
@@ -136,18 +138,15 @@ class Agreement
 		// Have we got a localized one?
 		if (file_exists(BOARDDIR . '/' . $this->_file_name . $this->normalizeLanguage() . '.txt'))
 		{
-			$agreement = file_get_contents(BOARDDIR . '/' . $this->_file_name . $this->normalizeLanguage() . '.txt');
-		}
-		elseif ($fallback === true && file_exists(BOARDDIR . '/' . $this->_file_name . '.txt'))
-		{
-			$agreement = file_get_contents(BOARDDIR . '/' . $this->_file_name . '.txt');
-		}
-		else
-		{
-			$agreement = '';
+			return file_get_contents(BOARDDIR . '/' . $this->_file_name . $this->normalizeLanguage() . '.txt');
 		}
 
-		return $agreement;
+		if ($fallback && file_exists(BOARDDIR . '/' . $this->_file_name . '.txt'))
+		{
+			return file_get_contents(BOARDDIR . '/' . $this->_file_name . '.txt');
+		}
+
+		return '';
 	}
 
 	/**
@@ -162,7 +161,7 @@ class Agreement
 	 */
 	public function getParsedText($fallback = true)
 	{
-		$bbc_parser = \BBC\ParserWrapper::instance();
+		$bbc_parser = ParserWrapper::instance();
 
 		return $bbc_parser->parseAgreement($this->getPlainText($fallback));
 	}
@@ -201,6 +200,14 @@ class Agreement
 		return !empty($accepted);
 	}
 
+	/**
+	 * Log that the member accepted the agreement
+	 *
+	 * @param int $id_member
+	 * @param string $ip
+	 * @param string $version
+	 * @throws \Exception
+	 */
 	public function accept($id_member, $ip, $version)
 	{
 		$db = database();
@@ -241,7 +248,7 @@ class Agreement
 		$counter = '';
 		$merger = '';
 
-		while (file_exists($this->_backup_dir . '/' . $backup_id . $merger . $counter . '/') === true)
+		while (file_exists($this->_backup_dir . '/' . $backup_id . $merger . $counter . '/'))
 		{
 			$counter++;
 			$merger = '_';
@@ -259,19 +266,22 @@ class Agreement
 	protected function _createBackup($backup_id)
 	{
 		$destination = $this->_backup_dir . '/' . $backup_id . '/';
-		if (file_exists($this->_backup_dir) === false)
+		if (!file_exists($this->_backup_dir))
 		{
 			@mkdir($this->_backup_dir);
 		}
-		if (@mkdir($destination) === false)
+
+		if (!@mkdir($destination))
 		{
 			return false;
 		}
+
 		$glob = new \GlobIterator(BOARDDIR . '/' . $this->_file_name . '*.txt', \FilesystemIterator::SKIP_DOTS);
 		foreach ($glob as $file)
 		{
 			copy($file->getPathname(), $destination . $file->getBasename());
 		}
+
 		return true;
 	}
 }

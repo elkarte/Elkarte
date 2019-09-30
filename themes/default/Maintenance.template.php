@@ -6,7 +6,7 @@
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause (see accompanying LICENSE.txt file)
  *
  * This file contains code covered by:
- * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * copyright: 2011 Simple Machines (http://www.simplemachines.org)
  *
  * @version 2.0 dev
  */
@@ -28,10 +28,12 @@ function template_maintain_database()
 
 	// If maintenance has finished tell the user.
 	if (!empty($context['maintenance_finished']))
+	{
 		echo '
 			<div class="successbox">
 				', sprintf($txt['maintain_done'], $context['maintenance_finished']), '
 			</div>';
+	}
 
 	echo '
 	<div id="manage_maintenance">
@@ -54,9 +56,12 @@ function template_maintain_database()
 				<p>', $txt['maintain_backup_info'], '</p>';
 
 	if ($context['safe_mode_enable'])
+	{
 		echo '
 			<div class="errorbox">', $txt['safe_mode_enabled'], '</div>';
+	}
 	else
+	{
 		echo '
 				<div class="', $context['suggested_method'] == 'use_external_tool' || $context['use_maintenance'] != 0 ? 'errorbox' : 'infobox', '">
 					', $txt[$context['suggested_method']], $context['use_maintenance'] != 0 ? '
@@ -68,6 +73,7 @@ function template_maintain_database()
 					<label for="data"><input type="checkbox" name="data" id="data" onclick="document.getElementById(\'submitDump\').disabled = !document.getElementById(\'struct\').checked &amp;&amp; !document.getElementById(\'data\').checked;" checked="checked" /> ', $txt['maintain_backup_data'], '</label><br />
 					<label for="compress"><input type="checkbox" name="compress" id="compress" value="gzip"', $context['suggested_method'] == 'zipped_file' ? ' checked="checked"' : '', ' /> ', $txt['maintain_backup_gz'], '</label>
 					</p>';
+	}
 
 	if (empty($context['skip_security']))
 	{
@@ -89,6 +95,7 @@ function template_maintain_database()
 
 	// Show an option to convert the body column of the post table to MEDIUMTEXT or TEXT
 	if (isset($context['convert_to']))
+	{
 		echo '
 		<h2 class="category_header">', $txt[$context['convert_to'] . '_title'], '</h2>
 		<div class="content">
@@ -102,6 +109,7 @@ function template_maintain_database()
 				</div>
 			</form>
 		</div>';
+	}
 
 	echo '
 	</div>';
@@ -120,10 +128,12 @@ function template_maintain_routine()
 
 	// If maintenance has finished tell the user.
 	if (!empty($context['maintenance_finished']))
+	{
 		echo '
 			<div class="successbox">
 				', sprintf($txt['maintain_done'], $context['maintenance_finished']), '
 			</div>';
+	}
 
 	foreach ($context['routine_actions'] as $action)
 	{
@@ -136,9 +146,13 @@ function template_maintain_routine()
 					<input type="submit" value="', $action['submit'], '" />';
 
 		if (!empty($action['hidden']))
+		{
 			foreach ($action['hidden'] as $name => $val)
+			{
 				echo '
 						<input type="hidden" name="', $context[$name], '" value="', $context[$val], '" />';
+			}
+		}
 
 		echo '
 				</div>
@@ -232,8 +246,10 @@ function template_maintain_members()
 				<legend data-collapsed="true">', $txt['maintain_members_all'], '</legend>';
 
 	foreach ($context['membergroups'] as $group)
+	{
 		echo '
 				<label for="groups', $group['id'], '"><input type="checkbox" name="groups[', $group['id'], ']" id="groups', $group['id'], '" checked="checked" /> ', $group['name'], '</label><br />';
+	}
 
 	echo '
 			</fieldset>
@@ -298,9 +314,13 @@ function template_maintain_topics()
 				<input type="submit" value="', $maintenace['submit'], '" ', !empty($maintenace['confirm']) ? 'onclick="return confirm(\'' . $maintenace['confirm'] . '\');"' : '', ' />';
 
 		if (!empty($maintenace['hidden']))
+		{
 			foreach ($maintenace['hidden'] as $name => $val)
+			{
 				echo '
 				<input type="hidden" name="', $context[$name], '" value="', $context[$val], '" />';
+			}
+		}
 
 		echo '
 			</div>
@@ -376,8 +396,10 @@ function template_optimize()
 
 	// List each table being optimized...
 	foreach ($context['optimized_tables'] as $table)
+	{
 		echo '
 				', sprintf($txt['database_optimizing'], $table['name'], $table['data_freed']), '<br />';
+	}
 
 	// How did we go?
 	echo '
@@ -416,12 +438,16 @@ function template_convert_msgbody()
 			</ul>';
 
 		if (!empty($context['exceeding_messages_morethan']))
+		{
 			echo '
 			<p>', $context['exceeding_messages_morethan'], '</p>';
+		}
 	}
 	else
+	{
 		echo '
 			<p class="successbox">', $txt['convert_to_text'], '</p>';
+	}
 
 	echo '
 			<form action="', $scripturl, '?action=admin;area=maintain;sa=database;activity=convertmsgbody" method="post" accept-charset="UTF-8">

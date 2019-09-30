@@ -12,6 +12,10 @@
  */
 
 namespace ElkArte\Exceptions;
+
+use ElkArte\EventManager;
+use ElkArte\User;
+
 /**
  * In certain cases a module of a controller my want to "redirect" to another
  * controller (e.g. from Calendar to Post).
@@ -51,8 +55,8 @@ class ControllerRedirectException extends \Exception
 			return $source->{$this->_method}();
 		}
 
-		$controller = new $this->_controller(new \ElkArte\EventManager());
-		$controller->setUser(\ElkArte\User::$info);
+		$controller = new $this->_controller(new EventManager());
+		$controller->setUser(User::$info);
 		$controller->pre_dispatch();
 
 		return $controller->{$this->_method}();

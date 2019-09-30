@@ -111,7 +111,7 @@ class StreamFetchWebdata
 		}
 
 		// I want this, from there, and I'm not going to be bothering you for more (probably.)
-		if ($this->_makeRequest() !== false)
+		if ($this->_makeRequest())
 		{
 			$this->_parseRequest();
 			$this->_processHeaders();
@@ -168,7 +168,7 @@ class StreamFetchWebdata
 		if (!empty($this->_post_data))
 		{
 			$this->_options['http']['method'] = 'POST';
-			$this->_options['http']['header'][] ='Content-Length: ' . strlen($this->_post_data);
+			$this->_options['http']['header'][] = 'Content-Length: ' . strlen($this->_post_data);
 			$this->_options['http']['content'] = $this->_post_data;
 		}
 	}

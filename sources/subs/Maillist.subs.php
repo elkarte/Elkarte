@@ -12,6 +12,7 @@
  */
 
 use ElkArte\User;
+use ElkArte\Util;
 
 /**
  * Loads failed emails from the database
@@ -19,14 +20,14 @@ use ElkArte\User;
  * - If its a message or topic will build the link to that for viewing
  * - If supplied a specific ID will load only that failed email
  *
- * @package Maillist
- *
  * @param int $id
  * @param int $start The item to start with (for pagination purposes)
  * @param int $items_per_page The number of items to show per page
  * @param string $sort A string indicating how to sort the results
  *
  * @return array
+ * @package Maillist
+ *
  */
 function list_maillist_unapproved($id = 0, $start = 0, $items_per_page = 0, $sort = '')
 {
@@ -45,16 +46,26 @@ function list_maillist_unapproved($id = 0, $start = 0, $items_per_page = 0, $sor
 
 	// Work out the query
 	if ($approve_boards == array(0))
+	{
 		$approve_query = '';
+	}
 	elseif (!empty($approve_boards))
+	{
 		$approve_query = ' AND e.id_board IN (' . implode(',', $approve_boards) . ')';
+	}
 	else
+	{
 		$approve_query = ' AND 0';
+	}
 
 	if ($id === 0)
+	{
 		$where_query = 'e.id_email > {int:id} AND (({query_see_board}' . $approve_query . ') OR e.id_board = -1)';
+	}
 	else
+	{
 		$where_query = 'e.id_email = {int:id} AND (({query_see_board}' . $approve_query . ') OR e.id_board = -1)';
+	}
 
 	// Load them errors
 	$request = $db->query('', '
@@ -93,11 +104,17 @@ function list_maillist_unapproved($id = 0, $start = 0, $items_per_page = 0, $sor
 
 		// Build a link to the topic or message in case someone wants to take a look at that thread
 		if ($row['message_type'] === 't')
+		{
 			$postemail[$i]['link'] = $boardurl . '?topic=' . $row['message_id'];
+		}
 		elseif ($row['message_type'] === 'm')
+		{
 			$postemail[$i]['link'] = $boardurl . '?msg=' . $row['message_id'];
+		}
 		elseif ($row['message_type'] === 'p')
+		{
 			$postemail[$i]['subject'] = $txt['private'];
+		}
 
 		$i++;
 	}
@@ -120,11 +137,17 @@ function list_maillist_count_unapproved()
 
 	// Work out the query
 	if ($approve_boards == array(0))
+	{
 		$approve_query = '';
+	}
 	elseif (!empty($approve_boards))
+	{
 		$approve_query = ' AND e.id_board IN (' . implode(',', $approve_boards) . ')';
+	}
 	else
+	{
 		$approve_query = ' AND 0';
+	}
 
 	// Get the total count of failed emails, needed for pages
 	$request = $db->query('', '
@@ -134,8 +157,7 @@ function list_maillist_count_unapproved()
 			LEFT JOIN {db_prefix}boards AS b ON (b.id_board = e.id_board)
 		WHERE {query_see_board}
 			' . $approve_query,
-		array(
-		)
+		array()
 	);
 	list ($total) = $db->fetch_row($request);
 	$db->free_result($request);
@@ -146,8 +168,8 @@ function list_maillist_count_unapproved()
 /**
  * Removes an single entry from the postby_emails_error table
  *
- * @package Maillist
  * @param int $id
+ * @package Maillist
  */
 function maillist_delete_error_entry($id)
 {
@@ -169,8 +191,6 @@ function maillist_delete_error_entry($id)
  * - If an ID is supplied, it will load that specific filter/parser
  * - Style defines if it will load parsers or filters
  *
- * @package Maillist
- *
  * @param int $start The item to start with (for pagination purposes)
  * @param int $items_per_page The number of items to show per page
  * @param string $sort A string indicating how to sort the results
@@ -178,6 +198,8 @@ function maillist_delete_error_entry($id)
  * @param string $style = filter Filter to fetch filters or parsers for parsers
  *
  * @return array
+ * @package Maillist
+ *
  */
 function list_get_filter_parser($start, $items_per_page, $sort = '', $id = 0, $style = 'filter')
 {
@@ -185,7 +207,9 @@ function list_get_filter_parser($start, $items_per_page, $sort = '', $id = 0, $s
 
 	// Init
 	if (empty($sort))
+	{
 		$sort = 'id_filter ASC';
+	}
 
 	// Define $email_filters
 	$email_filters = array();
@@ -211,9 +235,9 @@ function list_get_filter_parser($start, $items_per_page, $sort = '', $id = 0, $s
 		$email_filters[$row['id_filter']] = array(
 			'id_filter' => $row['id_filter'],
 			'filter_type' => $row['filter_type'],
-			'filter_to' => '<strong>"</strong>' . \ElkArte\Util::htmlspecialchars($row['filter_to']) . '<strong>"</strong>',
-			'filter_from' => '<strong>"</strong>' . \ElkArte\Util::htmlspecialchars($row['filter_from']) . '<strong>"</strong>',
-			'filter_name' => \ElkArte\Util::htmlspecialchars($row['filter_name']),
+			'filter_to' => '<strong>"</strong>' . Util::htmlspecialchars($row['filter_to']) . '<strong>"</strong>',
+			'filter_from' => '<strong>"</strong>' . Util::htmlspecialchars($row['filter_from']) . '<strong>"</strong>',
+			'filter_name' => Util::htmlspecialchars($row['filter_name']),
 			'filter_order' => $row['filter_order'],
 		);
 	}
@@ -228,12 +252,12 @@ function list_get_filter_parser($start, $items_per_page, $sort = '', $id = 0, $s
  * - If ID is 0, it will retrieve the count.
  * - If ID is a valid positive integer, it will return 1 and exit.
  *
- * @package Maillist
- *
  * @param int $id
  * @param string $style
  *
  * @return
+ * @package Maillist
+ *
  */
 function list_count_filter_parser($id, $style)
 {
@@ -262,13 +286,13 @@ function list_count_filter_parser($id, $style)
  *
  * - It will load only that filter/parser
  *
- * @package Maillist
- *
- * @param int    $id
+ * @param int $id
  * @param string $style parser or filter
  *
  * @return array of filters/parsers
  * @throws \ElkArte\Exceptions\Exception email_error_no_filter
+ * @package Maillist
+ *
  */
 function maillist_load_filter_parser($id, $style)
 {
@@ -291,7 +315,9 @@ function maillist_load_filter_parser($id, $style)
 
 	// Check that the filter does exist
 	if (empty($row))
+	{
 		throw new \ElkArte\Exceptions\Exception('email_error_no_filter');
+	}
 
 	return $row;
 }
@@ -299,8 +325,8 @@ function maillist_load_filter_parser($id, $style)
 /**
  * Removes a specific filter or parser from the system
  *
- * @package Maillist
  * @param int $id ID of the filter/parser
+ * @package Maillist
  */
 function maillist_delete_filter_parser($id)
 {
@@ -341,7 +367,9 @@ function maillist_board_list()
 	$result = array();
 	$result[0] = '';
 	while ($row = $db->fetch_row($request))
+	{
 		$result[$row[0]] = $row[1];
+	}
 	$db->free_result($request);
 
 	return $result;
@@ -350,8 +378,8 @@ function maillist_board_list()
 /**
  * Turns on or off the "fake" cron job for imap email retrieval
  *
- * @package Maillist
  * @param boolean $switch
+ * @package Maillist
  */
 function enable_maillist_imap_cron($switch)
 {
@@ -373,12 +401,12 @@ function enable_maillist_imap_cron($switch)
 /**
  * Load in the custom (public and this users private) email templates
  *
- * @package Maillist
- *
  * @param string $template_type - the type of template (e.g. 'bounce', 'warntpl', etc.)
  * @param string|null $subject - A subject for the template
  *
  * @return array
+ * @package Maillist
+ *
  */
 function maillist_templates($template_type, $subject = null)
 {
@@ -395,15 +423,16 @@ function maillist_templates($template_type, $subject = null)
 			'current_member' => User::$info->id,
 		)
 	)->fetch_callback(
-		function ($row) use ($subject)
-		{
+		function ($row) use ($subject) {
 			$template = array(
 				'title' => $row['template_title'],
 				'body' => $row['body'],
 			);
 
 			if ($subject !== null)
+			{
 				$template['subject'] = $subject;
+			}
 
 			return $template;
 		}
@@ -413,8 +442,8 @@ function maillist_templates($template_type, $subject = null)
 /**
  * Log in post-by emails an email being sent
  *
- * @package Maillist
  * @param mixed[] $sent associative array of id_email, time_sent, email_to
+ * @package Maillist
  */
 function log_email($sent)
 {
@@ -437,9 +466,9 @@ function log_email($sent)
  * - Done as a CASE WHEN one two three ELSE 0 END in place of many updates\
  * - Called by Xmlcontroller as part of drag sort event
  *
- * @package Maillist
  * @param string $replace constructed as WHEN fieldname=value THEN new viewvalue WHEN .....
  * @param int[] $filters list of ids in the WHEN clause to keep from updating the entire table
+ * @package Maillist
  */
 function updateParserFilterOrder($replace, $filters)
 {

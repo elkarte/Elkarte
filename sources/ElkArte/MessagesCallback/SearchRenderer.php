@@ -9,7 +9,7 @@
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause (see accompanying LICENSE.txt file)
  *
  * This file contains code covered by:
- * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * copyright: 2011 Simple Machines (http://www.simplemachines.org)
  *
  * @version 2.0 dev
  *
@@ -17,8 +17,11 @@
 
 namespace ElkArte\MessagesCallback;
 
-use \ElkArte\MessagesCallback\BodyParser\BodyParserInterface;
-use \ElkArte\ValuesContainer;
+use ElkArte\MembersList;
+use ElkArte\MessagesCallback\BodyParser\BodyParserInterface;
+use ElkArte\TopicUtil;
+use ElkArte\Util;
+use ElkArte\ValuesContainer;
 
 /**
  * SearchRenderer
@@ -31,7 +34,7 @@ class SearchRenderer extends Renderer
 	const CONTEXT_HOOK = 'integrate_prepare_search_context';
 
 	/**
-	 * 
+	 *
 	 * @var mixed[]
 	 */
 	protected $_participants = [];
@@ -39,9 +42,9 @@ class SearchRenderer extends Renderer
 	/**
 	 * {@inheritdoc }
 	 */
-	public function __construct($request, BodyParserInterface $bodyParser, ValuesContainer $opt = null)
+	public function __construct($request, $user, BodyParserInterface $bodyParser, ValuesContainer $opt = null)
 	{
-		parent::__construct($request, $bodyParser, $opt);
+		parent::__construct($request, $user, $bodyParser, $opt);
 
 		require_once(SUBSDIR . '/Attachments.subs.php');
 	}
@@ -77,7 +80,7 @@ class SearchRenderer extends Renderer
 	 */
 	protected function _adjustAllMembers($member_context)
 	{
-		$member = \ElkArte\MembersList::get($this->_this_message['id_member']);
+		$member = MembersList::get($this->_this_message['id_member']);
 		$member['ip'] = $this->_this_message['poster_ip'];
 
 		$this->_this_message['first_subject'] = censor($this->_this_message['first_subject']);
@@ -97,7 +100,7 @@ class SearchRenderer extends Renderer
 		// Do we have quote tag enabled?
 		$quote_enabled = empty($modSettings['disabledBBC']) || !in_array('quote', explode(',', $modSettings['disabledBBC']));
 
-		$output_pre = \ElkArte\TopicUtil::prepareContext(array($this->_this_message))[$this->_this_message['id_topic']];
+		$output_pre = TopicUtil::prepareContext(array($this->_this_message))[$this->_this_message['id_topic']];
 
 		$output = array_merge($context['topics'][$this->_this_message['id_msg']], $output_pre);
 
@@ -155,17 +158,20 @@ class SearchRenderer extends Renderer
 
 		foreach ($this->_bodyParser->getSearchArray() as $query)
 		{
-		
+
 			// Fix the international characters in the keyword too.
 			$query = un_htmlspecialchars($query);
 			$query = trim($query, '\*+');
-			$query = strtr(\ElkArte\Util::htmlspecialchars($query), array('\\\'' => '\''));
+			$query = strtr(Util::htmlspecialchars($query), array('\\\'' => '\''));
 
-			$body_highlighted = preg_replace_callback('/((<[^>]*)|' . preg_quote(strtr($query, array('\'' => '&#039;')), '/') . ')/iu', array($this, '_highlighted_callback'), $body_highlighted);
+			$body_highlighted = preg_replace_callback('/((<[^>]*)|' . preg_quote(strtr($query, array('\'' => '&#039;')), '/') . ')/iu',
+				function ($matches) {
+					return $this->_highlighted_callback($matches);
+				}, $body_highlighted);
 			$subject_highlighted = preg_replace('/(' . preg_quote($query, '/') . ')/iu', '<strong class="highlight">$1</strong>', $subject_highlighted);
 		}
 
-		$member = \ElkArte\MembersList::get($this->_this_message['id_member']);
+		$member = MembersList::get($this->_this_message['id_member']);
 		$output['matches'][] = array(
 			'id' => $this->_this_message['id_msg'],
 			'attachment' => loadAttachmentContext($this->_this_message['id_msg']),
@@ -228,6 +234,6 @@ class SearchRenderer extends Renderer
 	 */
 	private function _highlighted_callback($matches)
 	{
-		return isset($matches[2]) && $matches[2] == $matches[1] ? stripslashes($matches[1]) : '<span class="highlight">' . $matches[1] . '</span>';
+		return isset($matches[2]) && $matches[2] === $matches[1] ? stripslashes($matches[1]) : '<span class="highlight">' . $matches[1] . '</span>';
 	}
 }

@@ -13,6 +13,10 @@
 
 namespace ElkArte\AdminController;
 
+use ElkArte\AbstractController;
+use ElkArte\Action;
+use ElkArte\SettingsForm\SettingsForm;
+
 /**
  * AddonSettings controller handles administration settings added
  * in the common area for all addons in admin panel.
@@ -27,7 +31,7 @@ namespace ElkArte\AdminController;
  *
  * @package AddonSettings
  */
-class AddonSettings extends \ElkArte\AbstractController
+class AddonSettings extends AbstractController
 {
 	/**
 	 * This, my friend, is for all the authors of addons out there.
@@ -58,13 +62,12 @@ class AddonSettings extends \ElkArte\AbstractController
 			'help' => 'addonsettings',
 			'description' => $txt['modification_settings_desc'],
 			'tabs' => array(
-				'general' => array(
-				),
+				'general' => array(),
 			),
 		);
 
 		// Set up the action controller
-		$action = new \ElkArte\Action('modify_modifications');
+		$action = new Action('modify_modifications');
 
 		// Pick the correct sub-action, call integrate_sa_modify_modifications
 		$subAction = $action->initialize($subActions, 'general');
@@ -85,7 +88,7 @@ class AddonSettings extends \ElkArte\AbstractController
 		global $context, $txt;
 
 		// instantiate the form
-		$settingsForm = new \ElkArte\SettingsForm\SettingsForm(\ElkArte\SettingsForm\SettingsForm::DB_ADAPTER);
+		$settingsForm = new SettingsForm(SettingsForm::DB_ADAPTER);
 
 		// initialize it with our existing settings. If any.
 		$config_vars = $this->_settings();
@@ -162,9 +165,13 @@ class AddonSettings extends \ElkArte\AbstractController
 
 		// By default do the basic settings.
 		if (isset($this->_req->query->sa, $subActions[$this->_req->query->sa]))
+		{
 			$sa = $this->_req->query->sa;
+		}
 		elseif (!empty($defaultAction))
+		{
 			$sa = $defaultAction;
+		}
 		else
 		{
 			$keys = array_keys($subActions);

@@ -13,10 +13,14 @@
 
 namespace ElkArte\AdminController;
 
+use ElkArte\AbstractController;
+use ElkArte\Action;
+use ElkArte\SettingsForm\SettingsForm;
+
 /**
  * ManagePosts controller handles all the administration settings for topics and posts.
  */
-class ManageTopics extends \ElkArte\AbstractController
+class ManageTopics extends AbstractController
 {
 	/**
 	 * Check permissions and forward to the right method.
@@ -36,7 +40,7 @@ class ManageTopics extends \ElkArte\AbstractController
 		);
 
 		// Control for an action, why not!
-		$action = new \ElkArte\Action('manage_topics');
+		$action = new Action('manage_topics');
 
 		// Only one option I'm afraid, but integrate_sa_manage_topics may add more
 		$subAction = $action->initialize($subActions, 'display');
@@ -65,7 +69,7 @@ class ManageTopics extends \ElkArte\AbstractController
 		global $context, $txt, $scripturl;
 
 		// Initialize the form
-		$settingsForm = new \ElkArte\SettingsForm\SettingsForm(\ElkArte\SettingsForm\SettingsForm::DB_ADAPTER);
+		$settingsForm = new SettingsForm(SettingsForm::DB_ADAPTER);
 
 		// Initialize it with our settings
 		$settingsForm->setConfigVars($this->_settings());
@@ -109,27 +113,27 @@ class ManageTopics extends \ElkArte\AbstractController
 
 		// initialize it with our settings
 		$config_vars = array(
-				// Some simple big bools...
-				array('check', 'enableParticipation'),
-				array('check', 'enableFollowup'),
-				array('check', 'enable_unwatch'),
-				array('check', 'pollMode'),
+			// Some simple big bools...
+			array('check', 'enableParticipation'),
+			array('check', 'enableFollowup'),
+			array('check', 'enable_unwatch'),
+			array('check', 'pollMode'),
 			'',
-				// Pagination etc...
-				array('int', 'oldTopicDays', 'postinput' => $txt['manageposts_days'], 'subtext' => $txt['oldTopicDays_zero']),
-				array('int', 'defaultMaxTopics', 'postinput' => $txt['manageposts_topics']),
-				array('int', 'defaultMaxMessages', 'postinput' => $txt['manageposts_posts']),
-				array('check', 'disable_print_topic'),
+			// Pagination etc...
+			array('int', 'oldTopicDays', 'postinput' => $txt['manageposts_days'], 'subtext' => $txt['oldTopicDays_zero']),
+			array('int', 'defaultMaxTopics', 'postinput' => $txt['manageposts_topics']),
+			array('int', 'defaultMaxMessages', 'postinput' => $txt['manageposts_posts']),
+			array('check', 'disable_print_topic'),
 			'',
-				// Hot topics (etc)...
-				array('int', 'hotTopicPosts', 'postinput' => $txt['manageposts_posts']),
-				array('int', 'hotTopicVeryPosts', 'postinput' => $txt['manageposts_posts']),
-				array('check', 'useLikesNotViews'),
+			// Hot topics (etc)...
+			array('int', 'hotTopicPosts', 'postinput' => $txt['manageposts_posts']),
+			array('int', 'hotTopicVeryPosts', 'postinput' => $txt['manageposts_posts']),
+			array('check', 'useLikesNotViews'),
 			'',
-				// All, next/prev...
-				array('int', 'enableAllMessages', 'postinput' => $txt['manageposts_posts'], 'subtext' => $txt['enableAllMessages_zero']),
-				array('check', 'disableCustomPerPage'),
-				array('check', 'enablePreviousNext'),
+			// All, next/prev...
+			array('int', 'enableAllMessages', 'postinput' => $txt['manageposts_posts'], 'subtext' => $txt['enableAllMessages_zero']),
+			array('check', 'disableCustomPerPage'),
+			array('check', 'enablePreviousNext'),
 		);
 
 		call_integration_hook('integrate_modify_topic_settings', array(&$config_vars));

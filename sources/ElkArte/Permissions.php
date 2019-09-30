@@ -12,10 +12,13 @@
 
 namespace ElkArte;
 
+/**
+ * Class Permissions
+ *
+ * @package ElkArte
+ */
 class Permissions
 {
-	private $db;
-
 	/**
 	 * @var array
 	 */
@@ -24,12 +27,6 @@ class Permissions
 		'manage_membergroups',
 		'manage_permissions',
 	);
-
-	/**
-	 * @var string[]
-	 */
-	private $illegal_permissions = array();
-
 	/**
 	 * @var array
 	 */
@@ -66,6 +63,11 @@ class Permissions
 		'approve_emails',
 		'like_posts',
 	);
+	private $db;
+	/**
+	 * @var string[]
+	 */
+	private $illegal_permissions = array();
 
 	/**
 	 * Load a few illegal permissions into the class and context.
@@ -78,26 +80,6 @@ class Permissions
 		$this->db = database();
 		$this->loadIllegal();
 		$this->loadIllegalGuest();
-	}
-
-	/**
-	 * Return the list of illegal permissions
-	 *
-	 * @return string[]
-	 */
-	public function getIllegalPermissions()
-	{
-		return $this->illegal_permissions;
-	}
-
-	/**
-	 * Return the list of illegal guest permissions
-	 *
-	 * @return string[]
-	 */
-	public function getIllegalGuestPermissions()
-	{
-		return $this->illegal_guest_permissions;
 	}
 
 	/**
@@ -131,11 +113,31 @@ class Permissions
 	}
 
 	/**
+	 * Return the list of illegal permissions
+	 *
+	 * @return string[]
+	 */
+	public function getIllegalPermissions()
+	{
+		return $this->illegal_permissions;
+	}
+
+	/**
+	 * Return the list of illegal guest permissions
+	 *
+	 * @return string[]
+	 */
+	public function getIllegalGuestPermissions()
+	{
+		return $this->illegal_guest_permissions;
+	}
+
+	/**
 	 * Deletes permissions.
 	 *
 	 * @param string[] $permissions
 	 * @param string[] $where
-	 * @param mixed[]  $where_parameters = array() or values used in the where statement
+	 * @param mixed[] $where_parameters = array() or values used in the where statement
 	 */
 	public function deletePermissions($permissions, $where = array(), $where_parameters = array())
 	{

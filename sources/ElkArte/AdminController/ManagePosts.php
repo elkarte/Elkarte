@@ -8,7 +8,7 @@
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause (see accompanying LICENSE.txt file)
  *
  * This file contains code covered by:
- * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * copyright: 2011 Simple Machines (http://www.simplemachines.org)
  *
  * @version 2.0 dev
  *
@@ -16,12 +16,17 @@
 
 namespace ElkArte\AdminController;
 
+use ElkArte\AbstractController;
+use ElkArte\Action;
+use ElkArte\Exceptions\Exception;
+use ElkArte\SettingsForm\SettingsForm;
+
 /**
  * ManagePosts controller handles all the administration settings for topics and posts.
  *
  * @package Posts
  */
-class ManagePosts extends \ElkArte\AbstractController
+class ManagePosts extends AbstractController
 {
 	/**
 	 * The main entrance point for the 'Posts and topics' screen.
@@ -57,7 +62,7 @@ class ManagePosts extends \ElkArte\AbstractController
 		);
 
 		// Good old action handle
-		$action = new \ElkArte\Action('manage_posts');
+		$action = new Action('manage_posts');
 
 		// Tabs for browsing the different post functions.
 		$context[$context['admin_menu_name']]['tab_data'] = array(
@@ -178,20 +183,20 @@ class ManagePosts extends \ElkArte\AbstractController
 		$censor_proper = explode("\n", $modSettings['censor_proper']);
 
 		$context['censored_words'] = array();
-		for ($i = 0, $n = count($censor_vulgar); $i < $n; $i++)
+		foreach ($censor_vulgar as $i => $censor_vulgar_i)
 		{
-			if (empty($censor_vulgar[$i]))
+			if (empty($censor_vulgar_i))
 			{
 				continue;
 			}
 
 			// Skip it, it's either spaces or stars only.
-			if (trim(strtr($censor_vulgar[$i], '*', ' ')) === '')
+			if (trim(strtr($censor_vulgar_i, '*', ' ')) === '')
 			{
 				continue;
 			}
 
-			$context['censored_words'][htmlspecialchars(trim($censor_vulgar[$i]))] = isset($censor_proper[$i])
+			$context['censored_words'][htmlspecialchars(trim($censor_vulgar_i))] = isset($censor_proper[$i])
 				? htmlspecialchars($censor_proper[$i], ENT_COMPAT, 'UTF-8')
 				: '';
 		}
@@ -237,7 +242,7 @@ class ManagePosts extends \ElkArte\AbstractController
 		global $context, $txt, $modSettings, $scripturl;
 
 		// Initialize the form
-		$settingsForm = new \ElkArte\SettingsForm\SettingsForm(\ElkArte\SettingsForm\SettingsForm::DB_ADAPTER);
+		$settingsForm = new SettingsForm(SettingsForm::DB_ADAPTER);
 
 		// Initialize it with our settings
 		$settingsForm->setConfigVars($this->_settings());
@@ -267,7 +272,7 @@ class ManagePosts extends \ElkArte\AbstractController
 
 				if (isset($body_type) && ($this->_req->post->max_messageLength > 65535 || $this->_req->post->max_messageLength == 0) && $body_type === 'text')
 				{
-					throw new \ElkArte\Exceptions\Exception('convert_to_mediumtext', false, array($scripturl . '?action=admin;area=maintain;sa=database'));
+					throw new Exception('convert_to_mediumtext', false, array($scripturl . '?action=admin;area=maintain;sa=database'));
 				}
 
 			}

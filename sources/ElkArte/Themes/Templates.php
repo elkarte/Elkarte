@@ -17,8 +17,9 @@
 namespace ElkArte\Themes;
 
 use BadFunctionCallException;
-use \ElkArte\Exceptions\Exception;
+use ElkArte\Debug;
 use ElkArte\Errors\Errors;
+use ElkArte\Exceptions\Exception;
 use ElkArte\User;
 use Error;
 use Generator;
@@ -80,8 +81,6 @@ class Templates
 	 * instead
 	 * - If $this->dirs is empty, it delays the loading of the template
 	 *
-	 * @uses $this->requireTemplate() to actually load the file.
-	 *
 	 * @param string|false $template_name
 	 * @param string[]|string $style_sheets any style sheets to load with the template
 	 * @param bool $fatal = true if fatal is true, dies with an error message if the
@@ -89,6 +88,8 @@ class Templates
 	 *
 	 * @return boolean|null
 	 * @throws \ElkArte\Exceptions\Exception
+	 * @uses $this->requireTemplate() to actually load the file.
+	 *
 	 */
 	public function load($template_name, $style_sheets = [], $fatal = true): ?bool
 	{
@@ -128,8 +129,6 @@ class Templates
 	 * - Can be used to only load style sheets by using false as the template name
 	 *  loading of style sheets with this function is deprecated, use loadCSSFile instead
 	 *
-	 * @uses $this->templateInclude() to include the file.
-	 *
 	 * @param string|false $template_name
 	 * @param string[]|string $style_sheets any style sheets to load with the template
 	 * @param bool $fatal = true if fatal is true, dies with an error message if the
@@ -137,6 +136,8 @@ class Templates
 	 *
 	 * @return bool
 	 * @throws \ElkArte\Exceptions\Exception theme_template_error
+	 * @uses $this->templateInclude() to include the file.
+	 *
 	 */
 	protected function requireTemplate($template_name, $style_sheets, $fatal): bool
 	{
@@ -147,7 +148,7 @@ class Templates
 			$style_sheets = [$style_sheets];
 		}
 
-		if ($this->default_loaded === false)
+		if (!$this->default_loaded)
 		{
 			loadCSSFile('index.css');
 			$this->default_loaded = true;
@@ -164,7 +165,7 @@ class Templates
 			foreach ($style_sheets as $sheet)
 			{
 				$sheets[] = stripos('.css', $sheet) !== false ? $sheet : $sheet . '.css';
-				if ($sheet == 'admin' && !empty($context['theme_variant']))
+				if ($sheet === 'admin' && !empty($context['theme_variant']))
 				{
 					$sheets[] =
 						$context['theme_variant'] . '/admin' . $context['theme_variant'] . '.css';
@@ -199,7 +200,7 @@ class Templates
 		{
 			if ($db_show_debug === true)
 			{
-				\ElkArte\Debug::instance()->add(
+				Debug::instance()->add(
 					'templates',
 					$template_name . ' (' . basename($template_dir) . ')'
 				);
@@ -262,203 +263,6 @@ class Templates
 	}
 
 	/**
-	 * Load a language file.
-	 *
-	 * - Tries the current and default themes as well as the user and global languages.
-	 *
-	 * @param string[] $template_name
-	 * @param string $lang = ''
-	 * @param bool $fatal = true
-	 * @param bool $force_reload = false
-	 *
-	 * @return string The language actually loaded.
-	 */
-	public function loadLanguageFiles(
-		array $template_name,
-		$lang = '',
-		$fatal = true,
-		$force_reload = false
-	) {
-		global $language, $settings, $modSettings;
-		global $db_show_debug, $txt;
-		static $already_loaded = [];
-
-		// Default to the user's language.
-		if ($lang == '')
-		{
-			$lang = isset(User::$info->language) ? User::$info->language : $language;
-		}
-
-		// Make sure we have $settings - if not we're in trouble and need to find it!
-		if (empty($settings['default_theme_dir']))
-		{
-			$this->loadEssentialThemeData();
-		}
-
-		$fix_arrays = false;
-		// For each file open it up and write it out!
-		foreach ($template_name as $template)
-		{
-			if (!$force_reload && isset($already_loaded[$template]) && $already_loaded[$template] == $lang)
-			{
-				return $lang;
-			}
-
-			if ($template === 'index')
-			{
-				$fix_arrays = true;
-			}
-
-			// Do we want the English version of language file as fallback?
-			if (empty($modSettings['disable_language_fallback']) && $lang != 'english')
-			{
-				$this->loadLanguageFiles([$template], 'english', false);
-			}
-
-			// Try to find the language file.
-			$found = false;
-			foreach ($this->dirs as $template_dir)
-			{
-				if (file_exists(
-					$file =
-						$template_dir . '/languages/' . $lang . '/' . $template . '.' . $lang . '.php'
-				))
-				{
-					// Include it!
-					$this->templateInclude($file);
-
-					// Note that we found it.
-					$found = true;
-
-					// Keep track of what we're up to, soldier.
-					if ($db_show_debug === true)
-					{
-						\ElkArte\Debug::instance()->add(
-							'language_files',
-							$template . '.' . $lang . ' (' . basename(
-								$settings['theme_url']
-							) . ')'
-						);
-					}
-
-					// Remember what we have loaded, and in which language.
-					$already_loaded[$template] = $lang;
-
-					break;
-				}
-			}
-
-			// That couldn't be found!  Log the error, but *try* to continue normally.
-			if (!$found && $fatal)
-			{
-				Errors::instance()->log_error(
-					sprintf(
-						$txt['theme_language_error'],
-						$template_name . '.' . $lang,
-						'template'
-					)
-				);
-				break;
-			}
-		}
-
-		if ($fix_arrays)
-		{
-			fix_calendar_text();
-		}
-
-		// Return the language actually loaded.
-		return $lang;
-	}
-
-	/**
-	 * This loads the bare minimum data.
-	 *
-	 * - Needed by scheduled tasks,
-	 * - Needed by any other code that needs language files before the forum (the theme)
-	 * is loaded.
-	 */
-	public function loadEssentialThemeData()
-	{
-		global $settings, $modSettings, $mbname, $context;
-
-		if (function_exists('database') === false)
-		{
-			throw new \Exception('');
-		}
-
-		$db = database();
-
-		// Get all the default theme variables.
-		$db->fetchQuery(
-			'
-			SELECT id_theme, variable, value
-			FROM {db_prefix}themes
-			WHERE id_member = {int:no_member}
-				AND id_theme IN (1, {int:theme_guests})',
-			[
-				'no_member' => 0,
-				'theme_guests' => $modSettings['theme_guests'],
-			]
-		)->fetch_callback(
-			function ($row) {
-				global $settings;
-
-				$settings[$row['variable']] = $row['value'];
-				$indexes_to_default = [
-					'theme_dir',
-					'theme_url',
-					'images_url',
-				];
-
-				// Is this the default theme?
-				if ($row['id_theme'] == '1' && in_array($row['variable'], $indexes_to_default))
-				{
-					$settings['default_' . $row['variable']] = $row['value'];
-				}
-			}
-		);
-
-		// Check we have some directories setup.
-		if (!$this->hasDirectories())
-		{
-			$this->reloadDirectories($settings);
-		}
-
-		// Assume we want this.
-		$context['forum_name'] = $mbname;
-		$context['forum_name_html_safe'] = $context['forum_name'];
-
-		$this->loadLanguageFiles(['index', 'Addons']);
-	}
-
-	/**
-	 * Load a language file.
-	 *
-	 * - Tries the current and default themes as well as the user and global languages.
-	 *
-	 * @param string $template_name
-	 * @param string $lang = ''
-	 * @param bool $fatal = true
-	 * @param bool $force_reload = false
-	 *
-	 * @return string The language actually loaded.
-	 */
-	public function loadLanguageFile(
-		$template_name,
-		$lang = '',
-		$fatal = true,
-		$force_reload = false
-	) {
-		return $this->loadLanguageFiles(
-			explode('+', $template_name),
-			$lang,
-			$fatal,
-			$force_reload
-		);
-	}
-
-	/**
 	 * Load the template/language file using eval or require? (with eval we can show an
 	 * error message!)
 	 *
@@ -504,7 +308,8 @@ class Templates
 			{
 				require($filename);
 			}
-		} catch (Error $e)
+		}
+		catch (Error $e)
 		{
 			$this->templateNotFound($e);
 		}
@@ -614,41 +419,11 @@ class Templates
 	}
 
 	/**
-	 * Highlights PHP syntax.
-	 *
-	 * @param string $file Name of file to highlight.
-	 * @param int $min Minimum line numer to return.
-	 * @param int $max Maximum line numer to return.
-	 *
-	 * @used-by printLines() Prints syntax for template files with errors.
-	 * @uses    highlight_file() Highlights syntax.
-	 *
-	 * @return Generator Highlighted lines ranging from $min to $max.
-	 */
-	public function getHighlightedLinesFromFile(
-		string $file,
-		int $min,
-		int $max
-	): Generator
-	{
-		foreach (preg_split(
-			         '~\<br( /)?\>~',
-			         highlight_file($file, true)
-		         ) as $line => $content)
-		{
-			if ($line >= $min && $line <= $max)
-			{
-				yield $line + 1 => $content;
-			}
-		}
-	}
-
-	/**
 	 * Print lines from the file with the error.
 	 *
+	 * @param Error $e
 	 * @uses getHighlightedLinesFromFile() Highlights syntax.
 	 *
-	 * @param Error $e
 	 */
 	private function printLines(Error $e): void
 	{
@@ -687,67 +462,253 @@ class Templates
 	}
 
 	/**
-	 * Load a sub-template.
+	 * Highlights PHP syntax.
 	 *
-	 * What it does:
-	 * - loads the sub template specified by sub_template_name, which must be in an
-	 * already-loaded template.
-	 * - if ?debug is in the query string, shows administrators a marker after every sub
-	 * template for debugging purposes.
+	 * @param string $file Name of file to highlight.
+	 * @param int $min Minimum line numer to return.
+	 * @param int $max Maximum line numer to return.
 	 *
-	 * @todo get rid of reading $_REQUEST directly
+	 * @used-by printLines() Prints syntax for template files with errors.
+	 * @return Generator Highlighted lines ranging from $min to $max.
+	 * @uses    highlight_file() Highlights syntax.
 	 *
-	 * @param string $sub_template_name
-	 * @param bool|string $fatal = false, $fatal = true is for templates that
-	 *                           shouldn't get a 'pretty' error screen 'ignore' to skip
-	 *
-	 * @throws \ElkArte\Exceptions\Exception theme_template_error
 	 */
-	public function loadSubTemplate($sub_template_name, $fatal = false)
-	{
-		global $txt, $db_show_debug;
-
-		if (!empty($sub_template_name))
+	public function getHighlightedLinesFromFile(
+		string $file,
+		int $min,
+		int $max
+	): Generator {
+		foreach (preg_split(
+					 '~\<br( /)?\>~',
+					 highlight_file($file, true)
+				 ) as $line => $content)
 		{
-			if ($db_show_debug === true)
+			if ($line >= $min && $line <= $max)
 			{
-				\ElkArte\Debug::instance()->add('sub_templates', $sub_template_name);
+				yield $line + 1 => $content;
+			}
+		}
+	}
+
+	/**
+	 * Add a template directory to the search stack
+	 *
+	 * @param string $dir
+	 *
+	 * @return $this
+	 */
+	public function addDirectory($dir)
+	{
+		$this->dirs[] = (string) $dir;
+
+		return $this;
+	}
+
+	/**
+	 * Load a language file.
+	 *
+	 * - Tries the current and default themes as well as the user and global languages.
+	 *
+	 * @param string $template_name
+	 * @param string $lang = ''
+	 * @param bool $fatal = true
+	 * @param bool $force_reload = false
+	 *
+	 * @return string The language actually loaded.
+	 */
+	public function loadLanguageFile(
+		$template_name,
+		$lang = '',
+		$fatal = true,
+		$force_reload = false
+	) {
+		return $this->loadLanguageFiles(
+			explode('+', $template_name),
+			$lang,
+			$fatal,
+			$force_reload
+		);
+	}
+
+	/**
+	 * Load a language file.
+	 *
+	 * - Tries the current and default themes as well as the user and global languages.
+	 *
+	 * @param string[] $template_name
+	 * @param string $lang = ''
+	 * @param bool $fatal = true
+	 * @param bool $force_reload = false
+	 *
+	 * @return string The language actually loaded.
+	 */
+	public function loadLanguageFiles(
+		array $template_name,
+		$lang = '',
+		$fatal = true,
+		$force_reload = false
+	) {
+		global $language, $settings, $modSettings;
+		global $db_show_debug, $txt;
+		static $already_loaded = [];
+
+		// Default to the user's language.
+		if ($lang === '')
+		{
+			$lang = isset(User::$info->language) ? User::$info->language : $language;
+		}
+
+		// Make sure we have $settings - if not we're in trouble and need to find it!
+		if (empty($settings['default_theme_dir']))
+		{
+			$this->loadEssentialThemeData();
+		}
+
+		$fix_arrays = false;
+		// For each file open it up and write it out!
+		foreach ($template_name as $template)
+		{
+			if (!$force_reload && isset($already_loaded[$template]) && $already_loaded[$template] === $lang)
+			{
+				return $lang;
 			}
 
-			// Figure out what the template function is named.
-			$theme_function = 'template_' . $sub_template_name;
-
-			if (function_exists($theme_function))
+			if ($template === 'index')
 			{
-				try
+				$fix_arrays = true;
+			}
+
+			// Do we want the English version of language file as fallback?
+			if (empty($modSettings['disable_language_fallback']) && $lang != 'english')
+			{
+				$this->loadLanguageFiles([$template], 'english', false);
+			}
+
+			// Try to find the language file.
+			$found = false;
+			foreach ($this->dirs as $template_dir)
+			{
+				if (file_exists(
+					$file =
+						$template_dir . '/languages/' . $lang . '/' . $template . '.' . $lang . '.php'
+				))
 				{
-					$theme_function();
-				} catch (Error $e)
-				{
-					$this->templateNotFound($e);
+					// Include it!
+					$this->templateInclude($file);
+
+					// Note that we found it.
+					$found = true;
+
+					// Keep track of what we're up to, soldier.
+					if ($db_show_debug === true)
+					{
+						Debug::instance()->add(
+							'language_files',
+							$template . '.' . $lang . ' (' . basename(
+								$settings['theme_url']
+							) . ')'
+						);
+					}
+
+					// Remember what we have loaded, and in which language.
+					$already_loaded[$template] = $lang;
+
+					break;
 				}
 			}
-			elseif ($fatal === false)
+
+			// That couldn't be found!  Log the error, but *try* to continue normally.
+			if (!$found && $fatal)
 			{
-				throw new Exception(
-					'theme_template_error',
-					'template',
-					[(string) $sub_template_name]
-				);
-			}
-			elseif ($fatal !== 'ignore')
-			{
-				throw new BadFunctionCallException(
-					Errors::instance()->log_error(
-						sprintf(
-							isset($txt['theme_template_error']) ? $txt['theme_template_error'] : 'Unable to load the %s sub template!',
-							(string) $sub_template_name
-						),
+				Errors::instance()->log_error(
+					sprintf(
+						$txt['theme_language_error'],
+						$template_name . '.' . $lang,
 						'template'
 					)
 				);
+				break;
 			}
 		}
+
+		if ($fix_arrays)
+		{
+			fix_calendar_text();
+		}
+
+		// Return the language actually loaded.
+		return $lang;
+	}
+
+	/**
+	 * This loads the bare minimum data.
+	 *
+	 * - Needed by scheduled tasks,
+	 * - Needed by any other code that needs language files before the forum (the theme)
+	 * is loaded.
+	 */
+	public function loadEssentialThemeData()
+	{
+		global $settings, $modSettings, $mbname, $context;
+
+		if (!function_exists('database'))
+		{
+			throw new \Exception('');
+		}
+
+		$db = database();
+
+		// Get all the default theme variables.
+		$db->fetchQuery(
+			'
+			SELECT id_theme, variable, value
+			FROM {db_prefix}themes
+			WHERE id_member = {int:no_member}
+				AND id_theme IN (1, {int:theme_guests})',
+			[
+				'no_member' => 0,
+				'theme_guests' => $modSettings['theme_guests'],
+			]
+		)->fetch_callback(
+			function ($row) {
+				global $settings;
+
+				$settings[$row['variable']] = $row['value'];
+				$indexes_to_default = [
+					'theme_dir',
+					'theme_url',
+					'images_url',
+				];
+
+				// Is this the default theme?
+				if ($row['id_theme'] == '1' && in_array($row['variable'], $indexes_to_default))
+				{
+					$settings['default_' . $row['variable']] = $row['value'];
+				}
+			}
+		);
+
+		// Check we have some directories setup.
+		if (!$this->hasDirectories())
+		{
+			$this->reloadDirectories($settings);
+		}
+
+		// Assume we want this.
+		$context['forum_name'] = $mbname;
+		$context['forum_name_html_safe'] = $context['forum_name'];
+
+		$this->loadLanguageFiles(['index', 'Addons']);
+	}
+
+	/**
+	 * Returns if theme directory's have been loaded
+	 *
+	 * @return bool
+	 */
+	public function hasDirectories()
+	{
+		return !empty($this->dirs);
 	}
 
 	/**
@@ -778,17 +739,68 @@ class Templates
 	}
 
 	/**
-	 * Add a template directory to the search stack
+	 * Load a sub-template.
 	 *
-	 * @param string $dir
+	 * What it does:
+	 * - loads the sub template specified by sub_template_name, which must be in an
+	 * already-loaded template.
+	 * - if ?debug is in the query string, shows administrators a marker after every sub
+	 * template for debugging purposes.
 	 *
-	 * @return $this
+	 * @param string $sub_template_name
+	 * @param bool|string $fatal = false, $fatal = true is for templates that
+	 *                           shouldn't get a 'pretty' error screen 'ignore' to skip
+	 *
+	 * @throws \ElkArte\Exceptions\Exception theme_template_error
+	 * @todo get rid of reading $_REQUEST directly
+	 *
 	 */
-	public function addDirectory($dir)
+	public function loadSubTemplate($sub_template_name, $fatal = false)
 	{
-		$this->dirs[] = (string) $dir;
+		global $txt, $db_show_debug;
 
-		return $this;
+		if (!empty($sub_template_name))
+		{
+			if ($db_show_debug === true)
+			{
+				Debug::instance()->add('sub_templates', $sub_template_name);
+			}
+
+			// Figure out what the template function is named.
+			$theme_function = 'template_' . $sub_template_name;
+
+			if (function_exists($theme_function))
+			{
+				try
+				{
+					$theme_function();
+				}
+				catch (Error $e)
+				{
+					$this->templateNotFound($e);
+				}
+			}
+			elseif ($fatal === false)
+			{
+				throw new Exception(
+					'theme_template_error',
+					'template',
+					[(string) $sub_template_name]
+				);
+			}
+			elseif ($fatal !== 'ignore')
+			{
+				throw new BadFunctionCallException(
+					Errors::instance()->log_error(
+						sprintf(
+							isset($txt['theme_template_error']) ? $txt['theme_template_error'] : 'Unable to load the %s sub template!',
+							(string) $sub_template_name
+						),
+						'template'
+					)
+				);
+			}
+		}
 	}
 
 	/**
@@ -799,16 +811,6 @@ class Templates
 	public function setDirectories(array $dirs)
 	{
 		$this->dirs = $dirs;
-	}
-
-	/**
-	 * Returns if theme directory's have been loaded
-	 *
-	 * @return bool
-	 */
-	public function hasDirectories()
-	{
-		return !empty($this->dirs);
 	}
 
 	/**

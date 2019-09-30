@@ -8,7 +8,7 @@
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause (see accompanying LICENSE.txt file)
  *
  * This file contains code covered by:
- * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * copyright: 2011 Simple Machines (http://www.simplemachines.org)
  *
  * @version 2.0 dev
  *
@@ -27,6 +27,7 @@ class Display implements DisplayInterface
 {
 	/**
 	 * Name of this payment gateway
+	 *
 	 * @var string
 	 */
 	public $title = 'twoCheckOut | 2co';
@@ -40,12 +41,10 @@ class Display implements DisplayInterface
 	{
 		global $txt;
 
-		$setting_data = array(
+		return array(
 			array('text', '2co_id', 'subtext' => $txt['2co_id_desc']),
 			array('text', '2co_password', 'subtext' => $txt['2co_password_desc']),
 		);
-
-		return $setting_data;
 	}
 
 	/**

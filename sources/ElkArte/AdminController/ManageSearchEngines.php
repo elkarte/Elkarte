@@ -8,7 +8,7 @@
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause (see accompanying LICENSE.txt file)
  *
  * This file contains code covered by:
- * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * copyright: 2011 Simple Machines (http://www.simplemachines.org)
  *
  * @version 2.0 dev
  *
@@ -16,13 +16,18 @@
 
 namespace ElkArte\AdminController;
 
+use ElkArte\AbstractController;
+use ElkArte\Action;
+use ElkArte\Cache\Cache;
+use ElkArte\SettingsForm\SettingsForm;
+
 /**
  * ManageSearchEngines admin controller. This class handles all search engines
  * pages in admin panel, forwards to display and allows to change options.
  *
  * @package SearchEngines
  */
-class ManageSearchEngines extends \ElkArte\AbstractController
+class ManageSearchEngines extends AbstractController
 {
 	/**
 	 * Entry point for this section.
@@ -46,7 +51,7 @@ class ManageSearchEngines extends \ElkArte\AbstractController
 		);
 
 		// Control
-		$action = new \ElkArte\Action('manage_search_engines');
+		$action = new Action('manage_search_engines');
 
 		// Some more tab data.
 		$context[$context['admin_menu_name']]['tab_data'] = array(
@@ -75,7 +80,7 @@ class ManageSearchEngines extends \ElkArte\AbstractController
 		global $context, $txt, $scripturl;
 
 		// Initialize the form
-		$settingsForm = new \ElkArte\SettingsForm\SettingsForm(\ElkArte\SettingsForm\SettingsForm::DB_ADAPTER);
+		$settingsForm = new SettingsForm(SettingsForm::DB_ADAPTER);
 
 		// Initialize it with our settings
 		$config_vars = $this->_settings();
@@ -86,7 +91,9 @@ class ManageSearchEngines extends \ElkArte\AbstractController
 
 		// Make sure it's valid - note that regular members are given id_group = 1 which is reversed in Load.php - no admins here!
 		if (isset($this->_req->post->spider_group) && !isset($config_vars['spider_group'][2][$this->_req->post->spider_group]))
+		{
 			$this->_req->post->spider_group = 0;
+		}
 
 		// Setup the template.
 		$context['page_title'] = $txt['settings'];
@@ -125,9 +132,11 @@ class ManageSearchEngines extends \ElkArte\AbstractController
 		foreach ($config_vars as $variable)
 		{
 			if ($variable[1] != 'spider_mode')
+			{
 				$javascript_function .= '
 				if (document.getElementById(\'' . $variable[1] . '\'))
 					document.getElementById(\'' . $variable[1] . '\').disabled = disabledState;';
+			}
 		}
 
 		$javascript_function .= '
@@ -163,9 +172,13 @@ class ManageSearchEngines extends \ElkArte\AbstractController
 		{
 			// Unfortunately, regular members have to be 1 because 0 is for disabled.
 			if ($row['id'] == 0)
+			{
 				$config_vars['spider_group'][2][1] = $row['name'];
+			}
 			else
+			{
 				$config_vars['spider_group'][2][$row['id']] = $row['name'];
+			}
 		}
 
 		// Notify the integration that we're preparing to mess up with search engine settings...
@@ -202,7 +215,9 @@ class ManageSearchEngines extends \ElkArte\AbstractController
 
 		// Are we adding a new one?
 		if (!empty($this->_req->post->addSpider))
+		{
 			return $this->action_editspiders();
+		}
 		// User pressed the 'remove selection button'.
 		elseif (!empty($this->_req->post->removeSpiders) && !empty($this->_req->post->remove) && is_array($this->_req->post->remove))
 		{
@@ -215,7 +230,7 @@ class ManageSearchEngines extends \ElkArte\AbstractController
 			// Delete them all!
 			removeSpiders($toRemove);
 
-			\ElkArte\Cache\Cache::instance()->remove('spider_search');
+			Cache::instance()->remove('spider_search');
 			recacheSpiderNames();
 		}
 
@@ -358,14 +373,16 @@ class ManageSearchEngines extends \ElkArte\AbstractController
 			{
 				$test = ip2range(trim($set));
 				if (!empty($test))
+				{
 					$ips[] = $set;
+				}
 			}
 			$ips = implode(',', $ips);
 
 			// Goes in as it is...
 			updateSpider($context['id_spider'], $this->_req->post->spider_name, $this->_req->post->spider_agent, $ips);
 
-			\ElkArte\Cache\Cache::instance()->remove('spider_search');
+			Cache::instance()->remove('spider_search');
 			recacheSpiderNames();
 
 			redirectexit('action=admin;area=sengines;sa=spiders');
@@ -381,7 +398,9 @@ class ManageSearchEngines extends \ElkArte\AbstractController
 
 		// An edit?
 		if ($context['id_spider'])
+		{
 			$context['spider'] = getSpiderDetails($context['id_spider']);
+		}
 
 		createToken('admin-ses');
 	}
@@ -493,16 +512,22 @@ class ManageSearchEngines extends \ElkArte\AbstractController
 			{
 				// Feature disabled?
 				if (empty($row['data']['viewing']['value']) && isset($modSettings['spider_mode']) && $modSettings['spider_mode'] < 3)
+				{
 					$context['spider_logs']['rows'][$k]['data']['viewing']['value'] = '<em>' . $txt['spider_disabled'] . '</em>';
+				}
 				else
+				{
 					$urls[$k] = array($row['data']['viewing']['value'], -1);
+				}
 			}
 
 			// Now stick in the new URLs.
 			require_once(SUBSDIR . '/Who.subs.php');
 			$urls = determineActions($urls, 'whospider_');
 			foreach ($urls as $k => $new_url)
+			{
 				$context['spider_logs']['rows'][$k]['data']['viewing']['value'] = $new_url;
+			}
 		}
 
 		$context['page_title'] = $txt['spider_logs'];
@@ -554,12 +579,18 @@ class ManageSearchEngines extends \ElkArte\AbstractController
 			<select name="new_date" onchange="document.spider_stat_list.submit();">';
 
 		if (empty($date_choices))
+		{
 			$date_select .= '
 				<option></option>';
+		}
 		else
+		{
 			foreach ($date_choices as $id => $text)
+			{
 				$date_select .= '
 				<option value="' . $id . '"' . ($current_date == $id ? ' selected="selected"' : '') . '>' . $text . '</option>';
+			}
+		}
 
 		$date_select .= '
 			</select>

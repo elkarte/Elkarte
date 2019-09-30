@@ -8,14 +8,17 @@
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause (see accompanying LICENSE.txt file)
  *
  * This file contains code covered by:
- * copyright:    2011 Simple Machines (http://www.simplemachines.org)
+ * copyright: 2011 Simple Machines (http://www.simplemachines.org)
  *
  * @version 2.0 dev
  *
  */
 
 namespace ElkArte\SettingsForm\SettingsFormAdapter;
+
 use BBC\ParserWrapper;
+use ElkArte\DataValidator;
+use ElkArte\Util;
 
 /**
  * Class Db
@@ -95,100 +98,35 @@ class Db extends Adapter
 	}
 
 	/**
-	 * Initialize inline permissions settings.
+	 * Simply create the config var label value
+	 *
+	 * @param array $configVar
 	 */
-	private function init_inline_permissions()
+	private function prepareLabel($configVar)
 	{
-		global $context;
+		global $txt;
 
-		$inlinePermissions = array_filter($this->configVars,
-			function ($configVar)
-			{
-				return isset($configVar[0]) && $configVar[0] === 'permissions';
-			}
-		);
-
-		if (empty($inlinePermissions))
+		// See if there are any labels that might fit?
+		if (isset($configVar['text_label']))
 		{
-			return;
+			$this->context[$configVar[1]]['label'] = $configVar['text_label'];
 		}
-
-		$permissionsForm = new InlinePermissions;
-		$permissionsForm->setExcludedGroups(isset($context['permissions_excluded']) ? $context['permissions_excluded'] : array());
-		$permissionsForm->setPermissions($inlinePermissions);
-		$permissionsForm->prepare();
-	}
-
-	/**
-	 * @param mixed[] $configVar
-	 * @param string  $str
-	 *
-	 * @return string
-	 */
-	private function revertMasks(array $configVar, $str)
-	{
-		$known_rules = array(
-			'nohtml' => 'htmlspecialchars_decode[' . ENT_NOQUOTES . ']',
-		);
-		return $this->applyMasks($configVar, $str, $known_rules);
-	}
-
-	/**
-	 * @param mixed[] $configVar
-	 * @param string  $str
-	 *
-	 * @return string
-	 */
-	private function setMasks(array $configVar, $str)
-	{
-		$known_rules = array(
-			'nohtml' => '\\ElkArte\\Util::htmlspecialchars[' . ENT_QUOTES . ']',
-			'email' => 'valid_email',
-			'url' => 'valid_url',
-		);
-		return $this->applyMasks($configVar, $str, $known_rules);
-	}
-
-	/**
-	 * @param mixed[] $configVar
-	 * @param string  $str
-	 * @param array   $known_rules
-	 *
-	 * @return string
-	 */
-	private function applyMasks(array $configVar, $str, $known_rules)
-	{
-		if (isset($configVar['mask']))
+		elseif (isset($txt[$configVar[1]]))
 		{
-			$rules = array();
-			if (!is_array($configVar['mask']))
-			{
-				$configVar['mask'] = array($configVar['mask']);
-			}
-			foreach ($configVar['mask'] as $key => $mask)
-			{
-				if (isset($known_rules[$mask]))
-				{
-					$rules[$configVar[1]][] = $known_rules[$mask];
-				}
-				else
-				{
-					$rules[$configVar[1]][] = $mask;
-				}
-			}
-			if (!empty($rules))
-			{
-				$rules[$configVar[1]] = implode('|', $rules[$configVar[1]]);
-
-				$validator = new \ElkArte\DataValidator();
-				$validator->sanitation_rules($rules);
-				$validator->validate(array($configVar[1] => $str));
-
-				return $validator->{$configVar[1]};
-			}
+			$this->context[$configVar[1]]['label'] = $txt[$configVar[1]];
 		}
-
-		return $str;
+		elseif (isset($txt['setting_' . $configVar[1]]))
+		{
+			$this->context[$configVar[1]]['label'] = $txt['setting_' . $configVar[1]];
+		}
+		elseif (isset($txt['groups_' . $configVar[1]]))
+		{
+			$this->context[$configVar[1]]['label'] = $txt['groups_' . $configVar[1]];
+		}
+		else
+		{
+			$this->context[$configVar[1]]['label'] = $configVar[1];
+		}
 	}
 
 	/**
@@ -202,7 +140,7 @@ class Db extends Adapter
 			if ($configVar[0] === 'select' && !empty($configVar['multiple']))
 			{
 				$this->context[$configVar[1]]['name'] .= '[]';
-				$this->context[$configVar[1]]['value'] = !empty($this->context[$configVar[1]]['value']) ? \ElkArte\Util::unserialize($this->context[$configVar[1]]['value']) : array();
+				$this->context[$configVar[1]]['value'] = !empty($this->context[$configVar[1]]['value']) ? Util::unserialize($this->context[$configVar[1]]['value']) : array();
 			}
 
 			// If it's associative
@@ -218,6 +156,56 @@ class Db extends Adapter
 				}
 			}
 		}
+	}
+
+	/**
+	 * @param mixed[] $configVar
+	 * @param string $str
+	 *
+	 * @return string
+	 */
+	private function revertMasks(array $configVar, $str)
+	{
+		$known_rules = array(
+			'nohtml' => 'htmlspecialchars_decode[' . ENT_NOQUOTES . ']',
+		);
+
+		return $this->applyMasks($configVar, $str, $known_rules);
+	}
+
+	/**
+	 * @param mixed[] $configVar
+	 * @param string $str
+	 * @param array $known_rules
+	 *
+	 * @return string
+	 */
+	private function applyMasks(array $configVar, $str, $known_rules)
+	{
+		if (isset($configVar['mask']))
+		{
+			$rules = array();
+			if (!is_array($configVar['mask']))
+			{
+				$configVar['mask'] = array($configVar['mask']);
+			}
+			foreach ($configVar['mask'] as $key => $mask)
+			{
+				$rules[$configVar[1]][] = isset($known_rules[$mask]) ? $known_rules[$mask] : $mask;
+			}
+			if (!empty($rules))
+			{
+				$rules[$configVar[1]] = implode('|', $rules[$configVar[1]]);
+
+				$validator = new DataValidator();
+				$validator->sanitation_rules($rules);
+				$validator->validate(array($configVar[1] => $str));
+
+				return $validator->{$configVar[1]};
+			}
+		}
+
+		return $str;
 	}
 
 	/**
@@ -252,57 +240,27 @@ class Db extends Adapter
 	}
 
 	/**
-	 * @param string[] $var
-	 *
-	 * @return string
+	 * Initialize inline permissions settings.
 	 */
-	private function setBbcChoices($var)
+	private function init_inline_permissions()
 	{
-		$codes = ParserWrapper::instance()->getCodes();
-		$bbcTags = $codes->getTags();
+		global $context;
 
-		if (!isset($this->configValues[$var[1] . '_enabledTags']))
+		$inlinePermissions = array_filter($this->configVars,
+			function ($configVar) {
+				return isset($configVar[0]) && $configVar[0] === 'permissions';
+			}
+		);
+
+		if (empty($inlinePermissions))
 		{
-			$this->configValues[$var[1] . '_enabledTags'] = array();
-		}
-		elseif (!is_array($this->configValues[$var[1] . '_enabledTags']))
-		{
-			$this->configValues[$var[1] . '_enabledTags'] = array($this->configValues[$var[1] . '_enabledTags']);
+			return;
 		}
 
-		return implode(',', array_diff($bbcTags, $this->configValues[$var[1] . '_enabledTags']));
-	}
-
-	/**
-	 * Simply create the config var label value
-	 *
-	 * @param array $configVar
-	 */
-	private function prepareLabel($configVar)
-	{
-		global $txt;
-
-		// See if there are any labels that might fit?
-		if (isset($configVar['text_label']))
-		{
-			$this->context[$configVar[1]]['label'] = $configVar['text_label'];
-		}
-		elseif (isset($txt[$configVar[1]]))
-		{
-			$this->context[$configVar[1]]['label'] = $txt[$configVar[1]];
-		}
-		elseif (isset($txt['setting_' . $configVar[1]]))
-		{
-			$this->context[$configVar[1]]['label'] = $txt['setting_' . $configVar[1]];
-		}
-		elseif (isset($txt['groups_' . $configVar[1]]))
-		{
-			$this->context[$configVar[1]]['label'] = $txt['groups_' . $configVar[1]];
-		}
-		else
-		{
-			$this->context[$configVar[1]]['label'] = $configVar[1];
-		}
+		$permissionsForm = new InlinePermissions;
+		$permissionsForm->setExcludedGroups(isset($context['permissions_excluded']) ? $context['permissions_excluded'] : array());
+		$permissionsForm->setPermissions($inlinePermissions);
+		$permissionsForm->prepare();
 	}
 
 	/**
@@ -313,8 +271,7 @@ class Db extends Adapter
 		global $helptxt, $modSettings;
 
 		$bbcChoice = array_filter($this->configVars,
-			function ($configVar)
-			{
+			function ($configVar) {
 				return isset($configVar[0]) && $configVar[0] === 'bbc';
 			}
 		);
@@ -347,74 +304,6 @@ class Db extends Adapter
 				'data' => $bbc_sections,
 			), $this->context[$configVar[1]]);
 		}
-	}
-
-	/**
-	 * Cast all the config vars as defined
-	 *
-	 * @return array
-	 */
-	protected function sanitizeVars()
-	{
-		$setTypes = array();
-		$setArray = array();
-		foreach ($this->configVars as $var)
-		{
-			if (!isset($var[1]) || !isset($this->configValues[$var[1]]) && $var[0] !== 'check')
-			{
-				continue;
-			}
-			$setTypes[$var[1]] = $var[1];
-			switch ($var[0])
-			{
-				case 'check':
-					$setTypes[$var[1]] = 'int';
-					$setArray[$var[1]] = (int) !empty($this->configValues[$var[1]]);
-					break;
-				case 'select':
-					// Select boxes!
-					$setTypes[$var[1]] = 'string';
-					if (empty($var['multiple']) && in_array($this->configValues[$var[1]], array_keys($var[2])))
-					{
-						$setArray[$var[1]] = $this->configValues[$var[1]];
-					}
-					elseif (!empty($var['multiple']))
-					{
-						// For security purposes we validate this line by line.
-						$setArray[$var[1]] = serialize(array_intersect($this->configValues[$var[1]], array_keys($var[2])));
-					}
-					break;
-				case 'int':
-					// Integers!
-					$setArray[$var[1]] = (int) $this->configValues[$var[1]];
-					break;
-				case 'float':
-					// Floating point!
-					$setArray[$var[1]] = (float) $this->configValues[$var[1]];
-					break;
-				case 'text':
-				case 'color':
-				case 'large_text':
-					// Text!
-					$setTypes[$var[1]] = 'string';
-					$setArray[$var[1]] = $this->setMasks($var, $this->configValues[$var[1]]);
-					break;
-				case 'password':
-					// Passwords!
-					$setTypes[$var[1]] = 'string';
-					if (isset($this->configValues[$var[1]][1]) && $this->configValues[$var[1]][0] == $this->configValues[$var[1]][1])
-					{
-						$setArray[$var[1]] = $this->configValues[$var[1]][0];
-					}
-					break;
-				case 'bbc':
-					// BBC.
-					$setTypes[$var[1]] = 'string';
-					$setArray[$var[1]] = $this->setBbcChoices($var);
-					break;
-			}
-		}
-		return array($setArray, $setTypes);
 	}
 
 	/**
@@ -453,5 +342,114 @@ class Db extends Adapter
 			$permissionsForm->setPermissions($inlinePermissions);
 			$permissionsForm->save();
 		}
+	}
+
+	/**
+	 * Cast all the config vars as defined
+	 *
+	 * @return array
+	 */
+	protected function sanitizeVars()
+	{
+		$setTypes = array();
+		$setArray = array();
+		foreach ($this->configVars as $var)
+		{
+			if (!isset($var[1]) || !isset($this->configValues[$var[1]]) && $var[0] !== 'check')
+			{
+				continue;
+			}
+			$setTypes[$var[1]] = $var[1];
+			switch ($var[0])
+			{
+				case 'check':
+					$setTypes[$var[1]] = 'int';
+					$setArray[$var[1]] = (int) !empty($this->configValues[$var[1]]);
+					break;
+				case 'select':
+					// Select boxes!
+					$setTypes[$var[1]] = 'string';
+
+					if (empty($var['multiple']) && array_key_exists($this->configValues[$var[1]], $var[2]))
+					{
+						$setArray[$var[1]] = $this->configValues[$var[1]];
+					}
+					elseif (!empty($var['multiple']))
+					{
+						// For security purposes we validate this line by line.
+						$setArray[$var[1]] = serialize(array_intersect($this->configValues[$var[1]], array_keys($var[2])));
+					}
+					break;
+				case 'int':
+					// Integers!
+					$setArray[$var[1]] = (int) $this->configValues[$var[1]];
+					break;
+				case 'float':
+					// Floating point!
+					$setArray[$var[1]] = (float) $this->configValues[$var[1]];
+					break;
+				case 'text':
+				case 'color':
+				case 'large_text':
+					// Text!
+					$setTypes[$var[1]] = 'string';
+					$setArray[$var[1]] = $this->setMasks($var, $this->configValues[$var[1]]);
+					break;
+				case 'password':
+					// Passwords!
+					$setTypes[$var[1]] = 'string';
+					if (isset($this->configValues[$var[1]][1]) && $this->configValues[$var[1]][0] === $this->configValues[$var[1]][1])
+					{
+						$setArray[$var[1]] = $this->configValues[$var[1]][0];
+					}
+					break;
+				case 'bbc':
+					// BBC.
+					$setTypes[$var[1]] = 'string';
+					$setArray[$var[1]] = $this->setBbcChoices($var);
+					break;
+			}
+		}
+
+		return array($setArray, $setTypes);
+	}
+
+	/**
+	 * @param mixed[] $configVar
+	 * @param string $str
+	 *
+	 * @return string
+	 */
+	private function setMasks(array $configVar, $str)
+	{
+		$known_rules = array(
+			'nohtml' => '\\ElkArte\\Util::htmlspecialchars[' . ENT_QUOTES . ']',
+			'email' => 'valid_email',
+			'url' => 'valid_url',
+		);
+
+		return $this->applyMasks($configVar, $str, $known_rules);
+	}
+
+	/**
+	 * @param string[] $var
+	 *
+	 * @return string
+	 */
+	private function setBbcChoices($var)
+	{
+		$codes = ParserWrapper::instance()->getCodes();
+		$bbcTags = $codes->getTags();
+
+		if (!isset($this->configValues[$var[1] . '_enabledTags']))
+		{
+			$this->configValues[$var[1] . '_enabledTags'] = array();
+		}
+		elseif (!is_array($this->configValues[$var[1] . '_enabledTags']))
+		{
+			$this->configValues[$var[1] . '_enabledTags'] = array($this->configValues[$var[1] . '_enabledTags']);
+		}
+
+		return implode(',', array_diff($bbcTags, $this->configValues[$var[1] . '_enabledTags']));
 	}
 }

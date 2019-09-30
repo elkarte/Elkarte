@@ -14,8 +14,9 @@
 
 namespace ElkArte\MessagesCallback;
 
-use \ElkArte\MessagesCallback\BodyParser\BodyParserInterface;
-use \ElkArte\ValuesContainer;
+use ElkArte\MembersList;
+use ElkArte\MessagesCallback\BodyParser\BodyParserInterface;
+use ElkArte\ValuesContainer;
 
 /**
  * Class Renderer
@@ -32,54 +33,63 @@ abstract class Renderer
 {
 	/**
 	 * The request object
+	 *
 	 * @var Object
 	 */
 	protected $_dbRequest = null;
 
 	/**
 	 * The current user data
+	 *
 	 * @var \ElkArte\UserInfo
 	 */
 	protected $user = null;
 
 	/**
 	 * The parser that will convert the body
+	 *
 	 * @var BodyParserInterface
 	 */
 	protected $_bodyParser = null;
 
 	/**
 	 * The database object
+	 *
 	 * @var Object
 	 */
 	protected $_db = null;
 
 	/**
 	 * Some options
+	 *
 	 * @var ValuesContainer
 	 */
 	protected $_options = null;
 
 	/**
 	 * Position tracker, to know where we are into the request
+	 *
 	 * @var int
 	 */
 	protected $_counter = 0;
 
 	/**
 	 * Should we show the signature of this message?
+	 *
 	 * @var bool
 	 */
 	protected $_signature_shown = null;
 
 	/**
 	 * The current message being prepared
+	 *
 	 * @var mixed[]
 	 */
 	protected $_this_message = null;
 
 	/**
 	 * Index mapping, to normalize certain indexes across requests
+	 *
 	 * @var ValuesContainer
 	 */
 	protected $_idx_mapper = array();
@@ -88,6 +98,7 @@ abstract class Renderer
 	 * Renderer constructor, starts everything.
 	 *
 	 * @param Object $request
+	 * @param Object $user
 	 * @param BodyParserInterface $bodyParser
 	 * @param ValuesContainer $opt
 	 * @throws \Exception
@@ -108,14 +119,7 @@ abstract class Renderer
 		// opt:
 		// icon_sources
 		// show_signatures
-		if ($opt === null)
-		{
-			$this->_options = new ValuesContainer();
-		}
-		else
-		{
-			$this->_options = $opt;
-		}
+		$this->_options = $opt === null ? new ValuesContainer() : $opt;
 	}
 
 	/**
@@ -138,13 +142,13 @@ abstract class Renderer
 		}
 
 		// Remember which message this is.  (ie. reply #83)
-		if ($this->_counter === null || $reset === true)
+		if ($this->_counter === null || $reset)
 		{
 			$this->_counter = $context['start'];
 		}
 
 		// Start from the beginning...
-		if ($reset === true)
+		if ($reset)
 		{
 			$this->_currentContext($reset);
 		}
@@ -165,7 +169,7 @@ abstract class Renderer
 		$this->_setupPermissions();
 
 		$id_member = $this->_this_message[$this->_idx_mapper->id_member];
-		$member_context = \ElkArte\MembersList::get($id_member);
+		$member_context = MembersList::get($id_member);
 		$member_context->loadContext();
 
 		// If it couldn't load, or the user was a guest.... someday may be done with a guest table.
@@ -325,7 +329,7 @@ abstract class Renderer
 		return array(
 			'alternate' => $this->_counter % 2,
 			'id' => $this->_this_message[$this->_idx_mapper->id_msg],
-			'member' => \ElkArte\MembersList::get($this->_this_message[$this->_idx_mapper->id_member]),
+			'member' => MembersList::get($this->_this_message[$this->_idx_mapper->id_member]),
 			'subject' => $this->_this_message['subject'],
 			'html_time' => htmlTime($this->_this_message[$this->_idx_mapper->time]),
 			'time' => standardTime($this->_this_message[$this->_idx_mapper->time]),

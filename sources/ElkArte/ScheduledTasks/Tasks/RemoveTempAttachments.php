@@ -8,7 +8,7 @@
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause (see accompanying LICENSE.txt file)
  *
  * This file contains code covered by:
- * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * copyright: 2011 Simple Machines (http://www.simplemachines.org)
  *
  * @version 2.0 dev
  *
@@ -16,7 +16,7 @@
 
 namespace ElkArte\ScheduledTasks\Tasks;
 
-use \UnexpectedValueException;
+use ElkArte\Errors\Errors;
 
 /**
  * Class Remove_Temp_Attachments - Check for un-posted attachments is something we can do once in a while :P
@@ -31,6 +31,8 @@ class RemoveTempAttachments implements ScheduledTaskInterface
 	 * Clean up the file system by removing up-posted or failed attachments
 	 *
 	 * @return bool
+	 * @return bool
+	 * @throws \Exception
 	 */
 	public function run()
 	{
@@ -51,17 +53,19 @@ class RemoveTempAttachments implements ScheduledTaskInterface
 					{
 						// Temp file is more than 5 hours old!
 						if ($file->getMTime() < time() - 18000)
+						{
 							@unlink($file->getPathname());
+						}
 					}
 				}
 			}
-			catch (UnexpectedValueException $e)
+			catch (\UnexpectedValueException $e)
 			{
 				theme()->getTemplates()->loadEssentialThemeData();
 				theme()->getTemplates()->loadLanguageFile('Post');
 
 				$context['scheduled_errors']['remove_temp_attachments'][] = $txt['cant_access_upload_path'] . ' (' . $attach_dir . ')';
-				\ElkArte\Errors\Errors::instance()->log_error($txt['cant_access_upload_path'] . ' (' . $e->getMessage() . ')', 'critical');
+				Errors::instance()->log_error($txt['cant_access_upload_path'] . ' (' . $e->getMessage() . ')', 'critical');
 
 				return false;
 			}

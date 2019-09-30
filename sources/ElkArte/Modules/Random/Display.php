@@ -13,10 +13,13 @@
 
 namespace ElkArte\Modules\Random;
 
+use ElkArte\EventManager;
+use ElkArte\Modules\AbstractModule;
+
 /**
  * Class \ElkArte\Modules\Random\Display
  */
-class Display extends \ElkArte\Modules\AbstractModule
+class Display extends AbstractModule
 {
 	/**
 	 * @var bool
@@ -26,7 +29,7 @@ class Display extends \ElkArte\Modules\AbstractModule
 	/**
 	 * {@inheritdoc }
 	 */
-	public static function hooks(\ElkArte\EventManager $eventsManager)
+	public static function hooks(EventManager $eventsManager)
 	{
 		global $modSettings;
 
@@ -92,7 +95,9 @@ class Display extends \ElkArte\Modules\AbstractModule
 
 			// Derived from, set the link back
 			if (!empty($context['topic_derived_from']))
+			{
 				$context['links']['derived_from'] = $scripturl . '?msg=' . $context['topic_derived_from']['derived_from'];
+			}
 		}
 	}
 

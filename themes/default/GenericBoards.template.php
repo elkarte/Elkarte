@@ -6,11 +6,13 @@
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause (see accompanying LICENSE.txt file)
  *
  * This file contains code covered by:
- * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * copyright: 2011 Simple Machines (http://www.simplemachines.org)
  *
  * @version 2.0 dev
  *
  */
+
+use ElkArte\Util;
 
 /**
  * Helper function to subdivide the boards in a number of sets with
@@ -59,9 +61,13 @@ function optimizeBoardsSubdivision($categories, $total_boards)
 		$diff_alternate = $diff_current - 2 * ($categories[$last_group] + 1);
 
 		if (abs($diff_alternate) < $diff_current)
+		{
 			array_unshift($groups[1], $last_group);
+		}
 		else
+		{
 			$groups[0][] = $last_group;
+		}
 	}
 	// If we have less on the left, let's try picking one from the right
 	elseif ($diff_current < 0)
@@ -71,9 +77,13 @@ function optimizeBoardsSubdivision($categories, $total_boards)
 		$diff_alternate = $diff_current + 2 * ($categories[$first_group] + 1);
 
 		if (abs($diff_alternate) < abs($diff_current))
+		{
 			$groups[0][] = $first_group;
+		}
 		else
+		{
 			array_unshift($groups[1], $first_group);
+		}
 	}
 
 	return $groups;
@@ -105,18 +115,24 @@ function template_list_boards(array $boards, $id)
 
 		// If the board or children is new, show an indicator.
 		if ($board['new'] || $board['children_new'])
+		{
 			echo '
 							<span class="board_icon ', $board['new'] ? 'i-board-new' : 'i-board-sub', '" title="', $txt['new_posts'], '"></span>';
+		}
 
 		// Is it a redirection board?
 		elseif ($board['is_redirect'])
+		{
 			echo '
-							<span class="board_icon i-board-redirect" title="', sprintf($txt['redirect_board_to'], \ElkArte\Util::htmlspecialchars($board['name'])), '"></span>';
+							<span class="board_icon i-board-redirect" title="', sprintf($txt['redirect_board_to'], Util::htmlspecialchars($board['name'])), '"></span>';
+		}
 
 		// No new posts at all! The agony!!
 		else
+		{
 			echo '
 							<span class="board_icon i-board-off" title="', $txt['old_posts'], '"></span>';
+		}
 
 		echo '
 						</a>
@@ -125,8 +141,10 @@ function template_list_boards(array $boards, $id)
 
 		// Has it outstanding posts for approval? @todo - Might change presentation here.
 		if ($board['can_approve_posts'] && ($board['unapproved_posts'] || $board['unapproved_topics']))
+		{
 			echo '
 							<a href="', $scripturl, '?action=moderate;area=postmod;sa=', ($board['unapproved_topics'] > 0 ? 'topics' : 'posts'), ';brd=', $board['id'], ';', $context['session_var'], '=', $context['session_id'], '" title="', sprintf($txt['unapproved_posts'], $board['unapproved_topics'], $board['unapproved_posts']), '" class="moderation_link"><i class="icon i-alert"></i></a>';
+		}
 
 		echo '
 						</h3>
@@ -134,8 +152,10 @@ function template_list_boards(array $boards, $id)
 
 		// Show the "Moderators: ". Each has name, href, link, and id. (but we're gonna use link_moderators.)
 		if (!empty($board['moderators']))
+		{
 			echo '
 						<p class="moderators">', count($board['moderators']) === 1 ? $txt['moderator'] : $txt['moderators'], ': ', implode(', ', $board['link_moderators']), '</p>';
+		}
 
 		// Show some basic information about the number of posts, etc.
 		echo '
@@ -155,11 +175,16 @@ function template_list_boards(array $boards, $id)
 						<p class="board_lastpost">';
 
 			if (!empty($board['last_post']['member']['avatar']))
+			{
 				echo '
 							<span class="board_avatar"><a href="', $board['last_post']['member']['href'], '"><img class="avatar" src="', $board['last_post']['member']['avatar']['href'], '" alt="" /></a></span>';
+			}
 			else
+			{
 				echo '
 							<span class="board_avatar"><a href="#"></a></span>';
+			}
+
 			echo '
 							', $board['last_post']['last_post_message'], '
 						</p>';
@@ -180,13 +205,19 @@ function template_list_boards(array $boards, $id)
 			foreach ($board['children'] as $child)
 			{
 				if (!$child['is_redirect'])
+				{
 					$child['link'] = '<a href="' . $child['href'] . '" ' . ($child['new'] ? 'class="board_new_posts" ' : '') . 'title="' . ($child['new'] ? $txt['new_posts'] : $txt['old_posts']) . ' (' . $txt['board_topics'] . ': ' . comma_format($child['topics']) . ', ' . $txt['posts'] . ': ' . comma_format($child['posts']) . ')">' . $child['name'] . ($child['new'] ? '</a> <a ' . ($child['new'] ? 'class="new_posts" ' : '') . 'href="' . $scripturl . '?action=unread;board=' . $child['id'] . '" title="' . $txt['new_posts'] . ' (' . $txt['board_topics'] . ': ' . comma_format($child['topics']) . ', ' . $txt['posts'] . ': ' . comma_format($child['posts']) . ')"><span class="new_posts">' . $txt['new'] . '</span>' : '') . '</a>';
+				}
 				else
+				{
 					$child['link'] = '<a href="' . $child['href'] . '" title="' . comma_format($child['posts']) . ' ' . $txt['redirects'] . '">' . $child['name'] . '</a>';
+				}
 
 				// Has it posts awaiting approval?
 				if ($child['can_approve_posts'] && ($child['unapproved_posts'] || $child['unapproved_topics']))
+				{
 					$child['link'] .= ' <a href="' . $scripturl . '?action=moderate;area=postmod;sa=' . ($child['unapproved_topics'] > 0 ? 'topics' : 'posts') . ';brd=' . $child['id'] . ';' . $context['session_var'] . '=' . $context['session_id'] . '" title="' . sprintf($txt['unapproved_posts'], $child['unapproved_topics'], $child['unapproved_posts']) . '" class="moderation_link"><i class="icon i-alert"></i></a>';
+				}
 
 				$children[] = $child['link'];
 			}
@@ -225,6 +256,7 @@ function template_pick_boards($form_name, $input_names = 'brd', $select_all = tr
 	global $context, $txt;
 
 	if ($select_all)
+	{
 		echo '
 						<h3 class="secondary_header panel_toggle">
 							<span>
@@ -233,6 +265,7 @@ function template_pick_boards($form_name, $input_names = 'brd', $select_all = tr
 							<a href="#" id="advanced_panel_link">', $txt['choose_board'], '</a>
 						</h3>
 						<div id="advanced_panel_div"', $context['boards_check_all'] ? ' class="hide"' : '', '>';
+	}
 
 	// Make two nice columns of boards, link each category header to toggle select all boards in each
 	$group_cats = optimizeBoardsSubdivision($context['boards_in_category'], $context['num_boards']);

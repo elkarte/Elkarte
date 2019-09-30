@@ -11,11 +11,14 @@
  *
  */
 
+use ElkArte\Util;
+use ElkArte\XmlArray;
+
 /**
  * Removes the given language from all members..
  *
- * @package Languages
  * @param int $lang_id
+ * @package Languages
  */
 function removeLanguageFromMember($lang_id)
 {
@@ -74,9 +77,13 @@ function list_getLanguages()
 	// Put them back.
 	$settings['actual_theme_dir'] = $backup_actual_theme_dir;
 	if (!empty($backup_base_theme_dir))
+	{
 		$settings['base_theme_dir'] = $backup_base_theme_dir;
+	}
 	else
+	{
 		unset($settings['base_theme_dir']);
+	}
 
 	// Get the language files and data...
 	foreach ($all_languages as $lang)
@@ -90,7 +97,7 @@ function list_getLanguages()
 			'char_set' => 'UTF-8',
 			'default' => $language == $lang['filename'] || ($language == '' && $lang['filename'] == 'english'),
 			'locale' => $txt['lang_locale'],
-			'name' => \ElkArte\Util::ucwords(strtr($lang['filename'], array('_' => ' ', '-utf8' => ''))),
+			'name' => Util::ucwords(strtr($lang['filename'], array('_' => ' ', '-utf8' => ''))),
 		);
 	}
 
@@ -99,19 +106,24 @@ function list_getLanguages()
 		SELECT lngfile, COUNT(*) AS num_users
 		FROM {db_prefix}members
 		GROUP BY lngfile',
-		array(
-		)
+		array()
 	);
 	while ($row = $db->fetch_assoc($request))
 	{
 		// Default?
 		if (empty($row['lngfile']) || !isset($languages[$row['lngfile']]))
+		{
 			$row['lngfile'] = $language;
+		}
 
 		if (!isset($languages[$row['lngfile']]) && isset($languages['english']))
+		{
 			$languages['english']['count'] += $row['num_users'];
+		}
 		elseif (isset($languages[$row['lngfile']]))
+		{
 			$languages[$row['lngfile']]['count'] += $row['num_users'];
+		}
 	}
 	$db->free_result($request);
 
@@ -125,12 +137,12 @@ function list_getLanguages()
 /**
  * This function cleans language entries to/from display.
  *
- * @package Languages
- *
  * @param string $string
  * @param boolean $to_display
  *
  * @return null|string|string[]
+ * @package Languages
+ *
  */
 function cleanLangString($string, $to_display = true)
 {
@@ -152,7 +164,9 @@ function cleanLangString($string, $to_display = true)
 
 				// If we're now escaped don't add this string.
 				if ($is_escape)
+				{
 					continue;
+				}
 			}
 			// Special case - parsed string with line break etc?
 			elseif (($string[$i] == 'n' || $string[$i] == 't') && $in_string == 2 && $is_escape)
@@ -170,10 +184,14 @@ function cleanLangString($string, $to_display = true)
 				{
 					// Is it the end of a single quote string?
 					if ($in_string == 1)
+					{
 						$in_string = 0;
+					}
 					// Otherwise it's the start!
 					else
+					{
 						$in_string = 1;
+					}
 
 					// Don't actually include this character!
 					continue;
@@ -187,10 +205,14 @@ function cleanLangString($string, $to_display = true)
 				{
 					// Is it the end of a double quote string?
 					if ($in_string == 2)
+					{
 						$in_string = 0;
+					}
 					// Otherwise it's the start!
 					else
+					{
 						$in_string = 2;
+					}
 
 					// Don't actually include this character!
 					continue;
@@ -198,7 +220,9 @@ function cleanLangString($string, $to_display = true)
 			}
 			// A join/space outside of a string is simply removed.
 			elseif ($in_string == 0 && (empty($string[$i]) || $string[$i] == '.'))
+			{
 				continue;
+			}
 			// Start of a variable?
 			elseif ($in_string == 0 && $string[$i] == '$')
 			{
@@ -230,7 +254,7 @@ function cleanLangString($string, $to_display = true)
 		}
 
 		// Un-html then re-html the whole thing!
-		$new_string = \ElkArte\Util::htmlspecialchars(un_htmlspecialchars($new_string));
+		$new_string = Util::htmlspecialchars(un_htmlspecialchars($new_string));
 	}
 	else
 	{
@@ -264,9 +288,13 @@ function cleanLangString($string, $to_display = true)
 				if (!empty($matches[1]))
 				{
 					if ($in_string == 1)
+					{
 						$new_string .= '\' . ';
+					}
 					elseif ($new_string)
+					{
 						$new_string .= ' . ';
+					}
 
 					$new_string .= $matches[1];
 					$i += strlen($matches[1]) + 3;
@@ -280,7 +308,9 @@ function cleanLangString($string, $to_display = true)
 			{
 				// Probably HTML?
 				if ($string[$i + 1] != ' ')
+				{
 					$in_html = true;
+				}
 				// Assume we need an entity...
 				else
 				{
@@ -293,7 +323,9 @@ function cleanLangString($string, $to_display = true)
 			{
 				// Will it be HTML?
 				if ($in_html)
+				{
 					$in_html = false;
+				}
 				// Otherwise we need an entity...
 				else
 				{
@@ -303,7 +335,9 @@ function cleanLangString($string, $to_display = true)
 			}
 			// Is it a slash? If so escape it...
 			if ($string[$i] == '\\')
+			{
 				$new_string .= '\\';
+			}
 			// The infamous double quote?
 			elseif ($string[$i] == '"')
 			{
@@ -327,9 +361,13 @@ function cleanLangString($string, $to_display = true)
 
 		// If we ended as a string then close it off.
 		if ($in_string == 1)
+		{
 			$new_string .= '\'';
+		}
 		elseif ($in_string == 2)
+		{
 			$new_string .= '"';
+		}
 	}
 
 	return $new_string;
@@ -340,8 +378,8 @@ function cleanLangString($string, $to_display = true)
  *
  * - Will return a subset if searching, otherwise all available
  *
- * @package Languages
  * @return array
+ * @package Languages
  */
 function list_getLanguagesList()
 {
@@ -352,13 +390,17 @@ function list_getLanguagesList()
 	$url = 'http://download.elkarte.net/fetch_language.php?version=' . urlencode(strtr(FORUM_VERSION, array('ElkArte ' => '')));
 
 	// Load the class file and stick it into an array.
-	$language_list = new \ElkArte\XmlArray(fetch_web_data($url), true);
+	$language_list = new XmlArray(fetch_web_data($url), true);
 
 	// Check that the site responded and that the language exists.
 	if (!$language_list->exists('languages'))
+	{
 		$context['langfile_error'] = 'no_response';
+	}
 	elseif (!$language_list->exists('languages/language'))
+	{
 		$context['langfile_error'] = 'no_files';
+	}
 	else
 	{
 		$language_list = $language_list->path('languages[0]');
@@ -367,12 +409,14 @@ function list_getLanguagesList()
 		foreach ($lang_files as $file)
 		{
 			// Were we searching?
-			if (!empty($context['elk_search_term']) && strpos($file->fetch('name'), \ElkArte\Util::strtolower($context['elk_search_term'])) === false)
+			if (!empty($context['elk_search_term']) && strpos($file->fetch('name'), Util::strtolower($context['elk_search_term'])) === false)
+			{
 				continue;
+			}
 
 			$languages[] = array(
 				'id' => $file->fetch('id'),
-				'name' => \ElkArte\Util::ucwords($file->fetch('name')),
+				'name' => Util::ucwords($file->fetch('name')),
 				'version' => $file->fetch('version'),
 				'utf8' => $txt['yes'],
 				'description' => $file->fetch('description'),
@@ -380,9 +424,13 @@ function list_getLanguagesList()
 			);
 		}
 		if (empty($languages))
+		{
 			$context['langfile_error'] = 'no_files';
+		}
 		else
+		{
 			return $languages;
+		}
 	}
 }
 
@@ -416,7 +464,11 @@ function findPossiblePackages($lang)
 	$db->free_result($request);
 
 	if (!empty($pid))
+	{
 		return array($pid, $file_name);
+	}
 	else
+	{
 		return false;
+	}
 }

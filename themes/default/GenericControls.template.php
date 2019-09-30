@@ -6,7 +6,7 @@
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause (see accompanying LICENSE.txt file)
  *
  * This file contains code covered by:
- * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * copyright: 2011 Simple Machines (http://www.simplemachines.org)
  *
  * @version 2.0 dev
  *
@@ -31,7 +31,9 @@ function template_control_richedit($editor_id, $smileyContainer = null, $bbcCont
 
 	// Allow addons to insert additional editor plugin scripts
 	if (!empty($editor_context['plugin_addons']) && is_array($editor_context['plugin_addons']))
+	{
 		$plugins = array_filter(array_merge($plugins, $editor_context['plugin_addons']));
+	}
 
 	// Add in special config objects to the editor, typically for plugin use
 	$plugin_options = array();
@@ -41,6 +43,7 @@ function template_control_richedit($editor_id, $smileyContainer = null, $bbcCont
 					}';
 
 	if (!empty($context['mentions_enabled']))
+	{
 		$plugin_options[] = '
 					mentionOptions: {
 						editor_id: \'' . $editor_id . '\',
@@ -50,10 +53,13 @@ function template_control_richedit($editor_id, $smileyContainer = null, $bbcCont
 							names: []
 						}
 					}';
+	}
 
 	// Allow addons to insert additional editor objects
 	if (!empty($editor_context['plugin_options']) && is_array($editor_context['plugin_options']))
+	{
 		$plugin_options = array_merge($plugin_options, $editor_context['plugin_options']);
+	}
 
 	echo '
 		<div id="editor_toolbar_container"></div>
@@ -93,13 +99,17 @@ function template_control_richedit($editor_id, $smileyContainer = null, $bbcCont
 		{
 			$countLocations--;
 			if ($location === 'postform')
+			{
 				echo '
 						dropdown:
 						{';
+			}
 			elseif ($location === 'popup')
+			{
 				echo '
 						popup:
 						{';
+			}
 
 			$numRows = count($smileyRows);
 
@@ -114,8 +124,10 @@ function template_control_richedit($editor_id, $smileyContainer = null, $bbcCont
 				}
 
 				if (empty($smileyRow['isLast']) && $numRows !== 1)
+				{
 					echo ',
 						\'-', $emptyPlaceholder++, '\': \'\',';
+				}
 			}
 
 			echo '
@@ -126,9 +138,11 @@ function template_control_richedit($editor_id, $smileyContainer = null, $bbcCont
 					}';
 	}
 	else
+	{
 		echo ',
 					emoticons:
 					{}';
+	}
 
 	// Show all the editor command buttons
 	if ($bbcContainer !== null)
@@ -138,13 +152,17 @@ function template_control_richedit($editor_id, $smileyContainer = null, $bbcCont
 
 		// Create the tooltag rows to display the buttons in the editor
 		foreach ($context['bbc_toolbar'] as $i => $buttonRow)
+		{
 			echo $buttonRow[0], '||';
+		}
 
 		echo ',emoticon",';
 	}
 	else
+	{
 		echo ',
 					toolbar: "source,emoticon",';
+	}
 
 	echo '
 				});
@@ -182,8 +200,10 @@ function template_control_richedit_buttons($editor_id)
 
 	// If this message has been edited in the past - display when it was.
 	if (isset($context['last_modified']))
+	{
 		echo '
 			<p class="lastedit">', $context['last_modified_text'], '</p>';
+	}
 
 	// Show the helpful shortcut text
 	echo '
@@ -192,13 +212,17 @@ function template_control_richedit_buttons($editor_id)
 		<input type="submit" name="', isset($editor_context['labels']['post_name']) ? $editor_context['labels']['post_name'] : 'post', '" value="', isset($editor_context['labels']['post_button']) ? $editor_context['labels']['post_button'] : $txt['post'], '" tabindex="', $context['tabindex']++, '" onclick="return submitThisOnce(this);" accesskey="s" />';
 
 	if ($editor_context['preview_type'])
+	{
 		echo '
 		<input type="submit" name="preview" value="', isset($editor_context['labels']['preview_button']) ? $editor_context['labels']['preview_button'] : $txt['preview'], '" tabindex="', $context['tabindex']++, '" onclick="', $editor_context['preview_type'] == 2 ? 'return event.ctrlKey || previewControl();' : 'return submitThisOnce(this);', '" accesskey="p" />';
+	}
 
 	// Show the spellcheck button?
 	if ($context['show_spellchecking'])
+	{
 		echo '
 		<input type="button" value="', $txt['spell_check'], '" tabindex="', $context['tabindex']++, '" onclick="spellCheckStart();" />';
+	}
 
 	foreach ($editor_context['buttons'] as $button)
 	{
@@ -214,9 +238,11 @@ function template_control_richedit_buttons($editor_id)
 
 	// Create an area to show the draft last saved on text
 	if (!empty($context['drafts_autosave']) && !empty($options['drafts_autosave_enabled']))
+	{
 		echo '
 		<div class="draftautosave">
 			<span id="throbber" class="hide"><i class="icon icon-spin i-spinner"></i>&nbsp;</span>
 			<span id="draft_lastautosave"></span>
 		</div>';
+	}
 }

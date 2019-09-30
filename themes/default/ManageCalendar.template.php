@@ -6,7 +6,7 @@
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause (see accompanying LICENSE.txt file)
  *
  * This file contains code covered by:
- * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * copyright: 2011 Simple Machines (http://www.simplemachines.org)
  *
  * @version 2.0 dev
  *
@@ -41,8 +41,10 @@ function template_edit_holiday()
 
 	// Show a list of all the years we allow...
 	for ($year = $context['cal_minyear']; $year <= $context['cal_maxyear']; $year++)
+	{
 		echo '
 							<option value="', $year, '"', $year == $context['holiday']['year'] ? ' selected="selected"' : '', '>', $year, '</option>';
+	}
 
 	echo '
 						</select>
@@ -51,8 +53,10 @@ function template_edit_holiday()
 
 	// There are 12 months per year - ensure that they all get listed.
 	for ($month = 1; $month <= 12; $month++)
+	{
 		echo '
 							<option value="', $month, '"', $month == $context['holiday']['month'] ? ' selected="selected"' : '', '>', $txt['months'][$month], '</option>';
+	}
 
 	echo '
 						</select>
@@ -61,8 +65,10 @@ function template_edit_holiday()
 
 	// This prints out all the days in the current month - this changes dynamically as we switch months.
 	for ($day = 1; $day <= $context['holiday']['last_day']; $day++)
+	{
 		echo '
 							<option value="', $day, '"', $day == $context['holiday']['day'] ? ' selected="selected"' : '', '>', $day, '</option>';
+	}
 
 	echo '
 						</select>
@@ -72,13 +78,17 @@ function template_edit_holiday()
 				<div class="submitbutton">';
 
 	if ($context['is_new'])
+	{
 		echo '
 						<input type="submit" value="', $txt['holidays_button_add'], '" />';
+	}
 	else
+	{
 		echo '
 						<input type="submit" name="edit" value="', $txt['holidays_button_edit'], '" />
 						<input type="submit" name="delete" value="', $txt['holidays_button_remove'], '" />
 						<input type="hidden" name="holiday" value="', $context['holiday']['id'], '" />';
+	}
 
 	echo '
 						<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />

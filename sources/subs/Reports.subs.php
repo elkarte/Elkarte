@@ -8,7 +8,7 @@
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause (see accompanying LICENSE.txt file)
  *
  * This file contains code covered by:
- * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * copyright: 2011 Simple Machines (http://www.simplemachines.org)
  *
  * @version 2.0 dev
  *
@@ -16,6 +16,7 @@
 
 /**
  * Retrieve a list of all boards plus more details
+ *
  * @todo merge with some function in Boards.subs.php
  */
 function reportsBoardsList()
@@ -40,7 +41,9 @@ function reportsBoardsList()
 	);
 	$boards = array();
 	while ($row = $db->fetch_assoc($request))
+	{
 		$boards[] = $row;
+	}
 
 	return $boards;
 }
@@ -79,7 +82,9 @@ function allMembergroups($group_clause, $query_groups = array())
 	);
 	$member_groups = array();
 	while ($row = $db->fetch_assoc($request))
+	{
 		$member_groups[$row['id_group']] = $row['group_name'];
+	}
 	$db->free_result($request);
 
 	return $member_groups;
@@ -116,7 +121,9 @@ function boardPermissions($profiles, $group_clause, $query_groups)
 		)
 	);
 	while ($row = $db->fetch_assoc($request))
+	{
 		$board_permissions[] = $row;
+	}
 
 	$db->free_result($request);
 
@@ -166,7 +173,9 @@ function allMembergroupsBoardAccess()
 		),
 	);
 	while ($row = $db->fetch_assoc($request))
+	{
 		$rows[] = $row;
+	}
 	$db->free_result($request);
 
 	return $rows;
@@ -202,7 +211,9 @@ function boardPermissionsByGroup($group_clause, $query_groups)
 
 	$perms = array();
 	while ($row = $db->fetch_assoc($request))
+	{
 		$perms[] = $row;
+	}
 	$db->free_result($request);
 
 	return $perms;

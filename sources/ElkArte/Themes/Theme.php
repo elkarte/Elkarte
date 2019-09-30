@@ -18,12 +18,15 @@ namespace ElkArte\Themes;
  */
 abstract class Theme
 {
+	/** @var \ElkArte\ValuesContainer */
+	public $user;
 	const STANDARD = 'standard';
 	const DEFERRED = 'defer';
 	const ALL = -1;
 
 	/**
 	 * The id of the theme being used
+	 *
 	 * @var int
 	 */
 	protected $id;
@@ -50,12 +53,14 @@ abstract class Theme
 
 	/**
 	 * All of the JS files to include
+	 *
 	 * @var array
 	 */
 	protected $js_files = [];
 
 	/**
 	 * Any inline JS to output
+	 *
 	 * @var array
 	 */
 	protected $js_inline = [
@@ -65,30 +70,35 @@ abstract class Theme
 
 	/**
 	 * JS variables to output
+	 *
 	 * @var array
 	 */
 	protected $js_vars = [];
 
 	/**
 	 * Inline CSS
+	 *
 	 * @var array
 	 */
 	protected $css_rules = [];
 
 	/**
 	 * CSS files
+	 *
 	 * @var array
 	 */
 	protected $css_files = [];
 
 	/**
 	 * Holds base actions that we do not want crawled / indexed
+	 *
 	 * @var string[]
 	 */
 	protected $no_index_actions = array();
 
 	/**
 	 * Right to left language support
+	 *
 	 * @var bool
 	 */
 	protected $rtl;
@@ -131,6 +141,7 @@ abstract class Theme
 			'contact'
 		);
 	}
+
 	/**
 	 * Initialize the template... mainly little settings.
 	 *
@@ -157,8 +168,8 @@ abstract class Theme
 	/**
 	 * Add a Javascript variable for output later (for feeding text strings and similar to JS)
 	 *
-	 * @param mixed[] $vars   array of vars to include in the output done as 'varname' => 'var value'
-	 * @param bool    $escape = false, whether or not to escape the value
+	 * @param mixed[] $vars array of vars to include in the output done as 'varname' => 'var value'
+	 * @param bool $escape = false, whether or not to escape the value
 	 */
 	public function addJavascriptVar($vars, $escape = false)
 	{
@@ -176,7 +187,7 @@ abstract class Theme
 	/**
 	 * Add a CSS rule to a style tag in head.
 	 *
-	 * @param string      $rules the CSS rule/s
+	 * @param string $rules the CSS rule/s
 	 * @param null|string $media = null, the media query the rule belongs to
 	 */
 	public function addCSSRules($rules, $media = null)
@@ -249,7 +260,7 @@ abstract class Theme
 	 * - all code added with this function is added to the same <script> tag so do make sure your JS is clean!
 	 *
 	 * @param string $javascript
-	 * @param bool   $defer = false, define if the script should load in <head> or before the closing <html> tag
+	 * @param bool $defer = false, define if the script should load in <head> or before the closing <html> tag
 	 */
 	public function addInlineJavascript($javascript, $defer = false)
 	{

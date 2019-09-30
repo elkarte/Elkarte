@@ -6,7 +6,7 @@
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause (see accompanying LICENSE.txt file)
  *
  * This file contains code covered by:
- * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * copyright: 2011 Simple Machines (http://www.simplemachines.org)
  *
  * @version 2.0 dev
  *
@@ -72,20 +72,27 @@ function template_registration_agreement()
 
 	// Age restriction in effect?
 	if ($context['show_coppa'])
+	{
 		echo '
 				<input type="submit" name="accept_agreement" value="', $context['coppa_agree_above'], '" />
 				<br /><br />
 				<input type="submit" name="accept_agreement_coppa" value="', $context['coppa_agree_below'], '" />';
+	}
 	else
+	{
 		echo '
 				<input type="submit" name="accept_agreement" value="', $txt['agreement_agree'], '" />';
+	}
+
 	echo '
 				<input type="submit" name="no_accept" value="', $txt['agreement_no_agree'], '" />';
 
 	if ($context['show_contact_button'])
+	{
 		echo '
 				<br /><br />
 				<input type="submit" name="show_contact" value="', $txt['contact'], '" />';
+	}
 
 	if (!empty($context['register_subaction']))
 	{
@@ -134,8 +141,10 @@ function template_registration_form()
 
 		// Cycle through each error and display an error message.
 		foreach ($context['registration_errors'] as $error)
+		{
 			echo '
 				<li>', $error, '</li>';
+		}
 
 		echo '
 			</ul>
@@ -257,6 +266,7 @@ function template_registration_form()
 					<dl class="settings">';
 
 		foreach ($context['custom_fields'] as $key => $field)
+		{
 			if ($field['show_reg'] > 1)
 			{
 				echo '
@@ -273,6 +283,7 @@ function template_registration_form()
 				// Drop this one so we don't show the additonal information header unless needed
 				unset($context['custom_fields'][$key]);
 			}
+		}
 
 		echo '
 					</dl>';
@@ -312,8 +323,10 @@ function template_registration_form()
 
 				// Does it have any subtext to show?
 				if (!empty($field['subtext']))
+				{
 					echo '
 						<span class="smalltext">', $field['subtext'], '</span>';
+				}
 
 				echo '
 					</dt>
@@ -321,28 +334,38 @@ function template_registration_form()
 
 				// Want to put something in front of the box?
 				if (!empty($field['preinput']))
+				{
 					echo '
 						', $field['preinput'];
+				}
 
 				// What type of data are we showing?
 				if ($field['type'] == 'label')
+				{
 					echo '
 						', $field['value'];
+				}
 
 				// Maybe it's a text box - very likely!
 				elseif (in_array($field['type'], array('int', 'float', 'text', 'password')))
+				{
 					echo '
 						<input type="', $field['type'] == 'password' ? 'password' : 'text', '" name="', $key, '" id="', $key, '" size="', empty($field['size']) ? 30 : $field['size'], '" value="', $field['value'], '" tabindex="', $context['tabindex']++, '" ', $field['input_attr'], ' class="input_', $field['type'] == 'password' ? 'password' : 'text', '" />';
+				}
 
 				// Maybe it's an html5 input
 				elseif (in_array($field['type'], array('url', 'search', 'date', 'email', 'color')))
+				{
 					echo '
 						<input type="', $field['type'], '" name="', $key, '" id="', $key, '" size="', empty($field['size']) ? 30 : $field['size'], '" value="', $field['value'], '" ', $field['input_attr'], ' class="input_', $field['type'] == 'password' ? 'password' : 'text', '" />';
+				}
 
 				// You "checking" me out? ;)
 				elseif ($field['type'] == 'check')
+				{
 					echo '
 						<input type="hidden" name="', $key, '" value="0" /><input type="checkbox" name="', $key, '" id="', $key, '" ', !empty($field['value']) ? ' checked="checked"' : '', ' value="1" tabindex="', $context['tabindex']++, '" ', $field['input_attr'], ' />';
+				}
 
 				// Always fun - select boxes!
 				elseif ($field['type'] == 'select')
@@ -382,8 +405,10 @@ function template_registration_form()
 
 				// Something to end with?
 				if (!empty($field['postinput']))
+				{
 					echo '
 							', $field['postinput'];
+				}
 
 				echo '
 					</dd>';
@@ -397,12 +422,14 @@ function template_registration_form()
 		foreach ($context['custom_fields'] as $field)
 		{
 			if ($field['show_reg'] < 2)
+			{
 				echo '
 					<dt>
 						<label', !empty($field['is_error']) ? ' class="error"' : '', '>', $field['name'], ':</label>
 						<span class="smalltext">', $field['desc'], '</span>
 					</dt>
 					<dd>', $field['input_html'], '</dd>';
+			}
 		}
 	}
 
@@ -642,16 +669,20 @@ function template_verification_sound()
 			<div>';
 
 	if (isBrowser('is_ie'))
+	{
 		echo '
 			<object classid="clsid:22D6F312-B0F6-11D0-94AB-0080C74C7E95" type="audio/x-wav">
 				<param name="AutoStart" value="1" />
 				<param name="FileName" value="', $context['verification_sound_href'], '" />
 			</object>';
+	}
 	else
+	{
 		echo '
 			<audio controls="controls" autoplay="autoplay">
 				<source src="', $context['verification_sound_href'], '" type="audio/x-wav">
 			</audio>';
+	}
 
 	echo '
 			</div>
@@ -678,10 +709,12 @@ function template_admin_register()
 				<div id="register_screen" class="content">';
 
 	if (!empty($context['registration_done']))
+	{
 		echo '
 					<div class="successbox">
 						', $context['registration_done'], '
 					</div>';
+	}
 
 	echo '
 					<input type="password" name="autofill_honey_pot" class="hide" />
@@ -721,8 +754,10 @@ function template_admin_register()
 							<select name="group" id="group_select" tabindex="', $context['tabindex']++, '">';
 
 		foreach ($context['member_groups'] as $id => $name)
+		{
 			echo '
 								<option value="', $id, '">', $name, '</option>';
+		}
 
 		echo '
 							</select>
@@ -771,8 +806,10 @@ function template_edit_agreement()
 
 	// Warning for if the file isn't writable.
 	if (!empty($context['warning']))
+	{
 		echo '
 			<p class="error">', $context['warning'], '</p>';
+	}
 
 	echo '
 			<div id="registration_agreement">
@@ -789,8 +826,10 @@ function template_edit_agreement()
 						<select name="agree_lang" onchange="document.getElementById(\'admin_form_wrapper\').submit();" tabindex="', $context['tabindex']++, '">';
 
 		foreach ($context['editable_agreements'] as $file => $name)
+		{
 			echo '
 							<option value="', $file, '" ', $context['current_agreement'] == $file ? 'selected="selected"' : '', '>', $name, '</option>';
+		}
 
 		echo '
 						</select>
@@ -896,8 +935,10 @@ function template_contact_form()
 			<div class="content">';
 
 	if (!empty($context['errors']))
+	{
 		echo '
 				<div class="errorbox">', $txt['errors_contact_form'], ': <ul><li>', implode('</li><li>', $context['errors']), '</li></ul></div>';
+	}
 
 	echo '
 				<dl class="settings">

@@ -14,6 +14,11 @@
 
 namespace ElkArte\UrlGenerator;
 
+/**
+ * Class AbstractParseQuery
+ *
+ * @package ElkArte\UrlGenerator
+ */
 abstract class AbstractParseQuery
 {
 	/**

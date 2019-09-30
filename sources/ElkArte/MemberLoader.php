@@ -6,7 +6,7 @@
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause (see accompanying LICENSE.txt file)
  *
  * This file contains code covered by:
- * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * copyright: 2011 Simple Machines (http://www.simplemachines.org)
  *
  * @version 2.0 dev
  *
@@ -138,7 +138,7 @@ class MemberLoader
 	 * @param string $set The data to load (see the constants SET_*)
 	 * @return bool|int[] The ids of the members loaded
 	 */
-	public function loadById($users,  $set = MemberLoader::SET_NORMAL)
+	public function loadById($users, $set = MemberLoader::SET_NORMAL)
 	{
 		// Can't just look for no users :P.
 		if (empty($users))
@@ -153,61 +153,11 @@ class MemberLoader
 
 		$to_load = $this->loadFromCache($users);
 
-		$this->loadByCondition('mem.id_member' . (count($to_load) == 1 ? ' = {int:users}' : ' IN ({array_int:users})'), $to_load);
+		$this->loadByCondition('mem.id_member' . (count($to_load) === 1 ? ' = {int:users}' : ' IN ({array_int:users})'), $to_load);
 
 		$this->loadModerators();
 
 		return $this->loaded_ids;
-	}
-
-	/**
-	 * Loads users data from a member name
-	 *
-	 * @param string|string[] $name Single name or list of names to load
-	 * @param string $set The data to load (see the constants SET_*)
-	 * @return bool|int[] The ids of the members loaded
-	 */
-	public function loadByName($name,  $set = MemberLoader::SET_NORMAL)
-	{
-		// Can't just look for no users :P.
-		if (empty($name))
-		{
-			return false;
-		}
-
-		$this->set = $set;
-		$users = array_unique((array) $name);
-		$this->loaded_ids = [];
-
-		$this->loadByCondition('{column_case_insensitive:mem.member_name}' . (count($users) == 1 ? ' = {string_case_insensitive:users}' : ' IN ({array_string_case_insensitive:users})'), $users);
-
-		$this->loadModerators();
-
-		return $this->loaded_ids;
-	}
-
-	/**
-	 * Loads a guest member (i.e. some standard data for guests)
-	 */
-	public function loadGuest()
-	{
-		global $txt;
-
-		if (isset($this->loaded_members[0]))
-		{
-			return;
-		}
-
-		$this->loaded_members[0] = new Member([
-			'id' => 0,
-			'name' => $txt['guest_title'],
-			'group' => $txt['guest_title'],
-			'href' => '',
-			'link' => $txt['guest_title'],
-			'email' => $txt['guest_title'],
-			'is_guest' => true
-		], $this->set, $this->bbc_parser);
-		$this->users_list->add($this->loaded_members[0], 0);
 	}
 
 	/**
@@ -218,7 +168,7 @@ class MemberLoader
 	 */
 	protected function loadFromCache($users)
 	{
-		if ($this->useCache === false)
+		if (!$this->useCache)
 		{
 			$to_load = $users;
 		}
@@ -244,7 +194,130 @@ class MemberLoader
 				$this->loaded_members[$data['data']['id_member']] = $member;
 			}
 		}
+
 		return $to_load;
+	}
+
+	/**
+	 * Loads users data provided a where clause and an array of ids
+	 *
+	 * @param string $where_clause The WHERE clause of the query to run
+	 * @param int[] $to_load Array of ids to load
+	 * @return bool If loaded anything or not
+	 */
+	protected function loadByCondition($where_clause, $to_load)
+	{
+		if (empty($to_load))
+		{
+			return false;
+		}
+
+		$select_columns = $this->base_select_columns;
+		$select_tables = $this->base_select_tables;
+
+		// We add or replace according to the set
+		switch ($this->set)
+		{
+			case MemberLoader::SET_NORMAL:
+				$select_columns .= ', mem.buddy_list';
+				break;
+			case MemberLoader::SET_PROFILE:
+				$select_columns .= ', mem.openid_uri, mem.id_theme, mem.pm_ignore_list, mem.pm_email_notify, mem.receive_from,
+				mem.time_format, mem.secret_question, mem.additional_groups, mem.smiley_set,
+				mem.total_time_logged_in, mem.notify_announcements, mem.notify_regularity, mem.notify_send_body,
+				mem.notify_types, lo.url, mem.ignore_boards, mem.password_salt, mem.pm_prefs, mem.buddy_list, mem.otp_secret, mem.enable_otp';
+				break;
+			case MemberLoader::SET_MINIMAL:
+				$select_columns = '
+				mem.id_member, mem.member_name, mem.real_name, mem.email_address, mem.hide_email, mem.date_registered,
+				mem.posts, mem.last_login, mem.member_ip, mem.member_ip2, mem.lngfile, mem.id_group';
+				$select_tables = '';
+				break;
+			default:
+				trigger_error('\ElkArte\MembersList::load(): Invalid member data set \'' . $this->set . '\'', E_USER_WARNING);
+		}
+
+		// Allow addons to easily add to the selected member data
+		call_integration_hook('integrate_load_member_data', array(&$select_columns, &$select_tables, $this->set));
+
+		// Load the member's data.
+		$request = $this->db->query('', '
+			SELECT' . $select_columns . '
+			FROM {db_prefix}members AS mem' . $select_tables . '
+			WHERE ' . $where_clause,
+			array(
+				'blank_string' => '',
+				'users' => count($to_load) === 1 ? current($to_load) : $to_load,
+			)
+		);
+
+		$new_loaded_ids = array();
+		while ($row = $request->fetch_assoc())
+		{
+			$new_loaded_ids[] = $row['id_member'];
+			$this->loaded_ids[] = $row['id_member'];
+			$row['options'] = array();
+			$this->loaded_members[$row['id_member']] = new Member($row, $this->set, $this->bbc_parser);
+			$this->users_list->add($this->loaded_members[$row['id_member']], $row['id_member']);
+		}
+		$request->free_result();
+		$this->loadCustomFields($new_loaded_ids);
+
+		if (!empty($new_loaded_ids))
+		{
+			// Anything else integration may want to add to the user_profile array
+			call_integration_hook('integrate_add_member_data', array($new_loaded_ids, $this->users_list));
+
+			$this->storeInCache($new_loaded_ids);
+		}
+
+		return !empty($new_loaded_ids);
+	}
+
+	/**
+	 * Loads custom fields data for a set of users
+	 *
+	 * @param int[] $new_loaded_ids Array of ids to load
+	 */
+	protected function loadCustomFields($new_loaded_ids)
+	{
+		if (empty($new_loaded_ids) || $this->options['custom_fields'] === false)
+		{
+			return;
+		}
+
+		$request = $this->db->query('', '
+			SELECT 
+				cfd.id_member, cfd.variable, cfd.value, cf.field_options, cf.field_type
+			FROM {db_prefix}custom_fields_data AS cfd
+			JOIN {db_prefix}custom_fields AS cf ON (cf.col_name = cfd.variable)
+			WHERE id_member' . (count($new_loaded_ids) === 1 ? ' = {int:loaded_ids}' : ' IN ({array_int:loaded_ids})'),
+			array(
+				'loaded_ids' => count($new_loaded_ids) === 1 ? $new_loaded_ids[0] : $new_loaded_ids,
+			)
+		);
+		$data = [];
+		while ($row = $request->fetch_assoc())
+		{
+			if (!empty($row['field_options']))
+			{
+				$field_options = explode(',', $row['field_options']);
+				$key = (int) array_search($row['value'], $field_options);
+			}
+			else
+			{
+				$key = 0;
+			}
+
+			$data[$row['id_member']][$row['variable'] . '_key'] = $row['variable'] . '_' . $key;
+			$data[$row['id_member']][$row['variable']] = $row['value'];
+		}
+
+		foreach ($data as $id => $val)
+		{
+			$this->users_list->appendTo($val, 'options', $id, $this->options['display_fields']);
+		}
+		$request->free_result();
 	}
 
 	/**
@@ -254,7 +327,7 @@ class MemberLoader
 	 */
 	protected function storeInCache($new_loaded_ids)
 	{
-		if ($this->useCache === true)
+		if ($this->useCache)
 		{
 			foreach ($new_loaded_ids as $id)
 			{
@@ -309,123 +382,52 @@ class MemberLoader
 	}
 
 	/**
-	 * Loads users data provided a where clause and an array of ids
+	 * Loads users data from a member name
 	 *
-	 * @param string $where_clause The WHERE clause of the query to run
-	 * @param int[] $to_load Array of ids to load
-	 * @return bool If loaded anything or not
+	 * @param string|string[] $name Single name or list of names to load
+	 * @param string $set The data to load (see the constants SET_*)
+	 * @return bool|int[] The ids of the members loaded
 	 */
-	protected function loadByCondition($where_clause, $to_load)
+	public function loadByName($name, $set = MemberLoader::SET_NORMAL)
 	{
-		if (empty($to_load))
+		// Can't just look for no users :P.
+		if (empty($name))
 		{
 			return false;
 		}
 
-		$select_columns = $this->base_select_columns;
-		$select_tables = $this->base_select_tables;
+		$this->set = $set;
+		$users = array_unique((array) $name);
+		$this->loaded_ids = [];
 
-		// We add or replace according to the set
-		switch ($this->set)
-		{
-			case MemberLoader::SET_NORMAL:
-				$select_columns .= ', mem.buddy_list';
-				break;
-			case MemberLoader::SET_PROFILE:
-				$select_columns .= ', mem.openid_uri, mem.id_theme, mem.pm_ignore_list, mem.pm_email_notify, mem.receive_from,
-				mem.time_format, mem.secret_question, mem.additional_groups, mem.smiley_set,
-				mem.total_time_logged_in, mem.notify_announcements, mem.notify_regularity, mem.notify_send_body,
-				mem.notify_types, lo.url, mem.ignore_boards, mem.password_salt, mem.pm_prefs, mem.buddy_list, mem.otp_secret, mem.enable_otp';
-				break;
-			case MemberLoader::SET_MINIMAL:
-				$select_columns = '
-				mem.id_member, mem.member_name, mem.real_name, mem.email_address, mem.hide_email, mem.date_registered,
-				mem.posts, mem.last_login, mem.member_ip, mem.member_ip2, mem.lngfile, mem.id_group';
-				$select_tables = '';
-				break;
-			default:
-				trigger_error('\ElkArte\MembersList::load(): Invalid member data set \'' . $this->set . '\'', E_USER_WARNING);
-		}
+		$this->loadByCondition('{column_case_insensitive:mem.member_name}' . (count($users) === 1 ? ' = {string_case_insensitive:users}' : ' IN ({array_string_case_insensitive:users})'), $users);
 
-		// Allow addons to easily add to the selected member data
-		call_integration_hook('integrate_load_member_data', array(&$select_columns, &$select_tables, $this->set));
+		$this->loadModerators();
 
-		// Load the member's data.
-		$request = $this->db->query('', '
-			SELECT' . $select_columns . '
-			FROM {db_prefix}members AS mem' . $select_tables . '
-			WHERE ' . $where_clause,
-			array(
-				'blank_string' => '',
-				'users' => count($to_load) == 1 ? current($to_load) : $to_load,
-			)
-		);
-
-		$new_loaded_ids = array();
-		while ($row = $request->fetch_assoc())
-		{
-			$new_loaded_ids[] = $row['id_member'];
-			$this->loaded_ids[] = $row['id_member'];
-			$row['options'] = array();
-			$this->loaded_members[$row['id_member']] = new Member($row, $this->set, $this->bbc_parser);
-			$this->users_list->add($this->loaded_members[$row['id_member']], $row['id_member']);
-		}
-		$request->free_result();
-		$this->loadCustomFields($new_loaded_ids);
-
-		if (!empty($new_loaded_ids))
-		{
-			// Anything else integration may want to add to the user_profile array
-			call_integration_hook('integrate_add_member_data', array($new_loaded_ids, $this->users_list));
-
-			$this->storeInCache($new_loaded_ids);
-		}
-
-		return !empty($new_loaded_ids);
+		return $this->loaded_ids;
 	}
 
 	/**
-	 * Loads custom fields data for a set of users
-	 *
-	 * @param int[] $new_loaded_ids Array of ids to load
+	 * Loads a guest member (i.e. some standard data for guests)
 	 */
-	protected function loadCustomFields($new_loaded_ids)
+	public function loadGuest()
 	{
-		if (empty($new_loaded_ids) || $this->options['custom_fields'] === false)
+		global $txt;
+
+		if (isset($this->loaded_members[0]))
 		{
 			return;
 		}
 
-		$request = $this->db->query('', '
-			SELECT cfd.id_member, cfd.variable, cfd.value, cf.field_options, cf.field_type
-			FROM {db_prefix}custom_fields_data AS cfd
-			JOIN {db_prefix}custom_fields AS cf ON (cf.col_name = cfd.variable)
-			WHERE id_member' . (count($new_loaded_ids) == 1 ? ' = {int:loaded_ids}' : ' IN ({array_int:loaded_ids})'),
-			array(
-				'loaded_ids' => count($new_loaded_ids) == 1 ? $new_loaded_ids[0] : $new_loaded_ids,
-			)
-		);
-		$data = [];
-		while ($row = $request->fetch_assoc())
-		{
-			if (!empty($row['field_options']))
-			{
-				$field_options = explode(',', $row['field_options']);
-				$key = (int) array_search($row['value'], $field_options);
-			}
-			else
-			{
-				$key = 0;
-			}
-
-			$data[$row['id_member']][$row['variable'] . '_key'] = $row['variable'] . '_' . $key;
-			$data[$row['id_member']][$row['variable']] = $row['value'];
-		}
-
-		foreach ($data as $id => $val)
-		{
-			$this->users_list->appendTo($val, 'options', $id, $this->options['display_fields']);
-		}
-		$request->free_result();
+		$this->loaded_members[0] = new Member([
+			'id' => 0,
+			'name' => $txt['guest_title'],
+			'group' => $txt['guest_title'],
+			'href' => '',
+			'link' => $txt['guest_title'],
+			'email' => $txt['guest_title'],
+			'is_guest' => true
+		], $this->set, $this->bbc_parser);
+		$this->users_list->add($this->loaded_members[0], 0);
 	}
 }

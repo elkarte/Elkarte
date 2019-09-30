@@ -14,8 +14,7 @@
 
 namespace ElkArte;
 
-use ElkArte\User;
-use \ElkArte\Mentions\MentionType\NotificationInterface;
+use ElkArte\Mentions\MentionType\NotificationInterface;
 
 /**
  * Class Notifications
@@ -60,6 +59,7 @@ class Notifications extends AbstractModel
 	 * @var array
 	 */
 	protected $_to_actually_mention = array();
+
 	/**
 	 * Notifications constructor.
 	 *
@@ -80,40 +80,6 @@ class Notifications extends AbstractModel
 		$this->register(4, 'email_weekly', array($this, '_send_weekly_email'), array('subject' => 'subject', 'body' => 'snippet', 'suffix' => true));
 
 		call_integration_hook('integrate_notifications_methods', array($this));
-	}
-
-	/**
-	 * We hax a new notification to send out!
-	 *
-	 * @param \ElkArte\NotificationsTask $task
-	 */
-	public function add(NotificationsTask $task)
-	{
-		$this->_to_send[] = $task;
-	}
-
-	/**
-	 * Time to notify our beloved members! YAY!
-	 */
-	public function send()
-	{
-		$this->_notification_frequencies = array(
-			// 0 is for no notifications, so we start from 1 the counting, that saves a +1 later
-			1 => 'notification',
-			'email',
-			'email_daily',
-			'email_weekly',
-		);
-
-		if (!empty($this->_to_send))
-		{
-			foreach ($this->_to_send as $task)
-			{
-				$this->_send_task($task);
-			}
-		}
-
-		$this->_to_send = array();
 	}
 
 	/**
@@ -158,13 +124,52 @@ class Notifications extends AbstractModel
 	}
 
 	/**
-	 * Returns the notifications in the system, daily, weekly, etc
+	 * Singleton... until we have something better.
 	 *
-	 * @return string[]
+	 * @return Notifications
 	 */
-	public function getNotifiers()
+	public static function instance()
 	{
-		return $this->_notification_frequencies;
+		if (self::$_instance === null)
+		{
+			self::$_instance = new Notifications(database(), User::$info);
+		}
+
+		return self::$_instance;
+	}
+
+	/**
+	 * We hax a new notification to send out!
+	 *
+	 * @param \ElkArte\NotificationsTask $task
+	 */
+	public function add(NotificationsTask $task)
+	{
+		$this->_to_send[] = $task;
+	}
+
+	/**
+	 * Time to notify our beloved members! YAY!
+	 */
+	public function send()
+	{
+		$this->_notification_frequencies = array(
+			// 0 is for no notifications, so we start from 1 the counting, that saves a +1 later
+			1 => 'notification',
+			'email',
+			'email_daily',
+			'email_weekly',
+		);
+
+		if (!empty($this->_to_send))
+		{
+			foreach ($this->_to_send as $task)
+			{
+				$this->_send_task($task);
+			}
+		}
+
+		$this->_to_send = array();
 	}
 
 	/**
@@ -202,6 +207,76 @@ class Notifications extends AbstractModel
 				call_user_func_array($this->_notifiers[$key]['callback'], array($obj, $task, $bodies, $this->_db));
 			}
 		}
+	}
+
+	/**
+	 * Loads from the database the notification preferences for a certain type
+	 * of mention for a bunch of members.
+	 *
+	 * @param string[] $notification_frequencies
+	 * @param string $notification_type
+	 * @param int[] $members
+	 *
+	 * @return array
+	 */
+	protected function _getNotificationPreferences($notification_frequencies, $notification_type, $members)
+	{
+		$query_members = $members;
+		// The member 0 is the "default" setting
+		$query_members[] = 0;
+
+		require_once(SUBSDIR . '/Notification.subs.php');
+		$preferences = getUsersNotificationsPreferences($notification_type, $query_members);
+
+		$notification_types = array();
+		foreach ($notification_frequencies as $freq)
+		{
+			$notification_types[$freq] = array();
+		}
+
+		// notification_level can be:
+		//    - 0 => no notification
+		//    - 1 => only mention
+		//    - 2 => mention + immediate email
+		//    - 3 => mention + daily email
+		//    - 4 => mention + weekly email
+		//    - 5+ => usable by addons
+		foreach ($members as $member)
+		{
+			$this_pref = $preferences[$member][$notification_type];
+			if ($this_pref === 0)
+			{
+				continue;
+			}
+
+			// In the following two checks the use of the $this->_notification_frequencies
+			// is intended, because the numeric id is important and is not preserved
+			// in the local $notification_frequencies
+			if (isset($this->_notification_frequencies[1]))
+			{
+				$notification_types[$this->_notification_frequencies[1]][] = $member;
+			}
+
+			if ($this_pref > 1)
+			{
+				if (isset($this->_notification_frequencies[$this_pref]) && isset($notification_types[$this->_notification_frequencies[$this_pref]]))
+				{
+					$notification_types[$this->_notification_frequencies[$this_pref]][] = $member;
+				}
+			}
+		}
+
+		return $notification_types;
+	}
+
+	/**
+	 * Returns the notifications in the system, daily, weekly, etc
+	 *
+	 * @return string[]
+	 */
+	public function getNotifiers()
+	{
+		return $this->_notification_frequencies;
 	}
 
 	/**
@@ -271,30 +346,6 @@ class Notifications extends AbstractModel
 	}
 
 	/**
-	 * Stores data in the database to send a weekly digest.
-	 *
-	 * @param \ElkArte\Mentions\MentionType\NotificationInterface $obj
-	 * @param \ElkArte\NotificationsTask $task
-	 * @param mixed[] $bodies
-	 */
-	protected function _send_weekly_email(NotificationInterface $obj, NotificationsTask $task, $bodies)
-	{
-		foreach ($bodies as $body)
-		{
-			if (in_array($body['id_member_to'], $this->_to_actually_mention[$task['notification_type']]))
-			{
-				$this->_insert_delayed(array(
-					$task['notification_type'],
-					$body['id_member_to'],
-					$task['log_time'],
-					'w',
-					$body['body']
-				));
-			}
-		}
-	}
-
-	/**
 	 * Do the insert into the database for daily and weekly digests.
 	 *
 	 * @param mixed[] $insert_array
@@ -316,77 +367,26 @@ class Notifications extends AbstractModel
 	}
 
 	/**
-	 * Loads from the database the notification preferences for a certain type
-	 * of mention for a bunch of members.
+	 * Stores data in the database to send a weekly digest.
 	 *
-	 * @param string[] $notification_frequencies
-	 * @param string $notification_type
-	 * @param int[] $members
-	 *
-	 * @return array
+	 * @param \ElkArte\Mentions\MentionType\NotificationInterface $obj
+	 * @param \ElkArte\NotificationsTask $task
+	 * @param mixed[] $bodies
 	 */
-	protected function _getNotificationPreferences($notification_frequencies, $notification_type, $members)
+	protected function _send_weekly_email(NotificationInterface $obj, NotificationsTask $task, $bodies)
 	{
-		$query_members = $members;
-		// The member 0 is the "default" setting
-		$query_members[] = 0;
-
-		require_once(SUBSDIR . '/Notification.subs.php');
-		$preferences = getUsersNotificationsPreferences($notification_type, $query_members);
-
-		$notification_types = array();
-		foreach ($notification_frequencies as $freq)
+		foreach ($bodies as $body)
 		{
-			$notification_types[$freq] = array();
-		}
-
-		// notification_level can be:
-		//    - 0 => no notification
-		//    - 1 => only mention
-		//    - 2 => mention + immediate email
-		//    - 3 => mention + daily email
-		//    - 4 => mention + weekly email
-		//    - 5+ => usable by addons
-		foreach ($members as $member)
-		{
-			$this_pref = $preferences[$member][$notification_type];
-			if ($this_pref === 0)
+			if (in_array($body['id_member_to'], $this->_to_actually_mention[$task['notification_type']]))
 			{
-				continue;
-			}
-
-			// In the following two checks the use of the $this->_notification_frequencies
-			// is intended, because the numeric id is important and is not preserved
-			// in the local $notification_frequencies
-			if (isset($this->_notification_frequencies[1]))
-			{
-				$notification_types[$this->_notification_frequencies[1]][] = $member;
-			}
-
-			if ($this_pref > 1)
-			{
-				if (isset($this->_notification_frequencies[$this_pref]) && isset($notification_types[$this->_notification_frequencies[$this_pref]]))
-				{
-					$notification_types[$this->_notification_frequencies[$this_pref]][] = $member;
-				}
+				$this->_insert_delayed(array(
+					$task['notification_type'],
+					$body['id_member_to'],
+					$task['log_time'],
+					'w',
+					$body['body']
+				));
 			}
 		}
-
-		return $notification_types;
-	}
-
-	/**
-	 * Singleton... until we have something better.
-	 *
-	 * @return Notifications
-	 */
-	public static function instance()
-	{
-		if (self::$_instance === null)
-		{
-			self::$_instance = new Notifications(database(), User::$info);
-		}
-
-		return self::$_instance;
 	}
 }

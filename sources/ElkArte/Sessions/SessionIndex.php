@@ -1,7 +1,7 @@
 <?php
 
 /**
- * 
+ *
  *
  * @package   ElkArte Forum
  * @copyright ElkArte Forum contributors
@@ -13,7 +13,7 @@
 
 namespace ElkArte\Sessions;
 
-use \ElkArte\ValuesContainer;
+use ElkArte\ValuesContainer;
 
 /**
  *

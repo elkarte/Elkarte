@@ -8,12 +8,14 @@
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause (see accompanying LICENSE.txt file)
  *
  * This file contains code covered by:
- * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * copyright: 2011 Simple Machines (http://www.simplemachines.org)
  *
  * @version 2.0 dev
  *
  */
 
+use ElkArte\Notifications;
+use ElkArte\NotificationsTask;
 use ElkArte\User;
 
 /**
@@ -46,7 +48,7 @@ function getBuddiesID($buddies, $adding = true)
 	// If we are mentioning buddies, then let them know who's their buddy.
 	if ($adding && !empty($modSettings['mentions_enabled']) && !empty($modSettings['mentions_buddy']))
 	{
-		$notifier = \ElkArte\Notifications::instance();
+		$notifier = Notifications::instance();
 	}
 
 	// Add the new member(s) to the buddies array.
@@ -58,7 +60,7 @@ function getBuddiesID($buddies, $adding = true)
 		// Let them know they have been added as a buddy
 		if (isset($notifier))
 		{
-			$notifier->add(new \ElkArte\NotificationsTask(
+			$notifier->add(new NotificationsTask(
 				'buddy',
 				$row['id_member'],
 				User::$info->id,
@@ -113,11 +115,15 @@ function loadMembergroupsJoin($current_groups, $memID)
 		// Can they edit their primary group?
 		if (($row['id_group'] == $context['primary_group'] && $row['group_type'] > 1)
 			|| ($row['hidden'] != 2 && $context['primary_group'] == 0 && in_array($row['id_group'], $current_groups)))
+		{
 			$context['can_edit_primary'] = true;
+		}
 
 		// If they can't manage (protected) groups, and it's not publicly joinable or already assigned, they can't see it.
 		if (((!$context['can_manage_protected'] && $row['group_type'] == 1) || (!$context['can_manage_membergroups'] && $row['group_type'] == 0)) && $row['id_group'] != $context['primary_group'])
+		{
 			continue;
+		}
 
 		$groups[in_array($row['id_group'], $current_groups) ? 'member' : 'available'][$row['id_group']] = array(
 			'id' => $row['id_group'],

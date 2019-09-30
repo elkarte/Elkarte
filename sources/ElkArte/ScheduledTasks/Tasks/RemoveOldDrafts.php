@@ -8,7 +8,7 @@
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause (see accompanying LICENSE.txt file)
  *
  * This file contains code covered by:
- * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * copyright: 2011 Simple Machines (http://www.simplemachines.org)
  *
  * @version 2.0 dev
  *
@@ -35,7 +35,9 @@ class RemoveOldDrafts implements ScheduledTaskInterface
 		$db = database();
 
 		if (empty($modSettings['drafts_keep_days']))
+		{
 			return true;
+		}
 
 		// init
 		$drafts = array();
@@ -54,7 +56,9 @@ class RemoveOldDrafts implements ScheduledTaskInterface
 			)
 		);
 		while ($row = $db->fetch_row($request))
+		{
 			$drafts[] = (int) $row[0];
+		}
 		$db->free_result($request);
 
 		// If we have old one, remove them

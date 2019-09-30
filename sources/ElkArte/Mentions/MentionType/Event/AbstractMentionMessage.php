@@ -13,8 +13,8 @@
 
 namespace ElkArte\Mentions\MentionType\Event;
 
-use ElkArte\Mentions\MentionType\EventInterface;
 use ElkArte\HttpReq;
+use ElkArte\Mentions\MentionType\EventInterface;
 use ElkArte\UserInfo;
 
 /**

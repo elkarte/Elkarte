@@ -13,8 +13,6 @@
 
 namespace ElkArte\Mentions\MentionType\Notification;
 
-use ElkArte\Mentions\MentionType\Notification\AbstractMentionBoardAccess;
-
 /**
  * Class RlikemsgMention
  *
@@ -55,8 +53,6 @@ class Rlikemsg extends AbstractMentionBoardAccess
 	 * May notify the user about a like removed, or softly and gently remove
 	 * a 'likemsg' mention when the post is unliked.
 	 *
-	 * @package Mentions
-	 *
 	 * @param int $member_from the id of the member mentioning
 	 * @param int[] $members_to an array of ids of the members mentioned
 	 * @param int $target the id of the target involved in the mention
@@ -65,6 +61,8 @@ class Rlikemsg extends AbstractMentionBoardAccess
 	 *             - default is to set it as read (status = 1)
 	 * @param bool|null $is_accessible optional if the mention is accessible to the user
 	 * @return array|int[]
+	 * @package Mentions
+	 * @throws \ElkArte\Exceptions\Exception
 	 */
 	public function insert($member_from, $members_to, $target, $time = null, $status = null, $is_accessible = null)
 	{

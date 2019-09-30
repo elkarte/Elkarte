@@ -12,30 +12,35 @@
 
 namespace ElkArte;
 
-use ElkArte\User;
-
+/**
+ * Handle events in controller and classes
+ */
 class EventManager
 {
 	/**
 	 * An array of events, each entry is a different position.
+	 *
 	 * @var object[] Event
 	 */
 	protected $_registered_events = array();
 
 	/**
 	 * Instances of addons already loaded.
+	 *
 	 * @var object[]
 	 */
 	protected $_instances = array();
 
 	/**
 	 * Instances of the controller.
+	 *
 	 * @var object
 	 */
 	protected $_source = null;
 
 	/**
 	 * List of classes already registered.
+	 *
 	 * @var string[]
 	 */
 	protected $_classes = array();
@@ -43,6 +48,7 @@ class EventManager
 	/**
 	 * List of classes declared, kept here just to avoid
 	 * call get_declared_classes at each trigger
+	 *
 	 * @var null|string[]
 	 */
 	protected $_declared_classes = null;
@@ -81,7 +87,9 @@ class EventManager
 	{
 		// Nothing registered against this event, just return
 		if (!isset($this->_registered_events[$position]) || !$this->_registered_events[$position]->hasEvents())
+		{
 			return false;
+		}
 
 		// For all areas that that registered against this event, let them know its been triggered
 		foreach ($this->_registered_events[$position]->getEvents() as $event)
@@ -93,7 +101,9 @@ class EventManager
 			$dependencies = null;
 
 			if (!class_exists($class_name))
+			{
 				return false;
+			}
 
 			// Any dependency you want? In any order you want!
 			if (!empty($deps))
@@ -101,15 +111,21 @@ class EventManager
 				foreach ($deps as $dep)
 				{
 					if (array_key_exists($dep, $args))
+					{
 						$dependencies[$dep] = &$args[$dep];
+					}
 					else
+					{
 						$this->_source->provideDependencies($dep, $dependencies);
+					}
 				}
 			}
 			else
 			{
 				foreach ($args as $key => $val)
+				{
 					$dependencies[$key] = &$args[$key];
+				}
 			}
 
 			$instance = $this->_getInstance($class_name);
@@ -118,9 +134,13 @@ class EventManager
 			if (method_exists($instance, $method_name))
 			{
 				if (empty($dependencies))
+				{
 					call_user_func(array($instance, $method_name));
+				}
 				else
+				{
 					call_user_func_array(array($instance, $method_name), $dependencies);
+				}
 			}
 		}
 	}
@@ -161,7 +181,57 @@ class EventManager
 	protected function _setInstance($class_name, $instance)
 	{
 		if (!isset($this->_instances[$class_name]))
+		{
 			$this->_instances[$class_name] = $instance;
+		}
+	}
+
+	/**
+	 * Loads addons and modules based on a pattern.
+	 *
+	 * - The pattern defines the names of the classes that will be registered
+	 * to this \ElkArte\EventManager.
+	 *
+	 * @param string[] $classes A set of class names that should be attached
+	 */
+	public function registerClasses($classes)
+	{
+		$this->_register_events($classes);
+	}
+
+	/**
+	 * Takes care of registering the classes/methods to the different positions
+	 * of the \ElkArte\EventManager.
+	 *
+	 * What it does:
+	 *
+	 * - Each class must have a static Method ::hooks
+	 * - Method ::hooks must return an array defining where and how the class
+	 * will interact with the object that started the \ElkArte\EventManager.
+	 *
+	 * @param string[] $classes A list of class names.
+	 */
+	protected function _register_events($classes)
+	{
+		foreach ($classes as $class)
+		{
+			// Load the events for this area/class combination
+			$events = $class::hooks($this);
+			if (!is_array($events))
+			{
+				continue;
+			}
+
+			foreach ($events as $event)
+			{
+				// Check if a priority (ordering) was specified
+				$priority = isset($event[1][2]) ? $event[1][2] : 0;
+				$position = $event[0];
+
+				// Register the "action" to take when the event is triggered
+				$this->register($position, $event, $priority);
+			}
+		}
 	}
 
 	/**
@@ -187,22 +257,11 @@ class EventManager
 	public function register($position, $event, $priority = 0)
 	{
 		if (!isset($this->_registered_events[$position]))
+		{
 			$this->_registered_events[$position] = new Event(new Priority());
+		}
 
 		$this->_registered_events[$position]->add($event, $priority);
-	}
-
-	/**
-	 * Loads addons and modules based on a pattern.
-	 *
-	 * - The pattern defines the names of the classes that will be registered
-	 * to this \ElkArte\EventManager.
-	 *
-	 * @param string[] $classes A set of class names that should be attached
-	 */
-	public function registerClasses($classes)
-	{
-		$this->_register_events($classes);
 	}
 
 	/**
@@ -213,43 +272,10 @@ class EventManager
 	protected function _declared_classes()
 	{
 		if ($this->_declared_classes === null)
+		{
 			$this->_declared_classes = get_declared_classes();
+		}
 
 		return $this->_declared_classes;
-	}
-
-	/**
-	 * Takes care of registering the classes/methods to the different positions
-	 * of the \ElkArte\EventManager.
-	 *
-	 * What it does:
-	 *
-	 * - Each class must have a static Method ::hooks
-	 * - Method ::hooks must return an array defining where and how the class
-	 * will interact with the object that started the \ElkArte\EventManager.
-	 *
-	 * @param string[] $classes A list of class names.
-	 */
-	protected function _register_events($classes)
-	{
-		foreach ($classes as $class)
-		{
-			// Load the events for this area/class combination
-			$events = $class::hooks($this);
-			if (is_array($events) === false)
-			{
-				continue;
-			}
-
-			foreach ($events as $event)
-			{
-				// Check if a priority (ordering) was specified
-				$priority = isset($event[1][2]) ? $event[1][2] : 0;
-				$position = $event[0];
-
-				// Register the "action" to take when the event is triggered
-				$this->register($position, $event, $priority);
-			}
-		}
 	}
 }

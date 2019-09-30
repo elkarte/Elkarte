@@ -13,10 +13,16 @@
 
 namespace ElkArte;
 
+/**
+ * Class QueryAnalysis
+ *
+ * @package ElkArte
+ */
 class QueryAnalysis
 {
 	/**
 	 * The SELECT statement of the query (if any)
+	 *
 	 * @var string
 	 */
 	protected $_select;
@@ -36,7 +42,9 @@ class QueryAnalysis
 
 		// Make the filenames look a bit better.
 		if (isset($query_data['f']))
+		{
 			$query_data['f'] = preg_replace('~^' . preg_quote(BOARDDIR, '~') . '~', '...', $query_data['f']);
+		}
 
 		$query_info = array(
 			'text' => nl2br(str_replace("\t", '&nbsp;&nbsp;&nbsp;', htmlspecialchars($query_data['q'], ENT_COMPAT, 'UTF-8'))),
@@ -45,12 +53,18 @@ class QueryAnalysis
 		);
 
 		if (!empty($query_data['f']) && !empty($query_data['l']))
+		{
 			$query_info['position_time'] = sprintf($txt['debug_query_in_line'], $query_data['f'], $query_data['l']);
+		}
 
 		if (isset($query_data['s'], $query_data['t']) && isset($txt['debug_query_which_took_at']))
+		{
 			$query_info['position_time'] .= sprintf($txt['debug_query_which_took_at'], round($query_data['t'], 8), round($query_data['s'], 8));
+		}
 		else
+		{
 			$query_info['position_time'] .= sprintf($txt['debug_query_which_took'], round($query_data['t'], 8));
+		}
 
 		return $query_info;
 	}
@@ -60,62 +74,6 @@ class QueryAnalysis
 	 *
 	 * @return string[] - 'text', 'is_select', 'position_time'
 	 */
-
-	/**
-	 * Does the EXPLAIN of a query
-	 *
-	 * @return string[] an array with the results of the EXPLAIN with two
-	 *                  possible structures depending if the EXPLAIN is
-	 *                  successful or fails.
-	 *                  If successful:
-	 *                  array(
-	 *                    'headers' => array( ..list of headers.. )
-	 *                    'body' => array(
-	 *                      array( ..cells.. ) // one row
-	 *                    )
-	 *                  )
-	 *                  If th EXPLAIN fails:
-	 *                  array(
-	 *                    'is_error' => true
-	 *                    'error_text' => the error message
-	 *                  )
-	 */
-	public function doExplain()
-	{
-		if (empty($this->_select))
-			return array();
-
-		// db work...
-		$db = database();
-
-		$result = $db->query('', '
-			EXPLAIN ' . $this->_select,
-			array(
-			)
-		);
-
-		if ($result->hasResults() === false)
-		{
-			$explain = array(
-				'is_error' => true,
-				'error_text' => $db->last_error($db->connection()),
-			);
-		}
-		else
-		{
-			$row = $db->fetch_assoc($result);
-			$explain = array(
-				'headers' => array_keys($row),
-				'body' => array()
-			);
-
-			$db->data_seek($result, 0);
-			while ($row = $db->fetch_assoc($result))
-				$explain['body'][] = $row;
-		}
-
-		return $explain;
-	}
 
 	/**
 	 * Fix query indentation
@@ -133,11 +91,15 @@ class QueryAnalysis
 		foreach ($query as $line)
 		{
 			preg_match('/^(\t*)/', $line, $temp);
-			if (strlen($temp[0]) < $min_indent || $min_indent == 0)
+			if (strlen($temp[0]) < $min_indent || $min_indent === 0)
+			{
 				$min_indent = strlen($temp[0]);
+			}
 		}
 		foreach ($query as $l => $dummy)
+		{
 			$query[$l] = substr($dummy, $min_indent);
+		}
 
 		return implode("\n", $query);
 	}
@@ -151,11 +113,13 @@ class QueryAnalysis
 	 */
 	protected function _is_select_query($query_data)
 	{
-		$is_select_query = substr(trim($query_data), 0, 6) == 'SELECT';
+		$is_select_query = substr(trim($query_data), 0, 6) === 'SELECT';
 		$this->_select = '';
 
 		if ($is_select_query)
+		{
 			$this->_select = $query_data;
+		}
 		elseif (preg_match('~^INSERT(?: IGNORE)? INTO \w+(?:\s+\([^)]+\))?\s+(SELECT .+)$~s', trim($query_data), $matches) != 0)
 		{
 			$is_select_query = true;
@@ -181,5 +145,64 @@ class QueryAnalysis
 		}
 
 		return $is_select_query;
+	}
+
+	/**
+	 * Does the EXPLAIN of a query
+	 *
+	 * @return string[] an array with the results of the EXPLAIN with two
+	 *                  possible structures depending if the EXPLAIN is
+	 *                  successful or fails.
+	 *                  If successful:
+	 *                  array(
+	 *                    'headers' => array( ..list of headers.. )
+	 *                    'body' => array(
+	 *                      array( ..cells.. ) // one row
+	 *                    )
+	 *                  )
+	 *                  If th EXPLAIN fails:
+	 *                  array(
+	 *                    'is_error' => true
+	 *                    'error_text' => the error message
+	 *                  )
+	 */
+	public function doExplain()
+	{
+		if (empty($this->_select))
+		{
+			return array();
+		}
+
+		// db work...
+		$db = database();
+
+		$result = $db->query('', '
+			EXPLAIN ' . $this->_select,
+			array()
+		);
+
+		if ($result->hasResults() === false)
+		{
+			$explain = array(
+				'is_error' => true,
+				'error_text' => $db->last_error($db->connection()),
+			);
+		}
+		else
+		{
+			$row = $db->fetch_assoc($result);
+			$explain = array(
+				'headers' => array_keys($row),
+				'body' => array()
+			);
+
+			$db->data_seek($result, 0);
+			while ($row = $db->fetch_assoc($result))
+			{
+				$explain['body'][] = $row;
+			}
+		}
+
+		return $explain;
 	}
 }

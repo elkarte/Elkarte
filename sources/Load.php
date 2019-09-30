@@ -8,13 +8,18 @@
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause (see accompanying LICENSE.txt file)
  *
  * This file contains code covered by:
- * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * copyright: 2011 Simple Machines (http://www.simplemachines.org)
  *
  * @version 2.0 dev
  *
  */
 
+use BBC\ParserWrapper;
+use ElkArte\Cache\Cache;
+use ElkArte\Debug;
+use ElkArte\Hooks;
 use ElkArte\User;
+use ElkArte\Util;
 
 /**
  * Load the $modSettings array and many necessary forum settings.
@@ -33,14 +38,15 @@ use ElkArte\User;
  * @event integrate_pre_load to call any pre load integration functions.
  *
  * @global array $modSettings is a giant array of all of the forum-wide settings and statistics.
+ * @throws \ElkArte\Exceptions\Exception
  */
 function reloadSettings()
 {
 	global $modSettings;
 
 	$db = database();
-	$cache = \ElkArte\Cache\Cache::instance();
-	$hooks = \ElkArte\Hooks::instance();
+	$cache = Cache::instance();
+	$hooks = Hooks::instance();
 
 	// Try to load it from the cache first; it'll never get cached if the setting is off.
 	if (!$cache->getVar($modSettings, 'modSettings', 90))
@@ -48,25 +54,39 @@ function reloadSettings()
 		$request = $db->query('', '
 			SELECT variable, value
 			FROM {db_prefix}settings',
-			array(
-			)
+			array()
 		);
 		$modSettings = array();
 		if (!$request)
+		{
 			\ElkArte\Errors\Errors::instance()->display_db_error();
+		}
 		while ($row = $request->fetch_row())
+		{
 			$modSettings[$row[0]] = $row[1];
+		}
 		$request->free_result();
 
 		// Do a few things to protect against missing settings or settings with invalid values...
 		if (empty($modSettings['defaultMaxTopics']) || $modSettings['defaultMaxTopics'] <= 0 || $modSettings['defaultMaxTopics'] > 999)
+		{
 			$modSettings['defaultMaxTopics'] = 20;
+		}
+
 		if (empty($modSettings['defaultMaxMessages']) || $modSettings['defaultMaxMessages'] <= 0 || $modSettings['defaultMaxMessages'] > 999)
+		{
 			$modSettings['defaultMaxMessages'] = 15;
+		}
+
 		if (empty($modSettings['defaultMaxMembers']) || $modSettings['defaultMaxMembers'] <= 0 || $modSettings['defaultMaxMembers'] > 999)
+		{
 			$modSettings['defaultMaxMembers'] = 30;
+		}
+
 		if (empty($modSettings['subject_length']))
+		{
 			$modSettings['subject_length'] = 24;
+		}
 
 		$modSettings['warning_enable'] = $modSettings['warning_settings'][0];
 
@@ -77,7 +97,9 @@ function reloadSettings()
 
 	// Setting the timezone is a requirement for some functions in PHP >= 5.1.
 	if (isset($modSettings['default_timezone']))
+	{
 		date_default_timezone_set($modSettings['default_timezone']);
+	}
 
 	// Check the load averages?
 	if (!empty($modSettings['loadavg_enable']))
@@ -91,19 +113,29 @@ function reloadSettings()
 		}
 
 		if ($modSettings['load_average'] !== false)
+		{
 			call_integration_hook('integrate_load_average', array($modSettings['load_average']));
+		}
 
 		// Let's have at least a zero
 		if (empty($modSettings['loadavg_forum']) || $modSettings['load_average'] === false)
+		{
 			$modSettings['current_load'] = 0;
+		}
 		else
+		{
 			$modSettings['current_load'] = $modSettings['load_average'];
+		}
 
 		if (!empty($modSettings['loadavg_forum']) && $modSettings['current_load'] >= $modSettings['loadavg_forum'])
+		{
 			\ElkArte\Errors\Errors::instance()->display_loadavg_error();
+		}
 	}
 	else
+	{
 		$modSettings['current_load'] = 0;
+	}
 
 	// Is post moderation alive and well?
 	$modSettings['postmod_active'] = isset($modSettings['admin_features']) ? in_array('pm', explode(',', $modSettings['admin_features'])) : true;
@@ -127,9 +159,11 @@ function reloadSettings()
 	// Integration is cool.
 	if (defined('ELK_INTEGRATION_SETTINGS'))
 	{
-		$integration_settings = \ElkArte\Util::unserialize(ELK_INTEGRATION_SETTINGS);
+		$integration_settings = Util::unserialize(ELK_INTEGRATION_SETTINGS);
 		foreach ($integration_settings as $hook => $function)
+		{
 			add_integration_function($hook, $function);
+		}
 	}
 
 	// Any files to pre include?
@@ -158,7 +192,7 @@ function reloadSettings()
  */
 function loadUserSettings()
 {
-	\ElkArte\User::load(true);
+	User::load(true);
 }
 
 /**
@@ -186,7 +220,7 @@ function loadBoard()
 	global $board_info, $board, $topic;
 
 	$db = database();
-	$cache = \ElkArte\Cache\Cache::instance();
+	$cache = Cache::instance();
 
 	// Assume they are not a moderator.
 	User::$info->is_mod = false;
@@ -219,7 +253,9 @@ function loadBoard()
 
 		// Remember redirection is the key to avoiding fallout from your bosses.
 		if (!empty($topic))
+		{
 			redirectexit('topic=' . $topic . '.msg' . $_REQUEST['msg'] . '#msg' . $_REQUEST['msg']);
+		}
 		else
 		{
 			loadPermissions();
@@ -232,6 +268,7 @@ function loadBoard()
 	if (empty($board) && empty($topic))
 	{
 		$board_info = array('moderators' => array());
+
 		return;
 	}
 
@@ -239,9 +276,13 @@ function loadBoard()
 	{
 		// @todo SLOW?
 		if (!empty($topic))
+		{
 			$temp = $cache->get('topic_board-' . $topic, 120);
+		}
 		else
+		{
 			$temp = $cache->get('board-' . $board, 120);
+		}
 
 		if (!empty($temp))
 		{
@@ -283,7 +324,9 @@ function loadBoard()
 
 			// Set the current board.
 			if (!empty($row['id_board']))
+			{
 				$board = (int) $row['id_board'];
+			}
 
 			// Basic operating information. (globals... :/)
 			$board_info = array(
@@ -321,14 +364,15 @@ function loadBoard()
 			do
 			{
 				if (!empty($row['id_moderator']))
+				{
 					$board_info['moderators'][$row['id_moderator']] = array(
 						'id' => $row['id_moderator'],
 						'name' => $row['real_name'],
 						'href' => $scripturl . '?action=profile;u=' . $row['id_moderator'],
 						'link' => '<a href="' . $scripturl . '?action=profile;u=' . $row['id_moderator'] . '">' . $row['real_name'] . '</a>'
 					);
-			}
-			while ($row = $db->fetch_assoc($request));
+				}
+			} while ($row = $db->fetch_assoc($request));
 
 			// If the board only contains unapproved posts and the user can't approve then they can't see any topics.
 			// If that is the case do an additional check to see if they have any topics waiting to be approved.
@@ -359,7 +403,10 @@ function loadBoard()
 			{
 				// @todo SLOW?
 				if (!empty($topic))
+				{
 					$cache->put('topic_board-' . $topic, $board_info, 120);
+				}
+
 				$cache->put('board-' . $board, $board_info, 120);
 			}
 		}
@@ -377,7 +424,9 @@ function loadBoard()
 	}
 
 	if (!empty($topic))
+	{
 		$_GET['board'] = (int) $board;
+	}
 
 	if (!empty($board))
 	{
@@ -397,20 +446,22 @@ function loadBoard()
 		$context['linktree'] = array_merge(
 			$context['linktree'],
 			array(array(
-				'url' => getUrl('action', $modSettings['default_forum_action']) . '#c' . $board_info['cat']['id'],
-				'name' => $board_info['cat']['name']
-			)),
+					  'url' => getUrl('action', $modSettings['default_forum_action']) . '#c' . $board_info['cat']['id'],
+					  'name' => $board_info['cat']['name']
+				  )
+			),
 			array_reverse($board_info['parent_boards']),
 			array(array(
-				'url' => $scripturl . '?board=' . $board . '.0',
-				'name' => $board_info['name']
-			))
+					  'url' => $scripturl . '?board=' . $board . '.0',
+					  'name' => $board_info['name']
+				  )
+			)
 		);
 	}
 
 	// Set the template contextual information.
-	$context['user']['is_mod'] = User::$info->is_mod;
-	$context['user']['is_moderator'] = User::$info->is_moderator;
+	$context['user']['is_mod'] = (bool) User::$info->is_mod;
+	$context['user']['is_moderator'] = (bool) User::$info->is_moderator;
 	$context['current_topic'] = $topic;
 	$context['current_board'] = $board;
 
@@ -448,7 +499,9 @@ function loadBoard()
 			is_not_guest($txt['topic_gone']);
 		}
 		else
+		{
 			throw new \ElkArte\Exceptions\Exception('topic_gone', false);
+		}
 	}
 
 	if (User::$info->is_mod)
@@ -478,12 +531,13 @@ function loadPermissions()
 	if (User::$info->is_admin)
 	{
 		banPermissions();
+
 		return;
 	}
 
 	$removals = array();
 
-	$cache = \ElkArte\Cache\Cache::instance();
+	$cache = Cache::instance();
 
 	if ($cache->isEnabled())
 	{
@@ -521,7 +575,6 @@ function loadPermissions()
 
 	if (empty(User::$info->permissions))
 	{
-		$permissions = [];
 		// Get the general permissions.
 		$request = $db->query('', '
 			SELECT
@@ -534,12 +587,17 @@ function loadPermissions()
 				'spider_group' => !empty($modSettings['spider_group']) && $modSettings['spider_group'] != 1 ? $modSettings['spider_group'] : 0,
 			)
 		);
+		$permissions = [];
 		while ($row = $db->fetch_assoc($request))
 		{
 			if (empty($row['add_deny']))
+			{
 				$removals[] = $row['permission'];
+			}
 			else
+			{
 				$permissions[] = $row['permission'];
+			}
 		}
 		User::$info->permissions = $permissions;
 		$db->free_result($request);
@@ -576,9 +634,13 @@ function loadPermissions()
 		while ($row = $db->fetch_assoc($request))
 		{
 			if (empty($row['add_deny']))
+			{
 				$removals[] = $row['permission'];
+			}
 			else
+			{
 				$permissions[] = $row['permission'];
+			}
 		}
 		User::$info->permissions = $permissions;
 		$db->free_result($request);
@@ -644,10 +706,10 @@ function detectBrowser()
  * - loads default JS variables for use in every theme
  * - loads default JS scripts for use in every theme
  *
- * @deprecated since 2.0; use the theme object
- *
  * @param int $id_theme = 0
  * @param bool $initialize = true
+ * @deprecated since 2.0; use the theme object
+ *
  */
 function loadTheme($id_theme = 0, $initialize = true)
 {
@@ -664,14 +726,14 @@ function loadUserContext()
 
 	// Set up the contextual user array.
 	$context['user'] = array(
-		'id' => User::$info->id,
+		'id' => (int) User::$info->id,
 		'is_logged' => User::$info->is_guest === false,
-		'is_guest' => User::$info->is_guest,
-		'is_admin' => User::$info->is_admin,
-		'is_mod' => User::$info->is_mod,
-		'is_moderator' => User::$info->is_moderator,
+		'is_guest' => (bool) User::$info->is_guest,
+		'is_admin' => (bool) User::$info->is_admin,
+		'is_mod' => (bool) User::$info->is_mod,
+		'is_moderator' => (bool) User::$info->is_moderator,
 		// A user can mod if they have permission to see the mod center, or they are a board/group/approval moderator.
-		'can_mod' => User::$info->canMod($modSettings['postmod_active']),
+		'can_mod' => (bool) User::$info->canMod($modSettings['postmod_active']),
 		'username' => User::$info->username,
 		'language' => User::$info->language,
 		'email' => User::$info->email,
@@ -728,6 +790,7 @@ function determineSmileySet($user_smiley_set, $known_smiley_sets)
 function loadEssentialThemeData()
 {
 	\ElkArte\Errors\Errors::instance()->log_deprecated('loadEssentialThemeData()', 'theme()->getTemplates()->loadEssentialThemeData()');
+
 	return theme()->getTemplates()->loadEssentialThemeData();
 }
 
@@ -742,19 +805,20 @@ function loadEssentialThemeData()
  *   loading of style sheets with this function is deprecated, use loadCSSFile instead
  * - if $settings['template_dirs'] is empty, it delays the loading of the template
  *
- * @deprecated since 2.0; use the theme object
- *
- * @uses the requireTemplate() function to actually load the file.
- *
  * @param string|false $template_name
  * @param string[]|string $style_sheets any style sheets to load with the template
  * @param bool $fatal = true if fatal is true, dies with an error message if the template cannot be found
  *
  * @return boolean|null
+ * @deprecated since 2.0; use the theme object
+ *
+ * @uses the requireTemplate() function to actually load the file.
+ * @throws \ElkArte\Exceptions\Exception
  */
 function loadTemplate($template_name, $style_sheets = array(), $fatal = true)
 {
 	\ElkArte\Errors\Errors::instance()->log_deprecated('loadTemplate()', 'theme()->getTemplates()->load()');
+
 	return theme()->getTemplates()->load($template_name, $style_sheets, $fatal);
 }
 
@@ -767,14 +831,14 @@ function loadTemplate($template_name, $style_sheets = array(), $fatal = true)
  * - if ?debug is in the query string, shows administrators a marker after every sub template
  * for debugging purposes.
  *
- * @deprecated since 2.0; use the theme object
- *
  * @param string $sub_template_name
  * @param bool|string $fatal = false
  * - $fatal = true is for templates that shouldn't get a 'pretty' error screen
  * - $fatal = 'ignore' to skip
  *
  * @return bool
+ * @deprecated since 2.0; use the theme object
+ * @throws \ElkArte\Exceptions\Exception
  */
 function loadSubTemplate($sub_template_name, $fatal = false)
 {
@@ -802,13 +866,19 @@ function loadCSSFile($filenames, $params = array(), $id = '')
 	global $context;
 
 	if (empty($filenames))
+	{
 		return;
+	}
 
 	if (!is_array($filenames))
+	{
 		$filenames = array($filenames);
+	}
 
 	if (in_array('admin.css', $filenames))
+	{
 		$filenames[] = $context['theme_variant'] . '/admin' . $context['theme_variant'] . '.css';
+	}
 
 	$params['subdir'] = 'css';
 	$params['extension'] = 'css';
@@ -845,7 +915,9 @@ function loadCSSFile($filenames, $params = array(), $id = '')
 function loadJavascriptFile($filenames, $params = array(), $id = '')
 {
 	if (empty($filenames))
+	{
 		return;
+	}
 
 	$params['subdir'] = 'scripts';
 	$params['extension'] = 'js';
@@ -893,20 +965,30 @@ function loadAssetFile($filenames, $params = array(), $id = '')
 	global $settings, $context, $db_show_debug;
 
 	if (empty($filenames))
+	{
 		return;
+	}
 
-	$cache = \ElkArte\Cache\Cache::instance();
+	$cache = Cache::instance();
 
 	if (!is_array($filenames))
+	{
 		$filenames = array($filenames);
+	}
 
 	// Static values for all these settings
 	if (!isset($params['stale']) || $params['stale'] === true)
+	{
 		$staler_string = CACHE_STALE;
+	}
 	elseif (is_string($params['stale']))
+	{
 		$staler_string = ($params['stale'][0] === '?' ? $params['stale'] : '?' . $params['stale']);
+	}
 	else
+	{
 		$staler_string = '';
+	}
 
 	$fallback = (!empty($params['fallback']) && ($params['fallback'] === false)) ? false : true;
 	$dir = '/' . $params['subdir'] . '/';
@@ -917,7 +999,9 @@ function loadAssetFile($filenames, $params = array(), $id = '')
 	if ($cache->getVar($temp, $cache_name, 600))
 	{
 		if (empty($context[$params['index_name']]))
+		{
 			$context[$params['index_name']] = array();
+		}
 
 		$context[$params['index_name']] += $temp;
 
@@ -925,7 +1009,7 @@ function loadAssetFile($filenames, $params = array(), $id = '')
 		{
 			foreach ($temp as $temp_params)
 			{
-				\ElkArte\Debug::instance()->add($params['debug_index'], $temp_params['options']['basename'] . '(' . (!empty($temp_params['options']['local']) ? (!empty($temp_params['options']['url']) ? basename($temp_params['options']['url']) : basename($temp_params['options']['dir'])) : '') . ')');
+				Debug::instance()->add($params['debug_index'], $temp_params['options']['basename'] . '(' . (!empty($temp_params['options']['local']) ? (!empty($temp_params['options']['url']) ? basename($temp_params['options']['url']) : basename($temp_params['options']['dir'])) : '') . ')');
 			}
 		}
 	}
@@ -968,10 +1052,14 @@ function loadAssetFile($filenames, $params = array(), $id = '')
 						$params['url'] = $settings['default_theme_url'];
 					}
 					else
+					{
 						$filename = false;
+					}
 				}
 				else
+				{
 					$filename = $settings['theme_url'] . $dir . $params['basename'] . $cache_staler;
+				}
 			}
 
 			// Add it to the array for use in the template
@@ -981,7 +1069,7 @@ function loadAssetFile($filenames, $params = array(), $id = '')
 
 				if ($db_show_debug === true)
 				{
-					\ElkArte\Debug::instance()->add($params['debug_index'], $params['basename'] . '(' . (!empty($params['local']) ? (!empty($params['url']) ? basename($params['url']) : basename($params['dir'])) : '') . ')');
+					Debug::instance()->add($params['debug_index'], $params['basename'] . '(' . (!empty($params['local']) ? (!empty($params['url']) ? basename($params['url']) : basename($params['dir'])) : '') . ')');
 				}
 			}
 
@@ -994,10 +1082,10 @@ function loadAssetFile($filenames, $params = array(), $id = '')
 /**
  * Add a Javascript variable for output later (for feeding text strings and similar to JS)
  *
- * @deprecated since 2.0; use the theme object
- *
  * @param mixed[] $vars array of vars to include in the output done as 'varname' => 'var value'
  * @param bool $escape = false, whether or not to escape the value
+ * @deprecated since 2.0; use the theme object
+ *
  */
 function addJavascriptVar($vars, $escape = false)
 {
@@ -1014,10 +1102,10 @@ function addJavascriptVar($vars, $escape = false)
  *   or for scripts that require help from PHP/whatever, this can be useful.
  * - all code added with this function is added to the same <script> tag so do make sure your JS is clean!
  *
- * @deprecated since 2.0; use the theme object
- *
  * @param string $javascript
  * @param bool $defer = false, define if the script should load in <head> or before the closing <html> tag
+ * @deprecated since 2.0; use the theme object
+ *
  */
 function addInlineJavascript($javascript, $defer = false)
 {
@@ -1030,17 +1118,18 @@ function addInlineJavascript($javascript, $defer = false)
  *
  * - Tries the current and default themes as well as the user and global languages.
  *
- * @deprecated since 2.0; use the theme object
- *
  * @param string $template_name
  * @param string $lang = ''
  * @param bool $fatal = true
  * @param bool $force_reload = false
  * @return string The language actually loaded.
+ * @deprecated since 2.0; use the theme object
+ *
  */
 function loadLanguage($template_name, $lang = '', $fatal = true, $force_reload = false)
 {
 	\ElkArte\Errors\Errors::instance()->log_deprecated('loadLanguage()', 'theme()->getTemplates()->loadLanguageFile()');
+
 	return theme()->getTemplates()->loadLanguageFile($template_name, $lang, $fatal, $force_reload);
 }
 
@@ -1138,7 +1227,7 @@ function getBoardParents($id_parent)
 	global $scripturl;
 
 	$db = database();
-	$cache = \ElkArte\Cache\Cache::instance();
+	$cache = Cache::instance();
 	$boards = array();
 
 	// First check if we have this cached already.
@@ -1182,6 +1271,7 @@ function getBoardParents($id_parent)
 
 				// If a moderator exists for this board, add that moderator for all children too.
 				if (!empty($row['id_moderator']))
+				{
 					foreach ($boards as $id => $dummy)
 					{
 						$boards[$id]['moderators'][$row['id_moderator']] = array(
@@ -1191,6 +1281,7 @@ function getBoardParents($id_parent)
 							'link' => '<a href="' . $scripturl . '?action=profile;u=' . $row['id_moderator'] . '">' . $row['real_name'] . '</a>'
 						);
 					}
+				}
 			}
 			$db->free_result($result);
 		}
@@ -1212,7 +1303,7 @@ function getLanguages($use_cache = true)
 {
 	global $settings;
 
-	$cache = \ElkArte\Cache\Cache::instance();
+	$cache = Cache::instance();
 
 	// Either we don't use the cache, or its expired.
 	$languages = array();
@@ -1221,7 +1312,9 @@ function getLanguages($use_cache = true)
 	{
 		// If we don't have our theme information yet, lets get it.
 		if (empty($settings['default_theme_dir']))
+		{
 			new ElkArte\Themes\ThemeLoader(0, false);
+		}
 
 		// Default language directories to try.
 		$language_directories = array(
@@ -1231,7 +1324,9 @@ function getLanguages($use_cache = true)
 
 		// We possibly have a base theme directory.
 		if (!empty($settings['base_theme_dir']))
+		{
 			$language_directories[] = $settings['base_theme_dir'] . '/languages';
+		}
 
 		// Remove any duplicates.
 		$language_directories = array_unique($language_directories);
@@ -1240,14 +1335,18 @@ function getLanguages($use_cache = true)
 		{
 			// Can't look in here... doesn't exist!
 			if (!file_exists($language_dir))
+			{
 				continue;
+			}
 
 			$dir = dir($language_dir);
 			while ($entry = $dir->read())
 			{
 				// Only directories are interesting
 				if ($entry == '..' || !is_dir($dir->path . '/' . $entry))
+				{
 					continue;
+				}
 
 				// @todo at some point we may want to simplify that stuff (I mean scanning all the files just for index)
 				$file_dir = dir($dir->path . '/' . $entry);
@@ -1255,10 +1354,12 @@ function getLanguages($use_cache = true)
 				{
 					// Look for the index language file....
 					if (!preg_match('~^index\.(.+)\.php$~', $file_entry, $matches))
+					{
 						continue;
+					}
 
 					$languages[$matches[1]] = array(
-						'name' => \ElkArte\Util::ucwords(strtr($matches[1], array('_' => ' '))),
+						'name' => Util::ucwords(strtr($matches[1], array('_' => ' '))),
 						'selected' => false,
 						'filename' => $matches[1],
 						'location' => $language_dir . '/' . $entry . '/index.' . $matches[1] . '.php',
@@ -1291,7 +1392,7 @@ function loadDatabase()
 	{
 		$db = database(false);
 	}
-	catch (\Exception $e)
+	catch (Exception $e)
 	{
 		\ElkArte\Errors\Errors::instance()->display_db_error();
 	}
@@ -1313,19 +1414,21 @@ function loadDatabase()
 /**
  * Determine the user's avatar type and return the information as an array
  *
- * @todo this function seems more useful than expected, it should be improved. :P
- *
- * @event integrate_avatar allows access to $avatar array before it is returned
  * @param mixed[] $profile array containing the users profile data
  *
  * @return mixed[] $avatar
+ * @todo this function seems more useful than expected, it should be improved. :P
+ *
+ * @event integrate_avatar allows access to $avatar array before it is returned
  */
 function determineAvatar($profile)
 {
 	global $modSettings, $scripturl, $settings;
 
 	if (empty($profile))
+	{
 		return array();
+	}
 
 	$avatar_protocol = substr(strtolower($profile['avatar']), 0, 7);
 
@@ -1397,12 +1500,14 @@ function determineAvatar($profile)
 	}
 	// finally ...
 	else
+	{
 		$avatar = array(
 			'name' => '',
 			'image' => '',
 			'href' => '',
 			'url' => ''
 		);
+	}
 
 	// Make sure there's a preview for gravatars available.
 	$avatar['gravatar_preview'] = '//www.gravatar.com/avatar/' . hash('md5', strtolower($profile['email_address'])) . '?s=' . $modSettings['avatar_max_height'] . (!empty($modSettings['gravatar_rating']) ? ('&amp;r=' . $modSettings['gravatar_rating']) : '');
@@ -1467,7 +1572,7 @@ function doSecurityChecks()
 
 	$show_warnings = false;
 
-	$cache = \ElkArte\Cache\Cache::instance();
+	$cache = Cache::instance();
 
 	if (allowedTo('admin_forum') && User::$info->is_guest === false)
 	{
@@ -1488,7 +1593,9 @@ function doSecurityChecks()
 		}
 
 		if (checkSecurityFiles())
+		{
 			$show_warnings = true;
+		}
 
 		// We are already checking so many files...just few more doesn't make any difference! :P
 		require_once(SUBSDIR . '/Attachments.subs.php');
@@ -1498,11 +1605,15 @@ function doSecurityChecks()
 
 		// Active admin session?
 		if (isAdminSessionActive())
+		{
 			$context['warning_controls']['admin_session'] = sprintf($txt['admin_session_active'], ($scripturl . '?action=admin;area=adminlogoff;redir;' . $context['session_var'] . '=' . $context['session_id']));
+		}
 
 		// Maintenance mode enabled?
 		if (!empty($maintenance))
+		{
 			$context['warning_controls']['maintenance'] = sprintf($txt['admin_maintenance_active'], ($scripturl . '?action=admin;area=serversettings;' . $context['session_var'] . '=' . $context['session_id']));
+		}
 
 		// New updates
 		if (defined('FORUM_VERSION'))
@@ -1527,21 +1638,27 @@ function doSecurityChecks()
 			$context['security_controls_query']['title'] = $txt['query_command_denied'];
 			$show_warnings = true;
 			foreach ($_SESSION['query_command_denied'] as $command => $error)
-				$context['security_controls_query']['errors'][$command] = '<pre>' . \ElkArte\Util::htmlspecialchars($error) . '</pre>';
+			{
+				$context['security_controls_query']['errors'][$command] = '<pre>' . Util::htmlspecialchars($error) . '</pre>';
+			}
 		}
 		else
 		{
 			$context['security_controls_query']['title'] = $txt['query_command_denied_guests'];
 			foreach ($_SESSION['query_command_denied'] as $command => $error)
-				$context['security_controls_query']['errors'][$command] = '<pre>' . sprintf($txt['query_command_denied_guests_msg'], \ElkArte\Util::htmlspecialchars($command)) . '</pre>';
+			{
+				$context['security_controls_query']['errors'][$command] = '<pre>' . sprintf($txt['query_command_denied_guests_msg'], Util::htmlspecialchars($command)) . '</pre>';
+			}
 		}
 	}
 
 	// Are there any members waiting for approval?
 	if (allowedTo('moderate_forum') && ((!empty($modSettings['registration_method']) && $modSettings['registration_method'] == 2) || !empty($modSettings['approveAccountDeletion'])) && !empty($modSettings['unapprovedMembers']))
+	{
 		$context['warning_controls']['unapproved_members'] = sprintf($txt[$modSettings['unapprovedMembers'] == 1 ? 'approve_one_member_waiting' : 'approve_many_members_waiting'], $scripturl . '?action=admin;area=viewmembers;sa=browse;type=approve', $modSettings['unapprovedMembers']);
+	}
 
-	if (!empty($context['open_mod_reports']) && (empty(\ElkArte\User::$settings['mod_prefs']) || \ElkArte\User::$settings['mod_prefs'][0] == 1))
+	if (!empty($context['open_mod_reports']) && (empty(User::$settings['mod_prefs']) || User::$settings['mod_prefs'][0] == 1))
 	{
 		$context['warning_controls']['open_mod_reports'] = '<a href="' . $scripturl . '?action=moderate;area=reports">' . sprintf($txt['mod_reports_waiting'], $context['open_mod_reports']) . '</a>';
 	}
@@ -1560,17 +1677,25 @@ function doSecurityChecks()
 		$context['security_controls_ban']['errors']['reason'] = '';
 
 		if (!empty($_SESSION['ban']['cannot_post']['reason']))
+		{
 			$context['security_controls_ban']['errors']['reason'] = $_SESSION['ban']['cannot_post']['reason'];
+		}
 
 		if (!empty($_SESSION['ban']['expire_time']))
+		{
 			$context['security_controls_ban']['errors']['reason'] .= '<span class="smalltext">' . sprintf($txt['your_ban_expires'], standardTime($_SESSION['ban']['expire_time'], false)) . '</span>';
+		}
 		else
+		{
 			$context['security_controls_ban']['errors']['reason'] .= '<span class="smalltext">' . $txt['your_ban_expires_never'] . '</span>';
+		}
 	}
 
 	// Finally, let's show the layer.
 	if ($show_warnings || !empty($context['warning_controls']))
-		\theme()->getLayers()->addAfter('admin_warning', 'body');
+	{
+		theme()->getLayers()->addAfter('admin_warning', 'body');
+	}
 }
 
 /**
@@ -1584,10 +1709,14 @@ function loadBBCParsers()
 	if (!empty($modSettings['disabledBBC']))
 	{
 		if (!is_array($modSettings['disabledBBC']))
+		{
 			$disabledBBC = explode(',', $modSettings['disabledBBC']);
+		}
 		else
+		{
 			$disabledBBC = $modSettings['disabledBBC'];
-		\BBC\ParserWrapper::instance()->setDisabled(empty($disabledBBC) ? array() : (array) $disabledBBC);
+		}
+		ParserWrapper::instance()->setDisabled(empty($disabledBBC) ? array() : (array) $disabledBBC);
 	}
 
 	return 1;
@@ -1609,9 +1738,9 @@ function serializeToJson($variable, $save_callback = null)
 	{
 		try
 		{
-			$array_form = \ElkArte\Util::unserialize($variable);
+			$array_form = Util::unserialize($variable);
 		}
-		catch (\Exception $e)
+		catch (Exception $e)
 		{
 			$array_form = false;
 		}

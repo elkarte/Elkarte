@@ -18,41 +18,8 @@ namespace ElkArte\Errors;
  */
 final class ErrorContext
 {
-	/**
-	 * Holds the unique identifier of the error (a name).
-	 *
-	 * @var string
-	 */
-	private $_name = null;
-
-	/**
-	 * An array that holds all the errors occurred separated by severity.
-	 *
-	 * @var array
-	 */
-	private $_errors = null;
-
-	/**
-	 * The default severity code.
-	 *
-	 * @var mixed
-	 */
-	private $_default_severity = 0;
-
-	/**
-	 * A list of all severity code from the less important to the most serious.
-	 *
-	 * @var array|mixed
-	 */
-	private $_severity_levels = array(0);
-
-	/**
-	 * Certain errors may need some specific language file...
-	 *
-	 * @var array
-	 */
-	private $_language_files = array();
-
+	const MINOR = 0;
+	const SERIOUS = 1;
 	/**
 	 * Multiton. This is an array of instances of ErrorContext.
 	 * All callers use an error context ('post', 'attach', or 'default' if none chosen).
@@ -60,9 +27,36 @@ final class ErrorContext
 	 * @var array of ErrorContext
 	 */
 	private static $_contexts = null;
-
-	const MINOR = 0;
-	const SERIOUS = 1;
+	/**
+	 * Holds the unique identifier of the error (a name).
+	 *
+	 * @var string
+	 */
+	private $_name = null;
+	/**
+	 * An array that holds all the errors occurred separated by severity.
+	 *
+	 * @var array
+	 */
+	private $_errors = null;
+	/**
+	 * The default severity code.
+	 *
+	 * @var mixed
+	 */
+	private $_default_severity = 0;
+	/**
+	 * A list of all severity code from the less important to the most serious.
+	 *
+	 * @var array|mixed
+	 */
+	private $_severity_levels = array(0);
+	/**
+	 * Certain errors may need some specific language file...
+	 *
+	 * @var array
+	 */
+	private $_language_files = array();
 
 	/**
 	 * Create and initialize an instance of the class
@@ -94,6 +88,30 @@ final class ErrorContext
 	}
 
 	/**
+	 * Find and return ErrorContext instance if it exists,
+	 * or create a new instance for $id if it didn't already exist.
+	 *
+	 * @param string $id
+	 * @param int|null $default_severity
+	 *
+	 * @return ErrorContext
+	 */
+	public static function context($id = 'default', $default_severity = null)
+	{
+		if (self::$_contexts === null)
+		{
+			self::$_contexts = array();
+		}
+
+		if (!array_key_exists($id, self::$_contexts))
+		{
+			self::$_contexts[$id] = new self($id, $default_severity);
+		}
+
+		return self::$_contexts[$id];
+	}
+
+	/**
 	 * Add an error to the list
 	 *
 	 * @param mixed[]|mixed $error error code
@@ -113,31 +131,6 @@ final class ErrorContext
 		if (!empty($lang_file) && !isset($this->_language_files[$lang_file]))
 		{
 			$this->_language_files[$lang_file] = false;
-		}
-	}
-
-	/**
-	 * Remove an error from the list
-	 *
-	 * @param mixed[]|mixed $error error code
-	 */
-	public function removeError($error)
-	{
-		if (!empty($error))
-		{
-			$name = $this->getErrorName($error);
-
-			foreach ($this->_errors as $severity => $errors)
-			{
-				if (array_key_exists($name, $errors))
-				{
-					unset($this->_errors[$severity][$name]);
-				}
-				if (empty($this->_errors[$severity]))
-				{
-					unset($this->_errors[$severity]);
-				}
-			}
 		}
 	}
 
@@ -174,41 +167,38 @@ final class ErrorContext
 	}
 
 	/**
-	 * Finds the "value" of the error (Usually applicable only to
-	 * array of strings, being the second element of the array)
+	 * Remove an error from the list
 	 *
-	 * @param mixed|mixed[] $error error code
-	 *
-	 * @return null
+	 * @param mixed[]|mixed $error error code
 	 */
-	protected function getErrorValue($error)
+	public function removeError($error)
 	{
-		if (is_array($error))
+		if (!empty($error))
 		{
-			$first_error = array_values($error);
-			if (is_object($first_error[0]))
+			$name = $this->getErrorName($error);
+
+			foreach ($this->_errors as $severity => $errors)
 			{
-				return null;
+				if (array_key_exists($name, $errors))
+				{
+					unset($this->_errors[$severity][$name]);
+				}
+				if (empty($this->_errors[$severity]))
+				{
+					unset($this->_errors[$severity]);
+				}
 			}
-			else
-			{
-				return $first_error[1];
-			}
-		}
-		else
-		{
-			return null;
 		}
 	}
 
 	/**
 	 * Return an array of errors of a certain severity.
 	 *
-	 * @todo is it needed at all?
-	 *
 	 * @param string|int|null $severity the severity level wanted. If null returns all the errors
 	 *
 	 * @return array|bool|mixed
+	 * @todo is it needed at all?
+	 *
 	 */
 	public function getErrors($severity = null)
 	{
@@ -402,26 +392,30 @@ final class ErrorContext
 	}
 
 	/**
-	 * Find and return ErrorContext instance if it exists,
-	 * or create a new instance for $id if it didn't already exist.
+	 * Finds the "value" of the error (Usually applicable only to
+	 * array of strings, being the second element of the array)
 	 *
-	 * @param string $id
-	 * @param int|null $default_severity
+	 * @param mixed|mixed[] $error error code
 	 *
-	 * @return ErrorContext
+	 * @return null
 	 */
-	public static function context($id = 'default', $default_severity = null)
+	protected function getErrorValue($error)
 	{
-		if (self::$_contexts === null)
+		if (is_array($error))
 		{
-			self::$_contexts = array();
+			$first_error = array_values($error);
+			if (is_object($first_error[0]))
+			{
+				return null;
+			}
+			else
+			{
+				return $first_error[1];
+			}
 		}
-
-		if (!array_key_exists($id, self::$_contexts))
+		else
 		{
-			self::$_contexts[$id] = new self($id, $default_severity);
+			return null;
 		}
-
-		return self::$_contexts[$id];
 	}
 }

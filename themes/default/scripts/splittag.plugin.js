@@ -15,14 +15,16 @@
  *
  */
 
-(function ($) {
+(function ($)
+{
 	'use strict';
 
 	/**
 	 * Splittag plugin interface to SCEditor
 	 *  - Called from the editor as a plugin
 	 */
-	$.sceditor.plugins.splittag = function () {
+	$.sceditor.plugins.splittag = function ()
+	{
 		var base = this,
 			editor,
 			tagStack = [],
@@ -33,7 +35,8 @@
 		/**
 		 * Called when the plugin is registered to the editor
 		 */
-		base.init = function () {
+		base.init = function ()
+		{
 			// The this variable will be set to the instance of the editor calling it
 			editor = this;
 
@@ -41,7 +44,8 @@
 			editor.addShortcut('ctrl+enter', base.split);
 
 			// Add the command for editor button use
-			if (!editor.commands.splittag) {
+			if (!editor.commands.splittag)
+			{
 				editor.commands.splittag = {
 					txtExec: base.split,
 					exec: base.split_wizzy,
@@ -58,7 +62,8 @@
 		 * - Example | represents the caret
 		 * [quote]ElkArte is |cool[/quote] => [quote]ElkArte is [/quote]|[quote]cool[/quote]
 		 */
-		base.split = function () {
+		base.split = function ()
+		{
 			// Splits tags starting at the current cursor position.
 			var i = 0,
 				tagTextStart = "",
@@ -70,24 +75,31 @@
 			tagStack = parseTags(contents, caret.end);
 
 			// Inside tag(s), we need to insert close/open tags to split at this point
-			if (tagStack.length !== 0) {
+			if (tagStack.length !== 0)
+			{
 				// Traverse in reverse and build closing tags.
 				for (i = tagStack.length - 1; i >= 0; i--)
 					tagTextStart += '[/' + tagStack[i].name + ']';
 
 				// Traverse forward and build opening tags (with attr's)
-				for (i = 0; i < tagStack.length; i++) {
+				for (i = 0; i < tagStack.length; i++)
+				{
 					if (i === 0)
+					{
 						tagTextEnd += "\n";
+					}
 					tagTextEnd += '[' + tagStack[i].name + tagStack[i].attributes + "]";
 				}
 
 				// Did someone select text that they expect to be wrapped in tags as well?
 				if (caret.start !== caret.end)
+				{
 					editor.insertText(tagTextStart + tagTextEnd, tagTextStart + tagTextEnd);
-				// Insert the new close/open tags at the cursor position
+				}// Insert the new close/open tags at the cursor position
 				else
+				{
 					editor.insertText(tagTextStart, tagTextEnd);
+				}
 			}
 		};
 
@@ -104,7 +116,8 @@
 		 * @param {string} text Text inside the current editor window
 		 * @param {int} iPos caret position in the text
 		 */
-		var parseTags = function (text, iPos) {
+		var parseTags = function (text, iPos)
+		{
 			// Start off empty
 			tagStack = [];
 
@@ -113,14 +126,18 @@
 
 			// Run our BBC regex on the leading text
 			var matches;
-			while (matches = regex.exec(text)) { // jshint ignore:line
+			while (matches = regex.exec(text)) // jshint ignore:line
+			{
 				// Closing tag [/bbcName] found, remove one from the stack
 				// We could attempt to find a matching open in the stack as well ...
 				if (matches[3])
+				{
 					tagStack.pop();
-				// Opening tag [bbcName], add it to the stack
+				}// Opening tag [bbcName], add it to the stack
 				else
+				{
 					tagStack.push({"name": matches[1], "attributes": matches[2]});
+				}
 			}
 
 			// Return what's left in the stack, these are the "open" tags
@@ -139,7 +156,8 @@
 		 * - Does not currently build the cite tag for display, but does copy the
 		 * attributes so toggle and post work as expected.
 		 */
-		base.split_wizzy = function() {
+		base.split_wizzy = function ()
+		{
 			// sceditor's RangeHelper
 			var rangeHelper = editor.getRangeHelper(),
 				contentAfterRangeStart,
@@ -156,12 +174,14 @@
 
 			// Find the containing quote by walking up the DOM
 			quote = range.commonAncestorContainer;
-			while (quote && (quote.nodeType !== 1 || quote.tagName.toUpperCase() !== "BLOCKQUOTE")) {
+			while (quote && (quote.nodeType !== 1 || quote.tagName.toUpperCase() !== "BLOCKQUOTE"))
+			{
 				quote = quote.parentNode;
 			}
 
 			// Did we find it, did we?
-			if (quote) {
+			if (quote)
+			{
 				// Copy all of the quotes attributes, like author, date, etc
 				attributes = $(quote).prop("attributes");
 
@@ -172,7 +192,8 @@
 				contentAfterRangeStart = range.extractContents();
 
 				// Apply the existing quote attributes to the new quote
-				$.each(attributes, function() {
+				$.each(attributes, function ()
+				{
 					$(contentAfterRangeStart).attr(this.name, this.value);
 				});
 
@@ -199,7 +220,9 @@
 				editor.focus();
 			}
 			else
+			{
 				rangeHelper.restoreRange();
+			}
 		};
 	};
 })(jQuery);

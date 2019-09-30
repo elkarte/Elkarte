@@ -8,7 +8,7 @@
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause (see accompanying LICENSE.txt file)
  *
  * This file contains code covered by:
- * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * copyright: 2011 Simple Machines (http://www.simplemachines.org)
  *
  * @version 2.0 dev
  *
@@ -16,12 +16,19 @@
 
 namespace ElkArte\AdminController;
 
+use ElkArte\AbstractController;
+use ElkArte\Action;
+use ElkArte\Cache\Cache;
+use ElkArte\Exceptions\Exception;
+use ElkArte\SettingsForm\SettingsForm;
+use ElkArte\Util;
+
 /**
  * Manage languages controller class.
  *
  * @package Languages
  */
-class ManageLanguages extends \ElkArte\AbstractController
+class ManageLanguages extends AbstractController
 {
 	/**
 	 * This is the main function for the languages area.
@@ -33,7 +40,7 @@ class ManageLanguages extends \ElkArte\AbstractController
 	 *
 	 * @event integrate_sa_manage_languages Used to add more sub actions
 	 * @uses ManageSettings language file
-	 * @see \ElkArte\AbstractController::action_index()
+	 * @see  \ElkArte\AbstractController::action_index()
 	 */
 	public function action_index()
 	{
@@ -50,7 +57,7 @@ class ManageLanguages extends \ElkArte\AbstractController
 		);
 
 		// Get ready for action
-		$action = new \ElkArte\Action('manage_languages');
+		$action = new Action('manage_languages');
 
 		// Load up all the tabs...
 		$context[$context['admin_menu_name']]['tab_data'] = array(
@@ -164,14 +171,14 @@ class ManageLanguages extends \ElkArte\AbstractController
 			$available_langs = getLanguages();
 			foreach ($available_langs as $lang)
 			{
-				if ($this->_req->post->def_language == $lang['filename'])
+				if ($this->_req->post->def_language === $lang['filename'])
 				{
 					$lang_exists = true;
 					break;
 				}
 			}
 
-			if ($this->_req->post->def_language != $language && $lang_exists)
+			if ($this->_req->post->def_language !== $language && $lang_exists)
 			{
 				$language = $this->_req->post->def_language;
 				$this->updateLanguage($language);
@@ -191,9 +198,13 @@ class ManageLanguages extends \ElkArte\AbstractController
 			'data_check' => array(
 				'class' => function ($rowData) {
 					if ($rowData['default'])
+					{
 						return 'highlight2';
+					}
 					else
+					{
 						return '';
+					}
 				},
 			),
 			'get_items' => array(
@@ -265,16 +276,37 @@ class ManageLanguages extends \ElkArte\AbstractController
 
 		// Display a warning if we cannot edit the default setting.
 		if (!is_writable(BOARDDIR . '/Settings.php'))
+		{
 			$listOptions['additional_rows'][] = array(
 				'position' => 'after_title',
 				'value' => $txt['language_settings_writable'],
 				'class' => 'smalltext alert',
 			);
+		}
 
 		createList($listOptions);
 
 		$context['sub_template'] = 'show_list';
 		$context['default_list'] = 'language_list';
+	}
+
+	/**
+	 * Update the language in use
+	 *
+	 * @param string $language
+	 */
+	private function updateLanguage($language)
+	{
+		$configVars = array(
+			array('language', '', 'file')
+		);
+		$configValues = array(
+			'language' => $language
+		);
+		$settingsForm = new SettingsForm(SettingsForm::FILE_ADAPTER);
+		$settingsForm->setConfigVars($configVars);
+		$settingsForm->setConfigValues((array) $configValues);
+		$settingsForm->save();
 	}
 
 	/**
@@ -293,14 +325,16 @@ class ManageLanguages extends \ElkArte\AbstractController
 	public function action_downloadlang()
 	{
 		// @todo for the moment there is no facility to download packages, so better kill it here
-		throw new \ElkArte\Exceptions\Exception('no_access', false);
+		throw new Exception('no_access', false);
 
 		theme()->getTemplates()->loadLanguageFile('ManageSettings');
 		require_once(SUBSDIR . '/Package.subs.php');
 
 		// Clearly we need to know what to request.
 		if (!isset($this->_req->query->did))
-			throw new \ElkArte\Exceptions\Exception('no_access', false);
+		{
+			throw new Exception('no_access', false);
+		}
 
 		// Some lovely context.
 		$context['download_id'] = $this->_req->query->did;
@@ -321,7 +355,9 @@ class ManageLanguages extends \ElkArte\AbstractController
 			{
 				// Check it's not very bad.
 				if (strpos($file, '..') !== false || (strpos($file, 'themes') !== 0 && !preg_match('~agreement\.[A-Za-z-_0-9]+\.txt$~', $file)))
-					throw new \ElkArte\Exceptions\Exception($txt['languages_download_illegal_paths']);
+				{
+					throw new Exception($txt['languages_download_illegal_paths']);
+				}
 
 				$chmod_files[] = BOARDDIR . '/' . $file;
 				$install_files[] = $file;
@@ -333,7 +369,9 @@ class ManageLanguages extends \ElkArte\AbstractController
 
 			// Something not writable?
 			if (!empty($files_left))
+			{
 				$context['error_message'] = $txt['languages_download_not_chmod'];
+			}
 			// Otherwise, go go go!
 			elseif (!empty($install_files))
 			{
@@ -352,7 +390,9 @@ class ManageLanguages extends \ElkArte\AbstractController
 		$archive_content = read_tgz_file('http://download.elkarte.net/fetch_language.php?version=' . urlencode(strtr(FORUM_VERSION, array('ElkArte ' => ''))) . ';fetch=' . urlencode($this->_req->query->did), null);
 
 		if (empty($archive_content))
-			throw new \ElkArte\Exceptions\Exception($txt['add_language_error_no_response']);
+		{
+			throw new Exception($txt['add_language_error_no_response']);
+		}
 
 		// Now for each of the files, let's do some *stuff*
 		$context['files'] = array(
@@ -368,7 +408,9 @@ class ManageLanguages extends \ElkArte\AbstractController
 
 			// Don't do anything with files we don't understand.
 			if (!in_array($extension, array('php', 'jpg', 'gif', 'jpeg', 'png', 'txt')))
+			{
 				continue;
+			}
 
 			// Basic data.
 			$context_data = array(
@@ -388,7 +430,9 @@ class ManageLanguages extends \ElkArte\AbstractController
 			if (file_exists(BOARDDIR . '/' . $file['filename']))
 			{
 				if (is_writable(BOARDDIR . '/' . $file['filename']))
+				{
 					$context_data['writable'] = true;
+				}
 
 				// Finally, do we actually think the content has changed?
 				if ($file['size'] == filesize(BOARDDIR . '/' . $file['filename']) && $file['md5'] === md5_file(BOARDDIR . '/' . $file['filename']))
@@ -403,18 +447,22 @@ class ManageLanguages extends \ElkArte\AbstractController
 					$context_data['default_copy'] = false;
 				}
 				else
+				{
 					$context_data['exists'] = 'different';
+				}
 			}
 			// No overwrite?
 			else
 			{
 				// Can we at least stick it in the directory...
 				if (is_writable(BOARDDIR . '/' . $dirname))
+				{
 					$context_data['writable'] = true;
+				}
 			}
 
 			// I love PHP files, that's why I'm a developer and not an artistic type spending my time drinking absinth and living a life of sin...
-			if ($extension == 'php' && preg_match('~\w+\.\w+(?:-utf8)?\.php~', $filename))
+			if ($extension === 'php' && preg_match('~\w+\.\w+(?:-utf8)?\.php~', $filename))
 			{
 				$context_data += array(
 					'version' => '??',
@@ -426,7 +474,9 @@ class ManageLanguages extends \ElkArte\AbstractController
 
 				// Let's get the new version, I like versions, they tell me that I'm up to date.
 				if (preg_match('~\s*Version:\s+(.+?);\s*' . preg_quote($name, '~') . '~i', $file['preview'], $match) == 1)
+				{
 					$context_data['version'] = $match[1];
+				}
 
 				// Now does the old file exist - if so what is it's version?
 				if (file_exists(BOARDDIR . '/' . $file['filename']))
@@ -442,14 +492,20 @@ class ManageLanguages extends \ElkArte\AbstractController
 						$context_data['cur_version'] = $match[1];
 
 						// How does this compare?
-						if ($context_data['cur_version'] == $context_data['version'])
+						if ($context_data['cur_version'] === $context_data['version'])
+						{
 							$context_data['version_compare'] = 'same';
+						}
 						elseif ($context_data['cur_version'] > $context_data['version'])
+						{
 							$context_data['version_compare'] = 'older';
+						}
 
 						// Don't recommend copying if the version is the same.
 						if ($context_data['version_compare'] != 'newer')
+						{
 							$context_data['default_copy'] = false;
+						}
 					}
 				}
 
@@ -460,9 +516,13 @@ class ManageLanguages extends \ElkArte\AbstractController
 			{
 				// If we think it's a theme thing, work out what the theme is.
 				if (strpos($dirname, 'themes') === 0 && preg_match('~themes[\\/]([^\\/]+)[\\/]~', $dirname, $match))
+				{
 					$theme_name = $match[1];
+				}
 				else
+				{
 					$theme_name = 'misc';
+				}
 
 				// Assume it's an image, could be an acceptance note etc but rare.
 				$context['files']['images'][$theme_name][] = $context_data;
@@ -470,13 +530,17 @@ class ManageLanguages extends \ElkArte\AbstractController
 
 			// Collect together all non-writable areas.
 			if (!$context_data['writable'])
+			{
 				$context['make_writable'][] = $context_data['destination'];
+			}
 		}
 
 		// So, I'm a perfectionist - let's get the theme names.
 		$indexes = array();
 		foreach ($context['files']['images'] as $k => $dummy)
+		{
 			$indexes[] = $k;
+		}
 
 		$context['theme_names'] = array();
 		if (!empty($indexes))
@@ -497,7 +561,9 @@ class ManageLanguages extends \ElkArte\AbstractController
 
 			// Now we have the id_theme we can get the pretty description.
 			if (!empty($themes))
+			{
 				$context['theme_names'] = getBasicThemeInfos($themes);
+			}
 		}
 
 		// Before we go to far can we make anything writable, eh, eh?
@@ -513,21 +579,33 @@ class ManageLanguages extends \ElkArte\AbstractController
 				if ($type == 'lang')
 				{
 					foreach ($data as $k => $file)
+					{
 						if (!$file['writable'] && !in_array($file['destination'], $context['still_not_writable']))
+						{
 							$context['files'][$type][$k]['writable'] = true;
+						}
+					}
 				}
 				else
 				{
 					foreach ($data as $theme => $files)
+					{
 						foreach ($files as $k => $file)
+						{
 							if (!$file['writable'] && !in_array($file['destination'], $context['still_not_writable']))
+							{
 								$context['files'][$type][$theme][$k]['writable'] = true;
+							}
+						}
+					}
 				}
 			}
 
 			// Are we going to need more language stuff?
 			if (!empty($context['still_not_writable']))
+			{
 				theme()->getTemplates()->loadLanguageFile('Packages');
+			}
 		}
 
 		// This is the list for the main files.
@@ -537,6 +615,7 @@ class ManageLanguages extends \ElkArte\AbstractController
 			'get_items' => array(
 				'function' => function () {
 					global $context;
+
 					return $context['files']['lang'];
 				},
 			),
@@ -604,7 +683,7 @@ class ManageLanguages extends \ElkArte\AbstractController
 		);
 
 		// Kill the cache, as it is now invalid..
-		$cache = \ElkArte\Cache\Cache::instance();
+		$cache = Cache::instance();
 		$cache->put('known_languages', null, $cache->maxLevel(1) ? 86400 : 3600);
 
 		createList($listOptions);
@@ -645,14 +724,20 @@ class ManageLanguages extends \ElkArte\AbstractController
 		// Check we have themes with a path and a name - just in case - and add the path.
 		foreach ($themes as $id => $data)
 		{
-			if (count($data) != 2)
+			if (count($data) !== 2)
+			{
 				unset($themes[$id]);
+			}
 			elseif (is_dir($data['theme_dir'] . '/languages/' . $context['lang_id']))
+			{
 				$lang_dirs[$id] = $data['theme_dir'] . '/languages/' . $context['lang_id'];
+			}
 
 			// How about image directories?
 			if (is_dir($data['theme_dir'] . '/images/' . $context['lang_id']))
+			{
 				$images_dirs[$id] = $data['theme_dir'] . '/images/' . $context['lang_id'];
+			}
 		}
 
 		$current_file = $file_id ? $lang_dirs[$theme_id] . '/' . $file_id . '.' . $context['lang_id'] . '.php' : '';
@@ -667,14 +752,18 @@ class ManageLanguages extends \ElkArte\AbstractController
 			{
 				// We're only after the files for this language.
 				if (preg_match('~^([A-Za-z]+)\.' . $context['lang_id'] . '\.php$~', $entry, $matches) == 0)
+				{
 					continue;
+				}
 
 				if (!isset($context['possible_files'][$theme]))
+				{
 					$context['possible_files'][$theme] = array(
 						'id' => $theme,
 						'name' => $themes[$theme]['name'],
 						'files' => array(),
 					);
+				}
 
 				$context['possible_files'][$theme]['files'][] = array(
 					'id' => $matches[1],
@@ -720,7 +809,9 @@ class ManageLanguages extends \ElkArte\AbstractController
 			fclose($fp);
 
 			if ($this->_checkOpcache())
+			{
 				opcache_invalidate($settings['default_theme_dir'] . '/languages/' . $context['lang_id'] . '/index.' . $context['lang_id'] . '.php');
+			}
 
 			$madeSave = true;
 		}
@@ -732,7 +823,7 @@ class ManageLanguages extends \ElkArte\AbstractController
 
 		// Setup the primary settings context.
 		$context['primary_settings'] = array(
-			'name' => \ElkArte\Util::ucwords(strtr($context['lang_id'], array('_' => ' ', '-utf8' => ''))),
+			'name' => Util::ucwords(strtr($context['lang_id'], array('_' => ' ', '-utf8' => ''))),
 			'locale' => $txt['lang_locale'],
 			'dictionary' => $txt['lang_dictionary'],
 			'spelling' => $txt['lang_spelling'],
@@ -754,12 +845,14 @@ class ManageLanguages extends \ElkArte\AbstractController
 			{
 				// Only try to save if it's changed!
 				if ($this->_req->post->entry[$k] != $this->_req->post->comp[$k])
+				{
 					$save_strings[$k] = cleanLangString($v, false);
+				}
 			}
 		}
 
 		// If we are editing a file work away at that.
-		if ($current_file)
+		if ($current_file !== '')
 		{
 			$context['entries_not_writable_message'] = is_writable($current_file) ? '' : sprintf($txt['lang_entries_not_writable'], $current_file);
 
@@ -787,15 +880,17 @@ class ManageLanguages extends \ElkArte\AbstractController
 			}
 
 			// Last entry to add?
-			if ($multiline_cache)
+			if ($multiline_cache !== '')
 			{
 				preg_match('~\$(helptxt|txt|editortxt)\[\'(.+)\'\]\s?=\s?(.+);~ms', strtr($multiline_cache, array("\r" => '')), $matches);
 				if (!empty($matches[3]))
+				{
 					$entries[$matches[2]] = array(
 						'type' => $matches[1],
 						'full' => $matches[0],
 						'entry' => $matches[3],
 					);
+				}
 			}
 
 			// These are the entries we can definitely save.
@@ -810,7 +905,9 @@ class ManageLanguages extends \ElkArte\AbstractController
 				// Ignore some things we set separately.
 				$ignore_files = array('lang_character_set', 'lang_locale', 'lang_dictionary', 'lang_spelling', 'lang_rtl');
 				if (in_array($entryKey, $ignore_files))
+				{
 					continue;
+				}
 
 				// These are arrays that need breaking out.
 				$arrays = array('days', 'days_short', 'months', 'months_titles', 'months_short', 'happy_birthday_author', 'karlbenson1_author', 'nite0859_author', 'zwaldowski_author', 'geezmo_author', 'karlbenson2_author');
@@ -845,7 +942,9 @@ class ManageLanguages extends \ElkArte\AbstractController
 							$save_cache['enabled'] = true;
 						}
 						else
+						{
 							$save_cache['entries'][$cur_index] = $subValue;
+						}
 
 						$context['file_entries'][] = array(
 							'key' => $entryKey . '-+- ' . $cur_index,
@@ -865,13 +964,15 @@ class ManageLanguages extends \ElkArte\AbstractController
 						foreach ($save_cache['entries'] as $k2 => $v2)
 						{
 							// Manually show the custom index.
-							if ($k2 != $cur_index)
+							if ($k2 !== $cur_index)
 							{
 								$items[] = $k2 . ' => \'' . $v2 . '\'';
 								$cur_index = $k2;
 							}
 							else
+							{
 								$items[] = '\'' . $v2 . '\'';
+							}
 
 							$cur_index++;
 						}
@@ -886,11 +987,13 @@ class ManageLanguages extends \ElkArte\AbstractController
 				else
 				{
 					// Saving?
-					if (isset($save_strings[$md5EntryKey]) && $save_strings[$md5EntryKey] != $entryValue['entry'])
+					if (isset($save_strings[$md5EntryKey]) && $save_strings[$md5EntryKey] !== $entryValue['entry'])
 					{
 						// @todo Fix this properly.
 						if ($save_strings[$md5EntryKey] == '')
+						{
 							$save_strings[$md5EntryKey] = '\'\'';
+						}
 
 						// Set the new value.
 						$entryValue['entry'] = $save_strings[$md5EntryKey];
@@ -919,7 +1022,9 @@ class ManageLanguages extends \ElkArte\AbstractController
 
 				$file_contents = implode('', file($current_file));
 				foreach ($final_saves as $save)
+				{
 					$file_contents = strtr($file_contents, array($save['find'] => $save['replace']));
+				}
 
 				// Save the actual changes.
 				$fp = fopen($current_file, 'w+');
@@ -927,7 +1032,9 @@ class ManageLanguages extends \ElkArte\AbstractController
 				fclose($fp);
 
 				if ($this->_checkOpcache())
+				{
 					opcache_invalidate($current_file);
+				}
 
 				$madeSave = true;
 			}
@@ -938,9 +1045,21 @@ class ManageLanguages extends \ElkArte\AbstractController
 
 		// If we saved, redirect.
 		if ($madeSave)
+		{
 			redirectexit('action=admin;area=languages;sa=editlang;lid=' . $context['lang_id']);
+		}
 
 		createToken('admin-mlang');
+	}
+
+	/**
+	 * Checks if the Zend Opcahce is installed, active and cmd functions available.
+	 *
+	 * @return bool
+	 */
+	private function _checkOpcache()
+	{
+		return (extension_loaded('Zend OPcache') && ini_get('opcache.enable') && stripos(BOARDDIR, ini_get('opcache.restrict_api')) !== 0);
 	}
 
 	/**
@@ -957,7 +1076,7 @@ class ManageLanguages extends \ElkArte\AbstractController
 		global $context, $txt;
 
 		// Initialize the form
-		$settingsForm = new \ElkArte\SettingsForm\SettingsForm(\ElkArte\SettingsForm\SettingsForm::FILE_ADAPTER);
+		$settingsForm = new SettingsForm(SettingsForm::FILE_ADAPTER);
 
 		// Initialize it with our settings
 		$settingsForm->setConfigVars($this->_settings());
@@ -999,16 +1118,6 @@ class ManageLanguages extends \ElkArte\AbstractController
 	}
 
 	/**
-	 * Checks if the Zend Opcahce is installed, active and cmd functions available.
-	 *
-	 * @return bool
-	 */
-	private function _checkOpcache()
-	{
-		return (extension_loaded('Zend OPcache') && ini_get('opcache.enable') && stripos(BOARDDIR, ini_get('opcache.restrict_api')) !== 0);
-	}
-
-	/**
 	 * Load up all of the language settings
 	 *
 	 * @event integrate_modify_language_settings Use to add new config options
@@ -1030,7 +1139,9 @@ class ManageLanguages extends \ElkArte\AbstractController
 		// Get our languages. No cache.
 		$languages = getLanguages(false);
 		foreach ($languages as $lang)
+		{
 			$config_vars['language'][4][] = array($lang['filename'], strtr($lang['name'], array('-utf8' => ' (UTF-8)')));
+		}
 
 		return $config_vars;
 	}
@@ -1041,24 +1152,5 @@ class ManageLanguages extends \ElkArte\AbstractController
 	public function settings_search()
 	{
 		return $this->_settings();
-	}
-
-	/**
-	 * Update the language in use
-	 *
-	 * @param string $language
-	 */
-	private function updateLanguage($language)
-	{
-		$configVars = array(
-			array('language', '', 'file')
-		);
-		$configValues = array(
-			'language' => $language
-		);
-		$settingsForm = new \ElkArte\SettingsForm\SettingsForm(\ElkArte\SettingsForm\SettingsForm::FILE_ADAPTER);
-		$settingsForm->setConfigVars($configVars);
-		$settingsForm->setConfigValues((array) $configValues);
-		$settingsForm->save();
 	}
 }

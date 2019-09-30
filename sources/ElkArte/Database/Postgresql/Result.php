@@ -13,10 +13,12 @@
 
 namespace ElkArte\Database\Postgresql;
 
+use ElkArte\Database\AbstractResult;
+
 /**
  * PostgreSQL database class, implements database class to control postgresql functions
  */
-class Result extends \ElkArte\Database\AbstractResult
+class Result extends AbstractResult
 {
 	/**
 	 * {@inheritDoc}
@@ -24,9 +26,13 @@ class Result extends \ElkArte\Database\AbstractResult
 	public function affected_rows()
 	{
 		if ($this->details->replaceResults !== null)
+		{
 			return $this->details->replaceResults;
+		}
 		elseif ($this->result === null && !($this->details->lastResult))
+		{
 			return 0;
+		}
 
 		$resource = $this->result === null ? $this->details->lastResult : $this->result;
 		if (is_resource($resource))

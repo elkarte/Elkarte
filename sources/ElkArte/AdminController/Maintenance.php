@@ -8,7 +8,7 @@
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause (see accompanying LICENSE.txt file)
  *
  * This file contains code covered by:
- * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * copyright: 2011 Simple Machines (http://www.simplemachines.org)
  *
  * @version 2.0 dev
  *
@@ -16,40 +16,55 @@
 
 namespace ElkArte\AdminController;
 
+use ElkArte\AbstractController;
+use ElkArte\Action;
+use ElkArte\Cache\Cache;
+use ElkArte\DataValidator;
+use ElkArte\Debug;
+use ElkArte\EventManager;
+use ElkArte\Exceptions\Exception;
+use ElkArte\Http\FtpConnection;
+use ElkArte\User;
+
 /**
  * Entry point class for all of the maintenance ,routine, members, database,
  * attachments, topics and hooks
  *
  * @package Maintenance
  */
-class Maintenance extends \ElkArte\AbstractController
+class Maintenance extends AbstractController
 {
 	/**
 	 * Maximum topic counter
+	 *
 	 * @var int
 	 */
 	public $max_topics;
 
 	/**
 	 * How many actions to take for a maintenance actions
+	 *
 	 * @var int
 	 */
 	public $increment;
 
 	/**
 	 * Total steps for a given maintenance action
+	 *
 	 * @var int
 	 */
 	public $total_steps;
 
 	/**
 	 * reStart pointer for paused maintenance actions
+	 *
 	 * @var int
 	 */
 	public $start;
 
 	/**
 	 * Loop counter for paused maintenance actions
+	 *
 	 * @var int
 	 */
 	public $step;
@@ -140,14 +155,16 @@ class Maintenance extends \ElkArte\AbstractController
 		);
 
 		// Set up the action handler
-		$action = new \ElkArte\Action('manage_maintenance');
+		$action = new Action('manage_maintenance');
 
 		// Yep, sub-action time and call integrate_sa_manage_maintenance as well
 		$subAction = $action->initialize($subActions, 'routine');
 
 		// Doing something special, does it exist?
 		if (isset($this->_req->query->activity, $subActions[$subAction]['activities'][$this->_req->query->activity]))
+		{
 			$activity = $this->_req->query->activity;
+		}
 
 		// Set a few things.
 		$context[$context['admin_menu_name']]['current_subsection'] = $subAction;
@@ -161,9 +178,13 @@ class Maintenance extends \ElkArte\AbstractController
 		if (isset($activity))
 		{
 			if (is_string($subActions[$subAction]['activities'][$activity]) && method_exists($this, $subActions[$subAction]['activities'][$activity]))
+			{
 				$this->{$subActions[$subAction]['activities'][$activity]}();
+			}
 			elseif (is_string($subActions[$subAction]['activities'][$activity]))
+			{
 				$subActions[$subAction]['activities'][$activity]();
+			}
 			else
 			{
 				if (is_array($subActions[$subAction]['activities'][$activity]))
@@ -183,101 +204,6 @@ class Maintenance extends \ElkArte\AbstractController
 	}
 
 	/**
-	 * Supporting function for the database maintenance area.
-	 */
-	public function action_database()
-	{
-		global $context, $modSettings, $maintenance;
-
-		// We need this, really..
-		require_once(SUBSDIR . '/Maintenance.subs.php');
-
-		// Set up the sub-template
-		$context['sub_template'] = 'maintain_database';
-		$db = database();
-
-		if ($db->supportMediumtext())
-		{
-			$body_type = fetchBodyType();
-
-			$context['convert_to'] = $body_type == 'text' ? 'mediumtext' : 'text';
-			$context['convert_to_suggest'] = ($body_type != 'text' && !empty($modSettings['max_messageLength']) && $modSettings['max_messageLength'] < 65536);
-		}
-
-		// Check few things to give advices before make a backup
-		// If safe mod is enable the external tool is *always* the best (and probably the only) solution
-		$context['safe_mode_enable'] = false;
-		if (version_compare(PHP_VERSION, '5.4.0', '<'))
-		{
-			$context['safe_mode_enable'] = @ini_get('safe_mode');
-		}
-
-		// This is just a...guess
-		$messages = countMessages();
-
-		// 256 is what we use in the backup script
-		detectServer()->setMemoryLimit('256M');
-		$memory_limit = memoryReturnBytes(ini_get('memory_limit')) / (1024 * 1024);
-
-		// Zip limit is set to more or less 1/4th the size of the available memory * 1500
-		// 1500 is an estimate of the number of messages that generates a database of 1 MB (yeah I know IT'S AN ESTIMATION!!!)
-		// Why that? Because the only reliable zip package is the one sent out the first time,
-		// so when the backup takes 1/5th (just to stay on the safe side) of the memory available
-		$zip_limit = $memory_limit * 1500 / 5;
-
-		// Here is more tricky: it depends on many factors, but the main idea is that
-		// if it takes "too long" the backup is not reliable. So, I know that on my computer it take
-		// 20 minutes to backup 2.5 GB, of course my computer is not representative, so I'll multiply by 4 the time.
-		// I would consider "too long" 5 minutes (I know it can be a long time, but let's start with that):
-		// 80 minutes for a 2.5 GB and a 5 minutes limit means 160 MB approx
-		$plain_limit = 240000;
-
-		// Last thing: are we able to gain time?
-		$current_time_limit = (int) ini_get('max_execution_time');
-		@set_time_limit(159); //something strange just to be sure
-		$new_time_limit = ini_get('max_execution_time');
-		@set_time_limit($current_time_limit);
-
-		$context['use_maintenance'] = 0;
-
-		// External tool if:
-		//  * safe_mode enable OR
-		//  * cannot change the execution time OR
-		//  * cannot reset timeout
-		if ($context['safe_mode_enable'] || empty($new_time_limit) || ($current_time_limit == $new_time_limit && !function_exists('apache_reset_timeout')))
-			$context['suggested_method'] = 'use_external_tool';
-		elseif ($zip_limit < $plain_limit && $messages < $zip_limit)
-			$context['suggested_method'] = 'zipped_file';
-		elseif ($zip_limit > $plain_limit || ($zip_limit < $plain_limit && $plain_limit < $messages))
-		{
-			$context['suggested_method'] = 'use_external_tool';
-			$context['use_maintenance'] = empty($maintenance) ? 2 : 0;
-		}
-		else
-		{
-			$context['use_maintenance'] = 1;
-			$context['suggested_method'] = 'plain_text';
-		}
-
-		theme()->getTemplates()->load('Packages');
-		theme()->getTemplates()->loadLanguageFile('Packages');
-
-		// $context['package_ftp'] may be set action_backup_display when an error occur
-		if (!isset($context['package_ftp']))
-		{
-			$context['package_ftp'] = array(
-				'form_elements_only' => true,
-				'server' => '',
-				'port' => '',
-				'username' => isset($modSettings['package_username']) ? $modSettings['package_username'] : '',
-				'path' => '',
-				'error' => '',
-			);
-		}
-		$context['skip_security'] = defined('I_KNOW_IT_MAY_BE_UNSAFE');
-	}
-
-	/**
 	 * Supporting function for the routine maintenance area.
 	 *
 	 * @event integrate_routine_maintenance, passed $context['routine_actions'] array to allow
@@ -289,7 +215,9 @@ class Maintenance extends \ElkArte\AbstractController
 		global $context, $txt;
 
 		if ($this->_req->getQuery('done', 'trim|strval') === 'recount')
+		{
 			$context['maintenance_finished'] = $txt['maintain_recount'];
+		}
 
 		// set up the sub-template
 		$context['sub_template'] = 'maintain_routine';
@@ -362,9 +290,11 @@ class Maintenance extends \ElkArte\AbstractController
 
 		// Show that we completed this action
 		if ($this->_req->getQuery('done', 'strval') === 'recountposts')
+		{
 			$context['maintenance_finished'] = array(
 				'errors' => array(sprintf($txt['maintain_done'], $txt['maintain_recountposts'])),
 			);
+		}
 
 		loadJavascriptFile('suggest.js');
 
@@ -426,13 +356,17 @@ class Maintenance extends \ElkArte\AbstractController
 		call_integration_hook('integrate_topics_maintenance', array(&$context['topics_actions']));
 
 		if ($this->_req->getQuery('done', 'strval') === 'purgeold')
+		{
 			$context['maintenance_finished'] = array(
 				'errors' => array(sprintf($txt['maintain_done'], $txt['maintain_old'])),
 			);
+		}
 		elseif ($this->_req->getQuery('done', 'strval') === 'massmove')
+		{
 			$context['maintenance_finished'] = array(
 				'errors' => array(sprintf($txt['maintain_done'], $txt['move_topics_maintenance'])),
 			);
+		}
 
 		// Set up the sub-template
 		$context['sub_template'] = 'maintain_topics';
@@ -448,8 +382,8 @@ class Maintenance extends \ElkArte\AbstractController
 		// Honestly, this should be done in the sub function.
 		validateToken('admin-maint');
 
-		$controller = new RepairBoards(new \ElkArte\EventManager());
-		$controller->setUser(\ElkArte\User::$info);
+		$controller = new RepairBoards(new EventManager());
+		$controller->setUser(User::$info);
 		$controller->pre_dispatch();
 		$controller->action_repairboards();
 	}
@@ -469,7 +403,7 @@ class Maintenance extends \ElkArte\AbstractController
 		validateToken('admin-maint');
 
 		// Just wipe the whole cache directory!
-		\ElkArte\Cache\Cache::instance()->clean();
+		Cache::instance()->clean();
 
 		$context['maintenance_finished'] = $txt['maintain_cache'];
 	}
@@ -523,7 +457,9 @@ class Maintenance extends \ElkArte\AbstractController
 		$db = database();
 
 		if ($db->supportMediumtext() === false)
+		{
 			return;
+		}
 
 		$body_type = '';
 
@@ -547,15 +483,23 @@ class Maintenance extends \ElkArte\AbstractController
 
 			// Make it longer so we can do their limit.
 			if ($body_type === 'text')
+			{
 				resizeMessageTableBody('mediumtext');
+			}
 			// Shorten the column so we can have a bit (literally per record) less space occupied
 			else
+			{
 				resizeMessageTableBody('text');
+			}
 
 			$colData = getMessageTableColumns();
 			foreach ($colData as $column)
+			{
 				if ($column['name'] === 'body')
+				{
 					$body_type = $column['type'];
+				}
+			}
 
 			$context['maintenance_finished'] = $txt[$context['convert_to'] . '_title'];
 			$context['convert_to'] = $body_type === 'text' ? 'mediumtext' : 'text';
@@ -568,9 +512,13 @@ class Maintenance extends \ElkArte\AbstractController
 			checkSession();
 
 			if (empty($this->_req->query->start))
+			{
 				validateToken('admin-maint');
+			}
 			else
+			{
 				validateToken('admin-convertMsg');
+			}
 
 			$context['page_title'] = $txt['not_done_title'];
 			$context['continue_post_data'] = '';
@@ -618,7 +566,9 @@ class Maintenance extends \ElkArte\AbstractController
 					$context['exceeding_messages_morethan'] = sprintf($txt['exceeding_messages_morethan'], count($id_msg_exceeding));
 				}
 				else
+				{
 					$query_msg = $id_msg_exceeding;
+				}
 
 				$context['exceeding_messages'] = getExceedingMessages($query_msg);
 			}
@@ -657,7 +607,9 @@ class Maintenance extends \ElkArte\AbstractController
 		// If there aren't any tables then I believe that would mean the world has exploded...
 		$context['num_tables'] = count($tables);
 		if ($context['num_tables'] == 0)
-			throw new \ElkArte\Exceptions\Exception('You appear to be running ElkArte in a flat file mode... fantastic!', false);
+		{
+			throw new Exception('You appear to be running ElkArte in a flat file mode... fantastic!', false);
+		}
 
 		// For each table....
 		$context['optimized_tables'] = array();
@@ -669,10 +621,12 @@ class Maintenance extends \ElkArte\AbstractController
 			$data_freed = $db_table->optimize($table['table_name']);
 
 			if ($data_freed > 0)
+			{
 				$context['optimized_tables'][] = array(
 					'name' => $table['table_name'],
 					'data_freed' => $data_freed,
 				);
+			}
 		}
 
 		// Number of tables, etc....
@@ -715,9 +669,13 @@ class Maintenance extends \ElkArte\AbstractController
 
 		// Validate the request or the loop
 		if (!isset($this->_req->query->step))
+		{
 			validateToken('admin-maint');
+		}
 		else
+		{
 			validateToken('admin-boardrecount');
+		}
 
 		// For the loop template
 		$context['page_title'] = $txt['not_done_title'];
@@ -751,6 +709,7 @@ class Maintenance extends \ElkArte\AbstractController
 				{
 					$percent = round((100 * $this->start / $this->max_topics) / $this->total_steps);
 					$this->_buildContinue($percent, 0);
+
 					return;
 				}
 			}
@@ -763,7 +722,9 @@ class Maintenance extends \ElkArte\AbstractController
 		if ($this->step <= 1)
 		{
 			if (empty($this->start))
+			{
 				resetBoardsCounter('num_posts');
+			}
 
 			while ($this->start < $this->max_topics)
 			{
@@ -775,6 +736,7 @@ class Maintenance extends \ElkArte\AbstractController
 				{
 					$percent = round((200 + 100 * $this->start / $this->max_topics) / $this->total_steps);
 					$this->_buildContinue($percent, 1);
+
 					return;
 				}
 			}
@@ -787,7 +749,9 @@ class Maintenance extends \ElkArte\AbstractController
 		if ($this->step <= 2)
 		{
 			if (empty($this->start))
+			{
 				resetBoardsCounter('num_topics');
+			}
 
 			while ($this->start < $this->max_topics)
 			{
@@ -798,6 +762,7 @@ class Maintenance extends \ElkArte\AbstractController
 				{
 					$percent = round((300 + 100 * $this->start / $this->max_topics) / $this->total_steps);
 					$this->_buildContinue($percent, 2);
+
 					return;
 				}
 			}
@@ -810,7 +775,9 @@ class Maintenance extends \ElkArte\AbstractController
 		if ($this->step <= 3)
 		{
 			if (empty($this->start))
+			{
 				resetBoardsCounter('unapproved_posts');
+			}
 
 			while ($this->start < $this->max_topics)
 			{
@@ -821,6 +788,7 @@ class Maintenance extends \ElkArte\AbstractController
 				{
 					$percent = round((400 + 100 * $this->start / $this->max_topics) / $this->total_steps);
 					$this->_buildContinue($percent, 3);
+
 					return;
 				}
 			}
@@ -833,7 +801,9 @@ class Maintenance extends \ElkArte\AbstractController
 		if ($this->step <= 4)
 		{
 			if (empty($this->start))
+			{
 				resetBoardsCounter('unapproved_topics');
+			}
 
 			while ($this->start < $this->max_topics)
 			{
@@ -844,6 +814,7 @@ class Maintenance extends \ElkArte\AbstractController
 				{
 					$percent = round((500 + 100 * $this->start / $this->max_topics) / $this->total_steps);
 					$this->_buildContinue($percent, 4);
+
 					return;
 				}
 			}
@@ -862,6 +833,7 @@ class Maintenance extends \ElkArte\AbstractController
 				$this->start = 0;
 				$percent = round(700 / $this->total_steps);
 				$this->_buildContinue($percent, 6);
+
 				return;
 			}
 
@@ -881,6 +853,7 @@ class Maintenance extends \ElkArte\AbstractController
 				{
 					$percent = round((700 + 100 * $this->start / $modSettings['maxMsgID']) / $this->total_steps);
 					$this->_buildContinue($percent, 6);
+
 					return;
 				}
 			}
@@ -986,7 +959,7 @@ class Maintenance extends \ElkArte\AbstractController
 
 		checkSession();
 
-		$validator = new \ElkArte\DataValidator();
+		$validator = new DataValidator();
 		$validator->sanitation_rules(array('posts' => 'empty', 'type' => 'trim', 'from_email' => 'trim', 'from_name' => 'trim', 'to' => 'trim'));
 		$validator->validation_rules(array('from_email' => 'valid_email', 'from_name' => 'required', 'to' => 'required', 'type' => 'contains[name,email]'));
 		$validator->validate($this->_req->post);
@@ -1003,7 +976,9 @@ class Maintenance extends \ElkArte\AbstractController
 
 			// No members, no further
 			if (empty($members))
-				throw new \ElkArte\Exceptions\Exception('reattribute_cannot_find_member');
+			{
+				throw new Exception('reattribute_cannot_find_member');
+			}
 
 			$memID = array_shift($members);
 			$memID = $memID['id'];
@@ -1023,9 +998,13 @@ class Maintenance extends \ElkArte\AbstractController
 		{
 			// Show them the correct error
 			if ($our_post['type'] === 'name' && empty($our_post['from_name']))
+			{
 				$error = $validator->validation_errors(array('from_name', 'to'));
+			}
 			else
+			{
 				$error = $validator->validation_errors(array('from_email', 'to'));
+			}
 
 			$context['maintenance_finished'] = array(
 				'errors' => $error,
@@ -1046,12 +1025,14 @@ class Maintenance extends \ElkArte\AbstractController
 
 		// Administrators only!
 		if (!allowedTo('admin_forum'))
-			throw new \ElkArte\Exceptions\Exception('no_dump_database', 'critical');
+		{
+			throw new Exception('no_dump_database', 'critical');
+		}
 
 		checkSession('post');
 
 		// Validate access
-		if (defined('I_KNOW_IT_MAY_BE_UNSAFE') === false && $this->_validate_access() === false)
+		if (!defined('I_KNOW_IT_MAY_BE_UNSAFE') && $this->_validate_access() === false)
 		{
 			return $this->action_database();
 		}
@@ -1081,14 +1062,16 @@ class Maintenance extends \ElkArte\AbstractController
 	{
 		global $context, $txt;
 
-		$ftp = new \ElkArte\Http\FtpConnection($this->_req->post->ftp_server, $this->_req->post->ftp_port, $this->_req->post->ftp_username, $this->_req->post->ftp_password);
+		$ftp = new FtpConnection($this->_req->post->ftp_server, $this->_req->post->ftp_port, $this->_req->post->ftp_username, $this->_req->post->ftp_password);
 
 		// No errors on the connection, id/pass are good
 		if ($ftp->error === false)
 		{
 			// I know, I know... but a lot of people want to type /home/xyz/... which is wrong, but logical.
 			if (!$ftp->chdir($this->_req->post->ftp_path))
+			{
 				$ftp->chdir(preg_replace('~^/home[2]?/[^/]+~', '', $this->_req->post->ftp_path));
+			}
 		}
 
 		// If we had an error...
@@ -1114,6 +1097,105 @@ class Maintenance extends \ElkArte\AbstractController
 	}
 
 	/**
+	 * Supporting function for the database maintenance area.
+	 */
+	public function action_database()
+	{
+		global $context, $modSettings, $maintenance;
+
+		// We need this, really..
+		require_once(SUBSDIR . '/Maintenance.subs.php');
+
+		// Set up the sub-template
+		$context['sub_template'] = 'maintain_database';
+		$db = database();
+
+		if ($db->supportMediumtext())
+		{
+			$body_type = fetchBodyType();
+
+			$context['convert_to'] = $body_type == 'text' ? 'mediumtext' : 'text';
+			$context['convert_to_suggest'] = ($body_type != 'text' && !empty($modSettings['max_messageLength']) && $modSettings['max_messageLength'] < 65536);
+		}
+
+		// Check few things to give advices before make a backup
+		// If safe mod is enable the external tool is *always* the best (and probably the only) solution
+		$context['safe_mode_enable'] = false;
+		if (version_compare(PHP_VERSION, '5.4.0', '<'))
+		{
+			$context['safe_mode_enable'] = @ini_get('safe_mode');
+		}
+
+		// This is just a...guess
+		$messages = countMessages();
+
+		// 256 is what we use in the backup script
+		detectServer()->setMemoryLimit('256M');
+		$memory_limit = memoryReturnBytes(ini_get('memory_limit')) / (1024 * 1024);
+
+		// Zip limit is set to more or less 1/4th the size of the available memory * 1500
+		// 1500 is an estimate of the number of messages that generates a database of 1 MB (yeah I know IT'S AN ESTIMATION!!!)
+		// Why that? Because the only reliable zip package is the one sent out the first time,
+		// so when the backup takes 1/5th (just to stay on the safe side) of the memory available
+		$zip_limit = $memory_limit * 1500 / 5;
+
+		// Here is more tricky: it depends on many factors, but the main idea is that
+		// if it takes "too long" the backup is not reliable. So, I know that on my computer it take
+		// 20 minutes to backup 2.5 GB, of course my computer is not representative, so I'll multiply by 4 the time.
+		// I would consider "too long" 5 minutes (I know it can be a long time, but let's start with that):
+		// 80 minutes for a 2.5 GB and a 5 minutes limit means 160 MB approx
+		$plain_limit = 240000;
+
+		// Last thing: are we able to gain time?
+		$current_time_limit = (int) ini_get('max_execution_time');
+		@set_time_limit(159); //something strange just to be sure
+		$new_time_limit = ini_get('max_execution_time');
+		@set_time_limit($current_time_limit);
+
+		$context['use_maintenance'] = 0;
+
+		// External tool if:
+		//  * safe_mode enable OR
+		//  * cannot change the execution time OR
+		//  * cannot reset timeout
+		if ($context['safe_mode_enable'] || empty($new_time_limit) || ($current_time_limit == $new_time_limit && !function_exists('apache_reset_timeout')))
+		{
+			$context['suggested_method'] = 'use_external_tool';
+		}
+		elseif ($zip_limit < $plain_limit && $messages < $zip_limit)
+		{
+			$context['suggested_method'] = 'zipped_file';
+		}
+		elseif ($zip_limit > $plain_limit || ($zip_limit < $plain_limit && $plain_limit < $messages))
+		{
+			$context['suggested_method'] = 'use_external_tool';
+			$context['use_maintenance'] = empty($maintenance) ? 2 : 0;
+		}
+		else
+		{
+			$context['use_maintenance'] = 1;
+			$context['suggested_method'] = 'plain_text';
+		}
+
+		theme()->getTemplates()->load('Packages');
+		theme()->getTemplates()->loadLanguageFile('Packages');
+
+		// $context['package_ftp'] may be set action_backup_display when an error occur
+		if (!isset($context['package_ftp']))
+		{
+			$context['package_ftp'] = array(
+				'form_elements_only' => true,
+				'server' => '',
+				'port' => '',
+				'username' => isset($modSettings['package_username']) ? $modSettings['package_username'] : '',
+				'path' => '',
+				'error' => '',
+			);
+		}
+		$context['skip_security'] = defined('I_KNOW_IT_MAY_BE_UNSAFE');
+	}
+
+	/**
 	 * Removing old and inactive members.
 	 */
 	public function action_purgeinactive_display()
@@ -1124,7 +1206,7 @@ class Maintenance extends \ElkArte\AbstractController
 		validateToken('admin-maint');
 
 		// Start with checking and cleaning what was sent
-		$validator = new \ElkArte\DataValidator();
+		$validator = new DataValidator();
 		$validator->sanitation_rules(array('maxdays' => 'intval'));
 		$validator->validation_rules(array('maxdays' => 'required', 'groups' => 'isarray', 'del_type' => 'required'));
 
@@ -1139,7 +1221,9 @@ class Maintenance extends \ElkArte\AbstractController
 
 			$groups = array();
 			foreach ($our_post['groups'] as $id => $dummy)
+			{
 				$groups[] = (int) $id;
+			}
 
 			$time_limit = (time() - ($our_post['maxdays'] * 24 * 3600));
 			$members = purgeMembers($our_post['del_type'], $groups, $time_limit);
@@ -1171,14 +1255,20 @@ class Maintenance extends \ElkArte\AbstractController
 
 		// No boards at all?  Forget it then :/.
 		if (empty($this->_req->post->boards))
+		{
 			redirectexit('action=admin;area=maintain;sa=topics');
+		}
 
 		$boards = array_keys($this->_req->post->boards);
 
 		if (!isset($this->_req->post->delete_type) || !in_array($this->_req->post->delete_type, array('moved', 'nothing', 'locked')))
+		{
 			$delete_type = 'nothing';
+		}
 		else
+		{
 			$delete_type = $this->_req->post->delete_type;
+		}
 
 		$exclude_stickies = isset($this->_req->post->delete_old_not_sticky);
 
@@ -1223,7 +1313,9 @@ class Maintenance extends \ElkArte\AbstractController
 
 		// No boards then this is your stop.
 		if (empty($id_board_from) || empty($id_board_to))
+		{
 			return;
+		}
 
 		// These will be needed
 		require_once(SUBSDIR . '/Maintenance.subs.php');
@@ -1231,7 +1323,9 @@ class Maintenance extends \ElkArte\AbstractController
 
 		// How many topics are we moving?
 		if (!isset($this->_req->query->totaltopics))
+		{
 			$total_topics = countTopicsFromBoard($id_board_from);
+		}
 		else
 		{
 			$total_topics = (int) $this->_req->query->totaltopics;
@@ -1248,7 +1342,9 @@ class Maintenance extends \ElkArte\AbstractController
 
 				// Just return if we don't have any topics left to move.
 				if (empty($topics))
+				{
 					break;
+				}
 
 				// Lets move them.
 				moveTopics($topics, $id_board_to);
@@ -1277,8 +1373,8 @@ class Maintenance extends \ElkArte\AbstractController
 		}
 
 		// Don't confuse admins by having an out of date cache.
-		\ElkArte\Cache\Cache::instance()->remove('board-' . $id_board_from);
-		\ElkArte\Cache\Cache::instance()->remove('board-' . $id_board_to);
+		Cache::instance()->remove('board-' . $id_board_from);
+		Cache::instance()->remove('board-' . $id_board_to);
 
 		redirectexit('action=admin;area=maintain;sa=topics;done=massmove');
 	}
@@ -1300,7 +1396,7 @@ class Maintenance extends \ElkArte\AbstractController
 
 		// Get the list of the current system hooks, filter them if needed
 		$currentHooks = get_integration_hooks();
-		if (isset($this->_req->query->filter) && in_array($this->_req->query->filter, array_keys($currentHooks)))
+		if (isset($this->_req->query->filter) && array_key_exists($this->_req->query->filter, $currentHooks))
 		{
 			$context['filter_url'] = ';filter=' . $this->_req->query->filter;
 			$context['current_filter'] = $this->_req->query->filter;
@@ -1313,10 +1409,14 @@ class Maintenance extends \ElkArte\AbstractController
 			'base_href' => getUrl('admin', ['action' => 'admin', 'area' => 'maintain', 'sa' => 'hooks', $context['filter_url'], '{session_data}']),
 			'default_sort_col' => 'hook_name',
 			'get_items' => array(
-				'function' => array($this, 'list_getIntegrationHooks'),
+				'function' => function ($start, $items_per_page, $sort) {
+					return $this->list_getIntegrationHooks($start, $items_per_page, $sort);
+				},
 			),
 			'get_count' => array(
-				'function' => array($this, 'list_getIntegrationHooksCount'),
+				'function' => function () {
+					return $this->list_getIntegrationHooksCount();
+				},
 			),
 			'no_items_label' => $txt['hooks_no_hooks'],
 			'columns' => array(
@@ -1341,9 +1441,13 @@ class Maintenance extends \ElkArte\AbstractController
 							global $txt;
 
 							if (!empty($data['included_file']))
+							{
 								return $txt['hooks_field_function'] . ': ' . $data['real_function'] . '<br />' . $txt['hooks_field_included_file'] . ': ' . $data['included_file'];
+							}
 							else
+							{
 								return $data['real_function'];
+							}
 						},
 					),
 					'sort' => array(
@@ -1407,6 +1511,39 @@ class Maintenance extends \ElkArte\AbstractController
 	}
 
 	/**
+	 * Callback for createList(). Called by action_hooks
+	 *
+	 * @param int $start The item to start with (for pagination purposes)
+	 * @param int $items_per_page The number of items to show per page
+	 * @param string $sort A string indicating how to sort the results
+	 *
+	 * @return array
+	 */
+	public function list_getIntegrationHooks($start, $items_per_page, $sort)
+	{
+		return list_integration_hooks_data($start, $items_per_page, $sort);
+	}
+
+	/**
+	 * Simply returns the total count of integration hooks
+	 * Callback for createList().
+	 *
+	 * @return int
+	 */
+	public function list_getIntegrationHooksCount()
+	{
+		global $context;
+
+		$context['filter'] = false;
+		if (isset($this->_req->query->filter))
+		{
+			$context['filter'] = $this->_req->query->filter;
+		}
+
+		return integration_hooks_count($context['filter']);
+	}
+
+	/**
 	 * Recalculate all members post counts
 	 *
 	 * What it does:
@@ -1441,7 +1578,7 @@ class Maintenance extends \ElkArte\AbstractController
 
 		// Ask for some extra time, on big boards this may take a bit
 		detectServer()->setTimeLimit(600);
-		\ElkArte\Debug::instance()->off();
+		Debug::instance()->off();
 
 		// The functions here will come in handy
 		require_once(SUBSDIR . '/Maintenance.subs.php');
@@ -1475,47 +1612,17 @@ class Maintenance extends \ElkArte\AbstractController
 			$context['continue_post_data'] = '<input type="hidden" name="' . $context['admin-recountposts_token_var'] . '" value="' . $context['admin-recountposts_token'] . '" />
 				<input type="hidden" name="' . $context['session_var'] . '" value="' . $context['session_id'] . '" />';
 
-			\ElkArte\Debug::instance()->on();
+			Debug::instance()->on();
+
 			return;
 		}
 
 		// No countable posts? set posts counter to 0
 		updateZeroPostMembers();
 
-		\ElkArte\Debug::instance()->on();
+		Debug::instance()->on();
 		// All done, clean up and go back to maintenance
 		unset($_SESSION['total_members']);
 		redirectexit('action=admin;area=maintain;sa=members;done=recountposts');
-	}
-
-	/**
-	 * Simply returns the total count of integration hooks
-	 * Callback for createList().
-	 *
-	 * @return int
-	 */
-	public function list_getIntegrationHooksCount()
-	{
-		global $context;
-
-		$context['filter'] = false;
-		if (isset($this->_req->query->filter))
-			$context['filter'] = $this->_req->query->filter;
-
-		return integration_hooks_count($context['filter']);
-	}
-
-	/**
-	 * Callback for createList(). Called by action_hooks
-	 *
-	 * @param int $start The item to start with (for pagination purposes)
-	 * @param int $items_per_page The number of items to show per page
-	 * @param string $sort A string indicating how to sort the results
-	 *
-	 * @return array
-	 */
-	public function list_getIntegrationHooks($start, $items_per_page, $sort)
-	{
-		return list_integration_hooks_data($start, $items_per_page, $sort);
 	}
 }

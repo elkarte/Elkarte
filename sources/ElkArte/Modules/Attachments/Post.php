@@ -8,7 +8,7 @@
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause (see accompanying LICENSE.txt file)
  *
  * This file contains code covered by:
- * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * copyright: 2011 Simple Machines (http://www.simplemachines.org)
  *
  * @version 2.0 dev
  *
@@ -16,40 +16,47 @@
 
 namespace ElkArte\Modules\Attachments;
 
-use ElkArte\Errors\ErrorContext;
 use ElkArte\Errors\AttachmentErrorContext;
+use ElkArte\Errors\ErrorContext;
+use ElkArte\EventManager;
+use ElkArte\Modules\AbstractModule;
 
 /**
  * Class Attachments_Post_Module
  */
-class Post extends \ElkArte\Modules\AbstractModule
+class Post extends AbstractModule
 {
 	/**
 	 * The mode of attachments (disabled/enabled/show only).
+	 *
 	 * @var int
 	 */
 	protected static $_attach_level = 0;
 
 	/**
 	 * The objects that keeps track of errors.
+	 *
 	 * @var AttachmentErrorContext
 	 */
 	protected $_attach_errors = null;
 
 	/**
 	 * List of attachments ID already saved.
+	 *
 	 * @var int[]
 	 */
 	protected $_saved_attach_id = array();
 
 	/**
 	 * If it is a new message or if it is an existing one edited.
+	 *
 	 * @var bool
 	 */
 	protected $_is_new_message = false;
 
 	/**
 	 * If temporary attachments should be ignored or not
+	 *
 	 * @var bool
 	 */
 	protected $ignore_temp = false;
@@ -57,13 +64,13 @@ class Post extends \ElkArte\Modules\AbstractModule
 	/**
 	 * {@inheritdoc }
 	 */
-	public static function hooks(\ElkArte\EventManager $eventsManager)
+	public static function hooks(EventManager $eventsManager)
 	{
 		global $modSettings;
 
 		if (!empty($modSettings['attachmentEnable']))
 		{
-			self::$_attach_level = $modSettings['attachmentEnable'];
+			self::$_attach_level = (int) $modSettings['attachmentEnable'];
 
 			return array(
 				array('prepare_post', array('\\ElkArte\\Modules\\Attachments\\Post', 'prepare_post'), array()),
@@ -75,7 +82,9 @@ class Post extends \ElkArte\Modules\AbstractModule
 			);
 		}
 		else
+		{
 			return array();
+		}
 	}
 
 	/**
@@ -112,7 +121,9 @@ class Post extends \ElkArte\Modules\AbstractModule
 		$context['attachments']['current'] = array();
 
 		if ($this->_attach_errors->hasErrors())
+		{
 			$post_errors->addError(array('attachments_errors' => $this->_attach_errors));
+		}
 	}
 
 	/**
@@ -128,12 +139,13 @@ class Post extends \ElkArte\Modules\AbstractModule
 	 * @param bool $show_additional_options
 	 * @param int $board
 	 * @param int $topic
+	 * @throws \ElkArte\Exceptions\Exception
 	 */
 	public function finalize_post_form(&$show_additional_options, $board, $topic)
 	{
 		global $txt, $context, $modSettings, $scripturl;
 
-		$context['attachments']['can']['post'] = self::$_attach_level == 1 && (allowedTo('post_attachment') || ($modSettings['postmod_active'] && allowedTo('post_unapproved_attachments')));
+		$context['attachments']['can']['post'] = self::$_attach_level === 1 && (allowedTo('post_attachment') || ($modSettings['postmod_active'] && allowedTo('post_unapproved_attachments')));
 		$context['attachments']['ila_enabled'] = !empty($modSettings['attachment_inline_enabled']);
 
 		if ($context['attachments']['can']['post'])
@@ -148,12 +160,16 @@ class Post extends \ElkArte\Modules\AbstractModule
 			{
 				$attachments['quantity'] = count($context['attachments']['current']);
 				foreach ($context['attachments']['current'] as $attachment)
+				{
 					$attachments['total_size'] += $attachment['size'];
+				}
 			}
 
 			// A bit of house keeping first.
-			if (!empty($_SESSION['temp_attachments']) && count($_SESSION['temp_attachments']) == 1)
+			if (!empty($_SESSION['temp_attachments']) && count($_SESSION['temp_attachments']) === 1)
+			{
 				unset($_SESSION['temp_attachments']);
+			}
 
 			if (!empty($_SESSION['temp_attachments']))
 			{
@@ -181,7 +197,9 @@ class Post extends \ElkArte\Modules\AbstractModule
 						foreach ($_SESSION['temp_attachments'] as $attachID => $attachment)
 						{
 							if (strpos($attachID, 'post_tmp_' . $this->user->id . '_') === false)
+							{
 								continue;
+							}
 
 							if (file_exists($attachment['tmp_name']))
 							{
@@ -196,9 +214,13 @@ class Post extends \ElkArte\Modules\AbstractModule
 					{
 						// Since, they don't belong here. Let's inform the user that they exist..
 						if (!empty($topic))
+						{
 							$delete_url = $scripturl . '?action=post' . (!empty($_REQUEST['msg']) ? (';msg=' . $_REQUEST['msg']) : '') . (!empty($_REQUEST['last_msg']) ? (';last_msg=' . $_REQUEST['last_msg']) : '') . ';topic=' . $topic . ';delete_temp';
+						}
 						else
+						{
 							$delete_url = $scripturl . '?action=post;board=' . $board . ';delete_temp';
+						}
 
 						// Compile a list of the files to show the user.
 						$file_list = array();
@@ -233,11 +255,15 @@ class Post extends \ElkArte\Modules\AbstractModule
 				{
 					// Skipping over these
 					if (isset($context['ignore_temp_attachments']) || isset($_SESSION['temp_attachments']['post']['files']))
+					{
 						break;
+					}
 
 					// Initial errors (such as missing directory), we can recover
 					if ($attachID != 'initial_error' && strpos($attachID, 'post_tmp_' . $this->user->id . '_') === false)
+					{
 						continue;
+					}
 
 					if ($attachID === 'initial_error')
 					{
@@ -258,7 +284,9 @@ class Post extends \ElkArte\Modules\AbstractModule
 							$txt['error_attach_errors'] = empty($txt['error_attach_errors']) ? '<br />' : '';
 							$txt['error_attach_errors'] .= vsprintf($txt['attach_warning'], $attachment['name']) . '<div class="attachmenterrors">';
 							foreach ($attachment['errors'] as $error)
+							{
 								$txt['error_attach_errors'] .= (is_array($error) ? vsprintf($txt[$error[0]], $error[1]) : $txt[$error]) . '<br  />';
+							}
 							$txt['error_attach_errors'] .= '</div>';
 							$this->_attach_errors->addError('attach_errors');
 						}
@@ -281,7 +309,9 @@ class Post extends \ElkArte\Modules\AbstractModule
 					$attachments['total_size'] += $attachment['size'];
 
 					if (!isset($context['files_in_session_warning']))
+					{
 						$context['files_in_session_warning'] = $txt['attached_files_in_session'];
+					}
 
 					$context['attachments']['current'][] = array(
 						'name' => '<span class="underline">' . htmlspecialchars($attachment['name'], ENT_COMPAT, 'UTF-8') . '</span>',
@@ -316,9 +346,13 @@ class Post extends \ElkArte\Modules\AbstractModule
 			$context['attachments']['can']['post_unapproved'] = allowedTo('post_attachment');
 			$context['attachments']['restrictions'] = array();
 			if (!empty($modSettings['attachmentCheckExtensions']))
+			{
 				$context['attachments']['allowed_extensions'] = strtr(strtolower($modSettings['attachmentExtensions']), array(',' => ', '));
+			}
 			else
+			{
 				$context['attachments']['allowed_extensions'] = '';
+			}
 			$context['attachments']['template'] = 'template_add_new_attachments';
 
 			$attachmentRestrictionTypes = array('attachmentNumPerPostLimit', 'attachmentPostLimit', 'attachmentSizeLimit');
@@ -330,9 +364,13 @@ class Post extends \ElkArte\Modules\AbstractModule
 
 					// Show some numbers. If they exist.
 					if ($type === 'attachmentNumPerPostLimit' && $attachments['quantity'] > 0)
+					{
 						$context['attachments']['restrictions'][] = sprintf($txt['attach_remaining'], $modSettings['attachmentNumPerPostLimit'] - $attachments['quantity']);
+					}
 					elseif ($type === 'attachmentPostLimit' && $attachments['total_size'] > 0)
+					{
 						$context['attachments']['restrictions'][] = sprintf($txt['attach_available'], comma_format(round(max($modSettings['attachmentPostLimit'] - ($attachments['total_size'] / 1028), 0)), 0));
+					}
 				}
 			}
 		}
@@ -354,7 +392,9 @@ class Post extends \ElkArte\Modules\AbstractModule
 		$this->saveAttachments($msg);
 
 		if ($this->_attach_errors->hasErrors())
+		{
 			$post_errors->addError(array('attachments_errors' => $this->_attach_errors));
+		}
 	}
 
 	/**
@@ -379,9 +419,13 @@ class Post extends \ElkArte\Modules\AbstractModule
 				$attachID = getAttachmentIdFromPublic($dummy);
 
 				if (strpos($attachID, 'post_tmp_' . $this->user->id . '_') !== false)
+				{
 					$keep_temp[] = $attachID;
+				}
 				else
+				{
 					$keep_ids[] = (int) $attachID;
+				}
 			}
 
 			if (isset($_SESSION['temp_attachments']))
@@ -389,7 +433,9 @@ class Post extends \ElkArte\Modules\AbstractModule
 				foreach ($_SESSION['temp_attachments'] as $attachID => $attachment)
 				{
 					if ((isset($_SESSION['temp_attachments']['post']['files'], $attachment['name']) && in_array($attachment['name'], $_SESSION['temp_attachments']['post']['files'])) || in_array($attachID, $keep_temp) || strpos($attachID, 'post_tmp_' . $this->user->id . '_') === false)
+					{
 						continue;
+					}
 
 					unset($_SESSION['temp_attachments'][$attachID]);
 					@unlink($attachment['tmp_name']);
@@ -409,18 +455,11 @@ class Post extends \ElkArte\Modules\AbstractModule
 		}
 
 		// Then try to upload any attachments.
-		$context['attachments']['can']['post'] = self::$_attach_level == 1 && (allowedTo('post_attachment') || ($modSettings['postmod_active'] && allowedTo('post_unapproved_attachments')));
+		$context['attachments']['can']['post'] = self::$_attach_level === 1 && (allowedTo('post_attachment') || ($modSettings['postmod_active'] && allowedTo('post_unapproved_attachments')));
 		if ($context['attachments']['can']['post'] && empty($_POST['from_qr']))
 		{
 			require_once(SUBSDIR . '/Attachments.subs.php');
-			if (!empty($msg))
-			{
-				$this->ignore_temp = processAttachments((int) $msg);
-			}
-			else
-			{
-				$this->ignore_temp = processAttachments();
-			}
+			$this->ignore_temp = !empty($msg) ? processAttachments((int) $msg) : processAttachments();
 		}
 	}
 
@@ -443,7 +482,9 @@ class Post extends \ElkArte\Modules\AbstractModule
 			foreach ($_SESSION['temp_attachments'] as $attachID => $attachment)
 			{
 				if ($attachID !== 'initial_error' && strpos($attachID, 'post_tmp_' . $this->user->id . '_') === false)
+				{
 					continue;
+				}
 
 				// If there was an initial error just show that message.
 				if ($attachID === 'initial_error')
@@ -472,7 +513,9 @@ class Post extends \ElkArte\Modules\AbstractModule
 					{
 						$this->_saved_attach_id[] = $attachmentOptions['id'];
 						if (!empty($attachmentOptions['thumb']))
+						{
 							$this->_saved_attach_id[] = $attachmentOptions['thumb'];
+						}
 
 						$msgOptions['body'] = preg_replace('~\[attach(.*?)\]' . $attachment['public_attachid'] . '\[\/attach\]~', '[attach$1]' . $attachmentOptions['id'] . '[/attach]', $msgOptions['body']);
 					}
@@ -487,7 +530,9 @@ class Post extends \ElkArte\Modules\AbstractModule
 		}
 
 		if (!empty($this->_saved_attach_id) && $msgOptions['icon'] === 'xx')
+		{
 			$msgOptions['icon'] = 'clip';
+		}
 	}
 
 	/**
@@ -498,6 +543,8 @@ class Post extends \ElkArte\Modules\AbstractModule
 	public function after_save_post($msgOptions)
 	{
 		if ($this->_is_new_message && !empty($this->_saved_attach_id))
+		{
 			bindMessageAttachments($msgOptions['id'], $this->_saved_attach_id);
+		}
 	}
 }

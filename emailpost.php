@@ -21,7 +21,9 @@
 
 // Only do something for a pipe and direct calling
 if (!defined('STDIN'))
+{
 	return;
+}
 
 // Any output here is not good
 error_reporting(0);

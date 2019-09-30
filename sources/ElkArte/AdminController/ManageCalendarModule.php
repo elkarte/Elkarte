@@ -8,7 +8,7 @@
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause (see accompanying LICENSE.txt file)
  *
  * This file contains code covered by:
- * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * copyright: 2011 Simple Machines (http://www.simplemachines.org)
  *
  * @version 2.0 dev
  *
@@ -16,13 +16,18 @@
 
 namespace ElkArte\AdminController;
 
+use ElkArte\AbstractController;
+use ElkArte\Action;
+use ElkArte\SettingsForm\SettingsForm;
+use ElkArte\Util;
+
 /**
  * This class controls execution for actions in the manage calendar area
  * of the admin panel.
  *
  * @package Calendar
  */
-class ManageCalendarModule extends \ElkArte\AbstractController
+class ManageCalendarModule extends AbstractController
 {
 	/**
 	 * Used to add the Calendar entry to the Core Features list.
@@ -73,7 +78,7 @@ class ManageCalendarModule extends \ElkArte\AbstractController
 		);
 
 		// Action control
-		$action = new \ElkArte\Action('manage_calendar');
+		$action = new Action('manage_calendar');
 
 		// Set up the two tabs here...
 		$context[$context['admin_menu_name']]['tab_data'] = array(
@@ -239,18 +244,24 @@ class ManageCalendarModule extends \ElkArte\AbstractController
 			checkSession();
 
 			// Not too long good sir?
-			$this->_req->post->title = \ElkArte\Util::substr($this->_req->post->title, 0, 60);
+			$this->_req->post->title = Util::substr($this->_req->post->title, 0, 60);
 			$this->_req->post->holiday = $this->_req->getPost('holiday', 'intval', 0);
 
 			if (isset($this->_req->post->delete))
+			{
 				removeHolidays($this->_req->post->holiday);
+			}
 			else
 			{
 				$date = strftime($this->_req->post->year <= 4 ? '0004-%m-%d' : '%Y-%m-%d', mktime(0, 0, 0, $this->_req->post->month, $this->_req->post->day, $this->_req->post->year));
 				if (isset($this->_req->post->edit))
+				{
 					editHoliday($this->_req->post->holiday, $date, $this->_req->post->title);
+				}
 				else
+				{
 					insertHoliday($date, $this->_req->post->title);
+				}
 			}
 
 			redirectexit('action=admin;area=managecalendar;sa=holidays');
@@ -269,7 +280,9 @@ class ManageCalendarModule extends \ElkArte\AbstractController
 		}
 		// If it's not new load the data.
 		else
+		{
 			$context['holiday'] = getHoliday($this->_req->query->holiday);
+		}
 
 		// Last day for the drop down?
 		$context['holiday']['last_day'] = (int) strftime('%d', mktime(0, 0, 0, $context['holiday']['month'] == 12 ? 1 : $context['holiday']['month'] + 1, 0, $context['holiday']['month'] == 12 ? $context['holiday']['year'] + 1 : $context['holiday']['year']));
@@ -286,7 +299,7 @@ class ManageCalendarModule extends \ElkArte\AbstractController
 		global $txt, $context;
 
 		// Initialize the form
-		$settingsForm = new \ElkArte\SettingsForm\SettingsForm(\ElkArte\SettingsForm\SettingsForm::DB_ADAPTER);
+		$settingsForm = new SettingsForm(SettingsForm::DB_ADAPTER);
 
 		// Initialize it with our settings
 		$settingsForm->setConfigVars($this->_settings());
@@ -338,36 +351,38 @@ class ManageCalendarModule extends \ElkArte\AbstractController
 		$boards_list = getBoardList(array('override_permissions' => true, 'not_redirection' => true), true);
 		$boards = array('');
 		foreach ($boards_list as $board)
+		{
 			$boards[$board['id_board']] = $board['cat_name'] . ' - ' . $board['board_name'];
+		}
 
 		// Look, all the calendar settings - of which there are many!
 		$config_vars = array(
 			array('title', 'calendar_settings'),
-				// All the permissions:
-				array('permissions', 'calendar_view'),
-				array('permissions', 'calendar_post'),
-				array('permissions', 'calendar_edit_own'),
-				array('permissions', 'calendar_edit_any'),
+			// All the permissions:
+			array('permissions', 'calendar_view'),
+			array('permissions', 'calendar_post'),
+			array('permissions', 'calendar_edit_own'),
+			array('permissions', 'calendar_edit_any'),
 			'',
-				// How many days to show on board index, and where to display events etc?
-				array('int', 'cal_days_for_index', 6, 'postinput' => $txt['days_word']),
-				array('select', 'cal_showholidays', array(0 => $txt['setting_cal_show_never'], 1 => $txt['setting_cal_show_cal'], 3 => $txt['setting_cal_show_index'], 2 => $txt['setting_cal_show_all'])),
-				array('select', 'cal_showbdays', array(0 => $txt['setting_cal_show_never'], 1 => $txt['setting_cal_show_cal'], 3 => $txt['setting_cal_show_index'], 2 => $txt['setting_cal_show_all'])),
-				array('select', 'cal_showevents', array(0 => $txt['setting_cal_show_never'], 1 => $txt['setting_cal_show_cal'], 3 => $txt['setting_cal_show_index'], 2 => $txt['setting_cal_show_all'])),
-				array('check', 'cal_export'),
+			// How many days to show on board index, and where to display events etc?
+			array('int', 'cal_days_for_index', 6, 'postinput' => $txt['days_word']),
+			array('select', 'cal_showholidays', array(0 => $txt['setting_cal_show_never'], 1 => $txt['setting_cal_show_cal'], 3 => $txt['setting_cal_show_index'], 2 => $txt['setting_cal_show_all'])),
+			array('select', 'cal_showbdays', array(0 => $txt['setting_cal_show_never'], 1 => $txt['setting_cal_show_cal'], 3 => $txt['setting_cal_show_index'], 2 => $txt['setting_cal_show_all'])),
+			array('select', 'cal_showevents', array(0 => $txt['setting_cal_show_never'], 1 => $txt['setting_cal_show_cal'], 3 => $txt['setting_cal_show_index'], 2 => $txt['setting_cal_show_all'])),
+			array('check', 'cal_export'),
 			'',
-				// Linking events etc...
-				array('select', 'cal_defaultboard', $boards),
-				array('check', 'cal_daysaslink'),
-				array('check', 'cal_allow_unlinked'),
-				array('check', 'cal_showInTopic'),
+			// Linking events etc...
+			array('select', 'cal_defaultboard', $boards),
+			array('check', 'cal_daysaslink'),
+			array('check', 'cal_allow_unlinked'),
+			array('check', 'cal_showInTopic'),
 			'',
-				// Dates of calendar...
-				array('int', 'cal_minyear'),
+			// Dates of calendar...
+			array('int', 'cal_minyear'),
 			'',
-				// Calendar spanning...
-				array('check', 'cal_allowspan'),
-				array('int', 'cal_maxspan', 6, 'postinput' => $txt['days_word']),
+			// Calendar spanning...
+			array('check', 'cal_allowspan'),
+			array('int', 'cal_maxspan', 6, 'postinput' => $txt['days_word']),
 		);
 
 		// Add new settings with a nice hook, makes them available for admin settings search as well

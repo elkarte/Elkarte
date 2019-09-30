@@ -8,7 +8,7 @@
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause (see accompanying LICENSE.txt file)
  *
  * This file contains code covered by:
- * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * copyright: 2011 Simple Machines (http://www.simplemachines.org)
  *
  * @version 2.0 dev
  *
@@ -16,13 +16,16 @@
 
 namespace ElkArte\Controller;
 
+use ElkArte\AbstractController;
 use ElkArte\Errors\ErrorContext;
+use ElkArte\Exceptions\Exception;
+use ElkArte\Util;
 
 /**
  * This receives requests for voting, locking, removing and editing polls.
  * Note that that posting polls is done in Post.controller.php.
  */
-class Poll extends \ElkArte\AbstractController
+class Poll extends AbstractController
 {
 	/**
 	 * Forward to the right action.
@@ -62,14 +65,18 @@ class Poll extends \ElkArte\AbstractController
 		$row = checkVote($topic);
 
 		if (empty($row))
-			throw new \ElkArte\Exceptions\Exception('poll_error', false);
+		{
+			throw new Exception('poll_error', false);
+		}
 
 		// If this is a guest can they vote?
 		if ($this->user->is_guest)
 		{
 			// Guest voting disabled?
 			if (!$row['guest_vote'])
-				throw new \ElkArte\Exceptions\Exception('guest_vote_disabled');
+			{
+				throw new Exception('guest_vote_disabled');
+			}
 			// Guest already voted?
 			elseif (!empty($this->_req->cookie->guest_poll_vote) && preg_match('~^[0-9,;]+$~', $this->_req->cookie->guest_poll_vote) && strpos($this->_req->cookie->guest_poll_vote, ';' . $row['id_poll'] . ',') !== false)
 			{
@@ -81,7 +88,9 @@ class Poll extends \ElkArte\AbstractController
 				{
 					$guestvoted = explode(',', $guestvoted);
 					if ($guestvoted[0] == $row['id_poll'])
+					{
 						break;
+					}
 				}
 
 				// Has the poll been reset since guest voted?
@@ -90,12 +99,18 @@ class Poll extends \ElkArte\AbstractController
 					// Remove the poll info from the cookie to allow guest to vote again
 					unset($guestinfo[$i]);
 					if (!empty($guestinfo))
+					{
 						$this->_req->cookie->guest_poll_vote = ';' . implode(';', $guestinfo);
+					}
 					else
+					{
 						unset($this->_req->cookie->guest_poll_vote);
+					}
 				}
 				else
-					throw new \ElkArte\Exceptions\Exception('poll_error', false);
+				{
+					throw new Exception('poll_error', false);
+				}
 
 				unset($guestinfo, $guestvoted, $i);
 			}
@@ -103,11 +118,15 @@ class Poll extends \ElkArte\AbstractController
 
 		// Is voting locked or has it expired?
 		if (!empty($row['voting_locked']) || (!empty($row['expire_time']) && time() > $row['expire_time']))
-			throw new \ElkArte\Exceptions\Exception('poll_error', false);
+		{
+			throw new Exception('poll_error', false);
+		}
 
 		// If they have already voted and aren't allowed to change their vote - hence they are outta here!
 		if ($this->user->is_guest === false && $row['selected'] != -1 && empty($row['change_vote']))
-			throw new \ElkArte\Exceptions\Exception('poll_error', false);
+		{
+			throw new Exception('poll_error', false);
+		}
 		// Otherwise if they can change their vote yet they haven't sent any options... remove their vote and redirect.
 		elseif (!empty($row['change_vote']) && $this->user->is_guest === false && empty($this->_req->post->options))
 		{
@@ -128,18 +147,24 @@ class Poll extends \ElkArte\AbstractController
 
 			// Redirect back to the topic so the user can vote again!
 			if (empty($this->_req->post->options))
+			{
 				redirectexit('topic=' . $topic . '.' . $this->_req->post->start);
+			}
 		}
 
 		checkSession('request');
 
 		// Make sure the option(s) are valid.
 		if (empty($this->_req->post->options))
-			throw new \ElkArte\Exceptions\Exception('didnt_select_vote', false);
+		{
+			throw new Exception('didnt_select_vote', false);
+		}
 
 		// Too many options checked!
 		if (count($this->_req->post->options) > $row['max_votes'])
-			throw new \ElkArte\Exceptions\Exception('poll_too_many_votes', false, array($row['max_votes']));
+		{
+			throw new Exception('poll_too_many_votes', false, array($row['max_votes']));
+		}
 
 		$pollOptions = array();
 		$inserts = array();
@@ -205,27 +230,280 @@ class Poll extends \ElkArte\AbstractController
 
 		// If the user _can_ modify the poll....
 		if (!allowedTo('poll_lock_any'))
+		{
 			isAllowedTo('poll_lock_' . ($this->user->id == $poll['id_member_started'] ? 'own' : 'any'));
+		}
 
 		// It's been locked by a non-moderator.
 		if ($poll['locked'] == '1')
+		{
 			$poll['locked'] = '0';
+		}
 		// Locked by a moderator, and this is a moderator.
 		elseif ($poll['locked'] == '2' && allowedTo('moderate_board'))
+		{
 			$poll['locked'] = '0';
+		}
 		// Sorry, a moderator locked it.
 		elseif ($poll['locked'] == '2' && !allowedTo('moderate_board'))
-			throw new \ElkArte\Exceptions\Exception('locked_by_admin', 'user');
+		{
+			throw new Exception('locked_by_admin', 'user');
+		}
 		// A moderator *is* locking it.
 		elseif ($poll['locked'] == '0' && allowedTo('moderate_board'))
+		{
 			$poll['locked'] = '2';
+		}
 		// Well, it's gonna be locked one way or another otherwise...
 		else
+		{
 			$poll['locked'] = '1';
+		}
 
 		// Lock!  *Poof* - no one can vote.
 		lockPoll($poll['id_poll'], $poll['locked']);
 
+		redirectexit('topic=' . $topic . '.' . $this->_req->post->start);
+	}
+
+	/**
+	 * Update the settings for a poll, or add a new one.
+	 *
+	 * What it does:
+	 *
+	 * - Must be called with a topic specified in the URL.
+	 * - The user must have poll_edit_any/poll_add_any permission for the relevant action. Otherwise
+	 * they must be poll starter with poll_edit_own permission for editing, or be topic starter
+	 * with poll_add_any permission for adding.
+	 * - In the case of an error, this function will redirect back to action_editpoll and
+	 * display the relevant error message.
+	 * - Upon successful completion of action will direct user back to topic.
+	 * - Accessed via ?action=editpoll2.
+	 */
+	public function action_editpoll2()
+	{
+		global $topic, $board;
+
+		// Sneaking off, are we?
+		if (empty($this->_req->post))
+		{
+			redirectexit('action=editpoll;topic=' . $topic . '.0');
+		}
+
+		$poll_errors = ErrorContext::context('poll');
+
+		if (checkSession('post', '', false) != '')
+		{
+			$poll_errors->addError('session_timeout');
+		}
+
+		// HACKERS (!!) can't edit :P.
+		if (empty($topic))
+		{
+			throw new Exception('no_access', false);
+		}
+
+		// Is this a new poll, or editing an existing?
+		$isEdit = isset($this->_req->post->add) ? 0 : 1;
+
+		// Make sure we have our stuff.
+		require_once(SUBSDIR . '/Poll.subs.php');
+
+		// Get the starter and the poll's ID - if it's an edit.
+		$bcinfo = getPollStarter($topic);
+
+		// Check their adding/editing is valid.
+		if (!$isEdit && !empty($bcinfo['id_poll']))
+		{
+			throw new Exception('poll_already_exists');
+		}
+		// Are we editing a poll which doesn't exist?
+		elseif ($isEdit && empty($bcinfo['id_poll']))
+		{
+			throw new Exception('poll_not_found');
+		}
+
+		// Check if they have the power to add or edit the poll.
+		if ($isEdit && !allowedTo('poll_edit_any'))
+		{
+			isAllowedTo('poll_edit_' . ($this->user->id == $bcinfo['id_member_started'] || ($bcinfo['poll_starter'] != 0 && $this->user->id == $bcinfo['poll_starter']) ? 'own' : 'any'));
+		}
+		elseif (!$isEdit && !allowedTo('poll_add_any'))
+		{
+			isAllowedTo('poll_add_' . ($this->user->id == $bcinfo['id_member_started'] ? 'own' : 'any'));
+		}
+
+		$optionCount = 0;
+		$idCount = 0;
+
+		// Ensure the user is leaving a valid amount of options - there must be at least two.
+		foreach ($this->_req->post->options as $k => $option)
+		{
+			if (trim($option) !== '')
+			{
+				$optionCount++;
+				$idCount = max($idCount, $k);
+			}
+		}
+
+		if ($optionCount < 2)
+		{
+			$poll_errors->addError('poll_few');
+		}
+		elseif ($optionCount > 256 || $idCount > 255)
+		{
+			$poll_errors->addError('poll_many');
+		}
+
+		// Also - ensure they are not removing the question.
+		if ($this->_req->getPost('question', 'trim') === '')
+		{
+			$poll_errors->addError('no_question');
+		}
+
+		// Got any errors to report?
+		if ($poll_errors->hasErrors())
+		{
+			$this->action_editpoll();
+		}
+
+		// Prevent double submission of this form.
+		checkSubmitOnce('check');
+
+		// Now we've done all our error checking, let's get the core poll information cleaned... question first.
+		$question = Util::htmlspecialchars($this->_req->getPost('question', 'trim'));
+		$question = Util::substr($question, 0, 255);
+		$poll_hide = $this->_req->getPost('poll_hide', 'intval', 0);
+		$poll_expire = $this->_req->getPost('poll_expire', 'intval', 0);
+		$poll_change_vote = isset($this->_req->post->poll_change_vote) ? 1 : 0;
+		$poll_guest_vote = isset($this->_req->post->poll_guest_vote) ? 1 : 0;
+		$poll_max_votes = 0;
+
+		// Make sure guests are actually allowed to vote generally.
+		if ($poll_guest_vote)
+		{
+			require_once(SUBSDIR . '/Members.subs.php');
+			$allowedGroups = groupsAllowedTo('poll_vote', $board);
+			if (!in_array(-1, $allowedGroups['allowed']))
+			{
+				$poll_guest_vote = 0;
+			}
+		}
+
+		// Ensure that the number options allowed makes sense, and the expiration date is valid.
+		if (!$isEdit || allowedTo('moderate_board'))
+		{
+			$poll_expire = $poll_expire > 9999 ? 9999 : ($poll_expire < 0 ? 0 : $poll_expire);
+
+			if (empty($poll_expire) && $poll_hide == 2)
+			{
+				$poll_hide = 1;
+			}
+			elseif (!$isEdit || $poll_expire != ceil($bcinfo['expire_time'] <= time() ? -1 : ($bcinfo['expire_time'] - time()) / (3600 * 24)))
+			{
+				$poll_expire = empty($poll_expire) ? 0 : time() + $_POST['poll_expire'] * 3600 * 24;
+			}
+			else
+			{
+				$poll_expire = $bcinfo['expire_time'];
+			}
+
+			if (empty($this->_req->post->poll_max_votes) || $this->_req->post->poll_max_votes <= 0)
+			{
+				$poll_max_votes = 1;
+			}
+			else
+			{
+				$poll_max_votes = $this->_req->getPost('poll_max_votes', 'intval', 0);
+			}
+		}
+
+		// If we're editing, let's commit the changes.
+		if ($isEdit)
+		{
+			modifyPoll($bcinfo['id_poll'], $question,
+				!empty($poll_max_votes) ? $poll_max_votes : 0,
+				$poll_hide,
+				!empty($poll_expire) ? $poll_expire : 0,
+				$poll_change_vote, $poll_guest_vote
+			);
+		}
+		// Otherwise, let's get our poll going!
+		else
+		{
+			// Create the poll.
+			$bcinfo['id_poll'] = createPoll($question, $this->user->id, $this->user->username,
+				$poll_max_votes, $poll_hide, $poll_expire,
+				$poll_change_vote, $poll_guest_vote
+			);
+
+			// Link the poll to the topic.
+			associatedPoll($topic, $bcinfo['id_poll']);
+		}
+
+		// Get all the choices.  (no better way to remove all emptied and add previously non-existent ones.)
+		$choices = array_keys(pollOptions($bcinfo['id_poll']));
+
+		$add_options = array();
+		$update_options = array();
+		$delete_options = array();
+		foreach ($this->_req->post->options as $k => $option)
+		{
+			// Make sure the key is numeric for sanity's sake.
+			$k = (int) $k;
+
+			// They've cleared the box.  Either they want it deleted, or it never existed.
+			if (trim($option) === '')
+			{
+				// They want it deleted.  Bye.
+				if (in_array($k, $choices))
+				{
+					$delete_options[] = $k;
+				}
+
+				// Skip the rest...
+				continue;
+			}
+
+			// Dress the option up for its big date with the database.
+			$option = Util::htmlspecialchars($option);
+
+			// If it's already there, update it.  If it's not... add it.
+			if (in_array($k, $choices))
+			{
+				$update_options[] = array($bcinfo['id_poll'], $k, $option);
+			}
+			else
+			{
+				$add_options[] = array($bcinfo['id_poll'], $k, $option, 0);
+			}
+		}
+
+		if (!empty($update_options))
+		{
+			modifyPollOption($update_options);
+		}
+
+		if (!empty($add_options))
+		{
+			insertPollOptions($add_options);
+		}
+
+		// I'm sorry, but... well, no one was choosing you. Poor options, I'll put you out of your misery.
+		if (!empty($delete_options))
+		{
+			deletePollOptions($bcinfo['id_poll'], $delete_options);
+		}
+
+		// Shall I reset the vote count, sir?
+		if (isset($this->_req->post->resetVoteCount))
+		{
+			resetVotes($bcinfo['id_poll']);
+		}
+
+		call_integration_hook('integrate_poll_add_edit', array($bcinfo['id_poll'], $isEdit));
+
+		// Off we go.
 		redirectexit('topic=' . $topic . '.' . $this->_req->post->start);
 	}
 
@@ -252,7 +530,7 @@ class Poll extends \ElkArte\AbstractController
 		// No topic, means you can't edit the poll
 		if (empty($topic))
 		{
-			throw new \ElkArte\Exceptions\Exception('no_access', false);
+			throw new Exception('no_access', false);
 		}
 
 		// We work hard with polls.
@@ -272,18 +550,18 @@ class Poll extends \ElkArte\AbstractController
 		// Assume it all exists, right?
 		if (empty($pollinfo))
 		{
-			throw new \ElkArte\Exceptions\Exception('no_board');
+			throw new Exception('no_board');
 		}
 
 		// If we are adding a new poll - make sure that there isn't already a poll there.
 		if (!$context['is_edit'] && !empty($pollinfo['id_poll']))
 		{
-			throw new \ElkArte\Exceptions\Exception('poll_already_exists');
+			throw new Exception('poll_already_exists');
 		}
 		// Otherwise, if we're editing it, it does exist I assume?
 		elseif ($context['is_edit'] && empty($pollinfo['id_poll']))
 		{
-			throw new \ElkArte\Exceptions\Exception('poll_not_found');
+			throw new Exception('poll_not_found');
 		}
 
 		// Can you do this?
@@ -305,7 +583,7 @@ class Poll extends \ElkArte\AbstractController
 		// Want to make sure before you actually submit?  Must be a lot of options, or something.
 		if ($poll_errors->hasErrors())
 		{
-			$question = \ElkArte\Util::htmlspecialchars($this->_req->post->question);
+			$question = Util::htmlspecialchars($this->_req->post->question);
 
 			// Basic theme info...
 			$context['poll'] = array(
@@ -368,7 +646,7 @@ class Poll extends \ElkArte\AbstractController
 			// If an option exists, update it.  If it is new, add it - but don't reuse ids!
 			foreach ($this->_req->post->options as $id => $label)
 			{
-				$label = censor(\ElkArte\Util::htmlspecialchars($label));
+				$label = censor(Util::htmlspecialchars($label));
 
 				if (isset($context['poll']['choices'][$id]))
 				{
@@ -381,7 +659,7 @@ class Poll extends \ElkArte\AbstractController
 						'number' => $number++,
 						'label' => $label,
 						'votes' => -1,
-						'is_last' => $count++ == $totalPostOptions && $totalPostOptions > 1 ? true : false,
+						'is_last' => $count++ === $totalPostOptions && $totalPostOptions > 1,
 					);
 				}
 			}
@@ -390,7 +668,7 @@ class Poll extends \ElkArte\AbstractController
 			if ($totalPostOptions < 2)
 			{
 				// Need two?
-				if ($totalPostOptions == 0)
+				if ($totalPostOptions === 0)
 				{
 					$context['poll']['choices'][] = array(
 						'id' => $last_id++,
@@ -515,199 +793,6 @@ class Poll extends \ElkArte\AbstractController
 	}
 
 	/**
-	 * Update the settings for a poll, or add a new one.
-	 *
-	 * What it does:
-	 *
-	 * - Must be called with a topic specified in the URL.
-	 * - The user must have poll_edit_any/poll_add_any permission for the relevant action. Otherwise
-	 * they must be poll starter with poll_edit_own permission for editing, or be topic starter
-	 * with poll_add_any permission for adding.
-	 * - In the case of an error, this function will redirect back to action_editpoll and
-	 * display the relevant error message.
-	 * - Upon successful completion of action will direct user back to topic.
-	 * - Accessed via ?action=editpoll2.
-	 */
-	public function action_editpoll2()
-	{
-		global $topic, $board;
-
-		// Sneaking off, are we?
-		if (empty($this->_req->post))
-			redirectexit('action=editpoll;topic=' . $topic . '.0');
-
-		$poll_errors = ErrorContext::context('poll');
-
-		if (checkSession('post', '', false) != '')
-			$poll_errors->addError('session_timeout');
-
-		// HACKERS (!!) can't edit :P.
-		if (empty($topic))
-			throw new \ElkArte\Exceptions\Exception('no_access', false);
-
-		// Is this a new poll, or editing an existing?
-		$isEdit = isset($this->_req->post->add) ? 0 : 1;
-
-		// Make sure we have our stuff.
-		require_once(SUBSDIR . '/Poll.subs.php');
-
-		// Get the starter and the poll's ID - if it's an edit.
-		$bcinfo = getPollStarter($topic);
-
-		// Check their adding/editing is valid.
-		if (!$isEdit && !empty($bcinfo['id_poll']))
-			throw new \ElkArte\Exceptions\Exception('poll_already_exists');
-		// Are we editing a poll which doesn't exist?
-		elseif ($isEdit && empty($bcinfo['id_poll']))
-			throw new \ElkArte\Exceptions\Exception('poll_not_found');
-
-		// Check if they have the power to add or edit the poll.
-		if ($isEdit && !allowedTo('poll_edit_any'))
-			isAllowedTo('poll_edit_' . ($this->user->id == $bcinfo['id_member_started'] || ($bcinfo['poll_starter'] != 0 && $this->user->id == $bcinfo['poll_starter']) ? 'own' : 'any'));
-		elseif (!$isEdit && !allowedTo('poll_add_any'))
-			isAllowedTo('poll_add_' . ($this->user->id == $bcinfo['id_member_started'] ? 'own' : 'any'));
-
-		$optionCount = 0;
-		$idCount = 0;
-
-		// Ensure the user is leaving a valid amount of options - there must be at least two.
-		foreach ($this->_req->post->options as $k => $option)
-		{
-			if (trim($option) !== '')
-			{
-				$optionCount++;
-				$idCount = max($idCount, $k);
-			}
-		}
-
-		if ($optionCount < 2)
-			$poll_errors->addError('poll_few');
-		elseif ($optionCount > 256 || $idCount > 255)
-			$poll_errors->addError('poll_many');
-
-		// Also - ensure they are not removing the question.
-		if ($this->_req->getPost('question', 'trim') === '')
-			$poll_errors->addError('no_question');
-
-		// Got any errors to report?
-		if ($poll_errors->hasErrors())
-			$this->action_editpoll();
-
-		// Prevent double submission of this form.
-		checkSubmitOnce('check');
-
-		// Now we've done all our error checking, let's get the core poll information cleaned... question first.
-		$question = \ElkArte\Util::htmlspecialchars($this->_req->getPost('question', 'trim'));
-		$question = \ElkArte\Util::substr($question, 0, 255);
-		$poll_hide = $this->_req->getPost('poll_hide', 'intval', 0);
-		$poll_expire = $this->_req->getPost('poll_expire', 'intval', 0);
-		$poll_change_vote = isset($this->_req->post->poll_change_vote) ? 1 : 0;
-		$poll_guest_vote = isset($this->_req->post->poll_guest_vote) ? 1 : 0;
-		$poll_max_votes = 0;
-
-		// Make sure guests are actually allowed to vote generally.
-		if ($poll_guest_vote)
-		{
-			require_once(SUBSDIR . '/Members.subs.php');
-			$allowedGroups = groupsAllowedTo('poll_vote', $board);
-			if (!in_array(-1, $allowedGroups['allowed']))
-				$poll_guest_vote = 0;
-		}
-
-		// Ensure that the number options allowed makes sense, and the expiration date is valid.
-		if (!$isEdit || allowedTo('moderate_board'))
-		{
-			$poll_expire = $poll_expire > 9999 ? 9999 : ($poll_expire < 0 ? 0 : $poll_expire);
-
-			if (empty($poll_expire) && $poll_hide == 2)
-				$poll_hide = 1;
-			elseif (!$isEdit || $poll_expire != ceil($bcinfo['expire_time'] <= time() ? -1 : ($bcinfo['expire_time'] - time()) / (3600 * 24)))
-				$poll_expire = empty($poll_expire) ? 0 : time() + $_POST['poll_expire'] * 3600 * 24;
-			else
-				$poll_expire = $bcinfo['expire_time'];
-
-			if (empty($this->_req->post->poll_max_votes) || $this->_req->post->poll_max_votes <= 0)
-				$poll_max_votes = 1;
-			else
-				$poll_max_votes = $this->_req->getPost('poll_max_votes', 'intval', 0);
-		}
-
-		// If we're editing, let's commit the changes.
-		if ($isEdit)
-		{
-			modifyPoll($bcinfo['id_poll'], $question,
-				!empty($poll_max_votes) ? $poll_max_votes : 0,
-				$poll_hide,
-				!empty($poll_expire) ? $poll_expire : 0,
-				$poll_change_vote, $poll_guest_vote
-			);
-		}
-		// Otherwise, let's get our poll going!
-		else
-		{
-			// Create the poll.
-			$bcinfo['id_poll'] = createPoll($question, $this->user->id, $this->user->username,
-				$poll_max_votes, $poll_hide, $poll_expire,
-				$poll_change_vote, $poll_guest_vote
-			);
-
-			// Link the poll to the topic.
-			associatedPoll($topic, $bcinfo['id_poll']);
-		}
-
-		// Get all the choices.  (no better way to remove all emptied and add previously non-existent ones.)
-		$choices = array_keys(pollOptions($bcinfo['id_poll']));
-
-		$add_options = array();
-		$update_options = array();
-		$delete_options = array();
-		foreach ($this->_req->post->options as $k => $option)
-		{
-			// Make sure the key is numeric for sanity's sake.
-			$k = (int) $k;
-
-			// They've cleared the box.  Either they want it deleted, or it never existed.
-			if (trim($option) === '')
-			{
-				// They want it deleted.  Bye.
-				if (in_array($k, $choices))
-					$delete_options[] = $k;
-
-				// Skip the rest...
-				continue;
-			}
-
-			// Dress the option up for its big date with the database.
-			$option = \ElkArte\Util::htmlspecialchars($option);
-
-			// If it's already there, update it.  If it's not... add it.
-			if (in_array($k, $choices))
-				$update_options[] = array($bcinfo['id_poll'], $k, $option);
-			else
-				$add_options[] = array($bcinfo['id_poll'], $k, $option, 0);
-		}
-
-		if (!empty($update_options))
-			modifyPollOption($update_options);
-
-		if (!empty($add_options))
-			insertPollOptions($add_options);
-
-		// I'm sorry, but... well, no one was choosing you. Poor options, I'll put you out of your misery.
-		if (!empty($delete_options))
-			deletePollOptions($bcinfo['id_poll'], $delete_options);
-
-		// Shall I reset the vote count, sir?
-		if (isset($this->_req->post->resetVoteCount))
-			resetVotes($bcinfo['id_poll']);
-
-		call_integration_hook('integrate_poll_add_edit', array($bcinfo['id_poll'], $isEdit));
-
-		// Off we go.
-		redirectexit('topic=' . $topic . '.' . $this->_req->post->start);
-	}
-
-	/**
 	 * Remove a poll from a topic without removing the topic.
 	 *
 	 * What it does:
@@ -724,7 +809,9 @@ class Poll extends \ElkArte\AbstractController
 
 		// Make sure the topic is not empty.
 		if (empty($topic))
-			throw new \ElkArte\Exceptions\Exception('no_access', false);
+		{
+			throw new Exception('no_access', false);
+		}
 
 		// Verify the session.
 		checkSession('get');
@@ -737,11 +824,15 @@ class Poll extends \ElkArte\AbstractController
 		{
 			$pollStarters = pollStarters($topic);
 			if (empty($pollStarters))
-				throw new \ElkArte\Exceptions\Exception('no_access', false);
+			{
+				throw new Exception('no_access', false);
+			}
 
 			list ($topicStarter, $pollStarter) = $pollStarters;
 			if ($topicStarter == $this->user->id || ($pollStarter != 0 && $pollStarter == $this->user->id))
+			{
 				isAllowedTo('poll_remove_own');
+			}
 		}
 
 		// Retrieve the poll ID.

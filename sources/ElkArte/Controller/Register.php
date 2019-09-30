@@ -10,7 +10,7 @@
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause (see accompanying LICENSE.txt file)
  *
  * This file contains code covered by:
- * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * copyright: 2011 Simple Machines (http://www.simplemachines.org)
  *
  * @version 2.0 dev
  *
@@ -18,7 +18,15 @@
 
 namespace ElkArte\Controller;
 
+use ElkArte\AbstractController;
+use ElkArte\Action;
+use ElkArte\Agreement;
+use ElkArte\DataValidator;
 use ElkArte\Errors\ErrorContext;
+use ElkArte\Errors\Errors;
+use ElkArte\Exceptions\Exception;
+use ElkArte\PrivacyPolicy;
+use ElkArte\Util;
 
 /**
  * It registers new members, and it allows the administrator moderate member registration
@@ -32,10 +40,11 @@ use ElkArte\Errors\ErrorContext;
  * - 1 = Approved and active
  * - 0 = Not active
  */
-class Register extends \ElkArte\AbstractController
+class Register extends AbstractController
 {
 	/**
 	 * Holds the results of a findUser() request
+	 *
 	 * @var array
 	 */
 	private $_row;
@@ -62,7 +71,9 @@ class Register extends \ElkArte\AbstractController
 
 		// Check if the administrator has it disabled.
 		if (!empty($modSettings['registration_method']) && $modSettings['registration_method'] == '3')
-			throw new \ElkArte\Exceptions\Exception('registration_disabled', false);
+		{
+			throw new Exception('registration_disabled', false);
+		}
 	}
 
 	/**
@@ -89,7 +100,7 @@ class Register extends \ElkArte\AbstractController
 		);
 
 		// Setup the action handler
-		$action = new \ElkArte\Action('register');
+		$action = new Action('register');
 		$subAction = $action->initialize($subActions, 'register');
 
 		// Call the action
@@ -123,7 +134,9 @@ class Register extends \ElkArte\AbstractController
 
 		// Confused and want to contact the admins instead
 		if (isset($this->_req->post->show_contact))
+		{
 			redirectexit('action=register;sa=contact');
+		}
 
 		// If we have language support enabled then they need to be loaded
 		if ($this->_load_language_support())
@@ -164,7 +177,7 @@ class Register extends \ElkArte\AbstractController
 		$current_step = isset($this->_req->post->step) ? (int) $this->_req->post->step : ($context['require_agreement'] && !$context['checkbox_agreement'] ? 1 : 2);
 
 		// Does this user agree to the registration agreement?
-		if ($current_step == 1 && (isset($this->_req->post->accept_agreement) || isset($this->_req->post->accept_agreement_coppa)))
+		if ($current_step === 1 && (isset($this->_req->post->accept_agreement) || isset($this->_req->post->accept_agreement_coppa)))
 		{
 			$context['registration_passed_agreement'] = $_SESSION['registration_agreed'] = true;
 			$context['registration_passed_privacypol'] = $_SESSION['registration_privacypolicy'] = true;
@@ -179,17 +192,19 @@ class Register extends \ElkArte\AbstractController
 				if (empty($modSettings['coppaType']) && empty($_SESSION['skip_coppa']))
 				{
 					theme()->getTemplates()->loadLanguageFile('Login');
-					throw new \ElkArte\Exceptions\Exception('under_age_registration_prohibited', false, array($modSettings['coppaAge']));
+					throw new Exception('under_age_registration_prohibited', false, array($modSettings['coppaAge']));
 				}
 			}
 		}
 		// Make sure they don't squeeze through without agreeing.
 		elseif ($current_step > 1 && $context['require_agreement'] && !$context['checkbox_agreement'] && !$context['registration_passed_agreement'])
+		{
 			$current_step = 1;
+		}
 
 		// Show the user the right form.
-		$context['sub_template'] = $current_step == 1 ? 'registration_agreement' : 'registration_form';
-		$context['page_title'] = $current_step == 1 ? $txt['registration_agreement'] : $txt['registration_form'];
+		$context['sub_template'] = $current_step === 1 ? 'registration_agreement' : 'registration_form';
+		$context['page_title'] = $current_step === 1 ? $txt['registration_agreement'] : $txt['registration_form'];
 		loadJavascriptFile(array('register.js', 'mailcheck.min.js'));
 		theme()->addInlineJavascript('disableAutoComplete();
 		$("input[type=email]").on("blur", function(event) {
@@ -211,36 +226,40 @@ class Register extends \ElkArte\AbstractController
 
 		// Prepare the time gate! Done like this to allow later steps to reset the limit for any reason
 		if (!isset($_SESSION['register']))
+		{
 			$_SESSION['register'] = array(
 				'timenow' => time(),
 				// minimum number of seconds required on this page for registration
 				'limit' => 8,
 			);
+		}
 		else
+		{
 			$_SESSION['register']['timenow'] = time();
+		}
 
 		// If you have to agree to the agreement, it needs to be fetched from the file.
-		$agreement = new \ElkArte\Agreement($this->user->language);
+		$agreement = new Agreement($this->user->language);
 		$context['agreement'] = $agreement->getParsedText();
 
 		if (empty($context['agreement']))
 		{
 			// No file found or a blank file, log the error so the admin knows there is a problem!
 			theme()->getTemplates()->loadLanguageFile('Errors');
-			\ElkArte\Errors\Errors::instance()->log_error($txt['registration_agreement_missing'], 'critical');
-			throw new \ElkArte\Exceptions\Exception('registration_disabled', false);
+			Errors::instance()->log_error($txt['registration_agreement_missing'], 'critical');
+			throw new Exception('registration_disabled', false);
 		}
 
 		if (!empty($context['require_privacypol']))
 		{
-			$privacypol = new \ElkArte\PrivacyPolicy($this->user->language);
+			$privacypol = new PrivacyPolicy($this->user->language);
 			$context['privacy_policy'] = $privacypol->getParsedText();
 
 			if (empty($context['privacy_policy']))
 			{
 				// No file found or a blank file, log the error so the admin knows there is a problem!
 				loadLanguage('Errors');
-				\Errors::instance()->log_error($txt['registration_privacy_policy_missing'], 'critical');
+				Errors::instance()::instance()->log_error($txt['registration_privacy_policy_missing'], 'critical');
 				throw new \Exception('registration_disabled', false);
 			}
 		}
@@ -274,7 +293,9 @@ class Register extends \ElkArte\AbstractController
 		$context['registration_errors'] = array();
 		$reg_errors = ErrorContext::context('register', 0);
 		if ($reg_errors->hasErrors())
+		{
 			$context['registration_errors'] = $reg_errors->prepareErrors();
+		}
 
 		createToken('register');
 	}
@@ -303,41 +324,57 @@ class Register extends \ElkArte\AbstractController
 
 		checkSession();
 		if (!validateToken('register', 'post', true, false))
+		{
 			$reg_errors->addError('token_verification');
+		}
 
 		// If we're using an agreement checkbox, did they check it?
 		if (!empty($modSettings['checkboxAgreement']) && !empty($this->_req->post->checkbox_agreement))
+		{
 			$_SESSION['registration_agreed'] = true;
+		}
 
 		// Well, if you don't agree, you can't register.
 		if (!empty($modSettings['requireAgreement']) && empty($_SESSION['registration_agreed']))
+		{
 			redirectexit();
+		}
 
 		if (!empty($modSettings['requireAgreement']) && !empty($modSettings['requirePrivacypolicy']) && !empty($this->_req->post->checkbox_privacypol))
+		{
 			$_SESSION['registration_privacypolicy'] = true;
+		}
 
 		// Well, if you don't agree, you can't register.
 		if (!empty($modSettings['requireAgreement']) && !empty($modSettings['requirePrivacypolicy']) && empty($_SESSION['registration_privacypolicy']))
+		{
 			redirectexit();
+		}
 
 		// Make sure they came from *somewhere*, have a session.
 		if (!isset($_SESSION['old_url']))
+		{
 			redirectexit('action=register');
+		}
 
 		// If we don't require an agreement, we need a extra check for coppa.
 		if (empty($modSettings['requireAgreement']) && !empty($modSettings['coppaAge']))
+		{
 			$_SESSION['skip_coppa'] = !empty($this->_req->post->accept_agreement);
+		}
 
 		// Are they under age, and under age users are banned?
 		if (!empty($modSettings['coppaAge']) && empty($modSettings['coppaType']) && empty($_SESSION['skip_coppa']))
 		{
 			theme()->getTemplates()->loadLanguageFile('Login');
-			throw new \ElkArte\Exceptions\Exception('under_age_registration_prohibited', false, array($modSettings['coppaAge']));
+			throw new Exception('under_age_registration_prohibited', false, array($modSettings['coppaAge']));
 		}
 
 		// Check the time gate for miscreants. First make sure they came from somewhere that actually set it up.
 		if (empty($_SESSION['register']['timenow']) || empty($_SESSION['register']['limit']))
+		{
 			redirectexit('action=register');
+		}
 
 		// Failing that, check the time limit for excessive speed.
 		if (time() - $_SESSION['register']['timenow'] < $_SESSION['register']['limit'])
@@ -371,7 +408,9 @@ class Register extends \ElkArte\AbstractController
 
 		// Checks already done if coming from the action
 		if ($verifiedOpenID)
+		{
 			$this->_can_register();
+		}
 
 		// Clean the form values
 		foreach ($this->_req->post as $key => $value)
@@ -384,7 +423,9 @@ class Register extends \ElkArte\AbstractController
 
 		// A little security to any secret answer ... @todo increase?
 		if ($this->_req->getPost('secret_answer', 'trim', '') !== '')
+		{
 			$this->_req->post->secret_answer = md5($this->_req->post->secret_answer);
+		}
 
 		// Needed for isReservedName() and registerMember().
 		require_once(SUBSDIR . '/Members.subs.php');
@@ -396,14 +437,20 @@ class Register extends \ElkArte\AbstractController
 			$has_real_name = true;
 		}
 		else
+		{
 			$has_real_name = false;
+		}
 
 		// Handle a string as a birth date...
 		if ($this->_req->getPost('birthdate', 'trim', '') !== '')
+		{
 			$this->_req->post->birthdate = strftime('%Y-%m-%d', strtotime($this->_req->post->birthdate));
+		}
 		// Or birthdate parts...
 		elseif (!empty($this->_req->post->bday1) && !empty($this->_req->post->bday2))
+		{
 			$this->_req->post->birthdate = sprintf('%04d-%02d-%02d', empty($this->_req->post->bday3) ? 0 : (int) $this->_req->post->bday3, (int) $this->_req->post->bday1, (int) $this->_req->post->bday2);
+		}
 
 		// By default assume email is hidden, only show it if we tell it to.
 		$this->_req->post->hide_email = !empty($this->_req->post->allow_email) ? 0 : 1;
@@ -416,12 +463,18 @@ class Register extends \ElkArte\AbstractController
 
 			// Did we find it?
 			if (isset($context['languages'][$this->_req->post->lngfile]))
+			{
 				$_SESSION['language'] = $this->_req->post->lngfile;
+			}
 			else
+			{
 				unset($this->_req->post->lngfile);
+			}
 		}
 		elseif (isset($this->_req->post->lngfile))
+		{
 			unset($this->_req->post->lngfile);
+		}
 
 		// Set the options needed for registration.
 		$regOptions = array(
@@ -443,7 +496,9 @@ class Register extends \ElkArte\AbstractController
 
 		// Registration options are always default options...
 		if (isset($this->_req->post->default_options))
+		{
 			$this->_req->post->options = isset($this->_req->post->options) ? $this->_req->post->options + $this->_req->post->default_options : $this->_req->post->default_options;
+		}
 
 		$regOptions['theme_vars'] = isset($this->_req->post->options) && is_array($this->_req->post->options) ? $this->_req->post->options : array();
 
@@ -458,7 +513,9 @@ class Register extends \ElkArte\AbstractController
 		{
 			// Don't allow overriding of the theme variables.
 			if (isset($regOptions['theme_vars'][$row['colname']]))
+			{
 				unset($regOptions['theme_vars'][$row['colname']]);
+			}
 
 			// Prepare the value!
 			$value = isset($this->_req->post->customfield[$row['colname']]) ? trim($this->_req->post->customfield[$row['colname']]) : '';
@@ -471,7 +528,9 @@ class Register extends \ElkArte\AbstractController
 				{
 					$err_params = array($row['name']);
 					if ($is_valid === 'custom_field_not_number')
+					{
 						$err_params[] = $row['field_length'];
+					}
 
 					$reg_errors->addError(array($is_valid, $err_params));
 				}
@@ -479,7 +538,9 @@ class Register extends \ElkArte\AbstractController
 
 			// Is this required but not there?
 			if (trim($value) === '' && $row['show_reg'] > 1)
+			{
 				$reg_errors->addError(array('custom_field_empty', array($row['name'])));
+			}
 		}
 
 		// Lets check for other errors before trying to register the member.
@@ -491,6 +552,7 @@ class Register extends \ElkArte\AbstractController
 			$_SESSION['register']['limit'] = 4;
 
 			$this->action_register();
+
 			return false;
 		}
 
@@ -500,8 +562,12 @@ class Register extends \ElkArte\AbstractController
 			// What do we need to save?
 			$save_variables = array();
 			foreach ($this->_req->post as $k => $v)
+			{
 				if (!in_array($k, array('sc', 'sesc', $context['session_var'], 'passwrd1', 'passwrd2', 'regSubmit')))
+				{
 					$save_variables[$k] = $v;
+				}
+			}
 
 			$openID = new \ElkArte\OpenID();
 			$openID->validate($this->_req->post->openid_identifier, false, $save_variables);
@@ -509,8 +575,8 @@ class Register extends \ElkArte\AbstractController
 		// If we've come from OpenID set up some default stuff.
 		elseif ($verifiedOpenID || ((!empty($this->_req->post->openid_identifier) || !empty($_SESSION['openid']['openid_uri'])) && $this->_req->post->authenticate === 'openid'))
 		{
-			$regOptions['username'] = !empty($this->_req->post->user) && trim($this->_req->post->user) != '' ? $this->_req->post->user : $_SESSION['openid']['nickname'];
-			$regOptions['email'] = !empty($this->_req->post->email) && trim($this->_req->post->email) != '' ? $this->_req->post->email : $_SESSION['openid']['email'];
+			$regOptions['username'] = !empty($this->_req->post->user) && trim($this->_req->post->user) !== '' ? $this->_req->post->user : $_SESSION['openid']['nickname'];
+			$regOptions['email'] = !empty($this->_req->post->email) && trim($this->_req->post->email) !== '' ? $this->_req->post->email : $_SESSION['openid']['email'];
 			$regOptions['auth_method'] = 'openid';
 			$regOptions['openid'] = !empty($_SESSION['openid']['openid_uri']) ? $_SESSION['openid']['openid_uri'] : (!empty($this->_req->post->openid_identifier) ? $this->_req->post->openid_identifier : '');
 		}
@@ -527,7 +593,9 @@ class Register extends \ElkArte\AbstractController
 		if ($reg_errors->hasErrors(1) && $this->user->is_admin === false)
 		{
 			foreach ($reg_errors->prepareErrors(1) as $error)
-				throw new \ElkArte\Exceptions\Exception($error, 'general');
+			{
+				throw new Exception($error, 'general');
+			}
 		}
 
 		// Was there actually an error of some kind dear boy?
@@ -535,16 +603,17 @@ class Register extends \ElkArte\AbstractController
 		{
 			$this->_req->post->step = 2;
 			$this->action_register();
+
 			return false;
 		}
 
 		$lang = !empty($modSettings['userLanguage']) ? $modSettings['userLanguage'] : 'english';
-		$agreement = new \ElkArte\Agreement($lang);
+		$agreement = new Agreement($lang);
 		$agreement->accept($memberID, $this->user->ip, empty($modSettings['agreementRevision']) ? strftime('%Y-%m-%d', forum_time(false)) : $modSettings['agreementRevision']);
 
 		if (!empty($modSettings['requirePrivacypolicy']))
 		{
-			$policy = new \ElkArte\PrivacyPolicy($lang);
+			$policy = new PrivacyPolicy($lang);
 			$policy->accept($memberID, $this->user->ip, empty($modSettings['privacypolicyRevision']) ? strftime('%Y-%m-%d', forum_time(false)) : $modSettings['privacypolicyRevision']);
 		}
 
@@ -560,7 +629,9 @@ class Register extends \ElkArte\AbstractController
 
 		// If COPPA has been selected then things get complicated, setup the template.
 		if (!empty($modSettings['coppaAge']) && empty($_SESSION['skip_coppa']))
+		{
 			redirectexit('action=register;sa=coppa;member=' . $memberID);
+		}
 		// Basic template variable setup.
 		elseif (!empty($modSettings['registration_method']))
 		{
@@ -592,11 +663,15 @@ class Register extends \ElkArte\AbstractController
 
 		// You can't register if it's disabled.
 		if (!empty($modSettings['registration_method']) && $modSettings['registration_method'] == 3)
-			throw new \ElkArte\Exceptions\Exception('registration_disabled', false);
+		{
+			throw new Exception('registration_disabled', false);
+		}
 
 		// Make sure they didn't just register with this session.
 		if (!empty($_SESSION['just_registered']) && empty($modSettings['disableRegisterCheck']))
-			throw new \ElkArte\Exceptions\Exception('register_only_once', false);
+		{
+			throw new Exception('register_only_once', false);
+		}
 	}
 
 	/**
@@ -645,8 +720,10 @@ class Register extends \ElkArte\AbstractController
 			'hide_email', 'show_online',
 		);
 
-		if ($has_real_name && trim($this->_req->post->real_name) != '' && !isReservedName($this->_req->post->real_name) && \ElkArte\Util::strlen($this->_req->post->real_name) < 60)
+		if ($has_real_name && trim($this->_req->post->real_name) !== '' && !isReservedName($this->_req->post->real_name) && Util::strlen($this->_req->post->real_name) < 60)
+		{
 			$possible_strings[] = 'real_name';
+		}
 
 		// Some of these fields we may not want.
 		if (!empty($modSettings['registration_fields']))
@@ -658,13 +735,17 @@ class Register extends \ElkArte\AbstractController
 
 			// Website is a little different
 			if (!in_array('website', $reg_fields))
+			{
 				$exclude_fields = array_merge($exclude_fields, array('website_url', 'website_title'));
+			}
 
 			// We used to accept signature on registration but it's being abused by spammers these days, so no more.
 			$exclude_fields[] = 'signature';
 		}
 		else
+		{
 			$exclude_fields = array('signature', 'website_url', 'website_title');
+		}
 
 		$possible_strings = array_diff($possible_strings, $exclude_fields);
 		$possible_ints = array_diff($possible_ints, $exclude_fields);
@@ -675,20 +756,36 @@ class Register extends \ElkArte\AbstractController
 
 		// Include the additional options that might have been filled in.
 		foreach ($possible_strings as $var)
+		{
 			if (isset($this->_req->post->{$var}))
-				$extra_register_vars[$var] = \ElkArte\Util::htmlspecialchars($this->_req->post->{$var}, ENT_QUOTES);
+			{
+				$extra_register_vars[$var] = Util::htmlspecialchars($this->_req->post->{$var}, ENT_QUOTES);
+			}
+		}
 
 		foreach ($possible_ints as $var)
+		{
 			if (isset($this->_req->post->{$var}))
+			{
 				$extra_register_vars[$var] = (int) $this->_req->post->{$var};
+			}
+		}
 
 		foreach ($possible_floats as $var)
+		{
 			if (isset($this->_req->post->{$var}))
+			{
 				$extra_register_vars[$var] = (float) $this->_req->post->{$var};
+			}
+		}
 
 		foreach ($possible_bools as $var)
+		{
 			if (isset($this->_req->post->{$var}))
+			{
 				$extra_register_vars[$var] = empty($this->_req->post->{$var}) ? 0 : 1;
+			}
+		}
 
 		return $extra_register_vars;
 	}
@@ -701,6 +798,7 @@ class Register extends \ElkArte\AbstractController
 	 * - If language support is enabled, loads whats available
 	 * - Verifies the users choice is available
 	 * - Sets in in context / session
+	 *
 	 * @return bool true if the language was changed, false if not.
 	 */
 	private function _load_language_support()
@@ -731,12 +829,13 @@ class Register extends \ElkArte\AbstractController
 				$context['languages'][$key]['name'] = $lang['name'];
 
 				// Found it!
-				if ($selectedLanguage == $lang['filename'])
+				if ($selectedLanguage === $lang['filename'])
 				{
 					$context['languages'][$key]['selected'] = true;
 				}
 			}
 		}
+
 		return false;
 	}
 
@@ -772,7 +871,7 @@ class Register extends \ElkArte\AbstractController
 			{
 				if (isset($this->_req->post->{$field}))
 				{
-					$cur_profile[$field] = \ElkArte\Util::htmlspecialchars($this->_req->post->{$field});
+					$cur_profile[$field] = Util::htmlspecialchars($this->_req->post->{$field});
 				}
 			}
 
@@ -813,7 +912,7 @@ class Register extends \ElkArte\AbstractController
 			// Immediate 0 or disabled 3 means no need to try and activate
 			if (empty($modSettings['registration_method']) || $modSettings['registration_method'] == '3')
 			{
-				throw new \ElkArte\Exceptions\Exception('no_access', false);
+				throw new Exception('no_access', false);
 			}
 
 			// Otherwise its simply invalid
@@ -827,9 +926,10 @@ class Register extends \ElkArte\AbstractController
 		}
 
 		// Get the user from the database...
-		$this->_row = findUser(empty($this->_req->query->u) ? '
-			member_name = {string:email_address} OR email_address = {string:email_address}' : '
-			id_member = {int:id_member}', array(
+		$this->_row = findUser(empty($this->_req->query->u)
+			? 'member_name = {string:email_address} OR email_address = {string:email_address}'
+			: 'id_member = {int:id_member}',
+			array(
 				'id_member' => $this->_req->getQuery('u', 'intval', 0),
 				'email_address' => $this->_req->getPost('user', 'trim', ''),
 			), false
@@ -853,7 +953,9 @@ class Register extends \ElkArte\AbstractController
 
 		// Quit if this code is not right.
 		if ($this->_activate_validate_code() === false)
+		{
 			return;
+		}
 
 		// Validation complete - update the database!
 		require_once(SUBSDIR . '/Members.subs.php');
@@ -897,13 +999,13 @@ class Register extends \ElkArte\AbstractController
 		{
 			if (empty($modSettings['registration_method']) || $modSettings['registration_method'] == 3)
 			{
-				throw new \ElkArte\Exceptions\Exception('no_access', false);
+				throw new Exception('no_access', false);
 			}
 
 			// @todo Separate the sprintf?
-			if (!\ElkArte\DataValidator::is_valid($this->_req->post, array('new_email' => 'valid_email|required|max_length[255]'), array('new_email' => 'trim')))
+			if (!DataValidator::is_valid($this->_req->post, array('new_email' => 'valid_email|required|max_length[255]'), array('new_email' => 'trim')))
 			{
-				throw new \ElkArte\Exceptions\Exception(sprintf($txt['valid_email_needed'], htmlspecialchars($this->_req->post->new_email, ENT_COMPAT, 'UTF-8')), false);
+				throw new Exception(sprintf($txt['valid_email_needed'], htmlspecialchars($this->_req->post->new_email, ENT_COMPAT, 'UTF-8')), false);
 			}
 
 			// Make sure their email isn't banned.
@@ -913,7 +1015,7 @@ class Register extends \ElkArte\AbstractController
 			// @todo Separate the sprintf?
 			if (userByEmail($this->_req->post->new_email))
 			{
-				throw new \ElkArte\Exceptions\Exception('email_in_use', false, array(htmlspecialchars($this->_req->post->new_email, ENT_COMPAT, 'UTF-8')));
+				throw new Exception('email_in_use', false, array(htmlspecialchars($this->_req->post->new_email, ENT_COMPAT, 'UTF-8')));
 			}
 
 			require_once(SUBSDIR . '/Members.subs.php');
@@ -977,7 +1079,7 @@ class Register extends \ElkArte\AbstractController
 
 			// This will ensure we don't actually get an error message if it works!
 			$context['error_title'] = $txt['invalid_activation_resend'];
-			throw new \ElkArte\Exceptions\Exception(!empty($email_change) ? 'change_email_success' : 'resend_email_success', false);
+			throw new Exception(!empty($email_change) ? 'change_email_success' : 'resend_email_success', false);
 		}
 	}
 
@@ -996,12 +1098,12 @@ class Register extends \ElkArte\AbstractController
 		{
 			if (!empty($this->_row['is_activated']) && $this->_row['is_activated'] == 1)
 			{
-				throw new \ElkArte\Exceptions\Exception('already_activated', false);
+				throw new Exception('already_activated', false);
 			}
 			elseif ($this->_row['validation_code'] === '')
 			{
 				theme()->getTemplates()->loadLanguageFile('Profile');
-				throw new \ElkArte\Exceptions\Exception($txt['registration_not_approved'] . ' <a href="' . $scripturl . '?action=register;sa=activate;user=' . $this->_row['member_name'] . '">' . $txt['here'] . '</a>.', false);
+				throw new Exception($txt['registration_not_approved'] . ' <a href="' . $scripturl . '?action=register;sa=activate;user=' . $this->_row['member_name'] . '">' . $txt['here'] . '</a>.', false);
 			}
 
 			$context['sub_template'] = 'retry_activate';
@@ -1028,7 +1130,9 @@ class Register extends \ElkArte\AbstractController
 
 		// No User ID??
 		if (!isset($this->_req->query->member))
-			throw new \ElkArte\Exceptions\Exception('no_access', false);
+		{
+			throw new Exception('no_access', false);
+		}
 
 		// Get the user details...
 		require_once(SUBSDIR . '/Members.subs.php');
@@ -1036,7 +1140,9 @@ class Register extends \ElkArte\AbstractController
 
 		// If doesn't exist or not pending coppa
 		if (empty($member) || $member['is_activated'] != 5)
-			throw new \ElkArte\Exceptions\Exception('no_access', false);
+		{
+			throw new Exception('no_access', false);
+		}
 
 		if (isset($this->_req->query->form))
 		{
@@ -1126,7 +1232,9 @@ class Register extends \ElkArte\AbstractController
 			require_once(SUBSDIR . '/Graphics.subs.php');
 
 			if (!showCodeImage($code))
+			{
 				header('HTTP/1.1 400 Bad Request');
+			}
 		}
 		// Or direct link to the sound
 		elseif ($this->_req->query->format === '.wav')
@@ -1134,7 +1242,9 @@ class Register extends \ElkArte\AbstractController
 			require_once(SUBSDIR . '/Sound.subs.php');
 
 			if (!createWaveFile($code))
+			{
 				header('HTTP/1.1 400 Bad Request');
+			}
 		}
 
 		// Why die when we can exit to live another day...
@@ -1154,7 +1264,9 @@ class Register extends \ElkArte\AbstractController
 		// Users have no need to use this, just send a PM
 		// Disabled, you cannot enter.
 		if ($this->user->is_guest === false || empty($modSettings['enable_contactform']) || $modSettings['enable_contactform'] === 'disabled')
+		{
 			redirectexit();
+		}
 
 		theme()->getTemplates()->loadLanguageFile('Login');
 		theme()->getTemplates()->load('Register');
@@ -1176,7 +1288,7 @@ class Register extends \ElkArte\AbstractController
 			require_once(SUBSDIR . '/Members.subs.php');
 
 			// Form validation
-			$validator = new \ElkArte\DataValidator();
+			$validator = new DataValidator();
 			$validator->sanitation_rules(array(
 				'emailaddress' => 'trim',
 				'contactmessage' => 'trim'
@@ -1192,7 +1304,9 @@ class Register extends \ElkArte\AbstractController
 
 			// Any form errors
 			if (!$validator->validate($this->_req->post))
+			{
 				$context['errors'] = $validator->validation_errors();
+			}
 
 			// Get the clean data
 			$this->_req->post = new \ArrayObject($validator->validation_data(), \ArrayObject::ARRAY_AS_PROPS);
@@ -1222,7 +1336,9 @@ class Register extends \ElkArte\AbstractController
 
 		// Show the contact done form or the form itself
 		if (isset($this->_req->query->done))
+		{
 			$context['sub_template'] = 'contact_form_done';
+		}
 		else
 		{
 			loadJavascriptFile('mailcheck.min.js');
@@ -1279,7 +1395,7 @@ class Register extends \ElkArte\AbstractController
 
 		if (isset($this->_req->post->accept_agreement))
 		{
-			$agreement = new \ElkArte\Agreement($this->user->language);
+			$agreement = new Agreement($this->user->language);
 			$agreement->accept($this->user->id, $this->user->ip, empty($modSettings['agreementRevision']) ? strftime('%Y-%m-%d', forum_time(false)) : $modSettings['agreementRevision']);
 
 			$_SESSION['agreement_accepted'] = true;
@@ -1306,7 +1422,7 @@ class Register extends \ElkArte\AbstractController
 		loadLanguage('Profile');
 		loadTemplate('Register');
 		// If you have to agree to the agreement, it needs to be fetched from the file.
-		$agreement = new \ElkArte\Agreement($this->user->language);
+		$agreement = new Agreement($this->user->language);
 		$context['agreement'] = $agreement->getParsedText();
 		$context['page_title'] = $txt['registration_agreement'];
 
@@ -1326,7 +1442,7 @@ class Register extends \ElkArte\AbstractController
 	{
 		global $context, $modSettings, $txt;
 
-		$policy = new \ElkArte\PrivacyPolicy($this->user->language);
+		$policy = new PrivacyPolicy($this->user->language);
 
 		if (isset($this->_req->post->accept_agreement))
 		{

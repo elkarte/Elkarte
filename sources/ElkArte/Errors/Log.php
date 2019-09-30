@@ -12,12 +12,12 @@
 
 namespace ElkArte\Errors;
 
-use ElkArte\Themes\TemplateLayers;
+use ElkArte\AbstractModel;
 
 /**
  * Class to handle all forum errors and exceptions
  */
-class Log extends \ElkArte\AbstractModel
+class Log extends AbstractModel
 {
 	/**
 	 * Delete all or some of the errors in the error log.
@@ -33,7 +33,7 @@ class Log extends \ElkArte\AbstractModel
 	public function deleteErrors($type, $filter = null, $error_list = null)
 	{
 		// Delete all or just some?
-		if ($type == 'delall' && empty($filter))
+		if ($type === 'delall' && empty($filter))
 		{
 			$this->_db->query(
 				'truncate_table',
@@ -43,7 +43,7 @@ class Log extends \ElkArte\AbstractModel
 			);
 		}
 		// Deleting all with a filter?
-		elseif ($type == 'delall' && !empty($filter))
+		elseif ($type === 'delall' && !empty($filter))
 		{
 			$this->_db->query(
 				'',
@@ -56,7 +56,7 @@ class Log extends \ElkArte\AbstractModel
 			);
 		}
 		// Just specific errors?
-		elseif ($type == 'delete')
+		elseif ($type === 'delete')
 		{
 			$this->_db->query(
 				'',
@@ -114,10 +114,11 @@ class Log extends \ElkArte\AbstractModel
 		$request = $this->_db->query(
 			'',
 			'
-			SELECT id_error, id_member, ip, url, log_time, message, session, error_type, file, line
+			SELECT 
+				id_error, id_member, ip, url, log_time, message, session, error_type, file, line
 			FROM {db_prefix}log_errors' . (!empty($filter) ? '
 			WHERE ' . $filter['variable'] . ' LIKE {string:filter}' : '') . '
-			ORDER BY id_error ' . ($sort_direction == 'down' ? 'DESC' : '') . '
+			ORDER BY id_error ' . ($sort_direction === 'down' ? 'DESC' : '') . '
 			LIMIT ' . $start . ', ' . $this->_modSettings['defaultMaxMessages'],
 			array(
 				'filter' => !empty($filter) ? $filter['value']['sql'] : '',
@@ -136,7 +137,7 @@ class Log extends \ElkArte\AbstractModel
 			$show_message = strtr(strtr(preg_replace('~&lt;span class=&quot;remove&quot;&gt;(.+?)&lt;/span&gt;~', '$1', $row['message']), array("\r" => '', '<br />' => "\n", '<' => '&lt;', '>' => '&gt;', '"' => '&quot;')), array("\n" => '<br />'));
 
 			$log['errors'][$row['id_error']] = array(
-				'alternate' => $i % 2 == 0,
+				'alternate' => $i % 2 === 0,
 				'member' => array(
 					'id' => $row['id_member'],
 					'ip' => $row['ip'],
@@ -146,7 +147,7 @@ class Log extends \ElkArte\AbstractModel
 				'html_time' => htmlTime($row['log_time']),
 				'timestamp' => forum_time(true, $row['log_time']),
 				'url' => array(
-					'html' => htmlspecialchars((substr($row['url'], 0, 1) == '?' ? $scripturl : '') . $row['url'], ENT_COMPAT, 'UTF-8'),
+					'html' => htmlspecialchars((substr($row['url'], 0, 1) === '?' ? $scripturl : '') . $row['url'], ENT_COMPAT, 'UTF-8'),
 					'href' => base64_encode($this->_db->escape_wildcard_string($row['url'])),
 				),
 				'message' => array(

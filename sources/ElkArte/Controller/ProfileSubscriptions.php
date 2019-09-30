@@ -8,7 +8,7 @@
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause (see accompanying LICENSE.txt file)
  *
  * This file contains code covered by:
- * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * copyright: 2011 Simple Machines (http://www.simplemachines.org)
  *
  * @version 2.0 dev
  *
@@ -16,25 +16,32 @@
 
 namespace ElkArte\Controller;
 
+use ElkArte\AbstractController;
+use ElkArte\Exceptions\Exception;
+use ElkArte\Util;
+
 /**
  * This class handles the paid subscriptions on a user's profile.
  */
-class ProfileSubscriptions extends \ElkArte\AbstractController
+class ProfileSubscriptions extends AbstractController
 {
 	/**
 	 * Holds the the details of the subscription order
+	 *
 	 * @var
 	 */
 	private $_order;
 
 	/**
 	 * Holds all the available gateways so they can be initialized
+	 *
 	 * @var array
 	 */
 	private $_gateways;
 
 	/**
 	 * The id of the subscription
+	 *
 	 * @var int
 	 */
 	private $_id_sub;
@@ -80,12 +87,16 @@ class ProfileSubscriptions extends \ElkArte\AbstractController
 			$this->_gateways[$id] = new $gateway['display_class']();
 
 			if (!$this->_gateways[$id]->gatewayEnabled())
+			{
 				unset($this->_gateways[$id]);
+			}
 		}
 
 		// No gateways yet, no way to pay then, blame the admin !
 		if (empty($this->_gateways))
-			throw new \ElkArte\Exceptions\Exception($txt['paid_admin_not_setup_gateway']);
+		{
+			throw new Exception($txt['paid_admin_not_setup_gateway']);
+		}
 
 		// Get the members current subscriptions.
 		$context['current'] = loadMemberSubscriptions($memID, $context['subscriptions']);
@@ -94,18 +105,26 @@ class ProfileSubscriptions extends \ElkArte\AbstractController
 		foreach ($context['current'] as $id => $current)
 		{
 			if ($current['status'] == 1)
+			{
 				$context['subscriptions'][$id]['subscribed'] = true;
+			}
 		}
 
 		// Simple "done"?
 		if (isset($this->_req->query->done))
+		{
 			$this->_orderDone($memID);
+		}
 		// They have selected a subscription to order.
 		elseif (isset($this->_req->query->confirm) && isset($this->_req->post->sub_id) && is_array($this->_req->post->sub_id))
+		{
 			$this->_confirmOrder($memID);
+		}
 		// Show the users whats available and what they have
 		else
+		{
 			$context['sub_template'] = 'user_subscription';
+		}
 	}
 
 	/**
@@ -120,7 +139,7 @@ class ProfileSubscriptions extends \ElkArte\AbstractController
 		foreach ($context['subscriptions'] as $id => $sub)
 		{
 			// Work out the costs.
-			$costs = \ElkArte\Util::unserialize($sub['real_cost']);
+			$costs = Util::unserialize($sub['real_cost']);
 
 			$cost_array = array();
 
@@ -173,7 +192,7 @@ class ProfileSubscriptions extends \ElkArte\AbstractController
 		if (isset($context['current'][$sub_id]))
 		{
 			// What are the pending details?
-			$current_pending = \ElkArte\Util::unserialize($context['current'][$sub_id]['pending_details']);
+			$current_pending = Util::unserialize($context['current'][$sub_id]['pending_details']);
 
 			// Nothing pending, nothing to do
 			if (!empty($current_pending))
@@ -214,12 +233,14 @@ class ProfileSubscriptions extends \ElkArte\AbstractController
 
 		// Hopefully just one, if not we use the last one.
 		foreach ($this->_req->post->sub_id as $k => $v)
+		{
 			$this->_id_sub = (int) $k;
+		}
 
 		// Selecting a subscription that does not exist or is not active?
 		if (!isset($this->_id_sub, $context['subscriptions'][$this->_id_sub]) || $context['subscriptions'][$this->_id_sub]['active'] == 0)
 		{
-			throw new \ElkArte\Exceptions\Exception('paid_sub_not_active');
+			throw new Exception('paid_sub_not_active');
 		}
 
 		// Simplify...
@@ -235,7 +256,7 @@ class ProfileSubscriptions extends \ElkArte\AbstractController
 		// Check we have a valid cost.
 		if ($this->_order['flexible'] && $period === 'xx')
 		{
-			throw new \ElkArte\Exceptions\Exception('paid_sub_not_active');
+			throw new Exception('paid_sub_not_active');
 		}
 
 		// Sort out the cost/currency.
@@ -250,7 +271,9 @@ class ProfileSubscriptions extends \ElkArte\AbstractController
 
 		// No active payment gateways, then no way to pay, time to bail out, blame the admin
 		if (empty($context['gateways']))
-			throw new \ElkArte\Exceptions\Exception($txt['paid_admin_not_setup_gateway']);
+		{
+			throw new Exception($txt['paid_admin_not_setup_gateway']);
+		}
 
 		// Now we are going to assume they want to take this out ;)
 		$new_data = array($this->_order['id'], $context['value'], $period, 'prepay');
@@ -261,18 +284,24 @@ class ProfileSubscriptions extends \ElkArte\AbstractController
 			// What are the details like?
 			$current_pending = array();
 			if ($context['current'][$this->_order['id']]['pending_details'] != '')
-				$current_pending = \ElkArte\Util::unserialize($context['current'][$this->_order['id']]['pending_details']);
+			{
+				$current_pending = Util::unserialize($context['current'][$this->_order['id']]['pending_details']);
+			}
 
 			// Don't get silly.
 			if (count($current_pending) > 9)
+			{
 				$current_pending = array();
+			}
 
 			// Only record real pending payments as will otherwise confuse the admin!
 			$pending_count = 0;
 			foreach ($current_pending as $pending)
 			{
 				if (trim($pending[3]) === 'payback')
+				{
 					$pending_count++;
+				}
 			}
 
 			// If its already pending, don't increase the pending count

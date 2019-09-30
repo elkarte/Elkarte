@@ -20,69 +20,69 @@ namespace ElkArte;
 class Priority
 {
 	/**
+	 * Default priority
+	 */
+	const STDPRIORITY = 0;
+	/**
 	 * An array containing all the entities added
+	 *
 	 * @var array
 	 */
 	protected $_all_general = array();
-
 	/**
 	 * An array containing all the entities that should go *after* another one
+	 *
 	 * @var array
 	 */
 	protected $_all_after = array();
-
 	/**
 	 * An array containing all the entities that should go *before* another one
+	 *
 	 * @var array
 	 */
 	protected $_all_before = array();
-
 	/**
 	 * An array containing all the entities that should go at the end of the list
+	 *
 	 * @var array
 	 */
 	protected $_all_end = array();
-
 	/**
 	 * An array containing all the entities that should go at the beginning
+	 *
 	 * @var array
 	 */
 	protected $_all_begin = array();
-
 	/**
 	 * The highest priority assigned at a certain moment for $_all_general
+	 *
 	 * @var int
 	 */
 	protected $_general_highest_priority = 0;
-
 	/**
 	 * The highest priority assigned at a certain moment for $_all_end
+	 *
 	 * @var int
 	 */
 	protected $_end_highest_priority = 10000;
-
 	/**
 	 * The highest priority assigned at a certain moment for $_all_begin
 	 * Highest priority at "begin" is sort of tricky, because the value is negative
+	 *
 	 * @var int
 	 */
 	protected $_begin_highest_priority = -10000;
-
 	/**
 	 * Array of sorted entities
+	 *
 	 * @var array
 	 */
 	protected $_sorted_entities = null;
 
 	/**
-	 * Default priority
-	 */
-	const STDPRIORITY = 0;
-
-	/**
 	 * Add a new entity to the pile
 	 *
-	 * @param string   $entity name of a entity
+	 * @param string $entity name of a entity
 	 * @param int|null $priority an integer defining the priority of the entity.
 	 */
 	public function add($entity, $priority = null)
@@ -118,7 +118,7 @@ class Priority
 	/**
 	 * Add a entity at the end of the pile
 	 *
-	 * @param string   $entity name of a entity
+	 * @param string $entity name of a entity
 	 * @param int|null $priority an integer defining the priority of the entity.
 	 */
 	public function addEnd($entity, $priority = null)
@@ -132,7 +132,7 @@ class Priority
 	/**
 	 * Add a entity at the beginning of the pile
 	 *
-	 * @param string   $entity name of a entity
+	 * @param string $entity name of a entity
 	 * @param int|null $priority an integer defining the priority of the entity.
 	 */
 	public function addBegin($entity, $priority = null)

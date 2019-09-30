@@ -8,11 +8,13 @@
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause (see accompanying LICENSE.txt file)
  *
  * This file contains code covered by:
- * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * copyright: 2011 Simple Machines (http://www.simplemachines.org)
  *
  * @version 2.0 dev
  *
  */
+
+use ElkArte\BoardsTree;
 
 /**
  * Edit the position and properties of a category.
@@ -41,15 +43,16 @@ function modifyCategory($category_id, $catOptions)
 
 		// Setting 'move_after' to '0' moves the category to the top.
 		if ($catOptions['move_after'] == 0)
+		{
 			$cats[] = $category_id;
+		}
 
 		// Grab the categories sorted by cat_order.
 		$request = $db->query('', '
 			SELECT id_cat, cat_order
 			FROM {db_prefix}categories
 			ORDER BY cat_order',
-			array(
-			)
+			array()
 		);
 		while ($row = $db->fetch_assoc($request))
 		{
@@ -83,7 +86,7 @@ function modifyCategory($category_id, $catOptions)
 		}
 
 		// If the category order changed, so did the board order.
-		$boardTree = new \ElkArte\BoardsTree($db);
+		$boardTree = new BoardsTree($db);
 		$boardTree->reorderBoards();
 	}
 
@@ -118,7 +121,9 @@ function modifyCategory($category_id, $catOptions)
 		);
 
 		if (empty($catOptions['dont_log']))
+		{
 			logAction('edit_cat', array('catname' => isset($catOptions['cat_name']) ? $catOptions['cat_name'] : $category_id), 'admin');
+		}
 	}
 }
 
@@ -136,13 +141,19 @@ function createCategory($catOptions)
 
 	// Check required values.
 	if (!isset($catOptions['cat_name']) || trim($catOptions['cat_name']) == '')
+	{
 		trigger_error('createCategory(): A category name is required', E_USER_ERROR);
+	}
 
 	// Set default values.
 	if (!isset($catOptions['move_after']))
+	{
 		$catOptions['move_after'] = 0;
+	}
 	if (!isset($catOptions['is_collapsible']))
+	{
 		$catOptions['is_collapsible'] = true;
+	}
 	// Don't log an edit right after.
 	$catOptions['dont_log'] = true;
 
@@ -193,7 +204,7 @@ function deleteCategories($categories, $moveBoardsTo = null)
 
 	require_once(SUBSDIR . '/Boards.subs.php');
 
-	$boardTree = new \ElkArte\BoardsTree($db);
+	$boardTree = new BoardsTree($db);
 
 	call_integration_hook('integrate_delete_category', array($categories, &$moveBoardsTo));
 
@@ -283,6 +294,7 @@ function collapseCategories($categories, $new_status, $members = null, $check_co
 		);
 
 		if ($new_status === 'collapse')
+		{
 			$db->query('', '
 				INSERT INTO {db_prefix}collapsed_categories
 					(id_cat, id_member)
@@ -298,6 +310,7 @@ function collapseCategories($categories, $new_status, $members = null, $check_co
 					'is_collapsible' => 1,
 				)
 			);
+		}
 	}
 
 	// Toggle the categories: collapsed get expanded and expanded get collapsed.
@@ -320,17 +333,21 @@ function collapseCategories($categories, $new_status, $members = null, $check_co
 				'member_list' => $members,
 			)
 		)->fetch_callback(
-			function ($row) use (&$updates, $check_collapsable)
-			{
+			function ($row) use (&$updates, $check_collapsable) {
 				if (empty($row['is_collapsed']) && (!empty($row['can_collapse']) || !$check_collapsable))
+				{
 					$updates['insert'][] = array($row['id_member'], $row['id_cat']);
+				}
 				elseif (!empty($row['is_collapsed']))
+				{
 					$updates['remove'][] = '(id_member = ' . $row['id_member'] . ' AND id_cat = ' . $row['id_cat'] . ')';
+				}
 			}
 		);
 
 		// Collapse the ones that were originally expanded...
 		if (!empty($updates['insert']))
+		{
 			$db->insert('replace',
 				'{db_prefix}collapsed_categories',
 				array(
@@ -339,15 +356,17 @@ function collapseCategories($categories, $new_status, $members = null, $check_co
 				$updates['insert'],
 				array('id_cat', 'id_member')
 			);
+		}
 
 		// And expand the ones that were originally collapsed.
 		if (!empty($updates['remove']))
+		{
 			$db->query('', '
 				DELETE FROM {db_prefix}collapsed_categories
 				WHERE ' . implode(' OR ', $updates['remove']),
-				array(
-				)
+				array()
 			);
+		}
 	}
 }
 

@@ -6,7 +6,7 @@
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause (see accompanying LICENSE.txt file)
  *
  * This file contains code covered by:
- * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * copyright: 2011 Simple Machines (http://www.simplemachines.org)
  *
  * @version 2.0 dev
  *
@@ -111,17 +111,21 @@ function template_group_requests_block()
 									<ul>';
 
 	foreach ($context['group_requests'] as $request)
+	{
 		echo '
 										<li class="smalltext">
 											<a href="', $request['request_href'], '">', $request['group']['name'], '</a> ', $txt['mc_groupr_by'], ' ', $request['member']['link'], '
 										</li>';
+	}
 
 	// Don't have any watched users right now?
 	if (empty($context['group_requests']))
+	{
 		echo '
 										<li>
 											<strong class="smalltext">', $txt['mc_group_requests_none'], '</strong>
 										</li>';
+	}
 
 	echo '
 									</ul>
@@ -143,17 +147,21 @@ function template_reported_posts_block()
 									<ul>';
 
 	foreach ($context['reported_posts'] as $report)
+	{
 		echo '
 										<li class="smalltext">
 											<a href="', $report['report_href'], '">', $report['subject'], '</a> ', $txt['mc_reportedp_by'], ' ', $report['author']['link'], '
 										</li>';
+	}
 
 	// Don't have any watched users right now?
 	if (empty($context['reported_posts']))
+	{
 		echo '
 										<li>
 											<strong class="smalltext">', $txt['mc_recent_reports_none'], '</strong>
 										</li>';
+	}
 
 	echo '
 									</ul>
@@ -175,17 +183,21 @@ function template_watched_users()
 							<ul>';
 
 	foreach ($context['watched_users'] as $user)
+	{
 		echo '
 								<li>
 									<span class="smalltext">', sprintf(!empty($user['last_login']) ? $txt['mc_seen'] : $txt['mc_seen_never'], $user['link'], $user['last_login']), '</span>
 								</li>';
+	}
 
 	// Don't have any watched users right now?
 	if (empty($context['watched_users']))
+	{
 		echo '
 								<li>
 									<strong class="smalltext">', $txt['mc_watched_users_none'], '</strong>
 								</li>';
+	}
 
 	echo '
 							</ul>
@@ -215,8 +227,10 @@ function template_notes()
 
 		// Cycle through the notes.
 		foreach ($context['notes'] as $note)
+		{
 			echo '
 									<li class="smalltext"><a href="', $note['delete_href'], '"><img src="', $settings['images_url'], '/pm_recipient_delete.png" alt="" /></a> <strong>', $note['author']['link'], ':</strong> ', $note['text'], '</li>';
+		}
 
 		echo '
 								</ul>
@@ -273,7 +287,9 @@ function template_reported_posts()
 						</h2>';
 
 	if (!empty($context['reports']))
+	{
 		template_pagesection();
+	}
 
 	foreach ($context['reports'] as $report)
 	{
@@ -283,7 +299,9 @@ function template_reported_posts()
 		// Prepare the comments...
 		$comments = array();
 		foreach ($report['comments'] as $comment)
+		{
 			$comments[$comment['member']['id']] = $comment['member']['link'];
+		}
 		$report['date'] = $txt['mc_reportedp_last_reported'] . ': ' . $report['last_updated'] . '&nbsp;-&nbsp;' . '
 										' . $txt['mc_reportedp_reported_by'] . ': ' . implode(', ', $comments);
 
@@ -292,10 +310,14 @@ function template_reported_posts()
 
 	// Were none found?
 	if (empty($context['reports']))
+	{
 		echo '
 						<p class="infobox">', $txt['mc_reportedp_none_found'], '</p>';
+	}
 	else
+	{
 		template_pagesection(false, '', array('extra' => !$context['view_closed'] && !empty($options['display_quick_mod']) && $options['display_quick_mod'] == 1 ? '<input type="submit" name="close_selected" value="' . $txt['mc_reportedp_close_selected'] . '" class="right_submit" />' : ''));
+	}
 
 	echo '
 						<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
@@ -319,12 +341,16 @@ function template_unapproved_posts()
 
 	// No posts?
 	if (empty($context['unapproved_items']))
+	{
 		echo '
 						<div class="content">
 							<p class="centertext">', $txt['mc_unapproved_' . $context['current_view'] . '_none_found'], '</p>
 						</div>';
+	}
 	else
+	{
 		template_pagesection();
+	}
 
 	// Loop through and show each unapproved post
 	foreach ($context['unapproved_items'] as $item)
@@ -339,6 +365,7 @@ function template_unapproved_posts()
 	// Quick moderation checkbox action selection
 	$quick_mod = '';
 	if (!empty($options['display_quick_mod']) && $options['display_quick_mod'] == 1 && !empty($context['unapproved_items']))
+	{
 		$quick_mod = '
 					<div class="floatright">
 						<select name="do" onchange="if (this.value != 0 &amp;&amp; confirm(\'' . $txt['mc_unapproved_sure'] . '\')) submit();">
@@ -351,9 +378,12 @@ function template_unapproved_posts()
 							<input type="submit" name="mc_go" value="' . $txt['go'] . '" />
 						</noscript>
 					</div>';
+	}
 
 	if (!empty($context['unapproved_items']))
+	{
 		template_pagesection(false, '', array('extra' => $quick_mod));
+	}
 
 	echo '
 					<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
@@ -390,23 +420,29 @@ function template_viewmodreport()
 							<h2 class="category_header">', $txt['mc_modreport_whoreported_title'], '</h2>';
 
 	foreach ($context['report']['comments'] as $comment)
+	{
 		echo '
 							<div class="content">
 								<p class="smalltext">', sprintf($txt['mc_modreport_whoreported_data'], $comment['member']['link'] . (empty($comment['member']['id']) && !empty($comment['member']['ip']) ? ' (' . $comment['member']['ip'] . ')' : ''), $comment['time']), '</p>
 								<p>', $comment['message'], '</p>
 							</div>';
+	}
 
 	echo '
 							<h2 class="category_header">', $txt['mc_modreport_mod_comments'], '</h2>
 							<div class="content">';
 
 	if (empty($context['report']['mod_comments']))
+	{
 		echo '
 								<p class="successbox">', $txt['mc_modreport_no_mod_comment'], '</p>';
+	}
 
 	foreach ($context['report']['mod_comments'] as $comment)
+	{
 		echo
 		'<p>', $comment['member']['link'], ': ', $comment['message'], ' <em class="smalltext">(', $comment['time'], ')</em></p>';
+	}
 
 	echo '
 								<textarea rows="2" cols="60" style="width: 100%;" name="mod_comment"></textarea>
@@ -442,6 +478,7 @@ function template_user_watch_post_callback($post)
 						<div class="inner">' . $post['body'] . '</div>';
 
 	if ($post['can_delete'])
+	{
 		$output_html .= '
 						<ul class="quickbuttons">
 							<li class="listlevel1">
@@ -451,6 +488,7 @@ function template_user_watch_post_callback($post)
 								<a class="linklevel1 remove_button" href="' . $scripturl . '?action=moderate;area=userwatch;sa=post;delete=' . $post['id'] . ';start=' . $context['start'] . ';' . $context['session_var'] . '=' . $context['session_id'] . '" onclick="return confirm(\'' . $txt['mc_watched_users_delete_post'] . '\');">' . $txt['remove'] . '</a>
 							</li>
 						</ul>';
+	}
 
 	$output_html .= '
 					</div>';
@@ -476,8 +514,10 @@ function template_moderation_settings()
 					<dd>';
 
 	foreach ($context['homepage_blocks'] as $k => $v)
+	{
 		echo '
 						<label for="mod_homepage_', $k, '"><input type="checkbox" id="mod_homepage_', $k, '" name="mod_homepage[', $k, ']"', in_array($k, $context['mod_settings']['user_blocks']) ? ' checked="checked"' : '', ' /> ', $v, '</label><br />';
+	}
 
 	echo '
 					</dd>';
@@ -614,6 +654,7 @@ function template_warn_template()
 				</dl>';
 
 	if ($context['template_data']['can_edit_personal'])
+	{
 		echo '
 				<input type="checkbox" name="make_personal" id="make_personal" ', $context['template_data']['personal'] ? 'checked="checked"' : '', ' />
 				<label for="make_personal">
@@ -622,6 +663,7 @@ function template_warn_template()
 				<br />
 				<span class="smalltext">', $txt['mc_warning_template_personal_desc'], '</span>
 				<br />';
+	}
 
 	echo '
 				<hr />
@@ -637,7 +679,7 @@ function template_warn_template()
 
 	<script>
 		$(function() {
-			$("#preview_button").click(function() {
+			$("#preview_button").on("click", function() {
 				return ajax_getTemplatePreview();
 			});
 		});

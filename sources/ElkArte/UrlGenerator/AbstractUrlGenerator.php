@@ -13,6 +13,11 @@
 
 namespace ElkArte\UrlGenerator;
 
+/**
+ * Class AbstractUrlGenerator
+ *
+ * @package ElkArte\UrlGenerator
+ */
 abstract class AbstractUrlGenerator
 {
 	/**

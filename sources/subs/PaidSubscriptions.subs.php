@@ -8,22 +8,24 @@
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause (see accompanying LICENSE.txt file)
  *
  * This file contains code covered by:
- * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * copyright: 2011 Simple Machines (http://www.simplemachines.org)
  *
  * @version 2.0 dev
  *
  */
 
+use ElkArte\Util;
+
 /**
  * Returns how many people are subscribed to a paid subscription.
- *
- * @todo refactor away
  *
  * @param int $id_sub
  * @param string $search_string
  * @param mixed[] $search_vars = array()
  *
  * @return
+ * @todo refactor away
+ *
  */
 function list_getSubscribedUserCount($id_sub, $search_string, $search_vars = array())
 {
@@ -52,8 +54,6 @@ function list_getSubscribedUserCount($id_sub, $search_string, $search_vars = arr
 /**
  * Return the subscribed users list, for the given parameters.
  *
- * @todo refactor outta here
- *
  * @param int $start The item to start with (for pagination purposes)
  * @param int $items_per_page The number of items to show per page
  * @param string $sort A string indicating how to sort the results
@@ -62,6 +62,8 @@ function list_getSubscribedUserCount($id_sub, $search_string, $search_vars = arr
  * @param mixed[] $search_vars
  *
  * @return array
+ * @todo refactor outta here
+ *
  */
 function list_getSubscribedUsers($start, $items_per_page, $sort, $id_sub, $search_string, $search_vars = array())
 {
@@ -88,6 +90,7 @@ function list_getSubscribedUsers($start, $items_per_page, $sort, $id_sub, $searc
 	);
 	$subscribers = array();
 	while ($row = $db->fetch_assoc($request))
+	{
 		$subscribers[] = array(
 			'id' => $row['id_sublog'],
 			'id_member' => $row['id_member'],
@@ -98,6 +101,7 @@ function list_getSubscribedUsers($start, $items_per_page, $sort, $id_sub, $searc
 			'status' => $row['status'],
 			'status_text' => $row['status'] == 0 ? ($row['payments_pending'] == 0 ? $txt['paid_finished'] : $txt['paid_pending']) : $txt['paid_active'],
 		);
+	}
 	$db->free_result($request);
 
 	return $subscribers;
@@ -114,7 +118,9 @@ function reapplySubscriptions($users)
 
 	// Make it an array.
 	if (!is_array($users))
+	{
 		$users = array($users);
+	}
 
 	// Get all the members current groups.
 	$groups = array();
@@ -148,13 +154,17 @@ function reapplySubscriptions($users)
 		{
 			// If this is changing - add the old one to the additional groups so it's not lost.
 			if ($row['id_group'] != $groups[$row['id_member']]['primary'])
+			{
 				$groups[$row['id_member']]['additional'][] = $groups[$row['id_member']]['primary'];
+			}
 			$groups[$row['id_member']]['primary'] = $row['id_group'];
 		}
 
 		// Additional groups.
 		if (!empty($row['add_groups']))
+		{
 			$groups[$row['id_member']]['additional'] = array_merge($groups[$row['id_member']]['additional'], explode(',', $row['add_groups']));
+		}
 	}
 	$db->free_result($request);
 
@@ -164,8 +174,12 @@ function reapplySubscriptions($users)
 		$group['additional'] = array_unique($group['additional']);
 		$addgroups = array();
 		foreach ($group['additional'] as $key => $value)
+		{
 			if (!empty($value))
+			{
 				$addgroups[] = $value;
+			}
+		}
 
 		assignGroupsToMember($id, $group['primary'], $addgroups);
 	}
@@ -191,7 +205,9 @@ function addSubscription($id_subscribe, $id_member, $renewal = '', $forceStartTi
 
 	// Exists, yes?
 	if (!isset($context['subscriptions'][$id_subscribe]))
+	{
 		return;
+	}
 
 	$curSub = $context['subscriptions'][$id_subscribe];
 
@@ -240,15 +256,21 @@ function addSubscription($id_subscribe, $id_member, $renewal = '', $forceStartTi
 
 		// If this has already expired but is active, extension means the period from now.
 		if ($endtime < time())
+		{
 			$endtime = time();
+		}
 		if ($starttime == 0)
+		{
 			$starttime = time();
+		}
 
 		// Work out the new expiry date.
 		$endtime += $duration;
 
 		if ($forceEndTime != 0)
+		{
 			$endtime = $forceEndTime;
+		}
 
 		// As everything else should be good, just update!
 		$db->query('', '
@@ -284,15 +306,23 @@ function addSubscription($id_subscribe, $id_member, $renewal = '', $forceStartTi
 
 		// Ensure their old privileges are maintained.
 		if ($member['id_group'] != 0)
+		{
 			$newAddGroups[] = $member['id_group'];
+		}
 	}
 	else
+	{
 		$id_group = $member['id_group'];
+	}
 
 	// Yep, make sure it's unique, and no empties.
 	foreach ($newAddGroups as $k => $v)
+	{
 		if (empty($v))
+		{
 			unset($newAddGroups[$k]);
+		}
+	}
 	$newAddGroups = array_unique($newAddGroups);
 	$newAddGroups = implode(',', $newAddGroups);
 
@@ -319,15 +349,21 @@ function addSubscription($id_subscribe, $id_member, $renewal = '', $forceStartTi
 
 		// If this has already expired but is active, extension means the period from now.
 		if ($endtime < time())
+		{
 			$endtime = time();
+		}
 		if ($starttime == 0)
+		{
 			$starttime = time();
+		}
 
 		// Work out the new expiry date.
 		$endtime += $duration;
 
 		if ($forceEndTime != 0)
+		{
 			$endtime = $forceEndTime;
+		}
 
 		// As everything else should be good, just update!
 		$db->query('', '
@@ -352,12 +388,18 @@ function addSubscription($id_subscribe, $id_member, $renewal = '', $forceStartTi
 	// Otherwise a very simple insert.
 	$endtime = time() + $duration;
 	if ($forceEndTime != 0)
+	{
 		$endtime = $forceEndTime;
+	}
 
 	if ($forceStartTime == 0)
+	{
 		$starttime = time();
+	}
 	else
+	{
 		$starttime = $forceStartTime;
+	}
 
 	$db->insert('',
 		'{db_prefix}log_subscribed',
@@ -390,7 +432,7 @@ function loadPaymentGateways()
 
 	try
 	{
-		$files = new \FilesystemIterator(SOURCEDIR . '/ElkArte/Subscriptions/PaymentGateway', \FilesystemIterator::SKIP_DOTS);
+		$files = new FilesystemIterator(SOURCEDIR . '/ElkArte/Subscriptions/PaymentGateway', FilesystemIterator::SKIP_DOTS);
 		foreach ($files as $file)
 		{
 			if ($file->isDir())
@@ -431,7 +473,9 @@ function loadSubscriptions()
 	$db = database();
 
 	if (!empty($context['subscriptions']))
+	{
 		return;
+	}
 
 	// Make sure this is loaded, just in case.
 	theme()->getTemplates()->loadLanguageFile('ManagePaid');
@@ -440,19 +484,22 @@ function loadSubscriptions()
 		SELECT
 			id_subscribe, name, description, cost, length, id_group, add_groups, active, repeatable
 		FROM {db_prefix}subscriptions',
-		array(
-		)
+		array()
 	);
 	$context['subscriptions'] = array();
 	while ($row = $db->fetch_assoc($request))
 	{
 		// Pick a cost.
-		$costs = \ElkArte\Util::unserialize($row['cost']);
+		$costs = Util::unserialize($row['cost']);
 
 		if ($row['length'] != 'F' && !empty($modSettings['paid_currency_symbol']) && !empty($costs['fixed']))
+		{
 			$cost = sprintf($modSettings['paid_currency_symbol'], $costs['fixed']);
+		}
 		else
+		{
 			$cost = '???';
+		}
 
 		// Do the span.
 		$length = '??';
@@ -510,15 +557,16 @@ function loadSubscriptions()
 		SELECT COUNT(id_sublog) AS member_count, id_subscribe, status
 		FROM {db_prefix}log_subscribed
 		GROUP BY id_subscribe, status',
-		array(
-		)
+		array()
 	);
 	while ($row = $db->fetch_assoc($request))
 	{
 		$ind = $row['status'] == 0 ? 'finished' : 'total';
 
 		if (isset($context['subscriptions'][$row['id_subscribe']]))
+		{
 			$context['subscriptions'][$row['id_subscribe']][$ind] = $row['member_count'];
+		}
 	}
 	$db->free_result($request);
 
@@ -528,13 +576,14 @@ function loadSubscriptions()
 			SUM(payments_pending) AS total_pending, id_subscribe
 		FROM {db_prefix}log_subscribed
 		GROUP BY id_subscribe',
-		array(
-		)
+		array()
 	);
 	while ($row = $db->fetch_assoc($request))
 	{
 		if (isset($context['subscriptions'][$row['id_subscribe']]))
+		{
 			$context['subscriptions'][$row['id_subscribe']]['pending'] = $row['total_pending'];
+		}
 	}
 	$db->free_result($request);
 }
@@ -568,7 +617,9 @@ function loadMemberSubscriptions($memID, $active_subscriptions)
 	{
 		// The subscription must exist!
 		if (!isset($active_subscriptions[$row['id_subscribe']]))
+		{
 			continue;
+		}
 
 		$current[$row['id_subscribe']] = array(
 			'id' => $row['id_sublog'],
@@ -602,7 +653,9 @@ function loadAllSubsctiptions($sub_id)
 
 	// Need a subscription id
 	if (empty($sub_id))
+	{
 		return array();
+	}
 
 	// Find some basic information for each member that has subscribed
 	$request = $db->query('', '
@@ -657,7 +710,9 @@ function deleteSubscription($id)
 			foreach ($members as $id_member => $member_data)
 			{
 				if ($member_data['old_id_group'] != $member_data['id_group'] && $member_data['id_group'] == $sub_detail['prim_group'])
+				{
 					$changes[$id_member]['id_group'] = $member_data['old_id_group'];
+				}
 			}
 		}
 
@@ -671,7 +726,9 @@ function deleteSubscription($id)
 
 				// If they have any of the subscription groups, remove them
 				if (implode(',', $non_sub_groups) != $member_data['additional_groups'])
+				{
 					$changes[$id_member]['additional_groups'] = $non_sub_groups;
+				}
 			}
 		}
 
@@ -680,7 +737,9 @@ function deleteSubscription($id)
 		{
 			require_once(SUBSDIR . '/Members.subs.php');
 			foreach ($changes as $id_member => $new_values)
+			{
 				updateMemberData($id_member, $new_values);
+			}
 		}
 	}
 
@@ -704,7 +763,7 @@ function insertSubscription($insert)
 	$db = database();
 
 	$db->insert('',
-	'{db_prefix}subscriptions',
+		'{db_prefix}subscriptions',
 		array(
 			'name' => 'string-60', 'description' => 'string-255', 'active' => 'int', 'length' => 'string-4', 'cost' => 'string',
 			'id_group' => 'int', 'add_groups' => 'string-40', 'repeatable' => 'int', 'allow_partial' => 'int', 'email_complete' => 'string',
@@ -846,7 +905,7 @@ function getSubscriptionDetails($sub_id)
 			'id' => $row['id_subscribe'],
 			'name' => $row['name'],
 			'desc' => $row['description'],
-			'cost' => \ElkArte\Util::unserialize($row['cost']),
+			'cost' => Util::unserialize($row['cost']),
 			'span' => array(
 				'value' => $span_value,
 				'unit' => $span_unit,
@@ -893,7 +952,9 @@ function validateSubscriptionID($id)
 
 	// Humm this should not happen, if it does, boom
 	if ($sub_id === null)
+	{
 		throw new \ElkArte\Exceptions\Exception('no_access', false);
+	}
 
 	return $sub_id;
 }
@@ -952,12 +1013,16 @@ function getSubscriptionStatus($log_id)
 		)
 	);
 	if ($db->num_rows($request) !== 0)
+	{
 		list ($status['id_member'], $status['old_status']) = $db->fetch_row($request);
+	}
 	$db->free_result($request);
 
 	// Nothing found?
 	if (empty($status))
+	{
 		throw new \ElkArte\Exceptions\Exception('no_access', false);
+	}
 
 	return $status;
 }
@@ -1263,14 +1328,18 @@ function removeSubscription($id_subscribe, $id_member, $delete = false)
 	while ($row = $db->fetch_assoc($request))
 	{
 		if (!isset($context['subscriptions'][$row['id_subscribe']]))
+		{
 			continue;
+		}
 
 		// The one we're removing?
 		if ($row['id_subscribe'] == $id_subscribe)
 		{
 			$removals = explode(',', $context['subscriptions'][$row['id_subscribe']]['add_groups']);
 			if ($context['subscriptions'][$row['id_subscribe']]['prim_group'] != 0)
+			{
 				$removals[] = $context['subscriptions'][$row['id_subscribe']]['prim_group'];
+			}
 			$member['id_group'] = $row['old_id_group'];
 		}
 		// Otherwise things we allow.
@@ -1289,15 +1358,21 @@ function removeSubscription($id_subscribe, $id_member, $delete = false)
 	// Now, for everything we are removing check they definitely are not allowed it.
 	$existingGroups = explode(',', $member_info['additional_groups']);
 	foreach ($existingGroups as $key => $group)
+	{
 		if (empty($group) || (in_array($group, $removals) && !in_array($group, $allowed)))
+		{
 			unset($existingGroups[$key]);
+		}
+	}
 
 	// Finally, do something with the current primary group.
 	if (in_array($member_info['id_group'], $removals))
 	{
 		// If this primary group is actually allowed keep it.
 		if (in_array($member_info['id_group'], $allowed))
+		{
 			$existingGroups[] = $member_info['id_group'];
+		}
 
 		// Either way, change the id_group back.
 		if ($new_id_group < 1)
@@ -1305,13 +1380,19 @@ function removeSubscription($id_subscribe, $id_member, $delete = false)
 			// If we revert to the old id-group we need to ensure it wasn't from a subscription.
 			foreach ($context['subscriptions'] as $id => $group)
 				// It was? Make them a regular member then!
+			{
 				if ($group['prim_group'] == $member['id_group'])
+				{
 					$member['id_group'] = 0;
+				}
+			}
 
 			$member_info['id_group'] = $member['id_group'];
 		}
 		else
+		{
 			$member_info['id_group'] = $new_id_group;
+		}
 	}
 
 	// Crazy stuff, we seem to have our groups fixed, just make them unique
@@ -1322,6 +1403,7 @@ function removeSubscription($id_subscribe, $id_member, $delete = false)
 
 	// Disable the subscription.
 	if (!$delete)
+	{
 		$db->query('', '
 			UPDATE {db_prefix}log_subscribed
 			SET status = {int:not_active}
@@ -1333,8 +1415,10 @@ function removeSubscription($id_subscribe, $id_member, $delete = false)
 				'current_subscription' => $id_subscribe,
 			)
 		);
+	}
 	// Otherwise delete it!
 	else
+	{
 		$db->query('', '
 			DELETE FROM {db_prefix}log_subscribed
 			WHERE id_member = {int:current_member}
@@ -1344,4 +1428,5 @@ function removeSubscription($id_subscribe, $id_member, $delete = false)
 				'current_subscription' => $id_subscribe,
 			)
 		);
+	}
 }

@@ -12,13 +12,19 @@
 
 namespace ElkArte\AdminController;
 
+use ElkArte\AbstractController;
+use ElkArte\EventManager;
+use ElkArte\Hooks;
+use ElkArte\SettingsForm\SettingsForm;
+use ElkArte\User;
+
 /**
  * Drafts administration controller.
  * This class allows to modify admin drafts settings for the forum.
  *
  * @package Drafts
  */
-class ManageDraftsModule extends \ElkArte\AbstractController
+class ManageDraftsModule extends AbstractController
 {
 	/**
 	 * Used to add the Drafts entry to the Core Features list.
@@ -47,13 +53,13 @@ class ManageDraftsModule extends \ElkArte\AbstractController
 				{
 					enableModules('drafts', $modules);
 					calculateNextTrigger('remove_old_drafts');
-					\ElkArte\Hooks::instance()->enableIntegration('\\ElkArte\\DraftsIntegrate');
+					Hooks::instance()->enableIntegration('\\ElkArte\\DraftsIntegrate');
 				}
 				// Disabling, just forget about the modules
 				else
 				{
 					disableModules('drafts', $modules);
-					\ElkArte\Hooks::instance()->disableIntegration('\\ElkArte\\DraftsIntegrate');
+					Hooks::instance()->disableIntegration('\\ElkArte\\DraftsIntegrate');
 				}
 			},
 		);
@@ -140,8 +146,8 @@ class ManageDraftsModule extends \ElkArte\AbstractController
 	public static function integrate_sa_manage_maintenance(&$subActions)
 	{
 		$subActions['topics']['activities']['olddrafts'] = function () {
-			$controller = new ManageDraftsModule(new \ElkArte\EventManager());
-			$controller->setUser(\ElkArte\User::$info);
+			$controller = new ManageDraftsModule(new EventManager());
+			$controller->setUser(User::$info);
 			$controller->pre_dispatch();
 			$controller->action_olddrafts_display();
 		};
@@ -161,7 +167,9 @@ class ManageDraftsModule extends \ElkArte\AbstractController
 
 		// If we have old drafts, remove them
 		if (count($drafts) > 0)
+		{
 			deleteDrafts($drafts, -1, false);
+		}
 
 		// Errors?  no errors, only success !
 		$context['maintenance_finished'] = array(
@@ -200,7 +208,7 @@ class ManageDraftsModule extends \ElkArte\AbstractController
 		theme()->getTemplates()->loadLanguageFile('Drafts');
 
 		// Initialize the form
-		$settingsForm = new \ElkArte\SettingsForm\SettingsForm(\ElkArte\SettingsForm\SettingsForm::DB_ADAPTER);
+		$settingsForm = new SettingsForm(SettingsForm::DB_ADAPTER);
 
 		// Initialize it with our settings
 		$settingsForm->setConfigVars($this->_settings());
@@ -265,13 +273,13 @@ class ManageDraftsModule extends \ElkArte\AbstractController
 
 		// Here are all the draft settings, a bit lite for now, but we can add more :P
 		$config_vars = array(
-				// Draft settings ...
-				array('check', 'drafts_post_enabled'),
-				array('check', 'drafts_pm_enabled'),
-				array('int', 'drafts_keep_days', 'postinput' => $txt['days_word'], 'subtext' => $txt['drafts_keep_days_subnote']),
+			// Draft settings ...
+			array('check', 'drafts_post_enabled'),
+			array('check', 'drafts_pm_enabled'),
+			array('int', 'drafts_keep_days', 'postinput' => $txt['days_word'], 'subtext' => $txt['drafts_keep_days_subnote']),
 			'',
-				array('check', 'drafts_autosave_enabled', 'subtext' => $txt['drafts_autosave_enabled_subnote']),
-				array('int', 'drafts_autosave_frequency', 'postinput' => $txt['manageposts_seconds'], 'subtext' => $txt['drafts_autosave_frequency_subnote']),
+			array('check', 'drafts_autosave_enabled', 'subtext' => $txt['drafts_autosave_enabled_subnote']),
+			array('int', 'drafts_autosave_frequency', 'postinput' => $txt['manageposts_seconds'], 'subtext' => $txt['drafts_autosave_frequency_subnote']),
 		);
 
 		call_integration_hook('integrate_modify_drafts_settings', array(&$config_vars));

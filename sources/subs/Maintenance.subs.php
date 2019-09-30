@@ -8,16 +8,17 @@
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause (see accompanying LICENSE.txt file)
  *
  * This file contains code covered by:
- * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * copyright: 2011 Simple Machines (http://www.simplemachines.org)
  *
  * @version 2.0 dev
  *
  */
+
 /**
  * Counts the total number of messages
  *
- * @package Maintenance
  * @return int
+ * @package Maintenance
  */
 function countMessages()
 {
@@ -76,15 +77,14 @@ function flushLogTables()
 /**
  * Gets the table columns from the messages table, just a wrapper function
  *
- * @package Maintenance
  * @return array
+ * @package Maintenance
  */
 function getMessageTableColumns()
 {
 	$table = db_table();
-	$colData = $table->list_columns('{db_prefix}messages', true);
 
-	return $colData;
+	return $table->list_columns('{db_prefix}messages', true);
 }
 
 /**
@@ -99,8 +99,12 @@ function fetchBodyType()
 
 	$colData = $table->list_columns('{db_prefix}messages', true);
 	foreach ($colData as $column)
+	{
 		if ($column['name'] == 'body')
+		{
 			$body_type = $column['type'];
+		}
+	}
 
 	return $body_type;
 }
@@ -108,8 +112,8 @@ function fetchBodyType()
 /**
  * Resizes the body column from the messages table
  *
- * @package Maintenance
  * @param string $type
+ * @package Maintenance
  */
 function resizeMessageTableBody($type)
 {
@@ -120,19 +124,20 @@ function resizeMessageTableBody($type)
 /**
  * Detects messages, which exceed the max message size
  *
- * @package Maintenance
- *
  * @param int $start The item to start with (for pagination purposes)
  * @param int $increment
  *
  * @return array
+ * @package Maintenance
+ *
  */
 function detectExceedingMessages($start, $increment)
 {
 	$db = database();
 
 	return $db->fetchQuery('
-		SELECT /*!40001 SQL_NO_CACHE */ id_msg
+		SELECT 
+			/*!40001 SQL_NO_CACHE */ id_msg
 		FROM {db_prefix}messages
 		WHERE id_msg BETWEEN {int:start} AND {int:start} + {int:increment}
 			AND LENGTH(body) > 65535',
@@ -141,8 +146,7 @@ function detectExceedingMessages($start, $increment)
 			'increment' => $increment - 1,
 		)
 	)->fetch_callback(
-		function ($row)
-		{
+		function ($row) {
 			return $row['id_msg'];
 		}
 	);
@@ -154,9 +158,9 @@ function detectExceedingMessages($start, $increment)
  * - Used by maintenance when convert the column "body" of the table from TEXT
  * to MEDIUMTEXT and vice versa.
  *
- * @package Maintenance
  * @param int[] $msg
  * @return array
+ * @package Maintenance
  */
 function getExceedingMessages($msg)
 {
@@ -165,15 +169,15 @@ function getExceedingMessages($msg)
 	$db = database();
 
 	return $db->fetchQuery('
-		SELECT id_msg, id_topic, subject
+		SELECT 
+			id_msg, id_topic, subject
 		FROM {db_prefix}messages
 		WHERE id_msg IN ({array_int:messages})',
 		array(
 			'messages' => $msg,
 		)
 	)->fetch_callback(
-		function ($row) use ($scripturl)
-		{
+		function ($row) use ($scripturl) {
 			return '<a href="' . $scripturl . '?topic=' . $row['id_topic'] . '.msg' . $row['id_msg'] . '#msg' . $row['id_msg'] . '">' . $row['subject'] . '</a>';
 		}
 	);
@@ -184,8 +188,8 @@ function getExceedingMessages($msg)
  *
  * - Additional tables from addons are also included.
  *
- * @package Maintenance
  * @return array
+ * @package Maintenance
  */
 function getElkTables()
 {
@@ -201,7 +205,9 @@ function getElkTables()
 	// Get a list of tables, as well as how many there are.
 	$temp_tables = $db->list_tables(false, $real_prefix . '%');
 	foreach ($temp_tables as $table)
-			$tables[] = array('table_name' => $table);
+	{
+		$tables[] = array('table_name' => $table);
+	}
 
 	return $tables;
 }
@@ -209,8 +215,8 @@ function getElkTables()
 /**
  * Gets the last topics id.
  *
- * @package Maintenance
  * @return int
+ * @package Maintenance
  */
 function getMaxTopicID()
 {
@@ -219,8 +225,7 @@ function getMaxTopicID()
 	$request = $db->query('', '
 		SELECT MAX(id_topic)
 		FROM {db_prefix}topics',
-		array(
-		)
+		array()
 	);
 	list ($id_topic) = $db->fetch_row($request);
 	$db->free_result($request);
@@ -231,9 +236,9 @@ function getMaxTopicID()
 /**
  * Recounts all approved messages
  *
- * @package Maintenance
  * @param int $start The item to start with (for pagination purposes)
  * @param int $increment
+ * @package Maintenance
  */
 function recountApprovedMessages($start, $increment)
 {
@@ -255,8 +260,7 @@ function recountApprovedMessages($start, $increment)
 			'max_id' => $start + $increment,
 		)
 	)->fetch_callback(
-		function ($row)
-		{
+		function ($row) {
 			setTopicAttribute($row['id_topic'], array('num_replies' => $row['real_num_replies']));
 		}
 	);
@@ -265,9 +269,9 @@ function recountApprovedMessages($start, $increment)
 /**
  * Recounts all unapproved messages
  *
- * @package Maintenance
  * @param int $start The item to start with (for pagination purposes)
  * @param int $increment
+ * @package Maintenance
  */
 function recountUnapprovedMessages($start, $increment)
 {
@@ -289,8 +293,7 @@ function recountUnapprovedMessages($start, $increment)
 			'max_id' => $start + $increment,
 		)
 	)->fetch_callback(
-		function ($row)
-		{
+		function ($row) {
 			setTopicAttribute($row['id_topic'], array('unapproved_posts' => $row['real_unapproved_posts']));
 		}
 	);
@@ -302,11 +305,11 @@ function recountUnapprovedMessages($start, $increment)
  *
  * - Allowed parameters: num_posts, num_topics, unapproved_posts, unapproved_topics
  *
- * @package Maintenance
- *
  * @param string $column
  *
  * @return bool
+ * @package Maintenance
+ *
  */
 function resetBoardsCounter($column)
 {
@@ -315,7 +318,9 @@ function resetBoardsCounter($column)
 	$allowed_columns = array('num_posts', 'num_topics', 'unapproved_posts', 'unapproved_topics');
 
 	if (!in_array($column, $allowed_columns))
-			return false;
+	{
+		return false;
+	}
 
 	$db->query('', '
 		UPDATE {db_prefix}boards
@@ -331,10 +336,10 @@ function resetBoardsCounter($column)
 /**
  * Recalculates the boards table's counter
  *
- * @package Maintenance
  * @param string $type - can be 'posts', 'topic', 'unapproved_posts', 'unapproved_topics'
  * @param int $start The item to start with (for pagination purposes)
  * @param int $increment
+ * @package Maintenance
  */
 function updateBoardsCounter($type, $start, $increment)
 {
@@ -485,8 +490,7 @@ function updatePersonalMessagesCounter()
 			'is_not_deleted' => 0,
 		)
 	)->fetch_callback(
-		function ($row)
-		{
+		function ($row) {
 			updateMemberData($row['id_member'], array('personal_messages' => $row['real_num']));
 		}
 	);
@@ -503,8 +507,7 @@ function updatePersonalMessagesCounter()
 			'is_not_read' => 0,
 		)
 	)->fetch_callback(
-		function ($row)
-		{
+		function ($row) {
 			updateMemberData($row['id_member'], array('unread_messages' => $row['real_num']));
 		}
 	);
@@ -513,9 +516,9 @@ function updatePersonalMessagesCounter()
 /**
  * Fixes the column id_board from the messages table.
  *
- * @package Maintenance
  * @param int $start The item to start with (for pagination purposes)
  * @param int $increment
+ * @package Maintenance
  */
 function updateMessagesBoardID($start, $increment)
 {
@@ -534,10 +537,13 @@ function updateMessagesBoardID($start, $increment)
 	);
 	$boards = array();
 	while ($row = $db->fetch_assoc($request))
+	{
 		$boards[$row['id_board']][] = $row['id_msg'];
+	}
 	$db->free_result($request);
 
 	foreach ($boards as $board_id => $messages)
+	{
 		$db->query('', '
 			UPDATE {db_prefix}messages
 			SET id_board = {int:id_board}
@@ -547,6 +553,7 @@ function updateMessagesBoardID($start, $increment)
 				'id_board' => $board_id,
 			)
 		);
+	}
 }
 
 /**
@@ -570,14 +577,15 @@ function updateBoardsLastMessage()
 	);
 	$realBoardCounts = array();
 	while ($row = $db->fetch_assoc($request))
+	{
 		$realBoardCounts[$row['id_board']] = $row['local_last_msg'];
+	}
 	$db->free_result($request);
 
 	$request = $db->query('', '
 		SELECT /*!40001 SQL_NO_CACHE */ id_board, id_parent, id_last_msg, child_level, id_msg_updated
 		FROM {db_prefix}boards',
-		array(
-		)
+		array()
 	);
 	$resort_me = array();
 	while ($row = $db->fetch_assoc($request))
@@ -591,15 +599,21 @@ function updateBoardsLastMessage()
 
 	$lastModifiedMsg = array();
 	foreach ($resort_me as $rows)
+	{
 		foreach ($rows as $row)
 		{
 			// The latest message is the latest of the current board and its children.
 			if (isset($lastModifiedMsg[$row['id_board']]))
+			{
 				$curLastModifiedMsg = max($row['local_last_msg'], $lastModifiedMsg[$row['id_board']]);
+			}
 			else
+			{
 				$curLastModifiedMsg = $row['local_last_msg'];
-				// If what is and what should be the latest message differ, an update is necessary.
+			}
+			// If what is and what should be the latest message differ, an update is necessary.
 			if ($row['local_last_msg'] != $row['id_last_msg'] || $curLastModifiedMsg != $row['id_msg_updated'])
+			{
 				$db->query('', '
 					UPDATE {db_prefix}boards
 					SET id_last_msg = {int:id_last_msg}, id_msg_updated = {int:id_msg_updated}
@@ -610,21 +624,27 @@ function updateBoardsLastMessage()
 						'id_board' => $row['id_board'],
 					)
 				);
+			}
 
 			// Parent boards inherit the latest modified message of their children.
 			if (isset($lastModifiedMsg[$row['id_parent']]))
+			{
 				$lastModifiedMsg[$row['id_parent']] = max($row['local_last_msg'], $lastModifiedMsg[$row['id_parent']]);
+			}
 			else
+			{
 				$lastModifiedMsg[$row['id_parent']] = $row['local_last_msg'];
+			}
 		}
+	}
 }
 
 /**
  * Counts topics from a given board.
  *
- * @package Maintenance
  * @param int $id_board
  * @return int
+ * @package Maintenance
  */
 function countTopicsFromBoard($id_board)
 {
@@ -647,10 +667,10 @@ function countTopicsFromBoard($id_board)
 /**
  * Gets a list of the next 10 topics which should be moved to a different board.
  *
- * @package Maintenance
  * @param int $id_board
  *
  * @return int[]
+ * @package Maintenance
  */
 function getTopicsToMove($id_board)
 {
@@ -666,8 +686,7 @@ function getTopicsToMove($id_board)
 			'id_board' => $id_board,
 		)
 	)->fetch_callback(
-		function ($row)
-		{
+		function ($row) {
 			return $row['id_topic'];
 		}
 	);
@@ -676,8 +695,8 @@ function getTopicsToMove($id_board)
 /**
  * Counts members with posts > 0, we name them contributors
  *
- * @package Maintenance
  * @return int
+ * @package Maintenance
  */
 function countContributors()
 {
@@ -689,8 +708,7 @@ function countContributors()
 		WHERE m.id_member != 0
 			AND b.count_posts = 0
 			AND m.id_board = b.id_board',
-		array(
-		)
+		array()
 	);
 
 	// save it so we don't do this again for this task
@@ -703,10 +721,10 @@ function countContributors()
 /**
  * Recount the members posts.
  *
- * @package Maintenance
  * @param int $start The item to start with (for pagination purposes)
  * @param int $increment
  * @return int
+ * @package Maintenance
  */
 function updateMembersPostCount($start, $increment)
 {
@@ -735,7 +753,9 @@ function updateMembersPostCount($start, $increment)
 	// Update the post count for this group
 	require_once(SUBSDIR . '/Members.subs.php');
 	while ($row = $db->fetch_assoc($request))
+	{
 		updateMemberData($row['id_member'], array('posts' => $row['posts']));
+	}
 	$db->free_result($request);
 
 	return $total_rows;
@@ -768,12 +788,12 @@ function updateZeroPostMembers()
 			AND b.count_posts = {int:zero}' . (!empty($modSettings['recycle_enable']) ? '
 			AND b.id_board != {int:recycle}' : '') . '
 		GROUP BY m.id_member',
-		array(
-			'zero' => 0,
-			'string_zero' => '0',
-			'recycle' => $modSettings['recycle_board'],
-		)
-	)->hasResults() !== false;
+			array(
+				'zero' => 0,
+				'string_zero' => '0',
+				'recycle' => $modSettings['recycle_board'],
+			)
+		)->hasResults() !== false;
 
 	if ($createTemporary->hasResults())
 	{
@@ -789,8 +809,7 @@ function updateZeroPostMembers()
 				'zero' => 0,
 			)
 		)->fetch_callback(
-			function ($row)
-			{
+			function ($row) {
 				// Set the post count to zero for any delinquents we may have found
 				return $row['id_member'];
 			}
@@ -807,11 +826,11 @@ function updateZeroPostMembers()
 /**
  * Removing old and inactive members
  *
- * @package Maintenance
  * @param string $type
  * @param int[] $groups
  * @param int $time_limit
  * @return array
+ * @package Maintenance
  */
 function purgeMembers($type, $groups, $time_limit)
 {
@@ -820,20 +839,22 @@ function purgeMembers($type, $groups, $time_limit)
 	$where_vars = array(
 		'time_limit' => $time_limit,
 	);
-	if ($type == 'activated')
+	if ($type === 'activated')
 	{
 		$where = 'mem.date_registered < {int:time_limit} AND mem.is_activated = {int:is_activated}';
 		$where_vars['is_activated'] = 0;
 	}
 	else
+	{
 		$where = 'mem.last_login < {int:time_limit} AND (mem.last_login != 0 OR mem.date_registered < {int:time_limit})';
+	}
 
 	// Need to get *all* groups then work out which (if any) we avoid.
 	$request = $db->query('', '
-		SELECT id_group, group_name, min_posts
+		SELECT 
+			id_group, group_name, min_posts
 		FROM {db_prefix}membergroups',
-		array(
-		)
+		array()
 	);
 	while ($row = $db->fetch_assoc($request))
 	{
@@ -874,7 +895,9 @@ function purgeMembers($type, $groups, $time_limit)
 	while ($row = $db->fetch_assoc($request))
 	{
 		if (!$row['is_mod'] || !in_array(3, $groups))
+		{
 			$members[] = $row['id_member'];
+		}
 	}
 	$db->free_result($request);
 

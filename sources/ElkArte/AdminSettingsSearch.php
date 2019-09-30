@@ -8,7 +8,7 @@
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause (see accompanying LICENSE.txt file)
  *
  * This file contains code covered by:
- * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * copyright: 2011 Simple Machines (http://www.simplemachines.org)
  *
  * @version 2.0 dev
  *
@@ -23,6 +23,7 @@ class AdminSettingsSearch
 {
 	/**
 	 * All the settings we have found
+	 *
 	 * @var array
 	 */
 	protected $_search_data;
@@ -30,12 +31,14 @@ class AdminSettingsSearch
 	/**
 	 * Sections are supposed to be stored in a menu,
 	 * and the menu is in $context['menu_name']
+	 *
 	 * @var string
 	 */
 	protected $_menu_name;
 
 	/**
 	 * An array of settings used in the search
+	 *
 	 * @var string[]
 	 */
 	protected $_settings = array();
@@ -65,118 +68,6 @@ class AdminSettingsSearch
 		{
 			$this->_settings = $this->_load_settings($settings_search);
 		}
-	}
-
-	/**
-	 * Initialize the search populating the array to search in
-	 *
-	 * @param string $menu_name - The name of the menu to look into
-	 * @param array $additional_settings - Possible additional settings
-	 *                 (see _load_settings for the array structure)
-	 */
-	public function initSearch($menu_name, $additional_settings = array())
-	{
-		$this->_menu_name = $menu_name;
-
-		// This is the huge array that defines everything ... it's items are formatted as follows:
-		//	0 = Language index (Can be array of indexes) to search through for this setting.
-		//	1 = URL for this indexes page.
-		//	2 = Help index for help associated with this item (If different from 0)
-		$this->_search_data = array(
-			// All the major sections of the forum.
-			'sections' => $this->_load_search_sections(),
-			'settings' => array_merge(
-				$additional_settings,
-				$this->_settings
-			),
-		);
-	}
-
-	/**
-	 * Actually perform the search of a term in the array
-	 *
-	 * @param string $search_term - The term to search
-	 *
-	 * @return string[] - an array of search results with 4 indexes:
-	 *                     - url
-	 *                     - name
-	 *                     - type
-	 *                     - help
-	 */
-	public function doSearch($search_term)
-	{
-		global $scripturl, $context;
-
-		$search_results = array();
-
-		foreach ($this->_search_data as $section => $data)
-		{
-			foreach ($data as $item)
-			{
-				$search_result = $this->_find_term($search_term, $item);
-
-				if (!empty($search_result))
-				{
-					$search_result['type'] = $section;
-					$search_result['url'] = $item[1] . ';' . $context['session_var'] . '=' . $context['session_id'];
-
-					if (substr($item[1], 0, 4) == 'area')
-					{
-						$search_result['url'] = $scripturl . '?action=admin;' . $search_result['url'] . ($section == 'settings' && !empty($item['named_link']) ? '#' . $item['named_link'] : '');
-					}
-
-					$search_results[] = $search_result;
-				}
-			}
-		}
-
-		return $search_results;
-	}
-
-	/**
-	 * Find a term inside an $item
-	 *
-	 * @param string $search_term - The term to search
-	 * @param string|string[] $item - A string or array of strings that may be
-	 *                        standalone strings, index for $txt, partial index
-	 *                        for $txt['setting_' . $item]
-	 *
-	 * @return string[] - An empty array if $search_term is not found, otherwise
-	 *                    part of the search_result array (consisting of 'name'
-	 *                    and 'help') of the term the result was found
-	 */
-	protected function _find_term($search_term, $item)
-	{
-		global $helptxt;
-
-		$found = false;
-		$return = array();
-
-		if (!is_array($item[0]))
-		{
-			$item[0] = array($item[0]);
-		}
-
-		foreach ($item[0] as $term)
-		{
-			if (stripos($term, $search_term) !== false)
-			{
-				$found = $term;
-			}
-		}
-
-		// Format the name - and remove any descriptions the entry may have.
-		if ($found !== false)
-		{
-			$name = preg_replace('~<(?:div|span)\sclass="smalltext">.+?</(?:div|span)>~', '', $found);
-
-			$return = array(
-				'name' => $name,
-				'help' => Util::shorten_text(isset($item[2]) ? strip_tags($helptxt[$item[2]]) : (isset($helptxt[$found]) ? strip_tags($helptxt[$found]) : ''), 255),
-			);
-		}
-
-		return $return;
 	}
 
 	/**
@@ -227,8 +118,8 @@ class AdminSettingsSearch
 	 *                  controller name
 	 *                )
 	 *
-	 * @todo move to subs?
 	 * @return array
+	 * @todo move to subs?
 	 */
 	private function _load_settings($settings_search)
 	{
@@ -241,7 +132,7 @@ class AdminSettingsSearch
 			{
 				// an OOP controller: get the settings from the settings method.
 				$controller = new $setting_area[2](new EventManager());
-				$controller->setUser(\ElkArte\User::$info);
+				$controller->setUser(User::$info);
 				$controller->pre_dispatch();
 				$config_vars = $controller->{$setting_area[0]}();
 			}
@@ -307,6 +198,31 @@ class AdminSettingsSearch
 	}
 
 	/**
+	 * Initialize the search populating the array to search in
+	 *
+	 * @param string $menu_name - The name of the menu to look into
+	 * @param array $additional_settings - Possible additional settings
+	 *                 (see _load_settings for the array structure)
+	 */
+	public function initSearch($menu_name, $additional_settings = array())
+	{
+		$this->_menu_name = $menu_name;
+
+		// This is the huge array that defines everything ... it's items are formatted as follows:
+		//	0 = Language index (Can be array of indexes) to search through for this setting.
+		//	1 = URL for this indexes page.
+		//	2 = Help index for help associated with this item (If different from 0)
+		$this->_search_data = array(
+			// All the major sections of the forum.
+			'sections' => $this->_load_search_sections(),
+			'settings' => array_merge(
+				$additional_settings,
+				$this->_settings
+			),
+		);
+	}
+
+	/**
 	 * Loads all the admin sections
 	 */
 	private function _load_search_sections()
@@ -335,5 +251,92 @@ class AdminSettingsSearch
 		}
 
 		return $sections;
+	}
+
+	/**
+	 * Actually perform the search of a term in the array
+	 *
+	 * @param string $search_term - The term to search
+	 *
+	 * @return string[] - an array of search results with 4 indexes:
+	 *                     - url
+	 *                     - name
+	 *                     - type
+	 *                     - help
+	 */
+	public function doSearch($search_term)
+	{
+		global $scripturl, $context;
+
+		$search_results = array();
+
+		foreach ($this->_search_data as $section => $data)
+		{
+			foreach ($data as $item)
+			{
+				$search_result = $this->_find_term($search_term, $item);
+
+				if (!empty($search_result))
+				{
+					$search_result['type'] = $section;
+					$search_result['url'] = $item[1] . ';' . $context['session_var'] . '=' . $context['session_id'];
+
+					if (substr($item[1], 0, 4) === 'area')
+					{
+						$search_result['url'] = $scripturl . '?action=admin;' . $search_result['url'] . ($section == 'settings' && !empty($item['named_link']) ? '#' . $item['named_link'] : '');
+					}
+
+					$search_results[] = $search_result;
+				}
+			}
+		}
+
+		return $search_results;
+	}
+
+	/**
+	 * Find a term inside an $item
+	 *
+	 * @param string $search_term - The term to search
+	 * @param string|string[] $item - A string or array of strings that may be
+	 *                        standalone strings, index for $txt, partial index
+	 *                        for $txt['setting_' . $item]
+	 *
+	 * @return string[] - An empty array if $search_term is not found, otherwise
+	 *                    part of the search_result array (consisting of 'name'
+	 *                    and 'help') of the term the result was found
+	 */
+	protected function _find_term($search_term, $item)
+	{
+		global $helptxt;
+
+		$found = false;
+		$return = array();
+
+		if (!is_array($item[0]))
+		{
+			$item[0] = array($item[0]);
+		}
+
+		foreach ($item[0] as $term)
+		{
+			if (stripos($term, $search_term) !== false)
+			{
+				$found = $term;
+			}
+		}
+
+		// Format the name - and remove any descriptions the entry may have.
+		if ($found !== false)
+		{
+			$name = preg_replace('~<(?:div|span)\sclass="smalltext">.+?</(?:div|span)>~', '', $found);
+
+			$return = array(
+				'name' => $name,
+				'help' => Util::shorten_text(isset($item[2]) ? strip_tags($helptxt[$item[2]]) : (isset($helptxt[$found]) ? strip_tags($helptxt[$found]) : ''), 255),
+			);
+		}
+
+		return $return;
 	}
 }

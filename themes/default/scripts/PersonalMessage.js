@@ -4,7 +4,7 @@
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause (see accompanying LICENSE.txt file)
  *
  * This file contains code covered by:
- * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * copyright: 2011 Simple Machines (http://www.simplemachines.org)
  *
  * @version 2.0 dev
  */
@@ -45,7 +45,7 @@ function elk_PersonalMessageSend(oOptions)
 }
 
 // Initialise the PM recipient selection area
-elk_PersonalMessageSend.prototype.init = function()
+elk_PersonalMessageSend.prototype.init = function ()
 {
 	if (!this.opt.bBccShowByDefault)
 	{
@@ -62,7 +62,8 @@ elk_PersonalMessageSend.prototype.init = function()
 
 		// Make the link show the BCC control.
 		var oBccLink = document.getElementById(this.opt.sBccLinkId);
-		oBccLink.onclick = function() {
+		oBccLink.onclick = function ()
+		{
 			this.showBcc();
 			return false;
 		}.bind(this);
@@ -101,7 +102,7 @@ elk_PersonalMessageSend.prototype.init = function()
 };
 
 // Show the bbc fields
-elk_PersonalMessageSend.prototype.showBcc = function()
+elk_PersonalMessageSend.prototype.showBcc = function ()
 {
 	// No longer hide it, show it to the world!
 	this.oBccDiv.style.display = 'block';
@@ -109,7 +110,7 @@ elk_PersonalMessageSend.prototype.showBcc = function()
 };
 
 // Prevent items to be added twice or to both the 'To' and 'Bcc'.
-elk_PersonalMessageSend.prototype.callbackAddItem = function(oAutoSuggestInstance, sSuggestId)
+elk_PersonalMessageSend.prototype.callbackAddItem = function (sSuggestId)
 {
 	this.oToAutoSuggest.deleteAddedItem(sSuggestId);
 	this.oBccAutoSuggest.deleteAddedItem(sSuggestId);
@@ -130,20 +131,26 @@ function loadLabelChoices()
 		toRemove = {length: 0};
 
 	if (theSelect.childNodes.length === 0)
+	{
 		return;
+	}
 
 	// This is done this way for internationalization reasons.
 	if (!('-1' in allLabels))
 	{
 		for (var o = 0; o < theSelect.options.length; o++)
 			if (theSelect.options[o].value.substr(0, 4) === "rem_")
+			{
 				allLabels[theSelect.options[o].value.substr(4)] = theSelect.options[o].text;
+			}
 	}
 
 	for (var i = 0; i < listing.length; i++)
 	{
 		if (listing[i].name !== "pms[]" || !listing[i].checked)
+		{
 			continue;
+		}
 
 		var alreadyThere = [],
 			x;
@@ -169,7 +176,9 @@ function loadLabelChoices()
 	}
 
 	while (theSelect.options.length > 2)
+	{
 		theSelect.options[2] = null;
+	}
 
 	if (toAdd.length !== 0)
 	{
@@ -181,7 +190,9 @@ function loadLabelChoices()
 		for (i in toAdd)
 		{
 			if (i !== "length")
+			{
 				theSelect.options[theSelect.options.length] = new Option(toAdd[i], "add_" + i);
+			}
 		}
 	}
 
@@ -195,7 +206,9 @@ function loadLabelChoices()
 		for (i in toRemove)
 		{
 			if (i !== "length")
+			{
 				theSelect.options[theSelect.options.length] = new Option(toRemove[i], "rem_" + i);
+			}
 		}
 	}
 }
@@ -220,22 +233,32 @@ function rebuildRuleDesc()
 	// GLOBAL strings, convert to objects
 	/** global: groups */
 	if (typeof groups === "string")
+	{
 		groups = JSON.parse(groups);
+	}
 	/** global: labels */
 	if (typeof labels === "string")
+	{
 		labels = JSON.parse(labels);
+	}
 	/** global: rules */
 	if (typeof rules === "string")
+	{
 		rules = JSON.parse(rules);
+	}
 
 	for (var i = 0; i < document.forms.addrule.elements.length; i++)
 	{
 		if (document.forms.addrule.elements[i].id.substr(0, 8) === "ruletype")
 		{
 			if (foundCriteria)
+			{
 				joinText = document.getElementById("logic").value === 'and' ? ' ' + txt_pm_readable_and + ' ' : ' ' + txt_pm_readable_or + ' ';
+			}
 			else
+			{
 				joinText = '';
+			}
 
 			foundCriteria = true;
 
@@ -243,21 +266,35 @@ function rebuildRuleDesc()
 			curVal = document.forms.addrule.elements[i].value;
 
 			if (curVal === "gid")
+			{
 				curDef = document.getElementById("ruledefgroup" + curNum).value.php_htmlspecialchars();
+			}
 			else if (curVal !== "bud")
+			{
 				curDef = document.getElementById("ruledef" + curNum).value.php_htmlspecialchars();
+			}
 			else
+			{
 				curDef = "";
+			}
 
 			// What type of test is this?
 			if (curVal === "mid" && curDef)
+			{
 				text += joinText + txt_pm_readable_member.replace("{MEMBER}", curDef);
+			}
 			else if (curVal === "gid" && curDef && groups[curDef])
+			{
 				text += joinText + txt_pm_readable_group.replace("{GROUP}", groups[curDef]);
+			}
 			else if (curVal === "sub" && curDef)
+			{
 				text += joinText + txt_pm_readable_subject.replace("{SUBJECT}", curDef);
+			}
 			else if (curVal === "msg" && curDef)
+			{
 				text += joinText + txt_pm_readable_body.replace("{BODY}", curDef);
+			}
 			else if (curVal === "bud" && !hadBuddy)
 			{
 				text += joinText + txt_pm_readable_buddy;
@@ -268,9 +305,13 @@ function rebuildRuleDesc()
 		if (document.forms.addrule.elements[i].id.substr(0, 7) === "acttype")
 		{
 			if (foundAction)
+			{
 				joinText = ' ' + txt_pm_readable_and + ' ';
+			}
 			else
+			{
 				joinText = "";
+			}
 
 			foundAction = true;
 
@@ -278,25 +319,37 @@ function rebuildRuleDesc()
 			curVal = document.forms.addrule.elements[i].value;
 
 			if (curVal === "lab")
+			{
 				curDef = document.getElementById("labdef" + curNum).value.php_htmlspecialchars();
+			}
 			else
+			{
 				curDef = "";
+			}
 
 			// Now pick the actions.
 			if (curVal === "lab" && curDef && labels[curDef])
+			{
 				actionText += joinText + txt_pm_readable_label.replace("{LABEL}", labels[curDef]);
+			}
 			else if (curVal === "del")
+			{
 				actionText += joinText + txt_pm_readable_delete;
+			}
 		}
 	}
 
 	// If still nothing make it default!
 	if (text === "" || !foundCriteria)
+	{
 		text = txt_pm_rule_not_defined;
+	}
 	else
 	{
 		if (actionText !== "")
+		{
 			text += ' ' + txt_pm_readable_then + ' ' + actionText;
+		}
 		text = txt_pm_readable_start + text + txt_pm_readable_end;
 	}
 
@@ -311,11 +364,12 @@ function initUpdateRulesActions()
 	 * so that the form only makes available the proper choices (input, select, none, etc)
 	 */
 
-	// Handy shortcuts
+		// Handy shortcuts
 	var $criteria = $('#criteria'),
 		$actions = $('#actions');
 
-	$criteria.on('change', '[name^="ruletype"]', function() {
+	$criteria.on('change', '[name^="ruletype"]', function ()
+	{
 		var optNum = $(this).data('optnum');
 
 		if (document.getElementById("ruletype" + optNum).value === "gid")
@@ -336,10 +390,11 @@ function initUpdateRulesActions()
 	});
 
 	/**
-	* Maintains the personal message rule action options to conform with the action choice
-	* so that the form only makes available the proper choice
-	*/
-	$actions.on('change', '[name^="acttype"]', function() {
+	 * Maintains the personal message rule action options to conform with the action choice
+	 * so that the form only makes available the proper choice
+	 */
+	$actions.on('change', '[name^="acttype"]', function ()
+	{
 		var optNum = $(this).data('actnum');
 
 		if (document.getElementById("acttype" + optNum).value === "lab")
@@ -353,22 +408,24 @@ function initUpdateRulesActions()
 	});
 
 	// Trigger a change on the existing in order to let the function run
-	$criteria.find('[name^="ruletype"]').change();
-	$actions.find('[name^="acttype"]').change();
+	$criteria.find('[name^="ruletype"]').trigger('change');
+	$actions.find('[name^="acttype"]').trigger('change');
 
 	// Make sure the description is rebuilt every time something changes, even on elements not yet existing
 	$criteria.on('change keyup',
 		'[name^="ruletype"], [name^="ruledefgroup"], [name^="ruledef"], [name^="acttype"], [name^="labdef"], #logic',
-		function() {
+		function ()
+		{
 			rebuildRuleDesc();
-	});
+		});
 
 	// Make sure the description is rebuilt every time something changes, even on elements not yet existing
 	$('#criteria, #actions').on('change keyup',
 		'[name^="ruletype"], [name^="ruledefgroup"], [name^="ruledef"], [name^="acttype"], [name^="labdef"], #logic',
-		function() {
+		function ()
+		{
 			rebuildRuleDesc();
-	});
+		});
 
 	// Rebuild once at the beginning to ensure everything is correct
 	rebuildRuleDesc();
@@ -383,20 +440,28 @@ function addCriteriaOption()
 	{
 		for (var i = 0; i < document.forms.addrule.elements.length; i++)
 			if (document.forms.addrule.elements[i].id.substr(0, 8) === "ruletype")
+			{
 				criteriaNum++;
+			}
 	}
 	criteriaNum++;
 
 	// Global strings, convert to objects
 	/** global: groups */
 	if (typeof groups === "string")
+	{
 		groups = JSON.parse(groups);
+	}
 	/** global: labels */
 	if (typeof labels === "string")
+	{
 		labels = JSON.parse(labels);
+	}
 	/** global: rules */
 	if (typeof rules === "string")
+	{
 		rules = JSON.parse(rules);
+	}
 
 	// rules select
 	var rules_option = '',
@@ -405,7 +470,9 @@ function addCriteriaOption()
 	for (index in rules)
 	{
 		if (rules.hasOwnProperty(index))
+		{
 			rules_option += '<option value="' + index + '">' + rules[index] + '</option>';
+		}
 	}
 
 	// group selections
@@ -416,15 +483,15 @@ function addCriteriaOption()
 
 	setOuterHTML(document.getElementById("criteriaAddHere"), '<br />' +
 		'<select class="criteria" name="ruletype[' + criteriaNum + ']" id="ruletype' + criteriaNum + '" data-optnum="' + criteriaNum + '">' +
-			'<option value="">' + txt_pm_rule_criteria_pick + ':</option>' + rules_option + '' +
+		'<option value="">' + txt_pm_rule_criteria_pick + ':</option>' + rules_option + '' +
 		'</select>&nbsp;' +
 		'<span id="defdiv' + criteriaNum + '" class="hide">' +
-			'<input type="text" name="ruledef[' + criteriaNum + ']" id="ruledef' + criteriaNum + '" value="" class="input_text" />' +
+		'<input type="text" name="ruledef[' + criteriaNum + ']" id="ruledef' + criteriaNum + '" value="" class="input_text" />' +
 		'</span>' +
 		'<span id="defseldiv' + criteriaNum + '" class="hide">' +
-			'<select class="criteria" name="ruledefgroup[' + criteriaNum + ']" id="ruledefgroup' + criteriaNum + '">' +
-				'<option value="">' + txt_pm_rule_sel_group + '</option>' + group_option +
-			'</select>' +
+		'<select class="criteria" name="ruledefgroup[' + criteriaNum + ']" id="ruledefgroup' + criteriaNum + '">' +
+		'<option value="">' + txt_pm_rule_sel_group + '</option>' + group_option +
+		'</select>' +
 		'</span>' +
 		'<span id="criteriaAddHere"></span>');
 
@@ -440,7 +507,9 @@ function addActionOption()
 	{
 		for (var i = 0; i < document.forms.addrule.elements.length; i++)
 			if (document.forms.addrule.elements[i].id.substr(0, 7) === "acttype")
+			{
 				actionNum++;
+			}
 	}
 	actionNum++;
 
@@ -449,19 +518,21 @@ function addActionOption()
 		index = '';
 
 	if (typeof labels === "string")
+	{
 		labels = JSON.parse(labels);
+	}
 	for (index in labels)
 		label_option += '<option value="' + index + '">' + labels[index] + '</option>';
 
 	setOuterHTML(document.getElementById("actionAddHere"), '<br />' +
 		'<select name="acttype[' + actionNum + ']" id="acttype' + actionNum + '" data-actnum="' + actionNum + '">' +
-			'<option value="">' + txt_pm_rule_sel_action + ':</option>' +
-			'<option value="lab">' + txt_pm_rule_label + '</option>' +
-			'<option value="del">' + txt_pm_rule_delete + '</option>' +
+		'<option value="">' + txt_pm_rule_sel_action + ':</option>' +
+		'<option value="lab">' + txt_pm_rule_label + '</option>' +
+		'<option value="del">' + txt_pm_rule_delete + '</option>' +
 		'</select>&nbsp;' +
 		'<span id="labdiv' + actionNum + '" class="hide">' +
 		'<select name="labdef[' + actionNum + ']" id="labdef' + actionNum + '">' +
-			'<option value="">' + txt_pm_rule_sel_label + '</option>' + label_option +
+		'<option value="">' + txt_pm_rule_sel_label + '</option>' + label_option +
 		'</select></span>' +
 		'<span id="actionAddHere"></span>');
 }

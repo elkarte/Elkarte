@@ -8,13 +8,15 @@
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause (see accompanying LICENSE.txt file)
  *
  * This file contains code covered by:
- * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * copyright: 2011 Simple Machines (http://www.simplemachines.org)
  *
  * @version 2.0 dev
  *
  */
 
 namespace ElkArte\Search\API;
+
+use ElkArte\Util;
 
 /**
  * SearchAPI-Fulltext.class.php, Fulltext API, used when an SQL fulltext index is used
@@ -25,36 +27,42 @@ class Fulltext extends Standard
 {
 	/**
 	 * This is the last version of ElkArte that this was tested on, to protect against API changes.
+	 *
 	 * @var string
 	 */
 	public $version_compatible = 'ElkArte 2.0 dev';
 
 	/**
 	 * This won't work with versions of ElkArte less than this.
+	 *
 	 * @var string
 	 */
 	public $min_elk_version = 'ElkArte 1.0';
 
 	/**
 	 * Is it supported?
+	 *
 	 * @var boolean
 	 */
 	public $is_supported = true;
 
 	/**
 	 * What words are banned?
+	 *
 	 * @var array
 	 */
 	protected $bannedWords = array();
 
 	/**
 	 * What is the minimum word length?
+	 *
 	 * @var int
 	 */
 	protected $min_word_length = 4;
 
 	/**
 	 * What databases support the fulltext index?
+	 *
 	 * @var array
 	 */
 	protected $supported_databases = array('MySQL');
@@ -66,6 +74,8 @@ class Fulltext extends Standard
 	{
 		global $modSettings;
 
+		parent::__construct($config, $searchParams);
+
 		// Is this database supported?
 		if (!in_array($this->_db->title(), $this->supported_databases))
 		{
@@ -74,7 +84,6 @@ class Fulltext extends Standard
 			return;
 		}
 
-		parent::__construct($config, $searchParams);
 		$this->bannedWords = empty($modSettings['search_banned_words']) ? array() : explode(',', $modSettings['search_banned_words']);
 		$this->min_word_length = $this->_getMinWordLength();
 	}
@@ -126,8 +135,8 @@ class Fulltext extends Standard
 	 */
 	public function searchSort($a, $b)
 	{
-		$x = \ElkArte\Util::strlen($a) - (in_array($a, $this->_excludedWords) ? 1000 : 0);
-		$y = \ElkArte\Util::strlen($b) - (in_array($b, $this->_excludedWords) ? 1000 : 0);
+		$x = Util::strlen($a) - (in_array($a, $this->_excludedWords) ? 1000 : 0);
+		$y = Util::strlen($b) - (in_array($b, $this->_excludedWords) ? 1000 : 0);
 
 		return $x < $y ? 1 : ($x > $y ? -1 : 0);
 	}
@@ -149,13 +158,13 @@ class Fulltext extends Standard
 			{
 				// Using special characters that a full index would ignore and the remaining words are
 				// short which would also be ignored
-				if ((\ElkArte\Util::strlen(current($subwords)) < $this->min_word_length) && (\ElkArte\Util::strlen(next($subwords)) < $this->min_word_length))
+				if ((Util::strlen(current($subwords)) < $this->min_word_length) && (Util::strlen(next($subwords)) < $this->min_word_length))
 				{
 					$wordsSearch['words'][] = trim($word, '/*- ');
 					$wordsSearch['complex_words'][] = count($subwords) === 1 ? $word : '"' . $word . '"';
 				}
 			}
-			elseif (\ElkArte\Util::strlen(trim($word, '/*- ')) < $this->min_word_length)
+			elseif (Util::strlen(trim($word, '/*- ')) < $this->min_word_length)
 			{
 				// Short words have feelings too
 				$wordsSearch['words'][] = trim($word, '/*- ');
@@ -165,7 +174,7 @@ class Fulltext extends Standard
 
 		$fulltextWord = count($subwords) === 1 ? $word : '"' . $word . '"';
 		$wordsSearch['indexed_words'][] = $fulltextWord;
-		if ($isExcluded)
+		if ($isExcluded !== '')
 		{
 			$wordsExclude[] = $fulltextWord;
 		}
@@ -278,7 +287,9 @@ class Fulltext extends Standard
 			$words['indexed_words'] = array_diff($words['indexed_words'], $words['complex_words']);
 
 			foreach ($words['indexed_words'] as $fulltextWord)
+			{
 				$query_params['boolean_match'] .= (in_array($fulltextWord, $query_params['excluded_index_words']) ? '-' : '+') . $fulltextWord . ' ';
+			}
 			$query_params['boolean_match'] = substr($query_params['boolean_match'], 0, -1);
 
 			// If we have bool terms to search, add them in
@@ -288,7 +299,7 @@ class Fulltext extends Standard
 			}
 		}
 
-		$ignoreRequest = $db_search->search_query('insert_into_log_messages_fulltext', ($db->support_ignore() ? ('
+		return $db_search->search_query('insert_into_log_messages_fulltext', ($db->support_ignore() ? ('
 			INSERT IGNORE INTO {db_prefix}' . $search_data['insert_into'] . '
 				(' . implode(', ', array_keys($query_select)) . ')') : '') . '
 			SELECT ' . implode(', ', $query_select) . '
@@ -298,7 +309,5 @@ class Fulltext extends Standard
 			LIMIT ' . ($search_data['max_results'] - $search_data['indexed_results'])),
 			$query_params
 		);
-
-		return $ignoreRequest;
 	}
 }

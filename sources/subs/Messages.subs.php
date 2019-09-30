@@ -11,12 +11,13 @@
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause (see accompanying LICENSE.txt file)
  *
  * This file contains code covered by:
- * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * copyright: 2011 Simple Machines (http://www.simplemachines.org)
  *
  * @version 2.0 dev
  *
  */
 
+use ElkArte\MessagesDelete;
 use ElkArte\User;
 
 /**
@@ -38,7 +39,9 @@ function messageDetails($id_msg, $id_topic = 0, $attachment_type = 0)
 	$db = database();
 
 	if (empty($id_msg))
+	{
 		return false;
+	}
 
 	$request = $db->query('', '
 		SELECT
@@ -62,19 +65,25 @@ function messageDetails($id_msg, $id_topic = 0, $attachment_type = 0)
 	);
 	// The message they were trying to edit was most likely deleted.
 	if ($db->num_rows($request) == 0)
+	{
 		return false;
+	}
 	$row = $db->fetch_assoc($request);
 
 	$attachment_stuff = array($row);
 	while ($row2 = $db->fetch_assoc($request))
+	{
 		$attachment_stuff[] = $row2;
+	}
 	$db->free_result($request);
 
 	$temp = array();
 	foreach ($attachment_stuff as $attachment)
 	{
 		if ($attachment['filesize'] >= 0 && !empty($modSettings['attachmentEnable']))
+		{
 			$temp[$attachment['id_attach']] = $attachment;
+		}
 
 	}
 	ksort($temp);
@@ -101,7 +110,9 @@ function basicMessageInfo($id_msg, $override_permissions = false, $detailed = fa
 	$db = database();
 
 	if (empty($id_msg))
+	{
 		return false;
+	}
 
 	$request = $db->query('', '
 		SELECT
@@ -133,8 +144,8 @@ function basicMessageInfo($id_msg, $override_permissions = false, $detailed = fa
  * @param int $id_msg
  * @param bool $modify
  *
- * @todo why it doesn't take into account post moderation?
  * @return bool
+ * @todo why it doesn't take into account post moderation?
  */
 function quoteMessageInfo($id_msg, $modify)
 {
@@ -191,19 +202,31 @@ function checkMessagePermissions($message)
 	{
 		// Give an extra five minutes over the disable time threshold, so they can type - assuming the post is public.
 		if ($message['approved'] && !empty($modSettings['edit_disable_time']) && $message['poster_time'] + ($modSettings['edit_disable_time'] + 5) * 60 < time())
+		{
 			throw new \ElkArte\Exceptions\Exception('modify_post_time_passed', false);
+		}
 		elseif ($message['id_member_poster'] == User::$info->id && !allowedTo('modify_own'))
+		{
 			isAllowedTo('modify_replies');
+		}
 		else
+		{
 			isAllowedTo('modify_own');
+		}
 	}
 	elseif ($message['id_member_poster'] == User::$info->id && !allowedTo('modify_any'))
+	{
 		isAllowedTo('modify_replies');
+	}
 	else
+	{
 		isAllowedTo('modify_any');
+	}
 
 	if ($context['can_announce'] && !empty($message['id_action']))
+	{
 		return array('topic_already_announced');
+	}
 
 	return false;
 }
@@ -244,7 +267,9 @@ function prepareMessageContext($message)
 
 	// Show an "approve" box if the user can approve it, and the message isn't approved.
 	if (!$message['message']['approved'] && !$context['show_approval'])
+	{
 		$context['show_approval'] = allowedTo('approve_posts');
+	}
 }
 
 /**
@@ -292,7 +317,7 @@ function removeMessage($message, $decreasePostCount = true)
 {
 	global $modSettings;
 
-	$remover = new \ElkArte\MessagesDelete($modSettings['recycle_enable'], $modSettings['recycle_board']);
+	$remover = new MessagesDelete($modSettings['recycle_enable'], $modSettings['recycle_board']);
 	$remover->removeMessage($message, $decreasePostCount, true);
 }
 
@@ -319,11 +344,15 @@ function associatedTopic($msg_id, $topicID = null)
 			WHERE id_msg = {int:msg}',
 			array(
 				'msg' => $msg_id,
-		));
+			));
 		if ($db->num_rows($request) != 1)
+		{
 			$topic = false;
+		}
 		else
+		{
 			list ($topic) = $db->fetch_row($request);
+		}
 		$db->free_result($request);
 
 		return $topic;
@@ -442,15 +471,15 @@ function nextMessage($id_msg, $id_topic)
  *      - 'only_approved' => true/false - include or exclude the unapproved messages
  *      - 'limit' => mixed - the number of values to return (if false, no limits applied)
  *
- * @todo very similar to selectMessages in Topics.subs.php
  * @return array
+ * @todo very similar to selectMessages in Topics.subs.php
  */
 function messageAt($start, $id_topic, $params = array())
 {
 	$db = database();
 
 	$params = array_merge(
-		// Defaults
+	// Defaults
 		array(
 			'not_in' => false,
 			'include' => false,
@@ -480,7 +509,9 @@ function messageAt($start, $id_topic, $params = array())
 	);
 	$msg = array();
 	while ($row = $db->fetch_assoc($result))
+	{
 		$msg[] = $row['id_msg'];
+	}
 	$db->free_result($result);
 
 	return $msg;
@@ -515,11 +546,15 @@ function recordReport($message, $poster_comment)
 	);
 
 	if ($db->num_rows($request) != 0)
+	{
 		list ($id_report, $ignore_all) = $db->fetch_row($request);
+	}
 	$db->free_result($request);
 
 	if (!empty($ignore_all))
+	{
 		return false;
+	}
 
 	// Already reported? My god, we could be dealing with a real rogue here...
 	if (!empty($id_report))
@@ -538,7 +573,9 @@ function recordReport($message, $poster_comment)
 	else
 	{
 		if (empty($message['real_name']))
+		{
 			$message['real_name'] = $message['poster_name'];
+		}
 
 		$db->insert('',
 			'{db_prefix}log_reported',
@@ -663,19 +700,27 @@ function loadMessageDetails($msg_selects, $msg_tables, $msg_parameters, $optiona
 		$msg_parameters['message_list'] = array($msg_parameters['message_list']);
 	}
 	else
+	{
 		$single = false;
+	}
 
 	$request = loadMessageRequest($msg_selects, $msg_tables, $msg_parameters, $optional);
 
 	$return = array();
 	while ($row = $db->fetch_assoc($request))
+	{
 		$return[] = $row;
+	}
 	$db->free_result($request);
 
 	if ($single)
+	{
 		return $return[0];
+	}
 	else
+	{
 		return $return;
+	}
 }
 
 /**
@@ -710,7 +755,9 @@ function determineRemovableMessages($topic, $messages, $allowed_all)
 	while ($row = $db->fetch_assoc($request))
 	{
 		if (!$allowed_all && !empty($modSettings['edit_disable_time']) && $row['poster_time'] + $modSettings['edit_disable_time'] * 60 < time())
+		{
 			continue;
+		}
 		$messages_list[$row['id_msg']] = array($row['subject'], $row['id_member']);
 	}
 
@@ -746,7 +793,9 @@ function countSplitMessages($topic, $include_unapproved, $selection = array())
 		)
 	);
 	while ($row = $db->fetch_assoc($request))
+	{
 		$return[empty($row['is_selected']) || $row['is_selected'] == 'f' ? 'not_selected' : 'selected'] = $row['num_messages'];
+	}
 	$db->free_result($request);
 
 	return $return;
@@ -756,10 +805,10 @@ function countSplitMessages($topic, $include_unapproved, $selection = array())
  * Returns an email (and few other things) associated with a message,
  * either the member's email or the poster_email (for example in case of guests)
  *
- * @todo very similar to posterDetails
- *
  * @param int $id_msg the id of a message
  * @return array
+ * @todo very similar to posterDetails
+ *
  */
 function mailFromMessage($id_msg)
 {
@@ -795,7 +844,9 @@ function updateMessageStats($increment = null, $max_msg_id = null)
 	$db = database();
 
 	if ($increment === true && $max_msg_id !== null)
+	{
 		updateSettings(array('totalMessages' => true, 'maxMsgID' => $max_msg_id), true);
+	}
 	else
 	{
 		// SUM and MAX on a smaller table is better for InnoDB tables.
@@ -848,14 +899,18 @@ function updateSubjectStats($id_topic, $subject = null)
 
 		$inserts = array();
 		foreach ($subject_words as $word)
+		{
 			$inserts[] = array($word, $id_topic);
+		}
 
 		if (!empty($inserts))
+		{
 			$db->insert('ignore',
 				'{db_prefix}log_search_subjects',
 				array('word' => 'string', 'id_topic' => 'int'),
 				$inserts,
 				array('word', 'id_topic')
 			);
+		}
 	}
 }

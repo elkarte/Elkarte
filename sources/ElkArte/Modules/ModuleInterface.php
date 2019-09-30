@@ -14,6 +14,8 @@
 
 namespace ElkArte\Modules;
 
+use ElkArte\EventManager;
+
 /**
  * Interface ModuleInterface
  *
@@ -29,5 +31,5 @@ interface ModuleInterface
 	 *
 	 * @return mixed[]
 	 */
-	public static function hooks(\ElkArte\EventManager $eventsManager);
+	public static function hooks(EventManager $eventsManager);
 }

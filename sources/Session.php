@@ -14,11 +14,13 @@
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause (see accompanying LICENSE.txt file)
  *
  * This file contains code covered by:
- * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * copyright: 2011 Simple Machines (http://www.simplemachines.org)
  *
  * @version 2.0 dev
  *
  */
+
+use ElkArte\TokenHash;
 
 /**
  * Attempt to start the session, unless it already has been.
@@ -36,14 +38,18 @@ function loadSession()
 
 	// Secure PHPSESSIONID
 	if (parse_url($boardurl, PHP_URL_SCHEME) === 'https')
+	{
 		@ini_set('session.cookie_secure', true);
+	}
 
 	if (!empty($modSettings['globalCookies']))
 	{
 		$parsed_url = parse_url($boardurl);
 
 		if (preg_match('~^\d{1,3}(\.\d{1,3}){3}$~', $parsed_url['host']) == 0 && preg_match('~(?:[^\.]+\.)?([^\.]{2,}\..+)\z~i', $parsed_url['host'], $parts) == 1)
+		{
 			@ini_set('session.cookie_domain', '.' . $parts[1]);
+		}
 	}
 
 	// @todo Set the session cookie path?
@@ -52,12 +58,14 @@ function loadSession()
 	{
 		// Attempt to end the already-started session.
 		if (ini_get('session.auto_start') == 1)
+		{
 			session_write_close();
+		}
 
 		// This is here to stop people from using bad junky PHPSESSIDs.
 		if (isset($_REQUEST[session_name()]) && preg_match('~^[A-Za-z0-9,-]{16,64}$~', $_REQUEST[session_name()]) == 0 && !isset($_COOKIE[session_name()]))
 		{
-			$tokenizer = new \ElkArte\TokenHash();
+			$tokenizer = new TokenHash();
 			$session_id = hash('md5', hash('md5', 'elk_sess_' . time()) . $tokenizer->generate_hash(8));
 			$_REQUEST[session_name()] = $session_id;
 			$_GET[session_name()] = $session_id;
@@ -95,7 +103,9 @@ function loadSession()
 			// APC destroys static class members before sessions can be written.  To work around this we
 			// explicitly call session_write_close on script end/exit bugs.php.net/bug.php?id=60657
 			if (extension_loaded('apc') && ini_get('apc.enabled') && !extension_loaded('apcu'))
+			{
 				register_shutdown_function('session_write_close');
+			}
 		}
 
 		// Start the session
@@ -103,13 +113,15 @@ function loadSession()
 
 		// Change it so the cache settings are a little looser than default.
 		if (!empty($modSettings['databaseSession_loose']) || (isset($_REQUEST['action']) && $_REQUEST['action'] == 'search'))
+		{
 			header('Cache-Control: private');
+		}
 	}
 
 	// Set the randomly generated code.
 	if (!isset($_SESSION['session_var']))
 	{
-		$tokenizer = new \ElkArte\TokenHash();
+		$tokenizer = new TokenHash();
 		$_SESSION['session_value'] = $tokenizer->generate_hash(32, session_id());
 		$_SESSION['session_var'] = substr(preg_replace('~^\d+~', '', $tokenizer->generate_hash(16, session_id())), 0, rand(7, 12));
 	}

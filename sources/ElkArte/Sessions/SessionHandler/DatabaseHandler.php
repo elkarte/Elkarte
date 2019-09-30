@@ -8,7 +8,7 @@
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause (see accompanying LICENSE.txt file)
  *
  * This file contains code covered by:
- * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * copyright: 2011 Simple Machines (http://www.simplemachines.org)
  *
  * @version 2.0 dev
  *
@@ -25,12 +25,14 @@ class DatabaseHandler extends \SessionHandler
 {
 	/**
 	 * The database object
+	 *
 	 * @var \ElkArte\Database\QueryInterface
 	 */
 	protected $_db = null;
 
 	/**
 	 * The modSettings
+	 *
 	 * @var object
 	 */
 	protected $_modSettings = array();
@@ -39,6 +41,7 @@ class DatabaseHandler extends \SessionHandler
 	 * Make "global" items available to the class
 	 *
 	 * @param object|null $db
+	 * @throws \Exception
 	 */
 	public function __construct($db = null)
 	{

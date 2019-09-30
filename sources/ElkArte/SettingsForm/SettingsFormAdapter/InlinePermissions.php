@@ -12,6 +12,8 @@
 
 namespace ElkArte\SettingsForm\SettingsFormAdapter;
 
+use ElkArte\Permissions;
+
 /**
  * Class to initialize inline permissions sub-form and save its settings
  */
@@ -46,6 +48,19 @@ class InlinePermissions extends Adapter
 	private $db;
 
 	/**
+	 * InlinePermissions constructor.
+	 */
+	public function __construct()
+	{
+		$this->db = database();
+
+		// Make sure they can't do certain things,
+		// unless they have the right permissions.
+		$this->permissionsObject = new Permissions;
+		$this->illegal_permissions = $this->permissionsObject->getIllegalPermissions();
+	}
+
+	/**
 	 * @return string[]
 	 */
 	public function getPermissions()
@@ -62,8 +77,7 @@ class InlinePermissions extends Adapter
 
 		// Load the permission list
 		$this->permissionList = array_map(
-			function ($permission)
-			{
+			function ($permission) {
 				return $permission[1];
 			}, $this->permissions
 		);
@@ -89,19 +103,6 @@ class InlinePermissions extends Adapter
 	public function setExcludedGroups($excluded_groups)
 	{
 		$this->excluded_groups = $excluded_groups;
-	}
-
-	/**
-	 * InlinePermissions constructor.
-	 */
-	public function __construct()
-	{
-		$this->db = database();
-
-		// Make sure they can't do certain things,
-		// unless they have the right permissions.
-		$this->permissionsObject = new \ElkArte\Permissions;
-		$this->illegal_permissions = $this->permissionsObject->getIllegalPermissions();
 	}
 
 	/**
@@ -237,36 +238,6 @@ class InlinePermissions extends Adapter
 	}
 
 	/**
-	 * Prepare the template by loading context
-	 * variables for each permission.
-	 *
-	 * @uses ManagePermissions template
-	 * @uses ManagePermissions languuge
-	 */
-	protected function prepareContext()
-	{
-		global $context, $txt;
-
-		theme()->getTemplates()->load('ManagePermissions');
-		theme()->getTemplates()->loadLanguageFile('ManagePermissions');
-
-		// Load the names for guests
-		foreach ($this->permissions as $permission)
-		{
-			if (isset($this->context[$permission[1]][-1]))
-			{
-				$this->context[$permission[1]][-1]['name'] = $txt['membergroups_guests'];
-			}
-			if (isset($this->context[$permission[1]][0]))
-			{
-				$this->context[$permission[1]][0]['name'] = $txt['membergroups_members'];
-			}
-		}
-
-		$context['permissions'] = $this->context;
-	}
-
-	/**
 	 * Some permissions cannot be given to certain groups. Remove them.
 	 */
 	private function filterIllegalPermissions()
@@ -297,5 +268,35 @@ class InlinePermissions extends Adapter
 				unset($this->context[$permission[1]]);
 			}
 		}
+	}
+
+	/**
+	 * Prepare the template by loading context
+	 * variables for each permission.
+	 *
+	 * @uses ManagePermissions template
+	 * @uses ManagePermissions languuge
+	 */
+	protected function prepareContext()
+	{
+		global $context, $txt;
+
+		theme()->getTemplates()->load('ManagePermissions');
+		theme()->getTemplates()->loadLanguageFile('ManagePermissions');
+
+		// Load the names for guests
+		foreach ($this->permissions as $permission)
+		{
+			if (isset($this->context[$permission[1]][-1]))
+			{
+				$this->context[$permission[1]][-1]['name'] = $txt['membergroups_guests'];
+			}
+			if (isset($this->context[$permission[1]][0]))
+			{
+				$this->context[$permission[1]][0]['name'] = $txt['membergroups_members'];
+			}
+		}
+
+		$context['permissions'] = $this->context;
 	}
 }

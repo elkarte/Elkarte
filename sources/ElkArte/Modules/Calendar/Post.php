@@ -8,7 +8,7 @@
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause (see accompanying LICENSE.txt file)
  *
  * This file contains code covered by:
- * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * copyright: 2011 Simple Machines (http://www.simplemachines.org)
  *
  * @version 2.0 dev
  *
@@ -16,7 +16,13 @@
 
 namespace ElkArte\Modules\Calendar;
 
+use ElkArte\CalendarEvent;
+use ElkArte\EventManager;
 use ElkArte\Exceptions\ControllerRedirectException;
+use ElkArte\Exceptions\Exception;
+use ElkArte\HttpReq;
+use ElkArte\Modules\AbstractModule;
+use ElkArte\Util;
 
 /**
  * This class's task is to bind the posting of a topic to a calendar event.
@@ -24,10 +30,11 @@ use ElkArte\Exceptions\ControllerRedirectException;
  *
  * @package Calendar
  */
-class Post extends \ElkArte\Modules\AbstractModule
+class Post extends AbstractModule
 {
 	/**
 	 * If we are making a topic event
+	 *
 	 * @var bool
 	 */
 	protected static $_make_event = false;
@@ -35,7 +42,7 @@ class Post extends \ElkArte\Modules\AbstractModule
 	/**
 	 * {@inheritdoc }
 	 */
-	public static function hooks(\ElkArte\EventManager $eventsManager)
+	public static function hooks(EventManager $eventsManager)
 	{
 		global $context, $modSettings;
 
@@ -80,8 +87,10 @@ class Post extends \ElkArte\Modules\AbstractModule
 	 */
 	public function before_save_post($post_errors)
 	{
-		if (!isset($_REQUEST['deleteevent']) && \ElkArte\Util::htmltrim($_POST['evtitle']) === '')
+		if (!isset($_REQUEST['deleteevent']) && Util::htmltrim($_POST['evtitle']) === '')
+		{
 			$post_errors->addError('no_event');
+		}
 	}
 
 	/**
@@ -93,10 +102,10 @@ class Post extends \ElkArte\Modules\AbstractModule
 	{
 		global $modSettings, $board, $topic;
 
-		$req = \ElkArte\HttpReq::instance();
+		$req = HttpReq::instance();
 		$eventid = $req->getPost('eventid', 'intval', -1);
 
-		$event = new \ElkArte\CalendarEvent($eventid, $modSettings);
+		$event = new CalendarEvent($eventid, $modSettings);
 
 		try
 		{
@@ -131,7 +140,9 @@ class Post extends \ElkArte\Modules\AbstractModule
 
 			// Delete it?
 			if (isset($_REQUEST['deleteevent']))
+			{
 				$event->remove();
+			}
 			// ... or just update it?
 			else
 			{
@@ -155,7 +166,7 @@ class Post extends \ElkArte\Modules\AbstractModule
 		$event_id = isset($_REQUEST['eventid']) ? (int) $_REQUEST['eventid'] : -1;
 
 		// Editing an event?  (but NOT previewing!?)
-		if ($event_id != -1 && !isset($_REQUEST['subject']))
+		if ($event_id !== -1 && !isset($_REQUEST['subject']))
 		{
 			// If the user doesn't have permission to edit the post in this topic, redirect them.
 			if ((empty($id_member_poster) || $id_member_poster != $this->user->id || !allowedTo('modify_own')) && !allowedTo('modify_any'))
@@ -182,7 +193,9 @@ class Post extends \ElkArte\Modules\AbstractModule
 
 		// They might want to pick a board.
 		if (!isset($context['current_board']))
+		{
 			$context['current_board'] = 0;
+		}
 
 		// Start loading up the event info.
 		$context['event'] = array();
@@ -202,9 +215,13 @@ class Post extends \ElkArte\Modules\AbstractModule
 
 			// Make sure the user is allowed to edit this event.
 			if ($event_info['member'] != $this->user->id)
+			{
 				isAllowedTo('calendar_edit_any');
+			}
 			elseif (!allowedTo('calendar_edit_any'))
+			{
 				isAllowedTo('calendar_edit_own');
+			}
 
 			$context['event']['month'] = $event_info['month'];
 			$context['event']['day'] = $event_info['day'];
@@ -217,37 +234,40 @@ class Post extends \ElkArte\Modules\AbstractModule
 			// Posting a new event? (or preview...)
 			$today = getdate();
 
-			// You must have a month and year specified!
-			if (isset($_REQUEST['month']))
-				$context['event']['month'] = (int) $_REQUEST['month'];
-			else
-				$context['event']['month'] = $today['mon'];
+			$context['event']['month'] = isset($_REQUEST['month']) ? (int) $_REQUEST['month'] : $today['mon'];
 
-			if (isset($_REQUEST['year']))
-				$context['event']['year'] = (int) $_REQUEST['year'];
-			else
-				$context['event']['year'] = $today['year'];
+			$context['event']['year'] = isset($_REQUEST['year']) ? (int) $_REQUEST['year'] : $today['year'];
 
 			if (isset($_REQUEST['day']))
+			{
 				$context['event']['day'] = (int) $_REQUEST['day'];
+			}
 			else
-				$context['event']['day'] = $context['event']['month'] == $today['mon'] ? $today['mday'] : 0;
+			{
+				$context['event']['day'] = $context['event']['month'] === $today['mon'] ? $today['mday'] : 0;
+			}
 
 			$context['event']['span'] = isset($_REQUEST['span']) ? $_REQUEST['span'] : 1;
 
 			// Make sure the year and month are in the valid range.
 			if ($context['event']['month'] < 1 || $context['event']['month'] > 12)
-				throw new \ElkArte\Exceptions\Exception('invalid_month', false);
+			{
+				throw new Exception('invalid_month', false);
+			}
 
 			if ($context['event']['year'] < $modSettings['cal_minyear'] || $context['event']['year'] > date('Y') + $modSettings['cal_limityear'])
-				throw new \ElkArte\Exceptions\Exception('invalid_year', false);
+			{
+				throw new Exception('invalid_year', false);
+			}
 
 			// Get a list of boards they can post in.
 			require_once(SUBSDIR . '/Boards.subs.php');
 
 			$boards = boardsAllowedTo('post_new');
 			if (empty($boards))
-				throw new \ElkArte\Exceptions\Exception('cannot_post_new', 'user');
+			{
+				throw new Exception('cannot_post_new', 'user');
+			}
 
 			// Load a list of boards for this event in the context.
 			$boardListOptions = array(

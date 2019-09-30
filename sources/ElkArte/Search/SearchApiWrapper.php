@@ -8,13 +8,16 @@
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause (see accompanying LICENSE.txt file)
  *
  * This file contains code covered by:
- * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * copyright: 2011 Simple Machines (http://www.simplemachines.org)
  *
  * @version 2.0 dev
  *
  */
 
 namespace ElkArte\Search;
+
+use ElkArte\Errors\Errors;
+use ElkArte\ValuesContainer;
 
 /**
  * Actually do the searches
@@ -25,6 +28,7 @@ class SearchApiWrapper
 
 	/**
 	 * Holds instance of the search api in use such as ElkArte\Search\API\Standard_Search
+	 *
 	 * @var null|object
 	 */
 	protected $_searchAPI = null;
@@ -38,9 +42,46 @@ class SearchApiWrapper
 	{
 		if (!is_object($config))
 		{
-			$config = new \ElkArte\ValuesContainer((array) $config);
+			$config = new ValuesContainer((array) $config);
 		}
 		$this->load($config->search_index, $config, $searchParams);
+	}
+
+	/**
+	 * Creates a search API and returns the object.
+	 *
+	 * @param string $searchClass
+	 * @param \ElkArte\ValuesContainer $config
+	 */
+	protected function load($searchClass, $config, $searchParams)
+	{
+		global $txt;
+
+		require_once(SUBSDIR . '/Package.subs.php');
+
+		// Load up the search API we are going to use.
+		if (empty($searchClass))
+		{
+			$searchClass = self::DEFAULT_API;
+		}
+
+		// Try to initialize the API
+		$fqcn = '\\ElkArte\\Search\\API\\' . ucfirst($searchClass);
+		if (class_exists($fqcn) && is_a($fqcn, '\\ElkArte\\Search\\API\\AbstractAPI', true))
+		{
+			// Create an instance of the search API and check it is valid for this version of the software.
+			$this->_searchAPI = new $fqcn($config, $searchParams);
+		}
+
+		// An invalid Search API? Log the error and set it to use the standard API
+		if (!$this->_searchAPI || (!$this->_searchAPI->isValid()) || !matchPackageVersion(Search::FORUM_VERSION, $this->_searchAPI->min_elk_version . '-' . $this->_searchAPI->version_compatible))
+		{
+			// Log the error.
+			theme()->getTemplates()->loadLanguageFile('Errors');
+			Errors::instance()->log_error(sprintf($txt['search_api_not_compatible'], $fqcn), 'critical');
+
+			$this->_searchAPI = new API\Standard($config, $searchParams);
+		}
 	}
 
 	/**
@@ -118,6 +159,7 @@ class SearchApiWrapper
 
 	/**
 	 * Wrapper for searchQuery of the SearchAPI
+	 *
 	 * @param string[] $search_words
 	 * @param string[] $excluded_words
 	 * @param mixed[] $participants
@@ -224,42 +266,5 @@ class SearchApiWrapper
 	public function getNumResults()
 	{
 		return $this->_searchAPI->getNumResults();
-	}
-
-	/**
-	 * Creates a search API and returns the object.
-	 *
-	 * @param string $searchClass
-	 * @param \ElkArte\ValuesContainer $config
-	 */
-	protected function load($searchClass, $config, $searchParams)
-	{
-		global $txt;
-
-		require_once(SUBSDIR . '/Package.subs.php');
-
-		// Load up the search API we are going to use.
-		if (empty($searchClass))
-		{
-			$searchClass = self::DEFAULT_API;
-		}
-
-		// Try to initialize the API
-		$fqcn = '\\ElkArte\\Search\\API\\' . ucfirst($searchClass);
-		if (class_exists($fqcn) && is_a($fqcn, '\\ElkArte\\Search\\API\\SearchAPI', true))
-		{
-			// Create an instance of the search API and check it is valid for this version of the software.
-			$this->_searchAPI = new $fqcn($config, $searchParams);
-		}
-
-		// An invalid Search API? Log the error and set it to use the standard API
-		if (!$this->_searchAPI || (!$this->_searchAPI->isValid()) || !matchPackageVersion(Search::FORUM_VERSION, $this->_searchAPI->min_elk_version . '-' . $this->_searchAPI->version_compatible))
-		{
-			// Log the error.
-			theme()->getTemplates()->loadLanguageFile('Errors');
-			\ElkArte\Errors\Errors::instance()->log_error(sprintf($txt['search_api_not_compatible'], $fqcn), 'critical');
-
-			$this->_searchAPI = new API\Standard($config, $searchParams);
-		}
 	}
 }

@@ -15,6 +15,11 @@ namespace ElkArte\UrlGenerator\Semantic;
 
 use ElkArte\UrlGenerator\AbstractUrlGenerator;
 
+/**
+ * Class Standard
+ *
+ * @package ElkArte\UrlGenerator\Semantic
+ */
 class Standard extends AbstractUrlGenerator
 {
 	/**

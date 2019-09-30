@@ -9,7 +9,7 @@
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause (see accompanying LICENSE.txt file)
  *
  * This file contains code covered by:
- * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * copyright: 2011 Simple Machines (http://www.simplemachines.org)
  *
  * @version 2.0 dev
  *
@@ -17,12 +17,19 @@
 
 namespace ElkArte\AdminController;
 
+use ElkArte\AbstractController;
+use ElkArte\Action;
+use ElkArte\DataValidator;
+use ElkArte\Exceptions\Exception;
+use ElkArte\SettingsForm\SettingsForm;
+use ElkArte\Util;
+
 /**
  * ManagePaid controller, administration controller for paid subscriptions.
  *
  * @package Subscriptions
  */
-class ManagePaid extends \ElkArte\AbstractController
+class ManagePaid extends AbstractController
 {
 	/**
 	 * The main entrance point for the 'Paid Subscription' screen,
@@ -69,7 +76,7 @@ class ManagePaid extends \ElkArte\AbstractController
 		);
 
 		// Some actions
-		$action = new \ElkArte\Action('manage_subscriptions');
+		$action = new Action('manage_subscriptions');
 
 		// Tabs for browsing the different subscription functions.
 		$context[$context['admin_menu_name']]['tab_data'] = array(
@@ -116,7 +123,7 @@ class ManagePaid extends \ElkArte\AbstractController
 		require_once(SUBSDIR . '/PaidSubscriptions.subs.php');
 
 		// Initialize the form
-		$settingsForm = new \ElkArte\SettingsForm\SettingsForm(\ElkArte\SettingsForm\SettingsForm::DB_ADAPTER);
+		$settingsForm = new SettingsForm(SettingsForm::DB_ADAPTER);
 
 		// Initialize it with our settings
 		$config_vars = $this->_settings();
@@ -146,7 +153,7 @@ class ManagePaid extends \ElkArte\AbstractController
 			// Check that the entered email addresses are valid
 			if (!empty($this->_req->post->paid_email_to))
 			{
-				$validator = new \ElkArte\DataValidator();
+				$validator = new DataValidator();
 
 				// Some cleaning and some rules
 				$validator->sanitation_rules(array('paid_email_to' => 'trim'));
@@ -155,7 +162,9 @@ class ManagePaid extends \ElkArte\AbstractController
 				$validator->text_replacements(array('paid_email_to' => $txt['paid_email_to']));
 
 				if ($validator->validate($this->_req->post))
+				{
 					$this->_req->post->paid_email_to = $validator->validation_data('paid_email_to');
+				}
 				else
 				{
 					// That's not an email, lets set it back in the form to be fixed and let them know its wrong
@@ -163,7 +172,9 @@ class ManagePaid extends \ElkArte\AbstractController
 					$context['error_type'] = 'minor';
 					$context['settings_message'] = array();
 					foreach ($validator->validation_errors() as $id => $error)
+					{
 						$context['settings_message'][] = $error;
+					}
 				}
 			}
 
@@ -202,17 +213,19 @@ class ManagePaid extends \ElkArte\AbstractController
 		// If the currency is set to something different then we need to set it to other for this to work and set it back shortly.
 		$modSettings['paid_currency'] = !empty($modSettings['paid_currency_code']) ? $modSettings['paid_currency_code'] : '';
 		if (!empty($modSettings['paid_currency_code']) && !in_array($modSettings['paid_currency_code'], array('usd', 'eur', 'gbp')))
+		{
 			$modSettings['paid_currency'] = 'other';
+		}
 
 		// These are all the default settings.
 		$config_vars = array(
-				array('select', 'paid_email', array(0 => $txt['paid_email_no'], 1 => $txt['paid_email_error'], 2 => $txt['paid_email_all']), 'subtext' => $txt['paid_email_desc']),
-				array('text', 'paid_email_to', 'subtext' => $txt['paid_email_to_desc'], 'size' => 60),
+			array('select', 'paid_email', array(0 => $txt['paid_email_no'], 1 => $txt['paid_email_error'], 2 => $txt['paid_email_all']), 'subtext' => $txt['paid_email_desc']),
+			array('text', 'paid_email_to', 'subtext' => $txt['paid_email_to_desc'], 'size' => 60),
 			'',
-				'dummy_currency' => array('select', 'paid_currency', array('usd' => $txt['usd'], 'eur' => $txt['eur'], 'gbp' => $txt['gbp'], 'other' => $txt['other']), 'javascript' => 'onchange="toggleCurrencyOther();"'),
-				array('text', 'paid_currency_code', 'subtext' => $txt['paid_currency_code_desc'], 'size' => 5, 'force_div_id' => 'custom_currency_code_div'),
-				array('text', 'paid_currency_symbol', 'subtext' => $txt['paid_currency_symbol_desc'], 'size' => 8, 'force_div_id' => 'custom_currency_symbol_div'),
-				array('check', 'paidsubs_test', 'subtext' => $txt['paidsubs_test_desc'], 'onclick' => 'return document.getElementById(\'paidsubs_test\').checked ? confirm(\'' . $txt['paidsubs_test_confirm'] . '\') : true;'),
+			'dummy_currency' => array('select', 'paid_currency', array('usd' => $txt['usd'], 'eur' => $txt['eur'], 'gbp' => $txt['gbp'], 'other' => $txt['other']), 'javascript' => 'onchange="toggleCurrencyOther();"'),
+			array('text', 'paid_currency_code', 'subtext' => $txt['paid_currency_code_desc'], 'size' => 5, 'force_div_id' => 'custom_currency_code_div'),
+			array('text', 'paid_currency_symbol', 'subtext' => $txt['paid_currency_symbol_desc'], 'size' => 8, 'force_div_id' => 'custom_currency_symbol_div'),
+			array('check', 'paidsubs_test', 'subtext' => $txt['paidsubs_test_desc'], 'onclick' => 'return document.getElementById(\'paidsubs_test\').checked ? confirm(\'' . $txt['paidsubs_test_confirm'] . '\') : true;'),
 		);
 
 		require_once(SUBSDIR . '/PaidSubscriptions.subs.php');
@@ -258,7 +271,9 @@ class ManagePaid extends \ElkArte\AbstractController
 
 		// Not made the settings yet?
 		if (empty($modSettings['paid_currency_symbol']))
-			throw new \ElkArte\Exceptions\Exception('paid_not_set_currency', false, array($scripturl . '?action=admin;area=paidsubscribe;sa=settings'));
+		{
+			throw new Exception('paid_not_set_currency', false, array($scripturl . '?action=admin;area=paidsubscribe;sa=settings'));
+		}
 
 		// Some basic stuff.
 		$context['page_title'] = $txt['paid_subs_view'];
@@ -273,12 +288,14 @@ class ManagePaid extends \ElkArte\AbstractController
 			'get_items' => array(
 				'function' => function () {
 					global $context;
+
 					return $context['subscriptions'];
 				},
 			),
 			'get_count' => array(
 				'function' => function () {
 					global $context;
+
 					return count($context['subscriptions']);
 				},
 			),
@@ -461,7 +478,9 @@ class ManagePaid extends \ElkArte\AbstractController
 
 				// There needs to be something.
 				if (empty($this->_req->post->span_value) || empty($this->_req->post->cost))
-					throw new \ElkArte\Exceptions\Exception('paid_no_cost_value');
+				{
+					throw new Exception('paid_no_cost_value');
+				}
 			}
 			// Flexible is harder but more fun ;)
 			else
@@ -476,7 +495,9 @@ class ManagePaid extends \ElkArte\AbstractController
 				);
 
 				if (empty($this->_req->post->cost_day) && empty($this->_req->post->cost_week) && empty($this->_req->post->cost_month) && empty($this->_req->post->cost_year))
-					throw new \ElkArte\Exceptions\Exception('paid_all_freq_blank');
+				{
+					throw new Exception('paid_all_freq_blank');
+				}
 			}
 
 			$cost = serialize($cost);
@@ -486,7 +507,9 @@ class ManagePaid extends \ElkArte\AbstractController
 			if (!empty($this->_req->post->addgroup))
 			{
 				foreach ($this->_req->post->addgroup as $id => $dummy)
+				{
 					$addGroups[] = (int) $id;
+				}
 			}
 			$addGroups = implode(',', $addGroups);
 
@@ -578,6 +601,282 @@ class ManagePaid extends \ElkArte\AbstractController
 	}
 
 	/**
+	 * Edit or add a user subscription.
+	 *
+	 * - Accessed from ?action=admin;area=paidsubscribe;sa=modifyuser
+	 */
+	public function action_modifyuser()
+	{
+		global $context, $txt, $modSettings;
+
+		require_once(SUBSDIR . '/PaidSubscriptions.subs.php');
+		loadSubscriptions();
+
+		$context['log_id'] = $this->_req->getQuery('lid', 'intval', 0);
+		$context['sub_id'] = $this->_req->getQuery('sid', 'intval', 0);
+		$context['action_type'] = $context['log_id'] ? 'edit' : 'add';
+
+		// Setup the template.
+		$context['sub_template'] = 'modify_user_subscription';
+		$context['page_title'] = $txt[$context['action_type'] . '_subscriber'];
+		loadJavascriptFile('suggest.js', array('defer' => true));
+
+		// If we haven't been passed the subscription ID get it.
+		if ($context['log_id'] && !$context['sub_id'])
+		{
+			$context['sub_id'] = validateSubscriptionID($context['log_id']);
+		}
+
+		if (!isset($context['subscriptions'][$context['sub_id']]))
+		{
+			throw new Exception('no_access', false);
+		}
+
+		$context['current_subscription'] = $context['subscriptions'][$context['sub_id']];
+
+		// Searching?
+		if (isset($this->_req->post->ssearch))
+		{
+			return $this->action_viewsub();
+		}
+		// Saving?
+		elseif (isset($this->_req->post->save_sub))
+		{
+			checkSession();
+
+			// Work out the dates...
+			$starttime = mktime($this->_req->post->hour, $this->_req->post->minute, 0, $this->_req->post->month, $this->_req->post->day, $this->_req->post->year);
+			$endtime = mktime($this->_req->post->hourend, $this->_req->post->minuteend, 0, $this->_req->post->monthend, $this->_req->post->dayend, $this->_req->post->yearend);
+
+			// Status.
+			$status = $this->_req->post->status;
+
+			// New one?
+			if (empty($context['log_id']))
+			{
+				// Find the user...
+				require_once(SUBSDIR . '/Members.subs.php');
+				$member = getMemberByName($this->_req->post->name);
+
+				if (empty($member))
+				{
+					throw new Exception('error_member_not_found');
+				}
+
+				if (alreadySubscribed($context['sub_id'], $member['id_member']))
+				{
+					throw new Exception('member_already_subscribed');
+				}
+
+				// Actually put the subscription in place.
+				if ($status == 1)
+				{
+					addSubscription($context['sub_id'], $member['id_member'], 0, $starttime, $endtime);
+				}
+				else
+				{
+					$details = array(
+						'id_subscribe' => $context['sub_id'],
+						'id_member' => $member['id_member'],
+						'id_group' => $member['id_group'],
+						'start_time' => $starttime,
+						'end_time' => $endtime,
+						'status' => $status,
+					);
+
+					logSubscription($details);
+				}
+			}
+			// Updating.
+			else
+			{
+				$subscription_status = getSubscriptionStatus($context['log_id']);
+
+				// Pick the right permission stuff depending on what the status is changing from/to.
+				if ($subscription_status['old_status'] == 1 && $status != 1)
+				{
+					removeSubscription($context['sub_id'], $subscription_status['id_member']);
+				}
+				elseif ($status == 1 && $subscription_status['old_status'] != 1)
+				{
+					addSubscription($context['sub_id'], $subscription_status['id_member'], 0, $starttime, $endtime);
+				}
+				else
+				{
+					$item = array(
+						'start_time' => $starttime,
+						'end_time' => $endtime,
+						'status' => $status,
+						'current_log_item' => $context['log_id']
+					);
+					updateSubscriptionItem($item);
+				}
+			}
+
+			// Done - redirect...
+			redirectexit('action=admin;area=paidsubscribe;sa=viewsub;sid=' . $context['sub_id']);
+		}
+		// Deleting?
+		elseif (isset($this->_req->post->delete) || isset($this->_req->post->finished))
+		{
+			checkSession();
+
+			// Do the actual deletes!
+			if (!empty($this->_req->post->delsub))
+			{
+				$toDelete = array();
+				foreach ($this->_req->post->delsub as $id => $dummy)
+				{
+					$toDelete[] = (int) $id;
+				}
+
+				$deletes = prepareDeleteSubscriptions($toDelete);
+
+				foreach ($deletes as $id_subscribe => $id_member)
+				{
+					removeSubscription($id_subscribe, $id_member, isset($this->_req->post->delete));
+				}
+			}
+			redirectexit('action=admin;area=paidsubscribe;sa=viewsub;sid=' . $context['sub_id']);
+		}
+
+		// Default attributes.
+		if ($context['action_type'] === 'add')
+		{
+			$context['sub'] = array(
+				'id' => 0,
+				'start' => array(
+					'year' => (int) strftime('%Y', time()),
+					'month' => (int) strftime('%m', time()),
+					'day' => (int) strftime('%d', time()),
+					'hour' => (int) strftime('%H', time()),
+					'min' => (int) strftime('%M', time()) < 10 ? '0' . (int) strftime('%M', time()) : (int) strftime('%M', time()),
+					'last_day' => 0,
+				),
+				'end' => array(
+					'year' => (int) strftime('%Y', time()),
+					'month' => (int) strftime('%m', time()),
+					'day' => (int) strftime('%d', time()),
+					'hour' => (int) strftime('%H', time()),
+					'min' => (int) strftime('%M', time()) < 10 ? '0' . (int) strftime('%M', time()) : (int) strftime('%M', time()),
+					'last_day' => 0,
+				),
+				'status' => 1,
+			);
+			$context['sub']['start']['last_day'] = (int) strftime('%d', mktime(0, 0, 0, $context['sub']['start']['month'] == 12 ? 1 : $context['sub']['start']['month'] + 1, 0, $context['sub']['start']['month'] == 12 ? $context['sub']['start']['year'] + 1 : $context['sub']['start']['year']));
+			$context['sub']['end']['last_day'] = (int) strftime('%d', mktime(0, 0, 0, $context['sub']['end']['month'] == 12 ? 1 : $context['sub']['end']['month'] + 1, 0, $context['sub']['end']['month'] == 12 ? $context['sub']['end']['year'] + 1 : $context['sub']['end']['year']));
+
+			if (isset($this->_req->query->uid))
+			{
+				require_once(SUBSDIR . '/Members.subs.php');
+
+				// Get the latest activated member's display name.
+				$result = getBasicMemberData((int) $this->_req->query->uid);
+				$context['sub']['username'] = $result['real_name'];
+			}
+			else
+			{
+				$context['sub']['username'] = '';
+			}
+		}
+		// Otherwise load the existing info.
+		else
+		{
+			$row = getPendingSubscriptions($context['log_id']);
+			if (empty($row))
+			{
+				throw new Exception('no_access', false);
+			}
+
+			// Any pending payments?
+			$context['pending_payments'] = array();
+			if (!empty($row['pending_details']))
+			{
+				$pending_details = Util::unserialize($row['pending_details']);
+				foreach ($pending_details as $id => $pending)
+				{
+					// Only this type need be displayed.
+					if ($pending[3] === 'payback')
+					{
+						// Work out what the options were.
+						$costs = Util::unserialize($context['current_subscription']['real_cost']);
+
+						if ($context['current_subscription']['real_length'] === 'F')
+						{
+							foreach ($costs as $duration => $cost)
+							{
+								if ($cost != 0 && $cost == $pending[1] && $duration == $pending[2])
+								{
+									$context['pending_payments'][$id] = array(
+										'desc' => sprintf($modSettings['paid_currency_symbol'], $cost . '/' . $txt[$duration]),
+									);
+								}
+							}
+						}
+						elseif ($costs['fixed'] == $pending[1])
+						{
+							$context['pending_payments'][$id] = array(
+								'desc' => sprintf($modSettings['paid_currency_symbol'], $costs['fixed']),
+							);
+						}
+					}
+				}
+
+				// Check if we are adding/removing any.
+				if (isset($this->_req->query->pending))
+				{
+					foreach ($pending_details as $id => $pending)
+					{
+						// Found the one to action?
+						if ($this->_req->query->pending == $id && $pending[3] === 'payback' && isset($context['pending_payments'][$id]))
+						{
+							// Flexible?
+							if (isset($this->_req->query->accept))
+							{
+								addSubscription($context['current_subscription']['id'], $row['id_member'], $context['current_subscription']['real_length'] === 'F' ? strtoupper(substr($pending[2], 0, 1)) : 0);
+							}
+							unset($pending_details[$id]);
+
+							$new_details = serialize($pending_details);
+
+							// Update the entry.
+							updatePendingSubscription($context['log_id'], $new_details);
+
+							// Reload
+							redirectexit('action=admin;area=paidsubscribe;sa=modifyuser;lid=' . $context['log_id']);
+						}
+					}
+				}
+			}
+
+			$context['sub_id'] = $row['id_subscribe'];
+			$context['sub'] = array(
+				'id' => 0,
+				'start' => array(
+					'year' => (int) strftime('%Y', $row['start_time']),
+					'month' => (int) strftime('%m', $row['start_time']),
+					'day' => (int) strftime('%d', $row['start_time']),
+					'hour' => (int) strftime('%H', $row['start_time']),
+					'min' => (int) strftime('%M', $row['start_time']) < 10 ? '0' . (int) strftime('%M', $row['start_time']) : (int) strftime('%M', $row['start_time']),
+					'last_day' => 0,
+				),
+				'end' => array(
+					'year' => (int) strftime('%Y', $row['end_time']),
+					'month' => (int) strftime('%m', $row['end_time']),
+					'day' => (int) strftime('%d', $row['end_time']),
+					'hour' => (int) strftime('%H', $row['end_time']),
+					'min' => (int) strftime('%M', $row['end_time']) < 10 ? '0' . (int) strftime('%M', $row['end_time']) : (int) strftime('%M', $row['end_time']),
+					'last_day' => 0,
+				),
+				'status' => $row['status'],
+				'username' => $row['username'],
+			);
+			$context['sub']['start']['last_day'] = (int) strftime('%d', mktime(0, 0, 0, $context['sub']['start']['month'] == 12 ? 1 : $context['sub']['start']['month'] + 1, 0, $context['sub']['start']['month'] == 12 ? $context['sub']['start']['year'] + 1 : $context['sub']['start']['year']));
+			$context['sub']['end']['last_day'] = (int) strftime('%d', mktime(0, 0, 0, $context['sub']['end']['month'] == 12 ? 1 : $context['sub']['end']['month'] + 1, 0, $context['sub']['end']['month'] == 12 ? $context['sub']['end']['year'] + 1 : $context['sub']['end']['year']));
+		}
+	}
+
+	/**
 	 * View all the users subscribed to a particular subscription.
 	 *
 	 * What it does:
@@ -614,7 +913,9 @@ class ManagePaid extends \ElkArte\AbstractController
 			'base_href' => $scripturl . '?action=admin;area=paidsubscribe;sa=viewsub;sid=' . $context['sub_id'],
 			'default_sort_col' => 'name',
 			'get_items' => array(
-				'function' => array($this, 'getSubscribedUsers'),
+				'function' => function ($start, $items_per_page, $sort, $id_sub, $search_string, $search_vars) {
+					return $this->getSubscribedUsers($start, $items_per_page, $sort, $id_sub, $search_string, $search_vars);
+				},
 				'params' => array(
 					$context['sub_id'],
 					$search_string,
@@ -622,7 +923,9 @@ class ManagePaid extends \ElkArte\AbstractController
 				),
 			),
 			'get_count' => array(
-				'function' => array($this, 'getSubscribedUserCount'),
+				'function' => function ($id_sub, $search_string, $search_vars) {
+					return $this->getSubscribedUserCount($id_sub, $search_string, $search_vars);
+				},
 				'params' => array(
 					$context['sub_id'],
 					$search_string,
@@ -763,22 +1066,6 @@ class ManagePaid extends \ElkArte\AbstractController
 	}
 
 	/**
-	 * Returns the number of subscribers to a specific subscription in the system
-	 *
-	 * - Callback for createList()
-	 *
-	 * @param int $id_sub
-	 * @param string $search_string
-	 * @param mixed[] $search_vars
-	 *
-	 * @return
-	 */
-	public function getSubscribedUserCount($id_sub, $search_string, $search_vars)
-	{
-		return list_getSubscribedUserCount($id_sub, $search_string, $search_vars);
-	}
-
-	/**
 	 * Returns an array of subscription details and members for a specific subscription
 	 *
 	 * - Callback for createList()
@@ -798,252 +1085,18 @@ class ManagePaid extends \ElkArte\AbstractController
 	}
 
 	/**
-	 * Edit or add a user subscription.
+	 * Returns the number of subscribers to a specific subscription in the system
 	 *
-	 * - Accessed from ?action=admin;area=paidsubscribe;sa=modifyuser
+	 * - Callback for createList()
+	 *
+	 * @param int $id_sub
+	 * @param string $search_string
+	 * @param mixed[] $search_vars
+	 *
+	 * @return
 	 */
-	public function action_modifyuser()
+	public function getSubscribedUserCount($id_sub, $search_string, $search_vars)
 	{
-		global $context, $txt, $modSettings;
-
-		require_once(SUBSDIR . '/PaidSubscriptions.subs.php');
-		loadSubscriptions();
-
-		$context['log_id'] = $this->_req->getQuery('lid', 'intval', 0);
-		$context['sub_id'] = $this->_req->getQuery('sid', 'intval', 0);
-		$context['action_type'] = $context['log_id'] ? 'edit' : 'add';
-
-		// Setup the template.
-		$context['sub_template'] = 'modify_user_subscription';
-		$context['page_title'] = $txt[$context['action_type'] . '_subscriber'];
-		loadJavascriptFile('suggest.js', array('defer' => true));
-
-		// If we haven't been passed the subscription ID get it.
-		if ($context['log_id'] && !$context['sub_id'])
-			$context['sub_id'] = validateSubscriptionID($context['log_id']);
-
-		if (!isset($context['subscriptions'][$context['sub_id']]))
-			throw new \ElkArte\Exceptions\Exception('no_access', false);
-
-		$context['current_subscription'] = $context['subscriptions'][$context['sub_id']];
-
-		// Searching?
-		if (isset($this->_req->post->ssearch))
-			return $this->action_viewsub();
-		// Saving?
-		elseif (isset($this->_req->post->save_sub))
-		{
-			checkSession();
-
-			// Work out the dates...
-			$starttime = mktime($this->_req->post->hour, $this->_req->post->minute, 0, $this->_req->post->month, $this->_req->post->day, $this->_req->post->year);
-			$endtime = mktime($this->_req->post->hourend, $this->_req->post->minuteend, 0, $this->_req->post->monthend, $this->_req->post->dayend, $this->_req->post->yearend);
-
-			// Status.
-			$status = $this->_req->post->status;
-
-			// New one?
-			if (empty($context['log_id']))
-			{
-				// Find the user...
-				require_once(SUBSDIR . '/Members.subs.php');
-				$member = getMemberByName($this->_req->post->name);
-
-				if (empty($member))
-					throw new \ElkArte\Exceptions\Exception('error_member_not_found');
-
-				if (alreadySubscribed($context['sub_id'], $member['id_member']))
-					throw new \ElkArte\Exceptions\Exception('member_already_subscribed');
-
-				// Actually put the subscription in place.
-				if ($status == 1)
-					addSubscription($context['sub_id'], $member['id_member'], 0, $starttime, $endtime);
-				else
-				{
-					$details = array(
-						'id_subscribe' => $context['sub_id'],
-						'id_member' => $member['id_member'],
-						'id_group' => $member['id_group'],
-						'start_time' => $starttime,
-						'end_time' => $endtime,
-						'status' => $status,
-					);
-
-					logSubscription($details);
-				}
-			}
-			// Updating.
-			else
-			{
-				$subscription_status = getSubscriptionStatus($context['log_id']);
-
-				// Pick the right permission stuff depending on what the status is changing from/to.
-				if ($subscription_status['old_status'] == 1 && $status != 1)
-					removeSubscription($context['sub_id'], $subscription_status['id_member']);
-
-				elseif ($status == 1 && $subscription_status['old_status'] != 1)
-					addSubscription($context['sub_id'], $subscription_status['id_member'], 0, $starttime, $endtime);
-
-				else
-				{
-					$item = array(
-						'start_time' => $starttime,
-						'end_time' => $endtime,
-						'status' => $status,
-						'current_log_item' => $context['log_id']
-					);
-					updateSubscriptionItem($item);
-				}
-			}
-
-			// Done - redirect...
-			redirectexit('action=admin;area=paidsubscribe;sa=viewsub;sid=' . $context['sub_id']);
-		}
-		// Deleting?
-		elseif (isset($this->_req->post->delete) || isset($this->_req->post->finished))
-		{
-			checkSession();
-
-			// Do the actual deletes!
-			if (!empty($this->_req->post->delsub))
-			{
-				$toDelete = array();
-				foreach ($this->_req->post->delsub as $id => $dummy)
-					$toDelete[] = (int) $id;
-
-				$deletes = prepareDeleteSubscriptions($toDelete);
-
-				foreach ($deletes as $id_subscribe => $id_member)
-					removeSubscription($id_subscribe, $id_member, isset($this->_req->post->delete));
-			}
-			redirectexit('action=admin;area=paidsubscribe;sa=viewsub;sid=' . $context['sub_id']);
-		}
-
-		// Default attributes.
-		if ($context['action_type'] === 'add')
-		{
-			$context['sub'] = array(
-				'id' => 0,
-				'start' => array(
-					'year' => (int) strftime('%Y', time()),
-					'month' => (int) strftime('%m', time()),
-					'day' => (int) strftime('%d', time()),
-					'hour' => (int) strftime('%H', time()),
-					'min' => (int) strftime('%M', time()) < 10 ? '0' . (int) strftime('%M', time()) : (int) strftime('%M', time()),
-					'last_day' => 0,
-				),
-				'end' => array(
-					'year' => (int) strftime('%Y', time()),
-					'month' => (int) strftime('%m', time()),
-					'day' => (int) strftime('%d', time()),
-					'hour' => (int) strftime('%H', time()),
-					'min' => (int) strftime('%M', time()) < 10 ? '0' . (int) strftime('%M', time()) : (int) strftime('%M', time()),
-					'last_day' => 0,
-				),
-				'status' => 1,
-			);
-			$context['sub']['start']['last_day'] = (int) strftime('%d', mktime(0, 0, 0, $context['sub']['start']['month'] == 12 ? 1 : $context['sub']['start']['month'] + 1, 0, $context['sub']['start']['month'] == 12 ? $context['sub']['start']['year'] + 1 : $context['sub']['start']['year']));
-			$context['sub']['end']['last_day'] = (int) strftime('%d', mktime(0, 0, 0, $context['sub']['end']['month'] == 12 ? 1 : $context['sub']['end']['month'] + 1, 0, $context['sub']['end']['month'] == 12 ? $context['sub']['end']['year'] + 1 : $context['sub']['end']['year']));
-
-			if (isset($this->_req->query->uid))
-			{
-				require_once(SUBSDIR . '/Members.subs.php');
-
-				// Get the latest activated member's display name.
-				$result = getBasicMemberData((int) $this->_req->query->uid);
-				$context['sub']['username'] = $result['real_name'];
-			}
-			else
-				$context['sub']['username'] = '';
-		}
-		// Otherwise load the existing info.
-		else
-		{
-			$row = getPendingSubscriptions($context['log_id']);
-			if (empty($row))
-				throw new \ElkArte\Exceptions\Exception('no_access', false);
-
-			// Any pending payments?
-			$context['pending_payments'] = array();
-			if (!empty($row['pending_details']))
-			{
-				$pending_details = \ElkArte\Util::unserialize($row['pending_details']);
-				foreach ($pending_details as $id => $pending)
-				{
-					// Only this type need be displayed.
-					if ($pending[3] === 'payback')
-					{
-						// Work out what the options were.
-						$costs = \ElkArte\Util::unserialize($context['current_subscription']['real_cost']);
-
-						if ($context['current_subscription']['real_length'] === 'F')
-						{
-							foreach ($costs as $duration => $cost)
-							{
-								if ($cost != 0 && $cost == $pending[1] && $duration == $pending[2])
-									$context['pending_payments'][$id] = array(
-										'desc' => sprintf($modSettings['paid_currency_symbol'], $cost . '/' . $txt[$duration]),
-									);
-							}
-						}
-						elseif ($costs['fixed'] == $pending[1])
-						{
-							$context['pending_payments'][$id] = array(
-								'desc' => sprintf($modSettings['paid_currency_symbol'], $costs['fixed']),
-							);
-						}
-					}
-				}
-
-				// Check if we are adding/removing any.
-				if (isset($this->_req->query->pending))
-				{
-					foreach ($pending_details as $id => $pending)
-					{
-						// Found the one to action?
-						if ($this->_req->query->pending == $id && $pending[3] === 'payback' && isset($context['pending_payments'][$id]))
-						{
-							// Flexible?
-							if (isset($this->_req->query->accept))
-								addSubscription($context['current_subscription']['id'], $row['id_member'], $context['current_subscription']['real_length'] === 'F' ? strtoupper(substr($pending[2], 0, 1)) : 0);
-							unset($pending_details[$id]);
-
-							$new_details = serialize($pending_details);
-
-							// Update the entry.
-							updatePendingSubscription($context['log_id'], $new_details);
-
-							// Reload
-							redirectexit('action=admin;area=paidsubscribe;sa=modifyuser;lid=' . $context['log_id']);
-						}
-					}
-				}
-			}
-
-			$context['sub_id'] = $row['id_subscribe'];
-			$context['sub'] = array(
-				'id' => 0,
-				'start' => array(
-					'year' => (int) strftime('%Y', $row['start_time']),
-					'month' => (int) strftime('%m', $row['start_time']),
-					'day' => (int) strftime('%d', $row['start_time']),
-					'hour' => (int) strftime('%H', $row['start_time']),
-					'min' => (int) strftime('%M', $row['start_time']) < 10 ? '0' . (int) strftime('%M', $row['start_time']) : (int) strftime('%M', $row['start_time']),
-					'last_day' => 0,
-				),
-				'end' => array(
-					'year' => (int) strftime('%Y', $row['end_time']),
-					'month' => (int) strftime('%m', $row['end_time']),
-					'day' => (int) strftime('%d', $row['end_time']),
-					'hour' => (int) strftime('%H', $row['end_time']),
-					'min' => (int) strftime('%M', $row['end_time']) < 10 ? '0' . (int) strftime('%M', $row['end_time']) : (int) strftime('%M', $row['end_time']),
-					'last_day' => 0,
-				),
-				'status' => $row['status'],
-				'username' => $row['username'],
-			);
-			$context['sub']['start']['last_day'] = (int) strftime('%d', mktime(0, 0, 0, $context['sub']['start']['month'] == 12 ? 1 : $context['sub']['start']['month'] + 1, 0, $context['sub']['start']['month'] == 12 ? $context['sub']['start']['year'] + 1 : $context['sub']['start']['year']));
-			$context['sub']['end']['last_day'] = (int) strftime('%d', mktime(0, 0, 0, $context['sub']['end']['month'] == 12 ? 1 : $context['sub']['end']['month'] + 1, 0, $context['sub']['end']['month'] == 12 ? $context['sub']['end']['year'] + 1 : $context['sub']['end']['year']));
-		}
+		return list_getSubscribedUserCount($id_sub, $search_string, $search_vars);
 	}
 }

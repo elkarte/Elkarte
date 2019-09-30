@@ -8,7 +8,7 @@
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause (see accompanying LICENSE.txt file)
  *
  * This file contains code covered by:
- * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * copyright: 2011 Simple Machines (http://www.simplemachines.org)
  *
  * @version 2.0 dev
  *
@@ -70,7 +70,9 @@ class Birthdayemails implements ScheduledTaskInterface
 		while ($row = $db->fetch_assoc($result))
 		{
 			if (!isset($birthdays[$row['lngfile']]))
+			{
 				$birthdays[$row['lngfile']] = array();
+			}
 			$birthdays[$row['lngfile']][$row['id_member']] = array(
 				'name' => $row['real_name'],
 				'email' => $row['email_address']

@@ -8,13 +8,16 @@
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause (see accompanying LICENSE.txt file)
  *
  * This file contains code covered by:
- * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * copyright: 2011 Simple Machines (http://www.simplemachines.org)
  *
  * @version 2.0 dev
  *
  */
 
 namespace ElkArte\Search;
+
+use ElkArte\Errors\Errors;
+use ElkArte\Exceptions\Exception;
 
 class WeightFactors
 {
@@ -30,21 +33,6 @@ class WeightFactors
 		$this->_is_admin = (bool) $is_admin;
 
 		$this->_setup_weight_factors();
-	}
-
-	public function getFactors()
-	{
-		return $this->_weight_factors;
-	}
-
-	public function getWeight()
-	{
-		return $this->_weight;
-	}
-
-	public function getTotal()
-	{
-		return $this->_weight_total;
 	}
 
 	/**
@@ -105,11 +93,11 @@ class WeightFactors
 			// Admins can be bothered with a failure
 			if ($this->_is_admin)
 			{
-				throw new \ElkArte\Exceptions\Exception('search_invalid_weights');
+				throw new Exception('search_invalid_weights');
 			}
 
 			// Even if users will get an answer, the admin should know something is broken
-			\ElkArte\Errors\Errors::instance()->log_lang_error('search_invalid_weights');
+			Errors::instance()->log_lang_error('search_invalid_weights');
 
 			// Instead is better to give normal users and guests some kind of result
 			// using our defaults.
@@ -132,5 +120,20 @@ class WeightFactors
 			$this->_weight[$weight_factor] = (int) ($weights['search_weight_' . $weight_factor] ?? 0);
 			$this->_weight_total += $this->_weight[$weight_factor];
 		}
+	}
+
+	public function getFactors()
+	{
+		return $this->_weight_factors;
+	}
+
+	public function getWeight()
+	{
+		return $this->_weight;
+	}
+
+	public function getTotal()
+	{
+		return $this->_weight_total;
 	}
 }

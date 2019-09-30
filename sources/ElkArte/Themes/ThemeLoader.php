@@ -13,267 +13,26 @@
 
 namespace ElkArte\Themes;
 
+use ElkArte\Cache\Cache;
+use ElkArte\ext\Composer\Autoload\ClassLoader;
+use ElkArte\Hooks;
+use ElkArte\HttpReq;
 use ElkArte\User;
+use ElkArte\Util;
 
 /**
  * Class ThemeLoader
  */
 class ThemeLoader
 {
+	/**@var mixed|\ElkArte\ValuesContainer */
+	public $user;
+
 	/** @var int The id of the theme being used */
 	private $id;
 
 	/** @var Theme The current theme. */
 	private $theme;
-
-	/**
-	 * Resolves the ID of a theme.
-	 *
-	 * The identifier can be specified in:
-	 * - a GET variable
-	 * - the session
-	 * - user's prefrences
-	 * - board
-	 * - forum default
-	 *
-	 * In addition, the ID is verified against a comma-seperated list of
-	 * known good themes. This check is skipped if the user is an admin.
-	 *
-	 * @return void Theme ID to load
-	 */
-	private function getThemeId()
-	{
-		global $modSettings, $board_info, $ssi_theme;
-
-		if (!empty($modSettings['theme_allow']) || allowedTo('admin_forum'))
-		{
-			// The theme was specified by REQUEST.
-			if (!empty($_REQUEST['theme']))
-			{
-				$this->id = (int) $_REQUEST['theme'];
-				$_SESSION['theme'] = $this->id;
-			}
-			// The theme was specified by REQUEST... previously.
-			elseif (!empty($_SESSION['theme']))
-			{
-				$this->id = (int) $_SESSION['theme'];
-			}
-			// The theme is just the user's choice. (might use ?board=1;theme=0 to force board theme.)
-			elseif (!empty($this->user->theme))
-			{
-				$this->id = $this->user->theme;
-			}
-		}
-		// The theme was specified by the board.
-		elseif (!empty($board_info['theme']))
-		{
-			$this->id = $board_info['theme'];
-		}
-		// The theme is the forum's default.
-		else
-		{
-			$this->id = $modSettings['theme_guests'];
-		}
-
-		// Ensure that the theme is known... no foul play.
-		if (!allowedTo('admin_forum'))
-		{
-			$themes = explode(',', $modSettings['knownThemes']);
-			if (!in_array($this->id, $themes) || (!empty($ssi_theme) && $this->id != $ssi_theme))
-			{
-				$this->id = $modSettings['theme_guests'];
-			}
-		}
-	}
-
-	/**
-	 * Load in the theme variables for a given theme / member combination
-	 *
-	 * @param int $member
-	 *
-	 * @return array
-	 */
-	private function getThemeData($member)
-	{
-		global $modSettings, $boardurl;
-
-		$cache = \ElkArte\Cache\Cache::instance();
-
-		// Do we already have this members theme data and specific options loaded (for aggressive cache settings)
-		$temp = [];
-		if ($cache->levelHigherThan(1) && $cache->getVar($temp, 'theme_settings-' . $this->id . ':' . $member,
-				60) && time() - 60 > $modSettings['settings_updated']
-		)
-		{
-			$themeData = $temp;
-			$flag = true;
-		}
-		// Or do we just have the system wide theme settings cached
-		elseif ($cache->getVar($temp, 'theme_settings-' . $this->id,
-				90) && time() - 60 > $modSettings['settings_updated']
-		)
-		{
-			$themeData = $temp + [$member => []];
-		}
-		// Nothing at all then
-		else
-		{
-			$themeData = [-1 => [], 0 => [], $member => []];
-		}
-
-		if (empty($flag))
-		{
-			$db = database();
-
-			// Load variables from the current or default theme, global or this user's.
-			$result = $db->query('', '
-			SELECT variable, value, id_member, id_theme
-			FROM {db_prefix}themes
-			WHERE id_member' . (empty($themeData[0]) ? ' IN (-1, 0, {int:id_member})' : ' = {int:id_member}') . '
-				AND id_theme' . ($this->id == 1 ? ' = {int:id_theme}' : ' IN ({int:id_theme}, 1)'),
-				[
-					'id_theme' => $this->id,
-					'id_member' => $member,
-				]
-			);
-
-			$immutable_theme_data = [
-				'actual_theme_url',
-				'actual_images_url',
-				'base_theme_dir',
-				'base_theme_url',
-				'default_images_url',
-				'default_theme_dir',
-				'default_theme_url',
-				'default_template',
-				'images_url',
-				'number_recent_posts',
-				'smiley_sets_default',
-				'theme_dir',
-				'theme_id',
-				'theme_layers',
-				'theme_templates',
-				'theme_url',
-			];
-
-			// Pick between $settings and $options depending on whose data it is.
-			while ($row = $db->fetch_assoc($result))
-			{
-				// There are just things we shouldn't be able to change as members.
-				if ($row['id_member'] != 0 && in_array($row['variable'], $immutable_theme_data))
-				{
-					continue;
-				}
-
-				// If this is the theme_dir of the default theme, store it.
-				if (in_array($row['variable'], [
-						'theme_dir',
-						'theme_url',
-						'images_url',
-					]) && $row['id_theme'] == 1 && empty($row['id_member'])
-				)
-				{
-					$themeData[0]['default_' . $row['variable']] = $row['value'];
-				}
-
-				// If this isn't set yet, is a theme option, or is not the default theme..
-				if (!isset($themeData[$row['id_member']][$row['variable']]) || $row['id_theme'] != 1)
-				{
-					$themeData[$row['id_member']][$row['variable']] =
-						substr($row['variable'], 0, 5) == 'show_' ? $row['value'] == 1 : $row['value'];
-				}
-			}
-			$db->free_result($result);
-
-			if (file_exists($themeData[0]['default_theme_dir'] . '/cache') && is_writable($themeData[0]['default_theme_dir'] . '/cache'))
-			{
-				$themeData[0]['default_theme_cache_dir'] = $themeData[0]['default_theme_dir'] . '/cache';
-				$themeData[0]['default_theme_cache_url'] = $themeData[0]['default_theme_url'] . '/cache';
-			}
-			else
-			{
-				$themeData[0]['default_theme_cache_dir'] = CACHEDIR;
-				$themeData[0]['default_theme_cache_url'] = $boardurl . '/cache';
-			}
-
-			// Set the defaults if the user has not chosen on their own
-			if (!empty($themeData[-1]))
-			{
-				foreach ($themeData[-1] as $k => $v)
-				{
-					if (!isset($themeData[$member][$k]))
-					{
-						$themeData[$member][$k] = $v;
-					}
-				}
-			}
-
-			// If being aggressive we save the site wide and member theme settings
-			if ($cache->levelHigherThan(1))
-			{
-				$cache->put('theme_settings-' . $this->id . ':' . $member, $themeData, 60);
-			}
-			// Only if we didn't already load that part of the cache...
-			elseif (!isset($temp))
-			{
-				$cache->put('theme_settings-' . $this->id, [-1 => $themeData[-1], 0 => $themeData[0]], 90);
-			}
-		}
-
-		return $themeData;
-	}
-
-	/**
-	 * Initialize a theme for use
-	 */
-	private function initTheme()
-	{
-		global $settings, $options, $context;
-
-		// Validate / fetch the themes id
-		$this->getThemeId();
-
-		// Need to know who we are loading the theme for
-		$member = empty($this->user->id) ? -1 : $this->user->id;
-
-		// Load in the theme variables for them
-		$themeData = $this->getThemeData($member);
-		$settings = $themeData[0];
-		$options = $themeData[$member];
-
-		$settings['theme_id'] = $this->id;
-		$settings['actual_theme_url'] = $settings['theme_url'];
-		$settings['actual_images_url'] = $settings['images_url'];
-		$settings['actual_theme_dir'] = $settings['theme_dir'];
-
-		// Set the name of the default theme to something PHP will recognize.
-		$themeName = basename($settings['theme_dir']) == 'default'
-			? 'DefaultTheme'
-			: ucfirst(basename($settings['theme_dir']));
-
-		// The require should not be necessary, but I guess it's better to stay on the safe side.
-		require_once(EXTDIR . '/ClassLoader.php');
-		$loader = new \ElkArte\ext\Composer\Autoload\ClassLoader();
-		$loader->setPsr4('ElkArte\\Themes\\' . $themeName . '\\', $themeData[0]['default_theme_dir']);
-		$loader->register();
-
-		// Setup the theme file.
-		require_once($settings['theme_dir'] . '/Theme.php');
-		$class = 'ElkArte\\Themes\\' . $themeName . '\\Theme';
-		$theme = new $class($this->id, \ElkArte\User::$info);
-		$this->theme = $context['theme_instance'] = $theme;
-
-		// Reload the templates
-		$this->theme->getTemplates()->reloadDirectories($settings);
-	}
-
-	/**
-	 * @return Theme the current theme
-	 */
-	public function getTheme()
-	{
-		return $this->theme;
-	}
 
 	/**
 	 * Load a theme, by ID.
@@ -289,7 +48,7 @@ class ThemeLoader
 	 * - loads default JS variables for use in every theme
 	 * - loads default JS scripts for use in every theme
 	 *
-	 * @param int  $id_theme   = 0
+	 * @param int $id_theme = 0
 	 * @param bool $initialize = true
 	 */
 	public function __construct($id_theme = 0, $initialize = true)
@@ -313,8 +72,7 @@ class ThemeLoader
 		// Set up some additional interface preference context
 		if (!empty($options['admin_preferences']))
 		{
-			$context['admin_preferences'] = serializeToJson($options['admin_preferences'], function ($array_form)
-			{
+			$context['admin_preferences'] = serializeToJson($options['admin_preferences'], function ($array_form) {
 				global $context;
 
 				$context['admin_preferences'] = $array_form;
@@ -331,15 +89,14 @@ class ThemeLoader
 		{
 			if (!empty($options['minmax_preferences']))
 			{
-				$context['minmax_preferences'] = serializeToJson($options['minmax_preferences'], function ($array_form)
-				{
+				$context['minmax_preferences'] = serializeToJson($options['minmax_preferences'], function ($array_form) {
 					global $settings;
 
 					// Update the option.
 					require_once(SUBSDIR . '/Themes.subs.php');
 					updateThemeOptions([
 						$settings['theme_id'],
-						\ElkArte\User::$info->id,
+						User::$info->id,
 						'minmax_preferences',
 						json_encode($array_form),
 					]);
@@ -432,10 +189,10 @@ class ThemeLoader
 
 		// A bit lonely maybe, though I think it should be set up *after* the theme variants detection
 		$context['header_logo_url_html_safe'] =
-			empty($settings['header_logo_url']) ? $settings['images_url'] . '/' . $context['theme_variant_url'] . 'logo_elk.png' : \ElkArte\Util::htmlspecialchars($settings['header_logo_url']);
+			empty($settings['header_logo_url']) ? $settings['images_url'] . '/' . $context['theme_variant_url'] . 'logo_elk.png' : Util::htmlspecialchars($settings['header_logo_url']);
 
 		// Allow overriding the board wide time/number formats.
-		if (empty(\ElkArte\User::$settings['time_format']) && !empty($txt['time_format']))
+		if (empty(User::$settings['time_format']) && !empty($txt['time_format']))
 		{
 			$this->user->time_format = $txt['time_format'];
 		}
@@ -492,7 +249,7 @@ class ThemeLoader
 
 		$this->theme->loadThemeJavascript();
 
-		\ElkArte\Hooks::instance()->newPath(['$themedir' => $settings['theme_dir']]);
+		Hooks::instance()->newPath(['$themedir' => $settings['theme_dir']]);
 
 		// Any files to include at this point?
 		call_integration_include_hook('integrate_theme_include');
@@ -502,6 +259,274 @@ class ThemeLoader
 
 		// We are ready to go.
 		$context['theme_loaded'] = true;
+	}
+
+	/**
+	 * Initialize a theme for use
+	 */
+	private function initTheme()
+	{
+		global $settings, $options, $context;
+
+		// Validate / fetch the themes id
+		$this->getThemeId();
+
+		// Need to know who we are loading the theme for
+		$member = empty($this->user->id) ? -1 : $this->user->id;
+
+		// Load in the theme variables for them
+		$themeData = $this->getThemeData($member);
+		$settings = $themeData[0];
+		$options = $themeData[$member];
+
+		$settings['theme_id'] = $this->id;
+		$settings['actual_theme_url'] = $settings['theme_url'];
+		$settings['actual_images_url'] = $settings['images_url'];
+		$settings['actual_theme_dir'] = $settings['theme_dir'];
+
+		// Set the name of the default theme to something PHP will recognize.
+		$themeName = basename($settings['theme_dir']) === 'default'
+			? 'DefaultTheme'
+			: ucfirst(basename($settings['theme_dir']));
+
+		// The require should not be necessary, but I guess it's better to stay on the safe side.
+		require_once(EXTDIR . '/ClassLoader.php');
+		$loader = new ClassLoader();
+		$loader->setPsr4('ElkArte\\Themes\\' . $themeName . '\\', $themeData[0]['default_theme_dir']);
+		$loader->register();
+
+		// Setup the theme file.
+		require_once($settings['theme_dir'] . '/Theme.php');
+		$class = 'ElkArte\\Themes\\' . $themeName . '\\Theme';
+		$this->theme = new $class($this->id, User::$info);
+		$context['theme_instance'] = $this->theme;
+
+		// Reload the templates
+		$this->theme->getTemplates()->reloadDirectories($settings);
+	}
+
+	/**
+	 * Resolves the ID of a theme.
+	 *
+	 * The identifier can be specified in:
+	 * - a GET variable
+	 * - the session
+	 * - user's preferences
+	 * - board
+	 * - forum default
+	 *
+	 * In addition, the ID is verified against a comma-separated list of
+	 * known good themes. This check is skipped if the user is an admin.
+	 *
+	 * @return void Theme ID to load
+	 */
+	private function getThemeId()
+	{
+		global $modSettings, $board_info;
+
+		// The user has selected a theme
+		if (!empty($modSettings['theme_allow']) || allowedTo('admin_forum'))
+		{
+			$this->_chooseTheme();
+		}
+		// The theme was specified by the board.
+		elseif (!empty($board_info['theme']))
+		{
+			$this->id = $board_info['theme'];
+		}
+		// The theme is the forum's default.
+		else
+		{
+			$this->id = $modSettings['theme_guests'];
+		}
+
+		// Whatever we found, make sure its valid
+		$this->_validThemeID();
+	}
+
+	/**
+	 * Sets the chosen theme id
+	 */
+	private function _chooseTheme()
+	{
+		$_req = HttpReq::instance();
+
+		// The theme was previously set by th (ACP)
+		if (!empty($this->id) && !empty($_req->is_set('th')))
+		{
+			$this->id = (int) $this->id;
+		}
+		// The theme was specified by Get or Post.
+		elseif (!empty($_req->getQuery('theme', 'intval', $_req->getPost('theme', 'intval', null))))
+		{
+			$this->id = (int) $_REQUEST['theme'];
+			$_SESSION['theme'] = $this->id;
+		}
+		// The theme was specified by REQUEST... previously.
+		elseif (!empty($_SESSION['theme']))
+		{
+			$this->id = (int) $_SESSION['theme'];
+		}
+		// The theme is just the user's choice. (might use ?board=1;theme=0 to force board theme.)
+		elseif (!empty($this->user->theme))
+		{
+			$this->id = $this->user->theme;
+		}
+	}
+
+	/**
+	 * Validates, and corrects if in error, that the theme id is capable of
+	 * being used.
+	 */
+	private function _validThemeID()
+	{
+		global $modSettings, $ssi_theme;
+
+		// Ensure that the theme is known... no foul play.
+		if (!allowedTo('admin_forum'))
+		{
+			$themes = explode(',', $modSettings['knownThemes']);
+			if (!in_array($this->id, $themes) || (!empty($ssi_theme) && $this->id != $ssi_theme))
+			{
+				$this->id = $modSettings['theme_guests'];
+			}
+		}
+	}
+
+	/**
+	 * Load in the theme variables for a given theme / member combination
+	 *
+	 * @param int $member
+	 *
+	 * @return array
+	 * @throws \ElkArte\Exceptions\Exception
+	 */
+	private function getThemeData($member)
+	{
+		global $modSettings, $boardurl;
+
+		$cache = Cache::instance();
+
+		// Do we already have this members theme data and specific options loaded (for aggressive cache settings)
+		$temp = [];
+		if ($cache->levelHigherThan(1)
+			&& $cache->getVar($temp, 'theme_settings-' . $this->id . ':' . $member, 60)
+			&& time() - 60 > $modSettings['settings_updated']
+		)
+		{
+			$themeData = $temp;
+			$flag = true;
+		}
+		// Or do we just have the system wide theme settings cached
+		elseif ($cache->getVar($temp, 'theme_settings-' . $this->id, 90)
+			&& time() - 60 > $modSettings['settings_updated']
+		)
+		{
+			$themeData = $temp + [$member => []];
+		}
+		// Nothing at all then
+		else
+		{
+			$themeData = [-1 => [], 0 => [], $member => []];
+		}
+
+		if (empty($flag))
+		{
+			$db = database();
+
+			// Load variables from the current or default theme, global or this user's.
+			$result = $db->query('', '
+			SELECT 
+				variable, value, id_member, id_theme
+			FROM {db_prefix}themes
+			WHERE id_member' . (empty($themeData[0]) ? ' IN (-1, 0, {int:id_member})' : ' = {int:id_member}') . '
+				AND id_theme' . ($this->id == 1 ? ' = {int:id_theme}' : ' IN ({int:id_theme}, 1)'),
+				[
+					'id_theme' => $this->id,
+					'id_member' => $member,
+				]
+			);
+
+			$immutable_theme_data = [
+				'actual_theme_url',
+				'actual_images_url',
+				'base_theme_dir',
+				'base_theme_url',
+				'default_images_url',
+				'default_theme_dir',
+				'default_theme_url',
+				'default_template',
+				'images_url',
+				'number_recent_posts',
+				'smiley_sets_default',
+				'theme_dir',
+				'theme_id',
+				'theme_layers',
+				'theme_templates',
+				'theme_url',
+			];
+
+			// Pick between $settings and $options depending on whose data it is.
+			while ($row = $db->fetch_assoc($result))
+			{
+				// There are just things we shouldn't be able to change as members.
+				if ($row['id_member'] != 0 && in_array($row['variable'], $immutable_theme_data))
+				{
+					continue;
+				}
+
+				// If this is the theme_dir of the default theme, store it.
+				if (in_array($row['variable'], ['theme_dir', 'theme_url', 'images_url'])
+					&& $row['id_theme'] == 1 && empty($row['id_member']))
+				{
+					$themeData[0]['default_' . $row['variable']] = $row['value'];
+				}
+
+				// If this isn't set yet, is a theme option, or is not the default theme..
+				if (!isset($themeData[$row['id_member']][$row['variable']]) || $row['id_theme'] != 1)
+				{
+					$themeData[$row['id_member']][$row['variable']] = substr($row['variable'], 0, 5) === 'show_' ? $row['value'] == 1 : $row['value'];
+				}
+			}
+			$db->free_result($result);
+
+			if (file_exists($themeData[0]['default_theme_dir'] . '/cache')
+				&& is_writable($themeData[0]['default_theme_dir'] . '/cache'))
+			{
+				$themeData[0]['default_theme_cache_dir'] = $themeData[0]['default_theme_dir'] . '/cache';
+				$themeData[0]['default_theme_cache_url'] = $themeData[0]['default_theme_url'] . '/cache';
+			}
+			else
+			{
+				$themeData[0]['default_theme_cache_dir'] = CACHEDIR;
+				$themeData[0]['default_theme_cache_url'] = $boardurl . '/cache';
+			}
+
+			// Set the defaults if the user has not chosen on their own
+			if (!empty($themeData[-1]))
+			{
+				foreach ($themeData[-1] as $k => $v)
+				{
+					if (!isset($themeData[$member][$k]))
+					{
+						$themeData[$member][$k] = $v;
+					}
+				}
+			}
+
+			// If being aggressive we save the site wide and member theme settings
+			if ($cache->levelHigherThan(1))
+			{
+				$cache->put('theme_settings-' . $this->id . ':' . $member, $themeData, 60);
+			}
+			// Only if we didn't already load that part of the cache...
+			elseif (!isset($temp))
+			{
+				$cache->put('theme_settings-' . $this->id, [-1 => $themeData[-1], 0 => $themeData[0]], 90);
+			}
+		}
+
+		return $themeData;
 	}
 
 	/**
@@ -516,7 +541,7 @@ class ThemeLoader
 		// Check to see if they're accessing it from the wrong place.
 		if (isset($_SERVER['HTTP_HOST']) || isset($_SERVER['SERVER_NAME']))
 		{
-			$detected_url = isset($_SERVER['HTTPS']) && strtolower($_SERVER['HTTPS']) == 'on' ? 'https://' : 'http://';
+			$detected_url = isset($_SERVER['HTTPS']) && strtolower($_SERVER['HTTPS']) === 'on' ? 'https://' : 'http://';
 			$detected_url .= empty($_SERVER['HTTP_HOST']) ? $_SERVER['SERVER_NAME'] . (empty($_SERVER['SERVER_PORT']) || $_SERVER['SERVER_PORT'] == '80' ? '' : ':' . $_SERVER['SERVER_PORT']) : $_SERVER['HTTP_HOST'];
 			$temp = preg_replace('~/' . basename($scripturl) . '(/.+)?$~', '',
 				strtr(dirname($_SERVER['PHP_SELF']), '\\', '/'));
@@ -535,10 +560,10 @@ class ThemeLoader
 				foreach ($aliases as $alias)
 				{
 					// Rip off all the boring parts, spaces, etc.
-					if ($detected_url == trim($alias) || strtr($detected_url, [
+					if ($detected_url === trim($alias) || strtr($detected_url, [
 							'http://' => '',
 							'https://' => '',
-						]) == trim($alias)
+						]) === trim($alias)
 					)
 					{
 						$do_fix = true;
@@ -548,7 +573,7 @@ class ThemeLoader
 
 			// Hmm... check #2 - is it just different by a www?  Send them to the correct place!!
 			if (empty($do_fix) && strtr($detected_url,
-					['://' => '://www.']) == $boardurl && (empty($_GET) || count($_GET) == 1) && ELK != 'SSI'
+					['://' => '://www.']) == $boardurl && (empty($_GET) || count($_GET) === 1) && ELK != 'SSI'
 			)
 			{
 				// Okay, this seems weird, but we don't want an endless loop - this will make $_GET not empty ;).
@@ -622,7 +647,9 @@ class ThemeLoader
 		}
 
 		foreach ($context['linktree'] as $k => $dummy)
+		{
 			$context['linktree'][$k]['url'] = strtr($dummy['url'], array($oldurl => $boardurl));
+		}
 	}
 
 	/**
@@ -668,5 +695,13 @@ class ThemeLoader
 
 		// This allows sticking some HTML on the page output - useful for controls.
 		$context['insert_after_template'] = '';
+	}
+
+	/**
+	 * @return Theme the current theme
+	 */
+	public function getTheme()
+	{
+		return $this->theme;
 	}
 }

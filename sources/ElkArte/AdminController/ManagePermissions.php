@@ -9,7 +9,7 @@
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause (see accompanying LICENSE.txt file)
  *
  * This file contains code covered by:
- * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * copyright: 2011 Simple Machines (http://www.simplemachines.org)
  *
  * @version 2.0 dev
  *
@@ -17,35 +17,41 @@
 
 namespace ElkArte\AdminController;
 
+use BBC\ParserWrapper;
+use ElkArte\AbstractController;
+use ElkArte\Action;
+use ElkArte\BoardsTree;
+use ElkArte\Exceptions\Exception;
+use ElkArte\Permissions;
+use ElkArte\SettingsForm\SettingsForm;
+
 /**
  * ManagePermissions handles all possible permission stuff.
  *
  * @package Permissions
  */
-class ManagePermissions extends \ElkArte\AbstractController
+class ManagePermissions extends AbstractController
 {
+	/**
+	 * The profile ID that we are working with
+	 *
+	 * @var int|null
+	 */
+	protected $_pid = null;
 	/**
 	 * Permissions object
 	 *
 	 * @var \Elkarte\Permissions
 	 */
 	private $permissionsObject;
-
 	/**
 	 * @var string[]
 	 */
 	private $illegal_permissions = array();
-
 	/**
 	 * @var string[]
 	 */
 	private $illegal_guest_permissions = array();
-
-	/**
-	 * The profile ID that we are working with
-	 * @var int|null
-	 */
-	protected $_pid = null;
 
 	/**
 	 * Dispatches to the right function based on the given subaction.
@@ -55,7 +61,7 @@ class ManagePermissions extends \ElkArte\AbstractController
 	 *
 	 * @event integrate_sa_manage_permissions used to add new subactions
 	 * @uses ManagePermissions language file.
-	 * @see \ElkArte\AbstractController::action_index()
+	 * @see  \ElkArte\AbstractController::action_index()
 	 */
 	public function action_index()
 	{
@@ -63,7 +69,7 @@ class ManagePermissions extends \ElkArte\AbstractController
 
 		// Make sure they can't do certain things,
 		// unless they have the right permissions.
-		$this->permissionsObject = new \ElkArte\Permissions;
+		$this->permissionsObject = new Permissions;
 		$this->illegal_permissions = $this->permissionsObject->getIllegalPermissions();
 		$this->illegal_guest_permissions = $this->permissionsObject->getIllegalGuestPermissions();
 
@@ -112,7 +118,7 @@ class ManagePermissions extends \ElkArte\AbstractController
 		);
 
 		// Action controller
-		$action = new \ElkArte\Action('manage_permissions');
+		$action = new Action('manage_permissions');
 
 		// Create the tabs for the template.
 		$context[$context['admin_menu_name']]['tab_data'] = array(
@@ -176,7 +182,9 @@ class ManagePermissions extends \ElkArte\AbstractController
 
 		// pid = profile id
 		if (!empty($this->_req->query->pid))
+		{
 			$this->_pid = (int) $this->_req->query->pid;
+		}
 
 		// We can modify any permission set apart from the read only, reply only and no polls ones as they are redefined.
 		$context['can_modify'] = empty($this->_pid) || $this->_pid == 1 || $this->_pid > 4;
@@ -217,7 +225,9 @@ class ManagePermissions extends \ElkArte\AbstractController
 							// Since the moderator group has no explicit members, no link is needed.
 							// Since guests and regular members are not groups, no link is needed.
 							if (in_array($rowData['id_group'], array(-1, 0, 3)))
+							{
 								$group_name = $rowData['group_name'];
+							}
 							else
 							{
 								$group_name = sprintf('<a href="%1$s?action=admin;area=membergroups;sa=members;group=%2$d">%3$s</a>', $scripturl, $rowData['id_group'], $rowData['group_name_color']);
@@ -225,12 +235,16 @@ class ManagePermissions extends \ElkArte\AbstractController
 
 							// Add a help option for guests, regular members, moderator and administrator.
 							if (!empty($rowData['help']))
+							{
 								$group_name .= sprintf(' (<a href="%1$s?action=quickhelp;help=' . $rowData['help'] . '" onclick="return reqOverlayDiv(this.href);" class="helpicon i-help"></a>)', $scripturl);
+							}
 
 							if (!empty($rowData['children']))
+							{
 								$group_name .= '
 									<br />
 									<span class="smalltext">' . $txt['permissions_includes_inherited'] . ': &quot;' . implode('&quot;, &quot;', $rowData['children']) . '&quot;</span>';
+							}
 
 							return $group_name;
 						},
@@ -251,11 +265,17 @@ class ManagePermissions extends \ElkArte\AbstractController
 
 							// No explicit members for guests and the moderator group.
 							if (in_array($rowData['id_group'], array(-1, 3)))
+							{
 								return $txt['membergroups_guests_na'];
+							}
 							elseif ($rowData['can_search'])
+							{
 								return '<a href="' . $scripturl . '?action=moderate;area=viewgroups;sa=members;group=' . $rowData['id_group'] . '">' . comma_format($rowData['num_members']) . '</a>';
+							}
 							else
+							{
 								return comma_format($rowData['num_members']);
+							}
 						},
 					),
 					'sort' => array(
@@ -296,7 +316,9 @@ class ManagePermissions extends \ElkArte\AbstractController
 							global $scripturl, $txt;
 
 							if ($rowData['id_group'] != 1)
+							{
 								return '<a href="' . $scripturl . '?action=admin;area=permissions;sa=modify;group=' . $rowData['id_group'] . '' . (isset($this->_pid) ? ';pid=' . $this->_pid : '') . '">' . $txt['membergroups_modify'] . '</a>';
+							}
 
 							return '';
 						},
@@ -311,7 +333,9 @@ class ManagePermissions extends \ElkArte\AbstractController
 					'data' => array(
 						'function' => function ($rowData) {
 							if ($rowData['id_group'] != 1)
+							{
 								return '<input type="checkbox" name="group[]" value="' . $rowData['id_group'] . '" class="input_check" />';
+							}
 
 							return '';
 						},
@@ -389,9 +413,13 @@ class ManagePermissions extends \ElkArte\AbstractController
 								global $scripturl;
 
 								if ($rowData['can_search'])
+								{
 									return '<a href="' . $scripturl . '?action=moderate;area=viewgroups;sa=members;group=' . $rowData['id_group'] . '">' . comma_format($rowData['num_members']) . '</a>';
+								}
 								else
+								{
 									return comma_format($rowData['num_members']);
+								}
 							},
 						),
 						'sort' => array(
@@ -432,11 +460,15 @@ class ManagePermissions extends \ElkArte\AbstractController
 								global $scripturl, $txt;
 
 								if ($rowData['id_parent'] == -2)
-										return '<a href="' . $scripturl . '?action=admin;area=permissions;sa=modify;group=' . $rowData['id_group'] . (isset($this->_pid) ? ';pid=' . $this->_pid : '') . '">' . $txt['membergroups_modify'] . '</a>';
-									else
-										return '<span class="smalltext">' . $txt['permissions_includes_inherited_from'] . '&quot;' . $rowData['parent_name'] . '&quot;</span>
+								{
+									return '<a href="' . $scripturl . '?action=admin;area=permissions;sa=modify;group=' . $rowData['id_group'] . (isset($this->_pid) ? ';pid=' . $this->_pid : '') . '">' . $txt['membergroups_modify'] . '</a>';
+								}
+								else
+								{
+									return '<span class="smalltext">' . $txt['permissions_includes_inherited_from'] . '&quot;' . $rowData['parent_name'] . '&quot;</span>
 											<br />
 											<a href="' . $scripturl . '?action=admin;area=permissions;sa=modify;group=' . $rowData['id_parent'] . (isset($this->_pid) ? ';pid=' . $this->_pid : '') . '">' . $txt['membergroups_modify_parent'] . '</a>';
+								}
 							}
 						),
 					),
@@ -466,7 +498,9 @@ class ManagePermissions extends \ElkArte\AbstractController
 		if (!empty($this->_pid))
 		{
 			if (!isset($context['profiles'][$this->_pid]))
-				throw new \ElkArte\Exceptions\Exception('no_access', false);
+			{
+				throw new Exception('no_access', false);
+			}
 
 			// Change the selected tab to better reflect that this really is a board profile.
 			$context[$context['admin_menu_name']]['current_subsection'] = 'profiles';
@@ -526,7 +560,9 @@ class ManagePermissions extends \ElkArte\AbstractController
 		{
 			$js = 'new Array(';
 			foreach ($context['profiles'] as $id => $profile)
+			{
 				$js .= '{name: ' . JavaScriptEscape($profile['name']) . ', id: ' . $id . '},';
+			}
 
 			theme()->addJavascriptVar(array(
 				'permission_profiles' => substr($js, 0, -1) . ')',
@@ -535,14 +571,14 @@ class ManagePermissions extends \ElkArte\AbstractController
 		}
 
 		// Get the board tree.
-		$boardTree = new \ElkArte\BoardsTree(database());
+		$boardTree = new BoardsTree(database());
 		$boardList = $boardTree->getBoardList();
 		$cat_tree = $boardTree->getCategories();
 		$boards = $boardTree->getBoards();
 
 		// Build the list of the boards.
 		$context['categories'] = array();
-		$bbc_parser = \BBC\ParserWrapper::instance();
+		$bbc_parser = ParserWrapper::instance();
 		foreach ($cat_tree as $catid => $tree)
 		{
 			$context['categories'][$catid] = array(
@@ -555,7 +591,9 @@ class ManagePermissions extends \ElkArte\AbstractController
 				$boards[$boardid]['description'] = $bbc_parser->parseBoard($boards[$boardid]['description']);
 
 				if (!isset($context['profiles'][$boards[$boardid]['profile']]))
+				{
 					$boards[$boardid]['profile'] = 1;
+				}
 
 				$context['categories'][$catid]['boards'][$boardid] = array(
 					'id' => &$boards[$boardid]['id'],
@@ -586,14 +624,20 @@ class ManagePermissions extends \ElkArte\AbstractController
 
 		// Make sure only one of the quick options was selected.
 		if ((!empty($this->_req->post->predefined) && ((isset($this->_req->post->copy_from) && $this->_req->post->copy_from !== 'empty') || !empty($this->_req->post->permissions))) || (!empty($this->_req->post->copy_from) && $this->_req->post->copy_from !== 'empty' && !empty($this->_req->post->permissions)))
-			throw new \ElkArte\Exceptions\Exception('permissions_only_one_option', false);
+		{
+			throw new Exception('permissions_only_one_option', false);
+		}
 
 		if (empty($this->_req->post->group) || !is_array($this->_req->post->group))
+		{
 			$this->_req->post->group = array();
+		}
 
 		// Only accept numeric values for selected membergroups.
 		foreach ($this->_req->post->group as $id => $group_id)
+		{
 			$this->_req->post->group[$id] = (int) $group_id;
+		}
 		$this->_req->post->group = array_unique($this->_req->post->group);
 
 		$this->_pid = $this->_req->getQuery('pid', 'intval', 0);
@@ -603,28 +647,38 @@ class ManagePermissions extends \ElkArte\AbstractController
 
 		// No modifying the predefined profiles.
 		if ($this->_pid > 1 && $this->_pid < 5)
-			throw new \ElkArte\Exceptions\Exception('no_access', false);
+		{
+			throw new Exception('no_access', false);
+		}
 
 		// Clear out any cached authority.
 		updateSettings(array('settings_updated' => time()));
 
 		// No groups where selected.
 		if (empty($this->_req->post->group))
+		{
 			redirectexit('action=admin;area=permissions;pid=' . $this->_pid);
+		}
 
 		// Set a predefined permission profile.
 		if (!empty($this->_req->post->predefined))
 		{
 			// Make sure it's a predefined permission set we expect.
 			if (!in_array($this->_req->post->predefined, array('restrict', 'standard', 'moderator', 'maintenance')))
+			{
 				redirectexit('action=admin;area=permissions;pid=' . $this->_pid);
+			}
 
 			foreach ($this->_req->post->group as $group_id)
 			{
 				if (!empty($this->_pid))
+				{
 					setPermissionLevel($this->_req->post->predefined, $group_id, $this->_pid);
+				}
 				else
+				{
 					setPermissionLevel($this->_req->post->predefined, $group_id);
+				}
 			}
 		}
 		// Set a permission profile based on the permissions of a selected group.
@@ -632,17 +686,23 @@ class ManagePermissions extends \ElkArte\AbstractController
 		{
 			// Just checking the input.
 			if (!is_numeric($this->_req->post->copy_from))
+			{
 				redirectexit('action=admin;area=permissions;pid=' . $this->_pid);
+			}
 
 			// Make sure the group we're copying to is never included.
 			$this->_req->post->group = array_diff($this->_req->post->group, array($this->_req->post->copy_from));
 
 			// No groups left? Too bad.
 			if (empty($this->_req->post->group))
+			{
 				redirectexit('action=admin;area=permissions;pid=' . $this->_pid);
+			}
 
 			if (empty($this->_pid))
+			{
 				copyPermission($this->_req->post->copy_from, $this->_req->post->group, $this->illegal_permissions, $this->illegal_guest_permissions);
+			}
 
 			// Now do the same for the board permissions.
 			copyBoardPermission($this->_req->post->copy_from, $this->_req->post->group, $bid, $this->illegal_guest_permissions);
@@ -658,14 +718,20 @@ class ManagePermissions extends \ElkArte\AbstractController
 
 			// Check whether our input is within expected range.
 			if (!in_array($this->_req->post->add_remove, array('add', 'clear', 'deny')) || !in_array($permissionType, array('membergroup', 'board')))
+			{
 				redirectexit('action=admin;area=permissions;pid=' . $this->_pid);
+			}
 
 			if ($this->_req->post->add_remove === 'clear')
 			{
 				if ($permissionType === 'membergroup')
+				{
 					deletePermission($this->_req->post->group, $permission, $this->illegal_permissions);
+				}
 				else
+				{
 					deleteBoardPermission($this->_req->post->group, $bid, $permission);
+				}
 			}
 			// Add a permission (either 'set' or 'deny').
 			else
@@ -675,21 +741,31 @@ class ManagePermissions extends \ElkArte\AbstractController
 				foreach ($this->_req->post->group as $groupID)
 				{
 					if ($groupID == -1 && in_array($permission, $this->illegal_guest_permissions))
+					{
 						continue;
+					}
 
 					if ($permissionType === 'membergroup' && $groupID != 1 && $groupID != 3 && (empty($this->illegal_permissions) || !in_array($permission, $this->illegal_permissions)))
+					{
 						$permChange[] = array($permission, $groupID, $add_deny);
+					}
 					elseif ($permissionType !== 'membergroup')
+					{
 						$permChange[] = array($permission, $groupID, $add_deny, $bid);
+					}
 				}
 
 				if (!empty($permChange))
 				{
 					if ($permissionType === 'membergroup')
+					{
 						replacePermission($permChange);
+					}
 					// Board permissions go into the other table.
 					else
+					{
 						replaceBoardPermission($permChange);
+					}
 				}
 			}
 
@@ -708,14 +784,18 @@ class ManagePermissions extends \ElkArte\AbstractController
 		global $context, $txt;
 
 		if (!isset($this->_req->query->group))
-			throw new \ElkArte\Exceptions\Exception('no_access', false);
+		{
+			throw new Exception('no_access', false);
+		}
 
 		require_once(SUBSDIR . '/ManagePermissions.subs.php');
 		$context['group']['id'] = (int) $this->_req->query->group;
 
 		// It's not likely you'd end up here with this setting disabled.
 		if ($this->_req->query->group == 1)
+		{
 			redirectexit('action=admin;area=permissions');
+		}
 
 		loadAllPermissions();
 		loadPermissionProfiles();
@@ -730,12 +810,18 @@ class ManagePermissions extends \ElkArte\AbstractController
 
 			// Cannot edit an inherited group!
 			if ($parent != -2)
-				throw new \ElkArte\Exceptions\Exception('cannot_edit_permissions_inherited');
+			{
+				throw new Exception('cannot_edit_permissions_inherited');
+			}
 		}
 		elseif ($context['group']['id'] == -1)
+		{
 			$context['group']['name'] = $txt['membergroups_guests'];
+		}
 		else
+		{
 			$context['group']['name'] = $txt['membergroups_members'];
+		}
 
 		$context['profile']['id'] = $this->_req->getQuery('pid', 'intval', 0);
 
@@ -766,7 +852,9 @@ class ManagePermissions extends \ElkArte\AbstractController
 
 		// General permissions?
 		if ($context['permission_type'] === 'membergroup')
+		{
 			$permissions['membergroup'] = fetchPermissions($this->_req->query->group);
+		}
 
 		// Fetch current board permissions...
 		$permissions['board'] = fetchBoardPermissions($context['group']['id'], $context['permission_type'], $context['profile']['id']);
@@ -789,7 +877,9 @@ class ManagePermissions extends \ElkArte\AbstractController
 							$curPerm['own']['select'] = in_array($perm['id'] . '_own', $permissions[$permissionType]['allowed']) ? 'on' : (in_array($perm['id'] . '_own', $permissions[$permissionType]['denied']) ? 'denied' : 'off');
 						}
 						else
+						{
 							$curPerm['select'] = in_array($perm['id'], $permissions[$permissionType]['denied']) ? 'denied' : (in_array($perm['id'], $permissions[$permissionType]['allowed']) ? 'on' : 'off');
+						}
 					}
 				}
 			}
@@ -816,11 +906,15 @@ class ManagePermissions extends \ElkArte\AbstractController
 
 		// Cannot modify predefined profiles.
 		if ($this->_pid > 1 && $this->_pid < 5)
-			throw new \ElkArte\Exceptions\Exception('no_access', false);
+		{
+			throw new Exception('no_access', false);
+		}
 
 		// Verify this isn't inherited.
-		if ($current_group_id == -1 || $current_group_id == 0)
+		if ($current_group_id === -1 || $current_group_id === 0)
+		{
 			$parent = -2;
+		}
 		else
 		{
 			require_once(SUBSDIR . '/Membergroups.subs.php');
@@ -829,12 +923,14 @@ class ManagePermissions extends \ElkArte\AbstractController
 		}
 
 		if ($parent != -2)
-			throw new \ElkArte\Exceptions\Exception('cannot_edit_permissions_inherited');
+		{
+			throw new Exception('cannot_edit_permissions_inherited');
+		}
 
 		$givePerms = array('membergroup' => array(), 'board' => array());
 
 		// Guest group, we need illegal, guest permissions.
-		if ($current_group_id == -1)
+		if ($current_group_id === -1)
 		{
 			$this->illegal_permissions = array_merge($this->illegal_permissions, $this->illegal_guest_permissions);
 		}
@@ -847,25 +943,31 @@ class ManagePermissions extends \ElkArte\AbstractController
 				if (is_array($perm_array))
 				{
 					foreach ($perm_array as $permission => $value)
+					{
 						if ($value === 'on' || $value === 'deny')
 						{
 							// Don't allow people to escalate themselves!
 							if (in_array($permission, $this->illegal_permissions))
+							{
 								continue;
+							}
 
 							$givePerms[$perm_type][] = array($permission, $current_group_id, $value === 'deny' ? 0 : 1);
 						}
+					}
 				}
 			}
 		}
 
 		// Insert the general permissions.
-		if ($current_group_id != 3 && empty($this->_pid))
+		if ($current_group_id !== 3 && empty($this->_pid))
 		{
 			deleteInvalidPermissions($current_group_id, $this->illegal_permissions);
 
 			if (!empty($givePerms['membergroup']))
+			{
 				replacePermission($givePerms['membergroup']);
+			}
 		}
 
 		// Insert the boardpermissions.
@@ -875,7 +977,9 @@ class ManagePermissions extends \ElkArte\AbstractController
 		if (!empty($givePerms['board']))
 		{
 			foreach ($givePerms['board'] as $k => $v)
+			{
 				$givePerms['board'][$k][] = $profileid;
+			}
 			replaceBoardPermission($givePerms['board']);
 		}
 
@@ -900,7 +1004,7 @@ class ManagePermissions extends \ElkArte\AbstractController
 		require_once(SUBSDIR . '/ManagePermissions.subs.php');
 
 		// Initialize the form
-		$settingsForm = new \ElkArte\SettingsForm\SettingsForm(\ElkArte\SettingsForm\SettingsForm::DB_ADAPTER);
+		$settingsForm = new SettingsForm(SettingsForm::DB_ADAPTER);
 
 		// Initialize it with our settings
 		$settingsForm->setConfigVars($this->_settings());
@@ -920,11 +1024,15 @@ class ManagePermissions extends \ElkArte\AbstractController
 
 			// Clear all deny permissions...if we want that.
 			if (empty($modSettings['permission_enable_deny']))
+			{
 				clearDenyPermissions();
+			}
 
 			// Make sure there are no postgroup based permissions left.
 			if (empty($modSettings['permission_enable_postgroups']))
+			{
 				clearPostgroupPermissions();
+			}
 
 			redirectexit('action=admin;area=permissions;sa=settings');
 		}
@@ -945,12 +1053,12 @@ class ManagePermissions extends \ElkArte\AbstractController
 		// All the setting variables
 		$config_vars = array(
 			array('title', 'settings'),
-				// Inline permissions.
-				array('permissions', 'manage_permissions'),
+			// Inline permissions.
+			array('permissions', 'manage_permissions'),
 			'',
-				// A few useful settings
-				array('check', 'permission_enable_deny'),
-				array('check', 'permission_enable_postgroups'),
+			// A few useful settings
+			array('check', 'permission_enable_deny'),
+			array('check', 'permission_enable_postgroups'),
 		);
 
 		// Add new settings with a nice hook, makes them available for admin settings search as well
@@ -981,7 +1089,7 @@ class ManagePermissions extends \ElkArte\AbstractController
 		$context['sub_template'] = 'edit_profiles';
 
 		// If we're creating a new one do it first.
-		if (isset($this->_req->post->create) && trim($this->_req->post->profile_name) != '')
+		if (isset($this->_req->post->create) && trim($this->_req->post->profile_name) !== '')
 		{
 			checkSession();
 			validateToken('admin-mpp');
@@ -995,11 +1103,15 @@ class ManagePermissions extends \ElkArte\AbstractController
 
 			// Just showing the boxes?
 			if (!isset($this->_req->post->rename_profile))
+			{
 				$context['show_rename_boxes'] = true;
+			}
 			else
 			{
 				foreach ($this->_req->post->rename_profile as $id => $name)
+				{
 					renamePermissionProfile($id, $name);
+				}
 			}
 		}
 		// Deleting?
@@ -1010,8 +1122,12 @@ class ManagePermissions extends \ElkArte\AbstractController
 
 			$profiles = array();
 			foreach ($this->_req->post->delete_profile as $profile)
+			{
 				if ($profile > 4)
+				{
 					$profiles[] = (int) $profile;
+				}
+			}
 
 			deletePermissionProfiles($profiles);
 		}
@@ -1027,12 +1143,14 @@ class ManagePermissions extends \ElkArte\AbstractController
 		foreach ($context['profiles'] as $id => $profile)
 		{
 			// Can't delete special ones.
-			$context['profiles'][$id]['can_edit'] = isset($txt['permissions_profile_' . $profile['unformatted_name']]) ? false : true;
+			$context['profiles'][$id]['can_edit'] = !isset($txt['permissions_profile_' . $profile['unformatted_name']]);
 			if ($context['profiles'][$id]['can_edit'])
+			{
 				$context['can_edit_something'] = true;
+			}
 
 			// You can only delete it if you can edit it AND it's not in use.
-			$context['profiles'][$id]['can_delete'] = $context['profiles'][$id]['can_edit'] && empty($profile['in_use']) ? true : false;
+			$context['profiles'][$id]['can_delete'] = $context['profiles'][$id]['can_edit'] && empty($profile['in_use']);
 		}
 
 		theme()->addJavascriptVar(array(
@@ -1080,7 +1198,9 @@ class ManagePermissions extends \ElkArte\AbstractController
 		// What are the permissions we are querying?
 		$all_permissions = array();
 		foreach ($mappings as $perm_set)
+		{
 			$all_permissions = array_merge($all_permissions, $perm_set);
+		}
 
 		// If we're saving the changes then do just that - save them.
 		if (!empty($this->_req->post->save_changes) && ($context['current_profile'] == 1 || $context['current_profile'] > 4))
@@ -1106,14 +1226,18 @@ class ManagePermissions extends \ElkArte\AbstractController
 							$new_permissions[] = array($context['current_profile'], $group['id'], $data[1], 1);
 						}
 						elseif ($temp[$group['id']] === 'moderate')
+						{
 							$new_permissions[] = array($context['current_profile'], $group['id'], $data[1], 1);
+						}
 					}
 				}
 			}
 
 			// Insert new permissions.
 			if (!empty($new_permissions))
+			{
 				insertBoardPermission($new_permissions);
+			}
 		}
 
 		// Now get all the permissions!
@@ -1130,10 +1254,14 @@ class ManagePermissions extends \ElkArte\AbstractController
 					{
 						// Full allowance?
 						if ($index == 0)
+						{
 							$context['profile_groups'][$id_group][$key] = 'allow';
+						}
 						// Otherwise only bother with moderate if not on allow.
 						elseif ($context['profile_groups'][$id_group][$key] !== 'allow')
+						{
 							$context['profile_groups'][$id_group][$key] = 'moderate';
+						}
 					}
 				}
 			}

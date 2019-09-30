@@ -8,7 +8,7 @@
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause (see accompanying LICENSE.txt file)
  *
  * This file contains code covered by:
- * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * copyright: 2011 Simple Machines (http://www.simplemachines.org)
  *
  * @version 2.0 dev
  *
@@ -26,18 +26,21 @@ class Recent
 {
 	/**
 	 * Holds the boards the member is looking at
+	 *
 	 * @var string
 	 */
 	private $_query_this_board = '';
 
 	/**
 	 * All of hte recent messages
+	 *
 	 * @var array
 	 */
 	private $_messages = array();
 
 	/**
 	 * All of the recent posts
+	 *
 	 * @var array
 	 */
 	private $_board_ids = array();
@@ -49,12 +52,14 @@ class Recent
 
 	/**
 	 * If we will cache the results
+	 *
 	 * @var bool
 	 */
 	private $_cache_results = false;
 
 	/**
 	 * user id to check for recent messages
+	 *
 	 * @var int
 	 */
 	private $_user_id = 0;
@@ -88,14 +93,7 @@ class Recent
 	 */
 	public function setBoards($boards)
 	{
-		if (is_array($boards))
-		{
-			$this->_query_parameters['boards'] = $boards;
-		}
-		else
-		{
-			$this->_query_parameters['boards'] = array($boards);
-		}
+		$this->_query_parameters['boards'] = is_array($boards) ? $boards : array($boards);
 
 		$this->_query_this_board .= 'b.id_board IN ({array_int:boards})';
 	}
@@ -126,7 +124,9 @@ class Recent
 			AND m.id_msg >= {int:max_id_msg}';
 
 		if (!empty($recycle))
+		{
 			$this->_query_parameters['recycle_board'] = $msg_id;
+		}
 
 		$this->_query_parameters['max_id_msg'] = $msg_id;
 	}
@@ -156,67 +156,6 @@ class Recent
 		}
 
 		return !empty($this->_messages);
-	}
-
-	/**
-	 * Find the most recent messages in the forum.
-	 *
-	 * @param int $start - position to start the query
-	 * @param array $permissions - An array of boards permissions the members have.
-	 *                 Used to define the buttons a member can see next to a message.
-	 *                 Format of the array is:
-	 *                 array(
-	 *                   'own' => array(
-	 *                     'permission_name' => 'test_name'
-	 *                     ...
-	 *                   ),
-	 *                   'any' => array(
-	 *                     'permission_name' => 'test_name'
-	 *                     ...
-	 *                   )
-	 *                 )
-	 *
-	 * @return array
-	 */
-	public function getRecentPosts($start, $permissions)
-	{
-		// Provide an easy way for integration to interact with the recent display items
-		call_integration_hook('integrate_recent_message_list', array($this->_messages, &$permissions));
-
-		$this->_getRecentPosts($start);
-
-		// Now go through all the permissions, looking for boards they can do it on.
-		foreach ($permissions as $type => $list)
-		{
-			foreach ($list as $permission => $allowed)
-			{
-				// They can do it on these boards...
-				$boards = boardsAllowedTo($permission);
-
-				// If 0 is the only thing in the array, they can do it everywhere!
-				if (!empty($boards) && $boards[0] == 0)
-					$boards = array_keys($this->_board_ids[$type]);
-
-				// Go through the boards, and look for posts they can do this on.
-				foreach ($boards as $board_id)
-				{
-					// Hmm, they have permission, but there are no topics from that board on this page.
-					if (!isset($this->_board_ids[$type][$board_id]))
-						continue;
-
-					// Okay, looks like they can do it for these posts.
-					foreach ($this->_board_ids[$type][$board_id] as $counter)
-					{
-						if ($type === 'any' || $this->_posts[$counter]['poster']['id'] == $this->_user_id)
-						{
-							$this->_posts[$counter]['tests'][$allowed] = true;
-						}
-					}
-				}
-			}
-		}
-
-		return $this->_posts;
 	}
 
 	/**
@@ -258,7 +197,9 @@ class Recent
 				unset($this->_query_parameters['max_id_msg']);
 			}
 			else
+			{
 				$done = true;
+			}
 		}
 		$this->_messages = array();
 		while ($row = $this->_db->fetch_assoc($request))
@@ -266,6 +207,71 @@ class Recent
 			$this->_messages[] = $row['id_msg'];
 		}
 		$this->_db->free_result($request);
+	}
+
+	/**
+	 * Find the most recent messages in the forum.
+	 *
+	 * @param int $start - position to start the query
+	 * @param array $permissions - An array of boards permissions the members have.
+	 *                 Used to define the buttons a member can see next to a message.
+	 *                 Format of the array is:
+	 *                 array(
+	 *                   'own' => array(
+	 *                     'permission_name' => 'test_name'
+	 *                     ...
+	 *                   ),
+	 *                   'any' => array(
+	 *                     'permission_name' => 'test_name'
+	 *                     ...
+	 *                   )
+	 *                 )
+	 *
+	 * @return array
+	 */
+	public function getRecentPosts($start, $permissions)
+	{
+		// Provide an easy way for integration to interact with the recent display items
+		call_integration_hook('integrate_recent_message_list', array($this->_messages, &$permissions));
+
+		$this->_getRecentPosts($start);
+
+		// Now go through all the permissions, looking for boards they can do it on.
+		foreach ($permissions as $type => $list)
+		{
+			foreach ($list as $permission => $allowed)
+			{
+				// They can do it on these boards...
+				$boards = boardsAllowedTo($permission);
+
+				// If 0 is the only thing in the array, they can do it everywhere!
+				if (!empty($boards) && $boards[0] == 0)
+				{
+					$boards = array_keys($this->_board_ids[$type]);
+				}
+
+				// Go through the boards, and look for posts they can do this on.
+				foreach ($boards as $board_id)
+				{
+					// Hmm, they have permission, but there are no topics from that board on this page.
+					if (!isset($this->_board_ids[$type][$board_id]))
+					{
+						continue;
+					}
+
+					// Okay, looks like they can do it for these posts.
+					foreach ($this->_board_ids[$type][$board_id] as $counter)
+					{
+						if ($type === 'any' || $this->_posts[$counter]['poster']['id'] == $this->_user_id)
+						{
+							$this->_posts[$counter]['tests'][$allowed] = true;
+						}
+					}
+				}
+			}
+		}
+
+		return $this->_posts;
 	}
 
 	/**

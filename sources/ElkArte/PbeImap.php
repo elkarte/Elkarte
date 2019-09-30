@@ -144,17 +144,6 @@ class PbeImap extends AbstractModel
 	}
 
 	/**
-	 * Simply checks to see that the values from the ACP are complete
-	 *
-	 * @return bool
-	 */
-	private function _checkValues()
-	{
-		// I suppose that without this information we can't do anything.
-		return (empty($this->_hostname) || empty($this->_username) || empty($this->_password)) ? false : true;
-	}
-
-	/**
 	 * Finds the inbox of the email
 	 */
 	protected function _get_inbox()
@@ -185,48 +174,14 @@ class PbeImap extends AbstractModel
 	}
 
 	/**
-	 * Retrieves and composes and email (headers+message) from and imap inbox
+	 * Simply checks to see that the values from the ACP are complete
 	 *
-	 * @param int $email_uid - The email id
-	 *
-	 * @return string
+	 * @return bool
 	 */
-	protected function _fetch_email($email_uid)
+	private function _checkValues()
 	{
-		// Get the headers and prefetch the body as well to avoid a second request
-		$headers = imap_fetchheader($this->_inbox, $email_uid, FT_PREFETCHTEXT | FT_UID);
-		$message = imap_body($this->_inbox, $email_uid, FT_UID);
-
-		// Create the save-as email
-		if (!empty($headers) && !empty($message))
-		{
-			$email = $headers . "\n" . $message;
-		}
-		else
-		{
-			$email = '';
-		}
-
-		return $email;
-	}
-
-	/**
-	 * Deletes an email from an imap inbox
-	 *
-	 * @param int $email_uid - The email id
-	 */
-	protected function _delete_email($email_uid)
-	{
-		// Gmail labels make this more complicated
-		if ($this->_is_gmail)
-		{
-			// If using gmail, we may need the trash bin name as well
-			$trash_bin = $this->_get_trash_folder();
-			imap_mail_move($this->_inbox, $email_uid, $trash_bin, CP_UID);
-		}
-
-		imap_delete($this->_inbox, $email_uid, FT_UID);
-		imap_expunge($this->_inbox);
+		// I suppose that without this information we can't do anything.
+		return (empty($this->_hostname) || empty($this->_username) || empty($this->_password)) ? false : true;
 	}
 
 	/**
@@ -281,6 +236,43 @@ class PbeImap extends AbstractModel
 		}
 
 		return array('protocol' => $protocol, 'port' => $port, 'flags' => $flags);
+	}
+
+	/**
+	 * Retrieves and composes and email (headers+message) from and imap inbox
+	 *
+	 * @param int $email_uid - The email id
+	 *
+	 * @return string
+	 */
+	protected function _fetch_email($email_uid)
+	{
+		// Get the headers and prefetch the body as well to avoid a second request
+		$headers = imap_fetchheader($this->_inbox, $email_uid, FT_PREFETCHTEXT | FT_UID);
+		$message = imap_body($this->_inbox, $email_uid, FT_UID);
+
+		$email = !empty($headers) && !empty($message) ? $headers . "\n" . $message : '';
+
+		return $email;
+	}
+
+	/**
+	 * Deletes an email from an imap inbox
+	 *
+	 * @param int $email_uid - The email id
+	 */
+	protected function _delete_email($email_uid)
+	{
+		// Gmail labels make this more complicated
+		if ($this->_is_gmail)
+		{
+			// If using gmail, we may need the trash bin name as well
+			$trash_bin = $this->_get_trash_folder();
+			imap_mail_move($this->_inbox, $email_uid, $trash_bin, CP_UID);
+		}
+
+		imap_delete($this->_inbox, $email_uid, FT_UID);
+		imap_expunge($this->_inbox);
 	}
 
 	/**

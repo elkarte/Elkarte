@@ -8,7 +8,7 @@
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause (see accompanying LICENSE.txt file)
  *
  * This file contains code covered by:
- * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * copyright: 2011 Simple Machines (http://www.simplemachines.org)
  *
  * @version 2.0 dev
  *
@@ -17,9 +17,9 @@
 use ElkArte\User;
 
 /**
+ * @param string $session_id
  * @todo
  *
- * @param string $session_id
  */
 function deleteLogOnlineInterval($session_id)
 {
@@ -65,7 +65,9 @@ function updateLogOnline($session_id, $serialized)
 
 	// Guess it got deleted.
 	if ($db->affected_rows() == 0)
+	{
 		$_SESSION['log_time'] = 0;
+	}
 }
 
 /**
@@ -236,8 +238,8 @@ function deleteMemberLogOnline()
 /**
  * Delete expired/outdated session from log_online
  *
- * @package Authorization
  * @param string $session
+ * @package Authorization
  */
 function deleteOnline($session)
 {
@@ -255,16 +257,18 @@ function deleteOnline($session)
 /**
  * Set the passed users online or not, in the online log table
  *
- * @package Authorization
  * @param int[]|int $ids ids of the member(s) to log
  * @param bool $on = false if true, add the user(s) to online log, if false, remove 'em
+ * @package Authorization
  */
 function logOnline($ids, $on = false)
 {
 	$db = database();
 
 	if (!is_array($ids))
+	{
 		$ids = array($ids);
+	}
 
 	if (empty($on))
 	{

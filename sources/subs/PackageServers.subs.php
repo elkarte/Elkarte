@@ -14,9 +14,9 @@
 /**
  * Fetches a list of package servers.
  *
- * @package Packages
  * @param int|null $server
  * @return array
+ * @package Packages
  */
 function fetchPackageServers($server = null)
 {
@@ -49,8 +49,8 @@ function fetchPackageServers($server = null)
 /**
  * Delete a package server
  *
- * @package Packages
  * @param int $id
+ * @package Packages
  */
 function deletePackageServer($id)
 {
@@ -68,9 +68,9 @@ function deletePackageServer($id)
 /**
  * Adds a new package server
  *
- * @package Packages
  * @param string $name
  * @param string $url
+ * @package Packages
  */
 function addPackageServer($name, $url)
 {

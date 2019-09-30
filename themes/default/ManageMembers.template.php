@@ -6,7 +6,7 @@
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause (see accompanying LICENSE.txt file)
  *
  * This file contains code covered by:
- * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * copyright: 2011 Simple Machines (http://www.simplemachines.org)
  *
  * @version 2.0 dev
  *
@@ -151,6 +151,7 @@ function template_search_members()
 					<tbody>';
 
 	foreach ($context['membergroups'] as $membergroup)
+	{
 		echo '
 						<tr>
 							<td>', $membergroup['name'], '</td>
@@ -161,6 +162,7 @@ function template_search_members()
 								', $membergroup['can_be_additional'] ? '<input type="checkbox" name="membergroups[2][]" value="' . $membergroup['id'] . '" checked="checked" />' : '', '
 							</td>
 						</tr>';
+	}
 
 	echo '
 						<tr>
@@ -189,6 +191,7 @@ function template_search_members()
 					<tbody>';
 
 	foreach ($context['postgroups'] as $postgroup)
+	{
 		echo '
 						<tr>
 							<td>
@@ -198,6 +201,7 @@ function template_search_members()
 								<input type="checkbox" name="postgroups[]" value="', $postgroup['id'], '" checked="checked" />
 							</td>
 						</tr>';
+	}
 
 	echo '
 						<tr>

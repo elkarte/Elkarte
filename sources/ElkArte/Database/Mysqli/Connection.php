@@ -8,7 +8,7 @@
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause (see accompanying LICENSE.txt file)
  *
  * This file contains code covered by:
- * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * copyright: 2011 Simple Machines (http://www.simplemachines.org)
  *
  * @version 2.0 dev
  *
@@ -16,10 +16,12 @@
 
 namespace ElkArte\Database\Mysqli;
 
+use ElkArte\Database\ConnectionInterface;
+
 /**
  * SQL database class, implements database class to control mysql functions
  */
-class Connection implements \ElkArte\Database\ConnectionInterface
+class Connection implements ConnectionInterface
 {
 	/**
 	 * {@inheritDoc}
@@ -55,8 +57,7 @@ class Connection implements \ElkArte\Database\ConnectionInterface
 		// Few databases still have not set UTF-8 as their default input charset
 		$query->query('', '
 			SET NAMES UTF8',
-			array(
-			)
+			array()
 		);
 
 		return $query;

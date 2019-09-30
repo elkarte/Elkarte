@@ -8,7 +8,7 @@
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause (see accompanying LICENSE.txt file)
  *
  * This file contains code covered by:
- * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * copyright: 2011 Simple Machines (http://www.simplemachines.org)
  *
  * @version 2.0 dev
  *
@@ -16,19 +16,26 @@
 
 namespace ElkArte\Controller;
 
+use ElkArte\AbstractController;
+use ElkArte\Action;
+use ElkArte\Exceptions\Exception;
+use ElkArte\MembersList;
+
 /**
  * Show a users login, profile edits, IP history
  */
-class ProfileHistory extends \ElkArte\AbstractController
+class ProfileHistory extends AbstractController
 {
 	/**
 	 * Member id for the history being viewed
+	 *
 	 * @var int
 	 */
 	private $_memID = 0;
 
 	/**
 	 * The \ElkArte\Member object is stored here to avoid some global
+	 *
 	 * @var \ElkArte\Member
 	 */
 	private $_profile = null;
@@ -42,7 +49,7 @@ class ProfileHistory extends \ElkArte\AbstractController
 		require_once(SUBSDIR . '/Profile.subs.php');
 
 		$this->_memID = currentMemberID();
-		$this->_profile = \ElkArte\MembersList::get($this->_memID);
+		$this->_profile = MembersList::get($this->_memID);
 	}
 
 	/**
@@ -75,7 +82,7 @@ class ProfileHistory extends \ElkArte\AbstractController
 		);
 
 		// Set up action/subaction stuff.
-		$action = new \ElkArte\Action('profile_history');
+		$action = new Action('profile_history');
 
 		// Yep, sub-action time and call integrate_sa_profile_history as well
 		$subAction = $action->initialize($subActions, 'activity');
@@ -83,7 +90,9 @@ class ProfileHistory extends \ElkArte\AbstractController
 
 		// Moderation must be on to track edits.
 		if (empty($modSettings['modlog_enabled']))
+		{
 			unset($context[$context['profile_menu_name']]['tab_data']['edits']);
+		}
 
 		// Set a page title.
 		$context['history_area'] = $subAction;
@@ -105,8 +114,10 @@ class ProfileHistory extends \ElkArte\AbstractController
 
 		$context['last_ip'] = $this->_profile['member_ip'];
 
-		if ($context['last_ip'] != $this->_profile['member_ip2'])
+		if ($context['last_ip'] !== $this->_profile['member_ip2'])
+		{
 			$context['last_ip2'] = $this->_profile['member_ip2'];
+		}
 
 		$context['member']['name'] = $this->_profile['real_name'];
 
@@ -119,14 +130,18 @@ class ProfileHistory extends \ElkArte\AbstractController
 			'base_href' => $scripturl . '?action=profile;area=history;sa=user;u=' . $this->_memID,
 			'default_sort_col' => 'date',
 			'get_items' => array(
-				'function' => array($this, 'list_getUserErrors'),
+				'function' => function ($start, $items_per_page, $sort, $where, $where_vars = array()) {
+					return $this->list_getUserErrors($start, $items_per_page, $sort, $where, $where_vars);
+				},
 				'params' => array(
 					'le.id_member = {int:current_member}',
 					array('current_member' => $this->_memID),
 				),
 			),
 			'get_count' => array(
-				'function' => array($this, 'list_getUserErrorCount'),
+				'function' => function ($where, $where_vars = array()) {
+					return $this->list_getUserErrorCount($where, $where_vars);
+				},
 				'params' => array(
 					'id_member = {int:current_member}',
 					array('current_member' => $this->_memID),
@@ -195,10 +210,14 @@ class ProfileHistory extends \ElkArte\AbstractController
 		$context['error_ips'] = array();
 
 		foreach ($ips['message_ips'] as $ip)
+		{
 			$context['ips'][] = '<a href="' . $scripturl . '?action=profile;area=history;sa=ip;searchip=' . $ip . ';u=' . $this->_memID . '">' . $ip . '</a>';
+		}
 
 		foreach ($ips['error_ips'] as $ip)
+		{
 			$context['error_ips'][] = '<a href="' . $scripturl . '?action=profile;area=history;sa=ip;searchip=' . $ip . ';u=' . $this->_memID . '">' . $ip . '</a>';
+		}
 
 		// Find other users that might use the same IP.
 		$context['members_in_range'] = array();
@@ -208,11 +227,49 @@ class ProfileHistory extends \ElkArte\AbstractController
 		{
 			$members_in_range = getMembersInRange($all_ips, $this->_memID);
 			foreach ($members_in_range as $row)
+			{
 				$context['members_in_range'][$row['id_member']] = '<a href="' . $scripturl . '?action=profile;u=' . $row['id_member'] . '">' . $row['real_name'] . '</a>';
+			}
 		}
 
 		theme()->getTemplates()->load('ProfileHistory');
 		$context['sub_template'] = 'trackActivity';
+	}
+
+	/**
+	 * Get a list of error messages from this ip (range).
+	 *
+	 * Pass though to getUserErrors for createList in action_trackip() and action_trackactivity()
+	 *
+	 * @param int $start The item to start with (for pagination purposes)
+	 * @param int $items_per_page The number of items to show per page
+	 * @param string $sort A string indicating how to sort the results
+	 * @param string $where
+	 * @param mixed[] $where_vars array of values used in the where statement
+	 * @return mixed[] error messages array
+	 */
+	public function list_getUserErrors($start, $items_per_page, $sort, $where, $where_vars = array())
+	{
+		require_once(SUBSDIR . '/ProfileHistory.subs.php');
+
+		return getUserErrors($start, $items_per_page, $sort, $where, $where_vars);
+	}
+
+	/**
+	 * Get the number of user errors
+	 *
+	 * Pass though for createList to getUserErrorCount
+	 * used in action_trackip() and action_trackactivity()
+	 *
+	 * @param string $where
+	 * @param mixed[] $where_vars = array() or values used in the where statement
+	 * @return string number of user errors
+	 */
+	public function list_getUserErrorCount($where, $where_vars = array())
+	{
+		require_once(SUBSDIR . '/ProfileHistory.subs.php');
+
+		return getUserErrorCount($where, $where_vars);
 	}
 
 	/**
@@ -231,7 +288,7 @@ class ProfileHistory extends \ElkArte\AbstractController
 		theme()->getTemplates()->load('ProfileHistory');
 		theme()->getTemplates()->loadLanguageFile('Profile');
 
-		if ($this->_memID == 0)
+		if ($this->_memID === 0)
 		{
 			$context['ip'] = $this->user->ip;
 			$context['page_title'] = $txt['profile'];
@@ -245,19 +302,23 @@ class ProfileHistory extends \ElkArte\AbstractController
 
 		// Searching?
 		if (isset($this->_req->query->searchip))
+		{
 			$context['ip'] = trim($this->_req->query->searchip);
+		}
 
 		if (preg_match('/^\d{1,3}\.(\d{1,3}|\*)\.(\d{1,3}|\*)\.(\d{1,3}|\*)$/', $context['ip']) == 0
 			&& isValidIPv6($context['ip']) === false)
 		{
-			throw new \ElkArte\Exceptions\Exception('invalid_tracking_ip', false);
+			throw new Exception('invalid_tracking_ip', false);
 		}
 
 		$ip_var = str_replace('*', '%', $context['ip']);
 		$ip_string = strpos($ip_var, '%') === false ? '= {string:ip_address}' : 'LIKE {string:ip_address}';
 
 		if (empty($context['history_area']))
+		{
 			$context['page_title'] = $txt['trackIP'] . ' - ' . $context['ip'];
+		}
 
 		// Fetch the members that are associated with the ip's
 		require_once(SUBSDIR . '/Members.subs.php');
@@ -273,14 +334,18 @@ class ProfileHistory extends \ElkArte\AbstractController
 			'base_href' => $context['base_url'] . ';searchip=' . $context['ip'],
 			'default_sort_col' => 'date',
 			'get_items' => array(
-				'function' => array($this, 'list_getIPMessages'),
+				'function' => function ($start, $items_per_page, $sort, $where, $where_vars = array()) {
+					return $this->list_getIPMessages($start, $items_per_page, $sort, $where, $where_vars);
+				},
 				'params' => array(
 					'm.poster_ip ' . $ip_string,
 					array('ip_address' => $ip_var),
 				),
 			),
 			'get_count' => array(
-				'function' => array($this, 'list_getIPMessageCount'),
+				'function' => function ($where, $where_vars = array()) {
+					return $this->list_getIPMessageCount($where, $where_vars);
+				},
 				'params' => array(
 					'm.poster_ip ' . $ip_string,
 					array('ip_address' => $ip_var),
@@ -362,14 +427,18 @@ class ProfileHistory extends \ElkArte\AbstractController
 			'base_href' => $context['base_url'] . ';searchip=' . $context['ip'],
 			'default_sort_col' => 'date2',
 			'get_items' => array(
-				'function' => array($this, 'list_getUserErrors'),
+				'function' => function ($start, $items_per_page, $sort, $where, $where_vars = array()) {
+					return $this->list_getUserErrors($start, $items_per_page, $sort, $where, $where_vars);
+				},
 				'params' => array(
 					'le.ip ' . $ip_string,
 					array('ip_address' => $ip_var),
 				),
 			),
 			'get_count' => array(
-				'function' => array($this, 'list_getUserErrorCount'),
+				'function' => function ($where, $where_vars = array()) {
+					return $this->list_getUserErrorCount($where, $where_vars);
+				},
 				'params' => array(
 					'ip ' . $ip_string,
 					array('ip_address' => $ip_var),
@@ -473,6 +542,41 @@ class ProfileHistory extends \ElkArte\AbstractController
 	}
 
 	/**
+	 * Fetch a listing of messages made from a given IP
+	 *
+	 * Pass through to getIPMessages used by createList() in TrackIP()
+	 *
+	 * @param int $start The item to start with (for pagination purposes)
+	 * @param int $items_per_page The number of items to show per page
+	 * @param string $sort A string indicating how to sort the results
+	 * @param string $where
+	 * @param mixed[] $where_vars array of values used in the where statement
+	 * @return mixed[] an array of basic messages / details
+	 */
+	public function list_getIPMessages($start, $items_per_page, $sort, $where, $where_vars = array())
+	{
+		require_once(SUBSDIR . '/ProfileHistory.subs.php');
+
+		return getIPMessages($start, $items_per_page, $sort, $where, $where_vars);
+	}
+
+	/**
+	 * count of messages from a matching IP
+	 *
+	 * Pass though to getIPMessageCount for createList() in TrackIP()
+	 *
+	 * @param string $where
+	 * @param mixed[] $where_vars array of values used in the where statement
+	 * @return string count of messages matching the IP
+	 */
+	public function list_getIPMessageCount($where, $where_vars = array())
+	{
+		require_once(SUBSDIR . '/ProfileHistory.subs.php');
+
+		return getIPMessageCount($where, $where_vars);
+	}
+
+	/**
 	 * Tracks the logins of a given user.
 	 *
 	 * - Accessed by ?action=trackip and ?action=profile;area=history;sa=ip
@@ -481,10 +585,14 @@ class ProfileHistory extends \ElkArte\AbstractController
 	{
 		global $scripturl, $txt, $context;
 
-		if ($this->_memID == 0)
+		if ($this->_memID === 0)
+		{
 			$context['base_url'] = $scripturl . '?action=trackip';
+		}
 		else
+		{
 			$context['base_url'] = $scripturl . '?action=profile;area=history;sa=ip;u=' . $this->_memID;
+		}
 
 		// Start with the user messages.
 		$listOptions = array(
@@ -493,14 +601,18 @@ class ProfileHistory extends \ElkArte\AbstractController
 			'no_items_label' => $txt['trackLogins_none_found'],
 			'base_href' => $context['base_url'],
 			'get_items' => array(
-				'function' => array($this, 'list_getLogins'),
+				'function' => function ($start, $items_per_page, $sort, $where, $where_vars = array()) {
+					return $this->list_getLogins($start, $items_per_page, $sort, $where, $where_vars);
+				},
 				'params' => array(
 					'id_member = {int:current_member}',
 					array('current_member' => $this->_memID),
 				),
 			),
 			'get_count' => array(
-				'function' => array($this, 'list_getLoginCount'),
+				'function' => function ($where, $where_vars = array()) {
+					return $this->list_getLoginCount($where, $where_vars);
+				},
 				'params' => array(
 					'id_member = {int:current_member}',
 					array('current_member' => $this->_memID),
@@ -547,6 +659,43 @@ class ProfileHistory extends \ElkArte\AbstractController
 	}
 
 	/**
+	 * List of login history for a user
+	 *
+	 * Pass through to getLogins for trackLogins data.
+	 *
+	 * @param int $start The item to start with (for pagination purposes)
+	 * @param int $items_per_page The number of items to show per page
+	 * @param string $sort A string indicating how to sort the results
+	 * @param string $where
+	 * @param mixed[] $where_vars array of values used in the where statement
+	 *
+	 * @return mixed[] an array of messages
+	 */
+	public function list_getLogins($start, $items_per_page, $sort, $where, $where_vars = array())
+	{
+		require_once(SUBSDIR . '/ProfileHistory.subs.php');
+
+		return getLogins($where, $where_vars);
+	}
+
+	/**
+	 * Get list of all times this account was logged into
+	 *
+	 * Pass through to getLoginCount for trackLogins for counting history.
+	 * (createList() in TrackLogins())
+	 *
+	 * @param string $where
+	 * @param mixed[] $where_vars array of values used in the where statement
+	 * @return string count of messages matching the IP
+	 */
+	public function list_getLoginCount($where, $where_vars = array())
+	{
+		require_once(SUBSDIR . '/ProfileHistory.subs.php');
+
+		return getLoginCount($where, $where_vars);
+	}
+
+	/**
 	 * Logs edits to a members profile.
 	 */
 	public function action_trackedits()
@@ -566,10 +715,14 @@ class ProfileHistory extends \ElkArte\AbstractController
 			'base_href' => $scripturl . '?action=profile;area=history;sa=edits;u=' . $this->_memID,
 			'default_sort_col' => 'time',
 			'get_items' => array(
-				'function' => array($this, 'list_getProfileEdits'),
+				'function' => function ($start, $items_per_page, $sort) {
+					return $this->list_getProfileEdits($start, $items_per_page, $sort);
+				},
 			),
 			'get_count' => array(
-				'function' => array($this, 'list_getProfileEditCount'),
+				'function' => function () {
+					return $this->list_getProfileEditCount();
+				},
 			),
 			'columns' => array(
 				'action' => array(
@@ -627,117 +780,20 @@ class ProfileHistory extends \ElkArte\AbstractController
 	}
 
 	/**
-	 * Get the number of user errors
+	 * List of profile edits for display
 	 *
-	 * Pass though for createList to getUserErrorCount
-	 * used in action_trackip() and action_trackactivity()
-	 *
-	 * @param string $where
-	 * @param mixed[] $where_vars = array() or values used in the where statement
-	 * @return string number of user errors
-	 */
-	public function list_getUserErrorCount($where, $where_vars = array())
-	{
-		require_once(SUBSDIR . '/ProfileHistory.subs.php');
-		$count = getUserErrorCount($where, $where_vars);
-
-		return $count;
-	}
-
-	/**
-	 * Get a list of error messages from this ip (range).
-	 *
-	 * Pass though to getUserErrors for createList in action_trackip() and action_trackactivity()
+	 * Pass through to getProfileEdits function for createList in trackEdits().
 	 *
 	 * @param int $start The item to start with (for pagination purposes)
-	 * @param int $items_per_page  The number of items to show per page
+	 * @param int $items_per_page The number of items to show per page
 	 * @param string $sort A string indicating how to sort the results
-	 * @param string $where
-	 * @param mixed[] $where_vars array of values used in the where statement
-	 * @return mixed[] error messages array
+	 * @return mixed[] array of profile edits
 	 */
-	public function list_getUserErrors($start, $items_per_page, $sort, $where, $where_vars = array())
+	public function list_getProfileEdits($start, $items_per_page, $sort)
 	{
 		require_once(SUBSDIR . '/ProfileHistory.subs.php');
-		$error_messages = getUserErrors($start, $items_per_page, $sort, $where, $where_vars);
 
-		return $error_messages;
-	}
-
-	/**
-	 * count of messages from a matching IP
-	 *
-	 * Pass though to getIPMessageCount for createList() in TrackIP()
-	 *
-	 * @param string $where
-	 * @param mixed[] $where_vars array of values used in the where statement
-	 * @return string count of messages matching the IP
-	 */
-	public function list_getIPMessageCount($where, $where_vars = array())
-	{
-		require_once(SUBSDIR . '/ProfileHistory.subs.php');
-		$count = getIPMessageCount($where, $where_vars);
-
-		return $count;
-	}
-
-	/**
-	 * Fetch a listing of messages made from a given IP
-	 *
-	 * Pass through to getIPMessages used by createList() in TrackIP()
-	 *
-	 * @param int $start The item to start with (for pagination purposes)
-	 * @param int $items_per_page  The number of items to show per page
-	 * @param string $sort A string indicating how to sort the results
-	 * @param string $where
-	 * @param mixed[] $where_vars array of values used in the where statement
-	 * @return mixed[] an array of basic messages / details
-	 */
-	public function list_getIPMessages($start, $items_per_page, $sort, $where, $where_vars = array())
-	{
-		require_once(SUBSDIR . '/ProfileHistory.subs.php');
-		$messages = getIPMessages($start, $items_per_page, $sort, $where, $where_vars);
-
-		return $messages;
-	}
-
-	/**
-	 * Get list of all times this account was logged into
-	 *
-	 * Pass through to getLoginCount for trackLogins for counting history.
-	 * (createList() in TrackLogins())
-	 *
-	 * @param string $where
-	 * @param mixed[] $where_vars array of values used in the where statement
-	 * @return string count of messages matching the IP
-	 */
-	public function list_getLoginCount($where, $where_vars = array())
-	{
-		require_once(SUBSDIR . '/ProfileHistory.subs.php');
-		$count = getLoginCount($where, $where_vars);
-
-		return $count;
-	}
-
-	/**
-	 * List of login history for a user
-	 *
-	 * Pass through to getLogins for trackLogins data.
-	 *
-	 * @param int $start The item to start with (for pagination purposes)
-	 * @param int $items_per_page  The number of items to show per page
-	 * @param string $sort A string indicating how to sort the results
-	 * @param string $where
-	 * @param mixed[] $where_vars array of values used in the where statement
-	 *
-	 * @return mixed[] an array of messages
-	 */
-	public function list_getLogins($start, $items_per_page, $sort, $where, $where_vars = array())
-	{
-		require_once(SUBSDIR . '/ProfileHistory.subs.php');
-		$logins = getLogins($where, $where_vars);
-
-		return $logins;
+		return getProfileEdits($start, $items_per_page, $sort, $this->_memID);
 	}
 
 	/**
@@ -750,26 +806,7 @@ class ProfileHistory extends \ElkArte\AbstractController
 	public function list_getProfileEditCount()
 	{
 		require_once(SUBSDIR . '/ProfileHistory.subs.php');
-		$edit_count = getProfileEditCount($this->_memID);
 
-		return $edit_count;
-	}
-
-	/**
-	 * List of profile edits for display
-	 *
-	 * Pass through to getProfileEdits function for createList in trackEdits().
-	 *
-	 * @param int $start The item to start with (for pagination purposes)
-	 * @param int $items_per_page  The number of items to show per page
-	 * @param string $sort A string indicating how to sort the results
-	 * @return mixed[] array of profile edits
-	 */
-	public function list_getProfileEdits($start, $items_per_page, $sort)
-	{
-		require_once(SUBSDIR . '/ProfileHistory.subs.php');
-		$edits = getProfileEdits($start, $items_per_page, $sort, $this->_memID);
-
-		return $edits;
+		return getProfileEditCount($this->_memID);
 	}
 }

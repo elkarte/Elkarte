@@ -8,7 +8,7 @@
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause (see accompanying LICENSE.txt file)
  *
  * This file contains code covered by:
- * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * copyright: 2011 Simple Machines (http://www.simplemachines.org)
  *
  * @version 2.0 dev
  *
@@ -48,8 +48,7 @@ class ApprovalNotification implements ScheduledTaskInterface
 				INNER JOIN {db_prefix}messages AS m ON (m.id_msg = aq.id_msg)
 				INNER JOIN {db_prefix}topics AS t ON (t.id_topic = m.id_topic)
 				INNER JOIN {db_prefix}boards AS b ON (b.id_board = m.id_board)',
-			array(
-			)
+			array()
 		);
 		$notices = array();
 		$profiles = array();
@@ -57,15 +56,23 @@ class ApprovalNotification implements ScheduledTaskInterface
 		{
 			// If this is no longer around we'll ignore it.
 			if (empty($row['id_topic']))
+			{
 				continue;
+			}
 
 			// What type is it?
-			if ($row['id_first_msg'] && $row['id_first_msg'] == $row['id_msg'])
+			if ($row['id_first_msg'] && $row['id_first_msg'] === $row['id_msg'])
+			{
 				$type = 'topic';
+			}
 			elseif ($row['id_attach'])
+			{
 				$type = 'attach';
+			}
 			else
+			{
 				$type = 'msg';
+			}
 
 			// Add it to the array otherwise.
 			$notices[$row['id_board']][$type][] = array(
@@ -81,13 +88,14 @@ class ApprovalNotification implements ScheduledTaskInterface
 		// Delete it all!
 		$db->query('', '
 			DELETE FROM {db_prefix}approval_queue',
-			array(
-			)
+			array()
 		);
 
 		// If nothing quit now.
 		if (empty($notices))
+		{
 			return true;
+		}
 
 		// Now we need to think about finding out *who* can approve - this is hard!
 		// First off, get all the groups with this permission and sort by board.
@@ -108,13 +116,17 @@ class ApprovalNotification implements ScheduledTaskInterface
 		{
 			// Sorry guys, but we have to ignore guests AND members - it would be too many otherwise.
 			if ($row['id_group'] < 2)
+			{
 				continue;
+			}
 
 			$perms[$row['id_profile']][$row['add_deny'] ? 'add' : 'deny'][] = $row['id_group'];
 
 			// Anyone who can access has to be considered.
 			if ($row['add_deny'])
+			{
 				$addGroups[] = $row['id_group'];
+			}
 		}
 		$db->free_result($request);
 
@@ -129,8 +141,12 @@ class ApprovalNotification implements ScheduledTaskInterface
 			// Make sure they get included in the big loop.
 			$members = array_keys($all_mods);
 			foreach ($all_mods as $rows)
+			{
 				foreach ($rows as $row)
+				{
 					$mods[$row['id_member']][$row['id_board']] = true;
+				}
+			}
 		}
 
 		// Come along one and all... until we reject you ;)
@@ -154,9 +170,11 @@ class ApprovalNotification implements ScheduledTaskInterface
 			// Check whether they are interested.
 			if (!empty($row['mod_prefs']))
 			{
-				list (,, $pref_binary) = explode('|', $row['mod_prefs']);
+				list (, , $pref_binary) = explode('|', $row['mod_prefs']);
 				if (!($pref_binary & 4))
+				{
 					continue;
+				}
 			}
 
 			$members[$row['id_member']] = array(
@@ -183,8 +201,10 @@ class ApprovalNotification implements ScheduledTaskInterface
 			$emailbody = '';
 
 			// Load the language file as required.
-			if (empty($current_language) || $current_language != $member['language'])
+			if (empty($current_language) || $current_language !== $member['language'])
+			{
 				$current_language = theme()->getTemplates()->loadLanguageFile('EmailTemplates', $member['language'], false);
+			}
 
 			// Loop through each notice...
 			foreach ($notices as $board => $notice)
@@ -193,28 +213,40 @@ class ApprovalNotification implements ScheduledTaskInterface
 
 				// Can they mod in this board?
 				if (isset($mods[$id][$board]))
+				{
 					$access = true;
+				}
 
 				// Do the group check...
 				if (!$access && isset($perms[$profiles[$board]]['add']))
 				{
 					// They can access?!
-					if (array_intersect($perms[$profiles[$board]]['add'], $member['groups']))
+					if (array_intersect($perms[$profiles[$board]]['add'], $member['groups']) !== [])
+					{
 						$access = true;
+					}
 
 					// If they have deny rights don't consider them!
 					if (isset($perms[$profiles[$board]]['deny']))
-						if (array_intersect($perms[$profiles[$board]]['deny'], $member['groups']))
+					{
+						if (array_intersect($perms[$profiles[$board]]['deny'], $member['groups']) !== [])
+						{
 							$access = false;
+						}
+					}
 				}
 
 				// Finally, fix it for admins!
 				if (in_array(1, $member['groups']))
+				{
 					$access = true;
+				}
 
 				// If they can't access it then give it a break!
 				if (!$access)
+				{
 					continue;
+				}
 
 				foreach ($notice as $type => $items)
 				{
@@ -223,14 +255,18 @@ class ApprovalNotification implements ScheduledTaskInterface
 						'------------------------------------------------------' . "\n";
 
 					foreach ($items as $item)
+					{
 						$emailbody .= $item['subject'] . ' - ' . $item['href'] . "\n";
+					}
 
 					$emailbody .= "\n";
 				}
 			}
 
-			if ($emailbody == '')
+			if ($emailbody === '')
+			{
 				continue;
+			}
 
 			$replacements = array(
 				'REALNAME' => $member['name'],

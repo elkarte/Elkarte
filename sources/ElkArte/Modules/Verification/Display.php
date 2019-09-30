@@ -8,7 +8,7 @@
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause (see accompanying LICENSE.txt file)
  *
  * This file contains code covered by:
- * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * copyright: 2011 Simple Machines (http://www.simplemachines.org)
  *
  * @version 2.0 dev
  *
@@ -16,19 +16,22 @@
 
 namespace ElkArte\Modules\Verification;
 
+use ElkArte\EventManager;
+use ElkArte\Modules\AbstractModule;
 use ElkArte\User;
+use ElkArte\VerificationControls\VerificationControlsIntegrate;
 
 /**
  * Class \ElkArte\Modules\Verification\Display
  *
  * Adding Visual Verification event to Quick Reply area (display.controller)
  */
-class Display extends \ElkArte\Modules\AbstractModule
+class Display extends AbstractModule
 {
 	/**
 	 * {@inheritdoc }
 	 */
-	public static function hooks(\ElkArte\EventManager $eventsManager)
+	public static function hooks(EventManager $eventsManager)
 	{
 		global $modSettings;
 
@@ -39,7 +42,9 @@ class Display extends \ElkArte\Modules\AbstractModule
 			);
 		}
 		else
+		{
 			return array();
+		}
 	}
 
 	/**
@@ -53,7 +58,7 @@ class Display extends \ElkArte\Modules\AbstractModule
 		$verificationOptions = array(
 			'id' => 'post',
 		);
-		$context['require_verification'] = \ElkArte\VerificationControls\VerificationControlsIntegrate::create($verificationOptions);
+		$context['require_verification'] = VerificationControlsIntegrate::create($verificationOptions);
 		$context['visual_verification_id'] = $verificationOptions['id'];
 	}
 }

@@ -14,8 +14,6 @@
 
 namespace ElkArte;
 
-use ElkArte\User;
-
 /**
  * Dispatch the request to the function or method registered to handle it.
  *
@@ -36,12 +34,14 @@ class SiteDispatcher
 {
 	/**
 	 * Function or method to call
+	 *
 	 * @var string
 	 */
 	protected $_function_name;
 
 	/**
 	 * Class name, for object oriented controllers
+	 *
 	 * @var string
 	 */
 	protected $_controller_name;
@@ -59,6 +59,7 @@ class SiteDispatcher
 
 	/**
 	 * The instance of the controller
+	 *
 	 * @var \ElkArte\AbstractController
 	 */
 	protected $_controller;
@@ -131,55 +132,6 @@ class SiteDispatcher
 	);
 
 	/**
-	 * @return string[]
-	 */
-	protected function getFrontPage()
-	{
-		global $modSettings;
-
-		if (
-			!empty($modSettings['front_page'])
-			&& is_callable(array($modSettings['front_page'], 'frontPageHook'))
-		) {
-			$modSettings['default_forum_action'] = ['action' => 'forum'];
-			call_user_func_array(array($modSettings['front_page'], 'frontPageHook'), array(&$this->_default_action));
-		}
-		else
-		{
-			$modSettings['default_forum_action'] = [];
-		}
-		return $this->_default_action;
-	}
-
-	/**
-	 * Passes the \ElkArte\User::$info variable to the controller
-	 * @param \ElkArte\ValuesContainer $user
-	 */
-	public function setUser($user)
-	{
-		$this->_controller->setUser($user);
-	}
-
-	/**
-	 * Determine if guest access is restricted, and, if so,
-	 * only allow the listed actions
-	 *
-	 * @return boolean
-	 */
-	protected function restrictedGuestAccess()
-	{
-		global $modSettings;
-
-		return
-			empty($modSettings['allow_guestAccess'])
-			&& User::$info->is_guest
-			&& !in_array($this->action, array(
-				'login', 'login2', 'register', 'reminder',
-				'help', 'quickhelp', 'mailq', 'openidreturn'
-			));
-	}
-
-	/**
 	 * Create an instance and initialize it.
 	 *
 	 * This does all the work to figure out which controller and method need
@@ -204,6 +156,29 @@ class SiteDispatcher
 
 		// Initialize this controller with its event manager
 		$this->_controller = new $this->_controller_name(new EventManager());
+	}
+
+	/**
+	 * @return string[]
+	 */
+	protected function getFrontPage()
+	{
+		global $modSettings;
+
+		if (
+			!empty($modSettings['front_page'])
+				&& is_callable(array($modSettings['front_page'], 'frontPageHook'))
+		)
+		{
+			$modSettings['default_forum_action'] = ['action' => 'forum'];
+			call_user_func_array(array($modSettings['front_page'], 'frontPageHook'), array(&$this->_default_action));
+		}
+		else
+		{
+			$modSettings['default_forum_action'] = [];
+		}
+
+		return $this->_default_action;
 	}
 
 	/**
@@ -262,12 +237,18 @@ class SiteDispatcher
 
 			// If the method is coded in, use it
 			if (!empty($this->actionArray[$this->action][1]))
+			{
 				$this->_function_name = $this->actionArray[$this->action][1];
+			}
 			// Otherwise fall back to naming patterns
 			elseif (!empty($this->subAction) && preg_match('~^\w+$~', $this->subAction))
+			{
 				$this->_function_name = 'action_' . $this->subAction;
+			}
 			else
+			{
 				$this->_function_name = 'action_index';
+			}
 		}
 		// Fall back to naming patterns.
 		// addons can use any of them, and it should Just Work (tm).
@@ -277,9 +258,13 @@ class SiteDispatcher
 			// sa=upload => action_upload()
 			$this->_controller_name = '\\ElkArte\\Controller\\' . ucfirst($this->action);
 			if (isset($this->subAction) && preg_match('~^\w+$~', $this->subAction) && empty($this->area))
+			{
 				$this->_function_name = 'action_' . $this->subAction;
+			}
 			else
+			{
 				$this->_function_name = 'action_index';
+			}
 		}
 
 		// The file and function weren't found yet?
@@ -291,7 +276,9 @@ class SiteDispatcher
 		}
 
 		if (isset($_REQUEST['api']))
+		{
 			$this->_function_name .= '_api';
+		}
 
 		// 3, 2, ... and go
 		if (is_callable(array($this->_controller_name, $this->_function_name)))
@@ -308,6 +295,16 @@ class SiteDispatcher
 			$this->_controller_name = $this->_default_action['controller'];
 			$this->_function_name = $this->_default_action['function'];
 		}
+	}
+
+	/**
+	 * Passes the \ElkArte\User::$info variable to the controller
+	 *
+	 * @param \ElkArte\ValuesContainer $user
+	 */
+	public function setUser($user)
+	{
+		$this->_controller->setUser($user);
 	}
 
 	/**
@@ -362,7 +359,7 @@ class SiteDispatcher
 		if (!empty($maintenance) && !allowedTo('admin_forum'))
 		{
 			// You can only login
-			if ($this->action == 'login2' || $this->action == 'logout')
+			if ($this->action === 'login2' || $this->action === 'logout')
 			{
 				$this->_controller_name = '\\ElkArte\\Controller\\Auth';
 				$this->_function_name = 'action_' . $this->action;
@@ -388,6 +385,25 @@ class SiteDispatcher
 		}
 
 		return $this->_controller->needTheme($this->_function_name);
+	}
+
+	/**
+	 * Determine if guest access is restricted, and, if so,
+	 * only allow the listed actions
+	 *
+	 * @return boolean
+	 */
+	protected function restrictedGuestAccess()
+	{
+		global $modSettings;
+
+		return
+			empty($modSettings['allow_guestAccess'])
+			&& User::$info->is_guest
+			&& !in_array($this->action, array(
+				'login', 'login2', 'register', 'reminder',
+				'help', 'quickhelp', 'mailq', 'openidreturn'
+			));
 	}
 
 	/**

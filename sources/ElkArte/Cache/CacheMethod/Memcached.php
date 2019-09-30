@@ -53,44 +53,55 @@ class Memcached extends AbstractCacheMethod
 	/**
 	 * {@inheritdoc}
 	 */
-	public function exists($key)
+	public function isAvailable()
 	{
-		$this->get($key);
+		return class_exists('\\Memcached');
+	}
 
-		return !$this->is_miss;
+	/**
+	 * If this should be done as a persistent connection
+	 *
+	 * @return string|null
+	 */
+	private function _is_persist()
+	{
+		global $db_persist;
+
+		return !empty($db_persist) ? $this->prefix . '_memcached' : null;
 	}
 
 	/**
 	 * {@inheritdoc}
 	 */
-	public function put($key, $value, $ttl = 120)
+	protected function setOptions()
 	{
-		if ($value === null)
-		{
-			$this->obj->delete($key);
-		}
+		/*
+		 * the timeout after which a server is considered DEAD.
+		 */
+		$this->obj->setOption(\Memcached::OPT_CONNECT_TIMEOUT, 100);
 
-		$this->obj->set($key, $value, $ttl);
-	}
+		/*
+		 * If one memcached node is dead, its keys (and only its
+		 * keys) will be evenly distributed to other nodes.
+		 */
+		$this->obj->setOption(\Memcached::OPT_DISTRIBUTION, \Memcached::DISTRIBUTION_CONSISTENT);
 
-	/**
-	 * {@inheritdoc}
-	 */
-	public function get($key, $ttl = 120)
-	{
-		$result = $this->obj->get($key);
-		$this->is_miss = $result === null || $result === false;
+		/*
+		 * number of connection issues before a server is marked
+		 * as DEAD, and removed from the list of servers.
+		 */
+		$this->obj->setOption(\Memcached::OPT_SERVER_FAILURE_LIMIT, 2);
 
-		return $result;
-	}
+		/*
+		 * enables the removal of dead servers.
+		 */
+		$this->obj->setOption(\Memcached::OPT_REMOVE_FAILED_SERVERS, true);
 
-	/**
-	 * {@inheritdoc}
-	 */
-	public function clean($type = '')
-	{
-		// Clear it out, really invalidate whats there
-		$this->obj->flush();
+		/*
+		 * after a node is declared DEAD, libmemcached will
+		 * try it again after that many seconds.
+		 */
+		$this->obj->setOption(\Memcached::OPT_RETRY_TIMEOUT, 1);
 	}
 
 	/**
@@ -133,43 +144,44 @@ class Memcached extends AbstractCacheMethod
 	/**
 	 * {@inheritdoc}
 	 */
-	protected function setOptions()
+	public function exists($key)
 	{
-		/*
-		 * the timeout after which a server is considered DEAD.
-		 */
-		$this->obj->setOption(\Memcached::OPT_CONNECT_TIMEOUT, 100);
+		$this->get($key);
 
-		/*
-		 * If one memcached node is dead, its keys (and only its
-		 * keys) will be evenly distributed to other nodes.
-		 */
-		$this->obj->setOption(\Memcached::OPT_DISTRIBUTION, \Memcached::DISTRIBUTION_CONSISTENT);
-
-		/*
-		 * number of connection issues before a server is marked
-		 * as DEAD, and removed from the list of servers.
-		 */
-		$this->obj->setOption(\Memcached::OPT_SERVER_FAILURE_LIMIT, 2);
-
-		/*
-		 * enables the removal of dead servers.
-		 */
-		$this->obj->setOption(\Memcached::OPT_REMOVE_FAILED_SERVERS, true);
-
-		/*
-		 * after a node is declared DEAD, libmemcached will
-		 * try it again after that many seconds.
-		 */
-		$this->obj->setOption(\Memcached::OPT_RETRY_TIMEOUT, 1);
+		return !$this->is_miss;
 	}
 
 	/**
 	 * {@inheritdoc}
 	 */
-	public function isAvailable()
+	public function get($key, $ttl = 120)
 	{
-		return class_exists('\\Memcached');
+		$result = $this->obj->get($key);
+		$this->is_miss = $result === null || $result === false;
+
+		return $result;
+	}
+
+	/**
+	 * {@inheritdoc}
+	 */
+	public function put($key, $value, $ttl = 120)
+	{
+		if ($value === null)
+		{
+			$this->obj->delete($key);
+		}
+
+		$this->obj->set($key, $value, $ttl);
+	}
+
+	/**
+	 * {@inheritdoc}
+	 */
+	public function clean($type = '')
+	{
+		// Clear it out, really invalidate whats there
+		$this->obj->flush();
 	}
 
 	/**
@@ -209,17 +221,5 @@ class Memcached extends AbstractCacheMethod
 		}
 
 		$config_vars[] = $var;
-	}
-
-	/**
-	 * If this should be done as a persistent connection
-	 *
-	 * @return string|null
-	 */
-	private function _is_persist()
-	{
-		global $db_persist;
-
-		return !empty($db_persist) ? $this->prefix . '_memcached' : null;
 	}
 }

@@ -9,13 +9,17 @@
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause (see accompanying LICENSE.txt file)
  *
  * This file contains code covered by:
- * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * copyright: 2011 Simple Machines (http://www.simplemachines.org)
  *
  * @version 2.0 dev
  *
  */
 
 namespace ElkArte\Database;
+
+use ElkArte\Debug;
+use ElkArte\Errors\Errors;
+use ElkArte\Exceptions\Exception;
 
 /**
  * Abstract database class, implements database to control functions
@@ -24,24 +28,28 @@ abstract class AbstractQuery implements QueryInterface
 {
 	/**
 	 * Current connection to the database
+	 *
 	 * @var \ElkArte\Database\ConnectionInterface
 	 */
 	protected $connection = null;
 
 	/**
 	 * Number of queries run (may include queries from $_SESSION if is a redirect)
+	 *
 	 * @var int
 	 */
 	protected $_query_count = 0;
 
 	/**
 	 * The way to skip a database error
+	 *
 	 * @var boolean
 	 */
 	protected $_skip_error = false;
 
 	/**
 	 * The tables prefix
+	 *
 	 * @var string
 	 */
 	protected $_db_prefix = '';
@@ -49,6 +57,7 @@ abstract class AbstractQuery implements QueryInterface
 	/**
 	 * String to match visible boards.
 	 * By default set to a false, so that unless it is set, nothing is returned.
+	 *
 	 * @var string
 	 */
 	protected $query_see_board = '1!=1';
@@ -56,6 +65,7 @@ abstract class AbstractQuery implements QueryInterface
 	/**
 	 * String to match boards the user want to see.
 	 * By default set to a false, so that unless it is set, nothing is returned.
+	 *
 	 * @var string
 	 */
 	protected $query_wanna_see_board = '1!=1';
@@ -63,12 +73,14 @@ abstract class AbstractQuery implements QueryInterface
 	/**
 	 * MySQL supports unbuffered queries, this remembers if we are running an
 	 * unbuffered or not
+	 *
 	 * @var boolean
 	 */
 	protected $_unbuffered = false;
 
 	/**
 	 * This holds the "values" used in the replacement__callback method
+	 *
 	 * @var array
 	 */
 	protected $_db_callback_values = array();
@@ -76,6 +88,7 @@ abstract class AbstractQuery implements QueryInterface
 	/**
 	 * Temporary variable to support the migration to the new db-layer
 	 * Ideally to be removed before 2.0 shipment
+	 *
 	 * @var \ElkArte\Database\AbstractResult
 	 */
 	protected $result = null;
@@ -83,6 +96,7 @@ abstract class AbstractQuery implements QueryInterface
 	/**
 	 * Comments that are allowed in a query are preg_removed.
 	 * These replacements happen in the query checks.
+	 *
 	 * @var string[]
 	 */
 	protected $allowed_comments = [
@@ -102,12 +116,14 @@ abstract class AbstractQuery implements QueryInterface
 
 	/**
 	 * Holds some values (time, file, line, delta) to debug performancs of the queries.
+	 *
 	 * @var mixed[]
 	 */
 	protected $db_cache = [];
 
 	/**
 	 * The debug object.
+	 *
 	 * @var \ElkArte\Debug
 	 */
 	protected $_debug = null;
@@ -128,14 +144,9 @@ abstract class AbstractQuery implements QueryInterface
 		// Debugging.
 		if ($db_show_debug === true)
 		{
-			$this->_debug = \ElkArte\Debug::instance();
+			$this->_debug = Debug::instance();
 		}
 	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	abstract public function query($identifier, $db_string, $db_values = array());
 
 	/**
 	 * {@inheritDoc}
@@ -149,6 +160,7 @@ abstract class AbstractQuery implements QueryInterface
 
 	/**
 	 * Public setter for the string that defines which boards the user can see.
+	 *
 	 * @param string $string
 	 */
 	public function setSeeBoard($string)
@@ -158,11 +170,36 @@ abstract class AbstractQuery implements QueryInterface
 
 	/**
 	 * Public setter for the string that defines which boards the user want to see.
+	 *
 	 * @param string $string
 	 */
 	public function setWannaSeeBoard($string)
 	{
 		$this->query_wanna_see_board = $string;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public function quote($db_string, $db_values)
+	{
+		// Only bother if there's something to replace.
+		if (strpos($db_string, '{') !== false)
+		{
+			// This is needed by the callback function.
+			$this->_db_callback_values = $db_values;
+
+			// Do the quoting and escaping
+			$db_string = preg_replace_callback('~{([a-z_]+)(?::([\.a-zA-Z0-9_-]+))?}~',
+				function ($matches) {
+					return $this->replacement__callback($matches);
+				}, $db_string);
+
+			// Clear this variables.
+			$this->_db_callback_values = array();
+		}
+
+		return $db_string;
 	}
 
 	/**
@@ -183,7 +220,7 @@ abstract class AbstractQuery implements QueryInterface
 		// Connection gone???  This should *never* happen at this point, yet it does :'(
 		if (!$this->validConnection())
 		{
-			\ElkArte\Errors\Errors::instance()->display_db_error('ElkArte\\Database\\AbstractQuery::replacement__callback');
+			Errors::instance()->display_db_error('ElkArte\\Database\\AbstractQuery::replacement__callback');
 		}
 
 		switch ($matches[1])
@@ -237,66 +274,85 @@ abstract class AbstractQuery implements QueryInterface
 				return $replacement;
 			default:
 				$this->error_backtrace('Undefined type used in the database query. (' . $matches[1] . ':' . $matches[2] . ')', '', false, __FILE__, __LINE__);
-			break;
+				break;
 		}
 
 		return '';
 	}
 
 	/**
+	 * Finds out if the connection is still valid.
+	 *
+	 * @return bool
+	 */
+	public function validConnection()
+	{
+		return (bool) $this->connection;
+	}
+
+	/**
+	 * Casts the column to LOWER(column_name) for replacement__callback.
+	 *
+	 * @param mixed $replacement
+	 * @return string
+	 */
+	protected function _replaceColumnCaseInsensitive($replacement)
+	{
+		return 'LOWER(' . $replacement . ')';
+	}
+
+	/**
 	 * {@inheritDoc}
 	 */
-	public function quote($db_string, $db_values)
+	public function error_backtrace($error_message, $log_message = '', $error_type = false, $file = null, $line = null)
 	{
-		// Only bother if there's something to replace.
-		if (strpos($db_string, '{') !== false)
+		if (empty($log_message))
 		{
-			// This is needed by the callback function.
-			$this->_db_callback_values = $db_values;
-
-			// Do the quoting and escaping
-			$db_string = preg_replace_callback('~{([a-z_]+)(?::([\.a-zA-Z0-9_-]+))?}~', array($this, 'replacement__callback'), $db_string);
-
-			// Clear this variables.
-			$this->_db_callback_values = array();
+			$log_message = $error_message;
 		}
 
-		return $db_string;
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	public function fetchQuery($db_string, $db_values = array())
-	{
-		return $this->query('', $db_string, $db_values);
-	}
-
-	/**
-	 * This function combines the keys and values of the data passed to db::insert.
-	 *
-	 * @param integer[] $keys
-	 * @param mixed[] $values
-	 * @return mixed[]
-	 */
-	protected function _array_combine($keys, $values)
-	{
-		$is_numeric = array_filter(array_keys($values), 'is_numeric');
-
-		if (!empty($is_numeric))
-			return array_combine($keys, $values);
-		else
+		foreach (debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS) as $step)
 		{
-			$combined = array();
-			foreach ($keys as $key)
+			// Found it?
+			if (!method_exists($this, $step['function']) && !in_array(substr($step['function'], 0, 7), array('elk_db_', 'preg_re', 'db_erro', 'call_us')))
 			{
-				if (isset($values[$key]))
-					$combined[$key] = $values[$key];
+				$log_message .= '<br />Function: ' . $step['function'];
+				break;
 			}
 
-			// @todo should throw an E_WARNING if count($combined) != count($keys)
-			return $combined;
+			if (isset($step['line']))
+			{
+				$file = $step['file'];
+				$line = $step['line'];
+			}
 		}
+
+		// A special case - we want the file and line numbers for debugging.
+		if ($error_type == 'return')
+		{
+			return array($file, $line);
+		}
+
+		// Is always a critical error.
+		if (class_exists('\\ElkArte\\Errors\\Errors'))
+		{
+			Errors::instance()->log_error($log_message, 'critical', $file, $line);
+		}
+
+		if (class_exists('\\ElkArte\\Exceptions\\Exception'))
+		{
+			throw new Exception([false, $error_message], false);
+		}
+		elseif ($error_type)
+		{
+			trigger_error($error_message . ($line !== null ? '<em>(' . basename($file) . '-' . $line . ')</em>' : ''), $error_type);
+		}
+		else
+		{
+			trigger_error($error_message . ($line !== null ? '<em>(' . basename($file) . '-' . $line . ')</em>' : ''));
+		}
+
+		return array('', '');
 	}
 
 	/**
@@ -310,39 +366,11 @@ abstract class AbstractQuery implements QueryInterface
 	protected function _replaceInt($identifier, $replacement)
 	{
 		if (!is_numeric($replacement) || (string) $replacement !== (string) (int) $replacement)
+		{
 			$this->error_backtrace('Wrong value type sent to the database. Integer expected. (' . $identifier . ')', '', E_USER_ERROR, __FILE__, __LINE__);
+		}
+
 		return (string) (int) $replacement;
-	}
-
-	/**
-	 * Tests and casts arrays of integers for replacement__callback.
-	 *
-	 * @param string $identifier
-	 * @param mixed[] $replacement
-	 * @return string
-	 * @throws \ElkArte\Exceptions\Exception
-	 */
-	protected function _replaceArrayInt($identifier, $replacement)
-	{
-			if (is_array($replacement))
-			{
-				if (empty($replacement))
-					$this->error_backtrace('Database error, given array of integer values is empty. (' . $identifier . ')', '', E_USER_ERROR, __FILE__, __LINE__);
-
-				foreach ($replacement as $key => $value)
-				{
-					if (!is_numeric($value) || (string) $value !== (string) (int) $value)
-						$this->error_backtrace('Wrong value type sent to the database. Array of integers expected. (' . $identifier . ')', '', E_USER_ERROR, __FILE__, __LINE__);
-
-					$replacement[$key] = (string) (int) $value;
-				}
-
-				return implode(', ', $replacement);
-			}
-			else
-			{
-				$this->error_backtrace('Wrong value type sent to the database. Array of integers expected. (' . $identifier . ')', '', E_USER_ERROR, __FILE__, __LINE__);
-			}
 	}
 
 	/**
@@ -355,6 +383,15 @@ abstract class AbstractQuery implements QueryInterface
 	{
 		return sprintf('\'%1$s\'', $this->escape_string($replacement));
 	}
+
+	/**
+	 * Escape string for the database input
+	 *
+	 * @param string $string
+	 *
+	 * @return string
+	 */
+	abstract public function escape_string($string);
 
 	/**
 	 * Casts values to string for replacement__callback and in the DBMS that
@@ -380,14 +417,38 @@ abstract class AbstractQuery implements QueryInterface
 	}
 
 	/**
-	 * Casts the column to LOWER(column_name) for replacement__callback.
+	 * Tests and casts arrays of integers for replacement__callback.
 	 *
-	 * @param mixed $replacement
+	 * @param string $identifier
+	 * @param mixed[] $replacement
 	 * @return string
+	 * @throws \ElkArte\Exceptions\Exception
 	 */
-	protected function _replaceColumnCaseInsensitive($replacement)
+	protected function _replaceArrayInt($identifier, $replacement)
 	{
-		return 'LOWER(' . $replacement . ')';
+		if (is_array($replacement))
+		{
+			if (empty($replacement))
+			{
+				$this->error_backtrace('Database error, given array of integer values is empty. (' . $identifier . ')', '', E_USER_ERROR, __FILE__, __LINE__);
+			}
+
+			foreach ($replacement as $key => $value)
+			{
+				if (!is_numeric($value) || (string) $value !== (string) (int) $value)
+				{
+					$this->error_backtrace('Wrong value type sent to the database. Array of integers expected. (' . $identifier . ')', '', E_USER_ERROR, __FILE__, __LINE__);
+				}
+
+				$replacement[$key] = (string) (int) $value;
+			}
+
+			return implode(', ', $replacement);
+		}
+		else
+		{
+			$this->error_backtrace('Wrong value type sent to the database. Array of integers expected. (' . $identifier . ')', '', E_USER_ERROR, __FILE__, __LINE__);
+		}
 	}
 
 	/**
@@ -462,9 +523,13 @@ abstract class AbstractQuery implements QueryInterface
 	protected function _replaceDate($identifier, $replacement)
 	{
 		if (preg_match('~^(\d{4})-([0-1]?\d)-([0-3]?\d)$~', $replacement, $date_matches) === 1)
+		{
 			return sprintf('\'%04d-%02d-%02d\'', $date_matches[1], $date_matches[2], $date_matches[3]);
+		}
 		else
+		{
 			$this->error_backtrace('Wrong value type sent to the database. Date expected. (' . $identifier . ')', '', E_USER_ERROR, __FILE__, __LINE__);
+		}
 	}
 
 	/**
@@ -478,7 +543,10 @@ abstract class AbstractQuery implements QueryInterface
 	protected function _replaceFloat($identifier, $replacement)
 	{
 		if (!is_numeric($replacement))
+		{
 			$this->error_backtrace('Wrong value type sent to the database. Floating point number expected. (' . $identifier . ')', '', E_USER_ERROR, __FILE__, __LINE__);
+		}
+
 		return (string) (float) $replacement;
 	}
 
@@ -500,13 +568,309 @@ abstract class AbstractQuery implements QueryInterface
 	}
 
 	/**
+	 * {@inheritDoc}
+	 */
+	public function fetchQuery($db_string, $db_values = array())
+	{
+		return $this->query('', $db_string, $db_values);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	abstract public function query($identifier, $db_string, $db_values = array());
+
+	/**
+	 * {@inheritDoc}
+	 */
+	abstract public function error($db_string);
+
+	/**
+	 * {@inheritDoc}
+	 */
+	abstract public function insert($method = 'replace', $table, $columns, $data, $keys, $disable_trans = false);
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public function escape_wildcard_string($string, $translate_human_wildcards = false)
+	{
+		$replacements = array(
+			'%' => '\%',
+			'_' => '\_',
+			'\\' => '\\\\',
+		);
+
+		if ($translate_human_wildcards)
+		{
+			$replacements += array(
+				'*' => '%',
+			);
+		}
+
+		return strtr($string, $replacements);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public function connection()
+	{
+		// find it, find it
+		return $this->connection;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public function num_queries()
+	{
+		return $this->_query_count;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public function skip_next_error()
+	{
+		$this->_skip_error = true;
+	}
+
+	/**
+	 * Set the unbuffered state for the connection
+	 *
+	 * @param bool $state
+	 */
+	public function setUnbuffered($state)
+	{
+		$this->_unbuffered = (bool) $state;
+	}
+
+	/**
+	 *  Get the version number.
+	 *
+	 * @return string - the version
+	 * @throws \ElkArte\Exceptions\Exception
+	 */
+	abstract public function client_version();
+
+	/**
+	 * Return server info.
+	 *
+	 * @return string
+	 */
+	abstract public function server_info();
+
+	/**
+	 * Whether the database system is case sensitive.
+	 *
+	 * @return boolean
+	 */
+	abstract public function case_sensitive();
+
+	/**
+	 * Get the name (title) of the database system.
+	 *
+	 * @return string
+	 */
+	abstract public function title();
+
+	/**
+	 * Returns whether the database system supports ignore.
+	 *
+	 * @return false
+	 */
+	abstract public function support_ignore();
+
+	/**
+	 * Get the version number.
+	 *
+	 * @return string - the version
+	 * @throws \ElkArte\Exceptions\Exception
+	 */
+	abstract public function server_version();
+
+	/**
+	 * Temporary function to support migration to the new schema of the db layer
+	 *
+	 * @deprecated since 2.0
+	 */
+	public function fetch_row($result)
+	{
+// 		\ElkArte\Errors\Errors::instance()->log_deprecated('Query::fetch_row()', 'Result::fetch_row()');
+		if ($result === false)
+		{
+			return false;
+		}
+		else
+		{
+			return $result->fetch_row();
+		}
+	}
+
+	/**
+	 * Temporary function to support migration to the new schema of the db layer
+	 *
+	 * @deprecated since 2.0
+	 */
+	public function fetch_assoc($result)
+	{
+// 		\ElkArte\Errors\Errors::instance()->log_deprecated('Query::fetch_assoc()', 'Result::fetch_assoc()');
+		if ($result === false)
+		{
+			return false;
+		}
+		else
+		{
+			return $result->fetch_assoc();
+		}
+	}
+
+	/**
+	 * Temporary function to support migration to the new schema of the db layer
+	 *
+	 * @deprecated since 2.0
+	 */
+	public function free_result($result)
+	{
+// 		\ElkArte\Errors\Errors::instance()->log_deprecated('Query::free_result()', 'Result::free_result()');
+		if ($result === false)
+		{
+			return;
+		}
+		else
+		{
+			return $result->free_result();
+		}
+	}
+
+	/**
+	 * Temporary function to supoprt migration to the new schema of the db layer
+	 *
+	 * @deprecated since 2.0
+	 */
+	public function affected_rows()
+	{
+// 		\ElkArte\Errors\Errors::instance()->log_deprecated('Query::affected_rows()', 'Result::affected_rows()');
+		return $this->result->affected_rows();
+	}
+
+	/**
+	 * Temporary function to support migration to the new schema of the db layer
+	 *
+	 * @deprecated since 2.0
+	 */
+	public function num_rows($result)
+	{
+// 		\ElkArte\Errors\Errors::instance()->log_deprecated('Query::num_rows()', 'Result::num_rows()');
+		if ($result === false)
+		{
+			return 0;
+		}
+		else
+		{
+			return $result->num_rows();
+		}
+	}
+
+	/**
+	 * Temporary function to support migration to the new schema of the db layer
+	 *
+	 * @deprecated since 2.0
+	 */
+	public function num_fields($result)
+	{
+// 		\ElkArte\Errors\Errors::instance()->log_deprecated('Query::num_fields()', 'Result::num_fields()');
+		if ($result === false)
+		{
+			return 0;
+		}
+		else
+		{
+			return $result->num_fields();
+		}
+	}
+
+	/**
+	 * Temporary function to support migration to the new schema of the db layer
+	 *
+	 * @deprecated since 2.0
+	 */
+	public function insert_id($table)
+	{
+// 		\ElkArte\Errors\Errors::instance()->log_deprecated('Query::insert_id()', 'Result::insert_id()');
+		return $this->result->insert_id();
+	}
+
+	/**
+	 * Temporary function to support migration to the new schema of the db layer
+	 *
+	 * @deprecated since 2.0
+	 */
+	public function data_seek($result, $counter)
+	{
+// 		\ElkArte\Errors\Errors::instance()->log_deprecated('Query::data_seek()', 'Result::data_seek()');
+		return $result->data_seek($counter);
+	}
+
+	/**
+	 * Temporary function: I'm not sure this is the best place to have it, though it was
+	 * convenient while fixing other issues.
+	 *
+	 * @deprecated since 2.0
+	 */
+	public function supportMediumtext()
+	{
+		return false;
+	}
+
+	/**
+	 * Temporary function to support migration to the new schema of the db layer
+	 *
+	 * @deprecated since 2.0
+	 */
+	abstract public function list_tables($db_name_str = false, $filter = false);
+
+	/**
+	 * This function combines the keys and values of the data passed to db::insert.
+	 *
+	 * @param integer[] $keys
+	 * @param mixed[] $values
+	 * @return mixed[]
+	 */
+	protected function _array_combine($keys, $values)
+	{
+		$is_numeric = array_filter(array_keys($values), 'is_numeric');
+
+		if (!empty($is_numeric))
+		{
+			return array_combine($keys, $values);
+		}
+		else
+		{
+			$combined = array();
+			foreach ($keys as $key)
+			{
+				if (isset($values[$key]))
+				{
+					$combined[$key] = $values[$key];
+				}
+			}
+
+			// @todo should throw an E_WARNING if count($combined) != count($keys)
+			return $combined;
+		}
+	}
+
+	/**
 	 * Checks for "illegal characters" and runs replacement__callback if not
 	 * overriden.
 	 * In case of problems, the method can ends up dying.
 	 *
 	 * @param string $db_string
 	 * @param mixed $db_values
-	 * @return null|string|string[]
+	 * @return string
+	 * @throws \ElkArte\Exceptions\Exception
 	 */
 	protected function _prepareQuery($db_string, $db_values)
 	{
@@ -526,7 +890,10 @@ abstract class AbstractQuery implements QueryInterface
 			$count = -1;
 			while (($count > 0 && isset($db_values['recursive'])) || $count === -1)
 			{
-				$db_string = preg_replace_callback('~{([a-z_]+)(?::([\.a-zA-Z0-9_-]+))?}~', array($this, 'replacement__callback'), $db_string, -1, $count);
+				$db_string = preg_replace_callback('~{([a-z_]+)(?::([\.a-zA-Z0-9_-]+))?}~',
+					function ($matches) {
+						return $this->replacement__callback($matches);
+					}, $db_string, -1, $count);
 			}
 
 			// No need for them any longer.
@@ -540,6 +907,7 @@ abstract class AbstractQuery implements QueryInterface
 	 * Tracks the initial status (time, file/line, query) for performance evaluation.
 	 *
 	 * @param string $db_string
+	 * @throws \ElkArte\Exceptions\Exception
 	 */
 	protected function _preQueryDebug($db_string)
 	{
@@ -591,6 +959,7 @@ abstract class AbstractQuery implements QueryInterface
 	 *
 	 * @param string $db_string
 	 * @param string $escape_char
+	 * @throws \ElkArte\Exceptions\Exception
 	 */
 	protected function _doSanityCheck($db_string, $escape_char)
 	{
@@ -606,7 +975,9 @@ abstract class AbstractQuery implements QueryInterface
 			{
 				$pos = strpos($db_string, '\'', $pos + 1);
 				if ($pos === false)
+				{
 					break;
+				}
 				$clean .= substr($db_string, $old_pos, $pos - $old_pos);
 
 				while (true)
@@ -615,7 +986,9 @@ abstract class AbstractQuery implements QueryInterface
 					$pos2 = strpos($db_string, $escape_char, $pos + 1);
 
 					if ($pos1 === false)
+					{
 						break;
+					}
 					elseif ($pos2 === false || $pos2 > $pos1)
 					{
 						$pos = $pos1;
@@ -634,12 +1007,18 @@ abstract class AbstractQuery implements QueryInterface
 
 			// Comments?  We don't use comments in our queries, we leave 'em outside!
 			if (strpos($clean, '/*') > 2 || strpos($clean, '--') !== false || strpos($clean, ';') !== false)
+			{
 				$fail = true;
+			}
 			// Trying to change passwords, slow us down, or something?
 			elseif (strpos($clean, 'sleep') !== false && preg_match('~(^|[^a-z])sleep($|[^[_a-z])~s', $clean) != 0)
+			{
 				$fail = true;
+			}
 			elseif (strpos($clean, 'benchmark') !== false && preg_match('~(^|[^a-z])benchmark($|[^[a-z])~s', $clean) != 0)
+			{
 				$fail = true;
+			}
 
 			if (!empty($fail) && class_exists('\\ElkArte\\Errors\\Errors'))
 			{
@@ -647,308 +1026,4 @@ abstract class AbstractQuery implements QueryInterface
 			}
 		}
 	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	abstract public function error($db_string);
-
-	/**
-	 * {@inheritDoc}
-	 */
-	abstract public function insert($method = 'replace', $table, $columns, $data, $keys, $disable_trans = false);
-
-	/**
-	 * {@inheritDoc}
-	 */
-	public function error_backtrace($error_message, $log_message = '', $error_type = false, $file = null, $line = null)
-	{
-		if (empty($log_message))
-			$log_message = $error_message;
-
-		foreach (debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS) as $step)
-		{
-			// Found it?
-			if (!method_exists($this, $step['function']) && !in_array(substr($step['function'], 0, 7), array('elk_db_', 'preg_re', 'db_erro', 'call_us')))
-			{
-				$log_message .= '<br />Function: ' . $step['function'];
-				break;
-			}
-
-			if (isset($step['line']))
-			{
-				$file = $step['file'];
-				$line = $step['line'];
-			}
-		}
-
-		// A special case - we want the file and line numbers for debugging.
-		if ($error_type == 'return')
-			return array($file, $line);
-
-		// Is always a critical error.
-		if (class_exists('\\ElkArte\\Errors\\Errors'))
-		{
-			\ElkArte\Errors\Errors::instance()->log_error($log_message, 'critical', $file, $line);
-		}
-
-		if (class_exists('\\ElkArte\\Exceptions\\Exception'))
-		{
-			throw new \ElkArte\Exceptions\Exception([false, $error_message], false);
-		}
-		elseif ($error_type)
-			trigger_error($error_message . ($line !== null ? '<em>(' . basename($file) . '-' . $line . ')</em>' : ''), $error_type);
-		else
-			trigger_error($error_message . ($line !== null ? '<em>(' . basename($file) . '-' . $line . ')</em>' : ''));
-
-		return array('', '');
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	public function escape_wildcard_string($string, $translate_human_wildcards = false)
-	{
-		$replacements = array(
-			'%' => '\%',
-			'_' => '\_',
-			'\\' => '\\\\',
-		);
-
-		if ($translate_human_wildcards)
-			$replacements += array(
-				'*' => '%',
-			);
-
-		return strtr($string, $replacements);
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	public function connection()
-	{
-		// find it, find it
-		return $this->connection;
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	public function num_queries()
-	{
-		return $this->_query_count;
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	public function skip_next_error()
-	{
-		$this->_skip_error = true;
-	}
-
-	/**
-	 * Set the unbuffered state for the connection
-	 *
-	 * @param bool $state
-	 */
-	public function setUnbuffered($state)
-	{
-		$this->_unbuffered = (bool) $state;
-	}
-
-	/**
-	 * Finds out if the connection is still valid.
-	 *
-	 * @return bool
-	 */
-	public function validConnection()
-	{
-		return (bool) $this->connection;
-	}
-
-	/**
-	 *  Get the version number.
-	 *
-	 * @return string - the version
-	 * @throws \ElkArte\Exceptions\Exception
-	 */
-	abstract public function client_version();
-
-	/**
-	 * Return server info.
-	 *
-	 * @return string
-	 */
-	abstract public function server_info();
-
-	/**
-	 * Escape string for the database input
-	 *
-	 * @param string $string
-	 *
-	 * @return string
-	 */
-	abstract public function escape_string($string);
-
-	/**
-	 * Whether the database system is case sensitive.
-	 *
-	 * @return boolean
-	 */
-	abstract public function case_sensitive();
-
-	/**
-	 * Get the name (title) of the database system.
-	 *
-	 * @return string
-	 */
-	abstract public function title();
-
-	/**
-	 * Returns whether the database system supports ignore.
-	 *
-	 * @return false
-	 */
-	abstract public function support_ignore();
-
-	/**
-	 * Get the version number.
-	 *
-	 * @return string - the version
-	 * @throws \ElkArte\Exceptions\Exception
-	 */
-	abstract public function server_version();
-
-	/**
-	 * Temporary function to support migration to the new schema of the db layer
-	 * @deprecated since 2.0
-	 */
-	public function fetch_row($result)
-	{
-// 		\ElkArte\Errors\Errors::instance()->log_deprecated('Query::fetch_row()', 'Result::fetch_row()');
-		if ($result === false)
-		{
-			return false;
-		}
-		else
-		{
-			return $result->fetch_row();
-		}
-	}
-
-	/**
-	 * Temporary function to support migration to the new schema of the db layer
-	 * @deprecated since 2.0
-	 */
-	public function fetch_assoc($result)
-	{
-// 		\ElkArte\Errors\Errors::instance()->log_deprecated('Query::fetch_assoc()', 'Result::fetch_assoc()');
-		if ($result === false)
-		{
-			return false;
-		}
-		else
-		{
-			return $result->fetch_assoc();
-		}
-	}
-
-	/**
-	 * Temporary function to support migration to the new schema of the db layer
-	 * @deprecated since 2.0
-	 */
-	public function free_result($result)
-	{
-// 		\ElkArte\Errors\Errors::instance()->log_deprecated('Query::free_result()', 'Result::free_result()');
-		if ($result === false)
-		{
-			return;
-		}
-		else
-		{
-			return $result->free_result();
-		}
-	}
-
-	/**
-	 * Temporary function to supoprt migration to the new schema of the db layer
-	 * @deprecated since 2.0
-	 */
-	public function affected_rows()
-	{
-// 		\ElkArte\Errors\Errors::instance()->log_deprecated('Query::affected_rows()', 'Result::affected_rows()');
-		return $this->result->affected_rows();
-	}
-
-	/**
-	 * Temporary function to support migration to the new schema of the db layer
-	 * @deprecated since 2.0
-	 */
-	public function num_rows($result)
-	{
-// 		\ElkArte\Errors\Errors::instance()->log_deprecated('Query::num_rows()', 'Result::num_rows()');
-		if ($result === false)
-		{
-			return 0;
-		}
-		else
-		{
-			return $result->num_rows();
-		}
-	}
-
-	/**
-	 * Temporary function to support migration to the new schema of the db layer
-	 * @deprecated since 2.0
-	 */
-	public function num_fields($result)
-	{
-// 		\ElkArte\Errors\Errors::instance()->log_deprecated('Query::num_fields()', 'Result::num_fields()');
-		if ($result === false)
-		{
-			return 0;
-		}
-		else
-		{
-			return $result->num_fields();
-		}
-	}
-
-	/**
-	 * Temporary function to support migration to the new schema of the db layer
-	 * @deprecated since 2.0
-	 */
-	public function insert_id($table)
-	{
-// 		\ElkArte\Errors\Errors::instance()->log_deprecated('Query::insert_id()', 'Result::insert_id()');
-		return $this->result->insert_id();
-	}
-
-	/**
-	 * Temporary function to support migration to the new schema of the db layer
-	 * @deprecated since 2.0
-	 */
-	public function data_seek($result, $counter)
-	{
-// 		\ElkArte\Errors\Errors::instance()->log_deprecated('Query::data_seek()', 'Result::data_seek()');
-		return $result->data_seek($counter);
-	}
-
-	/**
-	 * Temporary function: I'm not sure this is the best place to have it, though it was
-	 * convenient while fixing other issues.
-	 * @deprecated since 2.0
-	 */
-	public function supportMediumtext()
-	{
-		return false;
-	}
-
-	/**
-	 * Temporary function to support migration to the new schema of the db layer
-	 * @deprecated since 2.0
-	 */
-	abstract public function list_tables($db_name_str = false, $filter = false);
 }

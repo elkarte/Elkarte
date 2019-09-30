@@ -16,6 +16,11 @@ namespace ElkArte\UrlGenerator\Semantic;
 
 use ElkArte\UrlGenerator\AbstractParseQuery;
 
+/**
+ * Class ParseQuery
+ *
+ * @package ElkArte\UrlGenerator\Semantic
+ */
 class ParseQuery extends AbstractParseQuery
 {
 	/**
@@ -27,14 +32,7 @@ class ParseQuery extends AbstractParseQuery
 	 */
 	public function parse($query)
 	{
-		if (isset($this->parsers[$query[0]]))
-		{
-			$call = $this->parsers[$query[0]];
-		}
-		else
-		{
-			$call = $this->parsers['s'];
-		}
+		$call = isset($this->parsers[$query[0]]) ? $this->parsers[$query[0]] : $this->parsers['s'];
 
 		return $this->{$call}($query);
 	}
@@ -65,29 +63,6 @@ class ParseQuery extends AbstractParseQuery
 	}
 
 	/**
-	 * Topics have to have a "topic" parameter, and this method ensures the query
-	 * has it.
-	 *
-	 * @param string $query The semantic query
-	 * @return string $query The corresponding standard query
-	 */
-	protected function topic($query)
-	{
-		return 'topic=' . $this->process($query);
-	}
-
-	/**
-	 * Profiles are an action to begin with and then have the "u" holding the user id.
-	 *
-	 * @param string $query The semantic query
-	 * @return string $query The corresponding standard query
-	 */
-	protected function profile($query)
-	{
-		return 'action=profile;u=' . $this->process($query);
-	}
-
-	/**
 	 * This method splits the semantic URL into pieces (exploding at each "/")
 	 * and puts more or less everything back together into the standard format.
 	 * Some more processing takes care of "-" => ".".
@@ -108,8 +83,30 @@ class ParseQuery extends AbstractParseQuery
 		{
 			$real_query = substr($split_query[0], strrpos($split_query[0], '-') + 1);
 		}
-		$real_query .= $this->separator . (isset($split_query[1]) ? $split_query[1] : '');
 
-		return $real_query;
+		return $real_query . ($this->separator . (isset($split_query[1]) ? $split_query[1] : ''));
+	}
+
+	/**
+	 * Topics have to have a "topic" parameter, and this method ensures the query
+	 * has it.
+	 *
+	 * @param string $query The semantic query
+	 * @return string $query The corresponding standard query
+	 */
+	protected function topic($query)
+	{
+		return 'topic=' . $this->process($query);
+	}
+
+	/**
+	 * Profiles are an action to begin with and then have the "u" holding the user id.
+	 *
+	 * @param string $query The semantic query
+	 * @return string $query The corresponding standard query
+	 */
+	protected function profile($query)
+	{
+		return 'action=profile;u=' . $this->process($query);
 	}
 }

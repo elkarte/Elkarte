@@ -61,18 +61,7 @@ class Gd2 extends AbstractManipulator
 	public static function canUse()
 	{
 		// Check to see if GD is installed and what version.
-		return !(get_extension_funcs('gd') === false);
-	}
-
-	/**
-	 * Cleanup when done
-	 */
-	public function __destruct()
-	{
-		if (is_resource($this->_image))
-		{
-			imagedestroy($this->_image);
-		}
+		return get_extension_funcs('gd') !== false;
 	}
 
 	/**
@@ -485,5 +474,16 @@ class Gd2 extends AbstractManipulator
 		$this->__destruct();
 
 		return $result ? $image : false;
+	}
+
+	/**
+	 * Cleanup when done
+	 */
+	public function __destruct()
+	{
+		if (is_resource($this->_image))
+		{
+			imagedestroy($this->_image);
+		}
 	}
 }

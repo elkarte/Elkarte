@@ -8,7 +8,7 @@
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause (see accompanying LICENSE.txt file)
  *
  * This file contains code covered by:
- * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * copyright: 2011 Simple Machines (http://www.simplemachines.org)
  *
  * @version 2.0 dev
  *
@@ -16,21 +16,26 @@
 
 namespace ElkArte\Modules\Drafts;
 
+use ElkArte\EventManager;
+use ElkArte\Modules\AbstractModule;
+
 /**
  * Class \ElkArte\Modules\Drafts\Display
  *
  * Enables draft functions for teh Display.controller page (quick reply)
  */
-class Display extends \ElkArte\Modules\AbstractModule
+class Display extends AbstractModule
 {
 	/**
 	 * Autosave switch
+	 *
 	 * @var bool
 	 */
 	protected static $_autosave_enabled = false;
 
 	/**
 	 * Autosave frequency, default to 30 seconds
+	 *
 	 * @var int
 	 */
 	protected static $_autosave_frequency = 30000;
@@ -38,7 +43,7 @@ class Display extends \ElkArte\Modules\AbstractModule
 	/**
 	 * {@inheritdoc }
 	 */
-	public static function hooks(\ElkArte\EventManager $eventsManager)
+	public static function hooks(EventManager $eventsManager)
 	{
 		global $modSettings;
 
@@ -47,14 +52,18 @@ class Display extends \ElkArte\Modules\AbstractModule
 			self::$_autosave_enabled = !empty($modSettings['drafts_autosave_enabled']);
 
 			if (!empty($modSettings['drafts_autosave_frequency']))
+			{
 				self::$_autosave_frequency = (int) $modSettings['drafts_autosave_frequency'] * 1000;
+			}
 
 			return array(
 				array('prepare_context', array('\\ElkArte\\Modules\\Drafts\\Display', 'prepare_context'), array('use_quick_reply', 'editorOptions', 'board')),
 			);
 		}
 		else
+		{
 			return array();
+		}
 	}
 
 	/**
@@ -88,9 +97,13 @@ class Display extends \ElkArte\Modules\AbstractModule
 				if (!empty($options['use_editor_quick_reply']))
 				{
 					if (!isset($editorOptions['plugin_addons']))
+					{
 						$editorOptions['plugin_addons'] = array();
+					}
 					if (!isset($editorOptions['plugin_options']))
+					{
 						$editorOptions['plugin_options'] = array();
+					}
 
 					// @todo remove
 					$context['drafts_autosave_frequency'] = self::$_autosave_frequency;

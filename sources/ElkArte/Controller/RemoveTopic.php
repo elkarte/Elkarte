@@ -9,7 +9,7 @@
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause (see accompanying LICENSE.txt file)
  *
  * This file contains code covered by:
- * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * copyright: 2011 Simple Machines (http://www.simplemachines.org)
  *
  * @version 2.0 dev
  *
@@ -17,13 +17,18 @@
 
 namespace ElkArte\Controller;
 
+use ElkArte\AbstractController;
+use ElkArte\Exceptions\Exception;
+use ElkArte\MessagesDelete;
+
 /**
  * Handles the deletion of topics, posts
  */
-class RemoveTopic extends \ElkArte\AbstractController
+class RemoveTopic extends AbstractController
 {
 	/**
 	 * Hold topic information for supplied message
+	 *
 	 * @var array
 	 */
 	private $_topic_info;
@@ -103,15 +108,32 @@ class RemoveTopic extends \ElkArte\AbstractController
 		if (allowedTo('remove_any') || (allowedTo('remove_own') && $this->_topic_info['id_member_started'] == $this->user->id))
 		{
 			logAction('remove', array(
-				(empty($modSettings['recycle_enable']) || $modSettings['recycle_board'] != $board ? 'topic' : 'old_topic_id') => $topic,
-				'subject' => $this->_topic_info['subject'],
-				'member' => $this->_topic_info['id_member_started'],
-				'board' => $board)
+					(empty($modSettings['recycle_enable']) || $modSettings['recycle_board'] != $board ? 'topic' : 'old_topic_id') => $topic,
+					'subject' => $this->_topic_info['subject'],
+					'member' => $this->_topic_info['id_member_started'],
+					'board' => $board)
 			);
 		}
 
 		// Back to the board where the topic was removed from
 		redirectexit('board=' . $board . '.0');
+	}
+
+	/**
+	 * Verifies the user has permissions to remove an unapproved message/topic
+	 */
+	private function _checkApproval()
+	{
+		global $modSettings;
+
+		// Verify they can see this!
+		if ($modSettings['postmod_active']
+			&& !$this->_topic_info['approved']
+			&& !empty($this->_topic_info['id_member'])
+			&& $this->_topic_info['id_member'] != $this->user->id)
+		{
+			isAllowedTo('approve_posts');
+		}
 	}
 
 	/**
@@ -163,73 +185,10 @@ class RemoveTopic extends \ElkArte\AbstractController
 		$this->_verifyDeletePermissions();
 
 		// Do the removal, track if we removed the entire topic so we redirect back to the board.
-		$remover = new \ElkArte\MessagesDelete($modSettings['recycle_enable'], $modSettings['recycle_board']);
+		$remover = new MessagesDelete($modSettings['recycle_enable'], $modSettings['recycle_board']);
 		$full_topic = $remover->removeMessage($_msg);
 
 		$this->_redirectBack($full_topic);
-	}
-
-	/**
-	 * Move back a topic or post from the recycle board to its original board.
-	 *
-	 * What it does:
-	 *
-	 * - Merges back the posts to the original as necessary.
-	 * - Accessed by ?action=restoretopic
-	 */
-	public function action_restoretopic()
-	{
-		global $modSettings;
-
-		// Check session.
-		checkSession('get');
-
-		// Is recycled board enabled?
-		if (empty($modSettings['recycle_enable']))
-		{
-			throw new \ElkArte\Exceptions\Exception('restored_disabled', 'critical');
-		}
-
-		// Can we be in here?
-		isAllowedTo('move_any', $modSettings['recycle_board']);
-
-		$restorer = new \ElkArte\MessagesDelete($modSettings['recycle_enable'], $modSettings['recycle_board']);
-
-		// Restoring messages?
-		if (!empty($this->_req->query->msgs))
-		{
-			$actioned_messages = $restorer->restoreMessages(array_map('intval', explode(',', $this->_req->query->msgs)));
-		}
-
-		// Now any topics?
-		if (!empty($this->_req->query->topics))
-		{
-			$topics_to_restore = array_map('intval', explode(',', $this->_req->query->topics));
-			$restorer->restoreTopics($topics_to_restore);
-		}
-
-		$restorer->doRestore();
-
-		// Didn't find some things?
-		if ($restorer->unfoundRestoreMessages())
-		{
-			throw new \ElkArte\Exceptions\Exception('restore_not_found', false, array('<ul><li>' . implode('</li><li>', $restorer->unfoundRestoreMessages(true)) . '</li></ul>'));
-		}
-
-		// Lets send them back somewhere that may make sense
-		if (isset($actioned_messages) && count($actioned_messages) == 1 && empty($topics_to_restore))
-		{
-			reset($actioned_messages);
-			redirectexit('topic=' . key($actioned_messages));
-		}
-		elseif (count($topics_to_restore) == 1)
-		{
-			redirectexit('topic=' . $topics_to_restore[0]);
-		}
-		else
-		{
-			redirectexit();
-		}
 	}
 
 	/**
@@ -260,7 +219,7 @@ class RemoveTopic extends \ElkArte\AbstractController
 				&& !empty($modSettings['edit_disable_time'])
 				&& $this->_topic_info['poster_time'] + $modSettings['edit_disable_time'] * 60 < time())
 			{
-				throw new \ElkArte\Exceptions\Exception('modify_post_time_passed', false);
+				throw new Exception('modify_post_time_passed', false);
 			}
 		}
 		elseif ($this->_topic_info['id_member_started'] == $this->user->id && !allowedTo('delete_any'))
@@ -306,19 +265,65 @@ class RemoveTopic extends \ElkArte\AbstractController
 	}
 
 	/**
-	 * Verifies the user has permissions to remove an unapproved message/topic
+	 * Move back a topic or post from the recycle board to its original board.
+	 *
+	 * What it does:
+	 *
+	 * - Merges back the posts to the original as necessary.
+	 * - Accessed by ?action=restoretopic
 	 */
-	private function _checkApproval()
+	public function action_restoretopic()
 	{
 		global $modSettings;
 
-		// Verify they can see this!
-		if ($modSettings['postmod_active']
-			&& !$this->_topic_info['approved']
-			&& !empty($this->_topic_info['id_member'])
-			&& $this->_topic_info['id_member'] != $this->user->id)
+		// Check session.
+		checkSession('get');
+
+		// Is recycled board enabled?
+		if (empty($modSettings['recycle_enable']))
 		{
-			isAllowedTo('approve_posts');
+			throw new Exception('restored_disabled', 'critical');
+		}
+
+		// Can we be in here?
+		isAllowedTo('move_any', $modSettings['recycle_board']);
+
+		$restorer = new MessagesDelete($modSettings['recycle_enable'], $modSettings['recycle_board']);
+
+		// Restoring messages?
+		if (!empty($this->_req->query->msgs))
+		{
+			$actioned_messages = $restorer->restoreMessages(array_map('intval', explode(',', $this->_req->query->msgs)));
+		}
+
+		// Now any topics?
+		if (!empty($this->_req->query->topics))
+		{
+			$topics_to_restore = array_map('intval', explode(',', $this->_req->query->topics));
+			$restorer->restoreTopics($topics_to_restore);
+		}
+
+		$restorer->doRestore();
+
+		// Didn't find some things?
+		if ($restorer->unfoundRestoreMessages())
+		{
+			throw new Exception('restore_not_found', false, array('<ul><li>' . implode('</li><li>', $restorer->unfoundRestoreMessages(true)) . '</li></ul>'));
+		}
+
+		// Lets send them back somewhere that may make sense
+		if (isset($actioned_messages) && count($actioned_messages) === 1 && empty($topics_to_restore))
+		{
+			reset($actioned_messages);
+			redirectexit('topic=' . key($actioned_messages));
+		}
+		elseif (count($topics_to_restore) === 1)
+		{
+			redirectexit('topic=' . $topics_to_restore[0]);
+		}
+		else
+		{
+			redirectexit();
 		}
 	}
 }

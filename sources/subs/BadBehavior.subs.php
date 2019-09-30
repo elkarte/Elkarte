@@ -20,12 +20,12 @@
  * - It attempts to TRUNCATE the table to reset the auto_increment.
  * - Redirects back to the badbehavior log when done.
  *
- * @package BadBehavior
- *
  * @param string $type
  * @param mixed[] $filter
  *
  * @return string
+ * @package BadBehavior
+ *
  */
 function deleteBadBehavior($type, $filter)
 {
@@ -36,8 +36,7 @@ function deleteBadBehavior($type, $filter)
 	{
 		$db->query('truncate_table', '
 			TRUNCATE {db_prefix}log_badbehavior',
-			array(
-			)
+			array()
 		);
 	}
 	// Deleting all with a filter?
@@ -52,7 +51,7 @@ function deleteBadBehavior($type, $filter)
 		);
 	}
 	// Just specific entries?
-	elseif ($type == 'delete')
+	elseif ($type === 'delete')
 	{
 		$db->query('', '
 			DELETE FROM {db_prefix}log_badbehavior
@@ -75,9 +74,9 @@ function deleteBadBehavior($type, $filter)
  *
  * - Will take in to account any current filter value in its count result
  *
- * @package BadBehavior
  * @param mixed[] $filter
  * @return integer
+ * @package BadBehavior
  */
 function getBadBehaviorLogEntryCount($filter)
 {
@@ -100,14 +99,14 @@ function getBadBehaviorLogEntryCount($filter)
 /**
  * Gets the badbehavior log entries that match the specified parameters.
  *
- * @package BadBehavior
- *
  * @param int $start The item to start with (for pagination purposes)
  * @param int $items_per_page The number of items to show per page
  * @param string $sort A string indicating how to sort the results
  * @param string|mixed[]|null $filter
  *
  * @return array
+ * @package BadBehavior
+ *
  */
 function getBadBehaviorLogEntries($start, $items_per_page, $sort, $filter = '')
 {
@@ -144,7 +143,7 @@ function getBadBehaviorLogEntries($start, $items_per_page, $sort, $filter = '')
 		}
 
 		$bb_entries[$row['id']] = array(
-			'alternate' => $i % 2 == 0,
+			'alternate' => $i % 2 === 0,
 			'ip' => $row['ip'],
 			'request_method' => $row['request_method'],
 			'server_protocol' => $row['server_protocol'],

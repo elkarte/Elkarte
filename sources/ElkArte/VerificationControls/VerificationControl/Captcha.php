@@ -9,13 +9,15 @@
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause (see accompanying LICENSE.txt file)
  *
  * This file contains code covered by:
- * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * copyright: 2011 Simple Machines (http://www.simplemachines.org)
  *
  * @version 2.0 dev
  *
  */
 
 namespace ElkArte\VerificationControls\VerificationControl;
+
+use ElkArte\Util;
 
 /**
  * Class to manage, create, show and validate captcha images
@@ -88,7 +90,9 @@ class Captcha implements ControlInterface
 		$this->_standard_captcha_range = array_merge(range('A', 'H'), array('K', 'M', 'N', 'P', 'R'), range('T', 'Y'));
 
 		if (!empty($verificationOptions))
+		{
 			$this->_options = $verificationOptions;
+		}
 	}
 
 	/**
@@ -136,7 +140,9 @@ class Captcha implements ControlInterface
 	public function createTest($sessionVal, $refresh = true)
 	{
 		if (!$this->_show_captcha)
+		{
 			return;
+		}
 
 		if ($refresh)
 		{
@@ -146,10 +152,14 @@ class Captcha implements ControlInterface
 			$character_range = !empty($this->_options['override_range']) ? $this->_options['override_range'] : $this->_standard_captcha_range;
 
 			for ($i = 0; $i < $this->_num_chars; $i++)
+			{
 				$sessionVal['code'] .= $character_range[array_rand($character_range)];
+			}
 		}
 		else
-			$this->_text_value = !empty($_REQUEST[$this->_options['id'] . '_vv']['code']) ? \ElkArte\Util::htmlspecialchars($_REQUEST[$this->_options['id'] . '_vv']['code']) : '';
+		{
+			$this->_text_value = !empty($_REQUEST[$this->_options['id'] . '_vv']['code']) ? Util::htmlspecialchars($_REQUEST[$this->_options['id'] . '_vv']['code']) : '';
+		}
 	}
 
 	/**
@@ -169,6 +179,16 @@ class Captcha implements ControlInterface
 	}
 
 	/**
+	 * Does what they typed = what was supplied in the image
+	 *
+	 * @return boolean
+	 */
+	private function _verifyCode($sessionVal)
+	{
+		return !$this->_show_captcha || (!empty($_REQUEST[$this->_options['id'] . '_vv']['code']) && !empty($sessionVal['code']) && strtoupper($_REQUEST[$this->_options['id'] . '_vv']['code']) === $sessionVal['code']);
+	}
+
+	/**
 	 * {@inheritdoc }
 	 */
 	public function doTest($sessionVal)
@@ -176,7 +196,9 @@ class Captcha implements ControlInterface
 		$this->_tested = true;
 
 		if (!$this->_verifyCode($sessionVal))
+		{
 			return 'wrong_verification_code';
+		}
 
 		return true;
 	}
@@ -206,20 +228,24 @@ class Captcha implements ControlInterface
 			array('title', 'configure_captcha'),
 			array('int', 'visual_verification_num_chars'),
 			'vv' => array('select', 'visual_verification_type',
-				array($txt['setting_image_verification_off'], $txt['setting_image_verification_vsimple'], $txt['setting_image_verification_simple'], $txt['setting_image_verification_medium'], $txt['setting_image_verification_high'], $txt['setting_image_verification_extreme']),
-				'subtext' => $txt['setting_visual_verification_type_desc']),
+						  array($txt['setting_image_verification_off'], $txt['setting_image_verification_vsimple'], $txt['setting_image_verification_simple'], $txt['setting_image_verification_medium'], $txt['setting_image_verification_high'], $txt['setting_image_verification_extreme']),
+						  'subtext' => $txt['setting_visual_verification_type_desc']),
 		);
 
 		// Save it
 		if (isset($_GET['save']))
 		{
 			if (isset($_POST['visual_verification_num_chars']) && $_POST['visual_verification_num_chars'] < 6)
+			{
 				$_POST['visual_verification_num_chars'] = 5;
+			}
 		}
 
 		$_SESSION['visual_verification_code'] = '';
 		for ($i = 0; $i < $this->_num_chars; $i++)
+		{
 			$_SESSION['visual_verification_code'] .= $this->_standard_captcha_range[array_rand($this->_standard_captcha_range)];
+		}
 
 		// Some javascript for CAPTCHA.
 		loadJavascriptFile('jquery.captcha.js');
@@ -236,14 +262,5 @@ class Captcha implements ControlInterface
 		$config_vars['vv']['postinput'] = '<br /><img src="' . $verification_image . ';type=' . (empty($modSettings['visual_verification_type']) ? 0 : $modSettings['visual_verification_type']) . '" alt="' . $txt['setting_image_verification_sample'] . '" id="verification_image" /><br />';
 
 		return $config_vars;
-	}
-
-	/**
-	 * Does what they typed = what was supplied in the image
-	 * @return boolean
-	 */
-	private function _verifyCode($sessionVal)
-	{
-		return !$this->_show_captcha || (!empty($_REQUEST[$this->_options['id'] . '_vv']['code']) && !empty($sessionVal['code']) && strtoupper($_REQUEST[$this->_options['id'] . '_vv']['code']) === $sessionVal['code']);
 	}
 }

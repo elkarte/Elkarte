@@ -12,7 +12,7 @@
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause (see accompanying LICENSE.txt file)
  *
  * This file contains code covered by:
- * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * copyright: 2011 Simple Machines (http://www.simplemachines.org)
  *
  * @version 2.0 dev
  *
@@ -25,21 +25,24 @@ use ElkArte\User;
  *
  * What it does:
  *
- * - Requires the GD extension.
+ * - Requires the GD2 extension.
  * - Uses a random font for each letter from default_theme_dir/fonts.
  * - Outputs a png if possible, otherwise a gif.
  *
- * @package Graphics
  * @param string $code The code to display
  *
  * @return false|null false if something goes wrong.
+ * @package Graphics
  */
 function showCodeImage($code)
 {
-	global $gd2, $settings, $modSettings;
+	global $settings, $modSettings;
 
-	if (!checkGD())
+	// No GD, No image code
+	if (get_extension_funcs('gd') === [])
+	{
 		return false;
+	}
 
 	// What type are we going to be doing?
 	// Note: The higher the value of visual_verification_type the harder the verification is
@@ -48,33 +51,35 @@ function showCodeImage($code)
 
 	// Special case to allow the admin center to show samples.
 	if (User::$info->is_admin && isset($_GET['type']))
+	{
 		$imageType = (int) $_GET['type'];
+	}
 
 	// Some quick references for what we do.
 	// Do we show no, low or high noise?
 	$noiseType = $imageType == 3 ? 'low' : ($imageType == 4 ? 'high' : ($imageType == 5 ? 'extreme' : 'none'));
 	// Can we have more than one font in use?
-	$varyFonts = $imageType > 1 ? true : false;
+	$varyFonts = $imageType > 1;
 	// Just a plain white background?
-	$simpleBGColor = $imageType < 3 ? true : false;
+	$simpleBGColor = $imageType < 3;
 	// Plain black foreground?
-	$simpleFGColor = $imageType == 0 ? true : false;
+	$simpleFGColor = $imageType == 0;
 	// High much to rotate each character.
 	$rotationType = $imageType == 1 ? 'none' : ($imageType > 3 ? 'low' : 'high');
 	// Do we show some characters inverse?
-	$showReverseChars = $imageType > 3 ? true : false;
+	$showReverseChars = $imageType > 3;
 	// Special case for not showing any characters.
-	$disableChars = $imageType == 0 ? true : false;
+	$disableChars = $imageType == 0;
 	// What do we do with the font colors. Are they one color, close to one color or random?
 	$fontColorType = $imageType == 1 ? 'plain' : ($imageType > 3 ? 'random' : 'cyclic');
 	// Are the fonts random sizes?
-	$fontSizeRandom = $imageType > 3 ? true : false;
+	$fontSizeRandom = $imageType > 3;
 	// How much space between characters?
 	$fontHorSpace = $imageType > 3 ? 'high' : ($imageType == 1 ? 'medium' : 'minus');
 	// Where do characters sit on the image? (Fixed position or random/very random)
 	$fontVerPos = $imageType == 1 ? 'fixed' : ($imageType > 3 ? 'vrandom' : 'random');
 	// Make font semi-transparent?
-	$fontTrans = $imageType == 2 || $imageType == 3 ? true : false;
+	$fontTrans = $imageType == 2 || $imageType == 3;
 	// Give the image a border?
 	$hasBorder = $simpleBGColor;
 
@@ -83,24 +88,34 @@ function showCodeImage($code)
 
 	// What color is the background - generally white unless we're on "hard".
 	if ($simpleBGColor)
+	{
 		$background_color = array(255, 255, 255);
+	}
 	else
+	{
 		$background_color = isset($settings['verification_background']) ? $settings['verification_background'] : array(236, 237, 243);
+	}
 
 	// The color of the characters shown (red, green, blue).
 	if ($simpleFGColor)
+	{
 		$foreground_color = array(0, 0, 0);
+	}
 	else
 	{
 		$foreground_color = array(64, 101, 136);
 
 		// Has the theme author requested a custom color?
 		if (isset($settings['verification_foreground']))
+		{
 			$foreground_color = $settings['verification_foreground'];
+		}
 	}
 
 	if (!is_dir($settings['default_theme_dir'] . '/fonts'))
+	{
 		return false;
+	}
 
 	// Can we use true type fonts?
 	$can_do_ttf = function_exists('imagettftext');
@@ -112,13 +127,19 @@ function showCodeImage($code)
 	while ($entry = $font_dir->read())
 	{
 		if (preg_match('~^(.+)\.gdf$~', $entry, $matches) === 1)
+		{
 			$font_list[] = $entry;
+		}
 		elseif (preg_match('~^(.+)\.ttf$~', $entry, $matches) === 1)
+		{
 			$ttfont_list[] = $entry;
+		}
 	}
 
 	if (empty($font_list) && ($can_do_ttf && empty($ttfont_list)))
+	{
 		return false;
+	}
 
 	// For non-hard things don't even change fonts.
 	if (!$varyFonts)
@@ -127,9 +148,13 @@ function showCodeImage($code)
 
 		// Try use Screenge if we can - it looks good!
 		if (in_array('VDS_New.ttf', $ttfont_list))
+		{
 			$ttfont_list = array('VDS_New.ttf');
+		}
 		else
+		{
 			$ttfont_list = empty($ttfont_list) ? array() : array($ttfont_list[0]);
+		}
 	}
 
 	// Create a list of characters to be shown.
@@ -148,8 +173,12 @@ function showCodeImage($code)
 
 	// Load all fonts and determine the maximum font height.
 	if (!$can_do_ttf)
+	{
 		foreach ($loaded_fonts as $font_index => $dummy)
+		{
 			$loaded_fonts[$font_index] = imageloadfont($settings['default_theme_dir'] . '/fonts/' . $font_list[$font_index]);
+		}
+	}
 
 	// Determine the dimensions of each character.
 	$total_width = $character_spacing * strlen($code) + 50;
@@ -158,11 +187,7 @@ function showCodeImage($code)
 	{
 		if ($can_do_ttf)
 		{
-			// GD2 handles font size differently.
-			if ($fontSizeRandom)
-				$font_size = $gd2 ? mt_rand(17, 19) : mt_rand(25, 27);
-			else
-				$font_size = $gd2 ? 17 : 27;
+			$font_size = $fontSizeRandom ? mt_rand(17, 19) : 17;
 
 			$img_box = imagettfbbox($font_size, 0, $settings['default_theme_dir'] . '/fonts/' . $ttfont_list[$character['font']], $character['id']);
 
@@ -180,7 +205,11 @@ function showCodeImage($code)
 	}
 
 	// Create an image.
-	$code_image = $gd2 ? imagecreatetruecolor($total_width, $max_height) : imagecreate($total_width, $max_height);
+	$code_image = imagecreatetruecolor($total_width, $max_height);
+	if ($code_image === false)
+	{
+		die();
+	}
 
 	// Draw the background.
 	$bg_color = imagecolorallocate($code_image, $background_color[0], $background_color[1], $background_color[2]);
@@ -188,13 +217,17 @@ function showCodeImage($code)
 
 	// Randomize the foreground color a little.
 	for ($i = 0; $i < 3; $i++)
+	{
 		$foreground_color[$i] = mt_rand(max($foreground_color[$i] - 3, 0), min($foreground_color[$i] + 3, 255));
+	}
 	$fg_color = imagecolorallocate($code_image, $foreground_color[0], $foreground_color[1], $foreground_color[2]);
 
 	// Color for the noise dots.
 	$dotbgcolor = array();
 	for ($i = 0; $i < 3; $i++)
+	{
 		$dotbgcolor[$i] = $background_color[$i] < $foreground_color[$i] ? mt_rand(0, max($foreground_color[$i] - 20, 0)) : mt_rand(min($foreground_color[$i] + 20, 255), 255);
+	}
 	$randomness_color = imagecolorallocate($code_image, $dotbgcolor[0], $dotbgcolor[1], $dotbgcolor[2]);
 
 	// Some squares/rectangles for new extreme level
@@ -206,7 +239,7 @@ function showCodeImage($code)
 			$x2 = $x1 + round(rand($total_width / 4, $total_width));
 			$y1 = rand(0, $max_height);
 			$y2 = $y1 + round(rand(0, $max_height / 3));
-			imagefilledrectangle($code_image, $x1, $y1, $x2, $y2, mt_rand(0, 1) ? $fg_color : $randomness_color);
+			imagefilledrectangle($code_image, $x1, $y1, $x2, $y2, mt_rand(0, 1) !== 0 ? $fg_color : $randomness_color);
 		}
 	}
 
@@ -219,9 +252,13 @@ function showCodeImage($code)
 		{
 			// How much rotation will we give?
 			if ($rotationType == 'none')
+			{
 				$angle = 0;
+			}
 			else
+			{
 				$angle = mt_rand(-100, 100) / ($rotationType == 'high' ? 6 : 10);
+			}
 
 			// What color shall we do it?
 			if ($fontColorType == 'cyclic')
@@ -238,23 +275,25 @@ function showCodeImage($code)
 
 				// Pick a color, but not the same one twice in a row
 				$new_index = $last_index;
-				while ($last_index == $new_index)
+				while ($last_index === $new_index)
+				{
 					$new_index = mt_rand(0, count($colors) - 1);
+				}
 				$char_fg_color = $colors[$new_index];
 				$last_index = $new_index;
 			}
-			elseif ($fontColorType == 'random')
+			elseif ($fontColorType === 'random')
+			{
 				$char_fg_color = array(mt_rand(max($foreground_color[0] - 2, 0), $foreground_color[0]), mt_rand(max($foreground_color[1] - 2, 0), $foreground_color[1]), mt_rand(max($foreground_color[2] - 2, 0), $foreground_color[2]));
+			}
 			else
+			{
 				$char_fg_color = array($foreground_color[0], $foreground_color[1], $foreground_color[2]);
+			}
 
 			if (!empty($can_do_ttf))
 			{
-				// GD2 handles font size differently.
-				if ($fontSizeRandom)
-					$font_size = $gd2 ? mt_rand(17, 19) : mt_rand(18, 25);
-				else
-					$font_size = $gd2 ? 18 : 24;
+				$font_size = $fontSizeRandom ? mt_rand(17, 19) : 18;
 
 				// Work out the sizes - also fix the character width cause TTF not quite so wide!
 				$font_x = $fontHorSpace === 'minus' && $cur_x > 0 ? $cur_x - 3 : $cur_x + 5;
@@ -262,7 +301,9 @@ function showCodeImage($code)
 
 				// What font face?
 				if (!empty($ttfont_list))
+				{
 					$fontface = $settings['default_theme_dir'] . '/fonts/' . $ttfont_list[mt_rand(0, count($ttfont_list) - 1)];
+				}
 
 				// What color are we to do it in?
 				$is_reverse = $showReverseChars ? mt_rand(0, 1) : false;
@@ -270,7 +311,9 @@ function showCodeImage($code)
 
 				$fontcord = @imagettftext($code_image, $font_size, $angle, $font_x, $font_y, $char_color, $fontface, $character['id']);
 				if (empty($fontcord))
+				{
 					$can_do_ttf = false;
+				}
 				elseif ($is_reverse !== false)
 				{
 					imagefilledpolygon($code_image, $fontcord, 4, $fg_color);
@@ -280,12 +323,18 @@ function showCodeImage($code)
 				}
 
 				if ($can_do_ttf)
+				{
 					$cur_x = max($fontcord[2], $fontcord[4]) + ($angle == 0 ? 0 : 3);
+				}
 			}
 
 			if (!$can_do_ttf)
 			{
-				$char_image = $gd2 ? imagecreatetruecolor($character['width'], $character['height']) : imagecreate($character['width'], $character['height']);
+				$char_image = imagecreatetruecolor($character['width'], $character['height']);
+				if ($char_image === false)
+				{
+					die();
+				}
 				$char_bgcolor = imagecolorallocate($char_image, $background_color[0], $background_color[1], $background_color[2]);
 				imagefilledrectangle($char_image, 0, 0, $character['width'] - 1, $character['height'] - 1, $char_bgcolor);
 				imagechar($char_image, $loaded_fonts[$character['font']], 0, 0, $character['id'], imagecolorallocate($char_image, $char_fg_color[0], $char_fg_color[1], $char_fg_color[2]));
@@ -307,17 +356,25 @@ function showCodeImage($code)
 
 	// Make the background color transparent on the hard image.
 	if (!$simpleBGColor)
+	{
 		imagecolortransparent($code_image, $bg_color);
+	}
 
 	if ($hasBorder)
+	{
 		imagerectangle($code_image, 0, 0, $total_width - 1, $max_height - 1, $fg_color);
+	}
 
 	// Add some noise to the background?
 	if ($noiseType != 'none')
 	{
 		for ($i = mt_rand(0, 2); $i < $max_height; $i += mt_rand(1, 2))
+		{
 			for ($j = mt_rand(0, 10); $j < $total_width; $j += mt_rand(1, 10))
-				imagesetpixel($code_image, $j, $i, mt_rand(0, 1) ? $fg_color : $randomness_color);
+			{
+				imagesetpixel($code_image, $j, $i, mt_rand(0, 1) !== 0 ? $fg_color : $randomness_color);
+			}
+		}
 
 		// Put in some lines too?
 		if ($noiseType != 'extreme')
@@ -325,7 +382,7 @@ function showCodeImage($code)
 			$num_lines = $noiseType == 'high' ? mt_rand(3, 7) : mt_rand(2, 5);
 			for ($i = 0; $i < $num_lines; $i++)
 			{
-				if (mt_rand(0, 1))
+				if (mt_rand(0, 1) !== 0)
 				{
 					$x1 = mt_rand(0, $total_width);
 					$x2 = mt_rand(0, $total_width);
@@ -340,7 +397,7 @@ function showCodeImage($code)
 					$x2 = $total_width;
 				}
 				imagesetthickness($code_image, mt_rand(1, 2));
-				imageline($code_image, $x1, $y1, $x2, $y2, mt_rand(0, 1) ? $fg_color : $randomness_color);
+				imageline($code_image, $x1, $y1, $x2, $y2, mt_rand(0, 1) !== 0 ? $fg_color : $randomness_color);
 			}
 		}
 		else
@@ -353,7 +410,7 @@ function showCodeImage($code)
 				$x2 = round(rand($total_width / 2, 2 * $total_width));
 				$y1 = round(rand(($max_height / 4) * -1, $max_height + ($max_height / 4)));
 				$y2 = round(rand($max_height / 2, 2 * $max_height));
-				imageellipse($code_image, $x1, $y1, $x2, $y2, mt_rand(0, 1) ? $fg_color : $randomness_color);
+				imageellipse($code_image, $x1, $y1, $x2, $y2, mt_rand(0, 1) !== 0 ? $fg_color : $randomness_color);
 			}
 		}
 	}
@@ -372,48 +429,5 @@ function showCodeImage($code)
 
 	// Bail out.
 	imagedestroy($code_image);
-	die();
-}
-
-/**
- * Show a letter for the visual verification code.
- *
- * - Alternative function for showCodeImage() in case GD is missing.
- * - Includes an image from a random sub directory of default_theme_dir/fonts.
- *
- * @package Graphics
- * @param string $letter A letter to show as an image
- *
- * @return false|null false if something goes wrong.
- */
-function showLetterImage($letter)
-{
-	global $settings;
-
-	if (!is_dir($settings['default_theme_dir'] . '/fonts'))
-		return false;
-
-	// Get a list of the available font directories.
-	$font_dir = dir($settings['default_theme_dir'] . '/fonts');
-	$font_list = array();
-	while ($entry = $font_dir->read())
-		if ($entry[0] !== '.' && is_dir($settings['default_theme_dir'] . '/fonts/' . $entry) && file_exists($settings['default_theme_dir'] . '/fonts/' . $entry . '.gdf'))
-			$font_list[] = $entry;
-
-	if (empty($font_list))
-		return false;
-
-	// Pick a random font.
-	$random_font = $font_list[array_rand($font_list)];
-
-	// Check if the given letter exists.
-	if (!file_exists($settings['default_theme_dir'] . '/fonts/' . $random_font . '/' . $letter . '.gif'))
-		return false;
-
-	// Include it!
-	header('Content-type: image/gif');
-	include($settings['default_theme_dir'] . '/fonts/' . $random_font . '/' . $letter . '.gif');
-
-	// Nothing more to come.
 	die();
 }

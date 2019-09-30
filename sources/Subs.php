@@ -8,13 +8,21 @@
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause (see accompanying LICENSE.txt file)
  *
  * This file contains code covered by:
- * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * copyright: 2011 Simple Machines (http://www.simplemachines.org)
  *
  * @version 2.0 dev
  *
  */
 
+use ElkArte\Cache\Cache;
+use ElkArte\Censor;
+use ElkArte\Debug;
+use ElkArte\GenericList;
+use ElkArte\Hooks;
+use ElkArte\Notifications;
+use ElkArte\UrlGenerator\UrlGenerator;
 use ElkArte\User;
+use ElkArte\Util;
 
 /**
  * Updates the settings table as well as $modSettings... only does one at a time if $update is true.
@@ -31,16 +39,19 @@ use ElkArte\User;
  *
  * @param mixed[] $changeArray An associative array of what we're changing in 'setting' => 'value' format
  * @param bool $update Use an UPDATE query instead of a REPLACE query
+ * @throws \ElkArte\Exceptions\Exception
  */
 function updateSettings($changeArray, $update = false)
 {
 	global $modSettings;
 
 	$db = database();
-	$cache = \ElkArte\Cache\Cache::instance();
+	$cache = Cache::instance();
 
 	if (empty($changeArray) || !is_array($changeArray))
+	{
 		return;
+	}
 
 	// In some cases, this may be better and faster, but for large sets we don't want so many UPDATEs.
 	if ($update)
@@ -70,11 +81,16 @@ function updateSettings($changeArray, $update = false)
 	foreach ($changeArray as $variable => $value)
 	{
 		// Don't bother if it's already like that ;).
-		if (isset($modSettings[$variable]) && $modSettings[$variable] == $value)
+		if (isset($modSettings[$variable]) && $modSettings[$variable] === $value)
+		{
 			continue;
+		}
+
 		// If the variable isn't set, but would only be set to nothing'ness, then don't bother setting it.
-		elseif (!isset($modSettings[$variable]) && empty($value))
+		if (!isset($modSettings[$variable]) && empty($value))
+		{
 			continue;
+		}
 
 		$replaceArray[] = array($variable, $value);
 
@@ -82,7 +98,9 @@ function updateSettings($changeArray, $update = false)
 	}
 
 	if (empty($replaceArray))
+	{
 		return;
+	}
 
 	$db->insert('replace',
 		'{db_prefix}settings',
@@ -107,10 +125,14 @@ function removeSettings($toRemove)
 	$db = database();
 
 	if (empty($toRemove))
+	{
 		return;
+	}
 
 	if (!is_array($toRemove))
+	{
 		$toRemove = array($toRemove);
+	}
 
 	// Remove the setting from the db
 	$db->query('', '
@@ -123,11 +145,15 @@ function removeSettings($toRemove)
 
 	// Remove it from $modSettings now so it does not persist
 	foreach ($toRemove as $setting)
+	{
 		if (isset($modSettings[$setting]))
+		{
 			unset($modSettings[$setting]);
+		}
+	}
 
 	// Kill the cache - it needs redoing now, but we won't bother ourselves with that here.
-	\ElkArte\Cache\Cache::instance()->remove('modSettings');
+	Cache::instance()->remove('modSettings');
 }
 
 /**
@@ -144,10 +170,6 @@ function removeSettings($toRemove)
  * - Uses the compactTopicPagesEnable and compactTopicPagesContiguous
  *   settings to decide how to display the menu.
  *
- * @example is available near the function definition.
- * @example $pageindex = constructPageIndex($scripturl . '?board=' . $board, $_REQUEST['start'], $num_messages,
- *     $maxindex, true);
- *
  * @param string $base_url The base URL to be used for each link.
  * @param int &$start The start position, by reference. If this is not a multiple
  * of the number of items per page, it is sanitized to be so and the value will persist upon the function's return.
@@ -157,6 +179,10 @@ function removeSettings($toRemove)
  * @param mixed[] $show associative array of option => boolean paris
  *
  * @return string
+ * @example $pageindex = constructPageIndex($scripturl . '?board=' . $board, $_REQUEST['start'], $num_messages,
+ *     $maxindex, true);
+ *
+ * @example is available near the function definition.
  */
 function constructPageIndex($base_url, &$start, $max_value, $num_per_page, $flexible_start = false, $show = array())
 {
@@ -174,13 +200,19 @@ function constructPageIndex($base_url, &$start, $max_value, $num_per_page, $flex
 
 	// Make sure $start is a proper variable - not less than 0.
 	if ($start_invalid)
+	{
 		$start = 0;
+	}
 	// Not greater than the upper bound.
 	elseif ($start >= $max_value)
-		$start = max(0, (int) $max_value - (((int) $max_value % (int) $num_per_page) == 0 ? $num_per_page : ((int) $max_value % (int) $num_per_page)));
+	{
+		$start = max(0, (int) $max_value - ((int) $max_value % (int) $num_per_page === 0 ? $num_per_page : ((int) $max_value % (int) $num_per_page)));
+	}
 	// And it has to be a multiple of $num_per_page!
 	else
+	{
 		$start = max(0, (int) $start - ((int) $start % (int) $num_per_page));
+	}
 
 	$context['current_page'] = $start / $num_per_page;
 
@@ -190,17 +222,21 @@ function constructPageIndex($base_url, &$start, $max_value, $num_per_page, $flex
 	if (empty($modSettings['compactTopicPagesEnable']))
 	{
 		// Show the left arrow.
-		$pageindex = $start == 0 || !$show['prev_next'] ? ' ' : sprintf($base_link, $start - $num_per_page, str_replace('{prev_txt}', $txt['prev'], $settings['page_index_template']['previous_page']));
+		$pageindex = $start === 0 || !$show['prev_next'] ? ' ' : sprintf($base_link, $start - $num_per_page, str_replace('{prev_txt}', $txt['prev'], $settings['page_index_template']['previous_page']));
 
 		// Show all the pages.
 		$display_page = 1;
 		for ($counter = 0; $counter < $max_value; $counter += $num_per_page)
-			$pageindex .= $start == $counter && !$start_invalid && empty($show['all_selected']) ? sprintf($settings['page_index_template']['current_page'], $display_page++) : sprintf($base_link, $counter, $display_page++);
+		{
+			$pageindex .= $start === $counter && !$start_invalid && empty($show['all_selected']) ? sprintf($settings['page_index_template']['current_page'], $display_page++) : sprintf($base_link, $counter, $display_page++);
+		}
 
 		// Show the right arrow.
 		$display_page = ($start + $num_per_page) > $max_value ? $max_value : ($start + $num_per_page);
-		if ($start != $counter - $max_value && !$start_invalid && $show['prev_next'] && empty($show['all_selected']))
+		if ($start !== $counter - $max_value && !$start_invalid && $show['prev_next'] && empty($show['all_selected']))
+		{
 			$pageindex .= $display_page > $counter - $num_per_page ? ' ' : sprintf($base_link, $display_page, str_replace('{next_txt}', $txt['next'], $settings['page_index_template']['next_page']));
+		}
 	}
 	else
 	{
@@ -209,13 +245,19 @@ function constructPageIndex($base_url, &$start, $max_value, $num_per_page, $flex
 
 		// Show the "prev page" link. (>prev page< 1 ... 6 7 [8] 9 10 ... 15 next page)
 		if (!empty($start) && $show['prev_next'])
+		{
 			$pageindex = sprintf($base_link, $start - $num_per_page, str_replace('{prev_txt}', $txt['prev'], $settings['page_index_template']['previous_page']));
+		}
 		else
+		{
 			$pageindex = '';
+		}
 
 		// Show the first page. (prev page >1< ... 6 7 [8] 9 10 ... 15)
 		if ($start > $num_per_page * $PageContiguous)
+		{
 			$pageindex .= sprintf($base_link, 0, '1');
+		}
 
 		// Show the ... after the first page.  (prev page 1 >...< 6 7 [8] 9 10 ... 15 next page)
 		if ($start > $num_per_page * ($PageContiguous + 1))
@@ -238,26 +280,34 @@ function constructPageIndex($base_url, &$start, $max_value, $num_per_page, $flex
 
 		// Show the pages before the current one. (prev page 1 ... >6 7< [8] 9 10 ... 15 next page)
 		for ($nCont = $PageContiguous; $nCont >= 1; $nCont--)
+		{
 			if ($start >= $num_per_page * $nCont)
 			{
 				$tmpStart = $start - $num_per_page * $nCont;
 				$pageindex .= sprintf($base_link, $tmpStart, $tmpStart / $num_per_page + 1);
 			}
+		}
 
 		// Show the current page. (prev page 1 ... 6 7 >[8]< 9 10 ... 15 next page)
 		if (!$start_invalid && empty($show['all_selected']))
+		{
 			$pageindex .= sprintf($settings['page_index_template']['current_page'], ($start / $num_per_page + 1));
+		}
 		else
+		{
 			$pageindex .= sprintf($base_link, $start, $start / $num_per_page + 1);
+		}
 
 		// Show the pages after the current one... (prev page 1 ... 6 7 [8] >9 10< ... 15 next page)
 		$tmpMaxPages = (int) (($max_value - 1) / $num_per_page) * $num_per_page;
 		for ($nCont = 1; $nCont <= $PageContiguous; $nCont++)
+		{
 			if ($start + $num_per_page * $nCont <= $tmpMaxPages)
 			{
 				$tmpStart = $start + $num_per_page * $nCont;
 				$pageindex .= sprintf($base_link, $tmpStart, $tmpStart / $num_per_page + 1);
 			}
+		}
 
 		// Show the '...' part near the end. (prev page 1 ... 6 7 [8] 9 10 >...< 15 next page)
 		if ($start + $num_per_page * ($PageContiguous + 1) < $tmpMaxPages)
@@ -280,20 +330,28 @@ function constructPageIndex($base_url, &$start, $max_value, $num_per_page, $flex
 
 		// Show the last number in the list. (prev page 1 ... 6 7 [8] 9 10 ... >15<  next page)
 		if ($start + $num_per_page * $PageContiguous < $tmpMaxPages)
+		{
 			$pageindex .= sprintf($base_link, $tmpMaxPages, $tmpMaxPages / $num_per_page + 1);
+		}
 
 		// Show the "next page" link. (prev page 1 ... 6 7 [8] 9 10 ... 15 >next page<)
-		if ($start != $tmpMaxPages && $show['prev_next'] && empty($show['all_selected']))
+		if ($start !== $tmpMaxPages && $show['prev_next'] && empty($show['all_selected']))
+		{
 			$pageindex .= sprintf($base_link, $start + $num_per_page, str_replace('{next_txt}', $txt['next'], $settings['page_index_template']['next_page']));
+		}
 	}
 
 	// The "all" button
 	if ($show['all'])
 	{
 		if (!empty($show['all_selected']))
+		{
 			$pageindex .= sprintf($settings['page_index_template']['current_page'], $txt['all']);
+		}
 		else
+		{
 			$pageindex .= sprintf(str_replace('%1$d', '%1$s', $base_link), '0;all', str_replace('{all_txt}', $txt['all'], $settings['page_index_template']['all']));
+		}
 	}
 
 	return $pageindex;
@@ -323,7 +381,9 @@ function comma_format($number, $override_decimal_count = false)
 	{
 		// Not set for whatever reason?
 		if (empty($txt['number_format']) || preg_match('~^1([^\d]*)?234([^\d]*)(0*?)$~', $txt['number_format'], $matches) != 1)
+		{
 			return $number;
+		}
 
 		// Cache these each load...
 		$thousands_separator = $matches[1];
@@ -414,16 +474,24 @@ function standardTime($log_time, $show_today = true, $offset_type = false)
 
 	// Offset the time.
 	if (!$offset_type)
+	{
 		$time = $log_time + (User::$info->time_offset + $modSettings['time_offset']) * 3600;
+	}
 	// Just the forum offset?
 	elseif ($offset_type === 'forum')
+	{
 		$time = $log_time + $modSettings['time_offset'] * 3600;
+	}
 	else
+	{
 		$time = $log_time;
+	}
 
 	// We can't have a negative date (on Windows, at least.)
 	if ($log_time < 0)
+	{
 		$log_time = 0;
+	}
 
 	// Today and Yesterday?
 	if ($modSettings['todayMod'] >= 1 && $show_today === true)
@@ -442,15 +510,21 @@ function standardTime($log_time, $show_today = true, $offset_type = false)
 			$today_fmt = $h . ':%M' . $s . ' %p';
 		}
 		else
+		{
 			$today_fmt = '%H:%M' . $s;
+		}
 
 		// Same day of the year, same year.... Today!
 		if ($then['yday'] == $now['yday'] && $then['year'] == $now['year'])
+		{
 			return sprintf($txt['today'], standardTime($log_time, $today_fmt, $offset_type));
+		}
 
 		// Day-of-year is one less and same year, or it's the first of the year and that's the last of the year...
 		if ($modSettings['todayMod'] == '2' && (($then['yday'] == $now['yday'] - 1 && $then['year'] == $now['year']) || ($now['yday'] == 0 && $then['year'] == $now['year'] - 1) && $then['mon'] == 12 && $then['mday'] == 31))
+		{
 			return sprintf($txt['yesterday'], standardTime($log_time, $today_fmt, $offset_type));
+		}
 	}
 
 	$str = !is_bool($show_today) ? $show_today : User::$info->time_format;
@@ -465,28 +539,44 @@ function standardTime($log_time, $show_today = true, $offset_type = false)
 	if (setlocale(LC_TIME, $txt['lang_locale']))
 	{
 		if (!isset($non_twelve_hour))
+		{
 			$non_twelve_hour = trim(strftime('%p')) === '';
+		}
 		if ($non_twelve_hour && strpos($str, '%p') !== false)
+		{
 			$str = str_replace('%p', (strftime('%H', $time) < 12 ? $txt['time_am'] : $txt['time_pm']), $str);
+		}
 
 		foreach (array('%a', '%A', '%b', '%B') as $token)
+		{
 			if (strpos($str, $token) !== false)
+			{
 				$str = str_replace($token, !empty($txt['lang_capitalize_dates']) ? ElkArte\Util::ucwords(strftime($token, $time)) : strftime($token, $time), $str);
+			}
+		}
 	}
 	else
 	{
 		// Do-it-yourself time localization.  Fun.
 		foreach (array('%a' => 'days_short', '%A' => 'days', '%b' => 'months_short', '%B' => 'months') as $token => $text_label)
+		{
 			if (strpos($str, $token) !== false)
+			{
 				$str = str_replace($token, $txt[$text_label][(int) strftime($token === '%a' || $token === '%A' ? '%w' : '%m', $time)], $str);
+			}
+		}
 
 		if (strpos($str, '%p') !== false)
+		{
 			$str = str_replace('%p', (strftime('%H', $time) < 12 ? $txt['time_am'] : $txt['time_pm']), $str);
+		}
 	}
 
 	// Windows doesn't support %e; on some versions, strftime fails altogether if used, so let's prevent that.
 	if ($is_win && strpos($str, '%e') !== false)
+	{
 		$str = str_replace('%e', ltrim(strftime('%d', $time), '0'), $str);
+	}
 
 	// Format any other characters..
 	return strftime($str, $time);
@@ -504,7 +594,9 @@ function htmlTime($timestamp)
 	global $txt, $context;
 
 	if (empty($timestamp))
+	{
 		return '';
+	}
 
 	$timestamp = forum_time(true, $timestamp);
 	$time = date('Y-m-d H:i', $timestamp);
@@ -531,9 +623,13 @@ function forum_time($use_user_offset = true, $timestamp = null)
 	global $modSettings;
 
 	if ($timestamp === null)
+	{
 		$timestamp = time();
-	elseif ($timestamp == 0)
+	}
+	elseif ($timestamp === 0)
+	{
 		return 0;
+	}
 
 	return $timestamp + ($modSettings['time_offset'] + ($use_user_offset ? User::$info->time_offset : 0)) * 3600;
 }
@@ -552,9 +648,8 @@ function forum_time($use_user_offset = true, $timestamp = null)
 function un_htmlspecialchars($string)
 {
 	$string = htmlspecialchars_decode($string, ENT_QUOTES);
-	$string = str_replace('&nbsp;', ' ', $string);
 
-	return $string;
+	return str_replace('&nbsp;', ' ', $string);
 }
 
 /**
@@ -632,36 +727,48 @@ function redirectexit($setLocation = '', $refresh = false)
 
 	// In case we have mail to send, better do that - as obExit doesn't always quite make it...
 	if (!empty($context['flush_mail']))
+	{
 		// @todo this relies on 'flush_mail' being only set in AddMailQueue itself... :\
 		AddMailQueue(true);
+	}
 
-	\ElkArte\Notifications::instance()->send();
+	Notifications::instance()->send();
 
-	$add = preg_match('~^(ftp|http)[s]?://~', $setLocation) == 0 && substr($setLocation, 0, 6) != 'about:';
+	$add = preg_match('~^(ftp|http)[s]?://~', $setLocation) == 0 && substr($setLocation, 0, 6) !== 'about:';
 
 	if ($add)
-		$setLocation = $scripturl . ($setLocation != '' ? '?' . $setLocation : '');
+	{
+		$setLocation = $scripturl . ($setLocation !== '' ? '?' . $setLocation : '');
+	}
 
 	// Put the session ID in.
 	if (empty($_COOKIE) && defined('SID') && SID != '')
+	{
 		$setLocation = preg_replace('/^' . preg_quote($scripturl, '/') . '(?!\?' . preg_quote(SID, '/') . ')\\??/', $scripturl . '?' . SID . ';', $setLocation);
+	}
 	// Keep that debug in their for template debugging!
 	elseif (isset($_GET['debug']))
+	{
 		$setLocation = preg_replace('/^' . preg_quote($scripturl, '/') . '\\??/', $scripturl . '?debug;', $setLocation);
+	}
 
 	// Maybe integrations want to change where we are heading?
 	call_integration_hook('integrate_redirect', array(&$setLocation, &$refresh));
 
 	// We send a Refresh header only in special cases because Location looks better. (and is quicker...)
 	if ($refresh)
+	{
 		header('Refresh: 0; URL=' . strtr($setLocation, array(' ' => '%20')));
+	}
 	else
+	{
 		header('Location: ' . str_replace(' ', '%20', $setLocation));
+	}
 
 	// Debugging.
 	if ($db_show_debug === true)
 	{
-		$_SESSION['debug_redirect'] = \ElkArte\Debug::instance()->get_db();
+		$_SESSION['debug_redirect'] = Debug::instance()->get_db();
 	}
 
 	obExit(false);
@@ -681,7 +788,7 @@ function redirectexit($setLocation = '', $refresh = false)
  * @param bool|null $do_footer = null Output the footer
  * @param bool $from_index = false If we're coming from index.php
  * @param bool $from_fatal_error = false If we are exiting due to a fatal error
- *
+ * @throws \ElkArte\Exceptions\Exception
  */
 function obExit($header = null, $do_footer = null, $from_index = false, $from_fatal_error = false)
 {
@@ -692,31 +799,41 @@ function obExit($header = null, $do_footer = null, $from_index = false, $from_fa
 	// Attempt to prevent a recursive loop.
 	++$level;
 	if ($level > 1 && !$from_fatal_error && !$has_fatal_error)
+	{
 		exit;
+	}
 
 	if ($from_fatal_error)
+	{
 		$has_fatal_error = true;
+	}
 
 	// Clear out the stat cache.
 	trackStats();
 
-	\ElkArte\Notifications::instance()->send();
+	Notifications::instance()->send();
 
 	// If we have mail to send, send it.
 	if (!empty($context['flush_mail']))
 		// @todo this relies on 'flush_mail' being only set in AddMailQueue itself... :\
+	{
 		AddMailQueue(true);
+	}
 
 	$do_header = $header === null ? !$header_done : $header;
 	if ($do_footer === null)
+	{
 		$do_footer = $do_header;
+	}
 
 	// Has the template/header been done yet?
 	if ($do_header)
 	{
 		// Was the page title set last minute? Also update the HTML safe one.
 		if (!empty($context['page_title']) && empty($context['page_title_html_safe']))
+		{
 			$context['page_title_html_safe'] = ElkArte\Util::htmlspecialchars(un_htmlspecialchars($context['page_title'])) . (!empty($context['current_page']) ? ' - ' . $txt['page'] . ' ' . ($context['current_page'] + 1) : '');
+		}
 
 		// Start up the session URL fixer.
 		ob_start('ob_sessrewrite');
@@ -745,7 +862,7 @@ function obExit($header = null, $do_footer = null, $from_index = false, $from_fa
 			{
 				if (!isset($_REQUEST['xml']) && ((!isset($_GET['action']) || $_GET['action'] != 'viewquery') && !isset($_GET['api'])))
 				{
-					\ElkArte\Debug::instance()->display();
+					Debug::instance()->display();
 				}
 			}
 		}
@@ -764,9 +881,14 @@ function obExit($header = null, $do_footer = null, $from_index = false, $from_fa
 
 	// Don't exit if we're coming from index.php; that will pass through normally.
 	if (!$from_index)
+	{
 		exit;
+	}
 }
 
+/**
+ * @param string $index
+ */
 function setOldUrl($index = 'old_url')
 {
 	// Remember this URL in case someone doesn't like sending HTTP_REFERER.
@@ -786,7 +908,8 @@ function setOldUrl($index = 'old_url')
 			break;
 		}
 	}
-	if ($make_old === true)
+
+	if ($make_old)
 	{
 		$_SESSION[$index] = $_SERVER['REQUEST_URL'];
 	}
@@ -801,19 +924,29 @@ function determineTopicClass(&$topic_context)
 {
 	// Set topic class depending on locked status and number of replies.
 	if ($topic_context['is_very_hot'])
+	{
 		$topic_context['class'] = 'veryhot';
+	}
 	elseif ($topic_context['is_hot'])
+	{
 		$topic_context['class'] = 'hot';
+	}
 	else
+	{
 		$topic_context['class'] = 'normal';
+	}
 
 	$topic_context['class'] .= !empty($topic_context['is_poll']) ? '_poll' : '_post';
 
 	if ($topic_context['is_locked'])
+	{
 		$topic_context['class'] .= '_locked';
+	}
 
 	if ($topic_context['is_sticky'])
+	{
 		$topic_context['class'] .= '_sticky';
+	}
 }
 
 /**
@@ -838,7 +971,9 @@ function setupThemeContext($forceload = false)
 function memoryReturnBytes($val)
 {
 	if (is_integer($val))
+	{
 		return $val;
+	}
 
 	// Separate the number from the designator
 	$val = trim($val);
@@ -909,6 +1044,7 @@ function template_footer()
 function template_javascript($do_deferred = false)
 {
 	theme()->template_javascript($do_deferred);
+
 	return;
 }
 
@@ -921,6 +1057,7 @@ function template_javascript($do_deferred = false)
 function template_css()
 {
 	theme()->template_css();
+
 	return;
 }
 
@@ -931,6 +1068,7 @@ function template_css()
 function template_admin_warning_above()
 {
 	theme()->template_admin_warning_above();
+
 	return;
 }
 
@@ -946,45 +1084,63 @@ function template_admin_warning_above()
 function ip2range($fullip)
 {
 	// If its IPv6, validate it first.
-	if (isValidIPv6($fullip) !== false)
+	if (isValidIPv6($fullip))
 	{
 		$ip_parts = explode(':', expandIPv6($fullip, false));
 		$ip_array = array();
 
-		if (count($ip_parts) != 8)
+		if (count($ip_parts) !== 8)
+		{
 			return array();
+		}
 
 		for ($i = 0; $i < 8; $i++)
 		{
-			if ($ip_parts[$i] == '*')
+			if ($ip_parts[$i] === '*')
+			{
 				$ip_array[$i] = array('low' => '0', 'high' => hexdec('ffff'));
+			}
 			elseif (preg_match('/^([0-9A-Fa-f]{1,4})\-([0-9A-Fa-f]{1,4})$/', $ip_parts[$i], $range) == 1)
+			{
 				$ip_array[$i] = array('low' => hexdec($range[1]), 'high' => hexdec($range[2]));
+			}
 			elseif (is_numeric(hexdec($ip_parts[$i])))
+			{
 				$ip_array[$i] = array('low' => hexdec($ip_parts[$i]), 'high' => hexdec($ip_parts[$i]));
+			}
 		}
 
 		return $ip_array;
 	}
 
 	// Pretend that 'unknown' is 255.255.255.255. (since that can't be an IP anyway.)
-	if ($fullip == 'unknown')
+	if ($fullip === 'unknown')
+	{
 		$fullip = '255.255.255.255';
+	}
 
 	$ip_parts = explode('.', $fullip);
 	$ip_array = array();
 
-	if (count($ip_parts) != 4)
+	if (count($ip_parts) !== 4)
+	{
 		return array();
+	}
 
 	for ($i = 0; $i < 4; $i++)
 	{
-		if ($ip_parts[$i] == '*')
+		if ($ip_parts[$i] === '*')
+		{
 			$ip_array[$i] = array('low' => '0', 'high' => '255');
+		}
 		elseif (preg_match('/^(\d{1,3})\-(\d{1,3})$/', $ip_parts[$i], $range) == 1)
+		{
 			$ip_array[$i] = array('low' => $range[1], 'high' => $range[2]);
+		}
 		elseif (is_numeric($ip_parts[$i]))
+		{
 			$ip_array[$i] = array('low' => $ip_parts[$i], 'high' => $ip_parts[$i]);
+		}
 	}
 
 	// Makes it simpler to work with.
@@ -1002,56 +1158,77 @@ function ip2range($fullip)
  * @param string $ip A full dot notation IP address
  *
  * @return string
+ * @throws \ElkArte\Exceptions\Exception
  */
 function host_from_ip($ip)
 {
 	global $modSettings;
 
-	$cache = \ElkArte\Cache\Cache::instance();
+	$cache = Cache::instance();
 
 	$host = '';
 	if ($cache->getVar($host, 'hostlookup-' . $ip, 600) || empty($ip))
+	{
 		return $host;
+	}
 
 	$t = microtime(true);
 
 	// Try the Linux host command, perhaps?
-	if ((strpos(strtolower(PHP_OS), 'win') === false || strpos(strtolower(PHP_OS), 'darwin') !== false) && mt_rand(0, 1) == 1)
+	if ((stripos(PHP_OS, 'win') === false || stripos(PHP_OS, 'darwin') !== false) && mt_rand(0, 1) === 1)
 	{
 		if (!isset($modSettings['host_to_dis']))
+		{
 			$test = @shell_exec('host -W 1 ' . @escapeshellarg($ip));
+		}
 		else
+		{
 			$test = @shell_exec('host ' . @escapeshellarg($ip));
+		}
 
 		// Did host say it didn't find anything?
 		if (strpos($test, 'not found') !== false)
+		{
 			$host = '';
+		}
 		// Invalid server option?
 		elseif ((strpos($test, 'invalid option') || strpos($test, 'Invalid query name 1')) && !isset($modSettings['host_to_dis']))
+		{
 			updateSettings(array('host_to_dis' => 1));
+		}
 		// Maybe it found something, after all?
 		elseif (preg_match('~\s([^\s]+?)\.\s~', $test, $match) == 1)
+		{
 			$host = $match[1];
+		}
 	}
 
 	// This is nslookup; usually only Windows, but possibly some Unix?
-	if (empty($host) && stripos(PHP_OS, 'win') !== false && strpos(strtolower(PHP_OS), 'darwin') === false && mt_rand(0, 1) == 1)
+	if (empty($host) && stripos(PHP_OS, 'win') !== false && stripos(PHP_OS, 'darwin') === false && mt_rand(0, 1) === 1)
 	{
 		$test = @shell_exec('nslookup -timeout=1 ' . @escapeshellarg($ip));
 
 		if (strpos($test, 'Non-existent domain') !== false)
+		{
 			$host = '';
+		}
 		elseif (preg_match('~Name:\s+([^\s]+)~', $test, $match) == 1)
+		{
 			$host = $match[1];
+		}
 	}
 
 	// This is the last try :/.
 	if (!isset($host) || $host === false)
+	{
 		$host = @gethostbyaddr($ip);
+	}
 
 	// It took a long time, so let's cache it!
 	if (microtime(true) - $t > 0.5)
+	{
 		$cache->put('hostlookup-' . $ip, $host, 600);
+	}
 
 	return $host;
 }
@@ -1093,12 +1270,15 @@ function text2words($text, $max_chars = 20, $encrypt = false)
 
 				// Create an integer representation
 				for ($i = 0; $i < $max_chars; $i++)
+				{
 					$total += $possible_chars[ord($encrypted{$i})] * pow(63, $i);
+				}
 
 				// Return the value
 				$returned_ints[] = $max_chars == 4 ? min($total, 16777215) : $total;
 			}
 		}
+
 		return array_unique($returned_ints);
 	}
 	else
@@ -1106,8 +1286,12 @@ function text2words($text, $max_chars = 20, $encrypt = false)
 		// Trim characters before and after and add slashes for database insertion.
 		$returned_words = array();
 		foreach ($words as $word)
+		{
 			if (($word = trim($word, '-_\'')) !== '')
+			{
 				$returned_words[] = $max_chars === null ? $word : substr($word, 0, $max_chars);
+			}
+		}
 
 		// Filter out all words that occur more than once.
 		return array_unique($returned_words);
@@ -1144,7 +1328,7 @@ function setupMenuContext()
  */
 function call_integration_hook($hook, $parameters = array())
 {
-	return \ElkArte\Hooks::instance()->hook($hook, $parameters);
+	return Hooks::instance()->hook($hook, $parameters);
 }
 
 /**
@@ -1154,7 +1338,7 @@ function call_integration_hook($hook, $parameters = array())
  */
 function call_integration_include_hook($hook)
 {
-	\ElkArte\Hooks::instance()->include_hook($hook);
+	Hooks::instance()->include_hook($hook);
 }
 
 /**
@@ -1162,7 +1346,7 @@ function call_integration_include_hook($hook)
  */
 function call_integration_buffer()
 {
-	\ElkArte\Hooks::instance()->buffer_hook();
+	Hooks::instance()->buffer_hook();
 }
 
 /**
@@ -1177,7 +1361,7 @@ function call_integration_buffer()
  */
 function add_integration_function($hook, $function, $file = '', $permanent = true)
 {
-	\ElkArte\Hooks::instance()->add($hook, $function, $file, $permanent);
+	Hooks::instance()->add($hook, $function, $file, $permanent);
 }
 
 /**
@@ -1194,7 +1378,7 @@ function add_integration_function($hook, $function, $file = '', $permanent = tru
  */
 function remove_integration_function($hook, $function, $file = '')
 {
-	\ElkArte\Hooks::instance()->remove($hook, $function, $file);
+	Hooks::instance()->remove($hook, $function, $file);
 }
 
 /**
@@ -1213,34 +1397,51 @@ function remove_integration_function($hook, $function, $file = '')
 function replaceEntities__callback($matches)
 {
 	if (!isset($matches[2]))
+	{
 		return '';
+	}
 
 	$num = $matches[2][0] === 'x' ? hexdec(substr($matches[2], 1)) : (int) $matches[2];
 
 	// remove left to right / right to left overrides
 	if ($num === 0x202D || $num === 0x202E)
+	{
 		return '';
+	}
 
 	// Quote, Ampersand, Apostrophe, Less/Greater Than get html replaced
 	if (in_array($num, array(0x22, 0x26, 0x27, 0x3C, 0x3E)))
+	{
 		return '&#' . $num . ';';
+	}
 
 	// <0x20 are control characters, 0x20 is a space, > 0x10FFFF is past the end of the utf8 character set
 	// 0xD800 >= $num <= 0xDFFF are surrogate markers (not valid for utf8 text)
 	if ($num < 0x20 || $num > 0x10FFFF || ($num >= 0xD800 && $num <= 0xDFFF))
+	{
 		return '';
+	}
+
 	// <0x80 (or less than 128) are standard ascii characters a-z A-Z 0-9 and punctuation
-	elseif ($num < 0x80)
+	if ($num < 0x80)
+	{
 		return chr($num);
+	}
+
 	// <0x800 (2048)
-	elseif ($num < 0x800)
+	if ($num < 0x800)
+	{
 		return chr(($num >> 6) + 192) . chr(($num & 63) + 128);
+	}
+
 	// < 0x10000 (65536)
-	elseif ($num < 0x10000)
+	if ($num < 0x10000)
+	{
 		return chr(($num >> 12) + 224) . chr((($num >> 6) & 63) + 128) . chr(($num & 63) + 128);
+	}
+
 	// <= 0x10FFFF (1114111)
-	else
-		return chr(($num >> 18) + 240) . chr((($num >> 12) & 63) + 128) . chr((($num >> 6) & 63) + 128) . chr(($num & 63) + 128);
+	return chr(($num >> 18) + 240) . chr((($num >> 12) & 63) + 128) . chr((($num >> 6) & 63) + 128) . chr(($num & 63) + 128);
 }
 
 /**
@@ -1259,26 +1460,39 @@ function replaceEntities__callback($matches)
 function fixchar__callback($matches)
 {
 	if (!isset($matches[1]))
+	{
 		return '';
+	}
 
 	$num = $matches[1][0] === 'x' ? hexdec(substr($matches[1], 1)) : (int) $matches[1];
 
 	// <0x20 are control characters, > 0x10FFFF is past the end of the utf8 character set
 	// 0xD800 >= $num <= 0xDFFF are surrogate markers (not valid for utf8 text), 0x202D-E are left to right overrides
 	if ($num < 0x20 || $num > 0x10FFFF || ($num >= 0xD800 && $num <= 0xDFFF) || $num === 0x202D || $num === 0x202E)
+	{
 		return '';
+	}
+
 	// <0x80 (or less than 128) are standard ascii characters a-z A-Z 0-9 and punctuation
-	elseif ($num < 0x80)
+	if ($num < 0x80)
+	{
 		return chr($num);
+	}
+
 	// <0x800 (2048)
-	elseif ($num < 0x800)
+	if ($num < 0x800)
+	{
 		return chr(($num >> 6) + 192) . chr(($num & 63) + 128);
+	}
+
 	// < 0x10000 (65536)
-	elseif ($num < 0x10000)
+	if ($num < 0x10000)
+	{
 		return chr(($num >> 12) + 224) . chr((($num >> 6) & 63) + 128) . chr(($num & 63) + 128);
+	}
+
 	// <= 0x10FFFF (1114111)
-	else
-		return chr(($num >> 18) + 240) . chr((($num >> 12) & 63) + 128) . chr((($num >> 6) & 63) + 128) . chr(($num & 63) + 128);
+	return chr(($num >> 18) + 240) . chr((($num >> 12) & 63) + 128) . chr((($num >> 6) & 63) + 128) . chr(($num & 63) + 128);
 }
 
 /**
@@ -1296,15 +1510,19 @@ function fixchar__callback($matches)
 function entity_fix__callback($matches)
 {
 	if (!isset($matches[2]))
+	{
 		return '';
+	}
 
 	$num = $matches[2][0] === 'x' ? hexdec(substr($matches[2], 1)) : (int) $matches[2];
 
 	// We don't allow control characters, characters out of range, byte markers, etc
 	if ($num < 0x20 || $num > 0x10FFFF || ($num >= 0xD800 && $num <= 0xDFFF) || $num == 0x202D || $num == 0x202E)
+	{
 		return '';
-	else
-		return '&#' . $num . ';';
+	}
+
+	return '&#' . $num . ';';
 }
 
 /**
@@ -1321,7 +1539,9 @@ function prepareSearchEngines()
 	{
 		$search_engines = ElkArte\Util::unserialize($modSettings['additional_search_engines']);
 		foreach ($search_engines as $engine)
+		{
 			$engines[strtolower(preg_replace('~[^A-Za-z0-9 ]~', '', $engine['name']))] = $engine;
+		}
 	}
 
 	return $engines;
@@ -1339,6 +1559,7 @@ function prepareSearchEngines()
  * @param bool $reset
  *
  * @return integer|boolean
+ * @throws \Exception
  */
 function currentContext($messages_request, $reset = false)
 {
@@ -1347,7 +1568,9 @@ function currentContext($messages_request, $reset = false)
 
 	// Start from the beginning...
 	if ($reset)
+	{
 		return $db->data_seek($messages_request, 0);
+	}
 
 	// If the query has already returned false, get out of here
 	if ($messages_request->hasResults())
@@ -1386,24 +1609,28 @@ function currentContext($messages_request, $reset = false)
  */
 function elk_array_insert($input, $key, $insert, $where = 'before', $assoc = true, $strict = false)
 {
-	// Search for key names or values
-	if ($assoc)
-		$position = array_search($key, array_keys($input), $strict);
-	else
-		$position = array_search($key, $input, $strict);
+	$position = $assoc ? array_search($key, array_keys($input), $strict) : array_search($key, $input, $strict);
 
 	// If the key is not found, just insert it at the end
 	if ($position === false)
+	{
 		return array_merge($input, $insert);
+	}
 
 	if ($where === 'after')
+	{
 		$position++;
+	}
 
 	// Insert as first
-	if ($position === 0)
+	if (empty($position))
+	{
 		$input = array_merge($insert, $input);
+	}
 	else
+	{
 		$input = array_merge(array_slice($input, 0, $position), $insert, array_slice($input, $position));
+	}
 
 	return $input;
 }
@@ -1417,15 +1644,20 @@ function elk_array_insert($input, $key, $insert, $where = 'before', $assoc = tru
  * - This function sets the scheduled task to be called before any other one
  *
  * @param string $task the name of a scheduled task
+ * @throws \ElkArte\Exceptions\Exception
  */
 function scheduleTaskImmediate($task)
 {
 	global $modSettings;
 
 	if (!isset($modSettings['scheduleTaskImmediate']))
+	{
 		$scheduleTaskImmediate = array();
+	}
 	else
-		$scheduleTaskImmediate = \ElkArte\Util::unserialize($modSettings['scheduleTaskImmediate']);
+	{
+		$scheduleTaskImmediate = Util::unserialize($modSettings['scheduleTaskImmediate']);
+	}
 
 	// If it has not been scheduled, the do so now
 	if (!isset($scheduleTaskImmediate[$task]))
@@ -1449,6 +1681,7 @@ function scheduleTaskImmediate($task)
  *
  * @param string $task the name of a scheduled task
  * @param bool $calculateNextTrigger if recalculate the next task to execute
+ * @throws \ElkArte\Exceptions\Exception
  */
 function removeScheduleTaskImmediate($task, $calculateNextTrigger = true)
 {
@@ -1456,9 +1689,13 @@ function removeScheduleTaskImmediate($task, $calculateNextTrigger = true)
 
 	// Not on, bail
 	if (!isset($modSettings['scheduleTaskImmediate']))
+	{
 		return;
+	}
 	else
-		$scheduleTaskImmediate = \ElkArte\Util::unserialize($modSettings['scheduleTaskImmediate']);
+	{
+		$scheduleTaskImmediate = Util::unserialize($modSettings['scheduleTaskImmediate']);
+	}
 
 	// Clear / remove the task if it was set
 	if (isset($scheduleTaskImmediate[$task]))
@@ -1531,7 +1768,7 @@ function createList($listOptions)
 {
 	call_integration_hook('integrate_list_' . $listOptions['id'], array(&$listOptions));
 
-	$list = new \ElkArte\GenericList($listOptions);
+	$list = new GenericList($listOptions);
 
 	$list->buildList();
 }
@@ -1562,9 +1799,11 @@ function db_last_error()
 	$time = trim(file_get_contents(BOARDDIR . '/db_last_error.txt'));
 
 	if (preg_match('~^\d{10}$~', $time) === 1)
+	{
 		return $time;
-	else
-		return 0;
+	}
+
+	return 0;
 }
 
 /**
@@ -1578,13 +1817,15 @@ function response_prefix()
 	global $language, $txt;
 	static $response_prefix = null;
 
-	$cache = \ElkArte\Cache\Cache::instance();
+	$cache = Cache::instance();
 
 	// Get a response prefix, but in the forum's default language.
 	if ($response_prefix === null && (!$cache->getVar($response_prefix, 'response_prefix') || !$response_prefix))
 	{
 		if ($language === User::$info->language)
+		{
 			$response_prefix = $txt['response_prefix'];
+		}
 		else
 		{
 			theme()->getTemplates()->loadLanguageFile('index', $language, false);
@@ -1612,9 +1853,11 @@ function isValidEmail($value)
 {
 	$value = trim($value);
 	if (filter_var($value, FILTER_VALIDATE_EMAIL) && ElkArte\Util::strlen($value) < 255)
+	{
 		return $value;
-	else
-		return false;
+	}
+
+	return false;
 }
 
 /**
@@ -1635,7 +1878,9 @@ function addProtocol($url, $protocols = array())
 	}
 	else
 	{
-		$pattern = '~^(' . implode('|', array_map(function ($val) {return preg_quote($val, '~'); }, $protocols)) . ')~i';
+		$pattern = '~^(' . implode('|', array_map(function ($val) {
+				return preg_quote($val, '~');
+			}, $protocols)) . ')~i';
 	}
 
 	$found = false;
@@ -1645,9 +1890,9 @@ function addProtocol($url, $protocols = array())
 		return strtolower($match[0]);
 	}, $url);
 
-	if ($found === true)
+	if ($found)
 	{
-			return $url;
+		return $url;
 	}
 
 	return $protocols[0] . $url;
@@ -1669,10 +1914,8 @@ function removeNestedQuotes($text)
 	{
 		return preg_replace(array('~\n?\[quote.*?\].+?\[/quote\]\n?~is', '~^\n~', '~\[/quote\]~'), '', $text);
 	}
-	else
-	{
-		return $text;
-	}
+
+	return $text;
 }
 
 /**
@@ -1718,7 +1961,7 @@ function isBrowser($browser)
 		detectBrowser();
 	}
 
-	return !empty($context['browser'][$browser]) || !empty($context['browser']['is_' . $browser]) ? true : false;
+	return !empty($context['browser'][$browser]) || !empty($context['browser']['is_' . $browser]);
 }
 
 /**
@@ -1744,7 +1987,7 @@ function censor($text, $force = false)
 
 	if ($censor === null)
 	{
-		$censor = new \ElkArte\Censor(explode("\n", $modSettings['censor_vulgar']), explode("\n", $modSettings['censor_proper']), $modSettings);
+		$censor = new Censor(explode("\n", $modSettings['censor_vulgar']), explode("\n", $modSettings['censor_proper']), $modSettings);
 	}
 
 	return $censor->censor($text, $force);
@@ -1765,7 +2008,9 @@ function can_see_button_strip($button_strip)
 	foreach ($button_strip as $key => $value)
 	{
 		if (!isset($value['test']) || !empty($context[$value['test']]))
+		{
 			return true;
+		}
 	}
 
 	return false;
@@ -1792,7 +2037,7 @@ function dieGif($expired = false)
 		die();
 	}
 
-	if ($expired === true)
+	if ($expired)
 	{
 		header('Expires: Mon, 26 Jul 1997 05:00:00 GMT');
 		header('Last-Modified: ' . gmdate('D, d M Y H:i:s') . ' GMT');
@@ -1815,7 +2060,7 @@ function obStart($use_compression = false)
 		@ob_end_clean();
 	}
 
-	if ($use_compression === true)
+	if ($use_compression)
 	{
 		ob_start('ob_gzhandler');
 	}
@@ -1864,6 +2109,7 @@ function getUrlQuery($type, $params)
 	{
 		$generator = initUrlGenerator();
 	}
+
 	return $generator->getQuery($type, $params);
 }
 
@@ -1876,7 +2122,7 @@ function initUrlGenerator()
 {
 	global $scripturl, $context, $url_format;
 
-	$generator = new \ElkArte\UrlGenerator\UrlGenerator([
+	$generator = new UrlGenerator([
 		'generator' => ucfirst($url_format ?? 'standard'),
 		'scripturl' => $scripturl,
 		'replacements' => [

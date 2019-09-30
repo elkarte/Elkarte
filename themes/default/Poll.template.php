@@ -6,7 +6,7 @@
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause (see accompanying LICENSE.txt file)
  *
  * This file contains code covered by:
- * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * copyright: 2011 Simple Machines (http://www.simplemachines.org)
  *
  * @version 2.0 dev
  *
@@ -30,18 +30,22 @@ function template_poll_edit()
 	</script>';
 
 	if (!empty($context['form_url']))
+	{
 		echo '
 	<div id="edit_poll">
 		<form id="postmodify" name="postmodify" action="', $context['form_url'], '" method="post" accept-charset="UTF-8" onsubmit="submitonce(this); smc_saveEntities(\'postmodify\', [\'question\'], \'options-\');">
 			<h2 class="category_header">', $context['page_title'], '</h2>
 			<div>
 				<div class="well">';
+	}
 
 	template_show_error('poll_error');
 
 	if (!empty($context['poll']['id']))
+	{
 		echo '
 					<input type="hidden" name="poll" value="', $context['poll']['id'], '" />';
+	}
 	echo '
 						<fieldset id="poll_main">
 							<legend>', $txt['poll_question_options'], '</legend>
@@ -59,7 +63,9 @@ function template_poll_edit()
 
 		// Does this option have a vote count yet, or is it new?
 		if (isset($choice['votes']) && $choice['votes'] != -1)
+		{
 			echo ' (', $choice['votes'], ' ', $txt['votes'], ')';
+		}
 
 		echo '
 								</li>';
@@ -98,6 +104,7 @@ function template_poll_edit()
 								</dd>';
 
 		if ($context['poll']['guest_vote_allowed'])
+		{
 			echo '
 								<dt>
 									<label for="poll_guest_vote">', $txt['poll_guest_vote'], ':</label>
@@ -105,6 +112,7 @@ function template_poll_edit()
 								<dd>
 									<input type="checkbox" id="poll_guest_vote" name="poll_guest_vote"', !empty($context['poll']['guest_vote']) ? ' checked="checked"' : '', ' />
 								</dd>';
+		}
 	}
 
 	echo '
@@ -128,13 +136,16 @@ function template_poll_edit()
 	// If this is an edit, we can allow them to reset the vote counts.
 	// @todo a warning maybe while saving?
 	if (!empty($context['is_edit']))
+	{
 		echo '
 					<fieldset id="poll_reset">
 						<legend>', $txt['reset_votes'], '</legend>
 						<input type="checkbox" id="resetVoteCount" name="resetVoteCount" value="on" /> <label for="resetVoteCount">' . $txt['reset_votes_check'] . '</label>
 					</fieldset>';
+	}
 
 	if (!empty($context['form_url']))
+	{
 		echo '
 					<div class="submitbutton">
 						<input type="submit" name="post" value="', $txt['save'], '" onclick="return submitThisOnce(this);" accesskey="s" />
@@ -145,4 +156,5 @@ function template_poll_edit()
 			</div>
 		</form>
 	</div>';
+	}
 }

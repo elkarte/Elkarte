@@ -30,7 +30,9 @@ class RemoveOldFollowups implements ScheduledTaskInterface
 		global $modSettings;
 
 		if (empty($modSettings['enableFollowup']))
+		{
 			return false;
+		}
 
 		$db = database();
 
@@ -48,11 +50,15 @@ class RemoveOldFollowups implements ScheduledTaskInterface
 		);
 		$remove = array();
 		while ($row = $db->fetch_assoc($request))
+		{
 			$remove[] = $row['derived_from'];
+		}
 		$db->free_result($request);
 
 		if (empty($remove))
+		{
 			return true;
+		}
 
 		require_once(SUBSDIR . '/FollowUps.subs.php');
 		removeFollowUpsByMessage($remove);

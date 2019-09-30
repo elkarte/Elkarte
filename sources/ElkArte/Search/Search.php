@@ -8,7 +8,7 @@
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause (see accompanying LICENSE.txt file)
  *
  * This file contains code covered by:
- * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * copyright: 2011 Simple Machines (http://www.simplemachines.org)
  *
  * @version 2.0 dev
  *
@@ -26,91 +26,88 @@ class Search
 	 * rewriting FORUM_VERSION.
 	 */
 	const FORUM_VERSION = 'ElkArte 2.0 dev';
-
+	/**
+	 *
+	 * @var mixed[]
+	 */
+	protected $_participants = [];
+	/**
+	 *
+	 * @var null|\ElkArte\Search\SearchParams
+	 */
+	protected $_searchParams = null;
 	/**
 	 * This is the minimum version of ElkArte that an API could have been written
 	 * for to work.
 	 * (strtr to stop accidentally updating version on release)
 	 */
 	private $_search_version = '';
-
 	/**
 	 * Holds the words and phrases to be searched on
+	 *
 	 * @var \ElkArte\Search\SearchArray
 	 */
 	private $_searchArray = null;
-
 	/**
 	 * Holds instance of the search api in use such as ElkArte\Search\API\Standard_Search
+	 *
 	 * @var null|object
 	 */
 	private $_searchAPI = null;
-
 	/**
 	 * Database instance
+	 *
 	 * @var \ElkArte\Database\QueryInterface|null
 	 */
 	private $_db = null;
-
 	/**
 	 * Search db instance
+	 *
 	 * @var \ElkArte\Database\SearchInterface|null
 	 */
 	private $_db_search = null;
-
 	/**
 	 * Searching for posts from a specific user(s)
+	 *
 	 * @var array
 	 */
 	private $_memberlist = array();
-
 	/**
 	 * Builds the array of words for use in the db query
+	 *
 	 * @var array
 	 */
 	private $_searchWords = array();
-
 	/**
 	 * Words excluded from indexes
+	 *
 	 * @var array
 	 */
 	private $_excludedIndexWords = array();
-
 	/**
 	 * Words not be be found in the subject (-word)
+	 *
 	 * @var array
 	 */
 	private $_excludedSubjectWords = array();
-
 	/**
 	 * Phrases not to be found in the search results (-"some phrase")
+	 *
 	 * @var array
 	 */
 	private $_excludedPhrases = array();
-
 	/**
 	 * The weights to associate to various areas for relevancy
+	 *
 	 * @var \ElkArte\Search\WeightFactors
 	 */
 	private $_weightFactors = array();
-
 	/**
 	 * If we are creating a tmp db table
+	 *
 	 * @var bool
 	 */
 	private $_createTemporary = true;
-
-	/**
-	 *
-	 * @var mixed[]
-	 */
-	protected $_participants = [];
-
-	/**
-	 *
-	 * @var null|\ElkArte\Search\SearchParams
-	 */
-	protected $_searchParams = null;
 
 	/**
 	 * Constructor
@@ -127,24 +124,24 @@ class Search
 		$this->_db_search->skip_next_error();
 		// Create new temporary table(s) (if we can) to store preliminary results in.
 		$this->_createTemporary = $this->_db_search->createTemporaryTable(
-			'{db_prefix}tmp_log_search_messages',
-			array(
+				'{db_prefix}tmp_log_search_messages',
 				array(
-					'name' => 'id_msg',
-					'type' => 'int',
-					'size' => 10,
-					'unsigned' => true,
-					'default' => 0,
-				)
-			),
-			array(
+					array(
+						'name' => 'id_msg',
+						'type' => 'int',
+						'size' => 10,
+						'unsigned' => true,
+						'default' => 0,
+					)
+				),
 				array(
-					'name' => 'id_msg',
-					'columns' => array('id_msg'),
-					'type' => 'primary'
+					array(
+						'name' => 'id_msg',
+						'columns' => array('id_msg'),
+						'type' => 'primary'
+					)
 				)
-			)
-		) !== false;
+			) !== false;
 
 		$this->_db_search->skip_next_error();
 		$this->_db_search->createTemporaryTable('{db_prefix}tmp_log_search_topics',
@@ -265,7 +262,7 @@ class Search
 	 */
 	public function getSearchParams($array = false)
 	{
-		if ($array === true)
+		if ($array)
 		{
 			return $this->_searchParams->get();
 		}
@@ -278,6 +275,139 @@ class Search
 	public function getExcludedPhrases()
 	{
 		return $this->_excludedPhrases;
+	}
+
+	/**
+	 * Tell me, do I want to see the full message or just a piece?
+	 */
+	public function isCompact()
+	{
+		return empty($this->_searchParams['show_complete']);
+	}
+
+	/**
+	 * Wrapper around SearchParams::compileURL
+	 *
+	 * @param array $search build param index with specific search term (did you mean?)
+	 *
+	 * @return string - the encoded string to be appended to the URL
+	 */
+	public function compileURLparams($search = array())
+	{
+		return $this->_searchParams->compileURL($search);
+	}
+
+	/**
+	 * Finds the posters of the messages
+	 *
+	 * @param int[] $msg_list - All the messages we want to find the posters
+	 * @param int $limit - There are only so much topics
+	 *
+	 * @return int[] - array of members id
+	 */
+	public function loadPosters($msg_list, $limit)
+	{
+		// Load the posters...
+		$request = $this->_db->query('', '
+			SELECT
+				id_member
+			FROM {db_prefix}messages
+			WHERE id_member != {int:no_member}
+				AND id_msg IN ({array_int:message_list})
+			LIMIT {int:limit}',
+			array(
+				'message_list' => $msg_list,
+				'limit' => $limit,
+				'no_member' => 0,
+			)
+		);
+		$posters = array();
+		while ($row = $this->_db->fetch_assoc($request))
+		{
+			$posters[] = $row['id_member'];
+		}
+		$this->_db->free_result($request);
+
+		return $posters;
+	}
+
+	/**
+	 * Finds the posters of the messages
+	 *
+	 * @param int[] $msg_list - All the messages we want to find the posters
+	 * @param int $limit - There are only so much topics
+	 *
+	 * @return resource|boolean
+	 */
+	public function loadMessagesRequest($msg_list, $limit)
+	{
+		global $modSettings;
+
+		return $this->_db->query('', '
+			SELECT
+				m.id_msg, m.subject, m.poster_name, m.poster_email, m.poster_time,
+				m.id_member, m.icon, m.poster_ip, m.body, m.smileys_enabled,
+				m.modified_time, m.modified_name, first_m.id_msg AS id_first_msg,
+				first_m.subject AS first_subject, first_m.icon AS first_icon,
+				first_m.poster_time AS first_poster_time,
+				first_mem.id_member AS first_id_member,
+				COALESCE(first_mem.real_name, first_m.poster_name) AS first_display_name,
+				COALESCE(first_mem.member_name, first_m.poster_name) AS first_member_name,
+				last_m.id_msg AS id_last_msg, last_m.poster_time AS last_poster_time,
+				last_mem.id_member AS last_id_member,
+				COALESCE(last_mem.real_name, last_m.poster_name) AS last_display_name,
+				COALESCE(last_mem.member_name, last_m.poster_name) AS last_member_name,
+				last_m.icon AS last_icon, last_m.subject AS last_subject,
+				t.id_topic, t.is_sticky, t.locked, t.id_poll, t.num_replies,
+				t.num_views, t.num_likes,
+				b.id_board, b.name AS bname, c.id_cat, c.name AS cat_name
+			FROM {db_prefix}messages AS m
+				INNER JOIN {db_prefix}topics AS t ON (t.id_topic = m.id_topic)
+				INNER JOIN {db_prefix}boards AS b ON (b.id_board = t.id_board)
+				INNER JOIN {db_prefix}categories AS c ON (c.id_cat = b.id_cat)
+				INNER JOIN {db_prefix}messages AS first_m ON (first_m.id_msg = t.id_first_msg)
+				INNER JOIN {db_prefix}messages AS last_m ON (last_m.id_msg = t.id_last_msg)
+				LEFT JOIN {db_prefix}members AS first_mem ON (first_mem.id_member = first_m.id_member)
+				LEFT JOIN {db_prefix}members AS last_mem ON (last_mem.id_member = first_m.id_member)
+			WHERE m.id_msg IN ({array_int:message_list})' . ($modSettings['postmod_active'] ? '
+				AND m.approved = {int:is_approved}' : '') . '
+			ORDER BY FIND_IN_SET(m.id_msg, {string:message_list_in_set})
+			LIMIT {int:limit}',
+			array(
+				'message_list' => $msg_list,
+				'is_approved' => 1,
+				'message_list_in_set' => implode(',', $msg_list),
+				'limit' => $limit,
+			)
+		);
+	}
+
+	/**
+	 * Did the user find any message at all?
+	 *
+	 * @param resource $messages_request holds a query result
+	 *
+	 * @return boolean
+	 */
+	public function noMessages($messages_request)
+	{
+		return $this->_db->num_rows($messages_request) == 0;
+	}
+
+	public function searchQuery(SearchApiWrapper $searchAPI)
+	{
+		$this->_searchAPI = $searchAPI;
+		$searchAPI->setExcludedPhrases($this->_excludedPhrases);
+		$searchAPI->setWeightFactors($this->_weightFactors);
+		$searchAPI->useTemporary($this->_createTemporary);
+		$searchAPI->setSearchArray($this->_searchArray);
+
+		return $searchAPI->searchQuery(
+			$this->searchWords(),
+			$this->_excludedIndexWords,
+			$this->_participants,
+			$this->_searchAPI
+		);
 	}
 
 	/**
@@ -306,7 +436,9 @@ class Search
 		else
 		{
 			foreach ($searchArray as $index => $value)
+			{
 				$orParts[$index] = array($value);
+			}
 		}
 
 		// Make sure the excluded words are in all or-branches.
@@ -378,139 +510,6 @@ class Search
 		}
 
 		return $this->_searchWords;
-	}
-
-	/**
-	 * Tell me, do I want to see the full message or just a piece?
-	 */
-	public function isCompact()
-	{
-		return empty($this->_searchParams['show_complete']);
-	}
-
-	/**
-	 * Wrapper around SearchParams::compileURL
-	 *
-	 * @param array $search build param index with specific search term (did you mean?)
-	 *
-	 * @return string - the encoded string to be appended to the URL
-	 */
-	public function compileURLparams($search = array())
-	{
-		return $this->_searchParams->compileURL($search);
-	}
-
-	/**
-	 * Finds the posters of the messages
-	 *
-	 * @param int[] $msg_list - All the messages we want to find the posters
-	 * @param int $limit - There are only so much topics
-	 *
-	 * @return int[] - array of members id
-	 */
-	public function loadPosters($msg_list, $limit)
-	{
-		// Load the posters...
-		$request = $this->_db->query('', '
-			SELECT
-				id_member
-			FROM {db_prefix}messages
-			WHERE id_member != {int:no_member}
-				AND id_msg IN ({array_int:message_list})
-			LIMIT {int:limit}',
-			array(
-				'message_list' => $msg_list,
-				'limit' => $limit,
-				'no_member' => 0,
-			)
-		);
-		$posters = array();
-		while ($row = $this->_db->fetch_assoc($request))
-			$posters[] = $row['id_member'];
-		$this->_db->free_result($request);
-
-		return $posters;
-	}
-
-	/**
-	 * Finds the posters of the messages
-	 *
-	 * @param int[] $msg_list - All the messages we want to find the posters
-	 * @param int $limit - There are only so much topics
-	 *
-	 * @return resource
-	 */
-	public function loadMessagesRequest($msg_list, $limit)
-	{
-		global $modSettings;
-
-		$request = $this->_db->query('', '
-			SELECT
-				m.id_msg, m.subject, m.poster_name, m.poster_email, m.poster_time,
-				m.id_member, m.icon, m.poster_ip, m.body, m.smileys_enabled,
-				m.modified_time, m.modified_name, first_m.id_msg AS id_first_msg,
-				first_m.subject AS first_subject, first_m.icon AS first_icon,
-				first_m.poster_time AS first_poster_time,
-				first_mem.id_member AS first_id_member,
-				COALESCE(first_mem.real_name, first_m.poster_name) AS first_display_name,
-				COALESCE(first_mem.member_name, first_m.poster_name) AS first_member_name,
-				last_m.id_msg AS id_last_msg, last_m.poster_time AS last_poster_time,
-				last_mem.id_member AS last_id_member,
-				COALESCE(last_mem.real_name, last_m.poster_name) AS last_display_name,
-				COALESCE(last_mem.member_name, last_m.poster_name) AS last_member_name,
-				last_m.icon AS last_icon, last_m.subject AS last_subject,
-				t.id_topic, t.is_sticky, t.locked, t.id_poll, t.num_replies,
-				t.num_views, t.num_likes,
-				b.id_board, b.name AS bname, c.id_cat, c.name AS cat_name
-			FROM {db_prefix}messages AS m
-				INNER JOIN {db_prefix}topics AS t ON (t.id_topic = m.id_topic)
-				INNER JOIN {db_prefix}boards AS b ON (b.id_board = t.id_board)
-				INNER JOIN {db_prefix}categories AS c ON (c.id_cat = b.id_cat)
-				INNER JOIN {db_prefix}messages AS first_m ON (first_m.id_msg = t.id_first_msg)
-				INNER JOIN {db_prefix}messages AS last_m ON (last_m.id_msg = t.id_last_msg)
-				LEFT JOIN {db_prefix}members AS first_mem ON (first_mem.id_member = first_m.id_member)
-				LEFT JOIN {db_prefix}members AS last_mem ON (last_mem.id_member = first_m.id_member)
-			WHERE m.id_msg IN ({array_int:message_list})' . ($modSettings['postmod_active'] ? '
-				AND m.approved = {int:is_approved}' : '') . '
-			ORDER BY FIND_IN_SET(m.id_msg, {string:message_list_in_set})
-			LIMIT {int:limit}',
-			array(
-				'message_list' => $msg_list,
-				'is_approved' => 1,
-				'message_list_in_set' => implode(',', $msg_list),
-				'limit' => $limit,
-			)
-		);
-
-		return $request;
-	}
-
-	/**
-	 * Did the user find any message at all?
-	 *
-	 * @param resource $messages_request holds a query result
-	 *
-	 * @return boolean
-	 */
-	public function noMessages($messages_request)
-	{
-		return $this->_db->num_rows($messages_request) == 0;
-	}
-
-	public function searchQuery(SearchApiWrapper $searchAPI)
-	{
-		$this->_searchAPI = $searchAPI;
-		$searchAPI->setExcludedPhrases($this->_excludedPhrases);
-		$searchAPI->setWeightFactors($this->_weightFactors);
-		$searchAPI->useTemporary($this->_createTemporary);
-		$searchAPI->setSearchArray($this->_searchArray);
-
-		return $searchAPI->searchQuery(
-			$this->searchWords(),
-			$this->_excludedIndexWords,
-			$this->_participants,
-			$this->_searchAPI
-		);
 	}
 
 	/**

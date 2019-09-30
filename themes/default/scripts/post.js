@@ -4,7 +4,7 @@
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause (see accompanying LICENSE.txt file)
  *
  * This file contains code covered by:
- * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * copyright: 2011 Simple Machines (http://www.simplemachines.org)
  *
  * @version 2.0 dev
  */
@@ -17,15 +17,17 @@
  * A q&d wrapper function to call the correct preview function
  * @todo could make this a class to be cleaner
  */
+
 // These are variables the xml response is going to need
 var bPost;
+
 function previewControl()
 {
 	// Lets make a background preview request
 	bPost = false;
 
 	// call the needed preview function
-	switch(preview_area)
+	switch (preview_area)
 	{
 		case 'pm':
 			previewPM();
@@ -113,8 +115,7 @@ function previewNews()
 	var textFields = [
 		'subject', post_box_name
 	];
-	var numericFields = [
-	];
+	var numericFields = [];
 	var checkboxFields = [
 		'send_html', 'send_pm'
 	];
@@ -161,7 +162,9 @@ function getFields(textFields, numericFields, checkboxFields, form_name)
 				fields[fields.length] = 'message_mode=' + $editor_data[post_box_name].inSourceMode();
 			}
 			else
+			{
 				fields[fields.length] = textFields[i] + '=' + document.forms[form_name][textFields[i]].value.replace(/&#/g, '&#38;#').php_urlencode();
+			}
 		}
 	}
 
@@ -171,7 +174,9 @@ function getFields(textFields, numericFields, checkboxFields, form_name)
 		if (numericFields[i] in document.forms[form_name])
 		{
 			if ('value' in document.forms[form_name][numericFields[i]])
+			{
 				fields[fields.length] = numericFields[i] + '=' + parseInt(document.forms[form_name].elements[numericFields[i]].value);
+			}
 			else
 			{
 				for (var j = 0, num = document.forms[form_name][numericFields[i]].length; j < num; j++)
@@ -184,7 +189,9 @@ function getFields(textFields, numericFields, checkboxFields, form_name)
 	for (i = 0, n = checkboxFields.length; i < n; i++)
 	{
 		if (checkboxFields[i] in document.forms[form_name] && document.forms[form_name].elements[checkboxFields[i]].checked)
+		{
 			fields[fields.length] = checkboxFields[i] + '=' + document.forms[form_name].elements[checkboxFields[i]].value;
+		}
 	}
 
 	// And some security
@@ -208,7 +215,10 @@ function onDocSent(XMLDoc)
 
 	if (!XMLDoc || !XMLDoc.getElementsByTagName('elk')[0])
 	{
-		document.forms[form_name].preview.onclick = function() {return true;};
+		document.forms[form_name].preview.onclick = function ()
+		{
+			return true;
+		};
 		document.forms[form_name].preview.click();
 		return true;
 	}
@@ -241,17 +251,23 @@ function onDocSent(XMLDoc)
 	{
 		errorCode = errors.getElementsByTagName('error')[i].attributes.getNamedItem("code").value;
 		if (errorCode === 'no_message' || errorCode === 'long_message')
+		{
 			error_post = true;
+		}
 		errorList += '<li id="' + error_area + '_' + errorCode + '" class="error">' + errors.getElementsByTagName('error')[i].firstChild.nodeValue + '</li>';
 	}
 
 	var oError_box = $(document.getElementById(error_area));
 	if ($.trim(oError_box.children(error_list).html()) === '')
+	{
 		oError_box.append("<ul id='" + error_list + "'></ul>");
+	}
 
 	// Add the error it and show it
 	if (numErrors === 0)
+	{
 		oError_box.css("display", "none");
+	}
 	else
 	{
 		document.getElementById(error_list).innerHTML = errorList;
@@ -261,32 +277,46 @@ function onDocSent(XMLDoc)
 
 	// Show a warning if the topic has been locked.
 	if (bPost)
+	{
 		document.getElementById('lock_warning').style.display = parseInt(errors.getAttribute('topic_locked')) === 1 ? '' : 'none';
+	}
 
 	// Adjust the color of captions if the given data is erroneous.
 	var captions = errors.getElementsByTagName('caption');
 	for (i = 0, numCaptions = errors.getElementsByTagName('caption').length; i < numCaptions; i++)
 	{
 		if (document.getElementById('caption_' + captions[i].getAttribute('name')))
+		{
 			document.getElementById('caption_' + captions[i].getAttribute('name')).className = captions[i].getAttribute('class');
+		}
 	}
 
 	if (typeof $editor_container[post_box_name] !== 'undefined')
+	{
 		$editor = $editor_container[post_box_name];
+	}
 	else
+	{
 		$editor = $(document.forms[form_name][post_box_name]);
+	}
 
 	if (error_post)
+	{
 		$editor.find("textarea, iframe").addClass('border_error');
+	}
 	else
+	{
 		$editor.find("textarea, iframe").removeClass('border_error');
+	}
 
 	// If this is a post preview, then we have some extra work to do
 	if (bPost)
 	{
 		// Set the new last message id.
 		if ('last_msg' in document.forms[form_name])
+		{
 			document.forms[form_name].last_msg.value = XMLDoc.getElementsByTagName('elk')[0].getElementsByTagName('last_msg')[0].firstChild.nodeValue;
+		}
 
 		var new_replies = [],
 			ignored_replies = [],
@@ -303,19 +333,25 @@ function onDocSent(XMLDoc)
 
 				ignoring = false;
 				if (newPosts[i].getElementsByTagName("is_ignored")[0].firstChild.nodeValue !== '0')
+				{
 					ignored_replies[ignored_replies.length] = ignoring = newPosts[i].getAttribute("id");
+				}
 
 				newPostsHTML += '<div class="content forumposts"><div class="postarea2" id="msg' + newPosts[i].getAttribute("id") + '"><div class="keyinfo">';
 				newPostsHTML += '<h5 class="floatleft"><span>' + txt_posted_by + '</span>&nbsp;' + newPosts[i].getElementsByTagName("poster")[0].firstChild.nodeValue + '&nbsp;-&nbsp;' + newPosts[i].getElementsByTagName("time")[0].firstChild.nodeValue;
 				newPostsHTML += ' <span class="new_posts" id="image_new_' + newPosts[i].getAttribute("id") + '">' + txt_new + '</span></h5>';
 
 				if (can_quote)
+				{
 					newPostsHTML += '<ul class="quickbuttons" id="msg_' + newPosts[i].getAttribute('id') + '_quote"><li class="listlevel1"><a href="#postmodify" onmousedown="return insertQuoteFast(' + newPosts[i].getAttribute('id') + ');" class="linklevel1 quote_button">' + txt_bbc_quote + '</a></li></ul>';
+				}
 
 				newPostsHTML += '</div>';
 
 				if (ignoring)
+				{
 					newPostsHTML += '<div id="msg_' + newPosts[i].getAttribute("id") + '_ignored_prompt">' + txt_ignoring_user + '<a href="#" id="msg_' + newPosts[i].getAttribute("id") + '_ignored_link" class="hide">' + show_ignore_user_post + '</a></div>';
+				}
 
 				newPostsHTML += '<div class="inner" id="msg_' + newPosts[i].getAttribute("id") + '_body">' + newPosts[i].getElementsByTagName("message")[0].firstChild.nodeValue + '</div></div></div>';
 			}
@@ -350,25 +386,33 @@ function onDocSent(XMLDoc)
 		}
 	}
 
-	$('html, body').animate({ scrollTop: $('#preview_section').offset().top }, 'slow');
+	$('html, body').animate({scrollTop: $('#preview_section').offset().top}, 'slow');
 
 	// Preview video links if the feature is available
-	if ($.isFunction($.fn.linkifyvideo))
+	if (typeof $.fn.linkifyvideo === 'function')
+	{
 		$().linkifyvideo(oEmbedtext, 'preview_body');
+	}
 
 	// Spoilers, Sweetie
-	$('.spoilerheader').on('click', function(){
+	$('.spoilerheader').on('click', function ()
+	{
 		$(this).next().children().slideToggle("fast");
 	});
 
 	// Fix and Prettify code blocks
 	if (typeof elk_codefix === 'function')
+	{
 		elk_codefix();
+	}
 	if (typeof prettyPrint === 'function')
+	{
 		prettyPrint();
+	}
 
 	// Prevent lighbox or default action on the preview
-	$('[data-lightboximage]').on('click.elk_lb', function(e) {
+	$('[data-lightboximage]').on('click.elk_lb', function (e)
+	{
 		e.preventDefault();
 	});
 }
@@ -407,7 +451,9 @@ function addAttachment()
 	current_attachment += 1;
 
 	if (allowed_attachments <= 0)
+	{
 		return alert(txt_more_attachments_error);
+	}
 
 	setOuterHTML(document.getElementById("moreAttachments"), '<dd class="smalltext"><input type="file" size="60" name="attachment[]" id="attachment' + current_attachment + '" class="input_file" /> (<a href="javascript:void(0);" onclick="cleanFileInput(\'attachment' + current_attachment + '\');">' + txt_clean_attach + '<\/a>)' + '<\/dd><dd class="smalltext" id="moreAttachments"><a href="#" onclick="addAttachment(); return false;">(' + txt_more_attachments + ')</a></dd>');
 
@@ -428,7 +474,7 @@ function cleanFileInput(idElement)
 
 	// Wrap the element in its own form, then reset the wrapper form
 	oElement.wrap('<form>').closest('form').get(0).reset();
-    oElement.unwrap();
+	oElement.unwrap();
 }
 
 /**

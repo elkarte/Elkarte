@@ -40,7 +40,9 @@ function followupTopics($messages, $include_approved = false)
 
 	$returns = array();
 	while ($row = $db->fetch_assoc($request))
+	{
 		$returns[$row['derived_from']][] = $row;
+	}
 
 	return $returns;
 }
@@ -73,7 +75,9 @@ function topicStartedHere($topic, $include_approved = false)
 
 	$returns = array();
 	while ($row = $db->fetch_assoc($request))
+	{
 		$returns = $row;
+	}
 
 	return $returns;
 }
@@ -100,9 +104,9 @@ function linkMessages($msg, $topic)
  * Used to break a "followup" relation between a message and a topic
  * Actually the function is not used at all...
  *
- * @todo remove?
  * @param int $msg message id
  * @param int $topic topic id
+ * @todo remove?
  */
 function unlinkMessages($msg, $topic)
 {

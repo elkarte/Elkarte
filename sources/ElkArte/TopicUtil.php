@@ -10,7 +10,7 @@
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause (see accompanying LICENSE.txt file)
  *
  * This file contains code covered by:
- * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * copyright: 2011 Simple Machines (http://www.simplemachines.org)
  *
  * @version 2.0 dev
  *
@@ -18,7 +18,7 @@
 
 namespace ElkArte;
 
-use ElkArte\User;
+use BBC\ParserWrapper;
 
 /**
  * Class TopicUtil
@@ -45,14 +45,16 @@ class TopicUtil
 		$topics = array();
 		$preview_length = (int) $preview_length;
 		if (empty($preview_length))
+		{
 			$preview_length = 128;
+		}
 
 		$messages_per_page = empty($modSettings['disableCustomPerPage']) && !empty($options['messages_per_page']) ? $options['messages_per_page'] : $modSettings['defaultMaxMessages'];
 		$topicseen = $topicseen ? 'topicseen' : '';
 
 		$icon_sources = new MessageTopicIcons(!empty($modSettings['messageIconChecks_enable']), $settings['theme_dir']);
 
-		$parser = \BBC\ParserWrapper::instance();
+		$parser = ParserWrapper::instance();
 
 		foreach ($topics_info as $row)
 		{
@@ -65,7 +67,9 @@ class TopicUtil
 
 				// No reply then they are the same, no need to process it again
 				if ($row['num_replies'] == 0)
+				{
 					$row['last_body'] = $row['first_body'];
+				}
 				else
 				{
 					$row['last_body'] = strtr($parser->parseMessage($row['last_body'], $row['last_smileys']), array('<br />' => "\n", '&nbsp;' => ' '));
@@ -95,9 +99,13 @@ class TopicUtil
 				$row['first_subject'] = censor($row['first_subject']);
 
 				if ($row['id_first_msg'] == $row['id_last_msg'])
+				{
 					$row['last_subject'] = $row['first_subject'];
+				}
 				else
+				{
 					$row['last_subject'] = censor($row['last_subject']);
+				}
 			}
 
 			// Decide how many pages the topic should have.
@@ -110,7 +118,9 @@ class TopicUtil
 				$pages = constructPageIndex(getUrl('topic', ['topic' => $row['id_topic'], 'start' => '%1$d', $topicseen, 'subject' => $row['first_subject']]), $start, $topic_length, $messages_per_page, true, array('prev_next' => false, 'all' => $show_all));
 			}
 			else
+			{
 				$pages = '';
+			}
 
 			$row['new_from'] = $row['new_from'] ?? 0;
 			$first_poster_href = getUrl('profile', ['action' => 'profile', 'u' => $row['first_id_member'], 'name' => $row['first_display_name']]);

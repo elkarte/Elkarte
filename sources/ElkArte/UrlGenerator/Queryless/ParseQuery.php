@@ -16,6 +16,11 @@ namespace ElkArte\UrlGenerator\Queryless;
 
 use ElkArte\UrlGenerator\AbstractParseQuery;
 
+/**
+ * Class ParseQuery
+ *
+ * @package ElkArte\UrlGenerator\Queryless
+ */
 class ParseQuery extends AbstractParseQuery
 {
 	/**
@@ -27,14 +32,7 @@ class ParseQuery extends AbstractParseQuery
 	 */
 	public function parse($query)
 	{
-		if (isset($this->parsers[$query[0]]))
-		{
-			$call = $this->parsers[$query[0]];
-		}
-		else
-		{
-			$call = $this->parsers['s'];
-		}
+		$call = isset($this->parsers[$query[0]]) ? $this->parsers[$query[0]] : $this->parsers['s'];
 
 		return $this->{$call}($query);
 	}
@@ -65,18 +63,6 @@ class ParseQuery extends AbstractParseQuery
 	}
 
 	/**
-	 * Topics have to have a "topic" parameter, and this method ensures the query
-	 * has it.
-	 *
-	 * @param string $query The semantic query
-	 * @return string $query The corresponding standard query
-	 */
-	protected function topic($query)
-	{
-		return 'topic=' . $this->process($query);
-	}
-
-	/**
 	 * This method splits the semantic URL into pieces (exploding at each "/")
 	 * and puts more or less everything back together into the standard format.
 	 * Some more processing takes care of "-" => ".".
@@ -88,8 +74,18 @@ class ParseQuery extends AbstractParseQuery
 	{
 		preg_match('~(?!board|topic),(\d+)\.([^\.]+)\.html(.*)~', $query, $parts);
 
-		$real_query = $parts[1] . '.' . $parts[2] . (!empty($parts[3]) ? $parts[3] : '');
+		return $parts[1] . '.' . $parts[2] . (!empty($parts[3]) ? $parts[3] : '');
+	}
 
-		return $real_query;
+	/**
+	 * Topics have to have a "topic" parameter, and this method ensures the query
+	 * has it.
+	 *
+	 * @param string $query The semantic query
+	 * @return string $query The corresponding standard query
+	 */
+	protected function topic($query)
+	{
+		return 'topic=' . $this->process($query);
 	}
 }

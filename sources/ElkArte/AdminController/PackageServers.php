@@ -9,7 +9,7 @@
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause (see accompanying LICENSE.txt file)
  *
  * This file contains code covered by:
- * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * copyright: 2011 Simple Machines (http://www.simplemachines.org)
  *
  * @version 2.0 dev
  *
@@ -17,13 +17,20 @@
 
 namespace ElkArte\AdminController;
 
+use ElkArte\AbstractController;
+use ElkArte\Action;
+use ElkArte\Exceptions\Exception;
+use ElkArte\Http\FtpConnection;
+use ElkArte\PackagesFilterIterator;
+use ElkArte\Util;
+
 /**
  * PackageServers controller handles browsing, adding and removing
  * package servers, and download of a package from them.
  *
  * @package Packages
  */
-class PackageServers extends \ElkArte\AbstractController
+class PackageServers extends AbstractController
 {
 	/**
 	 * Called before all other methods when coming from the dispatcher or
@@ -80,7 +87,7 @@ class PackageServers extends \ElkArte\AbstractController
 		);
 
 		// Set up action/subaction stuff.
-		$action = new \ElkArte\Action('package_servers');
+		$action = new Action('package_servers');
 
 		// Now let's decide where we are taking this... call integrate_sa_package_servers
 		$subAction = $action->initialize($subActions, 'servers');
@@ -114,7 +121,105 @@ class PackageServers extends \ElkArte\AbstractController
 		$context['package_download_broken'] = !is_writable(BOARDDIR . '/packages') || !is_writable(BOARDDIR . '/packages/installed.list');
 
 		if ($context['package_download_broken'])
+		{
 			$this->ftp_connect();
+		}
+	}
+
+	/**
+	 * This method attempts to chmod packages and installed.list
+	 *
+	 * - uses FTP if necessary.
+	 * - It sets the $context['package_download_broken'] status for the template.
+	 * - Used by package servers pages.
+	 */
+	public function ftp_connect()
+	{
+		global $context, $modSettings;
+
+		// Try to chmod from PHP first
+		@chmod(BOARDDIR . '/packages', 0777);
+		@chmod(BOARDDIR . '/packages/installed.list', 0777);
+
+		$unwritable = !is_writable(BOARDDIR . '/packages') || !is_writable(BOARDDIR . '/packages/installed.list');
+
+		// Let's initialize $context
+		$context['package_ftp'] = array(
+			'server' => '',
+			'port' => '',
+			'username' => '',
+			'path' => '',
+			'error' => '',
+		);
+
+		if ($unwritable)
+		{
+			// Are they connecting to their FTP account already?
+			if (isset($this->_req->post->ftp_username))
+			{
+				$ftp = new FtpConnection($this->_req->post->ftp_server, $this->_req->post->ftp_port, $this->_req->post->ftp_username, $this->_req->post->ftp_password);
+
+				if ($ftp->error === false)
+				{
+					// I know, I know... but a lot of people want to type /home/xyz/... which is wrong, but logical.
+					if (!$ftp->chdir($this->_req->post->ftp_path))
+					{
+						$ftp_error = $ftp->error;
+						$ftp->chdir(preg_replace('~^/home[2]?/[^/]+~', '', $this->_req->post->ftp_path));
+					}
+				}
+			}
+
+			// No attempt yet, or we had an error last time
+			if (!isset($ftp) || $ftp->error !== false)
+			{
+				// Maybe we didn't even try yet
+				if (!isset($ftp))
+				{
+					$ftp = new FtpConnection(null);
+				}
+				// ...or we failed
+				elseif ($ftp->error !== false && !isset($ftp_error))
+				{
+					$ftp_error = $ftp->last_message === null ? '' : $ftp->last_message;
+				}
+
+				list ($username, $detect_path, $found_path) = $ftp->detect_path(BOARDDIR);
+
+				if ($found_path || !isset($this->_req->post->ftp_path))
+				{
+					$this->_req->post->ftp_path = $detect_path;
+				}
+
+				if (!isset($this->_req->post->ftp_username))
+				{
+					$this->_req->post->ftp_username = $username;
+				}
+
+				// Fill the boxes for a FTP connection with data from the previous attempt too, if any
+				$context['package_ftp'] = array(
+					'server' => isset($this->_req->post->ftp_server) ? $this->_req->post->ftp_server : (isset($modSettings['package_server']) ? $modSettings['package_server'] : 'localhost'),
+					'port' => isset($this->_req->post->ftp_port) ? $this->_req->post->ftp_port : (isset($modSettings['package_port']) ? $modSettings['package_port'] : '21'),
+					'username' => isset($this->_req->post->ftp_username) ? $this->_req->post->ftp_username : (isset($modSettings['package_username']) ? $modSettings['package_username'] : ''),
+					'path' => $this->_req->post->ftp_path,
+					'error' => empty($ftp_error) ? null : $ftp_error,
+				);
+
+				// Announce the template it's time to display the ftp connection box.
+				$context['package_download_broken'] = true;
+			}
+			else
+			{
+				// FTP connection has succeeded
+				$context['package_download_broken'] = false;
+
+				// Try to chmod packages folder and our list file.
+				$ftp->chmod('packages', 0777);
+				$ftp->chmod('packages/installed.list', 0777);
+
+				$ftp->close();
+			}
+		}
 	}
 
 	/**
@@ -131,11 +236,15 @@ class PackageServers extends \ElkArte\AbstractController
 
 		// Browsing the packages from a server
 		if (isset($this->_req->query->server))
+		{
 			list($name, $url, $server) = $this->_package_server();
+		}
 
 		// Minimum required parameter did not exist so dump out.
 		else
-			throw new \ElkArte\Exceptions\Exception('couldnt_connect', false);
+		{
+			throw new Exception('couldnt_connect', false);
+		}
 
 		// Might take some time.
 		detectServer()->setTimeLimit(60);
@@ -160,11 +269,15 @@ class PackageServers extends \ElkArte\AbstractController
 			// Look through the list of installed mods and get version information for the compare
 			$installed_adds = array();
 			foreach ($instadds as $installed_add)
+			{
 				$installed_adds[$installed_add['package_id']] = $installed_add['version'];
+			}
 
 			$the_version = strtr(FORUM_VERSION, array('ElkArte ' => ''));
 			if (!empty($_SESSION['version_emulate']))
+			{
 				$the_version = $_SESSION['version_emulate'];
+			}
 
 			// Parse the json file, each section contains a category of addons
 			$packageNum = 0;
@@ -172,7 +285,7 @@ class PackageServers extends \ElkArte\AbstractController
 			{
 				// Section title / header for the category
 				$context['package_list'][$packageSection] = array(
-					'title' => \ElkArte\Util::htmlspecialchars(ucwords($packageSection)),
+					'title' => Util::htmlspecialchars(ucwords($packageSection)),
 					'text' => '',
 					'items' => array(),
 				);
@@ -239,7 +352,9 @@ class PackageServers extends \ElkArte\AbstractController
 				}
 
 				// Sort them naturally
-				usort($context['package_list'][$packageSection]['items'], array($this, 'package_sort'));
+				usort($context['package_list'][$packageSection]['items'], function ($a, $b) {
+					return $this->package_sort($a, $b);
+				});
 
 				$context['package_list'][$packageSection]['text'] = sprintf($txt['mod_section_count'], $section_count);
 			}
@@ -250,16 +365,42 @@ class PackageServers extends \ElkArte\AbstractController
 	}
 
 	/**
-	 * Case insensitive natural sort for packages
+	 * Returns the contact details for a server
 	 *
-	 * @param array $a
-	 * @param array $b
+	 * - Reads the database to fetch the server url and name
 	 *
-	 * @return int
+	 * @return array
+	 * @throws \ElkArte\Exceptions\Exception couldnt_connect
 	 */
-	public function package_sort($a, $b)
+	private function _package_server()
 	{
-		return strcasecmp($a['name'], $b['name']);
+		// Initialize the required variables.
+		$name = '';
+		$url = '';
+		$server = '';
+
+		if (isset($this->_req->query->server))
+		{
+			if ($this->_req->query->server == '')
+			{
+				redirectexit('action=admin;area=packageservers');
+			}
+
+			$server = $this->_req->getQuery('server', 'intval');
+
+			// Query the server table to find the requested server.
+			$packageserver = fetchPackageServers($server);
+			$url = $packageserver[0]['url'];
+			$name = $packageserver[0]['name'];
+
+			// If server does not exist then dump out.
+			if (empty($url))
+			{
+				throw new Exception('couldnt_connect', false);
+			}
+		}
+
+		return array($name, $url, $server);
 	}
 
 	/**
@@ -278,10 +419,10 @@ class PackageServers extends \ElkArte\AbstractController
 		return array(
 			'id' => !empty($thisPackage->pkid) ? array($thisPackage->pkid) : $this->_assume_id($thisPackage),
 			'type' => $packageSection,
-			'name' => \ElkArte\Util::htmlspecialchars($thisPackage->title),
+			'name' => Util::htmlspecialchars($thisPackage->title),
 			'date' => htmlTime(strtotime($thisPackage->date)),
-			'author' =>  \ElkArte\Util::htmlspecialchars($thisPackage->author),
-			'description' => !empty($thisPackage->short) ? \ElkArte\Util::htmlspecialchars($thisPackage->short) : '',
+			'author' => Util::htmlspecialchars($thisPackage->author),
+			'description' => !empty($thisPackage->short) ? Util::htmlspecialchars($thisPackage->short) : '',
 			'version' => $thisPackage->version,
 			'elkversion' => $thisPackage->elkversion,
 			'license' => $thisPackage->license,
@@ -353,12 +494,29 @@ class PackageServers extends \ElkArte\AbstractController
 			// not always accurate, especially when dealing with repos.  So for now just put in in no conflict mode
 			// and do the save.
 			if ($this->_req->getQuery('area') === 'packageservers' && $this->_req->getQuery('sa') === 'download')
+			{
 				$this->_req->query->auto = true;
+			}
 
 			return str_replace($invalid, '_', $newname) . $matches[6];
 		}
 		else
+		{
 			return basename($name);
+		}
+	}
+
+	/**
+	 * Case insensitive natural sort for packages
+	 *
+	 * @param array $a
+	 * @param array $b
+	 *
+	 * @return int
+	 */
+	public function package_sort($a, $b)
+	{
+		return strcasecmp($a['name'], $b['name']);
 	}
 
 	/**
@@ -385,13 +543,19 @@ class PackageServers extends \ElkArte\AbstractController
 
 		// Security is good...
 		if (isset($this->_req->query->server))
+		{
 			checkSession('get');
+		}
 		else
+		{
 			checkSession();
+		}
 
 		// To download something, we need either a valid server or url.
 		if (empty($this->_req->query->server) && (!empty($this->_req->query->get) && !empty($this->_req->post->package)))
-			throw new \ElkArte\Exceptions\Exception('package_get_error_is_zero', false);
+		{
+			throw new Exception('package_get_error_is_zero', false);
+		}
 
 		// Start off with nothing
 		$server = '';
@@ -420,7 +584,9 @@ class PackageServers extends \ElkArte\AbstractController
 			}
 			// Not found or some monkey business
 			else
-				throw new \ElkArte\Exceptions\Exception('package_cant_download', false);
+			{
+				throw new Exception('package_cant_download', false);
+			}
 		}
 		// Entered a url and optional filename
 		elseif (isset($this->_req->post->byurl) && !empty($this->_req->post->filename))
@@ -445,12 +611,16 @@ class PackageServers extends \ElkArte\AbstractController
 				$package_name = substr($package_name, 0, strrpos(substr($package_name, 0, -3), '.')) . '_';
 			}
 			else
+			{
 				$ext = '';
+			}
 
 			// Find the first available free name
 			$i = 1;
 			while (file_exists(BOARDDIR . '/packages/' . $package_name . $i . $ext))
+			{
 				$i++;
+			}
 
 			$package_name = $package_name . $i . $ext;
 		}
@@ -459,7 +629,9 @@ class PackageServers extends \ElkArte\AbstractController
 		$packageInfo = getPackageInfo($url . $package_id);
 
 		if (!is_array($packageInfo))
-			throw new \ElkArte\Exceptions\Exception($packageInfo);
+		{
+			throw new Exception($packageInfo);
+		}
 
 		// Save the package to disk, use FTP if necessary
 		create_chmod_control(
@@ -474,7 +646,9 @@ class PackageServers extends \ElkArte\AbstractController
 
 		// Done!  Did we get this package automatically?
 		if (preg_match('~^http://[\w_\-]+\.elkarte\.net/~', $package_id) == 1 && strpos($package_id, 'dlattach') === false && isset($this->_req->query->auto))
+		{
 			redirectexit('action=admin;area=packages;sa=install;package=' . $package_name);
+		}
 
 		// You just downloaded a addon from SERVER_NAME_GOES_HERE.
 		$context['package_server'] = $server;
@@ -483,16 +657,26 @@ class PackageServers extends \ElkArte\AbstractController
 		$context['package'] = getPackageInfo($package_name);
 
 		if (!is_array($context['package']))
-			throw new \ElkArte\Exceptions\Exception('package_cant_download', false);
+		{
+			throw new Exception('package_cant_download', false);
+		}
 
 		if ($context['package']['type'] === 'modification')
+		{
 			$context['package']['install']['link'] = '<a class="linkbutton" href="' . $scripturl . '?action=admin;area=packages;sa=install;package=' . $context['package']['filename'] . '">' . $txt['install_mod'] . '</a>';
+		}
 		elseif ($context['package']['type'] === 'avatar')
+		{
 			$context['package']['install']['link'] = '<a class="linkbutton" href="' . $scripturl . '?action=admin;area=packages;sa=install;package=' . $context['package']['filename'] . '">' . $txt['use_avatars'] . '</a>';
+		}
 		elseif ($context['package']['type'] === 'language')
+		{
 			$context['package']['install']['link'] = '<a class="linkbutton" href="' . $scripturl . '?action=admin;area=packages;sa=install;package=' . $context['package']['filename'] . '">' . $txt['add_languages'] . '</a>';
+		}
 		else
+		{
 			$context['package']['install']['link'] = '';
+		}
 
 		$context['package']['list_files']['link'] = '<a class="linkbutton" href="' . $scripturl . '?action=admin;area=packages;sa=list;package=' . $context['package']['filename'] . '">' . $txt['list_files'] . '</a>';
 
@@ -500,41 +684,6 @@ class PackageServers extends \ElkArte\AbstractController
 		unset($context['package']['xml']);
 
 		$context['page_title'] = $txt['download_success'];
-	}
-
-	/**
-	 * Returns the contact details for a server
-	 *
-	 * - Reads the database to fetch the server url and name
-	 *
-	 * @return array
-	 * @throws \ElkArte\Exceptions\Exception couldnt_connect
-	 */
-	private function _package_server()
-	{
-		// Initialize the required variables.
-		$name = '';
-		$url = '';
-		$server = '';
-
-		if (isset($this->_req->query->server))
-		{
-			if ($this->_req->query->server == '')
-				redirectexit('action=admin;area=packageservers');
-
-			$server = $this->_req->getQuery('server', 'intval');
-
-			// Query the server table to find the requested server.
-			$packageserver = fetchPackageServers($server);
-			$url = $packageserver[0]['url'];
-			$name = $packageserver[0]['name'];
-
-			// If server does not exist then dump out.
-			if (empty($url))
-				throw new \ElkArte\Exceptions\Exception('couldnt_connect', false);
-		}
-
-		return array($name, $url, $server);
 	}
 
 	/**
@@ -552,15 +701,21 @@ class PackageServers extends \ElkArte\AbstractController
 		// @todo Use FTP if the packages directory is not writable.
 		// Check the file was even sent!
 		if (!isset($_FILES['package']['name']) || $_FILES['package']['name'] == '')
-			throw new \ElkArte\Exceptions\Exception('package_upload_error_nofile');
+		{
+			throw new Exception('package_upload_error_nofile');
+		}
 		elseif (!is_uploaded_file($_FILES['package']['tmp_name']) || (ini_get('open_basedir') == '' && !file_exists($_FILES['package']['tmp_name'])))
-			throw new \ElkArte\Exceptions\Exception('package_upload_error_failed');
+		{
+			throw new Exception('package_upload_error_failed');
+		}
 
 		// Make sure it has a sane filename.
 		$_FILES['package']['name'] = preg_replace(array('/\s/', '/\.[\.]+/', '/[^\w_\.\-]/'), array('_', '.', ''), $_FILES['package']['name']);
 
 		if (strtolower(substr($_FILES['package']['name'], -4)) !== '.zip' && strtolower(substr($_FILES['package']['name'], -4)) !== '.tgz' && strtolower(substr($_FILES['package']['name'], -7)) !== '.tar.gz')
-			throw new \ElkArte\Exceptions\Exception('package_upload_error_supports', false, array('zip, tgz, tar.gz'));
+		{
+			throw new Exception('package_upload_error_supports', false, array('zip, tgz, tar.gz'));
+		}
 
 		// We only need the filename...
 		$packageName = basename($_FILES['package']['name']);
@@ -570,7 +725,9 @@ class PackageServers extends \ElkArte\AbstractController
 
 		// @todo Maybe just roll it like we do for downloads?
 		if (file_exists($destination))
-			throw new \ElkArte\Exceptions\Exception('package_upload_error_exists');
+		{
+			throw new Exception('package_upload_error_exists');
+		}
 
 		// Now move the file.
 		move_uploaded_file($_FILES['package']['tmp_name'], $destination);
@@ -586,7 +743,7 @@ class PackageServers extends \ElkArte\AbstractController
 			@unlink($destination);
 			theme()->getTemplates()->loadLanguageFile('Errors');
 			$txt[$context['package']] = str_replace('{MANAGETHEMEURL}', $scripturl . '?action=admin;area=theme;sa=admin;' . $context['session_var'] . '=' . $context['session_id'] . '#theme_install', $txt[$context['package']]);
-			throw new \ElkArte\Exceptions\Exception('package_upload_error_broken', false, $txt[$context['package']]);
+			throw new Exception('package_upload_error_broken', false, $txt[$context['package']]);
 		}
 		// Is it already uploaded, maybe?
 		else
@@ -595,26 +752,30 @@ class PackageServers extends \ElkArte\AbstractController
 			{
 				$dir = new \FilesystemIterator(BOARDDIR . '/packages', \FilesystemIterator::SKIP_DOTS);
 
-				$filter = new \ElkArte\PackagesFilterIterator($dir);
+				$filter = new PackagesFilterIterator($dir);
 				$packages = new \IteratorIterator($filter);
 
 				foreach ($packages as $package)
 				{
 					// No need to check these
 					if ($package->getFilename() == $packageName)
+					{
 						continue;
+					}
 
 					// Read package info for the archive we found
 					$packageInfo = getPackageInfo($package->getFilename());
 					if (!is_array($packageInfo))
+					{
 						continue;
+					}
 
 					// If it was already uploaded under another name don't upload it again.
-					if ($packageInfo['id'] == $context['package']['id'] && compareVersions($packageInfo['version'], $context['package']['version']) == 0)
+					if ($packageInfo['id'] === $context['package']['id'] && compareVersions($packageInfo['version'], $context['package']['version']) == 0)
 					{
 						@unlink($destination);
 						theme()->getTemplates()->loadLanguageFile('Errors');
-						throw new \ElkArte\Exceptions\Exception('package_upload_already_exists', 'general', $package->getFilename());
+						throw new Exception('package_upload_already_exists', 'general', $package->getFilename());
 					}
 				}
 			}
@@ -625,13 +786,21 @@ class PackageServers extends \ElkArte\AbstractController
 		}
 
 		if ($context['package']['type'] === 'modification')
+		{
 			$context['package']['install']['link'] = '<a class="linkbutton" href="' . $scripturl . '?action=admin;area=packages;sa=install;package=' . $context['package']['filename'] . '">' . $txt['install_mod'] . '</a>';
+		}
 		elseif ($context['package']['type'] === 'avatar')
+		{
 			$context['package']['install']['link'] = '<a class="linkbutton" href="' . $scripturl . '?action=admin;area=packages;sa=install;package=' . $context['package']['filename'] . '">' . $txt['use_avatars'] . '</a>';
+		}
 		elseif ($context['package']['type'] === 'language')
+		{
 			$context['package']['install']['link'] = '<a class="linkbutton" href="' . $scripturl . '?action=admin;area=packages;sa=install;package=' . $context['package']['filename'] . '">' . $txt['add_languages'] . '</a>';
+		}
 		else
+		{
 			$context['package']['install']['link'] = '';
+		}
 
 		$context['package']['list_files']['link'] = '<a class="linkbutton" href="' . $scripturl . '?action=admin;area=packages;sa=list;package=' . $context['package']['filename'] . '">' . $txt['list_files'] . '</a>';
 
@@ -655,11 +824,13 @@ class PackageServers extends \ElkArte\AbstractController
 
 		// If they put a slash on the end, get rid of it.
 		if (substr($this->_req->post->serverurl, -1) === '/')
+		{
 			$this->_req->post->serverurl = substr($this->_req->post->serverurl, 0, -1);
+		}
 
 		// Are they both nice and clean?
-		$servername = trim(\ElkArte\Util::htmlspecialchars($this->_req->post->servername));
-		$serverurl = trim(\ElkArte\Util::htmlspecialchars($this->_req->post->serverurl));
+		$servername = trim(Util::htmlspecialchars($this->_req->post->servername));
+		$serverurl = trim(Util::htmlspecialchars($this->_req->post->serverurl));
 
 		// Make sure the URL has the correct prefix.
 		$serverurl = addProtocol($serverurl, array('http://', 'https://'));
@@ -713,96 +884,8 @@ class PackageServers extends \ElkArte\AbstractController
 
 		// Give FTP a chance...
 		if ($context['package_download_broken'])
-			$this->ftp_connect();
-	}
-
-	/**
-	 * This method attempts to chmod packages and installed.list
-	 *
-	 * - uses FTP if necessary.
-	 * - It sets the $context['package_download_broken'] status for the template.
-	 * - Used by package servers pages.
-	 */
-	public function ftp_connect()
-	{
-		global $context, $modSettings;
-
-		// Try to chmod from PHP first
-		@chmod(BOARDDIR . '/packages', 0777);
-		@chmod(BOARDDIR . '/packages/installed.list', 0777);
-
-		$unwritable = !is_writable(BOARDDIR . '/packages') || !is_writable(BOARDDIR . '/packages/installed.list');
-
-		// Let's initialize $context
-		$context['package_ftp'] = array(
-			'server' => '',
-			'port' => '',
-			'username' => '',
-			'path' => '',
-			'error' => '',
-		);
-
-		if ($unwritable)
 		{
-			// Are they connecting to their FTP account already?
-			if (isset($this->_req->post->ftp_username))
-			{
-				$ftp = new \ElkArte\Http\FtpConnection($this->_req->post->ftp_server, $this->_req->post->ftp_port, $this->_req->post->ftp_username, $this->_req->post->ftp_password);
-
-				if ($ftp->error === false)
-				{
-					// I know, I know... but a lot of people want to type /home/xyz/... which is wrong, but logical.
-					if (!$ftp->chdir($this->_req->post->ftp_path))
-					{
-						$ftp_error = $ftp->error;
-						$ftp->chdir(preg_replace('~^/home[2]?/[^/]+~', '', $this->_req->post->ftp_path));
-					}
-				}
-			}
-
-			// No attempt yet, or we had an error last time
-			if (!isset($ftp) || $ftp->error !== false)
-			{
-				// Maybe we didn't even try yet
-				if (!isset($ftp))
-				{
-					$ftp = new \ElkArte\Http\FtpConnection(null);
-				}
-				// ...or we failed
-				elseif ($ftp->error !== false && !isset($ftp_error))
-					$ftp_error = $ftp->last_message === null ? '' : $ftp->last_message;
-
-				list ($username, $detect_path, $found_path) = $ftp->detect_path(BOARDDIR);
-
-				if ($found_path || !isset($this->_req->post->ftp_path))
-					$this->_req->post->ftp_path = $detect_path;
-
-				if (!isset($this->_req->post->ftp_username))
-					$this->_req->post->ftp_username = $username;
-
-				// Fill the boxes for a FTP connection with data from the previous attempt too, if any
-				$context['package_ftp'] = array(
-					'server' => isset($this->_req->post->ftp_server) ? $this->_req->post->ftp_server : (isset($modSettings['package_server']) ? $modSettings['package_server'] : 'localhost'),
-					'port' => isset($this->_req->post->ftp_port) ? $this->_req->post->ftp_port : (isset($modSettings['package_port']) ? $modSettings['package_port'] : '21'),
-					'username' => isset($this->_req->post->ftp_username) ? $this->_req->post->ftp_username : (isset($modSettings['package_username']) ? $modSettings['package_username'] : ''),
-					'path' => $this->_req->post->ftp_path,
-					'error' => empty($ftp_error) ? null : $ftp_error,
-				);
-
-				// Announce the template it's time to display the ftp connection box.
-				$context['package_download_broken'] = true;
-			}
-			else
-			{
-				// FTP connection has succeeded
-				$context['package_download_broken'] = false;
-
-				// Try to chmod packages folder and our list file.
-				$ftp->chmod('packages', 0777);
-				$ftp->chmod('packages/installed.list', 0777);
-
-				$ftp->close();
-			}
+			$this->ftp_connect();
 		}
 	}
 }

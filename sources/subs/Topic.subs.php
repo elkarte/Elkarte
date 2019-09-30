@@ -11,13 +11,18 @@
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause (see accompanying LICENSE.txt file)
  *
  * This file contains code covered by:
- * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * copyright: 2011 Simple Machines (http://www.simplemachines.org)
  *
  * @version 2.0 dev
  *
  */
 
+use BBC\ParserWrapper;
+use ElkArte\Cache\Cache;
+use ElkArte\MessagesDelete;
+use ElkArte\Search\SearchApiWrapper;
 use ElkArte\User;
+use ElkArte\Util;
 
 /**
  * Removes the passed id_topic's checking for permissions.
@@ -39,7 +44,9 @@ function removeTopicsPermissions($topics)
 	{
 		// Skip if we have to test the owner *and* the user is not the owner
 		if ($test_owner && $row['id_member_started'] != User::$info->id)
+		{
 			continue;
+		}
 
 		$removeCache[] = $row['id_topic'];
 		$removeCacheBoards[$row['id_topic']] = $row['id_board'];
@@ -47,7 +54,9 @@ function removeTopicsPermissions($topics)
 
 	// Maybe *none* were their own topics.
 	if (!empty($removeCache))
+	{
 		removeTopics($removeCache, true, false, true, $removeCacheBoards);
+	}
 }
 
 /**
@@ -68,14 +77,18 @@ function removeTopics($topics, $decreasePostCount = true, $ignoreRecycling = fal
 
 	// Nothing to do?
 	if (empty($topics))
+	{
 		return;
+	}
 
 	$db = database();
-	$cache = \ElkArte\Cache\Cache::instance();
+	$cache = Cache::instance();
 
 	// Only a single topic.
 	if (!is_array($topics))
+	{
 		$topics = array($topics);
+	}
 
 	if ($log)
 	{
@@ -111,7 +124,9 @@ function removeTopics($topics, $decreasePostCount = true, $ignoreRecycling = fal
 		{
 			require_once(SUBSDIR . '/Members.subs.php');
 			while ($rowMembers = $db->fetch_assoc($requestMembers))
+			{
 				updateMemberData($rowMembers['id_member'], array('posts' => 'posts - ' . $rowMembers['posts']));
+			}
 		}
 		$db->free_result($requestMembers);
 	}
@@ -131,7 +146,9 @@ function removeTopics($topics, $decreasePostCount = true, $ignoreRecycling = fal
 			{
 				// If it's already in the recycle board do nothing
 				if ($row['id_board'] == $modSettings['recycle_board'])
+				{
 					continue;
+				}
 
 				$recycleTopics[] = $row['id_topic'];
 
@@ -183,7 +200,9 @@ function removeTopics($topics, $decreasePostCount = true, $ignoreRecycling = fal
 
 	// Still topics left to delete?
 	if (empty($topics))
+	{
 		return;
+	}
 
 	$adjustBoards = array();
 
@@ -218,9 +237,13 @@ function removeTopics($topics, $decreasePostCount = true, $ignoreRecycling = fal
 
 		// Add the topics to the right type.
 		if ($row['approved'])
+		{
 			$adjustBoards[$row['id_board']]['num_topics'] += $row['num_topics'];
+		}
 		else
+		{
 			$adjustBoards[$row['id_board']]['unapproved_topics'] += $row['num_topics'];
+		}
 	}
 	$db->free_result($request);
 
@@ -252,7 +275,9 @@ function removeTopics($topics, $decreasePostCount = true, $ignoreRecycling = fal
 	foreach ($possible_polls as $row)
 	{
 		if (!empty($row['id_poll']))
+		{
 			$polls[] = $row['id_poll'];
+		}
 	}
 
 	if (!empty($polls))
@@ -291,7 +316,7 @@ function removeTopics($topics, $decreasePostCount = true, $ignoreRecycling = fal
 	// Delete search index entries.
 	if (!empty($modSettings['search_custom_index_config']))
 	{
-		$customIndexSettings = \ElkArte\Util::unserialize($modSettings['search_custom_index_config']);
+		$customIndexSettings = Util::unserialize($modSettings['search_custom_index_config']);
 
 		$request = $db->query('', '
 			SELECT id_msg, body
@@ -314,6 +339,7 @@ function removeTopics($topics, $decreasePostCount = true, $ignoreRecycling = fal
 		$words = array_unique($words);
 
 		if (!empty($words) && !empty($messages))
+		{
 			$db->query('', '
 				DELETE FROM {db_prefix}log_search_words
 				WHERE id_word IN ({array_int:word_list})
@@ -323,11 +349,14 @@ function removeTopics($topics, $decreasePostCount = true, $ignoreRecycling = fal
 					'message_list' => $messages,
 				)
 			);
+		}
 	}
 
 	// Reuse the message array if available
 	if (empty($messages))
+	{
 		$messages = messagesInTopics($topics);
+	}
 
 	// If there are messages left in this topic
 	if (!empty($messages))
@@ -415,7 +444,9 @@ function removeTopics($topics, $decreasePostCount = true, $ignoreRecycling = fal
 	removeFollowUpsByTopic($topics);
 
 	foreach ($topics as $topic_id)
+	{
 		$cache->remove('topic_board-' . $topic_id);
+	}
 
 	// Maybe there's an addon that wants to delete topic related data of its own
 	call_integration_hook('integrate_remove_topics', array($topics));
@@ -431,7 +462,9 @@ function removeTopics($topics, $decreasePostCount = true, $ignoreRecycling = fal
 	require_once(SUBSDIR . '/Post.subs.php');
 	$updates = array();
 	foreach ($adjustBoards as $stats)
+	{
 		$updates[] = $stats['id_board'];
+	}
 	updateLastMessages($updates);
 }
 
@@ -468,13 +501,17 @@ function moveTopicsPermissions($moveCache)
 		$to = $moveCache[1][$row['id_topic']];
 
 		if (empty($to))
+		{
 			continue;
+		}
 
 		// Does this topic's board count the posts or not?
 		$countPosts[$row['id_topic']] = empty($row['count_posts']);
 
 		if (!isset($moveTos[$to]))
+		{
 			$moveTos[$to] = array();
+		}
 
 		$moveTos[$to][] = $row['id_topic'];
 
@@ -485,7 +522,9 @@ function moveTopicsPermissions($moveCache)
 
 	// Do the actual moves...
 	foreach ($moveTos as $to => $topics)
+	{
 		moveTopics($topics, $to, true);
+	}
 
 	// Does the post counts need to be updated?
 	if (!empty($moveTos))
@@ -520,7 +559,9 @@ function moveTopicsPermissions($moveCache)
 			{
 				$post_adj = 0;
 				foreach ($topics as $id_topic)
+				{
 					$post_adj += $topicRecounts[$id_topic];
+				}
 
 				// And now update that member's post counts
 				if (!empty($post_adj))
@@ -553,13 +594,17 @@ function moveTopics($topics, $toBoard, $log = false)
 
 	// No topics or no board?
 	if (empty($topics) || empty($toBoard))
+	{
 		return;
+	}
 
 	$db = database();
 
 	// Only a single topic.
 	if (!is_array($topics))
+	{
 		$topics = array($topics);
+	}
 
 	$fromBoards = array();
 	$fromCacheBoards = array();
@@ -580,7 +625,9 @@ function moveTopics($topics, $toBoard, $log = false)
 	);
 	// Num of rows = 0 -> no topics found. Num of rows > 1 -> topics are on multiple boards.
 	if ($db->num_rows($request) == 0)
+	{
 		return;
+	}
 
 	while ($row = $db->fetch_assoc($request))
 	{
@@ -601,9 +648,13 @@ function moveTopics($topics, $toBoard, $log = false)
 
 		// Add the topics to the right type.
 		if ($row['approved'])
+		{
 			$fromBoards[$row['id_board']]['num_topics'] += $row['num_topics'];
+		}
 		else
+		{
 			$fromBoards[$row['id_board']]['unapproved_topics'] += $row['num_topics'];
+		}
 	}
 	$db->free_result($request);
 
@@ -721,11 +772,14 @@ function moveTopics($topics, $toBoard, $log = false)
 		);
 		$approval_msgs = array();
 		while ($row = $db->fetch_assoc($request))
+		{
 			$approval_msgs[] = $row['id_msg'];
+		}
 		$db->free_result($request);
 
 		// Empty the approval queue for these, as we're going to approve them next.
 		if (!empty($approval_msgs))
+		{
 			$db->query('', '
 				DELETE FROM {db_prefix}approval_queue
 				WHERE id_msg IN ({array_int:message_list})
@@ -735,6 +789,7 @@ function moveTopics($topics, $toBoard, $log = false)
 					'id_attach' => 0,
 				)
 			);
+		}
 
 		// Get all the current max and mins.
 		$topicAttribute = topicAttribute($topics, array('id_topic', 'id_first_msg', 'id_last_msg'));
@@ -761,10 +816,12 @@ function moveTopics($topics, $toBoard, $log = false)
 		{
 			// If not, update.
 			if ($row['first_msg'] != $topicMaxMin[$row['id_topic']]['min'] || $row['last_msg'] != $topicMaxMin[$row['id_topic']]['max'])
+			{
 				setTopicAttribute($row['id_topic'], array(
 					'id_first_msg' => $row['first_msg'],
 					'id_last_msg' => $row['last_msg'],
 				));
+			}
 		}
 		$db->free_result($request);
 	}
@@ -818,10 +875,12 @@ function moveTopics($topics, $toBoard, $log = false)
 		markBoardsRead($toBoard);
 	}
 
-	$cache = \ElkArte\Cache\Cache::instance();
+	$cache = Cache::instance();
 	// Update the cache?
 	foreach ($topics as $topic_id)
+	{
 		$cache->remove('topic_board-' . $topic_id);
+	}
 
 	require_once(SUBSDIR . '/Post.subs.php');
 
@@ -957,7 +1016,9 @@ function markTopicsRead($mark_topics, $was_set = false)
 	$db = database();
 
 	if (!is_array($mark_topics))
+	{
 		return;
+	}
 
 	$db->insert($was_set ? 'replace' : 'ignore',
 		'{db_prefix}log_topics',
@@ -971,10 +1032,11 @@ function markTopicsRead($mark_topics, $was_set = false)
 
 /**
  * Update user notifications for a topic... or the board it's in.
- * @todo look at board notification...
  *
  * @param int $id_topic
  * @param int $id_board
+ * @todo look at board notification...
+ *
  */
 function updateReadNotificationsFor($id_topic, $id_board)
 {
@@ -1000,7 +1062,9 @@ function updateReadNotificationsFor($id_topic, $id_board)
 	{
 		// Find if this topic is marked for notification...
 		if (!empty($row['id_topic']))
+		{
 			$context['is_marked_notify'] = true;
+		}
 
 		// Only do this once, but mark the notifications as "not sent yet" for next time.
 		if (!empty($row['sent']))
@@ -1042,7 +1106,7 @@ function getUnreadCountSince($id_board, $id_msg_last_visit)
 		WHERE t.id_board = {int:current_board}
 			AND t.id_last_msg > COALESCE(lb.id_msg, 0)
 			AND t.id_last_msg > COALESCE(lt.id_msg, 0)' .
-				(empty($id_msg_last_visit) ? '' : '
+		(empty($id_msg_last_visit) ? '' : '
 			AND t.id_last_msg > {int:id_msg_last_visit}'),
 		array(
 			'current_board' => $id_board,
@@ -1173,20 +1237,20 @@ function topicPointer($id_topic, $id_board, $next = true, $id_member = 0, $inclu
 		SELECT t2.id_topic
 		FROM {db_prefix}topics AS t
 		INNER JOIN {db_prefix}topics AS t2 ON (' .
-			(empty($includeStickies) ? '
+		(empty($includeStickies) ? '
 				t2.id_last_msg {raw:strictly} t.id_last_msg' : '
 				(t2.id_last_msg {raw:strictly} t.id_last_msg AND t2.is_sticky {raw:strictly_equal} t.is_sticky) OR t2.is_sticky {raw:strictly} t.is_sticky')
-			. ')
+		. ')
 		WHERE t.id_topic = {int:current_topic}
 			AND t2.id_board = {int:current_board}' .
-			($includeUnapproved ? '' : '
+		($includeUnapproved ? '' : '
 				AND (t2.approved = {int:is_approved} OR (t2.id_member_started != {int:id_member_started} AND t2.id_member_started = {int:current_member}))'
-				) . '
+		) . '
 		ORDER BY' . (
-			$includeStickies ? '
+		$includeStickies ? '
 				t2.is_sticky {raw:sorting},' :
-				'') .
-			' t2.id_last_msg {raw:sorting}
+			'') .
+		' t2.id_last_msg {raw:sorting}
 		LIMIT 1',
 		array(
 			'strictly' => $next ? '<' : '>',
@@ -1213,8 +1277,8 @@ function topicPointer($id_topic, $id_board, $next = true, $id_member = 0, $inclu
 			($includeUnapproved ? '' : '
 				AND (approved = {int:is_approved} OR (id_member_started != {int:id_member_started} AND id_member_started = {int:current_member}))') . '
 			ORDER BY' . (
-				$includeStickies ? ' is_sticky {raw:sorting},' : '') .
-				' id_last_msg {raw:sorting}
+			$includeStickies ? ' is_sticky {raw:sorting},' : '') .
+			' id_last_msg {raw:sorting}
 			LIMIT 1',
 			array(
 				'sorting' => $next ? 'DESC' : '',
@@ -1279,15 +1343,19 @@ function getTopicInfo($topic_parameters, $full = '', $selects = array(), $tables
 
 	// Nothing to do
 	if (empty($topic_parameters))
+	{
 		return false;
+	}
 
 	// Build what we can with what we were given
 	if (!is_array($topic_parameters))
+	{
 		$topic_parameters = array(
 			'topic' => $topic_parameters,
 			'member' => User::$info->id,
 			'board' => (int) $board,
 		);
+	}
 
 	$messages_table = $full === 'message' || $full === 'all' || $full === 'starter';
 	$members_table = $full === 'starter';
@@ -1305,7 +1373,7 @@ function getTopicInfo($topic_parameters, $full = '', $selects = array(), $tables
 			' . (User::$info->is_guest ? 't.id_last_msg + 1' : 'COALESCE(lt.id_msg, lmr.id_msg, -1) + 1') . ' AS new_from
 			' . (!empty($modSettings['recycle_board']) && $modSettings['recycle_board'] == $board ? ', t.id_previous_board, t.id_previous_topic' : '') . '
 			' . (User::$info->is_guest === false ? ', COALESCE(lt.unwatched, 0) as unwatched' : '') : '') .
-			(!empty($selects) ? ', ' . implode(', ', $selects) : '') . '
+		(!empty($selects) ? ', ' . implode(', ', $selects) : '') . '
 		FROM {db_prefix}topics AS t' . ($messages_table ? '
 			INNER JOIN {db_prefix}messages AS ms ON (ms.id_msg = t.id_first_msg)' : '') . ($members_table ? '
 			LEFT JOIN {db_prefix}members as mem ON (mem.id_member = ms.id_member)' : '') . ($logs_table && User::$info->is_guest === false ? '
@@ -1314,11 +1382,13 @@ function getTopicInfo($topic_parameters, $full = '', $selects = array(), $tables
 			' . implode("\n\t\t\t", $tables) : '') . '
 		WHERE t.id_topic = {int:topic}
 		LIMIT 1',
-			$topic_parameters
+		$topic_parameters
 	);
 	$topic_info = array();
 	if ($request !== false)
+	{
 		$topic_info = $db->fetch_assoc($request);
+	}
 	$db->free_result($request);
 
 	return $topic_info;
@@ -1338,7 +1408,9 @@ function getTopicInfoByMsg($topic, $msg = null)
 
 	// Nothing to do
 	if (empty($topic))
+	{
 		return false;
+	}
 
 	$db = database();
 
@@ -1429,7 +1501,9 @@ function removeOldTopics(array $boards, $delete_type, $exclude_stickies, $older_
 	);
 	$topics = array();
 	while ($row = $db->fetch_assoc($request))
+	{
 		$topics[] = $row['id_topic'];
+	}
 	$db->free_result($request);
 
 	removeTopics($topics, false, true);
@@ -1451,13 +1525,15 @@ function topicsStartedBy($memberID)
 		SELECT t.id_topic
 		FROM {db_prefix}topics AS t
 		WHERE t.id_member_started = {int:selected_member}',
-			array(
-				'selected_member' => $memberID,
-			)
-		);
+		array(
+			'selected_member' => $memberID,
+		)
+	);
 	$topicIDs = array();
 	while ($row = $db->fetch_assoc($request))
+	{
 		$topicIDs[] = $row['id_topic'];
+	}
 	$db->free_result($request);
 
 	return $topicIDs;
@@ -1494,7 +1570,9 @@ function messagesSince($id_topic, $id_msg, $include_current = false, $only_appro
 	);
 	$messages = array();
 	while ($row = $db->fetch_assoc($request))
+	{
 		$messages[] = $row['id_msg'];
+	}
 	$db->free_result($request);
 
 	return $messages;
@@ -1517,7 +1595,9 @@ function countMessagesSince($id_topic, $id_msg, $include_current = false, $only_
 
 	// Give us something to work with
 	if (empty($id_topic) || empty($id_msg))
+	{
 		return false;
+	}
 
 	$request = $db->query('', '
 		SELECT COUNT(*)
@@ -1614,7 +1694,7 @@ function selectMessages($topic, $start, $items_per_page, $messages = array(), $o
 	);
 
 	$messages = array();
-	$parser = \BBC\ParserWrapper::instance();
+	$parser = ParserWrapper::instance();
 
 	for ($counter = 0; $row = $db->fetch_assoc($request); $counter++)
 	{
@@ -1670,7 +1750,7 @@ function topicMessages($topic, $render = 'print')
 	);
 
 	$posts = array();
-	$parser = \BBC\ParserWrapper::instance();
+	$parser = ParserWrapper::instance();
 
 	if ($render === 'print')
 	{
@@ -1733,7 +1813,9 @@ function messagesAttachments($id_messages)
 	{
 		$temp[$row['id_attach']] = $row;
 		if (!isset($printattach[$row['id_msg']]))
+		{
 			$printattach[$row['id_msg']] = array();
+		}
 	}
 	$db->free_result($request);
 	ksort($temp);
@@ -1784,7 +1866,9 @@ function unapprovedPosts($id_topic, $id_member)
 
 	// not all guests are the same!
 	if (empty($id_member))
+	{
 		return array();
+	}
 
 	$request = $db->query('', '
 			SELECT COUNT(id_member) AS my_unapproved_posts
@@ -1792,11 +1876,11 @@ function unapprovedPosts($id_topic, $id_member)
 			WHERE id_topic = {int:current_topic}
 				AND id_member = {int:current_member}
 				AND approved = 0',
-			array(
-				'current_topic' => $id_topic,
-				'current_member' => $id_member,
-			)
-		);
+		array(
+			'current_topic' => $id_topic,
+			'current_member' => $id_member,
+		)
+	);
 	list ($myUnapprovedPosts) = $db->fetch_row($request);
 	$db->free_result($request);
 
@@ -1845,6 +1929,7 @@ function updateSplitTopics($options, $id_board)
 	// If the new topic isn't approved ensure the first message flags
 	// this just in case.
 	if (!$options['split2_approved'])
+	{
 		$db->query('', '
 			UPDATE {db_prefix}messages
 			SET approved = {int:approved}
@@ -1856,6 +1941,7 @@ function updateSplitTopics($options, $id_board)
 				'id_topic' => $options['split2_ID_TOPIC'],
 			)
 		);
+	}
 
 	// The board has more topics now (Or more unapproved ones!).
 	$db->query('', '
@@ -1893,8 +1979,8 @@ function topicStatus($topic)
  *
  * @param int|int[] $topic
  * @param mixed[] $attributes
- * @todo limited to integer attributes
  * @return int number of row affected
+ * @todo limited to integer attributes
  */
 function setTopicAttribute($topic, $attributes)
 {
@@ -1909,7 +1995,9 @@ function setTopicAttribute($topic, $attributes)
 	}
 
 	if (empty($update))
+	{
 		return false;
+	}
 
 	$attributes['current_topic'] = (array) $topic;
 
@@ -1955,7 +2043,9 @@ function topicAttribute($id_topic, $attributes)
 	{
 		$status = array();
 		while ($row = $db->fetch_assoc($request))
+		{
 			$status[] = $row;
+		}
 	}
 	else
 	{
@@ -2095,7 +2185,9 @@ function getLoggedTopics($member, $topics)
 	);
 	$logged_topics = array();
 	while ($row = $db->fetch_assoc($request))
+	{
 		$logged_topics[$row['id_topic']] = $row;
+	}
 	$db->free_result($request);
 
 	return $logged_topics;
@@ -2114,7 +2206,9 @@ function topicsList($topic_ids)
 
 	// you have to want *something* from this function
 	if (empty($topic_ids))
+	{
 		return array();
+	}
 
 	$db = database();
 
@@ -2184,8 +2278,10 @@ function getTopicsPostsAndPoster($topic, $limit, $sort)
 	while ($row = $db->fetch_assoc($request))
 	{
 		if (!empty($row['id_member']))
+		{
 			$topic_details['all_posters'][$row['id_msg']] = $row['id_member'];
-			$topic_details['messages'][] = $row['id_msg'];
+		}
+		$topic_details['messages'][] = $row['id_msg'];
 	}
 	$db->free_result($request);
 
@@ -2220,7 +2316,7 @@ function removeMessages($messages, $messageDetails, $type = 'replies')
 	}
 	else
 	{
-		$remover = new \ElkArte\MessagesDelete($modSettings['recycle_enable'], $modSettings['recycle_board']);
+		$remover = new MessagesDelete($modSettings['recycle_enable'], $modSettings['recycle_board']);
 		foreach ($messages as $post)
 		{
 			$remover->removeMessage($post);
@@ -2249,7 +2345,9 @@ function approveMessages($messages, $messageDetails, $type = 'replies')
 
 		// and tell the world about it again
 		foreach ($messages as $post)
+		{
 			logAction('approve', array('topic' => $messageDetails[$post]['topic'], 'subject' => $messageDetails[$post]['subject'], 'member' => $messageDetails[$post]['member'], 'board' => $messageDetails[$post]['board']));
+		}
 	}
 }
 
@@ -2268,10 +2366,14 @@ function approveTopics($topics, $approve = true, $log = false)
 	global $board;
 
 	if (!is_array($topics))
+	{
 		$topics = array($topics);
+	}
 
 	if (empty($topics))
+	{
 		return false;
+	}
 
 	$db = database();
 
@@ -2314,10 +2416,13 @@ function approveTopics($topics, $approve = true, $log = false)
 	);
 	$msgs = array();
 	while ($row = $db->fetch_assoc($request))
+	{
 		$msgs[] = $row['id_msg'];
+	}
 	$db->free_result($request);
 
 	require_once(SUBSDIR . '/Post.subs.php');
+
 	return approvePosts($msgs, $approve);
 }
 
@@ -2349,7 +2454,7 @@ function postSplitRedirect($reason, $subject, $board_info, $new_topic)
 	));
 
 	$msgOptions = array(
-		'subject' => $txt['split'] . ': ' . strtr(\ElkArte\Util::htmltrim(\ElkArte\Util::htmlspecialchars($subject)), array("\r" => '', "\n" => '', "\t" => '')),
+		'subject' => $txt['split'] . ': ' . strtr(Util::htmltrim(Util::htmlspecialchars($subject)), array("\r" => '', "\n" => '', "\t" => '')),
 		'body' => $reason,
 		'icon' => 'moved',
 		'smileys_enabled' => 1,
@@ -2379,8 +2484,8 @@ function postSplitRedirect($reason, $subject, $board_info, $new_topic)
  * logs the action in the moderation log.
  * a notification is sent to all users monitoring this topic.
  *
- * @param int    $split1_ID_TOPIC
- * @param int[]  $splitMessages
+ * @param int $split1_ID_TOPIC
+ * @param int[] $splitMessages
  * @param string $new_subject
  *
  * @return int the topic ID of the new split topic.
@@ -2394,7 +2499,9 @@ function splitTopic($split1_ID_TOPIC, $splitMessages, $new_subject)
 
 	// Nothing to split?
 	if (empty($splitMessages))
+	{
 		throw new \ElkArte\Exceptions\Exception('no_posts_selected', false);
+	}
 
 	// Get some board info.
 	$topicAttribute = topicAttribute($split1_ID_TOPIC, array('id_board', 'approved'));
@@ -2419,7 +2526,9 @@ function splitTopic($split1_ID_TOPIC, $splitMessages, $new_subject)
 	);
 	// You can't select ALL the messages!
 	if ($db->num_rows($request) == 0)
+	{
 		throw new \ElkArte\Exceptions\Exception('selected_all_posts', false);
+	}
 
 	$split1_first_msg = null;
 	$split1_last_msg = null;
@@ -2428,10 +2537,14 @@ function splitTopic($split1_ID_TOPIC, $splitMessages, $new_subject)
 	{
 		// Get the right first and last message dependant on approved state...
 		if (empty($split1_first_msg) || $row['myid_first_msg'] < $split1_first_msg)
+		{
 			$split1_first_msg = $row['myid_first_msg'];
+		}
 
 		if (empty($split1_last_msg) || $row['approved'])
+		{
 			$split1_last_msg = $row['myid_last_msg'];
+		}
 
 		// Get the counts correct...
 		if ($row['approved'])
@@ -2442,10 +2555,14 @@ function splitTopic($split1_ID_TOPIC, $splitMessages, $new_subject)
 		else
 		{
 			if (!isset($split1_replies))
+			{
 				$split1_replies = 0;
+			}
 			// If the topic isn't approved then num replies must go up by one... as first post wouldn't be counted.
 			elseif (!$split1_approved)
+			{
 				$split1_replies++;
+			}
 
 			$split1_unapprovedposts = $row['message_count'];
 		}
@@ -2472,10 +2589,14 @@ function splitTopic($split1_ID_TOPIC, $splitMessages, $new_subject)
 	{
 		// As before get the right first and last message dependant on approved state...
 		if (empty($split2_first_msg) || $row['myid_first_msg'] < $split2_first_msg)
+		{
 			$split2_first_msg = $row['myid_first_msg'];
+		}
 
 		if (empty($split2_last_msg) || $row['approved'])
+		{
 			$split2_last_msg = $row['myid_last_msg'];
+		}
 
 		// Then do the counts again...
 		if ($row['approved'])
@@ -2488,13 +2609,19 @@ function splitTopic($split1_ID_TOPIC, $splitMessages, $new_subject)
 		{
 			// Should this one be approved??
 			if ($split2_first_msg == $row['myid_first_msg'])
+			{
 				$split2_approved = false;
+			}
 
 			if (!isset($split2_replies))
+			{
 				$split2_replies = 0;
+			}
 			// As before, fix number of replies.
 			elseif (!$split2_approved)
+			{
 				$split2_replies++;
+			}
 
 			$split2_unapprovedposts = $row['message_count'];
 		}
@@ -2505,11 +2632,15 @@ function splitTopic($split1_ID_TOPIC, $splitMessages, $new_subject)
 
 	// No database changes yet, so let's double check to see if everything makes at least a little sense.
 	if ($split1_first_msg <= 0 || $split1_last_msg <= 0 || $split2_first_msg <= 0 || $split2_last_msg <= 0 || $split1_replies < 0 || $split2_replies < 0 || $split1_unapprovedposts < 0 || $split2_unapprovedposts < 0 || !isset($split1_approved) || !isset($split2_approved))
+	{
 		throw new \ElkArte\Exceptions\Exception('cant_find_messages');
+	}
 
 	// You cannot split off the first message of a topic.
 	if ($split1_first_msg > $split2_first_msg)
+	{
 		throw new \ElkArte\Exceptions\Exception('split_first_post', false);
+	}
 
 	// The message that is starting the new topic may have likes, these become topic likes
 	require_once(SUBSDIR . '/Likes.subs.php');
@@ -2538,14 +2669,18 @@ function splitTopic($split1_ID_TOPIC, $splitMessages, $new_subject)
 	);
 	$split2_ID_TOPIC = $db->insert_id('{db_prefix}topics', 'id_topic');
 	if ($split2_ID_TOPIC <= 0)
+	{
 		throw new \ElkArte\Exceptions\Exception('cant_insert_topic');
+	}
 
 	// Move the messages over to the other topic.
-	$new_subject = strtr(\ElkArte\Util::htmltrim(\ElkArte\Util::htmlspecialchars($new_subject)), array("\r" => '', "\n" => '', "\t" => ''));
+	$new_subject = strtr(Util::htmltrim(Util::htmlspecialchars($new_subject)), array("\r" => '', "\n" => '', "\t" => ''));
 
 	// Check the subject length.
-	if (\ElkArte\Util::strlen($new_subject) > 100)
-		$new_subject = \ElkArte\Util::substr($new_subject, 0, 100);
+	if (Util::strlen($new_subject) > 100)
+	{
+		$new_subject = Util::substr($new_subject, 0, 100);
+	}
 
 	// Valid subject?
 	if ($new_subject != '')
@@ -2607,7 +2742,9 @@ function splitTopic($split1_ID_TOPIC, $splitMessages, $new_subject)
 	{
 		$replaceEntries = array();
 		while ($row = $db->fetch_assoc($request))
+		{
 			$replaceEntries[] = array($row['id_member'], $split2_ID_TOPIC, $row['id_msg'], $row['unwatched']);
+		}
 
 		require_once(SUBSDIR . '/Topic.subs.php');
 		markTopicsRead($replaceEntries, false);
@@ -2626,7 +2763,7 @@ function splitTopic($split1_ID_TOPIC, $splitMessages, $new_subject)
 	sendNotifications($split1_ID_TOPIC, 'split');
 
 	// If there's a search index that needs updating, update it...
-	$searchAPI = new \ElkArte\Search\SearchApiWrapper(!empty($modSettings['search_index']) ? $modSettings['search_index'] : '');
+	$searchAPI = new SearchApiWrapper(!empty($modSettings['search_index']) ? $modSettings['search_index'] : '');
 	$searchAPI->topicSplit($split2_ID_TOPIC, $splitMessages);
 
 	// Return the ID of the newly created topic.
@@ -2652,12 +2789,16 @@ function splitAttemptMove($boards, $totopic)
 	{
 		$doMove = false;
 		if (allowedTo('move_any'))
+		{
 			$doMove = true;
+		}
 		else
 		{
 			$new_topic = getTopicInfo($totopic);
 			if ($new_topic['id_member_started'] == User::$info->id && allowedTo('move_own'))
+			{
 				$doMove = true;
+			}
 		}
 
 		if ($doMove)
@@ -2680,7 +2821,9 @@ function splitAttemptMove($boards, $totopic)
 				while ($row = $db->fetch_assoc($request))
 				{
 					if (!isset($posters[$row['id_member']]))
+					{
 						$posters[$row['id_member']] = 0;
+					}
 
 					$posters[$row['id_member']]++;
 				}
@@ -2691,10 +2834,14 @@ function splitAttemptMove($boards, $totopic)
 				{
 					// The board we're moving from counted posts, but not to.
 					if (empty($boards['current']['count_posts']))
+					{
 						updateMemberData($id_member, array('posts' => 'posts - ' . $posts));
+					}
 					// The reverse: from didn't, to did.
 					else
+					{
 						updateMemberData($id_member, array('posts' => 'posts + ' . $posts));
+					}
 				}
 			}
 
@@ -2702,7 +2849,9 @@ function splitAttemptMove($boards, $totopic)
 			moveTopics($totopic, $boards['destination']['id']);
 		}
 		else
+		{
 			$boards['destination'] = $boards['current'];
+		}
 	}
 }
 
@@ -2720,19 +2869,27 @@ function splitDestinationBoard($toboard = 0)
 
 	$current_board = boardInfo($board, $topic);
 	if (empty($current_board))
+	{
 		throw new \ElkArte\Exceptions\Exception('no_board');
+	}
 
 	if (!empty($toboard) && $board !== $toboard)
 	{
 		$destination_board = boardInfo($toboard);
 		if (empty($destination_board))
+		{
 			throw new \ElkArte\Exceptions\Exception('no_board');
+		}
 	}
 
 	if (!isset($destination_board))
+	{
 		$destination_board = array_merge($current_board, array('id' => $board));
+	}
 	else
+	{
 		$destination_board['id'] = $toboard;
+	}
 
 	return array('current' => $current_board, 'destination' => $destination_board);
 }
@@ -2774,7 +2931,7 @@ function topicNotificationCount($memID)
  * (used by createList() callbacks)
  *
  * @param int $start The item to start with (for pagination purposes)
- * @param int $items_per_page  The number of items to show per page
+ * @param int $items_per_page The number of items to show per page
  * @param string $sort A string indicating how to sort the results
  * @param int $memID id_member
  * @return array
@@ -2867,7 +3024,9 @@ function postersCount($id_topic)
 	while ($row = $db->fetch_assoc($request))
 	{
 		if (!isset($posters[$row['id_member']]))
+		{
 			$posters[$row['id_member']] = 0;
+		}
 
 		$posters[$row['id_member']]++;
 	}
@@ -2978,10 +3137,12 @@ function messagesInTopics($topics)
 		WHERE id_topic IN ({array_int:topic_list})',
 		array(
 			'topic_list' => $topics,
-	));
+		));
 	$messages = array();
 	while ($row = $db->fetch_assoc($request))
+	{
 		$messages[] = $row['id_msg'];
+	}
 	$db->free_result($request);
 
 	return $messages;
@@ -3005,9 +3166,11 @@ function topicsPosters($topics)
 		WHERE id_topic IN ({array_int:topic_list})',
 		array(
 			'topic_list' => $topics,
-	));
+		));
 	while ($row = $db->fetch_assoc($request))
+	{
 		$members[$row['id_member']][] = $row['id_topic'];
+	}
 	$db->free_result($request);
 
 	return $members;
@@ -3117,7 +3280,9 @@ function fixMergedTopics($first_msg, $topics, $id_topic, $target_board, $target_
 	{
 		$replaceEntries = array();
 		while ($row = $db->fetch_assoc($request))
+		{
 			$replaceEntries[] = array($row['id_member'], $id_topic, $row['new_id_msg'], $row['unwatched']);
+		}
 
 		markTopicsRead($replaceEntries, true);
 		unset($replaceEntries);
@@ -3148,14 +3313,16 @@ function fixMergedTopics($first_msg, $topics, $id_topic, $target_board, $target_
 		{
 			$replaceEntries = array();
 			while ($row = $db->fetch_assoc($request))
+			{
 				$replaceEntries[] = array($row['id_member'], $id_topic, 0, $row['sent']);
+			}
 
 			$db->insert('replace',
-					'{db_prefix}log_notify',
-					array('id_member' => 'int', 'id_topic' => 'int', 'id_board' => 'int', 'sent' => 'int'),
-					$replaceEntries,
-					array('id_member', 'id_topic', 'id_board')
-				);
+				'{db_prefix}log_notify',
+				array('id_member' => 'int', 'id_topic' => 'int', 'id_board' => 'int', 'sent' => 'int'),
+				$replaceEntries,
+				array('id_member', 'id_topic', 'id_board')
+			);
 			unset($replaceEntries);
 
 			$db->query('', '
@@ -3200,7 +3367,9 @@ function getSubject($id_topic)
 	);
 
 	if ($db->num_rows($request) == 0)
+	{
 		throw new \ElkArte\Exceptions\Exception('topic_gone', false);
+	}
 
 	list ($subject) = $db->fetch_row($request);
 	$db->free_result($request);
@@ -3221,7 +3390,9 @@ function updateTopicStats($increment = null)
 	$db = database();
 
 	if ($increment === true)
+	{
 		updateSettings(array('totalTopics' => true), true);
+	}
 	else
 	{
 		// Get the number of topics - a SUM is better for InnoDB tables.
@@ -3264,7 +3435,9 @@ function toggleTopicsLock($topics, $log = false)
 		// Skip the entry if it needs to be checked and the user is not the owen and
 		// the topic was not locked or locked by someone with more permissions
 		if ($needs_check && (User::$info->id != $row['id_member_started'] || !in_array($row['locked'], array(0, 2))))
+		{
 			continue;
+		}
 
 		$lockCache[] = $row['id_topic'];
 

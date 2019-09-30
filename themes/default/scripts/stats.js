@@ -4,7 +4,7 @@
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause (see accompanying LICENSE.txt file)
  *
  * This file contains code covered by:
- * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * copyright: 2011 Simple Machines (http://www.simplemachines.org)
  *
  * @version 2.0 dev
  */
@@ -29,13 +29,15 @@ function elk_StatsCenter(oOptions)
 }
 
 // Start up the stats area, current year/month expanded, all others collapsed and ready for action
-elk_StatsCenter.prototype.init = function()
+elk_StatsCenter.prototype.init = function ()
 {
 	this.oTable = document.getElementById(this.opt.sTableId);
 
 	// Is the table actually present?
 	if (typeof (this.oTable) !== 'object')
+	{
 		return;
+	}
 
 	// Find all months and years defined in the table.
 	var aRows = this.oTable.getElementsByTagName('tr'),
@@ -71,11 +73,11 @@ elk_StatsCenter.prototype.init = function()
 				bCurrentlyCollapsed: oCurYear.bIsCollapsed,
 				instanceRef: this,
 				sYearId: sYearId,
-				funcOnBeforeCollapse: function() {
+				funcOnBeforeCollapse: function ()
+				{
 					this.opt.instanceRef.onBeforeCollapseYear(this);
 				},
-				aSwappableContainers: [
-				],
+				aSwappableContainers: [],
 				aSwapImages: [
 					{
 						sId: this.opt.sYearImageIdPrefix + sYearId,
@@ -119,14 +121,15 @@ elk_StatsCenter.prototype.init = function()
 				bCurrentlyCollapsed: oCurMonth.bIsCollapsed,
 				instanceRef: this,
 				sMonthId: sMonthId,
-				funcOnBeforeCollapse: function() {
+				funcOnBeforeCollapse: function ()
+				{
 					this.opt.instanceRef.onBeforeCollapseMonth(this);
 				},
-				funcOnBeforeExpand: function() {
+				funcOnBeforeExpand: function ()
+				{
 					this.opt.instanceRef.onBeforeExpandMonth(this);
 				},
-				aSwappableContainers: [
-				],
+				aSwappableContainers: [],
 				aSwapImages: [
 					{
 						sId: this.opt.sMonthImageIdPrefix + sMonthId,
@@ -161,16 +164,18 @@ elk_StatsCenter.prototype.init = function()
 };
 
 // Helper function for year collapsing, close the months first
-elk_StatsCenter.prototype.onBeforeCollapseYear = function(oToggle)
+elk_StatsCenter.prototype.onBeforeCollapseYear = function (oToggle)
 {
 	// Tell ElkArte that all underlying months have disappeared.
 	for (var sMonth in this.oYears[oToggle.opt.sYearId].oMonths)
 		if (this.oYears[oToggle.opt.sYearId].oMonths[sMonth].oToggle.opt.aSwappableContainers.length > 0)
+		{
 			this.oYears[oToggle.opt.sYearId].oMonths[sMonth].oToggle.changeState(true);
+		}
 };
 
 // Helper function, called before the month is collapsed
-elk_StatsCenter.prototype.onBeforeCollapseMonth = function(oToggle)
+elk_StatsCenter.prototype.onBeforeCollapseMonth = function (oToggle)
 {
 	if (!oToggle.bCollapsed)
 	{
@@ -183,18 +188,22 @@ elk_StatsCenter.prototype.onBeforeCollapseMonth = function(oToggle)
 
 		for (var i = 0, n = oYearToggle.opt.aSwappableContainers.length; i < n; i++)
 			if (!in_array(oYearToggle.opt.aSwappableContainers[i], oToggle.opt.aSwappableContainers))
+			{
 				aNewContainers[aNewContainers.length] = oYearToggle.opt.aSwappableContainers[i];
+			}
 
 		oYearToggle.opt.aSwappableContainers = aNewContainers;
 	}
 };
 
 // Helper function, called before the month is expanded out, makes the ajax call to get the data
-elk_StatsCenter.prototype.onBeforeExpandMonth = function(oToggle)
+elk_StatsCenter.prototype.onBeforeExpandMonth = function (oToggle)
 {
 	// Ignore if we're still loading the previous batch.
 	if (this.bIsLoading)
+	{
 		return;
+	}
 
 	if (oToggle.opt.aSwappableContainers.length === 0)
 	{
@@ -202,18 +211,22 @@ elk_StatsCenter.prototype.onBeforeExpandMonth = function(oToggle)
 		sendXMLDocument.call(this, elk_prepareScriptUrl(elk_scripturl) + 'action=stats;expand=' + oToggle.opt.sMonthId + ';xml', '', this.onDocReceived);
 
 		if ('ajax_indicator' in window)
+		{
 			ajax_indicator(true);
+		}
 
 		this.bIsLoading = true;
 	}
 
 	// Silently let ElkArte know this one is expanded.
 	else
+	{
 		getXMLDocument(elk_prepareScriptUrl(elk_scripturl) + 'action=stats;expand=' + oToggle.opt.sMonthId + ';xml');
+	}
 };
 
 // Callback for the xml call to get the stats information for the expanded section
-elk_StatsCenter.prototype.onDocReceived = function(oXMLDoc)
+elk_StatsCenter.prototype.onDocReceived = function (oXMLDoc)
 {
 	// Loop through all the months we got from the XML.
 	var aMonthNodes = oXMLDoc.getElementsByTagName('month');
@@ -236,9 +249,13 @@ elk_StatsCenter.prototype.onDocReceived = function(oXMLDoc)
 				var oCurCell = oCurRow.insertCell(-1);
 
 				if (this.opt.aDataCells[iCellIndex] === 'date')
+				{
 					oCurCell.style.paddingLeft = '6ex';
+				}
 				else
+				{
 					oCurCell.style.textAlign = 'center';
+				}
 
 				var sCurData = aDayNodes[iDayIndex].getAttribute(this.opt.aDataCells[iCellIndex]);
 				oCurCell.appendChild(document.createTextNode(sCurData));
@@ -252,5 +269,7 @@ elk_StatsCenter.prototype.onDocReceived = function(oXMLDoc)
 
 	this.bIsLoading = false;
 	if (typeof (window.ajax_indicator) === 'function')
+	{
 		ajax_indicator(false);
+	}
 };

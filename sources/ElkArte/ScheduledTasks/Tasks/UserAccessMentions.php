@@ -13,6 +13,8 @@
 
 namespace ElkArte\ScheduledTasks\Tasks;
 
+use ElkArte\Util;
+
 /**
  * Re-syncs if a user can access a mention,
  *
@@ -37,7 +39,7 @@ class UserAccessMentions implements ScheduledTaskInterface
 
 		if (!empty($modSettings['user_access_mentions']))
 		{
-			$user_access_mentions = \ElkArte\Util::unserialize($modSettings['user_access_mentions']);
+			$user_access_mentions = Util::unserialize($modSettings['user_access_mentions']);
 		}
 		else
 		{
@@ -51,7 +53,9 @@ class UserAccessMentions implements ScheduledTaskInterface
 			{
 				// Just to stay on the safe side...
 				if (empty($member))
+				{
 					continue;
+				}
 
 				// Just a touch of needy
 				require_once(SUBSDIR . '/Boards.subs.php');
@@ -95,9 +99,13 @@ class UserAccessMentions implements ScheduledTaskInterface
 						while ($row = $db->fetch_assoc($request))
 						{
 							if (empty($row['id_board']))
+							{
 								$remove[] = $row['id_mention'];
+							}
 							else
+							{
 								$mentions[] = $row['id_mention'];
+							}
 						}
 						$db->free_result($request);
 
@@ -108,10 +116,14 @@ class UserAccessMentions implements ScheduledTaskInterface
 
 						// If we found something toggle them and increment the start for the next round
 						if (!empty($mentions))
+						{
 							toggleMentionsAccessibility($mentions, $can == 'can');
+						}
 						// Otherwise it means we have finished with this access level for this member
 						else
+						{
 							break;
+						}
 
 						// Next batch
 						$start += $limit;
@@ -133,7 +145,9 @@ class UserAccessMentions implements ScheduledTaskInterface
 
 			// If there are no more users, scheduleTaskImmediate can be stopped
 			if (empty($user_access_mentions))
+			{
 				removeScheduleTaskImmediate('user_access_mentions', false);
+			}
 
 			return true;
 		}
@@ -162,7 +176,9 @@ class UserAccessMentions implements ScheduledTaskInterface
 			$db->free_result($request);
 
 			if ($remaining == 0)
+			{
 				$current_check = 0;
+			}
 
 			// Grab users with mentions
 			$request = $db->query('', '
@@ -210,9 +226,13 @@ class UserAccessMentions implements ScheduledTaskInterface
 				if ($db->num_rows($request2) == 1)
 				{
 					if (!empty($modSettings['user_access_mentions']))
-						$modSettings['user_access_mentions'] = \ElkArte\Util::unserialize($modSettings['user_access_mentions']);
+					{
+						$modSettings['user_access_mentions'] = Util::unserialize($modSettings['user_access_mentions']);
+					}
 					else
+					{
 						$modSettings['user_access_mentions'] = array();
+					}
 
 					// But if the member is already on the list, let's skip it
 					if (!isset($modSettings['user_access_mentions'][$row['id_member']]))

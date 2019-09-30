@@ -6,7 +6,7 @@
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause (see accompanying LICENSE.txt file)
  *
  * This file contains code covered by:
- * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * copyright: 2011 Simple Machines (http://www.simplemachines.org)
  *
  * @version 2.0 dev
  *
@@ -35,7 +35,9 @@ function template_boards_list()
 	{
 		// If there are no parent boards we can see, avoid showing an empty category (unless its collapsed).
 		if (empty($category['boards']) && !$category['is_collapsed'])
+		{
 			continue;
+		}
 
 		// @todo - Invent nifty class name for boardindex header bars.
 		echo '
@@ -44,8 +46,10 @@ function template_boards_list()
 
 		// If this category even can collapse, show a link to collapse it.
 		if ($category['can_collapse'])
+		{
 			echo '
 			<a class="chevricon i-chevron-', $category['is_collapsed'] ? 'down' : 'up', '" href="', $category['collapse_href'], '" title="', $category['is_collapsed'] ? $txt['show'] : $txt['hide'], '"></a>';
+		}
 
 		// The "category link" is only a link for logged in members. Guests just get the name.
 		echo '
@@ -55,7 +59,9 @@ function template_boards_list()
 
 		// Assuming the category hasn't been collapsed...
 		if (!$category['is_collapsed'])
+		{
 			template_list_boards($category['boards'], 'category_' . $category['id'] . '_boards');
+		}
 
 		echo '
 		</section>';
@@ -79,7 +85,7 @@ function template_boardindex_outer_above()
 		</div>';
 	}
 
-		echo '
+	echo '
 		<main>';
 }
 
@@ -98,12 +104,16 @@ function template_boardindex_outer_below()
 
 	// Show the mark all as read button?
 	if ($settings['show_mark_read'] && !$context['user']['is_guest'] && !empty($context['categories']))
+	{
 		echo '
 			', template_button_strip($context['mark_read_button'], 'right');
+	}
 
 	if ($context['user']['is_logged'])
+	{
 		echo '
 			<p title="', $txt['new_posts'], '"><i class="icon i-board-new"></i>', $txt['new_posts'], '</p>';
+	}
 
 	echo '
 			<p title="', $txt['old_posts'], '"><i class="icon i-board-off"></i>', $txt['old_posts'], '</p>
@@ -251,8 +261,10 @@ function template_ic_show_events()
 
 	// Holidays like "Christmas", "Hanukkah", and "We Love [Unknown] Day" :P.
 	if (!empty($context['calendar_holidays']))
+	{
 		echo '
 				<p class="inline holiday">', $txt['calendar_prompt'], ' ', implode(', ', $context['calendar_holidays']), '</p>';
+	}
 
 	// People's birthdays. Like mine. And yours, I guess. Kidding.
 	if (!empty($context['calendar_birthdays']))
@@ -263,8 +275,10 @@ function template_ic_show_events()
 
 		// Each member in calendar_birthdays has: id, name (person), age (if they have one set?), is_last. (last in list?), and is_today (birthday is today?)
 		foreach ($context['calendar_birthdays'] as $member)
+		{
 			echo '
 					<a href="', getUrl('profile', ['action' => 'profile', 'u' => $member['id'], 'name' => $member['name']]), '">', $member['is_today'] ? '<strong>' : '', $member['name'], $member['is_today'] ? '</strong>' : '', isset($member['age']) ? ' (' . $member['age'] . ')' : '', '</a>', $member['is_last'] ? '' : ', ';
+		}
 
 		echo '
 				</p>';
@@ -280,8 +294,10 @@ function template_ic_show_events()
 		// Each event in calendar_events should have:
 		// title, href, is_last, can_edit (are they allowed?), modify_href, and is_today.
 		foreach ($context['calendar_events'] as $event)
+		{
 			echo '
 					', $event['can_edit'] ? '<a href="' . $event['modify_href'] . '" title="' . $txt['calendar_edit'] . '" class="icon i-modify"></a> ' : '', $event['href'] == '' ? '' : '<a href="' . $event['href'] . '">', $event['is_today'] ? '<strong>' . $event['title'] . '</strong>' : $event['title'], $event['href'] == '' ? '' : '</a>', $event['is_last'] ? '<br />' : ', ';
+		}
 
 		echo '
 				</p>';
@@ -327,16 +343,24 @@ function template_ic_show_users()
 	// Handle hidden users and buddies.
 	$bracketList = array();
 	if ($context['show_buddies'])
+	{
 		$bracketList[] = comma_format($context['num_buddies']) . ' ' . ($context['num_buddies'] == 1 ? $txt['buddy'] : $txt['buddies']);
+	}
 
 	if (!empty($context['num_spiders']))
+	{
 		$bracketList[] = comma_format($context['num_spiders']) . ' ' . ($context['num_spiders'] == 1 ? $txt['spider'] : $txt['spiders']);
+	}
 
 	if (!empty($context['num_users_hidden']))
+	{
 		$bracketList[] = comma_format($context['num_users_hidden']) . ' ' . ($context['num_users_hidden'] == 1 ? $txt['hidden'] : $txt['hidden_s']);
+	}
 
 	if (!empty($bracketList))
+	{
 		echo ' (' . implode(', ', $bracketList) . ')';
+	}
 
 	echo $context['show_who'] ? '</a>' : '', '
 				</h3>';
@@ -349,8 +373,10 @@ function template_ic_show_users()
 
 		// Showing membergroups?
 		if (!empty($settings['show_group_key']) && !empty($context['membergroups']))
+		{
 			echo '
 				<p class="inline membergroups">[' . implode(',&nbsp;', $context['membergroups']) . ']</p>';
+		}
 	}
 	echo '
 			</li>';
