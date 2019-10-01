@@ -58,13 +58,14 @@ class Errors extends AbstractModel
 	/**
 	 * Retrieve the sole instance of this class.
 	 *
-	 * @return Errors
+	 * @return \ElkArte\Errors\Errors
+	 * @throws \Exception
 	 */
 	public static function instance()
 	{
 		if (self::$_errors === null)
 		{
-			self::$_errors = function_exists('database') ? new self : new self(1);
+			self::$_errors = function_exists('database') ? new self(database(), \ElkArte\User::$info) : new self(1, null);
 		}
 
 		return self::$_errors;
@@ -138,6 +139,7 @@ class Errors extends AbstractModel
 	 * @param int $line = 0
 	 *
 	 * @return string
+	 * @throws \Exception
 	 */
 	public function log_error($error_message, $error_type = 'general', $file = '', $line = 00)
 	{
@@ -219,6 +221,7 @@ class Errors extends AbstractModel
 	 * @param string|boolean $error_type
 	 * @param string $file
 	 * @param int $line
+	 * @throws \Exception
 	 */
 	private function insertLog($query_string, $error_message, $error_type, $file, $line)
 	{
