@@ -828,7 +828,8 @@ function addData($inc_data, $custom_table = null)
 	{
 		return false;
 	}
-	elseif ($custom_table !== null)
+
+	if ($custom_table !== null)
 	{
 		$table = $custom_table;
 	}
@@ -909,7 +910,8 @@ function addSeparator($title = '', $custom_table = null)
 	{
 		return false;
 	}
-	elseif ($custom_table !== null)
+
+	if ($custom_table !== null)
 	{
 		$table = $custom_table;
 	}

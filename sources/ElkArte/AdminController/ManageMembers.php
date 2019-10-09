@@ -173,6 +173,7 @@ class ManageMembers extends AbstractController
 			{
 				$context['tabs']['search']['is_last'] = true;
 			}
+
 			unset($context['tabs']['approve']);
 		}
 
@@ -269,6 +270,7 @@ class ManageMembers extends AbstractController
 					'type' => 'string'
 				)
 			);
+
 			$range_trans = array(
 				'--' => '<',
 				'-' => '<=',
@@ -343,11 +345,13 @@ class ManageMembers extends AbstractController
 						$datearray = getdate(forum_time());
 						$upperlimit = sprintf('%04d-%02d-%02d', $datearray['year'] - $search_params[$param_name], $datearray['mon'], $datearray['mday']);
 						$lowerlimit = sprintf('%04d-%02d-%02d', $datearray['year'] - $search_params[$param_name] - 1, $datearray['mon'], $datearray['mday']);
+
 						if (in_array($search_params['types'][$param_name], array('-', '--', '=')))
 						{
 							$query_parts[] = ($param_info['db_fields'][0]) . ' > {string:' . $param_name . '_minlimit}';
 							$where_params[$param_name . '_minlimit'] = ($search_params['types'][$param_name] === '--' ? $upperlimit : $lowerlimit);
 						}
+
 						if (in_array($search_params['types'][$param_name], array('+', '++', '=')))
 						{
 							$query_parts[] = ($param_info['db_fields'][0]) . ' <= {string:' . $param_name . '_pluslimit}';
@@ -759,6 +763,7 @@ class ManageMembers extends AbstractController
 			'name' => $txt['remove_groups'],
 			'is_primary' => 0,
 		);
+
 		// no primary is tricky...
 		$member_groups[0] = array(
 			'id' => 0,
@@ -905,8 +910,8 @@ class ManageMembers extends AbstractController
 
 		// Create an option list for actions allowed to be done with selected members.
 		$allowed_actions = '
-				<option selected="selected" value="">' . $txt['admin_browse_with_selected'] . ':</option>
-				<option value="" disabled="disabled">' . str_repeat('&#8212;', strlen($txt['admin_browse_with_selected'])) . '</option>';
+			<option selected="selected" value="">' . $txt['admin_browse_with_selected'] . ':</option>
+			<option value="" disabled="disabled">' . str_repeat('&#8212;', strlen($txt['admin_browse_with_selected'])) . '</option>';
 
 		foreach ($context['allowed_actions'] as $key => $desc)
 		{
@@ -918,7 +923,7 @@ class ManageMembers extends AbstractController
 		$javascript = '
 			function onSelectChange()
 			{
-				if (document.forms.postForm.todo.value == "")
+				if (document.forms.postForm.todo.value === "")
 					return;
 
 				var message = "";';
@@ -927,7 +932,7 @@ class ManageMembers extends AbstractController
 		if ($context['current_filter'] == 4)
 		{
 			$javascript .= '
-				if (document.forms.postForm.todo.value.indexOf("reject") != -1)
+				if (document.forms.postForm.todo.value.indexOf("reject") !== -1)
 					message = "' . $txt['admin_browse_w_delete'] . '";
 				else
 					message = "' . $txt['admin_browse_w_reject'] . '";';
@@ -936,9 +941,9 @@ class ManageMembers extends AbstractController
 		else
 		{
 			$javascript .= '
-				if (document.forms.postForm.todo.value.indexOf("delete") != -1)
+				if (document.forms.postForm.todo.value.indexOf("delete") !== -1)
 					message = "' . $txt['admin_browse_w_delete'] . '";
-				else if (document.forms.postForm.todo.value.indexOf("reject") != -1)
+				else if (document.forms.postForm.todo.value.indexOf("reject") !== -1)
 					message = "' . $txt['admin_browse_w_reject'] . '";
 				else if (document.forms.postForm.todo.value == "remind")
 					message = "' . $txt['admin_browse_w_remind'] . '";

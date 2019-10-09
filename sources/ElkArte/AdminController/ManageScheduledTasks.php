@@ -464,7 +464,6 @@ class ManageScheduledTasks extends AbstractController
 		);
 
 		createToken('admin-tl');
-
 		createList($listOptions);
 
 		$context['sub_template'] = 'show_list';

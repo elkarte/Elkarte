@@ -238,8 +238,10 @@ class ManageRegistration extends AbstractController
 				}
 			});
 		});', true);
+
 		$context['sub_template'] = 'admin_register';
 		$context['page_title'] = $txt['registration_center'];
+
 		createToken('admin-regc');
 	}
 
@@ -311,15 +313,14 @@ class ManageRegistration extends AbstractController
 		}
 
 		$context['agreement'] = Util::htmlspecialchars($agreement->getPlainText(false));
-
 		$context['warning'] .= $agreement->isWritable() ? '' : $txt['agreement_not_writable'];
 		$context['require_agreement'] = !empty($modSettings['requireAgreement']);
 		$context['checkbox_agreement'] = !empty($modSettings['checkboxAgreement']);
-
 		$context['sub_template'] = 'edit_agreement';
 		$context['subaction'] = 'agreement';
 		$context['agreement_show_options'] = true;
 		$context['page_title'] = $txt['registration_agreement'];
+
 		createToken('admin-rega');
 	}
 
@@ -391,13 +392,12 @@ class ManageRegistration extends AbstractController
 		}
 
 		$context['agreement'] = Util::htmlspecialchars($privacypol->getPlainText(false));
-
 		$context['warning'] .= $privacypol->isWritable() ? '' : $txt['privacypol_not_writable'];
 		$context['require_agreement'] = !empty($modSettings['requirePrivacypolicy']);
-
 		$context['sub_template'] = 'edit_agreement';
 		$context['subaction'] = 'privacypol';
 		$context['page_title'] = $txt['privacy_policy'];
+
 		// These overrides are here to be able to reuse the template in a simple way without having to change much.
 		$txt['admin_agreement'] = $txt['admin_privacypol'];
 		$txt['admin_checkbox_accept_agreement'] = $txt['admin_checkbox_accept_privacypol'];
@@ -446,6 +446,7 @@ class ManageRegistration extends AbstractController
 		// Ready the template......
 		$context['sub_template'] = 'edit_reserved_words';
 		$context['page_title'] = $txt['admin_reserved_set'];
+
 		createToken('admin-regr');
 	}
 

@@ -435,8 +435,8 @@ class ManageServer extends AbstractController
 	{
 		global $txt;
 
-		require_once(SUBSDIR . '/Cache.subs.php');
 		// Detect all available optimizers
+		require_once(SUBSDIR . '/Cache.subs.php');
 		$detected = loadCacheEngines(false);
 		$detected_names = array();
 		$detected_supported = array();
@@ -513,7 +513,8 @@ class ManageServer extends AbstractController
 				{
 					continue;
 				}
-				elseif ($key === 'loadavg_auto_opt' && $value <= 1)
+
+				if ($key === 'loadavg_auto_opt' && $value <= 1)
 				{
 					$this->_req->post->loadavg_auto_opt = '1.0';
 				}
@@ -658,8 +659,6 @@ class ManageServer extends AbstractController
 		$context['pinfo'] = $pinfo;
 		$context['page_title'] = $txt['admin_server_settings'];
 		$context['sub_template'] = 'php_info';
-
-		return;
 	}
 
 	/**

@@ -129,6 +129,7 @@ class XmlPreview extends AbstractController
 		{
 			$context['post_error']['errors'][] = $txt['error_no_subject'];
 		}
+
 		if (empty($this->_req->post->message))
 		{
 			$context['post_error']['errors'][] = $txt['error_no_message'];

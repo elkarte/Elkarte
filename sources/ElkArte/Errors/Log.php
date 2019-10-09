@@ -29,6 +29,7 @@ class Log extends AbstractModel
 	 * @param string $type action
 	 * @param array|null $filter this->_db query of the view filter being used
 	 * @param int[]|null $error_list int list of error ID's to work on
+	 * @throws \ElkArte\Exceptions\Exception
 	 */
 	public function deleteErrors($type, $filter = null, $error_list = null)
 	{
@@ -105,6 +106,7 @@ class Log extends AbstractModel
 	 * @param array|null $filter
 	 *
 	 * @return array
+	 * @throws \ElkArte\Exceptions\Exception
 	 */
 	public function getErrorLogData($start, $sort_direction = 'DESC', $filter = null)
 	{
@@ -124,9 +126,7 @@ class Log extends AbstractModel
 				'filter' => !empty($filter) ? $filter['value']['sql'] : '',
 			)
 		);
-
 		$log = array();
-
 		for ($i = 0; $row = $this->_db->fetch_assoc($request); $i++)
 		{
 			$search_message = preg_replace('~&lt;span class=&quot;remove&quot;&gt;(.+?)&lt;/span&gt;~', '%', $this->_db->escape_wildcard_string($row['message']));
@@ -187,6 +187,7 @@ class Log extends AbstractModel
 	 * @param string|null $sort
 	 *
 	 * @return array
+	 * @throws \ElkArte\Exceptions\Exception
 	 */
 	public function fetchErrorsByType($filter = null, $sort = null)
 	{
@@ -199,7 +200,8 @@ class Log extends AbstractModel
 		$request = $this->_db->query(
 			'',
 			'
-			SELECT error_type, COUNT(*) AS num_errors
+			SELECT 
+				error_type, COUNT(*) AS num_errors
 			FROM {db_prefix}log_errors
 			GROUP BY error_type
 			ORDER BY error_type = {string:critical_type} DESC, error_type ASC',
