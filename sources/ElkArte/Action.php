@@ -61,42 +61,42 @@ class Action
 	}
 
 	/**
-	 * Initialize the instance with an array of sub-actions.
+	 * Initialize the instance with an array of sub-actions. Sets a valid default action is none
+	 * is supplied.  Returns the cleaned subaction or the default action if the subaction is not
+	 * valid / available
 	 *
 	 * @param array $subActions array of known subactions
+	 * The accepted array format is:
+	 *   'sub_action name' => 'function name',
+	 *  or
+	 *   'sub_action name' => array('function' => 'function name'),
+	 *  or
+	 *   'sub_action name' => array(
+	 *   	'controller' => 'controller name',
+	 *   	'function' => 'method name',
+	 *   	'enabled' => true/false,
+	 *   	'permission' => area),
+	 *  or
+	 *   'sub_action name' => array(
+	 *   	'controller object, i.e. $this',
+	 *   	'method name',
+	 *   	'enabled' => true/false
+	 *   	'permission' => area),
+	 *  or
+	 *   'sub_action name' => array(
+	 *   	'controller' => 'controller name',
+	 *   	'function' => 'method name',
+	 *   	'enabled' => true/false,
+	 *   	'permission' => area)
 	 *
-	 *                              The accepted array format is:
-	 *                              'sub_action name' => 'function name',
-	 *                              or
-	 *                              'sub_action name' => array(
-	 *                              'function' => 'function name'),
-	 *                              or
-	 *                              'sub_action name' => array(
-	 *                              'controller' => 'controller name',
-	 *                              'function' => 'method name',
-	 *                              'enabled' => true/false,
-	 *                              'permission' => area),
-	 *                              or
-	 *                              'sub_action name' => array(
-	 *                              'controller object, i.e. $this',
-	 *                              'method name',
-	 *                              'enabled' => true/false
-	 *                              'permission' => area),
-	 *                              or
-	 *                              'sub_action name' => array(
-	 *                              'controller' => 'controller name',
-	 *                              'function' => 'method name',
-	 *                              'enabled' => true/false,
-	 *                              'permission' => area)
-	 *
-	 *                              If `enabled` is not present, it is aassumed to be true.
+	 *  If `enabled` is not present, it is assumed to be true.
 	 *
 	 * @param string $default default action if unknown sa is requested
 	 * @param string $requestParam key to check HTTP GET value, defaults to `sa`
 	 *
 	 * @event  integrate_sa_ the name specified in the constructor is appended to this
 	 *
-	 * @return string
+	 * @return string the valid subaction
 	 */
 	public function initialize(array $subActions, string $default = '', string $requestParam = 'sa'): string
 	{
@@ -108,16 +108,25 @@ class Action
 		$this->_subActions = array_filter(
 			$subActions,
 			function ($subAction) {
-				return
-					!isset($subAction['enabled'])
-					|| isset($subAction['enabled'])
-					&& $subAction['enabled'] == true;
+				if (isset($subAction['disabled']) && $subAction['disabled'] == true)
+				{
+					return false;
+				}
+
+				if (isset($subAction['enabled']) && $subAction['enabled'] == false)
+				{
+					return false;
+				}
+
+				return true;
 			}
 		);
 
 		$this->_default = $default ?: key($this->_subActions);
 
-		return $this->req->getQuery($requestParam, 'trim|strval', $this->_default);
+		$subAction = $this->req->getQuery($requestParam, 'trim|strval', $this->_default);
+
+		return !empty($this->_subActions[$subAction]) ? $subAction : $this->_default;
 	}
 
 	/**
@@ -127,6 +136,7 @@ class Action
 	 * controller is not specified, the function is assumed to be a regular callable.
 	 *
 	 * @param string $sub_id a valid index in the subactions array
+	 * @throws \ElkArte\Exceptions\Exception
 	 */
 	public function dispatch(string $sub_id): void
 	{
