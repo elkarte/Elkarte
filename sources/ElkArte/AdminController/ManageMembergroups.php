@@ -368,7 +368,7 @@ class ManageMembergroups extends AbstractController
 		require_once(SUBSDIR . '/Membergroups.subs.php');
 
 		// A form was submitted, we can start adding.
-		if (!$this->_req->comparePost('group_name', '', 'trim'))
+		if (!$this->_req->comparePost('group_name', '', 'trim', ''))
 		{
 			checkSession();
 			validateToken('admin-mmg');
