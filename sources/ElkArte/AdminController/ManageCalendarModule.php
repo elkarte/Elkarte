@@ -128,7 +128,7 @@ class ManageCalendarModule extends AbstractController
 			'id' => 'holiday_list',
 			'title' => $txt['current_holidays'],
 			'items_per_page' => 20,
-			'base_href' => getUrl('admin', ['action' => 'admin', 'area' => 'managecalendar', 'sa' => 'holidas']),
+			'base_href' => getUrl('admin', ['action' => 'admin', 'area' => 'managecalendar', 'sa' => 'holidays']),
 			'default_sort_col' => 'name',
 			'get_items' => array(
 				'file' => SUBSDIR . '/Calendar.subs.php',
@@ -203,7 +203,7 @@ class ManageCalendarModule extends AbstractController
 				array(
 					'position' => 'below_table_data',
 					'class' => 'submitbutton',
-					'value' => '<input type="submit" name="delete" value="' . $txt['quickmod_delete_selected'] . '" class="right_submit" onclick="return confirm(\'' . $txt['holidays_delete_confirm'] . '\');" />
+					'value' => '<input type="submit" name="delete" value="' . $txt['quickmod_delete_selected'] . '" onclick="return confirm(\'' . $txt['holidays_delete_confirm'] . '\');" />
 					<a class="linkbutton" href="' . getUrl('admin', ['action' => 'admin', 'area' => 'managecalendar', 'sa' => 'editholiday']) . '">' . $txt['holidays_add'] . '</a>',
 				),
 			),
@@ -238,8 +238,7 @@ class ManageCalendarModule extends AbstractController
 		$this->_req->query->holiday = $this->_req->getQuery('holiday', 'intval');
 
 		// Submitting?
-
-		if (isset($this->_req->post->{$context['session_var']}) && (isset($this->_req->post->delete) || $this->_req->post->title != ''))
+		if (isset($this->_req->post->delete) || ($this->_req->getPost('title', 'trim', '') !== ''))
 		{
 			checkSession();
 
@@ -253,7 +252,7 @@ class ManageCalendarModule extends AbstractController
 			}
 			else
 			{
-				$date = strftime($this->_req->post->year <= 4 ? '0004-%m-%d' : '%Y-%m-%d', mktime(0, 0, 0, $this->_req->post->month, $this->_req->post->day, $this->_req->post->year));
+				$date = strftime('%Y-%m-%d', mktime(0, 0, 0, $this->_req->post->month, $this->_req->post->day, $this->_req->post->year));
 				if (isset($this->_req->post->edit))
 				{
 					editHoliday($this->_req->post->holiday, $date, $this->_req->post->title);
@@ -285,7 +284,11 @@ class ManageCalendarModule extends AbstractController
 		}
 
 		// Last day for the drop down?
-		$context['holiday']['last_day'] = (int) strftime('%d', mktime(0, 0, 0, $context['holiday']['month'] == 12 ? 1 : $context['holiday']['month'] + 1, 0, $context['holiday']['month'] == 12 ? $context['holiday']['year'] + 1 : $context['holiday']['year']));
+		$context['holiday']['last_day'] = (int) strftime('%d', mktime(0, 0, 0, $context['holiday']['month'] == 12
+			? 1
+			: $context['holiday']['month'] + 1, 0, $context['holiday']['month'] == 12
+				? $context['holiday']['year'] + 1
+				: $context['holiday']['year']));
 	}
 
 	/**
