@@ -264,9 +264,9 @@ class ManageNews extends AbstractController
 			'javascript' => '
 			document.getElementById(\'list_news_lists_last\').style.display = "none";
 			document.getElementById("moreNewsItems_link").style.display = "inline";
-			var last_preview = 0;
-			var txt_preview = ' . JavaScriptEscape($txt['preview']) . ';
-			var txt_news_error_no_news = ' . JavaScriptEscape($txt['news_error_no_news']) . ';
+			var last_preview = 0,
+			    txt_preview = ' . JavaScriptEscape($txt['preview']) . ',
+			    txt_news_error_no_news = ' . JavaScriptEscape($txt['news_error_no_news']) . ';
 
 			$(function() {
 				$("div[id ^= \'preview_\']").each(function () {
@@ -530,7 +530,7 @@ class ManageNews extends AbstractController
 	private function _toAddOrExclude()
 	{
 		// Members selected (via auto select) to specifically get the newsletter
-		if (isset($this->_req->post->member_list) && is_array($this->_req->post->member_list))
+		if (is_array($this->_req->getPost('member_list')))
 		{
 			$members = array();
 			foreach ($this->_req->post->member_list as $member_id)
@@ -542,7 +542,7 @@ class ManageNews extends AbstractController
 		}
 
 		// Members selected (via auto select) to specifically not get the newsletter
-		if (isset($this->_req->post->exclude_member_list) && is_array($this->_req->post->exclude_member_list))
+		if (is_array($this->_req->getPost('exclude_member_list')))
 		{
 			$members = array();
 			foreach ($this->_req->post->exclude_member_list as $member_id)
@@ -649,42 +649,36 @@ class ManageNews extends AbstractController
 		}
 
 		// Cleaning groups is simple - although deal with both checkbox and commas.
-		if (isset($this->_req->post->groups))
+		if (is_array($this->_req->getPost('groups')))
 		{
-			if (is_array($this->_req->post->groups))
+			foreach ($this->_req->post->groups as $group => $dummy)
 			{
-				foreach ($this->_req->post->groups as $group => $dummy)
-				{
-					$context['recipients']['groups'][] = (int) $group;
-				}
+				$context['recipients']['groups'][] = (int) $group;
 			}
-			elseif (trim($this->_req->post->groups) !== '')
+		}
+		elseif ($this->_req->getPost('groups', 'trim', '') !== '')
+		{
+			$groups = explode(',', $this->_req->post->groups);
+			foreach ($groups as $group)
 			{
-				$groups = explode(',', $this->_req->post->groups);
-				foreach ($groups as $group)
-				{
-					$context['recipients']['groups'][] = (int) $group;
-				}
+				$context['recipients']['groups'][] = (int) $group;
 			}
 		}
 
 		// Same for excluded groups
-		if (isset($this->_req->post->exclude_groups))
+		if (is_array($this->_req->getPost('exclude_groups')))
 		{
-			if (is_array($this->_req->post->exclude_groups))
+			foreach ($this->_req->post->exclude_groups as $group => $dummy)
 			{
-				foreach ($this->_req->post->exclude_groups as $group => $dummy)
-				{
-					$context['recipients']['exclude_groups'][] = (int) $group;
-				}
+				$context['recipients']['exclude_groups'][] = (int) $group;
 			}
-			elseif (trim($this->_req->post->exclude_groups) !== '')
+		}
+		elseif ($this->_req->getPost('exclude_groups', 'trim', '') !== '')
+		{
+			$groups = explode(',', $this->_req->post->exclude_groups);
+			foreach ($groups as $group)
 			{
-				$groups = explode(',', $this->_req->post->exclude_groups);
-				foreach ($groups as $group)
-				{
-					$context['recipients']['exclude_groups'][] = (int) $group;
-				}
+				$context['recipients']['exclude_groups'][] = (int) $group;
 			}
 		}
 
@@ -715,8 +709,7 @@ class ManageNews extends AbstractController
 			require_once(SUBSDIR . '/PersonalMessage.subs.php');
 		}
 
-		// We are relying too much on writing to superglobals...
-		$base_subject = $this->_req->getPost('subject', 'strval', '');
+		$base_subject = $this->_req->getPost('subject', 'trim|strval', '');
 		$base_message = $this->_req->getPost('message', 'strval', '');
 
 		// Save the message and its subject in $context
@@ -733,9 +726,9 @@ class ManageNews extends AbstractController
 			}
 
 			// This is here to prevent spam filters from tagging this as spam.
-			if (preg_match('~\<html~i', $base_message) == 0)
+			if (preg_match('~<html~i', $base_message) == 0)
 			{
-				if (preg_match('~\<body~i', $base_message) == 0)
+				if (preg_match('~<body~i', $base_message) == 0)
 				{
 					$base_message = '<html><head><title>' . $base_subject . '</title></head>' . "\n" . '<body>' . $base_message . '</body></html>';
 				}

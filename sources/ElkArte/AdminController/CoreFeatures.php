@@ -376,15 +376,8 @@ class CoreFeatures extends AbstractController
 		$context['sub_template'] = 'show_settings';
 
 		// By default do the basic settings.
-		if (isset($this->_req->query->sa, $subActions[$this->_req->query->sa]))
-		{
-			$context['sub_action'] = $this->_req->query->sa;
-		}
-		elseif (!empty($defaultAction))
-		{
-			$context['sub_action'] = $defaultAction;
-		}
-		else
+		$subAction = $this->_req->getQuery('sa', 'trim|strval', $defaultAction);
+		if (empty($subAction) || empty($subActions[$subAction]))
 		{
 			$temp = array_keys($subActions);
 			$context['sub_action'] = array_pop($temp);
@@ -396,6 +389,7 @@ class CoreFeatures extends AbstractController
 	 *
 	 * @param mixed[] $core_features - The array of all the core features, as
 	 *                returned by $this->settings()
+	 * @throws \ElkArte\Exceptions\Exception
 	 */
 	private function _save_core_features($core_features)
 	{
@@ -406,7 +400,7 @@ class CoreFeatures extends AbstractController
 		// Cycle each feature and change things as required!
 		foreach ($core_features as $id => $feature)
 		{
-			$feature_id = $this->_req->getPost('feature_' . $id);
+			$feature_id = $this->_req->getPost('feature_' . $id, 'trim|strval');
 
 			// Enabled?
 			if (!empty($feature_id))
@@ -461,7 +455,7 @@ class CoreFeatures extends AbstractController
 			// Standard save callback?
 			if (isset($feature['save_callback']))
 			{
-				$status = $this->_req->getPost('feature_' . $id);
+				$status = $this->_req->getPost('feature_' . $id, 'trim|strval');
 				$feature['save_callback'](!empty($status));
 			}
 		}

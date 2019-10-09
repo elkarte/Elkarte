@@ -88,8 +88,7 @@ class ManageMaillist extends AbstractController
 		);
 
 		// Default to sub action 'emaillist' if none was given, call integrate_sa_manage_maillist
-		$subAction = isset($this->_req->query->sa) && isset($subActions[$this->_req->query->sa]) && (empty($subActions[$this->_req->query->sa]['permission']) || allowedTo($subActions[$this->_req->query->sa]['permission'])) ? $this->_req->query->sa : 'emaillist';
-		$subAction = $action->initialize($subActions, $subAction);
+		$subAction = $action->initialize($subActions, 'emaillist');
 
 		// Final bits
 		$context['page_title'] = $txt['ml_admin_configuration'];
@@ -246,21 +245,20 @@ class ManageMaillist extends AbstractController
 							{
 								return $txt['not_applicable'];
 							}
+
 							// Personal?
-							elseif ($rowData['type'] === 'p')
+							if ($rowData['type'] === 'p')
 							{
 								return $txt['personal_message'];
 							}
+
 							// New Topic?
-							elseif ($rowData['type'] === 'x')
+							if ($rowData['type'] === 'x')
 							{
 								return $txt['new_topic'];
 							}
-							// Ah a Reply then
-							else
-							{
-								return $txt['topic'] . ' ' . $txt['reply'];
-							}
+
+							return $txt['topic'] . ' ' . $txt['reply'];
 						},
 					),
 					'sort' => array(
@@ -338,11 +336,10 @@ class ManageMaillist extends AbstractController
 	{
 		global $txt, $context;
 
-		allowedTo('approve_emails');
 		checkSession('get');
 		validateToken('admin-ml', 'get');
 
-		$id = (int) $this->_req->query->item;
+		$id = $this->_req->getQuery('item', 'intval', null);
 		if (!empty($id))
 		{
 			// Load up the email details, no funny biz ;)
@@ -402,11 +399,10 @@ class ManageMaillist extends AbstractController
 	 */
 	public function action_delete_email()
 	{
-		allowedTo('approve_emails');
 		checkSession('get');
 		validateToken('admin-ml', 'get');
 
-		$id = (int) $this->_req->query->item;
+		$id = $this->_req->getQuery('item', 'intval', null);
 
 		// Remove this entry
 		if (!empty($id))
@@ -436,12 +432,11 @@ class ManageMaillist extends AbstractController
 	{
 		global $txt;
 
-		allowedTo('approve_emails');
 		checkSession('get');
 		validateToken('admin-ml', 'get');
 
 		// Get the id to approve
-		$id = (int) $this->_req->query->item;
+		$id = $this->_req->getQuery('item', 'intval', null);
 
 		if (!empty($id) && $id !== -1)
 		{

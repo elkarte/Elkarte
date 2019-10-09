@@ -71,7 +71,7 @@ class AdminDebug extends AbstractController
 		$debug = Debug::instance();
 
 		// If we're just hiding/showing, do it now.
-		if (isset($this->_req->query->sa) && $this->_req->query->sa === 'hide')
+		if ($this->_req->compareQuery('sa', 'hide', 'trim|strval'))
 		{
 			$debug->toggleViewQueries();
 
@@ -86,8 +86,8 @@ class AdminDebug extends AbstractController
 		}
 
 		// Looking at a specific query?
-		$query_id = $this->_req->getQuery('qq', 'intval');
-		$query_id = $query_id === null ? -1 : $query_id - 1;
+		$query_id = $this->_req->getQuery('qq', 'intval', 0);
+		$query_id = $query_id - 1;
 
 		// Just to stay on the safe side, better remove any layer and add back only html
 		$layers = theme()->getLayers();

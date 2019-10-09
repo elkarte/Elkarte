@@ -53,10 +53,10 @@ class Modlog extends AbstractController
 		require_once(SUBSDIR . '/Modlog.subs.php');
 
 		// Are we looking at the moderation log or the administration log.
-		$context['log_type'] = isset($this->_req->query->sa) && $this->_req->query->sa === 'adminlog' ? 3 : 1;
+		$context['log_type'] = $this->_req->compareQuery('sa', 'adminlog') ? 3 : 1;
 
 		// Trying to view the admin log, lets check you can.
-		if ($context['log_type'] == 3)
+		if ($context['log_type'] === 3)
 		{
 			isAllowedTo('admin_forum');
 		}

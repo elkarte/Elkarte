@@ -63,6 +63,7 @@ use ElkArte\User;
  *     - hook                      => hook name to call integrate_ . 'hook name' . '_areas'
  *     - default_include_dir       => directory to include for function support
  * @return mixed[]|false
+ * @throws \ElkArte\Exceptions\Exception
  */
 function createMenu($menuData, $menuOptions = array())
 {
@@ -90,9 +91,9 @@ function createMenu($menuData, $menuOptions = array())
 	$menu_context['current_action'] = isset($menuOptions['action']) ? $menuOptions['action'] : $context['current_action'];
 
 	// What is the current area selected?
-	if (isset($menuOptions['current_area']) || isset($_req->query->area))
+	if (isset($menuOptions['current_area']) || $_req->is_set('area'))
 	{
-		$menu_context['current_area'] = isset($menuOptions['current_area']) ? $menuOptions['current_area'] : $_req->query->area;
+		$menu_context['current_area'] = isset($menuOptions['current_area']) ? $menuOptions['current_area'] : $_req->getQuery('area', 'trim');
 	}
 
 	// Build a list of additional parameters that should go in the URL.
@@ -254,16 +255,14 @@ function createMenu($menuData, $menuOptions = array())
 										}
 
 										// Is this the current subsection?
-										if (isset($_req->query->sa) && $_req->query->sa === $sa)
+										if ($_req->compareQuery('sa', $sa, 'trim'))
 										{
 											$menu_context['current_subsection'] = $sa;
 										}
-
-										elseif (isset($sub['active']) && isset($_req->query->sa) && in_array($_req->query->sa, $sub['active']))
+										elseif (isset($sub['active']) && in_array($_req->getQuery('sa', 'trim'), $sub['active']))
 										{
 											$menu_context['current_subsection'] = $sa;
 										}
-
 										// Otherwise is it the default?
 										elseif (!isset($menu_context['current_subsection']) && !empty($sub[2]))
 										{

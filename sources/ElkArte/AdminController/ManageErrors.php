@@ -46,7 +46,7 @@ class ManageErrors extends AbstractController
 		$activity = $this->_req->getQuery('activity', 'strval');
 
 		// Some code redundancy... and we only take this!
-		if (isset($activity) && $activity == 'file')
+		if (isset($activity) && $activity === 'file')
 			// View the file with the error
 		{
 			$this->action_viewfile();
@@ -141,7 +141,7 @@ class ManageErrors extends AbstractController
 			$this->errorLog->deleteErrors($type, $filter, $error_list);
 
 			// Go back to where we were.
-			if ($type == 'delete')
+			if ($type === 'delete')
 			{
 				redirectexit('action=admin;area=logs;sa=errorlog' . (isset($this->_req->query->desc) ? ';desc' : '') . ';start=' . $this->_req->query->start . (!empty($filter) ? ';filter=' . $this->_req->query->filter . ';value=' . $this->_req->query->value : ''));
 			}
@@ -243,25 +243,31 @@ class ManageErrors extends AbstractController
 			'line' => $txt['line'],
 		);
 
-		$filter = array();
+		$filter = $this->_req->getQuery('filter', 'trim', null);
+		$value = $this->_req->getQuery('value', 'trim', null);
 
 		// Set up the filtering...
-		if (isset($this->_req->query->value, $this->_req->query->filter) && isset($filters[$this->_req->query->filter]))
+		if (isset($value, $filters[$filter]))
 		{
 			$filter = array(
-				'variable' => $this->_req->query->filter,
+				'variable' => $filter,
 				'value' => array(
-					'sql' => in_array($this->_req->query->filter, array('message', 'url', 'file'))
-						? base64_decode(strtr($this->_req->query->value, array(' ' => '+')))
-						: $db->escape_wildcard_string($this->_req->query->value),
+					'sql' => in_array($filter, array('message', 'url', 'file'))
+						? base64_decode(strtr($value, array(' ' => '+')))
+						: $db->escape_wildcard_string($value),
 				),
-				'href' => ';filter=' . $this->_req->query->filter . ';value=' . $this->_req->query->value,
-				'entity' => $filters[$this->_req->query->filter]
+				'href' => ';filter=' . $filter . ';value=' . $value,
+				'entity' => $filters[$filter]
 			);
 		}
-		elseif (isset($this->_req->query->filter) || isset($this->_req->query->value))
+		else
 		{
-			unset($this->_req->query->filter, $this->_req->query->value);
+			if (isset($filter, $value))
+			{
+				unset($this->_req->query->filter, $this->_req->query->value);
+			}
+
+			$filter = [];
 		}
 
 		return $filter;

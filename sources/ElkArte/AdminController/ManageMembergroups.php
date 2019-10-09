@@ -89,11 +89,8 @@ class ManageMembergroups extends AbstractController
 			'description' => $txt['membergroups_description'],
 		);
 
-		// Default to sub action 'index' or 'settings' depending on permissions.
-		$subAction = isset($this->_req->query->sa) && isset($subActions[$this->_req->query->sa]) ? $this->_req->query->sa : (allowedTo('manage_membergroups') ? 'index' : 'settings');
-
 		// Set that subaction, call integrate_sa_manage_membergroups
-		$subAction = $action->initialize($subActions, $subAction);
+		$subAction = $action->initialize($subActions, allowedTo('manage_membergroups') ? 'index' : 'settings');
 
 		// Final items for the template
 		$context['page_title'] = $txt['membergroups_title'];
@@ -371,7 +368,7 @@ class ManageMembergroups extends AbstractController
 		require_once(SUBSDIR . '/Membergroups.subs.php');
 
 		// A form was submitted, we can start adding.
-		if (isset($this->_req->post->group_name) && trim($this->_req->post->group_name) !== '')
+		if (!$this->_req->comparePost('group_name', '', 'trim'))
 		{
 			checkSession();
 			validateToken('admin-mmg');
@@ -403,14 +400,14 @@ class ManageMembergroups extends AbstractController
 				$this->_req->post->perm_type = '';
 			}
 
-			if ($this->_req->post->perm_type == 'predefined')
+			if ($this->_req->post->perm_type === 'predefined')
 			{
 				// Set default permission level.
 				require_once(SUBSDIR . '/ManagePermissions.subs.php');
 				setPermissionLevel($this->_req->post->level, $id_group, null);
 			}
 			// Copy or inherit the permissions!
-			elseif ($this->_req->post->perm_type == 'copy' || $this->_req->post->perm_type == 'inherit')
+			elseif ($this->_req->post->perm_type === 'copy' || $this->_req->post->perm_type === 'inherit')
 			{
 				$copy_id = $this->_req->post->perm_type == 'copy' ? (int) $this->_req->post->copyperm : (int) $this->_req->post->inheritperm;
 
@@ -431,13 +428,12 @@ class ManageMembergroups extends AbstractController
 				copyBoardPermissions($id_group, $copy_id);
 
 				// Also get some membergroup information if we're copying and not copying from guests...
-				if ($copy_id > 0 && $this->_req->post->perm_type == 'copy')
+				if ($copy_id > 0 && $this->_req->post->perm_type === 'copy')
 				{
 					updateCopiedGroup($id_group, $copy_id);
 				}
-
 				// If inheriting say so...
-				elseif ($this->_req->post->perm_type == 'inherit')
+				elseif ($this->_req->post->perm_type === 'inherit')
 				{
 					updateInheritedGroup($id_group, $copy_id);
 				}
@@ -548,7 +544,7 @@ class ManageMembergroups extends AbstractController
 	{
 		global $context, $txt, $modSettings;
 
-		$current_group_id = isset($this->_req->query->group) ? (int) $this->_req->query->group : 0;
+		$current_group_id = $this->_req->getQuery('group', 'intval', 0);
 		$current_group = array();
 
 		if (!empty($modSettings['deny_boards_access']))
@@ -713,7 +709,7 @@ class ManageMembergroups extends AbstractController
 			}
 
 			// Lastly, moderators!
-			$moderator_string = isset($this->_req->post->group_moderators) ? trim($this->_req->post->group_moderators) : '';
+			$moderator_string = $this->_req->getPost('group_moderators', 'trim', '');
 			detachGroupModerators($current_group['id_group']);
 
 			if ((!empty($moderator_string) || !empty($this->_req->post->moderator_list)) && $min_posts == -1 && $current_group['id_group'] != 3)
@@ -862,11 +858,8 @@ class ManageMembergroups extends AbstractController
 		$context['sub_template'] = 'show_settings';
 		$context['page_title'] = $txt['membergroups_settings'];
 
-		// initialize the form
 		// Instantiate the form
 		$settingsForm = new SettingsForm(SettingsForm::DB_ADAPTER);
-
-		// Initialize it with our settings
 		$settingsForm->setConfigVars($this->_settings());
 
 		if (isset($this->_req->query->save))

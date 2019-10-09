@@ -151,7 +151,7 @@ class AddonSettings extends AbstractController
 	 *
 	 * @throws \ElkArte\Exceptions\Exception
 	 */
-	public function loadGeneralSettingParameters($subActions = array(), $defaultAction = '')
+	public function loadGeneralSettingParameters($subActions = [], $defaultAction = '')
 	{
 		global $context;
 
@@ -164,20 +164,13 @@ class AddonSettings extends AbstractController
 		$context['sub_template'] = 'show_settings';
 
 		// By default do the basic settings.
-		if (isset($this->_req->query->sa, $subActions[$this->_req->query->sa]))
-		{
-			$sa = $this->_req->query->sa;
-		}
-		elseif (!empty($defaultAction))
-		{
-			$sa = $defaultAction;
-		}
-		else
+		$subAction = $this->_req->getQuery('sa', 'trim|strval', $defaultAction);
+		if (empty($subAction) || empty($subActions[$subAction]))
 		{
 			$keys = array_keys($subActions);
-			$sa = array_pop($keys);
+			$subAction = array_pop($keys);
 		}
 
-		$context['sub_action'] = $sa;
+		$context['sub_action'] = $subAction;
 	}
 }

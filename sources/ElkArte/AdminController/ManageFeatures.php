@@ -184,6 +184,7 @@ class ManageFeatures extends AbstractController
 			writeLog();
 			redirectexit('action=admin;area=featuresettings;sa=basic');
 		}
+
 		if (isset($this->_req->post->cleanhives))
 		{
 			$clean_hives_result = theme()->cleanHives();
@@ -714,14 +715,12 @@ class ManageFeatures extends AbstractController
 			$codes = ParserWrapper::instance()->getCodes();
 			$bbcTags = $codes->getTags();
 
-			if (!isset($this->_req->post->signature_bbc_enabledTags))
+			$signature_bbc_enabledTags = $this->_req->getPost('signature_bbc_enabledTags', null, []);
+			if (!is_array($signature_bbc_enabledTags))
 			{
-				$this->_req->post->signature_bbc_enabledTags = array();
+				$signature_bbc_enabledTags = array($signature_bbc_enabledTags);
 			}
-			elseif (!is_array($this->_req->post->signature_bbc_enabledTags))
-			{
-				$this->_req->post->signature_bbc_enabledTags = array($this->_req->post->signature_bbc_enabledTags);
-			}
+			$this->_req->post->signature_bbc_enabledTags = $signature_bbc_enabledTags;
 
 			$sig_limits = array();
 			foreach ($context['signature_settings'] as $key => $value)

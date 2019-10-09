@@ -403,8 +403,10 @@ class ManageAttachments extends AbstractController
 	/**
 	 * Show a list of attachment or avatar files.
 	 *
-	 * - Called by ?action=admin;area=manageattachments;sa=browse for attachments
-	 * and ?action=admin;area=manageattachments;sa=browse;avatars for avatars.
+	 * - Called by
+	 * 		?action=admin;area=manageattachments;sa=browse for attachments
+	 * 		?action=admin;area=manageattachments;sa=browse;avatars for avatars.
+	 * 		?action=admin;area=manageattachments;sa=browse;thumbs for thumbnails.
 	 * - Allows sorting by name, date, size and member.
 	 * - Paginates results.
 	 *
@@ -416,6 +418,7 @@ class ManageAttachments extends AbstractController
 
 		// Attachments or avatars?
 		$context['browse_type'] = isset($this->_req->query->avatars) ? 'avatars' : (isset($this->_req->query->thumbs) ? 'thumbs' : 'attachments');
+		loadJavascriptFile('topic.js');
 
 		// Set the options for the list component.
 		$listOptions = array(
@@ -467,10 +470,10 @@ class ManageAttachments extends AbstractController
 
 							$link .= '"';
 
-							// Show a popup on click if it's a picture and we know its dimensions.
+							// Show a popup on click if it's a picture and we know its dimensions (use rand message to prevent navigation)
 							if (!empty($rowData['width']) && !empty($rowData['height']))
 							{
-								$link .= sprintf(' onclick="return reqWin(this.href' . ($rowData['attachment_type'] == 1 ? '' : ' + \';image\'') . ', %1$d, %2$d, true);"', $rowData['width'] + 20, $rowData['height'] + 20);
+								$link .= 'id="link_' . $rowData['id_attach'] .'" data-lightboxmessage="' . rand(0, 100000) . '" data-lightboximage="' . $rowData['id_attach'] . '"';
 							}
 
 							$link .= sprintf('>%1$s</a>', preg_replace('~&amp;#(\\\\d{1,7}|x[0-9a-fA-F]{1,6});~', '&#\\\\1;', htmlspecialchars($rowData['filename'], ENT_COMPAT, 'UTF-8')));
@@ -725,7 +728,7 @@ class ManageAttachments extends AbstractController
 		// @todo Ignore messages in topics that are stickied?
 
 		// Deleting an attachment?
-		if ($this->_req->getQuery('type', 'strval') !== 'avatars')
+		if (!$this->_req->compareQuery('type', 'avatars','trim|strval'))
 		{
 			// Get rid of all the old attachments.
 			$messages = removeAttachments(array('attachment_type' => 0, 'poster_time' => (time() - 24 * 60 * 60 * $this->_req->post->age)), 'messages', true);
@@ -787,7 +790,7 @@ class ManageAttachments extends AbstractController
 				$attachments[] = (int) $removeID;
 			}
 
-			if ($this->_req->query->type == 'avatars' && !empty($attachments))
+			if ($this->_req->compareQuery('type', 'avatars', 'trim|strval') && !empty($attachments))
 			{
 				removeAttachments(array('id_attach' => $attachments));
 			}
@@ -805,7 +808,7 @@ class ManageAttachments extends AbstractController
 			}
 		}
 
-		$sort = $this->_req->getQuery('sort', 'strval', 'date');
+		$sort = $this->_req->getQuery('sort', 'trim|strval', 'date');
 		redirectexit('action=admin;area=manageattachments;sa=browse;' . $this->_req->query->type . ';sort=' . $sort . (isset($this->_req->query->desc) ? ';desc' : '') . ';start=' . $this->_req->query->start);
 	}
 
@@ -822,7 +825,7 @@ class ManageAttachments extends AbstractController
 
 		$messages = removeAttachments(array('attachment_type' => 0), '', true);
 
-		$notice = $this->_req->getPost('notice', 'strval', $txt['attachment_delete_admin']);
+		$notice = $this->_req->getPost('notice', 'trim|strval', $txt['attachment_delete_admin']);
 
 		// Add the notice on the end of the changed messages.
 		if (!empty($messages))
@@ -1580,6 +1583,7 @@ class ManageAttachments extends AbstractController
 					}
 				}
 			}
+
 			unset($_SESSION['errors'], $this->_req->session->errors);
 		}
 
