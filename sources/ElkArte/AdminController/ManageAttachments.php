@@ -473,7 +473,7 @@ class ManageAttachments extends AbstractController
 							// Show a popup on click if it's a picture and we know its dimensions (use rand message to prevent navigation)
 							if (!empty($rowData['width']) && !empty($rowData['height']))
 							{
-								$link .= 'id="link_' . $rowData['id_attach'] .'" data-lightboxmessage="' . rand(0, 100000) . '" data-lightboximage="' . $rowData['id_attach'] . '"';
+								$link .= 'id="link_' . $rowData['id_attach'] . '" data-lightboxmessage="' . rand(0, 100000) . '" data-lightboximage="' . $rowData['id_attach'] . '"';
 							}
 
 							$link .= sprintf('>%1$s</a>', preg_replace('~&amp;#(\\\\d{1,7}|x[0-9a-fA-F]{1,6});~', '&#\\\\1;', htmlspecialchars($rowData['filename'], ENT_COMPAT, 'UTF-8')));
@@ -728,7 +728,7 @@ class ManageAttachments extends AbstractController
 		// @todo Ignore messages in topics that are stickied?
 
 		// Deleting an attachment?
-		if (!$this->_req->compareQuery('type', 'avatars','trim|strval'))
+		if (!$this->_req->compareQuery('type', 'avatars', 'trim|strval'))
 		{
 			// Get rid of all the old attachments.
 			$messages = removeAttachments(array('attachment_type' => 0, 'poster_time' => (time() - 24 * 60 * 60 * $this->_req->post->age)), 'messages', true);
