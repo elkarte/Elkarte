@@ -250,7 +250,7 @@ class ManageMail extends AbstractController
 		$all_emails = $this->_req->getQuery('te', 'intval', list_getMailQueueSize());
 
 		// If we don't know how many we sent, it must be because... we didn't send any!
-		$sent_emails = $this->_req->getQuery('sent', 'intval',0);
+		$sent_emails = $this->_req->getQuery('sent', 'intval', 0);
 
 		// Send this batch, then go for a short break...
 		while (reduceMailQueue($number_to_send, true, true) === true)
