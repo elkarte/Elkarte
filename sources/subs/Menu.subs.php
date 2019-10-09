@@ -124,6 +124,7 @@ function createMenu($menuData, $menuOptions = array())
 		{
 			continue;
 		}
+
 		// Has permission check?
 		if (isset($section['permission']))
 		{
@@ -255,11 +256,11 @@ function createMenu($menuData, $menuOptions = array())
 										}
 
 										// Is this the current subsection?
-										if ($_req->compareQuery('sa', $sa, 'trim'))
+										if ($_req->compareQuery('sa', $sa))
 										{
 											$menu_context['current_subsection'] = $sa;
 										}
-										elseif (isset($sub['active']) && in_array($_req->getQuery('sa', 'trim'), $sub['active']))
+										elseif (isset($sub['active']) && $_req->is_set('sa') && in_array($_req->query->sa, $sub['active']))
 										{
 											$menu_context['current_subsection'] = $sa;
 										}
