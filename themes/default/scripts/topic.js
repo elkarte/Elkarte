@@ -990,8 +990,12 @@ function expandThumbLB(thumbID, messageID)
 						'max-height': Math.floor(screenHeight) + 'px'
 					});
 
-					$elk_lb_content.html($(this)).append($elk_expand_icon)
-						.append($elk_next_icon).append($elk_prev_icon);
+					// Add expand and prev/next links
+					$elk_lb_content.html($(this)).append($elk_expand_icon);
+					if (navigation.length > 1)
+					{
+						$elk_lb_content.html($(this)).append($elk_next_icon).append($elk_prev_icon);
+					}
 
 					ajaxIndicatorOff();
 				})
