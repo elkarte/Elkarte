@@ -591,7 +591,7 @@ class ManageSmileys extends AbstractController
 				{
 					$smileys = array();
 					$dir = dir($modSettings['smileys_dir'] . '/' . $context['current_set']['path']);
-					while ($entry = $dir->read())
+					while (($entry = $dir->read()) !== false)
 					{
 						if (in_array(strrchr($entry, '.'), array('.jpg', '.gif', '.jpeg', '.png')))
 						{
@@ -627,7 +627,7 @@ class ManageSmileys extends AbstractController
 			if (!empty($modSettings['smileys_dir']) && is_dir($modSettings['smileys_dir']))
 			{
 				$dir = dir($modSettings['smileys_dir']);
-				while ($entry = $dir->read())
+				while (($entry = $dir->read()) !== false)
 				{
 					if (!in_array($entry, array('.', '..')) && is_dir($modSettings['smileys_dir'] . '/' . $entry))
 					{
@@ -681,7 +681,8 @@ class ManageSmileys extends AbstractController
 
 			$this->_req->post->smiley_code = $this->_req->getPost('smiley_code', '\\ElkArte\\Util::htmltrim', '');
 			$this->_req->post->smiley_filename = $this->_req->getPost('smiley_filename', '\\ElkArte\\Util::htmltrim', '');
-			$this->_req->post->smiley_location = empty($this->_req->post->smiley_location) || $this->_req->post->smiley_location > 2 || $this->_req->post->smiley_location < 0 ? 0 : (int) $this->_req->post->smiley_location;
+			$this->_req->post->smiley_location = $this->_req->getPost('smiley_location', 'intval', 0);
+			$this->_req->post->smiley_location = min(max($smiley_location, 0), 2);
 
 			// Make sure some code was entered.
 			if (empty($this->_req->post->smiley_code))
@@ -1226,6 +1227,7 @@ class ManageSmileys extends AbstractController
 							document.forms.smileyForm.submit();
 						return true;
 					}
+					
 					function changeSet(newSet)
 					{
 						var currentImage, i, knownSmileys = [];
@@ -1258,6 +1260,7 @@ class ManageSmileys extends AbstractController
 			$context['smileys_dir'] = empty($modSettings['smileys_dir']) ? BOARDDIR . '/smileys' : $modSettings['smileys_dir'];
 			$context['smileys_dir_found'] = is_dir($context['smileys_dir']);
 			$context['smiley_sets'] = explode(',', $modSettings['smiley_sets_known']);
+
 			$set_names = explode("\n", $modSettings['smiley_sets_names']);
 			foreach ($context['smiley_sets'] as $i => $set)
 			{
