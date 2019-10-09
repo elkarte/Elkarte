@@ -408,7 +408,7 @@ function template_optimize()
 	echo '
 			</p>
 			<p>
-				<a href="', $scripturl, '?action=admin;area=maintain">', $txt['maintain_return'], '</a>
+				<a href="', $scripturl, '?action=admin;area=maintain;sa=database;', $context['session_var'], '=', $context['session_id'], '">', $txt['maintain_return'], '</a>
 			</p>
 		</div>
 	</div>';
