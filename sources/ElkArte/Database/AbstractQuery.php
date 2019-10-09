@@ -115,7 +115,7 @@ abstract class AbstractQuery implements QueryInterface
 	];
 
 	/**
-	 * Holds some values (time, file, line, delta) to debug performancs of the queries.
+	 * Holds some values (time, file, line, delta) to debug performance of the queries.
 	 *
 	 * @var mixed[]
 	 */
@@ -745,7 +745,7 @@ abstract class AbstractQuery implements QueryInterface
 	}
 
 	/**
-	 * Temporary function to supoprt migration to the new schema of the db layer
+	 * Temporary function to support migration to the new schema of the db layer
 	 *
 	 * @deprecated since 2.0
 	 */
@@ -864,7 +864,7 @@ abstract class AbstractQuery implements QueryInterface
 
 	/**
 	 * Checks for "illegal characters" and runs replacement__callback if not
-	 * overriden.
+	 * overridden.
 	 * In case of problems, the method can ends up dying.
 	 *
 	 * @param string $db_string

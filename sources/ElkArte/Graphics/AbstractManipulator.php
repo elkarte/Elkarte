@@ -158,7 +158,7 @@ abstract class AbstractManipulator
 		// Determine the memory requirements for this image, note: if you want to use an image formula
 		// W x H x bits/8 x channels x Overhead factor
 		// You will need to account for single bit images as GD expands them to an 8 bit and will greatly
-		// overun the calculated value.
+		// overrun the calculated value.
 		// The 5 below is simply a shortcut of 8bpp, 3 channels, 1.66 overhead
 		$needed_memory = $this->_width * $this->_height * 5;
 

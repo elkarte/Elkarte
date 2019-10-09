@@ -45,7 +45,7 @@ abstract class AbstractTable
 
 	/**
 	 * Keeps a (reverse) log of changes to the table structure, to be undone.
-	 * This is used by Packages admin installation/uninstallation/upgrade.
+	 * This is used by Packages admin installation/uninstalling/upgrade.
 	 *
 	 * @var array
 	 */
@@ -373,7 +373,7 @@ abstract class AbstractTable
 	abstract public function list_columns($table_name, $detail = false, $parameters = array());
 
 	/**
-	 * Resturns name, columns and indexes of a table
+	 * Returns name, columns and indexes of a table
 	 *
 	 * @param string $table_name
 	 * @return mixed[]
