@@ -682,7 +682,7 @@ class ManageSmileys extends AbstractController
 			$this->_req->post->smiley_code = $this->_req->getPost('smiley_code', '\\ElkArte\\Util::htmltrim', '');
 			$this->_req->post->smiley_filename = $this->_req->getPost('smiley_filename', '\\ElkArte\\Util::htmltrim', '');
 			$this->_req->post->smiley_location = $this->_req->getPost('smiley_location', 'intval', 0);
-			$this->_req->post->smiley_location = min(max($smiley_location, 0), 2);
+			$this->_req->post->smiley_location = min(max($this->_req->post->smiley_location, 0), 2);
 
 			// Make sure some code was entered.
 			if (empty($this->_req->post->smiley_code))

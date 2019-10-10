@@ -363,8 +363,8 @@ class HttpReq
 	 *
 	 * @param string $name get value to fetch
 	 * @param mixed $compare value to compare the get value to
-	 * @param null $sanitize optional data validator comparison
-	 * @param null $default if not value exists, what to set it to (will also be used in the compare)
+	 * @param null|string $sanitize optional | delimited data for validator
+	 * @param null|mixed $default if no value exists, what to set it to (will also be used in the compare)
 	 *
 	 * @return bool
 	 */
@@ -385,8 +385,8 @@ class HttpReq
 	 *
 	 * @param string $name get value to fetch
 	 * @param mixed $compare value to compare the post value to
-	 * @param null $sanitize optional data validator comparison
-	 * @param null $default if not value exists, what to set it to (will also be used in the compare)
+	 * @param null|string $sanitize optional | delimited data for validator
+	 * @param null|mixed $default if no value exists, what to set it to (will also be used in the compare)
 	 *
 	 * @return bool
 	 */

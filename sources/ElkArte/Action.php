@@ -126,7 +126,7 @@ class Action
 
 		$subAction = $this->req->getQuery($requestParam, 'trim|strval', $this->_default);
 
-		return !empty($this->_subActions[$subAction]) ? $subAction : $this->_default;
+		return isset($this->_subActions[$subAction]) ? $subAction : $this->_default;
 	}
 
 	/**
