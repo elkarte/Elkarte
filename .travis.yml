@@ -9,39 +9,6 @@ matrix:
         - DB=mysql-5.7
         - WEBTESTS=false
         - COVERAGE=true
-    - php: 7.3
-      env:
-        - DB=mysql-5.7
-        - WEBTESTS=true
-        - COVERAGE=true
-    - php: 7.3
-      env:
-        - DB=postgres-9.6
-        - WEBTESTS=false
-        - COVERAGE=true
-      addons:
-        postgresql: "9.6"
-    - php: 7.2
-      env:
-        - DB=mariadb-10.3
-        - WEBTESTS=false
-        - COVERAGE=false
-      addons:
-        mariadb: '10.3'
-    - language: node_js
-      node_js:
-        - "node"
-      php:
-      # none
-      install:
-        - npm install --save-dev jshint stylelint stylelint-order stylelint-config-recommended
-      before_script:
-      # nothing
-      script:
-        - node_modules/jshint/bin/jshint .
-        - stylelint "**/*.css"
-      after_script:
-      # nothing
   fast_finish: true
 
 services:
