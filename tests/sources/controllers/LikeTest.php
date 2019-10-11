@@ -12,7 +12,7 @@ class TestLike extends \PHPUnit\Framework\TestCase
 	 */
 	function setUp()
 	{
-		global $modSettings, $settings, $board;
+		global $modSettings, $settings;
 
 		// Lets add in just enough info for the system to think we are logged
 		$modSettings['smiley_sets_known'] = 'none';
@@ -54,6 +54,7 @@ class TestLike extends \PHPUnit\Framework\TestCase
 
 		new ElkArte\Themes\ThemeLoader();
 		theme()->getTemplates()->loadLanguageFile('Profile', 'english', true, true);
+		theme()->getTemplates()->loadLanguageFile('Errors', 'english', true, true);
 	}
 
 	/**
@@ -71,24 +72,53 @@ class TestLike extends \PHPUnit\Framework\TestCase
 	}
 
 	/**
-	 * Test the settings for Likes Listing
+	 * Test the showing the Likes Listing
 	 */
 	public function testShowLikes()
 	{
-		global $context;
+		global $context, $modSettings;
 
 		$modSettings['likes_enabled'] = 1;
+		$context['profile_menu_name'] = 'menu_data_view_likes';
+		require_once(SUBSDIR . '/Profile.subs.php');
 
-		$controller = new \ElkArte\Controller\Likes();
+		$controller = new \ElkArte\Controller\Likes(new \ElkArte\EventManager());
 		$controller->setUser(\ElkArte\User::$info);
 		$controller->pre_dispatch();
 		$controller->action_showProfileLikes();
 
-		// 'sa' === 'received'
-
-		// Lets see some items loaded into context, there should some data
+		// Lets see some items loaded into context, as createlist will have run
 		$this->assertEquals('Posts you liked', $context['menu_data_view_likes']['tab_data']['title']);
-		$this->assertEquals('Likes', $context['title']);
+		$this->assertEquals(4, $context['view_likes']['num_columns']);
+		$this->assertEquals('Likes', $context['view_likes']['title']);
+	}
 
+	/**
+	 * Test liking a post
+	 */
+	public function testLikePost()
+	{
+		global $modSettings, $context;
+
+		$_req = \ElkArte\HttpReq::instance();
+		$_req->get('msg', null, 1);
+		$_req->get('xml', null, '');
+		$_req->get('api', null, 'json');
+
+		// Trick the session
+		$_GET['elk_test_session'] = 'elk_test_session';
+		$_SESSION['session_value'] = 'elk_test_session';
+		$_SESSION['session_var'] = 'elk_test_session';
+		$_SESSION['USER_AGENT'] = 'elkarte';
+		$modSettings['disableCheckUA'] = 1;
+
+		// Make a like
+		$modSettings['likes_enabled'] = 1;
+		$controller = new \ElkArte\Controller\Likes(new \ElkArte\EventManager());
+		$controller->setUser(\ElkArte\User::$info);
+		$controller->pre_dispatch();
+		$controller->action_likepost_api();
+
+		$this->assertNotNull($context['json_data']);
 	}
 }

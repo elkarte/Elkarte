@@ -50,6 +50,7 @@ class TestRecentPosts extends \PHPUnit\Framework\TestCase
 		);
 
 		new ElkArte\Themes\ThemeLoader();
+		theme()->getTemplates()->loadLanguageFile('Errors', 'english', true, true);
 	}
 
 	/**
