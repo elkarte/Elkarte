@@ -3,7 +3,7 @@
 /**
  * TestCase class for the Profile Info Controller
  */
-class TestProfileInfo extends \PHPUnit\Framework\TestCase
+class TestLike extends \PHPUnit\Framework\TestCase
 {
 	protected $backupGlobalsBlacklist = ['user_info'];
 
@@ -12,11 +12,12 @@ class TestProfileInfo extends \PHPUnit\Framework\TestCase
 	 */
 	function setUp()
 	{
-		global $modSettings, $settings;
+		global $modSettings, $settings, $board;
 
 		// Lets add in just enough info for the system to think we are logged
 		$modSettings['smiley_sets_known'] = 'none';
 		$modSettings['smileys_url'] = 'http://127.0.0.1/smileys';
+		$modSettings['default_forum_action'] = [];
 		$settings['default_theme_dir'] = '/var/www/themes/default';
 
 		\ElkArte\User::$info = new \ElkArte\ValuesContainer([
@@ -27,7 +28,8 @@ class TestProfileInfo extends \PHPUnit\Framework\TestCase
 			'is_guest' => false,
 			'username' => 'testing',
 			'query_wanna_see_board' => '1=1',
-			'is_moderator' => isset(\ElkArte\User::$info->is_moderator) ? \ElkArte\User::$info->is_moderator : false,
+			'query_see_board' => '1=1',
+			'is_moderator' => false,
 			'email' => 'a@a.com',
 			'ignoreusers' => '',
 			'name' => 'itsme',
@@ -37,6 +39,8 @@ class TestProfileInfo extends \PHPUnit\Framework\TestCase
 			'possibly_robot' => false,
 			'posts' => '15',
 			'buddies' => array(),
+			'groups' => array(0 => 1),
+			'ignoreboards' => array(),
 		]);
 
 		$settings['page_index_template'] = array(
@@ -67,20 +71,24 @@ class TestProfileInfo extends \PHPUnit\Framework\TestCase
 	}
 
 	/**
-	 * Test the settings for profile summary
+	 * Test the settings for Likes Listing
 	 */
-	public function testProfileSummary()
+	public function testShowLikes()
 	{
-		global $context, $modSettings;
+		global $context;
 
-		$controller = new \ElkArte\Controller\ProfileInfo(new \ElkArte\EventManager());
+		$modSettings['likes_enabled'] = 1;
+
+		$controller = new \ElkArte\Controller\Likes();
 		$controller->setUser(\ElkArte\User::$info);
 		$controller->pre_dispatch();
-		$controller->action_index();
+		$controller->action_showProfileLikes();
+
+		// 'sa' === 'received'
 
 		// Lets see some items loaded into context, there should some data
-		$this->assertNotNull($context);
-		$this->assertEquals($context['can_see_ip'], true);
-		$this->assertEquals($modSettings['jquery_include_ui'], true);
+		$this->assertEquals('Posts you liked', $context['menu_data_view_likes']['tab_data']['title']);
+		$this->assertEquals('Likes', $context['title']);
+
 	}
 }
