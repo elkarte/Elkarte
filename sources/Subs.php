@@ -755,6 +755,12 @@ function redirectexit($setLocation = '', $refresh = false)
 	// Maybe integrations want to change where we are heading?
 	call_integration_hook('integrate_redirect', array(&$setLocation, &$refresh));
 
+	// Allow a way for phpunit to run controller methods, pretty? no but allows a return to the test
+	if (defined('PHPUNITBOOTSTRAP'))
+	{
+		return;
+	}
+
 	// We send a Refresh header only in special cases because Location looks better. (and is quicker...)
 	if ($refresh)
 	{

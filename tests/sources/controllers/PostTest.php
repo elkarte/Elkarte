@@ -1,9 +1,12 @@
 <?php
 
 /**
- * TestCase class for the Likes Controller
+ * TestCase class for the Post Controller
+ *
+ * WARNING. These tests work directly with the local database. Don't run
+ * them local if you need to keep your data untouched!
  */
-class TestLike extends \PHPUnit\Framework\TestCase
+class TestPost extends \PHPUnit\Framework\TestCase
 {
 	protected $backupGlobalsBlacklist = ['user_info'];
 
@@ -72,53 +75,45 @@ class TestLike extends \PHPUnit\Framework\TestCase
 	}
 
 	/**
-	 * Test the showing the Likes Listing
+	 * Test making a post
 	 */
-	public function testShowLikes()
+	public function testMakePost()
 	{
-		global $context, $modSettings;
+		global $context, $board, $topic, $modSettings;
 
-		$modSettings['likes_enabled'] = 1;
-		$context['profile_menu_name'] = 'menu_data_view_likes';
-		require_once(SUBSDIR . '/Profile.subs.php');
+		require_once(SUBSDIR . '/Topic.subs.php');
 
-		$controller = new \ElkArte\Controller\Likes(new \ElkArte\EventManager());
-		$controller->setUser(\ElkArte\User::$info);
-		$controller->pre_dispatch();
-		$controller->action_showProfileLikes();
+		// Set up for making a post
+		$board = 1;
+		$topic = 1;
+		loadBoard();
+		$_POST['subject'] = 'Welcome to ElkArte!';
+		$_POST['message'] = 'Thanks, great to be here :D';
+		$_POST['email'] = 'a@a.com';
+		$_POST['icon'] = 'xx';
+		$_POST['additonal_items'] = 0;
 
-		// Lets see some items loaded into context, as createlist will have run
-		$this->assertEquals('Posts you liked', $context['menu_data_view_likes']['tab_data']['title']);
-		$this->assertEquals(4, $context['view_likes']['num_columns']);
-		$this->assertEquals('Likes', $context['view_likes']['title']);
-	}
-
-	/**
-	 * Test liking a post
-	 */
-	public function testLikePost()
-	{
-		global $modSettings, $context;
-
-		$_req = \ElkArte\HttpReq::instance();
-		$_req->get('msg', null, 1);
-		$_req->get('xml', null, '');
-		$_req->get('api', null, 'json');
+		// Used for the test to see if we updated the topic
+		$topic_info = getTopicInfo($topic);
+		$check = (int) $topic_info['num_replies'];
 
 		// Trick the session
-		$_GET['elk_test_session'] = 'elk_test_session';
+		$_POST['elk_test_session'] = 'elk_test_session';
 		$_SESSION['session_value'] = 'elk_test_session';
 		$_SESSION['session_var'] = 'elk_test_session';
 		$_SESSION['USER_AGENT'] = 'elkarte';
 		$modSettings['disableCheckUA'] = 1;
+		$context['session_var'] = 'elk_test_session';
+		$context['session_value'] = 'elk_test_session';
 
-		// Make a like
-		$modSettings['likes_enabled'] = 1;
-		$controller = new \ElkArte\Controller\Likes(new \ElkArte\EventManager());
+		// Post
+		$controller = new \ElkArte\Controller\Post(new \ElkArte\EventManager());
 		$controller->setUser(\ElkArte\User::$info);
 		$controller->pre_dispatch();
-		$controller->action_likepost_api();
+		$controller->action_post2();
 
-		$this->assertNotNull($context['json_data']);
+		// Check
+		$topic_info = getTopicInfo($topic);
+		$this->assertEquals($check + 1, $topic_info['num_replies']);
 	}
 }
