@@ -101,9 +101,9 @@ class TestLike extends \PHPUnit\Framework\TestCase
 		global $modSettings, $context;
 
 		$_req = \ElkArte\HttpReq::instance();
-		$_req->get('msg', null, 1);
-		$_req->get('xml', null, '');
-		$_req->get('api', null, 'json');
+		$_req->query['msg'] = 1;
+		$_req->query['xml'] = '';
+		$_req->query['api'] = 'json';
 
 		// Trick the session
 		$_GET['elk_test_session'] = 'elk_test_session';
@@ -119,6 +119,6 @@ class TestLike extends \PHPUnit\Framework\TestCase
 		$controller->pre_dispatch();
 		$controller->action_likepost_api();
 
-		$this->assertNotNull($context['json_data']);
+		$this->assertEquals(1, $context['json_data']['count']);
 	}
 }
