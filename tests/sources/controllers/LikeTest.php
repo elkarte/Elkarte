@@ -100,6 +100,7 @@ class TestLike extends \PHPUnit\Framework\TestCase
 	{
 		global $modSettings, $context;
 
+		// Set the form
 		$_req = \ElkArte\HttpReq::instance();
 		$_req->query['msg'] = 1;
 		$_req->query['xml'] = '';
@@ -112,8 +113,11 @@ class TestLike extends \PHPUnit\Framework\TestCase
 		$_SESSION['USER_AGENT'] = 'elkarte';
 		$modSettings['disableCheckUA'] = 1;
 
-		// Make a like
+		// Enabled but no mentions please
 		$modSettings['likes_enabled'] = 1;
+		$modSettings['mentions_enabled'] = 0;
+
+		// Make a lik
 		$controller = new \ElkArte\Controller\Likes(new \ElkArte\EventManager());
 		$controller->setUser(\ElkArte\User::$info);
 		$controller->pre_dispatch();

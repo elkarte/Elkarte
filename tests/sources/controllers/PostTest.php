@@ -77,7 +77,7 @@ class TestPost extends \PHPUnit\Framework\TestCase
 	/**
 	 * Test making a post
 	 */
-	public function testMakePost()
+	public function testMakeReplyPost()
 	{
 		global $context, $board, $topic, $modSettings;
 
@@ -106,7 +106,7 @@ class TestPost extends \PHPUnit\Framework\TestCase
 		$context['session_var'] = 'elk_test_session';
 		$context['session_value'] = 'elk_test_session';
 
-		// Post
+		// Post a reply
 		$controller = new \ElkArte\Controller\Post(new \ElkArte\EventManager());
 		$controller->setUser(\ElkArte\User::$info);
 		$controller->pre_dispatch();
@@ -115,5 +115,49 @@ class TestPost extends \PHPUnit\Framework\TestCase
 		// Check
 		$topic_info = getTopicInfo($topic);
 		$this->assertEquals($check + 1, $topic_info['num_replies']);
+	}
+
+	/**
+	 * Test making a post
+	 */
+	public function testMakeNewPost()
+	{
+		global $context, $board, $topic, $modSettings, $board_info;
+
+		require_once(SUBSDIR . '/Topic.subs.php');
+
+		// Set up for making a post
+		$board = 1;
+		loadBoard();
+		$_POST['subject'] = 'Welcome to Travis';
+		$_POST['message'] = 'So you want to test on Travis, fine, sure.';
+		$_POST['email'] = 'a@a.com';
+		$_POST['icon'] = 'thumbup';
+		$_POST['additonal_items'] = 0;
+
+		// Used for the test to see if we updated the topic
+		$check = (int) $board_info['num_topics'];
+
+		// Trick the session
+		$_POST['elk_test_session'] = 'elk_test_session';
+		$_SESSION['session_value'] = 'elk_test_session';
+		$_SESSION['session_var'] = 'elk_test_session';
+		$_SESSION['USER_AGENT'] = 'elkarte';
+		$modSettings['disableCheckUA'] = 1;
+		$context['session_var'] = 'elk_test_session';
+		$context['session_value'] = 'elk_test_session';
+
+		// Bypass spam protection
+		\ElkArte\User::$info['ip'] = '127.1.1.1';
+
+		// Post a new topic
+		$controller = new \ElkArte\Controller\Post(new \ElkArte\EventManager());
+		$controller->setUser(\ElkArte\User::$info);
+		$controller->pre_dispatch();
+		$controller->action_post2();
+
+		// Check
+		loadBoard();
+		$this->assertEquals($check + 1, $board_info['num_topics']);
 	}
 }
