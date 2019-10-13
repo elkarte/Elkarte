@@ -35,6 +35,7 @@ class Result extends AbstractResult
 		}
 
 		$resource = $this->result === null ? $this->details->lastResult : $this->result;
+
 		if (is_resource($resource))
 		{
 			return pg_affected_rows($resource);

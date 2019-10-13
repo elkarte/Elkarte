@@ -15,7 +15,7 @@ class TestPost extends \PHPUnit\Framework\TestCase
 	 */
 	function setUp()
 	{
-		global $modSettings, $settings;
+		global $modSettings, $context, $settings;
 
 		// Lets add in just enough info for the system to think we are logged
 		$modSettings['smiley_sets_known'] = 'none';
@@ -25,7 +25,7 @@ class TestPost extends \PHPUnit\Framework\TestCase
 
 		\ElkArte\User::$info = new \ElkArte\ValuesContainer([
 			'id' => 1,
-			'ip' => '127.0.0.1',
+			'ip' => long2ip(rand(0, 2147483647)),
 			'language' => 'english',
 			'is_admin' => true,
 			'is_guest' => false,
@@ -55,6 +55,15 @@ class TestPost extends \PHPUnit\Framework\TestCase
 			'all' => '<span></span>',
 		);
 
+		// Trick the session
+		$_POST['elk_test_session'] = 'elk_test_session';
+		$_SESSION['session_value'] = 'elk_test_session';
+		$_SESSION['session_var'] = 'elk_test_session';
+		$_SESSION['USER_AGENT'] = 'elkarte';
+		$modSettings['disableCheckUA'] = 1;
+		$context['session_var'] = 'elk_test_session';
+		$context['session_value'] = 'elk_test_session';
+
 		new ElkArte\Themes\ThemeLoader();
 		theme()->getTemplates()->loadLanguageFile('Profile', 'english', true, true);
 		theme()->getTemplates()->loadLanguageFile('Errors', 'english', true, true);
@@ -79,7 +88,7 @@ class TestPost extends \PHPUnit\Framework\TestCase
 	 */
 	public function testMakeReplyPost()
 	{
-		global $context, $board, $topic, $modSettings;
+		global $board, $topic;
 
 		require_once(SUBSDIR . '/Topic.subs.php');
 
@@ -97,15 +106,6 @@ class TestPost extends \PHPUnit\Framework\TestCase
 		$topic_info = getTopicInfo($topic);
 		$check = (int) $topic_info['num_replies'];
 
-		// Trick the session
-		$_POST['elk_test_session'] = 'elk_test_session';
-		$_SESSION['session_value'] = 'elk_test_session';
-		$_SESSION['session_var'] = 'elk_test_session';
-		$_SESSION['USER_AGENT'] = 'elkarte';
-		$modSettings['disableCheckUA'] = 1;
-		$context['session_var'] = 'elk_test_session';
-		$context['session_value'] = 'elk_test_session';
-
 		// Post a reply
 		$controller = new \ElkArte\Controller\Post(new \ElkArte\EventManager());
 		$controller->setUser(\ElkArte\User::$info);
@@ -118,11 +118,11 @@ class TestPost extends \PHPUnit\Framework\TestCase
 	}
 
 	/**
-	 * Test making a post
+	 * Test making a new topic
 	 */
-	public function testMakeNewPost()
+	public function testMakeNewTopic()
 	{
-		global $context, $board, $topic, $modSettings, $board_info;
+		global $board, $board_info;
 
 		require_once(SUBSDIR . '/Topic.subs.php');
 
@@ -138,17 +138,8 @@ class TestPost extends \PHPUnit\Framework\TestCase
 		// Used for the test to see if we updated the topic
 		$check = (int) $board_info['num_topics'];
 
-		// Trick the session
-		$_POST['elk_test_session'] = 'elk_test_session';
-		$_SESSION['session_value'] = 'elk_test_session';
-		$_SESSION['session_var'] = 'elk_test_session';
-		$_SESSION['USER_AGENT'] = 'elkarte';
-		$modSettings['disableCheckUA'] = 1;
-		$context['session_var'] = 'elk_test_session';
-		$context['session_value'] = 'elk_test_session';
-
 		// Bypass spam protection
-		\ElkArte\User::$info['ip'] = '127.1.1.1';
+		\ElkArte\User::$info->ip = long2ip(rand(0, 2147483647));
 
 		// Post a new topic
 		$controller = new \ElkArte\Controller\Post(new \ElkArte\EventManager());
@@ -159,5 +150,43 @@ class TestPost extends \PHPUnit\Framework\TestCase
 		// Check
 		loadBoard();
 		$this->assertEquals($check + 1, $board_info['num_topics']);
+	}
+
+	/**
+	 * Test making a post
+	 */
+	public function teestModifyPost()
+	{
+		global $context, $board, $topic, $modSettings;
+
+		require_once(SUBSDIR . '/Topic.subs.php');
+
+		// Set up for making a post
+		$board = 1;
+		$topic = 1;
+		loadBoard();
+		$_POST['subject'] = 'Welcome to ElkArte!';
+		$_POST['message'] = 'Thanks, great to be here :D';
+		$_POST['email'] = 'a@a.com';
+		$_POST['icon'] = 'xx';
+		$_POST['additonal_items'] = 0;
+
+		// Used for the test to see if we updated the topic
+		$topic_info = getTopicInfo($topic);
+		$check = (int) $topic_info['num_replies'];
+		$id = $topic_info['id_last_msg'];
+
+		// Bypass spam protection
+		\ElkArte\User::$info->ip = long2ip(rand(0, 2147483647));
+
+		// Post a reply
+		$controller = new \ElkArte\Controller\Post(new \ElkArte\EventManager());
+		$controller->setUser(\ElkArte\User::$info);
+		$controller->pre_dispatch();
+		$controller->action_post2();
+
+		// Check
+		$topic_info = getTopicInfo($topic);
+		$this->assertEquals($check + 1, $topic_info['num_replies']);
 	}
 }

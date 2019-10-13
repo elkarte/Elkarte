@@ -23,7 +23,7 @@ class TestRecentPosts extends \PHPUnit\Framework\TestCase
 		// We are not logged in for this test, so lets fake it
 		\ElkArte\User::$info = new \ElkArte\ValuesContainer([
 			'id' => 1,
-			'ip' => '127.0.0.1',
+			'ip' => long2ip(rand(0, 2147483647)),
 			'language' => 'english',
 			'is_admin' => true,
 			'is_guest' => false,

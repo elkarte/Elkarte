@@ -135,7 +135,7 @@ class Query extends AbstractQuery
 						' WHERE ' . $where,
 						$entry
 					);
-					$db_replace_result += (!$this->_db_last_result ? 0 : pg_affected_rows($this->_db_last_result));
+					$db_replace_result += (!is_resource($this->_db_last_result) ? 0 : pg_affected_rows($this->_db_last_result));
 				}
 			}
 		}
@@ -182,23 +182,30 @@ class Query extends AbstractQuery
 					'security_override' => true,
 				)
 			);
-			$inserted_results += (!$this->_db_last_result ? 0 : pg_affected_rows($this->_db_last_result));
+			$inserted_results += (!is_resource($this->_db_last_result) ? 0 : pg_affected_rows($this->_db_last_result));
 
-			if (isset($db_replace_result))
+			if ($method === 'replace')
 			{
 				$this->_db_replace_result = $db_replace_result + $inserted_results;
 			}
 		}
 
+		if ($method === 'replace')
+			var_dump('one ' . $this->_db_replace_result);
+
 		if ($priv_trans)
 		{
 			$this->transaction('commit');
 		}
+		if ($method === 'replace')
+			var_dump('two ' . $this->_db_replace_result);
 
 		if (!empty($data))
 		{
 			$last_inserted_id = $this->insert_id($table);
 		}
+		if ($method === 'replace')
+			var_dump('three ' . $this->_db_replace_result);
 
 		$this->result = new Result(
 			is_object($ret) ? $ret->getResultObject() : $ret,
@@ -208,6 +215,9 @@ class Query extends AbstractQuery
 				'lastResult' => $this->_db_last_result,
 			])
 		);
+
+		if ($method === 'replace')
+			var_dump($this->result);
 
 		return $this->result;
 	}
