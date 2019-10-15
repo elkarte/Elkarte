@@ -4,9 +4,9 @@ dist: xenial
 
 matrix:
   include:
-    - php: 7.3
+    - php: 7.1
       env:
-        - DB=postgres-9.6
+        - DB=mysql-5.7
         - WEBTESTS=false
         - COVERAGE=true
     - php: 7.3
@@ -46,6 +46,7 @@ matrix:
 
 services:
   - memcached
+  - mysql
 
 # Prepare the server (PHP, Apache, PHPUnit, APCu etc)
 install:
