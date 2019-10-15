@@ -855,21 +855,8 @@ function pbe_email_attachments($pbe, $email_message)
 	$attachment_count = 0;
 	$attachIDs = array();
 
-	// Make sure we're uploading the files to the right place.
-	if (!empty($modSettings['currentAttachmentUploadDir']))
-	{
-		if (!is_array($modSettings['attachmentUploadDir']))
-		{
-			$modSettings['attachmentUploadDir'] = Util::unserialize($modSettings['attachmentUploadDir']);
-		}
-
-		// The current directory, of course!
-		$current_attach_dir = $modSettings['attachmentUploadDir'][$modSettings['currentAttachmentUploadDir']];
-	}
-	else
-	{
-		$current_attach_dir = $modSettings['attachmentUploadDir'];
-	}
+	$attachmentsDir = new AttachmentsDirectory($modSettings);
+	$current_attach_dir = $attachmentsDir->getCurrent();
 
 	// For attachmentChecks function
 	require_once(SUBSDIR . '/Attachments.subs.php');
@@ -892,7 +879,7 @@ function pbe_email_attachments($pbe, $email_message)
 				'name' => htmlspecialchars(basename($name), ENT_COMPAT, 'UTF-8'),
 				'tmp_name' => $destName,
 				'size' => strlen($attachment),
-				'id_folder' => $modSettings['currentAttachmentUploadDir'],
+				'id_folder' => $attachmentsDir->currentDirectoryId(),
 				'errors' => array(),
 				'approved' => !$modSettings['postmod_active'] || in_array('post_unapproved_attachments', $pbe['user_info']['permissions'])
 			);

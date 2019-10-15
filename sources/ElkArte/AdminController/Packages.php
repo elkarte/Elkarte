@@ -1494,33 +1494,8 @@ class Packages extends AbstractController
 			);
 		}
 
-		// Are we using multiple attachment directories?
-		if (!empty($modSettings['currentAttachmentUploadDir']))
-		{
-			unset($context['file_tree'][strtr(BOARDDIR, array('\\' => '/'))]['contents']['attachments']);
-
-			if (!is_array($modSettings['attachmentUploadDir']))
-			{
-				$modSettings['attachmentUploadDir'] = Util::unserialize($modSettings['attachmentUploadDir']);
-			}
-
-			// @todo Should we suggest non-current directories be read only?
-			foreach ($modSettings['attachmentUploadDir'] as $dir)
-			{
-				$context['file_tree'][strtr($dir, array('\\' => '/'))] = array(
-					'type' => 'dir',
-					'writable_on' => 'restrictive',
-				);
-			}
-		}
-		elseif (substr($modSettings['attachmentUploadDir'], 0, strlen(BOARDDIR)) != BOARDDIR)
-		{
-			unset($context['file_tree'][strtr(BOARDDIR, array('\\' => '/'))]['contents']['attachments']);
-			$context['file_tree'][strtr($modSettings['attachmentUploadDir'], array('\\' => '/'))] = array(
-				'type' => 'dir',
-				'writable_on' => 'restrictive',
-			);
-		}
+		$attachmentsDir = new AttachmentsDirectory($modSettings);
+		$attachmentsDir->getAttachmentsTree();
 
 		if (substr($modSettings['smileys_dir'], 0, strlen(BOARDDIR)) != BOARDDIR)
 		{

@@ -1858,8 +1858,8 @@ class PersonalMessage extends AbstractController
 
 			// Mimic what profile would do.
 			// @todo fix this when Profile.subs is not dependant on this behavior
-			$_POST = htmltrim__recursive((array) $this->_req->post);
-			$_POST = htmlspecialchars__recursive($_POST);
+			$_POST = Util::htmltrim__recursive((array) $this->_req->post);
+			$_POST = Util::htmlspecialchars__recursive($_POST);
 
 			// Save the fields.
 			$fields = ProfileOptions::getFields('contactprefs');

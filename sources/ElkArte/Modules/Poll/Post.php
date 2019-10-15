@@ -198,7 +198,7 @@ class Post extends AbstractModule
 		$context['poll']['choices'] = array();
 		$choice_id = 0;
 
-		$_POST['options'] = empty($_POST['options']) ? array() : htmlspecialchars__recursive($_POST['options']);
+		$_POST['options'] = empty($_POST['options']) ? array() : Util::htmlspecialchars__recursive($_POST['options']);
 		foreach ($_POST['options'] as $option)
 		{
 			if (trim($option) === '')
@@ -321,7 +321,7 @@ class Post extends AbstractModule
 			$post_errors->addError('no_question');
 		}
 
-		$_POST['options'] = empty($_POST['options']) ? array() : htmltrim__recursive($_POST['options']);
+		$_POST['options'] = empty($_POST['options']) ? array() : Util::htmltrim__recursive($_POST['options']);
 
 		// Get rid of empty ones.
 		foreach ($_POST['options'] as $k => $option)
@@ -419,7 +419,7 @@ class Post extends AbstractModule
 		$question = htmlspecialchars($options['question'], ENT_COMPAT, 'UTF-8');
 		$question = Util::substr($question, 0, 255);
 		$question = preg_replace('~&amp;#(\d{4,5}|[2-9]\d{2,4}|1[2-9]\d);~', '&#$1;', $question);
-		$poll_options = htmlspecialchars__recursive($options['options']);
+		$poll_options = Util::htmlspecialchars__recursive($options['options']);
 
 		// Finally, make the poll.
 		require_once(SUBSDIR . '/Poll.subs.php');

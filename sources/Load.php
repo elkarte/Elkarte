@@ -145,17 +145,6 @@ function reloadSettings()
 		$modSettings['secureCookies'] = 0;
 	}
 
-	// Here to justify the name of this function. :P
-	// It should be added to the install and upgrade scripts.
-	// But since the converters need to be updated also. This is easier.
-	if (empty($modSettings['currentAttachmentUploadDir']))
-	{
-		updateSettings(array(
-			'attachmentUploadDir' => serialize(array(1 => $modSettings['attachmentUploadDir'])),
-			'currentAttachmentUploadDir' => 1,
-		));
-	}
-
 	// Integration is cool.
 	if (defined('ELK_INTEGRATION_SETTINGS'))
 	{

@@ -1755,7 +1755,7 @@ function makeCustomFieldChanges($memID, $area, $sanitize = true)
 
 	if ($sanitize && isset($_POST['customfield']))
 	{
-		$_POST['customfield'] = htmlspecialchars__recursive($_POST['customfield']);
+		$_POST['customfield'] = Util::htmlspecialchars__recursive($_POST['customfield']);
 	}
 
 	$where = $area === 'register' ? 'show_reg != 0' : 'show_profile = {string:area}';

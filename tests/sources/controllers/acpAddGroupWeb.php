@@ -14,6 +14,8 @@ class TestManageMembergroupsController extends ElkArteWebTest
 	 * Add a group
 	 *
 	 * Depends on the fact that we are logged in to the ACP
+	 *
+	 * @runInSeparateProcess
 	 */
 	public function testAcpAddGroup()
 	{

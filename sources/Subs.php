@@ -2161,3 +2161,144 @@ function featureEnabled($feature)
 
 	return in_array($feature, $features);
 }
+
+/**
+ * Clean up the XML to make sure it doesn't contain invalid characters.
+ *
+ * What it does:
+ *
+ * - Removes invalid XML characters to assure the input string being
+ * parsed properly.
+ *
+ * @param string $string The string to clean
+ *
+ * @return string The clean string
+ */
+function cleanXml($string)
+{
+	// http://www.w3.org/TR/2000/REC-xml-20001006#NT-Char
+	return preg_replace('~[\x00-\x08\x0B\x0C\x0E-\x19\x{FFFE}\x{FFFF}]~u', '', $string);
+}
+
+/**
+ * Validates a IPv6 address. returns true if it is ipv6.
+ *
+ * @param string $ip ip address to be validated
+ *
+ * @return boolean true|false
+ */
+function isValidIPv6($ip)
+{
+	return filter_var($ip, FILTER_VALIDATE_IP, FILTER_FLAG_IPV6) !== false;
+}
+
+/**
+ * Converts IPv6s to numbers.  This makes ban checks much easier.
+ *
+ * @param string $ip ip address to be converted
+ *
+ * @return int[] array
+ */
+function convertIPv6toInts($ip)
+{
+	static $expanded = array();
+
+	// Check if we have done this already.
+	if (isset($expanded[$ip]))
+	{
+		return $expanded[$ip];
+	}
+
+	// Expand the IP out.
+	$expanded_ip = explode(':', expandIPv6($ip));
+
+	$new_ip = array();
+	foreach ($expanded_ip as $int)
+	{
+		$new_ip[] = hexdec($int);
+	}
+
+	// Save this in case of repeated use.
+	$expanded[$ip] = $new_ip;
+
+	return $expanded[$ip];
+}
+
+/**
+ * Expands a IPv6 address to its full form.
+ *
+ * @param string $addr ipv6 address string
+ * @param boolean $strict_check checks length to expanded address for compliance
+ *
+ * @return boolean|string expanded ipv6 address.
+ */
+function expandIPv6($addr, $strict_check = true)
+{
+	static $converted = array();
+
+	// Check if we have done this already.
+	if (isset($converted[$addr]))
+	{
+		return $converted[$addr];
+	}
+
+	// Check if there are segments missing, insert if necessary.
+	if (strpos($addr, '::') !== false)
+	{
+		$part = explode('::', $addr);
+		$part[0] = explode(':', $part[0]);
+		$part[1] = explode(':', $part[1]);
+		$missing = array();
+
+		// Looks like this is an IPv4 address
+		if (isset($part[1][1]) && strpos($part[1][1], '.') !== false)
+		{
+			$ipoct = explode('.', $part[1][1]);
+			$p1 = dechex($ipoct[0]) . dechex($ipoct[1]);
+			$p2 = dechex($ipoct[2]) . dechex($ipoct[3]);
+
+			$part[1] = array(
+				$part[1][0],
+				$p1,
+				$p2
+			);
+		}
+
+		$limit = count($part[0]) + count($part[1]);
+		for ($i = 0; $i < (8 - $limit); $i++)
+		{
+			array_push($missing, '0000');
+		}
+
+		$part = array_merge($part[0], $missing, $part[1]);
+	}
+	else
+	{
+		$part = explode(':', $addr);
+	}
+
+	// Pad each segment until it has 4 digits.
+	foreach ($part as &$p)
+	{
+		while (strlen($p) < 4)
+		{
+			$p = '0' . $p;
+		}
+	}
+
+	unset($p);
+
+	// Join segments.
+	$result = implode(':', $part);
+
+	// Save this in case of repeated use.
+	$converted[$addr] = $result;
+
+	// Quick check to make sure the length is as expected.
+	if (!$strict_check || strlen($result) == 39)
+	{
+		return $result;
+	}
+
+	return false;
+}

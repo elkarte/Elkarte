@@ -417,7 +417,7 @@ class Register extends AbstractController
 		{
 			if (!is_array($value))
 			{
-				$this->_req->post->{$key} = htmltrim__recursive(str_replace(array("\n", "\r"), '', $value));
+				$this->_req->post->{$key} = Util::htmltrim__recursive(str_replace(array("\n", "\r"), '', $value));
 			}
 		}
 
@@ -503,7 +503,7 @@ class Register extends AbstractController
 		$regOptions['theme_vars'] = isset($this->_req->post->options) && is_array($this->_req->post->options) ? $this->_req->post->options : array();
 
 		// Make sure they are clean, dammit!
-		$regOptions['theme_vars'] = htmlspecialchars__recursive($regOptions['theme_vars']);
+		$regOptions['theme_vars'] = Util::htmlspecialchars__recursive($regOptions['theme_vars']);
 
 		// Check whether we have fields that simply MUST be displayed?
 		require_once(SUBSDIR . '/Profile.subs.php');

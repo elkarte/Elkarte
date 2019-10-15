@@ -506,7 +506,7 @@ class ManageThemes extends AbstractController
 		{
 			if (!in_array($setting, array('theme_url', 'theme_dir', 'images_url', 'template_dirs')))
 			{
-				$settings[$setting] = htmlspecialchars__recursive($settings[$setting]);
+				$settings[$setting] = Util::htmlspecialchars__recursive($settings[$setting]);
 			}
 		}
 

@@ -76,6 +76,37 @@ class Util
 	}
 
 	/**
+	 * Adds html entities to the array/variable.  Uses two underscores to guard against overloading.
+	 *
+	 * What it does:
+	 *
+	 * - Adds entities (&quot;, &lt;, &gt;) to the array or string var.
+	 * - Importantly, does not effect keys, only values.
+	 * - Calls itself recursively if necessary.
+	 * - Does not go deeper than 25 to prevent loop exhaustion
+	 *
+	 * @param array|string $var The string or array of strings to add entities
+	 * @param int $level = 0 The current level we're at within the array (if called recursively)
+	 *
+	 * @return array|string The string or array of strings with entities added
+	 */
+	public static function htmlspecialchars__recursive($var, $level = 0)
+	{
+		if (!is_array($var))
+		{
+			return Util::htmlspecialchars($var, ENT_QUOTES);
+		}
+
+		// Add the htmlspecialchars to every element.
+		foreach ($var as $k => $v)
+		{
+			$var[$k] = $level > 25 ? null : Util::htmlspecialchars__recursive($v, $level + 1);
+		}
+
+		return $var;
+	}
+
+	/**
 	 * Trims tabs, newlines, carriage returns, spaces, vertical tabs and null bytes
 	 * and any number of space characters from the start and end of a string
 	 *
@@ -102,6 +133,96 @@ class Util
 		}
 
 		return $check;
+	}
+
+	/**
+	 * Trim a string including the HTML space, character 160.  Uses two underscores to guard against overloading.
+	 *
+	 * What it does:
+	 *
+	 * - Trims a string or an array using html characters as well.
+	 * - Remove spaces (32), tabs (9), returns (13, 10, and 11), nulls (0), and hard spaces. (160)
+	 * - Does not effect keys, only values.
+	 * - May call itself recursively if needed.
+	 * - Does not go deeper than 25 to prevent loop exhaustion
+	 *
+	 * @param array|string $var The string or array of strings to trim
+	 * @param int $level = 0 How deep we're at within the array (if called recursively)
+	 *
+	 * @return mixed[]|string The trimmed string or array of trimmed strings
+	 */
+	public static function htmltrim__recursive($var, $level = 0)
+	{
+		// Remove spaces (32), tabs (9), returns (13, 10, and 11), nulls (0), and hard spaces. (160)
+		if (!is_array($var))
+		{
+			return \ElkArte\Util::htmltrim($var);
+		}
+
+		// Go through all the elements and remove the whitespace.
+		foreach ($var as $k => $v)
+		{
+			$var[$k] = $level > 25 ? null : htmltrim__recursive($v, $level + 1);
+		}
+
+		return $var;
+	}
+
+	/**
+	 * Perform a strpos search on a multi-byte string
+	 *
+	 * - Optionally performs an entity_fix to null any invalid character entities from the string before the search
+	 *
+	 * @param string $haystack what to search in
+	 * @param string $needle what is being looked for
+	 * @param int $offset where to start, assumed 0
+	 * @param bool $right set to true to mimic strrpos functions
+	 *
+	 * @return bool|mixed
+	 */
+	public static function strpos($haystack, $needle, $offset = 0, $right = false)
+	{
+		global $modSettings;
+
+		$haystack_check = empty($modSettings['disableEntityCheck']) ? preg_replace_callback(self::$_entity_check_reg, 'entity_fix__callback', $haystack) : $haystack;
+		$haystack_arr = preg_split('~(&#' . (empty($modSettings['disableEntityCheck']) ? '\d{1,7}' : '021') . ';|&quot;|&amp;|&lt;|&gt;|&nbsp;|.)~u', $haystack_check, -1, PREG_SPLIT_DELIM_CAPTURE | PREG_SPLIT_NO_EMPTY);
+		$count = 0;
+
+		// From the right side, like mb_strrpos instead
+		if ($right)
+		{
+			$haystack_arr = array_reverse($haystack_arr);
+			$count = count($haystack_arr) - 1;
+		}
+
+		// Single character search, lets go
+		if (strlen($needle) === 1)
+		{
+			$result = array_search($needle, array_slice($haystack_arr, $offset));
+
+			return is_int($result) ? ($right ? $count - ($result + $offset) : $result + $offset) : false;
+		}
+		else
+		{
+			$needle_check = empty($modSettings['disableEntityCheck']) ? preg_replace_callback(self::$_entity_check_reg, 'entity_fix__callback', $needle) : $needle;
+			$needle_arr = preg_split('~(&#' . (empty($modSettings['disableEntityCheck']) ? '\d{1,7}' : '021') . ';|&quot;|&amp;|&lt;|&gt;|&nbsp;|.)~u', $needle_check, -1, PREG_SPLIT_DELIM_CAPTURE | PREG_SPLIT_NO_EMPTY);
+			$needle_arr = $right ? array_reverse($needle_arr) : $needle_arr;
+			$needle_size = count($needle_arr);
+
+			$result = array_search($needle_arr[0], array_slice($haystack_arr, $offset));
+			while ((int) $result === $result)
+			{
+				$offset += $result;
+				if (array_slice($haystack_arr, $offset, $needle_size) === $needle_arr)
+				{
+					return $right ? ($count - $offset - $needle_size + 1) : $offset;
+				}
+
+				$result = array_search($needle_arr[0], array_slice($haystack_arr, ++$offset));
+			}
+
+			return false;
+		}
 	}
 
 	/**
@@ -273,63 +394,6 @@ class Util
 		}
 
 		return $length === null ? implode('', array_slice($ent_arr, $start)) : implode('', array_slice($ent_arr, $start, $length));
-	}
-
-	/**
-	 * Perform a strpos search on a multi-byte string
-	 *
-	 * - Optionally performs an entity_fix to null any invalid character entities from the string before the search
-	 *
-	 * @param string $haystack what to search in
-	 * @param string $needle what is being looked for
-	 * @param int $offset where to start, assumed 0
-	 * @param bool $right set to true to mimic strrpos functions
-	 *
-	 * @return bool|mixed
-	 */
-	public static function strpos($haystack, $needle, $offset = 0, $right = false)
-	{
-		global $modSettings;
-
-		$haystack_check = empty($modSettings['disableEntityCheck']) ? preg_replace_callback(self::$_entity_check_reg, 'entity_fix__callback', $haystack) : $haystack;
-		$haystack_arr = preg_split('~(&#' . (empty($modSettings['disableEntityCheck']) ? '\d{1,7}' : '021') . ';|&quot;|&amp;|&lt;|&gt;|&nbsp;|.)~u', $haystack_check, -1, PREG_SPLIT_DELIM_CAPTURE | PREG_SPLIT_NO_EMPTY);
-		$count = 0;
-
-		// From the right side, like mb_strrpos instead
-		if ($right)
-		{
-			$haystack_arr = array_reverse($haystack_arr);
-			$count = count($haystack_arr) - 1;
-		}
-
-		// Single character search, lets go
-		if (strlen($needle) === 1)
-		{
-			$result = array_search($needle, array_slice($haystack_arr, $offset));
-
-			return is_int($result) ? ($right ? $count - ($result + $offset) : $result + $offset) : false;
-		}
-		else
-		{
-			$needle_check = empty($modSettings['disableEntityCheck']) ? preg_replace_callback(self::$_entity_check_reg, 'entity_fix__callback', $needle) : $needle;
-			$needle_arr = preg_split('~(&#' . (empty($modSettings['disableEntityCheck']) ? '\d{1,7}' : '021') . ';|&quot;|&amp;|&lt;|&gt;|&nbsp;|.)~u', $needle_check, -1, PREG_SPLIT_DELIM_CAPTURE | PREG_SPLIT_NO_EMPTY);
-			$needle_arr = $right ? array_reverse($needle_arr) : $needle_arr;
-			$needle_size = count($needle_arr);
-
-			$result = array_search($needle_arr[0], array_slice($haystack_arr, $offset));
-			while ((int) $result === $result)
-			{
-				$offset += $result;
-				if (array_slice($haystack_arr, $offset, $needle_size) === $needle_arr)
-				{
-					return $right ? ($count - $offset - $needle_size + 1) : $offset;
-				}
-
-				$result = array_search($needle_arr[0], array_slice($haystack_arr, ++$offset));
-			}
-
-			return false;
-		}
 	}
 
 	/**

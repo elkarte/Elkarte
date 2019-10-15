@@ -58,6 +58,9 @@ class TestManageMembersController extends ElkArteWebTest
 		}
 	}
 
+	/**
+	 * @runInSeparateProcess
+	 */
 	public function testApproveMember()
 	{
 		// First, we register some members...
@@ -65,6 +68,10 @@ class TestManageMembersController extends ElkArteWebTest
 
 		// Then, navigate to member management.
 		$this->activateMember('user1', 'approve', 'ok');
+
+		// Login the admin in to the ACP
+		$this->adminLogin();
+		$this->enterACP();
 
 		// Finally, ensure they have been approved.
 		$this->url('index.php?action=admin;area=viewmembers;sa=search');
@@ -74,9 +81,16 @@ class TestManageMembersController extends ElkArteWebTest
 		$this->assertContains('user1', $this->byId('member_list')->text());
 	}
 
+	/**
+	 * @runInSeparateProcess
+	 */
 	public function testActivateMember()
 	{
 		$this->activateMember('user0', 'activate', 'delete');
+
+		// Login the admin in to the ACP
+		$this->adminLogin();
+		$this->enterACP();
 
 		// Should be gone.
 		$this->url('index.php?action=admin;area=viewmembers;sa=all');
