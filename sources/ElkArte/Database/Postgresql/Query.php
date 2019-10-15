@@ -66,10 +66,8 @@ class Query extends AbstractQuery
 		{
 			return pg_last_error($this->connection);
 		}
-		else
-		{
-			return false;
-		}
+
+		return false;
 	}
 
 	/**
@@ -190,22 +188,15 @@ class Query extends AbstractQuery
 			}
 		}
 
-		if ($method === 'replace')
-			var_dump('one ' . $this->_db_replace_result);
-
 		if ($priv_trans)
 		{
 			$this->transaction('commit');
 		}
-		if ($method === 'replace')
-			var_dump('two ' . $this->_db_replace_result);
 
 		if (!empty($data))
 		{
 			$last_inserted_id = $this->insert_id($table);
 		}
-		if ($method === 'replace')
-			var_dump('three ' . $this->_db_replace_result);
 
 		$this->result = new Result(
 			is_object($ret) ? $ret->getResultObject() : $ret,
@@ -215,9 +206,6 @@ class Query extends AbstractQuery
 				'lastResult' => $this->_db_last_result,
 			])
 		);
-
-		if ($method === 'replace')
-			var_dump($this->result);
 
 		return $this->result;
 	}
@@ -302,7 +290,7 @@ class Query extends AbstractQuery
 
 		// One more query....
 		$this->_query_count++;
-		$this->_db_replace_result = null;
+		$this->_db_replace_result = $this->_db_replace_result ?? null;
 
 		$db_string = $this->_prepareQuery($db_string, $db_values);
 
@@ -335,10 +323,8 @@ class Query extends AbstractQuery
 		{
 			return false;
 		}
-		else
-		{
-			return $this->result;
-		}
+
+		return $this->result;
 	}
 
 	/**
@@ -369,24 +355,18 @@ class Query extends AbstractQuery
 
 		// Show an error message, if possible.
 		$context['error_title'] = $txt['database_error'];
-		if (allowedTo('admin_forum'))
-		{
-			$context['error_message'] = nl2br($query_error) . '<br />' . $txt['file'] . ': ' . $file . '<br />' . $txt['line'] . ': ' . $line;
-		}
-		else
-		{
-			$context['error_message'] = $txt['try_again'];
-		}
+		$context['error_message'] = $txt['try_again'];
 
 		// Add database version that we know of, for the admin to know. (and ask for support)
 		if (allowedTo('admin_forum'))
 		{
-			$context['error_message'] .= '<br /><br />' . sprintf($txt['database_error_versions'], $modSettings['elkVersion']);
-		}
+			$context['error_message'] = nl2br($query_error) . '<br />' . $txt['file'] . ': ' . $file . '<br />' . $txt['line'] . ': ' . $line .
+				'<br /><br />' . sprintf($txt['database_error_versions'], $modSettings['elkVersion']);
 
-		if (allowedTo('admin_forum') && $db_show_debug === true)
-		{
-			$context['error_message'] .= '<br /><br />' . nl2br($db_string);
+			if ($db_show_debug === true)
+			{
+				$context['error_message'] .= '<br /><br />' . nl2br($db_string);
+			}
 		}
 
 		// It's already been logged... don't log it again.
@@ -406,6 +386,7 @@ class Query extends AbstractQuery
 		$table = str_replace('{db_prefix}', $this->_db_prefix, $table);
 
 		$this->skip_next_error();
+
 		// Try get the last ID for the auto increment field.
 		$request = $this->query('', 'SELECT CURRVAL(\'' . $table . '_seq\') AS insertID',
 			array()
