@@ -68,6 +68,7 @@ abstract class ElkArteCommonSetupTest extends \PHPUnit\Framework\TestCase
 		$_SESSION['session_value'] = 'elk_test_session';
 		$_SESSION['session_var'] = 'elk_test_session';
 		$_SESSION['USER_AGENT'] = 'elkarte';
+		$_SESSION['admin_time'] = time() + 600;
 		$modSettings['disableCheckUA'] = 1;
 		$context['session_var'] = 'elk_test_session';
 		$context['session_value'] = 'elk_test_session';
