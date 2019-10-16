@@ -33,6 +33,7 @@ class TestCalendar extends ElkArteCommonSetupTest
 
 	/**
 	 * Test getting the calendar
+	 *
 	 * @runInSeparateProcess
 	 */
 	public function testActionCalendar()
@@ -49,7 +50,7 @@ class TestCalendar extends ElkArteCommonSetupTest
 		{
 			$check = $e->getMessage();
 		}
-		$this->assertEquals('calendar_off', $check);
+		$this->assertContains('You cannot access the calendar right now because it is disabled', $check);
 
 		// Try again with it on
 		$modSettings['cal_enabled'] = 1;
