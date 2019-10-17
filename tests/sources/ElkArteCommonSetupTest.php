@@ -38,7 +38,7 @@ abstract class ElkArteCommonSetupTest extends \PHPUnit\Framework\TestCase
 			'query_see_board' => '1=1',
 			'is_moderator' => false,
 			'email' => 'a@a.com',
-			'ignoreusers' => '',
+			'ignoreusers' => array(),
 			'name' => 'itsme',
 			'smiley_set' => 'none',
 			'time_offset' => 0,
