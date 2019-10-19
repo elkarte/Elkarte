@@ -347,8 +347,11 @@ class AttachmentsDirectory
 	{
 		global $modSettings, $context;
 
-		// Not pretty, but since we don't want folders created for every post.
-		// It'll do unless a better solution can be found.
+		if ($this->autoManageEnabled() === false)
+		{
+			return;
+		}
+
 		if ($this->checkNewDir($is_admin_interface) === false)
 		{
 			return;
