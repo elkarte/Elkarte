@@ -1028,7 +1028,9 @@ function saveAvatar($temporary_path, $memID, $max_width, $max_height)
 	require_once(SUBSDIR . '/ManageAttachments.subs.php');
 	removeAttachments(array('id_member' => $memID));
 
-	$id_folder = getAttachmentPathID();
+	$attachmentsDir = new AttachmentsDirectory($modSettings);
+
+	$id_folder = $attachmentsDir->currentDirectoryId();
 	$avatar_hash = empty($modSettings['custom_avatar_enabled']) ? getAttachmentFilename($destName, 0, null, true) : '';
 	$db->insert('',
 		'{db_prefix}attachments',
@@ -1043,8 +1045,6 @@ function saveAvatar($temporary_path, $memID, $max_width, $max_height)
 		array('id_attach')
 	);
 	$attachID = $db->insert_id('{db_prefix}attachments', 'id_attach');
-
-	$attachmentsDir = new AttachmentsDirectory($modSettings);
 
 	// The destination filename will depend on whether custom dir for avatars has been set
 	$destName = getAvatarPath() . '/' . $destName;
@@ -1194,27 +1194,6 @@ function getAvatarPath()
 }
 
 /**
- * Little utility function for the $id_folder computation for attachments.
- *
- * What it does:
- *
- * - This returns the id of the folder where the attachment or avatar will be saved.
- * - If multiple attachment directories are not enabled, this will be 1 by default.
- *
- * @return int 1 if multiple attachment directories are not enabled,
- * or the id of the current attachment directory otherwise.
- * @deprecated since 2.0 see AttachmentsDirectory->currentDirectoryId
- * @package Attachments
- */
-function getAttachmentPathID()
-{
-	global $modSettings;
-
-	$attachmentsDir = new AttachmentsDirectory($modSettings);
-	return $attachmentsDir->currentDirectoryId();
-}
-
-/**
  * Returns the ID of the folder avatars are currently saved in.
  *
  * @return int 1 if custom avatar directory is enabled,
@@ -1227,13 +1206,14 @@ function getAvatarPathID()
 	global $modSettings;
 
 	// Little utility function for the endless $id_folder computation for avatars.
-	if (!empty($modSettings['custom_avatar_enabled']))
+	if (empty($modSettings['custom_avatar_enabled']))
 	{
-		return 1;
+		$attachmentsDir = new AttachmentsDirectory($modSettings);
+		return $attachmentsDir->currentDirectoryId();
 	}
 	else
 	{
-		return getAttachmentPathID();
+		return 1;
 	}
 }
 
@@ -1421,7 +1401,8 @@ function updateAttachmentThumbnail($filename, $id_attach, $id_msg, $old_id_thumb
 	if ($image->createThumbnail($filename, $modSettings['attachmentThumbWidth'], $modSettings['attachmentThumbHeight']))
 	{
 		// So what folder are we putting this image in?
-		$id_folder_thumb = getAttachmentPathID();
+		$attachmentsDir = new AttachmentsDirectory($modSettings);
+		$id_folder_thumb = $attachmentsDir->currentDirectoryId();
 
 		// Calculate the size of the created thumbnail.
 		$size = $image->getSize($filename . '_thumb');

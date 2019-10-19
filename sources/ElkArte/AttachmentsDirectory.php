@@ -107,6 +107,17 @@ class AttachmentsDirectory
 		}
 	}
 
+	/**
+	 * Little utility function for the $id_folder computation for attachments.
+	 *
+	 * What it does:
+	 *
+	 * - This returns the id of the folder where the attachment or avatar will be saved.
+	 * - If multiple attachment directories are not enabled, this will be 1 by default.
+	 *
+	 * @return int 1 if multiple attachment directories are not enabled,
+	 * or the id of the current attachment directory otherwise.
+	 */
 	public function currentDirectoryId()
 	{
 		if (!array_key_exists($this->currentAttachmentUploadDir, $this->attachmentUploadDir))
