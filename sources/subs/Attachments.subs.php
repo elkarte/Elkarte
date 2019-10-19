@@ -24,6 +24,8 @@ use ElkArte\Http\FsockFetchWebdata;
 use ElkArte\User;
 use ElkArte\Util;
 use ElkArte\AttachmentsDirectory;
+use ElkArte\Exceptions\Exception as ElkException;
+use \Exception;
 
 /**
  * Handles the actual saving of attachments to a directory.
@@ -47,19 +49,22 @@ function processAttachments($id_msg = null)
 
 	// Make sure we're uploading to the right place.
 	$attachmentDirectory = new AttachmentsDirectory($modSettings);
-	$attachmentDirectory->automanageCheckDirectory(isset($_REQUEST['action']) && $_REQUEST['action'] == 'admin');
-
-	$context['attach_dir'] = $attachmentDirectory->getCurrent();
-
-	// Is the attachments folder actually there?
-	if (!empty($context['dir_creation_error']))
+	try
 	{
-		$initial_error = $context['dir_creation_error'];
+		$attachmentDirectory->automanageCheckDirectory(isset($_REQUEST['action']) && $_REQUEST['action'] == 'admin');
+
+		$context['attach_dir'] = $attachmentDirectory->getCurrent();
+
+		if (!is_dir($context['attach_dir']))
+		{
+			$initial_error = 'attach_folder_warning';
+			\ElkArte\Errors\Errors::instance()->log_error(sprintf($txt['attach_folder_admin_warning'], $context['attach_dir']), 'critical');
+		}
 	}
-	elseif (!is_dir($context['attach_dir']))
+	catch (Exception $e)
 	{
-		$initial_error = 'attach_folder_warning';
-		\ElkArte\Errors\Errors::instance()->log_error(sprintf($txt['attach_folder_admin_warning'], $context['attach_dir']), 'critical');
+		// If the attachments folder is not there: error.
+		$initial_error = $e->getMessage();
 	}
 
 	if (!isset($initial_error) && !isset($context['attachments']['quantity']))
@@ -475,7 +480,7 @@ function attachmentChecks($attachID)
 	// Let's get their attention.
 	if (!empty($error))
 	{
-		throw new \ElkArte\Exceptions\Exception('attach_check_nag', 'debug', array($error));
+		throw new ElkException('attach_check_nag', 'debug', array($error));
 	}
 
 	// Just in case this slipped by the first checks, we stop it here and now
