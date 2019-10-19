@@ -325,7 +325,6 @@ function removeAttachments($condition, $query_type = '', $return_affected_messag
  * Return an array of attachments directories.
  *
  * @package Attachments
- * @see getAttachmentPath()
  * @deprecated since 2.0 see getAttachmentDirs
  */
 function attachmentPaths()

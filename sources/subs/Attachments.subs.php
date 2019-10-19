@@ -1044,9 +1044,11 @@ function saveAvatar($temporary_path, $memID, $max_width, $max_height)
 	);
 	$attachID = $db->insert_id('{db_prefix}attachments', 'id_attach');
 
+	$attachmentsDir = new AttachmentsDirectory($modSettings);
+
 	// The destination filename will depend on whether custom dir for avatars has been set
 	$destName = getAvatarPath() . '/' . $destName;
-	$path = getAttachmentPath();
+	$path = $attachmentsDir->getCurrent();
 	$destName = empty($avatar_hash) ? $destName : $path . '/' . $attachID . '_' . $avatar_hash . '.elk';
 	$format = !empty($modSettings['avatar_download_png']) ? IMAGETYPE_PNG : IMAGETYPE_JPEG;
 
@@ -1170,24 +1172,6 @@ function url_image_size($url)
 }
 
 /**
- * The current attachments path:
- *
- * see AttachmentsDirectory->getCurrent
- *
- * @return string
- * @deprecated since 2.0 see AttachmentsDirectory->getCurrent
- * @package Attachments
- */
-function getAttachmentPath()
-{
-	global $modSettings;
-
-	$attachmentsDir = new AttachmentsDirectory($modSettings);
-
-	return $attachmentsDir->getCurrent();
-}
-
-/**
  * The avatars path: if custom avatar directory is set, that's it.
  * Otherwise, it's attachments path.
  *
@@ -1198,7 +1182,15 @@ function getAvatarPath()
 {
 	global $modSettings;
 
-	return empty($modSettings['custom_avatar_enabled']) ? getAttachmentPath() : $modSettings['custom_avatar_dir'];
+	if (empty($modSettings['custom_avatar_enabled']))
+	{
+		$attachmentsDir = new AttachmentsDirectory($modSettings);
+		return $attachmentsDir->getCurrent();
+	}
+	else
+	{
+		return $modSettings['custom_avatar_dir'];
+	}
 }
 
 /**
