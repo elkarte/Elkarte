@@ -47,10 +47,11 @@ function processAttachments($id_msg = null)
 
 	// Make sure we're uploading to the right place.
 	$attachmentDirectory = new AttachmentsDirectory($modSettings);
-	$attachmentDirectory->automanage_attachments_check_directory(isset($_REQUEST['action']) && $_REQUEST['action'] == 'admin');
+	$attachmentDirectory->automanageCheckDirectory(isset($_REQUEST['action']) && $_REQUEST['action'] == 'admin');
+	// @TODO why this is checked twice in a row?
 	if ($attachmentDirectory->autoManageEnabled())
 	{
-		$attachmentDirectory->automanage_attachments_check_directory();
+		$attachmentDirectory->automanageCheckDirectory();
 	}
 
 	$context['attach_dir'] = $attachmentDirectory->getCurrent();

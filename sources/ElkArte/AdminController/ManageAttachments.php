@@ -174,6 +174,7 @@ class ManageAttachments extends AbstractController
 
 		// initialize the form
 		$settingsForm = new SettingsForm(SettingsForm::DB_ADAPTER);
+		$attachmentsDir = new AttachmentsDirectory($modSettings);
 
 		// Initialize settings
 		$settingsForm->setConfigVars($this->_settings());
@@ -242,7 +243,7 @@ class ManageAttachments extends AbstractController
 
 					if (!in_array($this->_req->post->basedirectory_for_attachments, $modSettings['attachmentUploadDir']))
 					{
-						if (!automanage_attachments_create_directory($this->_req->post->basedirectory_for_attachments))
+						if (!$attachmentsDir->createDirectory($this->_req->post->basedirectory_for_attachments))
 						{
 							$this->_req->post->basedirectory_for_attachments = $modSettings['basedirectory_for_attachments'];
 						}
@@ -1230,7 +1231,7 @@ class ManageAttachments extends AbstractController
 					}
 
 					// OK, so let's try to create it then.
-					if ($attachmentsDir->automanage_attachments_create_directory($path) === false)
+					if ($attachmentsDir->createDirectory($path) === false)
 					{
 						$errors[] = $path . ': ' . $txt[$context['dir_creation_error']];
 						continue;
@@ -1375,7 +1376,7 @@ class ManageAttachments extends AbstractController
 
 				if (!in_array($this->_req->post->new_base_dir, $modSettings['attachmentUploadDir']))
 				{
-					if (!automanage_attachments_create_directory($this->_req->post->new_base_dir))
+					if (!$attachmentsDir->createDirectory($this->_req->post->new_base_dir))
 					{
 						$errors[] = $this->_req->post->new_base_dir . ': ' . $txt['attach_dir_base_no_create'];
 					}
@@ -1730,7 +1731,7 @@ class ManageAttachments extends AbstractController
 						if ($attachmentsDir->remainingSpace($dir_size) === 0 || $attachmentsDir->remainingFiles($dir_files) === 0)
 						{
 							// Since we're in auto mode. Create a new folder and reset the counters.
-							$create_result = $attachmentsDir->automanage_attachments_by_space();
+							$create_result = $attachmentsDir->manageBySpace();
 							if ($create_result === true)
 							{
 								$results[] = sprintf($txt['attachments_transfered'], $total_moved, $attachmentsDir->getPathById($new_dir));

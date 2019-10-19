@@ -275,7 +275,7 @@ class AttachmentsDirectory
 			// If the folder is full, try to create a new one and move the thumb to it.
 			if (self::$dir_size > $this->sizeLimit * 1024 || self::$dir_files + 2 > $this->numFilesLimit)
 			{
-				if ($this->automanage_attachments_by_space())
+				if ($this->manageBySpace())
 				{
 					self::$dir_size = 0;
 					self::$dir_files = 0;
@@ -343,7 +343,7 @@ class AttachmentsDirectory
 	 *
 	 * @param bool $is_admin_interface
 	 */
-	public function automanage_attachments_check_directory($is_admin_interface = false)
+	public function automanageCheckDirectory($is_admin_interface = false)
 	{
 		global $modSettings, $context;
 
@@ -411,7 +411,7 @@ class AttachmentsDirectory
 
 		if (!in_array($updir, $modSettings['attachmentUploadDir']) && !empty($updir))
 		{
-			$outputCreation = automanage_attachments_create_directory($updir);
+			$outputCreation = $this->createDirectory($updir);
 		}
 		elseif (in_array($updir, $modSettings['attachmentUploadDir']))
 		{
@@ -459,7 +459,7 @@ class AttachmentsDirectory
 			if ($this->autoManageIsLevel(self::AUTO_SEQUENCE))
 			{
 				// Move it to the new folder if we can.
-				if (automanage_attachments_by_space())
+				if ($this->manageBySpace())
 				{
 					rename($_SESSION['temp_attachments'][$attachID]['tmp_name'], $context['attach_dir'] . '/' . $attachID);
 					$_SESSION['temp_attachments'][$attachID]['tmp_name'] = $context['attach_dir'] . '/' . $attachID;
@@ -519,21 +519,21 @@ class AttachmentsDirectory
 	 *
 	 * @return bool
 	 */
-	public function automanage_attachments_create_directory($updir)
+	public function createDirectory($updir)
 	{
 		global $modSettings, $context;
 
-		$tree = $this->get_directory_tree_elements($updir);
+		$tree = $this->getTreeElements($updir);
 		$count = count($tree);
 
-		$directory = !empty($tree) ? $this->attachments_init_dir($tree, $count) : false;
+		$directory = !empty($tree) ? $this->initDir($tree, $count) : false;
 		if ($directory === false)
 		{
 			// Maybe it's just the folder name
-			$tree = $this->get_directory_tree_elements(BOARDDIR . DIRECTORY_SEPARATOR . $updir);
+			$tree = $this->getTreeElements(BOARDDIR . DIRECTORY_SEPARATOR . $updir);
 			$count = count($tree);
 
-			$directory = !empty($tree) ? $this->attachments_init_dir($tree, $count) : false;
+			$directory = !empty($tree) ? $this->initDir($tree, $count) : false;
 			if ($directory === false)
 			{
 				return false;
@@ -712,11 +712,11 @@ class AttachmentsDirectory
 	 * What it does:
 	 *
 	 * - Increments the above directory to the next available slot
-	 * - Uses automanage_attachments_create_directory to create the incremental directory
+	 * - Uses createDirectory to create the incremental directory
 	 *
 	 * @package Attachments
 	 */
-	public function automanage_attachments_by_space()
+	public function manageBySpace()
 	{
 		global $modSettings;
 
@@ -750,7 +750,7 @@ class AttachmentsDirectory
 		$updir = $basedirectory . DIRECTORY_SEPARATOR . 'attachments_' . $this->last_dirs[$base_dir];
 
 		// make sure it exists and is writable
-		if (automanage_attachments_create_directory($updir))
+		if ($this->createDirectory($updir))
 		{
 			$this->currentAttachmentUploadDir = array_search($updir, $modSettings['attachmentUploadDir']);
 			updateSettings(array(
@@ -773,7 +773,7 @@ class AttachmentsDirectory
 	 * @param string $directory
 	 * @return string[]|boolean on fail else array of directory names
 	 */
-	protected function get_directory_tree_elements($directory)
+	protected function getTreeElements($directory)
 	{
 		/*
 			In Windows server both \ and / can be used as directory separators in paths
@@ -800,7 +800,7 @@ class AttachmentsDirectory
 	}
 
 	/**
-	 * Helper function for automanage_attachments_create_directory
+	 * Helper function for createDirectory
 	 *
 	 * What it does:
 	 *
@@ -813,7 +813,7 @@ class AttachmentsDirectory
 	 *
 	 * @return bool|mixed|string
 	 */
-	public function attachments_init_dir(&$tree, &$count)
+	public function initDir(&$tree, &$count)
 	{
 		$directory = '';
 
