@@ -185,6 +185,11 @@ class AttachmentsDirectory
 		}
 	}
 
+	/**
+	 * Returns the list of directories as an array.
+	 *
+	 * @return mixed[] the attachments directory/directories
+	 */
 	public function getPaths()
 	{
 		return $this->attachmentUploadDir;

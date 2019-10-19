@@ -322,17 +322,6 @@ function removeAttachments($condition, $query_type = '', $return_affected_messag
 }
 
 /**
- * Return an array of attachments directories.
- *
- * @package Attachments
- * @deprecated since 2.0 see getAttachmentDirs
- */
-function attachmentPaths()
-{
-	return getAttachmentDirs();
-}
-
-/**
  * How many attachments we have overall.
  *
  * @return int
@@ -414,21 +403,6 @@ function getAvatarCount()
 	$db->free_result($request);
 
 	return $num_avatars;
-}
-
-/**
- * Get the attachments directories, as an array.
- *
- * @return mixed[] the attachments directory/directories
- * @package Attachments
- * @deprecated since 2.0 see AttachmentsDirectory->getPaths
- */
-function getAttachmentDirs()
-{
-	global $modSettings;
-
-	$attachmentDirectory = new AttachmentsDirectory($modSettings);
-	return $attachmentDirectory->getPaths();
 }
 
 /**

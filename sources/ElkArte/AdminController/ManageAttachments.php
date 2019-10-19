@@ -645,7 +645,8 @@ class ManageAttachments extends AbstractController
 		$context['sub_template'] = 'maintenance';
 
 		// We need our attachments directories...
-		$attach_dirs = getAttachmentDirs();
+		$attachmentDirectory = new AttachmentsDirectory($modSettings);
+		$attach_dirs = $attachmentDirectory->getPaths();
 
 		// Get the number of attachments...
 		$context['num_attachments'] = comma_format(getAttachmentCount(), 0);
@@ -660,14 +661,14 @@ class ManageAttachments extends AbstractController
 		$current_dir = currentAttachDirProperties();
 
 		// If they specified a limit only....
-		if ($attach_dirs->hasSizeLimit())
+		if ($attachmentDirectory->hasSizeLimit())
 		{
-			$context['attachment_space'] = comma_format($attach_dirs->remainingSpace($current_dir['size']), 2);
+			$context['attachment_space'] = comma_format($attachmentDirectory->remainingSpace($current_dir['size']), 2);
 		}
 
-		if ($attach_dirs->hasNumFilesLimit())
+		if ($attachmentDirectory->hasNumFilesLimit())
 		{
-			$context['attachment_files'] = comma_format($attach_dirs->remainingFiles($current_dir['files']), 0);
+			$context['attachment_files'] = comma_format($attachmentDirectory->remainingFiles($current_dir['files']), 0);
 		}
 
 		$context['attachment_current_size'] = byte_format($current_dir['size']);
