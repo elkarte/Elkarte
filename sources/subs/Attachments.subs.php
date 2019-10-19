@@ -691,12 +691,15 @@ function createAttachment(&$attachmentOptions)
 
 			// We should check the file size and count here since thumbs are added to the existing totals.
 			$attachmentsDir->checkDirSize($thumb_size);
+			$current_dir_id = $attachmentsDir->currentDirectoryId();
 
 			// If a new folder has been already created. Gotta move this thumb there then.
 			if ($attachmentsDir->isCurrentDirectoryId($attachmentOptions['id_folder']) === false)
 			{
-				rename($thumb_path, $attachmentsDir->getCurrent() . '/' . $thumb_filename);
-				$thumb_path = $attachmentsDir->getCurrent() . '/' . $thumb_filename;
+				$current_dir = $attachmentsDir->getCurrent();
+				$current_dir_id = $attachmentsDir->currentDirectoryId();
+				rename($thumb_path,  $current_dir . '/' . $thumb_filename);
+				$thumb_path = $current_dir . '/' . $thumb_filename;
 			}
 
 			// To the database we go!
@@ -707,7 +710,7 @@ function createAttachment(&$attachmentOptions)
 					'size' => 'int', 'width' => 'int', 'height' => 'int', 'mime_type' => 'string-20', 'approved' => 'int',
 				),
 				array(
-					$attachmentsDir->currentDirectoryId(), (int) $attachmentOptions['post'], 3, $thumb_filename, $thumb_file_hash, $attachmentOptions['fileext'],
+					$current_dir_id, (int) $attachmentOptions['post'], 3, $thumb_filename, $thumb_file_hash, $attachmentOptions['fileext'],
 					$thumb_size, $thumb_width, $thumb_height, $thumb_mime, (int) $attachmentOptions['approved'],
 				),
 				array('id_attach')
@@ -726,7 +729,7 @@ function createAttachment(&$attachmentOptions)
 					)
 				);
 
-				rename($thumb_path, getAttachmentFilename($thumb_filename, $attachmentOptions['thumb'], $attachmentsDir->currentDirectoryId(), false, $thumb_file_hash));
+				rename($thumb_path, getAttachmentFilename($thumb_filename, $attachmentOptions['thumb'], $current_dir_id, false, $thumb_file_hash));
 			}
 		}
 	}
