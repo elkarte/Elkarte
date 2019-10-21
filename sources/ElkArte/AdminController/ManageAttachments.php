@@ -237,14 +237,19 @@ class ManageAttachments extends AbstractController
 					$modSettings['attachment_basedirectories'] = array();
 				}
 
-				if (!empty($this->_req->post->basedirectory_for_attachments) && !in_array($this->_req->post->basedirectory_for_attachments, $modSettings['attachment_basedirectories']))
+				if (!empty($this->_req->post->basedirectory_for_attachments) && $attachmentsDir->isBaseDir($this->_req->post->basedirectory_for_attachments) === false)
 				{
-					$currentAttachmentUploadDir = $modSettings['currentAttachmentUploadDir'];
+					$currentAttachmentUploadDir = $attachmentsDir->currentDirectoryId();
 
-					if (!in_array($this->_req->post->basedirectory_for_attachments, $modSettings['attachmentUploadDir']))
+					if ($attachmentsDir->directoryExists($this->_req->post->basedirectory_for_attachments) === false)
 					{
-						if (!$attachmentsDir->createDirectory($this->_req->post->basedirectory_for_attachments))
+						try
 						{
+							$attachmentsDir->createDirectory($this->_req->post->basedirectory_for_attachments);
+						}
+						catch (\Exception $e)
+						{
+
 							$this->_req->post->basedirectory_for_attachments = $modSettings['basedirectory_for_attachments'];
 						}
 					}
@@ -1232,9 +1237,13 @@ class ManageAttachments extends AbstractController
 					}
 
 					// OK, so let's try to create it then.
-					if ($attachmentsDir->createDirectory($path) === false)
+					try
 					{
-						$errors[] = $path . ': ' . $txt[$context['dir_creation_error']];
+						$attachmentsDir->createDirectory($path);
+					}
+					catch (\Exception $e)
+					{
+						$errors[] = $path . ': ' . $txt[$e->getMessage()];
 						continue;
 					}
 				}
@@ -1379,7 +1388,11 @@ class ManageAttachments extends AbstractController
 
 				if (!in_array($this->_req->post->new_base_dir, $attachmentUploadDir))
 				{
-					if (!$attachmentsDir->createDirectory($this->_req->post->new_base_dir))
+					try
+					{
+						$attachmentsDir->createDirectory($this->_req->post->new_base_dir);
+					}
+					catch (\Exception $e)
 					{
 						$errors[] = $this->_req->post->new_base_dir . ': ' . $txt['attach_dir_base_no_create'];
 					}

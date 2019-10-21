@@ -357,7 +357,7 @@ class AttachmentsDirectory
 	 */
 	public function automanageCheckDirectory($is_admin_interface = false)
 	{
-		global $modSettings, $context;
+		global $modSettings;
 
 		if ($this->autoManageEnabled() === false)
 		{
@@ -421,7 +421,15 @@ class AttachmentsDirectory
 
 		if (!in_array($updir, $this->attachmentUploadDir) && !empty($updir))
 		{
-			$outputCreation = $this->createDirectory($updir);
+			try
+			{
+				$this->createDirectory($updir);
+				$outputCreation = true;
+			}
+			catch (Exception $e)
+			{
+				$outputCreation = false;
+			}
 		}
 		elseif (in_array($updir, $this->attachmentUploadDir))
 		{
@@ -470,26 +478,22 @@ class AttachmentsDirectory
 			if ($this->autoManageIsLevel(self::AUTO_SEQUENCE))
 			{
 				// Move it to the new folder if we can.
-				if ($this->manageBySpace())
+				try
 				{
-					$file_path = $this->getCurrent() . '/' . $attachID;
-					$_SESSION['temp_attachments'][$attachID]['id_folder'] = $this->currentAttachmentUploadDir;
-					rename($_SESSION['temp_attachments'][$attachID]['tmp_name'], $file_path);
-					$_SESSION['temp_attachments'][$attachID]['tmp_name'] = $file_path;
-					self::$dir_size = 0;
-					self::$dir_files = 0;
+					if ($this->manageBySpace())
+					{
+						$file_path = $this->getCurrent() . '/' . $attachID;
+						$_SESSION['temp_attachments'][$attachID]['id_folder'] = $this->currentAttachmentUploadDir;
+						rename($_SESSION['temp_attachments'][$attachID]['tmp_name'], $file_path);
+						$_SESSION['temp_attachments'][$attachID]['tmp_name'] = $file_path;
+						self::$dir_size = 0;
+						self::$dir_files = 0;
+					}
 				}
 				// Or, let the user know that its not going to happen.
-				else
+				catch (Exception $e)
 				{
-					if (isset($context['dir_creation_error']))
-					{
-						$_SESSION['temp_attachments'][$attachID]['errors'][] = $context['dir_creation_error'];
-					}
-					else
-					{
-						$_SESSION['temp_attachments'][$attachID]['errors'][] = 'ran_out_of_space';
-					}
+					$_SESSION['temp_attachments'][$attachID]['errors'][] = $e->getMessage();
 				}
 			}
 			else
@@ -560,8 +564,7 @@ class AttachmentsDirectory
 			{
 				if (!@mkdir($directory, 0755))
 				{
-					$context['dir_creation_error'] = 'attachments_no_create';
-					return false;
+					Throw new Exception('attachments_no_create');
 				}
 			}
 
@@ -581,8 +584,7 @@ class AttachmentsDirectory
 					chmod($directory, 0777);
 					if (!is_writable($directory))
 					{
-						$context['dir_creation_error'] = 'attachments_no_write';
-						return false;
+						Throw new Exception('attachments_no_write');
 					}
 				}
 			}
@@ -731,7 +733,7 @@ class AttachmentsDirectory
 
 		if ($this->autoManageEnabled(self::AUTO_SEQUENCE))
 		{
-			return;
+			return true;
 		}
 
 		$basedirectory = !empty($this->useSubdirectories) ? $modSettings['basedirectory_for_attachments'] : BOARDDIR;
@@ -759,8 +761,10 @@ class AttachmentsDirectory
 		$updir = $basedirectory . DIRECTORY_SEPARATOR . 'attachments_' . $this->last_dirs[$base_dir];
 
 		// make sure it exists and is writable
-		if ($this->createDirectory($updir))
+		try
 		{
+			$this->createDirectory($updir);
+
 			$this->currentAttachmentUploadDir = array_search($updir, $modSettings['attachmentUploadDir']);
 			updateSettings(array(
 				'last_attachments_directory' => serialize($this->last_dirs),
@@ -769,7 +773,7 @@ class AttachmentsDirectory
 
 			return true;
 		}
-		else
+		catch (Exception $e)
 		{
 			return false;
 		}
