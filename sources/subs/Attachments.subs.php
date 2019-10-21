@@ -53,12 +53,12 @@ function processAttachments($id_msg = null)
 	{
 		$attachmentDirectory->automanageCheckDirectory(isset($_REQUEST['action']) && $_REQUEST['action'] == 'admin');
 
-		$context['attach_dir'] = $attachmentDirectory->getCurrent();
+		$attach_current_dir = $attachmentDirectory->getCurrent();
 
-		if (!is_dir($context['attach_dir']))
+		if (!is_dir($attach_current_dir))
 		{
 			$initial_error = 'attach_folder_warning';
-			\ElkArte\Errors\Errors::instance()->log_error(sprintf($txt['attach_folder_admin_warning'], $context['attach_dir']), 'critical');
+			\ElkArte\Errors\Errors::instance()->log_error(sprintf($txt['attach_folder_admin_warning'], $attach_current_dir), 'critical');
 		}
 	}
 	catch (Exception $e)
@@ -172,7 +172,7 @@ function processAttachments($id_msg = null)
 
 		// Set the names and destination for this file
 		$attachID = 'post_tmp_' . User::$info->id . '_' . md5(mt_rand());
-		$destName = $context['attach_dir'] . '/' . $attachID;
+		$destName = $attach_current_dir . '/' . $attachID;
 
 		// If we are error free, Try to move and rename the file before doing more checks on it.
 		if (empty($errors))
@@ -269,7 +269,7 @@ function processAttachments($id_msg = null)
 	// Upload to the current attachment folder with the file name $attachID or 'post_tmp_' . User::$info->id . '_' . md5(mt_rand())
 	// Populate $_SESSION['temp_attachments'][$attachID] with the following:
 	//   name => The file name
-	//   tmp_name => Path to the temp file ($context['attach_dir'] . '/' . $attachID).
+	//   tmp_name => Path to the temp file (AttachmentsDirectory->getCurrent() . '/' . $attachID).
 	//   size => File size (required).
 	//   type => MIME type (optional if not available on upload).
 	//   id_folder => AttachmentsDirectory->currentDirectoryId
@@ -472,10 +472,7 @@ function attachmentChecks($attachID)
 	{
 		$error = '$context[\'attachments\']';
 	}
-	elseif (empty($context['attach_dir']))
-	{
-		$error = '$context[\'attach_dir\']';
-	}
+	else
 
 	// Let's get their attention.
 	if (!empty($error))

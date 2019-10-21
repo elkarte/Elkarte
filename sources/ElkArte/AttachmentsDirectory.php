@@ -419,16 +419,11 @@ class AttachmentsDirectory
 				$updir = '';
 		}
 
-		if (!is_array($modSettings['attachmentUploadDir']))
-		{
-			$modSettings['attachmentUploadDir'] = Util::unserialize($modSettings['attachmentUploadDir']);
-		}
-
-		if (!in_array($updir, $modSettings['attachmentUploadDir']) && !empty($updir))
+		if (!in_array($updir, $this->attachmentUploadDir) && !empty($updir))
 		{
 			$outputCreation = $this->createDirectory($updir);
 		}
-		elseif (in_array($updir, $modSettings['attachmentUploadDir']))
+		elseif (in_array($updir, $this->attachmentUploadDir))
 		{
 			$outputCreation = true;
 		}
@@ -439,8 +434,7 @@ class AttachmentsDirectory
 
 		if ($outputCreation)
 		{
-			$this->currentAttachmentUploadDir = array_search($updir, $modSettings['attachmentUploadDir']);
-			$context['attach_dir'] = $modSettings['attachmentUploadDir'][$this->currentAttachmentUploadDir];
+			$this->currentAttachmentUploadDir = array_search($updir, $this->attachmentUploadDir);
 
 			updateSettings(array(
 				'currentAttachmentUploadDir' => $this->currentAttachmentUploadDir,
@@ -452,6 +446,8 @@ class AttachmentsDirectory
 
 	public function checkDirSpace($sess_attach = [])
 	{
+		global $modSettings, $context;
+
 		if (empty($this->dir_size) || empty($this->dir_files))
 		{
 			$this->dirSpace($tmp_attach_size);
@@ -476,9 +472,10 @@ class AttachmentsDirectory
 				// Move it to the new folder if we can.
 				if ($this->manageBySpace())
 				{
-					rename($_SESSION['temp_attachments'][$attachID]['tmp_name'], $context['attach_dir'] . '/' . $attachID);
-					$_SESSION['temp_attachments'][$attachID]['tmp_name'] = $context['attach_dir'] . '/' . $attachID;
+					$file_path = $this->getCurrent() . '/' . $attachID;
 					$_SESSION['temp_attachments'][$attachID]['id_folder'] = $this->currentAttachmentUploadDir;
+					rename($_SESSION['temp_attachments'][$attachID]['tmp_name'], $file_path);
+					$_SESSION['temp_attachments'][$attachID]['tmp_name'] = $file_path;
 					self::$dir_size = 0;
 					self::$dir_files = 0;
 				}
@@ -611,9 +608,6 @@ class AttachmentsDirectory
 				'currentAttachmentUploadDir' => $this->currentAttachmentUploadDir,
 			), true);
 		}
-
-		// @deprecated - to be removed
-		$context['attach_dir'] = $this->getCurrent();
 
 		return true;
 	}
