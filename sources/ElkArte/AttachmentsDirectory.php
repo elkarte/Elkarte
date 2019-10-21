@@ -244,7 +244,7 @@ class AttachmentsDirectory
 
 	public function updateLastDirs($dir_id)
 	{
-		if(!empty($this->last_dirs) && (isset($this->last_dirs[$dir_id]) || isset($this->last_dirs[0])))
+		if (!empty($this->last_dirs) && (isset($this->last_dirs[$dir_id]) || isset($this->last_dirs[0])))
 		{
 			$num = substr(strrchr($this->attachmentUploadDir[$dir_id], '_'), 1);
 			if (is_numeric($num))
@@ -847,7 +847,6 @@ class AttachmentsDirectory
 	 * Should we try to create a new directory or not?
 	 *
 	 * @param bool $is_admin_interface
-	 
 	 * @return bool
 	 */
 	protected function checkNewDir($is_admin_interface)

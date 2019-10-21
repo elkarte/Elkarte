@@ -700,7 +700,7 @@ function createAttachment(&$attachmentOptions)
 			{
 				$current_dir = $attachmentsDir->getCurrent();
 				$current_dir_id = $attachmentsDir->currentDirectoryId();
-				rename($thumb_path,  $current_dir . '/' . $thumb_filename);
+				rename($thumb_path, $current_dir . '/' . $thumb_filename);
 				$thumb_path = $current_dir . '/' . $thumb_filename;
 			}
 
