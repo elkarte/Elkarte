@@ -321,37 +321,33 @@ class AttachmentsDirectory
 		return count($this->attachmentUploadDir);
 	}
 
-	public function getAttachmentsTree()
+	public function getAttachmentsTree($file_tree)
 	{
-		global $context, $modSettings;
-
 		// Are we using multiple attachment directories?
-		if (!empty($this->currentAttachmentUploadDir))
+		if ($this->hasMultiPaths())
 		{
-			unset($context['file_tree'][strtr(BOARDDIR, array('\\' => '/'))]['contents']['attachments']);
-
-			if (!is_array($modSettings['attachmentUploadDir']))
-			{
-				$modSettings['attachmentUploadDir'] = Util::unserialize($modSettings['attachmentUploadDir']);
-			}
+			unset($file_tree[strtr(BOARDDIR, array('\\' => '/'))]['contents']['attachments']);
 
 			// @todo Should we suggest non-current directories be read only?
-			foreach ($modSettings['attachmentUploadDir'] as $dir)
+			foreach ($this->attachmentUploadDir as $dir)
 			{
-				$context['file_tree'][strtr($dir, array('\\' => '/'))] = array(
+				$file_tree[strtr($dir, array('\\' => '/'))] = array(
 					'type' => 'dir',
 					'writable_on' => 'restrictive',
 				);
 			}
 		}
-		elseif (substr($modSettings['attachmentUploadDir'], 0, strlen(BOARDDIR)) != BOARDDIR)
+		else
 		{
-			unset($context['file_tree'][strtr(BOARDDIR, array('\\' => '/'))]['contents']['attachments']);
-			$context['file_tree'][strtr($modSettings['attachmentUploadDir'], array('\\' => '/'))] = array(
+			if (substr($this->attachmentUploadDir[1], 0, strlen(BOARDDIR)) != BOARDDIR)
+			unset($file_tree[strtr(BOARDDIR, array('\\' => '/'))]['contents']['attachments']);
+			$file_tree[strtr($this->attachmentUploadDir[1], array('\\' => '/'))] = array(
 				'type' => 'dir',
 				'writable_on' => 'restrictive',
 			);
 		}
+
+		return $file_tree;
 	}
 
 	/**
