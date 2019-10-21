@@ -33,6 +33,7 @@ class AttachmentsDirectory
 	protected $numFilesLimit = 0;
 	protected $basedirectory_for_attachments = '';
 	protected $useSubdirectories = 0;
+	protected $attachment_full_notified = false;
 	protected $attachmentUploadDir = [];
 	protected $baseDirectories = [];
 	protected $last_dirs = [];
@@ -50,6 +51,7 @@ class AttachmentsDirectory
 		$this->last_dirs = $options['last_attachments_directory'] ?? serialize($this->last_dirs);
 		$this->useSubdirectories = $options['use_subdirectories_for_attachments'] ?? $this->useSubdirectories;
 		$this->basedirectory_for_attachments = $options['basedirectory_for_attachments'] ?? $this->basedirectory_for_attachments;
+		$this->attachment_full_notified = !empty($options['attachment_full_notified'] ?? $this->basedirectory_for_attachments);
 
 		$this->last_dirs = Util::unserialize($this->last_dirs);
 
@@ -281,8 +283,6 @@ class AttachmentsDirectory
 
 	public function checkDirSize($thumb_size)
 	{
-		global $modSettings;
-
 		if ($this->autoManageIsLevel(self::AUTO_SEQUENCE) && !empty($this->sizeLimit) || !empty($this->numFilesLimit))
 		{
 			self::$dir_size += $thumb_size;
@@ -357,8 +357,6 @@ class AttachmentsDirectory
 	 */
 	public function automanageCheckDirectory($is_admin_interface = false)
 	{
-		global $modSettings;
-
 		if ($this->autoManageEnabled() === false)
 		{
 			return;
@@ -384,14 +382,14 @@ class AttachmentsDirectory
 				$this->baseDirectories = Util::unserialize($this->baseDirectories);
 			}
 
-			$base_dir = array_search($modSettings['basedirectory_for_attachments'], $this->baseDirectories);
+			$base_dir = array_search($this->basedirectory_for_attachments, $this->baseDirectories);
 		}
 		else
 		{
 			$base_dir = 0;
 		}
 
-		$basedirectory = !empty($this->useSubdirectories) ? $modSettings['basedirectory_for_attachments'] : BOARDDIR;
+		$basedirectory = !empty($this->useSubdirectories) ? $this->basedirectory_for_attachments : BOARDDIR;
 
 		// Just to be sure: I don't want directory separators at the end
 		$sep = (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') ? '\/' : DIRECTORY_SEPARATOR;
@@ -454,15 +452,13 @@ class AttachmentsDirectory
 
 	public function checkDirSpace($sess_attach = [])
 	{
-		global $modSettings;
-
 		if (empty($this->dir_size) || empty($this->dir_files))
 		{
 			$this->dirSpace($tmp_attach_size);
 		}
 
 		// Are we about to run out of room? Let's notify the admin then.
-		if (empty($modSettings['attachment_full_notified']) && !empty($this->sizeLimit) && $this->sizeLimit > 4000 && self::$dir_size > ($this->sizeLimit - 2000) * 1024
+		if ($this->attachment_full_notified === false && !empty($this->sizeLimit) && $this->sizeLimit > 4000 && self::$dir_size > ($this->sizeLimit - 2000) * 1024
 			|| (!empty($this->numFilesLimit) && $this->numFilesLimit * .95 < self::$dir_files && $this->numFilesLimit > 500))
 		{
 			require_once(SUBSDIR . '/Admin.subs.php');
@@ -537,8 +533,6 @@ class AttachmentsDirectory
 	 */
 	public function createDirectory($updir)
 	{
-		global $modSettings;
-
 		$tree = $this->getTreeElements($updir);
 		$count = count($tree);
 
@@ -635,7 +629,7 @@ class AttachmentsDirectory
 			// Update the base directory path
 			if (!empty($this->baseDirectories) && array_key_exists($id, $this->baseDirectories))
 			{
-				$base = $modSettings['basedirectory_for_attachments'] === $this->attachmentUploadDir[$id] ? $real_path : $modSettings['basedirectory_for_attachments'];
+				$base = $this->basedirectory_for_attachments === $this->attachmentUploadDir[$id] ? $real_path : $this->basedirectory_for_attachments;
 
 				$this->baseDirectories[$id] = $real_path;
 				updateSettings(array(
@@ -729,14 +723,12 @@ class AttachmentsDirectory
 	 */
 	public function manageBySpace()
 	{
-		global $modSettings;
-
 		if ($this->autoManageEnabled(self::AUTO_SEQUENCE))
 		{
 			return true;
 		}
 
-		$basedirectory = !empty($this->useSubdirectories) ? $modSettings['basedirectory_for_attachments'] : BOARDDIR;
+		$basedirectory = !empty($this->useSubdirectories) ? $this->basedirectory_for_attachments : BOARDDIR;
 
 		// Just to be sure: I don't want directory separators at the end
 		$sep = (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') ? '\/' : DIRECTORY_SEPARATOR;
@@ -745,7 +737,7 @@ class AttachmentsDirectory
 		// Get the current base directory
 		if (!empty($this->useSubdirectories) && !empty($this->baseDirectories))
 		{
-			$base_dir = array_search($modSettings['basedirectory_for_attachments'], $this->baseDirectories);
+			$base_dir = array_search($this->basedirectory_for_attachments, $this->baseDirectories);
 		}
 		else
 		{
@@ -765,7 +757,7 @@ class AttachmentsDirectory
 		{
 			$this->createDirectory($updir);
 
-			$this->currentAttachmentUploadDir = array_search($updir, $modSettings['attachmentUploadDir']);
+			$this->currentAttachmentUploadDir = array_search($updir, $this->attachmentUploadDir);
 			updateSettings(array(
 				'last_attachments_directory' => serialize($this->last_dirs),
 				'currentAttachmentUploadDir' => $this->currentAttachmentUploadDir,
