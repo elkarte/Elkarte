@@ -1320,15 +1320,17 @@ class ManageAttachments extends AbstractController
 		if (isset($this->_req->post->save2))
 		{
 			checkSession();
+			$attachment_basedirectories = Util::unserialize($modSettings['attachment_basedirectories']);
+			$attachmentUploadDir = Util::unserialize($modSettings['attachmentUploadDir']);
 
 			// Changing the current base directory?
 			$this->current_base_dir = $this->_req->getQuery('current_base_dir', 'intval');
 			if (empty($this->_req->post->new_base_dir) && !empty($this->current_base_dir))
 			{
-				if ($modSettings['basedirectory_for_attachments'] !== $modSettings['attachmentUploadDir'][$this->current_base_dir])
+				if ($modSettings['basedirectory_for_attachments'] !== $attachmentUploadDir[$this->current_base_dir])
 				{
 					$update = (array(
-						'basedirectory_for_attachments' => $modSettings['attachmentUploadDir'][$this->current_base_dir],
+						'basedirectory_for_attachments' => $attachmentUploadDir[$this->current_base_dir],
 					));
 				}
 			}
@@ -1337,16 +1339,16 @@ class ManageAttachments extends AbstractController
 			{
 				foreach ($this->_req->post->base_dir as $id => $dir)
 				{
-					if (!empty($dir) && $dir !== $modSettings['attachmentUploadDir'][$id])
+					if (!empty($dir) && $dir !== $attachmentUploadDir[$id])
 					{
-						if (@rename($modSettings['attachmentUploadDir'][$id], $dir))
+						if (@rename($attachmentUploadDir[$id], $dir))
 						{
-							$modSettings['attachmentUploadDir'][$id] = $dir;
-							$modSettings['attachment_basedirectories'][$id] = $dir;
+							$attachmentUploadDir[$id] = $dir;
+							$attachment_basedirectories[$id] = $dir;
 							$update = (array(
-								'attachmentUploadDir' => serialize($modSettings['attachmentUploadDir']),
-								'attachment_basedirectories' => serialize($modSettings['attachment_basedirectories']),
-								'basedirectory_for_attachments' => $modSettings['attachmentUploadDir'][$this->current_base_dir],
+								'attachmentUploadDir' => serialize($attachmentUploadDir),
+								'attachment_basedirectories' => serialize($attachment_basedirectories),
+								'basedirectory_for_attachments' => $attachmentUploadDir[$this->current_base_dir],
 							));
 						}
 					}
@@ -1355,14 +1357,14 @@ class ManageAttachments extends AbstractController
 					{
 						if ($id === $this->current_base_dir)
 						{
-							$errors[] = $modSettings['attachmentUploadDir'][$id] . ': ' . $txt['attach_dir_is_current'];
+							$errors[] = $attachmentUploadDir[$id] . ': ' . $txt['attach_dir_is_current'];
 							continue;
 						}
 
-						unset($modSettings['attachment_basedirectories'][$id]);
+						unset($attachment_basedirectories[$id]);
 						$update = (array(
-							'attachment_basedirectories' => serialize($modSettings['attachment_basedirectories']),
-							'basedirectory_for_attachments' => $modSettings['attachmentUploadDir'][$this->current_base_dir],
+							'attachment_basedirectories' => serialize($attachment_basedirectories),
+							'basedirectory_for_attachments' => $attachmentUploadDir[$this->current_base_dir],
 						));
 					}
 				}
@@ -1375,7 +1377,7 @@ class ManageAttachments extends AbstractController
 
 				$current_dir = $modSettings['currentAttachmentUploadDir'];
 
-				if (!in_array($this->_req->post->new_base_dir, $modSettings['attachmentUploadDir']))
+				if (!in_array($this->_req->post->new_base_dir, $attachmentUploadDir))
 				{
 					if (!$attachmentsDir->createDirectory($this->_req->post->new_base_dir))
 					{
@@ -1383,15 +1385,15 @@ class ManageAttachments extends AbstractController
 					}
 				}
 
-				$modSettings['currentAttachmentUploadDir'] = array_search($this->_req->post->new_base_dir, $modSettings['attachmentUploadDir']);
-				if (!in_array($this->_req->post->new_base_dir, $modSettings['attachment_basedirectories']))
+				$modSettings['currentAttachmentUploadDir'] = array_search($this->_req->post->new_base_dir, $attachmentUploadDir);
+				if (!in_array($this->_req->post->new_base_dir, $attachment_basedirectories))
 				{
-					$modSettings['attachment_basedirectories'][$modSettings['currentAttachmentUploadDir']] = $this->_req->post->new_base_dir;
+					$attachment_basedirectories[$modSettings['currentAttachmentUploadDir']] = $this->_req->post->new_base_dir;
 				}
-				ksort($modSettings['attachment_basedirectories']);
+				ksort($attachment_basedirectories);
 
 				$update = (array(
-					'attachment_basedirectories' => serialize($modSettings['attachment_basedirectories']),
+					'attachment_basedirectories' => serialize($attachment_basedirectories),
 					'basedirectory_for_attachments' => $this->_req->post->new_base_dir,
 					'currentAttachmentUploadDir' => $current_dir,
 				));
@@ -1663,10 +1665,11 @@ class ManageAttachments extends AbstractController
 			if (!empty($this->auto))
 			{
 				$modSettings['automanage_attachments'] = 1;
+				$tmpattachmentUploadDir = Util::unserialize($modSettings['attachmentUploadDir']);
 
 				// Create sub directory's off the root or from an attachment directory?
 				$modSettings['use_subdirectories_for_attachments'] = $this->auto == -1 ? 0 : 1;
-				$modSettings['basedirectory_for_attachments'] = $this->auto > 0 ? $modSettings['attachmentUploadDir'][$this->auto] : $modSettings['basedirectory_for_attachments'];
+				$modSettings['basedirectory_for_attachments'] = serialize($this->auto > 0 ? $tmpattachmentUploadDir[$this->auto] : [1 => $modSettings['basedirectory_for_attachments']]);
 
 				// Finally, where do they need to go
 				$attachmentDirectory = new AttachmentsDirectory($modSettings);
