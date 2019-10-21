@@ -454,7 +454,7 @@ class AttachmentsDirectory
 
 	public function checkDirSpace($sess_attach = [])
 	{
-		global $modSettings, $context;
+		global $modSettings;
 
 		if (empty($this->dir_size) || empty($this->dir_files))
 		{
@@ -537,7 +537,7 @@ class AttachmentsDirectory
 	 */
 	public function createDirectory($updir)
 	{
-		global $modSettings, $context;
+		global $modSettings;
 
 		$tree = $this->getTreeElements($updir);
 		$count = count($tree);
