@@ -47,13 +47,14 @@ class AttachmentsDirectory
 		$this->currentAttachmentUploadDir = $options['currentAttachmentUploadDir'] ?? $this->currentAttachmentUploadDir;
 		$this->sizeLimit = $options['attachmentDirSizeLimit'] ?? $this->sizeLimit;
 		$this->numFilesLimit = $options['attachmentDirFileLimit'] ?? $this->numFilesLimit;
-		$this->baseDirectories = $options['attachment_basedirectories'] ?? $this->baseDirectories;
+		$this->baseDirectories = $options['attachment_basedirectories'] ?? serialize($this->baseDirectories);
 		$this->last_dirs = $options['last_attachments_directory'] ?? serialize($this->last_dirs);
 		$this->useSubdirectories = $options['use_subdirectories_for_attachments'] ?? $this->useSubdirectories;
 		$this->basedirectory_for_attachments = $options['basedirectory_for_attachments'] ?? $this->basedirectory_for_attachments;
 		$this->attachment_full_notified = !empty($options['attachment_full_notified'] ?? $this->basedirectory_for_attachments);
 
 		$this->last_dirs = Util::unserialize($this->last_dirs);
+		$this->baseDirectories = Util::unserialize($this->baseDirectories);
 
 		if (empty($options['attachmentUploadDir']))
 		{
@@ -377,11 +378,6 @@ class AttachmentsDirectory
 
 		if (!empty($this->baseDirectories) && !empty($this->useSubdirectories))
 		{
-			if (!is_array($this->baseDirectories))
-			{
-				$this->baseDirectories = Util::unserialize($this->baseDirectories);
-			}
-
 			$base_dir = array_search($this->basedirectory_for_attachments, $this->baseDirectories);
 		}
 		else
