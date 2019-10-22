@@ -1587,8 +1587,8 @@ function doSecurityChecks()
 		}
 
 		// We are already checking so many files...just few more doesn't make any difference! :P
-		require_once(SUBSDIR . '/Attachments.subs.php');
-		$path = getAttachmentPath();
+		$attachmentsDir = new AttachmentsDirectory($modSettings);
+		$path = $attachmentsDir->getCurrent();
 		secureDirectory($path, true);
 		secureDirectory(CACHEDIR, false, '"\.(js|css)$"');
 

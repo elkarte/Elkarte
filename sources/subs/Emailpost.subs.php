@@ -861,7 +861,6 @@ function pbe_email_attachments($pbe, $email_message)
 	// For attachmentChecks function
 	require_once(SUBSDIR . '/Attachments.subs.php');
 	$context['attachments'] = array('quantity' => 0, 'total_size' => 0);
-	$context['attach_dir'] = $current_attach_dir;
 
 	// Create the file(s) with a temp name so we can validate its contents/type
 	foreach ($email_message->attachments as $name => $attachment)

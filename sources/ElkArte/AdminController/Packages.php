@@ -1495,7 +1495,7 @@ class Packages extends AbstractController
 		}
 
 		$attachmentsDir = new AttachmentsDirectory($modSettings);
-		$attachmentsDir->getAttachmentsTree();
+		$context['file_tree'] = $attachmentsDir->getAttachmentsTree($context['file_tree']);
 
 		if (substr($modSettings['smileys_dir'], 0, strlen(BOARDDIR)) != BOARDDIR)
 		{
