@@ -385,8 +385,11 @@ class Bootstrap
 		// Load the current or SSI theme. (just use $ssi_theme = id_theme;)
 		new ThemeLoader(isset($ssi_theme) ? (int) $ssi_theme : 0);
 
-		// Load BadBehavior functions
-		loadBadBehavior();
+		// Load BadBehavior functions, but not when running from CLI
+		if (!defined('STDIN'))
+		{
+			loadBadBehavior();
+		}
 
 		// @todo: probably not the best place, but somewhere it should be set...
 		if (!headers_sent())
