@@ -356,6 +356,8 @@ class Attachment_Controller extends Action_Controller
 					$attachment[1] = !empty($full_attach[1]) ? $full_attach[1] : '';
 					$attachment[4] = 0;
 					$attachment[5] = 0;
+					$attachment[7] = $full_attach[7];
+					$attachment[8] = $full_attach[8];
 
 					// return mime type ala mimetype extension
 					$check = returnMimeThumb(!empty($full_attach[3]) ? $full_attach[3] : 'default');
