@@ -29,6 +29,7 @@ class Notify_Controller extends Action_Controller
 	{
 		// Our topic functions are here
 		require_once(SUBSDIR . '/Topic.subs.php');
+		require_once(SUBSDIR . '/Boards.subs.php');
 	}
 
 	/**
