@@ -32,6 +32,7 @@ class Notify extends AbstractController
 	{
 		// Our topic functions are here
 		require_once(SUBSDIR . '/Topic.subs.php');
+		require_once(SUBSDIR . '/Boards.subs.php');
 	}
 
 	/**
