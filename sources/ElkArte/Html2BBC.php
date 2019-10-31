@@ -698,7 +698,14 @@ class Html2BBC
 		$height = $node->getAttribute('height');
 		$style = $node->getAttribute('style');
 
+		$bbc = '';
 		$size = '';
+
+		// First if this is an inline image, we don't support those
+		if (substr($src, 0, 4) === 'cid:')
+		{
+			return $bbc;
+		}
 
 		// Do the basic things first, title/alt
 		if (!empty($title) && empty($alt))
@@ -769,6 +776,13 @@ class Html2BBC
 	{
 		$style = $node->getAttribute('style');
 		$value = $this->_get_innerHTML($node);
+
+		// Don't style it if its really just empty
+		$test_value = trim($value);
+		if ($test_value === '[br]' || $test_value === '<br>')
+		{
+			return $value;
+		}
 
 		// Its at least going to be itself
 		$bbc = $value;
