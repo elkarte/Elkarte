@@ -215,7 +215,7 @@ class TopicUtil
 				);
 			}
 
-			if (!empty($row['avatar']) || !empty($row['id_attach']))
+			if (isset($row['avatar']) || !empty($row['id_attach']))
 			{
 				$topics[$row['id_topic']]['last_post']['member']['avatar'] = determineAvatar($row);
 			}
