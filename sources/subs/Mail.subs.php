@@ -1567,7 +1567,7 @@ function reduceMailQueue($batch_size = false, $override_limit = false, $force_se
 			// If it sent, keep a record so we can save it in our allowed to reply log
 			if (!empty($unq_head) && $result)
 			{
-				$sent[] = array($unq_head, time(), $email['to']);
+				$sent[] = array_merge($unq_head_array, array(time(), $email['to']));
 			}
 
 			// Track total emails sent
