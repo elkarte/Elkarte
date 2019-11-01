@@ -11,7 +11,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.1
+ * @version 1.1.7
  *
  */
 
@@ -58,7 +58,7 @@ class Daily_Digest implements Scheduled_Task_Interface
 		loadEssentialThemeData();
 
 		// If the maillist function is on then so is the enhanced digest
-		$maillist = !empty($modSettings['maillist_enabled']) && !empty($modSettings['pbe_digest_enabled']);
+		$maillist = !empty($modSettings['maillist_enabled']) && !empty($modSettings['maillist_digest_enabled']);
 		if ($maillist)
 			require_once(SUBSDIR . '/Emailpost.subs.php');
 
