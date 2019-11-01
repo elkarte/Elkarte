@@ -125,8 +125,8 @@ $txt['announce_regular_members'] = 'Regular Members';
 
 $txt['digest_subject_daily'] = 'Daily Digest';
 $txt['digest_subject_weekly'] = 'Weekly Digest';
-$txt['digest_intro_daily'] = 'Below is a summary of all activity in your subscribed boards and topics at %1$s today. To unsubscribe please visit the link below.';
-$txt['digest_intro_weekly'] = 'Below is a summary of all activity in your subscribed boards and topics at %1$s this week. To unsubscribe please visit the link below.';
+$txt['digest_intro_daily'] = 'Below is a summary of today\'s activity for your subscriptions at %1$s. To unsubscribe please visit the following link.';
+$txt['digest_intro_weekly'] = 'Below is a summary of the weekly activity for your subscriptions at %1$s. To unsubscribe please visit the following link.';
 $txt['digest_new_topics'] = 'The following topics were started';
 $txt['digest_new_topics_line'] = '"%1$s" in the %2$s board';
 $txt['digest_new_replies'] = 'Replies have been made in the following topics';
