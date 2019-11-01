@@ -12,7 +12,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.1.4
+ * @version 1.1.7
  *
  */
 
@@ -1416,7 +1416,7 @@ function reduceMailQueue($batch_size = false, $override_limit = false, $force_se
 
 			// If it sent, keep a record so we can save it in our allowed to reply log
 			if (!empty($unq_head) && $result)
-				$sent[] = array($unq_head, time(), $email['to']);
+				$sent[] = array_merge($unq_head_array, array(time(),$email['to']));
 
 			// Track total emails sent
 			if ($result && !empty($modSettings['trackStats']))

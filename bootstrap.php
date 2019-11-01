@@ -11,7 +11,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.1.6
+ * @version 1.1.7
  *
  */
 
@@ -382,8 +382,11 @@ class Bootstrap
 		// Load the current or SSI theme. (just use $ssi_theme = id_theme;)
 		loadTheme(isset($ssi_theme) ? (int) $ssi_theme : 0);
 
-		// Load BadBehavior functions
-		loadBadBehavior();
+		// Load BadBehavior functions, but not when running from CLI
+		if (!defined('STDIN'))
+		{
+			loadBadBehavior();
+		}
 
 		// @todo: probably not the best place, but somewhere it should be set...
 		if (!headers_sent())

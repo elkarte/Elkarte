@@ -11,7 +11,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.1.6
+ * @version 1.1.7
  *
  */
 
@@ -1543,11 +1543,14 @@ function prepareMembersByQuery($query, &$query_params, $only_active = true)
 						$query_parts[$condition === 'or' ? 'or' : 'and'][] = isset($allowed_conditions[$query_condition]) ? $allowed_conditions[$query_condition] : $query_condition;
 				}
 			}
-			elseif ($query == 'member_names')
-				$query_parts['and'][] = $allowed_conditions[$query]($query_params);
+			elseif ($query_conditions == 'member_names')
+			{
+				$query_parts['and'][] = $allowed_conditions[$query_conditions]($query_params);
+			}
 			else
-				$query_parts['and'][] = isset($allowed_conditions[$query]) ? $allowed_conditions[$query] : $query;
-		}
+			{
+				$query_parts['and'][] = isset($allowed_conditions[$query_conditions]) ? $allowed_conditions[$query_conditions] : $query_conditions;
+			}		}
 
 		if (!empty($query_parts['or']))
 			$query_parts['and'][] = implode("\n\t\t\tOR ", $query_parts['or']);

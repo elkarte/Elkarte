@@ -13,7 +13,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.1.4
+ * @version 1.1.7
  *
  */
 
@@ -197,7 +197,7 @@ class Topic_Util
 				$topics[$row['id_topic']]['first_post']['started_by'] = sprintf($txt['topic_started_by_in'], '<strong>' . $topics[$row['id_topic']]['first_post']['member']['link'] . '</strong>', '<em>' . $topics[$row['id_topic']]['board']['link'] . '</em>');
 			}
 
-			if (!empty($row['avatar']) || !empty($row['id_attach']))
+			if (isset($row['avatar']) || !empty($row['id_attach']))
 			{
 				$topics[$row['id_topic']]['last_post']['member']['avatar'] = determineAvatar($row);
 			}
