@@ -1892,7 +1892,7 @@ class PersonalMessage extends AbstractController
 		global $txt, $context, $language, $modSettings;
 
 		// Check that this feature is even enabled!
-		if (empty($modSettings['enableReportPM']) || empty($this->_req->query->pmsg))
+		if (empty($modSettings['enableReportPM']) || empty($this->_req->getPost('pmsg', 'intval',  $this->_req->getQuery('pmsg', 'intval', 0))))
 		{
 			throw new Exception('no_access', false);
 		}
