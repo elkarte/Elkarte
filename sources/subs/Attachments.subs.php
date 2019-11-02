@@ -914,6 +914,8 @@ function createAttachment(&$attachmentOptions)
 	// If this is an image we need to set a few additional parameters.
 	$size = elk_getimagesize($attachmentOptions['tmp_name']);
 	list ($attachmentOptions['width'], $attachmentOptions['height']) = $size;
+	$attachmentOptions['width'] = max(0, $attachmentOptions['width']);
+	$attachmentOptions['height'] = max(0, $attachmentOptions['height']);
 
 	// If it's an image get the mime type right.
 	if (empty($attachmentOptions['mime_type']) && $attachmentOptions['width'])
