@@ -312,6 +312,8 @@ function createAttachment(&$attachmentOptions)
 	$is_image = $image->isImage();
 	$size = $is_image ? $image->getSize() : array(0, 0, 0);
 	list ($attachmentOptions['width'], $attachmentOptions['height']) = $size;
+	$attachmentOptions['width'] = max(0, $attachmentOptions['width']);
+	$attachmentOptions['height'] = max(0, $attachmentOptions['height']);
 
 	// If it's an image get the mime type right.
 	if ($is_image)
