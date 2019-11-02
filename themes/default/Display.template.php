@@ -339,7 +339,8 @@ function template_messages()
 			}
 
 			echo '
-								</ul>';
+								</ul>
+							</li>';
 		}
 
 		// Hide likes if its off
@@ -633,7 +634,7 @@ function template_quickreply_below()
 		</script>';
 
 	// Spell check for quick modify and quick reply (w/o the editor)
-	if ($context['show_spellchecking'])
+	if ($context['show_spellchecking'] && empty($options['use_editor_quick_reply']))
 	{
 		echo '
 			<form name="spell_form" id="spell_form" method="post" accept-charset="UTF-8" target="spellWindow" action="', $scripturl, '?action=spellcheck">
