@@ -85,13 +85,18 @@ function bb2_db_num_rows($result)
  */
 function bb2_db_query($query)
 {
+	global $modSettings;
+
 	$db = database();
 
 	// First fix the horrors caused by bb's support of only mysql
 	// ok they are right its my horror :P
 	if (strpos($query, 'DATE_SUB') !== false)
 	{
-		$query = 'DELETE FROM {db_prefix}log_badbehavior WHERE date < ' . (bb2_db_date() - 7 * 86400);
+		if (!empty($modSettings['badbehavior_logging']))
+			$query = 'DELETE FROM {db_prefix}log_badbehavior WHERE date < ' . (bb2_db_date() - 7 * 86400);
+		else
+			return true;
 	}
 
 	// Just intended to waste some time
