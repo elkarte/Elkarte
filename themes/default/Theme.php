@@ -115,11 +115,11 @@ class Theme extends BaseTheme
 			// How do we get anchors only, where they will work? Spans and strong only where necessary?
 			'page_index_template' => array(
 				'base_link' => '<li class="linavPages"><a class="navPages" href="{base_link}" role="menuitem">%2$s</a></li>',
-				'previous_page' => '<span class="previous_page" role="menuitem">{prev_txt}</span>',
+				'previous_page' => '<span class="previous_page">{prev_txt}</span>',
 				'current_page' => '<li class="linavPages"><strong class="current_page" role="menuitem">%1$s</strong></li>',
-				'next_page' => '<span class="next_page" role="menuitem">{next_txt}</span>',
+				'next_page' => '<span class="next_page">{next_txt}</span>',
 				'expand_pages' => '<li class="linavPages expand_pages" role="menuitem" {custom}> <a href="#">...</a> </li>',
-				'all' => '<span class="linavPages all_pages" role="menuitem">{all_txt}</span>',
+				'all' => '<span class="linavPages all_pages">{all_txt}</span>',
 			),
 
 			// @todo find a better place if we are going to create a notifications template
