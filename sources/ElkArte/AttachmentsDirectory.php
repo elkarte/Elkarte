@@ -38,11 +38,15 @@ class AttachmentsDirectory
 	protected $baseDirectories = [];
 	protected $last_dirs = [];
 
+	protected $db = null;
+
 	protected static $dir_size = 0;
 	protected static $dir_files = 0;
 
-	public function __construct($options)
+	public function __construct($options, $db)
 	{
+		$this->db = $db;
+
 		$this->automanage_attachments = (int) ($options['automanage_attachments'] ?? $this->automanage_attachments);
 		$this->currentAttachmentUploadDir = $options['currentAttachmentUploadDir'] ?? $this->currentAttachmentUploadDir;
 		$this->sizeLimit = $options['attachmentDirSizeLimit'] ?? $this->sizeLimit;
@@ -446,11 +450,11 @@ class AttachmentsDirectory
 		return $outputCreation;
 	}
 
-	public function checkDirSpace($sess_attach = [])
+	public function checkDirSpace($sess_attach, $attachID)
 	{
-		if (empty($this->dir_size) || empty($this->dir_files))
+		if (empty(self::$dir_size) || empty(self::$dir_files))
 		{
-			$this->dirSpace($tmp_attach_size);
+			$this->dirSpace($sess_attach['size']);
 		}
 
 		// Are we about to run out of room? Let's notify the admin then.
@@ -469,35 +473,29 @@ class AttachmentsDirectory
 			// If we are managing the directories space automatically, lets get to it
 			if ($this->autoManageIsLevel(self::AUTO_SEQUENCE))
 			{
-				// Move it to the new folder if we can.
-				try
+				// Move it to the new folder if we can. (Throws Exception if it fails)
+				if ($this->manageBySpace())
 				{
-					if ($this->manageBySpace())
-					{
-						$file_path = $this->getCurrent() . '/' . $attachID;
-						$_SESSION['temp_attachments'][$attachID]['id_folder'] = $this->currentAttachmentUploadDir;
-						rename($_SESSION['temp_attachments'][$attachID]['tmp_name'], $file_path);
-						$_SESSION['temp_attachments'][$attachID]['tmp_name'] = $file_path;
-						self::$dir_size = 0;
-						self::$dir_files = 0;
-					}
-				}
-				// Or, let the user know that its not going to happen.
-				catch (Exception $e)
-				{
-					$_SESSION['temp_attachments'][$attachID]['errors'][] = $e->getMessage();
+					$file_path = $this->getCurrent() . '/' . $attachID;
+					$sess_attach['id_folder'] = $this->currentAttachmentUploadDir;
+					rename($sess_attach['tmp_name'], $file_path);
+					$sess_attach['tmp_name'] = $file_path;
+					self::$dir_size = 0;
+					self::$dir_files = 0;
 				}
 			}
 			else
 			{
-				$_SESSION['temp_attachments'][$attachID]['errors'][] = 'ran_out_of_space';
+				throw new Exception('ran_out_of_space');
 			}
 		}
+
+		return $sess_attach;
 	}
 
 	protected function dirSpace($tmp_attach_size = 0)
 	{
-		$request = $db->query('', '
+		$request = $this->db->query('', '
 			SELECT COUNT(*), SUM(size)
 			FROM {db_prefix}attachments
 			WHERE id_folder = {int:folder_id}
@@ -507,10 +505,10 @@ class AttachmentsDirectory
 				'type' => 1,
 			)
 		);
-		list ($this->dir_files, $this->dir_size) = $db->fetch_row($request);
-		$db->free_result($request);
-		$this->dir_files += empty($tmp_attach_size) ? 0 : 1;
-		$this->dir_size += $tmp_attach_size;
+		list (self::$dir_files, self::$dir_size) = $this->db->fetch_row($request);
+		$this->db->free_result($request);
+		self::$dir_files += empty($tmp_attach_size) ? 0 : 1;
+		self::$dir_size += $tmp_attach_size;
 	}
 
 	/**

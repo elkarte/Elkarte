@@ -704,7 +704,7 @@ function repairAttachmentData($start, $fix_errors, $to_fix)
 	global $modSettings;
 
 	$db = database();
-	$attachmentDirectory = new AttachmentsDirectory($modSettings);
+	$attachmentDirectory = new AttachmentsDirectory($modSettings, $db);
 
 	require_once(SUBSDIR . '/Attachments.subs.php');
 
@@ -1244,7 +1244,7 @@ function list_getAttachDirs()
 	global $modSettings, $context, $txt, $scripturl;
 
 	$db = database();
-	$attachmentsDir = new AttachmentsDirectory($modSettings);
+	$attachmentsDir = new AttachmentsDirectory($modSettings, $db);
 
 	$request = $db->query('', '
 		SELECT 
@@ -1377,7 +1377,7 @@ function list_getBaseDirs()
 {
 	global $modSettings, $txt;
 
-	$attachmentsDir = new AttachmentsDirectory($modSettings);
+	$attachmentsDir = new AttachmentsDirectory($modSettings, database());
 
 	if ($attachmentsDir->hasBaseDir() === false)
 	{
@@ -1581,7 +1581,7 @@ function currentAttachDirProperties()
 {
 	global $modSettings;
 
-	$attachmentsDir = new AttachmentsDirectory($modSettings);
+	$attachmentsDir = new AttachmentsDirectory($modSettings, database());
 
 	return attachDirProperties($attachmentsDir->currentDirectoryId());
 }

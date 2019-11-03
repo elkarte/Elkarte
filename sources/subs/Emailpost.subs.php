@@ -855,7 +855,7 @@ function pbe_email_attachments($pbe, $email_message)
 	$attachment_count = 0;
 	$attachIDs = array();
 
-	$attachmentsDir = new AttachmentsDirectory($modSettings);
+	$attachmentsDir = new AttachmentsDirectory($modSettings, database());
 	$current_attach_dir = $attachmentsDir->getCurrent();
 
 	// For attachmentChecks function
