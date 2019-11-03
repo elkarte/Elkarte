@@ -23,6 +23,8 @@ use ElkArte\Database\ConnectionInterface;
  */
 class Connection implements ConnectionInterface
 {
+	static $failed_once = false;
+
 	/**
 	 * {@inheritDoc}
 	 */
@@ -41,7 +43,13 @@ class Connection implements ConnectionInterface
 		// Something's wrong, show an error if its fatal (which we assume it is)
 		if (!$connection)
 		{
-			throw new \Exception('Db initialization failed');
+			// If the connection fails more than once (e.g. wrong password) the exception
+			// should be thrown only once.
+			if (self::$failed_once == false)
+			{
+				self::$failed_once = true;
+				throw new \Exception('Db initialization failed');
+			}
 		}
 
 		$query = new Query($db_prefix, $connection);
