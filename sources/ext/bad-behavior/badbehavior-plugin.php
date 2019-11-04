@@ -10,7 +10,7 @@
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
- * @version 1.1
+ * @version 1.1.7
  *
  */
 
@@ -83,15 +83,25 @@ function bb2_db_num_rows($result)
  */
 function bb2_db_query($query)
 {
+	global $modSettings;
+
 	$db = database();
 
 	// First fix the horrors caused by bb's support of only mysql
 	// ok they are right its my horror :P
 	if (strpos($query, 'DATE_SUB') !== false)
-		$query = 'DELETE FROM {db_prefix}log_badbehavior WHERE date < ' . (bb2_db_date() - 7 * 86400);
-	elseif (strpos($query, 'OPTIMIZE TABLE') !== false)
+	{
+		if (!empty($modSettings['badbehavior_logging']))
+			$query = 'DELETE FROM {db_prefix}log_badbehavior WHERE date < ' . (bb2_db_date() - 7 * 86400);
+		else
+			return true;
+	}
+
+	if (strpos($query, 'OPTIMIZE TABLE') !== false)
 		return true;
 	elseif (strpos($query, '@@session.wait_timeout') !== false)
+		return true;
+	elseif (empty($query))
 		return true;
 
 	// Run the query, return success, failure or the actual results
