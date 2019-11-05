@@ -73,6 +73,11 @@ class ParseQuery extends AbstractParseQuery
 	protected function process($query)
 	{
 		$parts = explode('/', $query);
+		if (count($parts) === 1)
+		{
+			return $this->separator . $query;
+		}
+
 		$split_query = explode('?', $parts[isset($parts[2]) ? 2 : 1]);
 
 		if (isset($parts[2]))

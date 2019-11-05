@@ -347,7 +347,7 @@ class Attachment extends AbstractController
 					}
 					else
 					{
-						$attachmentsDir = new AttachmentsDirectory($modSettings);
+						$attachmentsDir = new AttachmentsDirectory($modSettings, database());
 
 						$filename = $attachmentsDir->getCurrent() . '/' . $attachment[1];
 					}

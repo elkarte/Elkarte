@@ -174,7 +174,7 @@ class ManageAttachments extends AbstractController
 
 		// initialize the form
 		$settingsForm = new SettingsForm(SettingsForm::DB_ADAPTER);
-		$attachmentsDir = new AttachmentsDirectory($modSettings);
+		$attachmentsDir = new AttachmentsDirectory($modSettings, database());
 
 		// Initialize settings
 		$settingsForm->setConfigVars($this->_settings());
@@ -291,7 +291,7 @@ class ManageAttachments extends AbstractController
 		global $modSettings, $txt, $context;
 
 		// Get the current attachment directory.
-		$attachmentsDir = new AttachmentsDirectory($modSettings);
+		$attachmentsDir = new AttachmentsDirectory($modSettings, database());
 		$context['attachmentUploadDir'] = $attachmentsDir->getCurrent();
 
 		// First time here?
@@ -650,7 +650,7 @@ class ManageAttachments extends AbstractController
 		$context['sub_template'] = 'maintenance';
 
 		// We need our attachments directories...
-		$attachmentDirectory = new AttachmentsDirectory($modSettings);
+		$attachmentDirectory = new AttachmentsDirectory($modSettings, database());
 		$attach_dirs = $attachmentDirectory->getPaths();
 
 		// Get the number of attachments...
@@ -1182,7 +1182,7 @@ class ManageAttachments extends AbstractController
 	{
 		global $modSettings, $context, $txt;
 
-		$attachmentsDir = new AttachmentsDirectory($modSettings);
+		$attachmentsDir = new AttachmentsDirectory($modSettings, database());
 
 		$errors = array();
 
@@ -1628,7 +1628,7 @@ class ManageAttachments extends AbstractController
 
 		checkSession();
 
-		$attachmentsDir = new AttachmentsDirectory($modSettings);
+		$attachmentsDir = new AttachmentsDirectory($modSettings, database());
 
 		// Clean the inputs
 		$this->from = $this->_req->getPost('from', 'intval');
@@ -1685,7 +1685,7 @@ class ManageAttachments extends AbstractController
 				$modSettings['basedirectory_for_attachments'] = serialize($this->auto > 0 ? $tmpattachmentUploadDir[$this->auto] : [1 => $modSettings['basedirectory_for_attachments']]);
 
 				// Finally, where do they need to go
-				$attachmentDirectory = new AttachmentsDirectory($modSettings);
+				$attachmentDirectory = new AttachmentsDirectory($modSettings, database());
 				$attachmentDirectory->automanage_attachments_check_directory(true);
 				$new_dir = $attachmentDirectory->currentDirectoryId();
 			}

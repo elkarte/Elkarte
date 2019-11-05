@@ -20,6 +20,7 @@ use ElkArte\Debug;
 use ElkArte\Hooks;
 use ElkArte\User;
 use ElkArte\Util;
+use ElkArte\AttachmentsDirectory;
 
 /**
  * Load the $modSettings array and many necessary forum settings.
@@ -1587,7 +1588,7 @@ function doSecurityChecks()
 		}
 
 		// We are already checking so many files...just few more doesn't make any difference! :P
-		$attachmentsDir = new AttachmentsDirectory($modSettings);
+		$attachmentsDir = new AttachmentsDirectory($modSettings, database());
 		$path = $attachmentsDir->getCurrent();
 		secureDirectory($path, true);
 		secureDirectory(CACHEDIR, false, '"\.(js|css)$"');

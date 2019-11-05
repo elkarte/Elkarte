@@ -39,7 +39,7 @@ class RemoveTempAttachments implements ScheduledTaskInterface
 		global $context, $txt, $modSettings;
 
 		// We need to know where this thing is going.
-		$attachmentsDir = new AttachmentsDirectory($modSettings);
+		$attachmentsDir = new AttachmentsDirectory($modSettings, database());
 		$attach_dirs = $attachmentDirectory->getPaths();
 
 		foreach ($attach_dirs as $attach_dir)

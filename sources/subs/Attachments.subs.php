@@ -25,7 +25,7 @@ use ElkArte\User;
 use ElkArte\Util;
 use ElkArte\AttachmentsDirectory;
 use ElkArte\Exceptions\Exception as ElkException;
-use \Exception;
+use \Exception as Exception;
 
 /**
  * Handles the actual saving of attachments to a directory.
@@ -48,7 +48,7 @@ function processAttachments($id_msg = null)
 	$attach_errors = AttachmentErrorContext::context();
 
 	// Make sure we're uploading to the right place.
-	$attachmentDirectory = new AttachmentsDirectory($modSettings);
+	$attachmentDirectory = new AttachmentsDirectory($modSettings, database());
 	try
 	{
 		$attachmentDirectory->automanageCheckDirectory(isset($_REQUEST['action']) && $_REQUEST['action'] == 'admin');
@@ -372,7 +372,7 @@ function getTempAttachById($attach_id)
 		throw new Exception('no_access');
 	}
 
-	$attachmentsDir = new AttachmentsDirectory($modSettings);
+	$attachmentsDir = new AttachmentsDirectory($modSettings, database());
 
 	$attach_dir = $attachmentsDir->getCurrent();
 
@@ -457,8 +457,6 @@ function attachmentChecks($attachID)
 {
 	global $modSettings, $context;
 
-	$db = database();
-
 	// No data or missing data .... Not necessarily needed, but in case a mod author missed something.
 	if (empty($_SESSION['temp_attachments'][$attachID]))
 	{
@@ -512,8 +510,15 @@ function attachmentChecks($attachID)
 		}
 	}
 
-	$attachmentDirectory = new AttachmentsDirectory($modSettings);
-	$attachmentDirectory->checkDirSpace($_SESSION['temp_attachments'][$attachID]['size']);
+	$attachmentDirectory = new AttachmentsDirectory($modSettings, database());
+	try
+	{
+		$_SESSION['temp_attachments'][$attachID] = $attachmentDirectory->checkDirSpace($_SESSION['temp_attachments'][$attachID], $attachID);
+	}
+	catch (Exception $e)
+	{
+		$_SESSION['temp_attachments'][$attachID]['errors'][] = $e->getMessage();
+	}
 
 	// Is the file too big?
 	if (!empty($modSettings['attachmentSizeLimit']) && $_SESSION['temp_attachments'][$attachID]['size'] > $modSettings['attachmentSizeLimit'] * 1024)
@@ -599,7 +604,7 @@ function createAttachment(&$attachmentOptions)
 	global $modSettings, $context;
 
 	$db = database();
-	$attachmentsDir = new AttachmentsDirectory($modSettings);
+	$attachmentsDir = new AttachmentsDirectory($modSettings, $db);
 
 	$image = new Image();
 
@@ -1025,7 +1030,7 @@ function saveAvatar($temporary_path, $memID, $max_width, $max_height)
 	require_once(SUBSDIR . '/ManageAttachments.subs.php');
 	removeAttachments(array('id_member' => $memID));
 
-	$attachmentsDir = new AttachmentsDirectory($modSettings);
+	$attachmentsDir = new AttachmentsDirectory($modSettings, $db);
 
 	$id_folder = $attachmentsDir->currentDirectoryId();
 	$avatar_hash = empty($modSettings['custom_avatar_enabled']) ? getAttachmentFilename($destName, 0, null, true) : '';
@@ -1181,7 +1186,7 @@ function getAvatarPath()
 
 	if (empty($modSettings['custom_avatar_enabled']))
 	{
-		$attachmentsDir = new AttachmentsDirectory($modSettings);
+		$attachmentsDir = new AttachmentsDirectory($modSettings, database());
 		return $attachmentsDir->getCurrent();
 	}
 	else
@@ -1205,7 +1210,7 @@ function getAvatarPathID()
 	// Little utility function for the endless $id_folder computation for avatars.
 	if (empty($modSettings['custom_avatar_enabled']))
 	{
-		$attachmentsDir = new AttachmentsDirectory($modSettings);
+		$attachmentsDir = new AttachmentsDirectory($modSettings, database());
 		return $attachmentsDir->currentDirectoryId();
 	}
 	else
@@ -1398,7 +1403,7 @@ function updateAttachmentThumbnail($filename, $id_attach, $id_msg, $old_id_thumb
 	if ($image->createThumbnail($filename, $modSettings['attachmentThumbWidth'], $modSettings['attachmentThumbHeight']))
 	{
 		// So what folder are we putting this image in?
-		$attachmentsDir = new AttachmentsDirectory($modSettings);
+		$attachmentsDir = new AttachmentsDirectory($modSettings, database());
 		$id_folder_thumb = $attachmentsDir->currentDirectoryId();
 
 		// Calculate the size of the created thumbnail.
@@ -1695,7 +1700,7 @@ function getLegacyAttachmentFilename($filename, $attachment_id, $dir = null, $ne
 		return $enc_name;
 	}
 
-	$attachmentsDir = new AttachmentsDirectory($modSettings);
+	$attachmentsDir = new AttachmentsDirectory($modSettings, database());
 	$path = $attachmentsDir->getCurrent();
 
 	$filename = file_exists($path . '/' . $enc_name) ? $path . '/' . $enc_name : $path . '/' . $clean_name;
@@ -1761,7 +1766,7 @@ function getAttachmentFilename($filename, $attachment_id, $dir = null, $new = fa
 		return getLegacyAttachmentFilename($filename, $attachment_id, $dir, $new);
 	}
 
-	$attachmentsDir = new AttachmentsDirectory($modSettings);
+	$attachmentsDir = new AttachmentsDirectory($modSettings, database());
 	$path = $attachmentsDir->getCurrent();
 
 	return $path . '/' . $attachment_id . '_' . $file_hash . '.elk';
