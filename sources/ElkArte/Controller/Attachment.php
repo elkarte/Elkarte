@@ -22,6 +22,7 @@ use ElkArte\Errors\AttachmentErrorContext;
 use ElkArte\Exceptions\Exception;
 use ElkArte\Graphics\Image;
 use ElkArte\AttachmentsDirectory;
+use ElkArte\TemporaryAttachments;
 
 /**
  *
@@ -153,7 +154,8 @@ class Attachment extends AbstractController
 			// No errors, lets get the details of what we have for our response back
 			else
 			{
-				foreach ($_SESSION['temp_attachments'] as $attachID => $val)
+				$tmp_attachments = new TemporaryAttachments();
+				foreach ($tmp_attachments as $attachID => $val)
 				{
 					// We need to grab the name anyhow
 					if (!empty($val['tmp_name']))
@@ -208,16 +210,22 @@ class Attachment extends AbstractController
 		if (isset($this->_req->post->attachid))
 		{
 			$result = false;
-			if (!empty($_SESSION['temp_attachments']))
+			$tmp_attachments = new TemporaryAttachments();
+			if ($tmp_attachments->hasAttachments())
 			{
 				require_once(SUBSDIR . '/Attachments.subs.php');
 
-				$attachId = getAttachmentIdFromPublic($this->_req->post->attachid);
+				$attachId = $tmp_attachments->getIdFromPublic($this->_req->post->attachid);
 
-				$result = removeTempAttachById($attachId);
-				if ($result === true)
+				try
 				{
+					$tmp_attachments->removeById($attachId);
 					$context['json_data'] = array('result' => true);
+					$result = true;
+				}
+				catch (\Exception $e)
+				{
+					$result = $e->getMessage();
 				}
 			}
 
@@ -616,12 +624,14 @@ class Attachment extends AbstractController
 
 		// We need to do some work on attachments and avatars.
 		require_once(SUBSDIR . '/Attachments.subs.php');
+		$tmp_attachments = new TemporaryAttachments();
+		$attachmentsDir = new AttachmentsDirectory($modSettings, database());
 
 		try
 		{
 			if (empty($topic) || (string) (int) $this->_req->query->attach !== (string) $this->_req->query->attach)
 			{
-				$attach_data = getTempAttachById($this->_req->query->attach);
+				$attach_data = $tmp_attachments->getTempAttachById($this->_req->query->attach, $attachmentsDir, User::$info->id);
 				$file_ext = pathinfo($attach_data['name'], PATHINFO_EXTENSION);
 				$filename = $attach_data['tmp_name'];
 				$id_attach = $attach_data['attachid'];

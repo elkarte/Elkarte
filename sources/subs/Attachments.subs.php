@@ -25,6 +25,7 @@ use ElkArte\User;
 use ElkArte\Util;
 use ElkArte\AttachmentsDirectory;
 use ElkArte\Exceptions\Exception as ElkException;
+use ElkArte\TemporaryAttachments;
 use \Exception as Exception;
 
 /**
@@ -83,7 +84,8 @@ function processAttachments($id_msg = null)
 
 	// Hmm. There are still files in session.
 	$ignore_temp = false;
-	if (!empty($_SESSION['temp_attachments']['post']['files']) && count($_SESSION['temp_attachments']) > 1)
+	$tmp_attachments = new TemporaryAttachments();
+	if ($tmp_attachments->getPostParam('files' !== null && $tmp_attachments->count() > 1)
 	{
 		// Let's try to keep them. But...
 		$ignore_temp = true;
@@ -104,16 +106,10 @@ function processAttachments($id_msg = null)
 		// Need to make space for the new files. So, bye bye.
 		if (!$ignore_temp)
 		{
-			foreach ($_SESSION['temp_attachments'] as $attachID => $attachment)
-			{
-				if (strpos($attachID, 'post_tmp_' . User::$info->id . '_') !== false)
-				{
-					@unlink($attachment['tmp_name']);
-				}
-			}
+			$tmp_attachments->removeAll(User::$info->id);
+			$tmp_attachments->unset();
 
 			$attach_errors->activate()->addError('temp_attachments_flushed');
-			$_SESSION['temp_attachments'] = array();
 		}
 	}
 
@@ -122,26 +118,21 @@ function processAttachments($id_msg = null)
 		$_FILES['attachment']['tmp_name'] = array();
 	}
 
-	if (!isset($_SESSION['temp_attachments']))
-	{
-		$_SESSION['temp_attachments'] = array();
-	}
-
 	// Remember where we are at. If it's anywhere at all.
 	if (!$ignore_temp)
 	{
-		$_SESSION['temp_attachments']['post'] = array(
-			'msg' => !empty($id_msg) ? $id_msg : 0,
-			'last_msg' => !empty($_REQUEST['last_msg']) ? $_REQUEST['last_msg'] : 0,
-			'topic' => !empty($topic) ? $topic : 0,
-			'board' => !empty($board) ? $board : 0,
-		);
+		$tmp_attachments->setPostParam([
+			'msg' => (int) ($id_msg ?? 0),
+			'last_msg' => (int) ($_REQUEST['last_msg'] ?? 0),
+			'topic' => (int) ($topic ?? 0),
+			'board' => (int) ($board ?? 0),
+		]);
 	}
 
 	// If we have an initial error, lets just display it.
 	if (!empty($initial_error))
 	{
-		$_SESSION['temp_attachments']['initial_error'] = $initial_error;
+		$tmp_attachments['initial_error'] = $initial_error;
 
 		// This is a generic error
 		$attach_errors->activate();
@@ -177,16 +168,16 @@ function processAttachments($id_msg = null)
 		// If we are error free, Try to move and rename the file before doing more checks on it.
 		if (empty($errors))
 		{
-			$_SESSION['temp_attachments'][$attachID] = array(
-				'name' => htmlspecialchars(basename($_FILES['attachment']['name'][$n]), ENT_COMPAT, 'UTF-8'),
+			$tmp_attachments->addAttachment([
+				'name' => basename($_FILES['attachment']['name'][$n]),
 				'tmp_name' => $destName,
 				'attachid' => $attachID,
-				'public_attachid' => 'post_tmp_' . User::$info->id . '_' . md5(mt_rand()),
+				'user_id' => User::$info->id,
 				'size' => $_FILES['attachment']['size'][$n],
 				'type' => $_FILES['attachment']['type'][$n],
 				'id_folder' => $attachmentDirectory->currentDirectoryId(),
 				'errors' => array(),
-			);
+			]);
 
 			// Move the file to the attachments folder with a temp name for now.
 			if (@move_uploaded_file($_FILES['attachment']['tmp_name'][$n], $destName))
@@ -195,7 +186,7 @@ function processAttachments($id_msg = null)
 			}
 			else
 			{
-				$_SESSION['temp_attachments'][$attachID]['errors'][] = 'attach_timeout';
+				$tmp_attachments->setAttachError($attachID, 'attach_timeout');
 				if (file_exists($_FILES['attachment']['tmp_name'][$n]))
 				{
 					unlink($_FILES['attachment']['tmp_name'][$n]);
@@ -205,11 +196,13 @@ function processAttachments($id_msg = null)
 		// Upload error(s) were detected, flag the error, remove the file
 		else
 		{
-			$_SESSION['temp_attachments'][$attachID] = array(
-				'name' => htmlspecialchars(basename($_FILES['attachment']['name'][$n]), ENT_COMPAT, 'UTF-8'),
+			$tmp_attachments->addAttachment([
+				'attachid' => $attachID,
+				'user_id' => User::$info->id,
+				'name' => basename($_FILES['attachment']['name'][$n]),
 				'tmp_name' => $destName,
 				'errors' => $errors,
-			);
+			]);
 
 			if (file_exists($_FILES['attachment']['tmp_name'][$n]))
 			{
@@ -217,44 +210,30 @@ function processAttachments($id_msg = null)
 			}
 		}
 
-		// If there were no errors to this point, we apply some additional checks
-		if (empty($_SESSION['temp_attachments'][$attachID]['errors']))
-		{
-			attachmentChecks($attachID);
-		}
-
+		$tmp_attachments->attachmentChecks($attachID);
 		// Want to correct for phonetographer photos?
-		if (!empty($modSettings['attachment_autorotate']) && empty($_SESSION['temp_attachments'][$attachID]['errors']) && substr($_SESSION['temp_attachments'][$attachID]['type'], 0, 5) === 'image')
+		if (!empty($modSettings['attachment_autorotate']))
 		{
-			$image = new Image($_SESSION['temp_attachments'][$attachID]['tmp_name']);
-			if ($image->autoRotateImage())
-			{
-				$image->saveImage($_SESSION['temp_attachments'][$attachID]['tmp_name'], IMAGETYPE_JPEG, 95);
-				$_SESSION['temp_attachments'][$attachID]['size'] = filesize($_SESSION['temp_attachments'][$attachID]['tmp_name']);
-			}
+			$tmp_attachments->autoRotate($attachID);
 		}
 
 		// Sort out the errors for display and delete any associated files.
-		if (!empty($_SESSION['temp_attachments'][$attachID]['errors']))
+		if ($tmp_attachments->hasAttachErrors($attachID))
 		{
-			$attach_errors->addAttach($attachID, $_SESSION['temp_attachments'][$attachID]['name']);
+			$attach_errors->addAttach($attachID, $tmp_attachments->getAttachName($attachID));
 			$log_these = array('attachments_no_create', 'attachments_no_write', 'attach_timeout', 'ran_out_of_space', 'cant_access_upload_path', 'attach_0_byte_file', 'bad_attachment');
 
-			foreach ($_SESSION['temp_attachments'][$attachID]['errors'] as $error)
+			foreach ($tmp_attachments->getAttachErrors($attachID) as $error)
 			{
 				if (!is_array($error))
 				{
 					$attach_errors->addError($error);
 					if (in_array($error, $log_these))
 					{
-						\ElkArte\Errors\Errors::instance()->log_error($_SESSION['temp_attachments'][$attachID]['name'] . ': ' . $txt[$error], 'critical');
+						\ElkArte\Errors\Errors::instance()->log_error($tmp_attachments->getAttachName($attachID) . ': ' . $txt[$error], 'critical');
 
 						// For critical errors, we don't want the file or session data to persist
-						if (file_exists($_SESSION['temp_attachments'][$attachID]['tmp_name']))
-						{
-							unlink($_SESSION['temp_attachments'][$attachID]['tmp_name']);
-						}
-						unset($_SESSION['temp_attachments'][$attachID]);
+						$tmp_attachments->removeById($attachID, false);
 					}
 				}
 				else
@@ -267,7 +246,7 @@ function processAttachments($id_msg = null)
 
 	// Mod authors, finally a hook to hang an alternate attachment upload system upon
 	// Upload to the current attachment folder with the file name $attachID or 'post_tmp_' . User::$info->id . '_' . md5(mt_rand())
-	// Populate $_SESSION['temp_attachments'][$attachID] with the following:
+	// Populate TemporaryAttachments[$attachID] with the following:
 	//   name => The file name
 	//   tmp_name => Path to the temp file (AttachmentsDirectory->getCurrent() . '/' . $attachID).
 	//   size => File size (required).
@@ -278,110 +257,6 @@ function processAttachments($id_msg = null)
 	call_integration_hook('integrate_attachment_upload');
 
 	return $ignore_temp;
-}
-
-/**
- * Deletes a temporary attachment from the $_SESSION (and the filesystem)
- *
- * @param string $attach_id the temporary name generated when a file is uploaded
- *               and used in $_SESSION to help identify the attachment itself
- *
- * @return bool|string
- * @package Attachments
- *
- */
-function removeTempAttachById($attach_id)
-{
-	foreach ($_SESSION['temp_attachments'] as $attachID => $attach)
-	{
-		if ($attachID === $attach_id)
-		{
-			// This file does exist, so lets terminate it!
-			if (file_exists($attach['tmp_name']))
-			{
-				@unlink($attach['tmp_name']);
-				unset($_SESSION['temp_attachments'][$attachID]);
-
-				return true;
-			}
-			// Nope can't delete it if we can't find it
-			else
-			{
-				return 'attachment_not_found';
-			}
-		}
-	}
-
-	return 'attachment_not_found';
-}
-
-/**
- * Finds and return a temporary attachment by its id
- *
- * @param string $attach_id the temporary name generated when a file is uploaded
- *  and used in $_SESSION to help identify the attachment itself
- *
- * @return mixed
- * @throws Exception
- * @package Attachments
- */
-function getTempAttachById($attach_id)
-{
-	global $modSettings;
-
-	$attach_real_id = null;
-
-	if (empty($_SESSION['temp_attachments']))
-	{
-		throw new Exception('no_access');
-	}
-
-	foreach ($_SESSION['temp_attachments'] as $attachID => $val)
-	{
-		if ($attachID === 'post')
-		{
-			continue;
-		}
-
-		if ($val['public_attachid'] === $attach_id)
-		{
-			$attach_real_id = $attachID;
-			break;
-		}
-	}
-
-	if (empty($attach_real_id))
-	{
-		throw new Exception('no_access');
-	}
-
-	// The common name form is "post_tmp_123_0ac9a0b1fc18604e8704084656ed5f09"
-	$id_attach = preg_replace('~[^0-9a-zA-Z_]~', '', $attach_real_id);
-
-	// Permissions: only temporary attachments
-	if (substr($id_attach, 0, 8) !== 'post_tmp')
-	{
-		throw new Exception('no_access');
-	}
-
-	// Permissions: only author is allowed.
-	$pieces = explode('_', substr($id_attach, 9));
-
-	if (!isset($pieces[0]) || $pieces[0] != User::$info->id)
-	{
-		throw new Exception('no_access');
-	}
-
-	$attachmentsDir = new AttachmentsDirectory($modSettings, database());
-
-	$attach_dir = $attachmentsDir->getCurrent();
-
-	if (file_exists($attach_dir . '/' . $attach_real_id) && isset($_SESSION['temp_attachments'][$attach_real_id]))
-	{
-		return $_SESSION['temp_attachments'][$attach_real_id];
-	}
-
-	throw new Exception('no_access');
 }
 
 /**
@@ -437,151 +312,6 @@ function attachmentUploadChecks($attachID)
 	}
 
 	return $errors;
-}
-
-/**
- * Performs various checks on an uploaded file.
- *
- * What it does:
- *
- * - Requires that $_SESSION['temp_attachments'][$attachID] be properly populated.
- *
- * @param int $attachID id of the attachment to check
- *
- * @return bool
- * @throws \ElkArte\Exceptions\Exception attach_check_nag
- * @package Attachments
- *
- */
-function attachmentChecks($attachID)
-{
-	global $modSettings, $context;
-
-	// No data or missing data .... Not necessarily needed, but in case a mod author missed something.
-	if (empty($_SESSION['temp_attachments'][$attachID]))
-	{
-		$error = '$_SESSION[\'temp_attachments\'][$attachID]';
-	}
-	elseif (empty($attachID))
-	{
-		$error = '$attachID';
-	}
-	elseif (empty($context['attachments']))
-	{
-		$error = '$context[\'attachments\']';
-	}
-	else
-
-	// Let's get their attention.
-	if (!empty($error))
-	{
-		throw new ElkException('attach_check_nag', 'debug', array($error));
-	}
-
-	// Just in case this slipped by the first checks, we stop it here and now
-	if ($_SESSION['temp_attachments'][$attachID]['size'] == 0)
-	{
-		$_SESSION['temp_attachments'][$attachID]['errors'][] = 'attach_0_byte_file';
-
-		return false;
-	}
-
-	// First, the dreaded security check. Sorry folks, but this should't be avoided
-	$image = new Image($_SESSION['temp_attachments'][$attachID]['tmp_name']);
-	$size = $image->getSize($_SESSION['temp_attachments'][$attachID]['tmp_name']);
-	$valid_mime = getValidMimeImageType($size[2]);
-
-	if ($valid_mime !== '')
-	{
-		if (!$image->checkImageContents($_SESSION['temp_attachments'][$attachID]['tmp_name']))
-		{
-			// It's bad. Last chance, maybe we can re-encode it?
-			if (empty($modSettings['attachment_image_reencode']) || (!$image->reencodeImage($_SESSION['temp_attachments'][$attachID]['tmp_name'])))
-			{
-				// Nothing to do: not allowed or not successful re-encoding it.
-				$_SESSION['temp_attachments'][$attachID]['errors'][] = 'bad_attachment';
-
-				return false;
-			}
-			else
-			{
-				$_SESSION['temp_attachments'][$attachID]['size'] = $image->getFilesize();
-			}
-		}
-	}
-
-	$attachmentDirectory = new AttachmentsDirectory($modSettings, database());
-	try
-	{
-		$_SESSION['temp_attachments'][$attachID] = $attachmentDirectory->checkDirSpace($_SESSION['temp_attachments'][$attachID], $attachID);
-	}
-	catch (Exception $e)
-	{
-		$_SESSION['temp_attachments'][$attachID]['errors'][] = $e->getMessage();
-	}
-
-	// Is the file too big?
-	if (!empty($modSettings['attachmentSizeLimit']) && $_SESSION['temp_attachments'][$attachID]['size'] > $modSettings['attachmentSizeLimit'] * 1024)
-	{
-		$_SESSION['temp_attachments'][$attachID]['errors'][] = array('file_too_big', array(comma_format($modSettings['attachmentSizeLimit'], 0)));
-	}
-
-	// Check the total upload size for this post...
-	$context['attachments']['total_size'] += $_SESSION['temp_attachments'][$attachID]['size'];
-	if (!empty($modSettings['attachmentPostLimit']) && $context['attachments']['total_size'] > $modSettings['attachmentPostLimit'] * 1024)
-	{
-		$_SESSION['temp_attachments'][$attachID]['errors'][] = array('attach_max_total_file_size', array(comma_format($modSettings['attachmentPostLimit'], 0), comma_format($modSettings['attachmentPostLimit'] - (($context['attachments']['total_size'] - $_SESSION['temp_attachments'][$attachID]['size']) / 1024), 0)));
-	}
-
-	// Have we reached the maximum number of files we are allowed?
-	$context['attachments']['quantity']++;
-
-	// Set a max limit if none exists
-	if (empty($modSettings['attachmentNumPerPostLimit']) && $context['attachments']['quantity'] >= 50)
-	{
-		$modSettings['attachmentNumPerPostLimit'] = 50;
-	}
-
-	if (!empty($modSettings['attachmentNumPerPostLimit']) && $context['attachments']['quantity'] > $modSettings['attachmentNumPerPostLimit'])
-	{
-		$_SESSION['temp_attachments'][$attachID]['errors'][] = array('attachments_limit_per_post', array($modSettings['attachmentNumPerPostLimit']));
-	}
-
-	// File extension check
-	if (!empty($modSettings['attachmentCheckExtensions']))
-	{
-		$allowed = explode(',', strtolower($modSettings['attachmentExtensions']));
-		foreach ($allowed as $k => $dummy)
-		{
-			$allowed[$k] = trim($dummy);
-		}
-
-		if (!in_array(strtolower(substr(strrchr($_SESSION['temp_attachments'][$attachID]['name'], '.'), 1)), $allowed))
-		{
-			$allowed_extensions = strtr(strtolower($modSettings['attachmentExtensions']), array(',' => ', '));
-			$_SESSION['temp_attachments'][$attachID]['errors'][] = array('cant_upload_type', array($allowed_extensions));
-		}
-	}
-
-	// Undo the math if there's an error
-	if (!empty($_SESSION['temp_attachments'][$attachID]['errors']))
-	{
-		if (isset($context['dir_size']))
-		{
-			$context['dir_size'] -= $_SESSION['temp_attachments'][$attachID]['size'];
-		}
-		if (isset($context['dir_files']))
-		{
-			$context['dir_files']--;
-		}
-
-		$context['attachments']['total_size'] -= $_SESSION['temp_attachments'][$attachID]['size'];
-		$context['attachments']['quantity']--;
-
-		return false;
-	}
-
-	return true;
 }
 
 /**
@@ -1881,31 +1611,6 @@ function returnMimeThumb($file_ext, $url = false)
 	$location = $url ? $settings['theme_url'] : $settings['theme_dir'];
 
 	return $location . '/images/mime_images/' . $file_ext . '.png';
-}
-
-/**
- * Finds in $_SESSION['temp_attachments'] an attachment id from its public id
- *
- * @param string $public_attachid
- *
- * @return string
- */
-function getAttachmentIdFromPublic($public_attachid)
-{
-	if (empty($_SESSION['temp_attachments']))
-	{
-		return $public_attachid;
-	}
-
-	foreach ($_SESSION['temp_attachments'] as $key => $val)
-	{
-		if (isset($val['public_attachid']) && $val['public_attachid'] === $public_attachid)
-		{
-			return $key;
-		}
-	}
-
-	return $public_attachid;
 }
 
 /**

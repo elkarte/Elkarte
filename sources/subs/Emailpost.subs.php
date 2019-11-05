@@ -21,6 +21,7 @@ use ElkArte\MembersList;
 use ElkArte\Notifications;
 use ElkArte\NotificationsTask;
 use ElkArte\Util;
+use ElkArte\TemporaryAttachments;
 
 /**
  * Converts text / HTML to BBC
@@ -832,7 +833,7 @@ function pbe_emailError($error, $email_message)
  *
  * What it does:
  *
- * - populates $_SESSION['temp_attachments'] with the email attachments
+ * - populates TemporaryAttachments with the email attachments
  * - calls attachmentChecks to validate them
  * - skips ones flagged with errors
  * - adds valid ones to attachmentOptions
@@ -855,6 +856,7 @@ function pbe_email_attachments($pbe, $email_message)
 	$attachment_count = 0;
 	$attachIDs = array();
 
+	$tmp_attachments = new TemporaryAttachments();
 	$attachmentsDir = new AttachmentsDirectory($modSettings, database());
 	$current_attach_dir = $attachmentsDir->getCurrent();
 
@@ -866,7 +868,7 @@ function pbe_email_attachments($pbe, $email_message)
 	foreach ($email_message->attachments as $name => $attachment)
 	{
 		// Write the contents to an actual file
-		$attachID = 'post_tmp_' . $pbe['profile']['id_member'] . '_' . md5(mt_rand()) . $attachment_count;
+		$attachID = $tmp_attachments->getFileName($pbe['profile']['id_member'], md5(mt_rand()) . $attachment_count);
 		$destName = $current_attach_dir . '/' . $attachID;
 
 		if (file_put_contents($destName, $attachment) !== false)
@@ -874,7 +876,7 @@ function pbe_email_attachments($pbe, $email_message)
 			@chmod($destName, 0644);
 
 			// Place them in session since that's where attachmentChecks looks
-			$_SESSION['temp_attachments'][$attachID] = array(
+			$tmp_attachments[$attachID] = array(
 				'name' => htmlspecialchars(basename($name), ENT_COMPAT, 'UTF-8'),
 				'tmp_name' => $destName,
 				'size' => strlen($attachment),
@@ -884,15 +886,13 @@ function pbe_email_attachments($pbe, $email_message)
 			);
 
 			// Make sure its valid
-			attachmentChecks($attachID);
+			$tmp_attachments->attachmentChecks($attachID);
 			$attachment_count++;
 		}
 	}
 
 	// Get the results from attachmentChecks and see if its suitable for posting
-	$attachments = $_SESSION['temp_attachments'];
-	unset($_SESSION['temp_attachments']);
-	foreach ($attachments as $attachID => $attachment)
+	foreach ($tmp_attachments as $attachID => $attachment)
 	{
 		// If there were any errors we just skip that file
 		if (($attachID != 'initial_error' && strpos($attachID, 'post_tmp_' . $pbe['profile']['id_member'] . '_') === false) || ($attachID == 'initial_error' || !empty($attachment['errors'])))
@@ -924,11 +924,12 @@ function pbe_email_attachments($pbe, $email_message)
 			}
 		}
 		// We had a problem so simply remove it
-		elseif (file_exists($attachment['tmp_name']))
+		else
 		{
-			@unlink($attachment['tmp_name']);
+			$tmp_attachments->removeById($attachment['tmp_name'], false);
 		}
 	}
+	$tmp_attachments->unset();
 
 	return $attachIDs;
 }

@@ -20,6 +20,7 @@ use ElkArte\Errors\AttachmentErrorContext;
 use ElkArte\Errors\ErrorContext;
 use ElkArte\EventManager;
 use ElkArte\Modules\AbstractModule;
+use ElkArte\TemporaryAttachments;
 
 /**
  * Class Attachments_Post_Module
@@ -151,6 +152,7 @@ class Post extends AbstractModule
 		if ($context['attachments']['can']['post'])
 		{
 			// If there are attachments, calculate the total size and how many.
+			$tmp_attachments = new TemporaryAttachments();
 			$attachments = array();
 			$attachments['total_size'] = 0;
 			$attachments['quantity'] = 0;
@@ -166,48 +168,31 @@ class Post extends AbstractModule
 			}
 
 			// A bit of house keeping first.
-			if (!empty($_SESSION['temp_attachments']) && count($_SESSION['temp_attachments']) === 1)
+			if ($tmp_attachments->count() === 1)
 			{
-				unset($_SESSION['temp_attachments']);
+				$tmp_attachments->unset();
 			}
 
-			if (!empty($_SESSION['temp_attachments']))
+			if ($tmp_attachments->hasAttachments())
 			{
 				// Is this a request to delete them?
 				if (isset($_GET['delete_temp']))
 				{
-					foreach ($_SESSION['temp_attachments'] as $attachID => $attachment)
-					{
-						if (strpos($attachID, 'post_tmp_' . $this->user->id . '_') !== false)
-						{
-							@unlink($attachment['tmp_name']);
-							@unlink($attachment['tmp_name'] . '_thumb');
-						}
-					}
+					$tmp_attachments->removeAll($this->user->id);
+					$tmp_attachments->unset();
 					$this->_attach_errors->addError('temp_attachments_gone');
-					$_SESSION['temp_attachments'] = array();
 				}
 				// Hmm, coming in fresh and there are files in session.
 				elseif ($context['current_action'] != 'post2' || !empty($_POST['from_qr']))
 				{
 					// Let's be nice and see if they belong here first.
-					if ((empty($_REQUEST['msg']) && empty($_SESSION['temp_attachments']['post']['msg']) && $_SESSION['temp_attachments']['post']['board'] == $board) || (!empty($_REQUEST['msg']) && $_SESSION['temp_attachments']['post']['msg'] == $_REQUEST['msg']))
+					if ((empty($_REQUEST['msg']) && $tmp_attachments->belongToBoard($board)) || (!empty($_REQUEST['msg']) && $tmp_attachments->belongToMsg($_REQUEST['msg'])))
 					{
 						// See if any files still exist before showing the warning message and the files attached.
-						foreach ($_SESSION['temp_attachments'] as $attachID => $attachment)
+						if ($tmp_attachments->fileExists($this->user->id))
 						{
-							if (strpos($attachID, 'post_tmp_' . $this->user->id . '_') === false)
-							{
-								continue;
-							}
-
-							if (file_exists($attachment['tmp_name']))
-							{
-								$this->_attach_errors->addError('temp_attachments_new');
-								$context['files_in_session_warning'] = $txt['attached_files_in_session'];
-								unset($_SESSION['temp_attachments']['post']['files']);
-								break;
-							}
+							$this->_attach_errors->addError('temp_attachments_new');
+							$context['files_in_session_warning'] = $txt['attached_files_in_session'];
 						}
 					}
 					else
@@ -223,103 +208,92 @@ class Post extends AbstractModule
 						}
 
 						// Compile a list of the files to show the user.
-						$file_list = array();
-						foreach ($_SESSION['temp_attachments'] as $attachID => $attachment)
-						{
-							if (strpos($attachID, 'post_tmp_' . $this->user->id . '_') !== false)
-							{
-								$file_list[] = $attachment['name'];
-							}
-						}
+						$file_list = $tmp_attachments->getFileNames($this->user->id);
 
-						$_SESSION['temp_attachments']['post']['files'] = $file_list;
 						$file_list = '<div class="attachments">' . implode('<br />', $file_list) . '</div>';
 
-						if (!empty($_SESSION['temp_attachments']['post']['msg']))
+						if ($tmp_attachments->areLostAttachments())
 						{
-							// We have a message id, so we can link back to the old topic they were trying to edit..
-							$goback_url = $scripturl . '?action=post' . (!empty($_SESSION['temp_attachments']['post']['msg']) ? (';msg=' . $_SESSION['temp_attachments']['post']['msg']) : '') . (!empty($_SESSION['temp_attachments']['post']['last_msg']) ? (';last_msg=' . $_SESSION['temp_attachments']['post']['last_msg']) : '') . ';topic=' . $_SESSION['temp_attachments']['post']['topic'] . ';additionalOptions';
-
-							$this->_attach_errors->addError(array('temp_attachments_found', array($delete_url, $goback_url, $file_list)));
+							$this->_attach_errors->addError(array('temp_attachments_lost', array($delete_url, $file_list)));
 							$context['ignore_temp_attachments'] = true;
 						}
 						else
 						{
-							$this->_attach_errors->addError(array('temp_attachments_lost', array($delete_url, $file_list)));
+							// We have a message id, so we can link back to the old topic they were trying to edit..
+							$goback_url = $scripturl . '?action=post;msg=' . $tmp_attachments->getPostParam('msg') . ($tmp_attachments->getPostParam('last_msg') === null ? '' : ';last_msg=' . $tmp_attachments->getPostParam('last_msg')) . ';topic=' . $tmp_attachments->getPostParam('topic') . ';additionalOptions';
+
+							$this->_attach_errors->addError(array('temp_attachments_found', array($delete_url, $goback_url, $file_list)));
 							$context['ignore_temp_attachments'] = true;
 						}
 					}
 				}
 
-				foreach ($_SESSION['temp_attachments'] as $attachID => $attachment)
+				// Skipping over these
+				if (!isset($context['ignore_temp_attachments']) && $tmp_attachments->getPostParam('files') === null)
 				{
-					// Skipping over these
-					if (isset($context['ignore_temp_attachments']) || isset($_SESSION['temp_attachments']['post']['files']))
+					$prefix = $tmp_attachments->getName($this->user->id, '');
+					foreach ($tmp_attachments as $attachID => $attachment)
 					{
-						break;
-					}
-
-					// Initial errors (such as missing directory), we can recover
-					if ($attachID != 'initial_error' && strpos($attachID, 'post_tmp_' . $this->user->id . '_') === false)
-					{
-						continue;
-					}
-
-					if ($attachID === 'initial_error')
-					{
-						if ($context['current_action'] != 'post2')
+						// Initial errors (such as missing directory), we can recover
+						if ($attachID != 'initial_error' && strpos($attachID, $prefix) === false)
 						{
-							$txt['error_attach_initial_error'] = $txt['attach_no_upload'] . '<div class="attachmenterrors">' . (is_array($attachment) ? vsprintf($txt[$attachment[0]], $attachment[1]) : $txt[$attachment]) . '</div>';
-							$this->_attach_errors->addError('attach_initial_error');
+							continue;
 						}
-						unset($_SESSION['temp_attachments']);
-						break;
-					}
 
-					// Show any errors which might have occurred.
-					if (!empty($attachment['errors']))
-					{
-						if ($context['current_action'] !== 'post2')
+						if ($attachID === 'initial_error')
 						{
-							$txt['error_attach_errors'] = empty($txt['error_attach_errors']) ? '<br />' : '';
-							$txt['error_attach_errors'] .= vsprintf($txt['attach_warning'], $attachment['name']) . '<div class="attachmenterrors">';
-							foreach ($attachment['errors'] as $error)
+							if ($context['current_action'] != 'post2')
 							{
-								$txt['error_attach_errors'] .= (is_array($error) ? vsprintf($txt[$error[0]], $error[1]) : $txt[$error]) . '<br  />';
+								$txt['error_attach_initial_error'] = $txt['attach_no_upload'] . '<div class="attachmenterrors">' . (is_array($attachment) ? vsprintf($txt[$attachment[0]], $attachment[1]) : $txt[$attachment]) . '</div>';
+								$this->_attach_errors->addError('attach_initial_error');
 							}
-							$txt['error_attach_errors'] .= '</div>';
-							$this->_attach_errors->addError('attach_errors');
+							$tmp_attachments->unset();
 						}
 
-						// Take out the trash.
-						unset($_SESSION['temp_attachments'][$attachID]);
-						@unlink($attachment['tmp_name']);
+						// Show any errors which might have occurred.
+						if (!empty($attachment['errors']))
+						{
+							if ($context['current_action'] !== 'post2')
+							{
+								$txt['error_attach_errors'] = empty($txt['error_attach_errors']) ? '<br />' : '';
+								$txt['error_attach_errors'] .= vsprintf($txt['attach_warning'], $attachment['name']) . '<div class="attachmenterrors">';
+								foreach ($attachment['errors'] as $error)
+								{
+									$txt['error_attach_errors'] .= (is_array($error) ? vsprintf($txt[$error[0]], $error[1]) : $txt[$error]) . '<br  />';
+								}
+								$txt['error_attach_errors'] .= '</div>';
+								$attach_errors->addError('attach_errors');
+							}
 
-						continue;
+							// Take out the trash.
+							$tmp_attachments->removeById($attachID, false);
+
+							continue;
+						}
+
+						// More house keeping.
+						if (!file_exists($attachment['tmp_name']))
+						{
+							$tmp_attachments->removeById($attachID, false);
+							continue;
+						}
+
+						$attachments['quantity']++;
+						$attachments['total_size'] += $attachment['size'];
+
+						if (!isset($context['files_in_session_warning']))
+						{
+							$context['files_in_session_warning'] = $txt['attached_files_in_session'];
+						}
+
+						$context['attachments']['current'][] = array(
+							'name' => '<span class="underline">' . htmlspecialchars($attachment['name'], ENT_COMPAT, 'UTF-8') . '</span>',
+							'size' => $attachment['size'],
+							'id' => $attachment['public_attachid'],
+							'unchecked' => false,
+							'approved' => 1,
+						);
 					}
-
-					// More house keeping.
-					if (!file_exists($attachment['tmp_name']))
-					{
-						unset($_SESSION['temp_attachments'][$attachID]);
-						continue;
-					}
-
-					$attachments['quantity']++;
-					$attachments['total_size'] += $attachment['size'];
-
-					if (!isset($context['files_in_session_warning']))
-					{
-						$context['files_in_session_warning'] = $txt['attached_files_in_session'];
-					}
-
-					$context['attachments']['current'][] = array(
-						'name' => '<span class="underline">' . htmlspecialchars($attachment['name'], ENT_COMPAT, 'UTF-8') . '</span>',
-						'size' => $attachment['size'],
-						'id' => $attachment['public_attachid'],
-						'unchecked' => false,
-						'approved' => 1,
-					);
 				}
 			}
 		}
@@ -375,7 +349,7 @@ class Post extends AbstractModule
 			}
 		}
 
-		$show_additional_options = $show_additional_options || isset($_SESSION['temp_attachments']['post']);
+		$show_additional_options = $show_additional_options || $tmp_attachments->hasPosts();
 	}
 
 	/**
@@ -413,12 +387,14 @@ class Post extends AbstractModule
 			require_once(SUBSDIR . '/Attachments.subs.php');
 			$keep_temp = array();
 			$keep_ids = array();
+			$tmp_attachments = new TemporaryAttachments();
+			$prefix = $tmp_attachments->getName($this->user->id, '');
 
-			foreach ($_POST['attach_del'] as $dummy)
+			foreach ($_POST['attach_del'] as $public_id)
 			{
-				$attachID = getAttachmentIdFromPublic($dummy);
+				$attachID = $tmp_attachments->getIdFromPublic($public_id);
 
-				if (strpos($attachID, 'post_tmp_' . $this->user->id . '_') !== false)
+				if (strpos($attachID, $prefix) !== false)
 				{
 					$keep_temp[] = $attachID;
 				}
@@ -428,19 +404,7 @@ class Post extends AbstractModule
 				}
 			}
 
-			if (isset($_SESSION['temp_attachments']))
-			{
-				foreach ($_SESSION['temp_attachments'] as $attachID => $attachment)
-				{
-					if ((isset($_SESSION['temp_attachments']['post']['files'], $attachment['name']) && in_array($attachment['name'], $_SESSION['temp_attachments']['post']['files'])) || in_array($attachID, $keep_temp) || strpos($attachID, 'post_tmp_' . $this->user->id . '_') === false)
-					{
-						continue;
-					}
-
-					unset($_SESSION['temp_attachments'][$attachID]);
-					@unlink($attachment['tmp_name']);
-				}
-			}
+			$tmp_attachments->removeExcept($keep_temp, $this->user->id)
 
 			if (!empty($msg))
 			{
@@ -473,15 +437,17 @@ class Post extends AbstractModule
 		global $context, $modSettings;
 
 		$this->_is_new_message = empty($msgOptions['id']);
+		$tmp_attachments = new TemporaryAttachments();
+		$prefix = $tmp_attachments->getName($this->user->id, '');
 
 		// ...or attach a new file...
-		if (empty($this->ignore_temp) && $context['attachments']['can']['post'] && !empty($_SESSION['temp_attachments']) && empty($_POST['from_qr']))
+		if (empty($this->ignore_temp) && $context['attachments']['can']['post'] && $tmp_attachments->hasAttachments() && empty($_POST['from_qr']))
 		{
 			$this->_saved_attach_id = array();
 
-			foreach ($_SESSION['temp_attachments'] as $attachID => $attachment)
+			foreach ($tmp_attachments as $attachID => $attachment)
 			{
-				if ($attachID !== 'initial_error' && strpos($attachID, 'post_tmp_' . $this->user->id . '_') === false)
+				if ($attachID !== 'initial_error' && strpos($attachID, $prefix) === false)
 				{
 					continue;
 				}
@@ -489,7 +455,7 @@ class Post extends AbstractModule
 				// If there was an initial error just show that message.
 				if ($attachID === 'initial_error')
 				{
-					unset($_SESSION['temp_attachments']);
+					$tmp_attachments->unset();
 					break;
 				}
 
@@ -526,7 +492,7 @@ class Post extends AbstractModule
 					@unlink($attachment['tmp_name']);
 				}
 			}
-			unset($_SESSION['temp_attachments']);
+			$tmp_attachments->unset();
 		}
 
 		if (!empty($this->_saved_attach_id) && $msgOptions['icon'] === 'xx')
