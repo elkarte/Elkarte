@@ -404,7 +404,7 @@ class Post extends AbstractModule
 				}
 			}
 
-			$tmp_attachments->removeExcept($keep_temp, $this->user->id)
+			$tmp_attachments->removeExcept($keep_temp, $this->user->id);
 
 			if (!empty($msg))
 			{

@@ -85,7 +85,7 @@ function processAttachments($id_msg = null)
 	// Hmm. There are still files in session.
 	$ignore_temp = false;
 	$tmp_attachments = new TemporaryAttachments();
-	if ($tmp_attachments->getPostParam('files' !== null && $tmp_attachments->count() > 1)
+	if ($tmp_attachments->getPostParam('files') !== null && $tmp_attachments->count() > 1)
 	{
 		// Let's try to keep them. But...
 		$ignore_temp = true;

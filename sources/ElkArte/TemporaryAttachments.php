@@ -192,21 +192,21 @@ class TemporaryAttachments extends ValuesContainer
 
 	public function areLostAttachments()
 	{
-		return empty($this->data->['post']['msg']);
+		return empty($this->data['post']['msg']);
 	}
 
 	public function getPostParam($idx)
 	{
-		return $this->data->['post'][$idx] ?? null;
+		return $this->data['post'][$idx] ?? null;
 	}
 
 	public function setPostParam(array $vals)
 	{
-		if (!isset($this->data->['post']))
+		if (!isset($this->data['post']))
 		{
-			$this->data->['post'] = [];
+			$this->data['post'] = [];
 		}
-		$this->data->['post'] = array_merge($this->data->['post'], $vals);
+		$this->data['post'] = array_merge($this->data['post'], $vals);
 	}
 
 	public function belongToMsg($msg)
