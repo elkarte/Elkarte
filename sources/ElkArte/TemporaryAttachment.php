@@ -17,7 +17,6 @@ use ElkArte\ValuesContainer;
 use ElkArte\Exceptions\Exception as ElkException;
 use \Exception as Exception;
 use ElkArte\Graphics\Image;
-use ElkArte\AttachmentsDirectory;
 
 /**
  *
@@ -134,7 +133,7 @@ class TemporaryAttachment extends ValuesContainer
 	 * @throws \ElkArte\Exceptions\Exception attach_check_nag
 	 *
 	 */
-	public function doChecks()
+	public function doChecks($attachmentDirectory)
 	{
 		global $modSettings, $context;
 
@@ -191,7 +190,6 @@ class TemporaryAttachment extends ValuesContainer
 			}
 		}
 
-		$attachmentDirectory = new AttachmentsDirectory($modSettings, database());
 		try
 		{
 			$attachmentDirectory->checkDirSpace($this);

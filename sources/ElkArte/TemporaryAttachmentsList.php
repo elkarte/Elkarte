@@ -14,10 +14,7 @@
 namespace ElkArte;
 
 use ElkArte\ValuesContainer;
-use ElkArte\Exceptions\Exception as ElkException;
 use \Exception as Exception;
-use ElkArte\Graphics\Image;
-use ElkArte\AttachmentsDirectory;
 use ElkArte\TemporaryAttachment;
 
 /**
@@ -70,12 +67,12 @@ class TemporaryAttachmentsList extends ValuesContainer
 	{
 		if ($fatal && !isset($this->data[$attachID]))
 		{
-			throw new \Exception('attachment_not_found');
+			throw new Exception('attachment_not_found');
 		}
 
 		if ($fatal && !file_exists($attach['tmp_name']))
 		{
-			throw new \Exception('attachment_not_found');
+			throw new Exception('attachment_not_found');
 		}
 
 		$this->data[$attachID]->remove($fatal);

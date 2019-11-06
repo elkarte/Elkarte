@@ -183,7 +183,7 @@ function processAttachments($id_msg = null)
 			$temp_file->remove(false);
 		}
 
-		$temp_file->doChecks();
+		$temp_file->doChecks($attachmentDirectory);
 
 		// Want to correct for phonetographer photos?
 		if (!empty($modSettings['attachment_autorotate']))

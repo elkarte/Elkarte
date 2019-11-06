@@ -886,7 +886,7 @@ function pbe_email_attachments($pbe, $email_message)
 			]);
 
 			// Make sure its valid
-			$temp_file->doChecks();
+			$temp_file->doChecks($attachmentDirectory);
 			$tmp_attachments->addAttachment($temp_file);
 			$attachment_count++;
 		}
