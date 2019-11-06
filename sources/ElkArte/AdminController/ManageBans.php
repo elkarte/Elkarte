@@ -61,7 +61,7 @@ class ManageBans extends AbstractController
 		$action = new Action('manage_bans');
 
 		// Default the sub-action to 'view ban list'.
-		$subAction = $this->_req->getQuery('sa', 'strval', 'list');
+		$subAction = $action->initialize($subActions, 'list');
 
 		// Tabs for browsing the different ban functions.
 		$context[$context['admin_menu_name']]['tab_data'] = array(
@@ -101,7 +101,6 @@ class ManageBans extends AbstractController
 		$context['sub_action'] = $subAction;
 
 		// Call the right function for this sub-action.
-		$action->initialize($subActions, 'list');
 		$action->dispatch($subAction);
 	}
 
@@ -611,7 +610,7 @@ class ManageBans extends AbstractController
 			{
 				$context['ban']['from_user'] = false;
 				$context['use_autosuggest'] = true;
-				$context['ban_suggestions']['member']['name'] = $this->_req->query->user;
+				$context['ban_suggestions']['member']['name'] = $this->_req->getQuery('user', 'trim|strval', '');
 			}
 
 			// Not strictly necessary, but it's nice
@@ -658,7 +657,8 @@ class ManageBans extends AbstractController
 		require_once(SUBSDIR . '/Bans.subs.php');
 
 		// Delete one or more entries.
-		if (!empty($this->_req->post->removeAll) || (!empty($this->_req->post->removeSelected) && !empty($this->_req->post->remove)))
+		if (!empty($this->_req->post->removeAll)
+			|| (!empty($this->_req->post->removeSelected) && !empty($this->_req->post->remove)))
 		{
 			checkSession();
 			validateToken('admin-bl');

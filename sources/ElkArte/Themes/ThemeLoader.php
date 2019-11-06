@@ -66,7 +66,6 @@ class ThemeLoader
 		}
 
 		$this->loadThemeUrls();
-
 		loadUserContext();
 
 		// Set up some additional interface preference context
@@ -140,7 +139,7 @@ class ThemeLoader
 		]);
 
 		// Just some mobile-friendly settings
-		if ($context['browser_body_id'] == 'mobile')
+		if ($context['browser_body_id'] === 'mobile')
 		{
 			// Disable the preview text.
 			$modSettings['message_index_preview'] = 0;
@@ -152,6 +151,7 @@ class ThemeLoader
 			$modSettings['search_dropdown'] = false;
 		}
 
+		// @todo Hummm this seems a bit wanky
 		if (!isset($txt))
 		{
 			$txt = [];
@@ -205,8 +205,7 @@ class ThemeLoader
 		}
 
 		// Make a special URL for the language.
-		$settings['lang_images_url'] =
-			$settings['images_url'] . '/' . (!empty($txt['image_lang']) ? $txt['image_lang'] : $this->user->language);
+		$settings['lang_images_url'] = $settings['images_url'] . '/' . (!empty($txt['image_lang']) ? $txt['image_lang'] : $this->user->language);
 
 		// RTL languages require an additional stylesheet.
 		if ($context['right_to_left'])
@@ -309,7 +308,7 @@ class ThemeLoader
 	 * Resolves the ID of a theme.
 	 *
 	 * The identifier can be specified in:
-	 * - a GET variable
+	 * - a GET variable if theme selection is enabled
 	 * - the session
 	 * - user's preferences
 	 * - board
@@ -357,15 +356,15 @@ class ThemeLoader
 			$this->id = (int) $this->id;
 		}
 		// The theme was specified by Get or Post.
-		elseif (!empty($_req->getQuery('theme', 'intval', $_req->getPost('theme', 'intval', null))))
+		elseif (!empty($_req->getRequest('theme', 'intval', null)))
 		{
-			$this->id = (int) $_REQUEST['theme'];
+			$this->id = $_req->get('theme');
 			$_SESSION['theme'] = $this->id;
 		}
 		// The theme was specified by REQUEST... previously.
-		elseif (!empty($_SESSION['theme']))
+		elseif (!empty($_req->getSession('theme')))
 		{
-			$this->id = (int) $_SESSION['theme'];
+			$this->id = (int) $_req->getSession('theme');
 		}
 		// The theme is just the user's choice. (might use ?board=1;theme=0 to force board theme.)
 		elseif (!empty($this->user->theme))

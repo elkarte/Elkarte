@@ -156,6 +156,7 @@ class ManageMail extends AbstractController
 
 		theme()->addInlineJavascript($javascript . '
 		};
+		
 		function fetch_birthday_preview()
 		{
 			var index = document.getElementById(\'birthday_email\').value;
@@ -188,6 +189,7 @@ class ManageMail extends AbstractController
 			$element = substr($key, strrpos($key, '_') + 1);
 			$processedBirthdayEmails[$index][$element] = $value;
 		}
+
 		foreach ($processedBirthdayEmails as $index => $dummy)
 		{
 			$emails[$index] = $index;
@@ -245,10 +247,10 @@ class ManageMail extends AbstractController
 		$number_to_send = empty($modSettings['mail_period_limit']) ? 25 : $modSettings['mail_period_limit'];
 
 		// If we don't yet have the total to clear, find it.
-		$all_emails = isset($this->_req->query->te) ? (int) $this->_req->query->te : list_getMailQueueSize();
+		$all_emails = $this->_req->getQuery('te', 'intval', list_getMailQueueSize());
 
 		// If we don't know how many we sent, it must be because... we didn't send any!
-		$sent_emails = isset($this->_req->query->sent) ? (int) $this->_req->query->sent : 0;
+		$sent_emails = $this->_req->getQuery('sent', 'intval', 0);
 
 		// Send this batch, then go for a short break...
 		while (reduceMailQueue($number_to_send, true, true) === true)

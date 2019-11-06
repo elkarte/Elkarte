@@ -91,7 +91,7 @@ abstract class AbstractDump
 	abstract public function backup_table($table_name, $backup_table);
 
 	/**
-	 * Gets all the necessary INSERTs for the table named table_name.
+	 * Gets all the necessary INSERT's for the table named table_name.
 	 * It goes in 250 row segments.
 	 *
 	 * @param string $tableName - the table to create the inserts for.

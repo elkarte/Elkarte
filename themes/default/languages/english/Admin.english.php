@@ -73,9 +73,10 @@ $txt['admin_ban_name'] = 'Mass-user Ban';
 $txt['remove_groups'] = 'Remove all groups';
 
 $txt['admin_repair'] = 'Repair All boards and topics';
-$txt['admin_main_welcome'] = 'This is your &quot;%1$s&quot;.  From here, you can edit settings, maintain your forum, view logs, install packages, manage themes, and many other things.<br /><br />If you have any trouble, please look at the &quot;Support &amp; Credits&quot; page.  If the information there doesn\'t help you, feel free to <a href="http://www.elkarte.net/index.php" target="_blank" class="new_win">look to us for help</a> with the problem.<br />You may also find answers to your questions or problems by clicking the <i class="helpicon i-help"><s>Help</s></i> symbols for more information on the related functions.';
+$txt['admin_main_welcome'] = 'This is your &quot;%1$s&quot;.  From here, you can edit settings, maintain your forum, view logs, install packages, manage themes, and many other things.<br /><br />If you have any trouble, please look at the &quot;Support &amp; Credits&quot; page.  If the information there doesn\'t help you, feel free to <a href="https://www.elkarte.net/index.php" target="_blank" class="new_win">look to us for help</a> with the problem.<br />You may also find answers to your questions or problems by clicking the <i class="helpicon i-help"><s>Help</s></i> symbols for more information on the related functions.';
 $txt['admin_news_desc'] = 'Please place one news item per box. BBC tags, such as <span>[b]</span>, <span>[i]</span> and <span>[u]</span> are allowed in your news, as well as smileys. Clear a news item\'s text box to remove it.';
 $txt['administrators'] = 'Forum Administrators';
+$txt['admin_control_panel'] = 'Admin Control Panel';
 $txt['admin_reserved_desc'] = 'Reserved names will keep members from registering certain user names or using these words in their displayed names. Choose the options you wish to use from the bottom before submitting.';
 $txt['admin_activation_email'] = 'Send activation email to new members upon registration';
 $txt['admin_match_whole'] = 'Match whole name only. If unchecked, search within names.';

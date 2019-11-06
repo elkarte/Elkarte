@@ -21,7 +21,7 @@ namespace ElkArte\UrlGenerator;
 abstract class AbstractUrlGenerator
 {
 	/**
-	 * The piece of glue between differet parameters of the URL
+	 * The piece of glue between different parameters of the URL
 	 */
 	protected $_separator = ';';
 

@@ -261,7 +261,7 @@ class Agreement
 	 * Creates a full backup of all the agreements.
 	 *
 	 * @param string $backup_id the name of the directory of the backup
-	 * @return bool true if successful, false if failes to create the directory
+	 * @return bool true if successful, false if fails to create the directory
 	 */
 	protected function _createBackup($backup_id)
 	{

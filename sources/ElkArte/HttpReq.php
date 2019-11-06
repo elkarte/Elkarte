@@ -326,6 +326,82 @@ class HttpReq
 	}
 
 	/**
+	 * Method to return a $_REQUEST value
+	 *
+	 * - Uses any sanitize rule(s) that can be passed to the \ElkArte\DataValidator class
+	 * - Returned value will be the sanitized value or null if the key is not found in either $_GET
+	 * or $_POST (in that order).  Ideally you should know if something is in GET or POST and use
+	 * those get function directly.
+	 *
+	 * @param string $name The key name of the value to return
+	 * @param string|null $sanitize a comma separated list of sanitation rules to apply
+	 * @param mixed|null $default default value to return if key value is not found
+	 *
+	 * @return mixed
+	 */
+	public function getRequest($name = '', $sanitize = null, $default = null)
+	{
+		$this->_param[$name] = $default;
+
+		if (isset($this->get->{$name}))
+		{
+			$this->_param[$name] = $this->get->{$name};
+			$this->_param[$name] = $this->cleanValue($name, $sanitize);
+		}
+		elseif (isset($this->post->{$name}))
+		{
+			$this->_param[$name] = $this->post->{$name};
+			$this->_param[$name] = $this->cleanValue($name, $sanitize);
+		}
+
+		return $this->_param[$name];
+	}
+
+	/**
+	 * Helper function to do a value comparison to a GET value.  Returns false
+	 * if the value does not exist or if it does not equal the comparison value.
+	 *
+	 * @param string $name get value to fetch
+	 * @param mixed $compare value to compare the get value to
+	 * @param null|string $sanitize optional | delimited data for validator
+	 * @param null|mixed $default if no value exists, what to set it to (will also be used in the compare)
+	 *
+	 * @return bool
+	 */
+	public function compareQuery($name = '', $compare, $sanitize = null, $default = null)
+	{
+		$this->getQuery($name, $sanitize, $default);
+		if ($this->is_set($name) && $this->_param[$name] === $compare)
+		{
+			return true;
+		}
+
+		return false;
+	}
+
+	/**
+	 * Helper function to do a value comparison to a Post value.  Returns false
+	 * if the value does not exist or if it does not equal the comparison value.
+	 *
+	 * @param string $name get value to fetch
+	 * @param mixed $compare value to compare the post value to
+	 * @param null|string $sanitize optional | delimited data for validator
+	 * @param null|mixed $default if no value exists, what to set it to (will also be used in the compare)
+	 *
+	 * @return bool
+	 */
+	public function comparePost($name = '', $compare, $sanitize = null, $default = null)
+	{
+		$this->getPost($name, $sanitize, $default);
+		if ($this->is_set($name) && $this->_param[$name] === $compare)
+		{
+			return true;
+		}
+
+		return false;
+	}
+
+	/**
 	 * Method to return a $_COOKIE value
 	 *
 	 * - Does not provide sanitation capability

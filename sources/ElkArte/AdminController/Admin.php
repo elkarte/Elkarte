@@ -682,8 +682,8 @@ class Admin extends AbstractController
 			'title' => $txt['admin_center'],
 			'help' => '',
 			'description' => '
-				<strong>' . $txt['hello_guest'] . ' ' . $context['user']['name'] . '!</strong>
-				' . sprintf($txt['admin_main_welcome'], $txt['admin_center'], $txt['help'], $settings['images_url']),
+				<span class="bbc_strong">' . $txt['hello_guest'] . ' ' . $context['user']['name'] . '!</span>
+				' . sprintf($txt['admin_main_welcome'], $txt['admin_control_panel'], $txt['help'], $settings['images_url']),
 		);
 
 		// Load in the admin quick tasks
@@ -831,18 +831,8 @@ class Admin extends AbstractController
 			'Login', 'ManageSmileys', 'Maillist', 'Mentions'
 		);
 
-		// All the files we need to include.
-		$include_files = array(
-// 			'AddonSettings', 'AdminLog', 'CoreFeatures',
-// 			'ManageAttachments', 'ManageAvatars', 'ManageBBC',
-// 			'ManageBoards',
-// 			'ManageFeatures', 'ManageLanguages', 'ManageMail',
-// 			'ManageNews', 'ManagePaid', 'ManagePermissions',
-// 			'ManagePosts', 'ManageRegistration', 'ManageSearch',
-// 			'ManageSearchEngines', 'ManageSecurity', 'ManageServer',
-// 			'ManageSmileys', 'ManageTopics', 'ManageMaillist',
-// 			'ManageMembergroups'
-		);
+		// All the files we need to include to search for settings
+		$include_files = array();
 
 		// This is a special array of functions that contain setting data
 		// - we query all these to simply pull all setting bits!
@@ -892,7 +882,6 @@ class Admin extends AbstractController
 
 		// Go through all the search data trying to find this text!
 		$search_term = strtolower(un_htmlspecialchars($context['search_term']));
-
 		$search = new AdminSettingsSearch($language_files, $include_files, $settings_search);
 		$search->initSearch($context['admin_menu_name'], array(
 			array('COPPA', 'area=regcenter;sa=settings'),

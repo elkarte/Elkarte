@@ -94,17 +94,14 @@ class ManageBBC extends AbstractController
 			$codes = ParserWrapper::instance()->getCodes();
 			$bbcTags = $codes->getTags();
 
-			if (!isset($this->_req->post->disabledBBC_enabledTags))
+			$disabledBBC_enabledTags = $this->_req->getPost('disabledBBC_enabledTags', null, []);
+			if (!is_array($disabledBBC_enabledTags))
 			{
-				$this->_req->post->disabledBBC_enabledTags = array();
-			}
-			elseif (!is_array($this->_req->post->disabledBBC_enabledTags))
-			{
-				$this->_req->post->disabledBBC_enabledTags = array($this->_req->post->disabledBBC_enabledTags);
+				$disabledBBC_enabledTags = array($disabledBBC_enabledTags);
 			}
 
 			// Work out what is actually disabled!
-			$this->_req->post->disabledBBC = implode(',', array_diff($bbcTags, $this->_req->post->disabledBBC_enabledTags));
+			$this->_req->post->disabledBBC = implode(',', array_diff($bbcTags, $disabledBBC_enabledTags));
 
 			// Notify addons and integrations
 			call_integration_hook('integrate_save_bbc_settings', array($bbcTags));

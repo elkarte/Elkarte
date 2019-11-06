@@ -122,7 +122,7 @@ final class ErrorHandler extends Errors
 		// \ElkArte\Exceptions\Exception handles its own logging.
 		if (!$e instanceof Exception)
 		{
-			$this->log_error(
+			\ElkArte\Errors::instance()->log_error(
 				$this->error_name . ': ' . $this->error_string,
 				stripos(
 					$this->error_string,

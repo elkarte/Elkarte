@@ -38,16 +38,19 @@ class ManagePermissions extends AbstractController
 	 * @var int|null
 	 */
 	protected $_pid = null;
+
 	/**
 	 * Permissions object
 	 *
 	 * @var \Elkarte\Permissions
 	 */
 	private $permissionsObject;
+
 	/**
 	 * @var string[]
 	 */
 	private $illegal_permissions = array();
+
 	/**
 	 * @var string[]
 	 */
@@ -106,7 +109,7 @@ class ManagePermissions extends AbstractController
 				'controller' => $this,
 				'function' => 'action_postmod',
 				'permission' => 'manage_permissions',
-				'disabled' => featureEnabled('pm') === false),
+				'disabled' => !featureEnabled('pm')),
 			'profiles' => array(
 				'controller' => $this,
 				'function' => 'action_profiles',
@@ -144,11 +147,8 @@ class ManagePermissions extends AbstractController
 			),
 		);
 
-		// Set the subAction, taking permissions in to account
-		$subAction = isset($this->_req->query->sa) && isset($subActions[$this->_req->query->sa]) && empty($subActions[$this->_req->query->sa]['disabled']) ? $this->_req->query->sa : (allowedTo('manage_permissions') ? 'index' : 'settings');
-
 		// Load the subactions, call integrate_sa_manage_permissions
-		$action->initialize($subActions);
+		$subAction = $action->initialize($subActions, (allowedTo('manage_permissions') ? 'index' : 'settings'));
 
 		// Last items needed
 		$context['page_title'] = $txt['permissions_title'];
@@ -613,6 +613,8 @@ class ManagePermissions extends AbstractController
 	/**
 	 * Handles permission modification actions from the upper part of the
 	 * permission manager index.
+	 *
+	 * @throws \ElkArte\Exceptions\Exception
 	 */
 	public function action_quick()
 	{
@@ -634,10 +636,7 @@ class ManagePermissions extends AbstractController
 		}
 
 		// Only accept numeric values for selected membergroups.
-		foreach ($this->_req->post->group as $id => $group_id)
-		{
-			$this->_req->post->group[$id] = (int) $group_id;
-		}
+		$this->_req->post->group = array_map('intval', $this->_req->post->group);
 		$this->_req->post->group = array_unique($this->_req->post->group);
 
 		$this->_pid = $this->_req->getQuery('pid', 'intval', 0);

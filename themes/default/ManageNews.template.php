@@ -272,7 +272,7 @@ function template_email_members_compose()
 	foreach ($context['recipients'] as $key => $values)
 	{
 		echo '
-			<input type="hidden" name="', $key, '" value="', implode(($key == 'emails' ? ';' : ','), $values), '" />';
+			<input type="hidden" name="', $key, '" value="', implode(($key === 'emails' ? ';' : ','), $values), '" />';
 	}
 
 	// The vars used to preview a newsletter without loading a new page, used by post.js previewControl()
@@ -284,10 +284,10 @@ function template_email_members_compose()
 
 		function checkboxes_status (item)
 		{
-			if (item.id == \'send_html\')
+			if (item.id === \'send_html\')
 				document.getElementById(\'parse_html\').disabled = !document.getElementById(\'parse_html\').disabled;
 
-			if (item.id == \'send_pm\')
+			if (item.id === \'send_pm\')
 			{
 				if (!document.getElementById(\'send_html\').checked)
 					document.getElementById(\'parse_html\').disabled = true;

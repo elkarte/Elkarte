@@ -48,9 +48,9 @@ class AdminSettingsSearch
 	 *
 	 * @param string[] $language_files - Language file names
 	 * @param string[] $include_files - File names to include (see _include_files
-	 *                 for details on the structure)
+	 * for details on the structure)
 	 * @param mixed[] $settings_search - Settings to search in (see
-	 *                 _load_settings for details on the structure)
+	 * _load_settings for details on the structure)
 	 */
 	public function __construct($language_files = array(), $include_files = array(), $settings_search = array())
 	{
@@ -74,20 +74,16 @@ class AdminSettingsSearch
 	 * Includes a set of files.
 	 *
 	 * @param string[] $include_files - array of file names (without extension),
-	 *                  it's possible to specify an array of arrays instead of an
-	 *                  array of strings, in that case the index 0 is the
-	 *                  directory of the file, while the 1 is the file name.
-	 *                  If a directory is not specified it will default to
-	 *                  the value of the constant ADMINDIR
-	 *                  e.g.
-	 *                  $include_files = array(
-	 *                    'file_name.controller',
-	 *                    'file_name2.controller',
-	 *                    array(
-	 *                      'dir_name'
-	 *                      'file_name3.controller'
-	 *                    )
-	 *                  )
+	 * it's possible to specify an array of arrays instead of an array of strings,
+	 * in that case the index 0 is the directory of the file, while the 1 is the file name.
+	 *
+	 * If a directory is not specified it will default to the value of the constant ADMINDIR
+	 * e.g.
+	 * $include_files = array(
+	 * 		'file_name.controller',
+	 * 		'file_name2.controller',
+	 * 		array('dir_name', 'file_name3.controller')
+	 * )
 	 */
 	protected function _include_files($include_files)
 	{
@@ -111,12 +107,12 @@ class AdminSettingsSearch
 	 * Loads all the settings
 	 *
 	 * @param mixed[] $settings_search - An array that defines where to look
-	 *                for settings. The structure is:
-	 *                array(
-	 *                  method name
-	 *                  url
-	 *                  controller name
-	 *                )
+	 * for settings. The structure is:
+	 * array(
+	 * 		method name
+	 * 		url
+	 * 		controller name
+	 * )
 	 *
 	 * @return array
 	 * @todo move to subs?
@@ -175,26 +171,25 @@ class AdminSettingsSearch
 		// See if there are any labels that might fit?
 		if (isset($var['text_label']))
 		{
-			$return = $var['text_label'];
-		}
-		elseif (isset($txt[$var[1]]))
-		{
-			$return = $txt[$var[1]];
-		}
-		elseif (isset($txt['setting_' . $var[1]]))
-		{
-			$return = $txt['setting_' . $var[1]];
-		}
-		elseif (isset($txt['groups_' . $var[1]]))
-		{
-			$return = $txt['groups_' . $var[1]];
-		}
-		else
-		{
-			$return = $var[1];
+			return $var['text_label'];
 		}
 
-		return $return;
+		if (isset($txt[$var[1]]))
+		{
+			return $txt[$var[1]];
+		}
+
+		if (isset($txt['setting_' . $var[1]]))
+		{
+			return $txt['setting_' . $var[1]];
+		}
+
+		if (isset($txt['groups_' . $var[1]]))
+		{
+			return $txt['groups_' . $var[1]];
+		}
+
+		return $var[1];
 	}
 
 	/**
@@ -202,7 +197,7 @@ class AdminSettingsSearch
 	 *
 	 * @param string $menu_name - The name of the menu to look into
 	 * @param array $additional_settings - Possible additional settings
-	 *                 (see _load_settings for the array structure)
+	 * (see _load_settings for the array structure)
 	 */
 	public function initSearch($menu_name, $additional_settings = array())
 	{
@@ -259,10 +254,10 @@ class AdminSettingsSearch
 	 * @param string $search_term - The term to search
 	 *
 	 * @return string[] - an array of search results with 4 indexes:
-	 *                     - url
-	 *                     - name
-	 *                     - type
-	 *                     - help
+	 *    - url
+	 *    - name
+	 *    - type
+	 *    - help
 	 */
 	public function doSearch($search_term)
 	{
@@ -299,12 +294,11 @@ class AdminSettingsSearch
 	 *
 	 * @param string $search_term - The term to search
 	 * @param string|string[] $item - A string or array of strings that may be
-	 *                        standalone strings, index for $txt, partial index
-	 *                        for $txt['setting_' . $item]
+	 * standalone strings, index for $txt, partial index for $txt['setting_' . $item]
 	 *
 	 * @return string[] - An empty array if $search_term is not found, otherwise
-	 *                    part of the search_result array (consisting of 'name'
-	 *                    and 'help') of the term the result was found
+	 * part of the search_result array (consisting of 'name' and 'help')
+	 * of the term the result was found
 	 */
 	protected function _find_term($search_term, $item)
 	{

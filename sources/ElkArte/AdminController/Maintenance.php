@@ -161,10 +161,7 @@ class Maintenance extends AbstractController
 		$subAction = $action->initialize($subActions, 'routine');
 
 		// Doing something special, does it exist?
-		if (isset($this->_req->query->activity, $subActions[$subAction]['activities'][$this->_req->query->activity]))
-		{
-			$activity = $this->_req->query->activity;
-		}
+		$activity = $this->_req->getQuery('activity', 'trim|strval', '');
 
 		// Set a few things.
 		$context[$context['admin_menu_name']]['current_subsection'] = $subAction;
@@ -175,7 +172,7 @@ class Maintenance extends AbstractController
 		$action->dispatch($subAction);
 
 		// Any special activity defined, then go to it.
-		if (isset($activity))
+		if (isset($subActions[$subAction]['activities'][$activity]))
 		{
 			if (is_string($subActions[$subAction]['activities'][$activity]) && method_exists($this, $subActions[$subAction]['activities'][$activity]))
 			{
@@ -214,7 +211,7 @@ class Maintenance extends AbstractController
 	{
 		global $context, $txt;
 
-		if ($this->_req->getQuery('done', 'trim|strval') === 'recount')
+		if ($this->_req->compareQuery('done', 'recount', 'trim|strval'))
 		{
 			$context['maintenance_finished'] = $txt['maintain_recount'];
 		}
@@ -289,7 +286,7 @@ class Maintenance extends AbstractController
 		$context['membergroups'] = getBasicMembergroupData(array('all'));
 
 		// Show that we completed this action
-		if ($this->_req->getQuery('done', 'strval') === 'recountposts')
+		if ($this->_req->compareQuery('done', 'recountposts', 'trim|strval'))
 		{
 			$context['maintenance_finished'] = array(
 				'errors' => array(sprintf($txt['maintain_done'], $txt['maintain_recountposts'])),
@@ -355,13 +352,13 @@ class Maintenance extends AbstractController
 
 		call_integration_hook('integrate_topics_maintenance', array(&$context['topics_actions']));
 
-		if ($this->_req->getQuery('done', 'strval') === 'purgeold')
+		if ($this->_req->compareQuery('done', 'purgeold', 'trim|strval'))
 		{
 			$context['maintenance_finished'] = array(
 				'errors' => array(sprintf($txt['maintain_done'], $txt['maintain_old'])),
 			);
 		}
-		elseif ($this->_req->getQuery('done', 'strval') === 'massmove')
+		elseif ($this->_req->compareQuery('done', 'massmove', 'trim|strval'))
 		{
 			$context['maintenance_finished'] = array(
 				'errors' => array(sprintf($txt['maintain_done'], $txt['move_topics_maintenance'])),
@@ -474,7 +471,7 @@ class Maintenance extends AbstractController
 			}
 		}
 
-		$context['convert_to'] = $body_type == 'text' ? 'mediumtext' : 'text';
+		$context['convert_to'] = $body_type === 'text' ? 'mediumtext' : 'text';
 
 		if ($body_type === 'text' || ($body_type !== 'text' && isset($this->_req->post->do_conversion)))
 		{
@@ -606,7 +603,7 @@ class Maintenance extends AbstractController
 
 		// If there aren't any tables then I believe that would mean the world has exploded...
 		$context['num_tables'] = count($tables);
-		if ($context['num_tables'] == 0)
+		if ($context['num_tables'] === 0)
 		{
 			throw new Exception('You appear to be running ElkArte in a flat file mode... fantastic!', false);
 		}
@@ -1114,17 +1111,13 @@ class Maintenance extends AbstractController
 		{
 			$body_type = fetchBodyType();
 
-			$context['convert_to'] = $body_type == 'text' ? 'mediumtext' : 'text';
+			$context['convert_to'] = $body_type === 'text' ? 'mediumtext' : 'text';
 			$context['convert_to_suggest'] = ($body_type != 'text' && !empty($modSettings['max_messageLength']) && $modSettings['max_messageLength'] < 65536);
 		}
 
 		// Check few things to give advices before make a backup
 		// If safe mod is enable the external tool is *always* the best (and probably the only) solution
 		$context['safe_mode_enable'] = false;
-		if (version_compare(PHP_VERSION, '5.4.0', '<'))
-		{
-			$context['safe_mode_enable'] = @ini_get('safe_mode');
-		}
 
 		// This is just a...guess
 		$messages = countMessages();
@@ -1155,10 +1148,9 @@ class Maintenance extends AbstractController
 		$context['use_maintenance'] = 0;
 
 		// External tool if:
-		//  * safe_mode enable OR
 		//  * cannot change the execution time OR
 		//  * cannot reset timeout
-		if ($context['safe_mode_enable'] || empty($new_time_limit) || ($current_time_limit == $new_time_limit && !function_exists('apache_reset_timeout')))
+		if (empty($new_time_limit) || ($current_time_limit == $new_time_limit && !function_exists('apache_reset_timeout')))
 		{
 			$context['suggested_method'] = 'use_external_tool';
 		}
@@ -1192,6 +1184,7 @@ class Maintenance extends AbstractController
 				'error' => '',
 			);
 		}
+
 		$context['skip_security'] = defined('I_KNOW_IT_MAY_BE_UNSAFE');
 	}
 
@@ -1534,11 +1527,7 @@ class Maintenance extends AbstractController
 	{
 		global $context;
 
-		$context['filter'] = false;
-		if (isset($this->_req->query->filter))
-		{
-			$context['filter'] = $this->_req->query->filter;
-		}
+		$context['filter'] = $this->_req->getQuery('filter', 'trim|strval', false);
 
 		return integration_hooks_count($context['filter']);
 	}
@@ -1621,6 +1610,7 @@ class Maintenance extends AbstractController
 		updateZeroPostMembers();
 
 		Debug::instance()->on();
+
 		// All done, clean up and go back to maintenance
 		unset($_SESSION['total_members']);
 		redirectexit('action=admin;area=maintain;sa=members;done=recountposts');

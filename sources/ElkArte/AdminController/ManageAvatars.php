@@ -90,7 +90,8 @@ class ManageAvatars extends AbstractController
 			call_integration_hook('integrate_save_avatar_settings');
 
 			// Disable if invalid values would result
-			if (isset($this->_req->post->custom_avatar_enabled) && $this->_req->post->custom_avatar_enabled == 1 && (empty($this->_req->post->custom_avatar_dir) || empty($this->_req->post->custom_avatar_url)))
+			$this->_req->post->custom_avatar_enabled = $this->_req->getPost('custom_avatar_enabled', 'intval', 0);
+			if ($this->_req->post->custom_avatar_enabled === 1 && (empty($this->_req->post->custom_avatar_dir) || empty($this->_req->post->custom_avatar_url)))
 			{
 				$this->_req->post->custom_avatar_enabled = 0;
 			}

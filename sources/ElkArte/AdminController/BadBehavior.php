@@ -176,6 +176,7 @@ class BadBehavior extends AbstractController
 			// Go back to where we were.
 			redirectexit($redirect_path . ';start=' . $start . (!empty($filter) ? $filter['href'] : ''));
 		}
+
 		redirectexit($redirect_path);
 	}
 

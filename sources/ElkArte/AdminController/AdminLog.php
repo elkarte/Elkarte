@@ -104,7 +104,8 @@ class AdminLog extends AbstractController
 			),
 		);
 
-		// If it's not got a sa set it must have come here for first time, pretend error log should be reversed.
+		// If there is no sa set it must have come here for first time,
+		// pretend error log should be reversed.
 		if (!isset($this->_req->query->sa))
 		{
 			$this->_req->query->desc = true;
@@ -159,7 +160,7 @@ class AdminLog extends AbstractController
 				$vals = array();
 				foreach ($config_vars as $index => $dummy)
 				{
-					if (!is_array($dummy) || $index == 'pruningOptions')
+					if (!is_array($dummy) || $index === 'pruningOptions')
 					{
 						continue;
 					}

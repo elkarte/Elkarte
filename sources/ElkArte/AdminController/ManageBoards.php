@@ -149,7 +149,8 @@ class ManageBoards extends AbstractController
 		require_once(SUBSDIR . '/Boards.subs.php');
 
 		// Moving a board, child of, before, after, top
-		if (isset($this->_req->query->sa) && $this->_req->query->sa == 'move' && in_array($this->_req->query->move_to, array('child', 'before', 'after', 'top')))
+		if ($this->_req->compareQuery('sa', 'move', 'trim|strval')
+			&& in_array($this->_req->query->move_to, array('child', 'before', 'after', 'top')))
 		{
 			checkSession('get');
 			validateToken('admin-bm-' . (int) $this->_req->query->src_board, 'request');
@@ -159,7 +160,7 @@ class ManageBoards extends AbstractController
 			{
 				$boardOptions = array(
 					'move_to' => $this->_req->query->move_to,
-					'target_category' => (int) $this->_req->query->target_cat,
+					'target_category' => $this->_req->getQuery('target_cat', 'intval', 0),
 					'move_first_child' => true,
 				);
 			}
@@ -168,7 +169,7 @@ class ManageBoards extends AbstractController
 			{
 				$boardOptions = array(
 					'move_to' => $this->_req->query->move_to,
-					'target_board' => (int) $this->_req->query->target_board,
+					'target_board' => $this->_req->getQuery('target_board', 'intval', 0),
 					'move_first_child' => true,
 				);
 			}
@@ -182,7 +183,8 @@ class ManageBoards extends AbstractController
 		$boardList = $boardTree->getBoardList();
 
 		createToken('admin-sort');
-		$context['move_board'] = !empty($this->_req->query->move) && isset($boards[(int) $this->_req->query->move]) ? (int) $this->_req->query->move : 0;
+		$move_board = $this->_req->getQuery('move', 'intval', 0);
+		$context['move_board'] = isset($boards[$move_board]) ? $move_board : 0;
 
 		$bbc_parser = ParserWrapper::instance();
 		$cat_tree = $boardTree->getCategories();
@@ -273,7 +275,6 @@ class ManageBoards extends AbstractController
 
 					$prev_board = $boardid;
 					$prev_child_level = $boards[$boardid]['level'];
-
 				}
 
 				if (!empty($stack) && !empty($context['categories'][$catid]['boards'][$prev_board]['move_links']))
@@ -321,7 +322,7 @@ class ManageBoards extends AbstractController
 
 		require_once(SUBSDIR . '/Categories.subs.php');
 
-		$this->cat = (int) $this->_req->post->cat;
+		$this->cat = $this->_req->getPost('cat', 'intval');
 
 		// Add a new category or modify an existing one..
 		if (isset($this->_req->post->edit) || isset($this->_req->post->add))
@@ -358,14 +359,14 @@ class ManageBoards extends AbstractController
 		elseif (isset($this->_req->post->delete))
 		{
 			// First off - check if we are moving all the current boards first - before we start deleting!
-			if (isset($this->_req->post->delete_action) && $this->_req->post->delete_action == 1)
+			if ($this->_req->comparePost('delete_action', 1, 'intval'))
 			{
 				if (empty($this->_req->post->cat_to))
 				{
 					throw new Exception('mboards_delete_error');
 				}
 
-				deleteCategories(array($this->cat), (int) $this->_req->post->cat_to);
+				deleteCategories(array($this->cat), $this->_req->getPost('cat_to', 'intval'));
 			}
 			else
 			{
@@ -412,7 +413,7 @@ class ManageBoards extends AbstractController
 		);
 
 		// If this is a new category set up some defaults.
-		if ($this->_req->query->sa == 'newcat')
+		if ($this->_req->compareQuery('sa', 'newcat', 'trim'))
 		{
 			$context['category'] = array(
 				'id' => 0,
@@ -470,7 +471,7 @@ class ManageBoards extends AbstractController
 		if (!isset($this->_req->query->delete))
 		{
 			$context['sub_template'] = 'modify_category';
-			$context['page_title'] = $this->_req->query->sa == 'newcat' ? $txt['mboards_new_cat_name'] : $txt['catEdit'];
+			$context['page_title'] = $this->_req->compareQuery('sa', 'newcat') ? $txt['mboards_new_cat_name'] : $txt['catEdit'];
 		}
 		else
 		{
@@ -581,7 +582,7 @@ class ManageBoards extends AbstractController
 			}
 
 			// Are they doing redirection?
-			$boardOptions['redirect'] = !empty($this->_req->post->redirect_enable) && isset($this->_req->post->redirect_address) && trim($this->_req->post->redirect_address) !== '' ? trim($this->_req->post->redirect_address) : '';
+			$boardOptions['redirect'] = !$this->_req->comparePost('redirect_address', '', 'trim') ? $this->_req->get('redirect_address') : '';
 
 			// Profiles...
 			$boardOptions['profile'] = $this->_req->post->profile;
@@ -617,7 +618,7 @@ class ManageBoards extends AbstractController
 				// New boards by default go to the bottom of the category.
 				if (empty($this->_req->post->new_cat))
 				{
-					$boardOptions['target_category'] = (int) $this->_req->post->cur_cat;
+					$boardOptions['target_category'] = $this->_req->getPost('cur_cat', 'intval', 0);
 				}
 				if (!isset($boardOptions['move_to']))
 				{
@@ -655,7 +656,7 @@ class ManageBoards extends AbstractController
 			}
 			else
 			{
-				if (isset($this->_req->post->delete_action) && $this->_req->post->delete_action == 1)
+				if ($this->_req->comparePost('delete_action', 1, 'intval'))
 				{
 					// Check if we are moving all the current sub-boards first - before we start deleting!
 					if (empty($this->_req->post->board_to))
@@ -663,7 +664,7 @@ class ManageBoards extends AbstractController
 						throw new Exception('mboards_delete_board_error');
 					}
 
-					$boardTree->deleteBoards(array($board_id), (int) $this->_req->post->board_to);
+					$boardTree->deleteBoards(array($board_id), $this->_req->getPost('board_to', 'intval'));
 				}
 				else
 				{
@@ -672,7 +673,7 @@ class ManageBoards extends AbstractController
 			}
 		}
 
-		if (isset($this->_req->query->rid) && $this->_req->query->rid == 'permissions')
+		if ($this->_req->compareQuery('rid', 'permissions', 'trim'))
 		{
 			redirectexit('action=admin;area=permissions;sa=board;' . $context['session_var'] . '=' . $context['session_id']);
 		}
@@ -717,7 +718,7 @@ class ManageBoards extends AbstractController
 			$this->_req->query->sa = 'newboard';
 		}
 
-		if ($this->_req->query->sa == 'newboard')
+		if ($this->_req->compareQuery('sa', 'newboard', 'trim'))
 		{
 			$this->cat = $this->_req->getQuery('cat', 'intval', 0);
 
@@ -762,7 +763,7 @@ class ManageBoards extends AbstractController
 		}
 
 		// As we may have come from the permissions screen keep track of where we should go on save.
-		$context['redirect_location'] = isset($this->_req->query->rid) && $this->_req->query->rid == 'permissions' ? 'permissions' : 'boards';
+		$context['redirect_location'] = $this->_req->compareQuery('rid', 'permissions', 'trim') ? 'permissions' : 'boards';
 
 		// We might need this to hide links to certain areas.
 		$context['can_manage_permissions'] = allowedTo('manage_permissions');
@@ -785,7 +786,7 @@ class ManageBoards extends AbstractController
 			)
 		);
 
-		$context['groups'] += getOtherGroups($curBoard, $this->_req->query->sa == 'newboard');
+		$context['groups'] += getOtherGroups($curBoard, $this->_req->compareQuery('sa', 'newboard'));
 
 		// Category doesn't exist, man... sorry.
 		if ($boardTree->categoryExists($curBoard['category']) === false)

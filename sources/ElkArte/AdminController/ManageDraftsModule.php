@@ -163,7 +163,7 @@ class ManageDraftsModule extends AbstractController
 		validateToken('admin-maint');
 
 		require_once(SUBSDIR . '/Drafts.subs.php');
-		$drafts = getOldDrafts((int) $this->_req->post->draftdays);
+		$drafts = getOldDrafts($this->_req->getPost('draftdays', 'intval', 0));
 
 		// If we have old drafts, remove them
 		if (count($drafts) > 0)
@@ -230,7 +230,7 @@ class ManageDraftsModule extends AbstractController
 			call_integration_hook('integrate_save_drafts_settings');
 
 			// Protect them from themselves.
-			$this->_req->post->drafts_autosave_frequency = $this->_req->post->drafts_autosave_frequency < 30 ? 30 : $this->_req->post->drafts_autosave_frequency;
+			$this->_req->post->drafts_autosave_frequency = min((int) $this->_req->post->drafts_autosave_frequency, 30);
 
 			$settingsForm->setConfigValues((array) $this->_req->post);
 			$settingsForm->save();

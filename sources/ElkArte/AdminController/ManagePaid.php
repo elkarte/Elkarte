@@ -93,11 +93,8 @@ class ManagePaid extends AbstractController
 			),
 		);
 
-		// Default the sub-action to 'view subscriptions', but only if they have already set things up..
-		$subAction = isset($this->_req->query->sa) && isset($subActions[$this->_req->query->sa]) ? $this->_req->query->sa : (!empty($modSettings['paid_currency_symbol']) ? 'view' : 'settings');
-
 		// Load in the subActions, call integrate_sa_manage_subscriptions
-		$action->initialize($subActions, 'settings');
+		$subAction = $action->initialize($subActions, !empty($modSettings['paid_currency_symbol']) ? 'view' : 'settings');
 
 		// Final things for the template
 		$context['page_title'] = $txt['paid_subscriptions'];
@@ -228,8 +225,8 @@ class ManagePaid extends AbstractController
 			array('check', 'paidsubs_test', 'subtext' => $txt['paidsubs_test_desc'], 'onclick' => 'return document.getElementById(\'paidsubs_test\').checked ? confirm(\'' . $txt['paidsubs_test_confirm'] . '\') : true;'),
 		);
 
-		require_once(SUBSDIR . '/PaidSubscriptions.subs.php');
 		// Now load all the other gateway settings.
+		require_once(SUBSDIR . '/PaidSubscriptions.subs.php');
 		$gateways = loadPaymentGateways();
 		foreach ($gateways as $gateway)
 		{

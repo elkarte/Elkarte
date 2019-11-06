@@ -131,7 +131,7 @@ class ManageSearchEngines extends AbstractController
 
 		foreach ($config_vars as $variable)
 		{
-			if ($variable[1] != 'spider_mode')
+			if ($variable[1] !== 'spider_mode')
 			{
 				$javascript_function .= '
 				if (document.getElementById(\'' . $variable[1] . '\'))
@@ -142,6 +142,7 @@ class ManageSearchEngines extends AbstractController
 		$javascript_function .= '
 			}
 			disableFields();';
+
 		theme()->addInlineJavascript($javascript_function, true);
 
 		// Prepare the settings...
@@ -500,7 +501,6 @@ class ManageSearchEngines extends AbstractController
 		);
 
 		createToken('admin-sl');
-
 		createList($listOptions);
 
 		// Now determine the actions of the URLs.
