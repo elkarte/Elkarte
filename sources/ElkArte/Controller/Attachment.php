@@ -22,7 +22,7 @@ use ElkArte\Errors\AttachmentErrorContext;
 use ElkArte\Exceptions\Exception;
 use ElkArte\Graphics\Image;
 use ElkArte\AttachmentsDirectory;
-use ElkArte\TemporaryAttachments;
+use ElkArte\TemporaryAttachmentsList;
 
 /**
  *
@@ -154,7 +154,7 @@ class Attachment extends AbstractController
 			// No errors, lets get the details of what we have for our response back
 			else
 			{
-				$tmp_attachments = new TemporaryAttachments();
+				$tmp_attachments = new TemporaryAttachmentsList();
 				foreach ($tmp_attachments as $attachID => $val)
 				{
 					// We need to grab the name anyhow
@@ -210,7 +210,7 @@ class Attachment extends AbstractController
 		if (isset($this->_req->post->attachid))
 		{
 			$result = false;
-			$tmp_attachments = new TemporaryAttachments();
+			$tmp_attachments = new TemporaryAttachmentsList();
 			if ($tmp_attachments->hasAttachments())
 			{
 				require_once(SUBSDIR . '/Attachments.subs.php');
@@ -624,7 +624,7 @@ class Attachment extends AbstractController
 
 		// We need to do some work on attachments and avatars.
 		require_once(SUBSDIR . '/Attachments.subs.php');
-		$tmp_attachments = new TemporaryAttachments();
+		$tmp_attachments = new TemporaryAttachmentsList();
 		$attachmentsDir = new AttachmentsDirectory($modSettings, database());
 
 		try

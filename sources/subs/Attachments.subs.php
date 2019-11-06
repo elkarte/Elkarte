@@ -25,7 +25,7 @@ use ElkArte\User;
 use ElkArte\Util;
 use ElkArte\AttachmentsDirectory;
 use ElkArte\Exceptions\Exception as ElkException;
-use ElkArte\TemporaryAttachments;
+use ElkArte\TemporaryAttachmentsList;
 use \Exception as Exception;
 
 /**
@@ -84,7 +84,7 @@ function processAttachments($id_msg = null)
 
 	// Hmm. There are still files in session.
 	$ignore_temp = false;
-	$tmp_attachments = new TemporaryAttachments();
+	$tmp_attachments = new TemporaryAttachmentsList();
 	if ($tmp_attachments->getPostParam('files') !== null && $tmp_attachments->count() > 1)
 	{
 		// Let's try to keep them. But...
@@ -246,7 +246,7 @@ function processAttachments($id_msg = null)
 
 	// Mod authors, finally a hook to hang an alternate attachment upload system upon
 	// Upload to the current attachment folder with the file name $attachID or 'post_tmp_' . User::$info->id . '_' . md5(mt_rand())
-	// Populate TemporaryAttachments[$attachID] with the following:
+	// Populate TemporaryAttachmentsList[$attachID] with the following:
 	//   name => The file name
 	//   tmp_name => Path to the temp file (AttachmentsDirectory->getCurrent() . '/' . $attachID).
 	//   size => File size (required).

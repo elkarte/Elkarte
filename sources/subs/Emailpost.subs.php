@@ -21,7 +21,7 @@ use ElkArte\MembersList;
 use ElkArte\Notifications;
 use ElkArte\NotificationsTask;
 use ElkArte\Util;
-use ElkArte\TemporaryAttachments;
+use ElkArte\TemporaryAttachmentsList;
 
 /**
  * Converts text / HTML to BBC
@@ -833,7 +833,7 @@ function pbe_emailError($error, $email_message)
  *
  * What it does:
  *
- * - populates TemporaryAttachments with the email attachments
+ * - populates TemporaryAttachmentsList with the email attachments
  * - calls attachmentChecks to validate them
  * - skips ones flagged with errors
  * - adds valid ones to attachmentOptions
@@ -856,7 +856,7 @@ function pbe_email_attachments($pbe, $email_message)
 	$attachment_count = 0;
 	$attachIDs = array();
 
-	$tmp_attachments = new TemporaryAttachments();
+	$tmp_attachments = new TemporaryAttachmentsList();
 	$attachmentsDir = new AttachmentsDirectory($modSettings, database());
 	$current_attach_dir = $attachmentsDir->getCurrent();
 

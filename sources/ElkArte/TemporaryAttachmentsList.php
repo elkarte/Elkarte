@@ -22,7 +22,7 @@ use ElkArte\AttachmentsDirectory;
 /**
  *
  */
-class TemporaryAttachments extends ValuesContainer
+class TemporaryAttachmentsList extends ValuesContainer
 {
 	const ID = 'temp_attachments';
 	const TMPNAME_TPL = 'post_tmp_{user}_{hash}';

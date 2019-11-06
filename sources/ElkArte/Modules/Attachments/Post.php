@@ -20,7 +20,7 @@ use ElkArte\Errors\AttachmentErrorContext;
 use ElkArte\Errors\ErrorContext;
 use ElkArte\EventManager;
 use ElkArte\Modules\AbstractModule;
-use ElkArte\TemporaryAttachments;
+use ElkArte\TemporaryAttachmentsList;
 
 /**
  * Class Attachments_Post_Module
@@ -152,7 +152,7 @@ class Post extends AbstractModule
 		if ($context['attachments']['can']['post'])
 		{
 			// If there are attachments, calculate the total size and how many.
-			$tmp_attachments = new TemporaryAttachments();
+			$tmp_attachments = new TemporaryAttachmentsList();
 			$attachments = array();
 			$attachments['total_size'] = 0;
 			$attachments['quantity'] = 0;
@@ -387,7 +387,7 @@ class Post extends AbstractModule
 			require_once(SUBSDIR . '/Attachments.subs.php');
 			$keep_temp = array();
 			$keep_ids = array();
-			$tmp_attachments = new TemporaryAttachments();
+			$tmp_attachments = new TemporaryAttachmentsList();
 			$prefix = $tmp_attachments->getName($this->user->id, '');
 
 			foreach ($_POST['attach_del'] as $public_id)
@@ -437,7 +437,7 @@ class Post extends AbstractModule
 		global $context, $modSettings;
 
 		$this->_is_new_message = empty($msgOptions['id']);
-		$tmp_attachments = new TemporaryAttachments();
+		$tmp_attachments = new TemporaryAttachmentsList();
 		$prefix = $tmp_attachments->getName($this->user->id, '');
 
 		// ...or attach a new file...
