@@ -1329,48 +1329,18 @@ function loadAttachmentContext($id_msg)
 	// Do we need to instigate a sort?
 	if ($have_unapproved)
 	{
-		usort($attachmentData, 'approved_attach_sort');
+		// Unapproved attachments go first.
+		usort($attachmentData, function($a, $b) {
+			if ($a['is_approved'] === $b['is_approved'])
+			{
+				return 0;
+			}
+
+			return $a['is_approved'] > $b['is_approved'] ? -1 : 1;
+		});
 	}
 
 	return $attachmentData;
-}
-
-/**
- * A sort function for putting unapproved attachments first.
- *
- * @param mixed[] $a
- * @param mixed[] $b
- * @return int -1, 0, 1
- * @package Attachments
- */
-function approved_attach_sort($a, $b)
-{
-	if ($a['is_approved'] === $b['is_approved'])
-	{
-		return 0;
-	}
-
-	return $a['is_approved'] > $b['is_approved'] ? -1 : 1;
-}
-
-/**
- * Callback filter for the retrieval of attachments.
- *
- * What it does:
- * This function returns false when:
- *  - the attachment is unapproved, and
- *  - the viewer is not the poster of the message where the attachment is
- *
- * @param mixed[] $attachment_info
- * @param mixed[] $all_posters
- *
- * @return bool
- * @package Attachments
- *
- */
-function filter_accessible_attachment($attachment_info, $all_posters)
-{
-	return !(!$attachment_info['approved'] && (!isset($all_posters[$attachment_info['id_msg']]) || $all_posters[$attachment_info['id_msg']] != User::$info->id));
 }
 
 /**

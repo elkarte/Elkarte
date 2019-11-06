@@ -480,7 +480,12 @@ class Display extends AbstractController
 			// Fetch attachments.
 			if (!empty($modSettings['attachmentEnable']) && allowedTo('view_attachments'))
 			{
-				$attachments = getAttachments($messages, $includeUnapproved, 'filter_accessible_attachment', $all_posters);
+				// The filter returns false when:
+				//  - the attachment is unapproved, and
+				//  - the viewer is not the poster of the message where the attachment is
+				$attachments = getAttachments($messages, $includeUnapproved, function ($attachment_info, $all_posters) {
+					return !(!$attachment_info['approved'] && (!isset($all_posters[$attachment_info['id_msg']]) || $all_posters[$attachment_info['id_msg']] != User::$info->id));
+				}, $all_posters);
 			}
 
 			$msg_parameters = array(
