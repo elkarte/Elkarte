@@ -189,7 +189,7 @@ class Post extends AbstractModule
 					if ((empty($_REQUEST['msg']) && $tmp_attachments->belongToBoard($board)) || (!empty($_REQUEST['msg']) && $tmp_attachments->belongToMsg($_REQUEST['msg'])))
 					{
 						// See if any files still exist before showing the warning message and the files attached.
-						if ($tmp_attachments->fileExists($this->user->id))
+						if ($tmp_attachments->filesExist($this->user->id))
 						{
 							$this->_attach_errors->addError('temp_attachments_new');
 							$context['files_in_session_warning'] = $txt['attached_files_in_session'];
@@ -251,13 +251,13 @@ class Post extends AbstractModule
 						}
 
 						// Show any errors which might have occurred.
-						if (!empty($attachment['errors']))
+						if ($attachment->hasErrors())
 						{
 							if ($context['current_action'] !== 'post2')
 							{
 								$txt['error_attach_errors'] = empty($txt['error_attach_errors']) ? '<br />' : '';
-								$txt['error_attach_errors'] .= vsprintf($txt['attach_warning'], $attachment['name']) . '<div class="attachmenterrors">';
-								foreach ($attachment['errors'] as $error)
+								$txt['error_attach_errors'] .= vsprintf($txt['attach_warning'], $attachment->getName()) . '<div class="attachmenterrors">';
+								foreach ($attachment->getErrors() as $error)
 								{
 									$txt['error_attach_errors'] .= (is_array($error) ? vsprintf($txt[$error[0]], $error[1]) : $txt[$error]) . '<br  />';
 								}
@@ -272,7 +272,7 @@ class Post extends AbstractModule
 						}
 
 						// More house keeping.
-						if (!file_exists($attachment['tmp_name']))
+						if ($attachment->fileExists() === false)
 						{
 							$tmp_attachments->removeById($attachID, false);
 							continue;

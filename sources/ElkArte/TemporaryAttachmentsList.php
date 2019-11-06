@@ -18,6 +18,7 @@ use ElkArte\Exceptions\Exception as ElkException;
 use \Exception as Exception;
 use ElkArte\Graphics\Image;
 use ElkArte\AttachmentsDirectory;
+use ElkArte\TemporaryAttachment;
 
 /**
  *
@@ -47,7 +48,7 @@ class TemporaryAttachmentsList extends ValuesContainer
 	 */
 	public function removeAll($userId)
 	{
-		$prefix = $this->getFileName($userId, '');
+		$prefix = $this->getTplName($userId, '');
 		foreach ($this->data as $attachID => $attachment)
 		{
 			if (strpos($attachID, $prefix) !== false)
@@ -77,7 +78,7 @@ class TemporaryAttachmentsList extends ValuesContainer
 			throw new \Exception('attachment_not_found');
 		}
 
-		@unlink($this->data[$attachID]['tmp_name']);
+		$this->data[$attachID]->remove($fatal);
 		unset($this->data[$attachID]);
 	}
 
@@ -92,9 +93,9 @@ class TemporaryAttachmentsList extends ValuesContainer
 	 *
 	 * @param int $userId
 	 */
-	public function fileExists($userId)
+	public function filesExist($userId)
 	{
-		$prefix = $this->getFileName($userId, '');
+		$prefix = $this->getTplName($userId, '');
 		foreach ($this->data as $attachID => $attachment)
 		{
 			if (strpos($attachID, $prefix) === false)
@@ -102,7 +103,7 @@ class TemporaryAttachmentsList extends ValuesContainer
 				continue;
 			}
 
-			if (file_exists($attachment['tmp_name']))
+			if ($attachment->fileExists())
 			{
 				unset($this->data['post']['files']);
 				return true;
@@ -113,7 +114,7 @@ class TemporaryAttachmentsList extends ValuesContainer
 
 	public function removeExcept($keep, $userId)
 	{
-		$prefix = $this->getFileName($userId, '');
+		$prefix = $this->getTplName($userId, '');
 		foreach ($this->data as $attachID => $attachment)
 		{
 			if ((isset($this->data['post']['files'], $attachment['name']) && in_array($attachment['name'], $this->data['post']['files'])) || in_array($attachID, $keep) || strpos($attachID, $prefix) === false)
@@ -121,8 +122,8 @@ class TemporaryAttachmentsList extends ValuesContainer
 				continue;
 			}
 
+			$attachment->remove(false);
 			unset($this->data[$attachID]);
-			@unlink($attachment['tmp_name']);
 		}
 	}
 
@@ -133,14 +134,13 @@ class TemporaryAttachmentsList extends ValuesContainer
 	 */
 	public function getFileNames($userId)
 	{
-		$prefix = $this->getFileName($userId, '');
-		$file_list = [];
+		$prefix = $this->getTplName($userId, '');
 
 		foreach ($this->data as $attachID => $attachment)
 		{
 			if (strpos($attachID, $prefix) !== false)
 			{
-				$this->data['post']['files'][] = $attachment['name'];
+				$this->data['post']['files'][] = $attachment->getName();
 			}
 		}
 
@@ -153,7 +153,7 @@ class TemporaryAttachmentsList extends ValuesContainer
 	 * @param int $userId
 	 * @param string $hash
 	 */
-	public function getFileName($userId, $hash = '')
+	public function getTplName($userId, $hash = '')
 	{
 		return str_replace(['{user}', '{hash}'], [$userId, $hash], static::TMPNAME_TPL);
 	}
@@ -163,31 +163,9 @@ class TemporaryAttachmentsList extends ValuesContainer
 		return isset($this->data['post']);
 	}
 
-	public function addAttachment($data)
+	public function addAttachment(TemporaryAttachment $data)
 	{
-		$data['name'] = htmlspecialchars($data['name'], ENT_COMPAT, 'UTF-8');
-		$data['public_attachid'] = $this->getFileName($data['user_id'], md5(mt_rand()));
 		$this->data[$data['attachid']] = $data;
-	}
-
-	public function setAttachError($attachID, $error)
-	{
-		$this->data[$attachID]['errors'][] = $error;
-	}
-
-	public function hasAttachErrors($attachID)
-	{
-		return !empty($this->data[$attachID]['errors']);
-	}
-
-	public function getAttachErrors($attachID)
-	{
-		return $this->data[$attachID]['errors'];
-	}
-
-	public function getAttachName($attachID)
-	{
-		return $this->data[$attachID]['name'];
 	}
 
 	public function areLostAttachments()
@@ -231,7 +209,7 @@ class TemporaryAttachmentsList extends ValuesContainer
 	 * @return mixed
 	 * @throws \Exception
 	 */
-	function getTempAttachById($attach_id, $attachmentsDir, $userId)
+	public function getTempAttachById($attach_id, $attachmentsDir, $userId)
 	{
 		$attach_real_id = null;
 
@@ -302,170 +280,13 @@ class TemporaryAttachmentsList extends ValuesContainer
 
 		foreach ($this->data as $key => $val)
 		{
-			if (isset($val['public_attachid']) && $val['public_attachid'] === $public_attachid)
+			if ($val['public_attachid'] === $public_attachid)
 			{
 				return $key;
 			}
 		}
 
 		return $public_attachid;
-	}
-
-	/**
-	 * Performs various checks on an uploaded file.
-	 *
-	 * @param int $attachID id of the attachment to check
-	 *
-	 * @return bool
-	 * @throws \ElkArte\Exceptions\Exception attach_check_nag
-	 *
-	 */
-	public function attachmentChecks($attachID)
-	{
-		global $modSettings, $context;
-
-		// If there were no errors to this point, we apply some additional checks
-		if (!empty($this->data[$attachID]['errors']))
-		{
-			return;
-		}
-		// No data or missing data .... Not necessarily needed, but in case a mod author missed something.
-		if (empty($this->data[$attachID]))
-		{
-			$error = '$_SESSION[\'temp_attachments\'][$attachID]';
-		}
-		elseif (empty($attachID))
-		{
-			$error = '$attachID';
-		}
-		elseif (empty($context['attachments']))
-		{
-			$error = '$context[\'attachments\']';
-		}
-
-		// Let's get their attention.
-		if (!empty($error))
-		{
-			throw new ElkException('attach_check_nag', 'debug', array($error));
-		}
-
-		// Just in case this slipped by the first checks, we stop it here and now
-		if ($this->data[$attachID]['size'] == 0)
-		{
-			$this->data['errors'][] = 'attach_0_byte_file';
-
-			return false;
-		}
-
-		// First, the dreaded security check. Sorry folks, but this should't be avoided
-		$image = new Image($this->data[$attachID]['tmp_name']);
-		$size = $image->getSize($this->data[$attachID]['tmp_name']);
-		$valid_mime = getValidMimeImageType($size[2]);
-
-		if ($valid_mime !== '')
-		{
-			if (!$image->checkImageContents($this->data[$attachID]['tmp_name']))
-			{
-				// It's bad. Last chance, maybe we can re-encode it?
-				if (empty($modSettings['attachment_image_reencode']) || (!$image->reencodeImage($this->data[$attachID]['tmp_name'])))
-				{
-					// Nothing to do: not allowed or not successful re-encoding it.
-					$this->data[$attachID]['errors'][] = 'bad_attachment';
-
-					return false;
-				}
-				else
-				{
-					$this->data[$attachID]['size'] = $image->getFilesize();
-				}
-			}
-		}
-
-		$attachmentDirectory = new AttachmentsDirectory($modSettings, database());
-		try
-		{
-			$this->data[$attachID] = $attachmentDirectory->checkDirSpace($this->data[$attachID], $attachID);
-		}
-		catch (Exception $e)
-		{
-			$this->data[$attachID]['errors'][] = $e->getMessage();
-		}
-
-		// Is the file too big?
-		if (!empty($modSettings['attachmentSizeLimit']) && $this->data[$attachID]['size'] > $modSettings['attachmentSizeLimit'] * 1024)
-		{
-			$this->data[$attachID]['errors'][] = array('file_too_big', array(comma_format($modSettings['attachmentSizeLimit'], 0)));
-		}
-
-		// Check the total upload size for this post...
-		$context['attachments']['total_size'] += $this->data[$attachID]['size'];
-		if (!empty($modSettings['attachmentPostLimit']) && $context['attachments']['total_size'] > $modSettings['attachmentPostLimit'] * 1024)
-		{
-			$this->data[$attachID]['errors'][] = array('attach_max_total_file_size', array(comma_format($modSettings['attachmentPostLimit'], 0), comma_format($modSettings['attachmentPostLimit'] - (($context['attachments']['total_size'] - $this->data[$attachID]['size']) / 1024), 0)));
-		}
-
-		// Have we reached the maximum number of files we are allowed?
-		$context['attachments']['quantity']++;
-
-		// Set a max limit if none exists
-		if (empty($modSettings['attachmentNumPerPostLimit']) && $context['attachments']['quantity'] >= 50)
-		{
-			$modSettings['attachmentNumPerPostLimit'] = 50;
-		}
-
-		if (!empty($modSettings['attachmentNumPerPostLimit']) && $context['attachments']['quantity'] > $modSettings['attachmentNumPerPostLimit'])
-		{
-			$this->data[$attachID]['errors'][] = array('attachments_limit_per_post', array($modSettings['attachmentNumPerPostLimit']));
-		}
-
-		// File extension check
-		if (!empty($modSettings['attachmentCheckExtensions']))
-		{
-			$allowed = explode(',', strtolower($modSettings['attachmentExtensions']));
-			foreach ($allowed as $k => $dummy)
-			{
-				$allowed[$k] = trim($dummy);
-			}
-
-			if (!in_array(strtolower(substr(strrchr($this->data[$attachID]['name'], '.'), 1)), $allowed))
-			{
-				$allowed_extensions = strtr(strtolower($modSettings['attachmentExtensions']), array(',' => ', '));
-				$this->data[$attachID]['errors'][] = array('cant_upload_type', array($allowed_extensions));
-			}
-		}
-
-		// Undo the math if there's an error
-		if (!empty($this->data[$attachID]['errors']))
-		{
-			if (isset($context['dir_size']))
-			{
-				$context['dir_size'] -= $this->data[$attachID]['size'];
-			}
-			if (isset($context['dir_files']))
-			{
-				$context['dir_files']--;
-			}
-
-			$context['attachments']['total_size'] -= $this->data[$attachID]['size'];
-			$context['attachments']['quantity']--;
-
-			return false;
-		}
-
-		return true;
-	}
-
-	public function autoRotate($attachID)
-	{
-		if (empty($this->data[$attachID]['errors']) && substr($this->data[$attachID]['type'], 0, 5) === 'image')
-		{
-			$image = new Image($this->data[$attachID]['tmp_name']);
-			if ($image->autoRotateImage())
-			{
-				$image->saveImage($this->data[$attachID]['tmp_name'], IMAGETYPE_JPEG, 95);
-				$this->data[$attachID]['size'] = filesize($this->data[$attachID]['tmp_name']);
-			}
-		}
 	}
 
 	/**

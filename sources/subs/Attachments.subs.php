@@ -161,79 +161,53 @@ function processAttachments($id_msg = null)
 		// First, let's first check for PHP upload errors.
 		$errors = attachmentUploadChecks($n);
 
-		// Set the names and destination for this file
-		$attachID = 'post_tmp_' . User::$info->id . '_' . md5(mt_rand());
-		$destName = $attach_current_dir . '/' . $attachID;
+		$temp_file = new TemporaryAttachment([
+			'name' => basename($_FILES['attachment']['name'][$n]),
+			'tmp_name' => $_FILES['attachment']['tmp_name'][$n],
+			'attachid' => $tmp_attachments->getTplName(User::$info->id, md5(mt_rand())),
+			'user_id' => User::$info->id,
+			'size' => $_FILES['attachment']['size'][$n],
+			'type' => $_FILES['attachment']['type'][$n],
+			'id_folder' => $attachmentDirectory->currentDirectoryId(),
+		]);
 
 		// If we are error free, Try to move and rename the file before doing more checks on it.
 		if (empty($errors))
 		{
-			$tmp_attachments->addAttachment([
-				'name' => basename($_FILES['attachment']['name'][$n]),
-				'tmp_name' => $destName,
-				'attachid' => $attachID,
-				'user_id' => User::$info->id,
-				'size' => $_FILES['attachment']['size'][$n],
-				'type' => $_FILES['attachment']['type'][$n],
-				'id_folder' => $attachmentDirectory->currentDirectoryId(),
-				'errors' => array(),
-			]);
-
-			// Move the file to the attachments folder with a temp name for now.
-			if (@move_uploaded_file($_FILES['attachment']['tmp_name'][$n], $destName))
-			{
-				@chmod($destName, 0644);
-			}
-			else
-			{
-				$tmp_attachments->setAttachError($attachID, 'attach_timeout');
-				if (file_exists($_FILES['attachment']['tmp_name'][$n]))
-				{
-					unlink($_FILES['attachment']['tmp_name'][$n]);
-				}
-			}
+			$temp_file->moveUploaded($attach_current_dir);
 		}
 		// Upload error(s) were detected, flag the error, remove the file
 		else
 		{
-			$tmp_attachments->addAttachment([
-				'attachid' => $attachID,
-				'user_id' => User::$info->id,
-				'name' => basename($_FILES['attachment']['name'][$n]),
-				'tmp_name' => $destName,
-				'errors' => $errors,
-			]);
-
-			if (file_exists($_FILES['attachment']['tmp_name'][$n]))
-			{
-				unlink($_FILES['attachment']['tmp_name'][$n]);
-			}
+			$temp_file->addError($errors);
+			$temp_file->remove(false);
 		}
 
-		$tmp_attachments->attachmentChecks($attachID);
+		$temp_file->doChecks();
+
 		// Want to correct for phonetographer photos?
 		if (!empty($modSettings['attachment_autorotate']))
 		{
-			$tmp_attachments->autoRotate($attachID);
+			$temp_file->autoRotate();
 		}
 
 		// Sort out the errors for display and delete any associated files.
-		if ($tmp_attachments->hasAttachErrors($attachID))
+		if ($temp_file->hasErrors())
 		{
-			$attach_errors->addAttach($attachID, $tmp_attachments->getAttachName($attachID));
+			$attach_errors->addAttach($temp_file['attachid'], $temp_file->getRealName());
 			$log_these = array('attachments_no_create', 'attachments_no_write', 'attach_timeout', 'ran_out_of_space', 'cant_access_upload_path', 'attach_0_byte_file', 'bad_attachment');
 
-			foreach ($tmp_attachments->getAttachErrors($attachID) as $error)
+			foreach ($temp_file->getErrors() as $error)
 			{
 				if (!is_array($error))
 				{
 					$attach_errors->addError($error);
 					if (in_array($error, $log_these))
 					{
-						\ElkArte\Errors\Errors::instance()->log_error($tmp_attachments->getAttachName($attachID) . ': ' . $txt[$error], 'critical');
+						\ElkArte\Errors\Errors::instance()->log_error($temp_file->getRealName() . ': ' . $txt[$error], 'critical');
 
 						// For critical errors, we don't want the file or session data to persist
-						$tmp_attachments->removeById($attachID, false);
+						$temp_file->remove(false);
 					}
 				}
 				else
@@ -242,6 +216,8 @@ function processAttachments($id_msg = null)
 				}
 			}
 		}
+
+		$tmp_attachments->addAttachment($temp_file);
 	}
 
 	// Mod authors, finally a hook to hang an alternate attachment upload system upon

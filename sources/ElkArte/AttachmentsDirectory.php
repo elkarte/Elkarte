@@ -454,7 +454,7 @@ class AttachmentsDirectory
 	{
 		if (empty(self::$dir_size) || empty(self::$dir_files))
 		{
-			$this->dirSpace($sess_attach['size']);
+			$this->dirSpace($sess_attach->getSize());
 		}
 
 		// Are we about to run out of room? Let's notify the admin then.
@@ -476,10 +476,8 @@ class AttachmentsDirectory
 				// Move it to the new folder if we can. (Throws Exception if it fails)
 				if ($this->manageBySpace())
 				{
-					$file_path = $this->getCurrent() . '/' . $attachID;
-					$sess_attach['id_folder'] = $this->currentAttachmentUploadDir;
-					rename($sess_attach['tmp_name'], $file_path);
-					$sess_attach['tmp_name'] = $file_path;
+					$sess_attach->moveTo($this->getCurrent());
+					$sess_attach->setIdFolder($this->currentAttachmentUploadDir);
 					self::$dir_size = 0;
 					self::$dir_files = 0;
 				}
@@ -489,8 +487,6 @@ class AttachmentsDirectory
 				throw new Exception('ran_out_of_space');
 			}
 		}
-
-		return $sess_attach;
 	}
 
 	protected function dirSpace($tmp_attach_size = 0)

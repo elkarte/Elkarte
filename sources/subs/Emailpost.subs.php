@@ -834,7 +834,7 @@ function pbe_emailError($error, $email_message)
  * What it does:
  *
  * - populates TemporaryAttachmentsList with the email attachments
- * - calls attachmentChecks to validate them
+ * - does all the checks to validate them
  * - skips ones flagged with errors
  * - adds valid ones to attachmentOptions
  * - calls createAttachment to store them
@@ -867,37 +867,44 @@ function pbe_email_attachments($pbe, $email_message)
 	// Create the file(s) with a temp name so we can validate its contents/type
 	foreach ($email_message->attachments as $name => $attachment)
 	{
+		$attachID = $tmp_attachments->getTplName($pbe['profile']['id_member'], md5(mt_rand()) . $attachment_count);
 		// Write the contents to an actual file
-		$attachID = $tmp_attachments->getFileName($pbe['profile']['id_member'], md5(mt_rand()) . $attachment_count);
 		$destName = $current_attach_dir . '/' . $attachID;
 
 		if (file_put_contents($destName, $attachment) !== false)
 		{
 			@chmod($destName, 0644);
 
-			// Place them in session since that's where attachmentChecks looks
-			$tmp_attachments[$attachID] = array(
-				'name' => htmlspecialchars(basename($name), ENT_COMPAT, 'UTF-8'),
+			$temp_file = new TemporaryAttachment([
+				'name' => basename($name),
 				'tmp_name' => $destName,
+				'attachid' => $attachID,
+				'user_id' => $pbe['profile']['id_member'],
 				'size' => strlen($attachment),
-				'id_folder' => $attachmentsDir->currentDirectoryId(),
-				'errors' => array(),
-				'approved' => !$modSettings['postmod_active'] || in_array('post_unapproved_attachments', $pbe['user_info']['permissions'])
-			);
+				'type' => null,
+				'id_folder' => $attachmentDirectory->currentDirectoryId(),
+			]);
 
 			// Make sure its valid
-			$tmp_attachments->attachmentChecks($attachID);
+			$temp_file->doChecks();
+			$tmp_attachments->addAttachment($temp_file);
 			$attachment_count++;
 		}
 	}
 
+	$prefix = $tmp_attachments->getTplName($pbe['profile']['id_member'], '');
 	// Get the results from attachmentChecks and see if its suitable for posting
 	foreach ($tmp_attachments as $attachID => $attachment)
 	{
 		// If there were any errors we just skip that file
-		if (($attachID != 'initial_error' && strpos($attachID, 'post_tmp_' . $pbe['profile']['id_member'] . '_') === false) || ($attachID == 'initial_error' || !empty($attachment['errors'])))
+		if (($attachID != 'initial_error' && strpos($attachID, $prefix) === false) || ($attachID == 'initial_error' || $attachment->hasErrors()))
 		{
-			@unlink($attachment['tmp_name']);
+			if ($attachID == 'initial_error')
+			{
+				$tmp_attachments->removeAll($pbe['profile']['id_member']);
+				break;
+			}
+			$attachment->remove(false);
 			continue;
 		}
 
@@ -907,9 +914,9 @@ function pbe_email_attachments($pbe, $email_message)
 			'poster' => $pbe['profile']['id_member'],
 			'name' => $attachment['name'],
 			'tmp_name' => $attachment['tmp_name'],
-			'size' => isset($attachment['size']) ? $attachment['size'] : 0,
-			'mime_type' => isset($attachment['type']) ? $attachment['type'] : '',
-			'id_folder' => isset($attachment['id_folder']) ? $attachment['id_folder'] : 0,
+			'size' => (int) $attachment['size'],
+			'mime_type' => (string) $attachment['type'],
+			'id_folder' => (int) $attachment['id_folder'],
 			'approved' => !$modSettings['postmod_active'] || allowedTo('post_attachment'),
 			'errors' => array(),
 		);
@@ -926,7 +933,7 @@ function pbe_email_attachments($pbe, $email_message)
 		// We had a problem so simply remove it
 		else
 		{
-			$tmp_attachments->removeById($attachment['tmp_name'], false);
+			$tmp_attachments->removeById($attachID, false);
 		}
 	}
 	$tmp_attachments->unset();
