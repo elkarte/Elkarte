@@ -29,6 +29,7 @@ class TemporaryAttachment extends ValuesContainer
 	public function __construct($data = null)
 	{
 		$data['errors'] = [];
+		$data['name'] = htmlspecialchars($data['name'], ENT_COMPAT, 'UTF-8');
 
 		parent::__construct($data);
 	}
