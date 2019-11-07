@@ -1,7 +1,7 @@
 <?php
 
 /**
- * TestCase class for the Attachment Controller
+ * TestCase class for the Display Controller
  *
  * WARNING. These tests work directly with the local database. Don't run
  * them local if you need to keep your data untouched!

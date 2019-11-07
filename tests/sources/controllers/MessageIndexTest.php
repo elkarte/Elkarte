@@ -1,7 +1,7 @@
 <?php
 
 /**
- * TestCase class for the Profile Info Controller
+ * TestCase class for the Message Index Controller
  */
 class TestMessageIndex extends ElkArteCommonSetupTest
 {
