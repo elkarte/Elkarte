@@ -20,6 +20,7 @@ class TestGroups extends ElkArteCommonSetupTest
 
 		new ElkArte\Themes\ThemeLoader();
 		theme()->getTemplates()->loadLanguageFile('Errors', 'english', true, true);
+		theme()->getTemplates()->loadLanguageFile('ManageMembers', 'english', true, true);
 	}
 
 	/**
