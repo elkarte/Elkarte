@@ -910,7 +910,7 @@ function pbe_email_attachments($pbe, $email_message)
 			'size' => (int) $attachment['size'],
 			'mime_type' => (string) $attachment['type'],
 			'id_folder' => (int) $attachment['id_folder'],
-			'approved' => !$modSettings['postmod_active'] || allowedTo('post_attachment'),
+			'approved' => !$modSettings['postmod_active'] || in_array('post_unapproved_attachments', $pbe['user_info']['permissions']),
 			'errors' => array(),
 		);
 
