@@ -48,6 +48,7 @@ abstract class ElkArteCommonSetupTest extends \PHPUnit\Framework\TestCase
 			'buddies' => array(),
 			'groups' => array(0 => 1),
 			'ignoreboards' => array(),
+			'avatar' => array('url' => '', 'name' => ''),
 		]);
 
 		$settings['page_index_template'] = array(
