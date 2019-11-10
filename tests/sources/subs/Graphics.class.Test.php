@@ -70,24 +70,23 @@ class TestGraphics extends \PHPUnit\Framework\TestCase
 
 		$modSettings['attachment_autorotate'] = 1;
 
-		$images = new \ElkArte\Graphics\Image();
-
 		$success = \ElkArte\Graphics\Gd2::canUse();
 		$this->assertEquals($success, true, 'GD NOT INSTALLED');
 
 		foreach ($this->image_testcases as $image)
 		{
-			$success = $images->createThumbnail($image['url'], 100, 100, '/tmp/test', $image['format']);
+			$current_image = new \ElkArte\Graphics\Image($image['url']);
+			$success = $current_image->createThumbnail('', 100, 100, '/tmp/test', $image['format']);
 
 			// Check for correct results
-			$this->assertEquals($success, true, $image['url']);
+			$this->assertEquals($success !== false, true, $image['url']);
 		}
 	}
 
 	public function testText()
 	{
-		$images = new \ElkArte\Graphics\Image();
-		$success = $images->generateTextImage('test', 100, 75, 'png');
+		$images = new \ElkArte\Graphics\TextImage('test');
+		$success = $images->generate(100, 75, 'png');
 		$success = !empty($success);
 
 		$this->assertEquals($success, true);

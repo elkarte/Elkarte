@@ -145,29 +145,6 @@ class Image
 	}
 
 	/**
-	 * Simple function to generate an image containing some text.
-	 * It uses preferentially Imagick if present, otherwise GD.
-	 * Font and size are fixed.
-	 *
-	 * @param string $text The text the image should contain
-	 * @param int $width Width of the final image
-	 * @param int $height Height of the image
-	 * @param string $format Type of the image (valid types are png, jpeg, gif)
-	 *
-	 * @return bool|string The image or false if neither Imagick nor GD are found
-	 */
-	public function generateTextImage($text, $width = 100, $height = 75, $format = 'png')
-	{
-		$valid_formats = array('jpeg', 'png', 'gif');
-		if (!in_array($format, $valid_formats))
-		{
-			$format = 'png';
-		}
-
-		return $this->_manipulator->generateTextImage($text, $width, $height, $format);
-	}
-
-	/**
 	 * Its how big ?
 	 *
 	 * @return int
