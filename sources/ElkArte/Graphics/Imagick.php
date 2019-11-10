@@ -31,7 +31,7 @@ class Imagick extends AbstractManipulator
 	 */
 	public function __construct($image)
 	{
-		$this->setSource($image);
+		$this->_fileName = $image;
 
 		try
 		{
@@ -41,16 +41,6 @@ class Imagick extends AbstractManipulator
 		{
 			// Just pass through
 		}
-	}
-
-	/**
-	 * Set the source to the class fileName
-	 *
-	 * @param string $source
-	 */
-	public function setSource($source)
-	{
-		$this->_fileName = $source;
 	}
 
 	/**

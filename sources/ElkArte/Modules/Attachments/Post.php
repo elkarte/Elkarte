@@ -231,6 +231,15 @@ class Post extends AbstractModule
 				// Skipping over these
 				if (!isset($context['ignore_temp_attachments']) && $tmp_attachments->getPostParam('files') === null)
 				{
+					if ($tmp_attachments->hasSystemError())
+					{
+						if ($context['current_action'] !== 'post2')
+						{
+							$txt['error_attach_initial_error'] = $txt['attach_no_upload'] . '<div class="attachmenterrors">' . (is_array($attachment) ? vsprintf($txt[$attachment[0]], $attachment[1]) : $txt[$attachment]) . '</div>';
+							$this->_attach_errors->addError('attach_initial_error');
+						}
+						$tmp_attachments->unset();
+					}
 					$prefix = $tmp_attachments->getTplName($this->user->id, '');
 					foreach ($tmp_attachments as $attachID => $attachment)
 					{
@@ -242,13 +251,6 @@ class Post extends AbstractModule
 
 						if ($attachID === 'initial_error')
 						{
-							if ($context['current_action'] !== 'post2')
-							{
-								$txt['error_attach_initial_error'] = $txt['attach_no_upload'] . '<div class="attachmenterrors">' . (is_array($attachment) ? vsprintf($txt[$attachment[0]], $attachment[1]) : $txt[$attachment]) . '</div>';
-								$this->_attach_errors->addError('attach_initial_error');
-							}
-
-							$tmp_attachments->unset();
 						}
 
 						// Show any errors which might have occurred.

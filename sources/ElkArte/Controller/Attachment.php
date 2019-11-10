@@ -20,7 +20,7 @@ use ElkArte\AbstractController;
 use ElkArte\Action;
 use ElkArte\Errors\AttachmentErrorContext;
 use ElkArte\Exceptions\Exception;
-use ElkArte\Graphics\Image;
+use ElkArte\Graphics\TextImage;
 use ElkArte\AttachmentsDirectory;
 use ElkArte\TemporaryAttachmentsList;
 use ElkArte\User;
@@ -464,8 +464,8 @@ class Attachment extends AbstractController
 
 		$this->_send_headers('no_image', 'no_image', 'image/png', false, 'inline', 'no_image.png', true, false);
 
-		$img = new Image();
-		$img = $img->generateTextImage($text, 200);
+		$img = new TextImage($text);
+		$img = $img->generate(200);
 
 		if ($img === false)
 		{
@@ -662,19 +662,18 @@ class Attachment extends AbstractController
 		{
 			// Create a thumbnail image and write it directly to the screen
 			$image = new Image();
-			$image->createThumbnail($filename, 100, 100, null);
+			$filename = $filename . '_thumb';
+			$image->createThumbnail(100, 100, $filename);
 		}
-		else
-		{
-			if (!$use_compression)
-			{
-				header('Content-Length: ' . filesize($filename));
-			}
 
-			if (@readfile($filename) === null)
-			{
-				echo file_get_contents($filename);
-			}
+		if (!$use_compression)
+		{
+			header('Content-Length: ' . filesize($filename));
+		}
+
+		if (@readfile($filename) === null)
+		{
+			echo file_get_contents($filename);
 		}
 
 		obExit(false);

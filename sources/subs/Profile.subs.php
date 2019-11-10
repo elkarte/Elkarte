@@ -2687,7 +2687,7 @@ function profileSaveAvatarData(&$value)
 					@chmod($_FILES['attachment']['tmp_name'], 0644);
 
 					$image = new Image($_FILES['attachment']['tmp_name']);
-					if (!$image->reencodeImage($_FILES['attachment']['tmp_name']))
+					if (!$image->reencodeImage())
 					{
 						@unlink($_FILES['attachment']['tmp_name']);
 
@@ -2720,14 +2720,14 @@ function profileSaveAvatarData(&$value)
 			{
 				// Now try to find an infection.
 				$image = new Image($_FILES['attachment']['tmp_name']);
-				$size = $image->getSize($_FILES['attachment']['tmp_name']);
+				$size = $image->getSize();
 				$valid_mime = getValidMimeImageType($size[2]);
 				if ($valid_mime !== '')
 				{
-					if (!$image->checkImageContents($_FILES['attachment']['tmp_name']))
+					if (!$image->checkImageContents())
 					{
 						// It's bad. Try to re-encode the contents?
-						if (empty($modSettings['avatar_reencode']) || (!$image->reencodeImage($_FILES['attachment']['tmp_name'])))
+						if (empty($modSettings['avatar_reencode']) || (!$image->reencodeImage()))
 						{
 							@unlink($_FILES['attachment']['tmp_name']);
 

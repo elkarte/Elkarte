@@ -76,7 +76,7 @@ class TestGraphics extends \PHPUnit\Framework\TestCase
 		foreach ($this->image_testcases as $image)
 		{
 			$current_image = new \ElkArte\Graphics\Image($image['url']);
-			$success = $current_image->createThumbnail('', 100, 100, '/tmp/test', $image['format']);
+			$success = $current_image->createThumbnail(100, 100, '/tmp/test', $image['format']);
 
 			// Check for correct results
 			$this->assertEquals($success !== false, true, $image['url']);

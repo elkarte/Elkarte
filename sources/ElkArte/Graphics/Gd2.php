@@ -31,7 +31,7 @@ class Gd2 extends AbstractManipulator
 	 */
 	public function __construct($image)
 	{
-		$this->setSource($image);
+		$this->_fileName = $image;
 
 		try
 		{
@@ -41,16 +41,6 @@ class Gd2 extends AbstractManipulator
 		{
 			// Just pass through since the check is not fatal
 		}
-	}
-
-	/**
-	 * Set the filename to the class
-	 *
-	 * @param string $source
-	 */
-	public function setSource($source)
-	{
-		$this->_fileName = $source;
 	}
 
 	/**

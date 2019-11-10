@@ -884,49 +884,50 @@ function pbe_email_attachments($pbe, $email_message)
 	}
 
 	$prefix = $tmp_attachments->getTplName($pbe['profile']['id_member'], '');
-
-	// Get the results from attachmentChecks and see if its suitable for posting
-	foreach ($tmp_attachments as $attachID => $attachment)
+	// Space for improvement: move the removeAll to the end before ->unset
+	if ($tmp_attachments->hasSystemError())
 	{
-		// If there were any errors we just skip that file
-		if (($attachID != 'initial_error' && strpos($attachID, $prefix) === false)
-			|| ($attachID == 'initial_error' || $attachment->hasErrors()))
+		$tmp_attachments->removeAll();
+	}
+	else
+	{
+		// Get the results from attachmentChecks and see if its suitable for posting
+		foreach ($tmp_attachments as $attachID => $attachment)
 		{
-			if ($attachID == 'initial_error')
+			// If there were any errors we just skip that file
+			if (strpos($attachID, $prefix) === false || $attachment->hasErrors())
 			{
-				$tmp_attachments->removeAll($pbe['profile']['id_member']);
-				break;
+				$attachment->remove(false);
+				continue;
 			}
-			$attachment->remove(false);
-			continue;
-		}
 
-		// Load the attachmentOptions array with the data needed to create an attachment
-		$attachmentOptions = array(
-			'post' => !empty($email_message->message_id) ? $email_message->message_id : 0,
-			'poster' => $pbe['profile']['id_member'],
-			'name' => $attachment['name'],
-			'tmp_name' => $attachment['tmp_name'],
-			'size' => (int) $attachment['size'],
-			'mime_type' => (string) $attachment['type'],
-			'id_folder' => (int) $attachment['id_folder'],
-			'approved' => !$modSettings['postmod_active'] || in_array('post_unapproved_attachments', $pbe['user_info']['permissions']),
-			'errors' => array(),
-		);
+			// Load the attachmentOptions array with the data needed to create an attachment
+			$attachmentOptions = array(
+				'post' => !empty($email_message->message_id) ? $email_message->message_id : 0,
+				'poster' => $pbe['profile']['id_member'],
+				'name' => $attachment['name'],
+				'tmp_name' => $attachment['tmp_name'],
+				'size' => (int) $attachment['size'],
+				'mime_type' => (string) $attachment['type'],
+				'id_folder' => (int) $attachment['id_folder'],
+				'approved' => !$modSettings['postmod_active'] || in_array('post_unapproved_attachments', $pbe['user_info']['permissions']),
+				'errors' => array(),
+			);
 
-		// Make it available to the forum/post
-		if (createAttachment($attachmentOptions))
-		{
-			$attachIDs[] = $attachmentOptions['id'];
-			if (!empty($attachmentOptions['thumb']))
+			// Make it available to the forum/post
+			if (createAttachment($attachmentOptions))
 			{
-				$attachIDs[] = $attachmentOptions['thumb'];
+				$attachIDs[] = $attachmentOptions['id'];
+				if (!empty($attachmentOptions['thumb']))
+				{
+					$attachIDs[] = $attachmentOptions['thumb'];
+				}
 			}
-		}
-		// We had a problem so simply remove it
-		else
-		{
-			$tmp_attachments->removeById($attachID, false);
+			// We had a problem so simply remove it
+			else
+			{
+				$tmp_attachments->removeById($attachID, false);
+			}
 		}
 	}
 	$tmp_attachments->unset();
