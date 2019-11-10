@@ -191,7 +191,7 @@ function processAttachments($id_msg = null)
 		// Sort out the errors for display and delete any associated files.
 		if ($temp_file->hasErrors())
 		{
-			$attach_errors->addAttach($temp_file['attachid'], $temp_file->getRealName());
+			$attach_errors->addAttach($temp_file['attachid'], $temp_file->getName());
 			$log_these = array('attachments_no_create', 'attachments_no_write', 'attach_timeout', 'ran_out_of_space', 'cant_access_upload_path', 'attach_0_byte_file', 'bad_attachment');
 
 			foreach ($temp_file->getErrors() as $error)
@@ -201,7 +201,7 @@ function processAttachments($id_msg = null)
 					$attach_errors->addError($error);
 					if (in_array($error, $log_these))
 					{
-						\ElkArte\Errors\Errors::instance()->log_error($temp_file->getRealName() . ': ' . $txt[$error], 'critical');
+						\ElkArte\Errors\Errors::instance()->log_error($temp_file->getName() . ': ' . $txt[$error], 'critical');
 
 						// For critical errors, we don't want the file or session data to persist
 						$temp_file->remove(false);

@@ -100,11 +100,6 @@ class TemporaryAttachment extends ValuesContainer
 		return $this->data['errors'];
 	}
 
-	public function getRealName()
-	{
-		return $this->data['name'];
-	}
-
 	public function getSize()
 	{
 		return $this->data['size'];
