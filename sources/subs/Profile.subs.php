@@ -2636,15 +2636,13 @@ function profileSaveAvatarData(&$value)
 			{
 				if (!is_writable($uploadDir))
 				{
-					theme()->getTemplates()->loadLanguageFile('Post');
-					throw new \ElkArte\Exceptions\Exception('attachments_no_write', 'critical');
+					throw new \ElkArte\Exceptions\Exception('Post.attachments_no_write', 'critical');
 				}
 
 				$new_avatar_name = $uploadDir . '/' . getAttachmentFilename('avatar_tmp_' . $memID, null, null, true);
 				if (!move_uploaded_file($_FILES['attachment']['tmp_name'], $new_avatar_name))
 				{
-					theme()->getTemplates()->loadLanguageFile('Post');
-					throw new \ElkArte\Exceptions\Exception('attach_timeout', 'critical');
+					throw new \ElkArte\Exceptions\Exception('Post.attach_timeout', 'critical');
 				}
 
 				$_FILES['attachment']['tmp_name'] = $new_avatar_name;

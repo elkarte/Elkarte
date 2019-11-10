@@ -1333,8 +1333,7 @@ function createSalvageBoard()
 
 		if ($result->affected_rows() <= 0)
 		{
-			theme()->getTemplates()->loadLanguageFile('Admin');
-			throw new \ElkArte\Exceptions\Exception('salvaged_board_error', false);
+			throw new \ElkArte\Exceptions\Exception('Admin.salvaged_board_error', false);
 		}
 
 		$salvageBoardID = $result->insert_id();
@@ -1394,8 +1393,7 @@ function createSalvageCategory()
 
 		if ($result->affected_rows() <= 0)
 		{
-			theme()->getTemplates()->loadLanguageFile('Admin');
-			throw new \ElkArte\Exceptions\Exception('salvaged_category_error', false);
+			throw new \ElkArte\Exceptions\Exception('Admin.salvaged_category_error', false);
 		}
 
 		$salvageCatID = $result->insert_id();

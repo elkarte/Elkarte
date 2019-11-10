@@ -352,8 +352,7 @@ class Image
 		// If we can't open it to scan, go no further
 		if ($fp === false)
 		{
-			theme()->getTemplates()->loadLanguageFile('Post');
-			throw new Exception('attach_timeout');
+			throw new Exception('Post.attach_timeout');
 		}
 
 		$prev_chunk = '';
