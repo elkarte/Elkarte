@@ -184,7 +184,7 @@ class Query extends AbstractQuery
 
 			if ($method === 'replace')
 			{
-				$this->_db_replace_result = $db_replace_result + $inserted_results;
+				$db_replace_result = $db_replace_result + $inserted_results;
 			}
 		}
 
@@ -202,7 +202,7 @@ class Query extends AbstractQuery
 			is_object($ret) ? $ret->getResultObject() : $ret,
 			new ValuesContainer([
 				'insert_id' => $last_inserted_id,
-				'replaceResults' => $this->_db_replace_result,
+				'replaceResults' => $db_replace_result ?? 0,
 				'lastResult' => $this->_db_last_result,
 			])
 		);
@@ -290,7 +290,7 @@ class Query extends AbstractQuery
 
 		// One more query....
 		$this->_query_count++;
-		$this->_db_replace_result = $this->_db_replace_result ?? null;
+		$this->_db_replace_result = null;
 
 		$db_string = $this->_prepareQuery($db_string, $db_values);
 
