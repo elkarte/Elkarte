@@ -86,7 +86,7 @@ function processAttachments($id_msg = null)
 
 	// There are files in session, likely already processed
 	$ignore_temp = false;
-	if ($tmp_attachments->getPostParam('files') !== null && $tmp_attachments->count() > 1)
+	if ($tmp_attachments->getPostParam('files') !== null && $tmp_attachments->hasAttachments())
 	{
 		// Let's try to keep them. But...
 		$ignore_temp = true;
