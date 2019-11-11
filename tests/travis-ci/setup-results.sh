@@ -19,5 +19,5 @@ SHORT_PHP=${TRAVIS_PHP_VERSION:0:3}
 if [[ "$COVERAGE" == "true" && "$TRAVIS_PULL_REQUEST" != "false" ]]
 then
   wget https://scrutinizer-ci.com/ocular.phar
-  php ocular.phar code-coverage:upload --format=php-clover /tmp/coverage.xml
+  php ocular.phar code-coverage:upload --format=php-clover /tmp/coverage.clover
 fi

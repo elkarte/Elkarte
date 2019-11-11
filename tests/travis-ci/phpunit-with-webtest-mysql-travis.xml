@@ -35,7 +35,7 @@
   </filter>
 
     <logging>
-        <log type="coverage-clover" target="/tmp/coverage.xml"/>
+        <log type="coverage-clover" target="/tmp/coverage.clover"/>
         <log type="coverage-text" target="php://stdout" />
     </logging>
 
