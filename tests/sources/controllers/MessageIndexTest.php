@@ -1,9 +1,9 @@
 <?php
 
 /**
- * TestCase class for the Profile Info Controller
+ * TestCase class for the Message Index Controller
  */
-class TestMessageIndex extends \PHPUnit\Framework\TestCase
+class TestMessageIndex extends ElkArteCommonSetupTest
 {
 	protected $backupGlobalsBlacklist = ['user_info'];
 	/**
@@ -11,45 +11,9 @@ class TestMessageIndex extends \PHPUnit\Framework\TestCase
 	 */
 	function setUp()
 	{
-		global $modSettings, $settings, $board;
+		global $board;
 
-		// Lets add in just enough info for the system to think we are logged
-		$modSettings['smiley_sets_known'] = 'none';
-		$modSettings['smileys_url'] = 'http://127.0.0.1/smileys';
-		$modSettings['default_forum_action'] = [];
-		$settings['default_theme_dir'] = '/var/www/themes/default';
-
-		\ElkArte\User::$info = new \ElkArte\ValuesContainer([
-			'id' => 1,
-			'ip' => '127.0.0.1',
-			'language' => 'english',
-			'is_admin' => true,
-			'is_guest' => false,
-			'username' => 'testing',
-			'query_wanna_see_board' => '1=1',
-			'query_see_board' => '1=1',
-			'is_moderator' => false,
-			'email' => 'a@a.com',
-			'ignoreusers' => '',
-			'name' => 'itsme',
-			'smiley_set' => 'none',
-			'time_offset' => 0,
-			'time_format' => '',
-			'possibly_robot' => false,
-			'posts' => '15',
-			'buddies' => array(),
-			'groups' => array(0 => 1),
-			'ignoreboards' => array(),
-		]);
-
-		$settings['page_index_template'] = array(
-			'base_link' => '<li></li>',
-			'previous_page' => '<span></span>',
-			'current_page' => '<li></li>',
-			'next_page' => '<span></span>',
-			'expand_pages' => '<li></li>',
-			'all' => '<span></span>',
-		);
+		parent::setUp();
 
 		new ElkArte\Themes\ThemeLoader();
 
@@ -64,11 +28,7 @@ class TestMessageIndex extends \PHPUnit\Framework\TestCase
 	 */
 	public function tearDown()
 	{
-		global $modSettings, $settings;
-
-		// remove temporary test data
-		unset($settings, $modSettings);
-		\ElkArte\User::$info = null;
+		parent::tearDown();
 	}
 
 	/**

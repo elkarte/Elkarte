@@ -66,10 +66,8 @@ class Query extends AbstractQuery
 		{
 			return pg_last_error($this->connection);
 		}
-		else
-		{
-			return false;
-		}
+
+		return false;
 	}
 
 	/**
@@ -135,7 +133,7 @@ class Query extends AbstractQuery
 						' WHERE ' . $where,
 						$entry
 					);
-					$db_replace_result += (!$this->_db_last_result ? 0 : pg_affected_rows($this->_db_last_result));
+					$db_replace_result += (!is_resource($this->_db_last_result) ? 0 : pg_affected_rows($this->_db_last_result));
 				}
 			}
 		}
@@ -182,11 +180,11 @@ class Query extends AbstractQuery
 					'security_override' => true,
 				)
 			);
-			$inserted_results += (!$this->_db_last_result ? 0 : pg_affected_rows($this->_db_last_result));
+			$inserted_results += (!is_resource($this->_db_last_result) ? 0 : pg_affected_rows($this->_db_last_result));
 
-			if (isset($db_replace_result))
+			if ($method === 'replace')
 			{
-				$this->_db_replace_result = $db_replace_result + $inserted_results;
+				$db_replace_result = $db_replace_result + $inserted_results;
 			}
 		}
 
@@ -204,7 +202,7 @@ class Query extends AbstractQuery
 			is_object($ret) ? $ret->getResultObject() : $ret,
 			new ValuesContainer([
 				'insert_id' => $last_inserted_id,
-				'replaceResults' => $this->_db_replace_result,
+				'replaceResults' => $db_replace_result ?? 0,
 				'lastResult' => $this->_db_last_result,
 			])
 		);
@@ -325,10 +323,8 @@ class Query extends AbstractQuery
 		{
 			return false;
 		}
-		else
-		{
-			return $this->result;
-		}
+
+		return $this->result;
 	}
 
 	/**
@@ -359,24 +355,18 @@ class Query extends AbstractQuery
 
 		// Show an error message, if possible.
 		$context['error_title'] = $txt['database_error'];
-		if (allowedTo('admin_forum'))
-		{
-			$context['error_message'] = nl2br($query_error) . '<br />' . $txt['file'] . ': ' . $file . '<br />' . $txt['line'] . ': ' . $line;
-		}
-		else
-		{
-			$context['error_message'] = $txt['try_again'];
-		}
+		$context['error_message'] = $txt['try_again'];
 
 		// Add database version that we know of, for the admin to know. (and ask for support)
 		if (allowedTo('admin_forum'))
 		{
-			$context['error_message'] .= '<br /><br />' . sprintf($txt['database_error_versions'], $modSettings['elkVersion']);
-		}
+			$context['error_message'] = nl2br($query_error) . '<br />' . $txt['file'] . ': ' . $file . '<br />' . $txt['line'] . ': ' . $line .
+				'<br /><br />' . sprintf($txt['database_error_versions'], $modSettings['elkVersion']);
 
-		if (allowedTo('admin_forum') && $db_show_debug === true)
-		{
-			$context['error_message'] .= '<br /><br />' . nl2br($db_string);
+			if ($db_show_debug === true)
+			{
+				$context['error_message'] .= '<br /><br />' . nl2br($db_string);
+			}
 		}
 
 		// It's already been logged... don't log it again.
@@ -396,6 +386,7 @@ class Query extends AbstractQuery
 		$table = str_replace('{db_prefix}', $this->_db_prefix, $table);
 
 		$this->skip_next_error();
+
 		// Try get the last ID for the auto increment field.
 		$request = $this->query('', 'SELECT CURRVAL(\'' . $table . '_seq\') AS insertID',
 			array()

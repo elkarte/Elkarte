@@ -27,7 +27,7 @@ global $ssi_db_user, $ssi_db_passwd;
 if (!defined('ELK'))
 {
 	DEFINE('ELK', '1');
-	DEFINE('CACHE_STALE', '?R11B2');
+	DEFINE('CACHE_STALE', '?R20B1');
 
 	// Get the forum's settings for database and file paths.
 	require_once('/var/www/Settings.php');
@@ -42,6 +42,7 @@ if (!defined('ELK'))
 	DEFINE('CONTROLLERDIR', $sourcedir . '/controllers');
 	DEFINE('SUBSDIR', $sourcedir . '/subs');
 	DEFINE('ADDONSDIR', $sourcedir . '/addons');
+	DEFINE('PHPUNITBOOTSTRAP', true);
 }
 else
 {

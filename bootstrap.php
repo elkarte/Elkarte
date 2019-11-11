@@ -161,7 +161,7 @@ class Bootstrap
 				require_once($settings_loc);
 			}
 
-			if (defined('IGNORE_INSTALL_DIR'))
+			if (!defined('IGNORE_INSTALL_DIR'))
 			{
 				if (file_exists($settings_loc) && empty($_SESSION['installing']))
 				{

@@ -10,6 +10,7 @@
 class TestManageMembergroupsController extends ElkArteWebTest
 {
 	protected $backupGlobalsBlacklist = ['user_info'];
+
 	/**
 	 * Add a group
 	 *

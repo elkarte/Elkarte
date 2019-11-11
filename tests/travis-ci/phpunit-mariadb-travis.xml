@@ -25,7 +25,6 @@
   </testsuites>
 
   <logging>
-     <log type="coverage-clover" target="/tmp/coverage.xml"/>
      <log type="coverage-text" target="php://stdout" />
   </logging>
 

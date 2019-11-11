@@ -1,0 +1,59 @@
+<?php
+
+/**
+ * TestCase class for the Announce Controller
+ *
+ * WARNING. These tests work directly with the local database. Don't run
+ * them local if you need to keep your data untouched!
+ */
+class TestAnnounce extends ElkArteCommonSetupTest
+{
+	protected $backupGlobalsBlacklist = ['user_info'];
+
+	/**
+	 * Initialize or add whatever necessary for these tests
+	 */
+	function setUp()
+	{
+		// Load in the common items so the system thinks we have an active login
+		parent::setUp();
+		$this->setSession();
+
+		new ElkArte\Themes\ThemeLoader();
+	}
+
+	/**
+	 * Cleanup data we no longer need at the end of the tests in this class.
+	 *
+	 * tearDown() is run automatically by the testing framework after each test method.
+	 */
+	public function tearDown()
+	{
+		parent::tearDown();
+	}
+
+	/**
+	 * Test getting the group list for an announcement
+	 */
+	public function testSelectgroup()
+	{
+		global $board, $topic, $context;
+
+		require_once(SUBSDIR . '/Topic.subs.php');
+
+		// Set up
+		$board = 1;
+		$topic = 1;
+		loadBoard();
+
+		// Get the groups list
+		$controller = new \ElkArte\Controller\Announce(new \ElkArte\EventManager());
+		$controller->setUser(\ElkArte\User::$info);
+		$controller->pre_dispatch();
+		$controller->action_index();
+
+		// Check
+		$this->assertEquals('Welcome to ElkArte!', $context['topic_subject'], $context['topic_subject']);
+		$this->assertFalse(empty($context['groups']), 'Groups is empty');
+	}
+}

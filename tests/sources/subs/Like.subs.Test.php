@@ -41,7 +41,7 @@ class TestLikes extends \PHPUnit\Framework\TestCase
 			'name' => 'test',
 			'email' => 'noemail@test.tes',
 			'update_post_count' => false,
-			'ip' => '127.0.0.1'
+			'ip' => long2ip(rand(0, 2147483647))
 		);
 
 		// Attempt to make the new topic.

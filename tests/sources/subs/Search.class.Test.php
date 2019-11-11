@@ -26,7 +26,7 @@ class TestSearchclass extends \PHPUnit\Framework\TestCase
 
 		// This is here to cheat with allowedTo
 		\ElkArte\User::$info->is_admin = true;
-		
+
 		// Create 2 boards
 		require_once(SUBSDIR . '/Boards.subs.php');
 		$this->board_all_access = createBoard([
@@ -64,8 +64,8 @@ class TestSearchclass extends \PHPUnit\Framework\TestCase
 			'send_welcome_email' => false,
 			'require' => 'nothing',
 			'memberGroup' => 1,
-			'ip' => '127.0.0.1',
-			'ip2' => '127.0.0.1',
+			'ip' => long2ip(rand(0, 2147483647)),
+			'ip2' => long2ip(rand(0, 2147483647)),
 			'auth_method' => 'password',
 		];
 		$this->member_full_access = registerMember($regOptions1);
@@ -82,8 +82,8 @@ class TestSearchclass extends \PHPUnit\Framework\TestCase
 			'send_welcome_email' => false,
 			'require' => 'nothing',
 			'memberGroup' => 0,
-			'ip' => '127.0.0.1',
-			'ip2' => '127.0.0.1',
+			'ip' => long2ip(rand(0, 2147483647)),
+			'ip2' => long2ip(rand(0, 2147483647)),
 			'auth_method' => 'password',
 		];
 		$this->member_limited_access = registerMember($regOptions2);
@@ -111,7 +111,7 @@ class TestSearchclass extends \PHPUnit\Framework\TestCase
 		];
 		$posterOptions = [
 			'id' => $this->member_full_access,
-			'ip' => '127.0.0.1',
+			'ip' => long2ip(rand(0, 2147483647)),
 			'name' => 'guestname',
 			'email' => $regOptions1['email'],
 			'update_post_count' => false,
@@ -136,7 +136,7 @@ class TestSearchclass extends \PHPUnit\Framework\TestCase
 		];
 		$posterOptions = [
 			'id' => $this->member_full_access,
-			'ip' => '127.0.0.1',
+			'ip' => long2ip(rand(0, 2147483647)),
 			'name' => 'guestname',
 			'email' => $regOptions1['email'],
 			'update_post_count' => false,
