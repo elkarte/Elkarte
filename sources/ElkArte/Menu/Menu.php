@@ -3,23 +3,24 @@
 /**
  * This class contains a standard way of displaying side/drop down menus.
  *
- * @name      ElkArte Forum
+ * @package   ElkArte Forum
  * @copyright ElkArte Forum contributors
- * @license   BSD http://opensource.org/licenses/BSD-3-Clause
+ * @license   BSD http://opensource.org/licenses/BSD-3-Clause (see accompanying LICENSE.txt file)
  *
  * This file contains code covered by:
  * copyright: 2011 Simple Machines (http://www.simplemachines.org)
- * license:   BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version   2.0 dev
+ * @version 2.0 dev
+ *
  */
-
-declare(strict_types=1);
 
 namespace ElkArte\Menu;
 
-use Elk_Exception;
-use HttpReq;
+use ElkArte\Exceptions\Exception;
+use ElkArte\HttpReq;
+use ElkArte\Menu\MenuArea;
+use ElkArte\Menu\MenuSection;
+use ElkArte\Menu\MenuSubsection;
 
 /**
  * Class Menu
@@ -65,7 +66,7 @@ class Menu
 	 *
 	 * @param HttpReq|null $req
 	 */
-	public function __construct(HttpReq $req = null)
+	public function __construct($req = null)
 	{
 		global $context;
 
@@ -89,17 +90,118 @@ class Menu
 	}
 
 	/**
+	 * Recipe compatibility, calls the methods in proper sequence to create a menu
+	 *
+	 * @param array $menuOptions
+	 * @param array $menuData
+	 * @return array
+	 * @throws \ElkArte\Exceptions\Exception
+	 */
+	public function createMenu($menuData, $menuOptions)
+	{
+		// Allow integration to modify as needed
+		$this->callHook($menuData, $menuOptions);
+
+		// Process options and data
+		$this->addOptions($menuOptions);
+		$this->addMenuData($menuData);
+
+		// Return the results
+		$include_data = $this->prepareMenu();
+		$this->setContext();
+
+		return $include_data;
+	}
+
+	/**
+	 * Allow extend *any* menu with a single hook, should be called before addOptions and addMenuData
+	 * left in place for compatibility
+	 *
+	 * @param array $menuData
+	 * @param array $menuOptions
+	 * @return array
+	 */
+	public function callHook(&$menuData, &$menuOptions)
+	{
+		// Allow extend *any* menu with a single hook
+		if (!empty($menuOptions['hook']))
+		{
+			call_integration_hook('integrate_' . $menuOptions['hook'] . '_areas', array(&$menuData, &$menuOptions));
+		}
+	}
+
+	/**
+	 * Add the base menu options for this menu
+	 *
+	 * @param array $menuOptions an array of options that can be used to override some default
+	 *                           behaviours. See MenuOptions for details.
+	 */
+	public function addOptions(array $menuOptions)
+	{
+		$this->menuOptions = MenuOptions::buildFromArray($menuOptions);
+	}
+
+	/**
+	 * Parses the supplied menu data in to the relevant menu array structure
+	 *
+	 * @param mixed[] $menuData the menu array
+	 */
+	public function addMenuData($menuData)
+	{
+		// Process each menu area's section/subsections
+		foreach ($menuData as $section_id => $section)
+		{
+			// $section['areas'] are the items under a menu button
+			$newAreas = ['areas' => []];
+			foreach ($section['areas'] as $area_id => $area)
+			{
+				// subsections are deeper menus inside of a area (3rd level menu)
+				$newSubsections = ['subsections' => []];
+				if (!empty($area['subsections']))
+				{
+					foreach ($area['subsections'] as $sa => $sub)
+					{
+						$newSubsections['subsections'][$sa] = MenuSubsection::buildFromArray($sub, $sa);
+						unset($area['subsections']);
+					}
+				}
+
+				$newAreas['areas'][$area_id] = MenuArea::buildFromArray($area + $newSubsections);
+			}
+
+			// Finally the menu button
+			unset($section['areas']);
+			$this->addSection($section_id, MenuSection::buildFromArray($section + $newAreas));
+		}
+	}
+
+	/**
+	 * Adds the built out menu sections/subsections to the menu
+	 *
+	 * @param string $id
+	 * @param MenuSection $section
+	 *
+	 * @return $this
+	 */
+	public function addSection($id, $section)
+	{
+		$this->menuData[$id] = $section;
+
+		return $this;
+	}
+
+	/**
 	 * Create a menu
 	 *
 	 * @return array
-	 * @throws Elk_Exception
+	 * @throws \ElkArte\Exceptions\Exception
 	 */
-	public function prepareMenu(): array
+	public function prepareMenu()
 	{
 		// Build URLs first.
 		$this->menuContext['base_url'] = $this->menuOptions->getBaseUrl();
 		$this->menuContext['current_action'] = $this->menuOptions->getAction();
-		$this->currentArea = $this->req->getQuery('area', 'trim|strval', $this->menuOptions->getArea());
+		$this->currentArea = !empty($this->menuOptions->getCurrentArea()) ? $this->menuOptions->getCurrentArea() : $this->req->getQuery('area', 'trim|strval', '');
 		$this->menuContext['extra_parameters'] = $this->menuOptions->buildAdditionalParams();
 
 		// Process the loopy menu data.
@@ -112,7 +214,7 @@ class Menu
 		if (empty($this->includeData))
 		{
 			// No valid areas -- reject!
-			throw new Elk_Exception('no_access');
+			throw new Exception('no_access', false);
 		}
 
 		// Finally - return information on the selected item.
@@ -125,41 +227,11 @@ class Menu
 	}
 
 	/**
-	 * Prepares tabs for the template.
-	 *
-	 * This should be called after the area is dispatched, because areas
-	 * are usually in their own file. Those files, once dispatched to, hold
-	 * some data for the tabs which must be specially combined with subaction
-	 * data for everything to work properly.
-	 *
-	 * Seems complicated, yes.
-	 */
-	public function prepareTabData(): void
-	{
-		global $context;
-
-		// Handy shortcut.
-		$tabContext = &$context['menu_data_' . $this->maxMenuId]['tab_data'];
-
-		// Tabs are really just subactions.
-		if (isset($tabContext['tabs'], $this->menuContext['sections'][$this->menuContext['current_section']]['areas'][$this->currentArea]['subsections']))
-		{
-			$tabContext['tabs'] = array_replace_recursive(
-				$tabContext['tabs'],
-				$this->menuContext['sections'][$this->menuContext['current_section']]['areas'][$this->currentArea]['subsections']
-			);
-
-			// Has it been deemed selected?
-			$tabContext = array_merge($tabContext, $tabContext['tabs'][$this->currentSubaction]);
-		}
-	}
-
-	/**
 	 * Process the menuData array passed to the class
 	 *
 	 *   - Only processes areas that are enabled and that the user has permissions
 	 */
-	protected function processMenuData(): void
+	protected function processMenuData()
 	{
 		// Now setup the context correctly.
 		foreach ($this->menuData as $sectionId => $section)
@@ -178,7 +250,7 @@ class Menu
 	/**
 	 * Determines if the user has the permissions to access the section/area
 	 *
-	 * If said item did not provide any permission to check, fullly
+	 * If said item did not provide any permission to check, fully
 	 * unfettered access is assumed.
 	 *
 	 * The profile areas are a bit different in that each permission is
@@ -187,8 +259,9 @@ class Menu
 	 * @param MenuItem $obj area or section being checked
 	 *
 	 * @return bool
+	 * @throws \ElkArte\Exceptions\Exception
 	 */
-	private function checkPermissions(MenuItem $obj): bool
+	private function checkPermissions($obj)
 	{
 		if (!empty($obj->getPermission()))
 		{
@@ -205,27 +278,58 @@ class Menu
 	}
 
 	/**
-	 * Checks if the area has a label or not
+	 * Sets the various section ID items
 	 *
-	 * @param string   $areaId
-	 * @param MenuArea $area
+	 * What it does:
+	 *   - If the ID is not set, sets it and sets the section title
+	 *   - Sets the section title
 	 *
-	 * @return bool
+	 * @param string $sectionId
+	 * @param MenuSection $section
 	 */
-	private function areaHasLabel(string $areaId, MenuArea $area): bool
+	private function setSectionContext($sectionId, $section)
 	{
 		global $txt;
 
-		return !empty($area->getLabel()) || isset($txt[$areaId]);
+		$this->menuContext['sections'][$sectionId] = [
+			'id' => $sectionId,
+			'label' => ($section->getLabel() ?: $txt[$sectionId]) . $this->parseCounter($section, 0),
+			'url' => $this->menuContext['base_url'] . $this->menuContext['extra_parameters'],
+		];
+	}
+
+	/**
+	 * If the menu has that little notification count, that's right this sets its value
+	 *
+	 * @param MenuItem $obj
+	 * @param integer $idx
+	 *
+	 * @return string
+	 */
+	private function parseCounter($obj, $idx)
+	{
+		global $settings;
+
+		$counter = '';
+		if (!empty($this->menuOptions->getCounters()[$obj->getCounter()]))
+		{
+			$counter = sprintf(
+				$settings['menu_numeric_notice'][$idx],
+				$this->menuOptions->getCounters()[$obj->getCounter()]
+			);
+		}
+
+		return $counter;
 	}
 
 	/**
 	 * Main processing for creating the menu items for all sections
 	 *
-	 * @param string      $sectionId
+	 * @param string $sectionId
 	 * @param MenuSection $section
+	 * @throws \ElkArte\Exceptions\Exception
 	 */
-	protected function processSectionAreas(string $sectionId, MenuSection $section): void
+	protected function processSectionAreas($sectionId, $section)
 	{
 		// Now we cycle through the sections to pick the right area.
 		foreach ($section->getAreas() as $areaId => $area)
@@ -259,32 +363,30 @@ class Menu
 	}
 
 	/**
-	 * Checks the menu item to see if it is the currently selected one
+	 * Checks if the area has a label or not
 	 *
-	 * @param string   $sectionId
-	 * @param string   $areaId
+	 * @param string $areaId
 	 * @param MenuArea $area
+	 *
+	 * @return bool
 	 */
-	private function checkCurrentSection(string $sectionId, string $areaId, MenuArea $area): void
+	private function areaHasLabel($areaId, $area)
 	{
-		// Is this the current section?
-		if ($this->currentArea == $areaId && !$this->foundSection)
-		{
-			$this->setAreaCurrent($sectionId, $areaId, $area);
+		global $txt;
 
-			// Only do this once, m'kay?
-			$this->foundSection = true;
-		}
+		return !empty($area->getLabel()) || (isset($txt[$areaId]) && !$area->getSelect());
 	}
 
 	/**
-	 * @param string   $sectionId
-	 * @param string   $areaId
+	 * Set the current area, or pick it for them
+	 *
+	 * @param string $sectionId
+	 * @param string $areaId
 	 * @param MenuArea $area
 	 */
-	private function setFirstAreaCurrent(string $sectionId, string $areaId, MenuArea $area): void
+	private function setFirstAreaCurrent($sectionId, $areaId, $area)
 	{
-		// If we don't have an area then the first valid one is our choice.
+		// If an area was not directly specified then the first valid one is our choice.
 		if (empty($this->currentArea))
 		{
 			$this->setAreaCurrent($sectionId, $areaId, $area);
@@ -294,59 +396,16 @@ class Menu
 	/**
 	 * Simply sets the current area
 	 *
-	 * @param string   $sectionId
-	 * @param string   $areaId
+	 * @param string $sectionId
+	 * @param string $areaId
 	 * @param MenuArea $area
 	 */
-	private function setAreaCurrent(string $sectionId, string $areaId, MenuArea $area): void
+	private function setAreaCurrent($sectionId, $areaId, $area)
 	{
 		// Update the context if required - as we can have areas pretending to be others. ;)
 		$this->menuContext['current_section'] = $sectionId;
 		$this->currentArea = $area->getSelect() ?: $areaId;
-		$this->includeData = $area->toArray();
-	}
-
-	/**
-	 * @param MenuItem $obj
-	 * @param integer  $idx
-	 *
-	 * @return string
-	 */
-	private function parseCounter(MenuItem $obj, int $idx): string
-	{
-		global $settings;
-
-		$counter = '';
-		if (!empty($this->menuOptions->getCounters()[$obj->getCounter()]))
-		{
-			$counter = sprintf(
-				$settings['menu_numeric_notice'][$idx],
-				$this->menuOptions->getCounters()[$obj->getCounter()]
-			);
-		}
-
-		return $counter;
-	}
-
-	/**
-	 * Sets the various section ID items
-	 *
-	 * What it does:
-	 *   - If the ID is not set, sets it and sets the section title
-	 *   - Sets the section title
-	 *
-	 * @param string      $sectionId
-	 * @param MenuSection $section
-	 */
-	private function setSectionContext(string $sectionId, MenuSection $section): void
-	{
-		global $txt;
-
-		$this->menuContext['sections'][$sectionId] = [
-			'id' => $sectionId,
-			'label' => ($section->getLabel() ?: $txt[$sectionId]) . $this->parseCounter($section, 0),
-			'url' => $this->menuContext['base_url'] . $this->menuContext['extra_parameters'],
-		];
+		$this->includeData = $area->toArray($area);
 	}
 
 	/**
@@ -356,11 +415,11 @@ class Menu
 	 *   - If the ID is not set, sets it and sets the area title
 	 *   - Sets the area title
 	 *
-	 * @param string   $sectionId
-	 * @param string   $areaId
+	 * @param string $sectionId
+	 * @param string $areaId
 	 * @param MenuArea $area
 	 */
-	private function setAreaContext(string $sectionId, string $areaId, MenuArea $area): void
+	private function setAreaContext($sectionId, $areaId, $area)
 	{
 		global $txt;
 
@@ -372,27 +431,26 @@ class Menu
 	/**
 	 * Set the URL for the menu item
 	 *
-	 * @param string   $sectionId
-	 * @param string   $areaId
+	 * @param string $sectionId
+	 * @param string $areaId
 	 * @param MenuArea $area
 	 */
-	private function setAreaUrl(string $sectionId, string $areaId, MenuArea $area): void
+	private function setAreaUrl($sectionId, $areaId, $area)
 	{
 		$area->setUrl(
 			$this->menuContext['sections'][$sectionId]['areas'][$areaId]['url'] =
-				$area->getUrl(
-				) ?: $this->menuContext['base_url'] . ';area=' . $areaId . $this->menuContext['extra_parameters']
+				$area->getUrl() ?: $this->menuContext['base_url'] . ';area=' . $areaId . $this->menuContext['extra_parameters']
 		);
 	}
 
 	/**
 	 * Set the menu icon
 	 *
-	 * @param string   $sectionId
-	 * @param string   $areaId
+	 * @param string $sectionId
+	 * @param string $areaId
 	 * @param MenuArea $area
 	 */
-	private function setAreaIcon(string $sectionId, string $areaId, MenuArea $area): void
+	private function setAreaIcon($sectionId, $areaId, $area)
 	{
 		global $settings;
 
@@ -405,9 +463,7 @@ class Menu
 		if (!empty($area->getIcon()))
 		{
 			$this->menuContext['sections'][$sectionId]['areas'][$areaId]['icon'] =
-				'<img ' . (!empty($area->getClass()) ? 'class="' . $area->getClass(
-					) . '" ' : 'style="background: none"') . ' src="' . $imagePath . '/' . $area->getIcon(
-				) . '" alt="" />&nbsp;&nbsp;';
+				'<img ' . (!empty($area->getClass()) ? 'class="' . $area->getClass() . '" ' : 'style="background: none"') . ' src="' . $imagePath . '/' . $area->getIcon() . '" alt="" />&nbsp;&nbsp;';
 		}
 		else
 		{
@@ -418,21 +474,23 @@ class Menu
 	/**
 	 * Processes all of the subsections for a menu item
 	 *
-	 * @param string   $sectionId
-	 * @param string   $areaId
+	 * @param string $sectionId
+	 * @param string $areaId
 	 * @param MenuArea $area
 	 */
-	protected function processAreaSubsections(string $sectionId, string $areaId, MenuArea $area): void
+	protected function processAreaSubsections($sectionId, $areaId, $area)
 	{
 		$this->menuContext['sections'][$sectionId]['areas'][$areaId]['subsections'] = [];
 
-		// For each subsection process the options
+		// Clear out ones not enabled or accessible
 		$subSections = array_filter(
 			$area->getSubsections(),
 			function ($sub) {
-				return $this->checkPermissions($sub) && $sub->isEnabled();
+				return $sub->isEnabled() && $this->checkPermissions($sub);
 			}
 		);
+
+		// For each subsection process the options
 		foreach ($subSections as $subId => $sub)
 		{
 			$this->menuContext['sections'][$sectionId]['areas'][$areaId]['subsections'][$subId] = [
@@ -441,41 +499,40 @@ class Menu
 
 			$this->setSubsSectionUrl($sectionId, $areaId, $subId, $sub);
 
-			if ($this->currentArea == $areaId)
+			if ($this->currentArea === $areaId)
 			{
 				$this->setCurrentSubSection($subId, $sub);
 			}
 		}
+
 		$this->setDefaultSubSection($areaId, $subSections);
 	}
 
 	/**
-	 * @param string         $sectionId
-	 * @param string         $areaId
-	 * @param string         $subId
+	 * @param string $sectionId
+	 * @param string $areaId
+	 * @param string $subId
 	 * @param MenuSubsection $sub
 	 */
-	private function setSubsSectionUrl(string $sectionId, string $areaId, string $subId, MenuSubsection $sub): void
+	private function setSubsSectionUrl($sectionId, $areaId, $subId, $sub)
 	{
 		$sub->setUrl(
 			$this->menuContext['sections'][$sectionId]['areas'][$areaId]['subsections'][$subId]['url'] =
-				$sub->getUrl(
-				) ?: $this->menuContext['base_url'] . ';area=' . $areaId . ';sa=' . $subId . $this->menuContext['extra_parameters']
+				$sub->getUrl() ?: $this->menuContext['base_url'] . ';area=' . $areaId . ';sa=' . $subId . $this->menuContext['extra_parameters']
 		);
 	}
 
 	/**
 	 * Set the current subsection
 	 *
-	 * @param string         $subId
+	 * @param string $subId
 	 * @param MenuSubsection $sub
 	 */
-	private function setCurrentSubSection(string $subId, MenuSubsection $sub): void
+	private function setCurrentSubSection($subId, $sub)
 	{
 		// Is this the current subsection?
 		$subIdCheck = $this->req->getQuery('sa', 'trim', null);
-		if (
-			$subIdCheck == $subId
+		if ($subIdCheck === $subId
 			|| in_array($subIdCheck, $sub->getActive(), true)
 			|| empty($this->currentSubaction) && $sub->isDefault()
 		)
@@ -488,58 +545,51 @@ class Menu
 	 * Ensures that the current subsection is set.
 	 *
 	 * @param string $areaId
-	 * @param array  $subSections
+	 * @param array $subSections
 	 */
-	private function setDefaultSubSection(string $areaId, array $subSections): void
+	private function setDefaultSubSection($areaId, $subSections)
 	{
-		if ($this->currentArea == $areaId && empty($this->currentSubaction))
+		if ($this->currentArea === $areaId && empty($this->currentSubaction))
 		{
 			$this->currentSubaction = key($subSections) ?? '';
 		}
 	}
 
 	/**
+	 * Checks the menu item to see if it is the one specified
+	 *
+	 * @param string $sectionId
+	 * @param string $areaId
+	 * @param MenuArea $area
+	 */
+	private function checkCurrentSection($sectionId, $areaId, $area)
+	{
+		// Is this the current selection?
+		if ($this->currentArea === $areaId && !$this->foundSection)
+		{
+			$this->setAreaCurrent($sectionId, $areaId, $area);
+
+			// Only do this once, m'kay?
+			$this->foundSection = true;
+		}
+	}
+
+	/**
 	 * Checks and updates base and section urls
 	 */
-	private function setActiveButtons(): void
+	private function setActiveButtons()
 	{
 		// If there are sections quickly goes through all the sections to check if the base menu has an url
 		if (!empty($this->menuContext['current_section']))
 		{
 			$this->menuContext['sections'][$this->menuContext['current_section']]['selected'] = true;
-			$this->menuContext['sections'][$this->menuContext['current_section']]['areas'][$this->currentArea]['selected'] =
-				true;
+			$this->menuContext['sections'][$this->menuContext['current_section']]['areas'][$this->currentArea]['selected'] = true;
 
 			if (!empty($this->menuContext['sections'][$this->menuContext['current_section']]['areas'][$this->currentArea]['subsections'][$this->currentSubaction]))
 			{
-				$this->menuContext['sections'][$this->menuContext['current_section']]['areas'][$this->currentArea]['subsections'][$this->currentSubaction]['selected'] =
-					true;
+				$this->menuContext['sections'][$this->menuContext['current_section']]['areas'][$this->currentArea]['subsections'][$this->currentSubaction]['selected'] = true;
 			}
 		}
-	}
-
-	/**
-	 * Add the base menu options for this menu
-	 *
-	 * @param array $menuOptions an array of options that can be used to override some default
-	 *                           behaviours. See MenuOptions for details.
-	 */
-	public function addOptions(array $menuOptions): void
-	{
-		$this->menuOptions = MenuOptions::buildFromArray($menuOptions);
-	}
-
-	/**
-	 * @param string      $id
-	 * @param MenuSection $section
-	 *
-	 * @return $this
-	 */
-	public function addSection(string $id, MenuSection $section): Menu
-	{
-		$this->menuData[$id] = $section;
-
-		return $this;
 	}
 
 	/**
@@ -550,7 +600,7 @@ class Menu
 	 *   - Loads context with the computed menu context
 	 *   - Sets current subaction and current max menu id
 	 */
-	public function setContext(): void
+	public function setContext()
 	{
 		global $context;
 
@@ -566,6 +616,41 @@ class Menu
 		$this->menuContext['current_subsection'] = $this->currentSubaction;
 		$this->menuContext['current_area'] = $this->currentArea;
 		$context['menu_data_' . $this->maxMenuId] = $this->menuContext;
+		$context['menu_data_' . $this->maxMenuId]['object'] = $this;
+	}
+
+	/**
+	 * Prepares tabs for the template.
+	 *
+	 * This should be called after the area is dispatched, because areas
+	 * are usually in their own file. Those files, once dispatched to, hold
+	 * some data for the tabs which must be specially combined with subaction
+	 * data for everything to work properly.
+	 *
+	 * Seems complicated, yes.
+	 */
+	public function prepareTabData()
+	{
+		global $context;
+
+		// Handy shortcut.
+		$tabContext = &$context['menu_data_' . $this->maxMenuId]['tab_data'];
+
+		// Tabs are really just subactions.
+		if (isset($tabContext['tabs'], $this->menuContext['sections'][$this->menuContext['current_section']]['areas'][$this->currentArea]['subsections']))
+		{
+			$tabContext['tabs'] = array_replace_recursive(
+				$tabContext['tabs'],
+				$this->menuContext['sections'][$this->menuContext['current_section']]['areas'][$this->currentArea]['subsections']
+			);
+
+			// Has it been deemed selected?
+			if (isset($tabContext['tabs'][$this->currentSubaction]))
+			{
+				$tabContext = array_merge($tabContext, $tabContext['tabs'][$this->currentSubaction]);
+			}
+		}
+
 	}
 
 	/**
@@ -576,7 +661,7 @@ class Menu
 	 * last known menu (if any) and remove the template layer
 	 * if there aren't any other known menus.
 	 */
-	public function destroy(): void
+	public function destroy()
 	{
 		global $context;
 
@@ -584,13 +669,13 @@ class Menu
 		if (isset($context[$menuName = 'menu_data_' . $this->maxMenuId]))
 		{
 			// Decrement the pointer if this is the final menu in the series.
-			if ($this->maxMenuId == $context['max_menu_id'])
+			if ($this->maxMenuId === $context['max_menu_id'])
 			{
 				$context['max_menu_id'] = max($context['max_menu_id'] - 1, 0);
 			}
 
 			// Remove the template layer if this was the only menu left.
-			if ($context['max_menu_id'] == 0)
+			if ($context['max_menu_id'] === 0)
 			{
 				theme()->getLayers()->remove($context[$menuName]['layer_name']);
 			}

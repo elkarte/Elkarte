@@ -218,12 +218,6 @@ class Profile extends AbstractController
 			redirectexit('action=profile' . ($context['user']['is_owner'] ? '' : ';u=' . $this->_memID) . ';area=' . $this->_current_area);
 		}
 
-		// Let go to the right place
-		if (isset($this->_profile_include_data['file']))
-		{
-			require_once($this->_profile_include_data['file']);
-		}
-
 		callMenu($this->_profile_include_data);
 
 		// Set the page title if it's not already set...
@@ -545,7 +539,6 @@ class Profile extends AbstractController
 			'extra_url_parameters' => array(
 				'u' => $context['id_member'],
 			),
-			'default_include_dir' => CONTROLLERDIR,
 		);
 
 		// Actually create the menu!
@@ -619,11 +612,11 @@ class Profile extends AbstractController
 			);
 		}
 
-		if (!empty($this->_profile_include_data['current_subsection']) && $this->_profile_include_data['subsections'][$this->_profile_include_data['current_subsection']][0] !== $this->_profile_include_data['label'])
+		if (!empty($this->_profile_include_data['current_subsection']) && $this->_profile_include_data['subsections'][$this->_profile_include_data['current_subsection']]['label'] !== $this->_profile_include_data['label'])
 		{
 			$context['linktree'][] = array(
 				'url' => getUrl('profile', ['action' => 'profile', 'area' => $this->_profile_include_data['current_area'], 'sa' => $this->_profile_include_data['current_subsection'], 'u' => $this->_memID, 'name' => $this->_profile['real_name']]),
-				'name' => $this->_profile_include_data['subsections'][$this->_profile_include_data['current_subsection']][0],
+				'name' => $this->_profile_include_data['subsections'][$this->_profile_include_data['current_subsection']]['label'],
 			);
 		}
 	}

@@ -89,12 +89,6 @@ class Admin extends AbstractController
 		$admin_include_data = $this->loadMenu();
 		$this->buildLinktree($admin_include_data);
 
-		// Now - finally - call the right place!
-		if (isset($admin_include_data['file']))
-		{
-			require_once($admin_include_data['file']);
-		}
-
 		callMenu($admin_include_data);
 	}
 
@@ -585,17 +579,13 @@ class Admin extends AbstractController
 		// Any files to include for administration?
 		call_integration_include_hook('integrate_admin_include');
 
-		$menuOptions = array('hook' => 'admin', 'default_include_dir' => ADMINDIR);
+		$menuOptions = array(
+			'hook' => 'admin',
+		);
 
 		// Actually create the menu!
 		$admin_include_data = createMenu($admin_areas, $menuOptions);
 		unset($admin_areas);
-
-		// Nothing valid?
-		if ($admin_include_data === false)
-		{
-			throw new Exception('no_access', false);
-		}
 
 		// Make a note of the Unique ID for this menu.
 		$context['admin_menu_id'] = $context['max_menu_id'];
@@ -630,11 +620,12 @@ class Admin extends AbstractController
 			);
 		}
 
-		if (!empty($admin_include_data['current_subsection']) && $admin_include_data['subsections'][$admin_include_data['current_subsection']][0] != $admin_include_data['label'])
+		if (isset($admin_include_data['current_subsection'], $admin_include_data['subsections'][$admin_include_data['current_subsection']])
+			&& $admin_include_data['subsections'][$admin_include_data['current_subsection']]['label'] != $admin_include_data['label'])
 		{
 			$context['linktree'][] = array(
 				'url' => getUrl('admin', ['action' => 'admin', 'area' => $admin_include_data['current_area'], 'sa' => $admin_include_data['current_subsection'], '{session_data}']),
-				'name' => $admin_include_data['subsections'][$admin_include_data['current_subsection']][0],
+				'name' => $admin_include_data['subsections'][$admin_include_data['current_subsection']]['label'],
 			);
 		}
 	}

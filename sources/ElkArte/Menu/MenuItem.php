@@ -3,11 +3,12 @@
 /**
  * This class contains a standard way of displaying side/drop down menus.
  *
- * @name      ElkArte Forum
+ * @package   ElkArte Forum
  * @copyright ElkArte Forum contributors
- * @license   BSD http://opensource.org/licenses/BSD-3-Clause
+ * @license   BSD http://opensource.org/licenses/BSD-3-Clause (see accompanying LICENSE.txt file)
  *
- * @version   2.0 dev
+ * @version 2.0 dev
+ *
  */
 
 namespace ElkArte\Menu;
@@ -15,7 +16,7 @@ namespace ElkArte\Menu;
 /**
  * Class MenuItem
  *
- * This class implements a standard way of creating menus
+ * This class implements a standard way of setting/getting menu params
  *
  * @package ElkArte\Menu
  */
@@ -38,40 +39,46 @@ abstract class MenuItem
 
 	/**
 	 * @param array $arr
+	 * @param string $sa
 	 *
 	 * @return MenuItem
 	 */
-	public static function buildFromArray(array $arr): MenuItem
+	public static function buildFromArray($arr, $sa = '')
 	{
 		$obj = new static;
 		$arr['permission'] = isset($arr['permission']) ? (array) $arr['permission'] : [];
 		$vars = get_object_vars($obj);
-		foreach (array_replace(
-					$vars,
-					array_intersect_key($arr, $vars)
-				) as $var => $val)
+
+		// Call the setters with our supplied menu values
+		foreach (array_replace($vars, array_intersect_key($arr, $vars)) as $var => $val)
 		{
 			$obj->{'set' . ucfirst($var)}($val);
 		}
-		$obj->buildMoreFromArray($arr);
+
+		// Account for any special setters
+		$obj->buildMoreFromArray($arr, $sa);
 
 		return $obj;
 	}
 
 	/**
+	 * Get the label
+	 *
 	 * @return string
 	 */
-	public function getLabel(): string
+	public function getLabel()
 	{
 		return $this->label;
 	}
 
 	/**
+	 * Set the label
+	 *
 	 * @param string $label
 	 *
 	 * @return MenuItem
 	 */
-	public function setLabel(string $label): MenuItem
+	public function setLabel($label)
 	{
 		$this->label = $label;
 
@@ -79,19 +86,23 @@ abstract class MenuItem
 	}
 
 	/**
+	 * Get the current counter
+	 *
 	 * @return string
 	 */
-	public function getCounter(): string
+	public function getCounter()
 	{
 		return $this->counter;
 	}
 
 	/**
+	 * Set the counter
+	 *
 	 * @param string $counter
 	 *
 	 * @return MenuItem
 	 */
-	public function setCounter(string $counter): MenuItem
+	public function setCounter($counter)
 	{
 		$this->counter = $counter;
 
@@ -99,19 +110,23 @@ abstract class MenuItem
 	}
 
 	/**
+	 * Get the url value
+	 *
 	 * @return string
 	 */
-	public function getUrl(): string
+	public function getUrl()
 	{
 		return $this->url;
 	}
 
 	/**
+	 * Set the url value
+	 *
 	 * @param string $url
 	 *
 	 * @return MenuItem
 	 */
-	public function setUrl(string $url): MenuItem
+	public function setUrl($url)
 	{
 		$this->url = $url;
 
@@ -119,19 +134,23 @@ abstract class MenuItem
 	}
 
 	/**
+	 * Get the permissions
+	 *
 	 * @return string[]
 	 */
-	public function getPermission(): array
+	public function getPermission()
 	{
 		return $this->permission;
 	}
 
 	/**
+	 * Set the permissions
+	 *
 	 * @param string[] $permission
 	 *
 	 * @return MenuItem
 	 */
-	public function setPermission(array $permission): MenuItem
+	public function setPermission($permission)
 	{
 		$this->permission = $permission;
 
@@ -139,19 +158,23 @@ abstract class MenuItem
 	}
 
 	/**
+	 * Get if the item is enabled
+	 *
 	 * @return boolean
 	 */
-	public function isEnabled(): bool
+	public function isEnabled()
 	{
 		return $this->enabled;
 	}
 
 	/**
+	 * Set if the item is enabled
+	 *
 	 * @param boolean $enabled
 	 *
 	 * @return MenuItem
 	 */
-	public function setEnabled(bool $enabled): MenuItem
+	public function setEnabled($enabled)
 	{
 		$this->enabled = $enabled;
 
