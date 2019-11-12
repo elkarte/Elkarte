@@ -3,11 +3,12 @@
 /**
  * This class contains a standard way of displaying side/drop down menus.
  *
- * @name      ElkArte Forum
+ * @package   ElkArte Forum
  * @copyright ElkArte Forum contributors
- * @license   BSD http://opensource.org/licenses/BSD-3-Clause
+ * @license   BSD http://opensource.org/licenses/BSD-3-Clause (see accompanying LICENSE.txt file)
  *
- * @version   2.0 dev
+ * @version 2.0 dev
+ *
  */
 
 namespace ElkArte\Menu;
@@ -41,18 +42,17 @@ abstract class MenuItem
 	 *
 	 * @return MenuItem
 	 */
-	public static function buildFromArray(array $arr): MenuItem
+	public static function buildFromArray($arr)
 	{
 		$obj = new static;
 		$arr['permission'] = isset($arr['permission']) ? (array) $arr['permission'] : [];
 		$vars = get_object_vars($obj);
-		foreach (array_replace(
-					$vars,
-					array_intersect_key($arr, $vars)
-				) as $var => $val)
+
+		foreach (array_replace($vars, array_intersect_key($arr, $vars)) as $var => $val)
 		{
 			$obj->{'set' . ucfirst($var)}($val);
 		}
+
 		$obj->buildMoreFromArray($arr);
 
 		return $obj;
@@ -61,7 +61,7 @@ abstract class MenuItem
 	/**
 	 * @return string
 	 */
-	public function getLabel(): string
+	public function getLabel()
 	{
 		return $this->label;
 	}
@@ -71,7 +71,7 @@ abstract class MenuItem
 	 *
 	 * @return MenuItem
 	 */
-	public function setLabel(string $label): MenuItem
+	public function setLabel($label)
 	{
 		$this->label = $label;
 
@@ -81,7 +81,7 @@ abstract class MenuItem
 	/**
 	 * @return string
 	 */
-	public function getCounter(): string
+	public function getCounter()
 	{
 		return $this->counter;
 	}
@@ -91,7 +91,7 @@ abstract class MenuItem
 	 *
 	 * @return MenuItem
 	 */
-	public function setCounter(string $counter): MenuItem
+	public function setCounter($counter)
 	{
 		$this->counter = $counter;
 
@@ -101,7 +101,7 @@ abstract class MenuItem
 	/**
 	 * @return string
 	 */
-	public function getUrl(): string
+	public function getUrl()
 	{
 		return $this->url;
 	}
@@ -111,7 +111,7 @@ abstract class MenuItem
 	 *
 	 * @return MenuItem
 	 */
-	public function setUrl(string $url): MenuItem
+	public function setUrl($url)
 	{
 		$this->url = $url;
 
@@ -121,7 +121,7 @@ abstract class MenuItem
 	/**
 	 * @return string[]
 	 */
-	public function getPermission(): array
+	public function getPermission()
 	{
 		return $this->permission;
 	}
@@ -131,7 +131,7 @@ abstract class MenuItem
 	 *
 	 * @return MenuItem
 	 */
-	public function setPermission(array $permission): MenuItem
+	public function setPermission($permission)
 	{
 		$this->permission = $permission;
 
@@ -141,7 +141,7 @@ abstract class MenuItem
 	/**
 	 * @return boolean
 	 */
-	public function isEnabled(): bool
+	public function isEnabled()
 	{
 		return $this->enabled;
 	}
@@ -151,7 +151,7 @@ abstract class MenuItem
 	 *
 	 * @return MenuItem
 	 */
-	public function setEnabled(bool $enabled): MenuItem
+	public function setEnabled($enabled)
 	{
 		$this->enabled = $enabled;
 

@@ -3,11 +3,12 @@
 /**
  * This class contains a standard way of displaying side/drop down menus.
  *
- * @name      ElkArte Forum
+ * @package   ElkArte Forum
  * @copyright ElkArte Forum contributors
- * @license   BSD http://opensource.org/licenses/BSD-3-Clause
+ * @license   BSD http://opensource.org/licenses/BSD-3-Clause (see accompanying LICENSE.txt file)
  *
- * @version   2.0 dev
+ * @version 2.0 dev
+ *
  */
 
 namespace ElkArte\Menu;
@@ -50,12 +51,13 @@ class MenuArea extends MenuItem
 	 *
 	 * @return MenuArea
 	 */
-	protected function buildMoreFromArray(array $arr): MenuArea
+	protected function buildMoreFromArray($arr)
 	{
 		if (isset($arr['custom_url']))
 		{
 			$this->setUrl($arr['custom_url']);
 		}
+
 		if (isset($arr['subsections']))
 		{
 			foreach ($arr['subsections'] as $var => $subsection)
@@ -68,12 +70,12 @@ class MenuArea extends MenuItem
 	}
 
 	/**
-	 * @param string         $id
+	 * @param string $id
 	 * @param MenuSubsection $subsection
 	 *
 	 * @return $this
 	 */
-	public function addSubsection(string $id, MenuSubsection $subsection): MenuArea
+	public function addSubsection($id, $subsection)
 	{
 		$this->subsections[$id] = $subsection;
 
@@ -93,7 +95,7 @@ class MenuArea extends MenuItem
 	 *
 	 * @return MenuArea
 	 */
-	public function setFunction($function): MenuArea
+	public function setFunction($function)
 	{
 		$this->function = $function;
 
@@ -103,7 +105,7 @@ class MenuArea extends MenuItem
 	/**
 	 * @return string
 	 */
-	public function getIcon(): string
+	public function getIcon()
 	{
 		return $this->icon;
 	}
@@ -113,7 +115,7 @@ class MenuArea extends MenuItem
 	 *
 	 * @return MenuArea
 	 */
-	public function setIcon(string $icon): MenuArea
+	public function setIcon($icon)
 	{
 		$this->icon = $icon;
 
@@ -123,7 +125,7 @@ class MenuArea extends MenuItem
 	/**
 	 * @return string
 	 */
-	public function getController(): string
+	public function getController()
 	{
 		return $this->controller;
 	}
@@ -133,7 +135,7 @@ class MenuArea extends MenuItem
 	 *
 	 * @return MenuArea
 	 */
-	public function setController(string $controller): MenuArea
+	public function setController($controller)
 	{
 		$this->controller = $controller;
 
@@ -143,7 +145,7 @@ class MenuArea extends MenuItem
 	/**
 	 * @return string
 	 */
-	public function getSelect(): string
+	public function getSelect()
 	{
 		return $this->select;
 	}
@@ -153,7 +155,7 @@ class MenuArea extends MenuItem
 	 *
 	 * @return MenuArea
 	 */
-	public function setSelect(string $select): MenuArea
+	public function setSelect($select)
 	{
 		$this->select = $select;
 
@@ -163,7 +165,7 @@ class MenuArea extends MenuItem
 	/**
 	 * @return string
 	 */
-	public function getClass(): string
+	public function getClass()
 	{
 		return $this->class;
 	}
@@ -173,7 +175,7 @@ class MenuArea extends MenuItem
 	 *
 	 * @return MenuArea
 	 */
-	public function setClass(string $class): MenuArea
+	public function setClass($class)
 	{
 		$this->class = $class;
 
@@ -183,7 +185,7 @@ class MenuArea extends MenuItem
 	/**
 	 * @return boolean
 	 */
-	public function isHidden(): bool
+	public function isHidden()
 	{
 		return $this->hidden;
 	}
@@ -193,7 +195,7 @@ class MenuArea extends MenuItem
 	 *
 	 * @return MenuArea
 	 */
-	public function setHidden(bool $hidden): MenuArea
+	public function setHidden($hidden)
 	{
 		$this->hidden = $hidden;
 
@@ -203,7 +205,7 @@ class MenuArea extends MenuItem
 	/**
 	 * @return array
 	 */
-	public function toArray(): array
+	public function toArray()
 	{
 		return get_object_vars($this);
 	}
@@ -211,7 +213,7 @@ class MenuArea extends MenuItem
 	/**
 	 * @return array
 	 */
-	public function getSubsections(): array
+	public function getSubsections()
 	{
 		return $this->subsections;
 	}

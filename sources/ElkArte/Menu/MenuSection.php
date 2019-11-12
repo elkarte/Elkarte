@@ -3,11 +3,12 @@
 /**
  * This class contains a standard way of displaying side/drop down menus.
  *
- * @name      ElkArte Forum
+ * @package   ElkArte Forum
  * @copyright ElkArte Forum contributors
- * @license   BSD http://opensource.org/licenses/BSD-3-Clause
+ * @license   BSD http://opensource.org/licenses/BSD-3-Clause (see accompanying LICENSE.txt file)
  *
- * @version   2.0 dev
+ * @version 2.0 dev
+ *
  */
 
 namespace ElkArte\Menu;
@@ -29,12 +30,13 @@ class MenuSection extends MenuItem
 	 *
 	 * @return MenuSection
 	 */
-	protected function buildMoreFromArray(array $arr): MenuSection
+	protected function buildMoreFromArray($arr)
 	{
 		if (isset($arr['title']))
 		{
 			$this->setLabel($arr['title']);
 		}
+
 		if (isset($arr['areas']))
 		{
 			foreach ($arr['areas'] as $var => $area)
@@ -47,12 +49,12 @@ class MenuSection extends MenuItem
 	}
 
 	/**
-	 * @param string   $id
+	 * @param string $id
 	 * @param MenuArea $area
 	 *
 	 * @return $this
 	 */
-	public function addArea(string $id, MenuArea $area): MenuSection
+	public function addArea($id, $area)
 	{
 		$this->areas[$id] = $area;
 
@@ -62,7 +64,7 @@ class MenuSection extends MenuItem
 	/**
 	 * @return array
 	 */
-	public function getAreas(): array
+	public function getAreas()
 	{
 		return $this->areas;
 	}

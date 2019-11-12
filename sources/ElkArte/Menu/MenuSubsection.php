@@ -3,11 +3,12 @@
 /**
  * This class contains a standard way of displaying side/drop down menus.
  *
- * @name      ElkArte Forum
+ * @package   ElkArte Forum
  * @copyright ElkArte Forum contributors
- * @license   BSD http://opensource.org/licenses/BSD-3-Clause
+ * @license   BSD http://opensource.org/licenses/BSD-3-Clause (see accompanying LICENSE.txt file)
  *
- * @version   2.0 dev
+ * @version 2.0 dev
+ *
  */
 
 namespace ElkArte\Menu;
@@ -32,7 +33,7 @@ class MenuSubsection extends MenuItem
 	 *
 	 * @return MenuSubsection
 	 */
-	protected function buildMoreFromArray(array $arr): MenuSubsection
+	protected function buildMoreFromArray($arr)
 	{
 		$this->label = $arr[0];
 		$this->permission = isset($arr[1]) ? (array) $arr[1] : [];
@@ -44,7 +45,7 @@ class MenuSubsection extends MenuItem
 	/**
 	 * @return boolean
 	 */
-	public function isDefault(): bool
+	public function isDefault()
 	{
 		return $this->default;
 	}
@@ -54,7 +55,7 @@ class MenuSubsection extends MenuItem
 	 *
 	 * @return MenuSubsection
 	 */
-	public function setDefault(bool $default): MenuSubsection
+	public function setDefault($default)
 	{
 		$this->default = $default;
 
@@ -64,7 +65,7 @@ class MenuSubsection extends MenuItem
 	/**
 	 * @return string[]
 	 */
-	public function getActive(): array
+	public function getActive()
 	{
 		return $this->active;
 	}
@@ -74,7 +75,7 @@ class MenuSubsection extends MenuItem
 	 *
 	 * @return MenuSubsection
 	 */
-	public function setActive(array $active): MenuSubsection
+	public function setActive($active)
 	{
 		$this->active = $active;
 

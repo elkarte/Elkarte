@@ -19,6 +19,8 @@ use ElkArte\Menu\Menu;
 use ElkArte\Menu\MenuArea;
 use ElkArte\Menu\MenuSection;
 use ElkArte\Menu\MenuSubsection;
+use ElkArte\Action;
+use ElkArte\User;
 
 /**
  * Create a menu.
@@ -31,13 +33,15 @@ use ElkArte\Menu\MenuSubsection;
  * @param array $menuOptions
  *
  * @return array
+ * @throws \ElkArte\Exceptions\Exception
  */
-function createMenu(array $menuData, array $menuOptions = []): array
+function createMenu($menuData, $menuOptions = [])
 {
 	global $context;
 
 	$menu = new Menu();
 	$menu->addOptions($menuOptions);
+
 	foreach ($menuData as $section_id => $section)
 	{
 		$newAreas = ['areas' => []];
@@ -52,11 +56,14 @@ function createMenu(array $menuData, array $menuOptions = []): array
 					unset($area['subsections']);
 				}
 			}
+
 			$newAreas['areas'][$area_id] = MenuArea::buildFromArray($area + $newSubsections);
 		}
+
 		unset($section['areas']);
 		$menu->addSection($section_id, MenuSection::buildFromArray($section + $newAreas));
 	}
+
 	$include_data = $menu->prepareMenu();
 	$menu->setContext();
 	$context['menu_data_' . $context['max_menu_id']]['object'] = $menu;
@@ -75,15 +82,13 @@ function createMenu(array $menuData, array $menuOptions = []): array
  *
  * @return boolean
  */
-function destroyMenu($menu_id = 'last'): bool
+function destroyMenu($menu_id = 'last')
 {
 	global $context;
 
-	$menu_name =
-		$menu_id === 'last'
-		&& isset($context['max_menu_id'], $context['menu_data_' . $context['max_menu_id']])
-			? 'menu_data_' . $context['max_menu_id']
-			: 'menu_data_' . $menu_id;
+	$menu_name = $menu_id === 'last' && isset($context['max_menu_id'], $context['menu_data_' . $context['max_menu_id']])
+		? 'menu_data_' . $context['max_menu_id']
+		: 'menu_data_' . $menu_id;
 
 	if (!isset($context['max_menu_id'], $context[$menu_name]))
 	{
@@ -92,13 +97,13 @@ function destroyMenu($menu_id = 'last'): bool
 	else
 	{
 		// Decrement the pointer if this is the final menu in the series.
-		if ($menu_id == 'last' || $menu_id == $context['max_menu_id'])
+		if ($menu_id === 'last' || $menu_id === $context['max_menu_id'])
 		{
 			$context['max_menu_id'] = max($context['max_menu_id'] - 1, 0);
 		}
 
 		// Remove the template layer if this was the only menu left.
-		if ($context['max_menu_id'] == 0)
+		if ($context['max_menu_id'] === 0)
 		{
 			theme()->getLayers()->remove($context[$menu_name]['layer_name']);
 		}
@@ -117,8 +122,9 @@ function destroyMenu($menu_id = 'last'): bool
  * developers don't remove this until 3.0-dev
  *
  * @param array $selectedMenu
+ * @throws \ElkArte\Exceptions\Exception
  */
-function callMenu(array $selectedMenu): void
+function callMenu(array $selectedMenu)
 {
 	global $context;
 
@@ -137,8 +143,9 @@ function callMenu(array $selectedMenu): void
  * Loads up all the default menu entries available.
  *
  * @return array
+ * @throws \ElkArte\Exceptions\Exception
  */
-function loadDefaultMenuButtons(): array
+function loadDefaultMenuButtons()
 {
 	global $scripturl, $txt, $context, $user_info, $modSettings;
 

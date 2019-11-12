@@ -3,18 +3,16 @@
 /**
  * This class contains a standard way of displaying side/drop down menus.
  *
- * @name      ElkArte Forum
+ * @package   ElkArte Forum
  * @copyright ElkArte Forum contributors
- * @license   BSD http://opensource.org/licenses/BSD-3-Clause
+ * @license   BSD http://opensource.org/licenses/BSD-3-Clause (see accompanying LICENSE.txt file)
  *
  * This file contains code covered by:
  * copyright: 2011 Simple Machines (http://www.simplemachines.org)
- * license:   BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version   2.0 dev
+ * @version 2.0 dev
+ *
  */
-
-declare(strict_types=1);
 
 namespace ElkArte\Menu;
 
@@ -60,7 +58,7 @@ class MenuOptions
 	/**
 	 * @return string
 	 */
-	public function getAction(): string
+	public function getAction()
 	{
 		return $this->action;
 	}
@@ -68,7 +66,7 @@ class MenuOptions
 	/**
 	 * @param string $action
 	 */
-	public function setAction(string $action)
+	public function setAction($action)
 	{
 		$this->action = $action;
 	}
@@ -76,7 +74,7 @@ class MenuOptions
 	/**
 	 * @return string
 	 */
-	public function getArea(): string
+	public function getArea()
 	{
 		return $this->area;
 	}
@@ -84,7 +82,7 @@ class MenuOptions
 	/**
 	 * @param string $area
 	 */
-	public function setArea(string $area)
+	public function setArea($area)
 	{
 		$this->area = $area;
 	}
@@ -92,7 +90,7 @@ class MenuOptions
 	/**
 	 * @return array
 	 */
-	public function getExtraUrlParameters(): array
+	public function getExtraUrlParameters()
 	{
 		return $this->extraUrlParameters;
 	}
@@ -100,7 +98,7 @@ class MenuOptions
 	/**
 	 * @param array $extraUrlParameters
 	 */
-	public function setExtraUrlParameters(array $extraUrlParameters)
+	public function setExtraUrlParameters($extraUrlParameters)
 	{
 		$this->extraUrlParameters = $extraUrlParameters;
 	}
@@ -108,7 +106,7 @@ class MenuOptions
 	/**
 	 * @return bool
 	 */
-	public function isUrlSessionCheckDisabled(): bool
+	public function isUrlSessionCheckDisabled()
 	{
 		return $this->disableUrlSessionCheck;
 	}
@@ -116,7 +114,7 @@ class MenuOptions
 	/**
 	 * @param bool $disableUrlSessionCheck
 	 */
-	public function setDisableUrlSessionCheck(bool $disableUrlSessionCheck)
+	public function setDisableUrlSessionCheck($disableUrlSessionCheck)
 	{
 		$this->disableUrlSessionCheck = $disableUrlSessionCheck;
 	}
@@ -124,7 +122,7 @@ class MenuOptions
 	/**
 	 * @return string
 	 */
-	public function getBaseUrl(): string
+	public function getBaseUrl()
 	{
 		return $this->baseUrl;
 	}
@@ -132,7 +130,7 @@ class MenuOptions
 	/**
 	 * @param string $baseUrl
 	 */
-	public function setBaseUrl(string $baseUrl)
+	public function setBaseUrl($baseUrl)
 	{
 		$this->baseUrl = $baseUrl;
 	}
@@ -140,7 +138,7 @@ class MenuOptions
 	/**
 	 * @return string
 	 */
-	public function getMenuType(): string
+	public function getMenuType()
 	{
 		return $this->menuType;
 	}
@@ -148,7 +146,7 @@ class MenuOptions
 	/**
 	 * @param string $menuType
 	 */
-	public function setMenuType(string $menuType)
+	public function setMenuType($menuType)
 	{
 		$this->menuType = $menuType;
 	}
@@ -156,7 +154,7 @@ class MenuOptions
 	/**
 	 * @return bool
 	 */
-	public function isDropDownToggleable(): bool
+	public function isDropDownToggleable()
 	{
 		return $this->canToggleDropDown;
 	}
@@ -164,7 +162,7 @@ class MenuOptions
 	/**
 	 * @param bool $canToggleDropDown
 	 */
-	public function setCanToggleDropDown(bool $canToggleDropDown)
+	public function setCanToggleDropDown($canToggleDropDown)
 	{
 		$this->canToggleDropDown = $canToggleDropDown;
 	}
@@ -172,7 +170,7 @@ class MenuOptions
 	/**
 	 * @return string
 	 */
-	public function getTemplateName(): string
+	public function getTemplateName()
 	{
 		return $this->templateName;
 	}
@@ -180,7 +178,7 @@ class MenuOptions
 	/**
 	 * @param string $templateName
 	 */
-	public function setTemplateName(string $templateName)
+	public function setTemplateName($templateName)
 	{
 		$this->templateName = $templateName;
 	}
@@ -188,7 +186,7 @@ class MenuOptions
 	/**
 	 * @return string
 	 */
-	public function getLayerName(): string
+	public function getLayerName()
 	{
 		return $this->layerName;
 	}
@@ -196,7 +194,7 @@ class MenuOptions
 	/**
 	 * @param string $layerName
 	 */
-	public function setLayerName(string $layerName)
+	public function setLayerName($layerName)
 	{
 		$this->layerName = $layerName;
 	}
@@ -204,7 +202,7 @@ class MenuOptions
 	/**
 	 * @return array
 	 */
-	public function getCounters(): array
+	public function getCounters()
 	{
 		return $this->counters;
 	}
@@ -212,7 +210,7 @@ class MenuOptions
 	/**
 	 * @param array $counters
 	 */
-	public function setCounters(array $counters)
+	public function setCounters($counters)
 	{
 		$this->counters = $counters;
 	}
@@ -226,7 +224,7 @@ class MenuOptions
 	 *
 	 * @return MenuOptions
 	 */
-	public static function buildFromArray(array $arr): MenuOptions
+	public static function buildFromArray($arr)
 	{
 		$obj = new self;
 		foreach ($arr as $var => $val)
@@ -236,6 +234,7 @@ class MenuOptions
 				$obj->{$call}($val);
 			}
 		}
+
 		$obj->buildBaseUrl();
 		$obj->buildTemplateVars();
 
@@ -245,7 +244,7 @@ class MenuOptions
 	/**
 	 * The theme needs some love, too.
 	 */
-	private function buildTemplateVars(): void
+	private function buildTemplateVars()
 	{
 		global $user_info, $options;
 
@@ -253,6 +252,7 @@ class MenuOptions
 		{
 			$this->setMenuType(empty($options['use_sidebar_menu']) ? 'dropdown' : 'sidebar');
 		}
+
 		$this->setCanToggleDropDown(!$user_info['is_guest'] && $this->isDropDownToggleable());
 
 		$this->setLayerName($this->getLayerName() . '_' . $this->getMenuType());
@@ -261,19 +261,13 @@ class MenuOptions
 	/**
 	 * Process the array of MenuOptions passed to the class
 	 */
-	protected function buildBaseUrl(): void
+	protected function buildBaseUrl()
 	{
 		global $context, $scripturl;
 
 		$this->setAction($this->getAction() ?: $context['current_action']);
 
-		$this->setBaseUrl(
-			$this->getBaseUrl() ?: sprintf(
-				'%s?action=%s',
-				$scripturl,
-				$this->getAction()
-			)
-		);
+		$this->setBaseUrl($this->getBaseUrl() ?: sprintf('%s?action=%s', $scripturl, $this->getAction()));
 	}
 
 	/**
@@ -281,7 +275,7 @@ class MenuOptions
 	 *
 	 * @return string
 	 */
-	public function buildAdditionalParams(): string
+	public function buildAdditionalParams()
 	{
 		global $context;
 
@@ -296,11 +290,7 @@ class MenuOptions
 		$extraUrlParameters = '';
 		foreach ($arr as $key => $value)
 		{
-			$extraUrlParameters .= sprintf(
-				';%s=%s',
-				$key,
-				$value
-			);
+			$extraUrlParameters .= sprintf(';%s=%s', $key, $value);
 		}
 
 		return $extraUrlParameters;
