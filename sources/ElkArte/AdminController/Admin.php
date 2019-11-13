@@ -585,7 +585,10 @@ class Admin extends AbstractController
 		// Any files to include for administration?
 		call_integration_include_hook('integrate_admin_include');
 
-		$menuOptions = array('hook' => 'admin', 'default_include_dir' => ADMINDIR);
+		$menuOptions = array(
+			'hook' => 'admin',
+			'default_include_dir' => ADMINDIR
+		);
 
 		// Actually create the menu!
 		$admin_include_data = createMenu($admin_areas, $menuOptions);

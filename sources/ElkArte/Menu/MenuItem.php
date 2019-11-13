@@ -59,6 +59,8 @@ abstract class MenuItem
 	}
 
 	/**
+	 * Get the label
+	 *
 	 * @return string
 	 */
 	public function getLabel()
@@ -67,6 +69,8 @@ abstract class MenuItem
 	}
 
 	/**
+	 * Set the label
+	 *
 	 * @param string $label
 	 *
 	 * @return MenuItem
@@ -79,6 +83,8 @@ abstract class MenuItem
 	}
 
 	/**
+	 * Get the current counter
+	 *
 	 * @return string
 	 */
 	public function getCounter()
@@ -87,6 +93,8 @@ abstract class MenuItem
 	}
 
 	/**
+	 * Set the counter
+	 *
 	 * @param string $counter
 	 *
 	 * @return MenuItem
@@ -99,6 +107,8 @@ abstract class MenuItem
 	}
 
 	/**
+	 * Get the url value
+	 *
 	 * @return string
 	 */
 	public function getUrl()
@@ -107,6 +117,8 @@ abstract class MenuItem
 	}
 
 	/**
+	 * Set the url value
+	 *
 	 * @param string $url
 	 *
 	 * @return MenuItem
@@ -119,6 +131,8 @@ abstract class MenuItem
 	}
 
 	/**
+	 * Get the permissions
+	 *
 	 * @return string[]
 	 */
 	public function getPermission()
@@ -127,6 +141,8 @@ abstract class MenuItem
 	}
 
 	/**
+	 * Set the permissions
+	 *
 	 * @param string[] $permission
 	 *
 	 * @return MenuItem
@@ -139,6 +155,8 @@ abstract class MenuItem
 	}
 
 	/**
+	 * Get if the item is enabled
+	 *
 	 * @return boolean
 	 */
 	public function isEnabled()
@@ -147,6 +165,8 @@ abstract class MenuItem
 	}
 
 	/**
+	 * Set if the item is enabled
+	 *
 	 * @param boolean $enabled
 	 *
 	 * @return MenuItem

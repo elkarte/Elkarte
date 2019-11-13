@@ -19,7 +19,19 @@ namespace ElkArte\Menu;
 /**
  * Class MenuOptions
  *
- * This class implements a standard way of creating menus
+ * This class will set and access the menu options. The supported options are:
+ *
+ *  - action                    => overrides the default action
+ *  - current_area              => overrides the current area
+ *  - extra_url_parameters      => an array or pairs or parameters to be added to the url
+ *  - disable_url_session_check => (boolean) if true the session var/id are omitted from the url
+ *  - base_url                  => an alternative base url
+ *  - menu_type                 => alternative menu types?
+ *  - can_toggle_drop_down      => (boolean) if the menu can "toggle"
+ *  - template_name             => an alternative template to load (instead of Generic)
+ *  - layer_name                => alternative layer name for the menu
+ *  - hook                      => hook name to call integrate_ . 'hook name' . '_areas'
+ *  - default_include_dir       => directory to include for function support
  *
  * @package ElkArte\Menu
  */
@@ -28,8 +40,8 @@ class MenuOptions
 	/** @var string $action overrides the default action */
 	private $action = '';
 
-	/** @var string $area overrides the current area */
-	private $area = '';
+	/** @var string $currentArea overrides the current area */
+	private $currentArea = '';
 
 	/** @var array $extraUrlParameters an array or pairs or parameters to be added to the url */
 	private $extraUrlParameters = [];
@@ -52,168 +64,11 @@ class MenuOptions
 	/** @var string $layerName alternative layer name for the menu */
 	private $layerName = 'generic_menu';
 
+	/** @var string $hook name to call integrate_ . $hook . '_areas' */
+	private $hook = '';
+
 	/** @var array $counters All the counters to be used for a menu. See Menu::parseCounter() */
 	private $counters = [];
-
-	/**
-	 * @return string
-	 */
-	public function getAction()
-	{
-		return $this->action;
-	}
-
-	/**
-	 * @param string $action
-	 */
-	public function setAction($action)
-	{
-		$this->action = $action;
-	}
-
-	/**
-	 * @return string
-	 */
-	public function getArea()
-	{
-		return $this->area;
-	}
-
-	/**
-	 * @param string $area
-	 */
-	public function setArea($area)
-	{
-		$this->area = $area;
-	}
-
-	/**
-	 * @return array
-	 */
-	public function getExtraUrlParameters()
-	{
-		return $this->extraUrlParameters;
-	}
-
-	/**
-	 * @param array $extraUrlParameters
-	 */
-	public function setExtraUrlParameters($extraUrlParameters)
-	{
-		$this->extraUrlParameters = $extraUrlParameters;
-	}
-
-	/**
-	 * @return bool
-	 */
-	public function isUrlSessionCheckDisabled()
-	{
-		return $this->disableUrlSessionCheck;
-	}
-
-	/**
-	 * @param bool $disableUrlSessionCheck
-	 */
-	public function setDisableUrlSessionCheck($disableUrlSessionCheck)
-	{
-		$this->disableUrlSessionCheck = $disableUrlSessionCheck;
-	}
-
-	/**
-	 * @return string
-	 */
-	public function getBaseUrl()
-	{
-		return $this->baseUrl;
-	}
-
-	/**
-	 * @param string $baseUrl
-	 */
-	public function setBaseUrl($baseUrl)
-	{
-		$this->baseUrl = $baseUrl;
-	}
-
-	/**
-	 * @return string
-	 */
-	public function getMenuType()
-	{
-		return $this->menuType;
-	}
-
-	/**
-	 * @param string $menuType
-	 */
-	public function setMenuType($menuType)
-	{
-		$this->menuType = $menuType;
-	}
-
-	/**
-	 * @return bool
-	 */
-	public function isDropDownToggleable()
-	{
-		return $this->canToggleDropDown;
-	}
-
-	/**
-	 * @param bool $canToggleDropDown
-	 */
-	public function setCanToggleDropDown($canToggleDropDown)
-	{
-		$this->canToggleDropDown = $canToggleDropDown;
-	}
-
-	/**
-	 * @return string
-	 */
-	public function getTemplateName()
-	{
-		return $this->templateName;
-	}
-
-	/**
-	 * @param string $templateName
-	 */
-	public function setTemplateName($templateName)
-	{
-		$this->templateName = $templateName;
-	}
-
-	/**
-	 * @return string
-	 */
-	public function getLayerName()
-	{
-		return $this->layerName;
-	}
-
-	/**
-	 * @param string $layerName
-	 */
-	public function setLayerName($layerName)
-	{
-		$this->layerName = $layerName;
-	}
-
-	/**
-	 * @return array
-	 */
-	public function getCounters()
-	{
-		return $this->counters;
-	}
-
-	/**
-	 * @param array $counters
-	 */
-	public function setCounters($counters)
-	{
-		$this->counters = $counters;
-	}
 
 	/**
 	 * Add an array of options for a menu.
@@ -227,6 +82,8 @@ class MenuOptions
 	public static function buildFromArray($arr)
 	{
 		$obj = new self;
+
+		// For each passed option, call the value setter method
 		foreach ($arr as $var => $val)
 		{
 			if (is_callable([$obj, $call = 'set' . str_replace('_', '', ucwords($var, '_'))]))
@@ -239,6 +96,58 @@ class MenuOptions
 		$obj->buildTemplateVars();
 
 		return $obj;
+	}
+
+	/**
+	 * Process the array of MenuOptions passed to the class
+	 */
+	protected function buildBaseUrl()
+	{
+		global $context, $scripturl;
+
+		$this->setAction($this->getAction() ?: $context['current_action']);
+
+		$this->setBaseUrl($this->getBaseUrl() ?: sprintf('%s?action=%s', $scripturl, $this->getAction()));
+	}
+
+	/**
+	 * Get action value
+	 *
+	 * @return string
+	 */
+	public function getAction()
+	{
+		return $this->action;
+	}
+
+	/**
+	 * Set action value
+	 *
+	 * @param string $action
+	 */
+	private function setAction($action)
+	{
+		$this->action = $action;
+	}
+
+	/**
+	 * Get base URL
+	 *
+	 * @return string
+	 */
+	public function getBaseUrl()
+	{
+		return $this->baseUrl;
+	}
+
+	/**
+	 * Set base URL
+	 *
+	 * @param string $baseUrl
+	 */
+	private function setBaseUrl($baseUrl)
+	{
+		$this->baseUrl = $baseUrl;
 	}
 
 	/**
@@ -259,15 +168,141 @@ class MenuOptions
 	}
 
 	/**
-	 * Process the array of MenuOptions passed to the class
+	 * Get menu type
+	 *
+	 * @return string
 	 */
-	protected function buildBaseUrl()
+	public function getMenuType()
 	{
-		global $context, $scripturl;
+		return $this->menuType;
+	}
 
-		$this->setAction($this->getAction() ?: $context['current_action']);
+	/**
+	 * Set menu type
+	 *
+	 * @param string $menuType
+	 */
+	private function setMenuType($menuType)
+	{
+		$this->menuType = $menuType;
+	}
 
-		$this->setBaseUrl($this->getBaseUrl() ?: sprintf('%s?action=%s', $scripturl, $this->getAction()));
+	/**
+	 * @return bool
+	 */
+	public function isDropDownToggleable()
+	{
+		return $this->canToggleDropDown;
+	}
+
+	/**
+	 * Set toggle dropdown
+	 *
+	 * @param bool $canToggleDropDown
+	 */
+	private function setCanToggleDropDown($canToggleDropDown)
+	{
+		$this->canToggleDropDown = $canToggleDropDown;
+	}
+
+	/**
+	 * Get Layer name
+	 *
+	 * @return string
+	 */
+	public function getLayerName()
+	{
+		return $this->layerName;
+	}
+
+	/**
+	 * Set Layer name
+	 *
+	 * @param string $layerName
+	 */
+	private function setLayerName($layerName)
+	{
+		$this->layerName = $layerName;
+	}
+
+	/**
+	 * Get area value
+	 *
+	 * @return string
+	 */
+	public function getCurrentArea()
+	{
+		return $this->currentArea;
+	}
+
+	/**
+	 * Set area value
+	 *
+	 * @param string $currentArea
+	 */
+	private function setCurrentArea($currentArea)
+	{
+		$this->currentArea = $currentArea;
+	}
+
+	/**
+	 * Get session check
+	 *
+	 * @return bool
+	 */
+	public function isUrlSessionCheckDisabled()
+	{
+		return $this->disableUrlSessionCheck;
+	}
+
+	/**
+	 * Set session check
+	 *
+	 * @param bool $disableUrlSessionCheck
+	 */
+	private function setDisableUrlSessionCheck($disableUrlSessionCheck)
+	{
+		$this->disableUrlSessionCheck = $disableUrlSessionCheck;
+	}
+
+	/**
+	 * Get template name
+	 *
+	 * @return string
+	 */
+	public function getTemplateName()
+	{
+		return $this->templateName;
+	}
+
+	/**
+	 * Set template name
+	 *
+	 * @param string $templateName
+	 */
+	private function setTemplateName($templateName)
+	{
+		$this->templateName = $templateName;
+	}
+
+	/**
+	 * Get counter
+	 *
+	 * @return array
+	 */
+	public function getCounters()
+	{
+		return $this->counters;
+	}
+
+	/**
+	 * Set Counter
+	 *
+	 * @param array $counters
+	 */
+	private function setCounters($counters)
+	{
+		$this->counters = $counters;
 	}
 
 	/**
@@ -294,5 +329,43 @@ class MenuOptions
 		}
 
 		return $extraUrlParameters;
+	}
+
+	/**
+	 * Get URL parameters
+	 *
+	 * @return array
+	 */
+	public function getExtraUrlParameters()
+	{
+		return $this->extraUrlParameters;
+	}
+
+	/**
+	 * Set URL parameters
+	 *
+	 * @param array $extraUrlParameters
+	 */
+	private function setExtraUrlParameters($extraUrlParameters)
+	{
+		$this->extraUrlParameters = $extraUrlParameters;
+	}
+
+	/**
+	 * Get the hook name
+	 *
+	 * @return string
+	 */
+	public function getHook()
+	{
+		return $this->hook;
+	}
+
+	/**
+	 * @param $hook
+	 */
+	private function setHook($hook)
+	{
+		$this->hook = 'integrate_' . $hook . '_areas';
 	}
 }
