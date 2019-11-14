@@ -176,10 +176,15 @@ class PersonalMessage extends AbstractController
 	{
 		global $context, $txt;
 
-		$context['labels'] = explode(',', User::$settings['message_labels']);
+		$userLabels = explode(',', User::$settings['message_labels']);
 
-		foreach ($context['labels'] as $id_label => $label_name)
+		foreach ($userLabels as $id_label => $label_name)
 		{
+			if (empty($label_name))
+			{
+				continue;
+			}
+
 			$context['labels'][(int) $id_label] = array(
 				'id' => $id_label,
 				'name' => trim($label_name),
