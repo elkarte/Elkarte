@@ -340,7 +340,7 @@ function loadDefaultMenuButtons()
 					'title' => $txt['mydrafts'],
 					'href' => getUrl('profile', ['action' => 'profile', 'area' => 'showdrafts', 'u' => User::$info->id, 'name' => User::$info->name]),
 					'show' => !empty($modSettings['drafts_enabled']) && !empty($modSettings['drafts_post_enabled']) && allowedTo('post_draft'),
-						),
+				),
 				'forumprofile' => array(
 					'title' => $txt['forumprofile'],
 					'href' => getUrl('profile', ['action' => 'profile', 'area' => 'forumprofile', 'u' => User::$info->id, 'name' => User::$info->name]),

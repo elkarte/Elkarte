@@ -16,32 +16,41 @@ namespace ElkArte\Menu;
 /**
  * Class MenuArea
  *
- * This class implements a standard way of creating menus
+ * This class implements a standard way of creating the area menus
+ *
+ * areas is an named index as follows:
+ *   - array $permission  => Array of permissions to determine who can access this area
+ *   - string $label      => Optional text string for link (Otherwise $txt[$index] will be used)
+ *   - string $controller => Name of controller required for this area
+ *   - string $function   => Method in controller to call when area is selected
+ *   - string $icon       => File name of an icon to use on the menu, if using a class set as transparent.png
+ *   - string $class      => CSS class name to apply to the icon img, used to apply a sprite icon
+ *   - string $custom_url => URL to call for this menu item
+ *   - bool $enabled      => Should this area even be enabled / accessible?
+ *   - bool $hidden       => If the area is visible in the menu
+ *   - string $select     => If set, references another area
+ *   - array $subsections => Array of subsections for this menu area see MenuSubsections
  *
  * @package ElkArte\Menu
  */
 class MenuArea extends MenuItem
-{
+{	/** @var string $controller URL to use for this menu item. */
+	protected $controller = '';
+
 	/** @var callable $function function to call when area is selected. */
 	protected $function;
 
 	/** @var string $icon File name of an icon to use on the menu, if using the sprite class, set as transparent.png */
 	protected $icon = '';
 
-	/** @var string $controller URL to use for this menu item. */
-	protected $controller = '';
-
-	/** @var string $select References another area to be highlighted while this one is active */
-	public $select = '';
-
 	/** @var string $class Class name to apply to the icon img, used to apply a sprite icon */
 	protected $class = '';
 
-	/** @var bool $enabled Should this area even be accessible? */
-	protected $enabled = true;
-
 	/** @var bool $hidden Should this area be visible? */
 	protected $hidden = false;
+
+	/** @var string $select References another area to be highlighted while this one is active */
+	public $select = '';
 
 	/** @var array $subsections Array of subsections from this area. */
 	private $subsections = [];

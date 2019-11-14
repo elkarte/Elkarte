@@ -16,7 +16,13 @@ namespace ElkArte\Menu;
 /**
  * Class MenuSection
  *
- * This class implements a standard way of creating menus
+ * This class implements a standard way of creating the top section menu
+ *
+ * The array is a unnamed index array interpreted as follows,
+ *   - string $title      => Section title
+ *   - bool $enabled      => Is the section enabled / shown
+ *   - array $areas       => Array of areas within this menu section, each area options processed by MenuArea
+ *   - array $permission  => Permission required to access the whole section
  *
  * @package ElkArte\Menu
  */
