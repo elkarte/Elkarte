@@ -26,6 +26,9 @@ if [[ -f /var/www/apache-error.log ]]; then cat /var/www/apache-error.log; fi
 if [[ -f /var/log/apache-error.log ]]; then cat /var/log/apache-error.log; fi
 if [[ -f /var/log/apache2/apache-error.log ]]; then cat /var/log/apache2/apache-error.log; fi
 
+# Phpunit
+if [[ -f /tmp/phpunutlogfile.txt ]]; then cat /tmp/phpunutlogfile.txt; fi
+
 # Upload any selenium selfies
 if [[ "$COVERAGE" == "true"  && "$WEBTESTS" == "true" ]]
 then

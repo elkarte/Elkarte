@@ -10,6 +10,7 @@
 class TestAuthController extends ElkArteWebTest
 {
 	protected $backupGlobalsBlacklist = ['user_info'];
+
 	public function testAlive()
 	{
 		$this->url('index.php');

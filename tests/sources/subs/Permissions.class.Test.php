@@ -4,7 +4,7 @@
  * TestCase class for Permissions Class.
  */
 
-class TestPermissionsClass extends \PHPUnit\Framework\TestCase
+class TestPermissionsClass extends ElkArteCommonSetupTest
 {
 	public $permissionsObject;
 	private $illegal_permissions = array();
@@ -18,7 +18,7 @@ class TestPermissionsClass extends \PHPUnit\Framework\TestCase
 	 */
 	public function setUp()
 	{
-
+		parent::setUp();
 	}
 
 	/**
@@ -27,7 +27,7 @@ class TestPermissionsClass extends \PHPUnit\Framework\TestCase
 	 */
 	public function tearDown()
 	{
-
+		parent::tearDown();
 	}
 
 	/**

@@ -23,6 +23,7 @@ class TestMembers extends \PHPUnit\Framework\TestCase
 		global $txt;
 
 		$txt['guest_title'] = 'Guest';
+		$txt['ban_register_prohibited'] = 'Sorry, you are not allowed to register on this forum.';
 
 		require_once(SUBSDIR . '/Members.subs.php');
 

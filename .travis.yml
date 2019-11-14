@@ -69,3 +69,6 @@ after_script:
 # Output screen shots, error logs etc
 after_failure:
   - /var/www/tests/travis-ci/setup-failure.sh $DB $TRAVIS_PHP_VERSION $WEBTESTS $COVERAGE
+
+after_success:
+  - /var/www/tests/travis-ci/setup-failure.sh $DB $TRAVIS_PHP_VERSION $WEBTESTS $COVERAGE

@@ -38,7 +38,7 @@ abstract class ElkArteWebTest extends \PHPUnit_Extensions_Selenium2TestCase
 	 *
 	 * This method is used to configure the Selenium Server session, url/browser
 	 */
-	protected function setUp()
+	public function setUp()
 	{
 		// Set the browser to be used by Selenium, it must be available on localhost
 		$this->keysHolder = new PHPUnit_Extensions_Selenium2TestCase_KeysHolder();
@@ -53,7 +53,7 @@ abstract class ElkArteWebTest extends \PHPUnit_Extensions_Selenium2TestCase
 	/**
 	 * Any common teardown functions
 	 */
-	protected function tearDown()
+	public function tearDown()
 	{
 		$this->timeouts()->implicitWait(0);
 

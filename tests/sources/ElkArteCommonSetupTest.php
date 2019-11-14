@@ -17,7 +17,7 @@ abstract class ElkArteCommonSetupTest extends \PHPUnit\Framework\TestCase
 	/**
 	 * Initialize or add whatever necessary for these tests
 	 */
-	function setUp()
+	public function setUp()
 	{
 		global $modSettings, $settings;
 
@@ -49,6 +49,7 @@ abstract class ElkArteCommonSetupTest extends \PHPUnit\Framework\TestCase
 			'groups' => array(0 => 1),
 			'ignoreboards' => array(),
 			'avatar' => array('url' => '', 'name' => ''),
+			'permissions' => array('admin_forum'),
 		]);
 
 		$settings['page_index_template'] = array(

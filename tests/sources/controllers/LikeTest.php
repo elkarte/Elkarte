@@ -10,27 +10,13 @@ class TestLike extends ElkArteCommonSetupTest
 	/**
 	 * Initialize or add whatever necessary for these tests
 	 */
-	function setUp()
+	public function setUp()
 	{
 		parent::setup();
 
 		new ElkArte\Themes\ThemeLoader();
 		theme()->getTemplates()->loadLanguageFile('Profile', 'english', true, true);
 		theme()->getTemplates()->loadLanguageFile('Errors', 'english', true, true);
-	}
-
-	/**
-	 * Cleanup data we no longer need at the end of the tests in this class.
-	 *
-	 * tearDown() is run automatically by the testing framework after each test method.
-	 */
-	public function tearDown()
-	{
-		global $modSettings, $settings;
-
-		// remove temporary test data
-		unset($settings, $modSettings);
-		\ElkArte\User::$info = null;
 	}
 
 	/**

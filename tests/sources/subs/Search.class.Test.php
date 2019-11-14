@@ -25,7 +25,10 @@ class TestSearchclass extends \PHPUnit\Framework\TestCase
 		}
 
 		// This is here to cheat with allowedTo
-		\ElkArte\User::$info->is_admin = true;
+		\ElkArte\User::$info = new \ElkArte\ValuesContainer([
+			'is_admin' => true,
+			'is_guest' => false,
+		]);
 
 		// Create 2 boards
 		require_once(SUBSDIR . '/Boards.subs.php');
