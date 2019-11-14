@@ -631,7 +631,7 @@ class Profile extends AbstractController
 			);
 		}
 
-		if (!empty($this->_profile_include_data['current_subsection']) && $this->_profile_include_data['subsections'][$this->_profile_include_data['current_subsection']][0] !== $this->_profile_include_data['label'])
+		if (!empty($this->_profile_include_data['current_subsection']) && $this->_profile_include_data['subsections'][$this->_profile_include_data['current_subsection']]->getLabel() !== $this->_profile_include_data['label'])
 		{
 			$context['linktree'][] = array(
 				'url' => getUrl('profile', ['action' => 'profile', 'area' => $this->_profile_include_data['current_area'], 'sa' => $this->_profile_include_data['current_subsection'], 'u' => $this->_memID, 'name' => $this->_profile['real_name']]),
