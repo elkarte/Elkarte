@@ -17,7 +17,7 @@ class TestPBE extends \PHPUnit\Framework\TestCase
 	{
 		require_once(SUBSDIR . '/Emailpost.subs.php');
 
-		theme()->getTemplates()->loadLanguageFile('Maillist');
+		theme()->getTemplates()->loadLanguageFile('Maillist', 'english', true, true);
 		\ElkArte\User::$info = new \ElkArte\UserInfo(['name' => 'name']);
 
 		$this->_email = 'Return-Path: <noreply@elkarte.net>

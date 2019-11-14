@@ -13,7 +13,7 @@ class TestPost extends ElkArteCommonSetupTest
 	/**
 	 * Initialize or add whatever necessary for these tests
 	 */
-	function setUp()
+	public function setUp()
 	{
 		// Load in the common items so the system thinks we have an active login
 		parent::setUp();
@@ -22,16 +22,6 @@ class TestPost extends ElkArteCommonSetupTest
 		new ElkArte\Themes\ThemeLoader();
 		theme()->getTemplates()->loadLanguageFile('Profile', 'english', true, true);
 		theme()->getTemplates()->loadLanguageFile('Errors', 'english', true, true);
-	}
-
-	/**
-	 * Cleanup data we no longer need at the end of the tests in this class.
-	 *
-	 * tearDown() is run automatically by the testing framework after each test method.
-	 */
-	public function tearDown()
-	{
-		parent::tearDown();
 	}
 
 	/**

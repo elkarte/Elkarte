@@ -8,29 +8,40 @@
  */
 class TestGroups extends ElkArteCommonSetupTest
 {
+	protected $controller;
 	protected $backupGlobalsBlacklist = ['user_info'];
 
 	/**
 	 * Initialize or add whatever necessary for these tests
 	 */
-	function setUp()
+	public function setUp()
 	{
+		global 	$modSettings;
+
 		// Load in the common items so the system thinks we have an active login
 		parent::setUp();
+		parent::setSession();
+
+		$modSettings['latestMember'] = 1;
+		$modSettings['latestRealName'] = 'itsme';
 
 		new ElkArte\Themes\ThemeLoader();
 		theme()->getTemplates()->loadLanguageFile('Errors', 'english', true, true);
 		theme()->getTemplates()->loadLanguageFile('ManageMembers', 'english', true, true);
+		theme()->getTemplates()->loadLanguageFile('ModerationCenter', 'english', true, true);
+
+		// Get the controller
+		$this->controller = new \ElkArte\Controller\Groups(new \ElkArte\EventManager());
+		$this->controller->setUser(\ElkArte\User::$info);
+		$this->controller->pre_dispatch();
 	}
 
-	/**
-	 * Cleanup data we no longer need at the end of the tests in this class.
-	 *
-	 * tearDown() is run automatically by the testing framework after each test method.
-	 */
 	public function tearDown()
 	{
+		global $modSettings;
+
 		parent::tearDown();
+		unset($modSettings['latestMember'], $modSettings['latestRealName']);
 	}
 
 	/**
@@ -40,13 +51,8 @@ class TestGroups extends ElkArteCommonSetupTest
 	{
 		global $context;
 
-		// Get the controller
-		$controller = new \ElkArte\Controller\Groups(new \ElkArte\EventManager());
-		$controller->setUser(\ElkArte\User::$info);
-		$controller->pre_dispatch();
-
 		// Default action will be called, its list
-		$controller->action_index();
+		$this->controller->action_index();
 
 		// Check the action ran
 		$this->assertEquals('show_list', $context['sub_template']);
@@ -56,14 +62,9 @@ class TestGroups extends ElkArteCommonSetupTest
 	/**
 	 * Test getting the members of a group
 	 */
-	public function testActionMembers()
+	public function teestActionMembers()
 	{
 		global $context;
-
-		// Get the controller
-		$controller = new \ElkArte\Controller\Groups(new \ElkArte\EventManager());
-		$controller->setUser(\ElkArte\User::$info);
-		$controller->pre_dispatch();
 
 		// Set the form
 		$_req = \ElkArte\HttpReq::instance();
@@ -71,7 +72,7 @@ class TestGroups extends ElkArteCommonSetupTest
 		$_req->query['start'] = 0;
 
 		// List the members of group 1
-		$controller->action_members();
+		$this->controller->action_members();
 
 		// Check the action ran
 		$this->assertEquals(1, $context['members'][1]['id']);
