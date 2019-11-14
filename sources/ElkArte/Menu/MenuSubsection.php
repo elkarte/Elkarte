@@ -16,7 +16,7 @@ namespace ElkArte\Menu;
 /**
  * Class MenuSubsection
  *
- * This class implements a standard way of creating the subsections menus
+ * This class will set and access the menu subsection options. The supported options are:
  *
  * $subsections sub array is a unnamed index array interpreted as follows,
  *   - string 0     => Label for this subsection
@@ -35,21 +35,6 @@ class MenuSubsection extends MenuItem
 
 	/** @var string[] $active Set the button active for other subsections. */
 	protected $active = [];
-
-	/**
-	 * @param array $arr
-	 *
-	 * @return MenuSubsection
-	 */
-	protected function buildMoreFromArray($arr)
-	{
-		// These are special due to the non named index so there is no generic setter
-		$this->label = $arr[0];
-		$this->permission = isset($arr[1]) ? (array) $arr[1] : [];
-		$this->default = isset($arr[2]) ? (bool) $arr[2] : false;
-
-		return $this;
-	}
 
 	/**
 	 * @return boolean
@@ -87,6 +72,24 @@ class MenuSubsection extends MenuItem
 	public function setActive($active)
 	{
 		$this->active = $active;
+
+		return $this;
+	}
+
+	/**
+	 * Standard name for our function, but for subsections unique areas they are unnamed
+	 * index values and have to be processed as such.
+	 *
+	 * @param array $arr
+	 *
+	 * @return MenuSubsection
+	 */
+	public function buildMoreFromArray($arr)
+	{
+		// These are special due to the non named index so there is no generic setter
+		$this->label = $arr[0];
+		$this->permission = isset($arr[1]) ? (array) $arr[1] : [];
+		$this->default = isset($arr[2]) ? (bool) $arr[2] : false;
 
 		return $this;
 	}

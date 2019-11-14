@@ -115,6 +115,7 @@ class Menu
 
 	/**
 	 * Allow extend *any* menu with a single hook, should be called before addOptions and addMenuData
+	 * let in place for compatibility
 	 *
 	 * @param array $menuData
 	 * @param array $menuOptions
@@ -141,15 +142,20 @@ class Menu
 	}
 
 	/**
-	 * @param $menuData
+	 * Parses the supplied menu data in to the relevant menu array structure
+	 *
+	 * @param mixed[] $menuData the menu array
 	 */
 	public function addMenuData($menuData)
 	{
+		// Process each menu area's section/subsections
 		foreach ($menuData as $section_id => $section)
 		{
+			// $section['areas'] are the items under a menu button
 			$newAreas = ['areas' => []];
 			foreach ($section['areas'] as $area_id => $area)
 			{
+				// subsections are deeper menus inside of a area (3rd level menu)
 				$newSubsections = ['subsections' => []];
 				if (!empty($area['subsections']))
 				{
@@ -163,12 +169,15 @@ class Menu
 				$newAreas['areas'][$area_id] = MenuArea::buildFromArray($area + $newSubsections);
 			}
 
+			// Finally the menu button
 			unset($section['areas']);
 			$this->addSection($section_id, MenuSection::buildFromArray($section + $newAreas));
 		}
 	}
 
 	/**
+	 * Adds the built out menu sections/subsections to the menu
+	 *
 	 * @param string $id
 	 * @param MenuSection $section
 	 *
@@ -192,7 +201,7 @@ class Menu
 		// Build URLs first.
 		$this->menuContext['base_url'] = $this->menuOptions->getBaseUrl();
 		$this->menuContext['current_action'] = $this->menuOptions->getAction();
-		$this->currentArea = !empty($this->menuOptions->getCurrentArea()) ? $this->menuOptions->getCurrentArea() : $this->req->getQuery('area', 'trim|strval', $this->menuOptions->getCurrentArea());
+		$this->currentArea = !empty($this->menuOptions->getCurrentArea()) ? $this->menuOptions->getCurrentArea() : $this->req->getQuery('area', 'trim|strval', '');
 		$this->menuContext['extra_parameters'] = $this->menuOptions->buildAdditionalParams();
 
 		// Process the loopy menu data.
@@ -205,7 +214,7 @@ class Menu
 		if (empty($this->includeData))
 		{
 			// No valid areas -- reject!
-			throw new Exception('no_access');
+			throw new Exception('no_access', false);
 		}
 
 		// Finally - return information on the selected item.
@@ -365,11 +374,11 @@ class Menu
 	{
 		global $txt;
 
-		return !empty($area->getLabel()) || isset($txt[$areaId]);
+		return !empty($area->getLabel()) || (isset($txt[$areaId]) && !$area->getSelect());
 	}
 
 	/**
-	 * Uaw the current area, or pick it for them
+	 * Set the current area, or pick it for them
 	 *
 	 * @param string $sectionId
 	 * @param string $areaId
@@ -377,7 +386,7 @@ class Menu
 	 */
 	private function setFirstAreaCurrent($sectionId, $areaId, $area)
 	{
-		// If we don't have an area then the first valid one is our choice.
+		// If an area was not directly specified then the first valid one is our choice.
 		if (empty($this->currentArea))
 		{
 			$this->setAreaCurrent($sectionId, $areaId, $area);
@@ -480,6 +489,7 @@ class Menu
 				return $this->checkPermissions($sub) && $sub->isEnabled();
 			}
 		);
+
 		foreach ($subSections as $subId => $sub)
 		{
 			$this->menuContext['sections'][$sectionId]['areas'][$areaId]['subsections'][$subId] = [
@@ -545,7 +555,7 @@ class Menu
 	}
 
 	/**
-	 * Checks the menu item to see if it is the currently selected one
+	 * Checks the menu item to see if it is the one specified
 	 *
 	 * @param string $sectionId
 	 * @param string $areaId
@@ -553,7 +563,7 @@ class Menu
 	 */
 	private function checkCurrentSection($sectionId, $areaId, $area)
 	{
-		// Is this the current section?
+		// Is this the current selection?
 		if ($this->currentArea === $areaId && !$this->foundSection)
 		{
 			$this->setAreaCurrent($sectionId, $areaId, $area);

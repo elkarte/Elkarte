@@ -16,7 +16,7 @@ namespace ElkArte\Menu;
 /**
  * Class MenuArea
  *
- * This class implements a standard way of creating the area menus
+ * This class will set and access the menu area options. The supported options are:
  *
  * areas is an named index as follows:
  *   - array $permission  => Array of permissions to determine who can access this area
@@ -34,7 +34,11 @@ namespace ElkArte\Menu;
  * @package ElkArte\Menu
  */
 class MenuArea extends MenuItem
-{	/** @var string $controller URL to use for this menu item. */
+{
+	/** @var string $select References another area to be highlighted while this one is active */
+	public $select = '';
+
+	/** @var string $controller URL to use for this menu item. */
 	protected $controller = '';
 
 	/** @var callable $function function to call when area is selected. */
@@ -49,47 +53,8 @@ class MenuArea extends MenuItem
 	/** @var bool $hidden Should this area be visible? */
 	protected $hidden = false;
 
-	/** @var string $select References another area to be highlighted while this one is active */
-	public $select = '';
-
 	/** @var array $subsections Array of subsections from this area. */
 	private $subsections = [];
-
-	/**
-	 * @param array $arr
-	 *
-	 * @return MenuArea
-	 */
-	protected function buildMoreFromArray($arr)
-	{
-		if (isset($arr['custom_url']))
-		{
-			$this->setUrl($arr['custom_url']);
-		}
-
-		if (isset($arr['subsections']))
-		{
-			foreach ($arr['subsections'] as $var => $subsection)
-			{
-				$this->addSubsection($var, $subsection);
-			}
-		}
-
-		return $this;
-	}
-
-	/**
-	 * @param string $id
-	 * @param MenuSubsection $subsection
-	 *
-	 * @return $this
-	 */
-	public function addSubsection($id, $subsection)
-	{
-		$this->subsections[$id] = $subsection;
-
-		return $this;
-	}
 
 	/**
 	 * @return callable
@@ -225,5 +190,41 @@ class MenuArea extends MenuItem
 	public function getSubsections()
 	{
 		return $this->subsections;
+	}
+
+	/**
+	 * @param array $arr
+	 *
+	 * @return MenuArea
+	 */
+	protected function buildMoreFromArray($arr)
+	{
+		if (isset($arr['custom_url']))
+		{
+			$this->setUrl($arr['custom_url']);
+		}
+
+		if (isset($arr['subsections']))
+		{
+			foreach ($arr['subsections'] as $var => $subsection)
+			{
+				$this->addSubsection($var, $subsection);
+			}
+		}
+
+		return $this;
+	}
+
+	/**
+	 * @param string $id
+	 * @param MenuSubsection $subsection
+	 *
+	 * @return $this
+	 */
+	public function addSubsection($id, $subsection)
+	{
+		$this->subsections[$id] = $subsection;
+
+		return $this;
 	}
 }

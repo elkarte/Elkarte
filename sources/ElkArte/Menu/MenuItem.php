@@ -16,7 +16,7 @@ namespace ElkArte\Menu;
 /**
  * Class MenuItem
  *
- * This class implements a standard way of creating menus
+ * This class implements a standard way of setting/getting menu params
  *
  * @package ElkArte\Menu
  */
@@ -48,6 +48,7 @@ abstract class MenuItem
 		$arr['permission'] = isset($arr['permission']) ? (array) $arr['permission'] : [];
 		$vars = get_object_vars($obj);
 
+		// Call the setters with our supplied menu values
 		foreach (array_replace($vars, array_intersect_key($arr, $vars)) as $var => $val)
 		{
 			$obj->{'set' . ucfirst($var)}($val);

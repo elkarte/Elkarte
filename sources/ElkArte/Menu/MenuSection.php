@@ -16,7 +16,7 @@ namespace ElkArte\Menu;
 /**
  * Class MenuSection
  *
- * This class implements a standard way of creating the top section menu
+ * This class will set and access the menu section options. The supported options are:
  *
  * The array is a unnamed index array interpreted as follows,
  *   - string $title      => Section title
@@ -32,11 +32,19 @@ class MenuSection extends MenuItem
 	private $areas = [];
 
 	/**
+	 * @return array
+	 */
+	public function getAreas()
+	{
+		return $this->areas;
+	}
+
+	/**
 	 * @param array $arr
 	 *
 	 * @return MenuSection
 	 */
-	protected function buildMoreFromArray($arr)
+	public function buildMoreFromArray($arr)
 	{
 		if (isset($arr['title']))
 		{
@@ -65,13 +73,5 @@ class MenuSection extends MenuItem
 		$this->areas[$id] = $area;
 
 		return $this;
-	}
-
-	/**
-	 * @return array
-	 */
-	public function getAreas()
-	{
-		return $this->areas;
 	}
 }

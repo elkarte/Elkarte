@@ -31,7 +31,6 @@ namespace ElkArte\Menu;
  *  - template_name             => an alternative template to load (instead of Generic)
  *  - layer_name                => alternative layer name for the menu
  *  - hook                      => hook name to call integrate_ . 'hook name' . '_areas'
- *  - default_include_dir       => directory to include for function support
  *
  * @package ElkArte\Menu
  */
@@ -362,7 +361,9 @@ class MenuOptions
 	}
 
 	/**
-	 * @param $hook
+	 * Set the hook name
+	 *
+	 * @param string $hook
 	 */
 	private function setHook($hook)
 	{
