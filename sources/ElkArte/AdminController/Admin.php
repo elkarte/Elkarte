@@ -89,12 +89,6 @@ class Admin extends AbstractController
 		$admin_include_data = $this->loadMenu();
 		$this->buildLinktree($admin_include_data);
 
-		// Now - finally - call the right place!
-		if (isset($admin_include_data['file']))
-		{
-			require_once($admin_include_data['file']);
-		}
-
 		callMenu($admin_include_data);
 	}
 
@@ -587,18 +581,11 @@ class Admin extends AbstractController
 
 		$menuOptions = array(
 			'hook' => 'admin',
-			'default_include_dir' => ADMINDIR
 		);
 
 		// Actually create the menu!
 		$admin_include_data = createMenu($admin_areas, $menuOptions);
 		unset($admin_areas);
-
-		// Nothing valid?
-		if ($admin_include_data === false)
-		{
-			throw new Exception('no_access', false);
-		}
 
 		// Make a note of the Unique ID for this menu.
 		$context['admin_menu_id'] = $context['max_menu_id'];

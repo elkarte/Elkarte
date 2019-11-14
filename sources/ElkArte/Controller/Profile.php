@@ -81,12 +81,6 @@ class Profile extends AbstractController
 	private $_profile = null;
 
 	/**
-	 * Holds the create menu object
-	 * @var object
-	 */
-	private $_menu;
-
-	/**
 	 * Called before all other methods when coming from the dispatcher or
 	 * action class.
 	 */
@@ -222,12 +216,6 @@ class Profile extends AbstractController
 		elseif (!empty($this->_force_redirect))
 		{
 			redirectexit('action=profile' . ($context['user']['is_owner'] ? '' : ';u=' . $this->_memID) . ';area=' . $this->_current_area);
-		}
-
-		// Let go to the right place
-		if (isset($this->_profile_include_data['file']))
-		{
-			require_once($this->_profile_include_data['file']);
 		}
 
 		$this->_menu->callMenu($this->_profile_include_data);
@@ -551,7 +539,6 @@ class Profile extends AbstractController
 			'extra_url_parameters' => array(
 				'u' => $context['id_member'],
 			),
-			'default_include_dir' => CONTROLLERDIR,
 		);
 
 		// Setup the profile menu
