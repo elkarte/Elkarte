@@ -77,7 +77,7 @@ class PersonalMessage extends AbstractModule
 		$context['drafts_pm_save'] = !empty($modSettings['drafts_enabled']) && !empty($modSettings['drafts_pm_enabled']) && allowedTo('pm_draft');
 		$context['drafts_autosave'] = !empty($context['drafts_pm_save']) && !empty($modSettings['drafts_autosave_enabled']) && allowedTo('pm_autosave_draft');
 
-		if (!empty($modSettings['drafts_enabled']) && !empty($modSettings['drafts_post_enabled']))
+		if (!empty($modSettings['drafts_enabled']) && !empty($modSettings['drafts_pm_enabled']))
 		{
 			self::$_eventsManager = $eventsManager;
 			self::$_autosave_enabled = !empty($modSettings['drafts_autosave_enabled']);
@@ -118,7 +118,7 @@ class PersonalMessage extends AbstractModule
 		global $scripturl, $txt;
 
 		$pm_areas['folders']['areas'] = elk_array_insert($pm_areas['folders']['areas'], 'sent', array(
-			'drafts' => array(
+			'showpmdrafts' => array(
 				'label' => $txt['drafts_show'],
 				'custom_url' => $scripturl . '?action=pm;sa=showpmdrafts',
 				'permission' => 'pm_draft',
