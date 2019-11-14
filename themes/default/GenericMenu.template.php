@@ -1,15 +1,14 @@
 <?php
 
 /**
- * @name      ElkArte Forum
+ * @package   ElkArte Forum
  * @copyright ElkArte Forum contributors
- * @license   BSD http://opensource.org/licenses/BSD-3-Clause
+ * @license   BSD http://opensource.org/licenses/BSD-3-Clause (see accompanying LICENSE.txt file)
  *
  * This file contains code covered by:
- * copyright:	2011 Simple Machines (http://www.simplemachines.org)
- * license:  	BSD, See included LICENSE.TXT for terms and conditions.
+ * copyright: 2011 Simple Machines (http://www.simplemachines.org)
  *
- * @version 1.1
+ * @version 2.0 dev
  *
  */
 
@@ -42,7 +41,9 @@ function template_generic_menu_sidebar_above()
 		{
 			// Not supposed to be printed?
 			if (empty($area['label']))
+			{
 				continue;
+			}
 
 			echo '
 				<li class="listlevel1', !empty($area['subsections']) ? ' subsections"  aria-haspopup="true"' : '"', '>
@@ -57,7 +58,9 @@ function template_generic_menu_sidebar_above()
 				foreach ($area['subsections'] as $sub)
 				{
 					if (!empty($sub['disabled']))
+					{
 						continue;
+					}
 
 					echo '
 						<li class="listlevel2">
@@ -84,7 +87,9 @@ function template_generic_menu_sidebar_above()
 
 	// If there are any "tabs" setup, this is the place to shown them.
 	if (empty($context['force_disable_tabs']))
+	{
 		template_generic_menu_tabs($menu_context['tab_data']);
+	}
 }
 
 /**
@@ -121,11 +126,14 @@ function template_generic_menu_dropdown_above()
 
 		// For every area of this section show a link to that area (bold if it's currently selected.)
 		// @todo Code for additional_items class was deprecated and has been removed. Suggest following up in Sources if required.
+		$section['areas'] = isset($section['areas']) ? $section['areas'] : [];
 		foreach ($section['areas'] as $area)
 		{
 			// Not supposed to be printed?
 			if (empty($area['label']))
+			{
 				continue;
+			}
 
 			echo '
 							<li class="listlevel2', !empty($area['subsections']) ? ' subsections" aria-haspopup="true"' : '"', '>
@@ -140,7 +148,9 @@ function template_generic_menu_dropdown_above()
 				foreach ($area['subsections'] as $sub)
 				{
 					if (!empty($sub['disabled']))
+					{
 						continue;
+					}
 
 					echo '
 									<li class="listlevel3">
@@ -169,7 +179,10 @@ function template_generic_menu_dropdown_above()
 				<div id="admin_content">';
 
 	// It's possible that some pages have their own tabs they wanna force...
-	template_generic_menu_tabs($menu_context['tab_data']);
+	if (isset($menu_context['tab_data']))
+	{
+		template_generic_menu_tabs($menu_context['tab_data']);
+	}
 }
 
 /**
@@ -198,16 +211,21 @@ function template_generic_menu_tabs($tab_context)
 
 		// Show an icon and/or a help item?
 		if (!empty($tab_context['icon']))
+		{
 			echo '
 						<img src="', $settings['images_url'], '/icons/', $tab_context['icon'], '" alt="" class="icon" />';
-
+		}
 		elseif (!empty($tab_context['class']))
+		{
 			echo '
 						<span class="hdicon cat_img_', $tab_context['class'], '"></span>';
+		}
 
 		if (!empty($tab_context['help']))
+		{
 			echo '
 						<a class="hdicon cat_img_helptopics help" href="', $scripturl, '?action=quickhelp;help=', $tab_context['help'], '" onclick="return reqOverlayDiv(this.href);" label="', $txt['help'], '"></a>';
+		}
 
 		echo '
 						', $tab_context['title'], '
@@ -216,16 +234,21 @@ function template_generic_menu_tabs($tab_context)
 		// The function is in Admin.template.php, but since this template is used elsewhere,
 		// we need to check if the function is available.
 		if (function_exists('template_admin_quick_search'))
+		{
 			template_admin_quick_search();
+		}
+
 		echo '
 					</div>';
 	}
 
 	if (!empty($tab_context['description']))
+	{
 		echo '
 					<p class="description">
 						', $tab_context['description'], '
 					</p>';
+	}
 
 	// Print out all the items in this tab (if any).
 	if (!empty($tab_context['tabs']))
@@ -237,7 +260,9 @@ function template_generic_menu_tabs($tab_context)
 		foreach ($tab_context['tabs'] as $tab)
 		{
 			if (!empty($tab['disabled']))
+			{
 				continue;
+			}
 
 			echo '
 						<li class="listlevel1">
