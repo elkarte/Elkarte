@@ -79,14 +79,14 @@ abstract class BaseMenuTest extends ElkArteCommonSetupTest
 		global $context;
 
 		$this->createMenu();
-				$result = $context['menu_data_' . $context['max_menu_id']];
+		$result = $context['menu_data_' . $context['max_menu_id']];
 		$this->assertSame(1, $context['max_menu_id']);
 		$this->assertSame('random', $result['current_action']);
 		$this->assertSame('section1', $result['current_section']);
 		$this->assertSame('area1', $result['current_area']);
 
 		$this->prepareMenu();
-		$this->addOptions(['action' => 'section2', 'area' => 'area3']);
+		$this->addOptions(['action' => 'section2', 'current_area' => 'area3']);
 		$this->createMenu();
 		$result = $context['menu_data_' . $context['max_menu_id']];
 		$this->assertSame(2, $context['max_menu_id']);
@@ -110,7 +110,7 @@ abstract class BaseMenuTest extends ElkArteCommonSetupTest
 	{
 		global $context;
 
-		$this->addOptions(['area' => 'area2']);
+		$this->addOptions(['current_area' => 'area2']);
 		$this->createMenu();
 		$result = $context['menu_data_' . $context['max_menu_id']];
 		$this->assertSame('area3', $result['current_area']);
@@ -121,7 +121,7 @@ abstract class BaseMenuTest extends ElkArteCommonSetupTest
 	{
 		global $context;
 
-		$this->addOptions(['area' => 'area2']);
+		$this->addOptions(['current_area' => 'area2']);
 		$this->createMenu();
 		$result = $context['menu_data_' . $context['max_menu_id']];
 		$this->assertSame('area3', $result['current_area']);

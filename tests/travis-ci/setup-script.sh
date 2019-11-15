@@ -40,7 +40,7 @@ then
 fi
 
 echo 'Running PHPUnit tests'
-/var/www/vendor/bin/phpunit ${CONFIG} ${COVER} > /tmp/phpunutlogfile.txt
+/var/www/vendor/bin/phpunit ${CONFIG} ${COVER}
 
 # Run validation (lock file)
 #if [[ "$SHORT_DB" != "none" ]]; then /var/www/vendor/bin/phpunit /var/www/tests/travis-ci/BootstrapRunTestExt.php; fi

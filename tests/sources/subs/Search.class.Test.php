@@ -39,6 +39,8 @@ class TestSearchclass extends \PHPUnit\Framework\TestCase
 			'target_category' => 1,
 			'access_groups' => [0,1],
 			'deny_groups' => [],
+			'profile' => '1',
+			'inherit_permissions' => false,
 		]);
 		$this->board_limited_access = createBoard([
 			'board_name' => 'Search 2',
@@ -47,6 +49,8 @@ class TestSearchclass extends \PHPUnit\Framework\TestCase
 			'target_category' => 1,
 			'access_groups' => [1],
 			'deny_groups' => [],
+			'profile' => '1',
+			'inherit_permissions' => false,
 		]);
 
 		// Create 3 users (actually 2)

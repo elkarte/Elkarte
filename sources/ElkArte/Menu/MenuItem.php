@@ -39,10 +39,11 @@ abstract class MenuItem
 
 	/**
 	 * @param array $arr
+	 * @param string $sa
 	 *
 	 * @return MenuItem
 	 */
-	public static function buildFromArray($arr)
+	public static function buildFromArray($arr, $sa = '')
 	{
 		$obj = new static;
 		$arr['permission'] = isset($arr['permission']) ? (array) $arr['permission'] : [];
@@ -54,7 +55,8 @@ abstract class MenuItem
 			$obj->{'set' . ucfirst($var)}($val);
 		}
 
-		$obj->buildMoreFromArray($arr);
+		// Account for any special setters
+		$obj->buildMoreFromArray($arr, $sa);
 
 		return $obj;
 	}

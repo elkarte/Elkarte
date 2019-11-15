@@ -179,9 +179,27 @@ class MenuArea extends MenuItem
 	/**
 	 * @return array
 	 */
-	public function toArray()
+	public function toArray($obj)
 	{
-		return get_object_vars($this);
+		if (is_object($obj))
+		{
+			$obj = get_object_vars($obj);
+		}
+
+		if (is_array($obj))
+		{
+			$new = array();
+			foreach ($obj as $key => $val)
+			{
+				$new[$key] = $this->toArray($val);
+			}
+		}
+		else
+		{
+			$new = $obj;
+		}
+
+		return $new;
 	}
 
 	/**

@@ -3,7 +3,7 @@
 /**
  * TestCase class for menu subs.
  */
-class TestMenuSubs extends ElkArteCommonSetupTest
+class TestMenuSubs extends \PHPUnit\Framework\TestCase
 {
 	protected $test_areas;
 	protected $test_options;
@@ -14,12 +14,9 @@ class TestMenuSubs extends ElkArteCommonSetupTest
 	 *
 	 * setUp() is run automatically by the testing framework before each test method.
 	 */
-	public function setUp()
+	protected function setUp()
 	{
 		global $context;
-
-		parent::setUp();
-		$this->setSession();
 
 		require_once(SUBSDIR . '/Menu.subs.php');
 
@@ -90,13 +87,21 @@ class TestMenuSubs extends ElkArteCommonSetupTest
 		// Set our menu options
 		$this->test_options = array(
 			'hook' => 'test',
-			'default_include_dir' => ADMINDIR,
-			'extra_url_parameters' => array('extra' => 'param')
+			'extra_url_parameters' => array('extra' => 'param'),
+			'action' => 'section1',
+			'current_area' => 'area1'
 		);
 
 		// Stuff the ballet box
+		$context['session_var'] = 'abcde';
+		$context['session_id'] = '123456789';
 		$context['right_to_left'] = false;
-		$context['current_action'] = 'section1';
+
+		// Your the admin now
+		\ElkArte\User::$info = new \ElkArte\ValuesContainer([
+			'is_admin' => true,
+			'is_guest' => false,
+		]);
 	}
 
 	/**
@@ -105,7 +110,6 @@ class TestMenuSubs extends ElkArteCommonSetupTest
 	 */
 	public function tearDown()
 	{
-		parent::tearDown();
 		destroyMenu('last');
 	}
 
@@ -122,10 +126,12 @@ class TestMenuSubs extends ElkArteCommonSetupTest
 		// Setup the menu
 		$test_include_data = createMenu($this->test_areas, $this->test_options);
 
-		$expected = array(
-			'label' => 'Area1 Label', 'controller' => 'Area1_Controller', 'function' => 'action_area1',
-			'icon' => 'transparent.png', 'class' => 'test_img_area1', 'current_action' => 'section1',
-			'current_area' => 'area1', 'current_section' => 'section1', 'current_subsection' => '');
+		$expected = array('select' => '', 'controller' => 'Area1_Controller', 'function' => 'action_area1',
+			'icon' => 'transparent.png', 'class' => 'test_img_area1', 'hidden' => false, 'subsections' => array(),
+			'label' => 'Area1 Label', 'counter' => '', 'url' => 'http://127.0.0.1/index.php?action=section1;area=area1;extra=param;abcde=123456789',
+			'permission' => array(), 'enabled' => true, 'current_action' => 'section1', 'current_area' => 'area1',
+			'current_section' => 'section1', 'current_subsection' => ''
+		);
 
 		$this->assertSame($expected, $test_include_data);
 	}
@@ -140,12 +146,15 @@ class TestMenuSubs extends ElkArteCommonSetupTest
 		$test_include_data = createMenu($this->test_areas, $this->test_options);
 
 		$expected = array(
-			'permission' => 'area3 permission', 'label' => 'Area3 Label', 'controller' => 'Area3_Controller',
-			'function' => 'action_area3', 'icon' => 'transparent.png', 'class' => 'test_img_area3',
+			'select' => '', 'controller' => 'Area3_Controller', 'function' => 'action_area3',
+			'icon' => 'transparent.png', 'class' => 'test_img_area3', 'hidden' => false,
 			'subsections' => array(
-				'sub1' => array('Sub One', 'url' => 'some url', 'active' => true),
-				'sub2' => Array('Sub Two', 'enabled' => false)),
-			'current_action' => 'section2', 'current_area' => 'area3', 'current_section' => 'section2', 'current_subsection' => 'sub1');
+				'sub1' => array('label' => 'Sub One', 'counter' => '', 'url' => 'some url', 'permission' => array(), 'enabled' => true),
+				'sub2' => array('label' => 'Sub Two', 'counter' => '', 'url' => '', 'permission' => array(), 'enabled' => false),
+			),
+			'label' => 'Area3 Label', 'counter' => '', 'url' => 'http://127.0.0.1/index.php?action=section2;area=area3;extra=param;abcde=123456789',
+			'permission' => array(0 => 'area3 permission'),
+			'enabled' => true, 'current_action' => 'section2', 'current_area' => 'area3', 'current_section' => 'section2', 'current_subsection' => 'sub1');
 
 		$this->assertSame($expected, $test_include_data);
 	}
@@ -171,11 +180,10 @@ class TestMenuSubs extends ElkArteCommonSetupTest
 		$this->assertArrayNotHasKey('section3', $result['sections']);
 
 		// this subsection was disabled
-		$this->assertEquals(true, $result['sections']['section2']['areas']['area3']['subsections']['sub2']['disabled']);
+		$this->assertArrayNotHasKey('sub2', $result['sections']['section2']['areas']['area3']['subsections']);
 
 		// this subsection has a url and was enabled
 		$this->assertEquals('some url', $result['sections']['section2']['areas']['area3']['subsections']['sub1']['url']);
-		$this->assertEquals(true, $result['sections']['section2']['areas']['area3']['subsections']['sub1']['is_first']);
 
 		// section 2 areas->area2 is hidden so should not be here
 		$this->assertArrayNotHasKey('area2', $result['sections']['section2']['areas']);
@@ -211,7 +219,7 @@ class TestMenuSubs extends ElkArteCommonSetupTest
 
 		// Section 3 should now appear, and be updated
 		$this->assertArrayHasKey('section3', $result['sections']);
-		$this->assertEquals('ThreeNew', $result['sections']['section3']['title']);
+		$this->assertEquals('ThreeNew', $result['sections']['section3']['label']);
 	}
 
 	public function testMenuAdd()
@@ -249,7 +257,7 @@ class TestMenuSubs extends ElkArteCommonSetupTest
 
 		// Section 4 should now appear, and area 6 selected
 		$this->assertArrayHasKey('section4', $result['sections']);
-		$this->assertEquals('Four', $result['sections']['section4']['title']);
+		$this->assertEquals('Four', $result['sections']['section4']['label']);
 		$this->assertEquals('Area6 Label', $test_include_data['label']);
 	}
 

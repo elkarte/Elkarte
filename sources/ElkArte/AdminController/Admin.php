@@ -612,7 +612,7 @@ class Admin extends AbstractController
 			'name' => $txt['admin_center'],
 		);
 
-		if (isset($admin_include_data['current_area']) && $admin_include_data['current_area'] !== 'index')
+		if (isset($admin_include_data['current_area']) && $admin_include_data['current_area'] != 'index')
 		{
 			$context['linktree'][] = array(
 				'url' => getUrl('admin', ['action' => 'admin', 'area' => $admin_include_data['current_area'], '{session_data}']),
@@ -620,11 +620,12 @@ class Admin extends AbstractController
 			);
 		}
 
-		if (!empty($admin_include_data['current_subsection']) && $admin_include_data['subsections'][$admin_include_data['current_subsection']][0] != $admin_include_data['label'])
+		if (isset($admin_include_data['current_subsection'], $admin_include_data['subsections'][$admin_include_data['current_subsection']])
+			&& $admin_include_data['subsections'][$admin_include_data['current_subsection']]['label'] != $admin_include_data['label'])
 		{
 			$context['linktree'][] = array(
 				'url' => getUrl('admin', ['action' => 'admin', 'area' => $admin_include_data['current_area'], 'sa' => $admin_include_data['current_subsection'], '{session_data}']),
-				'name' => $admin_include_data['subsections'][$admin_include_data['current_subsection']][0],
+				'name' => $admin_include_data['subsections'][$admin_include_data['current_subsection']]['label'],
 			);
 		}
 	}

@@ -218,7 +218,7 @@ class Profile extends AbstractController
 			redirectexit('action=profile' . ($context['user']['is_owner'] ? '' : ';u=' . $this->_memID) . ';area=' . $this->_current_area);
 		}
 
-		$this->_menu->callMenu($this->_profile_include_data);
+		callMenu($this->_profile_include_data);
 
 		// Set the page title if it's not already set...
 		if (!isset($context['page_title']))
@@ -541,14 +541,8 @@ class Profile extends AbstractController
 			),
 		);
 
-		// Setup the profile menu
-		$this->_menu = Menu::instance();
-		$this->_menu->addOptions($menuOptions);
-		$this->_menu->addAreas($profile_areas);
-
-		// Create the menu, calling integrate_profile_areas at the start
-		$this->_profile_include_data = $this->_menu->prepareMenu();
-		$this->_menu->setContext();
+		// Actually create the menu!
+		$this->_profile_include_data = createMenu($profile_areas, $menuOptions);
 		unset($profile_areas);
 	}
 
@@ -618,11 +612,11 @@ class Profile extends AbstractController
 			);
 		}
 
-		if (!empty($this->_profile_include_data['current_subsection']) && $this->_profile_include_data['subsections'][$this->_profile_include_data['current_subsection']]->getLabel() !== $this->_profile_include_data['label'])
+		if (!empty($this->_profile_include_data['current_subsection']) && $this->_profile_include_data['subsections'][$this->_profile_include_data['current_subsection']]['label'] !== $this->_profile_include_data['label'])
 		{
 			$context['linktree'][] = array(
 				'url' => getUrl('profile', ['action' => 'profile', 'area' => $this->_profile_include_data['current_area'], 'sa' => $this->_profile_include_data['current_subsection'], 'u' => $this->_memID, 'name' => $this->_profile['real_name']]),
-				'name' => $this->_profile_include_data['subsections'][$this->_profile_include_data['current_subsection']][0],
+				'name' => $this->_profile_include_data['subsections'][$this->_profile_include_data['current_subsection']]['label'],
 			);
 		}
 	}

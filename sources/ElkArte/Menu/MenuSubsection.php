@@ -81,15 +81,22 @@ class MenuSubsection extends MenuItem
 	 * index values and have to be processed as such.
 	 *
 	 * @param array $arr
+	 * @param string $sa
 	 *
 	 * @return MenuSubsection
 	 */
-	public function buildMoreFromArray($arr)
+	public function buildMoreFromArray($arr, $sa)
 	{
 		// These are special due to the non named index so there is no generic setter
 		$this->label = $arr[0];
 		$this->permission = isset($arr[1]) ? (array) $arr[1] : [];
 		$this->default = isset($arr[2]) ? (bool) $arr[2] : false;
+
+		// Support for boolean here, wrong but has been used
+		if ($this->getActive() === true)
+		{
+			$this->setActive([$sa]);
+		}
 
 		return $this;
 	}

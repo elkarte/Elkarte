@@ -310,7 +310,7 @@ class ModerationCenter extends AbstractController
 		{
 			$context['linktree'][] = array(
 				'url' => $scripturl . '?action=moderate;area=' . $mod_include_data['current_area'] . ';sa=' . $mod_include_data['current_subsection'],
-				'name' => $mod_include_data['subsections'][$mod_include_data['current_subsection']][0],
+				'name' => $mod_include_data['subsections'][$mod_include_data['current_subsection']]['label'],
 			);
 		}
 

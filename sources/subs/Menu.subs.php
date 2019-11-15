@@ -135,10 +135,11 @@ function destroyMenu($menu_id = 'last')
  * @param array $selectedMenu
  * @throws \ElkArte\Exceptions\Exception
  */
-function callMenu(array $selectedMenu)
+function callMenu($selectedMenu)
 {
 	global $context;
 
+	// Some help for the profile menu
 	if (!empty($context['user']['is_owner']) && isset($selectedMenu['permission']))
 	{
 		unset($selectedMenu['permission']);

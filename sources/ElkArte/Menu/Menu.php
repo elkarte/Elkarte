@@ -115,7 +115,7 @@ class Menu
 
 	/**
 	 * Allow extend *any* menu with a single hook, should be called before addOptions and addMenuData
-	 * let in place for compatibility
+	 * left in place for compatibility
 	 *
 	 * @param array $menuData
 	 * @param array $menuOptions
@@ -161,7 +161,7 @@ class Menu
 				{
 					foreach ($area['subsections'] as $sa => $sub)
 					{
-						$newSubsections['subsections'][$sa] = MenuSubsection::buildFromArray($sub);
+						$newSubsections['subsections'][$sa] = MenuSubsection::buildFromArray($sub, $sa);
 						unset($area['subsections']);
 					}
 				}
@@ -250,7 +250,7 @@ class Menu
 	/**
 	 * Determines if the user has the permissions to access the section/area
 	 *
-	 * If said item did not provide any permission to check, fullly
+	 * If said item did not provide any permission to check, fully
 	 * unfettered access is assumed.
 	 *
 	 * The profile areas are a bit different in that each permission is
@@ -405,7 +405,7 @@ class Menu
 		// Update the context if required - as we can have areas pretending to be others. ;)
 		$this->menuContext['current_section'] = $sectionId;
 		$this->currentArea = $area->getSelect() ?: $areaId;
-		$this->includeData = $area->toArray();
+		$this->includeData = $area->toArray($area);
 	}
 
 	/**
@@ -482,14 +482,15 @@ class Menu
 	{
 		$this->menuContext['sections'][$sectionId]['areas'][$areaId]['subsections'] = [];
 
-		// For each subsection process the options
+		// Clear out ones not enabled or accessible
 		$subSections = array_filter(
 			$area->getSubsections(),
 			function ($sub) {
-				return $this->checkPermissions($sub) && $sub->isEnabled();
+				return $sub->isEnabled() && $this->checkPermissions($sub);
 			}
 		);
 
+		// For each subsection process the options
 		foreach ($subSections as $subId => $sub)
 		{
 			$this->menuContext['sections'][$sectionId]['areas'][$areaId]['subsections'][$subId] = [
@@ -644,8 +645,12 @@ class Menu
 			);
 
 			// Has it been deemed selected?
-			$tabContext = array_merge($tabContext, $tabContext['tabs'][$this->currentSubaction]);
+			if (isset($tabContext['tabs'][$this->currentSubaction]))
+			{
+				$tabContext = array_merge($tabContext, $tabContext['tabs'][$this->currentSubaction]);
+			}
 		}
+
 	}
 
 	/**
