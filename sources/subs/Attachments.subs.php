@@ -317,6 +317,11 @@ function createAttachment(&$attachmentOptions)
 	if ($is_image)
 	{
 		$attachmentOptions['mime_type'] = getValidMimeImageType($size[2]);
+		// Want to correct for phonetographer photos?
+		if (!empty($modSettings['attachment_autorotate']))
+		{
+			$image->autoRotate();
+		}
 	}
 
 	// Get the hash if no hash has been given yet.
@@ -761,6 +766,11 @@ function saveAvatar($temporary_path, $memID, $max_width, $max_height)
 
 	// Resize it.
 	$image = new Image($temporary_path);
+	// Want to correct for phonetographer photos?
+	if (!empty($modSettings['attachment_autorotate']))
+	{
+		$image->autoRotate();
+	}
 	$thumb_image = $image->createThumbnail($max_width, $max_height, $destName, $format);
 	if ($thumb_image !== false)
 	{
@@ -1090,6 +1100,7 @@ function updateAttachmentThumbnail($filename, $id_attach, $id_msg, $old_id_thumb
 	$attachment = array('id_attach' => $id_attach);
 
 	$image = new Image($filename);
+	// Image is not autorotated because it was at the time of upload (hopefully)
 	$thumb_filename = (!empty($real_filename) ? $real_filename : $filename) . '_thumb';
 	$thumb_image = $image->createThumbnail($modSettings['attachmentThumbWidth'], $modSettings['attachmentThumbHeight'], $thumb_filename);
 	if ($thumb_image !== false)

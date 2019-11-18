@@ -170,12 +170,6 @@ class Image
 		$max_width = max(16, $max_width);
 		$max_height = max(16, $max_height);
 
-		// Spin it if needed
-		if (!empty($modSettings['attachment_autorotate']))
-		{
-			$this->autoRotateImage();
-		}
-
 		// Do the actual resize, thumbnails by default strip EXIF data to save space
 		$success = $this->resizeImage($max_width, $max_height, true);
 

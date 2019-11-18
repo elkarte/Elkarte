@@ -662,6 +662,11 @@ class Attachment extends AbstractController
 		{
 			// Create a thumbnail image and write it directly to the screen
 			$image = new Image();
+			// Maybe overkill, but want to correct for phonetographer photos?
+			if (!empty($modSettings['attachment_autorotate']))
+			{
+				$image->autoRotate();
+			}
 			$filename = $filename . '_thumb';
 			$image->createThumbnail(100, 100, $filename);
 		}
