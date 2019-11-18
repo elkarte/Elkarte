@@ -177,29 +177,18 @@ class MenuArea extends MenuItem
 	}
 
 	/**
+	 * Converts an object and any branches to an array, recursive.
+	 *
 	 * @return array
 	 */
 	public function toArray($obj)
 	{
-		if (is_object($obj))
+		if (!is_object($obj) && !is_array($obj))
 		{
-			$obj = get_object_vars($obj);
+			return $obj;
 		}
 
-		if (is_array($obj))
-		{
-			$new = array();
-			foreach ($obj as $key => $val)
-			{
-				$new[$key] = $this->toArray($val);
-			}
-		}
-		else
-		{
-			$new = $obj;
-		}
-
-		return $new;
+		return array_map(array($this, 'toArray'), is_array($obj) ? $obj : get_object_vars($obj));
 	}
 
 	/**

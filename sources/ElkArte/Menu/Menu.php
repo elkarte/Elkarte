@@ -90,47 +90,6 @@ class Menu
 	}
 
 	/**
-	 * Recipe compatibility, calls the methods in proper sequence to create a menu
-	 *
-	 * @param array $menuOptions
-	 * @param array $menuData
-	 * @return array
-	 * @throws \ElkArte\Exceptions\Exception
-	 */
-	public function createMenu($menuData, $menuOptions)
-	{
-		// Allow integration to modify as needed
-		$this->callHook($menuData, $menuOptions);
-
-		// Process options and data
-		$this->addOptions($menuOptions);
-		$this->addMenuData($menuData);
-
-		// Return the results
-		$include_data = $this->prepareMenu();
-		$this->setContext();
-
-		return $include_data;
-	}
-
-	/**
-	 * Allow extend *any* menu with a single hook, should be called before addOptions and addMenuData
-	 * left in place for compatibility
-	 *
-	 * @param array $menuData
-	 * @param array $menuOptions
-	 * @return array
-	 */
-	public function callHook(&$menuData, &$menuOptions)
-	{
-		// Allow extend *any* menu with a single hook
-		if (!empty($menuOptions['hook']))
-		{
-			call_integration_hook('integrate_' . $menuOptions['hook'] . '_areas', array(&$menuData, &$menuOptions));
-		}
-	}
-
-	/**
 	 * Add the base menu options for this menu
 	 *
 	 * @param array $menuOptions an array of options that can be used to override some default
@@ -191,13 +150,16 @@ class Menu
 	}
 
 	/**
-	 * Create a menu
+	 * Create a menu.  Expects that addOptions and addMenuData (or equivalent) have been called
 	 *
 	 * @return array
 	 * @throws \ElkArte\Exceptions\Exception
 	 */
 	public function prepareMenu()
 	{
+		// If options set a hook, give it call
+		$this->callHook();
+
 		// Build URLs first.
 		$this->menuContext['base_url'] = $this->menuOptions->getBaseUrl();
 		$this->menuContext['current_action'] = $this->menuOptions->getAction();
@@ -224,6 +186,18 @@ class Menu
 				'current_section' => !empty($this->menuContext['current_section']) ? $this->menuContext['current_section'] : '',
 				'current_subsection' => $this->currentSubaction,
 			];
+	}
+
+	/**
+	 * Allow extend *any* menu with a single hook
+	 */
+	public function callHook()
+	{
+		// Allow extend *any* menu with a single hook
+		if ($this->menuOptions->getHook())
+		{
+			call_integration_hook($this->menuOptions->getHook(), array($this));
+		}
 	}
 
 	/**
@@ -291,10 +265,11 @@ class Menu
 	{
 		global $txt;
 
+		$firstArea = key($section->getAreas());
 		$this->menuContext['sections'][$sectionId] = [
 			'id' => $sectionId,
 			'label' => ($section->getLabel() ?: $txt[$sectionId]) . $this->parseCounter($section, 0),
-			'url' => $this->menuContext['base_url'] . $this->menuContext['extra_parameters'],
+			'url' => $this->menuContext['base_url'] . ';area=' . $firstArea . $this->menuContext['extra_parameters'],
 		];
 	}
 
@@ -374,7 +349,7 @@ class Menu
 	{
 		global $txt;
 
-		return !empty($area->getLabel()) || (isset($txt[$areaId]) && !$area->getSelect());
+		return !empty($area->getLabel()) || isset($txt[$areaId]);
 	}
 
 	/**
@@ -633,15 +608,22 @@ class Menu
 	{
 		global $context;
 
-		// Handy shortcut.
+		// Handy shortcuts.
 		$tabContext = &$context['menu_data_' . $this->maxMenuId]['tab_data'];
+		$currentArea = $this->menuContext['sections'][$this->menuContext['current_section']]['areas'][$this->currentArea];
+
+		// Subsections of the current ara are tabs unless we are told otherwise.
+		if (!isset($tabContext['tabs']))
+		{
+			$tabContext['tabs'] = $currentArea['subsections'] ?: array();
+		}
 
 		// Tabs are really just subactions.
-		if (isset($tabContext['tabs'], $this->menuContext['sections'][$this->menuContext['current_section']]['areas'][$this->currentArea]['subsections']))
+		if (isset($tabContext['tabs'], $currentArea['subsections']))
 		{
 			$tabContext['tabs'] = array_replace_recursive(
 				$tabContext['tabs'],
-				$this->menuContext['sections'][$this->menuContext['current_section']]['areas'][$this->currentArea]['subsections']
+				$currentArea['subsections']
 			);
 
 			// Has it been deemed selected?
@@ -650,7 +632,6 @@ class Menu
 				$tabContext = array_merge($tabContext, $tabContext['tabs'][$this->currentSubaction]);
 			}
 		}
-
 	}
 
 	/**

@@ -75,7 +75,21 @@ use ElkArte\Menu\Menu;
 function createMenu($menuData, $menuOptions = [])
 {
 	$menu = new Menu();
-	$include_data = $menu->createMenu($menuData, $menuOptions);
+
+	// Call the hook in compatibility mode
+	if (!empty($menuOptions['hook']))
+	{
+		call_integration_hook('integrate_' . $menuOptions['hook'] . '_areas', array(&$menuData, &$menuOptions));
+		$menuOptions['hook'] = '';
+	}
+
+	// Process options and data
+	$menu->addOptions($menuOptions);
+	$menu->addMenuData($menuData);
+
+	// Set it to context
+	$include_data = $menu->prepareMenu();
+	$menu->setContext();
 
 	return $include_data;
 }

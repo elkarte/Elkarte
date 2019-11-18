@@ -47,6 +47,8 @@ abstract class MenuItem
 	{
 		$obj = new static;
 		$arr['permission'] = isset($arr['permission']) ? (array) $arr['permission'] : [];
+
+		// Fetch the protected and public members of this abstract + extended
 		$vars = get_object_vars($obj);
 
 		// Call the setters with our supplied menu values
