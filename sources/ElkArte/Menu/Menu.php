@@ -374,7 +374,7 @@ class Menu
 	{
 		global $txt;
 
-		return !empty($area->getLabel()) || (isset($txt[$areaId]) && !$area->getSelect());
+		return !empty($area->getLabel()) || isset($txt[$areaId]);
 	}
 
 	/**
@@ -633,15 +633,22 @@ class Menu
 	{
 		global $context;
 
-		// Handy shortcut.
+		// Handy shortcuts.
 		$tabContext = &$context['menu_data_' . $this->maxMenuId]['tab_data'];
+		$currentArea = $this->menuContext['sections'][$this->menuContext['current_section']]['areas'][$this->currentArea];
+
+		// Subsections of the current ara are tabs unless we are told otherwise.
+		if (!isset($tabContext['tabs']))
+		{
+			$tabContext['tabs'] = $currentArea['subsections'] ?: array();
+		}
 
 		// Tabs are really just subactions.
-		if (isset($tabContext['tabs'], $this->menuContext['sections'][$this->menuContext['current_section']]['areas'][$this->currentArea]['subsections']))
+		if (isset($tabContext['tabs'], $currentArea['subsections']))
 		{
 			$tabContext['tabs'] = array_replace_recursive(
 				$tabContext['tabs'],
-				$this->menuContext['sections'][$this->menuContext['current_section']]['areas'][$this->currentArea]['subsections']
+				$currentArea['subsections']
 			);
 
 			// Has it been deemed selected?
@@ -650,7 +657,6 @@ class Menu
 				$tabContext = array_merge($tabContext, $tabContext['tabs'][$this->currentSubaction]);
 			}
 		}
-
 	}
 
 	/**
