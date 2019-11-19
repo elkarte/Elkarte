@@ -265,11 +265,10 @@ class Menu
 	{
 		global $txt;
 
-		$firstArea = key($section->getAreas());
 		$this->menuContext['sections'][$sectionId] = [
 			'id' => $sectionId,
 			'label' => ($section->getLabel() ?: $txt[$sectionId]) . $this->parseCounter($section, 0),
-			'url' => $this->menuContext['base_url'] . ';area=' . $firstArea . $this->menuContext['extra_parameters'],
+			'url' => '',
 		];
 	}
 
@@ -335,6 +334,9 @@ class Menu
 				$this->checkCurrentSection($sectionId, $areaId, $area);
 			}
 		}
+
+		// Now that we have valid section areas, set the section url
+		$this->setSectionUrl($sectionId);
 	}
 
 	/**
@@ -414,7 +416,7 @@ class Menu
 	{
 		$area->setUrl(
 			$this->menuContext['sections'][$sectionId]['areas'][$areaId]['url'] =
-				$area->getUrl() ?: $this->menuContext['base_url'] . ';area=' . $areaId . $this->menuContext['extra_parameters']
+				($area->getUrl() ?: $this->menuContext['base_url'] . ';area=' . $areaId) . $this->menuContext['extra_parameters']
 		);
 	}
 
@@ -550,6 +552,19 @@ class Menu
 	}
 
 	/**
+	 * The top level section gets its url from the first valid area under it
+	 *
+	 * @param string $sectionId
+	 */
+	private function setSectionUrl($sectionId)
+	{
+		$firstAreaId = key($this->menuContext['sections'][$sectionId]['areas']);
+
+		$this->menuContext['sections'][$sectionId]['url'] =
+			$this->menuContext['sections'][$sectionId]['areas'][$firstAreaId]['url'];
+	}
+
+	/**
 	 * Checks and updates base and section urls
 	 */
 	private function setActiveButtons()
@@ -612,7 +627,7 @@ class Menu
 		$tabContext = &$context['menu_data_' . $this->maxMenuId]['tab_data'];
 		$currentArea = $this->menuContext['sections'][$this->menuContext['current_section']]['areas'][$this->currentArea];
 
-		// Subsections of the current ara are tabs unless we are told otherwise.
+		// Subsections of the current area are tabs unless we are told otherwise.
 		if (!isset($tabContext['tabs']))
 		{
 			$tabContext['tabs'] = $currentArea['subsections'] ?: array();
