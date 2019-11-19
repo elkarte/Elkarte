@@ -121,7 +121,7 @@ function template_generic_menu_dropdown_above()
 	{
 		echo '
 					<li class="listlevel1', !empty($section['areas']) ? ' subsections" aria-haspopup="true"' : '"', '>
-						<a class="linklevel1', !empty($section['selected']) ? ' active' : '', '" href="', $section['url'], $menu_context['extra_parameters'], '">', $section['label'], '</a>
+						<a class="linklevel1', !empty($section['selected']) ? ' active' : '', '" href="', $section['url'], '">', $section['label'], '</a>
 						<ul class="menulevel2">';
 
 		// For every area of this section show a link to that area (bold if it's currently selected.)
