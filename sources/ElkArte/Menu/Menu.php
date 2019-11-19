@@ -115,7 +115,7 @@ class Menu
 
 	/**
 	 * Allow extend *any* menu with a single hook, should be called before addOptions and addMenuData
-	 * left in place for compatibility
+	 * left in place for compatibility with 1.1
 	 *
 	 * @param array $menuData
 	 * @param array $menuOptions
@@ -198,6 +198,12 @@ class Menu
 	 */
 	public function prepareMenu()
 	{
+		// If options set a hook, give it call
+		if ($this->menuOptions->getHook())
+		{
+			call_integration_hook($this->menuOptions->getHook(), array($this));
+		}
+
 		// Build URLs first.
 		$this->menuContext['base_url'] = $this->menuOptions->getBaseUrl();
 		$this->menuContext['current_action'] = $this->menuOptions->getAction();

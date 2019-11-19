@@ -36,7 +36,7 @@ namespace ElkArte\Menu;
 class MenuArea extends MenuItem
 {
 	/** @var string $select References another area to be highlighted while this one is active */
-	protected $select = null;
+	public $select = '';
 
 	/** @var string $controller URL to use for this menu item. */
 	protected $controller = '';
