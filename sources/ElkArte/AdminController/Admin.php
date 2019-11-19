@@ -22,6 +22,7 @@ use ElkArte\AdminSettingsSearch;
 use ElkArte\EventManager;
 use ElkArte\Exceptions\Exception;
 use ElkArte\Hooks;
+use ElkArte\Menu\Menu;
 use ElkArte\User;
 use ElkArte\XmlArray;
 
@@ -584,13 +585,11 @@ class Admin extends AbstractController
 		);
 
 		// Actually create the menu!
-		$menu = new \ElkArte\Menu\Menu();
+		$menu = new Menu();
 		$menu->addMenuData($admin_areas);
 		$menu->addOptions($menuOptions);
 		$admin_include_data = $menu->prepareMenu();
 		$menu->setContext();
-
-		//$admin_include_data = createMenu($admin_areas, $menuOptions);
 		unset($admin_areas);
 
 		// Make a note of the Unique ID for this menu.
