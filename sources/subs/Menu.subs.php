@@ -153,12 +153,6 @@ function callMenu($selectedMenu)
 {
 	global $context;
 
-	// Some help for the profile menu
-	if (!empty($context['user']['is_owner']) && isset($selectedMenu['permission']))
-	{
-		unset($selectedMenu['permission']);
-	}
-
 	$action = new Action();
 	$action->initialize(['action' => $selectedMenu]);
 	$action->dispatch('action');
