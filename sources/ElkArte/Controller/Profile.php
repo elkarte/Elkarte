@@ -554,8 +554,7 @@ class Profile extends AbstractController
 		global $context;
 
 		// Does this require session validating?
-		if (!empty($this->_profile_include_data['validate'])
-			|| (isset($this->_saving) && !$context['user']['is_owner']))
+		if (isset($this->_saving) && !$context['user']['is_owner'])
 		{
 			validateSession();
 		}
