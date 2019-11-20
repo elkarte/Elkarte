@@ -53,6 +53,15 @@ class MenuArea extends MenuItem
 	/** @var bool $hidden Should this area be visible? */
 	protected $hidden = false;
 
+	/** @var string $token Name of the token to validate */
+	protected $token = '';
+
+	/** @var string $tokenType where to look for our token, get, request, post. */
+	protected $tokenType = 'post';
+
+	/** @var string $sc session check where to look for the session data, get or post */
+	protected $sc = '';
+
 	/** @var array $subsections Array of subsections from this area. */
 	private $subsections = [];
 
@@ -197,6 +206,66 @@ class MenuArea extends MenuItem
 	public function getSubsections()
 	{
 		return $this->subsections;
+	}
+
+	/**
+	 * @return string
+	 */
+	public function getToken()
+	{
+		return $this->token;
+	}
+
+	/**
+	 * @param string $token
+	 *
+	 * @return $this
+	 */
+	public function setToken($token)
+	{
+		$this->token = $token;
+
+		return $this;
+	}
+
+	/**
+	 * @return string
+	 */
+	public function getTokenType()
+	{
+		return $this->tokenType;
+	}
+
+	/**
+	 * @param string $tokenType
+	 *
+	 * @return $this
+	 */
+	public function setTokenType($tokenType)
+	{
+		$this->tokenType = $tokenType;
+
+		return $this;
+	}
+
+	/**
+	 * @return string
+	 */
+	public function getSc()
+	{
+		return $this->sc;
+	}
+
+	/**
+	 * @param $sc
+	 *
+	 * @return $this
+	 */
+	public function setSc($sc)
+	{
+		$this->sc = $sc;
+
+		return $this;
 	}
 
 	/**

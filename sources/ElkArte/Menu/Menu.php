@@ -21,6 +21,7 @@ use ElkArte\HttpReq;
 use ElkArte\Menu\MenuArea;
 use ElkArte\Menu\MenuSection;
 use ElkArte\Menu\MenuSubsection;
+use ElkArte\User;
 
 /**
  * Class Menu
@@ -175,7 +176,13 @@ class Menu
 		// Make sure we created some awesome sauce.
 		if (empty($this->includeData))
 		{
-			// No valid areas -- reject!
+			// Give a guest a boot to the login screen
+			if (User::$info->is_guest)
+			{
+				is_not_guest();
+			}
+
+			// Users get a slap in the face, No valid areas -- reject!
 			throw new Exception('no_access', false);
 		}
 
@@ -552,16 +559,20 @@ class Menu
 	}
 
 	/**
-	 * The top level section gets its url from the first valid area under it
+	 * The top level section gets its url from the first valid area under it.  Its
+	 * done here to avoid setting it to an invalid area.
 	 *
 	 * @param string $sectionId
 	 */
 	private function setSectionUrl($sectionId)
 	{
-		$firstAreaId = key($this->menuContext['sections'][$sectionId]['areas']);
+		if (!empty($this->menuContext['sections'][$sectionId]['areas']))
+		{
+			$firstAreaId = key($this->menuContext['sections'][$sectionId]['areas']);
 
-		$this->menuContext['sections'][$sectionId]['url'] =
-			$this->menuContext['sections'][$sectionId]['areas'][$firstAreaId]['url'];
+			$this->menuContext['sections'][$sectionId]['url'] =
+				$this->menuContext['sections'][$sectionId]['areas'][$firstAreaId]['url'];
+		}
 	}
 
 	/**
