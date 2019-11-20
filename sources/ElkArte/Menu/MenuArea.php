@@ -57,7 +57,7 @@ class MenuArea extends MenuItem
 	protected $token = '';
 
 	/** @var string $tokenType where to look for our token, get, request, post. */
-	protected $tokenType = 'post';
+	protected $tokenType = '';
 
 	/** @var string $sc session check where to look for the session data, get or post */
 	protected $sc = '';
