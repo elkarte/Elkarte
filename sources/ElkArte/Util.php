@@ -156,13 +156,13 @@ class Util
 		// Remove spaces (32), tabs (9), returns (13, 10, and 11), nulls (0), and hard spaces. (160)
 		if (!is_array($var))
 		{
-			return \ElkArte\Util::htmltrim($var);
+			return Util::htmltrim($var);
 		}
 
 		// Go through all the elements and remove the whitespace.
 		foreach ($var as $k => $v)
 		{
-			$var[$k] = $level > 25 ? null : htmltrim__recursive($v, $level + 1);
+			$var[$k] = $level > 25 ? null : Util::htmltrim__recursive($v, $level + 1);
 		}
 
 		return $var;
