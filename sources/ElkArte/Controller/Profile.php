@@ -18,6 +18,7 @@
 
 namespace ElkArte\Controller;
 
+use ArrayObject;
 use ElkArte\AbstractController;
 use ElkArte\Cache\Cache;
 use ElkArte\EventManager;
@@ -128,7 +129,7 @@ class Profile extends AbstractController
 		$context['user']['is_owner'] = (int) $this->_memID === (int) $this->user->id;
 
 		// Create the menu of profile options
-		$this->_define_profile_menu();
+		$this->defineProfileMenu();
 
 		// Is there an updated message to show?
 		if (isset($this->_req->query->updated))
@@ -182,10 +183,10 @@ class Profile extends AbstractController
 		}
 
 		// Session validation and/or Token Checks
-		$this->_check_access();
+		$this->checkAccess();
 
 		// Build the link tree.
-		$this->_build_profile_linktree();
+		$this->buildProfileLinktree();
 
 		// Set the template for this area... if you still can :P
 		// and add the profile layer.
@@ -196,7 +197,7 @@ class Profile extends AbstractController
 		loadJavascriptFile('profile.js');
 
 		// Right - are we saving - if so let's save the old data first.
-		$this->_save_updates();
+		$this->SaveUpdates();
 
 		// Have some errors for some reason?
 		// @todo check that this can be safely removed.
@@ -250,7 +251,7 @@ class Profile extends AbstractController
 	 *    - array $subsections: Array of subsections, in order of appearance.
 	 *    - array $permission:  Array of permissions to determine who can access this area. Should contain arrays $own and $any.
 	 */
-	private function _define_profile_menu()
+	private function defineProfileMenu()
 	{
 		global $txt, $context, $modSettings;
 
@@ -549,7 +550,7 @@ class Profile extends AbstractController
 	/**
 	 * Does session and token checks for the areas that require those
 	 */
-	private function _check_access()
+	private function checkAccess()
 	{
 		global $context;
 
@@ -594,7 +595,7 @@ class Profile extends AbstractController
 	 * Just builds the link tree based on where were are in the profile section
 	 * and who's profile is being viewed, etc.
 	 */
-	private function _build_profile_linktree()
+	private function buildProfileLinktree()
 	{
 		global $context, $txt;
 
@@ -623,7 +624,7 @@ class Profile extends AbstractController
 	/**
 	 * Save profile updates
 	 */
-	private function _save_updates()
+	private function SaveUpdates()
 	{
 		global $txt, $context, $modSettings, $post_errors, $profile_vars;
 
@@ -640,10 +641,10 @@ class Profile extends AbstractController
 			// Clean up the POST variables.
 			$post = Util::htmltrim__recursive((array) $this->_req->post);
 			$post = Util::htmlspecialchars__recursive($post);
-			$this->_req->post = new \ArrayObject($post, \ArrayObject::ARRAY_AS_PROPS);
+			$this->_req->post = new ArrayObject($post, ArrayObject::ARRAY_AS_PROPS);
 
 			// Does the change require the current password as well?
-			$this->_check_password($check_password);
+			$this->checkPassword($check_password);
 
 			// Change the IP address in the database.
 			if ($context['user']['is_owner'])
@@ -794,7 +795,7 @@ class Profile extends AbstractController
 	 * @param bool $check_password if this profile update requires a password verification
 	 * @throws \ElkArte\Exceptions\Exception
 	 */
-	private function _check_password($check_password)
+	private function checkPassword($check_password)
 	{
 		global $post_errors, $context;
 
