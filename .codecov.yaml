@@ -2,6 +2,10 @@ codecov:
   require_ci_to_pass: no
 
 coverage:
-  range: 50..100
+  range: 25..100
   round: down
   precision: 2
+
+ignore:
+  - "sources/ext"
+  - "themes/default/languages"
