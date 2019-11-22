@@ -63,6 +63,6 @@ class TestAuth extends ElkArteCommonSetupTest
 		$controller = new \ElkArte\Controller\Auth(new \ElkArte\EventManager());
 		$controller->action_kickguest();
 
-		$this->assertEquals($context['page_title'], 'Login');
+		$this->assertEquals($context['page_title'], 'Log in');
 	}
 }
