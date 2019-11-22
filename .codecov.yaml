@@ -1,0 +1,7 @@
+codecov:
+  require_ci_to_pass: no
+
+coverage:
+  range: 50..100
+  round: down
+  precision: 2
