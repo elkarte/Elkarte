@@ -10,6 +10,9 @@ class TestDataValidator extends \PHPUnit\Framework\TestCase
 	 */
 	public function setUp()
 	{
+		new ElkArte\Themes\ThemeLoader();
+		theme()->getTemplates()->loadLanguageFile('Validation', 'english', false, true);
+
 		$this->rules = array(
 			'required'      => 'required',
 			'max_length'    => 'max_length[1]',

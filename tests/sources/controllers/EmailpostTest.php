@@ -125,7 +125,7 @@ Regards, The ElkArte Community
 	}
 
 	/**
-	 * Test trying posting at a pbe message
+	 * Test trying to post at a pbe message
 	 */
 	public function testActionPbePost()
 	{
