@@ -9,7 +9,6 @@
 class TestEmailUserController extends ElkArteCommonSetupTest
 {
 	protected $backupGlobalsBlacklist = ['user_info'];
-	protected $data = '';
 
 	/**
 	 * Initialize or add whatever necessary for these tests
@@ -52,7 +51,6 @@ class TestEmailUserController extends ElkArteCommonSetupTest
 		$controller->action_index();
 
 		// Check that the send topic template was set
-		$context['sub_template'] = 'send_topic';
 		$this->assertEquals($context['sub_template'], 'send_topic');
 
 		// Now try to send it, but without filling out the form we get a error instead
@@ -66,7 +64,7 @@ class TestEmailUserController extends ElkArteCommonSetupTest
 	}
 
 	/**
-	 * Test trying to post at a pbe message
+	 * Test trying to report a post
 	 */
 	public function testActionReporttm()
 	{
@@ -84,9 +82,10 @@ class TestEmailUserController extends ElkArteCommonSetupTest
 		$controller->pre_dispatch();
 		$controller->action_reporttm();
 
-		// We will fail since the key does not exist
+		// We are ready to show the report forum
 		$this->assertEquals($context['sub_template'], 'report');
 
+		// Send the form, you should see a sendmail error in the travis log, ignore it.
 		$req->post->save = 1;
 		$controller->pre_dispatch();
 		$controller->action_reporttm();
