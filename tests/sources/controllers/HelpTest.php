@@ -13,7 +13,7 @@ class TestHelpController extends ElkArteCommonSetupTest
 	/**
 	 * Initialize or add whatever necessary for these tests
 	 */
-	function setUp()
+	public function setUp()
 	{
 		// Load in the common items so the system thinks we have an active login
 		parent::setUp();
@@ -24,7 +24,7 @@ class TestHelpController extends ElkArteCommonSetupTest
 		theme()->getTemplates()->loadLanguageFile('Help', 'english', false, true);
 	}
 
-	function tearDown()
+	public function tearDown()
 	{
 		parent::tearDown();
 	}

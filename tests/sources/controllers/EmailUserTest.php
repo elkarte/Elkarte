@@ -13,7 +13,7 @@ class TestEmailUserController extends ElkArteCommonSetupTest
 	/**
 	 * Initialize or add whatever necessary for these tests
 	 */
-	function setUp()
+	public function setUp()
 	{
 		global $topic;
 
@@ -28,7 +28,7 @@ class TestEmailUserController extends ElkArteCommonSetupTest
 		$topic = 1;
 	}
 
-	function tearDown()
+	public function tearDown()
 	{
 		global $topic;
 

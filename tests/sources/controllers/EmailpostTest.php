@@ -14,7 +14,7 @@ class TestEmailPostController extends ElkArteCommonSetupTest
 	/**
 	 * Initialize or add whatever necessary for these tests
 	 */
-	function setUp()
+	public function setUp()
 	{
 		global $modSettings;
 

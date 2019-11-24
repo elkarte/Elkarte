@@ -13,7 +13,7 @@ class TestMarkReadController extends ElkArteCommonSetupTest
 	/**
 	 * Initialize or add whatever necessary for these tests
 	 */
-	function setUp()
+	public function setUp()
 	{
 		// Load in the common items so the system thinks we have an active login
 		parent::setUp();
@@ -22,7 +22,7 @@ class TestMarkReadController extends ElkArteCommonSetupTest
 		new ElkArte\Themes\ThemeLoader();
 	}
 
-	function tearDown()
+	public function tearDown()
 	{
 		parent::tearDown();
 		unset($board, $topic);

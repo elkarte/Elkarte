@@ -13,7 +13,7 @@ class TestAuth extends ElkArteCommonSetupTest
 	/**
 	 * Initialize or add whatever necessary for these tests
 	 */
-	function setUp()
+	public function setUp()
 	{
 		// Load in the common items so the system thinks we have an active login
 		parent::setUp();
