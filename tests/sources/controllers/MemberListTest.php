@@ -57,7 +57,8 @@ class TestMemberListController extends ElkArteCommonSetupTest
 
 		// Lets do some searching
 		$req->query->sa = 'search';
-		//$controller->action_mlsearch();
-		$this->assertStringContains('test_admin', $context['members'][1]['real_name'], $context['members'][1]['real_name']);
+		$controller->action_index();
+		$this->assertStringContainsString('test_admin', $context['members'][1]['real_name'], $context['members'][1]['real_name']);
+		$req->query->sa = null;
 	}
 }
