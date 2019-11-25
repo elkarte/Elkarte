@@ -21,6 +21,7 @@ class TestAttachment extends ElkArteCommonSetupTest
 
 		new ElkArte\Themes\ThemeLoader();
 		theme()->getTemplates()->loadLanguageFile('Post', 'english', true, true);
+		theme()->getTemplates()->loadLanguageFile('Errors', 'english', true, true);
 	}
 
 	/**
