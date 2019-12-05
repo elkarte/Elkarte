@@ -51,10 +51,10 @@ abstract class MenuItem
 		$arr = $obj->camelCaseKeys($arr);
 		$arr['permission'] = isset($arr['permission']) ? (array) $arr['permission'] : [];
 
-		// Fetch the protected and public members of this abstract + extended
+		// Fetch the protected and public vars of this abstract + extended
 		$vars = get_object_vars($obj);
 
-		// Call the setters with the supplied menu values
+		// Call the setters, using the defined class vars, with the supplied menu values
 		foreach (array_replace($vars, array_intersect_key($arr, $vars)) as $var => $val)
 		{
 			$obj->{'set' . ucfirst($var)}($val);
@@ -67,7 +67,7 @@ abstract class MenuItem
 	}
 
 	/**
-	 * Takes array keys of this_key and renames them to thisKey
+	 * Renames array keys from under_score to underScore camelCase
 	 *
 	 * @param array $arr
 	 *
