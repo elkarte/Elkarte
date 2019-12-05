@@ -1,0 +1,11 @@
+codecov:
+  require_ci_to_pass: no
+
+coverage:
+  range: 25..90
+  round: down
+  precision: 2
+
+ignore:
+  - "sources/ext"
+  - "themes/default/languages"

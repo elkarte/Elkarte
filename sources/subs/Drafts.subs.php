@@ -261,6 +261,12 @@ function load_user_drafts($member_id, $draft_type = 0, $topic = false, $order = 
 
 	$db = database();
 
+	if (!empty($limit))
+	{
+		$limit = array_map('intval', explode(',', $limit));
+		$limit = implode(', ', $limit);
+	}
+
 	// Load the drafts that the user has available for the given type & action
 	return $db->fetchQuery('
 		SELECT ud.*' . ($draft_type === 0 ? ',b.id_board, b.name AS bname' : '') . '
@@ -272,14 +278,13 @@ function load_user_drafts($member_id, $draft_type = 0, $topic = false, $order = 
 			AND type = {int:draft_type}' . (!empty($modSettings['drafts_keep_days']) ? '
 			AND poster_time > {int:time}' : '') . (!empty($order) ? '
 		ORDER BY {raw:order}' : '') . (!empty($limit) ? '
-		LIMIT {raw:limit}' : ''),
+		LIMIT ' . $limit : ''),
 		array(
 			'id_member' => $member_id,
 			'id_topic' => (int) $topic,
 			'draft_type' => $draft_type,
 			'time' => !empty($modSettings['drafts_keep_days']) ? (time() - ($modSettings['drafts_keep_days'] * 86400)) : 0,
 			'order' => $order,
-			'limit' => $limit,
 		)
 	)->fetch_all();
 }

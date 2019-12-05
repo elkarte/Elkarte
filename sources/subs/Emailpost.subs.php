@@ -1667,7 +1667,7 @@ function query_load_board($message_id)
 	list ($board_id) = $db->fetch_row($request);
 	$db->free_result($request);
 
-	return $board_id === '' ? 0 : $board_id;
+	return empty($board_id) ? 0 : $board_id;
 }
 
 /**

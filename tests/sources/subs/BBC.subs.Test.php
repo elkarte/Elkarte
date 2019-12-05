@@ -15,14 +15,19 @@ class TestBBC extends \PHPUnit\Framework\TestCase
 	public function setUp()
 	{
 		global $modSettings, $context;
+
 		$modSettings['user_access_mentions'] = array();
 		$modSettings['enablePostHTML'] = 1;
 
-		\ElkArte\User::$info = new \ElkArte\UserInfo(['name' => 'name', 'is_guest' => true]);
+		\ElkArte\User::$info = new \ElkArte\UserInfo([
+			'name' => 'itsme',
+			'is_guest' => true,
+			'smiley_set' => 'default'
+		]);
 		\ElkArte\User::load();
+
 		new ElkArte\Themes\ThemeLoader();
 		$context['user']['smiley_path'] = 'http://127.0.0.1/smileys/default/';
-		\ElkArte\User::$info->smiley_set = 'default';
 
 		// Standard testcases
 		$this->bbcTestCases = array(
@@ -578,6 +583,19 @@ Should be an empty line in between.',
 				'<a href="http://www.google.com" class="bbc_link" target="_blank" rel="noopener noreferrer">Google</a>'
 			)
 		);
+	}
+
+	/**
+	 * Cleanup data we no longer need at the end of the tests in this class.
+	 *
+	 * tearDown() is run automatically by the testing framework after each test method.
+	 */
+	public function tearDown()
+	{
+		global $modSettings;
+
+		// remove temporary test data
+		unset($modSettings);
 	}
 
 	/**
