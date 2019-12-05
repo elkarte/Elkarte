@@ -13,6 +13,8 @@
 
 namespace ElkArte\Menu;
 
+use ElkArte\Errors\Errors;
+
 /**
  * Class MenuArea
  *
@@ -26,6 +28,9 @@ namespace ElkArte\Menu;
  *   - string $icon       => File name of an icon to use on the menu, if using a class set as transparent.png
  *   - string $class      => CSS class name to apply to the icon img, used to apply a sprite icon
  *   - string $custom_url => URL to call for this menu item
+ *   - string $token      => token name to use
+ *   - string $token_type => where to look for the returned token (get/post)
+ *   - string $sc         => session check where to look for returned session data (get/post)
  *   - bool $enabled      => Should this area even be enabled / accessible?
  *   - bool $hidden       => If the area is visible in the menu
  *   - string $select     => If set, references another area
@@ -61,6 +66,9 @@ class MenuArea extends MenuItem
 
 	/** @var string $sc session check where to look for the session data, get or post */
 	protected $sc = '';
+
+	/** @var bool $password is the user password requried to make a change, profile only use? */
+	protected $password = false;
 
 	/** @var array $subsections Array of subsections from this area. */
 	private $subsections = [];
@@ -166,7 +174,7 @@ class MenuArea extends MenuItem
 	}
 
 	/**
-	 * @return boolean
+	 * @return bool
 	 */
 	public function isHidden()
 	{
@@ -174,7 +182,7 @@ class MenuArea extends MenuItem
 	}
 
 	/**
-	 * @param boolean $hidden
+	 * @param bool $hidden
 	 *
 	 * @return MenuArea
 	 */
@@ -186,7 +194,29 @@ class MenuArea extends MenuItem
 	}
 
 	/**
+	 * @return bool
+	 */
+	public function isPassword()
+	{
+		return $this->password;
+	}
+
+	/**
+	 * @param bool $password
+	 *
+	 * @return MenuArea
+	 */
+	public function setPassword($password)
+	{
+		$this->password = $password;
+
+		return $this;
+	}
+
+	/**
 	 * Converts an object and any branches to an array, recursive.
+	 *
+	 * @param mixed $obj
 	 *
 	 * @return array
 	 */
@@ -269,17 +299,14 @@ class MenuArea extends MenuItem
 	}
 
 	/**
+	 * Account for unique setter/getter items for this area
+	 *
 	 * @param array $arr
 	 *
 	 * @return MenuArea
 	 */
 	protected function buildMoreFromArray($arr)
 	{
-		if (isset($arr['custom_url']))
-		{
-			$this->setUrl($arr['custom_url']);
-		}
-
 		if (isset($arr['subsections']))
 		{
 			foreach ($arr['subsections'] as $var => $subsection)
@@ -288,7 +315,29 @@ class MenuArea extends MenuItem
 			}
 		}
 
+		// Anything left over, for debug
+		$this->anythingMissed($arr);
+
 		return $this;
+	}
+
+	/**
+	 * Right now here just for debug.  Do any addons create keys that we have not accounted for
+	 * in the class?  Should we simply just set anything that is missing?
+	 *
+	 * @param array $arr
+	 * @throws \Exception
+	 */
+	private function anythingMissed($arr)
+	{
+		$missing = array_diff_key($arr, get_object_vars($this));
+		foreach($missing as $key => $value)
+		{
+			if (!in_array($key, ['subsections', 'customUrl']))
+			{
+				Errors::instance()->log_error('Depreciated: ' . $key . ' : ' . $value, 'depreciated');
+			}
+		}
 	}
 
 	/**
