@@ -87,7 +87,7 @@ class Menu
 		$this->currentSubaction = $context['current_subaction'] ?? null;
 
 		// Would you like fries with that?
-		$this->menuOptions = new MenuOptions;
+		$this->menuOptions = new MenuOptions();
 	}
 
 	/**
@@ -283,7 +283,7 @@ class Menu
 	 * If the menu has that little notification count, that's right this sets its value
 	 *
 	 * @param MenuItem $obj
-	 * @param integer $idx
+	 * @param int $idx
 	 *
 	 * @return string
 	 */

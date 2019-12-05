@@ -128,7 +128,7 @@ class TestMenuSubs extends \PHPUnit\Framework\TestCase
 
 		$expected = array('select' => '', 'controller' => 'Area1_Controller', 'function' => 'action_area1',
 			'icon' => 'transparent.png', 'class' => 'test_img_area1', 'hidden' => false, 'token' => '',
-			'tokenType' => '', 'sc' => '', 'subsections' => array(), 'label' => 'Area1 Label',
+			'tokenType' => '', 'sc' => '', 'password' => false, 'subsections' => array(), 'label' => 'Area1 Label',
 			'counter' => '', 'url' => 'http://127.0.0.1/index.php?action=section1;area=area1;extra=param;abcde=123456789',
 			'permission' => array(), 'enabled' => true, 'current_action' => 'section1', 'current_area' => 'area1',
 			'current_section' => 'section1', 'current_subsection' => ''
@@ -149,7 +149,7 @@ class TestMenuSubs extends \PHPUnit\Framework\TestCase
 		$expected = array(
 			'select' => '', 'controller' => 'Area3_Controller', 'function' => 'action_area3',
 			'icon' => 'transparent.png', 'class' => 'test_img_area3', 'hidden' => false,
-			'token' => '', 'tokenType' => '', 'sc' => '',
+			'token' => '', 'tokenType' => '', 'sc' => '', 'password' => false,
 			'subsections' => array(
 				'sub1' => array('label' => 'Sub One', 'counter' => '', 'url' => 'some url', 'permission' => array(), 'enabled' => true),
 				'sub2' => array('label' => 'Sub Two', 'counter' => '', 'url' => '', 'permission' => array(), 'enabled' => false),

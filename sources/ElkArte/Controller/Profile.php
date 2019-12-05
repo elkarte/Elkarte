@@ -119,6 +119,8 @@ class Profile extends AbstractController
 		// A little bit about this member
 		$context['id_member'] = $this->_memID;
 		$cur_profile = $this->_profile;
+
+		// Let's have some information about this member ready, too.
 		$context['member'] = $this->_profile;
 		$context['member']->loadContext();
 
@@ -547,7 +549,7 @@ class Profile extends AbstractController
 		if (!empty($this->_profile_include_data['token']))
 		{
 			$token_name = str_replace('%u', $context['id_member'], $this->_profile_include_data['token']);
-			$token_type = $this->_profile_include_data['token_type'] ?? 'post';
+			$token_type = $this->_profile_include_data['tokenType'] ?? 'post';
 
 			if (!in_array($token_type, ['request', 'post', 'get']))
 			{

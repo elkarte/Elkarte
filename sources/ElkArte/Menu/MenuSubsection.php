@@ -37,7 +37,7 @@ class MenuSubsection extends MenuItem
 	protected $active = [];
 
 	/**
-	 * @return boolean
+	 * @return bool
 	 */
 	public function isDefault()
 	{
@@ -45,7 +45,7 @@ class MenuSubsection extends MenuItem
 	}
 
 	/**
-	 * @param boolean $default
+	 * @param bool $default
 	 *
 	 * @return MenuSubsection
 	 */

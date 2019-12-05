@@ -45,13 +45,16 @@ abstract class MenuItem
 	 */
 	public static function buildFromArray($arr, $sa = '')
 	{
-		$obj = new static;
+		$obj = new static();
+
+		// Prepare
+		$arr = $obj->camelCaseKeys($arr);
 		$arr['permission'] = isset($arr['permission']) ? (array) $arr['permission'] : [];
 
-		// Fetch the protected and public members of this abstract + extended
+		// Fetch the protected and public vars of this abstract + extended
 		$vars = get_object_vars($obj);
 
-		// Call the setters with our supplied menu values
+		// Call the setters, using the defined class vars, with the supplied menu values
 		foreach (array_replace($vars, array_intersect_key($arr, $vars)) as $var => $val)
 		{
 			$obj->{'set' . ucfirst($var)}($val);
@@ -61,6 +64,29 @@ abstract class MenuItem
 		$obj->buildMoreFromArray($arr, $sa);
 
 		return $obj;
+	}
+
+	/**
+	 * Renames array keys from under_score to underScore camelCase
+	 *
+	 * @param array $arr
+	 *
+	 * @return array
+	 */
+	private function camelCaseKeys($arr)
+	{
+		$keys = array_keys($arr);
+		foreach ($keys as $key)
+		{
+			$keynew = lcfirst(str_replace(' ', '', ucwords(str_replace('_', ' ', $key))));
+			if (!isset($arr[$keynew]))
+			{
+				$arr[$keynew] = $arr[$key];
+				unset($arr[$key]);
+			}
+		}
+
+		return $arr;
 	}
 
 	/**
@@ -162,7 +188,7 @@ abstract class MenuItem
 	/**
 	 * Get if the item is enabled
 	 *
-	 * @return boolean
+	 * @return bool
 	 */
 	public function isEnabled()
 	{
@@ -172,7 +198,7 @@ abstract class MenuItem
 	/**
 	 * Set if the item is enabled
 	 *
-	 * @param boolean $enabled
+	 * @param bool $enabled
 	 *
 	 * @return MenuItem
 	 */
