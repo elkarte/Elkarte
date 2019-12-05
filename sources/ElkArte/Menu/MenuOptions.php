@@ -80,7 +80,7 @@ class MenuOptions
 	 */
 	public static function buildFromArray($arr)
 	{
-		$obj = new self;
+		$obj = new self();
 
 		// For each passed option, call the value setter method
 		foreach ($arr as $var => $val)

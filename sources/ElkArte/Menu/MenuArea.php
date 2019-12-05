@@ -31,6 +31,7 @@ use ElkArte\Errors\Errors;
  *   - string $token      => token name to use
  *   - string $token_type => where to look for the returned token (get/post)
  *   - string $sc         => session check where to look for returned session data (get/post)
+ *   - bool $password     => if the user will be required to enter login password
  *   - bool $enabled      => Should this area even be enabled / accessible?
  *   - bool $hidden       => If the area is visible in the menu
  *   - string $select     => If set, references another area
