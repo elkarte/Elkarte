@@ -42,7 +42,7 @@ use ElkArte\Errors\Errors;
 class MenuArea extends MenuItem
 {
 	/** @var string $select References another area to be highlighted while this one is active */
-	public $select = '';
+	protected $select = '';
 
 	/** @var string $controller URL to use for this menu item. */
 	protected $controller = '';
@@ -68,7 +68,10 @@ class MenuArea extends MenuItem
 	/** @var string $sc session check where to look for the session data, get or post */
 	protected $sc = '';
 
-	/** @var bool $password is the user password requried to make a change, profile only use? */
+	/** @var string $customUrl custom URL to use for this menu item. */
+	protected $customUrl = null;
+
+	/** @var bool $password is the user password required to make a change, profile only use? */
 	protected $password = false;
 
 	/** @var array $subsections Array of subsections from this area. */
@@ -170,6 +173,20 @@ class MenuArea extends MenuItem
 	public function setClass($class)
 	{
 		$this->class = $class;
+
+		return $this;
+	}
+
+	/**
+	 * Set the url value
+	 *
+	 * @param string $url
+	 *
+	 * @return MenuItem
+	 */
+	public function setCustomUrl($url)
+	{
+		$this->customUrl = $url;
 
 		return $this;
 	}
@@ -305,9 +322,12 @@ class MenuArea extends MenuItem
 	 * @param array $arr
 	 *
 	 * @return MenuArea
+	 * @throws \Exception
 	 */
 	protected function buildMoreFromArray($arr)
 	{
+		$this->url = $this->customUrl ?: $this->url;
+
 		if (isset($arr['subsections']))
 		{
 			foreach ($arr['subsections'] as $var => $subsection)
@@ -316,15 +336,15 @@ class MenuArea extends MenuItem
 			}
 		}
 
-		// Anything left over, for debug
+		// Anything left over, currently for debug purposes
 		$this->anythingMissed($arr);
 
 		return $this;
 	}
 
 	/**
-	 * Right now here just for debug.  Do any addons create keys that we have not accounted for
-	 * in the class?  Should we simply just set anything that is missing?
+	 * Right now this is here just for debug.  Do any addons create keys that we have not accounted for
+	 * in the class?  Should we simply just set anything that is not a defined var?
 	 *
 	 * @param array $arr
 	 * @throws \Exception
