@@ -51,6 +51,7 @@ abstract class ElkArteCommonSetupTest extends \PHPUnit\Framework\TestCase
 			'ignoreboards' => array(),
 			'avatar' => array('url' => '', 'name' => ''),
 			'permissions' => array('admin_forum'),
+			'date_registered' => time() - 86400,
 		];
 
 		\ElkArte\User::$info = new \ElkArte\UserInfo($userData);

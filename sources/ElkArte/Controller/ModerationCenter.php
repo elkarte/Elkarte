@@ -306,7 +306,7 @@ class ModerationCenter extends AbstractController
 			);
 		}
 
-		if (!empty($mod_include_data['current_subsection']) && $mod_include_data['subsections'][$mod_include_data['current_subsection']][0] !== $mod_include_data['label'])
+		if (!empty($mod_include_data['current_subsection']) && $mod_include_data['subsections'][$mod_include_data['current_subsection']]['label'] !== $mod_include_data['label'])
 		{
 			$context['linktree'][] = array(
 				'url' => $scripturl . '?action=moderate;area=' . $mod_include_data['current_area'] . ';sa=' . $mod_include_data['current_subsection'],
