@@ -186,6 +186,11 @@ class Menu
 			throw new Exception('no_access', false);
 		}
 
+		// For consistency with the past, clean up the returned array
+		$this->includeData = array_filter($this->includeData, function ($value) {
+			return !is_null($value) && $value !== '';
+		});
+
 		// Finally - return information on the selected item.
 		return $this->includeData + [
 				'current_action' => $this->menuContext['current_action'],
@@ -249,7 +254,7 @@ class Menu
 			// The profile menu has slightly different permissions
 			if (isset($obj->getPermission()['own'], $obj->getPermission()['any']))
 			{
-				return allowedTo($obj->getPermission()[$this->permissionSet]);
+				return !empty($obj->getPermission()[$this->permissionSet]) && allowedTo($obj->getPermission()[$this->permissionSet]);
 			}
 
 			return allowedTo($obj->getPermission());
