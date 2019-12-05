@@ -354,7 +354,8 @@ class MenuArea extends MenuItem
 		$missing = array_diff_key($arr, get_object_vars($this));
 		foreach($missing as $key => $value)
 		{
-			if (!in_array($key, ['subsections', 'customUrl']))
+			// excluding our private key, anything missed?
+			if ($key !== 'subsections')
 			{
 				Errors::instance()->log_error('Depreciated: ' . $key . ' : ' . $value, 'depreciated');
 			}
