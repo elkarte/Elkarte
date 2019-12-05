@@ -45,7 +45,7 @@ class MenuOptions
 	/** @var array $extraUrlParameters an array or pairs or parameters to be added to the url */
 	private $extraUrlParameters = [];
 
-	/** @var boolean $disableUrlSessionCheck if true the session var/id are omitted from the url */
+	/** @var bool $disableUrlSessionCheck if true the session var/id are omitted from the url */
 	private $disableUrlSessionCheck = false;
 
 	/** @var string $baseUrl an alternative base url */
@@ -54,7 +54,7 @@ class MenuOptions
 	/** @var string $menuType alternative menu type to replace the usual sidebar/dropdown. */
 	private $menuType = '';
 
-	/** @var boolean $canToggleDropDown if the menu can toggle between sidebar and dropdown. */
+	/** @var bool $canToggleDropDown if the menu can toggle between sidebar and dropdown. */
 	private $canToggleDropDown = true;
 
 	/** @var string $templateName an alternative template to load (instead of Generic) */

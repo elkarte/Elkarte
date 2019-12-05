@@ -18,7 +18,7 @@ matrix:
       env:
         - DB=postgres-9.6
         - WEBTESTS=false
-    	- COVERAGE=true
+        - COVERAGE=true
       addons:
         postgresql: "9.6"
     - php: 7.2
