@@ -333,6 +333,10 @@ class Register extends AbstractController
 			$_SESSION['registration_agreed'] = true;
 		}
 
+		// Using coppa and the registration checkbox?
+		if (!empty($modSettings['coppaAge']) && !empty($modSettings['checkboxAgreement']) && !empty($this->_req->post->accept_agreement))
+			$_SESSION['skip_coppa'] = true;
+
 		// Well, if you don't agree, you can't register.
 		if (!empty($modSettings['requireAgreement']) && empty($_SESSION['registration_agreed']))
 		{
