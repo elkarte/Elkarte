@@ -1935,6 +1935,10 @@ li.ui-tab.ui-tabs-active.ui-state-active.ui-state-hover .ui-tabs-anchor {
 	#main_menu .linklevel1 .icon-menu:hover {
 		background: #F4F4F4;
 	}
+
+	.statusbar .insertoverlay .button {
+		border-radius: 4px;
+	}
 }
 
 /* This one does up to 540 screens. */
