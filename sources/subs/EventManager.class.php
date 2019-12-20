@@ -7,7 +7,7 @@
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
- * @version 1.1
+ * @version 1.1.7
  */
 
 class Event_Manager
@@ -74,7 +74,7 @@ class Event_Manager
 	public function trigger($position, $args = array())
 	{
 		// Nothing registered against this event, just return
-		if (!isset($this->_registered_events[$position]) || !$this->_registered_events[$position]->hasEvents())
+		if (!$this->_registered_events[$position] instanceof Event || !$this->_registered_events[$position]->hasEvents())
 			return false;
 
 		// For all areas that that registered against this event, let them know its been triggered
@@ -178,7 +178,7 @@ class Event_Manager
 	 */
 	public function register($position, $event, $priority = 0)
 	{
-		if (!isset($this->_registered_events[$position]))
+		if (!$this->_registered_events[$position] instanceof Event)
 			$this->_registered_events[$position] = new Event(new Priority());
 
 		$this->_registered_events[$position]->add($event, $priority);
