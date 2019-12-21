@@ -178,7 +178,7 @@ class Event_Manager
 	 */
 	public function register($position, $event, $priority = 0)
 	{
-		if (!$this->_registered_events[$position] instanceof Event)
+		if (!isset($this->_registered_events[$position] ) || !$this->_registered_events[$position] instanceof Event)
 			$this->_registered_events[$position] = new Event(new Priority());
 
 		$this->_registered_events[$position]->add($event, $priority);
