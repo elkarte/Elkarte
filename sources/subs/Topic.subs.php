@@ -344,16 +344,9 @@ function removeTopics($topics, $decreasePostCount = true, $ignoreRecycling = fal
 			)
 		);
 
-		// Remove all mentions now that the topic is gone
-		$db->query('', '
-			DELETE FROM {db_prefix}log_mentions
-			WHERE id_target IN ({array_int:messages})
-				AND mention_type IN ({array_string:mension_types})',
-			array(
-				'messages' => $messages,
-				'mension_types' => array('mentionmem', 'likemsg', 'rlikemsg'),
-			)
-		);
+		// Remove all message mentions now that the topic is gone
+		$remover = new MessagesDelete($modSettings['recycle_enable'], $modSettings['recycle_board']);
+		$remover->deleteMessageMentions($messages);
 	}
 
 	// Delete messages in each topic.
