@@ -9,7 +9,7 @@
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
- * @version 1.1
+ * @version 1.1.7
  *
  */
 
@@ -106,6 +106,7 @@ class User_Notification extends AbstractModel
 	 */
 	protected function _addDesktopNotifications()
 	{
+		loadJavascriptFile('push.min.js');
 		loadJavascriptFile('desktop-notify.js');
 		addInlineJavascript('
 			$(function() {
