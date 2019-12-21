@@ -128,6 +128,7 @@ class UserNotification extends AbstractModel
 	 */
 	protected function _addDesktopNotifications()
 	{
+		loadJavascriptFile('push.min.js');
 		loadJavascriptFile('desktop-notify.js');
 		theme()->addInlineJavascript('
 			$(function() {
