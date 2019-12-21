@@ -7,7 +7,7 @@
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
- * @version 1.1
+ * @version 1.1.7
  *
  */
 
@@ -52,7 +52,7 @@ class Curl_Fetch_Webdata
 		CURLOPT_SSL_VERIFYPEER	=> 0, // stop cURL from verifying the peer's certificate
 		CURLOPT_SSL_VERIFYHOST	=> 0, // stop cURL from verifying the peer's host
 		CURLOPT_POST			=> 0, // no post data unless its passed
-		CURLOPT_HTTPHEADER		=> 0, // no special headers unless supplied
+		CURLOPT_HTTPHEADER		=> [], // no special headers unless supplied
 	);
 
 	/**
