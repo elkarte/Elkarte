@@ -86,7 +86,7 @@ class EventManager
 	public function trigger($position, $args = array())
 	{
 		// Nothing registered against this event, just return
-		if (!$this->_registered_events[$position] instanceof Event || !$this->_registered_events[$position]->hasEvents())
+		if (!array_key_exists($position, $this->_registered_events) || !$this->_registered_events[$position]->hasEvents())
 		{
 			return false;
 		}
@@ -256,7 +256,7 @@ class EventManager
 	 */
 	public function register($position, $event, $priority = 0)
 	{
-		if (!isset($this->_registered_events[$position] ) || !$this->_registered_events[$position] instanceof Event)
+		if (!array_key_exists($position, $this->_registered_events))
 		{
 			$this->_registered_events[$position] = new Event(new Priority());
 		}
