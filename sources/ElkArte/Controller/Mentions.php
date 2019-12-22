@@ -158,7 +158,7 @@ class Mentions extends AbstractController
 	 */
 	public function action_fetch()
 	{
-		global $context, $txt, $modSettings, $scripturl;
+		global $context, $txt, $modSettings;
 
 		if (empty($modSettings['usernotif_favicon_enable']) && empty($modSettings['usernotif_desktop_enable']))
 		{
@@ -192,7 +192,7 @@ class Mentions extends AbstractController
 			$context['json_data']['desktop_notifications'] = array(
 				'new_from_last' => getNewMentions($this->user->id, $lastsent),
 				'title' => sprintf($txt['forum_notification'], $context['forum_name']),
-				'link' => $scripturl . '?action=mentions',
+				'link' => '/index.php?action=mentions',
 			);
 			$context['json_data']['desktop_notifications']['message'] = sprintf($txt[$lastsent == 0 ? 'unread_notifications' : 'new_from_last_notifications'], $context['json_data']['desktop_notifications']['new_from_last']);
 		}

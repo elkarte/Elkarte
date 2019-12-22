@@ -124,7 +124,8 @@ class UserNotification extends AbstractModel
 	}
 
 	/**
-	 * Prepares the javascript for desktop notifications.
+	 * Prepares the javascript for desktop notifications.  The service worker is used on
+	 * mobile devices (at least chrome) and needs to be in the root for proper global access.
 	 */
 	protected function _addDesktopNotifications()
 	{
@@ -132,6 +133,8 @@ class UserNotification extends AbstractModel
 		loadJavascriptFile('desktop-notify.js');
 		theme()->addInlineJavascript('
 			$(function() {
+				Push.config({serviceWorker: "./elkServiceWorker.min.js"}); 
+				
 				ElkNotifier.add(new ElkDesktop(
 					{\'icon\': $(\'head\').find("link[rel=\'shortcut icon\']").attr("href")}
 				));
