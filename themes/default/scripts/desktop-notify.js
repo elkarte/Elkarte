@@ -16,15 +16,14 @@
 
 		var send = function (request) {
 			if (request.desktop_notifications.new_from_last > 0) {
-				if (!hasPermissions())
-					return;
-
-				Push.create(request.desktop_notifications.title, {
-					body: request.desktop_notifications.message,
-					icon: opt.icon,
-					link: request.desktop_notifications.link,
-					data: request.desktop_notifications.message
-				});
+				if (hasPermissions(request))
+				{
+					Push.create(request.desktop_notifications.title, {
+						body: request.desktop_notifications.message,
+						icon: opt.icon,
+						link: request.desktop_notifications.link
+					});
+				}
 			}
 		};
 
@@ -33,17 +32,9 @@
 				return true;
 
 			if (Push.Permission.get() === "default") {
-				return Push.Permission.request(onGranted, onDenied);
+				return Push.Permission.request();
 			}
 
-			return false;
-		};
-
-		var onGranted = function () {
-			return true;
-		};
-
-		var onDenied = function () {
 			return false;
 		};
 
