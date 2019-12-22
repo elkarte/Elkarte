@@ -715,6 +715,7 @@ class ProfileOptions extends AbstractController
 		require_once(SUBSDIR . '/Topic.subs.php');
 		require_once(SUBSDIR . '/Profile.subs.php');
 
+		// Show the list of notification types and how they can subscribe to them
 		$mention_methods = Notifications::instance()->getNotifiers();
 		$context['mention_types'] = getMemberNotificationsProfile($this->_memID);
 

@@ -3864,7 +3864,7 @@ function getMembersInRange($ips, $memID)
  */
 function getMemberNotificationsProfile($member_id)
 {
-	global $modSettings, $txt;
+	global $modSettings, $context, $txt;
 
 	if (empty($modSettings['enabled_mentions']))
 	{
@@ -3877,6 +3877,7 @@ function getMemberNotificationsProfile($member_id)
 	$enabled_mentions = explode(',', $modSettings['enabled_mentions']);
 	$user_preferences = getUsersNotificationsPreferences($enabled_mentions, $member_id);
 	$mention_types = array();
+	$push_enabled = false;
 	$defaults = getConfiguredNotificationMethods('*');
 
 	foreach ($enabled_mentions as $type)
@@ -3890,6 +3891,7 @@ function getMemberNotificationsProfile($member_id)
 			{
 				continue;
 			}
+
 			if (!isset($defaults[$type][$key]))
 			{
 				continue;
@@ -3907,6 +3909,11 @@ function getMemberNotificationsProfile($member_id)
 			{
 				$type_on = 0;
 			}
+
+			if (!$push_enabled && $notifier === 'notification' && $data[$key]['enabled'])
+			{
+				$push_enabled = true;
+			}
 		}
 
 		// In theory data should never be empty.
@@ -3918,6 +3925,17 @@ function getMemberNotificationsProfile($member_id)
 				'user_input_name' => 'notify[' . $type . '][user]',
 				'value' => $type_on
 			];
+		}
+
+		// If they enabled a notifications alert, then lets set a enable alerts browser permission
+		// just blows smoke if they already gave it.
+		$push_enabled &= $modSettings['usernotif_desktop_enable'] && !empty($context['profile_updated']);
+		if ($push_enabled)
+		{
+			addInlineJavascript('
+				$(function() {
+					Push.Permission.request();
+				});', true);
 		}
 	}
 
