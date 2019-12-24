@@ -17,7 +17,8 @@ use ElkArte\Util;
  * Calculate the next time the passed tasks should be triggered.
  *
  * @param string[]|string $tasks = array() the tasks
- * @param boolean $forceUpdate
+ * @param bool $forceUpdate
+ * @throws \ElkArte\Exceptions\Exception
  * @package ScheduledTasks
  */
 function calculateNextTrigger($tasks = array(), $forceUpdate = false)
@@ -50,7 +51,8 @@ function calculateNextTrigger($tasks = array(), $forceUpdate = false)
 
 	// Get the critical info for the tasks.
 	$request = $db->query('', '
-		SELECT id_task, next_time, time_offset, time_regularity, time_unit, task
+		SELECT 
+			id_task, next_time, time_offset, time_regularity, time_unit, task
 		FROM {db_prefix}scheduled_tasks
 		WHERE disabled = {int:no_disabled}
 			' . $task_query,
@@ -61,7 +63,7 @@ function calculateNextTrigger($tasks = array(), $forceUpdate = false)
 	);
 	$tasks = array();
 	$scheduleTaskImmediate = !empty($modSettings['scheduleTaskImmediate']) ? Util::unserialize($modSettings['scheduleTaskImmediate']) : array();
-	while ($row = $db->fetch_assoc($request))
+	while (($row = $request->fetch_assoc()))
 	{
 		// scheduleTaskImmediate is a way to speed up scheduled tasks and fire them as fast as possible
 		if (!empty($scheduleTaskImmediate) && isset($scheduleTaskImmediate[$row['task']]))
@@ -89,14 +91,15 @@ function calculateNextTrigger($tasks = array(), $forceUpdate = false)
 			$nextTaskTime = $next_time;
 		}
 	}
-	$db->free_result($request);
+	$request->free_result();
 
 	// Now make the changes!
 	foreach ($tasks as $id => $time)
 	{
 		$db->query('', '
 			UPDATE {db_prefix}scheduled_tasks
-			SET next_time = {int:next_time}
+			SET 
+				next_time = {int:next_time}
 			WHERE id_task = {int:id_task}',
 			array(
 				'next_time' => $time,
@@ -118,7 +121,7 @@ function calculateNextTrigger($tasks = array(), $forceUpdate = false)
  * @param int $regularity
  * @param string $unit
  * @param int $offset
- * @param boolean $immediate
+ * @param bool $immediate
  * @return int
  * @package ScheduledTasks
  */
@@ -138,7 +141,7 @@ function next_time($regularity, $unit, $offset, $immediate = false)
 		$next_time = time() + 10;
 	}
 	// If the unit is minutes only check regularity in minutes.
-	elseif ($unit == 'm')
+	elseif ($unit === 'm')
 	{
 		$off = date('i', $offset);
 
@@ -204,27 +207,28 @@ function next_time($regularity, $unit, $offset, $immediate = false)
  *
  * @param int[] $tasks
  * @return array
+ * @throws \Exception
  * @package ScheduledTasks
  */
 function loadTasks($tasks)
 {
 	$db = database();
 
-	$request = $db->query('', '
-		SELECT id_task, task
+	$task = array();
+	$db->fetchQuery('
+		SELECT 
+			id_task, task
 		FROM {db_prefix}scheduled_tasks
 		WHERE id_task IN ({array_int:tasks})
 		LIMIT ' . count($tasks),
 		array(
 			'tasks' => $tasks,
 		)
+	)->fetch_callback(
+		function ($row) use (&$task) {
+			$task[$row['id_task']] = $row['task'];
+		}
 	);
-	$task = array();
-	while ($row = $db->fetch_assoc($request))
-	{
-		$task[$row['id_task']] = $row['task'];
-	}
-	$db->free_result($request);
 
 	return $task;
 }
@@ -236,6 +240,7 @@ function loadTasks($tasks)
  * @param int $task_id the id of the task run (from the table scheduled_tasks)
  * @param int|null $total_time How long the task took to finish. If NULL (default value) -1 will be used
  * @return int the id_log value
+ * @throws \ElkArte\Exceptions\Exception
  * @package ScheduledTasks
  */
 function logTask($id_log, $task_id, $total_time = null)
@@ -251,13 +256,14 @@ function logTask($id_log, $task_id, $total_time = null)
 			array('id_task')
 		);
 
-		return $db->insert_id('{db_prefix}log_scheduled_tasks', 'id_log');
+		return $db->insert_id('{db_prefix}log_scheduled_tasks');
 	}
 	else
 	{
 		$db->query('', '
 			UPDATE {db_prefix}log_scheduled_tasks
-			SET time_taken = {float:time_taken}
+			SET 
+				time_taken = {float:time_taken}
 			WHERE id_log = {int:id_log}',
 			array(
 				'time_taken' => $total_time,
@@ -274,6 +280,7 @@ function logTask($id_log, $task_id, $total_time = null)
  * enabled, while the remaining are disabled
  *
  * @param int[] $enablers array od task IDs
+ * @throws \ElkArte\Exceptions\Exception
  * @package ScheduledTasks
  */
 function updateTaskStatus($enablers)
@@ -282,7 +289,8 @@ function updateTaskStatus($enablers)
 
 	$db->query('', '
 		UPDATE {db_prefix}scheduled_tasks
-		SET disabled = CASE WHEN id_task IN ({array_int:id_task_enable}) THEN 0 ELSE 1 END',
+		SET 
+			disabled = CASE WHEN id_task IN ({array_int:id_task_enable}) THEN 0 ELSE 1 END',
 		array(
 			'id_task_enable' => $enablers,
 		)
@@ -294,6 +302,7 @@ function updateTaskStatus($enablers)
  *
  * @param string $enabler the name (the function) of a task
  * @param bool $enable is if the tasks should be enabled or disabled
+ * @throws \ElkArte\Exceptions\Exception
  * @package ScheduledTasks
  */
 function toggleTaskStatusByName($enabler, $enable = true)
@@ -302,7 +311,8 @@ function toggleTaskStatusByName($enabler, $enable = true)
 
 	$db->query('', '
 		UPDATE {db_prefix}scheduled_tasks
-		SET disabled = {int:status}
+		SET 
+			disabled = {int:status}
 		WHERE task = {string:task_enable}',
 		array(
 			'task_enable' => $enabler,
@@ -319,6 +329,7 @@ function toggleTaskStatusByName($enabler, $enable = true)
  * @param int|null $offset
  * @param int|null $interval
  * @param string|null $unit
+ * @throws \ElkArte\Exceptions\Exception
  * @package ScheduledTasks
  */
 function updateTask($id_task, $disabled = null, $offset = null, $interval = null, $unit = null)
@@ -343,8 +354,8 @@ function updateTask($id_task, $disabled = null, $offset = null, $interval = null
 
 	$db->query('', '
 		UPDATE {db_prefix}scheduled_tasks
-		SET ' . (implode(',
-			', $updates)) . '
+		SET 
+			' . (implode(',', $updates)) . '
 		WHERE id_task = {int:id_task}',
 		array(
 			'disabled' => $disabled,
@@ -368,41 +379,42 @@ function updateTask($id_task, $disabled = null, $offset = null, $interval = null
  */
 function loadTaskDetails($id_task)
 {
-	global $txt;
-
 	$db = database();
 
 	$task = array();
 
-	$request = $db->query('', '
-		SELECT id_task, next_time, time_offset, time_regularity, time_unit, disabled, task
+	$db->fetchQuery('
+		SELECT 
+			id_task, next_time, time_offset, time_regularity, time_unit, disabled, task
 		FROM {db_prefix}scheduled_tasks
 		WHERE id_task = {int:id_task}',
 		array(
 			'id_task' => $id_task,
 		)
+	)->fetch_callback(
+		function ($row) use (&$task) {
+			global $txt;
+
+			$task = array(
+				'id' => $row['id_task'],
+				'function' => $row['task'],
+				'name' => isset($txt['scheduled_task_' . $row['task']]) ? $txt['scheduled_task_' . $row['task']] : $row['task'],
+				'desc' => isset($txt['scheduled_task_desc_' . $row['task']]) ? $txt['scheduled_task_desc_' . $row['task']] : '',
+				'next_time' => $row['disabled'] ? $txt['scheduled_tasks_na'] : standardTime($row['next_time'] == 0 ? time() : $row['next_time'], true, 'server'),
+				'disabled' => $row['disabled'],
+				'offset' => $row['time_offset'],
+				'regularity' => $row['time_regularity'],
+				'offset_formatted' => date('H:i', $row['time_offset']),
+				'unit' => $row['time_unit'],
+			);
+		}
 	);
+
 	// Should never, ever, happen!
-	if ($db->num_rows($request) == 0)
+	if (empty($task))
 	{
 		throw new \ElkArte\Exceptions\Exception('no_access', false);
 	}
-	while ($row = $db->fetch_assoc($request))
-	{
-		$task = array(
-			'id' => $row['id_task'],
-			'function' => $row['task'],
-			'name' => isset($txt['scheduled_task_' . $row['task']]) ? $txt['scheduled_task_' . $row['task']] : $row['task'],
-			'desc' => isset($txt['scheduled_task_desc_' . $row['task']]) ? $txt['scheduled_task_desc_' . $row['task']] : '',
-			'next_time' => $row['disabled'] ? $txt['scheduled_tasks_na'] : standardTime($row['next_time'] == 0 ? time() : $row['next_time'], true, 'server'),
-			'disabled' => $row['disabled'],
-			'offset' => $row['time_offset'],
-			'regularity' => $row['time_regularity'],
-			'offset_formatted' => date('H:i', $row['time_offset']),
-			'unit' => $row['time_unit'],
-		);
-	}
-	$db->free_result($request);
 
 	return $task;
 }
@@ -413,38 +425,39 @@ function loadTaskDetails($id_task)
  * - Used also by createList() callbacks.
  *
  * @return array
+ * @throws \Exception
  * @package ScheduledTasks
  */
 function scheduledTasks()
 {
-	global $txt;
-
 	$db = database();
 
-	$request = $db->query('', '
-		SELECT id_task, next_time, time_offset, time_regularity, time_unit, disabled, task
+	$known_tasks = array();
+	$db->fetchQuery('
+		SELECT 
+			id_task, next_time, time_offset, time_regularity, time_unit, disabled, task
 		FROM {db_prefix}scheduled_tasks',
 		array()
-	);
-	$known_tasks = array();
-	while ($row = $db->fetch_assoc($request))
-	{
-		// Find the next for regularity - don't offset as it's always server time!
-		$offset = sprintf($txt['scheduled_task_reg_starting'], date('H:i', $row['time_offset']));
-		$repeating = sprintf($txt['scheduled_task_reg_repeating'], $row['time_regularity'], $txt['scheduled_task_reg_unit_' . $row['time_unit']]);
+	)->fetch_callback(
+		function ($row) {
+			global $txt;
 
-		$known_tasks[] = array(
-			'id' => $row['id_task'],
-			'function' => $row['task'],
-			'name' => isset($txt['scheduled_task_' . $row['task']]) ? $txt['scheduled_task_' . $row['task']] : $row['task'],
-			'desc' => isset($txt['scheduled_task_desc_' . $row['task']]) ? $txt['scheduled_task_desc_' . $row['task']] : '',
-			'next_time' => $row['disabled'] ? $txt['scheduled_tasks_na'] : standardTime(($row['next_time'] == 0 ? time() : $row['next_time']), true, 'server'),
-			'disabled' => $row['disabled'],
-			'checked_state' => $row['disabled'] ? '' : 'checked="checked"',
-			'regularity' => $offset . ', ' . $repeating,
-		);
-	}
-	$db->free_result($request);
+			// Find the next for regularity - don't offset as it's always server time!
+			$offset = sprintf($txt['scheduled_task_reg_starting'], date('H:i', $row['time_offset']));
+			$repeating = sprintf($txt['scheduled_task_reg_repeating'], $row['time_regularity'], $txt['scheduled_task_reg_unit_' . $row['time_unit']]);
+
+			$known_tasks[] = array(
+				'id' => $row['id_task'],
+				'function' => $row['task'],
+				'name' => isset($txt['scheduled_task_' . $row['task']]) ? $txt['scheduled_task_' . $row['task']] : $row['task'],
+				'desc' => isset($txt['scheduled_task_desc_' . $row['task']]) ? $txt['scheduled_task_desc_' . $row['task']] : '',
+				'next_time' => $row['disabled'] ? $txt['scheduled_tasks_na'] : standardTime(($row['next_time'] == 0 ? time() : $row['next_time']), true, 'server'),
+				'disabled' => $row['disabled'],
+				'checked_state' => $row['disabled'] ? '' : 'checked="checked"',
+				'regularity' => $offset . ', ' . $repeating,
+			);
+		}
+	);
 
 	return $known_tasks;
 }
@@ -459,35 +472,36 @@ function scheduledTasks()
  * @param string $sort A string indicating how to sort the results
  *
  * @return array
+ * @throws \Exception
  * @package ScheduledTasks
  */
 function getTaskLogEntries($start, $items_per_page, $sort)
 {
-	global $txt;
-
 	$db = database();
 
-	$request = $db->query('', '
-		SELECT lst.id_log, lst.id_task, lst.time_run, lst.time_taken, st.task
+	$log_entries = array();
+	$db->fetchQuery('
+		SELECT 
+			lst.id_log, lst.id_task, lst.time_run, lst.time_taken, st.task
 		FROM {db_prefix}log_scheduled_tasks AS lst
 			INNER JOIN {db_prefix}scheduled_tasks AS st ON (st.id_task = lst.id_task)
 		ORDER BY ' . $sort . '
 		LIMIT ' . $start . ', ' . $items_per_page,
 		array()
+	)->fetch_callback(
+		function ($row) {
+			global $txt;
+
+			$log_entries[] = array(
+				'id' => $row['id_log'],
+				'name' => isset($txt['scheduled_task_' . $row['task']]) ? $txt['scheduled_task_' . $row['task']] : $row['task'],
+				'time_run' => $row['time_run'],
+				// -1 means failed task, but in order to look better in the UI we switch it to 0
+				'time_taken' => $row['time_taken'] == -1 ? 0 : $row['time_taken'],
+				'task_completed' => $row['time_taken'] != -1,
+			);
+		}
 	);
-	$log_entries = array();
-	while ($row = $db->fetch_assoc($request))
-	{
-		$log_entries[] = array(
-			'id' => $row['id_log'],
-			'name' => isset($txt['scheduled_task_' . $row['task']]) ? $txt['scheduled_task_' . $row['task']] : $row['task'],
-			'time_run' => $row['time_run'],
-			// -1 means failed task, but in order to look better in the UI we switch it to 0
-			'time_taken' => $row['time_taken'] == -1 ? 0 : $row['time_taken'],
-			'task_completed' => $row['time_taken'] != -1,
-		);
-	}
-	$db->free_result($request);
 
 	return $log_entries;
 }
@@ -498,6 +512,7 @@ function getTaskLogEntries($start, $items_per_page, $sort)
  * - Used by createList() callbacks.
  *
  * @return int
+ * @throws \ElkArte\Exceptions\Exception
  * @package ScheduledTasks
  */
 function countTaskLogEntries()
@@ -505,12 +520,13 @@ function countTaskLogEntries()
 	$db = database();
 
 	$request = $db->query('', '
-		SELECT COUNT(*)
+		SELECT 
+			COUNT(*)
 		FROM {db_prefix}log_scheduled_tasks',
 		array()
 	);
-	list ($num_entries) = $db->fetch_row($request);
-	$db->free_result($request);
+	list ($num_entries) = $request->fetch_row();
+	$request->free_result();
 
 	return $num_entries;
 }
@@ -532,6 +548,7 @@ function emptyTaskLog()
  * Process the next tasks, one by one, and update the results.
  *
  * @param int $ts = 0
+ * @throws \ElkArte\Exceptions\Exception
  * @package ScheduledTasks
  */
 function processNextTasks($ts = 0)
@@ -539,8 +556,9 @@ function processNextTasks($ts = 0)
 	$db = database();
 
 	// Select the next task to do.
-	$request = $db->query('', '
-		SELECT id_task, task, next_time, time_offset, time_regularity, time_unit
+	$request = $db->fetchQuery('
+		SELECT 
+			id_task, task, next_time, time_offset, time_regularity, time_unit
 		FROM {db_prefix}scheduled_tasks
 		WHERE disabled = {int:not_disabled}
 			AND next_time <= {int:current_time}
@@ -551,31 +569,29 @@ function processNextTasks($ts = 0)
 			'current_time' => time(),
 		)
 	);
-	if ($db->num_rows($request) != 0)
+	if ($request->num_rows() != 0)
 	{
 		// The two important things really...
-		$row = $db->fetch_assoc($request);
+		$row = $request->fetch_assoc();
 
 		// When should this next be run?
 		$next_time = next_time($row['time_regularity'], $row['time_unit'], $row['time_offset']);
 
 		// How long in seconds is the gap?
 		$duration = $row['time_regularity'];
-		if ($row['time_unit'] == 'm')
-		{
-			$duration *= 60;
-		}
-		elseif ($row['time_unit'] == 'h')
-		{
-			$duration *= 3600;
-		}
-		elseif ($row['time_unit'] == 'd')
-		{
-			$duration *= 86400;
-		}
-		elseif ($row['time_unit'] == 'w')
-		{
-			$duration *= 604800;
+		switch ($row['time_unit']) {
+			case 'm':
+				$duration *= 60;
+				break;
+			case 'h':
+			 	$duration *= 3600;
+				break;
+			case 'd':
+		   		$duration *= 86400;
+				break;
+			case 'w':
+				$duration *= 604800;
+				break;
 		}
 
 		// If we were really late running this task actually skip the next one.
@@ -585,9 +601,10 @@ function processNextTasks($ts = 0)
 		}
 
 		// Update it now, so no others run this!
-		$db->query('', '
+		$affected_rows = $db->query('', '
 			UPDATE {db_prefix}scheduled_tasks
-			SET next_time = {int:next_time}
+			SET 
+				next_time = {int:next_time}
 			WHERE id_task = {int:id_task}
 				AND next_time = {int:current_next_time}',
 			array(
@@ -595,8 +612,7 @@ function processNextTasks($ts = 0)
 				'id_task' => $row['id_task'],
 				'current_next_time' => $row['next_time'],
 			)
-		);
-		$affected_rows = $db->affected_rows();
+		)->affected_rows();
 
 		// Do also some timestamp checking,
 		// and do this only if we updated it before.
@@ -607,7 +623,6 @@ function processNextTasks($ts = 0)
 		}
 
 	}
-	$db->free_result($request);
 }
 
 /**
@@ -617,6 +632,7 @@ function processNextTasks($ts = 0)
  *
  * @param int $id_task specific id of the task to run, used for logging
  * @param string $task_name name of the task, class name, function name, method in ScheduledTask.class
+ * @throws \ElkArte\Exceptions\Exception
  * @package ScheduledTasks
  */
 function run_this_task($id_task, $task_name)
@@ -669,6 +685,7 @@ function run_this_task($id_task, $task_name)
  * Retrieve info if there's any next task scheduled and when.
  *
  * @return mixed int|false
+ * @throws \ElkArte\Exceptions\Exception
  * @package ScheduledTasks
  */
 function nextTime()
@@ -677,7 +694,8 @@ function nextTime()
 
 	// The next stored timestamp, is there any?
 	$request = $db->query('', '
-		SELECT next_time
+		SELECT 
+			next_time
 		FROM {db_prefix}scheduled_tasks
 		WHERE disabled = {int:not_disabled}
 		ORDER BY next_time ASC
@@ -687,16 +705,16 @@ function nextTime()
 		)
 	);
 	// No new task scheduled?
-	if ($db->num_rows($request) === 0)
+	if ($request->num_rows() === 0)
 	{
 		$result = false;
 	}
 	else
 	{
-		list ($result) = $db->fetch_row($request);
+		list ($result) = $request->fetch_row();
 	}
 
-	$db->free_result($request);
+	$request->free_result();
 
 	return $result;
 }

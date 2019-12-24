@@ -679,6 +679,7 @@ class ManagePaid extends AbstractController
 						'start_time' => $starttime,
 						'end_time' => $endtime,
 						'status' => $status,
+						'pending_details' => '',
 					);
 
 					logSubscription($details);

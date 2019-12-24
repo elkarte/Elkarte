@@ -26,18 +26,20 @@ use ElkArte\User;
  * Return the number of currently online members.
  *
  * @return double
+ * @throws \ElkArte\Exceptions\Exception
  */
 function onlineCount()
 {
 	$db = database();
 
 	$result = $db->query('', '
-		SELECT COUNT(*)
+		SELECT 
+			COUNT(*)
 		FROM {db_prefix}log_online',
 		array()
 	);
-	list ($users_online) = $db->fetch_row($result);
-	$db->free_result($result);
+	list ($users_online) = $result->fetch_row();
+	$result->free_result();
 
 	return $users_online;
 }
@@ -48,6 +50,7 @@ function onlineCount()
  * - Can be used (and is) with days up value to generate averages.
  *
  * @return array
+ * @throws \ElkArte\Exceptions\Exception
  */
 function getAverages()
 {
@@ -60,8 +63,8 @@ function getAverages()
 		FROM {db_prefix}log_activity',
 		array()
 	);
-	$row = $db->fetch_assoc($result);
-	$db->free_result($result);
+	$row = $result->fetch_assoc();
+	$result->free_result();
 
 	return $row;
 }
@@ -70,18 +73,20 @@ function getAverages()
  * Get the count of categories
  *
  * @return int
+ * @throws \ElkArte\Exceptions\Exception
  */
 function numCategories()
 {
 	$db = database();
 
 	$result = $db->query('', '
-		SELECT COUNT(*)
+		SELECT 
+			COUNT(*)
 		FROM {db_prefix}categories',
 		array()
 	);
-	list ($num_categories) = $db->fetch_row($result);
-	$db->free_result($result);
+	list ($num_categories) = $result->fetch_row();
+	$result->free_result();
 
 	return $num_categories;
 }
@@ -91,13 +96,15 @@ function numCategories()
  *
  * @param int $date
  * @return int
+ * @throws \ElkArte\Exceptions\Exception
  */
 function mostOnline($date)
 {
 	$db = database();
 
 	$result = $db->query('', '
-		SELECT most_on
+		SELECT 
+			most_on
 		FROM {db_prefix}log_activity
 		WHERE date = {date:given_date}
 		LIMIT 1',
@@ -105,8 +112,8 @@ function mostOnline($date)
 			'given_date' => $date,
 		)
 	);
-	list ($online) = $db->fetch_row($result);
-	$db->free_result($result);
+	list ($online) = $result->fetch_row();
+	$result->free_result();
 
 	return (int) $online;
 }
@@ -118,6 +125,7 @@ function mostOnline($date)
  *
  * @param int|null $limit if empty defaults to 10
  * @return array
+ * @throws \Exception
  */
 function topPosters($limit = null)
 {
@@ -137,8 +145,11 @@ function topPosters($limit = null)
 	}
 
 	// Make the query to the the x number of top posters
-	$members_result = $db->query('', '
-		SELECT id_member, real_name, posts
+	$top_posters = array();
+	$max_num_posts = 1;
+	$db->fetchQuery('
+		SELECT 
+			id_member, real_name, posts
 		FROM {db_prefix}members
 		WHERE posts > {int:no_posts}
 		ORDER BY posts DESC
@@ -147,26 +158,24 @@ function topPosters($limit = null)
 			'no_posts' => 0,
 			'limit_posts' => $limit,
 		)
-	);
-	$top_posters = array();
-	$max_num_posts = 1;
-	while ($row_members = $db->fetch_assoc($members_result))
-	{
-		$href = getUrl('profile', ['action' => 'profile', 'u' => $row_members['id_member'], 'name' => $row_members['real_name']]);
-		// Build general member information for each top poster
-		$top_posters[] = array(
-			'name' => $row_members['real_name'],
-			'id' => $row_members['id_member'],
-			'num_posts' => $row_members['posts'],
-			'href' => $href,
-			'link' => '<a href="' . $href . '">' . $row_members['real_name'] . '</a>'
-		);
-		if ($max_num_posts < $row_members['posts'])
-		{
-			$max_num_posts = $row_members['posts'];
+	)->fetch_callback(
+		function ($row) use (&$top_posters, &$max_num_posts) {
+			$href = getUrl('profile', ['action' => 'profile', 'u' => $row['id_member'], 'name' => $row['real_name']]);
+
+			// Build general member information for each top poster
+			$top_posters[] = array(
+				'name' => $row['real_name'],
+				'id' => $row['id_member'],
+				'num_posts' => $row['posts'],
+				'href' => $href,
+				'link' => '<a href="' . $href . '">' . $row['real_name'] . '</a>'
+			);
+			if ($max_num_posts < $row['posts'])
+			{
+				$max_num_posts = $row['posts'];
+			}
 		}
-	}
-	$db->free_result($members_result);
+	);
 
 	// Determine the percents and then format the num_posts
 	foreach ($top_posters as $i => $poster)
@@ -184,8 +193,9 @@ function topPosters($limit = null)
  * - x is configurable via $modSettings['stats_limit'].
  *
  * @param int|null $limit if not supplied, defaults to 10
- * @param boolean $read_status
+ * @param bool $read_status
  * @return array
+ * @throws \Exception
  */
 function topBoards($limit = null, $read_status = false)
 {
@@ -204,8 +214,11 @@ function topBoards($limit = null, $read_status = false)
 		$limit = empty($limit) ? 10 : $limit;
 	}
 
-	$boards_result = $db->query('', '
-		SELECT b.id_board, b.name, b.num_posts, b.num_topics' . ($read_status ? ',' . (User::$info->is_guest === false ? ' 1 AS is_read' : '
+	$top_boards = array();
+	$max_num_posts = 1;
+	$db->fetchQuery('
+		SELECT 
+			b.id_board, b.name, b.num_posts, b.num_topics' . ($read_status ? ',' . (User::$info->is_guest === false ? ' 1 AS is_read' : '
 			(COALESCE(lb.id_msg, 0) >= b.id_last_msg) AS is_read') : '') . '
 		FROM {db_prefix}boards AS b' . ($read_status ? '
 			LEFT JOIN {db_prefix}log_boards AS lb ON (lb.id_board = b.id_board AND lb.id_member = {int:current_member})' : '') . '
@@ -220,32 +233,30 @@ function topBoards($limit = null, $read_status = false)
 			'limit_boards' => $limit,
 			'current_member' => User::$info->id,
 		)
-	);
-	$top_boards = array();
-	$max_num_posts = 1;
-	while ($row_board = $db->fetch_assoc($boards_result))
-	{
-		$href = getUrl('board', ['board' => $row_board['id_board'], 'start' => '0', 'name' => $row_board['name']]);
-		// Load the boards info, number of posts, topics etc
-		$top_boards[$row_board['id_board']] = array(
-			'id' => $row_board['id_board'],
-			'name' => $row_board['name'],
-			'num_posts' => $row_board['num_posts'],
-			'num_topics' => $row_board['num_topics'],
-			'href' => $href,
-			'link' => '<a href="' . $href . '">' . $row_board['name'] . '</a>'
-		);
-		if ($read_status)
-		{
-			$top_boards[$row_board['id_board']]['is_read'] = !empty($row_board['is_read']);
-		}
+	)->fetch_callback(
+		function ($row) use (&$top_boards, &$max_num_posts, $read_status) {
+			$href = getUrl('board', ['board' => $row['id_board'], 'start' => '0', 'name' => $row['name']]);
 
-		if ($max_num_posts < $row_board['num_posts'])
-		{
-			$max_num_posts = $row_board['num_posts'];
+			// Load the boards info, number of posts, topics etc
+			$top_boards[$row['id_board']] = array(
+				'id' => $row['id_board'],
+				'name' => $row['name'],
+				'num_posts' => $row['num_posts'],
+				'num_topics' => $row['num_topics'],
+				'href' => $href,
+				'link' => '<a href="' . $href . '">' . $row['name'] . '</a>'
+			);
+			if ($read_status)
+			{
+				$top_boards[$row['id_board']]['is_read'] = !empty($row['is_read']);
+			}
+
+			if ($max_num_posts < $row['num_posts'])
+			{
+				$max_num_posts = $row['num_posts'];
+			}
 		}
-	}
-	$db->free_result($boards_result);
+	);
 
 	// Determine the post percentages for the boards, then format the numbers
 	foreach ($top_boards as $i => $board)
@@ -265,6 +276,7 @@ function topBoards($limit = null, $read_status = false)
  *
  * @param int $limit if not supplied, defaults to 10
  * @return array
+ * @throws \Exception
  */
 function topTopicReplies($limit = 10)
 {
@@ -276,8 +288,10 @@ function topTopicReplies($limit = 10)
 	$limit = min($limit, $modSettings['stats_limit'] ?? 10);
 
 	// Using the wrong alias here so that we can use {query_see_board}.
-	$request = $db->query('', '
-		SELECT id_topic, num_replies
+	$topic_ids = array();
+	$db->fetchQuery('
+		SELECT 
+			id_topic, num_replies
 		FROM {db_prefix}topics AS b
 		WHERE {query_see_board}' . (!empty($modSettings['recycle_enable']) && $modSettings['recycle_board'] > 0 ? '
 			AND b.id_board != {int:recycle_board}' : '') . '
@@ -288,43 +302,44 @@ function topTopicReplies($limit = 10)
 			'is_approved' => 1,
 			'recycle_board' => $modSettings['recycle_board'],
 		)
+	)->fetch_callback(
+		function ($row) use (&$topic_ids) {
+			$topic_ids[$row['id_topic']] = $row['num_replies'];
+		}
 	);
-	$topic_ids = array();
-	while ($row = $db->fetch_row($request))
-	{
-		$topic_ids[$row[0]] = $row[1];
-	}
-	$db->free_result($request);
+
 	arsort($topic_ids);
 	$topic_ids = array_slice($topic_ids, 0, $limit, true);
+	$topic_ids = empty($topic_ids) ? array(0 => 0) : $topic_ids;
 	$max_num_replies = max($topic_ids);
 
 	// Find the top x topics by number of replies
-	$topic_reply_result = $db->query('', '
-		SELECT m.subject, t.num_replies, t.num_views, t.id_board, t.id_topic
+	$top_topics_replies = array();
+	$db->fetchQuery('
+		SELECT 
+			m.subject, t.num_replies, t.num_views, t.id_board, t.id_topic
 		FROM {db_prefix}topics AS t
 			INNER JOIN {db_prefix}messages AS m ON (m.id_msg = t.id_first_msg)
 		WHERE t.id_topic IN ({array_int:topic_list})',
 		array(
 			'topic_list' => $topic_ids,
 		)
+	)->fetch_callback(
+		function ($row) use (&$top_topics_replies, &$max_num_replies) {
+			$href = getUrl('topic', ['topic' => $row['id_topic'], 'start' => '0', 'subject' => $row['subject']]);
+
+			// Build out this topics details for controller use
+			$top_topics_replies[$row['id_topic']] = array(
+				'id' => $row['id_topic'],
+				'subject' => censor($row['subject']),
+				'num_replies' => comma_format($row['num_replies']),
+				'post_percent' => round(($row['num_replies'] * 100) / $max_num_replies),
+				'num_views' => $row['num_views'],
+				'href' => $href,
+				'link' => '<a href="' . $href . '">' . $row['subject'] . '</a>'
+			);
+		}
 	);
-	$top_topics_replies = array();
-	while ($row_topic_reply = $db->fetch_assoc($topic_reply_result))
-	{
-		$href = getUrl('topic', ['topic' => $row_topic_reply['id_topic'], 'start' => '0', 'subject' => $row_topic_reply['subject']]);
-		// Build out this topics details for controller use
-		$top_topics_replies[$row_topic_reply['id_topic']] = array(
-			'id' => $row_topic_reply['id_topic'],
-			'subject' => censor($row_topic_reply['subject']),
-			'num_replies' => comma_format($row_topic_reply['num_replies']),
-			'post_percent' => round(($row_topic_reply['num_replies'] * 100) / $max_num_replies),
-			'num_views' => $row_topic_reply['num_views'],
-			'href' => $href,
-			'link' => '<a href="' . $href . '">' . $row_topic_reply['subject'] . '</a>'
-		);
-	}
-	$db->free_result($topic_reply_result);
 
 	// @todo dedupe this
 	usort($top_topics_replies, function ($a, $b) {
@@ -341,6 +356,7 @@ function topTopicReplies($limit = 10)
  *
  * @param int|null $limit if not supplied, defaults to 10
  * @return array
+ * @throws \Exception
  */
 function topTopicViews($limit = null)
 {
@@ -359,11 +375,13 @@ function topTopicViews($limit = null)
 		$limit = empty($limit) ? 10 : $limit;
 	}
 
-	// Large forums may need a bit more prodding...
+	// Large forums may need a bit more prodding..
+	$topic_ids = array();
 	if ($modSettings['totalMessages'] > 100000)
 	{
-		$request = $db->query('', '
-			SELECT id_topic
+		$db->fetchQuery('
+			SELECT 
+				id_topic
 			FROM {db_prefix}topics
 			WHERE num_views != {int:no_views}
 			ORDER BY num_views DESC
@@ -371,21 +389,18 @@ function topTopicViews($limit = null)
 			array(
 				'no_views' => 0,
 			)
+		)->fetch_callback(
+			function ($row) use (&$topic_ids) {
+				$topic_ids[] = $row['id_topic'];
+			}
 		);
-		$topic_ids = array();
-		while ($row = $db->fetch_assoc($request))
-		{
-			$topic_ids[] = $row['id_topic'];
-		}
-		$db->free_result($request);
-	}
-	else
-	{
-		$topic_ids = array();
 	}
 
-	$topic_view_result = $db->query('', '
-		SELECT m.subject, t.num_views, t.num_replies, t.id_board, t.id_topic, b.name
+	$top_topics_views = array();
+	$max_num_views = 1;
+	$db->fetchQuery('
+		SELECT 
+			m.subject, t.num_views, t.num_replies, t.id_board, t.id_topic, b.name
 		FROM {db_prefix}topics AS t
 			INNER JOIN {db_prefix}messages AS m ON (m.id_msg = t.id_first_msg)
 			INNER JOIN {db_prefix}boards AS b ON (b.id_board = t.id_board' . (!empty($modSettings['recycle_enable']) && $modSettings['recycle_board'] > 0 ? '
@@ -401,36 +416,34 @@ function topTopicViews($limit = null)
 			'is_approved' => 1,
 			'topic_views' => $limit,
 		)
-	);
-	$top_topics_views = array();
-	$max_num_views = 1;
-	while ($row_topic_views = $db->fetch_assoc($topic_view_result))
-	{
-		$board_href = getUrl('board', ['board' => $row_topic_views['id_board'], 'start' => '0', 'name' => $row_topic_views['name']]);
-		$topic_href = getUrl('topic', ['topic' => $row_topic_views['id_topic'], 'start' => '0', 'subject' => $row_topic_views['subject']]);
-		// Build the topic result array
-		$row_topic_views['subject'] = censor($row_topic_views['subject']);
-		$top_topics_views[$row_topic_views['id_topic']] = array(
-			'id' => $row_topic_views['id_topic'],
-			'board' => array(
-				'id' => $row_topic_views['id_board'],
-				'name' => $row_topic_views['name'],
-				'href' => $board_href,
-				'link' => '<a href="' . $board_href . '">' . $row_topic_views['name'] . '</a>'
-			),
-			'subject' => $row_topic_views['subject'],
-			'num_replies' => $row_topic_views['num_replies'],
-			'num_views' => $row_topic_views['num_views'],
-			'href' => $topic_href,
-			'link' => '<a href="' . $topic_href . '">' . $row_topic_views['subject'] . '</a>'
-		);
+	)->fetch_callback(
+		function ($row) use (&$top_topics_views, &$max_num_views) {
+			$board_href = getUrl('board', ['board' => $row['id_board'], 'start' => '0', 'name' => $row['name']]);
+			$topic_href = getUrl('topic', ['topic' => $row['id_topic'], 'start' => '0', 'subject' => $row['subject']]);
 
-		if ($max_num_views < $row_topic_views['num_views'])
-		{
-			$max_num_views = $row_topic_views['num_views'];
+			// Build the topic result array
+			$row['subject'] = censor($row['subject']);
+			$top_topics_views[$row['id_topic']] = array(
+				'id' => $row['id_topic'],
+				'board' => array(
+					'id' => $row['id_board'],
+					'name' => $row['name'],
+					'href' => $board_href,
+					'link' => '<a href="' . $board_href . '">' . $row['name'] . '</a>'
+				),
+				'subject' => $row['subject'],
+				'num_replies' => $row['num_replies'],
+				'num_views' => $row['num_views'],
+				'href' => $topic_href,
+				'link' => '<a href="' . $topic_href . '">' . $row['subject'] . '</a>'
+			);
+
+			if ($max_num_views < $row['num_views'])
+			{
+				$max_num_views = $row['num_views'];
+			}
 		}
-	}
-	$db->free_result($topic_view_result);
+	);
 
 	// Percentages and final formatting
 	foreach ($top_topics_views as $i => $topic)
@@ -448,6 +461,7 @@ function topTopicViews($limit = null)
  * - x is configurable via $modSettings['stats_limit'].
  *
  * @return array
+ * @throws \Exception
  */
 function topTopicStarter()
 {
@@ -460,20 +474,21 @@ function topTopicStarter()
 	// Try to cache this when possible, because it's a little unavoidably slow.
 	if (!Cache::instance()->getVar($members, 'stats_top_starters', 360) || empty($members))
 	{
-		$request = $db->query('', '
-			SELECT id_member_started, COUNT(*) AS hits
+		$db->fetchQuery('
+			SELECT 
+				id_member_started, COUNT(*) AS hits
 			FROM {db_prefix}topics' . (!empty($modSettings['recycle_enable']) && $modSettings['recycle_board'] > 0 ? '
 			WHERE id_board != {int:recycle_board}' : '') . '
 			GROUP BY id_member_started',
 			array(
 				'recycle_board' => $modSettings['recycle_board'],
 			)
+		)->fetch_callback(
+			function ($row) use (&$members) {
+				$members[$row['id_member_started']] = $row['hits'];
+			}
 		);
-		while ($row = $db->fetch_row($request))
-		{
-			$members[$row[0]] = $row[1];
-		}
-		$db->free_result($request);
+
 		arsort($members);
 		$members = array_slice($members, 0, $modSettings['stats_limit'] ?? 10, true);
 
@@ -487,29 +502,29 @@ function topTopicStarter()
 	}
 
 	// Find the top starters of topics
-	$members_result = $db->query('7', '
-		SELECT id_member, real_name
+	$db->fetchQuery('
+		SELECT 
+			id_member, real_name
 		FROM {db_prefix}members
 		WHERE id_member IN ({array_int:member_list})',
 		array(
 			'member_list' => array_keys($members),
 		)
-	);
-	while ($row_members = $db->fetch_assoc($members_result))
-	{
-		$href = getUrl('profile', ['action' => 'profile', 'u' => $row_members['id_member'], 'name' => $row_members['real_name']]);
-		// Our array of spammers, er topic starters !
-		$top_starters[$row_members['id_member']] = array(
-			'name' => $row_members['real_name'],
-			'id' => $row_members['id_member'],
-			'num_topics' => comma_format($members[$row_members['id_member']]),
-			'post_percent' => round(($members[$row_members['id_member']] * 100) / $max_num_topics),
-			'href' => $href,
-			'link' => '<a href="' . $href . '">' . $row_members['real_name'] . '</a>'
-		);
+	)->fetch_callback(
+		function ($row) use (&$top_starters, $members, $max_num_topics) {
+			$href = getUrl('profile', ['action' => 'profile', 'u' => $row['id_member'], 'name' => $row['real_name']]);
 
-	}
-	$db->free_result($members_result);
+			// Our array of spammers, er topic starters !
+			$top_starters[$row['id_member']] = array(
+				'name' => $row['real_name'],
+				'id' => $row['id_member'],
+				'num_topics' => comma_format($members[$row['id_member']]),
+				'post_percent' => round(($members[$row['id_member']] * 100) / $max_num_topics),
+				'href' => $href,
+				'link' => '<a href="' . $href . '">' . $row['real_name'] . '</a>'
+			);
+		}
+	);
 
 	// Even spammers must be orderly.
 	uksort($top_starters, function ($a, $b) use ($members) {
@@ -525,6 +540,7 @@ function topTopicStarter()
  * - x is configurable via $modSettings['stats_limit'], defaults to 10
  *
  * @return array
+ * @throws \ElkArte\Exceptions\Exception
  */
 function topTimeOnline()
 {
@@ -538,8 +554,9 @@ function topTimeOnline()
 	$temp = Cache::instance()->get('stats_total_time_members', 600);
 
 	// Get the member data, sorted by total time logged in
-	$members_result = $db->query('', '
-		SELECT id_member, real_name, total_time_logged_in
+	$result = $db->query('', '
+		SELECT 
+			id_member, real_name, total_time_logged_in
 		FROM {db_prefix}members' . (!empty($temp) ? '
 		WHERE id_member IN ({array_int:member_list_cached})' : '') . '
 		ORDER BY total_time_logged_in DESC
@@ -552,17 +569,17 @@ function topTimeOnline()
 	$top_time_online = array();
 	$temp2 = array();
 	$max_time_online = 1;
-	while ($row_members = $db->fetch_assoc($members_result))
+	while (($row = $result->fetch_assoc()))
 	{
-		$temp2[] = (int) $row_members['id_member'];
+		$temp2[] = (int) $row['id_member'];
 		if (count($top_time_online) >= $max_members)
 		{
 			continue;
 		}
 
 		// Figure out the days, hours and minutes.
-		$timeDays = floor($row_members['total_time_logged_in'] / 86400);
-		$timeHours = floor(($row_members['total_time_logged_in'] % 86400) / 3600);
+		$timeDays = floor($row['total_time_logged_in'] / 86400);
+		$timeHours = floor(($row['total_time_logged_in'] % 86400) / 3600);
 
 		// Figure out which things to show... (days, hours, minutes, etc.)
 		$timelogged = '';
@@ -576,25 +593,26 @@ function topTimeOnline()
 			$timelogged .= $timeHours . $txt['totalTimeLogged6'];
 		}
 
-		$timelogged .= floor(($row_members['total_time_logged_in'] % 3600) / 60) . $txt['totalTimeLogged7'];
+		$timelogged .= floor(($row['total_time_logged_in'] % 3600) / 60) . $txt['totalTimeLogged7'];
 
-		$href = getUrl('profile', ['action' => 'profile', 'u' => $row_members['id_member'], 'name' => $row_members['real_name']]);
+		$href = getUrl('profile', ['action' => 'profile', 'u' => $row['id_member'], 'name' => $row['real_name']]);
+
 		// Finally add it to the stats array
 		$top_time_online[] = array(
-			'id' => $row_members['id_member'],
-			'name' => $row_members['real_name'],
+			'id' => $row['id_member'],
+			'name' => $row['real_name'],
 			'time_online' => $timelogged,
-			'seconds_online' => $row_members['total_time_logged_in'],
+			'seconds_online' => $row['total_time_logged_in'],
 			'href' => $href,
-			'link' => '<a href="' . $href . '">' . $row_members['real_name'] . '</a>'
+			'link' => '<a href="' . $href . '">' . $row['real_name'] . '</a>'
 		);
 
-		if ($max_time_online < $row_members['total_time_logged_in'])
+		if ($max_time_online < $row['total_time_logged_in'])
 		{
-			$max_time_online = $row_members['total_time_logged_in'];
+			$max_time_online = $row['total_time_logged_in'];
 		}
 	}
-	$db->free_result($members_result);
+	$result->free_result();
 
 	// As always percentages are next
 	foreach ($top_time_online as $i => $member)
@@ -623,22 +641,22 @@ function monthlyActivity()
 
 	$db = database();
 
-	$months_result = $db->query('', '
+	$result = $db->fetchQuery('
 		SELECT
 			YEAR(date) AS stats_year, MONTH(date) AS stats_month, SUM(hits) AS hits, SUM(registers) AS registers, SUM(topics) AS topics, SUM(posts) AS posts, MAX(most_on) AS most_on, COUNT(*) AS num_days
 		FROM {db_prefix}log_activity
 		GROUP BY stats_year, stats_month',
 		array()
 	);
-	while ($row_months = $db->fetch_assoc($months_result))
+	while (($row = $result->fetch_assoc()))
 	{
-		$id_month = $row_months['stats_year'] . sprintf('%02d', $row_months['stats_month']);
-		$expanded = !empty($_SESSION['expanded_stats'][$row_months['stats_year']]) && in_array($row_months['stats_month'], $_SESSION['expanded_stats'][$row_months['stats_year']]);
+		$id_month = $row['stats_year'] . sprintf('%02d', $row['stats_month']);
+		$expanded = !empty($_SESSION['expanded_stats'][$row['stats_year']]) && in_array($row['stats_month'], $_SESSION['expanded_stats'][$row['stats_year']]);
 
-		if (!isset($context['yearly'][$row_months['stats_year']]))
+		if (!isset($context['yearly'][$row['stats_year']]))
 		{
-			$context['yearly'][$row_months['stats_year']] = array(
-				'year' => $row_months['stats_year'],
+			$context['yearly'][$row['stats_year']] = array(
+				'year' => $row['stats_year'],
 				'new_topics' => 0,
 				'new_posts' => 0,
 				'new_members' => 0,
@@ -647,38 +665,38 @@ function monthlyActivity()
 				'num_months' => 0,
 				'months' => array(),
 				'expanded' => false,
-				'current_year' => $row_months['stats_year'] == date('Y'),
+				'current_year' => $row['stats_year'] == date('Y'),
 			);
 		}
 
 		$href = getUrl('action', ['action' => 'stats', ($expanded ? 'collapse' : 'expand') => $id_month]) . '#m' . $id_month;
-		$context['yearly'][$row_months['stats_year']]['months'][(int) $row_months['stats_month']] = array(
+		$context['yearly'][$row['stats_year']]['months'][(int) $row['stats_month']] = array(
 			'id' => $id_month,
 			'date' => array(
-				'month' => sprintf('%02d', $row_months['stats_month']),
-				'year' => $row_months['stats_year']
+				'month' => sprintf('%02d', $row['stats_month']),
+				'year' => $row['stats_year']
 			),
 			'href' => $href,
-			'link' => '<a href="' . $href . '">' . $txt['months'][(int) $row_months['stats_month']] . ' ' . $row_months['stats_year'] . '</a>',
-			'month' => $txt['months'][(int) $row_months['stats_month']],
-			'year' => $row_months['stats_year'],
-			'new_topics' => comma_format($row_months['topics']),
-			'new_posts' => comma_format($row_months['posts']),
-			'new_members' => comma_format($row_months['registers']),
-			'most_members_online' => comma_format($row_months['most_on']),
-			'hits' => comma_format($row_months['hits']),
-			'num_days' => $row_months['num_days'],
+			'link' => '<a href="' . $href . '">' . $txt['months'][(int) $row['stats_month']] . ' ' . $row['stats_year'] . '</a>',
+			'month' => $txt['months'][(int) $row['stats_month']],
+			'year' => $row['stats_year'],
+			'new_topics' => comma_format($row['topics']),
+			'new_posts' => comma_format($row['posts']),
+			'new_members' => comma_format($row['registers']),
+			'most_members_online' => comma_format($row['most_on']),
+			'hits' => comma_format($row['hits']),
+			'num_days' => $row['num_days'],
 			'days' => array(),
 			'expanded' => $expanded
 		);
 
-		$context['yearly'][$row_months['stats_year']]['new_topics'] += $row_months['topics'];
-		$context['yearly'][$row_months['stats_year']]['new_posts'] += $row_months['posts'];
-		$context['yearly'][$row_months['stats_year']]['new_members'] += $row_months['registers'];
-		$context['yearly'][$row_months['stats_year']]['hits'] += $row_months['hits'];
-		$context['yearly'][$row_months['stats_year']]['num_months']++;
-		$context['yearly'][$row_months['stats_year']]['expanded'] |= $expanded;
-		$context['yearly'][$row_months['stats_year']]['most_members_online'] = max($context['yearly'][$row_months['stats_year']]['most_members_online'], $row_months['most_on']);
+		$context['yearly'][$row['stats_year']]['new_topics'] += $row['topics'];
+		$context['yearly'][$row['stats_year']]['new_posts'] += $row['posts'];
+		$context['yearly'][$row['stats_year']]['new_members'] += $row['registers'];
+		$context['yearly'][$row['stats_year']]['hits'] += $row['hits'];
+		$context['yearly'][$row['stats_year']]['num_months']++;
+		$context['yearly'][$row['stats_year']]['expanded'] |= $expanded;
+		$context['yearly'][$row['stats_year']]['most_members_online'] = max($context['yearly'][$row['stats_year']]['most_members_online'], $row['most_on']);
 	}
 
 	krsort($context['yearly']);
@@ -691,35 +709,36 @@ function monthlyActivity()
  *
  * @param string $condition_string
  * @param mixed[] $condition_parameters = array()
+ * @throws \Exception
  */
 function getDailyStats($condition_string, $condition_parameters = array())
 {
-	global $context;
-
 	$db = database();
 
 	// Activity by day.
-	$days_result = $db->query('', '
-		SELECT YEAR(date) AS stats_year, MONTH(date) AS stats_month, DAYOFMONTH(date) AS stats_day, topics, posts, registers, most_on, hits
+	$db->fetchQuery('
+		SELECT 
+			YEAR(date) AS stats_year, MONTH(date) AS stats_month, DAYOFMONTH(date) AS stats_day, topics, posts, registers, most_on, hits
 		FROM {db_prefix}log_activity
 		WHERE ' . $condition_string . '
 		ORDER BY stats_day DESC',
 		$condition_parameters
+	)->fetch_callback(
+		function ($row) {
+			global $context;
+
+			$context['yearly'][$row['stats_year']]['months'][(int) $row['stats_month']]['days'][] = array(
+				'day' => sprintf('%02d', $row['stats_day']),
+				'month' => sprintf('%02d', $row['stats_month']),
+				'year' => $row['stats_year'],
+				'new_topics' => comma_format($row['topics']),
+				'new_posts' => comma_format($row['posts']),
+				'new_members' => comma_format($row['registers']),
+				'most_members_online' => comma_format($row['most_on']),
+				'hits' => comma_format($row['hits'])
+			);
+		}
 	);
-	while ($row_days = $db->fetch_assoc($days_result))
-	{
-		$context['yearly'][$row_days['stats_year']]['months'][(int) $row_days['stats_month']]['days'][] = array(
-			'day' => sprintf('%02d', $row_days['stats_day']),
-			'month' => sprintf('%02d', $row_days['stats_month']),
-			'year' => $row_days['stats_year'],
-			'new_topics' => comma_format($row_days['topics']),
-			'new_posts' => comma_format($row_days['posts']),
-			'new_members' => comma_format($row_days['registers']),
-			'most_members_online' => comma_format($row_days['most_on']),
-			'hits' => comma_format($row_days['hits'])
-		);
-	}
-	$db->free_result($days_result);
 }
 
 /**
@@ -730,7 +749,8 @@ function getDailyStats($condition_string, $condition_parameters = array())
  *
  * @param int $memID
  *
- * @return
+ * @return int
+ * @throws \ElkArte\Exceptions\Exception
  */
 function UserStatsTopicsStarted($memID)
 {
@@ -740,7 +760,8 @@ function UserStatsTopicsStarted($memID)
 
 	// Number of topics started.
 	$result = $db->query('', '
-		SELECT COUNT(*)
+		SELECT 
+			COUNT(*)
 		FROM {db_prefix}topics
 		WHERE id_member_started = {int:current_member}' . (!empty($modSettings['recycle_enable']) && $modSettings['recycle_board'] > 0 ? '
 			AND id_board != {int:recycle_board}' : ''),
@@ -749,8 +770,8 @@ function UserStatsTopicsStarted($memID)
 			'recycle_board' => $modSettings['recycle_board'],
 		)
 	);
-	list ($num_topics) = $db->fetch_row($result);
-	$db->free_result($result);
+	list ($num_topics) = $result->fetch_row();
+	$result->free_result();
 
 	return $num_topics;
 }
@@ -763,7 +784,8 @@ function UserStatsTopicsStarted($memID)
  *
  * @param int $memID
  *
- * @return
+ * @return int
+ * @throws \ElkArte\Exceptions\Exception
  */
 function UserStatsPollsStarted($memID)
 {
@@ -773,7 +795,8 @@ function UserStatsPollsStarted($memID)
 
 	// Number polls started.
 	$result = $db->query('', '
-		SELECT COUNT(*)
+		SELECT 
+			COUNT(*)
 		FROM {db_prefix}topics
 		WHERE id_member_started = {int:current_member}' . (!empty($modSettings['recycle_enable']) && $modSettings['recycle_board'] > 0 ? '
 			AND id_board != {int:recycle_board}' : '') . '
@@ -784,8 +807,8 @@ function UserStatsPollsStarted($memID)
 			'no_poll' => 0,
 		)
 	);
-	list ($num_polls) = $db->fetch_row($result);
-	$db->free_result($result);
+	list ($num_polls) = $result->fetch_row();
+	$result->free_result();
 
 	return $num_polls;
 }
@@ -796,7 +819,8 @@ function UserStatsPollsStarted($memID)
  *
  * @param int $memID
  *
- * @return
+ * @return int
+ * @throws \ElkArte\Exceptions\Exception
  */
 function UserStatsPollsVoted($memID)
 {
@@ -804,15 +828,16 @@ function UserStatsPollsVoted($memID)
 
 	// Number polls voted in.
 	$result = $db->query('distinct_poll_votes', '
-		SELECT COUNT(DISTINCT id_poll)
+		SELECT 
+			COUNT(DISTINCT id_poll)
 		FROM {db_prefix}log_polls
 		WHERE id_member = {int:current_member}',
 		array(
 			'current_member' => $memID,
 		)
 	);
-	list ($num_votes) = $db->fetch_row($result);
-	$db->free_result($result);
+	list ($num_votes) = $result->fetch_row();
+	$result->free_result();
 
 	return $num_votes;
 }
@@ -826,13 +851,15 @@ function UserStatsPollsVoted($memID)
  * @param int $limit
  *
  * @return array
+ * @throws \Exception
  */
 function UserStatsMostPostedBoard($memID, $limit = 10)
 {
 	$db = database();
 
 	// Find the board this member spammed most often.
-	$result = $db->query('', '
+	$popular_boards = array();
+	$db->fetchQuery('
 		SELECT
 			b.id_board, MAX(b.name) AS name, MAX(b.num_posts) AS num_posts, COUNT(*) AS message_count
 		FROM {db_prefix}messages AS m
@@ -848,24 +875,23 @@ function UserStatsMostPostedBoard($memID, $limit = 10)
 			'count_enabled' => 0,
 			'limit' => (int) $limit,
 		)
+	)->fetch_callback(
+		function ($row) use (&$popular_boards) {
+			$href = getUrl('board', ['board' => $row['id_board'], 'start' => '0', 'name' => $row['name']]);
+			$posts = MembersList::get($memID)->posts;
+
+			// Build the board details that this member is responsible for
+			$popular_boards[$row['id_board']] = array(
+				'id' => $row['id_board'],
+				'posts' => $row['message_count'],
+				'href' => $href,
+				'link' => '<a href="' . $href . '">' . $row['name'] . '</a>',
+				'posts_percent' => $posts == 0 ? 0 : ($row['message_count'] * 100) / $posts,
+				'total_posts' => $row['num_posts'],
+				'total_posts_member' => $posts,
+			);
+		}
 	);
-	$popular_boards = array();
-	while ($row = $db->fetch_assoc($result))
-	{
-		$href = getUrl('board', ['board' => $row['id_board'], 'start' => '0', 'name' => $row['name']]);
-		$posts = MembersList::get($memID)->posts;
-		// Build the board details that this member is responsible for
-		$popular_boards[$row['id_board']] = array(
-			'id' => $row['id_board'],
-			'posts' => $row['message_count'],
-			'href' => $href,
-			'link' => '<a href="' . $href . '">' . $row['name'] . '</a>',
-			'posts_percent' => $posts == 0 ? 0 : ($row['message_count'] * 100) / $posts,
-			'total_posts' => $row['num_posts'],
-			'total_posts_member' => $posts,
-		);
-	}
-	$db->free_result($result);
 
 	return $popular_boards;
 }
@@ -879,6 +905,7 @@ function UserStatsMostPostedBoard($memID, $limit = 10)
  * @param int $limit
  *
  * @return array
+ * @throws \ElkArte\Exceptions\Exception
  */
 function UserStatsMostActiveBoard($memID, $limit = 10)
 {
@@ -902,9 +929,10 @@ function UserStatsMostActiveBoard($memID, $limit = 10)
 		)
 	);
 	$board_activity = array();
-	while ($row = $db->fetch_assoc($result))
+	while (($row = $result->fetch_assoc()))
 	{
 		$href = getUrl('board', ['board' => $row['id_board'], 'start' => '0', 'name' => $row['name']]);
+
 		// What have they been doing in this board
 		$board_activity[$row['id_board']] = array(
 			'id' => $row['id_board'],
@@ -916,7 +944,7 @@ function UserStatsMostActiveBoard($memID, $limit = 10)
 			'total_posts' => $row['num_posts'],
 		);
 	}
-	$db->free_result($result);
+	$result->free_result();
 
 	return $board_activity;
 }
@@ -929,6 +957,7 @@ function UserStatsMostActiveBoard($memID, $limit = 10)
  * @param int $memID
  *
  * @return array
+ * @throws \ElkArte\Exceptions\Exception
  */
 function UserStatsPostingTime($memID)
 {
@@ -961,7 +990,7 @@ function UserStatsPostingTime($memID)
 			'top_ten_thousand_topics' => $modSettings['totalTopics'] - 10000,
 		)
 	);
-	while (list ($poster_time) = $db->fetch_row($result))
+	while ((list ($poster_time) = $result->fetch_row()))
 	{
 		// Cast as an integer to remove the leading 0.
 		$hour = (int) standardTime($poster_time, '%H');
@@ -973,7 +1002,7 @@ function UserStatsPostingTime($memID)
 
 		$hours[$hour]++;
 	}
-	$db->free_result($result);
+	$result->free_result();
 	$maxPosts = max($hours);
 	$totalPosts = array_sum($hours);
 

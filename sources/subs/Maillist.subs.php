@@ -26,13 +26,12 @@ use ElkArte\Util;
  * @param string $sort A string indicating how to sort the results
  *
  * @return array
+ * @throws \ElkArte\Exceptions\Exception
  * @package Maillist
  *
  */
 function list_maillist_unapproved($id = 0, $start = 0, $items_per_page = 0, $sort = '')
 {
-	global $txt, $boardurl;
-
 	$db = database();
 
 	// Init
@@ -68,8 +67,9 @@ function list_maillist_unapproved($id = 0, $start = 0, $items_per_page = 0, $sor
 	}
 
 	// Load them errors
-	$request = $db->query('', '
-		SELECT e.id_email, e.error, e.message_key, e.subject, e.message_id, e.email_from, e.message_type, e.message, e.id_board
+	$db->fetchQuery('
+		SELECT 
+			e.id_email, e.error, e.message_key, e.subject, e.message_id, e.email_from, e.message_type, e.message, e.id_board
 		FROM {db_prefix}postby_emails_error e
 			LEFT JOIN {db_prefix}boards AS b ON (b.id_board = e.id_board)
 		WHERE ' . $where_query . '
@@ -81,44 +81,45 @@ function list_maillist_unapproved($id = 0, $start = 0, $items_per_page = 0, $sor
 			'sort' => $sort,
 			'id' => $id,
 		)
+	)->fetch_callback(
+		function ($row) use (&$postemail, &$i) {
+			global $txt, $boardurl;
+
+			$postemail[$i] = array(
+				'id_email' => $row['id_email'],
+				'error' => $txt[$row['error'] . '_short'],
+				'error_code' => $row['error'],
+				'key' => $row['message_key'],
+				'subject' => $row['subject'],
+				'message' => $row['message_id'],
+				'from' => $row['email_from'],
+				'type' => $row['message_type'],
+				'body' => $row['message'],
+				'link' => '#',
+			);
+
+			// Sender details we can use
+			$temp = query_load_user_info($row['email_from']);
+			$postemail[$i]['name'] = !empty($temp['user_info']['name']) ? $temp['user_info']['name'] : '';
+			$postemail[$i]['language'] = !empty($temp['user_info']['language']) ? $temp['user_info']['language'] : '';
+
+			// Build a link to the topic or message in case someone wants to take a look at that thread
+			switch ($row['message_type'])
+			{
+				case 't':
+					$postemail[$i]['link'] = $boardurl . '?topic=' . $row['message_id'];
+					break;
+				case 'm':
+					$postemail[$i]['link'] = $boardurl . '?msg=' . $row['message_id'];
+					break;
+				case 'p':
+					$postemail[$i]['subject'] = $txt['private'];
+					break;
+			}
+
+			$i++;
+		}
 	);
-	while ($row = $db->fetch_assoc($request))
-	{
-		$postemail[$i] = array(
-			'id_email' => $row['id_email'],
-			'error' => $txt[$row['error'] . '_short'],
-			'error_code' => $row['error'],
-			'key' => $row['message_key'],
-			'subject' => $row['subject'],
-			'message' => $row['message_id'],
-			'from' => $row['email_from'],
-			'type' => $row['message_type'],
-			'body' => $row['message'],
-			'link' => '#',
-		);
-
-		// Sender details we can use
-		$temp = query_load_user_info($row['email_from']);
-		$postemail[$i]['name'] = !empty($temp['user_info']['name']) ? $temp['user_info']['name'] : '';
-		$postemail[$i]['language'] = !empty($temp['user_info']['language']) ? $temp['user_info']['language'] : '';
-
-		// Build a link to the topic or message in case someone wants to take a look at that thread
-		if ($row['message_type'] === 't')
-		{
-			$postemail[$i]['link'] = $boardurl . '?topic=' . $row['message_id'];
-		}
-		elseif ($row['message_type'] === 'm')
-		{
-			$postemail[$i]['link'] = $boardurl . '?msg=' . $row['message_id'];
-		}
-		elseif ($row['message_type'] === 'p')
-		{
-			$postemail[$i]['subject'] = $txt['private'];
-		}
-
-		$i++;
-	}
-	$db->free_result($request);
 
 	return $postemail;
 }
@@ -159,8 +160,8 @@ function list_maillist_count_unapproved()
 			' . $approve_query,
 		array()
 	);
-	list ($total) = $db->fetch_row($request);
-	$db->free_result($request);
+	list ($total) = $request->fetch_row();
+	$request->free_result();
 
 	return $total;
 }
@@ -169,6 +170,7 @@ function list_maillist_count_unapproved()
  * Removes an single entry from the postby_emails_error table
  *
  * @param int $id
+ * @throws \ElkArte\Exceptions\Exception
  * @package Maillist
  */
 function maillist_delete_error_entry($id)
@@ -198,6 +200,7 @@ function maillist_delete_error_entry($id)
  * @param string $style = filter Filter to fetch filters or parsers for parsers
  *
  * @return array
+ * @throws \Exception
  * @package Maillist
  *
  */
@@ -215,8 +218,9 @@ function list_get_filter_parser($start, $items_per_page, $sort = '', $id = 0, $s
 	$email_filters = array();
 
 	// Load all the email_filters, we need lots of these :0
-	$request = $db->query('', '
-		SELECT id_filter, filter_style, filter_type, filter_to, filter_from, filter_name, filter_order
+	$db->fetchQuery('
+		SELECT 
+			id_filter, filter_style, filter_type, filter_to, filter_from, filter_name, filter_order
 		FROM {db_prefix}postby_emails_filters
 		WHERE id_filter' . (($id == 0) ? ' > {int:id}' : ' = {int:id}') . '
 			AND filter_style = {string:style}
@@ -229,19 +233,18 @@ function list_get_filter_parser($start, $items_per_page, $sort = '', $id = 0, $s
 			'id' => $id,
 			'style' => $style
 		)
+	)->fetch_callback(
+		function ($row) use (&$email_filters) {
+			$email_filters[$row['id_filter']] = array(
+				'id_filter' => $row['id_filter'],
+				'filter_type' => $row['filter_type'],
+				'filter_to' => '<strong>"</strong>' . Util::htmlspecialchars($row['filter_to']) . '<strong>"</strong>',
+				'filter_from' => '<strong>"</strong>' . Util::htmlspecialchars($row['filter_from']) . '<strong>"</strong>',
+				'filter_name' => Util::htmlspecialchars($row['filter_name']),
+				'filter_order' => $row['filter_order'],
+			);
+		}
 	);
-	while ($row = $db->fetch_assoc($request))
-	{
-		$email_filters[$row['id_filter']] = array(
-			'id_filter' => $row['id_filter'],
-			'filter_type' => $row['filter_type'],
-			'filter_to' => '<strong>"</strong>' . Util::htmlspecialchars($row['filter_to']) . '<strong>"</strong>',
-			'filter_from' => '<strong>"</strong>' . Util::htmlspecialchars($row['filter_from']) . '<strong>"</strong>',
-			'filter_name' => Util::htmlspecialchars($row['filter_name']),
-			'filter_order' => $row['filter_order'],
-		);
-	}
-	$db->free_result($request);
 
 	return $email_filters;
 }
@@ -255,7 +258,8 @@ function list_get_filter_parser($start, $items_per_page, $sort = '', $id = 0, $s
  * @param int $id
  * @param string $style
  *
- * @return
+ * @return int
+ * @throws \ElkArte\Exceptions\Exception
  * @package Maillist
  *
  */
@@ -275,10 +279,10 @@ function list_count_filter_parser($id, $style)
 			'style' => $style
 		)
 	);
-	list ($total) = $db->fetch_row($request);
-	$db->free_result($request);
+	list ($total) = $request->fetch_row();
+	$request->free_result();
 
-	return $total;
+	return (int) $total;
 }
 
 /**
@@ -310,8 +314,8 @@ function maillist_load_filter_parser($id, $style)
 			'style' => $style
 		)
 	);
-	$row = $db->fetch_assoc($request);
-	$db->free_result($request);
+	$row = $request->fetch_assoc();
+	$request->free_result();
 
 	// Check that the filter does exist
 	if (empty($row))
@@ -326,6 +330,7 @@ function maillist_load_filter_parser($id, $style)
  * Removes a specific filter or parser from the system
  *
  * @param int $id ID of the filter/parser
+ * @throws \ElkArte\Exceptions\Exception
  * @package Maillist
  */
 function maillist_delete_filter_parser($id)
@@ -356,21 +361,21 @@ function maillist_board_list()
 	$db = database();
 
 	// Get the board and the id's, we need these for the templates
-	$request = $db->query('', '
-		SELECT id_board, name
+	$result = array();
+	$result[0] = '';
+	$db->fetchQuery('
+		SELECT 
+			id_board, name
 		FROM {db_prefix}boards
 		WHERE id_board > {int:zero}',
 		array(
 			'zero' => 0,
 		)
+	)->fetch_callback(
+		function ($row) use (&$result) {
+			$result[$row['id_board']] = $row['name'];
+		}
 	);
-	$result = array();
-	$result[0] = '';
-	while ($row = $db->fetch_row($request))
-	{
-		$result[$row[0]] = $row[1];
-	}
-	$db->free_result($request);
 
 	return $result;
 }
@@ -378,7 +383,8 @@ function maillist_board_list()
 /**
  * Turns on or off the "fake" cron job for imap email retrieval
  *
- * @param boolean $switch
+ * @param bool $switch
+ * @throws \ElkArte\Exceptions\Exception
  * @package Maillist
  */
 function enable_maillist_imap_cron($switch)
@@ -405,6 +411,7 @@ function enable_maillist_imap_cron($switch)
  * @param string|null $subject - A subject for the template
  *
  * @return array
+ * @throws \Exception
  * @package Maillist
  *
  */
@@ -413,7 +420,8 @@ function maillist_templates($template_type, $subject = null)
 	$db = database();
 
 	return $db->fetchQuery('
-		SELECT recipient_name AS template_title, body
+		SELECT 
+			recipient_name AS template_title, body
 		FROM {db_prefix}log_comments
 		WHERE comment_type = {string:tpltype}
 			AND (id_recipient = {int:generic} OR id_recipient = {int:current_member})',
@@ -443,6 +451,7 @@ function maillist_templates($template_type, $subject = null)
  * Log in post-by emails an email being sent
  *
  * @param mixed[] $sent associative array of id_email, time_sent, email_to
+ * @throws \Exception
  * @package Maillist
  */
 function log_email($sent)
@@ -468,6 +477,7 @@ function log_email($sent)
  *
  * @param string $replace constructed as WHEN fieldname=value THEN new viewvalue WHEN .....
  * @param int[] $filters list of ids in the WHEN clause to keep from updating the entire table
+ * @throws \ElkArte\Exceptions\Exception
  * @package Maillist
  */
 function updateParserFilterOrder($replace, $filters)

@@ -57,6 +57,7 @@ function markBoardsRead($boards, $unread = false, $resetTopics = false)
 				'board_list' => $boards,
 			)
 		);
+
 		$db->query('', '
 			DELETE FROM {db_prefix}log_boards
 			WHERE id_board IN ({array_int:board_list})
@@ -110,15 +111,16 @@ function markBoardsRead($boards, $unread = false, $resetTopics = false)
 		}
 
 		$result = $db->query('', '
-			SELECT MIN(id_topic)
+			SELECT 
+				MIN(id_topic)
 			FROM {db_prefix}log_topics
 			WHERE id_member = {int:current_member}',
 			array(
 				'current_member' => User::$info->id,
 			)
 		);
-		list ($lowest_topic) = $db->fetch_row($result);
-		$db->free_result($result);
+		list ($lowest_topic) = $result->fetch_row();
+		$result->free_result();
 
 		if (empty($lowest_topic))
 		{
@@ -129,7 +131,8 @@ function markBoardsRead($boards, $unread = false, $resetTopics = false)
 		$delete_topics = array();
 		$update_topics = array();
 		$db->fetchQuery('
-			SELECT lt.id_topic, lt.unwatched
+			SELECT 
+				lt.id_topic, lt.unwatched
 			FROM {db_prefix}log_topics AS lt
 				INNER JOIN {db_prefix}topics AS t /*!40000 USE INDEX (PRIMARY) */ ON (t.id_topic = lt.id_topic
 					AND t.id_board IN ({array_int:board_list}))
@@ -229,10 +232,12 @@ function modifyBoard($board_id, &$boardOptions)
 	{
 		throw new \ElkArte\Exceptions\Exception('no_board');
 	}
+
 	if (isset($boardOptions['target_board']) && !isset($boards[$boardOptions['target_board']]))
 	{
 		throw new \ElkArte\Exceptions\Exception('no_board');
 	}
+
 	if (isset($boardOptions['target_category']) && !isset($cat_tree[$boardOptions['target_category']]))
 	{
 		throw new \ElkArte\Exceptions\Exception('no_board');
@@ -321,6 +326,7 @@ function modifyBoard($board_id, &$boardOptions)
 		{
 			$childUpdates[] = 'child_level = child_level ' . ($levelDiff > 0 ? '+ ' : '') . '{int:level_diff}';
 		}
+
 		if ($id_cat != $boards[$board_id]['category'])
 		{
 			$childUpdates[] = 'id_cat = {int:category}';
@@ -331,8 +337,8 @@ function modifyBoard($board_id, &$boardOptions)
 		{
 			$db->query('', '
 				UPDATE {db_prefix}boards
-				SET ' . implode(',
-					', $childUpdates) . '
+				SET 
+					' . implode(', ', $childUpdates) . '
 				WHERE id_board IN ({array_int:board_list})',
 				array(
 					'board_list' => $childList,
@@ -345,7 +351,8 @@ function modifyBoard($board_id, &$boardOptions)
 		// Make some room for this spot.
 		$db->query('', '
 			UPDATE {db_prefix}boards
-			SET board_order = board_order + {int:new_order}
+			SET 
+				board_order = board_order + {int:new_order}
 			WHERE board_order > {int:insert_after}
 				AND id_board != {int:selected_board}',
 			array(
@@ -486,7 +493,8 @@ function modifyBoard($board_id, &$boardOptions)
 			if (!empty($moderators))
 			{
 				$boardOptions['moderators'] = $db->fetchQuery('
-					SELECT id_member
+					SELECT 
+						id_member
 					FROM {db_prefix}members
 					WHERE member_name IN ({array_string:moderator_list}) OR real_name IN ({array_string:moderator_list})
 					LIMIT ' . count($moderators),
@@ -584,13 +592,12 @@ function createBoard($boardOptions)
 	);
 
 	// Insert a board, the settings are dealt with later.
-	$result = $db->insert('',
+	$board_id = $db->insert('',
 		'{db_prefix}boards',
 		$board_columns,
 		$board_parameters,
 		array('id_board')
-	);
-	$board_id = $result->insert_id();
+	)->insert_id();
 
 	if (empty($board_id))
 	{
@@ -612,7 +619,8 @@ function createBoard($boardOptions)
 
 			$db->query('', '
 				UPDATE {db_prefix}boards
-				SET id_profile = {int:new_profile}
+				SET 
+					id_profile = {int:new_profile}
 				WHERE id_board = {int:current_board}',
 				array(
 					'new_profile' => $board_data[$board['parent']]['id_profile'],
@@ -641,13 +649,13 @@ function createBoard($boardOptions)
  * - Executes the query and returns the list
  *
  * @param mixed[] $boardListOptions
- * @param boolean $simple if true a simple array is returned containing some basic
+ * @param bool $simple if true a simple array is returned containing some basic
  *                information regarding the board (id_board, board_name, child_level, id_cat, cat_name)
  *                if false the boards are returned in an array subdivided by categories including also
  *                additional data like the number of boards
  * @return array An array of boards sorted according to the normal boards order
- * @package Boards
  * @throws \ElkArte\Exceptions\Exception
+ *@package Boards
  */
 function getBoardList($boardListOptions = array(), $simple = false)
 {
@@ -731,7 +739,9 @@ function getBoardList($boardListOptions = array(), $simple = false)
 
 	// Bring all the options together and make the query
 	$request = $db->query('', '
-		SELECT c.name AS cat_name, c.id_cat, b.id_board, b.name AS board_name, b.child_level' . $select . '
+		SELECT 
+			c.name AS cat_name, c.id_cat, 
+			b.id_board, b.name AS board_name, b.child_level' . $select . '
 		FROM {db_prefix}boards AS b
 			LEFT JOIN {db_prefix}categories AS c ON (c.id_cat = b.id_cat)' . (empty($join) ? '' : implode(' ', $join)) . (empty($where) ? '' : '
 		WHERE ' . implode('
@@ -744,7 +754,7 @@ function getBoardList($boardListOptions = array(), $simple = false)
 	if ($simple)
 	{
 		$return_value = array();
-		while ($row = $db->fetch_assoc($request))
+		while (($row = $request->fetch_assoc()))
 		{
 			$return_value[$row['id_board']] = array(
 				'id_cat' => $row['id_cat'],
@@ -775,12 +785,12 @@ function getBoardList($boardListOptions = array(), $simple = false)
 	else
 	{
 		$return_value = array(
-			'num_boards' => $db->num_rows($request),
+			'num_boards' => $request->num_rows(),
 			'boards_check_all' => true,
 			'boards_current_disabled' => true,
 			'categories' => array(),
 		);
-		while ($row = $db->fetch_assoc($request))
+		while (($row = $request->fetch_assoc()))
 		{
 			// This category hasn't been set up yet..
 			if (!isset($return_value['categories'][$row['id_cat']]))
@@ -835,7 +845,7 @@ function getBoardList($boardListOptions = array(), $simple = false)
 		}
 	}
 
-	$db->free_result($request);
+	$request->free_result();
 
 	return $return_value;
 }
@@ -870,6 +880,7 @@ function recursiveBoards($tree)
  * @param int $id_member the member id
  * @param int $id_board the board to check
  * @return bool if they have notifications turned on for the board
+ * @throws \ElkArte\Exceptions\Exception
  */
 function hasBoardNotification($id_member, $id_board)
 {
@@ -877,7 +888,8 @@ function hasBoardNotification($id_member, $id_board)
 
 	// Find out if they have notification set for this board already.
 	$request = $db->query('', '
-		SELECT id_member
+		SELECT 
+			id_member
 		FROM {db_prefix}log_notify
 		WHERE id_member = {int:current_member}
 			AND id_board = {int:current_board}
@@ -887,8 +899,8 @@ function hasBoardNotification($id_member, $id_board)
 			'current_member' => $id_member,
 		)
 	);
-	$hasNotification = $db->num_rows($request) != 0;
-	$db->free_result($request);
+	$hasNotification = $request->num_rows() != 0;
+	$request->free_result();
 
 	return $hasNotification;
 }
@@ -899,6 +911,7 @@ function hasBoardNotification($id_member, $id_board)
  * @param int $id_member
  * @param int $id_board
  * @param bool $on = false
+ * @throws \ElkArte\Exceptions\Exception
  * @package Boards
  */
 function setBoardNotification($id_member, $id_board, $on = false)
@@ -941,6 +954,7 @@ function setBoardNotification($id_member, $id_board, $on = false)
  * @param int $id_board
  * @param bool $check = true check if the user has notifications enabled for the board
  * @return bool if the board was marked for notifications
+ * @throws \ElkArte\Exceptions\Exception
  * @package Boards
  */
 function resetSentBoardNotification($id_member, $id_board, $check = true)
@@ -952,7 +966,8 @@ function resetSentBoardNotification($id_member, $id_board, $check = true)
 	{
 		// check if the member has notifications enabled for this board
 		$request = $db->query('', '
-			SELECT sent
+			SELECT 
+				sent
 			FROM {db_prefix}log_notify
 			WHERE id_board = {int:current_board}
 				AND id_member = {int:current_member}
@@ -963,12 +978,12 @@ function resetSentBoardNotification($id_member, $id_board, $check = true)
 			)
 		);
 		// nothing to do
-		if ($db->num_rows($request) == 0)
+		if ($request->num_rows() == 0)
 		{
 			return false;
 		}
-		$sent = $db->fetch_row($request);
-		$db->free_result($request);
+		$sent = $request->fetch_row();
+		$request->free_result();
 
 		// not sent already? No need to stay around then
 		if (empty($sent))
@@ -980,7 +995,8 @@ function resetSentBoardNotification($id_member, $id_board, $check = true)
 	// Reset 'sent' status.
 	$db->query('', '
 		UPDATE {db_prefix}log_notify
-		SET sent = {int:is_sent}
+		SET 
+			sent = {int:is_sent}
 		WHERE id_board = {int:current_board}
 			AND id_member = {int:current_member}',
 		array(
@@ -998,6 +1014,7 @@ function resetSentBoardNotification($id_member, $id_board, $check = true)
  *
  * @param int $memID
  * @return int
+ * @throws \ElkArte\Exceptions\Exception
  * @package Boards
  */
 function getBoardNotificationsCount($memID)
@@ -1006,7 +1023,8 @@ function getBoardNotificationsCount($memID)
 
 	// All the boards that you have notification enabled
 	$request = $db->query('', '
-		SELECT COUNT(*)
+		SELECT 
+			COUNT(*)
 		FROM {db_prefix}log_notify AS ln
 			INNER JOIN {db_prefix}boards AS b ON (b.id_board = ln.id_board)
 			LEFT JOIN {db_prefix}log_boards AS lb ON (lb.id_board = b.id_board AND lb.id_member = {int:current_member})
@@ -1017,8 +1035,8 @@ function getBoardNotificationsCount($memID)
 			'selected_member' => $memID,
 		)
 	);
-	list ($totalNotifications) = $db->fetch_row($request);
-	$db->free_result($request);
+	list ($totalNotifications) = $request->fetch_row();
+	$request->free_result();
 
 	return $totalNotifications;
 }
@@ -1034,6 +1052,7 @@ function getBoardNotificationsCount($memID)
  * @param int[]|null $id_boards
  *
  * @return array
+ * @throws \ElkArte\Exceptions\Exception
  * @package Boards
  *
  */
@@ -1046,7 +1065,8 @@ function accessibleBoards($id_boards = null, $id_parents = null)
 	{
 		// Find all boards down from $id_parent
 		$request = $db->query('', '
-			SELECT b.id_board
+			SELECT 
+				b.id_board
 			FROM {db_prefix}boards AS b
 			WHERE b.id_parent IN ({array_int:parent_list})
 				AND {query_see_board}',
@@ -1059,7 +1079,8 @@ function accessibleBoards($id_boards = null, $id_parents = null)
 	{
 		// Find all the boards this user can see between those selected
 		$request = $db->query('', '
-			SELECT b.id_board
+			SELECT 
+				b.id_board
 			FROM {db_prefix}boards AS b
 			WHERE b.id_board IN ({array_int:board_list})
 				AND {query_see_board}',
@@ -1072,18 +1093,19 @@ function accessibleBoards($id_boards = null, $id_parents = null)
 	{
 		// Find all the boards this user can see.
 		$request = $db->query('', '
-			SELECT b.id_board
+			SELECT
+			 	b.id_board
 			FROM {db_prefix}boards AS b
 			WHERE {query_see_board}',
 			array()
 		);
 	}
 
-	while ($row = $db->fetch_assoc($request))
+	while (($row = $request->fetch_assoc()))
 	{
 		$boards[] = $row['id_board'];
 	}
-	$db->free_result($request);
+	$request->free_result();
 
 	return $boards;
 }
@@ -1095,6 +1117,7 @@ function accessibleBoards($id_boards = null, $id_parents = null)
  * @param bool $hide_recycle is tru the recycle bin is not returned
  *
  * @return array
+ * @throws \Exception
  * @package Boards
  *
  */
@@ -1110,7 +1133,8 @@ function wantedBoards($see_board, $hide_recycle = true)
 
 	// Find all boards down from $id_parent
 	return $db->fetchQuery('
-		SELECT b.id_board
+		SELECT 
+			b.id_board
 		FROM {db_prefix}boards AS b
 		WHERE ' . User::$info->{in_array($see_board, $allowed_see) ? $see_board : $allowed_see[0]} . ($hide_recycle && !empty($modSettings['recycle_enable']) && $modSettings['recycle_board'] > 0 ? '
 			AND b.id_board != {int:recycle_board}' : ''),
@@ -1133,6 +1157,7 @@ function wantedBoards($see_board, $hide_recycle = true)
  * @param int $board_id
  * @param int|null $topic_id
  * @return mixed[]
+ * @throws \ElkArte\Exceptions\Exception
  * @package Boards
  */
 function boardInfo($board_id, $topic_id = null)
@@ -1142,7 +1167,8 @@ function boardInfo($board_id, $topic_id = null)
 	if (!empty($topic_id))
 	{
 		$request = $db->query('', '
-			SELECT b.count_posts, b.name, m.subject
+			SELECT 
+				b.count_posts, b.name, m.subject
 			FROM {db_prefix}boards AS b
 				INNER JOIN {db_prefix}topics AS t ON (t.id_topic = {int:current_topic})
 				INNER JOIN {db_prefix}messages AS m ON (m.id_msg = t.id_first_msg)
@@ -1160,7 +1186,8 @@ function boardInfo($board_id, $topic_id = null)
 	else
 	{
 		$request = $db->query('', '
-			SELECT b.count_posts, b.name
+			SELECT 
+				b.count_posts, b.name
 			FROM {db_prefix}boards AS b
 			WHERE {query_see_board}
 				AND b.id_board = {int:board}
@@ -1173,8 +1200,8 @@ function boardInfo($board_id, $topic_id = null)
 		);
 	}
 
-	$returns = $db->fetch_assoc($request);
-	$db->free_result($request);
+	$returns = $request->fetch_assoc();
+	$request->free_result();
 
 	return $returns;
 }
@@ -1183,8 +1210,9 @@ function boardInfo($board_id, $topic_id = null)
  * Loads properties from non-standard groups
  *
  * @param int $curBoard
- * @param boolean $new_board = false Whether this is a new board
+ * @param bool $new_board = false Whether this is a new board
  * @return array
+ * @throws \Exception
  * @package Boards
  */
 function getOtherGroups($curBoard, $new_board = false)
@@ -1194,8 +1222,9 @@ function getOtherGroups($curBoard, $new_board = false)
 	$groups = array();
 
 	// Load membergroups.
-	$request = $db->query('', '
-		SELECT group_name, id_group, min_posts
+	$db->fetchQuery('
+		SELECT 
+			group_name, id_group, min_posts
 		FROM {db_prefix}membergroups
 		WHERE id_group > {int:moderator_group} OR id_group = {int:global_moderator}
 		ORDER BY min_posts, id_group != {int:global_moderator}, group_name',
@@ -1203,24 +1232,22 @@ function getOtherGroups($curBoard, $new_board = false)
 			'moderator_group' => 3,
 			'global_moderator' => 2,
 		)
-	);
+	)->fetch_callback(
+		function ($row) use (&$new_board, &$groups, &$curBoard) {
+			if ($new_board && $row['min_posts'] == -1)
+			{
+				$curBoard['member_groups'][] = $row['id_group'];
+			}
 
-	while ($row = $db->fetch_assoc($request))
-	{
-		if ($new_board && $row['min_posts'] == -1)
-		{
-			$curBoard['member_groups'][] = $row['id_group'];
+			$groups[(int) $row['id_group']] = array(
+				'id' => $row['id_group'],
+				'name' => trim($row['group_name']),
+				'allow' => in_array($row['id_group'], $curBoard['member_groups']),
+				'deny' => in_array($row['id_group'], $curBoard['deny_groups']),
+				'is_post_group' => $row['min_posts'] != -1,
+			);
 		}
-
-		$groups[(int) $row['id_group']] = array(
-			'id' => $row['id_group'],
-			'name' => trim($row['group_name']),
-			'allow' => in_array($row['id_group'], $curBoard['member_groups']),
-			'deny' => in_array($row['id_group'], $curBoard['deny_groups']),
-			'is_post_group' => $row['min_posts'] != -1,
-		);
-	}
-	$db->free_result($request);
+	);
 
 	return $groups;
 }
@@ -1231,6 +1258,7 @@ function getOtherGroups($curBoard, $new_board = false)
  * @param int $idboard
  * @param bool $only_id return only the id of the moderators instead of id and name (default false)
  * @return array
+ * @throws \Exception
  * @package Boards
  */
 function getBoardModerators($idboard, $only_id = false)
@@ -1241,22 +1269,23 @@ function getBoardModerators($idboard, $only_id = false)
 
 	if ($only_id)
 	{
-		$request = $db->query('', '
-			SELECT id_member
+		$db->fetchQuery('
+			SELECT 
+				id_member
 			FROM {db_prefix}moderators
 			WHERE id_board = {int:current_board}',
 			array(
 				'current_board' => $idboard,
 			)
+		)->fetch_callback(
+			function ($row) use (&$moderators) {
+				$moderators[] = $row['id_member'];
+			}
 		);
-		while ($row = $db->fetch_assoc($request))
-		{
-			$moderators[] = $row['id_member'];
-		}
 	}
 	else
 	{
-		$request = $db->query('', '
+		$db->fetchQuery('
 			SELECT mem.id_member, mem.real_name
 			FROM {db_prefix}moderators AS mods
 				INNER JOIN {db_prefix}members AS mem ON (mem.id_member = mods.id_member)
@@ -1264,14 +1293,12 @@ function getBoardModerators($idboard, $only_id = false)
 			array(
 				'current_board' => $idboard,
 			)
+		)->fetch_callback(
+			function ($row) use (&$moderators) {
+				$moderators[$row['id_member']] = $row['real_name'];
+			}
 		);
-
-		while ($row = $db->fetch_assoc($request))
-		{
-			$moderators[$row['id_member']] = $row['real_name'];
-		}
 	}
-	$db->free_result($request);
 
 	return $moderators;
 }
@@ -1282,6 +1309,7 @@ function getBoardModerators($idboard, $only_id = false)
  * @param bool $only_id return array with key of id_member of the moderator(s)
  * otherwise array with key of id_board id (default false)
  * @return array
+ * @throws \ElkArte\Exceptions\Exception
  * @package Boards
  */
 function allBoardModerators($only_id = false)
@@ -1293,7 +1321,8 @@ function allBoardModerators($only_id = false)
 	if ($only_id)
 	{
 		$request = $db->query('', '
-			SELECT id_board, id_member
+			SELECT 
+				id_board, id_member
 			FROM {db_prefix}moderators',
 			array()
 		);
@@ -1301,14 +1330,15 @@ function allBoardModerators($only_id = false)
 	else
 	{
 		$request = $db->query('', '
-			SELECT mods.id_board, mods.id_member, mem.real_name
+			SELECT 
+				mods.id_board, mods.id_member, mem.real_name
 			FROM {db_prefix}moderators AS mods
-				INNER JOIN {db_prefix}members AS mem ON (mem.id_member = mods.id_member)',
+			INNER JOIN {db_prefix}members AS mem ON (mem.id_member = mods.id_member)',
 			array()
 		);
 	}
 
-	while ($row = $db->fetch_assoc($request))
+	while (($row = $request->fetch_assoc()))
 	{
 		if ($only_id)
 		{
@@ -1319,7 +1349,7 @@ function allBoardModerators($only_id = false)
 			$moderators[$row['id_board']][] = $row;
 		}
 	}
-	$db->free_result($request);
+	$request->free_result();
 
 	return $moderators;
 }
@@ -1329,6 +1359,7 @@ function allBoardModerators($only_id = false)
  *
  * @param int $id_member the id of a member
  * @return array
+ * @throws \Exception
  * @package Boards
  */
 function boardsModerated($id_member)
@@ -1336,7 +1367,8 @@ function boardsModerated($id_member)
 	$db = database();
 
 	return $db->fetchQuery('
-		SELECT id_board
+		SELECT 
+			id_board
 		FROM {db_prefix}moderators
 		WHERE id_member = {int:current_member}',
 		array(
@@ -1353,6 +1385,7 @@ function boardsModerated($id_member)
  * Get all available themes
  *
  * @return array
+ * @throws \Exception
  * @package Boards
  */
 function getAllThemes()
@@ -1361,7 +1394,8 @@ function getAllThemes()
 
 	// Get all the themes...
 	return $db->fetchQuery('
-		SELECT id_theme AS id, value AS name
+		SELECT 
+			id_theme AS id, value AS name
 		FROM {db_prefix}themes
 		WHERE variable = {string:name}',
 		array(
@@ -1375,6 +1409,7 @@ function getAllThemes()
  *
  * @param int $idboard
  * @return array
+ * @throws \ElkArte\Exceptions\Exception
  * @package Boards
  */
 function getBoardProperties($idboard)
@@ -1384,15 +1419,16 @@ function getBoardProperties($idboard)
 	$properties = array();
 
 	$request = $db->query('', '
-		SELECT redirect, num_posts
+		SELECT 
+			redirect, num_posts
 		FROM {db_prefix}boards
 		WHERE id_board = {int:current_board}',
 		array(
 			'current_board' => $idboard,
 		)
 	);
-	list ($properties['oldRedirect'], $properties['numPosts']) = $db->fetch_row($request);
-	$db->free_result($request);
+	list ($properties['oldRedirect'], $properties['numPosts']) = $request->fetch_row();
+	$request->free_result();
 
 	return $properties;
 }
@@ -1406,6 +1442,7 @@ function getBoardProperties($idboard)
  * @param bool $include_recycle if false excludes any results from the recycle board (if enabled)
  *
  * @return array
+ * @throws \Exception
  * @package Boards
  *
  */
@@ -1442,20 +1479,20 @@ function boardsPosts($boards, $categories, $wanna_see_board = false, $include_re
 		return array();
 	}
 
-	$request = $db->query('', '
-		SELECT b.id_board, b.num_posts
+	$return = array();
+	$db->fetchQuery('
+		SELECT 
+			b.id_board, b.num_posts
 		FROM {db_prefix}boards AS b
 		WHERE ' . ($wanna_see_board ? '{query_wanna_see_board}' : '{query_see_board}') . '
 			AND b.' . implode(' OR b.', $clauses) . (!empty($removals) ? '
 			AND b.' . implode(' AND b.', $removals) : ''),
 		$clauseParameters
+	)->fetch_callback(
+		function ($row) use (&$return) {
+			$return[$row['id_board']] = $row['num_posts'];
+		}
 	);
-	$return = array();
-	while ($row = $db->fetch_assoc($request))
-	{
-		$return[$row['id_board']] = $row['num_posts'];
-	}
-	$db->free_result($request);
 
 	return $return;
 }
@@ -1471,7 +1508,8 @@ function sumRecentPosts()
 	global $modSettings;
 
 	$request = $db->query('', '
-		SELECT COALESCE(SUM(num_posts), 0)
+		SELECT 
+			COALESCE(SUM(num_posts), 0)
 		FROM {db_prefix}boards as b
 		WHERE {query_wanna_see_board}' . (!empty($modSettings['recycle_enable']) && $modSettings['recycle_board'] > 0 ? '
 			AND b.id_board != {int:recycle_board}' : ''),
@@ -1479,8 +1517,8 @@ function sumRecentPosts()
 			'recycle_board' => $modSettings['recycle_board']
 		)
 	);
-	list ($result) = $db->fetch_row($request);
-	$db->free_result($request);
+	list ($result) = $request->fetch_row();
+	$request->free_result();
 
 	return $result;
 }
@@ -1505,9 +1543,10 @@ function sumRecentPosts()
  *              'include_redirects' => (bool) redirects are included (default true)
  *
  * @return array
- * @todo unify the two queries?
+ * @throws \ElkArte\Exceptions\Exception
  * @package Boards
  *
+ * @todo unify the two queries?
  */
 function fetchBoardsInfo($conditions = 'all', $params = array())
 {
@@ -1602,12 +1641,11 @@ function fetchBoardsInfo($conditions = 'all', $params = array())
 		);
 	}
 	$return = array();
-	while ($row = $db->fetch_assoc($request))
+	while (($row = $request->fetch_assoc()))
 	{
 		$return[$row['id_board']] = $row;
 	}
-
-	$db->free_result($request);
+	$request->free_result();
 
 	return $return;
 }
@@ -1620,6 +1658,7 @@ function fetchBoardsInfo($conditions = 'all', $params = array())
  * is returned through the param itself, starting from 1.1 the expected behaviour
  * is that the result is returned.
  * @return bool|int[]
+ * @throws \Exception
  * @package Boards
  */
 function addChildBoards($boards)
@@ -1636,7 +1675,7 @@ function addChildBoards($boards)
 		$boards = array($boards);
 	}
 
-	$request = $db->query('', '
+	$db->fetchQuery('
 		SELECT
 			b.id_board, b.id_parent
 		FROM {db_prefix}boards AS b
@@ -1649,15 +1688,14 @@ function addChildBoards($boards)
 			'no_parents' => 0,
 			'board_list' => $boards,
 		)
-	);
-	while ($row = $db->fetch_assoc($request))
-	{
-		if (in_array($row['id_parent'], $boards))
-		{
-			$boards[] = $row['id_board'];
+	)->fetch_callback(
+		function ($row) use (&$boards) {
+			if (in_array($row['id_parent'], $boards))
+			{
+				$boards[] = $row['id_board'];
+			}
 		}
-	}
-	$db->free_result($request);
+	);
 
 	return $boards;
 }
@@ -1667,6 +1705,7 @@ function addChildBoards($boards)
  *
  * @param int $id_board
  * @param mixed[]|string $values an array of index => value of a string representing the index to increment
+ * @throws \ElkArte\Exceptions\Exception
  * @package Boards
  */
 function incrementBoard($id_board, $values)
@@ -1713,6 +1752,7 @@ function incrementBoard($id_board, $values)
  *
  * @param int $id_board
  * @param mixed[]|string $values an array of index => value of a string representing the index to decrement
+ * @throws \ElkArte\Exceptions\Exception
  * @package Boards
  */
 function decrementBoard($id_board, $values)
@@ -1765,6 +1805,7 @@ function decrementBoard($id_board, $values)
  * @param int $memID id_member
  *
  * @return array
+ * @throws \Exception
  * @package Boards
  *
  */
@@ -1776,10 +1817,11 @@ function boardNotifications($sort, $memID)
 
 	// All the boards that you have notification enabled
 	$notification_boards = $db->fetchQuery('
-		SELECT b.id_board, b.name, COALESCE(lb.id_msg, 0) AS board_read, b.id_msg_updated
+		SELECT 
+			b.id_board, b.name, COALESCE(lb.id_msg, 0) AS board_read, b.id_msg_updated
 		FROM {db_prefix}log_notify AS ln
-			INNER JOIN {db_prefix}boards AS b ON (b.id_board = ln.id_board)
-			LEFT JOIN {db_prefix}log_boards AS lb ON (lb.id_board = b.id_board AND lb.id_member = {int:current_member})
+		INNER JOIN {db_prefix}boards AS b ON (b.id_board = ln.id_board)
+		LEFT JOIN {db_prefix}log_boards AS lb ON (lb.id_board = b.id_board AND lb.id_member = {int:current_member})
 		WHERE ln.id_member = {int:selected_member}
 			AND {query_see_board}
 		ORDER BY ' . $sort,
@@ -1803,7 +1845,7 @@ function boardNotifications($sort, $memID)
 	);
 
 	// and all the boards that you can see but don't have notify turned on for
-	$request = $db->query('', '
+	$db->fetchQuery('
 		SELECT 
 			b.id_board, b.name, COALESCE(lb.id_msg, 0) AS board_read, b.id_msg_updated
 		FROM {db_prefix}boards AS b
@@ -1818,20 +1860,19 @@ function boardNotifications($sort, $memID)
 			'current_member' => User::$info->id,
 			'recycle_board' => $modSettings['recycle_board'],
 		)
+	)->fetch_callback(
+		function ($row) use (&$notification_boards) {
+			$href = getUrl('board', ['board' => $row['id_board'], 'start' => '0', 'name' => $row['name']]);
+			$notification_boards[] = array(
+				'id' => $row['id_board'],
+				'name' => $row['name'],
+				'href' => $href,
+				'link' => '<a href="' . $href . '">' . $row['name'] . '</a>',
+				'new' => $row['board_read'] < $row['id_msg_updated'],
+				'checked' => '',
+			);
+		}
 	);
-	while ($row = $db->fetch_assoc($request))
-	{
-		$href = getUrl('board', ['board' => $row['id_board'], 'start' => '0', 'name' => $row['name']]);
-		$notification_boards[] = array(
-			'id' => $row['id_board'],
-			'name' => $row['name'],
-			'href' => $href,
-			'link' => '<a href="' . $href . '">' . $row['name'] . '</a>',
-			'new' => $row['board_read'] < $row['id_msg_updated'],
-			'checked' => '',
-		);
-	}
-	$db->free_result($request);
 
 	return $notification_boards;
 }
@@ -1848,6 +1889,7 @@ function boardNotifications($sort, $memID)
  *              'include_recycle' => (bool) recycle board is included (default true)
  *              'include_redirects' => (bool) redirects are included (default true)
  * @return int
+ * @throws \ElkArte\Exceptions\Exception
  * @package Boards
  */
 function countBoards($conditions = 'all', $params = array())
@@ -1867,7 +1909,8 @@ function countBoards($conditions = 'all', $params = array())
 	{
 		// id_board, name, id_profile => used in admin/Reports.controller.php
 		$request = $db->query('', '
-			SELECT COUNT(*)
+			SELECT 
+				COUNT(*)
 			FROM {db_prefix}boards AS b',
 			array()
 		);
@@ -1889,7 +1932,8 @@ function countBoards($conditions = 'all', $params = array())
 		}
 
 		$request = $db->query('', '
-			SELECT COUNT(*)
+			SELECT 
+				COUNT(*)
 			FROM {db_prefix}boards AS b
 			WHERE ' . ($params['wanna_see_board'] ? '{query_wanna_see_board}' : '{query_see_board}') . (!empty($clauses) ? '
 				AND b.' . implode(' OR b.', $clauses) : '') . ($params['include_recycle'] ? '' : '
@@ -1902,8 +1946,8 @@ function countBoards($conditions = 'all', $params = array())
 		);
 	}
 
-	list ($num_boards) = $db->fetch_row($request);
-	$db->free_result($request);
+	list ($num_boards) = $request->fetch_row();
+	$request->free_result();
 
 	return $num_boards;
 }

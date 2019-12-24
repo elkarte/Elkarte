@@ -72,7 +72,8 @@ function approveAttachments($attachments)
 	// Approving an attachment is not hard - it's easy.
 	$db->query('', '
 		UPDATE {db_prefix}attachments
-		SET approved = {int:is_approved}
+		SET 
+			approved = {int:is_approved}
 		WHERE id_attach IN ({array_int:attachments})',
 		array(
 			'attachments' => $attachments,
@@ -262,7 +263,8 @@ function removeAttachments($condition, $query_type = '', $return_affected_messag
 	{
 		$db->query('', '
 			UPDATE {db_prefix}attachments
-			SET id_thumb = {int:no_thumb}
+			SET 
+				id_thumb = {int:no_thumb}
 			WHERE id_attach IN ({array_int:parent_attachments})',
 			array(
 				'parent_attachments' => $parents,
@@ -429,7 +431,8 @@ function removeOrphanAttachments($attach_ids)
 
 	$db->query('', '
 		UPDATE {db_prefix}attachments
-			SET id_thumb = {int:no_thumb}
+			SET 
+				id_thumb = {int:no_thumb}
 			WHERE id_thumb IN ({array_int:to_remove})',
 		array(
 			'to_remove' => $attach_ids,
@@ -476,7 +479,8 @@ function attachment_filesize($attach_id, $filesize = null)
 	{
 		$db->query('', '
 			UPDATE {db_prefix}attachments
-			SET size = {int:filesize}
+			SET 
+				size = {int:filesize}
 			WHERE id_attach = {int:id_attach}',
 			array(
 				'filesize' => $filesize,
@@ -524,7 +528,8 @@ function attachment_folder($attach_id, $folder_id = null)
 	{
 		$db->query('', '
 			UPDATE {db_prefix}attachments
-			SET id_folder = {int:new_folder}
+			SET 
+				id_folder = {int:new_folder}
 			WHERE id_attach = {int:id_attach}',
 			array(
 				'new_folder' => $folder_id,
@@ -672,7 +677,8 @@ function findParentsOrphanThumbnails($start, $fix_errors, $to_fix)
 	{
 		$db->query('', '
 			UPDATE {db_prefix}attachments
-			SET id_thumb = {int:no_thumb}
+			SET 
+				id_thumb = {int:no_thumb}
 			WHERE id_attach IN ({array_int:to_update})',
 			array(
 				'to_update' => $to_update,
@@ -1658,7 +1664,8 @@ function moveAvatars()
 	{
 		$db->query('', '
 			UPDATE {db_prefix}attachments
-			SET attachment_type = {int:attachment_type}
+			SET 
+				attachment_type = {int:attachment_type}
 			WHERE id_attach IN ({array_int:updated_avatars})',
 			array(
 				'updated_avatars' => $updatedAvatars,
@@ -1717,7 +1724,8 @@ function moveAttachments($moved, $new_dir)
 	// Update the database
 	$db->query('', '
 		UPDATE {db_prefix}attachments
-		SET id_folder = {int:new}
+		SET 
+			id_folder = {int:new}
 		WHERE id_attach IN ({array_int:attachments})',
 		array(
 			'attachments' => $moved,
@@ -1739,7 +1747,8 @@ function setRemovalNotice($messages, $notice)
 
 	$db->query('', '
 		UPDATE {db_prefix}messages
-		SET body = CONCAT(body, {string:notice})
+		SET 
+			body = CONCAT(body, {string:notice})
 		WHERE id_msg IN ({array_int:messages})',
 		array(
 			'messages' => $messages,
@@ -1822,7 +1831,8 @@ function updateAttachmentIdFolder($from, $to)
 
 	$db->query('', '
 		UPDATE {db_prefix}attachments
-		SET id_folder = {int:folder_to}
+		SET 
+			id_folder = {int:folder_to}
 		WHERE id_folder = {int:folder_from}',
 		array(
 			'folder_from' => $from,

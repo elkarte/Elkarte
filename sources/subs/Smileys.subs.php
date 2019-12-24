@@ -19,25 +19,26 @@
  *
  * @param string[] $smileys
  * @return array
+ * @throws \Exception
  */
 function smileyExists($smileys)
 {
 	$db = database();
 
 	$found = array();
-	$request = $db->query('', '
-		SELECT filename
+	$db->fetchQuery('
+		SELECT 
+			filename
 		FROM {db_prefix}smileys
 		WHERE filename IN ({array_string:smiley_list})',
 		array(
 			'smiley_list' => $smileys,
 		)
+	)->fetch_callback(
+		function ($row) use (&$found) {
+			$found[] = $row['filename'];
+		}
 	);
-	while ($row = $db->fetch_assoc($request))
-	{
-		$found[] = $row['filename'];
-	}
-	$db->free_result($request);
 
 	return $found;
 }
@@ -47,14 +48,16 @@ function smileyExists($smileys)
  *
  * @param string $code
  * @param string|null $current
- * @return boolean
+ * @return bool
+ * @throws \Exception
  */
 function validateDuplicateSmiley($code, $current = null)
 {
 	$db = database();
 
-	$request = $db->query('', '
-		SELECT id_smiley
+	return $db->fetchQuery('
+		SELECT 
+			id_smiley
 		FROM {db_prefix}smileys
 		WHERE code = {string_case_sensitive:smiley_code}' . (!isset($current) ? '' : '
 			AND id_smiley != {int:current_smiley}'),
@@ -62,14 +65,7 @@ function validateDuplicateSmiley($code, $current = null)
 			'current_smiley' => $current,
 			'smiley_code' => $code,
 		)
-	);
-	if ($db->num_rows($request) > 0)
-	{
-		return true;
-	}
-	$db->free_result($request);
-
-	return false;
+	)->num_rows() > 0;
 }
 
 /**
@@ -77,13 +73,14 @@ function validateDuplicateSmiley($code, $current = null)
  *
  * @param string $location
  *
- * @return
+ * @return int
+ * @throws \Exception
  */
 function nextSmileyLocation($location)
 {
 	$db = database();
 
-	$request = $db->query('', '
+	$request = $db->fetchQuery('
 		SELECT MAX(smiley_order) + 1
 		FROM {db_prefix}smileys
 		WHERE hidden = {int:smiley_location}
@@ -93,8 +90,8 @@ function nextSmileyLocation($location)
 			'first_row' => 0,
 		)
 	);
-	list ($smiley_order) = $db->fetch_row($request);
-	$db->free_result($request);
+	list ($smiley_order) = $request->fetch_row();
+	$request->free_result();
 
 	return $smiley_order;
 }
@@ -103,6 +100,7 @@ function nextSmileyLocation($location)
  * Adds a smiley to the database
  *
  * @param mixed[] $param associative array to use in the insert
+ * @throws \Exception
  */
 function addSmiley($param)
 {
@@ -122,6 +120,7 @@ function addSmiley($param)
  * Deletes smileys.
  *
  * @param int[] $smileys
+ * @throws \ElkArte\Exceptions\Exception
  */
 function deleteSmileys($smileys)
 {
@@ -141,6 +140,7 @@ function deleteSmileys($smileys)
  *
  * @param int[] $smileys
  * @param int $display_type
+ * @throws \ElkArte\Exceptions\Exception
  */
 function updateSmileyDisplayType($smileys, $display_type)
 {
@@ -148,7 +148,8 @@ function updateSmileyDisplayType($smileys, $display_type)
 
 	$db->query('', '
 		UPDATE {db_prefix}smileys
-		SET hidden = {int:display_type}
+		SET 
+			hidden = {int:display_type}
 		WHERE id_smiley IN ({array_int:checked_smileys})',
 		array(
 			'checked_smileys' => $smileys,
@@ -161,6 +162,7 @@ function updateSmileyDisplayType($smileys, $display_type)
  * Updates a smiley.
  *
  * @param mixed[] $param
+ * @throws \ElkArte\Exceptions\Exception
  */
 function updateSmiley($param)
 {
@@ -196,20 +198,21 @@ function getSmiley($id)
 {
 	$db = database();
 
-	$request = $db->query('', '
-		SELECT id_smiley AS id, code, filename, description, hidden AS location, 0 AS is_new, smiley_row AS row
+	$request = $db->fetchQuery('
+		SELECT 
+			id_smiley AS id, code, filename, description, hidden AS location, 0 AS is_new, smiley_row AS row
 		FROM {db_prefix}smileys
 		WHERE id_smiley = {int:current_smiley}',
 		array(
 			'current_smiley' => $id,
 		)
 	);
-	if ($db->num_rows($request) != 1)
+	if ($request->num_rows() != 1)
 	{
 		throw new \ElkArte\Exceptions\Exception('smiley_not_found');
 	}
-	$current_smiley = $db->fetch_assoc($request);
-	$db->free_result($request);
+	$current_smiley = $request->fetch_assoc();
+	$request->free_result();
 
 	return $current_smiley;
 }
@@ -221,6 +224,7 @@ function getSmiley($id)
  * @param int $id
  *
  * @return array
+ * @throws \ElkArte\Exceptions\Exception
  */
 function getSmileyPosition($location, $id)
 {
@@ -229,7 +233,8 @@ function getSmileyPosition($location, $id)
 	$smiley = array();
 
 	$request = $db->query('', '
-		SELECT smiley_row, smiley_order, hidden
+		SELECT 
+			smiley_row, smiley_order, hidden
 		FROM {db_prefix}smileys
 		WHERE hidden = {int:location}
 			AND id_smiley = {int:id_smiley}',
@@ -238,9 +243,8 @@ function getSmileyPosition($location, $id)
 			'id_smiley' => $id,
 		)
 	);
-	list ($smiley['row'], $smiley['order'], $smiley['location']) = $db->fetch_row($request);
-
-	$db->free_result($request);
+	list ($smiley['row'], $smiley['order'], $smiley['location']) = $request->fetch_row();
+	$request->free_result();
 
 	return $smiley;
 }
@@ -250,6 +254,7 @@ function getSmileyPosition($location, $id)
  *
  * @param int[] $smiley
  * @param int $source
+ * @throws \ElkArte\Exceptions\Exception
  */
 function moveSmileyPosition($smiley, $source)
 {
@@ -257,7 +262,8 @@ function moveSmileyPosition($smiley, $source)
 
 	$db->query('', '
 		UPDATE {db_prefix}smileys
-		SET smiley_order = smiley_order + 1
+		SET 
+			smiley_order = smiley_order + 1
 		WHERE hidden = {int:new_location}
 			AND smiley_row = {int:smiley_row}
 			AND smiley_order > {int:smiley_order}',
@@ -290,6 +296,7 @@ function moveSmileyPosition($smiley, $source)
  * @param int $id
  * @param int $row
  * @param int $location
+ * @throws \ElkArte\Exceptions\Exception
  */
 function updateSmileyRow($id, $row, $location)
 {
@@ -297,7 +304,8 @@ function updateSmileyRow($id, $row, $location)
 
 	$db->query('', '
 		UPDATE {db_prefix}smileys
-		SET smiley_row = {int:new_row}
+		SET 
+			smiley_row = {int:new_row}
 		WHERE smiley_row = {int:current_row}
 			AND hidden = {int:location}',
 		array(
@@ -313,6 +321,7 @@ function updateSmileyRow($id, $row, $location)
  *
  * @param int $id
  * @param int $order
+ * @throws \ElkArte\Exceptions\Exception
  */
 function updateSmileyOrder($id, $order)
 {
@@ -320,7 +329,8 @@ function updateSmileyOrder($id, $order)
 
 	$db->query('', '
 		UPDATE {db_prefix}smileys
-		SET smiley_order = {int:new_order}
+		SET 
+			smiley_order = {int:new_order}
 		WHERE id_smiley = {int:current_smiley}',
 		array(
 			'new_order' => $order,
@@ -336,15 +346,6 @@ function getSmileys()
 {
 	$db = database();
 
-	$request = $db->query('', '
-		SELECT id_smiley, code, filename, description, smiley_row, smiley_order, hidden
-		FROM {db_prefix}smileys
-		WHERE hidden != {int:popup}
-		ORDER BY smiley_order, smiley_row',
-		array(
-			'popup' => 1,
-		)
-	);
 	$smileys = array(
 		'postform' => array(
 			'rows' => array(),
@@ -353,20 +354,30 @@ function getSmileys()
 			'rows' => array(),
 		),
 	);
-	while ($row = $db->fetch_assoc($request))
-	{
-		$location = empty($row['hidden']) ? 'postform' : 'popup';
-		$smileys[$location]['rows'][$row['smiley_row']][] = array(
-			'id' => $row['id_smiley'],
-			'code' => htmlspecialchars($row['code'], ENT_COMPAT, 'UTF-8'),
-			'filename' => htmlspecialchars($row['filename'], ENT_COMPAT, 'UTF-8'),
-			'description' => htmlspecialchars($row['description'], ENT_COMPAT, 'UTF-8'),
-			'row' => $row['smiley_row'],
-			'order' => $row['smiley_order'],
-			'selected' => !empty($_REQUEST['move']) && $_REQUEST['move'] == $row['id_smiley'],
-		);
-	}
-	$db->free_result($request);
+
+	$db->fetchQuery('
+		SELECT 
+			id_smiley, code, filename, description, smiley_row, smiley_order, hidden
+		FROM {db_prefix}smileys
+		WHERE hidden != {int:popup}
+		ORDER BY smiley_order, smiley_row',
+		array(
+			'popup' => 1,
+		)
+	)->fetch_callback(
+		function ($row) use (&$smileys) {
+			$location = empty($row['hidden']) ? 'postform' : 'popup';
+			$smileys[$location]['rows'][$row['smiley_row']][] = array(
+				'id' => $row['id_smiley'],
+				'code' => htmlspecialchars($row['code'], ENT_COMPAT, 'UTF-8'),
+				'filename' => htmlspecialchars($row['filename'], ENT_COMPAT, 'UTF-8'),
+				'description' => htmlspecialchars($row['description'], ENT_COMPAT, 'UTF-8'),
+				'row' => $row['smiley_row'],
+				'order' => $row['smiley_order'],
+				'selected' => !empty($_REQUEST['move']) && $_REQUEST['move'] == $row['id_smiley'],
+			);
+		}
+	);
 
 	return $smileys;
 }
@@ -375,14 +386,16 @@ function getSmileys()
  * Validates, if a smiley set was properly installed.
  *
  * @param string $set name of smiley set to check
- * @return boolean
+ * @return bool
+ * @throws \Exception
  */
 function isSmileySetInstalled($set)
 {
 	$db = database();
 
-	$request = $db->query('', '
-		SELECT version, themes_installed, db_changes
+	return $db->fetchQuery('
+		SELECT 
+			version, themes_installed, db_changes
 		FROM {db_prefix}log_packages
 		WHERE package_id = {string:current_package}
 			AND install_state != {int:not_installed}
@@ -392,15 +405,14 @@ function isSmileySetInstalled($set)
 			'not_installed' => 0,
 			'current_package' => $set,
 		)
-	);
-
-	return $db->num_rows($request) <= 0;
+	)->num_rows($request) <= 0;
 }
 
 /**
  * Logs the installation of a new smiley set.
  *
  * @param mixed[] $param
+ * @throws \Exception
  */
 function logPackageInstall($param)
 {
@@ -428,13 +440,15 @@ function logPackageInstall($param)
  * Get the last smiley_order from the first smileys row.
  *
  * @return string
+ * @throws \ElkArte\Exceptions\Exception
  */
 function getMaxSmileyOrder()
 {
 	$db = database();
 
 	$request = $db->query('', '
-		SELECT MAX(smiley_order)
+		SELECT 
+			MAX(smiley_order)
 		FROM {db_prefix}smileys
 		WHERE hidden = {int:postform}
 			AND smiley_row = {int:first_row}',
@@ -443,8 +457,8 @@ function getMaxSmileyOrder()
 			'first_row' => 0,
 		)
 	);
-	list ($smiley_order) = $db->fetch_row($request);
-	$db->free_result($request);
+	list ($smiley_order) = $request->fetch_row();
+	$request->free_result();
 
 	return $smiley_order;
 }
@@ -528,26 +542,20 @@ function list_getNumSmileySets()
  * @param string $sort A string indicating how to sort the results
  *
  * @return array
+ * @throws \Exception
  */
 function list_getSmileys($start, $items_per_page, $sort)
 {
 	$db = database();
 
-	$request = $db->query('', '
-		SELECT id_smiley, code, filename, description, smiley_row, smiley_order, hidden
+	return $db->fetchQuery('
+		SELECT 
+			id_smiley, code, filename, description, smiley_row, smiley_order, hidden
 		FROM {db_prefix}smileys
 		ORDER BY ' . $sort . '
 		LIMIT ' . $start . ', ' . $items_per_page,
 		array()
-	);
-	$smileys = array();
-	while ($row = $db->fetch_assoc($request))
-	{
-		$smileys[] = $row;
-	}
-	$db->free_result($request);
-
-	return $smileys;
+	)->fetch_all();
 }
 
 /**
@@ -562,8 +570,8 @@ function list_getNumSmileys()
 		FROM {db_prefix}smileys',
 		array()
 	);
-	list ($numSmileys) = $db->fetch_row($request);
-	$db->free_result($request);
+	list ($numSmileys) = $request->fetch_row();
+	$request->free_result();
 
 	return $numSmileys;
 }

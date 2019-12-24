@@ -24,8 +24,10 @@ function installedThemes()
 {
 	$db = database();
 
-	$request = $db->query('', '
-		SELECT id_theme, variable, value
+	$themes = array();
+	$db->fetchQuery('
+		SELECT 
+			id_theme, variable, value
 		FROM {db_prefix}themes
 		WHERE variable IN ({string:name}, {string:theme_dir}, {string:theme_url}, {string:images_url}, {string:theme_templates}, {string:theme_layers})
 			AND id_member = {int:no_member}',
@@ -38,21 +40,20 @@ function installedThemes()
 			'theme_layers' => 'theme_layers',
 			'no_member' => 0,
 		)
-	);
-	$themes = array();
-	while ($row = $db->fetch_assoc($request))
-	{
-		if (!isset($themes[$row['id_theme']]))
-		{
-			$themes[$row['id_theme']] = array(
-				'id' => $row['id_theme'],
-				'num_default_options' => 0,
-				'num_members' => 0,
-			);
+	)->fetch_callback(
+		function ($row) use (&$themes) {
+			if (!isset($themes[$row['id_theme']]))
+			{
+				$themes[$row['id_theme']] = array(
+					'id' => $row['id_theme'],
+					'num_default_options' => 0,
+					'num_members' => 0,
+				);
+			}
+
+			$themes[$row['id_theme']][$row['variable']] = $row['value'];
 		}
-		$themes[$row['id_theme']][$row['variable']] = $row['value'];
-	}
-	$db->free_result($request);
+	);
 
 	return $themes;
 }
@@ -62,13 +63,15 @@ function installedThemes()
  *
  * @param int $id_theme the id of the theme
  * @return string
+ * @throws \ElkArte\Exceptions\Exception
  */
 function themeDirectory($id_theme)
 {
 	$db = database();
 
 	$request = $db->query('', '
-		SELECT value
+		SELECT 
+			value
 		FROM {db_prefix}themes
 		WHERE variable = {string:theme_dir}
 			AND id_theme = {int:current_theme}
@@ -78,8 +81,8 @@ function themeDirectory($id_theme)
 			'theme_dir' => 'theme_dir',
 		)
 	);
-	list ($themeDirectory) = $db->fetch_row($request);
-	$db->free_result($request);
+	list ($themeDirectory) = $request->fetch_row();
+	$request->free_result();
 
 	return $themeDirectory;
 }
@@ -89,14 +92,16 @@ function themeDirectory($id_theme)
  *
  * @param int $id_theme id of the theme
  *
- * @return
+ * @return string
+ * @throws \ElkArte\Exceptions\Exception
  */
 function themeUrl($id_theme)
 {
 	$db = database();
 
 	$request = $db->query('', '
-		SELECT value
+		SELECT 
+			value
 		FROM {db_prefix}themes
 		WHERE variable = {string:theme_url}
 			AND id_theme = {int:current_theme}
@@ -106,9 +111,8 @@ function themeUrl($id_theme)
 			'theme_url' => 'theme_url',
 		)
 	);
-
-	list ($theme_url) = $db->fetch_row($request);
-	$db->free_result($request);
+	list ($theme_url) = $request->fetch_row();
+	$request->free_result();
 
 	return $theme_url;
 }
@@ -120,13 +124,16 @@ function themeUrl($id_theme)
  * @param mixed[] $value_data
  *
  * @return array
+ * @throws \Exception
  */
 function validateThemeName($indexes, $value_data)
 {
 	$db = database();
 
-	$request = $db->query('', '
-		SELECT id_theme, value
+	$themes = array();
+	$db->fetchQuery('
+		SELECT 
+			id_theme, value
 		FROM {db_prefix}themes
 		WHERE id_member = {int:no_member}
 			AND variable = {string:theme_dir}
@@ -136,20 +143,18 @@ function validateThemeName($indexes, $value_data)
 			'theme_dir' => 'theme_dir',
 			'index_compare_explode' => 'value LIKE \'%' . implode('\' OR value LIKE \'%', $indexes) . '\'',
 		))
-	);
-	$themes = array();
-	while ($row = $db->fetch_assoc($request))
-	{
-		// Find the right one.
-		foreach ($indexes as $index)
-		{
-			if (strpos($row['value'], $index) !== false)
+	)->fetch_callback(
+		function ($row) use (&$themes, $indexes) {
+			// Find the right one.
+			foreach ($indexes as $index)
 			{
-				$themes[$row['id_theme']] = $index;
+				if (strpos($row['value'], $index) !== false)
+				{
+					$themes[$row['id_theme']] = $index;
+				}
 			}
 		}
-	}
-	$db->free_result($request);
+	);
 
 	return $themes;
 }
@@ -159,6 +164,7 @@ function validateThemeName($indexes, $value_data)
  *
  * @param int|int[] $themes
  * @return array
+ * @throws \Exception
  */
 function getBasicThemeInfos($themes)
 {
@@ -166,8 +172,9 @@ function getBasicThemeInfos($themes)
 
 	$themelist = array();
 
-	$request = $db->query('', '
-		SELECT id_theme, value
+	$db->fetchQuery('
+		SELECT 
+			id_theme, value
 		FROM {db_prefix}themes
 		WHERE id_member = {int:no_member}
 			AND variable = {string:name}
@@ -177,13 +184,11 @@ function getBasicThemeInfos($themes)
 			'no_member' => 0,
 			'name' => 'name',
 		)
+	)->fetch_callback(
+		function ($row) use (&$themelist) {
+			$themelist[$row['id_theme']] = $row['value'];
+		}
 	);
-	while ($row = $db->fetch_assoc($request))
-	{
-		$themelist[$row['id_theme']] = $row['value'];
-	}
-
-	$db->free_result($request);
 
 	return $themelist;
 }
@@ -192,6 +197,7 @@ function getBasicThemeInfos($themes)
  * Gets a list of all themes from the database
  *
  * @return array $themes
+ * @throws \Exception
  */
 function getCustomThemes()
 {
@@ -199,8 +205,17 @@ function getCustomThemes()
 
 	$db = database();
 
-	$request = $db->query('', '
-		SELECT id_theme, variable, value
+	// Manually add in the default
+	$themes = array(
+		1 => array(
+			'name' => $txt['dvc_default'],
+			'theme_dir' => $settings['default_theme_dir'],
+		),
+	);
+
+	$db->fetchQuery('
+		SELECT 
+			id_theme, variable, value
 		FROM {db_prefix}themes
 		WHERE id_theme != {int:default_theme}
 			AND id_member = {int:no_member}
@@ -211,19 +226,11 @@ function getCustomThemes()
 			'name' => 'name',
 			'theme_dir' => 'theme_dir',
 		)
+	)->fetch_callback(
+		function ($row) use (&$themes) {
+			$themes[$row['id_theme']][$row['variable']] = $row['value'];
+		}
 	);
-	// Manually add in the default
-	$themes = array(
-		1 => array(
-			'name' => $txt['dvc_default'],
-			'theme_dir' => $settings['default_theme_dir'],
-		),
-	);
-	while ($row = $db->fetch_assoc($request))
-	{
-		$themes[$row['id_theme']][$row['variable']] = $row['value'];
-	}
-	$db->free_result($request);
 
 	return $themes;
 }
@@ -234,6 +241,7 @@ function getCustomThemes()
  * @param int[] $theme_list
  *
  * @return array
+ * @throws \Exception
  */
 function getThemesPathbyID($theme_list = array())
 {
@@ -253,8 +261,10 @@ function getThemesPathbyID($theme_list = array())
 	}
 
 	// Load up any themes we need the paths for
-	$request = $db->query('', '
-		SELECT id_theme, variable, value
+	$theme_paths = array();
+	$db->fetchQuery('
+		SELECT 
+			id_theme, variable, value
 		FROM {db_prefix}themes
 		WHERE (id_theme = {int:default_theme} OR id_theme IN ({array_int:known_theme_list}))
 			AND variable IN ({string:name}, {string:theme_dir})',
@@ -264,13 +274,11 @@ function getThemesPathbyID($theme_list = array())
 			'name' => 'name',
 			'theme_dir' => 'theme_dir',
 		)
+	)->fetch_callback(
+		function ($row) use (&$theme_paths) {
+			$theme_paths[$row['id_theme']][$row['variable']] = $row['value'];
+		}
 	);
-	$theme_paths = array();
-	while ($row = $db->fetch_assoc($request))
-	{
-		$theme_paths[$row['id_theme']][$row['variable']] = $row['value'];
-	}
-	$db->free_result($request);
 
 	return $theme_paths;
 }
@@ -282,14 +290,17 @@ function getThemesPathbyID($theme_list = array())
  * @param int[] $knownThemes available themes
  *
  * @return array
+ * @throws \ElkArte\Exceptions\Exception
  */
 function loadThemes($knownThemes)
 {
 	$db = database();
 
 	// Load up all the themes.
-	$request = $db->query('', '
-		SELECT id_theme, value AS name
+	$themes = array();
+	$db->query('', '
+		SELECT 
+			id_theme, value AS name
 		FROM {db_prefix}themes
 		WHERE variable = {string:name}
 			AND id_member = {int:no_member}
@@ -298,17 +309,15 @@ function loadThemes($knownThemes)
 			'no_member' => 0,
 			'name' => 'name',
 		)
+	)->fetch_callback(
+		function ($row) use (&$themes, $knownThemes) {
+			$themes[] = array(
+				'id' => $row['id_theme'],
+				'name' => $row['name'],
+				'known' => in_array($row['id_theme'], $knownThemes),
+			);
+		}
 	);
-	$themes = array();
-	while ($row = $db->fetch_assoc($request))
-	{
-		$themes[] = array(
-			'id' => $row['id_theme'],
-			'name' => $row['name'],
-			'known' => in_array($row['id_theme'], $knownThemes),
-		);
-	}
-	$db->free_result($request);
 
 	return $themes;
 }
@@ -319,26 +328,27 @@ function loadThemes($knownThemes)
  * @param int $id id of the package we are checking
  *
  * @return array
+ * @throws \Exception
  */
 function loadThemesAffected($id)
 {
 	$db = database();
 
-	$request = $db->query('', '
-		SELECT themes_installed
+	$themes = array();
+	$db->fetchQuery('
+		SELECT 
+			themes_installed
 		FROM {db_prefix}log_packages
 		WHERE id_install = {int:install_id}
 		LIMIT 1',
 		array(
 			'install_id' => $id,
 		)
+	)->fetch_callback(
+		function ($row) use (&$themes) {
+			$themes = explode(',', $row['themes_installed']);
+		}
 	);
-	$themes = array();
-	while ($row = $db->fetch_row($request))
-	{
-		$themes = explode(',', $row[0]);
-	}
-	$db->free_result($request);
 
 	return $themes;
 }
@@ -368,7 +378,7 @@ function get_file_listing($path, $relative)
 	// Read this directory's contents
 	$entries = array();
 	$dir = dir($path);
-	while ($entry = $dir->read())
+	while (($entry = $dir->read()))
 	{
 		$entries[] = $entry;
 	}
@@ -430,29 +440,22 @@ function get_file_listing($path, $relative)
  * Counts the theme options configured for guests
  *
  * @return array
+ * @throws \Exception
  */
 function countConfiguredGuestOptions()
 {
 	$db = database();
 
-	$themes = array();
-
-	$request = $db->query('', '
-		SELECT id_theme, COUNT(*) AS value
+	return $db->fetchQuery('
+		SELECT 
+			id_theme, COUNT(*) AS value
 		FROM {db_prefix}themes
 		WHERE id_member = {int:guest_member}
 		GROUP BY id_theme',
 		array(
 			'guest_member' => -1,
 		)
-	);
-	while ($row = $db->fetch_assoc($request))
-	{
-		$themes[] = $row;
-	}
-	$db->free_result($request);
-
-	return ($themes);
+	)->fetch_all();
 }
 
 /**
@@ -462,6 +465,7 @@ function countConfiguredGuestOptions()
  * @param int $current_member
  *
  * @return array
+ * @throws \ElkArte\Exceptions\Exception
  */
 function availableThemes($current_theme, $current_member)
 {
@@ -472,8 +476,9 @@ function availableThemes($current_theme, $current_member)
 	$available_themes = array();
 	if (!empty($modSettings['knownThemes']))
 	{
-		$request = $db->query('', '
-			SELECT id_theme, variable, value
+		$db->fetchQuery('
+			SELECT 
+				id_theme, variable, value
 			FROM {db_prefix}themes
 			WHERE variable IN ({string:name}, {string:theme_url}, {string:theme_dir}, {string:images_url}, {string:disable_user_variant})' . (!allowedTo('admin_forum') ? '
 				AND id_theme IN ({array_string:known_themes})' : '') . '
@@ -489,20 +494,20 @@ function availableThemes($current_theme, $current_member)
 				'disable_user_variant' => 'disable_user_variant',
 				'known_themes' => !empty($modSettings['theme_allow']) || allowedTo('admin_forum') ? explode(',', $modSettings['knownThemes']) : array($modSettings['theme_guests']),
 			)
-		);
-		while ($row = $db->fetch_assoc($request))
-		{
-			if (!isset($available_themes[$row['id_theme']]))
-			{
-				$available_themes[$row['id_theme']] = array(
-					'id' => $row['id_theme'],
-					'selected' => $current_theme == $row['id_theme'],
-					'num_users' => 0
-				);
+		)->fetch_callback(
+			function ($row) use (&$available_themes, $current_theme) {
+				if (!isset($available_themes[$row['id_theme']]))
+				{
+					$available_themes[$row['id_theme']] = array(
+						'id' => $row['id_theme'],
+						'selected' => $current_theme == $row['id_theme'],
+						'num_users' => 0
+					);
+				}
+
+				$available_themes[$row['id_theme']][$row['variable']] = $row['value'];
 			}
-			$available_themes[$row['id_theme']][$row['variable']] = $row['value'];
-		}
-		$db->free_result($request);
+		);
 	}
 
 	// Okay, this is a complicated problem: the default theme is 1, but they aren't allowed to access 1!
@@ -518,42 +523,45 @@ function availableThemes($current_theme, $current_member)
 		$guest_theme = $modSettings['theme_guests'];
 	}
 
-	$request = $db->query('', '
-		SELECT id_theme, COUNT(*) AS the_count
+	$db->fetchQuery('
+		SELECT 
+			id_theme, COUNT(*) AS the_count
 		FROM {db_prefix}members
 		GROUP BY id_theme
 		ORDER BY id_theme DESC',
 		array()
-	);
-	while ($row = $db->fetch_assoc($request))
-	{
-		// Figure out which theme it is they are REALLY using.
-		if (!empty($modSettings['knownThemes']) && !in_array($row['id_theme'], explode(',', $modSettings['knownThemes'])))
-		{
-			$row['id_theme'] = $guest_theme;
-		}
-		elseif (empty($modSettings['theme_allow']))
-		{
-			$row['id_theme'] = $guest_theme;
-		}
+	)->fetch_callback(
+		function ($row) use (&$available_themes, $guest_theme) {
+			global $modSettings;
 
-		if (isset($available_themes[$row['id_theme']]))
-		{
-			$available_themes[$row['id_theme']]['num_users'] += $row['the_count'];
+			// Figure out which theme it is they are REALLY using.
+			if (!empty($modSettings['knownThemes']) && !in_array($row['id_theme'], explode(',', $modSettings['knownThemes'])))
+			{
+				$row['id_theme'] = $guest_theme;
+			}
+			elseif (empty($modSettings['theme_allow']))
+			{
+				$row['id_theme'] = $guest_theme;
+			}
+
+			if (isset($available_themes[$row['id_theme']]))
+			{
+				$available_themes[$row['id_theme']]['num_users'] += $row['the_count'];
+			}
+			else
+			{
+				$available_themes[$guest_theme]['num_users'] += $row['the_count'];
+			}
 		}
-		else
-		{
-			$available_themes[$guest_theme]['num_users'] += $row['the_count'];
-		}
-	}
-	$db->free_result($request);
+	);
 
 	// Get any member variant preferences.
 	$variant_preferences = array();
 	if ($current_member > 0)
 	{
-		$request = $db->query('', '
-			SELECT id_theme, value
+		$db->fetchQuery('
+			SELECT 
+				id_theme, value
 			FROM {db_prefix}themes
 			WHERE variable = {string:theme_variant}
 				AND id_member IN ({array_int:id_member})
@@ -562,12 +570,11 @@ function availableThemes($current_theme, $current_member)
 				'theme_variant' => 'theme_variant',
 				'id_member' => isset($_REQUEST['sa']) && $_REQUEST['sa'] == 'pick' ? array(-1, $current_member) : array(-1),
 			)
+		)->fetch_callback(
+			function ($row) use (&$variant_preferences) {
+				$variant_preferences[$row['id_theme']] = $row['value'];
+			}
 		);
-		while ($row = $db->fetch_assoc($request))
-		{
-			$variant_preferences[$row['id_theme']] = $row['value'];
-		}
-		$db->free_result($request);
 	}
 
 	// Save the setting first.
@@ -654,29 +661,22 @@ function availableThemes($current_theme, $current_member)
  * Counts the theme options configured for members
  *
  * @return array
+ * @throws \ElkArte\Exceptions\Exception
  */
 function countConfiguredMemberOptions()
 {
 	$db = database();
 
-	$themes = array();
-
-	$request = $db->query('themes_count', '
-		SELECT COUNT(DISTINCT id_member) AS value, id_theme
+	return $db->query('themes_count', '
+		SELECT 
+			COUNT(DISTINCT id_member) AS value, id_theme
 		FROM {db_prefix}themes
 		WHERE id_member > {int:no_member}
 		GROUP BY id_theme',
 		array(
 			'no_member' => 0,
 		)
-	);
-	while ($row = $db->fetch_assoc($request))
-	{
-		$themes[] = $row;
-	}
-	$db->free_result($request);
-
-	return $themes;
+	)->fetch_all();
 }
 
 /**
@@ -694,6 +694,7 @@ function countConfiguredMemberOptions()
  *               - 'non_default' => guests and members with custom settings (i.e. id_member != 0)
  *               - 'all' => any record
  * @param string[]|string $old_settings can be a string or an array of strings. If empty deletes all settings.
+ * @throws \ElkArte\Exceptions\Exception
  */
 function removeThemeOptions($theme, $membergroups, $old_settings = '')
 {
@@ -777,6 +778,7 @@ function removeThemeOptions($theme, $membergroups, $old_settings = '')
  * Update the default options for our users.
  *
  * @param mixed[] $setValues in the order: id_theme, id_member, variable name, value
+ * @throws \Exception
  */
 function updateThemeOptions($setValues)
 {
@@ -796,6 +798,7 @@ function updateThemeOptions($setValues)
  * @param int $id_theme
  * @param string $options
  * @param string[]|string $value
+ * @throws \ElkArte\Exceptions\Exception
  */
 function addThemeOptions($id_theme, $options, $value)
 {
@@ -804,7 +807,8 @@ function addThemeOptions($id_theme, $options, $value)
 	$db->query('substring', '
 		INSERT INTO {db_prefix}themes
 			(id_member, id_theme, variable, value)
-		SELECT id_member, {int:current_theme}, SUBSTRING({string:option}, 1, 255), SUBSTRING({string:value}, 1, 65534)
+		SELECT 
+			id_member, {int:current_theme}, SUBSTRING({string:option}, 1, 255), SUBSTRING({string:value}, 1, 65534)
 		FROM {db_prefix}members',
 		array(
 			'current_theme' => $id_theme,
@@ -842,7 +846,8 @@ function deleteTheme($id)
 	// Update the members ...
 	$db->query('', '
 		UPDATE {db_prefix}members
-		SET id_theme = {int:default_theme}
+		SET 
+			id_theme = {int:default_theme}
 		WHERE id_theme = {int:current_theme}',
 		array(
 			'default_theme' => 0,
@@ -853,7 +858,8 @@ function deleteTheme($id)
 	// ... and the boards table.
 	$db->query('', '
 		UPDATE {db_prefix}boards
-		SET id_theme = {int:default_theme}
+		SET 
+			id_theme = {int:default_theme}
 		WHERE id_theme = {int:current_theme}',
 		array(
 			'default_theme' => 0,
@@ -866,6 +872,7 @@ function deleteTheme($id)
  * Get the next free id for the theme.
  *
  * @return int
+ * @throws \ElkArte\Exceptions\Exception
  */
 function nextTheme()
 {
@@ -873,12 +880,13 @@ function nextTheme()
 
 	// Find the newest id_theme.
 	$result = $db->query('', '
-		SELECT MAX(id_theme)
+		SELECT 
+			MAX(id_theme)
 		FROM {db_prefix}themes',
 		array()
 	);
-	list ($id_theme) = $db->fetch_row($result);
-	$db->free_result($result);
+	list ($id_theme) = $result->fetch_row();
+	$result->free_result();
 
 	// This will be theme number...
 	$id_theme++;
@@ -890,6 +898,7 @@ function nextTheme()
  * Adds a new theme to the database.
  *
  * @param mixed[] $details
+ * @throws \Exception
  */
 function addTheme($details)
 {
@@ -908,13 +917,15 @@ function addTheme($details)
  *
  * @param int $id
  * @return string
+ * @throws \ElkArte\Exceptions\Exception
  */
 function getThemeName($id)
 {
 	$db = database();
 
 	$result = $db->query('', '
-		SELECT value
+		SELECT 
+			value
 		FROM {db_prefix}themes
 		WHERE id_theme = {int:current_theme}
 			AND id_member = {int:no_member}
@@ -926,8 +937,8 @@ function getThemeName($id)
 			'name' => 'name',
 		)
 	);
-	list ($theme_name) = $db->fetch_row($result);
-	$db->free_result($result);
+	list ($theme_name) = $result->fetch_row();
+	$result->free_result();
 
 	return $theme_name;
 }
@@ -936,6 +947,7 @@ function getThemeName($id)
  * Deletes all variants from a given theme id.
  *
  * @param int $id
+ * @throws \ElkArte\Exceptions\Exception
  */
 function deleteVariants($id)
 {
@@ -962,6 +974,7 @@ function deleteVariants($id)
  * @param string[] $variables
  *
  * @return array|mixed[]
+ * @throws \Exception
  */
 function loadThemeOptionsInto($theme, $memID = null, $options = array(), $variables = array())
 {
@@ -973,8 +986,9 @@ function loadThemeOptionsInto($theme, $memID = null, $options = array(), $variab
 	// I have the feeling that *sometimes* the default order may be a bit messy,
 	// and considering this function is not use in frequently accessed areas the
 	// overhead for an ORDER BY should be acceptable
-	$request = $db->query('', '
-		SELECT variable, value
+	$db->fetchQuery('
+		SELECT 
+			variable, value
 		FROM {db_prefix}themes
 		WHERE id_theme IN ({array_int:current_theme})' . ($memID === null ? '' : (is_array($memID) ? '
 			AND id_member IN ({array_int:guest_member})' : '
@@ -986,12 +1000,11 @@ function loadThemeOptionsInto($theme, $memID = null, $options = array(), $variab
 			'guest_member' => $memID,
 			'variables' => $variables,
 		)
+	)->fetch_callback(
+		function ($row) use (&$options) {
+			$options[$row['variable']] = $row['value'];
+		}
 	);
-	while ($row = $db->fetch_assoc($request))
-	{
-		$options[$row['variable']] = $row['value'];
-	}
-	$db->free_result($request);
 
 	return $options;
 }
@@ -1001,8 +1014,9 @@ function loadThemeOptionsInto($theme, $memID = null, $options = array(), $variab
  * Returns based-on theme directory values needed by the install function in ManageThemes.controller
  *
  * @param string $based_on name of theme this is based on, will do a LIKE search
- * @param boolean $explicit_images Don't worry its not like it sounds !
+ * @param bool $explicit_images Don't worry its not like it sounds !
  * @return mixed[]
+ * @throws \ElkArte\Exceptions\Exception
  * @todo may be merged with something else?
  */
 function loadBasedOnTheme($based_on, $explicit_images = false)
@@ -1010,7 +1024,8 @@ function loadBasedOnTheme($based_on, $explicit_images = false)
 	$db = database();
 
 	$request = $db->query('', '
-		SELECT th.value AS base_theme_dir, th2.value AS base_theme_url' . (!empty($explicit_images) ? '' : ', th3.value AS images_url') . '
+		SELECT 
+			th.value AS base_theme_dir, th2.value AS base_theme_url' . (!empty($explicit_images) ? '' : ', th3.value AS images_url') . '
 		FROM {db_prefix}themes AS th
 			INNER JOIN {db_prefix}themes AS th2 ON (th2.id_theme = th.id_theme
 				AND th2.id_member = {int:no_member}
@@ -1031,8 +1046,8 @@ function loadBasedOnTheme($based_on, $explicit_images = false)
 			'based_on_path' => '%\\' . $based_on,
 		)
 	);
-	$temp = $db->fetch_assoc($request);
-	$db->free_result($request);
+	$temp = $request->fetch_assoc();
+	$request->free_result();
 
 	return $temp;
 }
@@ -1049,7 +1064,7 @@ function loadBasedOnTheme($based_on, $explicit_images = false)
 function write_theme_info($name, $version, $theme_dir, $theme_values)
 {
 	$xml_info = '<' . '?xml version="1.0"?' . '>
-	<theme-info xmlns="http://www.elkarte.net/xml/theme-info" xmlns:elk="http://www.elkarte.net/">
+	<theme-info xmlns="https://www.elkarte.net/xml/theme-info" xmlns:elk="https://www.elkarte.net/">
 		<!-- For the id, always use something unique - put your name, a colon, and then the package name. -->
 		<id>elk:' . Util::strtolower(str_replace(array(' '), '_', $name)) . '</id>
 		<version>' . $version . '</version>

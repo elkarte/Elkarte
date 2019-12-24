@@ -25,7 +25,7 @@
  *
  * @return string
  * @package BadBehavior
- *
+ * @throws \ElkArte\Exceptions\Exception
  */
 function deleteBadBehavior($type, $filter)
 {
@@ -75,23 +75,25 @@ function deleteBadBehavior($type, $filter)
  * - Will take in to account any current filter value in its count result
  *
  * @param mixed[] $filter
- * @return integer
+ * @return int
  * @package BadBehavior
+ * @throws \ElkArte\Exceptions\Exception
  */
 function getBadBehaviorLogEntryCount($filter)
 {
 	$db = database();
 
 	$result = $db->query('', '
-		SELECT COUNT(*)
+		SELECT 
+			COUNT(*)
 		FROM {db_prefix}log_badbehavior' . (!empty($filter) ? '
 		WHERE ' . $filter['variable'] . ' LIKE {string:filter}' : ''),
 		array(
 			'filter' => !empty($filter) ? $filter['value']['sql'] : '',
 		)
 	);
-	list ($entry_count) = $db->fetch_row($result);
-	$db->free_result($result);
+	list ($entry_count) = $result->fetch_row();
+	$result->free_result();
 
 	return $entry_count;
 }
@@ -106,20 +108,20 @@ function getBadBehaviorLogEntryCount($filter)
  *
  * @return array
  * @package BadBehavior
- *
+ * @throws \Exception
  */
 function getBadBehaviorLogEntries($start, $items_per_page, $sort, $filter = '')
 {
-	global $scripturl;
-
 	$db = database();
 
 	require_once(EXTDIR . '/bad-behavior/bad-behavior/responses.inc.php');
 
 	$bb_entries = array();
 
-	$request = $db->query('', '
-		SELECT id, ip, date, request_method, request_uri, server_protocol, http_headers, user_agent, request_entity, valid, id_member, session
+	$db->fetchQuery('
+		SELECT 
+			id, ip, date, request_method, request_uri, server_protocol, http_headers, 
+			user_agent, request_entity, valid, id_member, session
 		FROM {db_prefix}log_badbehavior' . (!empty($filter) ? '
 		WHERE ' . $filter['variable'] . ' LIKE {string:filter}' : '') . '
 		ORDER BY id ' . ($sort === 'down' ? 'DESC' : '') . '
@@ -127,57 +129,56 @@ function getBadBehaviorLogEntries($start, $items_per_page, $sort, $filter = '')
 		array(
 			'filter' => !empty($filter) ? $filter['value']['sql'] : '',
 		)
-	);
+	)->fetch_callback(
+		function ($row) use (&$bb_entries) {
+			global $scripturl;
 
-	for ($i = 0; $row = $db->fetch_assoc($request); $i++)
-	{
-		// Turn the key in to something nice to show
-		$key_response = bb2_get_response($row['valid']);
+			// Turn the key in to something nice to show
+			$key_response = bb2_get_response($row['valid']);
 
-		// Prevent undefined errors and log ..
-		if (isset($key_response[0]) && $key_response[0] == '00000000')
-		{
-			$key_response['response'] = '';
-			$key_response['explanation'] = '';
-			$key_response['log'] = '';
-		}
+			// Prevent undefined errors and log ..
+			if (isset($key_response[0]) && $key_response[0] == '00000000')
+			{
+				$key_response['response'] = '';
+				$key_response['explanation'] = '';
+				$key_response['log'] = '';
+			}
 
-		$bb_entries[$row['id']] = array(
-			'alternate' => $i % 2 === 0,
-			'ip' => $row['ip'],
-			'request_method' => $row['request_method'],
-			'server_protocol' => $row['server_protocol'],
-			'user_agent' => array(
-				'html' => $row['user_agent'],
-				'href' => base64_encode($db->escape_wildcard_string($row['user_agent']))
-			),
-			'request_entity' => $row['request_entity'],
-			'valid' => array(
-				'code' => $row['valid'],
-				'response' => $key_response['response'],
-				'explanation' => $key_response['explanation'],
-				'log' => $key_response['log'],
-			),
-			'member' => array(
-				'id' => $row['id_member'],
+			$bb_entries[$row['id']] = array(
 				'ip' => $row['ip'],
-				'session' => $row['session']
-			),
-			'time' => standardTime($row['date']),
-			'html_time' => htmlTime($row['date']),
-			'timestamp' => forum_time(true, $row['date']),
-			'request_uri' => array(
-				'html' => htmlspecialchars((substr($row['request_uri'], 0, 1) === '?' ? $scripturl : '') . $row['request_uri'], ENT_COMPAT, 'UTF-8'),
-				'href' => base64_encode($db->escape_wildcard_string($row['request_uri']))
-			),
-			'http_headers' => array(
-				'html' => str_replace("\n", '<br />', $row['http_headers']),
-				'href' => '#'
-			),
-			'id' => $row['id'],
-		);
-	}
-	$db->free_result($request);
+				'request_method' => $row['request_method'],
+				'server_protocol' => $row['server_protocol'],
+				'user_agent' => array(
+					'html' => $row['user_agent'],
+					'href' => base64_encode($db->escape_wildcard_string($row['user_agent']))
+				),
+				'request_entity' => $row['request_entity'],
+				'valid' => array(
+					'code' => $row['valid'],
+					'response' => $key_response['response'],
+					'explanation' => $key_response['explanation'],
+					'log' => $key_response['log'],
+				),
+				'member' => array(
+					'id' => $row['id_member'],
+					'ip' => $row['ip'],
+					'session' => $row['session']
+				),
+				'time' => standardTime($row['date']),
+				'html_time' => htmlTime($row['date']),
+				'timestamp' => forum_time(true, $row['date']),
+				'request_uri' => array(
+					'html' => htmlspecialchars((substr($row['request_uri'], 0, 1) === '?' ? $scripturl : '') . $row['request_uri'], ENT_COMPAT, 'UTF-8'),
+					'href' => base64_encode($db->escape_wildcard_string($row['request_uri']))
+				),
+				'http_headers' => array(
+					'html' => str_replace("\n", '<br />', $row['http_headers']),
+					'href' => '#'
+				),
+				'id' => $row['id'],
+			);
+		}
+	);
 
 	return $bb_entries;
 }

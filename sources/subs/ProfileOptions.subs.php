@@ -24,8 +24,9 @@ use ElkArte\User;
  * - Will mention that a buddy has been added if that is enabled
  *
  * @param string[] $buddies
- * @param boolean $adding true when adding new buddies
+ * @param bool $adding true when adding new buddies
  * @return int[]
+ * @throws \Exception
  */
 function getBuddiesID($buddies, $adding = true)
 {
@@ -33,9 +34,17 @@ function getBuddiesID($buddies, $adding = true)
 
 	$db = database();
 
+	// If we are mentioning buddies, then let them know who's their buddy.
+	if ($adding && !empty($modSettings['mentions_enabled']) && !empty($modSettings['mentions_buddy']))
+	{
+		$notifier = Notifications::instance();
+	}
+
 	// Find the id_member of the buddy(s).
-	$request = $db->query('', '
-		SELECT id_member
+	$buddiesArray = array();
+	$db->fetchQuery('
+		SELECT 
+			id_member
 		FROM {db_prefix}members
 		WHERE member_name IN ({array_string:buddies}) OR real_name IN ({array_string:buddies})
 		LIMIT {int:count_new_buddies}',
@@ -43,32 +52,22 @@ function getBuddiesID($buddies, $adding = true)
 			'buddies' => $buddies,
 			'count_new_buddies' => count($buddies),
 		)
-	);
+	)->fetch_callback(
+		function ($row) use (&$buddiesArray, $notifier) {
+			$buddiesArray[] = (int) $row['id_member'];
 
-	// If we are mentioning buddies, then let them know who's their buddy.
-	if ($adding && !empty($modSettings['mentions_enabled']) && !empty($modSettings['mentions_buddy']))
-	{
-		$notifier = Notifications::instance();
-	}
-
-	// Add the new member(s) to the buddies array.
-	$buddiesArray = array();
-	while ($row = $db->fetch_assoc($request))
-	{
-		$buddiesArray[] = (int) $row['id_member'];
-
-		// Let them know they have been added as a buddy
-		if (isset($notifier))
-		{
-			$notifier->add(new NotificationsTask(
-				'buddy',
-				$row['id_member'],
-				User::$info->id,
-				array('id_members' => array($row['id_member']))
-			));
+			// Let them know they have been added as a buddy
+			if (isset($notifier))
+			{
+				$notifier->add(new NotificationsTask(
+					'buddy',
+					$row['id_member'],
+					User::$info->id,
+					array('id_members' => array($row['id_member']))
+				));
+			}
 		}
-	}
-	$db->free_result($request);
+	);
 
 	return $buddiesArray;
 }
@@ -80,16 +79,22 @@ function getBuddiesID($buddies, $adding = true)
  * @param int $memID
  *
  * @return array
+ * @throws \Exception
  */
 function loadMembergroupsJoin($current_groups, $memID)
 {
-	global $context;
-
 	$db = database();
 
+	// This beast will be our group holder.
+	$groups = array(
+		'member' => array(),
+		'available' => array()
+	);
+
 	// Get all the membergroups they can join.
-	$request = $db->query('', '
-		SELECT mg.id_group, mg.group_name, mg.description, mg.group_type, mg.online_color, mg.hidden,
+	$db->fetchQuery('
+		SELECT 
+			mg.id_group, mg.group_name, mg.description, mg.group_type, mg.online_color, mg.hidden,
 			COALESCE(lgr.id_member, 0) AS pending
 		FROM {db_prefix}membergroups AS mg
 			LEFT JOIN {db_prefix}log_group_requests AS lgr ON (lgr.id_member = {int:selected_member} AND lgr.id_group = mg.id_group)
@@ -104,41 +109,37 @@ function loadMembergroupsJoin($current_groups, $memID)
 			'min_posts' => -1,
 			'moderator_group' => 3,
 		)
-	);
-	// This beast will be our group holder.
-	$groups = array(
-		'member' => array(),
-		'available' => array()
-	);
-	while ($row = $db->fetch_assoc($request))
-	{
-		// Can they edit their primary group?
-		if (($row['id_group'] == $context['primary_group'] && $row['group_type'] > 1)
-			|| ($row['hidden'] != 2 && $context['primary_group'] == 0 && in_array($row['id_group'], $current_groups)))
-		{
-			$context['can_edit_primary'] = true;
-		}
+	)->fetch_callback(
+		function ($row) use (&$groups) {
+			global $context;
 
-		// If they can't manage (protected) groups, and it's not publicly joinable or already assigned, they can't see it.
-		if (((!$context['can_manage_protected'] && $row['group_type'] == 1) || (!$context['can_manage_membergroups'] && $row['group_type'] == 0)) && $row['id_group'] != $context['primary_group'])
-		{
-			continue;
-		}
+			// Can they edit their primary group?
+			if (($row['id_group'] == $context['primary_group'] && $row['group_type'] > 1)
+				|| ($row['hidden'] != 2 && $context['primary_group'] == 0 && in_array($row['id_group'], $current_groups)))
+			{
+				$context['can_edit_primary'] = true;
+			}
 
-		$groups[in_array($row['id_group'], $current_groups) ? 'member' : 'available'][$row['id_group']] = array(
-			'id' => $row['id_group'],
-			'name' => $row['group_name'],
-			'desc' => $row['description'],
-			'color' => $row['online_color'],
-			'type' => $row['group_type'],
-			'pending' => $row['pending'],
-			'is_primary' => $row['id_group'] == $context['primary_group'],
-			'can_be_primary' => $row['hidden'] != 2,
-			// Anything more than this needs to be done through account settings for security.
-			'can_leave' => $row['id_group'] != 1 && $row['group_type'] > 1 ? true : false,
-		);
-	}
-	$db->free_result($request);
+			// If they can't manage (protected) groups, and it's not publicly joinable or already assigned, they can't see it.
+			if (((!$context['can_manage_protected'] && $row['group_type'] == 1) || (!$context['can_manage_membergroups'] && $row['group_type'] == 0)) && $row['id_group'] != $context['primary_group'])
+			{
+				return;
+			}
+
+			$groups[in_array($row['id_group'], $current_groups) ? 'member' : 'available'][$row['id_group']] = array(
+				'id' => $row['id_group'],
+				'name' => $row['group_name'],
+				'desc' => $row['description'],
+				'color' => $row['online_color'],
+				'type' => $row['group_type'],
+				'pending' => $row['pending'],
+				'is_primary' => $row['id_group'] == $context['primary_group'],
+				'can_be_primary' => $row['hidden'] != 2,
+				// Anything more than this needs to be done through account settings for security.
+				'can_leave' => $row['id_group'] != 1 && $row['group_type'] > 1 ? true : false,
+			);
+		}
+	);
 
 	return $groups;
 }
@@ -148,6 +149,7 @@ function loadMembergroupsJoin($current_groups, $memID)
  *
  * @param int $group_id
  * @return int
+ * @throws \ElkArte\Exceptions\Exception
  */
 function checkMembergroupChange($group_id)
 {
@@ -155,7 +157,8 @@ function checkMembergroupChange($group_id)
 
 	// Check if non admin users are trying to promote themselves to admin.
 	$request = $db->query('', '
-		SELECT COUNT(permission)
+		SELECT 
+			COUNT(permission)
 		FROM {db_prefix}permissions
 		WHERE id_group = {int:selected_group}
 			AND permission = {string:admin_forum}
@@ -166,8 +169,8 @@ function checkMembergroupChange($group_id)
 			'not_denied' => 1,
 		)
 	);
-	list ($disallow) = $db->fetch_row($request);
-	$db->free_result($request);
+	list ($disallow) = $request->fetch_row();
+	$request->free_result();
 
 	return $disallow;
 }
@@ -179,12 +182,13 @@ function checkMembergroupChange($group_id)
  * @param int $memID
  *
  * @return bool
+ * @throws \Exception
  */
 function logMembergroupRequest($group_id, $memID)
 {
 	$db = database();
 
-	$request = $db->query('', '
+	$num = $db->fetchQuery('
 		SELECT id_member
 		FROM {db_prefix}log_group_requests
 		WHERE id_member = {int:selected_member}
@@ -193,12 +197,10 @@ function logMembergroupRequest($group_id, $memID)
 			'selected_member' => $memID,
 			'selected_group' => $group_id,
 		)
-	);
-	$num = $db->num_rows($request);
-	$db->free_result($request);
+	)->num_rows($request);
 
 	// Log the request.
-	if ($num == 0)
+	if ($num === 0)
 	{
 		$db->insert('',
 			'{db_prefix}log_group_requests',

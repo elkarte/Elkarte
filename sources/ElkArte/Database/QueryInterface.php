@@ -109,7 +109,7 @@ interface QueryInterface
 	 * @param mixed[] $data
 	 * @param string[] $keys
 	 * @param bool $disable_trans = false
-	 * @return void
+	 * @return bool|resource
 	 */
 	public function insert($method = 'replace', $table, $columns, $data, $keys, $disable_trans = false);
 

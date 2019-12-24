@@ -16,16 +16,19 @@
  * Retrieves all the follow-up topic for a certain message
  *
  * @param int[] $messages int array of message ids to work on
- * @param boolean $include_approved
+ * @param bool $include_approved
  *
  * @return array
+ * @throws \Exception
  */
 function followupTopics($messages, $include_approved = false)
 {
 	$db = database();
 
-	$request = $db->query('', '
-		SELECT fu.derived_from, fu.follow_up, m.subject
+	$returns = array();
+	$db->fetchQuery('
+		SELECT 
+			fu.derived_from, fu.follow_up, m.subject
 		FROM {db_prefix}follow_ups AS fu
 			LEFT JOIN {db_prefix}topics AS t ON (t.id_topic = fu.follow_up)
 			LEFT JOIN {db_prefix}messages AS m ON (t.id_first_msg = m.id_msg)
@@ -36,13 +39,11 @@ function followupTopics($messages, $include_approved = false)
 			'messages' => $messages,
 			'approved' => 1,
 		)
+	)->fetch_callback(
+		function ($row) use (&$returns) {
+			$returns[$row['derived_from']][] = $row;
+		}
 	);
-
-	$returns = array();
-	while ($row = $db->fetch_assoc($request))
-	{
-		$returns[$row['derived_from']][] = $row;
-	}
 
 	return $returns;
 }
@@ -51,15 +52,17 @@ function followupTopics($messages, $include_approved = false)
  * Retrieves the message from which the topic started
  *
  * @param int $topic id of the original topic the threads were started from
- * @param boolean $include_approved
+ * @param bool $include_approved
  *
  * @return array
+ * @throws \Exception
  */
 function topicStartedHere($topic, $include_approved = false)
 {
 	$db = database();
 
-	$request = $db->query('', '
+	$returns = array();
+	$db->fetchQuery('
 		SELECT fu.derived_from, m.subject
 		FROM {db_prefix}follow_ups AS fu
 			LEFT JOIN {db_prefix}messages AS m ON (fu.derived_from = m.id_msg)
@@ -71,13 +74,11 @@ function topicStartedHere($topic, $include_approved = false)
 			'original_topic' => $topic,
 			'approved' => 1,
 		)
+	)->fetch_callback(
+		function ($row) use (&$returns) {
+			$returns = $row;
+		}
 	);
-
-	$returns = array();
-	while ($row = $db->fetch_assoc($request))
-	{
-		$returns = $row;
-	}
 
 	return $returns;
 }
@@ -87,6 +88,7 @@ function topicStartedHere($topic, $include_approved = false)
  *
  * @param int $msg message id
  * @param int $topic topic id
+ * @throws \Exception
  */
 function linkMessages($msg, $topic)
 {
@@ -106,6 +108,7 @@ function linkMessages($msg, $topic)
  *
  * @param int $msg message id
  * @param int $topic topic id
+ * @throws \ElkArte\Exceptions\Exception
  * @todo remove?
  */
 function unlinkMessages($msg, $topic)
@@ -128,6 +131,7 @@ function unlinkMessages($msg, $topic)
  * Removes all the follow-ups from the db by topics
  *
  * @param int|int[] $topics topic id
+ * @throws \ElkArte\Exceptions\Exception
  */
 function removeFollowUpsByTopic($topics)
 {
@@ -146,6 +150,7 @@ function removeFollowUpsByTopic($topics)
  * Removes all the follow-ups from the db by message id
  *
  * @param int[]|int $msgs int or array of ints for the message id's to work on
+ * @throws \ElkArte\Exceptions\Exception
  */
 function removeFollowUpsByMessage($msgs)
 {

@@ -44,7 +44,8 @@ function detectServerLoad()
 		{
 			return (float) $matches[1] / $cores;
 		}
-		elseif (($load_average = @`uptime`) !== null && preg_match('~load average[s]?: (\d+\.\d+), (\d+\.\d+), (\d+\.\d+)~i', $load_average, $matches) != 0)
+
+		if (($load_average = @`uptime`) !== null && preg_match('~load average[s]?: (\d+\.\d+), (\d+\.\d+), (\d+\.\d+)~i', $load_average, $matches) != 0)
 		{
 			return (float) $matches[1] / $cores;
 		}

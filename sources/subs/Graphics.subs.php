@@ -124,7 +124,7 @@ function showCodeImage($code)
 	$font_dir = dir($settings['default_theme_dir'] . '/fonts');
 	$font_list = array();
 	$ttfont_list = array();
-	while ($entry = $font_dir->read())
+	while (($entry = $font_dir->read()))
 	{
 		if (preg_match('~^(.+)\.gdf$~', $entry, $matches) === 1)
 		{

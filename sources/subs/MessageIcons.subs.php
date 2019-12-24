@@ -19,7 +19,6 @@
  */
 function fetchMessageIconsDetails()
 {
-	global $settings, $txt;
 	static $icons;
 
 	if (isset($icons))
@@ -30,33 +29,34 @@ function fetchMessageIconsDetails()
 	$db = database();
 
 	$icons = array();
-
-	$request = $db->query('', '
-		SELECT m.id_icon, m.title, m.filename, m.icon_order, m.id_board, b.name AS board_name
+	$last_icon = 0;
+	$trueOrder = 0;
+	$db->fetchQuery('
+		SELECT 
+			m.id_icon, m.title, m.filename, m.icon_order, m.id_board, b.name AS board_name
 		FROM {db_prefix}message_icons AS m
 			LEFT JOIN {db_prefix}boards AS b ON (b.id_board = m.id_board)
 		WHERE ({query_see_board} OR b.id_board IS NULL)
 		ORDER BY m.icon_order',
 		array()
+	)->fetch_callback(
+		function ($row) use (&$icons, &$last_icon, &$trueOrder) {
+			global $settings, $txt;
+
+			$icons[$row['id_icon']] = array(
+				'id' => $row['id_icon'],
+				'title' => $row['title'],
+				'filename' => $row['filename'],
+				'image_url' => $settings[file_exists($settings['theme_dir'] . '/images/post/' . $row['filename'] . '.png') ? 'actual_images_url' : 'default_images_url'] . '/post/' . $row['filename'] . '.png',
+				'board_id' => $row['id_board'],
+				'board' => empty($row['board_name']) ? $txt['icons_edit_icons_all_boards'] : $row['board_name'],
+				'order' => $row['icon_order'],
+				'true_order' => $trueOrder++,
+				'after' => $last_icon,
+			);
+			$last_icon = $row['id_icon'];
+		}
 	);
-	$last_icon = 0;
-	$trueOrder = 0;
-	while ($row = $db->fetch_assoc($request))
-	{
-		$icons[$row['id_icon']] = array(
-			'id' => $row['id_icon'],
-			'title' => $row['title'],
-			'filename' => $row['filename'],
-			'image_url' => $settings[file_exists($settings['theme_dir'] . '/images/post/' . $row['filename'] . '.png') ? 'actual_images_url' : 'default_images_url'] . '/post/' . $row['filename'] . '.png',
-			'board_id' => $row['id_board'],
-			'board' => empty($row['board_name']) ? $txt['icons_edit_icons_all_boards'] : $row['board_name'],
-			'order' => $row['icon_order'],
-			'true_order' => $trueOrder++,
-			'after' => $last_icon,
-		);
-		$last_icon = $row['id_icon'];
-	}
-	$db->free_result($request);
 
 	return $icons;
 }
@@ -65,6 +65,7 @@ function fetchMessageIconsDetails()
  * Delete a message icon.
  *
  * @param int[] $icons
+ * @throws \ElkArte\Exceptions\Exception
  */
 function deleteMessageIcons($icons)
 {
@@ -84,6 +85,7 @@ function deleteMessageIcons($icons)
  * Updates a message icon.
  *
  * @param mixed[] $icon array of values to use in the $db->insert
+ * @throws \Exception
  */
 function updateMessageIcon($icon)
 {
@@ -101,6 +103,7 @@ function updateMessageIcon($icon)
  * Adds a new message icon.
  *
  * @param mixed[] $icon associative array to use in the insert
+ * @throws \Exception
  */
 function addMessageIcon($icon)
 {

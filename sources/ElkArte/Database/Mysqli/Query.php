@@ -155,16 +155,18 @@ class Query extends AbstractQuery
 		$this->_query_count++;
 
 		// Use "ORDER BY null" to prevent Mysql doing filesorts for Group By clauses without an Order By
-		if (strpos($db_string, 'GROUP BY') !== false && strpos($db_string, 'ORDER BY') === false && strpos($db_string, 'INSERT INTO') === false)
+		if (strpos($db_string, 'GROUP BY') !== false
+			&& strpos($db_string, 'ORDER BY') === false
+			&& strpos($db_string, 'INSERT INTO') === false)
 		{
-			// Add before LIMIT
-			if ($pos = strpos($db_string, 'LIMIT '))
+			if (($pos = strpos($db_string, 'LIMIT ')) !== false)
 			{
+				// Add before LIMIT
 				$db_string = substr($db_string, 0, $pos) . "\t\t\tORDER BY null\n" . substr($db_string, $pos, strlen($db_string));
 			}
 			else
-				// Append it.
 			{
+				// Append it.
 				$db_string .= "\n\t\t\tORDER BY null";
 			}
 		}
@@ -317,16 +319,16 @@ class Query extends AbstractQuery
 			// Check for errors like 145... only fix it once every three days, and send an email. (can't use empty because it might not be set yet...)
 			if (!empty($fix_tables))
 			{
-				// subs/Admin.subs.php for updateDbLastError(), subs/Mail.subs.php for sendmail().
+				// sources/Logging.php for logLastDatabaseError(), subs/Mail.subs.php for sendmail().
 				// @todo this should go somewhere else, not into the db-mysql layer I think
-				require_once(SUBSDIR . '/Admin.subs.php');
+				require_once(SOURCEDIR . '/Logging.php');
 				require_once(SUBSDIR . '/Mail.subs.php');
 
 				// Make a note of the REPAIR...
 				Cache::instance()->put('db_last_error', time(), 600);
 				if (!Cache::instance()->getVar($temp, 'db_last_error', 600))
 				{
-					updateDbLastError(time());
+					logLastDatabaseError();
 				}
 
 				// Attempt to find and repair the broken table.
@@ -574,7 +576,7 @@ class Query extends AbstractQuery
 	 * http://www.greywyvern.com/code/php/utf8_html.phps
 	 *
 	 * @param string $c
-	 * @return integer|false
+	 * @return int|false
 	 */
 	protected function _uniord($c)
 	{

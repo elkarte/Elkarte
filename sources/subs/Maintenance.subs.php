@@ -18,6 +18,7 @@
  * Counts the total number of messages
  *
  * @return int
+ * @throws \ElkArte\Exceptions\Exception
  * @package Maintenance
  */
 function countMessages()
@@ -25,12 +26,13 @@ function countMessages()
 	$db = database();
 
 	$request = $db->query('', '
-		SELECT COUNT(*)
+		SELECT 
+			COUNT(*)
 		FROM {db_prefix}messages',
 		array()
 	);
-	list ($messages) = $db->fetch_row($request);
-	$db->free_result($request);
+	list ($messages) = $request->fetch_row();
+	$request->free_result();
 
 	return $messages;
 }
@@ -78,6 +80,7 @@ function flushLogTables()
  * Gets the table columns from the messages table, just a wrapper function
  *
  * @return array
+ * @throws \Exception
  * @package Maintenance
  */
 function getMessageTableColumns()
@@ -113,6 +116,7 @@ function fetchBodyType()
  * Resizes the body column from the messages table
  *
  * @param string $type
+ * @throws \Exception
  * @package Maintenance
  */
 function resizeMessageTableBody($type)
@@ -128,6 +132,7 @@ function resizeMessageTableBody($type)
  * @param int $increment
  *
  * @return array
+ * @throws \Exception
  * @package Maintenance
  *
  */
@@ -160,6 +165,7 @@ function detectExceedingMessages($start, $increment)
  *
  * @param int[] $msg
  * @return array
+ * @throws \Exception
  * @package Maintenance
  */
 function getExceedingMessages($msg)
@@ -189,6 +195,7 @@ function getExceedingMessages($msg)
  * - Additional tables from addons are also included.
  *
  * @return array
+ * @throws \Exception
  * @package Maintenance
  */
 function getElkTables()
@@ -216,6 +223,7 @@ function getElkTables()
  * Gets the last topics id.
  *
  * @return int
+ * @throws \ElkArte\Exceptions\Exception
  * @package Maintenance
  */
 function getMaxTopicID()
@@ -223,12 +231,13 @@ function getMaxTopicID()
 	$db = database();
 
 	$request = $db->query('', '
-		SELECT MAX(id_topic)
+		SELECT 
+			MAX(id_topic)
 		FROM {db_prefix}topics',
 		array()
 	);
-	list ($id_topic) = $db->fetch_row($request);
-	$db->free_result($request);
+	list ($id_topic) = $request->fetch_row();
+	$request->free_result();
 
 	return $id_topic;
 }
@@ -238,6 +247,7 @@ function getMaxTopicID()
  *
  * @param int $start The item to start with (for pagination purposes)
  * @param int $increment
+ * @throws \Exception
  * @package Maintenance
  */
 function recountApprovedMessages($start, $increment)
@@ -246,7 +256,8 @@ function recountApprovedMessages($start, $increment)
 
 	// Recount approved messages
 	$db->fetchQuery('
-		SELECT /*!40001 SQL_NO_CACHE */ t.id_topic, MAX(t.num_replies) AS num_replies,
+		SELECT 
+			/*!40001 SQL_NO_CACHE */ t.id_topic, MAX(t.num_replies) AS num_replies,
 			CASE WHEN COUNT(ma.id_msg) >= 1 THEN COUNT(ma.id_msg) - 1 ELSE 0 END AS real_num_replies
 		FROM {db_prefix}topics AS t
 			LEFT JOIN {db_prefix}messages AS ma ON (ma.id_topic = t.id_topic AND ma.approved = {int:is_approved})
@@ -271,6 +282,7 @@ function recountApprovedMessages($start, $increment)
  *
  * @param int $start The item to start with (for pagination purposes)
  * @param int $increment
+ * @throws \Exception
  * @package Maintenance
  */
 function recountUnapprovedMessages($start, $increment)
@@ -279,7 +291,8 @@ function recountUnapprovedMessages($start, $increment)
 
 	// Recount unapproved messages
 	$db->fetchQuery('
-		SELECT /*!40001 SQL_NO_CACHE */ t.id_topic, MAX(t.unapproved_posts) AS unapproved_posts,
+		SELECT 
+			/*!40001 SQL_NO_CACHE */ t.id_topic, MAX(t.unapproved_posts) AS unapproved_posts,
 			COUNT(mu.id_msg) AS real_unapproved_posts
 		FROM {db_prefix}topics AS t
 			LEFT JOIN {db_prefix}messages AS mu ON (mu.id_topic = t.id_topic AND mu.approved = {int:not_approved})
@@ -308,6 +321,7 @@ function recountUnapprovedMessages($start, $increment)
  * @param string $column
  *
  * @return bool
+ * @throws \ElkArte\Exceptions\Exception
  * @package Maintenance
  *
  */
@@ -324,7 +338,8 @@ function resetBoardsCounter($column)
 
 	$db->query('', '
 		UPDATE {db_prefix}boards
-		SET ' . $column . ' = {int:counter}
+		SET 
+			' . $column . ' = {int:counter}
 		WHERE redirect = {string:redirect}',
 		array(
 			'counter' => 0,
@@ -339,6 +354,7 @@ function resetBoardsCounter($column)
  * @param string $type - can be 'posts', 'topic', 'unapproved_posts', 'unapproved_topics'
  * @param int $start The item to start with (for pagination purposes)
  * @param int $increment
+ * @throws \Exception
  * @package Maintenance
  */
 function updateBoardsCounter($type, $start, $increment)
@@ -348,8 +364,9 @@ function updateBoardsCounter($type, $start, $increment)
 	switch ($type)
 	{
 		case 'posts':
-			$request = $db->query('', '
-				SELECT /*!40001 SQL_NO_CACHE */ m.id_board, COUNT(*) AS real_num_posts
+			$db->fetchQuery('
+				SELECT 
+					/*!40001 SQL_NO_CACHE */ m.id_board, COUNT(*) AS real_num_posts
 				FROM {db_prefix}messages AS m
 				WHERE m.id_topic > {int:id_topic_min}
 					AND m.id_topic <= {int:id_topic_max}
@@ -360,25 +377,26 @@ function updateBoardsCounter($type, $start, $increment)
 					'id_topic_max' => $start + $increment,
 					'is_approved' => 1,
 				)
-			);
-			while ($row = $db->fetch_assoc($request))
-			{
-				$db->query('', '
+			)->fetch_callback(
+				function ($row) use ($db) {
+					$db->query('', '
 					UPDATE {db_prefix}boards
-					SET num_posts = num_posts + {int:real_num_posts}
+					SET 
+						num_posts = num_posts + {int:real_num_posts}
 					WHERE id_board = {int:id_board}',
-					array(
-						'id_board' => $row['id_board'],
-						'real_num_posts' => $row['real_num_posts'],
-					)
-				);
-			}
-			$db->free_result($request);
+						array(
+							'id_board' => $row['id_board'],
+							'real_num_posts' => $row['real_num_posts'],
+						)
+					);
+				}
+			);
 			break;
 
 		case 'topics':
-			$request = $db->query('', '
-				SELECT /*!40001 SQL_NO_CACHE */ t.id_board, COUNT(*) AS real_num_topics
+			$db->fetchQuery('
+				SELECT 
+					/*!40001 SQL_NO_CACHE */ t.id_board, COUNT(*) AS real_num_topics
 				FROM {db_prefix}topics AS t
 				WHERE t.approved = {int:is_approved}
 					AND t.id_topic > {int:id_topic_min}
@@ -389,25 +407,26 @@ function updateBoardsCounter($type, $start, $increment)
 					'id_topic_min' => $start,
 					'id_topic_max' => $start + $increment,
 				)
-			);
-			while ($row = $db->fetch_assoc($request))
-			{
-				$db->query('', '
+			)->fetch_callback(
+				function ($row) use ($db) {
+					$db->query('', '
 					UPDATE {db_prefix}boards
-					SET num_topics = num_topics + {int:real_num_topics}
+					SET 
+						num_topics = num_topics + {int:real_num_topics}
 					WHERE id_board = {int:id_board}',
-					array(
-						'id_board' => $row['id_board'],
-						'real_num_topics' => $row['real_num_topics'],
-					)
-				);
-			}
-			$db->free_result($request);
+						array(
+							'id_board' => $row['id_board'],
+							'real_num_topics' => $row['real_num_topics'],
+						)
+					);
+				}
+			);
 			break;
 
 		case 'unapproved_posts':
-			$request = $db->query('', '
-				SELECT /*!40001 SQL_NO_CACHE */ m.id_board, COUNT(*) AS real_unapproved_posts
+			$db->fetchQuery('
+				SELECT 
+					/*!40001 SQL_NO_CACHE */ m.id_board, COUNT(*) AS real_unapproved_posts
 				FROM {db_prefix}messages AS m
 				WHERE m.id_topic > {int:id_topic_min}
 					AND m.id_topic <= {int:id_topic_max}
@@ -418,25 +437,25 @@ function updateBoardsCounter($type, $start, $increment)
 					'id_topic_max' => $start + $increment,
 					'is_approved' => 0,
 				)
-			);
-			while ($row = $db->fetch_assoc($request))
-			{
-				$db->query('', '
+			)->fetch_callback(
+				function ($row) use ($db) {
+					$db->query('', '
 					UPDATE {db_prefix}boards
 					SET unapproved_posts = unapproved_posts + {int:unapproved_posts}
 					WHERE id_board = {int:id_board}',
-					array(
-						'id_board' => $row['id_board'],
-						'unapproved_posts' => $row['real_unapproved_posts'],
-					)
-				);
-			}
-			$db->free_result($request);
+						array(
+							'id_board' => $row['id_board'],
+							'unapproved_posts' => $row['real_unapproved_posts'],
+						)
+					);
+				}
+			);
 			break;
 
 		case 'unapproved_topics':
-			$request = $db->query('', '
-				SELECT /*!40001 SQL_NO_CACHE */ t.id_board, COUNT(*) AS real_unapproved_topics
+			$db->fetchQuery('
+				SELECT 
+					/*!40001 SQL_NO_CACHE */ t.id_board, COUNT(*) AS real_unapproved_topics
 				FROM {db_prefix}topics AS t
 				WHERE t.approved = {int:is_approved}
 					AND t.id_topic > {int:id_topic_min}
@@ -447,20 +466,19 @@ function updateBoardsCounter($type, $start, $increment)
 					'id_topic_min' => $start,
 					'id_topic_max' => $start + $increment,
 				)
-			);
-			while ($row = $db->fetch_assoc($request))
-			{
-				$db->query('', '
+			)->fetch_callback(
+				function ($row) use ($db) {
+					$db->query('', '
 					UPDATE {db_prefix}boards
 					SET unapproved_topics = unapproved_topics + {int:real_unapproved_topics}
 					WHERE id_board = {int:id_board}',
-					array(
-						'id_board' => $row['id_board'],
-						'real_unapproved_topics' => $row['real_unapproved_topics'],
-					)
-				);
-			}
-			$db->free_result($request);
+						array(
+							'id_board' => $row['id_board'],
+							'real_unapproved_topics' => $row['real_unapproved_topics'],
+						)
+					);
+				}
+			);
 			break;
 
 		default:
@@ -480,7 +498,8 @@ function updatePersonalMessagesCounter()
 	require_once(SUBSDIR . '/Members.subs.php');
 
 	$db->fetchQuery('
-		SELECT /*!40001 SQL_NO_CACHE */ mem.id_member, COUNT(pmr.id_pm) AS real_num,
+		SELECT 
+			/*!40001 SQL_NO_CACHE */ mem.id_member, COUNT(pmr.id_pm) AS real_num,
 			MAX(mem.personal_messages) AS personal_messages
 		FROM {db_prefix}members AS mem
 			LEFT JOIN {db_prefix}pm_recipients AS pmr ON (mem.id_member = pmr.id_member AND pmr.deleted = {int:is_not_deleted})
@@ -496,7 +515,8 @@ function updatePersonalMessagesCounter()
 	);
 
 	$db->fetchQuery('
-		SELECT /*!40001 SQL_NO_CACHE */ mem.id_member, COUNT(pmr.id_pm) AS real_num,
+		SELECT 
+			/*!40001 SQL_NO_CACHE */ mem.id_member, COUNT(pmr.id_pm) AS real_num,
 			MAX(mem.unread_messages) AS unread_messages
 		FROM {db_prefix}members AS mem
 			LEFT JOIN {db_prefix}pm_recipients AS pmr ON (mem.id_member = pmr.id_member AND pmr.deleted = {int:is_not_deleted} AND pmr.is_read = {int:is_not_read})
@@ -518,14 +538,17 @@ function updatePersonalMessagesCounter()
  *
  * @param int $start The item to start with (for pagination purposes)
  * @param int $increment
+ * @throws \ElkArte\Exceptions\Exception
  * @package Maintenance
  */
 function updateMessagesBoardID($start, $increment)
 {
 	$db = database();
 
-	$request = $db->query('', '
-		SELECT /*!40001 SQL_NO_CACHE */ t.id_board, m.id_msg
+	$boards = array();
+	$db->fetchQuery('
+		SELECT 
+			/*!40001 SQL_NO_CACHE */ t.id_board, m.id_msg
 		FROM {db_prefix}messages AS m
 			INNER JOIN {db_prefix}topics AS t ON (t.id_topic = m.id_topic AND t.id_board != m.id_board)
 		WHERE m.id_msg > {int:id_msg_min}
@@ -534,13 +557,11 @@ function updateMessagesBoardID($start, $increment)
 			'id_msg_min' => $start,
 			'id_msg_max' => $start + $increment,
 		)
+	)->fetch_callback(
+		function ($row) use (&$boards) {
+			$boards[$row['id_board']][] = $row['id_msg'];
+		}
 	);
-	$boards = array();
-	while ($row = $db->fetch_assoc($request))
-	{
-		$boards[$row['id_board']][] = $row['id_msg'];
-	}
-	$db->free_result($request);
 
 	foreach ($boards as $board_id => $messages)
 	{
@@ -566,34 +587,34 @@ function updateBoardsLastMessage()
 	$db = database();
 
 	// Update the latest message of each board.
-	$request = $db->query('', '
-		SELECT m.id_board, MAX(m.id_msg) AS local_last_msg
+	$realBoardCounts = array();
+	$db->fetchQuery('
+		SELECT 
+			m.id_board, MAX(m.id_msg) AS local_last_msg
 		FROM {db_prefix}messages AS m
 		WHERE m.approved = {int:is_approved}
 		GROUP BY m.id_board',
 		array(
 			'is_approved' => 1,
 		)
+	)->fetch_callback(
+		function ($row) use (&$realBoardCounts) {
+			$realBoardCounts[$row['id_board']] = $row['local_last_msg'];
+		}
 	);
-	$realBoardCounts = array();
-	while ($row = $db->fetch_assoc($request))
-	{
-		$realBoardCounts[$row['id_board']] = $row['local_last_msg'];
-	}
-	$db->free_result($request);
 
-	$request = $db->query('', '
-		SELECT /*!40001 SQL_NO_CACHE */ id_board, id_parent, id_last_msg, child_level, id_msg_updated
+	$resort_me = array();
+	$db->fetchQuery('
+		SELECT 
+			/*!40001 SQL_NO_CACHE */ id_board, id_parent, id_last_msg, child_level, id_msg_updated
 		FROM {db_prefix}boards',
 		array()
+	)->fetch_callback(
+		function ($row) use (&$resort_me, $realBoardCounts) {
+			$row['local_last_msg'] = isset($realBoardCounts[$row['id_board']]) ? $realBoardCounts[$row['id_board']] : 0;
+			$resort_me[$row['child_level']][] = $row;
+		}
 	);
-	$resort_me = array();
-	while ($row = $db->fetch_assoc($request))
-	{
-		$row['local_last_msg'] = isset($realBoardCounts[$row['id_board']]) ? $realBoardCounts[$row['id_board']] : 0;
-		$resort_me[$row['child_level']][] = $row;
-	}
-	$db->free_result($request);
 
 	krsort($resort_me);
 
@@ -644,6 +665,7 @@ function updateBoardsLastMessage()
  *
  * @param int $id_board
  * @return int
+ * @throws \ElkArte\Exceptions\Exception
  * @package Maintenance
  */
 function countTopicsFromBoard($id_board)
@@ -651,15 +673,16 @@ function countTopicsFromBoard($id_board)
 	$db = database();
 
 	$request = $db->query('', '
-		SELECT COUNT(*)
+		SELECT 
+			COUNT(*)
 		FROM {db_prefix}topics
 		WHERE id_board = {int:id_board}',
 		array(
 			'id_board' => $id_board,
 		)
 	);
-	list ($total_topics) = $db->fetch_row($request);
-	$db->free_result($request);
+	list ($total_topics) = $request->fetch_row();
+	$request->free_result();
 
 	return $total_topics;
 }
@@ -670,6 +693,7 @@ function countTopicsFromBoard($id_board)
  * @param int $id_board
  *
  * @return int[]
+ * @throws \Exception
  * @package Maintenance
  */
 function getTopicsToMove($id_board)
@@ -678,7 +702,8 @@ function getTopicsToMove($id_board)
 
 	// Lets get the topics.
 	return $db->fetchQuery('
-		SELECT id_topic
+		SELECT 
+			id_topic
 		FROM {db_prefix}topics
 		WHERE id_board = {int:id_board}
 		LIMIT 10',
@@ -696,6 +721,7 @@ function getTopicsToMove($id_board)
  * Counts members with posts > 0, we name them contributors
  *
  * @return int
+ * @throws \ElkArte\Exceptions\Exception
  * @package Maintenance
  */
 function countContributors()
@@ -703,7 +729,8 @@ function countContributors()
 	$db = database();
 
 	$request = $db->query('', '
-		SELECT COUNT(DISTINCT m.id_member)
+		SELECT 
+			COUNT(DISTINCT m.id_member)
 		FROM ({db_prefix}messages AS m, {db_prefix}boards AS b)
 		WHERE m.id_member != 0
 			AND b.count_posts = 0
@@ -712,8 +739,8 @@ function countContributors()
 	);
 
 	// save it so we don't do this again for this task
-	list ($total_members) = $db->fetch_row($request);
-	$db->free_result($request);
+	list ($total_members) = $request->fetch_row();
+	$request->free_result();
 
 	return $total_members;
 }
@@ -724,6 +751,7 @@ function countContributors()
  * @param int $start The item to start with (for pagination purposes)
  * @param int $increment
  * @return int
+ * @throws \ElkArte\Exceptions\Exception
  * @package Maintenance
  */
 function updateMembersPostCount($start, $increment)
@@ -731,9 +759,11 @@ function updateMembersPostCount($start, $increment)
 	global $modSettings;
 
 	$db = database();
+	require_once(SUBSDIR . '/Members.subs.php');
 
 	$request = $db->query('', '
-		SELECT /*!40001 SQL_NO_CACHE */ m.id_member, COUNT(m.id_member) AS posts
+		SELECT 
+			/*!40001 SQL_NO_CACHE */ m.id_member, COUNT(m.id_member) AS posts
 		FROM {db_prefix}messages AS m
 			INNER JOIN {db_prefix}boards AS b ON (m.id_board = b.id_board)
 		WHERE m.id_member != {int:zero}
@@ -748,15 +778,13 @@ function updateMembersPostCount($start, $increment)
 			'zero' => 0,
 		)
 	);
-	$total_rows = $db->num_rows($request);
-
+	$total_rows = $request->num_rows();
 	// Update the post count for this group
-	require_once(SUBSDIR . '/Members.subs.php');
-	while ($row = $db->fetch_assoc($request))
+	while (($row = $request->fetch_assoc()))
 	{
 		updateMemberData($row['id_member'], array('posts' => $row['posts']));
 	}
-	$db->free_result($request);
+	$request->free_result();
 
 	return $total_rows;
 }
@@ -781,7 +809,8 @@ function updateZeroPostMembers()
 			id_member mediumint(8) unsigned NOT NULL default {string:string_zero},
 			PRIMARY KEY (id_member)
 		)
-		SELECT m.id_member
+		SELECT 
+			m.id_member
 		FROM {db_prefix}messages AS m
 			INNER JOIN {db_prefix}boards AS b ON (m.id_board = b.id_board)
 		WHERE m.id_member != {int:zero}
@@ -800,7 +829,8 @@ function updateZeroPostMembers()
 		// Outer join the members table on the temporary table finding the members that
 		// have a post count but no posts in the message table
 		$members = $db->fetchQuery('
-			SELECT mem.id_member, mem.posts
+			SELECT 
+				mem.id_member, mem.posts
 			FROM {db_prefix}members AS mem
 				LEFT OUTER JOIN {db_prefix}tmp_maint_recountposts AS res ON (res.id_member = mem.id_member)
 			WHERE res.id_member IS NULL
@@ -830,6 +860,7 @@ function updateZeroPostMembers()
  * @param int[] $groups
  * @param int $time_limit
  * @return array
+ * @throws \Exception
  * @package Maintenance
  */
 function purgeMembers($type, $groups, $time_limit)
@@ -850,31 +881,30 @@ function purgeMembers($type, $groups, $time_limit)
 	}
 
 	// Need to get *all* groups then work out which (if any) we avoid.
-	$request = $db->query('', '
+	$db->fetchQuery('
 		SELECT 
 			id_group, group_name, min_posts
 		FROM {db_prefix}membergroups',
 		array()
-	);
-	while ($row = $db->fetch_assoc($request))
-	{
-		// Avoid this one?
-		if (!in_array($row['id_group'], $groups))
-		{
-			// Post group?
-			if ($row['min_posts'] != -1)
+	)->fetch_callback(
+		function ($row) use (&$where, &$where_vars, $groups) {
+			// Avoid this one?
+			if (!in_array($row['id_group'], $groups))
 			{
-				$where .= ' AND mem.id_post_group != {int:id_post_group_' . $row['id_group'] . '}';
-				$where_vars['id_post_group_' . $row['id_group']] = $row['id_group'];
-			}
-			else
-			{
-				$where .= ' AND mem.id_group != {int:id_group_' . $row['id_group'] . '} AND FIND_IN_SET({int:id_group_' . $row['id_group'] . '}, mem.additional_groups) = 0';
-				$where_vars['id_group_' . $row['id_group']] = $row['id_group'];
+				// Post group?
+				if ($row['min_posts'] != -1)
+				{
+					$where .= ' AND mem.id_post_group != {int:id_post_group_' . $row['id_group'] . '}';
+					$where_vars['id_post_group_' . $row['id_group']] = $row['id_group'];
+				}
+				else
+				{
+					$where .= ' AND mem.id_group != {int:id_group_' . $row['id_group'] . '} AND FIND_IN_SET({int:id_group_' . $row['id_group'] . '}, mem.additional_groups) = 0';
+					$where_vars['id_group_' . $row['id_group']] = $row['id_group'];
+				}
 			}
 		}
-	}
-	$db->free_result($request);
+	);
 
 	// If we have ungrouped unselected we need to avoid those guys.
 	if (!in_array(0, $groups))
@@ -884,22 +914,22 @@ function purgeMembers($type, $groups, $time_limit)
 	}
 
 	// Select all the members we're about to remove...
-	$request = $db->query('', '
-		SELECT mem.id_member, COALESCE(m.id_member, 0) AS is_mod
+	$members = array();
+	$db->fetchQuery('
+		SELECT 
+			mem.id_member, COALESCE(m.id_member, 0) AS is_mod
 		FROM {db_prefix}members AS mem
 			LEFT JOIN {db_prefix}moderators AS m ON (m.id_member = mem.id_member)
 		WHERE ' . $where,
 		$where_vars
-	);
-	$members = array();
-	while ($row = $db->fetch_assoc($request))
-	{
-		if (!$row['is_mod'] || !in_array(3, $groups))
-		{
-			$members[] = $row['id_member'];
+	)->fetch_callback(
+		function ($row) use (&$members) {
+			if (!$row['is_mod'] || !in_array(3, $groups))
+			{
+				$members[] = $row['id_member'];
+			}
 		}
-	}
-	$db->free_result($request);
+	);
 
 	return $members;
 }

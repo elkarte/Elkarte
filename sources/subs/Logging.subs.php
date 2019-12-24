@@ -18,6 +18,7 @@ use ElkArte\User;
 
 /**
  * @param string $session_id
+ * @throws \ElkArte\Exceptions\Exception
  * @todo
  *
  */
@@ -43,12 +44,13 @@ function deleteLogOnlineInterval($session_id)
  *
  * @param string $session_id
  * @param string $serialized
+ * @throws \ElkArte\Exceptions\Exception
  */
 function updateLogOnline($session_id, $serialized)
 {
 	$db = database();
 
-	$db->query('', '
+	$request = $db->query('', '
 		UPDATE {db_prefix}log_online
 		SET
 			log_time = {int:log_time},
@@ -64,7 +66,7 @@ function updateLogOnline($session_id, $serialized)
 	);
 
 	// Guess it got deleted.
-	if ($db->affected_rows() == 0)
+	if ($request->affected_rows() == 0)
 	{
 		$_SESSION['log_time'] = 0;
 	}
@@ -75,7 +77,8 @@ function updateLogOnline($session_id, $serialized)
  *
  * @param string $session_id
  * @param string $serialized
- * @param boolean $do_delete
+ * @param bool $do_delete
+ * @throws \ElkArte\Exceptions\Exception
  */
 function insertdeleteLogOnline($session_id, $serialized, $do_delete = false)
 {
@@ -119,19 +122,20 @@ function insertdeleteLogOnline($session_id, $serialized, $do_delete = false)
  * @param mixed[] $insert_keys
  * @param mixed[] $cache_stats
  * @param string $date
+ * @throws \ElkArte\Exceptions\Exception
  */
 function updateLogActivity($update_parameters, $setStringUpdate, $insert_keys, $cache_stats, $date)
 {
 	$db = database();
 
-	$db->query('', '
+	$request = $db->query('', '
 		UPDATE {db_prefix}log_activity
 		SET ' . $setStringUpdate . '
 		WHERE date = {date:current_date}',
 		$update_parameters
 	);
 
-	if ($db->affected_rows() == 0)
+	if ($request->affected_rows() === 0)
 	{
 		$db->insert('ignore',
 			'{db_prefix}log_activity',
@@ -150,6 +154,7 @@ function updateLogActivity($update_parameters, $setStringUpdate, $insert_keys, $
  * @param int $id_member
  * @param string $ip
  * @param string $ip2
+ * @throws \Exception
  */
 function logLoginHistory($id_member, $ip, $ip2)
 {
@@ -177,13 +182,15 @@ function logLoginHistory($id_member, $ip, $ip2)
  * @param string $type
  *
  * @return bool
+ * @throws \ElkArte\Exceptions\Exception
  */
 function loadLogReported($msg_id, $topic_id, $type = 'msg')
 {
 	$db = database();
 
 	$request = $db->query('', '
-		SELECT id_report
+		SELECT 
+			id_report
 		FROM {db_prefix}log_reported
 		WHERE {raw:column_name} = {int:reported}
 			AND type = {string:type}
@@ -194,8 +201,8 @@ function loadLogReported($msg_id, $topic_id, $type = 'msg')
 			'type' => $type,
 		)
 	);
-	$num = $db->num_rows($request);
-	$db->free_result($request);
+	$num = $request->num_rows();
+	$request->free_result();
 
 	return ($num > 0);
 }
@@ -204,6 +211,7 @@ function loadLogReported($msg_id, $topic_id, $type = 'msg')
  * Log a change to the forum, such as moderation events or administrative changes.
  *
  * @param mixed[] $inserts
+ * @throws \Exception
  */
 function insertLogActions($inserts)
 {
@@ -219,7 +227,7 @@ function insertLogActions($inserts)
 		array('id_action')
 	);
 
-	return $db->insert_id('{db_prefix}log_actions', 'id_action');
+	return $db->insert_id('{db_prefix}log_actions');
 }
 
 function deleteMemberLogOnline()
@@ -239,6 +247,7 @@ function deleteMemberLogOnline()
  * Delete expired/outdated session from log_online
  *
  * @param string $session
+ * @throws \ElkArte\Exceptions\Exception
  * @package Authorization
  */
 function deleteOnline($session)
@@ -259,6 +268,7 @@ function deleteOnline($session)
  *
  * @param int[]|int $ids ids of the member(s) to log
  * @param bool $on = false if true, add the user(s) to online log, if false, remove 'em
+ * @throws \ElkArte\Exceptions\Exception
  * @package Authorization
  */
 function logOnline($ids, $on = false)

@@ -29,7 +29,7 @@ use ElkArte\Util;
  * - Won't convert \n's and a few other things if previewing is true.
  *
  * @param string $message
- * @param boolean $previewing
+ * @param bool $previewing
  * @package Posts
  */
 function preparsecode(&$message, $previewing = false)
@@ -185,7 +185,7 @@ function createPost(&$msgOptions, &$topicOptions, &$posterOptions)
 		$message_parameters,
 		array('id_msg')
 	);
-	$msgOptions['id'] = $db->insert_id('{db_prefix}messages', 'id_msg');
+	$msgOptions['id'] = $db->insert_id('{db_prefix}messages');
 
 	// Something went wrong creating the message...
 	if (empty($msgOptions['id']))
@@ -233,7 +233,7 @@ function createPost(&$msgOptions, &$topicOptions, &$posterOptions)
 			$topic_parameters,
 			array('id_topic')
 		);
-		$topicOptions['id'] = $db->insert_id('{db_prefix}topics', 'id_topic');
+		$topicOptions['id'] = $db->insert_id('{db_prefix}topics');
 
 		// The topic couldn't be created for some reason.
 		if (empty($topicOptions['id']))
@@ -378,7 +378,7 @@ function createPost(&$msgOptions, &$topicOptions, &$posterOptions)
 		// Since it's likely they *read* it before replying, let's try an UPDATE first.
 		if (!$new_topic)
 		{
-			$db->query('', '
+			$flag = $db->query('', '
 				UPDATE {db_prefix}log_topics
 				SET id_msg = {int:id_msg}
 				WHERE id_member = {int:current_member}
@@ -388,9 +388,7 @@ function createPost(&$msgOptions, &$topicOptions, &$posterOptions)
 					'id_msg' => $msgOptions['id'],
 					'id_topic' => $topicOptions['id'],
 				)
-			);
-
-			$flag = $db->affected_rows() != 0;
+			)->affected_rows() != 0;
 		}
 
 		if (empty($flag))
@@ -471,18 +469,22 @@ function modifyPost(&$msgOptions, &$topicOptions, &$posterOptions)
 	{
 		$messages_columns['poster_name'] = $posterOptions['name'];
 	}
+
 	if (isset($posterOptions['email']))
 	{
 		$messages_columns['poster_email'] = $posterOptions['email'];
 	}
+
 	if (isset($msgOptions['icon']))
 	{
 		$messages_columns['icon'] = $msgOptions['icon'];
 	}
+
 	if (isset($msgOptions['subject']))
 	{
 		$messages_columns['subject'] = $msgOptions['subject'];
 	}
+
 	if (isset($msgOptions['body']))
 	{
 		$messages_columns['body'] = $msgOptions['body'];
@@ -495,12 +497,14 @@ function modifyPost(&$msgOptions, &$topicOptions, &$posterOptions)
 			$msgOptions['old_body'] = $message['body'];
 		}
 	}
+
 	if (!empty($msgOptions['modify_time']))
 	{
 		$messages_columns['modified_time'] = $msgOptions['modify_time'];
 		$messages_columns['modified_name'] = $msgOptions['modify_name'];
 		$messages_columns['id_msg_modified'] = $modSettings['maxMsgID'];
 	}
+
 	if (isset($msgOptions['smileys_enabled']))
 	{
 		$messages_columns['smileys_enabled'] = empty($msgOptions['smileys_enabled']) ? 0 : 1;
@@ -540,10 +544,12 @@ function modifyPost(&$msgOptions, &$topicOptions, &$posterOptions)
 	{
 		$attributes['is_sticky'] = $topicOptions['sticky_mode'];
 	}
+
 	if ($topicOptions['lock_mode'] !== null)
 	{
 		$attributes['locked'] = $topicOptions['lock_mode'];
 	}
+
 	if ($topicOptions['poll'] !== null)
 	{
 		$attributes['id_poll'] = $topicOptions['poll'];
@@ -559,7 +565,7 @@ function modifyPost(&$msgOptions, &$topicOptions, &$posterOptions)
 	if (!empty($topicOptions['mark_as_read']) && User::$info->is_guest === false)
 	{
 		// Since it's likely they *read* it before editing, let's try an UPDATE first.
-		$db->query('', '
+		$flag = $db->query('', '
 			UPDATE {db_prefix}log_topics
 			SET id_msg = {int:id_msg}
 			WHERE id_member = {int:current_member}
@@ -569,9 +575,7 @@ function modifyPost(&$msgOptions, &$topicOptions, &$posterOptions)
 				'id_msg' => $modSettings['maxMsgID'],
 				'id_topic' => $topicOptions['id'],
 			)
-		);
-
-		$flag = $db->affected_rows() != 0;
+		)->affected_rows() != 0;
 
 		if (empty($flag))
 		{
@@ -588,7 +592,8 @@ function modifyPost(&$msgOptions, &$topicOptions, &$posterOptions)
 	{
 		// Only update the subject if this was the first message in the topic.
 		$request = $db->query('', '
-			SELECT id_topic
+			SELECT 
+				id_topic
 			FROM {db_prefix}topics
 			WHERE id_first_msg = {int:id_first_msg}
 			LIMIT 1',
@@ -596,12 +601,12 @@ function modifyPost(&$msgOptions, &$topicOptions, &$posterOptions)
 				'id_first_msg' => $msgOptions['id'],
 			)
 		);
-		if ($db->num_rows($request) == 1)
+		if ($request->num_rows() == 1)
 		{
 			require_once(SUBSDIR . '/Messages.subs.php');
 			updateSubjectStats($topicOptions['id'], $msgOptions['subject']);
 		}
-		$db->free_result($request);
+		$request->free_result();
 	}
 
 	// Finally, if we are setting the approved state we need to do much more work :(
@@ -642,7 +647,8 @@ function approvePosts($msgs, $approve = true)
 
 	// May as well start at the beginning, working out *what* we need to change.
 	$request = $db->query('', '
-		SELECT m.id_msg, m.approved, m.id_topic, m.id_board, t.id_first_msg, t.id_last_msg,
+		SELECT 
+			m.id_msg, m.approved, m.id_topic, m.id_board, t.id_first_msg, t.id_last_msg,
 			m.body, m.subject, COALESCE(mem.real_name, m.poster_name) AS poster_name, m.id_member,
 			t.approved AS topic_approved, b.count_posts
 		FROM {db_prefix}messages AS m
@@ -663,7 +669,7 @@ function approvePosts($msgs, $approve = true)
 	$notification_topics = array();
 	$notification_posts = array();
 	$member_post_changes = array();
-	while ($row = $db->fetch_assoc($request))
+	while (($row = $request->fetch_assoc()))
 	{
 		// Easy...
 		$msgs[] = $row['id_msg'];
@@ -747,7 +753,7 @@ function approvePosts($msgs, $approve = true)
 			$member_post_changes[$row['id_member']] = isset($member_post_changes[$row['id_member']]) ? $member_post_changes[$row['id_member']] + 1 : 1;
 		}
 	}
-	$db->free_result($request);
+	$request->free_result();
 
 	if (empty($msgs))
 	{
@@ -768,8 +774,9 @@ function approvePosts($msgs, $approve = true)
 	// If we were unapproving find the last msg in the topics...
 	if (!$approve)
 	{
-		$request = $db->query('', '
-			SELECT id_topic, MAX(id_msg) AS id_last_msg
+		$db->fetchQuery('
+			SELECT 
+				id_topic, MAX(id_msg) AS id_last_msg
 			FROM {db_prefix}messages
 			WHERE id_topic IN ({array_int:topic_list})
 				AND approved = {int:approved}
@@ -778,12 +785,11 @@ function approvePosts($msgs, $approve = true)
 				'topic_list' => $topics,
 				'approved' => 1,
 			)
+		)->fetch_callback(
+			function ($row) use (&$topic_changes) {
+				$topic_changes[$row['id_topic']]['id_last_msg'] = $row['id_last_msg'];
+			}
 		);
-		while ($row = $db->fetch_assoc($request))
-		{
-			$topic_changes[$row['id_topic']]['id_last_msg'] = $row['id_last_msg'];
-		}
-		$db->free_result($request);
 	}
 
 	// ... next the topics...
@@ -931,8 +937,9 @@ function updateLastMessages($setboards, $id_msg = 0)
 	if (!$id_msg)
 	{
 		// Find the latest message on this board (highest id_msg.)
-		$request = $db->query('', '
-			SELECT id_board, MAX(id_last_msg) AS id_msg
+		$db->fetchQuery('
+			SELECT 
+				id_board, MAX(id_last_msg) AS id_msg
 			FROM {db_prefix}topics
 			WHERE id_board IN ({array_int:board_list})
 				AND approved = {int:approved}
@@ -941,12 +948,11 @@ function updateLastMessages($setboards, $id_msg = 0)
 				'board_list' => $setboards,
 				'approved' => 1,
 			)
+		)->fetch_callback(
+			function ($row) use (&$lastMsg) {
+				$lastMsg[$row['id_board']] = $row['id_msg'];
+			}
 		);
-		while ($row = $db->fetch_assoc($request))
-		{
-			$lastMsg[$row['id_board']] = $row['id_msg'];
-		}
-		$db->free_result($request);
 	}
 	else
 	{
@@ -1067,6 +1073,7 @@ function updateLastMessages($setboards, $id_msg = 0)
  * - respects approved, recycled, and board permissions
  *
  * @return array
+ * @throws \ElkArte\Exceptions\Exception
  * @package Posts
  */
 function lastPost()
@@ -1077,7 +1084,8 @@ function lastPost()
 
 	// Find it by the board - better to order by board than sort the entire messages table.
 	$request = $db->query('substring', '
-		SELECT ml.poster_time, ml.subject, ml.id_topic, ml.poster_name, SUBSTRING(ml.body, 1, 385) AS body,
+		SELECT 
+			ml.poster_time, ml.subject, ml.id_topic, ml.poster_name, SUBSTRING(ml.body, 1, 385) AS body,
 			ml.smileys_enabled
 		FROM {db_prefix}boards AS b
 			INNER JOIN {db_prefix}messages AS ml ON (ml.id_msg = b.id_last_msg)
@@ -1091,12 +1099,12 @@ function lastPost()
 			'is_approved' => 1,
 		)
 	);
-	if ($db->num_rows($request) == 0)
+	if ($request->num_rows() == 0)
 	{
 		return array();
 	}
-	$row = $db->fetch_assoc($request);
-	$db->free_result($request);
+	$row = $request->fetch_assoc();
+	$request->free_result();
 
 	// Censor the subject and post...
 	$row['subject'] = censor($row['subject']);
@@ -1191,12 +1199,12 @@ function getFormMsgSubject($editing, $topic, $first_subject = '', $msg_id = 0)
 					'is_approved' => 1,
 				)
 			);
-			if ($db->num_rows($request) == 0)
+			if ($request->num_rows() == 0)
 			{
 				throw new \ElkArte\Exceptions\Exception('quoted_post_deleted', false);
 			}
-			list ($form_subject, $mname, $mdate, $form_message) = $db->fetch_row($request);
-			$db->free_result($request);
+			list ($form_subject, $mname, $mdate, $form_message) = $request->fetch_row();
+			$request->free_result();
 
 			// Add 'Re: ' to the front of the quoted subject.
 			$response_prefix = response_prefix();
@@ -1253,6 +1261,7 @@ function getFormMsgSubject($editing, $topic, $first_subject = '', $msg_id = 0)
  * @param string $custom_subject
  * @param string $response_prefix = ''
  * @param bool $all = false
+ * @throws \ElkArte\Exceptions\Exception
  * @package Posts
  */
 function topicSubject($topic_info, $custom_subject, $response_prefix = '', $all = false)

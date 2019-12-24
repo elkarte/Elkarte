@@ -221,6 +221,7 @@ function adminLogin($type = 'admin')
 		{
 			unset($_POST[$type . '_hash_pass']);
 		}
+
 		if (isset($_POST[$type . '_pass']))
 		{
 			unset($_POST[$type . '_pass']);
@@ -267,7 +268,7 @@ function adminLogin($type = 'admin')
  *  - if 'value' is an array, the function is called recursively.
  *
  * @param string $k key
- * @param string|boolean $v value
+ * @param string|bool $v value
  * @return string 'hidden' HTML form fields, containing key-value-pairs
  * @package Authorization
  */
@@ -350,6 +351,7 @@ function construct_query_string($get)
  * @param bool $buddies_only = false,
  * @param int $max = 500 retrieves a maximum of max members, if passed
  * @return array containing information about the matching members
+ * @throws \ElkArte\Exceptions\Exception
  * @package Authorization
  */
 function findMembers($names, $use_wildcards = false, $buddies_only = false, $max = 500)
@@ -381,6 +383,7 @@ function findMembers($names, $use_wildcards = false, $buddies_only = false, $max
 		{
 			$names[$i] = strtr($names[$i], array('\'' => '&#039;'));
 		}
+
 		$names[$i] = $db->quote('{string:name}', array('name' => $names[$i]));
 	}
 
@@ -408,7 +411,7 @@ function findMembers($names, $use_wildcards = false, $buddies_only = false, $max
 	$real_name = '{column_case_insensitive:real_name}';
 
 	// Search by username, display name, and email address.
-	$request = $db->query('', '
+	$db->fetchQuery('
 		SELECT 
 			id_member, member_name, real_name, email_address, hide_email
 		FROM {db_prefix}members
@@ -425,19 +428,18 @@ function findMembers($names, $use_wildcards = false, $buddies_only = false, $max
 			'limit' => $max,
 			'recursive' => true,
 		)
+	)->fetch_callback(
+		function ($row) use (&$results, $scripturl) {
+			$results[$row['id_member']] = array(
+				'id' => $row['id_member'],
+				'name' => $row['real_name'],
+				'username' => $row['member_name'],
+				'email' => in_array(showEmailAddress(!empty($row['hide_email']), $row['id_member']), array('yes', 'yes_permission_override')) ? $row['email_address'] : '',
+				'href' => $scripturl . '?action=profile;u=' . $row['id_member'],
+				'link' => '<a href="' . $scripturl . '?action=profile;u=' . $row['id_member'] . '">' . $row['real_name'] . '</a>'
+			);
+		}
 	);
-	while ($row = $db->fetch_assoc($request))
-	{
-		$results[$row['id_member']] = array(
-			'id' => $row['id_member'],
-			'name' => $row['real_name'],
-			'username' => $row['member_name'],
-			'email' => in_array(showEmailAddress(!empty($row['hide_email']), $row['id_member']), array('yes', 'yes_permission_override')) ? $row['email_address'] : '',
-			'href' => $scripturl . '?action=profile;u=' . $row['id_member'],
-			'link' => '<a href="' . $scripturl . '?action=profile;u=' . $row['id_member'] . '">' . $row['real_name'] . '</a>'
-		);
-	}
-	$db->free_result($request);
 
 	// Return all the results.
 	return $results;
@@ -535,8 +537,8 @@ function resetPassword($memID, $username = null)
  * @param int $memID
  * @param string $username
  * @param string $ErrorContext
- * @param boolean $check_reserved_name
- * @param boolean $fatal pass through to isReservedName
+ * @param bool $check_reserved_name
+ * @param bool $fatal pass through to isReservedName
  * @return string
  * @throws \ElkArte\Exceptions\Exception
  * @package Authorization
@@ -650,7 +652,7 @@ function validatePassword($password, $username, $restrict_in = array())
  * @param string $password user password if not already 64 characters long will be SHA256 with the user name
  * @param string $hash hash as generated from a SHA256 password
  * @param string $user user name only required if creating a SHA-256 password
- * @param boolean $returnhash flag to determine if we are returning a hash suitable for the database
+ * @param bool $returnhash flag to determine if we are returning a hash suitable for the database
  *
  * @return bool|string
  * @package Authorization
@@ -667,9 +669,7 @@ function validateLoginPassword(&$password, $hash, $user = '', $returnhash = fals
 	// They need a password hash, something to save in the db?
 	if ($returnhash)
 	{
-		$passhash = password_hash($password, PASSWORD_BCRYPT, ['cost' => 10]);
-
-		return $passhash;
+		return password_hash($password, PASSWORD_BCRYPT, ['cost' => 10]);
 	}
 
 	// Doing a password check?
@@ -759,8 +759,8 @@ function rebuildModCache()
  * @param int $expire = 0
  * @param string $path = ''
  * @param string $domain = ''
- * @param boolean|null $secure = false
- * @param boolean|null $httponly = null
+ * @param bool|null $secure = false
+ * @param bool|null $httponly = null
  *
  * @return bool
  * @package Authorization
@@ -775,6 +775,7 @@ function elk_setcookie($name, $value = '', $expire = 0, $path = '', $domain = ''
 	{
 		$httponly = !empty($modSettings['httponlyCookies']);
 	}
+
 	if ($secure === null)
 	{
 		$secure = !empty($modSettings['secureCookies']);
@@ -822,7 +823,7 @@ function findUser($where, $where_params, $fatal = true)
 	$db = database();
 
 	// Find the user!
-	$request = $db->query('', '
+	$request = $db->fetchQuery('
 		SELECT 
 			id_member, real_name, member_name, email_address, is_activated, validation_code, lngfile, openid_uri, secret_question, passwd
 		FROM {db_prefix}members
@@ -832,11 +833,11 @@ function findUser($where, $where_params, $fatal = true)
 	);
 
 	// Maybe email?
-	if ($db->num_rows($request) == 0 && empty($_REQUEST['uid']) && isset($where_params['email_address']))
+	if ($request->num_rows() === 0 && empty($_REQUEST['uid']) && isset($where_params['email_address']))
 	{
-		$db->free_result($request);
+		$request->free_result();
 
-		$request = $db->query('', '
+		$request = $db->fetchQuery('
 			SELECT 
 				id_member, real_name, member_name, email_address, is_activated, validation_code, lngfile, openid_uri, secret_question
 			FROM {db_prefix}members
@@ -844,7 +845,7 @@ function findUser($where, $where_params, $fatal = true)
 			LIMIT 1',
 			array_merge($where_params, array())
 		);
-		if ($db->num_rows($request) == 0)
+		if ($request->num_rows() === 0)
 		{
 			if ($fatal)
 			{
@@ -855,8 +856,8 @@ function findUser($where, $where_params, $fatal = true)
 		}
 	}
 
-	$member = $db->fetch_assoc($request);
-	$db->free_result($request);
+	$member = $request->fetch_assoc();
+	$request->free_result();
 
 	return $member;
 }
@@ -866,14 +867,15 @@ function findUser($where, $where_params, $fatal = true)
  *
  * @param string $email
  * @param string|null $username
- * @return boolean
+ * @return bool
+ * @throws \Exception
  * @package Authorization
  */
 function userByEmail($email, $username = null)
 {
 	$db = database();
 
-	$request = $db->query('', '
+	$request = $db->fetchQuery('
 		SELECT 
 			id_member
 		FROM {db_prefix}members
@@ -886,8 +888,8 @@ function userByEmail($email, $username = null)
 		)
 	);
 
-	$return = $db->num_rows($request) != 0;
-	$db->free_result($request);
+	$return = $request->num_rows() !== 0;
+	$request->free_result();
 
 	return $return;
 }
@@ -914,6 +916,7 @@ function generateValidationCode($length = 10)
  * @param string $name
  * @param bool $is_id if true it treats $name as a member ID and try to load the data for that ID
  * @return mixed[]|false false if nothing is found
+ * @throws \Exception
  * @package Authorization
  */
 function loadExistingMember($name, $is_id = false)
@@ -922,7 +925,7 @@ function loadExistingMember($name, $is_id = false)
 
 	if ($is_id)
 	{
-		$request = $db->query('', '
+		$request = $db->fetchQuery('
 			SELECT 
 				passwd, id_member, id_group, lngfile, is_activated, email_address, additional_groups, member_name, password_salt,
 				openid_uri, passwd_flood, otp_secret, enable_otp, otp_used
@@ -937,7 +940,7 @@ function loadExistingMember($name, $is_id = false)
 	else
 	{
 		// Try to find the user, assuming a member_name was passed...
-		$request = $db->query('', '
+		$request = $db->fetchQuery('
 			SELECT 
 				passwd, id_member, id_group, lngfile, is_activated, email_address, additional_groups, member_name, password_salt,
 				openid_uri, passwd_flood, otp_secret, enable_otp, otp_used
@@ -949,11 +952,11 @@ function loadExistingMember($name, $is_id = false)
 			)
 		);
 		// Didn't work. Try it as an email address.
-		if ($db->num_rows($request) == 0 && strpos($name, '@') !== false)
+		if ($request->num_rows() === 0 && strpos($name, '@') !== false)
 		{
-			$db->free_result($request);
+			$request->free_result();
 
-			$request = $db->query('', '
+			$request = $db->fetchQuery('
 				SELECT 
 					passwd, id_member, id_group, lngfile, is_activated, email_address, additional_groups, member_name, password_salt, openid_uri,
 					passwd_flood, otp_secret, enable_otp, otp_used
@@ -968,17 +971,17 @@ function loadExistingMember($name, $is_id = false)
 	}
 
 	// Nothing? Ah the horror...
-	if ($db->num_rows($request) == 0)
+	if ($request->num_rows() === 0)
 	{
 		$user_auth_data = false;
 	}
 	else
 	{
-		$user_auth_data = $db->fetch_assoc($request);
+		$user_auth_data = $request->fetch_assoc();
 		$user_auth_data['id_member'] = (int) $user_auth_data['id_member'];
 	}
 
-	$db->free_result($request);
+	$request->free_result();
 
 	return $user_auth_data;
 }

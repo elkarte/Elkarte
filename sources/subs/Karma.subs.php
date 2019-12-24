@@ -16,6 +16,7 @@
  *
  * @param int $karmaWaitTime
  * @package Karma
+ * @throws \ElkArte\Exceptions\Exception
  */
 function clearKarma($karmaWaitTime)
 {
@@ -40,7 +41,7 @@ function clearKarma($karmaWaitTime)
  *
  * @return null
  * @package Karma
- *
+ * @throws \ElkArte\Exceptions\Exception
  */
 function lastActionOn($id_executor, $id_target)
 {
@@ -48,7 +49,8 @@ function lastActionOn($id_executor, $id_target)
 
 	// Find out if this user has done this recently...
 	$request = $db->query('', '
-		SELECT action
+		SELECT 
+			action
 		FROM {db_prefix}log_karma
 		WHERE id_target = {int:id_target}
 			AND id_executor = {int:current_member}
@@ -58,11 +60,11 @@ function lastActionOn($id_executor, $id_target)
 			'id_target' => $id_target,
 		)
 	);
-	if ($db->num_rows($request) > 0)
+	if ($request->num_rows() > 0)
 	{
-		list ($action) = $db->fetch_row($request);
+		list ($action) = $request->fetch_row();
 	}
-	$db->free_result($request);
+	$request->free_result();
 
 	return isset($action) ? $action : null;
 }
@@ -74,6 +76,7 @@ function lastActionOn($id_executor, $id_target)
  * @param int $id_target
  * @param int $direction - options: -1 or 1
  * @package Karma
+ * @throws \Exception
  */
 function addKarma($id_executor, $id_target, $direction)
 {
@@ -99,6 +102,7 @@ function addKarma($id_executor, $id_target, $direction)
  * @param int $id_target
  * @param int $direction - options: -1 or 1
  * @package Karma
+ * @throws \ElkArte\Exceptions\Exception
  */
 function updateKarma($id_executor, $id_target, $direction)
 {
@@ -107,7 +111,8 @@ function updateKarma($id_executor, $id_target, $direction)
 	// You decided to go back on your previous choice?
 	$db->query('', '
 		UPDATE {db_prefix}log_karma
-		SET action = {int:action}, log_time = {int:current_time}
+		SET 
+			action = {int:action}, log_time = {int:current_time}
 		WHERE id_target = {int:id_target}
 			AND id_executor = {int:current_member}',
 		array(

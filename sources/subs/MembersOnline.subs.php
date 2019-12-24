@@ -27,6 +27,7 @@ use ElkArte\Util;
  *
  * @param mixed[] $membersOnlineOptions
  * @return array
+ * @throws \ElkArte\Exceptions\Exception
  * @package Members
  */
 function getMembersOnlineStats($membersOnlineOptions)
@@ -98,7 +99,7 @@ function getMembersOnlineStats($membersOnlineOptions)
 			'reg_mem_group' => 0,
 		)
 	);
-	while ($row = $db->fetch_assoc($request))
+	while (($row = $request->fetch_assoc()))
 	{
 		if (empty($row['real_name']))
 		{
@@ -121,6 +122,7 @@ function getMembersOnlineStats($membersOnlineOptions)
 		}
 
 		$href = getUrl('profile', ['action' => 'profile', 'u' => $row['id_member'], 'name' => $row['real_name']]);
+
 		// Some basic color coding...
 		if (!empty($row['online_color']))
 		{
@@ -162,7 +164,7 @@ function getMembersOnlineStats($membersOnlineOptions)
 			);
 		}
 	}
-	$db->free_result($request);
+	$request->free_result();
 
 	// If there are spiders only and we're showing the detail, add them to the online list - at the bottom.
 	if (!empty($spider_finds) && $modSettings['show_spider_online'] > 1)
@@ -202,6 +204,7 @@ function getMembersOnlineStats($membersOnlineOptions)
  * @param mixed[] $membersOnlineStats
  * @param string $sortFunction
  * @return mixed[]
+ * @throws \ElkArte\Exceptions\Exception
  * @package Members
  */
 function filter_members_online($membersOnlineStats, $sortFunction)
@@ -238,6 +241,7 @@ function filter_members_online($membersOnlineStats, $sortFunction)
  * Check if the number of users online is a record and store it.
  *
  * @param int $total_users_online
+ * @throws \ElkArte\Exceptions\Exception
  * @package Members
  */
 function trackStatsUsersOnline($total_users_online)
@@ -263,7 +267,8 @@ function trackStatsUsersOnline($total_users_online)
 	if (!isset($modSettings['mostOnlineUpdated']) || $modSettings['mostOnlineUpdated'] != $date)
 	{
 		$request = $db->query('', '
-			SELECT most_on
+			SELECT 
+				most_on
 			FROM {db_prefix}log_activity
 			WHERE date = {date:date}
 			LIMIT 1',
@@ -273,7 +278,7 @@ function trackStatsUsersOnline($total_users_online)
 		);
 
 		// The log_activity hasn't got an entry for today?
-		if ($db->num_rows($request) === 0)
+		if ($request->num_rows() === 0)
 		{
 			$db->insert('ignore',
 				'{db_prefix}log_activity',
@@ -285,7 +290,7 @@ function trackStatsUsersOnline($total_users_online)
 		// There's an entry in log_activity on today...
 		else
 		{
-			list ($modSettings['mostOnlineToday']) = $db->fetch_row($request);
+			list ($modSettings['mostOnlineToday']) = $request->fetch_row();
 
 			if ($total_users_online > $modSettings['mostOnlineToday'])
 			{
@@ -294,12 +299,11 @@ function trackStatsUsersOnline($total_users_online)
 
 			$total_users_online = max($total_users_online, $modSettings['mostOnlineToday']);
 		}
-		$db->free_result($request);
+		$request->free_result();
 
 		$settingsToUpdate['mostOnlineUpdated'] = $date;
 		$settingsToUpdate['mostOnlineToday'] = $total_users_online;
 	}
-
 	// Highest number of users online today?
 	elseif ($total_users_online > $modSettings['mostOnlineToday'])
 	{

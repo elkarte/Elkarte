@@ -32,7 +32,7 @@ use ElkArte\XmlArray;
  * @param bool $single_file = false
  * @param bool $overwrite = false
  * @param string[]|null $files_to_extract = null
- * @return array|boolean
+ * @return array|bool
  * @throws \ElkArte\Exceptions\Exception
  * @package Packages
  */
@@ -86,7 +86,7 @@ function read_tgz_file($gzfilename, $destination, $single_file = false, $overwri
  * @param bool $single_file = false,
  * @param bool $overwrite = false,
  * @param string[]|null $files_to_extract = null
- * @return mixed[]|boolean
+ * @return mixed[]|bool
  * @throws \ElkArte\Exceptions\Exception
  * @package Packages
  */
@@ -117,7 +117,7 @@ function read_tgz_data($data, $destination, $single_file = false, $overwrite = f
  * @param bool $single_file
  * @param bool $overwrite
  * @param string[]|null $files_to_extract
- * @return mixed[]|boolean
+ * @return mixed[]|bool
  * @throws \ElkArte\Exceptions\Exception
  * @package Packages
  */
@@ -133,7 +133,7 @@ function read_zip_data($data, $destination, $single_file = false, $overwrite = f
  * will return false if the file is "moved permanently" or similar.
  *
  * @param string $url
- * @return boolean true if the remote url exists.
+ * @return bool true if the remote url exists.
  * @package Packages
  */
 function url_exists($url)
@@ -185,7 +185,8 @@ function loadInstalledPackages()
 	{
 		$db->query('', '
 			UPDATE {db_prefix}log_packages
-			SET install_state = {int:not_installed}',
+			SET 
+				install_state = {int:not_installed}',
 			array(
 				'not_installed' => 0,
 			)
@@ -196,36 +197,36 @@ function loadInstalledPackages()
 	}
 
 	// Load the packages from the database - note this is ordered by install time to ensure latest package uninstalled first.
-	$request = $db->query('', '
-		SELECT id_install, package_id, filename, name, version
+	$installed = array();
+	$found = array();
+	$db->fetchQuery('
+		SELECT 
+			id_install, package_id, filename, name, version
 		FROM {db_prefix}log_packages
 		WHERE install_state != {int:not_installed}
 		ORDER BY time_installed DESC',
 		array(
 			'not_installed' => 0,
 		)
-	);
-	$installed = array();
-	$found = array();
-	while ($row = $db->fetch_assoc($request))
-	{
-		// Already found this? If so don't add it twice!
-		if (in_array($row['package_id'], $found))
-		{
-			continue;
+	)->fetch_callback(
+		function ($row) use (&$found, &$installed) {
+			// Already found this? If so don't add it twice!
+			if (in_array($row['package_id'], $found))
+			{
+				return;
+			}
+
+			$found[] = $row['package_id'];
+
+			$installed[] = array(
+				'id' => $row['id_install'],
+				'name' => $row['name'],
+				'filename' => $row['filename'],
+				'package_id' => $row['package_id'],
+				'version' => $row['version'],
+			);
 		}
-
-		$found[] = $row['package_id'];
-
-		$installed[] = array(
-			'id' => $row['id_install'],
-			'name' => $row['name'],
-			'filename' => $row['filename'],
-			'package_id' => $row['package_id'],
-			'version' => $row['version'],
-		);
-	}
-	$db->free_result($request);
+	);
 
 	return $installed;
 }
@@ -321,8 +322,9 @@ function getPackageInfo($gzfilename)
  *
  * @param string[] $chmodFiles
  * @param mixed[] $chmodOptions
- * @param boolean $restore_write_status
- * @return array|boolean
+ * @param bool $restore_write_status
+ * @return array|bool
+ * @throws \ElkArte\Exceptions\Exception
  * @package Packages
  */
 function create_chmod_control($chmodFiles = array(), $chmodOptions = array(), $restore_write_status = false)
@@ -605,7 +607,7 @@ function create_chmod_control($chmodFiles = array(), $chmodOptions = array(), $r
  * @param string $dummy1
  * @param string $dummy2
  * @param string $dummy3
- * @param boolean $do_change
+ * @param bool $do_change
  *
  * @return array
  */
@@ -697,14 +699,17 @@ function packageRequireFTP($destination_url, $files = null, $return = false)
 			{
 				elk_chmod($file, 0755);
 			}
+
 			if (!@is_writable($file))
 			{
 				elk_chmod($file, 0777);
 			}
+
 			if (!@is_writable(dirname($file)))
 			{
 				elk_chmod($file, 0755);
 			}
+
 			if (!@is_writable(dirname($file)))
 			{
 				elk_chmod($file, 0777);
@@ -749,10 +754,12 @@ function packageRequireFTP($destination_url, $files = null, $return = false)
 				@touch($file);
 				elk_chmod($file, 0755);
 			}
+
 			if (!@is_writable($file))
 			{
 				elk_chmod($file, 0777);
 			}
+
 			if (!@is_writable(dirname($file)))
 			{
 				elk_chmod(dirname($file), 0777);
@@ -955,6 +962,7 @@ function parsePackageInfo(&$packageXML, $testing_only = true, $method = 'install
 		$the_version = $_REQUEST['ve'];
 		$_SESSION['single_version_emulate'][$_REQUEST['package']] = $the_version;
 	}
+
 	if (!empty($_REQUEST['package']) && (!empty($_SESSION['single_version_emulate'][$_REQUEST['package']])))
 	{
 		$the_version = $_SESSION['single_version_emulate'][$_REQUEST['package']];
@@ -1477,9 +1485,9 @@ function parsePackageInfo(&$packageXML, $testing_only = true, $method = 'install
  * - Returns true if the version matched.
  *
  * @param string $versions
- * @param boolean $reset
+ * @param bool $reset
  * @param string $the_version
- * @return string|boolean highest install value string or false
+ * @return string|bool highest install value string or false
  * @package Packages
  */
 function matchHighestPackageVersion($versions, $reset = false, $the_version)
@@ -1535,7 +1543,7 @@ function matchHighestPackageVersion($versions, $reset = false, $the_version)
  *
  * @param string $version
  * @param string $versions
- * @return boolean
+ * @return bool
  * @package Packages
  */
 function matchPackageVersion($version, $versions)
@@ -1816,7 +1824,7 @@ function deltree($dir, $delete_dir = true)
  *
  * @param string $strPath
  * @param int|false $mode
- * @return boolean true if successful, false otherwise
+ * @return bool true if successful, false otherwise
  * @package Packages
  */
 function mktree($strPath, $mode)
@@ -1941,7 +1949,7 @@ function copytree($source, $destination)
 		return;
 	}
 
-	while ($entryname = readdir($current_dir))
+	while (($entryname = readdir($current_dir)))
 	{
 		if (in_array($entryname, array('.', '..')))
 		{
@@ -2002,7 +2010,7 @@ function listtree($path, $sub_path = '')
 		return array();
 	}
 
-	while ($entry = $dir->read())
+	while (($entry = $dir->read()))
 	{
 		if ($entry === '.' || $entry === '..')
 		{
@@ -2492,7 +2500,7 @@ function package_get_contents($filename)
  * @param string $filename
  * @param string $data
  * @param bool $testing
- * @return int|boolean
+ * @return int|bool
  * @package Packages
  */
 function package_put_contents($filename, $data, $testing = false)
@@ -2567,7 +2575,7 @@ function package_put_contents($filename, $data, $testing = false)
 /**
  * Clears (removes the files) the current package cache (temp directory)
  *
- * @param boolean $trash
+ * @param bool $trash
  * @package Packages
  */
 function package_flush_cache($trash = false)
@@ -2641,7 +2649,7 @@ function package_flush_cache($trash = false)
  * @param string $filename
  * @param string $perm_state = 'writable'
  * @param bool $track_change = false
- * @return boolean True if it worked, false if it didn't
+ * @return bool True if it worked, false if it didn't
  * @package Packages
  */
 function package_chmod($filename, $perm_state = 'writable', $track_change = false)
@@ -2835,6 +2843,7 @@ function package_crypt($pass)
  * @param string $id
  *
  * @return bool
+ * @throws \Exception
  * @package Packages
  *
  */
@@ -2861,8 +2870,9 @@ function package_create_backup($id = 'backup')
 	);
 
 	// Find all installed theme directories
-	$request = $db->query('', '
-		SELECT value
+	$db->fetchQuery('
+		SELECT 
+			value
 		FROM {db_prefix}themes
 		WHERE id_member = {int:no_member}
 			AND variable = {string:theme_dir}',
@@ -2870,12 +2880,11 @@ function package_create_backup($id = 'backup')
 			'no_member' => 0,
 			'theme_dir' => 'theme_dir',
 		)
+	)->fetch_callback(
+		function ($row) use (&$dirs, $use_relative_paths) {
+			$dirs[$row['value']] = $use_relative_paths ? 'themes/' . basename($row['value']) . '/' : strtr($row['value'] . '/', '\\', '/');
+		}
 	);
-	while ($row = $db->fetch_assoc($request))
-	{
-		$dirs[$row['value']] = $use_relative_paths ? 'themes/' . basename($row['value']) . '/' : strtr($row['value'] . '/', '\\', '/');
-	}
-	$db->free_result($request);
 
 	try
 	{
@@ -3058,6 +3067,7 @@ function fetch_web_data($url, $post_data = '', $keep_alive = false, $redirection
  * @param string|null $install_id to check
  *
  * @return array
+ * @throws \Exception
  * @package Packages
  */
 function isPackageInstalled($id, $install_id = null)
@@ -3078,8 +3088,9 @@ function isPackageInstalled($id, $install_id = null)
 	}
 
 	// See if it is installed?
-	$request = $db->query('', '
-		SELECT version, themes_installed, db_changes, package_id, install_state
+	$db->fetchQuery('
+		SELECT 
+			version, themes_installed, db_changes, package_id, install_state
 		FROM {db_prefix}log_packages
 		WHERE package_id = {string:current_package}
 			AND install_state != {int:not_installed}
@@ -3091,18 +3102,17 @@ function isPackageInstalled($id, $install_id = null)
 			'current_package' => $id,
 			'install_id' => $install_id,
 		)
+	)->fetch_callback(
+		function ($row) use (&$result) {
+			$result = array(
+				'old_themes' => explode(',', $row['themes_installed']),
+				'old_version' => $row['version'],
+				'db_changes' => empty($row['db_changes']) ? array() : Util::unserialize($row['db_changes']),
+				'package_id' => $row['package_id'],
+				'install_state' => $row['install_state'],
+			);
+		}
 	);
-	while ($row = $db->fetch_assoc($request))
-	{
-		$result = array(
-			'old_themes' => explode(',', $row['themes_installed']),
-			'old_version' => $row['version'],
-			'db_changes' => empty($row['db_changes']) ? array() : Util::unserialize($row['db_changes']),
-			'package_id' => $row['package_id'],
-			'install_state' => $row['install_state'],
-		);
-	}
-	$db->free_result($request);
 
 	return $result;
 }
@@ -3112,6 +3122,7 @@ function isPackageInstalled($id, $install_id = null)
  *
  * @param string $id package_id to update
  * @param string $install_id install id of the package
+ * @throws \ElkArte\Exceptions\Exception
  * @package Packages
  */
 function setPackageState($id, $install_id)
@@ -3120,8 +3131,9 @@ function setPackageState($id, $install_id)
 
 	$db->query('', '
 		UPDATE {db_prefix}log_packages
-		SET install_state = {int:not_installed}, member_removed = {string:member_name}, id_member_removed = {int:current_member},
-			time_removed = {int:current_time}
+		SET 
+			install_state = {int:not_installed}, member_removed = {string:member_name}, 
+			id_member_removed = {int:current_member}, time_removed = {int:current_time}
 		WHERE package_id = {string:package_id}
 			AND id_install = {int:install_id}',
 		array(
@@ -3140,7 +3152,8 @@ function setPackageState($id, $install_id)
  *
  * @param string $id
  *
- * @return
+ * @return string
+ * @throws \Exception
  * @package Packages
  *
  */
@@ -3148,8 +3161,10 @@ function checkPackageDependency($id)
 {
 	$db = database();
 
-	$request = $db->query('', '
-		SELECT version
+	$version = '';
+	$db->fetchQuery('
+		SELECT 
+			version
 		FROM {db_prefix}log_packages
 		WHERE package_id = {string:current_package}
 			AND install_state != {int:not_installed}
@@ -3159,12 +3174,11 @@ function checkPackageDependency($id)
 			'not_installed' => 0,
 			'current_package' => $id,
 		)
+	)->fetch_callback(
+		function ($row) use (&$version) {
+			list ($version) = $row;
+		}
 	);
-	while ($row = $db->fetch_row($request))
-	{
-		list ($version) = $row;
-	}
-	$db->free_result($request);
 
 	return $version;
 }
@@ -3178,6 +3192,7 @@ function checkPackageDependency($id)
  * @param string $db_changes
  * @param bool $is_upgrade
  * @param string $credits_tag
+ * @throws \Exception
  * @package Packages
  */
 function addPackageLog($packageInfo, $failed_step_insert, $themes_installed, $db_changes, $is_upgrade, $credits_tag)

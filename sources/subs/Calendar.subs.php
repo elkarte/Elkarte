@@ -29,6 +29,7 @@ use ElkArte\Util;
  * @param string $low_date inclusive, YYYY-MM-DD
  * @param string $high_date inclusive, YYYY-MM-DD
  * @return mixed[] days, each of which an array of birthday information for the context
+ * @throws \ElkArte\Exceptions\Exception
  * @package Calendar
  */
 function getBirthdayRange($low_date, $high_date)
@@ -41,7 +42,8 @@ function getBirthdayRange($low_date, $high_date)
 
 	// Collect all of the birthdays for this month.  I know, it's a painful query.
 	$result = $db->query('birthday_array', '
-		SELECT id_member, real_name, YEAR(birthdate) AS birth_year, birthdate
+		SELECT 
+			id_member, real_name, YEAR(birthdate) AS birth_year, birthdate
 		FROM {db_prefix}members
 		WHERE YEAR(birthdate) != {string:year_one}
 			AND MONTH(birthdate) != {int:no_month}
@@ -65,7 +67,7 @@ function getBirthdayRange($low_date, $high_date)
 		)
 	);
 	$bday = array();
-	while ($row = $db->fetch_assoc($result))
+	while (($row = $result->fetch_assoc()))
 	{
 		if ($year_low != $year_high)
 		{
@@ -83,7 +85,7 @@ function getBirthdayRange($low_date, $high_date)
 			'is_last' => false
 		);
 	}
-	$db->free_result($result);
+	$result->free_result();
 
 	// Set is_last, so the themes know when to stop placing separators.
 	foreach ($bday as $mday => $array)
@@ -107,8 +109,9 @@ function getBirthdayRange($low_date, $high_date)
  * @param string $low_date
  * @param string $high_date
  * @param bool $use_permissions = true
- * @param integer|null $limit
+ * @param int|null $limit
  * @return array contextual information if use_permissions is true, and an array of the data needed to build that otherwise
+ * @throws \ElkArte\Exceptions\Exception
  * @package Calendar
  */
 function getEventRange($low_date, $high_date, $use_permissions = true, $limit = null)
@@ -143,7 +146,7 @@ function getEventRange($low_date, $high_date, $use_permissions = true, $limit = 
 		)
 	);
 	$events = array();
-	while ($row = $db->fetch_assoc($result))
+	while (($row = $result->fetch_assoc()))
 	{
 		// If the attached topic is not approved then for the moment pretend it doesn't exist
 		if (!empty($row['id_first_msg']) && $modSettings['postmod_active'] && !$row['approved'])
@@ -171,7 +174,7 @@ function getEventRange($low_date, $high_date, $use_permissions = true, $limit = 
 			$lastDate = strftime('%Y-%m-%d', $date);
 			$href = getUrl('topic', ['topic' => $row['id_topic'], 'start' => '0', 'subject' => $row['subject']]);
 
-			// If we're using permissions (calendar pages?) then just ouput normal contextual style information.
+			// If we're using permissions (calendar pages?) then just output normal contextual style information.
 			if ($use_permissions)
 			{
 				if ($row['id_board'] == 0)
@@ -222,7 +225,7 @@ function getEventRange($low_date, $high_date, $use_permissions = true, $limit = 
 			}
 		}
 	}
-	$db->free_result($result);
+	$result->free_result();
 
 	// If we're doing normal contextual data, go through and make things clear to the templates ;).
 	if ($use_permissions)
@@ -242,6 +245,7 @@ function getEventRange($low_date, $high_date, $use_permissions = true, $limit = 
  * @param string $low_date YYYY-MM-DD
  * @param string $high_date YYYY-MM-DD
  * @return array an array of days, which are all arrays of holiday names.
+ * @throws \Exception
  * @package Calendar
  */
 function getHolidayRange($low_date, $high_date)
@@ -260,8 +264,10 @@ function getHolidayRange($low_date, $high_date)
 	}
 
 	// Find some holidays... ;).
-	$result = $db->query('', '
-		SELECT event_date, YEAR(event_date) AS year, title
+	$holidays = array();
+	$db->fetchQuery('
+		SELECT 
+			event_date, YEAR(event_date) AS year, title
 		FROM {db_prefix}calendar_holidays
 		WHERE event_date BETWEEN {date:low_date} AND {date:high_date}
 			OR ' . $allyear_part,
@@ -273,22 +279,20 @@ function getHolidayRange($low_date, $high_date)
 			'all_year_jan' => '0004-01-01',
 			'all_year_dec' => '0004-12-31',
 		)
-	);
-	$holidays = array();
-	while ($row = $db->fetch_assoc($result))
-	{
-		if (substr($low_date, 0, 4) != substr($high_date, 0, 4))
-		{
-			$event_year = substr($row['event_date'], 5) < substr($high_date, 5) ? substr($high_date, 0, 4) : substr($low_date, 0, 4);
-		}
-		else
-		{
-			$event_year = substr($low_date, 0, 4);
-		}
+	)->fetch_callback(
+		function ($row) use (&$holidays, $low_date, $high_date) {
+			if (substr($low_date, 0, 4) != substr($high_date, 0, 4))
+			{
+				$event_year = substr($row['event_date'], 5) < substr($high_date, 5) ? substr($high_date, 0, 4) : substr($low_date, 0, 4);
+			}
+			else
+			{
+				$event_year = substr($low_date, 0, 4);
+			}
 
-		$holidays[$event_year . substr($row['event_date'], 4)][] = $row['title'];
-	}
-	$db->free_result($result);
+			$holidays[$event_year . substr($row['event_date'], 4)][] = $row['title'];
+		}
+	);
 
 	return $holidays;
 }
@@ -318,6 +322,7 @@ function canLinkEvent()
 	{
 		throw new \ElkArte\Exceptions\Exception('missing_board_id', false);
 	}
+
 	if (empty($topic))
 	{
 		throw new \ElkArte\Exceptions\Exception('missing_topic_id', false);
@@ -825,6 +830,7 @@ function cache_getRecentEvents($eventOptions)
  *
  * @param mixed[] $cache_block
  * @param mixed[] $params
+ * @throws \ElkArte\Exceptions\Exception
  * @package Calendar
  */
 function cache_getRecentEvents_post_retri_eval(&$cache_block, $params)
@@ -865,10 +871,12 @@ function cache_getRecentEvents_post_retri_eval(&$cache_block, $params)
 	{
 		$cache_block['data']['calendar_holidays'] = array();
 	}
+
 	if (empty($params[0]['include_birthdays']))
 	{
 		$cache_block['data']['calendar_birthdays'] = array();
 	}
+
 	if (empty($params[0]['include_events']))
 	{
 		$cache_block['data']['calendar_events'] = array();
@@ -882,6 +890,7 @@ function cache_getRecentEvents_post_retri_eval(&$cache_block, $params)
  *
  * @param int $event_id
  * @return int|bool the id of the poster or false if the event was not found
+ * @throws \ElkArte\Exceptions\Exception
  * @package Calendar
  */
 function getEventPoster($event_id)
@@ -890,7 +899,8 @@ function getEventPoster($event_id)
 
 	// A simple database query, how hard can that be?
 	$request = $db->query('', '
-		SELECT id_member
+		SELECT 
+			id_member
 		FROM {db_prefix}calendar
 		WHERE id_event = {int:id_event}
 		LIMIT 1',
@@ -900,14 +910,14 @@ function getEventPoster($event_id)
 	);
 
 	// No results, return false.
-	if ($db->num_rows($request) === 0)
+	if ($request->num_rows() === 0)
 	{
 		return false;
 	}
 
 	// Grab the results and return.
-	list ($poster) = $db->fetch_row($request);
-	$db->free_result($request);
+	list ($poster) = $request->fetch_row();
+	$request->free_result();
 
 	return (int) $poster;
 }
@@ -923,6 +933,7 @@ function getEventPoster($event_id)
  * - does not check any permissions of any sort.
  *
  * @param mixed[] $eventOptions
+ * @throws \ElkArte\Exceptions\Exception
  * @package Calendar
  */
 function insertEvent(&$eventOptions)
@@ -974,7 +985,7 @@ function insertEvent(&$eventOptions)
 	);
 
 	// Store the just inserted id_event for future reference.
-	$eventOptions['id'] = $db->insert_id('{db_prefix}calendar', 'id_event');
+	$eventOptions['id'] = $db->insert_id('{db_prefix}calendar');
 
 	// Update the settings to show something calendarish was updated.
 	updateSettings(array(
@@ -990,6 +1001,7 @@ function insertEvent(&$eventOptions)
  *
  * @param int $event_id
  * @param mixed[] $eventOptions
+ * @throws \ElkArte\Exceptions\Exception
  * @package Calendar
  */
 function modifyEvent($event_id, &$eventOptions)
@@ -1062,6 +1074,7 @@ function modifyEvent($event_id, &$eventOptions)
  * - does no permission checks.
  *
  * @param int $event_id
+ * @throws \ElkArte\Exceptions\Exception
  * @package Calendar
  */
 function removeEvent($event_id)
@@ -1089,6 +1102,7 @@ function removeEvent($event_id)
  * @param int $event_id
  * @param bool $calendar_only
  * @return mixed[]|bool
+ * @throws \ElkArte\Exceptions\Exception
  * @package Calendar
  */
 function getEventProperties($event_id, $calendar_only = false)
@@ -1112,15 +1126,13 @@ function getEventProperties($event_id, $calendar_only = false)
 			'id_event' => $event_id,
 		)
 	);
-
 	// If nothing returned, we are in poo, poo.
-	if ($db->num_rows($request) === 0)
+	if ($request->num_rows() === 0)
 	{
 		return false;
 	}
-
-	$row = $db->fetch_assoc($request);
-	$db->free_result($request);
+	$row = $request->fetch_assoc();
+	$request->free_result();
 
 	if ($calendar_only)
 	{
@@ -1160,6 +1172,7 @@ function getEventProperties($event_id, $calendar_only = false)
  * @param int $id_topic
  *
  * @return array
+ * @throws \Exception
  * @package Calendar
  *
  */
@@ -1169,7 +1182,8 @@ function eventInfoForTopic($id_topic)
 
 	// Get event for this topic. If we have one.
 	return $db->fetchQuery('
-		SELECT cal.id_event, cal.start_date, cal.end_date, cal.title, cal.id_member, mem.real_name
+		SELECT 
+			cal.id_event, cal.start_date, cal.end_date, cal.title, cal.id_member, mem.real_name
 		FROM {db_prefix}calendar AS cal
 			LEFT JOIN {db_prefix}members AS mem ON (mem.id_member = cal.id_member)
 		WHERE cal.id_topic = {int:current_topic}
@@ -1187,6 +1201,7 @@ function eventInfoForTopic($id_topic)
  * @param int $items_per_page The number of items to show per page
  * @param string $sort A string indicating how to sort the results
  * @return array
+ * @throws \Exception
  * @package Calendar
  */
 function list_getHolidays($start, $items_per_page, $sort)
@@ -1194,7 +1209,8 @@ function list_getHolidays($start, $items_per_page, $sort)
 	$db = database();
 
 	return $db->fetchQuery('
-		SELECT id_holiday, YEAR(event_date) AS year, MONTH(event_date) AS month, DAYOFMONTH(event_date) AS day, title
+		SELECT 
+			id_holiday, YEAR(event_date) AS year, MONTH(event_date) AS month, DAYOFMONTH(event_date) AS day, title
 		FROM {db_prefix}calendar_holidays
 		ORDER BY {raw:sort}
 		LIMIT ' . $start . ', ' . $items_per_page,
@@ -1208,6 +1224,7 @@ function list_getHolidays($start, $items_per_page, $sort)
  * Helper function to get the total number of holidays
  *
  * @return int
+ * @throws \ElkArte\Exceptions\Exception
  * @package Calendar
  */
 function list_getNumHolidays()
@@ -1215,12 +1232,13 @@ function list_getNumHolidays()
 	$db = database();
 
 	$request = $db->query('', '
-		SELECT COUNT(*)
+		SELECT 
+			COUNT(*)
 		FROM {db_prefix}calendar_holidays',
 		array()
 	);
-	list ($num_items) = $db->fetch_row($request);
-	$db->free_result($request);
+	list ($num_items) = $request->fetch_row();
+	$request->free_result();
 
 	return (int) $num_items;
 }
@@ -1229,6 +1247,7 @@ function list_getNumHolidays()
  * Remove a holiday from the calendar.
  *
  * @param int|int[] $holiday_ids An array of ids for holidays.
+ * @throws \ElkArte\Exceptions\Exception
  * @package Calendar
  */
 function removeHolidays($holiday_ids)
@@ -1259,6 +1278,7 @@ function removeHolidays($holiday_ids)
  * @param int $holiday
  * @param int $date
  * @param string $title
+ * @throws \ElkArte\Exceptions\Exception
  * @package Calendar
  */
 function editHoliday($holiday, $date, $title)
@@ -1267,7 +1287,8 @@ function editHoliday($holiday, $date, $title)
 
 	$db->query('', '
 		UPDATE {db_prefix}calendar_holidays
-		SET event_date = {date:holiday_date}, title = {string:holiday_title}
+		SET 
+			event_date = {date:holiday_date}, title = {string:holiday_title}
 		WHERE id_holiday = {int:selected_holiday}',
 		array(
 			'holiday_date' => $date,
@@ -1286,6 +1307,7 @@ function editHoliday($holiday, $date, $title)
  *
  * @param int $date
  * @param string $title
+ * @throws \ElkArte\Exceptions\Exception
  * @package Calendar
  */
 function insertHoliday($date, $title)
@@ -1313,32 +1335,33 @@ function insertHoliday($date, $title)
  *
  * @param int $id_holiday
  * @return array
+ * @throws \Exception
  * @package Calendar
  */
 function getHoliday($id_holiday)
 {
 	$db = database();
 
-	$request = $db->query('', '
-		SELECT id_holiday, YEAR(event_date) AS year, MONTH(event_date) AS month, DAYOFMONTH(event_date) AS day, title
+	$db->fetchQuery('
+		SELECT 
+			id_holiday, YEAR(event_date) AS year, MONTH(event_date) AS month, DAYOFMONTH(event_date) AS day, title
 		FROM {db_prefix}calendar_holidays
 		WHERE id_holiday = {int:selected_holiday}
 		LIMIT 1',
 		array(
 			'selected_holiday' => $id_holiday,
 		)
+	)->fetch_callback(
+		function ($row) use (&$holiday) {
+			$holiday = array(
+				'id' => $row['id_holiday'],
+				'day' => $row['day'],
+				'month' => $row['month'],
+				'year' => $row['year'] <= 4 ? 0 : $row['year'],
+				'title' => $row['title']
+			);
+		}
 	);
-	while ($row = $db->fetch_assoc($request))
-	{
-		$holiday = array(
-			'id' => $row['id_holiday'],
-			'day' => $row['day'],
-			'month' => $row['month'],
-			'year' => $row['year'] <= 4 ? 0 : $row['year'],
-			'title' => $row['title']
-		);
-	}
-	$db->free_result($request);
 
 	return $holiday;
 }

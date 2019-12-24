@@ -64,7 +64,9 @@ function sendNotifications($topics, $type, $exclude = array(), $members_only = a
 	require_once(SUBSDIR . '/Mail.subs.php');
 
 	// Get the subject, body and basic poster details, number of attachments if any
-	$result = $db->query('', '
+	$topicData = array();
+	$boards_index = array();
+	$db->fetchQuery('
 		SELECT 
 			mf.subject, ml.body, ml.id_member, t.id_last_msg, t.id_topic, t.id_board, mem.signature,
 			COALESCE(mem.real_name, ml.poster_name) AS poster_name, COUNT(a.id_attach) as num_attach
@@ -79,31 +81,28 @@ function sendNotifications($topics, $type, $exclude = array(), $members_only = a
 			'topic_list' => $topics,
 			'attachment_type' => 0,
 		)
+	)->fetch_callback(
+		function ($row) use (&$topicData, &$boards_index, $type) {
+			// Convert to markdown e.g. text ;) and clean it up
+			pbe_prepare_text($row['body'], $row['subject'], $row['signature']);
+
+			// all the boards for these topics, used to find all the members to be notified
+			$boards_index[] = $row['id_board'];
+
+			// And the information we are going to tell them about
+			$topicData[$row['id_topic']] = array(
+				'subject' => $row['subject'],
+				'body' => $row['body'],
+				'last_id' => $row['id_last_msg'],
+				'topic' => $row['id_topic'],
+				'board' => $row['id_board'],
+				'name' => $type === 'reply' ? $row['poster_name'] : User::$info->name,
+				'exclude' => '',
+				'signature' => $row['signature'],
+				'attachments' => $row['num_attach'],
+			);
+		}
 	);
-	$topicData = array();
-	$boards_index = array();
-	while ($row = $db->fetch_assoc($result))
-	{
-		// Convert to markdown e.g. text ;) and clean it up
-		pbe_prepare_text($row['body'], $row['subject'], $row['signature']);
-
-		// all the boards for these topics, used to find all the members to be notified
-		$boards_index[] = $row['id_board'];
-
-		// And the information we are going to tell them about
-		$topicData[$row['id_topic']] = array(
-			'subject' => $row['subject'],
-			'body' => $row['body'],
-			'last_id' => $row['id_last_msg'],
-			'topic' => $row['id_topic'],
-			'board' => $row['id_board'],
-			'name' => $type === 'reply' ? $row['poster_name'] : User::$info->name,
-			'exclude' => '',
-			'signature' => $row['signature'],
-			'attachments' => $row['num_attach'],
-		);
-	}
-	$db->free_result($result);
 
 	// Work out any exclusions...
 	foreach ($topics as $key => $id)
@@ -151,7 +150,8 @@ function sendNotifications($topics, $type, $exclude = array(), $members_only = a
 	if ($maillist)
 	{
 		// Find the members with *board* notifications on.
-		$members = $db->query('', '
+		$boards = array();
+		$members = $db->fetchQuery('
 			SELECT
 				mem.id_member, mem.email_address, mem.notify_regularity, mem.notify_types, mem.notify_send_body, mem.lngfile, mem.warning,
 				ln.sent, mem.id_group, mem.additional_groups, b.member_groups, mem.id_post_group, b.name, b.id_profile,
@@ -175,8 +175,7 @@ function sendNotifications($topics, $type, $exclude = array(), $members_only = a
 				'members_only' => is_array($members_only) ? $members_only : array($members_only),
 			)
 		);
-		$boards = array();
-		while ($row = $db->fetch_assoc($members))
+		while (($row = $members->fetch_assoc()))
 		{
 			// If they are not the poster do they want to know?
 			// @todo maybe if they posted via email?
@@ -281,11 +280,11 @@ function sendNotifications($topics, $type, $exclude = array(), $members_only = a
 				}
 			}
 		}
-		$db->free_result($members);
+		$members->free_result();
 	}
 
 	// Find the members with notification on for this topic.
-	$members = $db->query('', '
+	$members = $db->fetchQuery('
 		SELECT
 			mem.id_member, mem.email_address, mem.notify_regularity, mem.notify_types, mem.warning,
 			mem.notify_send_body, mem.lngfile, mem.id_group, mem.additional_groups,mem.id_post_group,
@@ -311,7 +310,7 @@ function sendNotifications($topics, $type, $exclude = array(), $members_only = a
 			'members_only' => is_array($members_only) ? $members_only : array($members_only),
 		)
 	);
-	while ($row = $db->fetch_assoc($members))
+	while (($row = $members->fetch_assoc()))
 	{
 		// Don't do the excluded...
 		if ($topicData[$row['id_topic']]['exclude'] == $row['id_member'])
@@ -392,7 +391,7 @@ function sendNotifications($topics, $type, $exclude = array(), $members_only = a
 			$sent++;
 		}
 	}
-	$db->free_result($members);
+	$members->free_result();
 
 	if (isset($current_language) && $current_language !== $user_language)
 	{
@@ -404,7 +403,8 @@ function sendNotifications($topics, $type, $exclude = array(), $members_only = a
 	{
 		$db->query('', '
 			UPDATE {db_prefix}log_notify
-			SET sent = {int:is_sent}
+			SET 
+				sent = {int:is_sent}
 			WHERE id_topic IN ({array_int:topic_list})
 				AND id_member != {int:current_member}',
 			array(
@@ -424,7 +424,8 @@ function sendNotifications($topics, $type, $exclude = array(), $members_only = a
 			{
 				$db->query('', '
 					UPDATE {db_prefix}log_notify
-					SET sent = {int:not_sent}
+					SET 
+						sent = {int:not_sent}
 					WHERE id_topic = {int:id_topic}
 						AND id_member = {int:id_member}',
 					array(
@@ -511,7 +512,7 @@ function sendBoardNotifications(&$topicData)
 	);
 
 	// Find the members with notification on for these boards.
-	$members = $db->query('', '
+	$members = $db->fetchQuery('
 		SELECT
 			mem.id_member, mem.email_address, mem.notify_regularity, mem.notify_send_body, mem.lngfile, mem.warning,
 			ln.sent, ln.id_board, mem.id_group, mem.additional_groups, b.member_groups, b.id_profile,
@@ -534,7 +535,7 @@ function sendBoardNotifications(&$topicData)
 		)
 	);
 	// While we have members with board notifications
-	while ($rowmember = $db->fetch_assoc($members))
+	while (($rowmember = $members->fetch_assoc()))
 	{
 		$email_perm = true;
 		if (!validateNotificationAccess($rowmember, $maillist, $email_perm))
@@ -611,14 +612,15 @@ function sendBoardNotifications(&$topicData)
 			$sentOnceAlready = 1;
 		}
 	}
-	$db->free_result($members);
+	$members->free_result();
 
 	theme()->getTemplates()->loadLanguageFile('index', User::$info->language);
 
 	// Sent!
 	$db->query('', '
 		UPDATE {db_prefix}log_notify
-		SET sent = {int:is_sent}
+		SET 
+			sent = {int:is_sent}
 		WHERE id_board IN ({array_int:board_list})
 			AND id_member != {int:current_member}',
 		array(
@@ -676,7 +678,7 @@ function sendApprovalNotifications(&$topicData)
 	);
 
 	// Find everyone who needs to know about this.
-	$members = $db->query('', '
+	$members = $db->fetchQuery('
 		SELECT
 			mem.id_member, mem.email_address, mem.notify_regularity, mem.notify_types, mem.notify_send_body, mem.lngfile,
 			ln.sent, mem.id_group, mem.additional_groups, b.member_groups, mem.id_post_group, t.id_member_started,
@@ -700,7 +702,7 @@ function sendApprovalNotifications(&$topicData)
 	);
 	$sent = 0;
 	$current_language = User::$info->language;
-	while ($row = $db->fetch_assoc($members))
+	while (($row = $members->fetch_assoc()))
 	{
 		if ($row['id_group'] != 1)
 		{
@@ -760,7 +762,7 @@ function sendApprovalNotifications(&$topicData)
 			$sent_this_time = true;
 		}
 	}
-	$db->free_result($members);
+	$members->free_result();
 
 	if (isset($current_language) && $current_language !== User::$info->language)
 	{
@@ -772,7 +774,8 @@ function sendApprovalNotifications(&$topicData)
 	{
 		$db->query('', '
 			UPDATE {db_prefix}log_notify
-			SET sent = {int:is_sent}
+			SET 
+				sent = {int:is_sent}
 			WHERE id_topic IN ({array_int:topic_list})
 				AND id_member != {int:current_member}',
 			array(
@@ -799,7 +802,7 @@ function sendApprovalNotifications(&$topicData)
  */
 function sendAdminNotifications($type, $memberID, $member_name = null)
 {
-	global $modSettings, $language, $scripturl;
+	global $modSettings, $language;
 
 	$db = database();
 
@@ -821,11 +824,11 @@ function sendAdminNotifications($type, $memberID, $member_name = null)
 		$member_name = $member_info['real_name'];
 	}
 
-	$groups = array();
-
 	// All membergroups who can approve members.
-	$request = $db->query('', '
-		SELECT id_group
+	$groups = array();
+	$db->fetchQuery('
+		SELECT 
+			id_group
 		FROM {db_prefix}permissions
 		WHERE permission = {string:moderate_forum}
 			AND add_deny = {int:add_deny}
@@ -835,19 +838,19 @@ function sendAdminNotifications($type, $memberID, $member_name = null)
 			'id_group' => 0,
 			'moderate_forum' => 'moderate_forum',
 		)
+	)->fetch_callback(
+		function ($row) use (&$groups) {
+			$groups[] = $row['id_group'];
+		}
 	);
-	while ($row = $db->fetch_assoc($request))
-	{
-		$groups[] = $row['id_group'];
-	}
-	$db->free_result($request);
 
 	// Add administrators too...
 	$groups[] = 1;
 	$groups = array_unique($groups);
 
 	// Get a list of all members who have ability to approve accounts - these are the people who we inform.
-	$request = $db->query('', '
+	$current_language = User::$info->language;
+	$db->query('', '
 		SELECT 
 			id_member, lngfile, email_address
 		FROM {db_prefix}members
@@ -859,30 +862,29 @@ function sendAdminNotifications($type, $memberID, $member_name = null)
 			'notify_types' => 4,
 			'group_array_implode' => implode(', additional_groups) != 0 OR FIND_IN_SET(', $groups),
 		)
-	);
+	)->fetch_callback(
+		function ($row) use ($type, $member_name, $memberID, $language) {
+			global $scripturl, $modSettings;
 
-	$current_language = User::$info->language;
-	while ($row = $db->fetch_assoc($request))
-	{
-		$replacements = array(
-			'USERNAME' => $member_name,
-			'PROFILELINK' => $scripturl . '?action=profile;u=' . $memberID
-		);
-		$emailtype = 'admin_notify';
+			$replacements = array(
+				'USERNAME' => $member_name,
+				'PROFILELINK' => $scripturl . '?action=profile;u=' . $memberID
+			);
+			$emailtype = 'admin_notify';
 
-		// If they need to be approved add more info...
-		if ($type === 'approval')
-		{
-			$replacements['APPROVALLINK'] = $scripturl . '?action=admin;area=viewmembers;sa=browse;type=approve';
-			$emailtype .= '_approval';
+			// If they need to be approved add more info...
+			if ($type === 'approval')
+			{
+				$replacements['APPROVALLINK'] = $scripturl . '?action=admin;area=viewmembers;sa=browse;type=approve';
+				$emailtype .= '_approval';
+			}
+
+			$emaildata = loadEmailTemplate($emailtype, $replacements, empty($row['lngfile']) || empty($modSettings['userLanguage']) ? $language : $row['lngfile']);
+
+			// And do the actual sending...
+			sendmail($row['email_address'], $emaildata['subject'], $emaildata['body'], null, null, false, 0);
 		}
-
-		$emaildata = loadEmailTemplate($emailtype, $replacements, empty($row['lngfile']) || empty($modSettings['userLanguage']) ? $language : $row['lngfile']);
-
-		// And do the actual sending...
-		sendmail($row['email_address'], $emaildata['subject'], $emaildata['body'], null, null, false, 0);
-	}
-	$db->free_result($request);
+	);
 
 	if (isset($current_language) && $current_language !== User::$info->language)
 	{
@@ -901,8 +903,8 @@ function sendAdminNotifications($type, $memberID, $member_name = null)
  * Sets email_perm to false if they should not get a reply-able message
  *
  * @param mixed[] $row
- * @param boolean $maillist
- * @param boolean $email_perm
+ * @param bool $maillist
+ * @param bool $email_perm
  *
  * @return bool
  * @throws \ElkArte\Exceptions\Exception
@@ -971,6 +973,7 @@ function validateNotificationAccess($row, $maillist, &$email_perm = true)
  * @param int[]|int $members
  *
  * @return array
+ * @throws \Exception
  */
 function getUsersNotificationsPreferences($notification_types, $members)
 {
@@ -980,8 +983,10 @@ function getUsersNotificationsPreferences($notification_types, $members)
 	$query_members = (array) $members;
 	$query_members[] = 0;
 
-	$request = $db->query('', '
-		SELECT id_member, notification_level, mention_type
+	$results = array();
+	$db->fetchQuery('
+		SELECT 
+			id_member, notification_level, mention_type
 		FROM {db_prefix}notifications_pref
 		WHERE id_member IN ({array_int:members_to})
 			AND mention_type IN ({array_string:mention_types})',
@@ -989,26 +994,23 @@ function getUsersNotificationsPreferences($notification_types, $members)
 			'members_to' => $query_members,
 			'mention_types' => $notification_types,
 		)
-	);
-	$results = array();
+	)->fetch_callback(
+		function ($row) use (&$results) {
+			if (!isset($results[$row['id_member']]))
+			{
+				$results[$row['id_member']] = array();
+			}
 
-	while ($row = $db->fetch_assoc($request))
-	{
-		if (!isset($results[$row['id_member']]))
-		{
-			$results[$row['id_member']] = array();
+			$results[$row['id_member']][$row['mention_type']] = (int) $row['notification_level'];
 		}
-
-		$results[$row['id_member']][$row['mention_type']] = (int) $row['notification_level'];
-	}
-
-	$db->free_result($request);
+	);
 
 	$defaults = array();
 	foreach ($notification_types as $val)
 	{
 		$defaults[$val] = 0;
 	}
+
 	if (isset($results[0]))
 	{
 		$defaults = array_merge($defaults, $results[0]);
@@ -1032,6 +1034,7 @@ function getUsersNotificationsPreferences($notification_types, $members)
  *
  * @param int $member The member id
  * @param int[] $notification_data The array of notifications ('type' => 'level')
+ * @throws \ElkArte\Exceptions\Exception
  */
 function saveUserNotificationsPreferences($member, $notification_data)
 {
@@ -1127,8 +1130,6 @@ function getConfiguredNotificationMethods($type)
 	{
 		return $unserialized[$type];
 	}
-	else
-	{
-		return array();
-	}
+
+	return array();
 }

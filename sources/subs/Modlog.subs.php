@@ -24,7 +24,8 @@ use ElkArte\Util;
  * @param mixed[] $query_params
  * @param int $log_type
  *
- * @return
+ * @return int
+ * @throws \ElkArte\Exceptions\Exception
  */
 function list_getModLogEntryCount($query_string = '', $query_params = array(), $log_type = 1)
 {
@@ -32,25 +33,25 @@ function list_getModLogEntryCount($query_string = '', $query_params = array(), $
 
 	$modlog_query = allowedTo('admin_forum') || User::$info->mod_cache['bq'] == '1=1' ? '1=1' : (User::$info->mod_cache['bq'] == '0=1' ? 'lm.id_board = 0 AND lm.id_topic = 0' : (strtr(User::$info->mod_cache['bq'], array('id_board' => 'b.id_board')) . ' AND ' . strtr(User::$info->mod_cache['bq'], array('id_board' => 't.id_board'))));
 
-	$result = $db->query('', '
-		SELECT COUNT(*)
+	$request = $db->query('', '
+		SELECT 
+			COUNT(*)
 		FROM {db_prefix}log_actions AS lm
 			LEFT JOIN {db_prefix}members AS mem ON (mem.id_member = lm.id_member)
 			LEFT JOIN {db_prefix}membergroups AS mg ON (mg.id_group = CASE WHEN mem.id_group = {int:reg_group_id} THEN mem.id_post_group ELSE mem.id_group END)
 			LEFT JOIN {db_prefix}boards AS b ON (b.id_board = lm.id_board)
 			LEFT JOIN {db_prefix}topics AS t ON (t.id_topic = lm.id_topic)
 		WHERE id_log = {int:log_type}
-			AND {raw:modlog_query}'
-		. (!empty($query_string) ? '
-				AND ' . $query_string : ''),
+			AND {raw:modlog_query}'	. (!empty($query_string) ? '
+			AND ' . $query_string : ''),
 		array_merge($query_params, array(
 			'reg_group_id' => 0,
 			'log_type' => $log_type,
 			'modlog_query' => $modlog_query,
 		))
 	);
-	list ($entry_count) = $db->fetch_row($result);
-	$db->free_result($result);
+	list ($entry_count) = $request->fetch_row();
+	$request->free_result();
 
 	return $entry_count;
 }
@@ -67,6 +68,7 @@ function list_getModLogEntryCount($query_string = '', $query_params = array(), $
  * @param int $log_type
  *
  * @return array
+ * @throws \ElkArte\Exceptions\Exception
  */
 function list_getModLogEntries($start, $items_per_page, $sort, $query_string = '', $query_params = array(), $log_type = 1)
 {
@@ -86,7 +88,7 @@ function list_getModLogEntries($start, $items_per_page, $sort, $query_string = '
 	$seeIP = allowedTo('moderate_forum');
 
 	// Here we have the query getting the log details.
-	$result = $db->query('', '
+	$request = $db->fetchQuery('
 		SELECT
 			lm.id_action, lm.id_member, lm.ip, lm.log_time, lm.action, lm.id_board, lm.id_topic, lm.id_msg, lm.extra,
 			mem.real_name, mg.group_name
@@ -114,7 +116,7 @@ function list_getModLogEntries($start, $items_per_page, $sort, $query_string = '
 	$members = array();
 	$messages = array();
 	$entries = array();
-	while ($row = $db->fetch_assoc($result))
+	while (($row = $request->fetch_assoc()))
 	{
 		$row['extra'] = Util::unserialize($row['extra']);
 
@@ -138,6 +140,7 @@ function list_getModLogEntries($start, $items_per_page, $sort, $query_string = '
 		{
 			$row['extra']['topic'] = $row['id_topic'];
 		}
+
 		if (!empty($row['id_msg']))
 		{
 			$row['extra']['message'] = $row['id_msg'];
@@ -148,6 +151,7 @@ function list_getModLogEntries($start, $items_per_page, $sort, $query_string = '
 		{
 			$topics[(int) $row['extra']['topic']][] = $row['id_action'];
 		}
+
 		if (isset($row['extra']['new_topic']))
 		{
 			$topics[(int) $row['extra']['new_topic']][] = $row['id_action'];
@@ -173,10 +177,12 @@ function list_getModLogEntries($start, $items_per_page, $sort, $query_string = '
 		{
 			$boards[(int) $row['extra']['board_to']][] = $row['id_action'];
 		}
+
 		if (isset($row['extra']['board_from']))
 		{
 			$boards[(int) $row['extra']['board_from']][] = $row['id_action'];
 		}
+
 		if (isset($row['extra']['board']))
 		{
 			$boards[(int) $row['extra']['board']][] = $row['id_action'];
@@ -247,7 +253,7 @@ function list_getModLogEntries($start, $items_per_page, $sort, $query_string = '
 			'action_text' => isset($row['action_text']) ? $row['action_text'] : '',
 		);
 	}
-	$db->free_result($result);
+	$request->free_result();
 
 	if (!empty($boards))
 	{
@@ -277,8 +283,9 @@ function list_getModLogEntries($start, $items_per_page, $sort, $query_string = '
 
 	if (!empty($topics))
 	{
-		$request = $db->query('', '
-			SELECT ms.subject, t.id_topic
+		$request = $db->fetchQuery('
+			SELECT 
+				ms.subject, t.id_topic
 			FROM {db_prefix}topics AS t
 				INNER JOIN {db_prefix}messages AS ms ON (ms.id_msg = t.id_first_msg)
 			WHERE t.id_topic IN ({array_int:topic_list})
@@ -287,7 +294,7 @@ function list_getModLogEntries($start, $items_per_page, $sort, $query_string = '
 				'topic_list' => array_keys($topics),
 			)
 		);
-		while ($row = $db->fetch_assoc($request))
+		while (($row = $request->fetch_assoc()))
 		{
 			foreach ($topics[$row['id_topic']] as $action)
 			{
@@ -312,13 +319,14 @@ function list_getModLogEntries($start, $items_per_page, $sort, $query_string = '
 				}
 			}
 		}
-		$db->free_result($request);
+		$request->free_result();
 	}
 
 	if (!empty($messages))
 	{
 		$request = $db->query('', '
-			SELECT id_msg, subject
+			SELECT 
+				id_msg, subject
 			FROM {db_prefix}messages
 			WHERE id_msg IN ({array_int:message_list})
 			LIMIT ' . count(array_keys($messages)),
@@ -326,7 +334,7 @@ function list_getModLogEntries($start, $items_per_page, $sort, $query_string = '
 				'message_list' => array_keys($messages),
 			)
 		);
-		while ($row = $db->fetch_assoc($request))
+		while (($row = $request->fetch_assoc()))
 		{
 			foreach ($messages[$row['id_msg']] as $action)
 			{
@@ -347,7 +355,7 @@ function list_getModLogEntries($start, $items_per_page, $sort, $query_string = '
 				}
 			}
 		}
-		$db->free_result($request);
+		$request->free_result();
 	}
 
 	if (!empty($members))
@@ -375,7 +383,7 @@ function list_getModLogEntries($start, $items_per_page, $sort, $query_string = '
 	}
 
 	// Do some formatting of the action string.
-	$callback = new ModLogEntriesReplacement;
+	$callback = new ModLogEntriesReplacement();
 	$callback->entries = $entries;
 	foreach ($entries as $k => $entry)
 	{
@@ -444,6 +452,7 @@ class ModLogEntriesReplacement
  * @param int $id_log
  * @param int $time
  * @param string[]|null $delete
+ * @throws \ElkArte\Exceptions\Exception
  */
 function deleteLogAction($id_log, $time, $delete = null)
 {
@@ -469,13 +478,15 @@ function deleteLogAction($id_log, $time, $delete = null)
  * @param int $time Timeframe since the last time the action has been performed
  *
  * @return bool
+ * @throws \ElkArte\Exceptions\Exception
  */
 function recentlyLogged($action, $time = 60)
 {
 	$db = database();
 
 	$request = $db->query('', '
-		SELECT COUNT(*)
+		SELECT 
+			COUNT(*)
 		FROM {db_prefix}log_actions
 		WHERE action = {string:action}
 			AND log_time >= {int:last_logged}',
@@ -484,8 +495,8 @@ function recentlyLogged($action, $time = 60)
 			'last_logged' => time() - $time,
 		)
 	);
-	list ($present) = $db->fetch_row($request);
-	$db->free_result($request);
+	list ($present) = $request->fetch_row();
+	$request->free_result();
 
 	return !empty($present);
 }

@@ -20,6 +20,7 @@ use ElkArte\Cache\Cache;
  * Do we think the current user is a spider?
  *
  * @return int
+ * @throws \Exception
  * @package SearchEngines
  */
 function spiderCheck()
@@ -40,17 +41,13 @@ function spiderCheck()
 	$cache = Cache::instance();
 	if (!$cache->getVar($spider_data, 'spider_search', 300))
 	{
-		$request = $db->query('', '
-			SELECT id_spider, user_agent, ip_info
+		$spider_data = $db->fetchQuery('
+			SELECT 
+				id_spider, user_agent, ip_info
 			FROM {db_prefix}spiders
 			ORDER BY LENGTH(user_agent) DESC',
 			array()
-		);
-		while ($row = $db->fetch_assoc($request))
-		{
-			$spider_data[] = $row;
-		}
-		$db->free_result($request);
+		)->fetch_all();
 
 		// Save it in the cache
 		$cache->put('spider_search', $spider_data, 300);
@@ -141,9 +138,10 @@ function logSpider()
 	if ($modSettings['spider_mode'] == 1)
 	{
 		$date = strftime('%Y-%m-%d', forum_time(false));
-		$db->query('', '
+		$result = $db->query('', '
 			UPDATE {db_prefix}log_spider_stats
-			SET last_seen = {int:current_time}, page_hits = page_hits + 1
+			SET 
+				last_seen = {int:current_time}, page_hits = page_hits + 1
 			WHERE id_spider = {int:current_spider}
 				AND stat_date = {date:current_date}',
 			array(
@@ -153,7 +151,7 @@ function logSpider()
 			)
 		);
 		// Nothing updated?
-		if ($db->affected_rows() == 0)
+		if ($result->affected_rows() == 0)
 		{
 			$db->insert('ignore',
 				'{db_prefix}log_spider_stats',
@@ -181,6 +179,7 @@ function logSpider()
 			{
 				unset($url['sesc']);
 			}
+
 			$url = serialize($url);
 		}
 		else
@@ -206,21 +205,16 @@ function consolidateSpiderStats()
 {
 	$db = database();
 
-	$request = $db->query('consolidate_spider_stats', '
-		SELECT id_spider, MAX(log_time) AS last_seen, COUNT(*) AS num_hits
+	$spider_hits = $db->query('consolidate_spider_stats', '
+		SELECT 
+			id_spider, MAX(log_time) AS last_seen, COUNT(*) AS num_hits
 		FROM {db_prefix}log_spider_hits
 		WHERE processed = {int:not_processed}
 		GROUP BY id_spider, MONTH(log_time), DAYOFMONTH(log_time)',
 		array(
 			'not_processed' => 0,
 		)
-	);
-	$spider_hits = array();
-	while ($row = $db->fetch_assoc($request))
-	{
-		$spider_hits[] = $row;
-	}
-	$db->free_result($request);
+	)->fetch_all();
 
 	if (empty($spider_hits))
 	{
@@ -233,9 +227,10 @@ function consolidateSpiderStats()
 	{
 		// We assume the max date is within the right day.
 		$date = strftime('%Y-%m-%d', $stat['last_seen']);
-		$db->query('', '
+		$result = $db->query('', '
 			UPDATE {db_prefix}log_spider_stats
-			SET page_hits = page_hits + ' . $stat['num_hits'] . ',
+			SET 
+				page_hits = page_hits + ' . $stat['num_hits'] . ',
 				last_seen = CASE WHEN last_seen > {int:last_seen} THEN last_seen ELSE {int:last_seen} END
 			WHERE id_spider = {int:current_spider}
 				AND stat_date = {date:last_seen_date}',
@@ -245,7 +240,7 @@ function consolidateSpiderStats()
 				'current_spider' => $stat['id_spider'],
 			)
 		);
-		if ($db->affected_rows() == 0)
+		if ($result->affected_rows() == 0)
 		{
 			$stat_inserts[] = array($date, $stat['id_spider'], $stat['num_hits'], $stat['last_seen']);
 		}
@@ -265,7 +260,8 @@ function consolidateSpiderStats()
 	// All processed.
 	$db->query('', '
 		UPDATE {db_prefix}log_spider_hits
-		SET processed = {int:is_processed}
+		SET 
+			processed = {int:is_processed}
 		WHERE processed = {int:not_processed}',
 		array(
 			'is_processed' => 1,
@@ -283,17 +279,17 @@ function recacheSpiderNames()
 {
 	$db = database();
 
-	$request = $db->query('', '
-		SELECT id_spider, spider_name
+	$spiders = array();
+	$db->fetchQuery('
+		SELECT 
+			id_spider, spider_name
 		FROM {db_prefix}spiders',
 		array()
+	)->fetch_callback(
+		function ($row) use (&$spiders) {
+			$spiders[$row['id_spider']] = $row['spider_name'];
+		}
 	);
-	$spiders = array();
-	while ($row = $db->fetch_assoc($request))
-	{
-		$spiders[$row['id_spider']] = $row['spider_name'];
-	}
-	$db->free_result($request);
 
 	updateSettings(array('spider_name_cache' => serialize($spiders)));
 }
@@ -307,6 +303,7 @@ function recacheSpiderNames()
  * @param string $sort A string indicating how to sort the results
  *
  * @return array
+ * @throws \Exception
  * @package SearchEngines
  *
  */
@@ -314,8 +311,10 @@ function getSpiders($start, $items_per_page, $sort)
 {
 	$db = database();
 
-	$request = $db->query('', '
-		SELECT id_spider, spider_name, user_agent, ip_info
+	$spiders = array();
+	$db->fetchQuery('
+		SELECT 
+			id_spider, spider_name, user_agent, ip_info
 		FROM {db_prefix}spiders
 		ORDER BY {raw:sort}
 		LIMIT {int:start}, {int:limit}',
@@ -324,13 +323,11 @@ function getSpiders($start, $items_per_page, $sort)
 			'start' => $start,
 			'limit' => $items_per_page,
 		)
+	)->fetch_callback(
+		function ($row) use (&$spiders) {
+			$spiders[$row['id_spider']] = $row;
+		}
 	);
-	$spiders = array();
-	while ($row = $db->fetch_assoc($request))
-	{
-		$spiders[$row['id_spider']] = $row;
-	}
-	$db->free_result($request);
 
 	return $spiders;
 }
@@ -340,6 +337,7 @@ function getSpiders($start, $items_per_page, $sort)
  *
  * @param int $spider_id id of a spider
  * @return mixed[]
+ * @throws \ElkArte\Exceptions\Exception
  * @package SearchEngines
  */
 function getSpiderDetails($spider_id)
@@ -347,16 +345,16 @@ function getSpiderDetails($spider_id)
 	$db = database();
 
 	$request = $db->query('', '
-		SELECT id_spider as id, spider_name as name, user_agent as agent, ip_info
+		SELECT 
+			id_spider as id, spider_name as name, user_agent as agent, ip_info
 		FROM {db_prefix}spiders
 		WHERE id_spider = {int:current_spider}',
 		array(
 			'current_spider' => $spider_id,
 		)
 	);
-	$spider = $db->fetch_assoc($request);
-
-	$db->free_result($request);
+	$spider = $request->fetch_assoc();
+	$request->free_result();
 
 	return $spider;
 }
@@ -366,6 +364,7 @@ function getSpiderDetails($spider_id)
  * (used by createList() callbacks)
  *
  * @return int
+ * @throws \ElkArte\Exceptions\Exception
  * @package SearchEngines
  */
 function getNumSpiders()
@@ -373,12 +372,13 @@ function getNumSpiders()
 	$db = database();
 
 	$request = $db->query('', '
-		SELECT COUNT(*) AS num_spiders
+		SELECT 
+			COUNT(*) AS num_spiders
 		FROM {db_prefix}spiders',
 		array()
 	);
-	list ($numSpiders) = $db->fetch_row($request);
-	$db->free_result($request);
+	list ($numSpiders) = $request->fetch_row();
+	$request->free_result();
 
 	return $numSpiders;
 }
@@ -392,28 +392,22 @@ function getNumSpiders()
  * @param int $items_per_page The number of items to show per page
  * @param string $sort A string indicating how to sort the results
  * @return array An array of spider hits
+ * @throws \Exception
  * @package SearchEngines
  */
 function getSpiderLogs($start, $items_per_page, $sort)
 {
 	$db = database();
 
-	$request = $db->query('', '
-		SELECT sl.id_spider, sl.url, sl.log_time, s.spider_name
+	return $db->fetchQuery('
+		SELECT 
+			sl.id_spider, sl.url, sl.log_time, s.spider_name
 		FROM {db_prefix}log_spider_hits AS sl
 			INNER JOIN {db_prefix}spiders AS s ON (s.id_spider = sl.id_spider)
 		ORDER BY ' . $sort . '
 		LIMIT ' . $start . ', ' . $items_per_page,
 		array()
-	);
-	$spider_logs = array();
-	while ($row = $db->fetch_assoc($request))
-	{
-		$spider_logs[] = $row;
-	}
-	$db->free_result($request);
-
-	return $spider_logs;
+	)->fetch_all();
 }
 
 /**
@@ -421,6 +415,7 @@ function getSpiderLogs($start, $items_per_page, $sort)
  * (used by createList() callbacks)
  *
  * @return int The number of rows in the log_spider_hits table
+ * @throws \ElkArte\Exceptions\Exception
  * @package SearchEngines
  */
 function getNumSpiderLogs()
@@ -428,12 +423,13 @@ function getNumSpiderLogs()
 	$db = database();
 
 	$request = $db->query('', '
-		SELECT COUNT(*) AS num_logs
+		SELECT 
+			COUNT(*) AS num_logs
 		FROM {db_prefix}log_spider_hits',
 		array()
 	);
-	list ($numLogs) = $db->fetch_row($request);
-	$db->free_result($request);
+	list ($numLogs) = $request->fetch_row();
+	$request->free_result();
 
 	return $numLogs;
 }
@@ -448,6 +444,7 @@ function getNumSpiderLogs()
  * @param string $sort A string indicating how to sort the results
  *
  * @return array
+ * @throws \ElkArte\Exceptions\Exception
  * @package SearchEngines
  *
  */
@@ -455,22 +452,15 @@ function getSpiderStats($start, $items_per_page, $sort)
 {
 	$db = database();
 
-	$request = $db->query('', '
-		SELECT ss.id_spider, ss.stat_date, ss.page_hits, s.spider_name
+	return $db->query('', '
+		SELECT 
+			ss.id_spider, ss.stat_date, ss.page_hits, s.spider_name
 		FROM {db_prefix}log_spider_stats AS ss
 			INNER JOIN {db_prefix}spiders AS s ON (s.id_spider = ss.id_spider)
 		ORDER BY ' . $sort . '
 		LIMIT ' . $start . ', ' . $items_per_page,
 		array()
-	);
-	$spider_stats = array();
-	while ($row = $db->fetch_assoc($request))
-	{
-		$spider_stats[] = $row;
-	}
-	$db->free_result($request);
-
-	return $spider_stats;
+	)->fetch_all();
 }
 
 /**
@@ -479,22 +469,24 @@ function getSpiderStats($start, $items_per_page, $sort)
  *
  * @param int|null $time (optional) if specified counts only the entries before that date
  * @return int The number of rows in the log_spider_stats table
+ * @throws \Exception
  * @package SearchEngines
  */
 function getNumSpiderStats($time = null)
 {
 	$db = database();
 
-	$request = $db->query('', '
-		SELECT COUNT(*)
+	$request = $db->fetchQuery('
+		SELECT 
+			COUNT(*)
 		FROM {db_prefix}log_spider_stats' . ($time === null ? '' : '
 		WHERE stat_date < {date:date_being_viewed}'),
 		array(
 			'date_being_viewed' => $time,
 		)
 	);
-	list ($numStats) = $db->fetch_row($request);
-	$db->free_result($request);
+	list ($numStats) = $request->fetch_row();
+	$request->free_result();
 
 	return $numStats;
 }
@@ -503,6 +495,7 @@ function getNumSpiderStats($time = null)
  * Remove spider logs older than the passed time
  *
  * @param int $time a time value
+ * @throws \ElkArte\Exceptions\Exception
  * @package SearchEngines
  */
 function removeSpiderOldLogs($time)
@@ -523,6 +516,7 @@ function removeSpiderOldLogs($time)
  * Remove spider logs older than the passed time
  *
  * @param int $time a time value
+ * @throws \ElkArte\Exceptions\Exception
  * @package SearchEngines
  */
 function removeSpiderOldStats($time)
@@ -543,6 +537,7 @@ function removeSpiderOldStats($time)
  * Remove all the entries connected to a certain spider (description, entries, stats)
  *
  * @param int[] $spiders_id an array of spider ids
+ * @throws \ElkArte\Exceptions\Exception
  * @package SearchEngines
  */
 function removeSpiders($spiders_id)
@@ -581,19 +576,18 @@ function spidersLastSeen()
 {
 	$db = database();
 
-	$request = $db->query('', '
-		SELECT id_spider, MAX(last_seen) AS last_seen_time
+	$spider_last_seen = array();
+	$db->query('', '
+		SELECT 
+			id_spider, MAX(last_seen) AS last_seen_time
 		FROM {db_prefix}log_spider_stats
 		GROUP BY id_spider',
 		array()
+	)->fetch_callback(
+		function ($row) use (&$spider_last_seen) {
+			$spider_last_seen[$row['id_spider']] = $row['last_seen_time'];
+		}
 	);
-
-	$spider_last_seen = array();
-	while ($row = $db->fetch_assoc($request))
-	{
-		$spider_last_seen[$row['id_spider']] = $row['last_seen_time'];
-	}
-	$db->free_result($request);
 
 	return $spider_last_seen;
 }
@@ -610,14 +604,14 @@ function spidersStatsDates()
 	$db = database();
 
 	// Get the earliest and latest dates.
-	$request = $db->query('', '
-		SELECT MIN(stat_date) AS first_date, MAX(stat_date) AS last_date
+	$request = $db->fetchQuery('
+		SELECT 
+			MIN(stat_date) AS first_date, MAX(stat_date) AS last_date
 		FROM {db_prefix}log_spider_stats',
 		array()
 	);
-
-	list ($min_date, $max_date) = $db->fetch_row($request);
-	$db->free_result($request);
+	list ($min_date, $max_date) = $request->fetch_row();
+	$request->free_result();
 
 	$min_year = (int) substr($min_date, 0, 4);
 	$max_year = (int) substr($max_date, 0, 4);
@@ -635,6 +629,7 @@ function spidersStatsDates()
 			{
 				continue;
 			}
+
 			if ($y === $max_year && $m > $max_month)
 			{
 				break;
@@ -654,6 +649,7 @@ function spidersStatsDates()
  * @param string $name spider name
  * @param string $agent ua of the spider
  * @param string $info_ip
+ * @throws \ElkArte\Exceptions\Exception
  * @package SearchEngines
  */
 function updateSpider($id = 0, $name = '', $agent = '', $info_ip = '')
@@ -679,7 +675,8 @@ function updateSpider($id = 0, $name = '', $agent = '', $info_ip = '')
 	{
 		$db->query('', '
 			UPDATE {db_prefix}spiders
-			SET spider_name = {string:spider_name}, user_agent = {string:spider_agent},
+			SET 
+				spider_name = {string:spider_name}, user_agent = {string:spider_agent},
 				ip_info = {string:ip_info}
 			WHERE id_spider = {int:current_spider}',
 			array(

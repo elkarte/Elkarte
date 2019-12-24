@@ -26,7 +26,7 @@ use ElkArte\User;
  *
  * @return array
  * @package Admin
- *
+ * @throws \ImagickException
  */
 function getServerVersions($checkFor)
 {
@@ -48,7 +48,7 @@ function getServerVersions($checkFor)
 	// Why not have a look at ImageMagick? If it is, we should show version information for it too.
 	if (in_array('imagick', $checkFor) && class_exists('Imagick'))
 	{
-		$temp = new Imagick;
+		$temp = new Imagick();
 		$temp2 = $temp->getVersion();
 		$versions['imagick'] = array('title' => $txt['support_versions_imagick'], 'version' => $temp2['versionString']);
 	}
@@ -282,7 +282,7 @@ function getFileVersions(&$versionOptions)
 	// Load up all the files in the default language directory and sort by language.
 	// @todo merge this loop into readFileVersions
 	$this_dir = dir($lang_dir);
-	while ($path = $this_dir->read())
+	while (($path = $this_dir->read()))
 	{
 		if ($path === '.' || $path === '..')
 		{
@@ -294,7 +294,7 @@ function getFileVersions(&$versionOptions)
 			$language = $path;
 			$this_lang_path = $lang_dir . '/' . $language;
 			$this_lang = dir($this_lang_path);
-			while ($entry = $this_lang->read())
+			while (($entry = $this_lang->read()))
 			{
 				if (substr($entry, -4) === '.php' && $entry !== 'index.php' && !is_dir($this_lang_path . '/' . $entry))
 				{
@@ -400,26 +400,6 @@ function readFileVersions(&$version_info, $directories, $pattern, $recursive = f
 			}
 		}
 	}
-}
-
-/**
- * Saves the time of the last db error for the error log
- *
- * What it does:
- *
- * - Done separately from \ElkArte\SettingsForm\SettingsForm::save_file() to avoid race conditions
- * which can occur during a db error
- * - If it fails Settings.php will assume 0
- *
- * @param int $time
- *
- * @package Admin
- * @todo seems a duplicate of Logging.php => logLastDatabaseError
- */
-function updateDbLastError($time)
-{
-	// Write out the db_last_error file with the error timestamp
-	file_put_contents(BOARDDIR . '/db_last_error.txt', $time, LOCK_EX);
 }
 
 /**
@@ -550,6 +530,7 @@ function emailAdmins($template, $replacements = array(), $additional_recipients 
  * @param bool $value the "new" status of the profile fields
  * (true => enabled, false => disabled)
  * @package Admin
+ * @throws \ElkArte\Exceptions\Exception
  */
 function custom_profiles_toggle_callback($value)
 {
@@ -560,7 +541,8 @@ function custom_profiles_toggle_callback($value)
 		// Disable all fields. Wouldn't want any to show when the feature is disabled.
 		$db->query('', '
 			UPDATE {db_prefix}custom_fields
-			SET active = 0'
+			SET 
+				active = 0'
 		);
 	}
 	else
@@ -618,6 +600,7 @@ function postbyemail_toggle_callback($value)
  * @param string[] $controllers list of controllers on which the module is
  *                 activated
  * @package Admin
+ * @throws \ElkArte\Exceptions\Exception
  */
 function enableModules($module, $controllers)
 {
@@ -647,6 +630,7 @@ function enableModules($module, $controllers)
  * @param string[] $controllers list of controllers on which the module is
  *                 activated
  * @package Admin
+ * @throws \ElkArte\Exceptions\Exception
  */
 function disableModules($module, $controllers)
 {
@@ -671,7 +655,7 @@ function disableModules($module, $controllers)
 /**
  * @param string $module the name of the module
  *
- * @return boolean
+ * @return bool
  */
 function isModuleEnabled($module)
 {

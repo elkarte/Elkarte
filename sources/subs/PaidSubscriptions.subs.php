@@ -23,7 +23,8 @@ use ElkArte\Util;
  * @param string $search_string
  * @param mixed[] $search_vars = array()
  *
- * @return
+ * @return int
+ * @throws \ElkArte\Exceptions\Exception
  * @todo refactor away
  *
  */
@@ -45,8 +46,8 @@ function list_getSubscribedUserCount($id_sub, $search_string, $search_vars = arr
 			'no_pending_payments' => 0,
 		))
 	);
-	list ($memberCount) = $db->fetch_row($request);
-	$db->free_result($request);
+	list ($memberCount) = $request->fetch_row();
+	$request->free_result();
 
 	return $memberCount;
 }
@@ -62,6 +63,7 @@ function list_getSubscribedUserCount($id_sub, $search_string, $search_vars = arr
  * @param mixed[] $search_vars
  *
  * @return array
+ * @throws \Exception
  * @todo refactor outta here
  *
  */
@@ -71,7 +73,8 @@ function list_getSubscribedUsers($start, $items_per_page, $sort, $id_sub, $searc
 
 	$db = database();
 
-	$request = $db->query('', '
+	$subscribers = array();
+	$db->fetchQuery('
 		SELECT
 			ls.id_sublog, ls.start_time, ls.end_time, ls.status, ls.payments_pending,
 			COALESCE(mem.id_member, 0) AS id_member, COALESCE(mem.real_name, {string:guest}) AS name
@@ -87,22 +90,20 @@ function list_getSubscribedUsers($start, $items_per_page, $sort, $id_sub, $searc
 			'no_payments_pending' => 0,
 			'guest' => $txt['guest'],
 		))
+	)->fetch_callback(
+		function ($row) use (&$subscribers) {
+			$subscribers[] = array(
+				'id' => $row['id_sublog'],
+				'id_member' => $row['id_member'],
+				'name' => $row['name'],
+				'start_date' => standardTime($row['start_time'], false),
+				'end_date' => $row['end_time'] == 0 ? 'N/A' : standardTime($row['end_time'], false),
+				'pending' => $row['payments_pending'],
+				'status' => $row['status'],
+				'status_text' => $row['status'] == 0 ? ($row['payments_pending'] == 0 ? $txt['paid_finished'] : $txt['paid_pending']) : $txt['paid_active'],
+			);
+		}
 	);
-	$subscribers = array();
-	while ($row = $db->fetch_assoc($request))
-	{
-		$subscribers[] = array(
-			'id' => $row['id_sublog'],
-			'id_member' => $row['id_member'],
-			'name' => $row['name'],
-			'start_date' => standardTime($row['start_time'], false),
-			'end_date' => $row['end_time'] == 0 ? 'N/A' : standardTime($row['end_time'], false),
-			'pending' => $row['payments_pending'],
-			'status' => $row['status'],
-			'status_text' => $row['status'] == 0 ? ($row['payments_pending'] == 0 ? $txt['paid_finished'] : $txt['paid_pending']) : $txt['paid_active'],
-		);
-	}
-	$db->free_result($request);
 
 	return $subscribers;
 }
@@ -111,6 +112,7 @@ function list_getSubscribedUsers($start, $items_per_page, $sort, $id_sub, $searc
  * Reapplies all subscription rules for each of the users.
  *
  * @param int[]|int $users
+ * @throws \ElkArte\Exceptions\Exception
  */
 function reapplySubscriptions($users)
 {
@@ -134,7 +136,7 @@ function reapplySubscriptions($users)
 		);
 	}
 
-	$request = $db->query('', '
+	$db->fetchQuery('
 		SELECT
 			ls.id_member, ls.old_id_group,
 			s.id_group, s.add_groups
@@ -146,27 +148,26 @@ function reapplySubscriptions($users)
 			'user_list' => $users,
 			'current_time' => time(),
 		)
-	);
-	while ($row = $db->fetch_assoc($request))
-	{
-		// Specific primary group?
-		if ($row['id_group'] != 0)
-		{
-			// If this is changing - add the old one to the additional groups so it's not lost.
-			if ($row['id_group'] != $groups[$row['id_member']]['primary'])
+	)->fetch_callback(
+		function ($row) use (&$groups) {
+			// Specific primary group?
+			if ($row['id_group'] != 0)
 			{
-				$groups[$row['id_member']]['additional'][] = $groups[$row['id_member']]['primary'];
+				// If this is changing - add the old one to the additional groups so it's not lost.
+				if ($row['id_group'] != $groups[$row['id_member']]['primary'])
+				{
+					$groups[$row['id_member']]['additional'][] = $groups[$row['id_member']]['primary'];
+				}
+				$groups[$row['id_member']]['primary'] = $row['id_group'];
 			}
-			$groups[$row['id_member']]['primary'] = $row['id_group'];
-		}
 
-		// Additional groups.
-		if (!empty($row['add_groups']))
-		{
-			$groups[$row['id_member']]['additional'] = array_merge($groups[$row['id_member']]['additional'], explode(',', $row['add_groups']));
+			// Additional groups.
+			if (!empty($row['add_groups']))
+			{
+				$groups[$row['id_member']]['additional'] = array_merge($groups[$row['id_member']]['additional'], explode(',', $row['add_groups']));
+			}
 		}
-	}
-	$db->free_result($request);
+	);
 
 	// Update all the members.
 	foreach ($groups as $id => $group)
@@ -193,6 +194,7 @@ function reapplySubscriptions($users)
  * @param string $renewal options 'D', 'W', 'M', 'Y', ''
  * @param int $forceStartTime = 0
  * @param int $forceEndTime = 0
+ * @throws \ElkArte\Exceptions\Exception
  */
 function addSubscription($id_subscribe, $id_member, $renewal = '', $forceStartTime = 0, $forceEndTime = 0)
 {
@@ -250,15 +252,16 @@ function addSubscription($id_subscribe, $id_member, $renewal = '', $forceStartTi
 			'is_active' => 1,
 		)
 	);
-	if ($db->num_rows($request) != 0)
+	if ($request->num_rows() != 0)
 	{
-		list ($id_sublog, $endtime, $starttime) = $db->fetch_row($request);
+		list ($id_sublog, $endtime, $starttime) = $request->fetch_row();
 
 		// If this has already expired but is active, extension means the period from now.
 		if ($endtime < time())
 		{
 			$endtime = time();
 		}
+
 		if ($starttime == 0)
 		{
 			$starttime = time();
@@ -275,7 +278,8 @@ function addSubscription($id_subscribe, $id_member, $renewal = '', $forceStartTi
 		// As everything else should be good, just update!
 		$db->query('', '
 			UPDATE {db_prefix}log_subscribed
-			SET end_time = {int:end_time}, start_time = {int:start_time}, reminder_sent = {int:no_reminder}
+			SET 
+				end_time = {int:end_time}, start_time = {int:start_time}, reminder_sent = {int:no_reminder}
 			WHERE id_sublog = {int:current_subscription_item}',
 			array(
 				'end_time' => $endtime,
@@ -287,7 +291,7 @@ function addSubscription($id_subscribe, $id_member, $renewal = '', $forceStartTi
 
 		return;
 	}
-	$db->free_result($request);
+	$request->free_result();
 
 	// If we're here, that means we don't have an active subscription - that means we need to do some work!
 	require_once(SUBSDIR . '/Members.subs.php');
@@ -316,18 +320,11 @@ function addSubscription($id_subscribe, $id_member, $renewal = '', $forceStartTi
 	}
 
 	// Yep, make sure it's unique, and no empties.
-	foreach ($newAddGroups as $k => $v)
-	{
-		if (empty($v))
-		{
-			unset($newAddGroups[$k]);
-		}
-	}
+	$newAddGroups = array_filter($newAddGroups);
 	$newAddGroups = array_unique($newAddGroups);
 	$newAddGroups = implode(',', $newAddGroups);
 
 	// Store the new settings.
-	require_once(SUBSDIR . '/Members.subs.php');
 	updateMemberData($id_member, array('id_group' => $id_group, 'additional_groups' => $newAddGroups));
 
 	// Now log the subscription - maybe we have a dormant subscription we can restore?
@@ -343,15 +340,16 @@ function addSubscription($id_subscribe, $id_member, $renewal = '', $forceStartTi
 		)
 	);
 	// @todo Don't really need to do this twice...
-	if ($db->num_rows($request) != 0)
+	if ($request->num_rows() != 0)
 	{
-		list ($id_sublog, $endtime, $starttime) = $db->fetch_row($request);
+		list ($id_sublog, $endtime, $starttime) = $request->fetch_row();
 
 		// If this has already expired but is active, extension means the period from now.
 		if ($endtime < time())
 		{
 			$endtime = time();
 		}
+
 		if ($starttime == 0)
 		{
 			$starttime = time();
@@ -368,8 +366,9 @@ function addSubscription($id_subscribe, $id_member, $renewal = '', $forceStartTi
 		// As everything else should be good, just update!
 		$db->query('', '
 			UPDATE {db_prefix}log_subscribed
-			SET start_time = {int:start_time}, end_time = {int:end_time}, old_id_group = {int:old_id_group}, status = {int:is_active},
-				reminder_sent = {int:no_reminder_sent}
+			SET 
+				start_time = {int:start_time}, end_time = {int:end_time}, old_id_group = {int:old_id_group}, 
+				status = {int:is_active}, reminder_sent = {int:no_reminder_sent}
 			WHERE id_sublog = {int:current_subscription_item}',
 			array(
 				'start_time' => $starttime,
@@ -383,7 +382,7 @@ function addSubscription($id_subscribe, $id_member, $renewal = '', $forceStartTi
 
 		return;
 	}
-	$db->free_result($request);
+	$request->free_result();
 
 	// Otherwise a very simple insert.
 	$endtime = time() + $duration;
@@ -437,8 +436,8 @@ function loadPaymentGateways()
 		{
 			if ($file->isDir())
 			{
-				$payment_class = '\\ElkArte\\Subscriptions\\PaymentGateway\\' . $file->getFileName() . '\\Payment';
-				$display_class = '\\ElkArte\\Subscriptions\\PaymentGateway\\' . $file->getFileName() . '\\Display';
+				$payment_class = '\\ElkArte\\Subscriptions\\PaymentGateway\\' . $file->getFilename() . '\\Payment';
+				$display_class = '\\ElkArte\\Subscriptions\\PaymentGateway\\' . $file->getFilename() . '\\Display';
 
 				// Check this is definitely a valid gateway!
 				if (in_array('ElkArte\\Subscriptions\\PaymentGateway\\PaymentInterface', class_implements($payment_class)))
@@ -468,8 +467,6 @@ function loadPaymentGateways()
  */
 function loadSubscriptions()
 {
-	global $context, $txt, $modSettings;
-
 	$db = database();
 
 	if (!empty($context['subscriptions']))
@@ -480,112 +477,112 @@ function loadSubscriptions()
 	// Make sure this is loaded, just in case.
 	theme()->getTemplates()->loadLanguageFile('ManagePaid');
 
-	$request = $db->query('', '
+	$context['subscriptions'] = array();
+	$db->fetchQuery('
 		SELECT
 			id_subscribe, name, description, cost, length, id_group, add_groups, active, repeatable
 		FROM {db_prefix}subscriptions',
 		array()
-	);
-	$context['subscriptions'] = array();
-	while ($row = $db->fetch_assoc($request))
-	{
-		// Pick a cost.
-		$costs = Util::unserialize($row['cost']);
+	)->fetch_callback(
+		function ($row) {
+			global $context, $modSettings, $txt;
 
-		if ($row['length'] != 'F' && !empty($modSettings['paid_currency_symbol']) && !empty($costs['fixed']))
-		{
-			$cost = sprintf($modSettings['paid_currency_symbol'], $costs['fixed']);
-		}
-		else
-		{
+			// Pick a cost.
+			$costs = Util::unserialize($row['cost']);
 			$cost = '???';
-		}
-
-		// Do the span.
-		$length = '??';
-		$num_length = 0;
-		if (preg_match('~^(\d*)([DWFMY]$)~', $row['length'], $match) === 1)
-		{
-			$num_length = $match[1];
-			$length = $match[1] . ' ';
-			switch ($match[2])
+			if ($row['length'] != 'F' && !empty($modSettings['paid_currency_symbol']) && !empty($costs['fixed']))
 			{
-				case 'D':
-					$length .= $txt['paid_mod_span_days'];
-					$num_length *= 86400;
-					break;
-				case 'W':
-					$length .= $txt['paid_mod_span_weeks'];
-					$num_length *= 604800;
-					break;
-				case 'M':
-					$length .= $txt['paid_mod_span_months'];
-					$num_length *= 2629743;
-					break;
-				case 'Y':
-					$length .= $txt['paid_mod_span_years'];
-					$num_length *= 31556926;
-					break;
-				default:
-					$length = '??';
+				$cost = sprintf($modSettings['paid_currency_symbol'], $costs['fixed']);
 			}
-		}
 
-		$context['subscriptions'][$row['id_subscribe']] = array(
-			'id' => $row['id_subscribe'],
-			'name' => $row['name'],
-			'desc' => $row['description'],
-			'cost' => $cost,
-			'real_cost' => $row['cost'],
-			'length' => $length,
-			'num_length' => $num_length,
-			'real_length' => $row['length'],
-			'pending' => 0,
-			'finished' => 0,
-			'total' => 0,
-			'active' => $row['active'],
-			'prim_group' => $row['id_group'],
-			'add_groups' => $row['add_groups'],
-			'flexible' => $row['length'] == 'F' ? true : false,
-			'repeatable' => $row['repeatable'],
-		);
-	}
-	$db->free_result($request);
+			// Do the span.
+			$length = '??';
+			$num_length = 0;
+			if (preg_match('~^(\d*)([DWFMY]$)~', $row['length'], $match) === 1)
+			{
+				$num_length = $match[1];
+				$length = $match[1] . ' ';
+				switch ($match[2])
+				{
+					case 'D':
+						$length .= $txt['paid_mod_span_days'];
+						$num_length *= 86400;
+						break;
+					case 'W':
+						$length .= $txt['paid_mod_span_weeks'];
+						$num_length *= 604800;
+						break;
+					case 'M':
+						$length .= $txt['paid_mod_span_months'];
+						$num_length *= 2629743;
+						break;
+					case 'Y':
+						$length .= $txt['paid_mod_span_years'];
+						$num_length *= 31556926;
+						break;
+					default:
+						$length = '??';
+				}
+			}
+
+			$context['subscriptions'][$row['id_subscribe']] = array(
+				'id' => $row['id_subscribe'],
+				'name' => $row['name'],
+				'desc' => $row['description'],
+				'cost' => $cost,
+				'real_cost' => $row['cost'],
+				'length' => $length,
+				'num_length' => $num_length,
+				'real_length' => $row['length'],
+				'pending' => 0,
+				'finished' => 0,
+				'total' => 0,
+				'active' => $row['active'],
+				'prim_group' => $row['id_group'],
+				'add_groups' => $row['add_groups'],
+				'flexible' => $row['length'] == 'F' ? true : false,
+				'repeatable' => $row['repeatable'],
+			);
+		}
+	);
 
 	// Do the counts.
-	$request = $db->query('', '
-		SELECT COUNT(id_sublog) AS member_count, id_subscribe, status
+	$db->fetchQuery('
+		SELECT 
+			COUNT(id_sublog) AS member_count, id_subscribe, status
 		FROM {db_prefix}log_subscribed
 		GROUP BY id_subscribe, status',
 		array()
-	);
-	while ($row = $db->fetch_assoc($request))
-	{
-		$ind = $row['status'] == 0 ? 'finished' : 'total';
+	)->fetch_callback(
+		function ($row) {
+			global $context;
 
-		if (isset($context['subscriptions'][$row['id_subscribe']]))
-		{
-			$context['subscriptions'][$row['id_subscribe']][$ind] = $row['member_count'];
+			$ind = $row['status'] == 0 ? 'finished' : 'total';
+
+			if (isset($context['subscriptions'][$row['id_subscribe']]))
+			{
+				$context['subscriptions'][$row['id_subscribe']][$ind] = $row['member_count'];
+			}
 		}
-	}
-	$db->free_result($request);
+	);
 
 	// How many payments are we waiting on?
-	$request = $db->query('', '
+	$db->fetchQuery('
 		SELECT
 			SUM(payments_pending) AS total_pending, id_subscribe
 		FROM {db_prefix}log_subscribed
 		GROUP BY id_subscribe',
 		array()
-	);
-	while ($row = $db->fetch_assoc($request))
-	{
-		if (isset($context['subscriptions'][$row['id_subscribe']]))
-		{
-			$context['subscriptions'][$row['id_subscribe']]['pending'] = $row['total_pending'];
+	)->fetch_callback(
+		function ($row) {
+			global $context;
+
+			if (isset($context['subscriptions'][$row['id_subscribe']]))
+			{
+				$context['subscriptions'][$row['id_subscribe']]['pending'] = $row['total_pending'];
+			}
 		}
-	}
-	$db->free_result($request);
+	);
 }
 
 /**
@@ -595,15 +592,15 @@ function loadSubscriptions()
  * @param mixed[] $active_subscriptions array of active subscriptions they can have
  *
  * @return array
+ * @throws \Exception
  */
 function loadMemberSubscriptions($memID, $active_subscriptions)
 {
-	global $txt;
-
 	$db = database();
 
 	// Get the current subscriptions.
-	$request = $db->query('', '
+	$current = array();
+	$db->fetchQuery('
 		SELECT
 			id_sublog, id_subscribe, start_time, end_time, status, payments_pending, pending_details
 		FROM {db_prefix}log_subscribed
@@ -611,29 +608,29 @@ function loadMemberSubscriptions($memID, $active_subscriptions)
 		array(
 			'selected_member' => $memID,
 		)
-	);
-	$current = array();
-	while ($row = $db->fetch_assoc($request))
-	{
-		// The subscription must exist!
-		if (!isset($active_subscriptions[$row['id_subscribe']]))
-		{
-			continue;
-		}
+	)->fetch_callback(
+		function ($row) use (&$current, $active_subscriptions) {
+			global $txt;
 
-		$current[$row['id_subscribe']] = array(
-			'id' => $row['id_sublog'],
-			'sub_id' => $row['id_subscribe'],
-			'hide' => $row['status'] == 0 && $row['end_time'] == 0 && $row['payments_pending'] == 0,
-			'name' => $active_subscriptions[$row['id_subscribe']]['name'],
-			'start' => standardTime($row['start_time'], false),
-			'end' => $row['end_time'] == 0 ? $txt['not_applicable'] : standardTime($row['end_time'], false),
-			'pending_details' => $row['pending_details'],
-			'status' => $row['status'],
-			'status_text' => $row['status'] == 0 ? ($row['payments_pending'] ? $txt['paid_pending'] : $txt['paid_finished']) : $txt['paid_active'],
-		);
-	}
-	$db->free_result($request);
+			// The subscription must exist!
+			if (!isset($active_subscriptions[$row['id_subscribe']]))
+			{
+				return;
+			}
+
+			$current[$row['id_subscribe']] = array(
+				'id' => $row['id_sublog'],
+				'sub_id' => $row['id_subscribe'],
+				'hide' => $row['status'] == 0 && $row['end_time'] == 0 && $row['payments_pending'] == 0,
+				'name' => $active_subscriptions[$row['id_subscribe']]['name'],
+				'start' => standardTime($row['start_time'], false),
+				'end' => $row['end_time'] == 0 ? $txt['not_applicable'] : standardTime($row['end_time'], false),
+				'pending_details' => $row['pending_details'],
+				'status' => $row['status'],
+				'status_text' => $row['status'] == 0 ? ($row['payments_pending'] ? $txt['paid_pending'] : $txt['paid_finished']) : $txt['paid_active'],
+			);
+		}
+	);
 
 	return $current;
 }
@@ -644,6 +641,7 @@ function loadMemberSubscriptions($memID, $active_subscriptions)
  * @param int $sub_id id of the subscription we are looking for
  *
  * @return array
+ * @throws \Exception
  */
 function loadAllSubsctiptions($sub_id)
 {
@@ -658,7 +656,8 @@ function loadAllSubsctiptions($sub_id)
 	}
 
 	// Find some basic information for each member that has subscribed
-	$request = $db->query('', '
+	$members = array();
+	$db->fetchQuery('
 		SELECT
 			ls.id_member, ls.old_id_group, ls.id_subscribe, ls.status,
 			mem.id_group, mem.additional_groups, COALESCE(mem.id_member, 0) AS id_member, COALESCE(mem.real_name, {string:guest}) AS name
@@ -671,14 +670,11 @@ function loadAllSubsctiptions($sub_id)
 			'is_active' => 1,
 			'guest' => $txt['guest'],
 		)
+	)->fetch_callback(
+		function ($row) use (&$members) {
+			$members[$row['id_member']] = $row;
+		}
 	);
-	$members = array();
-	while ($row = $db->fetch_assoc($request))
-	{
-		$id_member = $row['id_member'];
-		$members[$id_member] = $row;
-	}
-	$db->free_result($request);
 
 	return $members;
 }
@@ -689,6 +685,7 @@ function loadAllSubsctiptions($sub_id)
  * were related to the subscription
  *
  * @param int $id
+ * @throws \ElkArte\Exceptions\Exception
  */
 function deleteSubscription($id)
 {
@@ -757,6 +754,7 @@ function deleteSubscription($id)
  * Adds a new subscription
  *
  * @param mixed[] $insert
+ * @throws \Exception
  */
 function insertSubscription($insert)
 {
@@ -777,7 +775,7 @@ function insertSubscription($insert)
 		array('id_subscribe')
 	);
 
-	return $db->insert_id('{db_prefix}subscriptions', 'id_subscribe');
+	return $db->insert_id('{db_prefix}subscriptions');
 }
 
 /**
@@ -785,6 +783,7 @@ function insertSubscription($insert)
  *
  * @param int $sub_id
  * @return int
+ * @throws \ElkArte\Exceptions\Exception
  */
 function countActiveSubscriptions($sub_id)
 {
@@ -802,8 +801,8 @@ function countActiveSubscriptions($sub_id)
 			'is_active' => 1,
 		)
 	);
-	list ($isActive) = $db->fetch_row($request);
-	$db->free_result($request);
+	list ($isActive) = $request->fetch_row();
+	$request->free_result();
 
 	return $isActive;
 }
@@ -813,6 +812,7 @@ function countActiveSubscriptions($sub_id)
  *
  * @param mixed[] $update
  * @param int $ignore_active - used to ignore already active subscriptions.
+ * @throws \ElkArte\Exceptions\Exception
  */
 function updateSubscription($update, $ignore_active)
 {
@@ -820,7 +820,8 @@ function updateSubscription($update, $ignore_active)
 
 	$db->query('substring', '
 		UPDATE {db_prefix}subscriptions
-			SET name = SUBSTRING({string:name}, 1, 60), description = SUBSTRING({string:description}, 1, 255), active = {int:is_active},
+		SET 
+			name = SUBSTRING({string:name}, 1, 60), description = SUBSTRING({string:description}, 1, 255), active = {int:is_active},
 			length = SUBSTRING({string:length}, 1, 4), cost = {string:cost}' . ($ignore_active ? '' : ', id_group = {int:id_group},
 			add_groups = {string:additional_groups}') . ', repeatable = {int:repeatable}, allow_partial = {int:allow_partial},
 			email_complete = {string:email_complete}, reminder = {int:reminder}
@@ -847,6 +848,7 @@ function updateSubscription($update, $ignore_active)
  * (one-time payment)
  *
  * @param mixed[] $subscription_info
+ * @throws \ElkArte\Exceptions\Exception
  */
 function updateNonrecurrent($subscription_info)
 {
@@ -854,7 +856,8 @@ function updateNonrecurrent($subscription_info)
 
 	$db->query('', '
 		UPDATE {db_prefix}log_subscribed
-		SET payments_pending = {int:payments_pending}, pending_details = {string:pending_details}
+		SET 
+			payments_pending = {int:payments_pending}, pending_details = {string:pending_details}
 		WHERE id_sublog = {int:current_subscription_item}',
 		array(
 			'payments_pending' => $subscription_info['payments_pending'],
@@ -869,12 +872,14 @@ function updateNonrecurrent($subscription_info)
  *
  * @param int $sub_id
  * @return array
+ * @throws \Exception
  */
 function getSubscriptionDetails($sub_id)
 {
 	$db = database();
 
-	$request = $db->query('', '
+	$subscription = array();
+	$db->fetchQuery('
 		SELECT
 			id_subscribe, name, description, cost, length, id_group, add_groups, active, repeatable,
 			allow_partial, email_complete, reminder
@@ -884,43 +889,41 @@ function getSubscriptionDetails($sub_id)
 		array(
 			'current_subscription' => $sub_id,
 		)
-	);
-	$subscription = array();
-	while ($row = $db->fetch_assoc($request))
-	{
-		// Sort the date.
-		preg_match('~(\d*)(\w)~', $row['length'], $match);
-		if (isset($match[2]))
-		{
-			$span_value = $match[1];
-			$span_unit = $match[2];
-		}
-		else
-		{
-			$span_value = 0;
-			$span_unit = 'D';
-		}
+	)->fetch_callback(
+		function ($row) use (&$subscription) {
+			// Sort the date.
+			preg_match('~(\d*)(\w)~', $row['length'], $match);
+			if (isset($match[2]))
+			{
+				$span_value = $match[1];
+				$span_unit = $match[2];
+			}
+			else
+			{
+				$span_value = 0;
+				$span_unit = 'D';
+			}
 
-		$subscription = array(
-			'id' => $row['id_subscribe'],
-			'name' => $row['name'],
-			'desc' => $row['description'],
-			'cost' => Util::unserialize($row['cost']),
-			'span' => array(
-				'value' => $span_value,
-				'unit' => $span_unit,
-			),
-			'prim_group' => $row['id_group'],
-			'add_groups' => explode(',', $row['add_groups']),
-			'active' => $row['active'],
-			'repeatable' => $row['repeatable'],
-			'allow_partial' => $row['allow_partial'],
-			'duration' => $row['length'] == 'F' ? 'flexible' : 'fixed',
-			'email_complete' => htmlspecialchars($row['email_complete'], ENT_COMPAT, 'UTF-8'),
-			'reminder' => $row['reminder'],
-		);
-	}
-	$db->free_result($request);
+			$subscription = array(
+				'id' => $row['id_subscribe'],
+				'name' => $row['name'],
+				'desc' => $row['description'],
+				'cost' => Util::unserialize($row['cost']),
+				'span' => array(
+					'value' => $span_value,
+					'unit' => $span_unit,
+				),
+				'prim_group' => $row['id_group'],
+				'add_groups' => explode(',', $row['add_groups']),
+				'active' => $row['active'],
+				'repeatable' => $row['repeatable'],
+				'allow_partial' => $row['allow_partial'],
+				'duration' => $row['length'] == 'F' ? 'flexible' : 'fixed',
+				'email_complete' => htmlspecialchars($row['email_complete'], ENT_COMPAT, 'UTF-8'),
+				'reminder' => $row['reminder'],
+			);
+		}
+	);
 
 	return $subscription;
 }
@@ -947,8 +950,8 @@ function validateSubscriptionID($id)
 			'current_log_item' => $id,
 		)
 	);
-	list ($sub_id) = $db->fetch_row($request);
-	$db->free_result($request);
+	list ($sub_id) = $request->fetch_row();
+	$request->free_result();
 
 	// Humm this should not happen, if it does, boom
 	if ($sub_id === null)
@@ -964,7 +967,8 @@ function validateSubscriptionID($id)
  *
  * @param int $id_sub
  * @param int $id_member
- * @return boolean
+ * @return bool
+ * @throws \ElkArte\Exceptions\Exception
  */
 function alreadySubscribed($id_sub, $id_member)
 {
@@ -982,8 +986,8 @@ function alreadySubscribed($id_sub, $id_member)
 			'current_member' => $id_member,
 		)
 	);
-	$result = $db->num_rows($request) != 0;
-	$db->free_result($request);
+	$result = $request->num_rows() != 0;
+	$request->free_result();
 
 	return $result;
 }
@@ -1012,11 +1016,11 @@ function getSubscriptionStatus($log_id)
 			'current_log_item' => $log_id,
 		)
 	);
-	if ($db->num_rows($request) !== 0)
+	if ($request->num_rows($request) !== 0)
 	{
-		list ($status['id_member'], $status['old_status']) = $db->fetch_row($request);
+		list ($status['id_member'], $status['old_status']) = $request->fetch_row();
 	}
-	$db->free_result($request);
+	$request->free_result();
 
 	// Nothing found?
 	if (empty($status))
@@ -1031,6 +1035,7 @@ function getSubscriptionStatus($log_id)
  * Somebody paid again? we need to log that.
  *
  * @param int[] $item
+ * @throws \ElkArte\Exceptions\Exception
  */
 function updateSubscriptionItem($item)
 {
@@ -1038,7 +1043,8 @@ function updateSubscriptionItem($item)
 
 	$db->query('', '
 		UPDATE {db_prefix}log_subscribed
-		SET start_time = {int:start_time}, end_time = {int:end_time}, status = {int:status}
+		SET 
+			start_time = {int:start_time}, end_time = {int:end_time}, status = {int:status}
 		WHERE id_sublog = {int:current_log_item}',
 		array(
 			'start_time' => $item['start_time'],
@@ -1056,6 +1062,7 @@ function updateSubscriptionItem($item)
  * @param mixed[] $subscription_info the subscription information array
  * @param int $member_id
  * @param int $time
+ * @throws \ElkArte\Exceptions\Exception
  */
 function handleRefund($subscription_info, $member_id, $time)
 {
@@ -1080,7 +1087,8 @@ function handleRefund($subscription_info, $member_id, $time)
 	// Mark it as complete so we have a record.
 	$db->query('', '
 		UPDATE {db_prefix}log_subscribed
-		SET end_time = {int:current_time}
+		SET 
+			end_time = {int:current_time}
 		WHERE id_subscribe = {int:current_subscription}
 			AND id_member = {int:current_member}
 			AND status = {int:status}',
@@ -1098,12 +1106,14 @@ function handleRefund($subscription_info, $member_id, $time)
  *
  * @param int[] $toDelete
  * @return array $delete
+ * @throws \Exception
  */
 function prepareDeleteSubscriptions($toDelete)
 {
 	$db = database();
 
-	$request = $db->query('', '
+	$delete = array();
+	$db->fetchQuery('
 		SELECT
 			id_subscribe, id_member
 		FROM {db_prefix}log_subscribed
@@ -1111,13 +1121,11 @@ function prepareDeleteSubscriptions($toDelete)
 		array(
 			'subscription_list' => $toDelete,
 		)
+	)->fetch_callback(
+		function ($row) use (&$delete) {
+			$delete[$row['id_subscribe']] = $row['id_member'];
+		}
 	);
-	$delete = array();
-	while ($row = $db->fetch_assoc($request))
-	{
-		$delete[$row['id_subscribe']] = $row['id_member'];
-	}
-	$db->free_result($request);
 
 	return $delete;
 }
@@ -1127,12 +1135,13 @@ function prepareDeleteSubscriptions($toDelete)
  *
  * @param int $log_id
  * @return array
+ * @throws \ElkArte\Exceptions\Exception
  */
 function getPendingSubscriptions($log_id)
 {
 	$db = database();
 
-	$request = $db->query('', '
+	return $db->query('', '
 		SELECT
 			ls.id_sublog, ls.id_subscribe, ls.id_member,
 			start_time, end_time, status, payments_pending, pending_details, COALESCE(mem.real_name, {string:blank_string}) AS username
@@ -1144,17 +1153,14 @@ function getPendingSubscriptions($log_id)
 			'current_subscription_item' => $log_id,
 			'blank_string' => '',
 		)
-	);
-	$row = $db->fetch_assoc($request);
-	$db->free_result($request);
-
-	return $row;
+	)->fetch_assoc();
 }
 
 /**
  * Somebody paid the first time? Let's log ...
  *
  * @param mixed[] $details associative array for the insert
+ * @throws \Exception
  */
 function logSubscription($details)
 {
@@ -1164,11 +1170,11 @@ function logSubscription($details)
 		'{db_prefix}log_subscribed',
 		array(
 			'id_subscribe' => 'int', 'id_member' => 'int', 'old_id_group' => 'int', 'start_time' => 'int',
-			'end_time' => 'int', 'status' => 'int',
+			'end_time' => 'int', 'status' => 'int', 'pending_details' => 'string',
 		),
 		array(
 			$details['sub_id'], $details['id_member'], $details['id_group'], $details['start_time'],
-			$details['end_time'], $details['status'],
+			$details['end_time'], $details['status'], $details['pending_details'],
 		),
 		array('id_sublog')
 	);
@@ -1180,6 +1186,7 @@ function logSubscription($details)
  * @param int $sub_id
  * @param int $memID
  * @param string $pending_details
+ * @throws \Exception
  */
 function logNewSubscription($sub_id, $memID, $pending_details)
 {
@@ -1203,6 +1210,7 @@ function logNewSubscription($sub_id, $memID, $pending_details)
  *
  * @param int $sub_id
  * @param string $details
+ * @throws \ElkArte\Exceptions\Exception
  */
 function updatePendingSubscription($sub_id, $details)
 {
@@ -1211,7 +1219,8 @@ function updatePendingSubscription($sub_id, $details)
 	// Update the entry.
 	$db->query('', '
 		UPDATE {db_prefix}log_subscribed
-		SET payments_pending = payments_pending - 1, pending_details = {string:pending_details}
+		SET 
+			payments_pending = payments_pending - 1, pending_details = {string:pending_details}
 		WHERE id_sublog = {int:current_subscription_item}',
 		array(
 			'current_subscription_item' => $sub_id,
@@ -1227,6 +1236,7 @@ function updatePendingSubscription($sub_id, $details)
  * @param int $sub_id
  * @param int $memID
  * @param string $details
+ * @throws \ElkArte\Exceptions\Exception
  */
 function updatePendingSubscriptionCount($pending_count, $sub_id, $memID, $details)
 {
@@ -1234,7 +1244,8 @@ function updatePendingSubscriptionCount($pending_count, $sub_id, $memID, $detail
 
 	$db->query('', '
 		UPDATE {db_prefix}log_subscribed
-		SET payments_pending = {int:pending_count}, pending_details = {string:pending_details}
+		SET 
+			payments_pending = {int:pending_count}, pending_details = {string:pending_details}
 		WHERE id_sublog = {int:current_subscription_item}
 			AND id_member = {int:selected_member}',
 		array(
@@ -1255,6 +1266,7 @@ function updatePendingSubscriptionCount($pending_count, $sub_id, $memID, $detail
  * @param int $sub_id
  * @param int $memID
  * @param string $details
+ * @throws \ElkArte\Exceptions\Exception
  */
 function updatePendingStatus($sub_id, $memID, $details)
 {
@@ -1262,7 +1274,8 @@ function updatePendingStatus($sub_id, $memID, $details)
 
 	$db->query('', '
 		UPDATE {db_prefix}log_subscribed
-		SET payments_pending = payments_pending + 1, pending_details = {string:pending_details}
+		SET 
+			payments_pending = payments_pending + 1, pending_details = {string:pending_details}
 		WHERE id_sublog = {int:current_subscription_id}
 			AND id_member = {int:selected_member}',
 		array(
@@ -1278,7 +1291,8 @@ function updatePendingStatus($sub_id, $memID, $details)
  *
  * @param int $id_subscribe
  * @param int $id_member
- * @param boolean $delete
+ * @param bool $delete
+ * @throws \ElkArte\Exceptions\Exception
  */
 function removeSubscription($id_subscribe, $id_member, $delete = false)
 {
@@ -1306,8 +1320,15 @@ function removeSubscription($id_subscribe, $id_member, $delete = false)
 		return;
 	}
 
+	// These variables will be handy, honest ;)
+	$removals = array();
+	$allowed = array();
+	$member = array();
+	$member['id_group'] = 0;
+	$new_id_group = -1;
+
 	// Get all of the subscriptions for this user that are active - it will be necessary!
-	$request = $db->query('', '
+	$db->fetchQuery('
 		SELECT
 			id_subscribe, old_id_group
 		FROM {db_prefix}log_subscribed
@@ -1317,43 +1338,38 @@ function removeSubscription($id_subscribe, $id_member, $delete = false)
 			'current_member' => $id_member,
 			'is_active' => 1,
 		)
+	)->fetch_callback(
+		function ($row) use (&$removals, &$allowed, &$member, &$new_id_group, $id_subscribe) {
+			global $context;
+
+			if (!isset($context['subscriptions'][$row['id_subscribe']]))
+			{
+				return;
+			}
+
+			// The one we're removing?
+			if ($row['id_subscribe'] == $id_subscribe)
+			{
+				$removals = explode(',', $context['subscriptions'][$row['id_subscribe']]['add_groups']);
+				if ($context['subscriptions'][$row['id_subscribe']]['prim_group'] != 0)
+				{
+					$removals[] = $context['subscriptions'][$row['id_subscribe']]['prim_group'];
+				}
+
+				$member['id_group'] = $row['old_id_group'];
+			}
+			// Otherwise things we allow.
+			else
+			{
+				$allowed = array_merge($allowed, explode(',', $context['subscriptions'][$row['id_subscribe']]['add_groups']));
+				if ($context['subscriptions'][$row['id_subscribe']]['prim_group'] != 0)
+				{
+					$allowed[] = $context['subscriptions'][$row['id_subscribe']]['prim_group'];
+					$new_id_group = $context['subscriptions'][$row['id_subscribe']]['prim_group'];
+				}
+			}
+		}
 	);
-
-	// These variables will be handy, honest ;)
-	$removals = array();
-	$allowed = array();
-	$member = array();
-	$member['id_group'] = 0;
-	$new_id_group = -1;
-	while ($row = $db->fetch_assoc($request))
-	{
-		if (!isset($context['subscriptions'][$row['id_subscribe']]))
-		{
-			continue;
-		}
-
-		// The one we're removing?
-		if ($row['id_subscribe'] == $id_subscribe)
-		{
-			$removals = explode(',', $context['subscriptions'][$row['id_subscribe']]['add_groups']);
-			if ($context['subscriptions'][$row['id_subscribe']]['prim_group'] != 0)
-			{
-				$removals[] = $context['subscriptions'][$row['id_subscribe']]['prim_group'];
-			}
-			$member['id_group'] = $row['old_id_group'];
-		}
-		// Otherwise things we allow.
-		else
-		{
-			$allowed = array_merge($allowed, explode(',', $context['subscriptions'][$row['id_subscribe']]['add_groups']));
-			if ($context['subscriptions'][$row['id_subscribe']]['prim_group'] != 0)
-			{
-				$allowed[] = $context['subscriptions'][$row['id_subscribe']]['prim_group'];
-				$new_id_group = $context['subscriptions'][$row['id_subscribe']]['prim_group'];
-			}
-		}
-	}
-	$db->free_result($request);
 
 	// Now, for everything we are removing check they definitely are not allowed it.
 	$existingGroups = explode(',', $member_info['additional_groups']);
@@ -1406,7 +1422,8 @@ function removeSubscription($id_subscribe, $id_member, $delete = false)
 	{
 		$db->query('', '
 			UPDATE {db_prefix}log_subscribed
-			SET status = {int:not_active}
+			SET 
+				status = {int:not_active}
 			WHERE id_member = {int:current_member}
 				AND id_subscribe = {int:current_subscription}',
 			array(

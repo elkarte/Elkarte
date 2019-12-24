@@ -23,6 +23,7 @@ use ElkArte\Util;
  *
  * @param int $start_member
  * @return array
+ * @throws \Exception
  */
 function getSignatureFromMembers($start_member)
 {
@@ -30,8 +31,9 @@ function getSignatureFromMembers($start_member)
 
 	$members = array();
 
-	$request = $db->query('', '
-		SELECT id_member, signature
+	$db->fetchQuery('
+		SELECT 
+			id_member, signature
 		FROM {db_prefix}members
 		WHERE id_member BETWEEN ' . $start_member . ' AND ' . $start_member . ' + 49
 			AND id_group != {int:admin_group}
@@ -39,12 +41,12 @@ function getSignatureFromMembers($start_member)
 		array(
 			'admin_group' => 11,
 		)
+	)->fetch_callback(
+		function ($row) use (&$members) {
+			$members[$row['id_member']]['id_member'] = $row['id_member'];
+			$members[$row['id_member']]['signature'] = $row['signature'];
+		}
 	);
-	while ($result = $db->fetch_assoc($request))
-	{
-		$members[$result['id_member']]['id_member'] = $result['id_member'];
-		$members[$result['id_member']]['signature'] = $result['signature'];
-	}
 
 	return $members;
 }
@@ -357,9 +359,10 @@ function updateAllSignatures($applied_sigs)
  * @param int $start The item to start with (for pagination purposes)
  * @param int $items_per_page The number of items to show per page
  * @param string $sort A string indicating how to sort the results
- * @param boolean $standardFields
+ * @param bool $standardFields
  *
  * @return array
+ * @throws \Exception
  */
 function list_getProfileFields($start, $items_per_page, $sort, $standardFields)
 {
@@ -390,7 +393,7 @@ function list_getProfileFields($start, $items_per_page, $sort, $standardFields)
 	else
 	{
 		// Load all the fields.
-		$request = $db->query('', '
+		$db->fetchQuery('
 			SELECT 
 				id_field, col_name, field_name, field_desc, field_type, active, placement, vieworder
 			FROM {db_prefix}custom_fields
@@ -401,12 +404,11 @@ function list_getProfileFields($start, $items_per_page, $sort, $standardFields)
 				'start' => $start,
 				'items_per_page' => $items_per_page,
 			)
+		)->fetch_callback(
+			function ($row) use (&$list) {
+				$list[$row['id_field']] = $row;
+			}
 		);
-		while ($row = $db->fetch_assoc($request))
-		{
-			$list[$row['id_field']] = $row;
-		}
-		$db->free_result($request);
 	}
 
 	return $list;
@@ -420,13 +422,13 @@ function list_getProfileFieldSize()
 	$db = database();
 
 	$request = $db->query('', '
-		SELECT COUNT(*)
+		SELECT 
+			COUNT(*)
 		FROM {db_prefix}custom_fields',
 		array()
 	);
-
-	list ($numProfileFields) = $db->fetch_row($request);
-	$db->free_result($request);
+	list ($numProfileFields) = $request->fetch_row();
+	$request->free_result();
 
 	return $numProfileFields;
 }
@@ -436,6 +438,7 @@ function list_getProfileFieldSize()
  *
  * @param int $id_field
  * @return array $field
+ * @throws \Exception
  */
 function getProfileField($id_field)
 {
@@ -444,7 +447,7 @@ function getProfileField($id_field)
 	$field = array();
 
 	// The fully-qualified name for rows is here because it's a reserved word in Mariadb 10.2.4+ and quoting would be different for MySQL/Mariadb and PSQL
-	$request = $db->query('', '
+	$db->fetchQuery('
 		SELECT
 			id_field, col_name, field_name, field_desc, field_type, field_length, field_options,
 			show_reg, show_display, show_memberlist, show_profile, private, active, default_value, can_search,
@@ -454,39 +457,38 @@ function getProfileField($id_field)
 		array(
 			'current_field' => $id_field,
 		)
+	)->fetch_callback(
+		function ($row) use (&$field) {
+			$field = array(
+				'name' => $row['field_name'],
+				'desc' => $row['field_desc'],
+				'colname' => $row['col_name'],
+				'profile_area' => $row['show_profile'],
+				'reg' => $row['show_reg'],
+				'display' => $row['show_display'],
+				'memberlist' => $row['show_memberlist'],
+				'type' => $row['field_type'],
+				'max_length' => $row['field_length'],
+				'rows' => $row['rows'],
+				'cols' => $row['cols'],
+				'bbc' => $row['bbc'] ? true : false,
+				'default_check' => $row['field_type'] == 'check' && $row['default_value'] ? true : false,
+				'default_select' => $row['field_type'] == 'select' || $row['field_type'] == 'radio' ? $row['default_value'] : '',
+				'show_nodefault' => $row['field_type'] == 'select' || $row['field_type'] == 'radio',
+				'default_value' => $row['default_value'],
+				'options' => strlen($row['field_options']) > 1 ? explode(',', $row['field_options']) : array('', '', ''),
+				'active' => $row['active'],
+				'private' => $row['private'],
+				'can_search' => $row['can_search'],
+				'mask' => $row['mask'],
+				'regex' => substr($row['mask'], 0, 5) === 'regex' ? substr($row['mask'], 5) : '',
+				'enclose' => $row['enclose'],
+				'placement' => $row['placement'],
+			);
+		}
 	);
-	while ($row = $db->fetch_assoc($request))
-	{
-		$field = array(
-			'name' => $row['field_name'],
-			'desc' => $row['field_desc'],
-			'colname' => $row['col_name'],
-			'profile_area' => $row['show_profile'],
-			'reg' => $row['show_reg'],
-			'display' => $row['show_display'],
-			'memberlist' => $row['show_memberlist'],
-			'type' => $row['field_type'],
-			'max_length' => $row['field_length'],
-			'rows' => $row['rows'],
-			'cols' => $row['cols'],
-			'bbc' => $row['bbc'] ? true : false,
-			'default_check' => $row['field_type'] == 'check' && $row['default_value'] ? true : false,
-			'default_select' => $row['field_type'] == 'select' || $row['field_type'] == 'radio' ? $row['default_value'] : '',
-			'show_nodefault' => $row['field_type'] == 'select' || $row['field_type'] == 'radio',
-			'default_value' => $row['default_value'],
-			'options' => strlen($row['field_options']) > 1 ? explode(',', $row['field_options']) : array('', '', ''),
-			'active' => $row['active'],
-			'private' => $row['private'],
-			'can_search' => $row['can_search'],
-			'mask' => $row['mask'],
-			'regex' => substr($row['mask'], 0, 5) === 'regex' ? substr($row['mask'], 5) : '',
-			'enclose' => $row['enclose'],
-			'placement' => $row['placement'],
-		);
-	}
-	$db->free_result($request);
 
-	return ($field);
+	return $field;
 }
 
 /**
@@ -494,8 +496,9 @@ function getProfileField($id_field)
  *
  * @param string $colname
  * @param string $initial_colname
- * @param boolean $unique
- * @return boolean
+ * @param bool $unique
+ * @return bool
+ * @throws \ElkArte\Exceptions\Exception
  */
 function ensureUniqueProfileField($colname, $initial_colname, $unique = false)
 {
@@ -513,7 +516,7 @@ function ensureUniqueProfileField($colname, $initial_colname, $unique = false)
 				'current_column' => $colname,
 			)
 		);
-		if ($db->num_rows($request) == 0)
+		if ($request->num_rows() === 0)
 		{
 			$unique = true;
 		}
@@ -521,7 +524,7 @@ function ensureUniqueProfileField($colname, $initial_colname, $unique = false)
 		{
 			$colname = $initial_colname . $i;
 		}
-		$db->free_result($request);
+		$request->free_result();
 	}
 
 	return $unique;
@@ -534,6 +537,7 @@ function ensureUniqueProfileField($colname, $initial_colname, $unique = false)
  * @param mixed[] $newOptions
  * @param string $name
  * @param string $option
+ * @throws \ElkArte\Exceptions\Exception
  */
 function updateRenamedProfileField($key, $newOptions, $name, $option)
 {
@@ -558,6 +562,7 @@ function updateRenamedProfileField($key, $newOptions, $name, $option)
  * Update the custom profile fields active status on/off
  *
  * @param int[] $enabled
+ * @throws \ElkArte\Exceptions\Exception
  */
 function updateRenamedProfileStatus($enabled)
 {
@@ -577,6 +582,7 @@ function updateRenamedProfileStatus($enabled)
  * Update the profile field
  *
  * @param mixed[] $field_data
+ * @throws \ElkArte\Exceptions\Exception
  */
 function updateProfileField($field_data)
 {
@@ -626,6 +632,7 @@ function updateProfileField($field_data)
  * Done as a CASE WHEN one two three ELSE 0 END in place of many updates
  *
  * @param string $replace constructed as WHEN fieldname=value THEN new viewvalue WHEN .....
+ * @throws \ElkArte\Exceptions\Exception
  */
 function updateProfileFieldOrder($replace)
 {
@@ -643,6 +650,7 @@ function updateProfileFieldOrder($replace)
  *
  * @param string[] $newOptions
  * @param string $fieldname
+ * @throws \ElkArte\Exceptions\Exception
  */
 function deleteOldProfileFieldSelects($newOptions, $fieldname)
 {
@@ -665,6 +673,7 @@ function deleteOldProfileFieldSelects($newOptions, $fieldname)
  * Used to add a new custom profile field
  *
  * @param mixed[] $field
+ * @throws \Exception
  */
 function addProfileField($field)
 {
@@ -696,6 +705,7 @@ function addProfileField($field)
  * Delete all user data for a specified custom profile field
  *
  * @param string $name
+ * @throws \ElkArte\Exceptions\Exception
  */
 function deleteProfileFieldUserData($name)
 {
@@ -717,6 +727,7 @@ function deleteProfileFieldUserData($name)
  * Deletes a custom profile field.
  *
  * @param int $id
+ * @throws \ElkArte\Exceptions\Exception
  */
 function deleteProfileField($id)
 {
@@ -739,7 +750,8 @@ function updateDisplayCache()
 	$db = database();
 
 	$fields = $db->fetchQuery('
-		SELECT col_name, field_name, field_type, bbc, enclose, placement, vieworder
+		SELECT 
+			col_name, field_name, field_type, bbc, enclose, placement, vieworder
 		FROM {db_prefix}custom_fields
 		WHERE show_display = {int:is_displayed}
 			AND active = {int:active}
@@ -776,21 +788,20 @@ function loadAllCustomFields()
 	$db = database();
 
 	// Get the names of any custom fields.
-	$request = $db->query('', '
+	$custom_field_titles = array();
+	$db->fetchQuery('
 		SELECT
 			col_name, field_name, bbc
 		FROM {db_prefix}custom_fields',
 		array()
+	)->fetch_callback(
+		function ($row) use (&$custom_field_titles) {
+			$custom_field_titles['customfield_' . $row['col_name']] = array(
+				'title' => $row['field_name'],
+				'parse_bbc' => $row['bbc'],
+			);
+		}
 	);
-	$custom_field_titles = array();
-	while ($row = $db->fetch_assoc($request))
-	{
-		$custom_field_titles['customfield_' . $row['col_name']] = array(
-			'title' => $row['field_name'],
-			'parse_bbc' => $row['bbc'],
-		);
-	}
-	$db->free_result($request);
 
 	return $custom_field_titles;
 }
