@@ -9,14 +9,11 @@
  */
 class TestManageMembergroupsController extends ElkArteWebTest
 {
-	protected $backupGlobalsBlacklist = ['user_info'];
-
 	/**
 	 * Add a group
 	 *
 	 * Depends on the fact that we are logged in to the ACP
 	 *
-	 * @runInSeparateProcess
 	 */
 	public function testAcpAddGroup()
 	{

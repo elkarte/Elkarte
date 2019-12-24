@@ -13,6 +13,7 @@
 abstract class ElkArteCommonSetupTest extends \PHPUnit\Framework\TestCase
 {
 	private $session = false;
+	public $userData = [];
 
 	/**
 	 * Initialize or add whatever necessary for these tests
@@ -27,7 +28,7 @@ abstract class ElkArteCommonSetupTest extends \PHPUnit\Framework\TestCase
 		$modSettings['default_forum_action'] = [];
 		$settings['default_theme_dir'] = '/var/www/themes/default';
 
-		\ElkArte\User::$info = new \ElkArte\ValuesContainer([
+		$userData = [
 			'id' => 1,
 			'ip' => long2ip(rand(0, 2147483647)),
 			'language' => 'english',
@@ -50,7 +51,10 @@ abstract class ElkArteCommonSetupTest extends \PHPUnit\Framework\TestCase
 			'ignoreboards' => array(),
 			'avatar' => array('url' => '', 'name' => ''),
 			'permissions' => array('admin_forum'),
-		]);
+		];
+
+		\ElkArte\User::$info = new \ElkArte\UserInfo($userData);
+		\ElkArte\User::load();
 
 		$settings['page_index_template'] = array(
 			'base_link' => '<li></li>',

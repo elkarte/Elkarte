@@ -16,8 +16,6 @@ class TestMessageIndex extends ElkArteCommonSetupTest
 
 		parent::setUp();
 
-		new ElkArte\Themes\ThemeLoader();
-
 		$board = 1;
 		loadBoard();
 	}

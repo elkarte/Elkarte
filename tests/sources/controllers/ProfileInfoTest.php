@@ -25,10 +25,13 @@ class TestProfileInfo extends ElkArteCommonSetupTest
 	{
 		global $context, $modSettings;
 
+		$context['user']['is_owner'] = true;
+		$context['profile_menu_name'] = 'menu_data_1';
+
 		$controller = new \ElkArte\Controller\ProfileInfo(new \ElkArte\EventManager());
 		$controller->setUser(\ElkArte\User::$info);
 		$controller->pre_dispatch();
-		$controller->action_index();
+		$controller->action_summary();
 
 		// Lets see some items loaded into context, there should some data
 		$this->assertNotNull($context);

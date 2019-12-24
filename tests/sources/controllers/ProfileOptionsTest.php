@@ -46,8 +46,9 @@ class TestProfileOptions extends ElkArteCommonSetupTest
 
 	/**
 	 * Not run yet, the avatar data 'name' is not loading?
+	 * @todo figure that out and change name to testForumProfile
 	 */
-	public function teestForumProfile()
+	public function ForumProfile()
 	{
 		global $context;
 

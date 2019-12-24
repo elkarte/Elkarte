@@ -6,43 +6,21 @@
 
 class TestPermissionsClass extends ElkArteCommonSetupTest
 {
-	public $permissionsObject;
-	private $illegal_permissions = array();
-	private $illegal_guest_permissions = array();
 	protected $backupGlobalsBlacklist = ['user_info'];
-
-	/**
-	 * Prepare what is necessary to use in these tests.
-	 *
-	 * setUp() is run automatically by the testing framework before each test method.
-	 */
-	public function setUp()
-	{
-		parent::setUp();
-	}
-
-	/**
-	 * cleanup data we no longer need at the end of the tests in this class.
-	 * tearDown() is run automatically by the testing framework after each test method.
-	 */
-	public function tearDown()
-	{
-		parent::tearDown();
-	}
 
 	/**
 	 * Load and verify default illegal permissions
 	 */
 	public function testDefaultIllegalPermissions()
 	{
-		\ElkArte\User::$info->is_admin = false;
+		\ElkArte\User::$info = new \ElkArte\ValuesContainer(['is_admin' => false]);
 		$permissionsObject = new \ElkArte\Permissions();
-		$this->illegal_permissions = $permissionsObject->getIllegalPermissions();
+		$illegal_permissions = $permissionsObject->getIllegalPermissions();
 
 		foreach (array('admin_forum', 'manage_membergroups', 'manage_permissions') as $check)
 		{
-			$valid = in_array($check, $this->illegal_permissions);
-			$this->assertTrue($valid, $check);
+			$valid = in_array($check, $illegal_permissions);
+			$this->assertTrue($valid, $check, $check);
 		}
 	}
 
@@ -52,13 +30,13 @@ class TestPermissionsClass extends ElkArteCommonSetupTest
 	public function testDefaultIllegalGuestPermissions()
 	{
 		$permissionsObject = new \ElkArte\Permissions();
-		$this->illegal_guest_permissions = $permissionsObject->getIllegalGuestPermissions();
+		$illegal_guest_permissions = $permissionsObject->getIllegalGuestPermissions();
 
 		// Simple spot check
 		foreach (array('admin_forum', 'edit_news', 'mark_notify') as $check)
 		{
-			$valid = in_array($check, $this->illegal_guest_permissions);
-			$this->assertTrue($valid, $check);
+			$valid = in_array($check, $illegal_guest_permissions);
+			$this->assertTrue($valid, $check, $check);
 		}
 	}
 
@@ -71,16 +49,16 @@ class TestPermissionsClass extends ElkArteCommonSetupTest
 		add_integration_function('integrate_load_illegal_guest_permissions', 'testIntegrationIGP', 'SOURCEDIR/Testing.php', false);
 
 		$permissionsObject = new \ElkArte\Permissions();
-		$this->illegal_guest_permissions = $permissionsObject->getIllegalGuestPermissions();
+		$illegal_guest_permissions = $permissionsObject->getIllegalGuestPermissions();
 
 		// Check if the integration worked
-		$valid = in_array('no_bla_4_you', $this->illegal_guest_permissions);
+		$valid = in_array('no_bla_4_you', $illegal_guest_permissions);
 		$this->assertTrue($valid, 'no_bla_4_you');
 
-		$valid = in_array('issue_warning', $this->illegal_guest_permissions);
+		$valid = in_array('issue_warning', $illegal_guest_permissions);
 		$this->assertFalse($valid, 'issue_warning');
 
-		$valid = in_array('pm_read', $this->illegal_guest_permissions);
+		$valid = in_array('pm_read', $illegal_guest_permissions);
 		$this->assertFalse($valid, 'pm_read');
 
 		// Compatibility check

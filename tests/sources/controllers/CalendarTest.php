@@ -19,17 +19,14 @@ class TestCalendar extends ElkArteCommonSetupTest
 		parent::setUp();
 
 		new ElkArte\Themes\ThemeLoader();
+		theme()->getTemplates()->loadLanguageFile('Errors', 'english', true, true);
 	}
 
 	/**
 	 * Test getting the calendar
-	 *
-	 * @runInSeparateProcess
 	 */
 	public function testActionCalendar()
 	{
-		global $context, $modSettings;
-
 		// Get the controller
 		$controller = new \ElkArte\Controller\Calendar(new \ElkArte\EventManager());
 		try

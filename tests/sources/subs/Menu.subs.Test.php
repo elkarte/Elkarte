@@ -97,7 +97,10 @@ class TestMenuSubs extends \PHPUnit\Framework\TestCase
 		$context['right_to_left'] = false;
 
 		// Your the admin now
-		\ElkArte\User::$info->is_admin = true;
+		\ElkArte\User::$info = new \ElkArte\ValuesContainer([
+			'is_admin' => true,
+			'is_guest' => false,
+		]);
 		$context['current_action'] = 'section1';
 	}
 
