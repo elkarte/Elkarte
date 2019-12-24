@@ -9,7 +9,11 @@
  */
 class TestManageMembersController extends ElkArteWebTest
 {
-	protected $backupGlobalsBlacklist = ['user_info'];
+	/**
+	 * Register members
+	 *
+	 * @throws \ElkArte\Exceptions\Exception
+	 */
 	public function registerMembers()
 	{
 		require_once(SUBSDIR . '/Members.subs.php');
@@ -33,6 +37,13 @@ class TestManageMembersController extends ElkArteWebTest
 		}
 	}
 
+	/**
+	 * Activate a member that was registered
+	 *
+	 * @param string $mname
+	 * @param string $act
+	 * @param string $el
+	 */
 	public function activateMember($mname, $act, $el)
 	{
 		// First, navigate to member management.
@@ -59,19 +70,23 @@ class TestManageMembersController extends ElkArteWebTest
 	}
 
 	/**
-	 * @runInSeparateProcess
+	 * Register and activate some meatheads, uh ... members
+	 *
+	 * This used to run in runInSeparateProcess, but after 5 years some update just made
+	 * that process fail, so additonal ACP detection logic has been added.
 	 */
 	public function testApproveMember()
 	{
 		// First, we register some members...
 		$this->registerMembers();
 
-		// Then, navigate to member management.
-		$this->activateMember('user1', 'approve', 'ok');
-
 		// Login the admin in to the ACP
+		$this->adminLogout();
 		$this->adminLogin();
 		$this->enterACP();
+
+		// Then, navigate to member management.
+		$this->activateMember('user1', 'approve', 'ok');
 
 		// Finally, ensure they have been approved.
 		$this->url('index.php?action=admin;area=viewmembers;sa=search');
@@ -82,15 +97,15 @@ class TestManageMembersController extends ElkArteWebTest
 	}
 
 	/**
-	 * @runInSeparateProcess
+	 * Activate a member, as above used to runInSeparateProcess
 	 */
 	public function testActivateMember()
 	{
-		$this->activateMember('user0', 'activate', 'delete');
-
 		// Login the admin in to the ACP
 		$this->adminLogin();
 		$this->enterACP();
+
+		$this->activateMember('user0', 'activate', 'delete');
 
 		// Should be gone.
 		$this->url('index.php?action=admin;area=viewmembers;sa=all');

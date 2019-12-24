@@ -3,11 +3,12 @@
 <phpunit backupGlobals="true"
          colors="true"
          convertErrorsToExceptions="true"
-         convertNoticesToExceptions="true"
+         convertNoticesToExceptions="false"
          convertWarningsToExceptions="true"
          processIsolation="false"
          stopOnFailure="false"
          verbose="true"
+         beStrictAboutTestsThatDoNotTestAnything="false"
          bootstrap="/var/www/tests/travis-ci/bootstrap.php">
   <testsuites>
       <testsuite name="Web Tests">

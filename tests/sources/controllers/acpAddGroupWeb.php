@@ -18,7 +18,7 @@ class TestManageMembergroupsController extends ElkArteWebTest
 	public function testAcpAddGroup()
 	{
 		// Login the admin in to the ACP
-		$this->adminLogin();
+		$this->adminQuickLogin();
 		$this->enterACP();
 
 		// Start at the add member group page
@@ -44,7 +44,7 @@ class TestManageMembergroupsController extends ElkArteWebTest
 	/**
 	 * Try to logout with action=logout
 	 *
-	 * This does not seem to work yet. Rename to test when working
+	 * @todo This does not seem to work yet. Rename to test when working
 	 */
 	public function Logout()
 	{

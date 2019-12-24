@@ -90,19 +90,75 @@ abstract class ElkArteWebTest extends \PHPUnit_Extensions_Selenium2TestCase
 	/**
 	 * Log in the admin via the quick login bar
 	 */
+	public function adminQuickLogin()
+	{
+		// Main page
+		$this->url('index.php');
+		$this->assertEquals('My Community - Index', $this->title());
+
+		// Can we log in?
+		$check = $this->byCssSelector('#menu_nav')->text();
+		$check = strpos($check, 'Log in');
+		if ($check !== false)
+		{
+			// Use Quick login
+			$this->byCssSelector('input[name="user"]')->value($this->adminuser);
+			$this->byCssSelector('input[name="passwrd"]')->value($this->adminpass);
+			$this->clickit('#password_login > input[type="submit"]');
+		}
+
+		// Should see the admin button now
+		$this->assertContains('Admin', $this->byCssSelector('#button_admin > a')->text());
+	}
+
+	/**
+	 * Log in the admin via the login form
+	 */
 	public function adminLogin()
 	{
 		// Main page
 		$this->url('index.php');
 		$this->assertEquals('My Community - Index', $this->title());
 
-		// Quick login
-		$this->byName('user')->value($this->adminuser);
-		$this->byName('passwrd')->value($this->adminpass);
-		$this->clickit('#password_login > input[type="submit"]');
+		// Are we already logged in as the admin? check by seeing Admin in the main menu
+		$check = $this->byCssSelector('#menu_nav')->text();
+		$check = strpos($check, 'Admin');
+		if ($check === false)
+		{
+			// Select login from the main page
+			$this->clickit('#button_login > a');
+			$this->assertEquals('Log in', $this->title());
 
-		// Should see the admin button now
+			// Fill in the form, long hand style
+			$usernameInput = $this->byId('user');
+			$usernameInput->clear();
+			$usernameInput->value($this->adminuser);
+			$passwordInput = $this->byId('passwrd');
+			$passwordInput->clear();
+			$passwordInput->value($this->adminpass);
+
+			// Submit it
+			$this->clickit('.login > div > dl > input[type="submit"]');
+		}
+
+		// Should see the admin main menu button
 		$this->assertContains('Admin', $this->byCssSelector('#button_admin > a')->text());
+	}
+
+	/**
+	 * Logout when needed
+	 */
+	public function adminLogout()
+	{
+		// Seems this is throwing a session error so can't logout?
+		if (isset($_SESSION['session_var'], $_SESSION['session_value']))
+		{
+			$this->url('/index.php?action=logout;' . $_SESSION['session_var'] . '=' . $_SESSION['session_value']);
+			sleep(3);
+			return;
+		}
+
+		$this->url('index.php');
 	}
 
 	/**
@@ -110,11 +166,17 @@ abstract class ElkArteWebTest extends \PHPUnit_Extensions_Selenium2TestCase
 	 */
 	public function enterACP()
 	{
-		// Select admin, enter password
+		// Select admin
 		$this->clickit('#button_admin > a');
-		$this->assertEquals('Administration Log in', $this->title());
-		$this->byId('admin_pass')->value($this->adminpass);
-		$this->clickit('input[type="submit"]');
+
+		// Do we need to start the admin session?
+		if ($this->title() === 'Administration Log in')
+		{
+			// enter password to access
+			$this->assertEquals('Administration Log in', $this->title());
+			$this->byId('admin_pass')->value($this->adminpass);
+			$this->clickit('input[type="submit"]');
+		}
 
 		// Validate we are there
 		$this->assertEquals('Administration Center', $this->title());
