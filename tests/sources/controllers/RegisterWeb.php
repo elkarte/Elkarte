@@ -14,7 +14,6 @@ class TestRegisterController extends ElkArteWebTest
 	 */
 	public $registration_method;
 	public $visual_verification_type;
-	protected $backupGlobalsBlacklist = ['user_info'];
 
 	/**
 	 * Initialize or add whatever is necessary for these tests

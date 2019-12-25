@@ -287,7 +287,7 @@ class ProfileInfo extends AbstractController
 		global $context, $txt;
 
 		// They haven't even been registered for a full day!?
-		$days_registered = (int) ((time() - $this->_profile['date_registered']) / (3600 * 24));
+		$days_registered = (int) ((time() - $this->_profile['registered_raw']) / (3600 * 24));
 		if (empty($this->_profile['date_registered']) || $days_registered < 1)
 		{
 			$context['member']['posts_per_day'] = $txt['not_applicable'];

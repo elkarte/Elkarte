@@ -3,14 +3,15 @@
 /**
  * TestCase class for manage posts settings
  */
-class TestManagePostsSettings extends \PHPUnit\Framework\TestCase
+class TestManagePostsSettings extends ElkArteCommonSetupTest
 {
 	protected $backupGlobalsBlacklist = ['user_info'];
 	/**
 	 * Initialize or add whatever necessary for these tests
 	 */
-	function setUp()
+	public function setUp()
 	{
+		parent::setUp();
 		theme()->getTemplates()->loadLanguageFile('Admin', 'english', true, true);
 	}
 

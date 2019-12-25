@@ -27,7 +27,7 @@ class ElkArteInstallWeb extends ElkArteWebTest
 	 *
 	 * This method is used to configure the Selenium Server session, url/browser
 	 */
-	protected function setUp()
+	public function setUp()
 	{
 		// Set the browser to be used by Selenium, it must be available on localhost
 		$this->setBrowser($this->browser);
@@ -79,10 +79,7 @@ class ElkArteInstallWeb extends ElkArteWebTest
 		$this->byName('password2')->value($this->adminpass);
 		$this->byCssSelector('#email')->value('an_email_address@localhost.tld');
 		$this->clickit('#contbutt');
-
- 		//$this->assertEquals('Critical Error!', $this->byCssSelector('.errorbox')->text());
-		// @FIXME this test is failing, maybe its the test, maybe its really fubar
-		//$this->assertEquals('Congratulations, the installation process is complete!', $this->byCssSelector('#main_screen > h2')->text());
+		$this->assertContains('Congratulations', $this->byCssSelector('#main_screen > h2')->text());
 	}
 
 	/**

@@ -10,7 +10,7 @@ class TestProfileOptions extends ElkArteCommonSetupTest
 	/**
 	 * Initialize or add whatever necessary for these tests
 	 */
-	function setUp()
+	public function setUp()
 	{
 		global $context, $cur_profile;
 
@@ -25,16 +25,6 @@ class TestProfileOptions extends ElkArteCommonSetupTest
 		$cur_profile = \ElkArte\MembersList::get('1');
 		$context['user']['is_owner'] = true;
 		$context['id_member'] = 1;
-	}
-
-	/**
-	 * Cleanup data we no longer need at the end of the tests in this class.
-	 *
-	 * tearDown() is run automatically by the testing framework after each test method.
-	 */
-	public function tearDown()
-	{
-		parent::tearDown();
 	}
 
 	/**
@@ -56,8 +46,9 @@ class TestProfileOptions extends ElkArteCommonSetupTest
 
 	/**
 	 * Not run yet, the avatar data 'name' is not loading?
+	 * @todo figure that out and change name to testForumProfile
 	 */
-	public function teestForumProfile()
+	public function ForumProfile()
 	{
 		global $context;
 

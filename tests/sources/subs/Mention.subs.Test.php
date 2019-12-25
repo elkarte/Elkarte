@@ -32,6 +32,7 @@ class TestMentions extends \PHPUnit\Framework\TestCase
 			'is_admin' => true,
 			'is_guest' => false,
 			'username' => 'testing',
+			'name' => 'itsme',
 		]);
 
 		// Lets start by ensuring a topic exists by creating one
@@ -109,6 +110,11 @@ class TestMentions extends \PHPUnit\Framework\TestCase
 	 */
 	public function tearDown()
 	{
+		global $modSettings;
+
+		// remove temporary test data
+		unset($modSettings);
+		\ElkArte\User::$info = null;
 	}
 
 	/**
@@ -142,7 +148,7 @@ class TestMentions extends \PHPUnit\Framework\TestCase
 	public function testAddMentionByLike()
 	{
 		\ElkArte\User::$info->id = 2;
-		\ElkArte\User::$info->ip = '127.0.0.1';
+		\ElkArte\User::$info->ip = long2ip(rand(0, 2147483647));
 
 		$notifier = \ElkArte\Notifications::instance();
 		$notifier->add(new \ElkArte\NotificationsTask(

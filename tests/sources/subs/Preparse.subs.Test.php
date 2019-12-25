@@ -3,6 +3,7 @@
 class PrepaseBBC extends \PHPUnit\Framework\TestCase
 {
 	protected $backupGlobalsBlacklist = ['user_info'];
+
 	/**
 	 * Prepare what is necessary to use in these tests.
 	 *
@@ -11,6 +12,10 @@ class PrepaseBBC extends \PHPUnit\Framework\TestCase
 	public function setUp()
 	{
 		require_once(SUBSDIR . '/Post.subs.php');
+
+		\ElkArte\User::$info = new \ElkArte\ValuesContainer([
+			'name' => 'istme',
+		]);
 
 		$this->bbPreparse_tests = array(
 			array(
@@ -46,6 +51,11 @@ class PrepaseBBC extends \PHPUnit\Framework\TestCase
 				'some list[code][list][li]one[/list][/code]',
 			),
 		);
+	}
+
+	public function tearDown()
+	{
+		\ElkArte\User::$info = null;
 	}
 
 	/**

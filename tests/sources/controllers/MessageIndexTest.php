@@ -6,29 +6,18 @@
 class TestMessageIndex extends ElkArteCommonSetupTest
 {
 	protected $backupGlobalsBlacklist = ['user_info'];
+
 	/**
 	 * Initialize or add whatever necessary for these tests
 	 */
-	function setUp()
+	public function setUp()
 	{
 		global $board;
 
 		parent::setUp();
 
-		new ElkArte\Themes\ThemeLoader();
-
 		$board = 1;
 		loadBoard();
-	}
-
-	/**
-	 * Cleanup data we no longer need at the end of the tests in this class.
-	 *
-	 * tearDown() is run automatically by the testing framework after each test method.
-	 */
-	public function tearDown()
-	{
-		parent::tearDown();
 	}
 
 	/**

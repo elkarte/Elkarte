@@ -13,33 +13,20 @@ class TestCalendar extends ElkArteCommonSetupTest
 	/**
 	 * Initialize or add whatever necessary for these tests
 	 */
-	function setUp()
+	public function setUp()
 	{
 		// Load in the common items so the system thinks we have an active login
 		parent::setUp();
 
 		new ElkArte\Themes\ThemeLoader();
-	}
-
-	/**
-	 * Cleanup data we no longer need at the end of the tests in this class.
-	 *
-	 * tearDown() is run automatically by the testing framework after each test method.
-	 */
-	public function tearDown()
-	{
-		parent::tearDown();
+		theme()->getTemplates()->loadLanguageFile('Errors', 'english', true, true);
 	}
 
 	/**
 	 * Test getting the calendar
-	 *
-	 * @runInSeparateProcess
 	 */
 	public function testActionCalendar()
 	{
-		global $context, $modSettings;
-
 		// Get the controller
 		$controller = new \ElkArte\Controller\Calendar(new \ElkArte\EventManager());
 		try

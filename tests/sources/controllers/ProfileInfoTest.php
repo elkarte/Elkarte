@@ -10,22 +10,12 @@ class TestProfileInfo extends ElkArteCommonSetupTest
 	/**
 	 * Initialize or add whatever necessary for these tests
 	 */
-	function setUp()
+	public function setUp()
 	{
 		parent::setUp();
 
 		new ElkArte\Themes\ThemeLoader();
 		theme()->getTemplates()->loadLanguageFile('Profile', 'english', true, true);
-	}
-
-	/**
-	 * Cleanup data we no longer need at the end of the tests in this class.
-	 *
-	 * tearDown() is run automatically by the testing framework after each test method.
-	 */
-	public function tearDown()
-	{
-		parent::tearDown();
 	}
 
 	/**
@@ -35,10 +25,13 @@ class TestProfileInfo extends ElkArteCommonSetupTest
 	{
 		global $context, $modSettings;
 
+		$context['user']['is_owner'] = true;
+		$context['profile_menu_name'] = 'menu_data_1';
+
 		$controller = new \ElkArte\Controller\ProfileInfo(new \ElkArte\EventManager());
 		$controller->setUser(\ElkArte\User::$info);
 		$controller->pre_dispatch();
-		$controller->action_index();
+		$controller->action_summary();
 
 		// Lets see some items loaded into context, there should some data
 		$this->assertNotNull($context);
