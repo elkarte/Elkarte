@@ -405,7 +405,7 @@ function isSmileySetInstalled($set)
 			'not_installed' => 0,
 			'current_package' => $set,
 		)
-	)->num_rows($request) <= 0;
+	)->num_rows() <= 0;
 }
 
 /**

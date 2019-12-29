@@ -778,6 +778,8 @@ function list_getMembergroups($start, $items_per_page, $sort, $membergroup_type,
 		)
 	)->fetch_callback(
 		function ($row) use (&$parent_groups, &$groups, &$group_ids, &$include_hidden, $count_permissions, $aggregate) {
+			global $txt;
+
 			// We only list the groups they can see.
 			if ($row['hidden'] && !$row['can_moderate'] && !$include_hidden)
 			{

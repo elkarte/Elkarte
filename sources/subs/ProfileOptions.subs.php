@@ -35,6 +35,7 @@ function getBuddiesID($buddies, $adding = true)
 	$db = database();
 
 	// If we are mentioning buddies, then let them know who's their buddy.
+	$notifier = null;
 	if ($adding && !empty($modSettings['mentions_enabled']) && !empty($modSettings['mentions_buddy']))
 	{
 		$notifier = Notifications::instance();
@@ -110,7 +111,7 @@ function loadMembergroupsJoin($current_groups, $memID)
 			'moderator_group' => 3,
 		)
 	)->fetch_callback(
-		function ($row) use (&$groups) {
+		function ($row) use (&$groups, $current_groups) {
 			global $context;
 
 			// Can they edit their primary group?
@@ -197,7 +198,7 @@ function logMembergroupRequest($group_id, $memID)
 			'selected_member' => $memID,
 			'selected_group' => $group_id,
 		)
-	)->num_rows($request);
+	)->num_rows();
 
 	// Log the request.
 	if ($num === 0)

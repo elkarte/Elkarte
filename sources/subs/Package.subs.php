@@ -3176,7 +3176,7 @@ function checkPackageDependency($id)
 		)
 	)->fetch_callback(
 		function ($row) use (&$version) {
-			list ($version) = $row;
+			list ($version) = $row['version'];
 		}
 	);
 

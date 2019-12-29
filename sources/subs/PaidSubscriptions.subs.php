@@ -92,6 +92,8 @@ function list_getSubscribedUsers($start, $items_per_page, $sort, $id_sub, $searc
 		))
 	)->fetch_callback(
 		function ($row) use (&$subscribers) {
+			global $txt;
+
 			$subscribers[] = array(
 				'id' => $row['id_sublog'],
 				'id_member' => $row['id_member'],
@@ -468,6 +470,8 @@ function loadPaymentGateways()
 function loadSubscriptions()
 {
 	$db = database();
+
+	global $context;
 
 	if (!empty($context['subscriptions']))
 	{

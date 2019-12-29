@@ -44,8 +44,7 @@ function messageDetails($id_msg, $id_topic = 0, $attachment_type = 0)
 		return false;
 	}
 
-	$attachment_stuff = array();
-	$db->fetchQuery('
+	$attachment_stuff = $db->fetchQuery('
 		SELECT
 			m.id_member, m.modified_time, m.modified_name, m.smileys_enabled, m.body,
 			m.poster_name, m.poster_email, m.subject, m.icon, m.approved,
@@ -64,11 +63,7 @@ function messageDetails($id_msg, $id_topic = 0, $attachment_type = 0)
 			'id_msg' => $id_msg,
 			'announce_action' => 'announce_topic',
 		)
-	)->fetch_callback(
-		function ($row) use (&$attachment_stuff) {
-			$attachment_stuff[] = $row;
-		}
-	);
+	)->fetch_all();
 
 	// The message they were trying to edit was most likely deleted.
 	if (empty($attachment_stuff))
@@ -77,6 +72,7 @@ function messageDetails($id_msg, $id_topic = 0, $attachment_type = 0)
 	}
 
 	$temp = array();
+	$row = array_shift($attachment_stuff);
 	foreach ($attachment_stuff as $attachment)
 	{
 		if ($attachment['filesize'] >= 0 && !empty($modSettings['attachmentEnable']))

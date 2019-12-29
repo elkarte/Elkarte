@@ -501,7 +501,7 @@ function moveTopicsPermissions($moveCache)
 			'move_topic_ids' => $moveCache[0],
 		)
 	)->fetch_callback(
-		function ($row) use (&$countPosts, &$moveCache2, &$moveTos) {
+		function ($row) use (&$countPosts, &$moveCache2, &$moveTos, $moveCache) {
 			$to = $moveCache[1][$row['id_topic']];
 
 			if (empty($to))
@@ -1788,7 +1788,7 @@ function topicMessages($topic, $render = 'print')
 			'current_member' => User::$info->id,
 		)
 	)->fetch_callback(
-		function ($row) use (&$posts, $parser) {
+		function ($row) use (&$posts, $parser, $render) {
 			// Censor the subject and message.
 			$row['subject'] = censor($row['subject']);
 			$row['body'] = censor($row['body']);
@@ -2790,7 +2790,7 @@ function splitTopic($split1_ID_TOPIC, $splitMessages, $new_subject)
 			'id_topic' => (int) $split1_ID_TOPIC,
 		)
 	)->fetch_callback(
-		function ($row) use (&$replaceEntries) {
+		function ($row) use (&$replaceEntries, $split2_ID_TOPIC) {
 			$replaceEntries[] = array($row['id_member'], $split2_ID_TOPIC, $row['id_msg'], $row['unwatched']);
 		}
 	);

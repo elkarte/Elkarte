@@ -1221,7 +1221,7 @@ function decreaseLikeCounts($messages)
 				'members' => array_keys($likers),
 			)
 		)->fetch_callback(
-			function ($row) use (&$update_given) {
+			function ($row) use (&$update_given, $likers) {
 				// All who liked these messages have their "likes given" reduced
 				$update_given[$row['id_member']] = $row['likes'] - $likers[$row['id_member']];
 			}

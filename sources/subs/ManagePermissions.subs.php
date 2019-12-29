@@ -330,7 +330,7 @@ function setPermissionLevel($level, $group = null, $profile = null)
 				'newbie_group' => 4,
 			)
 		)->fetch_callback(
-			function ($row) use ($db) {
+			function ($row) use ($db, $boardLevels, $profile) {
 				$group = $row['id_group'];
 
 				$boardInserts = array();

@@ -876,7 +876,7 @@ function UserStatsMostPostedBoard($memID, $limit = 10)
 			'limit' => (int) $limit,
 		)
 	)->fetch_callback(
-		function ($row) use (&$popular_boards) {
+		function ($row) use (&$popular_boards, $memID) {
 			$href = getUrl('board', ['board' => $row['id_board'], 'start' => '0', 'name' => $row['name']]);
 			$posts = MembersList::get($memID)->posts;
 

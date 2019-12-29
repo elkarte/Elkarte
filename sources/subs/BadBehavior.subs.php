@@ -130,7 +130,7 @@ function getBadBehaviorLogEntries($start, $items_per_page, $sort, $filter = '')
 			'filter' => !empty($filter) ? $filter['value']['sql'] : '',
 		)
 	)->fetch_callback(
-		function ($row) use (&$bb_entries) {
+		function ($row) use (&$bb_entries, $db) {
 			global $scripturl;
 
 			// Turn the key in to something nice to show

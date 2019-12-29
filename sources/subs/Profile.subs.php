@@ -3659,7 +3659,7 @@ function getMemberBoardPermissions($memID, $curGroups, $board = null)
 			'moderator_group' => 3,
 		)
 	)->fetch_callback(
-		function ($row) use (&$board_permission) {
+		function ($row) use (&$board_permission, $board) {
 			global $txt;
 
 			// We don't know about this permission, it doesn't exist :P.

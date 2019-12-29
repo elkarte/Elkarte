@@ -923,7 +923,7 @@ function purgeMembers($type, $groups, $time_limit)
 		WHERE ' . $where,
 		$where_vars
 	)->fetch_callback(
-		function ($row) use (&$members) {
+		function ($row) use (&$members, $groups) {
 			if (!$row['is_mod'] || !in_array(3, $groups))
 			{
 				$members[] = $row['id_member'];

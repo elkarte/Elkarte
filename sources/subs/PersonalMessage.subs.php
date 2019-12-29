@@ -455,7 +455,7 @@ function updatePMMenuCounts($owner)
 			'is_not_deleted' => 0,
 		)
 	)->fetch_callback(
-		function ($row) use ($context, &$total_unread) {
+		function ($row) use ($context, &$total_unread, $owner) {
 			$total_unread += $row['num'];
 
 			if ($owner != User::$info->id)
@@ -678,7 +678,7 @@ function sendpm($recipients, $subject, $message, $store_outbox = true, $from = n
 			'delete_pm' => 1,
 		)
 	)->fetch_callback(
-		function ($row) use (&$deletes) {
+		function ($row) use (&$deletes, $from, $subject, $message) {
 			// Check whether we have to apply anything...
 			$criteria = Util::unserialize($row['criteria']);
 
@@ -1209,7 +1209,7 @@ function pmCount($id_member, $time)
 		)
 	)->fetch_callback(
 		function ($row) use (&$pmCount) {
-			list ($pmCount) = $row;
+			list ($pmCount) = $row['post_count'];
 		}
 	);
 

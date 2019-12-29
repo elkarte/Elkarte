@@ -439,7 +439,7 @@ function scheduledTasks()
 		FROM {db_prefix}scheduled_tasks',
 		array()
 	)->fetch_callback(
-		function ($row) {
+		function ($row, &$known_tasks) {
 			global $txt;
 
 			// Find the next for regularity - don't offset as it's always server time!
@@ -489,7 +489,7 @@ function getTaskLogEntries($start, $items_per_page, $sort)
 		LIMIT ' . $start . ', ' . $items_per_page,
 		array()
 	)->fetch_callback(
-		function ($row) {
+		function ($row) use (&$log_entries) {
 			global $txt;
 
 			$log_entries[] = array(

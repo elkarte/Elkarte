@@ -1062,7 +1062,7 @@ function watchedUsers($start, $items_per_page, $sort)
 	{
 		// First get the latest messages from these users.
 		$latest_posts = array();
-		$request = $db->fetchQuery('
+		$db->fetchQuery('
 			SELECT 
 				m.id_member, MAX(m.id_msg) AS last_post_id
 			FROM {db_prefix}messages AS m' . (User::$info->query_see_board == '1=1' ? '' : '
@@ -1253,6 +1253,8 @@ function groupRequests()
 		array()
 	)->fetch_callback(
 		function ($row) use (&$group_requests, &$i) {
+			global $scripturl;
+
 			$group_requests[] = array(
 				'id' => $row['id_request'],
 				'alternate' => $i % 2,
