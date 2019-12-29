@@ -738,7 +738,7 @@ function template_profile_block_contact()
 						<i class="icon i-website" title="', $txt['website'], '"></i>
 					</dt>
 					<dd>
-						<a href="', $context['member']['website']['url'], '" target="_blank" class="new_win">', $context['member']['website']['title'] == '' ? $context['member']['website']['url'] : $context['member']['website']['title'], '</a>
+						<a href="', $context['member']['website']['url'], '" target="_blank" rel="noopener noreferrer" class="new_win">', $context['member']['website']['title'] == '' ? $context['member']['website']['url'] : $context['member']['website']['title'], '</a>
 					</dd>';
 	}
 
