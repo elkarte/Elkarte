@@ -16,7 +16,7 @@ const DB_SCRIPT_VERSION = '1-1';
 const REQUIRED_PHP_VERSION = '5.3.6';
 
 // String constants
-const SITE_SOFTWARE = 'http://www.elkarte.net';
+const SITE_SOFTWARE = 'https://www.elkarte.net';
 
 function getUpgradeFiles()
 {
