@@ -165,9 +165,9 @@ function getQuickAdminTasks()
 		'https://github.com/elkarte/Elkarte/wiki/packages'
 	);
 	$txt['support_resources_p2'] = sprintf($txt['support_resources_p2'],
-		'http://www.elkarte.net/',
-		'http://www.elkarte.net/redirect/support',
-		'http://www.elkarte.net/redirect/customize_support'
+		'https://www.elkarte.net/',
+		'https://www.elkarte.net/redirect/support',
+		'https://www.elkarte.net/redirect/customize_support'
 	);
 
 	return $available_admin_tasks;
