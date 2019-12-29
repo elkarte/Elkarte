@@ -1231,7 +1231,7 @@ function decreaseLikeCounts($messages)
 	// Count the "likes received" totals for the message posters
 	if (!empty($posters))
 	{
-		$db->fetchQuery( '
+		$db->fetchQuery('
 			SELECT
 				COUNT(id_msg) AS likes, id_poster
 			FROM {db_prefix}message_likes

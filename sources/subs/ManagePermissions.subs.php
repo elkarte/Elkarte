@@ -319,7 +319,7 @@ function setPermissionLevel($level, $group = null, $profile = null)
 		}
 
 		// Get all the groups...
-		$db->fetchQuery( '
+		$db->fetchQuery('
 			SELECT 
 				id_group
 			FROM {db_prefix}membergroups
@@ -330,7 +330,7 @@ function setPermissionLevel($level, $group = null, $profile = null)
 				'newbie_group' => 4,
 			)
 		)->fetch_callback(
-			function ($row) use ($db, $boardLevels, $profile) {
+			function ($row) use ($db, $boardLevels, $profile, $level) {
 				$group = $row['id_group'];
 
 				$boardInserts = array();

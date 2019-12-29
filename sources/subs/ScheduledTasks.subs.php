@@ -579,7 +579,8 @@ function processNextTasks($ts = 0)
 
 		// How long in seconds is the gap?
 		$duration = $row['time_regularity'];
-		switch ($row['time_unit']) {
+		switch ($row['time_unit'])
+		{
 			case 'm':
 				$duration *= 60;
 				break;

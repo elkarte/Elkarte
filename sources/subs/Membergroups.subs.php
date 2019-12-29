@@ -1046,7 +1046,7 @@ function membersInGroups($postGroups, $normalGroups = array(), $include_hidden =
  *     false returns: id_group, group_name, group_type.
  *     true adds to above: description, min_posts, online_color, max_messages, icons, hidden, id_parent.
  * @param bool $assignable = false determine if the group is assignable or not and return that information.
- * @return array|false
+ * @return array
  * @throws \Exception
  * @package Membergroups
  */
@@ -1056,7 +1056,7 @@ function membergroupsById($group_ids, $limit = 1, $detailed = false, $assignable
 
 	if (empty($group_ids))
 	{
-		return false;
+		return [];
 	}
 
 	$group_ids = !is_array($group_ids) ? array($group_ids) : $group_ids;
@@ -2048,7 +2048,7 @@ function accessibleGroups()
 	$db = database();
 
 	$groups = array();
-	$db->fetchQuery( '
+	$db->fetchQuery('
 		SELECT 
 			mg.id_group, mg.group_name, COALESCE(gm.id_member, 0) AS can_moderate, mg.hidden
 		FROM {db_prefix}membergroups AS mg

@@ -736,7 +736,7 @@ function sendpm($recipients, $subject, $message, $store_outbox = true, $from = n
 			'read_permission' => 'pm_read',
 		)
 	)->fetch_callback(
-		function ($row) use (&$disallowed_groups, &$allowed_groups ) {
+		function ($row) use (&$disallowed_groups, &$allowed_groups) {
 			if (empty($row['add_deny']))
 			{
 				$disallowed_groups[] = $row['id_group'];
@@ -1209,7 +1209,7 @@ function pmCount($id_member, $time)
 		)
 	)->fetch_callback(
 		function ($row) use (&$pmCount) {
-			list ($pmCount) = $row['post_count'];
+			$pmCount = $row['post_count'];
 		}
 	);
 
