@@ -212,7 +212,10 @@ class Server extends \ArrayObject
 	 */
 	public function supportsSSL()
 	{
-		return isset($this->HTTPS) &&
-			($this->HTTPS === 'on' || $this->HTTPS === 1 || $this->SERVER_PORT === 443);
+		return
+			(isset($this->HTTPS) && ($this->HTTPS === 'on' || $this->HTTPS == 1))
+			|| (isset($this->REQUEST_SCHEME) && $this->REQUEST_SCHEME === 'https')
+			|| (isset($this->SERVER_PORT) && $this->SERVER_PORT == 443)
+			|| (isset($this->HTTP_X_FORWARDED_PROTO) && $this->HTTP_X_FORWARDED_PROTO === 'https');
 	}
 }
