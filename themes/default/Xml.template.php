@@ -553,7 +553,7 @@ function template_feedatom()
 
 		<updated>', gmstrftime('%Y-%m-%dT%H:%M:%SZ'), '</updated>
 		<subtitle><![CDATA[', strip_tags(un_htmlspecialchars($txt['xml_rss_desc'])), ']]></subtitle>
-		<generator uri="http://www.elkarte.net" version="', strtr(FORUM_VERSION, array('ElkArte' => '')), '">ElkArte</generator>
+		<generator uri="https://www.elkarte.net" version="', strtr(FORUM_VERSION, array('ElkArte' => '')), '">ElkArte</generator>
 		<author>
 			<name>', strip_tags(un_htmlspecialchars($context['forum_name'])), '</name>
 		</author>';

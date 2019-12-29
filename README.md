@@ -1,4 +1,4 @@
-[![ElkArte](https://raw.github.com/elkarte/Elkarte/master/themes/default/images/logo.png "ElkArte")](http://www.elkarte.net "ElkArte")
+[![ElkArte](https://raw.github.com/elkarte/Elkarte/master/themes/default/images/logo.png "ElkArte")](https://www.elkarte.net "ElkArte")
 
 This is the **ElkArte** repository.
 
@@ -8,7 +8,7 @@ Initially based on Simple Machines Forum (SMF), it began as an overhaul of the c
 
 Enjoy the benefits of enthusiasts from around the world who spend time making ElkArte what it is today.
 
-Test ElkArte yourself by [visiting ElkArte.net](http://www.elkarte.net).
+Test ElkArte yourself by [visiting ElkArte.net](https://www.elkarte.net).
 
 Contributions to documentation are licensed under [CC-by-SA 3](http://creativecommons.org/licenses/by-sa/3.0). Third party libraries or sets of images, are under their own licenses.
 
@@ -65,11 +65,11 @@ Simply install ElkArte using our Quick Installer (as outlined above), then utili
 
 ElkArte was built to be extensible, so you can add new features or give it your own custom look, with ease. With 100's of plugin hooks, adding new features can be done without any involved source edits.
 
-Browse the collections of Themes and Addons created by our [awesome community](http://www.elkarte.net/community)
+Browse the collections of Themes and Addons created by our [awesome community](https://www.elkarte.net/community)
 
 ## Contributing:
 
-* Troubleshoot issues you run into on the [ElkArte community forum](http://www.elkarte.net) so others can help & the developers can reference it later.
+* Troubleshoot issues you run into on the [ElkArte community forum](https://www.elkarte.net) so others can help & the developers can reference it later.
 * Have a new feature idea or improvement suggestion? Use the forum to discuss it.
 * File detailed issues on GitHub (what you did, and what the actual vs expected outcomes are).
 * Read the [Developer's Certificate of Origin](https://github.com/elkarte/Elkarte/blob/master/DCO.txt) if you want to send us code. It means you acknowledge that you can and do license your submissions under the license of the project.
@@ -84,4 +84,4 @@ ElkArte utilizes inline docblocks to provide descriptions for all of its classes
 
 Join us on IRC, on #elkarte channel on freenode.
 
-Project site: [www.elkarte.net](http://www.elkarte.net)
+Project site: [www.elkarte.net](https://www.elkarte.net)
