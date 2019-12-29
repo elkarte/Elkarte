@@ -78,7 +78,7 @@ Browse the collections of Themes and Addons created by our [awesome community](h
 Please see our [How to contribute](https://github.com/elkarte/Elkarte/blob/master/CONTRIBUTING.md) section for more information on how to contribute to the ElkArte Project.
 
 ## Class / Method / Function documentation
-ElkArte utilizes inline docblocks to provide descriptions for all of its classes, methods and functions.  This [API Documentation](http://elkarte.github.io/Doc/) is available online for viewing and searching.
+ElkArte utilizes inline docblocks to provide descriptions for all of its classes, methods and functions.  This [API Documentation](https://elkarte.github.io/Doc/) is available online for viewing and searching.
 
 ## Site and IRC
 
