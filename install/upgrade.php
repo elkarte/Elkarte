@@ -463,7 +463,8 @@ function loadEssentialData()
 {
 	global $db_character_set, $db_type, $modSettings;
 
-	error_reporting(E_ALL);
+	// Report all errors except for depreciation notices so users don't complain.
+	error_reporting(E_ALL & ~E_DEPRECATED);
 
 	if (!defined('ELK'))
 	{
@@ -571,6 +572,10 @@ function initialize_inputs()
 
 		$temp = substr($temp, 1);
 	}
+
+	header('X-Frame-Options: SAMEORIGIN');
+	header('X-XSS-Protection: 1');
+	header('X-Content-Type-Options: nosniff');
 
 	// Force a step, defaulting to 0.
 	$_GET['step'] = !isset($_GET['step']) ? 0 : (int) $_GET['step'];
