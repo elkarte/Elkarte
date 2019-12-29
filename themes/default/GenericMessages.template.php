@@ -148,7 +148,7 @@ function template_build_poster_div($message, $ignoring = false)
 			if ($message['member']['website']['url'] != '' && !isset($context['disabled_fields']['website']))
 			{
 				$poster_div .= '
-											<li class="cf_icon"><a href="' . $message['member']['website']['url'] . '" title="' . $message['member']['website']['title'] . '" target="_blank" class="new_win">' . ($settings['use_image_buttons'] ? '<i class="icon i-website" title="' . $message['member']['website']['title'] . '"></i>' : $txt['www']) . '</a></li>';
+											<li class="cf_icon"><a href="' . $message['member']['website']['url'] . '" title="' . $message['member']['website']['title'] . '" target="_blank" rel="noopener noreferrer" class="new_win">' . ($settings['use_image_buttons'] ? '<i class="icon i-website" title="' . $message['member']['website']['title'] . '"></i>' : $txt['www']) . '</a></li>';
 			}
 
 			// Don't show the email address if they want it hidden.
