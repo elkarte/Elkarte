@@ -218,4 +218,82 @@ class Server extends \ArrayObject
 			|| (isset($this->SERVER_PORT) && $this->SERVER_PORT == 443)
 			|| (isset($this->HTTP_X_FORWARDED_PROTO) && $this->HTTP_X_FORWARDED_PROTO === 'https');
 	}
+
+	/**
+	 * Try to determine a FQDN for the server
+	 *
+	 * Many SMTP servers *require* a fully qualified domain name in the
+	 * HELO/EHLO command.  This function tries to determine the fully qualified domain name
+	 * from the OS which often just returns the current host name, like bob, rather than a FQDN.
+	 *
+	 * From the rfc:
+	 * The SMTP client MUST, if possible, ensure that the domain parameter to the EHLO
+	 * command is a valid principal host name (not a CNAME or MX name) for its host. If
+	 * this is not possible (e.g., when the client's address is dynamically assigned and
+	 * the client does not have an obvious name), an address literal SHOULD be substituted
+	 * for the domain name and supplemental information provided that will assist in
+	 * identifying the client.
+	 *
+	 * @param string $fallback the fallback to use when we fail
+	 * @return string a FQDN
+	 */
+	public function getFQDN($fallback = '[127.0.0.1]')
+	{
+		// Try gethostname
+		if (function_exists('gethostname') && $this->_isValidFQDN(gethostname()))
+		{
+			return gethostname();
+		}
+
+		// Failing, try php_uname
+		if (function_exists('php_uname') && $this->_isValidFQDN(php_uname('n')))
+		{
+			return php_uname('n');
+		}
+
+		// This is likely a sitename vs host
+		if (!empty($_SERVER['SERVER_NAME']) && $this->_isValidFQDN($_SERVER['SERVER_NAME']))
+		{
+			return $_SERVER['SERVER_NAME'];
+		}
+
+		// Try a reverse IP lookup on the server addr
+		if (!empty($_SERVER['SERVER_ADDR']) && $this->_isValidFQDN((host_from_ip($_SERVER['SERVER_ADDR']))))
+		{
+			return host_from_ip($_SERVER['SERVER_ADDR']);
+		}
+
+		// Literal it is, but some SMTP servers may not accept this
+		if (!empty($_SERVER['SERVER_ADDR']) && $fallback === '[127.0.0.1]')
+		{
+			// Set the address literal prefix
+			$prefix = strpos($_SERVER['SERVER_ADDR'], ':' !== false) ? 'IPv6:' : '';
+
+			return  '[' . $prefix . $_SERVER['SERVER_ADDR'] . ']';
+		}
+
+		return $fallback;
+	}
+
+	/**
+	 * Checks if this is a valid FQDN first by basic syntax and then if it has domain records
+	 *
+	 * @param string $hostname
+	 * @return bool
+	 */
+	private function _isValidFQDN($hostname)
+	{
+		if (empty($hostname) || strpos($hostname, '.') === false)
+		{
+			return false;
+		}
+
+		if (preg_match('~^(?!\-)(?:[a-zA-Z\d\-]{0,62}[a-zA-Z\d]\.){1,126}(?!\d+)[a-zA-Z\d]{1,63}$~', $hostname) === 1)
+		{
+			// Check for ANY dns records for this name for simplicity although we really want A / AAAA
+			return checkdnsrr($hostname, 'ANY');
+		}
+
+		return false;
+	}
 }
