@@ -601,7 +601,8 @@ function smtp_mail($mail_to_array, $subject, $message, $headers, $priority, $mes
 	if (!server_parse(null, $socket, '220'))
 		return false;
 
-	$client = detectServer()->getFQDN($modSettings['smtp_host']);
+	// This should be set in the ACP
+	$client = empty($modSettings['smtp_client']) ? detectServer()->getFQDN($modSettings['smtp_host']) : $modSettings['smtp_client'];
 
 	if ($modSettings['mail_type'] == 1 && $modSettings['smtp_username'] != '' && $modSettings['smtp_password'] != '')
 	{
