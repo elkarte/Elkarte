@@ -669,18 +669,22 @@ function smtp_mail($mail_to_array, $subject, $message, $headers, $priority, $mes
 	}
 
 	// This should be set in the ACP
-	$client = empty($modSettings['smtp_client']) ? detectServer()->getFQDN($modSettings['smtp_host']) : $modSettings['smtp_client'];
+	if (empty($modSettings['smtp_client']))
+	{
+		$modSettings['smtp_client'] = detectServer()->getFQDN(empty($modSettings['smtp_host']) ? '' : $modSettings['smtp_host']);
+		updateSettings(array('smtp_client' => $modSettings['smtp_client']));
+	}
 
 	if ($modSettings['mail_type'] == 1 && $modSettings['smtp_username'] != '' && $modSettings['smtp_password'] != '')
 	{
 		// EHLO could be understood to mean encrypted hello...
-		if (server_parse('EHLO ' . $client, $socket, null) == '250')
+		if (server_parse('EHLO ' . $modSettings['smtp_client'], $socket, null) == '250')
 		{
 			if (!empty($modSettings['smtp_starttls']))
 			{
 				server_parse('STARTTLS', $socket, null);
 				stream_socket_enable_crypto($socket, true, STREAM_CRYPTO_METHOD_TLS_CLIENT);
-				server_parse('EHLO ' . $client, $socket, null);
+				server_parse('EHLO ' . $modSettings['smtp_client'], $socket, null);
 			}
 
 			if (!server_parse('AUTH LOGIN', $socket, '334'))
@@ -698,7 +702,7 @@ function smtp_mail($mail_to_array, $subject, $message, $headers, $priority, $mes
 				return false;
 			}
 		}
-		elseif (!server_parse('HELO ' . $client, $socket, '250'))
+		elseif (!server_parse('HELO ' . $modSettings['smtp_client'], $socket, '250'))
 		{
 			return false;
 		}
@@ -706,7 +710,7 @@ function smtp_mail($mail_to_array, $subject, $message, $headers, $priority, $mes
 	else
 	{
 		// Just say "helo".
-		if (!server_parse('HELO ' . $client, $socket, '250'))
+		if (!server_parse('HELO ' . $modSettings['smtp_client'], $socket, '250'))
 		{
 			return false;
 		}
