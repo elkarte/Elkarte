@@ -668,18 +668,18 @@ function smtp_mail($mail_to_array, $subject, $message, $headers, $priority, $mes
 		return false;
 	}
 
+	$client = detectServer()->getFQDN($modSettings['smtp_host']);
+
 	if ($modSettings['mail_type'] == 1 && $modSettings['smtp_username'] != '' && $modSettings['smtp_password'] != '')
 	{
-		// @todo These should send the CURRENT server's name, not the mail server's!
-
 		// EHLO could be understood to mean encrypted hello...
-		if (server_parse('EHLO ' . $modSettings['smtp_host'], $socket, null) == '250')
+		if (server_parse('EHLO ' . $client, $socket, null) == '250')
 		{
 			if (!empty($modSettings['smtp_starttls']))
 			{
 				server_parse('STARTTLS', $socket, null);
 				stream_socket_enable_crypto($socket, true, STREAM_CRYPTO_METHOD_TLS_CLIENT);
-				server_parse('EHLO ' . $modSettings['smtp_host'], $socket, null);
+				server_parse('EHLO ' . $client, $socket, null);
 			}
 
 			if (!server_parse('AUTH LOGIN', $socket, '334'))
@@ -697,15 +697,18 @@ function smtp_mail($mail_to_array, $subject, $message, $headers, $priority, $mes
 				return false;
 			}
 		}
-		elseif (!server_parse('HELO ' . $modSettings['smtp_host'], $socket, '250'))
+		elseif (!server_parse('HELO ' . $client, $socket, '250'))
 		{
 			return false;
 		}
 	}
-	elseif (!server_parse('HELO ' . $modSettings['smtp_host'], $socket, '250'))
+	else
 	{
 		// Just say "helo".
-		return false;
+		if (!server_parse('HELO ' . $client, $socket, '250'))
+		{
+			return false;
+		}
 	}
 
 	// Fix the message for any lines beginning with a period! (the first is ignored, you see.)
