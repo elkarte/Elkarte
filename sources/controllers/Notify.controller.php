@@ -427,6 +427,7 @@ class Notify_Controller extends Action_Controller
 				case 'topic':
 					$topic = $extra;
 					$this->_toggle_topic_notification();
+					break;
 				case 'board':
 					$board = $extra;
 					$this->_toggle_board_notification();
