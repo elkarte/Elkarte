@@ -108,7 +108,6 @@ class SiteDispatcher
 		'moderate' => array('\\ElkArte\\Controller\\ModerationCenter', 'action_index'),
 		'movetopic' => array('\\ElkArte\\Controller\\MoveTopic', 'action_movetopic'),
 		'movetopic2' => array('\\ElkArte\\Controller\\MoveTopic', 'action_movetopic2'),
-		'notify' => array('\\ElkArte\\Controller\\Notify', 'action_notify'),
 		'notifyboard' => array('\\ElkArte\\Controller\\Notify', 'action_notifyboard'),
 		'openidreturn' => array('\\ElkArte\\Controller\\OpenID', 'action_openidreturn'),
 		'xrds' => array('\\ElkArte\\Controller\\OpenID', 'action_xrds'),
