@@ -1175,7 +1175,7 @@ function getNotifierToken($memID, $memEmail, $memSalt, $area, $extra)
 
 	// Generate a 22 digit random code suitable for Blowfish crypt.
 	$tokenizer = new \Token_Hash();
-	$unsubscribe_salt = '$2a$10$' . $tokenizer->generate_hash(22);
+	$blowfish_salt = '$2a$10$' . $tokenizer->generate_hash(22);
 	$now = time();
 
 	// Ideally we would just have a larger -per user- password_salt
@@ -1187,7 +1187,7 @@ function getNotifierToken($memID, $memEmail, $memSalt, $area, $extra)
 	}
 
 	// Add member salt + site salt to the otherwise deterministic data
-	$hash = crypt($area . $extra . $now . $memEmail . $memSalt . $modSettings['unsubscribe_site_salt'], $unsubscribe_salt);
+	$hash = crypt($area . $extra . $now . $memEmail . $memSalt . $modSettings['unsubscribe_site_salt'], $blowfish_salt);
 
 	return urlencode(implode('_',
 		array(
@@ -1203,8 +1203,7 @@ function getNotifierToken($memID, $memEmail, $memSalt, $area, $extra)
 /**
  * Creates a hash code using the notification details and our secret key
  *
- * - If no salt (secret key) has been set, creates a random one and saves it
- * in modSettings for future use
+ * - If no site salt (secret key) has been set, simply fails
  *
  * @param string $memEmail member email address
  * @param string $memSalt member salt

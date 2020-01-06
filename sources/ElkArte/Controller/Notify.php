@@ -78,7 +78,8 @@ class Notify extends AbstractController
 		// Api ajax call?
 		if (isset($this->_req->query->api))
 		{
-			return $this->action_notify_api();
+			$this->action_notify_api();
+			return true;
 		}
 
 		// Make sure they aren't a guest or something - guests can't really receive notifications!
@@ -434,36 +435,54 @@ class Notify extends AbstractController
 		$valid = $this->_validateUnsubscribeToken($member, $area, $extra);
 		if ($valid)
 		{
-			global $user_info, $board, $topic;
+			$this->_unsubscribeToggle($member, $area, $extra);
+			$this->_prepareTemplateMessage( $area, $extra, $member['email_address']);
 
-			// Look away while we stuff the old ballet box, power to the people!
-			$user_info['id'] = $member['id_member'];
-			$this->_req->query->sa = 'off';
-
-			switch ($area)
-			{
-				case 'topic':
-					$topic = $extra;
-					$this->_toggle_topic_notification();
-					break;
-				case 'board':
-					$board = $extra;
-					$this->_toggle_board_notification();
-					break;
-				case 'buddy':
-				case 'likemsg':
-				case 'mentionmem':
-				case 'quotedmem':
-				case 'rlikemsg':
-					$this->_setUserNotificationArea($member['id_member'], $area, 1);
-					break;
-			}
+			return true;
 		}
 
-		$this->_prepareTemplateMessage($valid ? $area : 'default', $extra, isset($member['email_address']) ? $member['email_address'] : '');
+		// A default msg that we did something and maybe take a chill?
+		$this->_prepareTemplateMessage('default', '', '');
 
-		// Maybe take a chill? Not the proper message it should not happen either
-		return $valid ? true : spamProtection('remind');
+		// Not the proper message it should not happen either
+		spamProtection('remind');
+
+		return true;
+	}
+
+	/**
+	 * Does the actual area unsubscribe toggle
+	 *
+	 * @param mixed[] $member Member info from getBasicMemberData
+	 * @param string $area area they want to be removed from
+	 * @param string $extra parameters needed for some areas
+	 */
+	private function _unsubscribeToggle($member, $area, $extra)
+	{
+		global $user_info, $board, $topic;
+
+		// Look away while we stuff the old ballet box, power to the people!
+		$user_info['id'] = (int) $member['id_member'];
+		$this->_req->query->sa = 'off';
+
+		switch ($area)
+		{
+			case 'topic':
+				$topic = $extra;
+				$this->_toggle_topic_notification();
+				break;
+			case 'board':
+				$board = $extra;
+				$this->_toggle_board_notification();
+				break;
+			case 'buddy':
+			case 'likemsg':
+			case 'mentionmem':
+			case 'quotedmem':
+			case 'rlikemsg':
+				$this->_setUserNotificationArea($member['id_member'], $area, 1);
+				break;
+		}
 	}
 
 	/**
@@ -585,12 +604,12 @@ class Notify extends AbstractController
 		{
 			case 'topic':
 				require_once(SUBSDIR . '/Topic.subs.php');
-				$subject = getSubject($extra);
+				$subject = getSubject((int) $extra);
 				$context['unsubscribe_message'] = sprintf($txt['notify_topic_unsubscribed'], $subject, $email);
 				break;
 			case 'board':
 				require_once(SUBSDIR . '/Boards.subs.php');
-				$name = boardInfo($extra);
+				$name = boardInfo((int) $extra);
 				$context['unsubscribe_message'] = sprintf($txt['notify_board_unsubscribed'], $name['name'], $email);
 				break;
 			case 'buddy':
