@@ -2578,7 +2578,7 @@ class PersonalMessage extends AbstractController
 					'timestamp' => forum_time(true, $row['msgtime']),
 					'recipients' => &$recipients[$row['id_pm']],
 					'labels' => &$context['message_labels'][$row['id_pm']],
-					'fully_labeled' => count($context['message_labels'][$row['id_pm']]) === count($context['labels']),
+					'fully_labeled' => (!empty($context['message_labels'][$row['id_pm']]) ? count($context['message_labels'][$row['id_pm']]) : 0) == count($context['labels']),
 					'is_replied_to' => &$context['message_replied'][$row['id_pm']],
 					'href' => $href,
 					'link' => '<a href="' . $href . '">' . $subject_highlighted . '</a>',

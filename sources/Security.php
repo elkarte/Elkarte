@@ -1151,7 +1151,7 @@ function allowedTo($permission, $boards = null)
 	}
 
 	// You're never allowed to do something if your data hasn't been loaded yet!
-	if (empty(User::$info))
+	if (empty(User::$info) || !isset(User::info['permissions']))
 	{
 		return false;
 	}
