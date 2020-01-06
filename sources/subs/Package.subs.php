@@ -2417,7 +2417,7 @@ function package_crypt($pass)
 		$salt .= session_id();
 
 	for ($i = 0; $i < $n; $i++)
-		$pass{$i} = chr(ord($pass{$i}) ^ (ord($salt{$i}) - 32));
+		$pass[$i] = chr(ord($pass[$i]) ^ (ord($salt[$i]) - 32));
 
 	return $pass;
 }
