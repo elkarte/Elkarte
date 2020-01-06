@@ -11,7 +11,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.1
+ * @version 1.1.7
  *
  *
  */
@@ -193,7 +193,8 @@ class News_Controller extends Action_Controller
 		// Easy adding of sub actions
 		call_integration_hook('integrate_xmlfeeds', array(&$subActions));
 
-		$subAction = isset($this->_req->query->sa) && isset($subActions[$this->_req->query->sa]) ? $this->_req->query->sa : 'recent';
+		$subAction = $this->_req->getQuery('sa', 'strtolower', 'recent');
+		$subAction = isset($subActions[$subAction]) ? $subAction : 'recent';
 
 		// We only want some information, not all of it.
 		$cachekey = array($xml_format, $this->_req->query->action, $this->_limit, $subAction);
@@ -553,7 +554,7 @@ class News_Controller extends Action_Controller
 	 */
 	public function action_xmlprofile($xml_format)
 	{
-		global $scripturl, $memberContext, $user_profile, $modSettings, $user_info;
+		global $scripturl, $memberContext, $user_profile, $modSettings, $user_info, $language;
 
 		// You must input a valid user....
 		if (empty($this->_req->query->u) || loadMemberData((int) $this->_req->query->u) === false)
@@ -615,7 +616,7 @@ class News_Controller extends Action_Controller
 				'link' => $scripturl . '?action=profile;u=' . $profile['id'],
 				'posts' => $profile['posts'],
 				'post-group' => cdata_parse($profile['post_group']),
-				'language' => cdata_parse($profile['language']),
+				'language' => cdata_parse(!empty($profile['language']) ? $profile['language'] : Util::ucwords(strtr($language, array('_' => ' ', '-utf8' => '')))),
 				'last-login' => gmdate('D, d M Y H:i:s \G\M\T', $user_profile[$profile['id']]['last_login']),
 				'registered' => gmdate('D, d M Y H:i:s \G\M\T', $user_profile[$profile['id']]['date_registered'])
 			);
@@ -737,7 +738,7 @@ function cdata_parse($data, $ns = '')
 	{
 		$positions = array(
 			Util::strpos($data, '&', $pos),
-			Util::strpos($data, ']', $pos),
+			Util::strpos($data, ']]>', $pos),
 		);
 
 		if ($ns != '')
@@ -771,10 +772,10 @@ function cdata_parse($data, $ns = '')
 
 			$pos = $pos2 + 1;
 		}
-		elseif (Util::substr($data, $pos, 1) === ']')
+		elseif (Util::substr($data, $pos, 3) == ']]>')
 		{
-			$cdata .= ']]>&#093;<![CDATA[';
-			$pos++;
+			$cdata .= ']]]]><![CDATA[>';
+			$pos = $pos + 3;
 		}
 		elseif (Util::substr($data, $pos, 1) === '&')
 		{
