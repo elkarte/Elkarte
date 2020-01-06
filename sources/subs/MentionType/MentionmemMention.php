@@ -7,7 +7,7 @@
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
- * @version 1.1.4
+ * @version 1.1.7
  *
  */
 
@@ -169,7 +169,7 @@ class Mentionmem_Mention extends Mention_BoardAccess_Abstract
 				'mentionmem',
 				$msgOptions['id'],
 				$posterOptions['id'],
-				array('id_members' => $this->_actually_mentioned, 'notifier_data' => $posterOptions, 'status' => $becomesApproved
+				array('id_members' => $this->_actually_mentioned, 'notifier_data' => $posterOptions, 'subject' => $msgOptions['subject'], 'status' => $becomesApproved
 					? 'new'
 					: 'unapproved')
 			));
@@ -202,6 +202,7 @@ class Mentionmem_Mention extends Mention_BoardAccess_Abstract
 
 		$replacements = array(
 			'ACTIONNAME' => $this->_task['source_data']['notifier_data']['name'],
+			'SUBJECT' => $this->_task['source_data']['subject'],
 			'MSGLINK' => replaceBasicActionUrl('{script_url}?msg=' . $this->_task->id_target),
 		);
 
