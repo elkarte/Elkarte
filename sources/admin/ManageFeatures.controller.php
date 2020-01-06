@@ -11,7 +11,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.1.4
+ * @version 1.1.7
  *
  */
 
@@ -1413,22 +1413,30 @@ class ManageFeatures_Controller extends Action_Controller
 		);
 
 		$notification_methods = Notifications::instance()->getNotifiers();
-		$notification_types = getNotificationTypes();
+		list($notification_types, $frequency) = getNotificationTypes();
 		$current_settings = unserialize($modSettings['notification_methods']);
 
 		foreach ($notification_types as $title)
 		{
 			$config_vars[] = array('title', 'setting_' . $title);
 
-			foreach ($notification_methods as $method)
+			foreach ($notification_methods as $key => $method)
 			{
-				if ($method === 'notification')
-					$text_label = $txt['setting_notify_enable_this'];
-				else
-					$text_label = $txt['notify_' . $method];
+				// If the method is available in this area, show the option
+				if (in_array($method, $frequency[$title]))
+				{
+					if ($method === 'notification')
+					{
+						$text_label = $txt['setting_notify_enable_this'];
+					}
+					else
+					{
+						$text_label = $txt['notify_' . $method];
+					}
 
-				$config_vars[] = array('check', 'notifications[' . $title . '][' . $method . ']', 'text_label' => $text_label);
-				$modSettings['notifications[' . $title . '][' . $method . ']'] = !empty($current_settings[$title][$method]);
+					$config_vars[] = array('check', 'notifications[' . $title . '][' . $method . ']', 'text_label' => $text_label);
+					$modSettings['notifications[' . $title . '][' . $method . ']'] = !empty($current_settings[$title][$method]);
+				}
 			}
 		}
 

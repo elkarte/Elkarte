@@ -7,7 +7,7 @@
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
- * @version 1.1.4
+ * @version 1.1.7
  *
  */
 
@@ -26,6 +26,13 @@ abstract class Mention_Message_Abstract implements Mention_Type_Interface
 	 * @var string
 	 */
 	protected static $_type = '';
+
+	/**
+	 * Which frequencies are supported by the mention type
+	 *
+	 * @var array
+	 */
+	protected static $_frequency = ['notification', 'email', 'email_daily', 'email_weekly'];
 
 	/**
 	 * The database object
@@ -67,6 +74,14 @@ abstract class Mention_Message_Abstract implements Mention_Type_Interface
 	public static function getType()
 	{
 		return static::$_type;
+	}
+
+	/**
+	 * {@inheritdoc }
+	 */
+	public static function getSupportedFrequency()
+	{
+		return static::$_frequency;
 	}
 
 	/**
