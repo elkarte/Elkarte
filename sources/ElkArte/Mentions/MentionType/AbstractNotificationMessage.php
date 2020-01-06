@@ -196,7 +196,7 @@ abstract class AbstractNotificationMessage implements NotificationInterface
 			{
 				$replacements['REALNAME'] = $members_data[$member]['real_name'];
 				$replacements['UNSUBSCRIBELINK'] = replaceBasicActionUrl('{script_url}?action=notify;sa=unsubscribe;token=' .
-					getNotifierToken($member, $members_data[$member]['email_address'], $members_data[$member]['password_salt'], $task->notification_type . '_' . $task->id_target));
+					getNotifierToken($member, $members_data[$member]['email_address'], $members_data[$member]['password_salt'], $task->notification_type, $task->id_target));
 				$langstrings = $this->_loadStringsByTemplate($template, $members, $members_data, $lang_files, $replacements);
 
 				$return[] = array(

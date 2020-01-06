@@ -75,6 +75,12 @@ class Notify extends AbstractController
 	{
 		global $topic, $scripturl, $txt, $context;
 
+		// Api ajax call?
+		if (isset($this->_req->query->api))
+		{
+			return $this->action_notify_api();
+		}
+
 		// Make sure they aren't a guest or something - guests can't really receive notifications!
 		is_not_guest();
 		isAllowedTo('mark_any_notify');
@@ -425,7 +431,8 @@ class Notify extends AbstractController
 	public function action_unsubscribe()
 	{
 		// Looks like we need to unsubscribe someone
-		if ($this->_validateUnsubscribeToken($member, $area, $extra))
+		$valid = $this->_validateUnsubscribeToken($member, $area, $extra);
+		if ($valid)
 		{
 			global $user_info, $board, $topic;
 
@@ -451,13 +458,23 @@ class Notify extends AbstractController
 					$this->_setUserNotificationArea($member['id_member'], $area, 1);
 					break;
 			}
-
-			die('made it');
 		}
+
+		$this->_prepareTemplateMessage($valid ? $area : 'default', $extra, isset($member['email_address']) ? $member['email_address'] : '');
+
+		// Maybe take a chill? Not the proper message it should not happen either
+		return $valid ? true : spamProtection('remind');
 	}
 
 	/**
 	 * Validates a supplied token and extracts the needed bits
+	 *
+	 * What it does:
+	 *  - Checks token conforms to a known pattern
+	 *  - Checks token is for a known notification type
+	 *  - Checks the age of the token
+	 *  - Finds the member claimed in the token
+	 *  - Runs crypt on member data to validate it matches the supplied hash
 	 *
 	 * @param mixed[] $member Member info from getBasicMemberData
 	 * @param string $area area they want to be removed from
@@ -501,7 +518,6 @@ class Notify extends AbstractController
 
 		// Validate its this members token
 		require_once(SUBSDIR . '/Notification.subs.php');
-
 		return validateNotifierToken(
 			$member['email_address'],
 			$member['password_salt'],
@@ -552,5 +568,46 @@ class Notify extends AbstractController
 		}
 
 		saveUserNotificationsPreferences($memID, $to_save);
+	}
+
+	/**
+	 * Sets the unsubscribe string for template use
+	 *
+	 * @param string $area
+	 * @param string $extra
+	 * @throws \Elk_Exception
+	 */
+	private function _prepareTemplateMessage($area, $extra, $email)
+	{
+		global $txt, $context;
+
+		switch ($area)
+		{
+			case 'topic':
+				require_once(SUBSDIR . '/Topic.subs.php');
+				$subject = getSubject($extra);
+				$context['unsubscribe_message'] = sprintf($txt['notify_topic_unsubscribed'], $subject, $email);
+				break;
+			case 'board':
+				require_once(SUBSDIR . '/Boards.subs.php');
+				$name = boardInfo($extra);
+				$context['unsubscribe_message'] = sprintf($txt['notify_board_unsubscribed'], $name['name'], $email);
+				break;
+			case 'buddy':
+			case 'likemsg':
+			case 'mentionmem':
+			case 'quotedmem':
+			case 'rlikemsg':
+				loadLanguage('Mentions');
+				$context['unsubscribe_message'] = sprintf($txt['notify_mention_unsubscribed'], $txt['mentions_type_' . $area], $email);
+				break;
+			default:
+				$context['unsubscribe_message'] = $txt['notify_default_unsubscribed'];
+				break;
+		}
+
+		loadTemplate('Notify');
+		$context['page_title'] = $txt['notifications'];
+		$context['sub_template'] = 'notify_unsubscribe';
 	}
 }

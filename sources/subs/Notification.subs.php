@@ -222,7 +222,7 @@ function sendNotifications($topics, $type, $exclude = array(), $members_only = a
 					'TOPICLINKNEW' => $scripturl . '?topic=' . $id . '.new;topicseen#new',
 					'TOPICLINK' => $scripturl . '?topic=' . $id . '.msg' . $data['last_id'] . '#msg' . $data['last_id'],
 					'UNSUBSCRIBELINK' => replaceBasicActionUrl('{script_url}?action=notify;sa=unsubscribe;token=' .
-						getNotifierToken($row['id_member'], $row['email_address'], $row['password_salt'], 'board_' . $data['board'])),
+						getNotifierToken($row['id_member'], $row['email_address'], $row['password_salt'], 'board', $data['board'])),
 					'SIGNATURE' => $data['signature'],
 					'BOARDNAME' => $data['board_name'],
 					'SUBSCRIPTION' => $txt['board'],
@@ -352,7 +352,7 @@ function sendNotifications($topics, $type, $exclude = array(), $members_only = a
 			'TOPICLINKNEW' => $scripturl . '?topic=' . $row['id_topic'] . '.new;topicseen#new',
 			'TOPICLINK' => $scripturl . '?topic=' . $row['id_topic'] . '.msg' . $data['last_id'] . '#msg' . $data['last_id'],
 			'UNSUBSCRIBELINK' => replaceBasicActionUrl('{script_url}?action=notify;sa=unsubscribe;token=' .
-				getNotifierToken($row['id_member'], $row['email_address'], $row['password_salt'], 'topic_' . $row['id_topic'])),
+				getNotifierToken($row['id_member'], $row['email_address'], $row['password_salt'], 'topic', $row['id_topic'])),
 			'SIGNATURE' => $topicData[$row['id_topic']]['signature'],
 			'BOARDNAME' => $row['name'],
 			'SUBSCRIPTION' => $txt['topic'],
@@ -577,7 +577,7 @@ function sendBoardNotifications(&$topicData)
 				'TOPICLINKNEW' => $scripturl . '?topic=' . $topicData[$key]['topic'] . '.new#new',
 				'MESSAGE' => $send_body ? $topicData[$key]['body'] : '',
 				'UNSUBSCRIBELINK' => replaceBasicActionUrl('{script_url}?action=notify;sa=unsubscribe;token=' .
-					getNotifierToken($rowmember['id_member'], $rowmember['email_address'], $rowmember['password_salt'], 'board_' . $topicData[$key]['board'])),
+					getNotifierToken($rowmember['id_member'], $rowmember['email_address'], $rowmember['password_salt'], 'board', $topicData[$key]['board'])),
 				'SIGNATURE' => !empty($topicData[$key]['signature']) ? $topicData[$key]['signature'] : '',
 				'BOARDNAME' => $board_names[$topicData[$key]['board']]['name'],
 			);
@@ -732,7 +732,7 @@ function sendApprovalNotifications(&$topicData)
 		$replacements = array(
 			'TOPICLINK' => $scripturl . '?topic=' . $row['id_topic'] . '.new;topicseen#new',
 			'UNSUBSCRIBELINK' => replaceBasicActionUrl('{script_url}?action=notify;sa=unsubscribe;token=' .
-				getNotifierToken($row['id_member'], $row['email_address'], $row['password_salt'], 'topic_' . $row['id_topic'])),
+				getNotifierToken($row['id_member'], $row['email_address'], $row['password_salt'], 'topic', $row['id_topic'])),
 		);
 
 		// Now loop through all the messages to send.
@@ -1166,9 +1166,10 @@ function getConfiguredNotificationMethods($type = '*')
  * @param string $memEmail member email address
  * @param string $memSalt member salt
  * @param string $area area to unsubscribe
+ * @param string $extra area specific data such as topic id or liked msg
  * @return string the token for the unsubscribe link
  */
-function getNotifierToken($memID, $memEmail, $memSalt, $area)
+function getNotifierToken($memID, $memEmail, $memSalt, $area, $extra)
 {
 	global $modSettings;
 
@@ -1186,13 +1187,14 @@ function getNotifierToken($memID, $memEmail, $memSalt, $area)
 	}
 
 	// Add member salt + site salt to the otherwise deterministic data
-	$hash = crypt($area . $now . $memEmail . $memSalt . $modSettings['unsubscribe_site_salt'], $unsubscribe_salt);
+	$hash = crypt($area . $extra . $now . $memEmail . $memSalt . $modSettings['unsubscribe_site_salt'], $unsubscribe_salt);
 
 	return urlencode(implode('_',
 		array(
 			$memID,
 			substr($hash, 7),
 			$area,
+			$extra,
 			$now
 		)
 	));
