@@ -786,6 +786,11 @@ $txt['approve_many_members_waiting'] = 'There are <a href="%1$s">%2$d members</a
 $txt['notifyboard_turnon'] = 'Do you want a notification email when someone posts a new topic in this board?';
 $txt['notifyboard_turnoff'] = 'Are you sure you do not want to receive new topic notifications for this board?';
 
+$txt['notify_board_unsubscribed'] = 'The email, %2$s, has been successfully unsubscribed and you will no longer receive notifications from the "%1$s" board.';
+$txt['notify_topic_unsubscribed'] = 'The email, %2$s, has been successfully unsubscribed and you will no longer receive notifications on the "%1$s" topic.';
+$txt['notify_mention_unsubscribed'] = 'The email, %2$s, has been successfully unsubscribed and you will no longer receive "%1$s" notifications.';
+$txt['notify_default_unsubscribed'] = 'Your request has been successfully processed.';
+
 $txt['find_members'] = 'Find Members';
 $txt['find_username'] = 'Name, username, or email address';
 $txt['find_buddies'] = 'Show Buddies Only?';
