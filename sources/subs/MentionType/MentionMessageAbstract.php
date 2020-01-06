@@ -164,9 +164,13 @@ abstract class Mention_Message_Abstract implements Mention_Type_Interface
 		$return = array();
 		if (!empty($template))
 		{
+			require_once(SUBSDIR . '/Notification.subs.php');
+
 			foreach ($members as $member)
 			{
 				$replacements['REALNAME'] = $members_data[$member]['real_name'];
+				$replacements['UNSUBSCRIBELINK'] = replaceBasicActionUrl('{script_url}?action=notify;sa=unsubscribe;token=' .
+					getNotifierToken($member, $members_data[$member]['email_address'], $members_data[$member]['password_salt'], $task->notification_type . '_' . $task->id_target));
 				$langstrings = $this->_loadStringsByTemplate($template, $keys, $members, $members_data, $lang_files, $replacements);
 
 				$return[] = array(
