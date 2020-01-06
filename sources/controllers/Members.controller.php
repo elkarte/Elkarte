@@ -11,7 +11,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.1.6
+ * @version 1.1.7
  *
  */
 
@@ -71,7 +71,7 @@ class Members_Controller extends Action_Controller
 			$user_info['buddies'][] = $user;
 
 			// Do we want a mention for our newly added buddy?
-			if (!empty($modSettings['mentions_enabled']) && !empty($modSettings['mentions_buddy']))
+			if (!empty($modSettings['mentions_enabled']))
 			{
 				$notifier = Notifications::instance();
 				$notifier->add(new Notifications_Task(
