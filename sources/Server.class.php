@@ -11,7 +11,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.1
+ * @version 1.1.7
  *
  */
 
@@ -196,7 +196,10 @@ class Server extends \ArrayObject
 	 */
 	public function supportsSSL()
 	{
-		return isset($this->HTTPS) &&
-			($this->HTTPS === 'on' || $this->HTTPS === 1 || $this->SERVER_PORT === 443);
+		return
+			(isset($this->HTTPS) && ($this->HTTPS === 'on' || $this->HTTPS == 1))
+			|| (isset($this->REQUEST_SCHEME) && $this->REQUEST_SCHEME === 'https')
+			|| (isset($this->SERVER_PORT) && $this->SERVER_PORT == 443)
+			|| (isset($this->HTTP_X_FORWARDED_PROTO) && $this->HTTP_X_FORWARDED_PROTO === 'https');
 	}
 }

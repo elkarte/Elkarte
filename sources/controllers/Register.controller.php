@@ -13,7 +13,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.1.6
+ * @version 1.1.7
  *
  */
 
@@ -304,6 +304,10 @@ class Register_Controller extends Action_Controller
 		// If we're using an agreement checkbox, did they check it?
 		if (!empty($modSettings['checkboxAgreement']) && !empty($this->_req->post->checkbox_agreement))
 			$_SESSION['registration_agreed'] = true;
+
+		// Using coppa and the registration checkbox?
+		if (!empty($modSettings['coppaAge']) && !empty($modSettings['checkboxAgreement']) && !empty($this->_req->post->accept_agreement))
+			$_SESSION['skip_coppa'] = true;
 
 		// Well, if you don't agree, you can't register.
 		if (!empty($modSettings['requireAgreement']) && empty($_SESSION['registration_agreed']))

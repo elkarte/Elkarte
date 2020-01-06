@@ -12,7 +12,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.1
+ * @version 1.1.7
  *
  */
 
@@ -306,21 +306,21 @@ final class Hooks
     "description": "' . $name . '",
     "version": "1.0.0",
     "type": "addon",
-    "homepage": "http://www.elkarte.net",
+    "homepage": "https://www.elkarte.net",
     "time": "",
     "license": "",
     "authors": [
         {
             "name": "Unknown",
             "email": "notprovided",
-            "homepage": "http://www.elkarte.net",
+            "homepage": "https://www.elkarte.net",
             "role": "Developer"
         }
     ],
     "support": {
         "email": "",
-        "issues": "http://www.elkarte.net/community",
-        "forum": "http://www.elkarte.net/community",
+        "issues": "https://www.elkarte.net/community",
+        "forum": "https://www.elkarte.net/community",
         "wiki": "",
         "irc": "",
         "source": ""

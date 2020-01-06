@@ -12,7 +12,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.1
+ * @version 1.1.7
  *
  */
 
@@ -628,15 +628,7 @@ class MessagesDelete
 			);
 
 			// Remove the mentions!
-			$db->query('', '
-				DELETE FROM {db_prefix}log_mentions
-				WHERE id_target = {int:id_msg}
-				AND mention_type IN ({array_string:mension_types})',
-				array(
-					'id_msg' => $message,
-					'mension_types' => array('mentionmem', 'likemsg', 'rlikemsg'),
-				)
-			);
+			$this->deleteMessageMentions($message);
 
 			// Remove the message!
 			$db->query('', '
@@ -719,6 +711,57 @@ class MessagesDelete
 			logAction('delete', array('topic' => $row['id_topic'], 'subject' => $row['subject'], 'member' => $row['id_member'], 'board' => $row['id_board']));
 
 		return false;
+	}
+
+	/**
+	 * When a message is removed, we need to remove associated mentions and updated the member
+	 * mention count for anyone was mentioned in that message (like, quote, @, etc)
+	 *
+	 * @param int|int[] $messages
+	 */
+	public function deleteMessageMentions($messages)
+	{
+		$db = database();
+
+		$mentionTypes = array('mentionmem', 'likemsg', 'rlikemsg', 'quotedmem');
+		$messages = is_array($messages) ? $messages : array($messages);
+
+		// Who was mentioned in these messages
+		$request = $db->query('', '
+			SELECT 
+				DISTINCT(id_member) as id_member
+			FROM {db_prefix}log_mentions
+			WHERE id_target IN ({array_int:messages})
+				AND mention_type IN ({array_string:mention_types})',
+			array(
+				'messages' => $messages,
+				'mention_types' => $mentionTypes,
+			)
+		);
+		$changeMe = array();
+		while ($row = $db->fetch_assoc($request))
+		{
+			$changeMe[] = $row['id_member'];
+		}
+		$db->free_result($request);
+
+		// Remove the mentions!
+		$db->query('', '
+			DELETE FROM {db_prefix}log_mentions
+			WHERE id_target IN ({array_int:messages})
+				AND mention_type IN ({array_string:mention_types})',
+			array(
+				'messages' => $messages,
+				'mention_types' => $mentionTypes,
+			)
+		);
+
+		// Update the mention count for this group
+		require_once(SUBSDIR . '/Mentions.subs.php');
+		foreach ($changeMe as $member)
+		{
+			countUserMentions(false, '', $member);
+		}
 	}
 
 	/**
