@@ -282,7 +282,7 @@ class BBCParser
 			}
 
 			// The only special case is 'html', which doesn't need to close things.
-			if ($tag[Codes::ATTR_BLOCK_LEVEL] && $tag[Codes::ATTR_TAG] !== 'html' && !$this->inside_tag[Codes::ATTR_BLOCK_LEVEL])
+			if ($tag[Codes::ATTR_BLOCK_LEVEL] && $tag[Codes::ATTR_TAG] !== 'html' && empty($this->inside_tag[Codes::ATTR_BLOCK_LEVEL]))
 			{
 				$this->closeNonBlockLevel();
 			}

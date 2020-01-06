@@ -1315,7 +1315,7 @@ function text2words($text, $max_chars = 20, $encrypt = false)
 
 				// Create an integer representation
 				for ($i = 0; $i < $max_chars; $i++)
-					$total += $possible_chars[ord($encrypted{$i})] * pow(63, $i);
+					$total += $possible_chars[ord($encrypted[$i])] * pow(63, $i);
 
 				// Return the value
 				$returned_ints[] = $max_chars == 4 ? min($total, 16777215) : $total;
