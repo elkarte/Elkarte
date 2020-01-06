@@ -80,7 +80,7 @@ class Members extends AbstractController
 			$this->user->buddies[] = $user;
 
 			// Do we want a mention for our newly added buddy?
-			if (!empty($modSettings['mentions_enabled']) && !empty($modSettings['mentions_buddy']))
+			if (!empty($modSettings['mentions_enabled']))
 			{
 				$notifier = Notifications::instance();
 				$notifier->add(new NotificationsTask(
