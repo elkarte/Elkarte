@@ -2186,7 +2186,7 @@ function getTopicsPostsAndPoster($topic, $limit, $sort)
 				id_msg
 			FROM {db_prefix}messages
 			WHERE id_topic = {int:current_topic}' . ($postMod ? '' : '
-			AND (approved = {int:is_approved}' . ($user_info['is_guest'] ? '' : ' OR id_member = {int:current_member}') .')') . '
+			AND (approved = {int:is_approved}' . ($user_info['is_guest'] ? '' : ' OR id_member = {int:current_member}') . ')') . '
 			ORDER BY id_msg ' . ($sort ? '' : 'DESC') . ($limit['messages_per_page'] == -1 ? '' : '
 			LIMIT ' . $limit['start'] . ', ' . $limit['offset']) . ') AS o 
 		JOIN {db_prefix}messages as m ON o.id_msg=m.id_msg

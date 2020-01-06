@@ -39,6 +39,7 @@ class TestMessageIndex extends PHPUnit_Framework_TestCase
 			'buddies' => array(),
 			'groups' => array(0 => 1),
 			'ignoreboards' => array(),
+			'mod_cache' => array('gq' => '1=1', 'bq' => '1=1', 'ap' => '1=1'),
 		);
 
 		$settings['page_index_template'] = array(
