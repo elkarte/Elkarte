@@ -39,8 +39,20 @@ class Notify_Controller extends Action_Controller
 	 */
 	public function action_index()
 	{
+		// The number of choices is boggling, ok there are just 2
+		$subActions = array(
+			'notify' => array($this, 'action_notify'),
+			'unsubscribe' => array($this, 'action_unsubscribe'),
+		);
+
+		// We like action, so lets get ready for some
+		$action = new Action('');
+
+		// Get the subAction, or just go to action_notify
+		$subAction = $action->initialize($subActions, 'notify');
+
 		// forward to our respective method.
-		// $this->action_notify();
+		$action->dispatch($subAction);
 	}
 
 	/**
@@ -392,5 +404,141 @@ class Notify_Controller extends Action_Controller
 		global $user_info, $topic;
 
 		setTopicWatch($user_info['id'], $topic, $this->_req->query->sa === 'on');
+	}
+
+	/**
+	 * Accessed via the unsubscribe link provided in site emails. This will then
+	 * unsubscribe the user from a board or a topic (depending on the link) without them
+	 * having to login.
+	 */
+	public function action_unsubscribe()
+	{
+		// Looks like we need to unsubscribe someone
+		if ($this->_validateUnsubscribeToken($member, $area, $extra))
+		{
+			global $user_info, $board, $topic;
+
+			// Look away while we stuff the old ballet box, power to the people!
+			$user_info['id'] = $member['id_member'];
+			$this->_req->query->sa = 'off';
+
+			switch ($area)
+			{
+				case 'topic':
+					$topic = $extra;
+					$this->_toggle_topic_notification();
+				case 'board':
+					$board = $extra;
+					$this->_toggle_board_notification();
+					break;
+				case 'buddy':
+				case 'likemsg':
+				case 'mentionmem':
+				case 'quotedmem':
+				case 'rlikemsg':
+					$this->_setUserNotificationArea($member['id_member'], $area, 1);
+					break;
+			}
+
+			die('made it');
+		}
+	}
+
+	/**
+	 * Validates a supplied token and extracts the needed bits
+	 *
+	 * @param mixed[] $member Member info from getBasicMemberData
+	 * @param string $area area they want to be removed from
+	 * @param string $extra parameters needed for some areas
+	 * @return bool
+	 */
+	private function _validateUnsubscribeToken(&$member, &$area, &$extra)
+	{
+		$potentialAreas = array('topic', 'board', 'buddy', 'likemsg', 'mentionmem', 'quotedmem', 'rlikemsg');
+
+		// Token was passed and matches our expected pattern
+		$token = $this->_req->getQuery('token', 'trim', '');
+		$token = urldecode($token);
+		if (empty($token) || preg_match('~^(\d+_[a-zA-Z0-9./]{53}_.*)$~', $token, $match) !== 1)
+		{
+			return false;
+		}
+
+		// Expand the token
+		list ($id_member, $hash, $area, $extra, $time) = explode('_', $match[1]);
+		require_once(SUBSDIR . '/Members.subs.php');
+
+		// The area is a known one
+		if (!in_array($area, $potentialAreas))
+		{
+			return false;
+		}
+
+		// Not so old, 2 weeks is plenty
+		if (time() - $time > 60 * 60 * 24 * 14)
+		{
+			return false;
+		}
+
+		// Find the claimed member
+		$member = getBasicMemberData((int) $id_member, array('authentication' => true));
+		if (empty($member))
+		{
+			return false;
+		}
+
+		// Validate its this members token
+		require_once(SUBSDIR . '/Notification.subs.php');
+
+		return validateNotifierToken(
+			$member['email_address'],
+			$member['password_salt'],
+			$area . $extra . $time,
+			$hash
+		);
+	}
+
+	/**
+	 * Used to set a specific mention area to a new value while keeping other
+	 * areas as they are.
+	 *
+	 * @param int $memID
+	 * @param string $area buddy, likemsg, mentionmem, quotedmem, rlikemsg
+	 * @param int $value 1=notify 2=immediate email 3=daily email 4=weekly email
+	 */
+	private function _setUserNotificationArea($memID, $area, $value)
+	{
+		require_once(SUBSDIR . '/Profile.subs.php');
+
+		$to_save = array();
+		foreach (getMemberNotificationsProfile($memID) as $mention => $data)
+		{
+			$to_save[$mention] = 0;
+
+			// The area we are changing
+			if ($mention === $area)
+			{
+				// Off is always an option, but if the choice is valid set it
+				if (isset($data['data'][$value]))
+				{
+					$to_save[$mention] = (int) $value;
+				}
+
+				continue;
+			}
+
+			// Some other area, keep the existing choice
+			foreach ($data['data'] as $key => $choice)
+			{
+				if ($choice['enabled'] === true)
+				{
+					$to_save[$mention] = (int) $key;
+
+					break;
+				}
+			}
+		}
+
+		saveUserNotificationsPreferences($memID, $to_save);
 	}
 }

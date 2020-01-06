@@ -8,7 +8,7 @@
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
- * @version 1.1
+ * @version 1.1.7
  *
  */
 
@@ -96,7 +96,7 @@ class Notifications_Task extends \ElkArte\ValuesContainer
 		if ($this->_members_data === null)
 		{
 			require_once(SUBSDIR . '/Members.subs.php');
-			$this->_members_data = getBasicMemberData($this->getMembers(), array('preferences' => true));
+			$this->_members_data = getBasicMemberData($this->getMembers(), array('preferences' => true, 'authentication' => true));
 		}
 
 		return $this->_members_data;
