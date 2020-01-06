@@ -50,11 +50,11 @@ class Rlikemsg extends AbstractNotificationBoardAccess
 	}
 
 	/**
-	 * {@inheritdoc }
+	 * We don't support email notification of this action, just notification
 	 */
-	public function getNotificationBody($lang_data, $users)
+	public function getNotificationBody($lang_data, $members)
 	{
-		return array();
+		return $this->_getNotificationStrings('', array('subject' => static::$_type, 'body' => static::$_type), $members, $this->_task);
 	}
 
 	/**
