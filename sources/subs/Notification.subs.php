@@ -732,7 +732,7 @@ function sendApprovalNotifications(&$topicData)
 		$replacements = array(
 			'TOPICLINK' => $scripturl . '?topic=' . $row['id_topic'] . '.new;topicseen#new',
 			'UNSUBSCRIBELINK' => replaceBasicActionUrl('{script_url}?action=notify;sa=unsubscribe;token=' .
-				getNotifierToken($row['id_member'], $row['email_address'], $row['password_salt'], 'topic_' .  $row['id_topic'])),
+				getNotifierToken($row['id_member'], $row['email_address'], $row['password_salt'], 'topic_' . $row['id_topic'])),
 		);
 
 		// Now loop through all the messages to send.
