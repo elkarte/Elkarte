@@ -26,7 +26,7 @@ class UserSettingsLoader
 	/**
 	 * @var int
 	 */
-	public const HASH_LENGTH = 4;
+	public const HASH_LENGTH = 16;
 	/**
 	 * @var int
 	 */

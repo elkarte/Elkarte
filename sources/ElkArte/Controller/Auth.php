@@ -349,6 +349,8 @@ class Auth extends AbstractController
 			$valid_password = $user->validatePassword($sha_passwd);
 		}
 
+		require_once(SUBSDIR . '/Members.subs.php');
+
 		// Bad password!  Thought you could fool the database?!
 		if (!$valid_password)
 		{
@@ -364,7 +366,6 @@ class Auth extends AbstractController
 				$user->rehashPassword($sha_passwd);
 
 				// Update the password hash and set up the salt.
-				require_once(SUBSDIR . '/Members.subs.php');
 				updateMemberData($user_setting['id_member'], array('passwd' => $user_setting['passwd'], 'password_salt' => $user_setting['password_salt'], 'passwd_flood' => ''));
 			}
 			// Okay, they for sure didn't enter the password!
@@ -396,23 +397,20 @@ class Auth extends AbstractController
 			validatePasswordFlood($user_setting['id_member'], $user_setting['passwd_flood'], true);
 
 			// If we got here then we can reset the flood counter.
-			require_once(SUBSDIR . '/Members.subs.php');
 			updateMemberData($user_setting['id_member'], array('passwd_flood' => ''));
 		}
 
 		if ($user_setting->fixSalt() === true)
 		{
-			require_once(SUBSDIR . '/Members.subs.php');
 			updateMemberData($user_setting['id_member'], array('password_salt' => $user_setting['password_salt']));
 		}
-
 
 		// Let's track the last used one-time password.
 		if (!empty($_POST['otp_token']))
 		{
-			require_once(SUBSDIR . '/Members.subs.php');
 			updateMemberData($user_setting['id_member'], array('otp_used' => (int) $_POST['otp_token']));
 		}
+
 		// Check their activation status.
 		if ($user->checkActivation(isset($_REQUEST['undelete'])))
 		{

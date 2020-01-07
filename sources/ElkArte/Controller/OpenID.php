@@ -206,7 +206,7 @@ class OpenID extends AbstractController
 			$user_setting = $user->getSettings();
 
 			// Generate an ElkArte hash for the db to protect this account
-			$user->$user_setting($this->_secret);
+			$user->rehashPassword($this->_secret);
 
 			require_once(SUBSDIR . '/Members.subs.php');
 			updateMemberData($user_setting['id_member'], array('passwd' => $user_setting['passwd'], 'password_salt' => $user_setting['password_salt']));
