@@ -5,7 +5,7 @@ use ElkArte\Menu\MenuArea;
 use ElkArte\Menu\MenuSection;
 use ElkArte\Menu\MenuSubsection;
 
-abstract class BaseMenuTest extends \PHPUnit\Framework\TestCase
+abstract class BaseMenuTest extends ElkArteCommonSetupTest
 {
 	public function testMenu()
 	{
@@ -56,16 +56,16 @@ abstract class BaseMenuTest extends \PHPUnit\Framework\TestCase
 		global $context;
 
 		return [
-			[0, 'action', 'bubbh'],
+			[0, 'action', 'random'],
 			[1, 'extra', 'param'],
-			[1, 'action', 'bubbh'],
+			[1, 'action', 'random'],
 			[1, $context['session_var'], $context['session_id']],
 			[2, 'extra', 'param'],
-			[2, 'action', 'bubbh'],
+			[2, 'action', 'random'],
 			[2, $context['session_var'], $context['session_id']],
 			[2, 'area', 'area3'],
 			[3, 'extra', 'param'],
-			[3, 'action', 'bubbh'],
+			[3, 'action', 'random'],
 			[3, $context['session_var'], $context['session_id']],
 			[3, 'area', 'area3'],
 			[3, 'sa', 'sub1'],
@@ -79,12 +79,12 @@ abstract class BaseMenuTest extends \PHPUnit\Framework\TestCase
 		$this->createMenu();
 		$result = $context['menu_data_' . $context['max_menu_id']];
 		$this->assertSame(1, $context['max_menu_id']);
-		$this->assertSame('bubbh', $result['current_action']);
+		$this->assertSame('random', $result['current_action']);
 		$this->assertSame('section1', $result['current_section']);
 		$this->assertSame('area1', $result['current_area']);
 
 		$this->prepareMenu();
-		$this->addOptions(['action' => 'section2', 'area' => 'area3']);
+		$this->addOptions(['action' => 'section2', 'current_area' => 'area3']);
 		$this->createMenu();
 		$result = $context['menu_data_' . $context['max_menu_id']];
 		$this->assertSame(2, $context['max_menu_id']);
@@ -108,7 +108,7 @@ abstract class BaseMenuTest extends \PHPUnit\Framework\TestCase
 	{
 		global $context;
 
-		$this->addOptions(['area' => 'area2']);
+		$this->addOptions(['current_area' => 'area2']);
 		$this->createMenu();
 		$result = $context['menu_data_' . $context['max_menu_id']];
 		$this->assertSame('area3', $result['current_area']);
@@ -119,7 +119,7 @@ abstract class BaseMenuTest extends \PHPUnit\Framework\TestCase
 	{
 		global $context;
 
-		$this->addOptions(['area' => 'area2']);
+		$this->addOptions(['current_area' => 'area2']);
 		$this->createMenu();
 		$result = $context['menu_data_' . $context['max_menu_id']];
 		$this->assertSame('area3', $result['current_area']);
@@ -145,18 +145,21 @@ class MenuTest extends BaseMenuTest
 	private $options = [];
 	private $menuObjects = [];
 
-	protected function setUp()
+	public function setUp()
 	{
-		global $context, $user_info;
+		global $context;
 
-		$context['current_action'] = 'bubbh';
-		$user_info['is_admin'] = true;
+		// Load in the common items so the system thinks we have an active login
+		parent::setUp();
+
+		$context['current_action'] = 'random';
 
 		// Reset the menu counter. PHPUnit creates a copy of global
 		// state at boot and applies it for each test.
 		unset($context['max_menu_id']);
 
-		$this->sections = [[
+		$this->sections = [
+		[
 			'section1',
 			MenuSection::buildFromArray(
 				[
@@ -278,8 +281,10 @@ class MenuTest extends BaseMenuTest
 	/**
 	 * Always clean everything!
 	 */
-	protected function tearDown()
+	public function tearDown()
 	{
+		parent::tearDown();
+
 		if (count($this->menuObjects) > 0)
 		{
 			$this->menuObjects[count($this->menuObjects) - 1]->destroy();
@@ -295,7 +300,7 @@ class MenuTest extends BaseMenuTest
 
 	public function prepareMenu()
 	{
-		$this->req = new \HttpReq;
+		$this->req = new \ElkArte\HttpReq;
 		$this->menuObjects[] = new Menu($this->req);
 		foreach ($this->sections as list ($section_id, $section))
 		{
@@ -320,7 +325,7 @@ class MenuTest extends BaseMenuTest
 	}
 
 	/**
-	 * @expectedException Elk_Exception
+	 * @expectedException Exception
 	 */
 	public function testEmpty()
 	{
@@ -328,14 +333,12 @@ class MenuTest extends BaseMenuTest
 	}
 
 	/**
-	 * @expectedException Elk_Exception
+	 * @expectedException Exception
 	 */
 	public function testFail()
 	{
-		global $user_info;
-
-		$user_info['is_admin'] = false;
-		$user_info['permissions'] = [];
+		\ElkArte\User::$info->is_admin = false;
+		\ElkArte\User::$info->permissions = [];
 
 		$this->createMenu();
 	}
@@ -356,141 +359,5 @@ class MenuTest extends BaseMenuTest
 				$this->assertTrue(is_string($area->getController()));
 			}
 		}
-	}
-}
-
-class MenuTestOld extends BaseMenuTest
-{
-	private $sections = [];
-	private $options = [];
-
-	protected function setUp()
-	{
-		global $context, $user_info;
-
-		$context['current_action'] = 'bubbh';
-		$user_info['is_admin'] = true;
-
-		// Reset the menu counter. PHPUnit creates a copy of global
-		// state at boot and applies it for each test.
-		unset($context['max_menu_id']);
-
-		// These deprecated functions must also be tested to ensure that they still work.
-		$this->sections = [
-			'section1' =>
-				[
-					'title' => 'One',
-					'permission' => ['admin_forum'],
-					'areas' => [
-						'area1' => [
-							'label' => 'Area1 Label',
-							'function' => function ()
-							{
-							},
-						],
-					],
-				],
-			'section2' =>
-				[
-					'title' => 'Two',
-					'permission' => ['admin_forum'],
-					'areas' => [
-						'area2' => [
-							'label' => 'Area2 Label',
-							'function' => function ()
-							{
-							},
-							'url' => 'url',
-							'select' => 'area3',
-							'hidden' => true,
-						],
-						'area3' => [
-							'permission' => 'area3 permission',
-							'label' => 'Area3 Label',
-							'function' => function ()
-							{
-							},
-							'subsections' => [
-								'sub1' => ['Sub One', ['admin_forum']],
-								'sub2' => ['Sub Two', ['admin_forum'], true],
-								'sub3' => ['Sub Three', ['admin_forum'], 'enabled' => false],
-								'sub4' => ['Sub Four', ['admin_forum'], 'active' => ['sub1'], 'counter' => 'c'],
-							],
-						],
-						'area4' => [
-							'label' => 'Area4 Label',
-							'function' => function ()
-							{
-							},
-							'enabled' => false,
-						],
-					],
-				],
-			'section3' =>
-				[
-					'title' => 'Three',
-					'permission' => ['admin_forum'],
-					'enabled' => false,
-					'areas' => [
-						'area5' => [
-							'label' => 'Area5 Label',
-							'function' => function ()
-							{
-							},
-							'icon' => 'transparent.png',
-							'class' => 'admin_img_support',
-						],
-					],
-				],
-			'section4' =>
-				[
-					'title' => 'Four',
-					'permission' => ['admin_forum'],
-					'areas' => [
-						'area6' => [
-							'label' => 'Area6 Label',
-							'function' => function ()
-							{
-							},
-						],
-						'area7' => [
-							'label' => 'Area7 Label',
-							'function' => function ()
-							{
-							},
-						],
-					],
-				],
-		];
-		$this->addOptions(['extra_url_parameters' => ['extra' => 'param']]);
-	}
-
-	protected function tearDown()
-	{
-		destroyMenu('last');
-	}
-
-	public function addOptions($menuOptions)
-	{
-		$this->options = array_merge($this->options, $menuOptions);
-	}
-
-	public function prepareMenu()
-	{
-	}
-
-	/**
-	 * Create a menu
-	 *
-	 * @return array
-	 */
-	public function createMenu()
-	{
-		global $context;
-
-		$include_data = createMenu($this->sections, $this->options);
-		$this->assertGreaterThanOrEqual(1, $context['max_menu_id'], $context['max_menu_id']);
-
-		return $include_data;
 	}
 }

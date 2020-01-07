@@ -352,7 +352,7 @@ class MenuArea extends MenuItem
 	private function anythingMissed($arr)
 	{
 		$missing = array_diff_key($arr, get_object_vars($this));
-		foreach($missing as $key => $value)
+		foreach ($missing as $key => $value)
 		{
 			// excluding our private key, anything missed?
 			if ($key !== 'subsections')
