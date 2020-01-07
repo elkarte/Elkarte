@@ -2641,3 +2641,32 @@ function registerAgreementAccepted($id_member, $ip, $agreement_version)
 		array('version', 'id_member')
 	);
 }
+
+/**
+ * Utility function to update a members salt to a new value
+ *
+ * @param int $id member to update
+ * @param bool $refresh if to always refresh to a new salt
+ * @param int $min if current salt lenght is less than this, gen a new one
+ * @return bool
+ */
+function updateMemberSalt($id, $refresh = false, $min = 9)
+{
+	global $user_settings;
+
+	if (empty($user_settings['password_salt']))
+	{
+		return false;
+	}
+
+	if ((strlen($user_settings['password_salt']) > $min) && !$refresh)
+	{
+		return false;
+	}
+
+	$tokenizer = new Token_Hash();
+	$user_settings['password_salt'] = $tokenizer->generate_hash(16);
+	updateMemberData((int) $id, array('password_salt' => $user_settings['password_salt']));
+
+	return true;
+}
