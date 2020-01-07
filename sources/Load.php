@@ -326,6 +326,14 @@ function loadUserSettings()
 
 		// This is a logged in user, so definitely not a spider.
 		$user_info['possibly_robot'] = false;
+
+		// Lets upgrade the salt if needed.
+		require_once(SUBSDIR . '/Members.subs.php');
+		if (updateMemberSalt($id_member))
+		{
+			require_once(SUBSDIR . '/Auth.subs.php');
+			setLoginCookie(60 * $modSettings['cookieTime'], $user_settings['id_member'], hash('sha256', ($user_settings['passwd'] . $user_settings['password_salt'])));
+		}
 	}
 	// If the user is a guest, initialize all the critical user settings.
 	else
