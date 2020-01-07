@@ -587,7 +587,7 @@ function registerMember(&$regOptions, $ErrorContext = 'register')
 		'member_name' => $regOptions['username'],
 		'email_address' => $regOptions['email'],
 		'passwd' => validateLoginPassword($password, '', $regOptions['username'], true),
-		'password_salt' => $tokenizer->generate_hash(4),
+		'password_salt' => $tokenizer->generate_hash(16),
 		'posts' => 0,
 		'date_registered' => !empty($regOptions['time']) ? $regOptions['time'] : time(),
 		'member_ip' => $regOptions['interface'] == 'admin' ? '127.0.0.1' : $regOptions['ip'],
