@@ -62,6 +62,9 @@ class Menu
 	/** @var array  Holds menu definition structure set by addSection */
 	private $menuData = [];
 
+	/** @var array Holds the first accessible menu section/area if any */
+	private $firstAreaCurrent = [];
+
 	/**
 	 * Initial processing for the menu
 	 *
@@ -231,6 +234,12 @@ class Menu
 				$this->processSectionAreas($sectionId, $section);
 			}
 		}
+
+		// If we did not find a current area the use the first valid one found, if any
+		if (!$this->foundSection && !empty($this->firstAreaCurrent))
+		{
+			$this->setAreaCurrent($this->firstAreaCurrent[0], $this->firstAreaCurrent[1], $this->firstAreaCurrent[2]);
+		}
 	}
 
 	/**
@@ -375,10 +384,10 @@ class Menu
 	 */
 	private function setFirstAreaCurrent($sectionId, $areaId, $area)
 	{
-		// If an area was not directly specified then the first valid one is our choice.
-		if (empty($this->currentArea))
+		// If an area was not directly specified, or wrongly specified, this first valid one is our choice.
+		if (empty($this->firstAreaCurrent))
 		{
-			$this->setAreaCurrent($sectionId, $areaId, $area);
+			$this->firstAreaCurrent = [$sectionId, $areaId, $area];
 		}
 	}
 
