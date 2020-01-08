@@ -378,18 +378,11 @@ class PersonalMessage extends AbstractController
 			'hook' => 'pm',
 			'disable_url_session_check' => true,
 			'counters' => !empty($label_counters) ? $label_counters : 0,
-			'default_include_dir' => CONTROLLERDIR,
 		);
 
 		// Actually create the menu!
 		$pm_include_data = createMenu($pm_areas, $menuOptions);
 		unset($pm_areas);
-
-		// No menu means no access.
-		if (!$pm_include_data && ($this->user->is_guest === false || validateSession() !== true))
-		{
-			throw new Exception('no_access', false);
-		}
 
 		// Make a note of the Unique ID for this menu.
 		$context['pm_menu_id'] = $context['max_menu_id'];
@@ -397,12 +390,6 @@ class PersonalMessage extends AbstractController
 
 		// Set the selected item.
 		$context['menu_item_selected'] = $pm_include_data['current_area'];
-
-		// Grab the file needed for this action
-		if (isset($pm_include_data['file']))
-		{
-			require_once($pm_include_data['file']);
-		}
 
 		// Set the template for this area and add the profile layer.
 		if (!isset($this->_req->query->xml))

@@ -36,14 +36,14 @@ class Profile extends AbstractController
 	 *
 	 * @var boolean
 	 */
-	private $_completed_save = false;
+	private $completedSave = false;
 
 	/**
 	 * If this was a request to save an update
 	 *
 	 * @var null
 	 */
-	private $_saving = null;
+	private $isSaving = null;
 
 	/**
 	 * What it says, on completion
@@ -137,22 +137,14 @@ class Profile extends AbstractController
 		}
 
 		// If it said no permissions that meant it wasn't valid!
-		if ($this->_profile_include_data && empty($this->_profile_include_data['permission']))
-		{
-			$this->_profile_include_data['enabled'] = false;
-		}
-
-		// No menu and guest? A warm welcome to register
-		if (!$this->_profile_include_data && $this->user->is_guest)
-		{
-			is_not_guest();
-		}
-
-		// No menu means no access at all.
-		if (!$this->_profile_include_data || (isset($this->_profile_include_data['enabled']) && $this->_profile_include_data['enabled'] === false))
+		if (empty($this->_profile_include_data['permission']))
 		{
 			throw new Exception('no_access', false);
 		}
+
+		// Choose the right permission set and do a pat check for good measure.
+		$this->_profile_include_data['permission'] = $this->_profile_include_data['permission'][$context['user']['is_owner'] ? 'own' : 'any'];
+		isAllowedTo($this->_profile_include_data['permission']);
 
 		// Make a note of the Unique ID for this menu.
 		$context['profile_menu_id'] = $context['max_menu_id'];
@@ -164,22 +156,8 @@ class Profile extends AbstractController
 
 		// Before we go any further, let's work on the area we've said is valid.
 		// Note this is done here just in case we ever compromise the menu function in error!
-		$this->_completed_save = false;
 		$context['do_preview'] = isset($this->_req->post->preview_signature);
-
-		// Are we saving data in a valid area?
-		$this->_saving = $this->_req->getPost('save', 'trim', $this->_req->getQuery('save', 'trim', null));
-		if (isset($this->_profile_include_data['sc']) && (isset($this->_saving) || $context['do_preview']))
-		{
-			checkSession($this->_profile_include_data['sc']);
-			$this->_completed_save = true;
-		}
-
-		// Permissions for good measure.
-		if (!empty($this->_profile_include_data['permission']))
-		{
-			isAllowedTo($this->_profile_include_data['permission'][$context['user']['is_owner'] ? 'own' : 'any']);
-		}
+		$this->isSaving = $this->_req->getRequest('save', 'trim', null);
 
 		// Session validation and/or Token Checks
 		$this->_check_access();
@@ -216,12 +194,6 @@ class Profile extends AbstractController
 		elseif (!empty($this->_force_redirect))
 		{
 			redirectexit('action=profile' . ($context['user']['is_owner'] ? '' : ';u=' . $this->_memID) . ';area=' . $this->_current_area);
-		}
-
-		// Let go to the right place
-		if (isset($this->_profile_include_data['file']))
-		{
-			require_once($this->_profile_include_data['file']);
 		}
 
 		callMenu($this->_profile_include_data);
@@ -545,7 +517,6 @@ class Profile extends AbstractController
 			'extra_url_parameters' => array(
 				'u' => $context['id_member'],
 			),
-			'default_include_dir' => CONTROLLERDIR,
 		);
 
 		// Actually create the menu!
@@ -560,9 +531,16 @@ class Profile extends AbstractController
 	{
 		global $context;
 
-		// Does this require session validating?
-		if (!empty($this->_profile_include_data['validate'])
-			|| (isset($this->_saving) && !$context['user']['is_owner']))
+		// Check the session if required and they are trying to save
+		$this->completedSave = false;
+		if (isset($this->_profile_include_data['sc']) && (isset($this->isSaving) || $context['do_preview']))
+		{
+			checkSession($this->_profile_include_data['sc']);
+			$this->completedSave = true;
+		}
+
+		// Does this require admin/moderator session validating?
+		if (isset($this->isSaving) && !$context['user']['is_owner'])
 		{
 			validateSession();
 		}
@@ -570,25 +548,15 @@ class Profile extends AbstractController
 		// Do we need to perform a token check?
 		if (!empty($this->_profile_include_data['token']))
 		{
-			if ($this->_profile_include_data['token'] !== true)
-			{
-				$token_name = str_replace('%u', $context['id_member'], $this->_profile_include_data['token']);
-			}
-			else
-			{
-				$token_name = 'profile-u' . $context['id_member'];
-			}
+			$token_name = str_replace('%u', $context['id_member'], $this->_profile_include_data['token']);
+			$token_type = $this->_profile_include_data['tokenType'] ?? 'post';
 
-			if (isset($this->_profile_include_data['token_type']) && in_array($this->_profile_include_data['token_type'], array('request', 'post', 'get')))
-			{
-				$token_type = $this->_profile_include_data['token_type'];
-			}
-			else
+			if (!in_array($token_type, ['request', 'post', 'get']))
 			{
 				$token_type = 'post';
 			}
 
-			if (isset($this->_saving))
+			if (isset($this->isSaving))
 			{
 				validateToken($token_name, $token_type);
 			}
@@ -619,11 +587,11 @@ class Profile extends AbstractController
 			);
 		}
 
-		if (!empty($this->_profile_include_data['current_subsection']) && $this->_profile_include_data['subsections'][$this->_profile_include_data['current_subsection']][0] !== $this->_profile_include_data['label'])
+		if (!empty($this->_profile_include_data['current_subsection']) && $this->_profile_include_data['subsections'][$this->_profile_include_data['current_subsection']]['label'] !== $this->_profile_include_data['label'])
 		{
 			$context['linktree'][] = array(
 				'url' => getUrl('profile', ['action' => 'profile', 'area' => $this->_profile_include_data['current_area'], 'sa' => $this->_profile_include_data['current_subsection'], 'u' => $this->_memID, 'name' => $this->_profile['real_name']]),
-				'name' => $this->_profile_include_data['subsections'][$this->_profile_include_data['current_subsection']][0],
+				'name' => $this->_profile_include_data['subsections'][$this->_profile_include_data['current_subsection']]['label'],
 			);
 		}
 	}
@@ -643,7 +611,7 @@ class Profile extends AbstractController
 		$post_errors = array();
 		$profile_vars = array();
 
-		if ($this->_completed_save)
+		if ($this->completedSave)
 		{
 			// Clean up the POST variables.
 			$post = Util::htmltrim__recursive((array) $this->_req->post);

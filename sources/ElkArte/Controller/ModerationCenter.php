@@ -47,12 +47,6 @@ class ModerationCenter extends AbstractController
 		// Set up moderation menu.
 		$this->prepareModcenter();
 
-		// Now call the menu action.
-		if (isset($this->_mod_include_data['file']))
-		{
-			require_once($this->_mod_include_data['file']);
-		}
-
 		callMenu($this->_mod_include_data);
 	}
 
@@ -281,17 +275,11 @@ class ModerationCenter extends AbstractController
 			'action' => 'moderate',
 			'hook' => 'moderation',
 			'disable_url_session_check' => true,
-			'default_include_dir' => CONTROLLERDIR,
 		);
 
+		// Setup the menu
 		$mod_include_data = createMenu($moderation_areas, $menuOptions);
 		unset($moderation_areas);
-
-		// We got something - didn't we? DIDN'T WE!
-		if ($mod_include_data === false)
-		{
-			throw new Exception('no_access', false);
-		}
 
 		// Retain the ID information in case required by a subaction.
 		$context['moderation_menu_id'] = $context['max_menu_id'];
@@ -318,11 +306,11 @@ class ModerationCenter extends AbstractController
 			);
 		}
 
-		if (!empty($mod_include_data['current_subsection']) && $mod_include_data['subsections'][$mod_include_data['current_subsection']][0] !== $mod_include_data['label'])
+		if (!empty($mod_include_data['current_subsection']) && $mod_include_data['subsections'][$mod_include_data['current_subsection']]['label'] !== $mod_include_data['label'])
 		{
 			$context['linktree'][] = array(
 				'url' => $scripturl . '?action=moderate;area=' . $mod_include_data['current_area'] . ';sa=' . $mod_include_data['current_subsection'],
-				'name' => $mod_include_data['subsections'][$mod_include_data['current_subsection']][0],
+				'name' => $mod_include_data['subsections'][$mod_include_data['current_subsection']]['label'],
 			);
 		}
 

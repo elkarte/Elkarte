@@ -164,8 +164,7 @@ legend {
 .linklevel1:hover, .listlevel1:hover .linklevel1,
 .linklevel2:hover, .listlevel2:hover .linklevel2,
 .linklevel3:hover, .listlevel3:hover .linklevel3,
-#menu_sidebar .linklevel1:hover, #menu_sidebar .listlevel1:hover .linklevel1,
-#menu_current_area > strong > .linklevel1 {
+#menu_sidebar .linklevel1:hover, #menu_sidebar .listlevel1:hover .linklevel1 {
 	border-right: 1px solid #AFAFAF;
 	border-left: 1px solid #CCCCCC;
 	box-shadow: -2px 1px 1px rgba(0, 0, 0, 0.07) inset;

@@ -3,13 +3,25 @@
 /**
  * TestCase class for the admin search
  */
-class TestAdminSearch extends ElkArteCommonSetupTest
+class TestAdminSearch extends \PHPUnit\Framework\TestCase
 {
 	/**
 	 * @var ActionController
 	 */
 	private $controller;
 	protected $backupGlobalsBlacklist = ['user_info'];
+
+	/**
+	 * Cleans up the environment after running a test.
+	 */
+	protected function tearDown()
+	{
+		\ElkArte\User::$info->permissions = array();
+		global $context, $user_info;
+
+		$user_info['permissions'] = array();
+		unset($context['search_term'], $context['search_results']);
+	}
 
 	/**
 	 * Hacky solution to generate coverage for the internal search methods
@@ -61,9 +73,9 @@ class TestAdminSearch extends ElkArteCommonSetupTest
 		destroyMenu('last');
 
 		return array_map(function ($search_result)
-		{
-			return array($search_result['url'], strtolower($search_result['name']));
-		}, $context['search_results']
+			{
+				return array($search_result['url'], strtolower($search_result['name']));
+			}, $context['search_results']
 		);
 	}
 }
