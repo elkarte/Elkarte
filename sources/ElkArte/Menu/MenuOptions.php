@@ -31,6 +31,7 @@ namespace ElkArte\Menu;
  *  - template_name             => an alternative template to load (instead of Generic)
  *  - layer_name                => alternative layer name for the menu
  *  - hook                      => hook name to call integrate_ . 'hook name' . '_areas'
+ *  - counters					=> menu counter value
  *
  * @package ElkArte\Menu
  */

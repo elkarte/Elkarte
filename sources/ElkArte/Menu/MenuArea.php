@@ -355,9 +355,9 @@ class MenuArea extends MenuItem
 		foreach ($missing as $key => $value)
 		{
 			// excluding our private key, anything missed?
-			if ($key !== 'subsections')
+			if (!in_array($key, ['subsections', 'messages']))
 			{
-				Errors::instance()->log_error('Depreciated: ' . $key . ' : ' . $value, 'depreciated');
+				Errors::instance()->log_error('Depreciated: menu key: ' . $key . ' value: ' . $value, 'depreciated');
 			}
 		}
 	}
