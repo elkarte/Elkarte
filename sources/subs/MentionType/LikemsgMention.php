@@ -7,7 +7,7 @@
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
- * @version 1.1
+ * @version 1.1.7
  *
  */
 
@@ -45,6 +45,7 @@ class Likemsg_Mention extends Mention_BoardAccess_Abstract
 		$notifier = $this->_task->getNotifierData();
 		$replacements = array(
 			'ACTIONNAME' => $notifier['real_name'],
+			'SUBJECT' =>  $this->_task['source_data']['subject'],
 			'MSGLINK' => replaceBasicActionUrl('{script_url}?msg=' . $this->_task->id_target),
 		);
 

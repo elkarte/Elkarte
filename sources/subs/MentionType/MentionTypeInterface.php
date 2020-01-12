@@ -7,7 +7,7 @@
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
- * @version 1.1.4
+ * @version 1.1.7
  *
  */
 
@@ -31,6 +31,11 @@ interface Mention_Type_Interface
 	 * Just returns the _type property.
 	 */
 	public static function getType();
+
+	/**
+	 * Returns which frequencies (notification, email, daily, weekly, etc) are supported
+	 */
+	public static function getSupportedFrequency();
 
 	/**
 	 * Returns the modules to enable when turning on the mention.

@@ -102,7 +102,6 @@ class Site_Dispatcher
 		'moderate' => array('ModerationCenter_Controller', 'action_index'),
 		'movetopic' => array('MoveTopic_Controller', 'action_movetopic'),
 		'movetopic2' => array('MoveTopic_Controller', 'action_movetopic2'),
-		'notify' => array('Notify_Controller', 'action_notify'),
 		'notifyboard' => array('Notify_Controller', 'action_notifyboard'),
 		'openidreturn' => array('OpenID_Controller', 'action_openidreturn'),
 		'xrds' => array('OpenID_Controller', 'action_xrds'),

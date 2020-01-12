@@ -39,8 +39,20 @@ class Notify_Controller extends Action_Controller
 	 */
 	public function action_index()
 	{
+		// The number of choices is boggling, ok there are just 2
+		$subActions = array(
+			'notify' => array($this, 'action_notify'),
+			'unsubscribe' => array($this, 'action_unsubscribe'),
+		);
+
+		// We like action, so lets get ready for some
+		$action = new Action('');
+
+		// Get the subAction, or just go to action_notify
+		$subAction = $action->initialize($subActions, 'notify');
+
 		// forward to our respective method.
-		// $this->action_notify();
+		$action->dispatch($subAction);
 	}
 
 	/**
@@ -59,6 +71,13 @@ class Notify_Controller extends Action_Controller
 	public function action_notify()
 	{
 		global $topic, $scripturl, $txt, $user_info, $context;
+
+		// Api ajax call?
+		if (isset($this->_req->query->api))
+		{
+			$this->action_notify_api();
+			return true;
+		}
 
 		// Make sure they aren't a guest or something - guests can't really receive notifications!
 		is_not_guest();
@@ -392,5 +411,211 @@ class Notify_Controller extends Action_Controller
 		global $user_info, $topic;
 
 		setTopicWatch($user_info['id'], $topic, $this->_req->query->sa === 'on');
+	}
+
+	/**
+	 * Accessed via the unsubscribe link provided in site emails. This will then
+	 * unsubscribe the user from a board or a topic (depending on the link) without them
+	 * having to login.
+	 */
+	public function action_unsubscribe()
+	{
+		// Looks like we need to unsubscribe someone
+		$valid = $this->_validateUnsubscribeToken($member, $area, $extra);
+		if ($valid)
+		{
+			$this->_unsubscribeToggle($member, $area, $extra);
+			$this->_prepareTemplateMessage( $area, $extra, $member['email_address']);
+
+			return true;
+		}
+
+		// A default msg that we did something and maybe take a chill?
+		$this->_prepareTemplateMessage('default', '', '');
+
+		// Not the proper message it should not happen either
+		spamProtection('remind');
+
+		return true;
+	}
+
+	/**
+	 * Does the actual area unsubscribe toggle
+	 *
+	 * @param mixed[] $member Member info from getBasicMemberData
+	 * @param string $area area they want to be removed from
+	 * @param string $extra parameters needed for some areas
+	 */
+	private function _unsubscribeToggle($member, $area, $extra)
+	{
+		global $user_info, $board, $topic;
+
+		// Look away while we stuff the old ballet box, power to the people!
+		$user_info['id'] = (int) $member['id_member'];
+		$this->_req->query->sa = 'off';
+
+		switch ($area)
+		{
+			case 'topic':
+				$topic = $extra;
+				$this->_toggle_topic_notification();
+				break;
+			case 'board':
+				$board = $extra;
+				$this->_toggle_board_notification();
+				break;
+			case 'buddy':
+			case 'likemsg':
+			case 'mentionmem':
+			case 'quotedmem':
+			case 'rlikemsg':
+				$this->_setUserNotificationArea($member['id_member'], $area, 1);
+				break;
+		}
+	}
+
+	/**
+	 * Validates a supplied token and extracts the needed bits
+	 *
+	 * What it does:
+	 *  - Checks token conforms to a known pattern
+	 *  - Checks token is for a known notification type
+	 *  - Checks the age of the token
+	 *  - Finds the member claimed in the token
+	 *  - Runs crypt on member data to validate it matches the supplied hash
+	 *
+	 * @param mixed[] $member Member info from getBasicMemberData
+	 * @param string $area area they want to be removed from
+	 * @param string $extra parameters needed for some areas
+	 * @return bool
+	 */
+	private function _validateUnsubscribeToken(&$member, &$area, &$extra)
+	{
+		$potentialAreas = array('topic', 'board', 'buddy', 'likemsg', 'mentionmem', 'quotedmem', 'rlikemsg');
+
+		// Token was passed and matches our expected pattern
+		$token = $this->_req->getQuery('token', 'trim', '');
+		$token = urldecode($token);
+		if (empty($token) || preg_match('~^(\d+_[a-zA-Z0-9./]{53}_.*)$~', $token, $match) !== 1)
+		{
+			return false;
+		}
+
+		// Expand the token
+		list ($id_member, $hash, $area, $extra, $time) = explode('_', $match[1]);
+		require_once(SUBSDIR . '/Members.subs.php');
+
+		// The area is a known one
+		if (!in_array($area, $potentialAreas))
+		{
+			return false;
+		}
+
+		// Not so old, 2 weeks is plenty
+		if (time() - $time > 60 * 60 * 24 * 14)
+		{
+			return false;
+		}
+
+		// Find the claimed member
+		$member = getBasicMemberData((int) $id_member, array('authentication' => true));
+		if (empty($member))
+		{
+			return false;
+		}
+
+		// Validate its this members token
+		require_once(SUBSDIR . '/Notification.subs.php');
+		return validateNotifierToken(
+			$member['email_address'],
+			$member['password_salt'],
+			$area . $extra . $time,
+			$hash
+		);
+	}
+
+	/**
+	 * Used to set a specific mention area to a new value while keeping other
+	 * areas as they are.
+	 *
+	 * @param int $memID
+	 * @param string $area buddy, likemsg, mentionmem, quotedmem, rlikemsg
+	 * @param int $value 1=notify 2=immediate email 3=daily email 4=weekly email
+	 */
+	private function _setUserNotificationArea($memID, $area, $value)
+	{
+		require_once(SUBSDIR . '/Profile.subs.php');
+
+		$to_save = array();
+		foreach (getMemberNotificationsProfile($memID) as $mention => $data)
+		{
+			$to_save[$mention] = 0;
+
+			// The area we are changing
+			if ($mention === $area)
+			{
+				// Off is always an option, but if the choice is valid set it
+				if (isset($data['data'][$value]))
+				{
+					$to_save[$mention] = (int) $value;
+				}
+
+				continue;
+			}
+
+			// Some other area, keep the existing choice
+			foreach ($data['data'] as $key => $choice)
+			{
+				if ($choice['enabled'] === true)
+				{
+					$to_save[$mention] = (int) $key;
+
+					break;
+				}
+			}
+		}
+
+		saveUserNotificationsPreferences($memID, $to_save);
+	}
+
+	/**
+	 * Sets the unsubscribe string for template use
+	 *
+	 * @param string $area
+	 * @param string $extra
+	 * @throws \Elk_Exception
+	 */
+	private function _prepareTemplateMessage($area, $extra, $email)
+	{
+		global $txt, $context;
+
+		switch ($area)
+		{
+			case 'topic':
+				require_once(SUBSDIR . '/Topic.subs.php');
+				$subject = getSubject((int) $extra);
+				$context['unsubscribe_message'] = sprintf($txt['notify_topic_unsubscribed'], $subject, $email);
+				break;
+			case 'board':
+				require_once(SUBSDIR . '/Boards.subs.php');
+				$name = boardInfo((int) $extra);
+				$context['unsubscribe_message'] = sprintf($txt['notify_board_unsubscribed'], $name['name'], $email);
+				break;
+			case 'buddy':
+			case 'likemsg':
+			case 'mentionmem':
+			case 'quotedmem':
+			case 'rlikemsg':
+				loadLanguage('Mentions');
+				$context['unsubscribe_message'] = sprintf($txt['notify_mention_unsubscribed'], $txt['mentions_type_' . $area], $email);
+				break;
+			default:
+				$context['unsubscribe_message'] = $txt['notify_default_unsubscribed'];
+				break;
+		}
+
+		loadTemplate('Notify');
+		$context['page_title'] = $txt['notifications'];
+		$context['sub_template'] = 'notify_unsubscribe';
 	}
 }

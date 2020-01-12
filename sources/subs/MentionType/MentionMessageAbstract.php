@@ -7,7 +7,7 @@
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
- * @version 1.1.4
+ * @version 1.1.7
  *
  */
 
@@ -26,6 +26,13 @@ abstract class Mention_Message_Abstract implements Mention_Type_Interface
 	 * @var string
 	 */
 	protected static $_type = '';
+
+	/**
+	 * Which frequencies are supported by the mention type
+	 *
+	 * @var array
+	 */
+	protected static $_frequency = ['notification', 'email', 'email_daily', 'email_weekly'];
 
 	/**
 	 * The database object
@@ -67,6 +74,14 @@ abstract class Mention_Message_Abstract implements Mention_Type_Interface
 	public static function getType()
 	{
 		return static::$_type;
+	}
+
+	/**
+	 * {@inheritdoc }
+	 */
+	public static function getSupportedFrequency()
+	{
+		return static::$_frequency;
 	}
 
 	/**
@@ -149,9 +164,13 @@ abstract class Mention_Message_Abstract implements Mention_Type_Interface
 		$return = array();
 		if (!empty($template))
 		{
+			require_once(SUBSDIR . '/Notification.subs.php');
+
 			foreach ($members as $member)
 			{
 				$replacements['REALNAME'] = $members_data[$member]['real_name'];
+				$replacements['UNSUBSCRIBELINK'] = replaceBasicActionUrl('{script_url}?action=notify;sa=unsubscribe;token=' .
+					getNotifierToken($member, $members_data[$member]['email_address'], $members_data[$member]['password_salt'], $task->notification_type, $task->id_target));
 				$langstrings = $this->_loadStringsByTemplate($template, $keys, $members, $members_data, $lang_files, $replacements);
 
 				$return[] = array(

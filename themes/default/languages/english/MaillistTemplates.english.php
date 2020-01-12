@@ -40,7 +40,7 @@ You can reply to this email and have it posted as a topic reply.
 <*> You can see this message by using this link:
     {TOPICLINK}
 
-<*> Unsubscribe to this by using this link:
+<*> Unsubscribe to this board by using this link:
     {UNSUBSCRIBELINK}
 
 {EMAILREGARDS}';
@@ -81,7 +81,7 @@ You can reply to this email and have it posted as a topic reply.
 <*> You can go to your first unread message by using this link:
     {TOPICLINKNEW}
 
-<*> Unsubscribe to this by using this link:
+<*> Unsubscribe to this board by using this link:
     {UNSUBSCRIBELINK}
 
 {EMAILREGARDS}';
@@ -122,7 +122,7 @@ You can reply to this email and have it posted as a topic reply.
 <*> You can go to your first unread message by using this link:
     {TOPICLINKNEW}
 
-<*> Unsubscribe to this by using this link:
+<*> Unsubscribe to this {SUBSCRIPTION} by using this link:
     {UNSUBSCRIBELINK}
 
 {EMAILREGARDS}';
@@ -164,7 +164,7 @@ You can reply to this email and have it posted as a reply.
 <*> You can go to your first unread message by using this link:
     {TOPICLINKNEW}
 
-<*> Unsubscribe to this by using this link:
+<*> Unsubscribe to this {SUBSCRIPTION} by using this link:
     {UNSUBSCRIBELINK}
 
 {EMAILREGARDS}';
