@@ -618,7 +618,7 @@ function moveTopics($topics, $toBoard, $log = false)
 			SUM(num_replies) AS num_replies
 		FROM {db_prefix}topics
 		WHERE id_topic IN ({array_int:topics})
-		GROUP BY id_board, approved',
+		GROUP BY id_topic, id_board, approved',
 		array(
 			'topics' => $topics,
 		)
