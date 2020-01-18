@@ -537,30 +537,15 @@ class Attachment extends AbstractController
 
 		if (!empty($mime_type) && strpos($mime_type, 'image/') === 0)
 		{
-			header('Content-Type: ' . strtr($mime_type, array('image/bmp' => 'image/x-ms-bmp')));
+			header('Content-Type: ' . $mime_type);
 		}
 		else
 		{
-			header('Content-Type: ' . (isBrowser('ie') || isBrowser('opera') ? 'application/octetstream' : 'application/octet-stream'));
+			header('Content-Type: application/octet-stream');
 		}
 
 		// Different browsers like different standards...
-		if (isBrowser('firefox'))
-		{
-			header('Content-Disposition: ' . $disposition . '; filename*=UTF-8\'\'' . rawurlencode(preg_replace_callback('~&#(\d{3,8});~', 'fixchar__callback', $real_filename)));
-		}
-		elseif (isBrowser('opera'))
-		{
-			header('Content-Disposition: ' . $disposition . '; filename="' . preg_replace_callback('~&#(\d{3,8});~', 'fixchar__callback', $real_filename) . '"');
-		}
-		elseif (isBrowser('ie'))
-		{
-			header('Content-Disposition: ' . $disposition . '; filename="' . urlencode(preg_replace_callback('~&#(\d{3,8});~', 'fixchar__callback', $real_filename)) . '"');
-		}
-		else
-		{
-			header('Content-Disposition: ' . $disposition . '; filename="' . $real_filename . '"');
-		}
+		$this->setDownloadFileNameHeader($real_filename, $disposition);
 
 		// If this has an "image extension" - but isn't actually an image - then ensure it isn't cached cause of silly IE.
 		if ($do_cache)
@@ -575,6 +560,29 @@ class Attachment extends AbstractController
 
 		// Try to buy some time...
 		detectServer()->setTimeLimit(600);
+	}
+
+	/**
+	 * Set the proper filename header
+	 *
+	 * @param string $fileName
+	 * @param string $disposition 'inline' or'attachment'
+	 */
+	public function setDownloadFileNameHeader($fileName, $disposition)
+	{
+		$fileName = str_replace('"', '', $fileName);
+
+		// Send as UTF-8 if the name warrants that
+		if (preg_match('/[\x80-\xFF]/', $fileName))
+		{
+			$altNamePart = "; filename*=UTF-8''" . rawurlencode($fileName);
+		}
+		else
+		{
+			$altNamePart = '';
+		}
+
+		header('Content-Disposition: ' . $disposition . '; filename="' . $fileName . '"' . $altNamePart);
 	}
 
 	/**
