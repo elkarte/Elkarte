@@ -344,9 +344,6 @@ class ManageAttachments extends AbstractController
 			// Are attachments enabled?
 			array('select', 'attachmentEnable', array($txt['attachmentEnable_deactivate'], $txt['attachmentEnable_enable_all'], $txt['attachmentEnable_disable_new'])),
 			'',
-			// Extension checks etc.
-			array('check', 'attachmentRecodeLineEndings'),
-			'',
 			// Directory and size limits.
 			array('select', 'automanage_attachments', array(0 => $txt['attachments_normal'], 1 => $txt['attachments_auto_space'], 2 => $txt['attachments_auto_years'], 3 => $txt['attachments_auto_months'], 4 => $txt['attachments_auto_16'])),
 			array('check', 'use_subdirectories_for_attachments', 'subtext' => $txt['use_subdirectories_for_attachments_note']),

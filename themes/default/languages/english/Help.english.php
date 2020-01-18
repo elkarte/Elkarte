@@ -292,7 +292,6 @@ $helptxt['mail_type'] = 'This setting allows you to choose either PHP\'s default
 $helptxt['mail_batch_size'] = 'This setting determines how many emails will be sent per page load and can not be set greater than the maximum allowed per minute.<br />Leaving this as 0, the system will automatically determine a batch size to evenly spread the load and fill the quota.<br />If you want to set your own values, setting this to the same value as your limit is a good option for low per minute limits, or 1/6 of the limit for higher per minute limits.';
 
 $helptxt['attachmentEnable'] = 'Enable/Disable the attachment system or disable only new attachments leaving old one available.';
-$helptxt['attachmentRecodeLineEndings'] = 'Enabling this will re-code line endings of text based files (txt, css, html, php, xml) based on your server (Windows, Mac or Unix).';
 $helptxt['automanage_attachments'] = 'This will create a directory structure based on the selected option.  This can be post date (subdividing attachments by year, or by year and month or by year, month and day) or simply adding a new directory when the space limit is reached.  Each directory created will have the same file count and total size restrictions.  This will help prevent directories from reaching a file or size limit.';
 $helptxt['use_sub-directories_for_attachments'] = 'This will create all new directories as sub-directories under the main attachment directory.';
 $helptxt['attachmentDirSizeLimit'] = ' Set how large the attachment folder can be.';

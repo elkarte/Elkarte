@@ -418,30 +418,6 @@ class Attachment extends AbstractController
 
 		$this->_send_headers($filename, $eTag, $mime_type, $use_compression, $disposition, $real_filename, $do_cache);
 
-		// Recode line endings for text files, if enabled.
-		if (!empty($modSettings['attachmentRecodeLineEndings']) && !isset($this->_req->query->image) && in_array($file_ext, array('txt', 'css', 'htm', 'html', 'php', 'xml')))
-		{
-			$req = request();
-			if (strpos($req->user_agent(), 'Windows') !== false)
-			{
-				$callback = function ($buffer) {
-					return preg_replace('~[\r]?\n~', "\r\n", $buffer);
-				};
-			}
-			elseif (strpos($req->user_agent(), 'Mac') !== false)
-			{
-				$callback = function ($buffer) {
-					return preg_replace('~[\r]?\n~', "\r", $buffer);
-				};
-			}
-			else
-			{
-				$callback = function ($buffer) {
-					return preg_replace('~[\r]?\n~', "\n", $buffer);
-				};
-			}
-		}
-
 		// Since we don't do output compression for files this large...
 		if (filesize($filename) > 4194304)
 		{
@@ -454,14 +430,7 @@ class Attachment extends AbstractController
 			$fp = fopen($filename, 'rb');
 			while (!feof($fp))
 			{
-				if (isset($callback))
-				{
-					echo $callback(fread($fp, 8192));
-				}
-				else
-				{
-					echo fread($fp, 8192);
-				}
+				echo fread($fp, 8192);
 
 				flush();
 			}
@@ -470,7 +439,7 @@ class Attachment extends AbstractController
 		// On some of the less-bright hosts, readfile() is disabled.  It's just a faster, more byte safe, version of what's in the if.
 		elseif (isset($callback) || @readfile($filename) === null)
 		{
-			echo isset($callback) ? $callback(file_get_contents($filename)) : file_get_contents($filename);
+			echo file_get_contents($filename);
 		}
 
 		obExit(false);
