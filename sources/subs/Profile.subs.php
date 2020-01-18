@@ -2135,7 +2135,7 @@ function profileLoadAvatarData()
 	{
 		require_once(SUBSDIR . '/Attachments.subs.php');
 		$context['avatar_list'] = array();
-		$context['avatars'] = is_dir($modSettings['avatar_directory']) ? getServerStoredAvatars('', 0) : array();
+		$context['avatars'] = is_dir($modSettings['avatar_directory']) ? getServerStoredAvatars('') : array();
 	}
 	else
 	{

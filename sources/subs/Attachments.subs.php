@@ -81,7 +81,7 @@ function processAttachments($id_msg = null)
 		}
 	}
 
-	// Hmm. There are still files in session.
+	// There are files in session, likely already processed
 	$ignore_temp = false;
 	$tmp_attachments = new TemporaryAttachmentsList();
 	if ($tmp_attachments->getPostParam('files') !== null && $tmp_attachments->count() > 1)
@@ -300,7 +300,7 @@ function attachmentUploadChecks($attachID)
  *
  * @return bool
  * @package Attachments
- *
+ * @throws \ElkArte\Exceptions\Exception
  */
 function createAttachment(&$attachmentOptions)
 {
@@ -460,7 +460,7 @@ function createAttachment(&$attachmentOptions)
  *
  * @return array
  * @package Attachments
- *
+ * @throws \Exception
  */
 function getAvatar($id_attach)
 {
@@ -474,8 +474,11 @@ function getAvatar($id_attach)
 	}
 	else
 	{
-		$request = $db->query('', '
-			SELECT id_folder, filename, file_hash, fileext, id_attach, attachment_type, mime_type, approved, id_member
+		$avatarData = array();
+		$db->fetchQuery('
+			SELECT 
+				id_folder, filename, file_hash, fileext, id_attach, attachment_type,
+				mime_type, approved, id_member
 			FROM {db_prefix}attachments
 			WHERE id_attach = {int:id_attach}
 				AND id_member > {int:blank_id_member}
@@ -484,13 +487,11 @@ function getAvatar($id_attach)
 				'id_attach' => $id_attach,
 				'blank_id_member' => 0,
 			)
+		)->fetch_callback(
+			function ($row) use (&$avatarData) {
+				$avatarData = $row;
+			}
 		);
-		$avatarData = array();
-		if ($db->num_rows($request) != 0)
-		{
-			$avatarData = $db->fetch_row($request);
-		}
-		$db->free_result($request);
 
 		Cache::instance()->put('getAvatar_id-' . $id_attach, $avatarData, 900);
 	}
@@ -513,15 +514,18 @@ function getAvatar($id_attach)
  *
  * @return array
  * @package Attachments
- *
+ * @throws \Exception
  */
 function getAttachmentFromTopic($id_attach, $id_topic)
 {
 	$db = database();
 
 	// Make sure this attachment is on this board.
-	$request = $db->query('', '
-		SELECT a.id_folder, a.filename, a.file_hash, a.fileext, a.id_attach, a.attachment_type, a.mime_type, a.approved, m.id_member
+	$attachmentData = array();
+	$request = $db->fetchQuery('
+		SELECT 
+			a.id_folder, a.filename, a.file_hash, a.fileext, a.id_attach, a.attachment_type, 
+			a.mime_type, a.approved, m.id_member
 		FROM {db_prefix}attachments AS a
 			INNER JOIN {db_prefix}messages AS m ON (m.id_msg = a.id_msg AND m.id_topic = {int:current_topic})
 			INNER JOIN {db_prefix}boards AS b ON (b.id_board = m.id_board AND {query_see_board})
@@ -532,13 +536,11 @@ function getAttachmentFromTopic($id_attach, $id_topic)
 			'current_topic' => $id_topic,
 		)
 	);
-
-	$attachmentData = array();
-	if ($db->num_rows($request) != 0)
+	if ($request->num_rows() != 0)
 	{
-		$attachmentData = $db->fetch_row($request);
+		$attachmentData = $request->fetch_row();
 	}
-	$db->free_result($request);
+	$request->free_result();
 
 	return $attachmentData;
 }
@@ -558,15 +560,17 @@ function getAttachmentFromTopic($id_attach, $id_topic)
  *
  * @return array
  * @package Attachments
- *
+ * @throws \Exception
  */
 function getAttachmentThumbFromTopic($id_attach, $id_topic)
 {
 	$db = database();
 
 	// Make sure this attachment is on this board.
-	$request = $db->query('', '
-		SELECT th.id_folder, th.filename, th.file_hash, th.fileext, th.id_attach, th.attachment_type, th.mime_type,
+	$attachmentData = array_fill(0, 9, '');
+	$request = $db->fetchQuery('
+		SELECT 
+			th.id_folder, th.filename, th.file_hash, th.fileext, th.id_attach, th.attachment_type, th.mime_type,
 			a.id_folder AS attach_id_folder, a.filename AS attach_filename,
 			a.file_hash AS attach_file_hash, a.fileext AS attach_fileext,
 			a.id_attach AS attach_id_attach, a.attachment_type AS attach_attachment_type,
@@ -582,43 +586,42 @@ function getAttachmentThumbFromTopic($id_attach, $id_topic)
 			'current_topic' => $id_topic,
 		)
 	);
-	$attachmentData = array_fill(0, 9, '');
-	if ($db->num_rows($request) != 0)
+
+	if ($request->num_rows() != 0)
 	{
-		$fetch = $db->fetch_assoc($request);
+		$row = $request->fetch_assoc();
 
 		// If there is a hash then the thumbnail exists
-		if (!empty($fetch['file_hash']))
+		if (!empty($row['file_hash']))
 		{
 			$attachmentData = array(
-				$fetch['id_folder'],
-				$fetch['filename'],
-				$fetch['file_hash'],
-				$fetch['fileext'],
-				$fetch['id_attach'],
-				$fetch['attachment_type'],
-				$fetch['mime_type'],
-				$fetch['approved'],
-				$fetch['id_member'],
+				$row['id_folder'],
+				$row['filename'],
+				$row['file_hash'],
+				$row['fileext'],
+				$row['id_attach'],
+				$row['attachment_type'],
+				$row['mime_type'],
+				$row['approved'],
+				$row['id_member'],
 			);
 		}
 		// otherwise $modSettings['attachmentThumbnails'] may be (or was) off, so original file
-		elseif (getValidMimeImageType($fetch['attach_mime_type']) !== '')
+		elseif (getValidMimeImageType($row['attach_mime_type']) !== '')
 		{
 			$attachmentData = array(
-				$fetch['attach_id_folder'],
-				$fetch['attach_filename'],
-				$fetch['attach_file_hash'],
-				$fetch['attach_fileext'],
-				$fetch['attach_id_attach'],
-				$fetch['attach_attachment_type'],
-				$fetch['attach_mime_type'],
-				$fetch['approved'],
-				$fetch['id_member'],
+				$row['attach_id_folder'],
+				$row['attach_filename'],
+				$row['attach_file_hash'],
+				$row['attach_fileext'],
+				$row['attach_id_attach'],
+				$row['attach_attachment_type'],
+				$row['attach_mime_type'],
+				$row['approved'],
+				$row['id_member'],
 			);
 		}
 	}
-	$db->free_result($request);
 
 	return $attachmentData;
 }
@@ -635,18 +638,20 @@ function getAttachmentThumbFromTopic($id_attach, $id_topic)
  *
  * @param int $id_attach
  *
- * @returns array|boolean
+ * @return array|boolean
  * @package Attachments
+ * @throws \Exception
  */
 function isAttachmentImage($id_attach)
 {
 	$db = database();
 
 	// Make sure this attachment is on this board.
-	$request = $db->query('', '
+	$attachmentData = array();
+	$db->fetchQuery('
 		SELECT
-			a.filename, a.fileext, a.id_attach, a.attachment_type, a.mime_type, a.approved, a.downloads, a.size, a.width, a.height,
-			m.id_topic, m.id_board
+			a.filename, a.fileext, a.id_attach, a.attachment_type, a.mime_type, a.approved, 
+			a.downloads, a.size, a.width, a.height, m.id_topic, m.id_board
 		FROM {db_prefix}attachments as a
 			INNER JOIN {db_prefix}messages AS m ON (m.id_msg = a.id_msg)
 			INNER JOIN {db_prefix}boards AS b ON (b.id_board = m.id_board AND {query_see_board})
@@ -659,15 +664,13 @@ function isAttachmentImage($id_attach)
 			'approved' => 1,
 			'type' => 0,
 		)
+	)->fetch_callback(
+		function ($row) use (&$attachmentData) {
+			$attachmentData = $row;
+			$attachmentData['is_image'] = substr($attachmentData['mime_type'], 0, 5) === 'image';
+			$attachmentData['size'] = byte_format($attachmentData['size']);
+		}
 	);
-	$attachmentData = array();
-	if ($db->num_rows($request) != 0)
-	{
-		$attachmentData = $db->fetch_assoc($request);
-		$attachmentData['is_image'] = substr($attachmentData['mime_type'], 0, 5) === 'image';
-		$attachmentData['size'] = byte_format($attachmentData['size']);
-	}
-	$db->free_result($request);
 
 	return !empty($attachmentData) ? $attachmentData : false;
 }
@@ -681,6 +684,7 @@ function isAttachmentImage($id_attach)
  *
  * @param int $id_attach
  * @package Attachments
+ * @throws \ElkArte\Exceptions\Exception
  */
 function increaseDownloadCounter($id_attach)
 {
@@ -882,6 +886,7 @@ function url_image_size($url)
  *
  * @return string
  * @package Attachments
+ * @throws \Exception
  */
 function getAvatarPath()
 {
@@ -892,10 +897,8 @@ function getAvatarPath()
 		$attachmentsDir = new AttachmentsDirectory($modSettings, database());
 		return $attachmentsDir->getCurrent();
 	}
-	else
-	{
-		return $modSettings['custom_avatar_dir'];
-	}
+
+	return $modSettings['custom_avatar_dir'];
 }
 
 /**
@@ -905,6 +908,7 @@ function getAvatarPath()
  * and the ID of the current attachment folder otherwise.
  * NB: the latter could also be 1.
  * @package Attachments
+ * @throws \Exception
  */
 function getAvatarPathID()
 {
@@ -916,10 +920,8 @@ function getAvatarPathID()
 		$attachmentsDir = new AttachmentsDirectory($modSettings, database());
 		return $attachmentsDir->currentDirectoryId();
 	}
-	else
-	{
-		return 1;
-	}
+
+	return 1;
 }
 
 /**
@@ -935,7 +937,7 @@ function getAvatarPathID()
  *
  * @return array
  * @package Attachments
- *
+ * @throws \Exception
  */
 function getAttachments($messages, $includeUnapproved = false, $filter = null, $all_posters = array())
 {
@@ -944,7 +946,8 @@ function getAttachments($messages, $includeUnapproved = false, $filter = null, $
 	$db = database();
 
 	$attachments = array();
-	$request = $db->query('', '
+	$temp = array();
+	$db->fetchQuery('
 		SELECT
 			a.id_attach, a.id_folder, a.id_msg, a.filename, a.file_hash, COALESCE(a.size, 0) AS filesize, a.downloads, a.approved,
 			a.width, a.height' . (empty($modSettings['attachmentShowImages']) || empty($modSettings['attachmentThumbnails']) ? '' : ',
@@ -957,23 +960,22 @@ function getAttachments($messages, $includeUnapproved = false, $filter = null, $
 			'message_list' => $messages,
 			'attachment_type' => 0,
 		)
+	)->fetch_callback(
+		function ($row) use ($includeUnapproved, $filter, $all_posters, &$attachments, &$temp) {
+			if (!$row['approved'] && !$includeUnapproved
+				&& (empty($filter) || !call_user_func($filter, $row, $all_posters)))
+			{
+				return;
+			}
+
+			$temp[$row['id_attach']] = $row;
+
+			if (!isset($attachments[$row['id_msg']]))
+			{
+				$attachments[$row['id_msg']] = array();
+			}
+		}
 	);
-	$temp = array();
-	while ($row = $db->fetch_assoc($request))
-	{
-		if (!$row['approved'] && !$includeUnapproved && (empty($filter) || !call_user_func($filter, $row, $all_posters)))
-		{
-			continue;
-		}
-
-		$temp[$row['id_attach']] = $row;
-
-		if (!isset($attachments[$row['id_msg']]))
-		{
-			$attachments[$row['id_msg']] = array();
-		}
-	}
-	$db->free_result($request);
 
 	// This is better than sorting it with the query...
 	ksort($temp);
@@ -987,97 +989,83 @@ function getAttachments($messages, $includeUnapproved = false, $filter = null, $
 }
 
 /**
- * Recursive function to retrieve server-stored avatar files
+ * Function to retrieve server-stored avatar files
  *
  * @param string $directory
- * @param int $level
  * @return array
  * @package Attachments
  */
-function getServerStoredAvatars($directory, $level)
+function getServerStoredAvatars($directory)
 {
 	global $context, $txt, $modSettings;
 
-	$result = array();
+	$result = [];
 
-	// Open the directory..
-	$dir = dir($modSettings['avatar_directory'] . (!empty($directory) ? '/' : '') . $directory);
-	$dirs = array();
-	$files = array();
+	// You can always have no avatar
+	$result[] = array(
+		'filename' => 'blank.png',
+		'checked' => in_array($context['member']['avatar']['server_pic'], array('', 'blank.png')),
+		'name' => $txt['no_pic'],
+		'is_dir' => false
+	);
 
-	if (!$dir)
+	// Not valid is easy
+	$avatarDir = $modSettings['avatar_directory'] . (!empty($directory) ? '/' : '') . $directory;
+	if (!is_dir($avatarDir))
 	{
-		return array();
+		return $result;
 	}
 
-	while ($line = $dir->read())
+	// Find all of the other avatars under and in the avatar directory
+	$serverAvatars = new RecursiveIteratorIterator(
+		new RecursiveDirectoryIterator(
+			$avatarDir,
+			RecursiveDirectoryIterator::SKIP_DOTS
+		),
+		\RecursiveIteratorIterator::SELF_FIRST,
+		\RecursiveIteratorIterator::CATCH_GET_CHILD
+	);
+	$key = 0;
+	foreach ($serverAvatars as $entry)
 	{
-		if (in_array($line, array('.', '..', 'blank.png', 'index.php')))
+		if ($entry->isDir())
 		{
-			continue;
-		}
-
-		if (is_dir($modSettings['avatar_directory'] . '/' . $directory . (!empty($directory) ? '/' : '') . $line))
-		{
-			$dirs[] = $line;
-		}
-		else
-		{
-			$files[] = $line;
-		}
-	}
-	$dir->close();
-
-	// Sort the results...
-	natcasesort($dirs);
-	natcasesort($files);
-
-	if ($level == 0)
-	{
-		$result[] = array(
-			'filename' => 'blank.png',
-			'checked' => in_array($context['member']['avatar']['server_pic'], array('', 'blank.png')),
-			'name' => $txt['no_pic'],
-			'is_dir' => false
-		);
-	}
-
-	foreach ($dirs as $line)
-	{
-		$tmp = getServerStoredAvatars($directory . (!empty($directory) ? '/' : '') . $line, $level + 1);
-		if (!empty($tmp))
-		{
+			// Add a new directory
 			$result[] = array(
-				'filename' => htmlspecialchars($line, ENT_COMPAT, 'UTF-8'),
-				'checked' => strpos($context['member']['avatar']['server_pic'], $line . '/') !== false,
-				'name' => '[' . htmlspecialchars(str_replace('_', ' ', $line), ENT_COMPAT, 'UTF-8') . ']',
+				'filename' => htmlspecialchars(basename($entry), ENT_COMPAT, 'UTF-8'),
+				'checked' => strpos($context['member']['avatar']['server_pic'], basename($entry) . '/') !== false,
+				'name' => '[' . htmlspecialchars(str_replace('_', ' ', basename($entry)), ENT_COMPAT, 'UTF-8') . ']',
 				'is_dir' => true,
-				'files' => $tmp
+				'files' => []
 			);
-		}
-		unset($tmp);
-	}
+			$key++;
 
-	foreach ($files as $line)
-	{
-		$filename = substr($line, 0, (strlen($line) - strlen(strrchr($line, '.'))));
-		$extension = substr(strrchr($line, '.'), 1);
-
-		// Make sure it is an image.
-		if (getValidMimeImageType($extension) === '')
-		{
 			continue;
 		}
 
-		$result[] = array(
-			'filename' => htmlspecialchars($line, ENT_COMPAT, 'UTF-8'),
-			'checked' => $line == $context['member']['avatar']['server_pic'],
-			'name' => htmlspecialchars(str_replace('_', ' ', $filename), ENT_COMPAT, 'UTF-8'),
-			'is_dir' => false
-		);
-		if ($level == 1)
+		// Add the files under the current directory we are iterating on
+		if (!in_array($entry->getFilename(), array('blank.png', 'index.php', '.htaccess')))
 		{
-			$context['avatar_list'][] = $directory . '/' . $line;
+			$extension = $entry->getExtension();
+			$filename = $entry->getBasename('.' . $extension);
+
+			// Make sure it is an image.
+			if (empty(getValidMimeImageType($extension)))
+			{
+				continue;
+			}
+
+			$result[$key]['files'][] = [
+				'filename' => htmlspecialchars($entry->getFilename(), ENT_COMPAT, 'UTF-8'),
+				'checked' => $entry->getFilename() == $context['member']['avatar']['server_pic'],
+				'name' => htmlspecialchars(str_replace('_', ' ', $filename), ENT_COMPAT, 'UTF-8'),
+				'is_dir' => false
+			];
+
+			if (dirname($entry->getPath(), 1) === $modSettings['avatar_directory'])
+			{
+				$context['avatar_list'][] = str_replace($modSettings['avatar_directory'] . '/', '', $entry->getPathname());
+			}
 		}
 	}
 
@@ -1165,6 +1153,7 @@ function updateAttachmentThumbnail($filename, $id_attach, $id_msg, $old_id_thumb
  * @param int $id_msg
  * @param bool $include_count = true if true, it also returns the attachments count
  * @package Attachments
+ * @throws \ElkArte\Exceptions\Exception
  */
 function attachmentsSizeForMessage($id_msg, $include_count = true)
 {
@@ -1172,8 +1161,9 @@ function attachmentsSizeForMessage($id_msg, $include_count = true)
 
 	if ($include_count)
 	{
-		$request = $db->query('', '
-			SELECT COUNT(*), SUM(size)
+		$request = $db->fetchQuery('
+			SELECT 
+				COUNT(*), SUM(size)
 			FROM {db_prefix}attachments
 			WHERE id_msg = {int:id_msg}
 				AND attachment_type = {int:attachment_type}',
@@ -1185,8 +1175,9 @@ function attachmentsSizeForMessage($id_msg, $include_count = true)
 	}
 	else
 	{
-		$request = $db->query('', '
-			SELECT COUNT(*)
+		$request = $db->fetchQuery('
+			SELECT 
+				COUNT(*)
 			FROM {db_prefix}attachments
 			WHERE id_msg = {int:id_msg}
 				AND attachment_type = {int:attachment_type}',
@@ -1196,10 +1187,8 @@ function attachmentsSizeForMessage($id_msg, $include_count = true)
 			)
 		);
 	}
-	$size = $db->fetch_row($request);
-	$db->free_result($request);
 
-	return $size;
+	return $request->fetch_row();
 }
 
 /**
@@ -1217,6 +1206,7 @@ function attachmentsSizeForMessage($id_msg, $include_count = true)
  * @todo change this pre-condition, too fragile and error-prone.
  *
  * @package Attachments
+ * @throws \ElkArte\Exceptions\Exception
  */
 function loadAttachmentContext($id_msg)
 {
@@ -1350,7 +1340,7 @@ function loadAttachmentContext($id_msg)
  *
  * @return null|string|string[]
  * @package Attachments
- *
+ * @throws \Exception
  */
 function getLegacyAttachmentFilename($filename, $attachment_id, $dir = null, $new = false)
 {
@@ -1387,6 +1377,7 @@ function getLegacyAttachmentFilename($filename, $attachment_id, $dir = null, $ne
  * @param int $id_msg
  * @param int[] $attachment_ids
  * @package Attachments
+ * @throws \ElkArte\Exceptions\Exception
  */
 function bindMessageAttachments($id_msg, $attachment_ids)
 {
@@ -1421,7 +1412,7 @@ function bindMessageAttachments($id_msg, $attachment_ids)
  * Something messy like that.
  * @todo and of course everything relies on this behavior and work around it. :P.
  * Converters included.
- *
+ * @throws \Exception
  */
 function getAttachmentFilename($filename, $attachment_id, $dir = null, $new = false, $file_hash = '')
 {
@@ -1430,7 +1421,9 @@ function getAttachmentFilename($filename, $attachment_id, $dir = null, $new = fa
 	// Just make up a nice hash...
 	if ($new)
 	{
-		return hash('sha1', hash('md5', $filename . time()) . mt_rand());
+		$tokenizer = new \ElkArte\TokenHash();
+
+		return $tokenizer->generate_hash(40);
 	}
 
 	// In case of files from the old system, do a legacy call.
@@ -1451,13 +1444,14 @@ function getAttachmentFilename($filename, $attachment_id, $dir = null, $new = fa
  * @param int $id_attach
  * @return int[]|boolean on fail else an array of id_board, id_topic
  * @package Attachments
+ * @throws \Exception
  */
 function getAttachmentPosition($id_attach)
 {
 	$db = database();
 
 	// Make sure this attachment is on this board.
-	$request = $db->query('', '
+	$request = $db->fetchQuery('
 		SELECT 
 			m.id_board, m.id_topic
 		FROM {db_prefix}attachments AS a
@@ -1471,17 +1465,14 @@ function getAttachmentPosition($id_attach)
 		)
 	);
 
-	$attachmentData = $db->fetch_assoc($request);
-	$db->free_result($request);
+	$attachmentData = $request->fetch_all();
 
 	if (empty($attachmentData))
 	{
 		return false;
 	}
-	else
-	{
-		return $attachmentData;
-	}
+
+	return $attachmentData[0];
 }
 
 /**
@@ -1512,6 +1503,7 @@ function elk_getimagesize($file, $error = 'array')
  * @param bool $url
  *
  * @return bool|string
+ * @throws \Exception
  */
 function returnMimeThumb($file_ext, $url = false)
 {
@@ -1582,29 +1574,13 @@ function getValidMimeImageType($mime)
 		IMAGETYPE_WBMP => 'bmp'
 	);
 
-	if ((int) $mime > 0)
+	$ext = $validImageTypes[(int) $mime] ?? '';
+	if (empty($ext))
 	{
-		$ext = isset($validImageTypes[$mime]) ? $validImageTypes[$mime] : '';
-	}
-	elseif (strpos($mime, '/'))
-	{
-		$ext = substr($mime, strpos($mime, '/') + 1);
-	}
-	else
-	{
-		$ext = $mime;
+		$ext = strtolower(trim(substr($mime, strpos($mime, '/')), '/'));
 	}
 
-	$ext = strtolower($ext);
-	foreach ($validImageTypes as $valid_ext)
-	{
-		if ($valid_ext === $ext)
-		{
-			return 'image/' . $ext;
-		}
-	}
-
-	return '';
+	return in_array($ext, $validImageTypes) ? 'image/' . $ext : '';
 }
 
 /**
