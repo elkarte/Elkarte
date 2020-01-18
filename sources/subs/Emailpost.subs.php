@@ -867,7 +867,8 @@ function pbe_email_attachments($pbe, $email_message)
 	// Create the file(s) with a temp name so we can validate its contents/type
 	foreach ($email_message->attachments as $name => $attachment)
 	{
-		$attachID = $tmp_attachments->getTplName($pbe['profile']['id_member'], md5(mt_rand()) . $attachment_count);
+		$attachID = $tmp_attachments->getTplName($pbe['profile']['id_member'], bin2hex(random_bytes(16)));
+
 		// Write the contents to an actual file
 		$destName = $current_attach_dir . '/' . $attachID;
 
@@ -875,7 +876,7 @@ function pbe_email_attachments($pbe, $email_message)
 		{
 			@chmod($destName, 0644);
 
-			$temp_file = new TemporaryAttachment([
+			$temp_file = new \ElkArte\TemporaryAttachment([
 				'name' => basename($name),
 				'tmp_name' => $destName,
 				'attachid' => $attachID,
@@ -893,11 +894,13 @@ function pbe_email_attachments($pbe, $email_message)
 	}
 
 	$prefix = $tmp_attachments->getTplName($pbe['profile']['id_member'], '');
+
 	// Get the results from attachmentChecks and see if its suitable for posting
 	foreach ($tmp_attachments as $attachID => $attachment)
 	{
 		// If there were any errors we just skip that file
-		if (($attachID != 'initial_error' && strpos($attachID, $prefix) === false) || ($attachID == 'initial_error' || $attachment->hasErrors()))
+		if (($attachID != 'initial_error' && strpos($attachID, $prefix) === false)
+			|| ($attachID == 'initial_error' || $attachment->hasErrors()))
 		{
 			if ($attachID == 'initial_error')
 			{

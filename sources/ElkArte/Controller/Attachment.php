@@ -437,7 +437,7 @@ class Attachment extends AbstractController
 			fclose($fp);
 		}
 		// On some of the less-bright hosts, readfile() is disabled.  It's just a faster, more byte safe, version of what's in the if.
-		elseif (isset($callback) || @readfile($filename) === null)
+		elseif (@readfile($filename) === null)
 		{
 			echo file_get_contents($filename);
 		}
