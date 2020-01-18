@@ -134,7 +134,7 @@ class Attachment extends AbstractController
 			{
 				require_once(SUBSDIR . '/Attachments.subs.php');
 
-				$process = $this->_req->getPost('msg', 'intval', '');
+				$process = $this->_req->getPost('msg', 'intval', 0);
 				processAttachments($process);
 			}
 
@@ -151,11 +151,11 @@ class Attachment extends AbstractController
 
 				$context['json_data'] = array('result' => false, 'data' => $resp_data);
 			}
-			// No errors, lets get the details of what we have for our response back
+			// No errors, lets get the details of what we have for our response back to the upload dialog
 			else
 			{
 				$tmp_attachments = new TemporaryAttachmentsList();
-				foreach ($tmp_attachments as $attachID => $val)
+				foreach ($tmp_attachments->toArray() as $attachID => $val)
 				{
 					// We need to grab the name anyhow
 					if (!empty($val['tmp_name']))
@@ -600,7 +600,7 @@ class Attachment extends AbstractController
 		{
 			if (empty($topic) || (string) (int) $this->_req->query->attach !== (string) $this->_req->query->attach)
 			{
-				$attach_data = $tmp_attachments->getTempAttachById($this->_req->query->attach, $attachmentsDir, User::$info->id);
+				$attach_data = $tmp_attachments->getTempAttachById($this->_req->query->attach, $attachmentsDir, \ElkArte\User::$info->id);
 				$file_ext = pathinfo($attach_data['name'], PATHINFO_EXTENSION);
 				$filename = $attach_data['tmp_name'];
 				$id_attach = $attach_data['attachid'];

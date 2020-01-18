@@ -26,7 +26,6 @@ use ElkArte\Util;
 use ElkArte\AttachmentsDirectory;
 use ElkArte\Exceptions\Exception as ElkException;
 use ElkArte\TemporaryAttachmentsList;
-use \Exception as Exception;
 
 /**
  * Handles the actual saving of attachments to a directory.
@@ -62,7 +61,7 @@ function processAttachments($id_msg = null)
 			\ElkArte\Errors\Errors::instance()->log_error(sprintf($txt['attach_folder_admin_warning'], $attach_current_dir), 'critical');
 		}
 	}
-	catch (Exception $e)
+	catch (\Exception $e)
 	{
 		// If the attachments folder is not there: error.
 		$initial_error = $e->getMessage();
@@ -93,13 +92,10 @@ function processAttachments($id_msg = null)
 		// If new files are being added. We can't ignore those
 		if (!empty($_FILES['attachment']['tmp_name']))
 		{
-			foreach ($_FILES['attachment']['tmp_name'] as $dummy)
+			// If the array is not empty
+			if (count(array_filter($_FILES['attachment']['tmp_name'])) !== 0)
 			{
-				if (!empty($dummy))
-				{
-					$ignore_temp = false;
-					break;
-				}
+				$ignore_temp = false;
 			}
 		}
 
@@ -161,10 +157,11 @@ function processAttachments($id_msg = null)
 		// First, let's first check for PHP upload errors.
 		$errors = attachmentUploadChecks($n);
 
-		$temp_file = new TemporaryAttachment([
+		$temp_file = new \ElkArte\TemporaryAttachment([
 			'name' => basename($_FILES['attachment']['name'][$n]),
 			'tmp_name' => $_FILES['attachment']['tmp_name'][$n],
-			'attachid' => $tmp_attachments->getTplName(User::$info->id, md5(mt_rand())),
+			'attachid' => $tmp_attachments->getTplName(User::$info->id, bin2hex(random_bytes(16))),
+			'public_attachid' => $tmp_attachments->getTplName(User::$info->id, bin2hex(random_bytes(16))),
 			'user_id' => User::$info->id,
 			'size' => $_FILES['attachment']['size'][$n],
 			'type' => $_FILES['attachment']['type'][$n],
@@ -179,7 +176,7 @@ function processAttachments($id_msg = null)
 		// Upload error(s) were detected, flag the error, remove the file
 		else
 		{
-			$temp_file->addError($errors);
+			$temp_file->setErrors($errors);
 			$temp_file->remove(false);
 		}
 

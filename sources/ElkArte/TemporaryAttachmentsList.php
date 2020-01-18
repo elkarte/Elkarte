@@ -14,7 +14,6 @@
 namespace ElkArte;
 
 use ElkArte\ValuesContainer;
-use \Exception as Exception;
 use ElkArte\TemporaryAttachment;
 
 /**
@@ -22,8 +21,9 @@ use ElkArte\TemporaryAttachment;
  */
 class TemporaryAttachmentsList extends ValuesContainer
 {
-	const ID = 'temp_attachments';
-	const TMPNAME_TPL = 'post_tmp_{user}_{hash}';
+	private const ID = 'temp_attachments';
+
+	private const TMPNAME_TPL = 'post_tmp_{user}_{hash}';
 
 	/**
 	 * Constructor
@@ -59,20 +59,21 @@ class TemporaryAttachmentsList extends ValuesContainer
 	/**
 	 * Deletes a temporary attachment from the $_SESSION (and the filesystem)
 	 *
-	 * @param string $attach_id the temporary name generated when a file is uploaded
+	 * @param string $attachID the temporary name generated when a file is uploaded
 	 *               and used in $_SESSION to help identify the attachment itself
 	 * @param bool $fatal
+	 * @throws \Exception
 	 */
 	public function removeById($attachID, $fatal = true)
 	{
 		if ($fatal && !isset($this->data[$attachID]))
 		{
-			throw new Exception('attachment_not_found');
+			throw new \Exception('attachment_not_found');
 		}
 
-		if ($fatal && !file_exists($attach['tmp_name']))
+		if ($fatal && !$this->data[$attachID]->fileExists())
 		{
-			throw new Exception('attachment_not_found');
+			throw new \Exception('attachment_not_found');
 		}
 
 		$this->data[$attachID]->remove($fatal);
@@ -89,6 +90,7 @@ class TemporaryAttachmentsList extends ValuesContainer
 	 * file system.
 	 *
 	 * @param int $userId
+	 * @return bool
 	 */
 	public function filesExist($userId)
 	{
@@ -103,22 +105,34 @@ class TemporaryAttachmentsList extends ValuesContainer
 			if ($attachment->fileExists())
 			{
 				unset($this->data['post']['files']);
+
 				return true;
 			}
 		}
+
 		return false;
 	}
 
+	/**
+	 * Remove attachment files that we do not want to keep
+	 *
+	 * @param string[] $keep
+	 * @param int $userId
+	 */
 	public function removeExcept($keep, $userId)
 	{
 		$prefix = $this->getTplName($userId, '');
+
 		foreach ($this->data as $attachID => $attachment)
 		{
-			if ((isset($this->data['post']['files'], $attachment['name']) && in_array($attachment['name'], $this->data['post']['files'])) || in_array($attachID, $keep) || strpos($attachID, $prefix) === false)
+			if ((isset($this->data['post']['files'], $attachment['name']) && in_array($attachment['name'], $this->data['post']['files']))
+				|| in_array($attachID, $keep)
+				|| strpos($attachID, $prefix) === false)
 			{
 				continue;
 			}
 
+			// Remove this one from our data array and the filesystem
 			$attachment->remove(false);
 			unset($this->data[$attachID]);
 		}
@@ -128,6 +142,7 @@ class TemporaryAttachmentsList extends ValuesContainer
 	 * Returns an array of names of temporary attachments for the specified user.
 	 *
 	 * @param int $userId
+	 * @return mixed
 	 */
 	public function getFileNames($userId)
 	{
@@ -149,6 +164,7 @@ class TemporaryAttachmentsList extends ValuesContainer
 	 *
 	 * @param int $userId
 	 * @param string $hash
+	 * @return string|string[]
 	 */
 	public function getTplName($userId, $hash = '')
 	{
@@ -160,9 +176,19 @@ class TemporaryAttachmentsList extends ValuesContainer
 		return isset($this->data['post']);
 	}
 
-	public function addAttachment(TemporaryAttachment $data)
+	/**
+	 * Add file data, for those that passed upload tests, to the data attachid key
+	 *
+	 * @param \ElkArte\TemporaryAttachment $data
+	 */
+	public function addAttachment($data)
 	{
 		$this->data[$data['attachid']] = $data;
+	}
+
+	public function getAttachment()
+	{
+		return $this->data;
 	}
 
 	public function areLostAttachments()
@@ -175,12 +201,18 @@ class TemporaryAttachmentsList extends ValuesContainer
 		return $this->data['post'][$idx] ?? null;
 	}
 
+	/**
+	 * Add post values to the data array in the post key
+	 *
+	 * @param array $vals
+	 */
 	public function setPostParam(array $vals)
 	{
 		if (!isset($this->data['post']))
 		{
 			$this->data['post'] = [];
 		}
+
 		$this->data['post'] = array_merge($this->data['post'], $vals);
 	}
 
@@ -212,7 +244,7 @@ class TemporaryAttachmentsList extends ValuesContainer
 
 		if ($this->hasAttachments() === false)
 		{
-			throw new Exception('no_access');
+			throw new \Exception('no_access');
 		}
 
 		foreach ($this->data as $attachID => $val)
@@ -231,7 +263,7 @@ class TemporaryAttachmentsList extends ValuesContainer
 
 		if (empty($attach_real_id))
 		{
-			throw new Exception('no_access');
+			throw new \Exception('no_access');
 		}
 
 		// The common name form is "post_tmp_123_0ac9a0b1fc18604e8704084656ed5f09"
@@ -240,7 +272,7 @@ class TemporaryAttachmentsList extends ValuesContainer
 		// Permissions: only temporary attachments
 		if (substr($id_attach, 0, 8) !== 'post_tmp')
 		{
-			throw new Exception('no_access');
+			throw new \Exception('no_access');
 		}
 
 		// Permissions: only author is allowed.
@@ -248,7 +280,7 @@ class TemporaryAttachmentsList extends ValuesContainer
 
 		if (!isset($pieces[0]) || $pieces[0] != $userId)
 		{
-			throw new Exception('no_access');
+			throw new \Exception('no_access');
 		}
 
 		$attach_dir = $attachmentsDir->getCurrent();
@@ -258,7 +290,7 @@ class TemporaryAttachmentsList extends ValuesContainer
 			return $this->data[$attach_real_id];
 		}
 
-		throw new Exception('no_access');
+		throw new \Exception('no_access');
 	}
 
 	/**
@@ -268,7 +300,7 @@ class TemporaryAttachmentsList extends ValuesContainer
 	 *
 	 * @return string
 	 */
-	function getIdFromPublic($public_attachid)
+	public function getIdFromPublic($public_attachid)
 	{
 		if ($this->hasAttachments() === false)
 		{
@@ -277,7 +309,13 @@ class TemporaryAttachmentsList extends ValuesContainer
 
 		foreach ($this->data as $key => $val)
 		{
-			if ($val['public_attachid'] === $public_attachid)
+			if ($key === 'post')
+			{
+				continue;
+			}
+
+			$val = $val->toArray();
+			if (isset($val['public_attachid']) && $val['public_attachid'] === $public_attachid)
 			{
 				return $key;
 			}
@@ -287,7 +325,7 @@ class TemporaryAttachmentsList extends ValuesContainer
 	}
 
 	/**
-	 * Destroies all the attachments data in $_SESSION
+	 * Destroy all the attachments data in $_SESSION
 	 */
 	public function unset()
 	{

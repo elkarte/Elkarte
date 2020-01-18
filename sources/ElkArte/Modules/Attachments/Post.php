@@ -377,7 +377,7 @@ class Post extends AbstractModule
 	 * @param int $msg
 	 * @throws \ElkArte\Exceptions\Exception
 	 */
-	protected function saveAttachments($msg)
+	protected function saveAttachments($msg = 0)
 	{
 		global $context, $modSettings;
 
@@ -388,7 +388,7 @@ class Post extends AbstractModule
 			$keep_temp = array();
 			$keep_ids = array();
 			$tmp_attachments = new TemporaryAttachmentsList();
-			$prefix = $tmp_attachments->getName($this->user->id, '');
+			$prefix = $tmp_attachments->getTplName($this->user->id, '');
 
 			foreach ($_POST['attach_del'] as $public_id)
 			{
@@ -406,6 +406,7 @@ class Post extends AbstractModule
 
 			$tmp_attachments->removeExcept($keep_temp, $this->user->id);
 
+			// Editing a message, remove attachments they no longer wanted to keep
 			if (!empty($msg))
 			{
 				require_once(SUBSDIR . '/ManageAttachments.subs.php');
@@ -423,7 +424,7 @@ class Post extends AbstractModule
 		if ($context['attachments']['can']['post'] && empty($_POST['from_qr']))
 		{
 			require_once(SUBSDIR . '/Attachments.subs.php');
-			$this->ignore_temp = !empty($msg) ? processAttachments((int) $msg) : processAttachments();
+			$this->ignore_temp = processAttachments((int) $msg);
 		}
 	}
 
@@ -438,14 +439,17 @@ class Post extends AbstractModule
 
 		$this->_is_new_message = empty($msgOptions['id']);
 		$tmp_attachments = new TemporaryAttachmentsList();
-		$prefix = $tmp_attachments->getName($this->user->id, '');
+		$prefix = $tmp_attachments->getTplName($this->user->id, '');
 
 		// ...or attach a new file...
-		if (empty($this->ignore_temp) && $context['attachments']['can']['post'] && $tmp_attachments->hasAttachments() && empty($_POST['from_qr']))
+		if (empty($this->ignore_temp)
+			&& $context['attachments']['can']['post']
+			&& $tmp_attachments->hasAttachments()
+			&& empty($_POST['from_qr']))
 		{
 			$this->_saved_attach_id = array();
 
-			foreach ($tmp_attachments as $attachID => $attachment)
+			foreach ($tmp_attachments->toArray() as $attachID => $attachment)
 			{
 				if ($attachID !== 'initial_error' && strpos($attachID, $prefix) === false)
 				{

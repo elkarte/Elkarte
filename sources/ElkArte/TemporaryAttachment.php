@@ -15,7 +15,6 @@ namespace ElkArte;
 
 use ElkArte\ValuesContainer;
 use ElkArte\Exceptions\Exception as ElkException;
-use \Exception as Exception;
 use ElkArte\Graphics\Image;
 
 /**
@@ -37,9 +36,8 @@ class TemporaryAttachment extends ValuesContainer
 	/**
 	 * Deletes a temporary attachment from the $_SESSION (and the filesystem)
 	 *
-	 * @param string $attach_id the temporary name generated when a file is uploaded
-	 *               and used in $_SESSION to help identify the attachment itself
 	 * @param bool $fatal
+	 * @throws \Exception
 	 */
 	public function remove($fatal = true)
 	{
@@ -48,7 +46,7 @@ class TemporaryAttachment extends ValuesContainer
 
 		if ($fatal && !file_exists($this->data['tmp_name']))
 		{
-			throw new Exception('attachment_not_found');
+			throw new \Exception('attachment_not_found');
 		}
 
 		@unlink($this->data['tmp_name']);
@@ -59,29 +57,44 @@ class TemporaryAttachment extends ValuesContainer
 	 */
 	public function fileExists()
 	{
-			return file_exists($this->data['tmp_name']);
+		return file_exists($this->data['tmp_name']);
 	}
 
 	/**
-	 * Returns an array of names of temporary attachments for the specified user.
+	 * Returns an array of names of temporary attachments.
 	 *
-	 * @param int $userId
+	 * @return mixed
 	 */
 	public function getName()
 	{
 		return $this->data['name'];
 	}
 
-	public function addError($error)
+	/**
+	 * Error setter, adds errors to the stack
+	 *
+	 * @param $error
+	 */
+	public function setErrors($error)
 	{
 		$this->data['errors'][] = array_merge($this->data['errors'], (array) $error);
 	}
 
+	/**
+	 * Return if errors were found for this attachment attempt
+	 *
+	 * @return bool
+	 */
 	public function hasErrors()
 	{
 		return !empty($this->data['errors']);
 	}
 
+	/**
+	 * Error getter
+	 *
+	 * @return mixed
+	 */
 	public function getErrors()
 	{
 		return $this->data['errors'];
@@ -103,18 +116,25 @@ class TemporaryAttachment extends ValuesContainer
 		$this->data['tmp_name'] = $file_path;
 	}
 
+	/**
+	 * Move a file from one location to another.  Generally used to move from /tmp
+	 * to the current attachment directory
+	 *
+	 * @param $file_path
+	 */
 	public function moveUploaded($file_path)
 	{
-		$destName = $file_path . '/'. $this->data['attachid'];
+		$destName = $file_path . '/' . $this->data['attachid'];
 
 		// Move the file to the attachments folder with a temp name for now.
 		if (@move_uploaded_file($this->data['tmp_name'], $destName))
 		{
+			$this->data['tmp_name'] = $destName;
 			@chmod($destName, 0644);
 		}
 		else
 		{
-			$this->addError('attach_timeout');
+			$this->setErrors('attach_timeout');
 			if (file_exists($this->data['tmp_name']))
 			{
 				unlink($this->data['tmp_name']);
@@ -130,6 +150,7 @@ class TemporaryAttachment extends ValuesContainer
 	/**
 	 * Performs various checks on an uploaded file.
 	 *
+	 * @param \ElkArte\AttachmentsDirectory $attachmentDirectory
 	 * @return bool
 	 * @throws \ElkArte\Exceptions\Exception attach_check_nag
 	 *
@@ -138,11 +159,13 @@ class TemporaryAttachment extends ValuesContainer
 	{
 		global $modSettings, $context;
 
-		// If there were no errors to this point, we apply some additional checks
+		// If there were already errors at this point, no need to check further
 		if (!empty($this->data['errors']))
 		{
-			return;
+			return false;
 		}
+
+		// Apply some additional checks
 		if (empty($this->data['attachid']))
 		{
 			$error = 'attachid';
@@ -162,7 +185,7 @@ class TemporaryAttachment extends ValuesContainer
 		// Just in case this slipped by the first checks, we stop it here and now
 		if ($this->data['size'] == 0)
 		{
-			$this->addError('attach_0_byte_file');
+			$this->setErrors('attach_0_byte_file');
 
 			return false;
 		}
@@ -180,7 +203,7 @@ class TemporaryAttachment extends ValuesContainer
 				if (empty($modSettings['attachment_image_reencode']) || (!$image->reencodeImage($this->data['tmp_name'])))
 				{
 					// Nothing to do: not allowed or not successful re-encoding it.
-					$this->addError('bad_attachment');
+					$this->setErrors('bad_attachment');
 
 					return false;
 				}
@@ -195,15 +218,15 @@ class TemporaryAttachment extends ValuesContainer
 		{
 			$attachmentDirectory->checkDirSpace($this);
 		}
-		catch (Exception $e)
+		catch (\Exception $e)
 		{
-			$this->addError($e->getMessage());
+			$this->setErrors($e->getMessage());
 		}
 
 		// Is the file too big?
 		if (!empty($modSettings['attachmentSizeLimit']) && $this->data['size'] > $modSettings['attachmentSizeLimit'] * 1024)
 		{
-			$this->addError([
+			$this->setErrors([
 				'file_too_big', [
 					comma_format($modSettings['attachmentSizeLimit'], 0)
 				]
@@ -214,7 +237,7 @@ class TemporaryAttachment extends ValuesContainer
 		$context['attachments']['total_size'] += $this->data['size'];
 		if (!empty($modSettings['attachmentPostLimit']) && $context['attachments']['total_size'] > $modSettings['attachmentPostLimit'] * 1024)
 		{
-			$this->addError([
+			$this->setErrors([
 				'attach_max_total_file_size', [
 					comma_format($modSettings['attachmentPostLimit'], 0),
 					comma_format($modSettings['attachmentPostLimit'] - (($context['attachments']['total_size'] - $this->data['size']) / 1024), 0)
@@ -226,14 +249,14 @@ class TemporaryAttachment extends ValuesContainer
 		$context['attachments']['quantity']++;
 
 		// Set a max limit if none exists
-		if (empty($modSettings['attachmentNumPerPostLimit']) && $context['attachments']['quantity'] >= 50)
+		if (empty($modSettings['attachmentNumPerPostLimit']) && $context['attachments']['quantity'] >= 15)
 		{
-			$modSettings['attachmentNumPerPostLimit'] = 50;
+			$modSettings['attachmentNumPerPostLimit'] = 15;
 		}
 
 		if (!empty($modSettings['attachmentNumPerPostLimit']) && $context['attachments']['quantity'] > $modSettings['attachmentNumPerPostLimit'])
 		{
-			$this->addError([
+			$this->setErrors([
 				'attachments_limit_per_post', [
 					$modSettings['attachmentNumPerPostLimit']
 				]
@@ -244,15 +267,12 @@ class TemporaryAttachment extends ValuesContainer
 		if (!empty($modSettings['attachmentCheckExtensions']))
 		{
 			$allowed = explode(',', strtolower($modSettings['attachmentExtensions']));
-			foreach ($allowed as $k => $dummy)
-			{
-				$allowed[$k] = trim($dummy);
-			}
+			$allowed = array_map('trim', $allowed);
 
 			if (!in_array(strtolower(substr(strrchr($this->data['name'], '.'), 1)), $allowed))
 			{
 				$allowed_extensions = strtr(strtolower($modSettings['attachmentExtensions']), array(',' => ', '));
-				$this->addError([
+				$this->setErrors([
 					'cant_upload_type', [
 						$allowed_extensions
 					]
@@ -267,6 +287,7 @@ class TemporaryAttachment extends ValuesContainer
 			{
 				$context['dir_size'] -= $this->data['size'];
 			}
+
 			if (isset($context['dir_files']))
 			{
 				$context['dir_files']--;
@@ -281,6 +302,11 @@ class TemporaryAttachment extends ValuesContainer
 		return true;
 	}
 
+	/**
+	 * Rotate an image top side up based on its EXIF data
+	 *
+	 * @throws \Exception
+	 */
 	public function autoRotate()
 	{
 		if ($this->hasErrors() === false && substr($this->data['type'], 0, 5) === 'image')
