@@ -191,6 +191,14 @@ class ValuesContainer implements \ArrayAccess
 	}
 
 	/**
+	 * Returns the number of elements in the object
+	 */
+	public function count()
+	{
+		return count($this->data);
+	}
+
+	/**
 	 * Returns the data of the user in an array format
 	 *
 	 * @return mixed[]

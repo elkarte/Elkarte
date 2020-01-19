@@ -22,6 +22,7 @@ use ElkArte\Errors\AttachmentErrorContext;
 use ElkArte\Exceptions\Exception;
 use ElkArte\Graphics\Image;
 use ElkArte\AttachmentsDirectory;
+use ElkArte\TemporaryAttachmentsList;
 
 /**
  *
@@ -133,7 +134,7 @@ class Attachment extends AbstractController
 			{
 				require_once(SUBSDIR . '/Attachments.subs.php');
 
-				$process = $this->_req->getPost('msg', 'intval', '');
+				$process = $this->_req->getPost('msg', 'intval', 0);
 				processAttachments($process);
 			}
 
@@ -150,10 +151,11 @@ class Attachment extends AbstractController
 
 				$context['json_data'] = array('result' => false, 'data' => $resp_data);
 			}
-			// No errors, lets get the details of what we have for our response back
+			// No errors, lets get the details of what we have for our response back to the upload dialog
 			else
 			{
-				foreach ($_SESSION['temp_attachments'] as $attachID => $val)
+				$tmp_attachments = new TemporaryAttachmentsList();
+				foreach ($tmp_attachments->toArray() as $attachID => $val)
 				{
 					// We need to grab the name anyhow
 					if (!empty($val['tmp_name']))
@@ -208,16 +210,22 @@ class Attachment extends AbstractController
 		if (isset($this->_req->post->attachid))
 		{
 			$result = false;
-			if (!empty($_SESSION['temp_attachments']))
+			$tmp_attachments = new TemporaryAttachmentsList();
+			if ($tmp_attachments->hasAttachments())
 			{
 				require_once(SUBSDIR . '/Attachments.subs.php');
 
-				$attachId = getAttachmentIdFromPublic($this->_req->post->attachid);
+				$attachId = $tmp_attachments->getIdFromPublic($this->_req->post->attachid);
 
-				$result = removeTempAttachById($attachId);
-				if ($result === true)
+				try
 				{
+					$tmp_attachments->removeById($attachId);
 					$context['json_data'] = array('result' => true);
+					$result = true;
+				}
+				catch (\Exception $e)
+				{
+					$result = $e->getMessage();
 				}
 			}
 
@@ -410,30 +418,6 @@ class Attachment extends AbstractController
 
 		$this->_send_headers($filename, $eTag, $mime_type, $use_compression, $disposition, $real_filename, $do_cache);
 
-		// Recode line endings for text files, if enabled.
-		if (!empty($modSettings['attachmentRecodeLineEndings']) && !isset($this->_req->query->image) && in_array($file_ext, array('txt', 'css', 'htm', 'html', 'php', 'xml')))
-		{
-			$req = request();
-			if (strpos($req->user_agent(), 'Windows') !== false)
-			{
-				$callback = function ($buffer) {
-					return preg_replace('~[\r]?\n~', "\r\n", $buffer);
-				};
-			}
-			elseif (strpos($req->user_agent(), 'Mac') !== false)
-			{
-				$callback = function ($buffer) {
-					return preg_replace('~[\r]?\n~', "\r", $buffer);
-				};
-			}
-			else
-			{
-				$callback = function ($buffer) {
-					return preg_replace('~[\r]?\n~', "\n", $buffer);
-				};
-			}
-		}
-
 		// Since we don't do output compression for files this large...
 		if (filesize($filename) > 4194304)
 		{
@@ -446,23 +430,16 @@ class Attachment extends AbstractController
 			$fp = fopen($filename, 'rb');
 			while (!feof($fp))
 			{
-				if (isset($callback))
-				{
-					echo $callback(fread($fp, 8192));
-				}
-				else
-				{
-					echo fread($fp, 8192);
-				}
+				echo fread($fp, 8192);
 
 				flush();
 			}
 			fclose($fp);
 		}
 		// On some of the less-bright hosts, readfile() is disabled.  It's just a faster, more byte safe, version of what's in the if.
-		elseif (isset($callback) || @readfile($filename) === null)
+		elseif (@readfile($filename) === null)
 		{
-			echo isset($callback) ? $callback(file_get_contents($filename)) : file_get_contents($filename);
+			echo file_get_contents($filename);
 		}
 
 		obExit(false);
@@ -560,30 +537,15 @@ class Attachment extends AbstractController
 
 		if (!empty($mime_type) && strpos($mime_type, 'image/') === 0)
 		{
-			header('Content-Type: ' . strtr($mime_type, array('image/bmp' => 'image/x-ms-bmp')));
+			header('Content-Type: ' . $mime_type);
 		}
 		else
 		{
-			header('Content-Type: ' . (isBrowser('ie') || isBrowser('opera') ? 'application/octetstream' : 'application/octet-stream'));
+			header('Content-Type: application/octet-stream');
 		}
 
 		// Different browsers like different standards...
-		if (isBrowser('firefox'))
-		{
-			header('Content-Disposition: ' . $disposition . '; filename*=UTF-8\'\'' . rawurlencode(preg_replace_callback('~&#(\d{3,8});~', 'fixchar__callback', $real_filename)));
-		}
-		elseif (isBrowser('opera'))
-		{
-			header('Content-Disposition: ' . $disposition . '; filename="' . preg_replace_callback('~&#(\d{3,8});~', 'fixchar__callback', $real_filename) . '"');
-		}
-		elseif (isBrowser('ie'))
-		{
-			header('Content-Disposition: ' . $disposition . '; filename="' . urlencode(preg_replace_callback('~&#(\d{3,8});~', 'fixchar__callback', $real_filename)) . '"');
-		}
-		else
-		{
-			header('Content-Disposition: ' . $disposition . '; filename="' . $real_filename . '"');
-		}
+		$this->setDownloadFileNameHeader($real_filename, $disposition);
 
 		// If this has an "image extension" - but isn't actually an image - then ensure it isn't cached cause of silly IE.
 		if ($do_cache)
@@ -598,6 +560,29 @@ class Attachment extends AbstractController
 
 		// Try to buy some time...
 		detectServer()->setTimeLimit(600);
+	}
+
+	/**
+	 * Set the proper filename header
+	 *
+	 * @param string $fileName
+	 * @param string $disposition 'inline' or'attachment'
+	 */
+	public function setDownloadFileNameHeader($fileName, $disposition)
+	{
+		$fileName = str_replace('"', '', $fileName);
+
+		// Send as UTF-8 if the name warrants that
+		if (preg_match('/[\x80-\xFF]/', $fileName))
+		{
+			$altNamePart = "; filename*=UTF-8''" . rawurlencode($fileName);
+		}
+		else
+		{
+			$altNamePart = '';
+		}
+
+		header('Content-Disposition: ' . $disposition . '; filename="' . $fileName . '"' . $altNamePart);
 	}
 
 	/**
@@ -616,12 +601,14 @@ class Attachment extends AbstractController
 
 		// We need to do some work on attachments and avatars.
 		require_once(SUBSDIR . '/Attachments.subs.php');
+		$tmp_attachments = new TemporaryAttachmentsList();
+		$attachmentsDir = new AttachmentsDirectory($modSettings, database());
 
 		try
 		{
 			if (empty($topic) || (string) (int) $this->_req->query->attach !== (string) $this->_req->query->attach)
 			{
-				$attach_data = getTempAttachById($this->_req->query->attach);
+				$attach_data = $tmp_attachments->getTempAttachById($this->_req->query->attach, $attachmentsDir, \ElkArte\User::$info->id);
 				$file_ext = pathinfo($attach_data['name'], PATHINFO_EXTENSION);
 				$filename = $attach_data['tmp_name'];
 				$id_attach = $attach_data['attachid'];

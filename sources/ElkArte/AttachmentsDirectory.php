@@ -177,6 +177,7 @@ class AttachmentsDirectory
 				$expected_dirs++;
 			}
 		}
+
 		return $expected_dirs;
 	}
 
@@ -308,13 +309,14 @@ class AttachmentsDirectory
 	/**
 	 * The current attachments path:
 	 *
-	 * What it does: @todo not really true at the moment
+	 * What it does: @return string
+	 *
+	 * @todo not really true at the moment
 	 *  - BOARDDIR . '/attachments', if nothing is set yet.
 	 *  - if the forum is using multiple attachments directories,
 	 *    then the current path is stored as unserialize($modSettings['attachmentUploadDir'])[$modSettings['currentAttachmentUploadDir']]
 	 *  - otherwise, the current path is $modSettings['attachmentUploadDir'].
 	 *
-	 * @return string
 	 */
 	public function getCurrent()
 	{
@@ -345,7 +347,9 @@ class AttachmentsDirectory
 		else
 		{
 			if (substr($this->attachmentUploadDir[1], 0, strlen(BOARDDIR)) != BOARDDIR)
-			unset($file_tree[strtr(BOARDDIR, array('\\' => '/'))]['contents']['attachments']);
+			{
+				unset($file_tree[strtr(BOARDDIR, array('\\' => '/'))]['contents']['attachments']);
+			}
 			$file_tree[strtr($this->attachmentUploadDir[1], array('\\' => '/'))] = array(
 				'type' => 'dir',
 				'writable_on' => 'restrictive',
@@ -450,11 +454,17 @@ class AttachmentsDirectory
 		return $outputCreation;
 	}
 
-	public function checkDirSpace($sess_attach, $attachID)
+	/**
+	 * Checks if the current active directory has space allowed for a new attachment file
+	 *
+	 * @param $sess_attach
+	 * @throws \ElkArte\Exceptions\Exception
+	 */
+	public function checkDirSpace($sess_attach)
 	{
 		if (empty(self::$dir_size) || empty(self::$dir_files))
 		{
-			$this->dirSpace($sess_attach['size']);
+			$this->dirSpace($sess_attach->getSize());
 		}
 
 		// Are we about to run out of room? Let's notify the admin then.
@@ -476,10 +486,8 @@ class AttachmentsDirectory
 				// Move it to the new folder if we can. (Throws Exception if it fails)
 				if ($this->manageBySpace())
 				{
-					$file_path = $this->getCurrent() . '/' . $attachID;
-					$sess_attach['id_folder'] = $this->currentAttachmentUploadDir;
-					rename($sess_attach['tmp_name'], $file_path);
-					$sess_attach['tmp_name'] = $file_path;
+					$sess_attach->moveTo($this->getCurrent());
+					$sess_attach->setIdFolder($this->currentAttachmentUploadDir);
 					self::$dir_size = 0;
 					self::$dir_files = 0;
 				}
@@ -489,14 +497,13 @@ class AttachmentsDirectory
 				throw new Exception('ran_out_of_space');
 			}
 		}
-
-		return $sess_attach;
 	}
 
 	protected function dirSpace($tmp_attach_size = 0)
 	{
 		$request = $this->db->query('', '
-			SELECT COUNT(*), SUM(size)
+			SELECT 
+				COUNT(*), SUM(size)
 			FROM {db_prefix}attachments
 			WHERE id_folder = {int:folder_id}
 				AND attachment_type != {int:type}',
@@ -519,11 +526,11 @@ class AttachmentsDirectory
 	 * - Attempts to make the directory writable
 	 * - Places an .htaccess in new directories for security
 	 *
+	 * @param string $updir
+	 * @throws \ElkArte\Exceptions\Exception
+	 * @return bool
 	 * @package Attachments
 	 *
-	 * @param string $updir
-	 *
-	 * @return bool
 	 */
 	public function createDirectory($updir)
 	{
@@ -768,9 +775,9 @@ class AttachmentsDirectory
 	/**
 	 * Finds the current directory tree for the supplied base directory
 	 *
-	 * @package Attachments
 	 * @param string $directory
 	 * @return string[]|boolean on fail else array of directory names
+	 * @package Attachments
 	 */
 	protected function getTreeElements($directory)
 	{
@@ -805,12 +812,12 @@ class AttachmentsDirectory
 	 *
 	 * - Gets the directory w/o drive letter for windows
 	 *
-	 * @package Attachments
-	 *
 	 * @param string[] $tree
 	 * @param int $count
 	 *
 	 * @return bool|mixed|string
+	 * @package Attachments
+	 *
 	 */
 	public function initDir(&$tree, &$count)
 	{
@@ -869,6 +876,7 @@ class AttachmentsDirectory
 				}
 			}
 		}
+
 		return false;
 	}
 }
