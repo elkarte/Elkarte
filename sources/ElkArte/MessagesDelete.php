@@ -60,12 +60,13 @@ class MessagesDelete
 	 *
 	 * @param int|bool $recycle_enabled if the recycling is enabled.
 	 * @param int|null $recycle_board the id the the recycle board (if any)
+	 * @param User $user the user::info making the request
 	 */
-	public function __construct($recycle_enabled, $recycle_board, $user)
+	public function __construct($recycle_enabled, $recycle_board, $user = null)
 	{
 		$this->_recycle_board = $recycle_enabled ? (int) $recycle_board : null;
 
-		$this->user = $user;
+		$this->user = $user ?? User::$info;
 	}
 
 	/**
