@@ -23,6 +23,7 @@ use ElkArte\BoardsTree;
  *
  * @param int $category_id
  * @param mixed[] $catOptions
+ * @throws \ElkArte\Exceptions\Exception
  */
 function modifyCategory($category_id, $catOptions)
 {
@@ -48,25 +49,27 @@ function modifyCategory($category_id, $catOptions)
 		}
 
 		// Grab the categories sorted by cat_order.
-		$request = $db->query('', '
-			SELECT id_cat, cat_order
+		$db->fetchQuery('
+			SELECT 
+				id_cat, cat_order
 			FROM {db_prefix}categories
 			ORDER BY cat_order',
 			array()
+		)->fetch_callback(
+			function ($row) use (&$cat_order, &$cats, $category_id, $catOptions) {
+				if ($row['id_cat'] != $category_id)
+				{
+					$cats[] = $row['id_cat'];
+				}
+
+				if ($row['id_cat'] == $catOptions['move_after'])
+				{
+					$cats[] = $category_id;
+				}
+
+				$cat_order[$row['id_cat']] = $row['cat_order'];
+			}
 		);
-		while ($row = $db->fetch_assoc($request))
-		{
-			if ($row['id_cat'] != $category_id)
-			{
-				$cats[] = $row['id_cat'];
-			}
-			if ($row['id_cat'] == $catOptions['move_after'])
-			{
-				$cats[] = $category_id;
-			}
-			$cat_order[$row['id_cat']] = $row['cat_order'];
-		}
-		$db->free_result($request);
 
 		// Set the new order for the categories.
 		foreach ($cats as $index => $cat)
@@ -75,7 +78,8 @@ function modifyCategory($category_id, $catOptions)
 			{
 				$db->query('', '
 					UPDATE {db_prefix}categories
-					SET cat_order = {int:new_order}
+					SET 
+						cat_order = {int:new_order}
 					WHERE id_cat = {int:current_category}',
 					array(
 						'new_order' => $index,
@@ -134,6 +138,7 @@ function modifyCategory($category_id, $catOptions)
  * returns the ID of the newly created category.
  *
  * @param mixed[] $catOptions
+ * @throws \Exception
  */
 function createCategory($catOptions)
 {
@@ -150,6 +155,7 @@ function createCategory($catOptions)
 	{
 		$catOptions['move_after'] = 0;
 	}
+
 	if (!isset($catOptions['is_collapsible']))
 	{
 		$catOptions['is_collapsible'] = true;
@@ -175,7 +181,7 @@ function createCategory($catOptions)
 	);
 
 	// Grab the new category ID.
-	$category_id = $db->insert_id('{db_prefix}categories', 'id_cat');
+	$category_id = $db->insert_id('{db_prefix}categories');
 
 	// Set the given properties to the newly created category.
 	modifyCategory($category_id, $catOptions);
@@ -195,7 +201,7 @@ function createCategory($catOptions)
  * updates the statistics to reflect the new situation.
  *
  * @param int[] $categories
- * @param integer|null $moveBoardsTo = null
+ * @param int|null $moveBoardsTo = null
  * @throws \ElkArte\Exceptions\Exception
  */
 function deleteCategories($categories, $moveBoardsTo = null)
@@ -228,7 +234,8 @@ function deleteCategories($categories, $moveBoardsTo = null)
 	{
 		$db->query('', '
 			UPDATE {db_prefix}boards
-			SET id_cat = {int:new_parent_cat}
+			SET 
+				id_cat = {int:new_parent_cat}
 			WHERE id_cat IN ({array_int:category_list})',
 			array(
 				'category_list' => $categories,
@@ -275,6 +282,7 @@ function deleteCategories($categories, $moveBoardsTo = null)
  * @param string $new_status
  * @param int[]|null $members = null
  * @param bool $check_collapsable = true
+ * @throws \ElkArte\Exceptions\Exception
  */
 function collapseCategories($categories, $new_status, $members = null, $check_collapsable = true)
 {
@@ -322,7 +330,8 @@ function collapseCategories($categories, $new_status, $members = null, $check_co
 			'remove' => array(),
 		);
 		$db->fetchQuery('
-			SELECT mem.id_member, c.id_cat, COALESCE(cc.id_cat, 0) AS is_collapsed, c.can_collapse
+			SELECT 
+				mem.id_member, c.id_cat, COALESCE(cc.id_cat, 0) AS is_collapsed, c.can_collapse
 			FROM {db_prefix}members AS mem
 				INNER JOIN {db_prefix}categories AS c ON (c.id_cat IN ({array_int:category_list}))
 				LEFT JOIN {db_prefix}collapsed_categories AS cc ON (cc.id_cat = c.id_cat AND cc.id_member = mem.id_member)
@@ -375,13 +384,15 @@ function collapseCategories($categories, $new_status, $members = null, $check_co
  *
  * @param int $id_cat
  * @return string
+ * @throws \ElkArte\Exceptions\Exception
  */
 function categoryName($id_cat)
 {
 	$db = database();
 
 	$request = $db->query('', '
-		SELECT name
+		SELECT 
+			name
 		FROM {db_prefix}categories
 		WHERE id_cat = {int:id_cat}
 		LIMIT 1',
@@ -389,8 +400,8 @@ function categoryName($id_cat)
 			'id_cat' => $id_cat,
 		)
 	);
-	list ($name) = $db->fetch_row($request);
-	$db->free_result($request);
+	list ($name) = $request->fetch_row();
+	$request->free_result();
 
 	return $name;
 }

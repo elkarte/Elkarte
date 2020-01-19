@@ -143,7 +143,7 @@ abstract class AbstractResult
 
 		if (!is_bool($this->result))
 		{
-			while ($row = $this->fetch_assoc())
+			while (($row = $this->fetch_assoc()))
 			{
 				$results[] = call_user_func($callback, $row);
 			}

@@ -26,8 +26,10 @@ function reportsBoardsList()
 	$db = database();
 
 	// Go through each board!
-	$request = $db->query('', '
-		SELECT b.id_board, b.name, b.num_posts, b.num_topics, b.count_posts, b.member_groups, b.override_theme, b.id_profile, b.deny_member_groups,
+	$boards = array();
+	$db->fetchQuery('
+		SELECT 
+			b.id_board, b.name, b.num_posts, b.num_topics, b.count_posts, b.member_groups, b.override_theme, b.id_profile, b.deny_member_groups,
 			c.name AS cat_name, COALESCE(par.name, {string:text_none}) AS parent_name, COALESCE(th.value, {string:text_none}) AS theme_name
 		FROM {db_prefix}boards AS b
 			LEFT JOIN {db_prefix}categories AS c ON (c.id_cat = b.id_cat)
@@ -38,12 +40,11 @@ function reportsBoardsList()
 			'name' => 'name',
 			'text_none' => $txt['none'],
 		)
+	)->fetch_callback(
+		function ($row) use (&$boards) {
+			$boards[] = $row;
+		}
 	);
-	$boards = array();
-	while ($row = $db->fetch_assoc($request))
-	{
-		$boards[] = $row;
-	}
 
 	return $boards;
 }
@@ -55,6 +56,7 @@ function reportsBoardsList()
  * @param int[] $query_groups an array of group ids
  *
  * @return array
+ * @throws \ElkArte\Exceptions\Exception
  */
 function allMembergroups($group_clause, $query_groups = array())
 {
@@ -65,8 +67,10 @@ function allMembergroups($group_clause, $query_groups = array())
 	$group_clause = !empty($group_clause) ? $group_clause : '1=1';
 
 	// Get all the possible membergroups, except admin!
-	$request = $db->query('', '
-		SELECT id_group, group_name
+	$member_groups = array();
+	$db->query('', '
+		SELECT 
+			id_group, group_name
 		FROM {db_prefix}membergroups
 		WHERE ' . $group_clause . '
 			AND id_group != {int:admin_group}' . (empty($modSettings['permission_enable_postgroups']) ? '
@@ -79,13 +83,11 @@ function allMembergroups($group_clause, $query_groups = array())
 			'groups' => $query_groups,
 			'moderator_group' => 3,
 		)
+	)->fetch_callback(
+		function ($row) use (&$member_groups) {
+			$member_groups[$row['id_group']] = $row['group_name'];
+		}
 	);
-	$member_groups = array();
-	while ($row = $db->fetch_assoc($request))
-	{
-		$member_groups[$row['id_group']] = $row['group_name'];
-	}
-	$db->free_result($request);
 
 	return $member_groups;
 }
@@ -98,6 +100,7 @@ function allMembergroups($group_clause, $query_groups = array())
  * @param int[] $query_groups an array of group ids
  *
  * @return array
+ * @throws \Exception
  */
 function boardPermissions($profiles, $group_clause, $query_groups)
 {
@@ -106,9 +109,9 @@ function boardPermissions($profiles, $group_clause, $query_groups)
 	$db = database();
 
 	// Permissions, last!
-	$board_permissions = array();
-	$request = $db->query('', '
-		SELECT id_profile, id_group, add_deny, permission
+	return $db->fetchQuery('
+		SELECT 
+			id_profile, id_group, add_deny, permission
 		FROM {db_prefix}board_permissions
 		WHERE id_profile IN ({array_int:profile_list})
 			AND ' . $group_clause . (empty($modSettings['permission_enable_deny']) ? '
@@ -119,15 +122,7 @@ function boardPermissions($profiles, $group_clause, $query_groups)
 			'not_deny' => 1,
 			'groups' => $query_groups,
 		)
-	);
-	while ($row = $db->fetch_assoc($request))
-	{
-		$board_permissions[] = $row;
-	}
-
-	$db->free_result($request);
-
-	return $board_permissions;
+	)->fetch_all();
 }
 
 /**
@@ -138,20 +133,6 @@ function allMembergroupsBoardAccess()
 	global $txt;
 
 	$db = database();
-
-	$request = $db->query('', '
-		SELECT mg.id_group, mg.group_name, mg.online_color, mg.min_posts, mg.max_messages, mg.icons,
-			CASE WHEN bp.permission IS NOT NULL OR mg.id_group = {int:admin_group} THEN 1 ELSE 0 END AS can_moderate
-		FROM {db_prefix}membergroups AS mg
-			LEFT JOIN {db_prefix}board_permissions AS bp ON (bp.id_group = mg.id_group AND bp.id_profile = {int:default_profile} AND bp.permission = {string:moderate_board})
-		ORDER BY mg.min_posts, CASE WHEN mg.id_group < {int:newbie_group} THEN mg.id_group ELSE 4 END, mg.group_name',
-		array(
-			'admin_group' => 1,
-			'default_profile' => 1,
-			'newbie_group' => 4,
-			'moderate_board' => 'moderate_board',
-		)
-	);
 
 	// Cache them so we get regular members too.
 	$rows = array(
@@ -172,11 +153,25 @@ function allMembergroupsBoardAccess()
 			'icons' => ''
 		),
 	);
-	while ($row = $db->fetch_assoc($request))
-	{
-		$rows[] = $row;
-	}
-	$db->free_result($request);
+
+	$db->fetchQuery('
+		SELECT 
+			mg.id_group, mg.group_name, mg.online_color, mg.min_posts, mg.max_messages, mg.icons,
+			CASE WHEN bp.permission IS NOT NULL OR mg.id_group = {int:admin_group} THEN 1 ELSE 0 END AS can_moderate
+		FROM {db_prefix}membergroups AS mg
+			LEFT JOIN {db_prefix}board_permissions AS bp ON (bp.id_group = mg.id_group AND bp.id_profile = {int:default_profile} AND bp.permission = {string:moderate_board})
+		ORDER BY mg.min_posts, CASE WHEN mg.id_group < {int:newbie_group} THEN mg.id_group ELSE 4 END, mg.group_name',
+		array(
+			'admin_group' => 1,
+			'default_profile' => 1,
+			'newbie_group' => 4,
+			'moderate_board' => 'moderate_board',
+		)
+	)->fetch_callback(
+		function ($row) use (&$rows) {
+			$rows[] = $row;
+		}
+	);
 
 	return $rows;
 }
@@ -188,6 +183,7 @@ function allMembergroupsBoardAccess()
  * @param int[] $query_groups an array of group ids
  *
  * @return array
+ * @throws \Exception
  */
 function boardPermissionsByGroup($group_clause, $query_groups)
 {
@@ -196,8 +192,9 @@ function boardPermissionsByGroup($group_clause, $query_groups)
 	$db = database();
 
 	// Now the big permission fetch!
-	$request = $db->query('', '
-		SELECT id_group, add_deny, permission
+	return $db->fetchQuery('
+		SELECT 
+			id_group, add_deny, permission
 		FROM {db_prefix}permissions
 		WHERE ' . $group_clause . (empty($modSettings['permission_enable_deny']) ? '
 			AND add_deny = {int:not_denied}' : '') . '
@@ -207,14 +204,5 @@ function boardPermissionsByGroup($group_clause, $query_groups)
 			'moderator_group' => 3,
 			'groups' => $query_groups,
 		)
-	);
-
-	$perms = array();
-	while ($row = $db->fetch_assoc($request))
-	{
-		$perms[] = $row;
-	}
-	$db->free_result($request);
-
-	return $perms;
+	)->fetch_all();
 }

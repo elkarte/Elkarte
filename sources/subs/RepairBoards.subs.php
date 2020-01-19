@@ -117,7 +117,8 @@ function loadForumTests()
 				// Make sure that no topics claim the first/last message as theirs.
 				$db->query('', '
 					UPDATE {db_prefix}topics
-					SET id_first_msg = 0
+					SET 
+						id_first_msg = 0
 					WHERE id_first_msg = {int:id_first_msg}',
 					array(
 						'id_first_msg' => $row['myid_first_msg'],
@@ -125,7 +126,8 @@ function loadForumTests()
 				);
 				$db->query('', '
 					UPDATE {db_prefix}topics
-					SET id_last_msg = 0
+					SET 
+						id_last_msg = 0
 					WHERE id_last_msg = {int:id_last_msg}',
 					array(
 						'id_last_msg' => $row['myid_last_msg'],
@@ -156,11 +158,12 @@ function loadForumTests()
 					array('id_topic')
 				);
 
-				$newTopicID = $db->insert_id('{db_prefix}topics', 'id_topic');
+				$newTopicID = $db->insert_id('{db_prefix}topics');
 
 				$db->query('', '
 					UPDATE {db_prefix}messages
-				SET id_topic = {int:newTopicID}, id_board = {int:board_id}
+					SET 
+						id_topic = {int:newTopicID}, id_board = {int:board_id}
 					WHERE id_topic = {int:topic_id}',
 					array(
 						'board_id' => $row['id_board'],
@@ -181,7 +184,8 @@ function loadForumTests()
 					FROM {db_prefix}topics'
 			),
 			'check_query' => '
-				SELECT t.id_topic, COUNT(m.id_msg) AS num_msg
+				SELECT 
+					t.id_topic, COUNT(m.id_msg) AS num_msg
 				FROM {db_prefix}topics AS t
 					LEFT JOIN {db_prefix}messages AS m ON (m.id_topic = t.id_topic)
 				WHERE t.id_topic BETWEEN {STEP_LOW} AND {STEP_HIGH}
@@ -219,7 +223,8 @@ function loadForumTests()
 					FROM {db_prefix}polls'
 			),
 			'check_query' => '
-				SELECT p.id_poll, p.id_member, p.poster_name, t.id_board
+				SELECT 
+					p.id_poll, p.id_member, p.poster_name, t.id_board
 				FROM {db_prefix}polls AS p
 					LEFT JOIN {db_prefix}topics AS t ON (t.id_poll = p.id_poll)
 				WHERE p.id_poll BETWEEN {STEP_LOW} AND {STEP_HIGH}
@@ -270,7 +275,7 @@ function loadForumTests()
 					array('id_topic')
 				);
 
-				$newMessageID = $db->insert_id('{db_prefix}messages', 'id_msg');
+				$newMessageID = $db->insert_id('{db_prefix}messages');
 
 				$db->insert('',
 					'{db_prefix}topics',
@@ -295,11 +300,12 @@ function loadForumTests()
 					array('id_topic')
 				);
 
-				$newTopicID = $db->insert_id('{db_prefix}topics', 'id_topic');
+				$newTopicID = $db->insert_id('{db_prefix}topics');
 
 				$db->query('', '
 					UPDATE {db_prefix}messages
-				SET id_topic = {int:newTopicID}, id_board = {int:id_board}
+					SET 
+						id_topic = {int:newTopicID}, id_board = {int:id_board}
 					WHERE id_msg = {int:newMessageID}',
 					array(
 						'id_board' => $row['id_board'],
@@ -364,7 +370,7 @@ function loadForumTests()
 				global $txt, $context;
 
 				// A pretend error?
-				if ($row['myid_first_msg'] == $row['myid_first_msg'] && $row['myid_first_msg'] == $row['myid_first_msg'] && $row['approved'] == $row['firstmsg_approved'])
+				if ($row['id_first_msg'] == $row['myid_first_msg'] && $row['id_last_msg'] == $row['myid_last_msg'] && $row['approved'] == $row['firstmsg_approved'])
 				{
 					return false;
 				}
@@ -373,10 +379,12 @@ function loadForumTests()
 				{
 					$context['repair_errors'][] = sprintf($txt['repair_stats_topics_1'], $row['id_topic'], $row['id_first_msg']);
 				}
+
 				if ($row['id_last_msg'] != $row['myid_last_msg'])
 				{
 					$context['repair_errors'][] = sprintf($txt['repair_stats_topics_2'], $row['id_topic'], $row['id_last_msg']);
 				}
+
 				if ($row['approved'] != $row['firstmsg_approved'])
 				{
 					$context['repair_errors'][] = sprintf($txt['repair_stats_topics_5'], $row['id_topic']);
@@ -469,14 +477,16 @@ function loadForumTests()
 					FROM {db_prefix}topics'
 			),
 			'check_query' => '
-				SELECT t.id_topic, t.id_board
+				SELECT 
+					t.id_topic, t.id_board
 				FROM {db_prefix}topics AS t
 					LEFT JOIN {db_prefix}boards AS b ON (b.id_board = t.id_board)
 				WHERE b.id_board IS NULL
 					AND t.id_topic BETWEEN {STEP_LOW} AND {STEP_HIGH}
 				ORDER BY t.id_board, t.id_topic',
 			'fix_query' => '
-				SELECT t.id_board, COUNT(*) AS my_num_topics, COUNT(m.id_msg) AS my_num_posts
+				SELECT 
+					t.id_board, COUNT(*) AS my_num_topics, COUNT(m.id_msg) AS my_num_posts
 				FROM {db_prefix}topics AS t
 					LEFT JOIN {db_prefix}boards AS b ON (b.id_board = t.id_board)
 					LEFT JOIN {db_prefix}messages AS m ON (m.id_topic = t.id_topic)
@@ -498,11 +508,12 @@ function loadForumTests()
 					array($salvageCatID, $txt['salvaged_board_name'], $txt['salvaged_board_description'], $row['my_num_topics'], $row['my_num_posts'], '1'),
 					array('id_board')
 				);
-				$newBoardID = $db->insert_id('{db_prefix}boards', 'id_board');
+				$newBoardID = $db->insert_id('{db_prefix}boards');
 
 				$db->query('', '
 					UPDATE {db_prefix}topics
-					SET id_board = {int:newBoardID}
+					SET 
+						id_board = {int:newBoardID}
 					WHERE id_board = {int:board_id}',
 					array(
 						'newBoardID' => $newBoardID,
@@ -511,7 +522,8 @@ function loadForumTests()
 				);
 				$db->query('', '
 					UPDATE {db_prefix}messages
-					SET id_board = {int:newBoardID}
+					SET 
+					 	= {int:newBoardID}
 					WHERE id_board = {int:board_id}',
 					array(
 						'newBoardID' => $newBoardID,
@@ -524,7 +536,8 @@ function loadForumTests()
 		// Find boards with nonexistent categories.
 		'missing_categories' => array(
 			'check_query' => '
-				SELECT b.id_board, b.id_cat
+				SELECT 
+					b.id_board, b.id_cat
 				FROM {db_prefix}boards AS b
 					LEFT JOIN {db_prefix}categories AS c ON (c.id_cat = b.id_cat)
 				WHERE c.id_cat IS NULL
@@ -556,7 +569,8 @@ function loadForumTests()
 					FROM {db_prefix}messages'
 			),
 			'check_query' => '
-				SELECT m.id_msg, m.id_member
+				SELECT 
+					m.id_msg, m.id_member
 				FROM {db_prefix}messages AS m
 					LEFT JOIN {db_prefix}members AS mem ON (mem.id_member = m.id_member)
 				WHERE mem.id_member IS NULL
@@ -571,7 +585,8 @@ function loadForumTests()
 
 					$db->query('', '
 						UPDATE {db_prefix}messages
-						SET id_member = {int:guest_id}
+						SET 
+							id_member = {int:guest_id}
 						WHERE id_msg IN ({array_int:msgs})',
 						array(
 							'msgs' => $msgs,
@@ -585,7 +600,8 @@ function loadForumTests()
 		// Find boards with nonexistent parents.
 		'missing_parents' => array(
 			'check_query' => '
-				SELECT b.id_board, b.id_parent
+				SELECT 
+					b.id_board, b.id_parent
 				FROM {db_prefix}boards AS b
 					LEFT JOIN {db_prefix}boards AS p ON (p.id_board = b.id_parent)
 				WHERE b.id_parent != 0
@@ -599,7 +615,8 @@ function loadForumTests()
 					$salvageBoardID = createSalvageBoard();
 					$db->query('', '
 						UPDATE {db_prefix}boards
-						SET id_parent = {int:salvageBoardID}, id_cat = {int:salvageCatID}, child_level = 1
+						SET 
+							id_parent = {int:salvageBoardID}, id_cat = {int:salvageCatID}, child_level = 1
 						WHERE id_parent IN ({array_int:parents})',
 						array(
 							'salvageBoardID' => $salvageBoardID,
@@ -615,11 +632,13 @@ function loadForumTests()
 			'substeps' => array(
 				'step_size' => 500,
 				'step_max' => '
-					SELECT MAX(id_poll)
+					SELECT 
+						MAX(id_poll)
 					FROM {db_prefix}topics'
 			),
 			'check_query' => '
-				SELECT t.id_poll, t.id_topic
+				SELECT 
+					t.id_poll, t.id_topic
 				FROM {db_prefix}topics AS t
 					LEFT JOIN {db_prefix}polls AS p ON (p.id_poll = t.id_poll)
 				WHERE t.id_poll != 0
@@ -646,11 +665,13 @@ function loadForumTests()
 			'substeps' => array(
 				'step_size' => 1000,
 				'step_max' => '
-					SELECT MAX(id_topic)
+					SELECT 
+						MAX(id_topic)
 					FROM {db_prefix}calendar'
 			),
 			'check_query' => '
-				SELECT cal.id_topic, cal.id_event
+				SELECT 
+					cal.id_topic, cal.id_event
 				FROM {db_prefix}calendar AS cal
 					LEFT JOIN {db_prefix}topics AS t ON (t.id_topic = cal.id_topic)
 				WHERE cal.id_topic != 0
@@ -682,7 +703,8 @@ function loadForumTests()
 					FROM {db_prefix}log_topics'
 			),
 			'check_query' => '
-				SELECT lt.id_topic
+				SELECT 
+					lt.id_topic
 				FROM {db_prefix}log_topics AS lt
 					LEFT JOIN {db_prefix}topics AS t ON (t.id_topic = lt.id_topic)
 				WHERE t.id_topic IS NULL
@@ -711,7 +733,8 @@ function loadForumTests()
 					FROM {db_prefix}log_topics'
 			),
 			'check_query' => '
-				SELECT lt.id_member
+				SELECT 
+					lt.id_member
 				FROM {db_prefix}log_topics AS lt
 					LEFT JOIN {db_prefix}members AS mem ON (mem.id_member = lt.id_member)
 				WHERE mem.id_member IS NULL
@@ -741,7 +764,8 @@ function loadForumTests()
 					FROM {db_prefix}log_boards'
 			),
 			'check_query' => '
-				SELECT lb.id_board
+				SELECT 
+					lb.id_board
 				FROM {db_prefix}log_boards AS lb
 					LEFT JOIN {db_prefix}boards AS b ON (b.id_board = lb.id_board)
 				WHERE b.id_board IS NULL
@@ -771,7 +795,8 @@ function loadForumTests()
 					FROM {db_prefix}log_boards'
 			),
 			'check_query' => '
-				SELECT lb.id_member
+				SELECT 
+					.id_member
 				FROM {db_prefix}log_boards AS lb
 					LEFT JOIN {db_prefix}members AS mem ON (mem.id_member = lb.id_member)
 				WHERE mem.id_member IS NULL
@@ -801,7 +826,8 @@ function loadForumTests()
 					FROM {db_prefix}log_mark_read'
 			),
 			'check_query' => '
-				SELECT lmr.id_board
+				SELECT 
+					lmr.id_board
 				FROM {db_prefix}log_mark_read AS lmr
 					LEFT JOIN {db_prefix}boards AS b ON (b.id_board = lmr.id_board)
 				WHERE b.id_board IS NULL
@@ -831,7 +857,8 @@ function loadForumTests()
 					FROM {db_prefix}log_mark_read'
 			),
 			'check_query' => '
-				SELECT lmr.id_member
+				SELECT 
+					lmr.id_member
 				FROM {db_prefix}log_mark_read AS lmr
 					LEFT JOIN {db_prefix}members AS mem ON (mem.id_member = lmr.id_member)
 				WHERE mem.id_member IS NULL
@@ -861,7 +888,8 @@ function loadForumTests()
 					FROM {db_prefix}pm_recipients'
 			),
 			'check_query' => '
-				SELECT pmr.id_pm
+				SELECT 
+					pmr.id_pm
 				FROM {db_prefix}pm_recipients AS pmr
 					LEFT JOIN {db_prefix}personal_messages AS pm ON (pm.id_pm = pmr.id_pm)
 				WHERE pm.id_pm IS NULL
@@ -891,7 +919,8 @@ function loadForumTests()
 					FROM {db_prefix}pm_recipients'
 			),
 			'check_query' => '
-				SELECT pmr.id_member
+				SELECT 
+					pmr.id_member
 				FROM {db_prefix}pm_recipients AS pmr
 					LEFT JOIN {db_prefix}members AS mem ON (mem.id_member = pmr.id_member)
 				WHERE pmr.id_member != 0
@@ -922,7 +951,8 @@ function loadForumTests()
 					FROM {db_prefix}personal_messages'
 			),
 			'check_query' => '
-				SELECT pm.id_pm, pm.id_member_from
+				SELECT 
+					pm.id_pm, pm.id_member_from
 				FROM {db_prefix}personal_messages AS pm
 					LEFT JOIN {db_prefix}members AS mem ON (mem.id_member = pm.id_member_from)
 				WHERE pm.id_member_from != 0
@@ -952,7 +982,8 @@ function loadForumTests()
 					FROM {db_prefix}log_notify'
 			),
 			'check_query' => '
-				SELECT ln.id_member
+				SELECT 
+					.id_member
 				FROM {db_prefix}log_notify AS ln
 					LEFT JOIN {db_prefix}members AS mem ON (mem.id_member = ln.id_member)
 				WHERE ln.id_member BETWEEN {STEP_LOW} AND {STEP_HIGH}
@@ -982,7 +1013,8 @@ function loadForumTests()
 					FROM {db_prefix}topics'
 			),
 			'check_query' => '
-				SELECT t.id_topic, fm.subject
+				SELECT 
+					t.id_topic, fm.subject
 				FROM {db_prefix}topics AS t
 					INNER JOIN {db_prefix}messages AS fm ON (fm.id_msg = t.id_first_msg)
 					LEFT JOIN {db_prefix}log_search_subjects AS lss ON (lss.id_topic = t.id_topic)
@@ -993,7 +1025,7 @@ function loadForumTests()
 				$db = database();
 
 				$inserts = array();
-				while ($row = $db->fetch_assoc($result))
+				while (($row = $result->fetch_assoc()))
 				{
 					foreach (text2words($row['subject']) as $word)
 					{
@@ -1043,7 +1075,8 @@ function loadForumTests()
 					FROM {db_prefix}log_search_subjects'
 			),
 			'check_query' => '
-				SELECT lss.id_topic, lss.word
+				SELECT 
+					lss.id_topic, lss.word
 				FROM {db_prefix}log_search_subjects AS lss
 					LEFT JOIN {db_prefix}topics AS t ON (t.id_topic = lss.id_topic)
 				WHERE lss.id_topic BETWEEN {STEP_LOW} AND {STEP_HIGH}
@@ -1072,7 +1105,8 @@ function loadForumTests()
 					FROM {db_prefix}log_polls'
 			),
 			'check_query' => '
-				SELECT lp.id_poll, lp.id_member
+				SELECT 
+					lp.id_poll, lp.id_member
 				FROM {db_prefix}log_polls AS lp
 					LEFT JOIN {db_prefix}members AS mem ON (mem.id_member = lp.id_member)
 				WHERE lp.id_member BETWEEN {STEP_LOW} AND {STEP_HIGH}
@@ -1102,7 +1136,8 @@ function loadForumTests()
 					FROM {db_prefix}log_polls'
 			),
 			'check_query' => '
-				SELECT lp.id_poll, lp.id_member
+				SELECT 
+					lp.id_poll, lp.id_member
 				FROM {db_prefix}log_polls AS lp
 					LEFT JOIN {db_prefix}polls AS p ON (p.id_poll = lp.id_poll)
 				WHERE lp.id_poll BETWEEN {STEP_LOW} AND {STEP_HIGH}
@@ -1131,7 +1166,8 @@ function loadForumTests()
 					FROM {db_prefix}log_reported'
 			),
 			'check_query' => '
-				SELECT lr.id_report, lr.subject
+				SELECT 
+					lr.id_report, lr.subject
 				FROM {db_prefix}log_reported AS lr
 					LEFT JOIN {db_prefix}log_reported_comments AS lrc ON (lrc.id_report = lr.id_report)
 				WHERE lr.id_report BETWEEN {STEP_LOW} AND {STEP_HIGH}
@@ -1160,7 +1196,8 @@ function loadForumTests()
 					FROM {db_prefix}log_reported_comments'
 			),
 			'check_query' => '
-				SELECT lrc.id_report, lrc.membername
+				SELECT 
+					lrc.id_report, lrc.membername
 				FROM {db_prefix}log_reported_comments AS lrc
 					LEFT JOIN {db_prefix}log_reported AS lr ON (lr.id_report = lrc.id_report)
 				WHERE lrc.id_report BETWEEN {STEP_LOW} AND {STEP_HIGH}
@@ -1189,7 +1226,8 @@ function loadForumTests()
 					FROM {db_prefix}log_group_requests'
 			),
 			'check_query' => '
-				SELECT lgr.id_member
+				SELECT 
+					lgr.id_member
 				FROM {db_prefix}log_group_requests AS lgr
 					LEFT JOIN {db_prefix}members AS mem ON (mem.id_member = lgr.id_member)
 				WHERE lgr.id_member BETWEEN {STEP_LOW} AND {STEP_HIGH}
@@ -1219,7 +1257,8 @@ function loadForumTests()
 					FROM {db_prefix}log_group_requests'
 			),
 			'check_query' => '
-				SELECT lgr.id_group
+				SELECT 
+					lgr.id_group
 				FROM {db_prefix}log_group_requests AS lgr
 					LEFT JOIN {db_prefix}membergroups AS mg ON (mg.id_group = lgr.id_group)
 				WHERE lgr.id_group BETWEEN {STEP_LOW} AND {STEP_HIGH}
@@ -1266,7 +1305,8 @@ function createSalvageBoard()
 
 	// Check to see if a 'Salvage Board' exists, if not => insert one.
 	$result = $db->query('', '
-		SELECT id_board
+		SELECT 
+			id_board
 		FROM {db_prefix}boards
 		WHERE id_cat = {int:id_cat}
 			AND name = {string:board_name}
@@ -1328,7 +1368,8 @@ function createSalvageCategory()
 
 	// Check to see if a 'Salvage Category' exists, if not => insert one.
 	$result = $db->query('', '
-		SELECT id_cat
+		SELECT 
+			id_cat
 		FROM {db_prefix}categories
 		WHERE name = {string:cat_name}
 		LIMIT 1',
@@ -1377,7 +1418,7 @@ function createSalvageCategory()
  * @param mixed[] $to_fix
  * @param string $current_step_description
  * @param int $max_substep = none
- * @param boolean $force = false
+ * @param bool $force = false
  * @throws \ElkArte\Exceptions\Exception
  */
 function pauseRepairProcess($to_fix, $current_step_description, $max_substep = 0, $force = false)
@@ -1436,7 +1477,7 @@ function pauseRepairProcess($to_fix, $current_step_description, $max_substep = 0
  * won't have to recheck everything.
  * - returns the errors found.
  *
- * @param boolean $do_fix
+ * @param bool $do_fix
  * @return mixed[]
  * @throws \ElkArte\Exceptions\Exception
  */
@@ -1494,10 +1535,10 @@ function findForumErrors($do_fix = false)
 				$test['substeps']['step_max'],
 				array()
 			);
-			list ($step_max) = $db->fetch_row($request);
+			list ($step_max) = $request->fetch_row();
 
 			$total_queries++;
-			$db->free_result($request);
+			$request->free_result();
 		}
 
 		// We in theory keep doing this... the substeps.
@@ -1529,11 +1570,11 @@ function findForumErrors($do_fix = false)
 			// Does it need a fix?
 			if (!empty($test['check_type']) && $test['check_type'] == 'count')
 			{
-				list ($needs_fix) = $db->fetch_row($request);
+				list ($needs_fix) = $request->fetch_row();
 			}
 			else
 			{
-				$needs_fix = $db->num_rows($request);
+				$needs_fix = $request->num_rows();
 			}
 
 			$total_queries++;
@@ -1554,7 +1595,7 @@ function findForumErrors($do_fix = false)
 					// One per row!
 					elseif (isset($test['messages']))
 					{
-						while ($row = $db->fetch_assoc($request))
+						while (($row = $request->fetch_assoc()))
 						{
 							$variables = $test['messages'];
 							foreach ($variables as $k => $v)
@@ -1577,7 +1618,7 @@ function findForumErrors($do_fix = false)
 					{
 						// Find out if there are actually errors.
 						$found_errors = false;
-						while ($row = $db->fetch_assoc($request))
+						while (($row = $request->fetch_assoc()))
 						{
 							$found_errors |= $test['message_function']($row);
 						}
@@ -1597,7 +1638,7 @@ function findForumErrors($do_fix = false)
 					if (isset($test['fix_collect']))
 					{
 						$ids = array();
-						while ($row = $db->fetch_assoc($request))
+						while (($row = $request->fetch_assoc()))
 						{
 							$ids[] = $row[$test['fix_collect']['index']];
 						}
@@ -1620,7 +1661,7 @@ function findForumErrors($do_fix = false)
 					// Do we have some processing to do?
 					elseif (isset($test['fix_processing']))
 					{
-						while ($row = $db->fetch_assoc($request))
+						while (($row = $request->fetch_assoc()))
 						{
 							$test['fix_processing']($row);
 						}
@@ -1647,7 +1688,7 @@ function findForumErrors($do_fix = false)
 			}
 
 			// Free the result.
-			$db->free_result($request);
+			$request->free_result();
 
 			// Are we done yet?
 			if (isset($test['substeps']))

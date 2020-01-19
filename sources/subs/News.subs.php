@@ -56,6 +56,7 @@ function getNews()
  * - Only get the ones that can't login to turn off notification.
  *
  * @return array
+ * @throws \Exception
  * @package News
  */
 function excludeBannedMembers()
@@ -63,9 +64,9 @@ function excludeBannedMembers()
 	$db = database();
 
 	$excludes = array();
-
-	$request = $db->query('', '
-		SELECT DISTINCT mem.id_member
+	$db->fetchQuery('
+		SELECT 
+			DISTINCT mem.id_member
 		FROM {db_prefix}ban_groups AS bg
 			INNER JOIN {db_prefix}ban_items AS bi ON (bg.id_ban_group = bi.id_ban_group)
 			INNER JOIN {db_prefix}members AS mem ON (bi.id_member = mem.id_member)
@@ -76,14 +77,16 @@ function excludeBannedMembers()
 			'cannot_login' => 1,
 			'current_time' => time(),
 		)
+	)->fetch_callback(
+		function ($row) use (&$excludes) {
+			$excludes[] = $row['id_member'];
+		}
 	);
-	while ($row = $db->fetch_assoc($request))
-	{
-		$excludes[] = $row['id_member'];
-	}
-	$db->free_result($request);
 
-	$request = $db->query('', '
+	$condition_array = array();
+	$condition_array_params = array();
+	$count = 0;
+	$db->fetchQuery('
 		SELECT DISTINCT bi.email_address
 		FROM {db_prefix}ban_items AS bi
 			INNER JOIN {db_prefix}ban_groups AS bg ON (bg.id_ban_group = bi.id_ban_group)
@@ -96,30 +99,26 @@ function excludeBannedMembers()
 			'current_time' => time(),
 			'blank_string' => '',
 		)
+	)->fetch_callback(
+		function ($row) use (&$condition_array, &$condition_array_params, &$count) {
+			$condition_array[] = '{string:email_' . $count . '}';
+			$condition_array_params['email_' . ($count++)] = $row['email_address'];
+		}
 	);
-	$condition_array = array();
-	$condition_array_params = array();
-	$count = 0;
-	while ($row = $db->fetch_assoc($request))
-	{
-		$condition_array[] = '{string:email_' . $count . '}';
-		$condition_array_params['email_' . ($count++)] = $row['email_address'];
-	}
-	$db->free_result($request);
 
 	if (!empty($condition_array))
 	{
-		$request = $db->query('', '
-			SELECT id_member
+		$db->fetchQuery('
+			SELECT 
+				id_member
 			FROM {db_prefix}members
 			WHERE email_address IN(' . implode(', ', $condition_array) . ')',
 			$condition_array_params
+		)->fetch_callback(
+			function ($row) use (&$excludes) {
+				$excludes[] = $row['id_member'];
+			}
 		);
-		while ($row = $db->fetch_assoc($request))
-		{
-			$excludes[] = $row['id_member'];
-		}
-		$db->free_result($request);
 	}
 
 	return $excludes;
@@ -129,6 +128,7 @@ function excludeBannedMembers()
  * Get a list of our local board moderators.
  *
  * @return array
+ * @throws \Exception
  * @package News
  */
 function getModerators()
@@ -137,20 +137,20 @@ function getModerators()
 
 	$mods = array();
 
-	$request = $db->query('', '
-		SELECT DISTINCT mem.id_member AS identifier
+	$db->fetchQuery('
+		SELECT 
+			DISTINCT mem.id_member AS identifier
 		FROM {db_prefix}members AS mem
 			INNER JOIN {db_prefix}moderators AS mods ON (mods.id_member = mem.id_member)
 		WHERE mem.is_activated = {int:is_activated}',
 		array(
 			'is_activated' => 1,
 		)
+	)->fetch_callback(
+		function ($row) use (&$mods) {
+			$mods[] = $row['identifier'];
+		}
 	);
-	while ($row = $db->fetch_assoc($request))
-	{
-		$mods[] = $row['identifier'];
-	}
-	$db->free_result($request);
 
 	return $mods;
 }
@@ -164,6 +164,7 @@ function getModerators()
  * @param int $increment
  * @param int $counter
  * @return array
+ * @throws \Exception
  * @package News
  */
 function getNewsletterRecipients($sendQuery, $sendParams, $start, $increment, $counter)
@@ -172,8 +173,9 @@ function getNewsletterRecipients($sendQuery, $sendParams, $start, $increment, $c
 
 	$recipients = array();
 
-	$result = $db->query('', '
-		SELECT mem.id_member, mem.email_address, mem.real_name, mem.id_group, mem.additional_groups, mem.id_post_group
+	$db->fetchQuery('
+		SELECT 
+			mem.id_member, mem.email_address, mem.real_name, mem.id_group, mem.additional_groups, mem.id_post_group
 		FROM {db_prefix}members AS mem
 		WHERE mem.id_member > {int:min_id_member}
 			AND mem.id_member < {int:max_id_member}
@@ -189,12 +191,11 @@ function getNewsletterRecipients($sendQuery, $sendParams, $start, $increment, $c
 			'notify_announcements' => 1,
 			'is_activated' => 1,
 		))
+	)->fetch_callback(
+		function ($row) use (&$recipients) {
+			$recipients[] = $row;
+		}
 	);
-	while ($row = $db->fetch_assoc($result))
-	{
-		$recipients[] = $row;
-	}
-	$db->free_result($result);
 
 	return $recipients;
 }
@@ -211,6 +212,7 @@ function getNewsletterRecipients($sendQuery, $sendParams, $start, $increment, $c
  * @param int $limit
  *
  * @return array
+ * @throws \ElkArte\Exceptions\Exception
  * @package News
  *
  */
@@ -251,9 +253,9 @@ function getXMLNews($query_this_board, $board, $limit)
 			)
 		);
 		// If we don't have $limit results, we try again with an unoptimized version covering all rows.
-		if ($loops < 2 && $db->num_rows($request) < $limit)
+		if ($loops < 2 && $request->num_rows() < $limit)
 		{
-			$db->free_result($request);
+			$request->free_result();
 
 			if (empty($_REQUEST['boards']) && empty($board))
 			{
@@ -273,12 +275,12 @@ function getXMLNews($query_this_board, $board, $limit)
 		}
 	}
 	$data = array();
-	while ($row = $db->fetch_assoc($request))
+	while (($row = $request->fetch_assoc()))
 	{
 		$data[] = $row;
 	}
 
-	$db->free_result($request);
+	$request->free_result();
 
 	return $data;
 }
@@ -291,6 +293,7 @@ function getXMLNews($query_this_board, $board, $limit)
  * @param int $limit
  *
  * @return array
+ * @throws \ElkArte\Exceptions\Exception
  * @package News
  *
  */
@@ -306,7 +309,8 @@ function getXMLRecent($query_this_board, $board, $limit)
 	{
 		$optimize_msg = implode(' AND ', $context['optimize_msg']);
 		$request = $db->query('', '
-			SELECT m.id_msg
+			SELECT
+			 	m.id_msg
 			FROM {db_prefix}messages AS m
 				INNER JOIN {db_prefix}boards AS b ON (b.id_board = m.id_board)
 				INNER JOIN {db_prefix}topics AS t ON (t.id_topic = m.id_topic)
@@ -324,9 +328,9 @@ function getXMLRecent($query_this_board, $board, $limit)
 			)
 		);
 		// If we don't have $limit results, try again with an unoptimized version covering all rows.
-		if ($loops < 2 && $db->num_rows($request) < $limit)
+		if ($loops < 2 && $request->num_rows() < $limit)
 		{
-			$db->free_result($request);
+			$request->free_result();
 
 			if (empty($_REQUEST['boards']) && empty($board))
 			{
@@ -345,11 +349,11 @@ function getXMLRecent($query_this_board, $board, $limit)
 		}
 	}
 	$messages = array();
-	while ($row = $db->fetch_assoc($request))
+	while (($row = $request->fetch_assoc()))
 	{
 		$messages[] = $row['id_msg'];
 	}
-	$db->free_result($request);
+	$request->free_result();
 
 	// No messages found, then return nothing
 	if (empty($messages))
@@ -358,7 +362,8 @@ function getXMLRecent($query_this_board, $board, $limit)
 	}
 
 	// Find the most recent posts from our message list that this user can see.
-	$request = $db->query('', '
+	$data = array();
+	$db->fetchQuery('
 		SELECT
 			m.smileys_enabled, m.poster_time, m.id_msg, m.subject, m.body, m.id_topic, t.id_board,
 			b.name AS bname, t.num_replies, m.id_member, m.icon, mf.id_member AS id_first_member,
@@ -380,14 +385,11 @@ function getXMLRecent($query_this_board, $board, $limit)
 			'current_board' => $board,
 			'message_list' => $messages,
 		)
+	)->fetch_callback(
+		function ($row) use (&$data) {
+			$data[] = $row;
+		}
 	);
-	$data = array();
-	while ($row = $db->fetch_assoc($request))
-	{
-		$data[] = $row;
-	}
-
-	$db->free_result($request);
 
 	return $data;
 }

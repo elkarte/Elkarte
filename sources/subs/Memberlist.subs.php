@@ -33,8 +33,9 @@ function ml_CustomProfile()
 	$context['custom_profile_fields'] = array();
 
 	// Find any custom profile fields that are to be shown for the memberlist?
-	$request = $db->query('', '
-		SELECT col_name, field_name, field_desc, field_type, bbc, enclose, vieworder, default_value, field_options
+	$db->fetchQuery('
+		SELECT 
+			col_name, field_name, field_desc, field_type, bbc, enclose, vieworder, default_value, field_options
 		FROM {db_prefix}custom_fields
 		WHERE active = {int:active}
 			AND show_memberlist = {int:show}
@@ -45,48 +46,49 @@ function ml_CustomProfile()
 			'show' => 1,
 			'private_level' => 2,
 		)
-	);
-	while ($row = $db->fetch_assoc($request))
-	{
-		// Avoid collisions
-		$curField = 'cust_' . $row['col_name'];
+	)->fetch_callback(
+		function ($row) {
+			global $context;
 
-		// Load the standard column info
-		$context['custom_profile_fields']['columns'][$curField] = array(
-			'label' => $row['field_name'],
-			'class' => $row['field_name'],
-			'type' => $row['field_type'],
-			'bbc' => !empty($row['bbc']),
-			'enclose' => $row['enclose'],
-			'default_value' => $row['default_value'],
-			'field_options' => explode(',', $row['field_options']),
-		);
+			// Avoid collisions
+			$curField = 'cust_' . $row['col_name'];
 
-		// Have they selected to sort on a custom column? .., then we build the query
-		if (isset($_REQUEST['sort']) && $_REQUEST['sort'] === $curField)
-		{
-			// Build the sort queries.
-			if ($row['field_type'] != 'check')
+			// Load the standard column info
+			$context['custom_profile_fields']['columns'][$curField] = array(
+				'label' => $row['field_name'],
+				'class' => $row['field_name'],
+				'type' => $row['field_type'],
+				'bbc' => !empty($row['bbc']),
+				'enclose' => $row['enclose'],
+				'default_value' => $row['default_value'],
+				'field_options' => explode(',', $row['field_options']),
+			);
+
+			// Have they selected to sort on a custom column? .., then we build the query
+			if (isset($_REQUEST['sort']) && $_REQUEST['sort'] === $curField)
 			{
-				$context['custom_profile_fields']['columns'][$curField]['sort'] = array(
-					'down' => 'LENGTH(cfd' . $curField . '.value) > 0 ASC, COALESCE(cfd' . $curField . '.value, 1=1) DESC, cfd' . $curField . '.value DESC',
-					'up' => 'LENGTH(cfd' . $curField . '.value) > 0 DESC, COALESCE(cfd' . $curField . '.value, 1=1) ASC, cfd' . $curField . '.value ASC'
-				);
-			}
-			else
-			{
-				$context['custom_profile_fields']['columns'][$curField]['sort'] = array(
-					'down' => 'cfd' . $curField . '.value DESC',
-					'up' => 'cfd' . $curField . '.value ASC'
-				);
-			}
+				// Build the sort queries.
+				if ($row['field_type'] != 'check')
+				{
+					$context['custom_profile_fields']['columns'][$curField]['sort'] = array(
+						'down' => 'LENGTH(cfd' . $curField . '.value) > 0 ASC, COALESCE(cfd' . $curField . '.value, 1=1) DESC, cfd' . $curField . '.value DESC',
+						'up' => 'LENGTH(cfd' . $curField . '.value) > 0 DESC, COALESCE(cfd' . $curField . '.value, 1=1) ASC, cfd' . $curField . '.value ASC'
+					);
+				}
+				else
+				{
+					$context['custom_profile_fields']['columns'][$curField]['sort'] = array(
+						'down' => 'cfd' . $curField . '.value DESC',
+						'up' => 'cfd' . $curField . '.value ASC'
+					);
+				}
 
-			// Build the join and parameters for the sort query
-			$context['custom_profile_fields']['join'] = 'LEFT JOIN {db_prefix}custom_fields_data AS cfd' . $curField . ' ON (cfd' . $curField . '.variable = {string:cfd' . $curField . '} AND cfd' . $curField . '.id_member = mem.id_member)';
-			$context['custom_profile_fields']['parameters']['cfd' . $curField] = $row['col_name'];
+				// Build the join and parameters for the sort query
+				$context['custom_profile_fields']['join'] = 'LEFT JOIN {db_prefix}custom_fields_data AS cfd' . $curField . ' ON (cfd' . $curField . '.variable = {string:cfd' . $curField . '} AND cfd' . $curField . '.id_member = mem.id_member)';
+				$context['custom_profile_fields']['parameters']['cfd' . $curField] = $row['col_name'];
+			}
 		}
-	}
-	$db->free_result($request);
+	);
 
 	return !empty($context['custom_profile_fields']);
 }
@@ -99,6 +101,7 @@ function ml_CustomProfile()
  * @param int $cache_step_size
  *
  * @return array
+ * @throws \ElkArte\Exceptions\Exception
  */
 function ml_memberCache($cache_step_size)
 {
@@ -107,7 +110,8 @@ function ml_memberCache($cache_step_size)
 
 	// Get all of the activated members
 	$request = $db->query('', '
-		SELECT real_name
+		SELECT 
+			real_name
 		FROM {db_prefix}members
 		WHERE is_activated = {int:is_activated}
 		ORDER BY real_name',
@@ -118,21 +122,21 @@ function ml_memberCache($cache_step_size)
 
 	$memberlist_cache = array(
 		'last_update' => time(),
-		'num_members' => $db->num_rows($request),
+		'num_members' => $request->num_rows(),
 		'index' => array(),
 	);
 
 	// Get/Set our pointers in this list, used to later help limit our query
-	for ($i = 0, $n = $db->num_rows($request); $i < $n; $i += $cache_step_size)
+	for ($i = 0, $n = $request->num_rows(); $i < $n; $i += $cache_step_size)
 	{
-		$db->data_seek($request, $i);
-		list ($memberlist_cache['index'][$i]) = $db->fetch_row($request);
+		$request->data_seek($i);
+		list ($memberlist_cache['index'][$i]) = $request->fetch_row();
 	}
 
 	// Set the last one
-	$db->data_seek($request, $memberlist_cache['num_members'] - 1);
-	list ($memberlist_cache['index'][$i]) = $db->fetch_row($request);
-	$db->free_result($request);
+	$request->data_seek($memberlist_cache['num_members'] - 1);
+	list ($memberlist_cache['index'][$i]) = $request->fetch_row();
+	$request->free_result();
 
 	// Now we've got the cache...store it.
 	updateSettings(array('memberlist_cache' => serialize($memberlist_cache)));
@@ -148,15 +152,16 @@ function ml_memberCount()
 	$db = database();
 
 	$request = $db->query('', '
-		SELECT COUNT(*)
+		SELECT 
+			COUNT(*)
 		FROM {db_prefix}members
 		WHERE is_activated = {int:is_activated}',
 		array(
 			'is_activated' => 1,
 		)
 	);
-	list ($num_members) = $db->fetch_row($request);
-	$db->free_result($request);
+	list ($num_members) = $request->fetch_row();
+	$request->free_result();
 
 	return $num_members;
 }
@@ -167,13 +172,15 @@ function ml_memberCount()
  * @param string $start single letter to start with
  *
  * @return string
+ * @throws \ElkArte\Exceptions\Exception
  */
 function ml_alphaStart($start)
 {
 	$db = database();
 
 	$request = $db->query('substring', '
-		SELECT COUNT(*)
+		SELECT 
+			COUNT(*)
 		FROM {db_prefix}members
 		WHERE LOWER(SUBSTRING(real_name, 1, 1)) < {string:first_letter}
 			AND is_activated = {int:is_activated}',
@@ -182,8 +189,8 @@ function ml_alphaStart($start)
 			'first_letter' => $start,
 		)
 	);
-	list ($start) = $db->fetch_row($request);
-	$db->free_result($request);
+	list ($start) = $request->fetch_row();
+	$request->free_result();
 
 	return $start;
 }
@@ -196,6 +203,7 @@ function ml_alphaStart($start)
  * @param string $where
  * @param int $limit
  * @param string $sort
+ * @throws \ElkArte\Exceptions\Exception
  */
 function ml_selectMembers($query_parameters, $where = '', $limit = 0, $sort = '')
 {
@@ -205,7 +213,8 @@ function ml_selectMembers($query_parameters, $where = '', $limit = 0, $sort = ''
 
 	// Select the members from the database.
 	$request = $db->query('', '
-		SELECT mem.id_member
+		SELECT 
+			mem.id_member
 		FROM {db_prefix}members AS mem' . ($sort === 'online' ? '
 			LEFT JOIN {db_prefix}log_online AS lo ON (lo.id_member = mem.id_member)' : ($sort === 'id_group' ? '
 			LEFT JOIN {db_prefix}membergroups AS mg ON (mg.id_group = CASE WHEN mem.id_group = {int:regular_id_group} THEN mem.id_post_group ELSE mem.id_group END)' : '')) . '
@@ -218,7 +227,7 @@ function ml_selectMembers($query_parameters, $where = '', $limit = 0, $sort = ''
 	);
 
 	printMemberListRows($request);
-	$db->free_result($request);
+	$request->free_result();
 }
 
 /**
@@ -230,7 +239,8 @@ function ml_selectMembers($query_parameters, $where = '', $limit = 0, $sort = ''
  * @param string|string[]|null $customJoin
  * @param string $where
  * @param int $limit
- * @return integer
+ * @return int
+ * @throws \ElkArte\Exceptions\Exception
  */
 function ml_searchMembers($query_parameters, $customJoin = '', $where = '', $limit = 0)
 {
@@ -240,7 +250,8 @@ function ml_searchMembers($query_parameters, $customJoin = '', $where = '', $lim
 
 	// Get the number of results
 	$request = $db->query('', '
-		SELECT COUNT(*)
+		SELECT 
+			COUNT(*)
 		FROM {db_prefix}members AS mem
 			LEFT JOIN {db_prefix}membergroups AS mg ON (mg.id_group = CASE WHEN mem.id_group = {int:regular_id_group} THEN mem.id_post_group ELSE mem.id_group END)
 			' . (empty($customJoin) ? '' : implode('
@@ -249,8 +260,8 @@ function ml_searchMembers($query_parameters, $customJoin = '', $where = '', $lim
 			AND mem.is_activated = {int:is_activated}',
 		$query_parameters
 	);
-	list ($numResults) = $db->fetch_row($request);
-	$db->free_result($request);
+	list ($numResults) = $request->fetch_row();
+	$request->free_result();
 
 	// Select the members from the database.
 	$request = $db->query('', '
@@ -269,7 +280,7 @@ function ml_searchMembers($query_parameters, $customJoin = '', $where = '', $lim
 
 	// Place everything context so the template can use it
 	printMemberListRows($request);
-	$db->free_result($request);
+	$request->free_result();
 
 	return $numResults;
 }
@@ -283,9 +294,11 @@ function ml_findSearchableCustomFields()
 
 	$db = database();
 
-	$request = $db->query('', '
-		SELECT col_name, field_name, field_desc
-			FROM {db_prefix}custom_fields
+	$context['custom_search_fields'] = array();
+	$db->fetchQuery('
+		SELECT 
+			col_name, field_name, field_desc
+		FROM {db_prefix}custom_fields
 		WHERE active = {int:active}
 			' . (allowedTo('admin_forum') ? '' : ' AND private < {int:private_level}') . '
 			AND can_search = {int:can_search}
@@ -298,17 +311,17 @@ function ml_findSearchableCustomFields()
 			'field_type_textarea' => 'textarea',
 			'field_type_select' => 'select',
 		)
+	)->fetch_callback(
+		function ($row) {
+			global $context;
+
+			$context['custom_search_fields'][$row['col_name']] = array(
+				'colname' => $row['col_name'],
+				'name' => $row['field_name'],
+				'desc' => $row['field_desc'],
+			);
+		}
 	);
-	$context['custom_search_fields'] = array();
-	while ($row = $db->fetch_assoc($request))
-	{
-		$context['custom_search_fields'][$row['col_name']] = array(
-			'colname' => $row['col_name'],
-			'name' => $row['field_name'],
-			'desc' => $row['field_desc'],
-		);
-	}
-	$db->free_result($request);
 }
 
 /**
@@ -316,6 +329,7 @@ function ml_findSearchableCustomFields()
  * Puts results of request into the context for the sub template.
  *
  * @param resource $request
+ * @throws \ElkArte\Exceptions\Exception
  */
 function printMemberListRows($request)
 {
@@ -325,12 +339,13 @@ function printMemberListRows($request)
 
 	// Get the max post number for the bar graph
 	$result = $db->query('', '
-		SELECT MAX(posts)
+		SELECT 
+			MAX(posts)
 		FROM {db_prefix}members',
 		array()
 	);
-	list ($most_posts) = $db->fetch_row($result);
-	$db->free_result($result);
+	list ($most_posts) = $result->fetch_row();
+	$result->free_result();
 
 	// Avoid division by zero...
 	if ($most_posts == 0)
@@ -339,7 +354,7 @@ function printMemberListRows($request)
 	}
 
 	$members = array();
-	while ($row = $db->fetch_assoc($request))
+	while (($row = $request->fetch_assoc($request)))
 	{
 		$members[] = $row['id_member'];
 	}

@@ -25,6 +25,7 @@ use ElkArte\Util;
  * @param string $direction - + for like - for unlike a previous liked one
  *
  * @return bool
+ * @throws \ElkArte\Exceptions\Exception
  * @package Likes
  *
  */
@@ -58,6 +59,7 @@ function likePost($id_liker, $liked_message, $direction)
  * @param bool $prepare
  *
  * @return array|int[]
+ * @throws \Exception
  * @package Likes
  *
  */
@@ -77,7 +79,7 @@ function loadLikes($messages, $prepare = true)
 	}
 
 	// Load up them likes from the db
-	$request = $db->query('', '
+	$db->fetchQuery('
 		SELECT
 			l.id_member, l.id_msg,
 			m.real_name
@@ -87,19 +89,17 @@ function loadLikes($messages, $prepare = true)
 		array(
 			'id_messages' => $messages,
 		)
+	)->fetch_callback(
+		function ($row) use (&$likes) {
+			$likes[$row['id_msg']]['member'][$row['id_member']] = $row['real_name'];
+		}
 	);
-	while ($row = $db->fetch_assoc($request))
-	{
-		$likes[$row['id_msg']]['member'][$row['id_member']] = $row['real_name'];
-	}
 
 	// Total likes for this group
 	foreach ($likes as $msg_id => $like)
 	{
 		$likes[$msg_id]['count'] = count($like['member']);
 	}
-
-	$db->free_result($request);
 
 	if ($prepare)
 	{
@@ -170,6 +170,7 @@ function prepareLikes($likes)
  * Clear the likes log of older actions ... used to prevent a like love fest
  *
  * @param int $likeWaitTime
+ * @throws \ElkArte\Exceptions\Exception
  * @package Likes
  */
 function clearLikes($likeWaitTime)
@@ -198,6 +199,7 @@ function clearLikes($likeWaitTime)
  * @param int $id_liker
  *
  * @return bool
+ * @throws \ElkArte\Exceptions\Exception
  * @package Likes
  *
  */
@@ -213,15 +215,16 @@ function lastLikeOn($id_liker)
 	// Find out if, and how many, this user has done recently...
 	$db = database();
 	$request = $db->query('', '
-		SELECT action
+		SELECT 
+			action
 		FROM {db_prefix}log_likes
 		WHERE id_member = {int:current_member}',
 		array(
 			'current_member' => $id_liker,
 		)
 	);
-	$actions = $db->num_rows($request);
-	$db->free_result($request);
+	$actions = $request->num_rows();
+	$request->free_result();
 
 	return $actions < $modSettings['likeWaitCount'];
 }
@@ -232,6 +235,7 @@ function lastLikeOn($id_liker)
  * @param int $id_liker
  * @param int[] $liked_message
  * @param string $direction - options: - or +
+ * @throws \ElkArte\Exceptions\Exception
  * @package Likes
  */
 function updateLike($id_liker, $liked_message, $direction)
@@ -251,8 +255,8 @@ function updateLike($id_liker, $liked_message, $direction)
 			'id_msg' => $liked_message['id_msg'],
 		)
 	);
-	$count = $db->num_rows($request);
-	$db->free_result($request);
+	$count = $request->num_rows();
+	$request->free_result();
 
 	// Not previously liked, and you want to
 	if ($count === 0 && $direction === '+')
@@ -314,6 +318,7 @@ function updateLike($id_liker, $liked_message, $direction)
  *
  * @param int $id_topic - the topic
  * @param string $direction +/- liking or unliking
+ * @throws \ElkArte\Exceptions\Exception
  * @package Likes
  */
 function increaseTopicLikes($id_topic, $direction)
@@ -322,7 +327,8 @@ function increaseTopicLikes($id_topic, $direction)
 
 	$db->query('', '
 		UPDATE {db_prefix}topics
-		SET num_likes = num_likes ' . ($direction === '+' ? '+ 1' : '- 1') . '
+		SET 
+			num_likes = num_likes ' . ($direction === '+' ? '+ 1' : '- 1') . '
 		WHERE id_topic = {int:current_topic}',
 		array(
 			'current_topic' => $id_topic,
@@ -335,9 +341,10 @@ function increaseTopicLikes($id_topic, $direction)
  * have received a like (not the total likes received)
  *
  * @param int $memberID
- * @param boolean $given
+ * @param bool $given
  *
- * @return
+ * @return int
+ * @throws \ElkArte\Exceptions\Exception
  * @package Likes
  *
  */
@@ -353,7 +360,8 @@ function likesCount($memberID, $given = true)
 	else
 	{
 		$request = $db->query('', '
-			SELECT COUNT(*)
+			SELECT 
+				COUNT(*)
 			FROM {db_prefix}message_likes
 			WHERE id_poster = {int:id_member}
 			GROUP BY id_msg',
@@ -361,8 +369,8 @@ function likesCount($memberID, $given = true)
 				'id_member' => $memberID,
 			)
 		);
-		$likes = $db->num_rows($request);
-		$db->free_result($request);
+		$likes = $request->num_rows();
+		$request->free_result();
 	}
 
 	return $likes;
@@ -379,6 +387,7 @@ function likesCount($memberID, $given = true)
  * @param int $memberID
  *
  * @return array
+ * @throws \Exception
  * @package Likes
  *
  */
@@ -431,6 +440,7 @@ function likesPostsGiven($start, $items_per_page, $sort, $memberID)
  * @param int $memberID
  *
  * @return array
+ * @throws \Exception
  * @package Likes
  *
  */
@@ -481,6 +491,7 @@ function likesPostsReceived($start, $items_per_page, $sort, $memberID)
  * @param bool $simple
  *
  * @return array
+ * @throws \Exception
  * @package Likes
  *
  */
@@ -540,6 +551,7 @@ function postLikers($start, $items_per_page, $sort, $messageID, $simple = true)
  * @param int $message
  *
  * @return int
+ * @throws \ElkArte\Exceptions\Exception
  * @package Likes
  *
  */
@@ -562,8 +574,8 @@ function messageLikeCount($message)
 			'id_message' => $message,
 		)
 	);
-	list ($total) = $db->fetch_row($request);
-	$db->free_result($request);
+	list ($total) = $request->fetch_row();
+	$request->free_result();
 
 	return (int) $total;
 }
@@ -574,16 +586,19 @@ function messageLikeCount($message)
  * @param int $limit the number of top liked messages to fetch
  *
  * @return array
+ * @throws \Exception
  * @package Likes
  */
 function dbMostLikedMessage($limit = 10)
 {
-	global $scripturl, $txt;
+	global $txt;
 
 	$db = database();
 
 	// Most liked Message
-	$request = $db->query('', '
+	$mostLikedMessages = array();
+	$bbc_parser = ParserWrapper::instance();
+	$db->fetchQuery('
 		SELECT
 			COALESCE(mem.real_name, m.poster_name) AS member_received_name,
 			lp.id_msg, lp.like_count AS like_count,
@@ -607,49 +622,46 @@ function dbMostLikedMessage($limit = 10)
 		array(
 			'limit' => $limit,
 		)
+	)->fetch_callback(
+		function ($row) use (&$mostLikedMessages, $bbc_parser) {
+			global $scripturl;
+
+			// Censor it!
+			$row['subject'] = censor($row['subject']);
+			$row['body'] = censor($row['body']);
+
+			$row['body'] = $bbc_parser->parseMessage($row['body'], $row['smileys_enabled']);
+
+			// Something short and sweet
+			$msgString = Util::shorten_html($row['body'], 255);
+			$preview = Util::htmlspecialchars(strtr($msgString, array('<br />' => "\n", '&nbsp;' => ' ')));
+
+			// Love those avatars
+			$avatar = determineAvatar($row);
+
+			// Build it out
+			$mostLikedMessages[] = array(
+				'id_msg' => $row['id_msg'],
+				'id_topic' => $row['id_topic'],
+				'id_board' => $row['id_board'],
+				'like_count' => $row['like_count'],
+				'subject' => $row['subject'],
+				'preview' => $preview,
+				'body' => $msgString,
+				'time' => standardTime($row['poster_time']),
+				'html_time' => htmlTime($row['poster_time']),
+				'timestamp' => forum_time(true, $row['poster_time']),
+				'member_received' => array(
+					'id_member' => $row['id_member'],
+					'name' => $row['member_received_name'],
+					'total_posts' => $row['posts'],
+					'href' => !empty($row['id_member']) ? $scripturl . '?action=profile;u=' . $row['id_member'] : '',
+					'avatar' => $avatar['href'],
+				),
+				'member_liked_data' => postLikers(0, 20, 'l.id_member DESC', $row['id_msg'], false),
+			);
+		}
 	);
-
-	$mostLikedMessages = array();
-	$bbc_parser = ParserWrapper::instance();
-
-	while ($row = $db->fetch_assoc($request))
-	{
-		// Censor it!
-		$row['subject'] = censor($row['subject']);
-		$row['body'] = censor($row['body']);
-
-		$row['body'] = $bbc_parser->parseMessage($row['body'], $row['smileys_enabled']);
-
-		// Something short and sweet
-		$msgString = Util::shorten_html($row['body'], 255);
-		$preview = Util::htmlspecialchars(strtr($msgString, array('<br />' => "\n", '&nbsp;' => ' ')));
-
-		// Love those avatars
-		$avatar = determineAvatar($row);
-
-		// Build it out
-		$mostLikedMessages[] = array(
-			'id_msg' => $row['id_msg'],
-			'id_topic' => $row['id_topic'],
-			'id_board' => $row['id_board'],
-			'like_count' => $row['like_count'],
-			'subject' => $row['subject'],
-			'preview' => $preview,
-			'body' => $msgString,
-			'time' => standardTime($row['poster_time']),
-			'html_time' => htmlTime($row['poster_time']),
-			'timestamp' => forum_time(true, $row['poster_time']),
-			'member_received' => array(
-				'id_member' => $row['id_member'],
-				'name' => $row['member_received_name'],
-				'total_posts' => $row['posts'],
-				'href' => !empty($row['id_member']) ? $scripturl . '?action=profile;u=' . $row['id_member'] : '',
-				'avatar' => $avatar['href'],
-			),
-			'member_liked_data' => postLikers(0, 20, 'l.id_member DESC', $row['id_msg'], false),
-		);
-	}
-	$db->free_result($request);
 
 	// No likes in the system?
 	if (empty($mostLikedMessages))
@@ -674,6 +686,7 @@ function dbMostLikedMessage($limit = 10)
  * @param int $limit the maximum number of liked posts to return
  *
  * @return array
+ * @throws \Exception
  * @package Likes
  */
 function dbMostLikedMessagesByTopic($topic, $limit = 5)
@@ -762,6 +775,7 @@ function dbMostLikedMessagesByTopic($topic, $limit = 5)
  * @param int $limit - Optional, number of topics to return (default 10).
  *
  * @return array
+ * @throws \Exception
  * @package Likes
  *
  */
@@ -772,7 +786,8 @@ function dbMostLikedTopic($board = null, $limit = 10)
 	$db = database();
 
 	// The most liked topics by sum of likes and distinct likers
-	$request = $db->query('', '
+	$mostLikedTopics = array();
+	$db->fetchQuery('
 		SELECT
 			t.id_topic, t.num_replies, t.id_board,
 			COUNT(lp.id_msg) AS like_count,
@@ -790,22 +805,20 @@ function dbMostLikedTopic($board = null, $limit = 10)
 			'id_board' => $board,
 			'limit' => $limit * 5,
 		)
+	)->fetch_callback(
+		function ($row) use (&$mostLikedTopics) {
+			$mostLikedTopics[$row['id_topic']] = $row;
+
+			$log = log($row['like_count'] / ($row['num_replies'] + ($row['num_replies'] == 0 || $row['like_count'] == $row['num_replies'] ? 1 : 0)));
+			$distinct_likers = max(1,
+				min($row['distinct_likers'],
+					1 / ($log == 0 ? 1 : $log)));
+
+			$mostLikedTopics[$row['id_topic']]['relevance'] = $row['distinct_likers'] +
+				$row['distinct_likers'] / $row['num_messages_liked'] +
+				$distinct_likers;
+		}
 	);
-	$mostLikedTopics = array();
-	while ($row = $db->fetch_assoc($request))
-	{
-		$mostLikedTopics[$row['id_topic']] = $row;
-
-		$log = log($row['like_count'] / ($row['num_replies'] + ($row['num_replies'] == 0 || $row['like_count'] == $row['num_replies'] ? 1 : 0)));
-		$distinct_likers = max(1,
-			min($row['distinct_likers'],
-				1 / ($log == 0 ? 1 : $log)));
-
-		$mostLikedTopics[$row['id_topic']]['relevance'] = $row['distinct_likers'] +
-			$row['distinct_likers'] / $row['num_messages_liked'] +
-			$distinct_likers;
-	}
-	$db->free_result($request);
 
 	// Sort the results from the net we cast, then cut it down to the top X limit
 	uasort($mostLikedTopics, 'sort_by_relevance');
@@ -877,8 +890,8 @@ function dbMostLikedBoard()
 			'limit' => 1
 		)
 	);
-	$mostLikedBoard = $db->fetch_assoc($request);
-	$db->free_result($request);
+	$mostLikedBoard = $request->fetch_assoc();
+	$request->free_result();
 
 	if (empty($mostLikedBoard['id_board']))
 	{
@@ -899,16 +912,18 @@ function dbMostLikedBoard()
  * @param int $limit the number of most liked members to return
  *
  * @return array
+ * @throws \Exception
  * @package Likes
  *
  */
 function dbMostLikesReceivedUser($limit = 10)
 {
-	global $scripturl, $txt;
+	global  $txt;
 
 	$db = database();
 
-	$request = $db->query('', '
+	$mostLikedMembers = array();
+	$db->fetchQuery('
 		SELECT
 			lp.id_poster, lp.like_count,
 			COALESCE(a.id_attach, 0) AS id_attach, a.filename, a.attachment_type,
@@ -932,25 +947,25 @@ function dbMostLikesReceivedUser($limit = 10)
 		array(
 			'limit' => $limit
 		)
+	)->fetch_callback(
+		function ($row) use (&$mostLikedMembers) {
+			global $scripturl;
+
+			$avatar = determineAvatar($row);
+			$mostLikedMembers[] = array(
+				'member_received' => array(
+					'id_member' => $row['id_poster'],
+					'name' => $row['real_name'],
+					'total_posts' => $row['posts'],
+					'date_registered' => $row['date_registered'],
+					'href' => !empty($row['id_poster']) ? $scripturl . '?action=profile;u=' . $row['id_poster'] : '',
+					'avatar' => $avatar['href'],
+				),
+				'like_count' => $row['like_count'],
+				'post_data' => dbMostLikedPostsByUser($row['id_poster']),
+			);
+		}
 	);
-	$mostLikedMembers = array();
-	while ($row = $db->fetch_assoc($request))
-	{
-		$avatar = determineAvatar($row);
-		$mostLikedMembers[] = array(
-			'member_received' => array(
-				'id_member' => $row['id_poster'],
-				'name' => $row['real_name'],
-				'total_posts' => $row['posts'],
-				'date_registered' => $row['date_registered'],
-				'href' => !empty($row['id_poster']) ? $scripturl . '?action=profile;u=' . $row['id_poster'] : '',
-				'avatar' => $avatar['href'],
-			),
-			'like_count' => $row['like_count'],
-			'post_data' => dbMostLikedPostsByUser($row['id_poster']),
-		);
-	}
-	$db->free_result($request);
 
 	if (empty($mostLikedMembers))
 	{
@@ -969,6 +984,7 @@ function dbMostLikesReceivedUser($limit = 10)
  * @param int $limit then number of top posts to return
  *
  * @return array
+ * @throws \Exception
  */
 function dbMostLikedPostsByUser($id_member, $limit = 10)
 {
@@ -1025,16 +1041,18 @@ function dbMostLikedPostsByUser($id_member, $limit = 10)
  * @param int $limit the number of members to return
  *
  * @return array
+ * @throws \Exception
  * @package Likes
  *
  */
 function dbMostLikesGivenUser($limit = 10)
 {
-	global $scripturl, $txt;
+	global $txt;
 
 	$db = database();
 
-	$request = $db->query('', '
+	$mostLikeGivingMembers = array();
+	$db->fetchQuery('
 		SELECT
 			lp.id_member, lp.like_count,
 			COALESCE(a.id_attach, 0) AS id_attach, a.filename, a.attachment_type,
@@ -1054,26 +1072,26 @@ function dbMostLikesGivenUser($limit = 10)
 		array(
 			'limit' => $limit
 		)
-	);
-	$mostLikeGivingMembers = array();
-	while ($row = $db->fetch_assoc($request))
-	{
-		$avatar = determineAvatar($row);
+	)->fetch_callback(
+		function ($row) use (&$mostLikeGivingMembers) {
+			global $scripturl;
 
-		$mostLikeGivingMembers[] = array(
-			'member_given' => array(
-				'id_member' => $row['id_member'],
-				'name' => $row['real_name'],
-				'total_posts' => $row['posts'],
-				'date_registered' => $row['date_registered'],
-				'href' => !empty($row['id_member_gave']) ? $scripturl . '?action=profile;u=' . $row['id_member_gave'] : '',
-				'avatar' => $avatar['href'],
-			),
-			'like_count' => $row['like_count'],
-			'post_data' => dbRecentlyLikedPostsGivenUser($row['id_member'])
-		);
-	}
-	$db->free_result($request);
+			$avatar = determineAvatar($row);
+
+			$mostLikeGivingMembers[] = array(
+				'member_given' => array(
+					'id_member' => $row['id_member'],
+					'name' => $row['real_name'],
+					'total_posts' => $row['posts'],
+					'date_registered' => $row['date_registered'],
+					'href' => !empty($row['id_member_gave']) ? $scripturl . '?action=profile;u=' . $row['id_member_gave'] : '',
+					'avatar' => $avatar['href'],
+				),
+				'like_count' => $row['like_count'],
+				'post_data' => dbRecentlyLikedPostsGivenUser($row['id_member'])
+			);
+		}
+	);
 
 	if (empty($mostLikeGivingMembers))
 	{
@@ -1091,6 +1109,7 @@ function dbMostLikesGivenUser($limit = 10)
  * @param int $id_liker the userid to find recently liked posts
  * @param int $limit number of recently liked posts to fetch
  * @return array
+ * @throws \Exception
  */
 function dbRecentlyLikedPostsGivenUser($id_liker, $limit = 5)
 {
@@ -1148,6 +1167,7 @@ function dbRecentlyLikedPostsGivenUser($id_liker, $limit = 5)
  * for that message.
  *
  * @param int[]|int $messages
+ * @throws \Exception
  */
 function decreaseLikeCounts($messages)
 {
@@ -1164,7 +1184,9 @@ function decreaseLikeCounts($messages)
 	}
 
 	// Load the members who liked and who posted for this group of messages
-	$request = $db->query('', '
+	$posters = array();
+	$likers = array();
+	$db->fetchQuery('
 		SELECT
 			id_member, id_poster
 		FROM {db_prefix}message_likes
@@ -1172,16 +1194,13 @@ function decreaseLikeCounts($messages)
 		array(
 			'messages' => $messages,
 		)
+	)->fetch_callback(
+		function ($row) use (&$posters, &$likers) {
+			// Track how many likes each member gave and how many were received
+			$posters[$row['id_poster']] = isset($posters[$row['id_poster']]) ? $posters[$row['id_poster']]++ : 1;
+			$likers[$row['id_member']] = isset($likers[$row['id_member']]) ? $likers[$row['id_member']]++ : 1;
+		}
 	);
-	$posters = array();
-	$likers = array();
-	while ($row = $db->fetch_assoc($request))
-	{
-		// Track how many likes each member gave and how many were received
-		$posters[$row['id_poster']] = isset($posters[$row['id_poster']]) ? $posters[$row['id_poster']]++ : 1;
-		$likers[$row['id_member']] = isset($likers[$row['id_member']]) ? $likers[$row['id_member']]++ : 1;
-	}
-	$db->free_result($request);
 
 	// No one?
 	if (empty($posters) && empty($likers))
@@ -1192,7 +1211,7 @@ function decreaseLikeCounts($messages)
 	// Re-count the "likes given" totals for the likers
 	if (!empty($likers))
 	{
-		$request = $db->query('', '
+		$db->fetchQuery('
 			SELECT
 				COUNT(id_msg) AS likes, id_member
 			FROM {db_prefix}message_likes
@@ -1201,19 +1220,18 @@ function decreaseLikeCounts($messages)
 			array(
 				'members' => array_keys($likers),
 			)
+		)->fetch_callback(
+			function ($row) use (&$update_given, $likers) {
+				// All who liked these messages have their "likes given" reduced
+				$update_given[$row['id_member']] = $row['likes'] - $likers[$row['id_member']];
+			}
 		);
-		// All who liked these messages have their "likes given" reduced
-		while ($row = $db->fetch_assoc($request))
-		{
-			$update_given[$row['id_member']] = $row['likes'] - $likers[$row['id_member']];
-		}
-		$db->free_result($request);
 	}
 
 	// Count the "likes received" totals for the message posters
 	if (!empty($posters))
 	{
-		$request = $db->query('', '
+		$db->fetchQuery('
 			SELECT
 				COUNT(id_msg) AS likes, id_poster
 			FROM {db_prefix}message_likes
@@ -1222,13 +1240,12 @@ function decreaseLikeCounts($messages)
 			array(
 				'members' => array_keys($posters),
 			)
+		)->fetch_callback(
+			function ($row) use (&$update_received, $posters) {
+				// The message posters have their "likes received" reduced
+				$update_received[$row['id_poster']] = $row['likes'] - $posters[$row['id_poster']];
+			}
 		);
-		// The message posters have their "likes received" reduced
-		while ($row = $db->fetch_assoc($request))
-		{
-			$update_received[$row['id_poster']] = $row['likes'] - $posters[$row['id_poster']];
-		}
-		$db->free_result($request);
 	}
 
 	// Update the totals for these members

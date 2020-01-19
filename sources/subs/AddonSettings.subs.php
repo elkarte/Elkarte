@@ -272,7 +272,7 @@ function list_integration_hooks_data($start, $items_per_page, $sort)
  * - used by createList() as a callback to determine the number of hooks in
  * use in the system
  *
- * @param boolean $filter
+ * @param bool $filter
  *
  * @return int
  * @package AddonSettings

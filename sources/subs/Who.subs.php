@@ -22,6 +22,7 @@ use ElkArte\Util;
  * @param string $session
  * @param string $type
  * @return array
+ * @throws \Exception
  */
 function viewers($id, $session, $type = 'topic')
 {
@@ -33,8 +34,7 @@ function viewers($id, $session, $type = 'topic')
 		$type = 'topic';
 	}
 
-	$viewers = array();
-	$request = $db->query('', '
+	return $db->fetchQuery('
 		SELECT
 			lo.id_member, lo.log_time, mem.real_name, mem.member_name, mem.show_online,
 			mg.online_color, mg.id_group, mg.group_name
@@ -47,14 +47,7 @@ function viewers($id, $session, $type = 'topic')
 			'in_url_string' => 's:5:"' . $type . '";i:' . $id . ';',
 			'session' => $session
 		)
-	);
-	while ($row = $db->fetch_assoc($request))
-	{
-		$viewers[] = $row;
-	}
-	$db->free_result($request);
-
-	return $viewers;
+	)->fetch_all();
 }
 
 /**
@@ -62,6 +55,7 @@ function viewers($id, $session, $type = 'topic')
  *
  * @param int $id id of the element (topic or board) we're watching
  * @param string $type = 'topic, 'topic' or 'board'
+ * @throws \ElkArte\Exceptions\Exception
  */
 function formatViewers($id, $type)
 {
@@ -138,18 +132,17 @@ function formatViewers($id, $type)
  * and <credits> tags in package.xml.
  *
  * @return array
+ * @throws \ElkArte\Exceptions\Exception
  */
 function addonsCredits()
 {
-	global $txt;
-
 	$db = database();
 
 	$cache = Cache::instance();
 	$credits = array();
 	if (!$cache->getVar($credits, 'addons_credits', 86400))
 	{
-		$request = $db->query('substring', '
+		$db->query('substring', '
 			SELECT 
 				version, name, credits
 			FROM {db_prefix}log_packages
@@ -163,20 +156,23 @@ function addonsCredits()
 				'patch_name' => 'elk_patch',
 				'empty' => '',
 			)
+		)->fetch_callback(
+			function ($row) use (&$credits) {
+				global $txt;
+
+				$credit_info = Util::unserialize($row['credits']);
+
+				$copyright = empty($credit_info['copyright']) ? '' : $txt['credits_copyright'] . ' &copy; ' . Util::htmlspecialchars($credit_info['copyright']);
+				$license = empty($credit_info['license']) ? '' : $txt['credits_license'] . ': ' . Util::htmlspecialchars($credit_info['license']);
+				$version = $txt['credits_version'] . '' . $row['version'];
+				$title = (empty($credit_info['title']) ? $row['name'] : Util::htmlspecialchars($credit_info['title'])) . ': ' . $version;
+
+				// Build this one out and stash it away
+				$name = empty($credit_info['url']) ? $title : '<a href="' . $credit_info['url'] . '">' . $title . '</a>';
+				$credits[] = $name . (!empty($license) ? ' | ' . $license : '') . (!empty($copyright) ? ' | ' . $copyright : '');
+
+			}
 		);
-		while ($row = $db->fetch_assoc($request))
-		{
-			$credit_info = Util::unserialize($row['credits']);
-
-			$copyright = empty($credit_info['copyright']) ? '' : $txt['credits_copyright'] . ' &copy; ' . Util::htmlspecialchars($credit_info['copyright']);
-			$license = empty($credit_info['license']) ? '' : $txt['credits_license'] . ': ' . Util::htmlspecialchars($credit_info['license']);
-			$version = $txt['credits_version'] . '' . $row['version'];
-			$title = (empty($credit_info['title']) ? $row['name'] : Util::htmlspecialchars($credit_info['title'])) . ': ' . $version;
-
-			// Build this one out and stash it away
-			$name = empty($credit_info['url']) ? $title : '<a href="' . $credit_info['url'] . '">' . $title . '</a>';
-			$credits[] = $name . (!empty($license) ? ' | ' . $license : '') . (!empty($copyright) ? ' | ' . $copyright : '');
-		}
 
 		$cache->put('addons_credits', $credits, 86400);
 	}
@@ -372,7 +368,8 @@ function determineActions($urls, $preferred_prefix = false)
 				$msgid = (int) (isset($actions['msg']) ? $actions['msg'] : (isset($actions['quote']) ? $actions['quote'] : 0));
 
 				$result = $db->query('', '
-					SELECT m.id_topic, m.subject
+					SELECT 
+						m.id_topic, m.subject
 					FROM {db_prefix}messages AS m
 						INNER JOIN {db_prefix}boards AS b ON (b.id_board = m.id_board)
 						INNER JOIN {db_prefix}topics AS t ON (t.id_topic = m.id_topic' . ($modSettings['postmod_active'] ? ' AND t.approved = {int:is_approved}' : '') . ')
@@ -385,9 +382,9 @@ function determineActions($urls, $preferred_prefix = false)
 						'id_msg' => $msgid,
 					)
 				);
-				list ($id_topic, $subject) = $db->fetch_row($result);
+				list ($id_topic, $subject) = $result->fetch_row();
 				$data[$k] = sprintf($txt['whopost_' . $actions['action']], getUrl('topic', ['topic' => $id_topic, 'start' => '0', 'subject' => $subject]), $subject);
-				$db->free_result($result);
+				$result->free_result();
 
 				if (empty($id_topic))
 				{

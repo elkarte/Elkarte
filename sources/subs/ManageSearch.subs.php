@@ -29,25 +29,23 @@ function detectFulltextIndex()
 	// Something like 5.7.16
 	list($ver,) = explode('-', $db->server_version());
 
-	$request = $db->query('', '
+	$fulltext_index = array();
+	$db->fetchQuery('
 		SHOW INDEX
 		FROM {db_prefix}messages',
 		array()
-	);
-	$fulltext_index = array();
-	if ($request !== false || $db->num_rows($request) != 0)
-	{
-		while ($row = $db->fetch_assoc($request))
-		{
-			if ($row['Column_name'] === 'body' && (isset($row['Index_type']) && $row['Index_type'] === 'FULLTEXT' || isset($row['Comment']) && $row['Comment'] === 'FULLTEXT'))
+	)->fetch_callback(
+		function ($row) use (&$fulltext_index) {
+			if ($row['Column_name'] === 'body'
+				&& (isset($row['Index_type']) && $row['Index_type'] === 'FULLTEXT'
+					|| isset($row['Comment']) && $row['Comment'] === 'FULLTEXT'))
 			{
 				$fulltext_index[] = $row['Key_name'];
 			}
 		}
-		$db->free_result($request);
+	);
 
-		$fulltext_index = array_unique($fulltext_index);
-	}
+	$fulltext_index = array_unique($fulltext_index);
 
 	if (preg_match('~^`(.+?)`\.(.+?)$~', $db_prefix, $match) !== 0)
 	{
@@ -77,7 +75,7 @@ function detectFulltextIndex()
 		// InnoDB full-text search (FTS) is available in MySQL >=5.6.4
 		$innodb_capable = version_compare($ver, '5.6.4') >= 0;
 
-		while ($row = $db->fetch_assoc($request))
+		while (($row = $request->fetch_assoc()))
 		{
 			$check1 = isset($row['Type']) && strtolower($row['Type']) !== 'myisam' && !$innodb_capable;
 			$check2 = isset($row['Engine']) && strtolower($row['Engine']) !== 'myisam' && !$innodb_capable;
@@ -88,7 +86,7 @@ function detectFulltextIndex()
 			}
 		}
 
-		$db->free_result($request);
+		$request->free_result();
 	}
 
 	return $fulltext_index;
@@ -283,7 +281,8 @@ searchd
  *
  * @param string $table
  * @param string[]|string $indexes
- * @param boolean $add
+ * @param bool $add
+ * @throws \ElkArte\Exceptions\Exception
  * @package Search
  */
 function alterFullTextIndex($table, $indexes, $add = false)
@@ -325,6 +324,7 @@ function alterFullTextIndex($table, $indexes, $add = false)
  * @param mixed[] $index_settings array containing specifics of what to create e.g. bytes per word
  *
  * @return array
+ * @throws \ElkArte\Exceptions\Exception
  * @package Search
  *
  */
@@ -361,18 +361,19 @@ function createSearchIndex($start, $messages_per_batch, $column_size_definition,
 		'todo' => 0,
 	);
 
-	$request = $db->query('', '
-		SELECT id_msg >= {int:starting_id} AS todo, COUNT(*) AS num_messages
+	$db->fetchQuery('
+		SELECT 
+			id_msg >= {int:starting_id} AS todo, COUNT(*) AS num_messages
 		FROM {db_prefix}messages
 		GROUP BY todo',
 		array(
 			'starting_id' => $start,
 		)
+	)->fetch_callback(
+		function ($row) use (&$num_messages) {
+			$num_messages[empty($row['todo']) ? 'done' : 'todo'] = $row['num_messages'];
+		}
 	);
-	while ($row = $db->fetch_assoc($request))
-	{
-		$num_messages[empty($row['todo']) ? 'done' : 'todo'] = $row['num_messages'];
-	}
 
 	// Done with indexing the messages, on to the next step
 	if (empty($num_messages['todo']))
@@ -389,8 +390,11 @@ function createSearchIndex($start, $messages_per_batch, $column_size_definition,
 		while (time() < $stop)
 		{
 			$inserts = array();
-			$request = $db->query('', '
-				SELECT id_msg, body
+			$forced_break = false;
+			$number_processed = 0;
+			$db->fetchQuery('
+				SELECT 
+					id_msg, body
 				FROM {db_prefix}messages
 				WHERE id_msg BETWEEN {int:starting_id} AND {int:ending_id}
 				LIMIT {int:limit}',
@@ -399,27 +403,24 @@ function createSearchIndex($start, $messages_per_batch, $column_size_definition,
 					'ending_id' => $start + $messages_per_batch - 1,
 					'limit' => $messages_per_batch,
 				)
-			);
-			$forced_break = false;
-			$number_processed = 0;
-			while ($row = $db->fetch_assoc($request))
-			{
-				// In theory it's possible for one of these to take friggin ages so add more timeout protection.
-				if ($stop < time())
-				{
-					$forced_break = true;
-					break;
-				}
+			)->fetch_callback(
+				function ($row) use (&$forced_break, &$number_processed, &$inserts) {
+					// In theory it's possible for one of these to take friggin ages so add more timeout protection.
+					if ($stop < time() || $forced_break)
+					{
+						$forced_break = true;
+						return;
+					}
 
-				$number_processed++;
-				foreach (text2words($row['body'], $index_settings['bytes_per_word'], true) as $id_word)
-				{
-					$inserts[] = array($id_word, $row['id_msg']);
+					$number_processed++;
+					foreach (text2words($row['body'], $index_settings['bytes_per_word'], true) as $id_word)
+					{
+						$inserts[] = array($id_word, $row['id_msg']);
+					}
 				}
-			}
+			);
 			$num_messages['done'] += $number_processed;
 			$num_messages['todo'] -= $number_processed;
-			$db->free_result($request);
 
 			$start += $forced_break ? $number_processed : $messages_per_batch;
 
@@ -460,6 +461,7 @@ function createSearchIndex($start, $messages_per_batch, $column_size_definition,
  * @param mixed[] $column_definition
  *
  * @return array
+ * @throws \ElkArte\Exceptions\Exception
  * @package Search
  *
  */
@@ -476,8 +478,9 @@ function removeCommonWordsFromIndex($start, $column_definition)
 
 	while (time() < $stop)
 	{
-		$request = $db->query('', '
-			SELECT id_word, COUNT(id_word) AS num_words
+		$request = $db->fetchQuery('
+			SELECT
+			 	id_word, COUNT(id_word) AS num_words
 			FROM {db_prefix}log_search_words
 			WHERE id_word BETWEEN {int:starting_id} AND {int:ending_id}
 			GROUP BY id_word
@@ -487,12 +490,11 @@ function removeCommonWordsFromIndex($start, $column_definition)
 				'ending_id' => $start + $column_definition['step_size'] - 1,
 				'minimum_messages' => $max_messages,
 			)
+		)->fetch_callback(
+			function ($row) use (&$stop_words) {
+				$stop_words[] = $row['id_word'];
+			}
 		);
-		while ($row = $db->fetch_assoc($request))
-		{
-			$stop_words[] = $row['id_word'];
-		}
-		$db->free_result($request);
 
 		updateSettings(array('search_stopwords' => implode(',', $stop_words)));
 

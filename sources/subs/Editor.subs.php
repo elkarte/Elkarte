@@ -26,6 +26,7 @@ use ElkArte\Cache\Cache;
  *
  * @param int $board_id
  * @return array
+ * @throws \Exception
  */
 function getMessageIcons($board_id)
 {
@@ -110,8 +111,9 @@ function getMessageIcons($board_id)
  *     ),
  *   - preview_type => 2 how to act on preview click, see template_control_richedit_buttons
  *
- * @uses Post language
+ * @throws \ElkArte\Exceptions\Exception
  * @uses GenericControls template
+ * @uses Post language
  */
 function create_control_richedit($editorOptions)
 {
@@ -432,7 +434,8 @@ function create_control_richedit($editorOptions)
 			if (!Cache::instance()->getVar($temp, 'posting_smileys', 480))
 			{
 				$db->fetchQuery('
-					SELECT code, filename, description, smiley_row, hidden
+					SELECT 
+						code, filename, description, smiley_row, hidden
 					FROM {db_prefix}smileys
 					WHERE hidden IN (0, 2)
 					ORDER BY smiley_row, smiley_order',

@@ -31,6 +31,7 @@
  *     'custom_selects' => loads additional values from the tables used in the query, for addon use
  *
  * @return array
+ * @throws \ElkArte\Exceptions\Exception
  */
 function messageIndexTopics($id_board, $id_member, $start, $items_per_page, $sort_by, $sort_column, $indexOptions)
 {
@@ -49,8 +50,9 @@ function messageIndexTopics($id_board, $id_member, $start, $items_per_page, $sor
 	), $indexOptions);
 
 	// Fetch topic list in the order we want.
-	$request = $db->query('', '
-		SELECT t.id_topic
+	$db->fetchQuery('
+		SELECT 
+			t.id_topic
 		FROM {db_prefix}topics AS t' . ($sort_by === 'last_poster' ? '
 			INNER JOIN {db_prefix}messages AS ml ON (ml.id_msg = t.id_last_msg)' : (in_array($sort_by, array('starter', 'subject')) ? '
 			INNER JOIN {db_prefix}messages AS mf ON (mf.id_msg = t.id_first_msg)' : '')) . ($sort_by === 'starter' ? '
@@ -68,12 +70,11 @@ function messageIndexTopics($id_board, $id_member, $start, $items_per_page, $sor
 			'start' => $start,
 			'maxindex' => $items_per_page,
 		)
+	)->fetch_callback(
+		function ($row) use (&$topics) {
+			$topics[$row['id_topic']] = [];
+		}
 	);
-	while ($row = $db->fetch_assoc($request))
-	{
-		$topics[$row['id_topic']] = [];
-	}
-	$db->free_result($request);
 
 	// -1 means preview the whole body
 	if ($indexOptions['previews'] === -1)
@@ -127,14 +128,12 @@ function messageIndexTopics($id_board, $id_member, $start, $items_per_page, $sor
 				'topic_list' => array_keys($topics),
 			)
 		);
-
-		// Now we fill the above array, maintaining index asssociation.
-		while ($row = $db->fetch_assoc($request))
+		// Now we fill the above array, maintaining index association.
+		while (($row = $request->fetch_assoc()))
 		{
 			$topics[$row['id_topic']] = $row;
 		}
-
-		$db->free_result($request);
+		$request->free_result();
 	}
 
 	return $topics;
@@ -170,14 +169,16 @@ function messageIndexSort()
  * @param int[] $topic_ids array of topics ids to check for participation
  *
  * @return array
+ * @throws \Exception
  */
 function topicsParticipation($id_member, $topic_ids)
 {
 	$db = database();
 	$topics = array();
 
-	$result = $db->query('', '
-		SELECT id_topic
+	$db->fetchQuery('
+		SELECT 
+			id_topic
 		FROM {db_prefix}messages
 		WHERE id_topic IN ({array_int:topic_list})
 			AND id_member = {int:current_member}
@@ -187,13 +188,11 @@ function topicsParticipation($id_member, $topic_ids)
 			'current_member' => $id_member,
 			'topic_list' => $topic_ids,
 		)
+	)->fetch_callback(
+		function ($row) use (&$topics) {
+			$topics[] = $row;
+		}
 	);
-	while ($row = $db->fetch_assoc($result))
-	{
-		$topics[] = $row;
-	}
-
-	$db->free_result($result);
 
 	return $topics;
 }

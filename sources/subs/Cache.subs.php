@@ -29,6 +29,7 @@ use ElkArte\Cache\CacheMethod\AbstractCacheMethod;
  * @param int $level = 1
  *
  * @return mixed
+ * @throws \Exception
  * @deprecated since 2.0
  *
  */
@@ -52,6 +53,7 @@ function cache_quick_get($key, $file, $function, $params, $level = 1)
  * @param string $key
  * @param string|int|mixed[]|null $value
  * @param int $ttl = 120
+ * @throws \Exception
  * @deprecated since 2.0
  *
  */
@@ -71,6 +73,7 @@ function cache_put_data($key, $value, $ttl = 120)
  * @param int $ttl = 120
  *
  * @return bool|null
+ * @throws \Exception
  * @deprecated since 2.0
  *
  */
@@ -92,6 +95,7 @@ function cache_get_data($key, $ttl = 120)
  * For cache engines that do not distinguish on types, a full cache flush will be done
  *
  * @param string $type = ''
+ * @throws \Exception
  * @deprecated since 2.0
  *
  */

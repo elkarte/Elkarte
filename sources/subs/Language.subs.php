@@ -18,6 +18,7 @@ use ElkArte\XmlArray;
  * Removes the given language from all members..
  *
  * @param int $lang_id
+ * @throws \ElkArte\Exceptions\Exception
  * @package Languages
  */
 function removeLanguageFromMember($lang_id)
@@ -26,7 +27,8 @@ function removeLanguageFromMember($lang_id)
 
 	$db->query('', '
 		UPDATE {db_prefix}members
-		SET lngfile = {string:empty_string}
+		SET 
+			lngfile = {string:empty_string}
 		WHERE lngfile = {string:current_language}',
 		array(
 			'empty_string' => '',
@@ -102,30 +104,30 @@ function list_getLanguages()
 	}
 
 	// Work out how many people are using each language.
-	$request = $db->query('', '
-		SELECT lngfile, COUNT(*) AS num_users
+	$db->fetchQuery('
+		SELECT 
+			lngfile, COUNT(*) AS num_users
 		FROM {db_prefix}members
 		GROUP BY lngfile',
 		array()
-	);
-	while ($row = $db->fetch_assoc($request))
-	{
-		// Default?
-		if (empty($row['lngfile']) || !isset($languages[$row['lngfile']]))
-		{
-			$row['lngfile'] = $language;
-		}
+	)->fetch_callback(
+		function ($row) use (&$languages, $language) {
+			// Default?
+			if (empty($row['lngfile']) || !isset($languages[$row['lngfile']]))
+			{
+				$row['lngfile'] = $language;
+			}
 
-		if (!isset($languages[$row['lngfile']]) && isset($languages['english']))
-		{
-			$languages['english']['count'] += $row['num_users'];
+			if (!isset($languages[$row['lngfile']]) && isset($languages['english']))
+			{
+				$languages['english']['count'] += $row['num_users'];
+			}
+			elseif (isset($languages[$row['lngfile']]))
+			{
+				$languages[$row['lngfile']]['count'] += $row['num_users'];
+			}
 		}
-		elseif (isset($languages[$row['lngfile']]))
-		{
-			$languages[$row['lngfile']]['count'] += $row['num_users'];
-		}
-	}
-	$db->free_result($request);
+	);
 
 	// Restore the current users language.
 	$txt = $old_txt;
@@ -138,7 +140,7 @@ function list_getLanguages()
  * This function cleans language entries to/from display.
  *
  * @param string $string
- * @param boolean $to_display
+ * @param bool $to_display
  *
  * @return null|string|string[]
  * @package Languages
@@ -440,6 +442,7 @@ function list_getLanguagesList()
  * @param string $lang
  *
  * @return array|bool
+ * @throws \ElkArte\Exceptions\Exception
  */
 function findPossiblePackages($lang)
 {
@@ -457,18 +460,16 @@ function findPossiblePackages($lang)
 		)
 	);
 	$file_name = '';
-	if ($db->num_rows($request) > 0)
+	if ($request->num_rows() > 0)
 	{
-		list ($pid, $file_name) = $db->fetch_row($request);
+		list ($pid, $file_name) = $request->fetch_row();
 	}
-	$db->free_result($request);
+	$request->free_result();
 
 	if (!empty($pid))
 	{
 		return array($pid, $file_name);
 	}
-	else
-	{
-		return false;
-	}
+
+	return false;
 }

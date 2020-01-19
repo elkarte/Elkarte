@@ -34,7 +34,8 @@ use ElkArte\User;
  * @param bool $is_private
  * @param string|null $from_wrapper - used to provide envelope from wrapper based on if we sharing a users display name
  * @param int|null $reference - The parent topic id for use in a References header
- * @return boolean whether or not the email was accepted properly.
+ * @return bool whether or not the email was accepted properly.
+ * @throws \ElkArte\Exceptions\Exception
  * @package Mail
  */
 function sendmail($to, $subject, $message, $from = null, $message_id = null, $send_html = false, $priority = 3, $hotmail_fix = null, $is_private = false, $from_wrapper = null, $reference = null)
@@ -353,9 +354,10 @@ function sendmail($to, $subject, $message, $from = null, $message_id = null, $se
  * @param string $headers = ''
  * @param bool $send_html = false
  * @param int $priority = 3
- * @param boolean $is_private
+ * @param bool $is_private
  * @param string|null $message_id
- * @return boolean
+ * @return bool
+ * @throws \ElkArte\Exceptions\Exception
  * @package Mail
  */
 function AddMailQueue($flush = false, $to_array = array(), $subject = '', $message = '', $headers = '', $send_html = false, $priority = 3, $is_private = false, $message_id = '')
@@ -400,7 +402,8 @@ function AddMailQueue($flush = false, $to_array = array(), $subject = '', $messa
 
 		$db->query('', '
 			UPDATE {db_prefix}settings
-			SET value = {string:nextSendTime}
+			SET 
+				value = {string:nextSendTime}
 			WHERE variable = {string:mail_next_send}
 				AND value = {string:no_outstanding}',
 			array(
@@ -594,7 +597,8 @@ function mimespecialchars_callback($match)
  * @param string $headers
  * @param int $priority
  * @param string|null $message_id
- * @return boolean whether it sent or not.
+ * @return bool whether it sent or not.
+ * @throws \Exception
  * @internal
  * @package Mail
  */
@@ -643,7 +647,7 @@ function smtp_mail($mail_to_array, $subject, $message, $headers, $priority, $mes
 		// Maybe we can still save this?  The port might be wrong.
 		if (substr($modSettings['smtp_host'], 0, 4) === 'ssl:' && (empty($modSettings['smtp_port']) || $modSettings['smtp_port'] == 25))
 		{
-			if ($socket = fsockopen($modSettings['smtp_host'], 465, $errno, $errstr, 3))
+			if (($socket = fsockopen($modSettings['smtp_host'], 465, $errno, $errstr, 3)))
 			{
 				\ElkArte\Errors\Errors::instance()->log_error($txt['smtp_port_ssl']);
 			}
@@ -698,13 +702,10 @@ function smtp_mail($mail_to_array, $subject, $message, $headers, $priority, $mes
 			return false;
 		}
 	}
-	else
+	elseif (!server_parse('HELO ' . $modSettings['smtp_host'], $socket, '250'))
 	{
 		// Just say "helo".
-		if (!server_parse('HELO ' . $modSettings['smtp_host'], $socket, '250'))
-		{
-			return false;
-		}
+		return false;
 	}
 
 	// Fix the message for any lines beginning with a period! (the first is ignored, you see.)
@@ -819,9 +820,10 @@ function smtp_mail($mail_to_array, $subject, $message, $headers, $priority, $mes
  * @param string $message - the message to send
  * @param resource $socket - socket to send on
  * @param string $response - the expected response code
- * @return string|boolean it responded as such.
- * @package Mail
+ * @return string|bool it responded as such.
+ * @throws \Exception
  * @internal
+ * @package Mail
  */
 function server_parse($message, $socket, $response)
 {
@@ -1100,6 +1102,7 @@ function user_info_callback($matches)
  * @param int $items_per_page The number of items to show per page
  * @param string $sort A string indicating how to sort the results
  * @return array
+ * @throws \Exception
  * @package Mail
  */
 function list_getMailQueue($start, $items_per_page, $sort)
@@ -1136,6 +1139,7 @@ function list_getMailQueue($start, $items_per_page, $sort)
  * Returns the total count of items in the mail queue.
  *
  * @return int
+ * @throws \ElkArte\Exceptions\Exception
  * @package Mail
  */
 function list_getMailQueueSize()
@@ -1148,8 +1152,8 @@ function list_getMailQueueSize()
 		FROM {db_prefix}mail_queue',
 		array()
 	);
-	list ($mailQueueSize) = $db->fetch_row($request);
-	$db->free_result($request);
+	list ($mailQueueSize) = $request->fetch_row();
+	$request->free_result();
 
 	return $mailQueueSize;
 }
@@ -1158,6 +1162,7 @@ function list_getMailQueueSize()
  * Deletes items from the mail queue
  *
  * @param int[] $items
+ * @throws \ElkArte\Exceptions\Exception
  * @package Mail
  */
 function deleteMailQueueItems($items)
@@ -1190,8 +1195,8 @@ function list_MailQueueStatus()
 		FROM {db_prefix}mail_queue',
 		array()
 	);
-	list ($items['mailQueueSize'], $items['mailOldest']) = $db->fetch_row($request);
-	$db->free_result($request);
+	list ($items['mailQueueSize'], $items['mailOldest']) = $request->fetch_row();
+	$request->free_result();
 
 	return $items;
 }
@@ -1202,6 +1207,7 @@ function list_MailQueueStatus()
  * - It is used to keep track of failed emails attempts and next try.
  *
  * @param mixed[] $failed_emails
+ * @throws \ElkArte\Exceptions\Exception
  * @package Mail
  */
 function updateFailedQueue($failed_emails)
@@ -1296,6 +1302,7 @@ function resetNextSendTime()
  * - Requires an affected row
  *
  * @return int|bool
+ * @throws \ElkArte\Exceptions\Exception
  * @package Mail
  */
 function updateNextSendTime()
@@ -1307,7 +1314,7 @@ function updateNextSendTime()
 	// Set a delay based on the per minute limit (mail_period_limit)
 	$delay = !empty($modSettings['mail_queue_delay']) ? $modSettings['mail_queue_delay'] : (!empty($modSettings['mail_period_limit']) && $modSettings['mail_period_limit'] <= 5 ? 10 : 5);
 
-	$db->query('', '
+	$request = $db->query('', '
 		UPDATE {db_prefix}settings
 		SET value = {string:next_mail_send}
 		WHERE variable = {string:mail_next_send}
@@ -1318,7 +1325,7 @@ function updateNextSendTime()
 			'last_send' => $modSettings['mail_next_send'],
 		)
 	);
-	if ($db->affected_rows() == 0)
+	if ($request->affected_rows() === 0)
 	{
 		return false;
 	}
@@ -1331,6 +1338,7 @@ function updateNextSendTime()
  *
  * @param int $number
  * @return array
+ * @throws \Exception
  * @package Mail
  */
 function emailsInfo($number)
@@ -1374,9 +1382,10 @@ function emailsInfo($number)
  * - If batch size is not set, will determine a size such that it sends in 1/2 the period (buffer)
  *
  * @param int|bool $batch_size = false the number to send each loop
- * @param boolean $override_limit = false bypassing our limit flaf
- * @param boolean $force_send = false
- * @return boolean
+ * @param bool $override_limit = false bypassing our limit flaf
+ * @param bool $force_send = false
+ * @return bool
+ * @throws \ElkArte\Exceptions\Exception
  * @package Mail
  */
 function reduceMailQueue($batch_size = false, $override_limit = false, $force_send = false)
@@ -1616,8 +1625,9 @@ function reduceMailQueue($batch_size = false, $override_limit = false, $force_se
  * @param int $id_msg the id of a message
  * @param int $topic_id the topic the message belongs to
  * @return mixed[] the poster's details
- * @package Mail
+ * @throws \ElkArte\Exceptions\Exception
  * @todo very similar to mailFromMessage
+ * @package Mail
  */
 function posterDetails($id_msg, $topic_id)
 {
@@ -1636,9 +1646,8 @@ function posterDetails($id_msg, $topic_id)
 			'id_msg' => $id_msg,
 		)
 	);
-
-	$message = $db->fetch_assoc($request);
-	$db->free_result($request);
+	$message = $request->fetch_assoc();
+	$request->free_result();
 
 	return $message;
 }
@@ -1646,7 +1655,7 @@ function posterDetails($id_msg, $topic_id)
 /**
  * Little utility function to calculate how long ago a time was.
  *
- * @param integer|double $time_diff
+ * @param int|double $time_diff
  * @return string
  * @package Mail
  */
