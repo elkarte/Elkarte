@@ -481,11 +481,11 @@ class Attachment extends AbstractController
 	 * @param string $filename Full path+file name of the file in the filesystem
 	 * @param string $eTag ETag cache validator
 	 * @param string $mime_type The mime-type of the file
-	 * @param boolean $use_compression If use gzip compression
+	 * @param bool $use_compression If use gzip compression
 	 * @param string $disposition The value of the Content-Disposition header
 	 * @param string $real_filename The original name of the file
-	 * @param boolean $do_cache If send the a max-age header or not
-	 * @param boolean $check_filename When false, any check on $filename is skipped
+	 * @param bool $do_cache If send the a max-age header or not
+	 * @param bool $check_filename When false, any check on $filename is skipped
 	 */
 	protected function _send_headers($filename, $eTag, $mime_type, $use_compression, $disposition, $real_filename, $do_cache, $check_filename = true)
 	{
@@ -573,13 +573,10 @@ class Attachment extends AbstractController
 		$fileName = str_replace('"', '', $fileName);
 
 		// Send as UTF-8 if the name warrants that
+		$altNamePart = '';
 		if (preg_match('/[\x80-\xFF]/', $fileName))
 		{
 			$altNamePart = "; filename*=UTF-8''" . rawurlencode($fileName);
-		}
-		else
-		{
-			$altNamePart = '';
 		}
 
 		header('Content-Disposition: ' . $disposition . '; filename="' . $fileName . '"' . $altNamePart);

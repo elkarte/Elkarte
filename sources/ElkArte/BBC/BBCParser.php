@@ -159,7 +159,7 @@ class BBCParser
 		$this->parse_loop();
 
 		// Close any remaining tags.
-		while ($tag = $this->closeOpenedTag())
+		while (($tag = $this->closeOpenedTag()))
 		{
 			$this->message .= $this->noSmileys($tag[Codes::ATTR_AFTER]);
 		}

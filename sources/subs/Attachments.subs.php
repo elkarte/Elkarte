@@ -244,7 +244,7 @@ function processAttachments($id_msg = null)
  *
  * @return array
  * @package Attachments
- *
+ * @throws \Exception
  */
 function attachmentUploadChecks($attachID)
 {
@@ -255,13 +255,10 @@ function attachmentUploadChecks($attachID)
 	// Did PHP create any errors during the upload processing of this file?
 	if (!empty($_FILES['attachment']['error'][$attachID]))
 	{
-		// The file exceeds the max_filesize directive in php.ini
-		if ($_FILES['attachment']['error'][$attachID] == 1)
-		{
-			$errors[] = array('file_too_big', array($modSettings['attachmentSizeLimit']));
-		}
-		// The uploaded file exceeds the MAX_FILE_SIZE directive in the HTML form.
-		elseif ($_FILES['attachment']['error'][$attachID] == 2)
+		// (1) The file exceeds the max_filesize directive in php.ini
+		// (2) The uploaded file exceeds the MAX_FILE_SIZE directive in the HTML form.
+		if ($_FILES['attachment']['error'][$attachID] == 1
+			|| $_FILES['attachment']['error'][$attachID] == 2)
 		{
 			$errors[] = array('file_too_big', array($modSettings['attachmentSizeLimit']));
 		}
@@ -276,8 +273,8 @@ function attachmentUploadChecks($attachID)
 			\ElkArte\Errors\Errors::instance()->log_error($_FILES['attachment']['name'][$attachID] . ': ' . $txt['php_upload_error_' . $_FILES['attachment']['error'][$attachID]]);
 		}
 
-		// If we did not set an user error (3,4,6,7,8) to show then give them a generic one as there is
-		// no need to provide back specifics of a server error, those are logged
+		// If we did not set an user error (3,4,6,7,8) to show then give them a generic one as
+		// there is no need to provide back specifics of a server error, those are logged
 		if (empty($errors))
 		{
 			$errors[] = 'attach_php_error';
@@ -304,7 +301,7 @@ function attachmentUploadChecks($attachID)
  */
 function createAttachment(&$attachmentOptions)
 {
-	global $modSettings, $context;
+	global $modSettings;
 
 	$db = database();
 	$attachmentsDir = new AttachmentsDirectory($modSettings, $db);
@@ -352,7 +349,7 @@ function createAttachment(&$attachmentOptions)
 		),
 		array('id_attach')
 	);
-	$attachmentOptions['id'] = $db->insert_id('{db_prefix}attachments', 'id_attach');
+	$attachmentOptions['id'] = $db->insert_id('{db_prefix}attachments');
 
 	// @todo Add an error here maybe?
 	if (empty($attachmentOptions['id']))
@@ -395,7 +392,7 @@ function createAttachment(&$attachmentOptions)
 
 			$thumb_mime = getValidMimeImageType($size[2]);
 			$thumb_filename = $attachmentOptions['name'] . '_thumb';
-			$thumb_size = $image->getfilesize();
+			$thumb_size = $image->getFilesize();
 			$thumb_file_hash = getAttachmentFilename($thumb_filename, 0, null, true);
 			$thumb_path = $attachmentOptions['destination'] . '_thumb';
 
@@ -425,7 +422,7 @@ function createAttachment(&$attachmentOptions)
 				),
 				array('id_attach')
 			);
-			$attachmentOptions['thumb'] = $db->insert_id('{db_prefix}attachments', 'id_attach');
+			$attachmentOptions['thumb'] = $db->insert_id('{db_prefix}attachments');
 
 			if (!empty($attachmentOptions['thumb']))
 			{
@@ -638,7 +635,7 @@ function getAttachmentThumbFromTopic($id_attach, $id_topic)
  *
  * @param int $id_attach
  *
- * @return array|boolean
+ * @return array|bool
  * @package Attachments
  * @throws \Exception
  */
@@ -715,7 +712,7 @@ function increaseDownloadCounter($id_attach)
  * @param int $memID member ID
  * @param int $max_width
  * @param int $max_height
- * @return boolean whether the download and resize was successful.
+ * @return bool whether the download and resize was successful.
  * @throws \ElkArte\Exceptions\Exception
  * @package Attachments
  */
@@ -753,7 +750,7 @@ function saveAvatar($temporary_path, $memID, $max_width, $max_height)
 		),
 		array('id_attach')
 	);
-	$attachID = $db->insert_id('{db_prefix}attachments', 'id_attach');
+	$attachID = $db->insert_id('{db_prefix}attachments');
 
 	// The destination filename will depend on whether custom dir for avatars has been set
 	$destName = getAvatarPath() . '/' . $destName;
@@ -1100,7 +1097,7 @@ function updateAttachmentThumbnail($filename, $id_attach, $id_msg, $old_id_thumb
 		// Calculate the size of the created thumbnail.
 		$size = $image->getSize($filename . '_thumb');
 		list ($attachment['thumb_width'], $attachment['thumb_height']) = $size;
-		$thumb_size = $image->getfilesize();
+		$thumb_size = $image->getFilesize();
 
 		// Figure out the mime type.
 		$thumb_mime = getValidMimeImageType($size[2]);
@@ -1119,7 +1116,7 @@ function updateAttachmentThumbnail($filename, $id_attach, $id_msg, $old_id_thumb
 			array('id_attach')
 		);
 
-		$attachment['id_thumb'] = $db->insert_id('{db_prefix}attachments', 'id_attach');
+		$attachment['id_thumb'] = $db->insert_id('{db_prefix}attachments');
 		if (!empty($attachment['id_thumb']))
 		{
 			$db->query('', '
@@ -1153,7 +1150,8 @@ function updateAttachmentThumbnail($filename, $id_attach, $id_msg, $old_id_thumb
  * @param int $id_msg
  * @param bool $include_count = true if true, it also returns the attachments count
  * @package Attachments
- * @throws \ElkArte\Exceptions\Exception
+ * @return mixed
+ * @throws \Exception
  */
 function attachmentsSizeForMessage($id_msg, $include_count = true)
 {
@@ -1336,7 +1334,7 @@ function loadAttachmentContext($id_msg)
  * @param string $filename
  * @param int $attachment_id
  * @param string|null $dir
- * @param boolean $new
+ * @param bool $new
  *
  * @return null|string|string[]
  * @package Attachments
@@ -1423,7 +1421,7 @@ function getAttachmentFilename($filename, $attachment_id, $dir = null, $new = fa
 	{
 		$tokenizer = new \ElkArte\TokenHash();
 
-		return $tokenizer->generate_hash(40);
+		return $tokenizer->generate_hash(32);
 	}
 
 	// In case of files from the old system, do a legacy call.
@@ -1442,7 +1440,7 @@ function getAttachmentFilename($filename, $attachment_id, $dir = null, $new = fa
  * Returns the board and the topic the attachment belongs to.
  *
  * @param int $id_attach
- * @return int[]|boolean on fail else an array of id_board, id_topic
+ * @return int[]|bool on fail else an array of id_board, id_topic
  * @package Attachments
  * @throws \Exception
  */
@@ -1479,9 +1477,9 @@ function getAttachmentPosition($id_attach)
  * Simple wrapper for getimagesize
  *
  * @param string $file
- * @param string|boolean $error return array or false on error
+ * @param string|bool $error return array or false on error
  *
- * @return array|boolean
+ * @return array|bool
  */
 function elk_getimagesize($file, $error = 'array')
 {
