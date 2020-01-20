@@ -162,7 +162,7 @@ class TestPoll extends \PHPUnit\Framework\TestCase
 		$this->assertTrue(empty($id_poll_new));
 
 		// or, really removed, not only dissociated
-		$pollinfo = pollinfo($id_poll);
+		$pollinfo = pollInfo($id_poll);
 		$this->assertTrue(empty($pollinfo));
 	}
 

@@ -12,7 +12,7 @@ class TestLike extends ElkArteCommonSetupTest
 	 */
 	public function setUp()
 	{
-		parent::setup();
+		parent::setUp();
 
 		new ElkArte\Themes\ThemeLoader();
 		theme()->getTemplates()->loadLanguageFile('Profile', 'english', true, true);

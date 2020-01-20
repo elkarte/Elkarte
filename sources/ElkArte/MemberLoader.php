@@ -331,7 +331,7 @@ class MemberLoader
 		{
 			foreach ($new_loaded_ids as $id)
 			{
-				$this->cache->put('member_data-' . $this->set . '-' . $id, $this->users_list->getByid($id)->toArray(), 240);
+				$this->cache->put('member_data-' . $this->set . '-' . $id, $this->users_list->getById($id)->toArray(), 240);
 			}
 		}
 	}

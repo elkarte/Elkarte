@@ -136,7 +136,7 @@ class Filebased extends AbstractCacheMethod
 
 			foreach ($files as $file)
 			{
-				if ($file->getFileName() !== 'index.php' && $file->getFileName() !== '.htaccess' && $file->getExtension() === $this->ext)
+				if ($file->getFilename() !== 'index.php' && $file->getFilename() !== '.htaccess' && $file->getExtension() === $this->ext)
 				{
 					@unlink($file->getPathname());
 				}
