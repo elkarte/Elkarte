@@ -27,28 +27,28 @@ class Mentioning extends AbstractModel
 	 *
 	 * @const int
 	 */
-	const MNEW = 0;
+	public const MNEW = 0;
 
 	/**
 	 * Value assumed by a mention that has been read
 	 *
 	 * @const int
 	 */
-	const READ = 1;
+	public const READ = 1;
 
 	/**
 	 * Value assumed by a mention that has been deleted
 	 *
 	 * @const int
 	 */
-	const DELETED = 2;
+	public const DELETED = 2;
 
 	/**
 	 * Value assumed by an unapproved mention
 	 *
 	 * @const int
 	 */
-	const UNAPPROVED = 3;
+	public const UNAPPROVED = 3;
 
 	/**
 	 * Will hold all available mention types

@@ -257,7 +257,7 @@ class Db extends Adapter
 			return;
 		}
 
-		$permissionsForm = new InlinePermissions;
+		$permissionsForm = new InlinePermissions();
 		$permissionsForm->setExcludedGroups(isset($context['permissions_excluded']) ? $context['permissions_excluded'] : array());
 		$permissionsForm->setPermissions($inlinePermissions);
 		$permissionsForm->prepare();
@@ -338,7 +338,7 @@ class Db extends Adapter
 		// If we have inline permissions we need to save them.
 		if (!empty($inlinePermissions) && allowedTo('manage_permissions'))
 		{
-			$permissionsForm = new InlinePermissions;
+			$permissionsForm = new InlinePermissions();
 			$permissionsForm->setPermissions($inlinePermissions);
 			$permissionsForm->save();
 		}

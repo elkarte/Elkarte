@@ -945,16 +945,13 @@ class Packages extends AbstractController
 		{
 			$context['filedata'] = '<img src="' . $scripturl . '?action=admin;area=packages;sa=examine;package=' . $this->_req->query->package . ';file=' . $this->_req->query->file . ';raw" alt="' . $this->_req->query->file . '" />';
 		}
-		else
+		elseif (is_file(BOARDDIR . '/packages/' . $this->_req->query->package))
 		{
-			if (is_file(BOARDDIR . '/packages/' . $this->_req->query->package))
-			{
-				$context['filedata'] = htmlspecialchars(read_tgz_file(BOARDDIR . '/packages/' . $this->_req->query->package, $this->_req->query->file, true));
-			}
-			elseif (is_dir(BOARDDIR . '/packages/' . $this->_req->query->package))
-			{
-				$context['filedata'] = htmlspecialchars(file_get_contents(BOARDDIR . '/packages/' . $this->_req->query->package . '/' . $this->_req->query->file));
-			}
+			$context['filedata'] = htmlspecialchars(read_tgz_file(BOARDDIR . '/packages/' . $this->_req->query->package, $this->_req->query->file, true));
+		}
+		elseif (is_dir(BOARDDIR . '/packages/' . $this->_req->query->package))
+		{
+			$context['filedata'] = htmlspecialchars(file_get_contents(BOARDDIR . '/packages/' . $this->_req->query->package . '/' . $this->_req->query->file));
 		}
 	}
 

@@ -374,17 +374,14 @@ class Sphinxql extends AbstractAPI
 				continue;
 			}
 			// Must be something they want to search for!
-			else
+			elseif ($or_part)
 			{
 				// If this was part of an OR branch, add it to the proper section
-				if ($or_part)
-				{
-					$keywords['include'][count($keywords['include']) - 1] = array_merge($keywords['include'][count($keywords['include']) - 1], $addWords);
-				}
-				else
-				{
-					$keywords['include'] = array_merge($keywords['include'], $addWords);
-				}
+				$keywords['include'][count($keywords['include']) - 1] = array_merge($keywords['include'][count($keywords['include']) - 1], $addWords);
+			}
+			else
+			{
+				$keywords['include'] = array_merge($keywords['include'], $addWords);
 			}
 
 			// Start fresh on this...

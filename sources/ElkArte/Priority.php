@@ -22,7 +22,7 @@ class Priority
 	/**
 	 * Default priority
 	 */
-	const STDPRIORITY = 0;
+	public const STDPRIORITY = 0;
 	/**
 	 * An array containing all the entities added
 	 *

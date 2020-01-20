@@ -676,7 +676,7 @@ function detectBrowser()
 	global $context;
 
 	// Load the current user's browser of choice
-	$detector = new ElkArte\Http\BrowserDetector;
+	$detector = new ElkArte\Http\BrowserDetector();
 	$context['browser'] = $detector->detectBrowser();
 	$context['browser_body_id'] = $detector->browserBodyId();
 }

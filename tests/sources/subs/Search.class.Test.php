@@ -245,11 +245,10 @@ class TestSearchclass extends \PHPUnit\Framework\TestCase
 			'search_index' => !empty($modSettings['search_index']) ? $modSettings['search_index'] : '',
 			'banned_words' => empty($modSettings['search_banned_words']) ? array() : explode(',', $modSettings['search_banned_words']),
 		));
-		$topics = $search->searchQuery(
+
+		return $search->searchQuery(
 			new \ElkArte\Search\SearchApiWrapper($search_config, $search->getSearchParams())
 		);
-
-		return $topics;
 	}
 
 	protected function _getSalt($member)

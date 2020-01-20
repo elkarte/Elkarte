@@ -30,8 +30,8 @@ use ElkArte\ValuesContainer;
  */
 class SearchRenderer extends Renderer
 {
-	const BEFORE_PREPARE_HOOK = 'integrate_before_prepare_search_context';
-	const CONTEXT_HOOK = 'integrate_prepare_search_context';
+	public const BEFORE_PREPARE_HOOK = 'integrate_before_prepare_search_context';
+	public const CONTEXT_HOOK = 'integrate_prepare_search_context';
 
 	/**
 	 *

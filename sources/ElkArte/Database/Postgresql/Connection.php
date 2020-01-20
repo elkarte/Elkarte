@@ -20,7 +20,7 @@ use ElkArte\Database\ConnectionInterface;
  */
 class Connection implements ConnectionInterface
 {
-	static $failed_once = false;
+	private static $failed_once = false;
 
 	/**
 	 * {@inheritDoc}

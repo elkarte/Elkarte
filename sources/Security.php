@@ -1374,16 +1374,13 @@ function boardsAllowedTo($permissions, $check_access = true, $simple = true)
 				$boards[] = $row['id_board'];
 			}
 		}
+		elseif (empty($row['add_deny']))
+		{
+			$deny_boards[$row['permission']][] = $row['id_board'];
+		}
 		else
 		{
-			if (empty($row['add_deny']))
-			{
-				$deny_boards[$row['permission']][] = $row['id_board'];
-			}
-			else
-			{
-				$boards[$row['permission']][] = $row['id_board'];
-			}
+			$boards[$row['permission']][] = $row['id_board'];
 		}
 	}
 	$db->free_result($request);

@@ -185,7 +185,7 @@ class QueryAnalysis
 		{
 			$explain = array(
 				'is_error' => true,
-				'error_text' => $db->last_error($db->connection()),
+				'error_text' => $db->last_error(),
 			);
 		}
 		else

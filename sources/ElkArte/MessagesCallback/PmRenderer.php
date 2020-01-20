@@ -28,8 +28,8 @@ use ElkArte\ValuesContainer;
  */
 class PmRenderer extends Renderer
 {
-	const BEFORE_PREPARE_HOOK = 'integrate_before_prepare_pm_context';
-	const CONTEXT_HOOK = 'integrate_prepare_pm_context';
+	public const BEFORE_PREPARE_HOOK = 'integrate_before_prepare_pm_context';
+	public const CONTEXT_HOOK = 'integrate_prepare_pm_context';
 
 	/**
 	 * Array of selected personal messages

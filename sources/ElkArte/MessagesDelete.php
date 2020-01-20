@@ -1167,17 +1167,14 @@ class MessagesDelete
 					throw new Exceptions\Exception('cannot_remove_own', 'permission');
 				}
 			}
-			else
+			elseif ($row['id_member'] != $this->user->id)
 			{
 				// Check permissions to delete a whole topic.
-				if ($row['id_member'] != $this->user->id)
-				{
-					isAllowedTo('remove_any');
-				}
-				elseif (!allowedTo('remove_any'))
-				{
-					isAllowedTo('remove_own');
-				}
+				isAllowedTo('remove_any');
+			}
+			elseif (!allowedTo('remove_any'))
+			{
+				isAllowedTo('remove_own');
 			}
 
 			// ...if there is only one post.

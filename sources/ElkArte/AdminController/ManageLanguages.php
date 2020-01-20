@@ -452,13 +452,10 @@ class ManageLanguages extends AbstractController
 				}
 			}
 			// No overwrite?
-			else
+			elseif (is_writable(BOARDDIR . '/' . $dirname))
 			{
 				// Can we at least stick it in the directory...
-				if (is_writable(BOARDDIR . '/' . $dirname))
-				{
-					$context_data['writable'] = true;
-				}
+				$context_data['writable'] = true;
 			}
 
 			// I love PHP files, that's why I'm a developer and not an artistic type spending my time drinking absinth and living a life of sin...

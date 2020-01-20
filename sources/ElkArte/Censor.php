@@ -22,10 +22,10 @@ namespace ElkArte;
  */
 class Censor
 {
-	const WHOLE_WORD = 'censorWholeWord';
-	const IGNORE_CASE = 'censorIgnoreCase';
-	const SHOW_NO_CENSORED = 'show_no_censored';
-	const ALLOW_NO_CENSORED = 'allow_no_censored';
+	public const WHOLE_WORD = 'censorWholeWord';
+	public const IGNORE_CASE = 'censorIgnoreCase';
+	public const SHOW_NO_CENSORED = 'show_no_censored';
+	public const ALLOW_NO_CENSORED = 'allow_no_censored';
 
 	protected $vulgar = array();
 	protected $proper = array();

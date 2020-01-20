@@ -23,17 +23,17 @@ class MemberLoader
 	/**
 	 * Just the bare minimum set of fields
 	 */
-	const SET_MINIMAL = 'minimal';
+	public const SET_MINIMAL = 'minimal';
 
 	/**
 	 * What is needed in most of the cases
 	 */
-	const SET_NORMAL = 'normal';
+	public const SET_NORMAL = 'normal';
 
 	/**
 	 * What is required to see a profile page
 	 */
-	const SET_PROFILE = 'profile';
+	public const SET_PROFILE = 'profile';
 
 	/**
 	 * @var \ElkArte\Database\QueryInterface

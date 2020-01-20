@@ -55,7 +55,7 @@ if (!empty($modSettings['enableCompressedOutput']) && !headers_sent())
 }
 
 // Register error & exception handlers.
-new ElkArte\Errors\ErrorHandler;
+new ElkArte\Errors\ErrorHandler();
 
 // Start the session. (assuming it hasn't already been.)
 loadSession();

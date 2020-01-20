@@ -1122,12 +1122,9 @@ class EmailParse
 			preg_match($regex_key, $key, $match);
 		}
 		// Otherwise we play find the key
-		else
+		elseif (!$this->_load_key_from_headers($regex_key))
 		{
-			if (!$this->_load_key_from_headers($regex_key))
-			{
-				$this->_load_key_from_body();
-			}
+			$this->_load_key_from_body();
 		}
 
 		return !empty($this->message_key_id) ? $this->message_key_id : false;

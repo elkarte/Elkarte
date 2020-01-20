@@ -26,10 +26,10 @@ namespace BBC;
 class Codes
 {
 	/** the tag's name - must be lowercase */
-	const ATTR_TAG = 1;
+	public const ATTR_TAG = 1;
 
 	/** One of self::TYPE_* */
-	const ATTR_TYPE = 2;
+	public const ATTR_TYPE = 2;
 
 	/**
 	 * An optional array of parameters, for the form
@@ -37,14 +37,14 @@ class Codes
 	 * where the keys are the parameter names, and the values are an
 	 * array which *may* contain any of self::PARAM_ATTR_*
 	 */
-	const ATTR_PARAM = 3;
+	public const ATTR_PARAM = 3;
 
 	/**
 	 * A regular expression to test immediately after the tag's
 	 * '=', ' ' or ']'.  Typically, should have a \] at the end.
 	 * Optional.
 	 */
-	const ATTR_TEST = 4;
+	public const ATTR_TEST = 4;
 
 	/**
 	 * Only available for unparsed_content, closed, unparsed_commas_content, and unparsed_equals_content.
@@ -52,174 +52,178 @@ class Codes
 	 * Parameters are replaced in the form {param}.
 	 * For unparsed_commas_content, $2, $3, ..., $n are replaced.
 	 */
-	const ATTR_CONTENT = 5;
+	public const ATTR_CONTENT = 5;
 
 	/**
 	 * Only when content is not used, to go before any content.
 	 * For unparsed_equals, $1 is replaced with the value.
 	 * For unparsed_commas, $1, $2, ..., $n are replaced.
 	 */
-	const ATTR_BEFORE = 6;
+	public const ATTR_BEFORE = 6;
 
 	/**
 	 * Similar to before in every way, except that it is used when the tag is closed.
 	 */
-	const ATTR_AFTER = 7;
+	public const ATTR_AFTER = 7;
 
 	/**
 	 * Used in place of content when the tag is disabled.
 	 * For closed, default is '', otherwise it is '$1' if block_level is false, '<div>$1</div>' elsewise.
 	 */
-	const ATTR_DISABLED_CONTENT = 8;
+	public const ATTR_DISABLED_CONTENT = 8;
 
 	/**
 	 * Used in place of before when disabled.
 	 * Defaults to '<div>' if block_level, '' if not.
 	 */
-	const ATTR_DISABLED_BEFORE = 9;
+	public const ATTR_DISABLED_BEFORE = 9;
 
 	/**
 	 * Used in place of after when disabled.
 	 * Defaults to '</div>' if block_level, '' if not.
 	 */
-	const ATTR_DISABLED_AFTER = 10;
+	public const ATTR_DISABLED_AFTER = 10;
 
 	/**
 	 * Set to true the tag is a "block level" tag, similar to HTML.
 	 * Block level tags cannot be nested inside tags that are not block level, and will not be implicitly closed as easily.
 	 * One break following a block level tag may also be removed.
 	 */
-	const ATTR_BLOCK_LEVEL = 11;
+	public const ATTR_BLOCK_LEVEL = 11;
 
 	/**
 	 * Trim the whitespace after the opening tag or the closing tag or both.
 	 * One of self::TRIM_*
 	 * Optional
 	 */
-	const ATTR_TRIM = 12;
+	public const ATTR_TRIM = 12;
 
 	/**
 	 * Except when type is missing or 'closed', a callback to validate the data as $data.
 	 * Depending on the tag's type, $data may be a string or an array of strings (corresponding to the replacement.)
 	 */
-	const ATTR_VALIDATE = 13;
+	public const ATTR_VALIDATE = 13;
 
 	/**
 	 * When type is unparsed_equals or parsed_equals only, may be not set,
 	 * 'optional', or 'required' corresponding to if the content may be quoted.
 	 * This allows the parser to read [tag="abc]def[esdf]"] properly.
 	 */
-	const ATTR_QUOTED = 14;
+	public const ATTR_QUOTED = 14;
 
 	/**
 	 * An array of tag names, or not set.
 	 * If set, the enclosing tag *must* be one of the listed tags, or parsing won't    occur.
 	 */
-	const ATTR_REQUIRE_PARENTS = 15;
+	public const ATTR_REQUIRE_PARENTS = 15;
 
 	/**
 	 * similar to require_parents, if set children won't be parsed if they are not in the list.
 	 */
-	const ATTR_REQUIRE_CHILDREN = 16;
+	public const ATTR_REQUIRE_CHILDREN = 16;
 
 	/**
 	 * Similar to, but very different from, require_parents.
 	 * If it is set the listed tags will not be parsed inside the tag.
 	 */
-	const ATTR_DISALLOW_PARENTS = 17;
+	public const ATTR_DISALLOW_PARENTS = 17;
 
 	/**
 	 * Similar to, but very different from, require_children.
 	 * If it is set the listed tags will not be parsed inside the tag.
 	 */
-	const ATTR_DISALLOW_CHILDREN = 18;
+	public const ATTR_DISALLOW_CHILDREN = 18;
 
 	/**
 	 * When ATTR_DISALLOW_PARENTS is used, this gets put before the tag.
 	 */
-	const ATTR_DISALLOW_BEFORE = 19;
+	public const ATTR_DISALLOW_BEFORE = 19;
 
 	/**
 	 * * When ATTR_DISALLOW_PARENTS is used, this gets put after the tag.
 	 */
-	const ATTR_DISALLOW_AFTER = 20;
+	public const ATTR_DISALLOW_AFTER = 20;
 
 	/**
 	 * an array restricting what BBC can be in the parsed_equals parameter, if desired.
 	 */
-	const ATTR_PARSED_TAGS_ALLOWED = 21;
+	public const ATTR_PARSED_TAGS_ALLOWED = 21;
 
 	/**
 	 * (bool) Turn uris like http://www.google.com in to links
 	 */
-	const ATTR_AUTOLINK = 22;
+	public const ATTR_AUTOLINK = 22;
 
 	/**
 	 * The length of the tag
 	 */
-	const ATTR_LENGTH = 23;
+	public const ATTR_LENGTH = 23;
 
 	/**
 	 * Whether the tag is disabled
 	 */
-	const ATTR_DISABLED = 24;
+	public const ATTR_DISABLED = 24;
 
 	/**
 	 * If the message contains a code with this, the message should not be cached
 	 */
-	const ATTR_NO_CACHE = 25;
+	public const ATTR_NO_CACHE = 25;
 
 	/** [tag]parsed content[/tag] */
-	const TYPE_PARSED_CONTENT = 0;
+	public const TYPE_PARSED_CONTENT = 0;
 
 	/** [tag=xyz]parsed content[/tag] */
-	const TYPE_UNPARSED_EQUALS = 1;
+	public const TYPE_UNPARSED_EQUALS = 1;
 
 	/** [tag=parsed data]parsed content[/tag] */
-	const TYPE_PARSED_EQUALS = 2;
+	public const TYPE_PARSED_EQUALS = 2;
 
 	/** [tag]unparsed content[/tag] */
-	const TYPE_UNPARSED_CONTENT = 3;
+	public const TYPE_UNPARSED_CONTENT = 3;
 
 	/** [tag], [tag/], [tag /] */
-	const TYPE_CLOSED = 4;
+	public const TYPE_CLOSED = 4;
 
 	/** [tag=1,2,3]parsed content[/tag] */
-	const TYPE_UNPARSED_COMMAS = 5;
+	public const TYPE_UNPARSED_COMMAS = 5;
 
 	/** [tag=1,2,3]unparsed content[/tag] */
-	const TYPE_UNPARSED_COMMAS_CONTENT = 6;
+	public const TYPE_UNPARSED_COMMAS_CONTENT = 6;
 
 	/** [tag=...]unparsed content[/tag] */
-	const TYPE_UNPARSED_EQUALS_CONTENT = 7;
+	public const TYPE_UNPARSED_EQUALS_CONTENT = 7;
 
 	/** [*] */
-	const TYPE_ITEMCODE = 8;
+	public const TYPE_ITEMCODE = 8;
 
 	/** a regular expression to validate and match the value. */
-	const PARAM_ATTR_MATCH = 0;
+	public const PARAM_ATTR_MATCH = 0;
+
 	/** true if the value should be quoted. */
-	const PARAM_ATTR_QUOTED = 1;
+	public const PARAM_ATTR_QUOTED = 1;
+
 	/** callback to evaluate on the data, which is $data. */
-	const PARAM_ATTR_VALIDATE = 2;
+	public const PARAM_ATTR_VALIDATE = 2;
+
 	/** a string in which to replace $1 with the data. Either it or validate may be used, not both. */
-	const PARAM_ATTR_VALUE = 3;
+	public const PARAM_ATTR_VALUE = 3;
+
 	/** true if the parameter is optional. */
-	const PARAM_ATTR_OPTIONAL = 4;
+	public const PARAM_ATTR_OPTIONAL = 4;
 
 	/**  */
-	const TRIM_NONE = 0;
+	public const TRIM_NONE = 0;
 	/**  */
-	const TRIM_INSIDE = 1;
+	public const TRIM_INSIDE = 1;
 	/**  */
-	const TRIM_OUTSIDE = 2;
+	public const TRIM_OUTSIDE = 2;
 	/**  */
-	const TRIM_BOTH = 3;
+	public const TRIM_BOTH = 3;
 
 	// These are mainly for *ATTR_QUOTED since there are 3 options
-	const OPTIONAL = -1;
-	const NONE = 0;
-	const REQUIRED = 1;
+	public const OPTIONAL = -1;
+	public const NONE = 0;
+	public const REQUIRED = 1;
 
 	/**
 	 * An array of self::ATTR_*

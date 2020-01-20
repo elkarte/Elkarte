@@ -28,7 +28,7 @@ use Throwable;
 final class ErrorHandler extends Errors
 {
 	/** @var boolean Set this to TRUE to let PHP handle errors/warnings/notices. */
-	const USE_DEFAULT = false;
+	public const USE_DEFAULT = false;
 	/** @var int Mask for errors that are fatal and will halt */
 	protected $fatalErrors = E_ERROR | E_USER_ERROR | E_COMPILE_ERROR | E_CORE_ERROR | E_PARSE;
 	/** @var string The error string from $e->getMessage() */

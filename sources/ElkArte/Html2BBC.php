@@ -472,9 +472,7 @@ class Html2BBC
 		$title = $node->getAttribute('title');
 		$value = $this->_get_value($node);
 
-		$bbc = !empty($title) ? '[abbr=' . $title . ']' . $value . '[/abbr]' : '';
-
-		return $bbc;
+		return !empty($title) ? '[abbr=' . $title . ']' . $value . '[/abbr]' : '';
 	}
 
 	/**

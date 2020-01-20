@@ -196,25 +196,18 @@ class Html2Md
 		// The body of the HTML is where its at.
 		if ($this->_parser)
 		{
-			$body = $this->doc->getElementsByTagName('body')->item(0);
+			return $this->doc->getElementsByTagName('body')->item(0);
 		}
-		else
+		elseif ($this->doc->find('body', 0) !== null)
 		{
-			if ($this->doc->find('body', 0) !== null)
-			{
-				$body = $this->doc->find('body', 0);
-			}
-			elseif ($this->doc->find('html', 0) !== null)
-			{
-				$body = $this->doc->find('html', 0);
-			}
-			else
-			{
-				$body = $this->doc->root;
-			}
+			return $this->doc->find('body', 0);
+		}
+		elseif ($this->doc->find('html', 0) !== null)
+		{
+			return $this->doc->find('html', 0);
 		}
 
-		return $body;
+		return $this->doc->root;
 	}
 
 	/**
@@ -549,9 +542,7 @@ class Html2Md
 		$title = $node->getAttribute('title');
 		$value = $this->_get_value($node);
 
-		$markdown = !empty($title) ? '*[' . $value . ']: ' . $title . $this->line_break : '';
-
-		return $markdown;
+		return !empty($title) ? '*[' . $value . ']: ' . $title . $this->line_break : '';
 	}
 
 	/**

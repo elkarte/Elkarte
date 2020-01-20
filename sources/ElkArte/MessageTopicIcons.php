@@ -18,8 +18,8 @@ namespace ElkArte;
  */
 class MessageTopicIcons extends ValuesContainer
 {
-	const IMAGE_URL = 'images_url';
-	const DEFAULT_URL = 'default_images_url';
+	public const IMAGE_URL = 'images_url';
+	public const DEFAULT_URL = 'default_images_url';
 
 	/**
 	 * Whether to check if the icon exists in the expected location

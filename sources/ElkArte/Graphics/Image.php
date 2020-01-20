@@ -29,7 +29,7 @@ use ElkArte\Exceptions\Exception;
 class Image
 {
 	/** @var array The image formats we will work with */
-	const DEFAULT_FORMATS = [
+	public const DEFAULT_FORMATS = [
 		IMAGETYPE_GIF => 'gif',
 		IMAGETYPE_JPEG => 'jpeg',
 		IMAGETYPE_PNG => 'png',

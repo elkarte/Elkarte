@@ -1531,33 +1531,27 @@ class ProfileInfo extends AbstractController
 					{
 						$context['thumbs'][$i]['img'] = '<img id="thumb_' . $attachment['id'] . '" src="' . $scripturl . '?action=dlattach;topic=' . $attachment['topic'] . '.0;attach=' . $attachment['id_thumb'] . ';image" title="" alt="" />';
 					}
-					else
+					elseif (!empty($modSettings['attachmentThumbWidth']) && !empty($modSettings['attachmentThumbHeight']))
 					{
 						// No thumbnail available ... use html instead
-						if (!empty($modSettings['attachmentThumbWidth']) && !empty($modSettings['attachmentThumbHeight']))
+						if ($attachment['width'] > $modSettings['attachmentThumbWidth'] || $attachment['height'] > $modSettings['attachmentThumbHeight'])
 						{
-							if ($attachment['width'] > $modSettings['attachmentThumbWidth'] || $attachment['height'] > $modSettings['attachmentThumbHeight'])
-							{
-								$context['thumbs'][$i]['img'] = '<img id="thumb_' . $attachment['id'] . '" src="' . $scripturl . '?action=dlattach;topic=' . $attachment['topic'] . '.0;attach=' . $attachment['id'] . '" title="" alt="" width="' . $modSettings['attachmentThumbWidth'] . '" height="' . $modSettings['attachmentThumbHeight'] . '" />';
-							}
-							else
-							{
-								$context['thumbs'][$i]['img'] = '<img id="thumb_' . $attachment['id'] . '" src="' . $scripturl . '?action=dlattach;topic=' . $attachment['topic'] . '.0;attach=' . $attachment['id'] . '" title="" alt="" width="' . $attachment['width'] . '" height="' . $attachment['height'] . '" />';
-							}
+							$context['thumbs'][$i]['img'] = '<img id="thumb_' . $attachment['id'] . '" src="' . $scripturl . '?action=dlattach;topic=' . $attachment['topic'] . '.0;attach=' . $attachment['id'] . '" title="" alt="" width="' . $modSettings['attachmentThumbWidth'] . '" height="' . $modSettings['attachmentThumbHeight'] . '" />';
+						}
+						else
+						{
+							$context['thumbs'][$i]['img'] = '<img id="thumb_' . $attachment['id'] . '" src="' . $scripturl . '?action=dlattach;topic=' . $attachment['topic'] . '.0;attach=' . $attachment['id'] . '" title="" alt="" width="' . $attachment['width'] . '" height="' . $attachment['height'] . '" />';
 						}
 					}
 				}
 				// Not an image so lets set a mime thumbnail based off the filetype
+				elseif ((!empty($modSettings['attachmentThumbWidth']) && !empty($modSettings['attachmentThumbHeight'])) && (128 > $modSettings['attachmentThumbWidth'] || 128 > $modSettings['attachmentThumbHeight']))
+				{
+					$context['thumbs'][$i]['img'] = '<img src="' . $mime_images_url . (!file_exists($mime_path . $attachment['fileext'] . '.png') ? 'default' : $attachment['fileext']) . '.png" title="" alt="" width="' . $modSettings['attachmentThumbWidth'] . '" height="' . $modSettings['attachmentThumbHeight'] . '" />';
+				}
 				else
 				{
-					if ((!empty($modSettings['attachmentThumbWidth']) && !empty($modSettings['attachmentThumbHeight'])) && (128 > $modSettings['attachmentThumbWidth'] || 128 > $modSettings['attachmentThumbHeight']))
-					{
-						$context['thumbs'][$i]['img'] = '<img src="' . $mime_images_url . (!file_exists($mime_path . $attachment['fileext'] . '.png') ? 'default' : $attachment['fileext']) . '.png" title="" alt="" width="' . $modSettings['attachmentThumbWidth'] . '" height="' . $modSettings['attachmentThumbHeight'] . '" />';
-					}
-					else
-					{
-						$context['thumbs'][$i]['img'] = '<img src="' . $mime_images_url . (!file_exists($mime_path . $attachment['fileext'] . '.png') ? 'default' : $attachment['fileext']) . '.png" title="" alt="" />';
-					}
+					$context['thumbs'][$i]['img'] = '<img src="' . $mime_images_url . (!file_exists($mime_path . $attachment['fileext'] . '.png') ? 'default' : $attachment['fileext']) . '.png" title="" alt="" />';
 				}
 			}
 		}

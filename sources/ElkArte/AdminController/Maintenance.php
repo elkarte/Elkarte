@@ -182,17 +182,14 @@ class Maintenance extends AbstractController
 			{
 				$subActions[$subAction]['activities'][$activity]();
 			}
+			elseif (is_array($subActions[$subAction]['activities'][$activity]))
+			{
+				$activity_obj = new $subActions[$subAction]['activities'][$activity]['class']();
+				$activity_obj->{$subActions[$subAction]['activities'][$activity]['method']}();
+			}
 			else
 			{
-				if (is_array($subActions[$subAction]['activities'][$activity]))
-				{
-					$activity_obj = new $subActions[$subAction]['activities'][$activity]['class']();
-					$activity_obj->{$subActions[$subAction]['activities'][$activity]['method']}();
-				}
-				else
-				{
-					$subActions[$subAction]['activities'][$activity]();
-				}
+				$subActions[$subAction]['activities'][$activity]();
 			}
 		}
 

@@ -406,7 +406,7 @@ class Mentions extends AbstractController
 		$this->_buildUrl();
 
 		$id_mention = $this->_req->getQuery('item', 'intval', 0);
-		$mentioning = new Mentioning(database(), $this->user, new DataValidator, $modSettings['enabled_mentions']);
+		$mentioning = new Mentioning(database(), $this->user, new DataValidator(), $modSettings['enabled_mentions']);
 		$mentioning->updateStatus($id_mention, 'read');
 	}
 
@@ -419,7 +419,7 @@ class Mentions extends AbstractController
 
 		checkSession('request');
 
-		$mentioning = new Mentioning(database(), $this->user, new DataValidator, $modSettings['enabled_mentions']);
+		$mentioning = new Mentioning(database(), $this->user, new DataValidator(), $modSettings['enabled_mentions']);
 
 		$id_mention = $this->_req->getQuery('item', 'intval', 0);
 		$mark = $this->_req->getQuery('mark');

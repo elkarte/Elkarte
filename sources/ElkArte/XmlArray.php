@@ -244,7 +244,7 @@ class XmlArray
 				}
 
 				$offset = 0;
-				while (1 === 1)
+				while (true)
 				{
 					// Where is the next start tag?
 					$next_tag_start = strpos($data, '<' . $match[1], $offset);

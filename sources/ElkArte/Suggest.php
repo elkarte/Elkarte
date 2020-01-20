@@ -59,8 +59,6 @@ class Suggest
 		require_once(SUBSDIR . '/Members.subs.php');
 
 		// Find the member.
-		$xml_data = getMember($this->_search, !empty($this->_params['buddies']) ? User::$info->buddies : array());
-
-		return $xml_data;
+		return getMember($this->_search, !empty($this->_params['buddies']) ? User::$info->buddies : array());
 	}
 }

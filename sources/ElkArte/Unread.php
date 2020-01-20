@@ -21,8 +21,8 @@ namespace ElkArte;
  */
 class Unread
 {
-	const UNREAD = 0;
-	const UNREADREPLIES = 1;
+	public const UNREAD = 0;
+	public const UNREADREPLIES = 1;
 
 	/** @var bool */
 	private $_have_temp_table = false;
@@ -413,18 +413,15 @@ class Unread
 		{
 			$body_query = 'ml.body AS last_body, ms.body AS first_body,';
 		}
+		elseif (empty($this->_preview_bodies))
+		// If empty, no preview at all
+		{
+			$body_query = '';
+		}
+		// Default: a SUBSTRING
 		else
 		{
-			// If empty, no preview at all
-			if (empty($this->_preview_bodies))
-			{
-				$body_query = '';
-			}
-			// Default: a SUBSTRING
-			else
-			{
-				$body_query = 'SUBSTRING(ml.body, 1, ' . ($this->_preview_bodies + 256) . ') AS last_body, SUBSTRING(ms.body, 1, ' . ($this->_preview_bodies + 256) . ') AS first_body,';
-			}
+			$body_query = 'SUBSTRING(ml.body, 1, ' . ($this->_preview_bodies + 256) . ') AS last_body, SUBSTRING(ms.body, 1, ' . ($this->_preview_bodies + 256) . ') AS first_body,';
 		}
 
 		if (!empty($include_avatars))
@@ -566,18 +563,15 @@ class Unread
 		{
 			$body_query = 'ml.body AS last_body, ms.body AS first_body,';
 		}
-		else
+		elseif (empty($this->_preview_bodies))
 		{
 			// If empty, no preview at all
-			if (empty($this->_preview_bodies))
-			{
-				$body_query = '';
-			}
-			// Default: a SUBSTRING
-			else
-			{
-				$body_query = 'SUBSTRING(ml.body, 1, ' . ($this->_preview_bodies + 256) . ') AS last_body, SUBSTRING(ms.body, 1, ' . ($this->_preview_bodies + 256) . ') AS first_body,';
-			}
+			$body_query = '';
+		}
+		// Default: a SUBSTRING
+		else
+		{
+			$body_query = 'SUBSTRING(ml.body, 1, ' . ($this->_preview_bodies + 256) . ') AS last_body, SUBSTRING(ms.body, 1, ' . ($this->_preview_bodies + 256) . ') AS first_body,';
 		}
 
 		if (!empty($include_avatars))

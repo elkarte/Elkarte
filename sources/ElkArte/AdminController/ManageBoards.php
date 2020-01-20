@@ -649,27 +649,25 @@ class ManageBoards extends AbstractController
 		elseif (isset($this->_req->post->delete))
 		{
 			$boardTree = new BoardsTree(database());
+
 			// First, check if our board still has posts or topics.
 			if ($posts)
 			{
 				throw new Exception('mboards_delete_board_has_posts');
 			}
+			elseif ($this->_req->comparePost('delete_action', 1, 'intval'))
+			{
+				// Check if we are moving all the current sub-boards first - before we start deleting!
+				if (empty($this->_req->post->board_to))
+				{
+					throw new Exception('mboards_delete_board_error');
+				}
+
+				$boardTree->deleteBoards(array($board_id), $this->_req->getPost('board_to', 'intval'));
+			}
 			else
 			{
-				if ($this->_req->comparePost('delete_action', 1, 'intval'))
-				{
-					// Check if we are moving all the current sub-boards first - before we start deleting!
-					if (empty($this->_req->post->board_to))
-					{
-						throw new Exception('mboards_delete_board_error');
-					}
-
-					$boardTree->deleteBoards(array($board_id), $this->_req->getPost('board_to', 'intval'));
-				}
-				else
-				{
-					$boardTree->deleteBoards(array($board_id), 0);
-				}
+				$boardTree->deleteBoards(array($board_id), 0);
 			}
 		}
 

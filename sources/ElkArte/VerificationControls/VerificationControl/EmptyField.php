@@ -202,12 +202,10 @@ class EmptyField implements ControlInterface
 	public function settings()
 	{
 		// Empty field verification.
-		$config_vars = array(
+		return array(
 			array('title', 'configure_emptyfield'),
 			array('desc', 'configure_emptyfield_desc'),
 			array('check', 'enable_emptyfield'),
 		);
-
-		return $config_vars;
 	}
 }

@@ -450,7 +450,7 @@ class ManageSecurity extends AbstractController
 		$context['invalid_badbehavior_httpbl_key'] = (!empty($modSettings['badbehavior_httpbl_key']) && (strlen($modSettings['badbehavior_httpbl_key']) !== 12 || !ctype_lower($modSettings['badbehavior_httpbl_key'])));
 
 		// Build up our options array
-		$config_vars = array(
+		return array(
 			array('title', 'badbehavior_title'),
 			array('check', 'badbehavior_enabled', 'postinput' => $txt['badbehavior_enabled_desc']),
 			array('check', 'badbehavior_logging', 'postinput' => $txt['badbehavior_default_on']),
@@ -472,8 +472,6 @@ class ManageSecurity extends AbstractController
 			array('callback', 'badbehavior_add_url'),
 			array('callback', 'badbehavior_add_useragent'),
 		);
-
-		return $config_vars;
 	}
 
 	/**

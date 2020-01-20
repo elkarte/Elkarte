@@ -457,7 +457,7 @@ class BoardsTree
 	 * @param int $newLevel
 	 * @param int $newParent
 	 */
-	function fixChildren($parent, $newLevel, $newParent)
+	private function fixChildren($parent, $newLevel, $newParent)
 	{
 		// Grab all children of $parent...
 		$children = $this->db->fetchQuery('

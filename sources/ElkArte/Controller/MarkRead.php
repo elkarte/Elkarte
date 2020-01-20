@@ -379,16 +379,11 @@ class MarkRead extends AbstractController
 				return 'board=' . $board . '.0';
 			}
 		}
-		else
+		elseif (empty($board_info['parent']))
 		{
-			if (empty($board_info['parent']))
-			{
-				return '';
-			}
-			else
-			{
-				return 'board=' . $board_info['parent'] . '.0';
-			}
+			return '';
 		}
+
+		return 'board=' . $board_info['parent'] . '.0';
 	}
 }

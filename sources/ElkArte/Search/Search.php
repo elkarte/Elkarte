@@ -25,7 +25,7 @@ class Search
 	 * This is the forum version but is repeated due to some people
 	 * rewriting FORUM_VERSION.
 	 */
-	const FORUM_VERSION = 'ElkArte 2.0 dev';
+	public const FORUM_VERSION = 'ElkArte 2.0 dev';
 	/**
 	 *
 	 * @var mixed[]

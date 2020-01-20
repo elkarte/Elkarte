@@ -1120,23 +1120,20 @@ function template_show_settings()
 					</dd>';
 			}
 		}
-		else
+		elseif ($config_var == '')
 		{
 			// Just show a separator.
-			if ($config_var == '')
-			{
-				echo '
-				</dl>
-				<hr class="clear" />
-				<dl class="settings">';
-			}
-			else
-			{
-				echo '
-					<dd>
-						<strong>' . $config_var . '</strong>
-					</dd>';
-			}
+			echo '
+			</dl>
+			<hr class="clear" />
+			<dl class="settings">';
+		}
+		else
+		{
+			echo '
+				<dd>
+					<strong>' . $config_var . '</strong>
+				</dd>';
 		}
 	}
 
@@ -1394,27 +1391,24 @@ function template_repair_boards()
 			</p>';
 		}
 	}
+	elseif (!empty($context['redirect_to_recount']))
+	{
+		echo '
+		<p>
+			', $txt['errors_do_recount'], '
+		</p>
+		<form action="', $scripturl, '?action=admin;area=maintain;sa=routine;activity=recount" id="recount_form" method="post">
+			<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
+			<input type="submit" name="cont" id="cont" value="', $txt['errors_recount_now'], '" />
+		</form>';
+	}
 	else
 	{
-		if (!empty($context['redirect_to_recount']))
-		{
-			echo '
-			<p>
-				', $txt['errors_do_recount'], '
-			</p>
-			<form action="', $scripturl, '?action=admin;area=maintain;sa=routine;activity=recount" id="recount_form" method="post">
-				<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
-				<input type="submit" name="cont" id="cont" value="', $txt['errors_recount_now'], '" />
-			</form>';
-		}
-		else
-		{
-			echo '
+		echo '
 		<p class="successbox">', $txt['errors_fixed'], '</p>
 		<p>
 			<a class="linkbutton" href="', $scripturl, '?action=admin;area=maintain;sa=routine">', $txt['maintain_return'], '</a>
 		</p>';
-		}
 	}
 
 	echo '

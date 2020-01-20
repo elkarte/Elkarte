@@ -56,7 +56,7 @@ class InlinePermissions extends Adapter
 
 		// Make sure they can't do certain things,
 		// unless they have the right permissions.
-		$this->permissionsObject = new Permissions;
+		$this->permissionsObject = new Permissions();
 		$this->illegal_permissions = $this->permissionsObject->getIllegalPermissions();
 	}
 

@@ -40,6 +40,7 @@ class Errors extends AbstractModel
 		'user',
 		'template',
 		'debug',
+		'deprecated',
 	);
 
 	/**
@@ -120,7 +121,7 @@ class Errors extends AbstractModel
 	 * Log an error to the error log if the error logging is enabled.
 	 *
 	 * Available error types:
-	 * - generaal
+	 * - general
 	 * - critical
 	 * - database
 	 * - undefined_vars

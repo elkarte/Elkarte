@@ -18,8 +18,8 @@ namespace ElkArte\Errors;
  */
 final class ErrorContext
 {
-	const MINOR = 0;
-	const SERIOUS = 1;
+	public const MINOR = 0;
+	public const SERIOUS = 1;
 	/**
 	 * Multiton. This is an array of instances of ErrorContext.
 	 * All callers use an error context ('post', 'attach', or 'default' if none chosen).

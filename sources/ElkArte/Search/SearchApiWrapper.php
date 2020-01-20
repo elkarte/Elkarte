@@ -24,7 +24,7 @@ use ElkArte\ValuesContainer;
  */
 class SearchApiWrapper
 {
-	const DEFAULT_API = 'standard';
+	public const DEFAULT_API = 'standard';
 
 	/**
 	 * Holds instance of the search api in use such as ElkArte\Search\API\Standard_Search

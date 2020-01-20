@@ -580,12 +580,9 @@ class ThemeLoader
 				{
 					redirectexit('wwwRedirect');
 				}
-				else
+				elseif (key($_GET) !== 'wwwRedirect')
 				{
-					if (key($_GET) !== 'wwwRedirect')
-					{
-						redirectexit('wwwRedirect;' . key($_GET) . '=' . current($_GET));
-					}
+					redirectexit('wwwRedirect;' . key($_GET) . '=' . current($_GET));
 				}
 			}
 
