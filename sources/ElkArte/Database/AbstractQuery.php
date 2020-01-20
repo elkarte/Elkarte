@@ -559,7 +559,7 @@ abstract class AbstractQuery implements QueryInterface
 	 */
 	protected function _replaceIdentifier($replacement)
 	{
-		if (preg_match('~[a-z_][0-9,a-z,A-Z$_]{0,60}~', $replacement) !== 1)
+		if (preg_match('~[a-z_][0-9a-zA-Z$,_]{0,60}~', $replacement) !== 1)
 		{
 			$this->error_backtrace('Wrong value type sent to the database. Invalid identifier used. (' . $replacement . ')', '', E_USER_ERROR, __FILE__, __LINE__);
 		}
