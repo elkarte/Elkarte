@@ -52,7 +52,7 @@ class Sphinxql extends AbstractAPI
 	/**
 	 * Is it supported?
 	 *
-	 * @var boolean
+	 * @var bool
 	 */
 	public $is_supported = true;
 
@@ -111,7 +111,7 @@ class Sphinxql extends AbstractAPI
 	 *
 	 * @param string $a Word A
 	 * @param string $b Word B
-	 * @return integer indicating how the words should be sorted (-1, 0 1)
+	 * @return int indicating how the words should be sorted (-1, 0 1)
 	 */
 	public function searchSort($a, $b)
 	{

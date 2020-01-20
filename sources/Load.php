@@ -799,7 +799,7 @@ function loadEssentialThemeData()
  * @param string[]|string $style_sheets any style sheets to load with the template
  * @param bool $fatal = true if fatal is true, dies with an error message if the template cannot be found
  *
- * @return boolean|null
+ * @return bool|null
  * @deprecated since 2.0; use the theme object
  *
  * @uses the requireTemplate() function to actually load the file.

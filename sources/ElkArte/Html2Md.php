@@ -28,7 +28,7 @@ class Html2Md
 	/**
 	 * The value that will hold if we are using the internal or external parser
 	 *
-	 * @var boolean
+	 * @var bool
 	 */
 	private $_parser;
 
@@ -56,7 +56,7 @@ class Html2Md
 	/**
 	 * Strip remaining tags, set to false to leave them in
 	 *
-	 * @var boolean
+	 * @var bool
 	 */
 	public $strip_tags = true;
 
@@ -306,9 +306,9 @@ class Html2Md
 	 *  - Prevents converting anything that's inside a code block
 	 *
 	 * @param object $node
-	 * @param boolean $parser flag for internal or external parser
+	 * @param bool $parser flag for internal or external parser
 	 *
-	 * @return boolean
+	 * @return bool
 	 */
 	private static function _has_parent_code($node, $parser)
 	{
@@ -338,7 +338,7 @@ class Html2Md
 	 * Get the nesting level when inside a list
 	 *
 	 * @param object $node
-	 * @param boolean $parser flag for internal or external parser
+	 * @param bool $parser flag for internal or external parser
 	 *
 	 * @return int
 	 */

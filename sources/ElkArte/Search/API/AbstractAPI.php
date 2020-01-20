@@ -40,7 +40,7 @@ abstract class AbstractAPI
 	/**
 	 * Standard search is supported by default.
 	 *
-	 * @var boolean
+	 * @var bool
 	 */
 	public $is_supported;
 

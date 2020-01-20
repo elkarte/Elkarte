@@ -367,7 +367,7 @@ function constructPageIndex($base_url, &$start, $max_value, $num_per_page, $flex
  * - Caches the formatting data from the setting for optimization.
  *
  * @param float $number The float value to apply comma formatting
- * @param integer|bool $override_decimal_count = false or number of decimals
+ * @param int|bool $override_decimal_count = false or number of decimals
  *
  * @return string
  */
@@ -399,7 +399,7 @@ function comma_format($number, $override_decimal_count = false)
  * Formats a number to a multiple of thousands x, x k, x M, x G, x T
  *
  * @param float $number The value to format
- * @param integer|bool $override_decimal_count = false or number of decimals
+ * @param int|bool $override_decimal_count = false or number of decimals
  *
  * @return string
  */
@@ -972,7 +972,7 @@ function setupThemeContext($forceload = false)
  *
  * @param string $val The byte string, like 256M or 1G
  *
- * @return integer The string converted to a proper integer in bytes
+ * @return int The string converted to a proper integer in bytes
  */
 function memoryReturnBytes($val)
 {
@@ -1564,7 +1564,7 @@ function prepareSearchEngines()
  * @param resource $messages_request holds a query result
  * @param bool $reset
  *
- * @return integer|boolean
+ * @return int|bool
  * @throws \Exception
  */
 function currentContext($messages_request, $reset = false)
@@ -2191,7 +2191,7 @@ function cleanXml($string)
  *
  * @param string $ip ip address to be validated
  *
- * @return boolean true|false
+ * @return bool true|false
  */
 function isValidIPv6($ip)
 {
@@ -2234,9 +2234,9 @@ function convertIPv6toInts($ip)
  * Expands a IPv6 address to its full form.
  *
  * @param string $addr ipv6 address string
- * @param boolean $strict_check checks length to expanded address for compliance
+ * @param bool $strict_check checks length to expanded address for compliance
  *
- * @return boolean|string expanded ipv6 address.
+ * @return bool|string expanded ipv6 address.
  */
 function expandIPv6($addr, $strict_check = true)
 {

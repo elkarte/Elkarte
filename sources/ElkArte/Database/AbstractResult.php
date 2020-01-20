@@ -114,7 +114,7 @@ abstract class AbstractResult
 	/**
 	 * Reset the internal result pointer.
 	 *
-	 * @param integer $counter
+	 * @param int $counter
 	 *
 	 * @return bool
 	 */

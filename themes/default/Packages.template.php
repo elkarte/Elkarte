@@ -936,7 +936,7 @@ function template_file_permissions()
  * @param string $ident
  * @param array $contents
  * @param int $level
- * @param boolean $has_more
+ * @param bool $has_more
  * @todo
  *
  */

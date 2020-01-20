@@ -62,7 +62,7 @@ class PreparseCode
 	 *   - Won't convert \n's and a few other things if previewing is true.
 	 *
 	 * @param string $message
-	 * @param boolean $previewing
+	 * @param bool $previewing
 	 */
 	public function preparsecode(&$message, $previewing = false)
 	{

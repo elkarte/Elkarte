@@ -135,7 +135,7 @@ class Errors extends AbstractModel
 	 *   - die(Errors::instance()->log_error($msg));
 	 *
 	 * @param string $error_message
-	 * @param string|boolean $error_type = 'general'
+	 * @param string|bool $error_type = 'general'
 	 * @param string $file = ''
 	 * @param int $line = 0
 	 *
@@ -219,7 +219,7 @@ class Errors extends AbstractModel
 	 *
 	 * @param string $query_string
 	 * @param string $error_message
-	 * @param string|boolean $error_type
+	 * @param string|bool $error_type
 	 * @param string $file
 	 * @param int $line
 	 * @throws \Exception
@@ -259,7 +259,7 @@ class Errors extends AbstractModel
 	 * - It logs the error message if $log is specified.
 	 *
 	 * @param string $error
-	 * @param string|boolean $log defaults to 'general' false will skip logging, true will use general
+	 * @param string|bool $log defaults to 'general' false will skip logging, true will use general
 	 *
 	 * @throws \ElkArte\Exceptions\Exception
 	 */
@@ -281,7 +281,7 @@ class Errors extends AbstractModel
 	 * - the information is logged if log is specified.
 	 *
 	 * @param string $error
-	 * @param string|boolean $log defaults to 'general' false will skip logging, true will use general
+	 * @param string|bool $log defaults to 'general' false will skip logging, true will use general
 	 * @param string[] $sprintf defaults to empty array()
 	 *
 	 * @throws \ElkArte\Exceptions\Exception
@@ -346,7 +346,7 @@ class Errors extends AbstractModel
 	/**
 	 * Halts execution, optionally displays an error message
 	 *
-	 * @param string|integer $error
+	 * @param string|int $error
 	 */
 	protected function terminate($error = '')
 	{

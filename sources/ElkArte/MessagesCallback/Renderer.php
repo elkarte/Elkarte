@@ -213,7 +213,7 @@ abstract class Renderer
 	 *
 	 * @param bool $reset
 	 *
-	 * @return boolean
+	 * @return bool
 	 */
 	protected function _currentContext($reset = false)
 	{

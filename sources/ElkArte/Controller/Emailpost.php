@@ -45,7 +45,7 @@ class Emailpost extends AbstractController
 	 * - Returns an array of values for use in the template
 	 *
 	 * @param string $data raw email string, including headers
-	 * @return string[]|boolean
+	 * @return string[]|bool
 	 * @throws \ElkArte\Exceptions\Exception
 	 */
 	public function action_pbe_preview($data = '')
@@ -113,7 +113,7 @@ class Emailpost extends AbstractController
 	 * - Accessed by email imap cron script, and ManageMaillist.controller.php.
 	 *
 	 * @param string|null $data used to supply a full headers+body email
-	 * @param boolean $force used to override common failure errors
+	 * @param bool $force used to override common failure errors
 	 * @param string|null $key used to supply a lost key
 	 *
 	 * @return bool

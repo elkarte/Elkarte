@@ -57,7 +57,7 @@ class Packages extends AbstractController
 	/**
 	 * listing of files in a packages
 	 *
-	 * @var array|boolean
+	 * @var array|bool
 	 */
 	private $_extracted_files;
 	/**
@@ -75,13 +75,13 @@ class Packages extends AbstractController
 	/**
 	 * If this is an un-install pass or not
 	 *
-	 * @var boolean
+	 * @var bool
 	 */
 	private $_uninstalling;
 	/**
 	 * If the package is installed, previously or not
 	 *
-	 * @var boolean
+	 * @var bool
 	 */
 	private $_is_installed;
 
@@ -413,7 +413,7 @@ class Packages extends AbstractController
 	 *
 	 * @param array $package_installed
 	 * @param array $packageInfo Details for the package being tested/installed, set by getPackageInfo
-	 * @param boolean $testing passed to parsePackageInfo, true for test install, false for real install
+	 * @param bool $testing passed to parsePackageInfo, true for test install, false for real install
 	 *
 	 * @return array
 	 * @throws \ElkArte\Exceptions\Exception package_cant_uninstall, package_uninstall_cannot

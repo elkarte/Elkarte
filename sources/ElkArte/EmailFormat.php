@@ -89,7 +89,7 @@ class EmailFormat
 	/**
 	 * Set if we have entered an area of the message that is a signature block
 	 *
-	 * @var boolean
+	 * @var bool
 	 */
 	private $_found_sig = false;
 
@@ -174,7 +174,7 @@ class EmailFormat
 	 * in a quote (&depth) code (&depth) or list (bbc or plain) etc.
 	 *
 	 * @param string $data
-	 * @param boolean $bbc_br
+	 * @param bool $bbc_br
 	 */
 	private function _prep_data($data, $bbc_br)
 	{

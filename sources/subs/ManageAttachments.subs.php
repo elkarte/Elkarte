@@ -130,7 +130,7 @@ function approveAttachments($attachments)
  * @param string $query_type
  * @param bool $return_affected_messages = false
  * @param bool $autoThumbRemoval = true
- * @return int[]|boolean returns affected messages if $return_affected_messages is set to true
+ * @return int[]|bool returns affected messages if $return_affected_messages is set to true
  * @package Attachments
  */
 function removeAttachments($condition, $query_type = '', $return_affected_messages = false, $autoThumbRemoval = true)
@@ -570,7 +570,7 @@ function maxNoThumb()
  * - If $fix_errors is set to true it will attempt to remove the thumbnail from disk
  *
  * @param int $start
- * @param boolean $fix_errors
+ * @param bool $fix_errors
  * @param string[] $to_fix
  *
  * @return array
@@ -643,7 +643,7 @@ function findOrphanThumbnails($start, $fix_errors, $to_fix)
  * - If $fix_errors is set to true it will attempt to remove the thumbnail from disk
  *
  * @param int $start
- * @param boolean $fix_errors
+ * @param bool $fix_errors
  * @param string[] $to_fix
  *
  * @return array
@@ -698,7 +698,7 @@ function findParentsOrphanThumbnails($start, $fix_errors, $to_fix)
  * - remove DB entries if the file can not be found.
  *
  * @param int $start
- * @param boolean $fix_errors
+ * @param bool $fix_errors
  * @param string[] $to_fix
  *
  * @return array
@@ -843,7 +843,7 @@ function repairAttachmentData($start, $fix_errors, $to_fix)
  * - If $fix_errors is set, it will
  *
  * @param int $start
- * @param boolean $fix_errors
+ * @param bool $fix_errors
  * @param string[] $to_fix
  *
  * @return array
@@ -915,7 +915,7 @@ function findOrphanAvatars($start, $fix_errors, $to_fix)
  * Finds attachments that are not used in any message
  *
  * @param int $start
- * @param boolean $fix_errors
+ * @param bool $fix_errors
  * @param string[] $to_fix
  *
  * @return array
@@ -1095,7 +1095,7 @@ function attachmentBelongsTo($attachment)
  * Checks an attachments id
  *
  * @param int $id_attach
- * @return boolean
+ * @return bool
  * @package Attachments
  */
 function validateAttachID($id_attach)

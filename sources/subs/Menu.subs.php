@@ -103,7 +103,7 @@ function createMenu($menuData, $menuOptions = [])
  *
  * @param string $menu_id
  *
- * @return boolean
+ * @return bool
  */
 function destroyMenu($menu_id = 'last')
 {

@@ -34,7 +34,7 @@ class OpenID
 	 *
 	 * - Note that this function will not return when authentication is required.
 	 *
-	 * @return boolean|null
+	 * @return bool|null
 	 * @throws \ElkArte\Exceptions\Exception
 	 */
 	public function revalidate()

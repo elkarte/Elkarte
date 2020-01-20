@@ -123,7 +123,7 @@ class Unread
 	/**
 	 * Return the sorting direction
 	 *
-	 * @return boolean
+	 * @return bool
 	 */
 	public function isSortAsc()
 	{

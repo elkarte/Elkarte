@@ -52,7 +52,7 @@ class Display implements DisplayInterface
 	/**
 	 * Is this enabled for new payments?
 	 *
-	 * @return boolean
+	 * @return bool
 	 */
 	public function gatewayEnabled()
 	{

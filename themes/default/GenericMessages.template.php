@@ -16,7 +16,7 @@
  * Builds the poster area, avatar, group icons, pulldown information menu, etc
  *
  * @param mixed[] $message
- * @param boolean $ignoring
+ * @param bool $ignoring
  *
  * @return string
  */

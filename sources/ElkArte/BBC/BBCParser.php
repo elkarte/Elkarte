@@ -1446,7 +1446,7 @@ class BBCParser
 	/**
 	 * Enable the parsing of smileys
 	 *
-	 * @param boolean $enable
+	 * @param bool $enable
 	 *
 	 * @return $this
 	 */

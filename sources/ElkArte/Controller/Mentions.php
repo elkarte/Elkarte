@@ -84,7 +84,7 @@ class Mentions extends AbstractController
 	/**
 	 * Determine if we are looking only at unread mentions or any kind of
 	 *
-	 * @var boolean
+	 * @var bool
 	 */
 	protected $_all = false;
 

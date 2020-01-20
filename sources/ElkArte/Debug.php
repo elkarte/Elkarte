@@ -463,7 +463,7 @@ class Debug
 	 * Displays a page with all the queries executed during the "current"
 	 * page load and allows to EXPLAIN them
 	 *
-	 * @param integer $query_id the id of the query to EXPLAIN, if -1 no queries are explained
+	 * @param int $query_id the id of the query to EXPLAIN, if -1 no queries are explained
 	 *
 	 * @return array
 	 */

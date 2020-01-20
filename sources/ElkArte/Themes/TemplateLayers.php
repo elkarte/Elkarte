@@ -99,7 +99,7 @@ class TemplateLayers extends Priority
 	/**
 	 * Check if at least one layer has been added
 	 *
-	 * @param boolean $base if true will not consider body and html layers in result
+	 * @param bool $base if true will not consider body and html layers in result
 	 *
 	 * @return bool true if at least one layer has been added
 	 * @todo at that moment _all_after and _all_before are not considered because they may not be "forced"

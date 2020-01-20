@@ -235,8 +235,8 @@ class MessagesDelete
 	 * Take a load of messages from one place and stick them in a topic
 	 *
 	 * @param int[] $msgs
-	 * @param integer $from_topic
-	 * @param integer $target_topic
+	 * @param int $from_topic
+	 * @param int $target_topic
 	 * @throws \ElkArte\Exceptions\Exception
 	 */
 	private function _mergePosts($msgs, $from_topic, $target_topic)

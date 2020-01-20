@@ -337,7 +337,8 @@ class Search
 	 * @param int[] $msg_list - All the messages we want to find the posters
 	 * @param int $limit - There are only so much topics
 	 *
-	 * @return resource|boolean
+	 * @return resource|bool
+	 * @throws \ElkArte\Exceptions\Exception
 	 */
 	public function loadMessagesRequest($msg_list, $limit)
 	{
@@ -387,7 +388,7 @@ class Search
 	 *
 	 * @param resource $messages_request holds a query result
 	 *
-	 * @return boolean
+	 * @return bool
 	 */
 	public function noMessages($messages_request)
 	{

@@ -776,7 +776,7 @@ class AttachmentsDirectory
 	 * Finds the current directory tree for the supplied base directory
 	 *
 	 * @param string $directory
-	 * @return string[]|boolean on fail else array of directory names
+	 * @return string[]|bool on fail else array of directory names
 	 * @package Attachments
 	 */
 	protected function getTreeElements($directory)

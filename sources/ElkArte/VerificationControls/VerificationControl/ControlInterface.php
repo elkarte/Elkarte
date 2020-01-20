@@ -26,17 +26,17 @@ interface ControlInterface
 	/**
 	 * Used to build the control and return if it should be shown or not
 	 *
-	 * @param boolean $isNew
-	 * @param boolean $force_refresh
+	 * @param bool $isNew
+	 * @param bool $force_refresh
 	 *
-	 * @return boolean
+	 * @return bool
 	 */
 	public function showVerification($sessionVal, $isNew, $force_refresh = true);
 
 	/**
 	 * Create the actual test that will be used
 	 *
-	 * @param boolean $refresh
+	 * @param bool $refresh
 	 *
 	 * @return void
 	 */
@@ -52,14 +52,14 @@ interface ControlInterface
 	/**
 	 * Run the test, return if it passed or not
 	 *
-	 * @return string|boolean
+	 * @return string|bool
 	 */
 	public function doTest($sessionVal);
 
 	/**
 	 * If the control has a visible location on the template or if its hidden
 	 *
-	 * @return boolean
+	 * @return bool
 	 */
 	public function hasVisibleTemplate();
 

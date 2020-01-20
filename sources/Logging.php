@@ -196,7 +196,7 @@ function logLastDatabaseError()
  *
  * @param mixed[] $stats = array() array of array => direction (+/-)
  *
- * @return boolean|array
+ * @return bool|array
  */
 function trackStats($stats = array())
 {

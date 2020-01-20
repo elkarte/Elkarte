@@ -309,7 +309,7 @@ class Questions implements ControlInterface
 	/**
 	 * Checks if an the answers to anti-spam questions are correct
 	 *
-	 * @return boolean
+	 * @return bool
 	 */
 	private function _verifyAnswers($sessionVal)
 	{
@@ -399,7 +399,7 @@ class Questions implements ControlInterface
 	 * Prepares the questions coming from the UI to be saved into the database.
 	 *
 	 * @param string[] $save_question
-	 * @return boolean
+	 * @return bool
 	 */
 	protected function _saveSettings($save_question, $save_answer, $save_language)
 	{

@@ -488,7 +488,7 @@ function updatePMMenuCounts($owner)
  *
  * @param int $pmID
  * @param string $validFor
- * @return boolean|null
+ * @return bool|null
  * @package PersonalMessage
  */
 function isAccessiblePM($pmID, $validFor = 'in_or_outbox')
@@ -1414,7 +1414,7 @@ function loadRules($reload = false)
  * Update PM recipient when they receive or read a new PM
  *
  * @param int $id_member
- * @param boolean $new = false
+ * @param bool $new = false
  * @package PersonalMessage
  * @throws \Exception
  */
@@ -1540,7 +1540,7 @@ function getPmsFromDiscussion($pm_heads)
  * @param mixed[] $to_label
  * @param string[] $label_type
  * @param int $user_id
- * @return integer|null
+ * @return int|null
  * @package PersonalMessage
  * @throws \Exception
  */
@@ -1609,7 +1609,7 @@ function changePMLabels($to_label, $label_type, $user_id)
  * @param mixed[] $searchArray
  * @param mixed[] $new_labels
  * @param int $user_id
- * @return integer|null
+ * @return int|null
  * @package PersonalMessage
  * @throws \Exception
  */
@@ -2046,7 +2046,7 @@ function loadConversationUnreadStatus($pms)
  * @param int[] $all_pms
  * @param mixed[] $recipients
  * @param string $folder
- * @param boolean $search
+ * @param bool $search
  *
  * @return array
  * @package PersonalMessage
@@ -2160,7 +2160,7 @@ function loadPMSubjectRequest($pms, $orderBy)
  * @param int[] $display_pms list of PM's to fetch
  * @param string $sort_by_query raw query used in the sorting option
  * @param string $sort_by used to signal when addition joins are needed
- * @param boolean $descending if true descending order of display
+ * @param bool $descending if true descending order of display
  * @param int|string $display_mode how are they being viewed, all, conversation, etc
  * @param string $folder current pm folder
  * @return bool|resource
@@ -2225,7 +2225,7 @@ function checkPMReceived($pmsg)
  * Loads a pm by ID for use as a quoted pm in a new message
  *
  * @param int $pmsg
- * @param boolean $isReceived
+ * @param bool $isReceived
  *
  * @return bool
  * @package PersonalMessage
@@ -2266,7 +2266,7 @@ function loadPMQuote($pmsg, $isReceived)
  * - Will optionally count the number of bcc recipients and return that count
  *
  * @param int $pmsg
- * @param boolean $bcc_count
+ * @param bool $bcc_count
  *
  * @return array
  * @package PersonalMessage
@@ -2376,7 +2376,7 @@ function loadPersonalMessage($pm_id)
  * @param string $timeQuery raw query, used if we are limiting results to time periods
  * @param string $searchQuery raw query, the actual thing you are searching for in the subject and/or body
  * @param mixed[] $searchq_parameters value parameters used in the above query
- * @return integer
+ * @return int
  * @package PersonalMessage
  * @throws \Exception
  */

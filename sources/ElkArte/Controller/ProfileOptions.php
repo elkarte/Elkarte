@@ -978,7 +978,8 @@ class ProfileOptions extends AbstractController
 	 * - Retrieve topic notifications count.
 	 *
 	 * @param int $memID id_member the id of the member who's notifications we are loading
-	 * @return integer
+	 * @return int
+	 * @throws \ElkArte\Exceptions\Exception
 	 */
 	public function list_getTopicNotificationCount($memID)
 	{

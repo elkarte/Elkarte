@@ -30,7 +30,7 @@ class Payment implements PaymentInterface
 	 *
 	 * - Returns true/false for whether this gateway thinks the data is intended for it.
 	 *
-	 * @return boolean
+	 * @return bool
 	 */
 	public function isValid()
 	{
@@ -124,7 +124,7 @@ class Payment implements PaymentInterface
 	/**
 	 * Returns if this is this is a cancellation transaction
 	 *
-	 * @return boolean
+	 * @return bool
 	 */
 	public function isCancellation()
 	{

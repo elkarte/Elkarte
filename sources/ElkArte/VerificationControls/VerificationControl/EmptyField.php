@@ -36,7 +36,7 @@ class EmptyField implements ControlInterface
 	/**
 	 * If its going to be used or not on a form
 	 *
-	 * @var boolean
+	 * @var bool
 	 */
 	private $_empty_field = null;
 
@@ -50,7 +50,7 @@ class EmptyField implements ControlInterface
 	/**
 	 * If the validation test has been run
 	 *
-	 * @var boolean
+	 * @var bool
 	 */
 	private $_tested = false;
 

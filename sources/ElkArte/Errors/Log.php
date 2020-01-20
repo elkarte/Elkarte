@@ -76,7 +76,7 @@ class Log extends AbstractModel
 	 *
 	 * @param array $filter this->_db query of the filter being used
 	 *
-	 * @return integer
+	 * @return int
 	 */
 	public function numErrors($filter = array())
 	{

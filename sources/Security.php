@@ -197,7 +197,7 @@ function checkPassword($type, $hash = false)
  * - Message is what to tell them when asking them to login.
  *
  * @param string $message = ''
- * @param boolean $is_fatal = true
+ * @param bool $is_fatal = true
  *
  * @return bool
  * @throws \ElkArte\Exceptions\Exception
@@ -1136,7 +1136,7 @@ function checkSubmitOnce($action, $is_fatal = false)
  * @param string[]|string $permission permission
  * @param int[]|int|null $boards array of board IDs, a single id or null
  *
- * @return boolean if the user can do the permission
+ * @return bool if the user can do the permission
  * @throws \ElkArte\Exceptions\Exception
  */
 function allowedTo($permission, $boards = null)
@@ -1472,7 +1472,7 @@ function showEmailAddress($userProfile_hideEmail, $userProfile_id)
  *
  * @event integrate_spam_protection Allows to update action wait timeOverrides
  * @param string $error_type used also as a $txt index. (not an actual string.)
- * @param boolean $fatal is the spam check a fatal error on failure
+ * @param bool $fatal is the spam check a fatal error on failure
  *
  * @return bool|int|mixed
  * @throws \ElkArte\Exceptions\Exception
@@ -1547,7 +1547,7 @@ function spamProtection($error_type, $fatal = true)
  * A generic function to create a pair of index.php and .htaccess files in a directory
  *
  * @param string $path the (absolute) directory path
- * @param boolean $allow_localhost if access should be allowed to localhost
+ * @param bool $allow_localhost if access should be allowed to localhost
  * @param string $files (optional, default '*') parameter for the Files tag
  *
  * @return string[]|string|bool on success error string if anything fails
@@ -1759,7 +1759,7 @@ function loadBadBehavior()
  *
  * @param int $id_member
  * @param string|bool $password_flood_value = false or string joined on |'s
- * @param boolean $was_correct = false
+ * @param bool $was_correct = false
  *
  * @throws \ElkArte\Exceptions\Exception no_access
  */
@@ -1861,7 +1861,7 @@ function frameOptionsHeader($override = null)
  * only IE and Chrome are honouring this header. This reduces exposure to drive-by download attacks
  * and sites serving user uploaded content that could be treated as executable or dynamic HTML files.
  *
- * @param boolean|null $override
+ * @param bool|null $override
  */
 function securityOptionsHeader($override = null)
 {

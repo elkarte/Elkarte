@@ -61,14 +61,14 @@ class BrowserDetector
 	/**
 	 * Holds if the detected device may be a mobile one
 	 *
-	 * @var boolean
+	 * @var bool
 	 */
 	private $_is_mobile = null;
 
 	/**
 	 * Holds if the detected device may be a tablet
 	 *
-	 * @var boolean
+	 * @var bool
 	 */
 	private $_is_tablet = null;
 
@@ -131,7 +131,7 @@ class BrowserDetector
 	/**
 	 * Determine if the browser is Opera or not (for Opera < 15)
 	 *
-	 * @return boolean true if the browser is Opera otherwise false
+	 * @return bool true if the browser is Opera otherwise false
 	 */
 	public function isOpera()
 	{
@@ -168,7 +168,7 @@ class BrowserDetector
 	/**
 	 * Determine if the browser is a Webkit based one or not
 	 *
-	 * @return boolean true if the browser is Webkit based otherwise false
+	 * @return bool true if the browser is Webkit based otherwise false
 	 */
 	public function isWebkit()
 	{
@@ -272,7 +272,7 @@ class BrowserDetector
 	/**
 	 * Determine if the browser is Firefox or one of its variants
 	 *
-	 * @return boolean true if the browser is Firefox otherwise false
+	 * @return bool true if the browser is Firefox otherwise false
 	 */
 	public function isFirefox()
 	{
@@ -287,7 +287,7 @@ class BrowserDetector
 	/**
 	 * Determine if the browser is Gecko or not
 	 *
-	 * @return boolean true if the browser is Gecko otherwise false
+	 * @return bool true if the browser is Gecko otherwise false
 	 */
 	public function isGecko()
 	{
@@ -302,7 +302,7 @@ class BrowserDetector
 	/**
 	 * Determine if the browser is konqueror or not
 	 *
-	 * @return boolean true if the browser is konqueror otherwise false
+	 * @return bool true if the browser is konqueror otherwise false
 	 */
 	public function isKonqueror()
 	{
@@ -347,7 +347,7 @@ class BrowserDetector
 	/**
 	 * Determine if the browser is IE or not
 	 *
-	 * @return boolean true if the browser is IE otherwise false
+	 * @return bool true if the browser is IE otherwise false
 	 */
 	public function isIe()
 	{
@@ -363,7 +363,7 @@ class BrowserDetector
 	/**
 	 * Determine if the browser is WebTv or not
 	 *
-	 * @return boolean true if the browser is WebTv otherwise false
+	 * @return bool true if the browser is WebTv otherwise false
 	 */
 	public function isWebTv()
 	{
@@ -427,7 +427,7 @@ class BrowserDetector
 	/**
 	 * Determine if the browser is OperaMini or not
 	 *
-	 * @return boolean true if the browser is OperaMini otherwise false
+	 * @return bool true if the browser is OperaMini otherwise false
 	 */
 	public function isOperaMini()
 	{
@@ -446,7 +446,7 @@ class BrowserDetector
 	/**
 	 * Determine if the browser is OperaMobi or not
 	 *
-	 * @return boolean true if the browser is OperaMobi otherwise false
+	 * @return bool true if the browser is OperaMobi otherwise false
 	 */
 	public function isOperaMobi()
 	{
@@ -465,7 +465,7 @@ class BrowserDetector
 	/**
 	 * Determine if the browser is possibly a robot or not
 	 *
-	 * @return boolean true if the browser is possibly a robot otherwise false
+	 * @return bool true if the browser is possibly a robot otherwise false
 	 */
 	public function isPossibleRobot()
 	{

@@ -107,7 +107,7 @@ class Memcache extends AbstractCacheMethod
 	/**
 	 * If this should be done as a persistent connection
 	 *
-	 * @return boolean
+	 * @return bool
 	 */
 	private function _is_persist()
 	{

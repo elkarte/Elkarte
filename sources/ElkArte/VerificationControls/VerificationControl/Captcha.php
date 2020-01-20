@@ -34,7 +34,7 @@ class Captcha implements ControlInterface
 	/**
 	 * If we are actually displaying the captcha image
 	 *
-	 * @var boolean
+	 * @var bool
 	 */
 	private $_show_captcha = false;
 
@@ -62,7 +62,7 @@ class Captcha implements ControlInterface
 	/**
 	 * If the response has been tested or not
 	 *
-	 * @var boolean
+	 * @var bool
 	 */
 	private $_tested = false;
 
@@ -181,7 +181,7 @@ class Captcha implements ControlInterface
 	/**
 	 * Does what they typed = what was supplied in the image
 	 *
-	 * @return boolean
+	 * @return bool
 	 */
 	private function _verifyCode($sessionVal)
 	{

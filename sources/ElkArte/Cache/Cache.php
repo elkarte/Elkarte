@@ -76,7 +76,7 @@ class Cache
 	/**
 	 * The caching object
 	 *
-	 * @var object|boolean
+	 * @var object|bool
 	 */
 	protected $_cache_obj = null;
 
@@ -385,7 +385,7 @@ class Cache
 	 * @param string $key
 	 * @param int $ttl
 	 *
-	 * @return null|boolean if it was a hit
+	 * @return null|bool if it was a hit
 	 */
 	public function getVar(&$var, $key, $ttl = 120)
 	{

@@ -49,7 +49,7 @@ class Payment implements PaymentInterface
 	/**
 	 * This function returns true/false for whether this gateway thinks the data is intended for it.
 	 *
-	 * @return boolean
+	 * @return bool
 	 */
 	public function isValid()
 	{
@@ -274,7 +274,7 @@ class Payment implements PaymentInterface
 	/**
 	 * Is this a subscription?
 	 *
-	 * @return boolean
+	 * @return bool
 	 */
 	public function isSubscription()
 	{
@@ -344,7 +344,7 @@ class Payment implements PaymentInterface
 	/**
 	 * Is this a refund?
 	 *
-	 * @return boolean
+	 * @return bool
 	 */
 	public function isRefund()
 	{
@@ -354,7 +354,7 @@ class Payment implements PaymentInterface
 	/**
 	 * Is this a normal payment?
 	 *
-	 * @return boolean
+	 * @return bool
 	 */
 	public function isPayment()
 	{
@@ -364,7 +364,7 @@ class Payment implements PaymentInterface
 	/**
 	 * Is this a cancellation?
 	 *
-	 * @return boolean
+	 * @return bool
 	 */
 	public function isCancellation()
 	{

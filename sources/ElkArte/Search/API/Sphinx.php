@@ -51,7 +51,7 @@ class Sphinx extends AbstractAPI
 	/**
 	 * Is it supported?
 	 *
-	 * @var boolean
+	 * @var bool
 	 */
 	public $is_supported = true;
 

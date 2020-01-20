@@ -280,7 +280,7 @@ class BoardsTree
 	 * @param int $child The ID of the child board
 	 * @param int $parent The ID of a parent board
 	 *
-	 * @return boolean if the specified child board is a child of the specified parent board.
+	 * @return bool if the specified child board is a child of the specified parent board.
 	 */
 	public function isChildOf($child, $parent)
 	{

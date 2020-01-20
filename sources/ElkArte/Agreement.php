@@ -129,7 +129,7 @@ class Agreement
 	 * It uses the language, but if the localized version doesn't exist
 	 * then it may return the english version.
 	 *
-	 * @param boolean $fallback if fallback to the English version (default true).
+	 * @param bool $fallback if fallback to the English version (default true).
 	 *
 	 * @return bool|string
 	 */
@@ -155,7 +155,7 @@ class Agreement
 	 * It uses the language, but if the localized version doesn't exist
 	 * then it may return the english version.
 	 *
-	 * @param boolean $fallback if fallback to the English version (default true).
+	 * @param bool $fallback if fallback to the English version (default true).
 	 *
 	 * @return string
 	 */

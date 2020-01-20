@@ -428,7 +428,7 @@ class Likes extends AbstractController
 	 * else the number of posts (not likes) of theirs that have been liked
 	 *
 	 * @param int $memberID
-	 * @param boolean $given
+	 * @param bool $given
 	 *
 	 * @return
 	 */
