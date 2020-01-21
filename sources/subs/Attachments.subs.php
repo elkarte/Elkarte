@@ -21,6 +21,8 @@ use ElkArte\Cache\Cache;
 use ElkArte\Errors\AttachmentErrorContext;
 use ElkArte\Graphics\Image;
 use ElkArte\Http\FsockFetchWebdata;
+use ElkArte\TemporaryAttachment;
+use ElkArte\TokenHash;
 use ElkArte\User;
 use ElkArte\Util;
 use ElkArte\AttachmentsDirectory;
@@ -157,7 +159,7 @@ function processAttachments($id_msg = null)
 		// First, let's first check for PHP upload errors.
 		$errors = attachmentUploadChecks($n);
 
-		$temp_file = new \ElkArte\TemporaryAttachment([
+		$temp_file = new TemporaryAttachment([
 			'name' => basename($_FILES['attachment']['name'][$n]),
 			'tmp_name' => $_FILES['attachment']['tmp_name'][$n],
 			'attachid' => $tmp_attachments->getTplName(User::$info->id, bin2hex(random_bytes(16))),
@@ -1419,7 +1421,7 @@ function getAttachmentFilename($filename, $attachment_id, $dir = null, $new = fa
 	// Just make up a nice hash...
 	if ($new)
 	{
-		$tokenizer = new \ElkArte\TokenHash();
+		$tokenizer = new TokenHash();
 
 		return $tokenizer->generate_hash(32);
 	}

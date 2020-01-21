@@ -23,6 +23,7 @@ use ElkArte\Exceptions\Exception;
 use ElkArte\Graphics\Image;
 use ElkArte\AttachmentsDirectory;
 use ElkArte\TemporaryAttachmentsList;
+use ElkArte\User;
 
 /**
  *
@@ -605,7 +606,7 @@ class Attachment extends AbstractController
 		{
 			if (empty($topic) || (string) (int) $this->_req->query->attach !== (string) $this->_req->query->attach)
 			{
-				$attach_data = $tmp_attachments->getTempAttachById($this->_req->query->attach, $attachmentsDir, \ElkArte\User::$info->id);
+				$attach_data = $tmp_attachments->getTempAttachById($this->_req->query->attach, $attachmentsDir, User::$info->id);
 				$file_ext = pathinfo($attach_data['name'], PATHINFO_EXTENSION);
 				$filename = $attach_data['tmp_name'];
 				$id_attach = $attach_data['attachid'];

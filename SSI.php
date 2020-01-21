@@ -15,7 +15,14 @@
  *
  */
 
+use BBC\ParserWrapper;
+use ElkArte\Cache\Cache;
+use ElkArte\Controller\Poll;
+use ElkArte\EventManager;
+use ElkArte\MembersList;
+use ElkArte\MessageTopicIcons;
 use ElkArte\User;
+use ElkArte\Util;
 
 /**
  * Set this to one of three values depending on what you want to happen in the case of a fatal error.
@@ -58,7 +65,7 @@ $ssi_on_error_method = false;
 // We are in Elk, but from the side-entrance.
 if (!defined('ELKBOOT'))
 {
-	define('ELK', 'SSI');
+	DEFINE('ELK', 'SSI');
 
 	require_once(dirname(__FILE__) . '/bootstrap.php');
 	$bootstrap = new Bootstrap(true);
@@ -341,7 +348,7 @@ function ssi_queryPosts($query_where = '', $query_where_params = array(), $query
 		))
 	);
 
-	$bbc_parser = \BBC\ParserWrapper::instance();
+	$bbc_parser = ParserWrapper::instance();
 
 	$posts = array();
 	while ($row = $db->fetch_assoc($request))
@@ -371,8 +378,8 @@ function ssi_queryPosts($query_where = '', $query_where_params = array(), $query
 				'link' => empty($row['id_member']) ? $row['poster_name'] : '<a href="' . $scripturl . '?action=profile;u=' . $row['id_member'] . '">' . $row['poster_name'] . '</a>'
 			),
 			'subject' => $row['subject'],
-			'short_subject' => \ElkArte\Util::shorten_text($row['subject'], !empty($modSettings['ssi_subject_length']) ? $modSettings['ssi_subject_length'] : 24),
-			'preview' => \ElkArte\Util::shorten_text($preview, !empty($modSettings['ssi_preview_length']) ? $modSettings['ssi_preview_length'] : 128),
+			'short_subject' => Util::shorten_text($row['subject'], !empty($modSettings['ssi_subject_length']) ? $modSettings['ssi_subject_length'] : 24),
+			'preview' => Util::shorten_text($preview, !empty($modSettings['ssi_preview_length']) ? $modSettings['ssi_preview_length'] : 128),
 			'body' => $row['body'],
 			'time' => standardTime($row['poster_time']),
 			'html_time' => htmlTime($row['poster_time']),
@@ -454,7 +461,7 @@ function ssi_recentTopics($num_recent = 8, $exclude_boards = null, $include_boar
 		$include_boards = array();
 	}
 
-	$icon_sources = new \ElkArte\MessageTopicIcons(!empty($modSettings['messageIconChecks_enable']), $settings['theme_dir']);
+	$icon_sources = new MessageTopicIcons(!empty($modSettings['messageIconChecks_enable']), $settings['theme_dir']);
 
 	// Find all the posts in distinct topics. Newer ones will have higher IDs.
 	$request = $db->query('', '
@@ -540,7 +547,7 @@ function ssi_recentTopics($num_recent = 8, $exclude_boards = null, $include_boar
 			'topic_list' => $topic_list
 		)
 	);
-	$bbc_parser = \BBC\ParserWrapper::instance();
+	$bbc_parser = ParserWrapper::instance();
 	$posts = array();
 	while ($row = $db->fetch_assoc($request))
 	{
@@ -550,7 +557,7 @@ function ssi_recentTopics($num_recent = 8, $exclude_boards = null, $include_boar
 		$row['subject'] = censor($row['subject']);
 		$row['body'] = censor($row['body']);
 
-		$row['body'] = \ElkArte\Util::shorten_text($row['body'], 128);
+		$row['body'] = Util::shorten_text($row['body'], 128);
 
 		// Build the array.
 		$posts[$row['id_last_msg']] = array(
@@ -576,7 +583,7 @@ function ssi_recentTopics($num_recent = 8, $exclude_boards = null, $include_boar
 			'subject' => $row['subject'],
 			'replies' => $row['num_replies'],
 			'views' => $row['num_views'],
-			'short_subject' => \ElkArte\Util::shorten_text($row['subject'], 25),
+			'short_subject' => Util::shorten_text($row['subject'], 25),
 			'preview' => $row['body'],
 			'time' => standardTime($row['poster_time']),
 			'html_time' => htmlTime($row['poster_time']),
@@ -922,7 +929,7 @@ function ssi_queryMembers($query_where = null, $query_where_params = array(), $q
 	}
 
 	// Load the members.
-	\ElkArte\MembersList::load($members);
+	MembersList::load($members);
 
 	// Draw the table!
 	if ($output_method === 'echo')
@@ -934,7 +941,7 @@ function ssi_queryMembers($query_where = null, $query_where_params = array(), $q
 	$query_members = array();
 	foreach ($members as $id)
 	{
-		$member = \ElkArte\MembersList::get($id);
+		$member = MembersList::get($id);
 		// Load their context data.
 		if ($member->isEmpty())
 		{
@@ -1304,7 +1311,7 @@ function ssi_recentPoll($topPollInstead = false, $output_method = 'echo')
 		'options' => array()
 	);
 
-	$bbc_parser = \BBC\ParserWrapper::instance();
+	$bbc_parser = ParserWrapper::instance();
 
 	// Calculate the percentages and bar lengths...
 	$divisor = $return['total_votes'] == 0 ? 1 : $return['total_votes'];
@@ -1544,8 +1551,8 @@ function ssi_pollVote()
 	list ($topic, $board) = topicFromPoll($pollID);
 	loadBoard();
 
-	$poll_action = new \ElkArte\Controller\Poll(new \ElkArte\EventManager());
-	$poll_action->setUser(\ElkArte\User::$info);
+	$poll_action = new Poll(new EventManager());
+	$poll_action->setUser(User::$info);
 	$poll_action->pre_dispatch();
 
 	// The controller takes already care of redirecting properly or fail
@@ -1616,7 +1623,7 @@ function ssi_todaysBirthdays($output_method = 'echo')
 		'include_birthdays' => true,
 		'num_days_shown' => empty($modSettings['cal_days_for_index']) || $modSettings['cal_days_for_index'] < 1 ? 1 : $modSettings['cal_days_for_index'],
 	);
-	$return = \ElkArte\Cache\Cache::instance()->quick_get('calendar_index_offset_' . (User::$info->time_offset + $modSettings['time_offset']), 'subs/Calendar.subs.php', 'cache_getRecentEvents', array($eventOptions));
+	$return = Cache::instance()->quick_get('calendar_index_offset_' . (User::$info->time_offset + $modSettings['time_offset']), 'subs/Calendar.subs.php', 'cache_getRecentEvents', array($eventOptions));
 
 	if ($output_method !== 'echo')
 	{
@@ -1649,7 +1656,7 @@ function ssi_todaysHolidays($output_method = 'echo')
 		'include_holidays' => true,
 		'num_days_shown' => empty($modSettings['cal_days_for_index']) || $modSettings['cal_days_for_index'] < 1 ? 1 : $modSettings['cal_days_for_index'],
 	);
-	$return = \ElkArte\Cache\Cache::instance()->quick_get('calendar_index_offset_' . (User::$info->time_offset + $modSettings['time_offset']), 'subs/Calendar.subs.php', 'cache_getRecentEvents', array($eventOptions));
+	$return = Cache::instance()->quick_get('calendar_index_offset_' . (User::$info->time_offset + $modSettings['time_offset']), 'subs/Calendar.subs.php', 'cache_getRecentEvents', array($eventOptions));
 
 	if ($output_method !== 'echo')
 	{
@@ -1679,7 +1686,7 @@ function ssi_todaysEvents($output_method = 'echo')
 		'include_events' => true,
 		'num_days_shown' => empty($modSettings['cal_days_for_index']) || $modSettings['cal_days_for_index'] < 1 ? 1 : $modSettings['cal_days_for_index'],
 	);
-	$return = \ElkArte\Cache\Cache::instance()->quick_get('calendar_index_offset_' . (User::$info->time_offset + $modSettings['time_offset']), 'subs/Calendar.subs.php', 'cache_getRecentEvents', array($eventOptions));
+	$return = Cache::instance()->quick_get('calendar_index_offset_' . (User::$info->time_offset + $modSettings['time_offset']), 'subs/Calendar.subs.php', 'cache_getRecentEvents', array($eventOptions));
 
 	if ($output_method !== 'echo')
 	{
@@ -1721,7 +1728,7 @@ function ssi_todaysCalendar($output_method = 'echo')
 		'num_days_shown' => empty($modSettings['cal_days_for_index']) || $modSettings['cal_days_for_index'] < 1 ? 1 : $modSettings['cal_days_for_index'],
 	);
 
-	$return = \ElkArte\Cache\Cache::instance()->quick_get('calendar_index_offset_' . (User::$info->time_offset + $modSettings['time_offset']), 'subs/Calendar.subs.php', 'cache_getRecentEvents', array($eventOptions));
+	$return = Cache::instance()->quick_get('calendar_index_offset_' . (User::$info->time_offset + $modSettings['time_offset']), 'subs/Calendar.subs.php', 'cache_getRecentEvents', array($eventOptions));
 
 	if ($output_method !== 'echo')
 	{
@@ -1857,7 +1864,7 @@ function ssi_boardNews($board = null, $limit = null, $start = null, $length = nu
 	$db->free_result($request);
 
 	// Load the message icons - the usual suspects.
-	$icon_sources = new \ElkArte\MessageTopicIcons(!empty($modSettings['messageIconChecks_enable']), $settings['theme_dir']);
+	$icon_sources = new MessageTopicIcons(!empty($modSettings['messageIconChecks_enable']), $settings['theme_dir']);
 
 	// Find the posts.
 	$indexOptions = array(
@@ -1876,7 +1883,7 @@ function ssi_boardNews($board = null, $limit = null, $start = null, $length = nu
 		return false;
 	}
 
-	$bbc_parser = \BBC\ParserWrapper::instance();
+	$bbc_parser = ParserWrapper::instance();
 
 	$return = array();
 	foreach ($topics_info as $row)

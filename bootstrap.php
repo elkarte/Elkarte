@@ -15,6 +15,7 @@
  */
 
 use ElkArte\Debug;
+use ElkArte\ext\Composer\Autoload\ClassLoader;
 use ElkArte\Hooks;
 use ElkArte\User;
 use ElkArte\TokenHash;
@@ -103,15 +104,15 @@ class Bootstrap
 		// First things first, but not necessarily in that order.
 		if (!defined('ELK'))
 		{
-			define('ELK', '1');
+			DEFINE('ELK', '1');
 		}
-		define('ELKBOOT', '1');
+		DEFINE('ELKBOOT', '1');
 
 		// The software version
-		define('FORUM_VERSION', 'ElkArte 2.0 dev');
+		DEFINE('FORUM_VERSION', 'ElkArte 2.0 dev');
 
 		// Shortcut for the browser cache stale
-		define('CACHE_STALE', '?20dev');
+		DEFINE('CACHE_STALE', '?20dev');
 	}
 
 	/**
@@ -218,15 +219,15 @@ class Bootstrap
 		}
 
 		// Time to forget about variables and go with constants!
-		define('BOARDDIR', $boarddir);
-		define('CACHEDIR', $cachedir);
-		define('EXTDIR', $extdir);
-		define('LANGUAGEDIR', $languagedir);
-		define('SOURCEDIR', $sourcedir);
-		define('ADMINDIR', $sourcedir . '/ElkArte/AdminController');
-		define('CONTROLLERDIR', $sourcedir . '/ElkArte/Controller');
-		define('SUBSDIR', $sourcedir . '/subs');
-		define('ADDONSDIR', $boarddir . '/addons');
+		DEFINE('BOARDDIR', $boarddir);
+		DEFINE('CACHEDIR', $cachedir);
+		DEFINE('EXTDIR', $extdir);
+		DEFINE('LANGUAGEDIR', $languagedir);
+		DEFINE('SOURCEDIR', $sourcedir);
+		DEFINE('ADMINDIR', $sourcedir . '/ElkArte/AdminController');
+		DEFINE('CONTROLLERDIR', $sourcedir . '/ElkArte/Controller');
+		DEFINE('SUBSDIR', $sourcedir . '/subs');
+		DEFINE('ADDONSDIR', $boarddir . '/addons');
 		unset($boarddir, $cachedir, $sourcedir, $languagedir, $extdir);
 	}
 
@@ -252,7 +253,7 @@ class Bootstrap
 	{
 		require_once(EXTDIR . '/ClassLoader.php');
 
-		$loader = new \ElkArte\ext\Composer\Autoload\ClassLoader();
+		$loader = new ClassLoader();
 		$loader->setPsr4('ElkArte\\', SOURCEDIR . '/ElkArte');
 		$loader->setPsr4('BBC\\', SOURCEDIR . '/ElkArte/BBC');
 		$loader->register();
@@ -404,7 +405,7 @@ class Bootstrap
 		if (empty($ssi_guest_access) && empty($modSettings['allow_guestAccess']) && User::$info->is_guest && basename($_SERVER['PHP_SELF']) !== 'SSI.php')
 		{
 			$controller = new Auth(new EventManager());
-			$controller->setUser(\ElkArte\User::$info);
+			$controller->setUser(User::$info);
 			$controller->action_kickguest();
 			obExit(null, true);
 		}

@@ -17,6 +17,11 @@
  */
 
 // Bootstrap the system
+use ElkArte\Controller\ScheduledTasks;
+use ElkArte\EventManager;
+use ElkArte\HttpReq;
+use ElkArte\User;
+
 require_once(dirname(__FILE__) . '/bootstrap.php');
 new Bootstrap(false);
 
@@ -35,7 +40,7 @@ if (isset($_GET['scheduled']))
 		fastcgi_finish_request();
 	}
 
-	$controller = new \ElkArte\Controller\ScheduledTasks(new \ElkArte\EventManager());
+	$controller = new ScheduledTasks(new EventManager());
 	$controller->action_autotask();
 }
 
@@ -83,7 +88,7 @@ function elk_main()
 
 	// A safer way to work with our form globals
 	// @todo Use dependency injection
-	$_req = \ElkArte\HttpReq::instance();
+	$_req = HttpReq::instance();
 
 	// What shall we do?
 	$dispatcher = new ElkArte\SiteDispatcher($_req);
@@ -96,7 +101,7 @@ function elk_main()
 
 		// Load the user's cookie (or set as guest) and load their settings.
 		loadUserSettings();
-		$dispatcher->setUser(\ElkArte\User::$info);
+		$dispatcher->setUser(User::$info);
 
 		// Load the current board's information.
 		loadBoard();

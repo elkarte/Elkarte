@@ -12,6 +12,8 @@
  *
  */
 
+use ElkArte\Util;
+
 /**
  * Template used to manage package servers
  */
@@ -223,7 +225,7 @@ function template_package_list()
 				if ($package['type'] != '')
 				{
 					echo '
-								<li>', $txt['package_type'], ':&nbsp; ', \ElkArte\Util::ucwords(\ElkArte\Util::strtolower($package['type'])), '</li>';
+								<li>', $txt['package_type'], ':&nbsp; ', Util::ucwords(Util::strtolower($package['type'])), '</li>';
 				}
 
 				// Show the version number?

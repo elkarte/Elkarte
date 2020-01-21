@@ -51,7 +51,7 @@ class Memcache extends AbstractCacheMethod
 
 		if ($this->isAvailable())
 		{
-			$this->obj = new \Memcache;
+			$this->obj = new \Memcache();
 			$this->_is_running = $this->addServers();
 		}
 	}

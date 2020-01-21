@@ -20,6 +20,10 @@
  */
 
 // Only do something for a pipe and direct calling
+use ElkArte\Controller\Emailpost;
+use ElkArte\EventManager;
+use ElkArte\User;
+
 if (!defined('STDIN'))
 {
 	return;
@@ -40,8 +44,8 @@ $_SERVER['SERVER_SOFTWARE'] = '';
 $_SERVER['SERVER_NAME'] = '';
 
 // Our mail controller
-$controller = new \ElkArte\Controller\Emailpost(new \ElkArte\EventManager());
-$controller->setUser(\ElkArte\User::$info);
+$controller = new Emailpost(new EventManager());
+$controller->setUser(User::$info);
 $controller->action_pbe_post();
 
 // Always exit as successful

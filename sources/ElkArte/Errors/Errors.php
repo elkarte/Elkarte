@@ -22,6 +22,7 @@ use ElkArte\AbstractModel;
 use ElkArte\Cache\Cache;
 use ElkArte\Exceptions\Exception;
 use ElkArte\Themes\ThemeLoader;
+use ElkArte\User;
 
 /**
  * Class to handle all forum errors and exceptions
@@ -66,7 +67,7 @@ class Errors extends AbstractModel
 	{
 		if (self::$_errors === null)
 		{
-			self::$_errors = function_exists('database') ? new self(database(), \ElkArte\User::$info) : new self(1, null);
+			self::$_errors = function_exists('database') ? new self(database(), User::$info) : new self(1, null);
 		}
 
 		return self::$_errors;

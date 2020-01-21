@@ -16,6 +16,8 @@
 
 namespace BBC;
 
+use ElkArte\TokenHash;
+
 /**
  * Class PreparseCode
  *
@@ -230,7 +232,7 @@ class PreparseCode
 		$parts = preg_split('~(\[/code\]|\[code(?:=[^\]]+)?\])~i', $this->message, -1, PREG_SPLIT_DELIM_CAPTURE);
 
 		// Token generator
-		$tokenizer = new \ElkArte\TokenHash();
+		$tokenizer = new TokenHash();
 
 		foreach ($parts as $i => $part)
 		{

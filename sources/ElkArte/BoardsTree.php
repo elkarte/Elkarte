@@ -19,6 +19,7 @@ namespace ElkArte;
 
 use ElkArte\Cache\Cache;
 use ElkArte\Database\QueryInterface;
+use ElkArte\Exceptions\Exception;
 
 /**
  * Class BoardsTree
@@ -134,7 +135,7 @@ class BoardsTree
 					// Parent doesn't exist!
 					if (!isset($this->boards[$row['id_parent']]['tree']))
 					{
-						throw new \ElkArte\Exceptions\Exception('no_valid_parent', false, array($row['board_name']));
+						throw new Exception('no_valid_parent', false, array($row['board_name']));
 					}
 
 					// Wrong childlevel...we can silently fix this...

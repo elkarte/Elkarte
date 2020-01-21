@@ -13,9 +13,9 @@
 
 global $txt;
 
-define('BOARDDIR', dirname(__FILE__) . '/../..');
-define('CACHEDIR', BOARDDIR . '/cache');
-define('ELK', '1');
+DEFINE('BOARDDIR', dirname(__FILE__) . '/../..');
+DEFINE('CACHEDIR', BOARDDIR . '/cache');
+DEFINE('ELK', '1');
 
 // Lots of needs
 require_once(BOARDDIR . '/sources/Subs.php');

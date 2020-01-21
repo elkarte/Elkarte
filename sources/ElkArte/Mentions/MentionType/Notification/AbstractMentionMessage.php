@@ -106,8 +106,10 @@ abstract class AbstractMentionMessage implements NotificationInterface
 		$inserts = array();
 
 		// $time is not checked because it's useless
-		$request = $this->_db->query('', '
-			SELECT id_member
+		$existing = array();
+		$request = $this->_db->fetchQuery('
+			SELECT 
+				id_member
 			FROM {db_prefix}log_mentions
 			WHERE id_member IN ({array_int:members_to})
 				AND mention_type = {string:type}
@@ -119,13 +121,11 @@ abstract class AbstractMentionMessage implements NotificationInterface
 				'member_from' => $member_from,
 				'target' => $target,
 			)
+		)->fetch_callback(
+			function ($row) use (&$existing) {
+				$existing[] = $row['id_member'];
+			}
 		);
-		$existing = array();
-		while ($row = $this->_db->fetch_assoc($request))
-		{
-			$existing[] = $row['id_member'];
-		}
-		$this->_db->free_result($request);
 
 		$actually_mentioned = array();
 		// If the member has already been mentioned, it's not necessary to do it again

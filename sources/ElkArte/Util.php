@@ -19,7 +19,7 @@ namespace ElkArte;
  */
 class Util
 {
-	static protected $_entity_check_reg = '~(&#(\d{1,7}|x[0-9a-fA-F]{1,6});)~';
+	protected static  $_entity_check_reg = '~(&#(\d{1,7}|x[0-9a-fA-F]{1,6});)~';
 
 	/**
 	 * Converts invalid / disallowed / out of range entities to nulls
