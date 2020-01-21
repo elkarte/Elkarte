@@ -25,22 +25,22 @@ class TestDatabase extends \PHPUnit\Framework\TestCase
 		global $boarddir, $sourcedir;
 		global $ssi_db_user, $ssi_db_passwd;
 
-		DEFINE('ELK', '1');
-		DEFINE('CACHE_STALE', '?R11B2');
+		define('ELK', '1');
+		define('CACHE_STALE', '?R11B2');
 
 		// Get the forum's settings for database and file paths.
 		require_once('/var/www/Settings.php');
 
 		// Set our site "variable" constants
-		DEFINE('BOARDDIR', $boarddir);
-		DEFINE('CACHEDIR', $cachedir);
-		DEFINE('EXTDIR', $extdir);
-		DEFINE('LANGUAGEDIR', $boarddir . '/themes/default/languages');
-		DEFINE('SOURCEDIR', $sourcedir);
-		DEFINE('ADMINDIR', $sourcedir . '/admin');
-		DEFINE('CONTROLLERDIR', $sourcedir . '/controllers');
-		DEFINE('SUBSDIR', $sourcedir . '/subs');
-		DEFINE('ADDONSDIR', $sourcedir . '/addons');
+		define('BOARDDIR', $boarddir);
+		define('CACHEDIR', $cachedir);
+		define('EXTDIR', $extdir);
+		define('LANGUAGEDIR', $boarddir . '/themes/default/languages');
+		define('SOURCEDIR', $sourcedir);
+		define('ADMINDIR', $sourcedir . '/admin');
+		define('CONTROLLERDIR', $sourcedir . '/controllers');
+		define('SUBSDIR', $sourcedir . '/subs');
+		define('ADDONSDIR', $sourcedir . '/addons');
 
 		require_once('/var/www/tests/travis-ci/bootstrap.php');
 	}

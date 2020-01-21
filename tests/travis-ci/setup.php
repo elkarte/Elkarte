@@ -13,9 +13,9 @@
 
 global $txt;
 
-DEFINE('BOARDDIR', dirname(__FILE__) . '/../..');
-DEFINE('CACHEDIR', BOARDDIR . '/cache');
-DEFINE('ELK', '1');
+define('BOARDDIR', dirname(__FILE__) . '/../..');
+define('CACHEDIR', BOARDDIR . '/cache');
+define('ELK', '1');
 
 // Lots of needs
 require_once(BOARDDIR . '/sources/Subs.php');
@@ -233,13 +233,13 @@ Class Elk_Testing_Setup
 		global $ssi_db_user, $scripturl, $ssi_db_passwd, $db_passwd;
 		global $sourcedir, $boarddir;
 
-		DEFINE('SUBSDIR', BOARDDIR . '/sources/subs');
-		DEFINE('EXTDIR', BOARDDIR . '/sources/ext');
-		DEFINE('SOURCEDIR', BOARDDIR . '/sources');
-		DEFINE('LANGUAGEDIR', BOARDDIR . '/themes/default/languages');
-		DEFINE('ADMINDIR', SOURCEDIR . '/admin');
-		DEFINE('CONTROLLERDIR', SOURCEDIR . '/controllers');
-		DEFINE('ADDONSDIR', SOURCEDIR . '/addons');
+		define('SUBSDIR', BOARDDIR . '/sources/subs');
+		define('EXTDIR', BOARDDIR . '/sources/ext');
+		define('SOURCEDIR', BOARDDIR . '/sources');
+		define('LANGUAGEDIR', BOARDDIR . '/themes/default/languages');
+		define('ADMINDIR', SOURCEDIR . '/admin');
+		define('CONTROLLERDIR', SOURCEDIR . '/controllers');
+		define('ADDONSDIR', SOURCEDIR . '/addons');
 
 		require_once(BOARDDIR . '/Settings.php');
 		require_once(SOURCEDIR . '/Subs.php');

@@ -65,7 +65,7 @@ $ssi_on_error_method = false;
 // We are in Elk, but from the side-entrance.
 if (!defined('ELKBOOT'))
 {
-	DEFINE('ELK', 'SSI');
+	define('ELK', 'SSI');
 
 	require_once(dirname(__FILE__) . '/bootstrap.php');
 	$bootstrap = new Bootstrap(true);

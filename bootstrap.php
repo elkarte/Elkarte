@@ -103,15 +103,15 @@ class Bootstrap
 		// First things first, but not necessarily in that order.
 		if (!defined('ELK'))
 		{
-			DEFINE('ELK', '1');
+			define('ELK', '1');
 		}
-		DEFINE('ELKBOOT', '1');
+		define('ELKBOOT', '1');
 
 		// The software version
-		DEFINE('FORUM_VERSION', 'ElkArte 2.0 dev');
+		define('FORUM_VERSION', 'ElkArte 2.0 dev');
 
 		// Shortcut for the browser cache stale
-		DEFINE('CACHE_STALE', '?20dev');
+		define('CACHE_STALE', '?20dev');
 	}
 
 	/**
@@ -218,15 +218,15 @@ class Bootstrap
 		}
 
 		// Time to forget about variables and go with constants!
-		DEFINE('BOARDDIR', $boarddir);
-		DEFINE('CACHEDIR', $cachedir);
-		DEFINE('EXTDIR', $extdir);
-		DEFINE('LANGUAGEDIR', $languagedir);
-		DEFINE('SOURCEDIR', $sourcedir);
-		DEFINE('ADMINDIR', $sourcedir . '/ElkArte/AdminController');
-		DEFINE('CONTROLLERDIR', $sourcedir . '/ElkArte/Controller');
-		DEFINE('SUBSDIR', $sourcedir . '/subs');
-		DEFINE('ADDONSDIR', $boarddir . '/addons');
+		define('BOARDDIR', $boarddir);
+		define('CACHEDIR', $cachedir);
+		define('EXTDIR', $extdir);
+		define('LANGUAGEDIR', $languagedir);
+		define('SOURCEDIR', $sourcedir);
+		define('ADMINDIR', $sourcedir . '/ElkArte/AdminController');
+		define('CONTROLLERDIR', $sourcedir . '/ElkArte/Controller');
+		define('SUBSDIR', $sourcedir . '/subs');
+		define('ADDONSDIR', $boarddir . '/addons');
 		unset($boarddir, $cachedir, $sourcedir, $languagedir, $extdir);
 	}
 

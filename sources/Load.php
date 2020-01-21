@@ -1397,7 +1397,7 @@ function loadDatabase()
 	// @NOTE: I think it is already taken care by the abstraction, it should be possible to remove
 	if ($db->case_sensitive() && !defined('DB_CASE_SENSITIVE'))
 	{
-		DEFINE('DB_CASE_SENSITIVE', '1');
+		define('DB_CASE_SENSITIVE', '1');
 	}
 }
 
