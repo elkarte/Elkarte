@@ -218,7 +218,7 @@ function removeAttachments($condition, $query_type = '', $return_affected_messag
 		WHERE ' . $condition,
 		$query_parameter
 	)->fetch_callback(
-		function ($row) use (&$attach, &$parents, &$msgs, $modSettings, $return_affected_messages) {
+		function ($row) use (&$attach, &$parents, &$msgs, $modSettings, $return_affected_messages, $autoThumbRemoval) {
 			// Figure out the "encrypted" filename and unlink it ;).
 			if ($row['attachment_type'] == 1)
 			{
@@ -1272,7 +1272,7 @@ function list_getAttachDirs()
 			'type' => 1,
 		)
 	)->fetch_callback(
-		function ($row) use (&$expected_files) {
+		function ($row) use (&$expected_files, &$expected_size) {
 			$expected_files[$row['id_folder']] = $row['num_attach'];
 			$expected_size[$row['id_folder']] = $row['size_attach'];
 		}

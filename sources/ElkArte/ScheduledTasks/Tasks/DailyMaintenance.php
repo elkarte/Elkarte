@@ -86,7 +86,7 @@ class DailyMaintenance implements ScheduledTaskInterface
 						'warning' => 'warning',
 					)
 				)->fetch_callback(
-					function ($row) use (&$member_changes) {
+					function ($row) use (&$member_changes, $modSettings, $members) {
 						// More than 24 hours ago?
 						if ($row['last_warning'] <= time() - 86400)
 						{
