@@ -306,7 +306,8 @@ class ModerationCenter extends AbstractController
 			);
 		}
 
-		if (!empty($mod_include_data['current_subsection']) && $mod_include_data['subsections'][$mod_include_data['current_subsection']]['label'] !== $mod_include_data['label'])
+		if (!empty($mod_include_data['current_subsection']) && isset($mod_include_data['subsections'][$mod_include_data['current_subsection']]['label'])
+			&& $mod_include_data['subsections'][$mod_include_data['current_subsection']]['label'] !== $mod_include_data['label'])
 		{
 			$context['linktree'][] = array(
 				'url' => $scripturl . '?action=moderate;area=' . $mod_include_data['current_area'] . ';sa=' . $mod_include_data['current_subsection'],
@@ -336,24 +337,19 @@ class ModerationCenter extends AbstractController
 
 		// Load what blocks the user actually can see...
 		$valid_blocks['p'] = 'notes';
+		$valid_blocks['n'] = 'latestNews';
 
 		if ($context['can_moderate_boards'])
 		{
 			$valid_blocks['a'] = 'actionRequired';
 			$valid_blocks['r'] = 'reportedPosts';
+			$valid_blocks['w'] = 'watchedUsers';
 		}
 
 		if ($context['can_moderate_groups'])
 		{
 			$valid_blocks['g'] = 'groupRequests';
 		}
-
-		if ($context['can_moderate_boards'])
-		{
-			$valid_blocks['w'] = 'watchedUsers';
-		}
-
-		$valid_blocks['n'] = 'latestNews';
 
 		if (empty(User::$settings['mod_prefs']))
 		{

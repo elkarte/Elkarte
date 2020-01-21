@@ -48,9 +48,7 @@ function loadMessageLimit()
 			)
 		)->fetch_callback(
 			function ($row) use (&$message_limit) {
-				list ($maxMessage, $minMessage) = $row;
-
-				$message_limit = $minMessage == 0 ? 0 : $maxMessage;
+				$message_limit = $row['top_limit'] == 0 ? 0 : $row['bottom_limit'];
 			}
 		);
 
