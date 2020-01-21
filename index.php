@@ -100,7 +100,7 @@ function elk_main()
 		securityOptionsHeader();
 
 		// Load the user's cookie (or set as guest) and load their settings.
-		loadUserSettings();
+		User::load(true);
 		$dispatcher->setUser(User::$info);
 
 		// Load the current board's information.

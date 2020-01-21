@@ -378,7 +378,7 @@ class Bootstrap
 		$context['linktree'] = array();
 
 		// Load the user and their cookie, as well as their settings.
-		loadUserSettings();
+		User::load(true);
 
 		// Load the current user's permissions....
 		loadPermissions();
