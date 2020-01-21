@@ -147,6 +147,8 @@ class Questions implements ControlInterface
 
 	/**
 	 * Updates the cache of questions IDs
+	 *
+	 * @throws \Exception
 	 */
 	private function _refreshQuestionsCache()
 	{
@@ -157,18 +159,17 @@ class Questions implements ControlInterface
 
 		if (!$cache->getVar($modSettings['question_id_cache'], 'verificationQuestionIds', 300) || !$modSettings['question_id_cache'])
 		{
-			$request = $db->query('', '
+			$modSettings['question_id_cache'] = array();
+			$db->fetchQuery('
 				SELECT 
 					id_question, language
 				FROM {db_prefix}antispam_questions',
 				array()
+			)->fetch_callback(
+				function ($row) use (&$modSettings) {
+					$modSettings['question_id_cache'][$row['language']][] = $row['id_question'];
+				}
 			);
-			$modSettings['question_id_cache'] = array();
-			while ($row = $db->fetch_assoc($request))
-			{
-				$modSettings['question_id_cache'][$row['language']][] = $row['id_question'];
-			}
-			$db->free_result($request);
 
 			$cache->put('verificationQuestionIds', $modSettings['question_id_cache'], 300);
 		}
@@ -251,6 +252,7 @@ class Questions implements ControlInterface
 	 * Loads all the available antispam questions, or a subset based on a filter
 	 *
 	 * @return array
+	 * @throws \Exception
 	 */
 	private function _loadAntispamQuestions()
 	{
@@ -266,24 +268,23 @@ class Questions implements ControlInterface
 
 		// Load any question and answers!
 		$question_answers = array();
-		$request = $db->query('', '
+		$db->fetchQuery('
 			SELECT 
 				id_question, question, answer, language
 			FROM {db_prefix}antispam_questions' . $condition,
 			array(
 				'current_filter' => $this->_filter['value'],
 			)
+		)->fetch_callback(
+			function ($row) use (&$question_answers) {
+				$question_answers[$row['id_question']] = array(
+					'id_question' => $row['id_question'],
+					'question' => $row['question'],
+					'answer' => Util::unserialize($row['answer']),
+					'language' => $row['language'],
+				);
+			}
 		);
-		while ($row = $db->fetch_assoc($request))
-		{
-			$question_answers[$row['id_question']] = array(
-				'id_question' => $row['id_question'],
-				'question' => $row['question'],
-				'answer' => Util::unserialize($row['answer']),
-				'language' => $row['language'],
-			);
-		}
-		$db->free_result($request);
 
 		return $question_answers;
 	}
@@ -309,7 +310,9 @@ class Questions implements ControlInterface
 	/**
 	 * Checks if an the answers to anti-spam questions are correct
 	 *
+	 * @param array $sessionVal
 	 * @return bool
+	 * @throws \Exception
 	 */
 	private function _verifyAnswers($sessionVal)
 	{
@@ -399,7 +402,10 @@ class Questions implements ControlInterface
 	 * Prepares the questions coming from the UI to be saved into the database.
 	 *
 	 * @param string[] $save_question
-	 * @return bool
+	 * @param string[] $save_answer
+	 * @param string[] $save_language
+	 * @return int
+	 * @throws \Exception
 	 */
 	protected function _saveSettings($save_question, $save_answer, $save_language)
 	{
@@ -463,13 +469,14 @@ class Questions implements ControlInterface
 			$this->_insert($questionInserts);
 		}
 
-		return $count_questions;
+		return (int) $count_questions;
 	}
 
 	/**
 	 * Remove a question by id
 	 *
 	 * @param int $id
+	 * @throws \ElkArte\Exceptions\Exception
 	 */
 	private function _delete($id)
 	{
@@ -491,6 +498,7 @@ class Questions implements ControlInterface
 	 * @param string $question
 	 * @param string[] $answers
 	 * @param string $language
+	 * @throws \ElkArte\Exceptions\Exception
 	 */
 	private function _update($id, $question, $answers, $language)
 	{
@@ -517,6 +525,7 @@ class Questions implements ControlInterface
 	 * Adds the questions to the db
 	 *
 	 * @param mixed[] $questions
+	 * @throws \Exception
 	 */
 	private function _insert($questions)
 	{

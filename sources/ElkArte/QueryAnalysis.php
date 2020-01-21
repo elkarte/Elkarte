@@ -151,20 +151,21 @@ class QueryAnalysis
 	 * Does the EXPLAIN of a query
 	 *
 	 * @return string[] an array with the results of the EXPLAIN with two
-	 *                  possible structures depending if the EXPLAIN is
-	 *                  successful or fails.
-	 *                  If successful:
-	 *                  array(
-	 *                    'headers' => array( ..list of headers.. )
-	 *                    'body' => array(
-	 *                      array( ..cells.. ) // one row
-	 *                    )
-	 *                  )
-	 *                  If th EXPLAIN fails:
-	 *                  array(
-	 *                    'is_error' => true
-	 *                    'error_text' => the error message
-	 *                  )
+	 * possible structures depending if the EXPLAIN is successful or fails.
+	 *  - If successful:
+	 * 	  array(
+	 *		'headers' => array( ..list of headers.. )
+	 * 		'body' => array(
+	 * 			  array( ..cells.. ) // one row
+	 * 		)
+	 * 	  )
+	 *  - If the EXPLAIN fails:
+	 *   array(
+	 * 		'is_error' => true
+	 * 		'error_text' => the error message
+	 * 	 )
+	 *
+	 * @throws \ElkArte\Exceptions\Exception
 	 */
 	public function doExplain()
 	{
@@ -190,14 +191,14 @@ class QueryAnalysis
 		}
 		else
 		{
-			$row = $db->fetch_assoc($result);
+			$row = $result->fetch_assoc();
 			$explain = array(
 				'headers' => array_keys($row),
 				'body' => array()
 			);
 
-			$db->data_seek($result, 0);
-			while ($row = $db->fetch_assoc($result))
+			$result->data_seek(0);
+			while (($row = $result->fetch_assoc()))
 			{
 				$explain['body'][] = $row;
 			}

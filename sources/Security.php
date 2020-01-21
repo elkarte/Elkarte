@@ -284,7 +284,7 @@ function is_not_guest($message = '', $is_fatal = true)
  */
 function is_not_banned($forceCheck = false)
 {
-	global $txt, $modSettings, $context, $cookiename;
+	global $txt, $modSettings, $cookiename;
 
 	$db = database();
 
@@ -698,8 +698,9 @@ function isBannedEmail($email, $restriction, $error)
 	$ban_reason = isset($_SESSION['ban'][$restriction]) ? $_SESSION['ban'][$restriction]['reason'] : '';
 
 	// ...and add to that the email address you're trying to register.
-	$request = $db->query('', '
-		SELECT bi.id_ban, bg.' . $restriction . ', bg.cannot_access, bg.reason
+	$db->fetchQuery('
+		SELECT 
+			bi.id_ban, bg.' . $restriction . ', bg.cannot_access, bg.reason
 		FROM {db_prefix}ban_items AS bi
 			INNER JOIN {db_prefix}ban_groups AS bg ON (bg.id_ban_group = bi.id_ban_group)
 		WHERE {string:email} LIKE bi.email_address
@@ -710,21 +711,21 @@ function isBannedEmail($email, $restriction, $error)
 			'cannot_access' => 1,
 			'now' => time(),
 		)
+	)->fetch_callback(
+		function ($row) use (&$ban_ids, &$ban_reason, $restriction) {
+			if (!empty($row['cannot_access']))
+			{
+				$_SESSION['ban']['cannot_access']['ids'][] = $row['id_ban'];
+				$_SESSION['ban']['cannot_access']['reason'] = $row['reason'];
+			}
+
+			if (!empty($row[$restriction]))
+			{
+				$ban_ids[] = $row['id_ban'];
+				$ban_reason = $row['reason'];
+			}
+		}
 	);
-	while ($row = $db->fetch_assoc($request))
-	{
-		if (!empty($row['cannot_access']))
-		{
-			$_SESSION['ban']['cannot_access']['ids'][] = $row['id_ban'];
-			$_SESSION['ban']['cannot_access']['reason'] = $row['reason'];
-		}
-		if (!empty($row[$restriction]))
-		{
-			$ban_ids[] = $row['id_ban'];
-			$ban_reason = $row['reason'];
-		}
-	}
-	$db->free_result($request);
 
 	// You're in biiig trouble.  Banned for the rest of this session!
 	if (isset($_SESSION['ban']['cannot_access']))
@@ -1210,17 +1211,17 @@ function allowedTo($permission, $boards = null)
 	);
 
 	// Make sure they can do it on all of the boards.
-	if ($db->num_rows($request) != count($boards))
+	if ($request->num_rows() != count($boards))
 	{
 		return false;
 	}
 
 	$result = true;
-	while ($row = $db->fetch_assoc($request))
+	while (($row = $request->fetch_assoc()))
 	{
 		$result &= !empty($row['add_deny']);
 	}
-	$db->free_result($request);
+	$request->free_result();
 
 	// If the query returned 1, they can do it... otherwise, they can't.
 	return (bool) $result;
@@ -1342,7 +1343,9 @@ function boardsAllowedTo($permissions, $check_access = true, $simple = true)
 	// All groups the user is in except 'moderator'.
 	$groups = array_diff(User::$info->groups, array(3));
 
-	$request = $db->query('', '
+	$boards = array();
+	$deny_boards = array();
+	$db->fetchQuery('
 		SELECT 
 			b.id_board, bp.add_deny' . ($simple ? '' : ', bp.permission') . '
 		FROM {db_prefix}board_permissions AS bp
@@ -1358,32 +1361,29 @@ function boardsAllowedTo($permissions, $check_access = true, $simple = true)
 			'moderator_group' => 3,
 			'permissions' => $permissions,
 		)
-	);
-	$boards = array();
-	$deny_boards = array();
-	while ($row = $db->fetch_assoc($request))
-	{
-		if ($simple)
-		{
-			if (empty($row['add_deny']))
+	)->fetch_callback(
+		function ($row) use ($simple, &$deny_boards, &$boards) {
+			if ($simple)
 			{
-				$deny_boards[] = $row['id_board'];
+				if (empty($row['add_deny']))
+				{
+					$deny_boards[] = $row['id_board'];
+				}
+				else
+				{
+					$boards[] = $row['id_board'];
+				}
+			}
+			elseif (empty($row['add_deny']))
+			{
+				$deny_boards[$row['permission']][] = $row['id_board'];
 			}
 			else
 			{
-				$boards[] = $row['id_board'];
+				$boards[$row['permission']][] = $row['id_board'];
 			}
 		}
-		elseif (empty($row['add_deny']))
-		{
-			$deny_boards[$row['permission']][] = $row['id_board'];
-		}
-		else
-		{
-			$boards[$row['permission']][] = $row['id_board'];
-		}
-	}
-	$db->free_result($request);
+	);
 
 	if ($simple)
 	{
@@ -1427,6 +1427,7 @@ function boardsAllowedTo($permissions, $check_access = true, $simple = true)
  * @param int $userProfile_id
  *
  * @return string (yes, yes_permission_override, no_through_forum, no)
+ * @throws \ElkArte\Exceptions\Exception
  */
 function showEmailAddress($userProfile_hideEmail, $userProfile_id)
 {
@@ -1437,7 +1438,6 @@ function showEmailAddress($userProfile_hideEmail, $userProfile_id)
 	// If you're a moderator with sufficient permissions: yes_permission_override.
 	// If the user has set their profile to do not email me: no.
 	// Otherwise: no_through_forum. (don't show it but allow emailing the member)
-
 	if (User::$info->is_guest || isset($_SESSION['ban']['cannot_post']))
 	{
 		return 'no';
@@ -1518,7 +1518,7 @@ function spamProtection($error_type, $fatal = true)
 	);
 
 	// Add a new entry, deleting the old if necessary.
-	$db->insert('replace',
+	$request = $db->insert('replace',
 		'{db_prefix}log_floodcontrol',
 		array('ip' => 'string-16', 'log_time' => 'int', 'log_type' => 'string'),
 		array(User::$info->ip, time(), $error_type),
@@ -1526,7 +1526,7 @@ function spamProtection($error_type, $fatal = true)
 	);
 
 	// If affected is 0 or 2, it was there already.
-	if ($db->affected_rows() != 1)
+	if ($request->affected_rows() != 1)
 	{
 		// Spammer!  You only have to wait a *few* seconds!
 		if ($fatal)

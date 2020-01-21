@@ -130,6 +130,7 @@ class ApprovalNotification implements ScheduledTaskInterface
 
 		// Grab the moderators if they have permission!
 		$mods = array();
+		$membersQuery = array();
 		$members = array();
 		if (in_array(2, $addGroups))
 		{
@@ -137,7 +138,7 @@ class ApprovalNotification implements ScheduledTaskInterface
 			$all_mods = allBoardModerators(true);
 
 			// Make sure they get included in the big loop.
-			$members = array_keys($all_mods);
+			$membersQuery = array_keys($all_mods);
 			foreach ($all_mods as $rows)
 			{
 				foreach ($rows as $row)
@@ -148,8 +149,7 @@ class ApprovalNotification implements ScheduledTaskInterface
 		}
 
 		// Come along one and all... until we reject you ;)
-		$members = array();
-		$request = $db->query('', '
+		$db->query('', '
 			SELECT 
 				id_member, real_name, email_address, lngfile, id_group, additional_groups, mod_prefs
 			FROM {db_prefix}members
@@ -159,7 +159,7 @@ class ApprovalNotification implements ScheduledTaskInterface
 			ORDER BY lngfile',
 			array(
 				'additional_group_list' => $addGroups,
-				'member_list' => $members,
+				'member_list' => $membersQuery,
 				'additional_group_list_implode' => implode(', additional_groups) != 0 OR FIND_IN_SET(', $addGroups),
 			)
 		)->fetch_callback(

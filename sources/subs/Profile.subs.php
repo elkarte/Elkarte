@@ -1968,7 +1968,7 @@ function profileSendActivation()
 		$_COOKIE[$cookiename] = '';
 	}
 
-	loadUserSettings();
+	User::load(true);
 
 	User::$info['is_logged'] = $context['user']['is_logged'] = false;
 	User::$info['is_guest'] = $context['user']['is_guest'] = true;
@@ -2234,7 +2234,7 @@ function profileReloadUser()
 		setLoginCookie(60 * $modSettings['cookieTime'], $context['id_member'], hash('sha256', Util::strtolower($cur_profile['member_name']) . un_htmlspecialchars($_POST['passwrd2']) . $cur_profile['password_salt']));
 	}
 
-	loadUserSettings();
+	User::load(true);
 	writeLog();
 }
 

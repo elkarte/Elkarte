@@ -75,7 +75,9 @@ class UserAccessMentions implements ScheduledTaskInterface
 					while (true)
 					{
 						// Find all the mentions that this user can or cannot see
-						$request = $db->query('', '
+						$mentions = array();
+						$remove = array();
+						$db->fetchQuery('
 							SELECT 
 								mnt.id_mention, m.id_board
 							FROM {db_prefix}log_mentions as mnt
@@ -92,22 +94,18 @@ class UserAccessMentions implements ScheduledTaskInterface
 								'start' => $start,
 								'limit' => $limit,
 							)
+						)->fetch_callback(
+							function ($row) use (&$remove, &$mentions) {
+								if (empty($row['id_board']))
+								{
+									$remove[] = $row['id_mention'];
+								}
+								else
+								{
+									$mentions[] = $row['id_mention'];
+								}
+							}
 						);
-
-						$mentions = array();
-						$remove = array();
-						while ($row = $db->fetch_assoc($request))
-						{
-							if (empty($row['id_board']))
-							{
-								$remove[] = $row['id_mention'];
-							}
-							else
-							{
-								$mentions[] = $row['id_mention'];
-							}
-						}
-						$db->free_result($request);
 
 						if (!empty($remove))
 						{
@@ -172,8 +170,8 @@ class UserAccessMentions implements ScheduledTaskInterface
 					'mention_types' => array('mentionmem', 'likemsg', 'rlikemsg'),
 				)
 			);
-			list ($remaining) = $db->fetch_row($request);
-			$db->free_result($request);
+			list ($remaining) = $request->fetch_row();
+			$request->free_result();
 
 			if ($remaining == 0)
 			{
@@ -198,7 +196,7 @@ class UserAccessMentions implements ScheduledTaskInterface
 			// Remember where we are
 			updateSettings(array('mentions_member_check' => $current_check + $limit));
 
-			while ($row = $db->fetch_assoc($request))
+			while (($row = $request->fetch_assoc()))
 			{
 				// Rebuild 'query_see_board', a lot of code duplication... :(
 				$user_see_board = memberQuerySeeBoard($row['id_member']);
@@ -223,7 +221,7 @@ class UserAccessMentions implements ScheduledTaskInterface
 				);
 
 				// One row of results is enough: scheduleTaskImmediate!
-				if ($db->num_rows($request2) == 1)
+				if ($request2->num_rows() == 1)
 				{
 					if (!empty($modSettings['user_access_mentions']))
 					{
@@ -242,9 +240,9 @@ class UserAccessMentions implements ScheduledTaskInterface
 						scheduleTaskImmediate('user_access_mentions');
 					}
 				}
-				$db->free_result($request2);
+				$request2->free_result();
 			}
-			$db->free_result($request);
+			$request->free_result();
 
 			return true;
 		}

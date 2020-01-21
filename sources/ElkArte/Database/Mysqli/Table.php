@@ -309,7 +309,7 @@ class Table extends AbstractTable
 			)
 		);
 		$indexes = array();
-		while ($row = $this->_db->fetch_assoc($result))
+		while (($row = $result->fetch_assoc()))
 		{
 			if (!$detail)
 			{
@@ -356,7 +356,7 @@ class Table extends AbstractTable
 				}
 			}
 		}
-		$this->_db->free_result($result);
+		$result->free_result();
 
 		return $indexes;
 	}
@@ -426,7 +426,7 @@ class Table extends AbstractTable
 			)
 		);
 		$columns = array();
-		while ($row = $this->_db->fetch_assoc($result))
+		while (($row = $result->fetch_assoc()))
 		{
 			if (!$detail)
 			{
@@ -469,7 +469,7 @@ class Table extends AbstractTable
 				}
 			}
 		}
-		$this->_db->free_result($result);
+		$result->free_result();
 
 		return $columns;
 	}
@@ -482,14 +482,14 @@ class Table extends AbstractTable
 		$table = str_replace('{db_prefix}', $this->_db_prefix, $table);
 
 		// Get how much overhead there is.
-		$request = $this->_db->query('', '
+		$request = $this->_db->fetchQuery('
 			SHOW TABLE STATUS LIKE {string:table_name}',
 			array(
 				'table_name' => str_replace('_', '\_', $table),
 			)
 		);
-		$row = $this->_db->fetch_assoc($request);
-		$this->_db->free_result($request);
+		$row = $request->fetch_assoc($request);
+		$request->free_result();
 
 		$data_before = isset($row['Data_free']) ? $row['Data_free'] : 0;
 		$request = $this->_db->query('', '
@@ -504,14 +504,14 @@ class Table extends AbstractTable
 		}
 
 		// How much left?
-		$request = $this->_db->query('', '
+		$request = $this->_db->fetchQuery('
 			SHOW TABLE STATUS LIKE {string:table}',
 			array(
 				'table' => str_replace('_', '\_', $table),
 			)
 		);
-		$row = $this->_db->fetch_assoc($request);
-		$this->_db->free_result($request);
+		$row = $request->fetch_assoc();
+		$request->free_result();
 
 		return isset($row['Data_free']) && $data_before > $row['Data_free'] ? $data_before / 1024 : 0;
 	}

@@ -250,11 +250,9 @@ class HttpReq
 	{
 		switch (true)
 		{
-			case isset($this->_param[$key]):
-				return true;
-			case isset($this->query->{$key}):
-				return true;
 			case isset($this->post->{$key}):
+			case isset($this->query->{$key}):
+			case isset($this->_param[$key]):
 				return true;
 			default:
 				return false;

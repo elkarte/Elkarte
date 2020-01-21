@@ -51,8 +51,8 @@ class AutoOptimize implements ScheduledTaskInterface
 				FROM {db_prefix}log_online',
 				array()
 			);
-			list ($dont_do_it) = $db->fetch_row($request);
-			$db->free_result($request);
+			list ($dont_do_it) = $request->fetch_row();
+			$request->free_result();
 
 			if ($dont_do_it > $modSettings['autoOptMaxOnline'])
 			{

@@ -78,6 +78,7 @@ class Recent
 	 * Constructor
 	 *
 	 * @param int $user - ID of the user
+	 * @throws \Exception
 	 */
 	public function __construct($user)
 	{
@@ -171,7 +172,7 @@ class Recent
 		{
 			// Find the 10 most recent messages they can *view*.
 			// @todo SLOW This query is really slow still, probably?
-			$request = $this->_db->query('', '
+			$request = $this->_db->fetchQuery('
 				SELECT 
 					m.id_msg
 				FROM {db_prefix}messages AS m
@@ -189,9 +190,9 @@ class Recent
 				))
 			);
 			// If we don't have 10 results, try again with an unoptimized version covering all rows, and cache the result.
-			if (isset($this->_query_parameters['max_id_msg']) && $this->_db->num_rows($request) < $limit)
+			if (isset($this->_query_parameters['max_id_msg']) && $request->num_rows() < $limit)
 			{
-				$this->_db->free_result($request);
+				$request->free_result();
 				$this->_query_this_board = str_replace('AND m.id_msg >= {int:max_id_msg}', '', $this->_query_this_board);
 				$this->_cache_results = true;
 				unset($this->_query_parameters['max_id_msg']);
@@ -202,11 +203,11 @@ class Recent
 			}
 		}
 		$this->_messages = array();
-		while ($row = $this->_db->fetch_assoc($request))
+		while (($row = $request->fetch_assoc()))
 		{
 			$this->_messages[] = $row['id_msg'];
 		}
-		$this->_db->free_result($request);
+		$request->free_result();
 	}
 
 	/**
@@ -214,20 +215,21 @@ class Recent
 	 *
 	 * @param int $start - position to start the query
 	 * @param array $permissions - An array of boards permissions the members have.
-	 *                 Used to define the buttons a member can see next to a message.
-	 *                 Format of the array is:
-	 *                 array(
-	 *                   'own' => array(
-	 *                     'permission_name' => 'test_name'
-	 *                     ...
-	 *                   ),
-	 *                   'any' => array(
-	 *                     'permission_name' => 'test_name'
-	 *                     ...
-	 *                   )
-	 *                 )
+	 * Used to define the buttons a member can see next to a message.
+	 * Format of the array is:
+	 * array(
+	 *  	'own' => array(
+	 *  		'permission_name' => 'test_name'
+	 *     		 ...
+	 *       ),
+	 *       'any' => array(
+	 *       	'permission_name' => 'test_name'
+	 *           ...
+	 *       )
+	 *  )
 	 *
 	 * @return array
+	 * @throws \ElkArte\Exceptions\Exception
 	 */
 	public function getRecentPosts($start, $permissions)
 	{
@@ -289,7 +291,8 @@ class Recent
 	private function _getRecentPosts($start)
 	{
 		// Get all the most recent posts.
-		$request = $this->_db->query('', '
+		$returns = array();
+		$this->_db->fetchQuery('
 			SELECT
 				m.id_msg, m.subject, m.smileys_enabled, m.poster_time, m.body, m.id_topic, t.id_board, b.id_cat,
 				b.name AS bname, c.name AS cname, t.num_replies, m.id_member, m2.id_member AS first_id_member,
@@ -308,13 +311,11 @@ class Recent
 			array(
 				'message_list' => $this->_messages,
 			)
+		)->fetch_callback(
+			function ($row) use (&$returns) {
+				$returns[] = $row;
+			}
 		);
-		$returns = array();
-		while ($row = $this->_db->fetch_assoc($request))
-		{
-			$returns[] = $row;
-		}
-		$this->_db->free_result($request);
 
 		list ($this->_posts, $this->_board_ids) = prepareRecentPosts($returns, $start);
 	}

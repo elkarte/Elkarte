@@ -96,7 +96,7 @@ function template_folder()
 
 	// Do we have some messages to display?
 	$controller = $context['get_pmessage'][0];
-	while ($message = $controller->{$context['get_pmessage'][1]}($reset))
+	while (($message = $controller->{$context['get_pmessage'][1]}($reset)))
 	{
 		$reset = false;
 
@@ -476,7 +476,7 @@ function template_subject_list()
 
 	// Use the query callback to get the subject list
 	$controller = $context['get_psubject'][0];
-	while ($message = $controller->{$context['get_psubject'][1]}())
+	while (($message = $controller->{$context['get_psubject'][1]}()))
 	{
 		$discussion_url = $context['display_mode'] == 0 || $context['current_pm'] == $message['id'] ? '' : ($scripturl . '?action=pm;pmid=' . $message['id'] . ';kstart;f=' . $context['folder'] . ';start=' . $context['start'] . ';sort=' . $context['sort_by'] . ($context['sort_direction'] == 'up' ? ';asc' : ';desc') . ($context['current_label_id'] != -1 ? ';l=' . $context['current_label_id'] : ''));
 

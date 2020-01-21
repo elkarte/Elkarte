@@ -23,7 +23,7 @@ class RemoveOldFollowups implements ScheduledTaskInterface
 	/**
 	 * Remove followups that point to removed topics
 	 *
-	 * @return bool
+	 * @throws \ElkArte\Exceptions\Exception
 	 */
 	public function run()
 	{
@@ -37,7 +37,8 @@ class RemoveOldFollowups implements ScheduledTaskInterface
 		$db = database();
 
 		// The old FU request :P
-		$request = $db->query('', '
+		$remove = array();
+		$db->fetchQuery('
 			SELECT 
 				fu.derived_from
 			FROM {db_prefix}follow_ups AS fu
@@ -47,13 +48,11 @@ class RemoveOldFollowups implements ScheduledTaskInterface
 			array(
 				'limit' => 100,
 			)
+		)->fetch_callback(
+			function ($row) use (&$remove) {
+				$remove[] = $row['derived_from'];
+			}
 		);
-		$remove = array();
-		while ($row = $db->fetch_assoc($request))
-		{
-			$remove[] = $row['derived_from'];
-		}
-		$db->free_result($request);
 
 		if (empty($remove))
 		{

@@ -147,7 +147,7 @@ function DumpDatabase2()
 		$close_table = false;
 
 		// Are there any rows in this table?
-		while ($get_rows = $database->insert_sql($tableName, $first_round))
+		while (($get_rows = $database->insert_sql($tableName, $first_round)))
 		{
 			if (empty($get_rows))
 			{

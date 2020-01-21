@@ -260,7 +260,7 @@ class Sphinxql extends AbstractAPI
 
 			if (mysqli_num_rows($request) !== 0)
 			{
-				while ($match = mysqli_fetch_assoc($request))
+				while (($match = mysqli_fetch_assoc($request)))
 				{
 					if (empty($this->_searchParams->topic))
 					{

@@ -723,7 +723,7 @@ function pc_next_permutation($p, $size)
  */
 function redirectexit($setLocation = '', $refresh = false)
 {
-	global $scripturl, $context, $modSettings, $db_show_debug;
+	global $scripturl, $context, $db_show_debug;
 
 	// In case we have mail to send, better do that - as obExit doesn't always quite make it...
 	if (!empty($context['flush_mail']))
@@ -1569,13 +1569,10 @@ function prepareSearchEngines()
  */
 function currentContext($messages_request, $reset = false)
 {
-	// Can't work with a database without a database :P
-	$db = database();
-
 	// Start from the beginning...
 	if ($reset)
 	{
-		return $db->data_seek($messages_request, 0);
+		return $messages_request->data_seek(0);
 	}
 
 	// If the query has already returned false, get out of here
@@ -1585,10 +1582,10 @@ function currentContext($messages_request, $reset = false)
 	}
 
 	// Attempt to get the next message.
-	$message = $db->fetch_assoc($messages_request);
+	$message = $messages_request->fetch_assoc();
 	if (!$message)
 	{
-		$db->free_result($messages_request);
+		$messages_request->free_result();
 
 		return false;
 	}

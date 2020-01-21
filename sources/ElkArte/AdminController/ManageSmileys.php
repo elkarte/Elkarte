@@ -494,7 +494,7 @@ class ManageSmileys extends AbstractController
 
 		$smileys = array();
 		$dir = dir($modSettings['smileys_dir'] . '/' . $smileyPath);
-		while ($entry = $dir->read())
+		while (($entry = $dir->read()))
 		{
 			if (in_array(strrchr($entry, '.'), array('.jpg', '.gif', '.jpeg', '.png')))
 			{
@@ -894,7 +894,7 @@ class ManageSmileys extends AbstractController
 				}
 
 				$dir = dir($context['smileys_dir'] . '/' . un_htmlspecialchars($smiley_set['path']));
-				while ($entry = $dir->read())
+				while (($entry = $dir->read()))
 				{
 					if (!in_array($entry, $context['filenames']) && in_array(strrchr($entry, '.'), array('.jpg', '.gif', '.jpeg', '.png')))
 					{
@@ -1286,7 +1286,7 @@ class ManageSmileys extends AbstractController
 					}
 
 					$dir = dir($context['smileys_dir'] . '/' . un_htmlspecialchars($smiley_set['path']));
-					while ($entry = $dir->read())
+					while (($entry = $dir->read()))
 					{
 						if (!in_array($entry, $context['filenames']) && in_array(strrchr($entry, '.'), array('.jpg', '.gif', '.jpeg', '.png')))
 						{

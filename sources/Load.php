@@ -62,7 +62,7 @@ function reloadSettings()
 		{
 			\ElkArte\Errors\Errors::instance()->display_db_error();
 		}
-		while ($row = $request->fetch_row())
+		while (($row = $request->fetch_row()))
 		{
 			$modSettings[$row[0]] = $row[1];
 		}
@@ -308,9 +308,9 @@ function loadBoard()
 			)
 		);
 		// If there aren't any, skip.
-		if ($db->num_rows($request) > 0)
+		if ($request->num_rows() > 0)
 		{
-			$row = $db->fetch_assoc($request);
+			$row = $request->fetch_assoc();
 
 			// Set the current board.
 			if (!empty($row['id_board']))
@@ -362,14 +362,14 @@ function loadBoard()
 						'link' => '<a href="' . $scripturl . '?action=profile;u=' . $row['id_moderator'] . '">' . $row['real_name'] . '</a>'
 					);
 				}
-			} while ($row = $db->fetch_assoc($request));
+			} while (($row = $request->fetch_assoc()));
 
 			// If the board only contains unapproved posts and the user can't approve then they can't see any topics.
 			// If that is the case do an additional check to see if they have any topics waiting to be approved.
 			if ($board_info['num_topics'] == 0 && $modSettings['postmod_active'] && !allowedTo('approve_posts'))
 			{
 				// Free the previous result
-				$db->free_result($request);
+				$request->free_result();
 
 				// @todo why is this using id_topic?
 				// @todo Can this get cached?
@@ -386,7 +386,7 @@ function loadBoard()
 					)
 				);
 
-				list ($board_info['unapproved_user_topics']) = $db->fetch_row($request);
+				list ($board_info['unapproved_user_topics']) = $request->fetch_row();
 			}
 
 			if ($cache->isEnabled() && (empty($topic) || $cache->levelHigherThan(2)))
@@ -410,7 +410,7 @@ function loadBoard()
 			$topic = null;
 			$board = 0;
 		}
-		$db->free_result($request);
+		$request->free_result();
 	}
 
 	if (!empty($topic))
@@ -578,7 +578,7 @@ function loadPermissions()
 			)
 		);
 		$permissions = [];
-		while ($row = $db->fetch_assoc($request))
+		while (($row = $request->fetch_assoc()))
 		{
 			if (empty($row['add_deny']))
 			{
@@ -590,7 +590,7 @@ function loadPermissions()
 			}
 		}
 		User::$info->permissions = $permissions;
-		$db->free_result($request);
+		$request->free_result();
 
 		if (isset($cache_key))
 		{
@@ -608,7 +608,7 @@ function loadPermissions()
 		}
 
 		$permissions = [];
-		$request = $db->query('', '
+		$db->fetchQuery('
 			SELECT
 				permission, add_deny
 			FROM {db_prefix}board_permissions
@@ -620,20 +620,20 @@ function loadPermissions()
 				'id_profile' => $board_info['profile'],
 				'spider_group' => !empty($modSettings['spider_group']) && $modSettings['spider_group'] != 1 ? $modSettings['spider_group'] : 0,
 			)
+		)->fetch_callback(
+			function ($row) use (&$removals, &$permissions) {
+				if (empty($row['add_deny']))
+				{
+					$removals[] = $row['permission'];
+				}
+				else
+				{
+					$permissions[] = $row['permission'];
+				}
+			}
 		);
-		while ($row = $db->fetch_assoc($request))
-		{
-			if (empty($row['add_deny']))
-			{
-				$removals[] = $row['permission'];
-			}
-			else
-			{
-				$permissions[] = $row['permission'];
-			}
-		}
+
 		User::$info->permissions = $permissions;
-		$db->free_result($request);
 	}
 
 	// Remove all the permissions they shouldn't have ;).
@@ -1242,11 +1242,11 @@ function getBoardParents($id_parent)
 				)
 			);
 			// In the EXTREMELY unlikely event this happens, give an error message.
-			if ($db->num_rows($result) == 0)
+			if ($result->num_rows() == 0)
 			{
 				throw new \ElkArte\Exceptions\Exception('parent_not_found', 'critical');
 			}
-			while ($row = $db->fetch_assoc($result))
+			while (($row = $result->fetch_assoc()))
 			{
 				if (!isset($boards[$row['id_board']]))
 				{
@@ -1273,7 +1273,7 @@ function getBoardParents($id_parent)
 					}
 				}
 			}
-			$db->free_result($result);
+			$result->free_result();
 		}
 
 		$cache->put('board_parents-' . $original_parent, $boards, 480);
@@ -1330,7 +1330,7 @@ function getLanguages($use_cache = true)
 			}
 
 			$dir = dir($language_dir);
-			while ($entry = $dir->read())
+			while (($entry = $dir->read()))
 			{
 				// Only directories are interesting
 				if ($entry == '..' || !is_dir($dir->path . '/' . $entry))
@@ -1340,7 +1340,7 @@ function getLanguages($use_cache = true)
 
 				// @todo at some point we may want to simplify that stuff (I mean scanning all the files just for index)
 				$file_dir = dir($dir->path . '/' . $entry);
-				while ($file_entry = $file_dir->read())
+				while (($file_entry = $file_dir->read()))
 				{
 					// Look for the index language file....
 					if (!preg_match('~^index\.(.+)\.php$~', $file_entry, $matches))

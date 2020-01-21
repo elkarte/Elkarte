@@ -252,7 +252,7 @@ class MemberLoader
 		);
 
 		$new_loaded_ids = array();
-		while ($row = $request->fetch_assoc())
+		while (($row = $request->fetch_assoc()))
 		{
 			$new_loaded_ids[] = $row['id_member'];
 			$this->loaded_ids[] = $row['id_member'];
@@ -297,7 +297,7 @@ class MemberLoader
 			)
 		);
 		$data = [];
-		while ($row = $request->fetch_assoc())
+		while (($row = $request->fetch_assoc()))
 		{
 			if (!empty($row['field_options']))
 			{

@@ -204,7 +204,7 @@ function template_error_log()
  */
 function template_show_file()
 {
-	global $context, $settings;
+	global $context;
 
 	echo '<!DOCTYPE html>
 <html ', $context['right_to_left'] ? 'dir="rtl"' : '', '>

@@ -477,8 +477,8 @@ class Query extends AbstractQuery
 			SELECT VERSION()',
 			array()
 		);
-		list ($ver) = $this->fetch_row($request);
-		$this->free_result($request);
+		list ($ver) = $request->fetch_row();
+		$request->free_result();
 
 		return $ver;
 	}
@@ -627,8 +627,8 @@ class Query extends AbstractQuery
 			SELECT VERSION()',
 			array()
 		);
-		list ($ver) = $this->fetch_row($request);
-		$this->free_result($request);
+		list ($ver) = $request->fetch_row();
+		$request->free_result();
 
 		return $ver;
 	}

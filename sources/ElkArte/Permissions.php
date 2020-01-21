@@ -138,6 +138,7 @@ class Permissions
 	 * @param string[] $permissions
 	 * @param string[] $where
 	 * @param mixed[] $where_parameters = array() or values used in the where statement
+	 * @throws \ElkArte\Exceptions\Exception
 	 */
 	public function deletePermissions($permissions, $where = array(), $where_parameters = array())
 	{
@@ -163,6 +164,7 @@ class Permissions
 	 * @param int|null $profile = null an int or null for the customized profile, if any
 	 *
 	 * @return bool
+	 * @throws \ElkArte\Exceptions\Exception
 	 */
 	public function updateChild($parents, $profile = null)
 	{
@@ -173,8 +175,11 @@ class Permissions
 		}
 
 		// Find all the children of this group.
-		$request = $this->db->query('', '
-			SELECT id_parent, id_group
+		$children = array();
+		$child_groups = array();
+		$this->db->fetchQuery('
+			SELECT 
+				id_parent, id_group
 			FROM {db_prefix}membergroups
 			WHERE id_parent != {int:not_inherited}
 				' . (empty($parents) ? '' : 'AND id_parent IN ({array_int:parent_list})'),
@@ -182,17 +187,13 @@ class Permissions
 				'parent_list' => $parents,
 				'not_inherited' => -2,
 			)
+		)->fetch_callback(
+			function ($row) use (&$children, &$child_groups, &$parents) {
+				$children[$row['id_parent']][] = $row['id_group'];
+				$child_groups[] = $row['id_group'];
+				$parents[] = $row['id_parent'];
+			}
 		);
-		$children = array();
-		$parents = array();
-		$child_groups = array();
-		while ($row = $this->db->fetch_assoc($request))
-		{
-			$children[$row['id_parent']][] = $row['id_group'];
-			$child_groups[] = $row['id_group'];
-			$parents[] = $row['id_parent'];
-		}
-		$this->db->free_result($request);
 
 		$parents = array_unique($parents);
 
@@ -209,27 +210,26 @@ class Permissions
 		if ($profile < 1 || $profile === null)
 		{
 			// Fetch all the parent permissions.
-			$request = $this->db->query('', '
+			$permissions = array();
+			$this->db->fetchQuery('
 				SELECT id_group, permission, add_deny
 				FROM {db_prefix}permissions
 				WHERE id_group IN ({array_int:parent_list})',
 				array(
 					'parent_list' => $parents,
 				)
-			);
-			$permissions = array();
-			while ($row = $this->db->fetch_assoc($request))
-			{
-				foreach ($children[$row['id_group']] as $child)
-				{
-					$permissions[] = array(
-						'id_group' => (int) $child,
-						'permission' => $row['permission'],
-						'add_deny' => $row['add_deny'],
-					);
+			)->fetch_callback(
+				function ($row) use ($children, &$permissions) {
+					foreach ($children[$row['id_group']] as $child)
+					{
+						$permissions[] = array(
+							'id_group' => (int) $child,
+							'permission' => $row['permission'],
+							'add_deny' => $row['add_deny'],
+						);
+					}
 				}
-			}
-			$this->db->free_result($request);
+			);
 
 			$this->db->query('', '
 				DELETE FROM {db_prefix}permissions
@@ -252,8 +252,10 @@ class Permissions
 			$profileQuery = $profile === null ? '' : ' AND id_profile = {int:current_profile}';
 
 			// Again, get all the parent permissions.
-			$request = $this->db->query('', '
-				SELECT id_profile, id_group, permission, add_deny
+			$permissions = array();
+			$this->db->fetchQuery('
+				SELECT 
+					id_profile, id_group, permission, add_deny
 				FROM {db_prefix}board_permissions
 				WHERE id_group IN ({array_int:parent_groups})
 					' . $profileQuery,
@@ -261,16 +263,14 @@ class Permissions
 					'parent_groups' => $parents,
 					'current_profile' => $profile !== null && $profile ? $profile : 1,
 				)
-			);
-			$permissions = array();
-			while ($row = $this->db->fetch_assoc($request))
-			{
-				foreach ($children[$row['id_group']] as $child)
-				{
-					$permissions[] = array($row['permission'], $child, $row['add_deny'], $row['id_profile']);
+			)->fetch_callback(
+				function ($row) use (&$permissions, $children) {
+					foreach ($children[$row['id_group']] as $child)
+					{
+						$permissions[] = array($row['permission'], $child, $row['add_deny'], $row['id_profile']);
+					}
 				}
-			}
-			$this->db->free_result($request);
+			);
 
 			$this->db->query('', '
 				DELETE FROM {db_prefix}board_permissions

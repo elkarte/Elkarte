@@ -40,7 +40,8 @@ class Dump extends AbstractDump
 
 		// Find all the fields.
 		$result = $this->_db->query('', '
-			SELECT column_name, column_default, is_nullable, data_type, character_maximum_length
+			SELECT 
+				column_name, column_default, is_nullable, data_type, character_maximum_length
 			FROM information_schema.columns
 			WHERE table_name = {string:table}
 			ORDER BY ordinal_position',
@@ -48,7 +49,7 @@ class Dump extends AbstractDump
 				'table' => $tableName,
 			)
 		);
-		while ($row = $result->fetch_assoc())
+		while (($row = $result->fetch_assoc()))
 		{
 			if ($row['data_type'] == 'character varying')
 			{
@@ -100,7 +101,8 @@ class Dump extends AbstractDump
 		$schema_create = substr($schema_create, 0, -strlen($crlf) - 1);
 
 		$result = $this->_db->query('', '
-			SELECT CASE WHEN i.indisprimary THEN 1 ELSE 0 END AS is_primary, pg_get_indexdef(i.indexrelid) AS inddef
+			SELECT 
+				CASE WHEN i.indisprimary THEN 1 ELSE 0 END AS is_primary, pg_get_indexdef(i.indexrelid) AS inddef
 			FROM pg_class AS c
 				INNER JOIN pg_index AS i ON (i.indrelid = c.oid)
 				INNER JOIN pg_class AS c2 ON (c2.oid = i.indexrelid)
@@ -110,7 +112,7 @@ class Dump extends AbstractDump
 			)
 		);
 
-		while ($row = $result->fetch_assoc())
+		while (($row = $result->fetch_assoc()))
 		{
 			if ($row['is_primary'])
 			{
@@ -151,7 +153,7 @@ class Dump extends AbstractDump
 			)
 		);
 		$tables = array();
-		while ($row = $request->fetch_row())
+		while (($row = $request->fetch_row()))
 		{
 			$tables[] = $row[0];
 		}
@@ -198,7 +200,7 @@ class Dump extends AbstractDump
 	 */
 	public function insert_sql($tableName, $new_table = false)
 	{
-		static $start = 0, $num_rows, $fields, $limit;
+		static $start = 0, $fields, $limit;
 
 		if ($new_table)
 		{
@@ -239,7 +241,7 @@ class Dump extends AbstractDump
 		$insert_msg = 'INSERT INTO ' . $tableName . $crlf . "\t" . '(' . implode(', ', $fields) . ')' . $crlf . 'VALUES ' . $crlf . "\t";
 
 		// Loop through each row.
-		while ($row = $result->fetch_assoc())
+		while (($row = $result->fetch_assoc()))
 		{
 			// Get the fields in this row...
 			$field_list = array();

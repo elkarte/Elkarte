@@ -478,7 +478,7 @@ function removeCommonWordsFromIndex($start, $column_definition)
 
 	while (time() < $stop)
 	{
-		$request = $db->fetchQuery('
+		$db->fetchQuery('
 			SELECT
 			 	id_word, COUNT(id_word) AS num_words
 			FROM {db_prefix}log_search_words

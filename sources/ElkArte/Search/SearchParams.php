@@ -246,12 +246,12 @@ class SearchParams extends ValuesContainer
 					'is_approved_true' => 1,
 				)
 			);
-			list ($this->_minMsgID, $this->_maxMsgID) = $this->_db->fetch_row($request);
+			list ($this->_minMsgID, $this->_maxMsgID) = $request->fetch_row();
 			if ($this->_minMsgID < 0 || $this->_maxMsgID < 0)
 			{
 				$context['search_errors']['no_messages_in_time_frame'] = true;
 			}
-			$this->_db->free_result($request);
+			$request->free_result();
 		}
 
 		// Default the user name to a wildcard matching every user (*).
@@ -306,11 +306,11 @@ class SearchParams extends ValuesContainer
 			);
 
 			// Simply do nothing if there're too many members matching the criteria.
-			if ($this->_db->num_rows($request) > $maxMembersToSearch)
+			if ($request->num_rows() > $maxMembersToSearch)
 			{
 				$this->_userQuery = '';
 			}
-			elseif ($this->_db->num_rows($request) == 0)
+			elseif ($request->num_rows() == 0)
 			{
 				$this->_userQuery = $this->_db->quote(
 					'm.id_member = {int:id_member_guest} AND ({raw:match_possible_guest_names})',
@@ -322,7 +322,7 @@ class SearchParams extends ValuesContainer
 			}
 			else
 			{
-				while ($row = $this->_db->fetch_assoc($request))
+				while (($row = $request->fetch_assoc()))
 				{
 					$this->_memberlist[] = $row['id_member'];
 				}
@@ -336,7 +336,7 @@ class SearchParams extends ValuesContainer
 					)
 				);
 			}
-			$this->_db->free_result($request);
+			$request->free_result();
 		}
 
 		// Ensure that boards are an array of integers (or nothing).
@@ -383,14 +383,14 @@ class SearchParams extends ValuesContainer
 				)
 			);
 
-			if ($this->_db->num_rows($request) == 0)
+			if ($request->num_rows() == 0)
 			{
 				throw new Exception('topic_gone', false);
 			}
 
 			$this->_search_params['brd'] = array();
-			list ($this->_search_params['brd'][0]) = $this->_db->fetch_row($request);
-			$this->_db->free_result($request);
+			list ($this->_search_params['brd'][0]) = $request->fetch_row();
+			$request->free_result();
 		}
 		// Select all boards you've selected AND are allowed to see.
 		elseif (User::$info->is_admin && (!empty($this->_search_params['advanced']) || !empty($query_boards)))

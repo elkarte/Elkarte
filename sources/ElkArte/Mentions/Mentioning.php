@@ -110,6 +110,7 @@ class Mentioning extends AbstractModel
 	 * @param mixed[] $data must contain uid, type and msg at a minimum
 	 *
 	 * @return int[]
+	 * @throws \ElkArte\Exceptions\Exception
 	 */
 	public function create($mention_obj, $data)
 	{
@@ -179,6 +180,8 @@ class Mentioning extends AbstractModel
 
 	/**
 	 * Check if the user can do what he is supposed to do, and validates the input.
+	 *
+	 * @return bool
 	 */
 	protected function _isValid()
 	{
@@ -198,6 +201,7 @@ class Mentioning extends AbstractModel
 			$sanitization['id_member_from'] = 'intval';
 			$validation['id_member_from'] = 'required|notequal[0]';
 		}
+
 		if (isset($this->_data['log_time']))
 		{
 			$sanitization['log_time'] = 'intval';
@@ -224,6 +228,7 @@ class Mentioning extends AbstractModel
 	 * @param int $status
 	 * @param int $member_id
 	 * @package Mentions
+	 * @throws \ElkArte\Exceptions\Exception
 	 */
 	protected function _updateMenuCount($status, $member_id)
 	{
@@ -253,6 +258,7 @@ class Mentioning extends AbstractModel
 	 *
 	 * @param int|int[] $mention_id
 	 * @return bool if successfully changed or not
+	 * @throws \ElkArte\Exceptions\Exception
 	 */
 	public function markread($mention_id)
 	{
@@ -265,6 +271,7 @@ class Mentioning extends AbstractModel
 	 * @param int|int[] $items
 	 * @param string $mark
 	 * @return bool if successfully changed or not
+	 * @throws \ElkArte\Exceptions\Exception
 	 */
 	public function updateStatus($items, $mark)
 	{
@@ -340,7 +347,7 @@ class Mentioning extends AbstractModel
 	 */
 	protected function _changeStatus($id_mentions, $status = 'read')
 	{
-		$this->_db->query('', '
+		$success = $this->_db->query('', '
 			UPDATE {db_prefix}log_mentions
 			SET status = {int:status}
 			WHERE id_mention IN ({array_int:id_mentions})',
@@ -348,8 +355,7 @@ class Mentioning extends AbstractModel
 				'id_mentions' => (array) $id_mentions,
 				'status' => $this->_known_status[$status],
 			)
-		);
-		$success = $this->_db->affected_rows() != 0;
+		)->affected_rows() != 0;
 
 		// Update the top level mentions count
 		if ($success)

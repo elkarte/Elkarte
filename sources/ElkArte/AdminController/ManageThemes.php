@@ -2261,7 +2261,7 @@ class ManageThemes extends AbstractController
 		$lang_files = array();
 
 		$dir = dir($settings['default_theme_dir']);
-		while ($entry = $dir->read())
+		while (($entry = $dir->read()))
 		{
 			if (substr($entry, -13) === '.template.php')
 			{
@@ -2271,7 +2271,7 @@ class ManageThemes extends AbstractController
 		$dir->close();
 
 		$dir = dir($settings['default_theme_dir'] . '/languages');
-		while ($entry = $dir->read())
+		while (($entry = $dir->read()))
 		{
 			if (preg_match('~^([^\.]+\.[^\.]+)\.php$~', $entry, $matches))
 			{
@@ -2283,7 +2283,7 @@ class ManageThemes extends AbstractController
 		if (!empty($theme_dirs['base_theme_dir']))
 		{
 			$dir = dir($theme_dirs['base_theme_dir']);
-			while ($entry = $dir->read())
+			while (($entry = $dir->read()))
 			{
 				if (substr($entry, -13) === '.template.php' && !in_array(substr($entry, 0, -13), $templates))
 				{
@@ -2295,7 +2295,7 @@ class ManageThemes extends AbstractController
 			if (file_exists($theme_dirs['base_theme_dir'] . '/languages'))
 			{
 				$dir = dir($theme_dirs['base_theme_dir'] . '/languages');
-				while ($entry = $dir->read())
+				while (($entry = $dir->read()))
 				{
 					if (preg_match('~^([^\.]+\.[^\.]+)\.php$~', $entry, $matches) && !in_array($matches[1], $lang_files))
 					{
@@ -2331,7 +2331,7 @@ class ManageThemes extends AbstractController
 		}
 
 		$dir = dir($theme_dirs['theme_dir']);
-		while ($entry = $dir->read())
+		while (($entry = $dir->read()))
 		{
 			if (substr($entry, -13) === '.template.php' && isset($context['available_templates'][substr($entry, 0, -13)]))
 			{
@@ -2344,7 +2344,7 @@ class ManageThemes extends AbstractController
 		if (file_exists($theme_dirs['theme_dir'] . '/languages'))
 		{
 			$dir = dir($theme_dirs['theme_dir'] . '/languages');
-			while ($entry = $dir->read())
+			while (($entry = $dir->read()))
 			{
 				if (preg_match('~^([^\.]+\.[^\.]+)\.php$~', $entry, $matches) && isset($context['available_language_files'][$matches[1]]))
 				{

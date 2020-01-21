@@ -886,7 +886,7 @@ class Theme extends BaseTheme
 	 */
 	public function loadSupportCSS()
 	{
-		global $modSettings, $settings;
+		global $settings;
 
 		// Load the SVG support file with fallback to default theme
 		loadCSSFile('icons_svg.css');

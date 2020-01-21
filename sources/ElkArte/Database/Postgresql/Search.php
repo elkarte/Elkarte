@@ -98,9 +98,9 @@ class Search extends AbstractSearch
 			)
 		);
 
-		if ($request !== false && $this->_db->num_rows($request) > 0)
+		if ($request !== false && $request->num_rows() > 0)
 		{
-			while ($row = $this->_db->fetch_assoc($request))
+			while (($row = $request->fetch_assoc()))
 			{
 				if ($row['relname'] == $db_prefix . 'messages')
 				{
@@ -116,7 +116,7 @@ class Search extends AbstractSearch
 					$table_info['custom_index_length'] = (int) $row['KB'];
 				}
 			}
-			$this->_db->free_result($request);
+			$request->free_result();
 		}
 		else
 		{

@@ -73,7 +73,7 @@ class BoardsTree
 		$this->cat_tree = array();
 		$this->boards = array();
 		$last_board_order = 0;
-		while ($row = $request->fetch_assoc())
+		while (($row = $request->fetch_assoc()))
 		{
 			if (!isset($this->cat_tree[$row['id_cat']]))
 			{

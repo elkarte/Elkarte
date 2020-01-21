@@ -107,7 +107,7 @@ abstract class AbstractMentionMessage implements NotificationInterface
 
 		// $time is not checked because it's useless
 		$existing = array();
-		$request = $this->_db->fetchQuery('
+		$this->_db->fetchQuery('
 			SELECT 
 				id_member
 			FROM {db_prefix}log_mentions

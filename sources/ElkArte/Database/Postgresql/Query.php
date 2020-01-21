@@ -388,7 +388,8 @@ class Query extends AbstractQuery
 		$this->skip_next_error();
 
 		// Try get the last ID for the auto increment field.
-		$request = $this->query('', 'SELECT CURRVAL(\'' . $table . '_seq\') AS insertID',
+		$request = $this->query('', '
+			SELECT CURRVAL(\'' . $table . '_seq\') AS insertID',
 			array()
 		);
 
@@ -397,8 +398,8 @@ class Query extends AbstractQuery
 			return false;
 		}
 
-		list ($lastID) = $this->fetch_row($request);
-		$this->free_result($request);
+		list ($lastID) = $request->fetch_row();
+		$request->free_result();
 
 		return $lastID;
 	}
@@ -499,9 +500,9 @@ class Query extends AbstractQuery
 	}
 
 	/**
-	 * Returns the number of rows from the last query executed
+	 * Returns the result resouce of the last query executed
 	 *
-	 * @return int|null
+	 * @return resource
 	 */
 	public function lastResult()
 	{

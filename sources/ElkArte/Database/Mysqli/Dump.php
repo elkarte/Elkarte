@@ -47,7 +47,7 @@ class Dump extends AbstractDump
 				'table' => $tableName,
 			)
 		);
-		while ($row = $result->fetch_assoc())
+		while (($row = $result->fetch_assoc()))
 		{
 			// Make the CREATE for this column.
 			$schema_create .= ' `' . $row['Field'] . '` ' . $row['Type'] . ($row['Null'] != 'YES' ? ' NOT NULL' : '');
@@ -88,7 +88,7 @@ class Dump extends AbstractDump
 			)
 		);
 		$indexes = array();
-		while ($row = $result->fetch_assoc())
+		while (($row = $result->fetch_assoc()))
 		{
 			// Is this a primary key, unique index, or regular index?
 			$row['Key_name'] = $row['Key_name'] == 'PRIMARY' ? 'PRIMARY KEY' : (empty($row['Non_unique']) ? 'UNIQUE ' : ($row['Comment'] == 'FULLTEXT' || (isset($row['Index_type']) && $row['Index_type'] == 'FULLTEXT') ? 'FULLTEXT ' : 'KEY ')) . '`' . $row['Key_name'] . '`';
@@ -158,7 +158,7 @@ class Dump extends AbstractDump
 			)
 		);
 		$tables = array();
-		while ($row = $request->fetch_row())
+		while (($row = $request->fetch_row()))
 		{
 			$tables[] = $row[0];
 		}
@@ -309,7 +309,7 @@ class Dump extends AbstractDump
 	 */
 	public function insert_sql($tableName, $new_table = false)
 	{
-		static $start = 0, $num_rows, $fields, $limit;
+		static $start = 0, $fields, $limit;
 
 		if ($new_table)
 		{
@@ -349,7 +349,7 @@ class Dump extends AbstractDump
 		$data = 'INSERT INTO `' . $tableName . '`' . $crlf . "\t" . '(`' . implode('`, `', $fields) . '`)' . $crlf . 'VALUES ';
 
 		// Loop through each row.
-		while ($row = $result->fetch_assoc())
+		while (($row = $result->fetch_assoc()))
 		{
 			// Get the fields in this row...
 			$field_list = array();

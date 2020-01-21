@@ -233,7 +233,7 @@ class ManageLanguages extends AbstractController
 					),
 					'data' => array(
 						'function' => function ($rowData) {
-							return sprintf('<a href="%1$s">%3$s<i class="icon icon-small i-modify"></i></a>', getUrl('admin', ['action' => 'admin', 'area' => 'languages', 'sa' => 'editlang', 'lid' => $rowData['id']]), $rowData['name']);
+							return sprintf('<a href="%1$s">%2$s<i class="icon icon-small i-modify"></i></a>', getUrl('admin', ['action' => 'admin', 'area' => 'languages', 'sa' => 'editlang', 'lid' => $rowData['id']]), $rowData['name']);
 						},
 					),
 				),
@@ -745,7 +745,7 @@ class ManageLanguages extends AbstractController
 		{
 			// Open it up.
 			$dir = dir($theme_dir);
-			while ($entry = $dir->read())
+			while (($entry = $dir->read()))
 			{
 				// We're only after the files for this language.
 				if (preg_match('~^([A-Za-z]+)\.' . $context['lang_id'] . '\.php$~', $entry, $matches) == 0)

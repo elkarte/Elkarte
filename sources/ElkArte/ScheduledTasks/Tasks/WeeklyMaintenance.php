@@ -139,8 +139,9 @@ class WeeklyMaintenance implements ScheduledTaskInterface
 
 				// This one is more complex then the other logs.  First we need to figure out which reports are too old.
 				$reports = array();
-				$result = $db->query('', '
-					SELECT id_report
+				$db->fetchQuery('
+					SELECT 
+						id_report
 					FROM {db_prefix}log_reported
 					WHERE time_started < {int:time_started}
 						AND closed = {int:closed}',
@@ -148,12 +149,11 @@ class WeeklyMaintenance implements ScheduledTaskInterface
 						'time_started' => $t,
 						'closed' => 1,
 					)
+				)->fetch_callback(
+					function ($row) use (&$reports) {
+						$reports[] = $row[0];
+					}
 				);
-				while ($row = $db->fetch_row($result))
-				{
-					$reports[] = $row[0];
-				}
-				$db->free_result($result);
 
 				if (!empty($reports))
 				{

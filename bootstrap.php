@@ -15,7 +15,6 @@
  */
 
 use ElkArte\Debug;
-use ElkArte\ext\Composer\Autoload\ClassLoader;
 use ElkArte\Hooks;
 use ElkArte\User;
 use ElkArte\TokenHash;
@@ -253,7 +252,7 @@ class Bootstrap
 	{
 		require_once(EXTDIR . '/ClassLoader.php');
 
-		$loader = new ClassLoader();
+		$loader = new \ElkArte\ext\Composer\Autoload\ClassLoader();
 		$loader->setPsr4('ElkArte\\', SOURCEDIR . '/ElkArte');
 		$loader->setPsr4('BBC\\', SOURCEDIR . '/ElkArte/BBC');
 		$loader->register();

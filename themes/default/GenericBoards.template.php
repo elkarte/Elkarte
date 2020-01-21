@@ -21,7 +21,7 @@ use ElkArte\Util;
  *
  * @param int[] $categories contains the number of boards for each category
  * @param int $total_boards total number of boards present
- * @return int[]
+ * @return int[][]
  */
 function optimizeBoardsSubdivision($categories, $total_boards)
 {

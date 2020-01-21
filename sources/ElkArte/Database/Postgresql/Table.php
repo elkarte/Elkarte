@@ -437,8 +437,9 @@ class Table extends AbstractTable
 	{
 		$table_name = str_replace('{db_prefix}', $this->_db_prefix, $table_name);
 
-		$result = $this->_db->query('', '
-			SELECT CASE WHEN i.indisprimary THEN 1 ELSE 0 END AS is_primary,
+		$result = $this->_db->fetchQuery('
+			SELECT 
+				CASE WHEN i.indisprimary THEN 1 ELSE 0 END AS is_primary,
 				CASE WHEN i.indisunique THEN 1 ELSE 0 END AS is_unique,
 				c2.relname AS name,
 				pg_get_indexdef(i.indexrelid) AS inddef
@@ -451,7 +452,7 @@ class Table extends AbstractTable
 			)
 		);
 		$indexes = array();
-		while ($row = $this->_db->fetch_assoc($result))
+		while (($row = $result->fetch_assoc()))
 		{
 			// Try get the columns that make it up.
 			if (preg_match('~\(([^\)]+?)\)~i', $row['inddef'], $matches) == 0)
@@ -494,7 +495,7 @@ class Table extends AbstractTable
 				);
 			}
 		}
-		$this->_db->free_result($result);
+		$result->free_result();
 
 		return $indexes;
 	}
@@ -564,8 +565,9 @@ class Table extends AbstractTable
 	{
 		$table_name = str_replace('{db_prefix}', $this->_db_prefix, $table_name);
 
-		$result = $this->_db->query('', '
-			SELECT column_name, column_default, is_nullable, data_type, character_maximum_length
+		$result = $this->_db->fetchQuery('
+			SELECT 
+				column_name, column_default, is_nullable, data_type, character_maximum_length
 			FROM information_schema.columns
 			WHERE table_name = \'' . $table_name . '\'
 			ORDER BY ordinal_position',
@@ -574,7 +576,7 @@ class Table extends AbstractTable
 			)
 		);
 		$columns = array();
-		while ($row = $this->_db->fetch_assoc($result))
+		while (($row = $result->fetch_assoc()))
 		{
 			if (!$detail)
 			{
@@ -612,7 +614,7 @@ class Table extends AbstractTable
 				);
 			}
 		}
-		$this->_db->free_result($result);
+		$result->free_result();
 
 		return $columns;
 	}
@@ -624,7 +626,7 @@ class Table extends AbstractTable
 	{
 		$table = str_replace('{db_prefix}', $this->_db_prefix, $table);
 
-		$request = $this->_db->query('', '
+		$request = $this->_db->fetchQuery('
 			VACUUM ANALYZE {raw:table}',
 			array(
 				'table' => $table,
@@ -635,8 +637,8 @@ class Table extends AbstractTable
 			return -1;
 		}
 
-		$row = $this->_db->fetch_assoc($request);
-		$this->_db->free_result($request);
+		$row = $request->fetch_assoc($request);
+		$request->free_result();
 
 		if (isset($row['Data_free']))
 		{
