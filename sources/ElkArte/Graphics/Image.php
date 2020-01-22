@@ -312,7 +312,7 @@ class Image
 		{
 			// Write over the original file
 			$success = $this->saveImage($this->_fileName, $sizes[2]);
-			$this->loadImage()
+			$this->loadImage();
 
 			return $success;
 		}
