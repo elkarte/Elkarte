@@ -102,7 +102,7 @@ class Recent extends AbstractController implements FrontpageInterface
 	{
 		parent::frontPageOptions();
 
-		addInlineJavascript('
+		theme()->addInlineJavascript('
 			$(\'#front_page\').on(\'change\', function() {
 				var $base = $(\'#recent_frontpage\').parent();
 				if ($(this).val() == \'Recent_Controller\')
@@ -378,6 +378,7 @@ class Recent extends AbstractController implements FrontpageInterface
 	 * @param array $messages
 	 *
 	 * @return array|int[]
+	 * @throws \Exception
 	 */
 	private function _getLikes($messages)
 	{

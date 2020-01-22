@@ -19,7 +19,7 @@ namespace ElkArte;
  */
 class Util
 {
-	static protected $_entity_check_reg = '~(&#(\d{1,7}|x[0-9a-fA-F]{1,6});)~';
+	protected static  $_entity_check_reg = '~(&#(\d{1,7}|x[0-9a-fA-F]{1,6});)~';
 
 	/**
 	 * Converts invalid / disallowed / out of range entities to nulls
@@ -402,9 +402,9 @@ class Util
 	 * This function is an adaption of the cake php function truncate in utility string.php (MIT)
 	 *
 	 * @param string $string text to truncate.
-	 * @param integer $length length of returned string
+	 * @param int $length length of returned string
 	 * @param string $ellipsis characters to add at the end of cut string, like ...
-	 * @param boolean $exact If to account for the $ellipsis length in returned string length
+	 * @param bool $exact If to account for the $ellipsis length in returned string length
 	 *
 	 * @return string Trimmed string.
 	 */

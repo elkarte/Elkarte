@@ -49,7 +49,7 @@ class Payment implements PaymentInterface
 	/**
 	 * This function returns true/false for whether this gateway thinks the data is intended for it.
 	 *
-	 * @return boolean
+	 * @return bool
 	 */
 	public function isValid()
 	{
@@ -188,7 +188,7 @@ class Payment implements PaymentInterface
 	/**
 	 * Get paypal response to our requestString using curl
 	 *
-	 * @param $curl resource
+	 * @param resource $curl
 	 */
 	private function _fetchReturnResponseCurl($curl)
 	{
@@ -274,7 +274,7 @@ class Payment implements PaymentInterface
 	/**
 	 * Is this a subscription?
 	 *
-	 * @return boolean
+	 * @return bool
 	 */
 	public function isSubscription()
 	{
@@ -285,6 +285,7 @@ class Payment implements PaymentInterface
 	 * A private function to find out the subscription details.
 	 *
 	 * @return false|null
+	 * @throws \ElkArte\Exceptions\Exception
 	 */
 	private function _findSubscription()
 	{
@@ -308,12 +309,12 @@ class Payment implements PaymentInterface
 			)
 		);
 		// No joy?
-		if ($db->num_rows($request) == 0)
+		if ($request->num_rows() == 0)
 		{
 			// Can we identify them by email?
 			if (!empty($_POST['payer_email']))
 			{
-				$db->free_result($request);
+				$request->free_result();
 				$request = $db->query('', '
 					SELECT
 						ls.id_member, ls.id_subscribe
@@ -325,7 +326,7 @@ class Payment implements PaymentInterface
 						'payer_email' => $_POST['payer_email'],
 					)
 				);
-				if ($db->num_rows($request) === 0)
+				if ($request->num_rows() === 0)
 				{
 					return false;
 				}
@@ -336,25 +337,28 @@ class Payment implements PaymentInterface
 			}
 		}
 
-		list ($member_id, $subscription_id) = $db->fetch_row($request);
+		list ($member_id, $subscription_id) = $request->fetch_row();
 		$_POST['item_number'] = $member_id . '+' . $subscription_id;
-		$db->free_result($request);
+		$request->free_result();
 	}
 
 	/**
 	 * Is this a refund?
 	 *
-	 * @return boolean
+	 * @return bool
 	 */
 	public function isRefund()
 	{
-		return (($_POST['payment_status'] === 'Refunded' || $_POST['payment_status'] === 'Reversed' || $_POST['txn_type'] === 'Refunded' || ($_POST['txn_type'] === 'reversal' && $_POST['payment_status'] === 'Completed')));
+		return ($_POST['payment_status'] === 'Refunded'
+			|| $_POST['payment_status'] === 'Reversed'
+			|| $_POST['txn_type'] === 'Refunded'
+			|| ($_POST['txn_type'] === 'reversal' && $_POST['payment_status'] === 'Completed'));
 	}
 
 	/**
 	 * Is this a normal payment?
 	 *
-	 * @return boolean
+	 * @return bool
 	 */
 	public function isPayment()
 	{
@@ -364,7 +368,7 @@ class Payment implements PaymentInterface
 	/**
 	 * Is this a cancellation?
 	 *
-	 * @return boolean
+	 * @return bool
 	 */
 	public function isCancellation()
 	{
@@ -393,6 +397,7 @@ class Payment implements PaymentInterface
 	 * Record the transaction reference and exit
 	 *
 	 * @param int $subscription_id
+	 * @throws \ElkArte\Exceptions\Exception
 	 */
 	public function close($subscription_id)
 	{

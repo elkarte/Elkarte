@@ -25,7 +25,7 @@ namespace BBC;
 class BBCParser
 {
 	/** The max number of iterations to perform while solving for out of order attributes */
-	const MAX_PERMUTE_ITERATIONS = 5040;
+	public const MAX_PERMUTE_ITERATIONS = 5040;
 
 	/** @var string */
 	protected $message;
@@ -159,7 +159,7 @@ class BBCParser
 		$this->parse_loop();
 
 		// Close any remaining tags.
-		while ($tag = $this->closeOpenedTag())
+		while (($tag = $this->closeOpenedTag()))
 		{
 			$this->message .= $this->noSmileys($tag[Codes::ATTR_AFTER]);
 		}
@@ -460,7 +460,7 @@ class BBCParser
 	 */
 	public function loadHtmlParser()
 	{
-		$parser = new HtmlParser;
+		$parser = new HtmlParser();
 		call_integration_hook('integrate_bbc_load_html_parser', array(&$parser));
 		$this->html_parser = $parser;
 	}
@@ -1446,7 +1446,7 @@ class BBCParser
 	/**
 	 * Enable the parsing of smileys
 	 *
-	 * @param boolean $enable
+	 * @param bool $enable
 	 *
 	 * @return $this
 	 */

@@ -28,7 +28,7 @@ class Html2Md
 	/**
 	 * The value that will hold if we are using the internal or external parser
 	 *
-	 * @var boolean
+	 * @var bool
 	 */
 	private $_parser;
 
@@ -56,7 +56,7 @@ class Html2Md
 	/**
 	 * Strip remaining tags, set to false to leave them in
 	 *
-	 * @var boolean
+	 * @var bool
 	 */
 	public $strip_tags = true;
 
@@ -196,25 +196,18 @@ class Html2Md
 		// The body of the HTML is where its at.
 		if ($this->_parser)
 		{
-			$body = $this->doc->getElementsByTagName('body')->item(0);
+			return $this->doc->getElementsByTagName('body')->item(0);
 		}
-		else
+		elseif ($this->doc->find('body', 0) !== null)
 		{
-			if ($this->doc->find('body', 0) !== null)
-			{
-				$body = $this->doc->find('body', 0);
-			}
-			elseif ($this->doc->find('html', 0) !== null)
-			{
-				$body = $this->doc->find('html', 0);
-			}
-			else
-			{
-				$body = $this->doc->root;
-			}
+			return $this->doc->find('body', 0);
+		}
+		elseif ($this->doc->find('html', 0) !== null)
+		{
+			return $this->doc->find('html', 0);
 		}
 
-		return $body;
+		return $this->doc->root;
 	}
 
 	/**
@@ -313,9 +306,9 @@ class Html2Md
 	 *  - Prevents converting anything that's inside a code block
 	 *
 	 * @param object $node
-	 * @param boolean $parser flag for internal or external parser
+	 * @param bool $parser flag for internal or external parser
 	 *
-	 * @return boolean
+	 * @return bool
 	 */
 	private static function _has_parent_code($node, $parser)
 	{
@@ -345,7 +338,7 @@ class Html2Md
 	 * Get the nesting level when inside a list
 	 *
 	 * @param object $node
-	 * @param boolean $parser flag for internal or external parser
+	 * @param bool $parser flag for internal or external parser
 	 *
 	 * @return int
 	 */
@@ -549,9 +542,7 @@ class Html2Md
 		$title = $node->getAttribute('title');
 		$value = $this->_get_value($node);
 
-		$markdown = !empty($title) ? '*[' . $value . ']: ' . $title . $this->line_break : '';
-
-		return $markdown;
+		return !empty($title) ? '*[' . $value . ']: ' . $title . $this->line_break : '';
 	}
 
 	/**

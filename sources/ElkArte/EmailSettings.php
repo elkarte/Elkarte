@@ -35,7 +35,7 @@ class EmailSettings extends SettingsForm\SettingsForm
 	 * @param string $tableName name of the table the values will be saved in
 	 * @param array|object|null $configValues the key names of the vars are the table cols
 	 * @param string[] $indexes for compatibility
-	 * @param integer $editId -1 add a row, otherwise edit a row with the supplied key value
+	 * @param int $editId -1 add a row, otherwise edit a row with the supplied key value
 	 * @param string $editName used when editing a row, needs to be the name of the col to find $editId
 	 */
 	public static function saveTableSettings(array $configVars, $tableName, $configValues = null, array $indexes = array(), $editId = -1, $editName = '')

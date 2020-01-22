@@ -388,7 +388,8 @@ class Query extends AbstractQuery
 		$this->skip_next_error();
 
 		// Try get the last ID for the auto increment field.
-		$request = $this->query('', 'SELECT CURRVAL(\'' . $table . '_seq\') AS insertID',
+		$request = $this->query('', '
+			SELECT CURRVAL(\'' . $table . '_seq\') AS insertID',
 			array()
 		);
 
@@ -397,8 +398,8 @@ class Query extends AbstractQuery
 			return false;
 		}
 
-		list ($lastID) = $this->fetch_row($request);
-		$this->free_result($request);
+		list ($lastID) = $request->fetch_row();
+		$request->free_result();
 
 		return $lastID;
 	}
@@ -499,9 +500,9 @@ class Query extends AbstractQuery
 	}
 
 	/**
-	 * Returns the number of rows from the last query executed
+	 * Returns the result resouce of the last query executed
 	 *
-	 * @return int|null
+	 * @return resource
 	 */
 	public function lastResult()
 	{
@@ -531,7 +532,7 @@ class Query extends AbstractQuery
 	 */
 	protected function _replaceIdentifier($replacement)
 	{
-		if (preg_match('~[a-z_][0-9,a-z,A-Z$_]{0,60}~', $replacement) !== 1)
+		if (preg_match('~[a-z_][0-9a-zA-Z$,_]{0,60}~', $replacement) !== 1)
 		{
 			$this->error_backtrace('Wrong value type sent to the database. Invalid identifier used. (' . $replacement . ')', '', E_USER_ERROR, __FILE__, __LINE__);
 		}

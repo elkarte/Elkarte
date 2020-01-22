@@ -21,9 +21,9 @@ use ElkArte\TemporaryAttachment;
  */
 class TemporaryAttachmentsList extends ValuesContainer
 {
-	private const ID = 'temp_attachments';
+	public const ID = 'temp_attachments';
 
-	private const TMPNAME_TPL = 'post_tmp_{user}_{hash}';
+	public const TMPNAME_TPL = 'post_tmp_{user}_{hash}';
 
 	/**
 	 * Constructor

@@ -52,7 +52,7 @@ class Sphinxql extends AbstractAPI
 	/**
 	 * Is it supported?
 	 *
-	 * @var boolean
+	 * @var bool
 	 */
 	public $is_supported = true;
 
@@ -111,7 +111,7 @@ class Sphinxql extends AbstractAPI
 	 *
 	 * @param string $a Word A
 	 * @param string $b Word B
-	 * @return integer indicating how the words should be sorted (-1, 0 1)
+	 * @return int indicating how the words should be sorted (-1, 0 1)
 	 */
 	public function searchSort($a, $b)
 	{
@@ -260,7 +260,7 @@ class Sphinxql extends AbstractAPI
 
 			if (mysqli_num_rows($request) !== 0)
 			{
-				while ($match = mysqli_fetch_assoc($request))
+				while (($match = mysqli_fetch_assoc($request)))
 				{
 					if (empty($this->_searchParams->topic))
 					{
@@ -374,17 +374,14 @@ class Sphinxql extends AbstractAPI
 				continue;
 			}
 			// Must be something they want to search for!
-			else
+			elseif ($or_part)
 			{
 				// If this was part of an OR branch, add it to the proper section
-				if ($or_part)
-				{
-					$keywords['include'][count($keywords['include']) - 1] = array_merge($keywords['include'][count($keywords['include']) - 1], $addWords);
-				}
-				else
-				{
-					$keywords['include'] = array_merge($keywords['include'], $addWords);
-				}
+				$keywords['include'][count($keywords['include']) - 1] = array_merge($keywords['include'][count($keywords['include']) - 1], $addWords);
+			}
+			else
+			{
+				$keywords['include'] = array_merge($keywords['include'], $addWords);
 			}
 
 			// Start fresh on this...

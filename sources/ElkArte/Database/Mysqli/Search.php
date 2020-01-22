@@ -70,14 +70,14 @@ class Search extends AbstractSearch
 			);
 		}
 
-		if ($request !== false && $this->_db->num_rows($request) == 1)
+		if ($request !== false && $request->num_rows() == 1)
 		{
 			// Only do this if the user has permission to execute this query.
-			$row = $this->_db->fetch_assoc($request);
+			$row = $request->fetch_assoc();
 			$table_info['data_length'] = $row['Data_length'];
 			$table_info['index_length'] = $row['Index_length'];
 			$table_info['fulltext_length'] = $row['Index_length'];
-			$this->_db->free_result($request);
+			$request->free_result();
 		}
 
 		// Now check the custom index table, if it exists at all.
@@ -104,13 +104,13 @@ class Search extends AbstractSearch
 			);
 		}
 
-		if ($request !== false && $this->_db->num_rows($request) == 1)
+		if ($request !== false && $request->num_rows() == 1)
 		{
 			// Only do this if the user has permission to execute this query.
-			$row = $this->_db->fetch_assoc($request);
+			$row = $request->fetch_assoc();
 			$table_info['index_length'] += $row['Data_length'] + $row['Index_length'];
 			$table_info['custom_index_length'] = $row['Data_length'] + $row['Index_length'];
-			$this->_db->free_result($request);
+			$request->free_result();
 		}
 
 		return $table_info;

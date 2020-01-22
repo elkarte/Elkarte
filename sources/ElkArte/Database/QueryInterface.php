@@ -118,7 +118,7 @@ interface QueryInterface
 	 *
 	 * @param string $error_message
 	 * @param string $log_message
-	 * @param string|boolean $error_type
+	 * @param string|bool $error_type
 	 * @param string|null $file
 	 * @param int|null $line
 	 *

@@ -16,6 +16,8 @@
  */
 
 // Start things rolling by getting the forum alive...
+use ElkArte\Util;
+
 if (!file_exists(dirname(__FILE__) . '/bootstrap.php'))
 {
 	die('Unable to initialize');
@@ -118,13 +120,13 @@ $request = $db->query('', '
 );
 
 // Didn't find it?
-if ($db->num_rows($request) === 0)
+if ($request->num_rows() === 0)
 {
 	generateSubscriptionError(sprintf($txt['paid_count_not_find_subscription'], $member_id, $subscription_id), $notify_users);
 }
 
-$subscription_info = $db->fetch_assoc($request);
-$db->free_result($request);
+$subscription_info = $request->fetch_assoc();
+$request->free_result();
 
 // We wish to check the pending payments to make sure we are expecting this.
 $request = $db->query('', '
@@ -139,12 +141,12 @@ $request = $db->query('', '
 		'current_member' => $member_id,
 	)
 );
-if ($db->num_rows($request) == 0)
+if ($request->num_rows() == 0)
 {
 	generateSubscriptionError(sprintf($txt['paid_count_not_find_subscription_log'], $member_id, $subscription_id), $notify_users);
 }
-$subscription_info += $db->fetch_assoc($request);
-$db->free_result($request);
+$subscription_info += $request->fetch_assoc();
+$request->free_result();
 
 // Is this a refund?
 if ($gatewayClass->isRefund())
@@ -168,14 +170,14 @@ if ($gatewayClass->isRefund())
 // Otherwise is it what we want, a purchase?
 elseif ($gatewayClass->isPayment() || $gatewayClass->isSubscription())
 {
-	$cost = \ElkArte\Util::unserialize($subscription_info['cost']);
+	$cost = Util::unserialize($subscription_info['cost']);
 	$total_cost = $gatewayClass->getCost();
 	$notify = false;
 
 	// For one off's we want to only capture them once!
 	if (!$gatewayClass->isSubscription())
 	{
-		$real_details = \ElkArte\Util::unserialize($subscription_info['pending_details']);
+		$real_details = Util::unserialize($subscription_info['pending_details']);
 		if (empty($real_details))
 		{
 			generateSubscriptionError(sprintf($txt['paid_count_not_find_outstanding_payment'], $member_id, $subscription_id), $notify_users);
@@ -300,7 +302,7 @@ function generateSubscriptionError($text, $notify_users = [])
 	{
 		foreach ($_POST as $key => $val)
 		{
-			$text .= '<br />' . \ElkArte\Util::htmlspecialchars($key) . ': ' . \ElkArte\Util::htmlspecialchars($val);
+			$text .= '<br />' . Util::htmlspecialchars($key) . ': ' . Util::htmlspecialchars($val);
 		}
 	}
 

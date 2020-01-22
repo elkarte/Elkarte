@@ -39,8 +39,10 @@ class PaidSubscriptions implements ScheduledTaskInterface
 		$db = database();
 
 		// Start off by checking for removed subscriptions.
-		$request = $db->query('', '
-			SELECT id_subscribe, id_member
+		require_once(SUBSDIR . '/PaidSubscriptions.subs.php');
+		$db->fetchQuery('
+			SELECT 
+				id_subscribe, id_member
 			FROM {db_prefix}log_subscribed
 			WHERE status = {int:is_active}
 				AND end_time < {int:time_now}',
@@ -48,16 +50,15 @@ class PaidSubscriptions implements ScheduledTaskInterface
 				'is_active' => 1,
 				'time_now' => time(),
 			)
+		)->fetch_callback(
+			function ($row) {
+				removeSubscription($row['id_subscribe'], $row['id_member']);
+			}
 		);
-		require_once(SUBSDIR . '/PaidSubscriptions.subs.php');
-		while ($row = $db->fetch_assoc($request))
-		{
-			removeSubscription($row['id_subscribe'], $row['id_member']);
-		}
-		$db->free_result($request);
 
 		// Get all those about to expire that have not had a reminder sent.
-		$request = $db->query('', '
+		$subs_reminded = array();
+		$db->fetchQuery('
 			SELECT 
 				ls.id_sublog, ls.end_time,
 				m.id_member, m.member_name, m.email_address, m.lngfile, 
@@ -75,33 +76,31 @@ class PaidSubscriptions implements ScheduledTaskInterface
 				'reminder_wanted' => 0,
 				'time_now' => time(),
 			)
-		);
-		$subs_reminded = array();
-		while ($row = $db->fetch_assoc($request))
-		{
-			// If this is the first one load the important bits.
-			if (empty($subs_reminded))
-			{
-				// Need the below for theme()->getTemplates()->loadLanguageFile to work!
-				require_once(SUBSDIR . '/Mail.subs.php');
-				theme()->getTemplates()->loadEssentialThemeData();
+		)->fetch_callback(
+			function ($row) use (&$subs_reminded, $scripturl, $modSettings, $language) {
+				// If this is the first one load the important bits.
+				if (empty($subs_reminded))
+				{
+					// Need the below for theme()->getTemplates()->loadLanguageFile to work!
+					require_once(SUBSDIR . '/Mail.subs.php');
+					theme()->getTemplates()->loadEssentialThemeData();
+				}
+
+				$subs_reminded[] = $row['id_sublog'];
+
+				$replacements = array(
+					'PROFILE_LINK' => $scripturl . '?action=profile;area=subscriptions;u=' . $row['id_member'],
+					'REALNAME' => $row['member_name'],
+					'SUBSCRIPTION' => $row['name'],
+					'END_DATE' => strip_tags(standardTime($row['end_time'])),
+				);
+
+				$emaildata = loadEmailTemplate('paid_subscription_reminder', $replacements, empty($row['lngfile']) || empty($modSettings['userLanguage']) ? $language : $row['lngfile']);
+
+				// Send the actual email.
+				sendmail($row['email_address'], $emaildata['subject'], $emaildata['body'], null, null, false, 2);
 			}
-
-			$subs_reminded[] = $row['id_sublog'];
-
-			$replacements = array(
-				'PROFILE_LINK' => $scripturl . '?action=profile;area=subscriptions;u=' . $row['id_member'],
-				'REALNAME' => $row['member_name'],
-				'SUBSCRIPTION' => $row['name'],
-				'END_DATE' => strip_tags(standardTime($row['end_time'])),
-			);
-
-			$emaildata = loadEmailTemplate('paid_subscription_reminder', $replacements, empty($row['lngfile']) || empty($modSettings['userLanguage']) ? $language : $row['lngfile']);
-
-			// Send the actual email.
-			sendmail($row['email_address'], $emaildata['subject'], $emaildata['body'], null, null, false, 2);
-		}
-		$db->free_result($request);
+		);
 
 		// Mark the reminder as sent.
 		if (!empty($subs_reminded))

@@ -258,7 +258,7 @@ class Register extends AbstractController
 			if (empty($context['privacy_policy']))
 			{
 				// No file found or a blank file, log the error so the admin knows there is a problem!
-				loadLanguage('Errors');
+				theme()->getTemplates()->loadLanguageFile('Errors');
 				Errors::instance()::instance()->log_error($txt['registration_privacy_policy_missing'], 'critical');
 				throw new \Exception('registration_disabled', false);
 			}
@@ -1418,9 +1418,10 @@ class Register extends AbstractController
 			$context['register_subaction'] = 'agreement';
 		}
 
-		loadLanguage('Login');
-		loadLanguage('Profile');
-		loadTemplate('Register');
+		theme()->getTemplates()->loadLanguageFile('Login');
+		theme()->getTemplates()->loadLanguageFile('Profile');
+		theme()->getTemplates()->load('Register');
+
 		// If you have to agree to the agreement, it needs to be fetched from the file.
 		$agreement = new Agreement($this->user->language);
 		$context['agreement'] = $agreement->getParsedText();
@@ -1428,6 +1429,7 @@ class Register extends AbstractController
 
 		$context['show_coppa'] = !empty($modSettings['coppaAge']);
 		$context['show_contact_button'] = !empty($modSettings['enable_contactform']) && $modSettings['enable_contactform'] === 'registration';
+
 		// Under age restrictions?
 		if ($context['show_coppa'])
 		{
@@ -1468,9 +1470,9 @@ class Register extends AbstractController
 			$context['register_subaction'] = 'privacypol';
 		}
 
-		loadLanguage('Login');
-		loadLanguage('Profile');
-		loadTemplate('Register');
+		theme()->getTemplates()->loadLanguageFile('Login');
+		theme()->getTemplates()->loadLanguageFile('Profile');
+		theme()->getTemplates()->load('Register');
 
 		$txt['agreement_agree'] = $txt['policy_agree'];
 		$txt['agreement_no_agree'] = $txt['policy_no_agree'];

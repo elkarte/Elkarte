@@ -358,7 +358,7 @@ class Imagick extends AbstractManipulator
 	 * @param int $height Height of the image
 	 * @param string $format Type of the image (valid types are png, jpeg, gif)
 	 *
-	 * @return boolean|string The image or false on error
+	 * @return bool|string The image or false on error
 	 * @throws \ImagickException
 	 */
 	public function generateTextImage($text, $width = 100, $height = 75, $format = 'png')

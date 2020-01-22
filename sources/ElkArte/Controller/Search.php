@@ -18,6 +18,7 @@ namespace ElkArte\Controller;
 
 use ElkArte\AbstractController;
 use ElkArte\Cache\Cache;
+use ElkArte\Exceptions\Exception;
 use ElkArte\MembersList;
 use ElkArte\MessagesCallback\BodyParser\Normal;
 use ElkArte\MessagesCallback\SearchRenderer;
@@ -86,7 +87,7 @@ class Search extends AbstractController
 		// If load management is on and the load is high, no need to even show the form.
 		if (!empty($modSettings['loadavg_search']) && $modSettings['current_load'] >= $modSettings['loadavg_search'])
 		{
-			throw new \ElkArte\Exceptions\Exception('loadavg_search_disabled', false);
+			throw new Exception('loadavg_search_disabled', false);
 		}
 	}
 
@@ -125,7 +126,7 @@ class Search extends AbstractController
 		// Is the load average too high to allow searching just now?
 		if (!empty($modSettings['loadavg_search']) && $modSettings['current_load'] >= $modSettings['loadavg_search'])
 		{
-			throw new \ElkArte\Exceptions\Exception('loadavg_search_disabled', false);
+			throw new Exception('loadavg_search_disabled', false);
 		}
 
 		theme()->getTemplates()->loadLanguageFile('Search');

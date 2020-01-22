@@ -270,7 +270,7 @@ function template_results()
 		echo '
 		<results>';
 
-		while ($topic = $context['get_topics']())
+		while (($topic = $context['get_topics']()))
 		{
 			echo '
 			<result>

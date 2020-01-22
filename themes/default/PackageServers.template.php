@@ -12,6 +12,8 @@
  *
  */
 
+use ElkArte\Util;
+
 /**
  * Template used to manage package servers
  */
@@ -187,40 +189,33 @@ function template_package_list()
 					sprintf($txt['package_update'], '<i class="icon i-fail" title="' . $txt['package_installed_old'] . '"></i>', $txt['package_installed']);
 				}
 				// Installed but nothing newer is available
+				elseif ($package['is_installed'])
+				{
+
+
+					echo '
+							<span class="package_id">', $package['name'], '</span>&nbsp;',
+					sprintf($txt['package_current'], '<i class="icon i-check" title="' . $txt['package_installed_current'] . '"></i>', $txt['package_installed']);
+				}
+				// Downloaded, but there is a more recent version available
+				elseif ($package['is_downloaded'] && $package['is_newer'])
+				{
+					echo '
+							<span class="package_id">', $package['name'], '</span>&nbsp;<a class="linkbutton" href="', $package['download']['href'], '">', $txt['download'], '</a>&nbsp;',
+					sprintf($txt['package_update'], '<i class="icon i-warning" title="' . $txt['package_installed_old'] . '"></i>', $txt['package_downloaded']);
+				}
+				// Downloaded, and its current
+				elseif ($package['is_downloaded'])
+				{
+					echo '
+							<span class="package_id">', $package['name'], '</span>&nbsp;',
+					sprintf($txt['package_current'], '<i class="icon i-check" title="' . $txt['package_installed_current'] . '"></i>', $txt['package_downloaded']);
+				}
+				// Not downloaded or installed
 				else
 				{
-					if ($package['is_installed'])
-					{
-						echo '
-							<span class="package_id">', $package['name'], '</span>&nbsp;',
-						sprintf($txt['package_current'], '<i class="icon i-check" title="' . $txt['package_installed_current'] . '"></i>', $txt['package_installed']);
-					}
-					// Downloaded, but there is a more recent version available
-					else
-					{
-						if ($package['is_downloaded'] && $package['is_newer'])
-						{
-							echo '
-							<span class="package_id">', $package['name'], '</span>&nbsp;<a class="linkbutton" href="', $package['download']['href'], '">', $txt['download'], '</a>&nbsp;',
-							sprintf($txt['package_update'], '<i class="icon i-warning" title="' . $txt['package_installed_old'] . '"></i>', $txt['package_downloaded']);
-						}
-						// Downloaded, and its current
-						else
-						{
-							if ($package['is_downloaded'])
-							{
-								echo '
-							<span class="package_id">', $package['name'], '</span>&nbsp;',
-								sprintf($txt['package_current'], '<i class="icon i-check" title="' . $txt['package_installed_current'] . '"></i>', $txt['package_downloaded']);
-							}
-							// Not downloaded or installed
-							else
-							{
-								echo '
+					echo '
 							<span class="package_id">', $package['name'], '</span>&nbsp;<a class="linkbutton" href="', $package['download']['href'], '">', $txt['download'], '</a>';
-							}
-						}
-					}
 				}
 
 				echo '
@@ -230,7 +225,7 @@ function template_package_list()
 				if ($package['type'] != '')
 				{
 					echo '
-								<li>', $txt['package_type'], ':&nbsp; ', \ElkArte\Util::ucwords(\ElkArte\Util::strtolower($package['type'])), '</li>';
+								<li>', $txt['package_type'], ':&nbsp; ', Util::ucwords(Util::strtolower($package['type'])), '</li>';
 				}
 
 				// Show the version number?

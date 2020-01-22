@@ -119,14 +119,14 @@ class EmailParse
 	/**
 	 * If an html was found in the message
 	 *
-	 * @var boolean
+	 * @var bool
 	 */
 	public $html_found = false;
 
 	/**
 	 * If any positive spam headers were found in the message
 	 *
-	 * @var boolean
+	 * @var bool
 	 */
 	public $spam_found = false;
 
@@ -161,14 +161,14 @@ class EmailParse
 	/**
 	 * Holds the sending ip of the email
 	 *
-	 * @var string|boolean
+	 * @var string|bool
 	 */
 	public $ip = false;
 
 	/**
 	 * If the file was converted to utf8
 	 *
-	 * @var boolean
+	 * @var bool
 	 */
 	public $_converted_utf8 = false;
 
@@ -176,7 +176,7 @@ class EmailParse
 	 * Whether the message is a DSN (Delivery Status Notification - aka "bounce"),
 	 * indicating failed delivery
 	 *
-	 * @var boolean
+	 * @var bool
 	 */
 	public $_is_dsn = false;
 
@@ -235,7 +235,7 @@ class EmailParse
 	 * - determine content type and character encoding
 	 * - convert message body's
 	 *
-	 * @param boolean $html - flag to determine if we are saving html or not
+	 * @param bool $html - flag to determine if we are saving html or not
 	 * @param string $data - full header+message string
 	 * @param string $location - optional, used for debug
 	 * @throws \ElkArte\Exceptions\Exception
@@ -334,8 +334,8 @@ class EmailParse
 				'id' => $id
 			)
 		);
-		list ($message) = $db->fetch_row($request);
-		$db->free_result($request);
+		list ($message) = $request->fetch_row();
+		$request->free_result();
 
 		return $message;
 	}
@@ -669,7 +669,7 @@ class EmailParse
 	/**
 	 * Based on the the message content type, determine how to best proceed
 	 *
-	 * @param boolean $html
+	 * @param bool $html
 	 */
 	private function _parse_body($html = false)
 	{
@@ -851,7 +851,7 @@ class EmailParse
 	 * as its own email object
 	 *
 	 * @param string $boundary
-	 * @param boolean $html - flag to indicate html content
+	 * @param bool $html - flag to indicate html content
 	 */
 	private function _boundary_split($boundary, $html)
 	{
@@ -973,7 +973,7 @@ class EmailParse
 	private function _decode_body($val)
 	{
 		// The encoding tag can be missing in the headers or just wrong
-		if (preg_match('~(?:=C2|=A0|=D2|=D4|=96){1}~s', $val))
+		if (preg_match('~(?:=C2|=A0|=D2|=D4|=96)~s', $val))
 		{
 			// Remove /r/n to be just /n
 			$val = preg_replace('~(=0D=0A)~', "\n", $val);
@@ -994,9 +994,9 @@ class EmailParse
 			$val = $this->_decode_string($val, 'quoted-printable');
 		}
 		// Lines end in the tell tail quoted printable ... wrap and decode
-		elseif (preg_match('~\s=[\r?\n]{1}~s', $val))
+		elseif (preg_match('~\s=[\r?\n]~s', $val))
 		{
-			$val = preg_replace('~\s=[\r?\n]{1}~', ' ', $val);
+			$val = preg_replace('~\s=[\r?\n]~', ' ', $val);
 			$val = $this->_decode_string($val, 'quoted-printable');
 		}
 		// Lines end in = but not ==
@@ -1040,7 +1040,7 @@ class EmailParse
 	 * - As many, many daemons and providers do not adhere to the RFC 3464
 	 * standard, this function will hold the "special cases"
 	 *
-	 * @return boolean|null
+	 * @return bool|null
 	 */
 	private function _check_dsn()
 	{
@@ -1122,12 +1122,9 @@ class EmailParse
 			preg_match($regex_key, $key, $match);
 		}
 		// Otherwise we play find the key
-		else
+		elseif (!$this->_load_key_from_headers($regex_key))
 		{
-			if (!$this->_load_key_from_headers($regex_key))
-			{
-				$this->_load_key_from_body();
-			}
+			$this->_load_key_from_body();
 		}
 
 		return !empty($this->message_key_id) ? $this->message_key_id : false;
@@ -1327,7 +1324,7 @@ class EmailParse
 	 * - will look in various header fields where the ip may reside
 	 * - returns false if it can't find a valid IP4
 	 *
-	 * @return string|boolean on fail
+	 * @return string|bool on fail
 	 */
 	public function load_ip()
 	{
@@ -1389,7 +1386,7 @@ class EmailParse
 	 *
 	 * - will look in various header fields where the spam status may reside
 	 *
-	 * @return boolean on fail
+	 * @return bool on fail
 	 */
 	public function load_spam()
 	{

@@ -978,7 +978,8 @@ class ProfileOptions extends AbstractController
 	 * - Retrieve topic notifications count.
 	 *
 	 * @param int $memID id_member the id of the member who's notifications we are loading
-	 * @return integer
+	 * @return int
+	 * @throws \ElkArte\Exceptions\Exception
 	 */
 	public function list_getTopicNotificationCount($memID)
 	{
@@ -1275,22 +1276,19 @@ class ProfileOptions extends AbstractController
 				}
 			}
 			// ... if not, must be joining.
-			else
+			elseif ($canChangePrimary)
 			{
 				// Can we change the primary, and do we want to?
-				if ($canChangePrimary)
+				if ($this->_profile['id_group'] != 0)
 				{
-					if ($this->_profile['id_group'] != 0)
-					{
-						$addGroups[$this->_profile['id_group']] = -1;
-					}
-					$newPrimary = $group_id;
+					$addGroups[$this->_profile['id_group']] = -1;
 				}
-				// Otherwise it's an additional group...
-				else
-				{
-					$addGroups[$group_id] = -1;
-				}
+				$newPrimary = $group_id;
+			}
+			// Otherwise it's an additional group...
+			else
+			{
+				$addGroups[$group_id] = -1;
 			}
 		}
 		// Finally, we must be setting the primary.

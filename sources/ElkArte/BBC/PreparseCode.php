@@ -16,6 +16,8 @@
 
 namespace BBC;
 
+use ElkArte\TokenHash;
+
 /**
  * Class PreparseCode
  *
@@ -24,7 +26,7 @@ namespace BBC;
 class PreparseCode
 {
 	/** The regular expression non breaking space */
-	const NBS = '\x{A0}';
+	public const NBS = '\x{A0}';
 	/** @var string the message to preparse */
 	public $message = '';
 	/** @var string the username of the current user */
@@ -62,7 +64,7 @@ class PreparseCode
 	 *   - Won't convert \n's and a few other things if previewing is true.
 	 *
 	 * @param string $message
-	 * @param boolean $previewing
+	 * @param bool $previewing
 	 */
 	public function preparsecode(&$message, $previewing = false)
 	{
@@ -230,7 +232,7 @@ class PreparseCode
 		$parts = preg_split('~(\[/code\]|\[code(?:=[^\]]+)?\])~i', $this->message, -1, PREG_SPLIT_DELIM_CAPTURE);
 
 		// Token generator
-		$tokenizer = new \ElkArte\TokenHash();
+		$tokenizer = new TokenHash();
 
 		foreach ($parts as $i => $part)
 		{
@@ -675,17 +677,14 @@ class PreparseCode
 				}
 			}
 			// Otherwise is closed!
-			else
+			elseif (empty($table_array) || ($table_array[0] !== $matches[2]))
 			{
 				// Only keep the tag if it's closing the right thing.
-				if (empty($table_array) || ($table_array[0] !== $matches[2]))
-				{
-					$remove_tag = true;
-				}
-				else
-				{
-					array_shift($table_array);
-				}
+				$remove_tag = true;
+			}
+			else
+			{
+				array_shift($table_array);
 			}
 
 			// Removing?

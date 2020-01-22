@@ -26,11 +26,11 @@ class UserSettingsLoader
 	/**
 	 * @var int
 	 */
-	const HASH_LENGTH = 4;
+	public const HASH_LENGTH = 4;
 	/**
 	 * @var int
 	 */
-	const BAN_OFFSET = 10;
+	public const BAN_OFFSET = 10;
 	/**
 	 * @var mixed|string
 	 */

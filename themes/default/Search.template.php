@@ -313,7 +313,7 @@ function template_results()
 
 	// While we have results to show ...
 	$controller = $context['get_topics'][0];
-	while ($topic = $controller->{$context['get_topics'][1]}())
+	while (($topic = $controller->{$context['get_topics'][1]}()))
 	{
 		if ($context['compact'])
 		{

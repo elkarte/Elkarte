@@ -58,7 +58,7 @@ function template_list_groups_collapsible($group = 'default_groups_list')
  * @param string $name
  * @param string $label
  * @param string $extra
- * @param boolean $all
+ * @param bool $all
  *
  * @return string as echoed output
  */

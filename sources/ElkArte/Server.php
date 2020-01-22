@@ -58,7 +58,7 @@ class Server extends \ArrayObject
 	 * @param string $needed The amount of memory to request, if needed, like 256M
 	 * @param bool $in_use Set to true to account for current memory usage of the script
 	 *
-	 * @return boolean true if we have at least the needed memory
+	 * @return bool true if we have at least the needed memory
 	 */
 	public function setMemoryLimit($needed, $in_use = false)
 	{

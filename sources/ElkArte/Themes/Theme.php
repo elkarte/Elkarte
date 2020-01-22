@@ -20,9 +20,9 @@ abstract class Theme
 {
 	/** @var \ElkArte\ValuesContainer */
 	public $user;
-	const STANDARD = 'standard';
-	const DEFERRED = 'defer';
-	const ALL = -1;
+	public const STANDARD = 'standard';
+	public const DEFERRED = 'defer';
+	public const ALL = -1;
 
 	/**
 	 * The id of the theme being used
@@ -113,8 +113,8 @@ abstract class Theme
 	{
 		$this->id = $id;
 		$this->user = $user;
-		$this->layers = new TemplateLayers;
-		$this->templates = new Templates;
+		$this->layers = new TemplateLayers();
+		$this->templates = new Templates();
 
 		$this->css_files = &$GLOBALS['context']['css_files'];
 		$this->js_files = &$GLOBALS['context']['js_files'];

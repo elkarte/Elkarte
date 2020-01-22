@@ -589,7 +589,8 @@ class ManageNews extends AbstractController
 		{
 			$context['preview'] = true;
 
-			return $this->action_mailingcompose();
+			$this->action_mailingcompose();
+			return;
 		}
 
 		// How many to send at once? Quantity depends on whether we are queueing or not.
@@ -743,7 +744,8 @@ class ManageNews extends AbstractController
 		{
 			$context['preview'] = true;
 
-			return $this->action_mailingcompose();
+			$this->action_mailingcompose();
+			return;
 		}
 
 		// Use the default time format.

@@ -391,7 +391,7 @@ class SiteDispatcher
 	 * Determine if guest access is restricted, and, if so,
 	 * only allow the listed actions
 	 *
-	 * @return boolean
+	 * @return bool
 	 */
 	protected function restrictedGuestAccess()
 	{

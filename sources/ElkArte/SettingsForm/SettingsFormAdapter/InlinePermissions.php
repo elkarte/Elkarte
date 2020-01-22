@@ -56,7 +56,7 @@ class InlinePermissions extends Adapter
 
 		// Make sure they can't do certain things,
 		// unless they have the right permissions.
-		$this->permissionsObject = new Permissions;
+		$this->permissionsObject = new Permissions();
 		$this->illegal_permissions = $this->permissionsObject->getIllegalPermissions();
 	}
 
@@ -181,8 +181,9 @@ class InlinePermissions extends Adapter
 			);
 		}
 
-		$request = $this->db->query('', '
-			SELECT id_group, CASE WHEN add_deny = {int:denied} THEN {string:deny} ELSE {string:on} END AS status, permission
+		$this->db->fetchQuery('
+			SELECT 
+				id_group, CASE WHEN add_deny = {int:denied} THEN {string:deny} ELSE {string:on} END AS status, permission
 			FROM {db_prefix}permissions
 			WHERE id_group IN (-1, 0)
 				AND permission IN ({array_string:permissions})',
@@ -192,15 +193,15 @@ class InlinePermissions extends Adapter
 				'deny' => 'deny',
 				'on' => 'on',
 			)
+		)->fetch_callback(
+			function ($row) {
+				$this->context[$row['permission']][$row['id_group']]['status'] = $row['status'];
+			}
 		);
-		while ($row = $this->db->fetch_assoc($request))
-		{
-			$this->context[$row['permission']][$row['id_group']]['status'] = $row['status'];
-		}
-		$this->db->free_result($request);
 
-		$request = $this->db->query('', '
-			SELECT mg.id_group, mg.group_name, mg.min_posts, COALESCE(p.add_deny, -1) AS status, p.permission
+		$this->db->fetchQuery('
+			SELECT 
+				mg.id_group, mg.group_name, mg.min_posts, COALESCE(p.add_deny, -1) AS status, p.permission
 			FROM {db_prefix}membergroups AS mg
 				LEFT JOIN {db_prefix}permissions AS p ON (p.id_group = mg.id_group AND p.permission IN ({array_string:permissions}))
 			WHERE mg.id_group NOT IN (1, 3)
@@ -213,26 +214,27 @@ class InlinePermissions extends Adapter
 				'newbie_group' => 4,
 				'permissions' => $this->permissionList,
 			)
-		);
-		while ($row = $this->db->fetch_assoc($request))
-		{
-			// Initialize each permission as being 'off' until proven otherwise.
-			foreach ($this->permissions as $permission)
-			{
-				if (!isset($this->context[$permission[1]][$row['id_group']]))
+		)->fetch_callback(
+			function ($row) {
+				// Initialize each permission as being 'off' until proven otherwise.
+				foreach ($this->permissions as $permission)
 				{
-					$this->context[$permission[1]][$row['id_group']] = array(
-						'id' => $row['id_group'],
-						'name' => $row['group_name'],
-						'is_postgroup' => $row['min_posts'] != -1,
-						'status' => 'off',
-					);
+					if (!isset($this->context[$permission[1]][$row['id_group']]))
+					{
+						$this->context[$permission[1]][$row['id_group']] = array(
+							'id' => $row['id_group'],
+							'name' => $row['group_name'],
+							'is_postgroup' => $row['min_posts'] != -1,
+							'status' => 'off',
+						);
+					}
 				}
-			}
 
-			$this->context[$row['permission']][$row['id_group']]['status'] = empty($row['status']) ? 'deny' : ($row['status'] == 1 ? 'on' : 'off');
-		}
-		$this->db->free_result($request);
+				$this->context[$row['permission']][$row['id_group']]['status'] = empty($row['status']) ? 'deny' : ($row['status'] == 1 ? 'on' : 'off');
+
+			}
+		);
+
 		$this->filterIllegalPermissions();
 		$this->prepareContext();
 	}

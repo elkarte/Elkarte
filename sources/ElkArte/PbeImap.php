@@ -251,9 +251,7 @@ class PbeImap extends AbstractModel
 		$headers = imap_fetchheader($this->_inbox, $email_uid, FT_PREFETCHTEXT | FT_UID);
 		$message = imap_body($this->_inbox, $email_uid, FT_UID);
 
-		$email = !empty($headers) && !empty($message) ? $headers . "\n" . $message : '';
-
-		return $email;
+		return !empty($headers) && !empty($message) ? $headers . "\n" . $message : '';
 	}
 
 	/**

@@ -20,6 +20,7 @@ use ElkArte\Html2Md;
 use ElkArte\MembersList;
 use ElkArte\Notifications;
 use ElkArte\NotificationsTask;
+use ElkArte\TemporaryAttachment;
 use ElkArte\Util;
 use ElkArte\TemporaryAttachmentsList;
 
@@ -865,7 +866,7 @@ function pbe_email_attachments($pbe, $email_message)
 		{
 			@chmod($destName, 0644);
 
-			$temp_file = new \ElkArte\TemporaryAttachment([
+			$temp_file = new TemporaryAttachment([
 				'name' => basename($name),
 				'tmp_name' => $destName,
 				'attachid' => $attachID,

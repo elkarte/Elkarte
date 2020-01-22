@@ -56,7 +56,7 @@ class PackageActions extends AbstractController
 	/**
 	 * If any of the steps will fail to complete
 	 *
-	 * @var boolean
+	 * @var bool
 	 */
 	public $has_failure = false;
 	/**
@@ -98,7 +98,7 @@ class PackageActions extends AbstractController
 	/**
 	 * Passed value to indicate if this is an install or uninstall pass
 	 *
-	 * @var boolean
+	 * @var bool
 	 */
 	protected $_uninstalling;
 	/**
@@ -124,7 +124,7 @@ class PackageActions extends AbstractController
 	/**
 	 * Current check for a modification add/replace failure for the file being changed
 	 *
-	 * @var boolean
+	 * @var bool
 	 */
 	private $_failure;
 
@@ -146,7 +146,7 @@ class PackageActions extends AbstractController
 	 * Called from the packages.controller as part of the "test" phase
 	 *
 	 * @param array $actions set of actions as defined by parsePackageInfo
-	 * @param boolean $uninstalling Yea or Nay
+	 * @param bool $uninstalling Yea or Nay
 	 * @param string $base_path base path for the package within the temp directory
 	 * @param array $theme_paths
 	 */
@@ -279,7 +279,7 @@ class PackageActions extends AbstractController
 	 * Called from the packages.controller as part of the "install" phase
 	 *
 	 * @param array $actions set of actions as defined by parsePackageInfo
-	 * @param boolean $uninstalling Yea or Nay
+	 * @param bool $uninstalling Yea or Nay
 	 * @param string $base_path base path for the package within the temp directory
 	 * @param array $theme_paths
 	 * @param array $themes_installed

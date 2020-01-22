@@ -23,17 +23,17 @@ class MemberLoader
 	/**
 	 * Just the bare minimum set of fields
 	 */
-	const SET_MINIMAL = 'minimal';
+	public const SET_MINIMAL = 'minimal';
 
 	/**
 	 * What is needed in most of the cases
 	 */
-	const SET_NORMAL = 'normal';
+	public const SET_NORMAL = 'normal';
 
 	/**
 	 * What is required to see a profile page
 	 */
-	const SET_PROFILE = 'profile';
+	public const SET_PROFILE = 'profile';
 
 	/**
 	 * @var \ElkArte\Database\QueryInterface
@@ -252,7 +252,7 @@ class MemberLoader
 		);
 
 		$new_loaded_ids = array();
-		while ($row = $request->fetch_assoc())
+		while (($row = $request->fetch_assoc()))
 		{
 			$new_loaded_ids[] = $row['id_member'];
 			$this->loaded_ids[] = $row['id_member'];
@@ -297,7 +297,7 @@ class MemberLoader
 			)
 		);
 		$data = [];
-		while ($row = $request->fetch_assoc())
+		while (($row = $request->fetch_assoc()))
 		{
 			if (!empty($row['field_options']))
 			{
@@ -331,7 +331,7 @@ class MemberLoader
 		{
 			foreach ($new_loaded_ids as $id)
 			{
-				$this->cache->put('member_data-' . $this->set . '-' . $id, $this->users_list->getByid($id)->toArray(), 240);
+				$this->cache->put('member_data-' . $this->set . '-' . $id, $this->users_list->getById($id)->toArray(), 240);
 			}
 		}
 	}

@@ -42,7 +42,7 @@ class Standard extends AbstractAPI
 	/**
 	 * Standard search is supported by default.
 	 *
-	 * @var boolean
+	 * @var bool
 	 */
 	public $is_supported = true;
 
@@ -363,7 +363,7 @@ class Standard extends AbstractAPI
 		{
 			$inserts = array();
 
-			while ($row = $this->_db->fetch_assoc($ignoreRequest))
+			while (($row = $ignoreRequest->fetch_assoc()))
 			{
 				// No duplicates!
 				if ($use_old_ids)
@@ -373,12 +373,9 @@ class Standard extends AbstractAPI
 						continue;
 					}
 				}
-				else
+				elseif (isset($inserts[$row['id_topic']]))
 				{
-					if (isset($inserts[$row['id_topic']]))
-					{
-						continue;
-					}
+					continue;
 				}
 
 				$usedIDs[$row['id_topic']] = true;
@@ -387,7 +384,7 @@ class Standard extends AbstractAPI
 					$inserts[$row['id_topic']][] = (int) $row[$key];
 				}
 			}
-			$this->_db->free_result($ignoreRequest);
+			$ignoreRequest->free_result();
 
 			// Now put them in!
 			if (!empty($inserts))
@@ -409,7 +406,7 @@ class Standard extends AbstractAPI
 		}
 		else
 		{
-			$num_results = $this->_db->affected_rows();
+			$num_results = $ignoreRequest->affected_rows();
 		}
 
 		return $num_results;
@@ -760,7 +757,7 @@ class Standard extends AbstractAPI
 			// Don't do INSERT IGNORE? Manually fix this up!
 			if (!$this->_db->support_ignore())
 			{
-				while ($row = $this->_db->fetch_row($ignoreRequest))
+				while (($row = $ignoreRequest->fetch_row()))
 				{
 					$ind = $this->_createTemporary ? 0 : 1;
 
@@ -772,12 +769,12 @@ class Standard extends AbstractAPI
 
 					$inserts[$row[$ind]] = $row;
 				}
-				$this->_db->free_result($ignoreRequest);
+				$ignoreRequest->free_result();
 				$numSubjectResults = count($inserts);
 			}
 			else
 			{
-				$numSubjectResults += $this->_db->affected_rows();
+				$numSubjectResults += $ignoreRequest->affected_rows();
 			}
 
 			if (!empty($modSettings['search_max_results']) && $numSubjectResults >= $modSettings['search_max_results'])
@@ -859,7 +856,7 @@ class Standard extends AbstractAPI
 
 				if (!$this->_db->support_ignore())
 				{
-					while ($row = $this->_db->fetch_row($ignoreRequest))
+					while (($row = $ignoreRequest->fetch_row()))
 					{
 						// No duplicates!
 						if (isset($inserts[$row[0]]))
@@ -869,12 +866,12 @@ class Standard extends AbstractAPI
 
 						$inserts[$row[0]] = $row;
 					}
-					$this->_db->free_result($ignoreRequest);
+					$ignoreRequest->free_result();
 					$indexedResults = count($inserts);
 				}
 				else
 				{
-					$indexedResults += $this->_db->affected_rows();
+					$indexedResults += $ignoreRequest->affected_rows();
 				}
 
 				if (!empty($this->config->maxMessageResults) && $indexedResults >= $this->config->maxMessageResults)
@@ -934,7 +931,7 @@ class Standard extends AbstractAPI
 				'limit' => $limit,
 			)
 		);
-		while ($row = $this->_db->fetch_assoc($request))
+		while (($row = $request->fetch_assoc()))
 		{
 			$topics[$row['id_msg']] = array(
 				'relevance' => round($row['relevance'] / 10, 1) . '%',
@@ -944,7 +941,7 @@ class Standard extends AbstractAPI
 			// By default they didn't participate in the topic!
 			$participants[$row['id_topic']] = false;
 		}
-		$this->_db->free_result($request);
+		$request->free_result();
 
 		return $participants;
 	}

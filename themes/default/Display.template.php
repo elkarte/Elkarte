@@ -110,7 +110,7 @@ function template_messages()
 
 	// Get all the messages...
 	$controller = $context['get_message'][0];
-	while ($message = $controller->{$context['get_message'][1]}())
+	while (($message = $controller->{$context['get_message'][1]}()))
 	{
 		if ($message['can_remove'])
 		{

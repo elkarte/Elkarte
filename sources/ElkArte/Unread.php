@@ -21,8 +21,8 @@ namespace ElkArte;
  */
 class Unread
 {
-	const UNREAD = 0;
-	const UNREADREPLIES = 1;
+	public const UNREAD = 0;
+	public const UNREADREPLIES = 1;
 
 	/** @var bool */
 	private $_have_temp_table = false;
@@ -123,7 +123,7 @@ class Unread
 	/**
 	 * Return the sorting direction
 	 *
-	 * @return boolean
+	 * @return bool
 	 */
 	public function isSortAsc()
 	{
@@ -307,7 +307,7 @@ class Unread
 	 */
 	private function _countRecentTopics($is_first_login, $id_msg_last_visit = 0)
 	{
-		$request = $this->_db->query('', '
+		$request = $this->_db->fetchQuery('
 			SELECT COUNT(*), MIN(t.id_last_msg)
 			FROM {db_prefix}topics AS t' . (!empty($this->_have_temp_table) ? '
 				LEFT JOIN {db_prefix}log_topics_unread AS lt ON (lt.id_topic = t.id_topic)' : '
@@ -326,8 +326,8 @@ class Unread
 				'is_approved' => 1,
 			))
 		);
-		list ($this->_num_topics, $this->_min_message) = $this->_db->fetch_row($request);
-		$this->_db->free_result($request);
+		list ($this->_num_topics, $this->_min_message) = $request->fetch_row();
+		$request->free_result();
 	}
 
 	/**
@@ -337,22 +337,24 @@ class Unread
 	{
 		if (!empty($this->_have_temp_table))
 		{
-			$request = $this->_db->query('', '
-				SELECT COUNT(*)
+			$request = $this->_db->fetchQuery('
+				SELECT 
+					COUNT(*)
 				FROM {db_prefix}topics_posted_in AS pi
 					LEFT JOIN {db_prefix}log_topics_posted_in AS lt ON (lt.id_topic = pi.id_topic)
 				WHERE pi.id_board IN ({array_int:boards})
 					AND COALESCE(lt.id_msg, pi.id_msg) < pi.id_last_msg',
 				array_merge($this->_query_parameters, array())
 			);
-			list ($this->_num_topics) = $this->_db->fetch_row($request);
-			$this->_db->free_result($request);
+			list ($this->_num_topics) = $request->fetch_row();
+			$request->free_result();
 			$this->_min_message = 0;
 		}
 		else
 		{
 			$request = $this->_db->query('unread_fetch_topic_count', '
-				SELECT COUNT(DISTINCT t.id_topic), MIN(t.id_last_msg)
+				SELECT 
+					COUNT(DISTINCT t.id_topic), MIN(t.id_last_msg)
 				FROM {db_prefix}topics AS t
 					INNER JOIN {db_prefix}messages AS m ON (m.id_topic = t.id_topic)
 					LEFT JOIN {db_prefix}log_topics AS lt ON (lt.id_topic = t.id_topic AND lt.id_member = {int:current_member})
@@ -367,8 +369,8 @@ class Unread
 					'is_approved' => 1,
 				))
 			);
-			list ($this->_num_topics, $this->_min_message) = $this->_db->fetch_row($request);
-			$this->_db->free_result($request);
+			list ($this->_num_topics, $this->_min_message) = $request->fetch_row();
+			$request->free_result();
 		}
 	}
 
@@ -376,8 +378,7 @@ class Unread
 	 * Retrieves unread topics or messages
 	 *
 	 * @param string $join - kind of "JOIN" to execute. If 'topic' JOINs boards on
-	 *                       the topics table, otherwise ('message') the JOIN is on
-	 *                       the messages table
+	 * the topics table, otherwise ('message') the JOIN is on the messages table
 	 * @param int $start - position to start the query
 	 * @param int $limit - number of entries to grab
 	 * @param bool $include_avatars - if avatars should be retrieved as well
@@ -406,6 +407,7 @@ class Unread
 	 * @param int $limit - number of entries to grab
 	 * @param bool|int $include_avatars - if avatars should be retrieved as well
 	 * @return mixed[] - see \ElkArte\TopicUtil::prepareContext
+	 * @throws \ElkArte\Exceptions\Exception
 	 */
 	private function _getUnreadTopics($join, $start, $limit, $include_avatars = false)
 	{
@@ -413,18 +415,15 @@ class Unread
 		{
 			$body_query = 'ml.body AS last_body, ms.body AS first_body,';
 		}
+		elseif (empty($this->_preview_bodies))
+		// If empty, no preview at all
+		{
+			$body_query = '';
+		}
+		// Default: a SUBSTRING
 		else
 		{
-			// If empty, no preview at all
-			if (empty($this->_preview_bodies))
-			{
-				$body_query = '';
-			}
-			// Default: a SUBSTRING
-			else
-			{
-				$body_query = 'SUBSTRING(ml.body, 1, ' . ($this->_preview_bodies + 256) . ') AS last_body, SUBSTRING(ms.body, 1, ' . ($this->_preview_bodies + 256) . ') AS first_body,';
-			}
+			$body_query = 'SUBSTRING(ml.body, 1, ' . ($this->_preview_bodies + 256) . ') AS last_body, SUBSTRING(ms.body, 1, ' . ($this->_preview_bodies + 256) . ') AS first_body,';
 		}
 
 		if (!empty($include_avatars))
@@ -486,11 +485,11 @@ class Unread
 			))
 		);
 		$topics = array();
-		while ($row = $this->_db->fetch_assoc($request))
+		while (($row = $request->fetch_assoc()))
 		{
 			$topics[] = $row;
 		}
-		$this->_db->free_result($request);
+		$request->free_result();
 
 		return TopicUtil::prepareContext($topics, true, ((int) $this->_preview_bodies) + 128);
 	}
@@ -550,11 +549,11 @@ class Unread
 			);
 		}
 		$topics = array();
-		while ($row = $this->_db->fetch_assoc($request))
+		while (($row = $request->fetch_assoc()))
 		{
 			$topics[] = $row['id_topic'];
 		}
-		$this->_db->free_result($request);
+		$request->free_result();
 
 		// Sanity... where have you gone?
 		if (empty($topics))
@@ -566,18 +565,15 @@ class Unread
 		{
 			$body_query = 'ml.body AS last_body, ms.body AS first_body,';
 		}
-		else
+		elseif (empty($this->_preview_bodies))
 		{
 			// If empty, no preview at all
-			if (empty($this->_preview_bodies))
-			{
-				$body_query = '';
-			}
-			// Default: a SUBSTRING
-			else
-			{
-				$body_query = 'SUBSTRING(ml.body, 1, ' . ($this->_preview_bodies + 256) . ') AS last_body, SUBSTRING(ms.body, 1, ' . ($this->_preview_bodies + 256) . ') AS first_body,';
-			}
+			$body_query = '';
+		}
+		// Default: a SUBSTRING
+		else
+		{
+			$body_query = 'SUBSTRING(ml.body, 1, ' . ($this->_preview_bodies + 256) . ') AS last_body, SUBSTRING(ms.body, 1, ' . ($this->_preview_bodies + 256) . ') AS first_body,';
 		}
 
 		if (!empty($include_avatars))
@@ -631,11 +627,11 @@ class Unread
 			)
 		);
 		$return = array();
-		while ($row = $this->_db->fetch_assoc($request))
+		while (($row = $request->fetch_assoc()))
 		{
 			$return[] = $row;
 		}
-		$this->_db->free_result($request);
+		$request->free_result();
 
 		return TopicUtil::prepareContext($return, true, ((int) $this->_preview_bodies) + 128);
 	}

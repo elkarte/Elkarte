@@ -21,7 +21,7 @@ class TestModerationCenterController extends ElkArteCommonSetupTest
 		parent::setUp();
 		parent::setSession();
 
-		\ElkArte\user::$info->mod_cache = [
+		\ElkArte\User::$info->mod_cache = [
 			'bq' => '1=1',
 			'ap' => [0],
 			'gq' => '1=1',

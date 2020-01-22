@@ -68,7 +68,7 @@ class DailyDigest implements ScheduledTaskInterface
 		$is_weekly = !empty($is_weekly) ? 1 : 0;
 
 		// Right - get all the notification data FIRST.
-		$request = $db->query('', '
+		$request = $db->fetchQuery('
 			SELECT 
 				ln.id_topic, COALESCE(t.id_board, ln.id_board) AS id_board, 
 				mem.email_address, mem.member_name, mem.real_name, mem.notify_types, mem.lngfile, mem.id_member
@@ -87,7 +87,7 @@ class DailyDigest implements ScheduledTaskInterface
 		$langs = array();
 		$notify = array();
 		$boards = array();
-		while ($row = $db->fetch_assoc($request))
+		while (($row = $request->fetch_assoc()))
 		{
 			if (!isset($members[$row['id_member']]))
 			{
@@ -112,7 +112,7 @@ class DailyDigest implements ScheduledTaskInterface
 				$notify['boards'][$row['id_board']][] = $row['id_member'];
 			}
 		}
-		$db->free_result($request);
+		$request->free_result();
 
 		if (empty($boards))
 		{
@@ -129,7 +129,7 @@ class DailyDigest implements ScheduledTaskInterface
 		}
 
 		// Get the actual topics...
-		$request = $db->query('', '
+		$request = $db->fetchQuery('
 			SELECT 
 				ld.note_type, ld.id_msg AS last_reply,
 				t.id_topic, t.id_board, t.id_member_started, 
@@ -149,7 +149,7 @@ class DailyDigest implements ScheduledTaskInterface
 			)
 		);
 		$types = array();
-		while ($row = $db->fetch_assoc($request))
+		while (($row = $request->fetch_assoc()))
 		{
 			if (!isset($types[$row['note_type']][$row['id_board']]))
 			{
@@ -234,7 +234,7 @@ class DailyDigest implements ScheduledTaskInterface
 				$types[$row['note_type']][$row['id_board']]['lines'][$row['id_topic']]['members'] = array_merge($types[$row['note_type']][$row['id_board']]['lines'][$row['id_topic']]['members'], $notify['boards'][$row['id_board']]);
 			}
 		}
-		$db->free_result($request);
+		$request->free_result();
 
 		if (empty($types))
 		{

@@ -86,7 +86,7 @@ class Templates
 	 * @param bool $fatal = true if fatal is true, dies with an error message if the
 	 *     template cannot be found
 	 *
-	 * @return boolean|null
+	 * @return bool|null
 	 * @throws \ElkArte\Exceptions\Exception
 	 * @uses $this->requireTemplate() to actually load the file.
 	 *

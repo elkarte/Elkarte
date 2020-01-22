@@ -27,6 +27,7 @@ class RemoveOldDrafts implements ScheduledTaskInterface
 	 * Scheduled task for removing those old and abandoned drafts
 	 *
 	 * @return bool
+	 * @throws \ElkArte\Exceptions\Exception
 	 */
 	public function run()
 	{
@@ -55,11 +56,11 @@ class RemoveOldDrafts implements ScheduledTaskInterface
 				'poster_time_old' => time() - (86400 * $modSettings['drafts_keep_days']),
 			)
 		);
-		while ($row = $db->fetch_row($request))
+		while (($row = $request->fetch_row()))
 		{
 			$drafts[] = (int) $row[0];
 		}
-		$db->free_result($request);
+		$request->free_result();
 
 		// If we have old one, remove them
 		if (count($drafts) > 0)

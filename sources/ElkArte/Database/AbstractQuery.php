@@ -43,7 +43,7 @@ abstract class AbstractQuery implements QueryInterface
 	/**
 	 * The way to skip a database error
 	 *
-	 * @var boolean
+	 * @var bool
 	 */
 	protected $_skip_error = false;
 
@@ -74,7 +74,7 @@ abstract class AbstractQuery implements QueryInterface
 	 * MySQL supports unbuffered queries, this remembers if we are running an
 	 * unbuffered or not
 	 *
-	 * @var boolean
+	 * @var bool
 	 */
 	protected $_unbuffered = false;
 
@@ -559,7 +559,7 @@ abstract class AbstractQuery implements QueryInterface
 	 */
 	protected function _replaceIdentifier($replacement)
 	{
-		if (preg_match('~[a-z_][0-9,a-z,A-Z$_]{0,60}~', $replacement) !== 1)
+		if (preg_match('~[a-z_][0-9a-zA-Z$,_]{0,60}~', $replacement) !== 1)
 		{
 			$this->error_backtrace('Wrong value type sent to the database. Invalid identifier used. (' . $replacement . ')', '', E_USER_ERROR, __FILE__, __LINE__);
 		}
@@ -664,7 +664,7 @@ abstract class AbstractQuery implements QueryInterface
 	/**
 	 * Whether the database system is case sensitive.
 	 *
-	 * @return boolean
+	 * @return bool
 	 */
 	abstract public function case_sensitive();
 
@@ -834,7 +834,7 @@ abstract class AbstractQuery implements QueryInterface
 	/**
 	 * This function combines the keys and values of the data passed to db::insert.
 	 *
-	 * @param integer[] $keys
+	 * @param int[] $keys
 	 * @param mixed[] $values
 	 * @return mixed[]
 	 */

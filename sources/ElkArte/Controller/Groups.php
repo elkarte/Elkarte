@@ -151,7 +151,7 @@ class Groups extends AbstractController
 							else
 							{
 								$url = getUrl($base_type, array_merge($base_params, ['group' => $rowData['id_group']]));
-								$group_name = sprintf('<a href="%1$s">%3$s</a>', $url, $rowData['id_group'], $rowData['group_name_color']);
+								$group_name = sprintf('<a href="%1$s">%2$s</a>', $url, $rowData['group_name_color']);
 							}
 
 							// Add a help option for moderator and administrator.

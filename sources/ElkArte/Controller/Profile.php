@@ -34,7 +34,7 @@ class Profile extends AbstractController
 	/**
 	 * If the save was successful or not
 	 *
-	 * @var boolean
+	 * @var bool
 	 */
 	private $completedSave = false;
 
@@ -55,7 +55,7 @@ class Profile extends AbstractController
 	/**
 	 * Holds the output of createMenu for the profile areas
 	 *
-	 * @var array|boolean
+	 * @var array|bool
 	 */
 	private $_profile_include_data;
 

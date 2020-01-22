@@ -14,7 +14,6 @@
 namespace ElkArte\Themes;
 
 use ElkArte\Cache\Cache;
-use ElkArte\ext\Composer\Autoload\ClassLoader;
 use ElkArte\Hooks;
 use ElkArte\HttpReq;
 use ElkArte\User;
@@ -290,7 +289,7 @@ class ThemeLoader
 
 		// The require should not be necessary, but I guess it's better to stay on the safe side.
 		require_once(EXTDIR . '/ClassLoader.php');
-		$loader = new ClassLoader();
+		$loader = new \ElkArte\ext\Composer\Autoload\ClassLoader();
 		$loader->setPsr4('ElkArte\\Themes\\' . $themeName . '\\', $themeData[0]['default_theme_dir']);
 		$loader->register();
 
@@ -433,19 +432,6 @@ class ThemeLoader
 		{
 			$db = database();
 
-			// Load variables from the current or default theme, global or this user's.
-			$result = $db->query('', '
-			SELECT 
-				variable, value, id_member, id_theme
-			FROM {db_prefix}themes
-			WHERE id_member' . (empty($themeData[0]) ? ' IN (-1, 0, {int:id_member})' : ' = {int:id_member}') . '
-				AND id_theme' . ($this->id == 1 ? ' = {int:id_theme}' : ' IN ({int:id_theme}, 1)'),
-				[
-					'id_theme' => $this->id,
-					'id_member' => $member,
-				]
-			);
-
 			$immutable_theme_data = [
 				'actual_theme_url',
 				'actual_images_url',
@@ -465,29 +451,39 @@ class ThemeLoader
 				'theme_url',
 			];
 
-			// Pick between $settings and $options depending on whose data it is.
-			while ($row = $db->fetch_assoc($result))
-			{
-				// There are just things we shouldn't be able to change as members.
-				if ($row['id_member'] != 0 && in_array($row['variable'], $immutable_theme_data))
-				{
-					continue;
-				}
+			// Load variables from the current or default theme, global or this user's.
+			$db->fetchQuery('
+			SELECT 
+				variable, value, id_member, id_theme
+			FROM {db_prefix}themes
+			WHERE id_member' . (empty($themeData[0]) ? ' IN (-1, 0, {int:id_member})' : ' = {int:id_member}') . '
+				AND id_theme' . ($this->id == 1 ? ' = {int:id_theme}' : ' IN ({int:id_theme}, 1)'),
+				[
+					'id_theme' => $this->id,
+					'id_member' => $member,
+				]
+			)->fetch_callback(
+				function ($row) use ($immutable_theme_data, &$themeData) {
+					// There are just things we shouldn't be able to change as members.
+					if ($row['id_member'] != 0 && in_array($row['variable'], $immutable_theme_data))
+					{
+						return;
+					}
 
-				// If this is the theme_dir of the default theme, store it.
-				if (in_array($row['variable'], ['theme_dir', 'theme_url', 'images_url'])
-					&& $row['id_theme'] == 1 && empty($row['id_member']))
-				{
-					$themeData[0]['default_' . $row['variable']] = $row['value'];
-				}
+					// If this is the theme_dir of the default theme, store it.
+					if (in_array($row['variable'], ['theme_dir', 'theme_url', 'images_url'])
+						&& $row['id_theme'] == 1 && empty($row['id_member']))
+					{
+						$themeData[0]['default_' . $row['variable']] = $row['value'];
+					}
 
-				// If this isn't set yet, is a theme option, or is not the default theme..
-				if (!isset($themeData[$row['id_member']][$row['variable']]) || $row['id_theme'] != 1)
-				{
-					$themeData[$row['id_member']][$row['variable']] = substr($row['variable'], 0, 5) === 'show_' ? $row['value'] == 1 : $row['value'];
+					// If this isn't set yet, is a theme option, or is not the default theme..
+					if (!isset($themeData[$row['id_member']][$row['variable']]) || $row['id_theme'] != 1)
+					{
+						$themeData[$row['id_member']][$row['variable']] = substr($row['variable'], 0, 5) === 'show_' ? $row['value'] == 1 : $row['value'];
+					}
 				}
-			}
-			$db->free_result($result);
+			);
 
 			if (file_exists($themeData[0]['default_theme_dir'] . '/cache')
 				&& is_writable($themeData[0]['default_theme_dir'] . '/cache'))
@@ -580,12 +576,9 @@ class ThemeLoader
 				{
 					redirectexit('wwwRedirect');
 				}
-				else
+				elseif (key($_GET) !== 'wwwRedirect')
 				{
-					if (key($_GET) !== 'wwwRedirect')
-					{
-						redirectexit('wwwRedirect;' . key($_GET) . '=' . current($_GET));
-					}
+					redirectexit('wwwRedirect;' . key($_GET) . '=' . current($_GET));
 				}
 			}
 

@@ -67,9 +67,9 @@ namespace ElkArte\SettingsForm;
  */
 class SettingsForm
 {
-	const DB_ADAPTER = 'ElkArte\\SettingsForm\\SettingsFormAdapter\\Db';
-	const DBTABLE_ADAPTER = 'ElkArte\\SettingsForm\\SettingsFormAdapter\\DbTable';
-	const FILE_ADAPTER = 'ElkArte\\SettingsForm\\SettingsFormAdapter\\File';
+	public const DB_ADAPTER = 'ElkArte\\SettingsForm\\SettingsFormAdapter\\Db';
+	public const DBTABLE_ADAPTER = 'ElkArte\\SettingsForm\\SettingsFormAdapter\\DbTable';
+	public const FILE_ADAPTER = 'ElkArte\\SettingsForm\\SettingsFormAdapter\\File';
 
 	/**
 	 * @var \ElkArte\SettingsForm\SettingsFormAdapter\Adapter
@@ -83,7 +83,7 @@ class SettingsForm
 	{
 		$fqcn = $adapter ?: self::FILE_ADAPTER;
 
-		$this->adapter = new $fqcn;
+		$this->adapter = new $fqcn();
 	}
 
 	/**

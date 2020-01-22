@@ -244,7 +244,7 @@ class XmlArray
 				}
 
 				$offset = 0;
-				while (1 === 1)
+				while (true)
 				{
 					// Where is the next start tag?
 					$next_tag_start = strpos($data, '<' . $match[1], $offset);
@@ -574,7 +574,7 @@ class XmlArray
 	 * Get a specific element's xml. (privately used...)
 	 *
 	 * @param mixed[] $array
-	 * @param null|integer $indent
+	 * @param null|int $indent
 	 *
 	 * @return string
 	 */
@@ -685,7 +685,7 @@ class XmlArray
 	 *   echo $xml->exists('html/body') ? 'y' : 'n';
 	 *
 	 * @param string $path - the path to the element to get.
-	 * @return boolean
+	 * @return bool
 	 */
 	public function exists($path)
 	{

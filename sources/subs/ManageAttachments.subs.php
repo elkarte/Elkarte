@@ -27,7 +27,7 @@ use ElkArte\Util;
  *
  * @return int
  * @package Attachments
- *
+ * @throws \ElkArte\Exceptions\Exception
  */
 function approveAttachments($attachments)
 {
@@ -39,7 +39,8 @@ function approveAttachments($attachments)
 	}
 
 	// For safety, check for thumbnails...
-	$request = $db->query('', '
+	$attachments = array();
+	$db->fetchQuery('
 		SELECT
 			a.id_attach, a.id_member, COALESCE(thumb.id_attach, 0) AS id_thumb
 		FROM {db_prefix}attachments AS a
@@ -50,19 +51,17 @@ function approveAttachments($attachments)
 			'attachments' => $attachments,
 			'attachment_type' => 0,
 		)
-	);
-	$attachments = array();
-	while ($row = $db->fetch_assoc($request))
-	{
-		// Update the thumbnail too...
-		if (!empty($row['id_thumb']))
-		{
-			$attachments[] = $row['id_thumb'];
-		}
+	)->fetch_callback(
+		function ($row) use (&$attachments) {
+			// Update the thumbnail too...
+			if (!empty($row['id_thumb']))
+			{
+				$attachments[] = $row['id_thumb'];
+			}
 
-		$attachments[] = $row['id_attach'];
-	}
-	$db->free_result($request);
+			$attachments[] = $row['id_attach'];
+		}
+	);
 
 	if (empty($attachments))
 	{
@@ -130,8 +129,9 @@ function approveAttachments($attachments)
  * @param string $query_type
  * @param bool $return_affected_messages = false
  * @param bool $autoThumbRemoval = true
- * @return int[]|boolean returns affected messages if $return_affected_messages is set to true
+ * @return int[]|bool returns affected messages if $return_affected_messages is set to true
  * @package Attachments
+ * @throws \ElkArte\Exceptions\Exception
  */
 function removeAttachments($condition, $query_type = '', $return_affected_messages = false, $autoThumbRemoval = true)
 {
@@ -154,40 +154,40 @@ function removeAttachments($condition, $query_type = '', $return_affected_messag
 			$is_not = substr($real_type, 0, 4) === 'not_';
 			$type = $is_not ? substr($real_type, 4) : $real_type;
 
-			// @todo the !empty($restriction) is a trick to override the checks on $_POST['attach_del'] in Post.controller
-			// In theory it should not be necessary
-			if (in_array($type, array('id_member', 'id_attach', 'id_msg')) && !empty($restriction))
+			switch ($type)
 			{
-				$new_condition[] = 'a.' . $type . ($is_not ? ' NOT' : '') . ' IN (' . (is_array($restriction) ? '{array_int:' . $real_type . '}' : '{int:' . $real_type . '}') . ')';
-			}
-			elseif ($type == 'attachment_type')
-			{
-				$new_condition[] = 'a.attachment_type = {int:' . $real_type . '}';
-			}
-			elseif ($type == 'poster_time')
-			{
-				$new_condition[] = 'm.poster_time < {int:' . $real_type . '}';
-			}
-			elseif ($type == 'last_login')
-			{
-				$new_condition[] = 'mem.last_login < {int:' . $real_type . '}';
-			}
-			elseif ($type == 'size')
-			{
-				$new_condition[] = 'a.size > {int:' . $real_type . '}';
-			}
-			elseif ($type == 'id_topic')
-			{
-				$new_condition[] = 'm.id_topic IN (' . (is_array($restriction) ? '{array_int:' . $real_type . '}' : '{int:' . $real_type . '}') . ')';
+				case 'id_member':
+				case 'id_attach':
+				case 'id_msg':
+					// @todo the !empty($restriction) is a trick to override the checks on $_POST['attach_del'] in Post.controller
+					// In theory it should not be necessary
+					if (!empty($restriction))
+					{
+						$new_condition[] = 'a.' . $type . ($is_not ? ' NOT' : '') . ' IN (' . (is_array($restriction) ? '{array_int:' . $real_type . '}' : '{int:' . $real_type . '}') . ')';
+					}
+					break;
+				case 'attachment_type':
+					$new_condition[] = 'a.attachment_type = {int:' . $real_type . '}';
+					break;
+				case 'poster_time':
+					$new_condition[] = 'm.poster_time < {int:' . $real_type . '}';
+					break;
+				case 'last_login':
+					$new_condition[] = 'mem.last_login < {int:' . $real_type . '}';
+					break;
+				case 'size':
+					$new_condition[] = 'a.size > {int:' . $real_type . '}';
+					break;
+				case 'id_topic':
+					$new_condition[] = 'm.id_topic IN (' . (is_array($restriction) ? '{array_int:' . $real_type . '}' : '{int:' . $real_type . '}') . ')';
+					break;
+				case 'do_logging':
+					$do_logging = $condition['id_attach'];
+					break;
 			}
 
 			// Add the parameter!
 			$query_parameter[$real_type] = $restriction;
-
-			if ($type == 'do_logging')
-			{
-				$do_logging = $condition['id_attach'];
-			}
 		}
 
 		if (empty($new_condition))
@@ -206,7 +206,7 @@ function removeAttachments($condition, $query_type = '', $return_affected_messag
 	require_once(SUBSDIR . '/Attachments.subs.php');
 
 	// Get all the attachment names and id_msg's.
-	$request = $db->query('', '
+	$db->fetchQuery('
 		SELECT
 			a.id_folder, a.filename, a.file_hash, a.attachment_type, a.id_attach, a.id_member' . ($query_type == 'messages' ? ', m.id_msg' : ', a.id_msg') . ',
 			thumb.id_folder AS thumb_folder, COALESCE(thumb.id_attach, 0) AS id_thumb, thumb.filename AS thumb_filename, thumb.file_hash AS thumb_file_hash, thumb_parent.id_attach AS id_parent
@@ -217,45 +217,45 @@ function removeAttachments($condition, $query_type = '', $return_affected_messag
 			LEFT JOIN {db_prefix}attachments AS thumb_parent ON (thumb.attachment_type = {int:thumb_attachment_type} AND thumb_parent.id_thumb = a.id_attach)
 		WHERE ' . $condition,
 		$query_parameter
+	)->fetch_callback(
+		function ($row) use (&$attach, &$parents, &$msgs, $modSettings, $return_affected_messages, $autoThumbRemoval) {
+			// Figure out the "encrypted" filename and unlink it ;).
+			if ($row['attachment_type'] == 1)
+			{
+				// if attachment_type = 1, it's... an avatar in a custom avatar directory.
+				// wasn't it obvious? :P
+				// @todo look again at this.
+				@unlink($modSettings['custom_avatar_dir'] . '/' . $row['filename']);
+			}
+			else
+			{
+				$filename = getAttachmentFilename($row['filename'], $row['id_attach'], $row['id_folder'], false, $row['file_hash']);
+				@unlink($filename);
+
+				// If this was a thumb, the parent attachment should know about it.
+				if (!empty($row['id_parent']))
+				{
+					$parents[] = $row['id_parent'];
+				}
+
+				// If this attachments has a thumb, remove it as well.
+				if (!empty($row['id_thumb']) && $autoThumbRemoval)
+				{
+					$thumb_filename = getAttachmentFilename($row['thumb_filename'], $row['id_thumb'], $row['thumb_folder'], false, $row['thumb_file_hash']);
+					@unlink($thumb_filename);
+					$attach[] = $row['id_thumb'];
+				}
+			}
+
+			// Make a list.
+			if ($return_affected_messages && empty($row['attachment_type']))
+			{
+				$msgs[] = $row['id_msg'];
+			}
+
+			$attach[] = $row['id_attach'];
+		}
 	);
-	while ($row = $db->fetch_assoc($request))
-	{
-		// Figure out the "encrypted" filename and unlink it ;).
-		if ($row['attachment_type'] == 1)
-		{
-			// if attachment_type = 1, it's... an avatar in a custom avatar directory.
-			// wasn't it obvious? :P
-			// @todo look again at this.
-			@unlink($modSettings['custom_avatar_dir'] . '/' . $row['filename']);
-		}
-		else
-		{
-			$filename = getAttachmentFilename($row['filename'], $row['id_attach'], $row['id_folder'], false, $row['file_hash']);
-			@unlink($filename);
-
-			// If this was a thumb, the parent attachment should know about it.
-			if (!empty($row['id_parent']))
-			{
-				$parents[] = $row['id_parent'];
-			}
-
-			// If this attachments has a thumb, remove it as well.
-			if (!empty($row['id_thumb']) && $autoThumbRemoval)
-			{
-				$thumb_filename = getAttachmentFilename($row['thumb_filename'], $row['id_thumb'], $row['thumb_folder'], false, $row['thumb_file_hash']);
-				@unlink($thumb_filename);
-				$attach[] = $row['id_thumb'];
-			}
-		}
-
-		// Make a list.
-		if ($return_affected_messages && empty($row['attachment_type']))
-		{
-			$msgs[] = $row['id_msg'];
-		}
-		$attach[] = $row['id_attach'];
-	}
-	$db->free_result($request);
 
 	// Removed attachments don't have to be updated anymore.
 	$parents = array_diff($parents, $attach);
@@ -328,6 +328,7 @@ function removeAttachments($condition, $query_type = '', $return_affected_messag
  *
  * @return int
  * @package Attachments
+ * @throws \ElkArte\Exceptions\Exception
  */
 function getAttachmentCount()
 {
@@ -345,10 +346,10 @@ function getAttachmentCount()
 			'guest_id_member' => 0,
 		)
 	);
-	list ($num_attachments) = $db->fetch_row($request);
-	$db->free_result($request);
+	list ($num_attachments) = $request->fetch_row();
+	$request->free_result();
 
-	return $num_attachments;
+	return (int) $num_attachments;
 }
 
 /**
@@ -356,9 +357,9 @@ function getAttachmentCount()
  *
  * @param string $folder
  *
- * @return
+ * @return int
  * @package Attachments
- *
+ * @throws \ElkArte\Exceptions\Exception
  */
 function getFolderAttachmentCount($folder)
 {
@@ -376,10 +377,10 @@ function getFolderAttachmentCount($folder)
 			'attachment_type' => 1,
 		)
 	);
-	list ($num_attachments) = $db->fetch_row($request);
-	$db->free_result($request);
+	list ($num_attachments) = $request->fetch_row();
+	$request->free_result();
 
-	return $num_attachments;
+	return (int) $num_attachments;
 }
 
 /**
@@ -394,17 +395,18 @@ function getAvatarCount()
 
 	// Get the avatar amount....
 	$request = $db->query('', '
-		SELECT COUNT(*)
+		SELECT 
+			COUNT(*)
 		FROM {db_prefix}attachments
 		WHERE id_member != {int:guest_id_member}',
 		array(
 			'guest_id_member' => 0,
 		)
 	);
-	list ($num_avatars) = $db->fetch_row($request);
-	$db->free_result($request);
+	list ($num_avatars) = $request->fetch_row();
+	$request->free_result();
 
-	return $num_avatars;
+	return (int) $num_avatars;
 }
 
 /**
@@ -416,6 +418,7 @@ function getAvatarCount()
  *
  * @param int[] $attach_ids
  * @package Attachments
+ * @throws \ElkArte\Exceptions\Exception
  */
 function removeOrphanAttachments($attach_ids)
 {
@@ -449,7 +452,7 @@ function removeOrphanAttachments($attach_ids)
  *
  * @return bool|int|null
  * @package Attachments
- *
+ * @throws \ElkArte\Exceptions\Exception
  */
 function attachment_filesize($attach_id, $filesize = null)
 {
@@ -458,7 +461,8 @@ function attachment_filesize($attach_id, $filesize = null)
 	if ($filesize === null)
 	{
 		$result = $db->query('', '
-			SELECT size
+			SELECT 
+				size
 			FROM {db_prefix}attachments
 			WHERE id_attach = {int:id_attach}',
 			array(
@@ -467,10 +471,10 @@ function attachment_filesize($attach_id, $filesize = null)
 		);
 		if ($result->hasResults())
 		{
-			list ($filesize) = $db->fetch_row($result);
-			$db->free_result($result);
+			list ($filesize) = $result->fetch_row();
+			$result->free_result();
 
-			return $filesize;
+			return (int) $filesize;
 		}
 
 		return false;
@@ -498,7 +502,7 @@ function attachment_filesize($attach_id, $filesize = null)
  *
  * @return bool|int|null
  * @package Attachments
- *
+ * @throws \ElkArte\Exceptions\Exception
  */
 function attachment_folder($attach_id, $folder_id = null)
 {
@@ -507,7 +511,8 @@ function attachment_folder($attach_id, $folder_id = null)
 	if ($folder_id === null)
 	{
 		$result = $db->query('', '
-			SELECT id_folder
+			SELECT 
+				id_folder
 			FROM {db_prefix}attachments
 			WHERE id_attach = {int:id_attach}',
 			array(
@@ -516,10 +521,10 @@ function attachment_folder($attach_id, $folder_id = null)
 		);
 		if ($result->hasResults())
 		{
-			list ($folder_id) = $db->fetch_row($result);
-			$db->free_result($result);
+			list ($folder_id) = $result->fetch_row();
+			$result->free_result();
 
-			return $folder_id;
+			return (int) $folder_id;
 		}
 
 		return false;
@@ -549,17 +554,18 @@ function maxNoThumb()
 	$db = database();
 
 	$result = $db->query('', '
-		SELECT MAX(id_attach)
+		SELECT 
+			MAX(id_attach)
 		FROM {db_prefix}attachments
 		WHERE id_thumb != {int:no_thumb}',
 		array(
 			'no_thumb' => 0,
 		)
 	);
-	list ($thumbnails) = $db->fetch_row($result);
-	$db->free_result($result);
+	list ($thumbnails) = $result->fetch_row();
+	$result->free_result();
 
-	return $thumbnails;
+	return (int) $thumbnails;
 }
 
 /**
@@ -570,12 +576,12 @@ function maxNoThumb()
  * - If $fix_errors is set to true it will attempt to remove the thumbnail from disk
  *
  * @param int $start
- * @param boolean $fix_errors
+ * @param bool $fix_errors
  * @param string[] $to_fix
  *
  * @return array
  * @package Attachments
- *
+ * @throws \ElkArte\Exceptions\Exception
  */
 function findOrphanThumbnails($start, $fix_errors, $to_fix)
 {
@@ -597,10 +603,10 @@ function findOrphanThumbnails($start, $fix_errors, $to_fix)
 		)
 	);
 	$to_remove = array();
-	if ($db->num_rows($result) != 0)
+	if ($result->num_rows() != 0)
 	{
 		$to_fix[] = 'missing_thumbnail_parent';
-		while ($row = $db->fetch_assoc($result))
+		while (($row = $result->fetch_assoc($result)))
 		{
 			// Only do anything once... just in case
 			if (!isset($to_remove[$row['id_attach']]))
@@ -616,7 +622,7 @@ function findOrphanThumbnails($start, $fix_errors, $to_fix)
 			}
 		}
 	}
-	$db->free_result($result);
+	$result->free_result();
 
 	// Do we need to delete what we have?
 	if ($fix_errors && !empty($to_remove) && in_array('missing_thumbnail_parent', $to_fix))
@@ -643,12 +649,12 @@ function findOrphanThumbnails($start, $fix_errors, $to_fix)
  * - If $fix_errors is set to true it will attempt to remove the thumbnail from disk
  *
  * @param int $start
- * @param boolean $fix_errors
+ * @param bool $fix_errors
  * @param string[] $to_fix
  *
  * @return array
  * @package Attachments
- *
+ * @throws \ElkArte\Exceptions\Exception
  */
 function findParentsOrphanThumbnails($start, $fix_errors, $to_fix)
 {
@@ -698,12 +704,12 @@ function findParentsOrphanThumbnails($start, $fix_errors, $to_fix)
  * - remove DB entries if the file can not be found.
  *
  * @param int $start
- * @param boolean $fix_errors
+ * @param bool $fix_errors
  * @param string[] $to_fix
  *
  * @return array
  * @package Attachments
- *
+ * @throws \ElkArte\Exceptions\Exception
  */
 function repairAttachmentData($start, $fix_errors, $to_fix)
 {
@@ -722,7 +728,7 @@ function repairAttachmentData($start, $fix_errors, $to_fix)
 		'file_wrong_size' => 0
 	);
 
-	$result = $db->query('', '
+	$request = $db->query('', '
 		SELECT 
 			id_attach, id_folder, filename, file_hash, size, attachment_type
 		FROM {db_prefix}attachments
@@ -732,7 +738,7 @@ function repairAttachmentData($start, $fix_errors, $to_fix)
 		)
 	);
 	$to_remove = array();
-	while ($row = $db->fetch_assoc($result))
+	while (($row = $request->fetch_assoc()))
 	{
 		// Get the filename.
 		if ($row['attachment_type'] == 1)
@@ -826,7 +832,7 @@ function repairAttachmentData($start, $fix_errors, $to_fix)
 			}
 		}
 	}
-	$db->free_result($result);
+	$request->free_result();
 
 	// Do we need to delete what we have?
 	if ($fix_errors && !empty($to_remove) && in_array('file_missing_on_disk', $to_fix))
@@ -843,12 +849,12 @@ function repairAttachmentData($start, $fix_errors, $to_fix)
  * - If $fix_errors is set, it will
  *
  * @param int $start
- * @param boolean $fix_errors
+ * @param bool $fix_errors
  * @param string[] $to_fix
  *
  * @return array
  * @package Attachments
- *
+ * @throws \ElkArte\Exceptions\Exception
  */
 function findOrphanAvatars($start, $fix_errors, $to_fix)
 {
@@ -915,12 +921,12 @@ function findOrphanAvatars($start, $fix_errors, $to_fix)
  * Finds attachments that are not used in any message
  *
  * @param int $start
- * @param boolean $fix_errors
+ * @param bool $fix_errors
  * @param string[] $to_fix
  *
  * @return array
  * @package Attachments
- *
+ * @throws \ElkArte\Exceptions\Exception
  */
 function findOrphanAttachments($start, $fix_errors, $to_fix)
 {
@@ -992,8 +998,8 @@ function getMaxThumbnail()
 			'thumbnail' => 3,
 		)
 	);
-	list ($thumbnail) = $db->fetch_row($result);
-	$db->free_result($result);
+	list ($thumbnail) = $result->fetch_row();
+	$result->free_result();
 
 	return $thumbnail;
 }
@@ -1013,8 +1019,8 @@ function maxAttachment()
 		FROM {db_prefix}attachments',
 		array()
 	);
-	list ($attachment) = $db->fetch_row($result);
-	$db->free_result($result);
+	list ($attachment) = $result->fetch_row();
+	$result->free_result();
 
 	return $attachment;
 }
@@ -1027,7 +1033,7 @@ function maxAttachment()
  *
  * @return array
  * @package Attachments
- *
+ * @throws \Exception
  */
 function validateAttachments($attachments, $approve_query)
 {
@@ -1064,13 +1070,13 @@ function validateAttachments($attachments, $approve_query)
  *
  * @return int
  * @package Attachments
- *
+ * @throws \Exception
  */
 function attachmentBelongsTo($attachment)
 {
 	$db = database();
 
-	$request = $db->query('', '
+	$attachment = $db->fetchQuery('
 		SELECT 
 			a.id_attach, m.id_board, m.id_msg, m.id_topic
 		FROM {db_prefix}attachments AS a
@@ -1084,26 +1090,26 @@ function attachmentBelongsTo($attachment)
 			'attachment' => $attachment,
 			'attachment_type' => 0,
 		)
-	);
-	$attachment = $db->fetch_assoc($request);
-	$db->free_result($request);
+	)->fetch_all();
 
-	return $attachment;
+	return $attachment[0] ?? $attachment;
 }
 
 /**
  * Checks an attachments id
  *
  * @param int $id_attach
- * @return boolean
+ * @return bool
  * @package Attachments
+ * @throws \ElkArte\Exceptions\Exception
  */
 function validateAttachID($id_attach)
 {
 	$db = database();
 
 	$request = $db->query('', '
-		SELECT id_attach
+		SELECT 
+			id_attach
 		FROM {db_prefix}attachments
 		WHERE id_attach = {int:attachment_id}
 		LIMIT 1',
@@ -1111,8 +1117,8 @@ function validateAttachID($id_attach)
 			'attachment_id' => $id_attach,
 		)
 	);
-	$count = $db->num_rows($request);
-	$db->free_result($request);
+	$count = $request->num_rows();
+	$request->free_result();
 
 	return $count != 0;
 }
@@ -1128,6 +1134,7 @@ function validateAttachID($id_attach)
  * @param string $approve_query additional restrictions based on the boards the approver can see
  * @return mixed[] an array of unapproved attachments
  * @package Attachments
+ * @throws \Exception
  */
 function list_getUnapprovedAttachments($start, $items_per_page, $sort, $approve_query)
 {
@@ -1211,6 +1218,7 @@ function list_getUnapprovedAttachments($start, $items_per_page, $sort, $approve_
  * @param string $approve_query additional restrictions based on the boards the approver can see
  * @return int the number of unapproved attachments
  * @package Attachments
+ * @throws \ElkArte\Exceptions\Exception
  */
 function list_getNumUnapprovedAttachments($approve_query)
 {
@@ -1232,8 +1240,8 @@ function list_getNumUnapprovedAttachments($approve_query)
 			'attachment_type' => 0,
 		)
 	);
-	list ($total_unapproved_attachments) = $db->fetch_row($request);
-	$db->free_result($request);
+	list ($total_unapproved_attachments) = $request->fetch_row();
+	$request->free_result();
 
 	return $total_unapproved_attachments;
 }
@@ -1252,7 +1260,9 @@ function list_getAttachDirs()
 	$db = database();
 	$attachmentsDir = new AttachmentsDirectory($modSettings, $db);
 
-	$request = $db->query('', '
+	$expected_files = array();
+	$expected_size = array();
+	$db->fetchQuery('
 		SELECT 
 			id_folder, COUNT(id_attach) AS num_attach, SUM(size) AS size_attach
 		FROM {db_prefix}attachments
@@ -1261,15 +1271,12 @@ function list_getAttachDirs()
 		array(
 			'type' => 1,
 		)
+	)->fetch_callback(
+		function ($row) use (&$expected_files, &$expected_size) {
+			$expected_files[$row['id_folder']] = $row['num_attach'];
+			$expected_size[$row['id_folder']] = $row['size_attach'];
+		}
 	);
-	$expected_files = array();
-	$expected_size = array();
-	while ($row = $db->fetch_assoc($request))
-	{
-		$expected_files[$row['id_folder']] = $row['num_attach'];
-		$expected_size[$row['id_folder']] = $row['size_attach'];
-	}
-	$db->free_result($request);
 
 	$attachdirs = array();
 	foreach ($attachmentDirectory->getPaths() as $id => $dir)
@@ -1365,11 +1372,9 @@ function attachDirStatus($dir, $expected_files)
 	{
 		return array('unused', false, $num_files);
 	}
+
 	// All good!
-	else
-	{
-		return array('ok', false, $num_files);
-	}
+	return array('ok', false, $num_files);
 }
 
 /**
@@ -1440,9 +1445,9 @@ function list_getBaseDirs()
  *
  * @param string $browse_type can be one of 'avatars' or not. (in which case they're attachments)
  *
- * @return
+ * @return int
  * @package Attachments
- *
+ * @throws \ElkArte\Exceptions\Exception
  */
 function list_getNumFiles($browse_type)
 {
@@ -1479,10 +1484,10 @@ function list_getNumFiles($browse_type)
 		);
 	}
 
-	list ($num_files) = $db->fetch_row($request);
-	$db->free_result($request);
+	list ($num_files) = $request->fetch_row();
+	$request->free_result();
 
-	return $num_files;
+	return (int) $num_files;
 }
 
 /**
@@ -1498,7 +1503,7 @@ function list_getNumFiles($browse_type)
  *
  * @return array
  * @package Attachments
- *
+ * @throws \Exception
  */
 function list_getFiles($start, $items_per_page, $sort, $browse_type)
 {
@@ -1572,8 +1577,8 @@ function overallAttachmentsSize()
 			'type' => 1,
 		)
 	);
-	list ($attachmentDirSize) = $db->fetch_row($request);
-	$db->free_result($request);
+	list ($attachmentDirSize) = $request->fetch_row();
+	$request->free_result();
 
 	return byte_format($attachmentDirSize);
 }
@@ -1599,7 +1604,7 @@ function currentAttachDirProperties()
  *
  * @return array
  * @package Attachments
- *
+ * @throws \ElkArte\Exceptions\Exception
  */
 function attachDirProperties($dir)
 {
@@ -1618,8 +1623,8 @@ function attachDirProperties($dir)
 			'type' => 1,
 		)
 	);
-	list ($current_dir['files'], $current_dir['size']) = $db->fetch_row($request);
-	$db->free_result($request);
+	list ($current_dir['files'], $current_dir['size']) = $request->fetch_row();
+	$request->free_result();
 
 	return $current_dir;
 }
@@ -1637,7 +1642,8 @@ function moveAvatars()
 
 	require_once(SUBSDIR . '/Attachments.subs.php');
 
-	$request = $db->query('', '
+	$updatedAvatars = array();
+	$db->fetchQuery('
 		SELECT 
 			id_attach, id_folder, id_member, filename, file_hash
 		FROM {db_prefix}attachments
@@ -1647,18 +1653,16 @@ function moveAvatars()
 			'attachment_type' => 0,
 			'guest_id_member' => 0,
 		)
-	);
-	$updatedAvatars = array();
-	while ($row = $db->fetch_assoc($request))
-	{
-		$filename = getAttachmentFilename($row['filename'], $row['id_attach'], $row['id_folder'], false, $row['file_hash']);
+	)->fetch_callback(
+		function ($row) use (&$updatedAvatars, $modSettings) {
+			$filename = getAttachmentFilename($row['filename'], $row['id_attach'], $row['id_folder'], false, $row['file_hash']);
 
-		if (rename($filename, $modSettings['custom_avatar_dir'] . '/' . $row['filename']))
-		{
-			$updatedAvatars[] = $row['id_attach'];
+			if (rename($filename, $modSettings['custom_avatar_dir'] . '/' . $row['filename']))
+			{
+				$updatedAvatars[] = $row['id_attach'];
+			}
 		}
-	}
-	$db->free_result($request);
+	);
 
 	if (!empty($updatedAvatars))
 	{
@@ -1686,6 +1690,7 @@ function moveAvatars()
  * @param int $limit
  *
  * @return array
+ * @throws \Exception
  */
 function findAttachmentsToMove($from, $start, $limit)
 {
@@ -1716,6 +1721,7 @@ function findAttachmentsToMove($from, $start, $limit)
  *
  * @param int[] $moved integer array of attachment ids
  * @param string $new_dir new directory string
+ * @throws \ElkArte\Exceptions\Exception
  */
 function moveAttachments($moved, $new_dir)
 {
@@ -1740,6 +1746,7 @@ function moveAttachments($moved, $new_dir)
  * @param int[] $messages array of message id's to update
  * @param string $notice notice to add
  * @package Attachments
+ * @throws \ElkArte\Exceptions\Exception
  */
 function setRemovalNotice($messages, $notice)
 {
@@ -1765,6 +1772,7 @@ function setRemovalNotice($messages, $notice)
  * @return array
  * @todo $unapproved may be superfluous
  * @package Attachments
+ * @throws \Exception
  */
 function attachmentsOfMessage($id_msg, $unapproved = false)
 {
@@ -1796,7 +1804,7 @@ function attachmentsOfMessage($id_msg, $unapproved = false)
  *
  * @return
  * @package Attachments
- *
+ * @throws \ElkArte\Exceptions\Exception
  */
 function countAttachmentsInFolders($id_folder)
 {
@@ -1812,8 +1820,8 @@ function countAttachmentsInFolders($id_folder)
 			'id_folder' => $id_folder,
 		)
 	);
-	list ($num_attach) = $db->fetch_row($request);
-	$db->free_result($request);
+	list ($num_attach) = $request->fetch_row();
+	$request->free_result();
 
 	return $num_attach;
 }
@@ -1824,6 +1832,7 @@ function countAttachmentsInFolders($id_folder)
  * @param int $from - the folder the attachments are in
  * @param int $to - the folder the attachments should be moved to
  * @package Attachments
+ * @throws \ElkArte\Exceptions\Exception
  */
 function updateAttachmentIdFolder($from, $to)
 {

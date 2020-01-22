@@ -21,11 +21,11 @@ use \Exception;
 
 class AttachmentsDirectory
 {
-	const AUTO_SEQUENCE = 1;
-	const AUTO_YEAR = 2;
-	const AUTO_YEAR_MONTH = 3;
-	const AUTO_RAND = 4;
-	const AUTO_RAND2 = 5;
+	public const AUTO_SEQUENCE = 1;
+	public const AUTO_YEAR = 2;
+	public const AUTO_YEAR_MONTH = 3;
+	public const AUTO_RAND = 4;
+	public const AUTO_RAND2 = 5;
 
 	protected $automanage_attachments = 0;
 	protected $currentAttachmentUploadDir = 0;
@@ -776,7 +776,7 @@ class AttachmentsDirectory
 	 * Finds the current directory tree for the supplied base directory
 	 *
 	 * @param string $directory
-	 * @return string[]|boolean on fail else array of directory names
+	 * @return string[]|bool on fail else array of directory names
 	 * @package Attachments
 	 */
 	protected function getTreeElements($directory)

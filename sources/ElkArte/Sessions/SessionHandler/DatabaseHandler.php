@@ -86,7 +86,7 @@ class DatabaseHandler extends \SessionHandler
 		}
 
 		// Clean up after yerself ;).
-		$this->_db->query('', '
+		$result = $this->_db->query('', '
 			DELETE FROM {db_prefix}sessions
 			WHERE last_update < {int:last_update}',
 			array(
@@ -94,7 +94,7 @@ class DatabaseHandler extends \SessionHandler
 			)
 		);
 
-		return $this->_db->affected_rows() != 0;
+		return $result->affected_rows() != 0;
 	}
 
 	/**

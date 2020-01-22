@@ -29,7 +29,7 @@ use ElkArte\Exceptions\Exception;
 class Image
 {
 	/** @var array The image formats we will work with */
-	const DEFAULT_FORMATS = [
+	public const DEFAULT_FORMATS = [
 		IMAGETYPE_GIF => 'gif',
 		IMAGETYPE_JPEG => 'jpeg',
 		IMAGETYPE_PNG => 'png',
@@ -154,7 +154,7 @@ class Image
 	 * @param int $height Height of the image
 	 * @param string $format Type of the image (valid types are png, jpeg, gif)
 	 *
-	 * @return boolean|string The image or false if neither Imagick nor GD are found
+	 * @return bool|string The image or false if neither Imagick nor GD are found
 	 */
 	public function generateTextImage($text, $width = 100, $height = 75, $format = 'png')
 	{
@@ -299,7 +299,7 @@ class Image
 	 * @param bool $force_resize Always resize the image (force scale up)
 	 * @param bool $strip Allow IM to remove exif data as GD always will
 	 *
-	 * @return boolean Whether the thumbnail creation was successful.
+	 * @return bool Whether the thumbnail creation was successful.
 	 */
 	public function resizeImage($max_width, $max_height, $strip = false, $force_resize = true)
 	{

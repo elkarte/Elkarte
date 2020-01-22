@@ -685,7 +685,7 @@ class Poll extends AbstractController
 			// Always show one extra box...
 			$context['poll']['choices'][] = array(
 				'id' => $last_id++,
-				'number' => $number++,
+				'number' => $number,
 				'label' => '',
 				'votes' => -1,
 				'is_last' => true

@@ -304,7 +304,7 @@ class File extends Db
 	 * @param string $needle
 	 * @param mixed[] $haystack
 	 *
-	 * @return boolean
+	 * @return bool
 	 */
 	private function _array_value_exists__recursive($needle, $haystack)
 	{

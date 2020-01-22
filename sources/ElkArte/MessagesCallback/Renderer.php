@@ -213,14 +213,14 @@ abstract class Renderer
 	 *
 	 * @param bool $reset
 	 *
-	 * @return boolean
+	 * @return bool
 	 */
 	protected function _currentContext($reset = false)
 	{
 		// Start from the beginning...
 		if ($reset)
 		{
-			$this->_db->data_seek($this->_dbRequest, 0);
+			$this->_dbRequest->data_seek(0);
 		}
 
 		// If the query has already returned false, get out of here

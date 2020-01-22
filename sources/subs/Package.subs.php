@@ -1051,18 +1051,15 @@ function parsePackageInfo(&$packageXML, $testing_only = true, $method = 'install
 					}
 				}
 				// Fallback when we have no lang parameter.
+				elseif (isset($context[$type]['selected']))
+				{
+				// Already selected one for use?
+					$context[$type][] = 'default';
+					continue;
+				}
 				else
 				{
-					// Already selected one for use?
-					if (isset($context[$type]['selected']))
-					{
-						$context[$type][] = 'default';
-						continue;
-					}
-					else
-					{
-						$context[$type]['selected'] = 'default';
-					}
+					$context[$type]['selected'] = 'default';
 				}
 			}
 
@@ -1749,29 +1746,26 @@ function deltree($dir, $delete_dir = true)
 				deltree($entryname->getPathname());
 			}
 			// A file, delete it by any means necessary
-			else
+			elseif (isset($package_ftp))
 			{
 				// Here, 755 doesn't really matter since we're deleting it anyway.
-				if (isset($package_ftp))
+				$ftp_file = strtr($entryname->getPathname(), array($_SESSION['pack_ftp']['root'] => ''));
+
+				if (!$entryname->isWritable())
 				{
-					$ftp_file = strtr($entryname->getPathname(), array($_SESSION['pack_ftp']['root'] => ''));
-
-					if (!$entryname->isWritable())
-					{
-						$package_ftp->chmod($ftp_file, 0777);
-					}
-
-					$package_ftp->unlink($ftp_file);
+					$package_ftp->chmod($ftp_file, 0777);
 				}
-				else
+
+				$package_ftp->unlink($ftp_file);
+			}
+			else
+			{
+				if (!$entryname->isWritable())
 				{
-					if (!$entryname->isWritable())
-					{
-						elk_chmod($entryname->getPathname(), 0777);
-					}
-
-					@unlink($entryname->getPathname());
+					elk_chmod($entryname->getPathname(), 0777);
 				}
+
+				@unlink($entryname->getPathname());
 			}
 		}
 	}
@@ -2682,22 +2676,20 @@ function package_chmod($filename, $perm_state = 'writable', $track_change = fals
 				// Keep track of the writable status here.
 				$file_permissions = @fileperms($chmod_file);
 			}
-			else
+			elseif (!file_exists($chmod_file) && $perm_state === 'writable')
 			{
 				// This looks odd, but it's an attempt to work around PHP suExec.
-				if (!file_exists($chmod_file) && $perm_state === 'writable')
-				{
-					$file_permissions = @fileperms(dirname($chmod_file));
+				$file_permissions = @fileperms(dirname($chmod_file));
 
-					mktree(dirname($chmod_file), 0755);
-					@touch($chmod_file);
-					elk_chmod($chmod_file, 0755);
-				}
-				else
-				{
-					$file_permissions = @fileperms($chmod_file);
-				}
+				mktree(dirname($chmod_file), 0755);
+				@touch($chmod_file);
+				elk_chmod($chmod_file, 0755);
 			}
+			else
+			{
+				$file_permissions = @fileperms($chmod_file);
+			}
+
 
 			// This looks odd, but it's another attempt to work around PHP suExec.
 			if ($perm_state !== 'writable')

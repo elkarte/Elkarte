@@ -442,9 +442,7 @@ final class Hooks
 	{
 		global $modSettings;
 
-		$existing = !empty($modSettings['autoload_integrate']) ? explode(',', $modSettings['autoload_integrate']) : array();
-
-		return $existing;
+		return !empty($modSettings['autoload_integrate']) ? explode(',', $modSettings['autoload_integrate']) : array();
 	}
 
 	/**
@@ -477,8 +475,8 @@ final class Hooks
 				'variable' => $hook,
 			)
 		);
-		list ($current_functions) = $this->_db->fetch_row($request);
-		$this->_db->free_result($request);
+		list ($current_functions) = $request->fetch_row();
+		$request->free_result();
 
 		if (!empty($current_functions))
 		{
@@ -526,8 +524,8 @@ final class Hooks
 				'variable' => $hook,
 			)
 		);
-		list ($current_functions) = $this->_db->fetch_row($request);
-		$this->_db->free_result($request);
+		list ($current_functions) = $request->fetch_row();
+		$request->free_result();
 
 		// If we found entries for this hook
 		if (!empty($current_functions))

@@ -99,7 +99,7 @@ class HttpReq
 	public function __construct($dataValidator = null)
 	{
 		// Make sure the validator is initiated
-		$this->_dataValidator = $dataValidator === null ? new DataValidator : $dataValidator;
+		$this->_dataValidator = $dataValidator === null ? new DataValidator() : $dataValidator;
 
 		// Make the superglobals available as R/W properties
 		$this->cookie = new \ArrayObject($_COOKIE, \ArrayObject::ARRAY_AS_PROPS);
@@ -250,11 +250,9 @@ class HttpReq
 	{
 		switch (true)
 		{
-			case isset($this->_param[$key]):
-				return true;
-			case isset($this->query->{$key}):
-				return true;
 			case isset($this->post->{$key}):
+			case isset($this->query->{$key}):
+			case isset($this->_param[$key]):
 				return true;
 			default:
 				return false;

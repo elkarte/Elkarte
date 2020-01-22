@@ -233,7 +233,7 @@ class ManageLanguages extends AbstractController
 					),
 					'data' => array(
 						'function' => function ($rowData) {
-							return sprintf('<a href="%1$s">%3$s<i class="icon icon-small i-modify"></i></a>', getUrl('admin', ['action' => 'admin', 'area' => 'languages', 'sa' => 'editlang', 'lid' => $rowData['id']]), $rowData['name']);
+							return sprintf('<a href="%1$s">%2$s<i class="icon icon-small i-modify"></i></a>', getUrl('admin', ['action' => 'admin', 'area' => 'languages', 'sa' => 'editlang', 'lid' => $rowData['id']]), $rowData['name']);
 						},
 					),
 				),
@@ -452,13 +452,10 @@ class ManageLanguages extends AbstractController
 				}
 			}
 			// No overwrite?
-			else
+			elseif (is_writable(BOARDDIR . '/' . $dirname))
 			{
 				// Can we at least stick it in the directory...
-				if (is_writable(BOARDDIR . '/' . $dirname))
-				{
-					$context_data['writable'] = true;
-				}
+				$context_data['writable'] = true;
 			}
 
 			// I love PHP files, that's why I'm a developer and not an artistic type spending my time drinking absinth and living a life of sin...
@@ -748,7 +745,7 @@ class ManageLanguages extends AbstractController
 		{
 			// Open it up.
 			$dir = dir($theme_dir);
-			while ($entry = $dir->read())
+			while (($entry = $dir->read()))
 			{
 				// We're only after the files for this language.
 				if (preg_match('~^([A-Za-z]+)\.' . $context['lang_id'] . '\.php$~', $entry, $matches) == 0)

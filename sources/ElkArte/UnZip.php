@@ -75,28 +75,28 @@ class UnZip
 	/**
 	 * If the file passes or fails crc check
 	 *
-	 * @var boolean
+	 * @var bool
 	 */
 	protected $_crc_check = false;
 
 	/**
 	 * If we are going to write out the files processed
 	 *
-	 * @var boolean
+	 * @var bool
 	 */
 	protected $_write_this = false;
 
 	/**
 	 * If we will skip a file we found
 	 *
-	 * @var boolean
+	 * @var bool
 	 */
 	protected $_skip = false;
 
 	/**
 	 * If we found a file that was requested ($files_to_extract)
 	 *
-	 * @var boolean
+	 * @var bool
 	 */
 	protected $_found = false;
 
@@ -124,14 +124,14 @@ class UnZip
 	/**
 	 * If we are looking for a single specific file
 	 *
-	 * @var boolean|string
+	 * @var bool|string
 	 */
 	protected $single_file;
 
 	/**
 	 * If we can overwrite a file with the same name in the destination
 	 *
-	 * @var boolean
+	 * @var bool
 	 */
 	protected $overwrite;
 
@@ -178,7 +178,7 @@ class UnZip
 	/**
 	 * Class controller, calls the functions in required order
 	 *
-	 * @return boolean|mixed[]
+	 * @return bool|mixed[]
 	 */
 	public function read_zip_data()
 	{
@@ -228,7 +228,7 @@ class UnZip
 	/**
 	 * Does a quick check to see if this is a valid looking zip file
 	 *
-	 * @return boolean
+	 * @return bool
 	 */
 	public function check_valid_zip()
 	{

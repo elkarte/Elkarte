@@ -116,20 +116,17 @@ class Exception extends \Exception
 			$language = $message[0];
 			$msg = $message[1];
 		}
-		else
+		elseif (preg_match('/^(\w+)\.(.+)$/', $message, $matches) !== 0)
 		{
 			// language.messageIndex
-			if (preg_match('/^(\w+)\.(.+)$/', $message, $matches) !== 0)
-			{
-				$language = $matches[1];
-				$msg = $matches[2];
-			}
+			$language = $matches[1];
+			$msg = $matches[2];
+		}
+		else
+		{
 			// Simple Error message
-			else
-			{
-				$language = 'Errors';
-				$msg = $message;
-			}
+			$language = 'Errors';
+			$msg = $message;
 		}
 
 		return array($msg, $language);
@@ -141,6 +138,7 @@ class Exception extends \Exception
 	 *
 	 * @param string $msg
 	 * @param string $lang
+	 * @throws \Exception
 	 */
 	protected function logMessage($msg, $lang)
 	{

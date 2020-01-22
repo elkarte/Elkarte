@@ -47,7 +47,7 @@ final class ParserWrapper
 	{
 		if (self::$instance === null)
 		{
-			self::$instance = new ParserWrapper;
+			self::$instance = new ParserWrapper();
 		}
 
 		return self::$instance;
@@ -456,7 +456,7 @@ final class ParserWrapper
 	{
 		if ($this->html_parser === null)
 		{
-			$this->html_parser = new HtmlParser;
+			$this->html_parser = new HtmlParser();
 		}
 
 		return $this->html_parser;

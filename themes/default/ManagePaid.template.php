@@ -279,7 +279,7 @@ function template_modify_user_subscription()
 
 	echo '
 					</select>&nbsp;
-					', (isset($txt['calendar_month']) ? $txt['calendar_month'] : $txt['calendar_month']), '&nbsp;
+					<label for="month">', $txt['calendar_month'], '</label>
 					<select name="month" id="month" onchange="generateDays();">';
 
 	// There are 12 months per year - ensure that they all get listed.
@@ -291,7 +291,7 @@ function template_modify_user_subscription()
 
 	echo '
 					</select>&nbsp;
-					', (isset($txt['calendar_day']) ? $txt['calendar_day'] : $txt['calendar_day']), '&nbsp;
+					<label for="day">', $txt['calendar_day'], '</label>
 					<select name="day" id="day">';
 
 	// This prints out all the days in the current month - this changes dynamically as we switch months.

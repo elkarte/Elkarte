@@ -1204,7 +1204,6 @@ class ManageAttachments extends AbstractController
 
 			foreach ($this->_req->post->dirs as $id => $path)
 			{
-				$error = '';
 				$id = (int) $id;
 				if ($id < 1)
 				{

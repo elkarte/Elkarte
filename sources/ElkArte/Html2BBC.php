@@ -40,7 +40,7 @@ class Html2BBC
 	/**
 	 * The value that will hold if we are using the internal or external parser
 	 *
-	 * @var boolean
+	 * @var bool
 	 */
 	private $_parser;
 
@@ -75,7 +75,7 @@ class Html2BBC
 	/**
 	 * Used to strip newlines inside of 'p' and 'div' elements
 	 *
-	 * @var boolean|null
+	 * @var bool|null
 	 */
 	public $strip_newlines = null;
 
@@ -97,7 +97,7 @@ class Html2BBC
 	 * Gets everything started using the built in or external parser
 	 *
 	 * @param string $html string of html to convert
-	 * @param boolean $strip flag to strip newlines, true by default
+	 * @param bool $strip flag to strip newlines, true by default
 	 */
 	public function __construct($html, $strip = true)
 	{
@@ -224,7 +224,7 @@ class Html2BBC
 	 * - Prevents converting anything that's inside a code block
 	 *
 	 * @param \DOMNode|object $node current dom node being worked on
-	 * @param boolean $parser internal or external parser
+	 * @param bool $parser internal or external parser
 	 *
 	 * @return bool
 	 */
@@ -472,9 +472,7 @@ class Html2BBC
 		$title = $node->getAttribute('title');
 		$value = $this->_get_value($node);
 
-		$bbc = !empty($title) ? '[abbr=' . $title . ']' . $value . '[/abbr]' : '';
-
-		return $bbc;
+		return !empty($title) ? '[abbr=' . $title . ']' . $value . '[/abbr]' : '';
 	}
 
 	/**

@@ -13,6 +13,8 @@
  */
 
 // Any output here is not good
+use ElkArte\PbeImap;
+
 error_reporting(0);
 
 // Being run as a cron job
@@ -50,7 +52,7 @@ function postbyemail_imap()
 		return false;
 	}
 
-	$pbe = new \ElkArte\PbeImap();
+	$pbe = new PbeImap();
 
 	if ($pbe !== false)
 	{

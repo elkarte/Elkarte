@@ -38,7 +38,9 @@ class ApprovalNotification implements ScheduledTaskInterface
 		$db = database();
 
 		// Grab all the items awaiting approval and sort type then board - clear up any things that are no longer relevant.
-		$request = $db->query('', '
+		$notices = array();
+		$profiles = array();
+		$db->fetchQuery('
 			SELECT 
 				aq.id_msg, aq.id_attach, aq.id_event, 
 				m.id_topic, m.id_board, m.subject, 
@@ -49,41 +51,38 @@ class ApprovalNotification implements ScheduledTaskInterface
 				INNER JOIN {db_prefix}topics AS t ON (t.id_topic = m.id_topic)
 				INNER JOIN {db_prefix}boards AS b ON (b.id_board = m.id_board)',
 			array()
+		)->fetch_callback(
+			function ($row) use ($scripturl, &$notices, &$profiles) {
+				// If this is no longer around we'll ignore it.
+				if (empty($row['id_topic']))
+				{
+					return;
+				}
+
+				// What type is it?
+				if ($row['id_first_msg'] && $row['id_first_msg'] === $row['id_msg'])
+				{
+					$type = 'topic';
+				}
+				elseif ($row['id_attach'])
+				{
+					$type = 'attach';
+				}
+				else
+				{
+					$type = 'msg';
+				}
+
+				// Add it to the array otherwise.
+				$notices[$row['id_board']][$type][] = array(
+					'subject' => $row['subject'],
+					'href' => $scripturl . '?topic=' . $row['id_topic'] . '.msg' . $row['id_msg'] . '#msg' . $row['id_msg'],
+				);
+
+				// Store the profile for a bit later.
+				$profiles[$row['id_board']] = $row['id_profile'];
+			}
 		);
-		$notices = array();
-		$profiles = array();
-		while ($row = $db->fetch_assoc($request))
-		{
-			// If this is no longer around we'll ignore it.
-			if (empty($row['id_topic']))
-			{
-				continue;
-			}
-
-			// What type is it?
-			if ($row['id_first_msg'] && $row['id_first_msg'] === $row['id_msg'])
-			{
-				$type = 'topic';
-			}
-			elseif ($row['id_attach'])
-			{
-				$type = 'attach';
-			}
-			else
-			{
-				$type = 'msg';
-			}
-
-			// Add it to the array otherwise.
-			$notices[$row['id_board']][$type][] = array(
-				'subject' => $row['subject'],
-				'href' => $scripturl . '?topic=' . $row['id_topic'] . '.msg' . $row['id_msg'] . '#msg' . $row['id_msg'],
-			);
-
-			// Store the profile for a bit later.
-			$profiles[$row['id_board']] = $row['id_profile'];
-		}
-		$db->free_result($request);
 
 		// Delete it all!
 		$db->query('', '
@@ -99,7 +98,9 @@ class ApprovalNotification implements ScheduledTaskInterface
 
 		// Now we need to think about finding out *who* can approve - this is hard!
 		// First off, get all the groups with this permission and sort by board.
-		$request = $db->query('', '
+		$perms = array();
+		$addGroups = array(1);
+		$db->fetchQuery('
 			SELECT
 			 	id_group, id_profile, add_deny
 			FROM {db_prefix}board_permissions
@@ -109,29 +110,27 @@ class ApprovalNotification implements ScheduledTaskInterface
 				'profile_list' => $profiles,
 				'approve_posts' => 'approve_posts',
 			)
+		)->fetch_callback(
+			function ($row) use (&$addGroups, &$perms) {
+				// Sorry guys, but we have to ignore guests AND members - it would be too many otherwise.
+				if ($row['id_group'] < 2)
+				{
+					return;
+				}
+
+				$perms[$row['id_profile']][$row['add_deny'] ? 'add' : 'deny'][] = $row['id_group'];
+
+				// Anyone who can access has to be considered.
+				if ($row['add_deny'])
+				{
+					$addGroups[] = $row['id_group'];
+				}
+			}
 		);
-		$perms = array();
-		$addGroups = array(1);
-		while ($row = $db->fetch_assoc($request))
-		{
-			// Sorry guys, but we have to ignore guests AND members - it would be too many otherwise.
-			if ($row['id_group'] < 2)
-			{
-				continue;
-			}
-
-			$perms[$row['id_profile']][$row['add_deny'] ? 'add' : 'deny'][] = $row['id_group'];
-
-			// Anyone who can access has to be considered.
-			if ($row['add_deny'])
-			{
-				$addGroups[] = $row['id_group'];
-			}
-		}
-		$db->free_result($request);
 
 		// Grab the moderators if they have permission!
 		$mods = array();
+		$membersQuery = array();
 		$members = array();
 		if (in_array(2, $addGroups))
 		{
@@ -139,7 +138,7 @@ class ApprovalNotification implements ScheduledTaskInterface
 			$all_mods = allBoardModerators(true);
 
 			// Make sure they get included in the big loop.
-			$members = array_keys($all_mods);
+			$membersQuery = array_keys($all_mods);
 			foreach ($all_mods as $rows)
 			{
 				foreach ($rows as $row)
@@ -150,7 +149,7 @@ class ApprovalNotification implements ScheduledTaskInterface
 		}
 
 		// Come along one and all... until we reject you ;)
-		$request = $db->query('', '
+		$db->query('', '
 			SELECT 
 				id_member, real_name, email_address, lngfile, id_group, additional_groups, mod_prefs
 			FROM {db_prefix}members
@@ -160,32 +159,30 @@ class ApprovalNotification implements ScheduledTaskInterface
 			ORDER BY lngfile',
 			array(
 				'additional_group_list' => $addGroups,
-				'member_list' => $members,
+				'member_list' => $membersQuery,
 				'additional_group_list_implode' => implode(', additional_groups) != 0 OR FIND_IN_SET(', $addGroups),
 			)
-		);
-		$members = array();
-		while ($row = $db->fetch_assoc($request))
-		{
-			// Check whether they are interested.
-			if (!empty($row['mod_prefs']))
-			{
-				list (, , $pref_binary) = explode('|', $row['mod_prefs']);
-				if (!($pref_binary & 4))
+		)->fetch_callback(
+			function ($row) use (&$members) {
+				// Check whether they are interested.
+				if (!empty($row['mod_prefs']))
 				{
-					continue;
+					list (, , $pref_binary) = explode('|', $row['mod_prefs']);
+					if (!($pref_binary & 4))
+					{
+						return;
+					}
 				}
-			}
 
-			$members[$row['id_member']] = array(
-				'id' => $row['id_member'],
-				'groups' => array_merge(explode(',', $row['additional_groups']), array($row['id_group'])),
-				'language' => $row['lngfile'],
-				'email' => $row['email_address'],
-				'name' => $row['real_name'],
-			);
-		}
-		$db->free_result($request);
+				$members[$row['id_member']] = array(
+					'id' => $row['id_member'],
+					'groups' => array_merge(explode(',', $row['additional_groups']), array($row['id_group'])),
+					'language' => $row['lngfile'],
+					'email' => $row['email_address'],
+					'name' => $row['real_name'],
+				);
+			}
+		);
 
 		// Get the mailing stuff.
 		require_once(SUBSDIR . '/Mail.subs.php');

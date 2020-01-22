@@ -104,7 +104,7 @@ abstract class AbstractController
 	/**
 	 * Tells if the controller can be displayed as front page.
 	 *
-	 * @return boolean
+	 * @return bool
 	 */
 	public static function canFrontPage()
 	{
@@ -142,7 +142,7 @@ abstract class AbstractController
 	 *
 	 * @param string $action the function name of the current action
 	 *
-	 * @return boolean
+	 * @return bool
 	 */
 	public function needSecurity($action = '')
 	{
@@ -154,7 +154,7 @@ abstract class AbstractController
 	 *
 	 * @param string $action the function name of the current action
 	 *
-	 * @return boolean
+	 * @return bool
 	 */
 	public function needTheme($action = '')
 	{
@@ -166,7 +166,7 @@ abstract class AbstractController
 	 *
 	 * @param string $action the function name of the current action
 	 *
-	 * @return boolean
+	 * @return bool
 	 */
 	public function trackStats($action = '')
 	{

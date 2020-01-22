@@ -43,7 +43,7 @@ class RemoveTopicRedirect implements ScheduledTaskInterface
 		theme()->getTemplates()->loadEssentialThemeData();
 
 		// Find all of the old MOVE topic notices that were set to expire
-		$request = $db->query('', '
+		$db->fetchQuery('
 			SELECT 
 				id_topic
 			FROM {db_prefix}topics
@@ -52,12 +52,11 @@ class RemoveTopicRedirect implements ScheduledTaskInterface
 			array(
 				'redirect_expires' => time(),
 			)
+		)->fetch_callback(
+			function ($row) use (&$topics) {
+				$topics[] = $row[0];
+			}
 		);
-		while ($row = $db->fetch_row($request))
-		{
-			$topics[] = $row[0];
-		}
-		$db->free_result($request);
 
 		// Zap, you're gone
 		if (count($topics) > 0)

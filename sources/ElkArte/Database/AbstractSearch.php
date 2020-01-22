@@ -35,7 +35,7 @@ abstract class AbstractSearch implements SearchInterface
 	/**
 	 * The way to skip a database error
 	 *
-	 * @var boolean
+	 * @var bool
 	 */
 	protected $_skip_error = false;
 

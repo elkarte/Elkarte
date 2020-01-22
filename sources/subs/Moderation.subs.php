@@ -1227,8 +1227,6 @@ function watchedUserPosts($start, $items_per_page, $approve_query, $delete_board
  */
 function groupRequests()
 {
-	global $scripturl;
-
 	$db = database();
 
 	$group_requests = array();

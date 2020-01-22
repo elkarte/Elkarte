@@ -43,7 +43,7 @@ class Custom extends Standard
 	/**
 	 * Is it supported?
 	 *
-	 * @var boolean
+	 * @var bool
 	 */
 	public $is_supported = true;
 

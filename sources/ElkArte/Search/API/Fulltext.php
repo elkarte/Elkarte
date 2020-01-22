@@ -42,7 +42,7 @@ class Fulltext extends Standard
 	/**
 	 * Is it supported?
 	 *
-	 * @var boolean
+	 * @var bool
 	 */
 	public $is_supported = true;
 
@@ -95,8 +95,6 @@ class Fulltext extends Standard
 	 */
 	protected function _getMinWordLength()
 	{
-		$db = database();
-
 		// Need some search specific database tricks
 		$db_search = db_search();
 
@@ -108,10 +106,10 @@ class Fulltext extends Standard
 				'fulltext_minimum_word_length' => 'ft_min_word_len',
 			)
 		);
-		if ($request !== false && $db->num_rows($request) == 1)
+		if ($request !== false && $request->num_rows() == 1)
 		{
-			list (, $min_word_length) = $db->fetch_row($request);
-			$db->free_result($request);
+			list (, $min_word_length) = $request->fetch_row();
+			$request->free_result();
 		}
 		// 4 is the MySQL default...
 		else

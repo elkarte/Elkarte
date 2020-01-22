@@ -308,7 +308,7 @@ abstract class AbstractTable
 	 *
 	 * @param string $type_name
 	 * @param int|null $type_size
-	 * @param boolean $reverse
+	 * @param bool $reverse
 	 */
 	abstract public function calculate_type($type_name, $type_size = null, $reverse = false);
 

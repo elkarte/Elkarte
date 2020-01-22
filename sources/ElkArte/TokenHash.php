@@ -19,7 +19,7 @@ namespace ElkArte;
  *
  * Used to generate a high entropy random hash for use in one time use forms
  *
- * - Can return up to a 32 character alphanumeric hash A-Z a-z 0-9
+ * - Can return up to a 64 character alphanumeric hash A-Z a-z 0-9
  */
 class TokenHash
 {
@@ -29,13 +29,6 @@ class TokenHash
 	 * @var string
 	 */
 	private $itoa64;
-
-	/**
-	 * Random digits for initial seeding
-	 *
-	 * @var string
-	 */
-	private $random_state = '';
 
 	/**
 	 * Random salt to feed crypt
@@ -51,17 +44,6 @@ class TokenHash
 	{
 		// Valid salt characters for crypt
 		$this->itoa64 = './0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz';
-
-		// Set a random state to initialize
-		$this->_state_seed();
-	}
-
-	/**
-	 * Set a random value for our initial state
-	 */
-	private function _state_seed()
-	{
-		$this->random_state = bin2hex(random_bytes(8));
 	}
 
 	/**
@@ -77,25 +59,61 @@ class TokenHash
 	 * @param int $length the number of characters to return
 	 * @param string $salt use a custom salt, leave empty to let the system generate a secure one
 	 *
-	 * @return string the random hash
+	 * @return string the random token
+	 * @throws \Exception
 	 */
 	public function generate_hash($length = 10, $salt = '')
 	{
+		if ($length > 64)
+		{
+			Errors::instance()->fatal_lang_error('error_token_length');
+		}
+
 		// Generate a random salt
 		$this->_salt = $salt;
 		$this->_gen_salt();
 
-		// A random character password to hash
-		$this->_state_seed();
-		$password = bin2hex($this->get_random_bytes($length));
+		// A random lenght character password to hash
+		$password = bin2hex($this->get_random_bytes(mt_rand(10, 25)));
 
-		// Hash away
+		// Hash away, crypt allows us a full a-Z 0-9 set
 		$hash = crypt($password, $this->_salt);
 
-		// For our purposes lets stay with alphanumeric values only
-		$hash = preg_replace('~\W~', '', $hash);
+		// Clean and return this one
+		return substr($this->_prepareToken($hash, $length), mt_rand(1, 10), $length);
+	}
 
-		return substr($hash, mt_rand(0, 45), $length);
+	/**
+	 * Tidys up our token for return
+	 *
+	 * What it does:
+	 *  - Strips off the salt
+	 *  - removes non text characters, leaving just a-Z 0-9
+	 *  - May pad the result if for some reason we don't have enough characters
+	 *  to fulfill the request.
+	 *
+	 * @param string $hash
+	 * @param int $length
+	 * @return string
+	 * @throws \Exception
+	 */
+	private function _prepareToken($hash, $length)
+	{
+		// Strip off the salt and just use the crypt value
+		$hash = explode('$', $hash);
+		$token = array_pop($hash);
+
+		// For our purposes lets stay with alphanumeric values only
+		$token = preg_replace('~\W~', '', $token);
+
+		// This should never happen, but its better than vaping
+		$short = $length + 10 - strlen($token);
+		if ($short > 0)
+		{
+			$token = str_pad($token, $short, $this->_private_salt($this->get_random_bytes($short)), STR_PAD_RIGHT);
+		}
+
+		return $token;
 	}
 
 	/**
@@ -106,10 +124,13 @@ class TokenHash
 	 */
 	private function _gen_salt()
 	{
+		// We are just using this as a random generator, so opt for speed
+		$saltPrefix = '$6$rounds=1000$';
+
 		// Not supplied one, then generate a random one, this is preferred
 		if (empty($this->_salt) || strlen($this->_salt) < 16)
 		{
-			$this->_salt = '$6$' . $this->_private_salt($this->get_random_bytes(16)) . '$';
+			$this->_salt = $saltPrefix . $this->_private_salt($this->get_random_bytes(16)) . '$';
 		}
 		// Supplied a salt, make sure its valid
 		else
@@ -117,12 +138,12 @@ class TokenHash
 			// Prep it for crypt / etc
 			$this->_salt = substr(preg_replace('~\W~', '', $this->_salt), 0, 16);
 			$this->_salt = str_pad($this->_salt, 16, $this->_private_salt($this->get_random_bytes(16)), STR_PAD_RIGHT);
-			$this->_salt = '$6$' . $this->_salt . '$';
+			$this->_salt = $saltPrefix . $this->_salt . '$';
 		}
 	}
 
 	/**
-	 * Generates a random salt with a character set that is suitable for crypt
+	 * Generates a salt with a character set that is suitable for crypt
 	 *
 	 * @param string $input a binary string as supplied from get_random_bytes
 	 *
@@ -163,23 +184,15 @@ class TokenHash
 	/**
 	 * Generates a random string of binary characters
 	 *
-	 * - Can use as is or pass though bintohex or via ord to get characters.
+	 * - Can use as is or pass though bin2hex or via ord to get characters.
 	 *
 	 * @param int $count The number of bytes to produce
 	 *
 	 * @return string
+	 * @throws \Exception
 	 */
 	public function get_random_bytes($count)
 	{
-		$output = '';
-
-		// Loop every 16 characters
-		for ($i = 0; $i < $count; $i += 16)
-		{
-			$this->random_state = hash('sha1', microtime() . $this->random_state);
-			$output .= hash('sha1', $this->random_state, true);
-		}
-
-		return substr($output, 0, $count);
+		return random_bytes($count);
 	}
 }

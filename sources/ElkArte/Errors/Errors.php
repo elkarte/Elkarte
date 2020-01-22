@@ -22,6 +22,7 @@ use ElkArte\AbstractModel;
 use ElkArte\Cache\Cache;
 use ElkArte\Exceptions\Exception;
 use ElkArte\Themes\ThemeLoader;
+use ElkArte\User;
 
 /**
  * Class to handle all forum errors and exceptions
@@ -40,6 +41,7 @@ class Errors extends AbstractModel
 		'user',
 		'template',
 		'debug',
+		'deprecated',
 	);
 
 	/**
@@ -65,7 +67,7 @@ class Errors extends AbstractModel
 	{
 		if (self::$_errors === null)
 		{
-			self::$_errors = function_exists('database') ? new self(database(), \ElkArte\User::$info) : new self(1, null);
+			self::$_errors = function_exists('database') ? new self(database(), User::$info) : new self(1, null);
 		}
 
 		return self::$_errors;
@@ -120,7 +122,7 @@ class Errors extends AbstractModel
 	 * Log an error to the error log if the error logging is enabled.
 	 *
 	 * Available error types:
-	 * - generaal
+	 * - general
 	 * - critical
 	 * - database
 	 * - undefined_vars
@@ -134,7 +136,7 @@ class Errors extends AbstractModel
 	 *   - die(Errors::instance()->log_error($msg));
 	 *
 	 * @param string $error_message
-	 * @param string|boolean $error_type = 'general'
+	 * @param string|bool $error_type = 'general'
 	 * @param string $file = ''
 	 * @param int $line = 0
 	 *
@@ -218,7 +220,7 @@ class Errors extends AbstractModel
 	 *
 	 * @param string $query_string
 	 * @param string $error_message
-	 * @param string|boolean $error_type
+	 * @param string|bool $error_type
 	 * @param string $file
 	 * @param int $line
 	 * @throws \Exception
@@ -258,7 +260,7 @@ class Errors extends AbstractModel
 	 * - It logs the error message if $log is specified.
 	 *
 	 * @param string $error
-	 * @param string|boolean $log defaults to 'general' false will skip logging, true will use general
+	 * @param string|bool $log defaults to 'general' false will skip logging, true will use general
 	 *
 	 * @throws \ElkArte\Exceptions\Exception
 	 */
@@ -280,7 +282,7 @@ class Errors extends AbstractModel
 	 * - the information is logged if log is specified.
 	 *
 	 * @param string $error
-	 * @param string|boolean $log defaults to 'general' false will skip logging, true will use general
+	 * @param string|bool $log defaults to 'general' false will skip logging, true will use general
 	 * @param string[] $sprintf defaults to empty array()
 	 *
 	 * @throws \ElkArte\Exceptions\Exception
@@ -345,7 +347,7 @@ class Errors extends AbstractModel
 	/**
 	 * Halts execution, optionally displays an error message
 	 *
-	 * @param string|integer $error
+	 * @param string|int $error
 	 */
 	protected function terminate($error = '')
 	{

@@ -25,7 +25,7 @@ class Search
 	 * This is the forum version but is repeated due to some people
 	 * rewriting FORUM_VERSION.
 	 */
-	const FORUM_VERSION = 'ElkArte 2.0 dev';
+	public const FORUM_VERSION = 'ElkArte 2.0 dev';
 	/**
 	 *
 	 * @var mixed[]
@@ -57,13 +57,13 @@ class Search
 	/**
 	 * Database instance
 	 *
-	 * @var \ElkArte\Database\QueryInterface|null
+	 * @var \ElkArte\Database\QueryInterface
 	 */
 	private $_db = null;
 	/**
 	 * Search db instance
 	 *
-	 * @var \ElkArte\Database\SearchInterface|null
+	 * @var \ElkArte\Database\SearchInterface
 	 */
 	private $_db_search = null;
 	/**
@@ -186,7 +186,7 @@ class Search
 	/**
 	 * Returns all the search parameters.
 	 *
-	 * @return mixed[]
+	 * @return void
 	 */
 	public function getParams()
 	{
@@ -308,7 +308,8 @@ class Search
 	public function loadPosters($msg_list, $limit)
 	{
 		// Load the posters...
-		$request = $this->_db->query('', '
+		$posters = array();
+		$this->_db->fetchQuery('
 			SELECT
 				id_member
 			FROM {db_prefix}messages
@@ -320,13 +321,11 @@ class Search
 				'limit' => $limit,
 				'no_member' => 0,
 			)
+		)->fetch_callback(
+			function ($row) use (&$posters) {
+				$posters[] = $row['id_member'];
+			}
 		);
-		$posters = array();
-		while ($row = $this->_db->fetch_assoc($request))
-		{
-			$posters[] = $row['id_member'];
-		}
-		$this->_db->free_result($request);
 
 		return $posters;
 	}
@@ -337,7 +336,8 @@ class Search
 	 * @param int[] $msg_list - All the messages we want to find the posters
 	 * @param int $limit - There are only so much topics
 	 *
-	 * @return resource|boolean
+	 * @return resource|bool
+	 * @throws \ElkArte\Exceptions\Exception
 	 */
 	public function loadMessagesRequest($msg_list, $limit)
 	{
@@ -387,14 +387,20 @@ class Search
 	 *
 	 * @param resource $messages_request holds a query result
 	 *
-	 * @return boolean
+	 * @return bool
 	 */
 	public function noMessages($messages_request)
 	{
-		return $this->_db->num_rows($messages_request) == 0;
+		return $messages_request->num_rows() == 0;
 	}
 
-	public function searchQuery(SearchApiWrapper $searchAPI)
+	/**
+	 * Sets the query
+	 *
+	 * @param \ElkArte\Search\SearchApiWrapper $searchAPI
+	 * @return mixed[]
+	 */
+	public function searchQuery($searchAPI)
 	{
 		$this->_searchAPI = $searchAPI;
 		$searchAPI->setExcludedPhrases($this->_excludedPhrases);
@@ -522,6 +528,9 @@ class Search
 		return $this->_searchAPI->getNumResults();
 	}
 
+	/**
+	 * @return mixed[]
+	 */
 	public function getParticipants()
 	{
 		return $this->_participants;

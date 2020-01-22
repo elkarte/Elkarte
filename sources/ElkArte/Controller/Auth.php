@@ -562,8 +562,8 @@ class Auth extends AbstractController
 	 * - It redirects back to $_SESSION['logout_url'], if it exists.
 	 * - It is accessed via ?action=logout;session_var=...
 	 *
-	 * @param boolean $internal if true, it doesn't check the session
-	 * @param boolean $redirect if true, redirect to the board index
+	 * @param bool $internal if true, it doesn't check the session
+	 * @param bool $redirect if true, redirect to the board index
 	 * @throws \ElkArte\Exceptions\Exception
 	 */
 	public function action_logout($internal = false, $redirect = true)

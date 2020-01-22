@@ -19,6 +19,7 @@ namespace ElkArte;
 
 use ElkArte\Cache\Cache;
 use ElkArte\Database\QueryInterface;
+use ElkArte\Exceptions\Exception;
 
 /**
  * Class BoardsTree
@@ -72,7 +73,7 @@ class BoardsTree
 		$this->cat_tree = array();
 		$this->boards = array();
 		$last_board_order = 0;
-		while ($row = $request->fetch_assoc())
+		while (($row = $request->fetch_assoc()))
 		{
 			if (!isset($this->cat_tree[$row['id_cat']]))
 			{
@@ -134,7 +135,7 @@ class BoardsTree
 					// Parent doesn't exist!
 					if (!isset($this->boards[$row['id_parent']]['tree']))
 					{
-						throw new \ElkArte\Exceptions\Exception('no_valid_parent', false, array($row['board_name']));
+						throw new Exception('no_valid_parent', false, array($row['board_name']));
 					}
 
 					// Wrong childlevel...we can silently fix this...
@@ -280,7 +281,7 @@ class BoardsTree
 	 * @param int $child The ID of the child board
 	 * @param int $parent The ID of a parent board
 	 *
-	 * @return boolean if the specified child board is a child of the specified parent board.
+	 * @return bool if the specified child board is a child of the specified parent board.
 	 */
 	public function isChildOf($child, $parent)
 	{
@@ -457,7 +458,7 @@ class BoardsTree
 	 * @param int $newLevel
 	 * @param int $newParent
 	 */
-	function fixChildren($parent, $newLevel, $newParent)
+	private function fixChildren($parent, $newLevel, $newParent)
 	{
 		// Grab all children of $parent...
 		$children = $this->db->fetchQuery('

@@ -33,7 +33,7 @@ class FtpConnection
 	/**
 	 * Holds any errors
 	 *
-	 * @var string|boolean
+	 * @var string|bool
 	 */
 	public $error;
 
@@ -156,7 +156,7 @@ class FtpConnection
 	 * Changes to a directory (chdir) via the ftp connection
 	 *
 	 * @param string $ftp_path The path to the directory
-	 * @return boolean
+	 * @return bool
 	 */
 	public function chdir($ftp_path)
 	{
@@ -187,7 +187,7 @@ class FtpConnection
 	 *
 	 * @param string $ftp_file The file to CHMOD
 	 * @param int $chmod The value for the CHMOD operation
-	 * @return boolean If the chmod was successful or not
+	 * @return bool If the chmod was successful or not
 	 */
 	public function chmod($ftp_file, $chmod)
 	{
@@ -217,7 +217,7 @@ class FtpConnection
 	 * Deletes a file
 	 *
 	 * @param string $ftp_file The file to delete
-	 * @return boolean If the delete was successful or not
+	 * @return bool If the delete was successful or not
 	 */
 	public function unlink($ftp_file)
 	{
@@ -249,7 +249,7 @@ class FtpConnection
 	 * Creates a new file on the server
 	 *
 	 * @param string $ftp_file The file to create
-	 * @return boolean If we were able to create the file
+	 * @return bool If we were able to create the file
 	 */
 	public function create_file($ftp_file)
 	{
@@ -293,7 +293,7 @@ class FtpConnection
 	/**
 	 * Used to create a passive connection
 	 *
-	 * @return boolean If the connection was made or not
+	 * @return bool If the connection was made or not
 	 */
 	public function passive()
 	{
@@ -337,7 +337,7 @@ class FtpConnection
 	 * Creates a new directory on the server
 	 *
 	 * @param string $ftp_dir The name of the directory to create
-	 * @return boolean If the operation was successful
+	 * @return bool If the operation was successful
 	 */
 	public function create_dir($ftp_dir)
 	{
@@ -433,7 +433,7 @@ class FtpConnection
 	 * Generates a directory listing for the current directory
 	 *
 	 * @param string $ftp_path The path to the directory
-	 * @param string|boolean $search Whether or not to get a recursive directory listing
+	 * @param string|bool $search Whether or not to get a recursive directory listing
 	 * @return false|string The results of the command or false if unsuccessful
 	 */
 	public function list_dir($ftp_path = '', $search = false)
@@ -539,7 +539,7 @@ class FtpConnection
 	/**
 	 * Close the ftp connection
 	 *
-	 * @return boolean
+	 * @return bool
 	 */
 	public function close()
 	{

@@ -379,7 +379,7 @@ class ManageMembergroups extends AbstractController
 			// @todo Check for members with same name too?
 
 			// Don't allow copying of a real privileged person!
-			$permissionsObject = new Permissions;
+			$permissionsObject = new Permissions();
 			$illegal_permissions = $permissionsObject->getIllegalPermissions();
 			$minposts = !empty($this->_req->post->min_posts) ? (int) $this->_req->post->min_posts : '-1';
 
@@ -704,7 +704,7 @@ class ManageMembergroups extends AbstractController
 			// Do we need to set inherited permissions?
 			if ($group_inherit !== -2 && $group_inherit !== $this->_req->post->old_inherit)
 			{
-				$permissionsObject = new Permissions;
+				$permissionsObject = new Permissions();
 				$permissionsObject->updateChild($group_inherit);
 			}
 

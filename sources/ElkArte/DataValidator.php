@@ -105,7 +105,7 @@ class DataValidator
 	 * Strict data processing,
 	 * if true drops data for which no sanitation rule was set
 	 *
-	 * @var boolean
+	 * @var bool
 	 */
 	protected $_strict = false;
 
@@ -160,7 +160,7 @@ class DataValidator
 	 * Sets the sanitation rules used to clean data
 	 *
 	 * @param mixed[] $rules associative array of field => rule|rule|rule
-	 * @param boolean $strict
+	 * @param bool $strict
 	 *
 	 * @return mixed[]
 	 */
@@ -388,7 +388,7 @@ class DataValidator
 	/**
 	 * Return the validation data, all or a specific key
 	 *
-	 * @param integer|string|null $key int or string
+	 * @param int|string|null $key int or string
 	 *
 	 * @return mixed|mixed[]|null
 	 */
@@ -549,7 +549,7 @@ class DataValidator
 	/**
 	 * Return any errors found, either in the raw or nicely formatted
 	 *
-	 * @param mixed[]|string|boolean $raw
+	 * @param mixed[]|string|bool $raw
 	 *    - true returns the raw error array,
 	 *    - array returns just error messages of those fields
 	 *    - string returns just that error message
@@ -574,7 +574,7 @@ class DataValidator
 	/**
 	 * Process any errors and return the error strings
 	 *
-	 * @param mixed[]|boolean $keys
+	 * @param mixed[]|bool $keys
 	 *
 	 * @return array|bool
 	 */
@@ -1248,7 +1248,7 @@ class DataValidator
 			return;
 		}
 
-		if (!preg_match('`^(https{0,1}?:(//([a-z0-9\-._~%]+)(:\d+)?(/[a-z0-9\-._~%!$&\'()*+,;=:@]+)*/?))(\?[a-z0-9\-._~%!$&\'()*+,;=:@/?]*)?(\#[a-z0-9\-._~%!$&\'()*+,;=:@/?]*)?$`', $input[$field], $matches))
+		if (!preg_match('`^(https?:(//([a-z0-9\-._~%]+)(:\d+)?(/[a-z0-9\-._~%!$&\'()*+,;=:@]+)*/?))(\?[a-z0-9\-._~%!$&\'()*+,;=:@/?]*)?(\#[a-z0-9\-._~%!$&\'()*+,;=:@/?]*)?$`', $input[$field], $matches))
 		{
 			return array(
 				'field' => $field,

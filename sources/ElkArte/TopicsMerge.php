@@ -154,15 +154,15 @@ class TopicsMerge
 				'limit' => count($this->_topics),
 			)
 		);
-		if ($this->_db->num_rows($request) < 2)
+		if ($request->num_rows() < 2)
 		{
-			$this->_db->free_result($request);
+			$request->free_result();
 
 			$this->_errors[] = array('no_topic_id', true);
 
 			return false;
 		}
-		while ($row = $this->_db->fetch_assoc($request))
+		while (($row = $request->fetch_assoc()))
 		{
 			// Make a note for the board counts...
 			if (!isset($this->_boardTotals[$row['id_board']]))
@@ -231,7 +231,7 @@ class TopicsMerge
 
 			$this->_is_sticky = max($this->_is_sticky, $row['is_sticky']);
 		}
-		$this->_db->free_result($request);
+		$request->free_result();
 
 		$this->boards = array_map('intval', array_values(array_unique($this->boards)));
 
@@ -284,7 +284,7 @@ class TopicsMerge
 
 		if (count($this->_polls) > 1)
 		{
-			$request = $this->_db->query('', '
+			$this->_db->fetchQuery( '
 				SELECT
 					t.id_topic, t.id_poll, m.subject, p.question
 				FROM {db_prefix}polls AS p
@@ -296,20 +296,19 @@ class TopicsMerge
 					'polls' => $this->_polls,
 					'limit' => count($this->_polls),
 				)
+			)->fetch_callback(
+				function ($row) use (&$polls) {
+					$polls[] = array(
+						'id' => $row['id_poll'],
+						'topic' => array(
+							'id' => $row['id_topic'],
+							'subject' => $row['subject']
+						),
+						'question' => $row['question'],
+						'selected' => $row['id_topic'] == $this->firstTopic
+					);
+				}
 			);
-			while ($row = $this->_db->fetch_assoc($request))
-			{
-				$polls[] = array(
-					'id' => $row['id_poll'],
-					'topic' => array(
-						'id' => $row['id_topic'],
-						'subject' => $row['subject']
-					),
-					'question' => $row['question'],
-					'selected' => $row['id_topic'] == $this->firstTopic
-				);
-			}
-			$this->_db->free_result($request);
 		}
 
 		return $polls;
@@ -376,7 +375,10 @@ class TopicsMerge
 		}
 
 		// Get the first and last message and the number of messages....
-		$request = $this->_db->query('', '
+		$topic_approved = 1;
+		$first_msg = 0;
+		$num_replies = 0;
+		$this->_db->fetchQuery('
 			SELECT
 				approved, MIN(id_msg) AS first_msg, MAX(id_msg) AS last_msg, COUNT(*) AS message_count
 			FROM {db_prefix}messages
@@ -386,42 +388,39 @@ class TopicsMerge
 			array(
 				'topics' => $this->_topics,
 			)
-		);
-		$topic_approved = 1;
-		$first_msg = 0;
-		$num_replies = 0;
-		while ($row = $this->_db->fetch_assoc($request))
-		{
-			// If this is approved, or is fully unapproved.
-			if ($row['approved'] || !isset($first_msg))
-			{
-				$first_msg = $row['first_msg'];
-				$last_msg = $row['last_msg'];
-				if ($row['approved'])
+		)->fetch_callback(
+			function ($row) use (&$topic_approved, &$first_msg, &$num_replies, &$last_msg, &$num_unapproved) {
+				// If this is approved, or is fully unapproved.
+				if ($row['approved'] || !isset($first_msg))
 				{
-					$num_replies = $row['message_count'] - 1;
-					$num_unapproved = 0;
+					$first_msg = $row['first_msg'];
+					$last_msg = $row['last_msg'];
+					if ($row['approved'])
+					{
+						$num_replies = $row['message_count'] - 1;
+						$num_unapproved = 0;
+					}
+					else
+					{
+						$topic_approved = 0;
+						$num_replies = 0;
+						$num_unapproved = $row['message_count'];
+					}
 				}
 				else
 				{
-					$topic_approved = 0;
-					$num_replies = 0;
+					// If this has a lower first_msg then the first post is not approved and hence the number of replies was wrong!
+					if ($first_msg > $row['first_msg'])
+					{
+						$first_msg = $row['first_msg'];
+						$num_replies++;
+						$topic_approved = 0;
+					}
+
 					$num_unapproved = $row['message_count'];
 				}
 			}
-			else
-			{
-				// If this has a lower first_msg then the first post is not approved and hence the number of replies was wrong!
-				if ($first_msg > $row['first_msg'])
-				{
-					$first_msg = $row['first_msg'];
-					$num_replies++;
-					$topic_approved = 0;
-				}
-				$num_unapproved = $row['message_count'];
-			}
-		}
-		$this->_db->free_result($request);
+		);
 
 		// Ensure we have a board stat for the target board.
 		if (!isset($this->_boardTotals[$target_board]))
@@ -448,7 +447,7 @@ class TopicsMerge
 		$this->_boardTotals[$target_board]['num_posts'] -= $topic_approved ? $num_replies + 1 : $num_replies;
 
 		// Get the member ID of the first and last message.
-		$request = $this->_db->query('', '
+		$request = $this->_db->fetchQuery('
 			SELECT
 				id_member
 			FROM {db_prefix}messages
@@ -460,8 +459,8 @@ class TopicsMerge
 				'last_msg' => $last_msg,
 			)
 		);
-		list ($member_started) = $this->_db->fetch_row($request);
-		list ($member_updated) = $this->_db->fetch_row($request);
+		list ($member_started) = $request->fetch_row();
+		list ($member_updated) = $request->fetch_row();
 
 		// First and last message are the same, so only row was returned.
 		if ($member_updated === null)
@@ -469,7 +468,7 @@ class TopicsMerge
 			$member_updated = $member_started;
 		}
 
-		$this->_db->free_result($request);
+		$request->free_result();
 
 		// Obtain all the message ids we are going to affect.
 		$affected_msgs = messagesInTopics($this->_topics);
