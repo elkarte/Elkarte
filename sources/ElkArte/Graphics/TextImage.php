@@ -17,8 +17,6 @@
 
 namespace ElkArte\Graphics;
 
-use ElkArte\Exceptions\Exception;
-
 /**
  * Class TextImage
  *
@@ -28,10 +26,13 @@ use ElkArte\Exceptions\Exception;
  */
 class TextImage extends Image
 {
+	/** @var string text to be shown in the image */
+	protected $_text = '';
+
 	/**
 	 * Image constructor.
 	 *
-	 * @param string $fileName
+	 * @param string $text
 	 * @param bool $force_gd
 	 */
 	public function __construct($text, $force_gd = false)
@@ -74,10 +75,8 @@ class TextImage extends Image
 
 	/**
 	 * Do nothing
-	 *
-	 * @param string $source
 	 */
-	public function loadImage($source)
+	public function loadImage()
 	{
 	}
 
@@ -92,10 +91,8 @@ class TextImage extends Image
 
 	/**
 	 * Do nothing
-	 *
-	 * @param $source
 	 */
-	public function isWebAddress($source)
+	public function isWebAddress()
 	{
 	}
 
@@ -110,6 +107,7 @@ class TextImage extends Image
 	 * @param string $format Type of the image (valid types are png, jpeg, gif)
 	 *
 	 * @return bool|string The image or false if neither Imagick nor GD are found
+	 * @throws \ImagickException
 	 */
 	public function generate($width = 100, $height = 75, $format = 'png')
 	{
@@ -139,13 +137,12 @@ class TextImage extends Image
 	/**
 	 * Do nothing
 	 *
-	 * @param string $source the image file to thumbnail
 	 * @param int $max_width allowed width
 	 * @param int $max_height allowed height
 	 * @param string $dstName name to save
 	 * @param string $format image format to save the thumbnail
 	 */
-	public function createThumbnail($source, $max_width, $max_height, $dstName = '', $format = '')
+	public function createThumbnail($max_width, $max_height, $dstName = '', $format = '')
 	{
 	}
 
@@ -195,28 +192,22 @@ class TextImage extends Image
 
 	/**
 	 * Do nothing
-	 *
-	 * @param string $source
 	 */
-	public function reencodeImage($source)
+	public function reencodeImage()
 	{
 	}
 
 	/**
 	 * Do nothing
-	 *
-	 * @param string $source
 	 */
-	public function getSize($source)
+	public function getSize()
 	{
 	}
 
 	/**
 	 * Do nothing
-	 *
-	 * @param string $source
 	 */
-	public function checkImageContents($source)
+	public function checkImageContents()
 	{
 	}
 }

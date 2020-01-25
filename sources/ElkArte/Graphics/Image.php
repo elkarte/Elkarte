@@ -87,6 +87,7 @@ class Image
 
 	/**
 	 * Load an image from a file or web address into the active graphics library
+	 * @throws \ImagickException
 	 */
 	protected function loadImage()
 	{
@@ -294,6 +295,7 @@ class Image
 	 * - the function makes sure that all non-essential image contents are disposed.
 	 *
 	 * @return bool
+	 * @throws \ImagickException
 	 */
 	public function reencodeImage()
 	{
@@ -313,9 +315,9 @@ class Image
 			// Write over the original file
 			$success = $this->saveImage($this->_fileName, $sizes[2]);
 			$this->loadImage();
-
-			return $success;
 		}
+
+		return $success;
 	}
 
 	/**
