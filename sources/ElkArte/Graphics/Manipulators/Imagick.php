@@ -12,7 +12,7 @@
  *
  */
 
-namespace ElkArte\Graphics;
+namespace ElkArte\Graphics\Manipulators;
 
 /**
  * Class Imagick

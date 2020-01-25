@@ -52,28 +52,6 @@ class TextImage extends Image
 	}
 
 	/**
-	 * Determine and set what image library we will use
-	 *
-	 * @throws \Exception
-	 */
-	protected function setManipulator()
-	{
-		// Later this could become an array of "manipulators" (or not) and remove the hard-coded IM/GD requirements
-		if (!$this->_force_gd && Imagick::canUse())
-		{
-			$this->_manipulator = new Imagick($this->_fileName);
-		}
-		elseif (Gd2::canUse())
-		{
-			$this->_manipulator = new Gd2($this->_fileName);
-		}
-		else
-		{
-			throw new \Exception('No image manipulators available');
-		}
-	}
-
-	/**
 	 * Do nothing
 	 */
 	public function loadImage()
@@ -91,9 +69,12 @@ class TextImage extends Image
 
 	/**
 	 * Do nothing
+	 *
+	 * @return bool
 	 */
 	public function isWebAddress()
 	{
+		return false;
 	}
 
 	/**
@@ -122,16 +103,22 @@ class TextImage extends Image
 
 	/**
 	 * Do nothing
+	 *
+	 * @return int
 	 */
 	public function getFilesize()
 	{
+		return 0;
 	}
 
 	/**
 	 * Do nothing
+	 *
+	 * @return bool
 	 */
 	public function isImage()
 	{
+		return true;
 	}
 
 	/**
@@ -155,21 +142,17 @@ class TextImage extends Image
 
 	/**
 	 * Do nothing
-	 */
-	public function getOrientation()
-	{
-	}
-
-	/**
-	 * Do nothing
 	 *
 	 * @param int $max_width The maximum allowed width
 	 * @param int $max_height The maximum allowed height
 	 * @param bool $force_resize Always resize the image (force scale up)
 	 * @param bool $strip Allow IM to remove exif data as GD always will
+	 *
+	 * @return bool Always returns true.
 	 */
 	public function resizeImage($max_width, $max_height, $strip = false, $force_resize = true)
 	{
+		return true;
 	}
 
 	/**
@@ -178,9 +161,12 @@ class TextImage extends Image
 	 * @param string $file_name name to save the image to
 	 * @param int $preferred_format what format to save the image
 	 * @param int $quality some formats require we provide a compression quality
+	 *
+	 * @return bool Always returns true.
 	 */
 	public function saveImage($file_name = '', $preferred_format = IMAGETYPE_JPEG, $quality = 85)
 	{
+		return true;
 	}
 
 	/**
@@ -192,22 +178,31 @@ class TextImage extends Image
 
 	/**
 	 * Do nothing
+	 *
+	 * @return bool Always returns true.
 	 */
 	public function reencodeImage()
 	{
+		return true;
 	}
 
 	/**
 	 * Do nothing
+	 *
+	 * @return array
 	 */
 	public function getSize()
 	{
+		return $this->_manipulator->sizes;
 	}
 
 	/**
 	 * Do nothing
+	 *
+	 * @return bool Always returns true.
 	 */
 	public function checkImageContents()
 	{
+		return true;
 	}
 }

@@ -17,6 +17,8 @@
 
 namespace ElkArte\Graphics;
 
+use ElkArte\Graphics\Manipulators\Imagick;
+use ElkArte\Graphics\Manipulators\Gd2;
 use ElkArte\Exceptions\Exception;
 
 /**
@@ -37,7 +39,7 @@ class Image
 		IMAGETYPE_WBMP => 'wbmp'
 	];
 
-	/** @var \ElkArte\Graphics\Imagick|\ElkArte\Graphics\Gd2 */
+	/** @var \ElkArte\Graphics\Manipulators\Imagick|\ElkArte\Graphics\Manipulators\Gd2 */
 	protected $_manipulator;
 
 	/** @var string filename we are working with */
