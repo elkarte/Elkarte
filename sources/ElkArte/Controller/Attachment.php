@@ -21,6 +21,7 @@ use ElkArte\Action;
 use ElkArte\Errors\AttachmentErrorContext;
 use ElkArte\Exceptions\Exception;
 use ElkArte\Graphics\TextImage;
+use ElkArte\Graphics\Image;
 use ElkArte\AttachmentsDirectory;
 use ElkArte\TemporaryAttachmentsList;
 use ElkArte\User;
@@ -661,24 +662,24 @@ class Attachment extends AbstractController
 		if ($resize)
 		{
 			// Create a thumbnail image and write it directly to the screen
-			$image = new Image();
+			$image = new Image($filename);
 			// Maybe overkill, but want to correct for phonetographer photos?
 			if (!empty($modSettings['attachment_autorotate']))
 			{
 				$image->autoRotate();
 			}
-			$filename = $filename . '_thumb';
-			$image->createThumbnail(100, 100, $filename);
+			$thumb_filename = $filename . '_thumb';
+			$thumb_image = $image->createThumbnail(100, 100, $thumb_filename);
 		}
 
 		if (!$use_compression)
 		{
-			header('Content-Length: ' . filesize($filename));
+			header('Content-Length: ' . $thumb_image->getFilesize());
 		}
 
-		if (@readfile($filename) === null)
+		if (@readfile($thumb_filename) === null)
 		{
-			echo file_get_contents($filename);
+			echo file_get_contents($thumb_filename);
 		}
 
 		obExit(false);
