@@ -14,6 +14,8 @@
 
 namespace ElkArte\Graphics\Manipulators;
 
+use \ElkArte\Graphics\Image;
+
 /**
  * Class Gd2
  *
