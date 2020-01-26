@@ -70,7 +70,7 @@ class TestGraphics extends \PHPUnit\Framework\TestCase
 
 		$modSettings['attachment_autorotate'] = 1;
 
-		$success = \ElkArte\Graphics\Gd2::canUse();
+		$success = \ElkArte\Graphics\Manipulators\Gd2::canUse();
 		$this->assertEquals($success, true, 'GD NOT INSTALLED');
 
 		foreach ($this->image_testcases as $image)
