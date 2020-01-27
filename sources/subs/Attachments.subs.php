@@ -48,6 +48,7 @@ function processAttachments($id_msg = null)
 	global $context, $modSettings, $txt, $topic, $board;
 
 	$attach_errors = AttachmentErrorContext::context();
+	$tmp_attachments = new TemporaryAttachmentsList();
 
 	// Make sure we're uploading to the right place.
 	$attachmentDirectory = new AttachmentsDirectory($modSettings, database());
@@ -59,17 +60,17 @@ function processAttachments($id_msg = null)
 
 		if (!is_dir($attach_current_dir))
 		{
-			$initial_error = 'attach_folder_warning';
+			$tmp_attachments->setSystemError('attach_folder_warning');
 			\ElkArte\Errors\Errors::instance()->log_error(sprintf($txt['attach_folder_admin_warning'], $attach_current_dir), 'critical');
 		}
 	}
 	catch (\Exception $e)
 	{
 		// If the attachments folder is not there: error.
-		$initial_error = $e->getMessage();
+		$tmp_attachments->setSystemError($e->getMessage());
 	}
 
-	if (!isset($initial_error) && !isset($context['attachments']['quantity']))
+	if ($tmp_attachments->hasSystemError() === false && !isset($context['attachments']['quantity']))
 	{
 		// If this isn't a new post, check the current attachments.
 		if (!empty($id_msg))
@@ -85,8 +86,7 @@ function processAttachments($id_msg = null)
 
 	// There are files in session, likely already processed
 	$ignore_temp = false;
-	$tmp_attachments = new TemporaryAttachmentsList();
-	if ($tmp_attachments->getPostParam('files') !== null && $tmp_attachments->count() > 1)
+	if ($tmp_attachments->getPostParam('files') !== null && $tmp_attachments->hasAttachments())
 	{
 		// Let's try to keep them. But...
 		$ignore_temp = true;
@@ -128,10 +128,8 @@ function processAttachments($id_msg = null)
 	}
 
 	// If we have an initial error, lets just display it.
-	if (!empty($initial_error))
+	if ($tmp_attachments->hasSystemError())
 	{
-		$tmp_attachments['initial_error'] = $initial_error;
-
 		// This is a generic error
 		$attach_errors->activate();
 		$attach_errors->addError('attach_no_upload');
@@ -193,7 +191,7 @@ function processAttachments($id_msg = null)
 		// Sort out the errors for display and delete any associated files.
 		if ($temp_file->hasErrors())
 		{
-			$attach_errors->addAttach($temp_file['attachid'], $temp_file->getRealName());
+			$attach_errors->addAttach($temp_file['attachid'], $temp_file->getName());
 			$log_these = array('attachments_no_create', 'attachments_no_write', 'attach_timeout', 'ran_out_of_space', 'cant_access_upload_path', 'attach_0_byte_file', 'bad_attachment');
 
 			foreach ($temp_file->getErrors() as $error)
@@ -203,7 +201,7 @@ function processAttachments($id_msg = null)
 					$attach_errors->addError($error);
 					if (in_array($error, $log_these))
 					{
-						\ElkArte\Errors\Errors::instance()->log_error($temp_file->getRealName() . ': ' . $txt[$error], 'critical');
+						\ElkArte\Errors\Errors::instance()->log_error($temp_file->getName() . ': ' . $txt[$error], 'critical');
 
 						// For critical errors, we don't want the file or session data to persist
 						$temp_file->remove(false);
@@ -308,17 +306,22 @@ function createAttachment(&$attachmentOptions)
 	$db = database();
 	$attachmentsDir = new AttachmentsDirectory($modSettings, $db);
 
-	$image = new Image();
+	$image = new Image($attachmentOptions['tmp_name']);
 
 	// If this is an image we need to set a few additional parameters.
-	$is_image = $image->isImage($attachmentOptions['tmp_name']);
-	$size = $is_image ? $image->getSize($attachmentOptions['tmp_name']) : array(0, 0, 0);
+	$is_image = $image->isImage();
+	$size = $is_image ? $image->getSize() : array(0, 0, 0);
 	list ($attachmentOptions['width'], $attachmentOptions['height']) = $size;
 
 	// If it's an image get the mime type right.
 	if ($is_image)
 	{
 		$attachmentOptions['mime_type'] = getValidMimeImageType($size[2]);
+		// Want to correct for phonetographer photos?
+		if (!empty($modSettings['attachment_autorotate']))
+		{
+			$image->autoRotate();
+		}
 	}
 
 	// Get the hash if no hash has been given yet.
@@ -386,17 +389,18 @@ function createAttachment(&$attachmentOptions)
 	// Like thumbnails, do we?
 	if (!empty($modSettings['attachmentThumbWidth']) && !empty($modSettings['attachmentThumbHeight']) && ($attachmentOptions['width'] > $modSettings['attachmentThumbWidth'] || $attachmentOptions['height'] > $modSettings['attachmentThumbHeight']))
 	{
-		if ($image->createThumbnail($attachmentOptions['destination'], $modSettings['attachmentThumbWidth'], $modSettings['attachmentThumbHeight']))
+		$thumb_filename = $attachmentOptions['name'] . '_thumb';
+		$thumb_path = $attachmentOptions['destination'] . '_thumb';
+		$thumb_image = $image->createThumbnail($modSettings['attachmentThumbWidth'], $modSettings['attachmentThumbHeight'], $thumb_path);
+		if ($thumb_image !== false)
 		{
 			// Figure out how big we actually made it.
-			$size = $image->getSize($attachmentOptions['destination'] . '_thumb');
+			$size = $thumb_image->getSize();
 			list ($thumb_width, $thumb_height) = $size;
 
 			$thumb_mime = getValidMimeImageType($size[2]);
-			$thumb_filename = $attachmentOptions['name'] . '_thumb';
-			$thumb_size = $image->getFilesize();
+			$thumb_size = $thumb_image->getFilesize();
 			$thumb_file_hash = getAttachmentFilename($thumb_filename, 0, null, true);
-			$thumb_path = $attachmentOptions['destination'] . '_thumb';
 
 			// We should check the file size and count here since thumbs are added to the existing totals.
 			$attachmentsDir->checkDirSize($thumb_size);
@@ -761,10 +765,16 @@ function saveAvatar($temporary_path, $memID, $max_width, $max_height)
 	$format = !empty($modSettings['avatar_download_png']) ? IMAGETYPE_PNG : IMAGETYPE_JPEG;
 
 	// Resize it.
-	$image = new Image();
-	if ($image->createThumbnail($temporary_path, $max_width, $max_height, $destName, $format))
+	$image = new Image($temporary_path);
+	// Want to correct for phonetographer photos?
+	if (!empty($modSettings['attachment_autorotate']))
 	{
-		list ($width, $height) = $image->getSize($destName);
+		$image->autoRotate();
+	}
+	$thumb_image = $image->createThumbnail($max_width, $max_height, $destName, $format);
+	if ($thumb_image !== false)
+	{
+		list ($width, $height) = $thumb_image->getSize();
 		$mime_type = getValidMimeImageType($ext);
 
 		// Write filesize in the database.
@@ -774,7 +784,7 @@ function saveAvatar($temporary_path, $memID, $max_width, $max_height)
 				mime_type = {string:mime_type}
 			WHERE id_attach = {int:current_attachment}',
 			array(
-				'filesize' => $image->getFilesize(),
+				'filesize' => $thumb_image->getFilesize(),
 				'width' => (int) $width,
 				'height' => (int) $height,
 				'current_attachment' => $attachID,
@@ -1089,23 +1099,25 @@ function updateAttachmentThumbnail($filename, $id_attach, $id_msg, $old_id_thumb
 
 	$attachment = array('id_attach' => $id_attach);
 
-	$image = new Image();
-	if ($image->createThumbnail($filename, $modSettings['attachmentThumbWidth'], $modSettings['attachmentThumbHeight']))
+	$image = new Image($filename);
+	// Image is not autorotated because it was at the time of upload (hopefully)
+	$thumb_filename = (!empty($real_filename) ? $real_filename : $filename) . '_thumb';
+	$thumb_image = $image->createThumbnail($modSettings['attachmentThumbWidth'], $modSettings['attachmentThumbHeight'], $thumb_filename);
+	if ($thumb_image !== false)
 	{
 		// So what folder are we putting this image in?
 		$attachmentsDir = new AttachmentsDirectory($modSettings, database());
 		$id_folder_thumb = $attachmentsDir->currentDirectoryId();
 
 		// Calculate the size of the created thumbnail.
-		$size = $image->getSize($filename . '_thumb');
+		$size = $thumb_image->getSize();
 		list ($attachment['thumb_width'], $attachment['thumb_height']) = $size;
-		$thumb_size = $image->getFilesize();
+		$thumb_size = $thumb_image->getFilesize();
 
 		// Figure out the mime type.
 		$thumb_mime = getValidMimeImageType($size[2]);
 		$thumb_ext = substr($thumb_mime, strpos($thumb_mime, '/') + 1);
 
-		$thumb_filename = (!empty($real_filename) ? $real_filename : $filename) . '_thumb';
 		$thumb_hash = getAttachmentFilename($thumb_filename, 0, null, true);
 
 		$db = database();

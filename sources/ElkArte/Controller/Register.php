@@ -191,8 +191,7 @@ class Register extends AbstractController
 				// Are they saying they're under age, while under age registration is disabled?
 				if (empty($modSettings['coppaType']) && empty($_SESSION['skip_coppa']))
 				{
-					theme()->getTemplates()->loadLanguageFile('Login');
-					throw new Exception('under_age_registration_prohibited', false, array($modSettings['coppaAge']));
+					throw new Exception('Login.under_age_registration_prohibited', false, array($modSettings['coppaAge']));
 				}
 			}
 		}
@@ -366,8 +365,7 @@ class Register extends AbstractController
 		// Are they under age, and under age users are banned?
 		if (!empty($modSettings['coppaAge']) && empty($modSettings['coppaType']) && empty($_SESSION['skip_coppa']))
 		{
-			theme()->getTemplates()->loadLanguageFile('Login');
-			throw new Exception('under_age_registration_prohibited', false, array($modSettings['coppaAge']));
+			throw new Exception('Login.under_age_registration_prohibited', false, array($modSettings['coppaAge']));
 		}
 
 		// Check the time gate for miscreants. First make sure they came from somewhere that actually set it up.

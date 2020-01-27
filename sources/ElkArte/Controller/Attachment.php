@@ -20,6 +20,7 @@ use ElkArte\AbstractController;
 use ElkArte\Action;
 use ElkArte\Errors\AttachmentErrorContext;
 use ElkArte\Exceptions\Exception;
+use ElkArte\Graphics\TextImage;
 use ElkArte\Graphics\Image;
 use ElkArte\AttachmentsDirectory;
 use ElkArte\TemporaryAttachmentsList;
@@ -464,8 +465,8 @@ class Attachment extends AbstractController
 
 		$this->_send_headers('no_image', 'no_image', 'image/png', false, 'inline', 'no_image.png', true, false);
 
-		$img = new Image();
-		$img = $img->generateTextImage($text, 200);
+		$img = new TextImage($text);
+		$img = $img->generate(200);
 
 		if ($img === false)
 		{
@@ -661,20 +662,24 @@ class Attachment extends AbstractController
 		if ($resize)
 		{
 			// Create a thumbnail image and write it directly to the screen
-			$image = new Image();
-			$image->createThumbnail($filename, 100, 100, null);
+			$image = new Image($filename);
+			// Maybe overkill, but want to correct for phonetographer photos?
+			if (!empty($modSettings['attachment_autorotate']))
+			{
+				$image->autoRotate();
+			}
+			$thumb_filename = $filename . '_thumb';
+			$thumb_image = $image->createThumbnail(100, 100, $thumb_filename);
 		}
-		else
-		{
-			if (!$use_compression)
-			{
-				header('Content-Length: ' . filesize($filename));
-			}
 
-			if (@readfile($filename) === null)
-			{
-				echo file_get_contents($filename);
-			}
+		if (!$use_compression)
+		{
+			header('Content-Length: ' . $thumb_image->getFilesize());
+		}
+
+		if (@readfile($thumb_filename) === null)
+		{
+			echo file_get_contents($thumb_filename);
 		}
 
 		obExit(false);

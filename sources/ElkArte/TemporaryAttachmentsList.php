@@ -25,6 +25,8 @@ class TemporaryAttachmentsList extends ValuesContainer
 
 	public const TMPNAME_TPL = 'post_tmp_{user}_{hash}';
 
+	protected $sysError = '';
+
 	/**
 	 * Constructor
 	 */
@@ -43,9 +45,16 @@ class TemporaryAttachmentsList extends ValuesContainer
 	 *
 	 * @param int $userId
 	 */
-	public function removeAll($userId)
+	public function removeAll($userId = null)
 	{
-		$prefix = $this->getTplName($userId, '');
+		if ($userId === null)
+		{
+			$prefix = $this->getTplName('', '')[0];
+		}
+		else
+		{
+			$prefix = $this->getTplName($userId, '');
+		}
 		foreach ($this->data as $attachID => $attachment)
 		{
 			if (strpos($attachID, $prefix) !== false)
@@ -54,6 +63,36 @@ class TemporaryAttachmentsList extends ValuesContainer
 				@unlink($attachment['tmp_name'] . '_thumb');
 			}
 		}
+	}
+
+	/**
+	 * Sets the error message of a problem that prevents any attachment to be uploaded
+	 *
+	 * @param string $msg
+	 */
+	public function setSystemError($msg)
+	{
+		$this->sysError = $msg;
+	}
+
+	/**
+	 * Returns the error message of the problem that stops attachments
+	 *
+	 * @return string
+	 */
+	public function getSystemError()
+	{
+		return $this->sysError;
+	}
+
+	/**
+	 * Is there any error that prevents the system to upload any attachment?
+	 *
+	 * @return bool
+	 */
+	public function hasSystemError()
+	{
+		return !empty($this->sysError);
 	}
 
 	/**
@@ -326,6 +365,7 @@ class TemporaryAttachmentsList extends ValuesContainer
 
 	/**
 	 * Destroy all the attachments data in $_SESSION
+	 * Maybe it should also do some cleanup?
 	 */
 	public function unset()
 	{

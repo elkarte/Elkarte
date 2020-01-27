@@ -285,7 +285,7 @@ class BBCParser
 			}
 
 			// The only special case is 'html', which doesn't need to close things.
-			if ($tag[Codes::ATTR_BLOCK_LEVEL] && $tag[Codes::ATTR_TAG] !== 'html' && !$this->inside_tag[Codes::ATTR_BLOCK_LEVEL])
+			if ($tag[Codes::ATTR_BLOCK_LEVEL] && $tag[Codes::ATTR_TAG] !== 'html' && empty($this->inside_tag[Codes::ATTR_BLOCK_LEVEL]))
 			{
 				$this->closeNonBlockLevel();
 			}
@@ -582,7 +582,7 @@ class BBCParser
 		}
 
 		// If its a footnote, keep track of the number
-		if ($tag[Codes::ATTR_TAG] === 'footnote')
+		if ($tag !== null && $tag[Codes::ATTR_TAG] === 'footnote')
 		{
 			$this->num_footnotes++;
 		}

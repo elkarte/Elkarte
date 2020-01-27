@@ -100,11 +100,6 @@ class TemporaryAttachment extends ValuesContainer
 		return $this->data['errors'];
 	}
 
-	public function getRealName()
-	{
-		return $this->data['name'];
-	}
-
 	public function getSize()
 	{
 		return $this->data['size'];
@@ -192,15 +187,15 @@ class TemporaryAttachment extends ValuesContainer
 
 		// First, the dreaded security check. Sorry folks, but this should't be avoided
 		$image = new Image($this->data['tmp_name']);
-		$size = $image->getSize($this->data['tmp_name']);
+		$size = $image->getSize();
 		$valid_mime = getValidMimeImageType($size[2]);
 
 		if ($valid_mime !== '')
 		{
-			if (!$image->checkImageContents($this->data['tmp_name']))
+			if (!$image->checkImageContents())
 			{
 				// It's bad. Last chance, maybe we can re-encode it?
-				if (empty($modSettings['attachment_image_reencode']) || (!$image->reencodeImage($this->data['tmp_name'])))
+				if (empty($modSettings['attachment_image_reencode']) || (!$image->reencodeImage()))
 				{
 					// Nothing to do: not allowed or not successful re-encoding it.
 					$this->setErrors('bad_attachment');

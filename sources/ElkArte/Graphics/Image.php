@@ -17,6 +17,8 @@
 
 namespace ElkArte\Graphics;
 
+use ElkArte\Graphics\Manipulators\Imagick;
+use ElkArte\Graphics\Manipulators\Gd2;
 use ElkArte\Exceptions\Exception;
 
 /**
@@ -37,7 +39,7 @@ class Image
 		IMAGETYPE_WBMP => 'wbmp'
 	];
 
-	/** @var \ElkArte\Graphics\Imagick|\ElkArte\Graphics\Gd2 */
+	/** @var \ElkArte\Graphics\Manipulators\Imagick|\ElkArte\Graphics\Manipulators\Gd2 */
 	protected $_manipulator;
 
 	/** @var string filename we are working with */
@@ -55,25 +57,12 @@ class Image
 	 * @param string $fileName
 	 * @param bool $force_gd
 	 */
-	public function __construct($fileName = '', $force_gd = false)
+	public function __construct($fileName, $force_gd = false)
 	{
 		$this->_fileName = $fileName;
 		$this->_force_gd = $force_gd;
 
-		// Determine and set what image library we will use
-		try
-		{
-			$this->setManipulator();
-		}
-		catch (\Exception $e)
-		{
-			// Nothing to do
-		}
-
-		if (!empty($this->_fileName))
-		{
-			$this->loadImage($this->_fileName);
-		}
+		$this->loadImage();
 	}
 
 	/**
@@ -100,14 +89,21 @@ class Image
 
 	/**
 	 * Load an image from a file or web address into the active graphics library
-	 *
-	 * @param string $source
+	 * @throws \ImagickException
 	 */
-	public function loadImage($source)
+	protected function loadImage()
 	{
-		$this->setSource($source);
+		// Determine and set what image library we will use
+		try
+		{
+			$this->setManipulator();
+		}
+		catch (\Exception $e)
+		{
+			// Nothing to do
+		}
 
-		if ($this->isWebAddress($source))
+		if ($this->isWebAddress())
 		{
 			$success = $this->_manipulator->createImageFromWeb();
 		}
@@ -123,48 +119,13 @@ class Image
 	}
 
 	/**
-	 * Set the source name here and in the graphics manipulator
-	 *
-	 * @param string $source
-	 */
-	public function setSource($source)
-	{
-		$this->_fileName = $source;
-		$this->_manipulator->setSource($source);
-	}
-
-	/**
 	 * Return if the source is actually a web address vs local file
 	 *
-	 * @param $source
 	 * @return bool
 	 */
-	public function isWebAddress($source)
+	protected function isWebAddress()
 	{
-		return substr($source, 0, 7) === 'http://' || substr($this->_fileName, 0, 8) === 'https://';
-	}
-
-	/**
-	 * Simple function to generate an image containing some text.
-	 * It uses preferentially Imagick if present, otherwise GD.
-	 * Font and size are fixed.
-	 *
-	 * @param string $text The text the image should contain
-	 * @param int $width Width of the final image
-	 * @param int $height Height of the image
-	 * @param string $format Type of the image (valid types are png, jpeg, gif)
-	 *
-	 * @return bool|string The image or false if neither Imagick nor GD are found
-	 */
-	public function generateTextImage($text, $width = 100, $height = 75, $format = 'png')
-	{
-		$valid_formats = array('jpeg', 'png', 'gif');
-		if (!in_array($format, $valid_formats))
-		{
-			$format = 'png';
-		}
-
-		return $this->_manipulator->generateTextImage($text, $width, $height, $format);
+		return substr($this->_fileName, 0, 7) === 'http://' || substr($this->_fileName, 0, 8) === 'https://';
 	}
 
 	/**
@@ -180,12 +141,11 @@ class Image
 	/**
 	 * If the file is an image or not
 	 *
-	 * @param string $source
 	 * @return bool
 	 */
-	public function isImage($source)
+	public function isImage()
 	{
-		return substr(get_finfo_mime($source), 0, 5) === 'image';
+		return substr(get_finfo_mime($this->_fileName), 0, 5) === 'image';
 	}
 
 	/**
@@ -196,7 +156,6 @@ class Image
 	 * - Will adjust for image rotation if needed.
 	 * - Saves the thumbnail file
 	 *
-	 * @param string $source the image file to thumbnail
 	 * @param int $max_width allowed width
 	 * @param int $max_height allowed height
 	 * @param string $dstName name to save
@@ -204,24 +163,15 @@ class Image
 	 * @return bool
 	 * @throws \Exception
 	 */
-	public function createThumbnail($source, $max_width, $max_height, $dstName = '', $format = '')
+	public function createThumbnail($max_width, $max_height, $dstName = '', $format = '')
 	{
 		global $modSettings;
 
 		// The particulars
-		$dstName = $dstName === '' ? $source . '_thumb' : $dstName;
+		$dstName = $dstName === '' ? $this->_fileName . '_thumb' : $dstName;
 		$format = empty($format) && !empty($modSettings['attachment_thumb_png']) ? IMAGETYPE_PNG : IMAGETYPE_JPEG;
 		$max_width = max(16, $max_width);
 		$max_height = max(16, $max_height);
-
-		// Load the data to the manipulator
-		$this->loadImage($source);
-
-		// Spin it if needed
-		if (!empty($modSettings['attachment_autorotate']))
-		{
-			$this->autoRotateImage();
-		}
 
 		// Do the actual resize, thumbnails by default strip EXIF data to save space
 		$success = $this->resizeImage($max_width, $max_height, true);
@@ -229,7 +179,8 @@ class Image
 		// Save our work
 		if ($success)
 		{
-			$success = $this->saveImage($dstName, $format);
+			$this->saveImage($dstName, $format);
+			$success = new Image($dstName);
 		}
 		else
 		{
@@ -331,18 +282,8 @@ class Image
 	public function saveImage($file_name = '', $preferred_format = IMAGETYPE_JPEG, $quality = 85)
 	{
 		$success = $this->_manipulator->output($file_name, $preferred_format, $quality);
-		$this->__destruct();
 
 		return $success;
-	}
-
-	/**
-	 * Clears the image object
-	 */
-	public function __destruct()
-	{
-		$this->_manipulator->__destruct();
-		$this->_image_loaded = false;
 	}
 
 	/**
@@ -355,47 +296,40 @@ class Image
 	 * - strips the exif data
 	 * - the function makes sure that all non-essential image contents are disposed.
 	 *
-	 * @param $source
 	 * @return bool
+	 * @throws \ImagickException
 	 */
-	public function reencodeImage($source)
+	public function reencodeImage()
 	{
 		// The image should already be loaded
-		if (!$this->_image_loaded || $this->_fileName !== $source)
+		if (!$this->_image_loaded)
 		{
 			return false;
 		}
 
 		// re-encode the image at the same size it is now, strip exif data.
-		$sizes = $this->getSize($source);
+		$sizes = $this->getSize();
 		$success = $this->resizeImage(null, null, true, true);
 
 		// if all went well, and its valid, save it back in place
 		if ($success && !empty(Image::DEFAULT_FORMATS[$sizes[2]]))
 		{
 			// Write over the original file
-			$success = $this->saveImage($source, $sizes[2]);
-
-			return $success;
+			$success = $this->saveImage($this->_fileName, $sizes[2]);
+			$this->loadImage();
 		}
+
+		return $success;
 	}
 
 	/**
 	 * Return or set (via getimagesize or getimagesizefromstring) some image details such
 	 * as size and mime type
 	 *
-	 * @param string $source
-	 *
 	 * @return array
 	 */
-	public function getSize($source)
+	public function getSize()
 	{
-		if (empty($this->_manipulator->sizes) || $source !== $this->_fileName)
-		{
-			$this->setSource($source);
-			$this->_manipulator->getSize();
-		}
-
 		return $this->_manipulator->sizes;
 	}
 
@@ -406,19 +340,17 @@ class Image
 	 *
 	 * - Basic search of an image file for potential web (php/script) infections
 	 *
-	 * @param string $source
 	 * @return bool
 	 * @throws \ElkArte\Exceptions\Exception
 	 */
-	public function checkImageContents($source)
+	public function checkImageContents()
 	{
-		$fp = fopen($source, 'rb');
+		$fp = fopen($this->_fileName, 'rb');
 
 		// If we can't open it to scan, go no further
 		if ($fp === false)
 		{
-			theme()->getTemplates()->loadLanguageFile('Post');
-			throw new Exception('attach_timeout');
+			throw new Exception('Post.attach_timeout');
 		}
 
 		$prev_chunk = '';

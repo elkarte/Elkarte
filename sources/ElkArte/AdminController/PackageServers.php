@@ -774,8 +774,7 @@ class PackageServers extends AbstractController
 					if ($packageInfo['id'] === $context['package']['id'] && compareVersions($packageInfo['version'], $context['package']['version']) == 0)
 					{
 						@unlink($destination);
-						theme()->getTemplates()->loadLanguageFile('Errors');
-						throw new Exception('package_upload_already_exists', 'general', $package->getFilename());
+						throw new Exception('Errors.package_upload_already_exists', 'general', $package->getFilename());
 					}
 				}
 			}

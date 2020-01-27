@@ -2636,15 +2636,13 @@ function profileSaveAvatarData(&$value)
 			{
 				if (!is_writable($uploadDir))
 				{
-					theme()->getTemplates()->loadLanguageFile('Post');
-					throw new \ElkArte\Exceptions\Exception('attachments_no_write', 'critical');
+					throw new \ElkArte\Exceptions\Exception('Post.attachments_no_write', 'critical');
 				}
 
 				$new_avatar_name = $uploadDir . '/' . getAttachmentFilename('avatar_tmp_' . $memID, null, null, true);
 				if (!move_uploaded_file($_FILES['attachment']['tmp_name'], $new_avatar_name))
 				{
-					theme()->getTemplates()->loadLanguageFile('Post');
-					throw new \ElkArte\Exceptions\Exception('attach_timeout', 'critical');
+					throw new \ElkArte\Exceptions\Exception('Post.attach_timeout', 'critical');
 				}
 
 				$_FILES['attachment']['tmp_name'] = $new_avatar_name;
@@ -2687,7 +2685,7 @@ function profileSaveAvatarData(&$value)
 					@chmod($_FILES['attachment']['tmp_name'], 0644);
 
 					$image = new Image($_FILES['attachment']['tmp_name']);
-					if (!$image->reencodeImage($_FILES['attachment']['tmp_name']))
+					if (!$image->reencodeImage())
 					{
 						@unlink($_FILES['attachment']['tmp_name']);
 
@@ -2720,14 +2718,14 @@ function profileSaveAvatarData(&$value)
 			{
 				// Now try to find an infection.
 				$image = new Image($_FILES['attachment']['tmp_name']);
-				$size = $image->getSize($_FILES['attachment']['tmp_name']);
+				$size = $image->getSize();
 				$valid_mime = getValidMimeImageType($size[2]);
 				if ($valid_mime !== '')
 				{
-					if (!$image->checkImageContents($_FILES['attachment']['tmp_name']))
+					if (!$image->checkImageContents())
 					{
 						// It's bad. Try to re-encode the contents?
-						if (empty($modSettings['avatar_reencode']) || (!$image->reencodeImage($_FILES['attachment']['tmp_name'])))
+						if (empty($modSettings['avatar_reencode']) || (!$image->reencodeImage()))
 						{
 							@unlink($_FILES['attachment']['tmp_name']);
 
