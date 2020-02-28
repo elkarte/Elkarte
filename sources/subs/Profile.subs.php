@@ -1927,7 +1927,11 @@ function profileReloadUser()
 	if (isset($_POST['passwrd2']) && $_POST['passwrd2'] != '')
 	{
 		require_once(SUBSDIR . '/Auth.subs.php');
-		setLoginCookie(60 * $modSettings['cookieTime'], $context['id_member'], hash('sha256', Util::strtolower($cur_profile['member_name']) . un_htmlspecialchars($_POST['passwrd2']) . $cur_profile['password_salt']));
+		$check = validateLoginPassword($_POST['passwrd2'], $_POST['passwrd1'], $cur_profile['member_name']);
+		if ($check === true)
+		{
+			setLoginCookie(60 * $modSettings['cookieTime'], $context['id_member'], hash('sha256', $_POST['passwrd1'] . $cur_profile['password_salt']));
+		}
 	}
 
 	loadUserSettings();

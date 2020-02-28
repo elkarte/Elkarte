@@ -12,7 +12,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.1
+ * @version 1.1.7
  *
  */
 
@@ -304,6 +304,8 @@ class Auth_Controller extends Action_Controller
 			$valid_password = validateLoginPassword($sha_passwd, $user_settings['passwd'], $user_settings['member_name']);
 		}
 
+		require_once(SUBSDIR . '/Members.subs.php');
+
 		// Bad password!  Thought you could fool the database?!
 		if ($valid_password === false)
 		{
@@ -316,12 +318,10 @@ class Auth_Controller extends Action_Controller
 			// Whichever encryption it was using, let's make it use ElkArte's now ;).
 			if (in_array($user_settings['passwd'], $other_passwords))
 			{
-				$tokenizer = new Token_Hash();
+				updateMemberSalt($user_settings['id_member']);
 				$user_settings['passwd'] = validateLoginPassword($sha_passwd, '', '', true);
-				$user_settings['password_salt'] = $tokenizer->generate_hash(4);
 
 				// Update the password hash and set up the salt.
-				require_once(SUBSDIR . '/Members.subs.php');
 				updateMemberData($user_settings['id_member'], array('passwd' => $user_settings['passwd'], 'password_salt' => $user_settings['password_salt'], 'passwd_flood' => ''));
 			}
 			// Okay, they for sure didn't enter the password!
@@ -350,23 +350,18 @@ class Auth_Controller extends Action_Controller
 			validatePasswordFlood($user_settings['id_member'], $user_settings['passwd_flood'], true);
 
 			// If we got here then we can reset the flood counter.
-			require_once(SUBSDIR . '/Members.subs.php');
 			updateMemberData($user_settings['id_member'], array('passwd_flood' => ''));
 		}
 
-		// Correct password, but they've got no salt; fix it!
-		if ($user_settings['password_salt'] === '')
+		// Correct password, but they've got no/old salt; fix it!
+		if (strlen($user_settings['password_salt'] < 9))
 		{
-			require_once(SUBSDIR . '/Members.subs.php');
-			$tokenizer = new Token_Hash();
-			$user_settings['password_salt'] = $tokenizer->generate_hash(4);
-			updateMemberData($user_settings['id_member'], array('password_salt' => $user_settings['password_salt']));
+			updateMemberSalt($user_settings['id_member']);
 		}
 
 		// Let's track the last used one-time password.
 		if (!empty($_POST['otp_token']))
 		{
-			require_once(SUBSDIR . '/Members.subs.php');
 			updateMemberData($user_settings['id_member'], array('otp_used' => (int) $_POST['otp_token']));
 		}
 		// Check their activation status.
@@ -435,9 +430,8 @@ class Auth_Controller extends Action_Controller
 		session_destroy();
 		if (!empty($user_info['id']))
 		{
-			$tokenizer = new Token_Hash();
 			require_once(SUBSDIR . '/Members.subs.php');
-			updateMemberData($user_info['id'], array('password_salt' => $tokenizer->generate_hash(4)));
+			updateMemberSalt($user_info['id'], true);
 		}
 
 		// Off to the merry board index we go!

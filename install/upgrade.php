@@ -869,7 +869,7 @@ function checkLogin()
 					if ($valid_password)
 					{
 						$password = validateLoginPassword($_POST['passwrd'], '', $_POST['user'], true);
-						$password_salt = substr(md5(mt_rand()), 0, 4);
+						$password_salt = substr(base64_encode(sha1(mt_rand() . microtime(), true)), 0, 16);
 
 						// Update the password hash and set up the salt.
 						require_once(SUBSDIR . '/Members.subs.php');

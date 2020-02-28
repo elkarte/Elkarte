@@ -1067,7 +1067,7 @@ class Install_Controller
 			{
 				require_once(SUBSDIR . '/Auth.subs.php');
 
-				$incontext['member_salt'] = substr(md5(mt_rand()), 0, 4);
+				$incontext['member_salt'] = substr(base64_encode(sha1(mt_rand() . microtime(), true)), 0, 16);
 
 				// Format the username properly.
 				$_POST['username'] = preg_replace('~[\t\n\r\x0B\0\xA0]+~', ' ', $_POST['username']);
