@@ -1510,6 +1510,9 @@ function disableAutoComplete()
 				return;
 
 			$.ajax({
+				cache: false,
+				dataType: 'json',
+				timeout: 1500,
 				url: elk_scripturl + "?action=mentions;sa=fetch;api=json;lastsent=" + lastTime
 			})
 			.done(function(request) {
@@ -1517,7 +1520,8 @@ function disableAutoComplete()
 					send(request);
 					lastTime = request.timelast;
 				}
-
+			})
+			.always(function() {
 				setTimeout(function() {
 					fetch();
 				}, opt.delay);

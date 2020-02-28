@@ -7,7 +7,7 @@
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
- * @version 1.1
+ * @version 1.1.7
  *
  */
 
@@ -355,7 +355,7 @@ class Mentions_Controller extends Action_Controller
 	 */
 	public function action_fetch()
 	{
-		global $user_info, $context, $txt, $modSettings;
+		global $user_info, $context, $txt, $modSettings, $scripturl;
 
 		if (empty($modSettings['usernotif_favicon_enable']) && empty($modSettings['usernotif_desktop_enable']))
 			die();
@@ -387,6 +387,7 @@ class Mentions_Controller extends Action_Controller
 			$context['json_data']['desktop_notifications'] = array(
 				'new_from_last' => getNewMentions($user_info['id'], $lastsent),
 				'title' => sprintf($txt['forum_notification'], $context['forum_name']),
+				'link' => '/index.php?action=mentions'
 			);
 			$context['json_data']['desktop_notifications']['message'] = sprintf($txt[$lastsent == 0 ? 'unread_notifications' : 'new_from_last_notifications'], $context['json_data']['desktop_notifications']['new_from_last']);
 		}

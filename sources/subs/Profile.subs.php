@@ -11,7 +11,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.1.4
+ * @version 1.1.7
  *
  */
 
@@ -3398,7 +3398,7 @@ function getMembersInRange($ips, $memID)
  */
 function getMemberNotificationsProfile($member_id)
 {
-	global $modSettings;
+	global $modSettings, $context;
 
 	if (empty($modSettings['enabled_mentions']))
 		return array();
@@ -3410,6 +3410,7 @@ function getMemberNotificationsProfile($member_id)
 	$enabled_mentions = explode(',', $modSettings['enabled_mentions']);
 	$user_preferences = getUsersNotificationsPreferences($enabled_mentions, $member_id);
 	$mention_types = array();
+	$push_enabled = false;
 
 	foreach ($enabled_mentions as $type)
 	{
@@ -3421,10 +3422,24 @@ function getMemberNotificationsProfile($member_id)
 			$notif[$key] = array('id' => $val, 'enabled' => $user_preferences[$member_id][$type] === $key);
 			if ($user_preferences[$member_id][$type] > 0)
 				$type_on = true;
+
+			if (!$push_enabled && $val === 'notification' && $user_preferences[$member_id][$type] === $key)
+				$push_enabled = true;
 		}
 
 		if (!empty($notif))
 			$mention_types[$type] = array('data' => $notif, 'enabled' => $type_on);
+	}
+
+	// If they enabled notifications alert, then lets ask for browser permission to show them
+	// just blows smoke if they already gave it.
+	$push_enabled &= $modSettings['usernotif_desktop_enable'] && !empty($context['profile_updated']);
+	if ($push_enabled)
+	{
+		addInlineJavascript('
+			$(function() {
+				Push.Permission.request();
+			});', true);
 	}
 
 	return $mention_types;
