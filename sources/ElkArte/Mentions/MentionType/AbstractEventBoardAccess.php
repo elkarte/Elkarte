@@ -16,9 +16,9 @@ namespace ElkArte\Mentions\MentionType\Event;
 use ElkArte\Util;
 
 /**
- * Class AbstractMentionBoardAccess
+ * Class AbstractEventBoardAccess
  */
-abstract class AbstractMentionBoardAccess extends AbstractMentionMessage
+abstract class AbstractEventBoardAccess extends AbstractEventMessage
 {
 	/**
 	 * {@inheritdoc}

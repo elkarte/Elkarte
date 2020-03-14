@@ -18,9 +18,9 @@ use ElkArte\Mentions\MentionType\EventInterface;
 use ElkArte\UserInfo;
 
 /**
- * Class AbstractMentionMessage
+ * Class AbstractEventMessage
  */
-abstract class AbstractMentionMessage implements EventInterface
+abstract class AbstractEventMessage implements EventInterface
 {
 	/**
 	 * The identifier of the mention (the name that is stored in the db)

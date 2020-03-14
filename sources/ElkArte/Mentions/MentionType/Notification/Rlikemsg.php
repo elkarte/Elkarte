@@ -13,12 +13,14 @@
 
 namespace ElkArte\Mentions\MentionType\Notification;
 
+use ElkArte\Mentions\MentionType\AbstractNotificationBoardAccess;
+
 /**
  * Class RlikemsgMention
  *
  * Handles the notification (or non-notification) of removed likes.
  */
-class Rlikemsg extends AbstractMentionBoardAccess
+class Rlikemsg extends AbstractNotificationBoardAccess
 {
 	/**
 	 * {@inheritdoc }

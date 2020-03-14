@@ -824,11 +824,6 @@ function getNotificationTypes()
 	// For each file found, call its getType method
 	foreach ($glob as $file)
 	{
-		if (strpos($file->getBasename('.php'), 'Abstract') === 0)
-		{
-			continue;
-		}
-
 		$class_name = '\\ElkArte\\Mentions\\MentionType\\Notification\\' . $file->getBasename('.php');
 		$types[] = $class_name::getType();
 	}

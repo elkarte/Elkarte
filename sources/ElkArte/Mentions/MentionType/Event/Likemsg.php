@@ -13,12 +13,14 @@
 
 namespace ElkArte\Mentions\MentionType\Event;
 
+use ElkArte\Mentions\MentionType\AbstractEventBoardAccess;
+
 /**
  * Class LikemsgMention
  *
  * Handles mentions of likes
  */
-class Likemsg extends AbstractMentionBoardAccess
+class Likemsg extends AbstractEventBoardAccess
 {
 	/**
 	 * {@inheritdoc }

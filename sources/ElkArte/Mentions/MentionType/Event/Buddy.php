@@ -13,12 +13,14 @@
 
 namespace ElkArte\Mentions\MentionType\Event;
 
+use ElkArte\Mentions\MentionType\AbstractEventBoardAccess;
+
 /**
  * Class BuddyMention
  *
  * Handles mentioning of buddies
  */
-class Buddy extends AbstractMentionMessage
+class Buddy extends AbstractEventMessage
 {
 	/**
 	 * {@inheritdoc }

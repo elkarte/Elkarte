@@ -11,17 +11,16 @@
  *
  */
 
-namespace ElkArte\Mentions\MentionType\Notification;
+namespace ElkArte\Mentions\MentionType;
 
 use ElkArte\Database\QueryInterface;
-use ElkArte\Mentions\MentionType\NotificationInterface;
 use ElkArte\NotificationsTask;
 use ElkArte\UserInfo;
 
 /**
- * Class AbstractMentionMessage
+ * Class AbstractNotificationMessage
  */
-abstract class AbstractMentionMessage implements NotificationInterface
+abstract class AbstractNotificationMessage implements NotificationInterface
 {
 	/**
 	 * The identifier of the mention (the name that is stored in the db)
