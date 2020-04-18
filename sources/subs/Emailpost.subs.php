@@ -873,7 +873,7 @@ function pbe_email_attachments($pbe, $email_message)
 				'user_id' => $pbe['profile']['id_member'],
 				'size' => strlen($attachment),
 				'type' => null,
-				'id_folder' => $attachmentDirectory->currentDirectoryId(),
+				'id_folder' => $attachmentsDir->currentDirectoryId(),
 			]);
 
 			// Make sure its valid
