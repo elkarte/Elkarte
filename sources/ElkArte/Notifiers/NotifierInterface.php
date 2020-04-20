@@ -14,6 +14,9 @@
 
 namespace ElkArte\Notifiers;
 
+use ElkArte\Mentions\MentionType\NotificationInterface;
+use ElkArte\NotificationsTask;
+
 /**
  * Class Notifications
  *
@@ -28,12 +31,5 @@ Interface NotifierInterface
 	 * @param \ElkArte\NotificationsTask $task
 	 * @param string[] $bodies
 	 */
-	public function send($obj, $task, $bodies);
-
-	/**
-	 * Returns the notifications in the system, daily, weekly, etc
-	 *
-	 * @return string[]
-	 */
-	public function getName();
+	public function send(NotificationInterface $obj, NotificationsTask $task, $bodies);
 }

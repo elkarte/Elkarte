@@ -11,16 +11,18 @@
  *
  */
 
-namespace ElkArte\Notifiers;
+namespace ElkArte\Notifiers\Methods;
 
-use ElkArte\Notifiers\NotifierInterface;
+use ElkArte\Notifiers\AbstractNotifier;
+use ElkArte\Mentions\MentionType\NotificationInterface;
+use ElkArte\NotificationsTask;
 
 /**
  * Class Notifications
  *
  * Core area for notifications, defines the abstract model
  */
-class EmailDaily implements NotifierInterface
+class EmailDaily extends AbstractNotifier
 {
 	/**
 	 * Hash defining what is needed to build the message
@@ -49,7 +51,7 @@ class EmailDaily implements NotifierInterface
 	/**
 	 * {@inheritdoc }
 	 */
-	public function send($obj, $task, $bodies)
+	public function send(NotificationInterface $obj, NotificationsTask $task, $bodies)
 	{
 		$this->_send_daily_email($obj, $task, $bodies);
 	}
@@ -85,7 +87,7 @@ class EmailDaily implements NotifierInterface
 	 */
 	protected function _insert_delayed($insert_array)
 	{
-		$this->_db->insert('ignore',
+		$this->db->insert('ignore',
 			'{db_prefix}pending_notifications',
 			[
 				'notification_type' => 'string-10',

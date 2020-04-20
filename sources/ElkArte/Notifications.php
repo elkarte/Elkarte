@@ -87,13 +87,8 @@ class Notifications extends AbstractModel
 		$glob = new \GlobIterator(Notifications::NOTIFIERS_PATH . '/*.php', \FilesystemIterator::SKIP_DOTS);
 		foreach ($glob as $file)
 		{
-			$this->register($file->getBasename());
+			$this->register($file->getBasename('.php'));
 		}
-
-// 		$this->register(1, 'notification', array($this, '_send_notification'));
-// 		$this->register(2, 'email', array($this, '_send_email'), array('subject' => 'subject', 'body' => 'body', 'suffix' => true));
-// 		$this->register(3, 'email_daily', array($this, '_send_daily_email'), array('subject' => 'subject', 'body' => 'snippet', 'suffix' => true));
-// 		$this->register(4, 'email_weekly', array($this, '_send_weekly_email'), array('subject' => 'subject', 'body' => 'snippet', 'suffix' => true));
 
 		call_integration_hook('integrate_notifications_methods', array($this));
 	}
@@ -114,14 +109,15 @@ class Notifications extends AbstractModel
 			$namespace = Notifications::NOTIFIERS_NAMESPACE;
 		}
 
-		$class = Notifications::NOTIFIERS_NAMESPACE . '\\' . $file->getBasename();
+		$class = Notifications::NOTIFIERS_NAMESPACE . '\\' . $class_name;
+		$index = strtolower($class_name);
 
-		if (isset($this->_notifiers[$class_name]))
+		if (isset($this->_notifiers[$index]))
 		{
 			throw new Exceptions\Exception('error_notifier_already_instantiated');
 		}
 
-		$this->_notifiers[$class_name] = new $class($this->_db, $this->user);
+		$this->_notifiers[$index] = new $class($this->_db, $this->user);
 	}
 
 	/**
@@ -193,7 +189,6 @@ class Notifications extends AbstractModel
 		foreach ($notif_prefs as $notifier => $members)
 		{
 			$bodies = $obj->getNotificationBody($this->_notifiers[$notifier]->lang_data, $members);
-
 			// Just in case...
 			if (empty($bodies))
 			{
@@ -217,20 +212,6 @@ class Notifications extends AbstractModel
 	protected function _getNotificationPreferences($notifiers, $notification_type, $members)
 	{
 		$preferences = getUsersNotificationsPreferences($notification_type, $members);
-		/*
-		$preferences = [
-			123 => [
-				'mentionmem' => [
-					'Notification',
-					'Email',
-				],
-				'quotemem' => [
-					'Notification',
-					'Email',
-				]
-			]
-		]
-		*/
 
 		$notification_methods = [];
 		foreach ($notifiers as $notifier)
@@ -240,28 +221,26 @@ class Notifications extends AbstractModel
 
 		foreach ($members as $member)
 		{
-			$this_prefs = $preferences[$member][$notification_type];
 			// This user for this mention doesn't want any notification. Move on.
 			// Memo: at a certain point I used 'none', the two are basically equivalent
 			// since an \ElkArte\Notifiers\Methods\None doesn't exist, so nothing will be
 			// instantiated
-			if (empty($this_pref))
+			if (empty($preferences[$member][$notification_type]))
 			{
 				continue;
 			}
+			$this_prefs = $preferences[$member][$notification_type];
 			foreach ($this_prefs as $this_pref)
 			{
+				if (!isset($notification_methods[$this_pref]))
+				{
+					continue;
+				}
 				$notification_methods[$this_pref][] = $member;
 			}
 		}
 
 		return $notification_methods;
-		/*
-		$notification_methods = [
-			'Notification' => [123, 456],
-			'Email' => [159, 753]
-		]
-		*/
 	}
 
 	/**
@@ -277,7 +256,7 @@ class Notifications extends AbstractModel
 	/**
 	 * Inserts a new mention in the database (those that appear in the mentions area).
 	 *
-	 * @param \ElkArte\Mentions\MentionType\MentionType\NotificationInterface $obj
+	 * @param \ElkArte\Mentions\MentionType\NotificationInterface $obj
 	 * @param \ElkArte\NotificationsTask $task
 	 * @param mixed[] $bodies
 	 */

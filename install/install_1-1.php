@@ -2003,7 +2003,7 @@ class InstallInstructions_install_1_1
 				array('name' => 'mention_type',       'type' => 'varchar', 'size' => 12, 'default' => ''),
 			),
 			array(
-				array('name' => 'mention_member', 'columns' => array('id_member', 'mention_type'), 'type' => 'unique'),
+				array('name' => 'mention_member', 'columns' => array('id_member', 'notification_type', 'mention_type'), 'type' => 'unique'),
 			),
 			array(),
 			'ignore'
@@ -2660,27 +2660,27 @@ class InstallInstructions_install_1_1
 				array('badbehavior_url_wl_desc', 'a:1:{i:0;s:15:"Payment Gateway";}'),
 				array('notification_methods', serialize([
 					'buddy' => [
-						'Notification' => "1",
-						'Email' => "1",
-						'EmailDaily' => "1",
-						'EmailWeekly' => "1"
+						'notification' => "1",
+						'email' => "1",
+						'emaildaily' => "1",
+						'emailweekly' => "1"
 					],
 					'likemsg' => [
-						'Notification' => "1"
+						'notification' => "1"
 					],
 					"mentionmem" => [
-						"Notification" => "1",
-						"Email" => "1",
-						"EmailDaily" => "1",
-						"EmailWeekly" => "1",
+						"notification" => "1",
+						"email" => "1",
+						"emaildaily" => "1",
+						"emailweekly" => "1",
 					],
 					"quotedmem" => [
-						"Notification" => "1",
-						"Email" => "1",
-						"EmailDaily" => "1",
-						"EmailWeekly" => "1"
+						"notification" => "1",
+						"email" => "1",
+						"emaildaily" => "1",
+						"emailweekly" => "1"
 					]
-				]),
+				])),
 				array('autoload_integrate', '\\ElkArte\\UserNotificationIntegrate,\\ElkArte\\IlaIntegrate,\\ElkArte\\VerificationControls\\VerificationControlsIntegrate'),
 				array('usernotif_favicon_bgColor', '#ff0000'),
 				array('usernotif_favicon_position', 'up'),

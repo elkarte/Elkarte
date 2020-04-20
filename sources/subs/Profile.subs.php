@@ -3881,10 +3881,14 @@ function getMemberNotificationsProfile($member_id)
 	foreach ($enabled_mentions as $type)
 	{
 		$type_on = false;
-		$notif = filterNotificationMethods($mention_methods, $type);
+		$notif = filterNotificationMethods(array_keys($mention_methods), $type);
 
 		foreach ($notif as $key => $val)
 		{
+			if (empty($user_preferences[$member_id]) || empty($user_preferences[$member_id][$type]))
+			{
+				continue;
+			}
 			$notif[$key] = array('id' => $val, 'enabled' => $user_preferences[$member_id][$type] === $key);
 			if ($user_preferences[$member_id][$type] > 0)
 			{

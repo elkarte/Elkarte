@@ -994,10 +994,10 @@ function getUsersNotificationsPreferences($notification_types, $members, $disabl
 			'mention_types' => $notification_types,
 		)
 	)->fetch_callback(
-		function ($row) use (&$results) {
+		function ($row) use (&$results, $disabled) {
 			if (in_array($row['notification_type'], $disabled))
 			{
-				continue;
+				return;
 			}
 
 			if (!isset($results[$row['id_member']]))
@@ -1084,11 +1084,12 @@ function filterNotificationMethods($possible_methods, $type)
 	}
 
 	$allowed = array();
-	foreach ($possible_methods as $val)
+	foreach ($possible_methods as $class)
 	{
-		if (isset($unserialized[$val]))
+		$class = strtolower($class);
+		if (isset($unserialized[$class]))
 		{
-			$allowed[] = $val;
+			$allowed[] = $class;
 		}
 	}
 
@@ -1111,20 +1112,6 @@ function getConfiguredNotificationMethods($type)
 	if ($unserialized === null)
 	{
 		$unserialized = unserialize($modSettings['notification_methods']);
-		/*
-		$unserialized = [
-			'buddy' => [
-				'notification' => 1,
-				'email' => 1,
-				'email_daily' => 1
-			],
-			'mentionmem' => [
-				'notification' => 1,
-				'email' => 1,
-				'email_daily' => 1
-			]
-		]
-		*/
 	}
 
 	if (isset($unserialized[$type]))

@@ -11,16 +11,21 @@
  *
  */
 
-namespace ElkArte\Notifiers;
+namespace ElkArte\Notifiers\Methods;
 
-use ElkArte\Notifiers\NotifierInterface;
+use ElkArte\Notifiers\AbstractNotifier;
+use ElkArte\Mentions\MentionType\NotificationInterface;
+use ElkArte\NotificationsTask;
+use ElkArte\Mentions\Mentioning;
+use ElkArte\DataValidator;
+
 
 /**
  * Class Notifications
  *
  * Core area for notifications, defines the abstract model
  */
-class Notification implements NotifierInterface
+class Notification extends AbstractNotifier
 {
 	/**
 	 * Hash defining what is needed to build the message
@@ -48,7 +53,7 @@ class Notification implements NotifierInterface
 	/**
 	 * {@inheritdoc }
 	 */
-	public function send($obj, $task, $bodies)
+	public function send(NotificationInterface $obj, NotificationsTask $task, $bodies)
 	{
 		$this->_send_notification($obj, $task, $bodies);
 	}
@@ -62,7 +67,8 @@ class Notification implements NotifierInterface
 	 */
 	protected function _send_notification(NotificationInterface $obj, NotificationsTask $task, $bodies)
 	{
-		$mentioning = new Mentions\Mentioning($this->_db, $this->user, new DataValidator(), $this->_modSettings->enabled_mentions);
+		global $modSettings;
+		$mentioning = new Mentioning($this->db, $this->user, new DataValidator(), $modSettings['enabled_mentions']);
 		foreach ($bodies as $body)
 		{
 			$mentioning->create($obj, array(

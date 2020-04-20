@@ -38,6 +38,7 @@ class TestPackagesController extends ElkArteCommonSetupTest
 		// Get the controller, call index
 		$controller = new \ElkArte\AdminController\Packages(new \ElkArte\EventManager());
 		$controller->setUser(\ElkArte\User::$info);
+		$controller->pre_dispatch();
 		$controller->action_index();
 
 		// We should be ready to show the pm inbox, its empty right now

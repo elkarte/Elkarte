@@ -23,7 +23,30 @@ class TestMentions extends \PHPUnit\Framework\TestCase
 		// We are not logged in for this test, so lets fake it
 		$modSettings['mentions_enabled'] = true;
 
-		$modSettings['enabled_mentions'] = 'likemsg,mentionmem';
+		$modSettings['enabled_mentions'] = 'likemsg,mentionmem,buddy';
+		$modSettings['notification_methods'] = serialize([
+			'buddy' => [
+				'notification' => "1",
+				'email' => "1",
+				'emaildaily' => "1",
+				'emailweekly' => "1"
+			],
+			'likemsg' => [
+				'notification' => "1"
+			],
+			"mentionmem" => [
+				"notification" => "1",
+				"email" => "1",
+				"emaildaily" => "1",
+				"emailweekly" => "1",
+			],
+			"quotedmem" => [
+				"notification" => "1",
+				"email" => "1",
+				"emaildaily" => "1",
+				"emailweekly" => "1"
+			]
+		]);
 
 		\ElkArte\User::$info = new \ElkArte\UserInfo([
 			'id' => 1,
@@ -70,38 +93,43 @@ class TestMentions extends \PHPUnit\Framework\TestCase
 
 		$db = database();
 
-		$db->insert('ignore',
+		$db->insert('',
 			'{db_prefix}notifications_pref',
 			array(
 				'id_member' => 'int',
-				'notification_level' => 'int',
 				'notification_type' => 'string',
 				'mention_type' => 'string',
 			),
 			array(
 				array(
-					0,
-					1,
-					'email',
-					'likemsg'
+					'id_member' => 1,
+					'notification_type' => 'notification',
+					'mention_type' => 'likemsg'
 				),
 				array(
-					0,
-					1,
-					'email',
+					'id_member' => 1,
+					'notification_type' => 'email',
+					'mention_type' => 'mentionmem'
+				),
+				array(
+					'id_member' => 1,
+					'notification_type' => 'email',
+					'mention_type' => 'likemsg'
+				),
+				array(
+					'id_member' => 2,
+					'notification_type' => 'notification',
+					'mention_type' => 'mentionmem'
+				),
+				array(
+					'id_member' => 2,
+					'notification_type' => 'email',
 					'mentionmem'
 				),
 				array(
-					2,
-					1,
-					'email',
-					'mentionmem'
-				),
-				array(
-					2,
-					1,
-					'email',
-					'likemsg'
+					'id_member' => 2,
+					'notification_type' => 'email',
+					'mention_type' => 'likemsg'
 				),
 			),
 			array('id_member', 'mention_type')
@@ -120,6 +148,10 @@ class TestMentions extends \PHPUnit\Framework\TestCase
 		// remove temporary test data
 		unset($modSettings);
 		\ElkArte\User::$info = null;
+
+		$db = database();
+		$db->query('', '
+			DELETE FROM {db_prefix}notifications_pref', []);
 	}
 
 	/**
@@ -166,8 +198,31 @@ class TestMentions extends \PHPUnit\Framework\TestCase
 		$notifier->send();
 
 		// Get the number of mentions, should be one
-		$count = countUserMentions(false, 'likemsg', \ElkArte\User::$info->id);
+		$count = countUserMentions(false, 'likemsg', 1);
 		$this->assertEquals(1, $count);
+	}
+
+	/**
+	 * Test a notification that is off
+	 */
+	public function testAddMentionBuddy()
+	{
+		\ElkArte\User::$info->id = 2;
+		\ElkArte\User::$info->ip = long2ip(rand(0, 2147483647));
+
+		$notifier = \ElkArte\Notifications::instance();
+		$notifier->add(new \ElkArte\NotificationsTask(
+			'buddy',
+			1,
+			\ElkArte\User::$info->id,
+			array('id_members' => array(1))
+		));
+
+		$notifier->send();
+
+		// Get the number of mentions, should be zero
+		$count = countUserMentions(false, 'buddy', \ElkArte\User::$info->id);
+		$this->assertEquals(0, $count);
 	}
 
 	/**

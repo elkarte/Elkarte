@@ -11,24 +11,19 @@
  *
  */
 
-namespace ElkArte\Notifiers;
+namespace ElkArte\Notifiers\Methods;
 
-use ElkArte\Notifiers\NotifierInterface;
+use ElkArte\Notifiers\AbstractNotifier;
+use ElkArte\Mentions\MentionType\NotificationInterface;
+use ElkArte\NotificationsTask;
 
 /**
  * Class Notifications
  *
  * Core area for notifications, defines the abstract model
  */
-class Email implements NotifierInterface
+class Email extends AbstractNotifier
 {
-	/**
-	 * Hash defining what is needed to build the message
-	 *
-	 * @var string[]
-	 */
-	public $lang_data;
-
 	/**
 	 * Notifications constructor.
 	 *
@@ -49,7 +44,7 @@ class Email implements NotifierInterface
 	/**
 	 * {@inheritdoc }
 	 */
-	public function send($obj, $task, $bodies)
+	public function send(NotificationInterface $obj, NotificationsTask $task, $bodies)
 	{
 		$this->_send_email($obj, $task, $bodies);
 	}

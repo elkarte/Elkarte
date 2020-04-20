@@ -530,7 +530,16 @@ class ManageFeatures extends AbstractController
 			}
 			else
 			{
-				$notification_methods = serialize($this->_req->post->notifications);
+				$notification_methods = [];
+				foreach ($this->_req->post->notifications as $type => $notification)
+				{
+					if (!empty($notification['enable']))
+					{
+						unset($notification['enable']);
+						$notification_methods[$type] = $notification;
+					}
+				}
+				$notification_methods = serialize($notification_methods);
 			}
 
 			require_once(SUBSDIR . '/Mentions.subs.php');
@@ -618,17 +627,19 @@ class ManageFeatures extends AbstractController
 		$notification_methods = Notifications::instance()->getNotifiers();
 		$notification_types = getNotificationTypes();
 		$current_settings = unserialize($modSettings['notification_methods']);
-_debug($notification_methods);
+
 		foreach ($notification_types as $title)
 		{
+			$title = strtolower($title);
 			$config_vars[] = array('title', 'setting_' . $title);
+			$config_vars[] = array('check', 'notifications[' . $title . '][enable]', 'text_label' => $txt['setting_notify_enable_this']);
 
-			foreach ($notification_methods as $method)
+			foreach ($notification_methods as $method_name => $method)
 			{
-				$text_label = $method === 'notification' ? $txt['setting_notify_enable_this'] : $txt['notify_' . $method];
+				$method_name = strtolower($method_name);
 
-				$config_vars[] = array('check', 'notifications[' . $title . '][' . $method . ']', 'text_label' => $text_label);
-				$modSettings['notifications[' . $title . '][' . $method . ']'] = !empty($current_settings[$title][$method]);
+				$config_vars[] = array('check', 'notifications[' . $title . '][' . $method_name . ']', 'text_label' => $txt['notify_' . $method_name]);
+				$modSettings['notifications[' . $title . '][' . $method_name . ']'] = !empty($current_settings[$title][$method_name]);
 			}
 		}
 

@@ -124,6 +124,9 @@ $txt['notify_send_body_pbe_post'] = '<strong>NOT</strong> available with Daily /
 $txt['notify_method'] = 'Notification and:';
 $txt['notify_notification'] = 'no email (only mention/alert)';
 $txt['notify_email'] = 'Immediate email';
+$txt['notify_emaildaily'] = 'Daily email';
+$txt['notify_emailweekly'] = 'Weekly email';
+// @deprecated The following are for backward compatibility
 $txt['notify_email_daily'] = 'Daily email';
 $txt['notify_email_weekly'] = 'Weekly email';
 
