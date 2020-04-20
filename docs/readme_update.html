@@ -153,7 +153,7 @@
 							<h2 id="requirements">Minimum installation requirements</h2>
 							<p>Your server must meet a few requirements to be able to run ElkArte.  If you are unsure as to whether your webserver meets these, please try to update anyway - it should detect any problems.</p>
 							<ul>
-								<li>Any webserver that properly supports PHP, such as <a href="http://httpd.apache.org/" target="_blank">Apache</a> or <a href="http://www.microsoft.com/iis" target="_blank">Internet Information Services (IIS)</a>.</li>
+								<li>Any webserver that properly supports PHP, such as <a href="http://httpd.apache.org/" target="_blank">Apache</a> or <a href="https://www.iis.net" target="_blank">Internet Information Services (IIS)</a>.</li>
 								<li>
 									<a href="http://www.php.net" target="_blank">PHP</a> 4.1.0 or higher.  The following directives are required to be set correctly in php.ini:
 									<ul>
@@ -197,7 +197,7 @@
 										<li><a href="http://www.postgresql.org/" target="_blank">PostgreSQL</a> 8.3 or higher.</li>
 									</ul>
 								</li>
-								<li><a href="http://www.boutell.com/gd/" target="_blank">GD Graphics Library</a> 2.0 or higher.</li>
+								<li><a href="https://libgd.github.io/" target="_blank">GD Graphics Library</a> 2.0 or higher.</li>
 							</ul>
 							<p>If your server does not meet these requirements, ElkArte may not work properly.</p>
 						</div>
@@ -205,7 +205,7 @@
 							<h2 id="backups">Backing up data</h2>
 							<p>Before starting the update process, a backup of the live database should be taken. This protects the forum from accidental damage and any issues from updating. Although all steps are taken, and extensive testing carried out, sometimes issues develop. Therefore, having a backup is crucial. The upgrading tool can backup all database tables before it runs, however the best practice is to have a full backup available. </p>
 							<h3>Back up a database using ElkArte</h3>
-							<p>From Elarte, navigate to Forum Maintenance. (Administration Center -&gt; Maintenance -&gt; Forum Maintenance) On the database section, save the data and the structure. Then, compress the file. Select &quot;Download&quot; and wait for the database to complete the download completely. It is recommended if you use this method to verify that the backup is complete by opening the file and checking the last line. If the file is not complete and has an error please try one of the other methods to backup your database.</p>
+							<p>From ElkArte, navigate to Forum Maintenance. (Administration Center -&gt; Maintenance -&gt; Forum Maintenance) On the database section, save the data and the structure. Then, compress the file. Select &quot;Download&quot; and wait for the database to complete the download completely. It is recommended if you use this method to verify that the backup is complete by opening the file and checking the last line. If the file is not complete and has an error please try one of the other methods to backup your database.</p>
 							<h3>Back up a database using PHPMyAdmin</h3>
 							<p>PHPMyAdmin gives the option to export a database, from the initial page, select the &quot;Export&quot; option and follow the instructions. Select your ElkArte database. These are different based on host. </p>
 							<h3>Back up a database using a control panel</h3>
@@ -227,6 +227,7 @@
 							<p>The following files and directories must be writable. Depending on how your server is set up, this could mean that they must have <b>CHMOD</b> values of 644, 664 or 666 for files, and 755, 775 or 777 for folders:</p>
 							<ul><li>/attachments
 							</li><li>/avatars
+							</li><li>/cache
 							</li><li>/packages
 							</li><li>/packages/installed.list
 							</li><li>/smileys
