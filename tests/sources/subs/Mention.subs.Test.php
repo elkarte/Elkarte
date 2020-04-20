@@ -75,27 +75,32 @@ class TestMentions extends \PHPUnit\Framework\TestCase
 			array(
 				'id_member' => 'int',
 				'notification_level' => 'int',
+				'notification_type' => 'string',
 				'mention_type' => 'string',
 			),
 			array(
 				array(
 					0,
 					1,
+					'email',
 					'likemsg'
 				),
 				array(
 					0,
 					1,
+					'email',
 					'mentionmem'
 				),
 				array(
 					2,
 					1,
+					'email',
 					'mentionmem'
 				),
 				array(
 					2,
 					1,
+					'email',
 					'likemsg'
 				),
 			),

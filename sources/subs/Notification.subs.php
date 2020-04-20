@@ -975,18 +975,17 @@ function validateNotificationAccess($row, $maillist, &$email_perm = true)
  * @return array
  * @throws \Exception
  */
-function getUsersNotificationsPreferences($notification_types, $members)
+function getUsersNotificationsPreferences($notification_types, $members, $disabled = [])
 {
 	$db = database();
 
 	$notification_types = (array) $notification_types;
 	$query_members = (array) $members;
-	$query_members[] = 0;
 
 	$results = array();
 	$db->fetchQuery('
 		SELECT 
-			id_member, notification_level, mention_type
+			id_member, notification_type, mention_type
 		FROM {db_prefix}notifications_pref
 		WHERE id_member IN ({array_int:members_to})
 			AND mention_type IN ({array_string:mention_types})',
@@ -996,37 +995,25 @@ function getUsersNotificationsPreferences($notification_types, $members)
 		)
 	)->fetch_callback(
 		function ($row) use (&$results) {
-			if (!isset($results[$row['id_member']]))
+			if (in_array($row['notification_type'], $disabled))
 			{
-				$results[$row['id_member']] = array();
+				continue;
 			}
 
-			$results[$row['id_member']][$row['mention_type']] = (int) $row['notification_level'];
+			if (!isset($results[$row['id_member']]))
+			{
+				$results[$row['id_member']] = [];
+			}
+			if (!isset($results[$row['id_member']][$row['mention_type']]))
+			{
+				$results[$row['id_member']][$row['mention_type']] = [];
+			}
+
+			$results[$row['id_member']][$row['mention_type']][] = $row['notification_type'];
 		}
 	);
 
-	$defaults = array();
-	foreach ($notification_types as $val)
-	{
-		$defaults[$val] = 0;
-	}
-
-	if (isset($results[0]))
-	{
-		$defaults = array_merge($defaults, $results[0]);
-	}
-
-	$preferences = array();
-	foreach ((array) $members as $member)
-	{
-		$preferences[$member] = $defaults;
-		if (isset($results[$member]))
-		{
-			$preferences[$member] = array_merge($preferences[$member], $results[$member]);
-		}
-	}
-
-	return $preferences;
+	return $results;
 }
 
 /**
@@ -1097,11 +1084,11 @@ function filterNotificationMethods($possible_methods, $type)
 	}
 
 	$allowed = array();
-	foreach ($possible_methods as $key => $val)
+	foreach ($possible_methods as $val)
 	{
 		if (isset($unserialized[$val]))
 		{
-			$allowed[$key] = $val;
+			$allowed[] = $val;
 		}
 	}
 
@@ -1124,6 +1111,20 @@ function getConfiguredNotificationMethods($type)
 	if ($unserialized === null)
 	{
 		$unserialized = unserialize($modSettings['notification_methods']);
+		/*
+		$unserialized = [
+			'buddy' => [
+				'notification' => 1,
+				'email' => 1,
+				'email_daily' => 1
+			],
+			'mentionmem' => [
+				'notification' => 1,
+				'email' => 1,
+				'email_daily' => 1
+			]
+		]
+		*/
 	}
 
 	if (isset($unserialized[$type]))

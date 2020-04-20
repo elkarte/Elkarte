@@ -11,8 +11,9 @@
  *
  */
 
-namespace ElkArte\Mentions\MentionType\Event;
+namespace ElkArte\Mentions\MentionType;
 
+use ElkArte\Mentions\MentionType\AbstractEventMessage;
 use ElkArte\Util;
 
 /**

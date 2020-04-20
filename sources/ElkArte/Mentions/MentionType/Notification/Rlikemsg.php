@@ -30,15 +30,19 @@ class Rlikemsg extends AbstractNotificationBoardAccess
 	/**
 	 * {@inheritdoc }
 	 */
-	public function getUsersToNotify()
+	public function setUsersToNotify()
 	{
 		if ($this->_task['source_data']['rlike_notif'])
 		{
-			return (array) $this->_task['source_data']['id_members'];
+			parent::setUsersToNotify();
 		}
 		else
 		{
-			return array();
+			// I'm not entirely sure this is necessary, but better safe than sorry at this point.
+			if (isset($this->_task))
+			{
+				$this->_task->setMembers([]);
+			}
 		}
 	}
 

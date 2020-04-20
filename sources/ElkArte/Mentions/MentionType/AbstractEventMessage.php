@@ -11,7 +11,7 @@
  *
  */
 
-namespace ElkArte\Mentions\MentionType\Event;
+namespace ElkArte\Mentions\MentionType;
 
 use ElkArte\HttpReq;
 use ElkArte\Mentions\MentionType\EventInterface;

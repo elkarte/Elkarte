@@ -70,9 +70,12 @@ abstract class AbstractNotificationMessage implements NotificationInterface
 	/**
 	 * {@inheritdoc }
 	 */
-	public function getUsersToNotify()
+	public function setUsersToNotify()
 	{
-		return (array) $this->_task['source_data']['id_members'];
+		if (isset($this->_task))
+		{
+			$this->_task->setMembers((array) $this->_task['source_data']['id_members']);
+		}
 	}
 
 	/**

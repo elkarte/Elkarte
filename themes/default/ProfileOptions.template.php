@@ -757,26 +757,31 @@ function template_action_notification()
 			<div class="content">
 				<dl>';
 
-	foreach ($context['mention_types'] as $type => $mentions)
+	foreach ($context['mention_types'] as $type => $mention_methods)
 	{
 		echo '
 					<dt>
 						<label for="notify_', $type, '">', $txt['notify_type_' . $type], '</label>
 					</dt>
 					<dd>
-						<input id="notify_', $type, '" name="notify[', $type, '][status]" class="toggle_notify" type="checkbox" value="1" ', $mentions['enabled'] ? 'checked="checked"' : '', '/>
-						<label for="notify_', $type, '_method">', $txt['notify_method'], '
-							<select id="notify_', $type, '_method" name="notify[', $type, '][method]">';
-
-		foreach ($mentions['data'] as $key => $method)
+						<input id="notify_', $type, '" name="notify[', $type, '][status]" class="toggle_notify" type="checkbox" value="1" ', $mention_methods['enabled'] ? 'checked="checked"' : '', '/>';
+		foreach ($mention_methods['methods'] as $mention_method => $mentions)
 		{
 			echo '
-								<option value="', $key, '"', $method['enabled'] ? ' selected="selected"' : '', '>', $txt['notify_' . $method['id']], '</option>';
-		}
+						<label for="notify_', $type, '_' . $mention_method . '">', $txt['notify_method'], '
+							<select id="notify_', $type, '_' . $mention_method . '" name="notify[', $type, '][' . $mention_method . ']">';
 
-		echo '
+			foreach ($mentions['data'] as $key => $method)
+			{
+				echo '
+								<option value="', $key, '"', $method['enabled'] ? ' selected="selected"' : '', '>', $txt['notify_' . $mention_method . '_' . $method['id']], '</option>';
+			}
+
+			echo '
 							</select>
-						</label>
+						</label>';
+		}
+		echo '
 					</dd>';
 	}
 

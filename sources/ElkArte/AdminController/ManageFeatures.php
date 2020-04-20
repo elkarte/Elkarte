@@ -618,7 +618,7 @@ class ManageFeatures extends AbstractController
 		$notification_methods = Notifications::instance()->getNotifiers();
 		$notification_types = getNotificationTypes();
 		$current_settings = unserialize($modSettings['notification_methods']);
-
+_debug($notification_methods);
 		foreach ($notification_types as $title)
 		{
 			$config_vars[] = array('title', 'setting_' . $title);

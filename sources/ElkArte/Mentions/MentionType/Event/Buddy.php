@@ -20,7 +20,7 @@ use ElkArte\Mentions\MentionType\AbstractEventBoardAccess;
  *
  * Handles mentioning of buddies
  */
-class Buddy extends AbstractEventMessage
+class Buddy extends AbstractEventBoardAccess
 {
 	/**
 	 * {@inheritdoc }

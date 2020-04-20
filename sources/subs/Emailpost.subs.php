@@ -1135,9 +1135,11 @@ function pbe_disable_user_notify($email_message)
 			UPDATE {db_prefix}notifications_pref
 			SET
 				notification_level = 1
-			WHERE id_member = {int:id_member}',
+			WHERE id_member = {int:id_member}
+				AND notification_type = {string:email}',
 			array(
-				'id_member' => $id_member
+				'id_member' => $id_member,
+				'email' => 'email'
 			)
 		);
 

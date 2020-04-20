@@ -27,10 +27,8 @@ interface NotificationInterface
 
 	/**
 	 * Used by the Notifications class to find the users that want a notification.
-	 *
-	 * @return int[] An array of members id
 	 */
-	public function getUsersToNotify();
+	public function setUsersToNotify();
 
 	/**
 	 * Used by the Notifications class to retrieve the notifications to send.
