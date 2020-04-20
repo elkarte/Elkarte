@@ -1279,7 +1279,7 @@ function list_getAttachDirs()
 	);
 
 	$attachdirs = array();
-	foreach ($attachmentDirectory->getPaths() as $id => $dir)
+	foreach ($attachmentsDir->getPaths() as $id => $dir)
 	{
 		// If there aren't any attachments in this directory this won't exist.
 		if (!isset($expected_files[$id]))
