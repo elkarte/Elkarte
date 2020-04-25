@@ -284,7 +284,7 @@ class Debug
 			echo '
 			<script>
 				$(function() {
-					$(\\;', implode(', #', $expand_id), '\').click(function(ev) {
+					$(\'#', implode(', #', $expand_id), '\').click(function(ev) {
 						ev.preventDefault();
 						$(this).next().toggle();
 						$(this).remove();
