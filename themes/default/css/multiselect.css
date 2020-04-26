@@ -9,6 +9,7 @@
 .multiselect-wrapper .multiselect-input {
 	width: 100%;
 	padding-right: 50px;
+	cursor: default;
 }
 
 .multiselect-wrapper label {
