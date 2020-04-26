@@ -581,6 +581,7 @@ function prepareCreditsData()
 			'<a href="https://github.com/tubalmartin/YUI-CSS-compressor-PHP-port">YUI-CSS compressor (PHP port)</a> | &copy; Yahoo! Inc | Licensed under <a href="http://opensource.org/licenses/BSD-3-Clause">The BSD License</a>',
 			'<a href="http://lab.ejci.net/favico.js/">favico.js</a> | &copy; Miroslav Magda | Licensed under <a href="http://opensource.org/licenses/MIT">The MIT License (MIT)</a>',
 			'<a href="https://github.com/ttsvetko/HTML5-Desktop-Notifications">HTML5 Desktop Notifications</a> | &copy; Tsvetan Tsvetkov | Licensed under <a href="http://www.apache.org/licenses/LICENSE-2.0">Apache License, Version 2.0</a>',
+			'<a href="https://github.com/mneofit/multiselect">multiselect</a> | &copy; Mikhail Neofitov | Licensed under <a href="http://opensource.org/licenses/MIT">The MIT License (MIT)</a>',
 		),
 	);
 
