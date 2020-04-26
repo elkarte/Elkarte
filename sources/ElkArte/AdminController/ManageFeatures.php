@@ -535,7 +535,20 @@ class ManageFeatures extends AbstractController
 				{
 					if (!empty($notification['enable']))
 					{
+						$defaults = $notification['default'];
 						unset($notification['enable']);
+						unset($notification['default']);
+						foreach ($notification as $k => $v)
+						{
+							if (in_array($k, $defaults))
+							{
+								$notification[$k] = 2;
+							}
+							else
+							{
+								$notification[$k] = $v;
+							}
+						}
 						$notification_methods[$type] = $notification;
 					}
 				}
@@ -617,6 +630,10 @@ class ManageFeatures extends AbstractController
 
 		theme()->getTemplates()->loadLanguageFile('Profile');
 		theme()->getTemplates()->loadLanguageFile('UserNotifications');
+		loadJavascriptFile('jquery.multiselect.min.js');
+		theme()->addInlineJavascript('
+		$(\'.select_multiple\').multiselect();', true);
+		loadCSSFile('multiselect.css');
 
 		// The mentions settings
 		$config_vars = array(
@@ -633,6 +650,9 @@ class ManageFeatures extends AbstractController
 			$title = strtolower($title);
 			$config_vars[] = array('title', 'setting_' . $title);
 			$config_vars[] = array('check', 'notifications[' . $title . '][enable]', 'text_label' => $txt['setting_notify_enable_this']);
+			$modSettings['notifications[' . $title . '][enable]'] = !empty($current_settings[$title]);
+			$default_values = [];
+			$is_default = [];
 
 			foreach ($notification_methods as $method_name => $method)
 			{
@@ -640,7 +660,16 @@ class ManageFeatures extends AbstractController
 
 				$config_vars[] = array('check', 'notifications[' . $title . '][' . $method_name . ']', 'text_label' => $txt['notify_' . $method_name]);
 				$modSettings['notifications[' . $title . '][' . $method_name . ']'] = !empty($current_settings[$title][$method_name]);
+				$default_values[] = [$method_name, $txt['notify_' . $method_name]];
+
+				if (!empty($current_settings[$title][$method_name]) && $current_settings[$title][$method_name] == 2)
+				{
+					$is_default[] = $method_name;
+				}
 			}
+
+			$config_vars[] = array('select', 'notifications[' . $title . '][default]', $default_values, 'text_label' => $txt['default_active'], 'multiple' => true, 'value' => $is_default);
+			$modSettings['notifications[' . $title . '][default]'] = $is_default;
 		}
 
 		call_integration_hook('integrate_modify_mention_settings', array(&$config_vars));

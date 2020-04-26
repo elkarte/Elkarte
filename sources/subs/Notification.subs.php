@@ -1087,7 +1087,7 @@ function filterNotificationMethods($possible_methods, $type)
 	foreach ($possible_methods as $class)
 	{
 		$class = strtolower($class);
-		if (isset($unserialized[$class]))
+		if (!empty($unserialized[$class]))
 		{
 			$allowed[] = $class;
 		}
