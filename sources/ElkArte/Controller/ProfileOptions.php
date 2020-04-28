@@ -23,6 +23,7 @@ use ElkArte\Action;
 use ElkArte\Exceptions\Exception;
 use ElkArte\MembersList;
 use ElkArte\Util;
+use ElkArte\Notifications;
 
 /**
  *

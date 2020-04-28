@@ -542,7 +542,7 @@ class ManageFeatures extends AbstractController
 						{
 							if (in_array($k, $defaults))
 							{
-								$notification[$k] = 2;
+								$notification[$k] = Notifications::DEFAULT_LEVEL;
 							}
 							else
 							{
@@ -662,7 +662,7 @@ class ManageFeatures extends AbstractController
 				$modSettings['notifications[' . $title . '][' . $method_name . ']'] = !empty($current_settings[$title][$method_name]);
 				$default_values[] = [$method_name, $txt['notify_' . $method_name]];
 
-				if (!empty($current_settings[$title][$method_name]) && $current_settings[$title][$method_name] == 2)
+				if (!empty($current_settings[$title][$method_name]) && $current_settings[$title][$method_name] == Notifications::DEFAULT_LEVEL)
 				{
 					$is_default[] = $method_name;
 				}

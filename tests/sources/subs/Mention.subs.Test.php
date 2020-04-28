@@ -32,7 +32,7 @@ class TestMentions extends \PHPUnit\Framework\TestCase
 				'emailweekly' => "1"
 			],
 			'likemsg' => [
-				'notification' => "1"
+				'notification' => "2"
 			],
 			"mentionmem" => [
 				"notification" => "1",
@@ -103,18 +103,8 @@ class TestMentions extends \PHPUnit\Framework\TestCase
 			array(
 				array(
 					'id_member' => 1,
-					'notification_type' => 'notification',
-					'mention_type' => 'likemsg'
-				),
-				array(
-					'id_member' => 1,
 					'notification_type' => 'email',
 					'mention_type' => 'mentionmem'
-				),
-				array(
-					'id_member' => 1,
-					'notification_type' => 'email',
-					'mention_type' => 'likemsg'
 				),
 				array(
 					'id_member' => 2,

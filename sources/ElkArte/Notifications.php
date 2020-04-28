@@ -34,6 +34,11 @@ class Notifications extends AbstractModel
 	const NOTIFIERS_NAMESPACE = '\\ElkArte\\Notifiers\\Methods';
 
 	/**
+	 * Since we have to call them dynamically we need to know both path and namespace...
+	 */
+	const DEFAULT_LEVEL = 2;
+
+	/**
 	 * Instance manager
 	 *
 	 * @var Notifications

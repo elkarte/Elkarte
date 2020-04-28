@@ -975,12 +975,24 @@ function validateNotificationAccess($row, $maillist, &$email_perm = true)
  * @return array
  * @throws \Exception
  */
-function getUsersNotificationsPreferences($notification_types, $members, $disabled = [])
+function getUsersNotificationsPreferences($notification_types, $members)
 {
 	$db = database();
 
 	$notification_types = (array) $notification_types;
 	$query_members = (array) $members;
+	$defaults = array_map(function($vals) {
+		$return = [];
+		foreach ($vals as $k => $level)
+		{
+			if ($level == \ElkArte\Notifications::DEFAULT_LEVEL)
+			{
+				$return[] = $k;
+			}
+		}
+
+		return $return;
+	}, getConfiguredNotificationMethods('*'));
 
 	$results = array();
 	$db->fetchQuery('
@@ -994,12 +1006,7 @@ function getUsersNotificationsPreferences($notification_types, $members, $disabl
 			'mention_types' => $notification_types,
 		)
 	)->fetch_callback(
-		function ($row) use (&$results, $disabled) {
-			if (in_array($row['notification_type'], $disabled))
-			{
-				return;
-			}
-
+		function ($row) use (&$results, $defaults) {
 			if (!isset($results[$row['id_member']]))
 			{
 				$results[$row['id_member']] = [];
@@ -1012,6 +1019,26 @@ function getUsersNotificationsPreferences($notification_types, $members, $disabl
 			$results[$row['id_member']][$row['mention_type']][] = $row['notification_type'];
 		}
 	);
+
+	// Set the defaults
+	foreach ($query_members as $member)
+	{
+		foreach ($notification_types as $type)
+		{
+			if (empty($results[$member]) && !empty($defaults[$type]))
+			{
+				if (!isset($results[$member]))
+				{
+					$results[$member] = [];
+				}
+				if (!isset($results[$member][$type]))
+				{
+					$results[$member][$type] = [];
+				}
+				$results[$member][$type] = $defaults[$type];
+			}
+		}
+	}
 
 	return $results;
 }
@@ -1104,12 +1131,12 @@ function filterNotificationMethods($possible_methods, $type)
  *
  * @return array
  */
-function getConfiguredNotificationMethods($type)
+function getConfiguredNotificationMethods($type = '*')
 {
 	global $modSettings;
 	static $unserialized = null;
 
-	if ($unserialized === null)
+// 	if ($unserialized === null)
 	{
 		$unserialized = unserialize($modSettings['notification_methods']);
 	}
@@ -1117,6 +1144,11 @@ function getConfiguredNotificationMethods($type)
 	if (isset($unserialized[$type]))
 	{
 		return $unserialized[$type];
+	}
+
+	if ($type === '*')
+	{
+		return $unserialized;
 	}
 
 	return array();
