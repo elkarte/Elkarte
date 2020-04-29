@@ -1134,12 +1134,8 @@ function filterNotificationMethods($possible_methods, $type)
 function getConfiguredNotificationMethods($type = '*')
 {
 	global $modSettings;
-	static $unserialized = null;
 
-// 	if ($unserialized === null)
-	{
-		$unserialized = unserialize($modSettings['notification_methods']);
-	}
+	$unserialized = unserialize($modSettings['notification_methods']);
 
 	if (isset($unserialized[$type]))
 	{
