@@ -535,7 +535,7 @@ class ManageFeatures extends AbstractController
 				{
 					if (!empty($notification['enable']))
 					{
-						$defaults = $notification['default'];
+						$defaults = $notification['default'] ?? [];
 						unset($notification['enable']);
 						unset($notification['default']);
 						foreach ($notification as $k => $v)
