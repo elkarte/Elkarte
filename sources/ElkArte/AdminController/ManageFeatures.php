@@ -632,7 +632,7 @@ class ManageFeatures extends AbstractController
 		theme()->getTemplates()->loadLanguageFile('UserNotifications');
 		loadJavascriptFile('jquery.multiselect.min.js');
 		theme()->addInlineJavascript('
-		$(\'.select_multiple\').multiselect();', true);
+		$(\'.select_multiple\').multiselect({\'language_strings\': {\'Select all\': ' . JavascriptEscape($txt['notify_select_all']) . '}});', true);
 		loadCSSFile('multiselect.css');
 
 		// The mentions settings
