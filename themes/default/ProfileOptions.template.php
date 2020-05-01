@@ -17,7 +17,17 @@
  */
 function template_ProfileOptions_init()
 {
+	global $context, $txt;
+
 	theme()->getTemplates()->load('GenericBoards');
+
+	if (!empty($context['menu_item_selected']) && $context['menu_item_selected'] === 'notification')
+	{
+		loadJavascriptFile('jquery.multiselect.min.js');
+		theme()->addInlineJavascript('
+		$(\'.select_multiple\').multiselect({\'language_strings\': {\'Select all\': ' . JavascriptEscape($txt['notify_select_all']) . '}});', true);
+		loadCSSFile('multiselect.css');
+	}
 }
 
 /**
@@ -764,23 +774,18 @@ function template_action_notification()
 						<label for="notify_', $type, '">', $txt['notify_type_' . $type], '</label>
 					</dt>
 					<dd>
-						<input id="notify_', $type, '" name="notify[', $type, '][status]" class="toggle_notify" type="checkbox" value="1" ', $mention_methods['enabled'] ? 'checked="checked"' : '', '/>';
-		foreach ($mention_methods['methods'] as $mention_method => $mentions)
+						<label for="notify_', $type, '_default">', $txt['notify_method_use_default'], '</label>
+						<input id="notify_', $type, '_default" name="', $mention_methods['default_input_name'], '" class="toggle_notify" type="checkbox" value="', $mention_methods['value'], '" ', $mention_methods['value'] ? '' : 'checked="checked"', '/>
+						<select class="select_multiple" multiple="multiple" id="notify_', $type, '" ', $mention_methods['default_input_name'], '">';
+		foreach ($mention_methods['data'] as $key => $method)
 		{
 			echo '
-						<label for="notify_', $type, '_' . $mention_method . '">', $txt['notify_method'], '
-							<select id="notify_', $type, '_' . $mention_method . '" name="notify[', $type, '][' . $mention_method . ']">';
-
-			foreach ($mentions['data'] as $key => $method)
-			{
-				echo '
-								<option value="', $key, '"', $method['enabled'] ? ' selected="selected"' : '', '>', $txt['notify_' . $mention_method . '_' . $method['id']], '</option>';
-			}
-
-			echo '
-							</select>
-						</label>';
+							<option value="', $key, '"', $method['enabled'] ? ' selected="selected"' : '', '>', $method['text'], '</option>';
 		}
+
+		echo '
+						</select>';
+
 		echo '
 					</dd>';
 	}

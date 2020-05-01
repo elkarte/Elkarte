@@ -3864,7 +3864,7 @@ function getMembersInRange($ips, $memID)
  */
 function getMemberNotificationsProfile($member_id)
 {
-	global $modSettings;
+	global $modSettings, $txt;
 
 	if (empty($modSettings['enabled_mentions']))
 	{
@@ -3873,32 +3873,51 @@ function getMemberNotificationsProfile($member_id)
 
 	require_once(SUBSDIR . '/Notification.subs.php');
 
-	$mention_methods = Notifications::instance()->getNotifiers();
+	$notifiers = Notifications::instance()->getNotifiers();
 	$enabled_mentions = explode(',', $modSettings['enabled_mentions']);
 	$user_preferences = getUsersNotificationsPreferences($enabled_mentions, $member_id);
 	$mention_types = array();
+	$defaults = getConfiguredNotificationMethods('*');
 
 	foreach ($enabled_mentions as $type)
 	{
-		$type_on = false;
-		$notif = filterNotificationMethods(array_keys($mention_methods), $type);
-
-		foreach ($notif as $key => $val)
+		$type_on = 1;
+		$notif = filterNotificationMethods(array_keys($notifiers), $type);
+		$data = [];
+		foreach ($notifiers as $key => $notifier)
 		{
-			if (empty($user_preferences[$member_id]) || empty($user_preferences[$member_id][$type]))
+			if ((empty($user_preferences[$member_id]) || empty($user_preferences[$member_id][$type])) && empty($defaults[$type]))
 			{
 				continue;
 			}
-			$notif[$key] = array('id' => $val, 'enabled' => $user_preferences[$member_id][$type] === $key);
-			if ($user_preferences[$member_id][$type] > 0)
+			if (!isset($defaults[$type][$key]))
 			{
-				$type_on = true;
+				continue;
+			}
+
+			$data[$key] = [
+				'name' => $key,
+				'id' => '',
+				'input_name' => 'notify[' . $type . '][' . $key . ']',
+				'text' => $txt['notify_' . $key],
+				'enabled' => in_array($key, $user_preferences[$member_id][$type] ?? [])
+			];
+
+			if (empty($user_preferences[$member_id][$type]))
+			{
+				$type_on = 0;
 			}
 		}
 
-		if (!empty($notif))
+		// In theory data should never be empty.
+		if (!empty($data))
 		{
-			$mention_types[$type] = array('data' => $notif, 'enabled' => $type_on);
+			$mention_types[$type] = [
+				'data' => $data,
+				'default_input_name' => 'notify[' . $type . '][status]',
+				'user_input_name' => 'notify[' . $type . '][user]',
+				'value' => $type_on
+			];
 		}
 	}
 
