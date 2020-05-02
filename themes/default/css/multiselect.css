@@ -90,13 +90,14 @@
 	}
 
 .multiselect-count {
-	position: relative;
-	text-align: center;
-	border-radius: 2px;
-	background-color: lightblue;
+	position: relative !important;
+	text-align: center !important;
+	border-radius: 2px !important;
+	background-color: lightblue !important;
 	display: inline-block !important;
-	padding: 2px 7px;
-	left: -45px;
+	padding: 2px 7px !important;
+	left: -45px !important;
+	width: auto !important;
 }
 
 .multiselect-wrapper.disabled .multiselect-dropdown-arrow {
@@ -108,16 +109,16 @@
 }
 
 .multiselect-dropdown-arrow {
-	width: 0;
-	height: 0;
-	border-left: 5px solid transparent;
-	border-right: 5px solid transparent;
-	border-top: 5px solid black;
-	position: absolute;
-	line-height: 20px;
-	text-align: center;
+	width: 0 !important;
+	height: 0 !important;
+	border-left: 5px solid transparent !important;
+	border-right: 5px solid transparent !important;
+	border-top: 5px solid black !important;
+	position: absolute !important;
+	line-height: 20px !important;
+	text-align: center !important;
 	display: inline-block !important;
-	margin-top: 17px;
-	margin-left: -42px;
+	margin-top: 17px !important;
+	margin-left: -42px !important;
 }
 
