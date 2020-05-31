@@ -14,6 +14,7 @@
 namespace ElkArte\Mentions\MentionType\Notification;
 
 use ElkArte\Mentions\MentionType\AbstractNotificationBoardAccess;
+use ElkArte\Mentions\MentionType\MailfailConfigTrait;
 
 /**
  * Class MailfailMention
@@ -22,6 +23,8 @@ use ElkArte\Mentions\MentionType\AbstractNotificationBoardAccess;
  */
 class Mailfail extends AbstractNotificationBoardAccess
 {
+	use MailfailConfigTrait;
+
 	/**
 	 * {@inheritdoc }
 	 */

@@ -137,7 +137,7 @@ $txt['notify_type_mentionmem'] = 'Notify when you are @mentioned';
 $txt['notify_type_rlikemsg'] = 'Notify when a like is removed from one of your messages';
 $txt['notify_type_buddy'] = 'Notify when someone adds you as buddy';
 $txt['notify_type_quotedmem'] = 'Notify when someone quotes one of your messages';
-$txt['notify_type_mailfail'] = 'Notify when email notifications are disabled (mention only)';
+$txt['notify_type_mailfail'] = 'Notify when email notifications have failed and have been disabled';
 
 $txt['notifications_topics'] = 'Current Topic Notifications';
 $txt['notifications_topics_none'] = 'You are not currently receiving any notifications from topics.';

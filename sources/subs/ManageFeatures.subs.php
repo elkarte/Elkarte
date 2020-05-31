@@ -816,7 +816,7 @@ function loadAllCustomFields()
  *
  * @return array
  */
-function getNotificationTypes()
+function getAvailableNotifications()
 {
 	$glob = new GlobIterator(SOURCEDIR . '/ElkArte/Mentions/MentionType/Notification/*.php', FilesystemIterator::SKIP_DOTS);
 	$types = array();
@@ -825,7 +825,7 @@ function getNotificationTypes()
 	foreach ($glob as $file)
 	{
 		$class_name = '\\ElkArte\\Mentions\\MentionType\\Notification\\' . $file->getBasename('.php');
-		$types[] = $class_name::getType();
+		$types[] = $class_name;
 	}
 
 	return $types;

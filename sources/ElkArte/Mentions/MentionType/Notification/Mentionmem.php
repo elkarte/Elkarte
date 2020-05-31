@@ -14,6 +14,7 @@
 namespace ElkArte\Mentions\MentionType\Notification;
 
 use ElkArte\Mentions\MentionType\AbstractNotificationBoardAccess;
+use ElkArte\Mentions\MentionType\CommonConfigTrait;
 
 /**
  * Class MentionmemMention
@@ -22,6 +23,8 @@ use ElkArte\Mentions\MentionType\AbstractNotificationBoardAccess;
  */
 class Mentionmem extends AbstractNotificationBoardAccess
 {
+	use CommonConfigTrait;
+
 	/**
 	 * {@inheritdoc }
 	 */

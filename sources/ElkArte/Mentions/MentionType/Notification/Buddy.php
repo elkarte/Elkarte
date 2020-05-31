@@ -14,6 +14,7 @@
 namespace ElkArte\Mentions\MentionType\Notification;
 
 use ElkArte\Mentions\MentionType\AbstractNotificationMessage;
+use ElkArte\Mentions\MentionType\CommonConfigTrait;
 
 /**
  * Class BuddyMention
@@ -22,6 +23,8 @@ use ElkArte\Mentions\MentionType\AbstractNotificationMessage;
  */
 class Buddy extends AbstractNotificationMessage
 {
+	use CommonConfigTrait;
+
 	/**
 	 * {@inheritdoc }
 	 */

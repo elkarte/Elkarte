@@ -14,6 +14,7 @@
 namespace ElkArte\Mentions\MentionType\Event;
 
 use ElkArte\Mentions\MentionType\AbstractEventBoardAccess;
+use ElkArte\Mentions\MentionType\CommonConfigTrait;
 
 /**
  * Class RlikemsgMention
@@ -22,6 +23,8 @@ use ElkArte\Mentions\MentionType\AbstractEventBoardAccess;
  */
 class Rlikemsg extends AbstractEventBoardAccess
 {
+	use CommonConfigTrait;
+
 	/**
 	 * {@inheritdoc }
 	 */

@@ -42,4 +42,20 @@ interface EventInterface
 	 * @param mixed[] $mentions
 	 */
 // 	public function view($type, &$mentions);
+
+	/**
+	 * Provides a list of methods that should not be used by this mention type.
+	 *
+	 * @param string $method the Notifier method that is being considered
+	 *
+	 * @return bool
+	 */
+	public static function isBlacklisted($method);
+
+	/**
+	 * If needed checks for permissions to use this specific notification
+	 *
+	 * @return bool
+	 */
+	public static function canUse();
 }

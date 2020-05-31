@@ -14,6 +14,7 @@
 namespace ElkArte\Mentions\MentionType\Event;
 
 use ElkArte\Mentions\MentionType\AbstractEventBoardAccess;
+use ElkArte\Mentions\MentionType\MailfailConfigTrait;
 
 /**
  * Class MailfailMention
@@ -22,6 +23,8 @@ use ElkArte\Mentions\MentionType\AbstractEventBoardAccess;
  */
 class Mailfail extends AbstractEventBoardAccess
 {
+	use MailfailConfigTrait;
+
 	/**
 	 * {@inheritdoc }
 	 */

@@ -642,12 +642,17 @@ class ManageFeatures extends AbstractController
 		);
 
 		$notification_methods = Notifications::instance()->getNotifiers();
-		$notification_types = getNotificationTypes();
+		$notification_classes = getAvailableNotifications();
 		$current_settings = unserialize($modSettings['notification_methods']);
 
-		foreach ($notification_types as $title)
+		foreach ($notification_classes as $class)
 		{
-			$title = strtolower($title);
+			if ($class::canUse() === false)
+			{
+				continue;
+			}
+
+			$title = strtolower($class::getType());
 			$config_vars[] = array('title', 'setting_' . $title);
 			$config_vars[] = array('check', 'notifications[' . $title . '][enable]', 'text_label' => $txt['setting_notify_enable_this']);
 			$modSettings['notifications[' . $title . '][enable]'] = !empty($current_settings[$title]);
@@ -656,6 +661,11 @@ class ManageFeatures extends AbstractController
 
 			foreach ($notification_methods as $method_name => $method)
 			{
+				if ($class::isBlacklisted($method_name))
+				{
+					continue;
+				}
+
 				$method_name = strtolower($method_name);
 
 				$config_vars[] = array('check', 'notifications[' . $title . '][' . $method_name . ']', 'text_label' => $txt['notify_' . $method_name]);
