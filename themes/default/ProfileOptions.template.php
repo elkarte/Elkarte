@@ -17,7 +17,17 @@
  */
 function template_ProfileOptions_init()
 {
+	global $context, $txt;
+
 	theme()->getTemplates()->load('GenericBoards');
+
+	if (!empty($context['menu_item_selected']) && $context['menu_item_selected'] === 'notification')
+	{
+		loadJavascriptFile('jquery.multiselect.min.js');
+		theme()->addInlineJavascript('
+		$(\'.select_multiple\').multiselect({\'language_strings\': {\'Select all\': ' . JavascriptEscape($txt['notify_select_all']) . '}});', true);
+		loadCSSFile('multiselect.css');
+	}
 }
 
 /**
@@ -757,26 +767,26 @@ function template_action_notification()
 			<div class="content">
 				<dl>';
 
-	foreach ($context['mention_types'] as $type => $mentions)
+	foreach ($context['mention_types'] as $type => $mention_methods)
 	{
 		echo '
 					<dt>
 						<label for="notify_', $type, '">', $txt['notify_type_' . $type], '</label>
 					</dt>
 					<dd>
-						<input id="notify_', $type, '" name="notify[', $type, '][status]" class="toggle_notify" type="checkbox" value="1" ', $mentions['enabled'] ? 'checked="checked"' : '', '/>
-						<label for="notify_', $type, '_method">', $txt['notify_method'], '
-							<select id="notify_', $type, '_method" name="notify[', $type, '][method]">';
-
-		foreach ($mentions['data'] as $key => $method)
+						<label for="notify_', $type, '_default">', $txt['notify_method_use_default'], '</label>
+						<input id="notify_', $type, '_default" name="', $mention_methods['default_input_name'], '" class="toggle_notify" type="checkbox" value="', $mention_methods['value'], '" ', $mention_methods['value'] ? '' : 'checked="checked"', '/>
+						<select class="select_multiple" multiple="multiple" id="notify_', $type, '" ', $mention_methods['default_input_name'], '">';
+		foreach ($mention_methods['data'] as $key => $method)
 		{
 			echo '
-								<option value="', $key, '"', $method['enabled'] ? ' selected="selected"' : '', '>', $txt['notify_' . $method['id']], '</option>';
+							<option value="', $key, '"', $method['enabled'] ? ' selected="selected"' : '', '>', $method['text'], '</option>';
 		}
 
 		echo '
-							</select>
-						</label>
+						</select>';
+
+		echo '
 					</dd>';
 	}
 

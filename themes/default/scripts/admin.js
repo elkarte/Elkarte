@@ -1989,7 +1989,7 @@ function ajax_getCensorPreview()
  */
 $(function ()
 {
-	var $headers = $("#mention").find("input[id^='notifications'][id$='[notification]']");
+	var $headers = $("#mention").find("input[id^='notifications'][id$='[enable]']");
 
 	$headers.on('change', function ()
 	{

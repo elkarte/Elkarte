@@ -530,7 +530,29 @@ class ManageFeatures extends AbstractController
 			}
 			else
 			{
-				$notification_methods = serialize($this->_req->post->notifications);
+				$notification_methods = [];
+				foreach ($this->_req->post->notifications as $type => $notification)
+				{
+					if (!empty($notification['enable']))
+					{
+						$defaults = $notification['default'] ?? [];
+						unset($notification['enable']);
+						unset($notification['default']);
+						foreach ($notification as $k => $v)
+						{
+							if (in_array($k, $defaults))
+							{
+								$notification[$k] = Notifications::DEFAULT_LEVEL;
+							}
+							else
+							{
+								$notification[$k] = $v;
+							}
+						}
+						$notification_methods[$type] = $notification;
+					}
+				}
+				$notification_methods = serialize($notification_methods);
 			}
 
 			require_once(SUBSDIR . '/Mentions.subs.php');
@@ -608,6 +630,10 @@ class ManageFeatures extends AbstractController
 
 		theme()->getTemplates()->loadLanguageFile('Profile');
 		theme()->getTemplates()->loadLanguageFile('UserNotifications');
+		loadJavascriptFile('jquery.multiselect.min.js');
+		theme()->addInlineJavascript('
+		$(\'.select_multiple\').multiselect({\'language_strings\': {\'Select all\': ' . JavascriptEscape($txt['notify_select_all']) . '}});', true);
+		loadCSSFile('multiselect.css');
 
 		// The mentions settings
 		$config_vars = array(
@@ -616,20 +642,44 @@ class ManageFeatures extends AbstractController
 		);
 
 		$notification_methods = Notifications::instance()->getNotifiers();
-		$notification_types = getNotificationTypes();
+		$notification_classes = getAvailableNotifications();
 		$current_settings = unserialize($modSettings['notification_methods']);
 
-		foreach ($notification_types as $title)
+		foreach ($notification_classes as $class)
 		{
-			$config_vars[] = array('title', 'setting_' . $title);
-
-			foreach ($notification_methods as $method)
+			if ($class::canUse() === false)
 			{
-				$text_label = $method === 'notification' ? $txt['setting_notify_enable_this'] : $txt['notify_' . $method];
-
-				$config_vars[] = array('check', 'notifications[' . $title . '][' . $method . ']', 'text_label' => $text_label);
-				$modSettings['notifications[' . $title . '][' . $method . ']'] = !empty($current_settings[$title][$method]);
+				continue;
 			}
+
+			$title = strtolower($class::getType());
+			$config_vars[] = array('title', 'setting_' . $title);
+			$config_vars[] = array('check', 'notifications[' . $title . '][enable]', 'text_label' => $txt['setting_notify_enable_this']);
+			$modSettings['notifications[' . $title . '][enable]'] = !empty($current_settings[$title]);
+			$default_values = [];
+			$is_default = [];
+
+			foreach ($notification_methods as $method_name => $method)
+			{
+				if ($class::isBlacklisted($method_name))
+				{
+					continue;
+				}
+
+				$method_name = strtolower($method_name);
+
+				$config_vars[] = array('check', 'notifications[' . $title . '][' . $method_name . ']', 'text_label' => $txt['notify_' . $method_name]);
+				$modSettings['notifications[' . $title . '][' . $method_name . ']'] = !empty($current_settings[$title][$method_name]);
+				$default_values[] = [$method_name, $txt['notify_' . $method_name]];
+
+				if (!empty($current_settings[$title][$method_name]) && $current_settings[$title][$method_name] == Notifications::DEFAULT_LEVEL)
+				{
+					$is_default[] = $method_name;
+				}
+			}
+
+			$config_vars[] = array('select', 'notifications[' . $title . '][default]', $default_values, 'text_label' => $txt['default_active'], 'multiple' => true, 'value' => $is_default);
+			$modSettings['notifications[' . $title . '][default]'] = $is_default;
 		}
 
 		call_integration_hook('integrate_modify_mention_settings', array(&$config_vars));

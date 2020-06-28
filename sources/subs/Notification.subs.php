@@ -981,12 +981,23 @@ function getUsersNotificationsPreferences($notification_types, $members)
 
 	$notification_types = (array) $notification_types;
 	$query_members = (array) $members;
-	$query_members[] = 0;
+	$defaults = array_map(function($vals) {
+		$return = [];
+		foreach ($vals as $k => $level)
+		{
+			if ($level == \ElkArte\Notifications::DEFAULT_LEVEL)
+			{
+				$return[] = $k;
+			}
+		}
+
+		return $return;
+	}, getConfiguredNotificationMethods('*'));
 
 	$results = array();
 	$db->fetchQuery('
 		SELECT 
-			id_member, notification_level, mention_type
+			id_member, notification_type, mention_type
 		FROM {db_prefix}notifications_pref
 		WHERE id_member IN ({array_int:members_to})
 			AND mention_type IN ({array_string:mention_types})',
@@ -995,38 +1006,41 @@ function getUsersNotificationsPreferences($notification_types, $members)
 			'mention_types' => $notification_types,
 		)
 	)->fetch_callback(
-		function ($row) use (&$results) {
+		function ($row) use (&$results, $defaults) {
 			if (!isset($results[$row['id_member']]))
 			{
-				$results[$row['id_member']] = array();
+				$results[$row['id_member']] = [];
+			}
+			if (!isset($results[$row['id_member']][$row['mention_type']]))
+			{
+				$results[$row['id_member']][$row['mention_type']] = [];
 			}
 
-			$results[$row['id_member']][$row['mention_type']] = (int) $row['notification_level'];
+			$results[$row['id_member']][$row['mention_type']][] = $row['notification_type'];
 		}
 	);
 
-	$defaults = array();
-	foreach ($notification_types as $val)
+	// Set the defaults
+	foreach ($query_members as $member)
 	{
-		$defaults[$val] = 0;
-	}
-
-	if (isset($results[0]))
-	{
-		$defaults = array_merge($defaults, $results[0]);
-	}
-
-	$preferences = array();
-	foreach ((array) $members as $member)
-	{
-		$preferences[$member] = $defaults;
-		if (isset($results[$member]))
+		foreach ($notification_types as $type)
 		{
-			$preferences[$member] = array_merge($preferences[$member], $results[$member]);
+			if (empty($results[$member]) && !empty($defaults[$type]))
+			{
+				if (!isset($results[$member]))
+				{
+					$results[$member] = [];
+				}
+				if (!isset($results[$member][$type]))
+				{
+					$results[$member][$type] = [];
+				}
+				$results[$member][$type] = $defaults[$type];
+			}
 		}
 	}
 
-	return $preferences;
+	return $results;
 }
 
 /**
@@ -1097,11 +1111,12 @@ function filterNotificationMethods($possible_methods, $type)
 	}
 
 	$allowed = array();
-	foreach ($possible_methods as $key => $val)
+	foreach ($possible_methods as $class)
 	{
-		if (isset($unserialized[$val]))
+		$class = strtolower($class);
+		if (!empty($unserialized[$class]))
 		{
-			$allowed[$key] = $val;
+			$allowed[] = $class;
 		}
 	}
 
@@ -1116,19 +1131,20 @@ function filterNotificationMethods($possible_methods, $type)
  *
  * @return array
  */
-function getConfiguredNotificationMethods($type)
+function getConfiguredNotificationMethods($type = '*')
 {
 	global $modSettings;
-	static $unserialized = null;
 
-	if ($unserialized === null)
-	{
-		$unserialized = unserialize($modSettings['notification_methods']);
-	}
+	$unserialized = unserialize($modSettings['notification_methods']);
 
 	if (isset($unserialized[$type]))
 	{
 		return $unserialized[$type];
+	}
+
+	if ($type === '*')
+	{
+		return $unserialized;
 	}
 
 	return array();

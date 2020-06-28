@@ -44,7 +44,7 @@ class NotificationsTask extends ValuesContainer
 	 * @param int $id_member The id of the member generating the notification
 	 * @param mixed[] $data An array of data that can be necessary in the process
 	 * @param string $namespace A namespace for the class if different from the
-	 *               default \ElkArte\Mentions\MentionType\
+	 *               default \ElkArte\Mentions\MentionType\Notification\
 	 */
 	public function __construct($type, $id, $id_member, $data, $namespace = '')
 	{

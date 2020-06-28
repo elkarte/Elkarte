@@ -24,6 +24,21 @@ use ElkArte\Mentions\MentionType\NotificationInterface;
 class Notifications extends AbstractModel
 {
 	/**
+	 * Where the notifiers are stored
+	 */
+	const NOTIFIERS_PATH = SOURCEDIR . '/ElkArte/Notifiers/Methods';
+
+	/**
+	 * Since we have to call them dynamically we need to know both path and namespace...
+	 */
+	const NOTIFIERS_NAMESPACE = '\\ElkArte\\Notifiers\\Methods';
+
+	/**
+	 * Since we have to call them dynamically we need to know both path and namespace...
+	 */
+	const DEFAULT_LEVEL = 2;
+
+	/**
 	 * Instance manager
 	 *
 	 * @var Notifications
@@ -74,10 +89,11 @@ class Notifications extends AbstractModel
 		parent::__construct($db, $user);
 
 		// Let's register all the notifications we know by default
-		$this->register(1, 'notification', array($this, '_send_notification'));
-		$this->register(2, 'email', array($this, '_send_email'), array('subject' => 'subject', 'body' => 'body', 'suffix' => true));
-		$this->register(3, 'email_daily', array($this, '_send_daily_email'), array('subject' => 'subject', 'body' => 'snippet', 'suffix' => true));
-		$this->register(4, 'email_weekly', array($this, '_send_weekly_email'), array('subject' => 'subject', 'body' => 'snippet', 'suffix' => true));
+		$glob = new \GlobIterator(Notifications::NOTIFIERS_PATH . '/*.php', \FilesystemIterator::SKIP_DOTS);
+		foreach ($glob as $file)
+		{
+			$this->register($file->getBasename('.php'));
+		}
 
 		call_integration_hook('integrate_notifications_methods', array($this));
 	}
@@ -85,42 +101,28 @@ class Notifications extends AbstractModel
 	/**
 	 * Function to register any new notification method.
 	 *
-	 * @param int $id This shall be a unique integer representing the notification method.
-	 *
-	 * <b>WARNING for addons developers</b>: note that this has to be **unique** across
-	 * addons, so if you develop an addon that extends notifications, please verify this id
-	 * has not been "taken" by someone else! 1-4 are reserved system notifications.
-	 * @param int $key The string name identifying the notification method
-	 *
-	 *  - _send_email
-	 *  - _send_daily_email
-	 *  - _send_weekly_email
-	 * @param mixed|mixed[] $callback A callable function/array/whatever that will take care
-	 * of sending the notification
-	 * @param null|string[] $lang_data For the moment an array containing at least:
-	 *
-	 *  - 'subject' => 'something'
-	 *  - 'body' => 'something_else'
-	 *  - 'suffix' => true/false
+	 * @param string $class the name of a class.
+	 * @param string $namespace the namespace of the class.
 	 *
 	 * Used to identify the strings for the subject and body respectively of the notification.
 	 * @throws \ElkArte\Exceptions\Exception
 	 */
-	public function register($id, $key, $callback, $lang_data = null)
+	public function register($class_name, $namespace = null)
 	{
-		if (isset($this->_notifiers[$key]))
+		if ($namespace === null)
 		{
-			throw new Exceptions\Exception('error_invalid_notification_id');
+			$namespace = Notifications::NOTIFIERS_NAMESPACE;
 		}
 
-		$this->_notifiers[$key] = array(
-			'id' => $id,
-			'key' => $key,
-			'callback' => $callback,
-			'lang_data' => $lang_data,
-		);
+		$class = Notifications::NOTIFIERS_NAMESPACE . '\\' . $class_name;
+		$index = strtolower($class_name);
 
-		$this->_notification_frequencies[$id] = $key;
+		if (isset($this->_notifiers[$index]))
+		{
+			throw new Exceptions\Exception('error_notifier_already_instantiated');
+		}
+
+		$this->_notifiers[$index] = new $class($this->_db, $this->user);
 	}
 
 	/**
@@ -139,7 +141,9 @@ class Notifications extends AbstractModel
 	}
 
 	/**
-	 * We hax a new notification to send out!
+	 * We haz a new notification to send out!
+	 * Let's add it to the queue, later on (just before shutting down)
+	 * we will take care of sending it (see send)
 	 *
 	 * @param \ElkArte\NotificationsTask $task
 	 */
@@ -150,17 +154,12 @@ class Notifications extends AbstractModel
 
 	/**
 	 * Time to notify our beloved members! YAY!
+	 * This is usually used in obExit or close to it, just before the script ends
+	 * to actually send any type of notification that has piled up during
+	 * the execution
 	 */
 	public function send()
 	{
-		$this->_notification_frequencies = array(
-			// 0 is for no notifications, so we start from 1 the counting, that saves a +1 later
-			1 => 'notification',
-			'email',
-			'email_daily',
-			'email_weekly',
-		);
-
 		if (!empty($this->_to_send))
 		{
 			foreach ($this->_to_send as $task)
@@ -184,28 +183,24 @@ class Notifications extends AbstractModel
 		$obj->setTask($task);
 
 		require_once(SUBSDIR . '/Notification.subs.php');
-		require_once(SUBSDIR . '/Mail.subs.php');
-		$notification_frequencies = filterNotificationMethods($this->_notification_frequencies, $class::getType());
+
+		$active_notifiers = filterNotificationMethods(array_keys($this->_notifiers), $class::getType());
 
 		// Cleanup the list of members to notify,
 		// in certain cases it may differ from the list passed (if any)
-		$task->setMembers($obj->getUsersToNotify());
-		$notif_prefs = $this->_getNotificationPreferences($notification_frequencies, $task->notification_type, $task->getMembers());
+		$obj->setUsersToNotify();
+		$notif_prefs = $this->_getNotificationPreferences($active_notifiers, $task->notification_type, $task->getMembers());
 
-		foreach ($notification_frequencies as $key)
+		foreach ($notif_prefs as $notifier => $members)
 		{
-			if (!empty($notif_prefs[$key]))
+			$bodies = $obj->getNotificationBody($this->_notifiers[$notifier]->lang_data, $members);
+			// Just in case...
+			if (empty($bodies))
 			{
-				$bodies = $obj->getNotificationBody($this->_notifiers[$key]['lang_data'], $notif_prefs[$key]);
-
-				// Just in case...
-				if (empty($bodies))
-				{
-					continue;
-				}
-
-				call_user_func_array($this->_notifiers[$key]['callback'], array($obj, $task, $bodies, $this->_db));
+				continue;
 			}
+
+			$this->_notifiers[$notifier]->send($obj, $task, $bodies);
 		}
 	}
 
@@ -213,60 +208,44 @@ class Notifications extends AbstractModel
 	 * Loads from the database the notification preferences for a certain type
 	 * of mention for a bunch of members.
 	 *
-	 * @param string[] $notification_frequencies
+	 * @param string[] $notifiers
 	 * @param string $notification_type
 	 * @param int[] $members
 	 *
 	 * @return array
 	 */
-	protected function _getNotificationPreferences($notification_frequencies, $notification_type, $members)
+	protected function _getNotificationPreferences($notifiers, $notification_type, $members)
 	{
-		$query_members = $members;
-		// The member 0 is the "default" setting
-		$query_members[] = 0;
+		$preferences = getUsersNotificationsPreferences($notification_type, $members);
 
-		require_once(SUBSDIR . '/Notification.subs.php');
-		$preferences = getUsersNotificationsPreferences($notification_type, $query_members);
-
-		$notification_types = array();
-		foreach ($notification_frequencies as $freq)
+		$notification_methods = [];
+		foreach ($notifiers as $notifier)
 		{
-			$notification_types[$freq] = array();
+			$notification_methods[$notifier] = [];
 		}
 
-		// notification_level can be:
-		//    - 0 => no notification
-		//    - 1 => only mention
-		//    - 2 => mention + immediate email
-		//    - 3 => mention + daily email
-		//    - 4 => mention + weekly email
-		//    - 5+ => usable by addons
 		foreach ($members as $member)
 		{
-			$this_pref = $preferences[$member][$notification_type];
-			if ($this_pref === 0)
+			// This user for this mention doesn't want any notification. Move on.
+			// Memo: at a certain point I used 'none', the two are basically equivalent
+			// since an \ElkArte\Notifiers\Methods\None doesn't exist, so nothing will be
+			// instantiated
+			if (empty($preferences[$member][$notification_type]))
 			{
 				continue;
 			}
-
-			// In the following two checks the use of the $this->_notification_frequencies
-			// is intended, because the numeric id is important and is not preserved
-			// in the local $notification_frequencies
-			if (isset($this->_notification_frequencies[1]))
+			$this_prefs = $preferences[$member][$notification_type];
+			foreach ($this_prefs as $this_pref)
 			{
-				$notification_types[$this->_notification_frequencies[1]][] = $member;
-			}
-
-			if ($this_pref > 1)
-			{
-				if (isset($this->_notification_frequencies[$this_pref]) && isset($notification_types[$this->_notification_frequencies[$this_pref]]))
+				if (!isset($notification_methods[$this_pref]))
 				{
-					$notification_types[$this->_notification_frequencies[$this_pref]][] = $member;
+					continue;
 				}
+				$notification_methods[$this_pref][] = $member;
 			}
 		}
 
-		return $notification_types;
+		return $notification_methods;
 	}
 
 	/**
@@ -276,13 +255,13 @@ class Notifications extends AbstractModel
 	 */
 	public function getNotifiers()
 	{
-		return $this->_notification_frequencies;
+		return $this->_notifiers;
 	}
 
 	/**
 	 * Inserts a new mention in the database (those that appear in the mentions area).
 	 *
-	 * @param \ElkArte\Mentions\MentionType\MentionType\NotificationInterface $obj
+	 * @param \ElkArte\Mentions\MentionType\NotificationInterface $obj
 	 * @param \ElkArte\NotificationsTask $task
 	 * @param mixed[] $bodies
 	 */

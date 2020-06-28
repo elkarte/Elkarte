@@ -13,13 +13,18 @@
 
 namespace ElkArte\Mentions\MentionType\Event;
 
+use ElkArte\Mentions\MentionType\AbstractEventBoardAccess;
+use ElkArte\Mentions\MentionType\CommonConfigTrait;
+
 /**
  * Class BuddyMention
  *
  * Handles mentioning of buddies
  */
-class Buddy extends AbstractMentionMessage
+class Buddy extends AbstractEventBoardAccess
 {
+	use CommonConfigTrait;
+
 	/**
 	 * {@inheritdoc }
 	 */

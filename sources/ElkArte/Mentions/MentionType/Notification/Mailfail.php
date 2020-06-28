@@ -13,13 +13,18 @@
 
 namespace ElkArte\Mentions\MentionType\Notification;
 
+use ElkArte\Mentions\MentionType\AbstractNotificationBoardAccess;
+use ElkArte\Mentions\MentionType\MailfailConfigTrait;
+
 /**
  * Class MailfailMention
  *
  * Handles notifying users who have had email notifications disabled for failure to deliver
  */
-class Mailfail extends AbstractMentionBoardAccess
+class Mailfail extends AbstractNotificationBoardAccess
 {
+	use MailfailConfigTrait;
+
 	/**
 	 * {@inheritdoc }
 	 */

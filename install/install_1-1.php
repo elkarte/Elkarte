@@ -1999,11 +1999,11 @@ class InstallInstructions_install_1_1
 		return $this->table->create_table('{db_prefix}notifications_pref',
 			array(
 				array('name' => 'id_member',          'type' => 'mediumint', 'size' => 8, 'unsigned' => true, 'default' => 0),
-				array('name' => 'notification_level', 'type' => 'tinyint', 'size' => 1, 'default' => 1),
+				array('name' => 'notification_type', 'type' => 'varchar', 'size' => 20, 'default' => ''),
 				array('name' => 'mention_type',       'type' => 'varchar', 'size' => 12, 'default' => ''),
 			),
 			array(
-				array('name' => 'mention_member', 'columns' => array('id_member', 'mention_type'), 'type' => 'unique'),
+				array('name' => 'mention_member', 'columns' => array('id_member', 'notification_type', 'mention_type'), 'type' => 'unique'),
 			),
 			array(),
 			'ignore'
@@ -2014,32 +2014,32 @@ class InstallInstructions_install_1_1
 	{
 		return $this->db->insert('ignore',
 			'{db_prefix}notifications_pref',
-			array('id_member' => 'int', 'notification_level' => 'int', 'mention_type' => 'string-12'),
+			array('id_member' => 'int', 'mention_type' => 'string-12', 'notification_type' => 'string-20'),
 			array(
 				array(
 					0,
-					1,
-					'buddy'
+					'buddy',
+					'notification'
 				),
 				array(
 					0,
-					1,
-					'likemsg'
+					'likemsg',
+					'notification'
 				),
 				array(
 					0,
-					1,
-					'quotedmem'
+					'quotedmem',
+					'notification'
 				),
 				array(
 					0,
-					1,
-					'rlikemsg'
+					'rlikemsg',
+					'notification'
 				),
 				array(
 					0,
-					1,
-					'mentionmem'
+					'mentionmem',
+					'notification'
 				),
 			),
 			array('id_server')
@@ -2658,7 +2658,29 @@ class InstallInstructions_install_1_1
 				array('badbehavior_ip_wl_desc', 'a:3:{i:2;s:18:"RFC 1918 addresses";i:5;s:18:"RFC 1918 addresses";i:6;s:18:"RFC 1918 addresses";}'),
 				array('badbehavior_url_wl', 'a:1:{i:0;s:18:"/subscriptions.php";}'),
 				array('badbehavior_url_wl_desc', 'a:1:{i:0;s:15:"Payment Gateway";}'),
-				array('notification_methods', 'a:4:{s:5:"buddy";a:4:{s:12:"notification";s:1:"1";s:5:"email";s:1:"1";s:11:"email_daily";s:1:"1";s:12:"email_weekly";s:1:"1";}s:7:"likemsg";a:1:{s:12:"notification";s:1:"1";}s:10:"mentionmem";a:4:{s:12:"notification";s:1:"1";s:5:"email";s:1:"1";s:11:"email_daily";s:1:"1";s:12:"email_weekly";s:1:"1";}s:9:"quotedmem";a:4:{s:12:"notification";s:1:"1";s:5:"email";s:1:"1";s:11:"email_daily";s:1:"1";s:12:"email_weekly";s:1:"1";}}'),
+				array('notification_methods', serialize([
+					'buddy' => [
+						'notification' => "1",
+						'email' => "1",
+						'emaildaily' => "1",
+						'emailweekly' => "1"
+					],
+					'likemsg' => [
+						'notification' => "1"
+					],
+					"mentionmem" => [
+						"notification" => "1",
+						"email" => "1",
+						"emaildaily" => "1",
+						"emailweekly" => "1",
+					],
+					"quotedmem" => [
+						"notification" => "1",
+						"email" => "1",
+						"emaildaily" => "1",
+						"emailweekly" => "1"
+					]
+				])),
 				array('autoload_integrate', '\\ElkArte\\UserNotificationIntegrate,\\ElkArte\\IlaIntegrate,\\ElkArte\\VerificationControls\\VerificationControlsIntegrate'),
 				array('usernotif_favicon_bgColor', '#ff0000'),
 				array('usernotif_favicon_position', 'up'),

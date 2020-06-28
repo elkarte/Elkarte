@@ -13,6 +13,8 @@
 
 namespace ElkArte\Mentions\MentionType\Event;
 
+use ElkArte\Mentions\MentionType\AbstractEventBoardAccess;
+use ElkArte\Mentions\MentionType\CommonConfigTrait;
 use ElkArte\DataValidator;
 use ElkArte\Mentions\Mentioning;
 use ElkArte\Notifications;
@@ -23,8 +25,10 @@ use ElkArte\NotificationsTask;
  *
  * Handles the mentioning of members (@ member actions)
  */
-class Mentionmem extends AbstractMentionBoardAccess
+class Mentionmem extends AbstractEventBoardAccess
 {
+	use CommonConfigTrait;
+
 	/**
 	 * {@inheritdoc }
 	 */

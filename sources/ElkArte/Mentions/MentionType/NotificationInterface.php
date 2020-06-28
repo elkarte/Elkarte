@@ -27,10 +27,8 @@ interface NotificationInterface
 
 	/**
 	 * Used by the Notifications class to find the users that want a notification.
-	 *
-	 * @return int[] An array of members id
 	 */
-	public function getUsersToNotify();
+	public function setUsersToNotify();
 
 	/**
 	 * Used by the Notifications class to retrieve the notifications to send.
@@ -79,4 +77,20 @@ interface NotificationInterface
 	 * @package Mentions
 	 */
 	public function insert($member_from, $members_to, $target, $time = null, $status = null, $is_accessible = null);
+
+	/**
+	 * Provides a list of methods that should not be used by this mention type.
+	 *
+	 * @param string $method the Notifier method that is being considered
+	 *
+	 * @return bool
+	 */
+	public static function isBlacklisted($method);
+
+	/**
+	 * If needed checks for permissions to use this specific notification
+	 *
+	 * @return bool
+	 */
+	public static function canUse();
 }

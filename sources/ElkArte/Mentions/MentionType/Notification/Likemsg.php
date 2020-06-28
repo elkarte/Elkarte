@@ -13,13 +13,18 @@
 
 namespace ElkArte\Mentions\MentionType\Notification;
 
+use ElkArte\Mentions\MentionType\AbstractNotificationBoardAccess;
+use ElkArte\Mentions\MentionType\CommonConfigTrait;
+
 /**
  * Class LikemsgMention
  *
  * Handles mentions of likes
  */
-class Likemsg extends AbstractMentionBoardAccess
+class Likemsg extends AbstractNotificationBoardAccess
 {
+	use CommonConfigTrait;
+
 	/**
 	 * {@inheritdoc }
 	 */

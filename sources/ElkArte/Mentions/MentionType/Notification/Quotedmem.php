@@ -13,13 +13,18 @@
 
 namespace ElkArte\Mentions\MentionType\Notification;
 
+use ElkArte\Mentions\MentionType\AbstractNotificationBoardAccess;
+use ElkArte\Mentions\MentionType\CommonConfigTrait;
+
 /**
  * Class QuotedmemMention
  *
  * Handles mentioning of members whose messages has been quoted
  */
-class Quotedmem extends AbstractMentionBoardAccess
+class Quotedmem extends AbstractNotificationBoardAccess
 {
+	use CommonConfigTrait;
+
 	/**
 	 * {@inheritdoc }
 	 */

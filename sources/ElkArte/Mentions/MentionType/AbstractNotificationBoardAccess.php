@@ -11,11 +11,11 @@
  *
  */
 
-namespace ElkArte\Mentions\MentionType\Notification;
+namespace ElkArte\Mentions\MentionType;
 
 /**
- * Class AbstractMentionBoardAccess
+ * Class AbstractNotificationBoardAccess
  */
-abstract class AbstractMentionBoardAccess extends AbstractMentionMessage
+abstract class AbstractNotificationBoardAccess extends AbstractNotificationMessage
 {
 }

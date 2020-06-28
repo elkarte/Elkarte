@@ -2,6 +2,7 @@
 
 /**
  * Handles all the mentions actions so members are notified of mentionable actions
+ * @todo this class should be integrated into \ElkArte\Notifiers\Methods\Notifier.php
  *
  * @package   ElkArte Forum
  * @copyright ElkArte Forum contributors

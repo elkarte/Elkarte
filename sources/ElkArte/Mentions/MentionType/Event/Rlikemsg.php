@@ -13,13 +13,18 @@
 
 namespace ElkArte\Mentions\MentionType\Event;
 
+use ElkArte\Mentions\MentionType\AbstractEventBoardAccess;
+use ElkArte\Mentions\MentionType\CommonConfigTrait;
+
 /**
  * Class RlikemsgMention
  *
  * Handles the notification (or non-notification) of removed likes.
  */
-class Rlikemsg extends AbstractMentionBoardAccess
+class Rlikemsg extends AbstractEventBoardAccess
 {
+	use CommonConfigTrait;
+
 	/**
 	 * {@inheritdoc }
 	 */

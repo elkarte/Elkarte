@@ -122,8 +122,13 @@ $txt['notify_send_body_pbe'] = 'When sending email notifications, send the full 
 $txt['notify_send_body_pbe_post'] = '<strong>NOT</strong> available with Daily / Weekly summary';
 
 $txt['notify_method'] = 'Notification and:';
-$txt['notify_notification'] = 'no email (only mention/alert)';
+$txt['notify_method_use_default'] = 'Use default';
+$txt['notify_select_all'] = 'Select all';
+$txt['notify_notification'] = 'On-site mention';
 $txt['notify_email'] = 'Immediate email';
+$txt['notify_emaildaily'] = 'Daily email';
+$txt['notify_emailweekly'] = 'Weekly email';
+// @deprecated The following are for backward compatibility
 $txt['notify_email_daily'] = 'Daily email';
 $txt['notify_email_weekly'] = 'Weekly email';
 
@@ -132,7 +137,7 @@ $txt['notify_type_mentionmem'] = 'Notify when you are @mentioned';
 $txt['notify_type_rlikemsg'] = 'Notify when a like is removed from one of your messages';
 $txt['notify_type_buddy'] = 'Notify when someone adds you as buddy';
 $txt['notify_type_quotedmem'] = 'Notify when someone quotes one of your messages';
-$txt['notify_type_mailfail'] = 'Notify when email notifications are disabled (mention only)';
+$txt['notify_type_mailfail'] = 'Notify when email notifications have failed and have been disabled';
 
 $txt['notifications_topics'] = 'Current Topic Notifications';
 $txt['notifications_topics_none'] = 'You are not currently receiving any notifications from topics.';

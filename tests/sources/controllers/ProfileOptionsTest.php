@@ -25,6 +25,61 @@ class TestProfileOptions extends ElkArteCommonSetupTest
 		$cur_profile = \ElkArte\MembersList::get('1');
 		$context['user']['is_owner'] = true;
 		$context['id_member'] = 1;
+
+		$db = database();
+
+		$db->insert('',
+			'{db_prefix}notifications_pref',
+			array(
+				'id_member' => 'int',
+				'notification_type' => 'string',
+				'mention_type' => 'string',
+			),
+			array(
+				array(
+					'id_member' => 1,
+					'notification_type' => 'notification',
+					'mention_type' => 'likemsg'
+				),
+				array(
+					'id_member' => 1,
+					'notification_type' => 'email',
+					'mention_type' => 'mentionmem'
+				),
+				array(
+					'id_member' => 1,
+					'notification_type' => 'email',
+					'mention_type' => 'likemsg'
+				),
+				array(
+					'id_member' => 2,
+					'notification_type' => 'notification',
+					'mention_type' => 'mentionmem'
+				),
+				array(
+					'id_member' => 2,
+					'notification_type' => 'email',
+					'mentionmem'
+				),
+				array(
+					'id_member' => 2,
+					'notification_type' => 'email',
+					'mention_type' => 'likemsg'
+				),
+			),
+			array('id_member', 'mention_type')
+		);
+	}
+
+	/**
+	 * cleanup data we no longer need at the end of the tests in this class.
+	 * tearDown() is run automatically by the testing framework after each test method.
+	 */
+	public function tearDown()
+	{
+		$db = database();
+		$db->query('', '
+			DELETE FROM {db_prefix}notifications_pref', []);
 	}
 
 	/**

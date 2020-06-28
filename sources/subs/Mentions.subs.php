@@ -33,9 +33,9 @@ function countUserMentions($all = false, $type = '', $id_member = null)
 	$db = database();
 	$id_member = $id_member === null ? User::$info->id : (int) $id_member;
 
-	if (isset($counts[$id_member]))
+	if (isset($counts[$id_member . $type]))
 	{
-		return $counts[$id_member];
+		return $counts[$id_member . $type];
 	}
 
 	$request = $db->query('', '
@@ -54,7 +54,7 @@ function countUserMentions($all = false, $type = '', $id_member = null)
 			'is_accessible' => 1,
 		)
 	);
-	list ($counts[$id_member]) = $request->fetch_row();
+	list ($counts[$id_member . $type]) = $request->fetch_row();
 	$request->free_result();
 
 	// Counts as maintenance! :P
@@ -64,7 +64,7 @@ function countUserMentions($all = false, $type = '', $id_member = null)
 		updateMemberData($id_member, array('mentions' => $counts[$id_member]));
 	}
 
-	return $counts[$id_member];
+	return $counts[$id_member . $type];
 }
 
 /**
