@@ -27,7 +27,7 @@ function loadVerificationControls()
 	);
 
 	// Need GD for CAPTCHA images
-	if (!in_array('gd', get_loaded_extensions()))
+	if (in_array('gd', get_loaded_extensions()))
 	{
 		array_unshift($known_verifications,'captcha');
 	}
