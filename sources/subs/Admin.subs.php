@@ -260,7 +260,8 @@ function getFileVersions(&$versionOptions)
 		'file_versions_subs' => SUBSDIR,
 		'file_versions_modules' => SOURCEDIR . '/modules',
 	);
-	readFileVersions($tmp_version_info, $directories, '.php', true);
+	$tmp_version_info = array_combine(array_keys($directories),array_fill(0,count($directories),array()));
+	readFileVersions($tmp_version_info, $directories, '.php', false);
 
 	foreach ($tmp_version_info['file_versions_subs'] as $key => $val)
 	{
