@@ -11,5 +11,6 @@
 *.ttf binary
 *.otf binary
 *.woff binary
+*.woff2 binary
 *.eot binary
 *.phar binary
