@@ -1005,11 +1005,11 @@ class Theme extends \Theme
 
 		// Default JS variables for use in every theme
 		$this->addJavascriptVar(array(
+				'elk_scripturl' => '\'' . $scripturl . '\'',
 				'elk_theme_url' => JavaScriptEscape($settings['theme_url']),
 				'elk_default_theme_url' => JavaScriptEscape($settings['default_theme_url']),
 				'elk_images_url' => JavaScriptEscape($settings['images_url']),
 				'elk_smiley_url' => JavaScriptEscape($modSettings['smileys_url']),
-				'elk_scripturl' => '\'' . $scripturl . '\'',
 				'elk_iso_case_folding' => detectServer()->is('iso_case_folding') ? 'true' : 'false',
 				'elk_charset' => '"UTF-8"',
 				'elk_session_id' => JavaScriptEscape($context['session_id']),
