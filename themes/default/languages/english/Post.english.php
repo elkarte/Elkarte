@@ -180,6 +180,7 @@ $txt['attachments_limit_per_post'] = 'You may not upload more than %1$d attachme
 // Post settings (when I implement the post interface)
 $txt['ila_insert'] = 'Insert Attachment %1$d in the message';
 $txt['ila_title'] = 'End-of-post expandable thumbnail ';
+$txt['insert'] = 'Insert';
 $txt['ila_opt_size'] = 'Size';
 $txt['ila_opt_align'] = 'Alignment';
 $txt['ila_opt_size_thumb'] = 'Thumbnail';
