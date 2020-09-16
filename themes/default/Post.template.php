@@ -450,7 +450,7 @@ function template_add_new_attachments()
 				var inlineAttach = ElkInlineAttachments(\'#postAttachment2,#postAttachment\', \'' . $context['post_box_name'] . '\', {
 					trigger: $(\'<div class="share icon i-share" />\'),
 					template: ' . JavaScriptEscape('<div class="insertoverlay">
-						<input type="button" class="button" value="insert">
+						<input type="button" class="button" value="' . $txt['insert'] . '">
 						<ul data-group="tabs" class="tabs">
 							<li data-tab="size">' . $txt['ila_opt_size'] . '</li><li data-tab="align">' . $txt['ila_opt_align'] . '</li>
 						</ul>
