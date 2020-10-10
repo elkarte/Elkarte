@@ -582,6 +582,9 @@ function prepareCreditsData()
 			'<a href="http://lab.ejci.net/favico.js/">favico.js</a> | &copy; Miroslav Magda | Licensed under <a href="http://opensource.org/licenses/MIT">The MIT License (MIT)</a>',
 			'<a href="https://github.com/ttsvetko/HTML5-Desktop-Notifications">HTML5 Desktop Notifications</a> | &copy; Tsvetan Tsvetkov | Licensed under <a href="http://www.apache.org/licenses/LICENSE-2.0">Apache License, Version 2.0</a>',
 			'<a href="https://github.com/mneofit/multiselect">multiselect</a> | &copy; Mikhail Neofitov | Licensed under <a href="http://opensource.org/licenses/MIT">The MIT License (MIT)</a>',
+			'<a href="https://github.com/Spuds/ElkArte-Emoji">ElkArte Emoji</a> | &copy; Spuds | Licensed under <a href="http://mozilla.org/MPL/1.1">MPL 1.1</a>',
+			'<a href="#">EmojiOne</a> | &copy; Emoji One | Licensed under <a href="http://creativecommons.org/licenses/by-sa/4.0/">Creative Commons Attribution-ShareAlike 4.0 International</a>',
+			'<a href="https://github.com/twitter/twemoji">Twitter Emoji</a> | &copy; Twitter, Inc and other contributors | Licensed under <a href="https://github.com/twitter/twemoji/blob/master/LICENSE/">MIT</a>',
 		),
 	);
 
