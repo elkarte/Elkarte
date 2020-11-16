@@ -65,7 +65,7 @@
 		"phpunit/phpunit-selenium": "*",
 		"phpunit/dbunit": "*",
 		"phpunit/phpunit": "~7",
-		"myclabs/deep-copy": "1.8.0"
+		"myclabs/deep-copy": "1.10.2"
 	},
 	"autoload": {
 		"psr-4": { "ElkArte\\": ["sources/ElkArte"] }
