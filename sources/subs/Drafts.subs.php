@@ -7,7 +7,7 @@
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
- * @version 1.1
+ * @version 1.1.7
  *
  */
 
@@ -30,6 +30,7 @@ function create_pm_draft($draft, $recipientList)
 		'subject' => 'string-255',
 		'body' => 'string-65534',
 		'to_list' => 'string-255',
+		'is_usersaved' => 'int',
 	);
 	$draft_parameters = array(
 		$draft['reply_id'],
@@ -39,6 +40,7 @@ function create_pm_draft($draft, $recipientList)
 		$draft['subject'],
 		$draft['body'],
 		serialize($recipientList),
+		$draft['is_usersaved'],
 	);
 	$db->insert('',
 		'{db_prefix}user_drafts',
@@ -71,7 +73,8 @@ function modify_pm_draft($draft, $recipientList)
 			poster_time = {int:poster_time},
 			subject = {string:subject},
 			body = {string:body},
-			to_list = {string:to_list}
+			to_list = {string:to_list},
+			is_usersaved = {int:is_usersaved}
 		WHERE id_draft = {int:id_pm_draft}
 		LIMIT 1',
 		array(
@@ -82,6 +85,7 @@ function modify_pm_draft($draft, $recipientList)
 			'body' => $draft['body'],
 			'id_pm_draft' => $draft['id_pm_draft'],
 			'to_list' => serialize($recipientList),
+			'is_usersaved' => $draft['is_usersaved'],
 		)
 	);
 }
@@ -455,7 +459,7 @@ function saveDraft($draft, $check_last_save = false)
 	if (!isset($draft['is_usersaved']))
 		$draft['is_usersaved'] = 0;
 
-	if ($draft_info['is_usersaved'] == 1)
+	if (isset($draft_info['is_usersaved']) && $draft_info['is_usersaved'] == 1)
 		$draft['is_usersaved'] = 1;
 
 	// Modifying an existing draft, like hitting the save draft button or autosave enabled?
@@ -481,8 +485,6 @@ function saveDraft($draft, $check_last_save = false)
 		else
 			$post_errors->addError('draft_not_saved');
 	}
-
-	return;
 }
 
 /**
@@ -534,7 +536,7 @@ function savePMDraft($recipientList, $draft, $check_last_save = false)
 	if (!isset($draft['is_usersaved']))
 		$draft['is_usersaved'] = 0;
 
-	if ($draft_info['is_usersaved'] == 1)
+	if (isset($draft_info['is_usersaved']) && $draft_info['is_usersaved'] == 1)
 		$draft['is_usersaved'] = 1;
 
 	// Modifying an existing PM draft?
