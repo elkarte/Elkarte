@@ -970,6 +970,7 @@ a.bbc_link {
 #quick_edit_body_container .editor {
 	width: 100%;
 	margin-bottom: 10px;
+	padding: 2px;
 }
 
 #quick_edit_body_container .input_text {
