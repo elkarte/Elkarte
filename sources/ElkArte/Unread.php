@@ -338,9 +338,8 @@ class Unread
 				LEFT JOIN {db_prefix}boards AS b ON (b.id_board = t.id_board)' : '
 				LEFT JOIN {db_prefix}boards AS b ON (b.id_board = ms.id_board)') . '
 				LEFT JOIN {db_prefix}members AS mems ON (mems.id_member = ms.id_member)
-				LEFT JOIN {db_prefix}members AS meml ON (meml.id_member = ml.id_member)' . ($this->_have_temp_table ? '
-				LEFT JOIN {db_prefix}log_topics_unread AS lt ON (lt.id_topic = t.id_topic)' : '
-				LEFT JOIN {db_prefix}log_topics AS lt ON (lt.id_topic = t.id_topic AND lt.id_member = {int:current_member})') . (!empty($custom_joins) ? implode("\n\t\t\t\t", $custom_joins) : '') . '
+				LEFT JOIN {db_prefix}members AS meml ON (meml.id_member = ml.id_member)
+				LEFT JOIN {db_prefix}log_topics AS lt ON (lt.id_topic = t.id_topic AND lt.id_member = {int:current_member})' . (!empty($custom_joins) ? implode("\n\t\t\t\t", $custom_joins) : '') . '
 				LEFT JOIN {db_prefix}log_mark_read AS lmr ON (lmr.id_board = t.id_board AND lmr.id_member = {int:current_member})
 			WHERE t.id_board IN ({array_int:boards})
 				AND t.id_last_msg >= {int:min_message}
