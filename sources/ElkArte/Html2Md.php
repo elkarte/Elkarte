@@ -558,7 +558,9 @@ class Html2Md
 	{
 		global $txt;
 
-		$href = htmlentities($node->getAttribute('href'), ENT_COMPAT, 'UTF-8', false);
+		$href = htmlspecialchars_decode($node->getAttribute('href'));
+		$href = strtr($href, array('(' => '%28', ')' => '%29', '[' => '%5B', ']' => '%5D', '&' => '%26a'));
+
 		$title = $node->getAttribute('title');
 		$class = $node->getAttribute('class');
 		$value = $this->_get_value($node);
@@ -580,7 +582,9 @@ class Html2Md
 		}
 		else
 		{
-			$markdown = '[' . $value . '](' . $href . ')';
+			// This will trigger a base64 version in our outbound email
+			$link = "\xF0\x9F\x94\x97";
+			$markdown = '[' . $value . '](' . $href . ' ' . $link . ')';
 		}
 
 		// Some links can be very long and if we wrap them they break
