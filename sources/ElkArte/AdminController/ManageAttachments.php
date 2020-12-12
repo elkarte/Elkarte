@@ -913,8 +913,8 @@ class ManageAttachments extends AbstractController
 		);
 
 		$to_fix = !empty($_SESSION['attachments_to_fix']) ? $_SESSION['attachments_to_fix'] : array();
-		$context['repair_errors'] = $this->_req->getSession('attachments_to_fix2', $context['repair_errors']);
-		$fix_errors = isset($this->_req->query->fixErrors);
+		$context['repair_errors'] = isset($_SESSION['attachments_to_fix2']) ? $_SESSION['attachments_to_fix2'] : $context['repair_errors'];
+		$fix_errors = isset($this->_req->query->fixErrors) ? true : false;
 
 		// Get stranded thumbnails.
 		if ($this->step <= 0)
