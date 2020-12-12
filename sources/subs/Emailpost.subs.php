@@ -828,7 +828,7 @@ function pbe_email_attachments($pbe, $email_message)
 
 		// Load the attachmentOptions array with the data needed to create an attachment
 		$attachmentOptions = array(
-			'post' => !empty($email_message->message_id) ? $email_message->message_id : 0,
+			'post' => 0,
 			'poster' => $pbe['profile']['id_member'],
 			'name' => $attachment['name'],
 			'tmp_name' => $attachment['tmp_name'],

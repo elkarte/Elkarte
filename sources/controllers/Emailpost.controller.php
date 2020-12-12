@@ -7,7 +7,7 @@
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
- * @version 1.1
+ * @version 1.1.7
  *
  */
 
@@ -465,6 +465,12 @@ function pbe_create_post($pbe, $email_message, $topic_info)
 	// Make the post.
 	createPost($msgOptions, $topicOptions, $posterOptions);
 
+	// Bind any attachments that may be included to this new message
+	if (!empty($attachIDs) && !empty($msgOptions['id']))
+	{
+		bindMessageAttachments($msgOptions['id'], $attachIDs);
+	}
+
 	// We need the auto_notify setting, it may be theme based so pass the theme in use
 	$theme_settings = query_get_theme($pbe['profile']['id_member'], $pbe['profile']['id_theme'], $topic_info);
 	$auto_notify = isset($theme_settings['auto_notify']) ? $theme_settings['auto_notify'] : 0;
@@ -634,6 +640,12 @@ function pbe_create_topic($pbe, $email_message, $board_info)
 
 	// Attempt to make the new topic.
 	createPost($msgOptions, $topicOptions, $posterOptions);
+
+	// Bind any attachments that may be included to this new topic
+	if (!empty($attachIDs) && !empty($msgOptions['id']))
+	{
+		bindMessageAttachments($msgOptions['id'], $attachIDs);
+	}
 
 	// The auto_notify setting
 	$theme_settings = query_get_theme($pbe['profile']['id_member'], $pbe['profile']['id_theme'], $board_info);
