@@ -11,7 +11,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.1.6
+ * @version 1.1.7
  *
  */
 
@@ -840,8 +840,8 @@ class ManageAttachments_Controller extends Action_Controller
 			'files_without_attachment' => 0,
 		);
 
-		$to_fix = !empty($this->_req->session->attachments_to_fix) ? $this->_req->session->attachments_to_fix : array();
-		$context['repair_errors'] = $this->_req->getSession('attachments_to_fix2', $context['repair_errors']);
+		$to_fix = !empty($_SESSION['attachments_to_fix']) ? $_SESSION['attachments_to_fix'] : array();
+		$context['repair_errors'] = isset($_SESSION['attachments_to_fix2']) ? $_SESSION['attachments_to_fix2'] : $context['repair_errors'];
 		$fix_errors = isset($this->_req->query->fixErrors) ? true : false;
 
 		// Get stranded thumbnails.
