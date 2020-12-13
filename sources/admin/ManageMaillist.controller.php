@@ -8,7 +8,7 @@
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
- * @version 1.1
+ * @version 1.1.7
  *
  */
 
@@ -477,7 +477,7 @@ class ManageMaillist_Controller extends Action_Controller
 	{
 		global $context, $txt, $modSettings, $scripturl, $mbname;
 
-		if (!isset($this->_req->query->bounce))
+		if (isset($this->_req->query->bounce))
 		{
 			checkSession('get');
 			validateToken('admin-ml', 'get');
@@ -486,11 +486,9 @@ class ManageMaillist_Controller extends Action_Controller
 		require_once(SUBSDIR . '/Mail.subs.php');
 
 		// We should have been sent an email ID
-		if (isset($this->_req->query->item))
+		$id = $this->_req->get('item', 'intval');
+		if (!empty($id))
 		{
-			// Needs to be an int!
-			$id = (int) $this->_req->query->item;
-
 			// Load up the email details, no funny biz yall ;)
 			$temp_email = list_maillist_unapproved($id);
 
@@ -534,7 +532,7 @@ class ManageMaillist_Controller extends Action_Controller
 			$context['settings_message'] = $txt['badid'];
 
 		// Check if they are sending the notice
-		if (isset($this->_req->query->bounce) && isset($temp_email))
+		if (isset($this->_req->post->bounce) && isset($temp_email))
 		{
 			checkSession('post');
 			validateToken('admin-ml');
@@ -553,6 +551,8 @@ class ManageMaillist_Controller extends Action_Controller
 				else
 				{
 					// Time for someone to get a we're so sorry message!
+					$mark_down = new Html_2_Md($body);
+					$body = $mark_down->get_markdown();
 					sendmail($to, $subject, $body, null, null, false, 5);
 					redirectexit('action=admin;area=maillist;bounced');
 				}
