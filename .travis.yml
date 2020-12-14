@@ -1,34 +1,24 @@
-sudo: required
 language: php
 dist: trusty
+os: linix
 
-matrix:
+jobs:
   include:
-    - php: 5.6
-      env:
-        - DB=mysql-5.6
-        - WEBTESTS=false
-        - COVERAGE=true
     - php: 7.3
       env:
         - DB=mysql-5.6
         - WEBTESTS=false
         - COVERAGE=false
-    - php: 5.6
-      env:
-        - DB=postgres-9.4
-        - WEBTESTS=false
-        - COVERAGE=true
     - php: 7.1
       env:
         - DB=postgres-9.5
         - WEBTESTS=false
-        - COVERAGE=false
+        - COVERAGE=true
     - php: 5.6
       env:
         - DB=mariadb-10.0
         - WEBTESTS=false
-        - COVERAGE=false
+        - COVERAGE=true
       addons:
         mariadb: '10.0'
   fast_finish: true

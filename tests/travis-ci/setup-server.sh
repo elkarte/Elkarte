@@ -68,14 +68,7 @@ fi
 # Setup cache engines for elkarte cache testing
 if [ "$COVERAGE" == "true" ]
 then
-    if [ "$SHORT_PHP" == "5.3" -o "$SHORT_PHP" == "5.4" ]
-    then
-        sudo apt-get -qq --allow-downgrades install php5-xcache php5-apcu
-        printf "extension=xcache.so\nxcache.size=64M\nxcache.var_size=16M\nxcache.test=On" > xcache.ini
-        phpenv config-add xcache.ini
-        printf "extension=apc.so\napc.enabled=1" > 5.3.ini
-        phpenv config-add 5.3.ini
-    elif [ "$SHORT_PHP" == "7.0" -o "$SHORT_PHP" == "7.1" ]
+    if [ "$SHORT_PHP" == "7.0" -o "$SHORT_PHP" == "7.1" ]
     then
         printf "\n"| pecl install -f apcu
     else
@@ -83,8 +76,8 @@ then
         printf "\n"| pecl install -f channel://pecl.php.net/APCu-4.0.10
 
         # Build Xcache
-        wget http://xcache.lighttpd.net/pub/Releases/3.2.0/xcache-3.2.0.tar.gz
-        tar xf xcache-3.2.0.tar.gz
+        wget https://github.com/xuefer/xcache/archive/3.2.0.tar.gz
+        tar xf 3.2.0.tar.gz
         cd xcache-3.2.0
         phpize
         ./configure
@@ -92,7 +85,7 @@ then
         make --quiet install
         cd ../
         rm -r xcache-3.2.0
-        rm xcache-3.2.0.tar.gz
+        rm 3.2.0.tar.gz
         printf "extension=xcache.so\nxcache.size=64M\nxcache.var_size=16M\nxcache.test=On" > xcache.ini
         phpenv config-add xcache.ini
     fi
