@@ -779,7 +779,7 @@ class Codes
 				self::ATTR_TYPE => self::TYPE_PARSED_CONTENT,
 				self::ATTR_BEFORE => '<div class="bbc_table_container"><table class="bbc_table">',
 				self::ATTR_AFTER => '</table></div>',
-				self::ATTR_TRIM => self::TRIM_INSIDE,
+				self::ATTR_TRIM => self::TRIM_BOTH,
 				self::ATTR_REQUIRE_CHILDREN => array(
 					'tr' => 1,
 				),

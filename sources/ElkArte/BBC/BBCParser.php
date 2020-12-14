@@ -1539,7 +1539,7 @@ class BBCParser
 	{
 		if (preg_match('~(<br />|&nbsp;|\s)*~', $this->message, $matches, null, $offset) !== 0 && isset($matches[0]) && $matches[0] !== '')
 		{
-			$this->message = substr_replace($this->message, '', $this->pos, strlen($matches[0]));
+			$this->message = substr_replace($this->message, '', $offset, strlen($matches[0]));
 		}
 	}
 
