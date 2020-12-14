@@ -20,10 +20,14 @@ function template_show_email()
 
 	echo '
 		<h2 class="category_header">', $txt['show_notice'], '</h2>
-		<h2 class="category_header">', $context['notice_subject'], '</h2>
-		<h2 class="category_header">', $context['notice_from'], '</h2>
-		<h2 class="category_header">', $context['to'], '</h2>
-		<div class="warningbox">', $txt['email_failure'], ': ', $context['error_code'], '</div>
+		<div class="content">
+			<ul>
+				<li><strong>' . $txt['subject'] . ': </strong>', $context['notice_subject'], '</li>
+				<li><strong>' . $txt['from'] . ': </strong>', $context['notice_from'], '</li>
+				<li><strong>' . $txt['to'] . ': </strong>', $context['to'], '</li>
+			</ul>
+			<p class="warningbox">', $txt['email_failure'], ': ', $context['error_code'], '</p>
+		</div>
 		<div class="content">
 			<dl>
 				<dt>

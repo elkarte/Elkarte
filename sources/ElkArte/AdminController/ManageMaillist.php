@@ -380,9 +380,9 @@ class ManageMaillist extends AbstractController
 
 		// Prep and show the template with what we found
 		$context['body'] = $parser->parseEmail($text);
-		$context['to'] = $txt['to'] . ' ' . (isset($email_to) ? $email_to : '');
-		$context['notice_subject'] = isset($temp_email[0]['subject']) ? $txt['subject'] . ': ' . $temp_email[0]['subject'] : '';
-		$context['notice_from'] = isset($temp_email[0]['from']) ? $txt['from'] . ': ' . $temp_email[0]['from'] : '';
+		$context['to'] = isset($email_to) ? $email_to : '';
+		$context['notice_subject'] = isset($temp_email[0]['subject']) ? $temp_email[0]['subject'] : '';
+		$context['notice_from'] = isset($temp_email[0]['from']) ? $temp_email[0]['from'] : '';
 		$context['page_title'] = $txt['show_notice'];
 		$context['error_code'] = isset($temp_email[0]['error_code']) && isset($txt[$temp_email[0]['error_code']]) ? $txt[$temp_email[0]['error_code']] : '';
 		$context['sub_template'] = 'show_email';
