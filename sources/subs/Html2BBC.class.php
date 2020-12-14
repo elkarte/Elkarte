@@ -190,7 +190,12 @@ class Html_2_BBC
 		for ($i = 0, $n = count($parts); $i < $n; $i++)
 		{
 			if ($i % 4 == 0)
-				$parts[$i] = strip_tags($parts[$i]);
+			{
+				// protect << symbols from being stripped
+				$working = str_replace('<<', "[\xC2\xA0]", $parts[$i]);
+				$working = strip_tags($working);
+				$parts[$i] = str_replace("[\xC2\xA0]", '<<', $working);
+			}
 		}
 		$bbc = implode('', $parts);
 
