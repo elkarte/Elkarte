@@ -31,7 +31,7 @@ class TestHTML2Md extends PHPUnit_Framework_TestCase
 			array(
 				'Named links',
 				'<a href="http://www.elkarte.net/" class="bbc_link" target="_blank">ElkArte</a>',
-				'[ElkArte](http://www.elkarte.net/)',
+				'[ElkArte](http://www.elkarte.net/ 🔗)',
 			),
 			array(
 				'URL link',
