@@ -410,7 +410,7 @@ class BBCParser
 			$this->pos2 = $this->pos - 1;
 
 			// See the comment at the end of the big loop - just eating whitespace ;).
-			if (isset($tag[Codes::ATTR_BLOCK_LEVEL]) && isset($this->message[$this->pos]) && substr_compare($this->message, '<br />', $this->pos, 6) === 0)
+			if (!empty($tag[Codes::ATTR_BLOCK_LEVEL]) && isset($this->message[$this->pos]) && substr_compare($this->message, '<br />', $this->pos, 6) === 0)
 			{
 				$this->message = substr_replace($this->message, '', $this->pos, 6);
 			}
