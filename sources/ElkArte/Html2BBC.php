@@ -212,7 +212,10 @@ class Html2BBC
 		{
 			if ($i % 4 === 0)
 			{
-				$parts[$i] = strip_tags($part);
+				// protect << symbols from being stripped
+				$working = str_replace('<<', "[\xC2\xA0]", $parts[$i]);
+				$working = strip_tags($working);
+				$parts[$i] = str_replace("[\xC2\xA0]", '<<', $working);
 			}
 		}
 
