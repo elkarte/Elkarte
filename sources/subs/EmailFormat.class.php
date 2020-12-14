@@ -455,7 +455,11 @@ class Email_Format
 		// Starting a list like a) 1. 1) etc ...
 		$temp = $this->_in_plainlist;
 
-		if (preg_match('~^[a-j](\.|\)|-)\s~i', $var) || preg_match('~^[1-9](\.|\)|-)\s?~', $var) || preg_match('~' . chr(187) . '~', $var))
+		if (preg_match('~^[a-j](\.|\)|-)\s~i', $var)
+			|| preg_match('~^[1-9](\.|\)|-)\s?~', $var)
+			|| preg_match('~' . chr(187) . '~', $var)
+			|| preg_match('~^[ \t]?\* ?~', $var)
+		)
 			$this->_in_plainlist++;
 
 		return $this->_in_plainlist !== $temp;
