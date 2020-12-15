@@ -172,7 +172,13 @@ class Bootstrap
 					$redirec_file = 'install.php';
 				}
 
-				header('Location: http' . (!empty($_SERVER['HTTPS']) && strtolower($_SERVER['HTTPS']) === 'on' ? 's' : '') . '://' . (empty($_SERVER['HTTP_HOST']) ? $_SERVER['SERVER_NAME'] . (empty($_SERVER['SERVER_PORT']) || $_SERVER['SERVER_PORT'] === '80' ? '' : ':' . $_SERVER['SERVER_PORT']) : $_SERVER['HTTP_HOST']) . (strtr(dirname($_SERVER['PHP_SELF']), '\\', '/') == '/' ? '' : strtr(dirname($_SERVER['PHP_SELF']), '\\', '/')) . '/install/' . $redirec_file);
+				$version_running = str_replace('ElkArte ', '', FORUM_VERSION);
+				$proto = 'http' . (!empty($_SERVER['HTTPS']) && strtolower($_SERVER['HTTPS']) === 'on' ? 's' : '');
+				$port = empty($_SERVER['SERVER_PORT']) || $_SERVER['SERVER_PORT'] === '80' ? '' : ':' . $_SERVER['SERVER_PORT'];
+				$host = empty($_SERVER['HTTP_HOST']) ? $_SERVER['SERVER_NAME'] . $port : $_SERVER['HTTP_HOST'];
+				$path = strtr(dirname($_SERVER['PHP_SELF']), '\\', '/') == '/' ? '' : strtr(dirname($_SERVER['PHP_SELF']), '\\', '/');
+
+				header('Location:' . $proto . '://' . $host . $path . '/install/' . $redirec_file . '?v=' . $version_running);
 				die();
 			}
 		}
