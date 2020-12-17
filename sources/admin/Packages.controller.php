@@ -11,7 +11,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.1.6
+ * @version 1.1.7
  *
  */
 
@@ -924,7 +924,7 @@ class Packages_Controller extends Action_Controller
 				'no_items_label' => $txt['no_packages'],
 				'get_items' => array(
 					'function' => array($this, 'list_packages'),
-					'params' => array('type' => $type, 'installed' => $installed),
+					'params' => array('params' => $type, 'installed' => $installed),
 				),
 				'base_href' => $scripturl . '?action=admin;area=packages;sa=' . $context['sub_action'] . ';type=' . $type,
 				'default_sort_col' => 'mod_name' . $type,
@@ -1754,7 +1754,7 @@ class Packages_Controller extends Action_Controller
 	/**
 	 * Get a listing of all the packages
 	 *
-	 * - Determines if the package is a ddon, smiley, avatar, language or unknown package
+	 * - Determines if the package is addon, smiley, avatar, language or unknown package
 	 * - Determines if the package has been installed or not
 	 *
 	 * @param int $start The item to start with (for pagination purposes)
@@ -1916,7 +1916,7 @@ class Packages_Controller extends Action_Controller
 							// Get the highest install version that is available from the package
 							foreach ($installs as $install)
 							{
-								$packageInfo['can_emulate_install'] = matchHighestPackageVersion($install->fetch('@for'), $reset, $the_version);
+								$packageInfo['can_emulate_install'] = matchHighestPackageVersion($install->fetch('@for'), $the_version, $reset);
 								$reset = false;
 							}
 						}
@@ -1961,7 +1961,7 @@ class Packages_Controller extends Action_Controller
 							// Get the highest install version that is available from the package
 							foreach ($uninstalls as $uninstall)
 							{
-								$packageInfo['can_emulate_uninstall'] = matchHighestPackageVersion($uninstall->fetch('@for'), $reset, $the_version);
+								$packageInfo['can_emulate_uninstall'] = matchHighestPackageVersion($uninstall->fetch('@for'), $the_version, $reset);
 								$reset = false;
 							}
 						}
@@ -1975,7 +1975,7 @@ class Packages_Controller extends Action_Controller
 						{
 							if (!empty($context['available_addon'][$packageInfo['id']]))
 							{
-								$packages['modification'][strtolower($packageInfo[$sort]) . '_' . $sort_id['mod']] = $packageInfo['id'];
+								$packages['addon'][strtolower($packageInfo[$sort]) . '_' . $sort_id['addon']] = $packageInfo['id'];
 								$context['available_addon'][$packageInfo['id']] = array_merge($context['available_addon'][$packageInfo['id']], $packageInfo);
 							}
 						}
