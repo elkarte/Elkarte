@@ -1487,7 +1487,7 @@ function parsePackageInfo(&$packageXML, $testing_only = true, $method = 'install
  * @return string|bool highest install value string or false
  * @package Packages
  */
-function matchHighestPackageVersion($versions, $reset = false, $the_version)
+function matchHighestPackageVersion($versions, $the_version, $reset = false)
 {
 	static $near_version = 0;
 

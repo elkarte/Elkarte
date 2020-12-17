@@ -1039,7 +1039,7 @@ class Packages extends AbstractController
 				'no_items_label' => $txt['no_packages'],
 				'get_items' => array(
 					'function' => array($this, 'list_packages'),
-					'params' => array('type' => $type, 'installed' => $installed),
+					'params' => array('params' => $type, 'installed' => $installed),
 				),
 				'base_href' => $scripturl . '?action=admin;area=packages;sa=' . $context['sub_action'] . ';type=' . $type,
 				'default_sort_col' => 'mod_name' . $type,
@@ -2148,7 +2148,7 @@ class Packages extends AbstractController
 							// Get the highest install version that is available from the package
 							foreach ($installs as $install)
 							{
-								$packageInfo['can_emulate_install'] = matchHighestPackageVersion($install->fetch('@for'), $reset, $the_version);
+								$packageInfo['can_emulate_install'] = matchHighestPackageVersion($install->fetch('@for'), $the_version, $reset);
 								$reset = false;
 							}
 						}
@@ -2195,7 +2195,7 @@ class Packages extends AbstractController
 							// Get the highest install version that is available from the package
 							foreach ($uninstalls as $uninstall)
 							{
-								$packageInfo['can_emulate_uninstall'] = matchHighestPackageVersion($uninstall->fetch('@for'), $reset, $the_version);
+								$packageInfo['can_emulate_uninstall'] = matchHighestPackageVersion($uninstall->fetch('@for'), $the_version, $reset);
 								$reset = false;
 							}
 						}
@@ -2209,7 +2209,7 @@ class Packages extends AbstractController
 						{
 							if (!empty($context['available_addon'][$packageInfo['id']]))
 							{
-								$packages['modification'][strtolower($packageInfo[$sort]) . '_' . $sort_id['mod']] = $packageInfo['id'];
+								$packages['addon'][strtolower($packageInfo[$sort]) . '_' . $sort_id['addon']] = $packageInfo['id'];
 								$context['available_addon'][$packageInfo['id']] = array_merge($context['available_addon'][$packageInfo['id']], $packageInfo);
 							}
 						}
