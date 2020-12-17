@@ -766,7 +766,7 @@ function rebuildModCache()
  * @package Authorization
  *
  */
-function elk_setcookie($name, $value = '', $expire = 0, $path = '', $domain = '', $secure = null, $httponly = null)
+function elk_setcookie($name, $value = '', $expire = 0, $path = '', $domain = '', $secure = null, $httponly = null, $samesite = null)
 {
 	global $modSettings;
 
@@ -781,10 +781,27 @@ function elk_setcookie($name, $value = '', $expire = 0, $path = '', $domain = ''
 		$secure = !empty($modSettings['secureCookies']);
 	}
 
-	// Intercept cookie?
-	call_integration_hook('integrate_cookie', array($name, $value, $expire, $path, $domain, $secure, $httponly));
+	// Default value in modern browsers is Lax
+	$samesite = (empty($samesite)) ? 'Lax' : $samesite;
 
-	return setcookie($name, $value, $expire, $path, $domain, $secure, $httponly);
+	// Using SameSite=None requires Secure attribute in latest browser versions.
+	$samesite = (!$secure && $samesite === 'None') ? 'Lax' : $samesite;
+
+	// Intercept cookie?
+	call_integration_hook('integrate_cookie', array($name, $value, $expire, $path, $domain, $secure, $httponly, $samesite));
+
+	if (version_compare(PHP_VERSION, '7.3.0', '<'))
+	{
+		return setcookie($name, $value, $expire, $path, $domain, $secure, $httponly);
+	}
+
+	return setcookie($name, $value, array(
+		'expires' => $expire,
+		'path' => $path,
+		'domain' => $domain,
+		'secure' => $secure,
+		'httponly' => $httponly,
+		'samesite' => $samesite));
 }
 
 /**
