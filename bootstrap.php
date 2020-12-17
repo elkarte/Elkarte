@@ -418,7 +418,8 @@ class Bootstrap
 			obExit(null, true);
 		}
 
-		if (!empty($modSettings['front_page']) && is_callable(array($modSettings['front_page'], 'frontPageHook')))
+		if (!empty($modSettings['front_page']) && class_exists($modSettings['front_page'])
+			&& in_array('frontPageHook', get_class_methods($modSettings['front_page'])))
 		{
 			$modSettings['default_forum_action'] = ['action' => 'forum'];
 		}
