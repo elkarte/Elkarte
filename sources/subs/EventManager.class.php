@@ -109,9 +109,10 @@ class Event_Manager
 			$instance = $this->_getInstance($class_name);
 
 			// Do what we know we should do... if we find it.
-			if (method_exists($instance, $method_name))
+			if (is_callable(array($instance, $method_name)))
 			{
-				if (empty($dependencies))
+				// Don't send $dependencies if there are none / the method can't use them
+				if (empty($dependencies) || $this->_checkParameters($class_name, $method_name) === 0)
 					call_user_func(array($instance, $method_name));
 				else
 					call_user_func_array(array($instance, $method_name), $dependencies);
@@ -243,5 +244,34 @@ class Event_Manager
 				$this->register($position, $event, $priority);
 			}
 		}
+	}
+
+	/**
+	 * Reflects a specific class method to see what parameters are needed
+	 *
+	 * Currently only checks on number required, can be expanded to make use of
+	 * $params = $r->ReflectionParameter() and then $params-> getName getPosition
+	 * getType etc
+	 *
+	 * @param string $class_name
+	 * @param string $method_name
+	 *
+	 * @return int
+	 */
+	protected function _checkParameters($class_name, $method_name)
+	{
+		// Lets check on the required method parameters
+		try
+		{
+			$r = new ReflectionMethod($class_name, $method_name);
+			$number_params = $r->getNumberOfParameters();
+			unset($r);
+		}
+		catch (\Exception $e)
+		{
+			$number_params = 0;
+		}
+
+		return $number_params;
 	}
 }
