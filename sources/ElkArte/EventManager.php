@@ -131,14 +131,16 @@ class EventManager
 			$instance = $this->_getInstance($class_name);
 
 			// Do what we know we should do... if we find it.
-			if (method_exists($instance, $method_name))
+			if (is_callable(array($instance, $method_name)))
 			{
+				// Don't send $dependencies if there are none / the method can't use them
 				if (empty($dependencies))
 				{
 					call_user_func(array($instance, $method_name));
 				}
 				else
 				{
+					$this->_checkParameters($class_name, $method_name, $dependencies);
 					call_user_func_array(array($instance, $method_name), $dependencies);
 				}
 			}
@@ -235,47 +237,34 @@ class EventManager
 	}
 
 	/**
-	 * Registers an event at a certain position with a defined priority.
+	 * Reflects a specific class method to see what parameters are needed
 	 *
-	 * @param string $position The position at which the event will be triggered
-	 * @param mixed[] $event An array describing the event we want to trigger:
-	 *   0 => string - the position at which the event will be triggered
-	 *   1 => string[] - the class and method we want to call:
-	 *      array(
-	 *        0 => string - name of the class to instantiate
-	 *        1 => string - name of the method to call
-	 *      )
-	 *   2 => null|string[] - an array of dependencies in the form of strings representing the
-	 *        name of the variables the method requires.
-	 *        The variables can be from:
-	 *          - the default list of variables passed to the trigger
-	 *          - properties (private, protected, or public) of the object that instantiate the \ElkArte\EventManager
-	 *            (i.e. the controller)
-	 *          - globals
-	 * @param int $priority Defines the order the method is called.
+	 * Currently only checks on number required, can be expanded to make use of
+	 * $params = $r->ReflectionParameter() and then $params-> getName getPosition
+	 * getType etc
+	 *
+	 * @param string $class_name
+	 * @param string $method_name
+	 * @param array $dependencies the dependencies the event registered
 	 */
-	public function register($position, $event, $priority = 0)
+	protected function _checkParameters($class_name, $method_name, &$dependencies)
 	{
-		if (!array_key_exists($position, $this->_registered_events))
+		// Lets check on the actual methods parameters
+		try
 		{
-			$this->_registered_events[$position] = new Event(new Priority());
+			$r = new \ReflectionMethod($class_name, $method_name);
+			$number_params = $r->getNumberOfParameters();
+			unset($r);
+		}
+		catch (\Exception $e)
+		{
+			$number_params = 0;
 		}
 
-		$this->_registered_events[$position]->add($event, $priority);
-	}
-
-	/**
-	 * Gets the names of all the classes already loaded.
-	 *
-	 * @return string[]
-	 */
-	protected function _declared_classes()
-	{
-		if ($this->_declared_classes === null)
+		// Php8 will not like passing parameters to a method that takes none
+		if ($number_params == 0 && !empty($dependencies))
 		{
-			$this->_declared_classes = get_declared_classes();
+			$dependencies = array();
 		}
-
-		return $this->_declared_classes;
 	}
 }
