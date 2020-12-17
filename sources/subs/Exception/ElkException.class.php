@@ -9,7 +9,7 @@
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
- * @version 1.1.4
+ * @version 1.1.7
  *
  */
 
@@ -165,7 +165,7 @@ class Elk_Exception extends Exception
 
 		// Don't need to reload the language file if both the user and
 		// the forum share the same language.
-		if ($language !== $user_info['language'])
+		if (!isset($language) || $language !== $user_info['language'])
 			loadLanguage($lang, $language);
 
 		if ($this->log !== false)
