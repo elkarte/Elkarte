@@ -8,7 +8,7 @@
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
- * @version 1.1.1
+ * @version 1.1.7
  *
  */
 
@@ -149,8 +149,8 @@ class Site_Dispatcher
 			$this->_default_action = $default_action;
 		}
 
-		if (!empty($modSettings['front_page'])
-			&& is_callable(array($modSettings['front_page'], 'frontPageHook')))
+		if (!empty($modSettings['front_page']) && class_exists($modSettings['front_page'])
+			&& in_array('frontPageHook', get_class_methods($modSettings['front_page'])))
 		{
 			$modSettings['default_forum_action'] = '?action=forum;';
 			call_user_func_array(array($modSettings['front_page'], 'frontPageHook'), array(&$this->_default_action));
@@ -308,24 +308,30 @@ class Site_Dispatcher
 			$this->_function_name .= '_api';
 
 		// 3, 2, ... and go
-		if (is_callable(array($this->_controller_name, $this->_function_name)))
+		if (class_exists($this->_controller_name))
 		{
-			return;
-		}
-		elseif (is_callable(array($this->_controller_name, 'action_index')))
-		{
-			$this->_function_name = 'action_index';
-		}
-		// This should never happen, that's why its here :P
-		else
-		{
-			$this->_controller_name = $this->_default_action['controller'];
-			$this->_function_name = $this->_default_action['function'];
-			// Support legacy integrations.
-			if (isset($this->_default_action['file']))
+			// Method requested is in the list of its callable methods
+			if (in_array($this->_function_name, get_class_methods($this->_controller_name)))
 			{
-				require_once($this->_default_action['file']);
+				return;
 			}
+
+			// Maybe the default required by abstract method
+			if ($this->_function_name !== 'action_index'
+				&& in_array('action_index', get_class_methods($this->_controller_name)))
+			{
+				$this->_function_name = 'action_index';
+				return;
+			}
+		}
+
+		// This should never happen, that's why its here :P
+		$this->_controller_name = $this->_default_action['controller'];
+		$this->_function_name = $this->_default_action['function'];
+		// Support legacy integrations.
+		if (isset($this->_default_action['file']))
+		{
+			require_once($this->_default_action['file']);
 		}
 	}
 
