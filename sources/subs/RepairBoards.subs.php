@@ -353,6 +353,7 @@ function loadForumTests()
 				$memberStartedID = getMsgMemberID($row['myid_first_msg']);
 				$memberUpdatedID = getMsgMemberID($row['myid_last_msg']);
 
+				require_once(SUBSDIR . '/Topic.subs.php');
 				setTopicAttribute($row['id_topic'], array(
 					'id_first_msg' => $row['myid_first_msg'],
 					'id_member_started' => $memberStartedID,

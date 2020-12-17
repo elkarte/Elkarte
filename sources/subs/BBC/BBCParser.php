@@ -10,7 +10,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.1
+ * @version 1.1.7
  *
  */
 
@@ -337,7 +337,7 @@ class BBCParser
 				break;
 			}
 
-			if ($tag[Codes::ATTR_BLOCK_LEVEL])
+			if (!empty($tag[Codes::ATTR_BLOCK_LEVEL]))
 			{
 				// Only find out if we need to.
 				if ($block_level === false)
@@ -368,7 +368,7 @@ class BBCParser
 			}
 
 			$to_close[] = $tag;
-		} while ($tag[Codes::ATTR_TAG] !== $look_for);
+		} while (isset($tag[Codes::ATTR_TAG]) && $tag[Codes::ATTR_TAG] !== $look_for);
 
 		// Did we just eat through everything and not find it?
 		if (!$this->hasOpenTags() && (empty($tag) || $tag[Codes::ATTR_TAG] !== $look_for))
@@ -376,7 +376,7 @@ class BBCParser
 			$this->open_tags = $to_close;
 			return;
 		}
-		elseif (!empty($to_close) && $tag[Codes::ATTR_TAG] !== $look_for)
+		elseif (!empty($to_close) && isset($tag[Codes::ATTR_TAG]) && $tag[Codes::ATTR_TAG] !== $look_for)
 		{
 			if ($block_level === null && isset($look_for[0], $this->bbc_codes[$look_for[0]]))
 			{
@@ -410,7 +410,7 @@ class BBCParser
 			$this->pos2 = $this->pos - 1;
 
 			// See the comment at the end of the big loop - just eating whitespace ;).
-			if ($tag[Codes::ATTR_BLOCK_LEVEL] && isset($this->message[$this->pos]) && substr_compare($this->message, '<br />', $this->pos, 6) === 0)
+			if (!empty($tag[Codes::ATTR_BLOCK_LEVEL]) && isset($this->message[$this->pos]) && substr_compare($this->message, '<br />', $this->pos, 6) === 0)
 			{
 				$this->message = substr_replace($this->message, '', $this->pos, 6);
 			}
@@ -488,7 +488,7 @@ class BBCParser
 		{
 			foreach ($this->getOpenedTags() as $open_tag)
 			{
-				if (!$open_tag[Codes::ATTR_AUTOLINK])
+				if (empty($open_tag[Codes::ATTR_AUTOLINK]))
 				{
 					return $data;
 				}
@@ -574,7 +574,7 @@ class BBCParser
 		}
 
 		// If its a footnote, keep track of the number
-		if ($tag[Codes::ATTR_TAG] === 'footnote')
+		if (isset($tag[Codes::ATTR_TAG]) && $tag[Codes::ATTR_TAG] === 'footnote')
 		{
 			$this->num_footnotes++;
 		}
@@ -594,7 +594,7 @@ class BBCParser
 		foreach ($this->open_tags as $open_quote)
 		{
 			// Every parent quote this quote has flips the styling
-			if ($open_quote[Codes::ATTR_TAG] === 'quote')
+			if (isset($open_quote[Codes::ATTR_TAG]) && $open_quote[Codes::ATTR_TAG] === 'quote')
 			{
 				$quote_alt = !$quote_alt;
 			}
@@ -736,7 +736,7 @@ class BBCParser
 		$tag = $this->item_codes[$this->message[$this->pos + 1]];
 
 		// First let's set up the tree: it needs to be in a list, or after an li.
-		if ($this->inside_tag === null || ($this->inside_tag[Codes::ATTR_TAG] !== 'list' && $this->inside_tag[Codes::ATTR_TAG] !== 'li'))
+		if ($this->inside_tag === null || (isset($this->inside_tag[Codes::ATTR_TAG]) && $this->inside_tag[Codes::ATTR_TAG] !== 'list' && $this->inside_tag[Codes::ATTR_TAG] !== 'li'))
 		{
 			$this->addOpenTag(array(
 				Codes::ATTR_TAG => 'list',
@@ -751,7 +751,7 @@ class BBCParser
 			$code = '<ul' . ($tag === '' ? '' : ' style="list-style-type: ' . $tag . '"') . ' class="bbc_list">';
 		}
 		// We're in a list item already: another itemcode?  Close it first.
-		elseif ($this->inside_tag[Codes::ATTR_TAG] === 'li')
+		elseif (isset($this->inside_tag[Codes::ATTR_TAG]) && $this->inside_tag[Codes::ATTR_TAG] === 'li')
 		{
 			$this->closeOpenedTag();
 			$code = '</li>';
@@ -1527,7 +1527,7 @@ class BBCParser
 	{
 		if (preg_match('~(<br />|&nbsp;|\s)*~', $this->message, $matches, null, $offset) !== 0 && isset($matches[0]) && $matches[0] !== '')
 		{
-			$this->message = substr_replace($this->message, '', $this->pos, strlen($matches[0]));
+			$this->message = substr_replace($this->message, '', $offset, strlen($matches[0]));
 		}
 	}
 
@@ -1640,7 +1640,9 @@ class BBCParser
 		// Close all the non block level tags so this tag isn't surrounded by them.
 		for ($i = count($this->open_tags) - 1; $i > $n; $i--)
 		{
-			$tmp = $this->noSmileys($this->open_tags[$i][Codes::ATTR_AFTER]);
+			$tmp = isset($this->open_tags[$i][Codes::ATTR_AFTER])
+				? $this->noSmileys($this->open_tags[$i][Codes::ATTR_AFTER])
+				: $this->noSmileys('');
 			$this->message = substr_replace($this->message, $tmp, $this->pos, 0);
 			$ot_strlen = strlen($tmp);
 			$this->pos += $ot_strlen;

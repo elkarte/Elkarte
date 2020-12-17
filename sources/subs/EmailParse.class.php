@@ -7,7 +7,7 @@
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
- * @version 1.1
+ * @version 1.1.7
  *
  */
 
@@ -324,12 +324,6 @@ class Email_Parse
 		$this->_header_block = '';
 		$match = array();
 
-		// Do we even start with a header in this boundary section?
-		if (!preg_match('~^[\w-]+:[ ].*?\r?\n~i', $this->raw_message))
-		{
-			return;
-		}
-
 		// The header block ends based on condition (1) or (2)
 		if (!preg_match('~^(.*?)\r?\n(?:\r?\n|(?!(\t|[\w-]+:|[ ])))(.*)~s', $this->raw_message, $match))
 		{
@@ -491,6 +485,7 @@ class Email_Parse
 				break;
 			// The text/html content type is an Internet Media Type as well as a MIME content type.
 			case 'text/html':
+			case 'text/watch-html':
 				$this->html_found = true;
 				$this->body = $this->_decode_string($this->body, $this->headers['content-transfer-encoding'], $this->headers['x-parameters']['content-type']['charset']);
 				break;
@@ -531,6 +526,9 @@ class Email_Parse
 			case 'multipart/report':
 			case 'multipart/signed':
 			case 'multipart/encrypted':
+			case 'multipart/relative':
+			case 'multipart/appledouble':
+			case 'application/vnd.wap.multipart.related':
 			case 'message/rfc822':
 				if (!isset($this->headers['x-parameters']['content-type']['boundary']))
 				{
@@ -555,7 +553,7 @@ class Email_Parse
 					$html_ids = array();
 					$text_ids = array();
 					$this->body = '';
-					$this->plain_body = empty($this->plain_body) ? '' : $this->plain_body;
+					$this->plain_body = '';
 					$bypass = array('application/pgp-encrypted', 'application/pgp-signature', 'application/pgp-keys');
 
 					// Go through each boundary section
@@ -589,19 +587,17 @@ class Email_Parse
 					// We always return a plain text version for use
 					if (!empty($text_ids))
 					{
-						foreach ($text_ids as $id)
+						// As parts are ordered by increasing accuracy, use the last one found
+						$this->plain_body = $this->_boundary_section[end($text_ids)]->body;
+						if ($this->_boundary_section[end($text_ids)]->headers["content-transfer-encoding"] === 'base64')
 						{
-							$this->plain_body .= $this->_boundary_section[$id]->body;
+							$this->plain_body = str_replace("\n", '<br />', $this->plain_body);
 						}
 					}
 					elseif (!empty($html_ids))
 					{
 						// This should never run as emails should always have a plain text section to be valid, still ...
-						foreach ($html_ids as $id)
-						{
-							$this->plain_body .= $this->_boundary_section[$id]->body;
-						}
-
+						$this->plain_body .= $this->_boundary_section[0]->body;
 						$this->plain_body = str_ireplace('<p>', "\n\n", $this->plain_body);
 						$this->plain_body = str_ireplace(array('<br />', '<br>', '</p>', '</div>'), "\n", $this->plain_body);
 						$this->plain_body = strip_tags($this->plain_body);
@@ -620,7 +616,7 @@ class Email_Parse
 						// For all the chosen sections
 						foreach ($text_ids as $id)
 						{
-							$this->body .= $this->_boundary_section[$id]->body;
+							$this->body = $this->_boundary_section[$id]->body;
 
 							// A section may have its own attachments if it had is own unique boundary sections
 							// so we need to check and add them in as needed
@@ -748,19 +744,26 @@ class Email_Parse
 		{
 			$part = trim($part);
 
-			// Nothing?
-			if (empty($part))
+			// Nothing or epilogue section?
+			if (empty($part) || (strcmp($part, '--') == 0))
 			{
 				continue;
 			}
 
 			// Parse this section just like its was a separate email
-			$this->_boundary_section[$this->_boundary_section_count] = new Email_Parse();
-			$this->_boundary_section[$this->_boundary_section_count]->read_email($html, $part);
+			$boundary_section = new Email_Parse();
+			$boundary_section->read_email($html, $part);
 
-			$this->plain_body .= $this->_boundary_section[$this->_boundary_section_count]->plain_body;
-
+			// Save the data that we need and release the parser
+			$this->_boundary_section[$this->_boundary_section_count] = new stdClass;
+			$this->_boundary_section[$this->_boundary_section_count]->body = $boundary_section->body;
+			$this->_boundary_section[$this->_boundary_section_count]->plain_body = $boundary_section->plain_body;
+			$this->_boundary_section[$this->_boundary_section_count]->headers = $boundary_section->headers;
+			$this->_boundary_section[$this->_boundary_section_count]->attachments = $boundary_section->attachments;
+			$this->_boundary_section[$this->_boundary_section_count]->inline_files = $boundary_section->inline_files;
 			$this->_boundary_section_count++;
+
+			unset($boundary_section);
 		}
 	}
 
@@ -889,9 +892,9 @@ class Email_Parse
 			$val = $this->_decode_string($val, 'quoted-printable');
 		}
 		// Lines end in the tell tail quoted printable ... wrap and decode
-		elseif (preg_match('~\s=[\r?\n]{1}~s', $val))
+		elseif (preg_match('~\s=[\r?\n]~s', $val))
 		{
-			$val = preg_replace('~\s=[\r?\n]{1}~', ' ', $val);
+			$val = preg_replace('~\s=[\r?\n]~', ' ', $val);
 			$val = $this->_decode_string($val, 'quoted-printable');
 		}
 		// Lines end in = but not ==

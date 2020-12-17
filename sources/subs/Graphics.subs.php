@@ -77,7 +77,7 @@ function createThumbnail($source, $max_width, $max_height)
  */
 function reencodeImage($fileName, $preferred_format = 0)
 {
-	if (!resizeImageFile($fileName, $fileName . '.tmp', null, null, $preferred_format))
+	if (!resizeImageFile($fileName, $fileName . '.tmp', null, null, $preferred_format, true))
 	{
 		if (file_exists($fileName . '.tmp'))
 			unlink($fileName . '.tmp');
@@ -235,8 +235,8 @@ function imageMemoryCheck($sizes)
  * @param int $max_width The maximum allowed width
  * @param int $max_height The maximum allowed height
  * @param int $preferred_format Used by Imagick/resizeImage
- * @param bool $force_resize Always resize the image (force scale up)
  * @param bool $strip Allow IM to remove exif data as GD always will
+ * @param bool $force_resize Always resize the image (force scale up)
  *
  * @return boolean Whether the thumbnail creation was successful.
  */

@@ -11,7 +11,7 @@
  * copyright:    2011 Simple Machines (http://www.simplemachines.org)
  * license:        BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.1
+ * @version 1.1.7
  *
  */
 
@@ -23,7 +23,7 @@
 class Spellcheck_Controller extends Action_Controller
 {
 	/**
-	 * Known words that pspell will not now
+	 * Known words that pspell will not know
 	 *
 	 * @var array
 	 */
@@ -73,16 +73,17 @@ class Spellcheck_Controller extends Action_Controller
 		ob_start();
 		$old = error_reporting(0);
 
-		// See, first, some windows machines don't load pspell properly on the first try.  Dumb, but this is a workaround.
-		pspell_new('en');
-
 		// Next, the dictionary in question may not exist. So, we try it... but...
-		$this->pspell_link = pspell_new($txt['lang_dictionary'], $txt['lang_spelling'], '', 'utf-8', PSPELL_FAST | PSPELL_RUN_TOGETHER);
+		$this->pspell_link = pspell_new($txt['lang_locale'], $txt['lang_spelling'], null, 'utf-8', PSPELL_FAST);
+		if (!$this->pspell_link)
+		{
+			$this->pspell_link = pspell_new($txt['lang_dictionary'], $txt['lang_spelling'], null, 'utf-8', PSPELL_FAST);
+		}
 
 		// Most people don't have anything but English installed... So we use English as a last resort.
 		if (!$this->pspell_link)
 		{
-			$this->pspell_link = pspell_new('en', '', '', '', PSPELL_FAST | PSPELL_RUN_TOGETHER);
+			$this->pspell_link = pspell_new('en');
 		}
 
 		// Reset error reporting to what it was
@@ -92,7 +93,7 @@ class Spellcheck_Controller extends Action_Controller
 		// Nothing to check or nothing to check with
 		if (!isset($this->_req->post->spellstring) || !$this->pspell_link)
 		{
-			die;
+			die ('pspell initializing failure');
 		}
 
 		// Get all the words (Javascript already separated them).

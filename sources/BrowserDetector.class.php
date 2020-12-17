@@ -246,7 +246,7 @@ class Browser_Detector
 		// Be you robot or human?
 		if (!isset($this->_browsers['possibly_robot']))
 		{
-			if ($user_info['possibly_robot']) {
+			if (isset($user_info['possibly_robot'])) {
 				// This isn't meant to be reliable, it's just meant to catch most bots to prevent PHPSESSID from showing up.
 				$this->_browsers['possibly_robot'] = !empty($user_info['possibly_robot']);
 

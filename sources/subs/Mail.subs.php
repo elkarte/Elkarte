@@ -257,9 +257,8 @@ function sendmail($to, $subject, $message, $from = null, $message_id = null, $se
 				$unq_head_array[1] = $message_type;
 				$unq_head_array[2] = $message_id;
 				$unq_head = $unq_head_array[0] . '-' . $unq_head_array[1] . $unq_head_array[2];
-				$encoded_unq_head = base64_encode($line_break . $line_break . '[' . $unq_head . ']' . $line_break);
 				$unq_id = ($need_break ? $line_break : '') . 'Message-ID: <' . $unq_head . strstr(empty($modSettings['maillist_mail_from']) ? $webmaster_email : $modSettings['maillist_mail_from'], '@') . '>';
-				$message = mail_insert_key($message, $unq_head, $encoded_unq_head, $line_break);
+				$message = mail_insert_key($message, $unq_head, $line_break);
 			}
 			elseif (empty($modSettings['mail_no_message_id']))
 				$unq_id = ($need_break ? $line_break : '') . 'Message-ID: <' . md5($boardurl . microtime()) . '-' . $message_id . strstr(empty($modSettings['maillist_mail_from']) ? $webmaster_email : $modSettings['maillist_mail_from'], '@') . '>';
@@ -664,9 +663,8 @@ function smtp_mail($mail_to_array, $subject, $message, $headers, $priority, $mes
 			$unq_head_array[1] = $message_type;
 			$unq_head_array[2] = $message_id;
 			$unq_head = $unq_head_array[0] . '-' . $unq_head_array[1] . $unq_head_array[2];
-			$encoded_unq_head = base64_encode($line_break . $line_break . '[' . $unq_head . ']' . $line_break);
 			$unq_id = ($need_break ? $line_break : '') . 'Message-ID: <' . $unq_head . strstr(empty($modSettings['maillist_mail_from']) ? $webmaster_email : $modSettings['maillist_mail_from'], '@') . '>';
-			$message = mail_insert_key($message, $unq_head, $encoded_unq_head, $line_break);
+			$message = mail_insert_key($message, $unq_head, $line_break);
 		}
 
 		// Fix up the headers for this email!
@@ -778,10 +776,9 @@ function server_parse($message, $socket, $response)
  * @package Mail
  * @param string $message
  * @param string $unq_head
- * @param string $encoded_unq_head
  * @param string $line_break
  */
-function mail_insert_key($message, $unq_head, $encoded_unq_head, $line_break)
+function mail_insert_key($message, $unq_head, $line_break)
 {
 	// Append the key to the bottom of each message section, plain, html, encoded, etc
 	$message = preg_replace('~^(.*?)(' . $line_break . '--ELK-[a-z0-9]{32})~s', "$1{$line_break}{$line_break}[{$unq_head}]{$line_break}$2", $message);
@@ -793,8 +790,9 @@ function mail_insert_key($message, $unq_head, $encoded_unq_head, $line_break)
 	if (preg_match('~(Content-Transfer-Encoding: base64' . $line_break . $line_break . ')(.*?)(' . $line_break . '--ELK-[a-z0-9]{32})~s', $message, $match))
 	{
 		// un-chunk, add in our encoded key header, and re chunk, all so we match RFC 2045 semantics.
-		$encoded_message = str_replace($line_break, '', $match[2]);
-		$encoded_message .= $encoded_unq_head;
+		$encoded_message = base64_decode(str_replace($line_break, '', $match[2]));
+		$encoded_message .= $line_break . $line_break . '[' . $unq_head . ']' . $line_break;
+		$encoded_message = base64_encode($encoded_message);
 		$encoded_message = chunk_split($encoded_message, 76, $line_break);
 		$message = str_replace($match[2], $encoded_message, $message);
 	}
@@ -1409,9 +1407,8 @@ function reduceMailQueue($batch_size = false, $override_limit = false, $force_se
 				$unq_head_array[1] = $email['message_type'];
 				$unq_head_array[2] = $email['message_id'];
 				$unq_head = $unq_head_array[0] . '-' . $unq_head_array[1] . $unq_head_array[2];
-				$encoded_unq_head = base64_encode($line_break . $line_break . '[' . $unq_head . ']' . $line_break);
 				$unq_id = ($need_break ? $line_break : '') . 'Message-ID: <' . $unq_head . strstr(empty($modSettings['maillist_mail_from']) ? $webmaster_email : $modSettings['maillist_mail_from'], '@') . '>';
-				$email['body'] = mail_insert_key($email['body'], $unq_head, $encoded_unq_head, $line_break);
+				$email['body'] = mail_insert_key($email['body'], $unq_head, $line_break);
 			}
 			elseif ($email['message_id'] !== null && empty($modSettings['mail_no_message_id']))
 				$unq_id = ($need_break ? $line_break : '') . 'Message-ID: <' . md5($scripturl . microtime()) . '-' . $email['message_id'] . strstr(empty($modSettings['maillist_mail_from']) ? $webmaster_email : $modSettings['maillist_mail_from'], '@') . '>';

@@ -31,12 +31,12 @@ class TestHTML2Md extends PHPUnit_Framework_TestCase
 			array(
 				'Named links',
 				'<a href="http://www.elkarte.net/" class="bbc_link" target="_blank">ElkArte</a>',
-				'[ElkArte](http://www.elkarte.net/)',
+				'[ElkArte](http://www.elkarte.net/ 🔗)',
 			),
 			array(
 				'URL link',
 				'<a href="http://www.elkarte.net/" class="bbc_link" target="_blank">http://www.elkarte.net/</a>',
-				'[Link](http://www.elkarte.net/)',
+				'[Link](http://www.elkarte.net/ 🔗)',
 			),
 			array(
 				'Lists',
@@ -74,7 +74,7 @@ password, you can reset it by visiting
 [Link](https://www.awesomeforum.com/?action=reminder)
 Before you can login, you first need to activate your account. To do so, please follow this
 link:
-[Reg Link](https://www.awesomeforum.com/?action=register;sa=activate;u=12345;code=S5cv#4Xh)
+[Reg Link](https://www.awesomeforum.com/?action=register;sa=activate;u=12345;code=S5cv#4Xh 🔗)
 Should you have any problems with activation, please visit
 [Link](https://www.awesomeforum.com/?action=register;sa=activate;u=12345) use the code
 "S5cv#4Xh".
