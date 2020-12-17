@@ -146,14 +146,14 @@ class Exception extends \Exception
 
 		// Don't need to reload the language file if both the user and
 		// the forum share the same language.
-		if ($language !== User::$info->language && $lang !== false)
+		if (!isset($language) || $language !== $user_info['language'])
 		{
 			theme()->getTemplates()->loadLanguageFile($lang, $language);
 		}
 
 		if ($this->log !== false)
 		{
-			$msg = !isset($txt[$msg]) ? $msg : vsprintf($txt[$msg], $this->sprintf);
+			$msg = !isset($txt[$msg]) ? $msg : (empty($this->sprintf) ? $txt[$msg] : vsprintf($txt[$msg], $this->sprintf));
 			E::instance()->log_error($msg, $this->log, $this->getFile(), $this->getLine());
 		}
 	}
