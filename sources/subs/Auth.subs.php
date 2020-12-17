@@ -11,7 +11,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.1.2
+ * @version 1.1.7
  *
  */
 
@@ -149,7 +149,7 @@ function url_parts($local, $global)
 
 	// Globalize cookies across domains (filter out IP-addresses)?
 	elseif ($global && preg_match('~^\d{1,3}(\.\d{1,3}){3}$~', $parsed_url['host']) == 0 && preg_match('~(?:[^\.]+\.)?([^\.]{2,}\..+)\z~i', $parsed_url['host'], $parts) == 1)
-			$parsed_url['host'] = '.' . $parts[1];
+		$parsed_url['host'] = '.' . $parts[1];
 
 	// We shouldn't use a host at all if both options are off.
 	elseif (!$local && !$global)
@@ -609,7 +609,7 @@ function validateLoginPassword(&$password, $hash, $user = '', $returnhash = fals
 	}
 	// Or doing a password check?
 	else
-	 	$passhash = (bool) $hasher->CheckPassword($password, $hash);
+		$passhash = (bool) $hasher->CheckPassword($password, $hash);
 
 	unset($hasher);
 
@@ -709,8 +709,9 @@ function rebuildModCache()
  * @param string $domain = ''
  * @param boolean|null $secure = false
  * @param boolean|null $httponly = null
+ * @param string|null $samesite = null Can be one of None, Lax or Strict
  */
-function elk_setcookie($name, $value = '', $expire = 0, $path = '', $domain = '', $secure = null, $httponly = null)
+function elk_setcookie($name, $value = '', $expire = 0, $path = '', $domain = '', $secure = null, $httponly = null, $samesite = null)
 {
 	global $modSettings;
 
@@ -720,10 +721,27 @@ function elk_setcookie($name, $value = '', $expire = 0, $path = '', $domain = ''
 	if ($secure === null)
 		$secure = !empty($modSettings['secureCookies']);
 
-	// Intercept cookie?
-	call_integration_hook('integrate_cookie', array($name, $value, $expire, $path, $domain, $secure, $httponly));
+	// Default value in modern browsers is Lax
+	$samesite = (empty($samesite)) ? 'Lax' : $samesite;
 
-	return setcookie($name, $value, $expire, $path, $domain, $secure, $httponly);
+	// Using SameSite=None requires Secure attribute in latest browser versions.
+	$samesite = (!$secure && $samesite === 'None') ? 'Lax' : $samesite;
+
+	// Intercept cookie?
+	call_integration_hook('integrate_cookie', array($name, $value, $expire, $path, $domain, $secure, $httponly, $samesite));
+
+	if (version_compare(PHP_VERSION, '7.3.0', '<'))
+	{
+		return setcookie($name, $value, $expire, $path, $domain, $secure, $httponly);
+	}
+
+	return setcookie($name, $value, array(
+		'expires' => $expire,
+		'path' => $path,
+		'domain' => $domain,
+		'secure' => $secure,
+		'httponly' => $httponly,
+		'samesite' => $samesite));
 }
 
 /**
