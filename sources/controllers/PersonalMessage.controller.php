@@ -1859,7 +1859,8 @@ class PersonalMessage_Controller extends Action_Controller
 		global $txt, $context, $user_info, $language, $modSettings;
 
 		// Check that this feature is even enabled!
-		if (empty($modSettings['enableReportPM']) || empty($this->_req->getPost('pmsg', 'intval',  $this->_req->getQuery('pmsg', 'intval', 0))))
+		$pmsg_check = $this->_req->getPost('pmsg', 'intval',  $this->_req->getQuery('pmsg', 'intval', 0));
+		if (empty($modSettings['enableReportPM']) || empty($pmsg_check))
 		{
 			throw new Elk_Exception('no_access', false);
 		}
