@@ -11,7 +11,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.1
+ * @version 1.1.7
  *
  */
 
@@ -185,7 +185,7 @@ class CoreFeatures_Controller extends Action_Controller
 			),
 			// pe = post email
 			'pe' => array(
-				'url' => 'action=admin;area=maillist',
+				'url' => 'action=admin;area=maillist;sa=emailsettings',
 				'save_callback' => 'postbyemail_toggle_callback',
 				'settings' => array(
 					'maillist_enabled' => 1,
