@@ -285,7 +285,11 @@ class Errors extends \AbstractModel
 
 		// Maybe they came from dlattach or similar?
 		if (ELK !== 'SSI' && empty($context['theme_loaded']))
+		{
+			$context['linktree'] = isset($context['linktree']) ? $context['linktree'] : array();
+			loadUserSettings();
 			loadTheme();
+		}
 
 		// Don't bother indexing errors mate...
 		$context['robot_no_index'] = true;
