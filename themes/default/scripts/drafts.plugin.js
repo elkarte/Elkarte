@@ -265,9 +265,8 @@
 			formID = $('#' + this.opts.sTextareaID).closest("form").attr('id');
 
 		// Prevent autosave on post/save selection by mouse or keyboard
-		var $_form_submitt = $('#' + formID + ' .button_submit');
-		$_form_submitt.on('mousedown', oInstance, function ()
-		{
+		var $_form_submitt =  $('#' + formID + ' [name="post"]');
+		$_form_submitt.on('mousedown', oInstance, function() {
 			oInstance.opts._bInDraftMode = true;
 		});
 

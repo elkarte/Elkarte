@@ -100,6 +100,7 @@ class PersonalMessage extends AbstractModule
 				array('before_set_context', array('\\ElkArte\\Modules\\Drafts\\PersonalMessage', 'before_set_context'), array()),
 				array('prepare_send_context', array('\\ElkArte\\Modules\\Drafts\\PersonalMessage', 'prepare_send_context'), array('editorOptions', 'recipientList')),
 				array('before_sending', array('\\ElkArte\\Modules\\Drafts\\PersonalMessage', 'before_sending'), array('recipientList')),
+				array('message_sent', array('\\ElkArte\\Modules\\Drafts\\PersonalMessage', 'message_sent'), array('failed')),
 			);
 		}
 		else
