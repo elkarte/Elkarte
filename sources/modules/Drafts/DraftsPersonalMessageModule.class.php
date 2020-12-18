@@ -86,8 +86,8 @@ class Drafts_PersonalMessage_Module extends ElkArte\sources\modules\Abstract_Mod
 
 			// Events
 			return array(
-				array('before_set_context', array('Drafts_PersonalMessage_Module', 'before_set_context'), array()),
-				array('prepare_send_context', array('Drafts_PersonalMessage_Module', 'prepare_send_context'), array('editorOptions', 'recipientList')),
+				array('before_set_context', array('Drafts_PersonalMessage_Module', 'before_set_context'), array('pmsg')),
+				array('prepare_send_context', array('Drafts_PersonalMessage_Module', 'prepare_send_context'), array('editorOptions')),
 				array('before_sending', array('Drafts_PersonalMessage_Module', 'before_sending'), array('recipientList')),
 				array('message_sent', array('Drafts_PersonalMessage_Module', 'message_sent'), array('failed')),
 			);
