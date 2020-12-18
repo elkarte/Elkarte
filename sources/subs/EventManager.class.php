@@ -112,10 +112,13 @@ class Event_Manager
 			if (is_callable(array($instance, $method_name)))
 			{
 				// Don't send $dependencies if there are none / the method can't use them
-				if (empty($dependencies) || $this->_checkParameters($class_name, $method_name) === 0)
+				if (empty($dependencies))
 					call_user_func(array($instance, $method_name));
 				else
+				{
+					$this->_checkParameters($class_name, $method_name, $dependencies);
 					call_user_func_array(array($instance, $method_name), $dependencies);
+				}
 			}
 		}
 	}
@@ -250,17 +253,17 @@ class Event_Manager
 	 * Reflects a specific class method to see what parameters are needed
 	 *
 	 * Currently only checks on number required, can be expanded to make use of
-	 * $params = $r->ReflectionParameter() and then $params-> getName getPosition
-	 * getType etc
+	 * $params = $r->getParameters() and then $param-> getName isOptional etc
+	 * to ensure required named are being passed.
 	 *
 	 * @param string $class_name
 	 * @param string $method_name
+	 * @param array $dependencies the dependencies the event registered
 	 *
-	 * @return int
 	 */
-	protected function _checkParameters($class_name, $method_name)
+	protected function _checkParameters($class_name, $method_name, &$dependencies)
 	{
-		// Lets check on the required method parameters
+		// Lets check on the actual methods parameters
 		try
 		{
 			$r = new ReflectionMethod($class_name, $method_name);
@@ -272,6 +275,11 @@ class Event_Manager
 			$number_params = 0;
 		}
 
-		return $number_params;
+		// Php8 will not like passing parameters to a method that takes none
+		if ($number_params == 0 && !empty($dependencies))
+		{
+			$dependencies = array();
+			return;
+		}
 	}
 }
