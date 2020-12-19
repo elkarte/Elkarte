@@ -279,7 +279,6 @@ class Event_Manager
 		if ($number_params == 0 && !empty($dependencies))
 		{
 			$dependencies = array();
-			return;
 		}
 	}
 }
