@@ -13,7 +13,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.1.4
+ * @version 1.1.7
  *
  */
 
@@ -286,9 +286,19 @@ class Errors extends \AbstractModel
 		// Maybe they came from dlattach or similar?
 		if (ELK !== 'SSI' && empty($context['theme_loaded']))
 		{
+			global $modSettings;
+
+			// Who knew dying took this much effort
 			$context['linktree'] = isset($context['linktree']) ? $context['linktree'] : array();
 			loadUserSettings();
+
+			$_SESSION['session_var'] = '';
+			$_SESSION['session_value'] = '';
 			loadTheme();
+
+			// Here lies elkarte, dead from a program error. Just a cryptic message, no output could be better.
+			$context['user']['can_mod'] = false;
+			$modSettings['default_forum_action'] = '';
 		}
 
 		// Don't bother indexing errors mate...
