@@ -147,7 +147,7 @@ class Query_Analysis
 	 */
 	protected function _is_select_query($query_data)
 	{
-		$is_select_query = substr(trim($query_data), 0, 6) == 'SELECT';
+		$is_select_query = substr(trim($query_data), 0, 6) == 'SELECT' || substr(trim($query_data), 0, 4) == 'WITH';
 		$this->_select = '';
 
 		if ($is_select_query)
