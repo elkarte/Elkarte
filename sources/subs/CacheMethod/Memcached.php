@@ -46,6 +46,7 @@ class Memcached extends Cache_Method_Abstract
 		{
 			$this->obj = new \Memcached($this->_is_persist());
 			$this->setOptions();
+			$this->addServers();
 		}
 	}
 
