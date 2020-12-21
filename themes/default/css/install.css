@@ -132,6 +132,9 @@ img#logo {
 	padding: 1em 0 0 0;
 	overflow: auto;
 }
+.panel .errorbox {
+	font-size: 1.15em;
+}
 /* [WIP] Warning: this next bit may cause trouble. .. confirmed, it does :P */
 /* It's just to hide an empty div when the submits are not shown.
 .panel .clear:nth-child(4) {
