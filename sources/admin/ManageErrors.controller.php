@@ -171,6 +171,7 @@ class ManageErrors_Controller extends Action_Controller
 			{
 				case 'id_member':
 					$id = $filter['value']['sql'];
+					$user_profile[$id]['real_name'] = '';
 					loadMemberData($id, false, 'minimal');
 					$context['filter']['value']['html'] = '<a href="' . $scripturl . '?action=profile;u=' . $id . '">' . $user_profile[$id]['real_name'] . '</a>';
 					break;

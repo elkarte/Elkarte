@@ -227,7 +227,8 @@ class ManageFeatures_Controller extends Action_Controller
 			{
 				$front_page = (string) $this->_req->post->front_page;
 				if (
-					is_callable(array($modSettings['front_page'], 'validateFrontPageOptions'))
+					class_exists($modSettings['front_page'])
+					&& in_array('validateFrontPageOptions', get_class_methods($modSettings['front_page']))
 					&& !$front_page::validateFrontPageOptions($this->_req->post)
 				) {
 					$this->_req->post->front_page = '';

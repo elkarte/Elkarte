@@ -11,7 +11,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.1.4
+ * @version 1.1.7
  *
  */
 
@@ -1280,7 +1280,7 @@ function parsePackageInfo(&$packageXML, $testing_only = true, $method = 'install
  * @param string $the_version
  * @return string|boolean highest install value string or false
  */
-function matchHighestPackageVersion($versions, $reset = false, $the_version)
+function matchHighestPackageVersion($versions, $the_version, $reset = false)
 {
 	static $near_version = 0;
 

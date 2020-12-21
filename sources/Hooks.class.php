@@ -237,7 +237,7 @@ final class Hooks
 
 		foreach ($enabled as $class)
 		{
-			if (is_callable(array($class, 'register')))
+			if (class_exists($class) && in_array('register', get_class_methods($class)))
 			{
 				$hooks = $class::register();
 
@@ -259,7 +259,7 @@ final class Hooks
 
 		foreach ($enabled as $class)
 		{
-			if (is_callable(array($class, 'settingsRegister')))
+			if (class_exists($class) && in_array('settingsRegister', get_class_methods($class)))
 			{
 				$hooks = $class::settingsRegister();
 
