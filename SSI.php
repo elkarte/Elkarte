@@ -505,7 +505,7 @@ function ssi_recentTopics($num_recent = 8, $exclude_boards = null, $include_boar
 			WHERE
 				m.id_topic IN ({array_int:topic_list})
 				AND (m.id_msg > COALESCE(lt.id_msg, lmr.id_msg, 0))
-			GROUP BY m.id_topic',
+			GROUP BY m.id_topic, lt.id_msg, lmr.id_msg',
 			array(
 				'current_member' => $user_info['id'],
 				'topic_list' => $topic_list
