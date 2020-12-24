@@ -11,7 +11,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.1.4
+ * @version 1.1.7
  *
  */
 
@@ -222,7 +222,7 @@ class ManageSmileys_Controller extends Action_Controller
 			$context['smiley_sets'][$i] = array(
 				'id' => $i,
 				'path' => htmlspecialchars($set, ENT_COMPAT, 'UTF-8'),
-				'name' => htmlspecialchars($set_names[$i], ENT_COMPAT, 'UTF-8'),
+				'name' => htmlspecialchars(stripslashes($set_names[$i]), ENT_COMPAT, 'UTF-8'),
 				'selected' => $set == $modSettings['smiley_sets_default']
 			);
 
@@ -543,7 +543,7 @@ class ManageSmileys_Controller extends Action_Controller
 			$context['smiley_sets'][$i] = array(
 				'id' => $i,
 				'path' => htmlspecialchars($set, ENT_COMPAT, 'UTF-8'),
-				'name' => htmlspecialchars($set_names[$i], ENT_COMPAT, 'UTF-8'),
+				'name' => htmlspecialchars(stripslashes($set_names[$i]), ENT_COMPAT, 'UTF-8'),
 				'selected' => $set == $modSettings['smiley_sets_default']
 			);
 
@@ -847,7 +847,7 @@ class ManageSmileys_Controller extends Action_Controller
 			$context['smiley_sets'][$i] = array(
 				'id' => $i,
 				'path' => htmlspecialchars($set, ENT_COMPAT, 'UTF-8'),
-				'name' => htmlspecialchars($set_names[$i], ENT_COMPAT, 'UTF-8'),
+				'name' => htmlspecialchars(stripslashes($set_names[$i]), ENT_COMPAT, 'UTF-8'),
 				'selected' => $set == $modSettings['smiley_sets_default']
 			);
 
@@ -1082,7 +1082,7 @@ class ManageSmileys_Controller extends Action_Controller
 				$context['smiley_sets'][$i] = array(
 					'id' => $i,
 					'path' => htmlspecialchars($set, ENT_COMPAT, 'UTF-8'),
-					'name' => htmlspecialchars($set_names[$i], ENT_COMPAT, 'UTF-8'),
+					'name' => htmlspecialchars(stripslashes($set_names[$i]), ENT_COMPAT, 'UTF-8'),
 					'selected' => $set == $modSettings['smiley_sets_default']
 				);
 
@@ -1212,6 +1212,9 @@ class ManageSmileys_Controller extends Action_Controller
 
 				if (!empty($iconInsert_new))
 					addMessageIcon($iconInsert_new);
+
+				// Flush the cache so the changes are reflected
+				Cache::instance()->remove('posting_icons-' . (int) $this->_req->post->icon_board);
 			}
 
 			// Sort by order, so it is quicker :)
@@ -1671,7 +1674,7 @@ class ManageSmileys_Controller extends Action_Controller
 		$smiley_context = array();
 
 		foreach ($smiley_sets as $i => $set)
-			$smiley_context[$set] = $set_names[$i];
+			$smiley_context[$set] = stripslashes($set_names[$i]);
 
 		$this->_smiley_context = $smiley_context;
 	}

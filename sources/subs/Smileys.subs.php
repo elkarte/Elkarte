@@ -11,7 +11,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.1
+ * @version 1.1.7
  *
  */
 
@@ -486,7 +486,7 @@ function list_getSmileySets($start, $items_per_page, $sort)
 		$cols['id'][] = $i;
 		$cols['selected'][] = $i;
 		$cols['path'][] = $set;
-		$cols['name'][] = $set_names[$i];
+		$cols['name'][] = stripslashes($set_names[$i]);
 	}
 
 	$sort_flag = strpos($sort, 'DESC') === false ? SORT_ASC : SORT_DESC;
