@@ -140,9 +140,6 @@ function template_topic_listing()
 
 	if (!$context['no_topic_listing'])
 	{
-		// We know how to sprite these
-		$message_icon_sprite = array('clip' => '', 'lamp' => '', 'poll' => '', 'question' => '', 'xx' => '', 'moved' => '', 'exclamation' => '', 'thumbup' => '', 'thumbdown' => '');
-
 		// If Quick Moderation is enabled start the form.
 		if (!empty($context['can_quick_mod']) && $options['display_quick_mod'] > 0 && !empty($context['topics']))
 		{
@@ -207,9 +204,9 @@ function template_topic_listing()
 			echo '
 			<li class="', $color_class, '">
 				<div class="topic_info">
-					<p class="topic_icons', isset($message_icon_sprite[$topic['first_post']['icon']]) ? ' topicicon i-' . $topic['first_post']['icon'] : '', '">';
+					<p class="topic_icons', empty($modSettings['messageIcons_enable']) ? ' topicicon i-' . $topic['first_post']['icon'] : '', '">';
 
-			if (!isset($message_icon_sprite[$topic['first_post']['icon']]))
+			if (!empty($modSettings['messageIcons_enable']))
 			{
 				echo '
 						<img src="', $topic['first_post']['icon_url'], '" alt="" />';
