@@ -11,7 +11,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.1.3
+ * @version 1.1.7
  *
  */
 
@@ -660,8 +660,8 @@ class Search_Controller extends Action_Controller
 				'subject' => $message['first_subject'],
 				'href' => $scripturl . '?topic=' . $message['id_topic'] . '.0',
 				'link' => '<a href="' . $scripturl . '?topic=' . $message['id_topic'] . '.0">' . $message['first_subject'] . '</a>',
-				'icon' => $message['first_icon'],
-				'icon_url' => $this->_icon_sources->{$message['first_icon']},
+				'icon' => $this->_icon_sources->getIconName($message['first_icon']),
+				'icon_url' => $this->_icon_sources->getIconURL($message['first_icon']),
 				'member' => array(
 					'id' => $message['first_member_id'],
 					'name' => $message['first_member_name'],
@@ -677,8 +677,8 @@ class Search_Controller extends Action_Controller
 				'subject' => $message['last_subject'],
 				'href' => $scripturl . '?topic=' . $message['id_topic'] . ($message['num_replies'] == 0 ? '.0' : '.msg' . $message['last_msg']) . '#msg' . $message['last_msg'],
 				'link' => '<a href="' . $scripturl . '?topic=' . $message['id_topic'] . ($message['num_replies'] == 0 ? '.0' : '.msg' . $message['last_msg']) . '#msg' . $message['last_msg'] . '">' . $message['last_subject'] . '</a>',
-				'icon' => $message['last_icon'],
-				'icon_url' => $this->_icon_sources->{$message['last_icon']},
+				'icon' => $this->_icon_sources->getIconName($message['last_icon']),
+				'icon_url' => $this->_icon_sources->getIconURL($message['last_icon']),
 				'member' => array(
 					'id' => $message['last_member_id'],
 					'name' => $message['last_member_name'],
@@ -747,8 +747,8 @@ class Search_Controller extends Action_Controller
 			'attachment' => loadAttachmentContext($message['id_msg']),
 			'alternate' => $counter % 2,
 			'member' => &$memberContext[$message['id_member']],
-			'icon' => $message['icon'],
-			'icon_url' => $this->_icon_sources->{$message['icon']},
+			'icon' => $this->_icon_sources->getIconName($message['icon']),
+			'icon_url' => $this->_icon_sources->getIconURL($message['icon']),
 			'subject' => $message['subject'],
 			'subject_highlighted' => $subject_highlighted,
 			'time' => standardTime($message['poster_time']),
