@@ -186,9 +186,12 @@ class ManageAttachments_Controller extends Action_Controller
 				disableModules('attachments', array('post'));
 			}
 
+			// Default/Manual implies no subdirectories
+			if (empty($this->_req->post->automanage_attachments))
+				$this->_req->post->use_subdirectories_for_attachments = 0;
+
 			// Changing the attachment upload directory
-			if (isset($this->_req->post->attachmentUploadDir)
-				|| !empty($this->_req->post->use_subdirectories_for_attachments))
+			if (isset($this->_req->post->attachmentUploadDir))
 			{
 				if (!empty($this->_req->post->attachmentUploadDir) && file_exists($modSettings['attachmentUploadDir']) && $modSettings['attachmentUploadDir'] != $this->_req->post->attachmentUploadDir)
 					rename($modSettings['attachmentUploadDir'], $this->_req->post->attachmentUploadDir);
@@ -201,9 +204,10 @@ class ManageAttachments_Controller extends Action_Controller
 			if (!empty($this->_req->post->use_subdirectories_for_attachments))
 			{
 				// Make sure we have a base directory defined
-				if (isset($this->_req->post->use_subdirectories_for_attachments) && empty($this->_req->post->basedirectory_for_attachments))
-					$this->_req->post->basedirectory_for_attachments = (!empty($modSettings['basedirectory_for_attachments']) ? ($modSettings['basedirectory_for_attachments']) : BOARDDIR);
+				if (empty($this->_req->post->basedirectory_for_attachments))
+					$this->_req->post->basedirectory_for_attachments = !empty($modSettings['basedirectory_for_attachments']) ? ($modSettings['basedirectory_for_attachments']) : BOARDDIR;
 
+				// The current base directories that we know
 				if (!empty($modSettings['attachment_basedirectories']))
 				{
 					if (!is_array($modSettings['attachment_basedirectories']))
@@ -212,16 +216,19 @@ class ManageAttachments_Controller extends Action_Controller
 				else
 					$modSettings['attachment_basedirectories'] = array();
 
+				// Trying to use a non existent base directory
 				if (!empty($this->_req->post->basedirectory_for_attachments) && !in_array($this->_req->post->basedirectory_for_attachments, $modSettings['attachment_basedirectories']))
 				{
 					$currentAttachmentUploadDir = $modSettings['currentAttachmentUploadDir'];
 
+					// If this is a new directory being defined, attempt to create it
 					if (!in_array($this->_req->post->basedirectory_for_attachments, $modSettings['attachmentUploadDir']))
 					{
 						if (!automanage_attachments_create_directory($this->_req->post->basedirectory_for_attachments))
 							$this->_req->post->basedirectory_for_attachments = $modSettings['basedirectory_for_attachments'];
 					}
 
+					// The base directory should be in our list of available bases
 					if (!in_array($this->_req->post->basedirectory_for_attachments, $modSettings['attachment_basedirectories']))
 					{
 						$modSettings['attachment_basedirectories'][$modSettings['currentAttachmentUploadDir']] = $this->_req->post->basedirectory_for_attachments;
@@ -230,7 +237,6 @@ class ManageAttachments_Controller extends Action_Controller
 							'currentAttachmentUploadDir' => $currentAttachmentUploadDir,
 						));
 
-						$this->_req->post->use_subdirectories_for_attachments = 1;
 						$this->_req->post->attachmentUploadDir = serialize($modSettings['attachmentUploadDir']);
 					}
 				}
@@ -316,7 +322,7 @@ class ManageAttachments_Controller extends Action_Controller
 						? $txt['basedirectory_for_attachments_current']
 						: $txt['basedirectory_for_attachments_warning']))
 				),
-				empty($modSettings['attachment_basedirectories']) && $modSettings['currentAttachmentUploadDir'] == 1 && (is_array($modSettings['attachmentUploadDir']) && count($modSettings['attachmentUploadDir']) == 1)
+				is_string($modSettings['attachmentUploadDir'])
 					? array('text', 'attachmentUploadDir', 'postinput' => $txt['attachmentUploadDir_multiple_configure'], 40, 'invalid' => !$context['valid_upload_dir'])
 					: array('var_message', 'attach_current_directory', 'postinput' => $txt['attachmentUploadDir_multiple_configure'], 'message' => 'attachment_path', 'invalid' => empty($context['valid_upload_dir']), 'text_label' => (!empty($context['valid_upload_dir'])
 						? $txt['attach_current_dir']
@@ -1052,7 +1058,7 @@ class ManageAttachments_Controller extends Action_Controller
 		{
 			checkSession();
 
-			$this->current_dir = $this->_req->getPost('current_dir', 'intval', 0);
+			$this->current_dir = $this->_req->getPost('current_dir', 'intval', 1);
 			$new_dirs = array();
 
 			require_once(SUBSDIR . '/Themes.subs.php');
@@ -1318,8 +1324,8 @@ class ManageAttachments_Controller extends Action_Controller
 
 						unset($modSettings['attachment_basedirectories'][$id]);
 						$update = (array(
-							'attachment_basedirectories' => serialize($modSettings['attachment_basedirectories']),
-							'basedirectory_for_attachments' => $modSettings['attachmentUploadDir'][$this->current_base_dir],
+							'attachment_basedirectories' => !empty($modSettings['attachment_basedirectories']) ? serialize($modSettings['attachment_basedirectories']) : '',
+							'basedirectory_for_attachments' => isset($modSettings['attachmentUploadDir'][$this->current_base_dir]) ? $modSettings['attachmentUploadDir'][$this->current_base_dir] : '',
 						));
 					}
 				}
