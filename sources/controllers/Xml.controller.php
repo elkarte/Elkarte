@@ -94,7 +94,7 @@ class Xml_Controller extends Action_Controller
 	{
 		global $context, $board;
 
-		require_once(SUBSDIR . '/Editor.subs.php');
+		require_once(SUBSDIR . '/MessageIcons.subs.php');
 
 		$context['icons'] = getMessageIcons($board);
 		$context['sub_template'] = 'message_icons';
@@ -557,7 +557,7 @@ class Xml_Controller extends Action_Controller
 					$smiley['order'] = -1;
 
 					// If the node after the drop zone is in the same row/container, we use its position
-					if (isset($smiley_tree[$moved_key + 1]))
+					if (isset($smiley_tree[$moved_key + 1], $smiley_tree[$moved_key - 1]))
 					{
 						$possible_after = getSmiley($smiley_tree[$moved_key - 1]);
 						if ($possible_after['row'] == $smiley['row'] && $possible_after['location'] == $smiley['location'])
