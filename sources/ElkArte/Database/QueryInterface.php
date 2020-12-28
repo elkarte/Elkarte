@@ -66,7 +66,7 @@ interface QueryInterface
 	 * @param string $db_string
 	 * @param mixed[] $db_values = array()
 	 * @param mixed[]|null
-	 * @return array
+	 * @return bool|resource
 	 */
 	public function fetchQuery($db_string, $db_values = array());
 
