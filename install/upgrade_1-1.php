@@ -352,6 +352,7 @@ class UpgradeInstructions_upgrade_1_1
 					enableModules('random', array('post', 'display'));
 					\ElkArte\Hooks::instance()->enableIntegration('\\ElkArte\\UserNotificationIntegrate');
 					\ElkArte\Hooks::instance()->enableIntegration('\\ElkArte\\IlaIntegrate');
+					\ElkArte\Hooks::instance()->enableIntegration('\\ElkArte\\EmojiIntegrate');
 					updateSettings(array(
 						'usernotif_favicon_bgColor' => '#ff0000',
 						'usernotif_favicon_position' => 'up',
