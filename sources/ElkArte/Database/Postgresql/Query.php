@@ -244,10 +244,6 @@ class Query extends AbstractQuery
 	{
 		// Special queries that need processing.
 		$replacements = array(
-			'ban_suggest_error_ips' => array(
-				'~RLIKE~' => '~',
-				'~\\.~' => '\.',
-			),
 			'ban_suggest_message_ips' => array(
 				'~RLIKE~' => '~',
 				'~\\.~' => '\.',

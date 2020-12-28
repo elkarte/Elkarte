@@ -1619,23 +1619,19 @@ function banLoadAdditionalIPsError($member_id)
 {
 	$db = database();
 
-	$error_ips = array();
-	$request = $db->query('ban_suggest_error_ips', '
+	$error_ips = $db->fetchQuery('
 		SELECT DISTINCT ip
 		FROM {db_prefix}log_errors
 		WHERE id_member = {int:current_user}
-			AND ip RLIKE {string:poster_ip_regex}
+			AND ip != {string:empty}
 		ORDER BY ip',
 		array(
 			'current_user' => $member_id,
-			'poster_ip_regex' => '^[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}$',
+			'empty' => '',
 		)
-	);
-	while (($row = $request->fetch_assoc()))
-	{
-		$error_ips[] = $row['ip'];
-	}
-	$request->free_result();
+	)->fetch_callback(function ($row) {
+		return $row['ip'];
+	});
 
 	return $error_ips;
 }
