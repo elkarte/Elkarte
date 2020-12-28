@@ -13,10 +13,7 @@
  * @version 1.0.1
  */
 
-if (!defined('ELK'))
-{
-	die('No access...');
-}
+namespace ElkArte;
 
 /**
  * Used to add emoji images to text
@@ -29,7 +26,7 @@ if (!defined('ELK'))
 class Emoji
 {
 	// Array of keys with known emoji names
-	private static $_shortcode_replace = array(
+	private $shortcode_replace = array(
 		'+1' => '', '-1' => '', '100' => '', '1234' => '', '8ball' => '', 'a' => '', 'ab' => '', 'abc' => '', 'abcd' => '', 'accept' => '', 'aerial_tramway' => '', 'airplane' => '', 'alarm_clock' => '', 'alien' => '', 'ambulance' => '', 'anchor' => '',
 		'angel' => '', 'anger' => '', 'angry' => '', 'anguished' => '', 'ant' => '', 'apple' => '', 'aquarius' => '', 'aries' => '', 'arrow_backward' => '', 'arrow_double_down' => '', 'arrow_double_up' => '', 'arrow_down' => '',
 		'arrow_down_small' => '', 'arrow_forward' => '', 'arrow_heading_down' => '', 'arrow_heading_up' => '', 'arrow_left' => '', 'arrow_lower_left' => '', 'arrow_lower_right' => '',
@@ -113,6 +110,8 @@ class Emoji
 		'womans_hat' => '', 'womens' => '', 'wombat' => '', 'worried' => '', 'wrench' => '', 'x' => '', 'yellow_heart' => '', 'yen' => '', 'yum' => '', 'zap' => '', 'zero' => '', 'zzz'
 	);
 
+	private $smileys_url = '';
+
 	/**
 	 * Simple search and replace function
 	 *
@@ -125,6 +124,10 @@ class Emoji
 	 */
 	public static function emojiNameToImage($string)
 	{
+		global $modSettings;
+
+		$emoji = new Emoji(htmlspecialchars($modSettings['smileys_url']) . ($modSettings['emoji_selection'] === 'twitter' ? '/tw_emoji/' : '/emoji/'));
+
 		// Find all emoji tags outside code tags
 		$parts = preg_split('~(\[/code\]|\[code(?:=[^\]]+)?\])~i', $string, -1, PREG_SPLIT_DELIM_CAPTURE);
 
@@ -135,11 +138,16 @@ class Emoji
 			if ($i % 4 == 0)
 			{
 				// They must be at the start of a line, or have a leading space or be after a bbc ] tag
-				$parts[$i] = preg_replace_callback('~(\s?|^|\]|<br \/>)(:([-+\w]+):\s?)~si', 'Emoji::_emojiToImage_Callback', $parts[$i]);
+				$parts[$i] = preg_replace_callback('~(\s?|^|\]|<br \/>)(:([-+\w]+):\s?)~si', [$emoji, 'emojiToImage_Callback'], $parts[$i]);
 			}
 		}
 
 		return implode('', $parts);
+	}
+
+	public function __construct($smileys_url)
+	{
+		$this->smileys_url = $smileys_url;
 	}
 
 	/**
@@ -148,12 +156,10 @@ class Emoji
 	 * @param array $m results form preg_replace_callback
 	 * @return string
 	 */
-	private static function _emojiToImage_Callback($m)
+	private function emojiToImage_Callback($m)
 	{
 		global $modSettings;
 		static $smileys_url = null;
-
-		$smileys_url = empty($smileys_url) ? htmlspecialchars($modSettings['smileys_url']) . ($modSettings['emoji_selection'] === 'twitter' ? '/tw_emoji/' : '/emoji/') : $smileys_url;
 
 		// No :tag: found or not a complete result, return
 		if ((!is_array($m)) || (!isset($m[3])) || (empty($m[3])))
@@ -163,12 +169,12 @@ class Emoji
 		else
 		{
 			// If its not a known tag, just return
-			if (!isset(self::$_shortcode_replace[$m[3]]))
+			if (!isset($this->shortcode_replace[$m[3]]))
 			{
 				return $m[0];
 			}
 
-			$filename = $smileys_url . strtolower($m[3]) . '.png';
+			$filename = $this->smileys_url . strtolower($m[3]) . '.png';
 
 			return $m[1] . '<img class="smiley" style="max-width:18px;padding:0 2px;" src="' . $filename . '" alt="' . strtr($m[2], array(':' => '&#58;', '(' => '&#40;', ')' => '&#41;', '$' => '&#36;', '[' => '&#091;')) . '" title="' . strtr(htmlspecialchars($m[3]), array(':' => '&#58;', '(' => '&#40;', ')' => '&#41;', '$' => '&#36;', '[' => '&#091;')) . '" />';
 		}
