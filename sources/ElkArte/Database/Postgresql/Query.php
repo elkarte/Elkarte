@@ -244,9 +244,6 @@ class Query extends AbstractQuery
 	{
 		// Special queries that need processing.
 		$replacements = array(
-			'attach_download_increase' => array(
-				'~LOW_PRIORITY~' => '',
-			),
 			'insert_log_search_topics' => array(
 				'~NOT RLIKE~' => '!~',
 			),

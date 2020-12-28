@@ -695,8 +695,8 @@ function increaseDownloadCounter($id_attach)
 {
 	$db = database();
 
-	$db->query('attach_download_increase', '
-		UPDATE LOW_PRIORITY {db_prefix}attachments
+	$db->fetchQuery('
+		UPDATE {db_prefix}attachments
 		SET downloads = downloads + 1
 		WHERE id_attach = {int:id_attach}',
 		array(
