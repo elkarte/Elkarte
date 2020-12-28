@@ -205,12 +205,12 @@ function consolidateSpiderStats()
 {
 	$db = database();
 
-	$spider_hits = $db->query('consolidate_spider_stats', '
+	$spider_hits = $db->fetchQuery('
 		SELECT 
 			id_spider, MAX(log_time) AS last_seen, COUNT(*) AS num_hits
 		FROM {db_prefix}log_spider_hits
 		WHERE processed = {int:not_processed}
-		GROUP BY id_spider, MONTH(log_time), DAYOFMONTH(log_time)',
+		GROUP BY id_spider',
 		array(
 			'not_processed' => 0,
 		)
