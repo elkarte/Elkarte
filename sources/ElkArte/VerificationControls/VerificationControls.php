@@ -131,7 +131,7 @@ class VerificationControls
 		}
 
 		// Need GD for CAPTCHA images
-		if (!in_array('gd', get_loaded_extensions()))
+		if (in_array('gd', get_loaded_extensions()))
 		{
 			array_unshift($foundControls, 'captcha');
 		}
