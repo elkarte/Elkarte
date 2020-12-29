@@ -73,6 +73,13 @@ class ProfileInfo extends AbstractController
 			$context['user']['is_owner'] = (int) $this->_memID === (int) $this->user->id;
 		}
 
+		// Attempt to load the member's profile data.
+		if ($this->_profile->isEmpty())
+		{
+			throw new Exception('not_a_user', false);
+		}
+		$this->_profile->loadContext();
+
 		theme()->getTemplates()->loadLanguageFile('Profile');
 	}
 
@@ -114,13 +121,6 @@ class ProfileInfo extends AbstractController
 	public function action_summary()
 	{
 		global $context, $modSettings, $scripturl;
-
-		// Attempt to load the member's profile data.
-		if ($this->_profile->isEmpty())
-		{
-			throw new Exception('not_a_user', false);
-		}
-		$this->_profile->loadContext();
 
 		theme()->getTemplates()->load('ProfileInfo');
 		theme()->getTemplates()->loadLanguageFile('Profile');
