@@ -231,10 +231,7 @@ function removeBanLogs($ids = array())
 	// No specific id's passed, we truncate the entire table
 	if (empty($ids))
 	{
-		$db->query('truncate_table', '
-			TRUNCATE {db_prefix}log_banned',
-			array()
-		);
+		$db->truncate('{db_prefix}log_banned');
 	}
 	else
 	{

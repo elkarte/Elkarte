@@ -36,10 +36,7 @@ class Log extends AbstractModel
 		// Delete all or just some?
 		if ($type === 'delall' && empty($filter))
 		{
-			$this->_db->query('truncate_table','
-				TRUNCATE {db_prefix}log_errors',
-				array()
-			);
+			$this->_db->truncate('{db_prefix}log_errors');
 		}
 		// Deleting all with a filter?
 		elseif ($type === 'delall' && !empty($filter))

@@ -1039,10 +1039,7 @@ function action_upgradeOptions()
 	// Optionally empty the error log?
 	if (!empty($_POST['empty_error']))
 	{
-		$db->query('truncate_table', '
-			TRUNCATE {db_prefix}log_errors',
-			array()
-		);
+		$db->truncate('{db_prefix}log_errors');
 	}
 
 	$changes = array();

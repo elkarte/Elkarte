@@ -79,6 +79,13 @@ interface QueryInterface
 	public function insert_id($table);
 
 	/**
+	 * Deletes all the data from a table
+	 *
+	 * @param string $table
+	 */
+	public function truncate($table);
+
+	/**
 	 * Do a transaction.
 	 *
 	 * @param string $type - the step to perform (i.e. 'begin', 'commit', 'rollback')
