@@ -101,7 +101,7 @@ function messageIndexTopics($id_board, $id_member, $start, $items_per_page, $sor
 			$indexOptions['custom_joins'] = array_merge($indexOptions['custom_joins'], array('LEFT JOIN {db_prefix}attachments AS af ON (af.id_member = mf.id_member AND af.id_member != 0)'));
 		}
 
-		$request = $db->query('substring', '
+		$request = $db->fetchQuery('
 			SELECT
 				t.id_topic, t.num_replies, t.locked, t.num_views, t.num_likes, t.is_sticky, t.id_poll, t.id_previous_board,
 				' . ($id_member == 0 ? '0' : 'COALESCE(lt.id_msg, lmr.id_msg, -1) + 1') . ' AS new_from,

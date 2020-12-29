@@ -822,7 +822,7 @@ function updateSubscription($update, $ignore_active)
 {
 	$db = database();
 
-	$db->query('substring', '
+	$db->fetchQuery('
 		UPDATE {db_prefix}subscriptions
 		SET 
 			name = SUBSTRING({string:name}, 1, 60), description = SUBSTRING({string:description}, 1, 255), active = {int:is_active},

@@ -322,7 +322,7 @@ function ssi_queryPosts($query_where = '', $query_where_params = array(), $query
 	$db = database();
 
 	// Find all the posts. Newer ones will have higher IDs.
-	$request = $db->query('substring', '
+	$request = $db->fetchQuery('
 		SELECT
 			m.poster_time, m.subject, m.id_topic, m.id_member, m.id_msg, m.id_board, b.name AS board_name,
 			COALESCE(mem.real_name, m.poster_name) AS poster_name, ' . (User::$info->is_guest ? '1 AS is_read, 0 AS new_from' : '
@@ -525,7 +525,7 @@ function ssi_recentTopics($num_recent = 8, $exclude_boards = null, $include_boar
 	}
 
 	// Find all the posts in distinct topics. Newer ones will have higher IDs.
-	$request = $db->query('substring', '
+	$request = $db->fetchQuery('
 		SELECT
 			ml.poster_time, ml.id_member, ml.id_msg, ml.smileys_enabled, ml.icon,
 			mf.subject, mf.id_member AS id_op_member, 
