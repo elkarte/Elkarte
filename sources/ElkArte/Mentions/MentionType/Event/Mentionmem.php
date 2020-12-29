@@ -186,7 +186,7 @@ class Mentionmem extends AbstractEventBoardAccess
 				'mentionmem',
 				$msgOptions['id'],
 				$posterOptions['id'],
-				array('id_members' => $this->_actually_mentioned, 'notifier_data' => $posterOptions, 'status' => $becomesApproved
+				array('id_members' => $this->_actually_mentioned, 'notifier_data' => $posterOptions, 'subject' => $msgOptions['subject'], 'status' => $becomesApproved
 					? 'new'
 					: 'unapproved')
 			));
