@@ -29,28 +29,28 @@ class Minifier
     const COMMENT_TOKEN_START = '_CSSMIN_CMT_';
     const RULE_BODY_TOKEN = '_CSSMIN_RBT_%d_';
     const PRESERVED_TOKEN = '_CSSMIN_PTK_%d_';
-
+    
     // Token lists
     private $comments = array();
     private $ruleBodies = array();
     private $preservedTokens = array();
-
+    
     // Output options
     private $keepImportantComments = true;
     private $keepSourceMapComment = false;
     private $linebreakPosition = 0;
-
+    
     // PHP ini limits
     private $raisePhpLimits;
     private $memoryLimit;
     private $maxExecutionTime = 60; // 1 min
     private $pcreBacktrackLimit;
     private $pcreRecursionLimit;
-
+    
     // Color maps
     private $hexToNamedColorsMap;
     private $namedToHexColorsMap;
-
+    
     // Regexes
     private $numRegex;
     private $charsetRegex = '/@charset [^;]+;/Si';
@@ -335,13 +335,13 @@ class Minifier
             array($this, 'processImportUnquotedUrlAtRulesCallback'),
             $css
         );
-
+        
         // Process comments
         $css = $this->processComments($css);
-
+        
         // Process rule bodies
         $css = $this->processRuleBodies($css);
-
+        
         // Process at-rules and selectors
         $css = $this->processAtRulesAndSelectors($css);
 
@@ -376,7 +376,7 @@ class Minifier
             $searchOffset = $matchStartIndex + strlen($m[0][0]);
             $terminator = $m[1][0]; // ', " or empty (not quoted)
             $terminatorRegex = '/(?<!\\\\)'. (strlen($terminator) === 0 ? '' : $terminator.'\s*') .'(\))/S';
-
+            
             $ret .= substr($css, $substrOffset, $matchStartIndex - $substrOffset);
 
             // Terminator found
@@ -467,7 +467,7 @@ class Minifier
     {
         foreach ($this->comments as $commentId => $comment) {
             $commentIdString = '/*'. $commentId .'*/';
-
+            
             // ! in the first position of the comment means preserve
             // so push to the preserved tokens keeping the !
             if ($this->keepImportantComments && strpos($comment, '!') === 0) {
@@ -515,11 +515,6 @@ class Minifier
 
         while (($blockStartPos = strpos($css, '{', $searchOffset)) !== false) {
             $blockEndPos = strpos($css, '}', $blockStartPos);
-			// When ending curly brace is missing, let's
-			// behave like there was one at the end of the block...
-			if (false === $blockEndPos) {
-				$blockEndPos = strlen($css) - 1;
-			}
             $nextBlockStartPos = strpos($css, '{', $blockStartPos + 1);
             $ret .= substr($css, $substrOffset, $blockStartPos - $substrOffset);
 
@@ -555,7 +550,7 @@ class Minifier
 
         // Remove the spaces after the things that should not have spaces after them.
         $body = preg_replace('/([:=,(*\/!;\n]) /S', '$1', $body);
-
+        
         // Replace multiple semi-colons in a row by a single one
         $body = preg_replace('/;;+/S', ';', $body);
 
@@ -569,7 +564,7 @@ class Minifier
         if (strpos($body, '/*') !== false) {
             $body = preg_replace('/\n?\/\*[A-Z0-9_]+\*\/\n?/S', '', $body);
         }
-
+        
         // Empty rule body? Exit :)
         if (empty($body)) {
             return '';
@@ -710,13 +705,13 @@ class Minifier
         $charset = '';
         $imports = '';
         $namespaces = '';
-
+        
         // Remove spaces before the things that should not have spaces before them.
         $css = preg_replace('/ ([@{};>+)\]~=,\/\n])/S', '$1', $css);
 
         // Remove the spaces after the things that should not have spaces after them.
         $css = preg_replace('/([{}:;>+(\[~=,\/\n]) /S', '$1', $css);
-
+        
         // Shorten shortable double colon (CSS3) pseudo-elements to single colon (CSS2)
         $css = preg_replace('/::(before|after|first-(?:line|letter))(\{|,)/Si', ':$1$2', $css);
 
@@ -737,7 +732,7 @@ class Minifier
         if ($this->keepImportantComments) {
             $css = str_replace("\n\n", "\n", $css);
         }
-
+        
         // Restore fraction
         $css = str_replace(self::QUERY_FRACTION, '/', $css);
 
@@ -765,7 +760,7 @@ class Minifier
             array($this, 'strtolowerCallback'),
             $css
         );
-
+        
         // @charset handling
         if (preg_match($this->charsetRegex, $css, $matches)) {
             // Keep the first @charset at-rule found
@@ -789,7 +784,7 @@ class Minifier
             // Delete all @namespace at-rules
             return '';
         }, $css);
-
+        
         // Order critical at-rules:
         // 1. @charset first
         // 2. @imports below @charset
@@ -838,11 +833,11 @@ class Minifier
         $type = $matches[1];
         $values = explode(',', $matches[2]);
         $terminator = $matches[3];
-
+        
         if ($type === 'hsl') {
             $values = Utils::hslToRgb($values);
         }
-
+        
         $hexColors = Utils::rgbToHex($values);
 
         // Restore space after rgb() or hsl() function in some cases such as:
@@ -862,12 +857,12 @@ class Minifier
     private function shortenHexColorsCallback($matches)
     {
         $hex = $matches[1];
-
+        
         // Shorten suitable 6 chars HEX colors
         if (strlen($hex) === 6 && preg_match('/^([0-9a-f])\1([0-9a-f])\2([0-9a-f])\3$/Si', $hex, $m)) {
             $hex = $m[1] . $m[2] . $m[3];
         }
-
+        
         // Lowercase
         $hex = '#'. strtolower($hex);
 
