@@ -1591,7 +1591,7 @@ function banLoadAdditionalIPsMember($member_id)
 			'current_user' => $member_id,
 			'empty' => '',
 		]
-	)
+	);
 	$message_ips = $request->fetch_callback(function($row) {
 		return $row['poster_ip'];
 	});
