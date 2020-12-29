@@ -7,11 +7,7 @@
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause (see accompanying LICENSE.txt file)
  *
-<<<<<<< HEAD:sources/ElkArte/Html2BBC.php
  * @version 2.0 dev
-=======
- * @version 1.1.7
->>>>>>> 4c239a31c... ! sigh ... just yea:sources/subs/Html2BBC.class.php
  *
  */
 

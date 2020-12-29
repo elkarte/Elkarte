@@ -12,11 +12,7 @@
  * This file contains code covered by:
  * copyright: 2011 Simple Machines (http://www.simplemachines.org)
  *
-<<<<<<< HEAD:sources/ElkArte/TopicUtil.php
  * @version 2.0 dev
-=======
- * @version 1.1.7
->>>>>>> 4c239a31c... ! sigh ... just yea:sources/subs/TopicUtil.class.php
  *
  */
 
