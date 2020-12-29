@@ -352,12 +352,6 @@ class EmailParse
 		$this->_header_block = '';
 		$match = array();
 
-		// Do we even start with a header in this boundary section?
-		if (!preg_match('~^[\w-]+:[ ].*?\r?\n~i', $this->raw_message))
-		{
-			return;
-		}
-
 		// The header block ends based on condition (1) or (2)
 		if (!preg_match('~^(.*?)\r?\n(?:\r?\n|(?!(\t|[\w-]+:|[ ])))(.*)~s', $this->raw_message, $match))
 		{
@@ -861,8 +855,8 @@ class EmailParse
 		{
 			$part = trim($part);
 
-			// Nothing?
-			if (empty($part))
+			// Nothing or epilogue section?
+			if (empty($part) || (strcmp($part, '--') == 0))
 			{
 				continue;
 			}
