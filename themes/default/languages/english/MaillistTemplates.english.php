@@ -1,8 +1,8 @@
 <?php
-// Version: 1.1; MaillistTemplates
+// Version: 2.0; MaillistTemplates
 
 // Do not translate anything that is between {}, they are used as replacement variables and MUST remain exactly how they are.
-// 		Additionally do not translate the @additioinal_params: line or the variable names in the lines that follow it.  You may
+// 		Additionally do not translate the @additional_params: line or the variable names in the lines that follow it.  You may
 //		translate the description of the variable.
 //		Do not translate @description:, however you may translate the rest of that line.
 
@@ -17,7 +17,7 @@
 		SIGNATURE: The signature of the member who made the post
 		UNSUBSCRIBELINK: Link to unsubscribe from notifications.
 		EMAILREGARDS: The site name signature
-	@description: A memeber wants to be notified of new topics on a board they are watching
+	@description: A member wants to be notified of new topics on a board they are watching
 */
 $txt['pbe_notify_boards_once_body_subject'] = '[{FORUMNAMESHORT}] {TOPICSUBJECT}';
 $txt['pbe_notify_boards_once_body_body'] = 'A new topic, \'{TOPICSUBJECT}\', has been started in \'{BOARDNAME}\'.
@@ -40,7 +40,7 @@ You can reply to this email and have it posted as a topic reply.
 <*> You can see this message by using this link:
     {TOPICLINK}
 
-<*> Unsubscribe to this by using this link:
+<*> Unsubscribe to this board by using this link:
     {UNSUBSCRIBELINK}
 
 {EMAILREGARDS}';
@@ -81,7 +81,7 @@ You can reply to this email and have it posted as a topic reply.
 <*> You can go to your first unread message by using this link:
     {TOPICLINKNEW}
 
-<*> Unsubscribe to this by using this link:
+<*> Unsubscribe to this board by using this link:
     {UNSUBSCRIBELINK}
 
 {EMAILREGARDS}';
@@ -122,7 +122,7 @@ You can reply to this email and have it posted as a topic reply.
 <*> You can go to your first unread message by using this link:
     {TOPICLINKNEW}
 
-<*> Unsubscribe to this by using this link:
+<*> Unsubscribe to this {SUBSCRIPTION} by using this link:
     {UNSUBSCRIBELINK}
 
 {EMAILREGARDS}';
@@ -164,7 +164,7 @@ You can reply to this email and have it posted as a reply.
 <*> You can go to your first unread message by using this link:
     {TOPICLINKNEW}
 
-<*> Unsubscribe to this by using this link:
+<*> Unsubscribe to this {SUBSCRIPTION} by using this link:
     {UNSUBSCRIBELINK}
 
 {EMAILREGARDS}';
