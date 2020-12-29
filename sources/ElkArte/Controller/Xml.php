@@ -23,7 +23,6 @@ use ElkArte\Exceptions\Exception;
 use ElkArte\User;
 
 /**
- *
  * Receives XMLhttp requests of various types such as
  * jump to, message and group icons, core features, drag and drop ordering
  */
@@ -305,12 +304,12 @@ class Xml extends AbstractController
 		// Failed validation, tough to be you
 		else
 		{
-			if (!empty($validation_session))
+			if ($validation_session !== true)
 			{
-				$errors[] = array('value' => $txt[$validation_session]);
+				$errors[] = array('value' => $txt['session_verify_fail']);
 			}
 
-			if (empty($validation_token))
+			if ($validation_token === false)
 			{
 				$errors[] = array('value' => $txt['token_verify_fail']);
 			}
@@ -485,12 +484,12 @@ class Xml extends AbstractController
 		// Failed validation, extra work for you I'm afraid
 		else
 		{
-			if (!empty($validation_session))
+			if ($validation_session !== true)
 			{
-				$errors[] = array('value' => $txt[$validation_session]);
+				$errors[] = array('value' => $txt['session_verify_fail']);
 			}
 
-			if (empty($validation_token))
+			if ($validation_token === false)
 			{
 				$errors[] = array('value' => $txt['token_verify_fail']);
 			}
@@ -659,12 +658,12 @@ class Xml extends AbstractController
 		// Failed validation :'(
 		else
 		{
-			if (!empty($validation_session))
+			if ($validation_session !== true)
 			{
-				$errors[] = array('value' => $txt[$validation_session]);
+				$errors[] = array('value' => $txt['session_verify_fail']);
 			}
 
-			if (empty($validation_token))
+			if ($validation_token === false)
 			{
 				$errors[] = array('value' => $txt['token_verify_fail']);
 			}
@@ -757,12 +756,12 @@ class Xml extends AbstractController
 		// Failed validation, tough to be you
 		else
 		{
-			if (!empty($validation_session))
+			if ($validation_session !== true)
 			{
-				$errors[] = array('value' => $txt[$validation_session]);
+				$errors[] = array('value' => $txt['session_verify_fail']);
 			}
 
-			if (empty($validation_token))
+			if ($validation_token === false)
 			{
 				$errors[] = array('value' => $txt['token_verify_fail']);
 			}
@@ -856,12 +855,12 @@ class Xml extends AbstractController
 		// Failed validation, tough to be you
 		else
 		{
-			if (!empty($validation_session))
+			if ($validation_session !== true)
 			{
-				$errors[] = array('value' => $txt[$validation_session]);
+				$errors[] = array('value' => $txt['session_verify_fail']);
 			}
 
-			if (empty($validation_token))
+			if ($validation_token === false)
 			{
 				$errors[] = array('value' => $txt['token_verify_fail']);
 			}

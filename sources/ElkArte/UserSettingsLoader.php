@@ -259,7 +259,7 @@ class UserSettingsLoader
 			$_SESSION['id_msg_last_visit'] = $this->settings['id_msg_last_visit'];
 
 			// If it was *at least* five hours ago...
-			if ($visitOpt['poster_time'] < time() - 5 * 3600)
+			if ($visitOpt === false || $visitOpt['poster_time'] < time() - 5 * 3600)
 			{
 				require_once(SUBSDIR . '/Members.subs.php');
 				updateMemberData($this->id, array('id_msg_last_visit' => (int) $modSettings['maxMsgID'], 'last_login' => time(), 'member_ip' => $this->req->client_ip(), 'member_ip2' => $this->req->ban_ip()));
