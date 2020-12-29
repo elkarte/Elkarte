@@ -903,7 +903,7 @@ function pbe_email_attachments($pbe, $email_message)
 
 			// Load the attachmentOptions array with the data needed to create an attachment
 			$attachmentOptions = array(
-				'post' => !empty($email_message->message_id) ? $email_message->message_id : 0,
+				'post' => 0,
 				'poster' => $pbe['profile']['id_member'],
 				'name' => $attachment['name'],
 				'tmp_name' => $attachment['tmp_name'],
@@ -2181,6 +2181,12 @@ function pbe_create_post($pbe, $email_message, $topic_info)
 	// Make the post.
 	createPost($msgOptions, $topicOptions, $posterOptions);
 
+	// Bind any attachments that may be included to this new message
+	if (!empty($attachIDs) && !empty($msgOptions['id']))
+	{
+		bindMessageAttachments($msgOptions['id'], $attachIDs);
+	}
+
 	// We need the auto_notify setting, it may be theme based so pass the theme in use
 	$theme_settings = query_get_theme($pbe['profile']['id_member'], $pbe['profile']['id_theme'], $topic_info);
 	$auto_notify = isset($theme_settings['auto_notify']) ? $theme_settings['auto_notify'] : 0;
@@ -2386,6 +2392,12 @@ function pbe_create_topic($pbe, $email_message, $board_info)
 
 	// Attempt to make the new topic.
 	createPost($msgOptions, $topicOptions, $posterOptions);
+
+	// Bind any attachments that may be included to this new topic
+	if (!empty($attachIDs) && !empty($msgOptions['id']))
+	{
+		bindMessageAttachments($msgOptions['id'], $attachIDs);
+	}
 
 	// The auto_notify setting
 	$theme_settings = query_get_theme($pbe['profile']['id_member'], $pbe['profile']['id_theme'], $board_info);
