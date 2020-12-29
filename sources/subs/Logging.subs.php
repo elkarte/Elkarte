@@ -28,7 +28,7 @@ function deleteLogOnlineInterval($session_id)
 
 	$db = database();
 
-	$db->query('delete_log_online_interval', '
+	$db->fetchQuery('
 		DELETE FROM {db_prefix}log_online
 		WHERE log_time < {int:log_time}
 			AND session != {string:session}',

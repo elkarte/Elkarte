@@ -255,7 +255,7 @@ class OpenID
 		if (!$no_delete)
 		{
 			// Delete the already expired associations.
-			$db->query('openid_delete_assoc_old', '
+			$db->fetchQuery('
 				DELETE FROM {db_prefix}openid_assoc
 				WHERE expires <= {int:current_time}',
 				array(
@@ -265,7 +265,7 @@ class OpenID
 		}
 
 		// Get the association that has the longest lifetime from now.
-		$request = $db->query('openid_select_assoc', '
+		$request = $db->fetchQuery('
 			SELECT server_url, handle, secret, issued, expires, assoc_type
 			FROM {db_prefix}openid_assoc
 			WHERE (server_url = {string:https_server_url} OR server_url = {string:http_server_url})
@@ -592,7 +592,7 @@ class OpenID
 	{
 		$db = database();
 
-		$db->query('openid_remove_association', '
+		$db->fetchQuery('
 			DELETE FROM {db_prefix}openid_assoc
 			WHERE handle = {string:handle}',
 			array(
