@@ -667,7 +667,7 @@ function countConfiguredMemberOptions()
 {
 	$db = database();
 
-	return $db->query('themes_count', '
+	return $db->fetchQuery('
 		SELECT 
 			COUNT(DISTINCT id_member) AS value, id_theme
 		FROM {db_prefix}themes

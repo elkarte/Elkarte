@@ -218,7 +218,7 @@ class Unread
 		}
 		else
 		{
-			$request = $this->_db->query('unread_fetch_topic_count', '
+			$request = $this->_db->fetchQuery('
 				SELECT 
 					COUNT(DISTINCT t.id_topic), MIN(t.id_last_msg)
 				FROM {db_prefix}topics AS t
