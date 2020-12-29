@@ -208,14 +208,17 @@ class Html2BBC
 
 		// Remove any html tags we left behind ( outside of code tags that is )
 		$parts = preg_split('~(\[/code\]|\[code(?:=[^\]]+)?\])~i', $bbc, -1, PREG_SPLIT_DELIM_CAPTURE);
-		foreach ($parts as $i => $part)
+		if ($parts !== false)
 		{
-			if ($i % 4 === 0)
+			foreach ($parts as $i => $part)
 			{
-				// protect << symbols from being stripped
-				$working = str_replace('<<', "[\xC2\xA0]", $parts[$i]);
-				$working = strip_tags($working);
-				$parts[$i] = str_replace("[\xC2\xA0]", '<<', $working);
+				if ($i % 4 === 0)
+				{
+					// protect << symbols from being stripped
+					$working = str_replace('<<', "[\xC2\xA0]", $parts[$i]);
+					$working = strip_tags($working);
+					$parts[$i] = str_replace("[\xC2\xA0]", '<<', $working);
+				}
 			}
 		}
 
