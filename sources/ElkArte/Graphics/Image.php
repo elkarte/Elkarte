@@ -247,8 +247,8 @@ class Image
 	 *
 	 * @param int $max_width The maximum allowed width
 	 * @param int $max_height The maximum allowed height
-	 * @param bool $force_resize Always resize the image (force scale up)
 	 * @param bool $strip Allow IM to remove exif data as GD always will
+	 * @param bool $force_resize Always resize the image (force scale up)
 	 *
 	 * @return bool Whether the thumbnail creation was successful.
 	 */
