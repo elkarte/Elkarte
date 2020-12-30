@@ -1705,14 +1705,14 @@ function selectMessages($topic, $start, $items_per_page, $messages = array(), $o
 			SELECT 
 				m.id_msg 
 			FROM {db_prefix}messages AS m
-		WHERE m.id_topic = {int:current_topic}' . (empty($messages['before']) ? '' : '
-			AND m.id_msg < {int:msg_before}') . (empty($messages['after']) ? '' : '
-			AND m.id_msg > {int:msg_after}') . (empty($messages['excluded']) ? '' : '
-			AND m.id_msg NOT IN ({array_int:no_split_msgs})') . (empty($messages['included']) ? '' : '
-			AND m.id_msg IN ({array_int:split_msgs})') . (!$only_approved ? '' : '
-			AND approved = {int:is_approved}') . '
-		ORDER BY m.id_msg DESC
-		LIMIT {int:start}, {int:messages_per_page}) AS o 
+			WHERE m.id_topic = {int:current_topic}' . (empty($messages['before']) ? '' : '
+				AND m.id_msg < {int:msg_before}') . (empty($messages['after']) ? '' : '
+				AND m.id_msg > {int:msg_after}') . (empty($messages['excluded']) ? '' : '
+				AND m.id_msg NOT IN ({array_int:no_split_msgs})') . (empty($messages['included']) ? '' : '
+				AND m.id_msg IN ({array_int:split_msgs})') . (!$only_approved ? '' : '
+				AND approved = {int:is_approved}') . '
+			ORDER BY m.id_msg DESC
+			LIMIT {int:start}, {int:messages_per_page}) AS o 
 		JOIN {db_prefix}messages as m ON o.id_msg=m.id_msg 
 		LEFT JOIN {db_prefix}members AS mem ON (mem.id_member = m.id_member)
 		ORDER BY m.id_msg DESC',
@@ -2305,9 +2305,9 @@ function getTopicsPostsAndPoster($topic, $limit, $sort)
 	// When evaluating potentially huge offsets, grab the ids only, first.
     // The performance impact is still significant going from three columns to one.
 	$postMod = $modSettings['postmod_active'] && allowedTo('approve_posts');
- 	$db->fetchQuery('display_get_post_poster', '
+	$request = $db->query('display_get_post_poster', '
 		SELECT 
-			id_msg, id_member
+			m.id_msg, m.id_member
 		FROM (
 			SELECT 
 				id_msg 
@@ -2324,17 +2324,17 @@ function getTopicsPostsAndPoster($topic, $limit, $sort)
 			'is_approved' => 1,
 			'blank_id_member' => 0,
 		)
-	)->fetch_callback(
-		function ($row) use (&$topic_details)
-		{
-			if (!empty($row['id_member']))
-			{
-				$topic_details['all_posters'][$row['id_msg']] = $row['id_member'];
-			}
-
-			$topic_details['messages'][] = $row['id_msg'];
-		}
 	);
+	while ($row = $db->fetch_assoc($request))
+	{
+		if (!empty($row['id_member']))
+		{
+			$topic_details['all_posters'][$row['id_msg']] = $row['id_member'];
+		}
+
+		$topic_details['messages'][] = $row['id_msg'];
+	}
+	$db->free_result($request);
 
 	return $topic_details;
 }
