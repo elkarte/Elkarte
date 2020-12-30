@@ -86,7 +86,7 @@ function template_build_poster_div($message, $ignoring = false)
 		}
 
 		// Is this user allowed to modify this member's karma?
-		if ($message['member']['karma']['allow'])
+		if (!empty($message['member']['karma']['allow']))
 		{
 			$poster_div .= '
 									<li class="listlevel2 karma_allow">

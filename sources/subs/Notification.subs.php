@@ -11,6 +11,7 @@
  *
  */
 
+use ElkArte\TokenHash;
 use ElkArte\User;
 
 /**
@@ -1174,7 +1175,7 @@ function getNotifierToken($memID, $memEmail, $memSalt, $area, $extra)
 	global $modSettings;
 
 	// Generate a 22 digit random code suitable for Blowfish crypt.
-	$tokenizer = new \Token_Hash();
+	$tokenizer = new TokenHash();
 	$blowfish_salt = '$2a$10$' . $tokenizer->generate_hash(22);
 	$now = time();
 

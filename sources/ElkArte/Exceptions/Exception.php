@@ -146,7 +146,7 @@ class Exception extends \Exception
 
 		// Don't need to reload the language file if both the user and
 		// the forum share the same language.
-		if (!isset($language) || $language !== $user_info['language'])
+		if (!isset($language) || $language !== User::$info->language)
 		{
 			theme()->getTemplates()->loadLanguageFile($lang, $language);
 		}

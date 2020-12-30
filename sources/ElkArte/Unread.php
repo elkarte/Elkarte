@@ -506,6 +506,6 @@ class Unread
 		}
 		$request->free_result();
 
-		return Topic_Util::prepareContext($return, true, ((int) $this->_preview_bodies) + 128);
+		return TopicUtil::prepareContext($return, true, ((int) $this->_preview_bodies) + 128);
 	}
 }

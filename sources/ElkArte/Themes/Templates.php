@@ -623,7 +623,7 @@ class Templates
 				Errors::instance()->log_error(
 					sprintf(
 						$txt['theme_language_error'],
-						$template_name . '.' . $lang,
+						$template . '.' . $lang,
 						'template'
 					)
 				);

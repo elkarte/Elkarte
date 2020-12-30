@@ -46,7 +46,7 @@ class Mentionmem extends AbstractNotificationBoardAccess
 
 		$replacements = array(
 			'ACTIONNAME' => $this->_task['source_data']['notifier_data']['name'],
-			'SUBJECT' => $this->_task['source_data']['subject'],
+			'SUBJECT' => $this->_task['source_data']['notifier_data']['subject'],
 			'MSGLINK' => replaceBasicActionUrl('{script_url}?msg=' . $this->_task->id_target),
 		);
 

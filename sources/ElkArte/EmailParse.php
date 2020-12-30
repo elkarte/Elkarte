@@ -870,7 +870,7 @@ class EmailParse
 			$boundary_section->read_email($html, $part);
 
 			// Save the data that we need and release the parser
-			$this->_boundary_section[$this->_boundary_section_count] = new stdClass;
+			$this->_boundary_section[$this->_boundary_section_count] = new \stdClass;
 			$this->_boundary_section[$this->_boundary_section_count]->body = $boundary_section->body;
 			$this->_boundary_section[$this->_boundary_section_count]->plain_body = $boundary_section->plain_body;
 			$this->_boundary_section[$this->_boundary_section_count]->headers = $boundary_section->headers;

@@ -3933,7 +3933,7 @@ function getMemberNotificationsProfile($member_id)
 
 		// If they enabled a notifications alert, then lets set a enable alerts browser permission
 		// just blows smoke if they already gave it.
-		$push_enabled &= $modSettings['usernotif_desktop_enable'] && !empty($context['profile_updated']);
+		$push_enabled &= !empty($modSettings['usernotif_desktop_enable']) && !empty($context['profile_updated']);
 		if ($push_enabled)
 		{
 			addInlineJavascript('

@@ -16,6 +16,8 @@
 
 namespace ElkArte\Menu;
 
+use ElkArte\User;
+
 /**
  * Class MenuOptions
  *
@@ -155,14 +157,14 @@ class MenuOptions
 	 */
 	private function buildTemplateVars()
 	{
-		global $user_info, $options;
+		global $options;
 
 		if (empty($this->getMenuType()))
 		{
 			$this->setMenuType(empty($options['use_sidebar_menu']) ? 'dropdown' : 'sidebar');
 		}
 
-		$this->setCanToggleDropDown(!$user_info['is_guest'] && $this->isDropDownToggleable());
+		$this->setCanToggleDropDown(!User::$info->is_guest && $this->isDropDownToggleable());
 
 		$this->setLayerName($this->getLayerName() . '_' . $this->getMenuType());
 	}
