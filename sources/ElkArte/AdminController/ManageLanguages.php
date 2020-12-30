@@ -1056,7 +1056,8 @@ class ManageLanguages extends AbstractController
 	 */
 	private function _checkOpcache()
 	{
-		return (extension_loaded('Zend OPcache') && ini_get('opcache.enable') && stripos(BOARDDIR, ini_get('opcache.restrict_api')) !== 0);
+		return (extension_loaded('Zend OPcache') && ini_get('opcache.enable') &&
+			(ini_get('opcache.restrict_api') === '' || stripos(BOARDDIR, ini_get('opcache.restrict_api')) !== 0));
 	}
 
 	/**
