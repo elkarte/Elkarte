@@ -133,28 +133,13 @@ class DatabaseHandler extends \SessionHandler
 			return false;
 		}
 
-		// First try to update an existing row...
-		$result = $this->_db->query('test_connection', '
-			UPDATE {db_prefix}sessions
-			SET data = {string:data}, last_update = {int:last_update}
-			WHERE session_id = {string:session_id}',
-			array(
-				'last_update' => time(),
-				'data' => $data,
-				'session_id' => $sessionId,
-			)
+		// Update the session data, replace if necessary
+		$this->_db->insert('replace',
+			'{db_prefix}sessions',
+			array('session_id' => 'string', 'data' => 'string', 'last_update' => 'int'),
+			array($sessionId, $data, time()),
+			array('session_id')
 		);
-
-		// If that didn't work, try inserting a new one.
-		if ($result->affected_rows() == 0)
-		{
-			$this->_db->insert('ignore',
-				'{db_prefix}sessions',
-				array('session_id' => 'string', 'data' => 'string', 'last_update' => 'int'),
-				array($sessionId, $data, time()),
-				array('session_id')
-			);
-		}
 
 		return true;
 	}
