@@ -240,8 +240,8 @@ class EventManager
 	 * Reflects a specific class method to see what parameters are needed
 	 *
 	 * Currently only checks on number required, can be expanded to make use of
-	 * $params = $r->ReflectionParameter() and then $params-> getName getPosition
-	 * getType etc
+	 * $params = $r->getParameters() and then $param-> getName isOptional etc
+	 * to ensure required named are being passed.
 	 *
 	 * @param string $class_name
 	 * @param string $method_name
