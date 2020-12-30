@@ -3,9 +3,10 @@
 /**
  * TestCase class for the \ElkArte\CalendarEvent class.
  */
-class TestCalendarEvent extends \PHPUnit\Framework\TestCase
+class TestCalendarEvent extends ElkArteCommonSetupTest
 {
 	protected $backupGlobalsBlacklist = ['user_info'];
+
 	/**
 	 * To avoid duplicated function declarations, we need an empty Calendar.subs.php
 	 */
@@ -29,8 +30,8 @@ class TestCalendarEvent extends \PHPUnit\Framework\TestCase
 		global $context;
 
 		$context['linktree'] = array();
-		// Faking an admin
-		\ElkArte\User::$info->is_admin = true;
+		parent::setUp();
+
 		// Fiddling with globals is a chore in PHPUnit.
 		theme()->getTemplates()->loadLanguageFile('Errors', 'english', true, true);
 	}

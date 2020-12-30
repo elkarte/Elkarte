@@ -80,6 +80,7 @@ abstract class ElkArteCommonSetupTest extends \PHPUnit\Framework\TestCase
 		$modSettings['disableCheckUA'] = 1;
 		$context['session_var'] = 'elk_test_session';
 		$context['session_value'] = 'elk_test_session';
+		$context['session_id'] = 'elk_test_session';
 
 		$this->session = true;
 	}

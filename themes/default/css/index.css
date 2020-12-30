@@ -6098,7 +6098,10 @@ a > i {
 	}
 
 	.statusbar .insertoverlay .button {
+		top: -3em;
+		left: 0;
 		float: none;
+		border-radius: 4px;
 	}
 
 	.statusbar .insertoverlay .range,
@@ -6106,11 +6109,6 @@ a > i {
 	.statusbar .insertoverlay .button {
 		display: block;
 		margin: 1em auto;
-	}
-	.statusbar .insertoverlay .button {
-		left: 0;
-		top: -3em;
-		border-radius: 4px;
 	}
 
 	/*.listlevel1#button_profile .linklevel1 {

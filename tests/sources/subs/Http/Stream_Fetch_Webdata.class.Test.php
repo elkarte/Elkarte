@@ -49,7 +49,7 @@ class TestStreamFetchWebdata extends \PHPUnit\Framework\TestCase
 				'http://elkarte.net',
 				200,
 				'ElkArte, Free and Open Source Community Forum Software',
-				2
+				1
 			),
 		);
 	}

@@ -53,6 +53,6 @@ class TestDisplayIndex extends ElkArteCommonSetupTest
 		// Give the renderer a check as well
 		$controller = $context['get_message'][0];
 		$message = $controller->{$context['get_message'][1]}();
-		$this->assertEquals('Welcome to ElkArte!<br /><br />We hope you enjoy using this software and building your community.&nbsp; If you have any problems, please feel free to <a href="http://www.elkarte.net/index.php" class="bbc_link" target="_blank" rel="noopener noreferrer">ask us for assistance</a>.<br /><br />Thanks!<br />The ElkArte Community.', $message['body']);
+		$this->assertEquals('Welcome to ElkArte!<br /><br />We hope you enjoy using this software and building your community.&nbsp; If you have any problems, please feel free to <a href="https://www.elkarte.net/index.php" class="bbc_link" target="_blank" rel="noopener noreferrer">ask us for assistance</a>.<br /><br />Thanks!<br />The ElkArte Community.', $message['body']);
 	}
 }
