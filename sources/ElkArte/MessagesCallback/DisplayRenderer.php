@@ -80,8 +80,8 @@ class DisplayRenderer extends Renderer
 			'attachment' => loadAttachmentContext($this->_this_message['id_msg']),
 			'href' => $href,
 			'link' => '<a href="' . $href . '" rel="nofollow">' . $this->_this_message['subject'] . '</a>',
-			'icon' => $this->_this_message['icon'],
-			'icon_url' => $this->_options->icon_sources->{$this->_this_message['icon']},
+			'icon' => $this->_options->icon_sources->getIconName($this->_this_message['icon']),
+			'icon_url' => $this->_options->icon_sources->getIconURL($this->_this_message['icon']),
 			'modified' => array(
 				'time' => standardTime($this->_this_message['modified_time']),
 				'html_time' => htmlTime($this->_this_message['modified_time']),
