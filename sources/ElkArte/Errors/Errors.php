@@ -535,8 +535,8 @@ class Errors extends AbstractModel
 			$context['linktree'] = isset($context['linktree']) ? $context['linktree'] : array();
 			User::load(true);
 
-			$_SESSION['session_var'] = '';
-			$_SESSION['session_value'] = '';
+			$_SESSION['session_var'] = isset($_SESSION['session_var']) ? $_SESSION['session_var'] : '';
+			$_SESSION['session_value'] = isset($_SESSION['session_value'] ) ? $_SESSION['session_value'] : '';
 			new ThemeLoader();
 
 			// Here lies elkarte, dead from a program error. Just a cryptic message, no output could be better.
