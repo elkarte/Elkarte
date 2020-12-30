@@ -114,6 +114,65 @@ class MessageTopicIcons extends ValuesContainer
 	}
 
 	/**
+	 * Return the icon specified by idx, or the default icon for invalid names
+	 *
+	 * @param int|string $idx
+	 *
+	 * @return string
+	 */
+	public function __get($idx)
+	{
+		// Not a standard topic icon
+		if (!isset($this->data[$idx]))
+		{
+			$this->_setUrl($idx);
+		}
+
+		return $this->data[$idx];
+	}
+
+	/**
+	 * Return the icon URL specified by idx
+	 *
+	 * @param int|string $idx
+	 * @return string
+	 */
+	public function getIconURL($idx)
+	{
+		$this->_checkValue($idx);
+
+		return $this->data[$idx]['url'];
+	}
+
+	/**
+	 * Return the name of the icon specified by idx
+	 *
+	 * @param int|string $idx
+	 * @return string
+	 */
+	public function getIconName($idx)
+	{
+		$this->_checkValue($idx);
+
+		return $this->data[$idx]['name'];
+	}
+
+	/**
+	 * If the icon does not exist, sets a default
+	 *
+	 * @param $idx
+	 */
+	private function _checkValue($idx)
+	{
+		// Not a standard topic icon
+		if (!isset($this->data[$idx]))
+		{
+			$this->data[$idx]['url'] = $this->data[$this->_default_icon]['url'];
+			$this->data[$idx]['name'] = $this->_default_icon;
+		}
+	}
+
+	/**
 	 * This simple function returns the message topic icon array.
 	 */
 	protected function _loadIcons()
@@ -139,31 +198,15 @@ class MessageTopicIcons extends ValuesContainer
 
 		if ($this->_check)
 		{
-			$this->data[$icon] = $settings[file_exists($this->_theme_dir . '/images/post/' . $icon . '.png')
+			$this->data[$icon]['url'] = $settings[file_exists($this->_theme_dir . '/images/post/' . $icon . '.png')
 					? self::IMAGE_URL
 					: self::DEFAULT_URL] . '/post/' . $icon . '.png';
 		}
 		else
 		{
-			$this->data[$icon] = $settings[self::IMAGE_URL] . '/post/' . $icon . '.png';
-		}
-	}
-
-	/**
-	 * Return the icon specified by idx, or the default icon for invalid names
-	 *
-	 * @param int|string $idx
-	 *
-	 * @return string
-	 */
-	public function __get($idx)
-	{
-		// Not a standard topic icon
-		if (!isset($this->data[$idx]))
-		{
-			$this->_setUrl($idx);
+			$this->data[$icon]['url'] = $settings[self::IMAGE_URL] . '/post/' . $icon . '.png';
 		}
 
-		return $this->data[$idx];
+		$this->data[$icon]['name'] = $icon;
 	}
 }
