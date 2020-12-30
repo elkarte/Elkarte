@@ -948,7 +948,7 @@ class PersonalMessage extends AbstractController
 		);
 
 		// Trigger the prepare_send_context PM event
-		$this->_events->trigger('prepare_send_context', array('pmsg' => isset($this->_req->query->pmsg) ? $this->_req->query->pmsg : (isset($this->_req->query->quote) ? $this->_req->query->quote : 0), 'editorOptions' => &$editorOptions, 'recipientList' => &$context['recipients']));
+		$this->_events->trigger('prepare_send_context', array('editorOptions' => &$editorOptions));
 
 		create_control_richedit($editorOptions);
 
@@ -1094,7 +1094,7 @@ class PersonalMessage extends AbstractController
 		);
 
 		// Trigger the prepare_send_context PM event
-		$this->_events->trigger('prepare_send_context', array('pmsg' => isset($this->_req->query->pmsg) ? $this->_req->query->pmsg : (isset($this->_req->query->quote) ? $this->_req->query->quote : 0), 'editorOptions' => &$editorOptions, 'recipientList' => &$recipient_ids));
+		$this->_events->trigger('prepare_send_context', array('editorOptions' => &$editorOptions));
 
 		create_control_richedit($editorOptions);
 
