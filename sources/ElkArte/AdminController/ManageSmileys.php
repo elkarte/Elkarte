@@ -665,7 +665,7 @@ class ManageSmileys extends AbstractController
 			$context['smiley_sets'][$i] = array(
 				'id' => $i,
 				'path' => htmlspecialchars($set, ENT_COMPAT, 'UTF-8'),
-				'name' => htmlspecialchars(stripslashes$set_names[$i]), ENT_COMPAT, 'UTF-8'),
+				'name' => htmlspecialchars(stripslashes($set_names[$i]), ENT_COMPAT, 'UTF-8'),
 				'selected' => $set === $modSettings['smiley_sets_default']
 			);
 		}
@@ -1025,7 +1025,7 @@ class ManageSmileys extends AbstractController
 			$context['smiley_sets'][$i] = array(
 				'id' => $i,
 				'path' => htmlspecialchars($set, ENT_COMPAT, 'UTF-8'),
-				'name' => htmlspecialchars(stripslashes$set_names[$i]), ENT_COMPAT, 'UTF-8'),
+				'name' => htmlspecialchars(stripslashes($set_names[$i]), ENT_COMPAT, 'UTF-8'),
 				'selected' => $set === $modSettings['smiley_sets_default']
 			);
 		}
@@ -1267,7 +1267,7 @@ class ManageSmileys extends AbstractController
 				$context['smiley_sets'][$i] = array(
 					'id' => $i,
 					'path' => htmlspecialchars($set, ENT_COMPAT, 'UTF-8'),
-					'name' => htmlspecialchars(stripslashes$set_names[$i]), ENT_COMPAT, 'UTF-8'),
+					'name' => htmlspecialchars(stripslashes($set_names[$i]), ENT_COMPAT, 'UTF-8'),
 					'selected' => $set === $modSettings['smiley_sets_default']
 				);
 			}

@@ -11,7 +11,6 @@
  * copyright: 2011 Simple Machines (http://www.simplemachines.org)
  *
  * @version 2.0 dev
-Attachment.php *
  */
 
 use ElkArte\Debug;
