@@ -1712,7 +1712,8 @@ function selectMessages($topic, $start, $items_per_page, $messages = array(), $o
 				AND m.id_msg IN ({array_int:split_msgs})') . (!$only_approved ? '' : '
 				AND approved = {int:is_approved}') . '
 			ORDER BY m.id_msg DESC
-			LIMIT {int:start}, {int:messages_per_page}) AS o 
+			LIMIT {int:start}, {int:messages_per_page}
+		) AS o 
 		JOIN {db_prefix}messages as m ON o.id_msg=m.id_msg 
 		LEFT JOIN {db_prefix}members AS mem ON (mem.id_member = m.id_member)
 		ORDER BY m.id_msg DESC',
@@ -2315,7 +2316,8 @@ function getTopicsPostsAndPoster($topic, $limit, $sort)
 			WHERE id_topic = {int:current_topic}' . ($postMod ? '' : '
 			AND (approved = {int:is_approved}' . (User::$info->is_guest ? '' : ' OR id_member = {int:current_member}') .')') . '
 			ORDER BY id_msg ' . ($sort ? '' : 'DESC') . ($limit['messages_per_page'] == -1 ? '' : '
-			LIMIT (' . $limit['start'] . ', ' . $limit['offset']) . ') AS o 
+			LIMIT ' . $limit['start'] . ', ' . $limit['offset']) . '
+		) AS o 
 		JOIN {db_prefix}messages as m ON o.id_msg=m.id_msg
 		ORDER BY m.id_msg ' . ($sort ? '' : 'DESC'),
 		array(
@@ -3153,7 +3155,8 @@ function mergeableTopics($id_board, $id_topic, $approved, $offset)
 				AND t.id_topic != {int:id_topic}' . (empty($approved) ? '
 				AND t.approved = {int:is_approved}' : '') . '
 			ORDER BY t.is_sticky DESC, t.id_last_msg DESC
-			LIMIT {int:offset}, {int:limit}) AS o 
+			LIMIT {int:offset}, {int:limit}
+		) AS o 
 	    INNER JOIN {db_prefix}topics AS t ON (o.id_topic = t.id_topic)
 	    INNER JOIN {db_prefix}messages AS m ON (m.id_msg = t.id_first_msg)
 		LEFT JOIN {db_prefix}members AS mem ON (mem.id_member = m.id_member)
