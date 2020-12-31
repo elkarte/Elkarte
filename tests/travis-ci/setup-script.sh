@@ -27,7 +27,7 @@ COVER="--prepend /tmp/xdebug-filter.php"
 WEB=""
 if [[ "$COVERAGE" != "true" || "${TRAVIS_PULL_REQUEST}" == "false" ]]; then COVER="--no-coverage"; fi
 if [[ "$WEBTESTS" == "true" ]]; then WEB="-with-webtest"; fi
-CONFIG="--verbose --debug --configuration /var/www/tests/travis-ci/phpunit${WEB}-${SHORT_DB}-travis.xml"
+CONFIG="--stderr --verbose --debug --configuration /var/www/tests/travis-ci/phpunit${WEB}-${SHORT_DB}-travis.xml"
 
 # Run PHPUnit test to ensure the DB was correctly installed/populated
 #/var/www/vendor/bin/phpunit /var/www/tests/travis-ci/DatabaseTestExt.php --coverage-clover /tmp/dbcoverage.xml;

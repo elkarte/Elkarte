@@ -40,8 +40,6 @@ class WeightFactors
 	 */
 	private function _setup_weight_factors()
 	{
-		global $modSettings;
-
 		$default_factors = $this->_weight_factors = array(
 			'frequency' => array(
 				'search' => 'COUNT(*) / (MAX(t.num_replies) + 1)',
@@ -85,7 +83,7 @@ class WeightFactors
 		call_integration_hook('integrate_search_weights', array(&$this->_weight_factors));
 
 		// Set the weight factors for each area (frequency, age, etc) as defined in the ACP
-		$this->_calculate_weights($this->_weight_factors, $modSettings);
+		$this->_calculate_weights($this->_weight_factors, $this->_input_weights);
 
 		// Zero weight.  Weightless :P.
 		if (empty($this->_weight_total))

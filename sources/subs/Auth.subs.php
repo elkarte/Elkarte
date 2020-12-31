@@ -884,7 +884,7 @@ function findUser($where, $where_params, $fatal = true)
  *
  * @param string $email
  * @param string|null $username
- * @return bool
+ * @return false|int on failure, int of member on success
  * @throws \Exception
  * @package Authorization
  */
@@ -892,7 +892,8 @@ function userByEmail($email, $username = null)
 {
 	$db = database();
 
-	$request = $db->fetchQuery('
+	$return = false;
+	$db->fetchQuery('
 		SELECT 
 			id_member
 		FROM {db_prefix}members
@@ -903,10 +904,11 @@ function userByEmail($email, $username = null)
 			'email_address' => $email,
 			'username' => $username,
 		)
+	)->fetch_callback(
+		function ($row) use(&$return) {
+			$return = (int) $row['id_member'];
+		}
 	);
-
-	$return = $request->num_rows() !== 0;
-	$request->free_result();
 
 	return $return;
 }

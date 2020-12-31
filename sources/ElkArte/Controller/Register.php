@@ -1015,7 +1015,7 @@ class Register extends AbstractController
 
 			// Ummm... don't take someone else's email during the change
 			// @todo Separate the sprintf?
-			if (userByEmail($this->_req->post->new_email))
+			if  (userByEmail($this->_req->post->new_email) === false)
 			{
 				throw new Exception('email_in_use', false, array(htmlspecialchars($this->_req->post->new_email, ENT_COMPAT, 'UTF-8')));
 			}
