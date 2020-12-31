@@ -142,14 +142,6 @@ class Unread
 	}
 
 	/**
-	 * If a temporary table has been created
-	 */
-	public function hasTempTable()
-	{
-		return $this->_have_temp_table;
-	}
-
-	/**
 	 * Counts the number of unread topics or messages
 	 *
 	 * @param bool $first_login - If this is the first login of the user

@@ -26,6 +26,7 @@ use ElkArte\Exceptions\Exception;
 use ElkArte\SettingsForm\SettingsForm;
 use ElkArte\User;
 use ElkArte\Util;
+use ElkArte\Html2Md;
 
 /**
  * This class is the administration maillist controller.
@@ -602,7 +603,7 @@ class ManageMaillist extends AbstractController
 				else
 				{
 					// Time for someone to get a we're so sorry message!
-					$mark_down = new Html_2_Md($body);
+					$mark_down = new Html2Md($body);
 					$body = $mark_down->get_markdown();
 					sendmail($to, $subject, $body, null, null, false, 5);
 					redirectexit('action=admin;area=maillist;bounced');

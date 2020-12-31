@@ -19,6 +19,7 @@ namespace ElkArte\Controller;
 
 use ElkArte\AbstractController;
 use ElkArte\Exceptions\Exception;
+use ElkArte\Action;
 
 /**
  * Functions that turn on and off various member notifications
@@ -49,7 +50,7 @@ class Notify extends AbstractController
 		);
 
 		// We like action, so lets get ready for some
-		$action = new Action('');
+		$action = new Action('notify');
 
 		// Get the subAction, or just go to action_notify
 		$subAction = $action->initialize($subActions, 'notify');
@@ -617,7 +618,7 @@ class Notify extends AbstractController
 			case 'mentionmem':
 			case 'quotedmem':
 			case 'rlikemsg':
-				loadLanguage('Mentions');
+				theme()->getTemplates()->loadLanguageFile('Mentions');
 				$context['unsubscribe_message'] = sprintf($txt['notify_mention_unsubscribed'], $txt['mentions_type_' . $area], $email);
 				break;
 			default:
@@ -625,7 +626,7 @@ class Notify extends AbstractController
 				break;
 		}
 
-		loadTemplate('Notify');
+		theme()->getTemplates()->load('Notify');
 		$context['page_title'] = $txt['notifications'];
 		$context['sub_template'] = 'notify_unsubscribe';
 	}

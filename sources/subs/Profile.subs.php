@@ -3936,7 +3936,7 @@ function getMemberNotificationsProfile($member_id)
 		$push_enabled &= !empty($modSettings['usernotif_desktop_enable']) && !empty($context['profile_updated']);
 		if ($push_enabled)
 		{
-			addInlineJavascript('
+			theme()->addInlineJavascript('
 				$(function() {
 					Push.Permission.request();
 				});', true);

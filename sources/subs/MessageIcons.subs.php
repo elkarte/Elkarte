@@ -14,6 +14,8 @@
  *
  */
 
+use ElkArte\Cache\Cache;
+
 /**
  * Gets a list of all available message icons.
  */
