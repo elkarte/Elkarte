@@ -153,11 +153,11 @@ class TestSearchclass extends \PHPUnit\Framework\TestCase
 
 	/**
 	 * Admins are able to find both topics
+	 *
+	 * @runInSeparateProcess
 	 */
 	public function testBasicAdminSearch()
 	{
-		global $cookiename;
-
 		if ($this->run_tests === false)
 		{
 			return;
@@ -178,6 +178,8 @@ class TestSearchclass extends \PHPUnit\Framework\TestCase
 	/**
 	 * Normal users with access to one of the two boards are able to find
 	 * only one topic
+	 *
+	 * @runInSeparateProcess
 	 */
 	public function testBasicMemberSearch()
 	{

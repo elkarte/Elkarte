@@ -253,7 +253,7 @@ class Auth extends AbstractController
 		$req = request();
 
 		$user = new UserSettingsLoader($db, $cache, $req);
-		$user->loadUserById($member_found['id_member'], true, '');
+		$user->loadUserById($member_found === false ? 0 : $member_found['id_member'], true, '');
 		$user_setting = $user->getSettings();
 
 		// User using 2FA for login? Let's validate the token...

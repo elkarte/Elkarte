@@ -162,7 +162,7 @@ class StreamFetchWebdata
 		if (!empty($this->_user_options['max_length']))
 		{
 			$this->_content_length = intval($this->_user_options['max_length']);
-			$this->_options['http']['header'][] = 'Range: bytes=0-' . $this->_content_length - 1;
+			$this->_options['http']['header'][] = 'Range: bytes=0-' . ($this->_content_length - 1);
 		}
 
 		if (!empty($this->_post_data))
