@@ -574,7 +574,7 @@ $txt['skip_nav'] = 'Skip to main content';
 $txt['go_up'] = 'Go Up';
 $txt['go_down'] = 'Go Down';
 
-$forum_copyright = '<a href="http://www.elkarte.net" title="ElkArte Forum" target="_blank" class="new_win">Powered by %1$s</a> | <a href="{credits_url}" title="Credits" target="_blank" class="new_win" rel="nofollow">Credits</a>';
+$forum_copyright = '<a href="https://www.elkarte.net" title="ElkArte Forum" target="_blank" class="new_win">Powered by %1$s</a> | <a href="{credits_url}" title="Credits" target="_blank" class="new_win" rel="nofollow">Credits</a>';
 
 $txt['birthdays'] = 'Birthdays:';
 $txt['events'] = 'Events:';
@@ -784,6 +784,11 @@ $txt['approve_many_members_waiting'] = 'There are <a href="%1$s">%2$d members</a
 
 $txt['notifyboard_turnon'] = 'Do you want a notification email when someone posts a new topic in this board?';
 $txt['notifyboard_turnoff'] = 'Are you sure you do not want to receive new topic notifications for this board?';
+
+$txt['notify_board_unsubscribed'] = 'The email, %2$s, has been successfully unsubscribed and will no longer be sent notifications from the "%1$s" board.';
+$txt['notify_topic_unsubscribed'] = 'The email, %2$s, has been successfully unsubscribed and will no longer be sent notifications on the "%1$s" topic.';
+$txt['notify_mention_unsubscribed'] = 'The email, %2$s, has been successfully unsubscribed and will no longer be sent "%1$s" notifications.';
+$txt['notify_default_unsubscribed'] = 'Your request has been successfully processed.';
 
 $txt['find_members'] = 'Find Members';
 $txt['find_username'] = 'Name, username, or email address';

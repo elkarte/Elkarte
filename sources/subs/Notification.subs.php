@@ -11,6 +11,7 @@
  *
  */
 
+use ElkArte\TokenHash;
 use ElkArte\User;
 
 /**
@@ -155,7 +156,7 @@ function sendNotifications($topics, $type, $exclude = array(), $members_only = a
 			SELECT
 				mem.id_member, mem.email_address, mem.notify_regularity, mem.notify_types, mem.notify_send_body, mem.lngfile, mem.warning,
 				ln.sent, mem.id_group, mem.additional_groups, b.member_groups, mem.id_post_group, b.name, b.id_profile,
-				ln.id_board
+				ln.id_board, mem.password_salt
 			FROM {db_prefix}log_notify AS ln
 				INNER JOIN {db_prefix}boards AS b ON (b.id_board = ln.id_board)
 				INNER JOIN {db_prefix}members AS mem ON (mem.id_member = ln.id_member)
@@ -221,9 +222,11 @@ function sendNotifications($topics, $type, $exclude = array(), $members_only = a
 					'POSTERNAME' => un_htmlspecialchars($data['name']),
 					'TOPICLINKNEW' => $scripturl . '?topic=' . $id . '.new;topicseen#new',
 					'TOPICLINK' => $scripturl . '?topic=' . $id . '.msg' . $data['last_id'] . '#msg' . $data['last_id'],
-					'UNSUBSCRIBELINK' => $scripturl . '?action=notifyboard;board=' . $data['board'] . '.0',
+					'UNSUBSCRIBELINK' => replaceBasicActionUrl('{script_url}?action=notify;sa=unsubscribe;token=' .
+						getNotifierToken($row['id_member'], $row['email_address'], $row['password_salt'], 'board', $data['board'])),
 					'SIGNATURE' => $data['signature'],
 					'BOARDNAME' => $data['board_name'],
+					'SUBSCRIPTION' => $txt['board'],
 				);
 
 				if ($type === 'remove')
@@ -289,7 +292,7 @@ function sendNotifications($topics, $type, $exclude = array(), $members_only = a
 			mem.id_member, mem.email_address, mem.notify_regularity, mem.notify_types, mem.warning,
 			mem.notify_send_body, mem.lngfile, mem.id_group, mem.additional_groups,mem.id_post_group,
 			t.id_member_started, b.member_groups, b.name, b.id_profile, b.id_board,
-			ln.id_topic, ln.sent
+			ln.id_topic, ln.sent, mem.password_salt
 		FROM {db_prefix}log_notify AS ln
 			INNER JOIN {db_prefix}members AS mem ON (mem.id_member = ln.id_member)
 			INNER JOIN {db_prefix}topics AS t ON (t.id_topic = ln.id_topic)
@@ -349,9 +352,11 @@ function sendNotifications($topics, $type, $exclude = array(), $members_only = a
 			'POSTERNAME' => un_htmlspecialchars($topicData[$row['id_topic']]['name']),
 			'TOPICLINKNEW' => $scripturl . '?topic=' . $row['id_topic'] . '.new;topicseen#new',
 			'TOPICLINK' => $scripturl . '?topic=' . $row['id_topic'] . '.msg' . $data['last_id'] . '#msg' . $data['last_id'],
-			'UNSUBSCRIBELINK' => $scripturl . '?action=notify;topic=' . $row['id_topic'] . '.0',
+			'UNSUBSCRIBELINK' => replaceBasicActionUrl('{script_url}?action=notify;sa=unsubscribe;token=' .
+				getNotifierToken($row['id_member'], $row['email_address'], $row['password_salt'], 'topic', $row['id_topic'])),
 			'SIGNATURE' => $topicData[$row['id_topic']]['signature'],
 			'BOARDNAME' => $row['name'],
+			'SUBSCRIPTION' => $txt['topic'],
 		);
 
 		if ($type === 'remove')
@@ -516,7 +521,7 @@ function sendBoardNotifications(&$topicData)
 		SELECT
 			mem.id_member, mem.email_address, mem.notify_regularity, mem.notify_send_body, mem.lngfile, mem.warning,
 			ln.sent, ln.id_board, mem.id_group, mem.additional_groups, b.member_groups, b.id_profile,
-			mem.id_post_group
+			mem.id_post_group, mem.password_salt
 		FROM {db_prefix}log_notify AS ln
 			INNER JOIN {db_prefix}boards AS b ON (b.id_board = ln.id_board)
 			INNER JOIN {db_prefix}members AS mem ON (mem.id_member = ln.id_member)
@@ -572,7 +577,8 @@ function sendBoardNotifications(&$topicData)
 				'TOPICLINK' => $scripturl . '?topic=' . $topicData[$key]['topic'] . '.new#new',
 				'TOPICLINKNEW' => $scripturl . '?topic=' . $topicData[$key]['topic'] . '.new#new',
 				'MESSAGE' => $send_body ? $topicData[$key]['body'] : '',
-				'UNSUBSCRIBELINK' => $scripturl . '?action=notifyboard;board=' . $topicData[$key]['board'] . '.0',
+				'UNSUBSCRIBELINK' => replaceBasicActionUrl('{script_url}?action=notify;sa=unsubscribe;token=' .
+					getNotifierToken($rowmember['id_member'], $rowmember['email_address'], $rowmember['password_salt'], 'board', $topicData[$key]['board'])),
 				'SIGNATURE' => !empty($topicData[$key]['signature']) ? $topicData[$key]['signature'] : '',
 				'BOARDNAME' => $board_names[$topicData[$key]['board']]['name'],
 			);
@@ -682,7 +688,7 @@ function sendApprovalNotifications(&$topicData)
 		SELECT
 			mem.id_member, mem.email_address, mem.notify_regularity, mem.notify_types, mem.notify_send_body, mem.lngfile,
 			ln.sent, mem.id_group, mem.additional_groups, b.member_groups, mem.id_post_group, t.id_member_started,
-			ln.id_topic
+			ln.id_topic, mem.password_salt
 		FROM {db_prefix}log_notify AS ln
 			INNER JOIN {db_prefix}members AS mem ON (mem.id_member = ln.id_member)
 			INNER JOIN {db_prefix}topics AS t ON (t.id_topic = ln.id_topic)
@@ -726,7 +732,8 @@ function sendApprovalNotifications(&$topicData)
 		$sent_this_time = false;
 		$replacements = array(
 			'TOPICLINK' => $scripturl . '?topic=' . $row['id_topic'] . '.new;topicseen#new',
-			'UNSUBSCRIBELINK' => $scripturl . '?action=notify;topic=' . $row['id_topic'] . '.0',
+			'UNSUBSCRIBELINK' => replaceBasicActionUrl('{script_url}?action=notify;sa=unsubscribe;token=' .
+				getNotifierToken($row['id_member'], $row['email_address'], $row['password_salt'], 'topic', $row['id_topic'])),
 		);
 
 		// Now loop through all the messages to send.
@@ -1148,4 +1155,83 @@ function getConfiguredNotificationMethods($type = '*')
 	}
 
 	return array();
+}
+
+/**
+ * Creates a hash code using the notification details and our secret key
+ *
+ * - If no salt (secret key) has been set, creates a random one and saves it
+ * in modSettings for future use
+ *
+ * @param string $memID member id
+ * @param string $memEmail member email address
+ * @param string $memSalt member salt
+ * @param string $area area to unsubscribe
+ * @param string $extra area specific data such as topic id or liked msg
+ * @return string the token for the unsubscribe link
+ */
+function getNotifierToken($memID, $memEmail, $memSalt, $area, $extra)
+{
+	global $modSettings;
+
+	// Generate a 22 digit random code suitable for Blowfish crypt.
+	$tokenizer = new TokenHash();
+	$blowfish_salt = '$2a$10$' . $tokenizer->generate_hash(22);
+	$now = time();
+
+	// Ideally we would just have a larger -per user- password_salt
+	if (empty($modSettings['unsubscribe_site_salt']))
+	{
+		// extra 10 digits of salt
+		$unsubscribe_site_salt = $tokenizer->generate_hash();
+		updateSettings(array('unsubscribe_site_salt' => $unsubscribe_site_salt));
+	}
+
+	// Add member salt + site salt to the otherwise deterministic data
+	$hash = crypt($area . $extra . $now . $memEmail . $memSalt . $modSettings['unsubscribe_site_salt'], $blowfish_salt);
+
+	return urlencode(implode('_',
+		array(
+			$memID,
+			substr($hash, 7),
+			$area,
+			$extra,
+			$now
+		)
+	));
+}
+
+/**
+ * Creates a hash code using the notification details and our secret key
+ *
+ * - If no site salt (secret key) has been set, simply fails
+ *
+ * @param string $memEmail member email address
+ * @param string $memSalt member salt
+ * @param string $area area to unsubscribe
+ * @param string $hash the sent hash
+ * @return string|bool
+ */
+function validateNotifierToken($memEmail, $memSalt, $area, $hash)
+{
+	global $modSettings;
+
+	if (empty($modSettings['unsubscribe_site_salt']))
+	{
+		return false;
+	}
+
+	$expected = '$2a$10$' . $hash;
+	$check = crypt($area . $memEmail . $memSalt . $modSettings['unsubscribe_site_salt'], $expected);
+
+	// Basic safe compare as hash_equals is PHP 5.6+
+	if (function_exists('hash_equals'))
+	{
+		return hash_equals($expected, $check);
+	}
+
+	$ret = strlen($expected) ^ strlen($check);
+	$ret |= array_sum(unpack("C*", $expected ^ $check));
+
+	return !$ret;
 }

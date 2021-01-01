@@ -492,7 +492,7 @@ function list_getSmileySets($start, $items_per_page, $sort)
 		$cols['id'][] = $i;
 		$cols['selected'][] = $i;
 		$cols['path'][] = $set;
-		$cols['name'][] = $set_names[$i];
+		$cols['name'][] = stripslashes($set_names[$i]);
 	}
 
 	$sort_flag = strpos($sort, 'DESC') === false ? SORT_ASC : SORT_DESC;

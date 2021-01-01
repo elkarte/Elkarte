@@ -208,11 +208,17 @@ class Html2BBC
 
 		// Remove any html tags we left behind ( outside of code tags that is )
 		$parts = preg_split('~(\[/code\]|\[code(?:=[^\]]+)?\])~i', $bbc, -1, PREG_SPLIT_DELIM_CAPTURE);
-		foreach ($parts as $i => $part)
+		if ($parts !== false)
 		{
-			if ($i % 4 === 0)
+			foreach ($parts as $i => $part)
 			{
-				$parts[$i] = strip_tags($part);
+				if ($i % 4 === 0)
+				{
+					// protect << symbols from being stripped
+					$working = str_replace('<<', "[\xC2\xA0]", $parts[$i]);
+					$working = strip_tags($working);
+					$parts[$i] = str_replace("[\xC2\xA0]", '<<', $working);
+				}
 			}
 		}
 
@@ -698,7 +704,14 @@ class Html2BBC
 		$height = $node->getAttribute('height');
 		$style = $node->getAttribute('style');
 
+		$bbc = '';
 		$size = '';
+
+		// First if this is an inline image, we don't support those
+		if (substr($src, 0, 4) === 'cid:')
+		{
+			return $bbc;
+		}
 
 		// Do the basic things first, title/alt
 		if (!empty($title) && empty($alt))
@@ -769,6 +782,13 @@ class Html2BBC
 	{
 		$style = $node->getAttribute('style');
 		$value = $this->_get_innerHTML($node);
+
+		// Don't style it if its really just empty
+		$test_value = trim($value);
+		if ($test_value === '[br]' || $test_value === '<br>')
+		{
+			return $value;
+		}
 
 		// Its at least going to be itself
 		$bbc = $value;

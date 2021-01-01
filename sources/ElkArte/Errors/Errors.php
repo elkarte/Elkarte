@@ -529,7 +529,19 @@ class Errors extends AbstractModel
 		// Maybe they came from dlattach or similar?
 		if (ELK !== 'SSI' && empty($context['theme_loaded']))
 		{
+			global $modSettings;
+
+			// Who knew dying took this much effort
+			$context['linktree'] = isset($context['linktree']) ? $context['linktree'] : array();
+			User::load(true);
+
+			$_SESSION['session_var'] = isset($_SESSION['session_var']) ? $_SESSION['session_var'] : '';
+			$_SESSION['session_value'] = isset($_SESSION['session_value'] ) ? $_SESSION['session_value'] : '';
 			new ThemeLoader();
+
+			// Here lies elkarte, dead from a program error. Just a cryptic message, no output could be better.
+			$context['user']['can_mod'] = false;
+			$modSettings['default_forum_action'] = '';
 		}
 
 		// Don't bother indexing errors mate...

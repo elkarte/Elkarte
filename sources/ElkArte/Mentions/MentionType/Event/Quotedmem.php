@@ -87,20 +87,19 @@ class Quotedmem extends AbstractEventBoardAccess
 	public function post_after_save_post($msgOptions, $becomesApproved, $posterOptions)
 	{
 		$status = $becomesApproved ? 'new' : 'unapproved';
-		$this->_sendNotification($msgOptions['body'], $msgOptions['id'], $status, $posterOptions);
+		$this->_sendNotification($msgOptions, $status, $posterOptions);
 	}
 
 	/**
 	 * Checks if a message has been quoted and if so notifies the owner
 	 *
-	 * @param string $text The message body
-	 * @param int $msg_id The message id of the post containing the quote
+	 * @param mixed[] $msgOptions The message options array
 	 * @param string $status
 	 * @param mixed[] $posterOptions
 	 */
-	protected function _sendNotification($text, $msg_id, $status, $posterOptions)
+	protected function _sendNotification($msgOptions, $status, $posterOptions)
 	{
-		$quoted_names = $this->_findQuotedMembers($text);
+		$quoted_names = $this->_findQuotedMembers($msgOptions['body']);
 
 		if (!empty($quoted_names))
 		{
@@ -113,9 +112,9 @@ class Quotedmem extends AbstractEventBoardAccess
 			$notifier = Notifications::instance();
 			$notifier->add(new NotificationsTask(
 				'quotedmem',
-				$msg_id,
+				$msgOptions['id'],
 				$posterOptions['id'],
-				array('id_members' => $members_id, 'notifier_data' => $posterOptions, 'status' => $status)
+				array('id_members' => $members_id, 'notifier_data' => $posterOptions, 'status' => $status, 'subject' =>  $msgOptions['subject'])
 			));
 		}
 	}

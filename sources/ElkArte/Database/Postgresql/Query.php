@@ -267,6 +267,9 @@ class Query extends AbstractQuery
 			'insert_log_search_results_subject' => array(
 				'~NOT RLIKE~' => '!~',
 			),
+			'display_get_post_poster' => array(
+				'~GROUP BY id_msg\s+HAVING~' => 'AND',
+			),
 			'pm_conversation_list' => array(
 				'~ORDER\\s+BY\\s+\\{raw:sort\\}~' => 'ORDER BY ' . (isset($db_values['sort']) ? ($db_values['sort'] === 'pm.id_pm' ? 'MAX(pm.id_pm)' : $db_values['sort']) : ''),
 			),
@@ -281,7 +284,7 @@ class Query extends AbstractQuery
 		}
 
 		// Limits need to be a little different.
-		$db_string = preg_replace('~\sLIMIT\s(\d+|{int:.+}),\s*(\d+|{int:.+})\s*$~i', 'LIMIT $2 OFFSET $1', $db_string);
+		$db_string = preg_replace('~\sLIMIT\s(\d+|{int:.+}),\s*(\d+|{int:.+})\s*(.*)$~is', 'LIMIT $2 OFFSET $1 $3', $db_string);
 
 		if (trim($db_string) === '')
 		{

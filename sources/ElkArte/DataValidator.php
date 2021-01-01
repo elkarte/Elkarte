@@ -1388,7 +1388,7 @@ class DataValidator
 				'field' => $field,
 				'input' => $input[$field],
 				'error' => '_validate_php_syntax',
-				'error_msg' => $errorMsg['message'],
+				'error_msg' => isset($errorMsg['message']) ? $errorMsg['message'] : 'NaN',
 				'param' => $validation_parameters
 			);
 		}

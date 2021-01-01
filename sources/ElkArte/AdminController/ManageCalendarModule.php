@@ -203,8 +203,9 @@ class ManageCalendarModule extends AbstractController
 				array(
 					'position' => 'below_table_data',
 					'class' => 'submitbutton',
-					'value' => '<input type="submit" name="delete" value="' . $txt['quickmod_delete_selected'] . '" onclick="return confirm(\'' . $txt['holidays_delete_confirm'] . '\');" />
-					<a class="linkbutton" href="' . getUrl('admin', ['action' => 'admin', 'area' => 'managecalendar', 'sa' => 'editholiday']) . '">' . $txt['holidays_add'] . '</a>',
+					'value' => '
+					<a class="linkbutton_right" href="' . getUrl('admin', ['action' => 'admin', 'area' => 'managecalendar', 'sa' => 'editholiday']) . '">' . $txt['holidays_add'] . '</a>
+					<input type="submit" name="delete" value="' . $txt['quickmod_delete_selected'] . '" onclick="return confirm(\'' . $txt['holidays_delete_confirm'] . '\');" />',
 				),
 			),
 		);

@@ -1487,7 +1487,7 @@ function parsePackageInfo(&$packageXML, $testing_only = true, $method = 'install
  * @return string|bool highest install value string or false
  * @package Packages
  */
-function matchHighestPackageVersion($versions, $reset = false, $the_version)
+function matchHighestPackageVersion($versions, $the_version, $reset = false)
 {
 	static $near_version = 0;
 
@@ -2822,7 +2822,7 @@ function package_crypt($pass)
 
 	for ($i = 0; $i < $n; $i++)
 	{
-		$pass{$i} = chr(ord($pass{$i}) ^ (ord($salt{$i}) - 32));
+		$pass[$i] = chr(ord($pass[$i]) ^ (ord($salt[$i]) - 32));
 	}
 
 	return $pass;

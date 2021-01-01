@@ -23,7 +23,7 @@ class TestAuth extends ElkArteCommonSetupTest
 
 	/**
 	 * Test trying to login ... limited since we can't set a cookie without a
-	 * headers violation.   Now AuthWeb test does this but the code coverage is
+	 * headers violation.  Now AuthWeb test does this but the code coverage is
 	 * not captured for some reason.
 	 */
 	public function testActionLogin()

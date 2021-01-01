@@ -9,15 +9,16 @@
  */
 
 /*!
- * hoverIntent v1.9.0 // 2014.08.11 // jQuery v1.9.1+
- * http://cherne.net/brian/resources/jquery.hoverIntent.html
+ * hoverIntent v1.10.1 // 2019.10.05 // jQuery v1.7.0+
+ * http://briancherne.github.io/jquery-hoverIntent/
  *
  * You may use hoverIntent under the terms of the MIT license. Basically that
  * means you are free to use hoverIntent as long as this header is left intact.
- * Copyright 2007, 2014 Brian Cherne
+ * Copyright 2007-2019 Brian Cherne
  */
 
-/* hoverIntent is similar to jQuery's built-in "hover" method except that
+/**
+ * hoverIntent is similar to jQuery's built-in "hover" method except that
  * instead of firing the handlerIn function immediately, hoverIntent checks
  * to see if the user's mouse has slowed down (beneath the sensitivity
  * threshold) before firing the event. The handlerOut function is only
@@ -40,10 +41,12 @@
  * @author Brian Cherne <brian(at)cherne(dot)net>
  */
 
-(function(factory) {
+;(function(factory) {
 	'use strict';
 	if (typeof define === 'function' && define.amd) {
 		define(['jquery'], factory);
+	} else if (typeof module === 'object' && module.exports) {
+		module.exports = factory(require('jquery'));
 	} else if (jQuery && !jQuery.fn.hoverIntent) {
 		factory(jQuery);
 	}
@@ -63,7 +66,7 @@
 	// current X and Y position of mouse, updated during mousemove tracking (shared across instances)
 	var cX, cY;
 
-	// saves the current pointer position coordinated based on the given mouse event
+	// saves the current pointer position coordinates based on the given mousemove event
 	var track = function(ev) {
 		cX = ev.pageX;
 		cY = ev.pageY;
@@ -73,11 +76,13 @@
 	var compare = function(ev,$el,s,cfg) {
 		// compare mouse positions to see if pointer has slowed enough to trigger `over` function
 		if ( Math.sqrt( (s.pX-cX)*(s.pX-cX) + (s.pY-cY)*(s.pY-cY) ) < cfg.sensitivity ) {
-			$el.off('mousemove.hoverIntent'+s.namespace,track);
+			$el.off(s.event,track);
 			delete s.timeoutId;
-			// set hoverIntent state as active for this element (so `out` handler can eventually be called)
+			// set hoverIntent state as active for this element (permits `out` handler to trigger)
 			s.isActive = true;
-			// clear coordinate data
+			// overwrite old mouseenter event coordinates with most recent pointer position
+			ev.pageX = cX; ev.pageY = cY;
+			// clear coordinate data from state object
 			delete s.pX; delete s.pY;
 			return cfg.over.apply($el[0],[ev]);
 		} else {
@@ -90,7 +95,10 @@
 
 	// triggers given `out` function at configured `timeout` after a mouseleave and clears state
 	var delay = function(ev,$el,s,out) {
-		delete $el.data('hoverIntent')[s.id];
+		var data = $el.data('hoverIntent');
+		if (data) {
+			delete data[s.id];
+		}
 		return out.apply($el[0],[ev]);
 	};
 
@@ -102,6 +110,9 @@
 		var cfg = $.extend({}, _cfg);
 		if ( $.isPlainObject(handlerIn) ) {
 			cfg = $.extend(cfg, handlerIn );
+			if ( !$.isFunction(cfg.out) ) {
+				cfg.out = cfg.over;
+			}
 		} else if ($.isFunction(handlerOut)) {
 			cfg = $.extend(cfg, { over: handlerIn, out: handlerOut, selector: selector } );
 		} else {
@@ -129,13 +140,13 @@
 			// timeoutId = timeout ID, reused for tracking mouse position and delaying "out" handler
 			// isActive = plugin state, true after `over` is called just until `out` is called
 			// pX, pY = previously-measured pointer coordinates, updated at each polling interval
-			// namespace = string used as namespace for per-instance event management
+			// event = string representing the namespaced event used for mouse tracking
 
 			// clear any existing timeout
 			if (state.timeoutId) { state.timeoutId = clearTimeout(state.timeoutId); }
 
-			// event namespace, used to register and unregister mousemove tracking
-			var namespace = state.namespace = '.hoverIntent'+instanceId;
+			// namespaced event used to register and unregister mousemove tracking
+			var mousemove = state.event = 'mousemove.hoverIntent.hoverIntent'+instanceId;
 
 			// handle the event, based on its type
 			if (e.type === 'mouseenter') {
@@ -144,14 +155,14 @@
 				// set "previous" X and Y position based on initial entry point
 				state.pX = ev.pageX; state.pY = ev.pageY;
 				// update "current" X and Y position based on mousemove
-				$el.on('mousemove.hoverIntent'+namespace,track);
+				$el.off(mousemove,track).on(mousemove,track);
 				// start polling interval (self-calling timeout) to compare mouse coordinates over time
 				state.timeoutId = setTimeout( function(){compare(ev,$el,state,cfg);} , cfg.interval );
 			} else { // "mouseleave"
 				// do nothing if not already active
 				if (!state.isActive) { return; }
 				// unbind expensive mousemove event
-				$el.off('mousemove.hoverIntent'+namespace,track);
+				$el.off(mousemove,track);
 				// if hoverIntent state is true, then call the mouseOut function after the specified delay
 				state.timeoutId = setTimeout( function(){delay(ev,$el,state,cfg.out);} , cfg.timeout );
 			}
@@ -271,6 +282,11 @@
 				}
 			},
 			touchHandler = function (e) {
+				// iPad ios 13.1 top menu item link problem
+				if (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1) {
+					return this;
+				}
+
 				var $this = $(this),
 					o = getOptions($this),
 					$ul = $this.siblings(e.data.popUpSelector);

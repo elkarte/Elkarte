@@ -108,7 +108,6 @@ class SiteDispatcher
 		'moderate' => array('\\ElkArte\\Controller\\ModerationCenter', 'action_index'),
 		'movetopic' => array('\\ElkArte\\Controller\\MoveTopic', 'action_movetopic'),
 		'movetopic2' => array('\\ElkArte\\Controller\\MoveTopic', 'action_movetopic2'),
-		'notify' => array('\\ElkArte\\Controller\\Notify', 'action_notify'),
 		'notifyboard' => array('\\ElkArte\\Controller\\Notify', 'action_notifyboard'),
 		'openidreturn' => array('\\ElkArte\\Controller\\OpenID', 'action_openidreturn'),
 		'xrds' => array('\\ElkArte\\Controller\\OpenID', 'action_xrds'),
@@ -167,7 +166,8 @@ class SiteDispatcher
 
 		if (
 			!empty($modSettings['front_page'])
-				&& is_callable(array($modSettings['front_page'], 'frontPageHook'))
+				&& class_exists($modSettings['front_page'])
+				&& in_array('frontPageHook', get_class_methods($modSettings['front_page']))
 		)
 		{
 			$modSettings['default_forum_action'] = ['action' => 'forum'];
@@ -281,13 +281,21 @@ class SiteDispatcher
 		}
 
 		// 3, 2, ... and go
-		if (is_callable(array($this->_controller_name, $this->_function_name)))
+		if (class_exists($this->_controller_name))
 		{
-			return;
-		}
-		elseif (is_callable(array($this->_controller_name, 'action_index')))
-		{
-			$this->_function_name = 'action_index';
+			// Method requested is in the list of its callable methods
+			if (in_array($this->_function_name, get_class_methods($this->_controller_name)))
+			{
+				return;
+			}
+
+			// Maybe the default required by abstract method
+			if ($this->_function_name !== 'action_index'
+				&& in_array('action_index', get_class_methods($this->_controller_name)))
+			{
+				$this->_function_name = 'action_index';
+				return;
+			}
 		}
 		// This should never happen, that's why its here :P
 		else

@@ -655,7 +655,7 @@ class ProfileOptions extends AbstractController
 					updateMemberData($this->_memID, array('openid_uri' => '', 'passwd' => $passwd));
 					if ($context['user']['is_owner'])
 					{
-						setLoginCookie(60 * $modSettings['cookieTime'], $this->_memID, hash('sha256', $new_pass . $cur_profile['password_salt']));
+						setLoginCookie(60 * $modSettings['cookieTime'], $this->_memID, hash('sha256', $passwd . $cur_profile['password_salt']));
 						redirectexit('action=profile;area=authentication;updated');
 					}
 					else
@@ -715,6 +715,7 @@ class ProfileOptions extends AbstractController
 		require_once(SUBSDIR . '/Topic.subs.php');
 		require_once(SUBSDIR . '/Profile.subs.php');
 
+		// Show the list of notification types and how they can subscribe to them
 		$mention_methods = Notifications::instance()->getNotifiers();
 		$context['mention_types'] = getMemberNotificationsProfile($this->_memID);
 

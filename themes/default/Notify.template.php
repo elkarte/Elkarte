@@ -49,3 +49,19 @@ function template_notify_board()
 			</p>
 		</div>';
 }
+
+/**
+ * Something to show confirmation when they have unsubscribed from mention/topic/board/etc
+ */
+function template_notify_unsubscribe()
+{
+	global $context, $txt;
+
+	echo '
+		<h2 class="category_header hdicon cat_img_mail">
+			', $txt['unnotify'], '
+		</h2>
+		<div class="well centertext">
+			<p>', $context['unsubscribe_message'], '</p>
+		</div>';
+}

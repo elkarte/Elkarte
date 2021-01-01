@@ -463,7 +463,8 @@ function loadEssentialData()
 {
 	global $db_character_set, $db_type, $modSettings;
 
-	error_reporting(E_ALL);
+	// Report all errors except for depreciation notices so users don't complain.
+	error_reporting(E_ALL & ~E_DEPRECATED);
 
 	if (!defined('ELK'))
 	{
@@ -572,6 +573,10 @@ function initialize_inputs()
 		$temp = substr($temp, 1);
 	}
 
+	header('X-Frame-Options: SAMEORIGIN');
+	header('X-XSS-Protection: 1');
+	header('X-Content-Type-Options: nosniff');
+
 	// Force a step, defaulting to 0.
 	$_GET['step'] = !isset($_GET['step']) ? 0 : (int) $_GET['step'];
 	$_GET['substep'] = !isset($_GET['substep']) ? 0 : (int) $_GET['substep'];
@@ -587,7 +592,7 @@ function initialize_inputs()
  */
 function action_welcomeLogin()
 {
-	global $modSettings, $upgradeurl, $upcontext, $db_type, $databases, $db_character_set, $txt;
+	global $modSettings, $upgradeurl, $upcontext, $db_type, $databases, $db_character_set, $txt, $boardurl;
 
 	$db = load_database();
 
@@ -598,6 +603,29 @@ function action_welcomeLogin()
 		&& @file_exists(SOURCEDIR . '/QueryString.php')
 		&& @file_exists(SOURCEDIR . '/database/Db-' . $db_type . '.class.php')
 		&& @file_exists(__DIR__ . '/upgrade_' . DB_SCRIPT_VERSION . '.php');
+
+	// This needs to exist!
+	if (!file_exists($modSettings['theme_dir'] . '/languages/' . $upcontext['language'] . '/Install.' . $upcontext['language'] . '.php'))
+	{
+		return throw_error('The upgrade script could not find the &quot;Install&quot; language file for the forum default language, ' . $upcontext['language'] . '.<br /><br />Please make certain you uploaded all the files included in the package, even the theme and language files for the default theme.<br />&nbsp;&nbsp;&nbsp;[<a href="' . $upgradeurl . '?lang=english">Try English</a>]');
+	}
+	else
+	{
+		require_once($modSettings['theme_dir'] . '/languages/' . $upcontext['language'] . '/Install.' . $upcontext['language'] . '.php');
+	}
+
+	// Do not try to upgrade to the same version you are already running
+	if (isset($_GET['v']) && defined('CURRENT_VERSION'))
+	{
+		if ($_GET['v'] === CURRENT_VERSION)
+		{
+			$upcontext['current_step'] = 4;
+			$upcontext['overall_percent'] = 100;
+			unset($_GET['v']);
+
+			return throw_error(sprintf($txt['upgrade_warning_already_done'], CURRENT_VERSION, $boardurl), true);
+		}
+	}
 
 	// If the db is not UTF
 	if (!isset($modSettings['elkVersion']) && ($db_type == 'mysql' || $db_type == 'mysqli') && (!isset($db_character_set) || $db_character_set !== 'utf8' || empty($modSettings['global_character_set']) || $modSettings['global_character_set'] !== 'UTF-8'))
@@ -670,16 +698,6 @@ function action_welcomeLogin()
 		{
 			return throw_error('The upgrader found some old or outdated language files, for the forum default language, ' . $upcontext['language'] . '.<br /><br />Please make certain you uploaded the new versions of all the files included in the package, even the theme and language files for the default theme.<br />&nbsp;&nbsp;&nbsp;[<a href="' . $upgradeurl . '?skiplang">SKIP</a>] [<a href="' . $upgradeurl . '?lang=english">Try English</a>]');
 		}
-	}
-
-	// This needs to exist!
-	if (!file_exists($modSettings['theme_dir'] . '/languages/' . $upcontext['language'] . '/Install.' . $upcontext['language'] . '.php'))
-	{
-		return throw_error('The upgrader could not find the &quot;Install&quot; language file for the forum default language, ' . $upcontext['language'] . '.<br /><br />Please make certain you uploaded all the files included in the package, even the theme and language files for the default theme.<br />&nbsp;&nbsp;&nbsp;[<a href="' . $upgradeurl . '?lang=english">Try English</a>]');
-	}
-	else
-	{
-		require_once($modSettings['theme_dir'] . '/languages/' . $upcontext['language'] . '/Install.' . $upcontext['language'] . '.php');
 	}
 
 	if (!makeFilesWritable($writable_files))
@@ -849,7 +867,7 @@ function checkLogin()
 					if ($valid_password)
 					{
 						$password = validateLoginPassword($_POST['passwrd'], '', $_POST['user'], true);
-						$password_salt = substr(md5(mt_rand()), 0, 4);
+						$password_salt = substr(base64_encode(sha1(mt_rand() . microtime(), true)), 0, 16);
 
 						// Update the password hash and set up the salt.
 						require_once(SUBSDIR . '/Members.subs.php');
@@ -2002,11 +2020,13 @@ function print_error($message, $fatal = false)
  * Displays and error using the error template
  *
  * @param string $message
+ * @param bool $fatal
  */
-function throw_error($message)
+function throw_error($message, $fatal = false)
 {
 	global $upcontext;
 
+	$upcontext['fatal'] = $fatal;
 	$upcontext['error_msg'] = $message;
 	$upcontext['sub_template'] = 'error_message';
 

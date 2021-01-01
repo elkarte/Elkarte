@@ -259,7 +259,7 @@ function template_generic_menu_tabs($tab_context)
 
 		foreach ($tab_context['tabs'] as $tab)
 		{
-			if (!empty($tab['disabled']))
+			if (!empty($tab['disabled']) || empty($tab['url']))
 			{
 				continue;
 			}

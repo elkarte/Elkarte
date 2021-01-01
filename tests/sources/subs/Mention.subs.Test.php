@@ -79,6 +79,7 @@ class TestMentions extends \PHPUnit\Framework\TestCase
 		$posterOptions = array(
 			'id' => \ElkArte\User::$info->id,
 			'name' => 'test-user',
+			'subject' => 'the subject',
 			'email' => 'noemail@test.tes',
 			'update_post_count' => false,
 			'ip' => long2ip(rand(0, 2147483647))

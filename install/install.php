@@ -53,7 +53,7 @@ installExit();
 function initialize_inputs()
 {
 	// Turn off magic quotes runtime and enable error reporting.
-	error_reporting(E_ALL | E_STRICT);
+	error_reporting(E_ALL & ~E_DEPRECATED);
 
 	if (!defined('TMP_BOARDDIR'))
 		define('TMP_BOARDDIR', realpath(__DIR__ . '/..'));
@@ -88,6 +88,10 @@ function initialize_inputs()
 	// PHP 5 might cry if we don't do this now.
 	$server_offset = @mktime(0, 0, 0, 1, 1, 1970);
 	date_default_timezone_set('Etc/GMT' . ($server_offset > 0 ? '+' : '') . ($server_offset / 3600));
+
+	header('X-Frame-Options: SAMEORIGIN');
+	header('X-XSS-Protection: 1');
+	header('X-Content-Type-Options: nosniff');
 
 	// Force an integer step, defaulting to 0.
 	$_GET['step'] = isset($_GET['step']) ? (int) $_GET['step'] : 0;

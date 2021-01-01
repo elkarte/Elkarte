@@ -1838,7 +1838,7 @@ function maxMemberID()
  * - 'sort' (string) a column to sort the results
  * - 'moderation' (bool) includes member_ip, id_group, additional_groups, last_login
  * - 'authentication' (bool) includes secret_answer, secret_question, openid_uri,
- *    is_activated, validation_code, passwd_flood
+ *    is_activated, validation_code, passwd_flood, password_salt
  * - 'preferences' (bool) includes lngfile, mod_prefs, notify_types, signature
  * @return mixed[]
  * @throws \Exception
@@ -1881,7 +1881,7 @@ function getBasicMemberData($member_ids, $options = array())
 		SELECT 
 			id_member, member_name, real_name, email_address, hide_email, posts, id_theme' . (!empty($options['moderation']) ? ',
 			member_ip, id_group, additional_groups, last_login, id_post_group' : '') . (!empty($options['authentication']) ? ',
-			secret_answer, secret_question, openid_uri, is_activated, validation_code, passwd_flood' : '') . (!empty($options['preferences']) ? ',
+		secret_answer, secret_question, openid_uri, is_activated, validation_code, passwd_flood, password_salt' : '') . (!empty($options['preferences']) ? ',
 			lngfile, mod_prefs, notify_types, signature' : '') . '
 		FROM {db_prefix}members
 		WHERE id_member IN ({array_int:member_list})

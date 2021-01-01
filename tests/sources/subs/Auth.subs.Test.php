@@ -27,7 +27,7 @@ class TestAuthsubs extends \PHPUnit\Framework\TestCase
 	}
 
 	/**
-	 * We run this test in a seperate process to prevent headers already sent errors
+	 * We run this test in a separate process to prevent headers already sent errors
 	 * when the cookie is generated.
 	 *
 	 * @runInSeparateProcess

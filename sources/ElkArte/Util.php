@@ -120,16 +120,17 @@ class Util
 	{
 		global $modSettings;
 
-		// Preg_replace space characters
-		$space_chars = '\x{A0}\x{AD}\x{2000}-\x{200F}\x{201F}\x{202F}\x{3000}\x{FEFF}';
+		// Preg_replace for any kind of whitespace or invisible separator
+		// and invisible control characters and unused code points
+		$space_chars = '\p{Z}\p{C}';
 
 		if (empty($modSettings['disableEntityCheck']))
 		{
-			$check = preg_replace('~^(?:[ \t\n\r\x0B\x00' . $space_chars . ']|&nbsp;)+|(?:[ \t\n\r\x0B\x00]|&nbsp;)+$~u', '', preg_replace_callback(self::$_entity_check_reg, 'entity_fix__callback', $string));
+			$check = preg_replace('~^(?:[' . $space_chars . ']|&nbsp;)+|(?:[' . $space_chars . ']|&nbsp;)+$~u', '', preg_replace_callback(self::$_entity_check_reg, 'entity_fix__callback', $string));
 		}
 		else
 		{
-			$check = preg_replace('~^(?:[ \t\n\r\x0B\x00' . $space_chars . ']|&nbsp;)+|(?:[ \t\n\r\x0B\x00]|&nbsp;)+$~u', '', $string);
+			$check = preg_replace('~^(?:[' . $space_chars . ']|&nbsp;)+|(?:[' . $space_chars . ']|&nbsp;)+$~u', '', $string);
 		}
 
 		return $check;

@@ -1300,7 +1300,7 @@ class ManageThemes extends AbstractController
 		{
 			$method = 'upload';
 		}
-		elseif (isset($this->_req->query->theme_dir) && rtrim(realpath($this->_req->query->theme_dir), '/\\') != realpath(BOARDDIR . '/themes') && file_exists($this->_req->query->theme_dir))
+		elseif (isset($this->_req->post->theme_dir) && rtrim(realpath($this->_req->post->theme_dir), '/\\') != realpath(BOARDDIR . '/themes') && file_exists($this->_req->post->theme_dir))
 		{
 			$method = 'path';
 		}

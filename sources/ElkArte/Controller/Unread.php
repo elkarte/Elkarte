@@ -334,20 +334,7 @@ class Unread extends AbstractController
 		$this->_grabber->setEarliestMsg($context['showing_all_topics'] ? earliest_msg() : 0);
 
 		// @todo Add modified_time in for log_time check?
-		// Let's copy things out of the log_topics table, to reduce searching.
-		if ($modSettings['totalMessages'] > 100000 && $context['showing_all_topics'])
-		{
-			$this->_grabber->createTempTable();
-		}
-
-		// All unread replies with temp table
-		if ($context['showing_all_topics'] && $this->_grabber->hasTempTable())
-		{
-			$this->_num_topics = $this->_grabber->numUnreads(false);
-			$type = 'message';
-		}
-		// New posts with or without temp table
-		elseif ($this->_is_topics)
+		if ($this->_is_topics)
 		{
 			$this->_num_topics = $this->_grabber->numUnreads(empty($_SESSION['first_login']), $_SESSION['id_msg_last_visit']);
 			$type = 'topics';
@@ -399,11 +386,6 @@ class Unread extends AbstractController
 		global $scripturl, $context, $modSettings, $settings;
 
 		$this->_grabber->setAction(\ElkArte\Unread::UNREADREPLIES);
-
-		if ($modSettings['totalMessages'] > 100000)
-		{
-			$this->_grabber->createTempTable();
-		}
 
 		$this->_num_topics = $this->_grabber->numUnreads();
 

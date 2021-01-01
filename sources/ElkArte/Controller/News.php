@@ -218,7 +218,8 @@ class News extends AbstractController
 		// Easy adding of sub actions
 		call_integration_hook('integrate_xmlfeeds', array(&$subActions));
 
-		$subAction = isset($this->_req->query->sa) && isset($subActions[$this->_req->query->sa]) ? $this->_req->query->sa : 'recent';
+		$subAction = $this->_req->getQuery('sa', 'strtolower', 'recent');
+		$subAction = isset($subActions[$subAction]) ? $subAction : 'recent';
 
 		// We only want some information, not all of it.
 		$cachekey = array($xml_format, $this->_req->query->action, $this->_limit, $subAction);
@@ -606,7 +607,7 @@ class News extends AbstractController
 	 */
 	public function action_xmlprofile($xml_format)
 	{
-		global $scripturl, $modSettings;
+		global $scripturl, $modSettings, $language;
 
 		// You must input a valid user....
 		if (empty($this->_req->query->u))
@@ -679,7 +680,7 @@ class News extends AbstractController
 				'link' => $scripturl . '?action=profile;u=' . $member['id'],
 				'posts' => $member['posts'],
 				'post-group' => cdata_parse($member['post_group']),
-				'language' => cdata_parse($member['language']),
+				'language' => cdata_parse(!empty($member['language']) ? $member['language'] : Util::ucwords(strtr($language, array('_' => ' ', '-utf8' => '')))),
 				'last-login' => gmdate('D, d M Y H:i:s \G\M\T', $member->last_login),
 				'registered' => gmdate('D, d M Y H:i:s \G\M\T', $member->date_registered)
 			);
@@ -813,7 +814,7 @@ function cdata_parse($data, $ns = '', $override = null)
 	{
 		$positions = array(
 			Util::strpos($data, '&', $pos),
-			Util::strpos($data, ']', $pos),
+			Util::strpos($data, ']]>', $pos),
 		);
 
 		if ($ns !== '')
@@ -861,10 +862,10 @@ function cdata_parse($data, $ns = '', $override = null)
 
 			$pos = $pos2 + 1;
 		}
-		elseif (Util::substr($data, $pos, 1) === ']')
+		elseif (Util::substr($data, $pos, 3) == ']]>')
 		{
-			$cdata .= ']]>&#093;<![CDATA[';
-			$pos++;
+			$cdata .= ']]]]><![CDATA[>';
+			$pos = $pos + 3;
 		}
 		elseif (Util::substr($data, $pos, 1) === '&')
 		{

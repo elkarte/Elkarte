@@ -13,7 +13,7 @@ $maintenance = 0;
 /**
  * Title for the Maintenance Mode message.
  * @var string
- * @global int $mtitle
+ * @global string $mtitle
  */
 $mtitle = 'Maintenance Mode';
 

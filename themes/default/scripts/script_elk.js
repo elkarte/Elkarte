@@ -1697,21 +1697,24 @@ function disableAutoComplete()
 			}
 
 			$.ajax({
+				cache: false,
+				dataType: 'json',
+				timeout: 1500,
 				url: elk_scripturl + "?action=mentions;sa=fetch;api=json;lastsent=" + lastTime
 			})
-				.done(function (request)
+			.done(function (request)
+			{
+				if (request !== "")
 				{
-					if (request !== "")
-					{
-						send(request);
-						lastTime = request.timelast;
-					}
-
-					setTimeout(function ()
-					{
-						fetch();
-					}, opt.delay);
-				});
+					send(request);
+					lastTime = request.timelast;
+				}
+			})
+			.always(function() {
+				setTimeout(function() {
+					fetch();
+				}, opt.delay);
+			});
 		};
 
 		init(opt);

@@ -94,7 +94,7 @@ class NotificationsTask extends ValuesContainer
 		if ($this->_members_data === null)
 		{
 			require_once(SUBSDIR . '/Members.subs.php');
-			$this->_members_data = getBasicMemberData($this->getMembers(), array('preferences' => true));
+			$this->_members_data = getBasicMemberData($this->getMembers(), array('preferences' => true, 'authentication' => true));
 		}
 
 		return $this->_members_data;

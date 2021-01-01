@@ -371,13 +371,23 @@ function template_xml_below()
  */
 function template_error_message()
 {
-	global $upcontext;
+	global $upcontext, $txt;
 
 	echo '
 	<div class="errorbox">
-		', $upcontext['error_msg'], '
-		<br />
-		<a href="', $_SERVER['PHP_SELF'], '">Click here to try again.</a>
+		', $upcontext['error_msg'];
+
+	if (empty($upcontext['fatal']))
+	{
+		// To early to have even loaded language?
+		$txt['try_again'] = isset($txt['try_again']) ? $txt['try_again'] : 'Click here to try again.';
+
+		echo '
+		<br /><br />
+		<a href="', $_SERVER['PHP_SELF'], '">', $txt['try_again'] . '</a>';
+	}
+
+	echo '
 	</div>';
 }
 

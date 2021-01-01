@@ -210,7 +210,7 @@ class CoreFeatures extends AbstractController
 			),
 			// pe = post email
 			'pe' => array(
-				'url' => getUrl('admin', ['action' => 'admin', 'area' => 'maillist']),
+				'url' => getUrl('admin', ['action' => 'admin', 'area' => 'maillist', 'sa' => 'emailsettings']),
 				'save_callback' => 'postbyemail_toggle_callback',
 				'settings' => array(
 					'maillist_enabled' => 1,

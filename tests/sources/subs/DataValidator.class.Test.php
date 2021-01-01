@@ -1,6 +1,6 @@
 <?php
 
-class TestDataValidator extends \PHPUnit\Framework\TestCase
+class TestDataValidator extends ElkArteCommonSetupTest
 {
 	protected $backupGlobalsBlacklist = ['user_info'];
 	/**
@@ -10,6 +10,8 @@ class TestDataValidator extends \PHPUnit\Framework\TestCase
 	 */
 	public function setUp()
 	{
+		parent::setUp();
+
 		new ElkArte\Themes\ThemeLoader();
 		theme()->getTemplates()->loadLanguageFile('Validation', 'english', false, true);
 

@@ -115,7 +115,7 @@ $txt['themeadmin_admin_desc'] = 'Themes provide the different \'looks and feels\
 $txt['themeadmin_list_desc'] = 'In the Theme Settings area you can view the list of themes that you have installed, change their directory paths and settings, and uninstall them.';
 $txt['themeadmin_reset_desc'] = 'In the Member Options area you have the ability to change theme-specific options that affect all members. You will only see those themes that have their own set of option settings.';
 $txt['themeadmin_edit_desc'] = 'In the Modify Themes area you can alter the stylesheet and source code of your installed themes. You will need a basic understanding of CSS and PHP to effectively change a theme and not break your forum at the same time.';
-$txt['themeadmin_modify_styles'] = 'Changing a themes style is risky so be certain of what you are doing. Always have a backup copy of the theme directory that you are working in to use to recover from an error with. For help with this before you start, visit the <a href="http://www.elkarte.net/index.php" target="_blank" class="new_win">ElkArte Community</a>.';
+$txt['themeadmin_modify_styles'] = 'Changing a themes style is risky so be certain of what you are doing. Always have a backup copy of the theme directory that you are working in to use to recover from an error with. For help with this before you start, visit the <a href="https://www.elkarte.net/index.php" target="_blank" class="new_win">ElkArte Community</a>.';
 
 $txt['themeadmin_list_heading'] = 'Theme Settings';
 $txt['themeadmin_list_tip'] = 'The layout settings may be different for each installed theme. Edit the installed themes to set their individual options, change their directory or URL settings, or to find other options.';

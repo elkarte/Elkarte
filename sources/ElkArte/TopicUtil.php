@@ -154,8 +154,8 @@ class TopicUtil
 					'timestamp' => forum_time(true, $row['first_poster_time']),
 					'subject' => $row['first_subject'],
 					'preview' => isset($row['first_body']) ? trim($row['first_body']) : '',
-					'icon' => $row['first_icon'],
-					'icon_url' => $icon_sources->{$row['first_icon']},
+					'icon' => $icon_sources->getIconName($row['first_icon']),
+					'icon_url' => $icon_sources->getIconURL($row['first_icon']),
 					'href' => $first_topic_href,
 					'link' => '<a href="' . $first_topic_href . '">' . $row['first_subject'] . '</a>'
 				),
@@ -173,8 +173,8 @@ class TopicUtil
 					'timestamp' => forum_time(true, $row['last_poster_time']),
 					'subject' => $row['last_subject'],
 					'preview' => isset($row['last_body']) ? trim($row['last_body']) : '',
-					'icon' => $row['last_icon'],
-					'icon_url' => $icon_sources->{$row['last_icon']},
+					'icon' =>  $icon_sources->getIconName($row['last_icon']),
+					'icon_url' => $icon_sources->getIconURL($row['last_icon']),
 					'href' => $topic_href,
 					'link' => '<a href="' . $topic_href . '" ' . ($row['num_replies'] == 0 ? '' : 'rel="nofollow"') . '>' . $row['last_subject'] . '</a>',
 				),
@@ -185,8 +185,8 @@ class TopicUtil
 				'is_hot' => !empty($modSettings['useLikesNotViews']) ? $row['num_likes'] >= $modSettings['hotTopicPosts'] : $row['num_replies'] >= $modSettings['hotTopicPosts'],
 				'is_very_hot' => !empty($modSettings['useLikesNotViews']) ? $row['num_likes'] >= $modSettings['hotTopicVeryPosts'] : $row['num_replies'] >= $modSettings['hotTopicVeryPosts'],
 				'is_posted_in' => false,
-				'icon' => $row['first_icon'],
-				'icon_url' => $icon_sources->{$row['first_icon']},
+				'icon' => $icon_sources->getIconName($row['first_icon']),
+				'icon_url' => $icon_sources->getIconURL($row['first_icon']),
 				'subject' => $row['first_subject'],
 				'new' => !empty($row['id_msg_modified']) && $row['new_from'] <= $row['id_msg_modified'],
 				'new_from' => $row['new_from'],
@@ -215,7 +215,7 @@ class TopicUtil
 				);
 			}
 
-			if (!empty($row['avatar']) || !empty($row['id_attach']))
+			if (isset($row['avatar']) || !empty($row['id_attach']))
 			{
 				$topics[$row['id_topic']]['last_post']['member']['avatar'] = determineAvatar($row);
 			}

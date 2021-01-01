@@ -55,7 +55,7 @@ template_ssi_above();
 	<p>This functionality can be used to allow you to present the information in any way you wish.</p>
 
 	<h2>Additional Guides &amp; FAQ</h2>
-	<p>Need more information on using SSI.php? Check out <a href="https://github.com/elkarte/Elkarte/wiki/SSI">Using SSI.php article</a> or <a href="http://www.elkarte.net/index.php">ask on the forum</a>.</p>
+	<p>Need more information on using SSI.php? Check out <a href="https://github.com/elkarte/Elkarte/wiki/SSI">Using SSI.php article</a> or <a href="https://www.elkarte.net/index.php">ask on the forum</a>.</p>
 
 	<div id="sidenav" class="content">
 		<h2 id="functionlist">Function List</h2>
@@ -828,7 +828,7 @@ function template_ssi_below()
 		</div>
 		<div id="footer_section">
 			<div class="frame">
-				<div class="smalltext"><a href="http://www.elkarte.net/">ElkArte Community</a>
+				<div class="smalltext"><a href="https://www.elkarte.net/">ElkArte Community</a>
 			</div>
 		</div>
 	</body>

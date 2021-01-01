@@ -26,6 +26,7 @@ use ElkArte\Exceptions\Exception;
 use ElkArte\SettingsForm\SettingsForm;
 use ElkArte\User;
 use ElkArte\Util;
+use ElkArte\Html2Md;
 
 /**
  * This class is the administration maillist controller.
@@ -380,9 +381,9 @@ class ManageMaillist extends AbstractController
 
 		// Prep and show the template with what we found
 		$context['body'] = $parser->parseEmail($text);
-		$context['to'] = $txt['to'] . ' ' . (isset($email_to) ? $email_to : '');
-		$context['notice_subject'] = isset($temp_email[0]['subject']) ? $txt['subject'] . ': ' . $temp_email[0]['subject'] : '';
-		$context['notice_from'] = isset($temp_email[0]['from']) ? $txt['from'] . ': ' . $temp_email[0]['from'] : '';
+		$context['to'] = isset($email_to) ? $email_to : '';
+		$context['notice_subject'] = isset($temp_email[0]['subject']) ? $temp_email[0]['subject'] : '';
+		$context['notice_from'] = isset($temp_email[0]['from']) ? $temp_email[0]['from'] : '';
 		$context['page_title'] = $txt['show_notice'];
 		$context['error_code'] = isset($temp_email[0]['error_code']) && isset($txt[$temp_email[0]['error_code']]) ? $txt[$temp_email[0]['error_code']] : '';
 		$context['sub_template'] = 'show_email';
@@ -522,7 +523,7 @@ class ManageMaillist extends AbstractController
 	{
 		global $context, $txt, $modSettings, $scripturl, $mbname;
 
-		if (!isset($this->_req->query->bounce))
+		if (isset($this->_req->query->bounce))
 		{
 			checkSession('get');
 			validateToken('admin-ml', 'get');
@@ -531,11 +532,9 @@ class ManageMaillist extends AbstractController
 		require_once(SUBSDIR . '/Mail.subs.php');
 
 		// We should have been sent an email ID
-		if (isset($this->_req->query->item))
+		$id = $this->_req->get('item', 'intval');
+		if (!empty($id))
 		{
-			// Needs to be an int!
-			$id = (int) $this->_req->query->item;
-
 			// Load up the email details, no funny biz yall ;)
 			$temp_email = list_maillist_unapproved($id);
 
@@ -583,7 +582,7 @@ class ManageMaillist extends AbstractController
 		}
 
 		// Check if they are sending the notice
-		if (isset($this->_req->query->bounce) && isset($temp_email))
+		if (isset($this->_req->post->bounce) && isset($temp_email))
 		{
 			checkSession('post');
 			validateToken('admin-ml');
@@ -604,6 +603,8 @@ class ManageMaillist extends AbstractController
 				else
 				{
 					// Time for someone to get a we're so sorry message!
+					$mark_down = new Html2Md($body);
+					$body = $mark_down->get_markdown();
 					sendmail($to, $subject, $body, null, null, false, 5);
 					redirectexit('action=admin;area=maillist;bounced');
 				}

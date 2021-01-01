@@ -35,6 +35,7 @@ function create_pm_draft($draft, $recipientList)
 		'subject' => 'string-255',
 		'body' => 'string-65534',
 		'to_list' => 'string-255',
+		'is_usersaved' => 'int',
 	);
 	$draft_parameters = array(
 		$draft['reply_id'],
@@ -44,6 +45,7 @@ function create_pm_draft($draft, $recipientList)
 		$draft['subject'],
 		$draft['body'],
 		serialize($recipientList),
+		$draft['is_usersaved'],
 	);
 	$db->insert('',
 		'{db_prefix}user_drafts',
@@ -78,7 +80,8 @@ function modify_pm_draft($draft, $recipientList)
 			poster_time = {int:poster_time},
 			subject = {string:subject},
 			body = {string:body},
-			to_list = {string:to_list}
+			to_list = {string:to_list},
+			is_usersaved = {int:is_usersaved}
 		WHERE id_draft = {int:id_pm_draft}
 		LIMIT 1',
 		array(
@@ -89,6 +92,7 @@ function modify_pm_draft($draft, $recipientList)
 			'body' => $draft['body'],
 			'id_pm_draft' => $draft['id_pm_draft'],
 			'to_list' => serialize($recipientList),
+			'is_usersaved' => $draft['is_usersaved'],
 		)
 	);
 }

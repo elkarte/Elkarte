@@ -37,6 +37,8 @@ class UserAccessMentions implements ScheduledTaskInterface
 
 		$db = database();
 
+		$mentionTypes = array('mentionmem', 'likemsg', 'rlikemsg', 'quotedmem');
+
 		if (!empty($modSettings['user_access_mentions']))
 		{
 			$user_access_mentions = Util::unserialize($modSettings['user_access_mentions']);
@@ -89,7 +91,7 @@ class UserAccessMentions implements ScheduledTaskInterface
 							LIMIT {int:start}, {int:limit}',
 							array(
 								'current_member' => $member,
-								'mention_types' => array('mentionmem', 'likemsg', 'rlikemsg', 'quotedmem'),
+								'mention_types' => $mentionTypes,
 								'user_see_board' => ($can == 'can' ? '' : 'NOT ') . '(' . $user_see_board . (!empty($modSettings['recycle_enable']) && $modSettings['recycle_board'] > 0 ? ' AND b.id_board != ' . $modSettings['recycle_board'] : '') . ')',
 								'start' => $start,
 								'limit' => $limit,
@@ -167,7 +169,7 @@ class UserAccessMentions implements ScheduledTaskInterface
 					AND mention_type IN ({array_string:mention_types})',
 				array(
 					'last_id_member' => $current_check,
-					'mention_types' => array('mentionmem', 'likemsg', 'rlikemsg'),
+					'mention_types' => $mentionTypes,
 				)
 			);
 			list ($remaining) = $request->fetch_row();
@@ -188,7 +190,7 @@ class UserAccessMentions implements ScheduledTaskInterface
 				LIMIT {int:limit}',
 				array(
 					'last_id_member' => $current_check,
-					'mention_types' => array('mentionmem', 'likemsg', 'rlikemsg'),
+					'mention_types' => $mentionTypes,
 					'limit' => $limit,
 				)
 			);
@@ -215,7 +217,7 @@ class UserAccessMentions implements ScheduledTaskInterface
 					LIMIT 1',
 					array(
 						'current_member' => $row['id_member'],
-						'mention_types' => array('mentionmem', 'likemsg', 'rlikemsg', 'quotedmem'),
+						'mention_types' => $mentionTypes,
 						'user_see_board' => 'NOT (' . $user_see_board . (!empty($modSettings['recycle_enable']) && $modSettings['recycle_board'] > 0 ? ' AND b.id_board != ' . $modSettings['recycle_board'] : '') . ')',
 					)
 				);

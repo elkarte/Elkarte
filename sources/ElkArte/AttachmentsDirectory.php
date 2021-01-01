@@ -320,6 +320,9 @@ class AttachmentsDirectory
 	 */
 	public function getCurrent()
 	{
+		if (empty($this->attachmentUploadDir))
+			return BOARDDIR . '/attachments';
+
 		return $this->attachmentUploadDir[$this->currentAttachmentUploadDir];
 	}
 

@@ -48,6 +48,7 @@ class Likemsg extends AbstractNotificationBoardAccess
 		$notifier = $this->_task->getNotifierData();
 		$replacements = array(
 			'ACTIONNAME' => $notifier['real_name'],
+			'SUBJECT' =>  $notifier['subject'],
 			'MSGLINK' => replaceBasicActionUrl('{script_url}?msg=' . $this->_task->id_target),
 		);
 

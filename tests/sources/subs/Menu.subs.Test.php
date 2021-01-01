@@ -3,7 +3,7 @@
 /**
  * TestCase class for menu subs.
  */
-class TestMenuSubs extends \PHPUnit\Framework\TestCase
+class TestMenuSubs extends ElkArteCommonSetupTest
 {
 	protected $test_areas;
 	protected $test_options;
@@ -14,9 +14,12 @@ class TestMenuSubs extends \PHPUnit\Framework\TestCase
 	 *
 	 * setUp() is run automatically by the testing framework before each test method.
 	 */
-	protected function setUp()
+	public function setUp()
 	{
 		global $context;
+
+		parent::setUp();
+		parent::setSession();
 
 		require_once(SUBSDIR . '/Menu.subs.php');
 
@@ -93,15 +96,7 @@ class TestMenuSubs extends \PHPUnit\Framework\TestCase
 		);
 
 		// Stuff the ballet box
-		$context['session_var'] = 'abcde';
-		$context['session_id'] = '123456789';
 		$context['right_to_left'] = false;
-
-		// Your the admin now
-		\ElkArte\User::$info = new \ElkArte\ValuesContainer([
-			'is_admin' => true,
-			'is_uest' => false,
-		]);
 	}
 
 	/**
@@ -110,6 +105,7 @@ class TestMenuSubs extends \PHPUnit\Framework\TestCase
 	 */
 	public function tearDown()
 	{
+		parent::tearDown();
 		destroyMenu('last');
 	}
 
@@ -129,7 +125,7 @@ class TestMenuSubs extends \PHPUnit\Framework\TestCase
 		$expected = array('controller' => 'Area1_Controller', 'function' => 'action_area1',
 			'icon' => 'transparent.png', 'class' => 'test_img_area1', 'hidden' => false,
 			'password' => false, 'subsections' => array(), 'label' => 'Area1 Label',
-			'url' => 'http://127.0.0.1/index.php?action=section1;area=area1;extra=param;abcde=123456789',
+			'url' => 'http://127.0.0.1/index.php?action=section1;area=area1;extra=param;elk_test_session=elk_test_session',
 			'permission' => array(), 'enabled' => true, 'current_action' => 'section1', 'current_area' => 'area1',
 			'current_section' => 'section1', 'current_subsection' => ''
 		);
@@ -154,7 +150,7 @@ class TestMenuSubs extends \PHPUnit\Framework\TestCase
 				'sub1' => array('label' => 'Sub One', 'counter' => '', 'url' => 'some url', 'permission' => array(), 'enabled' => true),
 				'sub2' => array('label' => 'Sub Two', 'counter' => '', 'url' => '', 'permission' => array(), 'enabled' => false),
 			),
-			'label' => 'Area3 Label', 'url' => 'http://127.0.0.1/index.php?action=section2;area=area3;extra=param;abcde=123456789',
+			'label' => 'Area3 Label', 'url' => 'http://127.0.0.1/index.php?action=section2;area=area3;extra=param;elk_test_session=elk_test_session',
 			'permission' => array(0 => 'area3 permission'),
 			'enabled' => true, 'current_action' => 'section2', 'current_area' => 'area3', 'current_section' => 'section2', 'current_subsection' => 'sub1');
 

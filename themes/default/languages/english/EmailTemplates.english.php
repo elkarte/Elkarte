@@ -1,11 +1,11 @@
 <?php
-// Version: 1.1; EmailTemplates
+// Version: 2.0; EmailTemplates
 
 // Since all of these strings are being used in emails, numeric entities should be used.
 
 // Do not translate anything that is between {}, they are used as replacement variables and MUST remain exactly how they are.
-//   Additionally do not translate the @additioinal_parmas: line or the variable names in the lines that follow it.  You may
-//   translate the description of the variable.  Do not translate @description:, however you may translate the rest of that line.
+// Additionally do not translate the @additional_params: line or the variable names in the lines that follow it.  You may
+// translate the description of the variable.  Do not translate @description:, however you may translate the rest of that line.
 
 // Do not use block comments in this file, they will have special meaning.
 
@@ -868,7 +868,7 @@ Once the attachments directory reaches it\'s maximum permitted size users will n
 $txt['admin_backup_database_subject'] = 'A database backup has been taken';
 $txt['admin_backup_database_body'] = '{REALNAME},
 
-this email is to to inform you that {BAK_REALNAME} has just downloaded a backup of the database at {FORUMNAME}.
+This email is to inform you that {BAK_REALNAME} has just downloaded a backup of the database at {FORUMNAME}.
 
 {REGARDS}';
 
@@ -1038,9 +1038,15 @@ Reply to this Personal Message (to the sender only) here: {REPLYLINK}';
 $txt['notify_new_buddy_subject'] = '{ACTIONNAME} added you as buddy';
 $txt['notify_new_buddy_body'] = '{REALNAME},
 
-this email is to to inform you that {ACTIONNAME} has just has added you as buddy at {FORUMNAME}.
+We wanted to let you know that {ACTIONNAME} has just added you as a buddy 
+at {FORUMNAME}.  
 
-{REGARDS}';
+{REGARDS}
+
+
+You can unsubscribe to further "new buddy" notifications by using this link:
+{UNSUBSCRIBELINK}
+';
 $txt['notify_new_buddy_digest'] = 'You have been added as buddy by:';
 $txt['notify_new_buddy_snippet'] = '{ACTIONNAME}';
 
@@ -1048,14 +1054,23 @@ $txt['notify_new_buddy_snippet'] = '{ACTIONNAME}';
 	@additional_params: notify_new_likemsg
 		ACTIONNAME:  The user name of the member that liked the message.
 		MSGLINK:  The url to the message liked.
+		SUBJECT: The subject of the message
 	@description: A notification email sent to the members whose message has been liked
 */
 $txt['notify_new_likemsg_subject'] = 'A message received a like';
 $txt['notify_new_likemsg_body'] = '{REALNAME},
 
-this email is to to inform you that {ACTIONNAME} has just has liked the message {MSGLINK} at {FORUMNAME}.
+We wanted to let you know that {ACTIONNAME} has just liked your message 
+in the "{SUBJECT}" topic at {FORUMNAME}.  
+You can view that message by following this link:
+{MSGLINK}
 
-{REGARDS}';
+{REGARDS}
+
+
+You can unsubscribe to further "liked by" notifications by using this link:
+{UNSUBSCRIBELINK}
+';
 $txt['notify_new_likemsg_digest'] = 'The following messages has been liked:';
 $txt['notify_new_likemsg_snippet'] = '{MSGLINK}';
 
@@ -1063,29 +1078,47 @@ $txt['notify_new_likemsg_snippet'] = '{MSGLINK}';
 	@additional_params: notify_mentionmem
 		ACTIONNAME:  The user name of the member that mentioned someone.
 		MSGLINK:  The url to the message where someone has been mentioned.
+		SUBJECT: The subject of the message
 	@description: A notification email sent to the members mentioned by someone else in a message
 */
 $txt['notify_mentionmem_subject'] = 'You have been mentioned';
 $txt['notify_mentionmem_body'] = '{REALNAME},
 
-this email is to to inform you that {ACTIONNAME} has just mentioned you in the message {MSGLINK} at {FORUMNAME}.
+We wanted to let you know that {ACTIONNAME} has just mentioned you in a message 
+in the "{SUBJECT}" topic at {FORUMNAME}.  
+You can view that message by following this link:
+{MSGLINK}
 
-{REGARDS}';
-$txt['notify_mentionmem_digest'] = 'You have been mentioned in the followin messages:';
+{REGARDS}
+
+
+You can unsubscribe to further "mentioned" notifications by using this link:
+{UNSUBSCRIBELINK}
+';
+$txt['notify_mentionmem_digest'] = 'You have been mentioned in the following messages:';
 $txt['notify_mentionmem_snippet'] = '{MSGLINK}';
 
 /**
 	@additional_params: notify_quotedmem
 		ACTIONNAME:  The user name of the member that quoted someone's message.
 		MSGLINK:  The url to the message where someone has been quoted.
+		SUBJECT: The subject of the message
 	@description: A notification email sent to the members quoted in someone else message
 */
-$txt['notify_quotedmem_subject'] = 'A message has been quoted';
+$txt['notify_quotedmem_subject'] = 'Your message has been quoted';
 $txt['notify_quotedmem_body'] = '{REALNAME},
 
-this email is to to inform you that {ACTIONNAME} has just quoted one of your messages in {MSGLINK} at {FORUMNAME}.
+We wanted to let you know that {ACTIONNAME} at {FORUMNAME} has just quoted
+your messages in the "{SUBJECT}" topic.  You can view that message by 
+following this link:
+{MSGLINK}
 
-{REGARDS}';
+{REGARDS}
+
+
+You can unsubscribe to further "quoted message" notifications by using this link:
+{UNSUBSCRIBELINK}
+';
 $txt['notify_quotedmem_digest'] = 'Your messages have been quoted in:';
 $txt['notify_quotedmem_snippet'] = '{MSGLINK}';
 

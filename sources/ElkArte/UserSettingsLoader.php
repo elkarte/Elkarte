@@ -26,7 +26,7 @@ class UserSettingsLoader
 	/**
 	 * @var int
 	 */
-	public const HASH_LENGTH = 4;
+	public const HASH_LENGTH = 16;
 	/**
 	 * @var int
 	 */
@@ -259,7 +259,7 @@ class UserSettingsLoader
 			$_SESSION['id_msg_last_visit'] = $this->settings['id_msg_last_visit'];
 
 			// If it was *at least* five hours ago...
-			if ($visitOpt['poster_time'] < time() - 5 * 3600)
+			if ($visitOpt === false || $visitOpt['poster_time'] < time() - 5 * 3600)
 			{
 				require_once(SUBSDIR . '/Members.subs.php');
 				updateMemberData($this->id, array('id_msg_last_visit' => (int) $modSettings['maxMsgID'], 'last_login' => time(), 'member_ip' => $this->req->client_ip(), 'member_ip2' => $this->req->ban_ip()));
@@ -304,6 +304,16 @@ class UserSettingsLoader
 
 		// This is a logged in user, so definitely not a spider.
 		$user_info['possibly_robot'] = false;
+
+		// Lets upgrade the salt if needed.
+		if ($this->settings->fixSalt())
+		{
+			require_once(SUBSDIR . '/Members.subs.php');
+			require_once(SUBSDIR . '/Auth.subs.php');
+
+			updateMemberData($this->settings['id_member'], array('password_salt' => $this->settings['password_salt']));
+			setLoginCookie(60 * $modSettings['cookieTime'], $this->settings['id_member'], hash('sha256', ($this->settings['passwd'] . $this->settings['password_salt'])));
+		}
 
 		return $user_info;
 	}

@@ -948,7 +948,7 @@ class PersonalMessage extends AbstractController
 		);
 
 		// Trigger the prepare_send_context PM event
-		$this->_events->trigger('prepare_send_context', array('pmsg' => isset($this->_req->query->pmsg) ? $this->_req->query->pmsg : (isset($this->_req->query->quote) ? $this->_req->query->quote : 0), 'editorOptions' => &$editorOptions, 'recipientList' => &$context['recipients']));
+		$this->_events->trigger('prepare_send_context', array('editorOptions' => &$editorOptions));
 
 		create_control_richedit($editorOptions);
 
@@ -1094,7 +1094,7 @@ class PersonalMessage extends AbstractController
 		);
 
 		// Trigger the prepare_send_context PM event
-		$this->_events->trigger('prepare_send_context', array('pmsg' => isset($this->_req->query->pmsg) ? $this->_req->query->pmsg : (isset($this->_req->query->quote) ? $this->_req->query->quote : 0), 'editorOptions' => &$editorOptions, 'recipientList' => &$recipient_ids));
+		$this->_events->trigger('prepare_send_context', array('editorOptions' => &$editorOptions));
 
 		create_control_richedit($editorOptions);
 
@@ -1892,7 +1892,7 @@ class PersonalMessage extends AbstractController
 		global $txt, $context, $language, $modSettings;
 
 		// Check that this feature is even enabled!
-		if (empty($modSettings['enableReportPM']) || empty($this->_req->query->pmsg))
+		if (empty($modSettings['enableReportPM']) || empty($this->_req->getPost('pmsg', 'intval',  $this->_req->getQuery('pmsg', 'intval', 0))))
 		{
 			throw new Exception('no_access', false);
 		}
@@ -2578,7 +2578,7 @@ class PersonalMessage extends AbstractController
 					'timestamp' => forum_time(true, $row['msgtime']),
 					'recipients' => &$recipients[$row['id_pm']],
 					'labels' => &$context['message_labels'][$row['id_pm']],
-					'fully_labeled' => count($context['message_labels'][$row['id_pm']]) === count($context['labels']),
+					'fully_labeled' => (!empty($context['message_labels'][$row['id_pm']]) ? count($context['message_labels'][$row['id_pm']]) : 0) == count($context['labels']),
 					'is_replied_to' => &$context['message_replied'][$row['id_pm']],
 					'href' => $href,
 					'link' => '<a href="' . $href . '">' . $subject_highlighted . '</a>',

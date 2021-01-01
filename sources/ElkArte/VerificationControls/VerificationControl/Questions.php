@@ -273,7 +273,7 @@ class Questions implements ControlInterface
 				id_question, question, answer, language
 			FROM {db_prefix}antispam_questions' . $condition,
 			array(
-				'current_filter' => $this->_filter['value'],
+				'current_filter' => $this->_filter === null ? '' : $this->_filter['value'],
 			)
 		)->fetch_callback(
 			function ($row) use (&$question_answers) {

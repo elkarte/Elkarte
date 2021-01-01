@@ -124,7 +124,7 @@ class Likes extends AbstractController
 							$type,
 							$this->_id_liked,
 							$this->user->id,
-							array('id_members' => array($liked_message['id_member']), 'rlike_notif' => empty($modSettings['mentions_dont_notify_rlike']))
+							array('id_members' => array($liked_message['id_member']), 'rlike_notif' => empty($modSettings['mentions_dont_notify_rlike']), 'subject' => $liked_message['subject'])
 						));
 					}
 				}

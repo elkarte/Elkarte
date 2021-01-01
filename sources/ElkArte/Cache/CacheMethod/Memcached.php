@@ -138,7 +138,8 @@ class Memcached extends AbstractCacheMethod
 	 */
 	protected function getServers()
 	{
-		return array_keys((array) $this->obj->getStats());
+		$list = $this->obj->getStats();
+		return $list === false ? array() : array_keys((array) $this->obj->getStats());
 	}
 
 	/**
@@ -214,11 +215,8 @@ class Memcached extends AbstractCacheMethod
 		);
 
 		$serversmList = $this->getServers();
-
-		if (!empty($serversmList))
-		{
-			$var['postinput'] = $txt['cache_memcached_servers'] . implode('</li><li>', $serversmList) . '</li></ul>';
-		}
+		$serversmList = empty($serversmList) ? array($txt['admin_search_results_none']) : $serversmList;
+		$var['postinput'] = $txt['cache_memcached_servers'] . implode('</li><li>', $serversmList) . '</li></ul>';
 
 		$config_vars[] = $var;
 	}
