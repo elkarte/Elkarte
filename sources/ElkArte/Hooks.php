@@ -294,7 +294,13 @@ final class Hooks
 	}
 
 	/**
-	 * @todo
+	 * Loads ACP settings for enabled integrations
+	 *
+	 * What it does
+	 * - reads enabled integrations (those identified in autoload_integrate modsettings)
+	 * - verify the class exists
+	 * - verify it has a static method ::settingsRegister, if so calls that method and adds any hooks
+	 * returned by that method
 	 */
 	public function loadIntegrationsSettings()
 	{
