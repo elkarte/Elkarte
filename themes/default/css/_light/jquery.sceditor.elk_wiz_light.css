@@ -176,3 +176,9 @@ me:before {
 me {
 	color: #50AA3A;
 }
+
+.emoji {
+	max-width: 18px;
+	padding: 0 2px;
+	vertical-align: bottom;
+}
