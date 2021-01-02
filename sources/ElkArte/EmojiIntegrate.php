@@ -1,22 +1,25 @@
 <?php
 
 /**
- * @package Emoji for ElkArte
- * @author Spuds
- * @copyright (c) 2011-2017 Spuds
- * @license This Source Code is subject to the terms of the Mozilla Public License
- * version 1.1 (the "License"). You can obtain a copy of the License at
- * http://mozilla.org/MPL/1.1/.
+ * @package   ElkArte Forum
+ * @copyright ElkArte Forum contributors
+ * @license   BSD http://opensource.org/licenses/BSD-3-Clause (see accompanying LICENSE.txt file)
  *
- * @version 1.0.3
+ * @version 2.0 dev
+ *
  */
 
 namespace ElkArte;
 
+/**
+ * Class EmojiIntegrate, adds hooks to the system when called
+ *
+ * @package ElkArte
+ */
 class EmojiIntegrate
 {
 	/**
-	 * Register ILA hooks to the system
+	 * Register Emoji hooks to the system
 	 *
 	 * @return array
 	 */
@@ -63,7 +66,7 @@ class EmojiIntegrate
 	}
 
 	/**
-	 * integrate_pre_bbc_parser, called from BBCParser (ElkArte 1.1+)
+	 * integrate_pre_bbc_parser, called from BBCParser
 	 *
 	 * - Allow addons access before entering the main parse_bbc loop
 	 * - searches message for emoji :smile: tags and converts to image
@@ -83,6 +86,7 @@ class EmojiIntegrate
 	/**
 	 * integrate_editor_plugins called from Editor.subs.php
 	 *
+	 * What it does:
 	 * - Used to load in additional JS for the editor
 	 * - Add plugins to the editor
 	 * - Add initialization objects to the editor
@@ -107,35 +111,35 @@ class EmojiIntegrate
 		// Add the emoji plugin to the editor
 		$context['controls']['richedit'][$editor_id]['plugin_addons'][] = 'emoji';
 		$context['controls']['richedit'][$editor_id]['plugin_options'][] = '
-						emojiOptions: {
-							editor_id: \'' . $editor_id . '\',
-							emoji_group: \'' . (empty($modSettings['emoji_selection']) ? 'openemoji' : $modSettings['emoji_selection']) . '\'
-						}';
+			emojiOptions: {
+				editor_id: \'' . $editor_id . '\',
+				emoji_group: \'' . (empty($modSettings['emoji_selection']) ? 'openemoji' : $modSettings['emoji_selection']) . '\'
+			}';
 	}
 
 	/**
-	 * Adds the necessary setting
+	 * Adds the necessary settings to the smiley area of the ACP
 	 *
 	 * @param mixed[] $config_vars
 	 */
 	public static function integrate_modify_smiley_settings(&$config_vars)
 	{
-		global $txt, $context, $scripturl;
+		global $txt;
 
-		loadlanguage('emoji');
+		theme()->getTemplates()->loadLanguageFile('emoji');
 
 		// All the options, well at least some of them!
 		$config_vars[] = '';
 		$config_vars[] = array('select', 'emoji_selection', array(
 			'noemoji' => $txt['emoji_disabled'],
-			'openemoji' => $txt['emoji_open'],
-			'twitter' => $txt['emoji_twitter'],
+			'emojitwo' => $txt['emoji_open'],
+			'twemoji' => $txt['emoji_twitter'],
+			'noto-emoji' => $txt['emoji_google'],
 		));
 	}
 
-
 	/**
-	 * saves the setting
+	 * Saves the ACP settings
 	 *
 	 * @param mixed[] $config_vars
 	 */
@@ -145,7 +149,7 @@ class EmojiIntegrate
 
 		if (empty($req->post->emoji_selection))
 		{
-			$req->post->emoji_selection = 'openemoji';
+			$req->post->emoji_selection = 'noemoji';
 		}
 	}
 }
