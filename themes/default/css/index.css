@@ -3158,6 +3158,18 @@ img.new_posts {
 	vertical-align: bottom;
 }
 
+.emoji {
+	max-width: 18px;
+	padding: 0 2px;
+	vertical-align: text-bottom;
+}
+
+.emoji_tpl {
+	max-width: 22px;
+	padding: 0 2px 0 0;
+	vertical-align: middle;
+}
+
 /* All the signatures used in the forum. */
 .signature, .attachments, .custom_fields_above_signature {
 	font-size: 0.857em;
