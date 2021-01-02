@@ -185,3 +185,9 @@ me {
 	font-family: "DejaVu Sans Mono", Monaco, Consolas, monospace;
 	overflow: auto;
 }
+
+.emoji {
+	max-width: 18px;
+	padding: 0 2px;
+	vertical-align: bottom;
+}
