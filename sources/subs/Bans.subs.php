@@ -231,10 +231,7 @@ function removeBanLogs($ids = array())
 	// No specific id's passed, we truncate the entire table
 	if (empty($ids))
 	{
-		$db->query('truncate_table', '
-			TRUNCATE {db_prefix}log_banned',
-			array()
-		);
+		$db->truncate('{db_prefix}log_banned');
 	}
 	else
 	{
@@ -1584,22 +1581,20 @@ function banLoadAdditionalIPsMember($member_id)
 	$db = database();
 
 	// Find some additional IP's used by this member.
-	$message_ips = array();
-	$request = $db->query('ban_suggest_message_ips', '
+	$request = $db->fetchQuery('
 		SELECT DISTINCT poster_ip
 		FROM {db_prefix}messages
 		WHERE id_member = {int:current_user}
-			AND poster_ip RLIKE {string:poster_ip_regex}
+			AND poster_ip != {string:empty}
 		ORDER BY poster_ip',
-		array(
+		[
 			'current_user' => $member_id,
-			'poster_ip_regex' => '^[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}$',
-		)
+			'empty' => '',
+		]
 	);
-	while (($row = $request->fetch_assoc($request)))
-	{
-		$message_ips[] = $row['poster_ip'];
-	}
+	$message_ips = $request->fetch_callback(function($row) {
+		return $row['poster_ip'];
+	});
 	$request->free_result();
 
 	return $message_ips;
@@ -1619,22 +1614,20 @@ function banLoadAdditionalIPsError($member_id)
 {
 	$db = database();
 
-	$error_ips = array();
-	$request = $db->query('ban_suggest_error_ips', '
+	$request = $db->fetchQuery('
 		SELECT DISTINCT ip
 		FROM {db_prefix}log_errors
 		WHERE id_member = {int:current_user}
-			AND ip RLIKE {string:poster_ip_regex}
+			AND ip != {string:empty}
 		ORDER BY ip',
-		array(
+		[
 			'current_user' => $member_id,
-			'poster_ip_regex' => '^[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}$',
-		)
+			'empty' => '',
+		]
 	);
-	while (($row = $request->fetch_assoc()))
-	{
-		$error_ips[] = $row['ip'];
-	}
+	$error_ips = $request->fetch_callback(function ($row) {
+		return $row['ip'];
+	});
 	$request->free_result();
 
 	return $error_ips;

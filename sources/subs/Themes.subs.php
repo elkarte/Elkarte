@@ -667,7 +667,7 @@ function countConfiguredMemberOptions()
 {
 	$db = database();
 
-	return $db->query('themes_count', '
+	return $db->fetchQuery('
 		SELECT 
 			COUNT(DISTINCT id_member) AS value, id_theme
 		FROM {db_prefix}themes
@@ -804,7 +804,7 @@ function addThemeOptions($id_theme, $options, $value)
 {
 	$db = database();
 
-	$db->query('substring', '
+	$db->fetchQuery('
 		INSERT INTO {db_prefix}themes
 			(id_member, id_theme, variable, value)
 		SELECT 

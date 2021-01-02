@@ -218,7 +218,7 @@ class Unread
 		}
 		else
 		{
-			$request = $this->_db->query('unread_fetch_topic_count', '
+			$request = $this->_db->fetchQuery('
 				SELECT 
 					COUNT(DISTINCT t.id_topic), MIN(t.id_last_msg)
 				FROM {db_prefix}topics AS t
@@ -312,7 +312,7 @@ class Unread
 			}
 		}
 
-		$request = $this->_db->query('substring', '
+		$request = $this->_db->fetchQuery('
 			SELECT
 				ms.subject AS first_subject, ms.poster_time AS first_poster_time, ms.poster_name AS first_member_name,
 				ms.id_topic, t.id_board, b.name AS bname, t.num_replies, t.num_views, t.num_likes, t.approved,
@@ -349,11 +349,7 @@ class Unread
 				'limit' => $limit,
 			))
 		);
-		$topics = array();
-		while (($row = $request->fetch_assoc()))
-		{
-			$topics[] = $row;
-		}
+		$topics = $request->fetch_all();
 		$request->free_result();
 
 		return TopicUtil::prepareContext($topics, true, ((int) $this->_preview_bodies) + 128);
@@ -388,7 +384,7 @@ class Unread
 		}
 		else
 		{
-			$request = $this->_db->query('unread_replies', '
+			$request = $this->_db->fetchQuery('
 				SELECT t.id_topic, ' . $this->_sort_query . '
 				FROM {db_prefix}topics AS t
 					INNER JOIN {db_prefix}messages AS m ON (m.id_topic = t.id_topic AND m.id_member = {int:current_member})' . (strpos($this->_sort_query, 'ms.') === false ? '' : '
@@ -461,7 +457,7 @@ class Unread
 			}
 		}
 
-		$request = $this->_db->query('substring', '
+		$request = $this->_db->fetchQuery('
 			SELECT
 				ms.subject AS first_subject, ms.poster_time AS first_poster_time, ms.id_topic, t.id_board, b.name AS bname,
 				ms.poster_name AS first_member_name, ml.poster_name AS last_member_name, t.approved,
@@ -491,11 +487,7 @@ class Unread
 				'limit' => count($topics),
 			)
 		);
-		$return = array();
-		while (($row = $request->fetch_assoc()))
-		{
-			$return[] = $row;
-		}
+		$return = $request->fetch_all();
 		$request->free_result();
 
 		return TopicUtil::prepareContext($return, true, ((int) $this->_preview_bodies) + 128);

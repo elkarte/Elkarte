@@ -637,6 +637,17 @@ abstract class AbstractQuery implements QueryInterface
 	}
 
 	/**
+	 * {@inheritDoc}
+	 */
+	public function truncate($table)
+	{
+		return $this->fetchQuery('
+			TRUNCATE ' . $table,
+			[]
+		);
+	}
+
+	/**
 	 * Set the unbuffered state for the connection
 	 *
 	 * @param bool $state

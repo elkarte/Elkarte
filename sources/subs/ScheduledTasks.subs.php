@@ -538,8 +538,7 @@ function emptyTaskLog()
 {
 	$db = database();
 
-	$db->query('truncate_table', '
-		TRUNCATE {db_prefix}log_scheduled_tasks',
+	$db->truncate('{db_prefix}log_scheduled_tasks',
 		array()
 	);
 }

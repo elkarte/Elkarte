@@ -244,20 +244,6 @@ class Query extends AbstractQuery
 	{
 		// Special queries that need processing.
 		$replacements = array(
-			'ban_suggest_error_ips' => array(
-				'~RLIKE~' => '~',
-				'~\\.~' => '\.',
-			),
-			'ban_suggest_message_ips' => array(
-				'~RLIKE~' => '~',
-				'~\\.~' => '\.',
-			),
-			'consolidate_spider_stats' => array(
-				'~MONTH\(log_time\), DAYOFMONTH\(log_time\)~' => 'MONTH(CAST(CAST(log_time AS abstime) AS timestamp)), DAYOFMONTH(CAST(CAST(log_time AS abstime) AS timestamp))',
-			),
-			'attach_download_increase' => array(
-				'~LOW_PRIORITY~' => '',
-			),
 			'insert_log_search_topics' => array(
 				'~NOT RLIKE~' => '!~',
 			),

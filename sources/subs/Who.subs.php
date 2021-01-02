@@ -142,7 +142,7 @@ function addonsCredits()
 	$credits = array();
 	if (!$cache->getVar($credits, 'addons_credits', 86400))
 	{
-		$db->query('substring', '
+		$db->fetchQuery('
 			SELECT 
 				version, name, credits
 			FROM {db_prefix}log_packages

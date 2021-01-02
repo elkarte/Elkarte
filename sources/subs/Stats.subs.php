@@ -827,7 +827,7 @@ function UserStatsPollsVoted($memID)
 	$db = database();
 
 	// Number polls voted in.
-	$result = $db->query('distinct_poll_votes', '
+	$result = $db->fetchQuery('
 		SELECT 
 			COUNT(DISTINCT id_poll)
 		FROM {db_prefix}log_polls

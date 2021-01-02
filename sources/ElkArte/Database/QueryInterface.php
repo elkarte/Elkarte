@@ -55,7 +55,7 @@ interface QueryInterface
 	 * @param string $db_string
 	 * @param mixed[]|false $db_values = array()
 	 *
-	 * @return bool|resource
+	 * @return bool|Result
 	 * @throws \ElkArte\Exceptions\Exception
 	 */
 	public function query($identifier, $db_string, $db_values = array());
@@ -66,7 +66,7 @@ interface QueryInterface
 	 * @param string $db_string
 	 * @param mixed[] $db_values = array()
 	 * @param mixed[]|null
-	 * @return array
+	 * @return bool|Result
 	 */
 	public function fetchQuery($db_string, $db_values = array());
 
@@ -74,8 +74,16 @@ interface QueryInterface
 	 * Last insert id
 	 *
 	 * @param string $table
+	 * @return bool|int
 	 */
 	public function insert_id($table);
+
+	/**
+	 * Deletes all the data from a table
+	 *
+	 * @param string $table
+	 */
+	public function truncate($table);
 
 	/**
 	 * Do a transaction.

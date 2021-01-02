@@ -54,8 +54,7 @@ function flushLogTables()
 		DELETE FROM {db_prefix}log_banned');
 
 	// Start id_error back at 0 and dump the error log.
-	$db->query('truncate_table', '
-		TRUNCATE {db_prefix}log_errors');
+	$db->truncate('{db_prefix}log_errors');
 
 	// Clear out the spam log.
 	$db->query('', '
@@ -66,14 +65,11 @@ function flushLogTables()
 		DELETE FROM {db_prefix}log_karma');
 
 	// Last but not least, the search logs!
-	$db->query('truncate_table', '
-		TRUNCATE {db_prefix}log_search_topics');
+	$db->truncate('{db_prefix}log_search_topics');
 
-	$db->query('truncate_table', '
-		TRUNCATE {db_prefix}log_search_messages');
+	$db->truncate('{db_prefix}log_search_messages');
 
-	$db->query('truncate_table', '
-		TRUNCATE {db_prefix}log_search_results');
+	$db->truncate('{db_prefix}log_search_results');
 }
 
 /**

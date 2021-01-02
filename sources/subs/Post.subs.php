@@ -1083,7 +1083,7 @@ function lastPost()
 	$db = database();
 
 	// Find it by the board - better to order by board than sort the entire messages table.
-	$request = $db->query('substring', '
+	$request = $db->fetchQuery('
 		SELECT 
 			ml.poster_time, ml.subject, ml.id_topic, ml.poster_name, SUBSTRING(ml.body, 1, 385) AS body,
 			ml.smileys_enabled

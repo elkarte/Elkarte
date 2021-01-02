@@ -34,10 +34,7 @@ function deleteBadBehavior($type, $filter)
 	// Delete all or just some?
 	if ($type === 'delall' && empty($filter))
 	{
-		$db->query('truncate_table', '
-			TRUNCATE {db_prefix}log_badbehavior',
-			array()
-		);
+		$db->truncate('{db_prefix}log_badbehavior');
 	}
 	// Deleting all with a filter?
 	elseif ($type === 'delall' && !empty($filter))

@@ -178,7 +178,7 @@ function ml_alphaStart($start)
 {
 	$db = database();
 
-	$request = $db->query('substring', '
+	$request = $db->fetchQuery('
 		SELECT 
 			COUNT(*)
 		FROM {db_prefix}members
