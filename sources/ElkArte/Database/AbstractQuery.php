@@ -71,6 +71,34 @@ abstract class AbstractQuery implements QueryInterface
 	protected $query_wanna_see_board = '1!=1';
 
 	/**
+	 * String that defines case insensitive like query operator
+	 *
+	 * @var string
+	 */
+	protected $ilike = '';
+
+	/**
+	 * String that defines case insensitive not-like query operator
+	 *
+	 * @var string
+	 */
+	protected $not_ilike = '';
+
+	/**
+	 * String that defines regular-expression-like query operator
+	 *
+	 * @var string
+	 */
+	protected $rlike = '';
+
+	/**
+	 * String that defines regular-expression-not-like query operator
+	 *
+	 * @var string
+	 */
+	protected $not_rlike = '';
+
+	/**
 	 * MySQL supports unbuffered queries, this remembers if we are running an
 	 * unbuffered or not
 	 *
@@ -231,6 +259,14 @@ abstract class AbstractQuery implements QueryInterface
 				return $this->query_see_board;
 			case 'query_wanna_see_board':
 				return $this->query_wanna_see_board;
+			case 'ilike':
+				return $this->ilike;
+			case 'not_ilike':
+				return $this->not_ilike;
+			case 'rlike':
+				return $this->rlike;
+			case 'not_rlike':
+				return $this->not_rlike;
 			case 'column_case_insensitive':
 				return $this->_replaceColumnCaseInsensitive($matches[2]);
 		}

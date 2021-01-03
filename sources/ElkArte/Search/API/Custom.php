@@ -183,7 +183,7 @@ class Custom extends Standard
 		$count = 0;
 		foreach ($words['words'] as $regularWord)
 		{
-			$query_where[] = 'm.body' . (in_array($regularWord, $query_params['excluded_words']) ? ' NOT' : '') . (empty($modSettings['search_match_words']) || $search_data['no_regexp'] ? ' LIKE ' : ' RLIKE ') . '{string:complex_body_' . $count . '}';
+			$query_where[] = 'm.body' . (in_array($regularWord, $query_params['excluded_words']) ? ' {not_' : '{') . (empty($modSettings['search_match_words']) || $search_data['no_regexp'] ? 'like} ' : 'rlike} ') . '{string:complex_body_' . $count . '}';
 			$query_params['complex_body_' . ($count++)] = $this->prepareWord($regularWord, $search_data['no_regexp']);
 		}
 
@@ -213,7 +213,7 @@ class Custom extends Standard
 		{
 			foreach ($query_params['excluded_phrases'] as $phrase)
 			{
-				$query_where[] = 'subject NOT ' . (empty($modSettings['search_match_words']) || $search_data['no_regexp'] ? ' LIKE ' : ' RLIKE ') . '{string:exclude_subject_phrase_' . $count . '}';
+				$query_where[] = 'subject ' . (empty($modSettings['search_match_words']) || $search_data['no_regexp'] ? ' {not_ilike} ' : ' {not_rlike} ') . '{string:exclude_subject_phrase_' . $count . '}';
 				$query_params['exclude_subject_phrase_' . ($count++)] = $this->prepareWord($phrase, $search_data['no_regexp']);
 			}
 		}
@@ -223,7 +223,7 @@ class Custom extends Standard
 		{
 			foreach ($query_params['excluded_subject_words'] as $excludedWord)
 			{
-				$query_where[] = 'subject NOT ' . (empty($modSettings['search_match_words']) || $search_data['no_regexp'] ? ' LIKE ' : ' RLIKE ') . '{string:exclude_subject_words_' . $count . '}';
+				$query_where[] = 'subject ' . (empty($modSettings['search_match_words']) || $search_data['no_regexp'] ? ' {not_ilike} ' : ' {not_rlike} ') . '{string:exclude_subject_words_' . $count . '}';
 				$query_params['exclude_subject_words_' . ($count++)] = $this->prepareWord($excludedWord, $search_data['no_regexp']);
 			}
 		}
@@ -246,7 +246,7 @@ class Custom extends Standard
 			}
 		}
 
-		return $db_search->search_query('insert_into_log_messages_fulltext', ($db->support_ignore() ? ('
+		return $db_search->search_query('', ($db->support_ignore() ? ('
 			INSERT IGNORE INTO {db_prefix}' . $search_data['insert_into'] . '
 				(' . implode(', ', array_keys($query_select)) . ')') : '') . '
 			SELECT ' . implode(', ', $query_select) . '
