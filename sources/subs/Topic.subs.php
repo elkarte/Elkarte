@@ -2306,7 +2306,7 @@ function getTopicsPostsAndPoster($topic, $limit, $sort)
 	// When evaluating potentially huge offsets, grab the ids only, first.
     // The performance impact is still significant going from three columns to one.
 	$postMod = $modSettings['postmod_active'] && allowedTo('approve_posts');
-	$request = $db->query('display_get_post_poster', '
+	$request = $db->fetchQuery('
 		SELECT 
 			m.id_msg, m.id_member
 		FROM (
