@@ -817,6 +817,11 @@ function add_elk_mention(selector, oOptions)
 				})
 					.fail(function (jqXHR, textStatus, errorThrown)
 					{
+						if ('console' in window)
+						{
+							window.console.info(errorThrown);
+						}
+
 						oSettings.infobar.isError();
 						oSettings.infobar.changeText(textStatus).showBar();
 						// Reset the interface?

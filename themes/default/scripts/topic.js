@@ -360,7 +360,11 @@ QuickReply.prototype.swap = function (bInit, bSavestate)
 	}
 	else
 	{
-		console.log(bIsFull);
+		if ('console' in window)
+		{
+			window.console.info(bIsFull);
+		}
+;
 		$('#' + this.opt.sContainerId).slideDown();
 		if (bIsFull)
 		{
