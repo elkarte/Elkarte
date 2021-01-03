@@ -373,7 +373,8 @@ class Xml extends AbstractController
 		if ($validation_session === true && $validation_token === true)
 		{
 			// No question that we are doing some board reordering
-			if ($this->_req->getPost('order', 'trim', '') === 'reorder' && isset($this->_req->post->moved))
+			if ($this->_req->getPost('order', 'trim', '') === 'reorder'
+				&& isset($this->_req->post->moved))
 			{
 				$list_order = 0;
 				$moved_key = 0;
@@ -436,11 +437,9 @@ class Xml extends AbstractController
 
 				// Retrieve the current saved state
 				$boardTree = new BoardsTree(database());
-
-				$boardOptions = array();
 				$board_current = $boardTree->getBoardById($board_moved);
 				$board_new = $board_tree[$moved_key];
-
+//var_dump($board_current);
 				// Dropped on a sibling node, move after that
 				if (isset($board_previous_sibling))
 				{
@@ -461,13 +460,14 @@ class Xml extends AbstractController
 					$order[] = array('value' => $board_current['name'] . ' ' . $txt['mboards_order_child_of'] . ' ' . $boardTree->getBoardById($board_previous['id'])['name']);
 				}
 				// Nothing before this board at all, move to the top of the cat
-				elseif (!isset($board_previous))
+				else
 				{
 					$boardOptions = array(
 						'move_to' => 'top',
 						'target_category' => $board_new['category'],
+						'move_first_child' => true,
 					);
-					$order[] = array('value' => $board_current['name'] . ' ' . $txt['mboards_order_in_category'] . ' ' . $boardTree->getCategoryNodeById($board_new['category'])['name']);
+					$order[] = array('value' => $board_current['name'] . ' ' . $txt['mboards_order_in_category'] . ' ' . $boardTree->getCategoryNodeById($board_new['category'])['node']['name']);
 				}
 
 				// If we have figured out what to do
