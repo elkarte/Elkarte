@@ -99,7 +99,7 @@ class Fulltext extends Standard
 		$db_search = db_search();
 
 		// Try to determine the minimum number of letters for a fulltext search.
-		$request = $db_search->search_query('max_fulltext_length', '
+		$request = $db_search->search_query('', '
 			SHOW VARIABLES
 			LIKE {string:fulltext_minimum_word_length}',
 			array(

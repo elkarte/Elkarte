@@ -129,7 +129,7 @@ class Standard extends AbstractAPI
 	 */
 	public function clearCacheResults($id_search)
 	{
-		$this->_db_search->search_query('delete_log_search_results', '
+		$this->_db_search->search_query('', '
 			DELETE FROM {db_prefix}log_search_results
 			WHERE id_search = {int:search_id}',
 			array(
@@ -644,7 +644,7 @@ class Standard extends AbstractAPI
 		// Clean up some previous cache.
 		if (!$this->_createTemporary)
 		{
-			$this->_db_search->search_query('delete_log_search_topics', '
+			$this->_db_search->search_query('', '
 				DELETE FROM {db_prefix}log_search_topics
 				WHERE id_search = {int:search_id}',
 				array(
@@ -817,7 +817,7 @@ class Standard extends AbstractAPI
 		// Clear, all clear!
 		if (!$this->_createTemporary)
 		{
-			$this->_db_search->search_query('delete_log_search_messages', '
+			$this->_db_search->search_query('', '
 				DELETE FROM {db_prefix}log_search_messages
 				WHERE id_search = {int:id_search}',
 				array(
