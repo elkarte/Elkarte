@@ -755,12 +755,13 @@ class Email_Parse
 			$boundary_section->read_email($html, $part);
 
 			// Save the data that we need and release the parser
-			$this->_boundary_section[$this->_boundary_section_count] = new stdClass;
-			$this->_boundary_section[$this->_boundary_section_count]->body = $boundary_section->body;
-			$this->_boundary_section[$this->_boundary_section_count]->plain_body = $boundary_section->plain_body;
-			$this->_boundary_section[$this->_boundary_section_count]->headers = $boundary_section->headers;
-			$this->_boundary_section[$this->_boundary_section_count]->attachments = $boundary_section->attachments;
-			$this->_boundary_section[$this->_boundary_section_count]->inline_files = $boundary_section->inline_files;
+			$this->_boundary_section[$this->_boundary_section_count] = array();
+			$this->_boundary_section[$this->_boundary_section_count]['body'] = $boundary_section->body;
+			$this->_boundary_section[$this->_boundary_section_count]['plain_body'] = $boundary_section->plain_body;
+			$this->_boundary_section[$this->_boundary_section_count]['headers'] = $boundary_section->headers;
+			$this->_boundary_section[$this->_boundary_section_count]['attachments'] = $boundary_section->attachments;
+			$this->_boundary_section[$this->_boundary_section_count]['inline_files'] = $boundary_section->inline_files;
+			$this->_boundary_section[$this->_boundary_section_count] = (object) $this->_boundary_section[$this->_boundary_section_count];
 			$this->_boundary_section_count++;
 
 			unset($boundary_section);
