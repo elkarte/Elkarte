@@ -1626,6 +1626,12 @@ function fetchBoardsInfo($conditions = 'all', $params = array())
 			$security = $params['wanna_see_board'] ? '{query_wanna_see_board}' : '{query_see_board}';
 		}
 
+		// Prevent a bad query, from a triggered scheduled task or some other issue.
+		if (empty($security))
+		{
+			return [];
+		}
+
 		$request = $db->query('', '
 			SELECT ' . $select . '
 			FROM {db_prefix}boards AS b

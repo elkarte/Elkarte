@@ -633,7 +633,7 @@ function prepareDraft(&$draft, $draft_info)
 		$draft['is_usersaved'] = 0;
 	}
 
-	if ($draft_info['is_usersaved'] == 1)
+	if (isset($draft_info['is_usersaved']) && $draft_info['is_usersaved'] == 1)
 	{
 		$draft['is_usersaved'] = 1;
 	}

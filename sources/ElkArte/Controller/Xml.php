@@ -439,7 +439,7 @@ class Xml extends AbstractController
 				$boardTree = new BoardsTree(database());
 				$board_current = $boardTree->getBoardById($board_moved);
 				$board_new = $board_tree[$moved_key];
-//var_dump($board_current);
+
 				// Dropped on a sibling node, move after that
 				if (isset($board_previous_sibling))
 				{
