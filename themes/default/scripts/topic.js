@@ -364,7 +364,7 @@ QuickReply.prototype.swap = function (bInit, bSavestate)
 		{
 			window.console.info(bIsFull);
 		}
-;
+
 		$('#' + this.opt.sContainerId).slideDown();
 		if (bIsFull)
 		{
