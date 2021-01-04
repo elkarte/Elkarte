@@ -986,18 +986,19 @@ function getUsersNotificationsPreferences($notification_types, $members)
 
 	$notification_types = (array) $notification_types;
 	$query_members = (array) $members;
-	$defaults = array_map(function($vals) {
+	$defaults = [];
+	foreach (getConfiguredNotificationMethods('*') as $notification => $methods)
+	{
 		$return = [];
-		foreach ($vals as $k => $level)
+		foreach ($methods as $k => $level)
 		{
 			if ($level == \ElkArte\Notifications::DEFAULT_LEVEL)
 			{
 				$return[] = $k;
 			}
 		}
-
-		return $return;
-	}, getConfiguredNotificationMethods('*'));
+		$defaults[$notification] = $return;
+	}
 
 	$results = array();
 	$db->fetchQuery('
@@ -1011,7 +1012,7 @@ function getUsersNotificationsPreferences($notification_types, $members)
 			'mention_types' => $notification_types,
 		)
 	)->fetch_callback(
-		function ($row) use (&$results, $defaults) {
+		function ($row) use (&$results) {
 			if (!isset($results[$row['id_member']]))
 			{
 				$results[$row['id_member']] = [];
@@ -1073,6 +1074,11 @@ function saveUserNotificationsPreferences($member, $notification_data)
 	$inserts = array();
 	foreach ($notification_data as $type => $level)
 	{
+		// used to skip values that are here only to remove the default
+		if (empty($level))
+		{
+			continue;
+		}
 		$inserts[] = array(
 			$member,
 			$type,
@@ -1090,7 +1096,7 @@ function saveUserNotificationsPreferences($member, $notification_data)
 		array(
 			'id_member' => 'int',
 			'mention_type' => 'string-12',
-			'notification_level' => 'int',
+			'notification_type' => 'string-10',
 		),
 		$inserts,
 		array('id_member', 'mention_type')

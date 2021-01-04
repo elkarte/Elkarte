@@ -165,7 +165,7 @@ class UpgradeInstructions_upgrade_1_1
 					$this->table->create_table('{db_prefix}notifications_pref',
 						array(
 							array('name' => 'id_member', 'type' => 'mediumint', 'size' => 8, 'unsigned' => true, 'default' => 0),
-							array('name' => 'notification_level', 'type' => 'tinyint', 'size' => 1, 'default' => 1),
+							array('name' => 'notification_type', 'type' => 'varchar', 'size' => 10, 'default' => ''),
 							array('name' => 'mention_type', 'type' => 'varchar', 'size' => 12, 'default' => ''),
 						),
 						array(
@@ -176,8 +176,29 @@ class UpgradeInstructions_upgrade_1_1
 					);
 
 					updateSettings(array(
-						'notification_methods' => 'a:4:{s:5:"buddy";a:4:{s:12:"notification";s:1:"1";s:5:"email";s:1:"1";s:11:"email_daily";s:1:"1";s:12:"email_weekly";s:1:"1";}s:7:"likemsg";a:1:{s:12:"notification";s:1:"1";}s:10:"mentionmem";a:4:{s:12:"notification";s:1:"1";s:5:"email";s:1:"1";s:11:"email_daily";s:1:"1";s:12:"email_weekly";s:1:"1";}s:9:"quotedmem";a:4:{s:12:"notification";s:1:"1";s:5:"email";s:1:"1";s:11:"email_daily";s:1:"1";s:12:"email_weekly";s:1:"1";}}',
-					));
+						'notification_methods' => serialize([
+							'buddy' => [
+								'notification' => "1",
+								'email' => "1",
+								'emaildaily' => "1",
+								'emailweekly' => "1"
+							],
+							'likemsg' => [
+								'notification' => "1"
+							],
+							"mentionmem" => [
+								"notification" => "1",
+								"email" => "1",
+								"emaildaily" => "1",
+								"emailweekly" => "1",
+							],
+							"quotedmem" => [
+								"notification" => "1",
+								"email" => "1",
+								"emaildaily" => "1",
+								"emailweekly" => "1"
+							]
+						])));
 				}
 			)
 		);
@@ -285,12 +306,12 @@ class UpgradeInstructions_upgrade_1_1
 
 						$this->db->query('', '
 							INSERT IGNORE INTO {db_prefix}notifications_pref
-								(id_member, mention_type, notification_level)
-							SELECT id_member, {string:mention_type}, {int:level}
+								(id_member, mention_type, notification_type)
+							SELECT id_member, {string-12:mention_type}, {string-10:level}
 							FROM {db_prefix}members',
 							array(
 								'mention_type' => $toggle,
-								'level' => 1,
+								'level' => 'notification',
 							)
 						);
 					}

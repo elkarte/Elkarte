@@ -1639,16 +1639,28 @@ function makeNotificationChanges($memID)
 
 	if (isset($_POST['notify_submit']))
 	{
-		$to_save = array();
+		$to_save = [];
 		foreach (getMemberNotificationsProfile($memID) as $mention => $data)
 		{
-			if (isset($_POST['notify'][$mention]) && !empty($_POST['notify'][$mention]['status']) && isset($data['data'][$_POST['notify'][$mention]['method']]))
+			if (isset($_POST['notify'][$mention]) && !empty($_POST['notify'][$mention]['status']))
 			{
-				$to_save[$mention] = (int) $_POST['notify'][$mention]['method'];
+				// When is not an array it means => use default
+				if (!is_array($_POST['notify'][$mention]['status']))
+				{
+					$to_save[$mention] = 0;
+					continue;
+				}
+				foreach ($_POST['notify'][$mention]['status'] as $method)
+				{
+					if (isset($data['data'][$method]))
+					{
+						$to_save[$mention] = $method;
+					}
+				}
 			}
 			else
 			{
-				$to_save[$mention] = 0;
+				$to_save[$mention] = Notifications::DEFALT_NONE;
 			}
 		}
 

@@ -34,9 +34,15 @@ class Notifications extends AbstractModel
 	const NOTIFIERS_NAMESPACE = '\\ElkArte\\Notifiers\\Methods';
 
 	/**
-	 * Since we have to call them dynamically we need to know both path and namespace...
+	 * When in settings is stored with this value, it means it's the default for users that
+	 * have no specific setting
 	 */
 	const DEFAULT_LEVEL = 2;
+
+	/**
+	 * When notifications_pref has this value, no notifications are sent
+	 */
+	const DEFAULT_NONE = 'none';
 
 	/**
 	 * Instance manager

@@ -481,7 +481,8 @@ class Notify extends AbstractController
 			case 'mentionmem':
 			case 'quotedmem':
 			case 'rlikemsg':
-				$this->_setUserNotificationArea($member['id_member'], $area, 1);
+				throw new \Exception('This should no longer happen... in theory');
+// 				$this->_setUserNotificationArea($member['id_member'], $area, 1);
 				break;
 		}
 	}

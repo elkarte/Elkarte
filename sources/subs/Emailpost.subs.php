@@ -1130,11 +1130,8 @@ function pbe_disable_user_notify($email_message)
 		);
 
 		// Now that other notifications have been added, we need to turn off email for those, too.
-		// notification_level "1" = "Only mention/alert"
 		$db->query('', '
-			UPDATE {db_prefix}notifications_pref
-			SET
-				notification_level = 1
+			DELETE FROM {db_prefix}notifications_pref
 			WHERE id_member = {int:id_member}
 				AND notification_type = {string:email}',
 			array(
