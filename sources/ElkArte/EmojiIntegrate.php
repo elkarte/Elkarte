@@ -79,7 +79,8 @@ class EmojiIntegrate
 		// If we are doing smileys, then we are doing emoji!
 		if ((empty($_REQUEST['sa']) || $_REQUEST['sa'] !== 'install2') && $message !== false)
 		{
-			$message = Emoji::emojiNameToImage($message);
+			$emoji = Emoji::instance();
+			$message = $emoji->emojiNameToImage($message);
 		}
 	}
 
