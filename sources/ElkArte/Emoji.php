@@ -19,9 +19,13 @@ namespace ElkArte;
  * - Searches text for :tag: strings
  * - If tag is found to be a known emoji, replaces it with an image tag
  */
-class Emoji
+class Emoji extends AbstractModel
 {
-	// Array of keys with known emoji names
+	/** @var null|\ElkArte\Emoji holds the instance of this class */
+	private static $instance = null;
+	/** @var string holds the url of where the emojis are stored */
+	public $smileys_url;
+	/** @var string[] Array of keys with known emoji names */
 	private $shortcode_replace = array(
 		'joy' => '1f602', 'heart' => '2764', 'heart_eyes' => '1f60d', 'sob' => '1f62d', 'blush' => '1f60a', 'unamused' => '1f612', 'kissing_heart' => '1f618', 'two_hearts' => '1f495', 'weary' => '1f629', 'ok_hand' => '1f44c',
 		'pensive' => '1f614', 'smirk' => '1f60f', 'grin' => '1f601', 'recycle' => '267b', 'wink' => '1f609', 'thumbsup' => '1f44d', 'pray' => '1f64f', 'relieved' => '1f60c', 'notes' => '1f3b6', 'flushed' => '1f633',
@@ -88,7 +92,7 @@ class Emoji
 		'tent' => '26fa', 'seat' => '1f4ba', 'taxi' => '1f695', 'black_medium_small_square' => '25fe', 'briefcase' => '1f4bc', 'newspaper' => '1f4f0', 'circus_tent' => '1f3aa', 'six_pointed_star' => '1f52f', 'mens' => '1f6b9', 'european_castle' => '1f3f0',
 		'flashlight' => '1f526', 'foggy' => '1f301', 'arrow_double_up' => '23eb', 'bamboo' => '1f38d', 'ticket' => '1f3ab', 'helicopter' => '1f681', 'minidisc' => '1f4bd', 'oncoming_bus' => '1f68d', 'melon' => '1f348', 'white_small_square' => '25ab',
 		'european_post_office' => '1f3e4', 'keycap_ten' => '1f51f', 'notebook' => '1f4d3', 'no_bell' => '1f515', 'oden' => '1f362', 'flags' => '1f38f', 'carousel_horse' => '1f3a0', 'blowfish' => '1f421', 'chart_with_upwards_trend' => '1f4c8', 'sweet_potato' => '1f360',
-		'ski' => '1f3bf', 'clock12' => '1f55b', 'signal_strength' => '1f4f6', 'construction' => '1f6a7', 'black_medium_square' => '25fc', 'satellite' => '1f4e1', 'euro' => '1f4b6', 'womans_clothes' => '1f45a', 'ledger' => '1f4d2', 'leopard' => '1f406',
+		'ski' => '1f3bf', 'clock12' => '1f55b', 'signal_strength' => '1f4f6', 'construction' => '1f6a7', 'black_medium_square' => '25fc', 'satellite2' => '1f4e1', 'euro' => '1f4b6', 'womans_clothes' => '1f45a', 'ledger' => '1f4d2', 'leopard' => '1f406',
 		'low_brightness' => '1f505', 'clock3' => '1f552', 'department_store' => '1f3ec', 'truck' => '1f69a', 'sake' => '1f376', 'railway_car' => '1f683', 'speedboat' => '1f6a4', 'vhs' => '1f4fc', 'clock1' => '1f550', 'arrow_double_down' => '23ec',
 		'water_buffalo' => '1f403', 'arrow_down_small' => '1f53d', 'yen' => '1f4b4', 'mute' => '1f507', 'running_shirt_with_sash' => '1f3bd', 'white_large_square' => '2b1c', 'wheelchair' => '267f', 'clock2' => '1f551', 'paperclip' => '1f4ce', 'atm' => '1f3e7',
 		'cinema' => '1f3a6', 'telescope' => '1f52d', 'rice_scene' => '1f391', 'blue_book' => '1f4d8', 'white_medium_square' => '25fb', 'postbox' => '1f4ee', 'e-mail' => '1f4e7', 'mouse2' => '1f401', 'bullettrain_side' => '1f684', 'ideograph_advantage' => '1f250',
@@ -131,22 +135,27 @@ class Emoji
 		'gorilla' => '1f98d', 'fox' => '1f98a', 'deer' => '1f98c', 'rhinoceros' => '1f98f', 'bat' => '1f987', 'eagle' => '1f985', 'duck' => '1f986', 'owl' => '1f989', 'lizard' => '1f98e', 'shark' => '1f988',
 		'butterfly' => '1f98b', 'wilted_flower' => '1f940', 'kiwi_fruit' => '1f95d', 'avocado' => '1f951', 'potato' => '1f954', 'carrot' => '1f955', 'cucumber' => '1f952', 'peanuts' => '1f95c', 'croissant' => '1f950', 'baguette_bread' => '1f956',
 		'pancakes' => '1f95e', 'bacon' => '1f953', 'stuffed_flatbread' => '1f959', 'shallow_pan_of_food' => '1f958', 'green_salad' => '1f957', 'shrimp' => '1f990', 'squid' => '1f991', 'glass_of_milk' => '1f95b', 'clinking_glasses' => '1f942', 'tumbler_glass' => '1f943',
-		'spoon' => '1f944', 'motor_scooter' => '1f6f5', 'kick_scooter' => '1f6f4', 'canoe' => '1f6f6', 'umbrella' => '2602', 'snowman' => '2603', '1st_place_medal' => '1f947', '2nd_place_medal' => '1f948', '3rd_place_medal' => '1f949', 'boxing_glove' => '1f94a',
+		'spoon' => '1f944', 'motor_scooter' => '1f6f5', 'kick_scooter' => '1f6f4', 'canoe' => '1f6f6', 'umbrella2' => '2602', 'snowman2' => '2603', '1st_place_medal' => '1f947', '2nd_place_medal' => '1f948', '3rd_place_medal' => '1f949', 'boxing_glove' => '1f94a',
 		'martial_arts_uniform' => '1f94b', 'goal_net' => '1f945', 'envelope' => '2709', 'shopping_cart' => '1f6d2', 'eject_button' => '23cf', 'medical_symbol' => '2695', 'shinto_shrine' => '26e9', 'fast_forward' => '23e9', 'hash' => '0023', 'asterisk' => '002a',
 		'regional_indicator_z' => '1f1ff', 'regional_indicator_y' => '1f1fe', 'regional_indicator_x' => '1f1fd', 'regional_indicator_w' => '1f1fc', 'regional_indicator_v' => '1f1fb', 'regional_indicator_t' => '1f1f9', 'regional_indicator_s' => '1f1f8', 'regional_indicator_r' => '1f1f7', 'regional_indicator_q' => '1f1f6', 'regional_indicator_p' => '1f1f5',
 		'regional_indicator_o' => '1f1f4', 'regional_indicator_n' => '1f1f3', 'regional_indicator_m' => '1f1f2', 'regional_indicator_l' => '1f1f1', 'regional_indicator_k' => '1f1f0', 'regional_indicator_j' => '1f1ef', 'regional_indicator_i' => '1f1ee', 'regional_indicator_h' => '1f1ed', 'regional_indicator_g' => '1f1ec', 'regional_indicator_e' => '1f1ea',
 		'regional_indicator_d' => '1f1e9', 'regional_indicator_c' => '1f1e8', 'regional_indicator_b' => '1f1e7', 'regional_indicator_a' => '1f1e6'
 	);
 
-	private $smileys_url;
-
 	/**
 	 * Emoji constructor.
 	 *
-	 * @param $smileys_url
+	 * @param string $smileys_url
 	 */
-	public function __construct($smileys_url)
+	public function __construct($smileys_url = '')
 	{
+		parent::__construct();
+
+		if (empty($smileys_url))
+		{
+			$smileys_url = htmlspecialchars($this->_modSettings['smileys_url']) . '/' . $this->_modSettings['emoji_selection'];
+		}
+
 		$this->smileys_url = $smileys_url;
 	}
 
@@ -154,19 +163,17 @@ class Emoji
 	 * Simple search and replace function
 	 *
 	 * What it does:
-	 * - Finds emoji tags outside of code tags and converts them to images
+	 * - Finds emoji tags outside of code tags and converts applicable ones to images
 	 * - Called from integrate_pre_bbc_parser
 	 *
 	 * @param string $string
 	 * @return string
 	 */
-	public static function emojiNameToImage($string)
+	public function emojiNameToImage($string)
 	{
-		global $modSettings;
+		$emoji = Emoji::instance();
 
-		$emoji = new Emoji(htmlspecialchars($modSettings['smileys_url']) . '/' . $modSettings['emoji_selection']);
-
-		// Find all emoji tags outside code tags
+		// Only work on the areas outside of code tags
 		$parts = preg_split('~(\[/code]|\[code(?:=[^]]+)?])~i', $string, -1, PREG_SPLIT_DELIM_CAPTURE);
 
 		// Only converts :tags: outside.
@@ -175,8 +182,10 @@ class Emoji
 			// It goes 0 = outside, 1 = begin tag, 2 = inside, 3 = close tag, repeat.
 			if ($i % 4 == 0)
 			{
-				// They must be at the start of a line, or have a leading space or be after a bbc ] tag
-				$parts[$i] = preg_replace_callback('~(\s?|^|]|<br />)(:([-+\w]+):\s?)~si', [$emoji, 'emojiToImage_Callback'], $parts[$i]);
+				// :emoji: must be at the start of a line, or have a leading space or be after a bbc ] tag
+				$parts[$i] = preg_replace_callback('~(?:\s?|^|]|<br />|<br>)(:([-+\w]+):\s?)~si', [$emoji, 'emojiToImage'], $parts[$i]);
+
+				$parts[$i] = $this->keyboardEmojiToImage($parts[$i]);
 			}
 		}
 
@@ -184,32 +193,198 @@ class Emoji
 	}
 
 	/**
-	 * Callback for preg replace in shortnameToImage function
+	 * Find emoji codes that were keyboard entered, or HTML &#xxx codes and if found
+	 * and replaceable with our SVG standard ones, do it
 	 *
-	 * @param array $m results form preg_replace_callback
+	 * @param $string
 	 * @return string
 	 */
-	private function emojiToImage_Callback($m)
+	public function keyboardEmojiToImage($string)
 	{
-		static $smileys_url = null;
+		$string = $this->emojiFromHTML($string);
+		$string = $this->emojiFromUni($string);
 
+		return $string;
+	}
+
+	/**
+	 * Search and replace on &#xHEX; &#DEC; style emoji
+	 *
+	 * @param $string
+	 * @return string|string[]|null
+	 */
+	public function emojiFromHTML($string)
+	{
+		$result = preg_replace_callback('~&#([0-9]+);|&#x([0-9a-fA-F]+);~', function ($match) {
+			// See if we have an Emoji version of this HTML entity
+			$entity = !empty($match[1]) ? dechex($match[1]) : $match[2];
+			$found = $this->searchEmojiByHex($entity);
+
+			// Replace it with or emoji <img>
+			if ($found !== false)
+			{
+				return $this->emojiToImage([$match[0], ':' . $found . ':', $found]);
+			}
+
+			return $match[0];
+		}, $string);
+
+		return empty($result) ? $string : $result;
+	}
+
+	/**
+	 * Search the Emoji array by hex code
+	 *
+	 * @param $hex
+	 * @return string|false
+	 */
+	public function searchEmojiByHex($hex)
+	{
+		// Is it one we have in our library?
+		if (!empty($hex) && $key = (array_search($hex, $this->shortcode_replace)))
+		{
+			return $key;
+		}
+
+		return false;
+	}
+
+	/**
+	 * Takes a shortcode array and, if available, converts it to an <img> emoji
+	 *
+	 * - Uses input array of the form m[2] = 'doughnut' m[1]= ':doughnut:' m[0]= original
+	 * - If shortcode does not exist in the emoji returns m[0] the preg full match
+	 *
+	 * @param array $m results from preg_replace_callback or other array
+	 * @return string
+	 */
+	public function emojiToImage($m)
+	{
 		// No :tag: found or not a complete result, return
-		if ((!is_array($m)) || (!isset($m[3])) || (empty($m[3])))
+		if (!is_array($m) || empty($m[2]))
 		{
 			return $m[0];
 		}
 
-		// If its not a known tag, just return what was passed
-		if (!isset($this->shortcode_replace[$m[3]]))
+		// Its not a known tag, just return what was passed
+		if (!isset($this->shortcode_replace[$m[2]]))
 		{
 			return $m[0];
 		}
 
 		// Otherwise we have some Emoji :dancer:
-		$filename = $this->smileys_url . '/' . $this->shortcode_replace[$m[3]] . '.svg';
-		$alt = strtr($m[2], array(':' => '&#58;', '(' => '&#40;', ')' => '&#41;', '$' => '&#36;', '[' => '&#091;'));
-		$title = strtr(htmlspecialchars($m[3]), array(':' => '&#58;', '(' => '&#40;', ')' => '&#41;', '$' => '&#36;', '[' => '&#091;'));
+		$filename = $this->smileys_url . '/' . $this->shortcode_replace[$m[2]] . '.svg';
+		$alt = strtr($m[1], [':' => '&#58;', '(' => '&#40;', ')' => '&#41;', '$' => '&#36;', '[' => '&#091;']);
+		$title = ucwords(strtr(htmlspecialchars($m[2]), [':' => '&#58;', '(' => '&#40;', ')' => '&#41;', '$' => '&#36;', '[' => '&#091;', '_' => ' ']));
 
-		return $m[1] . '<img class="smiley emoji" src="' . $filename . '" alt="' . $alt . '" title="' . $title  . '" />';
+		return '<img class="smiley emoji" src="' . $filename . '" alt="' . $alt . '" title="' . $title . '" />';
+	}
+
+	/**
+	 * Searches a string for unicode points and replaces them with emoji <img> tags
+	 *
+	 * Instead of searching in specific groups of emoji code points, such as:
+	 *
+	 * flags -> (?:\x{1F3F4}[\x{E0060}-\x{E00FF}]{1,6})|[\x{1F1E0}-\x{1F1FF}]{2}
+	 * dingbats -> [\x{2700}-\x{27bf}]\x{FE0F}
+	 * emoticons -> [\x{1F000}-\x{1F6FF}\x{1F900}-\x{1F9FF}]\x{FE0F}?
+	 * symbols -> [\x{2600}-\x{26ff}]\x{FE0F}?
+	 * peeps -> (?:[\x{1F466}-\x{1F469}]+\x{FE0F}?[\x{1F3FB}-\x{1F3FF}]?)
+	 *
+	 * We will use \p{S} which will match anything in the symbol area including
+	 * symbols, currency signs, dingbats, box-drawing characters, etc.  This is an
+	 * easier regex but with more "false" hits for what we want.  The array searching
+	 * should be faster than the detailed regex.
+	 *
+	 * @param $string
+	 * @return string|string[]|null
+	 */
+	public function emojiFromUni($string)
+	{
+		$result = preg_replace_callback('~\p{S}~u', function ($match) {
+			$found = $this->knownEmojiCode($match[0]);
+
+			// Hey I know you, your :space_invader:
+			if ($found !== false)
+			{
+				return $this->emojiToImage([$match[0], ':' . $found . ':', $found]);
+			}
+
+			return $match[0];
+		}, $string);
+
+		return empty($result) ? $string : $result;
+	}
+
+	/**
+	 * Given a unicode convert to hex for emoji array searching
+	 *
+	 * @param string $code
+	 * @return string|false
+	 */
+	public function knownEmojiCode($code)
+	{
+		$points = [];
+		for ($i = 0; $i < Util::strlen($code); $i++)
+		{
+			$points[] = strtolower(dechex($this->uniord(Util::substr($code, $i, 1))));
+		}
+		$hex_str = implode('-', $points);
+
+		//echo $hex_str . ' ';
+
+		return $this->searchEmojiByHex($hex_str);
+	}
+
+	/**
+	 * Converts a 4byte char into the corresponding HTML entity code.
+	 * Subset of function _uniord($c) found in query.php as we are only
+	 * dealing with the emoji space
+	 *
+	 * @param $c
+	 * @return false|string
+	 */
+	private function uniord($c)
+	{
+		$ord0 = ord($c[0]);
+		if ($ord0 >= 0 && $ord0 <= 127)
+		{
+			return $ord0;
+		}
+
+		$ord1 = ord($c[1]);
+		if ($ord0 >= 192 && $ord0 <= 223)
+		{
+			return ($ord0 - 192) * 64 + ($ord1 - 128);
+		}
+
+		$ord2 = ord($c[2]);
+		if ($ord0 >= 224 && $ord0 <= 239)
+		{
+			return ($ord0 - 224) * 4096 + ($ord1 - 128) * 64 + ($ord2 - 128);
+		}
+
+		$ord3 = ord($c[3]);
+		if ($ord0 >= 240 && $ord0 <= 247)
+		{
+			return ($ord0 - 240) * 262144 + ($ord1 - 128) * 4096 + ($ord2 - 128) * 64 + ($ord3 - 128);
+		}
+
+		return false;
+	}
+
+	/**
+	 * Retrieve the sole instance of this class.
+	 *
+	 * @return \ElkArte\Emoji
+	 */
+	public static function instance()
+	{
+		if (self::$instance === null)
+		{
+			self::$instance = new Emoji();
+		}
+
+		return self::$instance;
 	}
 }
