@@ -7,7 +7,8 @@
  *
  */
 
-var disableDrafts = false;
+var disableDrafts = false,
+	emoji_url ='';
 
 (function ($, window, document)
 {
@@ -929,7 +930,7 @@ var disableDrafts = false;
 		{name: 'studio_microphone', key: '1f399'},
 		{name: 'thermometer', key: '1f321'},
 		{name: 'passenger_ship', key: '1f6f3'},
-		{name: 'satellite', key: '1f6f0'},
+		{name: 'satellite2', key: '1f6f0'},
 		{name: 'airplane_arriving', key: '1f6ec'},
 		{name: 'airplane_departure', key: '1f6eb'},
 		{name: 'small_airplane', key: '1f6e9'},
@@ -1103,8 +1104,8 @@ var disableDrafts = false;
 		{name: 'motor_scooter', key: '1f6f5'},
 		{name: 'kick_scooter', key: '1f6f4'},
 		{name: 'canoe', key: '1f6f6'},
-		{name: 'umbrella', key: '2602'},
-		{name: 'snowman', key: '2603'},
+		{name: 'umbrella2', key: '2602'},
+		{name: 'snowman2', key: '2603'},
 		{name: '1st_place_medal', key: '1f947'},
 		{name: '2nd_place_medal', key: '1f948'},
 		{name: '3rd_place_medal', key: '1f949'},
@@ -1154,7 +1155,7 @@ var disableDrafts = false;
 	 *
 	 * @param {object} options
 	 */
-	function elk_Emoji(options)
+	function Elk_Emoji(options)
 	{
 		// All the passed options and defaults are loaded to the opts object
 		this.opts = $.extend({}, this.defaults, options);
@@ -1166,7 +1167,7 @@ var disableDrafts = false;
 	 *
 	 * @param {string} emoji
 	 */
-	elk_Emoji.prototype.emojiExists = function (emoji)
+	Elk_Emoji.prototype.emojiExists = function (emoji)
 	{
 		return emojies.some(function (el)
 		{
@@ -1185,7 +1186,7 @@ var disableDrafts = false;
 	 * @param {object} $element
 	 * @param {object} oIframeWindow
 	 */
-	elk_Emoji.prototype.attachAtWho = function (oEmoji, $element, oIframeWindow)
+	Elk_Emoji.prototype.attachAtWho = function (oEmoji, $element, oIframeWindow)
 	{
 		/**
 		 * Create the dropdown selection list
@@ -1199,9 +1200,9 @@ var disableDrafts = false;
 			case 'twemoji':
 				//tpl = "https://twemoji.maxcdn.com/16x16/${key}.png";
 				tpl = "https://twemoji.maxcdn.com/svg/${key}.svg";
-				break
+				break;
 			case 'emojitwo':
-				tpl = "https://rawcdn.githack.com/EmojiTwo/emojitwo/d79b4477eb8f9110fc3ce7bed2cc66030a77933e/svg/${key}.svg"
+				tpl = "https://rawcdn.githack.com/EmojiTwo/emojitwo/d79b4477eb8f9110fc3ce7bed2cc66030a77933e/svg/${key}.svg";
 				break;
 			case 'noto-emoji':
 				tpl = "https://rawcdn.githack.com/googlefonts/noto-emoji/e7ac893b3315181f51710de3ba16704ec95e3f51/svg/emoji_u${key}.svg";
@@ -1299,7 +1300,7 @@ var disableDrafts = false;
 				// If the button has the active class, we clicked and entered wizzy mode
 				if (!$(this).hasClass("active"))
 				{
-					elk_Emoji.prototype.processEmoji(oEmoji.opts.emoji_group);
+					Elk_Emoji.prototype.processEmoji(oEmoji.opts.emoji_group);
 				}
 			});
 		}
@@ -1391,7 +1392,7 @@ var disableDrafts = false;
 	/**
 	 * Fetches the HTML from the editor window and updates any emoji :tags: with img tags
 	 */
-	elk_Emoji.prototype.processEmoji = function (emoji_group)
+	Elk_Emoji.prototype.processEmoji = function (emoji_group)
 	{
 		var instance, // sceditor instance
 			str, // current html in the editor
@@ -1417,16 +1418,7 @@ var disableDrafts = false;
 			if (i % 4 === 0)
 			{
 				// Search for emoji :tags: and replace known ones with the right image
-				str_split[i] = str_split[i].replace(emoji_regex, function (match, tag, shortname)
-				{
-					// Replace all valid emoji tags with the image tag
-					if (typeof shortname === 'undefined' || shortname === '' || !(elk_Emoji.prototype.emojiExists(shortname)))
-					{
-						return match;
-					}
-
-					return '<img data-sceditor-emoticon="' + tag + '" class="emoji" alt="' + tag + '" title="' + shortname + '" src="' + emoji_url + emojieskey + '.svg" />';
-				});
+				str_split[i] = str_split[i].replace(emoji_regex, Elk_Emoji.prototype.process);
 			}
 		}
 
@@ -1437,15 +1429,26 @@ var disableDrafts = false;
 		instance.val(str, false);
 	};
 
+	Elk_Emoji.prototype.process = function(match, tag, shortname)
+	{
+		// Replace all valid emoji tags with the image tag
+		if (typeof shortname === 'undefined' || shortname === '' || !(Elk_Emoji.prototype.emojiExists(shortname)))
+		{
+			return match;
+		}
+
+		return '<img data-sceditor-emoticon="' + tag + '" class="emoji" alt="' + tag + '" title="' + shortname + '" src="' + emoji_url + emojieskey + '.svg" />';
+	};
+
 	/**
 	 * Private emoji vars
 	 */
-	elk_Emoji.prototype.defaults = {};
+	Elk_Emoji.prototype.defaults = {_names: []};
 
 	/**
 	 * Holds all current emoji (defaults + passed options)
 	 */
-	elk_Emoji.prototype.opts = {};
+	Elk_Emoji.prototype.opts = {};
 
 	/**
 	 * Emoji plugin interface to SCEditor
@@ -1469,27 +1472,29 @@ var disableDrafts = false;
 		base.signalReady = function ()
 		{
 			// Init the emoji instance, load in the options
-			oEmoji = new elk_Emoji(this.opts.emojiOptions);
+			oEmoji = new Elk_Emoji(this.opts.emojiOptions);
 
 			if (typeof oEmoji.opts.editor_id === 'undefined')
 			{
 				oEmoji.opts.editor_id = post_box_name;
 			}
 
-			oEmoji.opts.emoji_url = elk_smileys_url.replace("default", oEmoji.opts.emoji_group);
+			emoji_url = elk_smileys_url.replace("default", oEmoji.opts.emoji_group);
+
+			var $option_eid = $('#' + oEmoji.opts.editor_id);
 
 			// Attach atwho to the textarea
-			oEmoji.attachAtWho(oEmoji, $('#' + oEmoji.opts.editor_id).parent().find('textarea'));
+			oEmoji.attachAtWho(oEmoji, $option_eid.parent().find('textarea'));
 
 			// Using wysiwyg, then lets attach atwho to it as well
-			var instance = $('#' + oEmoji.opts.editor_id).sceditor('instance');
+			var instance = $option_eid.sceditor('instance');
 
 			if (!instance.opts.runWithoutWysiwygSupport)
 			{
 				// We need to monitor the iframe window and body to text input
-				var oIframe = $('#' + oEmoji.opts.editor_id).parent().find('iframe')[0],
+				var oIframe = $option_eid.parent().find('iframe')[0],
 					oIframeWindow = oIframe.contentWindow,
-					oIframeBody = $('#' + oEmoji.opts.editor_id).parent().find('iframe').contents().find('body')[0];
+					oIframeBody = $option_eid.parent().find('iframe').contents().find('body')[0];
 
 				oEmoji.attachAtWho(oEmoji, $(oIframeBody), oIframeWindow);
 			}
