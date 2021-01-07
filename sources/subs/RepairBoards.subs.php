@@ -797,7 +797,7 @@ function loadForumTests()
 			),
 			'check_query' => '
 				SELECT 
-					.id_member
+					lb.id_member
 				FROM {db_prefix}log_boards AS lb
 					LEFT JOIN {db_prefix}members AS mem ON (mem.id_member = lb.id_member)
 				WHERE mem.id_member IS NULL
@@ -984,7 +984,7 @@ function loadForumTests()
 			),
 			'check_query' => '
 				SELECT 
-					.id_member
+					ln.id_member
 				FROM {db_prefix}log_notify AS ln
 					LEFT JOIN {db_prefix}members AS mem ON (mem.id_member = ln.id_member)
 				WHERE ln.id_member BETWEEN {STEP_LOW} AND {STEP_HIGH}
