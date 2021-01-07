@@ -26,10 +26,10 @@ function template_install_above()
 		<link rel="stylesheet" href="../themes/default/css/_light/index_light.css?10RC1" />
 		<link rel="stylesheet" href="../themes/default/css/install.css?10RC1" />
 		<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js" id="jquery"></script>
-		<script><!-- // --><![CDATA[
+		<script>
 			window.jQuery || document.write(\'<script src="../themes/default/scripts/jquery-2.1.4.min.js"><\/script>\');
 			var elk_scripturl = ', JavaScriptEscape(str_replace('/install/install.php', '/index.php', $installurl)), ';
-		// ]]></script>
+		</script>
 		<script src="../themes/default/scripts/script.js"></script>
 	</head>
 	<body>
@@ -143,8 +143,8 @@ function template_welcome_message()
 
 	echo '
 	<script src="../themes/default/scripts/admin.js"></script>
-		<script><!-- // --><![CDATA[
-			var oUpgradeCenter = new elk_AdminIndex({
+		<script>
+			var oUpgradeCenter = new Elk_AdminIndex({
 				bLoadAnnouncements: false,
 				bLoadVersions: true,
 				slatestVersionContainerId: \'latestVersion\',
@@ -156,7 +156,7 @@ function template_welcome_message()
 
 				bLoadUpdateNotification: false
 			});
-		// ]]></script>
+		</script>
 	<form action="', $incontext['form_url'], '" method="post">
 		<p>', sprintf($txt['install_welcome_desc'], CURRENT_VERSION), '</p>
 		<div id="version_warning" class="warningbox" style="display: none;">',CURRENT_VERSION, '</div>
@@ -173,7 +173,7 @@ function template_welcome_message()
 
 	// For the latest version stuff.
 	echo '
-		<script><!-- // --><![CDATA[
+		<script>
 			var currentVersionRounds = 0;
 
 			// Latest version?
@@ -204,7 +204,7 @@ function template_welcome_message()
 				document.getElementById(\'contbutt\').disabled = 0;
 			}
 			addLoadEvent(ourCurrentVersion);
-		// ]]></script>';
+		</script>';
 }
 
 /**
@@ -577,7 +577,7 @@ function template_delete_install()
 		<div id="delete_label" style="margin: 1ex; font-weight: bold; display: none">
 			<label for="delete_self"><input type="checkbox" id="delete_self" onclick="doTheDelete();" class="input_check" /> ', $txt['delete_installer'], !isset($_SESSION['installer_temp_ftp']) ? ' ' . $txt['delete_installer_maybe'] : '', '</label>
 		</div>
-		<script><!-- // --><![CDATA[
+		<script>
 			function doTheDelete()
 			{
 				var theCheck = document.getElementById ? document.getElementById("delete_self") : document.all.delete_self,
@@ -588,7 +588,7 @@ function template_delete_install()
 				theCheck.disabled = true;
 			}
 			document.getElementById(\'delete_label\').style.display = \'block\';
-		// ]]></script>
+		</script>
 		<br />';
 
 	echo '
