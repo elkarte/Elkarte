@@ -307,14 +307,18 @@ class ManagePosts extends AbstractController
 	{
 		global $txt;
 
+		$hasPspell = function_exists('pspell_new');
+
 		// Initialize it with our settings
 		$config_vars = array(
 			// Simple post options...
 			array('check', 'removeNestedQuotes'),
-			array('check', 'enableVideoEmbeding'),
 			array('check', 'enableCodePrettify'),
 			// Note show the warning as read if pspell not installed!
-			array('check', 'enableSpellChecking', 'postinput' => (function_exists('pspell_new') ? $txt['enableSpellChecking_warning'] : '<span class="error">' . $txt['enableSpellChecking_error'] . '</span>')),
+			array('check', 'disabled' => !$hasPspell, 'enableSpellChecking', 'postinput' => $hasPspell ? $txt['enableSpellChecking_warning'] : '<span class="error">' . $txt['enableSpellChecking_error'] . '</span>'),
+			'',
+			array('check', 'enableVideoEmbeding'),
+			array('int', 'video_embed_limit', 'postinput' => $txt['video_embed_limit_note']),
 			'',
 			// Posting limits...
 			array('int', 'max_messageLength', 'subtext' => $txt['max_messageLength_zero'], 'postinput' => $txt['manageposts_characters']),
