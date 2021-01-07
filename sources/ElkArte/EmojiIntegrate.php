@@ -56,11 +56,11 @@ class EmojiIntegrate
 		return [
 			[
 				'integrate_modify_smiley_settings',
-				'\\ElkArte\\EmojiIntegrate::integrate_modify_smiley_settings'
+				'\\ElkArte\\AdminController\\ManageEmojiModule::integrate_modify_smiley_settings'
 			],
 			[
 				'integrate_save_smiley_settings',
-				'\\ElkArte\\EmojiIntegrate::integrate_save_smiley_settings'
+				'\\ElkArte\\AdminController\\ManageEmojiModule::integrate_save_smiley_settings'
 			],
 		];
 	}
@@ -79,7 +79,8 @@ class EmojiIntegrate
 		// If we are doing smileys, then we are doing emoji!
 		if ((empty($_REQUEST['sa']) || $_REQUEST['sa'] !== 'install2') && $message !== false)
 		{
-			$message = Emoji::emojiNameToImage($message);
+			$emoji = Emoji::instance();
+			$message = $emoji->emojiNameToImage($message);
 		}
 	}
 
@@ -115,41 +116,5 @@ class EmojiIntegrate
 				editor_id: \'' . $editor_id . '\',
 				emoji_group: \'' . (empty($modSettings['emoji_selection']) ? 'openemoji' : $modSettings['emoji_selection']) . '\'
 			}';
-	}
-
-	/**
-	 * Adds the necessary settings to the smiley area of the ACP
-	 *
-	 * @param mixed[] $config_vars
-	 */
-	public static function integrate_modify_smiley_settings(&$config_vars)
-	{
-		global $txt;
-
-		theme()->getTemplates()->loadLanguageFile('emoji');
-
-		// All the options, well at least some of them!
-		$config_vars[] = '';
-		$config_vars[] = array('select', 'emoji_selection', array(
-			'noemoji' => $txt['emoji_disabled'],
-			'emojitwo' => $txt['emoji_open'],
-			'twemoji' => $txt['emoji_twitter'],
-			'noto-emoji' => $txt['emoji_google'],
-		));
-	}
-
-	/**
-	 * Saves the ACP settings
-	 *
-	 * @param mixed[] $config_vars
-	 */
-	public static function integrate_save_smiley_settings()
-	{
-		$req = HttpReq::instance();
-
-		if (empty($req->post->emoji_selection))
-		{
-			$req->post->emoji_selection = 'noemoji';
-		}
 	}
 }
