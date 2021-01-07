@@ -149,7 +149,7 @@ class UpgradeInstructions_upgrade_1_1
 				{
 					$this->table->create_table('{db_prefix}pending_notifications',
 						array(
-							array('name' => 'notification_type', 'type' => 'varchar', 'size' => 10),
+							array('name' => 'notification_type', 'type' => 'varchar', 'size' => 20),
 							array('name' => 'id_member', 'type' => 'mediumint', 'size' => 8, 'unsigned' => true, 'default' => 0),
 							array('name' => 'log_time', 'type' => 'int', 'size' => 10, 'default' => 0),
 							array('name' => 'frequency', 'type' => 'varchar', 'size' => 1, 'default' => ''),
@@ -165,7 +165,7 @@ class UpgradeInstructions_upgrade_1_1
 					$this->table->create_table('{db_prefix}notifications_pref',
 						array(
 							array('name' => 'id_member', 'type' => 'mediumint', 'size' => 8, 'unsigned' => true, 'default' => 0),
-							array('name' => 'notification_type', 'type' => 'varchar', 'size' => 10, 'default' => ''),
+							array('name' => 'notification_type', 'type' => 'varchar', 'size' => 20, 'default' => ''),
 							array('name' => 'mention_type', 'type' => 'varchar', 'size' => 12, 'default' => ''),
 						),
 						array(

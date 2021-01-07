@@ -1096,7 +1096,7 @@ function saveUserNotificationsPreferences($member, $notification_data)
 		array(
 			'id_member' => 'int',
 			'mention_type' => 'string-12',
-			'notification_type' => 'string-10',
+			'notification_type' => 'string-20',
 		),
 		$inserts,
 		array('id_member', 'mention_type')

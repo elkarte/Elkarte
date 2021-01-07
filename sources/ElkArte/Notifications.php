@@ -340,7 +340,7 @@ class Notifications extends AbstractModel
 		$this->_db->insert('ignore',
 			'{db_prefix}pending_notifications',
 			array(
-				'notification_type' => 'string-10',
+				'notification_type' => 'string-20',
 				'id_member' => 'int',
 				'log_time' => 'int',
 				'frequency' => 'string-1',

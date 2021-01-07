@@ -2098,7 +2098,7 @@ class InstallInstructions_install_1_1
 	{
 		return $this->table->create_table('{db_prefix}pending_notifications',
 			array(
-				array('name' => 'notification_type', 'type' => 'varchar', 'size' => 10),
+				array('name' => 'notification_type', 'type' => 'varchar', 'size' => 20),
 				array('name' => 'id_member',         'type' => 'mediumint', 'size' => 8, 'unsigned' => true, 'default' => 0),
 				array('name' => 'log_time',          'type' => 'int', 'size' => 10, 'default' => 0),
 				array('name' => 'frequency',         'type' => 'varchar', 'size' => 1, 'default' => ''),
