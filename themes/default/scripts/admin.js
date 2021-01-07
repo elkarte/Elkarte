@@ -97,7 +97,7 @@ Elk_AdminIndex.prototype.showCurrentVersion = function ()
 		sCurrentVersion = oinstalledVersionContainer.innerHTML,
 		adminIndex = this,
 		elkVersion = '???',
-		verCompare = new elk_ViewVersions();
+		verCompare = new Elk_ViewVersions();
 
 	$.getJSON('https://api.github.com/repos/elkarte/Elkarte/releases', {format: "json"},
 		function (data, textStatus, jqXHR)
@@ -284,7 +284,7 @@ Elk_AdminIndex.prototype.checkUpdateAvailable = function ()
 };
 
 /*
-	elk_ViewVersions(oOptions)
+	Elk_ViewVersions(oOptions)
 	{
 		public init()
 		public loadViewVersions
@@ -293,7 +293,7 @@ Elk_AdminIndex.prototype.checkUpdateAvailable = function ()
 		public determineVersions()
 	}
 */
-function elk_ViewVersions(oOptions)
+function Elk_ViewVersions(oOptions)
 {
 	this.opt = oOptions;
 	this.oSwaps = {};
@@ -301,7 +301,7 @@ function elk_ViewVersions(oOptions)
 }
 
 // initialize the version checker
-elk_ViewVersions.prototype.init = function ()
+Elk_ViewVersions.prototype.init = function ()
 {
 	// Load this on loading of the page.
 	window.viewVersionsInstanceRef = this;
@@ -312,12 +312,12 @@ elk_ViewVersions.prototype.init = function ()
 };
 
 // Load all the file versions
-elk_ViewVersions.prototype.loadViewVersions = function ()
+Elk_ViewVersions.prototype.loadViewVersions = function ()
 {
 	this.determineVersions();
 };
 
-elk_ViewVersions.prototype.swapOption = function (oSendingElement, sName)
+Elk_ViewVersions.prototype.swapOption = function (oSendingElement, sName)
 {
 	// If it is undefined, or currently off, turn it on - otherwise off.
 	this.oSwaps[sName] = !(sName in this.oSwaps) || !this.oSwaps[sName];
@@ -337,7 +337,7 @@ elk_ViewVersions.prototype.swapOption = function (oSendingElement, sName)
 };
 
 // compare a current and target version to determine if one is newer/older
-elk_ViewVersions.prototype.compareVersions = function (sCurrent, sTarget)
+Elk_ViewVersions.prototype.compareVersions = function (sCurrent, sTarget)
 {
 	var aVersions = [],
 		aParts = [],
@@ -396,7 +396,7 @@ elk_ViewVersions.prototype.compareVersions = function (sCurrent, sTarget)
 };
 
 // For each area of ElkArte, determine the current and installed versions
-elk_ViewVersions.prototype.determineVersions = function ()
+Elk_ViewVersions.prototype.determineVersions = function ()
 {
 	var oHighYour = {
 		sources: '??',
