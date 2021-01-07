@@ -502,6 +502,7 @@ class BoardsTree
 	{
 		$update_query = '';
 		$update_params = [];
+		$this->loadBoardTree();
 
 		// Set the board order for each category.
 		$board_order = 0;
@@ -537,7 +538,7 @@ class BoardsTree
 			'UPDATE {db_prefix}boards
 				SET
 					board_order = CASE id_board ' . $update_query . '
-						END',
+						ELSE board_order END',
 			$update_params
 		);
 	}

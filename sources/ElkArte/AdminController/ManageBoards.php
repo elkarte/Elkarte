@@ -176,6 +176,7 @@ class ManageBoards extends AbstractController
 
 			// Use modifyBoard to perform the action
 			modifyBoard((int) $this->_req->query->src_board, $boardOptions);
+			redirectexit('action=admin;area=manageboards');
 		}
 
 		$boardTree = new BoardsTree(database());

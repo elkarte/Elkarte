@@ -366,7 +366,7 @@ class HttpReq
 	 *
 	 * @return bool
 	 */
-	public function compareQuery($name = '', $compare, $sanitize = null, $default = null)
+	public function compareQuery($name, $compare, $sanitize = null, $default = null)
 	{
 		$this->getQuery($name, $sanitize, $default);
 		if ($this->is_set($name) && $this->_param[$name] === $compare)
@@ -388,7 +388,7 @@ class HttpReq
 	 *
 	 * @return bool
 	 */
-	public function comparePost($name = '', $compare, $sanitize = null, $default = null)
+	public function comparePost($name, $compare, $sanitize = null, $default = null)
 	{
 		$this->getPost($name, $sanitize, $default);
 		if ($this->is_set($name) && $this->_param[$name] === $compare)

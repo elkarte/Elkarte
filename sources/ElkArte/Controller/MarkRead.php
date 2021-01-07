@@ -25,17 +25,17 @@ class MarkRead extends AbstractController
 	 * String used to redirect user to the correct boards when marking unread
 	 * ajax-ively
 	 *
-	 * @var string
+	 * @var array
 	 */
-	private $_querystring_board_limits = '';
+	private $_querystring_board_limits;
 
 	/**
 	 * String used to remember user's sorting options when marking unread
 	 * ajax-ively
 	 *
-	 * @var string
+	 * @var array
 	 */
-	private $_querystring_sort_limits = '';
+	private $_querystring_sort_limits;
 
 	/**
 	 * This is the main function for markasread file if not using API

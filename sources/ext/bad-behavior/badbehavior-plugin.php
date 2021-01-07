@@ -190,7 +190,7 @@ function bb2_insert($settings, $package, $key)
 	$ip = bb2_db_escape($package['ip']);
 	$date = (int) bb2_db_date();
 	$request_method = bb2_db_escape($package['request_method']);
-	$request_uri = bb2_db_escape($package['request_uri']);
+	$request_uri = substr(bb2_db_escape($package['request_uri']), 0, 254);
 	$server_protocol = bb2_db_escape($package['server_protocol']);
 	$user_agent = bb2_db_escape($package['user_agent']);
 	$member_id = (int) !empty(\ElkArte\User::$info->id) ? \ElkArte\User::$info->id : 0;

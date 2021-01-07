@@ -342,7 +342,7 @@ class Cache
 	 * @param mixed[] $params parameters sent to the function
 	 * @param int $level = 1
 	 *
-	 * @return string
+	 * @return array
 	 */
 	public function quick_get($key, $file, $function, $params, $level = 1)
 	{
