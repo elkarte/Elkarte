@@ -149,7 +149,8 @@ Elk_AdminIndex.prototype.compareVersion = function (curVer, refVer)
 	{
 		return true;
 	}
-	else if (curVer.major < refVer.major)
+
+	if (curVer.major < refVer.major)
 	{
 		return false;
 	}
@@ -158,7 +159,8 @@ Elk_AdminIndex.prototype.compareVersion = function (curVer, refVer)
 	{
 		return true;
 	}
-	else if (curVer.minor < refVer.minor)
+
+	if (curVer.minor < refVer.minor)
 	{
 		return false;
 	}
@@ -167,7 +169,8 @@ Elk_AdminIndex.prototype.compareVersion = function (curVer, refVer)
 	{
 		return true;
 	}
-	else if (curVer.micro < refVer.micro)
+
+	if (curVer.micro < refVer.micro)
 	{
 		return false;
 	}
@@ -178,7 +181,8 @@ Elk_AdminIndex.prototype.compareVersion = function (curVer, refVer)
 		{
 			return true;
 		}
-		else if (curVer.nano < refVer.nano)
+
+		if (curVer.nano < refVer.nano)
 		{
 			return false;
 		}
@@ -287,16 +291,12 @@ Elk_AdminIndex.prototype.checkUpdateAvailable = function ()
 	Elk_ViewVersions(oOptions)
 	{
 		public init()
-		public loadViewVersions
-		public swapOption(oSendingElement, sName)
 		public compareVersions(sCurrent, sTarget)
-		public determineVersions()
 	}
 */
 function Elk_ViewVersions(oOptions)
 {
 	this.opt = oOptions;
-	this.oSwaps = {};
 	this.init();
 }
 
@@ -309,31 +309,6 @@ Elk_ViewVersions.prototype.init = function ()
 	{
 		window.viewVersionsInstanceRef.loadViewVersions();
 	});
-};
-
-// Load all the file versions
-Elk_ViewVersions.prototype.loadViewVersions = function ()
-{
-	this.determineVersions();
-};
-
-Elk_ViewVersions.prototype.swapOption = function (oSendingElement, sName)
-{
-	// If it is undefined, or currently off, turn it on - otherwise off.
-	this.oSwaps[sName] = !(sName in this.oSwaps) || !this.oSwaps[sName];
-	if (this.oSwaps[sName])
-	{
-		$("#" + sName).show(300);
-	}
-	else
-	{
-		$("#" + sName).hide(300);
-	}
-
-	// Unselect the link and return false.
-	oSendingElement.blur();
-
-	return false;
 };
 
 // compare a current and target version to determine if one is newer/older
@@ -380,226 +355,19 @@ Elk_ViewVersions.prototype.compareVersions = function (sCurrent, sTarget)
 			{
 				return aVersions[0][i] < aVersions[1][i] ? !aVersions[1][6] : aVersions[0][6];
 			}
-			else if (i === 6)
+
+			if (i === 6)
 			{
 				return aVersions[0][6] ? aVersions[1][3] === 'stable' : false;
-			}// Otherwise a simple comparison.
-			else
-			{
-				return aVersions[0][i] < aVersions[1][i];
 			}
+
+			// Otherwise a simple comparison.
+			return aVersions[0][i] < aVersions[1][i];
 		}
 	}
 
 	// They are the same!
 	return false;
-};
-
-// For each area of ElkArte, determine the current and installed versions
-Elk_ViewVersions.prototype.determineVersions = function ()
-{
-	var oHighYour = {
-		sources: '??',
-		admin: '??',
-		controllers: '??',
-		database: '??',
-		subs: '??',
-		'default': '??',
-		Languages: '??',
-		Templates: '??'
-	};
-	var oHighCurrent = {
-		sources: '??',
-		admin: '??',
-		controllers: '??',
-		database: '??',
-		subs: '??',
-		'default': '??',
-		Languages: '??',
-		Templates: '??'
-	};
-	var oLowVersion = {
-		sources: false,
-		admin: false,
-		controllers: false,
-		database: false,
-		subs: false,
-		'default': false,
-		Languages: false,
-		Templates: false
-	};
-
-	var sSections = [
-		'sources',
-		'admin',
-		'controllers',
-		'database',
-		'subs',
-		'default',
-		'Languages',
-		'Templates'
-	];
-
-	var sCurVersionType = '',
-		sinstalledVersion,
-		oSection,
-		oSectionLink;
-
-	for (var i = 0, n = sSections.length; i < n; i++)
-	{
-		// Collapse all sections.
-		oSection = document.getElementById(sSections[i]);
-
-		if (typeof (oSection) === 'object' && oSection !== null)
-		{
-			oSection.style.display = 'none';
-		}
-
-		// Make all section links clickable.
-		oSectionLink = document.getElementById(sSections[i] + '-link');
-		if (typeof (oSectionLink) === 'object' && oSectionLink !== null)
-		{
-			oSectionLink.onclick = function (oEvent)
-			{
-				this.swapOption(oEvent.target, oEvent.target.id.split('-')[0]);
-				return false;
-			}.bind(this);
-		}
-	}
-
-	if (!('ourVersions' in window))
-	{
-		window.ourVersions = {};
-	}
-
-	// for each file in the detailed-version.js
-	for (var sFilename in window.ourVersions)
-	{
-		if (!window.ourVersions.hasOwnProperty(sFilename))
-		{
-			continue;
-		}
-
-		if (!document.getElementById('our' + sFilename))
-		{
-			continue;
-		}
-
-		sCurVersionType = '';
-
-		sinstalledVersion = document.getElementById('your' + sFilename).innerHTML;
-
-		for (var sVersionType in oLowVersion)
-		{
-			if (!oLowVersion.hasOwnProperty(sVersionType))
-			{
-				continue;
-			}
-
-			if (sFilename.substr(0, sVersionType.length) === sVersionType)
-			{
-				sCurVersionType = sVersionType;
-				break;
-			}
-		}
-
-		if (sCurVersionType === '')
-		{
-			continue;
-		}
-
-		// use compareVersion to determine which version is >< the other
-		if (typeof (sCurVersionType) !== 'undefined')
-		{
-			if ((this.compareVersions(oHighYour[sCurVersionType], sinstalledVersion) || oHighYour[sCurVersionType] === '??') && !oLowVersion[sCurVersionType])
-			{
-				oHighYour[sCurVersionType] = sinstalledVersion;
-			}
-
-			if (this.compareVersions(oHighCurrent[sCurVersionType], ourVersions[sFilename]) || oHighCurrent[sCurVersionType] === '??')
-			{
-				oHighCurrent[sCurVersionType] = ourVersions[sFilename];
-			}
-
-			if (this.compareVersions(sinstalledVersion, ourVersions[sFilename]))
-			{
-				oLowVersion[sCurVersionType] = sinstalledVersion;
-				document.getElementById('your' + sFilename).style.color = 'red';
-			}
-		}
-		else if (this.compareVersions(sinstalledVersion, ourVersions[sFilename]))
-		{
-			oLowVersion[sCurVersionType] = sinstalledVersion;
-		}
-
-		document.getElementById('our' + sFilename).innerHTML = ourVersions[sFilename];
-		document.getElementById('your' + sFilename).innerHTML = sinstalledVersion;
-	}
-
-	if (!('ourLanguageVersions' in window))
-	{
-		window.ourLanguageVersions = {};
-	}
-
-	for (sFilename in window.ourLanguageVersions)
-	{
-		for (i = 0; i < this.opt.aKnownLanguages.length; i++)
-		{
-			if (!document.getElementById('our' + sFilename + this.opt.aKnownLanguages[i]))
-			{
-				continue;
-			}
-
-			document.getElementById('our' + sFilename + this.opt.aKnownLanguages[i]).innerHTML = ourLanguageVersions[sFilename];
-
-			sinstalledVersion = document.getElementById('your' + sFilename + this.opt.aKnownLanguages[i]).innerHTML;
-			document.getElementById('your' + sFilename + this.opt.aKnownLanguages[i]).innerHTML = sinstalledVersion;
-
-			if ((this.compareVersions(oHighYour.Languages, sinstalledVersion) || oHighYour.Languages === '??') && !oLowVersion.Languages)
-			{
-				oHighYour.Languages = sinstalledVersion;
-			}
-
-			if (this.compareVersions(oHighCurrent.Languages, ourLanguageVersions[sFilename]) || oHighCurrent.Languages === '??')
-			{
-				oHighCurrent.Languages = ourLanguageVersions[sFilename];
-			}
-
-			if (this.compareVersions(sinstalledVersion, ourLanguageVersions[sFilename]))
-			{
-				oLowVersion.Languages = sinstalledVersion;
-				document.getElementById('your' + sFilename + this.opt.aKnownLanguages[i]).style.color = 'red';
-			}
-		}
-	}
-
-	// Set the column titles based on the files each contain
-	for (i = 0, n = sSections.length; i < n; i++)
-	{
-		if (sSections[i] === 'Templates')
-		{
-			continue;
-		}
-
-		document.getElementById('your' + sSections[i]).innerHTML = oLowVersion[sSections[i]] ? oLowVersion[sSections[i]] : oHighYour[sSections[i]];
-		document.getElementById('our' + sSections[i]).innerHTML = oHighCurrent[sSections[i]];
-		if (oLowVersion[sSections[i]])
-		{
-			document.getElementById('your' + sSections[i]).style.color = 'red';
-		}
-	}
-
-	// Custom theme in use?
-	if (document.getElementById('Templates'))
-	{
-		document.getElementById('yourTemplates').innerHTML = oLowVersion.Templates ? oLowVersion.Templates : oHighYour.Templates;
-		document.getElementById('ourTemplates').innerHTML = oHighCurrent.Templates;
-
-		if (oLowVersion.Templates)
-		{
-			document.getElementById('yourTemplates').style.color = 'red';
-		}
-	}
 };
 
 /**

@@ -896,55 +896,6 @@ class Maintenance extends AbstractController
 	}
 
 	/**
-	 * Perform a detailed version check.  A very good thing ;).
-	 *
-	 * What it does
-	 * - The function parses the comment headers in all files for their version information,
-	 * and outputs that for some javascript to check with simplemachines.org.
-	 * - It does not connect directly with elkarte.net, but rather expects the client to.
-	 * - It requires the admin_forum permission.
-	 * - Uses the view_versions admin area.
-	 * - Accessed through ?action=admin;area=maintain;sa=routine;activity=version.
-	 *
-	 * @uses Admin template, view_versions sub-template.
-	 */
-	public function action_version_display()
-	{
-		global $txt, $context, $modSettings;
-
-		isAllowedTo('admin_forum');
-
-		// Call the function that'll get all the version info we need.
-		require_once(SUBSDIR . '/Admin.subs.php');
-		$versionOptions = array(
-			'include_ssi' => true,
-			'include_subscriptions' => true,
-			'sort_results' => true,
-		);
-		$version_info = getFileVersions($versionOptions);
-
-		// Add the new info to the template context.
-		$context += array(
-			'file_versions' => $version_info['file_versions'],
-			'file_versions_admin' => $version_info['file_versions_admin'],
-			'file_versions_controllers' => $version_info['file_versions_controllers'],
-			'file_versions_database' => $version_info['file_versions_database'],
-			'file_versions_subs' => $version_info['file_versions_subs'],
-			'default_template_versions' => $version_info['default_template_versions'],
-			'template_versions' => $version_info['template_versions'],
-			'default_language_versions' => $version_info['default_language_versions'],
-			'default_known_languages' => array_keys($version_info['default_language_versions']),
-		);
-
-		// Make it easier to manage for the template.
-		$context['forum_version'] = FORUM_VERSION;
-
-		$context['sub_template'] = 'view_versions';
-		$context['page_title'] = $txt['admin_version_check'];
-		$context['detailed_version_url'] = $modSettings['detailed-version.js'];
-	}
-
-	/**
 	 * Re-attribute posts to the user sent from the maintenance page.
 	 */
 	public function action_reattribute_display()
