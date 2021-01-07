@@ -31,7 +31,7 @@
 
 /**
  * Admin index class with the following methods
- * elk_AdminIndex(oOptions)
+ * Elk_AdminIndex(oOptions)
  * {
  *		public init()
  *		public loadAdminIndex()
@@ -42,7 +42,7 @@
  *
  * @param {object} oOptions
  */
-function elk_AdminIndex(oOptions)
+function Elk_AdminIndex(oOptions)
 {
 	this.opt = oOptions;
 	this.announcements = [];
@@ -52,7 +52,7 @@ function elk_AdminIndex(oOptions)
 }
 
 // Initialize the admin index to handle announcement, current version and updates
-elk_AdminIndex.prototype.init = function ()
+Elk_AdminIndex.prototype.init = function ()
 {
 	window.adminIndexInstanceRef = this;
 
@@ -62,7 +62,7 @@ elk_AdminIndex.prototype.init = function ()
 	});
 };
 
-elk_AdminIndex.prototype.loadAdminIndex = function ()
+Elk_AdminIndex.prototype.loadAdminIndex = function ()
 {
 	// Load the current master and your version numbers.
 	if (this.opt.bLoadVersions)
@@ -78,7 +78,7 @@ elk_AdminIndex.prototype.loadAdminIndex = function ()
 };
 
 // Update the announcement container with news
-elk_AdminIndex.prototype.setAnnouncement = function (announcement)
+Elk_AdminIndex.prototype.setAnnouncement = function (announcement)
 {
 	var oElem = document.getElementById(this.opt.sAnnouncementContainerId),
 		sMessages = this.init_news ? oElem.innerHTML : '';
@@ -90,7 +90,7 @@ elk_AdminIndex.prototype.setAnnouncement = function (announcement)
 };
 
 // Updates the current version container with the current version found in the repository
-elk_AdminIndex.prototype.showCurrentVersion = function ()
+Elk_AdminIndex.prototype.showCurrentVersion = function ()
 {
 	var oElkVersionContainer = document.getElementById(this.opt.slatestVersionContainerId),
 		oinstalledVersionContainer = document.getElementById(this.opt.sinstalledVersionContainerId),
@@ -143,7 +143,7 @@ elk_AdminIndex.prototype.showCurrentVersion = function ()
 };
 
 // Compare two different versions and return true if the firs is higher than the second
-elk_AdminIndex.prototype.compareVersion = function (curVer, refVer)
+Elk_AdminIndex.prototype.compareVersion = function (curVer, refVer)
 {
 	if (curVer.major > refVer.major)
 	{
@@ -188,7 +188,7 @@ elk_AdminIndex.prototype.compareVersion = function (curVer, refVer)
 };
 
 // Split a string representing a version number into an object
-elk_AdminIndex.prototype.normalizeVersion = function (sVersion)
+Elk_AdminIndex.prototype.normalizeVersion = function (sVersion)
 {
 	var splitVersion = sVersion.split(/[\s-]/),
 		normalVersion = {
@@ -255,7 +255,7 @@ elk_AdminIndex.prototype.normalizeVersion = function (sVersion)
 };
 
 // Checks if a new version of ElkArte is available and if so updates the admin info box
-elk_AdminIndex.prototype.checkUpdateAvailable = function ()
+Elk_AdminIndex.prototype.checkUpdateAvailable = function ()
 {
 	if (!('ourUpdatePackage' in window))
 	{

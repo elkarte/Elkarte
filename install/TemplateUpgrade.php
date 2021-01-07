@@ -402,7 +402,7 @@ function template_welcome_message()
 		<script src="', $settings['default_theme_url'], '/scripts/sha256.js"></script>
 		<script src="', $settings['default_theme_url'], '/scripts/admin.js"></script>
 		<script>
-			var oUpgradeCenter = new elk_AdminIndex({
+			var oUpgradeCenter = new Elk_AdminIndex({
 				bLoadAnnouncements: false,
 
 				bLoadVersions: true,
