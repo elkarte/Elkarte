@@ -17,7 +17,7 @@
  */
 function template_admin()
 {
-	global $context, $settings, $scripturl, $txt;
+	global $context, $settings, $txt;
 
 	// Welcome message for the admin.
 	echo '
@@ -34,7 +34,7 @@ function template_admin()
 	echo '
 				<div id="live_news" class="floatleft">
 					<h2 class="category_header">
-						<a href="', $scripturl, '?action=quickhelp;help=live_news" onclick="return reqOverlayDiv(this.href);" class="hdicon cat_img_helptopics help"></a>', $txt['live'], '
+						<a href="', getUrl('action', ['action' => 'quickhelp', 'help' => 'live_news']), '" onclick="return reqOverlayDiv(this.href);" class="hdicon cat_img_helptopics help"></a>', $txt['live'], '
 					</h2>
 					<div class="content">
 						<div id="ourAnnouncements">', $txt['lfyi'], '</div>
@@ -45,7 +45,7 @@ function template_admin()
 	echo '
 				<div id="supportVersionsTable" class="floatright">
 					<h2 class="category_header">
-						<a class="hdicon cat_img_plus" href="', $scripturl, '?action=admin;area=credits">', $txt['support_title'], '</a>
+						<a class="hdicon cat_img_plus" href="', getUrl('admin', ['action' => 'admin', 'area' => 'credits']), '">', $txt['support_title'], '</a>
 					</h2>
 						<div class="content">
 						<div id="version_details">
@@ -54,7 +54,7 @@ function template_admin()
 							<em id="installedVersion">', $context['forum_version'], '</em><br />
 							', $txt['support_versions_current'], ':
 							<em id="latestVersion">??</em><br />
-							', $context['can_admin'] ? '<a href="' . $scripturl . '?action=admin;area=maintain;sa=routine;activity=version">' . $txt['version_check_more'] . '</a>' : '', '<br />';
+							', $context['can_admin'] ? '<a href="' . getUrl('admin', ['action' => 'admin', 'area' => 'maintain', 'sa' => 'routine', 'activity' => 'version']) . '">' . $txt['version_check_more'] . '</a>' : '', '<br />';
 
 	// Display all the members who can administrate the forum.
 	echo '
@@ -97,7 +97,7 @@ function template_admin()
 	// This sets the announcements and current versions themselves ;).
 	echo '
 		<script>
-			var oAdminCenter = new elk_AdminIndex({
+			var oAdminCenter = new Elk_AdminIndex({
 				bLoadAnnouncements: true,
 				sAnnouncementTemplate: ', JavaScriptEscape('
 					<dl>
@@ -144,7 +144,7 @@ function template_admin()
  */
 function template_credits()
 {
-	global $context, $settings, $scripturl, $txt;
+	global $context, $settings, $txt;
 
 	// Show the user version information from their server.
 	echo '
@@ -156,7 +156,7 @@ function template_credits()
 							<div class="content">
 								<strong>', $txt['support_versions'], ':</strong><br />
 									', $txt['support_versions_forum'], ':
-								<em id="installedVersion">', $context['forum_version'], '</em>', $context['can_admin'] ? ' <a href="' . $scripturl . '?action=admin;area=maintain;sa=routine;activity=version">' . $txt['version_check_more'] . '</a>' : '', '<br />
+								<em id="installedVersion">', $context['forum_version'], '</em>', $context['can_admin'] ? ' <a href="' . getUrl('admin', ['action' => 'admin', 'area' => 'maintain', 'sa' => 'routine' , 'activity' => 'version']) . '">' . $txt['version_check_more'] . '</a>' : '', '<br />
 									', $txt['support_versions_current'], ':
 								<em id="latestVersion">??</em><br />';
 
@@ -171,7 +171,7 @@ function template_credits()
 		if ($context['can_admin'] && isset($version['more']))
 		{
 			echo
-			' <a class="linkbutton" href="', $scripturl, $version['more'], ';', $context['session_var'], '=', $context['session_id'], '">', $txt['version_check_more'], '</a>';
+			' <a class="linkbutton" href="', getUrl('admin', ['action' => 'admin', 'area' => 'serversettings', 'sa' => 'phpinfo', '{session_data}']), '">', $txt['version_check_more'], '</a>';
 		}
 
 		echo '
@@ -275,7 +275,7 @@ function template_credits()
 	// This sets the latest support stuff.
 	echo '
 					<script>
-						var oAdminCenter = new elk_AdminIndex({
+						var oAdminCenter = new Elk_AdminIndex({
 							bLoadVersions: true,
 							slatestVersionContainerId: \'latestVersion\',
 							sinstalledVersionContainerId: \'installedVersion\',
@@ -703,7 +703,8 @@ function template_view_versions()
 									Templates: \'Templates\'
 								}
 							});
-							var oAdminCenter = new elk_AdminIndex({
+							var oAdminCenter = new E
+							Elk_AdminIndex({
 								bLoadVersions: true,
 								slatestVersionContainerId: \'ourVersion\',
 								sinstalledVersionContainerId: \'yourVersion\',
@@ -720,12 +721,12 @@ function template_view_versions()
  */
 function template_edit_censored()
 {
-	global $context, $scripturl, $txt, $modSettings;
+	global $context, $txt, $modSettings;
 
 	// First section is for adding/removing words from the censored list.
 	echo '
 	<div id="admincenter" class="admincenter">
-		<form id="admin_form_wrapper" action="', $scripturl, '?action=admin;area=postsettings;sa=censor" method="post" accept-charset="UTF-8">
+		<form id="admin_form_wrapper" action="', getUrl('action', ['action'=>'admin','area'=>'postsettings','sa'=>'censor']), '" method="post" accept-charset="UTF-8">
 			<h2 class="category_header">
 				', $txt['admin_censored_words'], '
 			</h2>
@@ -771,7 +772,7 @@ function template_edit_censored()
 						<input type="checkbox" name="censorIgnoreCase" value="1" id="censorIgnoreCase_check"', empty($modSettings['censorIgnoreCase']) ? '' : ' checked="checked"', ' />
 					</dd>
 					<dt>
-						<a href="' . $scripturl . '?action=quickhelp;help=allow_no_censored" onclick="return reqOverlayDiv(this.href);" class="helpicon i-help"><s>' . $txt['help'] . '</s></a><label for="allow_no_censored">', $txt['censor_allow'], '</label>
+						<a href="' . getUrl('action', ['action' => 'quickhelp', 'help' => 'allow_no_censored']), '" onclick="return reqOverlayDiv(this.href);" class="helpicon i-help"><s>' . $txt['help'] . '</s></a><label for="allow_no_censored">', $txt['censor_allow'], '</label>
 					</dt>
 					<dd>
 						<input type="checkbox" name="allow_no_censored" value="1" id="allow_no_censored"', empty($modSettings['allow_no_censored']) ? '' : ' checked="checked"', ' />
@@ -811,7 +812,7 @@ function template_edit_censored()
  */
 function template_not_done()
 {
-	global $context, $txt, $scripturl;
+	global $context, $txt;
 
 	echo '
 	<div id="admincenter">
@@ -820,7 +821,7 @@ function template_not_done()
 			<div class="infobox">
 				', $txt['not_done_reason'], '
 			</div>
-			<form id="autoSubmit" name="autoSubmit" action="', $scripturl, $context['continue_get_data'], '" method="post" accept-charset="UTF-8" >';
+			<form id="autoSubmit" name="autoSubmit" action="', getUrl('action', $context['continue_get_data']), '" method="post" accept-charset="UTF-8" >';
 
 	// Show the progress bars
 	if (!empty($context['continue_percent']))
@@ -864,7 +865,7 @@ function template_not_done()
  */
 function template_show_settings()
 {
-	global $context, $txt, $scripturl;
+	global $context, $txt;
 
 	echo '
 	<div id="', isset($context['current_subaction']) ? $context['current_subaction'] : 'admincenter', '" class="admincenter">
@@ -921,12 +922,12 @@ function template_show_settings()
 					if (empty($config_var['class']))
 					{
 						echo '
-						<a href="' . $scripturl . '?action=quickhelp;help=' . $config_var['helptext'] . '" onclick="return reqOverlayDiv(this.href);" class="hdicon cat_img_helptopics help" title="' . $txt['help'] . '"></a>';
+						<a href="' . getUrl('action', ['action' => 'quickhelp', 'help' => $config_var['helptext']]) . '" onclick="return reqOverlayDiv(this.href);" class="hdicon cat_img_helptopics help" title="' . $txt['help'] . '"></a>';
 					}
 					else
 					{
 						echo '
-						<a href="' . $scripturl . '?action=quickhelp;help=' . $config_var['helptext'] . '" onclick="return reqOverlayDiv(this.href);" class="' . $config_var['class'] . ' help"><i class="helpicon i-help icon-lg"><s>', $txt['help'], '</s></i></a>';
+						<a href="' . getUrl('action', ['action' => 'quickhelp', 'help' => $config_var['helptext']]) . '" onclick="return reqOverlayDiv(this.href);" class="' . $config_var['class'] . ' help"><i class="helpicon i-help icon-lg"><s>', $txt['help'], '</s></i></a>';
 					}
 				}
 				elseif (isset($config_var['icon']))
@@ -1000,7 +1001,7 @@ function template_show_settings()
 				if (isset($config_var['helptext']))
 				{
 					echo '
-						<a id="setting_', $config_var['name'], '" href="', $scripturl, '?action=quickhelp;help=', $config_var['helptext'], '" onclick="return reqOverlayDiv(this.href);" class="helpicon i-help"><s>', $txt['help'], '</s>';
+						<a id="setting_', $config_var['name'], '" href="', getUrl('action', ['action' => 'quickhelp', 'help' => $config_var['helptext']]), '" onclick="return reqOverlayDiv(this.href);" class="helpicon i-help"><s>', $txt['help'], '</s>';
 				}
 				else
 				{
@@ -1081,7 +1082,7 @@ function template_show_settings()
 									<label>
 										<input type="checkbox" name="', $config_var['name'], '_enabledTags[]" value="', $bbcTag['tag'], '"', !in_array($bbcTag['tag'], $config_var['disabled_tags']) ? ' checked' : '', ' /> ', $bbcTag['tag'], '
 									</label>', $bbcTag['show_help'] ? '
-									<a href="' . $scripturl . '?action=quickhelp;help=tag_' . $bbcTag['tag'] . '" onclick="return reqOverlayDiv(this.href);" class="helpicon i-help"></a>' : '', '
+									<a href="' . getUrl('action', ['action' => 'quickhelp', 'help' => 'tag_' . $bbcTag['tag']]) . '" onclick="return reqOverlayDiv(this.href);" class="helpicon i-help"></a>' : '', '
 								</li>';
 					}
 
@@ -1349,7 +1350,7 @@ function template_callback_question_answer_list()
  */
 function template_repair_boards()
 {
-	global $context, $txt, $scripturl;
+	global $context, $txt;
 
 	echo '
 	<div id="admincenter">
@@ -1379,7 +1380,7 @@ function template_repair_boards()
 				', $txt['errors_fix'], '
 			</p>
 			<p>
-				<strong><a class="linkbutton" href="', $scripturl, '?action=admin;area=repairboards;fixErrors;', $context['session_var'], '=', $context['session_id'], '">', $txt['yes'], '</a> - <a href="', $scripturl, '?action=admin;area=maintain">', $txt['no'], '</a></strong>
+				<strong><a class="linkbutton" href="', getUrl('admin', ['action' => 'admin', 'area' => 'repairboards;fixErrors', '{session_data}']), '">', $txt['yes'], '</a> - <a href="', getUrl('admin', ['action' => 'admin', 'area' => 'maintain']), '">', $txt['no'], '</a></strong>
 			</p>';
 		}
 		else
@@ -1387,7 +1388,7 @@ function template_repair_boards()
 			echo '
 			<p class="infobox">', $txt['maintain_no_errors'], '</p>
 			<p>
-				<a class="linkbutton" href="', $scripturl, '?action=admin;area=maintain;sa=routine">', $txt['maintain_return'], '</a>
+				<a class="linkbutton" href="', getUrl('admin', ['action' => 'admin', 'area' => 'maintain', 'sa' => 'routine']), '">', $txt['maintain_return'], '</a>
 			</p>';
 		}
 	}
@@ -1397,7 +1398,7 @@ function template_repair_boards()
 		<p>
 			', $txt['errors_do_recount'], '
 		</p>
-		<form action="', $scripturl, '?action=admin;area=maintain;sa=routine;activity=recount" id="recount_form" method="post">
+		<form action="', getUrl('admin', ['action' => 'admin', 'area' => 'maintain', 'sa' => 'routine', 'activity' => 'recount']), '" id="recount_form" method="post">
 			<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
 			<input type="submit" name="cont" id="cont" value="', $txt['errors_recount_now'], '" />
 		</form>';
@@ -1407,7 +1408,7 @@ function template_repair_boards()
 		echo '
 		<p class="successbox">', $txt['errors_fixed'], '</p>
 		<p>
-			<a class="linkbutton" href="', $scripturl, '?action=admin;area=maintain;sa=routine">', $txt['maintain_return'], '</a>
+			<a class="linkbutton" href="', getUrl('admin', ['action' => 'admin', 'area' => 'maintain', 'sa' => 'routine']), '">', $txt['maintain_return'], '</a>
 		</p>';
 	}
 
@@ -1507,13 +1508,13 @@ function template_php_info()
  */
 function template_clean_cache_button_below()
 {
-	global $txt, $scripturl, $context;
+	global $txt, $context;
 
 	echo '
 	<div class="generic_list_wrapper">
 		<h2 class="category_header">', $txt['maintain_cache'], '</h2>
 		<div class="content">
-			<form action="', $scripturl, '?action=admin;area=maintain;sa=routine;activity=cleancache" method="post" accept-charset="UTF-8">
+			<form action="', getUrl('admin', ['action' => 'admin', 'area' => 'maintain', 'sa' => 'routine', 'activity' => 'cleancache']), '" method="post" accept-charset="UTF-8">
 				<p>', $txt['maintain_cache_info'], '</p>
 				<input type="submit" value="', $txt['maintain_run_now'], '" class="right_submit" />
 				<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
@@ -1528,12 +1529,12 @@ function template_clean_cache_button_below()
  */
 function template_admin_quick_search()
 {
-	global $context, $txt, $scripturl;
+	global $context, $txt;
 
 	if ($context['user']['is_admin'])
 	{
 		echo '
-			<form action="', $scripturl, '?action=admin;area=search" method="post" accept-charset="UTF-8" id="quick_search" class="floatright">
+			<form action="', getUrl('admin', ['action' => 'admin', 'area' => 'search']), '" method="post" accept-charset="UTF-8" id="quick_search" class="floatright">
 				<input type="text" name="search_term" placeholder="', $txt['admin_search'], '" class="input_text" />
 				<select name="sa">
 					<option value="internal"', (empty($context['admin_preferences']['sb']) || $context['admin_preferences']['sb'] == 'internal' ? ' selected="selected"' : ''), '>', $txt['admin_search_type_internal'], '</option>
@@ -1603,13 +1604,13 @@ function template_callback_pm_limits()
  */
 function template_viewquery()
 {
-	global $context, $scripturl;
+	global $context;
 
 	foreach ($context['queries_data'] as $q => $query_data)
 	{
 		echo '
 	<div id="qq', $q, '" class="query">
-		<a ', $query_data['is_select'] ? 'href="' . $scripturl . '?action=viewquery;qq=' . ($q + 1) . '#qq' . $q . '"' : '', '>
+		<a ', $query_data['is_select'] ? 'href="' . getUrl('action', ['action' => 'viewquery', 'qq' => ($q + 1) . '#qq' . $q]) . '"' : '', '>
 			', $query_data['text'], '
 		</a><br />', $query_data['position_time'], '
 	</div>';
