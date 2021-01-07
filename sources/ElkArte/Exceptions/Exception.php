@@ -113,23 +113,17 @@ class Exception extends \Exception
 		// Load message with language support
 		if (is_array($message))
 		{
-			$language = $message[0];
-			$msg = $message[1];
-		}
-		elseif (preg_match('/^(\w+)\.(.+)$/', $message, $matches) !== 0)
-		{
-			// language.messageIndex
-			$language = $matches[1];
-			$msg = $matches[2];
-		}
-		else
-		{
-			// Simple Error message
-			$language = 'Errors';
-			$msg = $message;
+			return [$message[1], $message[0]];
 		}
 
-		return array($msg, $language);
+		if (preg_match('/^(\w+)\.(.+)$/', $message, $matches) !== 0)
+		{
+			// language.messageIndex
+			return [$matches[2], $matches[1]];
+		}
+
+		// Simple Error message
+		return [$message, 'Errors'];
 	}
 
 	/**
