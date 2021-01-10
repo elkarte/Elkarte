@@ -1986,7 +1986,7 @@ class ModerationCenter extends AbstractController
 				'author' => array(
 					'id' => $row['id_author'],
 					'name' => $row['author_name'],
-					'link' => $row['id_author'] ? '<a href="' . $getUrl('profile', ['action' => 'profile', 'u' => $row['id_author']]) . '">' . $row['author_name'] . '</a>' : $row['author_name'],
+					'link' => $row['id_author'] ? '<a href="' . getUrl('profile', ['action' => 'profile', 'u' => $row['id_author']]) . '">' . $row['author_name'] . '</a>' : $row['author_name'],
 					'href' => getUrl('profile', ['action' => 'profile', 'u' => $row['id_author']]),
 				),
 				'comments' => array(),
