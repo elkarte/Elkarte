@@ -28,6 +28,6 @@ class Topic extends Standard
 		$url = 'topic,' . $params['topic'] . (!empty($params['start']) ? '.' . $params['start'] : '.0') . '.html';
 		unset($params['subject'], $params['topic'], $params['start']);
 
-		return $url . $this->generateQuery($params);
+		return $url . $this->_separator . $this->generateQuery($params);
 	}
 }

@@ -49,13 +49,15 @@ class Standard extends AbstractUrlGenerator
 				{
 					continue;
 				}
-				$args[] = $v;
+				$args[$k] = $v;
 			}
 			else
 			{
-				$args[] = $k . '=' . $v;
+				$args[$k] = $k . '=' . $v;
 			}
 		}
+
+		$args = $this->getHash($args);
 
 		return implode($this->_separator, $args);
 	}
