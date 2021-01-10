@@ -686,7 +686,7 @@ function sendApprovalNotifications(&$topicData)
 	// Find everyone who needs to know about this.
 	$members = $db->fetchQuery('
 		SELECT
-			mem.id_member, mem.email_address, mem.notify_regularity, mem.notify_types, mem.notify_send_body, mem.lngfile,
+			DISTINCT mem.id_member, mem.email_address, mem.notify_regularity, mem.notify_types, mem.notify_send_body, mem.lngfile,
 			ln.sent, mem.id_group, mem.additional_groups, b.member_groups, mem.id_post_group, t.id_member_started,
 			ln.id_topic, mem.password_salt
 		FROM {db_prefix}log_notify AS ln
@@ -697,7 +697,6 @@ function sendApprovalNotifications(&$topicData)
 			AND mem.is_activated = {int:is_activated}
 			AND mem.notify_types < {int:notify_types}
 			AND mem.notify_regularity < {int:notify_regularity}
-		GROUP BY mem.id_member, ln.id_topic, mem.email_address, mem.notify_regularity, mem.notify_types, mem.notify_send_body, mem.lngfile, ln.sent, mem.id_group, mem.additional_groups, b.member_groups, mem.id_post_group, t.id_member_started
 		ORDER BY mem.lngfile',
 		array(
 			'topic_list' => $topics,

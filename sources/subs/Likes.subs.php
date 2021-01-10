@@ -363,8 +363,7 @@ function likesCount($memberID, $given = true)
 			SELECT 
 				COUNT(*)
 			FROM {db_prefix}message_likes
-			WHERE id_poster = {int:id_member}
-			GROUP BY id_msg',
+			WHERE id_poster = {int:id_member}',
 			array(
 				'id_member' => $memberID,
 			)
