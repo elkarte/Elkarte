@@ -264,9 +264,6 @@ class Query extends AbstractQuery
 	{
 		// Special queries that need processing.
 		$replacements = array(
-			'display_get_post_poster' => array(
-				'~GROUP BY id_msg\s+HAVING~' => 'AND',
-			),
 			'pm_conversation_list' => array(
 				'~ORDER\\s+BY\\s+\\{raw:sort\\}~' => 'ORDER BY ' . (isset($db_values['sort']) ? ($db_values['sort'] === 'pm.id_pm' ? 'MAX(pm.id_pm)' : $db_values['sort']) : ''),
 			),
