@@ -9,6 +9,7 @@
 class TestMentions extends \PHPUnit\Framework\TestCase
 {
 	protected $_posterOptions = null;
+	protected $_msgOptions = null;
 	protected $backupGlobalsBlacklist = ['user_info'];
 
 	/**
@@ -85,6 +86,7 @@ class TestMentions extends \PHPUnit\Framework\TestCase
 			'ip' => long2ip(rand(0, 2147483647))
 		);
 		$this->_posterOptions = $posterOptions;
+		$this->_msgOptions = $msgOptions;
 
 		// Attempt to make the new topic.
 		createPost($msgOptions, $topicOptions, $posterOptions);
@@ -157,7 +159,7 @@ class TestMentions extends \PHPUnit\Framework\TestCase
 			'mentionmem',
 			$this->id_msg,
 			$this->_posterOptions['id'],
-			array('id_members' => array($id_member), 'notifier_data' => $this->_posterOptions)
+			array('id_members' => array($id_member), 'subject' => $this->_msgOptions['subject'], 'notifier_data' => $this->_posterOptions)
 		));
 
 		$notifier->send();
@@ -183,7 +185,7 @@ class TestMentions extends \PHPUnit\Framework\TestCase
 			'likemsg',
 			$this->id_msg,
 			\ElkArte\User::$info->id,
-			array('id_members' => array(1), 'rlike_notif' => true)
+			array('id_members' => array(1), 'subject' => $this->_msgOptions['subject'], 'rlike_notif' => true)
 		));
 
 		$notifier->send();
@@ -206,7 +208,7 @@ class TestMentions extends \PHPUnit\Framework\TestCase
 			'buddy',
 			1,
 			\ElkArte\User::$info->id,
-			array('id_members' => array(1))
+			array('id_members' => array(1), 'subject' => $this->_msgOptions['subject'])
 		));
 
 		$notifier->send();
