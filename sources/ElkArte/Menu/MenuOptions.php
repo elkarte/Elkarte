@@ -105,11 +105,11 @@ class MenuOptions
 	 */
 	protected function buildBaseUrl()
 	{
-		global $context, $scripturl;
+		global $context;
 
 		$this->setAction($this->getAction() ?: $context['current_action']);
 
-		$this->setBaseUrl($this->getBaseUrl() ?: sprintf('%s?action=%s', $scripturl, $this->getAction()));
+		$this->setBaseUrl($this->getBaseUrl() ?: getUrl('action', ['action' => $this->getAction()]));
 	}
 
 	/**

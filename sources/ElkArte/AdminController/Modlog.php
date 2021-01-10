@@ -48,7 +48,7 @@ class Modlog extends AbstractController
 	 */
 	public function action_log()
 	{
-		global $txt, $context, $scripturl;
+		global $txt, $context;
 
 		require_once(SUBSDIR . '/Modlog.subs.php');
 
@@ -64,11 +64,11 @@ class Modlog extends AbstractController
 		// These change dependant on whether we are viewing the moderation or admin log.
 		if ($context['log_type'] == 3 || $this->_req->query->action === 'admin')
 		{
-			$context['url_start'] = '?action=admin;area=logs;sa=' . ($context['log_type'] == 3 ? 'adminlog' : 'modlog') . ';type=' . $context['log_type'];
+			$context['url_start'] = getUrl('admin', ['action' => 'admin', 'area' => 'logs', 'sa' => ($context['log_type'] == 3 ? 'adminlog' : 'modlog'), 'type' => $context['log_type']]);
 		}
 		else
 		{
-			$context['url_start'] = '?action=moderate;area=modlog;type=' . $context['log_type'];
+			$context['url_start'] = getUrl('action', ['action' => 'moderate', 'area' => 'modlog', 'type' => $context['log_type']]);
 		}
 
 		$context['can_delete'] = allowedTo('admin_forum');
@@ -175,7 +175,7 @@ class Modlog extends AbstractController
 			'width' => '100%',
 			'items_per_page' => $context['displaypage'],
 			'no_items_label' => $txt['modlog_' . ($context['log_type'] == 3 ? 'admin_log_' : '') . 'no_entries_found'],
-			'base_href' => $scripturl . $context['url_start'],
+			'base_href' => $context['url_start'],
 			'default_sort_col' => 'time',
 			'get_items' => array(
 				'function' => function ($start, $items_per_page, $sort, $query_string, $query_params, $log_type) {
@@ -282,7 +282,7 @@ class Modlog extends AbstractController
 				),
 			),
 			'form' => array(
-				'href' => $scripturl . $context['url_start'],
+				'href' => $context['url_start'],
 				'include_sort' => true,
 				'include_start' => true,
 				'hidden_fields' => array(

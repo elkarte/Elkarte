@@ -279,11 +279,11 @@ class PostModeration extends AbstractController
 					'value' => $item['id'],
 				),
 				'approve' => array(
-					'href' => $scripturl . '?action=moderate;area=postmod;sa=' . $context['current_view'] . ';start=' . $context['start'] . ';' . $context['session_var'] . '=' . $context['session_id'] . ';approve=' . $item['id'],
+					'href' => getUrl('action', ['action' => 'moderate', 'area' => 'postmod', 'sa' => $context['current_view'], 'start' => $context['start'], '{session_data}', 'approve' => $item['id']]),
 					'text' => $txt['approve'],
 				),
 				'unapprove' => array(
-					'href' => $scripturl . '?action=moderate;area=postmod;sa=' . $context['current_view'] . ';start=' . $context['start'] . ';' . $context['session_var'] . '=' . $context['session_id'] . ';delete=' . $item['id'],
+					'href' => getUrl('action', ['action' => 'moderate', 'area' => 'postmod', 'sa' => $context['current_view'], 'start' => $context['start'], '{session_data}', 'delete' => $item['id']]),
 					'text' => $txt['remove'],
 					'test' => 'can_delete',
 				),
@@ -302,7 +302,7 @@ class PostModeration extends AbstractController
 	 */
 	public function action_unapproved_attachments()
 	{
-		global $txt, $scripturl, $context, $modSettings;
+		global $txt, $context, $modSettings;
 
 		$context['page_title'] = $txt['mc_unapproved_attachments'];
 
@@ -384,7 +384,7 @@ class PostModeration extends AbstractController
 			'width' => '100%',
 			'items_per_page' => $modSettings['defaultMaxMessages'],
 			'no_items_label' => $txt['mc_unapproved_attachments_none_found'],
-			'base_href' => $scripturl . '?action=moderate;area=attachmod;sa=attachments',
+			'base_href' => getUrl('action', ['action' => 'moderate', 'area' => 'attachmod', 'sa' => 'attachments']),
 			'default_sort_col' => 'attach_name',
 			'get_items' => array(
 				'function' => 'list_getUnapprovedAttachments',
@@ -486,7 +486,7 @@ class PostModeration extends AbstractController
 				),
 			),
 			'form' => array(
-				'href' => $scripturl . '?action=moderate;area=attachmod;sa=attachments',
+				'href' => getUrl('action', ['action' => 'moderate', 'area' => 'attachmod', 'sa' => 'attachments']),
 				'include_sort' => true,
 				'include_start' => true,
 				'hidden_fields' => array(

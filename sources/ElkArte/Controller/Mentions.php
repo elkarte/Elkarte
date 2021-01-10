@@ -246,7 +246,7 @@ class Mentions extends AbstractController
 					),
 					'data' => array(
 						'function' => function ($row) {
-							global $settings, $scripturl;
+							global $settings;
 
 							if (isset($settings['mentions']['mentioner_template']))
 							{
@@ -258,7 +258,7 @@ class Mentions extends AbstractController
 									),
 									array(
 										$row['avatar']['image'],
-										!empty($row['id_member_from']) ? $scripturl . '?action=profile;u=' . $row['id_member_from'] : '#',
+										!empty($row['id_member_from']) ? getUrl('action', ['action' => 'profile', 'u' => $row['id_member_from']]) : '#',
 										$row['mentioner'],
 									),
 									$settings['mentions']['mentioner_template']);
@@ -306,12 +306,12 @@ class Mentions extends AbstractController
 					),
 					'data' => array(
 						'function' => function ($row) {
-							global $txt, $settings, $context, $scripturl;
+							global $txt, $settings;
 
 							$mark = empty($row['status']) ? 'read' : 'unread';
-							$opts = '<a href="' . $scripturl . '?action=mentions;sa=updatestatus;mark=' . $mark . ';item=' . $row['id_mention'] . ';' . $context['session_var'] . '=' . $context['session_id'] . ';"><img title="' . $txt['mentions_mark' . $mark] . '" src="' . $settings['images_url'] . '/icons/mark_' . $mark . '.png" alt="*" /></a>&nbsp;';
+							$opts = '<a href="' . getUrl('action', ['action' => 'mentions', 'sa' => 'updatestatus', 'mark' => $mark, 'item' => $row['id_mention'] . '{session_data}']) . '"><img title="' . $txt['mentions_mark' . $mark] . '" src="' . $settings['images_url'] . '/icons/mark_' . $mark . '.png" alt="*" /></a>&nbsp;';
 
-							return $opts . '<a href="' . $scripturl . '?action=mentions;sa=updatestatus;mark=delete;item=' . $row['id_mention'] . ';' . $context['session_var'] . '=' . $context['session_id'] . ';"><i class="icon i-remove" title="' . $txt['delete'] . '"></i></a>';
+							return $opts . '<a href="' . getUrl('action', ['action' => 'mentions', 'sa' => 'updatestatus', 'mark' => 'delete', 'item' => $row['id_mention'], '{session_data}']) . '"><i class="icon i-remove" title="' . $txt['delete'] . '"></i></a>';
 						},
 						'class' => 'listaction grid8',
 					),
@@ -321,7 +321,7 @@ class Mentions extends AbstractController
 				'show_on' => 'top',
 				'links' => array(
 					array(
-						'href' => $scripturl . '?action=mentions' . (!empty($this->_all) ? ';all' : ''),
+						'href' => getUrl('action', ['action' => 'mentions' . (!empty($this->_all) ? ';all' : '')]),
 						'is_selected' => empty($this->_type),
 						'label' => $txt['mentions_type_all']
 					),
@@ -343,7 +343,7 @@ class Mentions extends AbstractController
 		foreach ($this->_known_mentions as $mention)
 		{
 			$list_options['list_menu']['links'][] = array(
-				'href' => $scripturl . '?action=mentions;type=' . $mention . (!empty($this->_all) ? ';all' : ''),
+				'href' => getUrl('action', ['action' => 'mentions', 'type' => $mention . (!empty($this->_all) ? ';all' : '')]),
 				'is_selected' => $this->_type === $mention,
 				'label' => $txt['mentions_type_' . $mention]
 			);
@@ -353,14 +353,14 @@ class Mentions extends AbstractController
 
 		$context['page_title'] = $txt['my_mentions'] . (!empty($this->_page) ? ' - ' . sprintf($txt['my_mentions_pages'], $this->_page) : '');
 		$context['linktree'][] = array(
-			'url' => $scripturl . '?action=mentions',
+			'url' => getUrl('action', ['action' => 'mentions']),
 			'name' => $txt['my_mentions'],
 		);
 
 		if (!empty($this->_type))
 		{
 			$context['linktree'][] = array(
-				'url' => $scripturl . '?action=mentions;type=' . $this->_type,
+				'url' => getUrl('action', ['action' => 'mentions', 'type' => $this->_type]),
 				'name' => $txt['mentions_type_' . $this->_type],
 			);
 		}

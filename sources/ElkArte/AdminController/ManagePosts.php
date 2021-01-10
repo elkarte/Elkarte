@@ -239,7 +239,7 @@ class ManagePosts extends AbstractController
 	 */
 	public function action_postSettings_display()
 	{
-		global $context, $txt, $modSettings, $scripturl;
+		global $context, $txt, $modSettings;
 
 		// Initialize the form
 		$settingsForm = new SettingsForm(SettingsForm::DB_ADAPTER);
@@ -272,7 +272,7 @@ class ManagePosts extends AbstractController
 
 				if (isset($body_type) && ($this->_req->post->max_messageLength > 65535 || $this->_req->post->max_messageLength == 0) && $body_type === 'text')
 				{
-					throw new Exception('convert_to_mediumtext', false, array($scripturl . '?action=admin;area=maintain;sa=database'));
+					throw new Exception('convert_to_mediumtext', false, array(getUrl('admin', ['action' => 'admin', 'area' => 'maintain', 'sa' => 'database'])));
 				}
 
 			}
@@ -291,7 +291,7 @@ class ManagePosts extends AbstractController
 		}
 
 		// Final settings...
-		$context['post_url'] = $scripturl . '?action=admin;area=postsettings;save;sa=posts';
+		$context['post_url'] = getUrl('admin', ['action' => 'admin', 'area' => 'postsettings;save', 'sa' => 'posts']);
 		$context['settings_title'] = $txt['manageposts_settings'];
 
 		// Prepare the settings...

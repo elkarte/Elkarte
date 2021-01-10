@@ -202,7 +202,7 @@ class Debug
 	 */
 	public function display()
 	{
-		global $scripturl, $txt;
+		global $txt;
 
 		$this->_prepare_last_bits();
 		$expand_id = array();
@@ -266,7 +266,7 @@ class Debug
 
 		// Want to see the querys in a new windows?
 		echo '
-				<a href="', $scripturl, '?action=viewquery" target="_blank" class="new_win">', sprintf($txt['debug_queries_used'], $this->_db_count), '</a><br />';
+				<a href="', getUrl('action', ['action' => 'viewquery']), '" target="_blank" class="new_win">', sprintf($txt['debug_queries_used'], $this->_db_count), '</a><br />';
 
 		if ($_SESSION['view_queries'] == 1 && !empty($this->_db_cache))
 		{
@@ -275,7 +275,7 @@ class Debug
 
 		// Or show/hide the querys in line with all of this data
 		echo '
-				<a href="' . $scripturl . '?action=viewquery;sa=hide">', $txt['debug_' . (empty($_SESSION['view_queries']) ? 'show' : 'hide') . '_queries'], '</a>
+				<a href="' . getUrl('action', ['action' => 'viewquery', 'sa' => 'hide']), '">', $txt['debug_' . (empty($_SESSION['view_queries']) ? 'show' : 'hide') . '_queries'], '</a>
 			</div>
 		</div>';
 
@@ -408,7 +408,7 @@ class Debug
 	 */
 	private function _show_queries()
 	{
-		global $scripturl, $txt;
+		global $txt;
 
 		foreach ($this->_db_cache as $q => $qq)
 		{
@@ -439,7 +439,7 @@ class Debug
 			}
 
 			echo '
-		<strong>', $is_select ? '<a href="' . $scripturl . '?action=viewquery;qq=' . ($q + 1) . '#qq' . $q . '" target="_blank" class="new_win">' : '', nl2br(str_replace("\t", '&nbsp;&nbsp;&nbsp;', htmlspecialchars(ltrim($qq['q'], "\n\r"), ENT_COMPAT, 'UTF-8'))) . ($is_select ? '</a></strong>' : '</strong>') . '<br />
+		<strong>', $is_select ? '<a href="' . getUrl('action', ['action' => 'viewquery', 'qq' => ($q + 1), 'hash' => '#qq' . $q]) . '" target="_blank" class="new_win">' : '', nl2br(str_replace("\t", '&nbsp;&nbsp;&nbsp;', htmlspecialchars(ltrim($qq['q'], "\n\r"), ENT_COMPAT, 'UTF-8'))) . ($is_select ? '</a></strong>' : '</strong>') . '<br />
 		&nbsp;&nbsp;&nbsp;';
 			if (!empty($qq['f']) && !empty($qq['l']))
 			{

@@ -302,7 +302,7 @@ class ManageFeatures extends AbstractController
 					class_exists($modSettings['front_page'])
 					&& in_array('validateFrontPageOptions', get_class_methods($modSettings['front_page']))
 					&& !$front_page::validateFrontPageOptions($this->_req->post)
-				) 
+				)
 				{
 					$this->_req->post->front_page = '';
 				}
@@ -873,7 +873,7 @@ class ManageFeatures extends AbstractController
 	 */
 	public function action_profile()
 	{
-		global $txt, $scripturl, $context;
+		global $txt, $context;
 
 		theme()->getTemplates()->load('ManageFeatures');
 		$context['page_title'] = $txt['custom_profile_title'];
@@ -1124,7 +1124,7 @@ class ManageFeatures extends AbstractController
 				'show_on_registration' => array(
 					'data' => array(
 						'sprintf' => array(
-							'format' => '<a href="' . $scripturl . '?action=admin;area=featuresettings;sa=profileedit;fid=%1$s">' . $txt['modify'] . '</a>',
+							'format' => '<a href="' . getUrl('admin', ['action' => 'admin', 'area' => 'featuresettings', 'sa' => 'profileedit', 'fid' => '%1$s']) . '">' . $txt['modify'] . '</a>',
 							'params' => array(
 								'id_field' => false,
 							),

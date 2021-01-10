@@ -136,7 +136,7 @@ class ManageNews extends AbstractController
 	 */
 	public function action_editnews()
 	{
-		global $txt, $modSettings, $context, $scripturl;
+		global $txt, $modSettings, $context;
 
 		require_once(SUBSDIR . '/Post.subs.php');
 
@@ -244,7 +244,7 @@ class ManageNews extends AbstractController
 				),
 			),
 			'form' => array(
-				'href' => $scripturl . '?action=admin;area=news;sa=editnews',
+				'href' => getUrl('admin', ['action' => 'admin', 'area' => 'news', 'sa' => 'editnews']),
 				'hidden_fields' => array(
 					$context['session_var'] => $context['session_id'],
 				),
@@ -767,7 +767,7 @@ class ManageNews extends AbstractController
 			array(
 				!empty($context['send_html']) ? '<a href="' . $scripturl . '">' . $scripturl . '</a>' : $scripturl,
 				standardTime(forum_time(), false),
-				!empty($context['send_html']) ? '<a href="' . $scripturl . '?action=profile;u=' . $modSettings['latestMember'] . '">' . $cleanLatestMember . '</a>' : ($context['send_pm'] ? '[url=' . $scripturl . '?action=profile;u=' . $modSettings['latestMember'] . ']' . $cleanLatestMember . '[/url]' : $cleanLatestMember),
+				!empty($context['send_html']) ? '<a href="' . getUrl('profile', ['action' => 'profile', 'u' => $modSettings['latestMember'], 'name' => $cleanLatestMember]) . '">' . $cleanLatestMember . '</a>' : ($context['send_pm'] ? '[url=' . getUrl('profile', ['action' => 'profile', 'u' => $modSettings['latestMember'], 'name' => $cleanLatestMember]) . ']' . $cleanLatestMember . '[/url]' : $cleanLatestMember),
 				$modSettings['latestMember'],
 				$cleanLatestMember
 			), $base_message);
@@ -915,7 +915,7 @@ class ManageNews extends AbstractController
 				$message = str_replace($from_member,
 					array(
 						$row['email_address'],
-						!empty($context['send_html']) ? '<a href="' . $scripturl . '?action=profile;u=' . $row['id_member'] . '">' . $cleanMemberName . '</a>' : ($context['send_pm'] ? '[url=' . $scripturl . '?action=profile;u=' . $row['id_member'] . ']' . $cleanMemberName . '[/url]' : $cleanMemberName),
+						!empty($context['send_html']) ? '<a href="' . getUrl('profile', ['action' => 'profile', 'u' => $row['id_member'], 'name' => $cleanMemberName]) . '">' . $cleanMemberName . '</a>' : ($context['send_pm'] ? '[url=' . getUrl('profile', ['action' => 'profile', 'u' => $row['id_member'], 'name' => $cleanMemberName]) . ']' . $cleanMemberName . '[/url]' : $cleanMemberName),
 						$row['id_member'],
 						$cleanMemberName,
 					), $base_message);
@@ -998,7 +998,7 @@ class ManageNews extends AbstractController
 		// Wrap it all up nice and warm...
 		$context['page_title'] = $txt['admin_edit_news'] . ' - ' . $txt['settings'];
 		$context['sub_template'] = 'show_settings';
-		$context['post_url'] = $scripturl . '?action=admin;area=news;save;sa=settings';
+		$context['post_url'] = getUrl('admin', ['action' => 'admin', 'area' => 'news;save', 'sa' => 'settings']);
 
 		// Saving the settings?
 		if (isset($this->_req->query->save))

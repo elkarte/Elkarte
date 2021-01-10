@@ -17,10 +17,10 @@
  */
 function template_registration_agreement()
 {
-	global $context, $scripturl, $txt;
+	global $context, $txt;
 
 	echo '
-		<form action="', $scripturl, '?action=register" method="post" accept-charset="UTF-8" id="registration">';
+		<form action="', getUrl('action', ['action' => 'register']), '" method="post" accept-charset="UTF-8" id="registration">';
 
 	if (!empty($context['languages']))
 	{
@@ -115,7 +115,7 @@ function template_registration_agreement()
  */
 function template_registration_form()
 {
-	global $context, $scripturl, $txt, $modSettings;
+	global $context, $txt, $modSettings;
 
 	theme()->addInlineJavascript('
 		function verifyAgree()
@@ -152,7 +152,7 @@ function template_registration_form()
 	}
 
 	echo '
-		<form action="', $scripturl, '?action=register;sa=register2" method="post" accept-charset="UTF-8" name="registration" id="registration" onsubmit="return verifyAgree();">
+		<form action="', getUrl('atcion', ['action' => 'register', 'sa' => 'register2']), '" method="post" accept-charset="UTF-8" name="registration" id="registration" onsubmit="return verifyAgree();">
 			<h2 class="category_header">', $txt['registration_form'], '</h2>
 			<h2 class="category_header">', $txt['required_info'], '</h2>
 				<input type="password" name="autofill_honey_pot" class="hide" />
@@ -209,7 +209,7 @@ function template_registration_form()
 		echo '
 					<dl class="settings" id="authentication_group">
 						<dt>
-							<a href="', $scripturl, '?action=quickhelp;help=register_openid" onclick="return reqOverlayDiv(this.href);" class="helpicon i-help"><s>', $txt['help'], '</s></a>
+							<a href="', getUrl('action', ['action' => 'quickhelp', 'help' => 'register_openid']), '" onclick="return reqOverlayDiv(this.href);" class="helpicon i-help"><s>', $txt['help'], '</s></a>
 							<strong>', $txt['authenticate_label'], ':</strong>
 						</dt>
 						<dd>
@@ -556,7 +556,7 @@ function template_after()
  */
 function template_coppa()
 {
-	global $context, $txt, $scripturl;
+	global $context, $txt;
 
 	// Formulate a nice complicated message!
 	echo '
@@ -564,7 +564,7 @@ function template_coppa()
 			<div class="content">
 				<p>', $context['coppa']['body'], '</p>
 				<p>
-					<span><a href="', $scripturl, '?action=register;sa=coppa;form;member=', $context['coppa']['id'], '" target="_blank" class="new_win">', $txt['coppa_form_link_popup'], '</a> | <a href="', $scripturl, '?action=register;sa=coppa;form;dl;member=', $context['coppa']['id'], '">', $txt['coppa_form_link_download'], '</a></span>
+					<span><a href="', getUrl('action', ['action' => 'register', 'sa' => 'coppa;form;', 'member' => $context['coppa']['id']]), '" target="_blank" class="new_win">', $txt['coppa_form_link_popup'], '</a> | <a href="', getUrl('action', ['action' => 'register', 'sa' => 'coppa;form;dl', 'member' => $context['coppa']['id']]), '">', $txt['coppa_form_link_download'], '</a></span>
 				</p>
 				<p>', $context['coppa']['many_options'] ? $txt['coppa_send_to_two_options'] : $txt['coppa_send_to_one_option'], '</p>
 				<ol>';
@@ -699,12 +699,12 @@ function template_verification_sound()
  */
 function template_admin_register()
 {
-	global $context, $scripturl, $txt, $modSettings;
+	global $context, $txt, $modSettings;
 
 	echo '
 	<div id="admincenter">
 		<div id="admin_form_wrapper">
-			<form id="postForm" action="', $scripturl, '?action=admin;area=regcenter" method="post" autocomplete="off" accept-charset="UTF-8" name="postForm">
+			<form id="postForm" action="', getUrl('admin', ['action' => 'admin', 'area' => 'regcenter']), '" method="post" autocomplete="off" accept-charset="UTF-8" name="postForm">
 				<h2 class="category_header">', $txt['admin_browse_register_new'], '</h2>
 				<div id="register_screen" class="content">';
 
@@ -797,11 +797,11 @@ function template_admin_register()
  */
 function template_edit_agreement()
 {
-	global $context, $scripturl, $txt;
+	global $context, $txt;
 
 	// Just a big box to edit the text file ;).
 	echo '
-		<form id="admin_form_wrapper" action="', $scripturl, '?action=admin;area=regcenter" method="post" accept-charset="UTF-8" onsubmit="return confirmAgreement(', JavaScriptEscape($txt['confirm_request_accept_agreement']), ');">
+		<form id="admin_form_wrapper" action="', getUrl('admin', ['action' => 'admin', 'area' => 'regcenter']), '" method="post" accept-charset="UTF-8" onsubmit="return confirmAgreement(', JavaScriptEscape($txt['confirm_request_accept_agreement']), ');">
 			<h2 class="category_header">', $context['page_title'], '</h2>';
 
 	// Warning for if the file isn't writable.
@@ -876,10 +876,10 @@ function template_edit_agreement()
  */
 function template_edit_reserved_words()
 {
-	global $context, $scripturl, $txt;
+	global $context, $txt;
 
 	echo '
-		<form id="admin_form_wrapper" class="content" action="', $scripturl, '?action=admin;area=regcenter" method="post" accept-charset="UTF-8">
+		<form id="admin_form_wrapper" class="content" action="', getUrl('admin', ['action' => 'admin', 'area' => 'regcenter']), '" method="post" accept-charset="UTF-8">
 			<h2 class="category_header">', $txt['admin_reserved_set'], '</h2>
 			<div class="content">
 				<h4>', $txt['admin_reserved_line'], '</h4>
@@ -927,11 +927,11 @@ function template_edit_reserved_words()
  */
 function template_contact_form()
 {
-	global $context, $scripturl, $txt;
+	global $context, $txt;
 
 	echo '
 		<h2 class="category_header">', $txt['admin_contact_form'], '</h2>
-		<form id="contact_form" class="content" action="', $scripturl, '?action=register;sa=contact" method="post" accept-charset="UTF-8">
+		<form id="contact_form" class="content" action="', getUrl('action', ['action' => 'register', 'sa' => 'contact']), '" method="post" accept-charset="UTF-8">
 			<div class="content">';
 
 	if (!empty($context['errors']))

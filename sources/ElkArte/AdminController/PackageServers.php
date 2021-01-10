@@ -229,7 +229,7 @@ class PackageServers extends AbstractController
 	 */
 	public function action_browse()
 	{
-		global $txt, $scripturl, $context;
+		global $txt, $context;
 
 		// Load our subs worker.
 		require_once(SUBSDIR . '/PackageServers.subs.php');
@@ -343,7 +343,7 @@ class PackageServers extends AbstractController
 					// Build the download to server link
 					$server_att = $server != '' ? ';server=' . $server : '';
 					$current_url = ';section=' . $packageSection . ';num=' . $section_count;
-					$package['download']['href'] = $scripturl . '?action=admin;area=packageservers;sa=download' . $server_att . $current_url . ';package=' . $package['filename'] . ($package['download_conflict'] ? ';conflict' : '') . ';' . $context['session_var'] . '=' . $context['session_id'];
+					$package['download']['href'] = getUrl('admin', ['action' => 'admin', 'area' => 'packageservers', 'sa' => 'download' . $server_att . $current_url, 'package' => $package['filename'] . ($package['download_conflict'] ? ';conflict' : ''), '{session_data}']);
 					$package['download']['link'] = '<a href="' . $package['download']['href'] . '">' . $package['name'] . '</a>';
 
 					// Add this package to the list
@@ -534,7 +534,7 @@ class PackageServers extends AbstractController
 	 */
 	public function action_download()
 	{
-		global $txt, $scripturl, $context;
+		global $txt, $context;
 
 		require_once(SUBSDIR . '/PackageServers.subs.php');
 
@@ -634,14 +634,14 @@ class PackageServers extends AbstractController
 		}
 
 		// Save the package to disk, use FTP if necessary
+
 		create_chmod_control(
 			array(BOARDDIR . '/packages/' . $package_name),
-			array('destination_url' => $scripturl . '?action=admin;area=packageservers;sa=download' . (isset($this->_req->query->server)
-					? ';server=' . $this->_req->query->server : '') . (isset($this->_req->query->auto)
-					? ';auto' : '') . ';package=' . $package_id . (isset($this->_req->query->conflict)
-					? ';conflict' : '') . ';' . $context['session_var'] . '=' . $context['session_id'],
-				  'crash_on_error' => true)
-		);
+			array('destination_url' => getUrl('admin', ['action' => 'admin', 'area' => 'packageservers', 'sa' => 'download', 'package' => $package_id, '{session_data}']
+				+ (isset($this->_req->query->server) ? ['server' => $this->_req->query->server] : [])
+				+ (isset($this->_req->query->auto) ? ['auto' => ''] : [])
+				+ (isset($this->_req->query->conflict) ? ['conflict' => ''] : [])), 'crash_on_error' => true));
+
 		package_put_contents(BOARDDIR . '/packages/' . $package_name, fetch_web_data($url . $package_id));
 
 		// Done!  Did we get this package automatically?
@@ -663,22 +663,22 @@ class PackageServers extends AbstractController
 
 		if ($context['package']['type'] === 'modification')
 		{
-			$context['package']['install']['link'] = '<a class="linkbutton" href="' . $scripturl . '?action=admin;area=packages;sa=install;package=' . $context['package']['filename'] . '">' . $txt['install_mod'] . '</a>';
+			$context['package']['install']['link'] = '<a class="linkbutton" href="' . getUrl('admin', ['action' => 'admin', 'area' => 'packages', 'sa' => 'install', 'package' => $context['package']['filename']]) . '">' . $txt['install_mod'] . '</a>';
 		}
 		elseif ($context['package']['type'] === 'avatar')
 		{
-			$context['package']['install']['link'] = '<a class="linkbutton" href="' . $scripturl . '?action=admin;area=packages;sa=install;package=' . $context['package']['filename'] . '">' . $txt['use_avatars'] . '</a>';
+			$context['package']['install']['link'] = '<a class="linkbutton" href="' . getUrl('admin', ['action' => 'admin', 'area' => 'packages', 'sa' => 'install', 'package' => $context['package']['filename']]) . '">' . $txt['use_avatars'] . '</a>';
 		}
 		elseif ($context['package']['type'] === 'language')
 		{
-			$context['package']['install']['link'] = '<a class="linkbutton" href="' . $scripturl . '?action=admin;area=packages;sa=install;package=' . $context['package']['filename'] . '">' . $txt['add_languages'] . '</a>';
+			$context['package']['install']['link'] = '<a class="linkbutton" href="' . getUrl('admin', ['action' => 'admin', 'area' => 'packages', 'sa' => 'install', 'package' => $context['package']['filename']]) . '">' . $txt['add_languages'] . '</a>';
 		}
 		else
 		{
 			$context['package']['install']['link'] = '';
 		}
 
-		$context['package']['list_files']['link'] = '<a class="linkbutton" href="' . $scripturl . '?action=admin;area=packages;sa=list;package=' . $context['package']['filename'] . '">' . $txt['list_files'] . '</a>';
+		$context['package']['list_files']['link'] = '<a class="linkbutton" href="' .getUrl('admin', ['action' => 'admin', 'area' => 'packages', 'sa' => 'list', 'package' => $context['package']['filename']]) . '">' . $txt['list_files'] . '</a>';
 
 		// Free a little bit of memory...
 		unset($context['package']['xml']);
@@ -693,7 +693,7 @@ class PackageServers extends AbstractController
 	 */
 	public function action_upload2()
 	{
-		global $txt, $scripturl, $context;
+		global $txt, $context;
 
 		// Setup the correct template, even though I'll admit we ain't downloading ;)
 		$context['sub_template'] = 'downloaded';
@@ -742,7 +742,7 @@ class PackageServers extends AbstractController
 		{
 			@unlink($destination);
 			theme()->getTemplates()->loadLanguageFile('Errors');
-			$txt[$context['package']] = str_replace('{MANAGETHEMEURL}', $scripturl . '?action=admin;area=theme;sa=admin;' . $context['session_var'] . '=' . $context['session_id'] . '#theme_install', $txt[$context['package']]);
+			$txt[$context['package']] = str_replace('{MANAGETHEMEURL}', getUrl('admin', ['action' => 'admin', 'area' => 'theme', 'sa' => 'admin', '{session_data}', 'hash' => '#theme_install']), $txt[$context['package']]);
 			throw new Exception('package_upload_error_broken', false, $txt[$context['package']]);
 		}
 		// Is it already uploaded, maybe?
@@ -786,22 +786,22 @@ class PackageServers extends AbstractController
 
 		if ($context['package']['type'] === 'modification')
 		{
-			$context['package']['install']['link'] = '<a class="linkbutton" href="' . $scripturl . '?action=admin;area=packages;sa=install;package=' . $context['package']['filename'] . '">' . $txt['install_mod'] . '</a>';
+			$context['package']['install']['link'] = '<a class="linkbutton" href="' . getUrl('admin', ['action' => 'admin', 'area' => 'packages', 'sa' => 'install', 'package' => $context['package']['filename']]) . '">' . $txt['install_mod'] . '</a>';
 		}
 		elseif ($context['package']['type'] === 'avatar')
 		{
-			$context['package']['install']['link'] = '<a class="linkbutton" href="' . $scripturl . '?action=admin;area=packages;sa=install;package=' . $context['package']['filename'] . '">' . $txt['use_avatars'] . '</a>';
+			$context['package']['install']['link'] = '<a class="linkbutton" href="' .getUrl('admin', ['action' => 'admin', 'area' => 'packages', 'sa' => 'install', 'package' => $context['package']['filename']]) . '">' . $txt['use_avatars'] . '</a>';
 		}
 		elseif ($context['package']['type'] === 'language')
 		{
-			$context['package']['install']['link'] = '<a class="linkbutton" href="' . $scripturl . '?action=admin;area=packages;sa=install;package=' . $context['package']['filename'] . '">' . $txt['add_languages'] . '</a>';
+			$context['package']['install']['link'] = '<a class="linkbutton" href="' . getUrl('admin', ['action' => 'admin', 'area' => 'packages', 'sa' => 'install', 'package' => $context['package']['filename']]) . '">' . $txt['add_languages'] . '</a>';
 		}
 		else
 		{
 			$context['package']['install']['link'] = '';
 		}
 
-		$context['package']['list_files']['link'] = '<a class="linkbutton" href="' . $scripturl . '?action=admin;area=packages;sa=list;package=' . $context['package']['filename'] . '">' . $txt['list_files'] . '</a>';
+		$context['package']['list_files']['link'] = '<a class="linkbutton" href="' . getUrl('admin', ['action' => 'admin', 'area' => 'packages', 'sa' => 'list', 'package' => $context['package']['filename']]) . '">' . $txt['list_files'] . '</a>';
 
 		unset($context['package']['xml']);
 

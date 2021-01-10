@@ -76,11 +76,9 @@ function getUserErrors($start, $items_per_page, $sort, $where, $where_vars = arr
 		))
 	)->fetch_callback(
 		function ($row) use (&$error_messages) {
-			global $scripturl;
-
 			$error_messages[] = array(
 				'ip' => $row['ip'],
-				'member_link' => $row['id_member'] > 0 ? '<a href="' . $scripturl . '?action=profile;u=' . $row['id_member'] . '">' . $row['display_name'] . '</a>' : $row['display_name'],
+				'member_link' => $row['id_member'] > 0 ? '<a href="' . getUrl('profile', ['action' => 'profile', 'u' => $row['id_member']]) . '">' . $row['display_name'] . '</a>' : $row['display_name'],
 				'message' => strtr($row['message'], array('&lt;span class=&quot;remove&quot;&gt;' => '', '&lt;/span&gt;' => '')),
 				'url' => $row['url'],
 				'time' => standardTime($row['log_time']),
@@ -150,14 +148,12 @@ function getIPMessages($start, $items_per_page, $sort, $where, $where_vars = arr
 		array_merge($where_vars, array())
 	)->fetch_callback(
 		function ($row) use (&$messages) {
-			global $scripturl;
-
 			$messages[] = array(
 				'ip' => $row['poster_ip'],
-				'member_link' => empty($row['id_member']) ? $row['display_name'] : '<a href="' . $scripturl . '?action=profile;u=' . $row['id_member'] . '">' . $row['display_name'] . '</a>',
+				'member_link' => empty($row['id_member']) ? $row['display_name'] : '<a href="' . getUrl('profile', ['action' => 'profile', 'u' => $row['id_member']]) . '">' . $row['display_name'] . '</a>',
 				'board' => array(
 					'id' => $row['id_board'],
-					'href' => $scripturl . '?board=' . $row['id_board']
+					'href' => getUrl('action', ['board' => $row['id_board']])
 				),
 				'topic' => $row['id_topic'],
 				'id' => $row['id_msg'],
@@ -284,7 +280,7 @@ function getProfileEditCount($memID)
  */
 function getProfileEdits($start, $items_per_page, $sort, $memID)
 {
-	global $txt, $scripturl, $context;
+	global $txt, $context;
 
 	$db = database();
 
@@ -367,7 +363,7 @@ function getProfileEdits($start, $items_per_page, $sort, $memID)
 		{
 			if (isset($members[$value['id_member']]))
 			{
-				$edits[$key]['member_link'] = '<a href="' . $scripturl . '?action=profile;u=' . $value['id_member'] . '">' . $members[$value['id_member']] . '</a>';
+				$edits[$key]['member_link'] = '<a href="' . getUrl('profile', ['action' => 'profile', 'u' => $value['id_member']]) . '">' . $members[$value['id_member']] . '</a>';
 			}
 		}
 	}

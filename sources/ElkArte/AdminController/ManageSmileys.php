@@ -150,7 +150,7 @@ class ManageSmileys extends AbstractController
 	 */
 	public function action_smileySettings_display()
 	{
-		global $context, $scripturl;
+		global $context;
 
 		// initialize the form
 		$settingsForm = new SettingsForm(SettingsForm::DB_ADAPTER);
@@ -163,7 +163,7 @@ class ManageSmileys extends AbstractController
 		$context['sub_template'] = 'show_settings';
 
 		// Finish up the form...
-		$context['post_url'] = $scripturl . '?action=admin;area=smileys;save;sa=settings';
+		$context['post_url'] = getUrl('admin', ['action' => 'admin', 'area' => 'smileys;save', 'sa' => 'settings']);
 
 		// Saving the settings?
 		if (isset($this->_req->query->save))
@@ -240,7 +240,7 @@ class ManageSmileys extends AbstractController
 	 */
 	public function action_edit()
 	{
-		global $modSettings, $context, $txt, $scripturl;
+		global $modSettings, $context, $txt;
 
 		require_once(SUBSDIR . '/Smileys.subs.php');
 
@@ -277,7 +277,7 @@ class ManageSmileys extends AbstractController
 			'id' => 'smiley_set_list',
 			'title' => $txt['smiley_sets'],
 			'no_items_label' => $txt['smiley_sets_none'],
-			'base_href' => $scripturl . '?action=admin;area=smileys;sa=editsets',
+			'base_href' => getUrl('admin', ['action' => 'admin', 'area' => 'smileys', 'sa' => 'editsets']),
 			'default_sort_col' => 'default',
 			'get_items' => array(
 				'function' => 'list_getSmileySets',
@@ -336,7 +336,7 @@ class ManageSmileys extends AbstractController
 					),
 					'data' => array(
 						'sprintf' => array(
-							'format' => '<a href="' . $scripturl . '?action=admin;area=smileys;sa=modifyset;set=%1$d">' . $txt['smiley_set_modify'] . '</a>',
+							'format' => '<a href="' . getUrl('admin', ['action' => 'admin', 'area' => 'smileys', 'sa' => 'modifyset', 'set' => '%1$d']) . '">' . $txt['smiley_set_modify'] . '</a>',
 							'params' => array(
 								'id' => true,
 							),
@@ -357,7 +357,7 @@ class ManageSmileys extends AbstractController
 				),
 			),
 			'form' => array(
-				'href' => $scripturl . '?action=admin;area=smileys;sa=editsets',
+				'href' =>getUrl('admin', ['action' => 'admin', 'area' => 'smileys', 'sa' => 'editsets']),
 				'token' => 'admin-mss',
 			),
 			'additional_rows' => array(
@@ -366,7 +366,7 @@ class ManageSmileys extends AbstractController
 					'class' => 'submitbutton',
 					'value' => '
 						<input type="submit" name="delete_set" value="' . $txt['smiley_sets_delete'] . '" onclick="return confirm(\'' . $txt['smiley_sets_confirm'] . '\');" />
-						<a class="linkbutton" href="' . $scripturl . '?action=admin;area=smileys;sa=modifyset">' . $txt['smiley_sets_add'] . '</a> ',
+						<a class="linkbutton" href="' . getUrl('admin', ['action' => 'admin', 'area' => 'smileys', 'sa' => 'modifyset']) . '">' . $txt['smiley_sets_add'] . '</a> ',
 				),
 			),
 		);
@@ -928,7 +928,7 @@ class ManageSmileys extends AbstractController
 	 */
 	public function action_editsmiley()
 	{
-		global $modSettings, $context, $txt, $scripturl;
+		global $modSettings, $context, $txt;
 
 		require_once(SUBSDIR . '/Smileys.subs.php');
 
@@ -1056,7 +1056,7 @@ class ManageSmileys extends AbstractController
 				'id' => 'smiley_list',
 				'title' => $txt['smileys_edit'],
 				'items_per_page' => 40,
-				'base_href' => $scripturl . '?action=admin;area=smileys;sa=editsmileys',
+				'base_href' => getUrl('admin', ['action' => 'admin', 'area' => 'smileys', 'sa' => 'editsmileys']),
 				'default_sort_col' => 'filename',
 				'get_items' => array(
 					'function' => 'list_getSmileys',
@@ -1069,7 +1069,7 @@ class ManageSmileys extends AbstractController
 					'picture' => array(
 						'data' => array(
 							'sprintf' => array(
-								'format' => '<a href="' . $scripturl . '?action=admin;area=smileys;sa=modifysmiley;smiley=%1$d"><img src="' . $modSettings['smileys_url'] . '/' . $modSettings['smiley_sets_default'] . '/%2$s" alt="%3$s" id="smiley%1$d" /><input type="hidden" name="smileys[%1$d][filename]" value="%2$s" /></a>',
+								'format' => '<a href="' . getUrl('admin', ['action' => 'admin', 'area' => 'smileys', 'sa' => 'modifysmiley', 'smiley' => '%1$d']) . '"><img src="' . $modSettings['smileys_url'] . '/' . $modSettings['smiley_sets_default'] . '/%2$s" alt="%3$s" id="smiley%1$d" /><input type="hidden" name="smileys[%1$d][filename]" value="%2$s" /></a>',
 								'params' => array(
 									'id_smiley' => false,
 									'filename' => true,
@@ -1162,7 +1162,7 @@ class ManageSmileys extends AbstractController
 						),
 						'data' => array(
 							'sprintf' => array(
-								'format' => '<a href="' . $scripturl . '?action=admin;area=smileys;sa=modifysmiley;smiley=%1$d">' . $txt['smileys_modify'] . '</a>',
+								'format' => '<a href="' . getUrl('admin', ['action' => 'admin', 'area' => 'smileys', 'sa' => 'modifysmiley', 'smiley' => '%1$d']) . '">' . $txt['smileys_modify'] . '</a>',
 								'params' => array(
 									'id_smiley' => false,
 								),
@@ -1187,7 +1187,7 @@ class ManageSmileys extends AbstractController
 					),
 				),
 				'form' => array(
-					'href' => $scripturl . '?action=admin;area=smileys;sa=editsmileys',
+					'href' => getUrl('admin', ['action' => 'admin', 'area' => 'smileys', 'sa' => 'editsmileys']),
 					'name' => 'smileyForm',
 				),
 				'additional_rows' => array(
@@ -1321,7 +1321,7 @@ class ManageSmileys extends AbstractController
 	 */
 	public function action_editicon()
 	{
-		global $context, $settings, $txt, $scripturl;
+		global $context, $settings, $txt;
 
 		require_once(SUBSDIR . '/MessageIcons.subs.php');
 
@@ -1448,7 +1448,7 @@ class ManageSmileys extends AbstractController
 			'id' => 'message_icon_list',
 			'title' => $txt['icons_edit_message_icons'],
 			'sortable' => true,
-			'base_href' => $scripturl . '?action=admin;area=smileys;sa=editicons',
+			'base_href' => getUrl('admin', ['action' => 'admin', 'area' => 'smileys', 'sa' => 'editicons']),
 			'get_items' => array(
 				'function' => function () {
 					return $this->list_fetchMessageIconsDetails();
@@ -1503,7 +1503,7 @@ class ManageSmileys extends AbstractController
 					),
 					'data' => array(
 						'sprintf' => array(
-							'format' => '<a href="' . $scripturl . '?action=admin;area=smileys;sa=editicon;icon=%1$s">' . $txt['smileys_modify'] . '</a>',
+							'format' => '<a href="' .getUrl('admin', ['action' => 'admin', 'area' => 'smileys', 'sa' => 'editicon', 'icon' => '%1$s']) .'">' . $txt['smileys_modify'] . '</a>',
 							'params' => array(
 								'id' => false,
 							),
@@ -1527,7 +1527,7 @@ class ManageSmileys extends AbstractController
 				),
 			),
 			'form' => array(
-				'href' => $scripturl . '?action=admin;area=smileys;sa=editicons',
+				'href' => getUrl('admin', ['action' => 'admin', 'area' => 'smileys', 'sa' => 'editicons']),
 				'hidden_fields' => array(
 					'icons_save' => 1,
 				)
@@ -1537,7 +1537,7 @@ class ManageSmileys extends AbstractController
 					'position' => 'below_table_data',
 					'class' => 'submitbutton',
 					'value' => '
-						<a class="linkbutton" href="' . $scripturl . '?action=admin;area=smileys;sa=editicon">' . $txt['icons_add_new'] . '</a>
+						<a class="linkbutton" href="' . getUrl('admin', ['action' => 'admin', 'area' => 'smileys', 'sa' => 'editicon']) . '">' . $txt['icons_add_new'] . '</a>
 						<input type="submit" name="delete" value="' . $txt['quickmod_delete_selected'] . '" onclick="return confirm(\'' . $txt['icons_confirm'] . '\');" />',
 				),
 				array(
@@ -1683,7 +1683,7 @@ class ManageSmileys extends AbstractController
 	 */
 	public function action_install()
 	{
-		global $modSettings, $scripturl, $context, $txt;
+		global $modSettings, $context, $txt;
 
 		isAllowedTo('manage_smileys');
 		checkSession('request');
@@ -1751,7 +1751,7 @@ class ManageSmileys extends AbstractController
 			{
 				deltree(BOARDDIR . '/packages/temp', false);
 				// @todo not sure about url in destination_url
-				create_chmod_control(array(BOARDDIR . '/packages/temp/delme.tmp'), array('destination_url' => $scripturl . '?action=admin;area=smileys;sa=install;set_gz=' . $this->_req->query->set_gz, 'crash_on_error' => true));
+				create_chmod_control(array(BOARDDIR . '/packages/temp/delme.tmp'), array('destination_url' => getUrl('admin', ['action' => 'admin', 'area' => 'smileys', 'sa' => 'install', 'set_gz' => $this->_req->query->set_gz]), 'crash_on_error' => true));
 
 				deltree(BOARDDIR . '/packages/temp', false);
 				if (!mktree(BOARDDIR . '/packages/temp', 0777))
@@ -1806,7 +1806,7 @@ class ManageSmileys extends AbstractController
 		// Everything is fine, now it's time to do something, first we test
 		$actions = parsePackageInfo($smileyInfo['xml'], true, 'install');
 
-		$context['post_url'] = $scripturl . '?action=admin;area=smileys;sa=install;package=' . $base_name;
+		$context['post_url'] = getUrl('admin', ['action' => 'admin', 'area' => 'smileys', 'sa' => 'install', 'package' => $base_name]);
 		$context['has_failure'] = false;
 		$context['actions'] = array();
 		$context['ftp_needed'] = false;

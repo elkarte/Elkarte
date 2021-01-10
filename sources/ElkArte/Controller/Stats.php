@@ -51,7 +51,7 @@ class Stats extends AbstractController
 	 */
 	public function action_stats()
 	{
-		global $txt, $scripturl, $modSettings, $context;
+		global $txt, $modSettings, $context;
 
 		// You have to be able to see these
 		isAllowedTo('view_stats');
@@ -99,7 +99,7 @@ class Stats extends AbstractController
 
 		// Build the link tree......
 		$context['linktree'][] = array(
-			'url' => $scripturl . '?action=stats',
+			'url' => getUrl('action', ['action' => 'stats']),
 			'name' => $txt['stats_center']
 		);
 
@@ -166,7 +166,7 @@ class Stats extends AbstractController
 	 */
 	public function loadGeneralStatistics()
 	{
-		global $scripturl, $modSettings, $context;
+		global $modSettings, $context;
 
 		require_once(SUBSDIR . '/Boards.subs.php');
 
@@ -179,7 +179,7 @@ class Stats extends AbstractController
 
 		// General forum stats
 		$context['general_statistics']['left'] = array(
-			'total_members' => allowedTo('view_mlist') ? '<a href="' . $scripturl . '?action=memberlist">' . comma_format($modSettings['totalMembers']) . '</a>' : comma_format($modSettings['totalMembers']),
+			'total_members' => allowedTo('view_mlist') ? '<a href="' . getUrl('action', ['action' => 'memberlist']) . '">' . comma_format($modSettings['totalMembers']) . '</a>' : comma_format($modSettings['totalMembers']),
 			'total_posts' => comma_format($modSettings['totalMessages']),
 			'total_topics' => comma_format($modSettings['totalTopics']),
 			'total_cats' => comma_format(numCategories()),

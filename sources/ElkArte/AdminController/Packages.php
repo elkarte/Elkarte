@@ -183,7 +183,7 @@ class Packages extends AbstractController
 	 */
 	public function action_install()
 	{
-		global $txt, $context, $scripturl;
+		global $txt, $context;
 
 		// You have to specify a file!!
 		$file = $this->_req->getQuery('package', 'trim');
@@ -288,7 +288,7 @@ class Packages extends AbstractController
 
 		// Change our last link tree item for more information on this Packages area.
 		$context['linktree'][count($context['linktree']) - 1] = array(
-			'url' => $scripturl . '?action=admin;area=packages;sa=browse',
+			'url' =>getUrl('admin', ['action' => 'admin', 'area' => 'packages', 'sa' => 'browse']),
 			'name' => $this->_uninstalling ? $txt['package_uninstall_actions'] : $txt['install_actions']
 		);
 
@@ -321,7 +321,7 @@ class Packages extends AbstractController
 			$context['ftp_needed'] = !empty($ftp_status['files']['notwritable']) && !empty($context['package_ftp']);
 		}
 
-		$context['post_url'] = $scripturl . '?action=admin;area=packages;sa=' . ($this->_uninstalling ? 'uninstall' : 'install') . ($context['ftp_needed'] ? '' : '2') . ';package=' . $this->_filename . ';pid=' . $this->install_id;
+		$context['post_url'] = getUrl('admin', ['action' => 'admin', 'area' => 'packages', 'sa' => ($this->_uninstalling ? 'uninstall' : 'install') . ($context['ftp_needed'] ? '' : '2'), 'package' => $this->_filename, 'pid' => $this->install_id]);
 		checkSubmitOnce('register');
 	}
 
@@ -334,7 +334,7 @@ class Packages extends AbstractController
 	 */
 	private function _create_temp_dir()
 	{
-		global $context, $scripturl;
+		global $context;
 
 		// Make the temp directory
 		if (!mktree(BOARDDIR . '/packages/temp', 0755))
@@ -345,7 +345,7 @@ class Packages extends AbstractController
 			{
 				// That did not work either, we need additional permissions
 				deltree(BOARDDIR . '/packages/temp', false);
-				create_chmod_control(array(BOARDDIR . '/packages/temp/delme.tmp'), array('destination_url' => $scripturl . '?action=admin;area=packages;sa=' . $this->_req->query->sa . ';package=' . $context['filename'], 'crash_on_error' => true));
+				create_chmod_control(array(BOARDDIR . '/packages/temp/delme.tmp'), array('destination_url' => getUrl('admin', ['action' => 'admin', 'area' => 'packages', 'sa' => $this->_req->query->sa, 'package' => $context['filename']]), 'crash_on_error' => true));
 
 				// No temp directory was able to be made, that's fatal
 				deltree(BOARDDIR . '/packages/temp', false);
@@ -598,7 +598,7 @@ class Packages extends AbstractController
 	 */
 	public function action_install2()
 	{
-		global $txt, $context, $scripturl, $modSettings;
+		global $txt, $context, $modSettings;
 
 		// Make sure we don't install this addon twice.
 		checkSubmitOnce('check');
@@ -627,7 +627,7 @@ class Packages extends AbstractController
 		$this->_uninstalling = $this->_req->query->sa === 'uninstall2';
 
 		// Load up the package FTP information?
-		create_chmod_control(array(), array('destination_url' => $scripturl . '?action=admin;area=packages;sa=' . $this->_req->query->sa . ';package=' . $this->_req->query->package));
+		create_chmod_control(array(), array('destination_url' => getUrl('admin', ['action' => 'admin', 'area' => 'packages', 'sa' =>  $this->_req->query->sa, 'package' => $this->_req->query->package])));
 
 		// Make sure temp directory exists and is empty!
 		if (file_exists(BOARDDIR . '/packages/temp'))
@@ -717,7 +717,7 @@ class Packages extends AbstractController
 
 		// Set up the details for the sub template, linktree, etc
 		$context['linktree'][count($context['linktree']) - 1] = array(
-			'url' => $scripturl . '?action=admin;area=packages;sa=browse',
+			'url' => getUrl('admin', ['action' => 'admin', 'area' => 'packages', 'sa' => 'browse']),
 			'name' => $this->_uninstalling ? $txt['uninstall'] : $txt['extracting']
 		);
 		$context['page_title'] .= ' - ' . ($this->_uninstalling ? $txt['uninstall'] : $txt['extracting']);
@@ -864,7 +864,7 @@ class Packages extends AbstractController
 	 */
 	public function action_list()
 	{
-		global $txt, $scripturl, $context;
+		global $txt, $context;
 
 		// No package?  Show him or her the door.
 		if (!isset($this->_req->query->package) || $this->_req->query->package == '')
@@ -873,7 +873,7 @@ class Packages extends AbstractController
 		}
 
 		$context['linktree'][] = array(
-			'url' => $scripturl . '?action=admin;area=packages;sa=list;package=' . $this->_req->query->package,
+			'url' => getUrl('admin', ['action' => 'admin', 'area' => 'packages', 'sa' => 'list', 'package' => $this->_req->query->package]),
 			'name' => $txt['list_file']
 		);
 		$context['page_title'] .= ' - ' . $txt['list_file'];
@@ -898,7 +898,7 @@ class Packages extends AbstractController
 	 */
 	public function action_examine()
 	{
-		global $txt, $scripturl, $context;
+		global $txt, $context;
 
 		// No package?  Show him or her the door.
 		if (!isset($this->_req->query->package) || $this->_req->query->package == '')
@@ -930,7 +930,7 @@ class Packages extends AbstractController
 		}
 
 		$context['linktree'][count($context['linktree']) - 1] = array(
-			'url' => $scripturl . '?action=admin;area=packages;sa=list;package=' . $this->_req->query->package,
+			'url' => getUrl('admin', ['action' => 'admin', 'area' => 'packages', 'sa' => 'list', 'package' => $this->_req->query->package]),
 			'name' => $txt['package_examine_file']
 		);
 		$context['page_title'] .= ' - ' . $txt['package_examine_file'];
@@ -943,7 +943,7 @@ class Packages extends AbstractController
 		// Let the unpacker do the work.... but make sure we handle images properly.
 		if (in_array(strtolower(strrchr($this->_req->query->file, '.')), array('.bmp', '.gif', '.jpeg', '.jpg', '.png')))
 		{
-			$context['filedata'] = '<img src="' . $scripturl . '?action=admin;area=packages;sa=examine;package=' . $this->_req->query->package . ';file=' . $this->_req->query->file . ';raw" alt="' . $this->_req->query->file . '" />';
+			$context['filedata'] = '<img src="' . getUrl('admin', ['action' => 'admin', 'area' => 'packages', 'sa' => 'examine', 'package' => $this->_req->query->package, 'file' => $this->_req->query->file . ';raw']) . '" alt="' . $this->_req->query->file . '" />';
 		}
 		elseif (is_file(BOARDDIR . '/packages/' . $this->_req->query->package))
 		{
@@ -979,8 +979,6 @@ class Packages extends AbstractController
 	 */
 	public function action_remove()
 	{
-		global $scripturl;
-
 		// Check it.
 		checkSession('get');
 
@@ -996,7 +994,7 @@ class Packages extends AbstractController
 			&& (substr($this->_req->query->package, -4) === '.zip' || substr($this->_req->query->package, -4) === '.tgz' || substr($this->_req->query->package, -7) === '.tar.gz' || is_dir(BOARDDIR . '/packages/' . $this->_req->query->package))
 			&& $this->_req->query->package !== 'backups' && substr($this->_req->query->package, 0, 1) !== '.')
 		{
-			create_chmod_control(array(BOARDDIR . '/packages/' . $this->_req->query->package), array('destination_url' => $scripturl . '?action=admin;area=packages;sa=remove;package=' . $this->_req->query->package, 'crash_on_error' => true));
+			create_chmod_control(array(BOARDDIR . '/packages/' . $this->_req->query->package), array('destination_url' => getUrl('admin', ['action' => 'admin', 'area' => 'packages', 'sa' => 'remove', 'package' => $this->_req->query->package]), 'crash_on_error' => true));
 
 			if (is_dir(BOARDDIR . '/packages/' . $this->_req->query->package))
 			{
@@ -1017,7 +1015,7 @@ class Packages extends AbstractController
 	 */
 	public function action_browse()
 	{
-		global $txt, $scripturl, $context;
+		global $txt, $context;
 
 		$context['page_title'] .= ' - ' . $txt['browse_packages'];
 		$context['forum_version'] = FORUM_VERSION;
@@ -1041,7 +1039,7 @@ class Packages extends AbstractController
 					'function' => array($this, 'list_packages'),
 					'params' => array('params' => $type, 'installed' => $installed),
 				),
-				'base_href' => $scripturl . '?action=admin;area=packages;sa=' . $context['sub_action'] . ';type=' . $type,
+				'base_href' => getUrl('admin', ['action' => 'admin', 'area' => 'packages', 'sa' => $context['sub_action'], 'type' => $type]),
 				'default_sort_col' => 'mod_name' . $type,
 				'columns' => array(
 					'mod_name' . $type => array(
@@ -1094,7 +1092,7 @@ class Packages extends AbstractController
 						),
 						'data' => array(
 							'function' => function ($package_md5) use ($type) {
-								global $context, $scripturl, $txt;
+								global $context, $txt;
 
 								if (!isset($context['available_' . $type . ''][$package_md5]))
 								{
@@ -1108,32 +1106,32 @@ class Packages extends AbstractController
 								if ($package['can_uninstall'])
 								{
 									$return = '
-										<a class="linkbutton" href="' . $scripturl . '?action=admin;area=packages;sa=uninstall;package=' . $package['filename'] . ';pid=' . $package['installed_id'] . '">' . $txt['uninstall'] . '</a>';
+										<a class="linkbutton" href="' . getUrl('admin', ['action' => 'admin', 'area' => 'packages', 'sa' => 'uninstall', 'package' => $package['filename'], 'pid' => $package['installed_id']]) . '">' . $txt['uninstall'] . '</a>';
 								}
 								elseif ($package['can_emulate_uninstall'])
 								{
 									$return = '
-										<a class="linkbutton" href="' . $scripturl . '?action=admin;area=packages;sa=uninstall;ve=' . $package['can_emulate_uninstall'] . ';package=' . $package['filename'] . ';pid=' . $package['installed_id'] . '">' . $txt['package_emulate_uninstall'] . ' ' . $package['can_emulate_uninstall'] . '</a>';
+										<a class="linkbutton" href="' . getUrl('admin', ['action' => 'admin', 'area' => 'packages', 'sa' => 'uninstall', 've' => $package['can_emulate_uninstall'], 'package' => $package['filename'], 'pid' => $package['installed_id']]) . '">' . $txt['package_emulate_uninstall'] . ' ' . $package['can_emulate_uninstall'] . '</a>';
 								}
 								elseif ($package['can_upgrade'])
 								{
 									$return = '
-										<a class="linkbutton" href="' . $scripturl . '?action=admin;area=packages;sa=install;package=' . $package['filename'] . '">' . $txt['package_upgrade'] . '</a>';
+										<a class="linkbutton" href="' . getUrl('admin', ['action' => 'admin', 'area' => 'packages', 'sa' => 'install', 'package' => $package['filename']]) . '">' . $txt['package_upgrade'] . '</a>';
 								}
 								elseif ($package['can_install'])
 								{
 									$return = '
-										<a class="linkbutton" href="' . $scripturl . '?action=admin;area=packages;sa=install;package=' . $package['filename'] . '">' . $txt['install_mod'] . '</a>';
+										<a class="linkbutton" href="' . getUrl('admin', ['action' => 'admin', 'area' => 'packages', 'sa' => 'install', 'package' => $package['filename']]) . '">' . $txt['install_mod'] . '</a>';
 								}
 								elseif ($package['can_emulate_install'])
 								{
 									$return = '
-										<a class="linkbutton" href="' . $scripturl . '?action=admin;area=packages;sa=install;ve=' . $package['can_emulate_install'] . ';package=' . $package['filename'] . '">' . $txt['package_emulate_install'] . ' ' . $package['can_emulate_install'] . '</a>';
+										<a class="linkbutton" href="' . getUrl('admin', ['action' => 'admin', 'area' => 'packages', 'sa' => 'install', 've' => $package['can_emulate_install'], 'package' => $package['filename']]) . '">' . $txt['package_emulate_install'] . ' ' . $package['can_emulate_install'] . '</a>';
 								}
 
 								return $return . '
-										<a class="linkbutton" href="' . $scripturl . '?action=admin;area=packages;sa=list;package=' . $package['filename'] . '">' . $txt['list_files'] . '</a>
-										<a class="linkbutton" href="' . $scripturl . '?action=admin;area=packages;sa=remove;package=' . $package['filename'] . ';' . $context['session_var'] . '=' . $context['session_id'] . '"' . ($package['is_installed'] && $package['is_current']
+										<a class="linkbutton" href="' . getUrl('admin', ['action' => 'admin', 'area' => 'packages', 'sa' => 'list', 'package' => $package['filename']]) . '">' . $txt['list_files'] . '</a>
+										<a class="linkbutton" href="' . getUrl('admin', ['action' => 'admin', 'area' => 'packages', 'sa' => 'remove', 'package' => $package['filename'], '{session_data}']) . '"' . ($package['is_installed'] && $package['is_current']
 										? ' onclick="return confirm(\'' . $txt['package_delete_bad'] . '\');"'
 										: '') . '>' . $txt['package_delete'] . '</a>';
 							},
@@ -1147,7 +1145,7 @@ class Packages extends AbstractController
 						'class' => 'submitbutton',
 						'value' => ($context['sub_action'] === 'browse'
 							? '<div class="smalltext">' . $txt['package_installed_key'] . '<i class="icon icon-small i-green-dot"></i>' . $txt['package_installed_current'] . '<i class="icon icon-small i-red-dot"></i>' . $txt['package_installed_old'] . '</div>'
-							: '<a class="linkbutton" href="' . $scripturl . '?action=admin;area=packages;sa=flush;' . $context['session_var'] . '=' . $context['session_id'] . '" onclick="return confirm(\'' . $txt['package_delete_list_warning'] . '\');">' . $txt['delete_list'] . '</a>'),
+							: '<a class="linkbutton" href="' . getUrl('admin', ['action' => 'admin', 'area' => 'packages', 'sa' => 'flush', '{session_data}']) . '" onclick="return confirm(\'' . $txt['package_delete_list_warning'] . '\');">' . $txt['delete_list'] . '</a>'),
 					),
 				),
 			);
@@ -1968,7 +1966,7 @@ class Packages extends AbstractController
 	 */
 	public function list_packages($start, $items_per_page, $sort, $params, $installed)
 	{
-		global $scripturl, $context;
+		global $context;
 		static $instadds, $packages;
 
 		// Start things up
@@ -1980,7 +1978,7 @@ class Packages extends AbstractController
 		// We need the packages directory to be writable for this.
 		if (!@is_writable(BOARDDIR . '/packages'))
 		{
-			create_chmod_control(array(BOARDDIR . '/packages'), array('destination_url' => $scripturl . '?action=admin;area=packages', 'crash_on_error' => true));
+			create_chmod_control(array(BOARDDIR . '/packages'), array('destination_url' =>getUrl('admin', ['action' => 'admin', 'area' => 'packages']), 'crash_on_error' => true));
 		}
 
 		list ($the_brand, $the_version) = explode(' ', FORUM_VERSION, 2);

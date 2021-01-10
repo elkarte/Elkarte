@@ -1731,7 +1731,7 @@ class ManageMaillist extends AbstractController
 	 */
 	public function action_view_bounce_templates()
 	{
-		global $modSettings, $context, $txt, $scripturl;
+		global $modSettings, $context, $txt;
 
 		// We'll need this, because bounce templates are stored with warning templates.
 		require_once(SUBSDIR . '/Moderation.subs.php');
@@ -1771,7 +1771,7 @@ class ManageMaillist extends AbstractController
 					),
 					'data' => array(
 						'sprintf' => array(
-							'format' => '<a href="' . $scripturl . '?action=admin;area=maillist;sa=emailtemplates;tid=%1$d">%2$s</a>',
+							'format' => '<a href="' . getUrl('admin', ['action' => 'admin', 'area' => 'maillist', 'sa' => 'emailtemplates', 'tid' => '%1$d']) . '">%2$s</a>',
 							'params' => array(
 								'id_comment' => false,
 								'title' => false,

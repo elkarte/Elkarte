@@ -220,7 +220,7 @@ class ManagePermissions extends AbstractController
 					),
 					'data' => array(
 						'function' => function ($rowData) {
-							global $scripturl, $txt;
+							global $txt;
 
 							// Since the moderator group has no explicit members, no link is needed.
 							// Since guests and regular members are not groups, no link is needed.
@@ -230,13 +230,13 @@ class ManagePermissions extends AbstractController
 							}
 							else
 							{
-								$group_name = sprintf('<a href="%1$s?action=admin;area=membergroups;sa=members;group=%2$d">%3$s</a>', $scripturl, $rowData['id_group'], $rowData['group_name_color']);
+								$group_name = sprintf('<a href="' . getUrl('action', ['action' => 'admin', 'area' => 'membergroups', 'sa' => 'members', 'group' => '%1$d']) . '">%2$s</a>', $rowData['id_group'], $rowData['group_name_color']);
 							}
 
 							// Add a help option for guests, regular members, moderator and administrator.
 							if (!empty($rowData['help']))
 							{
-								$group_name .= sprintf(' (<a href="%1$s?action=quickhelp;help=' . $rowData['help'] . '" onclick="return reqOverlayDiv(this.href);" class="helpicon i-help"></a>)', $scripturl);
+								$group_name .= '(<a href="' . getUrl('action', ['action' => 'quickhelp', 'help' => $rowData['help']]) . '" onclick="return reqOverlayDiv(this.href);" class="helpicon i-help"></a>)';
 							}
 
 							if (!empty($rowData['children']))
@@ -261,21 +261,20 @@ class ManagePermissions extends AbstractController
 					),
 					'data' => array(
 						'function' => function ($rowData) {
-							global $txt, $scripturl;
+							global $txt;
 
 							// No explicit members for guests and the moderator group.
 							if (in_array($rowData['id_group'], array(-1, 3)))
 							{
 								return $txt['membergroups_guests_na'];
 							}
-							elseif ($rowData['can_search'])
+
+							if ($rowData['can_search'])
 							{
-								return '<a href="' . $scripturl . '?action=moderate;area=viewgroups;sa=members;group=' . $rowData['id_group'] . '">' . comma_format($rowData['num_members']) . '</a>';
+								return '<a href="' . getUrl('action', ['action' => 'moderate', 'area' => 'viewgroups', 'sa' => 'members', 'group' => $rowData['id_group']]) . '">' . comma_format($rowData['num_members']) . '</a>';
 							}
-							else
-							{
-								return comma_format($rowData['num_members']);
-							}
+
+							return comma_format($rowData['num_members']);
 						},
 					),
 					'sort' => array(
@@ -313,11 +312,11 @@ class ManagePermissions extends AbstractController
 					),
 					'data' => array(
 						'function' => function ($rowData) {
-							global $scripturl, $txt;
+							global $txt;
 
 							if ($rowData['id_group'] != 1)
 							{
-								return '<a href="' . $scripturl . '?action=admin;area=permissions;sa=modify;group=' . $rowData['id_group'] . '' . (isset($this->_pid) ? ';pid=' . $this->_pid : '') . '">' . $txt['membergroups_modify'] . '</a>';
+								return '<a href="' . getUrl('action', ['action' => 'admin', 'area' => 'permissions', 'sa' => 'modify', 'group' => $rowData['id_group']] +  (isset($this->_pid) ? ['pid' => $this->_pid] : [])) . '">' . $txt['membergroups_modify'] . '</a>';
 							}
 
 							return '';
@@ -380,9 +379,7 @@ class ManagePermissions extends AbstractController
 						),
 						'data' => array(
 							'function' => function ($rowData) {
-								global $scripturl;
-
-								return sprintf('<a href="%1$s?action=admin;area=permissions;sa=members;group=%2$d">%3$s</a>', $scripturl, $rowData['id_group'], $rowData['group_name_color']);
+								return sprintf('<a href="' . getUrl('admin', ['action' => 'admin', 'area' => 'permissions', 'sa' => 'members', 'group' => '%1$d']) . '">%2$s</a>', $rowData['id_group'], $rowData['group_name_color']);
 							},
 						),
 						'sort' => array(
@@ -410,16 +407,12 @@ class ManagePermissions extends AbstractController
 						),
 						'data' => array(
 							'function' => function ($rowData) {
-								global $scripturl;
-
 								if ($rowData['can_search'])
 								{
-									return '<a href="' . $scripturl . '?action=moderate;area=viewgroups;sa=members;group=' . $rowData['id_group'] . '">' . comma_format($rowData['num_members']) . '</a>';
+									return '<a href="' . getUrl('action', ['action' => 'moderate', 'area' => 'viewgroups', 'sa' => 'members', 'group' => $rowData['id_group']]) . '">' . comma_format($rowData['num_members']) . '</a>';
 								}
-								else
-								{
-									return comma_format($rowData['num_members']);
-								}
+
+								return comma_format($rowData['num_members']);
 							},
 						),
 						'sort' => array(
@@ -457,18 +450,16 @@ class ManagePermissions extends AbstractController
 						),
 						'data' => array(
 							'function' => function ($rowData) {
-								global $scripturl, $txt;
+								global $txt;
 
 								if ($rowData['id_parent'] == -2)
 								{
-									return '<a href="' . $scripturl . '?action=admin;area=permissions;sa=modify;group=' . $rowData['id_group'] . (isset($this->_pid) ? ';pid=' . $this->_pid : '') . '">' . $txt['membergroups_modify'] . '</a>';
+									return '<a href="' . getUrl('admin', ['action' => 'admin', 'area' => 'permissions', 'sa' => 'modify', 'group' => $rowData['id_group']] + (isset($this->_pid) ? ['pid' => $this->_pid] : [])) . '">' . $txt['membergroups_modify'] . '</a>';
 								}
-								else
-								{
-									return '<span class="smalltext">' . $txt['permissions_includes_inherited_from'] . '&quot;' . $rowData['parent_name'] . '&quot;</span>
-											<br />
-											<a href="' . $scripturl . '?action=admin;area=permissions;sa=modify;group=' . $rowData['id_parent'] . (isset($this->_pid) ? ';pid=' . $this->_pid : '') . '">' . $txt['membergroups_modify_parent'] . '</a>';
-								}
+
+								return '<span class="smalltext">' . $txt['permissions_includes_inherited_from'] . '&quot;' . $rowData['parent_name'] . '&quot;</span>
+										<br />
+										<a href="' . getUrl('admin', ['action' => 'admin', 'area' => 'permissions', 'sa' => 'modify', 'group' => $rowData['id_parent']] + (isset($this->_pid) ? ['pid' => $this->_pid] : [])) . '">' . $txt['membergroups_modify_parent'] . '</a>';
 							}
 						),
 					),
@@ -998,7 +989,7 @@ class ManagePermissions extends AbstractController
 	 */
 	public function action_permSettings_display()
 	{
-		global $context, $modSettings, $txt, $scripturl;
+		global $context, $modSettings, $txt;
 
 		require_once(SUBSDIR . '/ManagePermissions.subs.php');
 
@@ -1011,7 +1002,7 @@ class ManagePermissions extends AbstractController
 		// Some items for the template
 		$context['page_title'] = $txt['permission_settings_title'];
 		$context['sub_template'] = 'show_settings';
-		$context['post_url'] = $scripturl . '?action=admin;area=permissions;save;sa=settings';
+		$context['post_url'] = getUrl('admin', ['action' => 'admin', 'area' => 'permissions;save', 'sa' => 'settings']);
 
 		// Saving the settings?
 		if (isset($this->_req->query->save))

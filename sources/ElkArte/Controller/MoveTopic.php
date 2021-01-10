@@ -169,7 +169,7 @@ class MoveTopic extends AbstractController
 	 */
 	private function _prep_template()
 	{
-		global $context, $txt, $scripturl, $language, $board;
+		global $context, $txt, $language, $board;
 
 		$context['is_approved'] = $this->_topic_info['approved'];
 		$context['subject'] = $this->_topic_info['subject'];
@@ -180,7 +180,7 @@ class MoveTopic extends AbstractController
 
 		// Breadcrumbs
 		$context['linktree'][] = array(
-			'url' => $scripturl . '?topic=' . $this->_topic . '.0',
+			'url' => getUrl('topic', ['topic' => $this->_topic, 'start' => 0, 'subject' => $context['subject']]),
 			'name' => $context['subject'],
 		);
 		$context['linktree'][] = array(
@@ -374,6 +374,7 @@ class MoveTopic extends AbstractController
 			// If it's still valid move onwards and upwards.
 			if ($custom_subject !== '')
 			{
+				$this->_board_info['subject_new'] = $custom_subject;
 				$all_messages = isset($this->_req->post->enforce_subject);
 				if ($all_messages)
 				{
@@ -404,7 +405,7 @@ class MoveTopic extends AbstractController
 	 */
 	private function _post_redirect()
 	{
-		global $txt, $board, $scripturl, $language;
+		global $txt, $board, $language;
 
 		// @todo Does this make sense if the topic was unapproved before? I'd just about say so.
 		if (isset($this->_req->post->postRedirect))
@@ -420,8 +421,8 @@ class MoveTopic extends AbstractController
 
 			// Add a URL onto the message.
 			$reason = strtr($reason, array(
-				$txt['movetopic_auto_board'] => '[url=' . $scripturl . '?board=' . $this->_toboard . '.0]' . $this->_board_info['name'] . '[/url]',
-				$txt['movetopic_auto_topic'] => '[iurl]' . $scripturl . '?topic=' . $this->_topic . '.0[/iurl]'
+				$txt['movetopic_auto_board'] => '[url=' . getUrl('board', ['board' => $this->_toboard, 'start' => 0, 'name' => $this->_board_info['name']]) .']' . $this->_board_info['name'] . '[/url]',
+				$txt['movetopic_auto_topic'] => '[iurl=' . getUrl('topic', ['topic' => $this->_topic, 'start' => 0, 'subject' => $this->_board_info['subject_new'] ?? $this->_board_info['subject']]) . ']' . ($this->_board_info['subject_new'] ?? $this->_board_info['subject']) . '[/iurl]'
 			));
 
 			// Auto remove this MOVED redirection topic in the future?

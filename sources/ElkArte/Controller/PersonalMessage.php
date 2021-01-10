@@ -70,7 +70,7 @@ class PersonalMessage extends AbstractController
 	 */
 	public function pre_dispatch()
 	{
-		global $txt, $scripturl, $context, $modSettings;
+		global $txt, $context, $modSettings;
 
 		// No guests!
 		is_not_guest();
@@ -137,7 +137,7 @@ class PersonalMessage extends AbstractController
 
 		// Build the linktree for all the actions...
 		$context['linktree'][] = array(
-			'url' => $scripturl . '?action=pm',
+			'url' => getUrl('action', ['action' => 'pm']),
 			'name' => $txt['personal_messages']
 		);
 
@@ -264,7 +264,7 @@ class PersonalMessage extends AbstractController
 	 */
 	private function _messageIndexBar($area)
 	{
-		global $txt, $context, $scripturl;
+		global $txt, $context;
 
 		require_once(SUBSDIR . '/Menu.subs.php');
 
@@ -275,17 +275,17 @@ class PersonalMessage extends AbstractController
 				'areas' => array(
 					'inbox' => array(
 						'label' => $txt['inbox'],
-						'custom_url' => $scripturl . '?action=pm',
+						'custom_url' => getUrl('action', ['action' => 'pm']),
 						'counter' => 'unread_messages',
 					),
 					'send' => array(
 						'label' => $txt['new_message'],
-						'custom_url' => $scripturl . '?action=pm;sa=send',
+						'custom_url' => getUrl('action', ['action' => 'pm', 'sa' => 'send']),
 						'permission' => 'pm_send',
 					),
 					'sent' => array(
 						'label' => $txt['sent_items'],
-						'custom_url' => $scripturl . '?action=pm;f=sent',
+						'custom_url' => getUrl('action', ['action' => 'pm', 'f' => 'sent']),
 					),
 				),
 			),
@@ -299,11 +299,11 @@ class PersonalMessage extends AbstractController
 				'areas' => array(
 					'search' => array(
 						'label' => $txt['pm_search_bar_title'],
-						'custom_url' => $scripturl . '?action=pm;sa=search',
+						'custom_url' => getUrl('action', ['action' => 'pm', 'sa' => 'search']),
 					),
 					'prune' => array(
 						'label' => $txt['pm_prune'],
-						'custom_url' => $scripturl . '?action=pm;sa=prune'
+						'custom_url' => getUrl('action', ['action' => 'pm', 'sa' => 'prune']),
 					),
 				),
 			),
@@ -312,15 +312,15 @@ class PersonalMessage extends AbstractController
 				'areas' => array(
 					'manlabels' => array(
 						'label' => $txt['pm_manage_labels'],
-						'custom_url' => $scripturl . '?action=pm;sa=manlabels',
+						'custom_url' => getUrl('action', ['action' => 'pm', 'sa' => 'manlabels']),
 					),
 					'manrules' => array(
 						'label' => $txt['pm_manage_rules'],
-						'custom_url' => $scripturl . '?action=pm;sa=manrules',
+						'custom_url' => getUrl('action', ['action' => 'pm', 'sa' => 'manrules']),
 					),
 					'settings' => array(
 						'label' => $txt['pm_settings'],
-						'custom_url' => $scripturl . '?action=pm;sa=settings',
+						'custom_url' => getUrl('action', ['action' => 'pm', 'sa' => 'settings']),
 					),
 				),
 			),
@@ -349,7 +349,7 @@ class PersonalMessage extends AbstractController
 				// Add the label to the menu.
 				$pm_areas['labels']['areas']['label' . $label['id']] = array(
 					'label' => $label['name'],
-					'custom_url' => $scripturl . '?action=pm;l=' . $label['id'],
+					'custom_url' => getUrl('action', ['action' => 'pm', 'l' => $label['id']]),
 					'counter' => 'label' . $label['id'],
 					'messages' => $label['messages'],
 				);
@@ -478,7 +478,7 @@ class PersonalMessage extends AbstractController
 		if ($context['current_label_id'] === -1)
 		{
 			$context['linktree'][] = array(
-				'url' => $scripturl . '?action=pm;f=' . $context['folder'],
+				'url' => getUrl('action', ['action' => 'pm', 'f' => $context['folder']]),
 				'name' => $pmbox
 			);
 		}
@@ -487,7 +487,7 @@ class PersonalMessage extends AbstractController
 		if ($context['current_label_id'] !== -1)
 		{
 			$context['linktree'][] = array(
-				'url' => $scripturl . '?action=pm;f=' . $context['folder'] . ';l=' . $context['current_label_id'],
+				'url' => getUrl('action', ['action' => 'pm', 'f' => $context['folder'], 'l' => $context['current_label_id']]),
 				'name' => $txt['pm_current_label'] . ': ' . $context['current_label']
 			);
 		}
@@ -740,7 +740,7 @@ class PersonalMessage extends AbstractController
 	 */
 	public function action_send()
 	{
-		global $txt, $scripturl, $modSettings, $context;
+		global $txt, $modSettings, $context;
 
 		// Load in some text and template dependencies
 		theme()->getTemplates()->loadLanguageFile('PersonalMessage');
@@ -849,8 +849,8 @@ class PersonalMessage extends AbstractController
 					'name' => $row_quoted['real_name'],
 					'username' => $row_quoted['member_name'],
 					'id' => $row_quoted['id_member'],
-					'href' => !empty($row_quoted['id_member']) ? $scripturl . '?action=profile;u=' . $row_quoted['id_member'] : '',
-					'link' => !empty($row_quoted['id_member']) ? '<a href="' . $scripturl . '?action=profile;u=' . $row_quoted['id_member'] . '">' . $row_quoted['real_name'] . '</a>' : $row_quoted['real_name'],
+					'href' => !empty($row_quoted['id_member']) ? getUrl('profile', ['action' => 'profile', 'u' => $row_quoted['id_member']]) : '',
+					'link' => !empty($row_quoted['id_member']) ? '<a href="' . getUrl('profile', ['action' => 'profile', 'u' => $row_quoted['id_member']]) . '">' . $row_quoted['real_name'] . '</a>' : $row_quoted['real_name'],
 				),
 				'subject' => $row_quoted['subject'],
 				'time' => standardTime($row_quoted['msgtime']),
@@ -928,7 +928,7 @@ class PersonalMessage extends AbstractController
 
 		// And build the link tree.
 		$context['linktree'][] = array(
-			'url' => $scripturl . '?action=pm;sa=send',
+			'url' => getUrl('action', ['action' => 'pm', 'sa' => 'send']),
 			'name' => $txt['new_message']
 		);
 
@@ -970,7 +970,7 @@ class PersonalMessage extends AbstractController
 	 */
 	public function messagePostError($named_recipients, $recipient_ids = array(), $msg_options = null)
 	{
-		global $txt, $context, $scripturl, $modSettings;
+		global $txt, $context, $modSettings;
 
 		if (isset($this->_req->query->xml))
 		{
@@ -1053,8 +1053,8 @@ class PersonalMessage extends AbstractController
 						'name' => $row_quoted['real_name'],
 						'username' => $row_quoted['member_name'],
 						'id' => $row_quoted['id_member'],
-						'href' => !empty($row_quoted['id_member']) ? $scripturl . '?action=profile;u=' . $row_quoted['id_member'] : '',
-						'link' => !empty($row_quoted['id_member']) ? '<a href="' . $scripturl . '?action=profile;u=' . $row_quoted['id_member'] . '">' . $row_quoted['real_name'] . '</a>' : $row_quoted['real_name'],
+						'href' => !empty($row_quoted['id_member']) ? getUrl('profile', ['action' => 'profile', 'u' => $row_quoted['id_member']]) : '',
+						'link' => !empty($row_quoted['id_member']) ? '<a href="' . getUrl('profile', ['action' => 'profile', 'u' => $row_quoted['id_member']]) . '">' . $row_quoted['real_name'] . '</a>' : $row_quoted['real_name'],
 					),
 					'subject' => $row_quoted['subject'],
 					'time' => standardTime($row_quoted['msgtime']),
@@ -1067,7 +1067,7 @@ class PersonalMessage extends AbstractController
 
 		// Build the link tree....
 		$context['linktree'][] = array(
-			'url' => $scripturl . '?action=pm;sa=send',
+			'url' => getUrl('action', ['action' => 'pm', 'sa' => 'send']),
 			'name' => $txt['new_message']
 		);
 
@@ -1590,7 +1590,7 @@ class PersonalMessage extends AbstractController
 	 */
 	public function action_prune()
 	{
-		global $txt, $context, $scripturl;
+		global $txt, $context;
 
 		// Actually delete the messages.
 		if (isset($this->_req->post->age))
@@ -1612,7 +1612,7 @@ class PersonalMessage extends AbstractController
 
 		// Build the link tree elements.
 		$context['linktree'][] = array(
-			'url' => $scripturl . '?action=pm;sa=prune',
+			'url' => getUrl('action', ['action' => 'pm', 'sa' => 'prune']),
 			'name' => $txt['pm_prune']
 		);
 		$context['sub_template'] = 'prune';
@@ -1624,13 +1624,13 @@ class PersonalMessage extends AbstractController
 	 */
 	public function action_manlabels()
 	{
-		global $txt, $context, $scripturl;
+		global $txt, $context;
 
 		require_once(SUBSDIR . '/PersonalMessage.subs.php');
 
 		// Build the link tree elements...
 		$context['linktree'][] = array(
-			'url' => $scripturl . '?action=pm;sa=manlabels',
+			'url' => getUrl('action', ['action' => 'pm', 'sa' => 'manlabels']),
 			'name' => $txt['pm_manage_labels']
 		);
 
@@ -1815,7 +1815,7 @@ class PersonalMessage extends AbstractController
 	 */
 	public function action_settings()
 	{
-		global $txt, $context, $scripturl, $profile_vars, $cur_profile;
+		global $txt, $context, $profile_vars, $cur_profile;
 
 		require_once(SUBSDIR . '/Profile.subs.php');
 
@@ -1828,7 +1828,7 @@ class PersonalMessage extends AbstractController
 		theme()->getTemplates()->load('Profile');
 
 		// We want them to submit back to here.
-		$context['profile_custom_submit_url'] = $scripturl . '?action=pm;sa=settings;save';
+		$context['profile_custom_submit_url'] = getUrl('action', ['action' => 'pm', 'sa' => 'settings;save']);
 
 		$context['page_title'] = $txt['pm_settings'];
 		$context['user']['is_owner'] = true;
@@ -1839,7 +1839,7 @@ class PersonalMessage extends AbstractController
 
 		// Add our position to the linktree.
 		$context['linktree'][] = array(
-			'url' => $scripturl . '?action=pm;sa=settings',
+			'url' => getUrl('action', ['action' => 'pm', 'sa' => 'settings']),
 			'name' => $txt['pm_settings']
 		);
 
@@ -2030,13 +2030,13 @@ class PersonalMessage extends AbstractController
 	 */
 	public function action_manrules()
 	{
-		global $txt, $context, $scripturl;
+		global $txt, $context;
 
 		require_once(SUBSDIR . '/PersonalMessage.subs.php');
 
 		// The link tree - gotta have this :o
 		$context['linktree'][] = array(
-			'url' => $scripturl . '?action=pm;sa=manrules',
+			'url' => getUrl('action', ['action' => 'pm', 'sa' => 'manrules']),
 			'name' => $txt['pm_manage_rules']
 		);
 
@@ -2592,7 +2592,7 @@ class PersonalMessage extends AbstractController
 		$context['sub_template'] = 'search_results';
 		$context['menu_data_' . $context['pm_menu_id']]['current_area'] = 'search';
 		$context['linktree'][] = array(
-			'url' => $scripturl . '?action=pm;sa=search',
+			'url' => getUrl('action', ['action' => 'pm', 'sa' => 'search']),
 			'name' => $txt['pm_search_bar_title'],
 		);
 	}
@@ -2888,7 +2888,7 @@ class PersonalMessage extends AbstractController
 	 */
 	public function action_search()
 	{
-		global $context, $txt, $scripturl;
+		global $context, $txt;
 
 		// If they provided some search parameters, we need to extract them
 		if (isset($this->_req->post->params))
@@ -2961,7 +2961,7 @@ class PersonalMessage extends AbstractController
 		$context['page_title'] = $txt['pm_search_title'];
 		$context['sub_template'] = 'search';
 		$context['linktree'][] = array(
-			'url' => $scripturl . '?action=pm;sa=search',
+			'url' => getUrl('action', ['action' => 'pm', 'sa' => 'search']),
 			'name' => $txt['pm_search_bar_title'],
 		);
 	}

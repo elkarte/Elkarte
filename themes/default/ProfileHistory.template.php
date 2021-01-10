@@ -17,7 +17,7 @@
  */
 function template_trackActivity()
 {
-	global $context, $scripturl, $txt;
+	global $context, $txt;
 
 	// The first table shows IP information about the user.
 	echo '
@@ -31,16 +31,16 @@ function template_trackActivity()
 					<dl class="noborder">
 						<dt>', $txt['most_recent_ip'], ':
 							', (empty($context['last_ip2']) ? '' : '<br />
-							<span class="smalltext">(<a href="' . $scripturl . '?action=quickhelp;help=whytwoip" onclick="return reqOverlayDiv(this.href);">' . $txt['why_two_ip_address'] . '</a>)</span>'), '
+							<span class="smalltext">(<a href="' . getUrl('action', ['action' => 'quickhelp', 'help' => 'whytwoip']) . '" onclick="return reqOverlayDiv(this.href);">' . $txt['why_two_ip_address'] . '</a>)</span>'), '
 						</dt>
 						<dd>
-							<a href="', $scripturl, '?action=profile;area=history;sa=ip;searchip=', $context['last_ip'], ';u=', $context['member']['id'], '">', $context['last_ip'], '</a>';
+							<a href="', getUrl('action', ['action' => 'profile', 'area' => 'history', 'sa' => 'ip', 'searchip' => $context['last_ip'], 'u' => $context['member']['id']]), '">', $context['last_ip'], '</a>';
 
 	// Second address detected?
 	if (!empty($context['last_ip2']))
 	{
 		echo '
-							, <a href="', $scripturl, '?action=profile;area=history;sa=ip;searchip=', $context['last_ip2'], ';u=', $context['member']['id'], '">', $context['last_ip2'], '</a>';
+							, <a href="', getUrl('action', ['action' => 'profile', 'area' => 'history', 'sa' => 'ip', 'searchip' => $context['last_ip2'], 'u' => $context['member']['id']]), '">', $context['last_ip2'], '</a>';
 	}
 
 	echo '

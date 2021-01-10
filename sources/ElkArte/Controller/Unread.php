@@ -383,7 +383,7 @@ class Unread extends AbstractController
 	 */
 	public function action_unreadreplies()
 	{
-		global $scripturl, $context, $modSettings, $settings;
+		global $scripturl, $context, $settings;
 
 		$this->_grabber->setAction(\ElkArte\Unread::UNREADREPLIES);
 

@@ -74,7 +74,7 @@ class Notify extends AbstractController
 	 */
 	public function action_notify()
 	{
-		global $topic, $scripturl, $txt, $context;
+		global $topic, $txt, $context;
 
 		// Api ajax call?
 		if (isset($this->_req->query->api))
@@ -103,7 +103,7 @@ class Notify extends AbstractController
 			$context['notification_set'] = hasTopicNotification($this->user->id, $topic);
 
 			// Set the template variables...
-			$context['topic_href'] = $scripturl . '?topic=' . $topic . '.' . $this->_req->query->start;
+			$context['topic_href'] = getUrl('action', ['topic' => $topic . '.' . $this->_req->query->start]);
 			$context['start'] = $this->_req->query->start;
 			$context['page_title'] = $txt['notifications'];
 			$context['sub_template'] = 'notification_settings';
@@ -141,7 +141,7 @@ class Notify extends AbstractController
 	 */
 	public function action_notify_api()
 	{
-		global $topic, $txt, $scripturl, $context;
+		global $topic, $txt, $context;
 
 		theme()->getTemplates()->load('Xml');
 
@@ -178,7 +178,7 @@ class Notify extends AbstractController
 			theme()->getTemplates()->loadLanguageFile('Errors');
 			$context['xml_data'] = array(
 				'error' => 1,
-				'url' => $scripturl . '?action=notify;sa=' . ($this->_req->query->sa === 'on' ? 'on' : 'off') . ';topic=' . $topic . '.' . $this->_req->query->start . ';' . $context['session_var'] . '=' . $context['session_id'],
+				'url' => getUrl('action', ['action' => 'notify', 'sa' => ($this->_req->query->sa === 'on' ? 'on' : 'off'), 'topic' => $topic . '.' . $this->_req->query->start, '{session_data}']),
 			);
 
 			return;
@@ -189,7 +189,7 @@ class Notify extends AbstractController
 		// Return the results so the UI can be updated properly
 		$context['xml_data'] = array(
 			'text' => $this->_req->query->sa === 'on' ? $txt['unnotify'] : $txt['notify'],
-			'url' => $scripturl . '?action=notify;sa=' . ($this->_req->query->sa === 'on' ? 'off' : 'on') . ';topic=' . $topic . '.' . $this->_req->query->start . ';' . $context['session_var'] . '=' . $context['session_id'] . ';api',
+			'url' => getUrl('action', ['action' => 'notify', 'sa' => ($this->_req->query->sa === 'on' ? 'off' : 'on'), 'topic' => $topic . '.' . $this->_req->query->start, '{session_data}', 'api' => '1']),
 			'confirm' => $this->_req->query->sa === 'on' ? $txt['notification_disable_topic'] : $txt['notification_enable_topic']
 		);
 	}
@@ -209,7 +209,7 @@ class Notify extends AbstractController
 	 */
 	public function action_notifyboard()
 	{
-		global $scripturl, $txt, $board, $context;
+		global $txt, $board, $context;
 
 		// Permissions are an important part of anything ;).
 		is_not_guest();
@@ -231,7 +231,7 @@ class Notify extends AbstractController
 			$context['notification_set'] = hasBoardNotification($this->user->id, $board);
 
 			// Set the template variables...
-			$context['board_href'] = $scripturl . '?board=' . $board . '.' . $this->_req->query->start;
+			$context['board_href'] = getUrl('action', ['board' => $board . '.' . $this->_req->query->start]);
 			$context['start'] = $this->_req->query->start;
 			$context['page_title'] = $txt['notifications'];
 			$context['sub_template'] = 'notify_board';
@@ -273,7 +273,7 @@ class Notify extends AbstractController
 	 */
 	public function action_notifyboard_api()
 	{
-		global $scripturl, $txt, $board, $context;
+		global $txt, $board, $context;
 
 		theme()->getTemplates()->load('Xml');
 
@@ -310,7 +310,7 @@ class Notify extends AbstractController
 			theme()->getTemplates()->loadLanguageFile('Errors');
 			$context['xml_data'] = array(
 				'error' => 1,
-				'url' => $scripturl . '?action=notifyboard;sa=' . ($this->_req->query->sa === 'on' ? 'on' : 'off') . ';board=' . $board . '.' . $this->_req->query->start . ';' . $context['session_var'] . '=' . $context['session_id'],
+				'url' => getUrl('action', ['action' => 'notifyboard', 'sa' => ($this->_req->query->sa === 'on' ? 'on' : 'off'), 'board' => $board . '.' . $this->_req->query->start, '{session_data}']),
 			);
 
 			return;
@@ -320,7 +320,7 @@ class Notify extends AbstractController
 
 		$context['xml_data'] = array(
 			'text' => $this->_req->query->sa === 'on' ? $txt['unnotify'] : $txt['notify'],
-			'url' => $scripturl . '?action=notifyboard;sa=' . ($this->_req->query->sa === 'on' ? 'off' : 'on') . ';board=' . $board . '.' . $this->_req->query->start . ';' . $context['session_var'] . '=' . $context['session_id'] . ';api' . (isset($_REQUEST['json']) ? ';json' : ''),
+			'url' => getUrl('action', ['action' => 'notifyboard', 'sa' => ($this->_req->query->sa === 'on' ? 'off' : 'on'), 'board' => $board . '.' . $this->_req->query->start, '{session_data}', 'api' => '1' . (isset($_REQUEST['json']) ? ';json' : '')]),
 			'confirm' => $this->_req->query->sa === 'on' ? $txt['notification_disable_board'] : $txt['notification_enable_board']
 		);
 	}
@@ -371,7 +371,7 @@ class Notify extends AbstractController
 	 */
 	public function action_unwatchtopic_api()
 	{
-		global $topic, $modSettings, $txt, $context, $scripturl;
+		global $topic, $modSettings, $txt, $context;
 
 		theme()->getTemplates()->load('Xml');
 
@@ -408,8 +408,8 @@ class Notify extends AbstractController
 			theme()->getTemplates()->loadLanguageFile('Errors');
 			$context['xml_data'] = array(
 				'error' => 1,
-				'url' => $scripturl . '?action=unwatchtopic;sa=' . ($this->_req->query->sa === 'on' ? 'on' : 'off') . ';topic=' . $topic . '.' . $this->_req->query->start . ';' . $context['session_var'] . '=' . $context['session_id'],
-			);
+				'url' => getUrl('action', ['action' => 'unwatchtopic', 'sa' => ($this->_req->query->sa === 'on' ? 'on' : 'off'), 'topic' => $topic . '.' . $this->_req->query->start, '{session_data}'])
+				);
 
 			return;
 		}
@@ -418,7 +418,7 @@ class Notify extends AbstractController
 
 		$context['xml_data'] = array(
 			'text' => $this->_req->query->sa === 'on' ? $txt['watch'] : $txt['unwatch'],
-			'url' => $scripturl . '?action=unwatchtopic;topic=' . $context['current_topic'] . '.' . $this->_req->query->start . ';sa=' . ($this->_req->query->sa === 'on' ? 'off' : 'on') . ';' . $context['session_var'] . '=' . $context['session_id'] . ';api' . (isset($_REQUEST['json']) ? ';json' : ''),
+			'url' => getUrl('action', ['action' => 'unwatchtopic', 'sa' => ($this->_req->query->sa === 'on' ? 'off' : 'on'), 'topic' => $context['current_topic'] . '.' . $this->_req->query->start, '{session_data}', 'api' => '1' . (isset($_REQUEST['json']) ? ';json' : '')]),
 		);
 		global $user_info, $topic;
 

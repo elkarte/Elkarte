@@ -108,7 +108,7 @@ class ManageSearch extends AbstractController
 	 */
 	public function action_searchSettings_display()
 	{
-		global $txt, $context, $scripturl, $modSettings;
+		global $txt, $context, $modSettings;
 
 		// Initialize the form
 		$settingsForm = new SettingsForm(SettingsForm::DB_ADAPTER);
@@ -170,7 +170,7 @@ class ManageSearch extends AbstractController
 		}
 
 		// Prep the template!
-		$context['post_url'] = $scripturl . '?action=admin;area=managesearch;save;sa=settings';
+		$context['post_url'] = getUrl('admin', ['action' => 'admin', 'area' => 'managesearch;save', 'sa' => 'settings']);
 		$context['settings_title'] = $txt['search_settings_title'];
 
 		$settingsForm->prepare();
@@ -424,7 +424,7 @@ class ManageSearch extends AbstractController
 	 */
 	private function loadSearchAPIs()
 	{
-		global $txt, $scripturl;
+		global $txt;
 
 		$apis = array();
 		try
@@ -446,8 +446,8 @@ class ManageSearch extends AbstractController
 						'filename' => $file->getFilename(),
 						'setting_index' => $index_name,
 						'has_template' => in_array($common_name, array('custom', 'fulltext', 'standard')),
-						'label' => $index_name && isset($txt['search_index_' . $common_name]) ? str_replace('{managesearch_url}', $scripturl . '?action=admin;area=managesearch;sa=manage' . $common_name, $txt['search_index_' . $common_name]) : '',
-						'desc' => $index_name && isset($txt['search_index_' . $common_name . '_desc']) ? str_replace('{managesearch_url}', $scripturl . '?action=admin;area=managesearch;sa=manage' . $common_name, $txt['search_index_' . $common_name . '_desc']) : '',
+						'label' => $index_name && isset($txt['search_index_' . $common_name]) ? str_replace('{managesearch_url}', getUrl('admin', ['action' => 'admin', 'area' => 'managesearch', 'sa' => 'manage' . $common_name]), $txt['search_index_' . $common_name]) : '',
+						'desc' => $index_name && isset($txt['search_index_' . $common_name . '_desc']) ? str_replace('{managesearch_url}', getUrl('admin', ['action' => 'admin', 'area' => 'managesearch', 'sa' => 'manage' . $common_name]), $txt['search_index_' . $common_name . '_desc']) : '',
 					);
 				}
 			}

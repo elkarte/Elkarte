@@ -116,7 +116,7 @@ class ManageMembergroups extends AbstractController
 	 */
 	public function action_list()
 	{
-		global $txt, $scripturl, $context;
+		global $txt, $context;
 
 		$context['page_title'] = $txt['membergroups_title'];
 
@@ -124,7 +124,7 @@ class ManageMembergroups extends AbstractController
 		$listOptions = array(
 			'id' => 'regular_membergroups_list',
 			'title' => $txt['membergroups_regular'],
-			'base_href' => $scripturl . '?action=admin;area=membergroups' . (isset($this->_req->query->sort2) ? ';sort2=' . urlencode($this->_req->query->sort2) : ''),
+			'base_href' => getUrl('admin', ['action' => 'admin', 'area' => 'membergroups'] + (isset($this->_req->query->sort2) ? ['sort2' => urlencode($this->_req->query->sort2)] : [])),
 			'default_sort_col' => 'name',
 			'get_items' => array(
 				'file' => SUBSDIR . '/Membergroups.subs.php',
@@ -143,8 +143,6 @@ class ManageMembergroups extends AbstractController
 					),
 					'data' => array(
 						'function' => function ($rowData) {
-							global $scripturl;
-
 							// Since the moderator group has no explicit members, no link is needed.
 							if ($rowData['id_group'] == 3)
 							{
@@ -152,17 +150,17 @@ class ManageMembergroups extends AbstractController
 							}
 							else
 							{
-								$group_name = sprintf('<a href="%1$s?action=admin;area=membergroups;sa=members;group=%2$d">%3$s</a>', $scripturl, $rowData['id_group'], $rowData['group_name_color']);
+								$group_name = sprintf('<a href="' . getUrl('admin', ['action' => 'admin', 'area' => 'membergroups', 'sa' => 'members', 'group' => '%1$d']) . '">%2$s</a>', $rowData['id_group'], $rowData['group_name_color']);
 							}
 
 							// Add a help option for moderator and administrator.
 							if ($rowData['id_group'] == 1)
 							{
-								$group_name .= sprintf(' (<a href="%1$s?action=quickhelp;help=membergroup_administrator" onclick="return reqOverlayDiv(this.href);" class="helpicon i-help"></a>)', $scripturl);
+								$group_name .= ' (<a href="' . getUrl('action', ['action' => 'quickhelp', 'help' => 'membergroup_administrator']) . '" onclick="return reqOverlayDiv(this.href);" class="helpicon i-help"></a>)';
 							}
 							elseif ($rowData['id_group'] == 3)
 							{
-								$group_name .= sprintf(' (<a href="%1$s?action=quickhelp;help=membergroup_moderator" onclick="return reqOverlayDiv(this.href);" class="helpicon i-help"></a>)', $scripturl);
+								$group_name .= ' (<a href="' . getUrl('action', ['action' => 'quickhelp', 'help' => 'membergroup_moderator']) . '" onclick="return reqOverlayDiv(this.href);" class="helpicon i-help"></a>)';
 							}
 
 							return $group_name;
@@ -219,7 +217,7 @@ class ManageMembergroups extends AbstractController
 					),
 					'data' => array(
 						'sprintf' => array(
-							'format' => '<a href="' . $scripturl . '?action=admin;area=membergroups;sa=edit;group=%1$d">' . $txt['membergroups_modify'] . '</a>',
+							'format' => '<a href="' . getUrl('admin', ['action' => 'admin', 'area' => 'membergroups', 'sa' => 'edit', 'group' => '%1$d']) . '">' . $txt['membergroups_modify'] . '</a>',
 							'params' => array(
 								'id_group' => false,
 							),
@@ -231,7 +229,7 @@ class ManageMembergroups extends AbstractController
 				array(
 					'position' => 'below_table_data',
 					'class' => 'submitbutton',
-					'value' => '<a class="linkbutton" href="' . $scripturl . '?action=admin;area=membergroups;sa=add;generalgroup">' . $txt['membergroups_add_group'] . '</a>',
+					'value' => '<a class="linkbutton" href="' . getUrl('admin', ['action' => 'admin', 'area' => 'membergroups', 'sa' => 'add;generalgroup']) . '">' . $txt['membergroups_add_group'] . '</a>',
 				),
 			),
 		);
@@ -242,7 +240,7 @@ class ManageMembergroups extends AbstractController
 		$listOptions = array(
 			'id' => 'post_count_membergroups_list',
 			'title' => $txt['membergroups_post'],
-			'base_href' => $scripturl . '?action=admin;area=membergroups' . (isset($this->_req->query->sort) ? ';sort=' . urlencode($this->_req->query->sort) : ''),
+			'base_href' => getUrl('admin', ['action' => 'admin', 'area' => 'membergroups'] + (isset($this->_req->query->sort) ? ['sort' => urlencode($this->_req->query->sort)] : [])),
 			'default_sort_col' => 'required_posts',
 			'request_vars' => array(
 				'sort' => 'sort2',
@@ -265,9 +263,7 @@ class ManageMembergroups extends AbstractController
 					),
 					'data' => array(
 						'function' => function ($rowData) {
-							global $scripturl;
-
-							return sprintf('<a href="%1$s?action=admin;area=membergroups;sa=members;group=%2$d">%3$s</a>', $scripturl, $rowData['id_group'], $rowData['group_name_color']);
+							return sprintf('<a href="' . getUrl('admin', ['action' => 'admin', 'area' => 'membergroups', 'sa' => 'members', 'group' => '%1$d']) . '">%2$s</a>', $rowData['id_group'], $rowData['group_name_color']);
 						},
 					),
 					'sort' => array(
@@ -328,7 +324,7 @@ class ManageMembergroups extends AbstractController
 					),
 					'data' => array(
 						'sprintf' => array(
-							'format' => '<a href="' . $scripturl . '?action=admin;area=membergroups;sa=edit;group=%1$d">' . $txt['membergroups_modify'] . '</a>',
+							'format' => '<a href="' . getUrl('admin', ['action' => 'admin', 'area' => 'membergroups', 'sa' => 'edit', 'group' => '%1$d']) . '">' . $txt['membergroups_modify'] . '</a>',
 							'params' => array(
 								'id_group' => false,
 							),
@@ -340,7 +336,7 @@ class ManageMembergroups extends AbstractController
 				array(
 					'position' => 'below_table_data',
 					'class' => 'submitbutton',
-					'value' => '<a class="linkbutton" href="' . $scripturl . '?action=admin;area=membergroups;sa=add;postgroup">' . $txt['membergroups_add_group'] . '</a>',
+					'value' => '<a class="linkbutton" href="' . getUrl('admin', ['action' => 'admin', 'area' => 'membergroups', 'sa' => 'add;postgroup']) . '">' . $txt['membergroups_add_group'] . '</a>',
 				),
 			),
 		);
@@ -853,7 +849,7 @@ class ManageMembergroups extends AbstractController
 	 */
 	public function action_groupSettings_display()
 	{
-		global $context, $scripturl, $txt;
+		global $context, $txt;
 
 		$context['sub_template'] = 'show_settings';
 		$context['page_title'] = $txt['membergroups_settings'];
@@ -874,7 +870,7 @@ class ManageMembergroups extends AbstractController
 		}
 
 		// Some simple context.
-		$context['post_url'] = $scripturl . '?action=admin;area=membergroups;save;sa=settings';
+		$context['post_url'] = getUrl('admin', ['action' => 'admin', 'area' => 'membergroups', 'sa' => 'settings']);
 		$context['settings_title'] = $txt['membergroups_settings'];
 
 		$settingsForm->prepare();

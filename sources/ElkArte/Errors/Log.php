@@ -154,8 +154,8 @@ class Log extends AbstractModel
 					$log['errors'][$row['id_error']]['file'] = array(
 						'file' => $row['file'],
 						'line' => $row['line'],
-						'href' => $scripturl . '?action=admin;area=logs;sa=errorlog;activity=file;err=' . $row['id_error'],
-						'link' => '<a href="' . $scripturl . '?action=admin;area=logs;sa=errorlog;activity=file;err=' . $row['id_error'] . '" onclick="return reqWin(this.href, 600, 480, false);">' . $row['file'] . '</a>',
+						'href' => getUrl('admin', ['action' => 'admin', 'area' => 'logs', 'sa' => 'errorlog', 'activity' => 'file', 'err' => $row['id_error']]),
+						'link' => '<a href="' . getUrl('admin', ['action' => 'admin', 'area' => 'logs', 'sa' => 'errorlog', 'activity' => 'file', 'err' => $row['id_error']]) . '" onclick="return reqWin(this.href, 600, 480, false);">' . $row['file'] . '</a>',
 						'search' => base64_encode($row['file']),
 					);
 				}
@@ -195,14 +195,14 @@ class Log extends AbstractModel
 				'critical_type' => 'critical',
 			)
 		)->fetch_callback(
-			function ($row) use (&$types, $scripturl, $filter, $txt, $sort, &$sum) {
+			function ($row) use (&$types, $filter, $txt, $sort, &$sum) {
 				// Total errors so far?
 				$sum += $row['num_errors'];
 
 				$types[$sum] = array(
 					'label' => (isset($txt['errortype_' . $row['error_type']]) ? $txt['errortype_' . $row['error_type']] : $row['error_type']) . ' (' . $row['num_errors'] . ')',
 					'description' => isset($txt['errortype_' . $row['error_type'] . '_desc']) ? $txt['errortype_' . $row['error_type'] . '_desc'] : '',
-					'url' => $scripturl . '?action=admin;area=logs;sa=errorlog' . ($sort == 'down' ? ';desc' : '') . ';filter=error_type;value=' . $row['error_type'],
+					'url' => getUrl('admin', ['action' => 'admin', 'area' => 'logs', 'sa' => 'errorlog' . ($sort == 'down' ? ';desc' : ''), 'filter' => 'error_type', 'value' => $row['error_type']]),
 					'is_selected' => !empty($filter) && $filter['value']['sql'] == $this->_db->escape_wildcard_string($row['error_type']),
 				);
 			}

@@ -120,13 +120,13 @@ class ProfileInfo extends AbstractController
 	 */
 	public function action_summary()
 	{
-		global $context, $modSettings, $scripturl;
+		global $context, $modSettings;
 
 		theme()->getTemplates()->load('ProfileInfo');
 		theme()->getTemplates()->loadLanguageFile('Profile');
 
 		// Set a canonical URL for this page.
-		$context['canonical_url'] = $scripturl . '?action=profile;u=' . $this->_memID;
+		$context['canonical_url'] = getUrl('action', ['action' => 'profile', 'u' => $this->_memID]);
 
 		// Are there things we don't show?
 		$context['disabled_fields'] = isset($modSettings['disabled_profile_fields']) ? array_flip(explode(',', $modSettings['disabled_profile_fields'])) : array();
@@ -163,7 +163,7 @@ class ProfileInfo extends AbstractController
 	 */
 	private function _register_summarytabs()
 	{
-		global $txt, $context, $modSettings, $scripturl;
+		global $txt, $context, $modSettings;
 
 		$context['summarytabs'] = array(
 			'summary' => array(
@@ -179,13 +179,13 @@ class ProfileInfo extends AbstractController
 				'name' => $txt['profile_recent_activity'],
 				'templates' => array('posts', 'topics', 'attachments'),
 				'active' => true,
-				'href' => $scripturl . '?action=profileInfo;sa=recent;xml;u=' . $this->_memID . ';' . $context['session_var'] . '=' . $context['session_id'],
+				'href' => getUrl('action', ['action' => 'profileInfo', 'sa' => 'recent;xml', 'u' => $this->_memID, '{session_data}']),
 			),
 			'buddies' => array(
 				'name' => $txt['buddies'],
 				'templates' => array('buddies'),
 				'active' => !empty($modSettings['enable_buddylist']) && $context['user']['is_owner'],
-				'href' => $scripturl . '?action=profileInfo;sa=buddies;xml;u=' . $this->_memID . ';' . $context['session_var'] . '=' . $context['session_id'],
+				'href' => getUrl('action', ['action' => 'profileInfo', 'sa' => 'buddies;xml', 'u' => $this->_memID, '{session_data}']),
 			)
 		);
 
@@ -375,7 +375,7 @@ class ProfileInfo extends AbstractController
 	 */
 	private function _determine_member_activation()
 	{
-		global $context, $scripturl, $txt;
+		global $context, $txt;
 
 		// If the user is awaiting activation, and the viewer has permission - setup some activation context messages.
 		if ($context['member']['is_activated'] % 10 !== 1 && allowedTo('moderate_forum'))
@@ -392,7 +392,7 @@ class ProfileInfo extends AbstractController
 				? $txt['account_activate_method_' . $context['member']['is_activated'] % 10]
 				: $txt['account_not_activated'];
 
-			$context['activate_url'] = $scripturl . '?action=profile;save;area=activateaccount;u=' . $this->_memID . ';' . $context['session_var'] . '=' . $context['session_id'] . ';' . $context['profile-aa' . $this->_memID . '_token_var'] . '=' . $context['profile-aa' . $this->_memID . '_token'];
+			$context['activate_url'] = getUrl('action', ['action' => 'profile;save', 'area' => 'activateaccount', 'u' => $this->_memID, '{session_data}', $context['profile-aa' . $this->_memID . '_token_var'] => $context['profile-aa' . $this->_memID . '_token']]);
 		}
 	}
 
@@ -424,7 +424,7 @@ class ProfileInfo extends AbstractController
 	 */
 	public function action_showPosts()
 	{
-		global $txt, $scripturl, $modSettings, $context, $board;
+		global $txt, $modSettings, $context, $board;
 
 		// Some initial context.
 		$context['start'] = $this->_req->getQuery('start', 'intval', 0);
@@ -464,8 +464,9 @@ class ProfileInfo extends AbstractController
 		{
 			return $this->action_showAttachments();
 		}
+
 		// Instead, if we're dealing with unwatched topics (and the feature is enabled) use that other function.
-		elseif ($action === 'unwatchedtopics' && $modSettings['enable_unwatch'])
+		if ($action === 'unwatchedtopics' && $modSettings['enable_unwatch'])
 		{
 			return $this->action_showUnwatched();
 		}
@@ -493,7 +494,8 @@ class ProfileInfo extends AbstractController
 		$maxIndex = (int) $modSettings['defaultMaxMessages'];
 
 		// Make sure the starting place makes sense and construct our friend the page index.
-		$context['page_index'] = constructPageIndex($scripturl . '?action=profile;u=' . $this->_memID . ';area=showposts' . ($context['is_topics'] ? ';sa=topics' : ';sa=messages') . (!empty($board) ? ';board=' . $board : ''), $context['start'], $msgCount, $maxIndex);
+		$baseUrl = getUrl('action', ['action' => 'profile', 'u' => $this->_memID, 'area' => 'showposts', 'sa' => $context['is_topics'] ? 'topics' : 'messages', (!empty($board) ? 'board' : '') => (!empty($board) ? $board : '')]);
+		$context['page_index'] = constructPageIndex($baseUrl, $context['start'], $msgCount, $maxIndex);
 		$context['current_page'] = $context['start'] / $maxIndex;
 
 		// Reverse the query if we're past 50% of the pages for better performance.
@@ -558,11 +560,11 @@ class ProfileInfo extends AbstractController
 				'board' => array(
 					'name' => $row['bname'],
 					'id' => $row['id_board'],
-					'link' => '<a href="' . $scripturl . '?board=' . $row['id_board'] . '.0">' . $row['bname'] . '</a>',
+					'link' => '<a href="' . getUrl('board', ['board' => $row['id_board'], 'start' => 0, 'name' => $row['bname']]) .'">' . $row['bname'] . '</a>',
 				),
 				'topic' => array(
 					'id' => $row['id_topic'],
-					'link' => '<a href="' . $scripturl . '?topic=' . $row['id_topic'] . '.msg' . $row['id_msg'] . '#msg' . $row['id_msg'] . '">' . $row['subject'] . '</a>',
+					'link' => '<a href="' . getUrl('topic', ['topic' => $row['id_topic'], 'msg' => $row['id_msg'], 'subject' => $row['subject'], 'start' => '0', 'hash' => '#msg' . $row['id_msg']]) . '">' . $row['subject'] . '</a>',
 				),
 				'subject' => $row['subject'],
 				'start' => 'msg' . $row['id_msg'],
@@ -581,26 +583,26 @@ class ProfileInfo extends AbstractController
 				'buttons' => array(
 					// How about... even... remove it entirely?!
 					'remove' => array(
-						'href' => $scripturl . '?action=deletemsg;msg=' . $row['id_msg'] . ';topic=' . $row['id_topic'] . ';profile;u=' . $context['member']['id'] . ';start=' . $context['start'] . ';' . $context['session_var'] . '=' . $context['session_id'],
+						'href' => getUrl('action', ['action' => 'deletemsg', 'msg' => $row['id_msg'], 'topic' => $row['id_topic'] . ';profile', 'u' => $context['member']['id'], 'start' => $context['start'], '{session_data}']),
 						'text' => $txt['remove'],
 						'test' => 'can_delete',
 						'custom' => 'onclick="return confirm(' . JavaScriptEscape($txt['remove_message'] . '?') . ');"',
 					),
 					// Can we request notification of topics?
 					'notify' => array(
-						'href' => $scripturl . '?action=notify;topic=' . $row['id_topic'] . '.msg' . $row['id_msg'],
+						'href' => getUrl('action', ['action' => 'notify', 'topic' => $row['id_topic'], 'msg' => $row['id_msg']]),
 						'text' => $txt['notify'],
 						'test' => 'can_mark_notify',
 					),
 					// If they *can* reply?
 					'reply' => array(
-						'href' => $scripturl . '?action=post;topic=' . $row['id_topic'] . '.msg' . $row['id_msg'],
+						'href' => getUrl('action', ['action' => 'post', 'topic' => $row['id_topic'], 'msg' => $row['id_msg']]),
 						'text' => $txt['reply'],
 						'test' => 'can_reply',
 					),
 					// If they *can* quote?
 					'quote' => array(
-						'href' => $scripturl . '?action=post;topic=' . $row['id_topic'] . '.msg' . $row['id_msg'] . ';quote=' . $row['id_msg'],
+						'href' => getUrl('action', ['action' => 'post', 'topic' => $row['id_topic'], 'msg' => $row['id_msg'], 'quote' => $row['id_msg']]),
 						'text' => $txt['quote'],
 						'test' => 'can_quote',
 					),
@@ -694,7 +696,7 @@ class ProfileInfo extends AbstractController
 	 */
 	public function action_showAttachments()
 	{
-		global $txt, $scripturl, $modSettings, $context;
+		global $txt, $modSettings, $context;
 
 		// OBEY permissions!
 		$boardsAllowed = boardsAllowedTo('view_attachments');
@@ -711,7 +713,7 @@ class ProfileInfo extends AbstractController
 			'title' => $txt['showAttachments'] . ($context['user']['is_owner'] ? '' : ' - ' . $context['member']['name']),
 			'items_per_page' => $modSettings['defaultMaxMessages'],
 			'no_items_label' => $txt['show_attachments_none'],
-			'base_href' => $scripturl . '?action=profile;area=showposts;sa=attach;u=' . $this->_memID,
+			'base_href' => getUrl('action', ['action' => 'profile', 'area' => 'showposts', 'sa' => 'attach', 'u' => $this->_memID]),
 			'default_sort_col' => 'filename',
 			'get_items' => array(
 				'function' => function ($start, $items_per_page, $sort, $boardsAllowed) {
@@ -754,16 +756,12 @@ class ProfileInfo extends AbstractController
 					),
 					'data' => array(
 						'function' => function ($rowData) {
-							global $scripturl;
-
 							if ($rowData['is_image'] && !empty($rowData['id_thumb']))
 							{
-								return '<img src="' . $scripturl . '?action=dlattach;attach=' . $rowData['id_thumb'] . ';image" />';
+								return '<img src="' . getUrl('action', ['action' => 'dlattach', 'attach' => $rowData['id_thumb'] . ';image']) .'" />';
 							}
-							else
-							{
-								return '<img src="' . $scripturl . '?action=dlattach;attach=' . $rowData['id'] . ';thumb" />';
-							}
+
+							return '<img src="' . getUrl('action', ['action' => 'dlattach', 'attach' => $rowData['id'] . ';thumb']) . '" />';
 						},
 						'class' => 'centertext recent_attachments',
 					),
@@ -859,7 +857,7 @@ class ProfileInfo extends AbstractController
 	 */
 	public function action_showUnwatched()
 	{
-		global $txt, $scripturl, $modSettings, $context;
+		global $txt, $modSettings, $context;
 
 		// Only the owner can see the list (if the function is enabled of course)
 		if ($this->user->id != $this->_memID || !$modSettings['enable_unwatch'])
@@ -873,7 +871,7 @@ class ProfileInfo extends AbstractController
 			'title' => $txt['showUnwatched'],
 			'items_per_page' => $modSettings['defaultMaxMessages'],
 			'no_items_label' => $txt['unwatched_topics_none'],
-			'base_href' => $scripturl . '?action=profile;area=showposts;sa=unwatchedtopics;u=' . $this->_memID,
+			'base_href' => getUrl('action', ['action' => 'profile', 'area' => 'showposts', 'sa' => 'unwatchedtopics', 'u' => $this->_memID]),
 			'default_sort_col' => 'started_on',
 			'get_items' => array(
 				'function' => function ($start, $items_per_page, $sort) {
@@ -894,7 +892,7 @@ class ProfileInfo extends AbstractController
 					),
 					'data' => array(
 						'sprintf' => array(
-							'format' => '<a href="' . $scripturl . '?topic=%1$d.0">%2$s</a>',
+							'format' => '<a href="' . getUrl('action', ['topic' => '%1$d.0']) . '">%2$s</a>',
 							'params' => array(
 								'id_topic' => false,
 								'subject' => false,
@@ -1059,7 +1057,7 @@ class ProfileInfo extends AbstractController
 	 */
 	public function action_showPermissions()
 	{
-		global $txt, $board, $context, $scripturl;
+		global $txt, $board, $context;
 
 		// Verify if the user has sufficient permissions.
 		isAllowedTo('manage_permissions');
@@ -1106,7 +1104,7 @@ class ProfileInfo extends AbstractController
 				$context['boards'][$row['id_board']] = array(
 					'id' => $row['id_board'],
 					'name' => $row['board_name'],
-					'url' => $scripturl, '?board=', $row['id_board'], '.0',
+					'url' => getUrl('board', ['board' => $row['id_board'], 'start' => 0, 'name' => $row['board_name']]),
 					'selected' => $board == $row['id_board'],
 					'profile' => $row['id_profile'],
 					'profile_name' => $context['profiles'][$row['id_profile']]['name'],
@@ -1143,7 +1141,7 @@ class ProfileInfo extends AbstractController
 	 */
 	public function action_viewWarning()
 	{
-		global $modSettings, $context, $txt, $scripturl;
+		global $modSettings, $context, $txt;
 
 		// Firstly, can we actually even be here?
 		if (!allowedTo('issue_warning') && (empty($modSettings['warning_show']) || ($modSettings['warning_show'] == 1 && !$context['user']['is_owner'])))
@@ -1168,7 +1166,7 @@ class ProfileInfo extends AbstractController
 			'title' => $txt['profile_viewwarning_previous_warnings'],
 			'items_per_page' => $modSettings['defaultMaxMessages'],
 			'no_items_label' => $txt['profile_viewwarning_no_warnings'],
-			'base_href' => $scripturl . '?action=profile;area=viewwarning;sa=user;u=' . $this->_memID,
+			'base_href' => getUrl('action', ['action' => 'profile', 'area' => 'viewwarning', 'sa' => 'user', 'u' => $this->_memID]),
 			'default_sort_col' => 'log_time',
 			'get_items' => array(
 				'function' => 'list_getUserWarnings',
@@ -1356,7 +1354,7 @@ class ProfileInfo extends AbstractController
 	 */
 	private function _load_recent_posts()
 	{
-		global $context, $modSettings, $scripturl;
+		global $context, $modSettings;
 
 		// How about their most recent posts?
 		if (in_array('posts', $this->_summary_areas))
@@ -1403,14 +1401,14 @@ class ProfileInfo extends AbstractController
 						'body' => $preview,
 						'board' => array(
 							'name' => $row['bname'],
-							'link' => '<a href="' . $scripturl . '?board=' . $row['id_board'] . '.0">' . $row['bname'] . '</a>'
+							'link' => '<a href="' . getUrl('board', ['board' => $row['id_board'], 'start' => 0, 'name' => $row['bname']]). '">' . $row['bname'] . '</a>'
 						),
 						'subject' => $row['subject'],
 						'short_subject' => $short_subject,
 						'time' => standardTime($row['poster_time']),
 						'html_time' => htmlTime($row['poster_time']),
 						'timestamp' => forum_time(true, $row['poster_time']),
-						'link' => '<a href="' . $scripturl . '?topic=' . $row['id_topic'] . '.msg' . $row['id_msg'] . '#msg' . $row['id_msg'] . '" rel="nofollow">' . $short_subject . '</a>',
+						'link' => '<a href="' . getUrl('topic', ['topic' => $row['id_topic'], 'msg' => $row['id_msg'], 'subject' => $row['subject'], 'hash' => '#msg' . $row['id_msg']]) . '" rel="nofollow">' . $short_subject . '</a>',
 					);
 				}
 			}
@@ -1422,7 +1420,7 @@ class ProfileInfo extends AbstractController
 	 */
 	private function _load_recent_topics()
 	{
-		global $context, $modSettings, $scripturl;
+		global $context, $modSettings;
 
 		// How about the most recent topics that they started?
 		if (in_array('topics', $this->_summary_areas))
@@ -1470,7 +1468,7 @@ class ProfileInfo extends AbstractController
 					$context['topics'][] = array(
 						'board' => array(
 							'name' => $row['bname'],
-							'link' => '<a href="' . $scripturl . '?board=' . $row['id_board'] . '.0">' . $row['bname'] . '</a>'
+							'link' => '<a href="' . getUrl('board', ['board' => $row['id_board'], 'start' => 0, 'name' => $row['bname']]) . '</a>'
 						),
 						'subject' => $row['subject'],
 						'short_subject' => $short_subject,
@@ -1478,7 +1476,7 @@ class ProfileInfo extends AbstractController
 						'time' => standardTime($row['poster_time']),
 						'html_time' => htmlTime($row['poster_time']),
 						'timestamp' => forum_time(true, $row['poster_time']),
-						'link' => '<a href="' . $scripturl . '?topic=' . $row['id_topic'] . '.msg' . $row['id_msg'] . '#msg' . $row['id_msg'] . '" rel="nofollow">' . $short_subject . '</a>',
+						'link' => '<a href="' . getUrl('topic', ['topic' => $row['id_topic'], 'msg' => $row['id_msg'], 'subject' => $row['subject'], 'hash' => '#msg' . $row['id_msg']]) . '" rel="nofollow">' . $short_subject . '</a>',
 					);
 				}
 			}
@@ -1490,7 +1488,7 @@ class ProfileInfo extends AbstractController
 	 */
 	private function _load_recent_attachments()
 	{
-		global $context, $modSettings, $scripturl, $settings;
+		global $context, $modSettings, $settings;
 
 		$context['thumbs'] = array();
 
@@ -1516,7 +1514,7 @@ class ProfileInfo extends AbstractController
 			foreach ($attachments as $i => $attachment)
 			{
 				$context['thumbs'][$i] = array(
-					'url' => $scripturl . '?action=dlattach;topic=' . $attachment['topic'] . '.0;attach=' . $attachment['id'],
+					'url' => getUrl('action', ['action' => 'dlattach', 'topic' => $attachment['topic'] . '.0', 'attach' => $attachment['id']]),
 					'img' => '',
 					'filename' => $attachment['filename'],
 					'downloads' => $attachment['downloads'],
@@ -1529,18 +1527,18 @@ class ProfileInfo extends AbstractController
 				{
 					if (!empty($attachment['id_thumb']))
 					{
-						$context['thumbs'][$i]['img'] = '<img id="thumb_' . $attachment['id'] . '" src="' . $scripturl . '?action=dlattach;topic=' . $attachment['topic'] . '.0;attach=' . $attachment['id_thumb'] . ';image" title="" alt="" />';
+						$context['thumbs'][$i]['img'] = '<img id="thumb_' . $attachment['id'] . '" src="' . getUrl('action', ['action' => 'dlattach', 'topic' => $attachment['topic'] . '.0', 'attach' => $attachment['id_thumb'] . ';image']) . '" title="" alt="" />';
 					}
 					elseif (!empty($modSettings['attachmentThumbWidth']) && !empty($modSettings['attachmentThumbHeight']))
 					{
 						// No thumbnail available ... use html instead
 						if ($attachment['width'] > $modSettings['attachmentThumbWidth'] || $attachment['height'] > $modSettings['attachmentThumbHeight'])
 						{
-							$context['thumbs'][$i]['img'] = '<img id="thumb_' . $attachment['id'] . '" src="' . $scripturl . '?action=dlattach;topic=' . $attachment['topic'] . '.0;attach=' . $attachment['id'] . '" title="" alt="" width="' . $modSettings['attachmentThumbWidth'] . '" height="' . $modSettings['attachmentThumbHeight'] . '" />';
+							$context['thumbs'][$i]['img'] = '<img id="thumb_' . $attachment['id'] . '" src="' . getUrl('action', ['action' => 'dlattach', 'topic' => $attachment['topic'] . '.0', 'attach' => $attachment['id']]) . '" title="" alt="" width="' . $modSettings['attachmentThumbWidth'] . '" height="' . $modSettings['attachmentThumbHeight'] . '" />';
 						}
 						else
 						{
-							$context['thumbs'][$i]['img'] = '<img id="thumb_' . $attachment['id'] . '" src="' . $scripturl . '?action=dlattach;topic=' . $attachment['topic'] . '.0;attach=' . $attachment['id'] . '" title="" alt="" width="' . $attachment['width'] . '" height="' . $attachment['height'] . '" />';
+							$context['thumbs'][$i]['img'] = '<img id="thumb_' . $attachment['id'] . '" src="' . getUrl('action', ['action' => 'dlattach', 'topic' => $attachment['topic'] . '.0', 'attach' => $attachment['id']]) . '" title="" alt="" width="' . $attachment['width'] . '" height="' . $attachment['height'] . '" />';
 						}
 					}
 				}

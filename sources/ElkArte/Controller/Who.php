@@ -54,7 +54,7 @@ class Who extends AbstractController
 	 */
 	public function action_who()
 	{
-		global $context, $scripturl, $txt, $modSettings;
+		global $context, $txt, $modSettings;
 
 		// Permissions, permissions, permissions.
 		isAllowedTo('who_view');
@@ -160,7 +160,8 @@ class Who extends AbstractController
 
 		$start = $this->_req->get('start', 'intval');
 		// Prepare some page index variables.
-		$context['page_index'] = constructPageIndex($scripturl . '?action=who;sort=' . $context['sort_by'] . ($context['sort_direction'] === 'up' ? ';asc' : '') . ';show=' . $context['show_by'], $start, $totalMembers, $modSettings['defaultMaxMembers']);
+		$baseUrl = getUrl('action', ['action' => 'who', 'sort' => $context['sort_by'] . ($context['sort_direction'] === 'up' ? ';asc' : ''), 'show' => $context['show_by']]);
+		$context['page_index'] = constructPageIndex($baseUrl, $start, $totalMembers, $modSettings['defaultMaxMembers']);
 		$context['start'] = $start;
 		$context['sub_template'] = 'whos_online';
 		theme()->getLayers()->add('whos_selection');
@@ -226,7 +227,7 @@ class Who extends AbstractController
 		// Setup the linktree and page title (do it down here because the language files are now loaded..)
 		$context['page_title'] = $txt['who_title'];
 		$context['linktree'][] = array(
-			'url' => $scripturl . '?action=who',
+			'url' => getUrl('action', ['action' => 'who']),
 			'name' => $txt['who_title']
 		);
 

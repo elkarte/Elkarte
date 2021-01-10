@@ -60,7 +60,7 @@ class ManageMembers extends AbstractController
 	 */
 	public function action_index()
 	{
-		global $txt, $scripturl, $context, $modSettings;
+		global $txt, $context, $modSettings;
 
 		// Load the essentials.
 		theme()->getTemplates()->loadLanguageFile('ManageMembers');
@@ -132,25 +132,25 @@ class ManageMembers extends AbstractController
 			'viewmembers' => array(
 				'label' => $txt['view_all_members'],
 				'description' => $txt['admin_members_list'],
-				'url' => $scripturl . '?action=admin;area=viewmembers;sa=all',
+				'url' => getUrl('admin', ['action' => 'admin', 'area' => 'viewmembers', 'sa' => 'all']),
 				'is_selected' => $subAction === 'all',
 			),
 			'search' => array(
 				'label' => $txt['mlist_search'],
 				'description' => $txt['admin_members_list'],
-				'url' => $scripturl . '?action=admin;area=viewmembers;sa=search',
+				'url' => getUrl('admin', ['action' => 'admin', 'area' => 'viewmembers', 'sa' => 'search']),
 				'is_selected' => $subAction === 'search' || $subAction === 'query',
 			),
 			'approve' => array(
 				'label' => sprintf($txt['admin_browse_awaiting_approval'], $context['awaiting_approval']),
 				'description' => $txt['admin_browse_approve_desc'],
-				'url' => $scripturl . '?action=admin;area=viewmembers;sa=browse;type=approve',
+				'url' => getUrl('admin', ['action' => 'admin', 'area' => 'viewmembers', 'sa' => 'browse', 'type' => 'approve']),
 				'is_selected' => false,
 			),
 			'activate' => array(
 				'label' => sprintf($txt['admin_browse_awaiting_activate'], $context['awaiting_activation']),
 				'description' => $txt['admin_browse_activate_desc'],
-				'url' => $scripturl . '?action=admin;area=viewmembers;sa=browse;type=activate',
+				'url' => getUrl('admin', ['action' => 'admin', 'area' => 'viewmembers', 'sa' => 'browse', 'type' => 'activate']),
 				'is_selected' => false,
 				'is_last' => true,
 			),
@@ -199,7 +199,7 @@ class ManageMembers extends AbstractController
 	 */
 	public function action_list()
 	{
-		global $txt, $scripturl, $context, $modSettings;
+		global $txt, $context, $modSettings;
 
 		// Set the current sub action.
 		$context['sub_action'] = $this->_req->getPost('sa', 'strval', 'all');
@@ -389,7 +389,7 @@ class ManageMembers extends AbstractController
 					// Replace the wildcard characters ('*' and '?') into MySQL ones.
 					$parameter = strtolower(strtr(Util::htmlspecialchars($search_params[$param_name], ENT_QUOTES), array('%' => '\%', '_' => '\_', '*' => '%', '?' => '_')));
 
-					$query_parts[] = '({column_case_insensitive:' . implode(' LIKE {string_case_insensitive:' . $param_name . '_normal} OR {column_case_insensitive:', $param_info['db_fields']) . '} LIKE {string_case_insensitive:' . $param_name . '_normal})';
+					$query_parts[] = '({column_case_insensitive:' . implode('} LIKE {string_case_insensitive:' . $param_name . '_normal} OR {column_case_insensitive:', $param_info['db_fields']) . '} LIKE {string_case_insensitive:' . $param_name . '_normal})';
 
 					$where_params[$param_name . '_normal'] = '%' . $parameter . '%';
 				}
@@ -438,7 +438,7 @@ class ManageMembers extends AbstractController
 		}
 
 		// Construct the additional URL part with the query info in it.
-		$context['params_url'] = $context['sub_action'] === 'query' ? ';sa=query;params=' . $search_url_params : '';
+		$context['params_url'] = $context['sub_action'] === 'query' ? ['sa' => 'query', 'params' => $search_url_params] : [];
 
 		// Get the title and sub template ready..
 		$context['page_title'] = $txt['admin_members'];
@@ -447,7 +447,7 @@ class ManageMembers extends AbstractController
 			'id' => 'member_list',
 			'title' => $txt['members_list'],
 			'items_per_page' => $modSettings['defaultMaxMembers'],
-			'base_href' => $scripturl . '?action=admin;area=viewmembers' . $context['params_url'],
+			'base_href' => getUrl('admin', ['action' => 'admin', 'area' => 'viewmembers'] + $context['params_url']),
 			'default_sort_col' => 'user_name',
 			'get_items' => array(
 				'file' => SUBSDIR . '/Members.subs.php',
@@ -484,7 +484,7 @@ class ManageMembers extends AbstractController
 					),
 					'data' => array(
 						'sprintf' => array(
-							'format' => '<a href="' . strtr($scripturl, array('%' => '%%')) . '?action=profile;u=%1$d">%2$s</a>',
+							'format' => '<a href="' . getUrl('profile', ['action' => 'profile', 'u' => '%1$d', 'name' =>'%2$s']) . '">%2$s</a>',
 							'params' => array(
 								'id_member' => false,
 								'member_name' => false,
@@ -502,7 +502,7 @@ class ManageMembers extends AbstractController
 					),
 					'data' => array(
 						'sprintf' => array(
-							'format' => '<a href="' . strtr($scripturl, array('%' => '%%')) . '?action=profile;u=%1$d">%2$s</a>',
+							'format' => '<a href="' . getUrl('action', ['action' => 'profile', 'u' => '%1$d']) . '">%2$s</a>',
 							'params' => array(
 								'id_member' => false,
 								'real_name' => false,
@@ -537,7 +537,7 @@ class ManageMembers extends AbstractController
 					),
 					'data' => array(
 						'sprintf' => array(
-							'format' => '<a href="' . strtr($scripturl, array('%' => '%%')) . '?action=trackip;searchip=%1$s">%1$s</a>',
+							'format' => '<a href="' . getUrl('action', ['action' => 'trackip', 'searchip' => '%1$s']) .'">%1$s</a>',
 							'params' => array(
 								'member_ip' => false,
 							),
@@ -601,7 +601,7 @@ class ManageMembers extends AbstractController
 				),
 			),
 			'form' => array(
-				'href' => $scripturl . '?action=admin;area=viewmembers' . $context['params_url'],
+				'href' => getUrl('admin', ['action' => 'admin', 'area' => 'viewmembers'] + $context['params_url']),
 				'include_start' => true,
 				'include_sort' => true,
 			),
@@ -817,7 +817,7 @@ class ManageMembers extends AbstractController
 	 */
 	public function action_browse()
 	{
-		global $txt, $context, $scripturl, $modSettings;
+		global $txt, $context, $modSettings;
 
 		// Not a lot here!
 		$context['page_title'] = $txt['admin_members'];
@@ -958,7 +958,7 @@ class ManageMembers extends AbstractController
 		$listOptions = array(
 			'id' => 'approve_list',
 			'items_per_page' => $modSettings['defaultMaxMembers'],
-			'base_href' => $scripturl . '?action=admin;area=viewmembers;sa=browse;type=' . $context['browse_type'] . (!empty($context['show_filter']) ? ';filter=' . $context['current_filter'] : ''),
+			'base_href' => getUrl('admin', ['action' => 'admin', 'area' => 'viewmembers', 'sa' => 'browse', 'type' => $context['browse_type'] . (!empty($context['show_filter']) ? ';filter=' . $context['current_filter'] : '')]),
 			'default_sort_col' => 'date_registered',
 			'get_items' => array(
 				'file' => SUBSDIR . '/Members.subs.php',
@@ -996,7 +996,7 @@ class ManageMembers extends AbstractController
 					),
 					'data' => array(
 						'sprintf' => array(
-							'format' => '<a href="' . strtr($scripturl, array('%' => '%%')) . '?action=profile;u=%1$d">%2$s</a>',
+							'format' => '<a href="' . getUrl('action', ['action' => 'profile', 'u' => '%1$d']) . '">%2$s</a>',
 							'params' => array(
 								'id_member' => false,
 								'member_name' => false,
@@ -1031,7 +1031,7 @@ class ManageMembers extends AbstractController
 					),
 					'data' => array(
 						'sprintf' => array(
-							'format' => '<a href="' . strtr($scripturl, array('%' => '%%')) . '?action=trackip;searchip=%1$s">%1$s</a>',
+							'format' => '<a href="' . getUrl('action', ['action' => 'trackip', 'searchip' => '%1$s']) . '">%1$s</a>',
 							'params' => array(
 								'member_ip' => false,
 							),
@@ -1077,14 +1077,14 @@ class ManageMembers extends AbstractController
 					),
 					'data' => array(
 						'function' => function ($rowData) {
-							global $scripturl, $txt;
+							global $txt;
 
 							$member_links = array();
 							foreach ($rowData['duplicate_members'] as $member)
 							{
 								if ($member['id'])
 								{
-									$member_links[] = '<a href="' . $scripturl . '?action=profile;u=' . $member['id'] . '" ' . (!empty($member['is_banned']) ? 'class="alert"' : '') . '>' . $member['name'] . '</a>';
+									$member_links[] = '<a href="' . getUrl('profile', ['action' => 'profile', 'u' => $member['id'], 'name' => $member['name']]) . '" ' . (!empty($member['is_banned']) ? 'class="alert"' : '') . '>' . $member['name'] . '</a>';
 								}
 								else
 								{
@@ -1115,7 +1115,7 @@ class ManageMembers extends AbstractController
 			),
 			'javascript' => $javascript,
 			'form' => array(
-				'href' => $scripturl . '?action=admin;area=viewmembers;sa=approve;type=' . $context['browse_type'],
+				'href' => getUrl('action', ['action' => 'admin', 'area' => 'viewmembers', 'sa' => 'approve', 'type' => $context['browse_type']]),
 				'name' => 'postForm',
 				'include_start' => true,
 				'include_sort' => true,
@@ -1128,7 +1128,7 @@ class ManageMembers extends AbstractController
 					'position' => 'below_table_data',
 					'value' => '
 						<div class="submitbutton">
-							<a class="linkbutton" href="' . $scripturl . '?action=admin;area=viewmembers;sa=browse;showdupes=' . ($context['show_duplicates'] ? 0 : 1) . ';type=' . $context['browse_type'] . (!empty($context['show_filter']) ? ';filter=' . $context['current_filter'] : '') . ';' . $context['session_var'] . '=' . $context['session_id'] . '">' . ($context['show_duplicates'] ? $txt['dont_check_for_duplicate'] : $txt['check_for_duplicate']) . '</a>
+							<a class="linkbutton" href="' . getUrl('action', ['action' => 'admin', 'area' => 'viewmembers', 'sa' => 'browse', 'showdupes' => $context['show_duplicates'] ? 0 : 1, 'type' => $context['browse_type'], '{session_data}'] + (!empty($context['show_filter']) ? ['filter' => $context['current_filter']] : [])) . '">' . ($context['show_duplicates'] ? $txt['dont_check_for_duplicate'] : $txt['check_for_duplicate']) . '</a>
 							<select name="todo" onchange="onSelectChange();">
 								' . $allowed_actions . '
 							</select>
@@ -1169,7 +1169,7 @@ class ManageMembers extends AbstractController
 			{
 				$listOptions['list_menu']['links'][] = array(
 					'is_selected' => $filter['selected'],
-					'href' => $scripturl . '?action=admin;area=viewmembers;sa=browse;type=' . $context['browse_type'] . ';filter=' . $filter['type'],
+					'href' => getUrl('action', ['action' => 'admin', 'area' => 'viewmembers', 'sa' => 'browse', 'type' => $context['browse_type'], 'filter' => $filter['type']]),
 					'label' => $filter['desc'] . ' - ' . $filter['amount'] . ' ' . ($filter['amount'] == 1 ? $txt['user'] : $txt['users'])
 				);
 			}
@@ -1308,8 +1308,6 @@ class ManageMembers extends AbstractController
 	 */
 	private function _okMember()
 	{
-		global $scripturl;
-
 		// Approve / activate this member.
 		approveMembers($this->conditions);
 
@@ -1321,8 +1319,8 @@ class ManageMembers extends AbstractController
 				$replacements = array(
 					'NAME' => $member['name'],
 					'USERNAME' => $member['username'],
-					'PROFILELINK' => $scripturl . '?action=profile;u=' . $member['id'],
-					'FORGOTPASSWORDLINK' => $scripturl . '?action=reminder',
+					'PROFILELINK' => getUrl('profile', ['action' => 'profile', 'u' => $member['id'], 'name' => $member['name']]),
+					'FORGOTPASSWORDLINK' => getUrl('action', ['action' => 'reminder']),
 				);
 
 				$emaildata = loadEmailTemplate('admin_approve_accept', $replacements, $member['language']);
@@ -1339,8 +1337,6 @@ class ManageMembers extends AbstractController
 	 */
 	private function _requireMember()
 	{
-		global $scripturl;
-
 		require_once(SUBSDIR . '/Auth.subs.php');
 
 		// We have to do this for each member I'm afraid.
@@ -1356,8 +1352,8 @@ class ManageMembers extends AbstractController
 
 			$replacements = array(
 				'USERNAME' => $member['name'],
-				'ACTIVATIONLINK' => $scripturl . '?action=register;sa=activate;u=' . $member['id'] . ';code=' . $this->conditions['validation_code'],
-				'ACTIVATIONLINKWITHOUTCODE' => $scripturl . '?action=register;sa=activate;u=' . $member['id'],
+				'ACTIVATIONLINK' => getUrl('action', ['action' => 'register', 'sa' => 'activate', 'u' => $member['id'], 'code' => $this->conditions['validation_code']]),
+				'ACTIVATIONLINKWITHOUTCODE' =>getUrl('action', ['action' => 'register', 'sa' => 'activate', 'u' => $member['id']]),
 				'ACTIVATIONCODE' => $this->conditions['validation_code'],
 			);
 
@@ -1415,8 +1411,6 @@ class ManageMembers extends AbstractController
 	 */
 	private function _remindMember()
 	{
-		global $scripturl;
-
 		require_once(SUBSDIR . '/Auth.subs.php');
 
 		foreach ($this->member_info as $member)
@@ -1428,8 +1422,8 @@ class ManageMembers extends AbstractController
 
 			$replacements = array(
 				'USERNAME' => $member['name'],
-				'ACTIVATIONLINK' => $scripturl . '?action=register;sa=activate;u=' . $member['id'] . ';code=' . $this->conditions['validation_code'],
-				'ACTIVATIONLINKWITHOUTCODE' => $scripturl . '?action=register;sa=activate;u=' . $member['id'],
+				'ACTIVATIONLINK' => getUrl('action', ['action' => 'register', 'sa' => 'activate', 'u' => $member['id'], 'code' => $this->conditions['validation_code']]),
+				'ACTIVATIONLINKWITHOUTCODE' => getUrl('action', ['action' => 'register', 'sa' => 'activate', 'u' => $member['id']]),
 				'ACTIVATIONCODE' => $this->conditions['validation_code'],
 			);
 

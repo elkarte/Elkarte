@@ -362,8 +362,8 @@ function loadBoard()
 					$board_info['moderators'][$row['id_moderator']] = array(
 						'id' => $row['id_moderator'],
 						'name' => $row['real_name'],
-						'href' => $scripturl . '?action=profile;u=' . $row['id_moderator'],
-						'link' => '<a href="' . $scripturl . '?action=profile;u=' . $row['id_moderator'] . '">' . $row['real_name'] . '</a>'
+						'href' => getUrl('profile', ['action' => 'profile', 'u' => $row['id_moderator']]),
+						'link' => '<a href="' . getUrl('profile', ['action' => 'profile', 'u' => $row['id_moderator']]) . '">' . $row['real_name'] . '</a>'
 					);
 				}
 			} while (($row = $request->fetch_assoc()));
@@ -446,7 +446,7 @@ function loadBoard()
 			),
 			array_reverse($board_info['parent_boards']),
 			array(array(
-					  'url' => $scripturl . '?board=' . $board . '.0',
+					  'url' => getUrl('board', ['board' => $board, 'start' => '0', 'name' => $board_info['name']]),
 					  'name' => $board_info['name']
 				  )
 			)
@@ -1222,8 +1222,6 @@ function fix_calendar_text()
  */
 function getBoardParents($id_parent)
 {
-	global $scripturl;
-
 	$db = database();
 	$cache = Cache::instance();
 	$boards = array();
@@ -1260,7 +1258,7 @@ function getBoardParents($id_parent)
 				{
 					$id_parent = $row['id_parent'];
 					$boards[$row['id_board']] = array(
-						'url' => $scripturl . '?board=' . $row['id_board'] . '.0',
+						'url' => getUrl('board', ['board' => $row['id_board'], 'name' => $row['name'], 'start' => '0']),
 						'name' => $row['name'],
 						'level' => $row['child_level'],
 						'moderators' => array()
@@ -1275,8 +1273,8 @@ function getBoardParents($id_parent)
 						$boards[$id]['moderators'][$row['id_moderator']] = array(
 							'id' => $row['id_moderator'],
 							'name' => $row['real_name'],
-							'href' => $scripturl . '?action=profile;u=' . $row['id_moderator'],
-							'link' => '<a href="' . $scripturl . '?action=profile;u=' . $row['id_moderator'] . '">' . $row['real_name'] . '</a>'
+							'href' => getUrl('profile', ['action' => 'profile', 'u' => $row['id_moderator']]),
+							'link' => '<a href="' .getUrl('profile', ['action' => 'profile', 'u' => $row['id_moderator']]) . '">' . $row['real_name'] . '</a>'
 						);
 					}
 				}
@@ -1421,7 +1419,7 @@ function loadDatabase()
  */
 function determineAvatar($profile)
 {
-	global $modSettings, $scripturl, $settings;
+	global $modSettings, $settings;
 
 	if (empty($profile))
 	{
@@ -1434,7 +1432,7 @@ function determineAvatar($profile)
 	if ($profile['id_attach'] > 0 && empty($profile['avatar']))
 	{
 		// where are those pesky avatars?
-		$avatar_url = empty($profile['attachment_type']) ? $scripturl . '?action=dlattach;attach=' . $profile['id_attach'] . ';type=avatar' : $modSettings['custom_avatar_url'] . '/' . $profile['filename'];
+		$avatar_url = empty($profile['attachment_type']) ? getUrl('action', ['action' => 'dlattach', 'attach' => $profile['id_attach'], 'type' => 'avatar']) : $modSettings['custom_avatar_url'] . '/' . $profile['filename'];
 
 		$avatar = array(
 			'name' => $profile['avatar'],
@@ -1566,7 +1564,7 @@ function serverIs($server)
  */
 function doSecurityChecks()
 {
-	global $modSettings, $context, $maintenance, $txt, $scripturl, $options;
+	global $modSettings, $context, $maintenance, $txt, $options;
 
 	$show_warnings = false;
 
@@ -1604,13 +1602,13 @@ function doSecurityChecks()
 		// Active admin session?
 		if (isAdminSessionActive())
 		{
-			$context['warning_controls']['admin_session'] = sprintf($txt['admin_session_active'], ($scripturl . '?action=admin;area=adminlogoff;redir;' . $context['session_var'] . '=' . $context['session_id']));
+			$context['warning_controls']['admin_session'] = sprintf($txt['admin_session_active'], (getUrl('admin', ['action' => 'admin', 'area' => 'adminlogoff;redir', '{session_data}'])));
 		}
 
 		// Maintenance mode enabled?
 		if (!empty($maintenance))
 		{
-			$context['warning_controls']['maintenance'] = sprintf($txt['admin_maintenance_active'], ($scripturl . '?action=admin;area=serversettings;' . $context['session_var'] . '=' . $context['session_id']));
+			$context['warning_controls']['maintenance'] = sprintf($txt['admin_maintenance_active'], (getUrl('admin', ['action' => 'admin', 'area' => 'serversettings', '{session_data}'])));
 		}
 
 		// New updates
@@ -1653,17 +1651,17 @@ function doSecurityChecks()
 	// Are there any members waiting for approval?
 	if (allowedTo('moderate_forum') && ((!empty($modSettings['registration_method']) && $modSettings['registration_method'] == 2) || !empty($modSettings['approveAccountDeletion'])) && !empty($modSettings['unapprovedMembers']))
 	{
-		$context['warning_controls']['unapproved_members'] = sprintf($txt[$modSettings['unapprovedMembers'] == 1 ? 'approve_one_member_waiting' : 'approve_many_members_waiting'], $scripturl . '?action=admin;area=viewmembers;sa=browse;type=approve', $modSettings['unapprovedMembers']);
+		$context['warning_controls']['unapproved_members'] = sprintf($txt[$modSettings['unapprovedMembers'] == 1 ? 'approve_one_member_waiting' : 'approve_many_members_waiting'], getUrl('admin', ['action' => 'admin', 'area' => 'viewmembers', 'sa' => 'browse', 'type' => 'approve']), $modSettings['unapprovedMembers']);
 	}
 
 	if (!empty($context['open_mod_reports']) && (empty(User::$settings['mod_prefs']) || User::$settings['mod_prefs'][0] == 1))
 	{
-		$context['warning_controls']['open_mod_reports'] = '<a href="' . $scripturl . '?action=moderate;area=reports">' . sprintf($txt['mod_reports_waiting'], $context['open_mod_reports']) . '</a>';
+		$context['warning_controls']['open_mod_reports'] = '<a href="' . getUrl('action', ['action' => 'moderate', 'area' => 'reports']) .'">' . sprintf($txt['mod_reports_waiting'], $context['open_mod_reports']) . '</a>';
 	}
 
 	if (!empty($context['open_pm_reports']) && allowedTo('admin_forum'))
 	{
-		$context['warning_controls']['open_pm_reports'] = '<a href="' . $scripturl . '?action=moderate;area=pm_reports">' . sprintf($txt['pm_reports_waiting'], $context['open_pm_reports']) . '</a>';
+		$context['warning_controls']['open_pm_reports'] = '<a href="' . getUrl('action', ['action' => 'moderate', 'area' => 'pm_reports']) . '">' . sprintf($txt['pm_reports_waiting'], $context['open_pm_reports']) . '</a>';
 	}
 
 	if (isset($_SESSION['ban']['cannot_post']))

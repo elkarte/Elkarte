@@ -100,7 +100,7 @@ class Captcha implements ControlInterface
 	 */
 	public function showVerification($sessionVal, $isNew, $force_refresh = true)
 	{
-		global $context, $modSettings, $scripturl;
+		global $context, $modSettings;
 
 		$show_captcha = !empty($this->_options['override_visual']) || (!empty($modSettings['visual_verification_type']) && !isset($this->_options['override_visual']));
 
@@ -122,7 +122,7 @@ class Captcha implements ControlInterface
 			if ($this->_show_captcha)
 			{
 				$this->_text_value = '';
-				$this->_image_href = $scripturl . '?action=register;sa=verificationcode;vid=' . $this->_options['id'] . ';rand=' . md5(mt_rand());
+				$this->_image_href = getUrl('action', ['action' => 'register', 'sa' => 'verificationcode', 'vid' => $this->_options['id'], 'rand' => md5(mt_rand())]);
 			}
 		}
 
@@ -216,10 +216,10 @@ class Captcha implements ControlInterface
 	 */
 	public function settings()
 	{
-		global $txt, $scripturl, $modSettings;
+		global $txt, $modSettings;
 
 		// Generate a sample registration image.
-		$verification_image = $scripturl . '?action=register;sa=verificationcode;rand=' . md5(mt_rand());
+		$verification_image = getUrl('action', ['action' => 'register', 'sa' => 'verificationcode', 'rand' => md5(mt_rand())]);
 
 		// Visual verification.
 		$config_vars = array(
