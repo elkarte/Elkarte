@@ -773,7 +773,7 @@ function countBoardPermissions($groups, $hidden_permissions = null, $profile_id 
 
 	$db->fetchQuery('
 		SELECT 
-			id_profile, id_group, COUNT(*) AS num_permissions, add_deny
+			' . (isset($profile_id) ? 'id_profile, ' : '') . 'id_group, add_deny, COUNT(*) AS num_permissions
 		FROM {db_prefix}board_permissions
 		WHERE 1 = 1'
 		. (isset($profile_id) ? ' AND id_profile = {int:current_profile}' : '')

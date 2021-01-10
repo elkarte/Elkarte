@@ -3344,10 +3344,10 @@ function fixMergedTopics($first_msg, $topics, $id_topic, $target_board, $target_
 	// The unwatched setting comes from the oldest topic
 	$request = $db->query('', '
 		SELECT 
-			id_member, MIN(id_msg) AS new_id_msg, unwatched
+			id_member, unwatched, MIN(id_msg) AS new_id_msg
 		FROM {db_prefix}log_topics
 		WHERE id_topic IN ({array_int:topics})
-		GROUP BY id_member',
+		GROUP BY id_member, unwatched',
 		array(
 			'topics' => $topics,
 		)

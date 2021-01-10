@@ -77,7 +77,7 @@ function sendNotifications($topics, $type, $exclude = array(), $members_only = a
 			LEFT JOIN {db_prefix}members AS mem ON (mem.id_member = ml.id_member)
 			LEFT JOIN {db_prefix}attachments AS a ON(a.attachment_type = {int:attachment_type} AND a.id_msg = t.id_last_msg)
 		WHERE t.id_topic IN ({array_int:topic_list})
-		GROUP BY t.id_topic, mf.subject, ml.body, ml.id_member, mem.signature, mem.real_name, ml.poster_name',
+		GROUP BY 1, 2, 3, 4, 5, 6, 7, 8',
 		array(
 			'topic_list' => $topics,
 			'attachment_type' => 0,
