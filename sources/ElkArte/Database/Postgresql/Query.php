@@ -270,7 +270,7 @@ class Query extends AbstractQuery
 		}
 
 		// Limits need to be a little different.
-		$db_string = preg_replace('~\sLIMIT\s(\d+|{int:.+}),\s*(\d+|{int:.+})\s*(.*)$~is', 'LIMIT $2 OFFSET $1 $3', $db_string);
+		$db_string = preg_replace('~\sLIMIT\s(\d+|{int:.+}),\s*(\d+|{int:.+})(.*)~i', ' LIMIT $2 OFFSET $1 $3', $db_string);
 
 		if (trim($db_string) === '')
 		{

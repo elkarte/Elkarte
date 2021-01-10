@@ -71,7 +71,7 @@ function template_latest_news()
 								<span class="hide" id="installedVersion">??</span>
 								<span class="hide" id="latestVersion">??</span>
 								<script>
-						var oAdminCenter = new elk_AdminIndex({
+						var oAdminCenter = new Elk_AdminIndex({
 							bLoadAnnouncements: true,
 							sAnnouncementTemplate: ', JavaScriptEscape('
 								<dl>

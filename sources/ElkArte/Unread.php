@@ -164,7 +164,7 @@ class Unread
 	}
 
 	/**
-	 * Counts unread topics, used in *all* unread replies with temp table and
+	 * Counts unread topics, used in *all* unread replies and
 	 * new posts since last visit
 	 *
 	 * @param bool $is_first_login - if the member has already logged in at least
@@ -175,9 +175,8 @@ class Unread
 	{
 		$request = $this->_db->fetchQuery('
 			SELECT COUNT(*), MIN(t.id_last_msg)
-			FROM {db_prefix}topics AS t' . (!empty($this->_have_temp_table) ? '
-				LEFT JOIN {db_prefix}log_topics_unread AS lt ON (lt.id_topic = t.id_topic)' : '
-				LEFT JOIN {db_prefix}log_topics AS lt ON (lt.id_topic = t.id_topic AND lt.id_member = {int:current_member})') . '
+			FROM {db_prefix}topics AS t
+				LEFT JOIN {db_prefix}log_topics AS lt ON (lt.id_topic = t.id_topic AND lt.id_member = {int:current_member})
 				LEFT JOIN {db_prefix}log_mark_read AS lmr ON (lmr.id_board = t.id_board AND lmr.id_member = {int:current_member})
 			WHERE t.id_board IN ({array_int:boards})' . ($this->_showing_all_topics && !empty($this->_earliest_msg) ? '
 				AND t.id_last_msg > {int:earliest_msg}' : (!$this->_showing_all_topics && $is_first_login ? '
@@ -201,43 +200,25 @@ class Unread
 	 */
 	private function _countUnreadReplies()
 	{
-		if (!empty($this->_have_temp_table))
-		{
-			$request = $this->_db->fetchQuery('
-				SELECT 
-					COUNT(*)
-				FROM {db_prefix}topics_posted_in AS pi
-					LEFT JOIN {db_prefix}log_topics_posted_in AS lt ON (lt.id_topic = pi.id_topic)
-				WHERE pi.id_board IN ({array_int:boards})
-					AND COALESCE(lt.id_msg, pi.id_msg) < pi.id_last_msg',
-				array_merge($this->_query_parameters, array())
-			);
-			list ($this->_num_topics) = $request->fetch_row();
-			$request->free_result();
-			$this->_min_message = 0;
-		}
-		else
-		{
-			$request = $this->_db->fetchQuery('
-				SELECT 
-					COUNT(DISTINCT t.id_topic), MIN(t.id_last_msg)
-				FROM {db_prefix}topics AS t
-					INNER JOIN {db_prefix}messages AS m ON (m.id_topic = t.id_topic)
-					LEFT JOIN {db_prefix}log_topics AS lt ON (lt.id_topic = t.id_topic AND lt.id_member = {int:current_member})
-					LEFT JOIN {db_prefix}log_mark_read AS lmr ON (lmr.id_board = t.id_board AND lmr.id_member = {int:current_member})
-				WHERE t.id_board IN ({array_int:boards})
-					AND m.id_member = {int:current_member}
-					AND COALESCE(lt.id_msg, lmr.id_msg, 0) < t.id_last_msg' . ($this->_post_mod ? '
-					AND t.approved = {int:is_approved}' : '') . ($this->_unwatch ? '
-					AND COALESCE(lt.unwatched, 0) != 1' : ''),
-				array_merge($this->_query_parameters, array(
-					'current_member' => $this->_user_id,
-					'is_approved' => 1,
-				))
-			);
-			list ($this->_num_topics, $this->_min_message) = $request->fetch_row();
-			$request->free_result();
-		}
+		$request = $this->_db->fetchQuery('
+			SELECT 
+				COUNT(DISTINCT t.id_topic), MIN(t.id_last_msg)
+			FROM {db_prefix}topics AS t
+				INNER JOIN {db_prefix}messages AS m ON (m.id_topic = t.id_topic)
+				LEFT JOIN {db_prefix}log_topics AS lt ON (lt.id_topic = t.id_topic AND lt.id_member = {int:current_member})
+				LEFT JOIN {db_prefix}log_mark_read AS lmr ON (lmr.id_board = t.id_board AND lmr.id_member = {int:current_member})
+			WHERE t.id_board IN ({array_int:boards})
+				AND m.id_member = {int:current_member}
+				AND COALESCE(lt.id_msg, lmr.id_msg, 0) < t.id_last_msg' . ($this->_post_mod ? '
+				AND t.approved = {int:is_approved}' : '') . ($this->_unwatch ? '
+				AND COALESCE(lt.unwatched, 0) != 1' : ''),
+			array_merge($this->_query_parameters, array(
+				'current_member' => $this->_user_id,
+				'is_approved' => 1,
+			))
+		);
+		list ($this->_num_topics, $this->_min_message) = $request->fetch_row();
+		$request->free_result();
 	}
 
 	/**
@@ -263,7 +244,7 @@ class Unread
 	}
 
 	/**
-	 * Retrieves unread topics, used in *all* unread replies with temp table and
+	 * Retrieves unread topics, used in *all* unread replies and
 	 * new posts since last visit
 	 *
 	 * @param string $join - kind of "JOIN" to execute. If 'topic' JOINs boards on
@@ -365,50 +346,30 @@ class Unread
 	 */
 	private function _getUnreadReplies($start, $limit, $include_avatars = false)
 	{
-		if (!empty($this->_have_temp_table))
-		{
-			$request = $this->_db->query('', '
-				SELECT t.id_topic
-				FROM {db_prefix}topics_posted_in AS t
-					LEFT JOIN {db_prefix}log_topics_posted_in AS lt ON (lt.id_topic = t.id_topic)
-				WHERE t.id_board IN ({array_int:boards})
-					AND COALESCE(lt.id_msg, t.id_msg) < t.id_last_msg
-				ORDER BY {raw:order}
-				LIMIT {int:offset}, {int:limit}',
-				array_merge($this->_query_parameters, array(
-					'order' => (in_array($this->_sort_query, array('t.id_last_msg', 't.id_topic')) ? $this->_sort_query : 't.sort_key') . ($this->_ascending ? '' : ' DESC'),
-					'offset' => $start,
-					'limit' => $limit,
-				))
-			);
-		}
-		else
-		{
-			$request = $this->_db->fetchQuery('
-				SELECT t.id_topic, ' . $this->_sort_query . '
-				FROM {db_prefix}topics AS t
-					INNER JOIN {db_prefix}messages AS m ON (m.id_topic = t.id_topic AND m.id_member = {int:current_member})' . (strpos($this->_sort_query, 'ms.') === false ? '' : '
-					INNER JOIN {db_prefix}messages AS ms ON (ms.id_msg = t.id_first_msg)') . (strpos($this->_sort_query, 'mems.') === false ? '' : '
-					LEFT JOIN {db_prefix}members AS mems ON (mems.id_member = ms.id_member)') . '
-					LEFT JOIN {db_prefix}log_topics AS lt ON (lt.id_topic = t.id_topic AND lt.id_member = {int:current_member})
-					LEFT JOIN {db_prefix}log_mark_read AS lmr ON (lmr.id_board = t.id_board AND lmr.id_member = {int:current_member})
-				WHERE t.id_board IN ({array_int:boards})
-					AND t.id_last_msg >= {int:min_message}
-					AND COALESCE(lt.id_msg, lmr.id_msg, 0) < t.id_last_msg' .
-				($this->_post_mod ? ' AND t.approved = {int:is_approved}' : '') .
-				($this->_unwatch ? ' AND COALESCE(lt.unwatched, 0) != 1' : '') . '
-				ORDER BY {raw:order}
-				LIMIT {int:offset}, {int:limit}',
-				array_merge($this->_query_parameters, array(
-					'current_member' => $this->_user_id,
-					'min_message' => $this->_min_message,
-					'is_approved' => 1,
-					'order' => $this->_sort_query . ($this->_ascending ? '' : ' DESC'),
-					'offset' => $start,
-					'limit' => $limit,
-				))
-			);
-		}
+		$request = $this->_db->fetchQuery('
+			SELECT t.id_topic, ' . $this->_sort_query . '
+			FROM {db_prefix}topics AS t
+				INNER JOIN {db_prefix}messages AS m ON (m.id_topic = t.id_topic AND m.id_member = {int:current_member})' . (strpos($this->_sort_query, 'ms.') === false ? '' : '
+				INNER JOIN {db_prefix}messages AS ms ON (ms.id_msg = t.id_first_msg)') . (strpos($this->_sort_query, 'mems.') === false ? '' : '
+				LEFT JOIN {db_prefix}members AS mems ON (mems.id_member = ms.id_member)') . '
+				LEFT JOIN {db_prefix}log_topics AS lt ON (lt.id_topic = t.id_topic AND lt.id_member = {int:current_member})
+				LEFT JOIN {db_prefix}log_mark_read AS lmr ON (lmr.id_board = t.id_board AND lmr.id_member = {int:current_member})
+			WHERE t.id_board IN ({array_int:boards})
+				AND t.id_last_msg >= {int:min_message}
+				AND COALESCE(lt.id_msg, lmr.id_msg, 0) < t.id_last_msg' .
+			($this->_post_mod ? ' AND t.approved = {int:is_approved}' : '') .
+			($this->_unwatch ? ' AND COALESCE(lt.unwatched, 0) != 1' : '') . '
+			ORDER BY {raw:order}
+			LIMIT {int:offset}, {int:limit}',
+			array_merge($this->_query_parameters, array(
+				'current_member' => $this->_user_id,
+				'min_message' => $this->_min_message,
+				'is_approved' => 1,
+				'order' => $this->_sort_query . ($this->_ascending ? '' : ' DESC'),
+				'offset' => $start,
+				'limit' => $limit,
+			))
+		);
 		$topics = array();
 		while (($row = $request->fetch_assoc()))
 		{

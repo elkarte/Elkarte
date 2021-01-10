@@ -139,8 +139,7 @@ $txt['agreement_backup_not_writable'] = 'Warning - the backup directory in forum
 $txt['privacypol_not_writable'] = 'Warning - privacypolicy.txt is not writable. Any changes you make will NOT be saved.';
 $txt['privacypol_backup_not_writable'] = 'Warning - the backup directory in forum_root/packages/backup cannot be created.';
 
-$txt['version_check_desc'] = 'This shows you the versions of your installation\'s files versus those of the latest version. If any of these files are out of date, you should download and upgrade to the latest version at our <a href="https://github.com/elkarte/Elkarte/wiki/downloads" target="_blank" class="new_win">ElkArte Site</a>.';
-$txt['version_check_more'] = '(more detailed)';
+$txt['version_check_more'] = 'more detailed';
 
 $txt['lfyi'] = 'You are unable to connect to ElkArte\'s latest news file.';
 
@@ -611,6 +610,8 @@ $txt['enableSpellChecking'] = 'Enable spell checking';
 $txt['enableSpellChecking_warning'] = 'this does not work on all servers.';
 $txt['enableSpellChecking_error'] = 'this does not work on your server.';
 $txt['enableVideoEmbeding'] = 'Enable auto-embedding of video links.';
+$txt['video_embed_limit'] = 'Maximum allowed embedded videos per page';
+$txt['video_embed_limit_note'] = '(0 for no limit)';
 $txt['enableCodePrettify'] = 'Enable prettifying of code tags';
 $txt['max_messageLength'] = 'Maximum allowed post size';
 $txt['max_messageLength_zero'] = '0 for no max.';
@@ -623,7 +624,7 @@ $txt['edit_disable_time_zero'] = '0 to disable';
 $txt['preview_characters'] = 'Maximum length of last/first post preview';
 $txt['preview_characters_units'] = 'characters';
 $txt['preview_characters_zero'] = '0 to show the entire message';
-$txt['message_index_preview'] = 'Show post previews on the message index';
+$txt['message_index_preview'] = 'Enable hover previews on the message index';
 $txt['message_index_preview_off'] = 'Do not show the previews';
 $txt['message_index_preview_first'] = 'Show the text of the first post';
 $txt['message_index_preview_last'] = 'Show the text of the last post';

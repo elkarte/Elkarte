@@ -250,6 +250,10 @@ function loadBoard()
 		{
 			loadPermissions();
 			new ElkArte\Themes\ThemeLoader();
+			if (!empty(User::$info->possibly_robot))
+			{
+				header('HTTP/1.1 410 Gone');
+			}
 			throw new \ElkArte\Exceptions\Exception('topic_gone', false);
 		}
 	}
@@ -490,6 +494,10 @@ function loadBoard()
 		}
 		else
 		{
+			if (!empty(User::$info->possibly_robot))
+			{
+				header('HTTP/1.1 410 Gone');
+			}
 			throw new \ElkArte\Exceptions\Exception('topic_gone', false);
 		}
 	}

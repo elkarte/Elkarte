@@ -788,9 +788,6 @@ function updateMembersPostCount($start, $increment)
 /**
  * Used to find members who have a post count >0 that should not.
  *
- * - Made more difficult since we don't yet support sub-selects on joins so we
- * place all members who have posts in the message table in a temp table
- *
  * @package Maintenance
  */
 function updateZeroPostMembers()
@@ -799,53 +796,40 @@ function updateZeroPostMembers()
 
 	$db = database();
 
-	$db->skip_next_error();
-	$createTemporary = $db->query('', '
-		CREATE TEMPORARY TABLE {db_prefix}tmp_maint_recountposts (
-			id_member mediumint(8) unsigned NOT NULL default {string:string_zero},
-			PRIMARY KEY (id_member)
-		)
+	// Sub select all member ids that have posts on post count enabled boards and
+	// right join the members table on that result with members who have a non zero
+	// post count.  result set will be members who do not exist in the sub select group.
+	$members = $db->fetchQuery('
 		SELECT 
-			m.id_member
-		FROM {db_prefix}messages AS m
-			INNER JOIN {db_prefix}boards AS b ON (m.id_board = b.id_board)
-		WHERE m.id_member != {int:zero}
-			AND b.count_posts = {int:zero}' . (!empty($modSettings['recycle_enable']) ? '
-			AND b.id_board != {int:recycle}' : '') . '
-		GROUP BY m.id_member',
-			array(
-				'zero' => 0,
-				'string_zero' => '0',
-				'recycle' => $modSettings['recycle_board'],
-			)
-		)->hasResults() !== false;
-
-	if ($createTemporary->hasResults())
-	{
-		// Outer join the members table on the temporary table finding the members that
-		// have a post count but no posts in the message table
-		$members = $db->fetchQuery('
+			mem.id_member, mem.posts
+		FROM (	
 			SELECT 
-				mem.id_member, mem.posts
-			FROM {db_prefix}members AS mem
-				LEFT OUTER JOIN {db_prefix}tmp_maint_recountposts AS res ON (res.id_member = mem.id_member)
-			WHERE res.id_member IS NULL
-				AND mem.posts != {int:zero}',
-			array(
-				'zero' => 0,
-			)
-		)->fetch_callback(
-			function ($row) {
-				// Set the post count to zero for any delinquents we may have found
-				return $row['id_member'];
-			}
-		);
-
-		if (!empty($members))
-		{
-			require_once(SUBSDIR . '/Members.subs.php');
-			updateMemberData($members, array('posts' => 0));
+				m.id_member
+			FROM {db_prefix}messages AS m
+				INNER JOIN {db_prefix}boards AS b ON (m.id_board = b.id_board)
+			WHERE m.id_member != {int:zero}
+				AND b.count_posts = {int:zero}' . (!empty($modSettings['recycle_enable']) ? '
+				AND b.id_board != {int:recycle}' : '') . '
+			GROUP BY m.id_member
+		) AS temp
+		RIGHT JOIN {db_prefix}members AS mem ON (temp.id_member = mem.id_member)
+		WHERE temp.id_member IS NULL
+			AND mem.posts != {int:zero}',
+		array(
+			'zero' => 0,
+			'recycle' => $modSettings['recycle_board']
+		)
+	)->fetch_callback(
+		function ($row) {
+			// Set the post count to zero for any delinquents we may have found
+			return $row['id_member'];
 		}
+	);
+
+	if (!empty($members))
+	{
+		require_once(SUBSDIR . '/Members.subs.php');
+		updateMemberData($members, array('posts' => 0));
 	}
 }
 

@@ -439,7 +439,7 @@ function scheduledTasks()
 		FROM {db_prefix}scheduled_tasks',
 		array()
 	)->fetch_callback(
-		function ($row, &$known_tasks) {
+		function ($row) use (&$known_tasks) {
 			global $txt;
 
 			// Find the next for regularity - don't offset as it's always server time!

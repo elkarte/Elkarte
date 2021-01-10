@@ -95,7 +95,7 @@ function toggleButtonAJAX(btn, confirmation_msg_variable, onSuccessCallback)
 					// @todo this appears to be the start of a confirmation dialog... needs finished.
 					if (typeof (confirm_text) !== 'undefined')
 					{
-						confirmation_msg_variable = confirm_text.replace(/[\\']/g, '\\$&');
+						window[confirmation_msg_variable] = confirm_text.replace(/[\\']/g, '\\$&');
 					}
 				});
 			}

@@ -134,7 +134,7 @@ class QueryAnalysis
 		// Temporary tables created in earlier queries are not explainable.
 		if ($is_select_query)
 		{
-			foreach (array('log_topics_unread', 'topics_posted_in', 'tmp_log_search_topics', 'tmp_log_search_messages') as $tmp)
+			foreach (array('tmp_log_search_topics', 'tmp_log_search_messages') as $tmp)
 			{
 				if (strpos($this->_select, $tmp) !== false)
 				{
