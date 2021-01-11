@@ -127,7 +127,7 @@ class ManageServer extends AbstractController
 	 */
 	public function action_generalSettings_display()
 	{
-		global $scripturl, $context, $txt;
+		global $context, $txt;
 
 		// Initialize the form
 		$settingsForm = new SettingsForm(SettingsForm::FILE_ADAPTER);
@@ -136,7 +136,7 @@ class ManageServer extends AbstractController
 		$settingsForm->setConfigVars($this->_generalSettings());
 
 		// Setup the template stuff.
-		$context['post_url'] = $scripturl . '?action=admin;area=serversettings;sa=general;save';
+		$context['post_url'] = getUrl('admin', ['action' => 'admin', 'area' => 'serversettings', 'sa' => 'general;save']);
 		$context['settings_title'] = $txt['general_settings'];
 
 		// Saving settings?
@@ -201,7 +201,7 @@ class ManageServer extends AbstractController
 	 */
 	public function action_databaseSettings_display()
 	{
-		global $scripturl, $context, $txt;
+		global $context, $txt;
 
 		// Initialize the form
 		$settingsForm = new SettingsForm(SettingsForm::FILE_ADAPTER);
@@ -210,7 +210,7 @@ class ManageServer extends AbstractController
 		$settingsForm->setConfigVars($this->_databaseSettings());
 
 		// Setup the template stuff.
-		$context['post_url'] = $scripturl . '?action=admin;area=serversettings;sa=database;save';
+		$context['post_url'] = getUrl('admin', ['action' => 'admin', 'area' => 'serversettings', 'sa' => 'database;save']);
 		$context['settings_title'] = $txt['database_paths_settings'];
 		$context['save_disabled'] = $context['settings_not_writable'];
 
@@ -274,7 +274,7 @@ class ManageServer extends AbstractController
 	 */
 	public function action_cookieSettings_display()
 	{
-		global $context, $scripturl, $txt, $modSettings, $cookiename, $boardurl;
+		global $context, $txt, $modSettings, $cookiename, $boardurl;
 
 		// Initialize the form
 		$settingsForm = new SettingsForm(SettingsForm::FILE_ADAPTER);
@@ -282,7 +282,7 @@ class ManageServer extends AbstractController
 		// Initialize it with our settings
 		$settingsForm->setConfigVars($this->_cookieSettings());
 
-		$context['post_url'] = $scripturl . '?action=admin;area=serversettings;sa=cookie;save';
+		$context['post_url'] = getUrl('admin', ['action' => 'admin', 'area' => 'serversettings', 'sa' => 'cookie;save']);
 		$context['settings_title'] = $txt['cookies_sessions_settings'];
 
 		// Saving settings?
@@ -380,7 +380,7 @@ class ManageServer extends AbstractController
 	 */
 	public function action_cacheSettings_display()
 	{
-		global $context, $scripturl, $txt;
+		global $context, $txt;
 
 		// Initialize the form
 		$settingsForm = new SettingsForm(SettingsForm::FILE_ADAPTER);
@@ -415,7 +415,7 @@ class ManageServer extends AbstractController
 			cache_type.addEventListener("change", toggleCache);
 			toggleCache();', true);
 
-		$context['post_url'] = $scripturl . '?action=admin;area=serversettings;sa=cache;save';
+		$context['post_url'] = getUrl('admin', ['action' => 'admin', 'area' => 'serversettings', 'sa' => 'cache;save']);
 		$context['settings_title'] = $txt['caching_settings'];
 		$context['settings_message'] = $txt['caching_information'] . '<br /><br />' . $txt['cache_settings_message'];
 
@@ -490,7 +490,7 @@ class ManageServer extends AbstractController
 	 */
 	public function action_loadavgSettings_display()
 	{
-		global $txt, $scripturl, $context;
+		global $txt, $context;
 
 		// Initialize the form
 		$settingsForm = new SettingsForm(SettingsForm::DB_ADAPTER);
@@ -500,7 +500,7 @@ class ManageServer extends AbstractController
 
 		call_integration_hook('integrate_loadavg_settings');
 
-		$context['post_url'] = $scripturl . '?action=admin;area=serversettings;sa=loads;save';
+		$context['post_url'] = getUrl('admin', ['action' => 'admin', 'area' => 'serversettings', 'sa' => 'loads;save']);
 		$context['settings_title'] = $txt['loadavg_settings'];
 
 		// Saving?

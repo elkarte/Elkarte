@@ -234,7 +234,7 @@ class ProfileAccount extends AbstractController
 			$context['notification_templates'][$k]['body'] = strtr($name['body'],
 				array(
 					'{MEMBER}' => un_htmlspecialchars($context['member']['name']),
-					'{MESSAGE}' => '[url=' . $scripturl . '?msg=' . $warning_for_message . ']' . un_htmlspecialchars($warned_message_subject) . '[/url]',
+					'{MESSAGE}' => '[url=' . getUrl('action', ['msg' => $warning_for_message]) . ']' . un_htmlspecialchars($warned_message_subject) . '[/url]',
 					'{SCRIPTURL}' => $scripturl,
 					'{FORUMNAME}' => $mbname,
 					'{REGARDS}' => replaceBasicActionUrl($txt['regards_team'])
@@ -410,14 +410,14 @@ class ProfileAccount extends AbstractController
 	 */
 	private function _create_issued_warnings_list()
 	{
-		global $txt, $scripturl, $modSettings;
+		global $txt, $modSettings;
 
 		$listOptions = array(
 			'id' => 'issued_warnings',
 			'title' => $txt['profile_viewwarning_previous_warnings'],
 			'items_per_page' => $modSettings['defaultMaxMessages'],
 			'no_items_label' => $txt['profile_viewwarning_no_warnings'],
-			'base_href' => $scripturl . '?action=profile;area=issuewarning;sa=user;u=' . $this->_memID,
+			'base_href' => getUrl('action', ['action' => 'profile', 'area' => 'issuewarning', 'sa' => 'user', 'u' => $this->_memID]),
 			'default_sort_col' => 'log_time',
 			'get_items' => array(
 				'function' => function ($start, $items_per_page, $sort) {
@@ -464,7 +464,7 @@ class ProfileAccount extends AbstractController
 					),
 					'data' => array(
 						'function' => function ($warning) {
-							global $scripturl, $txt;
+							global $txt;
 
 							$ret = '
 							<div class="floatleft">
@@ -476,7 +476,7 @@ class ProfileAccount extends AbstractController
 							{
 								$ret .= '
 							<div class="floatright">
-								<a href="' . $scripturl . '?action=moderate;area=notice;nid=' . $warning['id_notice'] . '" onclick="window.open(this.href, \'\', \'scrollbars=yes,resizable=yes,width=400,height=250\');return false;" target="_blank" class="new_win" title="' . $txt['profile_warning_previous_notice'] . '"><i class="icon icon-small i-search"></i></a>
+								<a href="' . getUrl('action', ['action' => 'moderate', 'area' => 'notice', 'nid' => $warning['id_notice']]) . '" onclick="window.open(this.href, \'\', \'scrollbars=yes,resizable=yes,width=400,height=250\');return false;" target="_blank" class="new_win" title="' . $txt['profile_warning_previous_notice'] . '"><i class="icon icon-small i-search"></i></a>
 							</div>';
 							}
 

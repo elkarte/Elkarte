@@ -121,7 +121,7 @@ class Search extends AbstractController
 	 */
 	public function action_search()
 	{
-		global $txt, $scripturl, $modSettings, $context;
+		global $txt, $modSettings, $context;
 
 		// Is the load average too high to allow searching just now?
 		if (!empty($modSettings['loadavg_search']) && $modSettings['current_load'] >= $modSettings['loadavg_search'])
@@ -144,7 +144,7 @@ class Search extends AbstractController
 
 		// Link tree....
 		$context['linktree'][] = array(
-			'url' => $scripturl . '?action=search',
+			'url' => getUrl('action', ['action' => 'search']),
 			'name' => $txt['search']
 		);
 
@@ -246,7 +246,7 @@ class Search extends AbstractController
 
 			$context['search_topic'] = array(
 				'id' => $context['search_params']['topic'],
-				'href' => $scripturl . '?topic=' . $context['search_params']['topic'] . '.0',
+				'href' => getUrl('action', ['topic' => $context['search_params']['topic'] . '.0']),
 			);
 
 			require_once(SUBSDIR . '/Topic.subs.php');
@@ -311,17 +311,18 @@ class Search extends AbstractController
 	 */
 	public function action_results()
 	{
-		global $scripturl, $modSettings, $txt, $settings;
-		global $context, $options, $messages_request;
+		global $modSettings, $txt, $settings, $context, $options, $messages_request;
 
 		// No, no, no... this is a bit hard on the server, so don't you go prefetching it!
 		stop_prefetching();
 
 		// These vars don't require an interface, they're just here for tweaking.
 		$recentPercentage = 0.30;
+
 		// Message length used to tweak messages relevance of the results
 		$humungousTopicPosts = 200;
 		$maxMembersToSearch = 500;
+
 		// Maximum number of results
 		$maxMessageResults = empty($modSettings['search_max_results']) ? 0 : $modSettings['search_max_results'] * 5;
 
@@ -409,14 +410,17 @@ class Search extends AbstractController
 		{
 			$context['search_params']['search'] = Util::htmlspecialchars($context['search_params']['search']);
 		}
+
 		if (isset($context['search_params']['userspec']))
 		{
 			$context['search_params']['userspec'] = Util::htmlspecialchars($context['search_params']['userspec']);
 		}
+
 		if (empty($context['search_params']['minage']))
 		{
 			$context['search_params']['minage'] = 0;
 		}
+
 		if (empty($context['search_params']['maxage']))
 		{
 			$context['search_params']['maxage'] = 9999;
@@ -430,12 +434,12 @@ class Search extends AbstractController
 
 		// ... and add the links to the link tree.
 		$context['linktree'][] = array(
-			'url' => $scripturl . '?action=search;params=' . $context['params'],
+			'url' => getUrl('action', ['action' => 'search', 'params' => $context['params']]),
 			'name' => $txt['search']
 		);
 
 		$context['linktree'][] = array(
-			'url' => $scripturl . '?action=search;sa=results;params=' . $context['params'],
+			'url' => getUrl('action', ['action' => 'search', 'sa' => 'results', 'params' => $context['params']]),
 			'name' => $txt['search_results']
 		);
 
@@ -471,6 +475,7 @@ class Search extends AbstractController
 				'search_index' => !empty($modSettings['search_index']) ? $modSettings['search_index'] : '',
 				'banned_words' => empty($modSettings['search_banned_words']) ? array() : explode(',', $modSettings['search_banned_words']),
 			));
+
 			$context['topics'] = $this->_search->searchQuery(
 				new SearchApiWrapper($search_config, $this->_search->getSearchParams())
 			);
@@ -523,7 +528,7 @@ class Search extends AbstractController
 		}
 
 		// Now that we know how many results to expect we can start calculating the page numbers.
-		$context['page_index'] = constructPageIndex($scripturl . '?action=search;sa=results;params=' . $context['params'], $_REQUEST['start'], $this->_search->getNumResults(), $modSettings['search_results_per_page'], false);
+		$context['page_index'] = constructPageIndex(getUrl('action', ['action' => 'search', 'sa' => 'results', 'params' => $context['params']]), $_REQUEST['start'], $this->_search->getNumResults(), $modSettings['search_results_per_page'], false);
 
 		// Consider the search complete!
 		Cache::instance()->remove('search_start:' . ($this->user->is_guest ? $this->user->ip : $this->user->id));
@@ -596,14 +601,16 @@ class Search extends AbstractController
 				$did_you_mean['display'][] = '&quot;' . Util::htmlspecialchars($word) . '&quot;';
 				continue;
 			}
+
 			// For some strange reason spell check can crash PHP on decimals.
-			elseif (preg_match('~\d~', $word) === 1)
+			if (preg_match('~\d~', $word) === 1)
 			{
 				$did_you_mean['search'][] = $word;
 				$did_you_mean['display'][] = Util::htmlspecialchars($word);
 				continue;
 			}
-			elseif (pspell_check($pspell_link, $word))
+
+			if (pspell_check($pspell_link, $word))
 			{
 				$did_you_mean['search'][] = $word;
 				$did_you_mean['display'][] = Util::htmlspecialchars($word);

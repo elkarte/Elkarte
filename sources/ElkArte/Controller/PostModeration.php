@@ -65,7 +65,7 @@ class PostModeration extends AbstractController
 	 */
 	public function action_unapproved()
 	{
-		global $txt, $scripturl, $context;
+		global $txt, $context;
 
 		$context['current_view'] = $this->_req->getQuery('sa', 'trim', '') === 'topics' ? 'topics' : 'replies';
 		$context['page_title'] = $txt['mc_unapproved_posts'];
@@ -242,7 +242,8 @@ class PostModeration extends AbstractController
 
 		$context['total_unapproved_topics'] = $mod_count['topics'];
 		$context['total_unapproved_posts'] = $mod_count['posts'];
-		$context['page_index'] = constructPageIndex($scripturl . '?action=moderate;area=postmod;sa=' . $context['current_view'] . (isset($this->_brd) ? ';brd=' . $this->_brd : ''), $this->_req->query->start, $context['current_view'] === 'topics' ? $context['total_unapproved_topics'] : $context['total_unapproved_posts'], 10);
+		$baseUrl = getUrl('action', ['action' => 'moderate', 'area' => 'postmod', 'sa' => $context['current_view']] + (isset($this->_brd) ? ['brd' => $this->_brd] : []));
+		$context['page_index'] = constructPageIndex($baseUrl,$this->_req->query->start,$context['current_view'] === 'topics' ? $context['total_unapproved_topics'] : $context['total_unapproved_posts'], 10);
 		$context['start'] = $this->_req->query->start;
 
 		// We have enough to make some pretty tabs!

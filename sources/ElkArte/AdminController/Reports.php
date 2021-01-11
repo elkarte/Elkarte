@@ -54,7 +54,7 @@ class Reports extends AbstractController
 	 */
 	public function action_index()
 	{
-		global $txt, $context, $scripturl;
+		global $txt, $context;
 
 		// Only admins, only EVER admins!
 		isAllowedTo('admin_forum');
@@ -145,14 +145,14 @@ class Reports extends AbstractController
 				'text' => 'generate_reports',
 				'image' => 'print.png',
 				'lang' => true,
-				'url' => $scripturl . '?action=admin;area=reports',
+				'url' => getUrl('admin', ['action' => 'admin', 'area' => 'reports']),
 				'active' => true,
 			),
 			'print' => array(
 				'text' => 'print',
 				'image' => 'print.png',
 				'lang' => true,
-				'url' => $scripturl . '?action=admin;area=reports;rt=' . $context['report_type'] . ';st=print',
+				'url' => getUrl('admin', ['action' => 'admin', 'area' => 'reports', 'rt' => $context['report_type'], 'st' => 'print']),
 				'custom' => 'target="_blank"',
 			),
 		);

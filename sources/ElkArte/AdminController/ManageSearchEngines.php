@@ -77,7 +77,7 @@ class ManageSearchEngines extends AbstractController
 	 */
 	public function action_engineSettings_display()
 	{
-		global $context, $txt, $scripturl;
+		global $context, $txt;
 
 		// Initialize the form
 		$settingsForm = new SettingsForm(SettingsForm::DB_ADAPTER);
@@ -87,7 +87,7 @@ class ManageSearchEngines extends AbstractController
 		$settingsForm->setConfigVars($config_vars);
 
 		// Set up a message.
-		$context['settings_message'] = sprintf($txt['spider_settings_desc'], $scripturl . '?action=admin;area=logs;sa=pruning;' . $context['session_var'] . '=' . $context['session_id']);
+		$context['settings_message'] = sprintf($txt['spider_settings_desc'], getUrl('admin', ['action' => 'admin', 'area' => 'logs', 'sa' => 'pruning', '{session_data}']));
 
 		// Make sure it's valid - note that regular members are given id_group = 1 which is reversed in Load.php - no admins here!
 		if (isset($this->_req->post->spider_group) && !isset($config_vars['spider_group'][2][$this->_req->post->spider_group]))
@@ -120,7 +120,7 @@ class ManageSearchEngines extends AbstractController
 		}
 
 		// Set up some details for the template.
-		$context['post_url'] = $scripturl . '?action=admin;area=sengines;save;sa=settings';
+		$context['post_url'] = getUrl('admin', ['action' => 'admin', 'area' => 'sengines;save', 'sa' => 'settings']);
 		$context['settings_title'] = $txt['settings'];
 
 		// Do some javascript.
@@ -203,7 +203,7 @@ class ManageSearchEngines extends AbstractController
 	 */
 	public function action_spiders()
 	{
-		global $context, $txt, $scripturl;
+		global $context, $txt;
 
 		// We'll need to do hard work here.
 		require_once(SUBSDIR . '/SearchEngines.subs.php');
@@ -217,7 +217,8 @@ class ManageSearchEngines extends AbstractController
 		// Are we adding a new one?
 		if (!empty($this->_req->post->addSpider))
 		{
-			return $this->action_editspiders();
+			$this->action_editspiders();
+			return;
 		}
 		// User pressed the 'remove selection button'.
 		elseif (!empty($this->_req->post->removeSpiders) && !empty($this->_req->post->remove) && is_array($this->_req->post->remove))
@@ -246,7 +247,7 @@ class ManageSearchEngines extends AbstractController
 			'id' => 'spider_list',
 			'title' => $txt['spiders'],
 			'items_per_page' => 20,
-			'base_href' => $scripturl . '?action=admin;area=sengines;sa=spiders',
+			'base_href' => getUrl('admin', ['action' => 'admin', 'area' => 'sengines', 'sa' => 'spiders']),
 			'default_sort_col' => 'name',
 			'get_items' => array(
 				'function' => 'getSpiders',
@@ -263,9 +264,7 @@ class ManageSearchEngines extends AbstractController
 					),
 					'data' => array(
 						'function' => function ($rowData) {
-							global $scripturl;
-
-							return sprintf('<a href="%1$s?action=admin;area=sengines;sa=editspiders;sid=%2$d">%3$s</a>', $scripturl, $rowData['id_spider'], htmlspecialchars($rowData['spider_name'], ENT_COMPAT, 'UTF-8'));
+							return sprintf('<a href=' . getUrl('admin', ['action' => 'admin', 'area' => 'sengines', 'sa' => 'editspiders', 'sid' => '%1$d']) . '">%2$s</a>', $rowData['id_spider'], htmlspecialchars($rowData['spider_name'], ENT_COMPAT, 'UTF-8'));
 						},
 					),
 					'sort' => array(
@@ -327,7 +326,7 @@ class ManageSearchEngines extends AbstractController
 				),
 			),
 			'form' => array(
-				'href' => $scripturl . '?action=admin;area=sengines;sa=spiders',
+				'href' => getUrl('admin', ['action' => 'admin', 'area' => 'sengines', 'sa' => 'spiders']),
 				'token' => 'admin-ser',
 			),
 			'additional_rows' => array(
@@ -413,7 +412,7 @@ class ManageSearchEngines extends AbstractController
 	 */
 	public function action_logs()
 	{
-		global $context, $txt, $scripturl, $modSettings;
+		global $context, $txt, $modSettings;
 
 		// Load the template and language just incase.
 		theme()->getTemplates()->loadLanguageFile('Search');
@@ -439,7 +438,7 @@ class ManageSearchEngines extends AbstractController
 			'items_per_page' => 20,
 			'title' => $txt['spider_logs'],
 			'no_items_label' => $txt['spider_logs_empty'],
-			'base_href' => $context['admin_area'] == 'sengines' ? $scripturl . '?action=admin;area=sengines;sa=logs' : $scripturl . '?action=admin;area=logs;sa=spiderlog',
+			'base_href' => $context['admin_area'] == 'sengines' ? getUrl('admin', ['action' => 'admin', 'area' => 'sengines', 'sa' => 'logs']) : getUrl('admin', ['action' => 'admin', 'area' => 'logs', 'sa' => 'spiderlog']),
 			'default_sort_col' => 'log_time',
 			'get_items' => array(
 				'function' => 'getSpiderLogs',
@@ -486,7 +485,7 @@ class ManageSearchEngines extends AbstractController
 			),
 			'form' => array(
 				'token' => 'admin-sl',
-				'href' => $scripturl . '?action=admin;area=sengines;sa=logs',
+				'href' => getUrl('admin', ['action' => 'admin', 'area' => 'sengines', 'sa' => 'logs']),
 			),
 			'additional_rows' => array(
 				array(
@@ -541,7 +540,7 @@ class ManageSearchEngines extends AbstractController
 	 */
 	public function action_stats()
 	{
-		global $context, $txt, $scripturl;
+		global $context, $txt;
 
 		// We'll need to do hard work here.
 		require_once(SUBSDIR . '/SearchEngines.subs.php');
@@ -610,7 +609,7 @@ class ManageSearchEngines extends AbstractController
 			'id' => 'spider_stat_list',
 			'title' => $txt['spider'] . ' ' . $txt['spider_stats'],
 			'items_per_page' => 20,
-			'base_href' => $scripturl . '?action=admin;area=sengines;sa=stats',
+			'base_href' => getUrl('admin', ['action' => 'admin', 'area' => 'sengines', 'sa' => 'stats']),
 			'default_sort_col' => 'stat_date',
 			'get_items' => array(
 				'function' => 'getSpiderStats',
@@ -659,7 +658,7 @@ class ManageSearchEngines extends AbstractController
 				),
 			),
 			'form' => array(
-				'href' => $scripturl . '?action=admin;area=sengines;sa=stats',
+				'href' =>getUrl('admin', ['action' => 'admin', 'area' => 'sengines', 'sa' => 'stats']),
 				'name' => 'spider_stat_list',
 			),
 			'additional_rows' => array(

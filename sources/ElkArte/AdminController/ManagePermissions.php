@@ -172,7 +172,7 @@ class ManagePermissions extends AbstractController
 	 */
 	public function action_list()
 	{
-		global $txt, $scripturl, $context, $modSettings;
+		global $txt, $context, $modSettings;
 
 		require_once(SUBSDIR . '/Membergroups.subs.php');
 		require_once(SUBSDIR . '/Members.subs.php');
@@ -181,10 +181,7 @@ class ManagePermissions extends AbstractController
 		$context['page_title'] = $txt['permissions_title'];
 
 		// pid = profile id
-		if (!empty($this->_req->query->pid))
-		{
-			$this->_pid = (int) $this->_req->query->pid;
-		}
+		$this->_pid = $this->_req->getQuery('pid', 'intval', null);
 
 		// We can modify any permission set apart from the read only, reply only and no polls ones as they are redefined.
 		$context['can_modify'] = empty($this->_pid) || $this->_pid == 1 || $this->_pid > 4;
@@ -198,7 +195,7 @@ class ManagePermissions extends AbstractController
 		$listOptions = array(
 			'id' => 'regular_membergroups_list',
 			'title' => $txt['membergroups_regular'],
-			'base_href' => $scripturl . '?action=admin;area=permissions;sa=index' . (isset($this->_req->query->sort2) ? ';sort2=' . urlencode($this->_req->query->sort2) : '') . (isset($this->_pid) ? ';pid=' . $this->_pid : ''),
+			'base_href' => getUrl('admin', ['action' => 'admin', 'area' => 'permissions', 'sa' => 'index'] + (isset($this->_req->query->sort2) ? ['sort2' => $this->_req->query->sort2] : []) + (isset($this->_pid) ? ['pid' => $this->_pid] : [])),
 			'default_sort_col' => 'name',
 			'get_items' => array(
 				'file' => SUBSDIR . '/Membergroups.subs.php',
@@ -352,7 +349,7 @@ class ManagePermissions extends AbstractController
 			$listOptions = array(
 				'id' => 'post_count_membergroups_list',
 				'title' => $txt['membergroups_post'],
-				'base_href' => $scripturl . '?action=admin;area=permissions;sa=index' . (isset($this->_req->query->sort2) ? ';sort2=' . urlencode($this->_req->query->sort2) : '') . (isset($this->_pid) ? ';pid=' . $this->_pid : ''),
+				'base_href' => getUrl('admin', ['action' => 'admin', 'area' => 'permissions', 'sa' => 'index'] + (isset($this->_req->query->sort) ? ['sort' => $this->_req->query->sort] : []) + (isset($this->_pid) ? ['pid' => $this->_pid] : [])),
 				'default_sort_col' => 'required_posts',
 				'request_vars' => array(
 					'sort' => 'sort2',
