@@ -18,6 +18,7 @@
  */
 
 use BBC\ParserWrapper;
+use ElkArte\AttachmentsDirectory;
 use ElkArte\Util;
 
 /**
@@ -317,10 +318,8 @@ function removeAttachments($condition, $query_type = '', $return_affected_messag
 	{
 		return array_unique($msgs);
 	}
-	else
-	{
-		return true;
-	}
+
+	return true;
 }
 
 /**
@@ -1293,12 +1292,12 @@ function list_getAttachDirs()
 		// If it is one, let's show that it's a base directory.
 		$sub_dirs = 0;
 		$is_base_dir = false;
-		if ($attachmentDirectory->hasBaseDir())
+		if ($attachmentsDir->hasBaseDir())
 		{
-			$is_base_dir = $attachmentDirectory->hasBaseDir($dir);
+			$is_base_dir = $attachmentsDir->hasBaseDir($dir);
 
 			// Count any sub-folders.
-			$sub_dirs = $attachmentDirectory->countSubdirs($dir);
+			$sub_dirs = $attachmentsDir->countSubdirs($dir);
 			$expected_files[$id] += $sub_dirs;
 		}
 
@@ -1318,7 +1317,7 @@ function list_getAttachDirs()
 	if (isset($_REQUEST['new_path']))
 	{
 		$attachdirs[] = array(
-			'id' => max(array_merge(array_keys($expected_files), array_keys($attachmentDirectory->getPaths()))) + 1,
+			'id' => max(array_merge(array_keys($expected_files), array_keys($attachmentsDir->getPaths()))) + 1,
 			'current' => false,
 			'path' => '',
 			'current_size' => '',

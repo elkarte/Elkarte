@@ -24,9 +24,7 @@ use ElkArte\Http\FsockFetchWebdata;
 use ElkArte\TemporaryAttachment;
 use ElkArte\TokenHash;
 use ElkArte\User;
-use ElkArte\Util;
 use ElkArte\AttachmentsDirectory;
-use ElkArte\Exceptions\Exception as ElkException;
 use ElkArte\TemporaryAttachmentsList;
 
 /**
@@ -40,7 +38,6 @@ use ElkArte\TemporaryAttachmentsList;
  * @param int|null $id_msg = null or id of the message with attachments, if any.
  *                  If null, this is an upload in progress for a new post.
  * @return bool
- * @throws \ElkArte\Exceptions\Exception
  * @package Attachments
  */
 function processAttachments($id_msg = null)
@@ -84,7 +81,7 @@ function processAttachments($id_msg = null)
 		}
 	}
 
-	// There are files in session, likely already processed
+	// There are files in session (temporary attachments list), likely already processed
 	$ignore_temp = false;
 	if ($tmp_attachments->getPostParam('files') !== null && $tmp_attachments->hasAttachments())
 	{
@@ -137,7 +134,7 @@ function processAttachments($id_msg = null)
 		// And delete the files 'cos they ain't going nowhere.
 		foreach ($_FILES['attachment']['tmp_name'] as $n => $dummy)
 		{
-			if (file_exists($_FILES['attachment']['tmp_name'][$n]))
+			if (is_writable(['attachment']['tmp_name'][$n]))
 			{
 				unlink($_FILES['attachment']['tmp_name'][$n]);
 			}
@@ -157,11 +154,12 @@ function processAttachments($id_msg = null)
 		// First, let's first check for PHP upload errors.
 		$errors = attachmentUploadChecks($n);
 
+		$tokenizer = new TokenHash();
 		$temp_file = new TemporaryAttachment([
 			'name' => basename($_FILES['attachment']['name'][$n]),
 			'tmp_name' => $_FILES['attachment']['tmp_name'][$n],
-			'attachid' => $tmp_attachments->getTplName(User::$info->id, bin2hex(random_bytes(16))),
-			'public_attachid' => $tmp_attachments->getTplName(User::$info->id, bin2hex(random_bytes(16))),
+			'attachid' => $tmp_attachments->getTplName(User::$info->id, $tokenizer->generate_hash(16)),
+			'public_attachid' => $tmp_attachments->getTplName(User::$info->id, $tokenizer->generate_hash(16)),
 			'user_id' => User::$info->id,
 			'size' => $_FILES['attachment']['size'][$n],
 			'type' => $_FILES['attachment']['type'][$n],
@@ -182,7 +180,7 @@ function processAttachments($id_msg = null)
 
 		$temp_file->doChecks($attachmentDirectory);
 
-		// Want to correct for phonetographer photos?
+		// Want to correct for phone rotated photos, hell yeah ya do!
 		if (!empty($modSettings['attachment_autorotate']))
 		{
 			$temp_file->autoRotate();
@@ -244,7 +242,6 @@ function processAttachments($id_msg = null)
  *
  * @return array
  * @package Attachments
- * @throws \Exception
  */
 function attachmentUploadChecks($attachID)
 {
@@ -255,29 +252,33 @@ function attachmentUploadChecks($attachID)
 	// Did PHP create any errors during the upload processing of this file?
 	if (!empty($_FILES['attachment']['error'][$attachID]))
 	{
-		// (1) The file exceeds the max_filesize directive in php.ini
-		// (2) The uploaded file exceeds the MAX_FILE_SIZE directive in the HTML form.
-		if ($_FILES['attachment']['error'][$attachID] == 1
-			|| $_FILES['attachment']['error'][$attachID] == 2)
+		switch ($_FILES['attachment']['error'][$attachID])
 		{
-			$errors[] = array('file_too_big', array($modSettings['attachmentSizeLimit']));
-		}
-		// Missing or a full a temp directory on the server
-		elseif ($_FILES['attachment']['error'][$attachID] == 6)
-		{
-			\ElkArte\Errors\Errors::instance()->log_error($_FILES['attachment']['name'][$attachID] . ': ' . $txt['php_upload_error_6'], 'critical');
-		}
-		// One of many errors such as (3)partially uploaded, (4)empty file,
-		else
-		{
-			\ElkArte\Errors\Errors::instance()->log_error($_FILES['attachment']['name'][$attachID] . ': ' . $txt['php_upload_error_' . $_FILES['attachment']['error'][$attachID]]);
-		}
-
-		// If we did not set an user error (3,4,6,7,8) to show then give them a generic one as
-		// there is no need to provide back specifics of a server error, those are logged
-		if (empty($errors))
-		{
-			$errors[] = 'attach_php_error';
+			case 1:
+			case 2:
+				// 1 The file exceeds the max_filesize directive in php.ini
+				// 2 The uploaded file exceeds the MAX_FILE_SIZE directive in the HTML form.
+				$errors[] = array('file_too_big', array($modSettings['attachmentSizeLimit']));
+				break;
+			case 3:
+			case 4:
+			case 8:
+				// 3 partially uploaded
+				// 4 no file uploaded
+				// 8 upload blocked by extension
+				\ElkArte\Errors\Errors::instance()->log_error($_FILES['attachment']['name'][$attachID] . ': ' . $txt['php_upload_error_' . $_FILES['attachment']['error'][$attachID]]);
+				$errors[] = 'attach_php_error';
+				break;
+			case 6:
+			case 7:
+				// 6 Missing or a full a temp directory on the server
+				// 7 Failed to write file
+				\ElkArte\Errors\Errors::instance()->log_error($_FILES['attachment']['name'][$attachID] . ': ' . $txt['php_upload_error_' . $_FILES['attachment']['error'][$attachID]], 'critical');
+				$errors[] = 'attach_php_error';
+				break;
+			default:
+				\ElkArte\Errors\Errors::instance()->log_error($_FILES['attachment']['name'][$attachID] . ': ' . $txt['php_upload_error_' . $_FILES['attachment']['error'][$attachID]]);
+				$errors[] = 'attach_php_error';
 		}
 	}
 
@@ -297,7 +298,6 @@ function attachmentUploadChecks($attachID)
  *
  * @return bool
  * @package Attachments
- * @throws \ElkArte\Exceptions\Exception
  */
 function createAttachment(&$attachmentOptions)
 {
@@ -319,10 +319,11 @@ function createAttachment(&$attachmentOptions)
 	if ($is_image)
 	{
 		$attachmentOptions['mime_type'] = getValidMimeImageType($size[2]);
+
 		// Want to correct for phonetographer photos?
 		if (!empty($modSettings['attachment_autorotate']))
 		{
-			$image->autoRotate();
+			$image->autoRotateImage();
 		}
 	}
 
@@ -389,7 +390,8 @@ function createAttachment(&$attachmentOptions)
 	}
 
 	// Like thumbnails, do we?
-	if (!empty($modSettings['attachmentThumbWidth']) && !empty($modSettings['attachmentThumbHeight']) && ($attachmentOptions['width'] > $modSettings['attachmentThumbWidth'] || $attachmentOptions['height'] > $modSettings['attachmentThumbHeight']))
+	if (!empty($modSettings['attachmentThumbWidth']) && !empty($modSettings['attachmentThumbHeight'])
+		&& ($attachmentOptions['width'] > $modSettings['attachmentThumbWidth'] || $attachmentOptions['height'] > $modSettings['attachmentThumbHeight']))
 	{
 		$thumb_filename = $attachmentOptions['name'] . '_thumb';
 		$thumb_path = $attachmentOptions['destination'] . '_thumb';
@@ -465,7 +467,6 @@ function createAttachment(&$attachmentOptions)
  *
  * @return array
  * @package Attachments
- * @throws \Exception
  */
 function getAvatar($id_attach)
 {
@@ -475,31 +476,29 @@ function getAvatar($id_attach)
 	$cache = array();
 	if (Cache::instance()->getVar($cache, 'getAvatar_id-' . $id_attach))
 	{
-		$avatarData = $cache;
+		return $cache;
 	}
-	else
-	{
-		$avatarData = array();
-		$db->fetchQuery('
-			SELECT 
-				id_folder, filename, file_hash, fileext, id_attach, attachment_type,
-				mime_type, approved, id_member
-			FROM {db_prefix}attachments
-			WHERE id_attach = {int:id_attach}
-				AND id_member > {int:blank_id_member}
-			LIMIT 1',
-			array(
-				'id_attach' => $id_attach,
-				'blank_id_member' => 0,
-			)
-		)->fetch_callback(
-			function ($row) use (&$avatarData) {
-				$avatarData = $row;
-			}
-		);
 
-		Cache::instance()->put('getAvatar_id-' . $id_attach, $avatarData, 900);
-	}
+	$avatarData = array();
+	$db->fetchQuery('
+		SELECT 
+			id_folder, filename, file_hash, fileext, id_attach, attachment_type,
+			mime_type, approved, id_member
+		FROM {db_prefix}attachments
+		WHERE id_attach = {int:id_attach}
+			AND id_member > {int:blank_id_member}
+		LIMIT 1',
+		array(
+			'id_attach' => $id_attach,
+			'blank_id_member' => 0,
+		)
+	)->fetch_callback(
+		function ($row) use (&$avatarData) {
+			$avatarData = $row;
+		}
+	);
+
+	Cache::instance()->put('getAvatar_id-' . $id_attach, $avatarData, 900);
 
 	return $avatarData;
 }
@@ -768,10 +767,11 @@ function saveAvatar($temporary_path, $memID, $max_width, $max_height)
 
 	// Resize it.
 	$image = new Image($temporary_path);
-	// Want to correct for phonetographer photos?
+
+	// Want to correct for rotated photos?
 	if (!empty($modSettings['attachment_autorotate']))
 	{
-		$image->autoRotate();
+		$image->autoRotateImage();
 	}
 	$thumb_image = $image->createThumbnail($max_width, $max_height, $destName, $format);
 	if ($thumb_image !== false)
@@ -782,8 +782,8 @@ function saveAvatar($temporary_path, $memID, $max_width, $max_height)
 		// Write filesize in the database.
 		$db->query('', '
 			UPDATE {db_prefix}attachments
-			SET size = {int:filesize}, width = {int:width}, height = {int:height},
-				mime_type = {string:mime_type}
+			SET 
+				size = {int:filesize}, width = {int:width}, height = {int:height}, mime_type = {string:mime_type}
 			WHERE id_attach = {int:current_attachment}',
 			array(
 				'filesize' => $thumb_image->getFilesize(),
@@ -1086,11 +1086,11 @@ function getServerStoredAvatars($directory)
 /**
  * Update an attachment's thumbnail
  *
- * @param string $filename
- * @param int $id_attach
- * @param int $id_msg
- * @param int $old_id_thumb = 0
- * @param string $real_filename
+ * @param string $filename the actual name of the file
+ * @param int $id_attach the numeric attach id
+ * @param int $id_msg the numeric message the attachment is associated with
+ * @param int $old_id_thumb = 0 id of thumbnail to remove, such as from our post form
+ * @param string $real_filename the fully qualified hash name of where the file is
  * @return array The updated information
  * @throws \ElkArte\Exceptions\Exception
  * @package Attachments
@@ -1101,11 +1101,14 @@ function updateAttachmentThumbnail($filename, $id_attach, $id_msg, $old_id_thumb
 
 	$attachment = array('id_attach' => $id_attach);
 
+	// Load our image functions, it will determine which graphics library to use
 	$image = new Image($filename);
+
 	// Image is not autorotated because it was at the time of upload (hopefully)
 	$thumb_filename = (!empty($real_filename) ? $real_filename : $filename) . '_thumb';
-	$thumb_image = $image->createThumbnail($modSettings['attachmentThumbWidth'], $modSettings['attachmentThumbHeight'], $thumb_filename);
-	if ($thumb_image !== false)
+	$thumb_image = $image->createThumbnail($modSettings['attachmentThumbWidth'], $modSettings['attachmentThumbHeight']);
+
+	if ($thumb_image instanceof Image)
 	{
 		// So what folder are we putting this image in?
 		$attachmentsDir = new AttachmentsDirectory($modSettings, database());
@@ -1116,15 +1119,13 @@ function updateAttachmentThumbnail($filename, $id_attach, $id_msg, $old_id_thumb
 		list ($attachment['thumb_width'], $attachment['thumb_height']) = $size;
 		$thumb_size = $thumb_image->getFilesize();
 
-		// Figure out the mime type.
+		// Figure out the mime type and other details
 		$thumb_mime = getValidMimeImageType($size[2]);
 		$thumb_ext = substr($thumb_mime, strpos($thumb_mime, '/') + 1);
-
 		$thumb_hash = getAttachmentFilename($thumb_filename, 0, null, true);
 
-		$db = database();
-
 		// Add this beauty to the database.
+		$db = database();
 		$db->insert('',
 			'{db_prefix}attachments',
 			array('id_folder' => 'int', 'id_msg' => 'int', 'attachment_type' => 'int', 'filename' => 'string-255', 'file_hash' => 'string-40', 'size' => 'int', 'width' => 'int', 'height' => 'int', 'fileext' => 'string-8', 'mime_type' => 'string-255'),
@@ -1146,7 +1147,10 @@ function updateAttachmentThumbnail($filename, $id_attach, $id_msg, $old_id_thumb
 			);
 
 			$thumb_realname = getAttachmentFilename($thumb_filename, $attachment['id_thumb'], $id_folder_thumb, false, $thumb_hash);
-			rename($filename . '_thumb', $thumb_realname);
+			if (file_exists($filename . '_thumb'))
+			{
+				rename($filename . '_thumb', $thumb_realname);
+			}
 
 			// Do we need to remove an old thumbnail?
 			if (!empty($old_id_thumb))
@@ -1284,7 +1288,7 @@ function loadAttachmentContext($id_msg)
 			{
 				$attachmentData[$i]['thumbnail'] = array(
 					'id' => $attachment['id_thumb'],
-					'href' => $scripturl . '?action=dlattach;topic=' . $topic . '.0;attach=' . $attachment['id_thumb'] . ';image',
+					'href' => getUrl('action', ['action' => 'dlattach', 'topic' => $topic . '.0', 'attach' => $attachment['id_thumb'] . ';image']),
 				);
 			}
 			$attachmentData[$i]['thumbnail']['has_thumb'] = !empty($attachment['id_thumb']);
@@ -1354,7 +1358,6 @@ function loadAttachmentContext($id_msg)
  *
  * @return null|string|string[]
  * @package Attachments
- * @throws \Exception
  */
 function getLegacyAttachmentFilename($filename, $attachment_id, $dir = null, $new = false)
 {
@@ -1391,7 +1394,6 @@ function getLegacyAttachmentFilename($filename, $attachment_id, $dir = null, $ne
  * @param int $id_msg
  * @param int[] $attachment_ids
  * @package Attachments
- * @throws \ElkArte\Exceptions\Exception
  */
 function bindMessageAttachments($id_msg, $attachment_ids)
 {
@@ -1458,7 +1460,6 @@ function getAttachmentFilename($filename, $attachment_id, $dir = null, $new = fa
  * @param int $id_attach
  * @return int[]|bool on fail else an array of id_board, id_topic
  * @package Attachments
- * @throws \Exception
  */
 function getAttachmentPosition($id_attach)
 {
@@ -1517,7 +1518,6 @@ function elk_getimagesize($file, $error = 'array')
  * @param bool $url
  *
  * @return bool|string
- * @throws \Exception
  */
 function returnMimeThumb($file_ext, $url = false)
 {
