@@ -24,15 +24,17 @@ use ElkArte\Graphics\TextImage;
 use ElkArte\Graphics\Image;
 use ElkArte\AttachmentsDirectory;
 use ElkArte\TemporaryAttachmentsList;
+use ElkArte\Themes\ThemeLoader;
 use ElkArte\User;
 
 /**
+ * Everything to do with attachment handling / processing
  *
  * What it does:
  *
  * - Handles the downloading of an attachment or avatar
  * - Handles the uploading of attachments via Ajax
- * - increments the download count where applicable
+ * - Increments the download count where applicable
  *
  * @package Attachments
  */
@@ -58,7 +60,7 @@ class Attachment extends AbstractController
 
 			return $sa === 'ulattach' || $sa === 'rmattach';
 		}
-		// else... politely kick him (or her).
+		// else... politely kick them out
 		else
 		{
 			return true;
@@ -269,6 +271,8 @@ class Attachment extends AbstractController
 	 * - It is accessed via the query string ?action=dlattach.
 	 * - Views to attachments and avatars do not increase hits and are not logged
 	 *   in the "Who's Online" log.
+	 *
+	 * @throws \ElkArte\Exceptions\Exception
 	 */
 	public function action_dlattach()
 	{
@@ -281,7 +285,8 @@ class Attachment extends AbstractController
 		// Make sure some attachment was requested!
 		if (!isset($this->_req->query->attach) && !isset($this->_req->query->id))
 		{
-			return $this->action_no_attach();
+			// Give them the old can't find it image
+			$this->action_no_attach();
 		}
 
 		// We need to do some work on attachments and avatars.
@@ -290,17 +295,11 @@ class Attachment extends AbstractController
 		// Temporary attachment, special case...
 		if (isset($this->_req->query->attach) && strpos($this->_req->query->attach, 'post_tmp_' . $this->user->id . '_') !== false)
 		{
+			// Return via tmpattach, back presumably to the post form
 			$this->action_tmpattach();
-
-			return;
-		}
-		else
-		{
-			$id_attach = isset($this->_req->query->attach)
-				? (int) $this->_req->query->attach
-				: (int) $this->_req->query->id;
 		}
 
+		$id_attach = $this->_req->getQuery('attach', 'intval', $this->_req->getQuery('id', 'intval', 0));
 		if ($this->_req->getQuery('type') === 'avatar')
 		{
 			$attachment = getAvatar($id_attach);
@@ -360,7 +359,6 @@ class Attachment extends AbstractController
 					else
 					{
 						$attachmentsDir = new AttachmentsDirectory($modSettings, database());
-
 						$filename = $attachmentsDir->getCurrent() . '/' . $attachment[1];
 					}
 
@@ -370,14 +368,14 @@ class Attachment extends AbstractController
 						$attachment[6] = 'image/png';
 						$filename = $settings['theme_dir'] . '/images/mime_images/default.png';
 					}
-
 				}
 			}
 		}
 
 		if (empty($attachment))
 		{
-			return $this->action_no_attach();
+			// Exit via no_attach
+			$this->action_no_attach();
 		}
 
 		list ($id_folder, $real_filename, $file_hash, $file_ext, $id_attach, $attachment_type, $mime_type, $is_approved, $id_member) = $attachment;
@@ -385,7 +383,7 @@ class Attachment extends AbstractController
 		// If it isn't yet approved, do they have permission to view it?
 		if (!$is_approved && ($id_member == 0 || $this->user->id !== $id_member) && ($attachment_type == 0 || $attachment_type == 3))
 		{
-			isAllowedTo('approve_posts', $id_board);
+			isAllowedTo('approve_posts', $id_board ?? $board);
 		}
 
 		// Update the download counter (unless it's a thumbnail or an avatar).
@@ -450,7 +448,7 @@ class Attachment extends AbstractController
 	}
 
 	/**
-	 * Generates a language image based on text for display.
+	 * Generates a language image based on text for display, outputs image and exits
 	 *
 	 * @param null|string $text
 	 * @throws \ElkArte\Exceptions\Exception
@@ -461,21 +459,24 @@ class Attachment extends AbstractController
 
 		if ($text === null)
 		{
+			new ThemeLoader();
 			theme()->getTemplates()->loadLanguageFile('Errors');
 			$text = $txt['attachment_not_found'];
 		}
 
-		$this->_send_headers('no_image', 'no_image', 'image/png', false, 'inline', 'no_image.png', true, false);
-
-		$img = new TextImage($text);
-		$img = $img->generate(200);
-
-		if ($img === false)
+		try
+		{
+			$img = new TextImage($text);
+			$img = $img->generate(200);
+		}
+		catch (\Exception $e)
 		{
 			throw new Exception('no_access', false);
 		}
 
+		$this->_send_headers('no_image', 'no_image', 'image/png', false, 'inline', 'no_image.png', true, false);
 		echo $img;
+
 		obExit(false);
 	}
 
@@ -597,7 +598,7 @@ class Attachment extends AbstractController
 		// Make sure some attachment was requested!
 		if (!isset($this->_req->query->attach))
 		{
-			return $this->action_no_attach();
+			$this->action_no_attach();
 		}
 
 		// We need to do some work on attachments and avatars.
@@ -622,10 +623,10 @@ class Attachment extends AbstractController
 
 				isAllowedTo('view_attachments');
 				$attachment = getAttachmentFromTopic($id_attach, $topic);
-
 				if (empty($attachment))
 				{
-					return $this->action_no_attach();
+					// Exit via no_attach
+					$this->action_no_attach();
 				}
 
 				list ($id_folder, $real_filename, $file_hash, $file_ext, $id_attach, $attachment_type, $mime_type, $is_approved, $id_member) = $attachment;
@@ -643,6 +644,7 @@ class Attachment extends AbstractController
 		{
 			throw new Exception($e->getMessage(), false);
 		}
+
 		$resize = true;
 
 		// Return mime type ala mimetype extension
@@ -665,23 +667,21 @@ class Attachment extends AbstractController
 		{
 			// Create a thumbnail image and write it directly to the screen
 			$image = new Image($filename);
-			// Maybe overkill, but want to correct for phonetographer photos?
-			if (!empty($modSettings['attachment_autorotate']))
-			{
-				$image->autoRotate();
-			}
+
 			$thumb_filename = $filename . '_thumb';
 			$thumb_image = $image->createThumbnail(100, 100, $thumb_filename);
-		}
 
-		if (!$use_compression)
-		{
-			header('Content-Length: ' . $thumb_image->getFilesize());
-		}
+			if (!$use_compression)
+			{
+				header('Content-Length: ' . $thumb_image->getFilesize());
+			}
 
-		if (@readfile($thumb_filename) === null)
-		{
-			echo file_get_contents($thumb_filename);
+			if (@readfile($thumb_filename) === null)
+			{
+				echo file_get_contents($thumb_filename);
+			}
+
+
 		}
 
 		obExit(false);
