@@ -1,7 +1,7 @@
 <?php
 
 /**
- *
+ * Handles the preparing of attachments from the post form.
  *
  * @package   ElkArte Forum
  * @copyright ElkArte Forum contributors
@@ -13,7 +13,6 @@
 
 namespace ElkArte;
 
-use ElkArte\ValuesContainer;
 use ElkArte\Exceptions\Exception as ElkException;
 use ElkArte\Graphics\Image;
 
@@ -34,30 +33,43 @@ class TemporaryAttachment extends ValuesContainer
 	}
 
 	/**
-	 * Deletes a temporary attachment from the $_SESSION (and the filesystem)
+	 * Deletes a temporary attachment from the filesystem
 	 *
 	 * @param bool $fatal
-	 * @throws \Exception
 	 */
 	public function remove($fatal = true)
 	{
 		$this->data['size'] = 0;
 		$this->data['type'] = '';
 
-		if ($fatal && !file_exists($this->data['tmp_name']))
+		if ($fatal && !$this->fileWritable())
 		{
 			throw new \Exception('attachment_not_found');
 		}
 
-		@unlink($this->data['tmp_name']);
+		try
+		{
+			if (!$this->fileWritable())
+			{
+				throw new \Exception('attachment_not_found');
+			}
+
+			unlink($this->data['tmp_name']);
+		}
+		catch (\Exception $e)
+		{
+			return false;
+		}
+
+		return true;
 	}
 
 	/**
-	 * Checks if the file exists in the file system.
+	 * Checks if the file exists, and is editable, in the file system.
 	 */
-	public function fileExists()
+	public function fileWritable()
 	{
-		return file_exists($this->data['tmp_name']);
+		return is_writable($this->data['tmp_name']);
 	}
 
 	/**
@@ -100,11 +112,21 @@ class TemporaryAttachment extends ValuesContainer
 		return $this->data['errors'];
 	}
 
+	/**
+	 * Return the attachment filesize
+	 *
+	 * @return int
+	 */
 	public function getSize()
 	{
 		return $this->data['size'];
 	}
 
+	/**
+	 * Renaming and moving
+	 *
+	 * @param $file_path
+	 */
 	public function moveTo($file_path)
 	{
 		rename($this->data['tmp_name'], $file_path . '/' . $this->data['attachid']);
@@ -130,7 +152,7 @@ class TemporaryAttachment extends ValuesContainer
 		else
 		{
 			$this->setErrors('attach_timeout');
-			if (file_exists($this->data['tmp_name']))
+			if ($this->fileWritable())
 			{
 				unlink($this->data['tmp_name']);
 			}
@@ -146,13 +168,12 @@ class TemporaryAttachment extends ValuesContainer
 	 * Performs various checks on an uploaded file.
 	 *
 	 * @param \ElkArte\AttachmentsDirectory $attachmentDirectory
-	 * @return bool
 	 * @throws \ElkArte\Exceptions\Exception attach_check_nag
-	 *
+	 * @return bool
 	 */
 	public function doChecks($attachmentDirectory)
 	{
-		global $modSettings, $context;
+		global $context;
 
 		// If there were already errors at this point, no need to check further
 		if (!empty($this->data['errors']))
@@ -185,95 +206,13 @@ class TemporaryAttachment extends ValuesContainer
 			return false;
 		}
 
-		// First, the dreaded security check. Sorry folks, but this should't be avoided
-		$image = new Image($this->data['tmp_name']);
-		$size = $image->getSize();
-		$valid_mime = getValidMimeImageType($size[2]);
-
-		if ($valid_mime !== '')
-		{
-			if (!$image->checkImageContents())
-			{
-				// It's bad. Last chance, maybe we can re-encode it?
-				if (empty($modSettings['attachment_image_reencode']) || (!$image->reencodeImage()))
-				{
-					// Nothing to do: not allowed or not successful re-encoding it.
-					$this->setErrors('bad_attachment');
-
-					return false;
-				}
-				else
-				{
-					$this->data['size'] = $image->getFilesize();
-				}
-			}
-		}
-
-		try
-		{
-			$attachmentDirectory->checkDirSpace($this);
-		}
-		catch (\Exception $e)
-		{
-			$this->setErrors($e->getMessage());
-		}
-
-		// Is the file too big?
-		if (!empty($modSettings['attachmentSizeLimit']) && $this->data['size'] > $modSettings['attachmentSizeLimit'] * 1024)
-		{
-			$this->setErrors([
-				'file_too_big', [
-					comma_format($modSettings['attachmentSizeLimit'], 0)
-				]
-			]);
-		}
-
-		// Check the total upload size for this post...
-		$context['attachments']['total_size'] += $this->data['size'];
-		if (!empty($modSettings['attachmentPostLimit']) && $context['attachments']['total_size'] > $modSettings['attachmentPostLimit'] * 1024)
-		{
-			$this->setErrors([
-				'attach_max_total_file_size', [
-					comma_format($modSettings['attachmentPostLimit'], 0),
-					comma_format($modSettings['attachmentPostLimit'] - (($context['attachments']['total_size'] - $this->data['size']) / 1024), 0)
-				]
-			]);
-		}
-
-		// Have we reached the maximum number of files we are allowed?
-		$context['attachments']['quantity']++;
-
-		// Set a max limit if none exists
-		if (empty($modSettings['attachmentNumPerPostLimit']) && $context['attachments']['quantity'] >= 15)
-		{
-			$modSettings['attachmentNumPerPostLimit'] = 15;
-		}
-
-		if (!empty($modSettings['attachmentNumPerPostLimit']) && $context['attachments']['quantity'] > $modSettings['attachmentNumPerPostLimit'])
-		{
-			$this->setErrors([
-				'attachments_limit_per_post', [
-					$modSettings['attachmentNumPerPostLimit']
-				]
-			]);
-		}
-
-		// File extension check
-		if (!empty($modSettings['attachmentCheckExtensions']))
-		{
-			$allowed = explode(',', strtolower($modSettings['attachmentExtensions']));
-			$allowed = array_map('trim', $allowed);
-
-			if (!in_array(strtolower(substr(strrchr($this->data['name'], '.'), 1)), $allowed))
-			{
-				$allowed_extensions = strtr(strtolower($modSettings['attachmentExtensions']), array(',' => ', '));
-				$this->setErrors([
-					'cant_upload_type', [
-						$allowed_extensions
-					]
-				]);
-			}
-		}
+		// Run our batch of tests, set any errors along the way
+		$this->checkImageContents();
+		$this->checkDirectorySpace($attachmentDirectory);
+		$this->checkFileSize();
+		$this->checkTotalUploadSize();
+		$this->checkTotalUploadCount();
+		$this->checkFileExtensions();
 
 		// Undo the math if there's an error
 		if ($this->hasErrors())
@@ -298,9 +237,156 @@ class TemporaryAttachment extends ValuesContainer
 	}
 
 	/**
-	 * Rotate an image top side up based on its EXIF data
+	 * If we have a valid image type, inspect to see if there is any
+	 * injected code fragments.  If found re encode to remove those fragments
+	 */
+	public function checkImageContents()
+	{
+		global $modSettings;
+
+		// First, the dreaded security check. Sorry folks, but this should't be avoided
+		$image = new Image($this->data['tmp_name']);
+		$size = $image->getSize();
+		$valid_mime = getValidMimeImageType($size[2]);
+
+		if ($valid_mime !== '')
+		{
+			try
+			{
+				if (!$image->checkImageContents())
+				{
+					// It's bad. Last chance, maybe we can re-encode it?
+					if (empty($modSettings['attachment_image_reencode']) || (!$image->reencodeImage()))
+					{
+						// Nothing to do: not allowed or not successful re-encoding it.
+						$this->setErrors('bad_attachment');
+					}
+					else
+					{
+						$this->data['size'] = $image->getFilesize();
+					}
+				}
+			}
+			catch(\Exception $e)
+			{
+				$this->setErrors('bad_attachment');
+			}
+		}
+
+		unset($image);
+	}
+
+	/**
+	 * Is there room in the directory for this file
 	 *
-	 * @throws \Exception
+	 * @param \ElkArte\AttachmentsDirectory $attachmentDirectory
+	 */
+	public function checkDirectorySpace($attachmentDirectory)
+	{
+		try
+		{
+			$attachmentDirectory->checkDirSpace($this);
+		}
+		catch (\Exception $e)
+		{
+			$this->setErrors($e->getMessage());
+		}
+	}
+
+	/**
+	 * Is the file larger than we accept
+	 */
+	public function checkFileSize()
+	{
+		global $modSettings;
+
+		// Is the file too big?
+		if (!empty($modSettings['attachmentSizeLimit'])
+			&& $this->data['size'] > $modSettings['attachmentSizeLimit'] * 1024)
+		{
+			$this->setErrors([
+				'file_too_big', [
+					comma_format($modSettings['attachmentSizeLimit'], 0)
+				]
+			]);
+		}
+	}
+
+	/**
+	 * Check if they are trying to send to much data in a single post
+	 */
+	public function checkTotalUploadSize()
+	{
+		global $context, $modSettings;
+
+		// Check the total upload size for this post...
+		$context['attachments']['total_size'] += $this->data['size'];
+		if (!empty($modSettings['attachmentPostLimit'])
+			&& $context['attachments']['total_size'] > $modSettings['attachmentPostLimit'] * 1024)
+		{
+			$this->setErrors([
+				'attach_max_total_file_size', [
+					comma_format($modSettings['attachmentPostLimit'], 0),
+					comma_format($modSettings['attachmentPostLimit'] - (($context['attachments']['total_size'] - $this->data['size']) / 1024), 0)
+				]
+			]);
+		}
+	}
+
+	/**
+	 * Check if they are sending in to many files at once
+	 */
+	public function checkTotalUploadCount()
+	{
+		global $context, $modSettings;
+
+		// Have we reached the maximum number of files we are allowed?
+		$context['attachments']['quantity']++;
+
+		// Set a max limit if none exists
+		if (empty($modSettings['attachmentNumPerPostLimit']) && $context['attachments']['quantity'] >= 15)
+		{
+			$modSettings['attachmentNumPerPostLimit'] = 15;
+		}
+
+		if (!empty($modSettings['attachmentNumPerPostLimit'])
+			&& $context['attachments']['quantity'] > $modSettings['attachmentNumPerPostLimit'])
+		{
+			$this->setErrors([
+				'attachments_limit_per_post', [
+					$modSettings['attachmentNumPerPostLimit']
+				]
+			]);
+		}
+	}
+
+	/**
+	 * If enabled, check if this is a filetype we accept (by extension)
+	 */
+	public function checkFileExtensions()
+	{
+		global $modSettings;
+
+		// File extension check
+		if (!empty($modSettings['attachmentCheckExtensions']))
+		{
+			$allowed = explode(',', strtolower($modSettings['attachmentExtensions']));
+			$allowed = array_map('trim', $allowed);
+
+			if (!in_array(strtolower(substr(strrchr($this->data['name'], '.'), 1)), $allowed))
+			{
+				$allowed_extensions = strtr(strtolower($modSettings['attachmentExtensions']), array(',' => ', '));
+				$this->setErrors([
+					'cant_upload_type', [
+						$allowed_extensions
+					]
+				]);
+			}
+		}
+	}
+
+	/**
+	 * Rotate an image top side up based on its EXIF data
 	 */
 	public function autoRotate()
 	{
