@@ -105,12 +105,14 @@ class Post extends AbstractController
 	{
 		global $context;
 
-		$this->_before_prepare_post();
+		// Initilaize the post area
+		$this->_beforePreparePost();
 
 		// Trigger the prepare_post event
 		$this->_events->trigger('prepare_post', array('topic_attributes' => &$this->_topic_attributes));
 
-		$this->_before_prepare_context();
+		// Sets post form options / checkbox / etc
+		$this->_beforePrepareContext();
 
 		// Trigger the prepare_context event
 		try
@@ -122,12 +124,13 @@ class Post extends AbstractController
 			return $e->doRedirect($this);
 		}
 
-		$this->_generating_message();
+		// Load up the message details if this is an existing msg
+		$this->_generatingMessage();
 
 		// Trigger post_errors event
 		$this->_events->trigger('post_errors');
 
-		$this->_preparing_page();
+		$this->_preparingPage();
 
 		// Needed for the editor and message icons.
 		require_once(SUBSDIR . '/Editor.subs.php');
@@ -152,10 +155,13 @@ class Post extends AbstractController
 		// Initialize the editor
 		create_control_richedit($editorOptions);
 
-		$this->_finalize_page();
+		$this->_finalizePage();
 	}
 
-	protected function _before_prepare_post()
+	/**
+	 * Load language files, templates and prepare posting basics
+	 */
+	protected function _beforePreparePost()
 	{
 		global $context;
 
@@ -176,7 +182,17 @@ class Post extends AbstractController
 		);
 	}
 
-	protected function _before_prepare_context()
+	/**
+	 * Does some basic checking and if everything is valid will
+	 * load $context with needed post form options
+	 *
+	 * - Ensures we have a topic id
+	 * - Checks if a topic is locked
+	 * - Determines if this msg will be pre approved or member requires approval
+	 *
+	 * @throws \ElkArte\Exceptions\Exception
+	 */
+	protected function _beforePrepareContext()
 	{
 		global $topic, $modSettings, $board, $context;
 
@@ -204,7 +220,7 @@ class Post extends AbstractController
 			$topic = associatedTopic((int) $_REQUEST['msg']);
 			if (empty($topic))
 			{
-				unset($_REQUEST['msg'], $_POST['msg'], $_GET['msg']);
+				$this->_req->clearValue('msg', 'both');
 			}
 		}
 
@@ -214,10 +230,12 @@ class Post extends AbstractController
 			$this->_topic_attributes = topicUserAttributes($topic, $this->user->id);
 			$context['notify'] = $this->_topic_attributes['notify'];
 			$context['topic_last_message'] = $this->_topic_attributes['id_last_msg'];
+			$msg = $this->_req->getRequest('msg', 'intval', 0);
 
-			if (empty($_REQUEST['msg']))
+			if (empty($msg))
 			{
-				if ($this->user->is_guest && !allowedTo('post_reply_any') && (!$modSettings['postmod_active'] || !allowedTo('post_unapproved_replies_any')))
+				if ($this->user->is_guest && !allowedTo('post_reply_any')
+					&& (!$modSettings['postmod_active'] || !allowedTo('post_unapproved_replies_any')))
 				{
 					is_not_guest();
 				}
@@ -226,7 +244,8 @@ class Post extends AbstractController
 				$context['becomes_approved'] = true;
 				if ($this->_topic_attributes['id_member'] != $this->user->id)
 				{
-					if ($modSettings['postmod_active'] && allowedTo('post_unapproved_replies_any') && !allowedTo('post_reply_any'))
+					if ($modSettings['postmod_active'] && allowedTo('post_unapproved_replies_any')
+						&& !allowedTo('post_reply_any'))
 					{
 						$context['becomes_approved'] = false;
 					}
@@ -316,14 +335,29 @@ class Post extends AbstractController
 		}
 	}
 
-	protected function _generating_message()
+	/**
+	 * Get the message setup for ...
+	 *
+	 * - Sets up the form for preview / modify / new message status.  Items
+	 * such as icons, text, etc
+	 * - Look if a new topic was posted while working on this prose
+	 * - Shows the message preview if requested
+	 * - triggers prepare_modifying, prepare_editing, prepare_posting
+	 */
+	protected function _generatingMessage()
 	{
 		global $txt, $topic, $modSettings, $context, $options;
 
+		// Convert / Clean the input elements
+		$msg = $this->_req->getRequest('msg', 'intval', null);
+		$last_msg = $this->_req->getRequest('last_msg', 'intval', null);
+		$message = $this->_req->getPost('message', 'trim', null);
+		$subject = $this->_req->getPost('subject', 'trim', '');
+
 		// See if any new replies have come along.
-		if (empty($_REQUEST['msg']) && !empty($topic))
+		if (empty($msg) && !empty($topic))
 		{
-			if (empty($options['no_new_reply_warning']) && isset($_REQUEST['last_msg']) && $context['topic_last_message'] > $_REQUEST['last_msg'])
+			if (empty($options['no_new_reply_warning']) && isset($last_msg) && $context['topic_last_message'] > $last_msg)
 			{
 				$context['new_replies'] = countMessagesSince($topic, (int) $_REQUEST['last_msg'], false, $modSettings['postmod_active'] && !allowedTo('approve_posts'));
 
@@ -347,237 +381,23 @@ class Post extends AbstractController
 
 		// Get a response prefix (like 'Re:') in the default forum language.
 		$context['response_prefix'] = response_prefix();
-		$context['destination'] = 'post2;start=' . $_REQUEST['start'];
+		$context['destination'] = 'post2;start=' . $this->_req->getRequest('start', 'intval', 0);
 
 		// Previewing, modifying, or posting?
 		// Do we have a body, but an error happened.
-		if (isset($_REQUEST['message']) || $this->_post_errors->hasErrors())
+		if (isset($message) || $this->_post_errors->hasErrors())
 		{
-			// Validate inputs.
-			if (!$this->_post_errors->hasErrors())
-			{
-				// This means they didn't click Post and get an error.
-				$really_previewing = true;
-			}
-			else
-			{
-				if (!isset($_REQUEST['subject']))
-				{
-					$_REQUEST['subject'] = '';
-				}
-
-				if (!isset($_REQUEST['message']))
-				{
-					$_REQUEST['message'] = '';
-				}
-
-				if (!isset($_REQUEST['icon']))
-				{
-					$_REQUEST['icon'] = 'xx';
-				}
-
-				// They are previewing if they asked to preview (i.e. came from quick reply).
-				$really_previewing = !empty($_REQUEST['preview']) || isset($_REQUEST['xml']);
-			}
-
-			// Trigger the prepare_modifying event
-			$this->_events->trigger('prepare_modifying', array('post_errors' => $this->_post_errors, 'really_previewing' => &$really_previewing));
-
-			// In order to keep the approval status flowing through, we have to pass it through the form...
-			$context['becomes_approved'] = empty($_REQUEST['not_approved']);
-			$context['show_approval'] = isset($_REQUEST['approve']) ? ($_REQUEST['approve'] ? 2 : 1) : 0;
-			$context['can_announce'] &= $context['becomes_approved'];
-
-			// Set up the inputs for the form.
-			$this->_form_subject = strtr(Util::htmlspecialchars($_REQUEST['subject']), array("\r" => '', "\n" => '', "\t" => ''));
-			$this->_form_message = Util::htmlspecialchars($_REQUEST['message'], ENT_QUOTES, 'UTF-8', true);
-
-			// Make sure the subject isn't too long - taking into account special characters.
-			if (Util::strlen($this->_form_subject) > 100)
-			{
-				$this->_form_subject = Util::substr($this->_form_subject, 0, 100);
-			}
-
-			// Are you... a guest?
-			if ($this->user->is_guest)
-			{
-				$context['name'] = !isset($_REQUEST['guestname']) ? '' : Util::htmlspecialchars(trim($_REQUEST['guestname']));
-				$context['email'] = !isset($_REQUEST['email']) ? '' : Util::htmlspecialchars(trim($_REQUEST['email']));
-				$this->user->name = $context['name'];
-			}
-
-			// Only show the preview stuff if they hit Preview.
-			if ($really_previewing)
-			{
-				// Set up the preview message and subject
-				$context['preview_message'] = $this->_form_message;
-				$this->preparse->preparsecode($this->_form_message, true);
-
-				// Do all bulletin board code thing on the message
-				$bbc_parser = ParserWrapper::instance();
-				$this->preparse->preparsecode($context['preview_message']);
-				$context['preview_message'] = $bbc_parser->parseMessage($context['preview_message'], isset($_REQUEST['ns']) ? 0 : 1);
-				$context['preview_message'] = censor($context['preview_message']);
-
-				// Don't forget the subject
-				$context['preview_subject'] = censor($this->_form_subject);
-
-				// Any errors we should tell them about?
-				if ($this->_form_subject === '')
-				{
-					$this->_post_errors->addError('no_subject');
-					$context['preview_subject'] = '<em>' . $txt['no_subject'] . '</em>';
-				}
-
-				if ($context['preview_message'] === '')
-				{
-					$this->_post_errors->addError('no_message');
-				}
-				elseif (!empty($modSettings['max_messageLength']) && Util::strlen($this->_form_message) > $modSettings['max_messageLength'])
-				{
-					$this->_post_errors->addError(array('long_message', array($modSettings['max_messageLength'])));
-				}
-
-				// Protect any CDATA blocks.
-				if (isset($_REQUEST['xml']))
-				{
-					$context['preview_message'] = strtr($context['preview_message'], array(']]>' => ']]]]><![CDATA[>'));
-				}
-			}
-
-			// Set up the checkboxes.
-			$context['notify'] = !empty($_REQUEST['notify']);
-			$context['use_smileys'] = !isset($_REQUEST['ns']);
-			$context['icon'] = isset($_REQUEST['icon']) ? preg_replace('~[\./\\\\*\':"<>]~', '', $_REQUEST['icon']) : 'xx';
-
-			// Set the destination action for submission.
-			$context['destination'] .= isset($_REQUEST['msg']) ? ';msg=' . $_REQUEST['msg'] . ';' . $context['session_var'] . '=' . $context['session_id'] : '';
-			$context['submit_label'] = isset($_REQUEST['msg']) ? $txt['save'] : $txt['post'];
-
-			// Previewing an edit?
-			if (isset($_REQUEST['msg']) && !empty($topic))
-			{
-				$msg_id = (int) $_REQUEST['msg'];
-
-				// Get the existing message.
-				$message = messageDetails((int) $msg_id, $topic);
-
-				// The message they were trying to edit was most likely deleted.
-				// @todo Change this error message?
-				if ($message === false)
-				{
-					throw new Exception('no_board', false);
-				}
-
-				$errors = checkMessagePermissions($message['message']);
-				if (!empty($errors))
-				{
-					foreach ($errors as $error)
-					{
-						$this->_post_errors->addError($error);
-					}
-				}
-
-				prepareMessageContext($message);
-			}
-			elseif (isset($_REQUEST['last_msg']))
-			{
-				// @todo: sort out what kind of combinations are actually possible
-				// Posting a quoted reply?
-				if ((!empty($topic) && !empty($_REQUEST['quote'])) || (!empty($modSettings['enableFollowup']) && !empty($_REQUEST['followup'])))
-				{
-					$case = 2;
-				}
-				// Posting a reply without a quote?
-				elseif (!empty($topic) && empty($_REQUEST['quote']))
-				{
-					$case = 3;
-				}
-				else
-				{
-					$case = 4;
-				}
-
-				list ($this->_form_subject,) = getFormMsgSubject($case, $topic, $this->_topic_attributes['subject']);
-			}
-
-			// No check is needed, since nothing is really posted.
-			checkSubmitOnce('free');
+			$this->_previewPost($msg, $topic, $message, $subject);
 		}
 		// Editing a message...
-		elseif (isset($_REQUEST['msg']) && !empty($topic))
+		elseif (isset($msg) && !empty($topic))
 		{
-			$msg_id = (int) $_REQUEST['msg'];
-
-			$message = getFormMsgSubject(1, $topic, '', $msg_id);
-
-			// The message they were trying to edit was most likely deleted.
-			if ($message === false)
-			{
-				throw new Exception('no_message', false);
-			}
-
-			// Trigger the prepare_editing event
-			$this->_events->trigger('prepare_editing', array('topic' => $topic, 'message' => &$message));
-
-			if (!empty($message['errors']))
-			{
-				foreach ($message['errors'] as $error)
-				{
-					$this->_post_errors->addError($error);
-				}
-			}
-
-			// Get the stuff ready for the form.
-			$this->_form_subject = $message['message']['subject'];
-			$this->_form_message = $this->preparse->un_preparsecode($message['message']['body']);
-
-			$this->_form_message = censor($this->_form_message);
-			$this->_form_subject = censor($this->_form_subject);
-
-			// Check the boxes that should be checked.
-			$context['use_smileys'] = !empty($message['message']['smileys_enabled']);
-			$context['icon'] = $message['message']['icon'];
-
-			// Set the destination.
-			$context['destination'] .= ';msg=' . $msg_id . ';' . $context['session_var'] . '=' . $context['session_id'];
-			$context['submit_label'] = $txt['save'];
+			$this->_editPost($msg, $topic);
 		}
 		// Posting...
 		else
 		{
-			// By default....
-			$context['use_smileys'] = true;
-			$context['icon'] = 'xx';
-
-			if ($this->user->is_guest)
-			{
-				$context['name'] = isset($_SESSION['guest_name']) ? $_SESSION['guest_name'] : '';
-				$context['email'] = isset($_SESSION['guest_email']) ? $_SESSION['guest_email'] : '';
-			}
-
-			// Trigger the prepare_posting event
-			$this->_events->trigger('prepare_posting');
-
-			$context['submit_label'] = $txt['post'];
-
-			// @todo: sort out what kind of combinations are actually possible
-			// Posting a quoted reply?
-			if ((!empty($topic) && !empty($_REQUEST['quote'])) || (!empty($modSettings['enableFollowup']) && !empty($_REQUEST['followup'])))
-			{
-				$case = 2;
-			}
-			// Posting a reply without a quote?
-			elseif (!empty($topic) && empty($_REQUEST['quote']))
-			{
-				$case = 3;
-			}
-			else
-			{
-				$case = 4;
-			}
-
-			list ($this->_form_subject, $this->_form_message) = getFormMsgSubject($case, $topic, $this->_topic_attributes['subject']);
+			$this->_makePost($topic, $subject);
 		}
 
 		// Check whether this is a really old post being bumped...
@@ -587,7 +407,285 @@ class Post extends AbstractController
 		}
 	}
 
-	protected function _preparing_page()
+	/**
+	 * Preview a post,
+	 * - From pressing preview
+	 * - When errors are generated when trying to post.
+	 *
+	 * @param int $msg
+	 * @param int $topic
+	 * @param string $message
+	 * @param string $subject
+	 */
+	private function _previewPost($msg, $topic, $message, $subject)
+	{
+		global $txt, $modSettings, $context;
+
+		$xml = $this->_req->getRequest('xml', 'isset', false);
+		$preview = $this->_req->getPost('preview', 'isset', false);
+		$ns = $this->_req->getPost('ns', 'isset', false);
+		$notify = $this->_req->getPost('notify', 'isset', false);
+		$quote = $this->_req->getRequest('quote', 'intval', 0);
+		$followup = $this->_req->getPost('followup', 'intval', 0);
+		$not_approved = $this->_req->getPost('not_approved', 'empty', true);
+		$last_msg = $this->_req->getRequest('last_msg', 'intval', null);
+		$icon = $this->_req->getPost('icon', 'trim', 'xx');
+		$msg_id = 0;
+
+		// Validate inputs.
+		if (!$this->_post_errors->hasErrors())
+		{
+			// This means they didn't click Post and get an error.
+			$really_previewing = true;
+		}
+		else
+		{
+			if (!isset($message))
+			{
+				$message = '';
+			}
+
+			// They are previewing if they asked to preview (i.e. came from quick reply).
+			$really_previewing = !empty($preview) || isset($xml);
+		}
+
+		// Trigger the prepare_modifying event
+		$this->_events->trigger('prepare_modifying', [
+				'post_errors' => $this->_post_errors,
+				'really_previewing' => &$really_previewing]
+		);
+
+		// In order to keep the approval status flowing through, we have to pass it through the form...
+		$context['becomes_approved'] = $not_approved;
+		$context['show_approval'] = isset($this->_req->post->approve) ? ($this->_req->post->approve ? 2 : 1) : 0;
+		$context['can_announce'] &= $context['becomes_approved'];
+
+		// Set up the inputs for the form.
+		$this->_form_subject = strtr(Util::htmlspecialchars($subject), array("\r" => '', "\n" => '', "\t" => ''));
+		$this->_form_message = Util::htmlspecialchars($message, ENT_QUOTES, 'UTF-8', true);
+
+		// Make sure the subject isn't too long - taking into account special characters.
+		if (Util::strlen($this->_form_subject) > 100)
+		{
+			$this->_form_subject = Util::substr($this->_form_subject, 0, 100);
+		}
+
+		// Are you... a guest?
+		if ($this->user->is_guest)
+		{
+			$context['name'] = $this->_req->getPost('guestname', 'Util::htmlspecialchars', '');
+			$context['email'] = $this->_req->getPost('email', 'Util::htmlspecialchars', '');
+			$this->user->name = $context['name'];
+		}
+
+		// Only show the preview stuff if they hit Preview.
+		if ($really_previewing)
+		{
+			$this->_setupPreviewContext($ns, $xml);
+		}
+
+		// Set up the checkboxes.
+		$context['notify'] = $notify;
+		$context['use_smileys'] = $ns;
+		$context['icon'] = preg_replace('~[\./\\\\*\':"<>]~', '', $icon);
+
+		// Set the destination action for submission.
+		$context['destination'] .= isset($msg) ? ';msg=' . $msg . ';' . $context['session_var'] . '=' . $context['session_id'] : '';
+		$context['submit_label'] = isset($msg) ? $txt['save'] : $txt['post'];
+
+		// Previewing an edit? Modifying an existing message?
+		if (isset($msg) && !empty($topic))
+		{
+			// Get the existing message.
+			$message = messageDetails($msg, $topic);
+
+			// The message they were trying to edit was most likely deleted.
+			if ($message === false)
+			{
+				throw new Exception('no_message', false);
+			}
+
+			$errors = checkMessagePermissions($message['message']);
+			if (!empty($errors))
+			{
+				foreach ($errors as $error)
+				{
+					$this->_post_errors->addError($error);
+				}
+			}
+
+			prepareMessageContext($message);
+		}
+		elseif (isset($last_msg))
+		{
+			// @todo: sort out what kind of combinations are actually possible
+			// Posting a quoted reply?
+			if ((!empty($topic) && !empty($quote))
+				|| (!empty($modSettings['enableFollowup']) && !empty($followup)))
+			{
+				$msg_id = !empty($quote) ? $quote : $followup;
+				$case = 2;
+			}
+			// Posting a reply without a quote?
+			elseif (!empty($topic) && empty($quote))
+			{
+				$this->_topic_attributes['subject'] = $subject;
+				$case = 3;
+			}
+			else
+			{
+				$case = 4;
+			}
+
+			list ($this->_form_subject,) = getFormMsgSubject($case, $topic, $this->_topic_attributes['subject'], $msg_id);
+		}
+
+		// No check is needed, since nothing is really posted.
+		checkSubmitOnce('free');
+	}
+
+	/**
+	 * Going back to a message to make changes, like damn I should watch what
+	 * my fingers are typing.
+	 *
+	 * @param int $msg
+	 * @param int $topic
+	 */
+	private function _editPost($msg, $topic)
+	{
+		global $txt, $context;
+
+		$message = getFormMsgSubject(1, $topic, '', $msg);
+
+		// The message they were trying to edit was most likely deleted.
+		if ($message === false)
+		{
+			throw new Exception('no_message', false);
+		}
+
+		// Trigger the prepare_editing event
+		$this->_events->trigger('prepare_editing', array('topic' => $topic, 'message' => &$message));
+
+		if (!empty($message['errors']))
+		{
+			foreach ($message['errors'] as $error)
+			{
+				$this->_post_errors->addError($error);
+			}
+		}
+
+		// Get the stuff ready for the form.
+		$this->_form_subject = censor($message['message']['subject']);
+		$this->_form_message = censor($this->preparse->un_preparsecode($message['message']['body']));
+
+		// Check the boxes that should be checked.
+		$context['use_smileys'] = !empty($message['message']['smileys_enabled']);
+		$context['icon'] = $message['message']['icon'];
+
+		// Set the destination.
+		$context['destination'] .= ';msg=' . $msg . ';' . $context['session_var'] . '=' . $context['session_id'];
+		$context['submit_label'] = $txt['save'];
+
+	}
+
+	/**
+	 * Think you are done and ready to make a post
+	 *
+	 * @param int $topic
+	 * @param string $subject
+	 */
+	private function _makePost($topic, $subject)
+	{
+		global $context, $txt, $modSettings;
+
+		$quote = $this->_req->getRequest('quote', 'intval', 0);
+		$followup = $this->_req->getPost('followup', 'intval', 0);
+
+		// By default....
+		$context['use_smileys'] = true;
+		$context['icon'] = 'xx';
+		$msg_id = 0;
+
+		if ($this->user->is_guest)
+		{
+			$context['name'] = isset($_SESSION['guest_name']) ? $_SESSION['guest_name'] : '';
+			$context['email'] = isset($_SESSION['guest_email']) ? $_SESSION['guest_email'] : '';
+		}
+
+		// Trigger the prepare_posting event
+		$this->_events->trigger('prepare_posting');
+
+		$context['submit_label'] = $txt['post'];
+
+		// @todo: sort out what kind of combinations are actually possible
+		// Posting a quoted reply?
+		if ((!empty($topic) && $quote !== 0)
+			|| (!empty($modSettings['enableFollowup']) && $followup !== 0))
+		{
+			$case = 2;
+			$msg_id = !empty($quote) ? $quote : $followup;
+		}
+		// Posting a reply without a quote?
+		elseif (!empty($topic) && $quote === 0)
+		{
+			$case = 3;
+		}
+		else
+		{
+			$this->_topic_attributes['subject'] = $subject;
+			$case = 4;
+		}
+
+		list ($this->_form_subject, $this->_form_message) = getFormMsgSubject($case, $topic, $this->_topic_attributes['subject'], $msg_id);
+	}
+
+	/**
+	 * Loads up the context global with a preview of the post
+	 *
+	 * @param bool $ns no smiley flag
+	 * @param bool $xml xml request
+	 */
+	private function _setupPreviewContext($ns, $xml)
+	{
+		global $txt, $modSettings, $context;
+
+			// Set up the preview message and subject
+			$context['preview_message'] = $this->_form_message;
+			$this->preparse->preparsecode($this->_form_message, true);
+
+			// Do all bulletin board code thing on the message
+			$bbc_parser = ParserWrapper::instance();
+			$this->preparse->preparsecode($context['preview_message']);
+			$context['preview_message'] = $bbc_parser->parseMessage($context['preview_message'], $ns);
+			$context['preview_message'] = censor($context['preview_message']);
+
+			// Don't forget the subject
+			$context['preview_subject'] = censor($this->_form_subject);
+
+			// Any errors we should tell them about?
+			if ($this->_form_subject === '')
+			{
+				$this->_post_errors->addError('no_subject');
+				$context['preview_subject'] = '<em>' . $txt['no_subject'] . '</em>';
+			}
+
+			if ($context['preview_message'] === '')
+			{
+				$this->_post_errors->addError('no_message');
+			}
+			elseif (!empty($modSettings['max_messageLength']) && Util::strlen($this->_form_message) > $modSettings['max_messageLength'])
+			{
+				$this->_post_errors->addError(array('long_message', array($modSettings['max_messageLength'])));
+			}
+
+			// Protect any CDATA blocks.
+			if ($xml === true)
+			{
+				$context['preview_message'] = strtr($context['preview_message'], array(']]>' => ']]]]><![CDATA[>'));
+			}
+	}
+
+	protected function _preparingPage()
 	{
 		global $txt, $topic, $modSettings, $board, $context;
 
@@ -696,7 +794,7 @@ class Post extends AbstractController
 		$context['show_additional_options'] = !empty($_POST['additional_options']) || isset($_GET['additionalOptions']);
 	}
 
-	protected function _finalize_page()
+	protected function _finalizePage()
 	{
 		global $txt, $scripturl, $topic, $context;
 
