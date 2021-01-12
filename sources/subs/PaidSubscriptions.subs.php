@@ -1020,7 +1020,7 @@ function getSubscriptionStatus($log_id)
 			'current_log_item' => $log_id,
 		)
 	);
-	if ($request->num_rows($request) !== 0)
+	if ($request->num_rows() !== 0)
 	{
 		list ($status['id_member'], $status['old_status']) = $request->fetch_row();
 	}

@@ -869,7 +869,7 @@ function moveTopics($topics, $toBoard, $log = false)
 		)
 	);
 	list ($isSeen) = $request->fetch_row();
-	$request->free_result($request);
+	$request->free_result();
 
 	if (!empty($isSeen) && User::$info->is_guest === false)
 	{
