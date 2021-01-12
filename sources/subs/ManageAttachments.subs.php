@@ -1391,7 +1391,7 @@ function list_getBaseDirs()
 
 	if ($attachmentsDir->hasBaseDir() === false)
 	{
-		return;
+		return false;
 	}
 
 	// Get a list of the base directories.
@@ -1803,7 +1803,6 @@ function attachmentsOfMessage($id_msg, $unapproved = false)
  *
  * @return
  * @package Attachments
- * @throws \ElkArte\Exceptions\Exception
  */
 function countAttachmentsInFolders($id_folder)
 {
