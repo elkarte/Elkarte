@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Handles the job of attachment and avatar maintenance /management.
+ * Handles the job of attachment and avatar maintenance / management.
  *
  * @package   ElkArte Forum
  * @copyright ElkArte Forum contributors
@@ -16,7 +16,6 @@
 
 namespace ElkArte;
 
-use ElkArte\Util;
 use \Exception;
 
 class AttachmentsDirectory
@@ -91,10 +90,8 @@ class AttachmentsDirectory
 		{
 			return max($this->numFilesLimit - $current_files, 0);
 		}
-		else
-		{
-			return false;
-		}
+
+		return false;
 	}
 
 	public function hasSizeLimit()
@@ -108,10 +105,8 @@ class AttachmentsDirectory
 		{
 			return max($this->sizeLimit - $current_dir_size, 0);
 		}
-		else
-		{
-			return false;
-		}
+
+		return false;
 	}
 
 	/**
@@ -141,10 +136,8 @@ class AttachmentsDirectory
 		{
 			return array_key_exists($id, $this->attachmentUploadDir);
 		}
-		else
-		{
-			return in_array($id, $this->attachmentUploadDir) || in_array(BOARDDIR . DIRECTORY_SEPARATOR . $path, $this->attachmentUploadDir);
-		}
+
+		return in_array($id, $this->attachmentUploadDir) || in_array(BOARDDIR . DIRECTORY_SEPARATOR . $path, $this->attachmentUploadDir);
 	}
 
 	public function isCurrentDirectoryId($id)
@@ -158,10 +151,8 @@ class AttachmentsDirectory
 		{
 			return $this->basedirectory_for_attachments === $this->attachmentUploadDir[$id];
 		}
-		else
-		{
-			return $this->basedirectory_for_attachments === $id;
-		}
+
+		return $this->basedirectory_for_attachments === $id;
 	}
 
 	/**
@@ -187,10 +178,8 @@ class AttachmentsDirectory
 		{
 			return $this->attachmentUploadDir[$id];
 		}
-		else
-		{
-			throw new Exception('dir_does_not_exists');
-		}
+
+		throw new Exception('dir_does_not_exists');
 	}
 
 	/**
@@ -229,10 +218,8 @@ class AttachmentsDirectory
 		{
 			return !empty($this->automanage_attachments);
 		}
-		else
-		{
-			return $this->automanage_attachments > $minLevel;
-		}
+
+		return $this->automanage_attachments > $minLevel;
 	}
 
 	protected function initLastDir($base_dir)
@@ -321,7 +308,9 @@ class AttachmentsDirectory
 	public function getCurrent()
 	{
 		if (empty($this->attachmentUploadDir))
+		{
 			return BOARDDIR . '/attachments';
+		}
 
 		return $this->attachmentUploadDir[$this->currentAttachmentUploadDir];
 	}
@@ -530,8 +519,8 @@ class AttachmentsDirectory
 	 * - Places an .htaccess in new directories for security
 	 *
 	 * @param string $updir
-	 * @throws \ElkArte\Exceptions\Exception
 	 * @return bool
+	 * @throws \ElkArte\Exceptions\Exception
 	 * @package Attachments
 	 *
 	 */
@@ -562,7 +551,7 @@ class AttachmentsDirectory
 			{
 				if (!@mkdir($directory, 0755))
 				{
-					Throw new Exception('attachments_no_create');
+					throw new Exception('attachments_no_create');
 				}
 			}
 
@@ -582,7 +571,7 @@ class AttachmentsDirectory
 					chmod($directory, 0777);
 					if (!is_writable($directory))
 					{
-						Throw new Exception('attachments_no_write');
+						throw new Exception('attachments_no_write');
 					}
 				}
 			}
@@ -861,15 +850,18 @@ class AttachmentsDirectory
 		{
 			return true;
 		}
-		elseif ($this->autoManageEnabled() === false)
+
+		if ($this->autoManageEnabled() === false)
 		{
 			return false;
 		}
-		elseif (!isset($_FILES))
+
+		if (!isset($_FILES))
 		{
 			return false;
 		}
-		elseif (isset($_FILES['attachment']))
+
+		if (isset($_FILES['attachment']))
 		{
 			foreach ($_FILES['attachment']['tmp_name'] as $dummy)
 			{

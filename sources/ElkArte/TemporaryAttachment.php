@@ -267,7 +267,7 @@ class TemporaryAttachment extends ValuesContainer
 					}
 				}
 			}
-			catch(\Exception $e)
+			catch (\Exception $e)
 			{
 				$this->setErrors('bad_attachment');
 			}

@@ -1294,7 +1294,7 @@ function list_getAttachDirs()
 		$is_base_dir = false;
 		if ($attachmentsDir->hasBaseDir())
 		{
-			$is_base_dir = $attachmentsDir->hasBaseDir($dir);
+			$is_base_dir = $attachmentsDir->hasBaseDir();
 
 			// Count any sub-folders.
 			$sub_dirs = $attachmentsDir->countSubdirs($dir);
