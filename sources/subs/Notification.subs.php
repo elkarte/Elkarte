@@ -28,7 +28,6 @@ use ElkArte\User;
  *                                   processed for the topic with the same key.
  * @param int[]|int $members_only = array() - are the only ones that will be sent the notification if they have it on.
  * @param mixed[] $pbe = array() - array containing user_info if this is being run as a result of an email posting
- * @throws \ElkArte\Exceptions\Exception
  * @uses Post language file
  */
 function sendNotifications($topics, $type, $exclude = array(), $members_only = array(), $pbe = array())

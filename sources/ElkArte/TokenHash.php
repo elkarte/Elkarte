@@ -60,7 +60,6 @@ class TokenHash
 	 * @param string $salt use a custom salt, leave empty to let the system generate a secure one
 	 *
 	 * @return string the random token
-	 * @throws \Exception
 	 */
 	public function generate_hash($length = 10, $salt = '')
 	{
@@ -95,7 +94,6 @@ class TokenHash
 	 * @param string $hash
 	 * @param int $length
 	 * @return string
-	 * @throws \Exception
 	 */
 	private function _prepareToken($hash, $length)
 	{
@@ -189,7 +187,6 @@ class TokenHash
 	 * @param int $count The number of bytes to produce
 	 *
 	 * @return string
-	 * @throws \Exception
 	 */
 	public function get_random_bytes($count)
 	{

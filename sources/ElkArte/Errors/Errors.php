@@ -61,7 +61,6 @@ class Errors extends AbstractModel
 	 * Retrieve the sole instance of this class.
 	 *
 	 * @return \ElkArte\Errors\Errors
-	 * @throws \Exception
 	 */
 	public static function instance()
 	{

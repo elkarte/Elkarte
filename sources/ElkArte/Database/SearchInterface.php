@@ -25,7 +25,7 @@ interface SearchInterface
 	 * @param string $db_string
 	 * @param mixed[] $db_values
 	 *
-	 * @return resource
+	 * @return \ElkArte\Database\AbstractResult|boolean
 	 */
 	public function search_query($identifier, $db_string, $db_values = array());
 

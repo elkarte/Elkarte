@@ -247,7 +247,7 @@ class IlaIntegrate
 	 *
 	 * - Keeps track of attachment usage to prevent displaying below the post
 	 *
-	 * @return object
+	 * @return callable
 	 */
 	public static function validate_options()
 	{
@@ -297,7 +297,7 @@ class IlaIntegrate
 	 * - Sets the lightbox attributes if an image is identified
 	 * - Keeps track of attachment usage to prevent displaying below the post
 	 *
-	 * @return object
+	 * @return callable
 	 */
 	public static function validate_plain()
 	{
@@ -354,7 +354,7 @@ class IlaIntegrate
 	 * - Determines if the ILA is an image or not
 	 * - Keeps track of attachment usage to prevent displaying below the post
 	 *
-	 * @return object
+	 * @return callable
 	 */
 	public static function validate_url()
 	{
