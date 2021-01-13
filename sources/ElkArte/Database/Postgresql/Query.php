@@ -52,6 +52,26 @@ class Query extends AbstractQuery
 	/**
 	 * {@inheritDoc}
 	 */
+	protected $ilike = ' ILIKE ';
+
+	/**
+	 * {@inheritDoc}
+	 */
+	protected $not_ilike = ' NOT ILIKE ';
+
+	/**
+	 * {@inheritDoc}
+	 */
+	protected $rlike = ' ~* ';
+
+	/**
+	 * {@inheritDoc}
+	 */
+	protected $not_rlike = ' !~* ';
+
+	/**
+	 * {@inheritDoc}
+	 */
 	public function fix_prefix($db_prefix, $db_name)
 	{
 		return $db_prefix;
@@ -244,23 +264,8 @@ class Query extends AbstractQuery
 	{
 		// Special queries that need processing.
 		$replacements = array(
-			'insert_log_search_topics' => array(
-				'~NOT RLIKE~' => '!~',
-			),
-			'insert_log_search_results_no_index' => array(
-				'~NOT RLIKE~' => '!~',
-			),
-			'insert_log_search_results_subject' => array(
-				'~NOT RLIKE~' => '!~',
-			),
-			'display_get_post_poster' => array(
-				'~GROUP BY id_msg\s+HAVING~' => 'AND',
-			),
 			'pm_conversation_list' => array(
 				'~ORDER\\s+BY\\s+\\{raw:sort\\}~' => 'ORDER BY ' . (isset($db_values['sort']) ? ($db_values['sort'] === 'pm.id_pm' ? 'MAX(pm.id_pm)' : $db_values['sort']) : ''),
-			),
-			'profile_board_stats' => array(
-				'~COUNT\(\*\) \/ MAX\(b.num_posts\)~' => 'CAST(COUNT(*) AS DECIMAL) / CAST(b.num_posts AS DECIMAL)',
 			),
 		);
 

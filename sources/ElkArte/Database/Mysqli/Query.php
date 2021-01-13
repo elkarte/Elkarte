@@ -28,6 +28,27 @@ use ElkArte\ValuesContainer;
  */
 class Query extends AbstractQuery
 {
+
+	/**
+	 * {@inheritDoc}
+	 */
+	protected $ilike = ' LIKE ';
+
+	/**
+	 * {@inheritDoc}
+	 */
+	protected $not_ilike = ' NOT LIKE ';
+
+	/**
+	 * {@inheritDoc}
+	 */
+	protected $rlike = ' RLIKE ';
+
+	/**
+	 * {@inheritDoc}
+	 */
+	protected $not_rlike = ' NOT RLIKE ';
+
 	/**
 	 * {@inheritDoc}
 	 */

@@ -77,7 +77,7 @@ function sendNotifications($topics, $type, $exclude = array(), $members_only = a
 			LEFT JOIN {db_prefix}members AS mem ON (mem.id_member = ml.id_member)
 			LEFT JOIN {db_prefix}attachments AS a ON(a.attachment_type = {int:attachment_type} AND a.id_msg = t.id_last_msg)
 		WHERE t.id_topic IN ({array_int:topic_list})
-		GROUP BY t.id_topic, mf.subject, ml.body, ml.id_member, mem.signature, mem.real_name, ml.poster_name',
+		GROUP BY 1, 2, 3, 4, 5, 6, 7, 8',
 		array(
 			'topic_list' => $topics,
 			'attachment_type' => 0,
@@ -686,7 +686,7 @@ function sendApprovalNotifications(&$topicData)
 	// Find everyone who needs to know about this.
 	$members = $db->fetchQuery('
 		SELECT
-			mem.id_member, mem.email_address, mem.notify_regularity, mem.notify_types, mem.notify_send_body, mem.lngfile,
+			DISTINCT mem.id_member, mem.email_address, mem.notify_regularity, mem.notify_types, mem.notify_send_body, mem.lngfile,
 			ln.sent, mem.id_group, mem.additional_groups, b.member_groups, mem.id_post_group, t.id_member_started,
 			ln.id_topic, mem.password_salt
 		FROM {db_prefix}log_notify AS ln
@@ -697,7 +697,6 @@ function sendApprovalNotifications(&$topicData)
 			AND mem.is_activated = {int:is_activated}
 			AND mem.notify_types < {int:notify_types}
 			AND mem.notify_regularity < {int:notify_regularity}
-		GROUP BY mem.id_member, ln.id_topic, mem.email_address, mem.notify_regularity, mem.notify_types, mem.notify_send_body, mem.lngfile, ln.sent, mem.id_group, mem.additional_groups, b.member_groups, mem.id_post_group, t.id_member_started
 		ORDER BY mem.lngfile',
 		array(
 			'topic_list' => $topics,

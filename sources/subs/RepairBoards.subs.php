@@ -734,13 +734,11 @@ function loadForumTests()
 					FROM {db_prefix}log_topics'
 			),
 			'check_query' => '
-				SELECT 
-					lt.id_member
+				SELECT DISTINCT lt.id_member
 				FROM {db_prefix}log_topics AS lt
 					LEFT JOIN {db_prefix}members AS mem ON (mem.id_member = lt.id_member)
 				WHERE mem.id_member IS NULL
-					AND lt.id_member BETWEEN {STEP_LOW} AND {STEP_HIGH}
-				GROUP BY lt.id_member',
+					AND lt.id_member BETWEEN {STEP_LOW} AND {STEP_HIGH}',
 			'fix_collect' => array(
 				'index' => 'id_member',
 				'process' => function ($members) {
@@ -765,13 +763,11 @@ function loadForumTests()
 					FROM {db_prefix}log_boards'
 			),
 			'check_query' => '
-				SELECT 
-					lb.id_board
+				SELECT DISTINCT lb.id_board
 				FROM {db_prefix}log_boards AS lb
 					LEFT JOIN {db_prefix}boards AS b ON (b.id_board = lb.id_board)
 				WHERE b.id_board IS NULL
-					AND lb.id_member BETWEEN {STEP_LOW} AND {STEP_HIGH}
-				GROUP BY lb.id_board',
+					AND lb.id_member BETWEEN {STEP_LOW} AND {STEP_HIGH}',
 			'fix_collect' => array(
 				'index' => 'id_board',
 				'process' => function ($boards) {
@@ -796,13 +792,11 @@ function loadForumTests()
 					FROM {db_prefix}log_boards'
 			),
 			'check_query' => '
-				SELECT 
-					lb.id_member
+				SELECT DISTINCT lb.id_member
 				FROM {db_prefix}log_boards AS lb
 					LEFT JOIN {db_prefix}members AS mem ON (mem.id_member = lb.id_member)
 				WHERE mem.id_member IS NULL
-					AND lb.id_member BETWEEN {STEP_LOW} AND {STEP_HIGH}
-				GROUP BY lb.id_member',
+					AND lb.id_member BETWEEN {STEP_LOW} AND {STEP_HIGH}',
 			'fix_collect' => array(
 				'index' => 'id_member',
 				'process' => function ($members) {
@@ -827,13 +821,11 @@ function loadForumTests()
 					FROM {db_prefix}log_mark_read'
 			),
 			'check_query' => '
-				SELECT 
-					lmr.id_board
+				SELECT DISTINCT lmr.id_board
 				FROM {db_prefix}log_mark_read AS lmr
 					LEFT JOIN {db_prefix}boards AS b ON (b.id_board = lmr.id_board)
 				WHERE b.id_board IS NULL
-					AND lmr.id_member BETWEEN {STEP_LOW} AND {STEP_HIGH}
-				GROUP BY lmr.id_board',
+					AND lmr.id_member BETWEEN {STEP_LOW} AND {STEP_HIGH}',
 			'fix_collect' => array(
 				'index' => 'id_board',
 				'process' => function ($boards) {
@@ -858,13 +850,11 @@ function loadForumTests()
 					FROM {db_prefix}log_mark_read'
 			),
 			'check_query' => '
-				SELECT 
-					lmr.id_member
+				SELECT DISTINCT lmr.id_member
 				FROM {db_prefix}log_mark_read AS lmr
 					LEFT JOIN {db_prefix}members AS mem ON (mem.id_member = lmr.id_member)
 				WHERE mem.id_member IS NULL
-					AND lmr.id_member BETWEEN {STEP_LOW} AND {STEP_HIGH}
-				GROUP BY lmr.id_member',
+					AND lmr.id_member BETWEEN {STEP_LOW} AND {STEP_HIGH}',
 			'fix_collect' => array(
 				'index' => 'id_member',
 				'process' => function ($members) {
@@ -920,14 +910,12 @@ function loadForumTests()
 					FROM {db_prefix}pm_recipients'
 			),
 			'check_query' => '
-				SELECT 
-					pmr.id_member
+				SELECT DISTINCT pmr.id_member
 				FROM {db_prefix}pm_recipients AS pmr
 					LEFT JOIN {db_prefix}members AS mem ON (mem.id_member = pmr.id_member)
 				WHERE pmr.id_member != 0
 					AND pmr.id_member BETWEEN {STEP_LOW} AND {STEP_HIGH}
-					AND mem.id_member IS NULL
-				GROUP BY pmr.id_member',
+					AND mem.id_member IS NULL',
 			'fix_collect' => array(
 				'index' => 'id_member',
 				'process' => function ($members) {
@@ -983,13 +971,11 @@ function loadForumTests()
 					FROM {db_prefix}log_notify'
 			),
 			'check_query' => '
-				SELECT 
-					ln.id_member
+				SELECT DISTINCT ln.id_member
 				FROM {db_prefix}log_notify AS ln
 					LEFT JOIN {db_prefix}members AS mem ON (mem.id_member = ln.id_member)
 				WHERE ln.id_member BETWEEN {STEP_LOW} AND {STEP_HIGH}
-					AND mem.id_member IS NULL
-				GROUP BY ln.id_member',
+					AND mem.id_member IS NULL',
 			'fix_collect' => array(
 				'index' => 'id_member',
 				'process' => function ($members) {
@@ -1227,13 +1213,11 @@ function loadForumTests()
 					FROM {db_prefix}log_group_requests'
 			),
 			'check_query' => '
-				SELECT 
-					lgr.id_member
+				SELECT DISTINCT lgr.id_member
 				FROM {db_prefix}log_group_requests AS lgr
 					LEFT JOIN {db_prefix}members AS mem ON (mem.id_member = lgr.id_member)
 				WHERE lgr.id_member BETWEEN {STEP_LOW} AND {STEP_HIGH}
-					AND mem.id_member IS NULL
-				GROUP BY lgr.id_member',
+					AND mem.id_member IS NULL',
 			'fix_collect' => array(
 				'index' => 'id_member',
 				'process' => function ($members) {
@@ -1258,13 +1242,11 @@ function loadForumTests()
 					FROM {db_prefix}log_group_requests'
 			),
 			'check_query' => '
-				SELECT 
-					lgr.id_group
+				SELECT DISTINCT lgr.id_group
 				FROM {db_prefix}log_group_requests AS lgr
 					LEFT JOIN {db_prefix}membergroups AS mg ON (mg.id_group = lgr.id_group)
 				WHERE lgr.id_group BETWEEN {STEP_LOW} AND {STEP_HIGH}
-					AND mg.id_group IS NULL
-				GROUP BY lgr.id_group',
+					AND mg.id_group IS NULL',
 			'fix_collect' => array(
 				'index' => 'id_group',
 				'process' => function ($groups) {

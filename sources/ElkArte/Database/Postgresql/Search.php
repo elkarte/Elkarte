@@ -41,18 +41,6 @@ class Search extends AbstractSearch
 			'drop_tmp_log_search_messages' => array(
 				'~IF\sEXISTS~i' => '',
 			),
-			'insert_into_log_messages_fulltext' => array(
-				'~LIKE~i' => 'iLIKE',
-				'~NOT\sLIKE~i' => '~NOT iLIKE',
-				'~NOT\sRLIKE~i' => '!~*',
-				'~RLIKE~i' => '~*',
-			),
-			'insert_log_search_results_subject' => array(
-				'~LIKE~i' => 'iLIKE',
-				'~NOT\sLIKE~i' => 'NOT iLIKE',
-				'~NOT\sRLIKE~i' => '!~*',
-				'~RLIKE~i' => '~*',
-			),
 		);
 
 		if (isset($replacements[$identifier]))

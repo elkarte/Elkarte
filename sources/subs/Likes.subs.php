@@ -363,8 +363,7 @@ function likesCount($memberID, $given = true)
 			SELECT 
 				COUNT(*)
 			FROM {db_prefix}message_likes
-			WHERE id_poster = {int:id_member}
-			GROUP BY id_msg',
+			WHERE id_poster = {int:id_member}',
 			array(
 				'id_member' => $memberID,
 			)
@@ -454,13 +453,13 @@ function likesPostsReceived($start, $items_per_page, $sort, $memberID)
 	return $db->fetchQuery('
 		SELECT
 			m.subject, m.id_topic,
-			b.name, l.id_msg, COUNT(l.id_msg) AS likes
+			b.name, m.id_msg, COUNT(l.id_msg) AS likes
 		FROM {db_prefix}message_likes AS l
 			LEFT JOIN {db_prefix}messages AS m ON (m.id_msg = l.id_msg)
 			LEFT JOIN {db_prefix}boards AS b ON (b.id_board = m.id_board)
 		WHERE l.id_poster = {int:id_member}' . (!empty($modSettings['recycle_enable']) ? ('
 			AND b.id_board != ' . $modSettings['recycle_board']) : '') . '
-		GROUP BY (l.id_msg)
+		GROUP BY m.subject, m.id_topic, b.name, m.id_msg
 		ORDER BY {raw:sort}
 		LIMIT {int:start}, {int:per_page}',
 		array(
@@ -798,7 +797,7 @@ function dbMostLikedTopic($board = null, $limit = 10)
 			INNER JOIN {db_prefix}topics AS t ON (m.id_topic = t.id_topic)
 			INNER JOIN {db_prefix}boards AS b ON (t.id_board = b.id_board)
 		WHERE ' . ($board === null ? '{query_wanna_see_board}' : 'b.id_board = {int:id_board}') . '
-		GROUP BY t.id_topic
+		GROUP BY t.id_topic, t.num_replies, t.id_board
 		ORDER BY distinct_likers DESC
 		LIMIT {int:limit}',
 		array(

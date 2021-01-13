@@ -1308,7 +1308,7 @@ function getGroups($groupList)
 		FROM {db_prefix}membergroups AS mg
 			LEFT JOIN {db_prefix}members AS mem ON (mem.id_group = mg.id_group OR FIND_IN_SET(mg.id_group, mem.additional_groups) != 0 OR mg.id_group = mem.id_post_group)
 		WHERE mg.id_group IN ({array_int:group_list})
-		GROUP BY mg.id_group',
+		GROUP BY mg.id_group, mg.group_name',
 		array(
 			'group_list' => $groupList,
 		)

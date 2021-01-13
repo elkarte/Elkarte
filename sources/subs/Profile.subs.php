@@ -3751,16 +3751,14 @@ function getMembersIPs($memID)
 	// @todo cache this
 	// Get all IP addresses this user has used for his messages.
 	$db->fetchQuery('
-		SELECT 
-			poster_ip
+		SELECT DISTINCT poster_ip
 		FROM {db_prefix}messages
 		WHERE id_member = {int:current_member} ' . (isset($min_msg_member) ? '
-			AND id_msg >= {int:min_msg_member} AND id_msg <= {int:max_msg_member}' : '') . '
-		GROUP BY poster_ip',
+			AND id_msg >= {int:min_msg_member} AND id_msg <= {int:max_msg_member}' : ''),
 		array(
 			'current_member' => $memID,
-			'min_msg_member' => !empty($min_msg_member) ? $min_msg_member : 0,
-			'max_msg_member' => !empty($max_msg_member) ? $max_msg_member : 0,
+			'min_msg_member' => $min_msg_member ?? 0,
+			'max_msg_member' => $max_msg_member ?? 0,
 		)
 	)->fetch_callback(
 		function ($row) use (&$ips) {
@@ -3807,13 +3805,11 @@ function getMembersInRange($ips, $memID)
 
 	// Get member ID's which are in messages...
 	$db->fetchQuery('
-		SELECT 
-			mem.id_member
+		SELECT DISTINCT mem.id_member
 		FROM {db_prefix}messages AS m
 			INNER JOIN {db_prefix}members AS mem ON (mem.id_member = m.id_member)
 		WHERE m.poster_ip IN ({array_string:ip_list})
-		GROUP BY mem.id_member
-		HAVING mem.id_member != {int:current_member}',
+			AND mem.id_member != {int:current_member}',
 		array(
 			'current_member' => $memID,
 			'ip_list' => $ips,

@@ -912,10 +912,10 @@ function UserStatsMostActiveBoard($memID, $limit = 10)
 	$db = database();
 
 	// Find the board this member spammed most often.
-	$result = $db->query('profile_board_stats', '
+	$result = $db->fetchQuery('
 		SELECT
 			b.id_board, MAX(b.name) AS name, b.num_posts, COUNT(*) AS message_count,
-			CASE WHEN COUNT(*) > MAX(b.num_posts) THEN 1 ELSE COUNT(*) / MAX(b.num_posts) END * 100 AS percentage
+			MAX(b.num_posts) as max_posts_per_board
 		FROM {db_prefix}messages AS m
 			INNER JOIN {db_prefix}boards AS b ON (b.id_board = m.id_board)
 		WHERE m.id_member = {int:current_member}
@@ -932,6 +932,8 @@ function UserStatsMostActiveBoard($memID, $limit = 10)
 	while (($row = $result->fetch_assoc()))
 	{
 		$href = getUrl('board', ['board' => $row['id_board'], 'start' => '0', 'name' => $row['name']]);
+		// min/max take care of cases when b.num_posts is broken for wwhatever reason
+		$percentage = min($row['message_count'] / max(1, $row['max_posts_per_board']), 1) * 100;
 
 		// What have they been doing in this board
 		$board_activity[$row['id_board']] = array(
@@ -939,8 +941,8 @@ function UserStatsMostActiveBoard($memID, $limit = 10)
 			'posts' => $row['message_count'],
 			'href' => $href,
 			'link' => '<a href="' . $href . '">' . $row['name'] . '</a>',
-			'percent' => comma_format((float) $row['percentage'], 2),
-			'posts_percent' => (float) $row['percentage'],
+			'percent' => comma_format($percentage, 2),
+			'posts_percent' => $percentage,
 			'total_posts' => $row['num_posts'],
 		);
 	}

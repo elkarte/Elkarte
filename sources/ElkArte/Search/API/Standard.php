@@ -129,7 +129,7 @@ class Standard extends AbstractAPI
 	 */
 	public function clearCacheResults($id_search)
 	{
-		$this->_db_search->search_query('delete_log_search_results', '
+		$this->_db_search->search_query('', '
 			DELETE FROM {db_prefix}log_search_results
 			WHERE id_search = {int:search_id}',
 			array(
@@ -174,13 +174,13 @@ class Standard extends AbstractAPI
 				$numTables++;
 				if (in_array($subjectWord, $excluded_words))
 				{
-					$subject_query['left_join'][] = '{db_prefix}log_search_subjects AS subj' . $numTables . ' ON (subj' . $numTables . '.word ' . (empty($modSettings['search_match_words']) ? 'LIKE {string:subject_words_' . $numTables . '_wild}' : '= {string:subject_words_' . $numTables . '}') . ' AND subj' . $numTables . '.id_topic = t.id_topic)';
+					$subject_query['left_join'][] = '{db_prefix}log_search_subjects AS subj' . $numTables . ' ON (subj' . $numTables . '.word ' . (empty($modSettings['search_match_words']) ? '{ilike} {string:subject_words_' . $numTables . '_wild}' : '= {string:subject_words_' . $numTables . '}') . ' AND subj' . $numTables . '.id_topic = t.id_topic)';
 					$subject_query['where'][] = '(subj' . $numTables . '.word IS NULL)';
 				}
 				else
 				{
 					$subject_query['inner_join'][] = '{db_prefix}log_search_subjects AS subj' . $numTables . ' ON (subj' . $numTables . '.id_topic = ' . ($prev_join === 0 ? 't' : 'subj' . $prev_join) . '.id_topic)';
-					$subject_query['where'][] = 'subj' . $numTables . '.word ' . (empty($modSettings['search_match_words']) ? 'LIKE {string:subject_words_' . $numTables . '_wild}' : '= {string:subject_words_' . $numTables . '}');
+					$subject_query['where'][] = 'subj' . $numTables . '.word ' . (empty($modSettings['search_match_words']) ? '{ilike} {string:subject_words_' . $numTables . '_wild}' : '= {string:subject_words_' . $numTables . '}');
 					$prev_join = $numTables;
 				}
 
@@ -221,7 +221,7 @@ class Standard extends AbstractAPI
 				$count = 0;
 				foreach ($this->_excludedPhrases as $phrase)
 				{
-					$subject_query['where'][] = 'm.subject NOT ' . (empty($modSettings['search_match_words']) || $this->noRegexp() ? 'LIKE' : 'RLIKE') . ' {string:excluded_phrases_' . $count . '}';
+					$subject_query['where'][] = 'm.subject ' . (empty($modSettings['search_match_words']) || $this->noRegexp() ? '{not_ilike}' : '{not_rlike}') . ' {string:excluded_phrases_' . $count . '}';
 					$subject_query_params['excluded_phrases_' . ($count++)] = $this->prepareWord($phrase, $this->noRegexp());
 				}
 			}
@@ -246,7 +246,7 @@ class Standard extends AbstractAPI
 
 			call_integration_hook('integrate_subject_only_search_query', array(&$subject_query, &$subject_query_params));
 
-			$numSubjectResults += $this->_build_search_results_log($subject_query, 'insert_log_search_results_subject');
+			$numSubjectResults += $this->_build_search_results_log($subject_query);
 
 			if (!empty($modSettings['search_max_results']) && $numSubjectResults >= $modSettings['search_max_results'])
 			{
@@ -336,7 +336,7 @@ class Standard extends AbstractAPI
 	 *
 	 * @return int - the number of rows affected by the query
 	 */
-	private function _build_search_results_log($main_query, $query_identifier, $use_old_ids = false)
+	private function _build_search_results_log($main_query, $query_identifier = '', $use_old_ids = false)
 	{
 		static $usedIDs;
 
@@ -527,10 +527,10 @@ class Standard extends AbstractAPI
 				$where = array();
 				foreach ($words['all_words'] as $regularWord)
 				{
-					$where[] = 'm.body' . (in_array($regularWord, $excludedWords) ? ' NOT' : '') . (empty($modSettings['search_match_words']) || $this->noRegexp() ? ' LIKE ' : ' RLIKE ') . '{string:all_word_body_' . $count . '}';
+					$where[] = 'm.body' . (in_array($regularWord, $excludedWords) ? ' {not_' : '{') . (empty($modSettings['search_match_words']) || $this->noRegexp() ? 'ilike} ' : 'rlike} ') . '{string:all_word_body_' . $count . '}';
 					if (in_array($regularWord, $excludedWords))
 					{
-						$where[] = 'm.subject NOT' . (empty($modSettings['search_match_words']) || $this->noRegexp() ? ' LIKE ' : ' RLIKE ') . '{string:all_word_body_' . $count . '}';
+						$where[] = 'm.subject ' . (empty($modSettings['search_match_words']) || $this->noRegexp() ? ' {not_ilike} ' : ' {not_rlike} ') . '{string:all_word_body_' . $count . '}';
 					}
 					$main_query['parameters']['all_word_body_' . ($count++)] = $this->prepareWord($regularWord, $this->noRegexp());
 				}
@@ -582,7 +582,7 @@ class Standard extends AbstractAPI
 		if (!empty($indexedResults) || !$this->useWordIndex())
 		{
 			$main_query['select']['relevance'] = $this->_build_relevance($main_query['weights']);
-			$num_results += $this->_build_search_results_log($main_query, 'insert_log_search_results_no_index');
+			$num_results += $this->_build_search_results_log($main_query);
 		}
 
 		// Insert subject-only matches.
@@ -644,7 +644,7 @@ class Standard extends AbstractAPI
 		// Clean up some previous cache.
 		if (!$this->_createTemporary)
 		{
-			$this->_db_search->search_query('delete_log_search_topics', '
+			$this->_db_search->search_query('', '
 				DELETE FROM {db_prefix}log_search_topics
 				WHERE id_search = {int:search_id}',
 				array(
@@ -672,17 +672,17 @@ class Standard extends AbstractAPI
 				if (in_array($subjectWord, $this->_excludedSubjectWords))
 				{
 					$subject_query['inner_join'][] = '{db_prefix}messages AS m ON (m.id_msg = t.id_first_msg)';
-					$subject_query['left_join'][] = '{db_prefix}log_search_subjects AS subj' . $numTables . ' ON (subj' . $numTables . '.word ' . (empty($modSettings['search_match_words']) ? 'LIKE {string:subject_not_' . $count . '}' : '= {string:subject_not_' . $count . '}') . ' AND subj' . $numTables . '.id_topic = t.id_topic)';
+					$subject_query['left_join'][] = '{db_prefix}log_search_subjects AS subj' . $numTables . ' ON (subj' . $numTables . '.word ' . (empty($modSettings['search_match_words']) ? '{ilike} {string:subject_not_' . $count . '}' : '= {string:subject_not_' . $count . '}') . ' AND subj' . $numTables . '.id_topic = t.id_topic)';
 					$subject_query['params']['subject_not_' . $count] = empty($modSettings['search_match_words']) ? '%' . $subjectWord . '%' : $subjectWord;
 
 					$subject_query['where'][] = '(subj' . $numTables . '.word IS NULL)';
-					$subject_query['where'][] = 'm.body NOT ' . (empty($modSettings['search_match_words']) || $this->noRegexp() ? ' LIKE ' : ' RLIKE ') . '{string:body_not_' . $count . '}';
+					$subject_query['where'][] = 'm.body ' . (empty($modSettings['search_match_words']) || $this->noRegexp() ? ' {not_ilike} ' : ' {not_rlike} ') . '{string:body_not_' . $count . '}';
 					$subject_query['params']['body_not_' . ($count++)] = $this->prepareWord($subjectWord, $this->noRegexp());
 				}
 				else
 				{
 					$subject_query['inner_join'][] = '{db_prefix}log_search_subjects AS subj' . $numTables . ' ON (subj' . $numTables . '.id_topic = ' . ($prev_join === 0 ? 't' : 'subj' . $prev_join) . '.id_topic)';
-					$subject_query['where'][] = 'subj' . $numTables . '.word LIKE {string:subject_like_' . $count . '}';
+					$subject_query['where'][] = 'subj' . $numTables . '.word {ilike} {string:subject_like_' . $count . '}';
 					$subject_query['params']['subject_like_' . ($count++)] = empty($modSettings['search_match_words']) ? '%' . $subjectWord . '%' : $subjectWord;
 					$prev_join = $numTables;
 				}
@@ -725,8 +725,8 @@ class Standard extends AbstractAPI
 				$count = 0;
 				foreach ($this->_excludedPhrases as $phrase)
 				{
-					$subject_query['where'][] = 'm.subject NOT ' . (empty($modSettings['search_match_words']) || $this->noRegexp() ? 'LIKE' : 'RLIKE') . ' {string:exclude_phrase_' . $count . '}';
-					$subject_query['where'][] = 'm.body NOT ' . (empty($modSettings['search_match_words']) || $this->noRegexp() ? 'LIKE' : 'RLIKE') . ' {string:exclude_phrase_' . $count . '}';
+					$subject_query['where'][] = 'm.subject ' . (empty($modSettings['search_match_words']) || $this->noRegexp() ? '{not_ilike}' : '{not_rlike}') . ' {string:exclude_phrase_' . $count . '}';
+					$subject_query['where'][] = 'm.body NOT ' . (empty($modSettings['search_match_words']) || $this->noRegexp() ? '{not_ilike}' : '{not_rlike}') . ' {string:exclude_phrase_' . $count . '}';
 					$subject_query['params']['exclude_phrase_' . ($count++)] = $this->prepareWord($phrase, $this->noRegexp());
 				}
 			}
@@ -739,7 +739,7 @@ class Standard extends AbstractAPI
 				continue;
 			}
 
-			$ignoreRequest = $this->_db_search->search_query('insert_log_search_topics', ($this->_db->support_ignore() ? ('
+			$ignoreRequest = $this->_db_search->search_query('', ($this->_db->support_ignore() ? ('
 				INSERT IGNORE INTO {db_prefix}' . ($this->_createTemporary ? 'tmp_' : '') . 'log_search_topics
 					(' . ($this->_createTemporary ? '' : 'id_search, ') . 'id_topic)') : '') . '
 				SELECT ' . ($this->_createTemporary ? '' : $id_search . ', ') . 't.id_topic
@@ -817,7 +817,7 @@ class Standard extends AbstractAPI
 		// Clear, all clear!
 		if (!$this->_createTemporary)
 		{
-			$this->_db_search->search_query('delete_log_search_messages', '
+			$this->_db_search->search_query('', '
 				DELETE FROM {db_prefix}log_search_messages
 				WHERE id_search = {int:id_search}',
 				array(
