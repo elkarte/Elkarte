@@ -469,32 +469,35 @@ function template_quickreply_below()
 			echo '
 							<div class="quickReplyContent">
 								<textarea cols="600" rows="7" class="quickreply" name="message" id="message" tabindex="', $context['tabindex']++, '"></textarea>
+							<div id="post_confirm_buttons" class="submitbutton">
+								<input type="submit" name="post" value="', $txt['post'], '" onclick="return submitThisOnce(this);" accesskey="s" tabindex="', $context['tabindex']++, '" />
+								<input type="submit" name="preview" value="', $txt['preview'], '" onclick="return submitThisOnce(this);" accesskey="p" tabindex="', $context['tabindex']++, '" />';
+
+			// Spellcheck button?
+			if ($context['show_spellchecking'])
+				echo '
+								<input type="button" value="', $txt['spell_check'], '" onclick="spellCheck(\'postmodify\', \'message\', ', (empty($options['use_editor_quick_reply']) ? 'false' : 'true'), ')" tabindex="', $context['tabindex']++, '" />';
+
+			// Draft save button?
+			if (!empty($context['drafts_save']))
+				echo '
+								<input type="button" name="save_draft" value="', $txt['draft_save'], '" onclick="return confirm(' . JavaScriptEscape($txt['draft_save_note']) . ') && submitThisOnce(this);" accesskey="d" tabindex="', $context['tabindex']++, '" />
+								<input type="hidden" id="id_draft" name="id_draft" value="', empty($context['id_draft']) ? 0 : $context['id_draft'], '" />';
+
+			echo '
 							</div>';
 		}
 		else
 		{
 			echo '
 							', template_control_richedit($context['post_box_name'], 'smileyBox_message', 'bbcBox_message');
-		}
 
-		echo '
+			// Show our submit buttons before any more options
+			echo '
 							<div id="post_confirm_buttons" class="submitbutton">
-								<input type="submit" name="post" value="', $txt['post'], '" onclick="return submitThisOnce(this);" accesskey="s" tabindex="', $context['tabindex']++, '" />
-								<input type="submit" name="preview" value="', $txt['preview'], '" onclick="return submitThisOnce(this);" accesskey="p" tabindex="', $context['tabindex']++, '" />';
-
-		// Spellcheck button?
-		if ($context['show_spellchecking'])
-			echo '
-								<input type="button" value="', $txt['spell_check'], '" onclick="spellCheck(\'postmodify\', \'message\', ', (empty($options['use_editor_quick_reply']) ? 'false' : 'true'), ')" tabindex="', $context['tabindex']++, '" />';
-
-		// Draft save button?
-		if (!empty($context['drafts_save']))
-			echo '
-								<input type="button" name="save_draft" value="', $txt['draft_save'], '" onclick="return confirm(' . JavaScriptEscape($txt['draft_save_note']) . ') && submitThisOnce(this);" accesskey="d" tabindex="', $context['tabindex']++, '" />
-								';
-
-		echo '
+								', template_control_richedit_buttons($context['post_box_name']), '
 							</div>';
+		}
 
 		// Show the draft last saved on area
 		if (!empty($context['drafts_autosave']) && !empty($options['drafts_autosave_enabled']))

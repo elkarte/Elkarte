@@ -621,7 +621,7 @@ class Display_Controller extends Action_Controller
 			'height' => '250px',
 			'width' => '100%',
 			// We do XML preview here.
-			'preview_type' => 0,
+			'preview_type' => 1,
 		);
 
 		// Trigger the prepare_context event for modules that have tied in to it
