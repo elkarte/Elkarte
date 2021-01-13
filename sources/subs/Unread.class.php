@@ -276,42 +276,24 @@ class Unread
 	 */
 	private function _countUnreadReplies()
 	{
-		if (!empty($this->_have_temp_table))
-		{
-			$request = $this->_db->query('', '
-				SELECT COUNT(*)
-				FROM {db_prefix}topics_posted_in AS pi
-					LEFT JOIN {db_prefix}log_topics_posted_in AS lt ON (lt.id_topic = pi.id_topic)
-				WHERE pi.id_board IN ({array_int:boards})
-					AND COALESCE(lt.id_msg, pi.id_msg) < pi.id_last_msg',
-				array_merge($this->_query_parameters, array(
-				))
-			);
-			list ($this->_num_topics) = $this->_db->fetch_row($request);
-			$this->_db->free_result($request);
-			$this->_min_message = 0;
-		}
-		else
-		{
-			$request = $this->_db->query('unread_fetch_topic_count', '
-				SELECT COUNT(DISTINCT t.id_topic), MIN(t.id_last_msg)
-				FROM {db_prefix}topics AS t
-					INNER JOIN {db_prefix}messages AS m ON (m.id_topic = t.id_topic)
-					LEFT JOIN {db_prefix}log_topics AS lt ON (lt.id_topic = t.id_topic AND lt.id_member = {int:current_member})
-					LEFT JOIN {db_prefix}log_mark_read AS lmr ON (lmr.id_board = t.id_board AND lmr.id_member = {int:current_member})
-				WHERE t.id_board IN ({array_int:boards})
-					AND m.id_member = {int:current_member}
-					AND COALESCE(lt.id_msg, lmr.id_msg, 0) < t.id_last_msg' . ($this->_post_mod ? '
-					AND t.approved = {int:is_approved}' : '') . ($this->_unwatch ? '
-					AND COALESCE(lt.unwatched, 0) != 1' : ''),
-				array_merge($this->_query_parameters, array(
-					'current_member' => $this->_user_id,
-					'is_approved' => 1,
-				))
-			);
-			list ($this->_num_topics, $this->_min_message) = $this->_db->fetch_row($request);
-			$this->_db->free_result($request);
-		}
+		$request = $this->_db->query('unread_fetch_topic_count', '
+			SELECT COUNT(DISTINCT t.id_topic), MIN(t.id_last_msg)
+			FROM {db_prefix}topics AS t
+				INNER JOIN {db_prefix}messages AS m ON (m.id_topic = t.id_topic)
+				LEFT JOIN {db_prefix}log_topics AS lt ON (lt.id_topic = t.id_topic AND lt.id_member = {int:current_member})
+				LEFT JOIN {db_prefix}log_mark_read AS lmr ON (lmr.id_board = t.id_board AND lmr.id_member = {int:current_member})
+			WHERE t.id_board IN ({array_int:boards})
+				AND m.id_member = {int:current_member}
+				AND COALESCE(lt.id_msg, lmr.id_msg, 0) < t.id_last_msg' . ($this->_post_mod ? '
+				AND t.approved = {int:is_approved}' : '') . ($this->_unwatch ? '
+				AND COALESCE(lt.unwatched, 0) != 1' : ''),
+			array_merge($this->_query_parameters, array(
+				'current_member' => $this->_user_id,
+				'is_approved' => 1,
+			))
+		);
+		list ($this->_num_topics, $this->_min_message) = $this->_db->fetch_row($request);
+		$this->_db->free_result($request);
 	}
 
 	/**
@@ -326,9 +308,8 @@ class Unread
 	{
 		$request = $this->_db->query('', '
 			SELECT COUNT(*), MIN(t.id_last_msg)
-			FROM {db_prefix}topics AS t' . (!empty($this->_have_temp_table) ? '
-				LEFT JOIN {db_prefix}log_topics_unread AS lt ON (lt.id_topic = t.id_topic)' : '
-				LEFT JOIN {db_prefix}log_topics AS lt ON (lt.id_topic = t.id_topic AND lt.id_member = {int:current_member})') . '
+			FROM {db_prefix}topics AS t
+				LEFT JOIN {db_prefix}log_topics AS lt ON (lt.id_topic = t.id_topic AND lt.id_member = {int:current_member})
 				LEFT JOIN {db_prefix}log_mark_read AS lmr ON (lmr.id_board = t.id_board AND lmr.id_member = {int:current_member})
 			WHERE t.id_board IN ({array_int:boards})' . ($this->_showing_all_topics && !empty($this->_earliest_msg) ? '
 				AND t.id_last_msg > {int:earliest_msg}' : (!$this->_showing_all_topics && $is_first_login ? '
