@@ -281,10 +281,7 @@ class Drafts_PersonalMessage_Module extends ElkArte\sources\modules\Abstract_Mod
 			loadLanguage('Post');
 
 			// Our not so concise shortcut line
-			if (!isset($context['shortcuts_text']))
-			{
-				$context['shortcuts_text'] = $txt['shortcuts_drafts' . (isBrowser('is_firefox') ? '_firefox' : '')];
-			}
+			$context['shortcuts_text'] = $txt['shortcuts_drafts'];
 
 			if (!isset($editorOptions['buttons']))
 			{
