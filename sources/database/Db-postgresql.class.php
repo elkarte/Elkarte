@@ -182,7 +182,7 @@ class Database_PostgreSQL extends Database_Abstract
 			$db_string = preg_replace(array_keys($replacements[$identifier]), array_values($replacements[$identifier]), $db_string);
 
 		// Limits need to be a little different.
-		$db_string = preg_replace('~\sLIMIT\s(\d+|{int:.+}),\s*(\d+|{int:.+})\s*(.*)$~is', 'LIMIT $2 OFFSET $1 $3', $db_string);
+		$db_string = preg_replace('~\sLIMIT\s(\d+|{int:.+}),\s*(\d+|{int:.+})(.*)~i', 'LIMIT $2 OFFSET $1 $3', $db_string);
 
 		if (trim($db_string) == '')
 			return false;
