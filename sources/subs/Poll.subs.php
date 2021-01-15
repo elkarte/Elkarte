@@ -574,7 +574,7 @@ function pollStarters($id_topic)
 		)
 	);
 
-	if ($request->num_rows($request) != 0)
+	if ($request->num_rows() != 0)
 	{
 		$pollStarters = $request->fetch_row();
 	}

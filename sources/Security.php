@@ -1138,7 +1138,6 @@ function checkSubmitOnce($action, $is_fatal = false)
  * @param int[]|int|null $boards array of board IDs, a single id or null
  *
  * @return bool if the user can do the permission
- * @throws \ElkArte\Exceptions\Exception
  */
 function allowedTo($permission, $boards = null)
 {

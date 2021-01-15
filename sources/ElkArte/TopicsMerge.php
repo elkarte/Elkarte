@@ -129,6 +129,7 @@ class TopicsMerge
 		global $modSettings;
 
 		// Joy of all joys, make sure they're not pi**ing about with unapproved topics they can't see :P
+		$can_approve_boards = false;
 		if ($modSettings['postmod_active'])
 		{
 			$can_approve_boards = !empty(User::$info->mod_cache['ap']) ? User::$info->mod_cache['ap'] : boardsAllowedTo('approve_posts');

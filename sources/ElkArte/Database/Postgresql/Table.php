@@ -637,7 +637,7 @@ class Table extends AbstractTable
 			return -1;
 		}
 
-		$row = $request->fetch_assoc($request);
+		$row = $request->fetch_assoc();
 		$request->free_result();
 
 		if (isset($row['Data_free']))

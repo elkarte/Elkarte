@@ -341,9 +341,9 @@ class HttpReq
 	{
 		$this->_param[$name] = $default;
 
-		if (isset($this->get->{$name}))
+		if (isset($this->query->{$name}))
 		{
-			$this->_param[$name] = $this->get->{$name};
+			$this->_param[$name] = $this->query->{$name};
 			$this->_param[$name] = $this->cleanValue($name, $sanitize);
 		}
 		elseif (isset($this->post->{$name}))
@@ -480,6 +480,27 @@ class HttpReq
 
 		// Return the clean value
 		return $this->_dataValidator->validation_data($name);
+	}
+
+	/**
+	 * Removes a value from the post or query arrays
+	 *
+	 * @param string $name the key name in the _param array
+	 * @param string|null $type where you want the value removed from post, query, both
+	 */
+	public function clearValue($name, $type)
+	{
+		unset($this->_param[$name]);
+
+		if ($type === 'post' || $type === 'both')
+		{
+			unset($this->post->{$name});
+		}
+
+		if ($type === 'query' || $type === 'both')
+		{
+			unset($this->post->{$name});
+		}
 	}
 
 	/**

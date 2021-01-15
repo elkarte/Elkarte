@@ -855,8 +855,8 @@ class JSqueeze
 				} elseif ('false' === $k) {
 					$this->charFreq[49] += $v;
 				} elseif (!$this->specialVarRx || !preg_match("#^{$this->specialVarRx}$#", $k)) {
-					foreach (count_chars($k, 1) as $k => $w) {
-						$this->charFreq[$k] += $w * $v;
+					foreach (count_chars($k, 1) as $c => $w) {
+						$this->charFreq[$c] += $w * $v;
 					}
 				} elseif (2 == strlen($k)) {
 					$tree['used'][] = $k[1];

@@ -286,13 +286,10 @@ class Mentioning extends AbstractModel
 				case 'read':
 				case 'readall':
 					return $this->_changeStatus($own_id, 'read');
-					break;
 				case 'unread':
 					return $this->_changeStatus($own_id, 'new');
-					break;
 				case 'delete':
 					return $this->_changeStatus($own_id, 'deleted');
-					break;
 			}
 		}
 

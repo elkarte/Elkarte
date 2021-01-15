@@ -133,7 +133,7 @@ abstract class AbstractResult
 	 * The callback is supposed to accept as argument the row of data fetched
 	 * by the query from the database.
 	 *
-	 * @param null|object|string $callback
+	 * @param callable|null|object|string $callback
 	 * @param mixed[]|null
 	 * @return array
 	 */

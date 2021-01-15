@@ -15,16 +15,15 @@
 /**
  * Initialize database classes and connection.
  *
- * @param string $db_server
- * @param string $db_name
- * @param string $db_user
- * @param string $db_passwd
- * @param string $db_prefix
+ * @param string $db_server server name
+ * @param string $db_name database name like forum
+ * @param string $db_user userid to attempt db connection
+ * @param string $db_passwd password of user to attempt db connection
+ * @param string $db_prefix prefix of the database, like elkarte_
  * @param mixed[] $db_options
  * @param string $db_type
  *
  * @return \ElkArte\Database\QueryInterface
- * @throws \Exception
  */
 function elk_db_initiate($db_server, $db_name, $db_user, $db_passwd, $db_prefix, $db_options = array(), $db_type = 'mysql')
 {
@@ -59,6 +58,8 @@ function database($fatal = true, $force = false)
 		];
 		$type = strtolower($db_type);
 		$type = $type === 'mysql' ? 'mysqli' : $type;
+
+		/** @var \ElkArte\Database\Mysqli\Connection $class */
 		$class = '\\ElkArte\\Database\\' . ucfirst($type) . '\\Connection';
 		try
 		{
@@ -75,8 +76,8 @@ function database($fatal = true, $force = false)
 				throw $e;
 			}
 		}
-
 	}
+
 	return $db;
 }
 
@@ -88,7 +89,6 @@ function database($fatal = true, $force = false)
  * @param bool $fatal - Stop the execution or throw an \Exception
  *
  * @return \ElkArte\Database\AbstractTable
- * @throws \Exception
  */
 function db_table($db = null, $fatal = false)
 {
@@ -129,7 +129,6 @@ function db_table($db = null, $fatal = false)
  * specifically designed for database utilities related to search.
  *
  * @return \ElkArte\Database\AbstractSearch
- * @throws \Exception
  */
 function db_search()
 {

@@ -1130,15 +1130,15 @@ function lastPost()
 }
 
 /**
- * Prepares a post subject for the post form
+ * Prepares a post for the post form
  *
  * What it does:
  *
  * - Will add the appropriate Re: to the post subject if its a reply to an existing post
  * - If quoting a post, or editing a post, this function also prepares the message body
- * - if editing is true, returns $message|$message[errors], else returns array($subject, $message)
+ * - returns array($subject, $message) or false on error
  *
- * @param int|bool $editing
+ * @param int $editing
  * @param int|null|false $topic
  * @param string $first_subject
  * @param int $msg_id
@@ -1154,10 +1154,9 @@ function getFormMsgSubject($editing, $topic, $first_subject = '', $msg_id = 0)
 
 	$db = database();
 
-	$form_subject = '';
-	$form_message = '';
 	switch ($editing)
 	{
+		// Modifying an existing message
 		case 1:
 			require_once(SUBSDIR . '/Messages.subs.php');
 
@@ -1182,8 +1181,6 @@ function getFormMsgSubject($editing, $topic, $first_subject = '', $msg_id = 0)
 			return $message;
 		// Posting a quoted reply?
 		case 2:
-			$msg_id = !empty($_REQUEST['quote']) ? (int) $_REQUEST['quote'] : (int) $_REQUEST['followup'];
-
 			// Make sure they _can_ quote this post, and if so get it.
 			$request = $db->query('', '
 				SELECT
@@ -1243,7 +1240,8 @@ function getFormMsgSubject($editing, $topic, $first_subject = '', $msg_id = 0)
 
 			break;
 		case 4:
-			$form_subject = isset($_GET['subject']) ? $_GET['subject'] : '';
+		default:
+			$form_subject = $first_subject;
 			$form_message = '';
 
 			break;

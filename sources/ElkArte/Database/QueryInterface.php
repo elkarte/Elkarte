@@ -55,7 +55,7 @@ interface QueryInterface
 	 * @param string $db_string
 	 * @param mixed[]|false $db_values = array()
 	 *
-	 * @return bool|Result
+	 * @return bool|\ElkArte\Database\AbstractResult
 	 * @throws \ElkArte\Exceptions\Exception
 	 */
 	public function query($identifier, $db_string, $db_values = array());
@@ -66,7 +66,7 @@ interface QueryInterface
 	 * @param string $db_string
 	 * @param mixed[] $db_values = array()
 	 * @param mixed[]|null
-	 * @return bool|Result
+	 * @return bool|\ElkArte\Database\AbstractResult
 	 */
 	public function fetchQuery($db_string, $db_values = array());
 

@@ -430,6 +430,8 @@ function updateAdminPreferences()
 
 	// Make sure we invalidate any cache.
 	Cache::instance()->put('theme_settings-' . $settings['theme_id'] . ':' . User::$info->id, null, 0);
+
+	return true;
 }
 
 /**

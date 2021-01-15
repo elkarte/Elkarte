@@ -719,7 +719,6 @@ function pc_next_permutation($p, $size)
  * @event integrate_redirect called before headers are sent
  * @param string $setLocation = '' The URL to redirect to
  * @param bool $refresh = false, enable to send a refresh header, default is a location header
- * @throws \ElkArte\Exceptions\Exception
  */
 function redirectexit($setLocation = '', $refresh = false)
 {

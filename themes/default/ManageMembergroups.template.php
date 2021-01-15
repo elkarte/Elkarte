@@ -629,23 +629,33 @@ function template_group_members()
 			<table class="table_grid">
 				<thead>
 					<tr class="table_head">
-						<th><a href="', $scripturl, '?action=', $context['current_action'], (isset($context['admin_area']) ? ';area=' . $context['admin_area'] : ''), ';sa=members;start=', $context['start'], ';sort=name', $context['sort_by'] == 'name' && $context['sort_direction'] == 'up' ? ';desc' : '', ';group=', $context['group']['id'], '">', $txt['name'], $context['sort_by'] == 'name' ? ' <i class="icon icon-small i-sort-alpha-' . $context['sort_direction'] . '"></i>' : '', '</a></th>';
+						<th>
+							<a href="', $scripturl, '?action=', $context['current_action'], (isset($context['admin_area']) ? ';area=' . $context['admin_area'] : ''), ';sa=members;start=', $context['start'], ';sort=name', $context['sort_by'] == 'name' && $context['sort_direction'] == 'up' ? ';desc' : '', ';group=', $context['group']['id'], '">', $txt['name'], $context['sort_by'] == 'name' ? ' <i class="icon icon-small i-sort-alpha-' . $context['sort_direction'] . '"></i>' : '', '</a>
+						</th>';
 
 	if ($context['can_send_email'])
 	{
 		echo '
-						<th><a href="', $scripturl, '?action=', $context['current_action'], (isset($context['admin_area']) ? ';area=' . $context['admin_area'] : ''), ';sa=members;start=', $context['start'], ';sort=email', $context['sort_by'] == 'email' && $context['sort_direction'] == 'up' ? ';desc' : '', ';group=', $context['group']['id'], '">', $txt['email'], $context['sort_by'] == 'email' ? ' <i class="icon icon-small i-sort-alpha-' . $context['sort_direction'] . '"></i>' : '', '</a></th>';
+						<th>
+							<a href="', $scripturl, '?action=', $context['current_action'], (isset($context['admin_area']) ? ';area=' . $context['admin_area'] : ''), ';sa=members;start=', $context['start'], ';sort=email', $context['sort_by'] == 'email' && $context['sort_direction'] == 'up' ? ';desc' : '', ';group=', $context['group']['id'], '">', $txt['email'], $context['sort_by'] == 'email' ? ' <i class="icon icon-small i-sort-alpha-' . $context['sort_direction'] . '"></i>' : '', '</a>
+						</th>';
 	}
 
 	echo '
-						<th><a href="', $scripturl, '?action=', $context['current_action'], (isset($context['admin_area']) ? ';area=' . $context['admin_area'] : ''), ';sa=members;start=', $context['start'], ';sort=active', $context['sort_by'] == 'active' && $context['sort_direction'] == 'up' ? ';desc' : '', ';group=', $context['group']['id'], '">', $txt['membergroups_members_last_active'], $context['sort_by'] == 'active' ? '<i class="icon icon-small i-sort-numeric-' . $context['sort_direction'] . '"></i>' : '', '</a></th>
-						<th><a href="', $scripturl, '?action=', $context['current_action'], (isset($context['admin_area']) ? ';area=' . $context['admin_area'] : ''), ';sa=members;start=', $context['start'], ';sort=registered', $context['sort_by'] == 'registered' && $context['sort_direction'] == 'up' ? ';desc' : '', ';group=', $context['group']['id'], '">', $txt['date_registered'], $context['sort_by'] == 'registered' ? '<i class="icon icon-small i-sort-numeric-' . $context['sort_direction'] . '"></i>' : '', '</a></th>
+						<th>
+							<a href="', $scripturl, '?action=', $context['current_action'], (isset($context['admin_area']) ? ';area=' . $context['admin_area'] : ''), ';sa=members;start=', $context['start'], ';sort=active', $context['sort_by'] == 'active' && $context['sort_direction'] == 'up' ? ';desc' : '', ';group=', $context['group']['id'], '">', $txt['membergroups_members_last_active'], $context['sort_by'] == 'active' ? '<i class="icon icon-small i-sort-numeric-' . $context['sort_direction'] . '"></i>' : '', '</a>
+						</th>
+						<th>
+							<a href="', $scripturl, '?action=', $context['current_action'], (isset($context['admin_area']) ? ';area=' . $context['admin_area'] : ''), ';sa=members;start=', $context['start'], ';sort=registered', $context['sort_by'] == 'registered' && $context['sort_direction'] == 'up' ? ';desc' : '', ';group=', $context['group']['id'], '">', $txt['date_registered'], $context['sort_by'] == 'registered' ? '<i class="icon icon-small i-sort-numeric-' . $context['sort_direction'] . '"></i>' : '', '</a>
+						</th>
 						<th ', empty($context['group']['assignable']) ? ' colspan="2"' : '', '><a href="', $scripturl, '?action=', $context['current_action'], (isset($context['admin_area']) ? ';area=' . $context['admin_area'] : ''), ';sa=members;start=', $context['start'], ';sort=posts', $context['sort_by'] == 'posts' && $context['sort_direction'] == 'up' ? ';desc' : '', ';group=', $context['group']['id'], '">', $txt['posts'], $context['sort_by'] == 'posts' ? ' <i class="icon icon-small i-sort-numeric-' . $context['sort_direction'] . '"></i>' : '', '</a></th>';
 
 	if (!empty($context['group']['assignable']))
 	{
 		echo '
-						<th style="width: 4%;"><input type="checkbox" onclick="invertAll(this, this.form);" /></th>';
+						<th style="width: 4%;" class="centertext">
+							<input type="checkbox" onclick="invertAll(this, this.form);" />
+						</th>';
 	}
 
 	echo '
@@ -670,7 +680,7 @@ function template_group_members()
 		if ($context['can_send_email'])
 		{
 			echo '
-						<td class="centertext"><em>' . template_member_email($member, true) . '</em></td>';
+						<td><em>' . template_member_email($member, true) . '</em></td>';
 		}
 
 		echo '

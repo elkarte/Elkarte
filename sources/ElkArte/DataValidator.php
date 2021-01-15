@@ -226,10 +226,10 @@ class DataValidator
 			$input = (array) $input;
 		}
 
-		// @todo this won't work, $input[$field] will be undefined
 		if (!is_array($input))
 		{
-			$input[$input] = array($input);
+			$key = (string) $input;
+			$input[$key] = $input;
 		}
 
 		// Clean em

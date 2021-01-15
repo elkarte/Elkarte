@@ -488,7 +488,7 @@ class Table extends AbstractTable
 				'table_name' => str_replace('_', '\_', $table),
 			)
 		);
-		$row = $request->fetch_assoc($request);
+		$row = $request->fetch_assoc();
 		$request->free_result();
 
 		$data_before = isset($row['Data_free']) ? $row['Data_free'] : 0;
