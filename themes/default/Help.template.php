@@ -45,7 +45,7 @@ function template_popup()
  */
 function template_manual()
 {
-	global $context, $scripturl, $txt;
+	global $context, $txt;
 
 	echo '
 			<h2 class="category_header">', $txt['manual_elkarte_user_help'], '</h2>
@@ -63,7 +63,7 @@ function template_manual()
 
 	echo '
 					</ul>
-					<p>', sprintf($txt['manual_docs_and_credits'], $context['wiki_url'], $scripturl . '?action=who;sa=credits'), '</p>
+					<p>', sprintf($txt['manual_docs_and_credits'], $context['wiki_url'], getUrl('action',['action' => 'who', 'sa' => 'credits'])), '</p>
 				</div>
 			</div>';
 }

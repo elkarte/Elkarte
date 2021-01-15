@@ -50,7 +50,7 @@ class DailyDigest implements ScheduledTaskInterface
 	 */
 	public function runDigest($is_weekly = false)
 	{
-		global $txt, $mbname, $scripturl, $modSettings, $boardurl;
+		global $txt, $mbname, $modSettings, $boardurl;
 
 		$db = database();
 
@@ -181,7 +181,7 @@ class DailyDigest implements ScheduledTaskInterface
 					$types[$row['note_type']][$row['id_board']]['lines'][$row['id_topic']] = array(
 						'id' => $row['id_topic'],
 						'subject' => un_htmlspecialchars($row['subject']),
-						'link' => $scripturl . '?topic=' . $row['id_topic'] . '.new;topicseen#new',
+						'link' => getUrl('action', ['topic' => $row['id_topic'] . '.new;topicseen', 'hash' => '#new']),
 						'count' => 1,
 						'body_id' => $row['last_reply'],
 						'body_text' => $row['last_body'],
@@ -204,7 +204,7 @@ class DailyDigest implements ScheduledTaskInterface
 				{
 					$types[$row['note_type']][$row['id_board']]['lines'][$row['id_topic']] = array(
 						'id' => $row['id_topic'],
-						'link' => $scripturl . '?topic=' . $row['id_topic'] . '.new;topicseen#new',
+						'link' => getUrl('action', ['topic' => $row['id_topic'] . '.new;topicseen', 'hash' => '#new']),
 						'subject' => un_htmlspecialchars($row['subject']),
 						'body' => $row['body'],
 					);
@@ -300,7 +300,7 @@ class DailyDigest implements ScheduledTaskInterface
 			// Do the start stuff!
 			$email = array(
 				'subject' => $mbname . ' - ' . $langtxt[$lang]['subject'],
-				'body' => $member['name'] . ',' . "\n\n" . $langtxt[$lang]['intro'] . "\n" . $scripturl . '?action=profile;area=notification;u=' . $member['id'] . "\n",
+				'body' => $member['name'] . ',' . "\n\n" . $langtxt[$lang]['intro'] . "\n" . getUrl('profile', ['action' => 'profile', 'area' => 'notification', 'u' => $member['id'], 'name' => $member['name']]) . "\n",
 				'email' => $member['email'],
 			);
 

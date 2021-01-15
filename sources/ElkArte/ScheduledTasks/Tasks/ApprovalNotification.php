@@ -33,7 +33,7 @@ class ApprovalNotification implements ScheduledTaskInterface
 	 */
 	public function run()
 	{
-		global $scripturl, $txt;
+		global $txt;
 
 		$db = database();
 
@@ -52,7 +52,7 @@ class ApprovalNotification implements ScheduledTaskInterface
 				INNER JOIN {db_prefix}boards AS b ON (b.id_board = m.id_board)',
 			array()
 		)->fetch_callback(
-			function ($row) use ($scripturl, &$notices, &$profiles) {
+			function ($row) use (&$notices, &$profiles) {
 				// If this is no longer around we'll ignore it.
 				if (empty($row['id_topic']))
 				{
@@ -76,7 +76,7 @@ class ApprovalNotification implements ScheduledTaskInterface
 				// Add it to the array otherwise.
 				$notices[$row['id_board']][$type][] = array(
 					'subject' => $row['subject'],
-					'href' => $scripturl . '?topic=' . $row['id_topic'] . '.msg' . $row['id_msg'] . '#msg' . $row['id_msg'],
+					'href' => getUrl('topic', ['topic' => $row['id_topic'], 'msg' => $row['id_msg'], 'subject' => $row['subject'], 'hash' => '#msg' . $row['id_msg']]),
 				);
 
 				// Store the profile for a bit later.

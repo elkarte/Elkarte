@@ -54,4 +54,21 @@ abstract class AbstractUrlGenerator
 	 * @param mixed[] $params The parameters of the URL
 	 */
 	abstract public function generate($params);
+
+	/**
+	 * If a hash #key is defined, ensures its at the end of the url
+	 *
+	 * @param array $args
+	 * @return array
+	 */
+	public function getHash($args)
+	{
+		if (isset($args['hash']))
+		{
+			array_push($args, str_replace(['=', 'hash'], '', $args['hash']));
+			unset($args['hash']);
+		}
+
+		return $args;
+	}
 }

@@ -199,7 +199,7 @@ class Topic extends AbstractController
 	 */
 	public function action_printpage()
 	{
-		global $topic, $scripturl, $context, $board_info, $modSettings;
+		global $topic, $context, $board_info, $modSettings;
 
 		// Redirect to the boardindex if no valid topic id is provided.
 		if (empty($topic))
@@ -277,10 +277,10 @@ class Topic extends AbstractController
 		}
 
 		// Set a canonical URL for this page.
-		$context['canonical_url'] = $scripturl . '?topic=' . $topic . '.0';
+		$context['canonical_url'] = getUrl('action', ['topic' => $topic . '.0']);
 		$context['view_attach_mode'] = array(
-			'text' => $scripturl . '?action=topic;sa=printpage;topic=' . $topic . '.0',
-			'images' => $scripturl . '?action=topic;sa=printpage;topic=' . $topic . '.0;images',
+			'text' => getUrl('action', ['action' => 'topic', 'sa' => 'printpage', 'topic' => $topic . '.0']),
+			'images' =>getUrl('action', ['action' => 'topic', 'sa' => 'printpage', 'topic' => $topic . '.0;images']),
 		);
 	}
 }

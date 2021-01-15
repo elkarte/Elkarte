@@ -66,7 +66,7 @@ class ManageTopics extends AbstractController
 	 */
 	public function action_topicSettings_display()
 	{
-		global $context, $txt, $scripturl;
+		global $context, $txt;
 
 		// Initialize the form
 		$settingsForm = new SettingsForm(SettingsForm::DB_ADAPTER);
@@ -95,7 +95,7 @@ class ManageTopics extends AbstractController
 		}
 
 		// Set up the template stuff nicely.
-		$context['post_url'] = $scripturl . '?action=admin;area=postsettings;save;sa=topics';
+		$context['post_url'] = getUrl('admin', ['action' => 'admin', 'area' => 'postsettings;save', 'sa' => 'topics']);
 		$context['settings_title'] = $txt['manageposts_topic_settings'];
 
 		// Prepare the settings

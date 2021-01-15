@@ -35,7 +35,7 @@ function template_ProfileOptions_init()
  */
 function template_editBuddies()
 {
-	global $context, $scripturl, $txt;
+	global $context, $txt;
 
 	echo '
 	<div id="edit_buddies">
@@ -104,7 +104,7 @@ function template_editBuddies()
 
 		echo '
 				<td class="righttext">
-					<a href="', $scripturl, '?action=profile;area=lists;sa=buddies;u=', $context['id_member'], ';remove=', $buddy['id'], ';', $context['session_var'], '=', $context['session_id'], '" class="icon i-remove" title="', $txt['buddy_remove'], '"></a>
+					<a href="', getUrl('action', ['action' => 'profile', 'area' => 'lists', 'sa' => 'buddies', 'u' => $context['id_member'], 'remove' => $buddy['id'], '{session_data}']), '" class="icon i-remove" title="', $txt['buddy_remove'], '"></a>
 				</td>
 			</tr>';
 	}
@@ -115,7 +115,7 @@ function template_editBuddies()
 
 	// Add a new buddy?
 	echo '
-	<form action="', $scripturl, '?action=profile;u=', $context['id_member'], ';area=lists;sa=buddies" method="post" accept-charset="UTF-8">
+	<form action="', getUrl('action', ['action' => 'profile', 'u' => $context['id_member'], 'area' => 'lists', 'sa' => 'buddies']), '" method="post" accept-charset="UTF-8">
 		<div class="add_buddy">
 			<h2 class="category_header">', $txt['buddy_add'], '</h2>
 			<div class="well">
@@ -159,7 +159,7 @@ function template_editBuddies()
  */
 function template_editIgnoreList()
 {
-	global $context, $scripturl, $txt;
+	global $context, $txt;
 
 	echo '
 	<div id="edit_buddies">
@@ -222,7 +222,7 @@ function template_editIgnoreList()
 
 	// Add to the ignore list?
 	echo '
-	<form action="', $scripturl, '?action=profile;u=', $context['id_member'], ';area=lists;sa=ignore" method="post" accept-charset="UTF-8">
+	<form action="', getUrl('action', ['action' => 'profile', 'u' => $context['id_member'], 'area' => 'lists', 'sa' => 'ignore']). '" method="post" accept-charset="UTF-8">
 		<div class="add_buddy">
 			<h2 class="category_header">', $txt['ignore_add'], '</h2>
 			<div class="well">
@@ -267,11 +267,11 @@ function template_editIgnoreList()
  */
 function template_edit_options()
 {
-	global $context, $scripturl, $txt;
+	global $context, $txt;
 
 	// The main header!
 	echo '
-		<form action="', (!empty($context['profile_custom_submit_url']) ? $context['profile_custom_submit_url'] : $scripturl . '?action=profile;area=' . $context['menu_item_selected'] . ';u=' . $context['id_member']), '" method="post" accept-charset="UTF-8" name="creator" id="creator" enctype="multipart/form-data" onsubmit="return checkProfileSubmit();">
+		<form action="', (!empty($context['profile_custom_submit_url']) ? $context['profile_custom_submit_url'] : getUrl('action', ['action' => 'profile', 'area' => $context['menu_item_selected'], 'u' => $context['id_member']])), '" method="post" accept-charset="UTF-8" name="creator" id="creator" enctype="multipart/form-data" onsubmit="return checkProfileSubmit();">
 			<h2 class="category_header hdicon cat_img_profile">';
 
 	// Don't say "Profile" if this isn't the profile...
@@ -519,7 +519,7 @@ function template_edit_options()
 	if (!empty($context['show_spellchecking']))
 	{
 		echo '
-		<form name="spell_form" id="spell_form" method="post" accept-charset="UTF-8" target="spellWindow" action="', $scripturl, '?action=spellcheck">
+		<form name="spell_form" id="spell_form" method="post" accept-charset="UTF-8" target="spellWindow" action="', getUrl('action', ['action' => 'spellcheck']), '">
 			<input type="hidden" id="spellstring" name="spellstring" value="" />
 			<input type="hidden" id="fulleditor" name="fulleditor" value="" />
 		</form>';
@@ -755,11 +755,11 @@ function template_profile_theme_settings()
  */
 function template_action_notification()
 {
-	global $context, $txt, $scripturl, $modSettings;
+	global $context, $txt, $modSettings;
 
 	// The main containing header.
 	echo '
-		<form id="creator" class="flow_hidden" action="', $scripturl, '?action=profile;area=notification" method="post" accept-charset="UTF-8">
+		<form id="creator" class="flow_hidden" action="', getUrl('action', ['action' => 'profile', 'area' => 'notification']), '" method="post" accept-charset="UTF-8">
 			<h2 class="category_header hdicon cat_img_profile">
 				', $txt['profile'], '
 			</h2>
@@ -892,11 +892,11 @@ function template_action_notification()
  */
 function template_groupMembership()
 {
-	global $context, $scripturl, $txt;
+	global $context, $txt;
 
 	// The main containing header.
 	echo '
-		<form action="', $scripturl, '?action=profile;area=groupmembership" method="post" accept-charset="UTF-8" name="creator" id="creator">
+		<form action="', getUrl('action', ['action' => 'profile', 'area' => 'groupmembership']), '" method="post" accept-charset="UTF-8" name="creator" id="creator">
 			<h2 class="category_header hdicon cat_img_profile">
 				', $txt['profile'], '
 			</h2>
@@ -964,7 +964,7 @@ function template_groupMembership()
 			if ($group['can_leave'])
 			{
 				echo '
-							<a class="linkbutton" href="' . $scripturl . '?action=profile;save;u=' . $context['id_member'] . ';area=groupmembership;' . $context['session_var'] . '=' . $context['session_id'] . ';gid=' . $group['id'] . ';', $context[$context['token_check'] . '_token_var'], '=', $context[$context['token_check'] . '_token'], '">' . $txt['leave_group'] . '</a>';
+							<a class="linkbutton" href="' . getUrl('action', ['action' => 'profile;save', 'u' => $context['id_member'], 'area' => 'groupmembership', '{session_data}', 'gid' => $group['id'], $context[$context['token_check'] . '_token_var'] => $context[$context['token_check'] . '_token']]), '">' . $txt['leave_group'] . '</a>';
 			}
 			echo '
 						</td>
@@ -1011,7 +1011,7 @@ function template_groupMembership()
 				if ($group['type'] == 3)
 				{
 					echo '
-							<a class="linkbutton_right" href="', $scripturl, '?action=profile;save;u=', $context['id_member'], ';area=groupmembership;', $context['session_var'], '=', $context['session_id'], ';gid=', $group['id'], ';', $context[$context['token_check'] . '_token_var'], '=', $context[$context['token_check'] . '_token'], '">', $txt['join_group'], '</a>';
+							<a class="linkbutton_right" href="', getUrl('action', ['action' => 'profile;save', 'u' => $context['id_member'], 'area' => 'groupmembership', '{session_data}', 'gid' => $group['id'], $context[$context['token_check'] . '_token_var'] => $context[$context['token_check'] . '_token']]), '">', $txt['join_group'], '</a>';
 				}
 				elseif ($group['type'] == 2 && $group['pending'])
 				{
@@ -1021,7 +1021,7 @@ function template_groupMembership()
 				elseif ($group['type'] == 2)
 				{
 					echo '
-							<a class="linkbutton_right" href="', $scripturl, '?action=profile;u=', $context['id_member'], ';area=groupmembership;request=', $group['id'], ';', $context['session_var'], '=', $context['session_id'], '">', $txt['request_group'], '</a>';
+							<a class="linkbutton_right" href="', getUrl('action', ['action' => 'profile', 'u' => $context['id_member'], 'area' => 'groupmembership', 'request' => $group['id'], '{session_data}']), '">', $txt['request_group'], '</a>';
 				}
 // @todo
 //				<input type="hidden" name="', $context[$context['token_check'] . '_token_var'], '" value="', $context[$context['token_check'] . '_token'], '" />';
@@ -1070,11 +1070,11 @@ function template_groupMembership()
  */
 function template_ignoreboards()
 {
-	global $txt, $scripturl;
+	global $txt;
 
 	// The main containing header.
 	echo '
-	<form id="creator" action="', $scripturl, '?action=profile;area=ignoreboards" method="post" accept-charset="UTF-8" name="creator">
+	<form id="creator" action="', getUrl('action', ['action' => 'profile', 'area' => 'ignoreboards']), '" method="post" accept-charset="UTF-8" name="creator">
 		<h2 class="category_header hdicon cat_img_profile">
 			', $txt['profile'], '
 		</h2>
@@ -1098,12 +1098,12 @@ function template_ignoreboards()
  */
 function template_profile_group_manage()
 {
-	global $context, $txt, $scripturl;
+	global $context, $txt;
 
 	echo '
 							<dt>
 								<label>', $txt['primary_membergroup'], '</label>
-								<p class="smalltext">[<a href="', $scripturl, '?action=quickhelp;help=moderator_why_missing" onclick="return reqOverlayDiv(this.href);">', $txt['moderator_why_missing'], '</a>]</p>
+								<p class="smalltext">[<a href="', getUrl('action', ['action' => 'quickhelp', 'help' => 'moderator_why_missing']), '" onclick="return reqOverlayDiv(this.href);">', $txt['moderator_why_missing'], '</a>]</p>
 							</dt>
 							<dd>
 								<select name="id_group" ', ($context['user']['is_owner'] && $context['member']['group_id'] == 1 ? 'onchange="if (this.value != 1 &amp;&amp; !confirm(\'' . $txt['deadmin_confirm'] . '\')) this.value = 1;"' : ''), '>';
@@ -1389,13 +1389,13 @@ function template_profile_karma_modify()
  */
 function template_profile_timeformat_modify()
 {
-	global $context, $txt, $scripturl;
+	global $context, $txt;
 
 	echo '
 							<dt>
 								<label for="easyformat">', $txt['time_format'], '</label>
 								<p>
-									<a href="', $scripturl, '?action=quickhelp;help=time_format" onclick="return reqOverlayDiv(this.href);" class="helpicon i-help"><s>', $txt['help'], '</s></a>
+									<a href="', getUrl('action', ['action' => 'quickhelp', 'help' => 'time_format']), '" onclick="return reqOverlayDiv(this.href);" class="helpicon i-help"><s>', $txt['help'], '</s></a>
 									&nbsp;', $txt['date_format'], '
 								</p>
 							</dt>
@@ -1438,14 +1438,14 @@ function template_profile_timeoffset_modify()
  */
 function template_profile_theme_pick()
 {
-	global $txt, $context, $scripturl;
+	global $txt, $context;
 
 	echo '
 							<dt>
 								<label>', $txt['current_theme'], '</label>
 							</dt>
 							<dd>
-								', $context['member']['theme']['name'], ' <a class="linkbutton" href="', $scripturl, '?action=theme;sa=pick;u=', $context['id_member'], ';', $context['session_var'], '=', $context['session_id'], '">', $txt['change'], '</a>
+								', $context['member']['theme']['name'], ' <a class="linkbutton" href="', getUrl('action', ['action' => 'theme', 'sa' => 'pick', 'u' => $context['id_member'], '{session_data}']), '">', $txt['change'], '</a>
 							</dd>';
 }
 
@@ -1480,11 +1480,11 @@ function template_profile_smiley_pick()
  */
 function template_authentication_method()
 {
-	global $context, $scripturl, $modSettings, $txt;
+	global $context, $modSettings, $txt;
 
 	// The main header!
 	echo '
-		<form action="', $scripturl, '?action=profile;area=authentication" method="post" accept-charset="UTF-8" name="creator" id="creator" enctype="multipart/form-data">
+		<form action="', getUrl('action', ['action' => 'profile', 'area' => 'authentication']), '" method="post" accept-charset="UTF-8" name="creator" id="creator" enctype="multipart/form-data">
 			<h2 class="category_header hdicon cat_img_profile">
 				', $txt['authentication'], '
 			</h2>
@@ -1494,7 +1494,7 @@ function template_authentication_method()
 					<dt>
 						<input type="radio" onclick="updateAuthMethod();" name="authenticate" value="openid" id="auth_openid"', $context['auth_method'] == 'openid' ? ' checked="checked"' : '', ' />
 						<label for="auth_openid">', $txt['authenticate_openid'], '</label>
-						<a href="', $scripturl, '?action=quickhelp;help=register_openid" onclick="return reqOverlayDiv(this.href);" class="helpicon i-help"><s>', $txt['help'], '</s></a>
+						<a href="', getUrl('action', ['action' => 'quickhelp', 'help' => 'register_openid']), '" onclick="return reqOverlayDiv(this.href);" class="helpicon i-help"><s>', $txt['help'], '</s></a>
 						<br />
 						<input type="radio" onclick="updateAuthMethod();" name="authenticate" value="passwd" id="auth_pass"', $context['auth_method'] == 'password' ? ' checked="checked"' : '', ' />
 						<label for="auth_pass">', $txt['authenticate_password'], '</label>

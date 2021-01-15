@@ -58,7 +58,7 @@ class ModerationCenter extends AbstractController
 	 */
 	public function prepareModcenter()
 	{
-		global $txt, $context, $scripturl, $modSettings, $options;
+		global $txt, $context, $modSettings, $options;
 
 		// Don't run this twice... and don't conflict with the admin bar.
 		if (isset($context['admin_area']))
@@ -176,7 +176,7 @@ class ModerationCenter extends AbstractController
 						'function' => 'action_index',
 						'icon' => 'transparent.png',
 						'class' => 'admin_img_posts',
-						'custom_url' => $scripturl . '?action=moderate;area=postmod',
+						'custom_url' => getUrl('action', ['action' => 'moderate', 'area' => 'postmod']),
 						'subsections' => array(
 							'posts' => array($txt['mc_unapproved_replies']),
 							'topics' => array($txt['mc_unapproved_topics']),
@@ -188,7 +188,7 @@ class ModerationCenter extends AbstractController
 						'function' => 'UnapprovedEmails',
 						'icon' => 'transparent.png',
 						'class' => 'admin_img_mail',
-						'custom_url' => $scripturl . '?action=admin;area=maillist;sa=emaillist',
+						'custom_url' => getUrl('action', ['action' => 'moderate', 'area' => 'maillist', 'sa' => 'emaillist']),
 					),
 					'attachmod' => array(
 						'label' => $txt['mc_unapproved_attachments'] . (!empty($mod_counts['attachments']) ? ' [' . $mod_counts['attachments'] . ']' : ''),
@@ -197,7 +197,7 @@ class ModerationCenter extends AbstractController
 						'function' => 'action_index',
 						'icon' => 'transparent.png',
 						'class' => 'admin_img_attachment',
-						'custom_url' => $scripturl . '?action=moderate;area=attachmod;sa=attachments',
+						'custom_url' => getUrl('action', ['action' => 'moderate', 'area' => 'attachmod', 'sa' => 'attachments']),
 					),
 					'reports' => array(
 						'label' => $txt['mc_reported_posts'] . (!empty($mod_counts['reports']) ? ' [' . $mod_counts['reports'] . ']' : ''),
@@ -245,7 +245,7 @@ class ModerationCenter extends AbstractController
 						'function' => 'action_index',
 						'icon' => 'transparent.png',
 						'class' => 'admin_img_regcenter',
-						'custom_url' => $scripturl . '?action=moderate;area=groups;sa=requests',
+						'custom_url' => getUrl('action', ['action' => 'moderate', 'area' => 'groups', 'sa' => 'requests']),
 					),
 					'members' => array(
 						'enabled' => allowedTo('moderate_forum'),
@@ -254,7 +254,7 @@ class ModerationCenter extends AbstractController
 						'function' => 'action_approve',
 						'icon' => 'transparent.png',
 						'class' => 'admin_img_members',
-						'custom_url' => $scripturl . '?action=admin;area=viewmembers;sa=browse;type=approve',
+						'custom_url' => getUrl('admin', ['action' => 'admin', 'area' => 'viewmembers', 'sa' => 'browse', 'type' => 'approve']),
 					),
 					'viewgroups' => array(
 						'label' => $txt['mc_view_groups'],
@@ -287,21 +287,21 @@ class ModerationCenter extends AbstractController
 		$context[$context['moderation_menu_name']]['tab_data'] = array(
 			'title' => $txt['moderation_center'],
 			'help' => '',
-			'description' => sprintf($txt['mc_description'], $context['user']['name'], $scripturl . '?action=moderate;area=settings'));
+			'description' => sprintf($txt['mc_description'], $context['user']['name'], getUrl('action', ['action' => 'moderate', 'area' => 'settings'])));
 
 		// What a pleasant shortcut - even tho we're not *really* on the admin screen who cares...
 		$context['admin_area'] = $mod_include_data['current_area'];
 
 		// Build the link tree.
 		$context['linktree'][] = array(
-			'url' => $scripturl . '?action=moderate',
+			'url' => getUrl('action', ['action' => 'moderate']),
 			'name' => $txt['moderation_center'],
 		);
 
 		if (isset($mod_include_data['current_area']) && $mod_include_data['current_area'] != 'index')
 		{
 			$context['linktree'][] = array(
-				'url' => $scripturl . '?action=moderate;area=' . $mod_include_data['current_area'],
+				'url' => getUrl('action', ['action' => 'moderate', 'area' => $mod_include_data['current_area']]),
 				'name' => $mod_include_data['label'],
 			);
 		}
@@ -310,7 +310,7 @@ class ModerationCenter extends AbstractController
 			&& $mod_include_data['subsections'][$mod_include_data['current_subsection']]['label'] !== $mod_include_data['label'])
 		{
 			$context['linktree'][] = array(
-				'url' => $scripturl . '?action=moderate;area=' . $mod_include_data['current_area'] . ';sa=' . $mod_include_data['current_subsection'],
+				'url' => getUrl('action', ['action' => 'moderate', 'area' => $mod_include_data['current_area'], 'sa' => $mod_include_data['current_subsection']]),
 				'name' => $mod_include_data['subsections'][$mod_include_data['current_subsection']]['label'],
 			);
 		}
@@ -427,7 +427,7 @@ class ModerationCenter extends AbstractController
 	 */
 	public function action_reportedPosts()
 	{
-		global $txt, $context, $scripturl;
+		global $txt, $context;
 
 		theme()->getTemplates()->load('ModerationCenter');
 		require_once(SUBSDIR . '/Moderation.subs.php');
@@ -514,7 +514,8 @@ class ModerationCenter extends AbstractController
 		$context['total_reports'] = totalReports($context['view_closed'], $show_pms);
 
 		// So, that means we can page index, yes?
-		$context['page_index'] = constructPageIndex($scripturl . '?action=moderate;area=' . $context['admin_area'] . ($context['view_closed'] ? ';sa=closed' : ''), $this->_req->query->start, $context['total_reports'], 10);
+		$baseUrl = getUrl('action', ['action' => 'moderate', 'area' => $context['admin_area'], 'sa' => ($context['view_closed'] ? 'closed' : '')]);
+		$context['page_index'] = constructPageIndex($baseUrl, $this->_req->query->start, $context['total_reports'], 10);
 		$context['start'] = $this->_req->query->start;
 
 		// By George, that means we in a position to get the reports, golly good.
@@ -527,13 +528,13 @@ class ModerationCenter extends AbstractController
 			$context['reports'][$row['id_report']] = array(
 				'board' => $row['id_board'],
 				'id' => $row['id_report'],
-				'topic_href' => $scripturl . '?topic=' . $row['id_topic'] . '.msg' . $row['id_msg'] . '#msg' . $row['id_msg'],
-				'report_href' => $scripturl . '?action=moderate;area=' . $context['admin_area'] . ';report=' . $row['id_report'],
+				'topic_href' => getUrl('topic', ['topic' => $row['id_topic'], 'msg' =>  $row['id_msg'], 'start' => $row['id_msg'], 'hash' => '#msg' . $row['id_msg']]),
+				'report_href' => getUrl('action', ['action' => 'moderate', 'area' => $context['admin_area'], 'report' => $row['id_report']]),
 				'author' => array(
 					'id' => $row['id_author'],
 					'name' => $row['author_name'],
-					'link' => $row['id_author'] ? '<a href="' . $scripturl . '?action=profile;u=' . $row['id_author'] . '">' . $row['author_name'] . '</a>' : $row['author_name'],
-					'href' => $scripturl . '?action=profile;u=' . $row['id_author'],
+					'link' => $row['id_author'] ? '<a href="' . getUrl('profile', ['action' => 'profile', 'u' => $row['id_author']]) . '">' . $row['author_name'] . '</a>' : $row['author_name'],
+					'href' => getUrl('profile', ['action' => 'profile', 'u' => $row['id_author']]),
 				),
 				'comments' => array(),
 				'time_started' => standardTime($row['time_started']),
@@ -550,16 +551,16 @@ class ModerationCenter extends AbstractController
 						'value' => $row['id_report'],
 					),
 					'details' => array(
-						'href' => $scripturl . '?action=moderate;area=' . $context['admin_area'] . ';report=' . $row['id_report'],
+						'href' => getUrl('action', ['action' => 'moderate', 'area' => $context['admin_area'], 'report' => $row['id_report']]),
 						'text' => $txt['mc_reportedp_details'],
 					),
 					'ignore' => array(
-						'href' => $scripturl . '?action=moderate;area=' . $context['admin_area'] . '' . ($context['view_closed'] ? ';sa=closed' : '') . ';ignore=' . ((int) !$row['ignore_all']) . ';rid=' . $row['id_report'] . ';start=' . $context['start'] . ';' . $context['session_var'] . '=' . $context['session_id'],
+						'href' => getUrl('action', ['action' => 'moderate', 'area' => $context['admin_area'], 'sa' => ($context['view_closed'] ? 'closed' : ''), 'ignore' => (int) !$row['ignore_all'], 'rid' => $row['id_report'], 'start' => $context['start'], '{session_data}']),
 						'text' => $row['ignore_all'] ? $txt['mc_reportedp_unignore'] : $txt['mc_reportedp_ignore'],
 						'custom' => $row['ignore_all'] ? '' : 'onclick="return confirm(' . JavaScriptEscape($txt['mc_reportedp_ignore_confirm']) . ');"',
 					),
 					'close' => array(
-						'href' => $scripturl . '?action=moderate;area=' . $context['admin_area'] . '' . ($context['view_closed'] ? ';sa=closed' : '') . ';close=' . ((int) !$row['closed']) . ';rid=' . $row['id_report'] . ';start=' . $context['start'] . ';' . $context['session_var'] . '=' . $context['session_id'],
+						'href' => getUrl('action', ['action' => 'moderate', 'area' => $context['admin_area'], 'sa' => ($context['view_closed'] ? 'closed' : ''), 'close' => (int) !$row['closed'], 'rid' => $row['id_report'], 'start' => $context['start'], '{session_data}']),
 						'text' => $context['view_closed'] ? $txt['mc_reportedp_open'] : $txt['mc_reportedp_close'],
 					),
 				),
@@ -601,8 +602,8 @@ class ModerationCenter extends AbstractController
 						'member' => array(
 							'id' => $row['id_member'],
 							'name' => empty($row['reporter']) ? $txt['guest'] : $row['reporter'],
-							'link' => $row['id_member'] ? '<a href="' . $scripturl . '?action=profile;u=' . $row['id_member'] . '">' . $row['reporter'] . '</a>' : (empty($row['reporter']) ? $txt['guest'] : $row['reporter']),
-							'href' => $row['id_member'] ? $scripturl . '?action=profile;u=' . $row['id_member'] : '',
+							'link' => $row['id_member'] ? '<a href="' . getUrl('profile', ['action' => 'profile', 'u' => $row['id_member']]) . '">' . $row['reporter'] . '</a>' : (empty($row['reporter']) ? $txt['guest'] : $row['reporter']),
+							'href' => $row['id_member'] ? getUrl('profile', ['action' => 'profile', 'u' => $row['id_member']]) : '',
 						),
 					);
 				}
@@ -617,7 +618,7 @@ class ModerationCenter extends AbstractController
 	 */
 	public function action_modReport()
 	{
-		global $context, $scripturl, $txt;
+		global $context, $txt;
 
 		// Have to at least give us something
 		$report = $this->_req->getQuery('report', 'intval', 0);
@@ -668,14 +669,14 @@ class ModerationCenter extends AbstractController
 			'topic_id' => $row['id_topic'],
 			'board_id' => $row['id_board'],
 			'message_id' => $row['id_msg'],
-			'message_href' => $scripturl . '?msg=' . $row['id_msg'],
-			'message_link' => '<a href="' . $scripturl . '?msg=' . $row['id_msg'] . '">' . $row['subject'] . '</a>',
-			'report_href' => $scripturl . '?action=moderate;area=' . $context['admin_area'] . ';' . $context['admin_area'] . '=' . $row['id_report'],
+			'message_href' => getUrl('action', ['msg' => $row['id_msg']]),
+			'message_link' => '<a href="' . getUrl('action', ['msg' => $row['id_msg']]) . '">' . $row['subject'] . '</a>',
+			'report_href' => getUrl('action', ['action' => 'moderate', 'area' => $context['admin_area'], $context['admin_area'] => $row['id_report']]),
 			'author' => array(
 				'id' => $row['id_author'],
 				'name' => $row['author_name'],
-				'link' => $row['id_author'] ? '<a href="' . $scripturl . '?action=profile;u=' . $row['id_author'] . '">' . $row['author_name'] . '</a>' : $row['author_name'],
-				'href' => $scripturl . '?action=profile;u=' . $row['id_author'],
+				'link' => $row['id_author'] ? '<a href="' . getUrl('profile', ['action' => 'profile', 'u' => $row['id_author']]) . '">' . $row['author_name'] . '</a>' : $row['author_name'],
+				'href' => getUrl('profile', ['action' => 'profile', 'u' => $row['id_author']]),
 			),
 			'comments' => array(),
 			'mod_comments' => array(),
@@ -701,9 +702,9 @@ class ModerationCenter extends AbstractController
 				'member' => array(
 					'id' => $row['id_member'],
 					'name' => empty($row['reporter']) ? $txt['guest'] : $row['reporter'],
-					'link' => $row['id_member'] ? '<a href="' . $scripturl . '?action=profile;u=' . $row['id_member'] . '">' . $row['reporter'] . '</a>' : (empty($row['reporter']) ? $txt['guest'] : $row['reporter']),
-					'href' => $row['id_member'] ? $scripturl . '?action=profile;u=' . $row['id_member'] : '',
-					'ip' => !empty($row['member_ip']) && allowedTo('moderate_forum') ? '<a href="' . $scripturl . '?action=trackip;searchip=' . $row['member_ip'] . '">' . $row['member_ip'] . '</a>' : '',
+					'link' => $row['id_member'] ? '<a href="' . getUrl('profile', ['action' => 'profile', 'u' => $row['id_member']]) . '">' . $row['reporter'] . '</a>' : (empty($row['reporter']) ? $txt['guest'] : $row['reporter']),
+					'href' => $row['id_member'] ? getUrl('profile', ['action' => 'profile', 'u' => $row['id_member']]) : '',
+					'ip' => !empty($row['member_ip']) && allowedTo('moderate_forum') ? '<a href="' . getUrl('action', ['action' => 'trackip', 'searchip' => $row['member_ip']]) . '">' . $row['member_ip'] . '</a>' : '',
 				),
 			);
 		}
@@ -721,8 +722,8 @@ class ModerationCenter extends AbstractController
 				'member' => array(
 					'id' => $row['id_member'],
 					'name' => $row['moderator'],
-					'link' => $row['id_member'] ? '<a href="' . $scripturl . '?action=profile;u=' . $row['id_member'] . '">' . $row['moderator'] . '</a>' : $row['moderator'],
-					'href' => $scripturl . '?action=profile;u=' . $row['id_member'],
+					'link' => $row['id_member'] ? '<a href="' . getUrl('profile', ['action' => 'profile', 'u' => $row['id_member']]) . '">' . $row['moderator'] . '</a>' : $row['moderator'],
+					'href' => getUrl('profile', ['action' => 'profile', 'u' => $row['id_member']]),
 				),
 			);
 		}
@@ -737,7 +738,7 @@ class ModerationCenter extends AbstractController
 			'title' => $txt['mc_modreport_modactions'],
 			'items_per_page' => 15,
 			'no_items_label' => $txt['modlog_no_entries_found'],
-			'base_href' => $scripturl . '?action=moderate;area=' . $context['admin_area'] . ';report=' . $context['report']['id'],
+			'base_href' =>getUrl('action', ['action' => 'moderate', 'area' => $context['admin_area'], 'report' => $context['report']['id']]),
 			'default_sort_col' => 'time',
 			'get_items' => array(
 				'function' => 'list_getModLogEntries',
@@ -971,7 +972,7 @@ class ModerationCenter extends AbstractController
 	 */
 	public function action_viewWatchedUsers()
 	{
-		global $modSettings, $context, $txt, $scripturl;
+		global $modSettings, $context, $txt;
 
 		// Some important context!
 		$context['page_title'] = $txt['mc_watched_users_title'];
@@ -1052,7 +1053,7 @@ class ModerationCenter extends AbstractController
 			'width' => '100%',
 			'items_per_page' => $modSettings['defaultMaxMessages'],
 			'no_items_label' => $context['view_posts'] ? $txt['mc_watched_users_no_posts'] : $txt['mc_watched_users_none'],
-			'base_href' => $scripturl . '?action=moderate;area=userwatch;sa=' . ($context['view_posts'] ? 'post' : 'member'),
+			'base_href' => getUrl('action', ['action' => 'moderate', 'area' => 'userwatch', 'sa' => ($context['view_posts'] ? 'post' : 'member')]),
 			'default_sort_col' => $context['view_posts'] ? '' : 'member',
 			'get_items' => array(
 				'function' => $context['view_posts']
@@ -1087,7 +1088,7 @@ class ModerationCenter extends AbstractController
 					),
 					'data' => array(
 						'sprintf' => array(
-							'format' => '<a href="' . $scripturl . '?action=profile;u=%1$d">%2$s</a>',
+							'format' => '<a href="' . getUrl('profile', ['action' => 'profile', 'u' => '%1$d']) . '">%2$s</a>',
 							'params' => array(
 								'id' => false,
 								'name' => false,
@@ -1105,9 +1106,7 @@ class ModerationCenter extends AbstractController
 					),
 					'data' => array(
 						'function' => function ($member) {
-							global $scripturl;
-
-							return allowedTo('issue_warning') ? '<a href="' . $scripturl . '?action=profile;area=issuewarning;u=' . $member['id'] . '">' . $member['warning'] . '%</a>' : $member['warning'] . '%';
+							return allowedTo('issue_warning') ? '<a href="' . getUrl('action', ['action' => 'profile', 'area' => 'issuewarning', 'u' => $member['id']]) . '">' . $member['warning'] . '%</a>' : $member['warning'] . '%';
 						},
 					),
 					'sort' => array(
@@ -1121,7 +1120,7 @@ class ModerationCenter extends AbstractController
 					),
 					'data' => array(
 						'sprintf' => array(
-							'format' => '<a href="' . $scripturl . '?action=profile;u=%1$d;area=showposts;sa=messages">%2$s</a>',
+							'format' => '<a href="' . getUrl('action', ['action' => 'profile', 'u' => '%1$d', 'area' => 'showposts', 'sa' => 'messages']) . '">%2$s</a>',
 							'params' => array(
 								'id' => false,
 								'posts' => false,
@@ -1151,22 +1150,18 @@ class ModerationCenter extends AbstractController
 					),
 					'data' => array(
 						'function' => function ($member) {
-							global $scripturl;
-
 							if ($member['last_post_id'])
 							{
-								return '<a href="' . $scripturl . '?msg=' . $member['last_post_id'] . '">' . $member['last_post'] . '</a>';
+								return '<a href="' . getUrl('action', ['msg' => $member['last_post_id']]) . '">' . $member['last_post'] . '</a>';
 							}
-							else
-							{
-								return $member['last_post'];
-							}
+
+							return $member['last_post'];
 						},
 					),
 				),
 			),
 			'form' => array(
-				'href' => $scripturl . '?action=moderate;area=userwatch;sa=post',
+				'href' => getUrl('action', ['action' => 'moderate', 'area' => 'userwatch', 'sa' => 'post']),
 				'include_sort' => true,
 				'include_start' => true,
 				'hidden_fields' => array(
@@ -1275,7 +1270,7 @@ class ModerationCenter extends AbstractController
 	 */
 	public function action_viewWarningLog()
 	{
-		global $modSettings, $context, $txt, $scripturl;
+		global $modSettings, $context, $txt;
 
 		// Setup context as always.
 		$context['page_title'] = $txt['mc_warning_log_title'];
@@ -1298,7 +1293,6 @@ class ModerationCenter extends AbstractController
 
 		// Setup the allowed quick search type
 		$context['order'] = isset($this->_req->query->sort) && isset($searchTypes[$this->_req->query->sort]) ? $this->_req->query->sort : 'member';
-		$context['url_start'] = '?action=moderate;area=warnings;sa=log;sort=' . $context['order'];
 
 		if (!isset($search_params['string']) || (!empty($this->_req->post->search) && $search_params['string'] !== $this->_req->post->search))
 		{
@@ -1338,7 +1332,7 @@ class ModerationCenter extends AbstractController
 			'title' => $txt['mc_warning_log_title'],
 			'items_per_page' => $modSettings['defaultMaxMessages'],
 			'no_items_label' => $txt['mc_warnings_none'],
-			'base_href' => $scripturl . '?action=moderate;area=warnings;sa=log;' . $context['session_var'] . '=' . $context['session_id'],
+			'base_href' => getUrl('action', ['action' => 'moderate', 'area' => 'warnings', 'sa' => 'log', '{session_data}']),
 			'default_sort_col' => 'time',
 			'get_items' => array(
 				'function' => function ($start, $items_per_page, $sort, $query_string, $query_params) {
@@ -1402,7 +1396,7 @@ class ModerationCenter extends AbstractController
 					),
 					'data' => array(
 						'function' => function ($warning) {
-							global $scripturl, $txt;
+							global $txt;
 
 							$output = '
 								<div class="floatleft">
@@ -1413,7 +1407,7 @@ class ModerationCenter extends AbstractController
 							if (!empty($warning['id_notice']))
 							{
 								$output .= '
-									<a href="' . $scripturl . '?action=moderate;area=notice;nid=' . $warning['id_notice'] . '" onclick="window.open(this.href, \'\', \'scrollbars=yes,resizable=yes,width=480,height=320\');return false;" target="_blank" class="new_win" title="' . $txt['profile_warning_previous_notice'] . '"><i class="icon icon-small i-search" title"' . $txt['profile_warning_previous_notice'] . '"></i></a>';
+									<a href="' . getUrl('action', ['action' => 'moderate', 'area' => 'notice', 'nid' => $warning['id_notice']]) . '" onclick="window.open(this.href, \'\', \'scrollbars=yes,resizable=yes,width=480,height=320\');return false;" target="_blank" class="new_win" title="' . $txt['profile_warning_previous_notice'] . '"><i class="icon icon-small i-search" title"' . $txt['profile_warning_previous_notice'] . '"></i></a>';
 							}
 
 							return $output;
@@ -1430,7 +1424,7 @@ class ModerationCenter extends AbstractController
 				),
 			),
 			'form' => array(
-				'href' => $scripturl . $context['url_start'],
+				'href' => getUrl('action', ['action' => 'moderate', 'area' => 'warnings', 'sa' => 'log', 'sort' => $context['order']]),
 				'include_sort' => true,
 				'include_start' => true,
 				'hidden_fields' => array(
@@ -1502,7 +1496,7 @@ class ModerationCenter extends AbstractController
 	 */
 	public function action_viewWarningTemplates()
 	{
-		global $modSettings, $context, $txt, $scripturl;
+		global $modSettings, $context, $txt;
 
 		require_once(SUBSDIR . '/Moderation.subs.php');
 
@@ -1531,7 +1525,7 @@ class ModerationCenter extends AbstractController
 			'title' => $txt['mc_warning_templates_title'],
 			'items_per_page' => $modSettings['defaultMaxMessages'],
 			'no_items_label' => $txt['mc_warning_templates_none'],
-			'base_href' => $scripturl . '?action=moderate;area=warnings;sa=templates;' . $context['session_var'] . '=' . $context['session_id'],
+			'base_href' => getUrl('action', ['action' => 'moderate', 'area' => 'warnings', 'sa' => 'templates', '{session_data}']),
 			'default_sort_col' => 'title',
 			'get_items' => array(
 				'function' => function ($start, $items_per_page, $sort, $template_type = 'warntpl') {
@@ -1550,7 +1544,7 @@ class ModerationCenter extends AbstractController
 					),
 					'data' => array(
 						'sprintf' => array(
-							'format' => '<a href="' . $scripturl . '?action=moderate;area=warnings;sa=templateedit;tid=%1$d">%2$s</a>',
+							'format' => '<a href="' . getUrl('action', ['action' => 'moderate', 'area' => 'warnings', 'sa' => 'templateedit', 'tid' => '%1$d']) . '">%2$s</a>',
 							'params' => array(
 								'id_comment' => false,
 								'title' => false,
@@ -1601,7 +1595,7 @@ class ModerationCenter extends AbstractController
 				),
 			),
 			'form' => array(
-				'href' => $scripturl . '?action=moderate;area=warnings;sa=templates',
+				'href' => getUrl('action', ['action' => 'moderate', 'area' => 'warnings', 'sa' => 'templates']),
 				'token' => 'mod-wt',
 			),
 			'additional_rows' => array(
@@ -1835,7 +1829,7 @@ class ModerationCenter extends AbstractController
 	 */
 	public function block_watchedUsers()
 	{
-		global $context, $scripturl;
+		global $context;
 
 		$watched_users = basicWatchedUsers();
 
@@ -1847,8 +1841,8 @@ class ModerationCenter extends AbstractController
 				$context['watched_users'][] = array(
 					'id' => $user['id_member'],
 					'name' => $user['real_name'],
-					'link' => '<a href="' . $scripturl . '?action=profile;u=' . $user['id_member'] . '">' . $user['real_name'] . '</a>',
-					'href' => $scripturl . '?action=profile;u=' . $user['id_member'],
+					'link' => '<a href="' . getUrl('profile', ['action' => 'profile', 'u' => $user['id_member']]) . '">' . $user['real_name'] . '</a>',
+					'href' => getUrl('profile', ['action' => 'profile', 'u' => $user['id_member']]),
 					'last_login' => !empty($user['last_login']) ? standardTime($user['last_login']) : '',
 				);
 			}
@@ -1893,7 +1887,7 @@ class ModerationCenter extends AbstractController
 	 */
 	public function block_notes()
 	{
-		global $context, $scripturl, $txt;
+		global $context, $txt;
 
 		// Are we saving a note?
 		if (isset($this->_req->post->makenote) && isset($this->_req->post->new_note))
@@ -1943,7 +1937,7 @@ class ModerationCenter extends AbstractController
 		$moderator_notes = moderatorNotes($offset);
 
 		// Lets construct a page index.
-		$context['page_index'] = constructPageIndex($scripturl . '?action=moderate;area=index;notes', $this->_req->query->start, $moderator_notes_total, 10);
+		$context['page_index'] = constructPageIndex(getUrl('action', ['action' => 'moderate', 'area' => 'index;notes']), $this->_req->query->start, $moderator_notes_total, 10);
 		$context['start'] = $this->_req->query->start;
 
 		$bbc_parser = ParserWrapper::instance();
@@ -1954,13 +1948,13 @@ class ModerationCenter extends AbstractController
 			$context['notes'][] = array(
 				'author' => array(
 					'id' => $note['id_member'],
-					'link' => $note['id_member'] ? ('<a href="' . $scripturl . '?action=profile;u=' . $note['id_member'] . '" title="' . $txt['on'] . ' ' . strip_tags(standardTime($note['log_time'])) . '">' . $note['member_name'] . '</a>') : $note['member_name'],
+					'link' => $note['id_member'] ? ('<a href="' . getUrl('profile', ['action' => 'profile', 'u' => $note['id_member']]) . '" title="' . $txt['on'] . ' ' . strip_tags(standardTime($note['log_time'])) . '">' . $note['member_name'] . '</a>') : $note['member_name'],
 				),
 				'time' => standardTime($note['log_time']),
 				'html_time' => htmlTime($note['log_time']),
 				'timestamp' => forum_time(true, $note['log_time']),
 				'text' => $bbc_parser->parseReport($note['body']),
-				'delete_href' => $scripturl . '?action=moderate;area=index;notes;delete=' . $note['id_note'] . ';' . $context['session_var'] . '=' . $context['session_id'],
+				'delete_href' => getUrl('action', ['action' => 'moderate', 'area' => 'index', 'notes' => 'delete=' . $note['id_note'], '{session_data}']),
 			);
 		}
 
@@ -1972,7 +1966,7 @@ class ModerationCenter extends AbstractController
 	 */
 	public function block_reportedPosts()
 	{
-		global $context, $scripturl;
+		global $context;
 
 		if ($this->user->mod_cache['bq'] === '0=1')
 		{
@@ -1987,13 +1981,13 @@ class ModerationCenter extends AbstractController
 			$context['reported_posts'][] = array(
 				'id' => $row['id_report'],
 				'alternate' => $i % 2,
-				'topic_href' => $scripturl . '?topic=' . $row['id_topic'] . '.msg' . $row['id_msg'] . '#msg' . $row['id_msg'],
-				'report_href' => $scripturl . '?action=moderate;area=' . $context['admin_area'] . ';report=' . $row['id_report'],
+				'topic_href' => getUrl('topic', ['topic' => $row['id_topic'], 'msg' => $row['id_msg'], 'start' => $row['id_msg'], 'hash' => '#msg' . $row['id_msg']]),
+				'report_href' => getUrl('action', ['action' => 'moderate', 'area' =>  $context['admin_area'], 'report' => $row['id_report']]),
 				'author' => array(
 					'id' => $row['id_author'],
 					'name' => $row['author_name'],
-					'link' => $row['id_author'] ? '<a href="' . $scripturl . '?action=profile;u=' . $row['id_author'] . '">' . $row['author_name'] . '</a>' : $row['author_name'],
-					'href' => $scripturl . '?action=profile;u=' . $row['id_author'],
+					'link' => $row['id_author'] ? '<a href="' . getUrl('profile', ['action' => 'profile', 'u' => $row['id_author']]) . '">' . $row['author_name'] . '</a>' : $row['author_name'],
+					'href' => getUrl('profile', ['action' => 'profile', 'u' => $row['id_author']]),
 				),
 				'comments' => array(),
 				'subject' => $row['subject'],

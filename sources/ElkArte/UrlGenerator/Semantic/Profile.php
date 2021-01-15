@@ -33,6 +33,6 @@ class Profile extends Standard
 		$url = 'p/' . urlencode(strtr($params['name'], ' ', '-')) . '-' . $params['u'];
 		unset($params['name'], $params['u'], $params['action']);
 
-		return $url . $this->generateQuery($params);
+		return $url . $this->_separator . $this->generateQuery($params);
 	}
 }

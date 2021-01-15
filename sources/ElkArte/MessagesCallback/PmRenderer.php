@@ -95,7 +95,7 @@ class PmRenderer extends Renderer
 	 */
 	protected function _buildOutputArray()
 	{
-		global $context, $modSettings, $scripturl, $txt;
+		global $context, $modSettings, $txt;
 
 		$id_pm = $this->_this_message['id_pm'];
 
@@ -118,7 +118,7 @@ class PmRenderer extends Renderer
 		if (!empty($output['can_report']) && $context['folder'] !== 'sent' && $output['member']['id'] != $this->user->id)
 		{
 			$context['additional_pm_drop_buttons']['warn_button'] = array(
-				'href' => $scripturl . '?action=pm;sa=report;l=' . $context['current_label_id'] . ';pmsg=' . $output['id'] . ';' . $context['session_var'] . '=' . $context['session_id'],
+				'href' => getUrl('action', ['action' => 'pm', 'sa' => 'report', 'l' => $context['current_label_id'], 'pmsg' => $output['id'], '{session_data}']),
 				'text' => $txt['pm_report_to_admin']
 			);
 		}
@@ -127,7 +127,7 @@ class PmRenderer extends Renderer
 		if (empty($output['is_unread']) && $context['folder'] !== 'sent' && $output['member']['id'] != $this->user->id)
 		{
 			$context['additional_pm_drop_buttons']['restore_button'] = array(
-				'href' => $scripturl . '?action=pm;sa=markunread;l=' . $context['current_label_id'] . ';pmsg=' . $output['id'] . ';' . $context['session_var'] . '=' . $context['session_id'],
+				'href' => getUrl('action', ['action' => 'pm', 'sa' => 'markunread', 'l' => $context['current_label_id'], 'pmsg' => $output['id'], '{session_data}']),
 				'text' => $txt['pm_mark_unread']
 			);
 		}
@@ -136,8 +136,8 @@ class PmRenderer extends Renderer
 		if (!empty($output['member']['karma']['allow']))
 		{
 			$output['member']['karma'] += array(
-				'applaud_url' => $scripturl . '?action=karma;sa=applaud;uid=' . $output['member']['id'] . ';f=' . $context['folder'] . ';start=' . $context['start'] . ($context['current_label_id'] != -1 ? ';l=' . $context['current_label_id'] : '') . ';pm=' . $output['id'] . ';' . $context['session_var'] . '=' . $context['session_id'],
-				'smite_url' => $scripturl . '?action=karma;sa=smite;uid=' . $output['member']['id'] . ';f=' . $context['folder'] . ';start=' . $context['start'] . ($context['current_label_id'] != -1 ? ';l=' . $context['current_label_id'] : '') . ';pm=' . $output['id'] . ';' . $context['session_var'] . '=' . $context['session_id'],
+				'applaud_url' => getUrl('action', ['action' => 'karma', 'sa' => 'applaud', 'uid' => $output['member']['id'], 'f' => $context['folder'], 'start' => $context['start'], 'pm' => $output['id'], '{session_data}'] + ($context['current_label_id'] != -1 ? ['l' => $context['current_label_id']] : [])),
+				'smite_url' => getUrl('action', ['action' => 'karma', 'sa' => 'smite', 'uid' => $output['member']['id'], 'f' => $context['folder'], 'start' => $context['start'], 'pm' => $output['id'], '{session_data}'] + ($context['current_label_id'] != -1 ? ['l' => $context['current_label_id']] : [])),
 			);
 		}
 

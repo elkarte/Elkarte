@@ -64,7 +64,7 @@ class Reminder extends AbstractController
 	 */
 	public function action_picktype()
 	{
-		global $context, $txt, $scripturl, $webmaster_email, $language, $modSettings;
+		global $context, $txt, $webmaster_email, $language, $modSettings;
 
 		// Security
 		checkSession();
@@ -112,11 +112,11 @@ class Reminder extends AbstractController
 			// Awaiting approval...
 			if (trim($member['validation_code']) === '')
 			{
-				throw new Exception($txt['registration_not_approved'] . ' <a class="linkbutton" href="' . $scripturl . '?action=register;sa=activate;user=' . $this->_req->post->user . '">' . $txt['here'] . '</a>.', false);
+				throw new Exception($txt['registration_not_approved'] . ' <a class="linkbutton" href="' . getUrl('action', ['action' => 'register', 'sa' => 'activate', 'user' => $this->_req->post->user]) . '">' . $txt['here'] . '</a>.', false);
 			}
 			else
 			{
-				throw new Exception($txt['registration_not_activated'] . ' <a class="linkbutton" href="' . $scripturl . '?action=register;sa=activate;user=' . $this->_req->post->user . '">' . $txt['here'] . '</a>.', false);
+				throw new Exception($txt['registration_not_activated'] . ' <a class="linkbutton" href="' . getUrl('action', ['action' => 'register', 'sa' => 'activate', 'user' => $this->_req->post->user]) . '">' . $txt['here'] . '</a>.', false);
 			}
 		}
 
@@ -137,7 +137,7 @@ class Reminder extends AbstractController
 			require_once(SUBSDIR . '/Mail.subs.php');
 			$replacements = array(
 				'REALNAME' => $member['real_name'],
-				'REMINDLINK' => $scripturl . '?action=reminder;sa=setpassword;u=' . $member['id_member'] . ';code=' . $password,
+				'REMINDLINK' => getUrl('action', ['action' => 'reminder', 'sa' => 'setpassword', 'u' => $member['id_member'], 'code' => $password]),
 				'IP' => $this->user->ip,
 				'MEMBERNAME' => $member['member_name'],
 				'OPENID' => $member['openid_uri'],

@@ -125,8 +125,7 @@ class MessageIndex extends AbstractController implements FrontpageInterface
 	 */
 	public function action_messageindex()
 	{
-		global $txt, $scripturl, $board, $modSettings, $context;
-		global $options, $settings, $board_info;
+		global $txt, $board, $modSettings, $context, $options, $settings, $board_info;
 
 		// Fairly often, we'll work with boards. Current board, sub-boards.
 		require_once(SUBSDIR . '/Boards.subs.php');
@@ -175,9 +174,9 @@ class MessageIndex extends AbstractController implements FrontpageInterface
 		// If we can view unapproved messages and there are some build up a list.
 		if (allowedTo('approve_posts') && ($board_info['unapproved_topics'] || $board_info['unapproved_posts']))
 		{
-			$untopics = $board_info['unapproved_topics'] ? '<a href="' . $scripturl . '?action=moderate;area=postmod;sa=topics;brd=' . $board . '">' . $board_info['unapproved_topics'] . '</a>' : 0;
-			$unposts = $board_info['unapproved_posts'] ? '<a href="' . $scripturl . '?action=moderate;area=postmod;sa=posts;brd=' . $board . '">' . ($board_info['unapproved_posts'] - $board_info['unapproved_topics']) . '</a>' : 0;
-			$context['unapproved_posts_message'] = sprintf($txt['there_are_unapproved_topics'], $untopics, $unposts, $scripturl . '?action=moderate;area=postmod;sa=' . ($board_info['unapproved_topics'] ? 'topics' : 'posts') . ';brd=' . $board);
+			$untopics = $board_info['unapproved_topics'] ? '<a href="' . getUrl('action', ['action' => 'moderate', 'area' => 'postmod', 'sa' => 'topics', 'brd' => $board]) . '">' . $board_info['unapproved_topics'] . '</a>' : 0;
+			$unposts = $board_info['unapproved_posts'] ? '<a href="' . getUrl('action', ['action' => 'moderate', 'area' => 'postmod', 'sa' => 'posts', 'brd' => $board]) . '">' . ($board_info['unapproved_posts'] - $board_info['unapproved_topics']) . '</a>' : 0;
+			$context['unapproved_posts_message'] = sprintf($txt['there_are_unapproved_topics'], $untopics, $unposts, getUrl('action', ['action' => 'moderate', 'area' => 'postmod', 'sa' => ($board_info['unapproved_topics'] ? 'topics' : 'posts'), 'brd' => $board]));
 		}
 
 		// And now, what we're here for: topics!
@@ -475,8 +474,8 @@ class MessageIndex extends AbstractController implements FrontpageInterface
 
 		// Build the message index button array.
 		$context['normal_buttons'] = array(
-			'new_topic' => array('test' => 'can_post_new', 'text' => 'new_topic', 'image' => 'new_topic.png', 'lang' => true, 'url' => $scripturl . '?action=post;board=' . $context['current_board'] . '.0', 'active' => true),
-			'notify' => array('test' => 'can_mark_notify', 'text' => $context['is_marked_notify'] ? 'unnotify' : 'notify', 'image' => ($context['is_marked_notify'] ? 'un' : '') . 'notify.png', 'lang' => true, 'custom' => 'onclick="return notifyboardButton(this);"', 'url' => $scripturl . '?action=notifyboard;sa=' . ($context['is_marked_notify'] ? 'off' : 'on') . ';board=' . $context['current_board'] . '.' . $context['start'] . ';' . $context['session_var'] . '=' . $context['session_id']),
+			'new_topic' => array('test' => 'can_post_new', 'text' => 'new_topic', 'image' => 'new_topic.png', 'lang' => true, 'url' => getUrl('action', ['action' => 'post', 'board' => $context['current_board'] . '.0']), 'active' => true),
+			'notify' => array('test' => 'can_mark_notify', 'text' => $context['is_marked_notify'] ? 'unnotify' : 'notify', 'image' => ($context['is_marked_notify'] ? 'un' : '') . 'notify.png', 'lang' => true, 'custom' => 'onclick="return notifyboardButton(this);"', 'url' => getUrl('action', ['action' => 'notifyboard', 'sa' => ($context['is_marked_notify'] ? 'off' : 'on'), 'board' => $context['current_board'] . '.' . $context['start'], '{session_data}'])),
 		);
 
 		theme()->addJavascriptVar(array(
@@ -490,7 +489,7 @@ class MessageIndex extends AbstractController implements FrontpageInterface
 				'text' => 'mark_read_short',
 				'image' => 'markread.png',
 				'lang' => true,
-				'url' => $scripturl . '?action=markasread;sa=board;board=' . $context['current_board'] . '.0;' . $context['session_var'] . '=' . $context['session_id'],
+				'url' => getUrl('action', ['action' => 'markasread', 'sa' => 'board', 'board' => $context['current_board'] . '.0', '{session_data}']),
 				'custom' => 'onclick="return markboardreadButton(this);"'
 			);
 		}

@@ -92,7 +92,7 @@ class ManageSecurity extends AbstractController
 	 */
 	public function action_securitySettings_display()
 	{
-		global $txt, $scripturl, $context;
+		global $txt, $context;
 
 		// Initialize the form
 		$settingsForm = new SettingsForm(SettingsForm::DB_ADAPTER);
@@ -114,7 +114,7 @@ class ManageSecurity extends AbstractController
 			redirectexit('action=admin;area=securitysettings;sa=general');
 		}
 
-		$context['post_url'] = $scripturl . '?action=admin;area=securitysettings;save;sa=general';
+		$context['post_url'] = getUrl('admin', ['action' => 'admin', 'area' => 'securitysettings;save', 'sa' => 'general']);
 		$context['settings_title'] = $txt['mods_cat_security_general'];
 
 		$settingsForm->prepare();
@@ -169,7 +169,7 @@ class ManageSecurity extends AbstractController
 	 */
 	public function action_moderationSettings_display()
 	{
-		global $txt, $scripturl, $context, $modSettings;
+		global $txt, $context, $modSettings;
 
 		// Initialize the form
 		$settingsForm = new SettingsForm(SettingsForm::DB_ADAPTER);
@@ -213,7 +213,7 @@ class ManageSecurity extends AbstractController
 		// We actually store lots of these together - for efficiency.
 		list ($modSettings['warning_enable'], $modSettings['user_limit'], $modSettings['warning_decrement']) = explode(',', $modSettings['warning_settings']);
 
-		$context['post_url'] = $scripturl . '?action=admin;area=securitysettings;save;sa=moderation';
+		$context['post_url'] = getUrl('admin', ['action' => 'admin', 'area' => 'securitysettings;save', 'sa' => 'moderation']);
 		$context['settings_title'] = $txt['moderation_settings'];
 		$context['settings_message'] = $txt['warning_enable'];
 
@@ -253,7 +253,7 @@ class ManageSecurity extends AbstractController
 	 */
 	public function action_spamSettings_display()
 	{
-		global $txt, $scripturl, $context, $modSettings;
+		global $txt, $context, $modSettings;
 
 		// Initialize the form
 		$settingsForm = new SettingsForm(SettingsForm::DB_ADAPTER);
@@ -302,7 +302,7 @@ class ManageSecurity extends AbstractController
 			theme()->addInlineJavascript('document.getElementById(\'guests_require_captcha\').disabled = true;', true);
 		}
 
-		$context['post_url'] = $scripturl . '?action=admin;area=securitysettings;save;sa=spam';
+		$context['post_url'] = getUrl('admin', ['action' => 'admin', 'area' => 'securitysettings;save', 'sa' => 'spam']);
 		$context['settings_title'] = $txt['antispam_Settings'];
 		$settingsForm->prepare();
 	}
@@ -348,7 +348,7 @@ class ManageSecurity extends AbstractController
 	 */
 	public function action_bbSettings_display()
 	{
-		global $txt, $scripturl, $context, $modSettings, $boardurl;
+		global $txt, $context, $modSettings, $boardurl;
 
 		// Initialize the form
 		$settingsForm = new SettingsForm(SettingsForm::DB_ADAPTER);
@@ -421,7 +421,7 @@ class ManageSecurity extends AbstractController
 			redirectexit('action=admin;area=securitysettings;sa=badbehavior');
 		}
 
-		$context['post_url'] = $scripturl . '?action=admin;area=securitysettings;save;sa=badbehavior';
+		$context['post_url'] = getUrl('admin', ['action' => 'admin', 'area' => 'securitysettings;save', 'sa' => 'badbehavior']);
 
 		// Javascript vars for the "add more xyz" buttons in the callback forms
 		theme()->addJavascriptVar(array(

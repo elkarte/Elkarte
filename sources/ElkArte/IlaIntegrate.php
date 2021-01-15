@@ -73,7 +73,7 @@ class IlaIntegrate
 	 */
 	public static function integrate_additional_bbc(&$additional_bbc)
 	{
-		global $scripturl, $modSettings;
+		global $modSettings;
 
 		// Generally we don't want to render inside of these tags ...
 		$disallow = array(
@@ -116,10 +116,10 @@ class IlaIntegrate
 						Codes::PARAM_ATTR_MATCH => '(right|left|center)',
 					),
 				),
-				Codes::ATTR_CONTENT => '<a id="link_$1" data-lightboximage="$1" data-lightboxmessage="0" href="' . $scripturl . '?action=dlattach;attach=$1;image"><img src="' . $scripturl . '?action=dlattach;attach=$1{width}{height}" alt="" class="bbc_img {align}" /></a>',
+				Codes::ATTR_CONTENT => '<a id="link_$1" data-lightboximage="$1" data-lightboxmessage="0" href="' . getUrl('action', ['action' => 'dlattach', 'attach' => '$1;image']) . '"><img src="' . getUrl('action', ['action' => 'dlattach', 'attach' => '$1{width}{height}']) . '" alt="" class="bbc_img {align}" /></a>',
 				Codes::ATTR_VALIDATE => $disableAttach ? null : self::validate_options(),
 				Codes::ATTR_DISALLOW_PARENTS => $disallow,
-				Codes::ATTR_DISABLED_CONTENT => '<a href="' . $scripturl . '?action=dlattach;attach=$1">(' . $scripturl . '?action=dlattach;attach=$1)</a>',
+				Codes::ATTR_DISABLED_CONTENT => '<a href="' . getUrl('action', ['action' => 'dlattach', 'attach' => '$1']) . '">(' . getUrl('action', ['action' => 'dlattach', 'attach' => '$1']) . ')</a>',
 				Codes::ATTR_BLOCK_LEVEL => false,
 				Codes::ATTR_AUTOLINK => false,
 				Codes::ATTR_LENGTH => 6,
@@ -144,10 +144,10 @@ class IlaIntegrate
 						Codes::PARAM_ATTR_MATCH => '(right|left|center)',
 					),
 				),
-				Codes::ATTR_CONTENT => '<a id="link_$1" data-lightboximage="$1" data-lightboxmessage="0" href="' . $scripturl . '?action=dlattach;attach=$1;image"><img src="' . $scripturl . '?action=dlattach;attach=$1{height}{width}" alt="" class="bbc_img {align}" /></a>',
+				Codes::ATTR_CONTENT => '<a id="link_$1" data-lightboximage="$1" data-lightboxmessage="0" href="' . getUrl('action', ['action' => 'dlattach', 'attach' => '$1;image']) . '"><img src="' . getUrl('action', ['action' => 'dlattach', 'attach' => '$1{height}{width}']) . '" alt="" class="bbc_img {align}" /></a>',
 				Codes::ATTR_VALIDATE => $disableAttach ? null : self::validate_options(),
 				Codes::ATTR_DISALLOW_PARENTS => $disallow,
-				Codes::ATTR_DISABLED_CONTENT => '<a href="' . $scripturl . '?action=dlattach;attach=$1">(' . $scripturl . '?action=dlattach;attach=$1)</a>',
+				Codes::ATTR_DISABLED_CONTENT => '<a href="' . getUrl('action', ['action' => 'dlattach', 'attach' => '$1']) . '">(' . getUrl('action', ['action' => 'dlattach', 'attach' => '$1']) . ')</a>',
 				Codes::ATTR_BLOCK_LEVEL => false,
 				Codes::ATTR_AUTOLINK => false,
 				Codes::ATTR_LENGTH => 6,
@@ -159,7 +159,7 @@ class IlaIntegrate
 				Codes::ATTR_CONTENT => '$1',
 				Codes::ATTR_VALIDATE => $disableAttach ? null : self::validate_plain(),
 				Codes::ATTR_DISALLOW_PARENTS => $disallow,
-				Codes::ATTR_DISABLED_CONTENT => '<a href="' . $scripturl . '?action=dlattach;attach=$1">(' . $scripturl . '?action=dlattach;attach=$1)</a>',
+				Codes::ATTR_DISABLED_CONTENT => '<a href="' . getUrl('action', ['action' => 'dlattach', 'attach' => '$1']) . '">(' . getUrl('action', ['action' => 'dlattach', 'attach' => '$1']) . ')</a>',
 				Codes::ATTR_BLOCK_LEVEL => false,
 				Codes::ATTR_AUTOLINK => false,
 				Codes::ATTR_LENGTH => 6,
@@ -180,10 +180,10 @@ class IlaIntegrate
 						Codes::PARAM_ATTR_MATCH => '(right|left|center)',
 					),
 				),
-				Codes::ATTR_CONTENT => '<a id="link_$1" data-lightboximage="$1" data-lightboxmessage="0" href="' . $scripturl . '?action=dlattach;attach=$1;image"><img src="' . $scripturl . '?action=dlattach;attach=$1{type}" alt="X" class="bbc_img {align}" /></a>',
+				Codes::ATTR_CONTENT => '<a id="link_$1" data-lightboximage="$1" data-lightboxmessage="0" href="' . getUrl('action', ['action' => 'dlattach', 'attach' => '$1;image']) . '"><img src="' . getUrl('action', ['action' => 'dlattach', 'attach' => '$1{type}']) . '" alt="X" class="bbc_img {align}" /></a>',
 				Codes::ATTR_VALIDATE => $disableAttach ? null : self::validate_options(),
 				Codes::ATTR_DISALLOW_PARENTS => $disallow,
-				Codes::ATTR_DISABLED_CONTENT => '<a href="' . $scripturl . '?action=dlattach;attach=$1">(' . $scripturl . '?action=dlattach;attach=$1)</a>',
+				Codes::ATTR_DISABLED_CONTENT => '<a href="' . getUrl('action', ['action' => 'dlattach', 'attach' => '$1']) . '">(' . getUrl('action', ['action' => 'dlattach', 'attach' => '$1']) . ')</a>',
 				Codes::ATTR_BLOCK_LEVEL => false,
 				Codes::ATTR_AUTOLINK => false,
 				Codes::ATTR_LENGTH => 6,
@@ -195,7 +195,7 @@ class IlaIntegrate
 				Codes::ATTR_CONTENT => '$1',
 				Codes::ATTR_VALIDATE => self::validate_url(),
 				Codes::ATTR_DISALLOW_PARENTS => $disallow,
-				Codes::ATTR_DISABLED_CONTENT => '<a href="' . $scripturl . '?action=dlattach;attach=$1">(' . $scripturl . '?action=dlattach;attach=$1)</a>',
+				Codes::ATTR_DISABLED_CONTENT => '<a href="' . getUrl('action', ['action' => 'dlattach', 'attach' => '$1']) . '">(' . getUrl('action', ['action' => 'dlattach', 'attach' => '$1']) . ')</a>',
 				Codes::ATTR_BLOCK_LEVEL => false,
 				Codes::ATTR_AUTOLINK => false,
 				Codes::ATTR_LENGTH => 9,
@@ -251,9 +251,9 @@ class IlaIntegrate
 	 */
 	public static function validate_options()
 	{
-		global $scripturl, $context;
+		global $context;
 
-		return function (&$data) use ($scripturl, &$context) {
+		return function (&$data) use (&$context) {
 			// Not a preview, then sanitize the attach id
 			if (strpos($data, 'post_tmp_' . User::$info->id . '_') === false)
 			{
@@ -301,9 +301,9 @@ class IlaIntegrate
 	 */
 	public static function validate_plain()
 	{
-		global $scripturl, $context, $modSettings;
+		global $context, $modSettings;
 
-		return function (&$data, $disabled) use ($scripturl, &$context, $modSettings) {
+		return function (&$data, $disabled) use (&$context, $modSettings) {
 			if (isset($disabled['attach']))
 			{
 				return $data;
@@ -326,7 +326,7 @@ class IlaIntegrate
 			if (!empty($is_image['is_image']) || $preview !== false)
 			{
 				$type = !empty($modSettings['attachmentThumbnails']) ? ';thumb' : '';
-				$data = '<a id="link_' . $num . '" data-lightboximage="' . $num . '" data-lightboxmessage="0" href="' . $scripturl . '?action=dlattach;attach=' . $num . ';image' . '"><img src="' . $scripturl . '?action=dlattach;attach=' . $num . $type . '" alt="" class="bbc_img" /></a>';
+				$data = '<a id="link_' . $num . '" data-lightboximage="' . $num . '" data-lightboxmessage="0" href="' . getUrl('action', ['action' => 'dlattach', 'attach' => $num . ';image']) . '"><img src="' . getUrl('action', ['action' => 'dlattach', 'attach' => $num . $type]) . '" alt="" class="bbc_img" /></a>';
 			}
 			else
 			{
@@ -339,7 +339,7 @@ class IlaIntegrate
 				}
 				else
 				{
-					$data = '<a href="' . $scripturl . '?action=dlattach;attach=' . $num . '"><img src="' . $check . '" alt="' . $is_image['filename'] . '" class="bbc_img" /></a>';
+					$data = '<a href="' . getUrl('action', ['action' => 'dlattach', 'attach' => $num]) . '"><img src="' . $check . '" alt="' . $is_image['filename'] . '" class="bbc_img" /></a>';
 				}
 			}
 
@@ -358,9 +358,9 @@ class IlaIntegrate
 	 */
 	public static function validate_url()
 	{
-		global $scripturl, $context;
+		global $context;
 
-		return function (&$data, $disabled) use ($scripturl, &$context) {
+		return function (&$data, $disabled) use (&$context) {
 			if (isset($disabled['attach']))
 			{
 				return $data;
@@ -381,13 +381,13 @@ class IlaIntegrate
 			// If we got the details ...
 			if ($attachment)
 			{
-				$data = '<a href="' . $scripturl . '?action=dlattach;attach=' . $num . '">
+				$data = '<a href="' . getUrl('action', ['action' => 'dlattach', 'attach' => $num]) . '">
 							<i class="icon icon-small i-paperclip"></i>&nbsp;' . $attachment['filename'] . '
 						</a>&nbsp;(' . $attachment['size'] . ($attachment['is_image'] ? ' ' . $attachment['width'] . 'x' . $attachment['height'] : '') . ')';
 			}
 			else
 			{
-				$data = '<a href="' . $scripturl . '?action=dlattach;attach=' . $num . '">
+				$data = '<a href="' . getUrl('action', ['action' => 'dlattach', 'attach' => $num]) . '">
 							<i class="icon icon-small i-paperclip"></i>&nbsp;' . $num . '
 						</a>';
 			}

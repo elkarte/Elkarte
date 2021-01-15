@@ -65,7 +65,7 @@ class PostModeration extends AbstractController
 	 */
 	public function action_unapproved()
 	{
-		global $txt, $scripturl, $context;
+		global $txt, $context;
 
 		$context['current_view'] = $this->_req->getQuery('sa', 'trim', '') === 'topics' ? 'topics' : 'replies';
 		$context['page_title'] = $txt['mc_unapproved_posts'];
@@ -242,7 +242,8 @@ class PostModeration extends AbstractController
 
 		$context['total_unapproved_topics'] = $mod_count['topics'];
 		$context['total_unapproved_posts'] = $mod_count['posts'];
-		$context['page_index'] = constructPageIndex($scripturl . '?action=moderate;area=postmod;sa=' . $context['current_view'] . (isset($this->_brd) ? ';brd=' . $this->_brd : ''), $this->_req->query->start, $context['current_view'] === 'topics' ? $context['total_unapproved_topics'] : $context['total_unapproved_posts'], 10);
+		$baseUrl = getUrl('action', ['action' => 'moderate', 'area' => 'postmod', 'sa' => $context['current_view']] + (isset($this->_brd) ? ['brd' => $this->_brd] : []));
+		$context['page_index'] = constructPageIndex($baseUrl,$this->_req->query->start,$context['current_view'] === 'topics' ? $context['total_unapproved_topics'] : $context['total_unapproved_posts'], 10);
 		$context['start'] = $this->_req->query->start;
 
 		// We have enough to make some pretty tabs!
@@ -279,11 +280,11 @@ class PostModeration extends AbstractController
 					'value' => $item['id'],
 				),
 				'approve' => array(
-					'href' => $scripturl . '?action=moderate;area=postmod;sa=' . $context['current_view'] . ';start=' . $context['start'] . ';' . $context['session_var'] . '=' . $context['session_id'] . ';approve=' . $item['id'],
+					'href' => getUrl('action', ['action' => 'moderate', 'area' => 'postmod', 'sa' => $context['current_view'], 'start' => $context['start'], '{session_data}', 'approve' => $item['id']]),
 					'text' => $txt['approve'],
 				),
 				'unapprove' => array(
-					'href' => $scripturl . '?action=moderate;area=postmod;sa=' . $context['current_view'] . ';start=' . $context['start'] . ';' . $context['session_var'] . '=' . $context['session_id'] . ';delete=' . $item['id'],
+					'href' => getUrl('action', ['action' => 'moderate', 'area' => 'postmod', 'sa' => $context['current_view'], 'start' => $context['start'], '{session_data}', 'delete' => $item['id']]),
 					'text' => $txt['remove'],
 					'test' => 'can_delete',
 				),
@@ -302,7 +303,7 @@ class PostModeration extends AbstractController
 	 */
 	public function action_unapproved_attachments()
 	{
-		global $txt, $scripturl, $context, $modSettings;
+		global $txt, $context, $modSettings;
 
 		$context['page_title'] = $txt['mc_unapproved_attachments'];
 
@@ -384,7 +385,7 @@ class PostModeration extends AbstractController
 			'width' => '100%',
 			'items_per_page' => $modSettings['defaultMaxMessages'],
 			'no_items_label' => $txt['mc_unapproved_attachments_none_found'],
-			'base_href' => $scripturl . '?action=moderate;area=attachmod;sa=attachments',
+			'base_href' => getUrl('action', ['action' => 'moderate', 'area' => 'attachmod', 'sa' => 'attachments']),
 			'default_sort_col' => 'attach_name',
 			'get_items' => array(
 				'function' => 'list_getUnapprovedAttachments',
@@ -486,7 +487,7 @@ class PostModeration extends AbstractController
 				),
 			),
 			'form' => array(
-				'href' => $scripturl . '?action=moderate;area=attachmod;sa=attachments',
+				'href' => getUrl('action', ['action' => 'moderate', 'area' => 'attachmod', 'sa' => 'attachments']),
 				'include_sort' => true,
 				'include_start' => true,
 				'hidden_fields' => array(

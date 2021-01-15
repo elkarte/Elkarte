@@ -74,12 +74,12 @@ function template_build_poster_div($message, $ignoring = false)
 		}
 
 		// Is karma display enabled?  Total or +/-?
-		if ($modSettings['karmaMode'] == '1')
+		if ($modSettings['karmaMode'] == '1' && !empty($message['member']['karma']))
 		{
 			$poster_div .= '
 									<li class="listlevel2 karma">' . $modSettings['karmaLabel'] . ' ' . ($message['member']['karma']['good'] - $message['member']['karma']['bad']) . '</li>';
 		}
-		elseif ($modSettings['karmaMode'] == '2')
+		elseif ($modSettings['karmaMode'] == '2' && !empty($message['member']['karma']))
 		{
 			$poster_div .= '
 									<li class="listlevel2 karma">' . $modSettings['karmaLabel'] . ' +' . $message['member']['karma']['good'] . '/-' . $message['member']['karma']['bad'] . '</li>';

@@ -34,7 +34,7 @@ class PaidSubscriptions implements ScheduledTaskInterface
 	 */
 	public function run()
 	{
-		global $scripturl, $modSettings, $language;
+		global $modSettings, $language;
 
 		$db = database();
 
@@ -77,7 +77,7 @@ class PaidSubscriptions implements ScheduledTaskInterface
 				'time_now' => time(),
 			)
 		)->fetch_callback(
-			function ($row) use (&$subs_reminded, $scripturl, $modSettings, $language) {
+			function ($row) use (&$subs_reminded, $modSettings, $language) {
 				// If this is the first one load the important bits.
 				if (empty($subs_reminded))
 				{
@@ -89,7 +89,7 @@ class PaidSubscriptions implements ScheduledTaskInterface
 				$subs_reminded[] = $row['id_sublog'];
 
 				$replacements = array(
-					'PROFILE_LINK' => $scripturl . '?action=profile;area=subscriptions;u=' . $row['id_member'],
+					'PROFILE_LINK' => getUrl('profile', ['action' => 'profile', 'area' => 'subscriptions', 'name' => $row['member_name'], 'u' => $row['id_member']]),
 					'REALNAME' => $row['member_name'],
 					'SUBSCRIPTION' => $row['name'],
 					'END_DATE' => strip_tags(standardTime($row['end_time'])),

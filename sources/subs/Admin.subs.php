@@ -124,7 +124,7 @@ function getServerVersions($checkFor)
  */
 function getQuickAdminTasks()
 {
-	global $txt, $scripturl, $context;
+	global $txt, $context;
 
 	// The format of this array is: permission, action, title, description, icon.
 	$quick_admin_tasks = array(
@@ -147,8 +147,8 @@ function getQuickAdminTasks()
 		}
 
 		$available_admin_tasks[] = array(
-			'href' => $scripturl . '?action=admin;area=' . $task[1],
-			'link' => '<a href="' . $scripturl . '?action=admin;area=' . $task[1] . '">' . $txt[$task[2]] . '</a>',
+			'href' => getUrl('admin', ['action' => 'admin', 'area' => $task[1]]),
+			'link' => '<a href="' . getUrl('admin', ['action' => 'admin', 'area' => $task[1]]) . '">' . $txt[$task[2]] . '</a>',
 			'title' => $txt[$task[2]],
 			'description' => $txt[$task[3]],
 			'icon' => $task[4],

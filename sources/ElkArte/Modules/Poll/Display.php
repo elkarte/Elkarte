@@ -88,7 +88,7 @@ class Display extends AbstractModule
 	 */
 	public function prepare_context($template_layers)
 	{
-		global $context, $scripturl, $txt;
+		global $context, $txt;
 
 		// Create the poll info if it exists.
 		if ($this->_id_poll > 0)
@@ -99,14 +99,51 @@ class Display extends AbstractModule
 			loadPollContext($this->_id_poll);
 
 			// Build the poll moderation button array.
-			$context['poll_buttons'] = array(
-				'vote' => array('test' => 'allow_return_vote', 'text' => 'poll_return_vote', 'image' => 'poll_options.png', 'lang' => true, 'url' => $scripturl . '?topic=' . $context['current_topic'] . '.' . $context['start']),
-				'results' => array('test' => 'allow_poll_view', 'text' => 'poll_results', 'image' => 'poll_results.png', 'lang' => true, 'url' => $scripturl . '?topic=' . $context['current_topic'] . '.' . $context['start'] . ';viewresults'),
-				'change_vote' => array('test' => 'allow_change_vote', 'text' => 'poll_change_vote', 'image' => 'poll_change_vote.png', 'lang' => true, 'url' => $scripturl . '?action=poll;sa=vote;topic=' . $context['current_topic'] . '.' . $context['start'] . ';poll=' . $context['poll']['id'] . ';' . $context['session_var'] . '=' . $context['session_id']),
-				'lock' => array('test' => 'allow_lock_poll', 'text' => (!$context['poll']['is_locked'] ? 'poll_lock' : 'poll_unlock'), 'image' => 'poll_lock.png', 'lang' => true, 'url' => $scripturl . '?action=lockvoting;topic=' . $context['current_topic'] . '.' . $context['start'] . ';' . $context['session_var'] . '=' . $context['session_id']),
-				'edit' => array('test' => 'allow_edit_poll', 'text' => 'poll_edit', 'image' => 'poll_edit.png', 'lang' => true, 'url' => $scripturl . '?action=editpoll;topic=' . $context['current_topic'] . '.' . $context['start']),
-				'remove_poll' => array('test' => 'can_remove_poll', 'text' => 'poll_remove', 'image' => 'admin_remove_poll.png', 'lang' => true, 'custom' => 'onclick="return confirm(\'' . $txt['poll_remove_warn'] . '\');"', 'url' => $scripturl . '?action=poll;sa=remove;topic=' . $context['current_topic'] . '.' . $context['start'] . ';' . $context['session_var'] . '=' . $context['session_id']),
-			);
+			$context['poll_buttons'] = [
+				'vote' => [
+					'test' => 'allow_return_vote',
+					'text' => 'poll_return_vote',
+					'image' => 'poll_options.png',
+					'lang' => true,
+					'url' => getUrl('action', ['topic' => $context['current_topic'] . '.' . $context['start']])
+				],
+				'results' => [
+					'test' => 'allow_poll_view',
+					'text' => 'poll_results',
+					'image' => 'poll_results.png',
+					'lang' => true,
+					'url' => getUrl('action', ['topic' => $context['current_topic'] . '.' . $context['start'] . ';viewresults'])
+				],
+				'change_vote' => [
+					'test' => 'allow_change_vote',
+					'text' => 'poll_change_vote',
+					'image' => 'poll_change_vote.png',
+					'lang' => true,
+					'url' => getUrl('action', ['action' => 'poll', 'sa' => 'vote', 'topic' => $context['current_topic'] . '.' . $context['start'], 'poll' => $context['poll']['id'], '{session_data}'])
+				],
+				'lock' => [
+					'test' => 'allow_lock_poll',
+					'text' => (!$context['poll']['is_locked'] ? 'poll_lock' : 'poll_unlock'),
+					'image' => 'poll_lock.png',
+					'lang' => true,
+					'url' => getUrl('action', ['action' => 'lockvoting', 'topic' => $context['current_topic'] . '.' . $context['start'], '{session_data}'])
+				],
+				'edit' => [
+					'test' => 'allow_edit_poll',
+					'text' => 'poll_edit',
+					'image' => 'poll_edit.png',
+					'lang' => true,
+					'url' => getUrl('action', ['action' => 'editpoll', 'topic' => $context['current_topic'] . '.' . $context['start']])
+				],
+				'remove_poll' => [
+					'test' => 'can_remove_poll',
+					'text' => 'poll_remove',
+					'image' => 'admin_remove_poll.png',
+					'lang' => true,
+					'custom' => 'onclick="return confirm(\'' . $txt['poll_remove_warn'] . '\');"',
+					'url' => getUrl('action', ['action' => 'poll', 'sa' => 'remove', 'topic' => $context['current_topic'] . '.' . $context['start'] . '{session_data}'])
+				],
+			];
 
 			// Allow mods to add additional buttons here
 			call_integration_hook('integrate_poll_buttons', array(&$context['poll_buttons']));

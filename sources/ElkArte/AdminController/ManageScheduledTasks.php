@@ -92,7 +92,7 @@ class ManageScheduledTasks extends AbstractController
 	 */
 	public function action_tasks()
 	{
-		global $context, $txt, $scripturl;
+		global $context, $txt;
 
 		// We'll need to recalculate dates and stuff like that.
 		require_once(SUBSDIR . '/ScheduledTasks.subs.php');
@@ -158,7 +158,7 @@ class ManageScheduledTasks extends AbstractController
 		$listOptions = array(
 			'id' => 'scheduled_tasks',
 			'title' => $txt['maintain_tasks'],
-			'base_href' => $scripturl . '?action=admin;area=scheduledtasks',
+			'base_href' => getUrl('admin', ['action' => 'admin', 'area' => 'scheduledtasks']),
 			'get_items' => array(
 				'function' => function () {
 					return $this->list_getScheduledTasks();
@@ -173,7 +173,7 @@ class ManageScheduledTasks extends AbstractController
 					'data' => array(
 						'sprintf' => array(
 							'format' => '
-								<a class="linkbutton" href="' . $scripturl . '?action=admin;area=scheduledtasks;sa=taskedit;tid=%1$d" title="' . $txt['scheduled_task_edit'] . ' %2$s"><i class="icon icon-small i-pencil"></i> %2$s</a><br /><span class="smalltext">%3$s</span>',
+								<a class="linkbutton" href="' . getUrl('admin', ['action' => 'admin', 'area' => 'scheduledtasks', 'sa' => 'taskedit', 'tid' => '%1$d']) . '" title="' . $txt['scheduled_task_edit'] . ' %2$s"><i class="icon icon-small i-pencil"></i> %2$s</a><br /><span class="smalltext">%3$s</span>',
 							'params' => array(
 								'id' => false,
 								'name' => false,
@@ -235,7 +235,7 @@ class ManageScheduledTasks extends AbstractController
 				),
 			),
 			'form' => array(
-				'href' => $scripturl . '?action=admin;area=scheduledtasks',
+				'href' => getUrl('admin', ['action' => 'admin', 'area' => 'scheduledtasks']),
 			),
 			'additional_rows' => array(
 				array(
@@ -359,7 +359,7 @@ class ManageScheduledTasks extends AbstractController
 	 */
 	public function action_log()
 	{
-		global $scripturl, $context, $txt;
+		global $context, $txt;
 
 		require_once(SUBSDIR . '/ScheduledTasks.subs.php');
 
@@ -381,7 +381,7 @@ class ManageScheduledTasks extends AbstractController
 			'items_per_page' => 30,
 			'title' => $txt['scheduled_log'],
 			'no_items_label' => $txt['scheduled_log_empty'],
-			'base_href' => $context['admin_area'] === 'scheduledtasks' ? $scripturl . '?action=admin;area=scheduledtasks;sa=tasklog' : $scripturl . '?action=admin;area=logs;sa=tasklog',
+			'base_href' => $context['admin_area'] === 'scheduledtasks' ? getUrl('admin', ['action' => 'admin', 'area' => 'scheduledtasks', 'sa' => 'tasklog']) :getUrl('admin', ['action' => 'admin', 'area' => 'logs', 'sa' => 'tasklog']),
 			'default_sort_col' => 'date',
 			'get_items' => array(
 				'function' => function ($start, $items_per_page, $sort) {
@@ -447,7 +447,7 @@ class ManageScheduledTasks extends AbstractController
 				),
 			),
 			'form' => array(
-				'href' => $context['admin_area'] === 'scheduledtasks' ? $scripturl . '?action=admin;area=scheduledtasks;sa=tasklog' : $scripturl . '?action=admin;area=logs;sa=tasklog',
+				'href' => $context['admin_area'] === 'scheduledtasks' ? getUrl('admin', ['action' => 'admin', 'area' => 'scheduledtasks', 'sa' => 'tasklog']) : getUrl('admin', ['action' => 'admin', 'area' => 'logs', 'sa' => 'tasklog']),
 				'token' => 'admin-tl',
 			),
 			'additional_rows' => array(

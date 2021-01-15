@@ -126,7 +126,7 @@ class TopicsMerge
 	 */
 	protected function _loadTopicDetails()
 	{
-		global $scripturl, $modSettings;
+		global $modSettings;
 
 		// Joy of all joys, make sure they're not pi**ing about with unapproved topics they can't see :P
 		if ($modSettings['postmod_active'])
@@ -202,15 +202,15 @@ class TopicsMerge
 					'time' => standardTime($row['time_started']),
 					'html_time' => htmlTime($row['time_started']),
 					'timestamp' => forum_time(true, $row['time_started']),
-					'href' => empty($row['id_member_started']) ? '' : $scripturl . '?action=profile;u=' . $row['id_member_started'],
-					'link' => empty($row['id_member_started']) ? $row['name_started'] : '<a href="' . $scripturl . '?action=profile;u=' . $row['id_member_started'] . '">' . $row['name_started'] . '</a>'
+					'href' => empty($row['id_member_started']) ? '' : getUrl('profile', ['action' => 'profile', 'u' => $row['id_member_started'], 'name' => $row['name_started']]),
+					'link' => empty($row['id_member_started']) ? $row['name_started'] : '<a href="' . getUrl('profile', ['action' => 'profile', 'u' => $row['id_member_started'], 'name' => $row['name_started']]) . '">' . $row['name_started'] . '</a>'
 				),
 				'updated' => array(
 					'time' => standardTime($row['time_updated']),
 					'html_time' => htmlTime($row['time_updated']),
 					'timestamp' => forum_time(true, $row['time_updated']),
-					'href' => empty($row['id_member_updated']) ? '' : $scripturl . '?action=profile;u=' . $row['id_member_updated'],
-					'link' => empty($row['id_member_updated']) ? $row['name_updated'] : '<a href="' . $scripturl . '?action=profile;u=' . $row['id_member_updated'] . '">' . $row['name_updated'] . '</a>'
+					'href' => empty($row['id_member_updated']) ? '' : getUrl('profile', ['action' => 'profile', 'u' => $row['id_member_updated'], 'name' => $row['name_updated']]),
+					'link' => empty($row['id_member_updated']) ? $row['name_updated'] : '<a href="' . getUrl('profile', ['action' => 'profile', 'u' => $row['id_member_updated'], 'name' => $row['name_updated']]) . '">' . $row['name_updated'] . '</a>'
 				)
 			);
 			$this->_num_views += $row['num_views'];

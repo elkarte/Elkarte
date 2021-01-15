@@ -220,8 +220,8 @@ class ThemeLoader
 		if (!empty($modSettings['xmlnews_enable']) && (!empty($modSettings['allow_guestAccess']) || $context['user']['is_logged']))
 		{
 			$context['newsfeed_urls'] = [
-				'rss' => $scripturl . '?action=.xml;type=rss2;limit=' . (!empty($modSettings['xmlnews_limit']) ? $modSettings['xmlnews_limit'] : 5),
-				'atom' => $scripturl . '?action=.xml;type=atom;limit=' . (!empty($modSettings['xmlnews_limit']) ? $modSettings['xmlnews_limit'] : 5),
+				'rss' => getUrl('action', ['action' => '.xml', 'type' => 'rss2', 'limit' => (!empty($modSettings['xmlnews_limit']) ? $modSettings['xmlnews_limit'] : 5)]),
+				'atom' => getUrl('action', ['action' => '.xml', 'type' => 'atom', 'limit' => (!empty($modSettings['xmlnews_limit']) ? $modSettings['xmlnews_limit'] : 5)]),
 			];
 		}
 

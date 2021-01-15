@@ -137,7 +137,7 @@ class ManageRegistration extends AbstractController
 	 */
 	public function action_register()
 	{
-		global $txt, $context, $scripturl;
+		global $txt, $context;
 
 		if (!empty($this->_req->post->regSubmit))
 		{
@@ -198,8 +198,8 @@ class ManageRegistration extends AbstractController
 				$context['new_member'] = array(
 					'id' => $memberID,
 					'name' => $this->_req->post->user,
-					'href' => $scripturl . '?action=profile;u=' . $memberID,
-					'link' => '<a href="' . $scripturl . '?action=profile;u=' . $memberID . '">' . $this->_req->post->user . '</a>',
+					'href' => getUrl('profile', ['action' => 'profile', 'u' => $memberID]),
+					'link' => '<a href="' . getUrl('profile', ['action' => 'profile', 'u' => $memberID]) . '">' . $this->_req->post->user . '</a>',
 				);
 				$context['registration_done'] = sprintf($txt['admin_register_done'], $context['new_member']['link']);
 			}
@@ -461,7 +461,7 @@ class ManageRegistration extends AbstractController
 	 */
 	public function action_registerSettings_display()
 	{
-		global $txt, $context, $scripturl, $modSettings;
+		global $txt, $context, $modSettings;
 
 		// Initialize the form
 		$settingsForm = new SettingsForm(SettingsForm::DB_ADAPTER);
@@ -494,7 +494,7 @@ class ManageRegistration extends AbstractController
 			redirectexit('action=admin;area=regcenter;sa=settings');
 		}
 
-		$context['post_url'] = $scripturl . '?action=admin;area=regcenter;save;sa=settings';
+		$context['post_url'] = getUrl('admin', ['action' => 'admin', 'area' => 'regcenter;save', 'sa' => 'settings']);
 		$context['settings_title'] = $txt['settings'];
 
 		// Define some javascript for COPPA.

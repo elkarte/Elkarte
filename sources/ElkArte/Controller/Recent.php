@@ -168,7 +168,7 @@ class Recent extends AbstractController implements FrontpageInterface
 	 */
 	public function action_recent()
 	{
-		global $txt, $scripturl, $context, $modSettings, $board;
+		global $txt, $context, $modSettings, $board;
 
 		// Start up a new recent posts grabber
 		$this->_grabber = new \ElkArte\Recent($this->user->id);
@@ -213,7 +213,7 @@ class Recent extends AbstractController implements FrontpageInterface
 
 		// Linktree
 		$context['linktree'][] = array(
-			'url' => $scripturl . '?action=recent' . (empty($board) ? (empty($categories) ? '' : ';c=' . implode(',', $categories)) : ';board=' . $board . '.0'),
+			'url' => getUrl('action', ['action' => 'recent'] + (empty($board) ? (empty($categories) ? [] : ['c' => implode(',', $categories)]) : ['board' => $board . '.0'])),
 			'name' => $context['page_title']
 		);
 
@@ -259,7 +259,7 @@ class Recent extends AbstractController implements FrontpageInterface
 	 */
 	private function _recentPostsCategory()
 	{
-		global $scripturl, $modSettings, $context;
+		global $modSettings, $context;
 
 		$categories = array_map('intval', explode(',', $this->_req->query->c));
 
@@ -298,7 +298,7 @@ class Recent extends AbstractController implements FrontpageInterface
 			$this->_maxMsgID = array(400, 7);
 		}
 
-		$this->_base_url = $scripturl . '?action=recent;c=' . implode(',', $categories);
+		$this->_base_url = getUrl('action', ['action' => 'recent', 'c' => implode(',', $categories)]);
 
 		return $categories;
 	}
@@ -308,7 +308,7 @@ class Recent extends AbstractController implements FrontpageInterface
 	 */
 	private function _recentPostsBoards()
 	{
-		global $scripturl, $modSettings;
+		global $modSettings;
 
 		$this->_req->query->boards = array_map('intval', explode(',', $this->_req->query->boards));
 
@@ -332,7 +332,7 @@ class Recent extends AbstractController implements FrontpageInterface
 			$this->_maxMsgID = array(500, 9);
 		}
 
-		$this->_base_url = $scripturl . '?action=recent;boards=' . implode(',', $this->_req->query->boards);
+		$this->_base_url = getUrl('action', ['action' => 'recent', 'boards' => implode(',', $this->_req->query->boards)]);
 	}
 
 	/**
@@ -340,7 +340,7 @@ class Recent extends AbstractController implements FrontpageInterface
 	 */
 	private function _recentPostsBoard()
 	{
-		global $scripturl, $modSettings, $board;
+		global $modSettings, $board;
 
 		$board_data = fetchBoardsInfo(array('boards' => $board), array('selects' => 'posts'));
 		$this->_total_posts = $board_data[(int) $board]['num_posts'];
@@ -353,7 +353,7 @@ class Recent extends AbstractController implements FrontpageInterface
 			$this->_maxMsgID = array(600, 10);
 		}
 
-		$this->_base_url = $scripturl . '?action=recent;board=' . $board . '.%1$d';
+		$this->_base_url = getUrl('action', ['action' => 'recent', 'board' => $board . '.%1$d']);
 		$this->_flex_start = true;
 	}
 
@@ -362,14 +362,14 @@ class Recent extends AbstractController implements FrontpageInterface
 	 */
 	private function _recentPostsAll()
 	{
-		global $scripturl, $modSettings;
+		global $modSettings;
 
 		$this->_total_posts = sumRecentPosts();
 
 		$this->_grabber->setVisibleBoards(max(0, $modSettings['maxMsgID'] - 100 - $this->_start * 6), !empty($modSettings['recycle_enable']) && $modSettings['recycle_board'] > 0 ? $modSettings['recycle_board'] : 0);
 
 		// Set up the pageindex
-		$this->_base_url = $scripturl . '?action=recent';
+		$this->_base_url = getUrl('action', ['action' => 'recent']);
 	}
 
 	/**
@@ -444,7 +444,7 @@ class Recent extends AbstractController implements FrontpageInterface
 	 */
 	private function _addButtons($post)
 	{
-		global $context, $txt, $scripturl;
+		global $context, $txt;
 
 		$txt_like_post = '<li></li>';
 
@@ -472,26 +472,26 @@ class Recent extends AbstractController implements FrontpageInterface
 		return array(
 			// How about... even... remove it entirely?!
 			'remove' => array(
-				'href' => $scripturl . '?action=deletemsg;msg=' . $post['id'] . ';topic=' . $post['topic'] . ';recent;' . $context['session_var'] . '=' . $context['session_id'],
+				'href' => getUrl('action', ['action' => 'deletemsg', 'msg' => $post['id'], 'topic' => $post['topic'] . ';recent', '{session_data}']),
 				'text' => $txt['remove'],
 				'test' => 'can_delete',
 				'custom' => 'onclick="return confirm(' . JavaScriptEscape($txt['remove_message'] . '?') . ');"',
 			),
 			// Can we request notification of topics?
 			'notify' => array(
-				'href' => $scripturl . '?action=notify;topic=' . $post['topic'] . '.' . $post['start'],
+				'href' => getUrl('action', ['action' => 'notify', 'topic' => $post['topic'] . '.' . $post['start']]),
 				'text' => $txt['notify'],
 				'test' => 'can_mark_notify',
 			),
 			// If they *can* reply?
 			'reply' => array(
-				'href' => $scripturl . '?action=post;topic=' . $post['topic'] . '.' . $post['start'],
+				'href' => getUrl('action', ['action' => 'post', 'topic' => $post['topic'] . '.' . $post['start']]),
 				'text' => $txt['reply'],
 				'test' => 'can_reply',
 			),
 			// If they *can* quote?
 			'quote' => array(
-				'href' => $scripturl . '?action=post;topic=' . $post['topic'] . '.' . $post['start'] . ';quote=' . $post['id'],
+				'href' => getUrl('action', ['action' => 'post', 'topic' => $post['topic'] . '.' . $post['start'], 'quote' => $post['id']]),
 				'text' => $txt['quote'],
 				'test' => 'can_quote',
 			),

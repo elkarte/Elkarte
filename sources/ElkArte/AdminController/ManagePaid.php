@@ -115,7 +115,7 @@ class ManagePaid extends AbstractController
 	 */
 	public function action_paidSettings_display()
 	{
-		global $context, $txt, $scripturl, $modSettings;
+		global $context, $txt, $modSettings;
 
 		require_once(SUBSDIR . '/PaidSubscriptions.subs.php');
 
@@ -133,7 +133,7 @@ class ManagePaid extends AbstractController
 		$context[$context['admin_menu_name']]['current_subsection'] = 'settings';
 
 		// Get the final touches in place.
-		$context['post_url'] = $scripturl . '?action=admin;area=paidsubscribe;save;sa=settings';
+		$context['post_url'] = getUrl('admin', ['action' => 'admin', 'area' => 'paidsubscribe;save', 'sa' => 'settings']);
 		$context['settings_title'] = $txt['settings'];
 
 		// We want javascript for our currency options.
@@ -264,12 +264,12 @@ class ManagePaid extends AbstractController
 	 */
 	public function action_view()
 	{
-		global $context, $txt, $modSettings, $scripturl;
+		global $context, $txt, $modSettings;
 
 		// Not made the settings yet?
 		if (empty($modSettings['paid_currency_symbol']))
 		{
-			throw new Exception('paid_not_set_currency', false, array($scripturl . '?action=admin;area=paidsubscribe;sa=settings'));
+			throw new Exception('paid_not_set_currency', false, array(getUrl('admin', ['action' => 'admin', 'area' => 'paidsubscribe', 'sa' => 'settings'])));
 		}
 
 		// Some basic stuff.
@@ -281,7 +281,7 @@ class ManagePaid extends AbstractController
 			'id' => 'subscription_list',
 			'title' => $txt['subscriptions'],
 			'items_per_page' => 20,
-			'base_href' => $scripturl . '?action=admin;area=paidsubscribe;sa=view',
+			'base_href' => getUrl('admin', ['action' => 'admin', 'area' => 'paidsubscribe', 'sa' => 'view']),
 			'get_items' => array(
 				'function' => function () {
 					global $context;
@@ -305,9 +305,7 @@ class ManagePaid extends AbstractController
 					),
 					'data' => array(
 						'function' => function ($rowData) {
-							global $scripturl;
-
-							return sprintf('<a href="%1$s?action=admin;area=paidsubscribe;sa=viewsub;sid=%2$s">%3$s</a>', $scripturl, $rowData['id'], $rowData['name']);
+							return sprintf('<a href="' . getUrl('admin', ['action' => 'admin', 'area' => 'paidsubscribe', 'sa' => 'viewsub', 'sid' => '%1$s']) . '">%2$s</a>', $rowData['id'], $rowData['name']);
 						},
 					),
 				),
@@ -366,9 +364,9 @@ class ManagePaid extends AbstractController
 					),
 					'data' => array(
 						'function' => function ($rowData) {
-							global $scripturl, $txt;
+							global $txt;
 
-							return '<a href="' . $scripturl . '?action=admin;area=paidsubscribe;sa=viewsub;sid=' . $rowData['id'] . '"><i class="icon i-view" title="' . $txt['view'] . '"></i></a>';
+							return '<a href="' . getUrl('admin', ['action' => 'admin', 'area' => 'paidsubscribe', 'sa' => 'viewsub', 'sid' => $rowData['id']]) . '"><i class="icon i-view" title="' . $txt['view'] . '"></i></a>';
 						},
 						'class' => 'centertext',
 					),
@@ -379,9 +377,9 @@ class ManagePaid extends AbstractController
 					),
 					'data' => array(
 						'function' => function ($rowData) {
-							global $txt, $scripturl;
+							global $txt;
 
-							return '<a href="' . $scripturl . '?action=admin;area=paidsubscribe;sa=modify;sid=' . $rowData['id'] . '"><i class="icon i-modify" title="' . $txt['modify'] . '"></i></a>';
+							return '<a href="' . getUrl('admin', ['action' => 'admin', 'area' => 'paidsubscribe', 'sa' => 'modify', 'sid' => $rowData['id']]) . '"><i class="icon i-modify" title="' . $txt['modify'] . '"></i></a>';
 						},
 						'class' => 'centertext',
 					),
@@ -392,16 +390,16 @@ class ManagePaid extends AbstractController
 					),
 					'data' => array(
 						'function' => function ($rowData) {
-							global $txt, $scripturl;
+							global $txt;
 
-							return '<a href="' . $scripturl . '?action=admin;area=paidsubscribe;sa=modify;delete;sid=' . $rowData['id'] . '"><i class="icon i-delete" title="' . $txt['delete'] . '"></i></a>';
+							return '<a href="' . getUrl('admin', ['action' => 'admin', 'area' => 'paidsubscribe', 'sa' => 'modify;delete', 'sid' => $rowData['id']]) . '"><i class="icon i-delete" title="' . $txt['delete'] . '"></i></a>';
 						},
 						'class' => 'centertext',
 					),
 				),
 			),
 			'form' => array(
-				'href' => $scripturl . '?action=admin;area=paidsubscribe;sa=modify',
+				'href' => getUrl('admin', ['action' => 'admin', 'area' => 'paidsubscribe', 'sa' => 'modify']),
 			),
 			'additional_rows' => array(
 				array(
@@ -869,6 +867,7 @@ class ManagePaid extends AbstractController
 				'status' => $row['status'],
 				'username' => $row['username'],
 			);
+
 			$context['sub']['start']['last_day'] = (int) strftime('%d', mktime(0, 0, 0, $context['sub']['start']['month'] == 12 ? 1 : $context['sub']['start']['month'] + 1, 0, $context['sub']['start']['month'] == 12 ? $context['sub']['start']['year'] + 1 : $context['sub']['start']['year']));
 			$context['sub']['end']['last_day'] = (int) strftime('%d', mktime(0, 0, 0, $context['sub']['end']['month'] == 12 ? 1 : $context['sub']['end']['month'] + 1, 0, $context['sub']['end']['month'] == 12 ? $context['sub']['end']['year'] + 1 : $context['sub']['end']['year']));
 		}
@@ -887,7 +886,7 @@ class ManagePaid extends AbstractController
 	 */
 	public function action_viewsub()
 	{
-		global $context, $txt, $scripturl;
+		global $context, $txt;
 
 		require_once(SUBSDIR . '/PaidSubscriptions.subs.php');
 
@@ -908,7 +907,7 @@ class ManagePaid extends AbstractController
 			'id' => 'subscribed_users_list',
 			'title' => sprintf($txt['view_users_subscribed'], $context['subscription']['name']),
 			'items_per_page' => 20,
-			'base_href' => $scripturl . '?action=admin;area=paidsubscribe;sa=viewsub;sid=' . $context['sub_id'],
+			'base_href' => getUrl('admin', ['action' => 'admin', 'area' => 'paidsubscribe', 'sa' => 'viewsub', 'sid' => $context['sub_id']]),
 			'default_sort_col' => 'name',
 			'get_items' => array(
 				'function' => function ($start, $items_per_page, $sort, $id_sub, $search_string, $search_vars) {
@@ -939,9 +938,9 @@ class ManagePaid extends AbstractController
 					),
 					'data' => array(
 						'function' => function ($rowData) {
-							global $txt, $scripturl;
+							global $txt;
 
-							return $rowData['id_member'] == 0 ? $txt['guest'] : '<a href="' . $scripturl . '?action=profile;u=' . $rowData['id_member'] . '">' . $rowData['name'] . '</a>';
+							return $rowData['id_member'] == 0 ? $txt['guest'] : '<a href="' . getUrl('profile', ['action' => 'profile', 'u' => $rowData['id_member'], 'name' =>  $rowData['name']]) . '">' . $rowData['name'] . '</a>';
 						},
 					),
 					'sort' => array(
@@ -1011,9 +1010,9 @@ class ManagePaid extends AbstractController
 					),
 					'data' => array(
 						'function' => function ($rowData) {
-							global $txt, $scripturl;
+							global $txt;
 
-							return '<a href="' . $scripturl . '?action=admin;area=paidsubscribe;sa=modifyuser;lid=' . $rowData['id'] . '">' . $txt['modify'] . '</a>';
+							return '<a href="' . getUrl('admin', ['action' => 'admin', 'area' => 'paidsubscribe', 'sa' => '=modifyuser', 'lid' => $rowData['id']]) . '">' . $txt['modify'] . '</a>';
 						},
 						'class' => 'centertext',
 					),
@@ -1032,7 +1031,7 @@ class ManagePaid extends AbstractController
 				),
 			),
 			'form' => array(
-				'href' => $scripturl . '?action=admin;area=paidsubscribe;sa=modifyuser;sid=' . $context['sub_id'],
+				'href' =>getUrl('admin', ['action' => 'admin', 'area' => 'paidsubscribe', 'sa' => 'modifyuser', 'sid' => $context['sub_id']]),
 			),
 			'additional_rows' => array(
 				array(

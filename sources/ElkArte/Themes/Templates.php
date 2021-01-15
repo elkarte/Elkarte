@@ -141,7 +141,7 @@ class Templates
 	 */
 	protected function requireTemplate($template_name, $style_sheets, $fatal): bool
 	{
-		global $context, $settings, $txt, $scripturl, $db_show_debug;
+		global $context, $settings, $txt, $db_show_debug;
 
 		if (!is_array($style_sheets))
 		{
@@ -231,7 +231,7 @@ class Templates
 				}
 
 				$context['security_controls_files']['errors']['theme_dir'] =
-					'<a href="' . $scripturl . '?action=admin;area=theme;sa=list;th=1;' . $context['session_var'] . '=' . $context['session_id'] . '">' . $txt['theme_dir_wrong'] . '</a>';
+					'<a href="' . getUrl('admin', ['action' => 'admin', 'area' => 'theme', 'sa' => 'list', 'th' => 1, '{session_data}']) . '">' . $txt['theme_dir_wrong'] . '</a>';
 			}
 
 			$this->load($template_name);
