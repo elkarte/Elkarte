@@ -1660,7 +1660,7 @@ function makeNotificationChanges($memID)
 			}
 			else
 			{
-				$to_save[$mention] = Notifications::DEFALT_NONE;
+				$to_save[$mention] = Notifications::DEFAULT_NONE;
 			}
 		}
 
