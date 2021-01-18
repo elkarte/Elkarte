@@ -14,6 +14,7 @@
 /**
  * Extension functions to provide ElkArte compatibility with sceditor
  */
+const itemCodes = ["*:disc", "@:disc", "+:square", "x:square", "#:decimal", "0:decimal", "O:circle", "o:circle"];
 (function ($)
 {
 	var extensionMethods = {
@@ -35,40 +36,14 @@
 				$(oIframeBody).on(event, func);
 			}
 		},
-		InsertText: function (text, bClear)
-		{
-			var bIsSource = this.inSourceMode();
-
-			if (!bIsSource)
-			{
-				this.toggleSourceMode();
-			}
-
-			var current_value = this.getSourceEditorValue(false),
-				iEmpty = current_value.length;
-
-			current_value = bClear ? text + "\n" : current_value + (iEmpty > 0 ? "\n" : "") + text + "\n";
-			this.setSourceEditorValue(current_value);
-
-			if (!bIsSource)
-			{
-				this.toggleSourceMode();
-			}
-		},
 		getText: function (filter)
 		{
-			var current_value = '';
-
 			if (this.inSourceMode())
 			{
-				current_value = this.getSourceEditorValue(false);
-			}
-			else
-			{
-				current_value = this.getWysiwygEditorValue(filter);
+				return this.getSourceEditorValue(false);
 			}
 
-			return current_value;
+			return this.getWysiwygEditorValue(filter);
 		},
 		appendEmoticon: function (code, emoticon)
 		{
@@ -106,19 +81,7 @@
 
 						e.preventDefault();
 					});
-				$wrapper = $('<span class="smiley"></span>').append($img);
-				line.append($wrapper);
-			}
-		},
-		storeLastState: function ()
-		{
-			this.wasSource = this.inSourceMode();
-		},
-		setTextMode: function ()
-		{
-			if (!this.inSourceMode())
-			{
-				this.toggleSourceMode();
+				line.append($('<span class="smiley"></span>').append($img));
 			}
 		},
 		createPermanentDropDown: function ()
@@ -220,7 +183,19 @@
 		}
 	};
 
-	$.extend(true, $['sceditor'].prototype, extensionMethods);
+	// Define our editor create function, used to add our extension methods
+	sceditor.createEx = function (textarea, options)
+	{
+		// Call the create function as normal
+		sceditor.create(textarea, options);
+
+		// Extend sceditor utility functions with our methods
+		let instance = sceditor.instance(textarea);
+		if (instance)
+		{
+			sceditor.utils.extend(instance.constructor.prototype, extensionMethods);
+		}
+	};
 })(jQuery);
 
 /**
@@ -235,23 +210,23 @@
  *
  * Adds Tt, Pre, Spoiler, Footnote commands
  */
-$.sceditor.command
+sceditor.command
 	.set('space', {})
 	.set('spoiler', {
 		state: function ()
 		{
-			var currentNode = this.currentNode(),
+			let currentNode = this.currentNode(),
 				currentRange = this.getRangeHelper();
 
 			// We don't have a node since we don't render the tag in the wizzy editor
 			// however we can spot check to see if the cursor is inside the tags.
 			if (currentRange.selectedRange())
 			{
-				var end = currentRange.selectedRange().startOffset,
-					text = $(currentNode).text();
+				let end = currentRange.selectedRange().startOffset,
+					text = typeof currentNode !== 'undefined' ? currentNode.textContent : '';
 
 				// Left and right text from the cursor position and tag positions
-				var left = text.substr(0, end),
+				let left = text.substr(0, end),
 					right = text.substr(end),
 					l1 = left.lastIndexOf("[spoiler]"),
 					l2 = left.lastIndexOf("[/spoiler]"),
@@ -277,19 +252,19 @@ $.sceditor.command
 	.set('footnote', {
 		state: function ()
 		{
-			var currentNode = this.currentNode(),
+			let currentNode = this.currentNode(),
 				currentRange = this.getRangeHelper();
 
 			// We don't have an html node since we don't render the tag in the editor
 			// but we can do a spot check to see if the cursor is placed between plain tags.  This
-			// will miss with nested tags but its nicer than nothing.
+			// will miss with [footnote]nested [b]tags[b][/footnote] but its nicer than nothing.
 			if (currentRange.selectedRange())
 			{
-				var end = currentRange.selectedRange().startOffset,
-					text = $(currentNode).text();
+				let end = currentRange.selectedRange().startOffset,
+					text = typeof currentNode !== 'undefined' ? currentNode.textContent : '';
 
 				// Left and right text from the cursor position and tag positions
-				var left = text.substr(0, end),
+				let left = text.substr(0, end),
 					right = text.substr(end),
 					l1 = left.lastIndexOf("[footnote]"),
 					l2 = left.lastIndexOf("[/footnote]"),
@@ -315,29 +290,42 @@ $.sceditor.command
 	.set('tt', {
 		state: function ()
 		{
-			var currentNode = this.currentNode();
+			let currentNode = this.currentNode();
 
-			return $(currentNode).is('span.tt') || $(currentNode).parents('span.tt').length > 0 ? 1 : 0;
+			if (currentNode && currentNode.nodeType === 3)
+			{
+				currentNode = currentNode.parentNode;
+			}
+
+			return (currentNode && (currentNode.classList.contains('tt') && currentNode.tagName.toLowerCase() === 'span')) ? 1 : 0;
 		},
 		exec: function ()
 		{
-			var editor = this,
-				currentNode = this.currentNode();
+			let editor = this,
+				currentNode = this.currentNode(),
+				isSpanTT = $(currentNode).is('span.tt'),
+				parentSpanTT = $(currentNode).parent('span.tt');
 
-			// Add a TT span if not in one
-			if (!$(currentNode).is('span.tt') && $(currentNode).parents('span.tt').length === 0)
+			if (!isSpanTT && parentSpanTT.length === 0)
 			{
-				editor.insert('<span class="tt">', '</span>', false);
-			}// Remove a TT span if in one and its empty
-			else if ($(currentNode).is('span.tt') && $(currentNode).text().length === 1)
-			{
-				$(currentNode).replaceWith('');
-				editor.insert('<span> ', '</span>', false);
+				return editor.insert('<span class="tt">', '</span>', false);
 			}
-			// Escape from this one then
-			else if (!$(currentNode).is('span.tt') && $(currentNode).parents('span.tt').length > 0)
+
+			// In a TT node and selected TT again, lets try to end it and escape to new block
+			if ((!isSpanTT && parentSpanTT.length > 0) || (isSpanTT && parentSpanTT.length === 0))
 			{
-				editor.insert('<span> ', '</span>', false);
+				// Treating TT as a block until inline tag is figured out
+				let rangerHelper = this.getRangeHelper(),
+					firstBlock = rangerHelper.getFirstBlockParent(),
+					sceditor = $editor_data[post_box_name],
+					newNode;
+
+				editor.insert('<span id="ttblank">', '</span>', false);
+				rangerHelper.saveRange();
+				newNode = $(sceditor.getBody()).find('#ttblank').get(0);
+				firstBlock.parentNode.insertBefore(newNode, firstBlock.nextSibling);
+				rangerHelper.restoreRange();
+				editor.focus();
 			}
 		},
 		txtExec: ['[tt]', '[/tt]'],
@@ -346,31 +334,40 @@ $.sceditor.command
 	.set('pre', {
 		state: function ()
 		{
-			var currentNode = this.currentNode();
+			let currentNode = this.currentNode();
 
-			return $(currentNode).is('pre') || $(currentNode).parents('pre').length > 0 ? 1 : 0;
+			if (currentNode && currentNode.nodeType === 3)
+			{
+				currentNode = currentNode.parentNode;
+			}
+
+			return (currentNode && currentNode.tagName.toLowerCase() === 'pre') ? 1 : 0;
 		},
 		exec: function ()
 		{
-			var editor = this,
-				currentNode = this.currentNode();
+			let editor = this,
+				currentNode = this.currentNode(),
+				isPre = $(currentNode).is('pre'),
+				parentPre = $(currentNode).parent('pre');
 
-			if (!$(currentNode).is('pre') && $(currentNode).parents('pre').length === 0)
+			if (!isPre && parentPre.length === 0)
 			{
-				editor.insert('<pre>', '</pre>', false);
-			}// In a pre node and selected pre again, lets try to end it and escape
-			else if (!$(currentNode).is('pre') && $(currentNode).parents('pre').length > 0)
-			{
-				var rangerhelper = this.getRangeHelper(),
-					firstblock = rangerhelper.getFirstBlockParent(),
-					sceditor = $("#" + post_box_name).sceditor("instance"),
-					newnode;
+				return editor.insert('<pre>', '</pre>', false);
+			}
 
-				editor.insert('<p id="blank"> ', '</p>', false);
-				rangerhelper.saveRange();
-				newnode = sceditor.getBody().find('#blank').get(0);
-				firstblock.parentNode.insertBefore(newnode, firstblock.nextSibling);
-				rangerhelper.restoreRange();
+			// In a pre node and selected pre again, lets try to end it and escape to new block
+			if ((!isPre && parentPre.length > 0) || (isPre && parentPre.length === 0))
+			{
+				let rangerHelper = this.getRangeHelper(),
+					firstBlock = rangerHelper.getFirstBlockParent(),
+					sceditor = $editor_data[post_box_name],
+					newNode;
+
+				editor.insert('<span id="blank">', '</span>', false);
+				rangerHelper.saveRange();
+				newNode = $(sceditor.getBody()).find('#blank').get(0);
+				firstBlock.parentNode.insertBefore(newNode, firstBlock.nextSibling);
+				rangerHelper.restoreRange();
 				editor.focus();
 			}
 		},
@@ -383,10 +380,41 @@ $.sceditor.command
 	 * Makes changes to the text inserted for Bulletlist, OrderedList and Table
 	 */
 	.set('bulletlist', {
-		txtExec: ['[list]\n[li]', '[/li]\n[li][/li]\n[/list]']
+		txtExec: function(called, selected)
+		{
+			// Selected some text to turn into a list?
+			if (selected)
+			{
+				let content = '';
+
+				$.each(selected.split(/\r?\n/), function ()
+				{
+					content += (content ? '\n' : '') + '[li]' + this + '[/li]';
+				});
+
+				return this.insertText('[list]\n' + content + '\n[/list]');
+			}
+
+			this.insertText('[list]\n[li]', ' [/li]\n[li] [/li]\n[/list]');
+		}
 	})
 	.set('orderedlist', {
-		txtExec: ['[list type=decimal]\n[li]', '[/li]\n[li][/li]\n[/list]']
+		txtExec: function (caller, selected)
+		{
+			if (selected)
+			{
+				let content = '';
+
+				$.each(selected.split(/\r?\n/), function ()
+				{
+					content += (content ? '\n' : '') + '[li]' + this + '[/li]';
+				});
+
+				return this.insertText('[list type=decimal]\n' + content + '\n[/list]');
+			}
+
+			this.insertText('[list type=decimal]\n[li] ', '[/li]\n[li] [/li]\n[/list]');
+		}
 	})
 	.set('table', {
 		txtExec: ['[table]\n[tr]\n[td]', '[/td]\n[/tr]\n[/table]']
@@ -395,12 +423,12 @@ $.sceditor.command
 /**
  * ElkArte custom bbc tags added to provide for the existing user experience
  *
- * These command define what happens to tags as to toggle from and to wizzy mode
+ * These command define what happens to tags as we toggle from and to wizzy mode
  * It converts html back to bbc or bbc back to html.  Read the sceditor docs for more
  *
  * Adds / modifies BBC codes List, Tt, Pre, quote, footnote, code, img
  */
-$.sceditor.plugins.bbcode.bbcode
+sceditor.formats.bbcode
 	.set('tt', {
 		tags: {
 			tt: null,
@@ -421,7 +449,7 @@ $.sceditor.plugins.bbcode.bbcode
 		isInline: true,
 		format: function (element, content)
 		{
-			return '[member=' + element.attr('data-mention') + ']' + content.replace('@', '') + '[/member]';
+			return '[member=' + element.getAttribute('data-mention') + ']' + content.replace('@', '') + '[/member]';
 		},
 		html: function (token, attrs, content)
 		{
@@ -440,10 +468,10 @@ $.sceditor.plugins.bbcode.bbcode
 			}
 		},
 		isInline: true,
-		quoteType: $.sceditor.BBCodeParser.QuoteType.always,
+		quoteType: sceditor.BBCodeParser.QuoteType.always,
 		format: function (element, content)
 		{
-			return '[me=' + element.attr('data-me') + ']' + content.replace(element.attr('data-me') + ' ', '') + '[/me]';
+			return '[me=' + element.getAttribute('data-me') + ']' + content.replace(element.getAttribute('data-me') + ' ', '') + '[/me]';
 		},
 		html: function (token, attrs, content)
 		{
@@ -457,7 +485,7 @@ $.sceditor.plugins.bbcode.bbcode
 	})
 	.set('attachurl', {
 		allowsEmpty: false,
-		quoteType: $.sceditor.BBCodeParser.QuoteType.never,
+		quoteType: sceditor.BBCodeParser.QuoteType.never,
 		format: function (element, content)
 		{
 			return '[attachurl]' + content + '[/attachurl]';
@@ -470,7 +498,7 @@ $.sceditor.plugins.bbcode.bbcode
 	})
 	.set('attach', {
 		allowsEmpty: false,
-		quoteType: $.sceditor.BBCodeParser.QuoteType.never,
+		quoteType: sceditor.BBCodeParser.QuoteType.never,
 		format: function (element, content)
 		{
 			/**
@@ -478,14 +506,14 @@ $.sceditor.plugins.bbcode.bbcode
 			 * instead the 'img'.format takes care of finding the ILA images and process
 			 * them accordingly to return the [attach] tag.
 			 */
-			var attribs = '',
+			let attribs = '',
 				params = function (names)
 				{
 					names.forEach(function (name)
 					{
-						if (element.attr(name))
+						if (element.getAttribute(name))
 						{
-							attribs += ' ' + name + '=' + element.attr(name);
+							attribs += ' ' + name + '=' + element.getAttribute(name);
 						}
 						else if (element.style[name])
 						{
@@ -500,8 +528,8 @@ $.sceditor.plugins.bbcode.bbcode
 		},
 		html: function (token, attrs, content)
 		{
-			var attribs = '';
-			align = '',
+			let attribs = '',
+				align = '',
 				thumb = '',
 				params = function (names)
 				{
@@ -520,6 +548,7 @@ $.sceditor.plugins.bbcode.bbcode
 			{
 				align = ' class="img_bbc float' + attrs.align + '"';
 			}
+
 			if (typeof attrs.type !== 'undefined')
 			{
 				thumb = ';' + attrs.type;
@@ -553,19 +582,19 @@ $.sceditor.plugins.bbcode.bbcode
 		allowedChildren: ['#', '#newline'],
 		format: function (element, content)
 		{
-			var from = '';
+			let from = '';
 
 			if (element.children("cite:first").length === 1)
 			{
 				from = element.children("cite:first").text().trim();
-				element.attr({'from': from.php_htmlspecialchars()});
+				element.getAttribute({'from': from.php_htmlspecialchars()});
 				from = '=' + from;
 				element.children("cite:first").remove();
 				content = this.elementToBbcode(element);
 			}
-			else if (typeof element.attr('from') !== 'undefined')
+			else if (element.getAttribute('from'))
 			{
-				from = '=' + element.attr('from').php_unhtmlspecialchars();
+				from = '=' + element.getAttribute('from').php_unhtmlspecialchars();
 			}
 
 			return '[code' + from + ']' + content.replace('&#91;', '[') + '[/code]';
@@ -576,7 +605,7 @@ $.sceditor.plugins.bbcode.bbcode
 		},
 		html: function (element, attrs, content)
 		{
-			var from = '';
+			let from = '';
 
 			if (typeof attrs.defaultattr !== 'undefined')
 			{
@@ -594,36 +623,40 @@ $.sceditor.plugins.bbcode.bbcode
 		isInline: false,
 		format: function (element, content)
 		{
-			var author = '',
+			let author = '',
 				date = '',
 				link = '';
 
-			if (element[0].tagName.toLowerCase() === 'cite')
+			if (element.tagName.toLowerCase() === 'cite')
 			{
 				return '';
 			}
-			if (element.attr('author'))
+
+			if (element.getAttribute('author'))
 			{
-				author = ' author=' + element.attr('author').php_unhtmlspecialchars();
-			}
-			if (element.attr('date'))
-			{
-				date = ' date=' + element.attr('date');
-			}
-			if (element.attr('link'))
-			{
-				link = ' link=' + element.attr('link');
-			}
-			if (author === '' && date === '' && link !== '')
-			{
-				link = '=' + element.attr('link');
+				author = ' author=' + element.getAttribute('author').php_unhtmlspecialchars();
 			}
 
-			return '[quote' + author + date + link + ']' + content + '[/quote]';
+			if (element.getAttribute('date'))
+			{
+				date = ' date=' + element.getAttribute('date');
+			}
+
+			if (element.getAttribute('link'))
+			{
+				link = ' link=' + element.getAttribute('link');
+			}
+
+			if (author === '' && date === '' && link !== '')
+			{
+				link = '=' + element.getAttribute('link');
+			}
+
+			return '[quote' + author + link + date + ']' + content + '[/quote]';
 		},
 		html: function (element, attrs, content)
 		{
-			var attr_author = '',
+			let attr_author = '',
 				sAuthor = '',
 				attr_date = '',
 				sDate = '',
@@ -641,18 +674,18 @@ $.sceditor.plugins.bbcode.bbcode
 			{
 				// Convert it to an author tag
 				attr_link = attrs.defaultattr;
-				sLink = attr_link.substr(0, 7) === 'http://' ? attr_link : elk_scripturl + '?' + attr_link;
+				sLink = attr_link.substr(0, 8) === 'https://' ? attr_link : elk_scripturl + '?' + attr_link;
 				sAuthor = '<a href="' + sLink + '">' + bbc_quote_from + ': ' + sLink + '</a>';
 			}
 
 			// Links could be in the form: link=topic=71.msg201#msg201 that would fool javascript, so we need a workaround
-			for (var key in attrs)
+			for (let key in attrs)
 			{
 				if (key.substr(0, 4) === 'link' && attrs.hasOwnProperty(key))
 				{
 					attr_link = key.length > 4 ? key.substr(5) + '=' + attrs[key] : attrs[key];
 
-					sLink = attr_link.substr(0, 7) === 'http://' ? attr_link : elk_scripturl + '?' + attr_link;
+					sLink = attr_link.substr(0, 7) === 'https://' ? attr_link : elk_scripturl + '?' + attr_link;
 					sAuthor = sAuthor === '' ? '<a href="' + sLink + '">' + bbc_quote_from + ': ' + sLink + '</a>' : '<a href="' + sLink + '">' + sAuthor + '</a>';
 				}
 			}
@@ -686,46 +719,48 @@ $.sceditor.plugins.bbcode.bbcode
 			}
 		},
 		allowsEmpty: true,
-		quoteType: $.sceditor.BBCodeParser.QuoteType.never,
+		quoteType: sceditor.BBCodeParser.QuoteType.never,
+		allowedChildren: ['#'],
 		format: function (element, content)
 		{
-			var attribs = '',
+			let attribs = '',
 				params = function (names)
 				{
 					names.forEach(function (name)
 					{
-						if (element.attr(name))
+						if (element.getAttribute(name))
 						{
-							attribs += ' ' + name + '=' + element.attr(name);
+							attribs += ' ' + name + '=' + element.getAttribute(name);
 						}
-						else if (element[0].style[name])
+						else if (element.style.name)
 						{
-							attribs += ' ' + name + '=' + element[0].style[name];
+							attribs += ' ' + name + '=' + element.style.name;
 						}
 					});
 				};
 
 			// check if this is an emoticon image
-			if (typeof element.attr('data-sceditor-emoticon') !== 'undefined')
+			if (element.getAttribute('data-sceditor-emoticon'))
 			{
 				return content;
 			}
 
 			// check if this is an ILA ?
-			if (element.attr('data-ila'))
+			if (element.getAttribute('data-ila'))
 			{
 				params(['width', 'height', 'align', 'type']);
-				return '[attach' + attribs + ']' + element.attr('data-ila') + '[/attach]';
+
+				return '[attach' + attribs + ']' + element.getAttribute('data-ila') + '[/attach]';
 			}
 
 			// normal image then
 			params(['width', 'height', 'title', 'alt']);
-			return '[img' + attribs + ']' + element.attr('src') + '[/img]';
-		},
 
+			return '[img' + attribs + ']' + element.getAttribute('src') + '[/img]';
+		},
 		html: function (token, attrs, content)
 		{
-			var attribs = '',
+			let attribs = '',
 				params = function (names)
 				{
 					names.forEach(function (name)
@@ -749,18 +784,33 @@ $.sceditor.plugins.bbcode.bbcode
 		allowedChildren: ['#', '*', 'li'],
 		html: function (element, attrs, content)
 		{
-			var style = '',
+			let style = '',
 				code = 'ul';
 
 			if (attrs.type)
 			{
-				style = 'style="list-style-type: ' + attrs.type + '"';
+				style = ' style="list-style-type: ' + attrs.type + '"';
 			}
-			return '<' + code + ' ' + style + '>' + content.replace(/<\/li><br \/>/g, '</li>') + '</' + code + '>';
+
+			return '<' + code + style + '>' + content.replace(/<\/li><br \/>/g, '</li>') + '</' + code + '>';
 		}
 	})
 	.set('li', {
-		breakAfter: false
+		breakAfter: false,
+		isInline: false,
+		closedBy: ['/ul', '/ol', '/list', 'li', '*', '@', '+', 'x', '#', '0', 'o', 'O'],
+		html: '<li data-itemcode="li">{0}</li>',
+		format: function (element, content) {
+			let token = 'li',
+				itemCodes = ['*', '@', '+', 'x', '#', '0', 'o', 'O'];
+
+			if (element.hasAttribute('data-itemcode') && itemCodes.indexOf(element.getAttribute('data-itemcode')) !== -1)
+			{
+				token = element.getAttribute('data-itemcode');
+			}
+
+			return '[' + token + ']' + content + (token === 'li' ? '[/li]' : '');
+		},
 	})
 	.set('ul', {
 		tags: {
@@ -769,16 +819,14 @@ $.sceditor.plugins.bbcode.bbcode
 		breakStart: true,
 		format: function (element, content)
 		{
-			var type = $(element[0]).prop('style')['list-style-type'];
+			let type = element.style['list-style-type'];
 
 			if (type === 'disc' || type === '')
 			{
 				return '[list]' + content + '[/list]';
 			}
-			else
-			{
-				return '[list type=' + type + ']' + content + '[/list]';
-			}
+
+			return '[list type=' + type + ']' + content + '[/list]';
 		},
 		isInline: false,
 		skipLastLineBreak: true,
@@ -801,31 +849,52 @@ $.sceditor.plugins.bbcode.bbcode
 				href: null
 			}
 		},
-		quoteType: $.sceditor.BBCodeParser.QuoteType.never,
+		quoteType: sceditor.BBCodeParser.QuoteType.never,
 		format: function (element, content)
 		{
-			var url = element.attr('href');
+			let url = element.getAttribute('href');
 
 			// return the type of link we are currently dealing with
 			if (url.substr(0, 7) === 'mailto:')
 			{
 				return '[email="' + url.substr(7) + '"]' + content + '[/email]';
 			}
-			if (typeof element.attr('data-mention') !== 'undefined')
+
+			if (element.getAttribute('data-mention'))
 			{
-				return '[member=' + element.attr('data-mention') + ']' + content.replace('@', '') + '[/member]';
+				return '[member=' + element.getAttribute('data-mention') + ']' + content.replace('@', '') + '[/member]';
 			}
-			if (typeof element.attr('data-ila') !== 'undefined')
+
+			if (element.getAttribute('data-ila'))
 			{
-				return '[attachurl]' + element.attr('data-ila') + '[/attachurl]';
+				return '[attachurl]' + element.getAttribute('data-ila') + '[/attachurl]';
 			}
 
 			return '[url=' + url + ']' + content + '[/url]';
 		},
 		html: function (token, attrs, content)
 		{
-			attrs.defaultattr = $.sceditor.escapeEntities(attrs.defaultattr, true) || content;
+			attrs.defaultattr = sceditor.escapeEntities(attrs.defaultattr, true) || content;
 
-			return '<a href="' + $.sceditor.escapeUriScheme(attrs.defaultattr) + '" class="mention">' + content + '</a>';
+			return '<a target="_blank" rel="noopener noreferrer" href="' + sceditor.escapeUriScheme(attrs.defaultattr) + '" class="bbc_link">' + content + '</a>';
 		}
 	});
+
+// All the lovely item [*] codes done in a loop
+itemCodes.forEach(function ( code)
+{
+	code = code.split(":");
+	sceditor.formats.bbcode
+		.set(code[0], {
+			tags: {
+				li: {
+					'data-itemcode': [code[0]]
+				}
+			},
+			isInline: false,
+			closedBy: ['/ul', '/ol', '/list', 'li', '*', '@', '+', 'x', '#', '0', 'o', 'O'],
+			excludeClosing: true,
+			html: '<li style="list-style-type:' + code[1] + '" data-itemcode="' + code[0] + '">{0}</li>',
+			format: '[' + code[0] + ']{0}',
+		});
+});
