@@ -79,6 +79,7 @@ function create_control_richedit($editorOptions)
 			'bbc_search_on' => $txt['search_on'],
 			'ila_filename' => $txt['file'] . ' ' . $txt['name']), true
 		);
+
 		// Editor language file
 		if (!empty($txt['lang_locale']))
 		{
@@ -92,10 +93,7 @@ function create_control_richedit($editorOptions)
 		}
 
 		// Our not so concise shortcut line
-		if (!isset($context['shortcuts_text']))
-		{
-			$context['shortcuts_text'] = $txt['shortcuts' . (isBrowser('is_firefox') ? '_firefox' : '')];
-		}
+		$context['shortcuts_text'] = $context['shortcuts_text'] ?? $txt['shortcuts'];
 
 		// Spellcheck?
 		$context['show_spellchecking'] = !empty($modSettings['enableSpellChecking']) && function_exists('pspell_new');
@@ -155,7 +153,7 @@ function create_control_richedit($editorOptions)
 	{
 		// The below array is used to show a command button in the editor, the execution
 		// and display details of any added buttons must be defined in the javascript files
-		// see jquery.sceditor.elkarte.js under the $.sceditor.plugins.bbcode.bbcode area
+		// see jquery.sceditor.elkarte.js under the $.sceditor.formats.bbcode area
 		// for examples of how to use the .set command to add codes.  Include your new
 		// JS with addInlineJavascript() or loadJavascriptFile()
 		$bbc_tags['row1'] = array(
@@ -163,6 +161,7 @@ function create_control_richedit($editorOptions)
 			array('left', 'center', 'right', 'pre', 'tt'),
 			array('font', 'size', 'color'),
 		);
+
 		$bbc_tags['row2'] = array(
 			array('quote', 'code', 'table'),
 			array('bulletlist', 'orderedlist', 'horizontalrule'),
@@ -185,7 +184,9 @@ function create_control_richedit($editorOptions)
 		}
 
 		// Map codes to tags
-		$translate_tags_to_code = array('b' => 'bold', 'i' => 'italic', 'u' => 'underline', 's' => 'strike', 'img' => 'image', 'url' => 'link', 'sup' => 'superscript', 'sub' => 'subscript', 'hr' => 'horizontalrule');
+		$translate_tags_to_code = array('b' => 'bold', 'i' => 'italic', 'u' => 'underline', 's' => 'strike',
+										'img' => 'image', 'url' => 'link', 'sup' => 'superscript',
+										'sub' => 'subscript', 'hr' => 'horizontalrule');
 
 		// Remove the toolbar buttons for any bbc tags that have been turned off in the ACP
 		foreach ($disabled_tags as $tag)

@@ -63,10 +63,10 @@ class Jslocale extends AbstractController
 			die();
 		}
 
-		$this->_file_data = '(function ($) {
+		$this->_file_data = '(function (sceditor) {
 		\'use strict\';
 
-		$.sceditor.locale[' . JavaScriptEscape($txt['lang_locale']) . '] = {';
+		sceditor.locale[' . JavaScriptEscape($txt['lang_locale']) . '] = {';
 
 		foreach ($editortxt as $key => $val)
 		{
@@ -77,7 +77,7 @@ class Jslocale extends AbstractController
 		$this->_file_data .= '
 			dateFormat: "day.month.year"
 		}
-	})(jQuery);';
+	})(sceditor);';
 
 		$this->_sendFile();
 	}
