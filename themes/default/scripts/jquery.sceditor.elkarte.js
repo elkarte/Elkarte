@@ -113,7 +113,7 @@ const itemCodes = ["*:disc", "@:disc", "+:square", "x:square", "#:decimal", "0:d
 							popupContent.append(line);
 						}
 
-						closeButton = $('<div id="sceditor-popup-close" />').text('[' + base._('Close') + ']').on('click', function ()
+						closeButton = $('<div id="sceditor-popup-close" />').text(base._('Close')).on('click', function ()
 						{
 							$(".sceditor-smileyPopup").fadeOut('fast');
 						});
@@ -121,17 +121,6 @@ const itemCodes = ["*:disc", "@:disc", "+:square", "x:square", "#:decimal", "0:d
 						if (typeof closeButton !== 'undefined')
 						{
 							popupContent.append(closeButton);
-						}
-
-						// IE needs unselectable attr to stop it from unselecting the text in the editor.
-						// The editor can cope if IE does unselect the text it's just not nice.
-						if (base.ieUnselectable !== false)
-						{
-							content = $(content);
-							content.find(':not(input,textarea)').filter(function ()
-							{
-								return this.nodeType === 1;
-							}).attr('unselectable', 'on');
 						}
 
 						// Show the smiley popup
