@@ -302,7 +302,7 @@ sceditor.command
 			rangeHelper.saveRange();
 			range = rangeHelper.cloneSelected();
 
-			// Find the span.tt node if we are in one that is
+			// Find the span.bbc_tt node if we are in one that is
 			tt = range.commonAncestorContainer;
 			while (tt && (tt.nodeType !== 1 || (tt.tagName.toLowerCase() !== "span" && !tt.classList.contains('bbc_tt'))))
 			{
@@ -354,30 +354,48 @@ sceditor.command
 		exec: function ()
 		{
 			let editor = this,
-				currentNode = this.currentNode(),
-				isPre = $(currentNode).is('pre'),
-				parentPre = $(currentNode).parent('pre');
+				rangeHelper = editor.getRangeHelper(),
+				pre,
+				range,
+				blank;
 
-			if (!isPre && parentPre.length === 0)
+			// Set our markers and make a copy
+			rangeHelper.saveRange();
+			range = rangeHelper.cloneSelected();
+
+			// Find the pre.bbc_pre node if we are in one that is
+			pre = range.commonAncestorContainer;
+			while (pre && (pre.nodeType !== 1 || (pre.tagName.toLowerCase() !== "pre" && !pre.classList.contains('bbc_pre'))))
 			{
-				return editor.insert('<pre class="bbc_pre">', '</pre>', false);
+				pre = pre.parentNode;
 			}
 
-			// In a pre node and selected pre again, lets try to end it and escape to new block
-			if ((!isPre && parentPre.length > 0) || (isPre && parentPre.length === 0))
+			// If we found one, we are in it and the user requested to end this PRE
+			if (pre)
 			{
-				let rangerHelper = this.getRangeHelper(),
-					firstBlock = rangerHelper.getFirstBlockParent(),
-					sceditor = $editor_data[post_box_name],
-					newNode;
+				// Place the markers at the end of the pre
+				range.setEndAfter(pre);
+				range.collapse(false);
 
-				editor.insert('<span id="blank">', '</span>', false);
-				rangerHelper.saveRange();
-				newNode = $(sceditor.getBody()).find('#blank').get(0);
-				firstBlock.parentNode.insertBefore(newNode, firstBlock.nextSibling);
-				rangerHelper.restoreRange();
-				editor.focus();
+				// Stuff in a new block node at that position
+				blank = pre.ownerDocument.createElement('p');
+				blank.innerHTML = '&nbsp;';
+				range.insertNode(blank);
+
+				// Move the caret to the new empty block node
+				let range_new = document.createRange();
+				range_new.setStartAfter(blank);
+
+				// Set sceditor to this new range
+				rangeHelper.selectRange(range_new);
+				editor.focus()
+
+				return;
 			}
+
+			// Otherwise, a new pre span for then
+			rangeHelper.restoreRange();
+			return editor.insert('<pre class="bbc_pre">', '</pre>', false);
 		},
 		txtExec: ['[pre]', '[/pre]'],
 		tooltip: 'Preformatted Text'
