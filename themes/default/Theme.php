@@ -268,8 +268,8 @@ class Theme extends BaseTheme
 	{
 		global $modSettings, $settings;
 
-		// Using a specified version of jquery or what was shipped 3.1.1  / 1.12.1
-		$jquery_version = (!empty($modSettings['jquery_default']) && !empty($modSettings['jquery_version'])) ? $modSettings['jquery_version'] : '3.1.1';
+		// Using a specified version of jquery or what was shipped 3.5.1  / 1.12.1
+		$jquery_version = (!empty($modSettings['jquery_default']) && !empty($modSettings['jquery_version'])) ? $modSettings['jquery_version'] : '3.5.1';
 		$jqueryui_version = (!empty($modSettings['jqueryui_default']) && !empty($modSettings['jqueryui_version'])) ? $modSettings['jqueryui_version'] : '1.12.1';
 
 		switch ($modSettings['jquery_source'])
@@ -302,6 +302,11 @@ class Theme extends BaseTheme
 	</script>';
 				break;
 		}
+
+		echo '
+			<script src="', $settings['default_theme_url'], '/scripts/migrate.min.js" id="jquerymigrate"></script>
+		';
+
 	}
 
 	/**
