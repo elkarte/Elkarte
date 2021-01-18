@@ -41,7 +41,7 @@ function spellCheck(formName, fieldName, bFull)
 
 	var aWords = [],
 		aResult,
-		sText = (spell_full) ? $editor_data[spell_fieldname].getText() : document.forms[spell_formname][spell_fieldname].value,
+		sText = (spell_full) ? $editor_data[spell_fieldname].val() : document.forms[spell_formname][spell_fieldname].value,
 		bInCode = false,
 		iOffset1,
 		iOffset2;
@@ -380,7 +380,7 @@ function openSpellWin(width, height)
  */
 function spellCheckGetText(editorID)
 {
-	return $editor_data[editorID].getText();
+	return $editor_data[editorID].val();
 }
 
 /**
@@ -391,12 +391,7 @@ function spellCheckGetText(editorID)
  */
 function spellCheckSetText(text, editorID)
 {
-	$editor_data[editorID].InsertText(text, true);
-
-	if (!$editor_data[editorID].inSourceMode)
-	{
-		$editor_data[editorID].toggleSourceMode();
-	}
+	$editor_data[editorID].val(text, true);
 }
 
 /**
@@ -410,12 +405,14 @@ function spellCheckStart()
 		return false;
 	}
 
-	$editor_data[post_box_name].storeLastState();
+	var saveState = $editor_data[post_box_name].inSourceMode();
 
 	// If we're in HTML mode we need to get the non-HTML text.
-	$editor_data[post_box_name].setTextMode();
+	$editor_data[post_box_name].sourceMode(true);
 
 	spellCheck(false, post_box_name, true);
+
+	$editor_data[post_box_name].sourceMode(saveState);
 
 	return true;
 }
