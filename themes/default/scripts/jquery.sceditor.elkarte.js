@@ -302,31 +302,48 @@ sceditor.command
 		exec: function ()
 		{
 			let editor = this,
-				currentNode = this.currentNode(),
-				isSpanTT = $(currentNode).is('span.tt'),
-				parentSpanTT = $(currentNode).parent('span.tt');
+				rangeHelper = editor.getRangeHelper(),
+				tt,
+				range,
+				blank;
 
-			if (!isSpanTT && parentSpanTT.length === 0)
+			// Set our markers and make a copy
+			rangeHelper.saveRange();
+			range = rangeHelper.cloneSelected();
+
+			// Find the span.tt node if we are in one that is
+			tt = range.commonAncestorContainer;
+			while (tt && (tt.nodeType !== 1 || (tt.tagName.toLowerCase() !== "span" && !tt.classList.contains('tt'))))
 			{
-				return editor.insert('<span class="tt">', '</span>', false);
+				tt = tt.parentNode;
 			}
 
-			// In a TT node and selected TT again, lets try to end it and escape to new block
-			if ((!isSpanTT && parentSpanTT.length > 0) || (isSpanTT && parentSpanTT.length === 0))
+			// If we found one, we are in it and the user requested to end this TT
+			if (tt)
 			{
-				// Treating TT as a block until inline tag is figured out
-				let rangerHelper = this.getRangeHelper(),
-					firstBlock = rangerHelper.getFirstBlockParent(),
-					sceditor = $editor_data[post_box_name],
-					newNode;
+				// Place the markers at the end of the TT span
+				range.setEndAfter(tt);
+				range.collapse(false);
 
-				editor.insert('<span id="ttblank">', '</span>', false);
-				rangerHelper.saveRange();
-				newNode = $(sceditor.getBody()).find('#ttblank').get(0);
-				firstBlock.parentNode.insertBefore(newNode, firstBlock.nextSibling);
-				rangerHelper.restoreRange();
-				editor.focus();
+				// Stuff in a new spacer node at that position
+				blank = tt.ownerDocument.createElement('span');
+				blank.innerHTML = '&nbsp;';
+				range.insertNode(blank);
+
+				// Move the caret to the new empty node
+				let range_new = document.createRange();
+				range_new.setStartAfter(blank);
+
+				// Set sceditor to this new range
+				rangeHelper.selectRange(range_new);
+				editor.focus()
+
+				return;
 			}
+
+			// Otherwise, a new TT span for then
+			rangeHelper.restoreRange();
+			return editor.insert('<span class="tt">', '</span>', false);
 		},
 		txtExec: ['[tt]', '[/tt]'],
 		tooltip: 'Teletype'
