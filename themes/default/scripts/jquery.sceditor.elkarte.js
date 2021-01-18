@@ -297,7 +297,7 @@ sceditor.command
 				currentNode = currentNode.parentNode;
 			}
 
-			return (currentNode && (currentNode.classList.contains('tt') && currentNode.tagName.toLowerCase() === 'span')) ? 1 : 0;
+			return (currentNode && (currentNode.classList.contains('bbc_tt') && currentNode.tagName.toLowerCase() === 'span')) ? 1 : 0;
 		},
 		exec: function ()
 		{
@@ -313,7 +313,7 @@ sceditor.command
 
 			// Find the span.tt node if we are in one that is
 			tt = range.commonAncestorContainer;
-			while (tt && (tt.nodeType !== 1 || (tt.tagName.toLowerCase() !== "span" && !tt.classList.contains('tt'))))
+			while (tt && (tt.nodeType !== 1 || (tt.tagName.toLowerCase() !== "span" && !tt.classList.contains('bbc_tt'))))
 			{
 				tt = tt.parentNode;
 			}
@@ -343,7 +343,7 @@ sceditor.command
 
 			// Otherwise, a new TT span for then
 			rangeHelper.restoreRange();
-			return editor.insert('<span class="tt">', '</span>', false);
+			return editor.insert('<span class="bbc_tt">', '</span>', false);
 		},
 		txtExec: ['[tt]', '[/tt]'],
 		tooltip: 'Teletype'
@@ -369,7 +369,7 @@ sceditor.command
 
 			if (!isPre && parentPre.length === 0)
 			{
-				return editor.insert('<pre>', '</pre>', false);
+				return editor.insert('<pre class="bbc_pre">', '</pre>', false);
 			}
 
 			// In a pre node and selected pre again, lets try to end it and escape to new block
@@ -449,18 +449,19 @@ sceditor.formats.bbcode
 	.set('tt', {
 		tags: {
 			tt: null,
-			span: {'class': ['tt']}
+			span: {'class': ['bbc_tt']}
 		},
 		format: '[tt]{0}[/tt]',
-		html: '<span class="tt">{0}</span>'
+		html: '<span class="bbc_tt">{0}</span>'
 	})
 	.set('pre', {
 		tags: {
-			pre: null
+			pre: null,
+			pre: {'class': ['bbc_pre']}
 		},
 		isInline: false,
 		format: '[pre]{0}[/pre]',
-		html: '<pre>{0}</pre>'
+		html: '<pre class="bbc_pre">{0}</pre>'
 	})
 	.set('member', {
 		isInline: true,
@@ -528,7 +529,7 @@ sceditor.formats.bbcode
 				{
 					names.forEach(function (name)
 					{
-						if (element.getAttribute(name))
+						if (element.hasAttribute(name))
 						{
 							attribs += ' ' + name + '=' + element.getAttribute(name);
 						}
@@ -609,7 +610,7 @@ sceditor.formats.bbcode
 				element.children("cite:first").remove();
 				content = this.elementToBbcode(element);
 			}
-			else if (element.getAttribute('from'))
+			else if (element.hasAttribute('from'))
 			{
 				from = '=' + element.getAttribute('from').php_unhtmlspecialchars();
 			}
@@ -649,17 +650,17 @@ sceditor.formats.bbcode
 				return '';
 			}
 
-			if (element.getAttribute('author'))
+			if (element.hasAttribute('author'))
 			{
 				author = ' author=' + element.getAttribute('author').php_unhtmlspecialchars();
 			}
 
-			if (element.getAttribute('date'))
+			if (element.hasAttribute('date'))
 			{
 				date = ' date=' + element.getAttribute('date');
 			}
 
-			if (element.getAttribute('link'))
+			if (element.hasAttribute('link'))
 			{
 				link = ' link=' + element.getAttribute('link');
 			}
@@ -745,7 +746,7 @@ sceditor.formats.bbcode
 				{
 					names.forEach(function (name)
 					{
-						if (element.getAttribute(name))
+						if (element.hasAttribute(name))
 						{
 							attribs += ' ' + name + '=' + element.getAttribute(name);
 						}
@@ -757,13 +758,13 @@ sceditor.formats.bbcode
 				};
 
 			// check if this is an emoticon image
-			if (element.getAttribute('data-sceditor-emoticon'))
+			if (element.hasAttribute('data-sceditor-emoticon'))
 			{
 				return content;
 			}
 
 			// check if this is an ILA ?
-			if (element.getAttribute('data-ila'))
+			if (element.hasAttribute('data-ila'))
 			{
 				params(['width', 'height', 'align', 'type']);
 
@@ -877,12 +878,12 @@ sceditor.formats.bbcode
 				return '[email="' + url.substr(7) + '"]' + content + '[/email]';
 			}
 
-			if (element.getAttribute('data-mention'))
+			if (element.hasAttribute('data-mention'))
 			{
 				return '[member=' + element.getAttribute('data-mention') + ']' + content.replace('@', '') + '[/member]';
 			}
 
-			if (element.getAttribute('data-ila'))
+			if (element.hasAttribute('data-ila'))
 			{
 				return '[attachurl]' + element.getAttribute('data-ila') + '[/attachurl]';
 			}

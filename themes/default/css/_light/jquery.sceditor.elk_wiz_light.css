@@ -176,3 +176,12 @@ me:before {
 me {
 	color: #50AA3A;
 }
+
+.bbc_tt {
+	font-family: "DejaVu Sans Mono", Monaco, "Lucida Console", "Courier New", monospace;
+}
+
+.bbc_pre {
+	font-family: "DejaVu Sans Mono", Monaco, Consolas, monospace;
+	overflow: auto;
+}
