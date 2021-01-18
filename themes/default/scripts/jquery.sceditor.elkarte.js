@@ -36,15 +36,6 @@ const itemCodes = ["*:disc", "@:disc", "+:square", "x:square", "#:decimal", "0:d
 				$(oIframeBody).on(event, func);
 			}
 		},
-		getText: function (filter)
-		{
-			if (this.inSourceMode())
-			{
-				return this.getSourceEditorValue(false);
-			}
-
-			return this.getWysiwygEditorValue(filter);
-		},
 		appendEmoticon: function (code, emoticon)
 		{
 			if (emoticon === '')
