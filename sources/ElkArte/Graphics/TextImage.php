@@ -136,7 +136,7 @@ class TextImage extends Image
 	/**
 	 * Do nothing
 	 */
-	public function autoRotateImage()
+	public function autoRotate()
 	{
 	}
 

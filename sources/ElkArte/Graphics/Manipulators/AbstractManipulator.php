@@ -69,7 +69,7 @@ abstract class AbstractManipulator
 	 *
 	 * @return mixed
 	 */
-	abstract public function autoRotateImage();
+	abstract public function autoRotate();
 
 	/**
 	 * Creates an image using the supplied text.
@@ -171,5 +171,32 @@ abstract class AbstractManipulator
 		}
 
 		return $success;
+	}
+
+	/**
+	 * Determine whether to resize to max width or to max height (depending on the limits.)
+	 *
+	 * @param int $max_width
+	 * @param int $max_height
+	 * @return array
+	 */
+	public function imageRatio($max_width, $max_height)
+	{
+		// Determine whether to resize to max width or to max height (depending on the limits.)
+		$image_ratio = $this->_width / $this->_height;
+		$requested_ratio = $max_width / $max_height;
+
+		if ($requested_ratio > $image_ratio)
+		{
+			$dst_width = max(1, $max_height * $image_ratio);
+			$dst_height = $max_height;
+		}
+		else
+		{
+			$dst_width = $max_width;
+			$dst_height = max(1, $max_width / $image_ratio);
+		}
+
+		return [$dst_width, $dst_height];
 	}
 }

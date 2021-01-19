@@ -13,9 +13,6 @@
 
 namespace ElkArte;
 
-use ElkArte\ValuesContainer;
-use ElkArte\TemporaryAttachment;
-
 /**
  *
  */
@@ -55,14 +52,41 @@ class TemporaryAttachmentsList extends ValuesContainer
 		{
 			$prefix = $this->getTplName($userId, '');
 		}
+
 		foreach ($this->data as $attachID => $attachment)
 		{
 			if (strpos($attachID, $prefix) !== false)
 			{
-				@unlink($attachment['tmp_name']);
-				@unlink($attachment['tmp_name'] . '_thumb');
+				$this->remove($attachment['tmp_name']);
+				$this->remove($attachment['tmp_name'] . '_thumb');
 			}
 		}
+	}
+
+	/**
+	 * Deletes a temporary attachment from the filesystem
+	 *
+	 * @param string $file
+	 * @return bool
+	 */
+	public function remove($file)
+	{
+		try
+		{
+			// Must exist and have edit permissions
+			if (!is_writable(($file)))
+			{
+				throw new \Exception('attachment_not_found');
+			}
+
+			unlink($file);
+		}
+		catch (\Exception $e)
+		{
+			return false;
+		}
+
+		return true;
 	}
 
 	/**
@@ -96,7 +120,7 @@ class TemporaryAttachmentsList extends ValuesContainer
 	}
 
 	/**
-	 * Deletes a temporary attachment from the $_SESSION (and the filesystem)
+	 * Deletes a temporary attachment from the TemporaryAttachment array (and the filesystem)
 	 *
 	 * @param string $attachID the temporary name generated when a file is uploaded
 	 *               and used in $_SESSION to help identify the attachment itself
@@ -119,6 +143,12 @@ class TemporaryAttachmentsList extends ValuesContainer
 		unset($this->data[$attachID]);
 	}
 
+	/**
+	 * Validates that a new message is bound to a given board
+	 *
+	 * @param int $board
+	 * @return bool
+	 */
 	public function belongToBoard($board)
 	{
 		return empty($this->data['post']['msg']) && $this->data['post']['board'] == $board;

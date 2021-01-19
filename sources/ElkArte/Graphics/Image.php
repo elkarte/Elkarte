@@ -89,7 +89,6 @@ class Image
 
 	/**
 	 * Load an image from a file or web address into the active graphics library
-	 * @throws \ImagickException
 	 */
 	protected function loadImage()
 	{
@@ -160,7 +159,7 @@ class Image
 	 * @param int $max_height allowed height
 	 * @param string $dstName name to save
 	 * @param string $format image format to save the thumbnail
-	 * @return bool
+	 * @return bool|\ElkArte\Graphics\Image On success returns an image class loaded with new image
 	 * @throws \Exception
 	 */
 	public function createThumbnail($max_width, $max_height, $dstName = '', $format = '')
@@ -194,9 +193,8 @@ class Image
 	 * Calls functions to correct an images orientation based on the EXIF orientation flag
 	 *
 	 * @return bool
-	 * @throws \Exception
 	 */
-	public function autoRotateImage()
+	public function autoRotate()
 	{
 		$this->getOrientation();
 
@@ -214,7 +212,7 @@ class Image
 
 		try
 		{
-			$this->_manipulator->autoRotateImage();
+			$this->_manipulator->autoRotate();
 		}
 		catch (\Exception $e)
 		{
@@ -297,7 +295,6 @@ class Image
 	 * - the function makes sure that all non-essential image contents are disposed.
 	 *
 	 * @return bool
-	 * @throws \ImagickException
 	 */
 	public function reencodeImage()
 	{

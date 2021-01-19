@@ -499,6 +499,9 @@ class Post extends AbstractModule
 					@unlink($attachment['tmp_name']);
 				}
 			}
+
+			// Clean up any post_tmp_.*?(_thumb)? items
+			$tmp_attachments->removeAll($this->user->id);
 			$tmp_attachments->unset();
 		}
 

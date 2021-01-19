@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Handles the job of attachment and avatar maintenance /management.
+ * Handles the job of attachment and avatar maintenance / management.
  *
  * @package   ElkArte Forum
  * @copyright ElkArte Forum contributors
@@ -16,7 +16,6 @@
 
 namespace ElkArte;
 
-use ElkArte\Util;
 use \Exception;
 
 class AttachmentsDirectory
@@ -26,7 +25,8 @@ class AttachmentsDirectory
 	public const AUTO_YEAR_MONTH = 3;
 	public const AUTO_RAND = 4;
 	public const AUTO_RAND2 = 5;
-
+	protected static $dir_size = 0;
+	protected static $dir_files = 0;
 	protected $automanage_attachments = 0;
 	protected $currentAttachmentUploadDir = 0;
 	protected $sizeLimit = 0;
@@ -37,11 +37,7 @@ class AttachmentsDirectory
 	protected $attachmentUploadDir = [];
 	protected $baseDirectories = [];
 	protected $last_dirs = [];
-
 	protected $db = null;
-
-	protected static $dir_size = 0;
-	protected static $dir_files = 0;
 
 	public function __construct($options, $db)
 	{
@@ -80,38 +76,56 @@ class AttachmentsDirectory
 		$this->attachmentUploadDir = Util::unserialize($options['attachmentUploadDir']);
 	}
 
-	public function hasNumFilesLimit()
-	{
-		return !empty($this->numFilesLimit);
-	}
-
+	/**
+	 * Return how many files will still "fit" in the directory
+	 *
+	 * @param int $current_files
+	 * @return false|mixed
+	 */
 	public function remainingFiles($current_files)
 	{
 		if ($this->hasNumFilesLimit())
 		{
 			return max($this->numFilesLimit - $current_files, 0);
 		}
-		else
-		{
-			return false;
-		}
+
+		return false;
 	}
 
-	public function hasSizeLimit()
+	/**
+	 * Returns if a file limit (count) has been placed on a directory
+	 *
+	 * @return bool
+	 */
+	public function hasNumFilesLimit()
 	{
-		return !empty($this->sizeLimit);
+		return !empty($this->numFilesLimit);
 	}
 
+	/**
+	 * Returns how much physical space is remaining for a directory
+	 *
+	 * @param $current_dir_size
+	 * @return false|mixed
+	 */
 	public function remainingSpace($current_dir_size)
 	{
 		if ($this->hasSizeLimit())
 		{
 			return max($this->sizeLimit - $current_dir_size, 0);
 		}
-		else
-		{
-			return false;
-		}
+
+		return false;
+	}
+
+	/**
+	 * Return if a directory physical space limit has been set
+	 *
+	 * @return bool
+	 */
+	public function hasSizeLimit()
+	{
+		return !empty($this->sizeLimit);
 	}
 
 	/**
@@ -135,37 +149,29 @@ class AttachmentsDirectory
 		return $this->currentAttachmentUploadDir;
 	}
 
+	/**
+	 * Checks if a given id or named directory has been defined.  Does not
+	 * check if it exists on disk.
+	 *
+	 * @param int|string $id
+	 * @return bool
+	 */
 	public function directoryExists($id)
 	{
 		if (is_integer($id))
 		{
 			return array_key_exists($id, $this->attachmentUploadDir);
 		}
-		else
-		{
-			return in_array($id, $this->attachmentUploadDir) || in_array(BOARDDIR . DIRECTORY_SEPARATOR . $path, $this->attachmentUploadDir);
-		}
-	}
 
-	public function isCurrentDirectoryId($id)
-	{
-		return $this->currentAttachmentUploadDir == $id;
-	}
-
-	public function isCurrentBaseDir($id)
-	{
-		if (is_integer($id))
-		{
-			return $this->basedirectory_for_attachments === $this->attachmentUploadDir[$id];
-		}
-		else
-		{
-			return $this->basedirectory_for_attachments === $id;
-		}
+		return in_array($id, $this->attachmentUploadDir)
+			|| in_array(BOARDDIR . DIRECTORY_SEPARATOR . $id, $this->attachmentUploadDir);
 	}
 
 	/**
 	 * Loop through the attach directory array to count any sub-directories
+	 *
+	 * @param string $dir
+	 * @return int
 	 */
 	public function countSubdirs($dir)
 	{
@@ -181,18 +187,6 @@ class AttachmentsDirectory
 		return $expected_dirs;
 	}
 
-	public function getPathById($id)
-	{
-		if (isset($this->attachmentUploadDir[$id]))
-		{
-			return $this->attachmentUploadDir[$id];
-		}
-		else
-		{
-			throw new Exception('dir_does_not_exists');
-		}
-	}
-
 	/**
 	 * Returns the list of directories as an array.
 	 *
@@ -203,49 +197,53 @@ class AttachmentsDirectory
 		return $this->attachmentUploadDir;
 	}
 
+	/**
+	 * Returns the directory name for a given key
+	 *
+	 * @param int $id key in our attachmentUploadDir array
+	 * @return string
+	 *
+	 * @throws \Exception
+	 */
+	public function getPathById($id)
+	{
+		if (isset($this->attachmentUploadDir[$id]))
+		{
+			return $this->attachmentUploadDir[$id];
+		}
+
+		throw new Exception('dir_does_not_exists');
+	}
+
+	/**
+	 * Return the base directory in use for attachments
+	 *
+	 * @return mixed
+	 */
 	public function getBaseDirs()
 	{
 		return $this->basedirectory_for_attachments;
 	}
 
+	/**
+	 * Return if base directories have been defined
+	 *
+	 * @return bool
+	 */
 	public function hasBaseDir()
 	{
 		return !empty($this->baseDirectories);
 	}
 
+	/**
+	 * Return if a given directory is a defined base dir
+	 *
+	 * @param $dir
+	 * @return bool
+	 */
 	public function isBaseDir($dir)
 	{
 		return in_array($dir, $this->baseDirectories);
-	}
-
-	public function hasMultiPaths()
-	{
-		return $this->autoManageEnabled() && count($this->attachmentUploadDir) > 1;
-	}
-
-	public function autoManageEnabled($minLevel = null)
-	{
-		if ($minLevel === null)
-		{
-			return !empty($this->automanage_attachments);
-		}
-		else
-		{
-			return $this->automanage_attachments > $minLevel;
-		}
-	}
-
-	protected function initLastDir($base_dir)
-	{
-		if (!isset($this->last_dirs[$base_dir]))
-		{
-			$this->last_dirs[$base_dir] = 0;
-		}
-	}
-
-	public function autoManageIsLevel($level)
-	{
-		return $this->automanage_attachments === (int) $level;
 	}
 
 	public function updateLastDirs($dir_id)
@@ -278,6 +276,7 @@ class AttachmentsDirectory
 				$this->last_dirs[$bid] = (int) $num;
 				$this->basedirectory_for_attachments = !empty($this->basedirectory_for_attachments) ? $this->basedirectory_for_attachments : '';
 				$this->useSubdirectories = (int) $this->useSubdirectories;
+
 				updateSettings(array(
 					'last_attachments_directory' => serialize($this->last_dirs),
 					'basedirectory_for_attachments' => $bid == 0 ? $this->basedirectory_for_attachments : $this->attachmentUploadDir[$bid],
@@ -287,6 +286,13 @@ class AttachmentsDirectory
 		}
 	}
 
+	/**
+	 * If size/count limits are enabled, validates a given file will still fit
+	 * within the given constraints.  If not will attempt to create new directorys
+	 * based on ACP options
+	 *
+	 * @param $thumb_size
+	 */
 	public function checkDirSize($thumb_size)
 	{
 		if ($this->autoManageIsLevel(self::AUTO_SEQUENCE) && !empty($this->sizeLimit) || !empty($this->numFilesLimit))
@@ -306,24 +312,250 @@ class AttachmentsDirectory
 		}
 	}
 
+	public function autoManageIsLevel($level)
+	{
+		return $this->automanage_attachments === (int) $level;
+	}
+
 	/**
-	 * The current attachments path:
+	 * Determines the current base directory and attachment directory
 	 *
-	 * What it does: @return string
+	 * What it does:
 	 *
-	 * @todo not really true at the moment
-	 *  - BOARDDIR . '/attachments', if nothing is set yet.
-	 *  - if the forum is using multiple attachments directories,
-	 *    then the current path is stored as unserialize($modSettings['attachmentUploadDir'])[$modSettings['currentAttachmentUploadDir']]
-	 *  - otherwise, the current path is $modSettings['attachmentUploadDir'].
+	 * - Increments the above directory to the next available slot
+	 * - Uses createDirectory to create the incremental directory
+	 *
+	 * @package Attachments
+	 */
+	public function manageBySpace()
+	{
+		if ($this->autoManageEnabled(self::AUTO_SEQUENCE))
+		{
+			return true;
+		}
+
+		$basedirectory = !empty($this->useSubdirectories) ? $this->basedirectory_for_attachments : BOARDDIR;
+
+		// Just to be sure: I don't want directory separators at the end
+		$sep = (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') ? '\/' : DIRECTORY_SEPARATOR;
+		$basedirectory = rtrim($basedirectory, $sep);
+
+		// Get the current base directory
+		if (!empty($this->useSubdirectories) && !empty($this->baseDirectories))
+		{
+			$base_dir = array_search($this->basedirectory_for_attachments, $this->baseDirectories);
+		}
+		else
+		{
+			$base_dir = 0;
+		}
+
+		// Get the last attachment directory for that base directory
+		$this->initLastDir($base_dir);
+
+		// And increment it.
+		$this->last_dirs[$base_dir]++;
+
+		$updir = $basedirectory . DIRECTORY_SEPARATOR . 'attachments_' . $this->last_dirs[$base_dir];
+
+		// make sure it exists and is writable
+		try
+		{
+			$this->createDirectory($updir);
+
+			$this->currentAttachmentUploadDir = array_search($updir, $this->attachmentUploadDir);
+			updateSettings(array(
+				'last_attachments_directory' => serialize($this->last_dirs),
+				'currentAttachmentUploadDir' => $this->currentAttachmentUploadDir,
+			));
+
+			return true;
+		}
+		catch (Exception $e)
+		{
+			return false;
+		}
+	}
+
+	public function autoManageEnabled($minLevel = null)
+	{
+		if ($minLevel === null)
+		{
+			return !empty($this->automanage_attachments);
+		}
+
+		return $this->automanage_attachments > $minLevel;
+	}
+
+	protected function initLastDir($base_dir)
+	{
+		if (!isset($this->last_dirs[$base_dir]))
+		{
+			$this->last_dirs[$base_dir] = 0;
+		}
+	}
+
+	/**
+	 * Creates a directory as defined by the admin attach options
+	 *
+	 * What it does:
+	 *
+	 * - Attempts to make the directory writable
+	 * - Places an .htaccess in new directories for security
+	 *
+	 * @param string $updir
+	 * @return bool
+	 * @throws \ElkArte\Exceptions\Exception
+	 * @package Attachments
 	 *
 	 */
-	public function getCurrent()
+	public function createDirectory($updir)
 	{
-		if (empty($this->attachmentUploadDir))
-			return BOARDDIR . '/attachments';
+		$tree = $this->getTreeElements($updir);
+		$count = count($tree);
 
-		return $this->attachmentUploadDir[$this->currentAttachmentUploadDir];
+		$directory = !empty($tree) ? $this->initDir($tree, $count) : false;
+		if ($directory === false)
+		{
+			// Maybe it's just the folder name
+			$tree = $this->getTreeElements(BOARDDIR . DIRECTORY_SEPARATOR . $updir);
+			$count = count($tree);
+
+			$directory = !empty($tree) ? $this->initDir($tree, $count) : false;
+			if ($directory === false)
+			{
+				throw new Exception('attachments_no_create');
+			}
+		}
+
+		$directory .= DIRECTORY_SEPARATOR . array_shift($tree);
+
+		while (!$this->isDir($directory) || $count != -1)
+		{
+			if (!$this->isDir($directory))
+			{
+				if (!@mkdir($directory, 0755))
+				{
+					throw new Exception('attachments_no_create');
+				}
+			}
+
+			$directory .= DIRECTORY_SEPARATOR . array_shift($tree);
+			$count--;
+		}
+
+		// Try to make it writable
+		if (!is_writable($directory))
+		{
+			chmod($directory, 0755);
+			if (!is_writable($directory))
+			{
+				chmod($directory, 0775);
+				if (!is_writable($directory))
+				{
+					chmod($directory, 0777);
+					if (!is_writable($directory))
+					{
+						throw new Exception('attachments_no_write');
+					}
+				}
+			}
+		}
+
+		// Everything seems fine...let's create the .htaccess
+		if (!file_exists($directory . DIRECTORY_SEPARATOR . '.htaccess'))
+		{
+			secureDirectory($updir, true);
+		}
+
+		$sep = (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') ? '\/' : DIRECTORY_SEPARATOR;
+		$updir = rtrim($updir, $sep);
+
+		// Only update if it's a new directory
+		if (!in_array($updir, $this->attachmentUploadDir))
+		{
+			$this->currentAttachmentUploadDir = max(array_keys($this->attachmentUploadDir)) + 1;
+			$this->attachmentUploadDir[$this->currentAttachmentUploadDir] = $updir;
+
+			updateSettings(array(
+				'attachmentUploadDir' => serialize($this->attachmentUploadDir),
+				'currentAttachmentUploadDir' => $this->currentAttachmentUploadDir,
+			), true);
+		}
+
+		return true;
+	}
+
+	/**
+	 * Finds the current directory tree for the supplied base directory
+	 *
+	 * @param string $directory
+	 * @return string[]|bool on fail else array of directory names
+	 * @package Attachments
+	 */
+	protected function getTreeElements($directory)
+	{
+		/*
+			In Windows server both \ and / can be used as directory separators in paths
+			In Linux (and presumably *nix) servers \ can be part of the name
+			So for this reasons:
+				 * in Windows we need to explode for both \ and /
+				 * while in linux should be safe to explode only for / (aka DIRECTORY_SEPARATOR)
+		 */
+		if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN')
+		{
+			$tree = preg_split('#[\\\/]#', $directory);
+		}
+		else
+		{
+			if (substr($directory, 0, 1) != DIRECTORY_SEPARATOR)
+			{
+				return false;
+			}
+
+			$tree = explode(DIRECTORY_SEPARATOR, trim($directory, DIRECTORY_SEPARATOR));
+		}
+
+		return $tree;
+	}
+
+	/**
+	 * Helper function for createDirectory
+	 *
+	 * What it does:
+	 *
+	 * - Gets the directory w/o drive letter for windows
+	 *
+	 * @param string[] $tree
+	 * @param int $count
+	 *
+	 * @return bool|mixed|string
+	 * @package Attachments
+	 *
+	 */
+	public function initDir(&$tree, &$count)
+	{
+		$directory = '';
+
+		// If on Windows servers the first part of the path is the drive (e.g. "C:")
+		if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN')
+		{
+			// Better be sure that the first part of the path is actually a drive letter...
+			// ...even if, I should check this in the admin page...isn't it?
+			// ...NHAAA Let's leave space for users' complains! :P
+			if (preg_match('/^[a-z]:$/i', $tree[0]))
+			{
+				$directory = array_shift($tree);
+			}
+			else
+			{
+				return false;
+			}
+
+			$count--;
+		}
+
+		return $directory;
 	}
 
 	public function countDirs()
@@ -360,6 +592,11 @@ class AttachmentsDirectory
 		}
 
 		return $file_tree;
+	}
+
+	public function hasMultiPaths()
+	{
+		return $this->autoManageEnabled() && count($this->attachmentUploadDir) > 1;
 	}
 
 	/**
@@ -458,6 +695,45 @@ class AttachmentsDirectory
 	}
 
 	/**
+	 * Should we try to create a new directory or not?
+	 *
+	 * @param bool $is_admin_interface
+	 * @return bool
+	 */
+	protected function checkNewDir($is_admin_interface)
+	{
+		// Not pretty, but since we don't want folders created for every post.
+		// It'll do unless a better solution can be found.
+		if ($is_admin_interface === true)
+		{
+			return true;
+		}
+
+		if ($this->autoManageEnabled() === false)
+		{
+			return false;
+		}
+
+		if (!isset($_FILES))
+		{
+			return false;
+		}
+
+		if (isset($_FILES['attachment']))
+		{
+			foreach ($_FILES['attachment']['tmp_name'] as $dummy)
+			{
+				if (!empty($dummy))
+				{
+					return true;
+				}
+			}
+		}
+
+		return false;
+	}
+
+	/**
 	 * Checks if the current active directory has space allowed for a new attachment file
 	 *
 	 * @param $sess_attach
@@ -522,101 +798,32 @@ class AttachmentsDirectory
 	}
 
 	/**
-	 * Creates a directory as defined by the admin attach options
+	 * The current attachments path:
 	 *
-	 * What it does:
+	 * What it does: @return string
 	 *
-	 * - Attempts to make the directory writable
-	 * - Places an .htaccess in new directories for security
-	 *
-	 * @param string $updir
-	 * @throws \ElkArte\Exceptions\Exception
-	 * @return bool
-	 * @package Attachments
+	 * @todo not really true at the moment
+	 *  - BOARDDIR . '/attachments', if nothing is set yet.
+	 *  - if the forum is using multiple attachments directories,
+	 *    then the current path is stored as unserialize($modSettings['attachmentUploadDir'])[$modSettings['currentAttachmentUploadDir']]
+	 *  - otherwise, the current path is $modSettings['attachmentUploadDir'].
 	 *
 	 */
-	public function createDirectory($updir)
+	public function getCurrent()
 	{
-		$tree = $this->getTreeElements($updir);
-		$count = count($tree);
-
-		$directory = !empty($tree) ? $this->initDir($tree, $count) : false;
-		if ($directory === false)
+		if (empty($this->attachmentUploadDir))
 		{
-			// Maybe it's just the folder name
-			$tree = $this->getTreeElements(BOARDDIR . DIRECTORY_SEPARATOR . $updir);
-			$count = count($tree);
-
-			$directory = !empty($tree) ? $this->initDir($tree, $count) : false;
-			if ($directory === false)
-			{
-				return false;
-			}
+			return BOARDDIR . '/attachments';
 		}
 
-		$directory .= DIRECTORY_SEPARATOR . array_shift($tree);
-
-		while (!@is_dir($directory) || $count != -1)
-		{
-			if (!@is_dir($directory))
-			{
-				if (!@mkdir($directory, 0755))
-				{
-					Throw new Exception('attachments_no_create');
-				}
-			}
-
-			$directory .= DIRECTORY_SEPARATOR . array_shift($tree);
-			$count--;
-		}
-
-		// Try to make it writable
-		if (!is_writable($directory))
-		{
-			chmod($directory, 0755);
-			if (!is_writable($directory))
-			{
-				chmod($directory, 0775);
-				if (!is_writable($directory))
-				{
-					chmod($directory, 0777);
-					if (!is_writable($directory))
-					{
-						Throw new Exception('attachments_no_write');
-					}
-				}
-			}
-		}
-
-		// Everything seems fine...let's create the .htaccess
-		if (!file_exists($directory . DIRECTORY_SEPARATOR . '.htaccess'))
-		{
-			secureDirectory($updir, true);
-		}
-
-		$sep = (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') ? '\/' : DIRECTORY_SEPARATOR;
-		$updir = rtrim($updir, $sep);
-
-		// Only update if it's a new directory
-		if (!in_array($updir, $this->attachmentUploadDir))
-		{
-			$this->currentAttachmentUploadDir = max(array_keys($this->attachmentUploadDir)) + 1;
-			$this->attachmentUploadDir[$this->currentAttachmentUploadDir] = $updir;
-
-			updateSettings(array(
-				'attachmentUploadDir' => serialize($this->attachmentUploadDir),
-				'currentAttachmentUploadDir' => $this->currentAttachmentUploadDir,
-			), true);
-		}
-
-		return true;
+		return $this->attachmentUploadDir[$this->currentAttachmentUploadDir];
 	}
 
 	public function rename($id, &$real_path)
 	{
 		if (!empty($this->attachmentUploadDir[$id]) && $real_path != $this->attachmentUploadDir[$id])
 		{
-			if ($real_path != $this->attachmentUploadDir[$id] && !is_dir($real_path))
+			if ($real_path != $this->attachmentUploadDir[$id] && !$this->isDir($real_path))
 			{
 				if (!@rename($this->attachmentUploadDir[$id], $real_path))
 				{
@@ -644,6 +851,13 @@ class AttachmentsDirectory
 		}
 	}
 
+	/**
+	 * Remove a directory if its empty (not counting .htaccess or index.php)
+	 *
+	 * @param $id
+	 * @param $real_path
+	 * @throws \ElkArte\Exceptions\Exception
+	 */
 	public function delete($id, &$real_path)
 	{
 		$real_path = $this->attachmentUploadDir[$id];
@@ -653,8 +867,9 @@ class AttachmentsDirectory
 		{
 			throw new Exception('attach_dir_is_current');
 		}
+
 		// Or the current base directory
-		elseif ($this->isCurrentBaseDir($id))
+		if ($this->isCurrentBaseDir($id))
 		{
 			throw new Exception('attach_dir_is_current_bd');
 		}
@@ -679,21 +894,30 @@ class AttachmentsDirectory
 			// It's safe to delete. So try to delete the folder also
 			if ($num_attach == 0)
 			{
-				if (is_dir($real_path))
+				if ($this->isDir($real_path))
 				{
 					$doit = true;
 				}
-				elseif (is_dir(BOARDDIR . DIRECTORY_SEPARATOR . $real_path))
+				elseif ($this->isDir(BOARDDIR . DIRECTORY_SEPARATOR . $real_path))
 				{
 					$doit = true;
 					$real_path = BOARDDIR . DIRECTORY_SEPARATOR . $real_path;
 				}
 
-				if (isset($doit))
+				if ($doit === true)
 				{
-					unlink($real_path . '/.htaccess');
-					unlink($real_path . '/index.php');
-					if (!@rmdir($real_path))
+					try
+					{
+						unlink($real_path . '/.htaccess');
+						unlink($real_path . '/index.php');
+						$result = rmdir($real_path);
+					}
+					catch (\Exception $e)
+					{
+						throw new Exception('attach_dir_no_delete');
+					}
+
+					if (!$result)
 					{
 						throw new Exception('attach_dir_no_delete');
 					}
@@ -715,169 +939,47 @@ class AttachmentsDirectory
 		}
 	}
 
-	/**
-	 * Determines the current base directory and attachment directory
-	 *
-	 * What it does:
-	 *
-	 * - Increments the above directory to the next available slot
-	 * - Uses createDirectory to create the incremental directory
-	 *
-	 * @package Attachments
-	 */
-	public function manageBySpace()
+	public function isCurrentDirectoryId($id)
 	{
-		if ($this->autoManageEnabled(self::AUTO_SEQUENCE))
-		{
-			return true;
-		}
-
-		$basedirectory = !empty($this->useSubdirectories) ? $this->basedirectory_for_attachments : BOARDDIR;
-
-		// Just to be sure: I don't want directory separators at the end
-		$sep = (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') ? '\/' : DIRECTORY_SEPARATOR;
-		$basedirectory = rtrim($basedirectory, $sep);
-
-		// Get the current base directory
-		if (!empty($this->useSubdirectories) && !empty($this->baseDirectories))
-		{
-			$base_dir = array_search($this->basedirectory_for_attachments, $this->baseDirectories);
-		}
-		else
-		{
-			$base_dir = 0;
-		}
-
-		// Get the last attachment directory for that base directory
-		$this->initLastDir($base_dir);
-
-		// And increment it.
-		$this->last_dirs[$base_dir]++;
-
-		$updir = $basedirectory . DIRECTORY_SEPARATOR . 'attachments_' . $this->last_dirs[$base_dir];
-
-		// make sure it exists and is writable
-		try
-		{
-			$this->createDirectory($updir);
-
-			$this->currentAttachmentUploadDir = array_search($updir, $this->attachmentUploadDir);
-			updateSettings(array(
-				'last_attachments_directory' => serialize($this->last_dirs),
-				'currentAttachmentUploadDir' => $this->currentAttachmentUploadDir,
-			));
-
-			return true;
-		}
-		catch (Exception $e)
-		{
-			return false;
-		}
+		return $this->currentAttachmentUploadDir == $id;
 	}
 
 	/**
-	 * Finds the current directory tree for the supplied base directory
+	 * Returns if a given directory is the current base directory used for attachments
 	 *
-	 * @param string $directory
-	 * @return string[]|bool on fail else array of directory names
-	 * @package Attachments
-	 */
-	protected function getTreeElements($directory)
-	{
-		/*
-			In Windows server both \ and / can be used as directory separators in paths
-			In Linux (and presumably *nix) servers \ can be part of the name
-			So for this reasons:
-				 * in Windows we need to explode for both \ and /
-				 * while in linux should be safe to explode only for / (aka DIRECTORY_SEPARATOR)
-		 */
-		if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN')
-		{
-			$tree = preg_split('#[\\\/]#', $directory);
-		}
-		else
-		{
-			if (substr($directory, 0, 1) != DIRECTORY_SEPARATOR)
-			{
-				return false;
-			}
-
-			$tree = explode(DIRECTORY_SEPARATOR, trim($directory, DIRECTORY_SEPARATOR));
-		}
-
-		return $tree;
-	}
-
-	/**
-	 * Helper function for createDirectory
-	 *
-	 * What it does:
-	 *
-	 * - Gets the directory w/o drive letter for windows
-	 *
-	 * @param string[] $tree
-	 * @param int $count
-	 *
-	 * @return bool|mixed|string
-	 * @package Attachments
-	 *
-	 */
-	public function initDir(&$tree, &$count)
-	{
-		$directory = '';
-
-		// If on Windows servers the first part of the path is the drive (e.g. "C:")
-		if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN')
-		{
-			// Better be sure that the first part of the path is actually a drive letter...
-			// ...even if, I should check this in the admin page...isn't it?
-			// ...NHAAA Let's leave space for users' complains! :P
-			if (preg_match('/^[a-z]:$/i', $tree[0]))
-			{
-				$directory = array_shift($tree);
-			}
-			else
-			{
-				return false;
-			}
-
-			$count--;
-		}
-
-		return $directory;
-	}
-
-	/**
-	 * Should we try to create a new directory or not?
-	 *
-	 * @param bool $is_admin_interface
+	 * @param int $id
 	 * @return bool
 	 */
-	protected function checkNewDir($is_admin_interface)
+	public function isCurrentBaseDir($id)
 	{
-		// Not pretty, but since we don't want folders created for every post.
-		// It'll do unless a better solution can be found.
-		if ($is_admin_interface === true)
+		if (is_integer($id))
 		{
-			return true;
+			return $this->basedirectory_for_attachments === $this->attachmentUploadDir[$id];
 		}
-		elseif ($this->autoManageEnabled() === false)
+
+		return $this->basedirectory_for_attachments === $id;
+	}
+
+	/**
+	 * is_dir() helper using spl functions.  is_dir can throw an exception if open_basedir
+	 * restrictions are in effect.  getType will not return true on a symlink
+	 *
+	 * @param string $dir
+	 * @return bool
+	 */
+	private function isDir($dir)
+	{
+		try
 		{
-			return false;
-		}
-		elseif (!isset($_FILES))
-		{
-			return false;
-		}
-		elseif (isset($_FILES['attachment']))
-		{
-			foreach ($_FILES['attachment']['tmp_name'] as $dummy)
+			$dir = new \SplFileInfo($dir);
+			if ($dir->getType() === 'dir')
 			{
-				if (!empty($dummy))
-				{
-					return true;
-				}
+				return true;
 			}
+		}
+		catch (\RuntimeException $e)
+		{
+			return false;
 		}
 
 		return false;

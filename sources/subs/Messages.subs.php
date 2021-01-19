@@ -21,10 +21,11 @@ use ElkArte\MessagesDelete;
 use ElkArte\User;
 
 /**
- * Get message and attachments data, for a message ID.
- * The function returns the data in an array with:
- *  'message' => array with message data
- *  'attachment_stuff' => array with attachments
+ * Get message and attachments data, for a message ID. The function returns the data in an array.
+ *
+ * What it does:
+ * - 'message' => array with all message data, body, subject, etc
+ * - 'attachment_stuff' => array with attachments ordered by attachment id as keys
  *
  * @param int $id_msg
  * @param int $id_topic = 0
@@ -44,7 +45,7 @@ function messageDetails($id_msg, $id_topic = 0, $attachment_type = 0)
 		return false;
 	}
 
-	$attachment_stuff = $db->fetchQuery('
+	$message_data = $db->fetchQuery('
 		SELECT
 			m.id_member, m.modified_time, m.modified_name, m.smileys_enabled, m.body,
 			m.poster_name, m.poster_email, m.subject, m.icon, m.approved,
@@ -66,24 +67,28 @@ function messageDetails($id_msg, $id_topic = 0, $attachment_type = 0)
 	)->fetch_all();
 
 	// The message they were trying to edit was most likely deleted.
-	if (empty($attachment_stuff))
+	if (empty($message_data))
 	{
 		return false;
 	}
 
-	$temp = array();
-	$row = array_shift($attachment_stuff);
-	foreach ($attachment_stuff as $attachment)
+	$temp = [];
+
+	// Attachments enabled, then return the details for each
+	if (!empty($modSettings['attachmentEnable']))
 	{
-		if ($attachment['filesize'] >= 0 && !empty($modSettings['attachmentEnable']))
+		foreach ($message_data as $attachment)
 		{
-			$temp[$attachment['id_attach']] = $attachment;
+			if ($attachment['filesize'] >= 0)
+			{
+				$temp[$attachment['id_attach']] = $attachment;
+			}
 		}
 
+		ksort($temp);
 	}
-	ksort($temp);
 
-	return array('message' => $row, 'attachment_stuff' => $temp);
+	return array('message' => $message_data[0], 'attachment_stuff' => $temp);
 }
 
 /**
@@ -227,8 +232,10 @@ function checkMessagePermissions($message)
 /**
  * Prepare context for a message.
  *
+ * What it does:
+ * - Loads data from messageDetails into $context array
+ *
  * @param mixed[] $message the message array
- * @throws \ElkArte\Exceptions\Exception
  */
 function prepareMessageContext($message)
 {
