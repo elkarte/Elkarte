@@ -69,7 +69,7 @@ abstract class AbstractManipulator
 	 *
 	 * @return mixed
 	 */
-	abstract public function autoRotateImage();
+	abstract public function autoRotate();
 
 	/**
 	 * Creates an image using the supplied text.

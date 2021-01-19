@@ -288,7 +288,7 @@ class Gd2 extends AbstractManipulator
 	 * @return bool
 	 * @throws \Exception
 	 */
-	public function autoRotateImage()
+	public function autoRotate()
 	{
 		// Time to spin and mirror as needed
 		switch ($this->orientation)

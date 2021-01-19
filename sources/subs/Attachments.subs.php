@@ -323,7 +323,7 @@ function createAttachment(&$attachmentOptions)
 		// Want to correct for phonetographer photos?
 		if (!empty($modSettings['attachment_autorotate']))
 		{
-			$image->autoRotateImage();
+			$image->autoRotate();
 		}
 	}
 
@@ -771,7 +771,7 @@ function saveAvatar($temporary_path, $memID, $max_width, $max_height)
 	// Want to correct for rotated photos?
 	if (!empty($modSettings['attachment_autorotate']))
 	{
-		$image->autoRotateImage();
+		$image->autoRotate();
 	}
 	$thumb_image = $image->createThumbnail($max_width, $max_height, $destName, $format);
 	if ($thumb_image !== false)

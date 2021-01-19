@@ -36,6 +36,8 @@ class TemporaryAttachment extends ValuesContainer
 	 * Deletes a temporary attachment from the filesystem
 	 *
 	 * @param bool $fatal
+	 * @return bool
+	 * @throws \Exception
 	 */
 	public function remove($fatal = true)
 	{
@@ -47,21 +49,7 @@ class TemporaryAttachment extends ValuesContainer
 			throw new \Exception('attachment_not_found');
 		}
 
-		try
-		{
-			if (!$this->fileWritable())
-			{
-				throw new \Exception('attachment_not_found');
-			}
-
-			unlink($this->data['tmp_name']);
-		}
-		catch (\Exception $e)
-		{
-			return false;
-		}
-
-		return true;
+		return $this->unlinkFile();
 	}
 
 	/**
@@ -152,10 +140,7 @@ class TemporaryAttachment extends ValuesContainer
 		else
 		{
 			$this->setErrors('attach_timeout');
-			if ($this->fileWritable())
-			{
-				unlink($this->data['tmp_name']);
-			}
+			$this->unlinkFile();
 		}
 	}
 
@@ -393,11 +378,36 @@ class TemporaryAttachment extends ValuesContainer
 		if ($this->hasErrors() === false && substr($this->data['type'], 0, 5) === 'image')
 		{
 			$image = new Image($this->data['tmp_name']);
-			if ($image->autoRotateImage())
+			if ($image->autoRotate())
 			{
 				$image->saveImage($this->data['tmp_name'], IMAGETYPE_JPEG, 95);
 				$this->data['size'] = filesize($this->data['tmp_name']);
 			}
 		}
+	}
+
+	/**
+	 * Checks if a file existence/permission and if granted will attempt
+	 * to remove/unlink the file.
+	 *
+	 * @return bool
+	 */
+	private function unlinkFile()
+	{
+		try
+		{
+			if (!$this->fileWritable())
+			{
+				throw new \Exception('attachment_not_found');
+			}
+
+			unlink($this->data['tmp_name']);
+		}
+		catch (\Exception $e)
+		{
+			return false;
+		}
+
+		return true;
 	}
 }

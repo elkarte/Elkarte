@@ -262,7 +262,7 @@ class Imagick extends AbstractManipulator
 	 *
 	 * @return bool
 	 */
-	public function autoRotateImage()
+	public function autoRotate()
 	{
 		try
 		{

@@ -194,7 +194,7 @@ class Image
 	 *
 	 * @return bool
 	 */
-	public function autoRotateImage()
+	public function autoRotate()
 	{
 		$this->getOrientation();
 
@@ -212,7 +212,7 @@ class Image
 
 		try
 		{
-			$this->_manipulator->autoRotateImage();
+			$this->_manipulator->autoRotate();
 		}
 		catch (\Exception $e)
 		{
