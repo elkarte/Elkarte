@@ -217,7 +217,7 @@ class Dump extends AbstractDump
 		$result = $this->_db->query('', '
 			SELECT *
 			FROM ' . $tableName . '
-			LIMIT ' . $start . ', ' . $limit,
+			LIMIT ' . $limit . ' OFFSET ' . $start,
 			array(
 				'security_override' => true,
 			)

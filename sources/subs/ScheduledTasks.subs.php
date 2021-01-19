@@ -486,7 +486,7 @@ function getTaskLogEntries($start, $items_per_page, $sort)
 		FROM {db_prefix}log_scheduled_tasks AS lst
 			INNER JOIN {db_prefix}scheduled_tasks AS st ON (st.id_task = lst.id_task)
 		ORDER BY ' . $sort . '
-		LIMIT ' . $start . ', ' . $items_per_page,
+		LIMIT ' . $items_per_page . '  OFFSET ' . $start,
 		array()
 	)->fetch_callback(
 		function ($row) use (&$log_entries) {

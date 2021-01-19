@@ -182,7 +182,7 @@ class Recent
 					AND m.approved = {int:is_approved}
 					AND t.approved = {int:is_approved}
 				ORDER BY m.id_msg DESC
-				LIMIT {int:offset}, {int:limit}',
+				LIMIT {int:limit} OFFSET {int:offset}',
 				array_merge($this->_query_parameters, array(
 					'is_approved' => 1,
 					'offset' => $start,

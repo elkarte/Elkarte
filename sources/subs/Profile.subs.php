@@ -2956,7 +2956,7 @@ function list_getUserWarnings($start, $items_per_page, $sort, $memID)
 		WHERE lc.id_recipient = {int:selected_member}
 			AND lc.comment_type = {string:warning}
 		ORDER BY ' . $sort . '
-		LIMIT ' . $start . ', ' . $items_per_page,
+		LIMIT ' . $items_per_page . '  OFFSET ' . $start,
 		array(
 			'selected_member' => $memID,
 			'warning' => 'warning',
@@ -3054,7 +3054,7 @@ function profileLoadAttachments($start, $items_per_page, $sort, $boardsAllowed, 
 			AND b.id_board NOT IN ({array_int:exclude_boards})' : '') . (!$modSettings['postmod_active'] || $context['user']['is_owner'] ? '' : '
 			AND m.approved = {int:is_approved}') . '
 		ORDER BY {raw:sort}
-		LIMIT {int:offset}, {int:limit}',
+		LIMIT {int:limit} OFFSET {int:offset} ',
 		array(
 			'boards_list' => $boardsAllowed,
 			'exclude_boards' => $exclude_boards,
@@ -3177,7 +3177,7 @@ function getUnwatchedBy($start, $items_per_page, $sort, $memID)
 			AND lt.unwatched = 1
 			AND {query_see_board}
 		ORDER BY {raw:sort}
-		LIMIT {int:offset}, {int:limit}',
+		LIMIT {int:limit} OFFSET {int:offset} ',
 		array(
 			'current_member' => $memID,
 			'sort' => $sort,

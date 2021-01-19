@@ -1050,7 +1050,7 @@ function loadPMs($pm_options, $id_member)
 					AND pm.id_pm = {int:id_pm}') . '
 				GROUP BY pm.id_pm_head
 				ORDER BY sort_param' . ($pm_options['descending'] ? ' DESC' : ' ASC') . (empty($pm_options['pmsg']) ? '
-				LIMIT ' . $pm_options['start'] . ', ' . $pm_options['limit'] : ''),
+				LIMIT ' . $pm_options['limit'] . ' OFFSET ' . $pm_options['start'] : ''),
 				array(
 					'current_member' => $id_member,
 					'not_deleted' => 0,
@@ -1077,7 +1077,7 @@ function loadPMs($pm_options, $id_member)
 					LEFT JOIN {db_prefix}members AS mem ON (mem.id_member = {raw:id_member})') : '') . '
 				WHERE ' . (empty($sub_pms) ? '0=1' : 'pm.id_pm IN ({array_int:pm_list})') . '
 				ORDER BY ' . ($pm_options['sort_by_query'] == 'pm.id_pm' && $pm_options['folder'] != 'sent' ? 'id_pm' : '{raw:sort}') . ($pm_options['descending'] ? ' DESC' : ' ASC') . (empty($pm_options['pmsg']) ? '
-				LIMIT ' . $pm_options['start'] . ', ' . $pm_options['limit'] : ''),
+				LIMIT ' . $pm_options['limit'] . ' OFFSET ' . $pm_options['start'] : ''),
 				array(
 					'current_member' => $id_member,
 					'pm_list' => array_keys($sub_pms),
@@ -1105,7 +1105,7 @@ function loadPMs($pm_options, $id_member)
 					AND pm.id_pm = {int:pmsg}') . '
 				GROUP BY pm.id_pm_head
 				ORDER BY ' . ($pm_options['sort_by_query'] == 'pm.id_pm' && $pm_options['folder'] != 'sent' ? 'id_pm' : '{raw:sort}') . ($pm_options['descending'] ? ' DESC' : ' ASC') . (isset($pm_options['pmsg']) ? '
-				LIMIT ' . $pm_options['start'] . ', ' . $pm_options['limit'] : ''),
+				LIMIT ' . $pm_options['limit'] . ' OFFSET ' . $pm_options['start'] : ''),
 				array(
 					'current_member' => $id_member,
 					'deleted_by' => 0,
@@ -1134,7 +1134,7 @@ function loadPMs($pm_options, $id_member)
 				AND pm.deleted_by_sender = {int:is_deleted}' : '1=1') . (empty($pm_options['pmsg']) ? '' : '
 				AND pm.id_pm = {int:pmsg}') . '
 			ORDER BY ' . ($pm_options['sort_by_query'] == 'pm.id_pm' && $pm_options['folder'] != 'sent' ? 'pmr.id_pm' : '{raw:sort}') . ($pm_options['descending'] ? ' DESC' : ' ASC') . (isset($pm_options['pmsg']) ? '
-			LIMIT ' . $pm_options['start'] . ', ' . $pm_options['limit'] : ''),
+			LIMIT ' . $pm_options['limit'] . ' OFFSET ' . $pm_options['start'] : ''),
 			array(
 				'current_member' => $id_member,
 				'is_deleted' => 0,

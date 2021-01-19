@@ -325,7 +325,7 @@ class Dump extends AbstractDump
 		$result = $this->_db->query('', '
 			SELECT /*!40001 SQL_NO_CACHE */ *
 			FROM `' . $tableName . '`
-			LIMIT ' . $start . ', ' . $limit,
+			LIMIT ' . $limit . ' OFFSET ' . $start,
 			array(
 				'security_override' => true,
 			)

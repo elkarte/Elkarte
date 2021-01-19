@@ -70,7 +70,7 @@ function getUserErrors($start, $items_per_page, $sort, $where, $where_vars = arr
 			LEFT JOIN {db_prefix}members AS mem ON (mem.id_member = le.id_member)
 		WHERE ' . $where . '
 		ORDER BY ' . $sort . '
-		LIMIT ' . $start . ', ' . $items_per_page,
+		LIMIT ' . $items_per_page . '  OFFSET ' . $start,
 		array_merge($where_vars, array(
 			'guest_title' => $txt['guest_title'],
 		))
@@ -144,7 +144,7 @@ function getIPMessages($start, $items_per_page, $sort, $where, $where_vars = arr
 			LEFT JOIN {db_prefix}members AS mem ON (mem.id_member = m.id_member)
 		WHERE {query_see_board} AND ' . $where . '
 		ORDER BY ' . $sort . '
-		LIMIT ' . $start . ', ' . $items_per_page,
+		LIMIT ' . $items_per_page . '  OFFSET ' . $start,
 		array_merge($where_vars, array())
 	)->fetch_callback(
 		function ($row) use (&$messages) {
@@ -292,7 +292,7 @@ function getProfileEdits($start, $items_per_page, $sort, $memID)
 		WHERE id_log = {int:log_type}
 			AND id_member = {int:owner}
 		ORDER BY ' . $sort . '
-		LIMIT ' . $start . ', ' . $items_per_page,
+		LIMIT ' . $items_per_page . '  OFFSET ' . $start,
 		array(
 			'log_type' => 2,
 			'owner' => $memID,

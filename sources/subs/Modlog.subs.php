@@ -102,7 +102,7 @@ function list_getModLogEntries($start, $items_per_page, $sort, $query_string = '
 		. (!empty($query_string) ? '
 				AND ' . $query_string : '') . '
 		ORDER BY ' . $sort . '
-		LIMIT ' . $start . ', ' . $items_per_page,
+		LIMIT ' . $items_per_page . '  OFFSET ' . $start,
 		array_merge($query_params, array(
 			'reg_group_id' => 0,
 			'log_type' => $log_type,

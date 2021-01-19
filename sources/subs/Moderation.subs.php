@@ -533,7 +533,7 @@ function warningTemplates($start, $items_per_page, $sort, $template_type = 'warn
 		WHERE lc.comment_type = {string:tpltype}
 			AND (id_recipient = {string:generic} OR id_recipient = {int:current_member})
 		ORDER BY ' . $sort . '
-		LIMIT ' . $start . ', ' . $items_per_page,
+		LIMIT ' . $items_per_page . '  OFFSET ' . $start,
 		array(
 			'tpltype' => $template_type,
 			'generic' => 0,
@@ -621,7 +621,7 @@ function warnings($start, $items_per_page, $sort, $query_string = '', $query_par
 		WHERE lc.comment_type = {string:warning}' . (!empty($query_string) ? '
 			AND ' . $query_string : '') . '
 		ORDER BY ' . $sort . '
-		LIMIT ' . $start . ', ' . $items_per_page,
+		LIMIT ' . $items_per_page . '  OFFSET ' . $start,
 		array_merge($query_params, array(
 			'warning' => 'warning',
 		))
@@ -843,7 +843,7 @@ function getModReports($status = 0, $start = 0, $limit = 10, $show_pms = false)
 				AND lr.type IN ({array_string:rep_type})
 				AND ' . (User::$info->mod_cache['bq'] == '1=1' || User::$info->mod_cache['bq'] == '0=1' ? User::$info->mod_cache['bq'] : 'lr.' . User::$info->mod_cache['bq']) . '
 			ORDER BY lr.time_updated DESC
-			LIMIT {int:start}, {int:limit}',
+			LIMIT {int:limit} OFFSET {int:start} ',
 		array(
 			'view_closed' => $status,
 			'start' => $start,
@@ -1035,7 +1035,7 @@ function watchedUsers($start, $items_per_page, $sort)
 		FROM {db_prefix}members
 		WHERE warning >= {int:warning_watch}
 		ORDER BY {raw:sort}
-		LIMIT ' . $start . ', ' . $items_per_page,
+		LIMIT ' . $items_per_page . '  OFFSET ' . $start,
 		array(
 			'warning_watch' => $modSettings['warning_watch'],
 			'sort' => $sort,
@@ -1192,7 +1192,7 @@ function watchedUserPosts($start, $items_per_page, $approve_query, $delete_board
 			AND b.id_board != {int:recycle}' : '') .
 		$approve_query . '
 		ORDER BY m.id_msg DESC
-		LIMIT ' . $start . ', ' . $items_per_page,
+		LIMIT ' . $items_per_page . '  OFFSET ' . $start,
 		array(
 			'warning_watch' => $modSettings['warning_watch'],
 			'recycle' => $modSettings['recycle_board'],
@@ -1494,7 +1494,7 @@ function moderatorNotes($offset)
 				LEFT JOIN {db_prefix}members AS mem ON (mem.id_member = lc.id_member)
 			WHERE lc.comment_type = {string:modnote}
 			ORDER BY id_comment DESC
-			LIMIT {int:offset}, 10',
+			LIMIT 10 OFFSET {int:offset} ',
 			array(
 				'modnote' => 'modnote',
 				'offset' => $offset,
@@ -1624,7 +1624,7 @@ function getUnapprovedPosts($approve_query, $current_view, $boards_allowed, $sta
 			AND t.id_first_msg ' . ($current_view == 'topics' ? '=' : '!=') . ' m.id_msg
 			AND {query_see_board}
 			' . $approve_query . '
-		LIMIT {int:start}, {int:limit}',
+		LIMIT {int:limit} OFFSET {int:start} ',
 		array(
 			'start' => $start,
 			'limit' => $limit,

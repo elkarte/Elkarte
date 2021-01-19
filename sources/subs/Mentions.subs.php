@@ -104,7 +104,7 @@ function getUserMentions($start, $limit, $sort, $all = false, $type = '')
 			AND mtn.mention_type IN ({array_string:current_type})' : '
 			AND mtn.mention_type = {string:current_type}')) . '
 		ORDER BY {raw:sort}
-		LIMIT {int:start}, {int:limit}',
+		LIMIT {int:limit} OFFSET {int:start} ',
 		array(
 			'current_user' => User::$info->id,
 			'current_type' => $type,

@@ -408,7 +408,7 @@ function likesPostsGiven($start, $items_per_page, $sort, $memberID)
 		WHERE l.id_member = {int:id_member}' . (!empty($modSettings['recycle_enable']) ? ('
 			AND b.id_board != ' . $modSettings['recycle_board']) : '') . '
 		ORDER BY {raw:sort}
-		LIMIT {int:start}, {int:per_page}',
+		LIMIT {int:per_page} OFFSET {int:start}',
 		array(
 			'id_member' => $memberID,
 			'sort' => $sort,
@@ -461,7 +461,7 @@ function likesPostsReceived($start, $items_per_page, $sort, $memberID)
 			AND b.id_board != ' . $modSettings['recycle_board']) : '') . '
 		GROUP BY m.subject, m.id_topic, b.name, m.id_msg
 		ORDER BY {raw:sort}
-		LIMIT {int:start}, {int:per_page}',
+		LIMIT {int:per_page} OFFSET {int:start}',
 		array(
 			'id_member' => $memberID,
 			'sort' => $sort,
@@ -518,7 +518,7 @@ function postLikers($start, $items_per_page, $sort, $messageID, $simple = true)
 			LEFT JOIN {db_prefix}attachments AS a ON (a.id_member = m.id_member)') . '
 		WHERE l.id_msg = {int:id_message}
 		ORDER BY {raw:sort}
-		LIMIT {int:start}, {int:per_page}',
+		LIMIT {int:per_page} OFFSET {int:start}',
 		array(
 			'id_message' => $messageID,
 			'sort' => $sort,

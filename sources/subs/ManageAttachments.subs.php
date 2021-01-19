@@ -1522,7 +1522,7 @@ function list_getFiles($start, $items_per_page, $sort, $browse_type)
 				LEFT JOIN {db_prefix}members AS mem ON (mem.id_member = a.id_member)
 			WHERE a.id_member != {int:guest_id}
 			ORDER BY {raw:sort}
-			LIMIT {int:start}, {int:per_page}',
+			LIMIT {int:per_page} OFFSET {int:start} ',
 			array(
 				'guest_id' => 0,
 				'blank_text' => '',
@@ -1546,7 +1546,7 @@ function list_getFiles($start, $items_per_page, $sort, $browse_type)
 				LEFT JOIN {db_prefix}members AS mem ON (mem.id_member = m.id_member)
 			WHERE a.attachment_type = {int:attachment_type}
 			ORDER BY {raw:sort}
-			LIMIT {int:start}, {int:per_page}',
+			LIMIT {int:per_page} OFFSET {int:start} ',
 			array(
 				'attachment_type' => $browse_type === 'thumbs' ? '3' : '0',
 				'sort' => $sort,
@@ -1702,7 +1702,7 @@ function findAttachmentsToMove($from, $start, $limit)
 		FROM {db_prefix}attachments
 		WHERE id_folder = {int:folder}
 			AND attachment_type != {int:attachment_type}
-		LIMIT {int:start}, {int:limit}',
+		LIMIT {int:limit} OFFSET {int:start} ',
 		array(
 			'folder' => $from,
 			'attachment_type' => 1,
