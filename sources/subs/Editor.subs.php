@@ -142,7 +142,7 @@ function create_control_richedit($editorOptions)
 
 	// Setup the toolbar, smileys, plugins
 	$context['bbc_toolbar'] = loadEditorToolbar();
-	$context['smileys'] = loadEditorSmileys();
+	$context['smileys'] = loadEditorSmileys($context['controls']['richedit'][$editorOptions['id']]);
 	$context['plugins'] = loadEditorPlugins($context['controls']['richedit'][$editorOptions['id']]);
 	$context['plugin_options'] = getPluginOptions($context['controls']['richedit'][$editorOptions['id']], $editorOptions['id']);
 
@@ -383,6 +383,8 @@ function getDisabledBBC()
  */
 function loadToolbarDefaults()
 {
+	$bbc_tags = [];
+
 	// The below array is used to show a command button in the editor, the execution
 	// and display details of any added buttons must be defined in the javascript files
 	// see jquery.sceditor.elkarte.js under the sceditor.formats.bbcode area
@@ -421,18 +423,18 @@ function loadToolbarDefaults()
  *
  * @return array|array[]|mixed
  */
-function loadEditorSmileys()
+function loadEditorSmileys($editorOptions)
 {
 	global $context, $modSettings;
+
+	$smileys = [
+		'postform' => [],
+		'popup' => [],
+	];
 
 	// Initialize smiley array... if not loaded before.
 	if (empty($context['smileys']) && empty($editorOptions['disable_smiley_box']))
 	{
-		$smileys = [
-			'postform' => [],
-			'popup' => [],
-		];
-
 		// Load smileys - don't bother to run a query if we're not using the database's ones anyhow.
 		if (empty($modSettings['smiley_enable']) && User::$info->smiley_set !== 'none')
 		{
@@ -495,7 +497,7 @@ function loadEditorSmileys()
 		}
 	}
 
-	return $context['smileys'];
+	return empty($context['smileys']) ? $smileys : $context['smileys'];
 }
 
 /**

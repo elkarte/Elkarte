@@ -3,3 +3,4 @@ node_modules
 **/*.min.js
 themes/default/scripts/qrcode.js
 themes/default/scripts/sha256.js
+themes/default/scripts/bbcode.js

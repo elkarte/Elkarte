@@ -243,7 +243,7 @@ class BBCParser
 			if ($this->isItemCode($next_char) && isset($this->message[$this->pos + 2]) && $this->message[$this->pos + 2] === ']' && !$this->bbc->isDisabled('list') && !$this->bbc->isDisabled('li'))
 			{
 				// Itemcodes cannot be 0 and must be proceeded by a semi-colon, space, tab, new line, or greater than sign
-				if (!($this->message[$this->pos + 1] === 0 && !in_array($this->message[$this->pos - 1], array(';', ' ', "\t", "\n", '>'))))
+				if (!($this->message[$this->pos + 1] === '0' && !in_array($this->message[$this->pos - 1], array(';', ' ', "\t", "\n", '>'))))
 				{
 					// Item codes are complicated buggers... they are implicit [li]s and can make [list]s!
 					$this->handleItemCode();

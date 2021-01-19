@@ -103,6 +103,8 @@
 				// Insert the new close/open tags at the cursor position
 				return editor.insertText(tagTextStart, tagTextEnd);
 			}
+
+			return '';
 		};
 
 		/**

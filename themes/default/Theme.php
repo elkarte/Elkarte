@@ -302,11 +302,6 @@ class Theme extends BaseTheme
 	</script>';
 				break;
 		}
-
-		echo '
-			<script src="', $settings['default_theme_url'], '/scripts/migrate.min.js" id="jquerymigrate"></script>
-		';
-
 	}
 
 	/**
