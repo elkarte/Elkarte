@@ -5600,6 +5600,7 @@ a.help .icon {
 }
 
 .helpicon, a.helpicon {
+	margin: 0 .4em 0 0;
 	cursor: help;
 }
 

@@ -1214,6 +1214,10 @@ div.labels {
 	padding: 0 8px 0 0 !important;
 }
 
+.helpicon, a.helpicon {
+	margin: 0 0 0 .4em !important;
+}
+
 /* Styles for the tooltips. */
 .tooltip {
 	right: -9999px;
