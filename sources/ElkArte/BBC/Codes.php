@@ -973,8 +973,10 @@ class Codes
 		{
 			foreach ($item_codes as $c => $dummy)
 			{
+				$c = (string) $c;
+
 				// Skip anything "bad"
-				if (!is_string($c) || (is_string($c) && trim($c) === ''))
+				if (trim($c) === '')
 				{
 					continue;
 				}

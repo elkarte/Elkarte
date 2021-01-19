@@ -243,7 +243,7 @@ class BBCParser
 			if ($this->isItemCode($next_char) && isset($this->message[$this->pos + 2]) && $this->message[$this->pos + 2] === ']' && !$this->bbc->isDisabled('list') && !$this->bbc->isDisabled('li'))
 			{
 				// Itemcodes cannot be 0 and must be proceeded by a semi-colon, space, tab, new line, or greater than sign
-				if (!($this->message[$this->pos + 1] === '0' && !in_array($this->message[$this->pos - 1], array(';', ' ', "\t", "\n", '>'))))
+				if (!($this->message[$this->pos + 1] === 0 && !in_array($this->message[$this->pos - 1], array(';', ' ', "\t", "\n", '>'))))
 				{
 					// Item codes are complicated buggers... they are implicit [li]s and can make [list]s!
 					$this->handleItemCode();
@@ -758,7 +758,8 @@ class BBCParser
 				Codes::ATTR_LENGTH => 4,
 				Codes::ATTR_AUTOLINK => true,
 			));
-			$code = '<ul' . ($tag === '' ? '' : ' style="list-style-type: ' . $tag . '"') . ' class="bbc_list">';
+
+			$code = '<ul class="bbc_list">';
 		}
 		// We're in a list item already: another itemcode?  Close it first.
 		elseif (isset($this->inside_tag[Codes::ATTR_TAG]) && $this->inside_tag[Codes::ATTR_TAG] === 'li')
@@ -784,8 +785,7 @@ class BBCParser
 		));
 
 		// First, open the tag...
-		$code .= '<li>';
-
+		$code .= '<li style="list-style-type: ' . $tag . '">';
 		$tmp = $this->noSmileys($code);
 		$this->message = substr_replace($this->message, $tmp, $this->pos, 3);
 		$this->pos += strlen($tmp) - 1;
