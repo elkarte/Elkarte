@@ -26,38 +26,7 @@ function template_control_richedit($editor_id, $smileyContainer = null, $bbcCont
 	global $context, $settings;
 
 	$editor_context = &$context['controls']['richedit'][$editor_id];
-
-	$plugins = array_filter(array('splittag', 'undo', (!empty($context['mentions_enabled']) ? 'mention' : '')));
-
-	// Allow addons to insert additional editor plugin scripts
-	if (!empty($editor_context['plugin_addons']) && is_array($editor_context['plugin_addons']))
-	{
-		$plugins = array_filter(array_merge($plugins, $editor_context['plugin_addons']));
-	}
-
-	// Add in special config objects to the editor, typically for plugin use
-	$plugin_options = [];
-	if (!empty($context['mentions_enabled']))
-	{
-		$plugin_options[] = '
-					mentionOptions: {
-						editor_id: \'' . $editor_id . '\',
-						cache: {
-							mentions: [],
-							queries: [],
-							names: []
-						}
-					}';
-	}
-
-	// Allow addons to insert additional editor objects
-	if (!empty($editor_context['plugin_options']) && is_array($editor_context['plugin_options']))
-	{
-		$plugin_options = array_merge($plugin_options, $editor_context['plugin_options']);
-	}
-
 	$useSmileys = (!empty($context['smileys']['postform']) || !empty($context['smileys']['popup'])) && !$editor_context['disable_smiley_box'] && $smileyContainer !== null;
-
 	$class = isset($context['post_error']['errors']['no_message']) || isset($context['post_error']['errors']['long_message']) ? ' border_error' : '';
 	$style = 'width:' . $editor_context['width'] . ';height: ' . $editor_context['height'];
 
@@ -82,15 +51,14 @@ function template_control_richedit($editor_id, $smileyContainer = null, $bbcCont
 					resizeWidth: false,
 					resizeMaxHeight: -1,
 					emoticonsCompat: true,
-					emoticonsEnabled: ', $useSmileys, ',
+					emoticonsEnabled: ', $useSmileys ? 'true' : 'false',  ',
 					locale: "', !empty($editor_context['locale']) ? $editor_context['locale'] : 'en_US', '",
 					rtl: ', empty($context['right_to_left']) ? 'false' : 'true', ',
 					colors: "black,red,yellow,pink,green,orange,purple,blue,beige,brown,teal,navy,maroon,limegreen,white",
-					itemCodes: ["li", "*", "@", "+", "x", "#", "o", "O", "0"],
 					enablePasteFiltering: true,
 					format: "bbcode",
-					plugins: "', implode(',', $plugins), '",
-					', trim(implode(',', $plugin_options));
+					plugins: "', implode(',', $context['plugins']), '",
+					', trim(implode(',', $context['plugin_options']));
 
 	// Show the smileys.
 	if ($useSmileys)
@@ -106,7 +74,8 @@ function template_control_richedit($editor_id, $smileyContainer = null, $bbcCont
 				echo '
 						dropdown: {';
 			}
-			elseif ($location === 'popup')
+
+			if ($location === 'popup')
 			{
 				echo '
 						popup: {';
@@ -177,7 +146,6 @@ function template_control_richedit($editor_id, $smileyContainer = null, $bbcCont
 			$(function() {
 				elk_editor();
 			});
-
 		</script>';
 }
 
