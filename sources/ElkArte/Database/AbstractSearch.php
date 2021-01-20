@@ -107,7 +107,7 @@ abstract class AbstractSearch implements SearchInterface
 				),
 			),
 			array(
-				'columns' => array('id_word', 'id_msg')
+				array('name' => 'id_word', 'columns' => array('id_word', 'id_msg'), 'type' => 'primary')
 			)
 		);
 	}
