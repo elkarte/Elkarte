@@ -121,25 +121,6 @@ class Fulltext extends Standard
 	}
 
 	/**
-	 * Callback function for usort used to sort the fulltext results.
-	 *
-	 * - The order of sorting is: large words, small words, large words that
-	 * are excluded from the search, small words that are excluded.
-	 *
-	 * @param string $a Word A
-	 * @param string $b Word B
-	 *
-	 * @return int An integer indicating how the words should be sorted (-1, 0 1)
-	 */
-	public function searchSort($a, $b)
-	{
-		$x = Util::strlen($a) - (in_array($a, $this->_excludedWords) ? 1000 : 0);
-		$y = Util::strlen($b) - (in_array($b, $this->_excludedWords) ? 1000 : 0);
-
-		return $x < $y ? 1 : ($x > $y ? -1 : 0);
-	}
-
-	/**
 	 * {@inheritdoc }
 	 */
 	public function prepareIndexes($word, &$wordsSearch, &$wordsExclude, $isExcluded, $excludedSubjectWords)
@@ -223,34 +204,7 @@ class Fulltext extends Standard
 			}
 		}
 
-		// Just by a specific user
-		if ($query_params['user_query'])
-		{
-			$query_where[] = '{raw:user_query}';
-		}
-
-		// Just in specific boards
-		if ($query_params['board_query'])
-		{
-			$query_where[] = 'm.id_board {raw:board_query}';
-		}
-
-		// Just search in a specific topic
-		if ($query_params['topic'])
-		{
-			$query_where[] = 'm.id_topic = {int:topic}';
-		}
-
-		// Just in a range of messages (age)
-		if ($query_params['min_msg_id'])
-		{
-			$query_where[] = 'm.id_msg >= {int:min_msg_id}';
-		}
-
-		if ($query_params['max_msg_id'])
-		{
-			$query_where[] = 'm.id_msg <= {int:max_msg_id}';
-		}
+		$query_where += $this->queryWhereModifiers($query_params);
 
 		$count = 0;
 		if (!empty($query_params['excluded_phrases']) && empty($modSettings['search_force_index']))

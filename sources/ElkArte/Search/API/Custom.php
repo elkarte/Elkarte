@@ -93,24 +93,6 @@ class Custom extends Standard
 	}
 
 	/**
-	 * Callback function for usort used to sort the fulltext results.
-	 *
-	 * - The order of sorting is: large words, small words, large words that
-	 * are excluded from the search, small words that are excluded.
-	 *
-	 * @param string $a Word A
-	 * @param string $b Word B
-	 * @return int An integer indicating how the words should be sorted (-1, 0 1)
-	 */
-	public function searchSort($a, $b)
-	{
-		$x = strlen($a) - (in_array($a, $this->_excludedWords) ? 1000 : 0);
-		$y = strlen($b) - (in_array($b, $this->_excludedWords) ? 1000 : 0);
-
-		return $y < $x ? 1 : ($y > $x ? -1 : 0);
-	}
-
-	/**
 	 * {@inheritdoc }
 	 */
 	public function prepareIndexes($word, &$wordsSearch, &$wordsExclude, $isExcluded, $excludedSubjectWords)
@@ -187,26 +169,7 @@ class Custom extends Standard
 			$query_params['complex_body_' . ($count++)] = $this->prepareWord($regularWord, $search_data['no_regexp']);
 		}
 
-		if ($query_params['user_query'])
-		{
-			$query_where[] = '{raw:user_query}';
-		}
-		if ($query_params['board_query'])
-		{
-			$query_where[] = 'm.id_board {raw:board_query}';
-		}
-		if ($query_params['topic'])
-		{
-			$query_where[] = 'm.id_topic = {int:topic}';
-		}
-		if ($query_params['min_msg_id'])
-		{
-			$query_where[] = 'm.id_msg >= {int:min_msg_id}';
-		}
-		if ($query_params['max_msg_id'])
-		{
-			$query_where[] = 'm.id_msg <= {int:max_msg_id}';
-		}
+		$query_where += $this->queryWhereModifiers($query_params);
 
 		$count = 0;
 		if (!empty($query_params['excluded_phrases']) && empty($modSettings['search_force_index']))
@@ -260,6 +223,11 @@ class Custom extends Standard
 			LIMIT ' . ($search_data['max_results'] - $search_data['indexed_results'])),
 			$query_params
 		);
+	}
+
+	private function buildWhere()
+	{
+
 	}
 
 	/**
