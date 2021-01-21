@@ -26,75 +26,51 @@ use ElkArte\ValuesContainer;
  */
 class SearchParams extends ValuesContainer
 {
-	/**
-	 * the db query for members
-	 *
-	 * @var string
-	 */
+	/** @var string the db query for members  */
 	public $_userQuery = '';
-	/**
-	 * The db query for brd's
-	 *
-	 * @var string
-	 */
+
+	/** @var string The db query for brd's */
 	public $_boardQuery = '';
-	/**
-	 * Needed to calculate relevance
-	 *
-	 * @var int
-	 */
+
+	/** @var int Needed to calculate relevance */
 	public $_minMsg = 0;
-	/**
-	 * The minimum message id we will search, needed to calculate relevance
-	 *
-	 * @var int
-	 */
+
+	/** @var int The minimum message id we will search, needed to calculate relevance */
 	public $_minMsgID = 0;
-	/**
-	 * The maximum message ID we will search, needed to calculate relevance
-	 *
-	 * @var int
-	 */
+
+	/** @var int The maximum message ID we will search, needed to calculate relevance */
 	public $_maxMsgID = 0;
-	/**
-	 * Message "age" via ID, given bounds, needed to calculate relevance
-	 *
-	 * @var int
-	 */
+
+	/** @var int Message "age" via ID, given bounds, needed to calculate relevance */
 	public $_recentMsg = 0;
-	/**
-	 *
-	 * @var int[]
-	 */
+
+	/** @var int[] */
 	public $_memberlist = [];
+
 	/**
 	 * $_search_params will carry all settings that differ from the default search parameters.
-	 *
 	 * That way, the URLs involved in a search page will be kept as short as possible.
 	 *
 	 * @var string[]
 	 */
-	protected $_search_params = array();
+	protected $_search_params = [];
+
 	/**
 	 * $_search_params will carry all settings that differ from the default search parameters.
-	 *
 	 * That way, the URLs involved in a search page will be kept as short as possible.
 	 *
 	 * @var string
 	 */
 	protected $_search_string = '';
-	/**
-	 *
-	 * @var null|Object
-	 */
-	protected $_db = null;
+
+	/** @var null|Object */
+	protected $_db;
 
 	/**
 	 * Constructor
 	 *
 	 * @param string $string - the string containing encoded search params
 	 * @package Search
-	 *
 	 */
 	public function __construct($string)
 	{
@@ -236,7 +212,6 @@ class SearchParams extends ValuesContainer
 				SELECT ' . (empty($this->_search_params['maxage']) ? '0, ' : 'COALESCE(MIN(id_msg), -1), ') . (empty($this->_search_params['minage']) ? '0' : 'COALESCE(MAX(id_msg), -1)') . '
 				FROM {db_prefix}messages
 				WHERE 1=1' . ($modSettings['postmod_active'] ? '
-					AND m.approved = {int:is_approved_true}
 					AND approved = {int:is_approved_true}' : '') . (empty($this->_search_params['minage']) ? '' : '
 					AND poster_time <= {int:timestamp_minimum_age}') . (empty($this->_search_params['maxage']) ? '' : '
 					AND poster_time >= {int:timestamp_maximum_age}'),
