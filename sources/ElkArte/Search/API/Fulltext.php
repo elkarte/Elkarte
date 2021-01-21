@@ -108,7 +108,11 @@ class Fulltext extends Standard
 		);
 		if ($request !== false && $request->num_rows() == 1)
 		{
+<<<<<<< HEAD
 			list (, $min_word_length) = $request->fetch_row();
+=======
+			list(, $min_word_length) = $request->fetch_row();
+>>>>>>> 72347b265... ! more common code consolidation
 			$request->free_result();
 		}
 		// 4 is the MySQL default...
@@ -204,27 +208,11 @@ class Fulltext extends Standard
 			}
 		}
 
+		// Modifiers such as specific user or specific board.
 		$query_where += $this->queryWhereModifiers($query_params);
 
-		$count = 0;
-		if (!empty($query_params['excluded_phrases']) && empty($modSettings['search_force_index']))
-		{
-			foreach ($query_params['excluded_phrases'] as $phrase)
-			{
-				$query_where[] = 'subject ' . (empty($modSettings['search_match_words']) || $search_data['no_regexp'] ? ' {not_ilike} ' : ' {not_rlike} ') . '{string:exclude_subject_phrase_' . $count . '}';
-				$query_params['exclude_subject_phrase_' . ($count++)] = $this->prepareWord($phrase, $search_data['no_regexp']);
-			}
-		}
-
-		$count = 0;
-		if (!empty($query_params['excluded_subject_words']) && empty($modSettings['search_force_index']))
-		{
-			foreach ($query_params['excluded_subject_words'] as $excludedWord)
-			{
-				$query_where[] = 'subject ' . (empty($modSettings['search_match_words']) || $search_data['no_regexp'] ? ' {not_ilike} ' : ' {not_rlike} ') . '{string:exclude_subject_words_' . $count . '}';
-				$query_params['exclude_subject_words_' . ($count++)] = $this->prepareWord($excludedWord, $search_data['no_regexp']);
-			}
-		}
+		// Modifiers to exclude words from the subject
+		$query_where += $this->queryExclusionModifiers($query_params, $search_data);
 
 		if (!empty($modSettings['search_simple_fulltext']))
 		{
@@ -242,6 +230,7 @@ class Fulltext extends Standard
 			{
 				$query_params['boolean_match'] .= (in_array($fulltextWord, $query_params['excluded_index_words']) ? '-' : '+') . $fulltextWord . ' ';
 			}
+
 			$query_params['boolean_match'] = substr($query_params['boolean_match'], 0, -1);
 
 			// If we have bool terms to search, add them in

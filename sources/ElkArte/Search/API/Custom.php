@@ -169,27 +169,11 @@ class Custom extends Standard
 			$query_params['complex_body_' . ($count++)] = $this->prepareWord($regularWord, $search_data['no_regexp']);
 		}
 
+		// Modifiers such as specific user or specific board.
 		$query_where += $this->queryWhereModifiers($query_params);
 
-		$count = 0;
-		if (!empty($query_params['excluded_phrases']) && empty($modSettings['search_force_index']))
-		{
-			foreach ($query_params['excluded_phrases'] as $phrase)
-			{
-				$query_where[] = 'subject ' . (empty($modSettings['search_match_words']) || $search_data['no_regexp'] ? ' {not_ilike} ' : ' {not_rlike} ') . '{string:exclude_subject_phrase_' . $count . '}';
-				$query_params['exclude_subject_phrase_' . ($count++)] = $this->prepareWord($phrase, $search_data['no_regexp']);
-			}
-		}
-
-		$count = 0;
-		if (!empty($query_params['excluded_subject_words']) && empty($modSettings['search_force_index']))
-		{
-			foreach ($query_params['excluded_subject_words'] as $excludedWord)
-			{
-				$query_where[] = 'subject ' . (empty($modSettings['search_match_words']) || $search_data['no_regexp'] ? ' {not_ilike} ' : ' {not_rlike} ') . '{string:exclude_subject_words_' . $count . '}';
-				$query_params['exclude_subject_words_' . ($count++)] = $this->prepareWord($excludedWord, $search_data['no_regexp']);
-			}
-		}
+		// Modifiers to exclude words from the subject
+		$query_where += $this->queryExclusionModifiers($query_params, $search_data);
 
 		$numTables = 0;
 		$prev_join = 0;
