@@ -319,6 +319,7 @@ class Post extends AbstractController
 		$context['can_move'] = allowedTo('move_any');
 		$context['move'] = !empty($_REQUEST['move']);
 		$context['announce'] = !empty($_REQUEST['announce']);
+		$context['id_draft'] = $this->_req->getPost('id_draft', 'intval', 0);
 
 		// You can only announce topics that will get approved...
 		$context['can_announce'] = allowedTo('announce_topic') && $context['becomes_approved'];

@@ -81,29 +81,26 @@ class Display extends AbstractModule
 	 */
 	public function prepare_context($use_quick_reply, &$editorOptions, $board)
 	{
-		global $context, $options;
+		global $context, $options, $txt;
 
 		// Check if the draft functions are enabled and that they have permission to use them (for quick reply.)
 		$context['drafts_save'] = $use_quick_reply && allowedTo('post_draft') && $context['can_reply'];
 		$context['drafts_autosave'] = $context['drafts_save'] && self::$_autosave_enabled && allowedTo('post_autosave_draft') && !empty($options['drafts_autosave_enabled']);
 
-		// Build a list of drafts that they can load into the editor
+		// Enable the drafts functions for the QR area
 		if (!empty($context['drafts_save']))
 		{
 			theme()->getTemplates()->loadLanguageFile('Drafts');
+
 			if ($context['drafts_autosave'])
 			{
 				// WYSIWYG editor
 				if (!empty($options['use_editor_quick_reply']))
 				{
-					if (!isset($editorOptions['plugin_addons']))
-					{
-						$editorOptions['plugin_addons'] = array();
-					}
-					if (!isset($editorOptions['plugin_options']))
-					{
-						$editorOptions['plugin_options'] = array();
-					}
+					theme()->getTemplates()->loadLanguageFile('Post');
+
+					$editorOptions['plugin_addons'] = $editorOptions['plugin_addons'] ?? [];
+					$editorOptions['plugin_options'] = $editorOptions['plugin_options'] ?? [];
 
 					// @todo remove
 					$context['drafts_autosave_frequency'] = self::$_autosave_frequency;
@@ -120,6 +117,22 @@ class Display extends AbstractModule
 							sTextareaID: \'' . $editorOptions['id'] . '\',
 							id_draft: ' . (empty($context['id_draft']) ? 0 : $context['id_draft']) . '
 						}';
+
+					$context['shortcuts_text'] = $txt['shortcuts_drafts'];
+
+					$editorOptions['buttons'] = $editorOptions['buttons'] ?? [];
+					$editorOptions['hidden_fields'] = $editorOptions['hidden_fields'] ?? [];
+
+					$editorOptions['buttons'][] = array(
+						'name' => 'save_draft',
+						'value' => $txt['draft_save'],
+						'options' => 'onclick="return confirm(' . JavaScriptEscape($txt['draft_save_note']) . ') && submitThisOnce(this);" accesskey="d"',
+					);
+
+					$editorOptions['hidden_fields'][] = array(
+						'name' => 'id_draft',
+						'value' => empty($context['id_draft']) ? 0 : $context['id_draft'],
+					);
 
 					loadJavascriptFile('drafts.plugin.js', array('defer' => true));
 				}

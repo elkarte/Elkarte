@@ -262,15 +262,8 @@ class PersonalMessage extends AbstractModule
 		// PM drafts enabled, then we need to tell the editor before it initialises
 		if (!empty($context['drafts_pm_save']) && !empty($options['drafts_autosave_enabled']))
 		{
-			if (!isset($editorOptions['plugin_addons']))
-			{
-				$editorOptions['plugin_addons'] = array();
-			}
-
-			if (!isset($editorOptions['plugin_options']))
-			{
-				$editorOptions['plugin_options'] = array();
-			}
+			$editorOptions['plugin_addons'] = $editorOptions['plugin_addons'] ?? [];
+			$editorOptions['plugin_options'] = $editorOptions['plugin_options'] ?? [];
 
 			// @todo remove
 			$context['drafts_autosave_frequency'] = self::$_autosave_frequency;
@@ -292,20 +285,10 @@ class PersonalMessage extends AbstractModule
 			theme()->getTemplates()->loadLanguageFile('Post');
 
 			// Our not so concise shortcut line
-			if (!isset($context['shortcuts_text']))
-			{
-				$context['shortcuts_text'] = $txt['shortcuts_drafts' . (isBrowser('is_firefox') ? '_firefox' : '')];
-			}
+			$context['shortcuts_text'] = $context['shortcuts_text'] ?? $txt['shortcuts_drafts'];
 
-			if (!isset($editorOptions['buttons']))
-			{
-				$editorOptions['buttons'] = array();
-			}
-
-			if (!isset($editorOptions['hidden_fields']))
-			{
-				$editorOptions['hidden_fields'] = array();
-			}
+			$editorOptions['buttons'] = $editorOptions['buttons'] ?? [];
+			$editorOptions['hidden_fields'] = $editorOptions['hidden_fields'] ?? [];
 
 			$editorOptions['buttons'][] = array(
 				'name' => 'save_draft',
