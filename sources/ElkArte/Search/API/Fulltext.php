@@ -121,25 +121,6 @@ class Fulltext extends Standard
 	}
 
 	/**
-	 * Callback function for usort used to sort the fulltext results.
-	 *
-	 * - The order of sorting is: large words, small words, large words that
-	 * are excluded from the search, small words that are excluded.
-	 *
-	 * @param string $a Word A
-	 * @param string $b Word B
-	 *
-	 * @return int An integer indicating how the words should be sorted (-1, 0 1)
-	 */
-	public function searchSort($a, $b)
-	{
-		$x = Util::strlen($a) - (in_array($a, $this->_excludedWords) ? 1000 : 0);
-		$y = Util::strlen($b) - (in_array($b, $this->_excludedWords) ? 1000 : 0);
-
-		return $x < $y ? 1 : ($x > $y ? -1 : 0);
-	}
-
-	/**
 	 * {@inheritdoc }
 	 */
 	public function prepareIndexes($word, &$wordsSearch, &$wordsExclude, $isExcluded, $excludedSubjectWords)
@@ -191,7 +172,7 @@ class Fulltext extends Standard
 	 * @param mixed[] $words Words to index
 	 * @param mixed[] $search_data
 	 *
-	 * @return resource
+	 * @return \ElkArte\Database\AbstractResult|boolean
 	 */
 	public function indexedWordQuery($words, $search_data)
 	{
@@ -218,59 +199,16 @@ class Fulltext extends Standard
 		{
 			foreach ($words['words'] as $regularWord)
 			{
-				$query_where[] = 'm.body' . (in_array($regularWord, $query_params['excluded_words']) ? ' {not_' : '{') . (empty($modSettings['search_match_words']) || $search_data['no_regexp'] ? 'like} ' : 'rlike} ') . '{string:complex_body_' . $count . '}';
+				$query_where[] = 'm.body' . (in_array($regularWord, $query_params['excluded_words']) ? ' {not_' : '{') . (empty($modSettings['search_match_words']) || $search_data['no_regexp'] ? 'ilike} ' : 'rlike} ') . '{string:complex_body_' . $count . '}';
 				$query_params['complex_body_' . ($count++)] = $this->prepareWord($regularWord, $search_data['no_regexp']);
 			}
 		}
 
-		// Just by a specific user
-		if ($query_params['user_query'])
-		{
-			$query_where[] = '{raw:user_query}';
-		}
+		// Modifiers such as specific user or specific board.
+		$query_where += $this->queryWhereModifiers($query_params);
 
-		// Just in specific boards
-		if ($query_params['board_query'])
-		{
-			$query_where[] = 'm.id_board {raw:board_query}';
-		}
-
-		// Just search in a specific topic
-		if ($query_params['topic'])
-		{
-			$query_where[] = 'm.id_topic = {int:topic}';
-		}
-
-		// Just in a range of messages (age)
-		if ($query_params['min_msg_id'])
-		{
-			$query_where[] = 'm.id_msg >= {int:min_msg_id}';
-		}
-
-		if ($query_params['max_msg_id'])
-		{
-			$query_where[] = 'm.id_msg <= {int:max_msg_id}';
-		}
-
-		$count = 0;
-		if (!empty($query_params['excluded_phrases']) && empty($modSettings['search_force_index']))
-		{
-			foreach ($query_params['excluded_phrases'] as $phrase)
-			{
-				$query_where[] = 'subject ' . (empty($modSettings['search_match_words']) || $search_data['no_regexp'] ? ' {not_ilike} ' : ' {not_rlike} ') . '{string:exclude_subject_phrase_' . $count . '}';
-				$query_params['exclude_subject_phrase_' . ($count++)] = $this->prepareWord($phrase, $search_data['no_regexp']);
-			}
-		}
-
-		$count = 0;
-		if (!empty($query_params['excluded_subject_words']) && empty($modSettings['search_force_index']))
-		{
-			foreach ($query_params['excluded_subject_words'] as $excludedWord)
-			{
-				$query_where[] = 'subject ' . (empty($modSettings['search_match_words']) || $search_data['no_regexp'] ? ' {not_ilike} ' : ' {not_rlike} ') . '{string:exclude_subject_words_' . $count . '}';
-				$query_params['exclude_subject_words_' . ($count++)] = $this->prepareWord($excludedWord, $search_data['no_regexp']);
-			}
-		}
+		// Modifiers to exclude words from the subject
+		$query_where += $this->queryExclusionModifiers($query_params, $search_data);
 
 		if (!empty($modSettings['search_simple_fulltext']))
 		{
@@ -288,6 +226,7 @@ class Fulltext extends Standard
 			{
 				$query_params['boolean_match'] .= (in_array($fulltextWord, $query_params['excluded_index_words']) ? '-' : '+') . $fulltextWord . ' ';
 			}
+
 			$query_params['boolean_match'] = substr($query_params['boolean_match'], 0, -1);
 
 			// If we have bool terms to search, add them in

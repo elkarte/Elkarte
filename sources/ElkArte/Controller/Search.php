@@ -118,6 +118,8 @@ class Search extends AbstractController
 	 *
 	 * @uses Search language file and Errors language when needed
 	 * @uses Search template, searchform sub template
+	 *
+	 * @throws \ElkArte\Exceptions\Exception loadavg_search_disabled
 	 */
 	public function action_search()
 	{
@@ -230,7 +232,7 @@ class Search extends AbstractController
 			$category['child_ids'] = array_keys($category['boards']);
 			foreach ($category['boards'] as &$board)
 			{
-				$board['selected'] = (empty($context['search_params']['brd']) && (empty($modSettings['recycle_enable']) || $board['id'] != $modSettings['recycle_board']) && !in_array($board['id'], $this->user->ignoreboards)) || (!empty($context['search_params']['brd']) && in_array($board['id'], $context['search_params']['brd']));
+				$board['selected'] = (empty($context['search_params']['brd']) && (empty($modSettings['recycle_enable']) || $board['id'] != $modSettings['recycle_board']) && !in_array($board['id'], (array) $this->user->ignoreboards)) || (!empty($context['search_params']['brd']) && in_array($board['id'], $context['search_params']['brd']));
 			}
 		}
 

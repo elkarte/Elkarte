@@ -17,6 +17,7 @@
 namespace ElkArte\Search\API;
 
 use ElkArte\Search\Cache\Session;
+use ElkArte\Util;
 
 /**
  * SearchAPI-Standard.class.php, Standard non full index, non custom index search
@@ -100,6 +101,7 @@ class Standard extends AbstractAPI
 				$num_res = $this->getResults(
 					$search_id
 				);
+
 				if (empty($num_res))
 				{
 					throw new \Exception('query_not_specific_enough');
@@ -109,14 +111,9 @@ class Standard extends AbstractAPI
 			$this->_search_cache->setNumResults($num_res);
 		}
 
-		$topics = array();
 		// *** Retrieve the results to be shown on the page
-		$participants = $this->addRelevance(
-			$topics,
-			$search_id,
-			(int) $_REQUEST['start'],
-			$modSettings['search_results_per_page']
-		);
+		$topics = array();
+		$participants = $this->addRelevance($topics, $search_id, (int) $_REQUEST['start'], $modSettings['search_results_per_page']);
 		$this->_num_results = $this->_search_cache->getNumResults();
 
 		return $topics;
@@ -505,7 +502,8 @@ class Standard extends AbstractAPI
 			{
 				return false;
 			}
-			elseif (!empty($indexedResults))
+
+			if (!empty($indexedResults))
 			{
 				$main_query['inner_join'][] = '{db_prefix}' . ($this->_createTemporary ? 'tmp_' : '') . 'log_search_messages AS lsm ON (lsm.id_msg = m.id_msg)';
 
@@ -944,5 +942,101 @@ class Standard extends AbstractAPI
 		$request->free_result();
 
 		return $participants;
+	}
+
+	/**
+	 * Callback function for usort used to sort the fulltext results.
+	 *
+	 * - The order of sorting is: large words, small words, large words that
+	 * are excluded from the search, small words that are excluded.
+	 *
+	 * @param string $a Word A
+	 * @param string $b Word B
+	 * @return int An integer indicating how the words should be sorted (-1, 0 1)
+	 */
+	public function searchSort($a, $b)
+	{
+		$x = Util::strlen($a) - (in_array($a, $this->_excludedWords) ? 1000 : 0);
+		$y = Util::strlen($b) - (in_array($b, $this->_excludedWords) ? 1000 : 0);
+
+		return $y < $x ? 1 : ($y > $x ? -1 : 0);
+	}
+
+	/**
+	 * Build out the query options based on board/topic/etc
+	 *
+	 * @param $query_params
+	 * @return array
+	 */
+	public function queryWhereModifiers($query_params)
+	{
+		$query_where = [];
+
+		// Just by a specific user
+		if ($query_params['user_query'])
+		{
+			$query_where[] = '{raw:user_query}';
+		}
+
+		// Just in specific boards
+		if ($query_params['board_query'])
+		{
+			$query_where[] = 'm.id_board {raw:board_query}';
+		}
+
+		// Just search in a specific topic
+		if ($query_params['topic'])
+		{
+			$query_where[] = 'm.id_topic = {int:topic}';
+		}
+
+		// Just in a range of messages (age)
+		if ($query_params['min_msg_id'])
+		{
+			$query_where[] = 'm.id_msg >= {int:min_msg_id}';
+		}
+
+		if ($query_params['max_msg_id'])
+		{
+			$query_where[] = 'm.id_msg <= {int:max_msg_id}';
+		}
+
+		return $query_where;
+	}
+
+	/**
+	 * Build out any subject excluded terms
+	 *
+	 * @param $query_params
+	 * @param $search_data
+	 * @return array
+	 */
+	public function queryExclusionModifiers(&$query_params, $search_data)
+	{
+		global $modSettings;
+
+		$query_where = [];
+
+		$count = 0;
+		if (!empty($query_params['excluded_phrases']) && empty($modSettings['search_force_index']))
+		{
+			foreach ($query_params['excluded_phrases'] as $phrase)
+			{
+				$query_where[] = 'subject ' . (empty($modSettings['search_match_words']) || $search_data['no_regexp'] ? ' {not_ilike} ' : ' {not_rlike} ') . '{string:exclude_subject_phrase_' . $count . '}';
+				$query_params['exclude_subject_phrase_' . ($count++)] = $this->prepareWord($phrase, $search_data['no_regexp']);
+			}
+		}
+
+		$count = 0;
+		if (!empty($query_params['excluded_subject_words']) && empty($modSettings['search_force_index']))
+		{
+			foreach ($query_params['excluded_subject_words'] as $excludedWord)
+			{
+				$query_where[] = 'subject ' . (empty($modSettings['search_match_words']) || $search_data['no_regexp'] ? ' {not_ilike} ' : ' {not_rlike} ') . '{string:exclude_subject_words_' . $count . '}';
+				$query_params['exclude_subject_words_' . ($count++)] = $this->prepareWord($excludedWord, $search_data['no_regexp']);
+			}
+		}
+
+		return $query_where;
 	}
 }

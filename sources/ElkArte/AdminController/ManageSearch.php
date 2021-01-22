@@ -315,7 +315,8 @@ class ManageSearch extends AbstractController
 		}
 
 		// Creating index, removing or simply changing the one in use?
-		if ($this->_req->getQuery('sa', 'trim', '') === 'createfulltext')
+		$sa = $this->_req->getQuery('sa', 'trim', '');
+		if ($sa === 'createfulltext')
 		{
 			checkSession('get');
 			validateToken('admin-msm', 'get');
@@ -323,7 +324,7 @@ class ManageSearch extends AbstractController
 			alterFullTextIndex('{db_prefix}messages', 'body', true);
 			$fulltext_index = true;
 		}
-		elseif ($this->_req->getQuery('sa', 'trim', '') === 'removefulltext' && !empty($fulltext_index))
+		elseif ($sa === 'removefulltext' && !empty($fulltext_index))
 		{
 			checkSession('get');
 			validateToken('admin-msm', 'get');
@@ -339,7 +340,7 @@ class ManageSearch extends AbstractController
 				));
 			}
 		}
-		elseif ($this->_req->getQuery('sa', 'trim', '') === 'removecustom')
+		elseif ($sa === 'removecustom')
 		{
 			checkSession('get');
 			validateToken('admin-msm', 'get');

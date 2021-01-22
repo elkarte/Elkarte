@@ -93,24 +93,6 @@ class Custom extends Standard
 	}
 
 	/**
-	 * Callback function for usort used to sort the fulltext results.
-	 *
-	 * - The order of sorting is: large words, small words, large words that
-	 * are excluded from the search, small words that are excluded.
-	 *
-	 * @param string $a Word A
-	 * @param string $b Word B
-	 * @return int An integer indicating how the words should be sorted (-1, 0 1)
-	 */
-	public function searchSort($a, $b)
-	{
-		$x = strlen($a) - (in_array($a, $this->_excludedWords) ? 1000 : 0);
-		$y = strlen($b) - (in_array($b, $this->_excludedWords) ? 1000 : 0);
-
-		return $y < $x ? 1 : ($y > $x ? -1 : 0);
-	}
-
-	/**
 	 * {@inheritdoc }
 	 */
 	public function prepareIndexes($word, &$wordsSearch, &$wordsExclude, $isExcluded, $excludedSubjectWords)
@@ -156,7 +138,7 @@ class Custom extends Standard
 	 * @param mixed[] $words An array of words
 	 * @param mixed[] $search_data An array of search data
 	 *
-	 * @return resource
+	 * @return \ElkArte\Database\AbstractResult|boolean
 	 */
 	public function indexedWordQuery($words, $search_data)
 	{
@@ -183,50 +165,15 @@ class Custom extends Standard
 		$count = 0;
 		foreach ($words['words'] as $regularWord)
 		{
-			$query_where[] = 'm.body' . (in_array($regularWord, $query_params['excluded_words']) ? ' {not_' : '{') . (empty($modSettings['search_match_words']) || $search_data['no_regexp'] ? 'like} ' : 'rlike} ') . '{string:complex_body_' . $count . '}';
+			$query_where[] = 'm.body' . (in_array($regularWord, $query_params['excluded_words']) ? ' {not_' : '{') . (empty($modSettings['search_match_words']) || $search_data['no_regexp'] ? 'ilike} ' : 'rlike} ') . '{string:complex_body_' . $count . '}';
 			$query_params['complex_body_' . ($count++)] = $this->prepareWord($regularWord, $search_data['no_regexp']);
 		}
 
-		if ($query_params['user_query'])
-		{
-			$query_where[] = '{raw:user_query}';
-		}
-		if ($query_params['board_query'])
-		{
-			$query_where[] = 'm.id_board {raw:board_query}';
-		}
-		if ($query_params['topic'])
-		{
-			$query_where[] = 'm.id_topic = {int:topic}';
-		}
-		if ($query_params['min_msg_id'])
-		{
-			$query_where[] = 'm.id_msg >= {int:min_msg_id}';
-		}
-		if ($query_params['max_msg_id'])
-		{
-			$query_where[] = 'm.id_msg <= {int:max_msg_id}';
-		}
+		// Modifiers such as specific user or specific board.
+		$query_where += $this->queryWhereModifiers($query_params);
 
-		$count = 0;
-		if (!empty($query_params['excluded_phrases']) && empty($modSettings['search_force_index']))
-		{
-			foreach ($query_params['excluded_phrases'] as $phrase)
-			{
-				$query_where[] = 'subject ' . (empty($modSettings['search_match_words']) || $search_data['no_regexp'] ? ' {not_ilike} ' : ' {not_rlike} ') . '{string:exclude_subject_phrase_' . $count . '}';
-				$query_params['exclude_subject_phrase_' . ($count++)] = $this->prepareWord($phrase, $search_data['no_regexp']);
-			}
-		}
-
-		$count = 0;
-		if (!empty($query_params['excluded_subject_words']) && empty($modSettings['search_force_index']))
-		{
-			foreach ($query_params['excluded_subject_words'] as $excludedWord)
-			{
-				$query_where[] = 'subject ' . (empty($modSettings['search_match_words']) || $search_data['no_regexp'] ? ' {not_ilike} ' : ' {not_rlike} ') . '{string:exclude_subject_words_' . $count . '}';
-				$query_params['exclude_subject_words_' . ($count++)] = $this->prepareWord($excludedWord, $search_data['no_regexp']);
-			}
-		}
+		// Modifiers to exclude words from the subject
+		$query_where += $this->queryExclusionModifiers($query_params, $search_data);
 
 		$numTables = 0;
 		$prev_join = 0;

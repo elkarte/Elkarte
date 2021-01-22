@@ -404,7 +404,7 @@ function createSearchIndex($start, $messages_per_batch, $column_size_definition,
 					'limit' => $messages_per_batch,
 				)
 			)->fetch_callback(
-				function ($row) use (&$forced_break, &$number_processed, &$inserts) {
+				function ($row) use (&$forced_break, &$number_processed, &$inserts, $index_settings, $stop) {
 					// In theory it's possible for one of these to take friggin ages so add more timeout protection.
 					if ($stop < time() || $forced_break)
 					{
