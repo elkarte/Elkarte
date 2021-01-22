@@ -138,7 +138,7 @@ class Custom extends Standard
 	 * @param mixed[] $words An array of words
 	 * @param mixed[] $search_data An array of search data
 	 *
-	 * @return resource
+	 * @return \ElkArte\Database\AbstractResult|boolean
 	 */
 	public function indexedWordQuery($words, $search_data)
 	{

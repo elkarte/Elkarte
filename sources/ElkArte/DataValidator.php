@@ -390,7 +390,7 @@ class DataValidator
 	 *
 	 * @param int|string|null $key int or string
 	 *
-	 * @return mixed|mixed[]|null
+	 * @return mixed|mixed[]
 	 */
 	public function validation_data($key = null)
 	{

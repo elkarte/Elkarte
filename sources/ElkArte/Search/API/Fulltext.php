@@ -172,7 +172,7 @@ class Fulltext extends Standard
 	 * @param mixed[] $words Words to index
 	 * @param mixed[] $search_data
 	 *
-	 * @return resource
+	 * @return \ElkArte\Database\AbstractResult|boolean
 	 */
 	public function indexedWordQuery($words, $search_data)
 	{
