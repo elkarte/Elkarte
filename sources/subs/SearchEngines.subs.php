@@ -317,7 +317,7 @@ function getSpiders($start, $items_per_page, $sort)
 			id_spider, spider_name, user_agent, ip_info
 		FROM {db_prefix}spiders
 		ORDER BY {raw:sort}
-		LIMIT {int:start}, {int:limit}',
+		LIMIT {int:limit} OFFSET {int:start} ',
 		array(
 			'sort' => $sort,
 			'start' => $start,
@@ -405,7 +405,7 @@ function getSpiderLogs($start, $items_per_page, $sort)
 		FROM {db_prefix}log_spider_hits AS sl
 			INNER JOIN {db_prefix}spiders AS s ON (s.id_spider = sl.id_spider)
 		ORDER BY ' . $sort . '
-		LIMIT ' . $start . ', ' . $items_per_page,
+		LIMIT ' . $items_per_page . '  OFFSET ' . $start,
 		array()
 	)->fetch_all();
 }
@@ -458,7 +458,7 @@ function getSpiderStats($start, $items_per_page, $sort)
 		FROM {db_prefix}log_spider_stats AS ss
 			INNER JOIN {db_prefix}spiders AS s ON (s.id_spider = ss.id_spider)
 		ORDER BY ' . $sort . '
-		LIMIT ' . $start . ', ' . $items_per_page,
+		LIMIT ' . $items_per_page . '  OFFSET ' . $start,
 		array()
 	)->fetch_all();
 }

@@ -1184,7 +1184,7 @@ function list_getBanTriggers($start, $items_per_page, $sort, $trigger_type)
 			INNER JOIN {db_prefix}members AS mem ON (mem.id_member = bi.id_member)' : '
 		WHERE ' . $where[$trigger_type]) . '
 		ORDER BY ' . $sort . '
-		LIMIT ' . $start . ', ' . $items_per_page,
+		LIMIT ' . $items_per_page . '  OFFSET ' . $start,
 		array(
 			'blank_string' => '',
 		)
@@ -1345,7 +1345,7 @@ function list_getBanLogEntries($start, $items_per_page, $sort)
 		FROM {db_prefix}log_banned AS lb
 			LEFT JOIN {db_prefix}members AS mem ON (mem.id_member = lb.id_member)
 		ORDER BY ' . $sort . '
-		LIMIT ' . $start . ', ' . $items_per_page,
+		LIMIT ' . $items_per_page . '  OFFSET ' . $start,
 		array(
 			'blank_string' => '',
 			'dash' => '-',
@@ -1526,7 +1526,7 @@ function list_getBans($start, $items_per_page, $sort)
 			LEFT JOIN {db_prefix}ban_items AS bi ON (bi.id_ban_group = bg.id_ban_group)
 		GROUP BY bg.id_ban_group, bg.name, bg.ban_time, bg.expire_time, bg.reason, bg.notes
 		ORDER BY {raw:sort}
-		LIMIT {int:offset}, {int:limit}',
+		LIMIT {int:limit} OFFSET {int:offset} ',
 		array(
 			'sort' => $sort,
 			'offset' => $start,

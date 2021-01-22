@@ -74,7 +74,7 @@ function list_maillist_unapproved($id = 0, $start = 0, $items_per_page = 0, $sor
 			LEFT JOIN {db_prefix}boards AS b ON (b.id_board = e.id_board)
 		WHERE ' . $where_query . '
 		ORDER BY {raw:sort}
-		' . ((!empty($items_per_page)) ? 'LIMIT {int:offset}, {int:limit} ' : 'LIMIT 1'),
+		' . ((!empty($items_per_page)) ? 'LIMIT {int:limit} OFFSET {int:offset}  ' : 'LIMIT 1'),
 		array(
 			'offset' => $start,
 			'limit' => $items_per_page,
@@ -225,7 +225,7 @@ function list_get_filter_parser($start, $items_per_page, $sort = '', $id = 0, $s
 		WHERE id_filter' . (($id == 0) ? ' > {int:id}' : ' = {int:id}') . '
 			AND filter_style = {string:style}
 		ORDER BY {raw:sort}, filter_type ASC, filter_order ASC
-		' . ((!empty($items_per_page)) ? 'LIMIT {int:offset}, {int:limit} ' : ''),
+		' . ((!empty($items_per_page)) ? 'LIMIT {int:limit} OFFSET {int:offset}  ' : ''),
 		array(
 			'offset' => $start,
 			'limit' => $items_per_page,

@@ -61,7 +61,7 @@ function messageIndexTopics($id_board, $id_member, $start, $items_per_page, $sor
 		WHERE t.id_board = {int:current_board}' . (!$indexOptions['only_approved'] ? '' : '
 			AND (t.approved = {int:is_approved}' . ($id_member == 0 ? '' : ' OR t.id_member_started = {int:current_member}') . ')') . '
 		ORDER BY ' . ($indexOptions['include_sticky'] ? 'is_sticky' . ($indexOptions['fake_ascending'] ? '' : ' DESC') . ', ' : '') . $sort_column . ($indexOptions['ascending'] ? '' : ' DESC') . '
-		LIMIT {int:start}, {int:maxindex}',
+		LIMIT {int:maxindex} OFFSET {int:start}',
 		array(
 			'current_board' => $id_board,
 			'current_member' => $id_member,

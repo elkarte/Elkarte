@@ -922,7 +922,7 @@ class Standard extends AbstractAPI
 				INNER JOIN {db_prefix}topics AS t ON (t.id_topic = lsr.id_topic)' : '') . '
 			WHERE lsr.id_search = {int:id_search}
 			ORDER BY {raw:sort} {raw:sort_dir}
-			LIMIT {int:start}, {int:limit}',
+			LIMIT {int:limit} OFFSET {int:start}',
 			array(
 				'id_search' => $id_search,
 				'sort' => $this->_searchParams->sort,

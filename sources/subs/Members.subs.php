@@ -1292,7 +1292,7 @@ function list_getMembers($start, $items_per_page, $sort, $where, $where_params =
 			LEFT JOIN {db_prefix}membergroups AS mg ON (mg.id_group = mem.id_group)
 		WHERE ' . ($where == '1' ? '1=1' : $where) . '
 		ORDER BY {raw:sort}
-		LIMIT {int:start}, {int:per_page}',
+		LIMIT {int:per_page} OFFSET {int:start}',
 		array_merge($where_params, array(
 			'sort' => $sort,
 			'start' => $start,
@@ -1611,7 +1611,7 @@ function membersBy($query, $query_params, $details = false, $only_active = true)
 			hide_email, posts, is_activated, real_name' : '') . '
 		FROM {db_prefix}members
 		WHERE ' . $query_where . (isset($query_params['start']) ? '
-		LIMIT {int:start}, {int:limit}' : '') . (!empty($query_params['order']) ? '
+		LIMIT {int:limit} OFFSET {int:start}' : '') . (!empty($query_params['order']) ? '
 		ORDER BY {raw:order}' : ''),
 		$query_params
 	)->fetch_callback(
@@ -2340,7 +2340,7 @@ function onlineMembers($conditions, $sort_method, $sort_direction, $start)
 			LEFT JOIN {db_prefix}membergroups AS mg ON (mg.id_group = CASE WHEN mem.id_group = {int:regular_member} THEN mem.id_post_group ELSE mem.id_group END)' . (!empty($conditions) ? '
 		WHERE ' . implode(' AND ', $conditions) : '') . '
 		ORDER BY {raw:sort_method} {raw:sort_direction}
-		LIMIT {int:offset}, {int:limit}',
+		LIMIT {int:limit} OFFSET {int:offset}',
 		array(
 			'regular_member' => 0,
 			'sort_method' => $sort_method,

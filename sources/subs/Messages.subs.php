@@ -515,7 +515,7 @@ function messageAt($start, $id_topic, $params = array())
 			AND id_msg NOT IN ({array_int:not_in})') . (!$params['only_approved'] ? '' : '
 			AND approved = {int:is_approved}') . '
 		ORDER BY id_msg DESC' . ($params['limit'] === false ? '' : '
-		LIMIT {int:start}, {int:limit}'),
+		LIMIT {int:limit} OFFSET {int:start} '),
 		$params
 	)->fetch_callback(
 		function ($row) use (&$msg) {

@@ -225,7 +225,7 @@ class Sphinxql extends AbstractAPI
 			}
 
 			$query .= ' ORDER BY ' . $sphinx_sort;
-			$query .= ' LIMIT 0,' . (int) $modSettings['sphinx_max_results'];
+			$query .= ' LIMIT ' . (int) $modSettings['sphinx_max_results'] . ' OFFSET 0';
 
 			// Set any options needed, like field weights
 			// A better ranker expression is one based off the standard Sphinx SPH04 algo but boosted for

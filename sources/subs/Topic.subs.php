@@ -3155,7 +3155,7 @@ function mergeableTopics($id_board, $id_topic, $approved, $offset)
 				AND t.id_topic != {int:id_topic}' . (empty($approved) ? '
 				AND t.approved = {int:is_approved}' : '') . '
 			ORDER BY t.is_sticky DESC, t.id_last_msg DESC
-			LIMIT {int:offset}, {int:limit}
+			LIMIT {int:limit} OFFSET {int:offset} 
 		) AS o 
 	    INNER JOIN {db_prefix}topics AS t ON (o.id_topic = t.id_topic)
 	    INNER JOIN {db_prefix}messages AS m ON (m.id_msg = t.id_first_msg)

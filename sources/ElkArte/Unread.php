@@ -320,7 +320,7 @@ class Unread
 			($this->_post_mod ? ' AND ms.approved = {int:is_approved}' : '') .
 			($this->_unwatch ? ' AND COALESCE(lt.unwatched, 0) != 1' : '') . '
 			ORDER BY {raw:order}
-			LIMIT {int:offset}, {int:limit}',
+			LIMIT {int:limit} OFFSET {int:offset}',
 			array_merge($this->_query_parameters, array(
 				'current_member' => $this->_user_id,
 				'min_message' => $this->_min_message,
@@ -360,7 +360,7 @@ class Unread
 			($this->_post_mod ? ' AND t.approved = {int:is_approved}' : '') .
 			($this->_unwatch ? ' AND COALESCE(lt.unwatched, 0) != 1' : '') . '
 			ORDER BY {raw:order}
-			LIMIT {int:offset}, {int:limit}',
+			LIMIT {int:limit} OFFSET {int:offset}',
 			array_merge($this->_query_parameters, array(
 				'current_member' => $this->_user_id,
 				'min_message' => $this->_min_message,

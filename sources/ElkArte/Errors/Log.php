@@ -111,7 +111,7 @@ class Log extends AbstractModel
 			FROM {db_prefix}log_errors' . (!empty($filter) ? '
 			WHERE ' . $filter['variable'] . ' LIKE {string:filter}' : '') . '
 			ORDER BY id_error ' . ($sort_direction === 'down' ? 'DESC' : '') . '
-			LIMIT ' . $start . ', ' . $this->_modSettings['defaultMaxMessages'],
+			LIMIT ' . $this->_modSettings['defaultMaxMessages'] . ' OFFSET ' . $start,
 			array(
 				'filter' => !empty($filter) ? $filter['value']['sql'] : '',
 			)

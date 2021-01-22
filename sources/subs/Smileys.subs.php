@@ -553,7 +553,7 @@ function list_getSmileys($start, $items_per_page, $sort)
 			id_smiley, code, filename, description, smiley_row, smiley_order, hidden
 		FROM {db_prefix}smileys
 		ORDER BY ' . $sort . '
-		LIMIT ' . $start . ', ' . $items_per_page,
+		LIMIT ' . $items_per_page . '  OFFSET ' . $start,
 		array()
 	)->fetch_all();
 }

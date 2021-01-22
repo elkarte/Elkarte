@@ -88,7 +88,7 @@ class UserAccessMentions implements ScheduledTaskInterface
 							WHERE mnt.id_member = {int:current_member}
 								AND mnt.mention_type IN ({array_string:mention_types})
 								AND {raw:user_see_board}
-							LIMIT {int:start}, {int:limit}',
+							LIMIT {int:limit} OFFSET {int:start}',
 							array(
 								'current_member' => $member,
 								'mention_types' => $mentionTypes,
