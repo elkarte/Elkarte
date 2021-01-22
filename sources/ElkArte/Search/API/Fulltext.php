@@ -108,11 +108,7 @@ class Fulltext extends Standard
 		);
 		if ($request !== false && $request->num_rows() == 1)
 		{
-<<<<<<< HEAD
 			list (, $min_word_length) = $request->fetch_row();
-=======
-			list(, $min_word_length) = $request->fetch_row();
->>>>>>> 72347b265... ! more common code consolidation
 			$request->free_result();
 		}
 		// 4 is the MySQL default...

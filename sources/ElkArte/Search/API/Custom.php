@@ -209,11 +209,6 @@ class Custom extends Standard
 		);
 	}
 
-	private function buildWhere()
-	{
-
-	}
-
 	/**
 	 * After a post is made, we update the search index database
 	 *
