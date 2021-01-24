@@ -165,7 +165,7 @@ class UpgradeInstructions_upgrade_1_1
 					$this->table->create_table('{db_prefix}notifications_pref',
 						array(
 							array('name' => 'id_member', 'type' => 'mediumint', 'size' => 8, 'unsigned' => true, 'default' => 0),
-							array('name' => 'notification_type', 'type' => 'varchar', 'size' => 20, 'default' => ''),
+							array('name' => 'notification_type', 'type' => 'text'),
 							array('name' => 'mention_type', 'type' => 'varchar', 'size' => 12, 'default' => ''),
 						),
 						array(
@@ -307,11 +307,11 @@ class UpgradeInstructions_upgrade_1_1
 						$this->db->query('', '
 							INSERT IGNORE INTO {db_prefix}notifications_pref
 								(id_member, mention_type, notification_type)
-							SELECT id_member, {string-12:mention_type}, {string-10:level}
+							SELECT id_member, {string-12:mention_type}, {string:notification_type}
 							FROM {db_prefix}members',
 							array(
 								'mention_type' => $toggle,
-								'level' => 'notification',
+								'notification_type' => json_encode(['notification']),
 							)
 						);
 					}

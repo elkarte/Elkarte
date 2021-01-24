@@ -1000,7 +1000,7 @@ function getUsersNotificationsPreferences($notification_types, $members)
 		$defaults[$notification] = $return;
 	}
 
-	$results = array();
+	$results = [];
 	$db->fetchQuery('
 		SELECT 
 			id_member, notification_type, mention_type
@@ -1017,12 +1017,8 @@ function getUsersNotificationsPreferences($notification_types, $members)
 			{
 				$results[$row['id_member']] = [];
 			}
-			if (!isset($results[$row['id_member']][$row['mention_type']]))
-			{
-				$results[$row['id_member']][$row['mention_type']] = [];
-			}
 
-			$results[$row['id_member']][$row['mention_type']][] = $row['notification_type'];
+			$results[$row['id_member']][$row['mention_type']] = json_decode($row['notification_type']);
 		}
 	);
 
@@ -1053,7 +1049,7 @@ function getUsersNotificationsPreferences($notification_types, $members)
  * Saves into the database the notification preferences of a certain member.
  *
  * @param int $member The member id
- * @param mixed[] $notification_data The array of notifications ([] => ['mention' => '*', 'level' => '*'])
+ * @param string[] $notification_data The array of notifications ('type' => ['level'])
  * @throws \ElkArte\Exceptions\Exception
  */
 function saveUserNotificationsPreferences($member, $notification_data)
@@ -1061,21 +1057,6 @@ function saveUserNotificationsPreferences($member, $notification_data)
 	$db = database();
 
 	$inserts = [];
-	$deletes = [];
-	foreach ($notification_data as $to_insert)
-	{
-		$deletes[] = $to_insert['mention'];
-		// used to skip values that are here only to remove the default
-		if (empty($to_insert['level']))
-		{
-			continue;
-		}
-		$inserts[] = array(
-			$member,
-			$to_insert['mention'],
-			$to_insert['level'],
-		);
-	}
 
 	// First drop the existing settings
 	$db->query('', '
@@ -1084,9 +1065,23 @@ function saveUserNotificationsPreferences($member, $notification_data)
 			AND mention_type IN ({array_string:mention_types})',
 		array(
 			'member' => $member,
-			'mention_types' => array_unique($deletes),
+			'mention_types' => array_keys($notification_data),
 		)
 	);
+
+	foreach ($notification_data as $type => $level)
+	{
+		// used to skip values that are here only to remove the default
+		if (empty($level))
+		{
+			continue;
+		}
+		$inserts[] = array(
+			$member,
+			$type,
+			json_encode($level),
+		);
+	}
 
 	if (empty($inserts))
 	{
@@ -1098,7 +1093,7 @@ function saveUserNotificationsPreferences($member, $notification_data)
 		array(
 			'id_member' => 'int',
 			'mention_type' => 'string-12',
-			'notification_type' => 'string-20',
+			'notification_type' => 'string',
 		),
 		$inserts,
 		array('id_member', 'mention_type')

@@ -1648,7 +1648,7 @@ function makeNotificationChanges($memID)
 				// When is not an array it means => use default => 0 so it's skipped on INSERT
 				if (!is_array($_POST['notify'][$mention]['status']))
 				{
-					$to_save[] = ['mention' => $mention, 'level' => 0];
+					$to_save[$mention] = 0;
 					continue;
 				}
 				foreach ($_POST['notify'][$mention]['status'] as $method)
@@ -1656,13 +1656,17 @@ function makeNotificationChanges($memID)
 					// This ensures that the $method passed by the user is valid and safe to INSERT.
 					if (isset($data['data'][$method]))
 					{
-						$to_save[] = ['mention' => $mention, 'level' => $method];
+						if (!isset($to_save[$mention]))
+						{
+							$to_save[$mention] = [];
+						}
+						$to_save[$mention][] = $method;
 					}
 				}
 			}
 			else
 			{
-				$to_save[] = ['mention' => $mention, 'level' => Notifications::DEFAULT_NONE];
+				$to_save[$mention] = [Notifications::DEFAULT_NONE];
 			}
 		}
 

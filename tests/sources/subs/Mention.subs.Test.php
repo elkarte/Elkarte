@@ -33,7 +33,7 @@ class TestMentions extends \PHPUnit\Framework\TestCase
 				'emailweekly' => "1"
 			],
 			'likemsg' => [
-				'notification' => "2"
+				'notification' => \ElkArte\Notifications::DEFAULT_LEVEL
 			],
 			"mentionmem" => [
 				"notification" => "1",
@@ -106,22 +106,17 @@ class TestMentions extends \PHPUnit\Framework\TestCase
 			array(
 				array(
 					'id_member' => 1,
-					'notification_type' => 'email',
+					'notification_type' => json_encode(['email']),
 					'mention_type' => 'mentionmem'
 				),
 				array(
 					'id_member' => 2,
-					'notification_type' => 'notification',
+					'notification_type' => json_encode(['notification', 'email']),
 					'mention_type' => 'mentionmem'
 				),
 				array(
 					'id_member' => 2,
-					'notification_type' => 'email',
-					'mentionmem'
-				),
-				array(
-					'id_member' => 2,
-					'notification_type' => 'email',
+					'notification_type' => json_encode(['email']),
 					'mention_type' => 'likemsg'
 				),
 			),
@@ -143,8 +138,7 @@ class TestMentions extends \PHPUnit\Framework\TestCase
 		\ElkArte\User::$info = null;
 
 		$db = database();
-		$db->query('', '
-			DELETE FROM {db_prefix}notifications_pref', []);
+		$db->query('', 'DELETE FROM {db_prefix}notifications_pref', []);
 	}
 
 	/**
