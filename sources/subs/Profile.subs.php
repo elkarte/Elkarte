@@ -1640,27 +1640,29 @@ function makeNotificationChanges($memID)
 	if (isset($_POST['notify_submit']))
 	{
 		$to_save = [];
+
 		foreach (getMemberNotificationsProfile($memID) as $mention => $data)
 		{
 			if (isset($_POST['notify'][$mention]) && !empty($_POST['notify'][$mention]['status']))
 			{
-				// When is not an array it means => use default
+				// When is not an array it means => use default => 0 so it's skipped on INSERT
 				if (!is_array($_POST['notify'][$mention]['status']))
 				{
-					$to_save[$mention] = 0;
+					$to_save[] = ['mention' => $mention, 'level' => 0];
 					continue;
 				}
 				foreach ($_POST['notify'][$mention]['status'] as $method)
 				{
+					// This ensures that the $method passed by the user is valid and safe to INSERT.
 					if (isset($data['data'][$method]))
 					{
-						$to_save[$mention] = $method;
+						$to_save[] = ['mention' => $mention, 'level' => $method];
 					}
 				}
 			}
 			else
 			{
-				$to_save[$mention] = Notifications::DEFAULT_NONE;
+				$to_save[] = ['mention' => $mention, 'level' => Notifications::DEFAULT_NONE];
 			}
 		}
 

@@ -554,6 +554,7 @@ class Notify extends AbstractController
 	 * @param int $memID
 	 * @param string $area buddy, likemsg, mentionmem, quotedmem, rlikemsg
 	 * @param int $value 1=notify 2=immediate email 3=daily email 4=weekly email
+	 * @deprecated - Currently not used (commented out in line 485)
 	 */
 	private function _setUserNotificationArea($memID, $area, $value)
 	{
