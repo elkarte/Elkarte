@@ -40,7 +40,7 @@ class TopicUtil
 	 */
 	public static function prepareContext($topics_info, $topicseen = false, $preview_length = null)
 	{
-		global $modSettings, $options, $txt, $settings;
+		global $modSettings, $options, $txt, $settings, $scripturl;
 
 		$topics = array();
 		$preview_length = (int) $preview_length;
@@ -115,7 +115,7 @@ class TopicUtil
 				// We can't pass start by reference.
 				$start = -1;
 				$show_all = !empty($modSettings['enableAllMessages']) && $topic_length < $modSettings['enableAllMessages'];
-				$pages = constructPageIndex(getUrl('topic', ['topic' => $row['id_topic'], 'start' => '%1$d', $topicseen, 'subject' => $row['first_subject']]), $start, $topic_length, $messages_per_page, true, array('prev_next' => false, 'all' => $show_all));
+				$pages = constructPageIndex($scripturl . '?topic=' . $row['id_topic'] . '.%1$d' . $topicseen, $start, $topic_length, $messages_per_page, true, array('prev_next' => false, 'all' => $show_all));
 			}
 			else
 			{
