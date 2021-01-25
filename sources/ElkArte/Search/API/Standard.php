@@ -116,6 +116,10 @@ class Standard extends AbstractAPI
 		$participants = $this->addRelevance($topics, $search_id, (int) $_REQUEST['start'], $modSettings['search_results_per_page']);
 		$this->_num_results = $this->_search_cache->getNumResults();
 
+// 1200
+// [1233] = >bool(false)
+// [23289]=> array(3) { ["relevance"]=> string(5) "38.3%" ["num_matches"]=> string(1) "2" ["matches"]=> array(0) { } } }
+
 		return $topics;
 	}
 
@@ -942,24 +946,6 @@ class Standard extends AbstractAPI
 		$request->free_result();
 
 		return $participants;
-	}
-
-	/**
-	 * Callback function for usort used to sort the fulltext results.
-	 *
-	 * - The order of sorting is: large words, small words, large words that
-	 * are excluded from the search, small words that are excluded.
-	 *
-	 * @param string $a Word A
-	 * @param string $b Word B
-	 * @return int An integer indicating how the words should be sorted (-1, 0 1)
-	 */
-	public function searchSort($a, $b)
-	{
-		$x = Util::strlen($a) - (in_array($a, $this->_excludedWords) ? 1000 : 0);
-		$y = Util::strlen($b) - (in_array($b, $this->_excludedWords) ? 1000 : 0);
-
-		return $y < $x ? 1 : ($y > $x ? -1 : 0);
 	}
 
 	/**

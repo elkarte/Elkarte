@@ -14,6 +14,7 @@ namespace ElkArte\Search\API;
 
 use ElkArte\Search\SearchArray;
 use ElkArte\Search\WeightFactors;
+use ElkArte\Util;
 
 /**
  * Abstract class that defines the methods any search API shall implement
@@ -271,18 +272,21 @@ abstract class AbstractAPI
 	}
 
 	/**
-	 * Callback function for usort used to sort the fulltext results.
+	 * Callback function for usort used to sort the results.
 	 *
-	 * - In the standard search ordering is not needed, so only 0 is returned.
+	 * - The order of sorting is: large words, small words, large words that
+	 * are excluded from the search, small words that are excluded.
 	 *
 	 * @param string $a Word A
 	 * @param string $b Word B
-	 *
 	 * @return int An integer indicating how the words should be sorted (-1, 0 1)
 	 */
 	public function searchSort($a, $b)
 	{
-		return 0;
+		$x = Util::strlen($a) - (in_array($a, $this->_excludedWords) ? 1000 : 0);
+		$y = Util::strlen($b) - (in_array($b, $this->_excludedWords) ? 1000 : 0);
+
+		return $y < $x ? 1 : ($y > $x ? -1 : 0);
 	}
 
 	/**
