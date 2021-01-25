@@ -103,7 +103,6 @@ class SearchRenderer extends Renderer
 		$output_pre = TopicUtil::prepareContext(array($this->_this_message))[$this->_this_message['id_topic']];
 
 		$output = array_merge($context['topics'][$this->_this_message['id_msg']], $output_pre);
-
 		$output['posted_in'] = !empty($this->_participants[$this->_this_message['id_topic']]);
 		$output['tests'] = array(
 			'can_reply' => in_array($this->_this_message['id_board'], $this->_options['boards_can']['post_reply_any']) || in_array(0, $this->_options['boards_can']['post_reply_any']),
@@ -111,12 +110,14 @@ class SearchRenderer extends Renderer
 			'can_mark_notify' => in_array($this->_this_message['id_board'], $this->_options['boards_can']['mark_any_notify']) || in_array(0, $this->_options['boards_can']['mark_any_notify']) && !$context['user']['is_guest'],
 		);
 		$href = getUrl('board', ['board' => $this->_this_message['id_board'], 'start' => '0', 'name' => $this->_this_message['bname']]);
+
 		$output['board'] = array(
 			'id' => $this->_this_message['id_board'],
 			'name' => $this->_this_message['bname'],
 			'href' => $href,
 			'link' => '<a href="' . $href . '0">' . $this->_this_message['bname'] . '</a>'
 		);
+
 		$output['category'] = array(
 			'id' => $this->_this_message['id_cat'],
 			'name' => $this->_this_message['cat_name'],
@@ -158,13 +159,12 @@ class SearchRenderer extends Renderer
 
 		foreach ($this->_bodyParser->getSearchArray() as $query)
 		{
-
 			// Fix the international characters in the keyword too.
 			$query = un_htmlspecialchars($query);
 			$query = trim($query, '\*+');
 			$query = strtr(Util::htmlspecialchars($query), array('\\\'' => '\''));
 
-			$body_highlighted = preg_replace_callback('/((<[^>]*)|' . preg_quote(strtr($query, array('\'' => '&#039;')), '/') . ')/iu',
+			$body_highlighted = preg_replace_callback('/((<[^>]*)|\b' . preg_quote(strtr($query, array('\'' => '&#039;')), '/') . '\b)/iu',
 				function ($matches) {
 					return $this->_highlighted_callback($matches);
 				}, $body_highlighted);
