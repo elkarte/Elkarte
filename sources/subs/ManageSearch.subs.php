@@ -177,6 +177,7 @@ function createSphinxConfig()
 # /usr/local/etc/sphinx.conf or /etc/sphinxsearch/sphinx.conf
 #
 
+## data source definition
 source ', $prefix, '_source
 {
 	type				= mysql
@@ -186,6 +187,7 @@ source ', $prefix, '_source
 	sql_db				= ', $db_name, '
 	sql_port			= 3306
 	sql_query_pre		= SET NAMES utf8
+	sql_query_pre		= SET CHARACTER_SET_RESULTS=utf8
 	# If you do not have query_cache enabled in my.cnf, then you can comment out the next line
 	sql_query_pre		= SET SESSION query_cache_type=OFF
 	sql_query_pre		= \
@@ -199,14 +201,16 @@ source ', $prefix, '_source
 	sql_range_step		= 1000
 	sql_query			= \
 		SELECT \
-			m.id_msg, m.id_topic, m.id_board, IF(m.id_member = 0, 4294967295, m.id_member) AS id_member, m.poster_time, m.body, m.subject, \
-			t.num_replies + 1 AS num_replies, CEILING(1000000 * ( \
-				IF(m.id_msg < 0.7 * s.value, 0, (m.id_msg - 0.7 * s.value) / (0.3 * s.value)) * ' . $weight['age'] . ' + \
-				IF(t.num_replies < 50, t.num_replies / 50, 1) * ' . $weight['length'] . ' + \
-				IF(m.id_msg = t.id_first_msg, 1, 0) * ' . $weight['first_message'] . ' + \
-				IF(t.num_likes < 20, t.num_likes / 20, 1) * ' . $weight['likes'] . ' + \
-				IF(t.is_sticky = 0, 0, 1) * ' . $weight['sticky'] . ' \
-			) / ' . $weight_total . ') AS relevance \
+			m.id_msg, m.id_topic, m.id_board, CASE WHEN m.id_member = 0 THEN 4294967295 ELSE m.id_member END AS id_member, \
+			m.poster_time, m.body, m.subject, t.num_replies + 1 AS num_replies, t.num_likes, t.is_sticky, \
+			1 - ((m.id_msg - t.id_first_msg) / (t.id_last_msg - t.id_first_msg)) AS position, \		
+			CEILING(10 * ( \
+				CASE WHEN m.id_msg < 0.8 * s.value THEN 0 ELSE (m.id_msg - 0.8 * s.value) / (0.2 * s.value) END * ' . $weight['age'] . ' + \
+				CASE WHEN t.num_replies < 50 THEN t.num_replies / 50 ELSE 1 END * ' . $weight['length'] . ' + \
+				CASE WHEN m.id_msg = t.id_first_msg THEN 1 ELSE 0 END * ' . $weight['first_message'] . ' + \
+				CASE WHEN t.num_likes < 20 THEN t.num_likes / 20 ELSE 1 END * ' . $weight['likes'] . ' + \
+				CASE WHEN t.is_sticky = 0 THEN 0 ELSE 1 END * ' . $weight['sticky'] . ' \
+			) /1) AS relevance \
 		FROM ', $db_prefix, 'messages AS m, ', $db_prefix, 'topics AS t, ', $db_prefix, 'settings AS s \
 		WHERE t.id_topic = m.id_topic \
 			AND s.variable = \'maxMsgID\' \
@@ -214,9 +218,12 @@ source ', $prefix, '_source
 	sql_attr_uint		= id_topic
 	sql_attr_uint		= id_board
 	sql_attr_uint		= id_member
-	sql_attr_timestamp	= poster_time
+	sql_attr_uint		= poster_time
 	sql_attr_uint		= relevance
 	sql_attr_uint		= num_replies
+	sql_attr_uint		= num_likes
+	sql_attr_bool		= is_sticky
+	sql_attr_float		= position	
 }
 
 source ', $prefix, '_delta_source : ', $prefix, '_source
@@ -231,16 +238,25 @@ source ', $prefix, '_delta_source : ', $prefix, '_source
 			AND s2.variable = \'maxMsgID\'
 }
 
+## index definition
 index ', $prefix, '_base_index
 {
-	html_strip		= 1
-	source			= ', $prefix, '_source
-	path			= ', $modSettings['sphinx_data_path'], '/', $prefix, '_sphinx_base.index', empty($modSettings['sphinx_stopword_path']) ? '' : '
-	stopwords		= ' . $modSettings['sphinx_stopword_path'], '
-	min_word_len	= 2
-	charset_type	= utf-8
-	charset_table	= 0..9, A..Z->a..z, _, a..z, U+451->U+435, U+401->U+435, U+410..U+42F->U+430..U+44F, U+430..U+44F
-	ignore_chars	= -, U+AD
+	html_strip		 	= 1
+	min_prefix_len		= 2
+	min_stemming_len	= 4
+	stopwords_unstemmed	= 1
+	index_exact_words	= 1
+	index_field_lengths	= 1
+	expand_keywords		= 1
+	blend_chars			= +, &, U+23, -, !, @
+	blend_mode			= trim_head | trim_none
+	source			 	= ', $prefix, '_source
+	path			 	= ', $modSettings['sphinx_data_path'], '/', $prefix, '_sphinx_base.index', empty($modSettings['sphinx_stopword_path']) ? '' : '
+	stopwords		 	= ', $modSettings['sphinx_stopword_path'], '
+	min_word_len	 	= 2
+	charset_table		= 0..9, A..Z->a..z, _, a..z, U+451->U+435, U+401->U+435, U+410..U+42F->U+430..U+44F, U+430..U+44F
+	ignore_chars	 	= U+AD
+	morphology       	= stem_en, soundex
 }
 
 index ', $prefix, '_delta_index : ', $prefix, '_base_index
@@ -256,11 +272,13 @@ index ', $prefix, '_index
 	local			= ', $prefix, '_delta_index
 }
 
+## indexer settings
 indexer
 {
-	mem_limit		= ', (empty($modSettings['sphinx_indexer_mem']) ? 128 : (int) $modSettings['sphinx_indexer_mem']), 'M
+	mem_limit		= ', (empty($modSettings['sphinx_indexer_mem']) ? 256 : (int) $modSettings['sphinx_indexer_mem']), 'M
 }
 
+## searchd definition
 searchd
 {
 	listen					= ', (empty($modSettings['sphinx_searchd_port']) ? 9312 : (int) $modSettings['sphinx_searchd_port']), '
@@ -269,8 +287,7 @@ searchd
 	query_log				= ', $modSettings['sphinx_log_path'], '/query.log
 	read_timeout			= 5
 	max_children			= 30
-	pid_file				= ', $modSettings['sphinx_data_path'], '/searchd.pid', version_compare($version, '2.2.3') < 0 ? '
-	max_matches				= ' . (empty($modSettings['sphinx_max_results']) ? 2000 : (int) $modSettings['sphinx_max_results']) : '', '
+	pid_file				= ', $modSettings['sphinx_data_path'], '/searchd.pid
 }
 ';
 	obExit(false, false);
