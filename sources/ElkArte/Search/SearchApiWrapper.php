@@ -36,6 +36,8 @@ class SearchApiWrapper
 	/**
 	 * Constructor
 	 *
+	 * @param \ElkArte\ValuesContainer $config
+	 * @param \ElkArte\Search\SearchParams $searchParams
 	 * @package Search
 	 */
 	public function __construct($config, $searchParams = null)
@@ -44,18 +46,21 @@ class SearchApiWrapper
 		{
 			$config = new ValuesContainer((array) $config);
 		}
-		$this->load($config->search_index, $config, $searchParams);
+
+		$this->load($config, $searchParams);
 	}
 
 	/**
 	 * Creates a search API and returns the object.
 	 *
-	 * @param string $searchClass
 	 * @param \ElkArte\ValuesContainer $config
+	 * @param \ElkArte\Search\SearchParams $searchParams
 	 */
-	protected function load($searchClass, $config, $searchParams)
+	protected function load($config, $searchParams)
 	{
 		global $txt;
+
+		$searchClass = $config->search_index;
 
 		require_once(SUBSDIR . '/Package.subs.php');
 
@@ -67,6 +72,7 @@ class SearchApiWrapper
 
 		// Try to initialize the API
 		$fqcn = '\\ElkArte\\Search\\API\\' . ucfirst($searchClass);
+
 		if (class_exists($fqcn) && is_a($fqcn, '\\ElkArte\\Search\\API\\AbstractAPI', true))
 		{
 			// Create an instance of the search API and check it is valid for this version of the software.

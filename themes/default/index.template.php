@@ -259,7 +259,7 @@ function template_th_login_bar()
 						<input type="hidden" name="old_hash_passwrd" value="" />
 						<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
 						<input type="hidden" name="', $context['login_token_var'], '" value="', $context['login_token'], '" />';
-
+// @todo login_token_var and login_token are not defined when installing the forum
 	if (!empty($modSettings['enableOpenID']))
 	{
 		echo '

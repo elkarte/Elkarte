@@ -546,7 +546,7 @@ class Search extends AbstractController
 		$opt = new ValuesContainer([
 			'icon_sources' => $this->_icon_sources,
 			'show_signatures' => false,
-			'boards_can' => $boards_can,
+			'boards_can' => $boards_can ?? [],
 		]);
 		$renderer = new SearchRenderer($messages_request, $this->user, $bodyParser, $opt);
 		$renderer->setParticipants($this->_participants);
