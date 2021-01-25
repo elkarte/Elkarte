@@ -61,7 +61,7 @@ class Sphinxql extends AbstractAPI
 	 *
 	 * @var array
 	 */
-	protected $bannedWords = array();
+	protected $bannedWords = [];
 
 	/**
 	 * What is the minimum word length?
@@ -75,7 +75,7 @@ class Sphinxql extends AbstractAPI
 	 *
 	 * @var array
 	 */
-	protected $supported_databases = array('MySQL');
+	protected $supported_databases = ['MySQL'];
 
 	/**
 	 * Nothing to do ...
@@ -104,28 +104,11 @@ class Sphinxql extends AbstractAPI
 	}
 
 	/**
-	 * Callback function for usort used to sort the results.
-	 *
-	 * - The order of sorting is: large words, small words, large words that
-	 * are excluded from the search, small words that are excluded.
-	 *
-	 * @param string $a Word A
-	 * @param string $b Word B
-	 * @return int indicating how the words should be sorted (-1, 0 1)
-	 */
-	public function searchSort($a, $b)
-	{
-		$x = strlen($a) - (in_array($a, $this->_excludedWords) ? 1000 : 0);
-		$y = strlen($b) - (in_array($b, $this->_excludedWords) ? 1000 : 0);
-
-		return $x < $y ? 1 : ($x > $y ? -1 : 0);
-	}
-
-	/**
 	 * {@inheritdoc }
 	 */
 	public function indexedWordQuery($words, $search_data)
 	{
+		// Sphinx uses its internal engine
 	}
 
 	/**
@@ -156,17 +139,11 @@ class Sphinxql extends AbstractAPI
 		if (!Cache::instance()->getVar($cached_results, $cache_key))
 		{
 			// Create an instance of the sphinx client and set a few options.
-			$mySphinx = @mysqli_connect(($modSettings['sphinx_searchd_server'] === 'localhost' ? '127.0.0.1' : $modSettings['sphinx_searchd_server']), '', '', '', (int) $modSettings['sphinxql_searchd_port']);
-
-			// No connection, daemon not running?  log the error
-			if ($mySphinx === false)
-			{
-				Errors::instance()->fatal_lang_error('error_no_search_daemon');
-			}
+			$mySphinx = $this->sphinxConnect();
 
 			// Compile different options for our query
 			$index = (!empty($modSettings['sphinx_index_prefix']) ? $modSettings['sphinx_index_prefix'] : 'elkarte') . '_index';
-			$query = 'SELECT *' . (empty($this->_searchParams->topic) ? ', COUNT(*) num' : '') . ', WEIGHT() weights, (weights + (relevance/10)) rank FROM ' . $index;
+			$query = 'SELECT *' . (empty($this->_searchParams->topic) ? ', COUNT(*) num' : '') . ', WEIGHT() weights, (weights * 80 + relevance * 20) rank FROM ' . $index;
 
 			// Construct the (binary mode & |) query.
 			$where_match = $this->_constructQuery($this->_searchParams->search);
@@ -185,23 +162,27 @@ class Sphinxql extends AbstractAPI
 			$query .= ' WHERE MATCH(\'' . $where_match . '\')';
 
 			// Set the limits based on the search parameters.
-			$extra_where = array();
+			$extra_where = [];
 			if (!empty($this->_searchParams->_minMsgID) || !empty($this->_searchParams->_maxMsgID))
 			{
 				$extra_where[] = 'id >= ' . $this->_searchParams->_minMsgID . ' AND id <= ' . (empty($this->_searchParams->_maxMsgID) ? (int) $modSettings['maxMsgID'] : $this->_searchParams->_maxMsgID);
 			}
+
 			if (!empty($this->_searchParams->topic))
 			{
 				$extra_where[] = 'id_topic = ' . (int) $this->_searchParams->topic;
 			}
+
 			if (!empty($this->_searchParams->brd))
 			{
 				$extra_where[] = 'id_board IN (' . implode(',', $this->_searchParams->brd) . ')';
 			}
+
 			if (!empty($this->_searchParams->_memberlist))
 			{
 				$extra_where[] = 'id_member IN (' . implode(',', $this->_searchParams->_memberlist) . ')';
 			}
+
 			if (!empty($extra_where))
 			{
 				$query .= ' AND ' . implode(' AND ', $extra_where);
@@ -212,30 +193,29 @@ class Sphinxql extends AbstractAPI
 			$sphinx_sort = $this->_searchParams->sort === 'id_msg' ? 'id_topic' : $this->_searchParams->sort;
 
 			// Add secondary sorting based on relevance value (if not the main sort method) and age
-			$sphinx_sort .= ' ' . $this->_searchParams->sort_dir . ($this->_searchParams->sort === 'relevance' ? '' : ', relevance DESC') . ', poster_time DESC';
-
-			// Replace relevance with the returned rank value, rank uses sphinx weight + our own computed field weight relevance
-			$sphinx_sort = str_replace('relevance ', 'rank ', $sphinx_sort);
+			$sphinx_sort .= ' ' . $this->_searchParams->sort_dir . ($this->_searchParams->sort === 'relevance' ? '' : ', weight DESC') . ', poster_time DESC';
 
 			// Grouping by topic id makes it return only one result per topic, so don't set that for in-topic searches
 			if (empty($this->_searchParams->topic))
 			{
-				// In the topic group, date based seems the most "normal" ORDER BY param for display purposes
-				$query .= ' GROUP BY id_topic WITHIN GROUP ORDER BY poster_time ASC';
+				// In the topic group, use the most weighty result for display purposes
+				$query .= ' GROUP BY id_topic WITHIN GROUP ORDER BY rank DESC';
 			}
 
 			$query .= ' ORDER BY ' . $sphinx_sort;
 			$query .= ' LIMIT ' . (int) $modSettings['sphinx_max_results'] . ' OFFSET 0';
 
-			// Set any options needed, like field weights
-			// A better ranker expression is one based off the standard Sphinx SPH04 algo but boosted for
-			// exact_hit and use of proper BM25F instead of the short form BM25.  Use the following for best results
-			// ranker=expr(\'sum((4 * lcs + 2 * (min_hit_pos == 1) + 4 * exact_hit) * user_weight) * 1000 + bm25f(2.0, 0.75, {subject = 4, body = 1})\'),
-			// For proper use of bm25f add "index_field_lengths = 1" to your sphinx.conf and rebuild the index
-			$query .= ' OPTION field_weights=(subject=' . (!empty($modSettings['search_weight_subject']) ? $modSettings['search_weight_subject'] * 10 : 100) . ',body=100),
-			ranker=proximity_bm25,
+			// Set any options needed, like field weights.
+			// ranker is a modification of SPH_RANK_SPH04 giving 70% to sphinx, 20% to our "ACP weights" and 10% to bm25
+			// sphinx results are further modified by position which is the relative reply # to a post, so the later a reply in
+			// a topic the less weight it is given
+			$subject_weight = !empty($modSettings['search_weight_subject']) ? $modSettings['search_weight_subject'] : 30;
+			$query .= '
+			OPTION field_weights=(subject=' . $subject_weight . ', body=' . (100 - $subject_weight) . '),
+			ranker=expr(\'sum((4*lcs+2*(min_hit_pos==1)+exact_hit)*user_weight*position)*70 + relevance*20 + bm25*10 \'),
 			idf=plain,
-			max_matches=' . (int) $modSettings['sphinx_max_results'];
+			boolean_simplify=1,
+			max_matches=' . min(500, $modSettings['sphinx_max_results']);
 
 			// Execute the search query.
 			$request = mysqli_query($mySphinx, $query);
@@ -273,11 +253,10 @@ class Sphinxql extends AbstractAPI
 
 					$cached_results['matches'][$match['id']] = array(
 						'id' => $match['id_topic'],
-						'relevance' => round($match['rank'] / 5000, 1) . '%',
 						'num_matches' => $num,
 						'matches' => array(),
 						'weight' => round($match['weights'], 0),
-						'rel' => round($match['relevance'] / 10, 0),
+						'relevance' => round($match['relevance'], 0),
 					);
 				}
 			}
@@ -290,23 +269,50 @@ class Sphinxql extends AbstractAPI
 			Cache::instance()->put($cache_key, $cached_results, 600);
 		}
 
-		$participants = array();
-		$topics = array();
+		$participants = [];
+		$topics = [];
 		foreach (array_slice(array_keys($cached_results['matches']), (int) $_REQUEST['start'], $modSettings['search_results_per_page']) as $msgID)
 		{
 			$topics[$msgID] = $cached_results['matches'][$msgID];
 			$participants[$cached_results['matches'][$msgID]['id']] = false;
 		}
 
-		// Sentences need to be broken up in words for proper highlighting.
-		$search_results = array();
-		foreach ($search_words as $orIndex => $words)
-		{
-			$search_results = array_merge($search_results, $search_words[$orIndex]['subject_words']);
-		}
 		$this->_num_results = $cached_results['num_results'];
 
 		return $topics;
+	}
+
+	/**
+	 * Connect to the sphinx server, on failure log error and exit
+	 *
+	 * @return \mysqli
+	 * @throws \ElkArte\Exceptions\Exception
+	 */
+	private function sphinxConnect()
+	{
+		global $modSettings;
+
+		set_error_handler(function () { /* ignore errors */ });
+		try
+		{
+			$mySphinx = mysqli_connect(($modSettings['sphinx_searchd_server'] === 'localhost' ? '127.0.0.1' : $modSettings['sphinx_searchd_server']), '', '', '', (int) $modSettings['sphinxql_searchd_port']);
+		}
+		catch (\Exception $e)
+		{
+			$mySphinx = false;
+		}
+		finally
+		{
+			restore_error_handler();
+		};
+
+		// No connection, daemon not running?  log the error and exit
+		if ($mySphinx === false)
+		{
+			Errors::instance()->fatal_lang_error('error_no_search_daemon');
+		}
+
+		return $mySphinx;
 	}
 
 	/**

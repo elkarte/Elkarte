@@ -60,7 +60,7 @@ class Sphinx extends AbstractAPI
 	 *
 	 * @var array
 	 */
-	protected $bannedWords = array();
+	protected $bannedWords = [];
 
 	/**
 	 * What is the minimum word length?
@@ -74,7 +74,7 @@ class Sphinx extends AbstractAPI
 	 *
 	 * @var array
 	 */
-	protected $supported_databases = array('MySQL');
+	protected $supported_databases = ['MySQL'];
 
 	/**
 	 * Check we support this db, set banned words
@@ -87,8 +87,6 @@ class Sphinx extends AbstractAPI
 		if (!in_array($this->_db->title(), $this->supported_databases))
 		{
 			$this->is_supported = false;
-
-			return;
 		}
 	}
 
@@ -103,28 +101,11 @@ class Sphinx extends AbstractAPI
 	}
 
 	/**
-	 * Callback function for usort used to sort the results.
-	 *
-	 * - The order of sorting is: large words, small words, large words that
-	 * are excluded from the search, small words that are excluded.
-	 *
-	 * @param string $a Word A
-	 * @param string $b Word B
-	 * @return int An integer indicating how the words should be sorted (-1, 0 1)
-	 */
-	public function searchSort($a, $b)
-	{
-		$x = strlen($a) - (in_array($a, $this->_excludedWords) ? 1000 : 0);
-		$y = strlen($b) - (in_array($b, $this->_excludedWords) ? 1000 : 0);
-
-		return $x < $y ? 1 : ($x > $y ? -1 : 0);
-	}
-
-	/**
 	 * {@inheritdoc }
 	 */
 	public function indexedWordQuery($words, $search_data)
 	{
+		// Sphinx uses its internal engine
 	}
 
 	/**
@@ -159,8 +140,9 @@ class Sphinx extends AbstractAPI
 		$cache_key = 'search_results_' . md5(User::$info->query_see_board . '_' . $context['params']);
 		if (!Cache::instance()->getVar($cached_results, $cache_key))
 		{
-			// The API communicating with the search daemon, this file is part of Sphinix and not distributed
-			// Elkarte
+			// The API communicating with the search daemon.  This file is part of Sphinix and not distributed
+			// with Elkarte.  You will need to http://sphinxsearch.com/downloads/current/ the package and copy
+			// the file from the api directory to your sourcedir ??/??/sources
 			require_once(SOURCEDIR . '/sphinxapi.php');
 
 			// Create an instance of the sphinx client and set a few options.
