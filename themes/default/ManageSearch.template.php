@@ -540,18 +540,18 @@ function template_manage_sphinx()
 						<input type="text" name="sphinx_searchd_server" id="sphinx_searchd_server_input" value="', isset($modSettings['sphinx_searchd_server']) ? $modSettings['sphinx_searchd_server'] : 'localhost', '" size="65" />
 					</dd>
 					<dt>
-						<label for="sphinx_searchd_port_input">', $txt['sphinx_searchd_port'], '</label><br />
-						<span class="smalltext">', $txt['sphinx_searchd_port_desc'], '</span>
-					</dt>
-					<dd>
-						<input type="text" name="sphinx_searchd_port" id="sphinx_searchd_port_input" value="', isset($modSettings['sphinx_searchd_port']) ? $modSettings['sphinx_searchd_port'] : '9312', '" size="4" />
-					</dd>
-					<dt>
 						<label for="sphinxql_searchd_port_input">', $txt['sphinx_searchd_qlport'], '</label><br />
 						<span class="smalltext">', $txt['sphinx_searchd_qlport_desc'], '</span>
 					</dt>
 					<dd>
 						<input type="text" name="sphinxql_searchd_port" id="sphinxql_searchd_port_input" value="', isset($modSettings['sphinxql_searchd_port']) ? $modSettings['sphinxql_searchd_port'] : '9306', '" size="4" />
+					</dd>
+					<dt>
+						<label for="sphinx_searchd_port_input">', $txt['sphinx_searchd_port'], '</label><br />
+						<span class="smalltext">', $txt['sphinx_searchd_port_desc'], '</span>
+					</dt>
+					<dd>
+						<input type="text" name="sphinx_searchd_port" id="sphinx_searchd_port_input" value="', isset($modSettings['sphinx_searchd_port']) ? $modSettings['sphinx_searchd_port'] : '9312', '" size="4" />
 					</dd>
 					<dt>
 						<label for="sphinx_max_results_input">', $txt['sphinx_max_matches'], '</label><br />

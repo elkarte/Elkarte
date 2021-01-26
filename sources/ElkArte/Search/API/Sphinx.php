@@ -117,7 +117,7 @@ class Sphinx extends AbstractAPI
 
 		$fulltextWord = count($subwords) === 1 ? $word : '"' . $word . '"';
 		$wordsSearch['indexed_words'][] = $fulltextWord;
-		if ($isExcluded !== '')
+		if ($isExcluded !== false)
 		{
 			$wordsExclude[] = $fulltextWord;
 		}
@@ -130,25 +130,21 @@ class Sphinx extends AbstractAPI
 	{
 		global $context, $modSettings;
 
-		if (!$this->_searchParams->subject_only)
-		{
-			return 0;
-		}
-
 		// Only request the results if they haven't been cached yet.
-		$cached_results = array();
+		$cached_results = [];
 		$cache_key = 'search_results_' . md5(User::$info->query_see_board . '_' . $context['params']);
-		if (!Cache::instance()->getVar($cached_results, $cache_key))
+		if (1==1 || !Cache::instance()->getVar($cached_results, $cache_key))
 		{
 			// The API communicating with the search daemon.  This file is part of Sphinix and not distributed
-			// with Elkarte.  You will need to http://sphinxsearch.com/downloads/current/ the package and copy
+			// with ElkArte.  You will need to http://sphinxsearch.com/downloads/current/ the package and copy
 			// the file from the api directory to your sourcedir ??/??/sources
 			require_once(SOURCEDIR . '/sphinxapi.php');
 
 			// Create an instance of the sphinx client and set a few options.
 			$mySphinx = new \SphinxClient();
 			$mySphinx->SetServer($modSettings['sphinx_searchd_server'], (int) $modSettings['sphinx_searchd_port']);
-			$mySphinx->SetLimits(0, (int) $modSettings['sphinx_max_results'], (int) $modSettings['sphinx_max_results']);
+			$mySphinx->SetLimits(0, (int) $modSettings['sphinx_max_results'], (int) $modSettings['sphinx_max_results'], 1000);
+			$mySphinx->SetSelect('*' . (empty($this->_searchParams->topic) ? ', COUNT(*) num' : '') . ', WEIGHT() relevance');
 
 			// Put together a sort string; besides the main column sort (relevance, id_topic, or num_replies),
 			$this->_searchParams->sort_dir = strtoupper($this->_searchParams->sort_dir);
@@ -157,20 +153,18 @@ class Sphinx extends AbstractAPI
 			// Add secondary sorting based on relevance value (if not the main sort method) and age
 			$sphinx_sort .= ' ' . $this->_searchParams->sort_dir . ($this->_searchParams->sort === 'relevance' ? '' : ', relevance DESC') . ', poster_time DESC';
 
-			// Include the engines weight values in the group sort
-			$sphinx_sort = str_replace('relevance ', '@weight ' . $this->_searchParams->sort_dir . ', relevance ', $sphinx_sort);
-
 			// Grouping by topic id makes it return only one result per topic, so don't set that for in-topic searches
 			if (empty($this->_searchParams->topic))
 			{
-				$mySphinx->SetGroupBy('id_topic', SPH_GROUPBY_ATTR, $sphinx_sort);
+				$mySphinx->SetGroupBy('id_topic', SPH_GROUPBY_ATTR, 'relevance DESC');
 			}
 
 			// Set up the sort expression
-			$mySphinx->SetSortMode(SPH_SORT_EXPR, '(@weight + (relevance / 10))');
+			$mySphinx->SetSortMode(SPH_SORT_EXTENDED, $sphinx_sort);
 
 			// Update the field weights for subject vs body
-			$mySphinx->SetFieldWeights(array('subject' => !empty($modSettings['search_weight_subject']) ? $modSettings['search_weight_subject'] * 10 : 100, 'body' => 100));
+			$subject_weight = !empty($modSettings['search_weight_subject']) ? (int) $modSettings['search_weight_subject'] : 30;
+			$mySphinx->SetFieldWeights(array('subject' => $subject_weight, 'body' => 100 - $subject_weight));
 
 			// Set the limits based on the search parameters.
 			if (!empty($this->_searchParams->min_msg_id) || !empty($this->_searchParams->max_msg_id))
@@ -194,8 +188,8 @@ class Sphinx extends AbstractAPI
 			}
 
 			// Construct the (binary mode & |) query while accounting for excluded words
-			$orResults = array();
-			$inc_words = array();
+			$orResults = [];
+			$inc_words = [];
 			foreach ($search_words as $orIndex => $words)
 			{
 				$inc_words = array_merge($inc_words, $words['indexed_words']);
@@ -204,6 +198,7 @@ class Sphinx extends AbstractAPI
 				{
 					$andResult .= (in_array($sphinxWord, $excluded_words) ? '-' : '') . $this->_cleanWordSphinx($sphinxWord, $mySphinx) . ' & ';
 				}
+
 				$orResults[] = substr($andResult, 0, -3);
 			}
 
@@ -223,22 +218,7 @@ class Sphinx extends AbstractAPI
 				$query = '@(subject) ' . $query;
 			}
 
-			// Choose an appropriate matching mode
-			$mode = SPH_MATCH_ALL;
-
-			// Over two words and searching for any (since we build a binary string, this will never get set)
-			if (substr_count($query, ' ') > 1 && (!empty($this->_searchParams->searchtype) && $this->_searchParams->searchtype == 2))
-			{
-				$mode = SPH_MATCH_ANY;
-			}
-			// Binary search?
-			if (preg_match('~[\|\(\)\^\$\?"\/=-]~', $query))
-			{
-				$mode = SPH_MATCH_EXTENDED;
-			}
-
-			// Set the matching mode
-			$mySphinx->SetMatchMode($mode);
+			$mySphinx->SetRankingMode(SPH_RANK_EXPR, 'sum((4*lcs+2*(min_hit_pos==1)+4*exact_hit)*user_weight*position)*700 + acprel*300 + bm25');
 
 			// Execute the search query.
 			$index = (!empty($modSettings['sphinx_index_prefix']) ? $modSettings['sphinx_index_prefix'] : 'elkarte') . '_index';
@@ -247,6 +227,7 @@ class Sphinx extends AbstractAPI
 			// Can a connection to the daemon be made?
 			if ($request === false)
 			{
+				var_dump($mySphinx->GetLastError());
 				// Just log the error.
 				if ($mySphinx->GetLastError())
 				{
@@ -258,7 +239,7 @@ class Sphinx extends AbstractAPI
 
 			// Get the relevant information from the search results.
 			$cached_results = array(
-				'matches' => array(),
+				'matches' => [],
 				'num_results' => $request['total'],
 			);
 
@@ -270,7 +251,7 @@ class Sphinx extends AbstractAPI
 						'id' => $match['attrs']['id_topic'],
 						'relevance' => round($match['attrs']['@count'] + $match['attrs']['relevance'] / 5000, 1) . '%',
 						'num_matches' => empty($this->_searchParams->topic) ? $match['attrs']['@count'] : 0,
-						'matches' => array(),
+						'matches' => [],
 					);
 				}
 			}
@@ -279,20 +260,14 @@ class Sphinx extends AbstractAPI
 			Cache::instance()->put($cache_key, $cached_results, 600);
 		}
 
-		$participants = array();
-		$topics = array();
+		$participants = [];
+		$topics = [];
 		foreach (array_slice(array_keys($cached_results['matches']), (int) $_REQUEST['start'], $modSettings['search_results_per_page']) as $msgID)
 		{
 			$topics[$msgID] = $cached_results['matches'][$msgID];
 			$participants[$cached_results['matches'][$msgID]['id']] = false;
 		}
 
-		// Sentences need to be broken up in words for proper highlighting.
-		$search_results = array();
-		foreach ($search_words as $orIndex => $words)
-		{
-			$search_results = array_merge($search_results, $search_words[$orIndex]['subject_words']);
-		}
 		$this->_num_results = $cached_results['num_results'];
 
 		return $topics;

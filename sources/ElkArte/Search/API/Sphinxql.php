@@ -29,7 +29,7 @@ use ElkArte\Util;
  *
  * - Used when an Sphinx search daemon is running
  * - Access is via Sphinx's own implementation of MySQL network protocol (SphinxQL)
- * - Requires Sphinx 2 or higher
+ * - Requires Sphinx 2.3 or higher
  *
  * @package Search
  */
@@ -120,7 +120,7 @@ class Sphinxql extends AbstractAPI
 
 		$fulltextWord = count($subwords) === 1 ? $word : '"' . $word . '"';
 		$wordsSearch['indexed_words'][] = $fulltextWord;
-		if ($isExcluded !== '')
+		if ($isExcluded !== false)
 		{
 			$wordsExclude[] = $fulltextWord;
 		}
@@ -134,16 +134,16 @@ class Sphinxql extends AbstractAPI
 		global $context, $modSettings;
 
 		// Only request the results if they haven't been cached yet.
-		$cached_results = array();
+		$cached_results = [];
 		$cache_key = 'searchql_results_' . md5(User::$info->query_see_board . '_' . $context['params']);
 		if (!Cache::instance()->getVar($cached_results, $cache_key))
 		{
-			// Create an instance of the sphinx client and set a few options.
+			// Connect to the sphinx searchd and set a few options.
 			$mySphinx = $this->sphinxConnect();
 
 			// Compile different options for our query
 			$index = (!empty($modSettings['sphinx_index_prefix']) ? $modSettings['sphinx_index_prefix'] : 'elkarte') . '_index';
-			$query = 'SELECT *' . (empty($this->_searchParams->topic) ? ', COUNT(*) num' : '') . ', WEIGHT() weights, (weights * 80 + relevance * 20) rank FROM ' . $index;
+			$query = 'SELECT *' . (empty($this->_searchParams->topic) ? ', COUNT(*) num' : '') . ', WEIGHT() relevance FROM ' . $index;
 
 			// Construct the (binary mode & |) query.
 			$where_match = $this->_constructQuery($this->_searchParams->search);
@@ -161,28 +161,8 @@ class Sphinxql extends AbstractAPI
 
 			$query .= ' WHERE MATCH(\'' . $where_match . '\')';
 
-			// Set the limits based on the search parameters.
-			$extra_where = [];
-			if (!empty($this->_searchParams->_minMsgID) || !empty($this->_searchParams->_maxMsgID))
-			{
-				$extra_where[] = 'id >= ' . $this->_searchParams->_minMsgID . ' AND id <= ' . (empty($this->_searchParams->_maxMsgID) ? (int) $modSettings['maxMsgID'] : $this->_searchParams->_maxMsgID);
-			}
-
-			if (!empty($this->_searchParams->topic))
-			{
-				$extra_where[] = 'id_topic = ' . (int) $this->_searchParams->topic;
-			}
-
-			if (!empty($this->_searchParams->brd))
-			{
-				$extra_where[] = 'id_board IN (' . implode(',', $this->_searchParams->brd) . ')';
-			}
-
-			if (!empty($this->_searchParams->_memberlist))
-			{
-				$extra_where[] = 'id_member IN (' . implode(',', $this->_searchParams->_memberlist) . ')';
-			}
-
+			// Set the limits based on the search parameters, board, member, dates, etc
+			$extra_where = $this->buildQueryLimits();
 			if (!empty($extra_where))
 			{
 				$query .= ' AND ' . implode(' AND ', $extra_where);
@@ -192,35 +172,36 @@ class Sphinxql extends AbstractAPI
 			$this->_searchParams->sort_dir = strtoupper($this->_searchParams->sort_dir);
 			$sphinx_sort = $this->_searchParams->sort === 'id_msg' ? 'id_topic' : $this->_searchParams->sort;
 
-			// Add secondary sorting based on relevance value (if not the main sort method) and age
-			$sphinx_sort .= ' ' . $this->_searchParams->sort_dir . ($this->_searchParams->sort === 'relevance' ? '' : ', weight DESC') . ', poster_time DESC';
+			// Add secondary sorting based on relevance(rank) value (if not the main sort method) and age
+			$sphinx_sort .= ' ' . $this->_searchParams->sort_dir . ($this->_searchParams->sort === 'relevance' ? '' : ', relevance DESC') . ', poster_time DESC';
 
 			// Grouping by topic id makes it return only one result per topic, so don't set that for in-topic searches
 			if (empty($this->_searchParams->topic))
 			{
 				// In the topic group, use the most weighty result for display purposes
-				$query .= ' GROUP BY id_topic WITHIN GROUP ORDER BY rank DESC';
+				$query .= ' GROUP BY id_topic WITHIN GROUP ORDER BY relevance DESC';
 			}
 
 			$query .= ' ORDER BY ' . $sphinx_sort;
-			$query .= ' LIMIT ' . (int) $modSettings['sphinx_max_results'] . ' OFFSET 0';
 
 			// Set any options needed, like field weights.
-			// ranker is a modification of SPH_RANK_SPH04 giving 70% to sphinx, 20% to our "ACP weights" and 10% to bm25
-			// sphinx results are further modified by position which is the relative reply # to a post, so the later a reply in
-			// a topic the less weight it is given
+			// ranker is a modification of SPH_RANK_SPH04 sum((4*lcs+2*(min_hit_pos==1)+exact_hit)*user_weight)*1000+bm25
+			// using 70% of the sphinx value and 30% acp weights. sphinx results are further modified by position which
+			// is the relative reply # to a post, so the later a reply in a topic the less overall weight it is given
+			// the calculated value of ranker is returned in WEIGHTS() which we name relevance in the query
 			$subject_weight = !empty($modSettings['search_weight_subject']) ? $modSettings['search_weight_subject'] : 30;
 			$query .= '
-			OPTION field_weights=(subject=' . $subject_weight . ', body=' . (100 - $subject_weight) . '),
-			ranker=expr(\'sum((4*lcs+2*(min_hit_pos==1)+exact_hit)*user_weight*position)*70 + relevance*20 + bm25*10 \'),
-			idf=plain,
-			boolean_simplify=1,
-			max_matches=' . min(500, $modSettings['sphinx_max_results']);
+			OPTION 
+				field_weights=(subject=' . $subject_weight . ', body=' . (100 - $subject_weight) . '),
+				ranker=expr(\'sum((4*lcs+2*(min_hit_pos==1)+4*exact_hit)*user_weight*position)*700 + acprel*300 + bm25 \'),
+				idf=plain,
+				boolean_simplify=1,
+				max_matches=' . min(500, $modSettings['sphinx_max_results']);
 
 			// Execute the search query.
 			$request = mysqli_query($mySphinx, $query);
 
-			// Can a connection to the daemon be made?
+			// Bad query, lets log the error and act like its not our fault
 			if ($request === false)
 			{
 				// Just log the error.
@@ -235,27 +216,23 @@ class Sphinxql extends AbstractAPI
 			// Get the relevant information from the search results.
 			$cached_results = array(
 				'num_results' => 0,
-				'matches' => array(),
+				'matches' => [],
 			);
 
 			if (mysqli_num_rows($request) !== 0)
 			{
 				while (($match = mysqli_fetch_assoc($request)))
 				{
+					$num = 0;
 					if (empty($this->_searchParams->topic))
 					{
 						$num = isset($match['num']) ? $match['num'] : (isset($match['@count']) ? $match['@count'] : 0);
-					}
-					else
-					{
-						$num = 0;
 					}
 
 					$cached_results['matches'][$match['id']] = array(
 						'id' => $match['id_topic'],
 						'num_matches' => $num,
-						'matches' => array(),
-						'weight' => round($match['weights'], 0),
+						'matches' => [],
 						'relevance' => round($match['relevance'], 0),
 					);
 				}
@@ -323,10 +300,10 @@ class Sphinxql extends AbstractAPI
 	 */
 	private function _constructQuery($string)
 	{
-		$keywords = array('include' => array(), 'exclude' => array());
+		$keywords = array('include' => [], 'exclude' => []);
 
 		// Split our search string and return an empty string if no matches
-		if (!preg_match_all('~ (-?)("[^"]+"|[^" ]+)~', ' ' . $string, $tokens, PREG_SET_ORDER))
+		if (!preg_match_all('~(-?)("[^"]+"|[^" ]+)~', $string, $tokens, PREG_SET_ORDER))
 		{
 			return '';
 		}
@@ -335,22 +312,20 @@ class Sphinxql extends AbstractAPI
 		$or_part = false;
 		foreach ($tokens as $token)
 		{
+			$phrase = false;
+
 			// Strip the quotes off of a phrase
 			if ($token[2][0] === '"')
 			{
 				$token[2] = substr($token[2], 1, -1);
 				$phrase = true;
 			}
-			else
-			{
-				$phrase = false;
-			}
 
 			// Prepare this token
 			$cleanWords = $this->_cleanString($token[2]);
 
 			// Explode the cleanWords again in case the cleaning puts more spaces into it
-			$addWords = $phrase ? array('"' . $cleanWords . '"') : preg_split('~ ~u', $cleanWords, null, PREG_SPLIT_NO_EMPTY);
+			$addWords = $phrase ? array('"' . $cleanWords . '"') : preg_split('~\s+~u', $cleanWords, null, PREG_SPLIT_NO_EMPTY);
 
 			// Excluding this word?
 			if ($token[1] === '-')
@@ -361,33 +336,27 @@ class Sphinxql extends AbstractAPI
 			elseif (($token[2] === 'OR' || $token[2] === '|') && count($keywords['include']))
 			{
 				$last = array_pop($keywords['include']);
-				if (!is_array($last))
-				{
-					$last = array($last);
-				}
-				$keywords['include'][] = $last;
+				$keywords['include'][] = is_array($last) ? $last : [$last];
 				$or_part = true;
 				continue;
 			}
 			// AND is implied in a Sphinx Search
-			elseif ($token[2] === 'AND' || $token[2] === '&')
+			elseif ($token[2] === 'AND' || $token[2] === '&' || trim($cleanWords) === '')
 			{
 				continue;
-			}
-			// If this part of the query ended up being blank, skip it
-			elseif (trim($cleanWords) === '')
-			{
-				continue;
-			}
-			// Must be something they want to search for!
-			elseif ($or_part)
-			{
-				// If this was part of an OR branch, add it to the proper section
-				$keywords['include'][count($keywords['include']) - 1] = array_merge($keywords['include'][count($keywords['include']) - 1], $addWords);
 			}
 			else
 			{
-				$keywords['include'] = array_merge($keywords['include'], $addWords);
+				// Must be something they want to search for!
+				if ($or_part)
+				{
+					// If this was part of an OR branch, add it to the proper section
+					$keywords['include'][count($keywords['include']) - 1] = array_merge($keywords['include'][count($keywords['include']) - 1], $addWords);
+				}
+				else
+				{
+					$keywords['include'] = array_merge($keywords['include'], $addWords);
+				}
 			}
 
 			// Start fresh on this...
@@ -395,13 +364,15 @@ class Sphinxql extends AbstractAPI
 		}
 
 		// Let's make sure they're not canceling each other out
-		if (count(array_diff($keywords['include'], $keywords['exclude'])) === 0)
+		$results = array_diff(array_map('serialize', $keywords['include']), array_map('serialize', $keywords['exclude']));
+		$temp = array_map('unserialize', $results);
+		if (count($temp) === 0)
 		{
 			return '';
 		}
 
 		// Now we compile our arrays into a valid search string
-		$query_parts = array();
+		$query_parts = [];
 		foreach ($keywords['include'] as $keyword)
 		{
 			$query_parts[] = is_array($keyword) ? '(' . implode(' | ', $keyword) . ')' : $keyword;
@@ -429,17 +400,54 @@ class Sphinxql extends AbstractAPI
 		// Lowercase string
 		$string = Util::strtolower($string);
 
-		// Fix numbers so they search easier (phone numbers, SSN, dates, etc)
-		$string = preg_replace('~([[:digit:]]+)\pP+(?=[[:digit:]])~u', '', $string);
+		// Fix numbers so they search easier (phone numbers, SSN, dates, etc) 123-45-6789 => 123456789
+		$string = preg_replace('~([\d]+)\pP+(?=[\d])~u', '$1', $string);
 
 		// Last but not least, strip everything out that's not alphanumeric
-		$string = preg_replace('~[^\pL\pN]+~u', ' ', $string);
+		$string = preg_replace('~[^\pL\pN_]+~u', ' ', $string);
 
 		return $string;
 	}
 
+	/**
+	 * {@inheritdoc }
+	 */
 	public function useWordIndex()
 	{
 		return false;
+	}
+
+	/**
+	 * Builds the query modifiers based on age, member, board etc
+	 *
+	 * @return array
+	 */
+	public function buildQueryLimits()
+	{
+		global $modSettings;
+
+		$extra_where = [];
+
+		if (!empty($this->_searchParams->_minMsgID) || !empty($this->_searchParams->_maxMsgID))
+		{
+			$extra_where[] = 'id >= ' . $this->_searchParams->_minMsgID . ' AND id <= ' . (empty($this->_searchParams->_maxMsgID) ? (int) $modSettings['maxMsgID'] : $this->_searchParams->_maxMsgID);
+		}
+
+		if (!empty($this->_searchParams->topic))
+		{
+			$extra_where[] = 'id_topic = ' . (int) $this->_searchParams->topic;
+		}
+
+		if (!empty($this->_searchParams->brd))
+		{
+			$extra_where[] = 'id_board IN (' . implode(',', $this->_searchParams->brd) . ')';
+		}
+
+		if (!empty($this->_searchParams->_memberlist))
+		{
+			$extra_where[] = 'id_member IN (' . implode(',', $this->_searchParams->_memberlist) . ')';
+		}
+
+		return $extra_where;
 	}
 }

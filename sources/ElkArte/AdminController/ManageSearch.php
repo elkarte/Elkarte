@@ -675,15 +675,15 @@ class ManageSearch extends AbstractController
 		{
 			include_once(SOURCEDIR . '/sphinxapi.php');
 			$server = !empty($modSettings['sphinx_searchd_server']) ? $modSettings['sphinx_searchd_server'] : 'localhost';
-			$port = !empty($modSettings['sphinx_searchd_port']) ? $modSettings['sphinxql_searchd_port'] : '9312';
+			$port = !empty($modSettings['sphinx_searchd_port']) ? $modSettings['sphinx_searchd_port'] : 9312;
 
 			$mySphinx = new \SphinxClient();
 			$mySphinx->SetServer($server, (int) $port);
-			$mySphinx->SetLimits(0, 25);
-			$mySphinx->SetSortMode(SPH_SORT_ATTR_ASC, 'id_topic');
+			$mySphinx->SetLimits(0, 25, 1);
 
 			$index = (!empty($modSettings['sphinx_index_prefix']) ? $modSettings['sphinx_index_prefix'] : 'elkarte') . '_index';
-			$request = $mySphinx->Query('test', $index);
+			$request = $mySphinx->Query('ElkArte', $index);
+
 			if ($request === false)
 			{
 				$context['settings_message'][] = $txt['sphinx_test_connect_failed'];
