@@ -12,7 +12,7 @@
  */
 var disableDrafts = false;
 
-(function ($, window, document)
+(function (sceditor)
 {
 	'use strict';
 
@@ -338,7 +338,7 @@ var disableDrafts = false;
 	 *  - Called from the editor as a plugin
 	 *  - Monitors events so we control the elk_mention
 	 */
-	$.sceditor.plugins.mention = function ()
+	sceditor.plugins.mention = function ()
 	{
 		var base = this,
 			oMentions;
@@ -376,4 +376,4 @@ var disableDrafts = false;
 			}
 		};
 	};
-})(jQuery, window, document);
+})(sceditor);

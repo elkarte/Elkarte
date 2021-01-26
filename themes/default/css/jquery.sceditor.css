@@ -1,6 +1,6 @@
 /**
  * SCEditor
- * http://www.ssceditor.com/
+ * https://www.ssceditor.com/
  *
  * Copyright (C) 2011-12, Sam Clarke (samclarke.com)
  *
@@ -9,6 +9,8 @@
  */
 
 .sceditor-container {
+	display: flex;
+	flex-direction: column;
 	position: relative;
 	border: 1px solid #BBBBBB;
 	border-top: 0;
@@ -17,7 +19,7 @@
 }
 
 .sceditor-unselectable {
-	-moz-user-select: -moz-none;
+	-moz-user-select: none;
 	-khtml-user-select: none;
 	-webkit-user-select: none;
 	-o-user-select: none;
@@ -41,9 +43,10 @@
 }
 
 .sceditor-container iframe, .sceditor-container textarea {
-	display: block;
-	margin: 0 0 23px;
-	padding: 5px;
+	display: flex;
+	flex-basis: 100%;
+	margin: 0 0 2em;
+	padding: 0 5px;
 	outline: none;
 	border: 0;
 	color: #444444;
@@ -61,10 +64,10 @@
 	top: 0;
 	left: 0;
 	z-index: 2;
-	width: 3000px;
-	height: 6000px;
-	background: #FFFFFF;
-	opacity: 0.7;
+	width: 100%;
+	height: 100%;
+	background: #222222;
+	opacity: 0.2;
 }
 
 .sceditor-grip {
@@ -74,7 +77,7 @@
 	left: 0;
 	z-index: 3;
 	overflow: hidden;
-	height: 22px;
+	height: 2em;
 	border-top: 1px solid #CCCCCC;
 	border-radius: 0 0 4px 4px;
 	background: #FAFAFA url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAQAAAAnOwc2AAAAJUlEQVR42mMgFyhJKM3EIqQkgSEEwmhCEIwiBMPYhGAASQg3AAB5Og6WLqLJcAAAAABJRU5ErkJggg==) 100% 100% no-repeat;
@@ -154,6 +157,7 @@
 	overflow: auto;
 	margin: 0;
 	max-width: 50%;
+	min-width: 10%;
 	max-height: 50%;
 	text-align: center;
 	cursor: pointer;
@@ -166,10 +170,17 @@
 }
 
 #sceditor-popup-close {
-	padding: 2px 0;
-	border-right: 1px solid #BBBBBB;
-	border-bottom: 1px solid #BBBBBB;
-	border-left: 1px solid #BBBBBB;
+	display: inline-block;
+	padding: 0 .35em;
+	border-radius: 0.125em;
+	font-size: 0.857em;
+	line-height: 1.85em;
+	color: #585858;
+	border: 1px solid #AFAFAF;
+	border-top-color: #CFCFCF;
+	border-left-color: #BFBFBF;
+	background: #F4F4F4 linear-gradient(to bottom, #FEFEFE, #E4E4E4);
+	box-shadow: 1px 1px 2px #E5E5E5, 0 -1px 0 #E5E5E5 inset;
 }
 
 .sceditor-fontsize-option, .sceditor-font-option {
@@ -273,7 +284,8 @@
 
 .sceditor-popup-grip {
 	display: block;
-	height: 15px;
+	height: 1.5em;
+	cursor: move;
 }
 
 div.sceditor-group {

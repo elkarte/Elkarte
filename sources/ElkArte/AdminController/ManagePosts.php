@@ -49,10 +49,6 @@ class ManagePosts extends AbstractController
 		$subActions = array(
 			'posts' => array(
 				$this, 'action_postSettings_display', 'permission' => 'admin_forum'),
-			'bbc' => array(
-				'function' => 'action_index',
-				'controller' => '\\ElkArte\\AdminController\\ManageBBC',
-				'permission' => 'admin_forum'),
 			'censor' => array(
 				$this, 'action_censor', 'permission' => 'admin_forum'),
 			'topics' => array(

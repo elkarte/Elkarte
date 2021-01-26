@@ -11,8 +11,7 @@
  * relates to an sceditor invocation
  */
 
-(function ($, window, document)
-{
+(function (sceditor) {
 	'use strict';
 
 	// Editor instance
@@ -322,7 +321,7 @@
 	 *  - Called from the editor as a plugin
 	 *  - Monitors events so we control the elk_draft autosaver (on/off/change)
 	 */
-	$.sceditor.plugins.draft = function ()
+	sceditor.plugins.draft = function ()
 	{
 		var base = this,
 			oDrafts;
@@ -409,4 +408,4 @@
 			oDrafts.opts._bCheckDraft = true;
 		};
 	};
-})(jQuery, window, document);
+})(sceditor);

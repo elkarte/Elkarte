@@ -539,7 +539,7 @@ function revalidateMentions(sForm, sInput)
 				cached_queries = $editor.opts.mentionOptions.cache.queries;
 
 				// Clean up the newlines and spacing so we can find the @mentions
-				body = $editor.getText().replace(/[\u00a0\r\n]/g, ' ');
+				body = $editor.val().replace(/[\u00a0\r\n]/g, ' ');
 				mentions = $($editor.opts.mentionOptions.cache.mentions);
 			}
 			// Or just our plain text quick reply box?

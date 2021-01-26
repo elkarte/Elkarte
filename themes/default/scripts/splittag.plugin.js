@@ -15,7 +15,7 @@
  *
  */
 
-(function ($)
+(function (sceditor)
 {
 	'use strict';
 
@@ -23,11 +23,11 @@
 	 * Splittag plugin interface to SCEditor
 	 *  - Called from the editor as a plugin
 	 */
-	$.sceditor.plugins.splittag = function ()
+	sceditor.plugins.splittag = function ()
 	{
 		var base = this,
-			editor,
 			tagStack = [],
+			editor,
 			// Regex to find bbc tags and attr's
 			// [1] open tag name, [2] open tag attribs, [3] closing tag name
 			regex = /\[(?:([a-z]+)([^\]]*)|(\/[a-z]+))]/gi;
@@ -65,7 +65,7 @@
 		base.split = function ()
 		{
 			// Splits tags starting at the current cursor position.
-			var i = 0,
+			let i = 0,
 				tagTextStart = "",
 				tagTextEnd = "",
 				contents = editor.val(null, false),
@@ -79,7 +79,9 @@
 			{
 				// Traverse in reverse and build closing tags.
 				for (i = tagStack.length - 1; i >= 0; i--)
+				{
 					tagTextStart += '[/' + tagStack[i].name + ']';
+				}
 
 				// Traverse forward and build opening tags (with attr's)
 				for (i = 0; i < tagStack.length; i++)
@@ -88,19 +90,21 @@
 					{
 						tagTextEnd += "\n";
 					}
+
 					tagTextEnd += '[' + tagStack[i].name + tagStack[i].attributes + "]";
 				}
 
 				// Did someone select text that they expect to be wrapped in tags as well?
 				if (caret.start !== caret.end)
 				{
-					editor.insertText(tagTextStart + tagTextEnd, tagTextStart + tagTextEnd);
-				}// Insert the new close/open tags at the cursor position
-				else
-				{
-					editor.insertText(tagTextStart, tagTextEnd);
+					return editor.insertText(tagTextStart + tagTextEnd, tagTextStart + tagTextEnd);
 				}
+
+				// Insert the new close/open tags at the cursor position
+				return editor.insertText(tagTextStart, tagTextEnd);
 			}
+
+			return '';
 		};
 
 		/**
@@ -133,7 +137,8 @@
 				if (matches[3])
 				{
 					tagStack.pop();
-				}// Opening tag [bbcName], add it to the stack
+				}
+				// Opening tag [bbcName], add it to the stack
 				else
 				{
 					tagStack.push({"name": matches[1], "attributes": matches[2]});
@@ -159,7 +164,7 @@
 		base.split_wizzy = function ()
 		{
 			// sceditor's RangeHelper
-			var rangeHelper = editor.getRangeHelper(),
+			let rangeHelper = editor.getRangeHelper(),
 				contentAfterRangeStart,
 				quote,
 				range,
@@ -213,7 +218,7 @@
 				range.insertNode(blank);
 
 				// Move the caret to the split text entry point
-				var range_new = document.createRange();
+				let range_new = document.createRange();
 				range_new.setStartBefore(blank);
 				rangeHelper.selectRange(range_new);
 				range_new.collapse(false);
@@ -225,4 +230,4 @@
 			}
 		};
 	};
-})(jQuery);
+})(sceditor);

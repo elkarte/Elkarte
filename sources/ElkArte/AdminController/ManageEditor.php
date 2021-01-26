@@ -19,22 +19,22 @@ use ElkArte\Action;
 use ElkArte\SettingsForm\SettingsForm;
 
 /**
- * ManageBBC controller handles administration options for BBC tags.
+ * ManageEditor controller handles administration options for BBC tags.
  *
- * @package BBC
+ * @package Editor
  */
-class ManageBBC extends AbstractController
+class ManageEditor extends AbstractController
 {
 	/**
-	 * The BBC admin area
+	 * The Editor admin area
 	 *
 	 * What it does:
 	 *
-	 * - This method is the entry point for index.php?action=admin;area=postsettings;sa=bbc
+	 * - This method is the entry point for index.php?action=admin;area=postsettings;sa=editor
 	 * and it calls a function based on the sub-action, here only display.
 	 * - requires admin_forum permissions
 	 *
-	 * @event integrate_sa_manage_bbc Used to add more sub actions
+	 * @event integrate_sa_manage_editor Used to add more sub actions
 	 * @see \ElkArte\AbstractController::action_index()
 	 */
 	public function action_index()
@@ -44,31 +44,31 @@ class ManageBBC extends AbstractController
 		$subActions = array(
 			'display' => array(
 				'controller' => $this,
-				'function' => 'action_bbcSettings_display',
+				'function' => 'action_editorSettings_display',
 				'permission' => 'admin_forum')
 		);
 
 		// Set up
-		$action = new Action('manage_bbc');
+		$action = new Action('manage_editor');
 
-		// Only one option I'm afraid, but integrate_sa_manage_bbc can add more
+		// Only one option I'm afraid, but integrate_sa_manage_editor can add more
 		$subAction = $action->initialize($subActions, 'display');
 		$context['sub_action'] = $subAction;
-		$context['page_title'] = $txt['manageposts_bbc_settings_title'];
+		$context['page_title'] = $txt['manageposts_editor_settings_title'];
 
 		// Make the call
 		$action->dispatch($subAction);
 	}
 
 	/**
-	 * Administration page in Posts and Topics > BBC.
+	 * Administration page in Posts and Topics > Editor.
 	 *
 	 * - This method handles displaying and changing which BBC tags are enabled on the forum.
 	 *
 	 * @event integrate_save_bbc_settings called during the save action
-	 * @uses Admin template, edit_bbc_settings sub-template.
+	 * @uses Admin template, edit_editor_settings sub-template.
 	 */
-	public function action_bbcSettings_display()
+	public function action_editorSettings_display()
 	{
 		global $context, $txt, $modSettings;
 
@@ -111,37 +111,42 @@ class ManageBBC extends AbstractController
 			$settingsForm->save();
 
 			// And we're out of here!
-			redirectexit('action=admin;area=postsettings;sa=bbc');
+			redirectexit('action=admin;area=editor');
 		}
 
 		// Make sure the template stuff is ready now...
 		$context['sub_template'] = 'show_settings';
-		$context['page_title'] = $txt['manageposts_bbc_settings_title'];
-		$context['post_url'] = getUrl('admin', ['action' => 'admin', 'area' => 'postsettings', 'sa' => 'bbc', 'save']);
-		$context['settings_title'] = $txt['manageposts_bbc_settings_title'];
+		$context['page_title'] = $txt['manageposts_editor_settings_title'];
+		$context['post_url'] = getUrl('admin', ['action' => 'admin', 'area' => 'editor;save']);
+		$context['settings_title'] = $txt['manageposts_editor_settings_title'];
 
 		$settingsForm->prepare();
 	}
 
 	/**
-	 * Return the BBC settings of the forum.
+	 * Return the editor settings of the forum.
 	 *
-	 * @event integrate_modify_bbc_settings used to add more options to config vars
+	 * @event integrate_modify_editor_settings used to add more options to config vars,
+	 * formerly known as integrate_modify_bbc_settings
 	 */
 	private function _settings()
 	{
 		$config_vars = array(
 			array('check', 'enableBBC'),
 			array('check', 'enableBBC', 0, 'onchange' => 'toggleBBCDisabled(\'disabledBBC\', !this.checked);'),
-			array('check', 'enablePostHTML'),
-			array('check', 'autoLinkUrls'),
-			'',
 			array('bbc', 'disabledBBC'),
+
+			array('title', 'editorSettings'),
+			array('check', 'enableUndoRedo'),
+			array('check', 'enableSplitTag'),
+
+			array('title', 'mods_cat_modifications_misc'),
+			array('check', 'autoLinkUrls'), // @todo not editor or bbc
+			array('check', 'enablePostHTML'),
 		);
 
 		// Add new settings with a nice hook, makes them available for admin settings search as well
-		call_integration_hook('integrate_modify_bbc_settings', array(&$config_vars));
-
+		call_integration_hook('integrate_modify_editor_settings', array(&$config_vars));
 		return $config_vars;
 	}
 

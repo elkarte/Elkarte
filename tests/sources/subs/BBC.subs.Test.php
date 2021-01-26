@@ -32,22 +32,22 @@ class TestBBC extends \PHPUnit\Framework\TestCase
 		// Standard testcases
 		$this->bbcTestCases = array(
 			array(
-				'Test abbreviation',
-				'[abbr=so have obtained random text]short[/abbr]',
-				'<abbr title="so have obtained random text">short</abbr>',
-			),
-			array(
-				'Test abbreviation',
+				'Test abbreviation 1',
 				'[abbr=so have obtained random &quot;quoted&quot; text]shor"q"t[/abbr]',
 				'<abbr title="so have obtained random &quot;quoted&quot; text">shor"q"t</abbr>',
 			),
 			array(
-				'Test anchor',
+				'Test abbreviation 2',
+				'[abbr=so have obtained random text]short[/abbr]',
+				'<abbr title="so have obtained random text">short</abbr>',
+			),
+			array(
+				'Test anchor 1',
 				'[anchor=abc]destination[/anchor]',
 				'<span id="post_abc">destination</span>',
 			),
 			array(
-				'Test anchor',
+				'Test anchor 2',
 				'[anchor=#abc]destination[/anchor]',
 				'<span id="post_#abc">destination</span>',
 			),
@@ -535,7 +535,7 @@ Should be an empty line in between.',
 			array(
 				'Item Codes',
 				'[*]Ahoy!\n[*]Me[@]Matey\n[+]Shiver\n[x]Me\n[#]Timbers\n[!]\n[*]I[*]dunno[*]why',
-				'<ul style="list-style-type: disc" class="bbc_list"><li>Ahoy!\n</li><li>Me</li><li>Matey\n</li><li>Shiver\n</li><li>Me\n</li><li>Timbers\n[!]\n</li><li>I</li><li>dunno</li><li>why</li></ul>'
+				'<ul class="bbc_list"><li style="list-style-type: disc">Ahoy!\n</li><li style="list-style-type: disc">Me</li><li style="list-style-type: disc">Matey\n</li><li style="list-style-type: square">Shiver\n</li><li style="list-style-type: square">Me\n</li><li style="list-style-type: decimal">Timbers\n[!]\n</li><li style="list-style-type: disc">I</li><li style="list-style-type: disc">dunno</li><li style="list-style-type: disc">why</li></ul>'
 			),
 			array(
 				'UTF8',

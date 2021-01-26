@@ -193,6 +193,8 @@ class Admin extends AbstractController
 						'controller' => '\\ElkArte\\AdminController\\Admin',
 						'function' => 'action_search',
 						'permission' => array('admin_forum'),
+						'icon' => 'transparent.png',
+						'class' => 'admin_img_search',
 						'select' => 'index'
 					),
 					'adminlogoff' => array(
@@ -335,17 +337,16 @@ class Admin extends AbstractController
 						'class' => 'admin_img_posts',
 						'subsections' => array(
 							'posts' => array($txt['manageposts_settings']),
-							'bbc' => array($txt['manageposts_bbc_settings']),
 							'censor' => array($txt['admin_censored_words']),
 							'topics' => array($txt['manageposts_topic_settings']),
 						),
 					),
-					'bbc' => array(
-						'label' => $txt['bbc_manage'],
-						'controller' => '\\ElkArte\\AdminController\\ManageBBC',
+					'editor' => array(
+						'label' => $txt['editor_manage'],
+						'controller' => '\\ElkArte\\AdminController\\ManageEditor',
 						'function' => 'action_index',
 						'icon' => 'transparent.png',
-						'class' => 'admin_img_smiley',
+						'class' => 'admin_img_themes',
 						'permission' => array('manage_bbc'),
 					),
 					'smileys' => array(
@@ -844,7 +845,7 @@ class Admin extends AbstractController
 			array('settings_search', 'area=addonsettings;sa=general', '\\ElkArte\\AdminController\\AddonSettings'),
 			array('settings_search', 'area=manageattachments;sa=attachments', '\\ElkArte\\AdminController\\ManageAttachments'),
 			array('settings_search', 'area=manageattachments;sa=avatars', '\\ElkArte\\AdminController\\ManageAvatars'),
-			array('settings_search', 'area=postsettings;sa=bbc', '\\ElkArte\\AdminController\\ManageBBC'),
+			array('settings_search', 'area=postsettings;sa=bbc', '\\ElkArte\\AdminController\\ManageEditor'),
 			array('settings_search', 'area=manageboards;sa=settings', '\\ElkArte\\AdminController\\ManageBoards'),
 			array('settings_search', 'area=languages;sa=settings', '\\ElkArte\\AdminController\\ManageLanguages'),
 			array('settings_search', 'area=mailqueue;sa=settings', '\\ElkArte\\AdminController\\ManageMail'),

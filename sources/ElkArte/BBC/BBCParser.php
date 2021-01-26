@@ -758,7 +758,8 @@ class BBCParser
 				Codes::ATTR_LENGTH => 4,
 				Codes::ATTR_AUTOLINK => true,
 			));
-			$code = '<ul' . ($tag === '' ? '' : ' style="list-style-type: ' . $tag . '"') . ' class="bbc_list">';
+
+			$code = '<ul class="bbc_list">';
 		}
 		// We're in a list item already: another itemcode?  Close it first.
 		elseif (isset($this->inside_tag[Codes::ATTR_TAG]) && $this->inside_tag[Codes::ATTR_TAG] === 'li')
@@ -784,8 +785,7 @@ class BBCParser
 		));
 
 		// First, open the tag...
-		$code .= '<li>';
-
+		$code .= '<li style="list-style-type: ' . $tag . '">';
 		$tmp = $this->noSmileys($code);
 		$this->message = substr_replace($this->message, $tmp, $this->pos, 3);
 		$this->pos += strlen($tmp) - 1;

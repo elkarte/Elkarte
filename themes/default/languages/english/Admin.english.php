@@ -150,8 +150,8 @@ $txt['viewmembers_online'] = 'Last Online';
 $txt['smileys_manage'] = 'Smileys and Message Icons';
 $txt['smileys_manage_info'] = 'Install new smiley sets, add smileys to existing sets or manage your message icons.';
 
-$txt['bbc_manage'] = 'Bulletin Board Codes (BBC)';
-$txt['bbc_manage_info'] = 'Add, remove, and edit bulletin board codes.';
+$txt['editor_manage'] = 'Editor & BBC settings';
+$txt['editor_manage_info'] = 'Add, remove, and edit options for the editor, including bulletin board codes (BBC).';
 
 $txt['package_info'] = 'Install, download and upload Modification packages; check File Permissions and FTP settings.';
 $txt['theme_admin'] = 'Theme Management';
@@ -589,7 +589,7 @@ $txt['manageposts_settings_description'] = 'Here you can set everything related 
 
 $txt['manageposts_bbc_settings'] = 'Bulletin Board Code';
 $txt['manageposts_bbc_settings_description'] = 'Bulletin board code can be used to add markup to forum messages. For example, to highlight the word \'house\' you can type [b]house[/b]. All Bulletin board code tags are surrounded by square brackets (\'[\' and \']\').';
-$txt['manageposts_bbc_settings_title'] = 'Bulletin Board Code settings';
+$txt['manageposts_editor_settings_title'] = 'Editor and Bulletin Board Code settings';
 
 $txt['manageposts_topic_settings'] = 'Topic Settings';
 $txt['manageposts_topic_settings_description'] = 'Here you can set all settings involving topics.';
@@ -630,12 +630,15 @@ $txt['message_index_preview_first'] = 'Show the text of the first post';
 $txt['message_index_preview_last'] = 'Show the text of the last post';
 
 $txt['enableBBC'] = 'Enable bulletin board code (BBC)';
-$txt['enablePostHTML'] = 'Enable <em>basic</em> HTML in posts';
+$txt['enablePostHTML'] = 'Enable basic HTML in posts';
 $txt['autoLinkUrls'] = 'Automatically link posted URLs';
 $txt['disabledBBC'] = 'Enabled BBC tags';
 $txt['bbcTagsToUse'] = 'Enabled BBC tags';
 $txt['bbcTagsToUse_select'] = 'Select the tags allowed to be used';
 $txt['bbcTagsToUse_select_all'] = 'Select all tags';
+$txt['editorSettings'] = 'Editor Options';
+$txt['enableUndoRedo'] = 'Enable the undo/redo plugin';
+$txt['enableSplitTag'] = 'Enable the split tag plugin';
 
 $txt['enableParticipation'] = 'Enable participation icons';
 $txt['enableFollowup'] = 'Enable followups';

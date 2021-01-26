@@ -53,7 +53,7 @@ class TestPersonalMessageController extends ElkArteCommonSetupTest
 
 	public function testActionSendPM()
 	{
-		global $context, $txt;
+		global $context;
 
 		$req = \ElkArte\HttpReq::instance();
 		$req->query->sa = 'send';
