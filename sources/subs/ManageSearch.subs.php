@@ -205,12 +205,12 @@ source ', $prefix, '_source
 			m.poster_time, m.body, m.subject, t.num_replies + 1 AS num_replies, t.num_likes, t.is_sticky, \
 			1 - ((m.id_msg - t.id_first_msg) / (t.id_last_msg - t.id_first_msg)) AS position, \		
 			CEILING(10 * ( \
-				CASE WHEN m.id_msg < 0.8 * s.value THEN 0 ELSE (m.id_msg - 0.8 * s.value) / (0.2 * s.value) END * ' . $weight['age'] . ' + \
+				CASE WHEN m.id_msg < 0.6 * s.value THEN 0 ELSE (m.id_msg - 0.6 * s.value) / (0.4 * s.value) END * ' . $weight['age'] . ' + \
 				CASE WHEN t.num_replies < 50 THEN t.num_replies / 50 ELSE 1 END * ' . $weight['length'] . ' + \
 				CASE WHEN m.id_msg = t.id_first_msg THEN 1 ELSE 0 END * ' . $weight['first_message'] . ' + \
 				CASE WHEN t.num_likes < 20 THEN t.num_likes / 20 ELSE 1 END * ' . $weight['likes'] . ' + \
 				CASE WHEN t.is_sticky = 0 THEN 0 ELSE 1 END * ' . $weight['sticky'] . ' \
-			) /1) AS relevance \
+			) * 100/' . $weight_total . ') AS acprel \
 		FROM ', $db_prefix, 'messages AS m, ', $db_prefix, 'topics AS t, ', $db_prefix, 'settings AS s \
 		WHERE t.id_topic = m.id_topic \
 			AND s.variable = \'maxMsgID\' \
@@ -219,7 +219,7 @@ source ', $prefix, '_source
 	sql_attr_uint		= id_board
 	sql_attr_uint		= id_member
 	sql_attr_uint		= poster_time
-	sql_attr_uint		= relevance
+	sql_attr_float		= acprel
 	sql_attr_uint		= num_replies
 	sql_attr_uint		= num_likes
 	sql_attr_bool		= is_sticky
