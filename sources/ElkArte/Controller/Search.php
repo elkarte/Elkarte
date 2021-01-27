@@ -68,20 +68,22 @@ class Search extends AbstractController
 		global $modSettings;
 
 		// Coming from quick search box and going to some custom place?
-		if (isset($_REQUEST['search_selection']) && !empty($modSettings['additional_search_engines']))
+		$search_selection = $this->_req->getRequest(('search_selection'), 'trim');
+		$search = $this->_req->getRequest(('search_selection'), 'trim');
+		if (isset($search_selection) && !empty($modSettings['additional_search_engines']))
 		{
 			$engines = prepareSearchEngines();
-			if (isset($engines[$_REQUEST['search_selection']]))
+			if (isset($engines[$search_selection]))
 			{
-				$engine = $engines[$_REQUEST['search_selection']];
-				redirectexit($engine['url'] . urlencode(implode($engine['separator'], explode(' ', $_REQUEST['search']))));
+				$engine = $engines[$search_selection];
+				redirectexit($engine['url'] . urlencode(implode($engine['separator'], explode(' ', $search))));
 			}
 		}
 
 		// If coming from the quick search box, and we want to search on members, well we need to do that ;)
-		if (isset($_REQUEST['search_selection']) && $_REQUEST['search_selection'] === 'members')
+		if (isset($search_selection) && $search_selection === 'members')
 		{
-			redirectexit('action=memberlist;sa=search;fields=name,email;search=' . urlencode($_REQUEST['search']));
+			redirectexit('action=memberlist;sa=search;fields=name,email;search=' . urlencode($search));
 		}
 
 		// If load management is on and the load is high, no need to even show the form.
@@ -134,7 +136,8 @@ class Search extends AbstractController
 		theme()->getTemplates()->loadLanguageFile('Search');
 
 		// Don't load this in XML mode.
-		if (!isset($_REQUEST['xml']))
+		$xml = $this->_req->getRequest('xml');
+		if (!isset($xml))
 		{
 			theme()->getTemplates()->load('Search');
 			$context['sub_template'] = 'searchform';
@@ -166,33 +169,40 @@ class Search extends AbstractController
 		}
 
 		// If you got back from search;sa=results by using the linktree, you get your original search parameters back.
-		if ($this->_search === null && isset($_REQUEST['params']))
+		$params = $this->_req->getQuery('params');
+		if ($this->_search === null && isset($params))
 		{
-			$search_params = new SearchParams($_REQUEST['params'] ?? '');
+			$search_params = new SearchParams($params);
 
 			$context['search_params'] = $search_params->get();
 		}
 
-		if (isset($_REQUEST['search']))
+		$search = $this->_req->getRequest('search', 'un_htmlspecialchars|trim');
+		if (isset($search))
 		{
-			$context['search_params']['search'] = un_htmlspecialchars($_REQUEST['search']);
+			$context['search_params']['search'] = $search;
 		}
+
 		if (isset($context['search_params']['search']))
 		{
 			$context['search_params']['search'] = Util::htmlspecialchars($context['search_params']['search']);
 		}
+
 		if (isset($context['search_params']['userspec']))
 		{
 			$context['search_params']['userspec'] = htmlspecialchars($context['search_params']['userspec'], ENT_COMPAT, 'UTF-8');
 		}
+
 		if (!empty($context['search_params']['searchtype']))
 		{
 			$context['search_params']['searchtype'] = 2;
 		}
+
 		if (!empty($context['search_params']['minage']))
 		{
 			$context['search_params']['minage'] = (int) $context['search_params']['minage'];
 		}
+
 		if (!empty($context['search_params']['maxage']))
 		{
 			$context['search_params']['maxage'] = (int) $context['search_params']['maxage'];
@@ -236,9 +246,10 @@ class Search extends AbstractController
 			}
 		}
 
-		if (!empty($_REQUEST['topic']))
+		$topic = $this->_req->getRequest('topic', 'intval', 0);
+		if (!empty($topic))
 		{
-			$context['search_params']['topic'] = (int) $_REQUEST['topic'];
+			$context['search_params']['topic'] = $topic;
 			$context['search_params']['show_complete'] = true;
 		}
 
@@ -338,7 +349,8 @@ class Search extends AbstractController
 		$context['search_string_limit'] = 100;
 
 		theme()->getTemplates()->loadLanguageFile('Search');
-		if (!isset($_REQUEST['xml']))
+		$xml = $this->_req->getRequest('xml');
+		if (!isset($xml))
 		{
 			theme()->getTemplates()->load('Search');
 		}
@@ -351,10 +363,11 @@ class Search extends AbstractController
 		// Are you allowed?
 		isAllowedTo('search_posts');
 
+		$params = $this->_req->getRequest('params', '', '');
 		$this->_search = new \ElkArte\Search\Search();
 		$this->_search->setWeights(new WeightFactors($modSettings, $this->user->is_admin));
-		$search_params = new SearchParams($_REQUEST['params'] ?? '');
-		$search_params->merge($_REQUEST, $recentPercentage, $maxMembersToSearch);
+		$search_params = new SearchParams($params);
+		$search_params->merge((array) $this->_req->post, $recentPercentage, $maxMembersToSearch);
 		$this->_search->setParams($search_params, !empty($modSettings['search_simple_fulltext']));
 
 		$context['compact'] = $this->_search->isCompact();
@@ -530,7 +543,8 @@ class Search extends AbstractController
 		}
 
 		// Now that we know how many results to expect we can start calculating the page numbers.
-		$context['page_index'] = constructPageIndex(getUrl('action', ['action' => 'search', 'sa' => 'results', 'params' => $context['params']]), $_REQUEST['start'], $this->_search->getNumResults(), $modSettings['search_results_per_page'], false);
+		$start = $this->_req->getRequest('start', 'intval', 0);
+		$context['page_index'] = constructPageIndex(getUrl('action', ['action' => 'search', 'sa' => 'results', 'params' => $context['params']]), $start, $this->_search->getNumResults(), $modSettings['search_results_per_page'], false);
 
 		// Consider the search complete!
 		Cache::instance()->remove('search_start:' . ($this->user->is_guest ? $this->user->ip : $this->user->id));
@@ -684,7 +698,8 @@ class Search extends AbstractController
 		if ($this->user->is_guest && !empty($modSettings['search_enable_captcha']) && empty($_SESSION['ss_vv_passed']) && (empty($_SESSION['last_ss']) || $_SESSION['last_ss'] !== $this->_search->param('search')))
 		{
 			// If we come from another search box tone down the error...
-			if (!isset($_REQUEST['search_vv']))
+			$searchvv = $this->_req->getRequest('search_vv', 'trim');
+			if (!isset($searchvv))
 			{
 				$context['search_errors']['need_verification_code'] = true;
 			}
