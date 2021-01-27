@@ -12,6 +12,7 @@
 
 namespace ElkArte\Search\API;
 
+use ElkArte\HttpReq;
 use ElkArte\Search\SearchArray;
 use ElkArte\Search\WeightFactors;
 use ElkArte\Util;
@@ -24,152 +25,71 @@ use ElkArte\Util;
  */
 abstract class AbstractAPI
 {
-	/**
-	 * This is the last version of ElkArte that this was tested on, to protect against API changes.
-	 *
-	 * @var string
-	 */
+	/** @var string This is the last version of ElkArte that this was tested on, to protect against API changes. */
 	public $version_compatible;
 
-	/**
-	 * This won't work with versions of ElkArte less than this.
-	 *
-	 * @var string
-	 */
+	/** @var string This won't work with versions of ElkArte less than this. */
 	public $min_elk_version;
 
-	/**
-	 * Standard search is supported by default.
-	 *
-	 * @var bool
-	 */
+	/** @var bool Standard search is supported by default. */
 	public $is_supported;
 
-	/**
-	 * Any word excluded from the search?
-	 *
-	 * @var array
-	 */
+	/** @var array Any word excluded from the search? */
 	protected $_excludedWords = array();
 
-	/**
-	 * Number of hits
-	 *
-	 * @var int
-	 */
+	/** @var int Number of hits */
 	protected $_num_results = 0;
 
-	/**
-	 * What words are banned?
-	 *
-	 * @var array
-	 */
+	/** @var array What words are banned? */
 	protected $bannedWords = array();
 
-	/**
-	 * What is the minimum word length?
-	 *
-	 * @var int
-	 */
+	/** @var int What is the minimum word length? */
 	protected $min_word_length = 3;
 
-	/**
-	 * All the search configurations
-	 *
-	 * @var \ElkArte\ValuesContainer
-	 */
+	/** @var \ElkArte\ValuesContainer All the search configurations */
 	protected $config = null;
 
-	/**
-	 * Parameters of the search
-	 *
-	 * @var null|\ElkArte\Search\SearchParams
-	 */
+	/** @var null|\ElkArte\Search\SearchParams Parameters of the search */
 	protected $_searchParams = null;
 
-	/**
-	 * The weights to associate to various areas for relevancy
-	 *
-	 * @var array
-	 */
+	/** @var array The weights to associate to various areas for relevancy */
 	protected $_weight_factors = array();
 
-	/**
-	 * Weighing factor each area, ie frequency, age, sticky, etc
-	 *
-	 * @var array
-	 */
+	/** @var array Weighing factor each area, ie frequency, age, sticky, etc */
 	protected $_weight = array();
 
-	/**
-	 * The sum of the _weight_factors, normally but not always 100
-	 *
-	 * @var int
-	 */
+	/** @var int The sum of the _weight_factors, normally but not always 100*/
 	protected $_weight_total = 0;
 
-	/**
-	 * If we are creating a tmp db table
-	 *
-	 * @var bool
-	 */
+	/** @var bool If we are creating a tmp db table */
 	protected $_createTemporary = true;
 
-	/**
-	 * Builds the array of words for use in the db query
-	 *
-	 * @var array
-	 */
+	/** @var array Builds the array of words for use in the db query */
 	protected $_searchWords = array();
 
-	/**
-	 * Phrases not to be found in the search results (-"some phrase")
-	 *
-	 * @var array
-	 */
+	/** @var array Phrases not to be found in the search results (-"some phrase") */
 	protected $_excludedPhrases = array();
 
-	/**
-	 * Database instance
-	 *
-	 * @var \ElkArte\Database\QueryInterface
-	 */
+	/** @var \ElkArte\Database\QueryInterface Database instance */
 	protected $_db;
 
-	/**
-	 * Search db instance
-	 *
-	 * @var \ElkArte\Database\AbstractSearch
-	 */
+	/** @var \Elkarte\HttpReq HttpReq instance */
+	protected $_req;
+
+	/** @var \ElkArte\Database\AbstractSearch Search db instance */
 	protected $_db_search;
 
-	/**
-	 * Words excluded from indexes
-	 *
-	 * @var array
-	 */
+	/** @var array Words excluded from indexes */
 	protected $_excludedIndexWords = array();
 
-	/**
-	 * Words not be be found in the subject (-word)
-	 *
-	 * @var array
-	 */
+	/** @var array Words not be be found in the subject (-word) */
 	protected $_excludedSubjectWords = array();
 
-	/**
-	 * Holds the words and phrases to be searched on
-	 *
-	 * @var \ElkArte\Search\SearchArray
-	 */
+	/** @var \ElkArte\Search\SearchArray Holds the words and phrases to be searched on */
 	protected $_searchArray = null;
 
-	/**
-	 * What databases do we support? (In general.)
-	 *
-	 * @var array
-	 */
-	protected $supported_databases = array('MySQL', 'PostgreSQL');
+	/** @var array What databases do we support? (In general.) */
+	protected $supported_databases = ['MySQL', 'PostgreSQL'];
 
 	/**
 	 * __construct()
@@ -184,6 +104,8 @@ abstract class AbstractAPI
 
 		$this->_db = database();
 		$this->_db_search = db_search();
+
+		$this->_req = HttpReq::instance();
 	}
 
 	/**
@@ -295,11 +217,12 @@ abstract class AbstractAPI
 	 * @param string $word
 	 * @param string $wordsSearch
 	 * @param string $wordsExclude
-	 * @param string $isExcluded
+	 * @param boolean $isExcluded
 	 * @param string $excludedSubjectWords
 	 */
 	public function prepareIndexes($word, &$wordsSearch, &$wordsExclude, $isExcluded, $excludedSubjectWords)
 	{
+		// API specific implementations
 	}
 
 	/**

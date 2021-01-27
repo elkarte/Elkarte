@@ -17,7 +17,6 @@
 namespace ElkArte\Search\API;
 
 use ElkArte\Search\Cache\Session;
-use ElkArte\Util;
 
 /**
  * SearchAPI-Standard.class.php, Standard non full index, non custom index search
@@ -70,7 +69,7 @@ class Standard extends AbstractAPI
 	 * @return mixed[]
 	 * @throws \Exception
 	 */
-	public function searchQuery($search_words, $excluded_words, &$participants, &$search_results)
+	public function searchQuery($search_words, $excluded_words, &$participants)
 	{
 		global $context, $modSettings;
 
@@ -91,10 +90,7 @@ class Standard extends AbstractAPI
 
 			if ($this->_searchParams['subject_only'])
 			{
-				$num_res = $this->getSubjectResults(
-					$search_id,
-					$search_words, $excluded_words
-				);
+				$num_res = $this->getSubjectResults($search_id, $search_words, $excluded_words);
 			}
 			else
 			{
@@ -113,12 +109,8 @@ class Standard extends AbstractAPI
 
 		// *** Retrieve the results to be shown on the page
 		$topics = array();
-		$participants = $this->addRelevance($topics, $search_id, (int) $_REQUEST['start'], $modSettings['search_results_per_page']);
+		$participants = $this->addRelevance($topics, $search_id, $this->_req->getRequest('start', 'intval', 0), $modSettings['search_results_per_page']);
 		$this->_num_results = $this->_search_cache->getNumResults();
-
-// 1200
-// [1233] = >bool(false)
-// [23289]=> array(3) { ["relevance"]=> string(5) "38.3%" ["num_matches"]=> string(1) "2" ["matches"]=> array(0) { } } }
 
 		return $topics;
 	}
@@ -151,6 +143,7 @@ class Standard extends AbstractAPI
 		global $modSettings;
 
 		$numSubjectResults = 0;
+
 		// We do this to try and avoid duplicate keys on databases not supporting INSERT IGNORE.
 		foreach ($search_words as $words)
 		{

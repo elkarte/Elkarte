@@ -24,68 +24,45 @@ use ElkArte\Util;
 class SearchArray
 {
 	/**
-	 * $_search_params will carry all settings that differ from the default search parameters.
+	 * The provided search orwell "striking thirteen" -movie
 	 *
 	 * That way, the URLs involved in a search page will be kept as short as possible.
 	 */
 	protected $_search_string = [];
-	/**
-	 * Words not be be found in the search results (-word)
-	 *
-	 * @var array
-	 */
+
+	/** @var array Words not be be found in the search results (-word) */
 	private $_excludedWords = [];
-	/**
-	 * Simplify the fulltext search
-	 *
-	 * @var bool
-	 */
+
+	/** @var bool Simplify the fulltext search */
 	private $_search_simple_fulltext = false;
-	/**
-	 * If we are performing a boolean or simple search
-	 *
-	 * @var bool
-	 */
+
+	/** @var bool If we are performing a boolean or simple search */
 	private $_no_regexp = false;
-	/**
-	 * Holds the words and phrases to be searched on
-	 *
-	 * @var array
-	 */
+
+	/** @var array Holds the words and phrases to be searched on */
 	private $_searchArray = [];
-	/**
-	 * Words we do not search due to length or common terms
-	 *
-	 * @var array
-	 */
-	private $_blacklisted_words = [];
-	/**
-	 * If search words were found on the blacklist
-	 *
-	 * @var bool
-	 */
-	private $_foundBlackListedWords = false;
-	/**
-	 * Holds words that will not be search on to inform the user they were skipped
-	 *
-	 * @var array
-	 */
+
+	/** @var array Words we do not search due to length or common terms */
+	private $_blocklist_words = [];
+
+	/** @var bool If search words were found on the blocklist */
+	private $_foundBlockListedWords = false;
+
+	/** @var array Holds words that will not be search on to inform the user they were skipped */
 	private $_ignored = [];
 
 	/**
 	 * Usual constructor that does what any constructor does.
 	 *
 	 * @param string $search_string
-	 * @param string[] $blacklisted_words
+	 * @param string[] $blocklist_words
 	 * @param bool $search_simple_fulltext
 	 */
-	public function __construct($search_string, $blacklisted_words, $search_simple_fulltext = false)
+	public function __construct($search_string, $blocklist_words, $search_simple_fulltext = false)
 	{
 		$this->_search_string = $search_string;
 		$this->_search_simple_fulltext = $search_simple_fulltext;
-		$this->_blacklisted_words = $blacklisted_words;
-
-
+		$this->_blocklist_words = $blocklist_words;
 		$this->searchArray();
 	}
 
@@ -133,10 +110,10 @@ class SearchArray
 			{
 				unset($this->_searchArray[$index]);
 			}
-			// Skip blacklisted words. Make sure to note we skipped them in case we end up with nothing.
-			elseif (in_array($this->_searchArray[$index], $this->_blacklisted_words))
+			// Skip blocklisted words. Make sure to note we skipped them in case we end up with nothing.
+			elseif (in_array($this->_searchArray[$index], $this->_blocklist_words))
 			{
-				$this->_foundBlackListedWords = true;
+				$this->_foundBlockListedWords = true;
 				unset($this->_searchArray[$index]);
 			}
 			// Don't allow very, very short words.
@@ -156,7 +133,7 @@ class SearchArray
 	 * Looks for phrases that should be excluded from results
 	 *
 	 * - Check for things like -"some words", but not "-some words"
-	 * - Prevents redundancy with blacklisted words
+	 * - Prevents redundancy with blocklist words
 	 *
 	 * @param string[] $matches
 	 * @param string[] $phraseArray
@@ -169,7 +146,7 @@ class SearchArray
 		{
 			if ($word === '-')
 			{
-				if (($word = trim($phraseArray[$index], '-_\' ')) !== '' && !in_array($word, $this->_blacklisted_words))
+				if (($word = trim($phraseArray[$index], '-_\' ')) !== '' && !in_array($word, $this->_blocklist_words))
 				{
 					$this->_excludedWords[] = $word;
 				}
@@ -185,7 +162,7 @@ class SearchArray
 	 * Looks for words that should be excluded in the results (-word)
 	 *
 	 * - Look for -test, etc
-	 * - Prevents excluding blacklisted words since it is redundant
+	 * - Prevents excluding blocklist words since it is redundant
 	 *
 	 * @param string[] $wordArray
 	 *
@@ -197,7 +174,7 @@ class SearchArray
 		{
 			if (strpos(trim($word), '-') === 0)
 			{
-				if (($word = trim($word, '-_\' ')) !== '' && !in_array($word, $this->_blacklisted_words))
+				if (($word = trim($word, '-_\' ')) !== '' && !in_array($word, $this->_blocklist_words))
 				{
 					$this->_excludedWords[] = $word;
 				}
@@ -344,9 +321,9 @@ class SearchArray
 		return $this->_no_regexp;
 	}
 
-	public function foundBlackListedWords()
+	public function foundBlockListedWords()
 	{
-		return $this->_foundBlackListedWords;
+		return $this->_foundBlockListedWords;
 	}
 
 	public function getIgnored()

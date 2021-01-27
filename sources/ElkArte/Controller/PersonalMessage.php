@@ -2320,8 +2320,8 @@ class PersonalMessage extends AbstractController
 		// Sort out any labels we may be searching by.
 		$labelQuery = $this->_setLabelQuery();
 
-		// Unfortunately, searching for words like this is going to be slow, so we're blacklisting them.
-		$blacklisted_words = array('quote', 'the', 'is', 'it', 'are', 'if');
+		// Unfortunately, searching for words like this is going to be slow, so we're blocking them.
+		$blocklist_words = array('quote', 'the', 'is', 'it', 'are', 'if', 'in');
 
 		// What are we actually searching for?
 		$this->_search_params['search'] = !empty($this->_search_params['search']) ? $this->_search_params['search'] : (isset($this->_req->post->search) ? $this->_req->post->search : '');
@@ -2354,7 +2354,7 @@ class PersonalMessage extends AbstractController
 		{
 			if ($word === '-')
 			{
-				if (($word = trim($phraseArray[$index], '-_\' ')) !== '' && !in_array($word, $blacklisted_words))
+				if (($word = trim($phraseArray[$index], '-_\' ')) !== '' && !in_array($word, $blocklist_words))
 				{
 					$excludedWords[] = $word;
 				}
@@ -2367,7 +2367,7 @@ class PersonalMessage extends AbstractController
 		{
 			if (strpos(trim($word), '-') === 0)
 			{
-				if (($word = trim($word, '-_\' ')) !== '' && !in_array($word, $blacklisted_words))
+				if (($word = trim($word, '-_\' ')) !== '' && !in_array($word, $blocklist_words))
 				{
 					$excludedWords[] = $word;
 				}
@@ -2386,10 +2386,10 @@ class PersonalMessage extends AbstractController
 			{
 				unset($searchArray[$index]);
 			}
-			// Skip blacklisted words. Make sure to note we skipped them as well
-			elseif (in_array($searchArray[$index], $blacklisted_words))
+			// Skip blocked words. Make sure to note we skipped them as well
+			elseif (in_array($searchArray[$index], $blocklist_words))
 			{
-				$foundBlackListedWords = true;
+				$foundBlockListedWords = true;
 				unset($searchArray[$index]);
 
 			}
@@ -2418,7 +2418,7 @@ class PersonalMessage extends AbstractController
 		// Make sure at least one word is being searched for.
 		if (empty($searchArray))
 		{
-			$context['search_errors']['invalid_search_string' . (!empty($foundBlackListedWords) ? '_blacklist' : '')] = true;
+			$context['search_errors']['invalid_search_string' . (!empty($foundBlockListedWords) ? '_blocklist' : '')] = true;
 		}
 
 		// Sort out the search query so the user can edit it - if they want.

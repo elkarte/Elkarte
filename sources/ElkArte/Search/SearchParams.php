@@ -18,6 +18,7 @@ namespace ElkArte\Search;
 
 use ElkArte\DataValidator;
 use ElkArte\Exceptions\Exception;
+use ElkArte\HttpReq;
 use ElkArte\User;
 use ElkArte\Util;
 use ElkArte\ValuesContainer;
@@ -48,6 +49,15 @@ class SearchParams extends ValuesContainer
 	/** @var int[] */
 	public $_memberlist = [];
 
+	/** @var string The string containing encoded search params */
+	protected $_search_string = '';
+
+	/** @var \ElkArte\Database\QueryInterface|null */
+	protected $_db;
+
+	/** @var \Elkarte\HttpReq HttpReq instance */
+	protected $_req;
+
 	/**
 	 * $_search_params will carry all settings that differ from the default search parameters.
 	 * That way, the URLs involved in a search page will be kept as short as possible.
@@ -55,12 +65,6 @@ class SearchParams extends ValuesContainer
 	 * @var mixed
 	 */
 	protected $_search_params = [];
-
-	/** @var string The string containing encoded search params */
-	protected $_search_string = '';
-
-	/** @var \ElkArte\Database\QueryInterface|null */
-	protected $_db;
 
 	/**
 	 * Constructor
@@ -73,6 +77,7 @@ class SearchParams extends ValuesContainer
 		$this->_search_string = $string;
 		$this->prepare();
 		$this->data = &$this->_search_params;
+		$this->_req = HttpReq::instance();
 	}
 
 	/**
@@ -582,17 +587,7 @@ class SearchParams extends ValuesContainer
 			return $this->_search_params['search'];
 		}
 
-		if (isset($_GET['search']))
-		{
-			return un_htmlspecialchars($_GET['search']);
-		}
-
-		if (isset($_POST['search']))
-		{
-			return $_POST['search'];
-		}
-
-		return '';
+		return $this->_req->getRequest('search', 'un_htmlspecialchars', '');
 	}
 
 	/**

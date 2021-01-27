@@ -480,7 +480,6 @@ function createSearchIndex($start, $messages_per_batch, $column_size_definition,
  * @return array
  * @throws \ElkArte\Exceptions\Exception
  * @package Search
- *
  */
 function removeCommonWordsFromIndex($start, $column_definition)
 {

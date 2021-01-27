@@ -27,7 +27,7 @@ class Search
 	/** @var mixed[] */
 	protected $_participants = [];
 
-	/** @var null|\ElkArte\Search\SearchParams */
+	/** @var \ElkArte\Search\SearchParams */
 	protected $_searchParams;
 
 	/** @var \ElkArte\Search\SearchArray Holds the words and phrases to be searched on  */
@@ -180,22 +180,22 @@ class Search
 	{
 		$this->_searchParams = $paramObject;
 
-		// Unfortunately, searching for words like this is going to be slow, or abundant, so we're blacklisting them.
+		// Unfortunately, searching for words like this is going to be slow, or abundant, so we're blocking them.
 		// @todo Setting to add more here?
-		$blacklisted_words = array('img', 'url', 'quote', 'www', 'http', 'the', 'is', 'it', 'are', 'if', 'in');
-		call_integration_hook('integrate_search_blacklisted_words', array(&$blacklisted_words));
+		$blocklist_words = array('img', 'url', 'quote', 'www', 'http', 'the', 'is', 'it', 'are', 'if', 'in');
+		call_integration_hook('integrate_search_blocklist_words', array(&$blocklist_words));
 
-		$this->_searchArray = new SearchArray($this->_searchParams->search, $blacklisted_words, $search_simple_fulltext);
+		$this->_searchArray = new SearchArray($this->_searchParams->search, $blocklist_words, $search_simple_fulltext);
 	}
 
 	/**
-	 * If any black-listed word has been found
+	 * If any block-listed word has been found
 	 *
 	 * @return bool
 	 */
-	public function foundBlackListedWords()
+	public function foundBlockListedWords()
 	{
-		return $this->_searchArray->foundBlackListedWords();
+		return $this->_searchArray->foundBlockListedWords();
 	}
 
 	public function getSearchArray()
@@ -353,10 +353,10 @@ class Search
 	}
 
 	/**
-	 * Sets the query
+	 * Sets the query, calls the searchQuery method of the API in use
 	 *
 	 * @param \ElkArte\Search\SearchApiWrapper $searchAPI
-	 * @return mixed[]
+	 * @return mixed[]|\ElkArte\Search\SearchApiWrapper
 	 */
 	public function searchQuery($searchAPI)
 	{
@@ -366,12 +366,7 @@ class Search
 		$searchAPI->useTemporary($this->_createTemporary);
 		$searchAPI->setSearchArray($this->_searchArray);
 
-		return $searchAPI->searchQuery(
-			$this->searchWords(),
-			$this->_excludedIndexWords,
-			$this->_participants,
-			$this->_searchAPI
-		);
+		return $searchAPI->searchQuery($this->searchWords(), $this->_excludedIndexWords, $this->_participants);
 	}
 
 	/**

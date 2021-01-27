@@ -118,7 +118,7 @@ class Custom extends Standard
 				if (Util::strlen($subword) >= $this->min_word_length && !in_array($subword, $this->bannedWords))
 				{
 					$wordsSearch['indexed_words'][] = $subword;
-					if ($isExcluded !== '')
+					if ($isExcluded !== false)
 					{
 						$wordsExclude[] = $subword;
 					}

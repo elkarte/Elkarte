@@ -387,7 +387,7 @@ class Search extends AbstractController
 			}
 			else
 			{
-				$context['search_errors']['invalid_search_string' . ($this->_search->foundBlackListedWords() ? '_blacklist' : '')] = true;
+				$context['search_errors']['invalid_search_string' . ($this->_search->foundBlockListedWords() ? '_blocklist' : '')] = true;
 			}
 
 			// Don't allow duplicate error messages if one string is too short.

@@ -26,17 +26,13 @@ class SearchApiWrapper
 {
 	public const DEFAULT_API = 'standard';
 
-	/**
-	 * Holds instance of the search api in use such as ElkArte\Search\API\Standard_Search
-	 *
-	 * @var null|object
-	 */
+	/** @var null|object Holds instance of the search api in use such as ElkArte\Search\API\Standard_Search */
 	protected $_searchAPI = null;
 
 	/**
 	 * Constructor
 	 *
-	 * @param \ElkArte\ValuesContainer $config
+	 * @param \ElkArte\ValuesContainer|string $config The searchAPI
 	 * @param \ElkArte\Search\SearchParams $searchParams
 	 * @package Search
 	 */
@@ -169,13 +165,12 @@ class SearchApiWrapper
 	 * @param string[] $search_words
 	 * @param string[] $excluded_words
 	 * @param mixed[] $participants
-	 * @param string[] $search_results
 	 *
 	 * @return mixed[]
 	 */
-	public function searchQuery($search_words, $excluded_words, &$participants, &$search_results)
+	public function searchQuery($search_words, $excluded_words, &$participants)
 	{
-		return $this->_searchAPI->searchQuery($search_words, $excluded_words, $participants, $search_results);
+		return $this->_searchAPI->searchQuery($search_words, $excluded_words, $participants);
 	}
 
 	/**
@@ -224,7 +219,7 @@ class SearchApiWrapper
 	 * @param string $word
 	 * @param string $wordsSearch
 	 * @param string $wordsExclude
-	 * @param string $isExcluded
+	 * @param boolean $isExcluded
 	 * @param string $excludedSubjectWords
 	 */
 	public function prepareIndexes($word, &$wordsSearch, &$wordsExclude, $isExcluded, $excludedSubjectWords)

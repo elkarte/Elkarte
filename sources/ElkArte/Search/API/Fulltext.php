@@ -153,7 +153,7 @@ class Fulltext extends Standard
 
 		$fulltextWord = count($subwords) === 1 ? $word : '"' . $word . '"';
 		$wordsSearch['indexed_words'][] = $fulltextWord;
-		if ($isExcluded !== '')
+		if ($isExcluded !== false)
 		{
 			$wordsExclude[] = $fulltextWord;
 		}

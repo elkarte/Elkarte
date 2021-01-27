@@ -128,7 +128,7 @@ class Sphinxql extends AbstractAPI
 	/**
 	 * {@inheritdoc }
 	 */
-	public function searchQuery($search_words, $excluded_words, &$participants, &$search_results)
+	public function searchQuery($search_words, $excluded_words, &$participants)
 	{
 		global $context, $modSettings;
 
@@ -185,7 +185,7 @@ class Sphinxql extends AbstractAPI
 
 			// Set any options needed, like field weights.
 			// ranker is a modification of SPH_RANK_SPH04 sum((4*lcs+2*(min_hit_pos==1)+exact_hit)*user_weight)*1000+bm25
-			// Each term will return a 0-1000 range we include our acprel value for the final totla and order.  Position
+			// Each term will return a 0-1000 range we include our acprel value for the final total and order.  Position
 			// is the relative reply # to a post, so the later a reply in a topic the less overall weight it is given
 			// the calculated value of ranker is returned in WEIGHTS() which we name relevance in the query
 			$subject_weight = !empty($modSettings['search_weight_subject']) ? $modSettings['search_weight_subject'] : 30;
@@ -247,7 +247,7 @@ class Sphinxql extends AbstractAPI
 
 		$participants = [];
 		$topics = [];
-		foreach (array_slice(array_keys($cached_results['matches']), (int) $_REQUEST['start'], $modSettings['search_results_per_page']) as $msgID)
+		foreach (array_slice(array_keys($cached_results['matches']), $this->_req->getRequest('start', 'intval', 0), $modSettings['search_results_per_page']) as $msgID)
 		{
 			$topics[$msgID] = $cached_results['matches'][$msgID];
 			$participants[$cached_results['matches'][$msgID]['id']] = false;

@@ -126,14 +126,14 @@ class Sphinx extends AbstractAPI
 	/**
 	 * {@inheritdoc }
 	 */
-	public function searchQuery($search_words, $excluded_words, &$participants, &$search_results)
+	public function searchQuery($search_words, $excluded_words, &$participants)
 	{
 		global $context, $modSettings;
 
 		// Only request the results if they haven't been cached yet.
 		$cached_results = [];
 		$cache_key = 'search_results_' . md5(User::$info->query_see_board . '_' . $context['params']);
-		if (1==1 || !Cache::instance()->getVar($cached_results, $cache_key))
+		if (!Cache::instance()->getVar($cached_results, $cache_key))
 		{
 			// The API communicating with the search daemon.  This file is part of Sphinix and not distributed
 			// with ElkArte.  You will need to http://sphinxsearch.com/downloads/current/ the package and copy
@@ -229,7 +229,7 @@ class Sphinx extends AbstractAPI
 
 		$participants = [];
 		$topics = [];
-		foreach (array_slice(array_keys($cached_results['matches']), (int) $_REQUEST['start'], $modSettings['search_results_per_page']) as $msgID)
+		foreach (array_slice(array_keys($cached_results['matches']), $this->_req->getRequest('start', 'intval', 0), $modSettings['search_results_per_page']) as $msgID)
 		{
 			$topics[$msgID] = $cached_results['matches'][$msgID];
 			$participants[$cached_results['matches'][$msgID]['id']] = false;
@@ -238,35 +238,6 @@ class Sphinx extends AbstractAPI
 		$this->_num_results = $cached_results['num_results'];
 
 		return $topics;
-	}
-
-	/**
-	 * Clean up a search word/phrase/term for Sphinx.
-	 *
-	 * @param string $sphinx_term
-	 * @param \SphinxClient $sphinx_client
-	 *
-	 * @return mixed|null|string|string[]
-	 */
-	private function _cleanWordSphinx($sphinx_term, $sphinx_client)
-	{
-		// Multiple quotation marks in a row can cause fatal errors, so handle them
-		$sphinx_term = preg_replace('/""+/', '"', $sphinx_term);
-
-		// Unmatched (i.e. odd number of) quotation marks also cause fatal errors, so handle them
-		if (substr_count($sphinx_term, '"') % 2 !== 0)
-		{
-			// Using preg_replace since it supports limiting the number of replacements
-			$sphinx_term = preg_replace('/"/', '', $sphinx_term, 1);
-		}
-
-		// Use the Sphinx API's built-in EscapeString function to escape special characters
-		$sphinx_term = $sphinx_client->EscapeString($sphinx_term);
-
-		// Since it escapes quotation marks and we don't want that, unescape them
-		$sphinx_term = str_replace('\"', '"', $sphinx_term);
-
-		return $sphinx_term;
 	}
 
 	public function useWordIndex()
