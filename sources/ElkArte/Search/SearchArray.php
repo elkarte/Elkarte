@@ -28,13 +28,13 @@ class SearchArray
 	 *
 	 * That way, the URLs involved in a search page will be kept as short as possible.
 	 */
-	protected $_search_string = array();
+	protected $_search_string = [];
 	/**
 	 * Words not be be found in the search results (-word)
 	 *
 	 * @var array
 	 */
-	private $_excludedWords = array();
+	private $_excludedWords = [];
 	/**
 	 * Simplify the fulltext search
 	 *
@@ -52,13 +52,13 @@ class SearchArray
 	 *
 	 * @var array
 	 */
-	private $_searchArray = array();
+	private $_searchArray = [];
 	/**
 	 * Words we do not search due to length or common terms
 	 *
 	 * @var array
 	 */
-	private $_blacklisted_words = array();
+	private $_blacklisted_words = [];
 	/**
 	 * If search words were found on the blacklist
 	 *
@@ -70,7 +70,7 @@ class SearchArray
 	 *
 	 * @var array
 	 */
-	private $_ignored = array();
+	private $_ignored = [];
 
 	/**
 	 * Usual constructor that does what any constructor does.
@@ -84,6 +84,8 @@ class SearchArray
 		$this->_search_string = $search_string;
 		$this->_search_simple_fulltext = $search_simple_fulltext;
 		$this->_blacklisted_words = $blacklisted_words;
+
+
 		$this->searchArray();
 	}
 
@@ -95,10 +97,7 @@ class SearchArray
 	protected function searchArray()
 	{
 		// Change non-word characters into spaces.
-		$stripped_query = preg_replace('~(?:[\x0B\0\x{A0}\t\r\s\n(){}\\[\\]<>!@$%^*.,:+=`\~\?/\\\\]+|&(?:amp|lt|gt|quot);)+~u', ' ', $this->_search_string);
-
-		// Make the query lower case. It's gonna be case insensitive anyway.
-		$stripped_query = un_htmlspecialchars(Util::strtolower($stripped_query));
+		$stripped_query = $this->cleanString($this->_search_string);
 
 		// This option will do fulltext searching in the most basic way.
 		if ($this->_search_simple_fulltext)
@@ -208,6 +207,126 @@ class SearchArray
 		}
 
 		return $wordArray;
+	}
+
+	/**
+	 * Constructs a binary mode query to pass back to a search API
+	 *
+	 * Understands the use of OR | AND & as search modifiers
+	 * Currently used by the sphinx API's
+	 *
+	 * @param string $string The user entered query to construct with
+	 * @return string A binary mode query
+	 */
+	public function searchArrayExtended($string)
+	{
+		$keywords = array('include' => [], 'exclude' => []);
+
+		// Split our search string and return an empty string if no matches
+		if (!preg_match_all('~(-?)("[^"]+"|[^" ]+)~', $string, $tokens, PREG_SET_ORDER))
+		{
+			return '';
+		}
+
+		// First we split our string into included and excluded words and phrases
+		$or_part = false;
+		foreach ($tokens as $token)
+		{
+			$phrase = false;
+
+			// Strip the quotes off of a phrase
+			if ($token[2][0] === '"')
+			{
+				$token[2] = substr($token[2], 1, -1);
+				$phrase = true;
+			}
+
+			// Prepare this token
+			$cleanWords = $this->cleanString($token[2]);
+
+			// Explode the cleanWords again in case the cleaning puts more spaces into it
+			$addWords = $phrase ? array('"' . $cleanWords . '"') : preg_split('~\s+~u', $cleanWords, null, PREG_SPLIT_NO_EMPTY);
+
+			// Excluding this word?
+			if ($token[1] === '-')
+			{
+				$keywords['exclude'] = array_merge($keywords['exclude'], $addWords);
+			}
+			// OR'd keywords (we only do this if we have something to OR with)
+			elseif (($token[2] === 'OR' || $token[2] === '|') && count($keywords['include']))
+			{
+				$last = array_pop($keywords['include']);
+				$keywords['include'][] = is_array($last) ? $last : [$last];
+				$or_part = true;
+				continue;
+			}
+			// AND is implied in a Sphinx Search
+			elseif ($token[2] === 'AND' || $token[2] === '&' || trim($cleanWords) === '')
+			{
+				continue;
+			}
+			else
+			{
+				// Must be something they want to search for!
+				if ($or_part)
+				{
+					// If this was part of an OR branch, add it to the proper section
+					$keywords['include'][count($keywords['include']) - 1] = array_merge($keywords['include'][count($keywords['include']) - 1], $addWords);
+				}
+				else
+				{
+					$keywords['include'] = array_merge($keywords['include'], $addWords);
+				}
+			}
+
+			// Start fresh on this...
+			$or_part = false;
+		}
+
+		// Let's make sure they're not canceling each other out
+		$results = array_diff(array_map('serialize', $keywords['include']), array_map('serialize', $keywords['exclude']));
+		if (count(array_map('unserialize', $results)) === 0)
+		{
+			return '';
+		}
+
+		// Now we compile our arrays into a valid search string
+		$query_parts = [];
+		foreach ($keywords['include'] as $keyword)
+		{
+			$query_parts[] = is_array($keyword) ? '(' . implode(' | ', $keyword) . ')' : $keyword;
+		}
+
+		foreach ($keywords['exclude'] as $keyword)
+		{
+			$query_parts[] = '-' . $keyword;
+		}
+
+		return implode(' ', $query_parts);
+	}
+
+	/**
+	 * Cleans a string of everything but alphanumeric characters and certain
+	 * special characters ",-,_  so -movie or "animal farm" are preserved
+	 *
+	 * @param string $string A string to clean
+	 * @return string A cleaned up string
+	 */
+	public function cleanString($string)
+	{
+		// Decode the entities first
+		$string = html_entity_decode($string, ENT_QUOTES, 'UTF-8');
+
+		// Lowercase string
+		$string = Util::strtolower($string);
+
+		// Fix numbers so they search easier (phone numbers, SSN, dates, etc) 123-45-6789 => 123456789
+		$string = preg_replace('~([\d]+)\pP+(?=[\d])~u', '$1', $string);
+
+		// Last but not least, strip everything out that's not alphanumeric
+		$string = preg_replace('~[^\pL\pN_"-]+~u', ' ', $string);
+
+		return $string;
 	}
 
 	public function getSearchArray()

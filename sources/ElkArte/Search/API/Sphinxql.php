@@ -20,7 +20,6 @@ namespace ElkArte\Search\API;
 use ElkArte\Cache\Cache;
 use ElkArte\Errors\Errors;
 use ElkArte\User;
-use ElkArte\Util;
 
 /**
  * SearchAPI-Sphinxql.class.php, SphinxQL API,
@@ -146,7 +145,7 @@ class Sphinxql extends AbstractAPI
 			$query = 'SELECT *' . (empty($this->_searchParams->topic) ? ', COUNT(*) num' : '') . ', WEIGHT() relevance FROM ' . $index;
 
 			// Construct the (binary mode & |) query.
-			$where_match = $this->_constructQuery($this->_searchParams->search);
+			$where_match = $this->_searchArray->searchArrayExtended($this->_searchParams->search);
 
 			// Nothing to search, return zero results
 			if (trim($where_match) === '')
@@ -186,14 +185,14 @@ class Sphinxql extends AbstractAPI
 
 			// Set any options needed, like field weights.
 			// ranker is a modification of SPH_RANK_SPH04 sum((4*lcs+2*(min_hit_pos==1)+exact_hit)*user_weight)*1000+bm25
-			// using 70% of the sphinx value and 30% acp weights. sphinx results are further modified by position which
+			// Each term will return a 0-1000 range we include our acprel value for the final totla and order.  Position
 			// is the relative reply # to a post, so the later a reply in a topic the less overall weight it is given
 			// the calculated value of ranker is returned in WEIGHTS() which we name relevance in the query
 			$subject_weight = !empty($modSettings['search_weight_subject']) ? $modSettings['search_weight_subject'] : 30;
 			$query .= '
 			OPTION 
 				field_weights=(subject=' . $subject_weight . ', body=' . (100 - $subject_weight) . '),
-				ranker=expr(\'sum((4*lcs+2*(min_hit_pos==1)+4*exact_hit)*user_weight*position)*700 + acprel*300 + bm25 \'),
+				ranker=expr(\'sum((4*lcs+2*(min_hit_pos==1)+word_count)*user_weight*position) + acprel + bm25 \'),
 				idf=plain,
 				boolean_simplify=1,
 				max_matches=' . min(500, $modSettings['sphinx_max_results']);
@@ -290,123 +289,6 @@ class Sphinxql extends AbstractAPI
 		}
 
 		return $mySphinx;
-	}
-
-	/**
-	 * Constructs a binary mode query to pass back to sphinx
-	 *
-	 * @param string $string The user entered query to construct with
-	 * @return string A binary mode query
-	 */
-	private function _constructQuery($string)
-	{
-		$keywords = array('include' => [], 'exclude' => []);
-
-		// Split our search string and return an empty string if no matches
-		if (!preg_match_all('~(-?)("[^"]+"|[^" ]+)~', $string, $tokens, PREG_SET_ORDER))
-		{
-			return '';
-		}
-
-		// First we split our string into included and excluded words and phrases
-		$or_part = false;
-		foreach ($tokens as $token)
-		{
-			$phrase = false;
-
-			// Strip the quotes off of a phrase
-			if ($token[2][0] === '"')
-			{
-				$token[2] = substr($token[2], 1, -1);
-				$phrase = true;
-			}
-
-			// Prepare this token
-			$cleanWords = $this->_cleanString($token[2]);
-
-			// Explode the cleanWords again in case the cleaning puts more spaces into it
-			$addWords = $phrase ? array('"' . $cleanWords . '"') : preg_split('~\s+~u', $cleanWords, null, PREG_SPLIT_NO_EMPTY);
-
-			// Excluding this word?
-			if ($token[1] === '-')
-			{
-				$keywords['exclude'] = array_merge($keywords['exclude'], $addWords);
-			}
-			// OR'd keywords (we only do this if we have something to OR with)
-			elseif (($token[2] === 'OR' || $token[2] === '|') && count($keywords['include']))
-			{
-				$last = array_pop($keywords['include']);
-				$keywords['include'][] = is_array($last) ? $last : [$last];
-				$or_part = true;
-				continue;
-			}
-			// AND is implied in a Sphinx Search
-			elseif ($token[2] === 'AND' || $token[2] === '&' || trim($cleanWords) === '')
-			{
-				continue;
-			}
-			else
-			{
-				// Must be something they want to search for!
-				if ($or_part)
-				{
-					// If this was part of an OR branch, add it to the proper section
-					$keywords['include'][count($keywords['include']) - 1] = array_merge($keywords['include'][count($keywords['include']) - 1], $addWords);
-				}
-				else
-				{
-					$keywords['include'] = array_merge($keywords['include'], $addWords);
-				}
-			}
-
-			// Start fresh on this...
-			$or_part = false;
-		}
-
-		// Let's make sure they're not canceling each other out
-		$results = array_diff(array_map('serialize', $keywords['include']), array_map('serialize', $keywords['exclude']));
-		$temp = array_map('unserialize', $results);
-		if (count($temp) === 0)
-		{
-			return '';
-		}
-
-		// Now we compile our arrays into a valid search string
-		$query_parts = [];
-		foreach ($keywords['include'] as $keyword)
-		{
-			$query_parts[] = is_array($keyword) ? '(' . implode(' | ', $keyword) . ')' : $keyword;
-		}
-
-		foreach ($keywords['exclude'] as $keyword)
-		{
-			$query_parts[] = '-' . $keyword;
-		}
-
-		return implode(' ', $query_parts);
-	}
-
-	/**
-	 * Cleans a string of everything but alphanumeric characters
-	 *
-	 * @param string $string A string to clean
-	 * @return string A cleaned up string
-	 */
-	private function _cleanString($string)
-	{
-		// Decode the entities first
-		$string = html_entity_decode($string, ENT_QUOTES, 'UTF-8');
-
-		// Lowercase string
-		$string = Util::strtolower($string);
-
-		// Fix numbers so they search easier (phone numbers, SSN, dates, etc) 123-45-6789 => 123456789
-		$string = preg_replace('~([\d]+)\pP+(?=[\d])~u', '$1', $string);
-
-		// Last but not least, strip everything out that's not alphanumeric
-		$string = preg_replace('~[^\pL\pN_]+~u', ' ', $string);
-
-		return $string;
 	}
 
 	/**

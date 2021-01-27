@@ -167,50 +167,18 @@ class Sphinx extends AbstractAPI
 			$mySphinx->SetFieldWeights(array('subject' => $subject_weight, 'body' => 100 - $subject_weight));
 
 			// Set the limits based on the search parameters.
-			if (!empty($this->_searchParams->min_msg_id) || !empty($this->_searchParams->max_msg_id))
-			{
-				$mySphinx->SetIDRange($this->_searchParams->min_msg_id, empty($this->_searchParams->max_msg_id) ? (int) $modSettings['maxMsgID'] : $this->_searchParams->max_msg_id);
-			}
-
-			if (!empty($this->_searchParams->topic))
-			{
-				$mySphinx->SetFilter('id_topic', array((int) $this->_searchParams->topic));
-			}
-
-			if (!empty($this->_searchParams->brd))
-			{
-				$mySphinx->SetFilter('id_board', $this->_searchParams->brd);
-			}
-
-			if (!empty($this->_searchParams->_memberlist))
-			{
-				$mySphinx->SetFilter('id_member', $this->_searchParams->_memberlist);
-			}
+			$this->buildQueryLimits($mySphinx);
 
 			// Construct the (binary mode & |) query while accounting for excluded words
-			$orResults = [];
-			$inc_words = [];
-			foreach ($search_words as $orIndex => $words)
-			{
-				$inc_words = array_merge($inc_words, $words['indexed_words']);
-				$andResult = '';
-				foreach ($words['indexed_words'] as $sphinxWord)
-				{
-					$andResult .= (in_array($sphinxWord, $excluded_words) ? '-' : '') . $this->_cleanWordSphinx($sphinxWord, $mySphinx) . ' & ';
-				}
-
-				$orResults[] = substr($andResult, 0, -3);
-			}
+			$query = $this->_searchArray->searchArrayExtended($this->_searchParams->search);
 
 			// If no search terms are left after comparing against excluded words (i.e. "test -test" or "test last -test -last"),
 			// sending that to Sphinx would result in a fatal error
-			if (count(array_diff($inc_words, $excluded_words)) === 0)
+			if (trim($query) === '')
 			{
 				// Instead, fail gracefully (return "no results")
 				return 0;
 			}
-
-			$query = count($orResults) === 1 ? $orResults[0] : '(' . implode(') | (', $orResults) . ')';
 
 			// Subject only searches need to be specified.
 			if ($this->_searchParams->subject_only)
@@ -218,7 +186,7 @@ class Sphinx extends AbstractAPI
 				$query = '@(subject) ' . $query;
 			}
 
-			$mySphinx->SetRankingMode(SPH_RANK_EXPR, 'sum((4*lcs+2*(min_hit_pos==1)+4*exact_hit)*user_weight*position)*700 + acprel*300 + bm25');
+			$mySphinx->SetRankingMode(SPH_RANK_EXPR, 'sum((4*lcs+2*(min_hit_pos==1)+word_count)*user_weight*position) + acprel + bm25');
 
 			// Execute the search query.
 			$index = (!empty($modSettings['sphinx_index_prefix']) ? $modSettings['sphinx_index_prefix'] : 'elkarte') . '_index';
@@ -227,7 +195,6 @@ class Sphinx extends AbstractAPI
 			// Can a connection to the daemon be made?
 			if ($request === false)
 			{
-				var_dump($mySphinx->GetLastError());
 				// Just log the error.
 				if ($mySphinx->GetLastError())
 				{
@@ -305,5 +272,35 @@ class Sphinx extends AbstractAPI
 	public function useWordIndex()
 	{
 		return false;
+	}
+
+	/**
+	 * Builds the query modifiers based on age, member, board etc
+	 *
+	 * @param \SphinxClient $mySphinx
+	 */
+	public function buildQueryLimits($mySphinx)
+	{
+		global $modSettings;
+
+		if (!empty($this->_searchParams->min_msg_id) || !empty($this->_searchParams->max_msg_id))
+		{
+			$mySphinx->SetIDRange($this->_searchParams->min_msg_id, empty($this->_searchParams->max_msg_id) ? (int) $modSettings['maxMsgID'] : $this->_searchParams->max_msg_id);
+		}
+
+		if (!empty($this->_searchParams->topic))
+		{
+			$mySphinx->SetFilter('id_topic', array((int) $this->_searchParams->topic));
+		}
+
+		if (!empty($this->_searchParams->brd))
+		{
+			$mySphinx->SetFilter('id_board', $this->_searchParams->brd);
+		}
+
+		if (!empty($this->_searchParams->_memberlist))
+		{
+			$mySphinx->SetFilter('id_member', $this->_searchParams->_memberlist);
+		}
 	}
 }
