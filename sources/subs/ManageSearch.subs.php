@@ -211,7 +211,9 @@ source ', $prefix, '_source
 				CASE WHEN t.num_likes < 20 THEN t.num_likes / 20 ELSE 1 END * ' . $weight['likes'] . ' + \
 				CASE WHEN t.is_sticky = 0 THEN 0 ELSE 1 END * ' . $weight['sticky'] . ' \
 			) * 100/' . $weight_total . ') AS acprel \
-		FROM ', $db_prefix, 'messages AS m, ', $db_prefix, 'topics AS t, ', $db_prefix, 'settings AS s \
+		FROM ', $db_prefix, 'messages AS m \
+		 	INNER JOIN ', $db_prefix, 'topics AS t ON (m.id_topic = t.id_topic) \
+		 	INNER JOIN ', $db_prefix, 'settings AS s \
 		WHERE t.id_topic = m.id_topic \
 			AND s.variable = \'maxMsgID\' \
 			AND m.id_msg BETWEEN $start AND $end
@@ -229,6 +231,7 @@ source ', $prefix, '_source
 source ', $prefix, '_delta_source : ', $prefix, '_source
 {
 	sql_query_pre = SET NAMES utf8
+	sql_query_pre		= SET CHARACTER_SET_RESULTS=utf8
 	# If you do not have query_cache enabled in my.cnf, then you can comment out the next line
 	sql_query_pre = SET SESSION query_cache_type=OFF
 	sql_query_range	= \
