@@ -7,19 +7,20 @@
  *
  */
 
-var disableDrafts = false,
-	emoji_url ='';
+/**
+ * This file contains javascript associated with the :emoji: function as it
+ * relates to an sceditor invocation
+ */
+var disableDrafts = false;
 
-(function ($, window, document)
-{
+(function (sceditor) {
 	'use strict';
 
 	// Editor instance
-	var editor,
-		rangeHelper;
+	let editor;
 
 	// These are all we know, but we can only remember about 6 of them
-	var emojies = [
+	let emojies = [
 		{name: 'joy', key: '1f602'},
 		{name: 'heart', key: '2764'},
 		{name: 'heart_eyes', key: '1f60d'},
@@ -1148,7 +1149,7 @@ var disableDrafts = false,
 	];
 
 	// Populated with unicode key when shortname is found in emojies array
-	var emojieskey;
+	let emojieskey;
 
 	/**
 	 * Load in options
@@ -1182,21 +1183,22 @@ var disableDrafts = false,
 	/**
 	 * Attach atwho to the passed $element so we create a pull down list
 	 *
-	 * @param {object} oEmoji
 	 * @param {object} $element
 	 * @param {object} oIframeWindow
 	 */
-	Elk_Emoji.prototype.attachAtWho = function (oEmoji, $element, oIframeWindow)
+	Elk_Emoji.prototype.attachAtWho = function ($element, oIframeWindow)
 	{
 		/**
 		 * Create the dropdown selection list
 		 * Inserts the site image location when one is selected.
 		 * Uses the CDN for the pulldown image to reduce site calls
 		 */
-		var tpl;
+		let tpl,
+			emoji_url = this.opts.emoji_url,
+			emoji_group = this.opts.emoji_group;
 
 		// Use CDN calls to populate the atwho selection list
-		switch(oEmoji.opts.emoji_group) {
+		switch(emoji_group) {
 			case 'twemoji':
 				//tpl = "https://twemoji.maxcdn.com/16x16/${key}.png";
 				tpl = "https://twemoji.maxcdn.com/svg/${key}.svg";
@@ -1240,7 +1242,7 @@ var disableDrafts = false,
 						return ":" + tpl[0] + ":";
 					}
 
-					return "<img class='emoji' data-sceditor-emoticon=':" + tpl[0] + ":' alt=':" + tpl[1] + ":' title='" + tpl[0] + "' src='" + oEmoji.opts.emoji_url + tpl[1] + ".svg' />";
+					return "<img class='emoji' data-sceditor-emoticon=':" + tpl[0] + ":' alt=':" + tpl[1] + ":' title='" + tpl[0] + "' src='" + emoji_url + tpl[1] + ".svg' />";
 				},
 				tplEval: function (tpl, map)
 				{
@@ -1270,7 +1272,7 @@ var disableDrafts = false,
 					}
 
 					// Lets get the caret position so we can add the emoji box there
-					var corrected_offset = findAtPosition();
+					let corrected_offset = editor.findCursorPosition(':');
 
 					offset.top = corrected_offset.top;
 					offset.left = corrected_offset.left;
@@ -1281,122 +1283,43 @@ var disableDrafts = false,
 		});
 
 		// Don't save a draft due to a emoji window open/close
-		$(oIframeWindow).on("shown.atwho", function (event, offset)
+		if (Object.keys(oIframeWindow).length)
 		{
-			disableDrafts = true;
-		});
+			$(oIframeWindow).on("shown.atwho", function (event, offset)
+			{
+				disableDrafts = true;
+			});
 
-		$(oIframeWindow).on("hidden.atwho", function (event, offset)
-		{
-			disableDrafts = false;
-		});
+			$(oIframeWindow).on("hidden.atwho", function (event, offset)
+			{
+				disableDrafts = false;
+			});
+		}
 
 		// Attach a click event to the toggle button, can't find a good plugin event to use
 		// for this purpose
-		if (typeof oIframeWindow !== 'undefined')
+		if (Object.keys(oIframeWindow).length)
 		{
+			let opts = this.opts;
+
 			$(".sceditor-button-source").on("click", function (event, offset)
 			{
 				// If the button has the active class, we clicked and entered wizzy mode
 				if (!$(this).hasClass("active"))
 				{
-					Elk_Emoji.prototype.processEmoji(oEmoji.opts.emoji_group);
+					Elk_Emoji.prototype.processEmoji(opts);
 				}
 			});
-		}
-
-		/**
-		 * Determine the caret position inside of sceditor's iframe
-		 *
-		 * What it does:
-		 * - Caret.js does not seem to return the correct position for (FF & IE) when
-		 * the iframe has vertically scrolled.
-		 * - This is an sceditor specific function to return a screen caret position
-		 * - Called just before At.js adds the mentions dropdown box
-		 * - Finds the @mentions tag and adds an invisible zero width space before it
-		 * - Gets the location offset() in the iframe "window" of the added space
-		 * - Adjusts for the iframe scroll
-		 * - Adds in the iframe container location offset() to main window
-		 * - Removes the space, restores the editor range.
-		 *
-		 * @returns {{}}
-		 */
-		function findAtPosition()
-		{
-			// Get sceditor's RangeHelper for use
-			rangeHelper = editor.getRangeHelper();
-
-			// Save the current state
-			rangeHelper.saveRange();
-
-			var start = rangeHelper.getMarker('sceditor-start-marker'),
-				parent = start.parentNode,
-				prev = start.previousSibling,
-				offset = {},
-				atPos,
-				placefinder;
-
-			// Create a placefinder span containing a 'ZERO WIDTH SPACE' Character
-			placefinder = start.ownerDocument.createElement('span');
-			$(placefinder).text("200B").addClass('placefinder');
-
-			// Look back and find the emoji : tag, so we can insert our span ahead of it
-			while (prev)
-			{
-				atPos = (prev.nodeValue || '').lastIndexOf(':');
-
-				// Found the start of Emoji
-				if (atPos > -1)
-				{
-					parent.insertBefore(placefinder, prev.splitText(atPos + 1));
-					break;
-				}
-
-				prev = prev.previousSibling;
-			}
-
-			// If we were successful in adding the placefinder
-			if (placefinder.parentNode)
-			{
-				var $_placefinder = $(placefinder),
-					wizzy_scroll = $('#' + oEmoji.opts.editor_id).parent().find('iframe').contents().scrollTop();
-
-				// Determine its Location in the iframe
-				offset = $_placefinder.offset();
-
-				// If we have scrolled, then we also need to account for those offsets
-				offset.top -= wizzy_scroll;
-				offset.top += $_placefinder.height();
-
-				// Remove our placefinder
-				$_placefinder.remove();
-			}
-
-			// Put things back just like we found them
-			rangeHelper.restoreRange();
-
-			// Add in the iframe's offset to get the final location.
-			if (offset)
-			{
-				var iframeOffset = editor.getContentAreaContainer().offset();
-
-				// Some fudge for the kids
-				offset.top += iframeOffset.top + 5;
-				offset.left += iframeOffset.left + 5;
-			}
-
-			return offset;
 		}
 	};
 
 	/**
 	 * Fetches the HTML from the editor window and updates any emoji :tags: with img tags
 	 */
-	Elk_Emoji.prototype.processEmoji = function (emoji_group)
+	Elk_Emoji.prototype.processEmoji = function (opts)
 	{
-		var instance, // sceditor instance
+		let instance, // sceditor instance
 			str, // current html in the editor
-			emoji_url = elk_smileys_url.replace("default", emoji_group), // where the emoji images are
 			emoji_regex = new RegExp("(:([-+\\w]+):)", "gi"), // find emoji
 			code_regex = new RegExp("(</code>|<code(?:[^>]+)?>)", "gi"), // split around code tags
 			str_split,
@@ -1404,7 +1327,7 @@ var disableDrafts = false,
 			n;
 
 		// Get the editors instance and html code from the window
-		instance = $('#' + post_box_name).sceditor('instance');
+		instance = sceditor.instance(document.getElementById(opts.editor_id));
 		str = instance.getWysiwygEditorValue(false);
 
 		// Only convert emoji outside <code> tags.
@@ -1418,7 +1341,7 @@ var disableDrafts = false,
 			if (i % 4 === 0)
 			{
 				// Search for emoji :tags: and replace known ones with the right image
-				str_split[i] = str_split[i].replace(emoji_regex, Elk_Emoji.prototype.process);
+				str_split[i] = str_split[i].replace(emoji_regex, Elk_Emoji.prototype.process).replace('{emoji_url}', opts.emoji_url);
 			}
 		}
 
@@ -1437,7 +1360,7 @@ var disableDrafts = false,
 			return match;
 		}
 
-		return '<img data-sceditor-emoticon="' + tag + '" class="emoji" alt="' + tag + '" title="' + shortname + '" src="' + emoji_url + emojieskey + '.svg" />';
+		return '<img data-sceditor-emoticon="' + tag + '" class="emoji" alt="' + tag + '" title="' + shortname + '" src="{emoji_url}' + emojieskey + '.svg" />';
 	};
 
 	/**
@@ -1455,7 +1378,7 @@ var disableDrafts = false,
 	 *  - Called from the editor as a plugin
 	 *  - Monitors events so we control the emoji's
 	 */
-	$.sceditor.plugins.emoji = function ()
+	sceditor.plugins.emoji = function ()
 	{
 		var base = this,
 			oEmoji;
@@ -1471,33 +1394,33 @@ var disableDrafts = false,
 		 */
 		base.signalReady = function ()
 		{
+			// Setup the options
+			this.opts.emojiOptions.emoji_url = elk_smileys_url.replace("default", this.opts.emojiOptions.emoji_group);
+			if (typeof this.opts.emojiOptions.editor_id === 'undefined')
+			{
+				this.opts.emojiOptions.editor_id = post_box_name;
+			}
+
 			// Init the emoji instance, load in the options
 			oEmoji = new Elk_Emoji(this.opts.emojiOptions);
 
-			if (typeof oEmoji.opts.editor_id === 'undefined')
-			{
-				oEmoji.opts.editor_id = post_box_name;
-			}
+			let original_textarea = document.getElementById(oEmoji.opts.editor_id),
+				instance = sceditor.instance(original_textarea),
+				sceditor_textarea = instance.getContentAreaContainer().nextSibling;
 
-			emoji_url = elk_smileys_url.replace("default", oEmoji.opts.emoji_group);
+			// Attach atwho to the editors source textarea
+			oEmoji.attachAtWho($(sceditor_textarea), {});
 
-			var $option_eid = $('#' + oEmoji.opts.editor_id);
-
-			// Attach atwho to the textarea
-			oEmoji.attachAtWho(oEmoji, $option_eid.parent().find('textarea'));
-
-			// Using wysiwyg, then lets attach atwho to it as well
-			var instance = $option_eid.sceditor('instance');
-
+			// Using wysiwyg, then lets attach atwho to the wysiwyg container as well
 			if (!instance.opts.runWithoutWysiwygSupport)
 			{
 				// We need to monitor the iframe window and body to text input
-				var oIframe = $option_eid.parent().find('iframe')[0],
+				let oIframe = instance.getContentAreaContainer(),
 					oIframeWindow = oIframe.contentWindow,
-					oIframeBody = $option_eid.parent().find('iframe').contents().find('body')[0];
+					oIframeBody = oIframe.contentDocument.body;
 
-				oEmoji.attachAtWho(oEmoji, $(oIframeBody), oIframeWindow);
+				oEmoji.attachAtWho($(oIframeBody), oIframeWindow);
 			}
 		};
 	};
-})(jQuery, window, document);
+})(sceditor);

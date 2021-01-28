@@ -268,7 +268,13 @@ final class Hooks
 	}
 
 	/**
-	 * Automatically loads all the integrations enabled and that can be found.
+	 * Registers non ACP integration hooks for enabled integrations
+	 *
+	 * What it does
+	 * - reads enabled integrations (those identified in autoload_integrate modsettings)
+	 * - verify the class exists
+	 * - verify it has a static method ::register, if so calls that method and adds any hooks
+	 * returned by that method
 	 */
 	public function loadIntegrations()
 	{
@@ -389,7 +395,7 @@ final class Hooks
     "repositories": [
         {
             "type": "composer",
-            "url": "http://packages.example.com"
+            "url": "https://packages.example.com"
         }
     ],
     "extra": {
