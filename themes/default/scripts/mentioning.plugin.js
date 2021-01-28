@@ -7,7 +7,7 @@
  */
 
 /**
- * This file contains javascript associated with the atwho function as it
+ * This file contains javascript associated with the @mentions function as it
  * relates to an sceditor invocation
  */
 var disableDrafts = false;
@@ -17,8 +17,7 @@ var disableDrafts = false;
 	'use strict';
 
 	// Editor instance
-	var editor,
-		rangeHelper;
+	var editor;
 
 	function Elk_Mentions(options)
 	{
@@ -28,7 +27,7 @@ var disableDrafts = false;
 
 	Elk_Mentions.prototype.attachAtWho = function (oMentions, $element, oIframeWindow)
 	{
-		var mentioned = $('#mentioned');
+		let mentioned = $('#mentioned');
 
 		// Create / use a container to hold the results
 		if (mentioned.length === 0)
@@ -69,7 +68,7 @@ var disableDrafts = false;
 					}
 
 					// No slamming the server either
-					var current_call = parseInt(new Date().getTime() / 1000);
+					let current_call = Math.round(new Date().getTime() / 1000);
 					if (oMentions.opts._last_call !== 0 && oMentions.opts._last_call + 0.5 > current_call)
 					{
 						callback(oMentions.opts._names);
@@ -106,7 +105,7 @@ var disableDrafts = false;
 				},
 				matcher: function (flag, subtext, should_startWithSpace, acceptSpaceBar)
 				{
-					var _a, _y, match, regexp, space;
+					let _a, _y, match, regexp, space;
 
 					flag = flag.replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, "\\$&");
 
@@ -137,7 +136,7 @@ var disableDrafts = false;
 				},
 				highlighter: function (li, query)
 				{
-					var regexp;
+					let regexp;
 
 					if (!query)
 					{
@@ -162,7 +161,7 @@ var disableDrafts = false;
 					}
 
 					// Lets get the caret position so we can add the mentions box there
-					var corrected_offset = findAtPosition();
+					let corrected_offset = editor.findCursorPosition('@');
 
 					offset.top = corrected_offset.top;
 					offset.left = corrected_offset.left;
@@ -173,15 +172,18 @@ var disableDrafts = false;
 		});
 
 		// Use atwho selection box show/hide events to prevent autosave from firing
-		$(oIframeWindow).on("shown.atwho", function (event, offset)
+		if (Object.keys(oIframeWindow).length)
 		{
-			disableDrafts = true;
-		});
+			$(oIframeWindow).on("shown.atwho", function (event, offset)
+			{
+				disableDrafts = true;
+			});
 
-		$(oIframeWindow).on("hidden.atwho", function (event, offset)
-		{
-			disableDrafts = false;
-		});
+			$(oIframeWindow).on("hidden.atwho", function (event, offset)
+			{
+				disableDrafts = false;
+			});
+		}
 
 		/**
 		 * Makes the ajax call for data, returns to callback function when done.
@@ -191,7 +193,7 @@ var disableDrafts = false;
 		 */
 		function suggest(obj, callback)
 		{
-			var postString = "jsonString=" + JSON.stringify(obj) + "&" + elk_session_var + "=" + elk_session_id;
+			let postString = "jsonString=" + JSON.stringify(obj) + "&" + elk_session_var + "=" + elk_session_id;
 
 			oMentions.opts._names = [];
 
@@ -223,94 +225,6 @@ var disableDrafts = false;
 
 					callback();
 				});
-		}
-
-		/**
-		 * Determine the caret position inside of sceditor's iframe
-		 *
-		 * What it does:
-		 * - Caret.js does not seem to return the correct position for (FF & IE) when
-		 * the iframe has vertically scrolled.
-		 * - This is an sceditor specific function to return a screen caret position
-		 * - Called just before At.js adds the mentions dropdown box
-		 * - Finds the @mentions tag and adds an invisible zero width space before it
-		 * - Gets the location offset() in the iframe "window" of the added space
-		 * - Adjusts for the iframe scroll
-		 * - Adds in the iframe container location offset() to main window
-		 * - Removes the space, restores the editor range.
-		 *
-		 * @returns {{}}
-		 */
-		function findAtPosition()
-		{
-			// Get sceditor's RangeHelper for use
-			rangeHelper = editor.getRangeHelper();
-
-			// Save the current state
-			rangeHelper.saveRange();
-
-			var start = rangeHelper.getMarker('sceditor-start-marker'),
-				parent = start.parentNode,
-				prev = start.previousSibling,
-				offset = {},
-				atPos,
-				placefinder;
-
-			// Create a placefinder span containing a 'ZERO WIDTH SPACE' Character
-			placefinder = start.ownerDocument.createElement('span');
-			$(placefinder).text("200B").addClass('placefinder');
-
-			// Look back and find the mentions @ tag, so we can insert our span ahead of it
-			while (prev)
-			{
-				atPos = (prev.nodeValue || '').lastIndexOf('@');
-
-				// Found the start of @mention
-				if (atPos > -1)
-				{
-					parent.insertBefore(placefinder, prev.splitText(atPos + 1));
-					break;
-				}
-
-				prev = prev.previousSibling;
-			}
-
-			// If we were successful in adding the placefinder
-			if (placefinder.parentNode)
-			{
-				var $_placefinder = $(placefinder);
-
-				// offset() returns the top offset inside the total iframe, so we need the vertical scroll
-				// value to adjust back to main window position
-				//	wizzy_height = $('#' + oMentions.opts.editor_id).parent().find('iframe').height(),
-				//	wizzy_window = $('#' + oMentions.opts.editor_id).parent().find('iframe').contents().height(),
-				var wizzy_scroll = $('#' + oMentions.opts.editor_id).parent().find('iframe').contents().scrollTop();
-
-				// Determine its Location in the iframe
-				offset = $_placefinder.offset();
-
-				// If we have scrolled, then we also need to account for those offsets
-				offset.top -= wizzy_scroll;
-				offset.top += $_placefinder.height();
-
-				// Remove our placefinder
-				$_placefinder.remove();
-			}
-
-			// Put things back just like we found them
-			rangeHelper.restoreRange();
-
-			// Add in the iframe's offset to get the final location.
-			if (offset)
-			{
-				var iframeOffset = editor.getContentAreaContainer().offset();
-
-				// Some fudge for the kids
-				offset.top += iframeOffset.top + 5;
-				offset.left += iframeOffset.left + 5;
-			}
-
-			return offset;
 		}
 	};
 
@@ -357,22 +271,23 @@ var disableDrafts = false;
 			// Init the mention instance, load in the options
 			oMentions = new Elk_Mentions(this.opts.mentionOptions);
 
-			var $option_eid = $('#' + oMentions.opts.editor_id);
+			let original_textarea = document.getElementById(oMentions.opts.editor_id),
+				instance = sceditor.instance(original_textarea),
+				sceditor_textarea = instance.getContentAreaContainer().nextSibling;
 
 			// Adds the selector to the list of known "mentioner"
 			add_elk_mention(oMentions.opts.editor_id, {isPlugin: true});
-			oMentions.attachAtWho(oMentions, $option_eid.parent().find('textarea'));
+			oMentions.attachAtWho(oMentions, $(sceditor_textarea), {});
 
 			// Using wysiwyg, then lets attach atwho to it
-			var instance = $option_eid.sceditor('instance');
 			if (!instance.opts.runWithoutWysiwygSupport)
 			{
 				// We need to monitor the iframe window and body to text input
-				var oIframe = $option_eid.parent().find('iframe')[0],
+				let oIframe = instance.getContentAreaContainer(),
 					oIframeWindow = oIframe.contentWindow,
-					oIframeBody = $(oIframe.contentDocument.body);
+					oIframeBody = oIframe.contentDocument.body;
 
-				oMentions.attachAtWho(oMentions, oIframeBody, oIframeWindow);
+				oMentions.attachAtWho(oMentions, $(oIframeBody), oIframeWindow);
 			}
 		};
 	};
