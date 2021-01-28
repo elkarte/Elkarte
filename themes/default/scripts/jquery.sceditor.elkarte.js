@@ -3,16 +3,13 @@
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause (see accompanying LICENSE.txt file)
  *
- * This file contains code covered by:
- * copyright: 2011 Simple Machines (http://www.simplemachines.org)
- *
  * @version 2.0 dev
  */
 
 /** global: elk_session_var, elk_session_id, ila_filename, elk_scripturl  */
 
 /**
- * Extension functions to provide ElkArte compatibility with sceditor
+ * Extension functions to provide ElkArte utility functions within sceditor
  */
 const itemCodes = ["*:disc", "@:disc", "+:square", "x:square", "#:decimal", "0:decimal", "O:circle", "o:circle"];
 (function ($)
@@ -160,6 +157,90 @@ const itemCodes = ["*:disc", "@:disc", "+:square", "x:square", "#:decimal", "0:d
 			{
 				content.append(moreButton);
 			}
+		},
+		/**
+		 * Determine the caret position inside of sceditor's iframe
+		 *
+		 * What it does:
+		 * - Caret.js does not seem to return the correct position for (FF & IE) when
+		 * the iframe has vertically scrolled.
+		 * - This is an sceditor specific function to return a screen caret position
+		 * - Called just before At.js adds its dropdown box
+		 * - Finds the @mentions tag and adds an invisible zero width space before it
+		 * - Gets the location offset() in the iframe "window" of the added space
+		 * - Adjusts for the iframe scroll
+		 * - Adds in the iframe container location offset() to main window
+		 * - Removes the space, restores the editor range.
+		 *
+		 * @returns {{}} offset object top, left
+		 */
+		findCursorPosition(tag)
+		{
+			// Get sceditor's RangeHelper for use
+			let editor = this,
+				rangeHelper = editor.getRangeHelper();
+
+			// Save the current state
+			rangeHelper.saveRange();
+
+			let start = rangeHelper.getMarker('sceditor-start-marker'),
+				parent = start.parentNode,
+				prev = start.previousSibling,
+				offset = {},
+				atPos,
+				placefinder;
+
+			// Create a placefinder span containing a 'ZERO WIDTH SPACE' Character
+			placefinder = start.ownerDocument.createElement('span');
+			$(placefinder).text("200B").addClass('placefinder');
+
+			// Look back and find the tag, so we can insert our span ahead of it
+			while (prev)
+			{
+				console.log(tag);
+				atPos = (prev.nodeValue || '').lastIndexOf(tag);
+
+				// Found the start of Emoji
+				if (atPos > -1)
+				{
+					parent.insertBefore(placefinder, prev.splitText(atPos + 1));
+					break;
+				}
+
+				prev = prev.previousSibling;
+			}
+
+			// If we were successful in adding the placefinder
+			if (placefinder.parentNode)
+			{
+				let $_placefinder = $(placefinder),
+					iframeDocument = editor.getContentAreaContainer().contentDocument;
+
+				// Determine its Location in the iframe
+				offset = $_placefinder.offset();
+
+				// If we have scrolled, then we also need to account for those offsets
+				offset.top -= $(iframeDocument).scrollTop();
+				offset.top += $_placefinder.height();
+
+				// Remove our placefinder
+				$_placefinder.remove();
+			}
+
+			// Put things back just like we found them
+			rangeHelper.restoreRange();
+
+			// Add in the iframe's offset to get the final location.
+			if (offset)
+			{
+				let iframeOffset = $(editor.getContentAreaContainer()).offset();
+
+				// Some fudge for the kids
+				offset.top += iframeOffset.top + 5;
+				offset.left += iframeOffset.left + 5;
+			}
+
+			return offset;
 		}
 	};
 
