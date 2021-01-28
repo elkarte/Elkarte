@@ -76,8 +76,11 @@ class EmojiIntegrate
 	 */
 	public static function integrate_pre_bbc_parser(&$message, &$parse_tags)
 	{
+		$req = HttpReq::instance();
+		$sa = $req->getQuery('sa', 'trim');
+
 		// If we are doing smileys, then we are doing emoji!
-		if ((empty($_REQUEST['sa']) || $_REQUEST['sa'] !== 'install2') && $message !== false)
+		if ((empty($sa) || $sa !== 'install2') && $message !== false)
 		{
 			$emoji = Emoji::instance();
 			$message = $emoji->emojiNameToImage($message);
@@ -102,11 +105,11 @@ class EmojiIntegrate
 		if (empty($context['mentions_enabled']))
 		{
 			loadCSSFile('jquery.atwho.css');
-			loadJavascriptFile(array('jquery.atwho.min.js', 'jquery.caret.min.js', 'Emoji.plugin.js'));
+			loadJavascriptFile(['jquery.atwho.min.js', 'jquery.caret.min.js', 'Emoji.plugin.js'], ['defer' => true]);
 		}
 		else
 		{
-			loadJavascriptFile(array('Emoji.plugin.js'));
+			loadJavascriptFile(['Emoji.plugin.js'], ['defer' => true]);
 		}
 
 		// Add the emoji plugin to the editor
