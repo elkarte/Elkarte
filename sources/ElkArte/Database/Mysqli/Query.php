@@ -102,7 +102,7 @@ class Query extends AbstractQuery
 		// With nothing to insert, simply return.
 		if (empty($data))
 		{
-			return;
+			return false;
 		}
 
 		// Inserting data as a single row can be done as a single array.
@@ -169,7 +169,7 @@ class Query extends AbstractQuery
 	/**
 	 * {@inheritDoc}
 	 */
-	protected function initialChecks($db_string, $db_values, $identifier)
+	protected function initialChecks($db_string, $db_values, $identifier = '')
 	{
 		// Use "ORDER BY null" to prevent Mysql doing filesorts for Group By clauses without an Order By
 		if (strpos($db_string, 'GROUP BY') !== false

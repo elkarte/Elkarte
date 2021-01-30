@@ -129,6 +129,13 @@ abstract class AbstractQuery implements QueryInterface
 	protected $result = null;
 
 	/**
+	 * Holds the resource from the dBMS of the last query run
+	 *
+	 * @var resource
+	 */
+	private $_db_last_result = null;
+
+	/**
 	 * Comments that are allowed in a query are preg_removed.
 	 * These replacements happen in the query checks.
 	 *

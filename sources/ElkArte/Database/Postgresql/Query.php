@@ -32,13 +32,6 @@ class Query extends AbstractQuery
 	const ESCAPE_CHAR = '\'\'';
 
 	/**
-	 * Holds last query result
-	 *
-	 * @var resource
-	 */
-	private $_db_last_result = null;
-
-	/**
 	 * Since PostgreSQL doesn't support INSERT REPLACE we are using this to remember
 	 * the rows affected by the delete
 	 *
@@ -95,7 +88,7 @@ class Query extends AbstractQuery
 		// With nothing to insert, simply return.
 		if (empty($data))
 		{
-			return;
+			return false;
 		}
 
 		// Inserting data as a single row can be done as a single array.
@@ -257,7 +250,7 @@ class Query extends AbstractQuery
 	/**
 	 * {@inheritDoc}
 	 */
-	protected function initialChecks($db_string, $db_values, $identifier)
+	protected function initialChecks($db_string, $db_values, $identifier = '')
 	{
 		// Special queries that need processing.
 		$replacements = array(
