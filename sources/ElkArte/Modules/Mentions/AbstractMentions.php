@@ -42,6 +42,10 @@ abstract class AbstractMentions extends AbstractModule
 			foreach ($mentions as $mention)
 			{
 				$class = '\\ElkArte\\Mentions\\MentionType\\Event\\' . ucfirst($mention);
+				if (!is_callable($class))
+				{
+					continue;
+				}
 				$hooks = $class::getEvents($action);
 
 				foreach ($hooks as $method => $dependencies)

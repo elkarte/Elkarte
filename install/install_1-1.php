@@ -2681,7 +2681,7 @@ class InstallInstructions_install_1_1
 						"emailweekly" => "1"
 					]
 				])),
-				array('autoload_integrate', '\\ElkArte\\UserNotificationIntegrate,\\ElkArte\\IlaIntegrate,\\ElkArte\\VerificationControls\\VerificationControlsIntegrate'),
+				array('autoload_integrate', '\\ElkArte\\UserNotificationIntegrate,\\ElkArte\\IlaIntegrate,\\ElkArte\\VerificationControls\\VerificationControlsIntegrate,\\ElkArte\\EmojiIntegrate'),
 				array('usernotif_favicon_bgColor', '#ff0000'),
 				array('usernotif_favicon_position', 'up'),
 				array('usernotif_favicon_textColor', '#ffff00'),
