@@ -444,7 +444,7 @@ class CoreFeatures extends AbstractController
 		updateSettings($setting_changes);
 
 		// This is needed to let menus appear if cache > 2
-		if ($modSettings['cache_enable'] > 2)
+		if (Cache::instance()->levelHigherThan(2))
 		{
 			Cache::instance()->clean('data');
 		}

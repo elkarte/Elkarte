@@ -2636,7 +2636,6 @@ class InstallInstructions_install_1_1
 				array('admin_features', 'cp'),
 				array('last_mod_report_action', '0'),
 				array('pruningOptions', '30,180,180,180,30,7,0'),
-				array('cache_enable', '1'),
 				array('reg_verification', '1'),
 				array('visual_verification_type', '3'),
 				array('visual_verification_num_chars', '6'),

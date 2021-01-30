@@ -287,13 +287,17 @@ class Query extends AbstractQuery
 		if (function_exists('\\ElkArte\\Cache\\Cache::instance()->get') && (!isset($modSettings['autoFixDatabase']) || $modSettings['autoFixDatabase'] == '1'))
 		{
 			$db_last_error = db_last_error();
+			$cache = Cache::instance();
 
 			// Force caching on, just for the error checking.
-			$old_cache = isset($modSettings['cache_enable']) ? $modSettings['cache_enable'] : null;
-			$modSettings['cache_enable'] = '1';
+			$old_cache = $cache->getLevel();
+			if ($cache->isEnabled() === false)
+			{
+				$cache->setLevel(1);
+			}
 			$temp = null;
 
-			if (Cache::instance()->getVar($temp, 'db_last_error', 600))
+			if ($cache->getVar($temp, 'db_last_error', 600))
 			{
 				$db_last_error = max($db_last_error, $temp);
 			}
@@ -346,8 +350,8 @@ class Query extends AbstractQuery
 				require_once(SUBSDIR . '/Mail.subs.php');
 
 				// Make a note of the REPAIR...
-				Cache::instance()->put('db_last_error', time(), 600);
-				if (!Cache::instance()->getVar($temp, 'db_last_error', 600))
+				$cache->put('db_last_error', time(), 600);
+				if (!$cache->getVar($temp, 'db_last_error', 600))
 				{
 					logLastDatabaseError();
 				}
