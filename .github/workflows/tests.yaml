@@ -1,0 +1,221 @@
+name: MaxPain
+
+on:
+  push:
+    branches:        # Run tests when commits are pushed to these branches
+      - master
+      - development
+      - GHActions
+  pull_request:      # Run tests when pull requests are made on these branches
+    branches:
+      - master
+      - development
+      - GHActions
+
+jobs:
+  # Static checks, e.g. syntax errors, lint, etc
+  static-checks:
+    runs-on: ubuntu-18.04
+    strategy:
+      matrix:
+        include:
+          - db: 'none'
+            php: '7.2'
+            NOTESTS: 1
+
+    name: Static Tests
+
+    steps:
+      - name: Checkout ElkArte
+        uses: actions/checkout@v2
+        with:
+          repository: spuds/elkarte
+          ref: ${{ env.ELKARTE_BRANCH }}
+          path: elkarte
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php }}
+          extensions: dom, curl, libxml, mbstring, zip, gd, exif, iconv
+          coverage: none
+          tools: composer:v2
+          ini-values: error_reporting=E_ALL, allow_url_fopen=On, opcache.enable=0
+
+      - name: Setup Server Enviroment
+        env:
+          DB: ${{ matrix.db }}
+          PHP_VERSION: ${{ matrix.php }}
+        run: .github/setup-elkarte.sh $DB $PHP_VERSION
+        working-directory: ./elkarte
+
+      - name: Install NodeJS
+        uses: actions/setup-node@v1
+        with:
+          node-version: 12
+
+      - name: Install Linters
+        run: npm install --save-dev jshint stylelint stylelint-order stylelint-config-recommended
+
+      - name: Run StyleLint
+        run: npx stylelint "**/*.css"
+        working-directory: ./elkarte
+
+      - name: Run JSHint
+        run: ../node_modules/jshint/bin/jshint . --config .jshintrc --exclude-path .jshintignore
+        working-directory: ./elkarte
+
+      - name: Syntax/Header Checks
+        run: vendor/bin/phpunit --stderr --verbose --debug --configuration .github/phpunit-static.xml
+        working-directory: ./elkarte
+  # End Static Testing
+
+  # START MySQL / MariaDB Tests
+  mysql-tests:
+    runs-on: ubuntu-18.04
+    strategy:
+      matrix:
+        include:
+          - php: '7.2'
+            db: "mariadb:10.2"
+          - php: '7.3'
+            db: "mysql:5.7"
+          - php: '7.4'
+            db: "mysql:8.0"
+
+    name: PHP ${{ matrix.php }} - ${{ matrix.db_alias != '' && matrix.db_alias || matrix.db }}
+
+    services:
+      mysql:
+        image: ${{ matrix.db }}
+        env:
+          MYSQL_ALLOW_EMPTY_PASSWORD: yes
+          MYSQL_DATABASE: elkarte_test
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="mysqladmin ping"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=3
+
+    steps:
+      - name: Checkout ElkArte
+        uses: actions/checkout@v2
+        with:
+          repository: spuds/elkarte
+          ref: ${{ env.ELKARTE_BRANCH }}
+          path: elkarte
+
+      - id: database-type
+        env:
+          MATRIX_DB: ${{ matrix.db }}
+        run: |
+          db=$(echo "${MATRIX_DB%%:*}")
+          echo "::set-output name=db::$db"
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php }}
+          extensions: dom, curl, libxml, mbstring, zip, pdo, mysqli, gd, exif, iconv, apcu, memcached
+          coverage: xdebug
+          tools: composer:v2
+          ini-values: error_reporting=E_ALL, allow_url_fopen=On, opcache.enable=0, apc.enable_cli=1
+
+      - name: Setup Server (Nginx/etc)
+        env:
+          DB: ${{steps.database-type.outputs.db}}
+          PHP_VERSION: ${{ matrix.php }}
+        run: .github/setup-elkarte.sh $DB $PHP_VERSION
+        working-directory: ./elkarte
+
+      - name: Install Database
+        env:
+          DB: ${{steps.database-type.outputs.db}}
+          PHP_VERSION: ${{ matrix.php }}
+        run: .github/setup-database.sh $DB
+        working-directory: ./elkarte
+
+      - name: Run unit tests
+        env:
+          DB: ${{steps.database-type.outputs.db}}
+          PHP_VERSION: ${{ matrix.php }}
+        run: .github/setup-results.sh $DB $CI_EVENT_NAME
+        working-directory: ./elkarte
+  # END MySQL and MariaDB Job
+
+  # START Postgres Tests
+  postgres-tests:
+    runs-on: ubuntu-18.04
+    strategy:
+      matrix:
+        include:
+          - php: '7.1'
+            db: "postgres:9.5"
+          - php: '7.4'
+            db: "postgres:11.10"
+
+    name: PHP ${{ matrix.php }} - ${{ matrix.db_alias != '' && matrix.db_alias || matrix.db }}
+
+    services:
+      postgres:
+        image: ${{ matrix.db }}
+        env:
+          POSTGRES_HOST: localhost
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+        ports:
+          - 5432:5432
+        options: >-
+          -v /var/run/postgresql:/var/run/postgresql
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+      - name: Checkout ElkArte
+        uses: actions/checkout@v2
+        with:
+          repository: spuds/elkarte
+          ref: ${{ env.ELKARTE_BRANCH }}
+          path: elkarte
+
+      - id: database-type
+        env:
+          MATRIX_DB: ${{ matrix.db }}
+        run: |
+          db=$(echo "${MATRIX_DB%%:*}")
+          echo "::set-output name=db::$db"
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php }}
+          extensions: dom, curl, libxml, mbstring, zip, pdo, gd, exif, iconv, apcu, memcached
+          coverage: xdebug
+          tools: composer:v2
+          ini-values: error_reporting=E_ALL, allow_url_fopen=On, opcache.enable=0, apc.enable_cli=1
+
+      - name: Setup Server (Nginx/etc)
+        env:
+          DB: ${{steps.database-type.outputs.db}}
+          PHP_VERSION: ${{ matrix.php }}
+        run: .github/setup-elkarte.sh $DB $PHP_VERSION
+        working-directory: ./elkarte
+
+      - name: Install Database
+        env:
+          DB: ${{steps.database-type.outputs.db}}
+          PHP_VERSION: ${{ matrix.php }}
+        run: .github/setup-database.sh $DB
+        working-directory: ./elkarte
+
+      - name: Run unit tests
+        env:
+          DB: ${{steps.database-type.outputs.db}}
+          PHP_VERSION: ${{ matrix.php }}
+        run: .github/setup-results.sh $DB $CI_EVENT_NAME
+        working-directory: ./elkarte
+  # END Postgres Job

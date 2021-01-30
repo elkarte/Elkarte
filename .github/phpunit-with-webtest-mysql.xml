@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<phpunit backupGlobals="true"
+         colors="true"
+         convertErrorsToExceptions="true"
+         convertNoticesToExceptions="false"
+         convertWarningsToExceptions="true"
+         processIsolation="false"
+         stopOnFailure="false"
+         verbose="true"
+         beStrictAboutTestsThatDoNotTestAnything="false"
+         bootstrap="bootstrap.php">
+  <testsuites>
+      <testsuite name="Web Tests">
+          <directory suffix="Web.php">../tests</directory>
+      </testsuite>
+  </testsuites>
+
+  <listeners>
+      <listener class="PHPUnit_Extensions_Selenium2TestCase_ScreenshotListener">
+          <arguments>
+              <string>../screenshots</string>
+          </arguments>
+      </listener>
+  </listeners>
+
+  <filter>
+      <whitelist addUncoveredFilesFromWhitelist="false">
+          <directory suffix=".php">../sources</directory>
+          <directory suffix=".php">../themes/default</directory>
+          <exclude>
+              <directory suffix=".php">../sources/ext</directory>
+              <directory suffix=".php">../themes/default/languages/english</directory>
+          </exclude>
+      </whitelist>
+  </filter>
+
+    <logging>
+        <log type="coverage-clover" target="/tmp/coverage.clover"/>
+        <log type="coverage-text" target="php://stdout" />
+    </logging>
+
+  <php>
+      <const name="DBTYPE" value="MySQL"/>
+      <const name="PHPUNIT_SELENIUM" value="true"/>
+      <const name="PHPUNIT_TESTSUITE" value="true"/>
+  </php>
+
+</phpunit>
