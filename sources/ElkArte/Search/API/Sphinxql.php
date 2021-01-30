@@ -20,7 +20,6 @@ namespace ElkArte\Search\API;
 use ElkArte\Cache\Cache;
 use ElkArte\Errors\Errors;
 use ElkArte\User;
-use ElkArte\Util;
 
 /**
  * SearchAPI-Sphinxql.class.php, SphinxQL API,
@@ -29,7 +28,7 @@ use ElkArte\Util;
  *
  * - Used when an Sphinx search daemon is running
  * - Access is via Sphinx's own implementation of MySQL network protocol (SphinxQL)
- * - Requires Sphinx 2 or higher
+ * - Requires Sphinx 2.3 or higher
  *
  * @package Search
  */
@@ -61,7 +60,7 @@ class Sphinxql extends AbstractAPI
 	 *
 	 * @var array
 	 */
-	protected $bannedWords = array();
+	protected $bannedWords = [];
 
 	/**
 	 * What is the minimum word length?
@@ -75,7 +74,7 @@ class Sphinxql extends AbstractAPI
 	 *
 	 * @var array
 	 */
-	protected $supported_databases = array('MySQL');
+	protected $supported_databases = ['MySQL'];
 
 	/**
 	 * Nothing to do ...
@@ -104,28 +103,11 @@ class Sphinxql extends AbstractAPI
 	}
 
 	/**
-	 * Callback function for usort used to sort the results.
-	 *
-	 * - The order of sorting is: large words, small words, large words that
-	 * are excluded from the search, small words that are excluded.
-	 *
-	 * @param string $a Word A
-	 * @param string $b Word B
-	 * @return int indicating how the words should be sorted (-1, 0 1)
-	 */
-	public function searchSort($a, $b)
-	{
-		$x = strlen($a) - (in_array($a, $this->_excludedWords) ? 1000 : 0);
-		$y = strlen($b) - (in_array($b, $this->_excludedWords) ? 1000 : 0);
-
-		return $x < $y ? 1 : ($x > $y ? -1 : 0);
-	}
-
-	/**
 	 * {@inheritdoc }
 	 */
 	public function indexedWordQuery($words, $search_data)
 	{
+		// Sphinx uses its internal engine
 	}
 
 	/**
@@ -137,7 +119,7 @@ class Sphinxql extends AbstractAPI
 
 		$fulltextWord = count($subwords) === 1 ? $word : '"' . $word . '"';
 		$wordsSearch['indexed_words'][] = $fulltextWord;
-		if ($isExcluded !== '')
+		if ($isExcluded !== false)
 		{
 			$wordsExclude[] = $fulltextWord;
 		}
@@ -146,30 +128,24 @@ class Sphinxql extends AbstractAPI
 	/**
 	 * {@inheritdoc }
 	 */
-	public function searchQuery($search_words, $excluded_words, &$participants, &$search_results)
+	public function searchQuery($search_words, $excluded_words, &$participants)
 	{
 		global $context, $modSettings;
 
 		// Only request the results if they haven't been cached yet.
-		$cached_results = array();
+		$cached_results = [];
 		$cache_key = 'searchql_results_' . md5(User::$info->query_see_board . '_' . $context['params']);
 		if (!Cache::instance()->getVar($cached_results, $cache_key))
 		{
-			// Create an instance of the sphinx client and set a few options.
-			$mySphinx = @mysqli_connect(($modSettings['sphinx_searchd_server'] === 'localhost' ? '127.0.0.1' : $modSettings['sphinx_searchd_server']), '', '', '', (int) $modSettings['sphinxql_searchd_port']);
-
-			// No connection, daemon not running?  log the error
-			if ($mySphinx === false)
-			{
-				Errors::instance()->fatal_lang_error('error_no_search_daemon');
-			}
+			// Connect to the sphinx searchd and set a few options.
+			$mySphinx = $this->sphinxConnect();
 
 			// Compile different options for our query
 			$index = (!empty($modSettings['sphinx_index_prefix']) ? $modSettings['sphinx_index_prefix'] : 'elkarte') . '_index';
-			$query = 'SELECT *' . (empty($this->_searchParams->topic) ? ', COUNT(*) num' : '') . ', WEIGHT() weights, (weights + (relevance/10)) rank FROM ' . $index;
+			$query = 'SELECT *' . (empty($this->_searchParams->topic) ? ', COUNT(*) num' : '') . ', WEIGHT() relevance FROM ' . $index;
 
 			// Construct the (binary mode & |) query.
-			$where_match = $this->_constructQuery($this->_searchParams->search);
+			$where_match = $this->_searchArray->searchArrayExtended($this->_searchParams->search);
 
 			// Nothing to search, return zero results
 			if (trim($where_match) === '')
@@ -184,24 +160,8 @@ class Sphinxql extends AbstractAPI
 
 			$query .= ' WHERE MATCH(\'' . $where_match . '\')';
 
-			// Set the limits based on the search parameters.
-			$extra_where = array();
-			if (!empty($this->_searchParams->_minMsgID) || !empty($this->_searchParams->_maxMsgID))
-			{
-				$extra_where[] = 'id >= ' . $this->_searchParams->_minMsgID . ' AND id <= ' . (empty($this->_searchParams->_maxMsgID) ? (int) $modSettings['maxMsgID'] : $this->_searchParams->_maxMsgID);
-			}
-			if (!empty($this->_searchParams->topic))
-			{
-				$extra_where[] = 'id_topic = ' . (int) $this->_searchParams->topic;
-			}
-			if (!empty($this->_searchParams->brd))
-			{
-				$extra_where[] = 'id_board IN (' . implode(',', $this->_searchParams->brd) . ')';
-			}
-			if (!empty($this->_searchParams->_memberlist))
-			{
-				$extra_where[] = 'id_member IN (' . implode(',', $this->_searchParams->_memberlist) . ')';
-			}
+			// Set the limits based on the search parameters, board, member, dates, etc
+			$extra_where = $this->buildQueryLimits();
 			if (!empty($extra_where))
 			{
 				$query .= ' AND ' . implode(' AND ', $extra_where);
@@ -211,36 +171,36 @@ class Sphinxql extends AbstractAPI
 			$this->_searchParams->sort_dir = strtoupper($this->_searchParams->sort_dir);
 			$sphinx_sort = $this->_searchParams->sort === 'id_msg' ? 'id_topic' : $this->_searchParams->sort;
 
-			// Add secondary sorting based on relevance value (if not the main sort method) and age
+			// Add secondary sorting based on relevance(rank) value (if not the main sort method) and age
 			$sphinx_sort .= ' ' . $this->_searchParams->sort_dir . ($this->_searchParams->sort === 'relevance' ? '' : ', relevance DESC') . ', poster_time DESC';
-
-			// Replace relevance with the returned rank value, rank uses sphinx weight + our own computed field weight relevance
-			$sphinx_sort = str_replace('relevance ', 'rank ', $sphinx_sort);
 
 			// Grouping by topic id makes it return only one result per topic, so don't set that for in-topic searches
 			if (empty($this->_searchParams->topic))
 			{
-				// In the topic group, date based seems the most "normal" ORDER BY param for display purposes
-				$query .= ' GROUP BY id_topic WITHIN GROUP ORDER BY poster_time ASC';
+				// In the topic group, use the most weighty result for display purposes
+				$query .= ' GROUP BY id_topic WITHIN GROUP ORDER BY relevance DESC';
 			}
 
 			$query .= ' ORDER BY ' . $sphinx_sort;
-			$query .= ' LIMIT ' . (int) $modSettings['sphinx_max_results'] . ' OFFSET 0';
 
-			// Set any options needed, like field weights
-			// A better ranker expression is one based off the standard Sphinx SPH04 algo but boosted for
-			// exact_hit and use of proper BM25F instead of the short form BM25.  Use the following for best results
-			// ranker=expr(\'sum((4 * lcs + 2 * (min_hit_pos == 1) + 4 * exact_hit) * user_weight) * 1000 + bm25f(2.0, 0.75, {subject = 4, body = 1})\'),
-			// For proper use of bm25f add "index_field_lengths = 1" to your sphinx.conf and rebuild the index
-			$query .= ' OPTION field_weights=(subject=' . (!empty($modSettings['search_weight_subject']) ? $modSettings['search_weight_subject'] * 10 : 100) . ',body=100),
-			ranker=proximity_bm25,
-			idf=plain,
-			max_matches=' . (int) $modSettings['sphinx_max_results'];
+			// Set any options needed, like field weights.
+			// ranker is a modification of SPH_RANK_SPH04 sum((4*lcs+2*(min_hit_pos==1)+exact_hit)*user_weight)*1000+bm25
+			// Each term will return a 0-1000 range we include our acprel value for the final total and order.  Position
+			// is the relative reply # to a post, so the later a reply in a topic the less overall weight it is given
+			// the calculated value of ranker is returned in WEIGHTS() which we name relevance in the query
+			$subject_weight = !empty($modSettings['search_weight_subject']) ? $modSettings['search_weight_subject'] : 30;
+			$query .= '
+			OPTION 
+				field_weights=(subject=' . $subject_weight . ', body=' . (100 - $subject_weight) . '),
+				ranker=expr(\'sum((4*lcs+2*(min_hit_pos==1)+word_count)*user_weight*position) + acprel + bm25 \'),
+				idf=plain,
+				boolean_simplify=1,
+				max_matches=' . min(500, $modSettings['sphinx_max_results']);
 
 			// Execute the search query.
 			$request = mysqli_query($mySphinx, $query);
 
-			// Can a connection to the daemon be made?
+			// Bad query, lets log the error and act like its not our fault
 			if ($request === false)
 			{
 				// Just log the error.
@@ -255,29 +215,24 @@ class Sphinxql extends AbstractAPI
 			// Get the relevant information from the search results.
 			$cached_results = array(
 				'num_results' => 0,
-				'matches' => array(),
+				'matches' => [],
 			);
 
 			if (mysqli_num_rows($request) !== 0)
 			{
 				while (($match = mysqli_fetch_assoc($request)))
 				{
+					$num = 0;
 					if (empty($this->_searchParams->topic))
 					{
 						$num = isset($match['num']) ? $match['num'] : (isset($match['@count']) ? $match['@count'] : 0);
 					}
-					else
-					{
-						$num = 0;
-					}
 
 					$cached_results['matches'][$match['id']] = array(
 						'id' => $match['id_topic'],
-						'relevance' => round($match['rank'] / 5000, 1) . '%',
 						'num_matches' => $num,
-						'matches' => array(),
-						'weight' => round($match['weights'], 0),
-						'rel' => round($match['relevance'] / 10, 0),
+						'matches' => [],
+						'relevance' => round($match['relevance'], 0),
 					);
 				}
 			}
@@ -290,150 +245,91 @@ class Sphinxql extends AbstractAPI
 			Cache::instance()->put($cache_key, $cached_results, 600);
 		}
 
-		$participants = array();
-		$topics = array();
-		foreach (array_slice(array_keys($cached_results['matches']), (int) $_REQUEST['start'], $modSettings['search_results_per_page']) as $msgID)
+		$participants = [];
+		$topics = [];
+		foreach (array_slice(array_keys($cached_results['matches']), $this->_req->getRequest('start', 'intval', 0), $modSettings['search_results_per_page']) as $msgID)
 		{
 			$topics[$msgID] = $cached_results['matches'][$msgID];
 			$participants[$cached_results['matches'][$msgID]['id']] = false;
 		}
 
-		// Sentences need to be broken up in words for proper highlighting.
-		$search_results = array();
-		foreach ($search_words as $orIndex => $words)
-		{
-			$search_results = array_merge($search_results, $search_words[$orIndex]['subject_words']);
-		}
 		$this->_num_results = $cached_results['num_results'];
 
 		return $topics;
 	}
 
 	/**
-	 * Constructs a binary mode query to pass back to sphinx
+	 * Connect to the sphinx server, on failure log error and exit
 	 *
-	 * @param string $string The user entered query to construct with
-	 * @return string A binary mode query
+	 * @return \mysqli
+	 * @throws \ElkArte\Exceptions\Exception
 	 */
-	private function _constructQuery($string)
+	private function sphinxConnect()
 	{
-		$keywords = array('include' => array(), 'exclude' => array());
+		global $modSettings;
 
-		// Split our search string and return an empty string if no matches
-		if (!preg_match_all('~ (-?)("[^"]+"|[^" ]+)~', ' ' . $string, $tokens, PREG_SET_ORDER))
+		set_error_handler(function () { /* ignore errors */ });
+		try
 		{
-			return '';
+			$mySphinx = mysqli_connect(($modSettings['sphinx_searchd_server'] === 'localhost' ? '127.0.0.1' : $modSettings['sphinx_searchd_server']), '', '', '', (int) $modSettings['sphinxql_searchd_port']);
+		}
+		catch (\Exception $e)
+		{
+			$mySphinx = false;
+		}
+		finally
+		{
+			restore_error_handler();
+		};
+
+		// No connection, daemon not running?  log the error and exit
+		if ($mySphinx === false)
+		{
+			Errors::instance()->fatal_lang_error('error_no_search_daemon');
 		}
 
-		// First we split our string into included and excluded words and phrases
-		$or_part = false;
-		foreach ($tokens as $token)
-		{
-			// Strip the quotes off of a phrase
-			if ($token[2][0] === '"')
-			{
-				$token[2] = substr($token[2], 1, -1);
-				$phrase = true;
-			}
-			else
-			{
-				$phrase = false;
-			}
-
-			// Prepare this token
-			$cleanWords = $this->_cleanString($token[2]);
-
-			// Explode the cleanWords again in case the cleaning puts more spaces into it
-			$addWords = $phrase ? array('"' . $cleanWords . '"') : preg_split('~ ~u', $cleanWords, null, PREG_SPLIT_NO_EMPTY);
-
-			// Excluding this word?
-			if ($token[1] === '-')
-			{
-				$keywords['exclude'] = array_merge($keywords['exclude'], $addWords);
-			}
-			// OR'd keywords (we only do this if we have something to OR with)
-			elseif (($token[2] === 'OR' || $token[2] === '|') && count($keywords['include']))
-			{
-				$last = array_pop($keywords['include']);
-				if (!is_array($last))
-				{
-					$last = array($last);
-				}
-				$keywords['include'][] = $last;
-				$or_part = true;
-				continue;
-			}
-			// AND is implied in a Sphinx Search
-			elseif ($token[2] === 'AND' || $token[2] === '&')
-			{
-				continue;
-			}
-			// If this part of the query ended up being blank, skip it
-			elseif (trim($cleanWords) === '')
-			{
-				continue;
-			}
-			// Must be something they want to search for!
-			elseif ($or_part)
-			{
-				// If this was part of an OR branch, add it to the proper section
-				$keywords['include'][count($keywords['include']) - 1] = array_merge($keywords['include'][count($keywords['include']) - 1], $addWords);
-			}
-			else
-			{
-				$keywords['include'] = array_merge($keywords['include'], $addWords);
-			}
-
-			// Start fresh on this...
-			$or_part = false;
-		}
-
-		// Let's make sure they're not canceling each other out
-		if (count(array_diff($keywords['include'], $keywords['exclude'])) === 0)
-		{
-			return '';
-		}
-
-		// Now we compile our arrays into a valid search string
-		$query_parts = array();
-		foreach ($keywords['include'] as $keyword)
-		{
-			$query_parts[] = is_array($keyword) ? '(' . implode(' | ', $keyword) . ')' : $keyword;
-		}
-
-		foreach ($keywords['exclude'] as $keyword)
-		{
-			$query_parts[] = '-' . $keyword;
-		}
-
-		return implode(' ', $query_parts);
+		return $mySphinx;
 	}
 
 	/**
-	 * Cleans a string of everything but alphanumeric characters
-	 *
-	 * @param string $string A string to clean
-	 * @return string A cleaned up string
+	 * {@inheritdoc }
 	 */
-	private function _cleanString($string)
-	{
-		// Decode the entities first
-		$string = html_entity_decode($string, ENT_QUOTES, 'UTF-8');
-
-		// Lowercase string
-		$string = Util::strtolower($string);
-
-		// Fix numbers so they search easier (phone numbers, SSN, dates, etc)
-		$string = preg_replace('~([[:digit:]]+)\pP+(?=[[:digit:]])~u', '', $string);
-
-		// Last but not least, strip everything out that's not alphanumeric
-		$string = preg_replace('~[^\pL\pN]+~u', ' ', $string);
-
-		return $string;
-	}
-
 	public function useWordIndex()
 	{
 		return false;
+	}
+
+	/**
+	 * Builds the query modifiers based on age, member, board etc
+	 *
+	 * @return array
+	 */
+	public function buildQueryLimits()
+	{
+		global $modSettings;
+
+		$extra_where = [];
+
+		if (!empty($this->_searchParams->_minMsgID) || !empty($this->_searchParams->_maxMsgID))
+		{
+			$extra_where[] = 'id >= ' . $this->_searchParams->_minMsgID . ' AND id <= ' . (empty($this->_searchParams->_maxMsgID) ? (int) $modSettings['maxMsgID'] : $this->_searchParams->_maxMsgID);
+		}
+
+		if (!empty($this->_searchParams->topic))
+		{
+			$extra_where[] = 'id_topic = ' . (int) $this->_searchParams->topic;
+		}
+
+		if (!empty($this->_searchParams->brd))
+		{
+			$extra_where[] = 'id_board IN (' . implode(',', $this->_searchParams->brd) . ')';
+		}
+
+		if (!empty($this->_searchParams->_memberlist))
+		{
+			$extra_where[] = 'id_member IN (' . implode(',', $this->_searchParams->_memberlist) . ')';
+		}
+
+		return $extra_where;
 	}
 }

@@ -26,16 +26,14 @@ class SearchApiWrapper
 {
 	public const DEFAULT_API = 'standard';
 
-	/**
-	 * Holds instance of the search api in use such as ElkArte\Search\API\Standard_Search
-	 *
-	 * @var null|object
-	 */
+	/** @var null|object Holds instance of the search api in use such as ElkArte\Search\API\Standard_Search */
 	protected $_searchAPI = null;
 
 	/**
 	 * Constructor
 	 *
+	 * @param \ElkArte\ValuesContainer|string $config The searchAPI
+	 * @param \ElkArte\Search\SearchParams $searchParams
 	 * @package Search
 	 */
 	public function __construct($config, $searchParams = null)
@@ -44,18 +42,21 @@ class SearchApiWrapper
 		{
 			$config = new ValuesContainer((array) $config);
 		}
-		$this->load($config->search_index, $config, $searchParams);
+
+		$this->load($config, $searchParams);
 	}
 
 	/**
 	 * Creates a search API and returns the object.
 	 *
-	 * @param string $searchClass
 	 * @param \ElkArte\ValuesContainer $config
+	 * @param \ElkArte\Search\SearchParams $searchParams
 	 */
-	protected function load($searchClass, $config, $searchParams)
+	protected function load($config, $searchParams)
 	{
 		global $txt;
+
+		$searchClass = $config->search_index;
 
 		require_once(SUBSDIR . '/Package.subs.php');
 
@@ -67,6 +68,7 @@ class SearchApiWrapper
 
 		// Try to initialize the API
 		$fqcn = '\\ElkArte\\Search\\API\\' . ucfirst($searchClass);
+
 		if (class_exists($fqcn) && is_a($fqcn, '\\ElkArte\\Search\\API\\AbstractAPI', true))
 		{
 			// Create an instance of the search API and check it is valid for this version of the software.
@@ -163,13 +165,12 @@ class SearchApiWrapper
 	 * @param string[] $search_words
 	 * @param string[] $excluded_words
 	 * @param mixed[] $participants
-	 * @param string[] $search_results
 	 *
 	 * @return mixed[]
 	 */
-	public function searchQuery($search_words, $excluded_words, &$participants, &$search_results)
+	public function searchQuery($search_words, $excluded_words, &$participants)
 	{
-		return $this->_searchAPI->searchQuery($search_words, $excluded_words, $participants, $search_results);
+		return $this->_searchAPI->searchQuery($search_words, $excluded_words, $participants);
 	}
 
 	/**
@@ -218,7 +219,7 @@ class SearchApiWrapper
 	 * @param string $word
 	 * @param string $wordsSearch
 	 * @param string $wordsExclude
-	 * @param string $isExcluded
+	 * @param boolean $isExcluded
 	 * @param string $excludedSubjectWords
 	 */
 	public function prepareIndexes($word, &$wordsSearch, &$wordsExclude, $isExcluded, $excludedSubjectWords)

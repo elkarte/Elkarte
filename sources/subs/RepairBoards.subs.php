@@ -524,7 +524,7 @@ function loadForumTests()
 				$db->query('', '
 					UPDATE {db_prefix}messages
 					SET 
-					 	= {int:newBoardID}
+						id_board = {int:newBoardID}
 					WHERE id_board = {int:board_id}',
 					array(
 						'newBoardID' => $newBoardID,

@@ -125,7 +125,7 @@ function messageIndexTopics($id_board, $id_member, $start, $items_per_page, $sor
 			array(
 				'current_board' => $id_board,
 				'current_member' => $id_member,
-				'topic_list' => array_keys($topics),
+				'topic_list' => $topics === [] ? [0] : array_keys($topics),
 			)
 		);
 		// Now we fill the above array, maintaining index association.

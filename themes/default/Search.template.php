@@ -350,8 +350,7 @@ function template_results()
 						<div class="topic_details">
 							<div class="counter">', $message['counter'], '</div>
 							<h5>', $topic['board']['link'], ' / <a href="', getUrl('topic', ['topic' => $topic['id'], 'subject' => $topic['subject'], 'start' => 'msg' . $message['id']]), '#msg', $message['id'], '">', $message['subject_highlighted'], '</a></h5>
-							<span class="smalltext">&#171;&nbsp;', $txt['by'], '&nbsp;<strong>', $message['member']['link'], '</strong> ', $txt['on'], '&nbsp;<em>', $message['time'], '</em>&nbsp;&#187;</span>';
-			echo '
+							<span class="smalltext">&#171;&nbsp;', $txt['by'], '&nbsp;<strong>', $message['member']['link'], '</strong> ', $txt['on'], '&nbsp;<em>', $message['time'], '</em>&nbsp;&#187;</span>
 						</div>';
 
 			if (!$context['compact'] || $message['body_highlighted'] != '')

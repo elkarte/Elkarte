@@ -101,7 +101,7 @@ function createPost(&$msgOptions, &$topicOptions, &$posterOptions)
 	{
 		require_once(SUBSDIR . '/Topic.subs.php');
 		$is_approved = topicAttribute($topicOptions['id'], array('approved'));
-		$topicOptions['is_approved'] = $is_approved['approved'];
+		$topicOptions['is_approved'] = !empty($is_approved['approved']);
 	}
 
 	// If nothing was filled in as name/email address, try the member table.

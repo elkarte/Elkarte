@@ -17,7 +17,6 @@
 namespace ElkArte\Search\API;
 
 use ElkArte\Search\Cache\Session;
-use ElkArte\Util;
 
 /**
  * SearchAPI-Standard.class.php, Standard non full index, non custom index search
@@ -70,7 +69,7 @@ class Standard extends AbstractAPI
 	 * @return mixed[]
 	 * @throws \Exception
 	 */
-	public function searchQuery($search_words, $excluded_words, &$participants, &$search_results)
+	public function searchQuery($search_words, $excluded_words, &$participants)
 	{
 		global $context, $modSettings;
 
@@ -91,10 +90,7 @@ class Standard extends AbstractAPI
 
 			if ($this->_searchParams['subject_only'])
 			{
-				$num_res = $this->getSubjectResults(
-					$search_id,
-					$search_words, $excluded_words
-				);
+				$num_res = $this->getSubjectResults($search_id, $search_words, $excluded_words);
 			}
 			else
 			{
@@ -113,7 +109,7 @@ class Standard extends AbstractAPI
 
 		// *** Retrieve the results to be shown on the page
 		$topics = array();
-		$participants = $this->addRelevance($topics, $search_id, (int) $_REQUEST['start'], $modSettings['search_results_per_page']);
+		$participants = $this->addRelevance($topics, $search_id, $this->_req->getRequest('start', 'intval', 0), $modSettings['search_results_per_page']);
 		$this->_num_results = $this->_search_cache->getNumResults();
 
 		return $topics;
@@ -147,6 +143,7 @@ class Standard extends AbstractAPI
 		global $modSettings;
 
 		$numSubjectResults = 0;
+
 		// We do this to try and avoid duplicate keys on databases not supporting INSERT IGNORE.
 		foreach ($search_words as $words)
 		{
@@ -942,24 +939,6 @@ class Standard extends AbstractAPI
 		$request->free_result();
 
 		return $participants;
-	}
-
-	/**
-	 * Callback function for usort used to sort the fulltext results.
-	 *
-	 * - The order of sorting is: large words, small words, large words that
-	 * are excluded from the search, small words that are excluded.
-	 *
-	 * @param string $a Word A
-	 * @param string $b Word B
-	 * @return int An integer indicating how the words should be sorted (-1, 0 1)
-	 */
-	public function searchSort($a, $b)
-	{
-		$x = Util::strlen($a) - (in_array($a, $this->_excludedWords) ? 1000 : 0);
-		$y = Util::strlen($b) - (in_array($b, $this->_excludedWords) ? 1000 : 0);
-
-		return $y < $x ? 1 : ($y > $x ? -1 : 0);
 	}
 
 	/**

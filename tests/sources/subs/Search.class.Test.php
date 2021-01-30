@@ -215,6 +215,8 @@ class TestSearchclass extends \PHPUnit\Framework\TestCase
 	{
 		global $modSettings, $context;
 
+		$req = \ElkArte\HttpReq::instance();
+
 		$recentPercentage = 0.30;
 		$maxMembersToSearch = 500;
 		$humungousTopicPosts = 200;
@@ -224,13 +226,14 @@ class TestSearchclass extends \PHPUnit\Framework\TestCase
 			'search_selection' => 'all',
 			'advanced' => 0
 		];
-		$_GET['search'] = $search_terms['search'];
+		$req->query->search = $search_terms['search'];
 
 		$search = new \ElkArte\Search\Search();
-		$search->setWeights(new \ElkArte\Search\WeightFactors($modSettings, 1));
+		$search->setWeights(new \ElkArte\Search\WeightFactors($modSettings, true));
 		$search_params = new \ElkArte\Search\SearchParams('');
 		$search_params->merge($search_terms, $recentPercentage, $maxMembersToSearch);
 		$search->setParams($search_params, !empty($modSettings['search_simple_fulltext']));
+		$search->getSearchArray();
 		$context['params'] = $search->compileURLparams();
 
 		$search_config = new \ElkArte\ValuesContainer(array(

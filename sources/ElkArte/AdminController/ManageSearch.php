@@ -430,7 +430,7 @@ class ManageSearch extends AbstractController
 		$apis = array();
 		try
 		{
-			$files = new \GlobIterator(SUBSDIR . '/Search/API/*.php', \FilesystemIterator::SKIP_DOTS);
+			$files = new \GlobIterator(SOURCEDIR . '/ElkArte/Search/API/*.php', \FilesystemIterator::SKIP_DOTS);
 			foreach ($files as $file)
 			{
 				if ($file->isFile())
@@ -615,57 +615,13 @@ class ManageSearch extends AbstractController
 			// Try to connect via Sphinx API?
 			if (empty($modSettings['search_index']) || $modSettings['search_index'] === 'Sphinx')
 			{
-				// This is included with sphinx and not distrubuted with ElkArte
-				if (file_exists(SOURCEDIR . '/sphinxapi.php'))
-				{
-					include_once(SOURCEDIR . '/sphinxapi.php');
-					$server = !empty($modSettings['sphinx_searchd_server']) ? $modSettings['sphinx_searchd_server'] : 'localhost';
-					$port = !empty($modSettings['sphinx_searchd_port']) ? $modSettings['sphinxql_searchd_port'] : '9312';
-
-					$mySphinx = new \SphinxClient();
-					$mySphinx->SetServer($server, (int) $port);
-					$mySphinx->SetLimits(0, 25);
-					$mySphinx->SetMatchMode(SPH_MATCH_BOOLEAN);
-					$mySphinx->SetSortMode(SPH_SORT_ATTR_ASC, 'id_topic');
-
-					$index = (!empty($modSettings['sphinx_index_prefix']) ? $modSettings['sphinx_index_prefix'] : 'elkarte') . '_index';
-					$request = $mySphinx->Query('test', $index);
-					if ($request === false)
-					{
-						$context['settings_message'][] = $txt['sphinx_test_connect_failed'];
-						$context['error_type'] = 'serious';
-					}
-					else
-					{
-						updateSettings(array('sphinx_searchd_server' => $server, 'sphinx_searchd_port' => $port));
-						$context['settings_message'][] = $txt['sphinx_test_passed'];
-					}
-				}
-				else
-				{
-					$context['settings_message'][] = $txt['sphinx_test_api_missing'];
-					$context['error_type'] = 'serious';
-				}
+				$this->connectSphinxApi();
 			}
 
 			// Try to connect via SphinxQL
 			if (empty($modSettings['search_index']) || $modSettings['search_index'] === 'Sphinxql')
 			{
-				$server = !empty($modSettings['sphinx_searchd_server']) ? $modSettings['sphinx_searchd_server'] : 'localhost';
-				$server = $server === 'localhost' ? '127.0.0.1' : $server;
-				$port = !empty($modSettings['sphinxql_searchd_port']) ? $modSettings['sphinxql_searchd_port'] : '9306';
-
-				$result = @mysqli_connect($server, '', '', '', (int) $port);
-				if ($result === false)
-				{
-					$context['settings_message'][] = $txt['sphinxql_test_connect_failed'];
-					$context['error_type'] = 'serious';
-				}
-				else
-				{
-					updateSettings(array('sphinx_searchd_server' => $server, 'sphinxql_searchd_port' => $port));
-					$context['settings_message'][] = $txt['sphinxql_test_passed'];
-				}
+				$this->connectSphinxQL();
 			}
 		}
 		elseif (isset($this->_req->post->createconfig))
@@ -705,5 +661,81 @@ class ManageSearch extends AbstractController
 			'sphinxql_searchd_port' => (int) $this->_req->post->sphinxql_searchd_port,
 			'sphinx_max_results' => (int) $this->_req->post->sphinx_max_results,
 		));
+	}
+
+	/**
+	 * Attempt to connect to sphinx using the API methods
+	 */
+	public function connectSphinxApi()
+	{
+		global $txt, $modSettings, $context;
+
+		// This is included with sphinx and not distrubuted with ElkArte
+		if (file_exists(SOURCEDIR . '/sphinxapi.php'))
+		{
+			include_once(SOURCEDIR . '/sphinxapi.php');
+			$server = !empty($modSettings['sphinx_searchd_server']) ? $modSettings['sphinx_searchd_server'] : 'localhost';
+			$port = !empty($modSettings['sphinx_searchd_port']) ? $modSettings['sphinx_searchd_port'] : 9312;
+
+			$mySphinx = new \SphinxClient();
+			$mySphinx->SetServer($server, (int) $port);
+			$mySphinx->SetLimits(0, 25, 1);
+
+			$index = (!empty($modSettings['sphinx_index_prefix']) ? $modSettings['sphinx_index_prefix'] : 'elkarte') . '_index';
+			$request = $mySphinx->Query('ElkArte', $index);
+
+			if ($request === false)
+			{
+				$context['settings_message'][] = $txt['sphinx_test_connect_failed'];
+				$context['error_type'] = 'serious';
+			}
+			else
+			{
+				updateSettings(array('sphinx_searchd_server' => $server, 'sphinx_searchd_port' => $port));
+				$context['settings_message'][] = $txt['sphinx_test_passed'];
+			}
+
+			return;
+		}
+
+		$context['settings_message'][] = $txt['sphinx_test_api_missing'];
+		$context['error_type'] = 'serious';
+	}
+
+	/**
+	 * Attempt to connect to Sphinx using the preferred QL way
+	 */
+	public function connectSphinxQL()
+	{
+		global $txt, $modSettings, $context;
+
+		$server = !empty($modSettings['sphinx_searchd_server']) ? $modSettings['sphinx_searchd_server'] : 'localhost';
+		$server = $server === 'localhost' ? '127.0.0.1' : $server;
+		$port = !empty($modSettings['sphinxql_searchd_port']) ? $modSettings['sphinxql_searchd_port'] : '9306';
+
+		set_error_handler(function () { /* ignore errors */ });
+		try
+		{
+			$result = mysqli_connect($server, '', '', '', (int) $port);
+		}
+		catch (\Exception $e)
+		{
+			$result = false;
+		}
+		finally
+		{
+			restore_error_handler();
+		}
+
+		if ($result === false)
+		{
+			$context['settings_message'][] = $txt['sphinxql_test_connect_failed'];
+			$context['error_type'] = 'serious';
+
+			return;
+		}
+
+		updateSettings(array('sphinx_searchd_server' => $server, 'sphinxql_searchd_port' => $port));
+		$context['settings_message'][] = $txt['sphinxql_test_passed'];
 	}
 }

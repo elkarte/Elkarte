@@ -21,93 +21,50 @@ namespace ElkArte\Search;
  */
 class Search
 {
-	/**
-	 * This is the forum version but is repeated due to some people
-	 * rewriting FORUM_VERSION.
-	 */
+	/** @const the forum version but is repeated due to some people rewriting FORUM_VERSION. */
 	public const FORUM_VERSION = 'ElkArte 2.0 dev';
-	/**
-	 *
-	 * @var mixed[]
-	 */
+
+	/** @var mixed[] */
 	protected $_participants = [];
-	/**
-	 *
-	 * @var null|\ElkArte\Search\SearchParams
-	 */
-	protected $_searchParams = null;
-	/**
-	 * This is the minimum version of ElkArte that an API could have been written
-	 * for to work.
-	 * (strtr to stop accidentally updating version on release)
-	 */
+
+	/** @var \ElkArte\Search\SearchParams */
+	protected $_searchParams;
+
+	/** @var \ElkArte\Search\SearchArray Holds the words and phrases to be searched on  */
+	private $_searchArray;
+
+	/** @var null|object Holds instance of the search api in use such as ElkArte\Search\API\Standard_Search */
+	private $_searchAPI;
+
+	/** @var \ElkArte\Database\QueryInterface Database instance */
+	private $_db;
+
+	/** @var \ElkArte\Database\SearchInterface Search db instance */
+	private $_db_search;
+
+	/** @var array Searching for posts from a specific user(s) */
+	private $_memberlist = [];
+
+	/** @var array Builds the array of words for use in the db query */
+	private $_searchWords = [];
+
+	/** @var array Words excluded from indexes */
+	private $_excludedIndexWords = [];
+
+	/** @var array Words not be be found in the subject (-word) */
+	private $_excludedSubjectWords = [];
+
+	/** @var array Phrases not to be found in the search results (-"some phrase") */
+	private $_excludedPhrases = [];
+
+	/** @var \ElkArte\Search\WeightFactors The weights to associate to various areas for relevancy */
+	private $_weightFactors = [];
+
+	/** @var bool If we are creating a tmp db table */
+	private $_createTemporary;
+
+	/** @var string the minimum version of ElkArte that an API will work with */
 	private $_search_version = '';
-	/**
-	 * Holds the words and phrases to be searched on
-	 *
-	 * @var \ElkArte\Search\SearchArray
-	 */
-	private $_searchArray = null;
-	/**
-	 * Holds instance of the search api in use such as ElkArte\Search\API\Standard_Search
-	 *
-	 * @var null|object
-	 */
-	private $_searchAPI = null;
-	/**
-	 * Database instance
-	 *
-	 * @var \ElkArte\Database\QueryInterface
-	 */
-	private $_db = null;
-	/**
-	 * Search db instance
-	 *
-	 * @var \ElkArte\Database\SearchInterface
-	 */
-	private $_db_search = null;
-	/**
-	 * Searching for posts from a specific user(s)
-	 *
-	 * @var array
-	 */
-	private $_memberlist = array();
-	/**
-	 * Builds the array of words for use in the db query
-	 *
-	 * @var array
-	 */
-	private $_searchWords = array();
-	/**
-	 * Words excluded from indexes
-	 *
-	 * @var array
-	 */
-	private $_excludedIndexWords = array();
-	/**
-	 * Words not be be found in the subject (-word)
-	 *
-	 * @var array
-	 */
-	private $_excludedSubjectWords = array();
-	/**
-	 * Phrases not to be found in the search results (-"some phrase")
-	 *
-	 * @var array
-	 */
-	private $_excludedPhrases = array();
-	/**
-	 * The weights to associate to various areas for relevancy
-	 *
-	 * @var \ElkArte\Search\WeightFactors
-	 */
-	private $_weightFactors = array();
-	/**
-	 * If we are creating a tmp db table
-	 *
-	 * @var bool
-	 */
-	private $_createTemporary = true;
 
 	/**
 	 * Constructor
@@ -117,12 +74,13 @@ class Search
 	 */
 	public function __construct()
 	{
+		// strtr to stop accidentally updating version on release
 		$this->_search_version = strtr('ElkArte 1+1', array('+' => '.', '=' => ' '));
 		$this->_db = database();
 		$this->_db_search = db_search();
 
-		$this->_db_search->skip_next_error();
 		// Create new temporary table(s) (if we can) to store preliminary results in.
+		$this->_db_search->skip_next_error();
 		$this->_createTemporary = $this->_db_search->createTemporaryTable(
 				'{db_prefix}tmp_log_search_messages',
 				array(
@@ -143,6 +101,7 @@ class Search
 				)
 			) !== false;
 
+		// Skip the error as its not uncommon for temp tables to be denied
 		$this->_db_search->skip_next_error();
 		$this->_db_search->createTemporaryTable('{db_prefix}tmp_log_search_topics',
 			array(
@@ -177,20 +136,16 @@ class Search
 		{
 			return $this->_searchParams[$name];
 		}
-		else
-		{
-			return false;
-		}
+
+		return false;
 	}
 
 	/**
-	 * Returns all the search parameters.
-	 *
-	 * @return void
+	 * Sets $this->data with all the search parameters.
 	 */
 	public function getParams()
 	{
-		return $this->_searchParams->mergeWith(array(
+		$this->_searchParams->mergeWith(array(
 			'min_msg_id' => (int) $this->_searchParams->_minMsgID,
 			'max_msg_id' => (int) $this->_searchParams->_maxMsgID,
 			'memberlist' => $this->_searchParams->_memberlist,
@@ -210,32 +165,37 @@ class Search
 	 *
 	 * @param \ElkArte\Search\WeightFactors $weight
 	 */
-	public function setWeights(WeightFactors $weight)
+	public function setWeights($weight)
 	{
 		$this->_weightFactors = $weight;
 	}
 
-	public function setParams(SearchParams $paramObject, $search_simple_fulltext = false)
+	/**
+	 * Set disallowed words etc.
+	 *
+	 * @param \ElkArte\Search\SearchParams $paramObject
+	 * @param false $search_simple_fulltext
+	 */
+	public function setParams($paramObject, $search_simple_fulltext = false)
 	{
 		$this->_searchParams = $paramObject;
 
-		// Unfortunately, searching for words like this is going to be slow, so we're blacklisting them.
+		// Unfortunately, searching for words like this is going to be slow, or abundant, so we're blocking them.
 		// @todo Setting to add more here?
-		// @todo Maybe only blacklist if they are the only word, or "any" is used?
-		$blacklisted_words = array('img', 'url', 'quote', 'www', 'http', 'the', 'is', 'it', 'are', 'if');
-		call_integration_hook('integrate_search_blacklisted_words', array(&$blacklisted_words));
+		$blocklist_words = array('img', 'url', 'quote', 'www', 'http', 'the', 'is', 'it', 'are', 'if', 'in');
+		call_integration_hook('integrate_search_blocklist_words', array(&$blocklist_words));
 
-		$this->_searchArray = new SearchArray($this->_searchParams->search, $blacklisted_words, $search_simple_fulltext);
+		$this->_searchArray = new SearchArray($this->_searchParams->search, $blocklist_words, $search_simple_fulltext);
 	}
 
 	/**
-	 * If any black-listed word has been found
+	 * If any block-listed word has been found
 	 *
 	 * @return bool
 	 */
-	public function foundBlackListedWords()
+	public function foundBlockListedWords()
 	{
-		return $this->_searchArray->foundBlackListedWords();
+		return $this->_searchArray->foundBlockListedWords();
 	}
 
 	public function getSearchArray()
@@ -266,10 +226,8 @@ class Search
 		{
 			return $this->_searchParams->get();
 		}
-		else
-		{
-			return $this->_searchParams;
-		}
+
+		return $this->_searchParams;
 	}
 
 	public function getExcludedPhrases()
@@ -395,10 +353,10 @@ class Search
 	}
 
 	/**
-	 * Sets the query
+	 * Sets the query, calls the searchQuery method of the API in use
 	 *
 	 * @param \ElkArte\Search\SearchApiWrapper $searchAPI
-	 * @return mixed[]
+	 * @return mixed[]|\ElkArte\Search\SearchApiWrapper
 	 */
 	public function searchQuery($searchAPI)
 	{
@@ -408,12 +366,7 @@ class Search
 		$searchAPI->useTemporary($this->_createTemporary);
 		$searchAPI->setSearchArray($this->_searchArray);
 
-		return $searchAPI->searchQuery(
-			$this->searchWords(),
-			$this->_excludedIndexWords,
-			$this->_participants,
-			$this->_searchAPI
-		);
+		return $searchAPI->searchQuery($this->searchWords(), $this->_excludedIndexWords, $this->_participants);
 	}
 
 	/**
@@ -468,6 +421,7 @@ class Search
 			);
 
 			$this->_searchAPI->setExcludedWords($excludedWords);
+
 			// Sort the indexed words (large words -> small words -> excluded words).
 			usort($orParts[$orIndex], array($this->_searchAPI, 'searchSort'));
 
@@ -501,18 +455,17 @@ class Search
 				$context['search_errors']['query_not_specific_enough'] = true;
 				break;
 			}
-			elseif ($this->_searchParams->subject_only && empty($this->_searchWords[$orIndex]['subject_words']) && empty($this->_excludedSubjectWords))
+
+			if ($this->_searchParams->subject_only && empty($this->_searchWords[$orIndex]['subject_words']) && empty($this->_excludedSubjectWords))
 			{
 				$context['search_errors']['query_not_specific_enough'] = true;
 				break;
 			}
+
 			// Make sure we aren't searching for too many indexed words.
-			else
-			{
-				$this->_searchWords[$orIndex]['indexed_words'] = array_slice($this->_searchWords[$orIndex]['indexed_words'], 0, 7);
-				$this->_searchWords[$orIndex]['subject_words'] = array_slice($this->_searchWords[$orIndex]['subject_words'], 0, 7);
-				$this->_searchWords[$orIndex]['words'] = array_slice($this->_searchWords[$orIndex]['words'], 0, 4);
-			}
+			$this->_searchWords[$orIndex]['indexed_words'] = array_slice($this->_searchWords[$orIndex]['indexed_words'], 0, 7);
+			$this->_searchWords[$orIndex]['subject_words'] = array_slice($this->_searchWords[$orIndex]['subject_words'], 0, 7);
+			$this->_searchWords[$orIndex]['words'] = array_slice($this->_searchWords[$orIndex]['words'], 0, 4);
 		}
 
 		return $this->_searchWords;
