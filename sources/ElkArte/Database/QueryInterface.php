@@ -122,20 +122,6 @@ interface QueryInterface
 	public function insert($method = 'replace', $table, $columns, $data, $keys, $disable_trans = false);
 
 	/**
-	 * This function tries to work out additional error information from a back trace.
-	 *
-	 * @param string $error_message
-	 * @param string $log_message
-	 * @param string|bool $error_type
-	 * @param string|null $file
-	 * @param int|null $line
-	 *
-	 * @return array
-	 * @throws \ElkArte\Exceptions\Exception
-	 */
-	public function error_backtrace($error_message, $log_message = '', $error_type = false, $file = null, $line = null);
-
-	/**
 	 * Escape string for the database input
 	 *
 	 * @param string $string

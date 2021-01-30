@@ -133,7 +133,7 @@ abstract class AbstractQuery implements QueryInterface
 	 *
 	 * @var resource
 	 */
-	private $_db_last_result = null;
+	protected $_db_last_result = null;
 
 	/**
 	 * Comments that are allowed in a query are preg_removed.
@@ -352,15 +352,16 @@ abstract class AbstractQuery implements QueryInterface
 	}
 
 	/**
-	 * {@inheritDoc}
+	 * Scans the debug_backtrace output looking for the place where the
+	 * actual error happened
+	 *
+	 * @return mixed[]
 	 */
-	public function error_backtrace($error_message, $log_message = '', $error_type = false, $file = null, $line = null)
+	protected function backtrace_message()
 	{
-		if (empty($log_message))
-		{
-			$log_message = $error_message;
-		}
-
+		$log_message = '';
+		$file = null;
+		$line = null;
 		foreach (debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS) as $step)
 		{
 			// Found it?
@@ -376,12 +377,35 @@ abstract class AbstractQuery implements QueryInterface
 				$line = $step['line'];
 			}
 		}
+		return [$file, $line, $log_message];
+	}
 
-		// A special case - we want the file and line numbers for debugging.
-		if ($error_type == 'return')
+	/**
+	 * This function tries to work out additional error information from a back trace.
+	 *
+	 * @param string $error_message
+	 * @param string $log_message
+	 * @param string|bool $error_type
+	 * @param string|null $file
+	 * @param int|null $line
+	 *
+	 * @return array
+	 * @throws \ElkArte\Exceptions\Exception
+	 */
+	protected function error_backtrace($error_message, $log_message = '', $error_type = false, $file_fallback = null, $line_fallback = null)
+	{
+		if (empty($log_message))
 		{
-			return array($file, $line);
+			$log_message = $error_message;
 		}
+
+		// We'll try recovering the file and line number the original db query was called from.
+		list ($file, $line, $backtrace_message) = $this->backtrace_message();
+
+		// Just in case nothing can be found from debug_backtrace
+		$file = $file ?? $file_fallback;
+		$line = $line ?? $line_fallback;
+		$log_message .= $backtrace_message;
 
 		// Is always a critical error.
 		if (class_exists('\\ElkArte\\Errors\\Errors'))
@@ -1035,8 +1059,12 @@ abstract class AbstractQuery implements QueryInterface
 		// Debugging.
 		if ($db_show_debug === true)
 		{
-			// Get the file and line number this function was called.
-			list ($file, $line) = $this->error_backtrace('', '', 'return', __FILE__, __LINE__);
+			// We'll try recovering the file and line number the original db query was called from.
+			list ($file, $line) = $this->backtrace_message();
+
+			// Just in case nothing can be found from debug_backtrace
+			$file = $file ?? __FILE__;
+			$line = $line ?? __LINE__;
 
 			if (!empty($_SESSION['debug_redirect']))
 			{

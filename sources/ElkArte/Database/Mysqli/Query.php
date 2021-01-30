@@ -210,8 +210,12 @@ class Query extends AbstractQuery
 		global $txt, $context, $webmaster_email, $modSettings, $db_persist;
 		global $db_server, $db_user, $db_passwd, $db_name, $db_show_debug, $ssi_db_user, $ssi_db_passwd;
 
-		// Get the file and line numbers.
-		list ($file, $line) = $this->error_backtrace('', '', 'return', __FILE__, __LINE__);
+		// We'll try recovering the file and line number the original db query was called from.
+		list ($file, $line) = $this->backtrace_message();
+
+		// Just in case nothing can be found from debug_backtrace
+		$file = $file ?? __FILE__;
+		$line = $line ?? __LINE__;
 
 		// This is the error message...
 		$query_error = mysqli_error($this->connection);

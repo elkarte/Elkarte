@@ -286,7 +286,11 @@ class Query extends AbstractQuery
 		global $txt, $context, $modSettings, $db_show_debug;
 
 		// We'll try recovering the file and line number the original db query was called from.
-		list ($file, $line) = $this->error_backtrace('', '', 'return', __FILE__, __LINE__);
+		list ($file, $line) = $this->backtrace_message();
+
+		// Just in case nothing can be found from debug_backtrace
+		$file = $file ?? __FILE__;
+		$line = $line ?? __LINE__;
 
 		// Decide which connection to use
 		// This is the error message...
