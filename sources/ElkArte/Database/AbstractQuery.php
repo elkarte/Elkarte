@@ -951,6 +951,16 @@ abstract class AbstractQuery implements QueryInterface
 	}
 
 	/**
+	 * Some initial checks and replacement of text insside the query string
+	 *
+	 * @param string $db_string
+	 * @param mixed $db_values
+	 * @param string $identifier The old (now mostly unused) query identifier
+	 * @return string
+	 */
+	abstract protected function initialReplacements($db_string, $db_values, $identifier = '');
+
+	/**
 	 * Tracks the initial status (time, file/line, query) for performance evaluation.
 	 *
 	 * @param string $db_string

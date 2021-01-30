@@ -167,14 +167,8 @@ class Query extends AbstractQuery
 		return $this->result;
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
-	public function query($identifier, $db_string, $db_values = array())
+	protected function initialChecks($db_string, $db_values, $identifier)
 	{
-		// One more query....
-		$this->_query_count++;
-
 		// Use "ORDER BY null" to prevent Mysql doing filesorts for Group By clauses without an Order By
 		if (strpos($db_string, 'GROUP BY') !== false
 			&& strpos($db_string, 'ORDER BY') === false
@@ -190,6 +184,23 @@ class Query extends AbstractQuery
 				// Append it.
 				$db_string .= "\n\t\t\tORDER BY null";
 			}
+		}
+		return $db_string;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public function query($identifier, $db_string, $db_values = array())
+	{
+		// One more query....
+		$this->_query_count++;
+
+		$db_string = $this->initialChecks($db_string, $db_values, $identifier);
+
+		if (trim($db_string) === '')
+		{
+			return false;
 		}
 
 		$db_string = $this->_prepareQuery($db_string, $db_values);

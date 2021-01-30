@@ -257,10 +257,7 @@ class Query extends AbstractQuery
 		return false;
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
-	public function query($identifier, $db_string, $db_values = array())
+	protected function initialChecks($db_string, $db_values, $identifier)
 	{
 		// Special queries that need processing.
 		$replacements = array(
@@ -277,13 +274,23 @@ class Query extends AbstractQuery
 		// Limits need to be a little different, left in place for non conformance addons
 		$db_string = preg_replace('~\sLIMIT\s(\d+|{int:.+}),\s*(\d+|{int:.+})(.*)~i', ' LIMIT $2 OFFSET $1 $3', $db_string);
 
+		return $db_string;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public function query($identifier, $db_string, $db_values = array())
+	{
+		// One more query....
+		$this->_query_count++;
+
+		$db_string = $this->initialChecks($db_string, $db_values, $identifier);
 		if (trim($db_string) === '')
 		{
 			return false;
 		}
 
-		// One more query....
-		$this->_query_count++;
 		$this->_db_replace_result = null;
 
 		$db_string = $this->_prepareQuery($db_string, $db_values);
