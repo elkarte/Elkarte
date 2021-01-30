@@ -39,14 +39,6 @@ class Query extends AbstractQuery
 	 *
 	 * @var int
 	 */
-	private $_db_replace_result = null;
-
-	/**
-	 * Since PostgreSQL doesn't support INSERT REPLACE we are using this to remember
-	 * the rows affected by the delete
-	 *
-	 * @var int
-	 */
 	private $_in_transaction = false;
 
 	/**
@@ -286,12 +278,11 @@ class Query extends AbstractQuery
 		$this->_query_count++;
 
 		$db_string = $this->initialChecks($db_string, $db_values, $identifier);
+
 		if (trim($db_string) === '')
 		{
 			return false;
 		}
-
-		$this->_db_replace_result = null;
 
 		$db_string = $this->_prepareQuery($db_string, $db_values);
 
@@ -488,16 +479,6 @@ class Query extends AbstractQuery
 	public function select_db($db_name = null)
 	{
 		return true;
-	}
-
-	/**
-	 * Returns the number of rows affected by a REPALCE statement
-	 *
-	 * @return int|null
-	 */
-	public function replaceResults()
-	{
-		return $this->_db_replace_result;
 	}
 
 	/**
