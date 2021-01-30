@@ -309,13 +309,6 @@ class Query extends AbstractQuery
 
 		$this->result = new Result($this->_db_last_result);
 
-		// This is here only for compatibility with the previous database code.
-		// To remove when all the instances are fixed.
-		if ($this->_db_last_result === false)
-		{
-			return false;
-		}
-
 		return $this->result;
 	}
 
