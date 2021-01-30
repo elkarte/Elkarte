@@ -27,6 +27,11 @@ use ElkArte\ValuesContainer;
 class Query extends AbstractQuery
 {
 	/**
+	 * {@inheritDoc}
+	 */
+	const ESCAPE_CHAR = '\'\'';
+
+	/**
 	 * Holds last query result
 	 *
 	 * @var resource
@@ -249,6 +254,9 @@ class Query extends AbstractQuery
 		return false;
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	protected function initialChecks($db_string, $db_values, $identifier)
 	{
 		// Special queries that need processing.
@@ -272,44 +280,9 @@ class Query extends AbstractQuery
 	/**
 	 * {@inheritDoc}
 	 */
-	public function query($identifier, $db_string, $db_values = array())
+	protected function executeQuery($db_string)
 	{
-		// One more query....
-		$this->_query_count++;
-
-		$db_string = $this->initialChecks($db_string, $db_values, $identifier);
-
-		if (trim($db_string) === '')
-		{
-			return false;
-		}
-
-		$db_string = $this->_prepareQuery($db_string, $db_values);
-
-		// Debugging.
-		$this->_preQueryDebug($db_string);
-
-		$this->_doSanityCheck($db_string, '\'\'');
-
 		$this->_db_last_result = @pg_query($this->connection, $db_string);
-
-		if ($this->_db_last_result === false && !$this->_skip_error)
-		{
-			$this->error($db_string);
-		}
-
-		// Revert not to skip errors
-		if ($this->_skip_error)
-		{
-			$this->_skip_error = false;
-		}
-
-		// Debugging.
-		$this->_postQueryDebug();
-
-		$this->result = new Result($this->_db_last_result);
-
-		return $this->result;
 	}
 
 	/**

@@ -28,7 +28,6 @@ use ElkArte\ValuesContainer;
  */
 class Query extends AbstractQuery
 {
-
 	/**
 	 * {@inheritDoc}
 	 */
@@ -167,6 +166,9 @@ class Query extends AbstractQuery
 		return $this->result;
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	protected function initialChecks($db_string, $db_values, $identifier)
 	{
 		// Use "ORDER BY null" to prevent Mysql doing filesorts for Group By clauses without an Order By
@@ -188,58 +190,16 @@ class Query extends AbstractQuery
 		return $db_string;
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
-	public function query($identifier, $db_string, $db_values = array())
+	protected function executeQuery($db_string)
 	{
-		// One more query....
-		$this->_query_count++;
-
-		$db_string = $this->initialChecks($db_string, $db_values, $identifier);
-
-		if (trim($db_string) === '')
-		{
-			return false;
-		}
-
-		$db_string = $this->_prepareQuery($db_string, $db_values);
-
-		// Debugging.
-		$this->_preQueryDebug($db_string);
-
-		$this->_doSanityCheck($db_string, '\\');
-
 		if (!$this->_unbuffered)
 		{
-			$ret = @mysqli_query($this->connection, $db_string);
+			$this->_db_last_result = @mysqli_query($this->connection, $db_string);
 		}
 		else
 		{
-			$ret = @mysqli_query($this->connection, $db_string, MYSQLI_USE_RESULT);
+			$this->_db_last_result = @mysqli_query($this->connection, $db_string, MYSQLI_USE_RESULT);
 		}
-
-		if ($ret === false && !$this->_skip_error)
-		{
-			$ret = $this->error($db_string);
-		}
-
-		// Revert not to skip errors
-		if ($this->_skip_error)
-		{
-			$this->_skip_error = false;
-		}
-
-		// Debugging.
-		$this->_postQueryDebug();
-
-		$this->result = new Result($ret,
-			new ValuesContainer([
-				'connection' => $this->connection
-			])
-		);
-
-		return $this->result;
 	}
 
 	/**

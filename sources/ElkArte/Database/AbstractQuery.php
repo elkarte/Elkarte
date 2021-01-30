@@ -27,6 +27,13 @@ use ElkArte\Exceptions\Exception;
 abstract class AbstractQuery implements QueryInterface
 {
 	/**
+	 * Of course the character used to escape characters that have to be escaped
+	 *
+	 * @var string
+	 */
+	const ESCAPE_CHAR = '\\';
+
+	/**
 	 * Current connection to the database
 	 *
 	 * @var \ElkArte\Database\ConnectionInterface
@@ -614,7 +621,55 @@ abstract class AbstractQuery implements QueryInterface
 	/**
 	 * {@inheritDoc}
 	 */
-	abstract public function query($identifier, $db_string, $db_values = array());
+	public function query($identifier, $db_string, $db_values = array())
+	{
+		// One more query....
+		$this->_query_count++;
+
+		$db_string = $this->initialChecks($db_string, $db_values, $identifier);
+
+		if (trim($db_string) === '')
+		{
+			return false;
+		}
+
+		$db_string = $this->_prepareQuery($db_string, $db_values);
+
+		$this->_preQueryDebug($db_string);
+
+		$this->_doSanityCheck($db_string);
+
+		$this->executeQuery($db_string);
+
+		if ($this->_db_last_result === false && !$this->_skip_error)
+		{
+			$this->_db_last_result = $this->error($db_string);
+		}
+
+		// Revert not to skip errors
+		if ($this->_skip_error)
+		{
+			$this->_skip_error = false;
+		}
+
+		// Debugging.
+		$this->_postQueryDebug();
+
+		$this->result = new Result($this->_db_last_result,
+			new ValuesContainer([
+				'connection' => $this->connection
+			])
+		);
+
+		return $this->result;
+	}
+
+	/**
+	 * Actually execute the DBMS-specific code to run the query
+	 *
+	 * @param string $db_string
+	 */
+	abstract protected function executeQuery($db_string);
 
 	/**
 	 * {@inheritDoc}
@@ -958,7 +1013,7 @@ abstract class AbstractQuery implements QueryInterface
 	 * @param string $identifier The old (now mostly unused) query identifier
 	 * @return string
 	 */
-	abstract protected function initialReplacements($db_string, $db_values, $identifier = '');
+	abstract protected function initialChecks($db_string, $db_values, $identifier = '');
 
 	/**
 	 * Tracks the initial status (time, file/line, query) for performance evaluation.
@@ -1015,10 +1070,9 @@ abstract class AbstractQuery implements QueryInterface
 	 * In case of problems, the method can ends up dying.
 	 *
 	 * @param string $db_string
-	 * @param string $escape_char
 	 * @throws \ElkArte\Exceptions\Exception
 	 */
-	protected function _doSanityCheck($db_string, $escape_char)
+	protected function _doSanityCheck($db_string)
 	{
 		global $modSettings;
 
@@ -1040,7 +1094,7 @@ abstract class AbstractQuery implements QueryInterface
 				while (true)
 				{
 					$pos1 = strpos($db_string, '\'', $pos + 1);
-					$pos2 = strpos($db_string, $escape_char, $pos + 1);
+					$pos2 = strpos($db_string, static::ESCAPE_CHAR, $pos + 1);
 
 					if ($pos1 === false)
 					{
