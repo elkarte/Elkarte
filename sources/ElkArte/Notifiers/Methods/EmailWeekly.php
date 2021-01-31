@@ -90,7 +90,7 @@ class EmailWeekly extends AbstractNotifier
 		$this->db->insert('ignore',
 			'{db_prefix}pending_notifications',
 			[
-				'notification_type' => 'string-10',
+				'notification_type' => 'string-20',
 				'id_member' => 'int',
 				'log_time' => 'int',
 				'frequency' => 'string-1',

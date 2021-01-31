@@ -3041,7 +3041,7 @@ function topicNotifications($start, $items_per_page, $sort, $memID)
 			$notification_topics[] = array(
 				'id' => $row['id_topic'],
 				'poster_link' => empty($row['id_member']) ? $row['real_name_col'] : '<a href="' . getUrl('profile', ['action' => 'profile', 'u' => $row['id_member'], 'name' => $row['real_name_col']]) . '">' . $row['real_name_col'] . '</a>',
-				'poster_updated_link' => empty($row['id_member_updated']) ? $row['last_real_name'] : '<a href="' . getUrl('profile', ['action' => 'profile', 'u' => $row['id_member_updated'], 'name' => $row['last_real_name']]) . '</a>',
+				'poster_updated_link' => empty($row['id_member_updated']) ? $row['last_real_name'] : '<a href="' . getUrl('profile', ['action' => 'profile', 'u' => $row['id_member_updated'], 'name' => $row['last_real_name']]) . '">' . $row['last_real_name'] . '</a>',
 				'subject' => $row['subject'],
 				'href' => $topic_href,
 				'link' => '<a href="' . $topic_href . '">' . $row['subject'] . '</a>',

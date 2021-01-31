@@ -54,7 +54,7 @@ class Standard extends AbstractUrlGenerator
 			}
 			else
 			{
-				$args[$k] = $k . '=' . $v;
+				$args[$k] = $k . '=' . urlencode($v);
 			}
 		}
 

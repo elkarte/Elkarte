@@ -776,7 +776,7 @@ function template_action_notification()
 					<dd>
 						<label for="notify_', $type, '_default">', $txt['notify_method_use_default'], '</label>
 						<input id="notify_', $type, '_default" name="', $mention_methods['default_input_name'], '" class="toggle_notify" type="checkbox" value="', $mention_methods['value'], '" ', $mention_methods['value'] ? '' : 'checked="checked"', '/>
-						<select class="select_multiple" multiple="multiple" id="notify_', $type, '" ', $mention_methods['default_input_name'], '">';
+						<select class="select_multiple" multiple="multiple" id="notify_', $type, '" name="', $mention_methods['default_input_name'], '[]">';
 		foreach ($mention_methods['data'] as $key => $method)
 		{
 			echo '
