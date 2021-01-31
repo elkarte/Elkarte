@@ -1,12 +1,20 @@
 <?php
 
+use ElkArte\DataValidator;
+use ElkArte\Mentions\Mentioning;
+use ElkArte\Notifications;
+use ElkArte\NotificationsTask;
+use ElkArte\User;
+use ElkArte\UserInfo;
+use PHPUnit\Framework\TestCase;
+
 /**
  * TestCase class for mention subs.
  *
  * WARNING. These tests work directly with the local database. Don't run
  * them if you need to keep your data untouched!
  */
-class TestMentions extends \PHPUnit\Framework\TestCase
+class TestMentions extends TestCase
 {
 	protected $_posterOptions = null;
 	protected $_msgOptions = null;
@@ -49,7 +57,7 @@ class TestMentions extends \PHPUnit\Framework\TestCase
 			]
 		]);
 
-		\ElkArte\User::$info = new \ElkArte\UserInfo([
+		User::$info = new UserInfo([
 			'id' => 1,
 			'ip' => long2ip(rand(0, 2147483647)),
 			'language' => 'english',
@@ -78,7 +86,7 @@ class TestMentions extends \PHPUnit\Framework\TestCase
 			'mark_as_read' => false
 		);
 		$posterOptions = array(
-			'id' => \ElkArte\User::$info->id,
+			'id' => User::$info->id,
 			'name' => 'test-user',
 			'subject' => 'the subject',
 			'email' => 'noemail@test.tes',
@@ -135,7 +143,7 @@ class TestMentions extends \PHPUnit\Framework\TestCase
 
 		// remove temporary test data
 		unset($modSettings);
-		\ElkArte\User::$info = null;
+		User::$info = null;
 
 		$db = database();
 		$db->query('', 'DELETE FROM {db_prefix}notifications_pref', []);
@@ -148,8 +156,8 @@ class TestMentions extends \PHPUnit\Framework\TestCase
 	{
 		$id_member = 2;
 
-		$notifier = \ElkArte\Notifications::instance();
-		$notifier->add(new \ElkArte\NotificationsTask(
+		$notifier = Notifications::instance();
+		$notifier->add(new NotificationsTask(
 			'mentionmem',
 			$this->id_msg,
 			$this->_posterOptions['id'],
@@ -171,14 +179,14 @@ class TestMentions extends \PHPUnit\Framework\TestCase
 	 */
 	public function testAddMentionByLike()
 	{
-		\ElkArte\User::$info->id = 2;
-		\ElkArte\User::$info->ip = long2ip(rand(0, 2147483647));
+		User::$info->id = 2;
+		User::$info->ip = long2ip(rand(0, 2147483647));
 
-		$notifier = \ElkArte\Notifications::instance();
-		$notifier->add(new \ElkArte\NotificationsTask(
+		$notifier = Notifications::instance();
+		$notifier->add(new NotificationsTask(
 			'likemsg',
 			$this->id_msg,
-			\ElkArte\User::$info->id,
+			User::$info->id,
 			array('id_members' => array(1), 'subject' => $this->_msgOptions['subject'], 'rlike_notif' => true)
 		));
 
@@ -194,21 +202,21 @@ class TestMentions extends \PHPUnit\Framework\TestCase
 	 */
 	public function testAddMentionBuddy()
 	{
-		\ElkArte\User::$info->id = 2;
-		\ElkArte\User::$info->ip = long2ip(rand(0, 2147483647));
+		User::$info->id = 2;
+		User::$info->ip = long2ip(rand(0, 2147483647));
 
-		$notifier = \ElkArte\Notifications::instance();
-		$notifier->add(new \ElkArte\NotificationsTask(
+		$notifier = Notifications::instance();
+		$notifier->add(new NotificationsTask(
 			'buddy',
 			1,
-			\ElkArte\User::$info->id,
+			User::$info->id,
 			array('id_members' => array(1), 'subject' => $this->_msgOptions['subject'])
 		));
 
 		$notifier->send();
 
 		// Get the number of mentions, should be zero
-		$count = countUserMentions(false, 'buddy', \ElkArte\User::$info->id);
+		$count = countUserMentions(false, 'buddy', User::$info->id);
 		$this->assertEquals(0, $count);
 	}
 
@@ -222,7 +230,7 @@ class TestMentions extends \PHPUnit\Framework\TestCase
 	{
 		global $modSettings;
 
-		$mentioning = new \ElkArte\Mentions\Mentioning(database(), \ElkArte\User::$info, new \ElkArte\DataValidator, $modSettings['enabled_mentions']);
+		$mentioning = new Mentioning(database(), User::$info, new DataValidator, $modSettings['enabled_mentions']);
 		// Mark mention 2 as read
 		$result = $mentioning->markread(2);
 
@@ -239,7 +247,7 @@ class TestMentions extends \PHPUnit\Framework\TestCase
 	public function testLoadCurrentUserMention()
 	{
 		// User 1 has 1 unread mention (i.e. the like)
-		\ElkArte\User::$info = new \ElkArte\UserInfo([
+		User::$info = new UserInfo([
 			'id' => 1,
 		]);
 
@@ -247,7 +255,7 @@ class TestMentions extends \PHPUnit\Framework\TestCase
 
 		$this->assertEquals(1, count($mentions));
 
-		\ElkArte\User::$info = new \ElkArte\UserInfo([
+		User::$info = new UserInfo([
 			'id' => 2,
 		]);
 

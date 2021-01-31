@@ -1,6 +1,9 @@
 <?php
 
-class TestHTML2BBC extends \PHPUnit\Framework\TestCase
+use ElkArte\Html2BBC;
+use PHPUnit\Framework\TestCase;
+
+class TestHTML2BBC extends TestCase
 {
 	protected $backupGlobalsBlacklist = ['user_info'];
 	/**
@@ -50,7 +53,7 @@ class TestHTML2BBC extends \PHPUnit\Framework\TestCase
 			$test = $testcase[1];
 			$expected = $testcase[2];
 
-			$parser = new \ElkArte\Html2BBC($test);
+			$parser = new Html2BBC($test);
 
 			// Convert the html to bbc
 			$result = $parser->get_bbc();

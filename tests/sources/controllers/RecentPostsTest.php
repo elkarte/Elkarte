@@ -1,5 +1,9 @@
 <?php
 
+use ElkArte\Controller\Recent;
+use ElkArte\EventManager;
+use ElkArte\User;
+
 /**
  * TestCase class for recent posts
  */
@@ -25,8 +29,8 @@ class TestRecentPosts extends ElkArteCommonSetupTest
 	{
 		global $context;
 
-		$controller = new \ElkArte\Controller\Recent(new \ElkArte\EventManager());
-		$controller->setUser(\ElkArte\User::$info);
+		$controller = new Recent(new EventManager());
+		$controller->setUser(User::$info);
 		$controller->pre_dispatch();
 		$controller->action_recent();
 

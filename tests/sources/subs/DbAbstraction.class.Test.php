@@ -1,6 +1,8 @@
 <?php
 
-class TestDbAbstraction extends \PHPUnit\Framework\TestCase
+use PHPUnit\Framework\TestCase;
+
+class TestDbAbstraction extends TestCase
 {
 	protected $backupGlobalsBlacklist = ['user_info'];
 	/**

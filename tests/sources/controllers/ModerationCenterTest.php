@@ -1,5 +1,10 @@
 <?php
 
+use ElkArte\Controller\ModerationCenter;
+use ElkArte\EventManager;
+use ElkArte\HttpReq;
+use ElkArte\User;
+
 /**
  * TestCase class for the ModerationCenter Controller
  *
@@ -21,7 +26,7 @@ class TestModerationCenterController extends ElkArteCommonSetupTest
 		parent::setUp();
 		parent::setSession();
 
-		\ElkArte\User::$info->mod_cache = [
+		User::$info->mod_cache = [
 			'bq' => '1=1',
 			'ap' => [0],
 			'gq' => '1=1',
@@ -47,12 +52,12 @@ class TestModerationCenterController extends ElkArteCommonSetupTest
 	{
 		global $context, $txt;
 
-		$req = \ElkArte\HttpReq::instance();
+		$req = HttpReq::instance();
 		$req->query->area = 'index';
 
 		// Get the controller, call index
-		$controller = new \ElkArte\Controller\ModerationCenter(new \ElkArte\EventManager());
-		$controller->setUser(\ElkArte\User::$info);
+		$controller = new ModerationCenter(new EventManager());
+		$controller->setUser(User::$info);
 		$controller->action_index();
 
 		$this->assertEquals($context[$context['moderation_menu_name']]['tab_data']['title'], $txt['moderation_center']);
@@ -69,12 +74,12 @@ class TestModerationCenterController extends ElkArteCommonSetupTest
 	{
 		global $context;
 
-		$req = \ElkArte\HttpReq::instance();
+		$req = HttpReq::instance();
 		$req->query->area = 'reports';
 
 		// Get the controller, call index to dispatch to reported posts
-		$controller = new \ElkArte\Controller\ModerationCenter(new \ElkArte\EventManager());
-		$controller->setUser(\ElkArte\User::$info);
+		$controller = new ModerationCenter(new EventManager());
+		$controller->setUser(User::$info);
 		$controller->action_index();
 
 		$this->assertEquals($context['total_reports'], 1, $context['total_reports']);
@@ -88,13 +93,13 @@ class TestModerationCenterController extends ElkArteCommonSetupTest
 	{
 		global $context;
 
-		$req = \ElkArte\HttpReq::instance();
+		$req = HttpReq::instance();
 		$req->query->area = 'reports';
 		$req->query->report = 1;
 
 		// Get the controller, call index to dispatch to reported posts and then to details
-		$controller = new \ElkArte\Controller\ModerationCenter(new \ElkArte\EventManager());
-		$controller->setUser(\ElkArte\User::$info);
+		$controller = new ModerationCenter(new EventManager());
+		$controller->setUser(User::$info);
 		$controller->action_index();
 
 		$this->assertEquals('some needless complaint', $context['report']['comments'][0]['message'], $context['report']['comments'][0]['message']);

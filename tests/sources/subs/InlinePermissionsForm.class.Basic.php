@@ -1,6 +1,12 @@
 <?php
 
-class TestInlinePermissionsForm extends \PHPUnit\Framework\TestCase
+use ElkArte\Permissions;
+use ElkArte\SettingsForm\SettingsFormAdapter\InlinePermissions;
+use ElkArte\User;
+use ElkArte\UserInfo;
+use PHPUnit\Framework\TestCase;
+
+class TestInlinePermissionsForm extends TestCase
 {
 	protected $permissionsForm;
 	protected $permissionsObject;
@@ -20,13 +26,13 @@ class TestInlinePermissionsForm extends \PHPUnit\Framework\TestCase
 		theme()->getTemplates()->loadLanguageFile('Admin', 'english', true, true);
 
 		// Elevate the user.
-		\ElkArte\User::$info = new \ElkArte\UserInfo([
+		User::$info = new UserInfo([
 			'permissions' => ['manage_permissions']
 		]);
 
 		// Make sure they can't do certain things,
 		// unless they have the right permissions.
-		$this->permissionsObject = new \ElkArte\Permissions;
+		$this->permissionsObject = new Permissions;
 		$this->illegal_permissions = $this->permissionsObject->getIllegalPermissions();
 
 		$this->config_vars = array(
@@ -58,7 +64,7 @@ class TestInlinePermissionsForm extends \PHPUnit\Framework\TestCase
 			),
 		);
 
-		$this->permissionsForm = new \ElkArte\SettingsForm\SettingsFormAdapter\InlinePermissions;
+		$this->permissionsForm = new InlinePermissions;
 		$this->permissionsForm->setPermissions($this->config_vars);
 
 		// Load the permission settings that guests cannot have

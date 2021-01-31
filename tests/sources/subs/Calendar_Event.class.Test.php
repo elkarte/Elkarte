@@ -1,5 +1,7 @@
 <?php
 
+use ElkArte\CalendarEvent;
+
 /**
  * TestCase class for the \ElkArte\CalendarEvent class.
  */
@@ -42,19 +44,19 @@ class TestCalendarEvent extends ElkArteCommonSetupTest
 	 */
 	public function testNew()
 	{
-		$event = new \ElkArte\CalendarEvent(null, array());
+		$event = new CalendarEvent(null, array());
 		$this->assertTrue($event->isNew());
 
-		$event = new \ElkArte\CalendarEvent(-1, array());
+		$event = new CalendarEvent(-1, array());
 		$this->assertTrue($event->isNew());
 
-		$event = new \ElkArte\CalendarEvent(1, array());
+		$event = new CalendarEvent(1, array());
 		$this->assertFalse($event->isNew());
 	}
 
 	public function testStarter()
 	{
-		$event = new \ElkArte\CalendarEvent(1, array());
+		$event = new CalendarEvent(1, array());
 
 		// Guest means not the starter
 		$this->assertFalse($event->isStarter(0));
@@ -70,7 +72,7 @@ class TestCalendarEvent extends ElkArteCommonSetupTest
 	 */
 	public function testRemove()
 	{
-		$event = new \ElkArte\CalendarEvent(1, array());
+		$event = new CalendarEvent(1, array());
 		$event->remove();
 	}
 
@@ -80,7 +82,7 @@ class TestCalendarEvent extends ElkArteCommonSetupTest
 	 */
 	public function testValidateNoSpan()
 	{
-		$event = new \ElkArte\CalendarEvent(1, array());
+		$event = new CalendarEvent(1, array());
 		$event->validate(array('span' => 1));
 	}
 
@@ -90,7 +92,7 @@ class TestCalendarEvent extends ElkArteCommonSetupTest
 	 */
 	public function testValidateInvalidSpan1()
 	{
-		$event = new \ElkArte\CalendarEvent(1, array('cal_allowspan' => 1, 'cal_maxspan' => 3));
+		$event = new CalendarEvent(1, array('cal_allowspan' => 1, 'cal_maxspan' => 3));
 		$event->validate(array('span' => -1));
 	}
 
@@ -100,7 +102,7 @@ class TestCalendarEvent extends ElkArteCommonSetupTest
 	 */
 	public function testValidateInvalidSpan2()
 	{
-		$event = new \ElkArte\CalendarEvent(1, array('cal_allowspan' => 1, 'cal_maxspan' => 3));
+		$event = new CalendarEvent(1, array('cal_allowspan' => 1, 'cal_maxspan' => 3));
 		$event->validate(array('span' => 5));
 	}
 
@@ -110,7 +112,7 @@ class TestCalendarEvent extends ElkArteCommonSetupTest
 	 */
 	public function testValidateNotDelete1()
 	{
-		$event = new \ElkArte\CalendarEvent(1, array('cal_minyear' => 2012, 'cal_limityear' => 10));
+		$event = new CalendarEvent(1, array('cal_minyear' => 2012, 'cal_limityear' => 10));
 		// No month passed => \ElkArte\Exceptions\Exception
 		$event->validate(array());
 	}
@@ -121,7 +123,7 @@ class TestCalendarEvent extends ElkArteCommonSetupTest
 	 */
 	public function testValidateNotDelete2()
 	{
-		$event = new \ElkArte\CalendarEvent(1, array('cal_minyear' => 2012, 'cal_limityear' => 10));
+		$event = new CalendarEvent(1, array('cal_minyear' => 2012, 'cal_limityear' => 10));
 		// No year passed => \ElkArte\Exceptions\Exception
 		$event->validate(array('month' => 1));
 	}
@@ -132,7 +134,7 @@ class TestCalendarEvent extends ElkArteCommonSetupTest
 	 */
 	public function testValidateNotDelete3()
 	{
-		$event = new \ElkArte\CalendarEvent(1, array('cal_minyear' => 2012, 'cal_limityear' => 10));
+		$event = new CalendarEvent(1, array('cal_minyear' => 2012, 'cal_limityear' => 10));
 		// Negative months are not allowed
 		$event->validate(array('month' => -1, 'year' => 2013));
 	}
@@ -143,7 +145,7 @@ class TestCalendarEvent extends ElkArteCommonSetupTest
 	 */
 	public function testValidateNotDelete4()
 	{
-		$event = new \ElkArte\CalendarEvent(1, array('cal_minyear' => 2012, 'cal_limityear' => 10));
+		$event = new CalendarEvent(1, array('cal_minyear' => 2012, 'cal_limityear' => 10));
 		// Zero is not a month
 		$event->validate(array('month' => 0, 'year' => 2013));
 	}
@@ -154,7 +156,7 @@ class TestCalendarEvent extends ElkArteCommonSetupTest
 	 */
 	public function testValidateNotDelete5()
 	{
-		$event = new \ElkArte\CalendarEvent(1, array('cal_minyear' => 2012, 'cal_limityear' => 10));
+		$event = new CalendarEvent(1, array('cal_minyear' => 2012, 'cal_limityear' => 10));
 		// An years haz only 12 months...
 		$event->validate(array('month' => 13, 'year' => 2013));
 	}
@@ -165,7 +167,7 @@ class TestCalendarEvent extends ElkArteCommonSetupTest
 	 */
 	public function testValidateNotDelete6()
 	{
-		$event = new \ElkArte\CalendarEvent(1, array('cal_minyear' => 2012, 'cal_limityear' => 10));
+		$event = new CalendarEvent(1, array('cal_minyear' => 2012, 'cal_limityear' => 10));
 		// Too low year
 		$event->validate(array('month' => 1, 'year' => 2011));
 	}
@@ -176,7 +178,7 @@ class TestCalendarEvent extends ElkArteCommonSetupTest
 	 */
 	public function testValidateNotDelete7()
 	{
-		$event = new \ElkArte\CalendarEvent(1, array('cal_minyear' => 2012, 'cal_limityear' => 10));
+		$event = new CalendarEvent(1, array('cal_minyear' => 2012, 'cal_limityear' => 10));
 		// Too far away in the future
 		$event->validate(array('month' => 1, 'year' => date('Y') + 12));
 	}
@@ -187,7 +189,7 @@ class TestCalendarEvent extends ElkArteCommonSetupTest
 	 */
 	public function testValidateNotDelete8()
 	{
-		$event = new \ElkArte\CalendarEvent(1, array('cal_minyear' => 2012, 'cal_limityear' => 10));
+		$event = new CalendarEvent(1, array('cal_minyear' => 2012, 'cal_limityear' => 10));
 		// No day => \ElkArte\Exceptions\Exception
 		$event->validate(array('month' => 1, 'year' => 2013));
 	}
@@ -198,7 +200,7 @@ class TestCalendarEvent extends ElkArteCommonSetupTest
 	 */
 	public function testValidateNotDelete9()
 	{
-		$event = new \ElkArte\CalendarEvent(1, array('cal_minyear' => 2012, 'cal_limityear' => 10));
+		$event = new CalendarEvent(1, array('cal_minyear' => 2012, 'cal_limityear' => 10));
 		// No title => \ElkArte\Exceptions\Exception
 		$event->validate(array('month' => 1, 'year' => 2013, 'day' => 1));
 	}
@@ -209,7 +211,7 @@ class TestCalendarEvent extends ElkArteCommonSetupTest
 	 */
 	public function testValidateNotDelete10()
 	{
-		$event = new \ElkArte\CalendarEvent(1, array('cal_minyear' => 2012, 'cal_limityear' => 10));
+		$event = new CalendarEvent(1, array('cal_minyear' => 2012, 'cal_limityear' => 10));
 		// No need to test the PHP checkdata function, so just one single bad date
 		$event->validate(array('month' => 2, 'year' => 2013, 'day' => 30, 'evtitle' => 'string', 'subject' => 'string'));
 	}
@@ -220,7 +222,7 @@ class TestCalendarEvent extends ElkArteCommonSetupTest
 	 */
 	public function testValidateNotDelete11()
 	{
-		$event = new \ElkArte\CalendarEvent(1, array('cal_minyear' => 2012, 'cal_limityear' => 10));
+		$event = new CalendarEvent(1, array('cal_minyear' => 2012, 'cal_limityear' => 10));
 		// A evtitle made up of spaces should be trimmed and result in an empty string
 		$event->validate(array('month' => 2, 'year' => 2013, 'day' => 1, 'evtitle' => '    ', 'subject' => 'string'));
 	}
@@ -232,7 +234,7 @@ class TestCalendarEvent extends ElkArteCommonSetupTest
 	{
 		$input = array('month' => 1, 'year' => 2013, 'day' => 1, 'subject' => 'string');
 
-		$event = new \ElkArte\CalendarEvent(1, array('cal_minyear' => 2012, 'cal_limityear' => 10));
+		$event = new CalendarEvent(1, array('cal_minyear' => 2012, 'cal_limityear' => 10));
 
 		// If no evtitle, but subject present, then evtitle == subject
 		$result = $event->validate($input);

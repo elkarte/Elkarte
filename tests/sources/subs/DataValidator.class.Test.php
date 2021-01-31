@@ -1,5 +1,7 @@
 <?php
 
+use ElkArte\DataValidator;
+
 class TestDataValidator extends ElkArteCommonSetupTest
 {
 	protected $backupGlobalsBlacklist = ['user_info'];
@@ -100,7 +102,7 @@ class TestDataValidator extends ElkArteCommonSetupTest
 	public function testValidation()
 	{
 		// These should all fail
-		$validation = new \ElkArte\DataValidator();
+		$validation = new DataValidator();
 		$validation->validation_rules($this->rules);
 		$validation->sanitation_rules(array('min_len_csv' => 'trim'));
 		$validation->input_processing(array('min_len_csv' => 'csv', 'min_len_array' => 'array'));
@@ -115,7 +117,7 @@ class TestDataValidator extends ElkArteCommonSetupTest
 		}
 
 		// These should all pass
-		$validation = new \ElkArte\DataValidator();
+		$validation = new DataValidator();
 		$validation->validation_rules($this->rules);
 		$validation->input_processing(array('min_len_csv' => 'csv', 'min_len_array' => 'array'));
 		$validation->validate($this->valid_data);
@@ -131,7 +133,7 @@ class TestDataValidator extends ElkArteCommonSetupTest
 
 	public function testCsv()
 	{
-		$validation = new \ElkArte\DataValidator();
+		$validation = new DataValidator();
 		$validation->validation_rules(array('csv' => 'limits[0,10]|without[1,2,3]'));
 		$validation->input_processing(array('csv' => 'csv'));
 		$validation->validate(array('csv' => '10,12,36,49,5'));
@@ -158,7 +160,7 @@ class TestDataValidator extends ElkArteCommonSetupTest
 	public function testIsValidBoolean($value, $expected)
 	{
 		$data = array('value' => $value);
-		$result = \ElkArte\DataValidator::is_valid($data, array('value' => 'boolean'));
+		$result = DataValidator::is_valid($data, array('value' => 'boolean'));
 		$this->assertSame($expected !== null, $result);
 	}
 
@@ -210,7 +212,7 @@ class TestDataValidator extends ElkArteCommonSetupTest
 	public function testIsValidFloat($value, $expected)
 	{
 		$data = array('value' => $value);
-		$result = \ElkArte\DataValidator::is_valid($data, array('value' => 'float'));
+		$result = DataValidator::is_valid($data, array('value' => 'float'));
 		$this->assertSame($expected, $result);
 	}
 
@@ -250,7 +252,7 @@ class TestDataValidator extends ElkArteCommonSetupTest
 	public function testIsValidInteger($value, $expected)
 	{
 		$data = array('value' => $value);
-		$result = \ElkArte\DataValidator::is_valid($data, array('value' => 'integer'));
+		$result = DataValidator::is_valid($data, array('value' => 'integer'));
 		$this->assertSame($expected, $result);
 	}
 

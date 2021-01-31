@@ -1,5 +1,9 @@
 <?php
 
+use ElkArte\AdminController\ManagePosts;
+use ElkArte\EventManager;
+use ElkArte\User;
+
 /**
  * TestCase class for manage posts settings
  */
@@ -20,8 +24,8 @@ class TestManagePostsSettings extends ElkArteCommonSetupTest
 	 */
 	public function testSettings()
 	{
-		$controller = new \ElkArte\AdminController\ManagePosts(new \ElkArte\EventManager());
-		$controller->setUser(\ElkArte\User::$info);
+		$controller = new ManagePosts(new EventManager());
+		$controller->setUser(User::$info);
 		$controller->pre_dispatch();
 		$settings = $controller->settings_search();
 

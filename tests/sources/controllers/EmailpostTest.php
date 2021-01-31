@@ -1,5 +1,8 @@
 <?php
 
+use ElkArte\Controller\Emailpost;
+use ElkArte\EventManager;
+
 /**
  * TestCase class for the EmailPost Controller
  *
@@ -116,7 +119,7 @@ Regards, The ElkArte Community
 	public function testActionPbePreview()
 	{
 		// Get the controller, call preview
-		$controller = new \ElkArte\Controller\Emailpost(new \ElkArte\EventManager());
+		$controller = new Emailpost(new EventManager());
 		$result = $controller->action_pbe_preview($this->data);
 
 		// Check that the preview was set
@@ -130,7 +133,7 @@ Regards, The ElkArte Community
 	public function testActionPbePost()
 	{
 		// Get the controller, call preview
-		$controller = new \ElkArte\Controller\Emailpost(new \ElkArte\EventManager());
+		$controller = new Emailpost(new EventManager());
 		$controller->action_pbe_post($this->data, false);
 
 		// We will fail since the key does not exist
@@ -143,7 +146,7 @@ Regards, The ElkArte Community
 	public function testActionPbeTopic()
 	{
 		// Get the controller, call preview
-		$controller = new \ElkArte\Controller\Emailpost(new \ElkArte\EventManager());
+		$controller = new Emailpost(new EventManager());
 		$controller->action_pbe_topic($this->data);
 
 		// We will fail since the key does not exist

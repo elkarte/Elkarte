@@ -15,7 +15,7 @@
  * It extends PHPUnit_Extensions_Selenium2TestCase and provides additional functions
  * as well as sets up the common environments for all tests
  */
-abstract class ElkArteWebTest extends \PHPUnit_Extensions_Selenium2TestCase
+abstract class ElkArteWebTest extends PHPUnit_Extensions_Selenium2TestCase
 {
 	protected $coverageScriptUrl = 'http://127.0.0.1/phpunit_coverage.php';
 	protected $backupGlobalsBlacklist = ['user_info'];

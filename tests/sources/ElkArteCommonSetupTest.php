@@ -1,5 +1,9 @@
 <?php
 
+use ElkArte\User;
+use ElkArte\UserInfo;
+use PHPUnit\Framework\TestCase;
+
 /**
  *
  * @package   ElkArte Forum
@@ -10,7 +14,7 @@
  *
  */
 
-abstract class ElkArteCommonSetupTest extends \PHPUnit\Framework\TestCase
+abstract class ElkArteCommonSetupTest extends TestCase
 {
 	private $session = false;
 	public $userData = [];
@@ -53,8 +57,8 @@ abstract class ElkArteCommonSetupTest extends \PHPUnit\Framework\TestCase
 			'permissions' => array('admin_forum'),
 		];
 
-		\ElkArte\User::$info = new \ElkArte\UserInfo($userData);
-		\ElkArte\User::load();
+		User::$info = new UserInfo($userData);
+		User::load();
 
 		$settings['page_index_template'] = array(
 			'base_link' => '<li></li>',
@@ -96,7 +100,7 @@ abstract class ElkArteCommonSetupTest extends \PHPUnit\Framework\TestCase
 
 		// remove temporary test data
 		unset($settings, $modSettings);
-		\ElkArte\User::$info = null;
+		User::$info = null;
 
 		if ($this->session)
 		{

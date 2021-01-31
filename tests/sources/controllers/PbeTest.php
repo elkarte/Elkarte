@@ -1,9 +1,14 @@
 <?php
 
+use ElkArte\EmailParse;
+use ElkArte\User;
+use ElkArte\UserInfo;
+use PHPUnit\Framework\TestCase;
+
 /**
  * TestCase class for basic PBE functions
  */
-class TestPBE extends \PHPUnit\Framework\TestCase
+class TestPBE extends TestCase
 {
 	protected $_email;
 	protected $backupGlobalsBlacklist = ['user_info'];
@@ -18,7 +23,7 @@ class TestPBE extends \PHPUnit\Framework\TestCase
 		require_once(SUBSDIR . '/Emailpost.subs.php');
 
 		theme()->getTemplates()->loadLanguageFile('Maillist', 'english', true, true);
-		\ElkArte\User::$info = new \ElkArte\UserInfo(['name' => 'name']);
+		User::$info = new UserInfo(['name' => 'name']);
 
 		$this->_email = 'Return-Path: <noreply@elkarte.net>
 Delivered-To: <drwho@tardis.com>
@@ -118,7 +123,7 @@ Regards, The ElkArte Community
 	public function testMailParse()
 	{
 		// Parse a simple email
-		$email_message = new \ElkArte\EmailParse();
+		$email_message = new EmailParse();
 		$email_message->read_email(true, $this->_email);
 
 		// Basics

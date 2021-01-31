@@ -1,5 +1,9 @@
 <?php
 
+use ElkArte\Controller\Auth;
+use ElkArte\EventManager;
+use ElkArte\User;
+
 /**
  * TestCase class for the Auth Controller
  *
@@ -31,10 +35,10 @@ class TestAuth extends ElkArteCommonSetupTest
 		global $context;
 
 		// Make us not logged in
-		\ElkArte\User::$info->id = null;
+		User::$info->id = null;
 
 		// Get the controller, call login via index
-		$controller = new \ElkArte\Controller\Auth(new \ElkArte\EventManager());
+		$controller = new Auth(new EventManager());
 		$controller->action_index();
 
 		// Check that a token was set.
@@ -42,7 +46,7 @@ class TestAuth extends ElkArteCommonSetupTest
 		$this->assertNotNull($context['login_token_var']);
 
 		// Lets try to login with some bogus stuff
-		\ElkArte\User::$info->is_guest = true;
+		User::$info->is_guest = true;
 		$this->setSession();
 		$_POST['user'] = 'somebotie';
 		$_POST['passwrd'] = 'password';
@@ -60,7 +64,7 @@ class TestAuth extends ElkArteCommonSetupTest
 		global $context;
 
 		// Get the controller, call login via index
-		$controller = new \ElkArte\Controller\Auth(new \ElkArte\EventManager());
+		$controller = new Auth(new EventManager());
 		$controller->action_kickguest();
 
 		$this->assertEquals($context['page_title'], 'Log in');

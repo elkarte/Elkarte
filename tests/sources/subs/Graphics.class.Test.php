@@ -1,6 +1,11 @@
 <?php
 
-class TestGraphics extends \PHPUnit\Framework\TestCase
+use ElkArte\Graphics\Image;
+use ElkArte\Graphics\Manipulators\Gd2;
+use ElkArte\Graphics\TextImage;
+use PHPUnit\Framework\TestCase;
+
+class TestGraphics extends TestCase
 {
 	protected $image_testcases = array();
 	protected $backupGlobalsBlacklist = ['user_info'];
@@ -70,12 +75,12 @@ class TestGraphics extends \PHPUnit\Framework\TestCase
 
 		$modSettings['attachment_autorotate'] = 1;
 
-		$success = \ElkArte\Graphics\Manipulators\Gd2::canUse();
+		$success = Gd2::canUse();
 		$this->assertEquals($success, true, 'GD NOT INSTALLED');
 
 		foreach ($this->image_testcases as $image)
 		{
-			$current_image = new \ElkArte\Graphics\Image($image['url']);
+			$current_image = new Image($image['url']);
 			$success = $current_image->createThumbnail(100, 100, '/tmp/test', $image['format']);
 
 			// Check for correct results
@@ -85,7 +90,7 @@ class TestGraphics extends \PHPUnit\Framework\TestCase
 
 	public function testText()
 	{
-		$images = new \ElkArte\Graphics\TextImage('test');
+		$images = new TextImage('test');
 		$success = $images->generate(100, 75, 'png');
 		$success = !empty($success);
 

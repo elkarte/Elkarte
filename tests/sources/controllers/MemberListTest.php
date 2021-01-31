@@ -1,5 +1,10 @@
 <?php
 
+use ElkArte\Controller\Memberlist;
+use ElkArte\EventManager;
+use ElkArte\HttpReq;
+use ElkArte\User;
+
 /**
  * TestCase class for the MemberList Controller
  *
@@ -30,8 +35,8 @@ class TestMemberListController extends ElkArteCommonSetupTest
 		global $context;
 
 		// Get the controller, call index
-		$controller = new \ElkArte\Controller\Memberlist(new \ElkArte\EventManager());
-		$controller->setUser(\ElkArte\User::$info);
+		$controller = new Memberlist(new EventManager());
+		$controller->setUser(User::$info);
 		$controller->pre_dispatch();
 
 		// With no options this will call the mlall action as well
@@ -47,11 +52,11 @@ class TestMemberListController extends ElkArteCommonSetupTest
 		global $context;
 
 		// Get the controller, call index
-		$controller = new \ElkArte\Controller\Memberlist(new \ElkArte\EventManager());
-		$controller->setUser(\ElkArte\User::$info);
+		$controller = new Memberlist(new EventManager());
+		$controller->setUser(User::$info);
 		$controller->pre_dispatch();
 
-		$req = \ElkArte\HttpReq::instance();
+		$req = HttpReq::instance();
 		$req->query->search = 'admin';
 		$req->query->fields = 'name, email';
 

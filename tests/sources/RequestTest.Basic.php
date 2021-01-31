@@ -1,11 +1,13 @@
 <?php
 
+use PHPUnit\Framework\TestCase;
+
 /**
  * TestCase class for request parsing etc.
  *
  * Without SSI: test Request methods as self-containing.
  */
-class TestRequest extends \PHPUnit\Framework\TestCase
+class TestRequest extends TestCase
 {
 	protected $backupGlobalsBlacklist = ['user_info'];
 	/**

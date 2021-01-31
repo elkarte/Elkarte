@@ -1,5 +1,10 @@
 <?php
 
+use ElkArte\Controller\Help;
+use ElkArte\EventManager;
+use ElkArte\HttpReq;
+use ElkArte\User;
+
 /**
  * TestCase class for the Help Controller
  *
@@ -37,8 +42,8 @@ class TestHelpController extends ElkArteCommonSetupTest
 		global $context;
 
 		// Get the controller, call index
-		$controller = new \ElkArte\Controller\Help(new \ElkArte\EventManager());
-		$controller->setUser(\ElkArte\User::$info);
+		$controller = new Help(new EventManager());
+		$controller->setUser(User::$info);
 		$controller->action_index();
 
 		// Check that the send topic template was set
@@ -52,11 +57,11 @@ class TestHelpController extends ElkArteCommonSetupTest
 	{
 		global $context;
 
-		$req = \ElkArte\HttpReq::instance();
+		$req = HttpReq::instance();
 		$req->query->help = 'permissionname_like_posts_stats';
 
-		$controller = new \ElkArte\Controller\Help(new \ElkArte\EventManager());
-		$controller->setUser(\ElkArte\User::$info);
+		$controller = new Help(new EventManager());
+		$controller->setUser(User::$info);
 		$controller->action_quickhelp();
 
 		$this->assertEquals($context['help_text'], 'See like posts stats', $context['help_text']);

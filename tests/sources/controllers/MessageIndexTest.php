@@ -1,5 +1,9 @@
 <?php
 
+use ElkArte\Controller\MessageIndex;
+use ElkArte\EventManager;
+use ElkArte\User;
+
 /**
  * TestCase class for the Message Index Controller
  */
@@ -27,8 +31,8 @@ class TestMessageIndex extends ElkArteCommonSetupTest
 	{
 		global $context, $board_info;
 
-		$controller = new \ElkArte\Controller\MessageIndex(new \ElkArte\EventManager());
-		$controller->setUser(\ElkArte\User::$info);
+		$controller = new MessageIndex(new EventManager());
+		$controller->setUser(User::$info);
 		$controller->pre_dispatch();
 		$controller->action_index();
 

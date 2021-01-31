@@ -1,9 +1,19 @@
 <?php
 
+use ElkArte\Cache\Cache;
+use ElkArte\Search\Search;
+use ElkArte\Search\SearchApiWrapper;
+use ElkArte\Search\SearchParams;
+use ElkArte\Search\WeightFactors;
+use ElkArte\User;
+use ElkArte\UserSettingsLoader;
+use ElkArte\ValuesContainer;
+use PHPUnit\Framework\TestCase;
+
 /**
  * Class TestSearchclass
  */
-class TestSearchclass extends \PHPUnit\Framework\TestCase
+class TestSearchclass extends TestCase
 {
 	protected $backupGlobalsBlacklist = ['user_info'];
 	protected $member_full_access;
@@ -17,7 +27,7 @@ class TestSearchclass extends \PHPUnit\Framework\TestCase
 	public static function setUpBeforeClass()
 	{
 		// This is here to cheat with allowedTo
-		\ElkArte\User::$info = new \ElkArte\ValuesContainer([
+		User::$info = new ValuesContainer([
 			'is_admin' => true,
 			'is_guest' => false,
 			'possibly_robot' => false,
@@ -197,12 +207,12 @@ class TestSearchclass extends \PHPUnit\Framework\TestCase
 	protected function loadUser($id)
 	{
 		$db = database();
-		$cache = \ElkArte\Cache\Cache::instance();
+		$cache = Cache::instance();
 		$req = request();
 
-		$user = new \ElkArte\UserSettingsLoader($db, $cache, $req);
+		$user = new UserSettingsLoader($db, $cache, $req);
 		$user->loadUserById($id, true, '');
-		\ElkArte\User::reloadByUser($user);
+		User::reloadByUser($user);
 	}
 
 	/**
@@ -228,15 +238,15 @@ class TestSearchclass extends \PHPUnit\Framework\TestCase
 		];
 		$req->query->search = $search_terms['search'];
 
-		$search = new \ElkArte\Search\Search();
-		$search->setWeights(new \ElkArte\Search\WeightFactors($modSettings, true));
-		$search_params = new \ElkArte\Search\SearchParams('');
+		$search = new Search();
+		$search->setWeights(new WeightFactors($modSettings, true));
+		$search_params = new SearchParams('');
 		$search_params->merge($search_terms, $recentPercentage, $maxMembersToSearch);
 		$search->setParams($search_params, !empty($modSettings['search_simple_fulltext']));
 		$search->getSearchArray();
 		$context['params'] = $search->compileURLparams();
 
-		$search_config = new \ElkArte\ValuesContainer(array(
+		$search_config = new ValuesContainer(array(
 			'humungousTopicPosts' => $humungousTopicPosts,
 			'maxMessageResults' => $maxMessageResults,
 			'search_index' => !empty($modSettings['search_index']) ? $modSettings['search_index'] : '',
@@ -244,7 +254,7 @@ class TestSearchclass extends \PHPUnit\Framework\TestCase
 		));
 
 		return $search->searchQuery(
-			new \ElkArte\Search\SearchApiWrapper($search_config, $search->getSearchParams())
+			new SearchApiWrapper($search_config, $search->getSearchParams())
 		);
 	}
 

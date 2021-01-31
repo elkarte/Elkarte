@@ -1,6 +1,9 @@
 <?php
 
-class TestBBCHTML extends \PHPUnit\Framework\TestCase
+use BBC\HtmlParser;
+use PHPUnit\Framework\TestCase;
+
+class TestBBCHTML extends TestCase
 {
 	protected $bbcTestCases;
 	protected $backupGlobalsBlacklist = ['user_info'];
@@ -48,7 +51,7 @@ class TestBBCHTML extends \PHPUnit\Framework\TestCase
 	public function testBBHTML()
 	{
 
-		$parser = new \BBC\HtmlParser;
+		$parser = new HtmlParser;
 
 		foreach ($this->bbcTestCases as $testcase)
 		{

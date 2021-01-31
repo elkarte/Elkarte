@@ -1,5 +1,8 @@
 <?php
 
+use ElkArte\Controller\BoardIndex;
+use ElkArte\EventManager;
+
 /**
  * TestCase class for the BoardIndex Controller
  *
@@ -29,7 +32,7 @@ class TestBoardIndex extends ElkArteCommonSetupTest
 		global $context;
 
 		// Get the controller
-		$controller = new \ElkArte\Controller\BoardIndex(new \ElkArte\EventManager());
+		$controller = new BoardIndex(new EventManager());
 		$controller->action_index();
 
 		// Check

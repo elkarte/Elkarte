@@ -1,5 +1,10 @@
 <?php
 
+use ElkArte\Cache\Cache;
+use ElkArte\Cache\CacheMethod\Apc;
+use ElkArte\Cache\CacheMethod\Filebased;
+use PHPUnit\Framework\TestCase;
+
 class MockMemcached extends \ElkArte\Cache\CacheMethod\Memcached
 {
 	/**
@@ -16,7 +21,7 @@ class MockMemcached extends \ElkArte\Cache\CacheMethod\Memcached
 /**
  * TestCase class for caching classes.
  */
-class TestCache extends \PHPUnit\Framework\TestCase
+class TestCache extends TestCase
 {
 	private $_cache_obj = null;
 	protected $backupGlobalsBlacklist = ['user_info'];
@@ -35,7 +40,7 @@ class TestCache extends \PHPUnit\Framework\TestCase
 	 */
 	public function testFilebasedCache()
 	{
-		$this->_cache_obj = new \ElkArte\Cache\CacheMethod\Filebased(array());
+		$this->_cache_obj = new Filebased(array());
 		$this->doCacheTests();
 	}
 
@@ -44,7 +49,7 @@ class TestCache extends \PHPUnit\Framework\TestCase
 	 */
 	public function testApc()
 	{
-		$this->_cache_obj = new \ElkArte\Cache\CacheMethod\Apc(array());
+		$this->_cache_obj = new Apc(array());
 
 		// We may not build APCu for every matrix
 		if (!$this->_cache_obj->isAvailable())
@@ -75,9 +80,9 @@ class TestCache extends \PHPUnit\Framework\TestCase
 		$cache_accelerator = '';
 		$cache_enable = 1;
 
-		$cache = \ElkArte\Cache\Cache::instance();
-		$file_cache = new \ElkArte\Cache\CacheMethod\Filebased(array());
-		$object = new \ReflectionClass($cache);
+		$cache = Cache::instance();
+		$file_cache = new Filebased(array());
+		$object = new ReflectionClass($cache);
 		$property = $object->getProperty('_cache_obj');
 		$property->setAccessible(true);
 

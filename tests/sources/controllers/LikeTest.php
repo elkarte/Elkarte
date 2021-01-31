@@ -1,5 +1,10 @@
 <?php
 
+use ElkArte\Controller\Likes;
+use ElkArte\EventManager;
+use ElkArte\HttpReq;
+use ElkArte\User;
+
 /**
  * TestCase class for the Likes Controller
  */
@@ -30,8 +35,8 @@ class TestLike extends ElkArteCommonSetupTest
 		$context['profile_menu_name'] = 'menu_data_view_likes';
 		require_once(SUBSDIR . '/Profile.subs.php');
 
-		$controller = new \ElkArte\Controller\Likes(new \ElkArte\EventManager());
-		$controller->setUser(\ElkArte\User::$info);
+		$controller = new Likes(new EventManager());
+		$controller->setUser(User::$info);
 		$controller->pre_dispatch();
 		$controller->action_showProfileLikes();
 
@@ -49,7 +54,7 @@ class TestLike extends ElkArteCommonSetupTest
 		global $modSettings, $context;
 
 		// Set the form
-		$_req = \ElkArte\HttpReq::instance();
+		$_req = HttpReq::instance();
 		$_req->query['msg'] = 1;
 		$_req->query['xml'] = '';
 		$_req->query['api'] = 'json';
@@ -62,8 +67,8 @@ class TestLike extends ElkArteCommonSetupTest
 		$modSettings['mentions_enabled'] = 0;
 
 		// Make a like
-		$controller = new \ElkArte\Controller\Likes(new \ElkArte\EventManager());
-		$controller->setUser(\ElkArte\User::$info);
+		$controller = new Likes(new EventManager());
+		$controller->setUser(User::$info);
 		$controller->pre_dispatch();
 		$controller->action_likepost_api();
 

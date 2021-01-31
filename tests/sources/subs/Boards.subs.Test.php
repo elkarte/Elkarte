@@ -1,12 +1,15 @@
 <?php
 
+use ElkArte\User;
+use PHPUnit\Framework\TestCase;
+
 /**
  * TestCase class for boards subs: working with boards.
  *
  * WARNING. These tests work directly with the local database. Don't run
  * them if you need to keep your data untouched!
  */
-class TestBoards extends \PHPUnit\Framework\TestCase
+class TestBoards extends TestCase
 {
 	protected $backupGlobalsBlacklist = ['user_info'];
 	/**
@@ -20,7 +23,7 @@ class TestBoards extends \PHPUnit\Framework\TestCase
 		//
 		// @todo might want to insert some boards, topics, and use those all through the tests here
 		require_once(SUBSDIR . '/Boards.subs.php');
-		\ElkArte\User::$info->query_see_board = '1=1';
+		User::$info->query_see_board = '1=1';
 	}
 
 	/**

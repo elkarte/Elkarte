@@ -1,12 +1,14 @@
 <?php
 
+use PHPUnit\Framework\TestCase;
+
 /**
  * TestCase class for poll subs.
  *
  * WARNING. These tests work directly with the local database. Don't run
  * them if you need to keep your data untouched!
  */
-class TestPoll extends \PHPUnit\Framework\TestCase
+class TestPoll extends TestCase
 {
 	protected $backupGlobalsBlacklist = ['user_info'];
 	/**

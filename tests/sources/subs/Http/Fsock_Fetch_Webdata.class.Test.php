@@ -1,6 +1,9 @@
 <?php
 
-class TestFsockFetchWebdata extends \PHPUnit\Framework\TestCase
+use ElkArte\Http\FsockFetchWebdata;
+use PHPUnit\Framework\TestCase;
+
+class TestFsockFetchWebdata extends TestCase
 {
 	protected $fetch_testcases = array();
 	protected $post_testcases = array();
@@ -69,7 +72,7 @@ class TestFsockFetchWebdata extends \PHPUnit\Framework\TestCase
 	public function testFsockFetch()
 	{
 		// Start Fsockopen, pass some default values for a test
-		$fsock = new \ElkArte\Http\FsockFetchWebdata(array(), 3);
+		$fsock = new FsockFetchWebdata(array(), 3);
 
 		foreach ($this->fetch_testcases as $testcase)
 		{
@@ -94,7 +97,7 @@ class TestFsockFetchWebdata extends \PHPUnit\Framework\TestCase
 	public function testFsockPost()
 	{
 		// Start curl, pass some default values for a test
-		$fsock = new \ElkArte\Http\FsockFetchWebdata(array(), 3);
+		$fsock = new FsockFetchWebdata(array(), 3);
 
 		foreach ($this->post_testcases as $testcase)
 		{
