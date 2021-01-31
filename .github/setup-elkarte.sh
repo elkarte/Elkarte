@@ -24,3 +24,7 @@ fi
 
 # Phpunit and support
 composer install --no-interaction --quiet
+
+# Copy phpunit_coverage.php into the webserver's document root directory.
+cp ./vendor/phpunit/phpunit-selenium/PHPUnit/Extensions/SeleniumCommon/phpunit_coverage.php .
+

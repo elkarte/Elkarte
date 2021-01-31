@@ -42,7 +42,7 @@ class TestCurlFetchWebdata extends TestCase
 			array(
 				'https://www.google.com',
 				200,
-				'Search the world',
+				'The Closure Library Authors',
 			),
 			array(
 				'http://www.google.com/elkarte',
