@@ -5,12 +5,10 @@ on:
     branches:        # Run tests when commits are pushed to these branches
       - master
       - development
-      - GHActions
   pull_request:      # Run tests when pull requests are made on these branches
     branches:
       - master
       - development
-      - GHActions
 
 jobs:
   # Static checks, e.g. syntax errors, lint, etc
@@ -29,7 +27,7 @@ jobs:
       - name: Checkout ElkArte
         uses: actions/checkout@v2
         with:
-          repository: spuds/elkarte
+          repository: elkarte/elkarte
           ref: ${{ env.ELKARTE_BRANCH }}
           path: elkarte
 
@@ -103,7 +101,7 @@ jobs:
       - name: Checkout ElkArte
         uses: actions/checkout@v2
         with:
-          repository: spuds/elkarte
+          repository: elkarte/elkarte
           ref: ${{ env.ELKARTE_BRANCH }}
           path: elkarte
 
@@ -178,7 +176,7 @@ jobs:
       - name: Checkout ElkArte
         uses: actions/checkout@v2
         with:
-          repository: spuds/elkarte
+          repository: elkarte/elkarte
           ref: ${{ env.ELKARTE_BRANCH }}
           path: elkarte
 
