@@ -20,6 +20,7 @@ namespace ElkArte\Database\Mysqli;
 use ElkArte\Cache\Cache;
 use ElkArte\Database\AbstractQuery;
 use ElkArte\Errors\Errors;
+use ElkArte\ValuesContainer;
 
 /**
  * SQL database class, implements database class to control mysql functions

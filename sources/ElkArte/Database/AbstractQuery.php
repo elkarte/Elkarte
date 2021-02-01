@@ -20,7 +20,6 @@ namespace ElkArte\Database;
 use ElkArte\Debug;
 use ElkArte\Errors\Errors;
 use ElkArte\Exceptions\Exception;
-use ElkArte\ValuesContainer;
 
 /**
  * Abstract database class, implements database to control functions
