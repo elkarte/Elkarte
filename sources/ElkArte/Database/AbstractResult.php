@@ -66,10 +66,34 @@ abstract class AbstractResult
 
 	/**
 	 * Returns the result object as obtained from the query function
+	 *
+	 * @deprecated - no longer needed
 	 */
 	public function getResultObject()
 	{
 		return $this->result;
+	}
+
+	/**
+	 * Returns the value of a "detail"
+	 *
+	 * @param string $index
+	 * @return mixed
+	 */
+	public function getDetail($index)
+	{
+		return $this->details[$index] ?? null;
+	}
+
+	/**
+	 * update details
+	 */
+	public function updateDetails($details)
+	{
+		foreach ($details as $key => $val)
+		{
+			$this->details[$key] = $value;
+		}
 	}
 
 	/**

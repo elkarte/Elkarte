@@ -119,7 +119,19 @@ interface QueryInterface
 	 * @param bool $disable_trans = false
 	 * @return bool|resource
 	 */
-	public function insert($method = 'replace', $table, $columns, $data, $keys, $disable_trans = false);
+	public function insert($method, $table, $columns, $data, $keys, $disable_trans = false);
+
+	/**
+	 * Replaces data.
+	 *
+	 * @param string $table
+	 * @param mixed[] $columns
+	 * @param mixed[] $data
+	 * @param string[] $keys
+	 * @param bool $disable_trans = false
+	 * @return bool|resource
+	 */
+	public function replace($table, $columns, $data, $keys, $disable_trans = false);
 
 	/**
 	 * Escape string for the database input

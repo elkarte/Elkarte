@@ -99,54 +99,13 @@ class Query extends AbstractQuery
 	 */
 	public function insert($method = 'replace', $table, $columns, $data, $keys, $disable_trans = false)
 	{
-		// With nothing to insert, simply return.
-		if (empty($data))
-		{
-			return false;
-		}
-
-		// Inserting data as a single row can be done as a single array.
-		if (!is_array($data[array_rand($data)]))
-		{
-			$data = array($data);
-		}
-
-		// Replace the prefix holder with the actual prefix.
-		$table = str_replace('{db_prefix}', $this->_db_prefix, $table);
-
-		// Create the mold for a single row insert.
-		$insertData = '(';
-		foreach ($columns as $columnName => $type)
-		{
-			// Are we restricting the length?
-			if (strpos($type, 'string-') !== false)
-			{
-				$insertData .= sprintf('SUBSTRING({string:%1$s}, 1, ' . substr($type, 7) . '), ', $columnName);
-			}
-			else
-			{
-				$insertData .= sprintf('{%1$s:%2$s}, ', $type, $columnName);
-			}
-		}
-		$insertData = substr($insertData, 0, -2) . ')';
-
-		// Create an array consisting of only the columns.
-		$indexed_columns = array_keys($columns);
-
-		// Here's where the variables are injected to the query.
-		$insertRows = array();
-		foreach ($data as $dataRow)
-		{
-			$insertRows[] = $this->quote($insertData, $this->_array_combine($indexed_columns, $dataRow));
-		}
+		list($table, $indexed_columns, $insertRows) = $this->prepareInsert($table, $columns, $data);
 
 		// Determine the method of insertion.
 		$queryTitle = $method === 'replace' ? 'REPLACE' : ($method === 'ignore' ? 'INSERT IGNORE' : 'INSERT');
 
-		$skip_error = $table === $this->_db_prefix . 'log_errors';
-		$this->_skip_error = $skip_error;
 		// Do the insert.
-		$ret = $this->query('', '
+		$this->result = $this->query('', '
 			' . $queryTitle . ' INTO ' . $table . '(`' . implode('`, `', $indexed_columns) . '`)
 			VALUES
 				' . implode(',
@@ -156,14 +115,19 @@ class Query extends AbstractQuery
 			)
 		);
 
-		$this->result = new Result(
-			is_object($ret) ? $ret->getResultObject() : $ret,
-			new ValuesContainer([
-				'connection' => $this->connection
-			])
-		);
+		$this->result->updateDetails([
+			'connection' => $this->connection
+		]);
 
 		return $this->result;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public function replace($table, $columns, $data, $keys, $disable_trans = false)
+	{
+		return $this->insert('replace', $table, $columns, $data, $keys, $disable_trans);
 	}
 
 	/**

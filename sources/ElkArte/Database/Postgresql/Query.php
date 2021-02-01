@@ -83,103 +83,18 @@ class Query extends AbstractQuery
 	/**
 	 * {@inheritDoc}
 	 */
-	public function insert($method = 'replace', $table, $columns, $data, $keys, $disable_trans = false)
+	public function insert($method, $table, $columns, $data, $keys, $disable_trans = false)
 	{
-		// With nothing to insert, simply return.
-		if (empty($data))
-		{
-			return false;
-		}
-
-		// Inserting data as a single row can be done as a single array.
-		if (!is_array($data[array_rand($data)]))
-		{
-			$data = array($data);
-		}
-
-		// Replace the prefix holder with the actual prefix.
-		$table = str_replace('{db_prefix}', $this->_db_prefix, $table);
-
-		$priv_trans = false;
-		if ((count($data) > 1 || $method === 'replace') && !$this->_in_transaction && !$disable_trans)
-		{
-			$this->transaction('begin');
-			$priv_trans = true;
-		}
-
-		// PostgreSQL doesn't support replace: we implement a MySQL-compatible behavior instead
+		// Compatibility check meant to support the old way of doing REPLACE's
 		if ($method === 'replace')
 		{
-			$count = 0;
-			$where = '';
-			$db_replace_result = 0;
-			foreach ($columns as $columnName => $type)
-			{
-				// Are we restricting the length?
-				if (strpos($type, 'string-') !== false)
-				{
-					$actualType = sprintf($columnName . ' = SUBSTRING({string:%1$s}, 1, ' . substr($type, 7) . '), ', $count);
-				}
-				else
-				{
-					$actualType = sprintf($columnName . ' = {%1$s:%2$s}, ', $type, $count);
-				}
-
-				// A key? That's what we were looking for.
-				if (in_array($columnName, $keys))
-				{
-					$where .= (empty($where) ? '' : ' AND ') . substr($actualType, 0, -2);
-				}
-				$count++;
-			}
-
-			// Make it so.
-			if (!empty($where))
-			{
-				foreach ($data as $k => $entry)
-				{
-					$this->query('', '
-						DELETE FROM ' . $table .
-						' WHERE ' . $where,
-						$entry
-					);
-					$db_replace_result += (!is_resource($this->_db_last_result) ? 0 : pg_affected_rows($this->_db_last_result));
-				}
-			}
+			return $this->replace($table, $columns, $data, $keys, $disable_trans);
 		}
 
-		// Create the mold for a single row insert.
-		$insertData = '(';
-		foreach ($columns as $columnName => $type)
-		{
-			// Are we restricting the length?
-			if (strpos($type, 'string-') !== false)
-			{
-				$insertData .= sprintf('SUBSTRING({string:%1$s}, 1, ' . substr($type, 7) . '), ', $columnName);
-			}
-			else
-			{
-				$insertData .= sprintf('{%1$s:%2$s}, ', $type, $columnName);
-			}
-		}
-		$insertData = substr($insertData, 0, -2) . ')';
-
-		// Create an array consisting of only the columns.
-		$indexed_columns = array_keys($columns);
-
-		// Here's where the variables are injected to the query.
-		$insertRows = array();
-		foreach ($data as $dataRow)
-		{
-			$insertRows[] = $this->quote($insertData, $this->_array_combine($indexed_columns, $dataRow));
-		}
-
-		$inserted_results = 0;
-		$skip_error = $method === 'ignore' || $table === $this->_db_prefix . 'log_errors';
-		$this->_skip_error = $skip_error;
+		list($table, $indexed_columns, $insertRows) = $this->prepareInsert($table, $columns, $data);
 
 		// Do the insert.
-		$ret = $this->query('', '
+		$this->result = $this->query('', '
 			INSERT INTO ' . $table . '("' . implode('", "', $indexed_columns) . '")
 			VALUES
 			' . implode(',
@@ -188,31 +103,79 @@ class Query extends AbstractQuery
 				'security_override' => true,
 			)
 		);
-		$inserted_results += (!is_resource($this->_db_last_result) ? 0 : pg_affected_rows($this->_db_last_result));
+		$inserted_results = !is_resource($this->_db_last_result) ? 0 : pg_affected_rows($this->_db_last_result);
 
-		if ($method === 'replace')
+		$last_inserted_id = $this->insert_id($table);
+
+		$this->result->updateDetails([
+			'insert_id' => $last_inserted_id,
+			'insertedResults' => $inserted_results,
+			'lastResult' => $this->_db_last_result,
+		]);
+
+		return $this->result;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public function replace($table, $columns, $data, $keys, $disable_trans = false)
+	{
+		$local_transaction = false;
+		if (!$this->_in_transaction && !$disable_trans)
 		{
-			$db_replace_result = $db_replace_result + $inserted_results;
+			$this->transaction('begin');
+			$local_transaction = true;
 		}
 
-		if ($priv_trans)
+		// PostgreSQL doesn't support replace: we implement a MySQL-compatible behavior instead
+		$count = 0;
+		$where = '';
+		$db_replace_result = 0;
+		foreach ($columns as $columnName => $type)
+		{
+			// Are we restricting the length?
+			if (strpos($type, 'string-') !== false)
+			{
+				$actualType = sprintf($columnName . ' = SUBSTRING({string:%1$s}, 1, ' . substr($type, 7) . '), ', $count);
+			}
+			else
+			{
+				$actualType = sprintf($columnName . ' = {%1$s:%2$s}, ', $type, $count);
+			}
+
+			// A key? That's what we were looking for.
+			if (in_array($columnName, $keys))
+			{
+				$where .= (empty($where) ? '' : ' AND ') . substr($actualType, 0, -2);
+			}
+			$count++;
+		}
+
+		// Make it so.
+		if (!empty($where))
+		{
+			foreach ($data as $k => $entry)
+			{
+				$this->query('', '
+					DELETE FROM ' . $table .
+					' WHERE ' . $where,
+					$entry
+				);
+				$db_replace_result += (!is_resource($this->_db_last_result) ? 0 : pg_affected_rows($this->_db_last_result));
+			}
+		}
+
+		$this->insert('', $table, $columns, $data, $keys, $disable_trans);
+
+		$this->result->updateDetails([
+			'replaceResults' => $db_replace_result + $this->result->getDetail('insertedResults')
+		]);
+
+		if ($local_transaction)
 		{
 			$this->transaction('commit');
 		}
-
-		if (!empty($data))
-		{
-			$last_inserted_id = $this->insert_id($table);
-		}
-
-		$this->result = new Result(
-			is_object($ret) ? $ret->getResultObject() : $ret,
-			new ValuesContainer([
-				'insert_id' => $last_inserted_id,
-				'replaceResults' => $db_replace_result ?? 0,
-				'lastResult' => $this->_db_last_result,
-			])
-		);
 
 		return $this->result;
 	}

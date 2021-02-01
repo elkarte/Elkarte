@@ -661,7 +661,7 @@ abstract class AbstractQuery implements QueryInterface
 
 		if (trim($db_string) === '')
 		{
-			return false;
+			throw new \Exception('Query string empty');
 		}
 
 		$db_string = $this->_prepareQuery($db_string, $db_values);
@@ -710,7 +710,66 @@ abstract class AbstractQuery implements QueryInterface
 	/**
 	 * {@inheritDoc}
 	 */
-	abstract public function insert($method = 'replace', $table, $columns, $data, $keys, $disable_trans = false);
+	abstract public function insert($method, $table, $columns, $data, $keys, $disable_trans = false);
+
+	/**
+	 * Prepares the data that will be later implode'd into the actual query string
+	 *
+	 * @param string $table
+	 * @param mixed[] $columns
+	 * @param mixed[] $data
+	 * @return mixed[]
+	 */
+	protected function prepareInsert($table, $columns, $data)
+	{
+		// With nothing to insert, simply return.
+		if (empty($data))
+		{
+			throw new \Exception('No data to insert');
+		}
+
+		// Inserting data as a single row can be done as a single array.
+		if (!is_array($data[array_rand($data)]))
+		{
+			$data = [$data];
+		}
+
+		// Replace the prefix holder with the actual prefix.
+		$table = str_replace('{db_prefix}', $this->_db_prefix, $table);
+		$this->_skip_error = $table === $this->_db_prefix . 'log_errors';
+
+		// Create the mold for a single row insert.
+		$insertData = '(';
+		foreach ($columns as $columnName => $type)
+		{
+			// Are we restricting the length?
+			if (strpos($type, 'string-') !== false)
+			{
+				$insertData .= sprintf('SUBSTRING({string:%1$s}, 1, ' . substr($type, 7) . '), ', $columnName);
+			}
+			else
+			{
+				$insertData .= sprintf('{%1$s:%2$s}, ', $type, $columnName);
+			}
+		}
+		$insertData = substr($insertData, 0, -2) . ')';
+
+		// Create an array consisting of only the columns.
+		$indexed_columns = array_keys($columns);
+
+		// Here's where the variables are injected to the query.
+		$insertRows = [];
+		foreach ($data as $dataRow)
+		{
+			$insertRows[] = $this->quote($insertData, $this->_array_combine($indexed_columns, $dataRow));
+		}
+		return [$table, $indexed_columns, $insertRows];
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	abstract public function replace($table, $columns, $data, $keys, $disable_trans = false);
 
 	/**
 	 * {@inheritDoc}
