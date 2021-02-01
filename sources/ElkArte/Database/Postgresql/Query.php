@@ -18,8 +18,6 @@ namespace ElkArte\Database\Postgresql;
 
 use ElkArte\Database\AbstractQuery;
 use ElkArte\Errors\Errors;
-use ElkArte\Exceptions\Exception;
-use ElkArte\ValuesContainer;
 
 /**
  * PostgreSQL database class, implements database class to control mysql functions
@@ -236,6 +234,8 @@ class Query extends AbstractQuery
 	protected function executeQuery($db_string)
 	{
 		$this->_db_last_result = @pg_query($this->connection, $db_string);
+
+		$this->result = new Result($this->_db_last_result);
 	}
 
 	/**

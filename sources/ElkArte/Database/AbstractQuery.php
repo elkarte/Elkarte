@@ -20,6 +20,7 @@ namespace ElkArte\Database;
 use ElkArte\Debug;
 use ElkArte\Errors\Errors;
 use ElkArte\Exceptions\Exception;
+use ElkArte\ValuesContainer;
 
 /**
  * Abstract database class, implements database to control functions
@@ -669,12 +670,6 @@ abstract class AbstractQuery implements QueryInterface
 
 		// Debugging.
 		$this->_postQueryDebug();
-
-		$this->result = new Result($this->_db_last_result,
-			new ValuesContainer([
-				'connection' => $this->connection
-			])
-		);
 
 		return $this->result;
 	}

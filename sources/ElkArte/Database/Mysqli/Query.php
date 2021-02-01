@@ -20,8 +20,6 @@ namespace ElkArte\Database\Mysqli;
 use ElkArte\Cache\Cache;
 use ElkArte\Database\AbstractQuery;
 use ElkArte\Errors\Errors;
-use ElkArte\Exceptions\Exception;
-use ElkArte\ValuesContainer;
 
 /**
  * SQL database class, implements database class to control mysql functions
@@ -164,6 +162,12 @@ class Query extends AbstractQuery
 		{
 			$this->_db_last_result = @mysqli_query($this->connection, $db_string, MYSQLI_USE_RESULT);
 		}
+
+		$this->result = new Result($this->_db_last_result,
+			new ValuesContainer([
+				'connection' => $this->connection
+			])
+		);
 	}
 
 	/**
