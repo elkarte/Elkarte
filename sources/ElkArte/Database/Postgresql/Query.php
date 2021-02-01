@@ -134,7 +134,7 @@ class Query extends AbstractQuery
 			}
 
 			// Make it so.
-			if (!empty($where) && !empty($data))
+			if (!empty($where))
 			{
 				foreach ($data as $k => $entry)
 				{
@@ -148,54 +148,51 @@ class Query extends AbstractQuery
 			}
 		}
 
-		if (!empty($data))
+		// Create the mold for a single row insert.
+		$insertData = '(';
+		foreach ($columns as $columnName => $type)
 		{
-			// Create the mold for a single row insert.
-			$insertData = '(';
-			foreach ($columns as $columnName => $type)
+			// Are we restricting the length?
+			if (strpos($type, 'string-') !== false)
 			{
-				// Are we restricting the length?
-				if (strpos($type, 'string-') !== false)
-				{
-					$insertData .= sprintf('SUBSTRING({string:%1$s}, 1, ' . substr($type, 7) . '), ', $columnName);
-				}
-				else
-				{
-					$insertData .= sprintf('{%1$s:%2$s}, ', $type, $columnName);
-				}
+				$insertData .= sprintf('SUBSTRING({string:%1$s}, 1, ' . substr($type, 7) . '), ', $columnName);
 			}
-			$insertData = substr($insertData, 0, -2) . ')';
-
-			// Create an array consisting of only the columns.
-			$indexed_columns = array_keys($columns);
-
-			// Here's where the variables are injected to the query.
-			$insertRows = array();
-			foreach ($data as $dataRow)
+			else
 			{
-				$insertRows[] = $this->quote($insertData, $this->_array_combine($indexed_columns, $dataRow));
+				$insertData .= sprintf('{%1$s:%2$s}, ', $type, $columnName);
 			}
+		}
+		$insertData = substr($insertData, 0, -2) . ')';
 
-			$inserted_results = 0;
-			$skip_error = $method === 'ignore' || $table === $this->_db_prefix . 'log_errors';
-			$this->_skip_error = $skip_error;
+		// Create an array consisting of only the columns.
+		$indexed_columns = array_keys($columns);
 
-			// Do the insert.
-			$ret = $this->query('', '
-				INSERT INTO ' . $table . '("' . implode('", "', $indexed_columns) . '")
-				VALUES
-				' . implode(',
-				', $insertRows),
-				array(
-					'security_override' => true,
-				)
-			);
-			$inserted_results += (!is_resource($this->_db_last_result) ? 0 : pg_affected_rows($this->_db_last_result));
+		// Here's where the variables are injected to the query.
+		$insertRows = array();
+		foreach ($data as $dataRow)
+		{
+			$insertRows[] = $this->quote($insertData, $this->_array_combine($indexed_columns, $dataRow));
+		}
 
-			if ($method === 'replace')
-			{
-				$db_replace_result = $db_replace_result + $inserted_results;
-			}
+		$inserted_results = 0;
+		$skip_error = $method === 'ignore' || $table === $this->_db_prefix . 'log_errors';
+		$this->_skip_error = $skip_error;
+
+		// Do the insert.
+		$ret = $this->query('', '
+			INSERT INTO ' . $table . '("' . implode('", "', $indexed_columns) . '")
+			VALUES
+			' . implode(',
+			', $insertRows),
+			array(
+				'security_override' => true,
+			)
+		);
+		$inserted_results += (!is_resource($this->_db_last_result) ? 0 : pg_affected_rows($this->_db_last_result));
+
+		if ($method === 'replace')
+		{
+			$db_replace_result = $db_replace_result + $inserted_results;
 		}
 
 		if ($priv_trans)
