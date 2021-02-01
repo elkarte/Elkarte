@@ -5,15 +5,15 @@
 set -e
 set +x
 
-# Access passed params from travis.yml
+# Access passed params
 DB=$1
-TRAVIS_PHP_VERSION=$2
+PHP_VERSION=$2
 WEBTESTS=$3
 COVERAGE=$4
 
 # Common names
 SHORT_DB=${DB%%-*}
-SHORT_PHP=${TRAVIS_PHP_VERSION:0:3}
+SHORT_PHP=${PHP_VERSION:0:3}
 
 # Some vars to make this easy to change
 SELENIUM_HUB_URL='http://127.0.0.1:4444'

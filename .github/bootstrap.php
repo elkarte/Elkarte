@@ -30,7 +30,7 @@ if (!defined('ELK'))
 	define('CACHE_STALE', '?R20B1');
 
 	// Get the forum's settings for database and file paths.
-	require_once('/var/www/Settings.php');
+	require_once('Settings.php');
 
 	// Set our site "variable" constants
 	define('BOARDDIR', $boarddir);
@@ -46,7 +46,7 @@ if (!defined('ELK'))
 }
 else
 {
-	require_once('/var/www/Settings.php');
+	require_once('Settings.php');
 }
 
 // A few files we cannot live without and will not be autoload
@@ -106,4 +106,4 @@ if (defined('PHPUNIT_SELENIUM'))
 	PHPUnit_Extensions_Selenium2TestCase::shareSession(true);
 }
 
-file_put_contents('/var/www/bootstrapcompleted.lock', '1');
+file_put_contents('bootstrapcompleted.lock', '1');

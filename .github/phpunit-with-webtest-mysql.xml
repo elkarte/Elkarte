@@ -9,28 +9,28 @@
          stopOnFailure="false"
          verbose="true"
          beStrictAboutTestsThatDoNotTestAnything="false"
-         bootstrap="/var/www/tests/travis-ci/bootstrap.php">
+         bootstrap="bootstrap.php">
   <testsuites>
       <testsuite name="Web Tests">
-          <directory suffix="Web.php">/var/www/tests</directory>
+          <directory suffix="Web.php">../tests</directory>
       </testsuite>
   </testsuites>
 
   <listeners>
       <listener class="PHPUnit_Extensions_Selenium2TestCase_ScreenshotListener">
           <arguments>
-              <string>/var/www/screenshots</string>
+              <string>../screenshots</string>
           </arguments>
       </listener>
   </listeners>
 
   <filter>
       <whitelist addUncoveredFilesFromWhitelist="false">
-          <directory suffix=".php">/var/www/sources</directory>
-          <directory suffix=".php">/var/www/themes/default</directory>
+          <directory suffix=".php">../sources</directory>
+          <directory suffix=".php">../themes/default</directory>
           <exclude>
-              <directory suffix=".php">/var/www/sources/ext</directory>
-              <directory suffix=".php">/var/www/themes/default/languages/english</directory>
+              <directory suffix=".php">../sources/ext</directory>
+              <directory suffix=".php">../themes/default/languages/english</directory>
           </exclude>
       </whitelist>
   </filter>

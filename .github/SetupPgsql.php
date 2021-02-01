@@ -1,9 +1,9 @@
 <?php
 
 /**
- * Handles the mysql db actions for travis-ci
+ * Handles the postgresql actions
  *
- * Called by setup-elkarte.sh as part of the install: directive in .travis.yml
+ * Called by setup-database.sh as part of the install:
  *
  * @package   ElkArte Forum
  * @copyright ElkArte Forum contributors
@@ -15,8 +15,8 @@
 
 define('TESTDIR', dirname(__FILE__));
 
-require_once(TESTDIR . '/setup.php');
-require_once(TESTDIR . '/Elk_Testing_mysql.php');
+require_once(TESTDIR . '/SetupDbUtil.php');
+require_once(TESTDIR . '/ElkTestingPsql.php');
 
-$setup = new Elk_Testing_mysql();
+$setup = new Elk_Testing_psql();
 $setup->init();

@@ -1,9 +1,11 @@
 <?php
 
+use PHPUnit\Framework\TestCase;
+
 /**
  * TestCase class for tables present
  */
-class TestDatabase extends \PHPUnit\Framework\TestCase
+class TestDatabase extends TestCase
 {
 	/**
 	 * Prepare what is necessary to use in these tests.
@@ -29,7 +31,7 @@ class TestDatabase extends \PHPUnit\Framework\TestCase
 		define('CACHE_STALE', '?R11B2');
 
 		// Get the forum's settings for database and file paths.
-		require_once('/var/www/Settings.php');
+		require_once('Settings.php');
 
 		// Set our site "variable" constants
 		define('BOARDDIR', $boarddir);
@@ -42,18 +44,17 @@ class TestDatabase extends \PHPUnit\Framework\TestCase
 		define('SUBSDIR', $sourcedir . '/subs');
 		define('ADDONSDIR', $sourcedir . '/addons');
 
-		require_once('/var/www/tests/travis-ci/bootstrap.php');
+		require_once('/.github/bootstrap.php');
 	}
 
 	/**
 	 * testTablesExist() get a list of tables and see if they all exist
+	 *
 	 * @runInSeparateProcess
 	 * @preserveGlobalState disabled
 	 */
 	public function testTablesExist()
 	{
-		//$this->bootstrap();
-
 		global $db_prefix;
 
 		$db = database();
@@ -135,7 +136,6 @@ class TestDatabase extends \PHPUnit\Framework\TestCase
 			'topics',
 			'user_drafts',
 		);
-		$exists = false;
 
 		foreach ($known_tables as $table)
 		{

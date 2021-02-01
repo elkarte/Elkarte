@@ -1,9 +1,11 @@
 <?php
 
+use PHPUnit\Framework\TestCase;
+
 /**
  * TestCase class for file integrity
  */
-class TestFiles extends \PHPUnit\Framework\TestCase
+class TestFiles extends TestCase
 {
 	protected $_ourFiles = array();
 	protected $backupGlobalsBlacklist = ['user_info'];
@@ -17,6 +19,10 @@ class TestFiles extends \PHPUnit\Framework\TestCase
 	{
 		$this->_ourFiles = array();
 
+		// Not using bootstrap for this static test
+		if (!defined('BOARDDIR'))
+			define('BOARDDIR', dirname(__DIR__, 2));
+
 		$directory = new \RecursiveDirectoryIterator(BOARDDIR);
 		$iterator = new \RecursiveIteratorIterator($directory);
 		$regex = new \RegexIterator($iterator, '/^.+\.php$/i', \RecursiveRegexIterator::GET_MATCH);
@@ -28,6 +34,7 @@ class TestFiles extends \PHPUnit\Framework\TestCase
 			// We do not care about non-project files
 			if (strpos($file, '/sources/ext/') !== false)
 				continue;
+
 			if (strpos($file, '/vendor/') !== false)
 				continue;
 
@@ -196,6 +203,8 @@ class TestFiles extends \PHPUnit\Framework\TestCase
 		foreach ($this->_ourFiles as $file)
 		{
 			// We do not care about some project files
+			if (strpos($file, BOARDDIR . '/.github/') !== false)
+				continue;
 			if (strpos($file, BOARDDIR . '/cache/') !== false)
 				continue;
 			if (strpos($file, BOARDDIR . '/addons/') !== false)

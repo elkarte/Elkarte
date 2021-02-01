@@ -6,15 +6,15 @@
 set -e
 set +x
 
-# Passed params from the travis.yml file
+# Passed params
 DB=$1
-TRAVIS_PHP_VERSION=$2
+PHP_VERSION=$2
 WEBTESTS=$3
 COVERAGE=$4
 
 # Common name
 SHORT_DB=${DB%%-*}
-SHORT_PHP=${TRAVIS_PHP_VERSION:0:3}
+SHORT_PHP=${PHP_VERSION:0:3}
 
 # Show the php error log
 if [[ -f /var/www/error.log ]]; then cat /var/www/error.log; fi

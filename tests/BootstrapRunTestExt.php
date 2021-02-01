@@ -1,6 +1,8 @@
 <?php
 
-class BootstrapRunTest extends \PHPUnit\Framework\TestCase
+use PHPUnit\Framework\TestCase;
+
+class BootstrapRunTest extends TestCase
 {
 	protected $backupGlobalsBlacklist = ['user_info'];
 
@@ -12,6 +14,6 @@ class BootstrapRunTest extends \PHPUnit\Framework\TestCase
 	 */
 	public function testBootstraplock()
 	{
-		$this->assertTrue(file_exists('/var/www/bootstrapcompleted.lock'));
+		$this->assertTrue(file_exists('bootstrapcompleted.lock'));
 	}
 }

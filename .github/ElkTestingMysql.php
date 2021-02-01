@@ -1,8 +1,8 @@
 <?php
 
 /**
- * Handles the mysql db actions
- * Called by setup-elkarte.sh as part of the install: directive in .travis.yml
+ * Handles the mysql / mariadb db actions
+ * Called by setup-database.sh as part of the install
  *
  * @package   ElkArte Forum
  * @copyright ElkArte Forum contributors
@@ -12,10 +12,13 @@
  *
  */
 
+use ElkArte\Database\Mysqli\Connection;
+use ElkArte\Database\Mysqli\Table;
+
 /**
  * Sets up a Database_MySQL object
  */
-class DbTable_MySQL_Install extends \ElkArte\Database\Mysqli\Table
+class DbTable_MySQL_Install extends Table
 {
 	public static $_tbl_inst = null;
 
@@ -67,16 +70,16 @@ class DbTable_MySQLi_Install extends DbTable_MySQL_Install
 }
 
 /**
- * Extend Elk_Testing_Setup with MySql values
+ * Extend ElkTestingSetup with MySql values
  */
-class Elk_Testing_mysql extends Elk_Testing_Setup
+class ElkTestingMysql extends ElkTestingSetup
 {
 	public function init()
 	{
 		global $db_name, $db_prefix, $db_type, $boardurl, $db_server, $db_user, $db_passwd;
 
 		$boardurl = $this->_boardurl = 'http://127.0.0.1';
-		$db_server = $this->_db_server = 'localhost';
+		$db_server = $this->_db_server = '127.0.0.1';
 		$db_type = $this->_db_type = 'mysql';
 		$db_name = $this->_db_name = 'elkarte_test';
 		$db_user = $this->_db_user = 'root';
@@ -93,10 +96,10 @@ class Elk_Testing_mysql extends Elk_Testing_Setup
 		try
 		{
 			// Start the database interface
-			$this->_db = \ElkArte\Database\Mysqli\Connection::initiate($this->_db_server, $this->_db_name, $this->_db_user, $this->_db_passwd, $this->_db_prefix, ['select_db' => true]);
+			$this->_db = Connection::initiate($this->_db_server, $this->_db_name, $this->_db_user, $this->_db_passwd, $this->_db_prefix, ['select_db' => true]);
 			$this->_db_table = DbTable_MySQL_Install::db_table($this->_db, $this->_db_prefix);
 		}
-		catch (\Exception $e)
+		catch (Exception $e)
 		{
 			die($e->getMessage());
 		}

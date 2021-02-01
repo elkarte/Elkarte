@@ -1,9 +1,9 @@
 <?php
 
 /**
- * Handles the postgresql actions for travis-ci
+ * Handles the postgresql actions
  *
- * Called by setup-elkarte.sh as part of the install: directive in .travis.yml
+ * Called by setup-database.sh as part of the install
  *
  * @package   ElkArte Forum
  * @copyright ElkArte Forum contributors
@@ -63,9 +63,9 @@ class DbTable_PostgreSQL_Install extends \ElkArte\Database\Postgresql\Table
 }
 
 /**
- * Extend Elk_Testing_Setup with PostgreSQL values
+ * Extend ElkTestingSetup with PostgreSQL values
  */
-class Elk_Testing_psql extends Elk_Testing_Setup
+class Elk_Testing_psql extends ElkTestingSetup
 {
 	public function init()
 	{
@@ -73,11 +73,11 @@ class Elk_Testing_psql extends Elk_Testing_Setup
 		global $modSettings;
 
 		$boardurl = $this->_boardurl = 'http://127.0.0.1';
-		$db_server = $this->_db_server = 'localhost';
+		$db_server = $this->_db_server = '127.0.0.1';
 		$db_type = $this->_db_type = 'postgresql';
 		$db_name = $this->_db_name = 'elkarte_test';
 		$db_user = $this->_db_user = 'postgres';
-		$db_passwd = $this->_db_passwd = '';
+		$db_passwd = $this->_db_passwd = 'postgres';
 		$db_prefix = $this->_db_prefix = 'elkarte_';
 
 		$link = pg_connect('host=' . $this->_db_server . ' dbname=' . $this->_db_name . ' user=\'' . $this->_db_user . '\' password=\'' . $this->_db_passwd . '\'');

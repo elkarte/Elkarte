@@ -1,3 +1,4 @@
 *min.css
 *jquery*.css
 multiselect.css
+vendor/**/*.css

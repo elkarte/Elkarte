@@ -39,7 +39,7 @@ class TestCurlFetchWebdata extends \PHPUnit\Framework\TestCase
 			array(
 				'https://www.google.com',
 				200,
-				'Search the world\'s information',
+				'Search the world',
 			),
 			array(
 				'http://www.google.com/elkarte',
