@@ -93,7 +93,7 @@ function updateMessageIcon($icon)
 {
 	$db = database();
 
-	$db->insert('replace',
+	$db->replace(
 		'{db_prefix}message_icons',
 		array('id_icon' => 'int', 'id_board' => 'int', 'title' => 'string-80', 'filename' => 'string-80', 'icon_order' => 'int'),
 		$icon,

@@ -784,7 +784,7 @@ function updateThemeOptions($setValues)
 {
 	$db = database();
 
-	$db->insert('replace',
+	$db->replace(
 		'{db_prefix}themes',
 		array('id_theme' => 'int', 'id_member' => 'int', 'variable' => 'string-255', 'value' => 'string-65534'),
 		$setValues,

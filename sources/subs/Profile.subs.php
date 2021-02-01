@@ -1893,7 +1893,7 @@ function makeCustomFieldChanges($memID, $area, $sanitize = true)
 	// Make those changes!
 	if (!empty($changes) && empty($context['password_auth_failed']))
 	{
-		$db->insert('replace',
+		$db->replace(
 			'{db_prefix}custom_fields_data',
 			array('variable' => 'string-255', 'value' => 'string-65534', 'id_member' => 'int'),
 			$changes,

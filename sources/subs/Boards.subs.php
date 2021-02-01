@@ -77,7 +77,7 @@ function markBoardsRead($boards, $unread = false, $resetTopics = false)
 			$markRead[] = array($modSettings['maxMsgID'], User::$info->id, $board);
 		}
 
-		$db->insert('replace',
+		$db->replace(
 			'{db_prefix}log_boards',
 			array('id_msg' => 'int', 'id_member' => 'int', 'id_board' => 'int'),
 			$markRead,
@@ -102,7 +102,7 @@ function markBoardsRead($boards, $unread = false, $resetTopics = false)
 		// @todo check this condition <= I think I did, but better double check
 		if (!$unread && !empty($markRead))
 		{
-			$db->insert('replace',
+			$db->replace(
 				'{db_prefix}log_mark_read',
 				array('id_msg' => 'int', 'id_member' => 'int', 'id_board' => 'int'),
 				$markRead,
@@ -163,7 +163,7 @@ function markBoardsRead($boards, $unread = false, $resetTopics = false)
 
 		if (!empty($update_topics))
 		{
-			$db->insert('replace',
+			$db->replace(
 				'{db_prefix}log_topics',
 				array(
 					'id_member' => 'int',

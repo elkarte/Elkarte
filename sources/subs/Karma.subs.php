@@ -83,7 +83,7 @@ function addKarma($id_executor, $id_target, $direction)
 	$db = database();
 
 	// Put it in the log.
-	$db->insert('replace',
+	$db->replace(
 		'{db_prefix}log_karma',
 		array('action' => 'int', 'id_target' => 'int', 'id_executor' => 'int', 'log_time' => 'int'),
 		array($direction, $id_target, $id_executor, time()),

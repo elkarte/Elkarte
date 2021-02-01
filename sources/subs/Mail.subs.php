@@ -1223,7 +1223,7 @@ function updateFailedQueue($failed_emails)
 	$db = database();
 
 	// Update the failed attempts check.
-	$db->insert('replace',
+	$db->replace(
 		'{db_prefix}settings',
 		array('variable' => 'string', 'value' => 'string'),
 		array('mail_failed_attempts', empty($modSettings['mail_failed_attempts']) ? 1 : ++$modSettings['mail_failed_attempts']),

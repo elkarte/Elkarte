@@ -102,7 +102,7 @@ function updateSettings($changeArray, $update = false)
 		return;
 	}
 
-	$db->insert('replace',
+	$db->replace(
 		'{db_prefix}settings',
 		array('variable' => 'string-255', 'value' => 'string-65534'),
 		$replaceArray,
