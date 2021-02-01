@@ -408,25 +408,9 @@ abstract class AbstractQuery implements QueryInterface
 		$log_message .= $backtrace_message;
 
 		// Is always a critical error.
-		if (class_exists('\\ElkArte\\Errors\\Errors'))
-		{
-			Errors::instance()->log_error($log_message, 'critical', $file, $line);
-		}
+		Errors::instance()->log_error($log_message, 'critical', $file, $line);
 
-		if (class_exists('\\ElkArte\\Exceptions\\Exception'))
-		{
-			throw new Exception([false, $error_message], false);
-		}
-		elseif ($error_type)
-		{
-			trigger_error($error_message . ($line !== null ? '<em>(' . basename($file) . '-' . $line . ')</em>' : ''), $error_type);
-		}
-		else
-		{
-			trigger_error($error_message . ($line !== null ? '<em>(' . basename($file) . '-' . $line . ')</em>' : ''));
-		}
-
-		return array('', '');
+		throw new Exception([false, $error_message], false);
 	}
 
 	/**
@@ -706,6 +690,45 @@ abstract class AbstractQuery implements QueryInterface
 	 * {@inheritDoc}
 	 */
 	abstract public function error($db_string);
+
+	/**
+	 * Prepares the strings to show the error to the user/admin and stop
+	 * the code execution
+	 *
+	 * @param string $db_string
+	 * @param string $query_error
+	 * @param string $file
+	 * @param int $line
+	 */
+	protected function throwError($db_string, $query_error, $file, $line)
+	{
+		global $context, $txt, $modSettings, $db_show_debug;
+
+		// Nothing's defined yet... just die with it.
+		if (empty($context) || empty($txt))
+		{
+			die($query_error);
+		}
+
+		// Show an error message, if possible.
+		$context['error_title'] = $txt['database_error'];
+		$message = $txt['try_again'];
+
+		// Add database version that we know of, for the admin to know. (and ask for support)
+		if (allowedTo('admin_forum'))
+		{
+			$message = nl2br($query_error) . '<br />' . $txt['file'] . ': ' . $file . '<br />' . $txt['line'] . ': ' . $line .
+				'<br /><br />' . sprintf($txt['database_error_versions'], $modSettings['elkVersion']);
+
+			if ($db_show_debug === true)
+			{
+				$message .= '<br /><br />' . nl2br($db_string);
+			}
+		}
+
+		// It's already been logged... don't log it again.
+		throw new Exception($message, false);
+	}
 
 	/**
 	 * {@inheritDoc}

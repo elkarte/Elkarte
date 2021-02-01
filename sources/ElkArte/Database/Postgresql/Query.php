@@ -243,7 +243,7 @@ class Query extends AbstractQuery
 	 */
 	public function error($db_string)
 	{
-		global $txt, $context, $modSettings, $db_show_debug;
+		global $txt, $modSettings;
 
 		// We'll try recovering the file and line number the original db query was called from.
 		list ($file, $line) = $this->backtrace_message();
@@ -257,35 +257,9 @@ class Query extends AbstractQuery
 		$query_error = @pg_last_error($this->connection);
 
 		// Log the error.
-		if (class_exists('\\ElkArte\\Errors\\Errors'))
-		{
-			Errors::instance()->log_error($txt['database_error'] . ': ' . $query_error . (!empty($modSettings['enableErrorQueryLogging']) ? "\n\n" . $db_string : ''), 'database', $file, $line);
-		}
+		Errors::instance()->log_error($txt['database_error'] . ': ' . $query_error . (!empty($modSettings['enableErrorQueryLogging']) ? "\n\n" . $db_string : ''), 'database', $file, $line);
 
-		// Nothing's defined yet... just die with it.
-		if (empty($context) || empty($txt))
-		{
-			die($query_error);
-		}
-
-		// Show an error message, if possible.
-		$context['error_title'] = $txt['database_error'];
-		$context['error_message'] = $txt['try_again'];
-
-		// Add database version that we know of, for the admin to know. (and ask for support)
-		if (allowedTo('admin_forum'))
-		{
-			$context['error_message'] = nl2br($query_error) . '<br />' . $txt['file'] . ': ' . $file . '<br />' . $txt['line'] . ': ' . $line .
-				'<br /><br />' . sprintf($txt['database_error_versions'], $modSettings['elkVersion']);
-
-			if ($db_show_debug === true)
-			{
-				$context['error_message'] .= '<br /><br />' . nl2br($db_string);
-			}
-		}
-
-		// It's already been logged... don't log it again.
-		throw new Exception($context['error_message'], false);
+		$this->throwError($db_string, $query_error, $file, $line);
 	}
 
 	/**

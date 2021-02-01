@@ -171,8 +171,8 @@ class Query extends AbstractQuery
 	 */
 	public function error($db_string)
 	{
-		global $txt, $context, $webmaster_email, $modSettings, $db_persist;
-		global $db_server, $db_user, $db_passwd, $db_name, $db_show_debug, $ssi_db_user, $ssi_db_passwd;
+		global $txt, $webmaster_email, $modSettings, $db_persist;
+		global $db_server, $db_user, $db_passwd, $db_name, $ssi_db_user, $ssi_db_passwd;
 
 		// We'll try recovering the file and line number the original db query was called from.
 		list ($file, $line) = $this->backtrace_message();
@@ -207,19 +207,10 @@ class Query extends AbstractQuery
 				$_SESSION['query_command_denied'][$command] = $query_error;
 
 				// Let the admin know there is a command denied issue
-				if (class_exists('Errors'))
-				{
-					Errors::instance()->log_error($txt['database_error'] . ': ' . $query_error . (!empty($modSettings['enableErrorQueryLogging']) ? "\n\n$db_string" : ''), 'database', $file, $line);
-				}
+				Errors::instance()->log_error($txt['database_error'] . ': ' . $query_error . (!empty($modSettings['enableErrorQueryLogging']) ? "\n\n$db_string" : ''), 'database', $file, $line);
 
 				return false;
 			}
-		}
-
-		// Log the error.
-		if ($query_errno != 1213 && $query_errno != 1205 && class_exists('Errors'))
-		{
-			Errors::instance()->log_error($txt['database_error'] . ': ' . $query_error . (!empty($modSettings['enableErrorQueryLogging']) ? "\n\n$db_string" : ''), 'database', $file, $line);
 		}
 
 		// Database error auto fixing ;).
@@ -380,36 +371,13 @@ class Query extends AbstractQuery
 			}
 		}
 
-		// Nothing's defined yet... just die with it.
-		if (empty($context) || empty($txt))
+		// Log the error.
+		if ($query_errno != 1213 && $query_errno != 1205)
 		{
-			die($query_error);
+			Errors::instance()->log_error($txt['database_error'] . ': ' . $query_error . (!empty($modSettings['enableErrorQueryLogging']) ? "\n\n$db_string" : ''), 'database', $file, $line);
 		}
 
-		// Show an error message, if possible.
-		$context['error_title'] = $txt['database_error'];
-		if (allowedTo('admin_forum'))
-		{
-			$message = nl2br($query_error) . '<br />' . $txt['file'] . ': ' . $file . '<br />' . $txt['line'] . ': ' . $line;
-		}
-		else
-		{
-			$message = $txt['try_again'];
-		}
-
-		// Add database version that we know of, for the admin to know. (and ask for support)
-		if (allowedTo('admin_forum'))
-		{
-			$message .= '<br /><br />' . sprintf($txt['database_error_versions'], $modSettings['elkVersion']);
-		}
-
-		if (allowedTo('admin_forum') && $db_show_debug === true)
-		{
-			$message .= '<br /><br />' . nl2br($db_string);
-		}
-
-		// It's already been logged... don't log it again.
-		throw new Exception($message, false);
+		$this->throwError($db_string, $query_error, $file, $line);
 	}
 
 	/**
