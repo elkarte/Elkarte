@@ -59,6 +59,11 @@ class Query extends AbstractQuery
 	protected $not_rlike = ' !~* ';
 
 	/**
+	 * Used by insert to deal with conflicts (mostly for replace)
+	 */
+	private $on_conflict = '';
+
+	/**
 	 * {@inheritDoc}
 	 */
 	public function fix_prefix($db_prefix, $db_name)
@@ -90,6 +95,11 @@ class Query extends AbstractQuery
 			return $this->replace($table, $columns, $data, $keys, $disable_trans);
 		}
 
+		if ($method === 'ignore')
+		{
+			$this->on_conflict = 'ON CONFLICT (' . implode(', ', $keys) . ') DO NOTHING';
+		}
+
 		list($table, $indexed_columns, $insertRows) = $this->prepareInsert($table, $columns, $data);
 
 		// Do the insert.
@@ -97,11 +107,16 @@ class Query extends AbstractQuery
 			INSERT INTO ' . $table . '("' . implode('", "', $indexed_columns) . '")
 			VALUES
 			' . implode(',
-			', $insertRows),
+			', $insertRows) . $this->on_conflict,
 			array(
 				'security_override' => true,
 			)
 		);
+		if ($method === 'ignore')
+		{
+			$this->on_conflict = '';
+		}
+
 		$inserted_results = !is_resource($this->_db_last_result) ? 0 : pg_affected_rows($this->_db_last_result);
 
 		$last_inserted_id = $this->insert_id($table);
@@ -120,67 +135,22 @@ class Query extends AbstractQuery
 	 */
 	public function replace($table, $columns, $data, $keys, $disable_trans = false)
 	{
-		$local_transaction = false;
-		if (!$this->_in_transaction && !$disable_trans)
-		{
-			$this->transaction('begin');
-			$local_transaction = true;
-		}
-
-		// PostgreSQL doesn't support replace: we implement a MySQL-compatible behavior instead
-		$count = 0;
-		$where = '';
-		$db_replace_result = 0;
+		$sets = [];
 		foreach ($columns as $columnName => $type)
 		{
-			// Are we restricting the length?
-			if (strpos($type, 'string-') !== false)
-			{
-				$actualType = sprintf($columnName . ' = SUBSTRING({string:%1$s}, 1, ' . substr($type, 7) . '), ', $count);
-			}
-			else
-			{
-				$actualType = sprintf($columnName . ' = {%1$s:%2$s}, ', $type, $count);
-			}
-
-			// A key? That's what we were looking for.
-			if (in_array($columnName, $keys))
-			{
-				$where .= (empty($where) ? '' : ' AND ') . substr($actualType, 0, -2);
-			}
-			$count++;
+			$sets[] = $columnName . ' = EXCLUDED.' . $columnName;
 		}
-
-		// Make it so.
-		if (!empty($where))
-		{
-			// Inserting data as a single row can be done as a single array.
-			if (!is_array($data[array_rand($data)]))
-			{
-				$data = array($data);
-			}
-
-			foreach ($data as $k => $entry)
-			{
-				$this->query('', '
-					DELETE FROM ' . $table .
-					' WHERE ' . $where,
-					$entry
-				);
-				$db_replace_result += (!is_resource($this->_db_last_result) ? 0 : pg_affected_rows($this->_db_last_result));
-			}
-		}
+		$this->on_conflict = '
+			ON CONFLICT (' . implode(', ', $keys) . ') DO
+			UPDATE SET ' . implode(',
+				', $sets);
 
 		$this->insert('', $table, $columns, $data, $keys, $disable_trans);
+		$this->on_conflict = '';
 
 		$this->result->updateDetails([
-			'replaceResults' => $db_replace_result + $this->result->getDetail('insertedResults')
+			'replaceResults' => $this->result->getDetail('insertedResults')
 		]);
-
-		if ($local_transaction)
-		{
-			$this->transaction('commit');
-		}
 
 		return $this->result;
 	}

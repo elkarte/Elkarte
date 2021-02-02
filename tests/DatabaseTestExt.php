@@ -181,7 +181,7 @@ class TestDatabase extends TestCase
 		{
 			$result = $db->fetchQuery('SELECT count(*) FROM {db_prefix}' . $tbl);
 			list($counted) = $result->fetch_row();
-			$this->assertEquals($counted, $number, 'The number of inserted rows for the table ' . $tbl . ' doesn\'t match the expectations (' . $counted . ' -VS- ' . $number . ')');
+			$this->assertEquals($number, $counted, 'The number of inserted rows for the table ' . $tbl . ' doesn\'t match the expectations (' . $counted . ' -VS- ' . $number . ')');
 		}
 	}
 }
