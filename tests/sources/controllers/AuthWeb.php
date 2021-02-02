@@ -44,10 +44,11 @@ class TestAuthController extends ElkArteWebTest
 		$this->clickit('#button_logout > a');
 
 		// Now lets login
-		$this->clickit('#button_login > a');
-		$this->assertEquals('Log in', $this->title());
+		$this->url('index.php?action=login');
+		sleep(1);
+		$this->assertEquals('Log in', $this->title(), $this->source());
 
-		// Fill in the form, long hand style
+		// Fill in the form
 		$usernameInput = $this->byId('user');
 		$usernameInput->clear();
 		$usernameInput->value($username);

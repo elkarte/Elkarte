@@ -13,4 +13,8 @@
           <directory suffix="Basic.php">../tests</directory>
       </testsuite>
   </testsuites>
+
+  <logging>
+      <log type="coverage-clover" target="/tmp/coverage.clover"/>
+  </logging>
 </phpunit>

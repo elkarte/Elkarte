@@ -2,6 +2,7 @@
 #
 # "since failure is always an option"
 # Perform various actions if things don't go as expected during the test
+# currently not used with GHA
 
 set -e
 set +x

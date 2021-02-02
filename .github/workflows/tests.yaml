@@ -5,12 +5,96 @@ on:
     branches:        # Run tests when commits are pushed to these branches
       - master
       - development
+      - GHActionsII
   pull_request:      # Run tests when pull requests are made on these branches
     branches:
       - master
       - development
+      - GHActionsII
+
+env:
+  WEBSERVER: 'none'
 
 jobs:
+  # Selenium headless browser testing
+  Selenium-checks:
+    runs-on: ubuntu-18.04
+    strategy:
+      matrix:
+        include:
+          - db: 'mysql:5.7'
+            php: '7.2'
+
+    name: WebTest (PHP ${{ matrix.php }} - DB ${{ matrix.db_alias != '' && matrix.db_alias || matrix.db }})
+
+    services:
+      mysql:
+        image: ${{ matrix.db }}
+        env:
+          MYSQL_ALLOW_EMPTY_PASSWORD: yes
+          MYSQL_DATABASE: elkarte_test
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="mysqladmin ping"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=3
+
+    steps:
+      - name: Checkout ElkArte
+        uses: actions/checkout@v2
+        with:
+          repository: spuds/elkarte
+          ref: ${{ env.ELKARTE_BRANCH }}
+          path: elkarte
+
+      - id: database-type
+        env:
+          MATRIX_DB: ${{ matrix.db }}
+        run: |
+          db=$(echo "${MATRIX_DB%%:*}")
+          echo "::set-output name=db::$db"
+          .github/setup-webtest-php.sh
+        working-directory: ./elkarte
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php }}
+          extensions: dom, curl, libxml, mbstring, zip, mysqli, gd, exif, iconv, apcu, memcached
+          coverage: xdebug
+          tools: composer:v2
+          ini-values: error_reporting=E_ALL, allow_url_fopen=On, opcache.enable=0, auto_prepend_file="/usr/share/php/prepend.php", auto_append_file="/usr/share/php/append.php"
+
+      - name: Setup problem matchers for PHP
+        run: echo "::add-matcher::${{ runner.tool_cache }}/php.json"
+
+      - name: Setup Server Enviroment
+        env:
+          DB: ${{ matrix.db }}
+          PHP_VERSION: ${{ matrix.php }}
+          WEBSERVER: 'nginx'
+        run: .github/setup-elkarte.sh $DB $PHP_VERSION $WEB
+        working-directory: ./elkarte
+
+      - name: Run Unit Tests
+        env:
+          DB: ${{ matrix.db }}
+          PHP_VERSION: ${{ matrix.php }}
+        run: .github/setup-selenium.sh $DB $PHP_VERSION
+        working-directory: ./elkarte
+        continue-on-error: false
+
+      - name: Server Error Log # may need to use continue-on-error: true above to get here
+        env:
+          DB: ${{ matrix.db }}
+          PHP_VERSION: ${{ matrix.php }}
+        run: |
+          sudo cat /var/log/nginx/127.0.0.1.error.log
+        working-directory: ./elkarte
+  # End Selenium headless browser testing
+
   # Static checks, e.g. syntax errors, lint, etc
   static-checks:
     runs-on: ubuntu-18.04
@@ -19,7 +103,6 @@ jobs:
         include:
           - db: 'none'
             php: '7.2'
-            NOTESTS: 1
 
     name: Static Tests
 
@@ -27,7 +110,7 @@ jobs:
       - name: Checkout ElkArte
         uses: actions/checkout@v2
         with:
-          repository: elkarte/elkarte
+          repository: spuds/elkarte
           ref: ${{ env.ELKARTE_BRANCH }}
           path: elkarte
 
@@ -81,7 +164,7 @@ jobs:
           - php: '7.4'
             db: "mysql:8.0"
 
-    name: PHP ${{ matrix.php }} - ${{ matrix.db_alias != '' && matrix.db_alias || matrix.db }}
+    name: MySql/MariaDB (${{ matrix.php }} - DB ${{ matrix.db_alias != '' && matrix.db_alias || matrix.db }})
 
     services:
       mysql:
@@ -101,7 +184,7 @@ jobs:
       - name: Checkout ElkArte
         uses: actions/checkout@v2
         with:
-          repository: elkarte/elkarte
+          repository: spuds/elkarte
           ref: ${{ env.ELKARTE_BRANCH }}
           path: elkarte
 
@@ -116,12 +199,15 @@ jobs:
         uses: shivammathur/setup-php@v2
         with:
           php-version: ${{ matrix.php }}
-          extensions: dom, curl, libxml, mbstring, zip, pdo, mysqli, gd, exif, iconv, apcu, memcached
+          extensions: dom, curl, libxml, mbstring, zip, mysqli, gd, exif, iconv, apcu, memcached
           coverage: xdebug
           tools: composer:v2
           ini-values: error_reporting=E_ALL, allow_url_fopen=On, opcache.enable=0, apc.enable_cli=1
 
-      - name: Setup Server (Nginx/etc)
+      - name: Setup problem matchers for PHP
+        run: echo "::add-matcher::${{ runner.tool_cache }}/php.json"
+
+      - name: Setup Server Enviroment
         env:
           DB: ${{steps.database-type.outputs.db}}
           PHP_VERSION: ${{ matrix.php }}
@@ -132,14 +218,14 @@ jobs:
         env:
           DB: ${{steps.database-type.outputs.db}}
           PHP_VERSION: ${{ matrix.php }}
-        run: .github/setup-database.sh $DB
+        run: .github/setup-database.sh $DB $PHP_VERSION
         working-directory: ./elkarte
 
-      - name: Run unit tests
+      - name: Run Unit Tests
         env:
           DB: ${{steps.database-type.outputs.db}}
           PHP_VERSION: ${{ matrix.php }}
-        run: .github/setup-results.sh $DB $CI_EVENT_NAME
+        run: .github/setup-results.sh $DB $PHP_VERSION
         working-directory: ./elkarte
   # END MySQL and MariaDB Job
 
@@ -149,12 +235,12 @@ jobs:
     strategy:
       matrix:
         include:
-          - php: '7.1'
+          - php: '7.2'
             db: "postgres:9.5"
           - php: '7.4'
             db: "postgres:11.10"
 
-    name: PHP ${{ matrix.php }} - ${{ matrix.db_alias != '' && matrix.db_alias || matrix.db }}
+    name: Postgre (${{ matrix.php }} - DB ${{ matrix.db_alias != '' && matrix.db_alias || matrix.db }})
 
     services:
       postgres:
@@ -176,7 +262,7 @@ jobs:
       - name: Checkout ElkArte
         uses: actions/checkout@v2
         with:
-          repository: elkarte/elkarte
+          repository: spuds/elkarte
           ref: ${{ env.ELKARTE_BRANCH }}
           path: elkarte
 
@@ -191,12 +277,15 @@ jobs:
         uses: shivammathur/setup-php@v2
         with:
           php-version: ${{ matrix.php }}
-          extensions: dom, curl, libxml, mbstring, zip, pdo, gd, exif, iconv, apcu, memcached
+          extensions: dom, curl, libxml, mbstring, zip, pgsql, imagick, exif, iconv, apcu, memcached
           coverage: xdebug
           tools: composer:v2
           ini-values: error_reporting=E_ALL, allow_url_fopen=On, opcache.enable=0, apc.enable_cli=1
 
-      - name: Setup Server (Nginx/etc)
+      - name: Setup problem matchers for PHP
+        run: echo "::add-matcher::${{ runner.tool_cache }}/php.json"
+
+      - name: Setup Server Enviroment
         env:
           DB: ${{steps.database-type.outputs.db}}
           PHP_VERSION: ${{ matrix.php }}
@@ -207,13 +296,13 @@ jobs:
         env:
           DB: ${{steps.database-type.outputs.db}}
           PHP_VERSION: ${{ matrix.php }}
-        run: .github/setup-database.sh $DB
+        run: .github/setup-database.sh $DB $PHP_VERSION
         working-directory: ./elkarte
 
-      - name: Run unit tests
+      - name: Run Unit Tests
         env:
           DB: ${{steps.database-type.outputs.db}}
           PHP_VERSION: ${{ matrix.php }}
-        run: .github/setup-results.sh $DB $CI_EVENT_NAME
+        run: .github/setup-results.sh $DB $PHP_VERSION
         working-directory: ./elkarte
   # END Postgres Job

@@ -27,9 +27,9 @@
       </whitelist>
   </filter>
 
-    <logging>
-        <log type="coverage-clover" target="/tmp/coverage.clover"/>
-    </logging>
+   <logging>
+       <log type="coverage-clover" target="/tmp/coverage.clover"/>
+   </logging>
 
   <php>
       <const name="DBTYPE" value="MySQL"/>

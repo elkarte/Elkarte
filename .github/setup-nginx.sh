@@ -11,7 +11,7 @@ USER=$(whoami)
 ELKARTE_ROOT_PATH=$(realpath "$DIR/../elkarte")
 APP_SOCK=$(realpath "$DIR")/php-fpm.sock
 
-# set the sock file with user:group
+# Create and set the php-fpm app sock file with user:group
 sudo touch "$APP_SOCK"
 sudo chown "$USER:$USER" "$APP_SOCK"
 
@@ -45,14 +45,14 @@ echo "
 	php_admin_value[memory_limit] = 128M
 " > $PHP_FPM_CONF
 
-# Start PHP-FPM with this config
+# Add our pool config to PHP-FPM
 sudo $PHP_FPM_BIN \
 	--fpm-config "$DIR/php-fpm.conf"
 
-# Nginx conf, Update with correct user
+# Default Nginx conf needs to be updated with correct user
 sudo sed -i "s/user www-data;/user $USER;/g" $NGINX_CONF
 
-# Nginx default sites enabled conf, update one from the repo with correct site, sock, root
+# Nginx sites enabled conf, we update the one from the repo with correct site, sock, root
 sudo cp "$DIR/../.github/nginx.conf" "$NGINX_SITE_CONF"
 sudo sed -i \
 	-e "s/example\.com/127.0.0.1/g" \
