@@ -40,9 +40,9 @@ class TestStreamFetchWebdata extends TestCase
 		// expected in output
 		$this->fetch_testcases = array(
 			array(
-				'https://www.google.com',
+				'https://developer.mozilla.org/en-US/',
 				200,
-				'Search the world\'s information',
+				'Resources for developers',
 			),
 			array(
 				'http://www.google.com/elkarte',

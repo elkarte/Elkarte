@@ -40,9 +40,9 @@ class TestCurlFetchWebdata extends TestCase
 		// expected in output
 		$this->curl_fetch_testcases = array(
 			array(
-				'https://www.google.com',
+				'https://developer.mozilla.org/en-US/',
 				200,
-				'The Closure Library Authors',
+				'Resources for developers',
 			),
 			array(
 				'http://www.google.com/elkarte',
