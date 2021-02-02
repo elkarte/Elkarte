@@ -1,6 +1,7 @@
 <?php
 
 use ElkArte\Errors\ErrorContext;
+use PHPUnit\Framework\TestCase;
 
 /**
  * TestCase class for members subs.
@@ -8,7 +9,7 @@ use ElkArte\Errors\ErrorContext;
  * WARNING. These tests work directly with the local database. Don't run
  * them if you need to keep your data untouched!
  */
-class TestMembers extends \PHPUnit\Framework\TestCase
+class TestMembers extends TestCase
 {
 	private $memberID = null;
 	protected $backupGlobalsBlacklist = ['user_info'];

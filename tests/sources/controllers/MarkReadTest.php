@@ -1,5 +1,10 @@
 <?php
 
+use ElkArte\Controller\MarkRead;
+use ElkArte\EventManager;
+use ElkArte\HttpReq;
+use ElkArte\User;
+
 /**
  * TestCase class for the MarkRead Controller
  *
@@ -36,8 +41,8 @@ class TestMarkReadController extends ElkArteCommonSetupTest
 		global $modSettings;
 
 		// Get the controller, call index
-		$controller = new \ElkArte\Controller\MarkRead(new \ElkArte\EventManager());
-		$controller->setUser(\ElkArte\User::$info);
+		$controller = new MarkRead(new EventManager());
+		$controller->setUser(User::$info);
 		$result = $controller->action_markboards();
 
 		// Check that the url was set
@@ -49,12 +54,12 @@ class TestMarkReadController extends ElkArteCommonSetupTest
 	 */
 	public function testActionMarkReplies()
 	{
-		$req = \ElkArte\HttpReq::instance();
+		$req = HttpReq::instance();
 		$req->query->topics = 1;
 
 		// Get the controller, call index
-		$controller = new \ElkArte\Controller\MarkRead(new \ElkArte\EventManager());
-		$controller->setUser(\ElkArte\User::$info);
+		$controller = new MarkRead(new EventManager());
+		$controller->setUser(User::$info);
 		$result = $controller->action_markreplies();
 
 		// Check that the result was set
@@ -71,12 +76,12 @@ class TestMarkReadController extends ElkArteCommonSetupTest
 		$board = 1;
 		$topic = 1;
 
-		$req = \ElkArte\HttpReq::instance();
+		$req = HttpReq::instance();
 		$req->query->t = 1;
 
 		// Get the controller, call index
-		$controller = new \ElkArte\Controller\MarkRead(new \ElkArte\EventManager());
-		$controller->setUser(\ElkArte\User::$info);
+		$controller = new MarkRead(new EventManager());
+		$controller->setUser(User::$info);
 		$result = $controller->action_marktopic();
 
 		// Check that result was set
@@ -93,15 +98,15 @@ class TestMarkReadController extends ElkArteCommonSetupTest
 		$board = 1;
 		$topic = 1;
 
-		$req = \ElkArte\HttpReq::instance();
+		$req = HttpReq::instance();
 		$req->query->t = 1;
 		$req->query->c = 1;
 		$req->query->boards = 1;
 		$req->query->children = 1;
 
 		// Get the controller, call index
-		$controller = new \ElkArte\Controller\MarkRead(new \ElkArte\EventManager());
-		$controller->setUser(\ElkArte\User::$info);
+		$controller = new MarkRead(new EventManager());
+		$controller->setUser(User::$info);
 		$result = $controller->action_markasread();
 
 		// Check that result was set

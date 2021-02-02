@@ -9,6 +9,14 @@
  */
 class TestAuthController extends ElkArteWebTest
 {
+	public function setUp()
+	{
+		parent::setUp();
+
+		//require_once('./bootstrap.php');
+		//new Bootstrap(false);
+	}
+
 	/**
 	 * Hello, good.
 	 */
@@ -29,26 +37,30 @@ class TestAuthController extends ElkArteWebTest
 		$username = 'test';
 		$password = 'ainttellin';
 
-		// Select login from the main page
+		// Goto the main page
 		$this->url('index.php');
-		$this->clickit('#button_login > a');
-		$this->assertEquals('Log in', $this->title());
 
-		// Fill in the form, long hand style
+		// First lets log out as we have just come from install
+		$this->clickit('#button_logout > a');
+
+		// Now lets login
+		$this->url('index.php?action=login');
+		sleep(1);
+		$this->assertEquals('Log in', $this->title(), $this->source());
+
+		// Fill in the form
 		$usernameInput = $this->byId('user');
 		$usernameInput->clear();
 		$usernameInput->value($username);
-		//$this->keys($username);
 		$this->assertEquals($username, $usernameInput->value());
 
 		$passwordInput = $this->byId('passwrd');
 		$passwordInput->clear();
 		$passwordInput->value($password);
-		//$this->keys($password);
 		$this->assertEquals($password, $passwordInput->value());
 
 		// Submit it
-		$this->clickit('.login > div > dl > input[type="submit"]');
+		$this->byId('frmLogin')->submit();
 
 		// Nope, huh? I hope :P
 		$this->assertEquals('That username does not exist.', $this->byClassName('errorbox')->text());

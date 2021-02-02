@@ -18,7 +18,7 @@
  */
 class ElkArteInstallWeb extends ElkArteWebTest
 {
-	protected $forumPath = '/var/www/test';
+	protected $forumPath = '.';
 	protected $backupGlobalsBlacklist = ['user_info'];
 
 	/**
@@ -32,25 +32,22 @@ class ElkArteInstallWeb extends ElkArteWebTest
 		// Set the browser to be used by Selenium, it must be available on localhost
 		$this->setBrowser($this->browser);
 
-		// Set the base URL for the tests.
-		$this->setBrowserUrl('http://127.0.0.1/test');
-
 		parent::setUp();
 	}
 
 	/**
-	 * Log in the admin via the quick login bar
+	 * Actually install ElkArte just like a user would
 	 */
 	public function testInstall()
 	{
 		// Missing files warning
-		$this->url('test/install/install.php');
+		$this->url('install/install.php');
 		$this->assertEquals('ElkArte Installer', $this->title());
 		$this->assertContains('It looks like Settings.php and/or Settings_bak.php are missing', $this->byCssSelector('#main_screen form .information')->text());
 
 		// Warning gone
 		$this->prepareSettings();
-		$this->url('test/install/install.php');
+		$this->url('install/install.php');
 		$this->assertEquals('ElkArte Installer', $this->title());
 		$this->assertNotContains('It looks like Settings.php and/or Settings_bak.php are missing', $this->byCssSelector('#main_screen form')->text());
 
@@ -59,8 +56,11 @@ class ElkArteInstallWeb extends ElkArteWebTest
 		$this->assertEquals('Database Server Settings', $this->byCssSelector('#main_screen > h2')->text());
 
 		// Filling the database settings
+		$this->byId('db_server_input')->clear();
+		$this->byId('db_server_input')->value('127.0.0.1');
 		$this->byId('db_user_input')->value('root');
-		$this->byId('db_name_input')->value('elkarte_install_test');
+		$this->byId('db_name_input')->clear();
+		$this->byId('db_name_input')->value('elkarte_test');
 		$this->clickit('#contbutt');
 		$this->assertEquals('Forum Settings', $this->byCssSelector('#main_screen > h2')->text());
 
@@ -68,7 +68,7 @@ class ElkArteInstallWeb extends ElkArteWebTest
 		$this->clickit('#contbutt');
 
 		// Hang tight while the server does its thing
-		sleep(10);
+		sleep(15);
 		$this->assertEquals('Populated Database', $this->byCssSelector('#main_screen > h2')->text());
 
 		// All that is left is to create our admin account
@@ -80,10 +80,13 @@ class ElkArteInstallWeb extends ElkArteWebTest
 		$this->byCssSelector('#email')->value('an_email_address@localhost.tld');
 		$this->clickit('#contbutt');
 		$this->assertContains('Congratulations', $this->byCssSelector('#main_screen > h2')->text());
+
+		// Move the install dir so we can run more tests without redirecting back to install/update
+		rename($this->forumPath  . '/install', $this->forumPath  . '/installdone');
 	}
 
 	/**
-	 * Renames Settings and db_last_error
+	 * Renames Settings and db_last_error.
 	 */
 	protected function prepareSettings()
 	{

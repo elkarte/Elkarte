@@ -15,18 +15,14 @@
  * It extends PHPUnit_Extensions_Selenium2TestCase and provides additional functions
  * as well as sets up the common environments for all tests
  */
-abstract class ElkArteWebTest extends \PHPUnit_Extensions_Selenium2TestCase
+abstract class ElkArteWebTest extends PHPUnit_Extensions_Selenium2TestCase
 {
 	protected $coverageScriptUrl = 'http://127.0.0.1/phpunit_coverage.php';
 	protected $backupGlobalsBlacklist = ['user_info'];
-
-	// Screenshots will not be available with htmlunit since it does not render
-	protected $captureScreenshotOnFailure = true;
-	protected $screenshotPath = '/var/www/screenshots';
-
 	protected $width = 1280;
 	protected $height = 1024;
 	protected $adminuser = 'test_admin';
+	protected $adminname = 'admin';
 	protected $adminpass = 'test_admin_pwd';
 	protected $browser = 'htmlunit';
 	protected $port = 4444;
@@ -189,7 +185,58 @@ abstract class ElkArteWebTest extends \PHPUnit_Extensions_Selenium2TestCase
 	 */
 	public function clickit($selector)
 	{
-		$this->byCssSelector($selector)->click();
-		sleep(1);
+		$this->timeouts()->implicitWait(10000);
+		try
+		{
+			$selector = $this->byCssSelector($selector);
+			$selector->click();
+			sleep(1);
+		}
+		catch (PHPUnit_Extensions_Selenium2TestCase_WebDriverException $exception)
+		{
+			// continue on
+		}
+	}
+
+	/**
+	 * In some places we are not logged on, so we need to fake it to keep things moving along
+	 */
+	public function loadUserData()
+	{
+		global $context;
+
+		$context['linktree'] = [];
+		$context['session_id'] ='';
+		$context['session_var'] = '';
+
+		$userData = [
+			'id' => 1,
+			'ip' => long2ip(rand(0, 2147483647)),
+			'language' => 'english',
+			'is_admin' => true,
+			'is_guest' => false,
+			'username' => $this->adminuser,
+			'query_wanna_see_board' => '1=1',
+			'query_see_board' => '1=1',
+			'is_moderator' => false,
+			'email' => 'a@a.com',
+			'ignoreusers' => [],
+			'name' => $this->adminname,
+			'smiley_set' => 'none',
+			'time_offset' => 0,
+			'time_format' => '',
+			'possibly_robot' => false,
+			'posts' => '15',
+			'buddies' => [],
+			'groups' => [0 => 1],
+			'ignoreboards' => [],
+			'avatar' => ['url' => '', 'name' => ''],
+			'permissions' => ['admin_forum'],
+		];
+
+		\ElkArte\User::$info = new \ElkArte\UserInfo($userData);
+		\ElkArte\User::load();
+
+		new ElkArte\Themes\ThemeLoader();
 	}
 }

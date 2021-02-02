@@ -1,6 +1,8 @@
 <?php
 
-class TestEmailpost extends \PHPUnit\Framework\TestCase
+use PHPUnit\Framework\TestCase;
+
+class TestEmailpost extends TestCase
 {
 	protected $backupGlobalsBlacklist = ['user_info'];
 	/**

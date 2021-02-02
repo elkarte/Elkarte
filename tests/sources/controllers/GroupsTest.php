@@ -1,5 +1,10 @@
 <?php
 
+use ElkArte\Controller\Groups;
+use ElkArte\EventManager;
+use ElkArte\HttpReq;
+use ElkArte\User;
+
 /**
  * TestCase class for the Groups Controller
  *
@@ -31,8 +36,8 @@ class TestGroups extends ElkArteCommonSetupTest
 		theme()->getTemplates()->loadLanguageFile('ModerationCenter', 'english', true, true);
 
 		// Get the controller
-		$this->controller = new \ElkArte\Controller\Groups(new \ElkArte\EventManager());
-		$this->controller->setUser(\ElkArte\User::$info);
+		$this->controller = new Groups(new EventManager());
+		$this->controller->setUser(User::$info);
 		$this->controller->pre_dispatch();
 	}
 
@@ -67,7 +72,7 @@ class TestGroups extends ElkArteCommonSetupTest
 		global $context;
 
 		// Set the form
-		$_req = \ElkArte\HttpReq::instance();
+		$_req = HttpReq::instance();
 		$_req->query['group'] = 1;
 		$_req->query['start'] = 0;
 

@@ -1,5 +1,9 @@
 <?php
 
+use ElkArte\Permissions;
+use ElkArte\User;
+use ElkArte\ValuesContainer;
+
 /**
  * TestCase class for Permissions Class.
  */
@@ -13,8 +17,8 @@ class TestPermissionsClass extends ElkArteCommonSetupTest
 	 */
 	public function testDefaultIllegalPermissions()
 	{
-		\ElkArte\User::$info = new \ElkArte\ValuesContainer(['is_admin' => false]);
-		$permissionsObject = new \ElkArte\Permissions();
+		User::$info = new ValuesContainer(['is_admin' => false]);
+		$permissionsObject = new Permissions();
 		$illegal_permissions = $permissionsObject->getIllegalPermissions();
 
 		foreach (array('admin_forum', 'manage_membergroups', 'manage_permissions') as $check)
@@ -29,7 +33,7 @@ class TestPermissionsClass extends ElkArteCommonSetupTest
 	 */
 	public function testDefaultIllegalGuestPermissions()
 	{
-		$permissionsObject = new \ElkArte\Permissions();
+		$permissionsObject = new Permissions();
 		$illegal_guest_permissions = $permissionsObject->getIllegalGuestPermissions();
 
 		// Simple spot check
@@ -48,7 +52,7 @@ class TestPermissionsClass extends ElkArteCommonSetupTest
 		// Add simple integration to play with values
 		add_integration_function('integrate_load_illegal_guest_permissions', 'testIntegrationIGP', 'SOURCEDIR/Testing.php', false);
 
-		$permissionsObject = new \ElkArte\Permissions();
+		$permissionsObject = new Permissions();
 		$illegal_guest_permissions = $permissionsObject->getIllegalGuestPermissions();
 
 		// Check if the integration worked

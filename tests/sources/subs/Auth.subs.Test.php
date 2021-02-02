@@ -1,6 +1,10 @@
 <?php
 
-class TestAuthsubs extends \PHPUnit\Framework\TestCase
+use ElkArte\MembersList;
+use ElkArte\Util;
+use PHPUnit\Framework\TestCase;
+
+class TestAuthsubs extends TestCase
 {
 	protected $passwd = 'test_admin_pwd';
 	protected $user = 'test_admin';
@@ -37,8 +41,8 @@ class TestAuthsubs extends \PHPUnit\Framework\TestCase
 		global $cookiename, $context;
 
 		// Lets test load data, this should be id #1 for the testcase
-		$user_data = \ElkArte\MembersList::load($this->user, true, 'profile');
-		$member = \ElkArte\MembersList::get($user_data[0]);
+		$user_data = MembersList::load($this->user, true, 'profile');
+		$member = MembersList::get($user_data[0]);
 
 		$this->assertEquals(1, $user_data[0]);
 		$salt = $member->password_salt;
@@ -59,7 +63,7 @@ class TestAuthsubs extends \PHPUnit\Framework\TestCase
 		$this->assertNotEmpty($user_data);
 
 		// What a form could send in
-		$password = hash('sha256', \ElkArte\Util::strtolower($this->user) . un_htmlspecialchars($this->passwd));
+		$password = hash('sha256', Util::strtolower($this->user) . un_htmlspecialchars($this->passwd));
 
 		// Check secure and insecure forms
 		$this->assertTrue(validateLoginPassword($password, $user_data['passwd']));

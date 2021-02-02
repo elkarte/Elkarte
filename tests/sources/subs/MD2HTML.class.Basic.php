@@ -1,6 +1,8 @@
 <?php
 
-class TestMD2HTML extends \PHPUnit\Framework\TestCase
+use PHPUnit\Framework\TestCase;
+
+class TestMD2HTML extends TestCase
 {
 	protected $mdTestCases = array();
 	protected $backupGlobalsBlacklist = ['user_info'];

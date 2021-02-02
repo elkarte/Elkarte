@@ -1,5 +1,10 @@
 <?php
 
+use ElkArte\Controller\ProfileOptions;
+use ElkArte\EventManager;
+use ElkArte\MembersList;
+use ElkArte\User;
+
 /**
  * TestCase class for the Profile Options Controller
  */
@@ -21,8 +26,8 @@ class TestProfileOptions extends ElkArteCommonSetupTest
 
 		// Some tricks, maybe
 		require_once(SUBSDIR . '/Profile.subs.php');
-		\ElkArte\MembersList::load('1', false, 'profile');
-		$cur_profile = \ElkArte\MembersList::get('1');
+		MembersList::load('1', false, 'profile');
+		$cur_profile = MembersList::get('1');
 		$context['user']['is_owner'] = true;
 		$context['id_member'] = 1;
 
@@ -89,8 +94,8 @@ class TestProfileOptions extends ElkArteCommonSetupTest
 	{
 		global $context;
 
-		$controller = new \ElkArte\Controller\ProfileOptions(new \ElkArte\EventManager());
-		$controller->setUser(\ElkArte\User::$info);
+		$controller = new ProfileOptions(new EventManager());
+		$controller->setUser(User::$info);
 		$controller->pre_dispatch();
 		$controller->action_account();
 
@@ -107,8 +112,8 @@ class TestProfileOptions extends ElkArteCommonSetupTest
 	{
 		global $context;
 
-		$controller = new \ElkArte\Controller\ProfileOptions(new \ElkArte\EventManager());
-		$controller->setUser(\ElkArte\User::$info);
+		$controller = new ProfileOptions(new EventManager());
+		$controller->setUser(User::$info);
 		$controller->pre_dispatch();
 		$controller->action_forumProfile();
 
@@ -125,8 +130,8 @@ class TestProfileOptions extends ElkArteCommonSetupTest
 		$context['profile-u1_token_var'] = 'profile-u1';
 		$context['profile-u1_token'] = 'profile-u1';
 
-		$controller = new \ElkArte\Controller\ProfileOptions(new \ElkArte\EventManager());
-		$controller->setUser(\ElkArte\User::$info);
+		$controller = new ProfileOptions(new EventManager());
+		$controller->setUser(User::$info);
 		$controller->pre_dispatch();
 		$controller->action_notification();
 

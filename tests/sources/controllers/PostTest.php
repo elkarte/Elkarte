@@ -1,5 +1,9 @@
 <?php
 
+use ElkArte\Controller\Post;
+use ElkArte\EventManager;
+use ElkArte\User;
+
 /**
  * TestCase class for the Post Controller
  *
@@ -48,8 +52,8 @@ class TestPost extends ElkArteCommonSetupTest
 		$check = (int) $topic_info['num_replies'];
 
 		// Post a reply
-		$controller = new \ElkArte\Controller\Post(new \ElkArte\EventManager());
-		$controller->setUser(\ElkArte\User::$info);
+		$controller = new Post(new EventManager());
+		$controller->setUser(User::$info);
 		$controller->pre_dispatch();
 		$controller->action_post2();
 
@@ -80,11 +84,11 @@ class TestPost extends ElkArteCommonSetupTest
 		$check = (int) $board_info['num_topics'];
 
 		// Bypass spam protection
-		\ElkArte\User::$info->ip = long2ip(rand(0, 2147483647));
+		User::$info->ip = long2ip(rand(0, 2147483647));
 
 		// Post a new topic
-		$controller = new \ElkArte\Controller\Post(new \ElkArte\EventManager());
-		$controller->setUser(\ElkArte\User::$info);
+		$controller = new Post(new EventManager());
+		$controller->setUser(User::$info);
 		$controller->pre_dispatch();
 		$controller->action_post2();
 
@@ -117,11 +121,11 @@ class TestPost extends ElkArteCommonSetupTest
 		$_POST['additonal_items'] = 0;
 
 		// Bypass spam protection
-		\ElkArte\User::$info->ip = long2ip(rand(0, 2147483647));
+		User::$info->ip = long2ip(rand(0, 2147483647));
 
 		// Lock the post
-		$controller = new \ElkArte\Controller\Post(new \ElkArte\EventManager());
-		$controller->setUser(\ElkArte\User::$info);
+		$controller = new Post(new EventManager());
+		$controller->setUser(User::$info);
 		$controller->pre_dispatch();
 		$controller->action_post2();
 

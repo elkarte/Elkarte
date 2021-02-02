@@ -1,9 +1,14 @@
 <?php
 
+use ElkArte\HttpReq;
+use ElkArte\SiteDispatcher;
+use ElkArte\User;
+use PHPUnit\Framework\TestCase;
+
 /**
  * TestCase class for the admin search
  */
-class TestAdminSearch extends \PHPUnit\Framework\TestCase
+class TestAdminSearch extends TestCase
 {
 	/**
 	 * @var ActionController
@@ -16,7 +21,7 @@ class TestAdminSearch extends \PHPUnit\Framework\TestCase
 	 */
 	protected function tearDown()
 	{
-		\ElkArte\User::$info->permissions = array();
+		User::$info->permissions = array();
 		global $context, $user_info;
 
 		$user_info['permissions'] = array();
@@ -59,8 +64,8 @@ class TestAdminSearch extends \PHPUnit\Framework\TestCase
 
 		// Set up the controller.
 		$_GET['action'] = 'admin';
-		\ElkArte\User::$info->permissions = array_merge(\ElkArte\User::$info->permissions, ['admin_forum']);
-		$dispatcher = new \ElkArte\SiteDispatcher(new \ElkArte\HttpReq);
+		User::$info->permissions = array_merge(User::$info->permissions, ['admin_forum']);
+		$dispatcher = new SiteDispatcher(new HttpReq);
 		$this->controller = $dispatcher->getController();
 
 		// Won't hurt to call this again...

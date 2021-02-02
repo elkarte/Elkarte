@@ -1,5 +1,10 @@
 <?php
 
+use ElkArte\Controller\PersonalMessage;
+use ElkArte\EventManager;
+use ElkArte\HttpReq;
+use ElkArte\User;
+
 /**
  * TestCase class for the PersonalMessage Controller
  *
@@ -34,12 +39,12 @@ class TestPersonalMessageController extends ElkArteCommonSetupTest
 	{
 		global $context, $txt;
 
-		$req = \ElkArte\HttpReq::instance();
+		$req = HttpReq::instance();
 		$req->query->area = 'index';
 
 		// Get the controller, call index
-		$controller = new \ElkArte\Controller\PersonalMessage(new \ElkArte\EventManager());
-		$controller->setUser(\ElkArte\User::$info);
+		$controller = new PersonalMessage(new EventManager());
+		$controller->setUser(User::$info);
 		$controller->pre_dispatch();
 		$controller->action_index();
 
@@ -55,12 +60,12 @@ class TestPersonalMessageController extends ElkArteCommonSetupTest
 	{
 		global $context;
 
-		$req = \ElkArte\HttpReq::instance();
+		$req = HttpReq::instance();
 		$req->query->sa = 'send';
 
 		// Get the controller, call index
-		$controller = new \ElkArte\Controller\PersonalMessage(new \ElkArte\EventManager());
-		$controller->setUser(\ElkArte\User::$info);
+		$controller = new PersonalMessage(new EventManager());
+		$controller->setUser(User::$info);
 		$controller->pre_dispatch();
 		$controller->action_index();
 

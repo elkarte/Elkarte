@@ -1,5 +1,11 @@
 <?php
 
+use ElkArte\AdminController\Packages;
+use ElkArte\AdminController\PackageServers;
+use ElkArte\EventManager;
+use ElkArte\HttpReq;
+use ElkArte\User;
+
 /**
  * TestCase class for the Packages & PackageServer Controller
  *
@@ -36,8 +42,8 @@ class TestPackagesController extends ElkArteCommonSetupTest
 		global $context;
 
 		// Get the controller, call index
-		$controller = new \ElkArte\AdminController\Packages(new \ElkArte\EventManager());
-		$controller->setUser(\ElkArte\User::$info);
+		$controller = new Packages(new EventManager());
+		$controller->setUser(User::$info);
 		$controller->pre_dispatch();
 		$controller->action_index();
 
@@ -50,13 +56,13 @@ class TestPackagesController extends ElkArteCommonSetupTest
 	{
 		global $context;
 
-		$req = \ElkArte\HttpReq::instance();
+		$req = HttpReq::instance();
 		$req->query->sa='download';
 		$req->post->package='https://github.com/Spuds/Elk_Resize_Attachment_Images/releases/download/V1.0.5/elk_ResizeAttachedImages.zip';
 
 		// Get the controller, call index
-		$controller = new \ElkArte\AdminController\PackageServers(new \ElkArte\EventManager());
-		$controller->setUser(\ElkArte\User::$info);
+		$controller = new PackageServers(new EventManager());
+		$controller->setUser(User::$info);
 		$controller->pre_dispatch();
 		$controller->action_index();
 		$req->query->sa = null;
@@ -70,7 +76,7 @@ class TestPackagesController extends ElkArteCommonSetupTest
 	{
 		global $context;
 
-		$req = \ElkArte\HttpReq::instance();
+		$req = HttpReq::instance();
 		$req->query->ve = '1.1';
 		$req->query->package = 'elk_ResizeAttachedImages.zip';
 		$req->query->sa = 'install';
@@ -81,8 +87,8 @@ class TestPackagesController extends ElkArteCommonSetupTest
 		$_REQUEST['package'] = 'elk_ResizeAttachedImages.zip';
 
 		// Get the controller, call index
-		$controller = new \ElkArte\AdminController\Packages(new \ElkArte\EventManager());
-		$controller->setUser(\ElkArte\User::$info);
+		$controller = new Packages(new EventManager());
+		$controller->setUser(User::$info);
 		$controller->pre_dispatch();
 		$controller->action_index();
 		$req->query->sa = null;

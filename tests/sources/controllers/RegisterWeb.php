@@ -22,6 +22,9 @@ class TestRegisterController extends ElkArteWebTest
 	{
 		global $modSettings;
 
+		require_once('./bootstrap.php');
+		new Bootstrap(false);
+
 		// Let's remember about these
 		$this->registration_method = $modSettings['registration_method'];
 		$this->visual_verification_type = $modSettings['visual_verification_type'];
@@ -49,7 +52,6 @@ class TestRegisterController extends ElkArteWebTest
 	public function registerMember()
 	{
 		$username = 'testuser';
-		$display = 'itsMe';
 		$email = 'valid@emailaddress.net';
 		$password = 'ainttellin';
 
@@ -64,7 +66,6 @@ class TestRegisterController extends ElkArteWebTest
 
 		// Fill out the registration form
 		$this->byId('elk_autov_username')->value($username);
-		// $this->byId('elk_autov_displayname')->value($display);
 		$this->byId('elk_autov_reserve1')->value($email);
 		$this->byId('elk_autov_pwmain')->value($password);
 		$this->byId('elk_autov_pwverify')->value($password);
@@ -102,10 +103,14 @@ class TestRegisterController extends ElkArteWebTest
 	}
 
 	/**
-	 * Delete the account
+	 * User delete their account
 	 */
 	public function testDeleteAccount()
 	{
+		// Register a member that we can delete
+		$this->loadUserData();
+
+		// Register a member that we can delete
 		require_once(SUBSDIR . '/Members.subs.php');
 		$_SESSION['just_registered'] = 0;
 		$regOptions = array(
@@ -115,6 +120,7 @@ class TestRegisterController extends ElkArteWebTest
 			'password' => 'user49',
 			'password_check' => 'user49',
 			'require' => 'nothing',
+			'send_welcome_email' => false,
 		);
 		$memberID = registerMember($regOptions);
 		$_SESSION['just_registered'] = 0;
@@ -127,12 +133,10 @@ class TestRegisterController extends ElkArteWebTest
 		// Fill in the form, long hand style
 		$usernameInput = $this->byId('user');
 		$usernameInput->clear();
-		//$this->keys('user49');
 		$usernameInput->value('user49');
 
 		$passwordInput = $this->byId('passwrd');
 		$passwordInput->clear();
-		//$this->keys('user49');
 		$passwordInput->value('user49');
 
 		// Submit it
@@ -144,7 +148,6 @@ class TestRegisterController extends ElkArteWebTest
 		$passwordInput = $this->byId('oldpasswrd');
 		$passwordInput->clear();
 		$passwordInput->value('user49');
-		//$this->keys('user49');
 		$this->assertEquals('user49', $passwordInput->value());
 
 		// Submit it

@@ -1,6 +1,9 @@
 <?php
 
-class TestHTML2Md extends \PHPUnit\Framework\TestCase
+use ElkArte\Html2Md;
+use PHPUnit\Framework\TestCase;
+
+class TestHTML2Md extends TestCase
 {
 	protected $mdTestCases = array();
 	protected $restore_txt = false;
@@ -101,7 +104,7 @@ Gracias'
 			$test = $testcase[1];
 			$expected = $testcase[2];
 
-			$parser = new \ElkArte\Html2Md($test);
+			$parser = new Html2Md($test);
 
 			// Convert the html to bbc
 			$result = $parser->get_markdown();

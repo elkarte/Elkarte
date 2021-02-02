@@ -1,5 +1,9 @@
 <?php
 
+use ElkArte\AdminController\ManageBoards;
+use ElkArte\EventManager;
+use ElkArte\User;
+
 /**
  * TestCase class for manage boards settings
  */
@@ -22,8 +26,8 @@ class TestManageBoardsSettings extends ElkArteCommonSetupTest
 	{
 		global $txt;
 
-		$controller = new \ElkArte\AdminController\ManageBoards(new \ElkArte\EventManager());
-		$controller->setUser(\ElkArte\User::$info);
+		$controller = new ManageBoards(new EventManager());
+		$controller->setUser(User::$info);
 		$controller->pre_dispatch();
 		$settings = $controller->settings_search();
 

@@ -13,6 +13,13 @@
  *
  */
 
+use BBC\ParserWrapper;
+use ElkArte\Cache\Cache;
+use ElkArte\Debug;
+use ElkArte\ext\Composer\Autoload\ClassLoader;
+use ElkArte\Hooks;
+use ElkArte\MembersList;
+
 // We're going to need, cough, a few globals
 global $mbname, $language;
 global $boardurl, $webmaster_email, $cookiename;
@@ -58,7 +65,7 @@ require_once(SOURCEDIR . '/Load.php');
 require_once(SOURCEDIR . '/Security.php');
 require_once(EXTDIR . '/ClassLoader.php');
 
-$loader = new \ElkArte\ext\Composer\Autoload\ClassLoader();
+$loader = new ClassLoader();
 $loader->setPsr4('ElkArte\\', SOURCEDIR . '/ElkArte');
 $loader->setPsr4('BBC\\', SOURCEDIR . '/ElkArte/BBC');
 $loader->register();
@@ -71,9 +78,9 @@ $context['forum_name_html_safe'] = $context['forum_name'];
 // Just like we are starting, almost
 cleanRequest();
 loadDatabase();
-\ElkArte\Hooks::init(database(), \ElkArte\Debug::instance());
+Hooks::init(database(), Debug::instance());
 reloadSettings();
-\ElkArte\MembersList::init(database(), \ElkArte\Cache\Cache::instance(),  \BBC\ParserWrapper::instance());
+MembersList::init(database(), Cache::instance(),  ParserWrapper::instance());
 
 loadSession();
 loadUserSettings();
@@ -102,7 +109,7 @@ theme()->getTemplates()->loadLanguageFile('index+Errors');
 // If we are running functional tests as well
 if (defined('PHPUNIT_SELENIUM'))
 {
-	require_once('/var/www/tests/sources/controllers/ElkArteWebTest.php');
+	require_once('tests/sources/controllers/ElkArteWebTest.php');
 	PHPUnit_Extensions_Selenium2TestCase::shareSession(true);
 }
 

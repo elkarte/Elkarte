@@ -1,5 +1,8 @@
 <?php
 
+use ElkArte\Controller\Calendar;
+use ElkArte\EventManager;
+
 /**
  * TestCase class for the Calendar Controller
  *
@@ -28,12 +31,12 @@ class TestCalendar extends ElkArteCommonSetupTest
 	public function testActionCalendar()
 	{
 		// Get the controller
-		$controller = new \ElkArte\Controller\Calendar(new \ElkArte\EventManager());
+		$controller = new Calendar(new EventManager());
 		try
 		{
 			$controller->action_index();
 		}
-		catch (\Exception $e)
+		catch (Exception $e)
 		{
 			$check = $e->getMessage();
 		}

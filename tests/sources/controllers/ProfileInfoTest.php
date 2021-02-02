@@ -1,5 +1,9 @@
 <?php
 
+use ElkArte\Controller\ProfileInfo;
+use ElkArte\EventManager;
+use ElkArte\User;
+
 /**
  * TestCase class for the Profile Info Controller
  */
@@ -28,8 +32,8 @@ class TestProfileInfo extends ElkArteCommonSetupTest
 		$context['user']['is_owner'] = true;
 		$context['profile_menu_name'] = 'menu_data_1';
 
-		$controller = new \ElkArte\Controller\ProfileInfo(new \ElkArte\EventManager());
-		$controller->setUser(\ElkArte\User::$info);
+		$controller = new ProfileInfo(new EventManager());
+		$controller->setUser(User::$info);
 		$controller->pre_dispatch();
 		$controller->action_summary();
 

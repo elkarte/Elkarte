@@ -1,5 +1,10 @@
 <?php
 
+use ElkArte\Controller\Display;
+use ElkArte\EventManager;
+use ElkArte\HttpReq;
+use ElkArte\User;
+
 /**
  * TestCase class for the Display Controller
  *
@@ -34,14 +39,14 @@ class TestDisplayIndex extends ElkArteCommonSetupTest
 		loadBoard();
 
 		// Set up to exercise various areas
-		$_req = \ElkArte\HttpReq::instance();
+		$_req = HttpReq::instance();
 		$_req->query['prev_next'] = 'next';
 		$modSettings['enablePreviousNext'] = 1;
 		$settings['display_who_viewing'] = 1;
 
 		// Get the controller
-		$controller = new \ElkArte\Controller\Display(new \ElkArte\EventManager());
-		$controller->setUser(\ElkArte\User::$info);
+		$controller = new Display(new EventManager());
+		$controller->setUser(User::$info);
 		$controller->action_index();
 
 		// Check the action ran

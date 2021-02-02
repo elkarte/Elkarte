@@ -1,12 +1,14 @@
 <?php
 
+use PHPUnit\Framework\TestCase;
+
 require_once(SUBSDIR . '/Logging.subs.php');
 
 /**
  * TestCase class for logging
  * @backupGlobals disabled
  */
-class TestLogging extends \PHPUnit\Framework\TestCase
+class TestLogging extends TestCase
 {
 	protected $backupGlobalsBlacklist = ['user_info'];
 	/**

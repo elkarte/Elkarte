@@ -1,13 +1,14 @@
 <?php
 
 use ElkArte\Errors\ErrorContext;
+use PHPUnit\Framework\TestCase;
 
 /**
  * TestCase class for ErrorContext class.
  *
  * Tests adding and removing errors and few other options
  */
-class TestErrorContext extends \PHPUnit\Framework\TestCase
+class TestErrorContext extends TestCase
 {
 	protected $backupGlobalsBlacklist = ['user_info'];
 	public function testSimpleError()

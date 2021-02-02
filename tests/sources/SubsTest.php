@@ -1,10 +1,12 @@
 <?php
 
+use PHPUnit\Framework\TestCase;
+
 /**
  * TestCase class for (ideally) all the functions in the Subs.php file
  * that do not fit in any other test
  */
-class TestSubs extends \PHPUnit\Framework\TestCase
+class TestSubs extends TestCase
 {
 	protected $backupGlobalsBlacklist = ['user_info'];
 	/**

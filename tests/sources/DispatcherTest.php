@@ -1,5 +1,11 @@
 <?php
 
+use ElkArte\EventManager;
+use ElkArte\HttpReq;
+use ElkArte\SiteDispatcher;
+use ElkArte\User;
+use PHPUnit\Framework\TestCase;
+
 /**
  * TestCase class for dispatching.
  *
@@ -9,7 +15,7 @@
  * force to check that all expected subactions are still routed, and
  * update it.
  */
-class DispatcherTest extends \PHPUnit\Framework\TestCase
+class DispatcherTest extends TestCase
 {
 	protected $backupGlobalsBlacklist = ['user_info'];
 	/**
@@ -33,8 +39,8 @@ class DispatcherTest extends \PHPUnit\Framework\TestCase
 		foreach (array_keys($auto_actions) as $action)
 		{
 			$controller_name = '\\ElkArte\\Controller\\' . ucfirst($action);
-			$controller = new $controller_name(new \ElkArte\EventManager());
-			$controller->setUser(\ElkArte\User::$info);
+			$controller = new $controller_name(new EventManager());
+			$controller->setUser(User::$info);
 			foreach ($auto_actions[$action] as $subaction)
 				$this->assertTrue(method_exists($controller, 'action_' . $subaction));
 		}
@@ -72,7 +78,7 @@ class DispatcherTest extends \PHPUnit\Framework\TestCase
 		foreach (array_keys($actions) as $action)
 		{
 			$controller_name = ucfirst($actions[$action]);
-			$controller = new $controller_name(new \ElkArte\EventManager());
+			$controller = new $controller_name(new EventManager());
 			$this->assertTrue(method_exists($controller, 'action_' . $action));
 		}
 
@@ -172,7 +178,7 @@ class DispatcherTest extends \PHPUnit\Framework\TestCase
 			);
 
 			// Start a new dispatcher every time (the dispatching is done on __construct)
-			$dispatcher = New SiteDispatcher_Tester(new \ElkArte\HttpReq);
+			$dispatcher = New SiteDispatcher_Tester(new HttpReq);
 			$this->assertTrue($dispatcher->compare($test['result']), $test['test_name']);
 		}
 	}
@@ -198,7 +204,7 @@ class DispatcherTest extends \PHPUnit\Framework\TestCase
  * A small variation of SiteDispatcher that provides a method to expose the
  * otherwise hidden results of the dispaching (_function_name and _controller_name)
  */
-class SiteDispatcher_Tester extends \ElkArte\SiteDispatcher
+class SiteDispatcher_Tester extends SiteDispatcher
 {
 	/**
 	 * This method compares the values of _function_name and

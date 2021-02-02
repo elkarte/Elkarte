@@ -1,6 +1,9 @@
 <?php
 
-class TestStreamFetchWebdata extends \PHPUnit\Framework\TestCase
+use ElkArte\Http\StreamFetchWebdata;
+use PHPUnit\Framework\TestCase;
+
+class TestStreamFetchWebdata extends TestCase
 {
 	protected $fetch_testcases = array();
 	protected $post_testcases = array();
@@ -37,9 +40,9 @@ class TestStreamFetchWebdata extends \PHPUnit\Framework\TestCase
 		// expected in output
 		$this->fetch_testcases = array(
 			array(
-				'https://www.google.com',
+				'https://developer.mozilla.org/en-US/',
 				200,
-				'Search the world\'s information',
+				'Resources for developers',
 			),
 			array(
 				'http://www.google.com/elkarte',
@@ -68,7 +71,7 @@ class TestStreamFetchWebdata extends \PHPUnit\Framework\TestCase
 	public function testStreamFetch()
 	{
 		// Start Stream, pass some default values for a test
-		$fsock = new \ElkArte\Http\StreamFetchWebdata(array(), 3);
+		$fsock = new StreamFetchWebdata(array(), 3);
 
 		foreach ($this->fetch_testcases as $testcase)
 		{
@@ -93,7 +96,7 @@ class TestStreamFetchWebdata extends \PHPUnit\Framework\TestCase
 	public function testStreamPost()
 	{
 		// Start curl, pass some default values for a test
-		$fsock = new \ElkArte\Http\StreamFetchWebdata(array(), 3);
+		$fsock = new StreamFetchWebdata(array(), 3);
 
 		foreach ($this->post_testcases as $testcase)
 		{

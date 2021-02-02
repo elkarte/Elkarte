@@ -12,7 +12,7 @@ then
     psql -c "CREATE DATABASE elkarte_test;" -U postgres
 fi
 
-# Rename ElkArte test files so they can be used by the install
+# Rename ElkArte test files so they can be used by the tests
 mv ./Settings.sample.php ./Settings.php
 mv ./Settings_bak.sample.php ./Settings_bak.php
 mv ./db_last_error.sample.txt ./db_last_error.txt
@@ -27,6 +27,3 @@ if [[ "$DB" == "postgres" ]]; then php .github/SetupPgsql.php; fi
 
 # Remove the install dir
 sudo rm -rf /install
-
-# Copy phpunit_coverage.php into the webserver's document root directory.
-cp ./vendor/phpunit/phpunit-selenium/PHPUnit/Extensions/SeleniumCommon/phpunit_coverage.php .

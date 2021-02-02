@@ -1,6 +1,9 @@
 <?php
 
-class TestBrowser extends \PHPUnit\Framework\TestCase
+use ElkArte\Http\BrowserDetector;
+use PHPUnit\Framework\TestCase;
+
+class TestBrowser extends TestCase
 {
 	protected $browser_testcases = array();
 	protected $backupGlobalsBlacklist = ['user_info'];
@@ -157,7 +160,7 @@ class TestBrowser extends \PHPUnit\Framework\TestCase
 	}
 }
 
-class testBrowserDetector extends \ElkArte\Http\BrowserDetector
+class testBrowserDetector extends BrowserDetector
 {
 	public function testdetectBrowser()
 	{

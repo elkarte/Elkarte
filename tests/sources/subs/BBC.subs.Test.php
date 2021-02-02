@@ -1,6 +1,12 @@
 <?php
 
-class TestBBC extends \PHPUnit\Framework\TestCase
+use BBC\ParserWrapper;
+use BBC\PreparseCode;
+use ElkArte\User;
+use ElkArte\UserInfo;
+use PHPUnit\Framework\TestCase;
+
+class TestBBC extends TestCase
 {
 	protected $bbcTestCases;
 	protected $bbcInvalidTestCases;
@@ -19,12 +25,12 @@ class TestBBC extends \PHPUnit\Framework\TestCase
 		$modSettings['user_access_mentions'] = array();
 		$modSettings['enablePostHTML'] = 1;
 
-		\ElkArte\User::$info = new \ElkArte\UserInfo([
+		User::$info = new UserInfo([
 			'name' => 'itsme',
 			'is_guest' => true,
 			'smiley_set' => 'default'
 		]);
-		\ElkArte\User::load();
+		User::load();
 
 		new ElkArte\Themes\ThemeLoader();
 		$context['user']['smiley_path'] = 'http://127.0.0.1/smileys/default/';
@@ -575,7 +581,7 @@ Should be an empty line in between.',
 			array(
 				'itsMe',
 				'/me likes this',
-				'<div class="meaction">&nbsp;' . \ElkArte\User::$info->name . ' likes this</div>'
+				'<div class="meaction">&nbsp;' . User::$info->name . ' likes this</div>'
 			),
 			array(
 				'schemelessUrl',
@@ -603,7 +609,7 @@ Should be an empty line in between.',
 	 */
 	public function testBBcode()
 	{
-		$parsers = \BBC\ParserWrapper::instance();
+		$parsers = ParserWrapper::instance();
 		foreach ($this->bbcTestCases as $testcase)
 		{
 			$name = $testcase[0];
@@ -621,7 +627,7 @@ Should be an empty line in between.',
 	 */
 	public function testInvalidBBcode()
 	{
-		$parsers = \BBC\ParserWrapper::instance();
+		$parsers = ParserWrapper::instance();
 		foreach ($this->bbcInvalidTestCases as $testcase)
 		{
 			$name = 'Broken ' . $testcase[0];
@@ -638,8 +644,8 @@ Should be an empty line in between.',
 	 */
 	public function testPreparseBBcode()
 	{
-		$preparse = \BBC\PreparseCode::instance('');
-		$parse = \BBC\ParserWrapper::instance();
+		$preparse = PreparseCode::instance('');
+		$parse = ParserWrapper::instance();
 
 		foreach ($this->bbcPreparseTestCases as $testcase)
 		{

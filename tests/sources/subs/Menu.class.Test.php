@@ -1,9 +1,11 @@
 <?php
 
+use ElkArte\HttpReq;
 use ElkArte\Menu\Menu;
 use ElkArte\Menu\MenuArea;
 use ElkArte\Menu\MenuSection;
 use ElkArte\Menu\MenuSubsection;
+use ElkArte\User;
 
 abstract class BaseMenuTest extends ElkArteCommonSetupTest
 {
@@ -300,7 +302,7 @@ class MenuTest extends BaseMenuTest
 
 	public function prepareMenu()
 	{
-		$this->req = new \ElkArte\HttpReq;
+		$this->req = new HttpReq;
 		$this->menuObjects[] = new Menu($this->req);
 		foreach ($this->sections as list ($section_id, $section))
 		{
@@ -337,8 +339,8 @@ class MenuTest extends BaseMenuTest
 	 */
 	public function testFail()
 	{
-		\ElkArte\User::$info->is_admin = false;
-		\ElkArte\User::$info->permissions = [];
+		User::$info->is_admin = false;
+		User::$info->permissions = [];
 
 		$this->createMenu();
 	}

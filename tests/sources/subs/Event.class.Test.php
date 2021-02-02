@@ -1,14 +1,18 @@
 <?php
 
+use ElkArte\Event;
+use ElkArte\Priority;
+use PHPUnit\Framework\TestCase;
+
 /**
  * TestCase class for Event class.
  */
-class TestEvent extends \PHPUnit\Framework\TestCase
+class TestEvent extends TestCase
 {
 	protected $backupGlobalsBlacklist = ['user_info'];
 	public function testEmpty()
 	{
-		$event = new \ElkArte\Event(new \ElkArte\Priority());
+		$event = new Event(new Priority());
 
 		// First basic: no events at the beginning
 		$this->assertFalse($event->hasEvents());
@@ -16,7 +20,7 @@ class TestEvent extends \PHPUnit\Framework\TestCase
 
 	public function testSingle()
 	{
-		$event = new \ElkArte\Event(new \ElkArte\Priority());
+		$event = new Event(new Priority());
 
 		// A properly formed event
 		$event_def = array(
@@ -40,7 +44,7 @@ class TestEvent extends \PHPUnit\Framework\TestCase
 
 	public function testMultiple()
 	{
-		$event = new \ElkArte\Event(new \ElkArte\Priority());
+		$event = new Event(new Priority());
 
 		// A properly formed event
 		$event_def = array(
@@ -78,7 +82,7 @@ class TestEvent extends \PHPUnit\Framework\TestCase
 	 */
 	public function testMultipleSorted()
 	{
-		$event = new \ElkArte\Event(new \ElkArte\Priority());
+		$event = new Event(new Priority());
 
 		// A properly formed event
 		$event_def = array(

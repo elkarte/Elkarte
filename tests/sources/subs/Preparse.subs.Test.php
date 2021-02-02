@@ -1,6 +1,10 @@
 <?php
 
-class PrepaseBBC extends \PHPUnit\Framework\TestCase
+use ElkArte\User;
+use ElkArte\ValuesContainer;
+use PHPUnit\Framework\TestCase;
+
+class PrepaseBBC extends TestCase
 {
 	protected $backupGlobalsBlacklist = ['user_info'];
 
@@ -13,7 +17,7 @@ class PrepaseBBC extends \PHPUnit\Framework\TestCase
 	{
 		require_once(SUBSDIR . '/Post.subs.php');
 
-		\ElkArte\User::$info = new \ElkArte\ValuesContainer([
+		User::$info = new ValuesContainer([
 			'name' => 'istme',
 		]);
 
@@ -55,7 +59,7 @@ class PrepaseBBC extends \PHPUnit\Framework\TestCase
 
 	public function tearDown()
 	{
-		\ElkArte\User::$info = null;
+		User::$info = null;
 	}
 
 	/**

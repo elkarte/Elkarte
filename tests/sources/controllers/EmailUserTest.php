@@ -1,5 +1,10 @@
 <?php
 
+use ElkArte\Controller\Emailuser;
+use ElkArte\EventManager;
+use ElkArte\HttpReq;
+use ElkArte\User;
+
 /**
  * TestCase class for the EmailUser Controller
  *
@@ -45,8 +50,8 @@ class TestEmailUserController extends ElkArteCommonSetupTest
 		global $context;
 
 		// Get the controller, call index
-		$controller = new \ElkArte\Controller\Emailuser(new \ElkArte\EventManager());
-		$controller->setUser(\ElkArte\User::$info);
+		$controller = new Emailuser(new EventManager());
+		$controller->setUser(User::$info);
 		$controller->pre_dispatch();
 		$controller->action_index();
 
@@ -54,7 +59,7 @@ class TestEmailUserController extends ElkArteCommonSetupTest
 		$this->assertEquals($context['sub_template'], 'send_topic');
 
 		// Now try to send it, but without filling out the form we get a error instead
-		$req = \ElkArte\HttpReq::instance();
+		$req = HttpReq::instance();
 		$req->post->send = true;
 
 		$controller->pre_dispatch();
@@ -70,15 +75,15 @@ class TestEmailUserController extends ElkArteCommonSetupTest
 	{
 		global $context, $modSettings;
 
-		$req = \ElkArte\HttpReq::instance();
+		$req = HttpReq::instance();
 		$req->query->msg = 1;
 		$req->post->msg = 1;
 		$req->post->comment = 'some needless complaint';
 		$req->post->email = 'complainer@nowhere.tld';
 
 		// Get the controller
-		$controller = new \ElkArte\Controller\Emailuser(new \ElkArte\EventManager());
-		$controller->setUser(\ElkArte\User::$info);
+		$controller = new Emailuser(new EventManager());
+		$controller->setUser(User::$info);
 		$controller->pre_dispatch();
 		$controller->action_reporttm();
 

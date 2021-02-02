@@ -1,9 +1,11 @@
 <?php
 
+use PHPUnit\Framework\TestCase;
+
 /**
  * TestCase class for language files integrity
  */
-class TestLanguageStrings extends \PHPUnit\Framework\TestCase
+class TestLanguageStrings extends TestCase
 {
 	protected $backupGlobalsBlacklist = ['user_info'];
 	/**

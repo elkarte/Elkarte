@@ -1,5 +1,9 @@
 <?php
 
+use ElkArte\Controller\Announce;
+use ElkArte\EventManager;
+use ElkArte\User;
+
 /**
  * TestCase class for the Announce Controller
  *
@@ -37,8 +41,8 @@ class TestAnnounce extends ElkArteCommonSetupTest
 		loadBoard();
 
 		// Get the groups list
-		$controller = new \ElkArte\Controller\Announce(new \ElkArte\EventManager());
-		$controller->setUser(\ElkArte\User::$info);
+		$controller = new Announce(new EventManager());
+		$controller->setUser(User::$info);
 		$controller->pre_dispatch();
 		$controller->action_index();
 

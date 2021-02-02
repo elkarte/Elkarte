@@ -1,5 +1,8 @@
 <?php
 
+use ElkArte\Controller\Attachment;
+use ElkArte\EventManager;
+
 /**
  * TestCase class for the Attachment Controller
  *
@@ -30,7 +33,7 @@ class TestAttachment extends ElkArteCommonSetupTest
 	public function testNeedTheme()
 	{
 		// Get the attachment controller
-		$controller = new \ElkArte\Controller\Attachment(new \ElkArte\EventManager());
+		$controller = new Attachment(new EventManager());
 		$check = $controller->needTheme();
 
 		// Check
@@ -42,7 +45,7 @@ class TestAttachment extends ElkArteCommonSetupTest
 		global $context;
 
 		// Get the attachment controller
-		$controller = new \ElkArte\Controller\Attachment(new \ElkArte\EventManager());
+		$controller = new Attachment(new EventManager());
 		$controller->action_ulattach();
 
 		// With no files supplied, the json result should be false

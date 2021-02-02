@@ -1,5 +1,9 @@
 <?php
 
+use ElkArte\Controller\Draft;
+use ElkArte\EventManager;
+use ElkArte\User;
+
 /**
  * TestCase class for the Draft Controller
  *
@@ -33,8 +37,8 @@ class TestDraft extends ElkArteCommonSetupTest
 		$context['profile_menu']['tab_data'] = [];
 
 		// Get the controller, call draft listing the long way
-		$controller = new \ElkArte\Controller\Draft(new \ElkArte\EventManager());
-		$controller->setUser(\ElkArte\User::$info);
+		$controller = new Draft(new EventManager());
+		$controller->setUser(User::$info);
 		$controller->pre_dispatch();
 		$controller->action_post();
 
@@ -50,8 +54,8 @@ class TestDraft extends ElkArteCommonSetupTest
 		global $context;
 
 		// Get the controller, call draft listing the long way
-		$controller = new \ElkArte\Controller\Draft(new \ElkArte\EventManager());
-		$controller->setUser(\ElkArte\User::$info);
+		$controller = new Draft(new EventManager());
+		$controller->setUser(User::$info);
 		$controller->pre_dispatch();
 		$controller->action_showPMDrafts();
 

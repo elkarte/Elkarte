@@ -5,13 +5,19 @@ set -x
 
 DB=$1
 PHP_VERSION=$2
+
 DIR=$(dirname "$0")
 USER=$(whoami)
 ELKARTE_ROOT_PATH=$(realpath "$DIR/../elkarte")
+APP_SOCK=$(realpath "$DIR")/php-fpm.sock
+
+# Create and set the php-fpm app sock file with user:group
+sudo touch "$APP_SOCK"
+sudo chown "$USER:$USER" "$APP_SOCK"
+
+# Nginx config file locations
 NGINX_SITE_CONF="/etc/nginx/sites-enabled/default"
 NGINX_CONF="/etc/nginx/nginx.conf"
-APP_SOCK=$(realpath "$DIR")/php-app.sock
-NGINX_PHP_CONF="$DIR/nginx-php.conf"
 
 # Install Nginx
 sudo apt-get install nginx -qq > /dev/null
@@ -30,32 +36,29 @@ echo "
 	group = $USER
 	listen = $APP_SOCK
 	listen.mode = 0666
+	listen.owner = $USER
+	listen.group = $USER
 	pm = static
 	pm.max_children = 2
+	security.limit_extensions = .php
 
 	php_admin_value[memory_limit] = 128M
 " > $PHP_FPM_CONF
 
-# Use it
+# Add our pool config to PHP-FPM
 sudo $PHP_FPM_BIN \
 	--fpm-config "$DIR/php-fpm.conf"
 
-# Nginx conf, Update basic one from the repo with correct dir and user
+# Default Nginx conf needs to be updated with correct user
 sudo sed -i "s/user www-data;/user $USER;/g" $NGINX_CONF
+
+# Nginx sites enabled conf, we update the one from the repo with correct site, sock, root
 sudo cp "$DIR/../.github/nginx.conf" "$NGINX_SITE_CONF"
 sudo sed -i \
-	-e "s/example\.com/localhost/g" \
+	-e "s/example\.com/127.0.0.1/g" \
 	-e "s|root /path/to/elkarte;|root $ELKARTE_ROOT_PATH;|g" \
+	-e "s|/path/to/socket|$APP_SOCK|g" \
 	$NGINX_SITE_CONF
-
-# Generate FastCGI configuration for Nginx
-echo "
-upstream php {
-	server unix:$APP_SOCK;
-}
-" > $NGINX_PHP_CONF
-
-sudo mv "$NGINX_PHP_CONF" /etc/nginx/conf.d/php.conf
 
 # Test for debug output and start
 sudo nginx -t

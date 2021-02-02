@@ -1,10 +1,12 @@
 <?php
 
+use PHPUnit\Framework\TestCase;
+
 /**
  * TestCase class for hooks adding/removing/other stuff
  * @backupGlobals disabled
  */
-class TestHooks extends \PHPUnit\Framework\TestCase
+class TestHooks extends TestCase
 {
 	protected $backupGlobalsBlacklist = ['user_info'];
 	/**

@@ -49,14 +49,15 @@
 // the same directory in phpunit_coverage.php. Also note that the webserver
 // needs write access to the directory.
 if (!isset($GLOBALS['PHPUNIT_COVERAGE_DATA_DIRECTORY'])) {
-    $GLOBALS['PHPUNIT_COVERAGE_DATA_DIRECTORY'] = FALSE;
+	$GLOBALS['PHPUNIT_COVERAGE_DATA_DIRECTORY'] = FALSE;
 }
 
-if ( !isset($_GET['PHPUNIT_SELENIUM_TEST_ID']) &&
-    extension_loaded('xdebug')) {
-    $GLOBALS['PHPUNIT_FILTERED_FILES'] = array(__FILE__);
+if ( isset($_COOKIE['PHPUNIT_SELENIUM_TEST_ID']) &&
+	!isset($_GET['PHPUNIT_SELENIUM_TEST_ID']) &&
+	extension_loaded('xdebug')) {
+	$GLOBALS['PHPUNIT_FILTERED_FILES'] = array(__FILE__);
 
-    xdebug_start_code_coverage(XDEBUG_CC_UNUSED | XDEBUG_CC_DEAD_CODE);
+	xdebug_start_code_coverage(XDEBUG_CC_UNUSED | XDEBUG_CC_DEAD_CODE);
 }
 
 include ('ExitHandler.php');

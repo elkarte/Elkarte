@@ -10,15 +10,16 @@
 class TestManageMembersController extends ElkArteWebTest
 {
 	/**
-	 * Register members
-	 *
-	 * @throws \ElkArte\Exceptions\Exception
+	 * Register some members, user0, user1, user2
 	 */
 	public function registerMembers()
 	{
+		new ElkArte\Themes\ThemeLoader();
+
 		require_once(SUBSDIR . '/Members.subs.php');
 		$require = array('activation', 'approval');
 		$_SESSION['just_registered'] = 0;
+
 		for ($i = 0; $i < 2; $i++)
 		{
 			$regOptions = array(
