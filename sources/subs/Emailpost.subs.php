@@ -707,7 +707,7 @@ function pbe_emailError($error, $email_message)
 	$subject = ($subject === '' ? $txt['no_subject'] : $subject);
 
 	// Start off with what we know about the security key, even if its nothing
-	$message_key = (string) $email_message->message_key_id;
+	$message_key = (string) $email_message->message_key;
 	$message_type = (string) $email_message->message_type;
 	$message_id = (int) $email_message->message_id;
 	$board_id = -1;
@@ -722,7 +722,7 @@ function pbe_emailError($error, $email_message)
 			$email_message->email['from'] = $email_message->email['from'] . ' => ' . $key_owner;
 
 			// Since we have a valid key set those details as well
-			$message_key = $email_message->message_key_id;
+			$message_key = $email_message->message_key;
 			$message_type = $email_message->message_type;
 			$message_id = $email_message->message_id;
 		}
@@ -738,7 +738,7 @@ function pbe_emailError($error, $email_message)
 			$email_message->email['from'] = $key_owner . ' => ' . $email_message->email['from'];
 
 			// Since we have a valid key set those details as well
-			$message_key = $email_message->message_key_id;
+			$message_key = $email_message->message_key;
 			$message_type = $email_message->message_type;
 			$message_id = $email_message->message_id;
 		}
@@ -762,7 +762,7 @@ function pbe_emailError($error, $email_message)
 		{
 			if (preg_match('~([a-z0-9]{32})\-([ptm])(\d+)~', $user_key['id_email'], $match))
 			{
-				$key = $match[0];
+				$key = $match[1];
 				$type = $match[2];
 				$message = $match[3];
 
