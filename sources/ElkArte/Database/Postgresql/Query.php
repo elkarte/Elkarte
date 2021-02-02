@@ -280,7 +280,7 @@ class Query extends AbstractQuery
 		// Try get the last ID for the auto increment field.
 		$request = $this->query('', '
 			SELECT CURRVAL(\'' . $table . '_seq\') AS insertID',
-			array()
+			array('security_override' => true)
 		);
 
 		if (!$request)
