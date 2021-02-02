@@ -154,6 +154,12 @@ class Query extends AbstractQuery
 		// Make it so.
 		if (!empty($where))
 		{
+			// Inserting data as a single row can be done as a single array.
+			if (!is_array($data[array_rand($data)]))
+			{
+				$data = array($data);
+			}
+
 			foreach ($data as $k => $entry)
 			{
 				$this->query('', '

@@ -92,7 +92,7 @@ abstract class AbstractResult
 	{
 		foreach ($details as $key => $val)
 		{
-			$this->details[$key] = $value;
+			$this->details[$key] = $val;
 		}
 	}
 
