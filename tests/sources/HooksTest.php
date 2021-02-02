@@ -78,7 +78,7 @@ class TestHooks extends \PHPUnit\Framework\TestCase
 		$this->_call = call_integration_hook($this->_hook_name);
 
 		foreach ($this->_tests as $test)
-			$this->assertTrue($this->_is_hook_called($test['call'] . (!empty($test['file']) ? '|' . $test['file'] : '')));
+			$this->assertTrue($this->_is_hook_called($test['call'] . (!empty($test['file']) ? '|' . $test['file'] : '')), 'The hook ' . $test['call'] . ' was not properly called.');
 	}
 
 	/**
