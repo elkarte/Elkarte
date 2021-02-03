@@ -2003,7 +2003,7 @@ class InstallInstructions_install_1_1
 				array('name' => 'mention_type',       'type' => 'varchar', 'size' => 12, 'default' => ''),
 			),
 			array(
-				array('name' => 'mention_member', 'columns' => array('id_member', 'notification_type', 'mention_type'), 'type' => 'unique'),
+				array('name' => 'mention_member', 'columns' => array('id_member', 'mention_type'), 'type' => 'unique'),
 			),
 			array(),
 			'ignore'
@@ -2014,7 +2014,7 @@ class InstallInstructions_install_1_1
 	{
 		return $this->db->insert('ignore',
 			'{db_prefix}notifications_pref',
-			array('id_member' => 'int', 'mention_type' => 'string-12', 'notification_type' => 'string-20'),
+			array('id_member' => 'int', 'mention_type' => 'string-12', 'notification_type' => 'string'),
 			array(
 				array(
 					0,
@@ -2042,7 +2042,7 @@ class InstallInstructions_install_1_1
 					json_encode(['notification'])
 				),
 			),
-			array('id_server')
+			array('id_member', 'mention_type')
 		);
 	}
 

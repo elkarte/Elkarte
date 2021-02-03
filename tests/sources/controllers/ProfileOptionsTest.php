@@ -38,7 +38,7 @@ class TestProfileOptions extends ElkArteCommonSetupTest
 			array(
 				array(
 					'id_member' => 1,
-					'notification_type' => 'notification',
+					'notification_type' => json_encode(['email', 'notification']),
 					'mention_type' => 'likemsg'
 				),
 				array(
@@ -47,19 +47,9 @@ class TestProfileOptions extends ElkArteCommonSetupTest
 					'mention_type' => 'mentionmem'
 				),
 				array(
-					'id_member' => 1,
-					'notification_type' => 'email',
-					'mention_type' => 'likemsg'
-				),
-				array(
 					'id_member' => 2,
-					'notification_type' => 'notification',
+					'notification_type' => json_encode(['email', 'notification']),
 					'mention_type' => 'mentionmem'
-				),
-				array(
-					'id_member' => 2,
-					'notification_type' => 'email',
-					'mentionmem'
 				),
 				array(
 					'id_member' => 2,
