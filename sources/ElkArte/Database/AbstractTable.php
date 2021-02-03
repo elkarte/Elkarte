@@ -55,6 +55,7 @@ abstract class AbstractTable
 	 * DbTable::construct
 	 *
 	 * @param object $db - An implementation of the abstract DbTable
+	 * @param string $db_prefix - Database tables prefix
 	 */
 	public function __construct($db, $db_prefix)
 	{
@@ -403,6 +404,7 @@ abstract class AbstractTable
 	 * Clean the indexes strings (e.g. PostgreSQL doesn't support max length)
 	 *
 	 * @param string[] $columns
+	 * @return string
 	 */
 	protected function _clean_indexes($columns)
 	{
@@ -414,6 +416,8 @@ abstract class AbstractTable
 	 *
 	 * @param string $table_name
 	 * @param string $statement
+	 * @return bool|\ElkArte\Database\AbstractResult
+	 * @throws \ElkArte\Exceptions\Exception
 	 */
 	protected function _alter_table($table_name, $statement)
 	{

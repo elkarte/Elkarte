@@ -368,7 +368,7 @@ class OpenID
 		}
 
 		// Store the data
-		$db->insert('replace',
+		$db->replace(
 			'{db_prefix}openid_assoc',
 			array('server_url' => 'string', 'handle' => 'string', 'secret' => 'string', 'issued' => 'int', 'expires' => 'int', 'assoc_type' => 'string'),
 			array($server, $handle, $secret, $issued, $expires, $assoc_type),

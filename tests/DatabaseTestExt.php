@@ -170,7 +170,7 @@ class TestDatabase extends TestCase
 			'permission_profiles' => 4,
 			'permissions' => 40,
 			'scheduled_tasks' => 14,
-			'settings' => 204,
+			'settings' => 203,
 			'smileys' => 22,
 			'spiders' => 27,
 			'themes' => 22,
@@ -181,7 +181,7 @@ class TestDatabase extends TestCase
 		{
 			$result = $db->fetchQuery('SELECT count(*) FROM {db_prefix}' . $tbl);
 			list($counted) = $result->fetch_row();
-			$this->assertEquals($counted, $number, 'The number of inserted rows for the table ' . $tbl . ' doesn\'t match the expectations (' . $counted . ' -VS- ' . $number . ')');
+			$this->assertEquals($number, $counted, 'The number of inserted rows for the table ' . $tbl . ' doesn\'t match the expectations (' . $counted . ' -VS- ' . $number . ')');
 		}
 	}
 }

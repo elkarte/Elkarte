@@ -119,21 +119,19 @@ interface QueryInterface
 	 * @param bool $disable_trans = false
 	 * @return bool|resource
 	 */
-	public function insert($method = 'replace', $table, $columns, $data, $keys, $disable_trans = false);
+	public function insert($method, $table, $columns, $data, $keys, $disable_trans = false);
 
 	/**
-	 * This function tries to work out additional error information from a back trace.
+	 * Replaces data.
 	 *
-	 * @param string $error_message
-	 * @param string $log_message
-	 * @param string|bool $error_type
-	 * @param string|null $file
-	 * @param int|null $line
-	 *
-	 * @return array
-	 * @throws \ElkArte\Exceptions\Exception
+	 * @param string $table
+	 * @param mixed[] $columns
+	 * @param mixed[] $data
+	 * @param string[] $keys
+	 * @param bool $disable_trans = false
+	 * @return bool|resource
 	 */
-	public function error_backtrace($error_message, $log_message = '', $error_type = false, $file = null, $line = null);
+	public function replace($table, $columns, $data, $keys, $disable_trans = false);
 
 	/**
 	 * Escape string for the database input

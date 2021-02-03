@@ -305,7 +305,7 @@ function updateLike($id_liker, $liked_message, $direction)
 	}
 
 	// Put it in the log so we can prevent flooding the system with likes
-	$db->insert('replace',
+	$db->replace(
 		'{db_prefix}log_likes',
 		array('action' => 'string', 'id_target' => 'int', 'id_member' => 'int', 'log_time' => 'int'),
 		array($direction, $liked_message['id_msg'], $id_liker, time()),

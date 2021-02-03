@@ -134,7 +134,7 @@ class DatabaseHandler extends \SessionHandler
 		}
 
 		// Update the session data, replace if necessary
-		$this->_db->insert('replace',
+		$this->_db->replace(
 			'{db_prefix}sessions',
 			array('session_id' => 'string', 'data' => 'string', 'last_update' => 'int'),
 			array($sessionId, $data, time()),

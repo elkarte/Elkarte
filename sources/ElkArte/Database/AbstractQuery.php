@@ -27,9 +27,16 @@ use ElkArte\Exceptions\Exception;
 abstract class AbstractQuery implements QueryInterface
 {
 	/**
+	 * Of course the character used to escape characters that have to be escaped
+	 *
+	 * @var string
+	 */
+	const ESCAPE_CHAR = '\\';
+
+	/**
 	 * Current connection to the database
 	 *
-	 * @var \ElkArte\Database\ConnectionInterface
+	 * @var resource
 	 */
 	protected $connection = null;
 
@@ -120,6 +127,13 @@ abstract class AbstractQuery implements QueryInterface
 	 * @var \ElkArte\Database\AbstractResult
 	 */
 	protected $result = null;
+
+	/**
+	 * Holds the resource from the dBMS of the last query run
+	 *
+	 * @var resource
+	 */
+	protected $_db_last_result = null;
 
 	/**
 	 * Comments that are allowed in a query are preg_removed.
@@ -338,15 +352,16 @@ abstract class AbstractQuery implements QueryInterface
 	}
 
 	/**
-	 * {@inheritDoc}
+	 * Scans the debug_backtrace output looking for the place where the
+	 * actual error happened
+	 *
+	 * @return mixed[]
 	 */
-	public function error_backtrace($error_message, $log_message = '', $error_type = false, $file = null, $line = null)
+	protected function backtrace_message()
 	{
-		if (empty($log_message))
-		{
-			$log_message = $error_message;
-		}
-
+		$log_message = '';
+		$file = null;
+		$line = null;
 		foreach (debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS) as $step)
 		{
 			// Found it?
@@ -362,33 +377,39 @@ abstract class AbstractQuery implements QueryInterface
 				$line = $step['line'];
 			}
 		}
+		return [$file, $line, $log_message];
+	}
 
-		// A special case - we want the file and line numbers for debugging.
-		if ($error_type == 'return')
+	/**
+	 * This function tries to work out additional error information from a back trace.
+	 *
+	 * @param string $error_message
+	 * @param string $log_message
+	 * @param string|bool $error_type
+	 * @param string|null $file_fallback
+	 * @param int|null $line_fallback
+	 *
+	 * @throws \ElkArte\Exceptions\Exception
+	 */
+	protected function error_backtrace($error_message, $log_message = '', $error_type = false, $file_fallback = null, $line_fallback = null)
+	{
+		if (empty($log_message))
 		{
-			return array($file, $line);
+			$log_message = $error_message;
 		}
+
+		// We'll try recovering the file and line number the original db query was called from.
+		list ($file, $line, $backtrace_message) = $this->backtrace_message();
+
+		// Just in case nothing can be found from debug_backtrace
+		$file = $file ?? $file_fallback;
+		$line = $line ?? $line_fallback;
+		$log_message .= $backtrace_message;
 
 		// Is always a critical error.
-		if (class_exists('\\ElkArte\\Errors\\Errors'))
-		{
-			Errors::instance()->log_error($log_message, 'critical', $file, $line);
-		}
+		Errors::instance()->log_error($log_message, 'critical', $file, $line);
 
-		if (class_exists('\\ElkArte\\Exceptions\\Exception'))
-		{
-			throw new Exception([false, $error_message], false);
-		}
-		elseif ($error_type)
-		{
-			trigger_error($error_message . ($line !== null ? '<em>(' . basename($file) . '-' . $line . ')</em>' : ''), $error_type);
-		}
-		else
-		{
-			trigger_error($error_message . ($line !== null ? '<em>(' . basename($file) . '-' . $line . ')</em>' : ''));
-		}
-
-		return array('', '');
+		throw new Exception([false, $error_message], false);
 	}
 
 	/**
@@ -614,7 +635,49 @@ abstract class AbstractQuery implements QueryInterface
 	/**
 	 * {@inheritDoc}
 	 */
-	abstract public function query($identifier, $db_string, $db_values = array());
+	public function query($identifier, $db_string, $db_values = array())
+	{
+		// One more query....
+		$this->_query_count++;
+
+		$db_string = $this->initialChecks($db_string, $db_values, $identifier);
+
+		if (trim($db_string) === '')
+		{
+			throw new \Exception('Query string empty');
+		}
+
+		$db_string = $this->_prepareQuery($db_string, $db_values);
+
+		$this->_preQueryDebug($db_string);
+
+		$this->_doSanityCheck($db_string);
+
+		$this->executeQuery($db_string);
+
+		if ($this->_db_last_result === false && !$this->_skip_error)
+		{
+			$this->_db_last_result = $this->error($db_string);
+		}
+
+		// Revert not to skip errors
+		if ($this->_skip_error)
+		{
+			$this->_skip_error = false;
+		}
+
+		// Debugging.
+		$this->_postQueryDebug();
+
+		return $this->result;
+	}
+
+	/**
+	 * Actually execute the DBMS-specific code to run the query
+	 *
+	 * @param string $db_string
+	 */
+	abstract protected function executeQuery($db_string);
 
 	/**
 	 * {@inheritDoc}
@@ -622,9 +685,109 @@ abstract class AbstractQuery implements QueryInterface
 	abstract public function error($db_string);
 
 	/**
+	 * Prepares the strings to show the error to the user/admin and stop
+	 * the code execution
+	 *
+	 * @param string $db_string
+	 * @param string $query_error
+	 * @param string $file
+	 * @param int $line
+	 * @throws \ElkArte\Exceptions\Exception
+	 */
+	protected function throwError($db_string, $query_error, $file, $line)
+	{
+		global $context, $txt, $modSettings, $db_show_debug;
+
+		// Nothing's defined yet... just die with it.
+		if (empty($context) || empty($txt))
+		{
+			die($query_error);
+		}
+
+		// Show an error message, if possible.
+		$context['error_title'] = $txt['database_error'];
+		$message = $txt['try_again'];
+
+		// Add database version that we know of, for the admin to know. (and ask for support)
+		if (allowedTo('admin_forum'))
+		{
+			$message = nl2br($query_error) . '<br />' . $txt['file'] . ': ' . $file . '<br />' . $txt['line'] . ': ' . $line .
+				'<br /><br />' . sprintf($txt['database_error_versions'], $modSettings['elkVersion']);
+
+			if ($db_show_debug === true)
+			{
+				$message .= '<br /><br />' . nl2br($db_string);
+			}
+		}
+
+		// It's already been logged... don't log it again.
+		throw new Exception($message, false);
+	}
+
+	/**
 	 * {@inheritDoc}
 	 */
-	abstract public function insert($method = 'replace', $table, $columns, $data, $keys, $disable_trans = false);
+	abstract public function insert($method, $table, $columns, $data, $keys, $disable_trans = false);
+
+	/**
+	 * Prepares the data that will be later implode'd into the actual query string
+	 *
+	 * @param string $table
+	 * @param mixed[] $columns
+	 * @param mixed[] $data
+	 * @return mixed[]
+	 * @throws \Exception
+	 */
+	protected function prepareInsert($table, $columns, $data)
+	{
+		// With nothing to insert, simply return.
+		if (empty($data))
+		{
+			throw new \Exception('No data to insert');
+		}
+
+		// Inserting data as a single row can be done as a single array.
+		if (!is_array($data[array_rand($data)]))
+		{
+			$data = [$data];
+		}
+
+		// Replace the prefix holder with the actual prefix.
+		$table = str_replace('{db_prefix}', $this->_db_prefix, $table);
+		$this->_skip_error = $table === $this->_db_prefix . 'log_errors';
+
+		// Create the mold for a single row insert.
+		$insertData = '(';
+		foreach ($columns as $columnName => $type)
+		{
+			// Are we restricting the length?
+			if (strpos($type, 'string-') !== false)
+			{
+				$insertData .= sprintf('SUBSTRING({string:%1$s}, 1, ' . substr($type, 7) . '), ', $columnName);
+			}
+			else
+			{
+				$insertData .= sprintf('{%1$s:%2$s}, ', $type, $columnName);
+			}
+		}
+		$insertData = substr($insertData, 0, -2) . ')';
+
+		// Create an array consisting of only the columns.
+		$indexed_columns = array_keys($columns);
+
+		// Here's where the variables are injected to the query.
+		$insertRows = [];
+		foreach ($data as $dataRow)
+		{
+			$insertRows[] = $this->quote($insertData, $this->_array_combine($indexed_columns, $dataRow));
+		}
+		return [$table, $indexed_columns, $insertRows];
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	abstract public function replace($table, $columns, $data, $keys, $disable_trans = false);
 
 	/**
 	 * {@inheritDoc}
@@ -951,10 +1114,19 @@ abstract class AbstractQuery implements QueryInterface
 	}
 
 	/**
+	 * Some initial checks and replacement of text insside the query string
+	 *
+	 * @param string $db_string
+	 * @param mixed $db_values
+	 * @param string $identifier The old (now mostly unused) query identifier
+	 * @return string
+	 */
+	abstract protected function initialChecks($db_string, $db_values, $identifier = '');
+
+	/**
 	 * Tracks the initial status (time, file/line, query) for performance evaluation.
 	 *
 	 * @param string $db_string
-	 * @throws \ElkArte\Exceptions\Exception
 	 */
 	protected function _preQueryDebug($db_string)
 	{
@@ -963,8 +1135,12 @@ abstract class AbstractQuery implements QueryInterface
 		// Debugging.
 		if ($db_show_debug === true)
 		{
-			// Get the file and line number this function was called.
-			list ($file, $line) = $this->error_backtrace('', '', 'return', __FILE__, __LINE__);
+			// We'll try recovering the file and line number the original db query was called from.
+			list ($file, $line) = $this->backtrace_message();
+
+			// Just in case nothing can be found from debug_backtrace
+			$file = $file ?? __FILE__;
+			$line = $line ?? __LINE__;
 
 			if (!empty($_SESSION['debug_redirect']))
 			{
@@ -1005,10 +1181,9 @@ abstract class AbstractQuery implements QueryInterface
 	 * In case of problems, the method can ends up dying.
 	 *
 	 * @param string $db_string
-	 * @param string $escape_char
 	 * @throws \ElkArte\Exceptions\Exception
 	 */
-	protected function _doSanityCheck($db_string, $escape_char)
+	protected function _doSanityCheck($db_string)
 	{
 		global $modSettings;
 
@@ -1030,7 +1205,7 @@ abstract class AbstractQuery implements QueryInterface
 				while (true)
 				{
 					$pos1 = strpos($db_string, '\'', $pos + 1);
-					$pos2 = strpos($db_string, $escape_char, $pos + 1);
+					$pos2 = strpos($db_string, static::ESCAPE_CHAR, $pos + 1);
 
 					if ($pos1 === false)
 					{

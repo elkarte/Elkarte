@@ -677,7 +677,7 @@ class UpgradeInstructions_upgrade_1_1
 				'debug_title' => 'Inserting custom fields for gender/location/personal text',
 				'function' => function()
 				{
-					$this->db->insert('replace',
+					$this->db->replace(
 						'{db_prefix}custom_fields',
 						array('col_name' => 'string', 'field_name' => 'string', 'field_desc' => 'string', 'field_type' => 'string', 'field_length' => 'int', 'field_options' => 'string', 'mask' => 'string', 'show_reg' => 'int', 'show_display' => 'int', 'show_profile' => 'string', 'private' => 'int', 'active' => 'int', 'bbc' => 'int', 'can_search' => 'int', 'default_value' => 'string', 'enclose' => 'string', 'placement' => 'int', 'rows' => 'int', 'cols' => 'int'),
 						array(
@@ -747,7 +747,7 @@ class UpgradeInstructions_upgrade_1_1
 									break;
 							}
 
-							$this->db->insert('replace',
+							$this->db->replace(
 								'{db_prefix}custom_fields_data',
 								array('id_member' => 'int', 'variable' => 'string', 'value' => 'string'),
 								array(
@@ -771,7 +771,7 @@ class UpgradeInstructions_upgrade_1_1
 							WHERE location != ""');
 						while ($row = $this->db->fetch_assoc($result))
 						{
-							$this->db->insert('replace',
+							$this->db->replace(
 								'{db_prefix}custom_fields_data',
 								array('id_member' => 'int', 'variable' => 'string', 'value' => 'string'),
 								array(
@@ -795,7 +795,7 @@ class UpgradeInstructions_upgrade_1_1
 							WHERE personal_text != ""');
 						while ($row = $this->db->fetch_assoc($result))
 						{
-							$this->db->insert('replace',
+							$this->db->replace(
 								'{db_prefix}custom_fields_data',
 								array('id_member' => 'int', 'variable' => 'string', 'value' => 'string'),
 								array(

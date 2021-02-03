@@ -357,7 +357,7 @@ function collapseCategories($categories, $new_status, $members = null, $check_co
 		// Collapse the ones that were originally expanded...
 		if (!empty($updates['insert']))
 		{
-			$db->insert('replace',
+			$db->replace(
 				'{db_prefix}collapsed_categories',
 				array(
 					'id_cat' => 'int', 'id_member' => 'int',

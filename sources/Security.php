@@ -1517,7 +1517,7 @@ function spamProtection($error_type, $fatal = true)
 	);
 
 	// Add a new entry, deleting the old if necessary.
-	$request = $db->insert('replace',
+	$request = $db->replace(
 		'{db_prefix}log_floodcontrol',
 		array('ip' => 'string-16', 'log_time' => 'int', 'log_type' => 'string'),
 		array(User::$info->ip, time(), $error_type),

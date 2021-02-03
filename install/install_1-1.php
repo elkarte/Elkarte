@@ -2003,7 +2003,7 @@ class InstallInstructions_install_1_1
 				array('name' => 'mention_type',       'type' => 'varchar', 'size' => 12, 'default' => ''),
 			),
 			array(
-				array('name' => 'mention_member', 'columns' => array('id_member', 'notification_type', 'mention_type'), 'type' => 'unique'),
+				array('name' => 'mention_member', 'columns' => array('id_member', 'mention_type'), 'type' => 'unique'),
 			),
 			array(),
 			'ignore'
@@ -2014,7 +2014,7 @@ class InstallInstructions_install_1_1
 	{
 		return $this->db->insert('ignore',
 			'{db_prefix}notifications_pref',
-			array('id_member' => 'int', 'mention_type' => 'string-12', 'notification_type' => 'string-20'),
+			array('id_member' => 'int', 'mention_type' => 'string-12', 'notification_type' => 'string'),
 			array(
 				array(
 					0,
@@ -2042,7 +2042,7 @@ class InstallInstructions_install_1_1
 					json_encode(['notification'])
 				),
 			),
-			array('id_server')
+			array('id_member', 'mention_type')
 		);
 	}
 
@@ -2138,7 +2138,7 @@ class InstallInstructions_install_1_1
 				array('reply_only'),
 				array('read_only'),
 			),
-			array('id_group')
+			array('id_profile')
 		);
 	}
 
@@ -2636,7 +2636,6 @@ class InstallInstructions_install_1_1
 				array('admin_features', 'cp'),
 				array('last_mod_report_action', '0'),
 				array('pruningOptions', '30,180,180,180,30,7,0'),
-				array('cache_enable', '1'),
 				array('reg_verification', '1'),
 				array('visual_verification_type', '3'),
 				array('visual_verification_num_chars', '6'),

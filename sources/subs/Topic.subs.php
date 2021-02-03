@@ -3394,7 +3394,7 @@ function fixMergedTopics($first_msg, $topics, $id_topic, $target_board, $target_
 				$replaceEntries[] = array($row['id_member'], $id_topic, 0, $row['sent']);
 			}
 
-			$db->insert('replace',
+			$db->replace(
 				'{db_prefix}log_notify',
 				array('id_member' => 'int', 'id_topic' => 'int', 'id_board' => 'int', 'sent' => 'int'),
 				$replaceEntries,

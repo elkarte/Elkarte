@@ -1013,7 +1013,7 @@ function replacePermission($permChange)
 {
 	$db = database();
 
-	$db->insert('replace',
+	$db->replace(
 		'{db_prefix}permissions',
 		array('permission' => 'string', 'id_group' => 'int', 'add_deny' => 'int'),
 		$permChange,
@@ -1032,7 +1032,7 @@ function replaceBoardPermission($permChange)
 {
 	$db = database();
 
-	$db->insert('replace',
+	$db->replace(
 		'{db_prefix}board_permissions',
 		array('permission' => 'string', 'id_group' => 'int', 'add_deny' => 'int', 'id_profile' => 'int'),
 		$permChange,

@@ -158,6 +158,8 @@ class Table extends AbstractTable
 
 		$this->_alter_table($table_name, '
 			CHANGE COLUMN `' . $old_column . '` ' . $this->_db_create_query_column($column_info, $table_name));
+
+		return true;
 	}
 
 	/**
@@ -292,6 +294,7 @@ class Table extends AbstractTable
 			$this->_alter_table($table_name, '
 				ADD ' . (isset($index_info['type']) && $index_info['type'] === 'unique' ? 'UNIQUE' : 'INDEX') . ' ' . $index_info['name'] . ' (' . $columns . ')');
 		}
+		return true;
 	}
 
 	/**

@@ -20,7 +20,6 @@ namespace ElkArte\Database\Mysqli;
 use ElkArte\Cache\Cache;
 use ElkArte\Database\AbstractQuery;
 use ElkArte\Errors\Errors;
-use ElkArte\Exceptions\Exception;
 use ElkArte\ValuesContainer;
 
 /**
@@ -28,7 +27,6 @@ use ElkArte\ValuesContainer;
  */
 class Query extends AbstractQuery
 {
-
 	/**
 	 * {@inheritDoc}
 	 */
@@ -98,56 +96,15 @@ class Query extends AbstractQuery
 	/**
 	 * {@inheritDoc}
 	 */
-	public function insert($method = 'replace', $table, $columns, $data, $keys, $disable_trans = false)
+	public function insert($method, $table, $columns, $data, $keys, $disable_trans = false)
 	{
-		// With nothing to insert, simply return.
-		if (empty($data))
-		{
-			return;
-		}
-
-		// Inserting data as a single row can be done as a single array.
-		if (!is_array($data[array_rand($data)]))
-		{
-			$data = array($data);
-		}
-
-		// Replace the prefix holder with the actual prefix.
-		$table = str_replace('{db_prefix}', $this->_db_prefix, $table);
-
-		// Create the mold for a single row insert.
-		$insertData = '(';
-		foreach ($columns as $columnName => $type)
-		{
-			// Are we restricting the length?
-			if (strpos($type, 'string-') !== false)
-			{
-				$insertData .= sprintf('SUBSTRING({string:%1$s}, 1, ' . substr($type, 7) . '), ', $columnName);
-			}
-			else
-			{
-				$insertData .= sprintf('{%1$s:%2$s}, ', $type, $columnName);
-			}
-		}
-		$insertData = substr($insertData, 0, -2) . ')';
-
-		// Create an array consisting of only the columns.
-		$indexed_columns = array_keys($columns);
-
-		// Here's where the variables are injected to the query.
-		$insertRows = array();
-		foreach ($data as $dataRow)
-		{
-			$insertRows[] = $this->quote($insertData, $this->_array_combine($indexed_columns, $dataRow));
-		}
+		list($table, $indexed_columns, $insertRows) = $this->prepareInsert($table, $columns, $data);
 
 		// Determine the method of insertion.
 		$queryTitle = $method === 'replace' ? 'REPLACE' : ($method === 'ignore' ? 'INSERT IGNORE' : 'INSERT');
 
-		$skip_error = $table === $this->_db_prefix . 'log_errors';
-		$this->_skip_error = $skip_error;
 		// Do the insert.
-		$ret = $this->query('', '
+		$this->result = $this->query('', '
 			' . $queryTitle . ' INTO ' . $table . '(`' . implode('`, `', $indexed_columns) . '`)
 			VALUES
 				' . implode(',
@@ -157,12 +114,9 @@ class Query extends AbstractQuery
 			)
 		);
 
-		$this->result = new Result(
-			is_object($ret) ? $ret->getResultObject() : $ret,
-			new ValuesContainer([
-				'connection' => $this->connection
-			])
-		);
+		$this->result->updateDetails([
+			'connection' => $this->connection
+		]);
 
 		return $this->result;
 	}
@@ -170,11 +124,16 @@ class Query extends AbstractQuery
 	/**
 	 * {@inheritDoc}
 	 */
-	public function query($identifier, $db_string, $db_values = array())
+	public function replace($table, $columns, $data, $keys, $disable_trans = false)
 	{
-		// One more query....
-		$this->_query_count++;
+		return $this->insert('replace', $table, $columns, $data, $keys, $disable_trans);
+	}
 
+	/**
+	 * {@inheritDoc}
+	 */
+	protected function initialChecks($db_string, $db_values, $identifier = '')
+	{
 		// Use "ORDER BY null" to prevent Mysql doing filesorts for Group By clauses without an Order By
 		if (strpos($db_string, 'GROUP BY') !== false
 			&& strpos($db_string, 'ORDER BY') === false
@@ -191,44 +150,25 @@ class Query extends AbstractQuery
 				$db_string .= "\n\t\t\tORDER BY null";
 			}
 		}
+		return $db_string;
+	}
 
-		$db_string = $this->_prepareQuery($db_string, $db_values);
-
-		// Debugging.
-		$this->_preQueryDebug($db_string);
-
-		$this->_doSanityCheck($db_string, '\\');
-
+	protected function executeQuery($db_string)
+	{
 		if (!$this->_unbuffered)
 		{
-			$ret = @mysqli_query($this->connection, $db_string);
+			$this->_db_last_result = @mysqli_query($this->connection, $db_string);
 		}
 		else
 		{
-			$ret = @mysqli_query($this->connection, $db_string, MYSQLI_USE_RESULT);
+			$this->_db_last_result = @mysqli_query($this->connection, $db_string, MYSQLI_USE_RESULT);
 		}
 
-		if ($ret === false && !$this->_skip_error)
-		{
-			$ret = $this->error($db_string);
-		}
-
-		// Revert not to skip errors
-		if ($this->_skip_error)
-		{
-			$this->_skip_error = false;
-		}
-
-		// Debugging.
-		$this->_postQueryDebug();
-
-		$this->result = new Result($ret,
+		$this->result = new Result($this->_db_last_result,
 			new ValuesContainer([
 				'connection' => $this->connection
 			])
 		);
-
-		return $this->result;
 	}
 
 	/**
@@ -236,11 +176,15 @@ class Query extends AbstractQuery
 	 */
 	public function error($db_string)
 	{
-		global $txt, $context, $webmaster_email, $modSettings, $db_persist;
-		global $db_server, $db_user, $db_passwd, $db_name, $db_show_debug, $ssi_db_user, $ssi_db_passwd;
+		global $txt, $webmaster_email, $modSettings, $db_persist;
+		global $db_server, $db_user, $db_passwd, $db_name, $ssi_db_user, $ssi_db_passwd;
 
-		// Get the file and line numbers.
-		list ($file, $line) = $this->error_backtrace('', '', 'return', __FILE__, __LINE__);
+		// We'll try recovering the file and line number the original db query was called from.
+		list ($file, $line) = $this->backtrace_message();
+
+		// Just in case nothing can be found from debug_backtrace
+		$file = $file ?? __FILE__;
+		$line = $line ?? __LINE__;
 
 		// This is the error message...
 		$query_error = mysqli_error($this->connection);
@@ -268,32 +212,27 @@ class Query extends AbstractQuery
 				$_SESSION['query_command_denied'][$command] = $query_error;
 
 				// Let the admin know there is a command denied issue
-				if (class_exists('Errors'))
-				{
-					Errors::instance()->log_error($txt['database_error'] . ': ' . $query_error . (!empty($modSettings['enableErrorQueryLogging']) ? "\n\n$db_string" : ''), 'database', $file, $line);
-				}
+				Errors::instance()->log_error($txt['database_error'] . ': ' . $query_error . (!empty($modSettings['enableErrorQueryLogging']) ? "\n\n$db_string" : ''), 'database', $file, $line);
 
 				return false;
 			}
-		}
-
-		// Log the error.
-		if ($query_errno != 1213 && $query_errno != 1205 && class_exists('Errors'))
-		{
-			Errors::instance()->log_error($txt['database_error'] . ': ' . $query_error . (!empty($modSettings['enableErrorQueryLogging']) ? "\n\n$db_string" : ''), 'database', $file, $line);
 		}
 
 		// Database error auto fixing ;).
 		if (function_exists('\\ElkArte\\Cache\\Cache::instance()->get') && (!isset($modSettings['autoFixDatabase']) || $modSettings['autoFixDatabase'] == '1'))
 		{
 			$db_last_error = db_last_error();
+			$cache = Cache::instance();
 
 			// Force caching on, just for the error checking.
-			$old_cache = isset($modSettings['cache_enable']) ? $modSettings['cache_enable'] : null;
-			$modSettings['cache_enable'] = '1';
+			$old_cache = $cache->getLevel();
+			if ($cache->isEnabled() === false)
+			{
+				$cache->setLevel(1);
+			}
 			$temp = null;
 
-			if (Cache::instance()->getVar($temp, 'db_last_error', 600))
+			if ($cache->getVar($temp, 'db_last_error', 600))
 			{
 				$db_last_error = max($db_last_error, $temp);
 			}
@@ -346,8 +285,8 @@ class Query extends AbstractQuery
 				require_once(SUBSDIR . '/Mail.subs.php');
 
 				// Make a note of the REPAIR...
-				Cache::instance()->put('db_last_error', time(), 600);
-				if (!Cache::instance()->getVar($temp, 'db_last_error', 600))
+				$cache->put('db_last_error', time(), 600);
+				if (!$cache->getVar($temp, 'db_last_error', 600))
 				{
 					logLastDatabaseError();
 				}
@@ -437,36 +376,13 @@ class Query extends AbstractQuery
 			}
 		}
 
-		// Nothing's defined yet... just die with it.
-		if (empty($context) || empty($txt))
+		// Log the error.
+		if ($query_errno != 1213 && $query_errno != 1205)
 		{
-			die($query_error);
+			Errors::instance()->log_error($txt['database_error'] . ': ' . $query_error . (!empty($modSettings['enableErrorQueryLogging']) ? "\n\n$db_string" : ''), 'database', $file, $line);
 		}
 
-		// Show an error message, if possible.
-		$context['error_title'] = $txt['database_error'];
-		if (allowedTo('admin_forum'))
-		{
-			$message = nl2br($query_error) . '<br />' . $txt['file'] . ': ' . $file . '<br />' . $txt['line'] . ': ' . $line;
-		}
-		else
-		{
-			$message = $txt['try_again'];
-		}
-
-		// Add database version that we know of, for the admin to know. (and ask for support)
-		if (allowedTo('admin_forum'))
-		{
-			$message .= '<br /><br />' . sprintf($txt['database_error_versions'], $modSettings['elkVersion']);
-		}
-
-		if (allowedTo('admin_forum') && $db_show_debug === true)
-		{
-			$message .= '<br /><br />' . nl2br($db_string);
-		}
-
-		// It's already been logged... don't log it again.
-		throw new Exception($message, false);
+		$this->throwError($db_string, $query_error, $file, $line);
 	}
 
 	/**
