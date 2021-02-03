@@ -147,7 +147,7 @@ class MenuTest extends BaseMenuTest
 	private $options = [];
 	private $menuObjects = [];
 
-	public function setUp()
+	protected function setUp(): void
 	{
 		global $context;
 
@@ -283,7 +283,7 @@ class MenuTest extends BaseMenuTest
 	/**
 	 * Always clean everything!
 	 */
-	public function tearDown()
+	protected function tearDown(): void
 	{
 		parent::tearDown();
 
@@ -326,19 +326,15 @@ class MenuTest extends BaseMenuTest
 		return $include_data;
 	}
 
-	/**
-	 * @expectedException Exception
-	 */
 	public function testEmpty()
 	{
+		$this->expectException(Exception::class);
 		(new Menu())->prepareMenu();
 	}
 
-	/**
-	 * @expectedException Exception
-	 */
 	public function testFail()
 	{
+		$this->expectException(Exception::class);
 		User::$info->is_admin = false;
 		User::$info->permissions = [];
 

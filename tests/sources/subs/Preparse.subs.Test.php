@@ -13,7 +13,7 @@ class PrepaseBBC extends TestCase
 	 *
 	 * setUp() is run automatically by the testing framework before each test method.
 	 */
-	public function setUp()
+	protected function setUp(): void
 	{
 		require_once(SUBSDIR . '/Post.subs.php');
 
@@ -57,7 +57,7 @@ class PrepaseBBC extends TestCase
 		);
 	}
 
-	public function tearDown()
+	protected function tearDown(): void
 	{
 		User::$info = null;
 	}

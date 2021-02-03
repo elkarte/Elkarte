@@ -14,7 +14,7 @@ class TestCurlFetchWebdata extends TestCase
 	 *
 	 * setUp() is run automatically by the testing framework before each test method.
 	 */
-	public function setUp()
+	protected function setUp(): void
 	{
 		// url
 		// post data
@@ -55,7 +55,7 @@ class TestCurlFetchWebdata extends TestCase
 	 * cleanup data we no longer need at the end of the tests in this class.
 	 * tearDown() is run automatically by the testing framework after each test method.
 	 */
-	public function tearDown()
+	protected function tearDown(): void
 	{
 	}
 
@@ -76,7 +76,7 @@ class TestCurlFetchWebdata extends TestCase
 			if (!empty($testcase[1]))
 				$this->assertEquals($testcase[1], $curl->result('code'));
 			if (!empty($testcase[2]))
-				$this->assertContains($testcase[2], $curl->result('body'));
+				$this->assertStringContainsString($testcase[2], $curl->result('body'));
 		}
 	}
 
@@ -97,7 +97,7 @@ class TestCurlFetchWebdata extends TestCase
 			if (!empty($testcase[2]))
 				$this->assertEquals($testcase[2], $curl->result('code'));
 			if (!empty($testcase[3]))
-				$this->assertContains($testcase[3], $curl->result('body'));
+				$this->assertStringContainsString($testcase[3], $curl->result('body'));
 		}
 	}
 }

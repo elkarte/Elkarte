@@ -14,7 +14,7 @@ class TestProfileInfo extends ElkArteCommonSetupTest
 	/**
 	 * Initialize or add whatever necessary for these tests
 	 */
-	public function setUp()
+	protected function setUp(): void
 	{
 		parent::setUp();
 
@@ -39,7 +39,7 @@ class TestProfileInfo extends ElkArteCommonSetupTest
 
 		// Lets see some items loaded into context, there should some data
 		$this->assertNotNull($context);
-		$this->assertEquals($context['can_see_ip'], true);
-		$this->assertEquals($modSettings['jquery_include_ui'], true);
+		$this->assertEquals(true, $context['can_see_ip']);
+		$this->assertEquals(true, $modSettings['jquery_include_ui']);
 	}
 }

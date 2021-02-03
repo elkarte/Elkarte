@@ -8,9 +8,9 @@ use PHPUnit\Framework\TestCase;
 class MockMemcached extends \ElkArte\Cache\CacheMethod\Memcached
 {
 	/**
-	 * Server count.
+	 * Server array for count.
 	 *
-	 * @return int
+	 * @return string[]
 	 */
 	public function getNumServers()
 	{
@@ -31,7 +31,7 @@ class TestCache extends TestCase
 	 *
 	 * setUp() is run automatically by the testing framework before each test method.
 	 */
-	public function setUp()
+	protected function setUp(): void
 	{
 	}
 

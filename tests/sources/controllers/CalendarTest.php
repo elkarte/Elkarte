@@ -16,7 +16,7 @@ class TestCalendar extends ElkArteCommonSetupTest
 	/**
 	 * Initialize or add whatever necessary for these tests
 	 */
-	public function setUp()
+	protected function setUp(): void
 	{
 		// Load in the common items so the system thinks we have an active login
 		parent::setUp();
@@ -31,6 +31,7 @@ class TestCalendar extends ElkArteCommonSetupTest
 	public function testActionCalendar()
 	{
 		// Get the controller
+		$check = '';
 		$controller = new Calendar(new EventManager());
 		try
 		{
@@ -40,7 +41,7 @@ class TestCalendar extends ElkArteCommonSetupTest
 		{
 			$check = $e->getMessage();
 		}
-		$this->assertContains('You cannot access the calendar right now because it is disabled', $check);
+		$this->assertStringContainsString('You cannot access the calendar right now because it is disabled', $check);
 
 		// Try again with it on
 		// Unfortunately the Calendar_Event.class.test has a section of mock functions which will cause

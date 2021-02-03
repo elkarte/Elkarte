@@ -14,7 +14,7 @@ class TestHTML2Md extends TestCase
 	 *
 	 * setUp() is run automatically by the testing framework before each test method.
 	 */
-	public function setUp()
+	protected function setUp(): void
 	{
 		global $txt;
 
@@ -85,7 +85,7 @@ Gracias'
 		);
 	}
 
-	public function tearDown()
+	protected function tearDown(): void
 	{
 		global $txt;
 

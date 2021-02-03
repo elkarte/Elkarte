@@ -15,7 +15,7 @@ class TestPoll extends TestCase
 	 * Prepare some test data, to use in these tests.
 	 * setUp() is run automatically by the testing framework before each test method.
 	 */
-	public function setUp()
+	protected function setUp(): void
 	{
 		// make sure a topic exists
 		require_once(SUBSDIR . '/Poll.subs.php');
@@ -56,7 +56,7 @@ class TestPoll extends TestCase
 	 * Cleanup data we no longer need at the end of the tests in this class.
 	 * tearDown() is run automatically by the testing framework after each test method.
 	 */
-	public function tearDown()
+	protected function tearDown(): void
 	{
 		// remove temporary test data
 		require_once(SUBSDIR . '/Topic.subs.php');
@@ -85,15 +85,15 @@ class TestPoll extends TestCase
 		// get some values from it
 		$pollinfo = pollInfoForTopic($this->id_topic);
 
-		$this->assertEquals($pollinfo['id_member_started'], 1);
+		$this->assertEquals(1, $pollinfo['id_member_started']);
 		$this->assertEquals($pollinfo['question'], $question);
-		$this->assertEquals($pollinfo['max_votes'], 1); // the default value
-		$this->assertEquals($pollinfo['poll_starter'], 0);
+		$this->assertEquals(1, $pollinfo['max_votes']); // the default value
+		$this->assertEquals(0, $pollinfo['poll_starter']);
 
 		// lets use pollStarters() and test its result
 		list($topic_starter, $poll_starter) = pollStarters($this->id_topic);
-		$this->assertEquals($topic_starter, 1);
-		$this->assertEquals($poll_starter, 0);
+		$this->assertEquals(1, $topic_starter);
+		$this->assertEquals(0, $poll_starter);
 	}
 
 	/**
@@ -127,10 +127,10 @@ class TestPoll extends TestCase
 		$pollOptions = pollOptions($id_poll);
 		$this->assertEquals($pollOptions[0]['label'], $options[0]);
 		$this->assertEquals($pollOptions[1]['label'], $options[1]);
-		$this->assertEquals($pollOptions[0]['id_choice'], 0);
-		$this->assertEquals($pollOptions[1]['id_choice'], 1);
-		$this->assertEquals($pollOptions[0]['votes'], 0);
-		$this->assertEquals($pollOptions[1]['votes'], 0);
+		$this->assertEquals(0, $pollOptions[0]['id_choice']);
+		$this->assertEquals(1, $pollOptions[1]['id_choice']);
+		$this->assertEquals(0, $pollOptions[0]['votes']);
+		$this->assertEquals(0, $pollOptions[1]['votes']);
 
 	}
 

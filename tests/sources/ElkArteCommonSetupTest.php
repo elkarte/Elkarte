@@ -22,7 +22,7 @@ abstract class ElkArteCommonSetupTest extends TestCase
 	/**
 	 * Initialize or add whatever necessary for these tests
 	 */
-	public function setUp()
+	protected function setUp(): void
 	{
 		global $modSettings, $settings;
 
@@ -94,7 +94,7 @@ abstract class ElkArteCommonSetupTest extends TestCase
 	 *
 	 * tearDown() is run automatically by the testing framework after each test method.
 	 */
-	public function tearDown()
+	protected function tearDown(): void
 	{
 		global $modSettings, $settings;
 

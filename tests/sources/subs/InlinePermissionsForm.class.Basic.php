@@ -21,7 +21,7 @@ class TestInlinePermissionsForm extends TestCase
 	 *
 	 * setUp() is run automatically by the testing framework before each test method.
 	 */
-	public function setUp()
+	protected function setUp(): void
 	{
 		theme()->getTemplates()->loadLanguageFile('Admin', 'english', true, true);
 

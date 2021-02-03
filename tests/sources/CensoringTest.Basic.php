@@ -15,7 +15,7 @@ class CensoringTest extends TestCase
 	 * prepare what is necessary to use in these tests.
 	 * setUp() is run automatically by the testing framework before each test method.
 	 */
-	public function setUp()
+	protected function setUp(): void
 	{
 		$this->tests = array(
 			'this' => array('this' => 'not_this'),
@@ -29,11 +29,11 @@ class CensoringTest extends TestCase
 	 * cleanup data we no longer need at the end of the tests in this class.
 	 * tearDown() is run automatically by the testing framework after each test method.
 	 */
-	public function tearDown()
+	protected function tearDown(): void
 	{
 	}
 
-	function testWholeWordsCaseSensitive()
+	public function testWholeWordsCaseSensitive()
 	{
 		global $modSettings;
 
@@ -60,7 +60,7 @@ class CensoringTest extends TestCase
 		}
 	}
 
-	function testWholeWordsCaseInsensitive()
+	public function testWholeWordsCaseInsensitive()
 	{
 		global $modSettings;
 
@@ -87,7 +87,7 @@ class CensoringTest extends TestCase
 		}
 	}
 
-	function testNotWholeWordsCaseSensitive()
+	public function testNotWholeWordsCaseSensitive()
 	{
 		global $modSettings;
 
@@ -114,7 +114,7 @@ class CensoringTest extends TestCase
 		}
 	}
 
-	function testNotWholeWordsCaseInsensitive()
+	public function testNotWholeWordsCaseInsensitive()
 	{
 		global $modSettings;
 

@@ -17,7 +17,7 @@ class TestAuth extends ElkArteCommonSetupTest
 	/**
 	 * Initialize or add whatever necessary for these tests
 	 */
-	public function setUp()
+	protected function setUp(): void
 	{
 		// Load in the common items so the system thinks we have an active login
 		parent::setUp();
@@ -42,7 +42,7 @@ class TestAuth extends ElkArteCommonSetupTest
 		$controller->action_index();
 
 		// Check that a token was set.
-		$this->assertEquals(strlen($context['login_token']), 32);
+		$this->assertEquals(32, strlen($context['login_token']));
 		$this->assertNotNull($context['login_token_var']);
 
 		// Lets try to login with some bogus stuff
@@ -53,7 +53,7 @@ class TestAuth extends ElkArteCommonSetupTest
 		$controller->action_login2();
 
 		// We should fail
-		$this->assertEquals($context['login_errors'][0], 'That username does not exist.');
+		$this->assertEquals('That username does not exist.', $context['login_errors'][0]);
 	}
 
 	/**
@@ -67,6 +67,6 @@ class TestAuth extends ElkArteCommonSetupTest
 		$controller = new Auth(new EventManager());
 		$controller->action_kickguest();
 
-		$this->assertEquals($context['page_title'], 'Log in');
+		$this->assertEquals('Log in', $context['page_title']);
 	}
 }

@@ -18,7 +18,7 @@ class TestModerationCenterController extends ElkArteCommonSetupTest
 	/**
 	 * Initialize or add whatever necessary for these tests
 	 */
-	public function setUp()
+	protected function setUp(): void
 	{
 		global $context, $modSettings;
 
@@ -61,7 +61,7 @@ class TestModerationCenterController extends ElkArteCommonSetupTest
 		$controller->action_index();
 
 		$this->assertEquals($context[$context['moderation_menu_name']]['tab_data']['title'], $txt['moderation_center']);
-		$this->assertEquals($context['linktree'][1]['name'], 'My Community');
+		$this->assertEquals('My Community', $context['linktree'][1]['name']);
 	}
 
 	/**
@@ -82,7 +82,7 @@ class TestModerationCenterController extends ElkArteCommonSetupTest
 		$controller->setUser(User::$info);
 		$controller->action_index();
 
-		$this->assertEquals($context['total_reports'], 1, $context['total_reports']);
+		$this->assertEquals(1, $context['total_reports'], $context['total_reports']);
 		$this->assertEquals('some needless complaint', $context['reports'][1]['comments'][0]['message'], $context['reports'][1]['comments'][0]['message']);
 	}
 

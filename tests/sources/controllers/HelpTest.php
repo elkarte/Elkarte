@@ -18,7 +18,7 @@ class TestHelpController extends ElkArteCommonSetupTest
 	/**
 	 * Initialize or add whatever necessary for these tests
 	 */
-	public function setUp()
+	protected function setUp(): void
 	{
 		// Load in the common items so the system thinks we have an active login
 		parent::setUp();
@@ -29,7 +29,7 @@ class TestHelpController extends ElkArteCommonSetupTest
 		theme()->getTemplates()->loadLanguageFile('Help', 'english', false, true);
 	}
 
-	public function tearDown()
+	protected function tearDown(): void
 	{
 		parent::tearDown();
 	}
@@ -47,7 +47,7 @@ class TestHelpController extends ElkArteCommonSetupTest
 		$controller->action_index();
 
 		// Check that the send topic template was set
-		$this->assertEquals($context['sub_template'], 'manual');
+		$this->assertEquals('manual', $context['sub_template']);
 	}
 
 	/**
@@ -64,6 +64,6 @@ class TestHelpController extends ElkArteCommonSetupTest
 		$controller->setUser(User::$info);
 		$controller->action_quickhelp();
 
-		$this->assertEquals($context['help_text'], 'See like posts stats', $context['help_text']);
+		$this->assertEquals('See like posts stats', $context['help_text'], $context['help_text']);
 	}
 }

@@ -15,9 +15,9 @@ class TestFiles extends TestCase
 	 *
 	 * setUp() is run automatically by the testing framework before each test method.
 	 */
-	public function setUp()
+	protected function setUp(): void
 	{
-		$this->_ourFiles = array();
+		$this->_ourFiles = [];
 
 		// Not using bootstrap for this static test
 		if (!defined('BOARDDIR'))
@@ -47,7 +47,7 @@ class TestFiles extends TestCase
 	 *
 	 * tearDown() is run automatically by the testing framework after each test method.
 	 */
-	public function tearDown()
+	protected function tearDown(): void
 	{
 	}
 

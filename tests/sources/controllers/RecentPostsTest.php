@@ -14,7 +14,7 @@ class TestRecentPosts extends ElkArteCommonSetupTest
 	/**
 	 * Initialize or add whatever necessary for these tests
 	 */
-	public function setUp()
+	protected function setUp(): void
 	{
 		parent::setUp();
 
@@ -36,7 +36,7 @@ class TestRecentPosts extends ElkArteCommonSetupTest
 
 		// Lets see some items loaded into context, there should be the first post
 		$this->assertNotNull($context);
-		$this->assertEquals($context['posts'][1]['subject'], 'Welcome to ElkArte!');
-		$this->assertEquals($context['sub_template'], 'recent');
+		$this->assertEquals('Welcome to ElkArte!', $context['posts'][1]['subject']);
+		$this->assertEquals('recent', $context['sub_template']);
 	}
 }

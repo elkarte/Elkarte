@@ -18,7 +18,7 @@ class TestEmailUserController extends ElkArteCommonSetupTest
 	/**
 	 * Initialize or add whatever necessary for these tests
 	 */
-	public function setUp()
+	protected function setUp(): void
 	{
 		global $topic;
 
@@ -33,7 +33,7 @@ class TestEmailUserController extends ElkArteCommonSetupTest
 		$topic = 1;
 	}
 
-	public function tearDown()
+	protected function tearDown(): void
 	{
 		global $topic;
 
@@ -56,7 +56,7 @@ class TestEmailUserController extends ElkArteCommonSetupTest
 		$controller->action_index();
 
 		// Check that the send topic template was set
-		$this->assertEquals($context['sub_template'], 'send_topic');
+		$this->assertEquals('send_topic', $context['sub_template']);
 
 		// Now try to send it, but without filling out the form we get a error instead
 		$req = HttpReq::instance();
@@ -88,7 +88,7 @@ class TestEmailUserController extends ElkArteCommonSetupTest
 		$controller->action_reporttm();
 
 		// We are ready to show the report forum
-		$this->assertEquals($context['sub_template'], 'report');
+		$this->assertEquals('report', $context['sub_template']);
 
 		// Send the form, you should see a sendmail error in the travis log, ignore it.
 		$req->post->save = 1;

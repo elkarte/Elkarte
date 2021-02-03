@@ -1,6 +1,7 @@
 <?php
 
 use ElkArte\Cache\Cache;
+use ElkArte\HttpReq;
 use ElkArte\Search\Search;
 use ElkArte\Search\SearchApiWrapper;
 use ElkArte\Search\SearchParams;
@@ -24,7 +25,7 @@ class TestSearchclass extends TestCase
 	 *
 	 * setUpBeforeClass() is run automatically by the testing framework just once before any test method.
 	 */
-	public static function setUpBeforeClass()
+	public static function setUpBeforeClass(): void
 	{
 		// This is here to cheat with allowedTo
 		User::$info = new ValuesContainer([
@@ -157,7 +158,7 @@ class TestSearchclass extends TestCase
 	/**
 	 * Initialize or add whatever necessary for these tests
 	 */
-	public function setUp()
+	protected function setUp(): void
 	{
 		require_once(SUBSDIR . '/Auth.subs.php');
 
@@ -225,8 +226,6 @@ class TestSearchclass extends TestCase
 	{
 		global $modSettings, $context;
 
-		$req = \ElkArte\HttpReq::instance();
-
 		$recentPercentage = 0.30;
 		$maxMembersToSearch = 500;
 		$humungousTopicPosts = 200;
@@ -236,14 +235,15 @@ class TestSearchclass extends TestCase
 			'search_selection' => 'all',
 			'advanced' => 0
 		];
-		$req->query->search = $search_terms['search'];
+
+		$req = HttpReq::instance();
+		$req->query['search'] = $search_terms['search'];
 
 		$search = new Search();
-		$search->setWeights(new WeightFactors($modSettings, true));
+		$search->setWeights(new WeightFactors($modSettings, 1));
 		$search_params = new SearchParams('');
 		$search_params->merge($search_terms, $recentPercentage, $maxMembersToSearch);
 		$search->setParams($search_params, !empty($modSettings['search_simple_fulltext']));
-		$search->getSearchArray();
 		$context['params'] = $search->compileURLparams();
 
 		$search_config = new ValuesContainer(array(
@@ -290,7 +290,7 @@ class TestSearchclass extends TestCase
 	 *
 	 * tearDown() is run automatically by the testing framework after each test method.
 	 */
-	public function tearDown()
+	protected function tearDown(): void
 	{
 	}
 }

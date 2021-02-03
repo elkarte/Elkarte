@@ -17,7 +17,7 @@ class TestSettingsForm extends TestCase
 	 *
 	 * setUp() is run automatically by the testing framework before each test method.
 	 */
-	public function setUp()
+	protected function setUp(): void
 	{
 		theme()->getTemplates()->loadLanguageFile('Admin', 'english', true, true);
 
@@ -152,7 +152,7 @@ class TestSettingsForm extends TestCase
 	 *
 	 * tearDown() is run automatically by the testing framework after each test method.
 	 */
-	public function tearDown()
+	protected function tearDown(): void
 	{
 		$db = database();
 		$request = $db->query('', '

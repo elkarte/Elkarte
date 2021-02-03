@@ -13,7 +13,7 @@ class TestBBCHTML extends TestCase
 	 *
 	 * setUp() is run automatically by the testing framework before each test method.
 	 */
-	public function setUp()
+	protected function setUp(): void
 	{
 		$GLOBALS['modSettings']['user_access_mentions'] = array();
 		$GLOBALS['modSettings']['enablePostHTML'] = 1;

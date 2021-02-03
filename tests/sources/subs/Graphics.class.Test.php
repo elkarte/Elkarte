@@ -15,7 +15,7 @@ class TestGraphics extends TestCase
 	 *
 	 * setUp() is run automatically by the testing framework before each test method.
 	 */
-	public function setUp()
+	protected function setUp(): void
 	{
 		$this->image_testcases = array(
 			array(
@@ -49,7 +49,7 @@ class TestGraphics extends TestCase
 	 * cleanup data we no longer need at the end of the tests in this class.
 	 * tearDown() is run automatically by the testing framework after each test method.
 	 */
-	public function tearDown()
+	protected function tearDown(): void
 	{
 	}
 
@@ -76,7 +76,7 @@ class TestGraphics extends TestCase
 		$modSettings['attachment_autorotate'] = 1;
 
 		$success = Gd2::canUse();
-		$this->assertEquals($success, true, 'GD NOT INSTALLED');
+		$this->assertEquals(true, $success, 'GD NOT INSTALLED');
 
 		foreach ($this->image_testcases as $image)
 		{
@@ -84,7 +84,7 @@ class TestGraphics extends TestCase
 			$success = $current_image->createThumbnail(100, 100, '/tmp/test', $image['format']);
 
 			// Check for correct results
-			$this->assertEquals($success !== false, true, $image['url']);
+			$this->assertEquals(true, $success !== false, $image['url']);
 		}
 	}
 
@@ -94,6 +94,6 @@ class TestGraphics extends TestCase
 		$success = $images->generate(100, 75, 'png');
 		$success = !empty($success);
 
-		$this->assertEquals($success, true);
+		$this->assertEquals(true, $success);
 	}
 }

@@ -186,7 +186,7 @@ class DispatcherTest extends TestCase
 	/**
 	 * prepare some test data, to use in these tests
 	 */
-	public function setUp()
+	protected function setUp(): void
 	{
 		// set up some data for testing
 	}
@@ -194,7 +194,7 @@ class DispatcherTest extends TestCase
 	/**
 	 * cleanup data we no longer need at the end of the tests in this class.
 	 */
-	public function tearDown()
+	protected function tearDown(): void
 	{
 		// remove useless data
 	}

@@ -19,7 +19,7 @@ class TestGroups extends ElkArteCommonSetupTest
 	/**
 	 * Initialize or add whatever necessary for these tests
 	 */
-	public function setUp()
+	protected function setUp(): void
 	{
 		global 	$modSettings;
 
@@ -41,7 +41,7 @@ class TestGroups extends ElkArteCommonSetupTest
 		$this->controller->pre_dispatch();
 	}
 
-	public function tearDown()
+	protected function tearDown(): void
 	{
 		global $modSettings;
 

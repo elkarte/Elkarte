@@ -20,7 +20,7 @@ class TestErrorContext extends TestCase
 		$this->assertTrue($errorContext->hasErrors());
 		$this->assertTrue($errorContext->hasError('test'));
 		$this->assertFalse($errorContext->hasError('test2'));
-		$this->assertEquals($errorContext->getErrorType(), ErrorContext::MINOR);
+		$this->assertEquals(ErrorContext::MINOR, $errorContext->getErrorType());
 
 		// Now the error can be removed
 		$errorContext->removeError('test');
