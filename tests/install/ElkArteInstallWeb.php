@@ -9,14 +9,16 @@
  *
  */
 
+use PHPUnit\Extensions\Selenium2TestCase;
+
 /**
  * ElkArteInstallWeb uses Selenium 2 for testing installation.
  *
- * It extends PHPUnit_Extensions_Selenium2TestCase and provides additional functions
+ * It extends Selenium2TestCase and provides additional functions
  * as well as sets up the common environments for the tests
  *
  */
-class ElkArteInstallWeb extends ElkArteWebTest
+class ElkArteInstallWeb extends ElkArteWebSupport
 {
 	protected $forumPath = '.';
 	protected $backupGlobalsBlacklist = ['user_info'];
@@ -27,7 +29,7 @@ class ElkArteInstallWeb extends ElkArteWebTest
 	 *
 	 * This method is used to configure the Selenium Server session, url/browser
 	 */
-	public function setUp()
+	protected function setUp(): void
 	{
 		// Set the browser to be used by Selenium, it must be available on localhost
 		$this->setBrowser($this->browser);
@@ -43,13 +45,13 @@ class ElkArteInstallWeb extends ElkArteWebTest
 		// Missing files warning
 		$this->url('install/install.php');
 		$this->assertEquals('ElkArte Installer', $this->title());
-		$this->assertContains('It looks like Settings.php and/or Settings_bak.php are missing', $this->byCssSelector('#main_screen form .information')->text());
+		$this->assertStringContainsString('It looks like Settings.php and/or Settings_bak.php are missing', $this->byCssSelector('#main_screen form .information')->text());
 
 		// Warning gone
 		$this->prepareSettings();
 		$this->url('install/install.php');
 		$this->assertEquals('ElkArte Installer', $this->title());
-		$this->assertNotContains('It looks like Settings.php and/or Settings_bak.php are missing', $this->byCssSelector('#main_screen form')->text());
+		$this->assertStringNotContainsString('It looks like Settings.php and/or Settings_bak.php are missing', $this->byCssSelector('#main_screen form')->text());
 
 		// Let's start
 		$this->clickit('#contbutt');
@@ -62,24 +64,24 @@ class ElkArteInstallWeb extends ElkArteWebTest
 		$this->byId('db_name_input')->clear();
 		$this->byId('db_name_input')->value('elkarte_test');
 		$this->clickit('#contbutt');
-		$this->assertEquals('Forum Settings', $this->byCssSelector('#main_screen > h2')->text());
+		$this->assertEquals('Forum Settings', $this->byCssSelector('#main_screen > h2')->text(), $this->source());
 
 		// Let the install create the DB
 		$this->clickit('#contbutt');
 
 		// Hang tight while the server does its thing
 		sleep(15);
-		$this->assertEquals('Populated Database', $this->byCssSelector('#main_screen > h2')->text());
+		$this->assertEquals('Populated Database', $this->byCssSelector('#main_screen > h2')->text(), $this->source());
 
 		// All that is left is to create our admin account
 		$this->clickit('#contbutt');
-		$this->assertEquals('Create Your Account', $this->byCssSelector('#main_screen > h2')->text());
+		$this->assertEquals('Create Your Account', $this->byCssSelector('#main_screen > h2')->text(), $this->source());
 		$this->byCssSelector('#username')->value($this->adminuser);
 		$this->byName('password1')->value($this->adminpass);
 		$this->byName('password2')->value($this->adminpass);
 		$this->byCssSelector('#email')->value('an_email_address@localhost.tld');
 		$this->clickit('#contbutt');
-		$this->assertContains('Congratulations', $this->byCssSelector('#main_screen > h2')->text());
+		$this->assertStringContainsString('Congratulations', $this->byCssSelector('#main_screen > h2')->text(), $this->source());
 
 		// Move the install dir so we can run more tests without redirecting back to install/update
 		rename($this->forumPath  . '/install', $this->forumPath  . '/installdone');
@@ -102,7 +104,16 @@ class ElkArteInstallWeb extends ElkArteWebTest
 	 */
 	public function clickit($selector)
 	{
-		$this->byCssSelector($selector)->click();
-		sleep(3);
+		$this->timeouts()->implicitWait(10000);
+		try
+		{
+			$selector = $this->byCssSelector($selector);
+			$selector->click();
+			sleep(1);
+		}
+		catch (Selenium2TestCase\WebDriverException $e)
+		{
+			// Pass through
+		}
 	}
 }

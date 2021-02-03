@@ -7,7 +7,7 @@
  *
  * @backupGlobals disabled
  */
-class TestRegisterController extends ElkArteWebTest
+class SupportRegisterController extends ElkArteWebSupport
 {
 	/*
 	 * Used by teardown();
@@ -18,7 +18,7 @@ class TestRegisterController extends ElkArteWebTest
 	/**
 	 * Initialize or add whatever is necessary for these tests
 	 */
-	public function setUp()
+	protected function setUp(): void
 	{
 		global $modSettings;
 
@@ -42,7 +42,7 @@ class TestRegisterController extends ElkArteWebTest
 	 *
 	 * tearDown() is run automatically by the testing framework after each test method.
 	 */
-	public function tearDown()
+	protected function tearDown(): void
 	{
 		// Restore it to default
 		updateSettings(array('registration_method' => $this->registration_method));
@@ -82,7 +82,7 @@ class TestRegisterController extends ElkArteWebTest
 		$this->clickit('input[name="regSubmit"]');
 
 		// Should fail for speed reasons
-		$this->assertContains('You went through the registration process too quickly', $this->byCssSelector('div.errorbox')->text());
+		$this->assertStringContainsString('You went through the registration process too quickly', $this->byCssSelector('div.errorbox')->text());
 	}
 
 	/**

@@ -9,13 +9,17 @@
  *
  */
 
+use ElkArte\User;
+use ElkArte\UserInfo;
+use PHPUnit\Extensions\Selenium2TestCase;
+
 /**
- * ElkArteWebTest is the base class for Selenium 2 functional test case classes.
+ * ElkArteWebSupport is the base class for Selenium 2 functional test case classes.
  *
- * It extends PHPUnit_Extensions_Selenium2TestCase and provides additional functions
+ * It extends Selenium2TestCase and provides additional functions
  * as well as sets up the common environments for all tests
  */
-abstract class ElkArteWebTest extends PHPUnit_Extensions_Selenium2TestCase
+abstract class ElkArteWebSupport extends Selenium2TestCase
 {
 	protected $coverageScriptUrl = 'http://127.0.0.1/phpunit_coverage.php';
 	protected $backupGlobalsBlacklist = ['user_info'];
@@ -34,10 +38,10 @@ abstract class ElkArteWebTest extends PHPUnit_Extensions_Selenium2TestCase
 	 *
 	 * This method is used to configure the Selenium Server session, url/browser
 	 */
-	public function setUp()
+	protected function setUp(): void
 	{
 		// Set the browser to be used by Selenium, it must be available on localhost
-		$this->keysHolder = new PHPUnit_Extensions_Selenium2TestCase_KeysHolder();
+		$this->keysHolder = new Selenium2TestCase\KeysHolder();
 		$this->setBrowser($this->browser);
 		$this->setDesiredCapabilities(array('javascript_enabled' => true, 'javascript' => 1));
 		$this->setPort($this->port);
@@ -49,7 +53,7 @@ abstract class ElkArteWebTest extends PHPUnit_Extensions_Selenium2TestCase
 	/**
 	 * Any common teardown functions
 	 */
-	public function tearDown()
+	protected function tearDown(): void
 	{
 		$this->timeouts()->implicitWait(0);
 
@@ -104,7 +108,7 @@ abstract class ElkArteWebTest extends PHPUnit_Extensions_Selenium2TestCase
 		}
 
 		// Should see the admin button now
-		$this->assertContains('Admin', $this->byCssSelector('#button_admin > a')->text());
+		$this->assertStringContainsString('Admin', $this->byCssSelector('#button_admin > a')->text());
 	}
 
 	/**
@@ -138,7 +142,7 @@ abstract class ElkArteWebTest extends PHPUnit_Extensions_Selenium2TestCase
 		}
 
 		// Should see the admin main menu button
-		$this->assertContains('Admin', $this->byCssSelector('#button_admin > a')->text());
+		$this->assertStringContainsString('Admin', $this->byCssSelector('#button_admin > a')->text());
 	}
 
 	/**
@@ -192,7 +196,7 @@ abstract class ElkArteWebTest extends PHPUnit_Extensions_Selenium2TestCase
 			$selector->click();
 			sleep(1);
 		}
-		catch (PHPUnit_Extensions_Selenium2TestCase_WebDriverException $exception)
+		catch (Selenium2TestCase\WebDriverException $exception)
 		{
 			// continue on
 		}
@@ -234,8 +238,8 @@ abstract class ElkArteWebTest extends PHPUnit_Extensions_Selenium2TestCase
 			'permissions' => ['admin_forum'],
 		];
 
-		\ElkArte\User::$info = new \ElkArte\UserInfo($userData);
-		\ElkArte\User::load();
+		User::$info = new UserInfo($userData);
+		User::load();
 
 		new ElkArte\Themes\ThemeLoader();
 	}
