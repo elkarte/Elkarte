@@ -2138,7 +2138,7 @@ class InstallInstructions_install_1_1
 				array('reply_only'),
 				array('read_only'),
 			),
-			array('id_group')
+			array('id_profile')
 		);
 	}
 

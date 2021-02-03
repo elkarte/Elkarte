@@ -97,7 +97,7 @@ class Query extends AbstractQuery
 
 		if ($method === 'ignore')
 		{
-			$this->on_conflict = 'ON CONFLICT (' . implode(', ', $keys) . ') DO NOTHING';
+			$this->on_conflict = ' ON CONFLICT (' . implode(', ', $keys) . ') DO NOTHING';
 		}
 
 		list($table, $indexed_columns, $insertRows) = $this->prepareInsert($table, $columns, $data);
