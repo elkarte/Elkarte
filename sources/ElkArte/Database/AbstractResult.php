@@ -86,7 +86,9 @@ abstract class AbstractResult
 	}
 
 	/**
-	 * update details
+	 * Update details
+	 *
+	 * @param mixed[] $details
 	 */
 	public function updateDetails($details)
 	{

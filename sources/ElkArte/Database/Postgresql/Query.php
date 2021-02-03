@@ -18,7 +18,6 @@ namespace ElkArte\Database\Postgresql;
 
 use ElkArte\Database\AbstractQuery;
 use ElkArte\Errors\Errors;
-use ElkArte\ValuesContainer;
 
 /**
  * PostgreSQL database class, implements database class to control mysql functions

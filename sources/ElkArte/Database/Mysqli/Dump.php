@@ -367,7 +367,7 @@ class Dump extends AbstractDump
 				}
 				else
 				{
-					$field_list[] = '\'' . $this->escape_string($item) . '\'';
+					$field_list[] = '\'' . $this->_db->escape_string($item) . '\'';
 				}
 			}
 

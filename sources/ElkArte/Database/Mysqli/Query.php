@@ -96,7 +96,7 @@ class Query extends AbstractQuery
 	/**
 	 * {@inheritDoc}
 	 */
-	public function insert($method = 'replace', $table, $columns, $data, $keys, $disable_trans = false)
+	public function insert($method, $table, $columns, $data, $keys, $disable_trans = false)
 	{
 		list($table, $indexed_columns, $insertRows) = $this->prepareInsert($table, $columns, $data);
 

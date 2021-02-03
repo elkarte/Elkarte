@@ -36,7 +36,7 @@ abstract class AbstractQuery implements QueryInterface
 	/**
 	 * Current connection to the database
 	 *
-	 * @var \ElkArte\Database\ConnectionInterface
+	 * @var resource
 	 */
 	protected $connection = null;
 
@@ -386,10 +386,9 @@ abstract class AbstractQuery implements QueryInterface
 	 * @param string $error_message
 	 * @param string $log_message
 	 * @param string|bool $error_type
-	 * @param string|null $file
-	 * @param int|null $line
+	 * @param string|null $file_fallback
+	 * @param int|null $line_fallback
 	 *
-	 * @return array
 	 * @throws \ElkArte\Exceptions\Exception
 	 */
 	protected function error_backtrace($error_message, $log_message = '', $error_type = false, $file_fallback = null, $line_fallback = null)
@@ -693,6 +692,7 @@ abstract class AbstractQuery implements QueryInterface
 	 * @param string $query_error
 	 * @param string $file
 	 * @param int $line
+	 * @throws \ElkArte\Exceptions\Exception
 	 */
 	protected function throwError($db_string, $query_error, $file, $line)
 	{
@@ -736,6 +736,7 @@ abstract class AbstractQuery implements QueryInterface
 	 * @param mixed[] $columns
 	 * @param mixed[] $data
 	 * @return mixed[]
+	 * @throws \Exception
 	 */
 	protected function prepareInsert($table, $columns, $data)
 	{
@@ -1126,7 +1127,6 @@ abstract class AbstractQuery implements QueryInterface
 	 * Tracks the initial status (time, file/line, query) for performance evaluation.
 	 *
 	 * @param string $db_string
-	 * @throws \ElkArte\Exceptions\Exception
 	 */
 	protected function _preQueryDebug($db_string)
 	{

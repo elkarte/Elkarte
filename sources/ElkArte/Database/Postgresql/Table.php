@@ -265,6 +265,7 @@ class Table extends AbstractTable
 					ALTER COLUMN ' . $column_info['name'] . ' SET DEFAULT nextval(\'' . $table_name . '_seq\')');
 			}
 		}
+		return true;
 	}
 
 	/**
@@ -428,6 +429,7 @@ class Table extends AbstractTable
 				)
 			);
 		}
+		return true;
 	}
 
 	/**
