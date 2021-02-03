@@ -21,4 +21,4 @@ require_once(TESTDIR . '/ElkTestingMysql.php');
 
 // Lets install the db
 $setup = new ElkTestingMysql();
-$setup->init();
+return $setup->init();

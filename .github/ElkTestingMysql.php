@@ -71,6 +71,8 @@ class DbTable_MySQLi_Install extends DbTable_MySQL_Install
 
 /**
  * Extend ElkTestingSetup with MySql values
+ *
+ * return int 0|1
  */
 class ElkTestingMysql extends ElkTestingSetup
 {
@@ -89,8 +91,10 @@ class ElkTestingMysql extends ElkTestingSetup
 		$link = mysqli_connect($this->_db_server, $this->_db_user, $this->_db_passwd);
 		if (!$link)
 		{
-			die('Could not connect: ' . mysqli_error($link));
+			echo 'Could not connect: ' . mysqli_error($link);
+			return 1;
 		}
+
 		printf("MySQL server version: %s\n", mysqli_get_server_info($link));
 
 		try
@@ -101,14 +105,20 @@ class ElkTestingMysql extends ElkTestingSetup
 		}
 		catch (Exception $e)
 		{
-			die($e->getMessage());
+			echo $e->getMessage();
+			return 1;
 		}
 
 		// Load the mysql install queries
 		$this->load_queries(BOARDDIR . '/install/install_' . DB_SCRIPT_VERSION . '.php');
-		$this->run_queries();
+
+		$result = $this->run_queries();
+
+		if (empty($result))
+			return 1;
 
 		// Prepare Settings.php, add a member, set time
 		$this->prepare();
+		return 0;
 	}
 }
