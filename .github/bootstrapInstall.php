@@ -14,6 +14,7 @@
  */
 
 use ElkArte\ext\Composer\Autoload\ClassLoader;
+use PHPUnit\Extensions\Selenium2TestCase;
 
 $mySource = './sources';
 $_SERVER['SERVER_NAME'] = '127.0.0.1';
@@ -23,11 +24,11 @@ $_SERVER['REMOTE_ADDR'] = '127.0.0.1';
 require_once($mySource . '/Subs.php');
 require_once($mySource . '/Load.php');
 require_once($mySource . '/ext/ClassLoader.php');
-require_once('./tests/sources/controllers/ElkArteWebTest.php');
+require_once('./tests/sources/controllers/ElkArteWebSupport.php');
 
 $loader = new ClassLoader();
 $loader->setPsr4('ElkArte\\', $mySource . '/ElkArte');
 $loader->register();
 
 // If we are running functional tests as well
-PHPUnit_Extensions_Selenium2TestCase::shareSession(true);
+Selenium2TestCase::shareSession(true);
