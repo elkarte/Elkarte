@@ -5,11 +5,12 @@
 	"type": "project",
 	"keywords": ["elkarte", "forum", "discussion", "php", "community"],
 	"homepage": "https://www.elkarte.net",
+	"readme": "https://github.com/elkarte/Elkarte/README.md",
 	"license": "BSD-3-Clause",
-	"repository": [
+	"repositories": [
 		{
-			"type": "git",
-			"url": "git+https://github.com/elkarte/Elkarte.git"
+			"type": "vcs",
+			"url": "https://github.com/elkarte/Elkarte.git"
 		}
 	],
 	"authors": [
@@ -51,7 +52,6 @@
 		"ext-imap": "*",
 		"ext-memcached": "*",
 		"ext-zend-opcache": "*",
-		"ext-apc": "*",
 		"ext-mbstring": "*",
 		"ext-apcu": "*",
 		"ext-libxml": "*",
@@ -62,11 +62,10 @@
 		"ext-imagick": "*"
 	},
 	"require-dev": {
-		"phpunit/phpunit-selenium": "*",
-		"phpunit/dbunit": "*",
-		"phpunit/phpunit": "~7",
-		"myclabs/deep-copy": "1.8.0"
-	},
+		"phpunit/phpunit-selenium": "8.*",
+		"phpunit/phpunit": "~8",
+		"myclabs/deep-copy": "1.10.2"
+    },
 	"autoload": {
 		"psr-4": { "ElkArte\\": ["sources/ElkArte"] }
 	}
