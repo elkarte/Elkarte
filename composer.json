@@ -7,12 +7,6 @@
 	"homepage": "https://www.elkarte.net",
 	"readme": "https://github.com/elkarte/Elkarte/README.md",
 	"license": "BSD-3-Clause",
-	"repositories": [
-		{
-			"type": "vcs",
-			"url": "https://github.com/elkarte/Elkarte.git"
-		}
-	],
 	"authors": [
 		{
 			"name": "ElkArte Forum Contributors",
