@@ -44,6 +44,7 @@ jobs:
         uses: actions/checkout@v2
         with:
           repository: elkarte/elkarte
+          fetch-depth: 10
           ref: ${{ env.ELKARTE_BRANCH }}
           path: elkarte
 
@@ -109,6 +110,7 @@ jobs:
         uses: actions/checkout@v2
         with:
           repository: elkarte/elkarte
+          fetch-depth: 10
           ref: ${{ env.ELKARTE_BRANCH }}
           path: elkarte
 
@@ -183,6 +185,7 @@ jobs:
         uses: actions/checkout@v2
         with:
           repository: elkarte/elkarte
+          fetch-depth: 10
           ref: ${{ env.ELKARTE_BRANCH }}
           path: elkarte
 
@@ -261,6 +264,7 @@ jobs:
         uses: actions/checkout@v2
         with:
           repository: elkarte/elkarte
+          fetch-depth: 10
           ref: ${{ env.ELKARTE_BRANCH }}
           path: elkarte
 
