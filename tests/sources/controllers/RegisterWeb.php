@@ -140,7 +140,7 @@ class SupportRegisterController extends ElkArteWebSupport
 		$passwordInput->value('user49');
 
 		// Submit it
-		$this->clickit('.login > div > dl > input[type="submit"]');
+		$this->byId('frmLogin')->submit();
 		$this->url('index.php?action=profile;area=deleteaccount');
 
 		// Delete the account by using the main profile area.

@@ -138,7 +138,7 @@ abstract class ElkArteWebSupport extends Selenium2TestCase
 			$passwordInput->value($this->adminpass);
 
 			// Submit it
-			$this->clickit('.login > div > dl > input[type="submit"]');
+			$this->byId('frmLogin')->submit();
 		}
 
 		// Should see the admin main menu button
@@ -189,10 +189,21 @@ abstract class ElkArteWebSupport extends Selenium2TestCase
 	 */
 	public function clickit($selector)
 	{
-		$this->timeouts()->implicitWait(6000);
+		$this->timeouts()->implicitWait(10000);
 		try
 		{
-			$selector = $this->byCssSelector($selector);
+			$elements = explode(' > ', $selector);
+			if (count($elements) > 1)
+			{
+				$parent = $this->byCssSelector($elements[0]);
+				$child = $parent->element($this->using('css selector')->value($elements[1]));
+				$selector = $child;
+			}
+			else
+			{
+				$selector = $this->byCssSelector($elements[0]);
+			}
+
 			$selector->click();
 		}
 		catch (PHPUnit\Extensions\Selenium2TestCase\WebDriverException $exception)
