@@ -49,7 +49,7 @@ else
 fi
 
 # Agents will merge all coverage data...
-if [[ "$CI_EVENT_NAME" == "pull_request" ]]
+if [[ "${GITHUB_EVENT_NAME}" == "pull_request" ]]
 then
     bash <(curl -s https://codecov.io/bash) -f "/tmp/coverage.clover"
 fi
