@@ -17,7 +17,7 @@ class TestDraft extends ElkArteCommonSetupTest
 	/**
 	 * Initialize or add whatever necessary for these tests
 	 */
-	function setUp()
+	protected function setUp(): void
 	{
 		// Load in the common items so the system thinks we have an active login
 		parent::setUp();
@@ -43,7 +43,7 @@ class TestDraft extends ElkArteCommonSetupTest
 		$controller->action_post();
 
 		// Check that we set the sub template
-		$this->assertEquals($context['sub_template'], 'showDrafts');
+		$this->assertEquals('showDrafts', $context['sub_template']);
 	}
 
 	/**
@@ -60,6 +60,6 @@ class TestDraft extends ElkArteCommonSetupTest
 		$controller->action_showPMDrafts();
 
 		// Check that we set the sub template
-		$this->assertEquals($context['sub_template'], 'showPMDrafts');
+		$this->assertEquals('showPMDrafts', $context['sub_template']);
 	}
 }

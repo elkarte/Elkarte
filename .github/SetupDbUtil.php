@@ -63,6 +63,7 @@ class ElkTestingSetup
 	public function run_queries()
 	{
 		$exists = array();
+		$success = true;
 		foreach ($this->_queries['tables'] as $table_method)
 		{
 			$table_name = substr($table_method, 6);
@@ -80,7 +81,7 @@ class ElkTestingSetup
 				continue;
 			}
 
-			$this->_install_instance->{$table_method}();
+			$success .= $this->_install_instance->{$table_method}();
 		}
 
 		foreach ($this->_queries['inserts'] as $insert_method)
@@ -92,14 +93,16 @@ class ElkTestingSetup
 				continue;
 			}
 
-			$this->_install_instance->{$insert_method}();
+			$success .= $this->_install_instance->{$insert_method}();
 		}
 
 		// Errors here are ignored
 		foreach ($this->_queries['others'] as $other_method)
 		{
-			$this->_install_instance->{$other_method}();
+			$success .= $this->_install_instance->{$other_method}();
 		}
+
+		return $success;
 	}
 
 	/**
@@ -185,14 +188,15 @@ class ElkTestingSetup
 	{
 		$file = file_get_contents(BOARDDIR . '/Settings.php');
 
-		$file = str_replace(array(
-			'$boardurl = \'http://127.0.0.1/elkarte\';',
-			'$db_type = \'mysql\';',
-			'$db_name = \'elkarte\';',
-			'$db_user = \'root\';',
-			'$db_prefix = \'elkarte_\';',
-			'$db_passwd = \'\';',
-		),
+		$file = str_replace(
+			array(
+				'$boardurl = \'http://127.0.0.1/elkarte\';',
+				'$db_type = \'mysql\';',
+				'$db_name = \'elkarte\';',
+				'$db_user = \'root\';',
+				'$db_prefix = \'elkarte_\';',
+				'$db_passwd = \'\';',
+			),
 			array(
 				'$boardurl = \'' . $this->_boardurl . '\';',
 				'$db_type = \'' . $this->_db_type . '\';',
@@ -219,8 +223,6 @@ class ElkTestingSetup
 	{
 		$this->prepare_settings();
 		$this->update();
-
-		//$this->createTests();
 	}
 
 	/**

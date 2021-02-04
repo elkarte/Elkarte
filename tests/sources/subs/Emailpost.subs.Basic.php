@@ -10,7 +10,7 @@ class TestEmailpost extends TestCase
 	 *
 	 * setUp() is run automatically by the testing framework before each test method.
 	 */
-	public function setUp()
+	protected function setUp(): void
 	{
 		require_once(SUBSDIR . '/Emailpost.subs.php');
 

@@ -64,6 +64,8 @@ class DbTable_PostgreSQL_Install extends \ElkArte\Database\Postgresql\Table
 
 /**
  * Extend ElkTestingSetup with PostgreSQL values
+ *
+ * return int 0|1
  */
 class Elk_Testing_psql extends ElkTestingSetup
 {
@@ -83,8 +85,10 @@ class Elk_Testing_psql extends ElkTestingSetup
 		$link = pg_connect('host=' . $this->_db_server . ' dbname=' . $this->_db_name . ' user=\'' . $this->_db_user . '\' password=\'' . $this->_db_passwd . '\'');
 		if (!$link)
 		{
-			die('Could not connect: ' . pg_last_error($link));
+			echo 'Could not connect: ' . pg_last_error($link);
+			return 1;
 		}
+
 		$v = pg_version($link);
 		printf("PostgreSQL server version: %s\n", $v['client']);
 
@@ -97,7 +101,8 @@ class Elk_Testing_psql extends ElkTestingSetup
 		}
 		catch (\Exception $e)
 		{
-			die($e->getMessage());
+			echo $e->getMessage();
+			return 1;
 		}
 
 		// Load the postgre install sql queries
@@ -108,9 +113,14 @@ class Elk_Testing_psql extends ElkTestingSetup
 
 		// Now the rest normally
 		$this->load_queries(BOARDDIR . '/install/install_' . DB_SCRIPT_VERSION . '.php');
-		$this->run_queries();
+		$result = $this->run_queries();
+
+		if (empty($result))
+			return 1;
+
 
 		// Prepare Settings.php, add a member, set time
 		$this->prepare();
+		return 0;
 	}
 }

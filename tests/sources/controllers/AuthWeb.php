@@ -7,9 +7,9 @@
  *
  * @backupGlobals disabled
  */
-class TestAuthController extends ElkArteWebTest
+class SupportAuthController extends ElkArteWebSupport
 {
-	public function setUp()
+	protected function setUp(): void
 	{
 		parent::setUp();
 

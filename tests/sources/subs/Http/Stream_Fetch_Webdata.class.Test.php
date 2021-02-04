@@ -14,7 +14,7 @@ class TestStreamFetchWebdata extends TestCase
 	 *
 	 * setUp() is run automatically by the testing framework before each test method.
 	 */
-	public function setUp()
+	protected function setUp(): void
 	{
 		// url
 		// post data
@@ -61,7 +61,7 @@ class TestStreamFetchWebdata extends TestCase
 	 * cleanup data we no longer need at the end of the tests in this class.
 	 * tearDown() is run automatically by the testing framework after each test method.
 	 */
-	public function tearDown()
+	protected function tearDown(): void
 	{
 	}
 
@@ -83,7 +83,7 @@ class TestStreamFetchWebdata extends TestCase
 				$this->assertEquals($testcase[1], $fsock->result('code'), 'FetchCodeError:: ' . $testcase[0]);
 
 			if (!empty($testcase[2]))
-				$this->assertContains($testcase[2], $fsock->result('body'), 'FetchBodyError:: ' . $testcase[0]);
+				$this->assertStringContainsString($testcase[2], $fsock->result('body'), 'FetchBodyError:: ' . $testcase[0]);
 
 			if (!empty($testcase[3]))
 				$this->assertEquals($testcase[3], $fsock->result('redirects'), 'FectchRedirectError:: ' . $testcase[0]);
@@ -108,7 +108,7 @@ class TestStreamFetchWebdata extends TestCase
 				$this->assertEquals($testcase[2], $fsock->result('code'), 'PostCodeError:: ' . $testcase[0]);
 
 			if (!empty($testcase[3]))
-				$this->assertContains($testcase[3], $fsock->result('body'), 'PostBodyError:: ' . $testcase[0]);
+				$this->assertStringContainsString($testcase[3], $fsock->result('body'), 'PostBodyError:: ' . $testcase[0]);
 		}
 	}
 }

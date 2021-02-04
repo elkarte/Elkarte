@@ -12,7 +12,7 @@ class TestDatabase extends TestCase
 	 *
 	 * setUp() is run automatically by the testing framework before each test method.
 	 */
-	public function setUp()
+	protected function setUp(): void
 	{
 	}
 
@@ -44,7 +44,7 @@ class TestDatabase extends TestCase
 		define('SUBSDIR', $sourcedir . '/subs');
 		define('ADDONSDIR', $sourcedir . '/addons');
 
-		require_once('/.github/bootstrap.php');
+		require_once('.github/bootstrap.php');
 	}
 
 	/**
@@ -152,8 +152,6 @@ class TestDatabase extends TestCase
 	 */
 	public function testTablesPopulated()
 	{
-		// $this->bootstrap();
-
 		$db = database();
 
 		$known_inserts = [

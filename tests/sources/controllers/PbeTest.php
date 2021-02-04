@@ -18,7 +18,7 @@ class TestPBE extends TestCase
 	 *
 	 * setUp() is run automatically by the testing framework before each test method.
 	 */
-	public function setUp()
+	protected function setUp(): void
 	{
 		require_once(SUBSDIR . '/Emailpost.subs.php');
 
@@ -113,7 +113,7 @@ Regards, The ElkArte Community
 	 *
 	 * tearDown() is run automatically by the testing framework after each test method.
 	 */
-	public function tearDown()
+	protected function tearDown(): void
 	{
 	}
 
@@ -145,7 +145,7 @@ Regards, The ElkArte Community
 		$this->assertEquals('cd8c399768891330804a1d2fc613ccf3', $email_message->message_key);
 
 		// The plain and HTML messages
-		$this->assertContains('<strong>Testing</strong>', $email_message->body);
+		$this->assertStringContainsString('<strong>Testing</strong>', $email_message->body);
 		$this->assertRegExp('/Testing\n/', $email_message->plain_body);
 
 		// The IP
@@ -153,6 +153,6 @@ Regards, The ElkArte Community
 
 		// And some MD as well
 		$markdown = pbe_load_text($email_message->html_found, $email_message, array());
-		$this->assertContains('[b]Testing[/b]', $markdown);
+		$this->assertStringContainsString('[b]Testing[/b]', $markdown);
 	}
 }

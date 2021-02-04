@@ -7,7 +7,7 @@
  *
  * @backupGlobals disabled
  */
-class TestManageMembergroupsController extends ElkArteWebTest
+class SupportManageMembergroupsController extends ElkArteWebSupport
 {
 	/**
 	 * Add a group
@@ -38,7 +38,7 @@ class TestManageMembergroupsController extends ElkArteWebTest
 
 		// We should be back at the group listing, the new group should be there
 		$this->assertEquals("Manage Membergroups", $this->title());
-		$this->assertContains('Test Group', $this->byCssSelector('#list_regular_membergroups_list_9')->text());
+		$this->assertStringContainsString('Test Group', $this->byCssSelector('#list_regular_membergroups_list_9')->text());
 	}
 
 	/**
@@ -59,6 +59,6 @@ class TestManageMembergroupsController extends ElkArteWebTest
 			)
 		);
 		$this->clickit('#button_logout > a');
-		$this->assertContains('Log In', $this->byCssSelector('#button_login > a')->text());
+		$this->assertStringContainsString('Log In', $this->byCssSelector('#button_login > a')->text());
 	}
 }

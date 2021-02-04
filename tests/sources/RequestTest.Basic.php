@@ -15,7 +15,7 @@ class TestRequest extends TestCase
 	 *
 	 * setUp() is run automatically by the testing framework before each test method.
 	 */
-	public function setUp()
+	protected function setUp(): void
 	{
 		// clean slate please.
 		$_REQUEST = array();
@@ -30,7 +30,7 @@ class TestRequest extends TestCase
 	 *
 	 * tearDown() is run automatically by the testing framework after each test method.
 	 */
-	public function tearDown()
+	protected function tearDown(): void
 	{
 		// Remove useless data.
 		$_REQUEST = array();
@@ -49,14 +49,14 @@ class TestRequest extends TestCase
 
 		// We expect a nice board number
 		$this->assertNotNull($board);
-		$this->assertInternalType('numeric', $board);
-		$this->assertEquals($board, 0);
+		$this->assertIsNumeric($board);
+		$this->assertEquals(0, $board);
 
 		// We expect $topic initialized
 		$this->assertTrue(isset($GLOBALS['topic']));
 		$topic = $GLOBALS['topic'];
-		$this->assertInternalType('numeric', $topic);
-		$this->assertEquals($topic, 0);
+		$this->assertIsNumeric($topic);
+		$this->assertEquals(0, $topic);
 	}
 
 	/**
@@ -71,13 +71,13 @@ class TestRequest extends TestCase
 
 		// We expect a nice board number
 		$this->assertNotNull($board);
-		$this->assertInternalType('numeric', $board);
-		$this->assertEquals($board, 34);
+		$this->assertIsNumeric($board);
+		$this->assertEquals(34, $board);
 
 		// $topic stripped down
 		$topic = $GLOBALS['topic'];
-		$this->assertInternalType('numeric', $topic);
-		$this->assertEquals($topic, 0);
+		$this->assertIsNumeric($topic);
+		$this->assertEquals(0, $topic);
 	}
 
 	/**
@@ -91,19 +91,19 @@ class TestRequest extends TestCase
 		$board = $GLOBALS['board'];
 
 		// We expect a nice board number
-		$this->assertInternalType('numeric', $board);
-		$this->assertEquals($board, 3);
+		$this->assertIsNumeric($board);
+		$this->assertEquals(3, $board);
 
 		// $start should've been found
 		$this->assertTrue(isset($_REQUEST['start']));
 		$start = $_REQUEST['start'];
-		$this->assertInternalType('numeric', $start);
-		$this->assertEquals($start, 10);
+		$this->assertIsNumeric($start);
+		$this->assertEquals(10, $start);
 
 		// $topic is set...
 		$topic = $GLOBALS['topic'];
-		$this->assertInternalType('numeric', $topic);
-		$this->assertEquals($topic, 7);
+		$this->assertIsNumeric($topic);
+		$this->assertEquals(7, $topic);
 	}
 
 	/**
@@ -116,19 +116,19 @@ class TestRequest extends TestCase
 		$board = $GLOBALS['board'];
 
 		// We *still* expect a nice board number
-		$this->assertInternalType('numeric', $board);
-		$this->assertEquals($board, 0);
+		$this->assertIsNumeric($board);
+		$this->assertEquals(0, $board);
 
 		// And a start
 		$this->assertTrue(isset($_REQUEST['start']));
 		$start = $_REQUEST['start'];
-		$this->assertInternalType('numeric', $start);
-		$this->assertEquals($start, 0);
+		$this->assertIsNumeric($start);
+		$this->assertEquals(0, $start);
 
 		// And the thread as $topic
 		$topic = $GLOBALS['topic'];
-		$this->assertInternalType('numeric', $topic);
-		$this->assertEquals($topic, 4);
+		$this->assertIsNumeric($topic);
+		$this->assertEquals(4, $topic);
 	}
 
 	/**
@@ -144,6 +144,6 @@ class TestRequest extends TestCase
 		$this->assertTrue($is_string);
 
 		// We expect 'action' as string
-		$this->assertInternalType('string', $_GET['action']);
+		$this->assertIsString($_GET['action']);
 	}
 }

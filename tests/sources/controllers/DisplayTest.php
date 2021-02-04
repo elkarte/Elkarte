@@ -18,7 +18,7 @@ class TestDisplayIndex extends ElkArteCommonSetupTest
 	/**
 	 * Initialize or add whatever necessary for these tests
 	 */
-	public function setUp()
+	protected function setUp(): void
 	{
 		// Load in the common items so the system thinks we have an active login
 		parent::setUp();

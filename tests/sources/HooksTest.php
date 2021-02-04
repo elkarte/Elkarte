@@ -28,7 +28,7 @@ class TestHooks extends TestCase
 	 * prepare what is necessary to use in these tests.
 	 * setUp() is run automatically by the testing framework before each test method.
 	 */
-	public function setUp()
+	protected function setUp(): void
 	{
 		$this->_tests = array(
 			// A simple one, just the function, default (i.e. in theory permanent)
@@ -54,7 +54,7 @@ class TestHooks extends TestCase
 	 * cleanup data we no longer need at the end of the tests in this class.
 	 * tearDown() is run automatically by the testing framework after each test method.
 	 */
-	public function tearDown()
+	protected function tearDown(): void
 	{
 	}
 
@@ -170,7 +170,7 @@ class TestHooks extends TestCase
 	 * and finds if the specified one exists
 	 *
 	 * @param string[] $expected_hook - the call and file (optional) expected
-	 * @param string[] $hooks - Array oh hooks found in the db or $modSettings
+	 * @param mixed $hooks - Array oh hooks found in the db or $modSettings
 	 * @return bool
 	 */
 	private function _find_hook($expected_hook, $hooks)

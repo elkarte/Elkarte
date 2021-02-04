@@ -16,7 +16,7 @@ class TestLikes extends TestCase
 	 *
 	 * setUp() is run automatically by the testing framework before each test method.
 	 */
-	public function setUp()
+	protected function setUp(): void
 	{
 		// Lets make sure a topic exists by creating one
 		require_once(SUBSDIR . '/Likes.subs.php');
@@ -60,7 +60,7 @@ class TestLikes extends TestCase
 	 *
 	 * tearDown() is run automatically by the testing framework after each test method.
 	 */
-	public function tearDown()
+	protected function tearDown(): void
 	{
 		// remove temporary test data
 		require_once(SUBSDIR . '/Topic.subs.php');
@@ -82,11 +82,11 @@ class TestLikes extends TestCase
 
 		// Get the number of likes, better be one
 		$likescount = messageLikeCount($this->id_topic);
-		$this->assertEquals($likescount, 1);
+		$this->assertEquals(1, $likescount);
 
 		// Load it in, should be able to find this as well
 		$likes = loadLikes($this->id_topic, false);
-		$this->assertEquals($likes[$this->id_topic]['count'], 1);
+		$this->assertEquals(1, $likes[$this->id_topic]['count']);
 	}
 
 	/**
@@ -101,6 +101,6 @@ class TestLikes extends TestCase
 
 		// get the number of likes, better be none now
 		$likescount = messageLikeCount($this->id_topic);
-		$this->assertEquals($likescount, 0);
+		$this->assertEquals(0, $likescount);
 	}
 }

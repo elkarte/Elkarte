@@ -7,7 +7,7 @@
  *
  * @backupGlobals disabled
  */
-class TestManageMembersController extends ElkArteWebTest
+class SupportManageMembersController extends ElkArteWebSupport
 {
 	/**
 	 * Register some members, user0, user1, user2
@@ -52,16 +52,16 @@ class TestManageMembersController extends ElkArteWebTest
 		$this->assertEquals('Manage Members', $this->title());
 
 		// Let's do it: approve/delete...
-		$this->assertContains('new accounts', $this->byCssSelector('.generic_menu li a:last-child')->text());
+		$this->assertStringContainsString('new accounts', $this->byCssSelector('.generic_menu li a:last-child')->text());
 		$this->clickit('.generic_menu li a:last-child');
-		$this->assertContains($mname, $this->byCssSelector('#list_approve_list_0')->text());
+		$this->assertStringContainsString($mname, $this->byCssSelector('#list_approve_list_0')->text());
 		$this->clickit('#list_approve_list_0 input');
 		$this->clickit('select[name=todo] option[value=' . $el . ']');
 
 		// htmlunit does not seem to work with the alert code
 		if (in_array($this->browser, array('firefox', 'chrome')))
 		{
-			$this->assertContains('all selected members?', $this->alertText());
+			$this->assertStringContainsString('all selected members?', $this->alertText());
 			$this->acceptAlert();
 		}
 		else
@@ -94,7 +94,7 @@ class TestManageMembersController extends ElkArteWebTest
 		$this->clickit('#activated-1');
 		$this->clickit('#activated-2');
 		$this->clickit('input[value=Search]');
-		$this->assertContains('user1', $this->byId('member_list')->text());
+		$this->assertStringContainsString('user1', $this->byId('member_list')->text());
 	}
 
 	/**
@@ -110,6 +110,6 @@ class TestManageMembersController extends ElkArteWebTest
 
 		// Should be gone.
 		$this->url('index.php?action=admin;area=viewmembers;sa=all');
-		$this->assertNotContains('user0', $this->byId('member_list')->text());
+		$this->assertStringNotContainsString('user0', $this->byId('member_list')->text());
 	}
 }

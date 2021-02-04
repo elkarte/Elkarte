@@ -17,7 +17,7 @@ class TestEmailPostController extends ElkArteCommonSetupTest
 	/**
 	 * Initialize or add whatever necessary for these tests
 	 */
-	public function setUp()
+	protected function setUp(): void
 	{
 		global $modSettings;
 
@@ -123,7 +123,7 @@ Regards, The ElkArte Community
 		$result = $controller->action_pbe_preview($this->data);
 
 		// Check that the preview was set
-		$this->assertEquals($result['to'], 'email@testadmin.tld', $result['to']);
+		$this->assertEquals('email@testadmin.tld', $result['to'], $result['to']);
 		$this->assertStringContainsString('[b]Testing[/b]', $result['body'], $result['body']);
 	}
 
@@ -137,7 +137,7 @@ Regards, The ElkArte Community
 		$controller->action_pbe_post($this->data, false);
 
 		// We will fail since the key does not exist
-		$this->assertEquals($_SESSION['email_error'], 'It appears that you already replied to this email.  If you need to modify your post please use the web interface, if you are making another reply to this topic please reply to the latest notification', $_SESSION['email_error']);
+		$this->assertEquals('It appears that you already replied to this email.  If you need to modify your post please use the web interface, if you are making another reply to this topic please reply to the latest notification', $_SESSION['email_error'], $_SESSION['email_error']);
 	}
 
 	/**
@@ -150,6 +150,6 @@ Regards, The ElkArte Community
 		$controller->action_pbe_topic($this->data);
 
 		// We will fail since the key does not exist
-		$this->assertEquals($_SESSION['email_error'], 'Attempted to start a new topic to a non existing board, potential hacking attempt', $_SESSION['email_error']);
+		$this->assertEquals('Attempted to start a new topic to a non existing board, potential hacking attempt', $_SESSION['email_error'], $_SESSION['email_error']);
 	}
 }

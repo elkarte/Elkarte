@@ -19,7 +19,7 @@ class TestAdminSearch extends TestCase
 	/**
 	 * Cleans up the environment after running a test.
 	 */
-	protected function tearDown()
+	protected function tearDown(): void
 	{
 		User::$info->permissions = array();
 		global $context, $user_info;
@@ -48,8 +48,8 @@ class TestAdminSearch extends TestCase
 	{
 		global $context, $scripturl;
 
-		$this->assertContains($scripturl, $url);
-		$this->assertContains($context['search_term'], $name);
+		$this->assertStringContainsString($scripturl, $url);
+		$this->assertStringContainsString($context['search_term'], $name);
 	}
 
 	public function settingsProvider()

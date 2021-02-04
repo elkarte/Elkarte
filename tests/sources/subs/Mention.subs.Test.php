@@ -25,7 +25,7 @@ class TestMentions extends TestCase
 	 *
 	 * setUp() is run automatically by the testing framework before each test method.
 	 */
-	public function setUp()
+	protected function setUp(): void
 	{
 		global $modSettings;
 
@@ -41,7 +41,7 @@ class TestMentions extends TestCase
 				'emailweekly' => "1"
 			],
 			'likemsg' => [
-				'notification' => \ElkArte\Notifications::DEFAULT_LEVEL
+				'notification' => "2"
 			],
 			"mentionmem" => [
 				"notification" => "1",
@@ -108,24 +108,24 @@ class TestMentions extends TestCase
 			'{db_prefix}notifications_pref',
 			array(
 				'id_member' => 'int',
+				'mention_type' => 'string-12',
 				'notification_type' => 'string',
-				'mention_type' => 'string',
 			),
 			array(
 				array(
 					'id_member' => 1,
-					'notification_type' => json_encode(['email']),
-					'mention_type' => 'mentionmem'
+					'mention_type' => 'mentionmem',
+					'notification_type' => json_encode(['email'])
 				),
 				array(
 					'id_member' => 2,
+					'mention_type' => 'mentionmem',
 					'notification_type' => json_encode(['notification', 'email']),
-					'mention_type' => 'mentionmem'
 				),
 				array(
 					'id_member' => 2,
+					'mention_type' => 'likemsg',
 					'notification_type' => json_encode(['email']),
-					'mention_type' => 'likemsg'
 				),
 			),
 			array('id_member', 'mention_type')
@@ -137,7 +137,7 @@ class TestMentions extends TestCase
 	 *
 	 * tearDown() is run automatically by the testing framework after each test method.
 	 */
-	public function tearDown()
+	protected function tearDown(): void
 	{
 		global $modSettings;
 
@@ -146,7 +146,8 @@ class TestMentions extends TestCase
 		User::$info = null;
 
 		$db = database();
-		$db->query('', 'DELETE FROM {db_prefix}notifications_pref', []);
+		$db->query('', '
+			DELETE FROM {db_prefix}notifications_pref', []);
 	}
 
 	/**
@@ -161,16 +162,21 @@ class TestMentions extends TestCase
 			'mentionmem',
 			$this->id_msg,
 			$this->_posterOptions['id'],
-			array('id_members' => array($id_member), 'subject' => $this->_msgOptions['subject'], 'notifier_data' => $this->_posterOptions)
+			array(
+				'id_members' => [$id_member],
+				'subject' => $this->_msgOptions['subject'],
+				'notifier_data' => $this->_posterOptions,
+				'status' => 'new'
+			)
 		));
 
 		$notifier->send();
 
 		// Get the number of mentions, should be one
 		$count = countUserMentions(false, 'mentionmem', $id_member);
-		$this->assertEquals(1, $count);
+		$this->assertEquals(1, $count, 'Mention count wrong, expected 1 and found ' . $count);
 
-		// Check this is thier mention
+		// Check this is their mention
 		$this->assertTrue(findMemberMention(1, $id_member));
 	}
 

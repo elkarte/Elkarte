@@ -15,7 +15,7 @@ class TestLike extends ElkArteCommonSetupTest
 	/**
 	 * Initialize or add whatever necessary for these tests
 	 */
-	public function setUp()
+	protected function setUp(): void
 	{
 		parent::setUp();
 

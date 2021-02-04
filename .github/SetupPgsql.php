@@ -19,4 +19,4 @@ require_once(TESTDIR . '/SetupDbUtil.php');
 require_once(TESTDIR . '/ElkTestingPsql.php');
 
 $setup = new Elk_Testing_psql();
-$setup->init();
+return $setup->init();

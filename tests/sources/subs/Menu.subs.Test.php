@@ -14,7 +14,7 @@ class TestMenuSubs extends ElkArteCommonSetupTest
 	 *
 	 * setUp() is run automatically by the testing framework before each test method.
 	 */
-	public function setUp()
+	protected function setUp(): void
 	{
 		global $context;
 
@@ -103,7 +103,7 @@ class TestMenuSubs extends ElkArteCommonSetupTest
 	 * cleanup data we no longer need at the end of the tests in this class.
 	 * tearDown() is run automatically by the testing framework after each test method.
 	 */
-	public function tearDown()
+	protected function tearDown(): void
 	{
 		parent::tearDown();
 		destroyMenu('last');

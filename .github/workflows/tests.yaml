@@ -43,7 +43,8 @@ jobs:
       - name: Checkout ElkArte
         uses: actions/checkout@v2
         with:
-          repository: spuds/elkarte
+          repository: elkarte/elkarte
+          fetch-depth: 10
           ref: ${{ env.ELKARTE_BRANCH }}
           path: elkarte
 
@@ -82,9 +83,9 @@ jobs:
           PHP_VERSION: ${{ matrix.php }}
         run: .github/setup-selenium.sh $DB $PHP_VERSION
         working-directory: ./elkarte
-        continue-on-error: false
+        continue-on-error: true
 
-      - name: Server Error Log # may need to use continue-on-error: true above to get here
+      - name: Server Error Log
         env:
           DB: ${{ matrix.db }}
           PHP_VERSION: ${{ matrix.php }}
@@ -109,6 +110,7 @@ jobs:
         uses: actions/checkout@v2
         with:
           repository: elkarte/elkarte
+          fetch-depth: 10
           ref: ${{ env.ELKARTE_BRANCH }}
           path: elkarte
 
@@ -183,6 +185,7 @@ jobs:
         uses: actions/checkout@v2
         with:
           repository: elkarte/elkarte
+          fetch-depth: 10
           ref: ${{ env.ELKARTE_BRANCH }}
           path: elkarte
 
@@ -261,6 +264,7 @@ jobs:
         uses: actions/checkout@v2
         with:
           repository: elkarte/elkarte
+          fetch-depth: 10
           ref: ${{ env.ELKARTE_BRANCH }}
           path: elkarte
 

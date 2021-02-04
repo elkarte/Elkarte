@@ -18,7 +18,7 @@ class TestMarkReadController extends ElkArteCommonSetupTest
 	/**
 	 * Initialize or add whatever necessary for these tests
 	 */
-	public function setUp()
+	protected function setUp(): void
 	{
 		// Load in the common items so the system thinks we have an active login
 		parent::setUp();
@@ -27,7 +27,7 @@ class TestMarkReadController extends ElkArteCommonSetupTest
 		new ElkArte\Themes\ThemeLoader();
 	}
 
-	public function tearDown()
+	protected function tearDown(): void
 	{
 		parent::tearDown();
 		unset($board, $topic);
@@ -46,7 +46,7 @@ class TestMarkReadController extends ElkArteCommonSetupTest
 		$result = $controller->action_markboards();
 
 		// Check that the url was set
-		$this->assertEquals($result, '', $result);
+		$this->assertEquals('', $result, $result);
 	}
 
 	/**
@@ -63,7 +63,7 @@ class TestMarkReadController extends ElkArteCommonSetupTest
 		$result = $controller->action_markreplies();
 
 		// Check that the result was set
-		$this->assertEquals($result, 'action=unreadreplies', $result);
+		$this->assertEquals('action=unreadreplies', $result, $result);
 	}
 
 	/**
@@ -85,7 +85,7 @@ class TestMarkReadController extends ElkArteCommonSetupTest
 		$result = $controller->action_marktopic();
 
 		// Check that result was set
-		$this->assertEquals($result, 'board=1.0', $result);
+		$this->assertEquals('board=1.0', $result, $result);
 	}
 
 	/**
@@ -110,6 +110,6 @@ class TestMarkReadController extends ElkArteCommonSetupTest
 		$result = $controller->action_markasread();
 
 		// Check that result was set
-		$this->assertEquals($result, 'board=1.0', $result);
+		$this->assertEquals('board=1.0', $result, $result);
 	}
 }

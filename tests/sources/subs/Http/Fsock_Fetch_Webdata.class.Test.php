@@ -14,7 +14,7 @@ class TestFsockFetchWebdata extends TestCase
 	 *
 	 * setUp() is run automatically by the testing framework before each test method.
 	 */
-	public function setUp()
+	protected function setUp(): void
 	{
 		// url
 		// post data
@@ -62,7 +62,7 @@ class TestFsockFetchWebdata extends TestCase
 	 * cleanup data we no longer need at the end of the tests in this class.
 	 * tearDown() is run automatically by the testing framework after each test method.
 	 */
-	public function tearDown()
+	protected function tearDown(): void
 	{
 	}
 
@@ -84,7 +84,7 @@ class TestFsockFetchWebdata extends TestCase
 				$this->assertEquals($testcase[1], $fsock->result('code'));
 
 			if (!empty($testcase[2]))
-				$this->assertContains($testcase[2], $fsock->result('body'));
+				$this->assertStringContainsString($testcase[2], $fsock->result('body'));
 
 			if (!empty($testcase[3]))
 				$this->assertEquals($testcase[3], $fsock->result('redirects'));
@@ -109,7 +109,7 @@ class TestFsockFetchWebdata extends TestCase
 				$this->assertEquals($testcase[2], $fsock->result('code'));
 
 			if (!empty($testcase[3]))
-				$this->assertContains($testcase[3], $fsock->result('body'));
+				$this->assertStringContainsString($testcase[3], $fsock->result('body'));
 		}
 	}
 }

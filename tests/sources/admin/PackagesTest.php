@@ -19,7 +19,7 @@ class TestPackagesController extends ElkArteCommonSetupTest
 	/**
 	 * Initialize or add whatever necessary for these tests
 	 */
-	public function setUp()
+	protected function setUp(): void
 	{
 		// Load in the common items so the system thinks we have an active login
 		parent::setUp();
@@ -48,8 +48,8 @@ class TestPackagesController extends ElkArteCommonSetupTest
 		$controller->action_index();
 
 		// We should be ready to show the pm inbox, its empty right now
-		$this->assertEquals($context['sub_template'], 'browse');
-		$this->assertEquals($context['default_list'], 'packages_lists');
+		$this->assertEquals('browse', $context['sub_template']);
+		$this->assertEquals('packages_lists', $context['default_list']);
 	}
 
 	public function testActionDownload()
@@ -68,8 +68,8 @@ class TestPackagesController extends ElkArteCommonSetupTest
 		$req->query->sa = null;
 		$req->query->area = null;
 
-		$this->assertEquals($context['page_title'], 'Package downloaded successfully');
-		$this->assertEquals($context['package']['name'], 'Attachment Image Resize');
+		$this->assertEquals('Package downloaded successfully', $context['page_title']);
+		$this->assertEquals('Attachment Image Resize', $context['package']['name']);
 	}
 
 	public function testActionInstall()
@@ -94,7 +94,7 @@ class TestPackagesController extends ElkArteCommonSetupTest
 		$req->query->sa = null;
 		$req->query->area = null;
 
-		$this->assertEquals($context['is_installed'], false);
-		$this->assertEquals($context['actions'][7]['description'], '<strong>Test successful</strong>', $context['actions'][7]['description']);
+		$this->assertEquals(false, $context['is_installed']);
+		$this->assertEquals('<strong>Test successful</strong>', $context['actions'][7]['description'], $context['actions'][7]['description']);
 	}
 }

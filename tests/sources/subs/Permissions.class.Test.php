@@ -24,7 +24,7 @@ class TestPermissionsClass extends ElkArteCommonSetupTest
 		foreach (array('admin_forum', 'manage_membergroups', 'manage_permissions') as $check)
 		{
 			$valid = in_array($check, $illegal_permissions);
-			$this->assertTrue($valid, $check, $check);
+			$this->assertTrue($valid, $check);
 		}
 	}
 
@@ -40,7 +40,7 @@ class TestPermissionsClass extends ElkArteCommonSetupTest
 		foreach (array('admin_forum', 'edit_news', 'mark_notify') as $check)
 		{
 			$valid = in_array($check, $illegal_guest_permissions);
-			$this->assertTrue($valid, $check, $check);
+			$this->assertTrue($valid, $check);
 		}
 	}
 

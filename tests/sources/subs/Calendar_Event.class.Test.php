@@ -12,7 +12,7 @@ class TestCalendarEvent extends ElkArteCommonSetupTest
 	/**
 	 * To avoid duplicated function declarations, we need an empty Calendar.subs.php
 	 */
-	public static function setUpBeforeClass()
+	public static function setUpBeforeClass(): void
 	{
 		rename(SUBSDIR . '/Calendar.subs.php', SUBSDIR . '/Calendar_tmp.subs.php');
 		touch(SUBSDIR . '/Calendar.subs.php');
@@ -21,14 +21,14 @@ class TestCalendarEvent extends ElkArteCommonSetupTest
 	/**
 	 * Better restore it before leaving
 	 */
-	public static function tearDownAfterClass()
+	public static function tearDownAfterClass(): void
 	{
 		unlink(SUBSDIR . '/Calendar.subs.php');
 		rename(SUBSDIR . '/Calendar_tmp.subs.php', SUBSDIR . '/Calendar.subs.php');
 		rename(BOARDDIR . '/tests/sources/subs/Calendar_Event.class.Test.php', BOARDDIR . '/tests/sources/subs/Calendar_Event.class.Test.tmp');
 	}
 
-	public function setUp()
+	protected function setUp(): void
 	{
 		global $context;
 
@@ -66,162 +66,132 @@ class TestCalendarEvent extends ElkArteCommonSetupTest
 		$this->assertFalse($event->isStarter(2));
 	}
 
-	/**
-	 * @expectedException Exception
-	 * @expectedExceptionMessage removeEvent called with id = 1
-	 */
 	public function testRemove()
 	{
+		$this->expectException('\Exception');
+		$this->expectExceptionMessage('removeEvent called with id = 1');
 		$event = new CalendarEvent(1, array());
 		$event->remove();
 	}
 
-	/**
-	 * @expectedException \ElkArte\Exceptions\Exception
-	 * @expectedExceptionMessage The span feature is currently disabled.
-	 */
 	public function testValidateNoSpan()
 	{
+		$this->expectException('\Exception');
+		$this->expectExceptionMessage('The span feature is currently disabled.');
 		$event = new CalendarEvent(1, array());
 		$event->validate(array('span' => 1));
 	}
 
-	/**
-	 * @expectedException \ElkArte\Exceptions\Exception
-	 * @expectedExceptionMessage Invalid number of days to span.
-	 */
 	public function testValidateInvalidSpan1()
 	{
+		$this->expectException('\Exception');
+		$this->expectExceptionMessage('Invalid number of days to span.');
 		$event = new CalendarEvent(1, array('cal_allowspan' => 1, 'cal_maxspan' => 3));
 		$event->validate(array('span' => -1));
 	}
 
-	/**
-	 * @expectedException \ElkArte\Exceptions\Exception
-	 * @expectedExceptionMessage Invalid number of days to span.
-	 */
 	public function testValidateInvalidSpan2()
 	{
+		$this->expectException('\Exception');
+		$this->expectExceptionMessage('Invalid number of days to span.');
 		$event = new CalendarEvent(1, array('cal_allowspan' => 1, 'cal_maxspan' => 3));
 		$event->validate(array('span' => 5));
 	}
 
-	/**
-	 * @expectedException \ElkArte\Exceptions\Exception
-	 * @expectedExceptionMessage Event month is missing.
-	 */
 	public function testValidateNotDelete1()
 	{
+		$this->expectException('\Exception');
+		$this->expectExceptionMessage('Event month is missing.');
 		$event = new CalendarEvent(1, array('cal_minyear' => 2012, 'cal_limityear' => 10));
 		// No month passed => \ElkArte\Exceptions\Exception
 		$event->validate(array());
 	}
 
-	/**
-	 * @expectedException \ElkArte\Exceptions\Exception
-	 * @expectedExceptionMessage Event year is missing.
-	 */
 	public function testValidateNotDelete2()
 	{
+		$this->expectException('\Exception');
+		$this->expectExceptionMessage('Event year is missing.');
 		$event = new CalendarEvent(1, array('cal_minyear' => 2012, 'cal_limityear' => 10));
 		// No year passed => \ElkArte\Exceptions\Exception
 		$event->validate(array('month' => 1));
 	}
 
-	/**
-	 * @expectedException \ElkArte\Exceptions\Exception
-	 * @expectedExceptionMessage Invalid month value.
-	 */
 	public function testValidateNotDelete3()
 	{
+		$this->expectException('\Exception');
+		$this->expectExceptionMessage('Invalid month value.');
 		$event = new CalendarEvent(1, array('cal_minyear' => 2012, 'cal_limityear' => 10));
 		// Negative months are not allowed
 		$event->validate(array('month' => -1, 'year' => 2013));
 	}
 
-	/**
-	 * @expectedException \ElkArte\Exceptions\Exception
-	 * @expectedExceptionMessage Invalid month value.
-	 */
 	public function testValidateNotDelete4()
 	{
+		$this->expectException('\Exception');
+		$this->expectExceptionMessage('Invalid month value.');
 		$event = new CalendarEvent(1, array('cal_minyear' => 2012, 'cal_limityear' => 10));
 		// Zero is not a month
 		$event->validate(array('month' => 0, 'year' => 2013));
 	}
 
-	/**
-	 * @expectedException \ElkArte\Exceptions\Exception
-	 * @expectedExceptionMessage Invalid month value.
-	 */
 	public function testValidateNotDelete5()
 	{
+		$this->expectException('\Exception');
+		$this->expectExceptionMessage('Invalid month value.');
 		$event = new CalendarEvent(1, array('cal_minyear' => 2012, 'cal_limityear' => 10));
 		// An years haz only 12 months...
 		$event->validate(array('month' => 13, 'year' => 2013));
 	}
 
-	/**
-	 * @expectedException \ElkArte\Exceptions\Exception
-	 * @expectedExceptionMessage Invalid year value.
-	 */
 	public function testValidateNotDelete6()
 	{
+		$this->expectException('\Exception');
+		$this->expectExceptionMessage('Invalid year value.');
 		$event = new CalendarEvent(1, array('cal_minyear' => 2012, 'cal_limityear' => 10));
 		// Too low year
 		$event->validate(array('month' => 1, 'year' => 2011));
 	}
 
-	/**
-	 * @expectedException \ElkArte\Exceptions\Exception
-	 * @expectedExceptionMessage Invalid year value.
-	 */
 	public function testValidateNotDelete7()
 	{
+		$this->expectException('\Exception');
+		$this->expectExceptionMessage('Invalid year value.');
 		$event = new CalendarEvent(1, array('cal_minyear' => 2012, 'cal_limityear' => 10));
 		// Too far away in the future
 		$event->validate(array('month' => 1, 'year' => date('Y') + 12));
 	}
 
-	/**
-	 * @expectedException \ElkArte\Exceptions\Exception
-	 * @expectedExceptionMessage Event day is missing.
-	 */
 	public function testValidateNotDelete8()
 	{
+		$this->expectException('\Exception');
+		$this->expectExceptionMessage('Event day is missing.');
 		$event = new CalendarEvent(1, array('cal_minyear' => 2012, 'cal_limityear' => 10));
 		// No day => \ElkArte\Exceptions\Exception
 		$event->validate(array('month' => 1, 'year' => 2013));
 	}
 
-	/**
-	 * @expectedException \ElkArte\Exceptions\Exception
-	 * @expectedExceptionMessage Event title is missing.
-	 */
 	public function testValidateNotDelete9()
 	{
+		$this->expectException('\Exception');
+		$this->expectExceptionMessage('Event title is missing.');
 		$event = new CalendarEvent(1, array('cal_minyear' => 2012, 'cal_limityear' => 10));
 		// No title => \ElkArte\Exceptions\Exception
 		$event->validate(array('month' => 1, 'year' => 2013, 'day' => 1));
 	}
 
-	/**
-	 * @expectedException \ElkArte\Exceptions\Exception
-	 * @expectedExceptionMessage Invalid date.
-	 */
 	public function testValidateNotDelete10()
 	{
+		$this->expectException('\Exception');
+		$this->expectExceptionMessage('Invalid date.');
 		$event = new CalendarEvent(1, array('cal_minyear' => 2012, 'cal_limityear' => 10));
 		// No need to test the PHP checkdata function, so just one single bad date
 		$event->validate(array('month' => 2, 'year' => 2013, 'day' => 30, 'evtitle' => 'string', 'subject' => 'string'));
 	}
 
-	/**
-	 * @expectedException \ElkArte\Exceptions\Exception
-	 * @expectedExceptionMessage No event title was entered.
-	 */
 	public function testValidateNotDelete11()
 	{
+		$this->expectException(\ElkArte\Exceptions\Exception::class);
+		$this->expectExceptionMessage("No event title was entered.");
 		$event = new CalendarEvent(1, array('cal_minyear' => 2012, 'cal_limityear' => 10));
 		// A evtitle made up of spaces should be trimmed and result in an empty string
 		$event->validate(array('month' => 2, 'year' => 2013, 'day' => 1, 'evtitle' => '    ', 'subject' => 'string'));

@@ -25,5 +25,8 @@ if [[ "$DB" == "mysql" ]]; then php .github/SetupMysql.php; fi
 if [[ "$DB" == "mariadb" ]]; then php .github/SetupMysql.php; fi
 if [[ "$DB" == "postgres" ]]; then php .github/SetupPgsql.php; fi
 
+# Show the db install as failed
+if [[ "$?" != 0 ]]; then exit $?; fi
+
 # Remove the install dir
 sudo rm -rf /install

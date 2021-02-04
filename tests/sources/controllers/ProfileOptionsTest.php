@@ -15,7 +15,7 @@ class TestProfileOptions extends ElkArteCommonSetupTest
 	/**
 	 * Initialize or add whatever necessary for these tests
 	 */
-	public function setUp()
+	protected function setUp(): void
 	{
 		global $context, $cur_profile;
 
@@ -48,7 +48,7 @@ class TestProfileOptions extends ElkArteCommonSetupTest
 				),
 				array(
 					'id_member' => 1,
-					'notification_type' => 'email',
+					'notification_type' => json_encode(['email']),
 					'mention_type' => 'mentionmem'
 				),
 				array(
@@ -58,7 +58,7 @@ class TestProfileOptions extends ElkArteCommonSetupTest
 				),
 				array(
 					'id_member' => 2,
-					'notification_type' => 'email',
+					'notification_type' => json_encode(['email']),
 					'mention_type' => 'likemsg'
 				),
 			),
@@ -70,7 +70,7 @@ class TestProfileOptions extends ElkArteCommonSetupTest
 	 * cleanup data we no longer need at the end of the tests in this class.
 	 * tearDown() is run automatically by the testing framework after each test method.
 	 */
-	public function tearDown()
+	protected function tearDown(): void
 	{
 		$db = database();
 		$db->query('', '

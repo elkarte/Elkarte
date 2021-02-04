@@ -25,7 +25,8 @@
   </testsuites>
 
   <logging>
-     <log type="coverage-text" target="php://stdout" />
+      <log type="coverage-clover" target="/tmp/coverage.madb.clover"/>
+      <log type="coverage-text" target="php://stdout" />
   </logging>
 
   <filter>

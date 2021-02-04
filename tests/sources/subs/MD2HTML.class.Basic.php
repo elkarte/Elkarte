@@ -12,7 +12,7 @@ class TestMD2HTML extends TestCase
 	 *
 	 * setUp() is run automatically by the testing framework before each test method.
 	 */
-	public function setUp()
+	protected function setUp(): void
 	{
 		require_once(EXTDIR . '/markdown/markdown.php');
 
@@ -50,7 +50,7 @@ class TestMD2HTML extends TestCase
 		);
 	}
 
-	public function tearDown()
+	protected function tearDown(): void
 	{
 
 	}

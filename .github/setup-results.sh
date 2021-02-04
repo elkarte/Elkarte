@@ -7,6 +7,7 @@ set +x
 
 # Passed params
 DB=$1
+PHP_VERSION=$2
 
 # Build a config string for PHPUnit
 COVER="--prepend /tmp/xdebug-filter.php"
@@ -19,7 +20,7 @@ vendor/bin/phpunit --dump-xdebug-filter /tmp/xdebug-filter.php ${CONFIG}
 vendor/bin/phpunit ${CONFIG} ${COVER}
 
 # Agents will merge all coverage data...
-if [[ "$CI_EVENT_NAME" == "pull_request" ]]
+if [[ "${GITHUB_EVENT_NAME}" == "pull_request" ]]
 then
-  bash <(curl -s https://codecov.io/bash) -f "/tmp/coverage.clover"
+    bash <(curl -s https://codecov.io/bash) -s "/tmp" -f '*.clover'
 fi

@@ -106,11 +106,4 @@ removeSettings('mentions_member_check');
 // Basic language is good to have for functional tests
 theme()->getTemplates()->loadLanguageFile('index+Errors');
 
-// If we are running functional tests as well
-if (defined('PHPUNIT_SELENIUM'))
-{
-	require_once('tests/sources/controllers/ElkArteWebTest.php');
-	PHPUnit_Extensions_Selenium2TestCase::shareSession(true);
-}
-
 file_put_contents('bootstrapcompleted.lock', '1');

@@ -13,7 +13,7 @@ class TestUtilclass extends TestCase
 	 *
 	 * setUp() is run automatically by the testing framework before each test method.
 	 */
-	public function setUp()
+	protected function setUp(): void
 	{
 		// Create a utf-8 string with 4 byte characters
 		$this->string = html_entity_decode('Some 4 byte characters&#x2070e;&#x20731;&#x20779; for elkarte testing', ENT_COMPAT, 'UTF-8');
@@ -24,7 +24,7 @@ class TestUtilclass extends TestCase
 	 *
 	 * tearDown() is run automatically by the testing framework after each test method.
 	 */
-	public function tearDown()
+	protected function tearDown(): void
 	{
 	}
 
@@ -72,7 +72,7 @@ class TestUtilclass extends TestCase
 	public function test_strpos()
 	{
 		// Should be 30, strpos would say 39
-		$this->assertEquals(Util::strpos($this->string, 'elkarte'), 30);
+		$this->assertEquals(30, Util::strpos($this->string, 'elkarte'));
 	}
 
 	/**
@@ -81,7 +81,7 @@ class TestUtilclass extends TestCase
 	public function test_substr()
 	{
 		// Should be 30, strpos would say 39
-		$this->assertEquals(Util::substr($this->string, 30, 7), 'elkarte');
+		$this->assertEquals('elkarte', Util::substr($this->string, 30, 7));
 	}
 
 	/**
@@ -132,6 +132,6 @@ class TestUtilclass extends TestCase
 	 */
 	public function test_strlen()
 	{
-		$this->assertEquals(Util::strlen($this->string), 45);
+		$this->assertEquals(45, Util::strlen($this->string));
 	}
 }

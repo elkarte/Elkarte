@@ -28,7 +28,7 @@
   </filter>
 
    <logging>
-       <log type="coverage-clover" target="/tmp/coverage.clover"/>
+       <log type="coverage-clover" target="/tmp/coverage.web.clover"/>
    </logging>
 
   <php>
