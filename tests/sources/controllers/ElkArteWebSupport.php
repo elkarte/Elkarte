@@ -189,13 +189,13 @@ abstract class ElkArteWebSupport extends Selenium2TestCase
 	 */
 	public function clickit($selector)
 	{
-		$this->timeouts()->implicitWait(5000);
+		$this->timeouts()->implicitWait(6000);
 		try
 		{
 			$selector = $this->byCssSelector($selector);
 			$selector->click();
 		}
-		catch (Selenium2TestCase\WebDriverException $exception)
+		catch (PHPUnit\Extensions\Selenium2TestCase\WebDriverException $exception)
 		{
 			// continue on
 		}

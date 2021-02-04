@@ -82,9 +82,9 @@ jobs:
           PHP_VERSION: ${{ matrix.php }}
         run: .github/setup-selenium.sh $DB $PHP_VERSION
         working-directory: ./elkarte
-        continue-on-error: false
+        continue-on-error: true
 
-      - name: Server Error Log # may need to use continue-on-error: true above to get here
+      - name: Server Error Log
         env:
           DB: ${{ matrix.db }}
           PHP_VERSION: ${{ matrix.php }}
