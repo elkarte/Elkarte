@@ -12,7 +12,7 @@ Test ElkArte yourself by visting our support forums [at ElkArte.net](https://www
 
 Contributions to documentation are licensed under [CC-by-SA 3](https://creativecommons.org/licenses/by-sa/3.0). Third party libraries or sets of images, are under their own licenses.
 
-[![Build Status](https://img.shields.io/travis/elkarte/Elkarte/development.svg?style=flat)](https://travis-ci.org/elkarte/Elkarte)
+![Build Status](https://github.com/elkarte/Elkarte/workflows/MaxPain/badge.svg)
 [![Open Issues](https://img.shields.io/github/issues/elkarte/Elkarte.svg?style=flat)](https://github.com/elkarte/Elkarte/issues)
 [![Current Release](https://img.shields.io/github/release/elkarte/ElkArte.svg?style=flat)](https://github.com/elkarte/ElkArte/releases)
 [![License](https://img.shields.io/badge/License-BSD-green.svg?style=flat)](https://opensource.org/licenses/BSD-3-Clause)
