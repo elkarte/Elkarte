@@ -74,7 +74,7 @@ jobs:
           DB: ${{ matrix.db }}
           PHP_VERSION: ${{ matrix.php }}
           WEBSERVER: 'nginx'
-        run: .github/setup-elkarte.sh $DB $PHP_VERSION $WEB
+        run: .github/setup-elkarte.sh $DB $PHP_VERSION
         working-directory: ./elkarte
 
       - name: Run Unit Tests
@@ -91,6 +91,8 @@ jobs:
           PHP_VERSION: ${{ matrix.php }}
         run: |
           sudo cat /var/log/nginx/127.0.0.1.error.log
+          sudo cat /tmp/selenium.log
+          .github/setup-failure.sh $DB $PHP_VERSION
         working-directory: ./elkarte
   # End Selenium headless browser testing
 
