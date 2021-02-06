@@ -12,23 +12,40 @@ PHP_VERSION=$2
 # Some vars to make this easy to change
 SELENIUM_HUB_URL='http://127.0.0.1:4444'
 SELENIUM_JAR=/usr/share/selenium/selenium-server-standalone.jar
-SELENIUM_DOWNLOAD_URL=https://selenium-release.storage.googleapis.com/3.7/selenium-server-standalone-3.7.1.jar
+SELENIUM_DOWNLOAD_URL=https://selenium-release.storage.googleapis.com/3.141/selenium-server-standalone-3.141.59.jar
 
 # Location of geckodriver for use as webdriver in xvfb
-GECKODRIVER_DOWNLOAD_URL=https://github.com/mozilla/geckodriver/releases/download/v0.14.0/geckodriver-v0.14.0-linux64.tar.gz
+GECKODRIVER_DOWNLOAD_URL=https://github.com/mozilla/geckodriver/releases/download/v0.26.0/geckodriver-v0.26.0-linux64.tar.gz
 GECKODRIVER_TAR=/tmp/geckodriver.tar.gz
 
 # Location of chromedriver for use as webdriver in xvfb
-CHROMEDRIVER_DOWNLOAD_URL=https://chromedriver.storage.googleapis.com/2.9/chromedriver_linux64.zip
+CHROMEDRIVER_DOWNLOAD_URL=https://chromedriver.storage.googleapis.com/76.0.3809.25/chromedriver_linux64.zip
 CHROMEDRIVER_ZIP=/tmp/chromedriver.zip
 
 # Download Selenium
-sudo mkdir -p $(dirname "$SELENIUM_JAR")
-sudo wget -nv -O "$SELENIUM_JAR" "$SELENIUM_DOWNLOAD_URL"
+echo "Downloading Selenium"
+mkdir -p $(dirname "$SELENIUM_JAR")
+wget -nv -O "$SELENIUM_JAR" "$SELENIUM_DOWNLOAD_URL"
 
-# Start Selenium using default HTML driver
+# Install Fx or Chrome
+echo "Installing Browser"
+#sudo apt install firefox -y -qq > /dev/null
+wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb -q
+sudo dpkg -i google-chrome-stable_current_amd64.deb
+
+# Download Chrome Driver
+echo "Downloading chromedriver"
+wget -nv -O "$CHROMEDRIVER_ZIP" "$CHROMEDRIVER_DOWNLOAD_URL"
+sudo unzip "$CHROMEDRIVER_ZIP" && mv chromedriver /usr/local/bin
+
+# Download Gecko driver
+#echo "Downloading geckodriver"
+#wget -nv -O "$GECKODRIVER_TAR" "$GECKODRIVER_DOWNLOAD_URL"
+#sudo tar -xvf "$GECKODRIVER_TAR" -C "/usr/local/bin/"
+
+# Start Selenium using default chosen webdriver
 export DISPLAY=:99.0
-sudo xvfb-run --server-args="-screen 0 1280x1024x24" java -jar "$SELENIUM_JAR" > /tmp/selenium.log &
+xvfb-run --server-args="-screen 0 1280x1024x24" java -Dwebdriver.chromedriver.bin=/usr/local/bin/chromedriver -jar "$SELENIUM_JAR" > /tmp/selenium.log &
 wget --retry-connrefused --tries=120 --waitretry=3 --output-file=/dev/null "$SELENIUM_HUB_URL/wd/hub/status" -O /dev/null
 
 # Test to see if the selenium server really did start
@@ -46,10 +63,4 @@ else
 
     # Run the phpunit selenium tests
     vendor/bin/phpunit --verbose --debug --configuration .github/phpunit-webtest.xml
-fi
-
-# Agents will merge all coverage data...
-if [[ "${GITHUB_EVENT_NAME}" == "pull_request" ]]
-then
-    bash <(curl -s https://codecov.io/bash) -s "/tmp" -f '*.clover'
 fi
