@@ -407,10 +407,6 @@ class Admin extends AbstractController
 						'icon' => 'transparent.png',
 						'class' => 'admin_img_members',
 						'permission' => array('moderate_forum'),
-						'subsections' => array(
-							'all' => array($txt['view_all_members']),
-							'search' => array($txt['mlist_search']),
-						),
 					),
 					'membergroups' => array(
 						'label' => $txt['admin_groups'],

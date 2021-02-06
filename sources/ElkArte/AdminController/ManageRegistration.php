@@ -198,8 +198,8 @@ class ManageRegistration extends AbstractController
 				$context['new_member'] = array(
 					'id' => $memberID,
 					'name' => $this->_req->post->user,
-					'href' => getUrl('profile', ['action' => 'profile', 'u' => $memberID]),
-					'link' => '<a href="' . getUrl('profile', ['action' => 'profile', 'u' => $memberID]) . '">' . $this->_req->post->user . '</a>',
+					'href' => getUrl('profile', ['action' => 'profile', 'u' => $memberID, 'name' => $this->_req->post->user]),
+					'link' => '<a href="' . getUrl('profile', ['action' => 'profile', 'u' => $memberID, 'name' => $this->_req->post->user]) . '">' . $this->_req->post->user . '</a>',
 				);
 				$context['registration_done'] = sprintf($txt['admin_register_done'], $context['new_member']['link']);
 			}
