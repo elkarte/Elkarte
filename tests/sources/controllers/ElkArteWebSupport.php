@@ -113,11 +113,12 @@ abstract class ElkArteWebSupport extends Selenium2TestCase
 			$passwordInput = $this->byName('passwrd');
 			$passwordInput->value($this->adminpass);
 
-			$this->clickit('#password_login > input[type="submit"]');
+			$submit = $this->byId('password_login')->byCssSelector('input[type="submit"]');
+			$submit->click();
 		}
 
 		// Should see the admin button now
-		$this->assertStringContainsString('Admin', $this->byCssSelector('#button_admin > a')->text());
+		$this->assertStringContainsString('Admin', $this->byId('menu_nav')->text());
 	}
 
 	/**
@@ -168,7 +169,7 @@ abstract class ElkArteWebSupport extends Selenium2TestCase
 		// Logged in as Admin
 		if ($check)
 		{
-		   	$link = $this->byId('button_logout')->byCssSelector('a')->attribute('href');
+			$link = $this->byId('button_logout')->byCssSelector('a')->attribute('href');
 			$this->url($link);
 		}
 	}
@@ -217,6 +218,7 @@ abstract class ElkArteWebSupport extends Selenium2TestCase
 
 		if ($found)
 		{
+			$this->moveto($found);
 			$found->click();
 		}
 	}

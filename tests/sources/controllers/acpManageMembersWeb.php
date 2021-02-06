@@ -57,17 +57,29 @@ class SupportManageMembersController extends ElkArteWebSupport
 
 		$this->assertStringContainsString($mname, $this->byCssSelector('#list_approve_list_0')->text());
 		$this->clickit('#list_approve_list_0 input');
-		$this->clickit('select[name=todo] option[value=' . $el . ']');
 
-		// htmlunit does not seem to work with the alert code
-		if (in_array($this->browser, array('firefox', 'chrome')))
+		// Submit the form, catch the exception thrown (at least by chrome)
+		try
 		{
-			$this->assertStringContainsString('all selected members?', $this->alertText());
-			$this->acceptAlert();
+			$this->select($this->byName('todo'))->selectOptionByValue($el);
+			$this->select($this->byName('todo'))->submit();
 		}
-		else
+		catch (PHPUnit\Extensions\Selenium2TestCase\WebDriverException $e)
 		{
-			$this->keys($this->keysHolder->specialKey('ENTER'));
+			// At least chromedriver will throw an exception
+		}
+		finally
+		{
+			// htmlunit does not seem to work with the alert code
+			if (in_array($this->browser, array('firefox', 'chrome')))
+			{
+				$this->assertStringContainsString('all selected members?', $this->alertText());
+				$this->acceptAlert();
+			}
+			else
+			{
+				$this->keys($this->keysHolder->specialKey('ENTER'));
+			}
 		}
 	}
 
