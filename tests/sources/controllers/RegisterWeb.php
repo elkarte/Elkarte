@@ -79,7 +79,7 @@ class SupportRegisterController extends ElkArteWebSupport
 		$this->registerMember();
 
 		// Let's select register!
-		$this->clickit('input[name="regSubmit"]');
+		$this->byId('registration')->submit();
 
 		// Should fail for speed reasons
 		$this->assertStringContainsString('You went through the registration process too quickly', $this->byCssSelector('div.errorbox')->text());
@@ -96,7 +96,7 @@ class SupportRegisterController extends ElkArteWebSupport
 		sleep(9);
 
 		// Let's select register!
-		$this->clickit('input[name="regSubmit"]');
+		$this->byId('registration')->submit();
 
 		// Did it work? Did it work?
 		$this->assertEquals('Registration Successful', $this->byCssSelector('h2.category_header')->text());
