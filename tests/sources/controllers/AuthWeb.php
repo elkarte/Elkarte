@@ -12,9 +12,6 @@ class SupportAuthController extends ElkArteWebSupport
 	protected function setUp(): void
 	{
 		parent::setUp();
-
-		//require_once('./bootstrap.php');
-		//new Bootstrap(false);
 	}
 
 	/**
@@ -23,7 +20,7 @@ class SupportAuthController extends ElkArteWebSupport
 	public function testAlive()
 	{
 		$this->url('index.php');
-		$this->assertEquals('My Community - Index', $this->title());
+		$this->assertEquals('My Community - Index', $this->title(), $this->source());
 	}
 
 	/**
@@ -37,15 +34,23 @@ class SupportAuthController extends ElkArteWebSupport
 		$username = 'test';
 		$password = 'ainttellin';
 
-		// Goto the main page
+		$this->timeouts()->implicitWait(10000);
 		$this->url('index.php');
 
-		// First lets log out as we have just come from install
-		$this->clickit('#button_logout > a');
+		// We should be logged in after install ... should
+		$check = $this->byId('menu_nav')->text();
+		$check = strpos($check, 'Log in');
+		if (!$check)
+		{
+			// Logged in, so log out
+			$link = $this->byId('button_logout')->byCssSelector('a')->attribute('href');
+			$this->url($link);
+		}
 
-		// Now lets login
+		// Not logged in so go to the login page
 		$this->url('index.php?action=login');
-		sleep(1);
+
+		// Now lets try to login with some bogus credentials
 		$this->assertEquals('Log in', $this->title(), $this->source());
 
 		// Fill in the form
