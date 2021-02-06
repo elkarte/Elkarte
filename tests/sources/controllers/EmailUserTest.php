@@ -90,7 +90,7 @@ class TestEmailUserController extends ElkArteCommonSetupTest
 		// We are ready to show the report forum
 		$this->assertEquals('report', $context['sub_template']);
 
-		// Send the form, you should see a sendmail error in the travis log, ignore it.
+		// Send the form, you will see a sendmail error in the CI log, ignore it.
 		$req->post->save = 1;
 		$controller->pre_dispatch();
 		$controller->action_reporttm();

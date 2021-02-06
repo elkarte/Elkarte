@@ -96,24 +96,4 @@ class ElkArteInstallWeb extends ElkArteWebSupport
 		rename($this->forumPath . '/Settings_bak.sample.php', $this->forumPath . '/Settings_bak.php');
 		rename($this->forumPath . '/db_last_error.sample.txt', $this->forumPath . '/db_last_error.txt');
 	}
-
-	/**
-	 * Click the selector and briefly pause.
-	 *
-	 * @param string $selector
-	 */
-	public function clickit($selector)
-	{
-		$this->timeouts()->implicitWait(10000);
-		try
-		{
-			$selector = $this->byCssSelector($selector);
-			$selector->click();
-			sleep(1);
-		}
-		catch (Selenium2TestCase\WebDriverException $e)
-		{
-			// Pass through
-		}
-	}
 }
