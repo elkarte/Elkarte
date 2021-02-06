@@ -20,6 +20,7 @@ class SupportManageMembersController extends ElkArteWebSupport
 		$require = array('activation', 'approval');
 		$_SESSION['just_registered'] = 0;
 
+		// Register a couple of members, like user0, user1
 		for ($i = 0; $i < 2; $i++)
 		{
 			$regOptions = array(
@@ -32,8 +33,11 @@ class SupportManageMembersController extends ElkArteWebSupport
 				'memberGroup' => 2,
 			);
 
-			// Will show sh: 1: sendmail: not found in the travis console
-			registerMember($regOptions);
+			// Will show sh: 1: sendmail: not found in the CI console
+			$id = registerMember($regOptions);
+
+			// Depends a bit on when it runs, but normally will be 4, 5
+			$this->assertContains($id, [2, 3, 4, 5], 'Unexpected MemberID: ' . $id);
 			$_SESSION['just_registered'] = 0;
 		}
 	}
@@ -49,24 +53,33 @@ class SupportManageMembersController extends ElkArteWebSupport
 	{
 		// First, navigate to member management.
 		$this->url('index.php?action=admin;area=viewmembers;sa=browse;type=' . $act);
-		$this->assertEquals('Manage Members', $this->title());
+		$this->assertEquals('Manage Members', $this->title(), $this->source());
 
-		// Let's do it: approve/delete...
-		$this->assertStringContainsString('new accounts', $this->byCssSelector('.generic_menu li a:last-child')->text());
-		$this->clickit('.generic_menu li a:last-child');
 		$this->assertStringContainsString($mname, $this->byCssSelector('#list_approve_list_0')->text());
 		$this->clickit('#list_approve_list_0 input');
-		$this->clickit('select[name=todo] option[value=' . $el . ']');
 
-		// htmlunit does not seem to work with the alert code
-		if (in_array($this->browser, array('firefox', 'chrome')))
+		// Submit the form, catch the exception thrown (at least by chrome)
+		try
 		{
-			$this->assertStringContainsString('all selected members?', $this->alertText());
-			$this->acceptAlert();
+			$this->select($this->byName('todo'))->selectOptionByValue($el);
+			$this->select($this->byName('todo'))->submit();
 		}
-		else
+		catch (PHPUnit\Extensions\Selenium2TestCase\WebDriverException $e)
 		{
-			$this->keys($this->keysHolder->specialKey('ENTER'));
+			// At least chromedriver will throw an exception
+		}
+		finally
+		{
+			// htmlunit does not seem to work with the alert code
+			if (in_array($this->browser, array('firefox', 'chrome')))
+			{
+				$this->assertStringContainsString('all selected members?', $this->alertText());
+				$this->acceptAlert();
+			}
+			else
+			{
+				$this->keys($this->keysHolder->specialKey('ENTER'));
+			}
 		}
 	}
 
@@ -100,12 +113,13 @@ class SupportManageMembersController extends ElkArteWebSupport
 	/**
 	 * Activate a member, as above used to runInSeparateProcess
 	 */
-	public function testActivateMember()
+	public function testRejectActivateMember()
 	{
 		// Login the admin in to the ACP
 		$this->adminLogin();
 		$this->enterACP();
 
+		// Lets delete this request
 		$this->activateMember('user0', 'activate', 'delete');
 
 		// Should be gone.

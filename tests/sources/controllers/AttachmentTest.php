@@ -55,7 +55,7 @@ class TestAttachment extends ElkArteCommonSetupTest
 		$_FILES['attachment'] = [0 => 'blablabla', 'tmp_name' => 'blablabla'];
 		$controller->action_ulattach();
 
-		// just check for a key, the results are somewhat random from o'Travis
+		// just check for a key, the results are somewhat random from CI
 		$this->assertArrayHasKey('result', $context['json_data']);
 	}
 }

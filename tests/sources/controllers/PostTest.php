@@ -74,8 +74,8 @@ class TestPost extends ElkArteCommonSetupTest
 		// Set up for making a post
 		$board = 1;
 		loadBoard();
-		$_POST['subject'] = 'Welcome to Travis';
-		$_POST['message'] = 'So you want to test on Travis, fine, sure.';
+		$_POST['subject'] = 'Welcome to CI';
+		$_POST['message'] = 'So you want to test on CI, fine, sure.';
 		$_POST['email'] = 'a@a.com';
 		$_POST['icon'] = 'thumbup';
 		$_POST['additonal_items'] = 0;

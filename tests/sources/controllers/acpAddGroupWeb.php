@@ -18,12 +18,13 @@ class SupportManageMembergroupsController extends ElkArteWebSupport
 	public function testAcpAddGroup()
 	{
 		// Login the admin in to the ACP
+		$this->timeouts()->implicitWait(10000);
 		$this->adminQuickLogin();
 		$this->enterACP();
 
 		// Start at the add member group page
 		$this->url('index.php?action=admin;area=membergroups;sa=add');
-		$this->assertEquals("Add Member Group", $this->title());
+		$this->assertEquals("Add Member Group", $this->title(), $this->source());
 
 		// Fill in the new group form with initial values
 		$this->ById('group_name_input')->value('Test Group');
@@ -31,14 +32,14 @@ class SupportManageMembergroupsController extends ElkArteWebSupport
 		$this->clickit('input[value="Add group"]');
 
 		// Group Details, give it a description, icons, etc
-		$this->assertEquals("Edit Membergroup", $this->title());
+		$this->assertEquals("Edit Membergroup", $this->title(), $this->source());
 		$this->ById('group_desc_input')->value('The Test Group');
 		$this->ById('icon_count_input')->value('2');
 		$this->clickit('input[name="save"]');
 
 		// We should be back at the group listing, the new group should be there
 		$this->assertEquals("Manage Membergroups", $this->title());
-		$this->assertStringContainsString('Test Group', $this->byCssSelector('#list_regular_membergroups_list_9')->text());
+		$this->assertStringContainsString('Test Group', $this->byCssSelector('#list_regular_membergroups_list_9')->text(), $this->source());
 	}
 
 	/**
@@ -51,7 +52,6 @@ class SupportManageMembergroupsController extends ElkArteWebSupport
 		// In order to interact with hidden elements, we need to expose them.
 		// Here we hover (move) over the profile button
 		// so the logout button is visible, such that we can click it.
-		$this->timeouts()->implicitWait(10000);
 		$this->moveto(array(
 			'element' => $this->byId('button_profile'),
 			'xoffset' => 10,

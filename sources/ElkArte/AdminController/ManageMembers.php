@@ -177,6 +177,9 @@ class ManageMembers extends AbstractController
 			unset($context['tabs']['approve']);
 		}
 
+		// This is a cheat but prepareTabData is called earlier and we need to add them
+		$context['menu_data_' . $context['max_menu_id']]['tab_data']['tabs'] = $context['tabs'];
+
 		// Last items for the template
 		$context['page_title'] = $txt['admin_members'];
 		$context['sub_action'] = $subAction;
@@ -202,7 +205,7 @@ class ManageMembers extends AbstractController
 		global $txt, $context, $modSettings;
 
 		// Set the current sub action.
-		$context['sub_action'] = $this->_req->getPost('sa', 'strval', 'all');
+		$context['sub_action'] = $this->_req->getQuery('sa', 'strval', 'all');
 
 		// Are we performing a mass action?
 		if (isset($this->_req->post->maction_on_members, $this->_req->post->maction) && !empty($this->_req->post->members))

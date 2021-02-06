@@ -28,7 +28,7 @@ abstract class ElkArteWebSupport extends Selenium2TestCase
 	protected $adminuser = 'test_admin';
 	protected $adminname = 'admin';
 	protected $adminpass = 'test_admin_pwd';
-	protected $browser = 'htmlunit';
+	protected $browser = 'chrome';
 	protected $port = 4444;
 	protected $keysHolder;
 
@@ -43,8 +43,13 @@ abstract class ElkArteWebSupport extends Selenium2TestCase
 		// Set the browser to be used by Selenium, it must be available on localhost
 		$this->keysHolder = new Selenium2TestCase\KeysHolder();
 		$this->setBrowser($this->browser);
-		$this->setDesiredCapabilities(array('javascript_enabled' => true, 'javascript' => 1));
+		$this->setDesiredCapabilities([
+			"chromeOptions" => [
+				'w3c' => false,
+			]
+		]);
 		$this->setPort($this->port);
+		$this->setHost('localhost');
 		$this->setBrowserUrl('http://127.0.0.1/');
 
 		parent::setUp();
@@ -97,18 +102,23 @@ abstract class ElkArteWebSupport extends Selenium2TestCase
 		$this->assertEquals('My Community - Index', $this->title());
 
 		// Can we log in?
-		$check = $this->byCssSelector('#menu_nav')->text();
+		$check = $this->byId('menu_nav')->text();
 		$check = strpos($check, 'Log in');
 		if ($check !== false)
 		{
 			// Use Quick login
-			$this->byCssSelector('input[name="user"]')->value($this->adminuser);
-			$this->byCssSelector('input[name="passwrd"]')->value($this->adminpass);
-			$this->clickit('#password_login > input[type="submit"]');
+			$usernameInput = $this->byName('user');
+			$usernameInput->value($this->adminuser);
+
+			$passwordInput = $this->byName('passwrd');
+			$passwordInput->value($this->adminpass);
+
+			$submit = $this->byId('password_login')->byCssSelector('input[type="submit"]');
+			$submit->click();
 		}
 
 		// Should see the admin button now
-		$this->assertStringContainsString('Admin', $this->byCssSelector('#button_admin > a')->text());
+		$this->assertStringContainsString('Admin', $this->byId('menu_nav')->text());
 	}
 
 	/**
@@ -121,9 +131,9 @@ abstract class ElkArteWebSupport extends Selenium2TestCase
 		$this->assertEquals('My Community - Index', $this->title());
 
 		// Are we already logged in as the admin? check by seeing Admin in the main menu
-		$check = $this->byCssSelector('#menu_nav')->text();
+		$check = $this->byId('menu_nav')->text();
 		$check = strpos($check, 'Admin');
-		if ($check === false)
+		if (!$check)
 		{
 			// Select login from the main page
 			$this->clickit('#button_login > a');
@@ -133,6 +143,7 @@ abstract class ElkArteWebSupport extends Selenium2TestCase
 			$usernameInput = $this->byId('user');
 			$usernameInput->clear();
 			$usernameInput->value($this->adminuser);
+
 			$passwordInput = $this->byId('passwrd');
 			$passwordInput->clear();
 			$passwordInput->value($this->adminpass);
@@ -142,7 +153,7 @@ abstract class ElkArteWebSupport extends Selenium2TestCase
 		}
 
 		// Should see the admin main menu button
-		$this->assertStringContainsString('Admin', $this->byCssSelector('#button_admin > a')->text());
+		$this->assertStringContainsString('Admin', $this->byId('menu_nav')->text());
 	}
 
 	/**
@@ -150,15 +161,17 @@ abstract class ElkArteWebSupport extends Selenium2TestCase
 	 */
 	public function adminLogout()
 	{
-		// Seems this is throwing a session error so can't logout?
-		if (isset($_SESSION['session_var'], $_SESSION['session_value']))
-		{
-			$this->url('/index.php?action=logout;' . $_SESSION['session_var'] . '=' . $_SESSION['session_value']);
-			sleep(3);
-			return;
-		}
-
+		// Logout, if logged in
 		$this->url('index.php');
+		$check = $this->byId('menu_nav')->text();
+		$check = strpos($check, 'Admin');
+
+		// Logged in as Admin
+		if ($check)
+		{
+			$link = $this->byId('button_logout')->byCssSelector('a')->attribute('href');
+			$this->url($link);
+		}
 	}
 
 	/**
@@ -167,48 +180,46 @@ abstract class ElkArteWebSupport extends Selenium2TestCase
 	public function enterACP()
 	{
 		// Select admin
-		$this->clickit('#button_admin > a');
+		$this->url('index.php?action=admin');
 
 		// Do we need to start the admin session?
 		if ($this->title() === 'Administration Log in')
 		{
 			// enter password to access
-			$this->assertEquals('Administration Log in', $this->title());
+			$this->assertEquals('Administration Log in', $this->title(), $this->source());
 			$this->byId('admin_pass')->value($this->adminpass);
-			$this->clickit('input[type="submit"]');
+			$this->byId('frmLogin')->submit();
 		}
 
 		// Validate we are there
-		$this->assertEquals('Administration Center', $this->title());
+		$this->assertEquals('Administration Center', $this->title(), $this->source());
 	}
 
 	/**
-	 * Click the selector and briefly pause.
+	 * Wait for the selector and then ->click()
 	 *
 	 * @param string $selector
 	 */
 	public function clickit($selector)
 	{
-		$this->timeouts()->implicitWait(10000);
-		try
-		{
-			$elements = explode(' > ', $selector);
-			if (count($elements) > 1)
+		$found = $this->waitUntil(function ($testCase) use ($selector) {
+			try
 			{
-				$parent = $this->byCssSelector($elements[0]);
-				$child = $parent->element($this->using('css selector')->value($elements[1]));
-				$selector = $child;
-			}
-			else
-			{
-				$selector = $this->byCssSelector($elements[0]);
-			}
+				$selector = $testCase->byCssSelector($selector);
 
-			$selector->click();
-		}
-		catch (PHPUnit\Extensions\Selenium2TestCase\WebDriverException $exception)
+				return $selector;
+			}
+			catch (PHPUnit\Extensions\Selenium2TestCase\WebDriverException $e)
+			{
+				echo 'Selector ' . $selector . " was not found\n";
+				return false;
+			}
+		}, 15000);
+
+		if ($found)
 		{
-			// continue on
+			$this->moveto($found);
+			$found->click();
 		}
 	}
 
