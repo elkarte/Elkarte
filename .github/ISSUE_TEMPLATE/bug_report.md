@@ -1,6 +1,6 @@
 ---
-Name: Bug reports
-About: Submit a report to help us improve the software
+name: Bug reports
+about: Submit a report to help us improve the software
 ---
 
 **Describe the bug**

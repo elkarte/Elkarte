@@ -1,6 +1,6 @@
 ---
-Name: Pull Request
-About: ElkArte Pull Request
+name: Pull Request
+about: ElkArte Pull Request
 ---
 
 #### Description
@@ -11,4 +11,4 @@ About: ElkArte Pull Request
 ### Checklist:
 - [ ] Correct branch: development for new features & fixes; master/patch for fixes
 - [ ] CI Tests pass
-- [ ] Code follows coding [Guidlines](https://github.com/elkarte/Elkarte/wiki/Tech-Home)
+- [ ] Code follows coding [Guidelines](https://github.com/elkarte/Elkarte/wiki/Tech-Home)
