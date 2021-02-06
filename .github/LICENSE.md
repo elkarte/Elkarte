@@ -1,6 +1,6 @@
 # BSD License
 
-Copyright (c) 2012 - 2017, ElkArte Forum contributors
+Copyright (c) 2012 - 2021, ElkArte Forum contributors
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification,
