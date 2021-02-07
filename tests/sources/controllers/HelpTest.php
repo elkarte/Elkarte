@@ -25,8 +25,8 @@ class TestHelpController extends ElkArteCommonSetupTest
 		parent::setSession();
 
 		new ElkArte\Themes\ThemeLoader();
-		theme()->getTemplates()->loadLanguageFile('Manual', 'english', false, true);
-		theme()->getTemplates()->loadLanguageFile('Help', 'english', false, true);
+		\ElkArte\Themes\ThemeLoader::loadLanguageFile('Manual', 'english', false, true);
+		\ElkArte\Themes\ThemeLoader::loadLanguageFile('Help', 'english', false, true);
 	}
 
 	protected function tearDown(): void

@@ -62,7 +62,7 @@ class RepairBoards extends AbstractController
 		$context[$context['admin_menu_name']]['current_subsection'] = 'general';
 
 		// Load the language file.
-		theme()->getTemplates()->loadLanguageFile('Maintenance');
+		\ElkArte\Themes\ThemeLoader::loadLanguageFile('Maintenance');
 
 		// Make sure the tabs stay nice.
 		$context[$context['admin_menu_name']]['tab_data'] = array(

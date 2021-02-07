@@ -587,7 +587,7 @@ class DataValidator
 			return false;
 		}
 
-		theme()->getTemplates()->loadLanguageFile('Validation');
+		\ElkArte\Themes\ThemeLoader::loadLanguageFile('Validation');
 		$result = array();
 
 		// Just want specific errors then it must be an array

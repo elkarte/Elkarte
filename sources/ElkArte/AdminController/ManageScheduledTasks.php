@@ -45,7 +45,7 @@ class ManageScheduledTasks extends AbstractController
 	{
 		global $context, $txt;
 
-		theme()->getTemplates()->loadLanguageFile('ManageScheduledTasks');
+		\ElkArte\Themes\ThemeLoader::loadLanguageFile('ManageScheduledTasks');
 		theme()->getTemplates()->load('ManageScheduledTasks');
 
 		$subActions = array(
@@ -364,7 +364,7 @@ class ManageScheduledTasks extends AbstractController
 		require_once(SUBSDIR . '/ScheduledTasks.subs.php');
 
 		// Lets load the language just in case we are outside the Scheduled area.
-		theme()->getTemplates()->loadLanguageFile('ManageScheduledTasks');
+		\ElkArte\Themes\ThemeLoader::loadLanguageFile('ManageScheduledTasks');
 
 		// Empty the log?
 		if (!empty($this->_req->post->removeAll))

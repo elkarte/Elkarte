@@ -15,7 +15,7 @@ class TestDataValidator extends ElkArteCommonSetupTest
 		parent::setUp();
 
 		new ElkArte\Themes\ThemeLoader();
-		theme()->getTemplates()->loadLanguageFile('Validation', 'english', false, true);
+		\ElkArte\Themes\ThemeLoader::loadLanguageFile('Validation', 'english', false, true);
 
 		$this->rules = array(
 			'required'      => 'required',

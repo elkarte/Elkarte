@@ -62,7 +62,7 @@ class ManageBoards extends AbstractController
 		global $context, $txt;
 
 		// Everything's gonna need this.
-		theme()->getTemplates()->loadLanguageFile('ManageBoards');
+		\ElkArte\Themes\ThemeLoader::loadLanguageFile('ManageBoards');
 
 		// Format: 'sub-action' => array('controller', 'function', 'permission'=>'need')
 		$subActions = array(
@@ -705,7 +705,7 @@ class ManageBoards extends AbstractController
 		$boardTree = new BoardsTree(database());
 
 		// For editing the profile we'll need this.
-		theme()->getTemplates()->loadLanguageFile('ManagePermissions');
+		\ElkArte\Themes\ThemeLoader::loadLanguageFile('ManagePermissions');
 		require_once(SUBSDIR . '/ManagePermissions.subs.php');
 		loadPermissionProfiles();
 
@@ -928,7 +928,7 @@ class ManageBoards extends AbstractController
 		global $txt;
 
 		// We need to borrow a string from here
-		theme()->getTemplates()->loadLanguageFile('ManagePermissions');
+		\ElkArte\Themes\ThemeLoader::loadLanguageFile('ManagePermissions');
 
 		// Load the boards list - for the recycle bin!
 		require_once(SUBSDIR . '/Boards.subs.php');

@@ -56,7 +56,7 @@ class AdminSettingsSearch
 	{
 		if (!empty($language_files))
 		{
-			theme()->getTemplates()->loadLanguageFile(implode('+', $language_files));
+			\ElkArte\Themes\ThemeLoader::loadLanguageFile(implode('+', $language_files));
 		}
 
 		if (!empty($include_files))

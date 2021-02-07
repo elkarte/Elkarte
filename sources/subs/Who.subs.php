@@ -210,7 +210,7 @@ function determineActions($urls, $preferred_prefix = false)
 		return array();
 	}
 
-	theme()->getTemplates()->loadLanguageFile('Who');
+	\ElkArte\Themes\ThemeLoader::loadLanguageFile('Who');
 
 	// Actions that require a specific permission level.
 	$allowedActions = array(

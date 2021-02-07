@@ -284,7 +284,7 @@ class InlinePermissions extends Adapter
 		global $context, $txt;
 
 		theme()->getTemplates()->load('ManagePermissions');
-		theme()->getTemplates()->loadLanguageFile('ManagePermissions');
+		\ElkArte\Themes\ThemeLoader::loadLanguageFile('ManagePermissions');
 
 		// Load the names for guests
 		foreach ($this->permissions as $permission)

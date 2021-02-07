@@ -24,8 +24,8 @@ class TestPost extends ElkArteCommonSetupTest
 		$this->setSession();
 
 		new ElkArte\Themes\ThemeLoader();
-		theme()->getTemplates()->loadLanguageFile('Profile', 'english', true, true);
-		theme()->getTemplates()->loadLanguageFile('Errors', 'english', true, true);
+		\ElkArte\Themes\ThemeLoader::loadLanguageFile('Profile', 'english', true, true);
+		\ElkArte\Themes\ThemeLoader::loadLanguageFile('Errors', 'english', true, true);
 	}
 
 	/**

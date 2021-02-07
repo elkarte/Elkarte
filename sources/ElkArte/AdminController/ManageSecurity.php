@@ -41,8 +41,8 @@ class ManageSecurity extends AbstractController
 	{
 		global $context, $txt;
 
-		theme()->getTemplates()->loadLanguageFile('Help');
-		theme()->getTemplates()->loadLanguageFile('ManageSettings');
+		\ElkArte\Themes\ThemeLoader::loadLanguageFile('Help');
+		\ElkArte\Themes\ThemeLoader::loadLanguageFile('ManageSettings');
 
 		$subActions = array(
 			'general' => array($this, 'action_securitySettings_display', 'permission' => 'admin_forum'),

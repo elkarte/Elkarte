@@ -237,7 +237,7 @@ class Topic extends AbstractController
 		// @todo this code is almost the same as the one in Display.controller.php
 		if ($topicinfo['id_poll'] > 0 && !empty($modSettings['pollMode']) && allowedTo('poll_view'))
 		{
-			theme()->getTemplates()->loadLanguageFile('Post');
+			\ElkArte\Themes\ThemeLoader::loadLanguageFile('Post');
 			require_once(SUBSDIR . '/Poll.subs.php');
 
 			loadPollContext($topicinfo['id_poll']);

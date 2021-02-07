@@ -73,7 +73,7 @@ class Modlog extends AbstractController
 
 		$context['can_delete'] = allowedTo('admin_forum');
 
-		theme()->getTemplates()->loadLanguageFile('Modlog');
+		\ElkArte\Themes\ThemeLoader::loadLanguageFile('Modlog');
 
 		$context['page_title'] = $context['log_type'] == 3 ? $txt['modlog_admin_log'] : $txt['modlog_view'];
 

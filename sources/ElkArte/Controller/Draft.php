@@ -37,7 +37,7 @@ class Draft extends Post
 	public function pre_dispatch()
 	{
 		// Language and helper functions
-		theme()->getTemplates()->loadLanguageFile('Drafts');
+		\ElkArte\Themes\ThemeLoader::loadLanguageFile('Drafts');
 		require_once(SUBSDIR . '/Drafts.subs.php');
 		require_once(SUBSDIR . '/Profile.subs.php');
 

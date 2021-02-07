@@ -217,7 +217,7 @@ class Emailuser extends AbstractController
 		// Guests can't mark things.
 		if (empty($topic))
 		{
-			theme()->getTemplates()->loadLanguageFile('Errors');
+			\ElkArte\Themes\ThemeLoader::loadLanguageFile('Errors');
 			$context['xml_data'] = array(
 				'error' => 1,
 				'text' => $txt['not_a_topic']
@@ -229,7 +229,7 @@ class Emailuser extends AbstractController
 		// Is the session valid?
 		if (checkSession('post', '', false))
 		{
-			theme()->getTemplates()->loadLanguageFile('Errors');
+			\ElkArte\Themes\ThemeLoader::loadLanguageFile('Errors');
 			$context['xml_data'] = array(
 				'error' => 1,
 				'url' => getUrl('action', ['action' => 'emailuser', 'sa' => 'sendtopic', 'topic' => $topic . '.0']),
@@ -243,7 +243,7 @@ class Emailuser extends AbstractController
 		$row = getTopicInfo($topic, 'message');
 		if (empty($row))
 		{
-			theme()->getTemplates()->loadLanguageFile('Errors');
+			\ElkArte\Themes\ThemeLoader::loadLanguageFile('Errors');
 			$context['xml_data'] = array(
 				'error' => 1,
 				'text' => $txt['not_a_topic']
@@ -255,7 +255,7 @@ class Emailuser extends AbstractController
 		// Can't send topic if its unapproved and using post moderation.
 		if ($modSettings['postmod_active'] && !$row['approved'])
 		{
-			theme()->getTemplates()->loadLanguageFile('Errors');
+			\ElkArte\Themes\ThemeLoader::loadLanguageFile('Errors');
 			$context['xml_data'] = array(
 				'error' => 1,
 				'text' => $txt['not_approved_topic']
@@ -267,7 +267,7 @@ class Emailuser extends AbstractController
 		$is_spam = spamProtection('sendtopic', false);
 		if ($is_spam !== false)
 		{
-			theme()->getTemplates()->loadLanguageFile('Errors');
+			\ElkArte\Themes\ThemeLoader::loadLanguageFile('Errors');
 			$context['xml_data'] = array(
 				'error' => 1,
 				'text' => sprintf($txt['sendtopic_WaitTime_broken'], $is_spam)
@@ -283,7 +283,7 @@ class Emailuser extends AbstractController
 		$result = $this->_sendTopic($row);
 		if ($result !== true)
 		{
-			theme()->getTemplates()->loadLanguageFile('Errors');
+			\ElkArte\Themes\ThemeLoader::loadLanguageFile('Errors');
 			$context['xml_data'] = $result;
 
 			return;
@@ -529,8 +529,8 @@ class Emailuser extends AbstractController
 		}
 
 		// Show the inputs for the comment, etc.
-		theme()->getTemplates()->loadLanguageFile('Post');
-		theme()->getTemplates()->loadLanguageFile('Errors');
+		\ElkArte\Themes\ThemeLoader::loadLanguageFile('Post');
+		\ElkArte\Themes\ThemeLoader::loadLanguageFile('Errors');
 		theme()->getTemplates()->load('Emailuser');
 
 		theme()->addInlineJavascript('

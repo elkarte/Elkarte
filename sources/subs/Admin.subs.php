@@ -34,7 +34,7 @@ function getServerVersions($checkFor)
 
 	$db = database();
 
-	theme()->getTemplates()->loadLanguageFile('Admin');
+	\ElkArte\Themes\ThemeLoader::loadLanguageFile('Admin');
 
 	$versions = array();
 

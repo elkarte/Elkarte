@@ -23,7 +23,7 @@ class TestInlinePermissionsForm extends TestCase
 	 */
 	protected function setUp(): void
 	{
-		theme()->getTemplates()->loadLanguageFile('Admin', 'english', true, true);
+		\ElkArte\Themes\ThemeLoader::loadLanguageFile('Admin', 'english', true, true);
 
 		// Elevate the user.
 		User::$info = new UserInfo([

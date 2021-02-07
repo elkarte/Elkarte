@@ -39,7 +39,7 @@ class ManageSearchEngines extends AbstractController
 	{
 		global $context, $txt;
 
-		theme()->getTemplates()->loadLanguageFile('Search');
+		\ElkArte\Themes\ThemeLoader::loadLanguageFile('Search');
 		theme()->getTemplates()->load('ManageSearch');
 
 		$subActions = array(
@@ -415,7 +415,7 @@ class ManageSearchEngines extends AbstractController
 		global $context, $txt, $modSettings;
 
 		// Load the template and language just incase.
-		theme()->getTemplates()->loadLanguageFile('Search');
+		\ElkArte\Themes\ThemeLoader::loadLanguageFile('Search');
 		theme()->getTemplates()->load('ManageSearch');
 
 		// Did they want to delete some or all entries?

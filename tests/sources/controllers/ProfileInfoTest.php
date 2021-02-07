@@ -19,7 +19,7 @@ class TestProfileInfo extends ElkArteCommonSetupTest
 		parent::setUp();
 
 		new ElkArte\Themes\ThemeLoader();
-		theme()->getTemplates()->loadLanguageFile('Profile', 'english', true, true);
+		\ElkArte\Themes\ThemeLoader::loadLanguageFile('Profile', 'english', true, true);
 	}
 
 	/**

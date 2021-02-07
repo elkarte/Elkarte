@@ -61,7 +61,7 @@ class Reports extends AbstractController
 
 		// Let's get our things running...
 		theme()->getTemplates()->load('Reports');
-		theme()->getTemplates()->loadLanguageFile('Reports');
+		\ElkArte\Themes\ThemeLoader::loadLanguageFile('Reports');
 
 		$context['page_title'] = $txt['generate_reports'];
 
@@ -186,7 +186,7 @@ class Reports extends AbstractController
 		require_once(SUBSDIR . '/Membergroups.subs.php');
 		require_once(SUBSDIR . '/Reports.subs.php');
 
-		theme()->getTemplates()->loadLanguageFile('ManagePermissions');
+		\ElkArte\Themes\ThemeLoader::loadLanguageFile('ManagePermissions');
 		loadPermissionProfiles();
 
 		// Get every moderator.

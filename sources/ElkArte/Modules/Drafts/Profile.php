@@ -78,7 +78,7 @@ class Profile extends AbstractModule
 	{
 		if (empty($post_errors))
 		{
-			theme()->getTemplates()->loadLanguageFile('Drafts');
+			\ElkArte\Themes\ThemeLoader::loadLanguageFile('Drafts');
 		}
 	}
 }

@@ -624,7 +624,7 @@ function availableThemes($current_theme, $current_member)
 
 				if (!empty($settings['theme_variants']))
 				{
-					theme()->getTemplates()->loadLanguageFile('Settings');
+					\ElkArte\Themes\ThemeLoader::loadLanguageFile('Settings');
 
 					$available_themes[$id_theme]['variants'] = array();
 					foreach ($settings['theme_variants'] as $variant)

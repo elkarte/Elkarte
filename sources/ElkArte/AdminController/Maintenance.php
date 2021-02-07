@@ -87,7 +87,7 @@ class Maintenance extends AbstractController
 		isAllowedTo('admin_forum');
 
 		// Need something to talk about?
-		theme()->getTemplates()->loadLanguageFile('Maintenance');
+		\ElkArte\Themes\ThemeLoader::loadLanguageFile('Maintenance');
 		theme()->getTemplates()->load('Maintenance');
 
 		// This uses admin tabs - as it should!
@@ -1022,7 +1022,7 @@ class Maintenance extends AbstractController
 		// If we had an error...
 		if ($ftp->error !== false)
 		{
-			theme()->getTemplates()->loadLanguageFile('Packages');
+			\ElkArte\Themes\ThemeLoader::loadLanguageFile('Packages');
 			$ftp_error = $ftp->last_message === null ? (isset($txt['package_ftp_' . $ftp->error]) ? $txt['package_ftp_' . $ftp->error] : '') : $ftp->last_message;
 
 			// Fill the boxes for a FTP connection with data from the previous attempt
@@ -1118,7 +1118,7 @@ class Maintenance extends AbstractController
 		}
 
 		theme()->getTemplates()->load('Packages');
-		theme()->getTemplates()->loadLanguageFile('Packages');
+		\ElkArte\Themes\ThemeLoader::loadLanguageFile('Packages');
 
 		// $context['package_ftp'] may be set action_backup_display when an error occur
 		if (!isset($context['package_ftp']))

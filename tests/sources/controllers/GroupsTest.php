@@ -31,9 +31,9 @@ class TestGroups extends ElkArteCommonSetupTest
 		$modSettings['latestRealName'] = 'itsme';
 
 		new ElkArte\Themes\ThemeLoader();
-		theme()->getTemplates()->loadLanguageFile('Errors', 'english', true, true);
-		theme()->getTemplates()->loadLanguageFile('ManageMembers', 'english', true, true);
-		theme()->getTemplates()->loadLanguageFile('ModerationCenter', 'english', true, true);
+		\ElkArte\Themes\ThemeLoader::loadLanguageFile('Errors', 'english', true, true);
+		\ElkArte\Themes\ThemeLoader::loadLanguageFile('ManageMembers', 'english', true, true);
+		\ElkArte\Themes\ThemeLoader::loadLanguageFile('ModerationCenter', 'english', true, true);
 
 		// Get the controller
 		$this->controller = new Groups(new EventManager());

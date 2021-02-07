@@ -14,10 +14,12 @@
 namespace ElkArte\Themes;
 
 use ElkArte\Cache\Cache;
+use ElkArte\Themes\Directories;
 use ElkArte\Hooks;
 use ElkArte\HttpReq;
 use ElkArte\User;
 use ElkArte\Util;
+use ElkArte\Debug;
 
 /**
  * Class ThemeLoader
@@ -32,6 +34,9 @@ class ThemeLoader
 
 	/** @var Theme The current theme. */
 	private $theme;
+
+	/** @var Directories The list of directories. */
+	protected static $dirs;
 
 	/**
 	 * Load a theme, by ID.
@@ -296,11 +301,9 @@ class ThemeLoader
 		// Setup the theme file.
 		require_once($settings['theme_dir'] . '/Theme.php');
 		$class = 'ElkArte\\Themes\\' . $themeName . '\\Theme';
-		$this->theme = new $class($this->id, User::$info);
+		static::$dirs = new Directories($settings);
+		$this->theme = new $class($this->id, User::$info, static::$dirs);
 		$context['theme_instance'] = $this->theme;
-
-		// Reload the templates
-		$this->theme->getTemplates()->reloadDirectories($settings);
 	}
 
 	/**
@@ -695,5 +698,203 @@ class ThemeLoader
 	public function getTheme()
 	{
 		return $this->theme;
+	}
+
+	/**
+	 * This loads the bare minimum data.
+	 *
+	 * - Needed by scheduled tasks,
+	 * - Needed by any other code that needs language files before the forum (the theme)
+	 * is loaded.
+	 */
+	public static function loadEssentialThemeData()
+	{
+		global $settings, $modSettings, $mbname, $context;
+
+		if (!function_exists('database'))
+		{
+			throw new \Exception('');
+		}
+
+		$db = database();
+
+		// Get all the default theme variables.
+		$db->fetchQuery(
+			'
+			SELECT id_theme, variable, value
+			FROM {db_prefix}themes
+			WHERE id_member = {int:no_member}
+				AND id_theme IN (1, {int:theme_guests})',
+			[
+				'no_member' => 0,
+				'theme_guests' => $modSettings['theme_guests'],
+			]
+		)->fetch_callback(
+			function ($row) {
+				global $settings;
+
+				$settings[$row['variable']] = $row['value'];
+				$indexes_to_default = [
+					'theme_dir',
+					'theme_url',
+					'images_url',
+				];
+
+				// Is this the default theme?
+				if ($row['id_theme'] == '1' && in_array($row['variable'], $indexes_to_default))
+				{
+					$settings['default_' . $row['variable']] = $row['value'];
+				}
+			}
+		);
+
+		static::$dirs = new Directories($settings);
+		// Check we have some directories setup.
+		if (static::$dirs->hasDirectories() === false)
+		{
+			static::$dirs->reloadDirectories($settings);
+		}
+
+		// Assume we want this.
+		$context['forum_name'] = $mbname;
+		$context['forum_name_html_safe'] = $context['forum_name'];
+
+		static::loadLanguageFiles(['index', 'Addons']);
+	}
+
+	/**
+	 * Load a language file.
+	 *
+	 * - Tries the current and default themes as well as the user and global languages.
+	 *
+	 * @param string[] $template_name
+	 * @param string $lang = ''
+	 * @param bool $fatal = true
+	 * @param bool $force_reload = false
+	 *
+	 * @return string The language actually loaded.
+	 */
+	public static function loadLanguageFiles(
+		array $template_name,
+		$lang = '',
+		$fatal = true,
+		$force_reload = false
+	) {
+		global $language, $settings, $modSettings;
+		global $db_show_debug, $txt;
+		static $already_loaded = [];
+
+		// Default to the user's language.
+		if ($lang === '')
+		{
+			$lang = isset(User::$info->language) ? User::$info->language : $language;
+		}
+
+		// Make sure we have $settings - if not we're in trouble and need to find it!
+		if (empty($settings['default_theme_dir']))
+		{
+			static::loadEssentialThemeData();
+		}
+
+		$fix_arrays = false;
+		// For each file open it up and write it out!
+		foreach ($template_name as $template)
+		{
+			if (!$force_reload && isset($already_loaded[$template]) && $already_loaded[$template] === $lang)
+			{
+				return $lang;
+			}
+
+			if ($template === 'index')
+			{
+				$fix_arrays = true;
+			}
+
+			// Do we want the English version of language file as fallback?
+			if (empty($modSettings['disable_language_fallback']) && $lang != 'english')
+			{
+				static::loadLanguageFiles([$template], 'english', false);
+			}
+
+			// Try to find the language file.
+			$found = false;
+			foreach (static::$dirs->getDirectories() as $template_dir)
+			{
+				if (file_exists(
+					$file =
+						$template_dir . '/languages/' . $lang . '/' . $template . '.' . $lang . '.php'
+				))
+				{
+					// Include it!
+					static::$dirs->fileInclude($file);
+
+					// Note that we found it.
+					$found = true;
+
+					// Keep track of what we're up to, soldier.
+					if ($db_show_debug === true)
+					{
+						Debug::instance()->add(
+							'language_files',
+							$template . '.' . $lang . ' (' . basename(
+								$settings['theme_url']
+							) . ')'
+						);
+					}
+
+					// Remember what we have loaded, and in which language.
+					$already_loaded[$template] = $lang;
+
+					break;
+				}
+			}
+
+			// That couldn't be found!  Log the error, but *try* to continue normally.
+			if (!$found && $fatal)
+			{
+				Errors::instance()->log_error(
+					sprintf(
+						$txt['theme_language_error'],
+						$template . '.' . $lang,
+						'template'
+					)
+				);
+				break;
+			}
+		}
+
+		if ($fix_arrays)
+		{
+			fix_calendar_text();
+		}
+
+		// Return the language actually loaded.
+		return $lang;
+	}
+
+	/**
+	 * Load a language file.
+	 *
+	 * - Tries the current and default themes as well as the user and global languages.
+	 *
+	 * @param string $template_name
+	 * @param string $lang = ''
+	 * @param bool $fatal = true
+	 * @param bool $force_reload = false
+	 *
+	 * @return string The language actually loaded.
+	 */
+	public static function loadLanguageFile(
+		$template_name,
+		$lang = '',
+		$fatal = true,
+		$force_reload = false
+	) {
+		return static::loadLanguageFiles(
+			explode('+', $template_name),
+			$lang,
+			$fatal,
+			$force_reload
+		);
 	}
 }

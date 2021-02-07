@@ -80,7 +80,7 @@ class ProfileInfo extends AbstractController
 		}
 		$this->_profile->loadContext();
 
-		theme()->getTemplates()->loadLanguageFile('Profile');
+		\ElkArte\Themes\ThemeLoader::loadLanguageFile('Profile');
 	}
 
 	/**
@@ -123,7 +123,7 @@ class ProfileInfo extends AbstractController
 		global $context, $modSettings;
 
 		theme()->getTemplates()->load('ProfileInfo');
-		theme()->getTemplates()->loadLanguageFile('Profile');
+		\ElkArte\Themes\ThemeLoader::loadLanguageFile('Profile');
 
 		// Set a canonical URL for this page.
 		$context['canonical_url'] = getUrl('action', ['action' => 'profile', 'u' => $this->_memID]);
@@ -359,7 +359,7 @@ class ProfileInfo extends AbstractController
 		{
 			include_once(SUBSDIR . '/Who.subs.php');
 			$action = determineActions($this->_profile['url']);
-			theme()->getTemplates()->loadLanguageFile('index');
+			\ElkArte\Themes\ThemeLoader::loadLanguageFile('index');
 
 			if ($action !== false)
 			{
@@ -1062,8 +1062,8 @@ class ProfileInfo extends AbstractController
 		// Verify if the user has sufficient permissions.
 		isAllowedTo('manage_permissions');
 
-		theme()->getTemplates()->loadLanguageFile('ManagePermissions');
-		theme()->getTemplates()->loadLanguageFile('Admin');
+		\ElkArte\Themes\ThemeLoader::loadLanguageFile('ManagePermissions');
+		\ElkArte\Themes\ThemeLoader::loadLanguageFile('Admin');
 		theme()->getTemplates()->load('ManageMembers');
 		theme()->getTemplates()->load('ProfileInfo');
 

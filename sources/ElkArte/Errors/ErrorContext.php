@@ -373,7 +373,7 @@ final class ErrorContext
 	private function _loadLang()
 	{
 		// Errors is always needed
-		theme()->getTemplates()->loadLanguageFile('Errors');
+		\ElkArte\Themes\ThemeLoader::loadLanguageFile('Errors');
 
 		// Any custom one?
 		if (!empty($this->_language_files))
@@ -382,7 +382,7 @@ final class ErrorContext
 			{
 				if (!$loaded)
 				{
-					theme()->getTemplates()->loadLanguageFile($language);
+					\ElkArte\Themes\ThemeLoader::loadLanguageFile($language);
 
 					// Remember this file has been loaded already
 					$this->_language_files[$language] = true;

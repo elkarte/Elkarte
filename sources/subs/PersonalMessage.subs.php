@@ -553,7 +553,7 @@ function sendpm($recipients, $subject, $message, $store_outbox = true, $from = n
 	$db = database();
 
 	// Make sure the PM language file is loaded, we might need something out of it.
-	theme()->getTemplates()->loadLanguageFile('PersonalMessage');
+	\ElkArte\Themes\ThemeLoader::loadLanguageFile('PersonalMessage');
 
 	// Needed for our email and post functions
 	require_once(SUBSDIR . '/Mail.subs.php');
@@ -981,7 +981,7 @@ function sendpm($recipients, $subject, $message, $store_outbox = true, $from = n
 	call_integration_hook('integrate_personal_message_after', array(&$id_pm, &$log, &$recipients, &$from, &$subject, &$message));
 
 	// Back to what we were on before!
-	theme()->getTemplates()->loadLanguageFile('index+PersonalMessage');
+	\ElkArte\Themes\ThemeLoader::loadLanguageFile('index+PersonalMessage');
 
 	// Add one to their unread and read message counts.
 	foreach ($all_to as $k => $id)

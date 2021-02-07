@@ -118,7 +118,7 @@ class XmlPreview extends AbstractController
 
 		// Needed to create the preview
 		require_once(SUBSDIR . '/Mail.subs.php');
-		theme()->getTemplates()->loadLanguageFile('Errors');
+		\ElkArte\Themes\ThemeLoader::loadLanguageFile('Errors');
 
 		$context['post_error']['errors'] = array();
 		$context['send_pm'] = !empty($this->_req->post->send_pm) ? 1 : 0;
@@ -148,8 +148,8 @@ class XmlPreview extends AbstractController
 		global $context, $txt;
 
 		require_once(SUBSDIR . '/Profile.subs.php');
-		theme()->getTemplates()->loadLanguageFile('Profile');
-		theme()->getTemplates()->loadLanguageFile('Errors');
+		\ElkArte\Themes\ThemeLoader::loadLanguageFile('Profile');
+		\ElkArte\Themes\ThemeLoader::loadLanguageFile('Errors');
 
 		$user = isset($this->_req->post->user) ? (int) $this->_req->post->user : 0;
 		$is_owner = $user == $this->user->id;
@@ -247,8 +247,8 @@ class XmlPreview extends AbstractController
 		global $context, $txt, $scripturl, $mbname;
 
 		require_once(SUBSDIR . '/Post.subs.php');
-		theme()->getTemplates()->loadLanguageFile('Errors');
-		theme()->getTemplates()->loadLanguageFile('ModerationCenter');
+		\ElkArte\Themes\ThemeLoader::loadLanguageFile('Errors');
+		\ElkArte\Themes\ThemeLoader::loadLanguageFile('ModerationCenter');
 
 		$context['post_error']['errors'] = array();
 
@@ -324,8 +324,8 @@ class XmlPreview extends AbstractController
 		global $context, $txt, $scripturl, $mbname, $modSettings;
 
 		require_once(SUBSDIR . '/Post.subs.php');
-		theme()->getTemplates()->loadLanguageFile('Errors');
-		theme()->getTemplates()->loadLanguageFile('ModerationCenter');
+		\ElkArte\Themes\ThemeLoader::loadLanguageFile('Errors');
+		\ElkArte\Themes\ThemeLoader::loadLanguageFile('ModerationCenter');
 
 		$context['post_error']['errors'] = array();
 

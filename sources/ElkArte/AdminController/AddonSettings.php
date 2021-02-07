@@ -42,8 +42,8 @@ class AddonSettings extends AbstractController
 	{
 		global $context, $txt;
 
-		theme()->getTemplates()->loadLanguageFile('Help');
-		theme()->getTemplates()->loadLanguageFile('ManageSettings');
+		\ElkArte\Themes\ThemeLoader::loadLanguageFile('Help');
+		\ElkArte\Themes\ThemeLoader::loadLanguageFile('ManageSettings');
 
 		// Our tidy subActions array
 		$subActions = array(
@@ -158,8 +158,8 @@ class AddonSettings extends AbstractController
 		// You need to be an admin to edit settings!
 		isAllowedTo('admin_forum');
 
-		theme()->getTemplates()->loadLanguageFile('Help');
-		theme()->getTemplates()->loadLanguageFile('ManageSettings');
+		\ElkArte\Themes\ThemeLoader::loadLanguageFile('Help');
+		\ElkArte\Themes\ThemeLoader::loadLanguageFile('ManageSettings');
 
 		$context['sub_template'] = 'show_settings';
 

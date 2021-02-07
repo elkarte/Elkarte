@@ -24,7 +24,7 @@ class TestDisplayIndex extends ElkArteCommonSetupTest
 		parent::setUp();
 
 		new ElkArte\Themes\ThemeLoader();
-		theme()->getTemplates()->loadLanguageFile('Errors', 'english', true, true);
+		\ElkArte\Themes\ThemeLoader::loadLanguageFile('Errors', 'english', true, true);
 	}
 
 	/**

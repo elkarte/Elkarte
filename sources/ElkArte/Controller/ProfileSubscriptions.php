@@ -68,7 +68,7 @@ class ProfileSubscriptions extends AbstractController
 
 		// Load the paid template anyway.
 		theme()->getTemplates()->load('ManagePaid');
-		theme()->getTemplates()->loadLanguageFile('ManagePaid');
+		\ElkArte\Themes\ThemeLoader::loadLanguageFile('ManagePaid');
 
 		$memID = currentMemberID();
 		$context['member']['id'] = $memID;

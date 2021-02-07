@@ -76,7 +76,7 @@ class ManagePermissions extends AbstractController
 		$this->illegal_permissions = $this->permissionsObject->getIllegalPermissions();
 		$this->illegal_guest_permissions = $this->permissionsObject->getIllegalGuestPermissions();
 
-		theme()->getTemplates()->loadLanguageFile('ManagePermissions+ManageMembers');
+		\ElkArte\Themes\ThemeLoader::loadLanguageFile('ManagePermissions+ManageMembers');
 		theme()->getTemplates()->load('ManagePermissions');
 
 		// Format: 'sub-action' => array('function_to_call', 'permission_needed'),

@@ -35,7 +35,7 @@ class Reminder extends AbstractController
 	{
 		global $txt, $context;
 
-		theme()->getTemplates()->loadLanguageFile('Profile');
+		\ElkArte\Themes\ThemeLoader::loadLanguageFile('Profile');
 		theme()->getTemplates()->load('Reminder');
 
 		$context['page_title'] = $txt['authentication_reminder'];
@@ -186,7 +186,7 @@ class Reminder extends AbstractController
 	{
 		global $txt, $context;
 
-		theme()->getTemplates()->loadLanguageFile('Login');
+		\ElkArte\Themes\ThemeLoader::loadLanguageFile('Login');
 
 		// You need a code!
 		if (!isset($this->_req->query->code))
@@ -239,7 +239,7 @@ class Reminder extends AbstractController
 		$member_id = $this->_req->getPost('u', 'intval', -1);
 		$code = $this->_req->getPost('code', 'trim', '');
 
-		theme()->getTemplates()->loadLanguageFile('Login');
+		\ElkArte\Themes\ThemeLoader::loadLanguageFile('Login');
 
 		// Get the code as it should be from the database.
 		require_once(SUBSDIR . '/Members.subs.php');
@@ -318,7 +318,7 @@ class Reminder extends AbstractController
 			throw new Exception('username_no_exist', false);
 		}
 
-		theme()->getTemplates()->loadLanguageFile('Login');
+		\ElkArte\Themes\ThemeLoader::loadLanguageFile('Login');
 
 		// Get the information from the database.
 		require_once(SUBSDIR . '/Members.subs.php');
@@ -400,7 +400,7 @@ function secretAnswerInput()
 	checkSession();
 
 	// Strings for the register auto javascript clever stuffy wuffy.
-	theme()->getTemplates()->loadLanguageFile('Login');
+	\ElkArte\Themes\ThemeLoader::loadLanguageFile('Login');
 
 	// Check they entered something...
 	if (empty($_POST['uid']))

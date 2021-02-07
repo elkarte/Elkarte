@@ -1830,9 +1830,9 @@ function response_prefix()
 		}
 		else
 		{
-			theme()->getTemplates()->loadLanguageFile('index', $language, false);
+			\ElkArte\Themes\ThemeLoader::loadLanguageFile('index', $language, false);
 			$response_prefix = $txt['response_prefix'];
-			theme()->getTemplates()->loadLanguageFile('index');
+			\ElkArte\Themes\ThemeLoader::loadLanguageFile('index');
 		}
 
 		$cache->put('response_prefix', $response_prefix, 600);

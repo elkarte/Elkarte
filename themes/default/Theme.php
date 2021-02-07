@@ -22,6 +22,7 @@ use ElkArte\Controller\ScheduledTasks;
 use ElkArte\EventManager;
 use ElkArte\SiteCombiner;
 use ElkArte\Themes\Theme as BaseTheme;
+use ElkArte\Themes\ThemeLoader;
 use ElkArte\Util;
 
 /**
@@ -1174,7 +1175,7 @@ class Theme extends BaseTheme
 				$this->getTemplates()->load($template);
 
 			// ...and attempt to load their associated language files.
-			$this->getTemplates()->loadLanguageFiles(array_merge($templates, ['Addons']), '', false);
+			ThemeLoader::loadLanguageFiles(array_merge($templates, ['Addons']), '', false);
 
 			// Custom template layers?
 			$layers = isset($settings['theme_layers']) ? explode(',', $settings['theme_layers']) : ['html', 'body'];

@@ -74,7 +74,7 @@ class Auth extends AbstractController
 		}
 
 		// Load the Login template/language file.
-		theme()->getTemplates()->loadLanguageFile('Login');
+		\ElkArte\Themes\ThemeLoader::loadLanguageFile('Login');
 		theme()->getTemplates()->load('Login');
 		loadJavascriptFile('sha256.js', array('defer' => true));
 		$context['sub_template'] = 'login';
@@ -161,7 +161,7 @@ class Auth extends AbstractController
 			$modSettings['cookieTime'] = (int) $_POST['cookielength'];
 		}
 
-		theme()->getTemplates()->loadLanguageFile('Login');
+		\ElkArte\Themes\ThemeLoader::loadLanguageFile('Login');
 
 		// Load the template stuff
 		theme()->getTemplates()->load('Login');
@@ -656,7 +656,7 @@ class Auth extends AbstractController
 	{
 		global $txt, $context;
 
-		theme()->getTemplates()->loadLanguageFile('Login');
+		\ElkArte\Themes\ThemeLoader::loadLanguageFile('Login');
 		theme()->getTemplates()->load('Login');
 		loadJavascriptFile('sha256.js', array('defer' => true));
 		createToken('login');
@@ -684,7 +684,7 @@ class Auth extends AbstractController
 	{
 		global $txt, $mtitle, $mmessage, $context;
 
-		theme()->getTemplates()->loadLanguageFile('Login');
+		\ElkArte\Themes\ThemeLoader::loadLanguageFile('Login');
 		theme()->getTemplates()->load('Login');
 		loadJavascriptFile('sha256.js', array('defer' => true));
 		createToken('login');

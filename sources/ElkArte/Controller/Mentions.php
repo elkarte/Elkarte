@@ -213,7 +213,7 @@ class Mentions extends AbstractController
 		is_not_guest();
 
 		require_once(SUBSDIR . '/Mentions.subs.php');
-		theme()->getTemplates()->loadLanguageFile('Mentions');
+		\ElkArte\Themes\ThemeLoader::loadLanguageFile('Mentions');
 
 		$this->_buildUrl();
 
@@ -435,7 +435,7 @@ class Mentions extends AbstractController
 				$mentioning->updateStatus($id_mention, $mark);
 				break;
 			case 'readall':
-				theme()->getTemplates()->loadLanguageFile('Mentions');
+				\ElkArte\Themes\ThemeLoader::loadLanguageFile('Mentions');
 				$mentions = $this->list_loadMentions((int) $this->_page, $this->_items_per_page, $this->_sort, $this->_all, $this->_type);
 				$mentioning->markread($mentions);
 				break;
@@ -461,7 +461,7 @@ class Mentions extends AbstractController
 		$totalMentions = countUserMentions($all, $type);
 		$mentions = array();
 		$round = 0;
-		theme()->getTemplates()->loadLanguageFile('Mentions');
+		\ElkArte\Themes\ThemeLoader::loadLanguageFile('Mentions');
 
 		$this->_registerEvents($type);
 

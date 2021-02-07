@@ -22,7 +22,7 @@ class TestProfileOptions extends ElkArteCommonSetupTest
 		parent::setUp();
 
 		new ElkArte\Themes\ThemeLoader();
-		theme()->getTemplates()->loadLanguageFile('Profile', 'english', true, true);
+		\ElkArte\Themes\ThemeLoader::loadLanguageFile('Profile', 'english', true, true);
 
 		// Some tricks, maybe
 		require_once(SUBSDIR . '/Profile.subs.php');

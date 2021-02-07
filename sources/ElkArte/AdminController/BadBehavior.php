@@ -52,7 +52,7 @@ class BadBehavior extends AbstractController
 		isAllowedTo('admin_forum');
 
 		// Templates, etc...
-		theme()->getTemplates()->loadLanguageFile('BadBehaviorlog');
+		\ElkArte\Themes\ThemeLoader::loadLanguageFile('BadBehaviorlog');
 		theme()->getTemplates()->load('BadBehavior');
 
 		// Functions we will need

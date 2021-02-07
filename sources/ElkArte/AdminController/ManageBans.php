@@ -340,7 +340,7 @@ class ManageBans extends AbstractController
 		$ban_group_id = isset($context['ban']['id']) ? $context['ban']['id'] : $this->_req->getQuery('bg', 'intval', 0);
 
 		// Template needs this to show errors using javascript
-		theme()->getTemplates()->loadLanguageFile('Errors');
+		\ElkArte\Themes\ThemeLoader::loadLanguageFile('Errors');
 		createToken('admin-bet');
 		$context['form_url'] = getUrl('admin', ['action' => 'admin', 'area' => 'ban', 'sa' => 'edit']);
 

@@ -105,7 +105,7 @@ class ProfileAccount extends AbstractController
 		}
 
 		// Get the base (errors related) stuff done.
-		theme()->getTemplates()->loadLanguageFile('Errors');
+		\ElkArte\Themes\ThemeLoader::loadLanguageFile('Errors');
 		$context['custom_error_title'] = $txt['profile_warning_errors_occurred'];
 
 		// Make sure things which are disabled stay disabled.

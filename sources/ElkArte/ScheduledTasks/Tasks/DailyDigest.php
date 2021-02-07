@@ -56,7 +56,7 @@ class DailyDigest implements ScheduledTaskInterface
 
 		// We'll want this...
 		require_once(SUBSDIR . '/Mail.subs.php');
-		theme()->getTemplates()->loadEssentialThemeData();
+		\ElkArte\Themes\ThemeLoader::loadEssentialThemeData();
 
 		// If the maillist function is on then so is the enhanced digest
 		$maillist = !empty($modSettings['maillist_enabled']) && !empty($modSettings['maillist_digest_enabled']);
@@ -264,10 +264,10 @@ class DailyDigest implements ScheduledTaskInterface
 		$langtxt = array();
 		foreach ($langs as $lang)
 		{
-			theme()->getTemplates()->loadLanguageFile('Post', $lang);
-			theme()->getTemplates()->loadLanguageFile('index', $lang);
-			theme()->getTemplates()->loadLanguageFile('Maillist', $lang);
-			theme()->getTemplates()->loadLanguageFile('EmailTemplates', $lang);
+			\ElkArte\Themes\ThemeLoader::loadLanguageFile('Post', $lang);
+			\ElkArte\Themes\ThemeLoader::loadLanguageFile('index', $lang);
+			\ElkArte\Themes\ThemeLoader::loadLanguageFile('Maillist', $lang);
+			\ElkArte\Themes\ThemeLoader::loadLanguageFile('EmailTemplates', $lang);
 
 			$langtxt[$lang] = array(
 				'subject' => $txt['digest_subject_' . ($is_weekly ? 'weekly' : 'daily')],

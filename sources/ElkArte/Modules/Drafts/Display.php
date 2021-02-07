@@ -90,14 +90,14 @@ class Display extends AbstractModule
 		// Enable the drafts functions for the QR area
 		if (!empty($context['drafts_save']))
 		{
-			theme()->getTemplates()->loadLanguageFile('Drafts');
+			\ElkArte\Themes\ThemeLoader::loadLanguageFile('Drafts');
 
 			if ($context['drafts_autosave'])
 			{
 				// WYSIWYG editor
 				if (!empty($options['use_editor_quick_reply']))
 				{
-					theme()->getTemplates()->loadLanguageFile('Post');
+					\ElkArte\Themes\ThemeLoader::loadLanguageFile('Post');
 
 					$editorOptions['plugin_addons'] = $editorOptions['plugin_addons'] ?? [];
 					$editorOptions['plugin_options'] = $editorOptions['plugin_options'] ?? [];

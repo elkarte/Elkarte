@@ -200,7 +200,7 @@ function adminLogin($type = 'admin')
 {
 	global $context, $txt;
 
-	theme()->getTemplates()->loadLanguageFile('Admin');
+	\ElkArte\Themes\ThemeLoader::loadLanguageFile('Admin');
 	theme()->getTemplates()->load('Login');
 	loadJavascriptFile('sha256.js', array('defer' => true));
 
@@ -468,7 +468,7 @@ function resetPassword($memID, $username = null)
 	global $modSettings, $language;
 
 	// Language... and a required file.
-	theme()->getTemplates()->loadLanguageFile('Login');
+	\ElkArte\Themes\ThemeLoader::loadLanguageFile('Login');
 	require_once(SUBSDIR . '/Mail.subs.php');
 
 	// Get some important details.
@@ -605,7 +605,7 @@ function validatePassword($password, $username, $restrict_in = array())
 	// Perform basic requirements first.
 	if (Util::strlen($password) < (empty($modSettings['password_strength']) ? 4 : 8))
 	{
-		theme()->getTemplates()->loadLanguageFile('Errors');
+		\ElkArte\Themes\ThemeLoader::loadLanguageFile('Errors');
 		$txt['profile_error_password_short'] = sprintf($txt['profile_error_password_short'], empty($modSettings['password_strength']) ? 4 : 8);
 
 		return 'short';

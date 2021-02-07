@@ -133,7 +133,7 @@ class Search extends AbstractController
 			throw new Exception('loadavg_search_disabled', false);
 		}
 
-		theme()->getTemplates()->loadLanguageFile('Search');
+		\ElkArte\Themes\ThemeLoader::loadLanguageFile('Search');
 
 		// Don't load this in XML mode.
 		$xml = $this->_req->getRequest('xml');
@@ -214,7 +214,7 @@ class Search extends AbstractController
 		// Load the error text strings if there were errors in the search.
 		if (!empty($context['search_errors']))
 		{
-			theme()->getTemplates()->loadLanguageFile('Errors');
+			\ElkArte\Themes\ThemeLoader::loadLanguageFile('Errors');
 			$context['search_errors']['messages'] = array();
 			foreach ($context['search_errors'] as $search_error => $dummy)
 			{
@@ -348,7 +348,7 @@ class Search extends AbstractController
 		// Maximum length of the string.
 		$context['search_string_limit'] = 100;
 
-		theme()->getTemplates()->loadLanguageFile('Search');
+		\ElkArte\Themes\ThemeLoader::loadLanguageFile('Search');
 		$xml = $this->_req->getRequest('xml');
 		if (!isset($xml))
 		{

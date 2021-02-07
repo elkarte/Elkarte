@@ -104,7 +104,7 @@ class GenericList
 		$this->listOptions = $listOptions;
 
 		// Be ready for those pesky errors
-		theme()->getTemplates()->loadLanguageFile('Errors');
+		\ElkArte\Themes\ThemeLoader::loadLanguageFile('Errors');
 
 		// Load the template
 		theme()->getTemplates()->load('GenericList');

@@ -63,7 +63,7 @@ class ManageMembers extends AbstractController
 		global $txt, $context, $modSettings;
 
 		// Load the essentials.
-		theme()->getTemplates()->loadLanguageFile('ManageMembers');
+		\ElkArte\Themes\ThemeLoader::loadLanguageFile('ManageMembers');
 		theme()->getTemplates()->load('ManageMembers');
 
 		$subActions = array(
@@ -1200,7 +1200,7 @@ class ManageMembers extends AbstractController
 		require_once(SUBSDIR . '/Members.subs.php');
 
 		// We also need to the login languages here - for emails.
-		theme()->getTemplates()->loadLanguageFile('Login');
+		\ElkArte\Themes\ThemeLoader::loadLanguageFile('Login');
 
 		// Start off clean
 		$this->conditions = array();

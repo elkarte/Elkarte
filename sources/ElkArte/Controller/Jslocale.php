@@ -93,7 +93,7 @@ class Jslocale extends AbstractController
 
 		if (!empty($language_file))
 		{
-			theme()->getTemplates()->loadLanguageFile($language_file);
+			\ElkArte\Themes\ThemeLoader::loadLanguageFile($language_file);
 		}
 
 		theme()->getLayers()->removeAll();
