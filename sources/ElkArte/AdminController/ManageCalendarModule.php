@@ -65,7 +65,7 @@ class ManageCalendarModule extends AbstractController
 		global $context, $txt;
 
 		// Everything's gonna need this.
-		theme()->getTemplates()->loadLanguageFile('ManageCalendar');
+		\ElkArte\Themes\ThemeLoader::loadLanguageFile('ManageCalendar');
 
 		// Default text.
 		$context['explain_text'] = $txt['calendar_desc'];

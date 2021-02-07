@@ -50,7 +50,7 @@ class ManageSearch extends AbstractController
 	{
 		global $context, $txt;
 
-		theme()->getTemplates()->loadLanguageFile('Search');
+		\ElkArte\Themes\ThemeLoader::loadLanguageFile('Search');
 		theme()->getTemplates()->load('ManageSearch');
 
 		$subActions = array(

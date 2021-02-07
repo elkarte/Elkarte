@@ -218,7 +218,7 @@ class Mentioning extends AbstractModel
 		}
 
 		// If everything is fine, let's prepare for the fun!
-		theme()->getTemplates()->loadLanguageFile('Mentions');
+		\ElkArte\Themes\ThemeLoader::loadLanguageFile('Mentions');
 
 		return true;
 	}

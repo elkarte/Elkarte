@@ -43,7 +43,7 @@ class PostModeration extends AbstractController
 	public function action_index()
 	{
 		// @todo We'll shift these later bud.
-		theme()->getTemplates()->loadLanguageFile('ModerationCenter');
+		\ElkArte\Themes\ThemeLoader::loadLanguageFile('ModerationCenter');
 		theme()->getTemplates()->load('ModerationCenter');
 
 		// Allowed sub-actions, you know the drill by now!

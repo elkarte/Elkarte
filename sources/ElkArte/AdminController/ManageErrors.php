@@ -123,7 +123,7 @@ class ManageErrors extends AbstractController
 		global $txt, $context, $modSettings;
 
 		// Templates, etc...
-		theme()->getTemplates()->loadLanguageFile('Maintenance');
+		\ElkArte\Themes\ThemeLoader::loadLanguageFile('Maintenance');
 		theme()->getTemplates()->load('Errors');
 
 		// Set up any filters chosen

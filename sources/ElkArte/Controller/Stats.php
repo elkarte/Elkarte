@@ -93,7 +93,7 @@ class Stats extends AbstractController
 		}
 
 		// Stats it is
-		theme()->getTemplates()->loadLanguageFile('Stats');
+		\ElkArte\Themes\ThemeLoader::loadLanguageFile('Stats');
 		theme()->getTemplates()->load('Stats');
 		loadJavascriptFile('stats.js');
 

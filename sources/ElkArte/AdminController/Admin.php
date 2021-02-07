@@ -72,7 +72,7 @@ class Admin extends AbstractController
 		validateSession();
 
 		// Load the language and templates....
-		theme()->getTemplates()->loadLanguageFile('Admin');
+		\ElkArte\Themes\ThemeLoader::loadLanguageFile('Admin');
 		theme()->getTemplates()->load('Admin');
 		loadCSSFile('admin.css');
 		loadJavascriptFile('admin.js', array(), 'admin_script');
@@ -717,7 +717,7 @@ class Admin extends AbstractController
 			'help' => '',
 			'description' => '',
 		);
-		theme()->getTemplates()->loadLanguageFile('Who');
+		\ElkArte\Themes\ThemeLoader::loadLanguageFile('Who');
 		$context += prepareCreditsData();
 
 		// This makes it easier to get the latest news with your time format.

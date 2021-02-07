@@ -54,9 +54,9 @@ class ManageFeatures extends AbstractController
 		global $context, $txt, $settings;
 
 		// Often Helpful
-		theme()->getTemplates()->loadLanguageFile('Help');
-		theme()->getTemplates()->loadLanguageFile('ManageSettings');
-		theme()->getTemplates()->loadLanguageFile('Mentions');
+		\ElkArte\Themes\ThemeLoader::loadLanguageFile('Help');
+		\ElkArte\Themes\ThemeLoader::loadLanguageFile('ManageSettings');
+		\ElkArte\Themes\ThemeLoader::loadLanguageFile('Mentions');
 
 		// All the actions we know about
 		$subActions = array(
@@ -499,7 +499,7 @@ class ManageFeatures extends AbstractController
 	{
 		global $txt, $context, $modSettings;
 
-		theme()->getTemplates()->loadLanguageFile('Mentions');
+		\ElkArte\Themes\ThemeLoader::loadLanguageFile('Mentions');
 
 		// Instantiate the form
 		$settingsForm = new SettingsForm(SettingsForm::DB_ADAPTER);
@@ -631,8 +631,8 @@ class ManageFeatures extends AbstractController
 	{
 		global $txt, $modSettings;
 
-		theme()->getTemplates()->loadLanguageFile('Profile');
-		theme()->getTemplates()->loadLanguageFile('UserNotifications');
+		\ElkArte\Themes\ThemeLoader::loadLanguageFile('Profile');
+		\ElkArte\Themes\ThemeLoader::loadLanguageFile('UserNotifications');
 		loadJavascriptFile('jquery.multiselect.min.js');
 		theme()->addInlineJavascript('
 		$(\'.select_multiple\').multiselect({\'language_strings\': {\'Select all\': ' . JavascriptEscape($txt['notify_select_all']) . '}});', true);
@@ -1187,7 +1187,7 @@ class ManageFeatures extends AbstractController
 		// Any errors messages to show?
 		if (isset($this->_req->query->msg))
 		{
-			theme()->getTemplates()->loadLanguageFile('Errors');
+			\ElkArte\Themes\ThemeLoader::loadLanguageFile('Errors');
 
 			if (isset($txt['custom_option_' . $this->_req->query->msg]))
 			{
@@ -1196,7 +1196,7 @@ class ManageFeatures extends AbstractController
 		}
 
 		// Load the profile language for section names.
-		theme()->getTemplates()->loadLanguageFile('Profile');
+		\ElkArte\Themes\ThemeLoader::loadLanguageFile('Profile');
 
 		// Load up the profile field, if one was supplied
 		if ($context['fid'])
@@ -1523,7 +1523,7 @@ class ManageFeatures extends AbstractController
 		$settingsForm->setConfigVars($this->_pmSettings());
 
 		require_once(SUBSDIR . '/PersonalMessage.subs.php');
-		theme()->getTemplates()->loadLanguageFile('ManageMembers');
+		\ElkArte\Themes\ThemeLoader::loadLanguageFile('ManageMembers');
 
 		$context['pm_limits'] = loadPMLimits();
 

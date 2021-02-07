@@ -237,7 +237,7 @@ function is_not_guest($message = '', $is_fatal = true)
 	}
 
 	// Load the Login template and language file.
-	theme()->getTemplates()->loadLanguageFile('Login');
+	\ElkArte\Themes\ThemeLoader::loadLanguageFile('Login');
 
 	// Apparently we're not in a position to handle this now. Let's go to a safer location for now.
 	if (!theme()->getLayers()->hasLayers())
@@ -1269,7 +1269,7 @@ function isAllowedTo($permission, $boards = null)
 		// If they are a guest, show a login. (because the error might be gone if they do!)
 		if (User::$info->is_guest)
 		{
-			theme()->getTemplates()->loadLanguageFile('Errors');
+			\ElkArte\Themes\ThemeLoader::loadLanguageFile('Errors');
 			is_not_guest($txt['cannot_' . $error_permission]);
 		}
 

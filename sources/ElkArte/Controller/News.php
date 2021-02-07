@@ -101,7 +101,7 @@ class News extends AbstractController
 			obExit(false);
 		}
 
-		theme()->getTemplates()->loadLanguageFile('Stats');
+		\ElkArte\Themes\ThemeLoader::loadLanguageFile('Stats');
 		$txt['xml_rss_desc'] = replaceBasicActionUrl($txt['xml_rss_desc']);
 
 		// Default to latest 5.  No more than whats defined in the ACP or 255

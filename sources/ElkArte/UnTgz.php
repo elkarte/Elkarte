@@ -162,7 +162,7 @@ class UnTgz
 		}
 
 		// Make sure we have this loaded.
-		theme()->getTemplates()->loadLanguageFile('Packages');
+		\ElkArte\Themes\ThemeLoader::loadLanguageFile('Packages');
 
 		// Likely to need this
 		require_once(SUBSDIR . '/Package.subs.php');

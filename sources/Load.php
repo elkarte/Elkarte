@@ -489,7 +489,7 @@ function loadBoard()
 		}
 		elseif (User::$info->is_guest)
 		{
-			theme()->getTemplates()->loadLanguageFile('Errors');
+			\ElkArte\Themes\ThemeLoader::loadLanguageFile('Errors');
 			is_not_guest($txt['topic_gone']);
 		}
 		else
@@ -787,9 +787,9 @@ function determineSmileySet($user_smiley_set, $known_smiley_sets)
  */
 function loadEssentialThemeData()
 {
-	\ElkArte\Errors\Errors::instance()->log_deprecated('loadEssentialThemeData()', 'theme()->getTemplates()->loadEssentialThemeData()');
+	\ElkArte\Errors\Errors::instance()->log_deprecated('loadEssentialThemeData()', '\ElkArte\Themes\ThemeLoader::loadEssentialThemeData()');
 
-	return theme()->getTemplates()->loadEssentialThemeData();
+	return \ElkArte\Themes\ThemeLoader::loadEssentialThemeData();
 }
 
 /**
@@ -1126,9 +1126,9 @@ function addInlineJavascript($javascript, $defer = false)
  */
 function loadLanguage($template_name, $lang = '', $fatal = true, $force_reload = false)
 {
-	\ElkArte\Errors\Errors::instance()->log_deprecated('loadLanguage()', 'theme()->getTemplates()->loadLanguageFile()');
+	\ElkArte\Errors\Errors::instance()->log_deprecated('loadLanguage()', '\ElkArte\Themes\ThemeLoader::loadLanguageFile()');
 
-	return theme()->getTemplates()->loadLanguageFile($template_name, $lang, $fatal, $force_reload);
+	return \ElkArte\Themes\ThemeLoader::loadLanguageFile($template_name, $lang, $fatal, $force_reload);
 }
 
 /**

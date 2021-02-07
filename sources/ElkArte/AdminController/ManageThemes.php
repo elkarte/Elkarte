@@ -141,8 +141,8 @@ class ManageThemes extends AbstractController
 		}
 
 		// Load the important language files...
-		theme()->getTemplates()->loadLanguageFile('ManageThemes');
-		theme()->getTemplates()->loadLanguageFile('Settings');
+		\ElkArte\Themes\ThemeLoader::loadLanguageFile('ManageThemes');
+		\ElkArte\Themes\ThemeLoader::loadLanguageFile('Settings');
 
 		// No guests in here.
 		is_not_guest();
@@ -223,7 +223,7 @@ class ManageThemes extends AbstractController
 		// No guests in here.
 		if ($this->user->is_guest)
 		{
-			theme()->getTemplates()->loadLanguageFile('Errors');
+			\ElkArte\Themes\ThemeLoader::loadLanguageFile('Errors');
 			$context['xml_data'] = array(
 				'error' => 1,
 				'text' => $txt['not_guests']
@@ -255,7 +255,7 @@ class ManageThemes extends AbstractController
 		}
 		else
 		{
-			theme()->getTemplates()->loadLanguageFile('Errors');
+			\ElkArte\Themes\ThemeLoader::loadLanguageFile('Errors');
 			$context['xml_data'] = array(
 				'error' => 1,
 				'text' => $txt['error_sa_not_set']
@@ -277,7 +277,7 @@ class ManageThemes extends AbstractController
 
 		// Load in the helpers we need
 		require_once(SUBSDIR . '/Themes.subs.php');
-		theme()->getTemplates()->loadLanguageFile('Admin');
+		\ElkArte\Themes\ThemeLoader::loadLanguageFile('Admin');
 
 		if (isset($this->_req->query->th))
 		{
@@ -392,7 +392,7 @@ class ManageThemes extends AbstractController
 
 		// Select the best fitting tab.
 		$context[$context['admin_menu_name']]['current_subsection'] = 'list';
-		theme()->getTemplates()->loadLanguageFile('Admin');
+		\ElkArte\Themes\ThemeLoader::loadLanguageFile('Admin');
 
 		// Fetch the smiley sets...
 		$sets = explode(',', 'none,' . $modSettings['smiley_sets_known']);
@@ -411,10 +411,10 @@ class ManageThemes extends AbstractController
 		new ThemeLoader($theme, false);
 
 		// Also load the actual themes language file - in case of special settings.
-		theme()->getTemplates()->loadLanguageFile('Settings', '', true, true);
+		\ElkArte\Themes\ThemeLoader::loadLanguageFile('Settings', '', true, true);
 
 		// And the custom language strings...
-		theme()->getTemplates()->loadLanguageFile('ThemeStrings', '', false, true);
+		\ElkArte\Themes\ThemeLoader::loadLanguageFile('ThemeStrings', '', false, true);
 
 		// Let the theme take care of the settings.
 		theme()->getTemplates()->load('Settings');
@@ -592,7 +592,7 @@ class ManageThemes extends AbstractController
 	{
 		global $context, $modSettings;
 
-		theme()->getTemplates()->loadLanguageFile('Admin');
+		\ElkArte\Themes\ThemeLoader::loadLanguageFile('Admin');
 
 		// Saving?
 		if (isset($this->_req->post->save))
@@ -828,10 +828,10 @@ class ManageThemes extends AbstractController
 		$old_settings = $settings;
 
 		new ThemeLoader($theme, false);
-		theme()->getTemplates()->loadLanguageFile('Profile');
+		\ElkArte\Themes\ThemeLoader::loadLanguageFile('Profile');
 
 		// @todo Should we just move these options so they are no longer theme dependant?
-		theme()->getTemplates()->loadLanguageFile('PersonalMessage');
+		\ElkArte\Themes\ThemeLoader::loadLanguageFile('PersonalMessage');
 
 		// Let the theme take care of the settings.
 		theme()->getTemplates()->load('Settings');
@@ -987,7 +987,7 @@ class ManageThemes extends AbstractController
 		// Validate what was sent
 		if (checkSession('get', '', false))
 		{
-			theme()->getTemplates()->loadLanguageFile('Errors');
+			\ElkArte\Themes\ThemeLoader::loadLanguageFile('Errors');
 			$context['xml_data'] = array(
 				'error' => 1,
 				'text' => $txt['session_verify_fail'],
@@ -999,7 +999,7 @@ class ManageThemes extends AbstractController
 		// Not just any John Smith can send in a api request
 		if (!allowedTo('admin_forum'))
 		{
-			theme()->getTemplates()->loadLanguageFile('Errors');
+			\ElkArte\Themes\ThemeLoader::loadLanguageFile('Errors');
 			$context['xml_data'] = array(
 				'error' => 1,
 				'text' => $txt['cannot_admin_forum'],
@@ -1011,7 +1011,7 @@ class ManageThemes extends AbstractController
 		// Even if you are John Smith, you still need a ticket
 		if (!validateToken('admin-tr', 'request', true, false))
 		{
-			theme()->getTemplates()->loadLanguageFile('Errors');
+			\ElkArte\Themes\ThemeLoader::loadLanguageFile('Errors');
 			$context['xml_data'] = array(
 				'error' => 1,
 				'text' => $txt['token_verify_fail'],
@@ -1026,7 +1026,7 @@ class ManageThemes extends AbstractController
 		// You can't delete the default theme!
 		if ($theme == 1)
 		{
-			theme()->getTemplates()->loadLanguageFile('Errors');
+			\ElkArte\Themes\ThemeLoader::loadLanguageFile('Errors');
 			$context['xml_data'] = array(
 				'error' => 1,
 				'text' => $txt['no_access'],
@@ -1086,7 +1086,7 @@ class ManageThemes extends AbstractController
 			throw new Exception('no_access', false);
 		}
 
-		theme()->getTemplates()->loadLanguageFile('Profile');
+		\ElkArte\Themes\ThemeLoader::loadLanguageFile('Profile');
 		theme()->getTemplates()->load('ManageThemes');
 
 		// Build the link tree.
@@ -1917,7 +1917,7 @@ class ManageThemes extends AbstractController
 		// Session timed out.
 		else
 		{
-			theme()->getTemplates()->loadLanguageFile('Errors');
+			\ElkArte\Themes\ThemeLoader::loadLanguageFile('Errors');
 
 			// Notify the template of trouble
 			$context['session_error'] = true;

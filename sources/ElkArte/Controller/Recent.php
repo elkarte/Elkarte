@@ -413,7 +413,7 @@ class Recent extends AbstractController implements FrontpageInterface
 		theme()->addJavascriptVar(array(
 			'likemsg_are_you_sure' => JavaScriptEscape($txt['likemsg_are_you_sure']),
 		));
-		theme()->getTemplates()->loadLanguageFile('Errors');
+		\ElkArte\Themes\ThemeLoader::loadLanguageFile('Errors');
 
 		// Initiate likes and the tooltips for likes
 		theme()->addInlineJavascript('

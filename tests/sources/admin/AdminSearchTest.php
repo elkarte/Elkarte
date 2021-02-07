@@ -60,7 +60,7 @@ class TestAdminSearch extends TestCase
 		 * Forcefully reload language files to combat PHPUnit
 		 * messing up globals between tests.
 		 */
-		theme()->getTemplates()->loadLanguageFile('Admin', 'english', true, true);
+		\ElkArte\Themes\ThemeLoader::loadLanguageFile('Admin', 'english', true, true);
 
 		// Set up the controller.
 		$_GET['action'] = 'admin';

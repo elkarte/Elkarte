@@ -59,7 +59,7 @@ class Help extends AbstractController
 		global $context, $txt;
 
 		theme()->getTemplates()->load('Help');
-		theme()->getTemplates()->loadLanguageFile('Manual');
+		\ElkArte\Themes\ThemeLoader::loadLanguageFile('Manual');
 
 		// We need to know where our wiki is.
 		$context['wiki_url'] = 'https://github.com/elkarte/Elkarte/wiki';
@@ -118,12 +118,12 @@ class Help extends AbstractController
 		$help_str = Util::htmlspecialchars($this->_req->query->help);
 
 		// Load the admin help language file and template.
-		theme()->getTemplates()->loadLanguageFile('Help');
+		\ElkArte\Themes\ThemeLoader::loadLanguageFile('Help');
 
 		// Load permission specific help
 		if (substr($help_str, 0, 14) === 'permissionhelp')
 		{
-			theme()->getTemplates()->loadLanguageFile('ManagePermissions');
+			\ElkArte\Themes\ThemeLoader::loadLanguageFile('ManagePermissions');
 		}
 
 		// Load our template

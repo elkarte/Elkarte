@@ -77,7 +77,7 @@ abstract class AbstractEventBoardAccess extends AbstractEventMessage
 		// Do the permissions checks and replace inappropriate messages
 		require_once(SUBSDIR . '/Boards.subs.php');
 		// @todo find a better place?
-		theme()->getTemplates()->loadLanguageFile('Mentions');
+		\ElkArte\Themes\ThemeLoader::loadLanguageFile('Mentions');
 
 		$removed = false;
 		$accessibleBoards = accessibleBoards($boards);

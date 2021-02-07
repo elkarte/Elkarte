@@ -34,7 +34,7 @@ class Db extends Adapter
 	{
 		global $modSettings;
 
-		theme()->getTemplates()->loadLanguageFile('Help');
+		\ElkArte\Themes\ThemeLoader::loadLanguageFile('Help');
 
 		foreach ($this->configVars as $configVar)
 		{

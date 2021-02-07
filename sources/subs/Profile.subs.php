@@ -1024,7 +1024,7 @@ function loadProfileFields($force_reload = false)
 			'preload' => function () {
 				global $context;
 
-				theme()->getTemplates()->loadLanguageFile('Settings');
+				\ElkArte\Themes\ThemeLoader::loadLanguageFile('Settings');
 
 				// Can they disable censoring?
 				$context['allow_no_censored'] = false;
@@ -2056,7 +2056,7 @@ function profileLoadSignatureData()
 		$validation = profileValidateSignature($signature);
 		if (empty($context['post_errors']))
 		{
-			theme()->getTemplates()->loadLanguageFile('Errors');
+			\ElkArte\Themes\ThemeLoader::loadLanguageFile('Errors');
 			$context['post_errors'] = array();
 		}
 
@@ -2538,7 +2538,7 @@ function profileSaveAvatarData(&$value)
 	$valid_https = isset($_POST['userpicpersonal']) && substr($_POST['userpicpersonal'], 0, 8) === 'https://' && strlen($_POST['userpicpersonal']) > 8;
 	if ($value === 'external' && !empty($modSettings['avatar_external_enabled']) && ($valid_http || $valid_https) && !empty($modSettings['avatar_download_external']))
 	{
-		theme()->getTemplates()->loadLanguageFile('Post');
+		\ElkArte\Themes\ThemeLoader::loadLanguageFile('Post');
 		if (!is_writable($uploadDir))
 		{
 			throw new \ElkArte\Exceptions\Exception('attachments_no_write', 'critical');
@@ -2792,7 +2792,7 @@ function profileSaveAvatarData(&$value)
 				$destinationPath = $uploadDir . '/' . (empty($file_hash) ? $destName : $cur_profile['id_attach'] . '_' . $file_hash . '.elk');
 				if (!rename($_FILES['attachment']['tmp_name'], $destinationPath))
 				{
-					theme()->getTemplates()->loadLanguageFile('Post');
+					\ElkArte\Themes\ThemeLoader::loadLanguageFile('Post');
 					// I guess a man can try.
 					removeAttachments(array('id_member' => $memID));
 					throw new \ElkArte\Exceptions\Exception('attach_timeout', 'critical');
@@ -3578,7 +3578,7 @@ function load_user_topics($memID, $start, $count, $range_limit = '', $reverse = 
 function getMemberGeneralPermissions($curGroups)
 {
 	$db = database();
-	theme()->getTemplates()->loadLanguageFile('ManagePermissions');
+	\ElkArte\Themes\ThemeLoader::loadLanguageFile('ManagePermissions');
 
 	// Get all general permissions.
 	$general_permission = array();
@@ -3657,7 +3657,7 @@ function getMemberGeneralPermissions($curGroups)
 function getMemberBoardPermissions($memID, $curGroups, $board = null)
 {
 	$db = database();
-	theme()->getTemplates()->loadLanguageFile('ManagePermissions');
+	\ElkArte\Themes\ThemeLoader::loadLanguageFile('ManagePermissions');
 
 	$board_permission = array();
 	$db->fetchQuery('

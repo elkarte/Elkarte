@@ -138,7 +138,7 @@ function getMessageIcons($board_id)
 
 	if (empty($modSettings['messageIcons_enable']))
 	{
-		theme()->getTemplates()->loadLanguageFile('Post');
+		\ElkArte\Themes\ThemeLoader::loadLanguageFile('Post');
 
 		$icons = array(
 			array('value' => 'xx', 'name' => $txt['standard']),

@@ -67,7 +67,7 @@ class Who extends AbstractController
 
 		// Load the 'Who' template.
 		theme()->getTemplates()->load('Who');
-		theme()->getTemplates()->loadLanguageFile('Who');
+		\ElkArte\Themes\ThemeLoader::loadLanguageFile('Who');
 
 		// Sort out... the column sorting.
 		$sort_methods = array(
@@ -290,7 +290,7 @@ class Who extends AbstractController
 		global $context, $txt;
 
 		require_once(SUBSDIR . '/Who.subs.php');
-		theme()->getTemplates()->loadLanguageFile('Who');
+		\ElkArte\Themes\ThemeLoader::loadLanguageFile('Who');
 
 		$context += prepareCreditsData();
 

@@ -134,7 +134,7 @@ class AdminLog extends AbstractController
 		global $txt, $context, $modSettings;
 
 		// Make sure we understand what's going on.
-		theme()->getTemplates()->loadLanguageFile('ManageSettings');
+		\ElkArte\Themes\ThemeLoader::loadLanguageFile('ManageSettings');
 
 		$context['page_title'] = $txt['pruning_title'];
 

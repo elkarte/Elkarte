@@ -50,7 +50,7 @@ class Announce extends AbstractController
 		}
 
 		// Language files
-		theme()->getTemplates()->loadLanguageFile('Post');
+		\ElkArte\Themes\ThemeLoader::loadLanguageFile('Post');
 		theme()->getTemplates()->load('Announce');
 
 		$context['page_title'] = $txt['announce_topic'];
@@ -215,7 +215,7 @@ class Announce extends AbstractController
 		// Go back to the correct language for the user ;)
 		if (!empty($modSettings['userLanguage']))
 		{
-			theme()->getTemplates()->loadLanguageFile('Post');
+			\ElkArte\Themes\ThemeLoader::loadLanguageFile('Post');
 		}
 	}
 

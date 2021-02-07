@@ -108,7 +108,7 @@ class Packages extends AbstractController
 		isAllowedTo('admin_forum');
 
 		// Load all the basic stuff.
-		theme()->getTemplates()->loadLanguageFile('Packages');
+		\ElkArte\Themes\ThemeLoader::loadLanguageFile('Packages');
 		theme()->getTemplates()->load('Packages');
 		loadCSSFile('admin.css');
 		$context['page_title'] = $txt['package'];

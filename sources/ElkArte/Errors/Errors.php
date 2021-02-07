@@ -100,7 +100,7 @@ class Errors extends AbstractModel
 	{
 		global $language, $txt;
 
-		theme()->getTemplates()->loadLanguageFile('Errors', $language);
+		\ElkArte\Themes\ThemeLoader::loadLanguageFile('Errors', $language);
 
 		$reload_lang_file = $language !== $this->user->language;
 
@@ -110,7 +110,7 @@ class Errors extends AbstractModel
 		// Load the language file, only if it needs to be reloaded
 		if ($reload_lang_file)
 		{
-			theme()->getTemplates()->loadLanguageFile('Errors');
+			\ElkArte\Themes\ThemeLoader::loadLanguageFile('Errors');
 		}
 
 		// Return the message to make things simpler.

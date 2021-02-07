@@ -46,8 +46,8 @@ class ManageMail extends AbstractController
 	{
 		global $context, $txt;
 
-		theme()->getTemplates()->loadLanguageFile('Help');
-		theme()->getTemplates()->loadLanguageFile('ManageMail');
+		\ElkArte\Themes\ThemeLoader::loadLanguageFile('Help');
+		\ElkArte\Themes\ThemeLoader::loadLanguageFile('ManageMail');
 
 		$subActions = array(
 			'browse' => array($this, 'action_browse', 'permission' => 'admin_forum'),
@@ -181,7 +181,7 @@ class ManageMail extends AbstractController
 		global $txt, $modSettings, $txtBirthdayEmails;
 
 		// We need $txtBirthdayEmails
-		theme()->getTemplates()->loadLanguageFile('EmailTemplates');
+		\ElkArte\Themes\ThemeLoader::loadLanguageFile('EmailTemplates');
 
 		$body = $txtBirthdayEmails[(empty($modSettings['birthday_email']) ? 'happy_birthday' : $modSettings['birthday_email']) . '_body'];
 		$subject = $txtBirthdayEmails[(empty($modSettings['birthday_email']) ? 'happy_birthday' : $modSettings['birthday_email']) . '_subject'];

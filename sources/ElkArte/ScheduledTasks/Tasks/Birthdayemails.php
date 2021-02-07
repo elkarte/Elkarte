@@ -37,7 +37,7 @@ class Birthdayemails implements ScheduledTaskInterface
 		$db = database();
 
 		// Need this in order to load the language files.
-		theme()->getTemplates()->loadEssentialThemeData();
+		\ElkArte\Themes\ThemeLoader::loadEssentialThemeData();
 
 		// Going to need this to send the emails.
 		require_once(SUBSDIR . '/Mail.subs.php');
@@ -84,7 +84,7 @@ class Birthdayemails implements ScheduledTaskInterface
 		foreach ($birthdays as $lang => $recps)
 		{
 			// We need to do some shuffling to make this work properly.
-			theme()->getTemplates()->loadLanguageFile('EmailTemplates', $lang);
+			\ElkArte\Themes\ThemeLoader::loadLanguageFile('EmailTemplates', $lang);
 			$txt['happy_birthday_subject'] = $txtBirthdayEmails[$greeting . '_subject'];
 			$txt['happy_birthday_body'] = $txtBirthdayEmails[$greeting . '_body'];
 

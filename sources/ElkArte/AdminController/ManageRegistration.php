@@ -56,7 +56,7 @@ class ManageRegistration extends AbstractController
 		global $context, $txt;
 
 		// Loading, always loading.
-		theme()->getTemplates()->loadLanguageFile('Login');
+		\ElkArte\Themes\ThemeLoader::loadLanguageFile('Login');
 		theme()->getTemplates()->load('Register');
 		loadJavascriptFile('register.js');
 

@@ -432,7 +432,7 @@ class ManageNews extends AbstractController
 		$this->action_mailingsend(true);
 
 		// We need a couple strings from the email template file
-		theme()->getTemplates()->loadLanguageFile('EmailTemplates');
+		\ElkArte\Themes\ThemeLoader::loadLanguageFile('EmailTemplates');
 		require_once(SUBSDIR . '/News.subs.php');
 
 		// Get a list of all full banned users.  Use their Username and email to find them.

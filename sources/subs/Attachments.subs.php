@@ -1548,7 +1548,7 @@ function returnMimeThumb($file_ext, $url = false)
 
 	if (empty($settings))
 	{
-		theme()->getTemplates()->loadEssentialThemeData();
+		\ElkArte\Themes\ThemeLoader::loadEssentialThemeData();
 	}
 
 	// Return the mine thumbnail if it exists or just the default

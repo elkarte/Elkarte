@@ -40,7 +40,7 @@ class RemoveTopicRedirect implements ScheduledTaskInterface
 		$topics = array();
 
 		// We will need this for language files
-		theme()->getTemplates()->loadEssentialThemeData();
+		\ElkArte\Themes\ThemeLoader::loadEssentialThemeData();
 
 		// Find all of the old MOVE topic notices that were set to expire
 		$db->fetchQuery('

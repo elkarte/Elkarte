@@ -927,17 +927,17 @@ function loadEmailTemplate($template, $replacements = array(), $lang = '', $load
 	// First things first, load up the email templates language file, if we need to.
 	if ($loadLang)
 	{
-		theme()->getTemplates()->loadLanguageFile('EmailTemplates', $lang);
+		\ElkArte\Themes\ThemeLoader::loadLanguageFile('EmailTemplates', $lang);
 		if (!empty($modSettings['maillist_enabled']))
 		{
-			theme()->getTemplates()->loadLanguageFile('MaillistTemplates', $lang);
+			\ElkArte\Themes\ThemeLoader::loadLanguageFile('MaillistTemplates', $lang);
 		}
 
 		if (!empty($additional_files))
 		{
 			foreach ($additional_files as $file)
 			{
-				theme()->getTemplates()->loadLanguageFile($file, $lang);
+				\ElkArte\Themes\ThemeLoader::loadLanguageFile($file, $lang);
 			}
 		}
 	}
@@ -1005,7 +1005,7 @@ function prepareMailingForPreview()
 {
 	global $context, $modSettings, $scripturl, $txt;
 
-	theme()->getTemplates()->loadLanguageFile('Errors');
+	\ElkArte\Themes\ThemeLoader::loadLanguageFile('Errors');
 	require_once(SUBSDIR . '/Post.subs.php');
 
 	$processing = array(

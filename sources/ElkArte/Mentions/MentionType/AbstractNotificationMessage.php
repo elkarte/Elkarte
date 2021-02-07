@@ -260,7 +260,7 @@ abstract class AbstractNotificationMessage implements NotificationInterface
 		{
 			foreach ($lang_files as $file)
 			{
-				theme()->getTemplates()->loadLanguageFile($file);
+				\ElkArte\Themes\ThemeLoader::loadLanguageFile($file);
 			}
 		}
 

@@ -31,7 +31,7 @@ abstract class ManageEmojiModule extends AbstractController
 	{
 		global $txt;
 
-		theme()->getTemplates()->loadLanguageFile('emoji');
+		\ElkArte\Themes\ThemeLoader::loadLanguageFile('emoji');
 
 		// All the options, well at least some of them!
 		$config_vars[] = '';

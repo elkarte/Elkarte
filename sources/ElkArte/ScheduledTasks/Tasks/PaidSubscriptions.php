@@ -81,9 +81,9 @@ class PaidSubscriptions implements ScheduledTaskInterface
 				// If this is the first one load the important bits.
 				if (empty($subs_reminded))
 				{
-					// Need the below for theme()->getTemplates()->loadLanguageFile to work!
+					// Need the below for \ElkArte\Themes\ThemeLoader::loadLanguageFile to work!
 					require_once(SUBSDIR . '/Mail.subs.php');
-					theme()->getTemplates()->loadEssentialThemeData();
+					\ElkArte\Themes\ThemeLoader::loadEssentialThemeData();
 				}
 
 				$subs_reminded[] = $row['id_sublog'];

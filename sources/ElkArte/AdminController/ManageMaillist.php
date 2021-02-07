@@ -54,7 +54,7 @@ class ManageMaillist extends AbstractController
 
 		// Template & language
 		theme()->getTemplates()->load('Maillist');
-		theme()->getTemplates()->loadLanguageFile('Maillist');
+		\ElkArte\Themes\ThemeLoader::loadLanguageFile('Maillist');
 
 		// All the functions available
 		$subActions = array(
@@ -1490,7 +1490,7 @@ class ManageMaillist extends AbstractController
 		}
 
 		// Templates and language
-		theme()->getTemplates()->loadLanguageFile('Admin');
+		\ElkArte\Themes\ThemeLoader::loadLanguageFile('Admin');
 		theme()->getTemplates()->load('Admin');
 		loadCSSFile('admin.css');
 

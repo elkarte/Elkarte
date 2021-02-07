@@ -104,6 +104,6 @@ updateSettings(array(
 removeSettings('mentions_member_check');
 
 // Basic language is good to have for functional tests
-theme()->getTemplates()->loadLanguageFile('index+Errors');
+\ElkArte\Themes\ThemeLoader::loadLanguageFile('index+Errors');
 
 file_put_contents('bootstrapcompleted.lock', '1');

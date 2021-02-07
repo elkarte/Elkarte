@@ -712,7 +712,7 @@ function list_getMembergroups($start, $items_per_page, $sort, $membergroup_type,
 	global $txt, $context;
 
 	$db = database();
-	theme()->getTemplates()->loadLanguageFile('Admin');
+	\ElkArte\Themes\ThemeLoader::loadLanguageFile('Admin');
 
 	// Start collecting the data.
 	$groups = array();
@@ -2288,7 +2288,7 @@ function getGroupsList()
 {
 	global $txt;
 
-	theme()->getTemplates()->loadLanguageFile('Profile');
+	\ElkArte\Themes\ThemeLoader::loadLanguageFile('Profile');
 
 	$db = database();
 	$member_groups = array(

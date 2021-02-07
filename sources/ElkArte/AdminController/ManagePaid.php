@@ -49,7 +49,7 @@ class ManagePaid extends AbstractController
 		global $context, $txt, $modSettings;
 
 		// Load the required language and template.
-		theme()->getTemplates()->loadLanguageFile('ManagePaid');
+		\ElkArte\Themes\ThemeLoader::loadLanguageFile('ManagePaid');
 		theme()->getTemplates()->load('ManagePaid');
 
 		$subActions = array(

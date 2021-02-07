@@ -16,7 +16,7 @@ class TestManageBoardsSettings extends ElkArteCommonSetupTest
 	protected function setUp(): void
 	{
 		parent::setUp();
-		theme()->getTemplates()->loadLanguageFile('ManagePermissions', 'english', true, true);
+		\ElkArte\Themes\ThemeLoader::loadLanguageFile('ManagePermissions', 'english', true, true);
 	}
 
 	/**

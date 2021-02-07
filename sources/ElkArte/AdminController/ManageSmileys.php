@@ -49,7 +49,7 @@ class ManageSmileys extends AbstractController
 	{
 		global $context, $txt, $modSettings;
 
-		theme()->getTemplates()->loadLanguageFile('ManageSmileys');
+		\ElkArte\Themes\ThemeLoader::loadLanguageFile('ManageSmileys');
 		theme()->getTemplates()->load('ManageSmileys');
 
 		$subActions = array(
@@ -1689,8 +1689,8 @@ class ManageSmileys extends AbstractController
 		checkSession('request');
 
 		// One of these two may be necessary
-		theme()->getTemplates()->loadLanguageFile('Errors');
-		theme()->getTemplates()->loadLanguageFile('Packages');
+		\ElkArte\Themes\ThemeLoader::loadLanguageFile('Errors');
+		\ElkArte\Themes\ThemeLoader::loadLanguageFile('Packages');
 
 		require_once(SUBSDIR . '/Smileys.subs.php');
 		require_once(SUBSDIR . '/Package.subs.php');

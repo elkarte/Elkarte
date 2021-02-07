@@ -53,7 +53,7 @@ class UserNotification extends AbstractModel
 	public function __construct($db, $user)
 	{
 		parent::__construct($db, $user);
-		theme()->getTemplates()->loadLanguageFile('UserNotifications');
+		\ElkArte\Themes\ThemeLoader::loadLanguageFile('UserNotifications');
 	}
 
 	/**

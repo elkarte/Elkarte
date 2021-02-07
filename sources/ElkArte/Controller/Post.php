@@ -165,8 +165,8 @@ class Post extends AbstractController
 	{
 		global $context;
 
-		theme()->getTemplates()->loadLanguageFile('Post');
-		theme()->getTemplates()->loadLanguageFile('Errors');
+		\ElkArte\Themes\ThemeLoader::loadLanguageFile('Post');
+		\ElkArte\Themes\ThemeLoader::loadLanguageFile('Errors');
 
 		$context['robot_no_index'] = true;
 		$this->_template_layers->add('postarea');
@@ -894,7 +894,7 @@ class Post extends AbstractController
 		}
 
 		require_once(SUBSDIR . '/Boards.subs.php');
-		theme()->getTemplates()->loadLanguageFile('Post');
+		\ElkArte\Themes\ThemeLoader::loadLanguageFile('Post');
 
 		// Trigger the prepare_save_post event
 		$this->_events->trigger('prepare_save_post', array('topic_info' => &$topic_info));
@@ -1522,7 +1522,7 @@ class Post extends AbstractController
 	{
 		global $context;
 
-		theme()->getTemplates()->loadLanguageFile('Post');
+		\ElkArte\Themes\ThemeLoader::loadLanguageFile('Post');
 
 		// Where we going if we need to?
 		$context['post_box_name'] = isset($_GET['pb']) ? $_GET['pb'] : '';

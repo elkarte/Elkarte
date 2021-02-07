@@ -13,6 +13,9 @@
 
 namespace ElkArte\Themes;
 
+use \ElkArte\Themes\Directories;
+use \ElkArte\ValuesContainer;
+
 /**
  * Class Theme
  */
@@ -108,13 +111,14 @@ abstract class Theme
 	 *
 	 * @param int $id
 	 * @param \ElkArte\ValuesContainer $user
+	 * @param \ElkArte\Themes\Directories $dirs
 	 */
-	public function __construct($id, $user)
+	public function __construct(int $id, ValuesContainer $user, Directories $dirs)
 	{
 		$this->id = $id;
 		$this->user = $user;
 		$this->layers = new TemplateLayers();
-		$this->templates = new Templates();
+		$this->templates = new Templates($dirs);
 
 		$this->css_files = &$GLOBALS['context']['css_files'];
 		$this->js_files = &$GLOBALS['context']['js_files'];

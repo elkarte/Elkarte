@@ -511,7 +511,7 @@ function registerMember(&$regOptions, $ErrorContext = 'register')
 
 	$db = database();
 
-	theme()->getTemplates()->loadLanguageFile('Login');
+	\ElkArte\Themes\ThemeLoader::loadLanguageFile('Login');
 
 	// We'll need some external functions.
 	require_once(SUBSDIR . '/Auth.subs.php');

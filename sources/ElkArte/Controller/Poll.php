@@ -59,7 +59,7 @@ class Poll extends AbstractController
 		// Make sure you can vote.
 		isAllowedTo('poll_vote');
 
-		theme()->getTemplates()->loadLanguageFile('Post');
+		\ElkArte\Themes\ThemeLoader::loadLanguageFile('Post');
 
 		// Check if they have already voted, or voting is locked.
 		$row = checkVote($topic);
@@ -536,7 +536,7 @@ class Poll extends AbstractController
 		// We work hard with polls.
 		require_once(SUBSDIR . '/Poll.subs.php');
 
-		theme()->getTemplates()->loadLanguageFile('Post');
+		\ElkArte\Themes\ThemeLoader::loadLanguageFile('Post');
 		theme()->getTemplates()->load('Poll');
 		loadJavascriptFile('post.js', array(), 'post_scripts');
 
@@ -859,7 +859,7 @@ class Poll extends AbstractController
 		global $context, $board, $db_show_debug;
 
 		theme()->getTemplates()->load('Poll');
-		theme()->getTemplates()->loadLanguageFile('Post');
+		\ElkArte\Themes\ThemeLoader::loadLanguageFile('Post');
 		theme()->getLayers()->removeAll();
 
 		$db_show_debug = false;

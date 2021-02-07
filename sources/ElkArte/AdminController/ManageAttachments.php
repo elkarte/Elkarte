@@ -814,9 +814,9 @@ class ManageAttachments extends AbstractController
 				// And change the message to reflect this.
 				if (!empty($messages))
 				{
-					theme()->getTemplates()->loadLanguageFile('index', $language, true);
+					\ElkArte\Themes\ThemeLoader::loadLanguageFile('index', $language, true);
 					setRemovalNotice($messages, $txt['attachment_delete_admin']);
-					theme()->getTemplates()->loadLanguageFile('index', $this->user->language, true);
+					\ElkArte\Themes\ThemeLoader::loadLanguageFile('index', $this->user->language, true);
 				}
 			}
 		}

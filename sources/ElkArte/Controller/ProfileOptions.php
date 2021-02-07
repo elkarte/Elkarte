@@ -608,7 +608,7 @@ class ProfileOptions extends AbstractController
 	{
 		global $context, $cur_profile, $post_errors, $modSettings;
 
-		theme()->getTemplates()->loadLanguageFile('Login');
+		\ElkArte\Themes\ThemeLoader::loadLanguageFile('Login');
 		theme()->getTemplates()->load('ProfileOptions');
 
 		// We are saving?

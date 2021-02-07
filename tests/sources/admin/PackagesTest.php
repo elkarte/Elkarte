@@ -31,7 +31,7 @@ class TestPackagesController extends ElkArteCommonSetupTest
 		}
 
 		new ElkArte\Themes\ThemeLoader();
-		theme()->getTemplates()->loadLanguageFile('Packages', 'english', false, true);
+		\ElkArte\Themes\ThemeLoader::loadLanguageFile('Packages', 'english', false, true);
 	}
 
 	/**

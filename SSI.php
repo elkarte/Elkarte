@@ -1790,7 +1790,7 @@ function ssi_boardNews($board = null, $limit = null, $start = null, $length = nu
 {
 	global $scripturl, $txt, $settings, $modSettings;
 
-	theme()->getTemplates()->loadLanguageFile('Stats');
+	\ElkArte\Themes\ThemeLoader::loadLanguageFile('Stats');
 
 	$db = database();
 
