@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This class has the only scope to handle themes directories to
  * tell Templates and loadLanguageFiles where to go check for files.
