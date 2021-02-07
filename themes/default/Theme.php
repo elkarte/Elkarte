@@ -1155,14 +1155,14 @@ class Theme extends BaseTheme
 		// Output is fully XML
 		if (isset($_REQUEST['xml']))
 		{
-			$this->getTemplates()->loadLanguageFile('index+Addons');
+			\ElkArte\Themes\ThemeLoader::loadLanguageFile('index+Addons');
 			$this->getTemplates()->load('Xml');
 			$this->getLayers()->removeAll();
 		}
 		// These actions don't require the index template at all.
 		elseif (!empty($_REQUEST['action']) && in_array($_REQUEST['action'], $simpleActions))
 		{
-			$this->getTemplates()->loadLanguageFile('index+Addons');
+			\ElkArte\Themes\ThemeLoader::loadLanguageFile('index+Addons');
 			$this->getLayers()->removeAll();
 		}
 		else

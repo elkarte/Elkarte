@@ -218,7 +218,7 @@ class Templates
 
 			if (!empty($context['user']['is_admin']) && !isset($_GET['th']))
 			{
-				$this->loadLanguageFile('Errors');
+				\ElkArte\Themes\ThemeLoader::loadLanguageFile('Errors');
 
 				if (!isset($context['security_controls_files']['title']))
 				{
