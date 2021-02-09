@@ -9,6 +9,13 @@
  */
 class SupportAuthController extends ElkArteWebSupport
 {
+	public function setUpPage($url = '', $login = false)
+	{
+		$this->url = 'index.php';
+		$this->login = false;
+		parent::setUpPage();
+	}
+
 	protected function setUp(): void
 	{
 		parent::setUp();
@@ -19,7 +26,6 @@ class SupportAuthController extends ElkArteWebSupport
 	 */
 	public function testAlive()
 	{
-		$this->url('index.php');
 		$this->assertEquals('My Community - Index', $this->title(), $this->source());
 	}
 
@@ -33,9 +39,6 @@ class SupportAuthController extends ElkArteWebSupport
 	{
 		$username = 'test';
 		$password = 'ainttellin';
-
-		$this->timeouts()->implicitWait(10000);
-		$this->url('index.php');
 
 		// We should be logged in after install ... should
 		$check = $this->byId('menu_nav')->text();
@@ -54,15 +57,11 @@ class SupportAuthController extends ElkArteWebSupport
 		$this->assertEquals('Log in', $this->title(), $this->source());
 
 		// Fill in the form
-		$usernameInput = $this->byId('user');
-		$usernameInput->clear();
-		$usernameInput->value($username);
-		$this->assertEquals($username, $usernameInput->value());
+		$this->byId('user')->click();
+		$this->keys($username);
 
-		$passwordInput = $this->byId('passwrd');
-		$passwordInput->clear();
-		$passwordInput->value($password);
-		$this->assertEquals($password, $passwordInput->value());
+		$this->byId('passwrd')->click();
+		$this->keys($password);
 
 		// Submit it
 		$this->byId('frmLogin')->submit();
