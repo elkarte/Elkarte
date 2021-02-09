@@ -9,9 +9,10 @@ use PHPUnit\Framework\TestCase;
  * WARNING. These tests work directly with the local database. Don't run
  * them if you need to keep your data untouched!
  */
-class TestBoards extends TestCase
+class TestBoards extends ElkArteCommonSetupTest
 {
 	protected $backupGlobalsBlacklist = ['user_info'];
+
 	/**
 	 * Prepare some test data, to use in these tests.
 	 *
@@ -23,7 +24,6 @@ class TestBoards extends TestCase
 		//
 		// @todo might want to insert some boards, topics, and use those all through the tests here
 		require_once(SUBSDIR . '/Boards.subs.php');
-		User::$info->query_see_board = '1=1';
 	}
 
 	/**
@@ -65,4 +65,17 @@ class TestBoards extends TestCase
 		$this->assertTrue($num);
 		$this->assertIsNumeric($post_counts[1]);
 	}
+
+	/**
+	 * Mark the boards read
+	 */
+	public function testMarkBoardsRead()
+	{
+		markBoardsRead(1, false, true);
+
+		require_once(SUBSDIR . '/Topic.subs.php');
+		$num = getUnreadCountSince(1);
+		$this->assertEquals(0, $num, 'Missed unread topics, expected 0 saw ' . $num);
+	}
+
 }
