@@ -24,20 +24,6 @@ class ElkArteInstallWeb extends ElkArteWebSupport
 	protected $backupGlobalsBlacklist = ['user_info'];
 
 	/**
-	 * You must provide a setUp() method for Selenium2TestCase
-	 * If you override this method, make sure the parent implementation is invoked.
-	 *
-	 * This method is used to configure the Selenium Server session, url/browser
-	 */
-	protected function setUp(): void
-	{
-		// Set the browser to be used by Selenium, it must be available on localhost
-		$this->setBrowser($this->browser);
-
-		parent::setUp();
-	}
-
-	/**
 	 * Actually install ElkArte just like a user would
 	 */
 	public function testInstall()

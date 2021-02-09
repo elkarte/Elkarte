@@ -47,8 +47,13 @@ class SupportRegisterController extends ElkArteWebSupport
 		// Restore it to default
 		updateSettings(array('registration_method' => $this->registration_method));
 		updateSettings(array('visual_verification_type' => $this->visual_verification_type));
+
+		parent::tearDown();
 	}
 
+	/**
+	 * Utility function to support function tests below
+	 */
 	public function registerMember()
 	{
 		$username = 'testuser';
@@ -56,6 +61,7 @@ class SupportRegisterController extends ElkArteWebSupport
 		$password = 'ainttellin';
 
 		// Register from the main menu
+		$this->adminLogout();
 		$this->url('index.php');
 		$this->clickit('#button_register > a');
 		$this->assertEquals('Registration Agreement', $this->title());
@@ -65,10 +71,14 @@ class SupportRegisterController extends ElkArteWebSupport
 		$this->assertEquals('Registration Form', $this->title());
 
 		// Fill out the registration form
-		$this->byId('elk_autov_username')->value($username);
-		$this->byId('elk_autov_reserve1')->value($email);
-		$this->byId('elk_autov_pwmain')->value($password);
-		$this->byId('elk_autov_pwverify')->value($password);
+		$this->byId('elk_autov_username')->click();
+		$this->keys($username);
+		$this->byId('elk_autov_reserve1')->click();
+		$this->keys($email);
+		$this->byId('elk_autov_pwmain')->click();
+		$this->keys($password);
+		$this->byId('elk_autov_pwverify')->click();
+		$this->keys($password);
 	}
 
 	/**
@@ -82,7 +92,7 @@ class SupportRegisterController extends ElkArteWebSupport
 		$this->byId('registration')->submit();
 
 		// Should fail for speed reasons
-		$this->assertStringContainsString('You went through the registration process too quickly', $this->byCssSelector('div.errorbox')->text());
+		$this->assertStringContainsString('You went through the registration process too quickly', $this->byCssSelector('div.errorbox')->text(), $this->source());
 	}
 
 	/**
@@ -107,7 +117,7 @@ class SupportRegisterController extends ElkArteWebSupport
 	 */
 	public function testDeleteAccount()
 	{
-		// Register a member that we can delete
+		// Use standard functions and not GUI
 		$this->loadUserData();
 
 		// Register a member that we can delete
@@ -131,13 +141,11 @@ class SupportRegisterController extends ElkArteWebSupport
 		$this->assertEquals('Log in', $this->title());
 
 		// Fill in the form, long hand style
-		$usernameInput = $this->byId('user');
-		$usernameInput->clear();
-		$usernameInput->value('user49');
+		$this->byId('user')->click();
+		$this->keys('user49');
 
-		$passwordInput = $this->byId('passwrd');
-		$passwordInput->clear();
-		$passwordInput->value('user49');
+		$this->byId('passwrd')->click();
+		$this->keys('user49');
 
 		// Submit it
 		$this->byId('frmLogin')->submit();
@@ -145,12 +153,14 @@ class SupportRegisterController extends ElkArteWebSupport
 
 		// Delete the account by using the main profile area.
 		$this->assertEquals('Delete this account: user49', $this->title());
-		$passwordInput = $this->byId('oldpasswrd');
-		$passwordInput->clear();
-		$passwordInput->value('user49');
-		$this->assertEquals('user49', $passwordInput->value());
+		$this->byId('oldpasswrd')->click();
+		$this->keys('user49');
 
 		// Submit it
 		$this->clickit('input[type="submit"]');
+		sleep(2);
+
+		// Should be logged out
+		$this->assertStringContainsString( 'Log in', $this->byId('menu_nav')->text());
 	}
 }

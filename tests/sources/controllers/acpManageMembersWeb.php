@@ -9,6 +9,13 @@
  */
 class SupportManageMembersController extends ElkArteWebSupport
 {
+	public function setUpPage($url = '', $login = false)
+	{
+		$this->url = 'index.php';
+		$this->login = true;
+		parent::setUpPage();
+	}
+
 	/**
 	 * Register some members, user0, user1, user2
 	 */
@@ -43,7 +50,8 @@ class SupportManageMembersController extends ElkArteWebSupport
 	}
 
 	/**
-	 * Activate a member that was registered
+	 * Activate a member that was registered, utility function for other
+	 * test functions in this group.
 	 *
 	 * @param string $mname
 	 * @param string $act
@@ -95,8 +103,6 @@ class SupportManageMembersController extends ElkArteWebSupport
 		$this->registerMembers();
 
 		// Login the admin in to the ACP
-		$this->adminLogout();
-		$this->adminLogin();
 		$this->enterACP();
 
 		// Then, navigate to member management.
@@ -104,8 +110,20 @@ class SupportManageMembersController extends ElkArteWebSupport
 
 		// Finally, ensure they have been approved.
 		$this->url('index.php?action=admin;area=viewmembers;sa=search');
-		$this->clickit('#activated-1');
-		$this->clickit('#activated-2');
+		$this->waitUntil(function ($testCase) {
+			try
+			{
+				return $testCase->byId('activated-1');
+			}
+			catch (PHPUnit\Extensions\Selenium2TestCase\WebDriverException $e)
+			{
+				return false;
+			}
+		}, 15000);
+
+		// Unselect Not Activated and Banned so we only see activated members
+		$this->byId('activated-1')->click();
+		$this->byId('activated-2')->click();
 		$this->clickit('input[value=Search]');
 		$this->assertStringContainsString('user1', $this->byId('member_list')->text());
 	}
@@ -116,7 +134,6 @@ class SupportManageMembersController extends ElkArteWebSupport
 	public function testRejectActivateMember()
 	{
 		// Login the admin in to the ACP
-		$this->adminLogin();
 		$this->enterACP();
 
 		// Lets delete this request
@@ -124,6 +141,17 @@ class SupportManageMembersController extends ElkArteWebSupport
 
 		// Should be gone.
 		$this->url('index.php?action=admin;area=viewmembers;sa=all');
+		$this->waitUntil(function ($testCase) {
+			try
+			{
+				return $testCase->byId('member_list');
+			}
+			catch (PHPUnit\Extensions\Selenium2TestCase\WebDriverException $e)
+			{
+				return false;
+			}
+		}, 10000);
+
 		$this->assertStringNotContainsString('user0', $this->byId('member_list')->text());
 	}
 }

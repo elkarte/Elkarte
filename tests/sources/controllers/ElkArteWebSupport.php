@@ -31,6 +31,8 @@ abstract class ElkArteWebSupport extends Selenium2TestCase
 	protected $browser = 'chrome';
 	protected $port = 4444;
 	protected $keysHolder;
+	public $url = '';
+	public $login = false;
 
 	/**
 	 * You must provide a setUp() method for Selenium2TestCase
@@ -51,6 +53,8 @@ abstract class ElkArteWebSupport extends Selenium2TestCase
 		$this->setPort($this->port);
 		$this->setHost('localhost');
 		$this->setBrowserUrl('http://127.0.0.1/');
+		$this::shareSession(true);
+		$this::keepSessionOnFailure(true);
 
 		parent::setUp();
 	}
@@ -60,6 +64,7 @@ abstract class ElkArteWebSupport extends Selenium2TestCase
 	 */
 	protected function tearDown(): void
 	{
+		$this->adminLogout();
 		$this->timeouts()->implicitWait(0);
 
 		parent::tearDown();
@@ -80,6 +85,16 @@ abstract class ElkArteWebSupport extends Selenium2TestCase
 		if ($this->width && $this->height)
 		{
 			$this->setWindowSize();
+		}
+
+		if ($this->login)
+		{
+			$this->adminLogin();
+		}
+
+		if (!empty($this->url))
+		{
+			$this->url($this->url);
 		}
 	}
 
@@ -107,11 +122,11 @@ abstract class ElkArteWebSupport extends Selenium2TestCase
 		if ($check !== false)
 		{
 			// Use Quick login
-			$usernameInput = $this->byName('user');
-			$usernameInput->value($this->adminuser);
+			$this->byName('user')->click();
+			$this->keys($this->adminuser);
 
-			$passwordInput = $this->byName('passwrd');
-			$passwordInput->value($this->adminpass);
+			$this->byName('passwrd')->click();
+			$this->keys($this->adminpass);
 
 			$submit = $this->byId('password_login')->byCssSelector('input[type="submit"]');
 			$submit->click();
@@ -128,32 +143,47 @@ abstract class ElkArteWebSupport extends Selenium2TestCase
 	{
 		// Main page
 		$this->url('index.php');
-		$this->assertEquals('My Community - Index', $this->title());
 
-		// Are we already logged in as the admin? check by seeing Admin in the main menu
+		// Can we log in?
 		$check = $this->byId('menu_nav')->text();
-		$check = strpos($check, 'Admin');
-		if (!$check)
+		if (strpos($check, 'Log in') !== false)
 		{
 			// Select login from the main page
-			$this->clickit('#button_login > a');
-			$this->assertEquals('Log in', $this->title());
+			$this->url('index.php?action=login');
+			$this->assertEquals('Log in', $this->title(), 'Unable to find the login forum');
 
 			// Fill in the form, long hand style
-			$usernameInput = $this->byId('user');
-			$usernameInput->clear();
-			$usernameInput->value($this->adminuser);
+			$this->byId('user')->click();
+			$this->keys($this->adminuser);
 
-			$passwordInput = $this->byId('passwrd');
-			$passwordInput->clear();
-			$passwordInput->value($this->adminpass);
+			$this->byId('passwrd')->click();
+			$this->keys($this->adminpass);
 
 			// Submit it
+			//$this->clickit('#password_login > input[type="submit"]');
 			$this->byId('frmLogin')->submit();
 		}
+		else
+		{
+			return;
+		}
+
+		// Hang about until the page refreshes
+		$this->url('index.php');
+		$this->waitUntil(function ($testCase)
+		{
+			try
+			{
+				return $testCase->byId('menu_nav');
+			}
+			catch (PHPUnit\Extensions\Selenium2TestCase\WebDriverException $e)
+			{
+				return false;
+			}
+		}, 5000);
 
 		// Should see the admin main menu button
-		$this->assertStringContainsString('Admin', $this->byId('menu_nav')->text());
+		$this->assertStringContainsString('Admin', $this->byId('menu_nav')->text(), $this->source());
 	}
 
 	/**
@@ -187,7 +217,8 @@ abstract class ElkArteWebSupport extends Selenium2TestCase
 		{
 			// enter password to access
 			$this->assertEquals('Administration Log in', $this->title(), $this->source());
-			$this->byId('admin_pass')->value($this->adminpass);
+			$this->byId('admin_pass')->click();
+			$this->keys($this->adminpass);
 			$this->byId('frmLogin')->submit();
 		}
 
