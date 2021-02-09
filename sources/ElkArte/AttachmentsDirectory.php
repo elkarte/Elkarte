@@ -74,6 +74,7 @@ class AttachmentsDirectory
 		}
 
 		$this->attachmentUploadDir = Util::unserialize($options['attachmentUploadDir']);
+		$this->attachmentUploadDir = $this->attachmentUploadDir ?: [1 => $options['attachmentUploadDir']];
 	}
 
 	/**

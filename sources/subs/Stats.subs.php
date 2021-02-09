@@ -921,17 +921,18 @@ function UserStatsMostActiveBoard($memID, $limit = 10)
 		WHERE m.id_member = {int:current_member}
 			AND {query_see_board}
 		GROUP BY b.id_board, b.num_posts
-		ORDER BY percentage DESC
 		LIMIT {int:limit}',
 		array(
 			'current_member' => $memID,
 			'limit' => (int) $limit,
 		)
 	);
-	$board_activity = array();
+	$board_activity = [];
+	$percent = [];
 	while (($row = $result->fetch_assoc()))
 	{
 		$href = getUrl('board', ['board' => $row['id_board'], 'start' => '0', 'name' => $row['name']]);
+
 		// min/max take care of cases when b.num_posts is broken for wwhatever reason
 		$percentage = min($row['message_count'] / max(1, $row['max_posts_per_board']), 1) * 100;
 
@@ -945,8 +946,12 @@ function UserStatsMostActiveBoard($memID, $limit = 10)
 			'posts_percent' => $percentage,
 			'total_posts' => $row['num_posts'],
 		);
+
+		$percent[$row['id_board']] = $percentage;
 	}
 	$result->free_result();
+
+	array_multisort($percent, SORT_DESC, $board_activity);
 
 	return $board_activity;
 }
