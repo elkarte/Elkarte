@@ -48,7 +48,7 @@ abstract class ElkArteWebSupport extends Selenium2TestCase
 		$this->setDesiredCapabilities([
 			"chromeOptions" => [
 				'w3c' => false,
-			]
+			],
 		]);
 		$this->setPort($this->port);
 		$this->setHost('localhost');
@@ -75,6 +75,8 @@ abstract class ElkArteWebSupport extends Selenium2TestCase
 	 *
 	 * - Calls parent setUpPage
 	 * - sets a window size good for screenshots etc.
+	 * - Logins in the admin (optional)
+	 * - Sets initial browser page (optional)
 	 */
 	public function setUpPage()
 	{
@@ -292,7 +294,5 @@ abstract class ElkArteWebSupport extends Selenium2TestCase
 
 		User::$info = new UserInfo($userData);
 		User::load();
-
-		new ElkArte\Themes\ThemeLoader();
 	}
 }
