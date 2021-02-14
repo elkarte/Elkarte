@@ -508,7 +508,7 @@ function registerMember(&$regOptions, $ErrorContext = 'register')
 	validateUsername(0, $regOptions['username'], $ErrorContext, !empty($regOptions['check_reserved_name']));
 
 	// Generate a validation code if it's supposed to be emailed.
-	$validation_code = $regOptions['require'] === 'activation' ? generateValidationCode(14) : '';
+	$validation_code = generateValidationCode(14);
 
 	// Does the first password match the second?
 	if ($regOptions['password'] != $regOptions['password_check'] && $regOptions['auth_method'] == 'password')
