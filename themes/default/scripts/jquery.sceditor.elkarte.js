@@ -7,7 +7,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.1.4
+ * @version 1.1.7
  */
 
 /** global: elk_session_var, elk_session_id, ila_filename, elk_scripturl  */
@@ -418,7 +418,7 @@ $.sceditor.plugins.bbcode.bbcode
 			return '[attach' + attribs + ']' + content + '[/attach]';
 		},
 		html: function (token, attrs, content) {
-			var attribs = ''
+			var attribs = '',
 				align = '',
 				thumb = '',
 				params = function(names) {
@@ -600,7 +600,6 @@ $.sceditor.plugins.bbcode.bbcode
 			params(['width', 'height', 'title', 'alt']);
 			return '[img' + attribs + ']' + element.attr('src') + '[/img]';
 		},
-
 		html: function (token, attrs, content) {
 			var attribs = '',
 				params = function (names) {
@@ -612,7 +611,7 @@ $.sceditor.plugins.bbcode.bbcode
 
 			// handle [img alt=alt title=title width=123 height=123]url[/img]
 			params(['width', 'height', 'alt', 'title']);
-			return '<img' + attribs + ' src="' + content + '" />';
+			return '<img' + attribs + ' src="' + $.sceditor.escapeEntities(content) + '" />';
 		}
 	})
 	.set('list', {
