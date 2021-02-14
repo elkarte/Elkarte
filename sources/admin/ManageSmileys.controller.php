@@ -137,7 +137,7 @@ class ManageSmileys_Controller extends Action_Controller
 			checkSession();
 
 			$this->_req->post->smiley_sets_default = $this->_req->getPost('smiley_sets_default', 'trim|strval', 'default');
-			$this->_req->post->smileys_url = $url = rtrim($this->_req->post->smileys_url, '/\\');
+			$this->_req->post->smileys_url = rtrim($this->_req->post->smileys_url, '/\\');
 
 			// Make sure that the smileys are in the right order after enabling them.
 			if (isset($this->_req->post->smiley_enable))
