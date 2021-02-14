@@ -9,7 +9,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.1
+ * @version 1.1.7
  *
  */
 
@@ -66,8 +66,7 @@ function template_control_richedit($editor_id, $smileyContainer = null, $bbcCont
 			var $editor_data = {},
 				$editor_container = {};
 
-			function elk_editor() {',
-				!empty($context['bbcodes_handlers']) ? $context['bbcodes_handlers'] : '', '
+			function elk_editor() {
 				$("#', $editor_id, '").sceditor({
 					style: "', $settings['theme_url'], '/css/', $context['theme_variant_url'], 'jquery.sceditor.elk_wiz', $context['theme_variant'], '.css', CACHE_STALE, '",
 					width: "100%",
