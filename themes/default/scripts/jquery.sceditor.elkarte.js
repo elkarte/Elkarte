@@ -879,7 +879,7 @@ sceditor.formats.bbcode
 
 			// handle [img alt=alt title=title width=123 height=123]url[/img]
 			params(['width', 'height', 'alt', 'title']);
-			return '<img' + attribs + ' src="' + content + '" />';
+			return '<img' + attribs + ' src="' + sceditor.escapeEntities(content) + '" />';
 		}
 	})
 	.set('list', {
