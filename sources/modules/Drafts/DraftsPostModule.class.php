@@ -11,7 +11,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.1
+ * @version 1.1.7
  *
  */
 
@@ -164,7 +164,7 @@ class Drafts_Post_Module extends ElkArte\sources\modules\Abstract_Module
 
 				loadJavascriptFile('drafts.plugin.js', array('defer' => true));
 			}
-			$context['shortcuts_text'] = $txt['shortcuts_drafts' . (isBrowser('is_firefox') ? '_firefox' : '')];
+			$context['shortcuts_text'] = $txt['shortcuts_drafts'];
 
 			if (!isset($editorOptions['buttons']))
 				$editorOptions['buttons'] = array();

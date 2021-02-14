@@ -90,7 +90,7 @@ function create_control_richedit($editorOptions)
 
 		// Our not so concise shortcut line
 		if (!isset($context['shortcuts_text']))
-			$context['shortcuts_text'] = $txt['shortcuts' . (isBrowser('is_firefox') ? '_firefox' : '')];
+			$context['shortcuts_text'] = $txt['shortcuts'];
 
 		// Spellcheck?
 		$context['show_spellchecking'] = !empty($modSettings['enableSpellChecking']) && function_exists('pspell_new');

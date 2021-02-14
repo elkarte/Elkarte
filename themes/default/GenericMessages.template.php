@@ -73,7 +73,7 @@ function template_build_poster_div($message, $ignoring = false)
 									<li class="listlevel2 karma">' . $modSettings['karmaLabel'] . ' +' . $message['member']['karma']['good'] . '/-' . $message['member']['karma']['bad'] . '</li>';
 
 		// Is this user allowed to modify this member's karma?
-		if ($message['member']['karma']['allow'])
+		if (!empty($message['member']['karma']['allow']))
 			$poster_div .= '
 									<li class="listlevel2 karma_allow">
 										<a class="linklevel2" href="' . $message['member']['karma']['applaud_url'] . '">' . $modSettings['karmaApplaudLabel'] . '</a>' .

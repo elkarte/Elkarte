@@ -932,6 +932,7 @@ a.bbc_link {
 	width: 100%;
 	margin-bottom: 10px;
 	padding: 2px;
+	box-sizing: border-box
 }
 #quick_edit_body_container .input_text {
 	width: 85%;
@@ -3443,6 +3444,8 @@ dl.send_mail dd {
 
 #postmodify #message {
 	width: 100%;
+	padding: 2px;
+	box-sizing: border-box;
 }
 
 #postmodify .lastedit {

@@ -32,7 +32,7 @@ abstract class Mention_Message_Abstract implements Mention_Type_Interface
 	 *
 	 * @var array
 	 */
-	protected static $_frequency = ['notification', 'email', 'email_daily', 'email_weekly'];
+	protected static $_frequency = array('notification', 'email', 'email_daily', 'email_weekly');
 
 	/**
 	 * The database object

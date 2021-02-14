@@ -7,7 +7,7 @@
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
- * @version 1.1.5
+ * @version 1.1.7
  *
  */
 
@@ -1205,7 +1205,7 @@ class Data_Validator
 				'field' => $field,
 				'input' => $input[$field],
 				'error' => '_validate_php_syntax',
-				'error_msg' => $errorMsg['message'],
+				'error_msg' => isset($errorMsg['message']) ? $errorMsg['message'] : 'NaN',
 				'param' => $validation_parameters
 			);
 		}
