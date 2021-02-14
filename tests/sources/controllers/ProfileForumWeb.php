@@ -9,7 +9,11 @@
  */
 class ProfileForumController extends ElkArteWebSupport
 {
-	public function setUpPage($url = '', $login = false)
+	/**
+	 * Called just before a test run, but after setUp() use to
+	 * auto login or set a default page for initial browser view
+	 */
+	public function setUpPage()
 	{
 		$this->url = 'index.php?action=profile;area=forumprofile';
 		$this->login = true;

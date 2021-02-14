@@ -7,6 +7,8 @@
  *
  * @backupGlobals disabled
  */
+use ElkArte\Errors\ErrorContext;
+
 class SupportRegisterController extends ElkArteWebSupport
 {
 	/*
@@ -25,6 +27,8 @@ class SupportRegisterController extends ElkArteWebSupport
 		require_once('./bootstrap.php');
 		new Bootstrap(false);
 
+		$this->loadUserData();
+
 		// Let's remember about these
 		$this->registration_method = $modSettings['registration_method'];
 		$this->visual_verification_type = $modSettings['visual_verification_type'];
@@ -35,6 +39,16 @@ class SupportRegisterController extends ElkArteWebSupport
 		updateSettings(array('reg_verification' => 0));
 
 		parent::setUp();
+	}
+
+	/**
+	 * Called just before a test run, but after setUp() use to
+	 * auto login or set a default page for initial browser view
+	 */
+	public function setUpPage()
+	{
+		$this->url = 'index.php';
+		parent::setUpPage();
 	}
 
 	/**
@@ -54,7 +68,7 @@ class SupportRegisterController extends ElkArteWebSupport
 	/**
 	 * Utility function to support function tests below
 	 */
-	public function registerMember()
+	private function fillRegisterForm()
 	{
 		$username = 'testuser';
 		$email = 'valid@emailaddress.net';
@@ -63,6 +77,7 @@ class SupportRegisterController extends ElkArteWebSupport
 		// Register from the main menu
 		$this->adminLogout();
 		$this->url('index.php');
+
 		$this->clickit('#button_register > a');
 		$this->assertEquals('Registration Agreement', $this->title());
 
@@ -86,10 +101,23 @@ class SupportRegisterController extends ElkArteWebSupport
 	 */
 	public function testRegisterInValid()
 	{
-		$this->registerMember();
+		$this->fillRegisterForm();
 
 		// Let's select register!
 		$this->byId('registration')->submit();
+
+		// Wait for it to fail
+		$this->waitUntil(function ($testCase)
+		{
+			try
+			{
+				return $this->byCssSelector('div.errorbox');
+			}
+			catch (PHPUnit\Extensions\Selenium2TestCase\WebDriverException $e)
+			{
+				return false;
+			}
+		}, 5000);
 
 		// Should fail for speed reasons
 		$this->assertStringContainsString('You went through the registration process too quickly', $this->byCssSelector('div.errorbox')->text(), $this->source());
@@ -100,7 +128,7 @@ class SupportRegisterController extends ElkArteWebSupport
 	 */
 	public function testRegisterValid()
 	{
-		$this->registerMember();
+		$this->fillRegisterForm();
 
 		// We need this to avoid our anti-spam feature
 		sleep(9);
@@ -117,9 +145,6 @@ class SupportRegisterController extends ElkArteWebSupport
 	 */
 	public function testDeleteAccount()
 	{
-		// Use standard functions and not GUI
-		$this->loadUserData();
-
 		// Register a member that we can delete
 		require_once(SUBSDIR . '/Members.subs.php');
 		$_SESSION['just_registered'] = 0;
@@ -132,7 +157,12 @@ class SupportRegisterController extends ElkArteWebSupport
 			'require' => 'nothing',
 			'send_welcome_email' => false,
 		);
+
+		$reg_errors = ErrorContext::context('register', 0);
 		$memberID = registerMember($regOptions);
+		$this->assertFalse($memberID === 0, 'Failed to create member, code:: ' . $memberID);
+		$this->assertFalse($reg_errors->hasErrors());
+
 		$_SESSION['just_registered'] = 0;
 
 		// Select login from the main page

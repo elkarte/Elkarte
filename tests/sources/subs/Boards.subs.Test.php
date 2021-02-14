@@ -24,6 +24,8 @@ class TestBoards extends ElkArteCommonSetupTest
 		//
 		// @todo might want to insert some boards, topics, and use those all through the tests here
 		require_once(SUBSDIR . '/Boards.subs.php');
+
+		parent::setUp();
 	}
 
 	/**
@@ -68,20 +70,20 @@ class TestBoards extends ElkArteCommonSetupTest
 
 	/**
 	 * Mark the boards read
-	 *
-	 * Not working, fix in the future ::
 	 */
-	public function MarkBoardsRead()
+	public function testMarkBoardsRead()
 	{
 		global $modSettings;
 
 		// Set a max that is greater than what we have done in the tests
 		$modSettings['maxMsgID'] = 10;
 
+		// Mark them as read
 		markBoardsRead(1, false, true);
 
 		require_once(SUBSDIR . '/Topic.subs.php');
-		$num = getUnreadCountSince(1);
+		$num = getUnreadCountSince(1, 0);
+
 		$this->assertEquals(0, $num, 'Missed unread topics, expected 0 saw ' . $num);
 	}
 }

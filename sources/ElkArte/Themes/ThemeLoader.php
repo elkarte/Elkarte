@@ -14,10 +14,10 @@
 namespace ElkArte\Themes;
 
 use ElkArte\Cache\Cache;
-use ElkArte\Themes\Directories;
 use ElkArte\Hooks;
 use ElkArte\HttpReq;
 use ElkArte\User;
+use ElkArte\UserInfo;
 use ElkArte\Util;
 use ElkArte\Debug;
 
@@ -302,6 +302,7 @@ class ThemeLoader
 		require_once($settings['theme_dir'] . '/Theme.php');
 		$class = 'ElkArte\\Themes\\' . $themeName . '\\Theme';
 		static::$dirs = new Directories($settings);
+		User::$info = User::$info ?? new UserInfo([]);
 		$this->theme = new $class($this->id, User::$info, static::$dirs);
 		$context['theme_instance'] = $this->theme;
 	}
