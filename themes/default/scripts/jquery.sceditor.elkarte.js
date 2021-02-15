@@ -489,7 +489,7 @@ $.sceditor.plugins.bbcode.bbcode
 			var from = '';
 
 			if (typeof attrs.defaultattr !== 'undefined')
-				from = '<cite>' + attrs.defaultattr + '</cite>';
+				from = '<cite>' + $.sceditor.escapeEntities(attrs.defaultattr) + '</cite>';
 
 			return '<code>' + from + content.replace('[', '&#91;') + '</code>';
 		}
@@ -529,13 +529,15 @@ $.sceditor.plugins.bbcode.bbcode
 			// Author tag in the quote ?
 			if (typeof attrs.author !== 'undefined') {
 				attr_author = attrs.author;
-				sAuthor = bbc_quote_from + ': ' + attr_author;
+				sAuthor = bbc_quote_from + ': ' + $.sceditor.escapeEntities(attr_author);
 			}
 			// Done as [quote=someone]
 			else if (typeof attrs.defaultattr !== 'undefined') {
 				// Convert it to an author tag
-				attr_link = attrs.defaultattr;
-				sLink = attr_link.substr(0, 7) === 'http://' ? attr_link : elk_scripturl + '?' + attr_link;
+				attr_link = $.sceditor.escapeEntities(attrs.defaultattr);
+				sLink = (attr_link.substr(0, 7) === 'http://' || attr_link.substr(0, 8) === 'https://')
+					? $.sceditor.escapeUriScheme(attr_link)
+					: elk_scripturl + '?' + attr_link;
 				sAuthor = '<a href="' + sLink + '">' + bbc_quote_from + ': ' + sLink + '</a>';
 			}
 
@@ -543,9 +545,13 @@ $.sceditor.plugins.bbcode.bbcode
 			for (var key in attrs) {
 				if (key.substr(0, 4) === 'link' && attrs.hasOwnProperty(key)) {
 					attr_link = key.length > 4 ? key.substr(5) + '=' + attrs[key] : attrs[key];
-
-					sLink = attr_link.substr(0, 7) === 'http://' ? attr_link : elk_scripturl + '?' + attr_link;
-					sAuthor = sAuthor === '' ? '<a href="' + sLink + '">' + bbc_quote_from + ': ' + sLink + '</a>' : '<a href="' + sLink + '">' + sAuthor + '</a>';
+					attr_link = $.sceditor.escapeEntities(attr_link);
+					sLink = (attr_link.substr(0, 7) === 'http://' || attr_link.substr(0, 8) === 'https://')
+						? attr_link
+						: elk_scripturl + '?' + attr_link;
+					sAuthor = sAuthor === ''
+						? '<a href="' + sLink + '">' + bbc_quote_from + ': ' + sLink + '</a>'
+						: '<a href="' + sLink + '">' + sAuthor + '</a>';
 				}
 			}
 
@@ -561,7 +567,7 @@ $.sceditor.plugins.bbcode.bbcode
 			else
 				sAuthor += sDate !== '' ? ' ' + bbc_search_on : '';
 
-			content = '<blockquote author="' + attr_author + '" link="' + attr_link + '" date="' + attr_date + '"><cite>' + sAuthor + ' ' + sDate + '</cite>' + content + '</blockquote>&nbsp;';
+			content = '<blockquote author="' + attr_author + '" link="' + attr_link + '" date="' + attr_date + '"><cite>' + sAuthor + ' ' + sDate + '</cite>' + content + '</blockquote>';
 
 			return content;
 		}
@@ -605,13 +611,13 @@ $.sceditor.plugins.bbcode.bbcode
 				params = function (names) {
 					names.forEach(function (name) {
 						if (typeof attrs[name] !== 'undefined')
-							attribs += ' ' + name + '="' + attrs[name] + '"';
+							attribs += ' ' + name + '="' + $.sceditor.escapeEntities(attrs[name]) + '"';
 					});
 				};
 
 			// handle [img alt=alt title=title width=123 height=123]url[/img]
 			params(['width', 'height', 'alt', 'title']);
-			return '<img' + attribs + ' src="' + $.sceditor.escapeEntities(content) + '" />';
+			return '<img' + attribs + ' src="' + $.sceditor.escapeUriScheme(content) + '" />';
 		}
 	})
 	.set('list', {
