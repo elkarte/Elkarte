@@ -70,24 +70,12 @@ function detectFulltextIndex()
 		);
 	}
 
-	if ($request !== false)
+	// innodb (since 5.6.4 and myisam) both support fulltext index
+	if ($request === false)
 	{
-		// InnoDB full-text search (FTS) is available in MySQL >=5.6.4
-		$innodb_capable = version_compare($ver, '5.6.4') >= 0;
-
-		while (($row = $request->fetch_assoc()))
-		{
-			$check1 = isset($row['Type']) && strtolower($row['Type']) !== 'myisam' && !$innodb_capable;
-			$check2 = isset($row['Engine']) && strtolower($row['Engine']) !== 'myisam' && !$innodb_capable;
-
-			if ($check1 || $check2)
-			{
-				$context['cannot_create_fulltext'] = true;
-			}
-		}
-
-		$request->free_result();
+		$context['cannot_create_fulltext'] = true;
 	}
+	$request->free_result();
 
 	return $fulltext_index;
 }
@@ -221,7 +209,7 @@ source ', $prefix, '_source
 	sql_attr_uint		= id_board
 	sql_attr_uint		= id_member
 	sql_attr_uint		= poster_time
-	sql_attr_float		= acprel
+	sql_attr_uint		= acprel
 	sql_attr_uint		= num_replies
 	sql_attr_uint		= num_likes
 	sql_attr_bool		= is_sticky
@@ -245,12 +233,13 @@ source ', $prefix, '_delta_source : ', $prefix, '_source
 index ', $prefix, '_base_index
 {
 	html_strip		 	= 1
-	min_prefix_len		= 2
+	min_prefix_len		= 3
 	min_stemming_len	= 4
 	stopwords_unstemmed	= 1
 	index_exact_words	= 1
 	index_field_lengths	= 1
 	expand_keywords		= 1
+	regexp_filter 		= \b(\d+)[.-/]+(\d+)\b => \1_\2
 	blend_chars			= +, &, U+23, -, !, @
 	blend_mode			= trim_head | trim_none
 	source			 	= ', $prefix, '_source
@@ -340,15 +329,13 @@ function alterFullTextIndex($table, $indexes, $add = false)
  *
  * @param int $start
  * @param int $messages_per_batch
- * @param string $column_size_definition
- * @param mixed[] $index_settings array containing specifics of what to create e.g. bytes per word
  *
  * @return array
  * @throws \ElkArte\Exceptions\Exception
  * @package Search
  *
  */
-function createSearchIndex($start, $messages_per_batch, $column_size_definition, $index_settings)
+function createSearchIndex($start, $messages_per_batch)
 {
 	global $modSettings;
 
@@ -361,7 +348,7 @@ function createSearchIndex($start, $messages_per_batch, $column_size_definition,
 	{
 		drop_log_search_words();
 
-		$db_search->create_word_search($column_size_definition);
+		$db_search->create_word_search();
 
 		// Temporarily switch back to not using a search index.
 		if (!empty($modSettings['search_index']) && $modSettings['search_index'] === 'custom')
@@ -424,7 +411,7 @@ function createSearchIndex($start, $messages_per_batch, $column_size_definition,
 					'limit' => $messages_per_batch,
 				)
 			)->fetch_callback(
-				function ($row) use (&$forced_break, &$number_processed, &$inserts, $index_settings, $stop) {
+				function ($row) use (&$forced_break, &$number_processed, &$inserts, $stop) {
 					// In theory it's possible for one of these to take friggin ages so add more timeout protection.
 					if ($stop < time() || $forced_break)
 					{
@@ -433,7 +420,7 @@ function createSearchIndex($start, $messages_per_batch, $column_size_definition,
 					}
 
 					$number_processed++;
-					foreach (text2words($row['body'], $index_settings['bytes_per_word'], true) as $id_word)
+					foreach (text2words($row['body'], true) as $id_word)
 					{
 						$inserts[] = array($id_word, $row['id_msg']);
 					}
@@ -463,12 +450,12 @@ function createSearchIndex($start, $messages_per_batch, $column_size_definition,
 			}
 			else
 			{
-				updateSettings(array('search_custom_index_resume' => serialize(array_merge($index_settings, array('resume_at' => $start)))));
+				updateSettings(array('search_custom_index_resume' => serialize(array('resume_at' => $start))));
 			}
 		}
 
 		// Since there are still steps to go, 80% is the maximum here.
-		$percentage = round($num_messages['done'] / ($num_messages['done'] + $num_messages['todo']), 3) * 80;
+		$percentage = round($num_messages['done'] / ($num_messages['done'] + $num_messages['todo']), 1) * 80;
 	}
 
 	return array($start, $step, $percentage);
@@ -478,13 +465,12 @@ function createSearchIndex($start, $messages_per_batch, $column_size_definition,
  * Removes common stop words from the index as they inhibit search performance
  *
  * @param int $start
- * @param mixed[] $column_definition
  *
  * @return array
  * @throws \ElkArte\Exceptions\Exception
  * @package Search
  */
-function removeCommonWordsFromIndex($start, $column_definition)
+function removeCommonWordsFromIndex($start)
 {
 	global $modSettings;
 
@@ -494,9 +480,12 @@ function removeCommonWordsFromIndex($start, $column_definition)
 	$stop = time() + 3;
 	$max_messages = ceil(60 * $modSettings['totalMessages'] / 100);
 	$complete = false;
+   	$step_size = 100000000;
+   	$max_size = 2000000000;
 
 	while (time() < $stop)
 	{
+		// Find indexed words that appear to often
 		$db->fetchQuery('
 			SELECT
 			 	id_word, COUNT(id_word) AS num_words
@@ -506,7 +495,7 @@ function removeCommonWordsFromIndex($start, $column_definition)
 			HAVING COUNT(id_word) > {int:minimum_messages}',
 			array(
 				'starting_id' => $start,
-				'ending_id' => $start + $column_definition['step_size'] - 1,
+				'ending_id' => $start + $step_size - 1,
 				'minimum_messages' => $max_messages,
 			)
 		)->fetch_callback(
@@ -515,8 +504,10 @@ function removeCommonWordsFromIndex($start, $column_definition)
 			}
 		);
 
+		// Add them to the stopwords list since we are removing them as to common
 		updateSettings(array('search_stopwords' => implode(',', $stop_words)));
 
+		// Pfft ... commoners
 		if (!empty($stop_words))
 		{
 			$db->query('', '
@@ -528,8 +519,8 @@ function removeCommonWordsFromIndex($start, $column_definition)
 			);
 		}
 
-		$start += $column_definition['step_size'];
-		if ($start > $column_definition['max_size'])
+		$start += $step_size;
+		if ($start > $max_size)
 		{
 			$complete = true;
 			break;
