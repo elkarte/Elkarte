@@ -226,6 +226,16 @@ abstract class AbstractAPI
 	}
 
 	/**
+	 * Returns if the API uses the extended query syntax (aka sphinx etc)
+	 *
+	 * @return bool
+	 */
+	public function supportsExtended()
+	{
+		return false;
+	}
+
+	/**
 	 * If the current API can use a word index.
 	 *
 	 * @return bool

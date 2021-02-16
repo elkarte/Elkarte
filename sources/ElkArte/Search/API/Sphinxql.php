@@ -111,6 +111,14 @@ class Sphinxql extends AbstractAPI
 	}
 
 	/**
+	 *  {@inheritdoc }
+	 */
+	public function supportsExtended()
+	{
+		return true;
+	}
+
+	/**
 	 * {@inheritdoc }
 	 */
 	public function prepareIndexes($word, &$wordsSearch, &$wordsExclude, $isExcluded, $excludedSubjectWords)
@@ -145,7 +153,7 @@ class Sphinxql extends AbstractAPI
 			$query = 'SELECT *' . (empty($this->_searchParams->topic) ? ', COUNT(*) num' : '') . ', WEIGHT() relevance FROM ' . $index;
 
 			// Construct the (binary mode & |) query.
-			$where_match = $this->_searchArray->searchArrayExtended($this->_searchParams->search);
+			$where_match = $search_words[0];
 
 			// Nothing to search, return zero results
 			if (trim($where_match) === '')
@@ -209,7 +217,7 @@ class Sphinxql extends AbstractAPI
 					Errors::instance()->log_error(mysqli_error($mySphinx));
 				}
 
-				Errors::instance()->fatal_lang_error('error_no_search_daemon');
+				Errors::instance()->fatal_lang_error('error_invalid_search_daemon');
 			}
 
 			// Get the relevant information from the search results.

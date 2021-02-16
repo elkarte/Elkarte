@@ -366,6 +366,11 @@ class Search
 		$searchAPI->useTemporary($this->_createTemporary);
 		$searchAPI->setSearchArray($this->_searchArray);
 
+		if ($searchAPI->supportsExtended())
+		{
+			return $searchAPI->searchQuery($this->_searchArray->getSearchArray(), $this->_excludedIndexWords, $this->_participants);
+		}
+
 		return $searchAPI->searchQuery($this->searchWords(), $this->_excludedIndexWords, $this->_participants);
 	}
 

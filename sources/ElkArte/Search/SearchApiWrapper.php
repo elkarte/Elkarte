@@ -184,6 +184,14 @@ class SearchApiWrapper
 	}
 
 	/**
+	 * Wrapper for supportsExtended
+	 */
+	public function supportsExtended()
+	{
+		return $this->_searchAPI->supportsExtended();
+	}
+
+	/**
 	 * Wrapper for setExcludedPhrases of the SearchAPI
 	 *
 	 * @param string[] $phrases An array of phrases to exclude

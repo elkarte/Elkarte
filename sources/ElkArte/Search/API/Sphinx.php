@@ -77,7 +77,7 @@ class Sphinx extends AbstractAPI
 	protected $supported_databases = ['MySQL'];
 
 	/**
-	 * Check we support this db, set banned words
+	 * Check we support this db
 	 */
 	public function __construct($config, $searchParams)
 	{
@@ -106,6 +106,14 @@ class Sphinx extends AbstractAPI
 	public function indexedWordQuery($words, $search_data)
 	{
 		// Sphinx uses its internal engine
+	}
+
+	/**
+	 *  {@inheritdoc }
+	 */
+	public function supportsExtended()
+	{
+		return true;
 	}
 
 	/**
@@ -186,6 +194,7 @@ class Sphinx extends AbstractAPI
 				$query = '@(subject) ' . $query;
 			}
 
+			// Set our ranking equation
 			$mySphinx->SetRankingMode(SPH_RANK_EXPR, 'sum((4*lcs+2*(min_hit_pos==1)+word_count)*user_weight*position) + acprel + bm25');
 
 			// Execute the search query.
@@ -240,6 +249,11 @@ class Sphinx extends AbstractAPI
 		return $topics;
 	}
 
+	/**
+	 * Answer no
+	 *
+	 * @return false
+	 */
 	public function useWordIndex()
 	{
 		return false;
