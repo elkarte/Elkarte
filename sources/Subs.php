@@ -1242,17 +1242,19 @@ function host_from_ip($ip)
  * Chops a string into words and prepares them to be inserted into (or searched from) the database.
  *
  * @param string $text The string to process
- * @param int $max_chars defaults to 20
  *     - if encrypt = true this is the maximum number of bytes to use in integer hashes (for searching)
  *     - if encrypt = false this is the maximum number of letters in each word
  * @param bool $encrypt = false Used for custom search indexes to return an int[] array representing the words
  *
  * @return array
  */
-function text2words($text, $max_chars = 20, $encrypt = false)
+function text2words($text, $encrypt = false)
 {
+	// Step 0: prepare numbers so they are good for search & index 1000.45 -> 1000_45
+	$words = preg_replace('~([\d]+)[.-/]+(?=[\d])~u', '$1_', $text);
+
 	// Step 1: Remove entities/things we don't consider words:
-	$words = preg_replace('~(?:[\x0B\0\x{A0}\t\r\s\n(){}\\[\\]<>!@$%^*.,:+=`\~\?/\\\\]+|&(?:amp|lt|gt|quot);)+~u', ' ', strtr($text, array('<br />' => ' ')));
+	$words = preg_replace('~(?:[\x0B\0\x{A0}\t\r\s\n(){}\\[\\]<>!@$%^*.,:+=`\~\?/\\\\]+|&(?:amp|lt|gt|quot);)+~u', ' ', strtr($words, array('<br />' => ' ')));
 
 	// Step 2: Entities we left to letters, where applicable, lowercase.
 	$words = un_htmlspecialchars(ElkArte\Util::strtolower($words));
@@ -1262,25 +1264,21 @@ function text2words($text, $max_chars = 20, $encrypt = false)
 
 	if ($encrypt)
 	{
-		// Range of characters that crypt will produce (0-9, a-z, A-Z .)
-		$possible_chars = array_flip(array_merge(range(46, 57), range(65, 90), range(97, 122)));
 		$returned_ints = array();
 		foreach ($words as $word)
 		{
 			if (($word = trim($word, '-_\'')) !== '')
 			{
-				// Get a crypt representation of this work
-				$encrypted = substr(crypt($word, 'uk'), 2, $max_chars);
-				$total = 0;
+				// Get a hex representation of this word using a database indexing hash
+				// designed to be fast while maintaining a very low collision rate
+				$encrypted = hash('FNV1A32', $word);
 
-				// Create an integer representation
-				for ($i = 0; $i < $max_chars; $i++)
-				{
-					$total += $possible_chars[ord($encrypted[$i])] * pow(63, $i);
-				}
+				// Create an integer representation, the hash is an 8 char hex
+				// so the largest int will be 4294967295 which fits in int(10)
+				$total = hexdec($encrypted);
 
 				// Return the value
-				$returned_ints[] = $max_chars == 4 ? min($total, 16777215) : $total;
+				$returned_ints[] = $total;
 			}
 		}
 
@@ -1294,7 +1292,7 @@ function text2words($text, $max_chars = 20, $encrypt = false)
 		{
 			if (($word = trim($word, '-_\'')) !== '')
 			{
-				$returned_words[] = $max_chars === null ? $word : substr($word, 0, $max_chars);
+				$returned_words[] = substr($word, 0, 20);
 			}
 		}
 
