@@ -79,7 +79,6 @@ class Custom extends Standard
 		$this->indexSettings = Util::unserialize($modSettings['search_custom_index_config']);
 
 		$this->bannedWords = empty($modSettings['search_stopwords']) ? array() : explode(',', $modSettings['search_stopwords']);
-		$this->min_word_length = $this->indexSettings['bytes_per_word'];
 	}
 
 	/**
@@ -99,7 +98,7 @@ class Custom extends Standard
 	{
 		global $modSettings;
 
-		$subwords = text2words($word, $this->min_word_length, true);
+		$subwords = text2words($word, true);
 
 		if (empty($modSettings['search_force_index']))
 		{
@@ -218,14 +217,10 @@ class Custom extends Standard
 	 */
 	public function postCreated($msgOptions, $topicOptions, $posterOptions)
 	{
-		global $modSettings;
-
 		$db = database();
 
-		$customIndexSettings = Util::unserialize($modSettings['search_custom_index_config']);
-
 		$inserts = array();
-		foreach (text2words($msgOptions['body'], $customIndexSettings['bytes_per_word'], true) as $word)
+		foreach (text2words($msgOptions['body'], true) as $word)
 		{
 			$inserts[] = array($word, $msgOptions['id']);
 		}
@@ -261,8 +256,8 @@ class Custom extends Standard
 			$old_body = isset($msgOptions['old_body']) ? $msgOptions['old_body'] : '';
 
 			// Create the new and old index
-			$old_index = text2words($old_body, $customIndexSettings['bytes_per_word'], true);
-			$new_index = text2words($msgOptions['body'], $customIndexSettings['bytes_per_word'], true);
+			$old_index = text2words($old_body, true);
+			$new_index = text2words($msgOptions['body'], true);
 
 			// Calculate the words to be added and removed from the index.
 			$removed_words = array_diff(array_diff($old_index, $new_index), $stopwords);

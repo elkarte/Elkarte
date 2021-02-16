@@ -335,7 +335,7 @@ function removeTopics($topics, $decreasePostCount = true, $ignoreRecycling = fal
 			function ($row) use (&$words, &$messages, $customIndexSettings) {
 				detectServer()->setTimeLimit(300);
 
-				$words = array_merge($words, text2words($row['body'], $customIndexSettings['bytes_per_word'], true));
+				$words = array_merge($words, text2words($row['body'], true));
 				$messages[] = $row['id_msg'];
 			}
 		);
