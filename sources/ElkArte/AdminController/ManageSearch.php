@@ -484,7 +484,7 @@ class ManageSearch extends AbstractController
 		$context[$context['admin_menu_name']]['current_subsection'] = 'method';
 		$context['page_title'] = $txt['search_index_custom'];
 
-		$messages_per_batch = 50;
+		$messages_per_batch = 75;
 
 		// Resume building an index that was not completed
 		if (isset($this->_req->query->resume) && !empty($modSettings['search_custom_index_resume']))
@@ -523,14 +523,13 @@ class ManageSearch extends AbstractController
 		// Step 2: removing the words that occur too often and are of no use.
 		if ($context['step'] === 2)
 		{
-			list ($context['start'], $complete) = removeCommonWordsFromIndex($context['start']);
+			list ($context['start'], $complete, $context['percentage']) = removeCommonWordsFromIndex($context['start']);
 			if ($complete)
 			{
 				$context['step'] = 3;
 			}
 
 			$context['sub_template'] = 'create_index_progress';
-			$context['percentage'] = 80 + round($context['start'] / 2000000000, 1) * 20;
 		}
 
 		// Restore previous debug state

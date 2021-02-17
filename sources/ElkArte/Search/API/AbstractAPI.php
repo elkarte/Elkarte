@@ -44,7 +44,7 @@ abstract class AbstractAPI
 	protected $bannedWords = array();
 
 	/** @var int What is the minimum word length? */
-	protected $min_word_length = 3;
+	protected $min_word_length;
 
 	/** @var \ElkArte\ValuesContainer All the search configurations */
 	protected $config = null;
