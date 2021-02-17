@@ -551,7 +551,7 @@ class Database_PostgreSQL extends Database_Abstract
 	 * @param resource|null $connection = null
 	 * @throws Elk_Exception
 	 */
-	public function insert($method = 'replace', $table, $columns, $data, $keys, $disable_trans = false, $connection = null)
+	public function insert($method, $table, $columns, $data, $keys, $disable_trans = false, $connection = null)
 	{
 		global $db_prefix;
 
