@@ -20,6 +20,7 @@ use ElkArte\Debug;
 use ElkArte\GenericList;
 use ElkArte\Hooks;
 use ElkArte\Notifications;
+use ElkArte\Search\Search;
 use ElkArte\UrlGenerator\UrlGenerator;
 use ElkArte\User;
 use ElkArte\Util;
@@ -1264,25 +1265,27 @@ function text2words($text, $encrypt = false)
 
 	if ($encrypt)
 	{
-		$returned_ints = array();
+		$blocklist = getBlocklist();
+		$returned_ints = [];
+
+		// Only index unique words
+		$words = array_unique($words);
 		foreach ($words as $word)
 		{
-			if (($word = trim($word, '-_\'')) !== '')
+			$word = trim($word, '-_\'');
+			if ($word !== '' && !in_array($word, $blocklist) && Util::strlen($word) > 2)
 			{
 				// Get a hex representation of this word using a database indexing hash
 				// designed to be fast while maintaining a very low collision rate
 				$encrypted = hash('FNV1A32', $word);
 
 				// Create an integer representation, the hash is an 8 char hex
-				// so the largest int will be 4294967295 which fits in int(10)
-				$total = hexdec($encrypted);
-
-				// Return the value
-				$returned_ints[] = $total;
+				// so the largest int will be 4294967295 which fits in db int(10)
+				$returned_ints[$word] = hexdec($encrypted);
 			}
 		}
 
-		return array_unique($returned_ints);
+		return $returned_ints;
 	}
 	else
 	{
@@ -1299,6 +1302,25 @@ function text2words($text, $encrypt = false)
 		// Filter out all words that occur more than once.
 		return array_unique($returned_words);
 	}
+}
+
+/**
+ * Get the block list from the search controller.
+ *
+ * @return array
+ */
+function getBlocklist()
+{
+	static $blocklist;
+
+	if (!isset($blocklist))
+	{
+		$search = new Search();
+		$blocklist = $search->getBlockListedWords();
+		unset($search);
+	}
+
+	return $blocklist;
 }
 
 /**
