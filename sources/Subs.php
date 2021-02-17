@@ -40,7 +40,6 @@ use ElkArte\Util;
  *
  * @param mixed[] $changeArray An associative array of what we're changing in 'setting' => 'value' format
  * @param bool $update Use an UPDATE query instead of a REPLACE query
- * @throws \ElkArte\Exceptions\Exception
  */
 function updateSettings($changeArray, $update = false)
 {

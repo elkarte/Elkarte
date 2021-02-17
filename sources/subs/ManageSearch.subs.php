@@ -26,9 +26,6 @@ function detectFulltextIndex()
 
 	$db = database();
 
-	// Something like 5.7.16
-	list($ver,) = explode('-', $db->server_version());
-
 	$fulltext_index = array();
 	$db->fetchQuery('
 		SHOW INDEX
@@ -105,8 +102,6 @@ function SphinxVersion()
 function createSphinxConfig()
 {
 	global $db_server, $db_name, $db_user, $db_passwd, $db_prefix, $modSettings;
-
-	$version = SphinxVersion();
 
 	// Set up to output a file to the users browser
 	while (ob_get_level() > 0)
@@ -291,7 +286,6 @@ searchd
  * @param string $table
  * @param string[]|string $indexes
  * @param bool $add
- * @throws \ElkArte\Exceptions\Exception
  * @package Search
  */
 function alterFullTextIndex($table, $indexes, $add = false)
@@ -331,7 +325,6 @@ function alterFullTextIndex($table, $indexes, $add = false)
  * @param int $messages_per_batch
  *
  * @return array
- * @throws \ElkArte\Exceptions\Exception
  * @package Search
  *
  */
@@ -467,7 +460,6 @@ function createSearchIndex($start, $messages_per_batch)
  * @param int $start
  *
  * @return array
- * @throws \ElkArte\Exceptions\Exception
  * @package Search
  */
 function removeCommonWordsFromIndex($start)

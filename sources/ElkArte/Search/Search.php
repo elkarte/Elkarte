@@ -411,8 +411,8 @@ class Search
 			return $this->_searchWords;
 		}
 
-		$orParts = array();
-		$this->_searchWords = array();
+		$orParts = [];
+		$this->_searchWords = [];
 		$searchArray = $this->_searchArray->getSearchArray();
 		$excludedWords = $this->_searchArray->getExcludedWords();
 
