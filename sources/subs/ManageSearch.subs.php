@@ -454,8 +454,8 @@ function createSearchIndex($start, $messages_per_batch)
 			}
 		}
 
-		// Since there are still steps to go, 80% is the maximum here.
-		$percentage = round($num_messages['done'] / ($num_messages['done'] + $num_messages['todo']), 1) * 80;
+		// Since there are still steps to go, 90% is the maximum here.
+		$percentage = round($num_messages['done'] / ($num_messages['done'] + $num_messages['todo']), 2) * 90;
 	}
 
 	return array($start, $step, $percentage);
@@ -478,25 +478,25 @@ function removeCommonWordsFromIndex($start)
 
 	$stop_words = $start === 0 || empty($modSettings['search_stopwords']) ? array() : explode(',', $modSettings['search_stopwords']);
 	$stop = time() + 3;
-	$max_messages = ceil(60 * $modSettings['totalMessages'] / 100);
+	$max_occurrences = ceil(60 * $modSettings['totalMessages'] / 100);
 	$complete = false;
    	$step_size = 100000000;
-   	$max_size = 2000000000;
+   	$max_size = 4294967295; // FFFF FFFF
 
 	while (time() < $stop)
 	{
 		// Find indexed words that appear to often
 		$db->fetchQuery('
 			SELECT
-			 	id_word, COUNT(id_word) AS num_words
+			 	id_word, COUNT(id_word) AS num_words, id_msg
 			FROM {db_prefix}log_search_words
 			WHERE id_word BETWEEN {int:starting_id} AND {int:ending_id}
 			GROUP BY id_word
 			HAVING COUNT(id_word) > {int:minimum_messages}',
 			array(
 				'starting_id' => $start,
-				'ending_id' => $start + $step_size - 1,
-				'minimum_messages' => $max_messages,
+				'ending_id' => min($start + $step_size - 1, $max_size),
+				'minimum_messages' => $max_occurrences,
 			)
 		)->fetch_callback(
 			function ($row) use (&$stop_words) {
@@ -520,14 +520,16 @@ function removeCommonWordsFromIndex($start)
 		}
 
 		$start += $step_size;
-		if ($start > $max_size)
+		if ($start >= $max_size)
 		{
 			$complete = true;
 			break;
 		}
 	}
 
-	return array($start, $complete);
+	$percentage = 90 + (min(round($start / $max_size, 2), 1) * 10);
+
+	return array($start, $complete, $percentage);
 }
 
 /**

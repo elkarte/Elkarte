@@ -617,12 +617,12 @@ class ManageSearch extends AbstractController
 			'sphinx_index_prefix' => rtrim($this->_req->post->sphinx_index_prefix, '/'),
 			'sphinx_data_path' => rtrim($this->_req->post->sphinx_data_path, '/'),
 			'sphinx_log_path' => rtrim($this->_req->post->sphinx_log_path, '/'),
-			'sphinx_stopword_path' => $this->_req->post->sphinx_stopword_path,
-			'sphinx_indexer_mem' => (int) $this->_req->post->sphinx_indexer_mem,
-			'sphinx_searchd_server' => $this->_req->post->sphinx_searchd_server,
-			'sphinx_searchd_port' => (int) $this->_req->post->sphinx_searchd_port,
-			'sphinxql_searchd_port' => (int) $this->_req->post->sphinxql_searchd_port,
-			'sphinx_max_results' => (int) $this->_req->post->sphinx_max_results,
+			'sphinx_stopword_path' => $this->_req->getPost('sphinx_stopword_path', 'trim', ''),
+			'sphinx_indexer_mem' => $this->_req->getPost('sphinx_indexer_mem', 'intval', 128),
+			'sphinx_searchd_server' => $this->_req->getPost('sphinx_searchd_server', 'trim', 'localhost'),
+			'sphinx_searchd_port' => $this->_req->getPost('sphinx_searchd_port', 'intval', 0),
+			'sphinxql_searchd_port' => $this->_req->getPost('sphinxql_searchd_port', 'intval', 0),
+			'sphinx_max_results' => $this->_req->getPost('sphinx_max_results', 'intval', 0)
 		));
 	}
 
