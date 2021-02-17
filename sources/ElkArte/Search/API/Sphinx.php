@@ -121,7 +121,7 @@ class Sphinx extends AbstractAPI
 	 */
 	public function prepareIndexes($word, &$wordsSearch, &$wordsExclude, $isExcluded, $excludedSubjectWords)
 	{
-		$subwords = text2words($word, null, false);
+		$subwords = text2words($word, false);
 
 		$fulltextWord = count($subwords) === 1 ? $word : '"' . $word . '"';
 		$wordsSearch['indexed_words'][] = $fulltextWord;
@@ -178,7 +178,7 @@ class Sphinx extends AbstractAPI
 			$this->buildQueryLimits($mySphinx);
 
 			// Construct the (binary mode & |) query while accounting for excluded words
-			$query = $this->_searchArray->searchArrayExtended($this->_searchParams->search);
+			$query = $this->_searchArray->searchArrayExtended();
 
 			// If no search terms are left after comparing against excluded words (i.e. "test -test" or "test last -test -last"),
 			// sending that to Sphinx would result in a fatal error

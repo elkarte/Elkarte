@@ -251,7 +251,6 @@ class Custom extends Standard
 
 		if (isset($msgOptions['body']))
 		{
-			$customIndexSettings = Util::unserialize($modSettings['search_custom_index_config']);
 			$stopwords = empty($modSettings['search_stopwords']) ? array() : explode(',', $modSettings['search_stopwords']);
 			$old_body = isset($msgOptions['old_body']) ? $msgOptions['old_body'] : '';
 

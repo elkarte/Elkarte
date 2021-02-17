@@ -123,7 +123,7 @@ class Sphinxql extends AbstractAPI
 	 */
 	public function prepareIndexes($word, &$wordsSearch, &$wordsExclude, $isExcluded, $excludedSubjectWords)
 	{
-		$subwords = text2words($word, null, false);
+		$subwords = text2words($word, false);
 
 		$fulltextWord = count($subwords) === 1 ? $word : '"' . $word . '"';
 		$wordsSearch['indexed_words'][] = $fulltextWord;

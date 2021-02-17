@@ -127,7 +127,7 @@ class Fulltext extends Standard
 	{
 		global $modSettings;
 
-		$subwords = text2words($word, null, false);
+		$subwords = text2words($word, false);
 
 		if (empty($modSettings['search_force_index']))
 		{
