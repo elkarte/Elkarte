@@ -158,10 +158,9 @@ class Who extends AbstractController
 		require_once(SUBSDIR . '/Members.subs.php');
 		$totalMembers = countMembersOnline($conditions);
 
-		$start = $this->_req->get('start', 'intval');
 		// Prepare some page index variables.
-		$baseUrl = getUrl('action', ['action' => 'who', 'sort' => $context['sort_by'] . ($context['sort_direction'] === 'up' ? ';asc' : ''), 'show' => $context['show_by']]);
-		$context['page_index'] = constructPageIndex($baseUrl, $start, $totalMembers, $modSettings['defaultMaxMembers']);
+		$start = $this->_req->get('start', 'intval');
+		$context['page_index'] = constructPageIndex('{scripturl}?action=who;sort=' . $context['sort_by'] . ($context['sort_direction'] === 'up' ? ';asc' : '') . ';show=' . $context['show_by'], $start, $totalMembers, $modSettings['defaultMaxMembers']);
 		$context['start'] = $start;
 		$context['sub_template'] = 'whos_online';
 		theme()->getLayers()->add('whos_selection');

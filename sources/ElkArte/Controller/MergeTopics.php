@@ -101,7 +101,7 @@ class MergeTopics extends AbstractController
 		$topiccount = countTopicsByBoard($target_board, $onlyApproved);
 
 		// Make the page list.
-		$context['page_index'] = constructPageIndex(getUrl('action', ['action' => 'mergetopics', 'from' => $from, 'targetboard' => $target_board, 'board' => $board . '.%1$d']), $this->_req->query->start, $topiccount, $modSettings['defaultMaxTopics'], true);
+		$context['page_index'] = constructPageIndex('{scripturl}?action=mergetopics;from=' . $from . ';targetboard=' . $target_board . ';board=' . $board . '.%1$d', $this->_req->query->start, $topiccount, $modSettings['defaultMaxTopics'], true);
 
 		// Get the topic's subject.
 		$topic_info = getTopicInfo($from, 'message');

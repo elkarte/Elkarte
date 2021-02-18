@@ -435,8 +435,7 @@ class Groups extends AbstractController
 		$context['total_members'] = comma_format($context['total_members']);
 
 		// Create the page index.
-		$context['page_index'] = constructPageIndex(
-			getUrl($context['group']['can_moderate'] ? 'moderate' : 'group', ['action' => $context['group']['can_moderate'] ? 'moderate' : 'groups', 'area' => $context['group']['can_moderate'] ? 'viewgroups' : '', 'sa' => 'members', 'group' => $current_group, 'sort' => $context['sort_by'], isset($this->_req->query->desc) ? 'desc' : '']), $this->_req->query->start, $context['total_members'], $modSettings['defaultMaxMembers']);
+		$context['page_index'] = constructPageIndex('{scripturl}?action=' . ($context['group']['can_moderate'] ? 'moderate;area=viewgroups' : 'groups') . ';sa=members;group=' . $current_group . ';sort=' . $context['sort_by'] . (isset($this->_req->query->desc) ? ';desc' : ''), $this->_req->query->start, $context['total_members'], $modSettings['defaultMaxMembers']);
 
 		// Fetch the members that meet the where criteria
 		$context['members'] = membersBy($where, array($where => $current_group, 'order' => $querySort), true);

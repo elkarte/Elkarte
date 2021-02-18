@@ -168,7 +168,7 @@ class ManageErrors extends AbstractController
 		$context['sort_direction'] = isset($this->_req->query->desc) ? 'down' : 'up';
 
 		// Set the page listing up.
-		$context['page_index'] = constructPageIndex(getUrl('admin', ['action' => 'admin' , 'area' => 'logs' , 'sa' => 'errorlog' . ($context['sort_direction'] == 'down' ? ';desc' : '')] + (isset($filter['href']) ? $filter['href'] : [])), $this->_req->query->start, $num_errors, $modSettings['defaultMaxMessages']);
+		$context['page_index'] = constructPageIndex('{scripturl}?action=admin;area=logs;sa=errorlog' . ($context['sort_direction'] == 'down' ? ';desc' : '') . (isset($filter['href']) ? $filter['href'] : ''), $this->_req->query->start, $num_errors, $modSettings['defaultMaxMessages']);
 		$context['start'] = $this->_req->query->start;
 		$context['errors'] = array();
 

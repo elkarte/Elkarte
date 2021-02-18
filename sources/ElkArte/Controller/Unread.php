@@ -461,7 +461,7 @@ class Unread extends AbstractController
 		$all = $context['showing_all_topics'] ? ';all' : '';
 
 		// Make sure the starting place makes sense and construct the page index.
-		$context['page_index'] = constructPageIndex($scripturl . '?action=' . $this->_action . $all . $context['querystring_board_limits'] . $context['querystring_sort_limits'], $this->_req->query->start, $this->_num_topics, $context['topics_per_page'], true);
+		$context['page_index'] = constructPageIndex('{scripturl}?action=' . $this->_action . $all . $context['querystring_board_limits'] . $context['querystring_sort_limits'], $this->_req->query->start, $this->_num_topics, $context['topics_per_page'], true);
 		$context['current_page'] = (int) $this->_req->query->start / $context['topics_per_page'];
 
 		if ($context['showing_all_topics'])

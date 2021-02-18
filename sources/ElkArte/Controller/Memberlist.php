@@ -348,7 +348,7 @@ class Memberlist extends AbstractController
 		$context['sort_direction'] = !isset($desc) ? 'up' : 'down';
 
 		// Construct the page index.
-		$context['page_index'] = constructPageIndex($scripturl . '?action=memberlist;sort=' . $sort . (isset($desc) ? ';desc' : ''), $start, $context['num_members'], $modSettings['defaultMaxMembers']);
+		$context['page_index'] = constructPageIndex('{scripturl}?action=memberlist;sort=' . $sort . (isset($desc) ? ';desc' : ''), $start, $context['num_members'], $modSettings['defaultMaxMembers']);
 
 		// Send the data to the template.
 		$context['start'] = $start + 1;
@@ -576,7 +576,7 @@ class Memberlist extends AbstractController
 			// Find the members from the database.
 			$numResults = ml_searchMembers($query_parameters, array_unique($customJoin), $where, $start);
 			$context['letter_links'] = '';
-			$context['page_index'] = constructPageIndex($scripturl . '?action=memberlist;sa=search;search=' . $search . ';fields=' . implode(',', $validFields), $start, $numResults, $modSettings['defaultMaxMembers']);
+			$context['page_index'] = constructPageIndex('{scripturl}?action=memberlist;sa=search;search=' . $search . ';fields=' . implode(',', $validFields), $start, $numResults, $modSettings['defaultMaxMembers']);
 		}
 		else
 		{

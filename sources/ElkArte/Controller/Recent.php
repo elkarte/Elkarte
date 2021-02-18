@@ -298,7 +298,7 @@ class Recent extends AbstractController implements FrontpageInterface
 			$this->_maxMsgID = array(400, 7);
 		}
 
-		$this->_base_url = getUrl('action', ['action' => 'recent', 'c' => implode(',', $categories)]);
+		$this->_base_url = '{scripturl}?action=recent;c=' . implode(',', $categories);
 
 		return $categories;
 	}
@@ -332,7 +332,7 @@ class Recent extends AbstractController implements FrontpageInterface
 			$this->_maxMsgID = array(500, 9);
 		}
 
-		$this->_base_url = getUrl('action', ['action' => 'recent', 'boards' => implode(',', $this->_req->query->boards)]);
+		$this->_base_url = '{scripturl}?action=recent;boards=' . implode(',', $this->_req->query->boards);
 	}
 
 	/**
@@ -353,7 +353,7 @@ class Recent extends AbstractController implements FrontpageInterface
 			$this->_maxMsgID = array(600, 10);
 		}
 
-		$this->_base_url = getUrl('action', ['action' => 'recent', 'board' => $board . '.%1$d']);
+		$this->_base_url = '{scripturl}?action=recent;board=' . $board . '.%1$d';
 		$this->_flex_start = true;
 	}
 
@@ -369,7 +369,7 @@ class Recent extends AbstractController implements FrontpageInterface
 		$this->_grabber->setVisibleBoards(max(0, $modSettings['maxMsgID'] - 100 - $this->_start * 6), !empty($modSettings['recycle_enable']) && $modSettings['recycle_board'] > 0 ? $modSettings['recycle_board'] : 0);
 
 		// Set up the pageindex
-		$this->_base_url = getUrl('action', ['action' => 'recent']);
+		$this->_base_url = '{scripturl}?action=recent';
 	}
 
 	/**

@@ -354,7 +354,7 @@ class Display extends AbstractController
 		}
 
 		// Construct the page index, allowing for the .START method...
-		$context['page_index'] = constructPageIndex(getUrl('topic', ['topic' => $topicinfo['id_topic'], 'start' => '%1$d', 'subject' => $topicinfo['subject']]), $this->_start, $total_visible_posts, $context['messages_per_page'], true, array('all' => $can_show_all, 'all_selected' => isset($this->_req->query->all)));
+		$context['page_index'] = constructPageIndex('{scripturl}?topic=' . $topic . '.%1$d', $this->_start, $total_visible_posts, $context['messages_per_page'], true, array('all' => $can_show_all, 'all_selected' => isset($this->_req->query->all)));
 		$context['start'] = $this->_start;
 
 		// This is information about which page is current, and which page we're on - in case you don't like
