@@ -161,7 +161,8 @@ const itemCodes = ["*:disc", "@:disc", "+:square", "x:square", "#:decimal", "0:d
 
 		/**
 		 * When you don't have a DOM node to check (non rendering tag), this will
-		 * check if the cursor is inside of the supplied tag
+		 * check if the cursor is inside of the supplied tag.  Used for footnote
+		 * and spoiler which don't and should not have wizzy rendering for best UE
 		 *
 		 * @param tag
 		 * @returns {number}
@@ -196,12 +197,11 @@ const itemCodes = ["*:disc", "@:disc", "+:square", "x:square", "#:decimal", "0:d
 		/**
 		 * Allows selecting the toolbar to end a tag if you are in that tag or
 		 * start a new tag otherwise. Will end the tag if currently in it, otherwise
-		 * returns 'start' back to caller for it to begin a new tag
+		 * starts new tag with supplied name and class
 		 *
 		 * @param nodeName the name of the node such as tt or pre
 		 * @param nodeClass the specific class name of the nodeName like bbc_tt
-		 * @param insertElement what you want to insert to END the tag e.g. span, p
-		 * @returns string start if starting a new tag
+		 * @param insertElement what you want to insert to END the tag e.g. span, p (inline/block)
 		 */
 		toggleTagStartEnd: function(nodeName, nodeClass, insertElement)
 		{
@@ -243,13 +243,12 @@ const itemCodes = ["*:disc", "@:disc", "+:square", "x:square", "#:decimal", "0:d
 				rangeHelper.selectRange(range_new);
 				editor.focus()
 
-				return 'end'
+				return
 			}
 
 			// Otherwise, a new tag for them, done by the caller
 			rangeHelper.restoreRange();
-
-			return 'start';
+			editor.insert('<' + nodeName + ' class="' + nodeClass + '">', '</' + nodeName + '>', false);
 		},
 		/**
 		 * Determine the caret position inside of sceditor's iframe for dropdown
@@ -387,7 +386,7 @@ sceditor.command
 		},
 		exec: function ()
 		{
-			this.insert('[footnote] ', '[/footnote]');
+			this.insert('[footnote]', '[/footnote]');
 		},
 		txtExec: ['[footnote]', '[/footnote]'],
 		tooltip: 'Insert Footnote'
@@ -406,15 +405,9 @@ sceditor.command
 		},
 		exec: function ()
 		{
-			let editor = this;
-
 			if (typeof this.toggleTagStartEnd === 'function')
 			{
-				if (this.toggleTagStartEnd('span', 'bbc_tt', 'span') === 'start')
-				{
-					// a new TT span for them
-					editor.insert('<span class="bbc_tt">', '</span>', false);
-				}
+				this.toggleTagStartEnd('span', 'bbc_tt', 'span');
 			}
 		},
 		txtExec: ['[tt]', '[/tt]'],
@@ -434,15 +427,9 @@ sceditor.command
 		},
 		exec: function ()
 		{
-			let editor = this;
-
 			if (typeof this.toggleTagStartEnd === 'function')
 			{
-				if (this.toggleTagStartEnd('pre', 'bbc_pre', 'p') === 'start')
-				{
-					// A a new pre span for then
-					editor.insert('<pre class="bbc_pre">', '</pre>', false);
-				}
+				this.toggleTagStartEnd('pre', 'bbc_pre', 'p');
 			}
 		},
 		txtExec: ['[pre]', '[/pre]'],
@@ -500,7 +487,7 @@ sceditor.command
  * These command define what happens to tags as we toggle from and to wizzy mode
  * It converts html back to bbc or bbc back to html.  Read the sceditor docs for more
  *
- * Adds / modifies BBC codes List, Tt, Pre, quote, footnote, code, img
+ * Adds / modifies BBC codes List, Tt, Pre, Quote, Code, Img
  */
 sceditor.formats.bbcode
 	.set('tt', {
