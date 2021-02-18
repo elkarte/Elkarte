@@ -6,7 +6,7 @@
  * @version 2.0 dev
  */
 
-/** global: elk_session_var, elk_session_id, ila_filename, elk_scripturl  */
+/** global: elk_session_var, elk_session_id, ila_filename, elk_scripturl, sceditor  */
 
 /**
  * Extension functions to provide ElkArte utility functions within sceditor
@@ -248,12 +248,17 @@ const itemCodes = ["*:disc", "@:disc", "+:square", "x:square", "#:decimal", "0:d
 			rangeHelper.restoreRange();
 			editor.insert('<' + nodeName + ' class="' + nodeClass + '">', '</' + nodeName + '>', false);
 		},
+		/**
+		 * If they selected any text in the node, assumes they want to remove that
+		 * formatting defined by the parent.  If nothing is selected simply returns
+		 *
+		 * @param tag name of tag/node to remove
+		 * @returns {boolean}
+		 */
 		checkRemoveFormat: function(tag) {
 			let range = this.getRangeHelper();
 			let selected = range.selectedRange();
 
-			// If they selected any text in the node, assume they want to remove the
-			// format defined by the parent.  If no selection they simply want to end the command
 			if (selected.startOffset !== selected.endOffset)
 			{
 				let dom = sceditor.dom,
@@ -284,8 +289,7 @@ const itemCodes = ["*:disc", "@:disc", "+:square", "x:square", "#:decimal", "0:d
 		 * positioning of select box
 		 *
 		 * What it does:
-		 * - Caret.js does not return the correct position when the iframe has scrolled.
-		 * - Finds the supplied tag (@ or :) and adds a placeholder before it
+		 * - Finds a supplied tag (@ or :) and adds a placeholder before it
 		 * - Gets the location offset() in the iframe "window" of the added placeholder
 		 * - Adjusts for the iframe scroll, adds in the iframe container location offset()
 		 * - Removes the placeholder, restores the editor range.
@@ -395,7 +399,7 @@ sceditor.command
 		{
 			if (typeof this.checkInsideSourceTag === 'function')
 			{
-				return this.checkInsideSourceTag('spoiler');
+				this.checkInsideSourceTag('spoiler');
 			}
 		},
 		exec: function ()
@@ -410,7 +414,7 @@ sceditor.command
 		{
 			if (typeof this.checkInsideSourceTag === 'function')
 			{
-				return this.checkInsideSourceTag('footnote');
+				this.checkInsideSourceTag('footnote');
 			}
 		},
 		exec: function ()
