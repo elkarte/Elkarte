@@ -6,7 +6,7 @@
  * @version 2.0 dev
  */
 
-/** global: elk_session_var, elk_session_id, ila_filename, elk_scripturl  */
+/** global: elk_session_var, elk_session_id, ila_filename, elk_scripturl, sceditor  */
 
 /**
  * Extension functions to provide ElkArte utility functions within sceditor
@@ -20,7 +20,7 @@ const itemCodes = ["*:disc", "@:disc", "+:square", "x:square", "#:decimal", "0:d
 			var current_event = event,
 				$_id = $('#' + id);
 
-			$_id.parent().on(event, 'textarea', func);
+			$_id.parent().on(current_event, 'textarea', func);
 
 			var oIframe = $_id.parent().find('iframe')[0],
 				oIframeWindow = oIframe.contentWindow;
@@ -30,7 +30,7 @@ const itemCodes = ["*:disc", "@:disc", "+:square", "x:square", "#:decimal", "0:d
 				var oIframeDoc = oIframeWindow.document,
 					oIframeBody = oIframeDoc.body;
 
-				$(oIframeBody).on(event, func);
+				$(oIframeBody).on(current_event, func);
 			}
 		},
 		appendEmoticon: function (code, emoticon)
@@ -100,7 +100,7 @@ const itemCodes = ["*:disc", "@:disc", "+:square", "x:square", "#:decimal", "0:d
 						popupContent = $('<div id="sceditor-popup" />');
 						line = $('<div id="sceditor-popup-smiley" />');
 
-						// create our popup, title bar, smiles, then the close button
+						// Create our popup, title bar, smiles, then the close button
 						popupContent.append(titlebar);
 
 						// Add in all the smileys / lines
@@ -142,7 +142,7 @@ const itemCodes = ["*:disc", "@:disc", "+:square", "x:square", "#:decimal", "0:d
 				});
 			}
 
-			// show the standard placement icons
+			// Show the standard placement icons
 			$.each(emoticons, base.appendEmoticon);
 
 			if (line.children().length > 0)
@@ -159,18 +159,140 @@ const itemCodes = ["*:disc", "@:disc", "+:square", "x:square", "#:decimal", "0:d
 			}
 		},
 		/**
-		 * Determine the caret position inside of sceditor's iframe
+		 * When you don't have a DOM node to check (non rendering tag), this will
+		 * check if the cursor is inside of the supplied tag.  Used for footnote
+		 * and spoiler which don't and should not have wizzy rendering for best UE
+		 *
+		 * @param tag
+		 * @returns {number}
+		 */
+		checkInsideSourceTag: function (tag)
+		{
+			let currentNode = this.currentNode(),
+				currentRange = this.getRangeHelper();
+
+			if (currentRange.selectedRange())
+			{
+				let end = currentRange.selectedRange().startOffset,
+					text = typeof currentNode !== 'undefined' ? currentNode.textContent : '';
+
+				// Left and right text from the cursor position and tag positions
+				let left = text.substr(0, end),
+					right = text.substr(end),
+					l1 = left.lastIndexOf("[" + tag + "]"),
+					l2 = left.lastIndexOf("[/" + tag + "]"),
+					r1 = right.indexOf("[" + tag + "]"),
+					r2 = right.indexOf("[/" + tag + "]");
+
+				// Inside ot the [tag]your are here[/tag]
+				if ((l1 > -1 && l1 > l2) || (r2 > -1 && (r1 === -1 || (r1 > r2))))
+				{
+					return 1;
+				}
+			}
+
+			return 0;
+		},
+		/**
+		 * Allows selecting the toolbar icon to end the tag if you are in that tag or
+		 * start a new tag otherwise.
+		 *
+		 * @param nodeName the name of the node such as tt or pre
+		 * @param nodeClass the specific class name of the nodeName like bbc_tt
+		 * @param insertElement what you want to insert to END the tag e.g. span, p (inline/block)
+		 */
+		toggleTagStartEnd: function(nodeName, nodeClass, insertElement)
+		{
+			let editor = this,
+				rangeHelper = editor.getRangeHelper(),
+				tag,
+				range,
+				blank;
+
+			// Set our markers and make a copy
+			rangeHelper.saveRange();
+			range = rangeHelper.cloneSelected();
+
+			// Find the name/class node if we are in one at all
+			tag = range.commonAncestorContainer;
+			while (tag && (tag.nodeType !== 1 ||
+				(tag.tagName.toLowerCase() !== nodeName && !tag.classList.contains(nodeClass))))
+			{
+				tag = tag.parentNode;
+			}
+
+			// If we found one, we are in it and the user has requested to end this one
+			if (tag)
+			{
+				// Place the markers at the end of the found node
+				range.setEndAfter(tag);
+				range.collapse(false);
+
+				// Stuff in a new spacer node at that position
+				blank = tag.ownerDocument.createElement(insertElement);
+				blank.innerHTML = '&#8203; &#8203;';
+				range.insertNode(blank);
+
+				// Move the caret after this new empty node
+				let range_new = document.createRange();
+				range_new.setStartAfter(blank);
+
+				// Set sceditor to this new range
+				rangeHelper.selectRange(range_new);
+				editor.focus();
+
+				return;
+			}
+
+			// Otherwise, a new tag for them, done by the caller
+			rangeHelper.restoreRange();
+			editor.insert('<' + nodeName + ' class="' + nodeClass + '">', '</' + nodeName + '>', false);
+		},
+		/**
+		 * If they selected any text in the node, assumes they want to remove that
+		 * formatting defined by the parent.  If nothing is selected simply returns
+		 *
+		 * @param tag name of tag/node to remove
+		 * @returns {boolean}
+		 */
+		checkRemoveFormat: function(tag) {
+			let range = this.getRangeHelper();
+			let selected = range.selectedRange();
+
+			if (selected.startOffset !== selected.endOffset)
+			{
+				let dom = sceditor.dom,
+					parent = range.parentNode(),
+					node = dom.closest(parent, tag);
+
+				if (node)
+				{
+					let frag = document.createDocumentFragment(),
+						child;
+
+					while (node.firstChild)
+					{
+						child = node.removeChild(node.firstChild);
+						frag.appendChild(child);
+					}
+
+					node.parentNode.replaceChild(frag, node);
+
+					return true;
+				}
+			}
+
+			return false;
+		},
+		/**
+		 * Determine the caret position inside of sceditor's iframe for dropdown
+		 * positioning of select box
 		 *
 		 * What it does:
-		 * - Caret.js does not seem to return the correct position for (FF & IE) when
-		 * the iframe has vertically scrolled.
-		 * - This is an sceditor specific function to return a screen caret position
-		 * - Called just before At.js adds its dropdown box
-		 * - Finds the @mentions tag and adds an invisible zero width space before it
-		 * - Gets the location offset() in the iframe "window" of the added space
-		 * - Adjusts for the iframe scroll
-		 * - Adds in the iframe container location offset() to main window
-		 * - Removes the space, restores the editor range.
+		 * - Finds a supplied tag (@ or :) and adds a placeholder before it
+		 * - Gets the location offset() in the iframe "window" of the added placeholder
+		 * - Adjusts for the iframe scroll, adds in the iframe container location offset()
+		 * - Removes the placeholder, restores the editor range.
 		 *
 		 * @returns {{}} offset object top, left
 		 */
@@ -197,10 +319,9 @@ const itemCodes = ["*:disc", "@:disc", "+:square", "x:square", "#:decimal", "0:d
 			// Look back and find the tag, so we can insert our span ahead of it
 			while (prev)
 			{
-				console.log(tag);
 				atPos = (prev.nodeValue || '').lastIndexOf(tag);
 
-				// Found the start of Emoji
+				// Found the start tag
 				if (atPos > -1)
 				{
 					parent.insertBefore(placefinder, prev.splitText(atPos + 1));
@@ -276,32 +397,10 @@ sceditor.command
 	.set('spoiler', {
 		state: function ()
 		{
-			let currentNode = this.currentNode(),
-				currentRange = this.getRangeHelper();
-
-			// We don't have a node since we don't render the tag in the wizzy editor
-			// however we can spot check to see if the cursor is inside the tags.
-			if (currentRange.selectedRange())
+			if (typeof this.checkInsideSourceTag === 'function')
 			{
-				let end = currentRange.selectedRange().startOffset,
-					text = typeof currentNode !== 'undefined' ? currentNode.textContent : '';
-
-				// Left and right text from the cursor position and tag positions
-				let left = text.substr(0, end),
-					right = text.substr(end),
-					l1 = left.lastIndexOf("[spoiler]"),
-					l2 = left.lastIndexOf("[/spoiler]"),
-					r1 = right.indexOf("[spoiler]"),
-					r2 = right.indexOf("[/spoiler]");
-
-				// Inside spoiler tags
-				if ((l1 > -1 && l1 > l2) || (r2 > -1 && (r1 === -1 || (r1 > r2))))
-				{
-					return 1;
-				}
+				this.checkInsideSourceTag('spoiler');
 			}
-
-			return 0;
 		},
 		exec: function ()
 		{
@@ -313,37 +412,14 @@ sceditor.command
 	.set('footnote', {
 		state: function ()
 		{
-			let currentNode = this.currentNode(),
-				currentRange = this.getRangeHelper();
-
-			// We don't have an html node since we don't render the tag in the editor
-			// but we can do a spot check to see if the cursor is placed between plain tags.  This
-			// will miss with [footnote]nested [b]tags[b][/footnote] but its nicer than nothing.
-			if (currentRange.selectedRange())
+			if (typeof this.checkInsideSourceTag === 'function')
 			{
-				let end = currentRange.selectedRange().startOffset,
-					text = typeof currentNode !== 'undefined' ? currentNode.textContent : '';
-
-				// Left and right text from the cursor position and tag positions
-				let left = text.substr(0, end),
-					right = text.substr(end),
-					l1 = left.lastIndexOf("[footnote]"),
-					l2 = left.lastIndexOf("[/footnote]"),
-					r1 = right.indexOf("[footnote]"),
-					r2 = right.indexOf("[/footnote]");
-
-				// Inside footnote tags
-				if ((l1 > -1 && l1 > l2) || (r2 > -1 && (r1 === -1 || (r1 > r2))))
-				{
-					return 1;
-				}
+				this.checkInsideSourceTag('footnote');
 			}
-
-			return 0;
 		},
 		exec: function ()
 		{
-			this.insert('[footnote] ', '[/footnote]');
+			this.insert('[footnote]', '[/footnote]');
 		},
 		txtExec: ['[footnote]', '[/footnote]'],
 		tooltip: 'Insert Footnote'
@@ -362,49 +438,15 @@ sceditor.command
 		},
 		exec: function ()
 		{
-			let editor = this,
-				rangeHelper = editor.getRangeHelper(),
-				tt,
-				range,
-				blank;
-
-			// Set our markers and make a copy
-			rangeHelper.saveRange();
-			range = rangeHelper.cloneSelected();
-
-			// Find the span.bbc_tt node if we are in one that is
-			tt = range.commonAncestorContainer;
-			while (tt && (tt.nodeType !== 1 || (tt.tagName.toLowerCase() !== "span" && !tt.classList.contains('bbc_tt'))))
+			if (typeof this.toggleTagStartEnd !== 'function')
 			{
-				tt = tt.parentNode;
-			}
-
-			// If we found one, we are in it and the user requested to end this TT
-			if (tt)
-			{
-				// Place the markers at the end of the TT span
-				range.setEndAfter(tt);
-				range.collapse(false);
-
-				// Stuff in a new spacer node at that position
-				blank = tt.ownerDocument.createElement('span');
-				blank.innerHTML = '&nbsp;';
-				range.insertNode(blank);
-
-				// Move the caret to the new empty node
-				let range_new = document.createRange();
-				range_new.setStartAfter(blank);
-
-				// Set sceditor to this new range
-				rangeHelper.selectRange(range_new);
-				editor.focus()
-
 				return;
 			}
 
-			// Otherwise, a new TT span for then
-			rangeHelper.restoreRange();
-			return editor.insert('<span class="bbc_tt">', '</span>', false);
+			if (!this.checkRemoveFormat('span.bbc_tt'))
+			{
+				this.toggleTagStartEnd('span', 'bbc_tt', 'span');
+			}
 		},
 		txtExec: ['[tt]', '[/tt]'],
 		tooltip: 'Teletype'
@@ -423,49 +465,15 @@ sceditor.command
 		},
 		exec: function ()
 		{
-			let editor = this,
-				rangeHelper = editor.getRangeHelper(),
-				pre,
-				range,
-				blank;
-
-			// Set our markers and make a copy
-			rangeHelper.saveRange();
-			range = rangeHelper.cloneSelected();
-
-			// Find the pre.bbc_pre node if we are in one that is
-			pre = range.commonAncestorContainer;
-			while (pre && (pre.nodeType !== 1 || (pre.tagName.toLowerCase() !== "pre" && !pre.classList.contains('bbc_pre'))))
+			if (typeof this.toggleTagStartEnd !== 'function')
 			{
-				pre = pre.parentNode;
-			}
-
-			// If we found one, we are in it and the user requested to end this PRE
-			if (pre)
-			{
-				// Place the markers at the end of the pre
-				range.setEndAfter(pre);
-				range.collapse(false);
-
-				// Stuff in a new block node at that position
-				blank = pre.ownerDocument.createElement('p');
-				blank.innerHTML = '&nbsp;';
-				range.insertNode(blank);
-
-				// Move the caret to the new empty block node
-				let range_new = document.createRange();
-				range_new.setStartAfter(blank);
-
-				// Set sceditor to this new range
-				rangeHelper.selectRange(range_new);
-				editor.focus()
-
 				return;
 			}
 
-			// Otherwise, a new pre span for then
-			rangeHelper.restoreRange();
-			return editor.insert('<pre class="bbc_pre">', '</pre>', false);
+			if (!this.checkRemoveFormat('pre.bbc_pre'))
+			{
+				this.toggleTagStartEnd('pre', 'bbc_pre', 'p');
+			}
 		},
 		txtExec: ['[pre]', '[/pre]'],
 		tooltip: 'Preformatted Text'
@@ -522,7 +530,7 @@ sceditor.command
  * These command define what happens to tags as we toggle from and to wizzy mode
  * It converts html back to bbc or bbc back to html.  Read the sceditor docs for more
  *
- * Adds / modifies BBC codes List, Tt, Pre, quote, footnote, code, img
+ * Adds / modifies BBC codes List, Tt, Pre, Quote, Code, Img
  */
 sceditor.formats.bbcode
 	.set('tt', {
