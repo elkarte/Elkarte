@@ -158,6 +158,7 @@ const itemCodes = ["*:disc", "@:disc", "+:square", "x:square", "#:decimal", "0:d
 				content.append(moreButton);
 			}
 		},
+
 		/**
 		 * When you don't have a DOM node to check (non rendering tag), this will
 		 * check if the cursor is inside of the supplied tag
@@ -165,7 +166,7 @@ const itemCodes = ["*:disc", "@:disc", "+:square", "x:square", "#:decimal", "0:d
 		 * @param tag
 		 * @returns {number}
 		 */
-		checkInsideSourceTag(tag)
+		checkInsideSourceTag: function (tag)
 		{
 			let currentNode = this.currentNode(),
 				currentRange = this.getRangeHelper();
@@ -193,18 +194,73 @@ const itemCodes = ["*:disc", "@:disc", "+:square", "x:square", "#:decimal", "0:d
 			return 0;
 		},
 		/**
-		 * Determine the caret position inside of sceditor's iframe
+		 * Allows selecting the toolbar to end a tag if you are in that tag or
+		 * start a new tag otherwise. Will end the tag if currently in it, otherwise
+		 * returns 'start' back to caller for it to begin a new tag
+		 *
+		 * @param nodeName the name of the node such as tt or pre
+		 * @param nodeClass the specific class name of the nodeName like bbc_tt
+		 * @param insertElement what you want to insert to END the tag e.g. span, p
+		 * @returns string start if starting a new tag
+		 */
+		toggleTagStartEnd: function(nodeName, nodeClass, insertElement)
+		{
+			let editor = this,
+				rangeHelper = editor.getRangeHelper(),
+				tag,
+				range,
+				blank;
+
+			// Set our markers and make a copy
+			rangeHelper.saveRange();
+			range = rangeHelper.cloneSelected();
+
+			// Find the name/class node if we are in one at all
+			tag = range.commonAncestorContainer;
+			while (tag && (tag.nodeType !== 1 ||
+				(tag.tagName.toLowerCase() !== nodeName && !tag.classList.contains(nodeClass))))
+			{
+				tag = tag.parentNode;
+			}
+
+			// If we found one, we are in it and the user has requested to end this one
+			if (tag)
+			{
+				// Place the markers at the end of the found node
+				range.setEndAfter(tag);
+				range.collapse(false);
+
+				// Stuff in a new spacer node at that position
+				blank = tag.ownerDocument.createElement(insertElement);
+				blank.innerHTML = '&nbsp;';
+				range.insertNode(blank);
+
+				// Move the caret to this new empty node
+				let range_new = document.createRange();
+				range_new.setStartAfter(blank);
+
+				// Set sceditor to this new range
+				rangeHelper.selectRange(range_new);
+				editor.focus()
+
+				return 'end'
+			}
+
+			// Otherwise, a new tag for them, done by the caller
+			rangeHelper.restoreRange();
+
+			return 'start';
+		},
+		/**
+		 * Determine the caret position inside of sceditor's iframe for dropdown
+		 * positioning of select box
 		 *
 		 * What it does:
-		 * - Caret.js does not seem to return the correct position for (FF & IE) when
-		 * the iframe has vertically scrolled.
-		 * - This is an sceditor specific function to return a screen caret position
-		 * - Called just before At.js adds its dropdown box
-		 * - Finds the @mentions tag and adds an invisible zero width space before it
-		 * - Gets the location offset() in the iframe "window" of the added space
-		 * - Adjusts for the iframe scroll
-		 * - Adds in the iframe container location offset() to main window
-		 * - Removes the space, restores the editor range.
+		 * - Caret.js does not return the correct position when the iframe has scrolled.
+		 * - Finds the supplied tag (@ or :) and adds a placeholder before it
+		 * - Gets the location offset() in the iframe "window" of the added placeholder
+		 * - Adjusts for the iframe scroll, adds in the iframe container location offset()
+		 * - Removes the placeholder, restores the editor range.
 		 *
 		 * @returns {{}} offset object top, left
 		 */
@@ -350,49 +406,16 @@ sceditor.command
 		},
 		exec: function ()
 		{
-			let editor = this,
-				rangeHelper = editor.getRangeHelper(),
-				tt,
-				range,
-				blank;
+			let editor = this;
 
-			// Set our markers and make a copy
-			rangeHelper.saveRange();
-			range = rangeHelper.cloneSelected();
-
-			// Find the span.bbc_tt node if we are in one that is
-			tt = range.commonAncestorContainer;
-			while (tt && (tt.nodeType !== 1 || (tt.tagName.toLowerCase() !== "span" && !tt.classList.contains('bbc_tt'))))
+			if (typeof this.toggleTagStartEnd === 'function')
 			{
-				tt = tt.parentNode;
+				if (this.toggleTagStartEnd('span', 'bbc_tt', 'span') === 'start')
+				{
+					// a new TT span for them
+					editor.insert('<span class="bbc_tt">', '</span>', false);
+				}
 			}
-
-			// If we found one, we are in it and the user requested to end this TT
-			if (tt)
-			{
-				// Place the markers at the end of the TT span
-				range.setEndAfter(tt);
-				range.collapse(false);
-
-				// Stuff in a new spacer node at that position
-				blank = tt.ownerDocument.createElement('span');
-				blank.innerHTML = '&nbsp;';
-				range.insertNode(blank);
-
-				// Move the caret to the new empty node
-				let range_new = document.createRange();
-				range_new.setStartAfter(blank);
-
-				// Set sceditor to this new range
-				rangeHelper.selectRange(range_new);
-				editor.focus()
-
-				return;
-			}
-
-			// Otherwise, a new TT span for then
-			rangeHelper.restoreRange();
-			return editor.insert('<span class="bbc_tt">', '</span>', false);
 		},
 		txtExec: ['[tt]', '[/tt]'],
 		tooltip: 'Teletype'
@@ -411,49 +434,16 @@ sceditor.command
 		},
 		exec: function ()
 		{
-			let editor = this,
-				rangeHelper = editor.getRangeHelper(),
-				pre,
-				range,
-				blank;
+			let editor = this;
 
-			// Set our markers and make a copy
-			rangeHelper.saveRange();
-			range = rangeHelper.cloneSelected();
-
-			// Find the pre.bbc_pre node if we are in one that is
-			pre = range.commonAncestorContainer;
-			while (pre && (pre.nodeType !== 1 || (pre.tagName.toLowerCase() !== "pre" && !pre.classList.contains('bbc_pre'))))
+			if (typeof this.toggleTagStartEnd === 'function')
 			{
-				pre = pre.parentNode;
+				if (this.toggleTagStartEnd('pre', 'bbc_pre', 'p') === 'start')
+				{
+					// A a new pre span for then
+					editor.insert('<pre class="bbc_pre">', '</pre>', false);
+				}
 			}
-
-			// If we found one, we are in it and the user requested to end this PRE
-			if (pre)
-			{
-				// Place the markers at the end of the pre
-				range.setEndAfter(pre);
-				range.collapse(false);
-
-				// Stuff in a new block node at that position
-				blank = pre.ownerDocument.createElement('p');
-				blank.innerHTML = '&nbsp;';
-				range.insertNode(blank);
-
-				// Move the caret to the new empty block node
-				let range_new = document.createRange();
-				range_new.setStartAfter(blank);
-
-				// Set sceditor to this new range
-				rangeHelper.selectRange(range_new);
-				editor.focus()
-
-				return;
-			}
-
-			// Otherwise, a new pre span for then
-			rangeHelper.restoreRange();
-			return editor.insert('<pre class="bbc_pre">', '</pre>', false);
 		},
 		txtExec: ['[pre]', '[/pre]'],
 		tooltip: 'Preformatted Text'
