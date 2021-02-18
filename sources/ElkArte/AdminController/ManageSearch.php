@@ -484,24 +484,7 @@ class ManageSearch extends AbstractController
 		$context[$context['admin_menu_name']]['current_subsection'] = 'method';
 		$context['page_title'] = $txt['search_index_custom'];
 
-		$messages_per_batch = 50;
-
-		$index_properties = array(
-			2 => array(
-				'column_definition' => 'small',
-				'step_size' => 1000000,
-			),
-			4 => array(
-				'column_definition' => 'medium',
-				'step_size' => 1000000,
-				'max_size' => 16777215,
-			),
-			5 => array(
-				'column_definition' => 'large',
-				'step_size' => 100000000,
-				'max_size' => 2000000000,
-			),
-		);
+		$messages_per_batch = 75;
 
 		// Resume building an index that was not completed
 		if (isset($this->_req->query->resume) && !empty($modSettings['search_custom_index_resume']))
@@ -513,26 +496,16 @@ class ManageSearch extends AbstractController
 		}
 		else
 		{
-			$context['index_settings'] = array(
-				'bytes_per_word' => isset($this->_req->post->bytes_per_word) && isset($index_properties[$this->_req->post->bytes_per_word]) ? (int) $this->_req->post->bytes_per_word : 2,
-			);
-			$context['start'] = isset($this->_req->post->start) ? (int) $this->_req->post->start : 0;
-			$context['step'] = isset($this->_req->post->step) ? (int) $this->_req->post->step : 0;
+			$context['index_settings'] = array();
+			$context['start'] = $this->_req->getPost('start', 'intval', 0);
+			$context['step'] = $this->_req->getPost('step', 'intval', 0);
+			$context['step'] = 1;
 		}
 
-		if ($context['step'] !== 0)
-		{
-			checkSession('request');
+		checkSession('request');
 
-			// Admin timeouts are painful when building these long indexes
-			$_SESSION['admin_time'] = time();
-		}
-
-		// Step 0: let the user determine how they like their index.
-		if ($context['step'] === 0)
-		{
-			$context['sub_template'] = 'create_index';
-		}
+		// Admin timeouts are painful when building these long indexes
+		$_SESSION['admin_time'] = time();
 
 		require_once(SUBSDIR . '/ManageSearch.subs.php');
 
@@ -544,29 +517,19 @@ class ManageSearch extends AbstractController
 		if ($context['step'] === 1)
 		{
 			$context['sub_template'] = 'create_index_progress';
-
-			list ($context['start'], $context['step'], $context['percentage']) = createSearchIndex($context['start'], $messages_per_batch, $index_properties[$context['index_settings']['bytes_per_word']]['column_definition'], $context['index_settings']);
+			list ($context['start'], $context['step'], $context['percentage']) = createSearchIndex($context['start'], $messages_per_batch);
 		}
 
 		// Step 2: removing the words that occur too often and are of no use.
 		if ($context['step'] === 2)
 		{
-			if ($context['index_settings']['bytes_per_word'] < 4)
+			list ($context['start'], $complete, $context['percentage']) = removeCommonWordsFromIndex($context['start']);
+			if ($complete)
 			{
 				$context['step'] = 3;
 			}
-			else
-			{
-				list ($context['start'], $complete) = removeCommonWordsFromIndex($context['start'], $index_properties[$context['index_settings']['bytes_per_word']]);
-				if ($complete)
-				{
-					$context['step'] = 3;
-				}
 
-				$context['sub_template'] = 'create_index_progress';
-
-				$context['percentage'] = 80 + round($context['start'] / $index_properties[$context['index_settings']['bytes_per_word']]['max_size'], 3) * 20;
-			}
+			$context['sub_template'] = 'create_index_progress';
 		}
 
 		// Restore previous debug state
@@ -654,12 +617,12 @@ class ManageSearch extends AbstractController
 			'sphinx_index_prefix' => rtrim($this->_req->post->sphinx_index_prefix, '/'),
 			'sphinx_data_path' => rtrim($this->_req->post->sphinx_data_path, '/'),
 			'sphinx_log_path' => rtrim($this->_req->post->sphinx_log_path, '/'),
-			'sphinx_stopword_path' => $this->_req->post->sphinx_stopword_path,
-			'sphinx_indexer_mem' => (int) $this->_req->post->sphinx_indexer_mem,
-			'sphinx_searchd_server' => $this->_req->post->sphinx_searchd_server,
-			'sphinx_searchd_port' => (int) $this->_req->post->sphinx_searchd_port,
-			'sphinxql_searchd_port' => (int) $this->_req->post->sphinxql_searchd_port,
-			'sphinx_max_results' => (int) $this->_req->post->sphinx_max_results,
+			'sphinx_stopword_path' => $this->_req->getPost('sphinx_stopword_path', 'trim', ''),
+			'sphinx_indexer_mem' => $this->_req->getPost('sphinx_indexer_mem', 'intval', 128),
+			'sphinx_searchd_server' => $this->_req->getPost('sphinx_searchd_server', 'trim', 'localhost'),
+			'sphinx_searchd_port' => $this->_req->getPost('sphinx_searchd_port', 'intval', 0),
+			'sphinxql_searchd_port' => $this->_req->getPost('sphinxql_searchd_port', 'intval', 0),
+			'sphinx_max_results' => $this->_req->getPost('sphinx_max_results', 'intval', 0)
 		));
 	}
 

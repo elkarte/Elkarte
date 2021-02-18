@@ -94,9 +94,7 @@ class Standard extends AbstractAPI
 			}
 			else
 			{
-				$num_res = $this->getResults(
-					$search_id
-				);
+				$num_res = $this->getResults($search_id);
 
 				if (empty($num_res))
 				{
@@ -108,7 +106,7 @@ class Standard extends AbstractAPI
 		}
 
 		// *** Retrieve the results to be shown on the page
-		$topics = array();
+		$topics = [];
 		$participants = $this->addRelevance($topics, $search_id, $this->_req->getRequest('start', 'intval', 0), $modSettings['search_results_per_page']);
 		$this->_num_results = $this->_search_cache->getNumResults();
 
@@ -912,7 +910,9 @@ class Standard extends AbstractAPI
 		// *** Retrieve the results to be shown on the page
 		$participants = array();
 		$request = $this->_db_search->search_query('', '
-			SELECT ' . (empty($this->_searchParams['topic']) ? 'lsr.id_topic' : $this->_searchParams->topic . ' AS id_topic') . ', lsr.id_msg, lsr.relevance, lsr.num_matches
+			SELECT ' .
+				(empty($this->_searchParams['topic']) ? 'lsr.id_topic' : $this->_searchParams->topic . ' AS id_topic') . ',
+			 	lsr.id_msg, lsr.relevance, lsr.num_matches
 			FROM {db_prefix}log_search_results AS lsr' . ($this->_searchParams->sort === 'num_replies' ? '
 				INNER JOIN {db_prefix}topics AS t ON (t.id_topic = lsr.id_topic)' : '') . '
 			WHERE lsr.id_search = {int:id_search}

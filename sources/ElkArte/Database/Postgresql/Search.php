@@ -119,12 +119,4 @@ class Search extends AbstractSearch
 
 		return $table_info;
 	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	public function create_word_search($type, $size = 10)
-	{
-		parent::create_word_search('int', 10);
-	}
 }

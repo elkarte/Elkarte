@@ -77,7 +77,7 @@ class Sphinx extends AbstractAPI
 	protected $supported_databases = ['MySQL'];
 
 	/**
-	 * Check we support this db, set banned words
+	 * Check we support this db
 	 */
 	public function __construct($config, $searchParams)
 	{
@@ -109,11 +109,19 @@ class Sphinx extends AbstractAPI
 	}
 
 	/**
+	 *  {@inheritdoc }
+	 */
+	public function supportsExtended()
+	{
+		return true;
+	}
+
+	/**
 	 * {@inheritdoc }
 	 */
 	public function prepareIndexes($word, &$wordsSearch, &$wordsExclude, $isExcluded, $excludedSubjectWords)
 	{
-		$subwords = text2words($word, null, false);
+		$subwords = text2words($word, false);
 
 		$fulltextWord = count($subwords) === 1 ? $word : '"' . $word . '"';
 		$wordsSearch['indexed_words'][] = $fulltextWord;
@@ -170,7 +178,7 @@ class Sphinx extends AbstractAPI
 			$this->buildQueryLimits($mySphinx);
 
 			// Construct the (binary mode & |) query while accounting for excluded words
-			$query = $this->_searchArray->searchArrayExtended($this->_searchParams->search);
+			$query = $this->_searchArray->searchArrayExtended();
 
 			// If no search terms are left after comparing against excluded words (i.e. "test -test" or "test last -test -last"),
 			// sending that to Sphinx would result in a fatal error
@@ -186,6 +194,7 @@ class Sphinx extends AbstractAPI
 				$query = '@(subject) ' . $query;
 			}
 
+			// Set our ranking equation
 			$mySphinx->SetRankingMode(SPH_RANK_EXPR, 'sum((4*lcs+2*(min_hit_pos==1)+word_count)*user_weight*position) + acprel + bm25');
 
 			// Execute the search query.
@@ -240,6 +249,11 @@ class Sphinx extends AbstractAPI
 		return $topics;
 	}
 
+	/**
+	 * Answer no
+	 *
+	 * @return false
+	 */
 	public function useWordIndex()
 	{
 		return false;

@@ -115,28 +115,4 @@ class Search extends AbstractSearch
 
 		return $table_info;
 	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	public function create_word_search($type, $size = 10)
-	{
-		if ($size == 'small')
-		{
-			$type = 'smallint';
-			$size = 5;
-		}
-		elseif ($size == 'medium')
-		{
-			$type = 'mediumint';
-			$size = 8;
-		}
-		else
-		{
-			$type = 'int';
-			$size = 10;
-		}
-
-		parent::create_word_search($type, $size);
-	}
 }

@@ -44,7 +44,7 @@ abstract class AbstractAPI
 	protected $bannedWords = array();
 
 	/** @var int What is the minimum word length? */
-	protected $min_word_length = 3;
+	protected $min_word_length;
 
 	/** @var \ElkArte\ValuesContainer All the search configurations */
 	protected $config = null;
@@ -223,6 +223,16 @@ abstract class AbstractAPI
 	public function prepareIndexes($word, &$wordsSearch, &$wordsExclude, $isExcluded, $excludedSubjectWords)
 	{
 		// API specific implementations
+	}
+
+	/**
+	 * Returns if the API uses the extended query syntax (aka sphinx etc)
+	 *
+	 * @return bool
+	 */
+	public function supportsExtended()
+	{
+		return false;
 	}
 
 	/**

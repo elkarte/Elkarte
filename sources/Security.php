@@ -760,7 +760,6 @@ function isBannedEmail($email, $restriction, $error)
  * @param bool $is_fatal = true
  *
  * @return string the error message if is_fatal is false.
- * @throws \ElkArte\Exceptions\Exception
  */
 function checkSession($type = 'post', $from_action = '', $is_fatal = true)
 {

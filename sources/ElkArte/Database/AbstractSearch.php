@@ -86,15 +86,15 @@ abstract class AbstractSearch implements SearchInterface
 	/**
 	 * {@inheritDoc}
 	 */
-	public function create_word_search($type, $size = 10)
+	public function create_word_search()
 	{
 		$db_table = db_table();
 		$db_table->create_table('{db_prefix}log_search_words',
 			array(
 				array(
 					'name' => 'id_word',
-					'type' => $type,
-					'size' => $size,
+					'type' => 'int',
+					'size' => 10,
 					'unsigned' => true,
 					'default' => 0
 				),

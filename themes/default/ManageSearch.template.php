@@ -218,7 +218,7 @@ function template_select_search_method()
 	else
 	{
 		echo '
-								<strong>', $txt['search_index_label'], ':</strong> ', $txt['search_method_no_index_exists'], ' <a class="linkbutton" href="', $scripturl, '?action=admin;area=managesearch;sa=createmsgindex">', $txt['search_index_create_custom'], '</a>';
+								<strong>', $txt['search_index_label'], ':</strong> ', $txt['search_method_no_index_exists'], ' <a class="linkbutton" href="', $scripturl, '?action=admin;area=managesearch;sa=createmsgindex;', $context['session_var'], '=', $context['session_id'], '">', $txt['search_index_create_custom'], '</a>';
 	}
 
 	echo '
@@ -274,40 +274,6 @@ function template_select_search_method()
 }
 
 /**
- * Template to create a search index.
- */
-function template_create_index()
-{
-	global $context, $scripturl, $txt;
-
-	echo '
-	<div id="admincenter">
-		<form action="', $scripturl, '?action=admin;area=managesearch;sa=createmsgindex" method="post" accept-charset="UTF-8" name="create_index">
-			<h2 class="category_header">', $txt['search_create_index'], '</h2>
-			<div class="content">
-				<dl class="settings">
-					<dt>
-						<label for="predefine_select">', $txt['search_predefined'], ':</label>
-					</dt>
-					<dd>
-						<select name="bytes_per_word" id="predefine_select">
-							<option value="2">', $txt['search_predefined_small'], '</option>
-							<option value="4" selected="selected">', $txt['search_predefined_moderate'], '</option>
-							<option value="5">', $txt['search_predefined_large'], '</option>
-						</select>
-					</dd>
-				</dl>
-				<div class="submitbutton">
-					<input type="submit" name="save" value="', $txt['search_create_index_start'], '" />
-					<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
-					<input type="hidden" name="step" value="1" />
-				</div>
-			</div>
-		</form>
-	</div>';
-}
-
-/**
  * Template to show progress during creation of a search index.
  */
 function template_create_index_progress()
@@ -330,14 +296,13 @@ function template_create_index_progress()
 					<input type="submit" name="cont" value="', $txt['search_create_index_continue'], '" />
 					<input type="hidden" name="step" value="', $context['step'], '" />
 					<input type="hidden" name="start" value="', $context['start'], '" />
-					<input type="hidden" name="bytes_per_word" value="', $context['index_settings']['bytes_per_word'], '" />
 					<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
 				</div>
 			</div>
 		</form>
 	</div>
 	<script>
-		doAutoSubmit(10, ', JavaScriptEscape($txt['search_create_index_continue']), ');
+		doAutoSubmit(5, ', JavaScriptEscape($txt['search_create_index_continue']), ');
 	</script>';
 }
 

@@ -17,11 +17,13 @@
 namespace ElkArte\Search;
 
 use ElkArte\Util;
+use ElkArte\AbstractModel;
+use ElkArte\ValuesContainer;
 
 /**
  * Actually do the searches
  */
-class SearchArray
+class SearchArray extends AbstractModel
 {
 	/**
 	 * The provided search orwell "striking thirteen" -movie
@@ -60,10 +62,19 @@ class SearchArray
 	 */
 	public function __construct($search_string, $blocklist_words, $search_simple_fulltext = false)
 	{
+		parent::__construct();
+
 		$this->_search_string = $search_string;
 		$this->_search_simple_fulltext = $search_simple_fulltext;
 		$this->_blocklist_words = $blocklist_words;
-		$this->searchArray();
+
+		// Build the search query appropriate for the API in use
+		$search_config = new ValuesContainer(array(
+			'search_index' => $this->_modSettings['search_index'] ?: '',
+		));
+		$searchAPI = new SearchApiWrapper($search_config);
+		$searchAPI->supportsExtended() ? $this->searchArrayExtended() : $this->searchArray();
+		unset($searchAPI);
 	}
 
 	/**
@@ -192,17 +203,16 @@ class SearchArray
 	 * Understands the use of OR | AND & as search modifiers
 	 * Currently used by the sphinx API's
 	 *
-	 * @param string $string The user entered query to construct with
-	 * @return string A binary mode query
+	 * @return string
 	 */
-	public function searchArrayExtended($string)
+	public function searchArrayExtended()
 	{
 		$keywords = array('include' => [], 'exclude' => []);
 
 		// Split our search string and return an empty string if no matches
-		if (!preg_match_all('~(-?)("[^"]+"|[^" ]+)~', $string, $tokens, PREG_SET_ORDER))
+		if (!preg_match_all('~(-?)("[^"]+"|[^" ]+)~', $this->_search_string, $tokens, PREG_SET_ORDER))
 		{
-			return '';
+			return $this->_searchArray[] = '';
 		}
 
 		// First we split our string into included and excluded words and phrases
@@ -264,7 +274,7 @@ class SearchArray
 		$results = array_diff(array_map('serialize', $keywords['include']), array_map('serialize', $keywords['exclude']));
 		if (count(array_map('unserialize', $results)) === 0)
 		{
-			return '';
+			return $this->_searchArray[] = '';
 		}
 
 		// Now we compile our arrays into a valid search string
@@ -279,7 +289,7 @@ class SearchArray
 			$query_parts[] = '-' . $keyword;
 		}
 
-		return implode(' ', $query_parts);
+		return $this->_searchArray[] = implode(' ', $query_parts);
 	}
 
 	/**
@@ -297,8 +307,8 @@ class SearchArray
 		// Lowercase string
 		$string = Util::strtolower($string);
 
-		// Fix numbers so they search easier (phone numbers, SSN, dates, etc) 123-45-6789 => 123456789
-		$string = preg_replace('~([\d]+)\pP+(?=[\d])~u', '$1', $string);
+		// Fix numbers so they search easier (decimals, SSN, dates) 123-45-6789 => 123_45_6789
+		$string = preg_replace('~([\d]+)[-./]+(?=[\d])~u', '$1_', $string);
 
 		// Last but not least, strip everything out that's not alphanumeric
 		$string = preg_replace('~[^\pL\pN_"-]+~u', ' ', $string);

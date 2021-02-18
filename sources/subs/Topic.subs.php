@@ -319,8 +319,6 @@ function removeTopics($topics, $decreasePostCount = true, $ignoreRecycling = fal
 	// Delete search index entries.
 	if (!empty($modSettings['search_custom_index_config']))
 	{
-		$customIndexSettings = Util::unserialize($modSettings['search_custom_index_config']);
-
 		$words = array();
 		$messages = array();
 		$db->fetchQuery('
@@ -332,10 +330,10 @@ function removeTopics($topics, $decreasePostCount = true, $ignoreRecycling = fal
 				'topics' => $topics,
 			)
 		)->fetch_callback(
-			function ($row) use (&$words, &$messages, $customIndexSettings) {
+			function ($row) use (&$words, &$messages) {
 				detectServer()->setTimeLimit(300);
 
-				$words = array_merge($words, text2words($row['body'], $customIndexSettings['bytes_per_word'], true));
+				$words = array_merge($words, text2words($row['body'], true));
 				$messages[] = $row['id_msg'];
 			}
 		);

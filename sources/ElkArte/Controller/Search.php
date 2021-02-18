@@ -502,6 +502,7 @@ class Search extends AbstractController
 			return $this->action_search();
 		}
 
+		// Did we find anything?
 		if (!empty($context['topics']))
 		{
 			// Create an array for the permissions.

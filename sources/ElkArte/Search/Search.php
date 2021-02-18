@@ -66,6 +66,9 @@ class Search
 	/** @var string the minimum version of ElkArte that an API will work with */
 	private $_search_version = '';
 
+	/** @var array common words that we will not index or search for */
+	private $_blocklist_words = [];
+
 	/**
 	 * Constructor
 	 * Easy enough, initialize the database objects (generic db and search db)
@@ -179,13 +182,8 @@ class Search
 	public function setParams($paramObject, $search_simple_fulltext = false)
 	{
 		$this->_searchParams = $paramObject;
-
-		// Unfortunately, searching for words like this is going to be slow, or abundant, so we're blocking them.
-		// @todo Setting to add more here?
-		$blocklist_words = array('img', 'url', 'quote', 'www', 'http', 'the', 'is', 'it', 'are', 'if', 'in');
-		call_integration_hook('integrate_search_blocklist_words', array(&$blocklist_words));
-
-		$this->_searchArray = new SearchArray($this->_searchParams->search, $blocklist_words, $search_simple_fulltext);
+		$this->setBlockListedWords();
+		$this->_searchArray = new SearchArray($this->_searchParams->search, $this->_blocklist_words, $search_simple_fulltext);
 	}
 
 	/**
@@ -196,6 +194,33 @@ class Search
 	public function foundBlockListedWords()
 	{
 		return $this->_searchArray->foundBlockListedWords();
+	}
+
+	/**
+	 * Returns the block-listed word array
+	 *
+	 * @return array
+	 */
+	public function getBlockListedWords()
+	{
+		if (empty($this->_blocklist_words))
+		{
+			$this->setBlockListedWords();
+		}
+
+		return $this->_blocklist_words;
+	}
+
+	/**
+	 * Sets the block-listed word array
+	 */
+	public function setBlockListedWords()
+	{
+		// Unfortunately, searching for words like this is going to be slow, or abundant, so we're blocking them.
+		$blocklist_words = array('img', 'url', 'quote', 'www', 'http', 'the', 'is', 'it', 'are', 'if', 'in');
+		call_integration_hook('integrate_search_blocklist_words', array(&$blocklist_words));
+
+		$this->_blocklist_words = $blocklist_words;
 	}
 
 	public function getSearchArray()
@@ -366,6 +391,11 @@ class Search
 		$searchAPI->useTemporary($this->_createTemporary);
 		$searchAPI->setSearchArray($this->_searchArray);
 
+		if ($searchAPI->supportsExtended())
+		{
+			return $searchAPI->searchQuery($this->_searchArray->getSearchArray(), $this->_excludedIndexWords, $this->_participants);
+		}
+
 		return $searchAPI->searchQuery($this->searchWords(), $this->_excludedIndexWords, $this->_participants);
 	}
 
@@ -381,8 +411,8 @@ class Search
 			return $this->_searchWords;
 		}
 
-		$orParts = array();
-		$this->_searchWords = array();
+		$orParts = [];
+		$this->_searchWords = [];
 		$searchArray = $this->_searchArray->getSearchArray();
 		$excludedWords = $this->_searchArray->getExcludedWords();
 
