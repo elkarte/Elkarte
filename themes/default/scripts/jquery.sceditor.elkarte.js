@@ -158,7 +158,6 @@ const itemCodes = ["*:disc", "@:disc", "+:square", "x:square", "#:decimal", "0:d
 				content.append(moreButton);
 			}
 		},
-
 		/**
 		 * When you don't have a DOM node to check (non rendering tag), this will
 		 * check if the cursor is inside of the supplied tag.  Used for footnote
@@ -195,9 +194,8 @@ const itemCodes = ["*:disc", "@:disc", "+:square", "x:square", "#:decimal", "0:d
 			return 0;
 		},
 		/**
-		 * Allows selecting the toolbar to end a tag if you are in that tag or
-		 * start a new tag otherwise. Will end the tag if currently in it, otherwise
-		 * starts new tag with supplied name and class
+		 * Allows selecting the toolbar icon to end the tag if you are in that tag or
+		 * start a new tag otherwise.
 		 *
 		 * @param nodeName the name of the node such as tt or pre
 		 * @param nodeClass the specific class name of the nodeName like bbc_tt
@@ -232,23 +230,54 @@ const itemCodes = ["*:disc", "@:disc", "+:square", "x:square", "#:decimal", "0:d
 
 				// Stuff in a new spacer node at that position
 				blank = tag.ownerDocument.createElement(insertElement);
-				blank.innerHTML = '&nbsp;';
+				blank.innerHTML = '&#8203; &#8203;';
 				range.insertNode(blank);
 
-				// Move the caret to this new empty node
+				// Move the caret after this new empty node
 				let range_new = document.createRange();
 				range_new.setStartAfter(blank);
 
 				// Set sceditor to this new range
 				rangeHelper.selectRange(range_new);
-				editor.focus()
+				editor.focus();
 
-				return
+				return;
 			}
 
 			// Otherwise, a new tag for them, done by the caller
 			rangeHelper.restoreRange();
 			editor.insert('<' + nodeName + ' class="' + nodeClass + '">', '</' + nodeName + '>', false);
+		},
+		checkRemoveFormat: function(tag) {
+			let range = this.getRangeHelper();
+			let selected = range.selectedRange();
+
+			// If they selected any text in the node, assume they want to remove the
+			// format defined by the parent.  If no selection they simply want to end the command
+			if (selected.startOffset !== selected.endOffset)
+			{
+				let dom = sceditor.dom,
+					parent = range.parentNode(),
+					node = dom.closest(parent, tag);
+
+				if (node)
+				{
+					let frag = document.createDocumentFragment(),
+						child;
+
+					while (node.firstChild)
+					{
+						child = node.removeChild(node.firstChild);
+						frag.appendChild(child);
+					}
+
+					node.parentNode.replaceChild(frag, node);
+
+					return true;
+				}
+			}
+
+			return false;
 		},
 		/**
 		 * Determine the caret position inside of sceditor's iframe for dropdown
@@ -405,7 +434,12 @@ sceditor.command
 		},
 		exec: function ()
 		{
-			if (typeof this.toggleTagStartEnd === 'function')
+			if (typeof this.toggleTagStartEnd !== 'function')
+			{
+				return;
+			}
+
+			if (!this.checkRemoveFormat('span.bbc_tt'))
 			{
 				this.toggleTagStartEnd('span', 'bbc_tt', 'span');
 			}
@@ -427,7 +461,12 @@ sceditor.command
 		},
 		exec: function ()
 		{
-			if (typeof this.toggleTagStartEnd === 'function')
+			if (typeof this.toggleTagStartEnd !== 'function')
+			{
+				return;
+			}
+
+			if (!this.checkRemoveFormat('pre.bbc_pre'))
 			{
 				this.toggleTagStartEnd('pre', 'bbc_pre', 'p');
 			}
