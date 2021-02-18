@@ -20,7 +20,7 @@ const itemCodes = ["*:disc", "@:disc", "+:square", "x:square", "#:decimal", "0:d
 			var current_event = event,
 				$_id = $('#' + id);
 
-			$_id.parent().on(event, 'textarea', func);
+			$_id.parent().on(current_event, 'textarea', func);
 
 			var oIframe = $_id.parent().find('iframe')[0],
 				oIframeWindow = oIframe.contentWindow;
@@ -30,7 +30,7 @@ const itemCodes = ["*:disc", "@:disc", "+:square", "x:square", "#:decimal", "0:d
 				var oIframeDoc = oIframeWindow.document,
 					oIframeBody = oIframeDoc.body;
 
-				$(oIframeBody).on(event, func);
+				$(oIframeBody).on(current_event, func);
 			}
 		},
 		appendEmoticon: function (code, emoticon)
@@ -100,7 +100,7 @@ const itemCodes = ["*:disc", "@:disc", "+:square", "x:square", "#:decimal", "0:d
 						popupContent = $('<div id="sceditor-popup" />');
 						line = $('<div id="sceditor-popup-smiley" />');
 
-						// create our popup, title bar, smiles, then the close button
+						// Create our popup, title bar, smiles, then the close button
 						popupContent.append(titlebar);
 
 						// Add in all the smileys / lines
@@ -142,7 +142,7 @@ const itemCodes = ["*:disc", "@:disc", "+:square", "x:square", "#:decimal", "0:d
 				});
 			}
 
-			// show the standard placement icons
+			// Show the standard placement icons
 			$.each(emoticons, base.appendEmoticon);
 
 			if (line.children().length > 0)
@@ -157,6 +157,40 @@ const itemCodes = ["*:disc", "@:disc", "+:square", "x:square", "#:decimal", "0:d
 			{
 				content.append(moreButton);
 			}
+		},
+		/**
+		 * When you don't have a DOM node to check (non rendering tag), this will
+		 * check if the cursor is inside of the supplied tag
+		 *
+		 * @param tag
+		 * @returns {number}
+		 */
+		checkInsideSourceTag(tag)
+		{
+			let currentNode = this.currentNode(),
+				currentRange = this.getRangeHelper();
+
+			if (currentRange.selectedRange())
+			{
+				let end = currentRange.selectedRange().startOffset,
+					text = typeof currentNode !== 'undefined' ? currentNode.textContent : '';
+
+				// Left and right text from the cursor position and tag positions
+				let left = text.substr(0, end),
+					right = text.substr(end),
+					l1 = left.lastIndexOf("[" + tag + "]"),
+					l2 = left.lastIndexOf("[/" + tag + "]"),
+					r1 = right.indexOf("[" + tag + "]"),
+					r2 = right.indexOf("[/" + tag + "]");
+
+				// Inside ot the [tag]your are here[/tag]
+				if ((l1 > -1 && l1 > l2) || (r2 > -1 && (r1 === -1 || (r1 > r2))))
+				{
+					return 1;
+				}
+			}
+
+			return 0;
 		},
 		/**
 		 * Determine the caret position inside of sceditor's iframe
@@ -197,10 +231,9 @@ const itemCodes = ["*:disc", "@:disc", "+:square", "x:square", "#:decimal", "0:d
 			// Look back and find the tag, so we can insert our span ahead of it
 			while (prev)
 			{
-				console.log(tag);
 				atPos = (prev.nodeValue || '').lastIndexOf(tag);
 
-				// Found the start of Emoji
+				// Found the start tag
 				if (atPos > -1)
 				{
 					parent.insertBefore(placefinder, prev.splitText(atPos + 1));
@@ -276,32 +309,10 @@ sceditor.command
 	.set('spoiler', {
 		state: function ()
 		{
-			let currentNode = this.currentNode(),
-				currentRange = this.getRangeHelper();
-
-			// We don't have a node since we don't render the tag in the wizzy editor
-			// however we can spot check to see if the cursor is inside the tags.
-			if (currentRange.selectedRange())
+			if (typeof this.checkInsideSourceTag === 'function')
 			{
-				let end = currentRange.selectedRange().startOffset,
-					text = typeof currentNode !== 'undefined' ? currentNode.textContent : '';
-
-				// Left and right text from the cursor position and tag positions
-				let left = text.substr(0, end),
-					right = text.substr(end),
-					l1 = left.lastIndexOf("[spoiler]"),
-					l2 = left.lastIndexOf("[/spoiler]"),
-					r1 = right.indexOf("[spoiler]"),
-					r2 = right.indexOf("[/spoiler]");
-
-				// Inside spoiler tags
-				if ((l1 > -1 && l1 > l2) || (r2 > -1 && (r1 === -1 || (r1 > r2))))
-				{
-					return 1;
-				}
+				return this.checkInsideSourceTag('spoiler');
 			}
-
-			return 0;
 		},
 		exec: function ()
 		{
@@ -313,33 +324,10 @@ sceditor.command
 	.set('footnote', {
 		state: function ()
 		{
-			let currentNode = this.currentNode(),
-				currentRange = this.getRangeHelper();
-
-			// We don't have an html node since we don't render the tag in the editor
-			// but we can do a spot check to see if the cursor is placed between plain tags.  This
-			// will miss with [footnote]nested [b]tags[b][/footnote] but its nicer than nothing.
-			if (currentRange.selectedRange())
+			if (typeof this.checkInsideSourceTag === 'function')
 			{
-				let end = currentRange.selectedRange().startOffset,
-					text = typeof currentNode !== 'undefined' ? currentNode.textContent : '';
-
-				// Left and right text from the cursor position and tag positions
-				let left = text.substr(0, end),
-					right = text.substr(end),
-					l1 = left.lastIndexOf("[footnote]"),
-					l2 = left.lastIndexOf("[/footnote]"),
-					r1 = right.indexOf("[footnote]"),
-					r2 = right.indexOf("[/footnote]");
-
-				// Inside footnote tags
-				if ((l1 > -1 && l1 > l2) || (r2 > -1 && (r1 === -1 || (r1 > r2))))
-				{
-					return 1;
-				}
+				return this.checkInsideSourceTag('footnote');
 			}
-
-			return 0;
 		},
 		exec: function ()
 		{
