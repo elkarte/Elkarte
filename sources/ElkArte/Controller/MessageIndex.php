@@ -192,18 +192,14 @@ class MessageIndex extends AbstractController implements FrontpageInterface
 			$this->_req->query->sort = $default_sort_method;
 		}
 
-		$board_url_param = ['board' => $board, 'start' => '%1$d', 'name' => $board_info['name']];
 		// Make sure the starting place makes sense and construct the page index.
+		$sort_string = '';
 		if (isset($this->_req->query->sort))
 		{
-			$board_url_param['sort'] = $this->_req->query->sort;
-			if (isset($this->_req->query->desc))
-			{
-				$board_url_param[] = 'desc';
-			}
+			$sort_string = ';sort=' . $this->_req->query->sort . (isset($this->_req->query->desc) ? ';desc' : '');
 		}
 
-		$context['page_index'] = constructPageIndex(getUrl('board', $board_url_param), $this->_req->query->start, $board_info['total_topics'], $maxindex, true);
+		$context['page_index'] = constructPageIndex('{scripturl}?board=' . $board . '.%1$d' . $sort_string, $this->_req->query->start, $board_info['total_topics'], $maxindex, true);
 		$context['start'] = &$this->_req->query->start;
 
 		// Set a canonical URL for this page.

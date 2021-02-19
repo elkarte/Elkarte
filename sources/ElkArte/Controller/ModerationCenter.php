@@ -514,8 +514,7 @@ class ModerationCenter extends AbstractController
 		$context['total_reports'] = totalReports($context['view_closed'], $show_pms);
 
 		// So, that means we can page index, yes?
-		$baseUrl = getUrl('action', ['action' => 'moderate', 'area' => $context['admin_area'], 'sa' => ($context['view_closed'] ? 'closed' : '')]);
-		$context['page_index'] = constructPageIndex($baseUrl, $this->_req->query->start, $context['total_reports'], 10);
+		$context['page_index'] = constructPageIndex('{scripturl}?action=moderate;area=' . $context['admin_area'] . ($context['view_closed'] ? ';sa=closed' : ''), $this->_req->query->start, $context['total_reports'], 10);
 		$context['start'] = $this->_req->query->start;
 
 		// By George, that means we in a position to get the reports, golly good.
@@ -1937,7 +1936,7 @@ class ModerationCenter extends AbstractController
 		$moderator_notes = moderatorNotes($offset);
 
 		// Lets construct a page index.
-		$context['page_index'] = constructPageIndex(getUrl('action', ['action' => 'moderate', 'area' => 'index;notes']), $this->_req->query->start, $moderator_notes_total, 10);
+		$context['page_index'] = constructPageIndex('{scripturl}?action=moderate;area=index;notes', $this->_req->query->start, $moderator_notes_total, 10);
 		$context['start'] = $this->_req->query->start;
 
 		$bbc_parser = ParserWrapper::instance();

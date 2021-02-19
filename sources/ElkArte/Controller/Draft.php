@@ -101,7 +101,7 @@ class Draft extends Post
 		$name = MembersList::get($this->_memID)->real_name;
 
 		// Make sure the starting place makes sense and construct our friend the page index.
-		$context['page_index'] = constructPageIndex(getUrl('profile', ['action' => 'profile', 'area' => 'showdrafts', 'u' => $this->_memID, 'name' => $name]), $context['start'], $msgCount, $maxIndex);
+		$context['page_index'] = constructPageIndex('{scripturl}?action=pm;sa=showpmdrafts', $context['start'], $msgCount, $maxIndex);
 		$context['current_page'] = $context['start'] / $maxIndex;
 
 		list ($maxIndex, $reverse, $limit, $order) = $this->_query_limits($msgCount, $maxIndex);
@@ -324,7 +324,7 @@ class Draft extends Post
 		$maxIndex = (int) $modSettings['defaultMaxMessages'];
 
 		// Make sure the starting place makes sense and construct our friend the page index.
-		$context['page_index'] = constructPageIndex(getUrl('action', ['action' => 'pm', 'sa' => 'showpmdrafts']), $context['start'], $msgCount, $maxIndex);
+		$context['page_index'] = constructPageIndex('{scripturl}?action=pm;sa=showpmdrafts', $context['start'], $msgCount, $maxIndex);
 		$context['current_page'] = $context['start'] / $maxIndex;
 
 		list ($maxIndex, $reverse, $limit, $order) = $this->_query_limits($msgCount, $maxIndex);

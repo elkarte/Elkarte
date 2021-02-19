@@ -494,8 +494,7 @@ class ProfileInfo extends AbstractController
 		$maxIndex = (int) $modSettings['defaultMaxMessages'];
 
 		// Make sure the starting place makes sense and construct our friend the page index.
-		$baseUrl = getUrl('action', ['action' => 'profile', 'u' => $this->_memID, 'area' => 'showposts', 'sa' => $context['is_topics'] ? 'topics' : 'messages', (!empty($board) ? 'board' : '') => (!empty($board) ? $board : '')]);
-		$context['page_index'] = constructPageIndex($baseUrl, $context['start'], $msgCount, $maxIndex);
+		$context['page_index'] = constructPageIndex('{scripturl}?action=profile;u=' . $this->_memID . ';area=showposts' . ($context['is_topics'] ? ';sa=topics' : ';sa=messages') . (!empty($board) ? ';board=' . $board : ''), $context['start'], $msgCount, $maxIndex);
 		$context['current_page'] = $context['start'] / $maxIndex;
 
 		// Reverse the query if we're past 50% of the pages for better performance.

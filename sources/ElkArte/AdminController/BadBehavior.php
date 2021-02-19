@@ -94,7 +94,7 @@ class BadBehavior extends AbstractController
 		$sort = isset($this->_req->query->desc) ? 'down' : 'up';
 
 		// Set the page listing up.
-		$context['page_index'] = constructPageIndex(getUrl('admin', ['action' => 'admin', 'area' => 'logs', 'sa' => 'badbehaviorlog', $sort == 'down' ? 'desc' : '', !empty($filter) ? $filter['href'] : '']), $start, $num_errors, $modSettings['defaultMaxMessages']);
+		$context['page_index'] = constructPageIndex('{scripturl}?action=admin;area=logs;sa=badbehaviorlog' . ($sort == 'down' ? ';desc' : '') . (!empty($filter) ? $filter['href'] : ''), $start, $num_errors, $modSettings['defaultMaxMessages']);
 
 		// Find and sort out the log entries.
 		$context['bb_entries'] = getBadBehaviorLogEntries($start, $modSettings['defaultMaxMessages'], $sort, $filter);

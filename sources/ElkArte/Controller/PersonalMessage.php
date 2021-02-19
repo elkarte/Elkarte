@@ -697,7 +697,7 @@ class PersonalMessage extends AbstractController
 		}
 
 		// Set up the page index.
-		$context['page_index'] = constructPageIndex($scripturl . '?action=pm;f=' . $context['folder'] . (isset($this->_req->query->l) ? ';l=' . (int) $this->_req->query->l : '') . ';sort=' . $context['sort_by'] . ($descending ? ';desc' : ''), $start, $max_messages, $modSettings['defaultMaxMessages']);
+		$context['page_index'] = constructPageIndex('{scripturl}?action=pm;f=' . $context['folder'] . (isset($this->_req->query->l) ? ';l=' . (int) $this->_req->query->l : '') . ';sort=' . $context['sort_by'] . ($descending ? ';desc' : ''), $start, $max_messages, $modSettings['defaultMaxMessages']);
 		$context['start'] = $start;
 
 		$context['pm_form_url'] = $scripturl . '?action=pm;sa=pmactions;' . ($context['display_mode'] == 2 ? 'conversation;' : '') . 'f=' . $context['folder'] . ';start=' . $context['start'] . ($context['current_label_id'] != -1 ? ';l=' . $context['current_label_id'] : '');
@@ -2505,7 +2505,7 @@ class PersonalMessage extends AbstractController
 		}
 
 		// Sort out the page index.
-		$context['page_index'] = constructPageIndex($scripturl . '?action=pm;sa=search2;params=' . $context['params'], $this->_req->query->start, $numResults, $modSettings['search_results_per_page'], false);
+		$context['page_index'] = constructPageIndex('{scripturl}?action=pm;sa=search2;params=' . $context['params'], $this->_req->query->start, $numResults, $modSettings['search_results_per_page'], false);
 
 		$context['message_labels'] = array();
 		$context['message_replied'] = array();
