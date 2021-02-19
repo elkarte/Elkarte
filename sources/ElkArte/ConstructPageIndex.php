@@ -42,18 +42,40 @@ namespace ElkArte;
  * @example $pageindex = constructPageIndex({scripturl} . '?board=' . $board, $_REQUEST['start'], $num_messages,
  *     $maxindex, true);
  */
-class ConstructPageIndex
+class ConstructPageIndex extends AbstractModel
 {
+	/** @var int stating page */
 	private $start;
+
+	/** @var array holds the desired options for the index all, prev_next, all_selected */
 	private $show;
+
+	/** @var int max page # to show */
 	private $max_value;
+
+	/** @var int  */
 	private $num_per_page;
+
+	/** @var bool  */
 	private $flexible_start;
+
+	/** @var string  */
 	private $base_url;
+
+	/** @var string */
 	private $base_link;
+
+	/** @var bool If we have tried to navigate off the end */
 	private $start_invalid;
+
+	/** @var int */
 	private $counter;
+
+	/** @var mixed|string What we are after */
 	private $pageindex;
+
+	/** @var int the maximum number of pages in the index */
+	private $maxPages;
 
 	/**
 	 * ConstructPageIndex constructor.
@@ -67,8 +89,6 @@ class ConstructPageIndex
 	 */
 	public function __construct($base_url, &$start, $max_value, $num_per_page, $flexible_start = false, $show = [])
 	{
-		global $modSettings, $context;
-
 		$this->start = (int) $start;
 		$this->show = array_merge(['prev_next' => true, 'all' => false], $show);
 		$this->max_value = (int) $max_value;
@@ -76,25 +96,39 @@ class ConstructPageIndex
 		$this->flexible_start = $flexible_start;
 		$this->base_url = $base_url;
 
-		$start = $this->setStart();
+		// Do it!
+		$this->createPageIndex();
+	}
+
+	/**
+	 * Does what it says, creates the handy pageindex navigation bar
+	 */
+	public function createPageIndex()
+	{
+		global $context;
+
+		$this->setStart();
 		$context['current_page'] = (int) $this->start / $this->num_per_page;
 
 		$this->setBaseLink();
 
 		// Compact pages is off or on?
-		if (empty($modSettings['compactTopicPagesEnable']))
+		if (empty($this->_modSettings['compactTopicPagesEnable']))
 		{
-			$pageindex = $this->normalLinks();
+			$pageindex = $this->simplelLinks();
 		}
 		else
 		{
 			$pageindex = $this->compactLinks();
 		}
 
+		// Here it is, use getPageIndex to fetch it
 		$this->pageindex = $this->showAll($pageindex);
 	}
 
 	/**
+	 * Returns the completed page index
+	 *
 	 * @return string
 	 */
 	public function getPageIndex()
@@ -103,6 +137,8 @@ class ConstructPageIndex
 	}
 
 	/**
+	 * Validate and sets the page starting point
+	 *
 	 * @return int
 	 */
 	public function setStart()
@@ -131,7 +167,9 @@ class ConstructPageIndex
 	}
 
 	/**
-	 *
+	 * Sets the base url that navigation will start from.
+	 * will replace {base_link} and {scripturl} as needed.
+	 * Uses ['page_index_template']['base_link'] template
 	 */
 	private function setBaseLink()
 	{
@@ -145,21 +183,26 @@ class ConstructPageIndex
 	}
 
 	/**
+	 * Simple prev 1 2 3 4 next style links
+	 *
 	 * @return string
 	 */
-	private function normalLinks()
+	private function simplelLinks()
 	{
-		$pageindex = $this->setLeftArrow();
+		$pageindex = $this->setLeftNavigation();
 		$pageindex .= $this->setAll();
-		$pageindex .= $this->setRightArrow();
+		$pageindex .= $this->setRightNavigation();
 
 		return $pageindex;
 	}
 
 	/**
+	 * AKA previous button for simple navigation index
+	 * uses ['page_index_template']['previous_page'] template
+	 *
 	 * @return string
 	 */
-	private function setLeftArrow()
+	private function setLeftNavigation()
 	{
 		global $settings, $txt;
 
@@ -172,6 +215,9 @@ class ConstructPageIndex
 	}
 
 	/**
+	 * AKA all the pages 1 2 3 4 5 for simple navigation
+	 * Uses ['page_index_template']['current_page'] template
+	 *
 	 * @return string
 	 */
 	private function setAll()
@@ -194,9 +240,12 @@ class ConstructPageIndex
 	}
 
 	/**
+	 * AKA the next button for simple navigation.  Uses 'page_index_template']['next_page']
+	 * template
+	 *
 	 * @return string
 	 */
-	private function setRightArrow()
+	private function setRightNavigation()
 	{
 		global $settings, $txt;
 
@@ -219,19 +268,20 @@ class ConstructPageIndex
 	}
 
 	/**
+	 * Compact links, good for displaying a many available pages bar
+	 * prev page >1< ... 6 7 [8] 9 10 ... 15)
+	 *
 	 * @return string
 	 */
 	private function compactLinks()
 	{
-		global $modSettings;
-
 		$pageindex = '';
 
 		// If they didn't enter an odd value, pretend they did.
-		$PageContiguous = (int) ($modSettings['compactTopicPagesContiguous'] - ($modSettings['compactTopicPagesContiguous'] % 2)) / 2;
+		$PageContiguous = (int) ($this->_modSettings['compactTopicPagesContiguous'] - ($this->_modSettings['compactTopicPagesContiguous'] % 2)) / 2;
 
 		// Start with previous, if there is one
-		$pageindex .= $this->compactPreviousArrow();
+		$pageindex .= $this->compactPreviousNavigation();
 
 		// Show the first page. (prev page >1< ... 6 7 [8] 9 10 ... 15)
 		if ($this->start > $this->num_per_page * $PageContiguous)
@@ -245,37 +295,40 @@ class ConstructPageIndex
 			$pageindex .= $this->compactContinuation($PageContiguous, 'before');
 		}
 
-		// Show the pages before the current one. (prev page 1 ... >6 7< [8] 9 10 ... 15 next page)
+		// Show a few pages before the current one. (prev page 1 ... >6 7< [8] 9 10 ... 15 next page)
 		$pageindex .= $this->compactBeforeCurrent($PageContiguous);
 
 		// Show the current page. (prev page 1 ... 6 7 >[8]< 9 10 ... 15 next page)
 		$pageindex .= $this->compactCurrent();
 
-		// Show the pages after the current one... (prev page 1 ... 6 7 [8] >9 10< ... 15 next page)
+		// Show a few pages after the current one... (prev page 1 ... 6 7 [8] >9 10< ... 15 next page)
 		$pageindex .= $this->compactAfterCurrent($PageContiguous);
 
 		// Show the '...' part near the end. (prev page 1 ... 6 7 [8] 9 10 >...< 15 next page)
-		if ($this->start + $this->num_per_page * ($PageContiguous + 1) < $this->tmpMaxPages())
+		if ($this->start + $this->num_per_page * ($PageContiguous + 1) < $this->getMaxPages())
 		{
 			$pageindex .= $this->compactContinuation($PageContiguous, 'after');
 		}
 
 		// Show the last number in the list. (prev page 1 ... 6 7 [8] 9 10 ... >15<  next page)
-		if ($this->start + $this->num_per_page * $PageContiguous < $this->tmpMaxPages())
+		if ($this->start + $this->num_per_page * $PageContiguous < $this->getMaxPages())
 		{
-			$pageindex .= sprintf($this->base_link, $this->tmpMaxPages(), $this->tmpMaxPages() / $this->num_per_page + 1);
+			$pageindex .= sprintf($this->base_link, $this->getMaxPages(), $this->getMaxPages() / $this->num_per_page + 1);
 		}
 
 		// Show the "next page" link. (prev page 1 ... 6 7 [8] 9 10 ... 15 >next page<)
-		$pageindex .=  $this->compactNextArrow();
+		$pageindex .=  $this->compactNextNavigation();
 
 		return $pageindex;
 	}
 
 	/**
+	 * Shows the previous page link
+	 * Uses ['page_index_template']['previous_page' template
+	 *
 	 * @return string
 	 */
-	private function compactPreviousArrow()
+	private function compactPreviousNavigation()
 	{
 		global $settings, $txt;
 
@@ -291,8 +344,10 @@ class ConstructPageIndex
 	}
 
 	/**
-	 * @param $PageContiguous
-	 * @param $position
+	 * Shows the ... continuation link, helper function for before or after
+	 *
+	 * @param int $PageContiguous
+	 * @param string $position before or after
 	 * @return string|string[]
 	 */
 	private function compactContinuation($PageContiguous, $position)
@@ -300,7 +355,7 @@ class ConstructPageIndex
 		global $settings, $scripturl;
 
 		$first = ($this->start + $this->num_per_page * ($PageContiguous + 1));
-		$last = $this->tmpMaxPages();
+		$last = $this->getMaxPages();
 		$firstpage = $position === 'after' ? $first : $last;
 		$lastpage = $position === 'after' ? $last : $first;
 
@@ -320,7 +375,9 @@ class ConstructPageIndex
 	}
 
 	/**
-	 * @return float|int
+	 * The maximum number of pages for this index
+	 *
+	 * @return int
 	 */
 	private function tmpMaxPages()
 	{
@@ -328,6 +385,20 @@ class ConstructPageIndex
 	}
 
 	/**
+	 * Simply returns the maxpages for the index
+	 *
+	 * @return int
+	 */
+	private function getMaxPages()
+	{
+		$this->maxPages = $this->maxPages ?? $this->tmpMaxPages();
+
+		return $this->maxPages;
+	}
+
+	/**
+	 * The numbered pages before the current one. (prev page 1 ... >6 7< [8] 9 10 ... 15 next page)
+	 *
 	 * @param $PageContiguous
 	 * @return string
 	 */
@@ -347,6 +418,9 @@ class ConstructPageIndex
 	}
 
 	/**
+	 * The current page. (prev page 1 ... 6 7 >[8]< 9 10 ... 15 next page)
+	 * Uses ['page_index_template']['current_page'] template
+	 *
 	 * @return string
 	 */
 	private function compactCurrent()
@@ -362,6 +436,8 @@ class ConstructPageIndex
 	}
 
 	/**
+	 * The pages after the current one... (prev page 1 ... 6 7 [8] >9 10< ... 15 next page)
+	 *
 	 * @param $PageContiguous
 	 * @return string
 	 */
@@ -370,7 +446,7 @@ class ConstructPageIndex
 		$pageindex = '';
 		for ($nCont = 1; $nCont <= $PageContiguous; $nCont++)
 		{
-			if ($this->start + $this->num_per_page * $nCont <= $this->tmpMaxPages())
+			if ($this->start + $this->num_per_page * $nCont <= $this->getMaxPages())
 			{
 				$tmpStart = $this->start + $this->num_per_page * $nCont;
 				$pageindex .= sprintf($this->base_link, $tmpStart, $tmpStart / $this->num_per_page + 1);
@@ -381,13 +457,16 @@ class ConstructPageIndex
 	}
 
 	/**
+	 * Show the "next page" link. (prev page 1 ... 6 7 [8] 9 10 ... 15 >next page<)
+	 * Uses ['page_index_template']['next_page'] template
+	 *
 	 * @return string
 	 */
-	private function compactNextArrow()
+	private function compactNextNavigation()
 	{
 		global $settings, $txt;
 
-		if ($this->start !== $this->tmpMaxPages() && $this->show['prev_next'] && empty($this->show['all_selected']))
+		if ($this->start !== $this->getMaxPages() && $this->show['prev_next'] && empty($this->show['all_selected']))
 		{
 			$next = str_replace('{next_txt}', $txt['next'], $settings['page_index_template']['next_page']);
 
@@ -398,6 +477,9 @@ class ConstructPageIndex
 	}
 
 	/**
+	 * The show all button if requested/
+	 * Uses 'page_index_template']['current_page'] template
+	 *
 	 * @param $pageindex
 	 * @return mixed|string
 	 */
@@ -408,7 +490,7 @@ class ConstructPageIndex
 		// The "all" button
 		if ($this->show['all'])
 		{
-			if (!empty($show['all_selected']))
+			if (!empty($this->show['all_selected']))
 			{
 				$pageindex .= sprintf($settings['page_index_template']['current_page'], $txt['all']);
 			}
