@@ -383,22 +383,22 @@ class Database_PostgreSQL extends Database_Abstract
 	 * Tracking the current row.
 	 * Fetch a row from the resultset given as parameter.
 	 *
-	 * @param resource $request
+	 * @param resource $result
 	 * @param integer|bool $counter = false
 	 */
-	public function fetch_row($request, $counter = false)
+	public function fetch_row($result, $counter = false)
 	{
 		global $db_row_count;
 
 		if ($counter !== false)
-			return pg_fetch_row($request, $counter);
+			return pg_fetch_row($result, $counter);
 
 		// Reset the row counter...
-		if (!isset($db_row_count[(int) $request]))
-			$db_row_count[(int) $request] = 0;
+		if (!isset($db_row_count[(int) $result]))
+			$db_row_count[(int) $result] = 0;
 
 		// Return the right row.
-		return @pg_fetch_row($request, $db_row_count[(int) $request]++);
+		return @pg_fetch_row($result, $db_row_count[(int) $result]++);
 	}
 
 	/**
@@ -1039,12 +1039,12 @@ class Database_PostgreSQL extends Database_Abstract
 	/**
 	 * Dummy function really. Doesn't do anything on PostgreSQL.
 	 *
-	 * @param string|null $db_name = null
+	 * @param string|null $dbName = null
 	 * @param resource|null $connection = null
 	 *
 	 * @return boolean
 	 */
-	public function select_db($db_name = null, $connection = null)
+	public function select_db($dbName = null, $connection = null)
 	{
 		return true;
 	}
