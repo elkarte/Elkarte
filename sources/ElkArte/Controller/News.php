@@ -259,22 +259,23 @@ class News extends AbstractController
 
 		obStart(!empty($modSettings['enableCompressedOutput']));
 
+		$headers = \ElkArte\Http\Headers::instance();
 		// This is an xml file....
 		if (isset($this->_req->query->debug))
 		{
-			header('Content-Type: text/xml; charset=UTF-8');
+			$headers->contentType('text/xml', 'UTF-8');
 		}
 		elseif ($xml_format === 'rss' || $xml_format === 'rss2')
 		{
-			header('Content-Type: application/rss+xml; charset=UTF-8');
+			$headers->contentType('application/rss+xml', 'UTF-8');
 		}
 		elseif ($xml_format === 'atom')
 		{
-			header('Content-Type: application/atom+xml; charset=UTF-8');
+			$headers->contentType('application/atom+xml', 'UTF-8');
 		}
 		elseif ($xml_format === 'rdf')
 		{
-			header('Content-Type: ' . (isBrowser('ie') ? 'text/xml' : 'application/rdf+xml') . '; charset=UTF-8');
+			$headers->contentType('application/rdf+xml','UTF-8');
 		}
 
 		theme()->getTemplates()->load('Xml');

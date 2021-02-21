@@ -409,20 +409,25 @@ class Calendar extends AbstractController
 		obStart(!empty($modSettings['enableCompressedOutput']));
 
 		// Send the file headers
-		header('Pragma: no-cache');
-		header('Cache-Control: no-cache');
-		header('Expires: ' . gmdate('D, d M Y H:i:s', time() + 525600 * 60) . ' GMT');
-		header('Last-Modified: ' . gmdate('D, d M Y H:i:s', time()) . 'GMT');
-		header('Accept-Ranges: bytes');
-		header('Connection: close');
-		header('Content-Disposition: attachment; filename="' . $event['title'] . '.ics"');
+		$headers = \ElkArte\Http\Headers::instance();
+		$headers
+			->header('Pragma', 'no-cache')
+			->header('Cache-Control', 'no-cache')
+			->header('Expires', '' . gmdate('D, d M Y H:i:s', time() + 525600 * 60) . ' GMT')
+			->header('Last-Modified', '' . gmdate('D, d M Y H:i:s', time()) . 'GMT')
+			->header('Accept-Ranges', 'bytes')
+			->header('Connection', 'close')
+			->header('Content-Disposition', 'attachment; filename="' . $event['title'] . '.ics"');
 		if (empty($modSettings['enableCompressedOutput']))
 		{
-			header('Content-Length: ' . Util::strlen($filecontents));
+			$headers->header('Content-Length', Util::strlen($filecontents));
 		}
 
 		// This is a calendar item!
-		header('Content-Type: text/calendar');
+
+		$headers
+			->contentType('text/calendar', 'UTF-8')
+			->sendHeaders();
 
 		// Chuck out the card.
 		echo $filecontents;

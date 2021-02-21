@@ -18,6 +18,8 @@ use BBC\ParserWrapper;
 use ElkArte\Cache\Cache;
 use ElkArte\Debug;
 use ElkArte\Hooks;
+use ElkArte\Http\Headers;
+use ElkArte\Themes\ThemeLoader;
 use ElkArte\User;
 use ElkArte\Util;
 use ElkArte\AttachmentsDirectory;
@@ -252,8 +254,12 @@ function loadBoard()
 			new ElkArte\Themes\ThemeLoader();
 			if (!empty(User::$info->possibly_robot))
 			{
-				header('HTTP/1.1 410 Gone');
+				Headers::instance()
+					->removeHeader('all')
+					->headerSpecial('HTTP/1.1 410 Gone')
+					->sendHeaders();
 			}
+
 			throw new \ElkArte\Exceptions\Exception('topic_gone', false);
 		}
 	}
@@ -484,20 +490,27 @@ function loadBoard()
 		if (!empty($_REQUEST['action']) && $_REQUEST['action'] === 'dlattach')
 		{
 			ob_end_clean();
-			header('HTTP/1.1 403 Forbidden');
+			Headers::instance()
+				->removeHeader('all')
+				->headerSpecial('HTTP/1.1 403 Forbidden')
+				->sendHeaders();
 			exit;
 		}
 		elseif (User::$info->is_guest)
 		{
-			\ElkArte\Themes\ThemeLoader::loadLanguageFile('Errors');
+			ThemeLoader::loadLanguageFile('Errors');
 			is_not_guest($txt['topic_gone']);
 		}
 		else
 		{
 			if (!empty(User::$info->possibly_robot))
 			{
-				header('HTTP/1.1 410 Gone');
+				Headers::instance()
+					->removeHeader('all')
+					->headerSpecial('HTTP/1.1 410 Gone')
+					->sendHeaders();
 			}
+
 			throw new \ElkArte\Exceptions\Exception('topic_gone', false);
 		}
 	}
@@ -789,7 +802,7 @@ function loadEssentialThemeData()
 {
 	\ElkArte\Errors\Errors::instance()->log_deprecated('loadEssentialThemeData()', '\ElkArte\Themes\ThemeLoader::loadEssentialThemeData()');
 
-	return \ElkArte\Themes\ThemeLoader::loadEssentialThemeData();
+	return ThemeLoader::loadEssentialThemeData();
 }
 
 /**
@@ -1128,7 +1141,7 @@ function loadLanguage($template_name, $lang = '', $fatal = true, $force_reload =
 {
 	\ElkArte\Errors\Errors::instance()->log_deprecated('loadLanguage()', '\ElkArte\Themes\ThemeLoader::loadLanguageFile()');
 
-	return \ElkArte\Themes\ThemeLoader::loadLanguageFile($template_name, $lang, $fatal, $force_reload);
+	return ThemeLoader::loadLanguageFile($template_name, $lang, $fatal, $force_reload);
 }
 
 /**
@@ -1532,8 +1545,6 @@ function detectServer()
 		}
 
 		$context['server']['iso_case_folding'] = $server->is('iso_case_folding');
-		// A bug in some versions of IIS under CGI (older ones) makes cookie setting not work with Location: headers.
-		$context['server']['needs_login_fix'] = $server->is('needs_login_fix');
 	}
 
 	return $server;

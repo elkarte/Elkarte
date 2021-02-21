@@ -17,6 +17,7 @@
 
 use ElkArte\Controller\Auth;
 use ElkArte\EventManager;
+use ElkArte\Http\Headers;
 use ElkArte\OpenID;
 use ElkArte\TokenHash;
 use ElkArte\User;
@@ -878,7 +879,10 @@ function checkSession($type = 'post', $from_action = '', $is_fatal = true)
 		if (isset($_GET['xml']) || isset($_REQUEST['api']))
 		{
 			@ob_end_clean();
-			header('HTTP/1.1 403 Forbidden - Session timeout');
+			Headers::instance()
+				->removeHeader('all')
+				->headerSpecial('HTTP/1.1 403 Forbidden - Session timeout')
+				->sendHeaders();
 			die;
 		}
 		else
@@ -1844,7 +1848,7 @@ function frameOptionsHeader($override = null)
 	}
 
 	// Finally set it.
-	header('X-Frame-Options: ' . $option);
+	Headers::instance()->header('X-Frame-Options', $option);
 }
 
 /**
@@ -1865,8 +1869,9 @@ function securityOptionsHeader($override = null)
 {
 	if ($override !== true)
 	{
-		header('X-XSS-Protection: 1');
-		header('X-Content-Type-Options: nosniff');
+		Headers::instance()
+			->header('X-XSS-Protection', '1')
+			->header('X-Content-Type-Options', 'nosniff');
 	}
 }
 
@@ -1879,7 +1884,10 @@ function stop_prefetching()
 		|| (isset($_SERVER['HTTP_X_MOZ']) && $_SERVER['HTTP_X_MOZ'] === 'prefetch'))
 	{
 		@ob_end_clean();
-		header('HTTP/1.1 403 Forbidden');
+		Headers::instance()
+			->removeHeader('all')
+			->headerSpecial('HTTP/1.1 403 Forbidden')
+			->sendHeaders();
 		die;
 	}
 }

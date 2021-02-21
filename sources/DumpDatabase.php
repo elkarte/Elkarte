@@ -55,6 +55,7 @@ function DumpDatabase2()
 	$current_used_memory = 0;
 	$db_backup = '';
 	$output_function = 'un_compressed';
+	$headers = \ElkArte\Http\Headers::instance();
 
 	@ob_end_clean();
 
@@ -64,9 +65,10 @@ function DumpDatabase2()
 		$output_function = 'gzencode';
 
 		// Send faked headers so it will just save the compressed output as a gzip.
-		header('Content-Type: application/x-gzip');
-		header('Accept-Ranges: bytes');
-		header('Content-Encoding: none');
+		$headers
+			->removeHeader('all')
+			->contentType('application/x-gzip', '')
+			->header('Accept-Ranges', 'bytes');
 
 		// The file extension will include .gz...
 		$extension = '.sql.gz';
@@ -85,8 +87,9 @@ function DumpDatabase2()
 		}
 
 		// Tell the client to save this file, even though it's text.
-		header('Content-Type: ' . (isBrowser('ie') || isBrowser('opera') ? 'application/octetstream' : 'application/octet-stream'));
-		header('Content-Encoding: none');
+		$headers
+			->removeHeader('all')
+			->contentType('application/octet-stream', '';
 
 		// This time the extension should just be .sql.
 		$extension = '.sql';
@@ -96,9 +99,13 @@ function DumpDatabase2()
 	$scripturl = '';
 
 	// Send the proper headers to let them download this file.
-	header('Content-Disposition: attachment; filename="' . $db_name . '-' . (empty($_REQUEST['struct']) ? 'data' : (empty($_REQUEST['data']) ? 'structure' : 'complete')) . '_' . strftime('%Y-%m-%d') . $extension . '"');
-	header('Cache-Control: private');
-	header('Connection: close');
+	$filename = $db_name . '-' . (empty($_REQUEST['struct']) ? 'data' : (empty($_REQUEST['data']) ? 'structure' : 'complete')) . '_' . strftime('%Y-%m-%d') . $extension . '"';
+
+	$headers
+		->header('Content-Disposition', 'attachment; filename="' . $filename . '"')
+		->header('Cache-Control', 'private')
+		->header('Connection', 'close')
+		->sendHeaders();
 
 	// This makes things simpler when using it so very very often.
 	$crlf = "\r\n";
@@ -131,8 +138,8 @@ function DumpDatabase2()
 				$crlf .
 				$database->table_sql($tableName) . ';' . $crlf;
 		}
+		// This is needed to speedup things later
 		else
-			// This is needed to speedup things later
 		{
 			$database->table_sql($tableName);
 		}
@@ -176,8 +183,7 @@ function DumpDatabase2()
 					$crlf;
 				$first_round = false;
 			}
-			$db_chunks .=
-				$get_rows;
+			$db_chunks .= $get_rows;
 			$current_used_memory += Util::strlen($db_chunks);
 
 			$db_backup .= $db_chunks;
@@ -204,9 +210,7 @@ function DumpDatabase2()
 	}
 
 	// write the last line
-	$db_backup .=
-		$crlf .
-		'-- Done' . $crlf;
+	$db_backup .= $crlf . '-- Done' . $crlf;
 
 	echo $output_function($db_backup);
 

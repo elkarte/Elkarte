@@ -16,6 +16,7 @@
 
 namespace ElkArte\Themes;
 
+use ElkArte\Http\Headers;
 use ElkArte\Themes\Directories;
 use BadFunctionCallException;
 use ElkArte\Debug;
@@ -271,9 +272,13 @@ class Templates
 		obStart();
 
 		// Don't cache error pages!!
-		header('Expires: Mon, 26 Jul 1997 05:00:00 GMT');
-		header('Last-Modified: ' . gmdate('D, d M Y H:i:s') . ' GMT');
-		header('Cache-Control: no-cache');
+		Headers::instance()
+			->removeHeader('all')
+			->header('Expires', 'Mon, 26 Jul 1997 05:00:00 GMT')
+			->header('Last-Modified',  gmdate('D, d M Y H:i:s') . ' GMT')
+			->header('Cache-Control', 'no-cache')
+			->contentType('text/html', 'UTF-8')
+			->sendHeaders();
 
 		if (!isset($txt['template_parse_error']))
 		{

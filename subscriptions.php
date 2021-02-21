@@ -15,9 +15,11 @@
  *
  */
 
-// Start things rolling by getting the forum alive...
+use ElkArte\Http\Headers;
+use ElkArte\Themes\ThemeLoader;
 use ElkArte\Util;
 
+// Start things rolling by getting the forum alive...
 if (!file_exists(dirname(__FILE__) . '/bootstrap.php'))
 {
 	die('Unable to initialize');
@@ -36,12 +38,12 @@ require_once(SUBSDIR . '/PaidSubscriptions.subs.php');
 require_once(SUBSDIR . '/Admin.subs.php');
 require_once(SUBSDIR . '/Members.subs.php');
 
-\ElkArte\Themes\ThemeLoader::loadLanguageFile('ManagePaid');
+ThemeLoader::loadLanguageFile('ManagePaid');
 
 // If there's literally nothing coming in, let's take flight!
 if (empty($_POST))
 {
-	header('Content-Type: text/html; charset=UTF-8');
+	Headers::instance()->contentType('text/html', 'UTF-8')->sendHeaders();
 	die($txt['paid_no_data']);
 }
 

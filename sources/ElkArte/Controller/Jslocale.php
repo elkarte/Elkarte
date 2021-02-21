@@ -15,8 +15,9 @@ namespace ElkArte\Controller;
 
 use ElkArte\AbstractController;
 use ElkArte\Agreement;
-use ElkArte\Exceptions\Exception;
+use ElkArte\Http\Headers;
 use ElkArte\PrivacyPolicy;
+use ElkArte\Themes\ThemeLoader;
 
 /**
  * This file is called via ?action=jslocale;sa=sceditor to load in a list of
@@ -93,7 +94,7 @@ class Jslocale extends AbstractController
 
 		if (!empty($language_file))
 		{
-			\ElkArte\Themes\ThemeLoader::loadLanguageFile($language_file);
+			ThemeLoader::loadLanguageFile($language_file);
 		}
 
 		theme()->getLayers()->removeAll();
@@ -108,7 +109,9 @@ class Jslocale extends AbstractController
 	private function _sendFile()
 	{
 		// Make sure they know what type of file we are.
-		header('Content-Type: text/javascript');
+		Headers::instance()
+			->contentType('text/javascript', 'UTF-8')
+			->sendHeaders();
 
 		echo $this->_file_data;
 
@@ -145,7 +148,7 @@ class Jslocale extends AbstractController
 					$context['json_data']['privacypol'] = $privacypol->getParsedText();
 				}
 			}
-			catch (Exception $e)
+			catch (\Exception $e)
 			{
 				$context['json_data'] = $e->getMessage();
 			}

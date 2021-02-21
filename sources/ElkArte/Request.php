@@ -13,7 +13,7 @@
 
 namespace ElkArte;
 
-use ElkArte\Util;
+use ElkArte\Http\Headers;
 
 /**
  * Class to parse $_REQUEST for always necessary data, such as 'action', 'board', 'topic', 'start'.
@@ -368,7 +368,10 @@ final class Request
 		// It seems that sticking a URL after the query string is mighty common, well, it's evil - don't.
 		if (strpos($_SERVER['QUERY_STRING'], 'http') === 0)
 		{
-			header('HTTP/1.1 400 Bad Request');
+			Headers::instance()
+				->removeHeader('all')
+				->headerSpecial('HTTP/1.1 400 Bad Request')
+				->sendHeaders();
 			throw new Exceptions\Exception('', false);
 		}
 

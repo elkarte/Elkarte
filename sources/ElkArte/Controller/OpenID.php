@@ -20,6 +20,7 @@ use ElkArte\AbstractController;
 use ElkArte\Cache\Cache;
 use ElkArte\EventManager;
 use ElkArte\Exceptions\Exception;
+use ElkArte\Http\Headers;
 use ElkArte\User;
 use ElkArte\UserSettingsLoader;
 
@@ -263,7 +264,8 @@ class OpenID extends AbstractController
 
 		obStart(!empty($modSettings['enableCompressedOutput']));
 
-		header('Content-Type: application/xrds+xml');
+		Headers::instance()->contentType('application/xrds+xml')->sendHeaders();
+
 		echo '<?xml version="1.0" encoding="UTF-8"?' . '>';
 		// Generate the XRDS data for OpenID 2.0, YADIS discovery..
 		echo '
