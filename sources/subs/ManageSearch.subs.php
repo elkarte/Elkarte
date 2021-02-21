@@ -33,7 +33,7 @@ function detectFulltextIndex()
 		array()
 	)->fetch_callback(
 		function ($row) use (&$fulltext_index) {
-			if ($row['Column_name'] === 'body'
+			if ( ( $row['Column_name'] === 'body' || $row['Column_name'] === 'subject' )
 				&& (isset($row['Index_type']) && $row['Index_type'] === 'FULLTEXT'
 					|| isset($row['Comment']) && $row['Comment'] === 'FULLTEXT'))
 			{
@@ -197,8 +197,8 @@ source ', $prefix, '_source
 				CASE WHEN t.is_sticky = 0 THEN 0 ELSE 1 END * ' . $weight['sticky'] . ' \
 			) * 100/' . $weight_total . ') AS acprel \
 		FROM ', $db_prefix, 'messages AS m \
-		 	INNER JOIN ', $db_prefix, 'topics AS t ON (m.id_topic = t.id_topic) \
-		 	INNER JOIN ', $db_prefix, 'settings AS s \
+			INNER JOIN ', $db_prefix, 'topics AS t ON (m.id_topic = t.id_topic) \
+			INNER JOIN ', $db_prefix, 'settings AS s \
 		WHERE t.id_topic = m.id_topic \
 			AND s.variable = \'maxMsgID\' \
 			AND m.id_msg BETWEEN $start AND $end
@@ -229,23 +229,23 @@ source ', $prefix, '_delta_source : ', $prefix, '_source
 ## index definition
 index ', $prefix, '_base_index
 {
-	html_strip		 	= 1
+	html_strip			= 1
 	min_prefix_len		= 3
 	min_stemming_len	= 4
 	stopwords_unstemmed	= 1
 	index_exact_words	= 1
 	index_field_lengths	= 1
 	expand_keywords		= 1
-	regexp_filter 		= \b(\d+)[.-/]+(\d+)\b => \1_\2
+	regexp_filter		= \b(\d+)[.-/]+(\d+)\b => \1_\2
 	blend_chars			= +, &, U+23, -, !, @
 	blend_mode			= trim_head | trim_none
-	source			 	= ', $prefix, '_source
-	path			 	= ', $modSettings['sphinx_data_path'], '/', $prefix, '_sphinx_base.index', empty($modSettings['sphinx_stopword_path']) ? '' : '
-	stopwords		 	= ', $modSettings['sphinx_stopword_path'], '
-	min_word_len	 	= 2
+	source				= ', $prefix, '_source
+	path				= ', $modSettings['sphinx_data_path'], '/', $prefix, '_sphinx_base.index', empty($modSettings['sphinx_stopword_path']) ? '' : '
+	stopwords			= ', $modSettings['sphinx_stopword_path'], '
+	min_word_len		= 2
 	charset_table		= 0..9, A..Z->a..z, _, a..z, U+451->U+435, U+401->U+435, U+410..U+42F->U+430..U+44F, U+430..U+44F
-	ignore_chars	 	= U+AD
-	morphology       	= stem_en, soundex
+	ignore_chars		= U+AD
+	morphology			= stem_en, soundex
 }
 
 index ', $prefix, '_delta_index : ', $prefix, '_base_index
@@ -309,11 +309,13 @@ function alterFullTextIndex($table, $indexes, $add = false)
 	{
 		foreach ($indexes as $index)
 		{
+			$name = str_replace(',', '_', $index);
 			$db->query('', '
 				ALTER TABLE ' . $table . '
-				ADD FULLTEXT {raw:name} ({raw:name})',
+				ADD FULLTEXT {raw:name} ({raw:index})',
 				array(
-					'name' => $index
+					'index' => $index,
+					'name'	=> $name
 				)
 			);
 		}
@@ -474,15 +476,15 @@ function removeCommonWordsFromIndex($start)
 	$stop = time() + 3;
 	$max_occurrences = ceil(60 * $modSettings['totalMessages'] / 100);
 	$complete = false;
-   	$step_size = 100000000;
-   	$max_size = 4294967295; // FFFF FFFF
+	$step_size = 100000000;
+	$max_size = 4294967295; // FFFF FFFF
 
 	while (time() < $stop)
 	{
 		// Find indexed words that appear to often
 		$db->fetchQuery('
 			SELECT
-			 	id_word, COUNT(id_word) AS num_words, id_msg
+				id_word, COUNT(id_word) AS num_words, id_msg
 			FROM {db_prefix}log_search_words
 			WHERE id_word BETWEEN {int:starting_id} AND {int:ending_id}
 			GROUP BY id_word
