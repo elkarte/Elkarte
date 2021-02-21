@@ -13,7 +13,6 @@
 namespace ElkArte\Http;
 
 use ElkArte\HttpReq;
-use ElkArte\Notifications;
 
 class Headers
 {
@@ -100,30 +99,8 @@ class Headers
 	 */
 	public function send()
 	{
-		$this->maintance();
+		handleMaintance();
 		$this->sendHeaders();
-	}
-
-	/**
-	 * Do some maintance such as sending notifications, queuing mail, tracking stats
-	 */
-	public function maintance()
-	{
-		global $context;
-
-		// Lets stay on top of our mail queue by writing anything new to the db
-		if (!empty($context['flush_mail']))
-		{
-			// @todo this relies on 'flush_mail' being only set in AddMailQueue itself... :\
-			require_once(SUBSDIR . '/Mail.subs.php');
-			AddMailQueue(true);
-		}
-
-		// And send any notifications that have queued
-		Notifications::instance()->send();
-
-		// Clear out the stat cache.
-		trackStats();
 	}
 
 	/**
