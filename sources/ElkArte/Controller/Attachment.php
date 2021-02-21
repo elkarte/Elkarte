@@ -23,6 +23,7 @@ use ElkArte\Exceptions\Exception;
 use ElkArte\Graphics\TextImage;
 use ElkArte\Graphics\Image;
 use ElkArte\AttachmentsDirectory;
+use ElkArte\Http\Headers;
 use ElkArte\TemporaryAttachmentsList;
 use ElkArte\Themes\ThemeLoader;
 use ElkArte\User;
@@ -109,7 +110,7 @@ class Attachment extends AbstractController
 		global $context, $modSettings, $txt;
 
 		$resp_data = array();
-		\ElkArte\Themes\ThemeLoader::loadLanguageFile('Errors');
+		ThemeLoader::loadLanguageFile('Errors');
 		$context['attachments']['can']['post'] = !empty($modSettings['attachmentEnable']) && $modSettings['attachmentEnable'] == 1 && (allowedTo('post_attachment') || ($modSettings['postmod_active'] && allowedTo('post_unapproved_attachments')));
 
 		// Set up the template details
@@ -129,7 +130,7 @@ class Attachment extends AbstractController
 		// We should have files, otherwise why are we here?
 		if (isset($_FILES['attachment']))
 		{
-			\ElkArte\Themes\ThemeLoader::loadLanguageFile('Post');
+			ThemeLoader::loadLanguageFile('Post');
 
 			$attach_errors = AttachmentErrorContext::context();
 			$attach_errors->activate();
@@ -204,7 +205,7 @@ class Attachment extends AbstractController
 		// Make sure the session is valid
 		if (checkSession('request', '', false) !== '')
 		{
-			\ElkArte\Themes\ThemeLoader::loadLanguageFile('Errors');
+			ThemeLoader::loadLanguageFile('Errors');
 			$context['json_data'] = array('result' => false, 'data' => $txt['session_timeout']);
 
 			return false;
@@ -250,13 +251,13 @@ class Attachment extends AbstractController
 
 			if ($result !== true)
 			{
-				\ElkArte\Themes\ThemeLoader::loadLanguageFile('Errors');
+				ThemeLoader::loadLanguageFile('Errors');
 				$context['json_data'] = array('result' => false, 'data' => $txt[!empty($result) ? $result : 'attachment_not_found']);
 			}
 		}
 		else
 		{
-			\ElkArte\Themes\ThemeLoader::loadLanguageFile('Errors');
+			ThemeLoader::loadLanguageFile('Errors');
 			$context['json_data'] = array('result' => false, 'data' => $txt['attachment_not_found']);
 		}
 	}
@@ -418,31 +419,8 @@ class Attachment extends AbstractController
 			}
 		}
 
-		$this->_send_headers($filename, $eTag, $mime_type, $use_compression, $disposition, $real_filename, $do_cache);
-
-		// Since we don't do output compression for files this large...
-		if (filesize($filename) > 4194304)
-		{
-			// Forcibly end any output buffering going on.
-			while (ob_get_level() > 0)
-			{
-				@ob_end_clean();
-			}
-
-			$fp = fopen($filename, 'rb');
-			while (!feof($fp))
-			{
-				echo fread($fp, 8192);
-
-				flush();
-			}
-			fclose($fp);
-		}
-		// On some of the less-bright hosts, readfile() is disabled.  It's just a faster, more byte safe, version of what's in the if.
-		elseif (@readfile($filename) === null)
-		{
-			echo file_get_contents($filename);
-		}
+		$this->prepare_headers($filename, $eTag, $mime_type, $use_compression, $disposition, $real_filename, $do_cache);
+		$this->send_file($filename, $mime_type);
 
 		obExit(false);
 	}
@@ -460,7 +438,7 @@ class Attachment extends AbstractController
 		if ($text === null)
 		{
 			new ThemeLoader();
-			\ElkArte\Themes\ThemeLoader::loadLanguageFile('Errors');
+			ThemeLoader::loadLanguageFile('Errors');
 			$text = $txt['attachment_not_found'];
 		}
 
@@ -474,10 +452,38 @@ class Attachment extends AbstractController
 			throw new Exception('no_access', false);
 		}
 
-		$this->_send_headers('no_image', 'no_image', 'image/png', false, 'inline', 'no_image.png', true, false);
+		$this->prepare_headers('no_image', 'no_image', 'image/png', false, 'inline', 'no_image.png', true, false);
+		Headers::instance()->sendHeaders();
 		echo $img;
 
 		obExit(false);
+	}
+
+	/**
+	 * If the mime type benefits from compression e.g. text/xyz and gzencode is
+	 * available and the user agent accpets gzip, then return true, else false
+	 *
+	 * @param string $mime_type
+	 * @return bool if we should compress the file
+	 */
+	public function useCompression($mime_type)
+	{
+		global $modSettings;
+
+		// Not compressible, or not supported / requested by client
+		if (!preg_match('~^(?:text/|application/(?:json|xml|rss\+xml)$)~i', $mime_type)
+			|| strpos($_SERVER['HTTP_ACCEPT_ENCODING'], 'gzip') === false)
+		{
+			return false;
+		}
+
+		// Support is available on the server
+		if (!function_exists('gzencode') && !empty($modSettings['enableCompressedOutput']))
+		{
+			return false;
+		}
+
+		return true;
 	}
 
 	/**
@@ -492,19 +498,23 @@ class Attachment extends AbstractController
 	 * @param bool $do_cache If send the a max-age header or not
 	 * @param bool $check_filename When false, any check on $filename is skipped
 	 */
-	protected function _send_headers($filename, $eTag, $mime_type, $use_compression, $disposition, $real_filename, $do_cache, $check_filename = true)
+	public function prepare_headers($filename, $eTag, $mime_type, $use_compression, $disposition, $real_filename, $do_cache, $check_filename = true)
 	{
 		global $txt;
 
-		obStart($use_compression);
+		$headers = Headers::instance();
 
 		// No point in a nicer message, because this is supposed to be an attachment anyway...
 		if ($check_filename && !file_exists($filename))
 		{
-			\ElkArte\Themes\ThemeLoader::loadLanguageFile('Errors');
+			ThemeLoader::loadLanguageFile('Errors');
 
-			header((preg_match('~HTTP/1\.[01]~i', $this->_req->server->SERVER_PROTOCOL) ? $this->_req->server->SERVER_PROTOCOL : 'HTTP/1.0') . ' 404 Not Found');
-			header('Content-Type: text/plain; charset=UTF-8');
+			$protocol = preg_match('~HTTP/1\.[01]~i', $this->_req->server->SERVER_PROTOCOL) ? $this->_req->server->SERVER_PROTOCOL : 'HTTP/1.0';
+			$headers
+				->httpCode(404)
+				->headerSpecial($protocol . ' 404 Not Found')
+				->contentType('')
+				->sendHeaders();
 
 			// We need to die like this *before* we send any anti-caching headers as below.
 			die('404 - ' . $txt['attachment_not_found']);
@@ -519,7 +529,10 @@ class Attachment extends AbstractController
 				@ob_end_clean();
 
 				// Answer the question - no, it hasn't been modified ;).
-				header('HTTP/1.1 304 Not Modified');
+				$headers
+					->removeHeader('all')
+					->headerSpecial('HTTP/1.1 304 Not Modified')
+					->sendHeaders();
 				exit;
 			}
 		}
@@ -529,38 +542,35 @@ class Attachment extends AbstractController
 		{
 			@ob_end_clean();
 
-			header('HTTP/1.1 304 Not Modified');
+			$headers
+				->removeHeader('all')
+				->headerSpecial('HTTP/1.1 304 Not Modified')
+				->sendHeaders();
 			exit;
 		}
 
 		// Send the attachment headers.
-		header('Expires: ' . gmdate('D, d M Y H:i:s', time() + 525600 * 60) . ' GMT');
-		header('Last-Modified: ' . gmdate('D, d M Y H:i:s', $check_filename ? filemtime($filename) : time() - 525600 * 60) . ' GMT');
-		header('Accept-Ranges: bytes');
-		header('Connection: close');
-		header('ETag: ' . $eTag);
-
-		if (!empty($mime_type) && strpos($mime_type, 'image/') === 0)
-		{
-			header('Content-Type: ' . $mime_type);
-		}
-		else
-		{
-			header('Content-Type: application/octet-stream');
-		}
+		$headers
+			->header('Expires', gmdate('D, d M Y H:i:s', time() + 525600 * 60) . ' GMT')
+			->header('Last-Modified', gmdate('D, d M Y H:i:s', $check_filename ? filemtime($filename) : time() - 525600 * 60) . ' GMT')
+			->header('Accept-Ranges', 'bytes')
+			->header('Connection', 'close')
+			->header('ETag', $eTag);
 
 		// Different browsers like different standards...
-		$this->setDownloadFileNameHeader($real_filename, $disposition);
+		$headers->setAttachmentFileParams($mime_type, $real_filename, $disposition);
 
 		// If this has an "image extension" - but isn't actually an image - then ensure it isn't cached cause of silly IE.
 		if ($do_cache)
 		{
-			header('Cache-Control: max-age=' . (525600 * 60) . ', private');
+			$headers
+				->header('Cache-Control', 'max-age=' . (525600 * 60) . ', private');
 		}
 		else
 		{
-			header('Pragma: no-cache');
-			header('Cache-Control: no-cache');
+			$headers
+				->header('Pragma', 'no-cache')
+				->header('Cache-Control', 'no-cache');
 		}
 
 		// Try to buy some time...
@@ -568,27 +578,35 @@ class Attachment extends AbstractController
 	}
 
 	/**
-	 * Set the proper filename header
+	 * Sends the requested file to the user.  If the file is compressible e.g.
+	 * has a mine type of text/??? may compress the file prior to sending.
 	 *
-	 * @param string $fileName
-	 * @param string $disposition 'inline' or'attachment'
+	 * @param string $filename
+	 * @param string $mime_type
 	 */
-	public function setDownloadFileNameHeader($fileName, $disposition)
+	public function send_file($filename, $mime_type)
 	{
-		$fileName = str_replace('"', '', $fileName);
+		$headers = Headers::instance();
+		$body = file_get_contents($filename);
+		$use_compression = $this->useCompression($mime_type);
 
-		// Send as UTF-8 if the name warrants that
-		$altNamePart = '';
-		if (preg_match('/[\x80-\xFF]/', $fileName))
+		// If we can/should compress this file
+		if ($use_compression && strlen($body) > 250)
 		{
-			$altNamePart = "; filename*=UTF-8''" . rawurlencode($fileName);
+			$body = gzencode($body, 2);
+			$headers
+				->header('Content-Encoding', 'gzip')
+				->header('Vary', 'Accept-Encoding');
 		}
 
-		header('Content-Disposition: ' . $disposition . '; filename="' . $fileName . '"' . $altNamePart);
+		// Someone is getting a present
+		$headers->header('Content-Length', strlen($body));
+		$headers->send();
+		echo $body;
 	}
 
 	/**
-	 * Simplified version of action_dlattach to send out thumbnails while creating
+	 * "Simplified", cough, version of action_dlattach to send out thumbnails while creating
 	 * or editing a message.
 	 */
 	public function action_tmpattach()
@@ -661,7 +679,7 @@ class Attachment extends AbstractController
 		$use_compression = !empty($modSettings['enableCompressedOutput']) && @filesize($filename) <= 4194304 && in_array($file_ext, $compressible_files);
 		$do_cache = !(!isset($this->_req->query->image) && getValidMimeImageType($file_ext) !== '');
 
-		$this->_send_headers($filename, $eTag, $mime_type, $use_compression, 'inline', $real_filename, $do_cache);
+		$this->prepare_headers($filename, $eTag, $mime_type, $use_compression, 'inline', $real_filename, $do_cache);
 
 		if ($resize)
 		{
@@ -671,17 +689,12 @@ class Attachment extends AbstractController
 			$thumb_filename = $filename . '_thumb';
 			$thumb_image = $image->createThumbnail(100, 100, $thumb_filename);
 
-			if (!$use_compression)
-			{
-				header('Content-Length: ' . $thumb_image->getFilesize());
-			}
+			Headers::instance()->header('Content-Length', $thumb_image->getFilesize())->sendHeaders();
 
 			if (@readfile($thumb_filename) === null)
 			{
 				echo file_get_contents($thumb_filename);
 			}
-
-
 		}
 
 		obExit(false);
