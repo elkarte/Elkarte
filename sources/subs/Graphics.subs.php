@@ -18,6 +18,7 @@
  *
  */
 
+use ElkArte\Http\Headers;
 use ElkArte\User;
 
 /**
@@ -418,12 +419,12 @@ function showCodeImage($code)
 	// Show the image.
 	if (function_exists('imagepng'))
 	{
-		header('Content-type: image/png');
+		Headers::instance()->contentType('image/png')->sendHeaders();
 		imagepng($code_image);
 	}
 	else
 	{
-		header('Content-type: image/gif');
+		Headers::instance()->contentType('image/gif')->sendHeaders();
 		imagegif($code_image);
 	}
 

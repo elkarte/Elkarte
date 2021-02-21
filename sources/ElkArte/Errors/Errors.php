@@ -333,14 +333,16 @@ class Errors extends AbstractModel
 	private function _set_fatal_error_headers()
 	{
 		// Don't cache this page!
-		header('Expires: Mon, 26 Jul 1997 05:00:00 GMT');
-		header('Last-Modified: ' . gmdate('D, d M Y H:i:s') . ' GMT');
-		header('Cache-Control: no-cache');
-
-		// Send the right error codes.
-		header('HTTP/1.1 503 Service Temporarily Unavailable');
-		header('Status: 503 Service Temporarily Unavailable');
-		header('Retry-After: 3600');
+		\ElkArte\Http\Headers::instance()
+			->httpCode(503)
+			->header('Expires', 'Mon, 26 Jul 1997 05:00:00 GMT')
+			->header('Last-Modified', gmdate('D, d M Y H:i:s') . ' GMT')
+			->header('Cache-Control', 'no-cache')
+			->contentType('text/html', 'UTF-8')
+			->headerSpecial('HTTP/1.1 503 Service Temporarily Unavailable')
+			->header('Status', '503 Service Temporarily Unavailable')
+			->header('Retry-After', '3600')
+			->sendHeaders();
 	}
 
 	/**

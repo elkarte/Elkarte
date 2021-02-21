@@ -177,7 +177,9 @@ class Bootstrap
 				$host = empty($_SERVER['HTTP_HOST']) ? $_SERVER['SERVER_NAME'] . $port : $_SERVER['HTTP_HOST'];
 				$path = strtr(dirname($_SERVER['PHP_SELF']), '\\', '/') == '/' ? '' : strtr(dirname($_SERVER['PHP_SELF']), '\\', '/');
 
-				header('Location:' . $proto . '://' . $host . $path . '/install/' . $redirec_file . '?v=' . $version_running);
+				\ElkArte\Http\Headers::instance()
+					->header('Location', $proto . '://' . $host . $path . '/install/' . $redirec_file . '?v=' . $version_running)
+					->sendHeaders();
 				die();
 			}
 		}
@@ -394,12 +396,6 @@ class Bootstrap
 		if (!defined('STDIN'))
 		{
 			loadBadBehavior();
-		}
-
-		// @todo: probably not the best place, but somewhere it should be set...
-		if (!headers_sent())
-		{
-			header('Content-Type: text/html; charset=UTF-8');
 		}
 
 		// Take care of any banning that needs to be done.

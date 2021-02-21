@@ -161,8 +161,6 @@ class Server extends \ArrayObject
 				return $this->_is_web_server('lighttpd');
 			case 'litespeed':
 				return $this->_is_web_server('LiteSpeed');
-			case 'needs_login_fix':
-				return $this->is('cgi') && $this->_is_web_server('Microsoft-IIS');
 			case 'nginx':
 				return $this->_is_web_server('nginx');
 			case 'windows':

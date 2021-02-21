@@ -19,6 +19,7 @@ use ElkArte\Censor;
 use ElkArte\Debug;
 use ElkArte\GenericList;
 use ElkArte\Hooks;
+use ElkArte\Http\Headers;
 use ElkArte\Notifications;
 use ElkArte\Search\Search;
 use ElkArte\UrlGenerator\UrlGenerator;
@@ -523,47 +524,14 @@ function pc_next_permutation($p, $size)
  *
  * - Makes sure the browser doesn't come back and repost the form data.
  * - Should be used whenever anything is posted.
- * - Calls AddMailQueue to process any mail queue items its can
- * - Calls call_integration_hook integrate_redirect before headers are sent
  * - Diverts final execution to obExit() which means a end to processing and sending of final output
  *
  * @event integrate_redirect called before headers are sent
  * @param string $setLocation = '' The URL to redirect to
- * @param bool $refresh = false, enable to send a refresh header, default is a location header
  */
-function redirectexit($setLocation = '', $refresh = false)
+function redirectexit($setLocation = '')
 {
-	global $scripturl, $context, $db_show_debug;
-
-	// In case we have mail to send, better do that - as obExit doesn't always quite make it...
-	if (!empty($context['flush_mail']))
-	{
-		// @todo this relies on 'flush_mail' being only set in AddMailQueue itself... :\
-		AddMailQueue(true);
-	}
-
-	Notifications::instance()->send();
-
-	$add = preg_match('~^(ftp|http)[s]?://~', $setLocation) == 0 && substr($setLocation, 0, 6) !== 'about:';
-
-	if ($add)
-	{
-		$setLocation = $scripturl . ($setLocation !== '' ? '?' . $setLocation : '');
-	}
-
-	// Put the session ID in.
-	if (empty($_COOKIE) && defined('SID') && SID != '')
-	{
-		$setLocation = preg_replace('/^' . preg_quote($scripturl, '/') . '(?!\?' . preg_quote(SID, '/') . ')\\??/', $scripturl . '?' . SID . ';', $setLocation);
-	}
-	// Keep that debug in their for template debugging!
-	elseif (isset($_GET['debug']))
-	{
-		$setLocation = preg_replace('/^' . preg_quote($scripturl, '/') . '\\??/', $scripturl . '?debug;', $setLocation);
-	}
-
-	// Maybe integrations want to change where we are heading?
-	call_integration_hook('integrate_redirect', array(&$setLocation, &$refresh));
+	global $db_show_debug;
 
 	// Allow a way for phpunit to run controller methods, pretty? no but allows us to return to the test
 	if (defined('PHPUNITBOOTSTRAP') && defined('STDIN'))
@@ -571,15 +539,11 @@ function redirectexit($setLocation = '', $refresh = false)
 		return;
 	}
 
-	// We send a Refresh header only in special cases because Location looks better. (and is quicker...)
-	if ($refresh)
-	{
-		header('Refresh: 0; URL=' . strtr($setLocation, array(' ' => '%20')));
-	}
-	else
-	{
-		header('Location: ' . str_replace(' ', '%20', $setLocation));
-	}
+	// Send headers, call integration, do maintance
+	Headers::instance()
+		->removeHeader('all')
+		->redirect($setLocation)
+		->send();
 
 	// Debugging.
 	if ($db_show_debug === true)
@@ -624,27 +588,14 @@ function obExit($header = null, $do_footer = null, $from_index = false, $from_fa
 		$has_fatal_error = true;
 	}
 
-	// Clear out the stat cache.
-	trackStats();
-
-	Notifications::instance()->send();
-
-	// If we have mail to send, send it.
-	if (!empty($context['flush_mail']))
-		// @todo this relies on 'flush_mail' being only set in AddMailQueue itself... :\
-	{
-		AddMailQueue(true);
-	}
-
-	$do_header = $header === null ? !$header_done : $header;
-	if ($do_footer === null)
-	{
-		$do_footer = $do_header;
-	}
+	$do_header = $header ?? !$header_done;
+	$do_footer = $do_footer ?? $do_header;
 
 	// Has the template/header been done yet?
 	if ($do_header)
 	{
+		handleMaintance();
+
 		// Was the page title set last minute? Also update the HTML safe one.
 		if (!empty($context['page_title']) && empty($context['page_title_html_safe']))
 		{
@@ -699,6 +650,27 @@ function obExit($header = null, $do_footer = null, $from_index = false, $from_fa
 	if (!$from_index)
 	{
 		exit;
+	}
+}
+
+/**
+ * Takes care of a few dynamic maintenance items
+ */
+function handleMaintance()
+{
+	global $context;
+
+	// Clear out the stat cache.
+	trackStats();
+
+	// Send off any notifications accumulated
+	Notifications::instance()->send();
+
+	// Queue any mail that needs to be sent
+	if (!empty($context['flush_mail']))
+	{
+		// @todo this relies on 'flush_mail' being only set in AddMailQueue itself... :\
+		AddMailQueue(true);
 	}
 }
 
@@ -1869,13 +1841,15 @@ function dieGif($expired = false)
 		die();
 	}
 
+	$headers = Headers::instance();
 	if ($expired)
 	{
-		header('Expires: Mon, 26 Jul 1997 05:00:00 GMT');
-		header('Last-Modified: ' . gmdate('D, d M Y H:i:s') . ' GMT');
+		$headers
+			->header('Expires', 'Mon, 26 Jul 1997 05:00:00 GMT')
+			->header('Last-Modified', gmdate('D, d M Y H:i:s') . ' GMT');
 	}
 
-	header('Content-Type: image/gif');
+	$headers->contentType('image/gif')->sendHeaders();
 	die("\x47\x49\x46\x38\x39\x61\x01\x00\x01\x00\x80\x00\x00\x00\x00\x00\x00\x00\x00\x21\xF9\x04\x01\x00\x00\x00\x00\x2C\x00\x00\x00\x00\x01\x00\x01\x00\x00\x02\x02\x44\x01\x00\x3B");
 }
 
@@ -1899,7 +1873,7 @@ function obStart($use_compression = false)
 	else
 	{
 		ob_start();
-		header('Content-Encoding: none');
+		Headers::instance()->header('Content-Encoding', 'none');
 	}
 }
 

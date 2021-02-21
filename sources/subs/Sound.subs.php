@@ -17,6 +17,7 @@
  */
 
 use ElkArte\Cache\Cache;
+use ElkArte\Http\Headers;
 use ElkArte\User;
 
 /**
@@ -88,7 +89,6 @@ function createWaveFile($word)
 					}
 				}
 				break;
-
 			case 1:
 				for ($j = 0, $n = strlen($sound_letter) - 1; $j < $n; $j += 2)
 				{
@@ -96,7 +96,6 @@ function createWaveFile($word)
 				}
 				$sound_word .= str_repeat($sound_letter[$n], 2);
 				break;
-
 			case 2:
 				$shift = 0;
 				for ($j = 0, $n = strlen($sound_letter); $j < $n; $j++)
@@ -141,19 +140,23 @@ function createWaveFile($word)
 	}
 
 	// Set up our headers
-	header('Content-Encoding: none');
-	header('Content-Duration: ' . round($time, 0));
-	header('Content-Disposition: inline; filename="captcha.wav"');
-	header('Content-Type: audio/x-wav');
-	header('Cache-Control: no-cache');
-	header('Expires: ' . gmdate('D, d M Y H:i:s', time() + 525600 * 60) . ' GMT');
-	header('Accept-Ranges: bytes');
+	$headers = Headers::instance();
+	$headers
+		->header('Content-Encoding', 'none')
+		->header('Content-Duration', round($time, 0))
+		->header('Content-Disposition', 'inline; filename="captcha.wav"')
+		->contentType('audio/x-wav', '')
+		->header('Cache-Control', 'no-cache')
+		->header('Expires', gmdate('D, d M Y H:i:s', time() + 525600 * 60) . ' GMT')
+		->header('Accept-Ranges', 'bytes');
 
 	// Output the wav.
 	$range = set_range(strlen($wav));
 	$length = $range[1] - $range[0] + 1;
 	$stub = substr($wav, $range[0], $length);
-	header('Content-Length: ' . strlen($stub));
+	$headers
+		->header('Content-Length', strlen($stub))
+		->sendHeaders();
 	echo $stub;
 
 	return true;
@@ -194,8 +197,9 @@ function set_range($file_size)
 			$range = array($file_size - intval($matches[2]), $file_size - 1);
 		}
 
-		header('HTTP/1.1 206 Partial Content');
-		header('Content-Range: bytes ' . $range[0] . '-' . $range[1] . '/' . $file_size);
+		Headers::instance()
+			->headerSpecial('HTTP/1.1 206 Partial Content')
+			->header('Content-Range', 'bytes ' . $range[0] . '-' . $range[1] . '/' . $file_size);
 	}
 
 	return $range;

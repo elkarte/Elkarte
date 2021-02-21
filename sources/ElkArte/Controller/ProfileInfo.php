@@ -23,6 +23,7 @@ use ElkArte\Action;
 use ElkArte\Exceptions\Exception;
 use ElkArte\MembersList;
 use ElkArte\MessagesDelete;
+use ElkArte\Themes\ThemeLoader;
 use ElkArte\Util;
 
 /**
@@ -80,7 +81,7 @@ class ProfileInfo extends AbstractController
 		}
 		$this->_profile->loadContext();
 
-		\ElkArte\Themes\ThemeLoader::loadLanguageFile('Profile');
+		ThemeLoader::loadLanguageFile('Profile');
 	}
 
 	/**
@@ -123,7 +124,7 @@ class ProfileInfo extends AbstractController
 		global $context, $modSettings;
 
 		theme()->getTemplates()->load('ProfileInfo');
-		\ElkArte\Themes\ThemeLoader::loadLanguageFile('Profile');
+		ThemeLoader::loadLanguageFile('Profile');
 
 		// Set a canonical URL for this page.
 		$context['canonical_url'] = getUrl('action', ['action' => 'profile', 'u' => $this->_memID]);
@@ -280,7 +281,7 @@ class ProfileInfo extends AbstractController
 	}
 
 	/**
-	 * Gives there spam level as a posts per day kind of statistic
+	 * Gives their spam level as a posts per day kind of statistic
 	 */
 	private function _determine_posts_per_day()
 	{
@@ -359,7 +360,7 @@ class ProfileInfo extends AbstractController
 		{
 			include_once(SUBSDIR . '/Who.subs.php');
 			$action = determineActions($this->_profile['url']);
-			\ElkArte\Themes\ThemeLoader::loadLanguageFile('index');
+			ThemeLoader::loadLanguageFile('index');
 
 			if ($action !== false)
 			{
@@ -1061,8 +1062,8 @@ class ProfileInfo extends AbstractController
 		// Verify if the user has sufficient permissions.
 		isAllowedTo('manage_permissions');
 
-		\ElkArte\Themes\ThemeLoader::loadLanguageFile('ManagePermissions');
-		\ElkArte\Themes\ThemeLoader::loadLanguageFile('Admin');
+		ThemeLoader::loadLanguageFile('ManagePermissions');
+		ThemeLoader::loadLanguageFile('Admin');
 		theme()->getTemplates()->load('ManageMembers');
 		theme()->getTemplates()->load('ProfileInfo');
 
@@ -1258,7 +1259,6 @@ class ProfileInfo extends AbstractController
 		checkSession('get');
 
 		// Need the ProfileInfo and Index (for helper functions) templates
-		theme()->getTemplates()->load('Index');
 		theme()->getTemplates()->load('ProfileInfo');
 
 		// Prep for a buddy check
@@ -1267,7 +1267,6 @@ class ProfileInfo extends AbstractController
 
 		// This is returned only for ajax request to a jqueryUI tab
 		theme()->getLayers()->removeAll();
-		header('Content-Type: text/html; charset=UTF-8');
 
 		// Some buddies for you
 		if (in_array('buddies', $this->_summary_areas))
@@ -1285,21 +1284,22 @@ class ProfileInfo extends AbstractController
 		global $context, $modSettings;
 
 		// Would you be mine? Could you be mine? Be my buddy :D
-		$context['buddies'] = array();
+		$context['buddies'] = [];
 		if (!empty($modSettings['enable_buddylist'])
 			&& $context['user']['is_owner']
 			&& !empty($this->user->buddies)
 			&& in_array('buddies', $this->_summary_areas))
 		{
-			MembersList::load($this->user->buddies, false, 'profile');
-
-			// Get the info for this buddy
-			foreach ($this->user->buddies as $buddy)
+			if (MembersList::load($this->user->buddies, false, 'profile'))
 			{
-				$member = MembersList::get($buddy);
-				$member->loadContext(true);
+				// Get the info for this buddy
+				foreach ($this->user->buddies as $buddy)
+				{
+					$member = MembersList::get($buddy);
+					$member->loadContext(true);
 
-				$context['buddies'][$buddy] = $member;
+					$context['buddies'][$buddy] = $member;
+				}
 			}
 		}
 	}
@@ -1326,7 +1326,6 @@ class ProfileInfo extends AbstractController
 
 		// Flush everything since we intend to return the information to an ajax handler
 		theme()->getLayers()->removeAll();
-		header('Content-Type: text/html; charset=UTF-8');
 
 		// So, just what have you been up to?
 		if (in_array('posts', $this->_summary_areas))

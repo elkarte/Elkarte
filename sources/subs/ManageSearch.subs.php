@@ -109,12 +109,14 @@ function createSphinxConfig()
 		@ob_end_clean();
 	}
 
-	header('Content-Encoding: none');
-	header('Pragma: no-cache');
-	header('Cache-Control: no-cache');
-	header('Connection: close');
-	header('Content-Disposition: attachment; filename="sphinx.conf"');
-	header('Content-Type: application/octet-stream');
+	\ElkArte\Http\Headers::instance()
+		->header('Content-Encoding', 'none')
+		->header('Pragma', 'no-cache')
+		->header('Cache-Control', 'no-cache')
+		->header('Connection', 'close')
+		->header('Content-Disposition', 'attachment; filename="sphinx.conf"')
+		->contentType('application/octet-stream', '')
+		->sendHeaders();
 
 	$weight_factors = array(
 		'age',

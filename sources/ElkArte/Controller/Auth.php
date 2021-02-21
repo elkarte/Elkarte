@@ -21,6 +21,8 @@ use ElkArte\AbstractController;
 use ElkArte\Cache\Cache;
 use ElkArte\Errors\Errors;
 use ElkArte\Exceptions\Exception;
+use ElkArte\Http\Headers;
+use ElkArte\Themes\ThemeLoader;
 use ElkArte\User;
 use ElkArte\UserSettingsLoader;
 use ElkArte\Util;
@@ -74,7 +76,7 @@ class Auth extends AbstractController
 		}
 
 		// Load the Login template/language file.
-		\ElkArte\Themes\ThemeLoader::loadLanguageFile('Login');
+		ThemeLoader::loadLanguageFile('Login');
 		theme()->getTemplates()->load('Login');
 		loadJavascriptFile('sha256.js', array('defer' => true));
 		$context['sub_template'] = 'login';
@@ -161,7 +163,7 @@ class Auth extends AbstractController
 			$modSettings['cookieTime'] = (int) $_POST['cookielength'];
 		}
 
-		\ElkArte\Themes\ThemeLoader::loadLanguageFile('Login');
+		ThemeLoader::loadLanguageFile('Login');
 
 		// Load the template stuff
 		theme()->getTemplates()->load('Login');
@@ -626,7 +628,7 @@ class Auth extends AbstractController
 		{
 			if (empty($_SESSION['logout_url']))
 			{
-				redirectexit('', detectServer()->is('needs_login_fix'));
+				redirectexit();
 			}
 			elseif (!empty($_SESSION['logout_url']) && (substr($_SESSION['logout_url'], 0, 7) !== 'http://' && substr($_SESSION['logout_url'], 0, 8) !== 'https://'))
 			{
@@ -638,7 +640,7 @@ class Auth extends AbstractController
 				$temp = $_SESSION['logout_url'];
 				unset($_SESSION['logout_url']);
 
-				redirectexit($temp, detectServer()->is('needs_login_fix'));
+				redirectexit($temp);
 			}
 		}
 	}
@@ -656,7 +658,7 @@ class Auth extends AbstractController
 	{
 		global $txt, $context;
 
-		\ElkArte\Themes\ThemeLoader::loadLanguageFile('Login');
+		ThemeLoader::loadLanguageFile('Login');
 		theme()->getTemplates()->load('Login');
 		loadJavascriptFile('sha256.js', array('defer' => true));
 		createToken('login');
@@ -684,13 +686,16 @@ class Auth extends AbstractController
 	{
 		global $txt, $mtitle, $mmessage, $context;
 
-		\ElkArte\Themes\ThemeLoader::loadLanguageFile('Login');
+		ThemeLoader::loadLanguageFile('Login');
 		theme()->getTemplates()->load('Login');
 		loadJavascriptFile('sha256.js', array('defer' => true));
 		createToken('login');
 
 		// Send a 503 header, so search engines don't bother indexing while we're in maintenance mode.
-		header('HTTP/1.1 503 Service Temporarily Unavailable');
+		Headers::instance()
+			->headerSpecial('HTTP/1.1 503 Service Temporarily Unavailable')
+			->header('Status', '503 Service Temporarily Unavailable')
+			->header('Retry-After', '3600');
 
 		// Basic template stuff..
 		$context['sub_template'] = 'maintenance';
@@ -892,11 +897,11 @@ function doLogin(UserSettingsLoader $user)
 	// Just log you back out if it's in maintenance mode and you AREN'T an admin.
 	if (empty($maintenance) || allowedTo('admin_forum'))
 	{
-		redirectexit('action=auth;sa=check;member=' . User::$info->id, detectServer()->is('needs_login_fix'));
+		redirectexit('action=auth;sa=check;member=' . User::$info->id);
 	}
 	else
 	{
-		redirectexit('action=logout;' . $context['session_var'] . '=' . $context['session_id'], detectServer()->is('needs_login_fix'));
+		redirectexit('action=logout;' . $context['session_var'] . '=' . $context['session_id']);
 	}
 }
 

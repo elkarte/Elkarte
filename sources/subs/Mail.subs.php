@@ -356,7 +356,6 @@ function sendmail($to, $subject, $message, $from = null, $message_id = null, $se
  * @param bool $is_private
  * @param string|null $message_id
  * @return bool
- * @throws \ElkArte\Exceptions\Exception
  * @package Mail
  */
 function AddMailQueue($flush = false, $to_array = array(), $subject = '', $message = '', $headers = '', $send_html = false, $priority = 3, $is_private = false, $message_id = '')

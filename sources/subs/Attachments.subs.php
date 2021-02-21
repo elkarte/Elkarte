@@ -1423,12 +1423,11 @@ function bindMessageAttachments($id_msg, $attachment_ids)
  * @param bool $new If this is a new attachment, if so just returns a hash
  * @param string $file_hash The file hash
  *
- * @return null|string|string[]
+ * @return string
  * @todo this currently returns the hash if new, and the full filename otherwise.
  * Something messy like that.
  * @todo and of course everything relies on this behavior and work around it. :P.
  * Converters included.
- * @throws \Exception
  */
 function getAttachmentFilename($filename, $attachment_id, $dir = null, $new = false, $file_hash = '')
 {

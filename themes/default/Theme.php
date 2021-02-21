@@ -20,6 +20,7 @@ use BBC\ParserWrapper;
 use ElkArte\Cache\Cache;
 use ElkArte\Controller\ScheduledTasks;
 use ElkArte\EventManager;
+use ElkArte\Http\Headers;
 use ElkArte\SiteCombiner;
 use ElkArte\Themes\Theme as BaseTheme;
 use ElkArte\Themes\ThemeLoader;
@@ -149,34 +150,25 @@ class Theme extends BaseTheme
 		doSecurityChecks();
 
 		$this->setupThemeContext();
+		$header = Headers::instance();
 
 		// Print stuff to prevent caching of pages (except on attachment errors, etc.)
 		if (empty($context['no_last_modified']))
 		{
-			header('Expires: Mon, 26 Jul 1997 05:00:00 GMT');
-			header('Last-Modified: ' . gmdate('D, d M Y H:i:s') . ' GMT');
-
-			if ($this->headerSent('Content-Type') === false && (!isset($_REQUEST['xml']) && !isset($_REQUEST['api'])))
-			{
-				header('Content-Type: text/html; charset=UTF-8');
-			}
+			$header
+				->header('Expires', 'Mon, 26 Jul 1997 05:00:00 GMT')
+				->header('Last-Modified',  gmdate('D, d M Y H:i:s') . ' GMT')
+				->contentType('text/html', 'UTF-8');
 		}
 
-		if ($this->headerSent('Content-Type') === false)
+		// Probably temporary ($_REQUEST['xml'] should be replaced by $_REQUEST['api'])
+		if (isset($_REQUEST['api']) && $_REQUEST['api'] === 'json')
 		{
-			// Probably temporary ($_REQUEST['xml'] should be replaced by $_REQUEST['api'])
-			if (isset($_REQUEST['api']) && $_REQUEST['api'] === 'json')
-			{
-				header('Content-Type: application/json; charset=UTF-8');
-			}
-			elseif (isset($_REQUEST['xml']) || isset($_REQUEST['api']))
-			{
-				header('Content-Type: text/xml; charset=UTF-8');
-			}
-			else
-			{
-				header('Content-Type: text/html; charset=UTF-8');
-			}
+			$header->contentType('application/json', 'UTF-8');
+		}
+		else
+		{
+			$header->contentType('text/html', 'UTF-8');
 		}
 
 		foreach ($this->getLayers()->prepareContext() as $layer)
@@ -190,27 +182,8 @@ class Theme extends BaseTheme
 			$settings['images_url'] = $settings['default_images_url'];
 			$settings['theme_dir'] = $settings['default_theme_dir'];
 		}
-	}
 
-	/**
-	 * Checks if a header of a given type has already been sent
-	 *
-	 * @param string $type
-	 *
-	 * @return bool
-	 */
-	protected function headerSent($type)
-	{
-		$sent = headers_list();
-		foreach ($sent as $header)
-		{
-			if (substr($header, 0, strlen($type)) === $type)
-			{
-				return true;
-			}
-		}
-
-		return false;
+		$header->sendHeaders();
 	}
 
 	/**
@@ -1032,7 +1005,7 @@ class Theme extends BaseTheme
 				}
 			}
 
-			
+
 			if ($cache->levelHigherThan(1))
 			{
 				$cache->put('menu_buttons-' . implode('_', $this->user->groups) . '-' . $this->user->language, $menu_buttons, $cacheTime);

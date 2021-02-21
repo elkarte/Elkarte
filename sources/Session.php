@@ -20,6 +20,7 @@
  *
  */
 
+use ElkArte\Http\Headers;
 use ElkArte\TokenHash;
 
 /**
@@ -114,7 +115,7 @@ function loadSession()
 		// Change it so the cache settings are a little looser than default.
 		if (!empty($modSettings['databaseSession_loose']) || (isset($_REQUEST['action']) && $_REQUEST['action'] == 'search'))
 		{
-			header('Cache-Control: private');
+			Headers::instance()->header('Cache-Control', 'private');
 		}
 	}
 
