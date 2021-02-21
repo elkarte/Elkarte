@@ -185,7 +185,7 @@ class Announce extends AbstractController
 			}
 			elseif (!empty($this->_req->post->goback))
 			{
-				redirectexit('topic=' . $topic . '.new;boardseen#new', isBrowser('ie'));
+				redirectexit('topic=' . $topic . '.new;boardseen#new');
 			}
 			else
 			{

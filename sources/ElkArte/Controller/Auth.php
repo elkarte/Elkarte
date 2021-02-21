@@ -626,7 +626,7 @@ class Auth extends AbstractController
 		{
 			if (empty($_SESSION['logout_url']))
 			{
-				redirectexit('', detectServer()->is('needs_login_fix'));
+				redirectexit();
 			}
 			elseif (!empty($_SESSION['logout_url']) && (substr($_SESSION['logout_url'], 0, 7) !== 'http://' && substr($_SESSION['logout_url'], 0, 8) !== 'https://'))
 			{
@@ -638,7 +638,7 @@ class Auth extends AbstractController
 				$temp = $_SESSION['logout_url'];
 				unset($_SESSION['logout_url']);
 
-				redirectexit($temp, detectServer()->is('needs_login_fix'));
+				redirectexit($temp);
 			}
 		}
 	}
@@ -690,7 +690,8 @@ class Auth extends AbstractController
 		createToken('login');
 
 		// Send a 503 header, so search engines don't bother indexing while we're in maintenance mode.
-		header('HTTP/1.1 503 Service Temporarily Unavailable');
+		\ElkArte\Http\Headers::instance()
+			->headerSpecial('HTTP/1.1 503 Service Temporarily Unavailable');
 
 		// Basic template stuff..
 		$context['sub_template'] = 'maintenance';
@@ -896,7 +897,7 @@ function doLogin(UserSettingsLoader $user)
 	}
 	else
 	{
-		redirectexit('action=logout;' . $context['session_var'] . '=' . $context['session_id'], detectServer()->is('needs_login_fix'));
+		redirectexit('action=logout;' . $context['session_var'] . '=' . $context['session_id']);
 	}
 }
 

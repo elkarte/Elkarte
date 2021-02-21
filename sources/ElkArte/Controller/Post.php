@@ -1433,11 +1433,11 @@ class Post extends AbstractController
 		// Return to post if the mod is on.
 		if (isset($_REQUEST['msg']) && !empty($_REQUEST['goback']))
 		{
-			redirectexit('topic=' . $topic . '.msg' . $_REQUEST['msg'] . '#msg' . $_REQUEST['msg'], isBrowser('ie'));
+			redirectexit('topic=' . $topic . '.msg' . $_REQUEST['msg'] . '#msg' . $_REQUEST['msg']);
 		}
 		elseif (!empty($_REQUEST['goback']))
 		{
-			redirectexit('topic=' . $topic . '.new#new', isBrowser('ie'));
+			redirectexit('topic=' . $topic . '.new#new');
 		}
 		// Dut-dut-duh-duh-DUH-duh-dut-duh-duh!  *dances to the Final Fantasy Fanfare...*
 		else

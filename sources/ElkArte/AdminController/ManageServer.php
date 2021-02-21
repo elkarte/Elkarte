@@ -318,7 +318,7 @@ class ManageServer extends AbstractController
 				$cookiename = $this->_req->post->cookiename;
 				setLoginCookie(60 * $modSettings['cookieTime'], (int) User::$settings['id_member'], hash('sha256', User::$settings['passwd'] . User::$settings['password_salt']));
 
-				redirectexit('action=admin;area=serversettings;sa=cookie;' . $context['session_var'] . '=' . $original_session_id, detectServer()->is('needs_login_fix'));
+				redirectexit('action=admin;area=serversettings;sa=cookie;' . $context['session_var'] . '=' . $original_session_id);
 			}
 
 			redirectexit('action=admin;area=serversettings;sa=cookie;' . $context['session_var'] . '=' . $context['session_id'] . ';msg=' . (!empty($context['settings_message']) ? $context['settings_message'] : 'core_settings_saved'));
