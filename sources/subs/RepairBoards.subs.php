@@ -366,9 +366,8 @@ function loadForumTests()
 				global $txt, $context;
 
 				// A pretend error?
-				if ($row['myid_first_msg'] == $row['myid_first_msg'] && $row['myid_first_msg'] == $row['myid_first_msg'] && $row['approved'] == $row['firstmsg_approved'])
+				if ($row['id_first_msg'] == $row['myid_first_msg'] && $row['id_last_msg'] == $row['myid_last_msg'] && $row['approved'] == $row['firstmsg_approved'])
 					return false;
-
 				if ($row['id_first_msg'] != $row['myid_first_msg'])
 					$context['repair_errors'][] = sprintf($txt['repair_stats_topics_1'], $row['id_topic'], $row['id_first_msg']);
 				if ($row['id_last_msg'] != $row['myid_last_msg'])

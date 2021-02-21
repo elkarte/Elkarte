@@ -12,7 +12,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.1
+ * @version 1.1.7
  *
  */
 
@@ -620,27 +620,35 @@ class DbTable_MySQL extends DbTable
 		$row = $this->_db->fetch_assoc($request);
 		$this->_db->free_result($request);
 
-		$data_before = isset($row['Data_free']) ? $row['Data_free'] : 0;
-		$request = $this->_db->query('', '
-			OPTIMIZE TABLE `{raw:table}`',
-			array(
-				'table' => $table,
-			)
-		);
-		if (!$request)
-			return -1;
+		// Optimize tables that will benefit from this operation.
+		if (isset($row['Engine']) && $row['Engine'] === 'MyISAM')
+		{
+			$data_before = isset($row['Data_free']) ? $row['Data_free'] : 0;
+			$request = $this->_db->query('', '
+				OPTIMIZE TABLE `{raw:table}`',
+				array(
+					'table' => $table,
+				)
+			);
+			if (!$request)
+				return -1;
 
-		// How much left?
-		$request = $this->_db->query('', '
-			SHOW TABLE STATUS LIKE {string:table}',
-			array(
-				'table' => str_replace('_', '\_', $table),
-			)
-		);
-		$row = $this->_db->fetch_assoc($request);
-		$this->_db->free_result($request);
+			// How much left?
+			$request = $this->_db->query('', '
+				SHOW TABLE STATUS LIKE {string:table}',
+				array(
+					'table' => str_replace('_', '\_', $table),
+				)
+			);
+			$row = $this->_db->fetch_assoc($request);
+			$this->_db->free_result($request);
 
-		$total_change = isset($row['Data_free']) && $data_before > $row['Data_free'] ? $data_before / 1024 : 0;
+			$total_change = isset($row['Data_free']) && $data_before > $row['Data_free'] ? $data_before / 1024 : 0;
+		}
+		else
+		{
+			$total_change = 0;
+		}
 
 		return $total_change;
 	}

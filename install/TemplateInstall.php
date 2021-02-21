@@ -538,7 +538,7 @@ function template_admin_account()
 			</tr><tr>
 				<td style="vertical-align: top;" class="textbox"><label for="email">', $txt['user_settings_email'], ':</label></td>
 				<td>
-					<input type="text" name="email" id="email" value="', $incontext['email'], '" size="40" class="input_text" />
+					<input type="email" name="email" id="email" value="', $incontext['email'], '" size="40" class="input_text" />
 					<div style="font-size: smaller; margin-bottom: 2ex;">', $txt['user_settings_email_info'], '</div>
 				</td>
 			</tr>

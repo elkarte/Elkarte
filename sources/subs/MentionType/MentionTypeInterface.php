@@ -89,7 +89,7 @@ interface Mention_Type_Interface
 	 * Used by the Notifications class to retrieve the notifications to send.
 	 *
 	 * @param array $lang_data
-	 * @param int[] $users
+	 * @param int[] $members
 	 *
 	 * @return mixed[] array(array(
 	 *                  id_member_to (int),
@@ -99,7 +99,7 @@ interface Mention_Type_Interface
 	 *                  last_id (int), ???
 	 *                ))
 	 */
-	public function getNotificationBody($lang_data, $users);
+	public function getNotificationBody($lang_data, $members);
 
 	/**
 	 * The Notifications_Task contains few data that may be necessary for the processing

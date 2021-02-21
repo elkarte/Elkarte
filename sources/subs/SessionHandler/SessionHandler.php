@@ -41,7 +41,7 @@ class SessionHandler extends \AbstractModel implements SessionHandlerInterface
 	/**
 	 * {@inheritdoc}
 	 */
-	public function gc($maxlifetime)
+	public function gc($maxLifetime)
 	{
 		return true;
 	}

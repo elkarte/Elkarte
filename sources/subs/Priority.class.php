@@ -7,7 +7,7 @@
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
- * @version 1.1.4
+ * @version 1.1.7
  *
  */
 
@@ -80,12 +80,12 @@ class Priority
 	/**
 	 * Add a new entity to the pile
 	 *
-	 * @param string   $entity name of a entity
+	 * @param string   $layer name of a entity
 	 * @param int|null $priority an integer defining the priority of the entity.
 	 */
-	public function add($entity, $priority = null)
+	public function add($layer, $priority = null)
 	{
-		$this->_all_general[$entity] = $priority === null
+		$this->_all_general[$layer] = $priority === null
 			? $this->_general_highest_priority
 			: (int) $priority;
 		$this->_general_highest_priority = max($this->_all_general) + 100;
@@ -94,12 +94,12 @@ class Priority
 	/**
 	 * Add an entity to the pile before another existing entity
 	 *
-	 * @param string $entity the name of a entity
+	 * @param string $layer the name of a entity
 	 * @param string $following the name of the entity before which $entity must be added
 	 */
-	public function addBefore($entity, $following)
+	public function addBefore($layer, $following)
 	{
-		$this->_all_before[$entity] = $following;
+		$this->_all_before[$layer] = $following;
 	}
 
 	/**

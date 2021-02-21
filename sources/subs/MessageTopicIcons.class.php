@@ -104,7 +104,7 @@ class MessageTopicIcons extends ElkArte\ValuesContainer
 		{
 			// Merge in additional ones
 			$custom_icons = array_map(function ($element) {
-				return $element['name'];
+				return $element['value'];
 			}, $this->_custom_icons);
 
 			$this->_stable_icons = array_merge($this->_stable_icons, $custom_icons);
@@ -126,18 +126,18 @@ class MessageTopicIcons extends ElkArte\ValuesContainer
 	/**
 	 * Return the icon specified by idx
 	 *
-	 * @param int|string $idx
+	 * @param int|string $key
 	 * @return string
 	 */
-	public function __get($idx)
+	public function __get($key)
 	{
 		// Not a standard topic icon
-		if (!isset($this->data[$idx]))
+		if (!isset($this->data[$key]))
 		{
-			$this->_setUrl($idx);
+			$this->_setUrl($key);
 		}
 
-		return $this->data[$idx]['url'];
+		return $this->data[$key]['url'];
 	}
 
 	/**

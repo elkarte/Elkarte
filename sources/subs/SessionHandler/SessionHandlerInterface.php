@@ -43,13 +43,13 @@ interface SessionHandlerInterface
 	/**
 	 * Cleanup old sessions
 	 *
-	 * @param   int  $maxlifetime  Sessions that have not updated for
-	 *                             the last maxlifetime seconds will be removed.
+	 * @param   int  $maxLifetime  Sessions that have not updated for
+	 *                             the last maxLifetime seconds will be removed.
 	 *
 	 * @return  bool  The return value (usually TRUE on success, FALSE on failure).
 	 *                Note this value is returned internally to PHP for processing.
 	 */
-	public function gc($maxlifetime);
+	public function gc($maxLifetime);
 
 	/**
 	 * Initialize session
