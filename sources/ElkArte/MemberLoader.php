@@ -140,6 +140,8 @@ class MemberLoader
 	 */
 	public function loadById($users, $set = MemberLoader::SET_NORMAL)
 	{
+		$users = array_filter(array_unique((array) $users));
+
 		// Can't just look for no users :P.
 		if (empty($users))
 		{
@@ -147,7 +149,6 @@ class MemberLoader
 		}
 
 		$this->set = $set;
-		$users = array_unique((array) $users);
 		$this->loaded_ids = [];
 		$this->loaded_members = [];
 
@@ -390,16 +391,16 @@ class MemberLoader
 	 */
 	public function loadByName($name, $set = MemberLoader::SET_NORMAL)
 	{
+		$users = array_filter(array_unique((array) $name));
+
 		// Can't just look for no users :P.
-		if (empty($name))
+		if (empty($users))
 		{
 			return false;
 		}
 
 		$this->set = $set;
-		$users = array_unique((array) $name);
 		$this->loaded_ids = [];
-
 		$this->loadByCondition('{column_case_insensitive:mem.member_name}' . (count($users) === 1 ? ' = {string_case_insensitive:users}' : ' IN ({array_string_case_insensitive:users})'), $users);
 
 		$this->loadModerators();

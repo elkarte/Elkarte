@@ -162,7 +162,8 @@ class UserSettingsLoader
 		if ($this->cache->levelLowerThan(2) || $this->cache->getVar($user_settings, 'user_settings-' . $this->id, 60) === false)
 		{
 			$this_user = $this->db->fetchQuery('
-				SELECT mem.*, COALESCE(a.id_attach, 0) AS id_attach, a.filename, a.attachment_type
+				SELECT 
+					mem.*, COALESCE(a.id_attach, 0) AS id_attach, a.filename, a.attachment_type
 				FROM {db_prefix}members AS mem
 					LEFT JOIN {db_prefix}attachments AS a ON (a.id_member = {int:id_member})
 				WHERE mem.id_member = {int:id_member}
@@ -400,7 +401,7 @@ class UserSettingsLoader
 			'mentions' => max(0, (int) $this->settings->mentions),
 			'unread_messages' => (int) $this->settings->unread_messages,
 			'total_time_logged_in' => (int) $this->settings->total_time_logged_in,
-			'buddies' => !empty($modSettings['enable_buddylist']) ? explode(',', (string) $this->settings->buddy_list) : [],
+			'buddies' => !empty($modSettings['enable_buddylist']) ? (!empty($this->settings->buddy_list) ? explode(',', (string) $this->settings->buddy_list) : []) : [],
 			'ignoreboards' => explode(',', (string) $this->settings->ignore_boards),
 			'ignoreusers' => explode(',', (string) $this->settings->pm_ignore_list),
 			'warning' => (int) $this->settings->warning,
