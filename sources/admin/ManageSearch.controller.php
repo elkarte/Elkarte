@@ -318,7 +318,7 @@ class ManageSearch_Controller extends Action_Controller
 			checkSession('get');
 			validateToken('admin-msm', 'get');
 
-			alterFullTextIndex('{db_prefix}messages', 'body', true);
+			alterFullTextIndex('{db_prefix}messages', array('body', 'subject', 'subject,body'), true);
 			$fulltext_index = true;
 		}
 		elseif ($this->_req->getQuery('sa', 'trim', '') === 'removefulltext' && !empty($fulltext_index))
