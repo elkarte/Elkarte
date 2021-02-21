@@ -17,6 +17,7 @@
  */
 
 use ElkArte\Cache\Cache;
+use ElkArte\Http\Headers;
 use ElkArte\User;
 
 /**
@@ -139,7 +140,7 @@ function createWaveFile($word)
 	}
 
 	// Set up our headers
-	$headers = \ElkArte\Http\Headers::instance();
+	$headers = Headers::instance();
 	$headers
 		->header('Content-Encoding', 'none')
 		->header('Content-Duration', round($time, 0))
@@ -196,7 +197,7 @@ function set_range($file_size)
 			$range = array($file_size - intval($matches[2]), $file_size - 1);
 		}
 
-		\ElkArte\Http\Headers::instance()
+		Headers::instance()
 			->headerSpecial('HTTP/1.1 206 Partial Content')
 			->header('Content-Range', 'bytes ' . $range[0] . '-' . $range[1] . '/' . $file_size);
 	}

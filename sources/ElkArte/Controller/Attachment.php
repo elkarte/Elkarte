@@ -509,9 +509,8 @@ class Attachment extends AbstractController
 
 			$protocol = preg_match('~HTTP/1\.[01]~i', $this->_req->server->SERVER_PROTOCOL) ? $this->_req->server->SERVER_PROTOCOL : 'HTTP/1.0';
 			$headers
-				->httpCode(404)
+				->removeHeader('all')
 				->headerSpecial($protocol . ' 404 Not Found')
-				->contentType('')
 				->sendHeaders();
 
 			// We need to die like this *before* we send any anti-caching headers as below.

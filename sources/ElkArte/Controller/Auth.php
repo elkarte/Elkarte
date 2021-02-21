@@ -21,6 +21,8 @@ use ElkArte\AbstractController;
 use ElkArte\Cache\Cache;
 use ElkArte\Errors\Errors;
 use ElkArte\Exceptions\Exception;
+use ElkArte\Http\Headers;
+use ElkArte\Themes\ThemeLoader;
 use ElkArte\User;
 use ElkArte\UserSettingsLoader;
 use ElkArte\Util;
@@ -74,7 +76,7 @@ class Auth extends AbstractController
 		}
 
 		// Load the Login template/language file.
-		\ElkArte\Themes\ThemeLoader::loadLanguageFile('Login');
+		ThemeLoader::loadLanguageFile('Login');
 		theme()->getTemplates()->load('Login');
 		loadJavascriptFile('sha256.js', array('defer' => true));
 		$context['sub_template'] = 'login';
@@ -161,7 +163,7 @@ class Auth extends AbstractController
 			$modSettings['cookieTime'] = (int) $_POST['cookielength'];
 		}
 
-		\ElkArte\Themes\ThemeLoader::loadLanguageFile('Login');
+		ThemeLoader::loadLanguageFile('Login');
 
 		// Load the template stuff
 		theme()->getTemplates()->load('Login');
@@ -656,7 +658,7 @@ class Auth extends AbstractController
 	{
 		global $txt, $context;
 
-		\ElkArte\Themes\ThemeLoader::loadLanguageFile('Login');
+		ThemeLoader::loadLanguageFile('Login');
 		theme()->getTemplates()->load('Login');
 		loadJavascriptFile('sha256.js', array('defer' => true));
 		createToken('login');
@@ -684,14 +686,16 @@ class Auth extends AbstractController
 	{
 		global $txt, $mtitle, $mmessage, $context;
 
-		\ElkArte\Themes\ThemeLoader::loadLanguageFile('Login');
+		ThemeLoader::loadLanguageFile('Login');
 		theme()->getTemplates()->load('Login');
 		loadJavascriptFile('sha256.js', array('defer' => true));
 		createToken('login');
 
 		// Send a 503 header, so search engines don't bother indexing while we're in maintenance mode.
-		\ElkArte\Http\Headers::instance()
-			->headerSpecial('HTTP/1.1 503 Service Temporarily Unavailable');
+		Headers::instance()
+			->headerSpecial('HTTP/1.1 503 Service Temporarily Unavailable')
+			->header('Status', '503 Service Temporarily Unavailable')
+			->header('Retry-After', '3600');
 
 		// Basic template stuff..
 		$context['sub_template'] = 'maintenance';
