@@ -115,7 +115,7 @@ function createSphinxConfig()
 		->header('Cache-Control', 'no-cache')
 		->header('Connection', 'close')
 		->header('Content-Disposition', 'attachment; filename="sphinx.conf"')
-		->contentType('application/octet-stream')
+		->contentType('application/octet-stream', '')
 		->sendHeaders();
 
 	$weight_factors = array(

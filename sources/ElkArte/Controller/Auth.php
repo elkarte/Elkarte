@@ -893,7 +893,7 @@ function doLogin(UserSettingsLoader $user)
 	// Just log you back out if it's in maintenance mode and you AREN'T an admin.
 	if (empty($maintenance) || allowedTo('admin_forum'))
 	{
-		redirectexit('action=auth;sa=check;member=' . User::$info->id, detectServer()->is('needs_login_fix'));
+		redirectexit('action=auth;sa=check;member=' . User::$info->id);
 	}
 	else
 	{

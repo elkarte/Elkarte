@@ -89,7 +89,7 @@ function DumpDatabase2()
 		// Tell the client to save this file, even though it's text.
 		$headers
 			->removeHeader('all')
-			->contentType('application/octet-stream', '';
+			->contentType('application/octet-stream', '');
 
 		// This time the extension should just be .sql.
 		$extension = '.sql';

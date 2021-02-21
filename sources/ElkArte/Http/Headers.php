@@ -197,10 +197,10 @@ class Headers
 	 *
 	 * @param string $mime_type
 	 * @param string $fileName
-	 * @param false $disposition
+	 * @param string $disposition 'attachment' or 'inline';
 	 * @return $this
 	 */
-	public function setAttachmentFileParams($mime_type, $fileName, $disposition = false)
+	public function setAttachmentFileParams($mime_type, $fileName, $disposition = 'attachment')
 	{
 		// If its an image set the content type to the image/type defined in the mime_type
 		if (!empty($mime_type) && strpos($mime_type, 'image/') === 0)
@@ -249,7 +249,7 @@ class Headers
 	 *
 	 * @param string|null $contentType
 	 * @param string|null $charset
-	 * @return $this|string
+	 * @return $this
 	 */
 	public function contentType($contentType, $charset = null)
 	{
@@ -266,10 +266,10 @@ class Headers
 	/**
 	 * Sets the character set in use, defaults to utf-8
 	 *
-	 * @param null $charset
-	 * @return $this|string
+	 * @param string $charset
+	 * @return $this
 	 */
-	public function charset($charset = null)
+	public function charset($charset)
 	{
 		$this->charset = $charset;
 

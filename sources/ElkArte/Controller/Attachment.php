@@ -399,7 +399,6 @@ class Attachment extends AbstractController
 		}
 
 		$eTag = '"' . substr($id_attach . $real_filename . @filemtime($filename), 0, 64) . '"';
-		$use_compression = !empty($modSettings['enableCompressedOutput']) && @filesize($filename) <= 4194304 && in_array($file_ext, array('txt', 'html', 'htm', 'js', 'doc', 'docx', 'rtf', 'css', 'php', 'log', 'xml', 'sql', 'c', 'java'));
 		$disposition = !isset($this->_req->query->image) ? 'attachment' : 'inline';
 		$do_cache = !(!isset($this->_req->query->image) && getValidMimeImageType($file_ext) !== '');
 
@@ -419,7 +418,7 @@ class Attachment extends AbstractController
 			}
 		}
 
-		$this->prepare_headers($filename, $eTag, $mime_type, $use_compression, $disposition, $real_filename, $do_cache);
+		$this->prepare_headers($filename, $eTag, $mime_type, $disposition, $real_filename, $do_cache);
 		$this->send_file($filename, $mime_type);
 
 		obExit(false);
@@ -452,7 +451,7 @@ class Attachment extends AbstractController
 			throw new Exception('no_access', false);
 		}
 
-		$this->prepare_headers('no_image', 'no_image', 'image/png', false, 'inline', 'no_image.png', true, false);
+		$this->prepare_headers('no_image', 'no_image', 'image/png', 'inline', 'no_image.png', true, false);
 		Headers::instance()->sendHeaders();
 		echo $img;
 
@@ -492,13 +491,12 @@ class Attachment extends AbstractController
 	 * @param string $filename Full path+file name of the file in the filesystem
 	 * @param string $eTag ETag cache validator
 	 * @param string $mime_type The mime-type of the file
-	 * @param bool $use_compression If use gzip compression
 	 * @param string $disposition The value of the Content-Disposition header
 	 * @param string $real_filename The original name of the file
 	 * @param bool $do_cache If send the a max-age header or not
 	 * @param bool $check_filename When false, any check on $filename is skipped
 	 */
-	public function prepare_headers($filename, $eTag, $mime_type, $use_compression, $disposition, $real_filename, $do_cache, $check_filename = true)
+	public function prepare_headers($filename, $eTag, $mime_type, $disposition, $real_filename, $do_cache, $check_filename = true)
 	{
 		global $txt;
 
@@ -675,11 +673,9 @@ class Attachment extends AbstractController
 		}
 
 		$eTag = '"' . substr($id_attach . $real_filename . filemtime($filename), 0, 64) . '"';
-		$compressible_files = array('txt', 'html', 'htm', 'js', 'doc', 'docx', 'rtf', 'css', 'php', 'log', 'xml', 'sql', 'c', 'java');
-		$use_compression = !empty($modSettings['enableCompressedOutput']) && @filesize($filename) <= 4194304 && in_array($file_ext, $compressible_files);
 		$do_cache = !(!isset($this->_req->query->image) && getValidMimeImageType($file_ext) !== '');
 
-		$this->prepare_headers($filename, $eTag, $mime_type, $use_compression, 'inline', $real_filename, $do_cache);
+		$this->prepare_headers($filename, $eTag, $mime_type, 'inline', $real_filename, $do_cache);
 
 		if ($resize)
 		{
