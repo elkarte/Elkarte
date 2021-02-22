@@ -321,7 +321,7 @@ class ManageSearch extends AbstractController
 			checkSession('get');
 			validateToken('admin-msm', 'get');
 
-			alterFullTextIndex('{db_prefix}messages', 'body', true);
+			alterFullTextIndex('{db_prefix}messages', array('body', 'subject', 'body,subject'), true);
 			$fulltext_index = true;
 		}
 		elseif ($sa === 'removefulltext' && !empty($fulltext_index))
