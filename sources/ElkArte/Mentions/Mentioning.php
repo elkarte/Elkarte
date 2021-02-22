@@ -123,15 +123,15 @@ class Mentioning extends AbstractModel
 			return array();
 		}
 
-		// Cleanup, validate and remove the invalid values (0 and $this->user->id)
-		$id_targets = array_diff(array_map('intval', array_unique($this->_validator->uid)), array(0, $this->user->id));
+		// Cleanup, validate and remove the invalid values (0 and $this->_data['id_member_from'])
+		$id_targets = array_diff(array_map('intval', array_unique($this->_validator->uid)), array(0, $this->_data['id_member_from']));
 
 		if (empty($id_targets))
 		{
 			return array();
 		}
 
-		$actually_mentioned = $mention_obj->insert($this->user->id, $id_targets, $this->_validator->msg, $this->_validator->log_time, $this->_data['status']);
+		$actually_mentioned = $mention_obj->insert($this->_data['id_member_from'], $id_targets, $this->_validator->msg, $this->_validator->log_time, $this->_data['status']);
 
 		// Update the member mention count
 		foreach ($actually_mentioned as $id_target)

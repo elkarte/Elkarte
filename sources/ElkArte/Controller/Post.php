@@ -1297,6 +1297,8 @@ class Post extends AbstractController
 		// This is an already existing message. Edit it.
 		if (!empty($_REQUEST['msg']))
 		{
+			$posterOptions['id_starter'] = isset($msgInfo['id_member']) ? $msgInfo['id_member'] : $user_info['id'];
+
 			// Have admins allowed people to hide their screwups?
 			if (time() - $msgInfo['poster_time'] > $modSettings['edit_wait_time'] || $this->user->id != $msgInfo['id_member'])
 			{
