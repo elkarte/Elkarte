@@ -502,4 +502,12 @@ class Templates
 			}
 		}
 	}
+
+    /**
+     * @return Template Directories
+     */
+    public function getDirectory()
+    {
+        return $this->dirs;
+    }
 }
