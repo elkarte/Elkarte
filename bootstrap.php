@@ -295,9 +295,6 @@ class Bootstrap
 	{
 		global $context;
 
-		// Clean the request.
-		cleanRequest();
-
 		// Initiate the database connection and define some database functions to use.
 		loadDatabase();
 
@@ -306,6 +303,9 @@ class Bootstrap
 
 		// It's time for settings loaded from the database.
 		reloadSettings();
+
+		// Clean the request.
+		cleanRequest();
 
 		// Our good ole' contextual array, which will hold everything
 		if (empty($context))
@@ -471,7 +471,7 @@ class Bootstrap
 		{
 			die('No access...');
 		}
-		elseif (isset($_REQUEST['ssi_layers'], $ssi_layers) && (@get_magic_quotes_gpc() ? stripslashes($_REQUEST['ssi_layers']) : $_REQUEST['ssi_layers']) == $ssi_layers)
+		elseif (isset($_REQUEST['ssi_layers'], $ssi_layers) && $_REQUEST['ssi_layers'] == $ssi_layers)
 		{
 			die('No access...');
 		}
