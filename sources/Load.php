@@ -891,7 +891,7 @@ function loadCSSFile($filenames, $params = array(), $id = '')
 		$filenames[] = $context['theme_variant'] . '/admin' . $context['theme_variant'] . '.css';
 	}
 
-	$params['subdir'] = 'css';
+	$params['subdir'] = isset($params['subdir']) ? $params['subdir'] : 'css';
 	$params['extension'] = 'css';
 	$params['index_name'] = 'css_files';
 	$params['debug_index'] = 'sheets';
@@ -930,7 +930,7 @@ function loadJavascriptFile($filenames, $params = array(), $id = '')
 		return;
 	}
 
-	$params['subdir'] = 'scripts';
+	$params['subdir'] = isset($params['subdir']) ? $params['subdir'] : 'scripts';
 	$params['extension'] = 'js';
 	$params['index_name'] = 'js_files';
 	$params['debug_index'] = 'javascript';
