@@ -1691,7 +1691,7 @@ class BBCParser
 	 * @param array $tag
 	 * @param $data
 	 */
-	protected function filterData(array $tag, &$data)
+	protected function filterData(array &$tag, &$data)
 	{
 		$tag[Codes::ATTR_VALIDATE]($tag, $data, $this->bbc->getDisabled());
 	}
