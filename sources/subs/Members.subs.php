@@ -1550,7 +1550,8 @@ function prepareMembersByQuery($query, &$query_params, $only_active = true)
 			else
 			{
 				$query_parts['and'][] = isset($allowed_conditions[$query_conditions]) ? $allowed_conditions[$query_conditions] : $query_conditions;
-			}		}
+			}
+		}
 
 		if (!empty($query_parts['or']))
 			$query_parts['and'][] = implode("\n\t\t\tOR ", $query_parts['or']);
