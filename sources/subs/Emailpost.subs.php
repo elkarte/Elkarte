@@ -760,11 +760,9 @@ function pbe_emailError($error, $email_message)
 		// While we have keys to look at see if we can match up this lost message on subjects
 		foreach ($user_keys as $user_key)
 		{
-			if (preg_match('~([a-z0-9]{32})\-([ptm])(\d+)~', $user_key['id_email'], $match))
-			{
-				$key = $match[1];
-				$type = $match[2];
-				$message = $match[3];
+			$key = $user_key['message_key'];
+			$type = $user_key['message_type'];
+			$message = $user_key['message_id'];
 
 				// If we know/suspect its a "m,t or p" then use that to avoid a match on a wrong type, that would be bad ;)
 				if ((!empty($message_type) && $message_type === $type) || (empty($message_type) && $type !== 'p'))
