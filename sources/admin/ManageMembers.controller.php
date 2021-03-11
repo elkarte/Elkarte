@@ -189,7 +189,7 @@ class ManageMembers_Controller extends Action_Controller
 		global $txt, $scripturl, $context, $modSettings;
 
 		// Set the current sub action.
-		$context['sub_action'] = $this->_req->getQuery('sa', 'strval', 'all');
+		$context['sub_action'] = $this->_req->getPost('sa', 'strval', 'all');
 
 		// Are we performing a mass action?
 		if (isset($this->_req->post->maction_on_members, $this->_req->post->maction) && !empty($this->_req->post->members))
