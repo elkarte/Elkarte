@@ -1018,7 +1018,10 @@ class Email_Parse
 		// Supplied a key, lets check it
 		if (!empty($key))
 		{
-			preg_match($regex_key, $key, $match);
+			if (preg_match($regex_key, $key, $match) === 1)
+			{
+				$this->_load_key_details($match);
+			}
 		}
 		// Otherwise we play find the key
 		else

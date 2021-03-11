@@ -414,7 +414,7 @@ class ManageMaillist_Controller extends Action_Controller
 				{
 					// Set up the details needed to get this posted
 					$force = true;
-					$key = $temp_email[0]['key'];
+					$key = $temp_email[0]['key'] . '-' . $temp_email[0]['type'] . $temp_email[0]['message'];
 					$data = $temp_email[0]['body'];
 
 					// Unknown from email?  Update the message ONLY if we found an appropriate one during the error checking process
