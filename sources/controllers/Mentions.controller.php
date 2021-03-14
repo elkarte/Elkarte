@@ -386,7 +386,7 @@ class Mentions_Controller extends Action_Controller
 		{
 			$context['json_data']['desktop_notifications'] = array(
 				'new_from_last' => getNewMentions($user_info['id'], $lastsent),
-				'title' => sprintf($txt['forum_notification'], $context['forum_name']),
+				'title' => sprintf($txt['forum_notification'], strip_tags(un_htmlspecialchars($context['forum_name']))),
 				'link' => '/index.php?action=mentions'
 			);
 			$context['json_data']['desktop_notifications']['message'] = sprintf($txt[$lastsent == 0 ? 'unread_notifications' : 'new_from_last_notifications'], $context['json_data']['desktop_notifications']['new_from_last']);
