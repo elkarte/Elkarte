@@ -638,7 +638,7 @@ function pbe_emailError($error, $email_message)
 	$subject = ($subject === '' ? $txt['no_subject'] : $subject);
 
 	// Start off with what we know about the security key, even if its nothing
-	$message_key = (string) $email_message->message_key_id;
+	$message_key = (string) $email_message->message_key;
 	$message_type = (string) $email_message->message_type;
 	$message_id = (int) $email_message->message_id;
 	$board_id = -1;
@@ -653,7 +653,7 @@ function pbe_emailError($error, $email_message)
 			$email_message->email['from'] = $email_message->email['from'] . ' => ' . $key_owner;
 
 			// Since we have a valid key set those details as well
-			$message_key = $email_message->message_key_id;
+			$message_key = $email_message->message_key;
 			$message_type = $email_message->message_type;
 			$message_id = $email_message->message_id;
 		}
@@ -669,7 +669,7 @@ function pbe_emailError($error, $email_message)
 			$email_message->email['from'] = $key_owner . ' => ' . $email_message->email['from'];
 
 			// Since we have a valid key set those details as well
-			$message_key = $email_message->message_key_id;
+			$message_key = $email_message->message_key;
 			$message_type = $email_message->message_type;
 			$message_id = $email_message->message_id;
 		}
@@ -689,24 +689,21 @@ function pbe_emailError($error, $email_message)
 		// While we have keys to look at see if we can match up this lost message on subjects
 		foreach ($user_keys as $user_key)
 		{
-			if (preg_match('~([a-z0-9]{32})\-(p|t|m)(\d+)~', $user_key['id_email'], $match))
-			{
-				$key = $match[0];
-				$type = $match[2];
-				$message = $match[3];
+			$key = $user_key['message_key'];
+			$type = $user_key['message_type'];
+			$message = $user_key['message_id'];
 
-				// If we know/suspect its a "m,t or p" then use that to avoid a match on a wrong type, that would be bad ;)
-				if ((!empty($message_type) && $message_type === $type) || (empty($message_type) && $type !== 'p'))
+			// If we know/suspect its a "m,t or p" then use that to avoid a match on a wrong type, that would be bad ;)
+			if ((!empty($message_type) && $message_type === $type) || (empty($message_type) && $type !== 'p'))
+			{
+				// lets look up this message/topic/pm and see if the subjects match ... if they do then tada!
+				if (query_load_subject($message, $type, $email_message->email['from']) === $subject)
 				{
-					// lets look up this message/topic/pm and see if the subjects match ... if they do then tada!
-					if (query_load_subject($message, $type, $email_message->email['from']) === $subject)
-					{
-						// This email has a subject that matches the subject of a message that was sent to them
-						$message_key = $key;
-						$message_id = $message;
-						$message_type = $type;
-						break;
-					}
+					// This email has a subject that matches the subject of a message that was sent to them
+					$message_key = $key;
+					$message_id = $message;
+					$message_type = $type;
+					break;
 				}
 			}
 		}
