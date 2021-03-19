@@ -897,7 +897,7 @@ class EmailParse
 		foreach (explode("\n", str_replace("\r\n", "\n", $this->_boundary_section[$i]->body)) as $line)
 		{
 			$type = '';
-			list($field, $rest) = explode(':', $line);
+			list($field, $rest) = array_pad(explode(':', $line), 2, '');
 
 			if (strpos($line, ';'))
 			{
