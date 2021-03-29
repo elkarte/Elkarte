@@ -133,6 +133,9 @@ function pbe_fix_email_body($body, $real_name = '', $charset = 'UTF-8')
 	// Remove the \r's now so its done
 	$body = trim(str_replace("\r", '', $body));
 
+	// Remove any control characters
+	$body = preg_replace('/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]/', '', $body);
+
 	// Remove the riff-raff as defined by the ACP filters
 	$body = pbe_filter_email_message($body);
 
