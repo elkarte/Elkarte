@@ -31,12 +31,12 @@ class TestHTML2Md extends PHPUnit_Framework_TestCase
 			array(
 				'Named links',
 				'<a href="http://www.elkarte.net/" class="bbc_link" target="_blank">ElkArte</a>',
-				'[ElkArte](http://www.elkarte.net/ 🔗)',
+				'[ElkArte]( http://www.elkarte.net/ )',
 			),
 			array(
 				'URL link',
 				'<a href="http://www.elkarte.net/" class="bbc_link" target="_blank">http://www.elkarte.net/</a>',
-				'[Link](http://www.elkarte.net/ 🔗)',
+				'[Link]( http://www.elkarte.net/ )',
 			),
 			array(
 				'Lists',
@@ -69,15 +69,12 @@ Before you can login, you first need to activate your account. To do so, please 
 Should you have any problems with activation, please visit https://www.awesomeforum.com/?action=register;sa=activate;u=12345 use the code "S5cv#4Xh".
 
 Gracias',
-				'Thank you for registering at Awesome Forum. Your username is SomeUser. If you forget your
-password, you can reset it by visiting
-[Link](https://www.awesomeforum.com/?action=reminder)
-Before you can login, you first need to activate your account. To do so, please follow this
-link:
-[Reg Link](https://www.awesomeforum.com/?action=register;sa=activate;u=12345;code=S5cv#4Xh 🔗)
-Should you have any problems with activation, please visit
-[Link](https://www.awesomeforum.com/?action=register;sa=activate;u=12345) use the code
-"S5cv#4Xh".
+				'Thank you for registering at Awesome Forum. Your username is SomeUser. If you forget your password, you can reset it by visiting 
+[Link]( https://www.awesomeforum.com/?action=reminder )
+Before you can login, you first need to activate your account. To do so, please follow this link:
+[Reg Link]( https://www.awesomeforum.com/?action=register;sa=activate;u=12345;code=S5cv#4Xh )
+Should you have any problems with activation, please visit 
+[Link]( https://www.awesomeforum.com/?action=register;sa=activate;u=12345 ) use the code "S5cv#4Xh".
 Gracias'
 			),
 		);
@@ -105,10 +102,10 @@ Gracias'
 			$parser = new Html_2_Md($test);
 
 			// Convert the html to bbc
-			$result = $parser->get_markdown();
+			$result = trim($parser->get_markdown(), "\x00");
 
 			// See if its the result we expect
-			$this->assertEquals($expected, $result);
+			$this->assertEquals($expected . "\n", $result, 'Error:: ' . str_replace("\n", "<br>", $result));
 		}
 	}
 }
