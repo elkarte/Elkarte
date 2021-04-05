@@ -3,15 +3,15 @@
 /**
  * This search class is used when a fulltext index is used (mysql only)
  *
- * @name      ElkArte Forum
+ * @name	  ElkArte Forum
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
  * This file contains code covered by:
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
- * license:  	BSD, See included LICENSE.TXT for terms and conditions.
+ * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.1
+ * @version 1.1.7
  *
  */
 
@@ -194,16 +194,16 @@ class Fulltext extends SearchAPI
 
 		$db_search = db_search();
 
-        if($search_data['type'] == 'messages') {
-            $query_select = array(
-                'id_msg' => 'm.id_msg',
-            );
-        }
-        else {
-            $query_select = array(
-                'id_topic' => 'm.id_topic',
-            );
-        }
+		if($search_data['type'] == 'messages') {
+			$query_select = array(
+				'id_msg' => 'm.id_msg',
+			);
+		}
+		else {
+			$query_select = array(
+				'id_topic' => 'm.id_topic',
+			);
+		}
 
 		$query_where = array();
 		$query_params = $search_data['params'];
