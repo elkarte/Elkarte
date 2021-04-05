@@ -450,6 +450,14 @@ class Notify_Controller extends Action_Controller
 	{
 		global $user_info, $board, $topic;
 
+		$baseAreas = array('topic', 'board', 'buddy', 'likemsg', 'mentionmem', 'quotedmem', 'rlikemsg');
+
+		// Not a base method, so an addon will need to process this
+		if (!in_array($area, $baseAreas))
+		{
+			return $this->_unsubscribeModuleToggle($member, $area, $extra);
+		}
+
 		// Look away while we stuff the old ballet box, power to the people!
 		$user_info['id'] = (int) $member['id_member'];
 		$this->_req->query->sa = 'off';
@@ -472,6 +480,32 @@ class Notify_Controller extends Action_Controller
 				$this->_setUserNotificationArea($member['id_member'], $area, 1);
 				break;
 		}
+
+		return true;
+	}
+
+	/**
+	 * Pass unsubscribe information to the appropriate mention class/method
+	 *
+	 * @param mixed[] $member Member info from getBasicMemberData
+	 * @param string $area area they want to be removed from
+	 * @param string $extra parameters needed for some
+	 *
+	 * @return bool if the $unsubscribe method was called
+	 */
+	private function _unsubscribeModuleToggle($member, $area, $extra)
+	{
+		Elk_Autoloader::instance()->register(SUBSDIR . '/MentionType', '\\ElkArte\\sources\\subs\\MentionType');
+		$class_name = '\\ElkArte\\sources\\subs\\MentionType\\' . ucwords($area) . '_Mention';
+
+		if (method_exists($class_name, 'unsubscribe'))
+		{
+			$unsubscribe = new $class_name;
+
+			return $unsubscribe->unsubscribe($member, $area, $extra);
+		}
+
+		return false;
 	}
 
 	/**
@@ -491,7 +525,10 @@ class Notify_Controller extends Action_Controller
 	 */
 	private function _validateUnsubscribeToken(&$member, &$area, &$extra)
 	{
-		$potentialAreas = array('topic', 'board', 'buddy', 'likemsg', 'mentionmem', 'quotedmem', 'rlikemsg');
+		// Load all notification types in the system e.g.buddy, likemsg, etc
+		require_once(SUBSDIR . '/ManageFeatures.subs.php');
+		list($potentialAreas,) = getNotificationTypes();
+		$potentialAreas = array_merge($potentialAreas, ['topic', 'board']);
 
 		// Token was passed and matches our expected pattern
 		$token = $this->_req->getQuery('token', 'trim', '');

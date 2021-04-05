@@ -27,7 +27,7 @@ class TestCurl_Fetch_Webdata extends PHPUnit_Framework_TestCase
 				'https://duckduckgo.com/html',
 				array('q' => 'elkarte', 'ia' => 'about'),
 				200,
-				'<b>ElkArte</b>, Free and Open Source Community Forum Software',
+				'Free and Open Source Community Forum Software',
 			),
 		);
 
