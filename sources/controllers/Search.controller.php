@@ -11,7 +11,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.1.7
+ * @version 1.1.8
  *
  */
 
@@ -434,7 +434,7 @@ class Search_Controller extends Action_Controller
 				$this->_search->clearCacheResults($_SESSION['search_cache']['id_search']);
 
 				if ($this->_search->param('subject_only'))
-					$_SESSION['search_cache']['num_results'] = $this->_search->getSubjectResults($_SESSION['search_cache']['id_search'], $humungousTopicPosts);
+					$_SESSION['search_cache']['num_results'] = $this->_search->getSubjectResults($_SESSION['search_cache']['id_search'], $humungousTopicPosts, $maxMessageResults);
 				else
 				{
 					$num_res = $this->_search->getResults($_SESSION['search_cache']['id_search'], $humungousTopicPosts, $maxMessageResults);
