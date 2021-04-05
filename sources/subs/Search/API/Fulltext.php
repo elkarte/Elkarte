@@ -11,7 +11,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.1.7
+ * @version 1.1
  *
  */
 
@@ -194,9 +194,16 @@ class Fulltext extends SearchAPI
 
 		$db_search = db_search();
 
-		$query_select = array(
-			'id_msg' => 'm.id_msg',
-		);
+        if($search_data['type'] == 'messages') {
+            $query_select = array(
+                'id_msg' => 'm.id_msg',
+            );
+        }
+        else {
+            $query_select = array(
+                'id_topic' => 'm.id_topic',
+            );
+        }
 
 		$query_where = array();
 		$query_params = $search_data['params'];
@@ -267,7 +274,7 @@ class Fulltext extends SearchAPI
 
 		if (!empty($modSettings['search_simple_fulltext']))
 		{
-			$query_where[] = 'MATCH (body, subject) AGAINST ({string:body_match})';
+			$query_where[] = 'MATCH (subject ' . ($search_data['type'] == 'messages' ? ', body' : '') . ') AGAINST ({string:body_match})';
 			$query_params['body_match'] = implode(' ', array_diff($words['indexed_words'], $query_params['excluded_index_words']));
 		}
 		else
@@ -284,7 +291,7 @@ class Fulltext extends SearchAPI
 			// If we have bool terms to search, add them in
 			if ($query_params['boolean_match'])
 			{
-				$query_where[] = 'MATCH (body, subject) AGAINST ({string:boolean_match} IN BOOLEAN MODE)';
+				$query_where[] = 'MATCH (subject ' . ($search_data['type'] == 'messages' ? ', body' : '') . ') AGAINST ({string:boolean_match} IN BOOLEAN MODE)';
 			}
 		}
 
