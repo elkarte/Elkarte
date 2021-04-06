@@ -45,7 +45,7 @@ class TestHTML2Md extends PHPUnit_Framework_TestCase
 			),
 			array(
 				'Table',
-				'<h3>Simple table</h3><br /><table><thead><tr><th>Header 1</th><th>Header 2</th></tr></thead><tbody><tr><td>Cell 1</td><td>Cell 2</td></tr><tr><td>Cell 3</td><td>Cell 4</td></tr></tbody></table>',
+				'<h3>Simple table</h3><table><thead><tr><th>Header 1</th><th>Header 2</th></tr></thead><tbody><tr><td>Cell 1</td><td>Cell 2</td></tr><tr><td>Cell 3</td><td>Cell 4</td></tr></tbody></table>',
 				"### Simple table\n\n| Header 1 | Header 2 |\n| -------- | -------- | \n| Cell 1   | Cell 2   |\n| Cell 3   | Cell 4   |",
 			),
 			array(
@@ -71,10 +71,14 @@ Should you have any problems with activation, please visit https://www.awesomefo
 Gracias',
 				'Thank you for registering at Awesome Forum. Your username is SomeUser. If you forget your password, you can reset it by visiting 
 [Link]( https://www.awesomeforum.com/?action=reminder )
+
 Before you can login, you first need to activate your account. To do so, please follow this link:
+
 [Reg Link]( https://www.awesomeforum.com/?action=register;sa=activate;u=12345;code=S5cv#4Xh )
+
 Should you have any problems with activation, please visit 
 [Link]( https://www.awesomeforum.com/?action=register;sa=activate;u=12345 ) use the code "S5cv#4Xh".
+
 Gracias'
 			),
 		);

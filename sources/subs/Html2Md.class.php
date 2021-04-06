@@ -458,7 +458,9 @@ class Html_2_Md
 				break;
 			case 'ol':
 			case 'ul':
-				$markdown = rtrim($this->_get_value($node)) . $this->line_break;
+				$markdown = $this->line_end . rtrim($this->_get_value($node)) . $this->line_break;
+				if ($this->_has_parent_list($node, $this->_parser))
+					$markdown = rtrim($this->_get_value($node)) . $this->line_end;
 				break;
 			case 'li':
 				$markdown = $this->_convert_list($node);
@@ -1240,6 +1242,10 @@ class Html_2_Md
 		foreach ($strings as $string)
 		{
 			$in_quote = isset($string[0]) && $string[0] === '>';
+			if (empty($string))
+			{
+				$lines[] = '';
+			}
 			while (!empty($string))
 			{
 				// Get the next #width characters before a break (space, punctuation tab etc)
