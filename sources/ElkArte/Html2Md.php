@@ -1221,6 +1221,10 @@ class Html2Md
 		foreach ($strings as $string)
 		{
 			$in_quote = isset($string[0]) && $string[0] === '>';
+			if (empty($string))
+			{
+				$lines[] = '';
+			}
 			while (!empty($string))
 			{
 				// Get the next #width characters before a break (space, punctuation tab etc)
