@@ -458,7 +458,9 @@ class Html_2_Md
 				break;
 			case 'ol':
 			case 'ul':
-				$markdown = rtrim($this->_get_value($node)) . $this->line_break;
+				$markdown = $this->line_end . rtrim($this->_get_value($node)) . $this->line_break;
+				if ($this->_has_parent_list($node, $this->_parser))
+					$markdown = rtrim($this->_get_value($node)) . $this->line_end;
 				break;
 			case 'li':
 				$markdown = $this->_convert_list($node);
