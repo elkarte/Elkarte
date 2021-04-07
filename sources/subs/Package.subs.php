@@ -2913,7 +2913,8 @@ function elk_chmod($file, $mode = null)
 {
 	$result = false;
 
-	if (empty($mode))
+	$mode = trim($mode);
+	if (empty($mode) || !is_numeric($mode))
 	{
 		if (is_dir($file))
 		{
@@ -2926,8 +2927,9 @@ function elk_chmod($file, $mode = null)
 	}
 
 	// Make sure we have a form of 0777 or '777' or '0777' so its safe for intval '8'
-	$mode = trim($mode);
-	if ($mode == decoct(octdec("$mode")))
+	if (($mode % 10) >= 8)
+		$mode = decoct($mode);
+	if ($mode == decoct(octdec($mode)))
 		$result = @chmod($file, intval($mode, 8));
 
 	return $result;
