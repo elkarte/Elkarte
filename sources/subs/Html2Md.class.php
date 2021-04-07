@@ -270,6 +270,9 @@ class Html_2_Md
 			'&gt|?|' => '>?'
 		));
 
+		// We may have hidden content ending in ?<br /> due to the above
+		$this->markdown = str_replace('<br />', "\n\n", $this->markdown);
+
 		// Strip the chaff and any excess blank lines we may have produced
 		$this->markdown = trim($this->markdown);
 		$this->markdown = preg_replace("~(\n(\s)?){3,}~", "\n\n", $this->markdown);
