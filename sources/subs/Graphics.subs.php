@@ -15,7 +15,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.1.6
+ * @version 1.1.7
  *
  */
 
@@ -1168,7 +1168,7 @@ function showCodeImage($code)
 			$characters[$char_index]['height'] = imagefontheight($loaded_fonts[$character['font']]);
 		}
 
-		$max_height = max($characters[$char_index]['height'] + 5, $max_height);
+		$max_height = max($characters[$char_index]['height'] + 15, $max_height);
 		$total_width += $characters[$char_index]['width'] + 2;
 	}
 

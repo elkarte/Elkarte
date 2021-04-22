@@ -7,7 +7,7 @@
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
- * @version 1.1
+ * @version 1.1.7
  *
  */
 
@@ -387,7 +387,16 @@ class UnTgz
 		foreach ($this->_current as $key => $value)
 		{
 			if (in_array($key, $octdec))
-				$this->_current[$key] = octdec(trim($value));
+			{
+				$value = trim($value);
+				if (!empty($value) && is_numeric($value))
+				{
+					if (($value % 10) >= 8)
+						$value = decoct($value);
+					$value = octdec($value);
+				}
+				$this->_current[$key] = $value;
+			}
 			else
 				$this->_current[$key] = trim($value);
 		}
