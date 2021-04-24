@@ -218,8 +218,8 @@ if (isset($modSettings['elkVersion']))
 if (!isset($modSettings['theme_dir']) || !file_exists($modSettings['theme_dir']))
 {
 	$modSettings['theme_dir'] = BOARDDIR . '/themes/default';
-	$modSettings['theme_url'] = 'themes/default';
-	$modSettings['images_url'] = 'themes/default/images';
+	$modSettings['theme_url'] = $boardurl . '/themes/default';
+	$modSettings['images_url'] = $boardurl . '/themes/default/images';
 }
 
 if (!isset($settings['default_theme_url']))
@@ -615,7 +615,7 @@ function action_welcomeLogin()
 	}
 
 	// Do not try to upgrade to the same version you are already running
-	if (isset($_GET['v']) && defined('CURRENT_VERSION'))
+	if (isset($_GET['v']) && defined('CURRENT_VERSION') && !empty($_SESSION['installing']))
 	{
 		if ($_GET['v'] === CURRENT_VERSION)
 		{
