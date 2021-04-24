@@ -1,6 +1,7 @@
 a:link, a:hover, a:visited {
 	text-decoration: underline;
 }
+
 /* These divisions wrap the forum sections when a forum width is set. */
 #wrapper, .frame {
 	width: 90%;
@@ -8,6 +9,7 @@ a:link, a:hover, a:visited {
 	margin: 0 auto;
 	padding-top: 12px;
 }
+
 h1.forumtitle {
 	font-size: 2em;
 	font-family: tahoma, serif;
@@ -15,17 +17,20 @@ h1.forumtitle {
 	padding: 35px 0 0 15px;
 	float: left;
 	font-weight: normal;
-	color: #4b863c;
-	text-shadow: -1px -1px 0 rgba(0,0,0,0.5), 1px 1px 0 #fff;
+	color: #4B863C;
+	text-shadow: -1px -1px 0 rgba(0, 0, 0, 0.5), 1px 1px 0 #FFFFFF;
 }
+
 /* Tweak the logo */
 img#logo {
 	margin: 12px 12px 0 0;
 }
+
 #inner_wrap {
 	min-height: 60px;
-	border-bottom: 1px solid #ccc;
+	border-bottom: 1px solid #CCCCCC;
 }
+
 #inner_wrap .news {
 	height: 80px;
 	text-align: right;
@@ -33,108 +38,138 @@ img#logo {
 	max-width: 100%;
 	float: left;
 }
+
 #main_steps {
 	float: right;
 	width: 50%;
 	padding: 0 0 1em 0;
 }
+
 #main_steps h2 {
 	font-size: 1.2em;
-	border-bottom: 1px solid #4b863c;
+	border-bottom: 1px solid #4B863C;
 	line-height: 1.6em;
 	margin: 0 1em 0.5em 0;
-	color: #4b863c;
+	color: #4B863C;
 }
+
 #main_steps ul {
 	list-style: none;
 	padding: 0 0.5em;
 	margin: 0;
 	line-height: 1.8em;
 }
+
 #main_steps ul li.stepdone {
-	color: #aaa;
+	color: #AAAAAA;
 }
+
 #main_steps ul li.stepcurrent {
-	color: #222;
+	color: #222222;
 	font-weight: bold;
 }
+
 #main_steps ul li.stepwaiting {
-	color: #666;
+	color: #666666;
 }
+
 #progress_bar {
 	position: relative;
 	font-size: 1.2em;
 	height: 2.3em;
 	border: 1px solid black;
 	border-radius: 2px;
-	background: #fff;
+	background: #FFFFFF;
 	float: left;
 	margin: 0.6em 0 0 4em;
 	width: 33%;
 }
+
 #overall_text, #step_text {
 	z-index: 2;
-	color: #111;
+	color: #111111;
 	font-weight: bold;
 	position: absolute;
 	top: 0.5em;
 	left: -3.3em;
 }
+
 #overall_progress, #step_progress {
 	height: 2.3em;
 	z-index: 1;
 	background: lime;
 }
+
 #step_progress {
-	background: #ffd000;
+	background: #FFD000;
 }
+
 .overall_progress, .progress {
 	position: absolute;
 	top: 0.5em;
 	left: 0.5em;
 }
+
 #main_screen {
 	padding: 1em 1em 0.5em 1em;
 }
+
 #main_screen h2 {
 	font-size: 1.2em;
-	border-bottom: 1px solid #4b863c;
+	border-bottom: 1px solid #4B863C;
 	line-height: 1.6em;
 	margin: 0 0 0.5em 0;
-	color: #4b863c;
+	color: #4B863C;
 }
-.panel form div{
+
+.panel form div {
 	max-height: 560px;
 	overflow: auto;
 }
+
 .panel p, .panel h3 {
 	margin: 0 0.5em 1em 0.5em;
 }
+
 .panel ul {
 	margin: 0 0.5em 1em 0.5em;
 }
+
 .error_message {
 	color: red;
 	padding: 0.5em;
 }
+
 .panel .button_submit, .panel .linkbutton {
 	font-size: 1em;
 	font-weight: bold;
-	color: #333;
+	color: #333333;
 	padding: 3px 6px;
 	text-decoration: none;
 }
+
 .panel .button_submit:hover, .panel .linkbutton:hover {
-	color: #af6700;
+	color: #AF6700;
 	text-decoration: none;
 }
+
+/* Don't show disabled buttons as active on hover */
+.panel .button_submit[disabled]:hover {
+	border-color: #AFAFAF;
+	border-top-color: #CFCFCF;
+	border-left-color: #BFBFBF;
+	box-shadow: 1px 1px 2px #E4E4E4;
+}
+
 .panel .clear {
 	padding: 1em 0 0 0;
 	overflow: auto;
 }
+
 .panel .errorbox {
 	font-size: 1.15em;
 }
+
 /* [WIP] Warning: this next bit may cause trouble. .. confirmed, it does :P */
 /* It's just to hide an empty div when the submits are not shown.
 .panel .clear:nth-child(4) {
@@ -145,12 +180,12 @@ img#logo {
 #time_elapsed {
 	clear: both;
 	/* [WIP] */
-	background: /*#f0f4f7*/ #fcfcfc;
+	background: /*#f0f4f7*/ #FCFCFC;
 	margin: 1em 0.9em 0 0.9em;
 	padding: 6px 8px 8px 8px;
-	border: 1px solid #ccc;
+	border: 1px solid #CCCCCC;
 	border-radius: 5px;
-	box-shadow: 0 -2px 2px rgba(0,0,0,0.1);
+	box-shadow: 0 -2px 2px rgba(0, 0, 0, 0.1);
 	/* End [WIP] */
 }
 
