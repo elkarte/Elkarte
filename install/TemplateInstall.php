@@ -127,7 +127,9 @@ function template_install_below()
 		<div id="footer_section">
 			<div class="frame">
 				<ul>
-					<li class="copyright"><a href="', SITE_SOFTWARE, '" title="ElkArte Community" target="_blank" class="new_win">ElkArte &copy; 2012 - 2017, ElkArte Community</a></li>
+					<li class="copyright">
+						<a href="', SITE_SOFTWARE, '" title="ElkArte Community" target="_blank" class="new_win">ElkArte &copy; 2012 - 2021, ElkArte Community</a>
+					</li>
 				</ul>
 			</div>
 		</div>
