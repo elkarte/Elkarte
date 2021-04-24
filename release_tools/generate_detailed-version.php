@@ -10,25 +10,24 @@
  */
 
 $output_file_name = 'detailed-version.js';
-
-if (empty($argv[1]))
+if (empty($argv[1]) && empty($_GET['b']))
 {
 	echo "Please specify a branch to compare against master\n";
 	die();
 }
 else
 {
-	$new_release = $argv[1];
+	$new_release = $argv[1] ?? $_GET['b'];
 }
 
-if (empty($argv[2]))
+if (empty($argv[2]) && empty($_GET['v']))
 {
 	echo "Please specify a version\n";
 	die();
 }
 else
 {
-	$new_version = $argv[2];
+	$new_version = $argv[2] ?? $_GET['v'];
 }
 
 // Some constants and $settings needed to let getFileVersions do it's magic
@@ -53,11 +52,15 @@ $versionOptions = array(
 	'include_subscriptions' => true,
 	'sort_results' => true,
 );
+
+// Use our function to read all file headers and get the stated version
 $version_info = getFileVersions($versionOptions);
+
+// Use git to get our list of file changed by commit
 $changed_files_list = getFilesChanged('master', $new_release);
 $update_files = array();
 
-// Now we need to grab the current version of the script from index.php
+// Now we need to grab the current version of the forum from index.php
 $index = file_get_contents(BOARDDIR . '/bootstrap.php');
 $index_lines = explode("\n", $index);
 foreach ($index_lines as $line)
@@ -137,14 +140,30 @@ fwrite($handle, '};');
 fclose($handle);
 if (count(array_diff($update_files, $changed_files_list)) !== 0)
 {
-	echo "Something is wrong: at least one of the files updated is not in the list of those changed since the lastest version.\nThis is a list of the files affected by the problem:\n";
-	print_r(array_diff($update_files, $changed_files_list));
+	if (empty($_GET))
+	{
+		echo "Something is wrong: at least one of the files updated is not in the list of those changed since the lastest version.\nThis is a list of the files affected by the problem:\n";
+		print_r(array_diff($update_files, $changed_files_list));
+	}
+	else
+	{
+		echo "Something is wrong:<br>At least one of the files updated is not in the list of those changed since the lastest version.<br>This is a list of the files affected by the problem:<br>";
+		echo implode('<br>', array_diff($update_files, $changed_files_list));
+	}
 }
 
 if (count(array_diff($changed_files_list, $update_files)) !== 0)
 {
-	echo "Something is wrong: at least one of the files changed since the last released version has not been updated in the repository.\nThis is a list of the files affected by the problem:\n";
-	print_r(array_diff($changed_files_list, $update_files));
+	if (empty($_GET))
+	{
+		echo "Something is wrong: at least one of the files changed since the last released version has not been updated in the repository.\nThis is a list of the files affected by the problem:\n";
+		print_r(array_diff($changed_files_list, $update_files));
+	}
+	else
+	{
+		echo "Something is wrong:<br>At least one of the files changed since the last released version has not been updated in the repository.<br>This is a list of the files affected by the problem:<br>";
+		echo implode('<br>', array_diff($changed_files_list, $update_files));
+	}
 }
 
 /**
@@ -159,7 +178,12 @@ function getFilesChanged($from, $to)
 {
 	global $settings;
 
-	$output = shell_exec('git log --name-only --pretty=oneline --full-index ' . $from . '..' . $to . ' | grep -vE \'^[0-9a-f]{40} \' | sort | uniq');
+	$output = shell_exec('git diff --name-only --pretty=oneline --full-index ' . $from . '..' . $to . ' | sort | uniq');
+	if (empty($output))
+	{
+		echo "The git command failed to return any results\n";
+		//die;
+	}
 
 	$dirs = array(
 		str_replace(BOARDDIR . '/', '', SOURCEDIR . '/database/') => 'database',
@@ -246,6 +270,16 @@ function getFilesChanged($from, $to)
 		}
 
 		if ($file === 'ssi_examples.php')
+		{
+			continue;
+		}
+
+		if ($file === 'ssi_examples.shtml')
+		{
+			continue;
+		}
+
+		if ($file === 'elkServiceWorker.min.js')
 		{
 			continue;
 		}
