@@ -17,7 +17,7 @@ if (empty($argv[1]) && empty($_GET['b']))
 }
 else
 {
-	$new_release = $argv[1] ?? $_GET['b'];
+	$new_release = isset($argv[1]) ? $argv[1] : $_GET['b'];
 }
 
 if (empty($argv[2]) && empty($_GET['v']))
@@ -27,7 +27,7 @@ if (empty($argv[2]) && empty($_GET['v']))
 }
 else
 {
-	$new_version = $argv[2] ?? $_GET['v'];
+	$new_version = isset($argv[2]) ? $arg[2] : $_GET['v'];
 }
 
 // Some constants and $settings needed to let getFileVersions do it's magic

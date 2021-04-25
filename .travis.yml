@@ -1,5 +1,5 @@
 language: php
-dist: trusty
+dist: xenial
 os: linix
 
 jobs:
@@ -9,18 +9,34 @@ jobs:
         - DB=mysql-5.6
         - WEBTESTS=false
         - COVERAGE=false
+      services:
+        - mysql
+        - memcached
     - php: 7.1
       env:
         - DB=postgres-9.5
         - WEBTESTS=false
         - COVERAGE=true
+      services:
+        - postgresql
+        - memcached
+      addons:
+        postgresql: "9.5"
     - php: 5.6
       env:
-        - DB=mariadb-10.0
+        - DB=mariadb-10.3
         - WEBTESTS=false
         - COVERAGE=true
+      services:
+        - memcached
       addons:
-        mariadb: '10.0'
+        apt:
+          sources:
+            - sourceline: "ppa:ondrej/php"
+          packages:
+            - php5.6-cli
+            - php5.6-mysql
+        mariadb: "10.3"
   fast_finish: true
 
 addons:

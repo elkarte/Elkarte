@@ -37,15 +37,18 @@ then
 fi
 
 # Install basics for PHP CLI
-sudo apt-get -qq install php5-cli php5-mysql php5-pgsql
+if [ "$SHORT_PHP" != "5.6" ]
+then
+    sudo apt-get -qq install php-cli php-mysql php-pgsql
+fi
 
 # Install Apache, mod-FPM and DB support
 if [ "$SHORT_DB" == "postgres" ]
 then
-    sudo apt-get -qq install apache2 libapache2-mod-fastcgi php5-pgsql > /dev/null
+    sudo apt-get -qq install apache2 libapache2-mod-fastcgi php-pgsql > /dev/null
 elif [ "$SHORT_DB" == "mysql" -o "$SHORT_DB" == "mariadb" ]
 then
-    sudo apt-get -qq --allow-downgrades install apache2 libapache2-mod-fastcgi php5-mysql > /dev/null
+    sudo apt-get -qq --allow-downgrades install apache2 libapache2-mod-fastcgi php-mysql > /dev/null
 else
     sudo apt-get -qq --allow-downgrades install apache2 libapache2-mod-fastcgi > /dev/null
 fi
