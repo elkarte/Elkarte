@@ -11,7 +11,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.1.6
+ * @version 1.1.7
  *
  */
 
@@ -508,7 +508,7 @@ function registerMember(&$regOptions, $ErrorContext = 'register')
 	validateUsername(0, $regOptions['username'], $ErrorContext, !empty($regOptions['check_reserved_name']));
 
 	// Generate a validation code if it's supposed to be emailed.
-	$validation_code = $regOptions['require'] === 'activation' ? generateValidationCode(14) : '';
+	$validation_code = generateValidationCode(14);
 
 	// Does the first password match the second?
 	if ($regOptions['password'] != $regOptions['password_check'] && $regOptions['auth_method'] == 'password')
@@ -587,7 +587,7 @@ function registerMember(&$regOptions, $ErrorContext = 'register')
 		'member_name' => $regOptions['username'],
 		'email_address' => $regOptions['email'],
 		'passwd' => validateLoginPassword($password, '', $regOptions['username'], true),
-		'password_salt' => $tokenizer->generate_hash(4),
+		'password_salt' => $tokenizer->generate_hash(16),
 		'posts' => 0,
 		'date_registered' => !empty($regOptions['time']) ? $regOptions['time'] : time(),
 		'member_ip' => $regOptions['interface'] == 'admin' ? '127.0.0.1' : $regOptions['ip'],
@@ -1543,10 +1543,14 @@ function prepareMembersByQuery($query, &$query_params, $only_active = true)
 						$query_parts[$condition === 'or' ? 'or' : 'and'][] = isset($allowed_conditions[$query_condition]) ? $allowed_conditions[$query_condition] : $query_condition;
 				}
 			}
-			elseif ($query == 'member_names')
-				$query_parts['and'][] = $allowed_conditions[$query]($query_params);
+			elseif ($query_conditions == 'member_names')
+			{
+				$query_parts['and'][] = $allowed_conditions[$query_conditions]($query_params);
+			}
 			else
-				$query_parts['and'][] = isset($allowed_conditions[$query]) ? $allowed_conditions[$query] : $query;
+			{
+				$query_parts['and'][] = isset($allowed_conditions[$query_conditions]) ? $allowed_conditions[$query_conditions] : $query_conditions;
+			}
 		}
 
 		if (!empty($query_parts['or']))
@@ -1646,7 +1650,7 @@ function maxMemberID()
  * - 'sort' (string) a column to sort the results
  * - 'moderation' (bool) includes member_ip, id_group, additional_groups, last_login
  * - 'authentication' (bool) includes secret_answer, secret_question, openid_uri,
- *    is_activated, validation_code, passwd_flood
+ *    is_activated, validation_code, passwd_flood, password_salt
  * - 'preferences' (bool) includes lngfile, mod_prefs, notify_types, signature
  * @return array
  */
@@ -1683,7 +1687,7 @@ function getBasicMemberData($member_ids, $options = array())
 	$request = $db->query('', '
 		SELECT id_member, member_name, real_name, email_address, hide_email, posts, id_theme' . (!empty($options['moderation']) ? ',
 		member_ip, id_group, additional_groups, last_login, id_post_group' : '') . (!empty($options['authentication']) ? ',
-		secret_answer, secret_question, openid_uri, is_activated, validation_code, passwd_flood' : '') . (!empty($options['preferences']) ? ',
+		secret_answer, secret_question, openid_uri, is_activated, validation_code, passwd_flood, password_salt' : '') . (!empty($options['preferences']) ? ',
 		lngfile, mod_prefs, notify_types, signature' : '') . '
 		FROM {db_prefix}members
 		WHERE id_member IN ({array_int:member_list})
@@ -2637,4 +2641,33 @@ function registerAgreementAccepted($id_member, $ip, $agreement_version)
 		),
 		array('version', 'id_member')
 	);
+}
+
+/**
+ * Utility function to update a members salt to a new value
+ *
+ * @param int $id member to update
+ * @param bool $refresh if to always refresh to a new salt
+ * @param int $min if current salt lenght is less than this, gen a new one
+ * @return bool
+ */
+function updateMemberSalt($id, $refresh = false, $min = 9)
+{
+	global $user_settings;
+
+	if (empty($user_settings['password_salt']))
+	{
+		return false;
+	}
+
+	if ((strlen($user_settings['password_salt']) > $min) && !$refresh)
+	{
+		return false;
+	}
+
+	$tokenizer = new Token_Hash();
+	$user_settings['password_salt'] = $tokenizer->generate_hash(16);
+	updateMemberData((int) $id, array('password_salt' => $user_settings['password_salt']));
+
+	return true;
 }

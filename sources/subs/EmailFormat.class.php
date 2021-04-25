@@ -7,7 +7,7 @@
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
- * @version 1.1.4
+ * @version 1.1.7
  *
  */
 
@@ -363,7 +363,7 @@ class Email_Format
 		$this->_body = strtr($this->_body, array("\xe2\x80\x98" => "'", "\xe2\x80\x99" => "'", "\xe2\x80\x9c" => '"', "\xe2\x80\x9d" => '"', "\xe2\x80\x93" => '-', "\xe2\x80\x94" => '--', "\xe2\x80\xa6" => '...'));
 
 		// And its 1252 variants
-		if ($charset !== 'UTF-8')
+		if (strcasecmp($charset, 'UTF-8') !== 0)
 			$this->_body = strtr($this->_body, array(chr(145) => "'", chr(146) => "'", chr(147) => '"', chr(148) => '"', chr(150) => '-', chr(151) => '--', chr(133) => '...'));
 	}
 
@@ -455,7 +455,11 @@ class Email_Format
 		// Starting a list like a) 1. 1) etc ...
 		$temp = $this->_in_plainlist;
 
-		if (preg_match('~^[a-j](\.|\)|-)\s~i', $var) || preg_match('~^[1-9](\.|\)|-)\s?~', $var) || preg_match('~' . chr(187) . '~', $var))
+		if (preg_match('~^[a-j](\.|\)|-)\s~i', $var)
+			|| preg_match('~^[1-9](\.|\)|-)\s?~', $var)
+			|| preg_match('~' . chr(187) . '~', $var)
+			|| preg_match('~^[ \t]?\* ?~', $var)
+		)
 			$this->_in_plainlist++;
 
 		return $this->_in_plainlist !== $temp;

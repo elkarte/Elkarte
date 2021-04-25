@@ -11,7 +11,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.1.4
+ * @version 1.1.7
  *
  */
 
@@ -1280,7 +1280,7 @@ function parsePackageInfo(&$packageXML, $testing_only = true, $method = 'install
  * @param string $the_version
  * @return string|boolean highest install value string or false
  */
-function matchHighestPackageVersion($versions, $reset = false, $the_version)
+function matchHighestPackageVersion($versions, $the_version, $reset = false)
 {
 	static $near_version = 0;
 
@@ -2417,7 +2417,7 @@ function package_crypt($pass)
 		$salt .= session_id();
 
 	for ($i = 0; $i < $n; $i++)
-		$pass{$i} = chr(ord($pass{$i}) ^ (ord($salt{$i}) - 32));
+		$pass[$i] = chr(ord($pass[$i]) ^ (ord($salt[$i]) - 32));
 
 	return $pass;
 }
@@ -2913,7 +2913,8 @@ function elk_chmod($file, $mode = null)
 {
 	$result = false;
 
-	if (!isset($mode))
+	$mode = trim($mode);
+	if (empty($mode) || !is_numeric($mode))
 	{
 		if (is_dir($file))
 		{
@@ -2926,7 +2927,9 @@ function elk_chmod($file, $mode = null)
 	}
 
 	// Make sure we have a form of 0777 or '777' or '0777' so its safe for intval '8'
-	if ($mode == decoct(octdec("$mode")))
+	if (($mode % 10) >= 8)
+		$mode = decoct($mode);
+	if ($mode == decoct(octdec($mode)))
 		$result = @chmod($file, intval($mode, 8));
 
 	return $result;

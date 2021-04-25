@@ -14,7 +14,7 @@
  * copyright:	2004-2011, GreyWyvern - All rights reserved.
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.1.6
+ * @version 1.1.7
  *
  */
 
@@ -708,7 +708,7 @@ class Database_MySQL extends Database_Abstract
 	 * @param mysqli|null $connection = null
 	 * @throws Elk_Exception
 	 */
-	public function insert($method = 'replace', $table, $columns, $data, $keys, $disable_trans = false, $connection = null)
+	public function insert($method, $table, $columns, $data, $keys, $disable_trans = false, $connection = null)
 	{
 		global $db_prefix;
 

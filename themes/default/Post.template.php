@@ -9,7 +9,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.1.6
+ * @version 1.1.7
  *
  */
 
@@ -450,7 +450,7 @@ function template_add_new_attachments()
 				var inlineAttach = ElkInlineAttachments(\'#postAttachment2,#postAttachment\', \'' . $context['post_box_name'] . '\', {
 					trigger: $(\'<div class="share icon i-share" />\'),
 					template: ' . JavaScriptEscape('<div class="insertoverlay">
-						<input type="button" class="button" value="insert">
+						<input type="button" class="button" value="' . $txt['insert'] . '">
 						<ul data-group="tabs" class="tabs">
 							<li data-tab="size">' . $txt['ila_opt_size'] . '</li><li data-tab="align">' . $txt['ila_opt_align'] . '</li>
 						</ul>

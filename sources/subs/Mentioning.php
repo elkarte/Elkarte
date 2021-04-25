@@ -7,7 +7,7 @@
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
- * @version 1.1.4
+ * @version 1.1.7
  *
  */
 
@@ -109,22 +109,20 @@ class Mentioning extends AbstractModel
 	 */
 	public function create($mention_obj, $data)
 	{
-		global $user_info;
-
 		$this->_data = $this->_prepareData($data);
 
 		// Common checks to determine if we can go on
 		if (!$this->_isValid())
 			return array();
 
-		// Cleanup, validate and remove the invalid values (0 and $user_info['id'])
-		$id_targets = array_diff(array_map('intval', array_unique($this->_validator->uid)), array(0, $user_info['id']));
+		// Cleanup, validate and remove the invalid values (0 and $this->_data['id_member_from'])
+		$id_targets = array_diff(array_map('intval', array_unique($this->_validator->uid)), array(0, $this->_data['id_member_from']));
 
 		if (empty($id_targets))
 			return array();
 
 		$mention_obj->setDb($this->_db);
-		$actually_mentioned = $mention_obj->insert($user_info['id'], $id_targets, $this->_validator->msg, $this->_validator->log_time, $this->_data['status']);
+		$actually_mentioned = $mention_obj->insert($this->_data['id_member_from'], $id_targets, $this->_validator->msg, $this->_validator->log_time, $this->_data['status']);
 
 		// Update the member mention count
 		foreach ($actually_mentioned as $id_target)

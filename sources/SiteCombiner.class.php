@@ -7,7 +7,7 @@
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
- * @version 1.1.4
+ * @version 1.1.7
  */
 
 /**
@@ -238,9 +238,8 @@ class Site_Combiner
 			$this->_combineFiles('css');
 
 			// CSSmin it to save some space
-			require_once(EXTDIR . '/cssmin.php');
-			$compressor = new CSSmin();
-			$this->_minified_cache = $compressor->run($this->_cache);
+			require_once(EXTDIR . '/cssmin/cssmin.php');
+			$this->_minified_cache = CSSmin($this->_cache);
 
 			// Combine in any pre minimized css files to our new minimized string
 			$this->_minified_cache .= "\n" . $this->_min_cache;

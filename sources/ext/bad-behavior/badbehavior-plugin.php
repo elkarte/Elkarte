@@ -10,7 +10,7 @@
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
- * @version 1.1
+ * @version 1.1.7
  *
  */
 
@@ -83,15 +83,25 @@ function bb2_db_num_rows($result)
  */
 function bb2_db_query($query)
 {
+	global $modSettings;
+
 	$db = database();
 
 	// First fix the horrors caused by bb's support of only mysql
 	// ok they are right its my horror :P
 	if (strpos($query, 'DATE_SUB') !== false)
-		$query = 'DELETE FROM {db_prefix}log_badbehavior WHERE date < ' . (bb2_db_date() - 7 * 86400);
-	elseif (strpos($query, 'OPTIMIZE TABLE') !== false)
+	{
+		if (!empty($modSettings['badbehavior_logging']))
+			$query = 'DELETE FROM {db_prefix}log_badbehavior WHERE date < ' . (bb2_db_date() - 7 * 86400);
+		else
+			return true;
+	}
+
+	if (strpos($query, 'OPTIMIZE TABLE') !== false)
 		return true;
 	elseif (strpos($query, '@@session.wait_timeout') !== false)
+		return true;
+	elseif (empty($query))
 		return true;
 
 	// Run the query, return success, failure or the actual results
@@ -160,7 +170,7 @@ function bb2_insert($settings, $package, $key)
 	$ip = bb2_db_escape($package['ip']);
 	$date = (int) bb2_db_date();
 	$request_method = bb2_db_escape($package['request_method']);
-	$request_uri = bb2_db_escape($package['request_uri']);
+	$request_uri = substr(bb2_db_escape($package['request_uri']), 0, 254);
 	$server_protocol = bb2_db_escape($package['server_protocol']);
 	$user_agent = bb2_db_escape($package['user_agent']);
 	$member_id = (int) !empty($user_info['id']) ? $user_info['id'] : 0;

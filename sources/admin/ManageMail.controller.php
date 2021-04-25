@@ -11,7 +11,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.1
+ * @version 1.1.7
  *
  */
 
@@ -260,6 +260,12 @@ class ManageMail_Controller extends Action_Controller
 			if (!empty($this->_req->post->mail_batch_size))
 				$this->_req->post->mail_batch_size = min((int) $this->_req->post->mail_batch_size, (int) $this->_req->post->mail_period_limit);
 
+			// If not supplied, attempt to set a FQDN value for the SMTP client
+			if (empty($this->_req->post->smtp_client) && $this->_req->post->mail_type === '1')
+			{
+				$this->_req->post->smtp_client = detectServer()->getFQDN();
+			}
+
 			$settingsForm->setConfigValues((array) $this->_req->post);
 			$settingsForm->save();
 			redirectexit('action=admin;area=mailqueue;sa=settings');
@@ -332,6 +338,7 @@ class ManageMail_Controller extends Action_Controller
 				// SMTP stuff.
 				array('select', 'mail_type', array($txt['mail_type_default'], 'SMTP')),
 				array('text', 'smtp_host'),
+				array('text', 'smtp_client'),
 				array('text', 'smtp_port'),
 				array('check', 'smtp_starttls'),
 				array('text', 'smtp_username'),

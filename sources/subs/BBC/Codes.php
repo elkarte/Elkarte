@@ -10,7 +10,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.1.6
+ * @version 1.1.7
  *
  */
 
@@ -642,7 +642,7 @@ class Codes
 				self::ATTR_TYPE => self::TYPE_PARSED_CONTENT,
 				self::ATTR_PARAM => array(
 					'author' => array(
-						self::PARAM_ATTR_MATCH => '([^<>&"\'=\\\\]{1,192}?)',
+						self::PARAM_ATTR_MATCH => '([^<>]{1,192}?)',
 						self::PARAM_ATTR_QUOTED => self::OPTIONAL,
 					),
 				),
@@ -671,7 +671,7 @@ class Codes
 				self::ATTR_TYPE => self::TYPE_PARSED_CONTENT,
 				self::ATTR_PARAM => array(
 					'author' => array(
-						self::PARAM_ATTR_MATCH => '([^<>&"\'=\\\\]{1,192}?)'
+						self::PARAM_ATTR_MATCH => '([^<>]{1,192}?)',
 					),
 					'link' => array(
 						self::PARAM_ATTR_MATCH => '(?:board=\d+;)?((?:topic|threadid)=[\dmsg#\./]{1,40}(?:;start=[\dmsg#\./]{1,40})?|msg=\d{1,40}|action=profile;u=\d+)',
@@ -692,7 +692,7 @@ class Codes
 				self::ATTR_TYPE => self::TYPE_PARSED_CONTENT,
 				self::ATTR_PARAM => array(
 					'author' => array(
-						self::PARAM_ATTR_MATCH => '([^<>&"\'=\\\\]{1,192}?)'
+						self::PARAM_ATTR_MATCH => '([^<>]{1,192}?)',
 					),
 				),
 				self::ATTR_BEFORE => '<div class="quoteheader">' . $txt['quote_from'] . ': {author}</div><blockquote>',
@@ -783,7 +783,7 @@ class Codes
 				self::ATTR_TYPE => self::TYPE_PARSED_CONTENT,
 				self::ATTR_BEFORE => '<div class="bbc_table_container"><table class="bbc_table">',
 				self::ATTR_AFTER => '</table></div>',
-				self::ATTR_TRIM => self::TRIM_INSIDE,
+				self::ATTR_TRIM => self::TRIM_BOTH,
 				self::ATTR_REQUIRE_CHILDREN => array(
 					'tr' => 1,
 				),

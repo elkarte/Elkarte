@@ -139,7 +139,7 @@ $helptxt['deleteAccount_posts'] = 'Replies Only: This will remove just the posts
 	Topics and Replies: This will do the same as above, and additionally will remove all topic threads started by this member.';
 
 $helptxt['live_news'] = '<strong>Live announcements</strong><br />
-	This box shows recently updated announcements from <a href="http://www.elkarte.net/" target="_blank" class="new_win">www.elkarte.net/</a>.
+	This box shows recently updated announcements from <a href="https://www.elkarte.net/" target="_blank" class="new_win">www.elkarte.net/</a>.
 	You should check here every now and then for updates, new releases, and important information from ElkArte.';
 
 $helptxt['registrations'] = '<strong>Registration Management</strong><br />
@@ -292,6 +292,7 @@ $helptxt['search_dropdown'] = 'This will show a search selection dropdown next t
 $helptxt['max_image_width'] = 'This allows you to set a maximum size for posted pictures. Pictures smaller than the maximum will not be affected. This also determines how attached images are displayed when a thumbnail is clicked on.';
 $helptxt['mail_type'] = 'This setting allows you to choose either PHP\'s default settings, or to override those settings with SMTP.  PHP doesn\'t support using authentication with SMTP (which many hosts require now) so if you want that you should select SMTP.  Please note that SMTP can be slower, and some servers will not take user names and passwords.<br /><br />You don\'t need to fill in the SMTP settings if this is set to PHP\'s default.';
 $helptxt['mail_batch_size'] = 'This setting determines how many emails will be sent per page load and can not be set greater than the maximum allowed per minute.<br />Leaving this as 0, the system will automatically determine a batch size to evenly spread the load and fill the quota.<br />If you want to set your own values, setting this to the same value as your limit is a good option for low per minute limits, or 1/6 of the limit for higher per minute limits.';
+$helptxt['smtp_client'] = 'Used to identify this client to the SMTP server.<br />The field should contain the fully-qualified domain name (FQDN) of the SMTP client. In situations in which the client system does not have a meaningful domain name you can instead use an address literal formatted as [ipv4] or [IPv6:ipv6 address].<br />If left blank the system will attempt to detect this value for you.';
 
 $helptxt['attachmentEnable'] = 'Enable/Disable the attachment system or disable only new attachments leaving old one available.';
 $helptxt['attachmentRecodeLineEndings'] = 'Enabling this will re-code line endings of text based files (txt, css, html, php, xml) based on your server (Windows, Mac or Unix).';
@@ -484,8 +485,8 @@ $helptxt['coppaPost'] = 'The contact boxes are required so that forms granting p
 $helptxt['allow_hideOnline'] = 'With this option enabled all members will be able to hide their online status from other users (except administrators). If disabled only users who can moderate the forum can hide their presence. Note that disabling this option will not change any member\'s current status - it just stops them from hiding themselves in the future.';
 
 $helptxt['latest_support'] = 'This panel shows you some of the most common problems and questions on your server configuration. Don\'t worry, this information isn\'t logged or anything.<br /><br />If this stays as &quot;Retrieving support information...&quot;, your computer probably cannot connect to the website.';
-$helptxt['latest_packages'] = 'Here you can see some of the most popular and some random packages, with quick and easy installations.<br /><br />If this section doesn\'t show up, your computer probably cannot connect to <a href="http://www.elkarte.net/" target="_blank" class="new_win">www.elkarte.net/</a>.';
-$helptxt['latest_themes'] = 'This area shows a few of the latest and most popular themes from <a href="http://www.elkarte.net/" target="_blank" class="new_win">www.elkarte.net/</a>.  It may not show up properly if your computer can\'t find <a href="http://www.elkarte.net/" target="_blank" class="new_win">www.elkarte.net/</a>, though.';
+$helptxt['latest_packages'] = 'Here you can see some of the most popular and some random packages, with quick and easy installations.<br /><br />If this section doesn\'t show up, your computer probably cannot connect to <a href="https://www.elkarte.net/" target="_blank" class="new_win">www.elkarte.net/</a>.';
+$helptxt['latest_themes'] = 'This area shows a few of the latest and most popular themes from <a href="https://www.elkarte.net/" target="_blank" class="new_win">www.elkarte.net/</a>.  It may not show up properly if your computer can\'t find <a href="https://www.elkarte.net/" target="_blank" class="new_win">www.elkarte.net/</a>, though.';
 
 $helptxt['secret_why_blank'] = 'For your security, your password and the answer to your secret question are encrypted so that ElkArte will never tell you, or anyone else, what they are.';
 $helptxt['moderator_why_missing'] = 'Since moderation is done on a board-by-board basis, you have to make members moderators from the <a href="%1$s?action=admin;area=manageboards" target="_blank" class="new_win">board management interface</a>.';

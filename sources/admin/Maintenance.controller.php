@@ -11,7 +11,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.1.6
+ * @version 1.1.7
  *
  */
 
@@ -1214,8 +1214,8 @@ class Maintenance_Controller extends Action_Controller
 		$context['start'] = $this->_req->getQuery('start', 'intval', 0);
 
 		// First time we do this?
-		$id_board_from = $this->_req->getPost('id_board_from', 'intval', (int) $this->_req->query->id_board_from);
-		$id_board_to = $this->_req->getPost('id_board_to', 'intval', (int) $this->_req->query->id_board_to);
+		$id_board_from = $this->_req->getPost('id_board_from', 'intval', $this->_req->getQuery('id_board_from', 'intval', 0));
+		$id_board_to = $this->_req->getPost('id_board_to', 'intval', $this->_req->getQuery('id_board_to', 'intval', 0));
 
 		// No boards then this is your stop.
 		if (empty($id_board_from) || empty($id_board_to))
@@ -1226,12 +1226,11 @@ class Maintenance_Controller extends Action_Controller
 		require_once(SUBSDIR . '/Topic.subs.php');
 
 		// How many topics are we moving?
-		if (!isset($this->_req->query->totaltopics))
-			$total_topics = countTopicsFromBoard($id_board_from);
-		else
+		$total_topics = $this->_req->getQuery('totaltopics', 'intval', 0);
+		if (empty($total_topics) || $context['start'] === 0)
 		{
-			$total_topics = (int) $this->_req->query->totaltopics;
-			validateToken('admin_movetopics');
+			validateToken('admin-maint');
+			$total_topics = countTopicsFromBoard($id_board_from);
 		}
 
 		// We have topics to move so start the process.
@@ -1255,16 +1254,13 @@ class Maintenance_Controller extends Action_Controller
 				// If this is really taking some time, show the pause screen
 				if (microtime(true) - $time_start > 3)
 				{
-					createToken('admin_movetopics');
-
 					// What's the percent?
 					$context['continue_percent'] = round(100 * ($context['start'] / $total_topics), 1);
 
 					// Set up for the form
 					$context['continue_get_data'] = '?action=admin;area=maintain;sa=topics;activity=massmove;id_board_from=' . $id_board_from . ';id_board_to=' . $id_board_to . ';totaltopics=' . $total_topics . ';start=' . $context['start'];
 					$context['continue_post_data'] = '
-						<input type="hidden" name="' . $context['session_var'] . '" value="' . $context['session_id'] . '" />
-						<input type="hidden" name="' . $context['admin_movetopics_token_var'] . '" value="' . $context['admin_movetopics_token'] . '" />';
+						<input type="hidden" name="' . $context['session_var'] . '" value="' . $context['session_id'] . '" />';
 
 					// Let the template system do it's thang.
 					return;

@@ -13,7 +13,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.1.6
+ * @version 1.1.7
  *
  */
 
@@ -567,7 +567,7 @@ class ProfileOptions_Controller extends Action_Controller
 					updateMemberData($this->_memID, array('openid_uri' => '', 'passwd' => $passwd));
 					if ($context['user']['is_owner'])
 					{
-						setLoginCookie(60 * $modSettings['cookieTime'], $this->_memID, hash('sha256', $new_pass . $cur_profile['password_salt']));
+						setLoginCookie(60 * $modSettings['cookieTime'], $this->_memID, hash('sha256', $passwd . $cur_profile['password_salt']));
 						redirectexit('action=profile;area=authentication;updated');
 					}
 					else
@@ -622,6 +622,7 @@ class ProfileOptions_Controller extends Action_Controller
 		require_once(SUBSDIR . '/Topic.subs.php');
 		require_once(SUBSDIR . '/Profile.subs.php');
 
+		// Show the list of notification types and how they can subscribe to them
 		$context['mention_types'] = getMemberNotificationsProfile($this->_memID);
 
 		// Fine, start with the board list.

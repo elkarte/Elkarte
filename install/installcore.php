@@ -5,18 +5,18 @@
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
- * @version 1.1.6
+ * @version 1.1.7
  *
  */
 
 // Version Constants
-const CURRENT_VERSION = '1.1.6';
+const CURRENT_VERSION = '1.1.7';
 const CURRENT_LANG_VERSION = '1.1';
 const DB_SCRIPT_VERSION = '1-1';
-const REQUIRED_PHP_VERSION = '5.3.6';
+const REQUIRED_PHP_VERSION = '5.5.0';
 
 // String constants
-const SITE_SOFTWARE = 'http://www.elkarte.net';
+const SITE_SOFTWARE = 'https://www.elkarte.net';
 
 function getUpgradeFiles()
 {

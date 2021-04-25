@@ -9,7 +9,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.1
+ * @version 1.1.7
  *
  */
 
@@ -54,7 +54,7 @@ installExit();
 function initialize_inputs()
 {
 	// Turn off magic quotes runtime and enable error reporting.
-	error_reporting(E_ALL | E_STRICT);
+	error_reporting(E_ALL & ~E_DEPRECATED);
 
 	if (!defined('TMP_BOARDDIR'))
 		define('TMP_BOARDDIR', realpath(__DIR__ . '/..'));
@@ -77,20 +77,6 @@ function initialize_inputs()
 	if (function_exists('session_start'))
 		@session_start();
 
-	// Reject magic_quotes_sybase='on'.
-	if (version_compare(PHP_VERSION, '5.4.0', '<'))
-	{
-		if (ini_get('magic_quotes_sybase') || strtolower(ini_get('magic_quotes_sybase')) == 'on')
-		{
-			die('magic_quotes_sybase=on was detected: your host is using an insecure PHP configuration, deprecated and removed in current versions. Please upgrade PHP.');
-		}
-
-		if (function_exists('get_magic_quotes_gpc') && get_magic_quotes_gpc() != 0)
-		{
-			die('magic_quotes_gpc=on was detected: your host is using an insecure PHP configuration, deprecated and removed in current versions. Please upgrade PHP.');
-		}
-	}
-
 	// Add slashes, as long as they aren't already being added.
 	foreach ($_POST as $k => $v)
 	{
@@ -103,6 +89,10 @@ function initialize_inputs()
 	// PHP 5 might cry if we don't do this now.
 	$server_offset = @mktime(0, 0, 0, 1, 1, 1970);
 	date_default_timezone_set('Etc/GMT' . ($server_offset > 0 ? '+' : '') . ($server_offset / 3600));
+
+	header('X-Frame-Options: SAMEORIGIN');
+	header('X-XSS-Protection: 1');
+	header('X-Content-Type-Options: nosniff');
 
 	// Force an integer step, defaulting to 0.
 	$_GET['step'] = isset($_GET['step']) ? (int) $_GET['step'] : 0;
@@ -217,7 +207,6 @@ function installExit($fallThrough = false)
 	die();
 }
 
-
 /**
  * Write out the contents of Settings.php file.
  * This function will add the variables passed to it in $config_vars,
@@ -227,6 +216,15 @@ function installExit($fallThrough = false)
  */
 function updateSettingsFile($config_vars)
 {
+	// Lets ensure its writable
+	if (!is_writeable(dirname(__FILE__, 2) . '/Settings.php'))
+	{
+		@chmod(dirname(__FILE__, 2) . '/Settings.php', 0777);
+
+		if (!is_writeable(dirname(__FILE__, 2) . '/Settings.php'))
+			return false;
+	}
+
 	// Modify Settings.php.
 	$settingsArray = file(TMP_BOARDDIR . '/Settings.php');
 

@@ -11,7 +11,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.1.5
+ * @version 1.1.7
  *
  */
 
@@ -291,7 +291,7 @@ function loadUserSettings()
 			$_SESSION['id_msg_last_visit'] = $user_settings['id_msg_last_visit'];
 
 			// If it was *at least* five hours ago...
-			if ($visitOpt['poster_time'] < time() - 5 * 3600)
+			if ($visitOpt === false || $visitOpt['poster_time'] < time() - 5 * 3600)
 			{
 				require_once(SUBSDIR . '/Members.subs.php');
 				updateMemberData($id_member, array('id_msg_last_visit' => (int) $modSettings['maxMsgID'], 'last_login' => time(), 'member_ip' => $req->client_ip(), 'member_ip2' => $req->ban_ip()));
@@ -326,6 +326,14 @@ function loadUserSettings()
 
 		// This is a logged in user, so definitely not a spider.
 		$user_info['possibly_robot'] = false;
+
+		// Lets upgrade the salt if needed.
+		require_once(SUBSDIR . '/Members.subs.php');
+		if (updateMemberSalt($id_member))
+		{
+			require_once(SUBSDIR . '/Auth.subs.php');
+			setLoginCookie(60 * $modSettings['cookieTime'], $user_settings['id_member'], hash('sha256', ($user_settings['passwd'] . $user_settings['password_salt'])));
+		}
 	}
 	// If the user is a guest, initialize all the critical user settings.
 	else
@@ -2020,7 +2028,7 @@ function loadCSSFile($filenames, $params = array(), $id = '')
 	if (in_array('admin.css', $filenames))
 		$filenames[] = $context['theme_variant'] . '/admin' . $context['theme_variant'] . '.css';
 
-	$params['subdir'] = 'css';
+	$params['subdir'] = isset($params['subdir']) ? $params['subdir'] : 'css';
 	$params['extension'] = 'css';
 	$params['index_name'] = 'css_files';
 	$params['debug_index'] = 'sheets';
@@ -2057,7 +2065,7 @@ function loadJavascriptFile($filenames, $params = array(), $id = '')
 	if (empty($filenames))
 		return;
 
-	$params['subdir'] = 'scripts';
+	$params['subdir'] = isset($params['subdir']) ? $params['subdir'] : 'scripts';
 	$params['extension'] = 'js';
 	$params['index_name'] = 'js_files';
 	$params['debug_index'] = 'javascript';

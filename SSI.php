@@ -12,7 +12,7 @@
  * copyright:    2011 Simple Machines (http://www.simplemachines.org)
  * license:        BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.1.6
+ * @version 1.1.7
  *
  */
 
@@ -505,7 +505,7 @@ function ssi_recentTopics($num_recent = 8, $exclude_boards = null, $include_boar
 			WHERE
 				m.id_topic IN ({array_int:topic_list})
 				AND (m.id_msg > COALESCE(lt.id_msg, lmr.id_msg, 0))
-			GROUP BY m.id_topic',
+			GROUP BY m.id_topic, lt.id_msg, lmr.id_msg',
 			array(
 				'current_member' => $user_info['id'],
 				'topic_list' => $topic_list
@@ -584,7 +584,7 @@ function ssi_recentTopics($num_recent = 8, $exclude_boards = null, $include_boar
 			'link' => '<a href="' . $scripturl . '?topic=' . $row['id_topic'] . '.msg' . $row['id_msg'] . '#new" rel="nofollow">' . $row['subject'] . '</a>',
 			'is_new' => !empty($topics[$row['id_topic']]['new_from']),
 			'new_from' => empty($topics[$row['id_topic']]['new_from']) ? 0 : $topics[$row['id_topic']]['new_from'],
-			'icon' => '<img src="' . $icon_sources->{$row['icon']} . '" class="centericon" alt="' . $row['icon'] . '" />',
+			'icon' => '<img src="' . $icon_sources->getIconURL($row['icon']) . '" class="centericon" alt="' . $row['icon'] . '" />',
 		);
 	}
 	$db->free_result($request);
@@ -1906,7 +1906,7 @@ function ssi_boardNews($board = null, $limit = null, $start = null, $length = nu
 		$return[] = array(
 			'id' => $row['id_topic'],
 			'message_id' => $row['id_msg'],
-			'icon' => '<img src="' . $icon_sources->{$row['icon']} . '" alt="' . $row['icon'] . '" />',
+			'icon' => '<img src="' . $icon_sources->getIconURL($row['icon']) . '" alt="' . $row['icon'] . '" />',
 			'subject' => $row['subject'],
 			'time' => standardTime($row['poster_time']),
 			'html_time' => htmlTime($row['poster_time']),

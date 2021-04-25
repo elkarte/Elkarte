@@ -12,7 +12,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.1.6
+ * @version 1.1.7
  *
  */
 
@@ -27,7 +27,7 @@ function loadVerificationControls()
 	);
 
 	// Need GD for CAPTCHA images
-	if (!in_array('gd', get_loaded_extensions()))
+	if (in_array('gd', get_loaded_extensions()))
 	{
 		array_unshift($known_verifications,'captcha');
 	}
@@ -831,7 +831,7 @@ class Verification_Controls_Questions implements Verification_Controls
 			FROM {db_prefix}antispam_questions' . ($filter === null || !isset($available_filters[$filter['type']]) ? '' : '
 			WHERE ' . $available_filters[$filter['type']]),
 			array(
-				'current_filter' => $filter['value'],
+				'current_filter' => $filter === null ? '' : $filter['value'],
 			)
 		);
 		while ($row = $db->fetch_assoc($request))

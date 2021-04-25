@@ -7,7 +7,7 @@
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
- * @version 1.1
+ * @version 1.1.7
  *
  */
 
@@ -187,12 +187,20 @@ class Html_2_BBC
 
 		// Remove any html tags we left behind ( outside of code tags that is )
 		$parts = preg_split('~(\[/code\]|\[code(?:=[^\]]+)?\])~i', $bbc, -1, PREG_SPLIT_DELIM_CAPTURE);
-		for ($i = 0, $n = count($parts); $i < $n; $i++)
+		if ($parts !== false)
 		{
-			if ($i % 4 == 0)
-				$parts[$i] = strip_tags($parts[$i]);
+			for ($i = 0, $n = count($parts); $i < $n; $i++)
+			{
+				if ($i % 4 == 0)
+				{
+					// protect << symbols from being stripped
+					$working = str_replace('<<', "[\xC2\xA0]", $parts[$i]);
+					$working = strip_tags($working);
+					$parts[$i] = str_replace("[\xC2\xA0]", '<<', $working);
+				}
+			}
+			$bbc = implode('', $parts);
 		}
-		$bbc = implode('', $parts);
 
 		return $bbc;
 	}
@@ -639,7 +647,14 @@ class Html_2_BBC
 		$height = $node->getAttribute('height');
 		$style = $node->getAttribute('style');
 
+		$bbc = '';
 		$size = '';
+
+		// First if this is an inline image, we don't support those
+		if (substr($src, 0, 4) === 'cid:')
+		{
+			return $bbc;
+		}
 
 		// Do the basic things first, title/alt
 		if (!empty($title) && empty($alt))
@@ -696,6 +711,13 @@ class Html_2_BBC
 	{
 		$style = $node->getAttribute('style');
 		$value = $this->_get_innerHTML($node);
+
+		// Don't style it if its really just empty
+		$test_value = trim($value);
+		if ($test_value === '[br]' || $test_value === '<br>')
+		{
+			return $value;
+		}
 
 		// Its at least going to be itself
 		$bbc = $value;

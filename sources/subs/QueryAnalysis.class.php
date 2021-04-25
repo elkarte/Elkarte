@@ -7,7 +7,7 @@
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
- * @version 1.1
+ * @version 1.1.7
  *
  */
 
@@ -147,7 +147,7 @@ class Query_Analysis
 	 */
 	protected function _is_select_query($query_data)
 	{
-		$is_select_query = substr(trim($query_data), 0, 6) == 'SELECT';
+		$is_select_query = substr(trim($query_data), 0, 6) == 'SELECT' || substr(trim($query_data), 0, 4) == 'WITH';
 		$this->_select = '';
 
 		if ($is_select_query)

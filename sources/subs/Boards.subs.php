@@ -12,7 +12,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.1
+ * @version 1.1.7
  *
  */
 
@@ -1858,6 +1858,10 @@ function fetchBoardsInfo($conditions = 'all', $params = array())
 			$security = '1=1';
 		else
 			$security = $params['wanna_see_board'] ? '{query_wanna_see_board}' : '{query_see_board}';
+
+		// Prevent a bad query, from a triggered scheduled task or some other issue.
+		if (empty($security))
+			return array();
 
 		$request = $db->query('', '
 			SELECT ' . $select . '

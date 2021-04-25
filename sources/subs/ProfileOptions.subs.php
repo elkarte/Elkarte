@@ -11,7 +11,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.1
+ * @version 1.1.7
  *
  */
 
@@ -43,7 +43,7 @@ function getBuddiesID($buddies, $adding = true)
 	);
 
 	// If we are mentioning buddies, then let them know who's their buddy.
-	if ($adding && !empty($modSettings['mentions_enabled']) && !empty($modSettings['mentions_buddy']))
+	if ($adding && !empty($modSettings['mentions_enabled']))
 	{
 		$notifier = Notifications::instance();
 	}

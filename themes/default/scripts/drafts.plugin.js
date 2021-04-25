@@ -3,11 +3,10 @@
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
- * @version 1.1
+ * @version 1.1.7
  */
 
 /**
- *
  * This file contains javascript associated with the drafts auto function as it
  * relates to an sceditor invocation
  */
@@ -249,7 +248,7 @@
 		}
 
 		// Prevent autosave on post/save selection by mouse or keyboard
-		var $_form_submitt =  $('#' + formID + ' .button_submit');
+		var $_form_submitt =  $('#' + formID + ' [name="post"]');
 		$_form_submitt.on('mousedown', oInstance, function() {
 			oInstance.opts._bInDraftMode = true;
 		});

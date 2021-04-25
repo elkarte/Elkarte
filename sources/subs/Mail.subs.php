@@ -12,7 +12,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.1.4
+ * @version 1.1.7
  *
  */
 
@@ -251,15 +251,14 @@ function sendmail($to, $subject, $message, $from = null, $message_id = null, $se
 			$unq_head_array = array();
 
 			// If we are using the post by email functions, then we generate "reply to mail" security keys
-			if ($maillist)
+			if ($maillist && !empty($message_id) && $priority != 4)
 			{
 				$unq_head_array[0] = md5($boardurl . microtime() . rand());
 				$unq_head_array[1] = $message_type;
 				$unq_head_array[2] = $message_id;
 				$unq_head = $unq_head_array[0] . '-' . $unq_head_array[1] . $unq_head_array[2];
-				$encoded_unq_head = base64_encode($line_break . $line_break . '[' . $unq_head . ']' . $line_break);
 				$unq_id = ($need_break ? $line_break : '') . 'Message-ID: <' . $unq_head . strstr(empty($modSettings['maillist_mail_from']) ? $webmaster_email : $modSettings['maillist_mail_from'], '@') . '>';
-				$message = mail_insert_key($message, $unq_head, $encoded_unq_head, $line_break);
+				$message = mail_insert_key($message, $unq_head, $line_break);
 			}
 			elseif (empty($modSettings['mail_no_message_id']))
 				$unq_id = ($need_break ? $line_break : '') . 'Message-ID: <' . md5($boardurl . microtime()) . '-' . $message_id . strstr(empty($modSettings['maillist_mail_from']) ? $webmaster_email : $modSettings['maillist_mail_from'], '@') . '>';
@@ -601,18 +600,23 @@ function smtp_mail($mail_to_array, $subject, $message, $headers, $priority, $mes
 	if (!server_parse(null, $socket, '220'))
 		return false;
 
+	// This should be set in the ACP
+	if (empty($modSettings['smtp_client']))
+	{
+		$modSettings['smtp_client'] = detectServer()->getFQDN(empty($modSettings['smtp_host']) ? '' : $modSettings['smtp_host']);
+		updateSettings(array('smtp_client' => $modSettings['smtp_client']));
+	}
+
 	if ($modSettings['mail_type'] == 1 && $modSettings['smtp_username'] != '' && $modSettings['smtp_password'] != '')
 	{
-		// @todo These should send the CURRENT server's name, not the mail server's!
-
 		// EHLO could be understood to mean encrypted hello...
-		if (server_parse('EHLO ' . $modSettings['smtp_host'], $socket, null) == '250')
+		if (server_parse('EHLO ' . $modSettings['smtp_client'], $socket, null) == '250')
 		{
 			if (!empty($modSettings['smtp_starttls']))
 			{
 				server_parse('STARTTLS', $socket, null);
 				stream_socket_enable_crypto($socket, true, STREAM_CRYPTO_METHOD_TLS_CLIENT);
-				server_parse('EHLO ' . $modSettings['smtp_host'], $socket, null);
+				server_parse('EHLO ' . $modSettings['smtp_client'], $socket, null);
 			}
 
 			if (!server_parse('AUTH LOGIN', $socket, '334'))
@@ -624,13 +628,13 @@ function smtp_mail($mail_to_array, $subject, $message, $headers, $priority, $mes
 			if (!server_parse($modSettings['smtp_password'], $socket, '235'))
 				return false;
 		}
-		elseif (!server_parse('HELO ' . $modSettings['smtp_host'], $socket, '250'))
+		elseif (!server_parse('HELO ' . $modSettings['smtp_client'], $socket, '250'))
 			return false;
 	}
 	else
 	{
 		// Just say "helo".
-		if (!server_parse('HELO ' . $modSettings['smtp_host'], $socket, '250'))
+		if (!server_parse('HELO ' . $modSettings['smtp_client'], $socket, '250'))
 			return false;
 	}
 
@@ -653,15 +657,14 @@ function smtp_mail($mail_to_array, $subject, $message, $headers, $priority, $mes
 
 		// Using the post by email functions, and not a digest (priority 4)
 		// then generate "reply to mail" keys and place them in the message
-		if (!empty($modSettings['maillist_enabled']) && $message_id !== null && $priority != 4)
+		if (!empty($modSettings['maillist_enabled']) && !empty($message_id) && $priority != 4)
 		{
 			$unq_head_array[0] = md5($scripturl . microtime() . rand());
 			$unq_head_array[1] = $message_type;
 			$unq_head_array[2] = $message_id;
 			$unq_head = $unq_head_array[0] . '-' . $unq_head_array[1] . $unq_head_array[2];
-			$encoded_unq_head = base64_encode($line_break . $line_break . '[' . $unq_head . ']' . $line_break);
 			$unq_id = ($need_break ? $line_break : '') . 'Message-ID: <' . $unq_head . strstr(empty($modSettings['maillist_mail_from']) ? $webmaster_email : $modSettings['maillist_mail_from'], '@') . '>';
-			$message = mail_insert_key($message, $unq_head, $encoded_unq_head, $line_break);
+			$message = mail_insert_key($message, $unq_head, $line_break);
 		}
 
 		// Fix up the headers for this email!
@@ -773,10 +776,9 @@ function server_parse($message, $socket, $response)
  * @package Mail
  * @param string $message
  * @param string $unq_head
- * @param string $encoded_unq_head
  * @param string $line_break
  */
-function mail_insert_key($message, $unq_head, $encoded_unq_head, $line_break)
+function mail_insert_key($message, $unq_head, $line_break)
 {
 	// Append the key to the bottom of each message section, plain, html, encoded, etc
 	$message = preg_replace('~^(.*?)(' . $line_break . '--ELK-[a-z0-9]{32})~s', "$1{$line_break}{$line_break}[{$unq_head}]{$line_break}$2", $message);
@@ -788,8 +790,9 @@ function mail_insert_key($message, $unq_head, $encoded_unq_head, $line_break)
 	if (preg_match('~(Content-Transfer-Encoding: base64' . $line_break . $line_break . ')(.*?)(' . $line_break . '--ELK-[a-z0-9]{32})~s', $message, $match))
 	{
 		// un-chunk, add in our encoded key header, and re chunk, all so we match RFC 2045 semantics.
-		$encoded_message = str_replace($line_break, '', $match[2]);
-		$encoded_message .= $encoded_unq_head;
+		$encoded_message = base64_decode(str_replace($line_break, '', $match[2]));
+		$encoded_message .= $line_break . $line_break . '[' . $unq_head . ']' . $line_break;
+		$encoded_message = base64_encode($encoded_message);
 		$encoded_message = chunk_split($encoded_message, 76, $line_break);
 		$message = str_replace($match[2], $encoded_message, $message);
 	}
@@ -1404,9 +1407,8 @@ function reduceMailQueue($batch_size = false, $override_limit = false, $force_se
 				$unq_head_array[1] = $email['message_type'];
 				$unq_head_array[2] = $email['message_id'];
 				$unq_head = $unq_head_array[0] . '-' . $unq_head_array[1] . $unq_head_array[2];
-				$encoded_unq_head = base64_encode($line_break . $line_break . '[' . $unq_head . ']' . $line_break);
 				$unq_id = ($need_break ? $line_break : '') . 'Message-ID: <' . $unq_head . strstr(empty($modSettings['maillist_mail_from']) ? $webmaster_email : $modSettings['maillist_mail_from'], '@') . '>';
-				$email['body'] = mail_insert_key($email['body'], $unq_head, $encoded_unq_head, $line_break);
+				$email['body'] = mail_insert_key($email['body'], $unq_head, $line_break);
 			}
 			elseif ($email['message_id'] !== null && empty($modSettings['mail_no_message_id']))
 				$unq_id = ($need_break ? $line_break : '') . 'Message-ID: <' . md5($scripturl . microtime()) . '-' . $email['message_id'] . strstr(empty($modSettings['maillist_mail_from']) ? $webmaster_email : $modSettings['maillist_mail_from'], '@') . '>';
@@ -1416,7 +1418,7 @@ function reduceMailQueue($batch_size = false, $override_limit = false, $force_se
 
 			// If it sent, keep a record so we can save it in our allowed to reply log
 			if (!empty($unq_head) && $result)
-				$sent[] = array($unq_head, time(), $email['to']);
+				$sent[] = array_merge($unq_head_array, array(time(),$email['to']));
 
 			// Track total emails sent
 			if ($result && !empty($modSettings['trackStats']))

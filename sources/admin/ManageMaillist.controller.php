@@ -8,7 +8,7 @@
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
- * @version 1.1
+ * @version 1.1.7
  *
  */
 
@@ -345,9 +345,9 @@ class ManageMaillist_Controller extends Action_Controller
 
 		// Prep and show the template with what we found
 		$context['body'] = $parser->parseEmail($text);
-		$context['to'] = $txt['to'] . ' ' . (isset($email_to) ? $email_to : '');
-		$context['notice_subject'] = isset($temp_email[0]['subject']) ? $txt['subject'] . ': ' . $temp_email[0]['subject'] : '';
-		$context['notice_from'] = isset($temp_email[0]['from']) ? $txt['from'] . ': ' . $temp_email[0]['from'] : '';
+		$context['to'] = isset($email_to) ? $email_to : '';
+		$context['notice_subject'] = isset($temp_email[0]['subject']) ? $temp_email[0]['subject'] : '';
+		$context['notice_from'] = isset($temp_email[0]['from']) ? $temp_email[0]['from'] : '';
 		$context['page_title'] = $txt['show_notice'];
 		$context['error_code'] = isset($temp_email[0]['error_code']) && isset($txt[$temp_email[0]['error_code']]) ? $txt[$temp_email[0]['error_code']] : '';
 		$context['sub_template'] = 'show_email';
@@ -414,7 +414,7 @@ class ManageMaillist_Controller extends Action_Controller
 				{
 					// Set up the details needed to get this posted
 					$force = true;
-					$key = $temp_email[0]['key'];
+					$key = $temp_email[0]['key'] . '-' . $temp_email[0]['type'] . $temp_email[0]['message'];
 					$data = $temp_email[0]['body'];
 
 					// Unknown from email?  Update the message ONLY if we found an appropriate one during the error checking process
@@ -477,7 +477,7 @@ class ManageMaillist_Controller extends Action_Controller
 	{
 		global $context, $txt, $modSettings, $scripturl, $mbname;
 
-		if (!isset($this->_req->query->bounce))
+		if (isset($this->_req->query->bounce))
 		{
 			checkSession('get');
 			validateToken('admin-ml', 'get');
@@ -486,11 +486,9 @@ class ManageMaillist_Controller extends Action_Controller
 		require_once(SUBSDIR . '/Mail.subs.php');
 
 		// We should have been sent an email ID
-		if (isset($this->_req->query->item))
+		$id = $this->_req->get('item', 'intval');
+		if (!empty($id))
 		{
-			// Needs to be an int!
-			$id = (int) $this->_req->query->item;
-
 			// Load up the email details, no funny biz yall ;)
 			$temp_email = list_maillist_unapproved($id);
 
@@ -534,7 +532,7 @@ class ManageMaillist_Controller extends Action_Controller
 			$context['settings_message'] = $txt['badid'];
 
 		// Check if they are sending the notice
-		if (isset($this->_req->query->bounce) && isset($temp_email))
+		if (isset($this->_req->post->bounce) && isset($temp_email))
 		{
 			checkSession('post');
 			validateToken('admin-ml');
@@ -553,6 +551,8 @@ class ManageMaillist_Controller extends Action_Controller
 				else
 				{
 					// Time for someone to get a we're so sorry message!
+					$mark_down = new Html_2_Md($body);
+					$body = $mark_down->get_markdown();
 					sendmail($to, $subject, $body, null, null, false, 5);
 					redirectexit('action=admin;area=maillist;bounced');
 				}

@@ -11,7 +11,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.1
+ * @version 1.1.7
  *
  */
 
@@ -182,7 +182,7 @@ class Database_PostgreSQL extends Database_Abstract
 			$db_string = preg_replace(array_keys($replacements[$identifier]), array_values($replacements[$identifier]), $db_string);
 
 		// Limits need to be a little different.
-		$db_string = preg_replace('~\sLIMIT\s(\d+|{int:.+}),\s*(\d+|{int:.+})\s*$~i', 'LIMIT $2 OFFSET $1', $db_string);
+		$db_string = preg_replace('~\sLIMIT\s(\d+|{int:.+}),\s*(\d+|{int:.+})(.*)~i', 'LIMIT $2 OFFSET $1 $3', $db_string);
 
 		if (trim($db_string) == '')
 			return false;
@@ -383,22 +383,22 @@ class Database_PostgreSQL extends Database_Abstract
 	 * Tracking the current row.
 	 * Fetch a row from the resultset given as parameter.
 	 *
-	 * @param resource $request
+	 * @param resource $result
 	 * @param integer|bool $counter = false
 	 */
-	public function fetch_row($request, $counter = false)
+	public function fetch_row($result, $counter = false)
 	{
 		global $db_row_count;
 
 		if ($counter !== false)
-			return pg_fetch_row($request, $counter);
+			return pg_fetch_row($result, $counter);
 
 		// Reset the row counter...
-		if (!isset($db_row_count[(int) $request]))
-			$db_row_count[(int) $request] = 0;
+		if (!isset($db_row_count[(int) $result]))
+			$db_row_count[(int) $result] = 0;
 
 		// Return the right row.
-		return @pg_fetch_row($request, $db_row_count[(int) $request]++);
+		return @pg_fetch_row($result, $db_row_count[(int) $result]++);
 	}
 
 	/**
@@ -551,7 +551,7 @@ class Database_PostgreSQL extends Database_Abstract
 	 * @param resource|null $connection = null
 	 * @throws Elk_Exception
 	 */
-	public function insert($method = 'replace', $table, $columns, $data, $keys, $disable_trans = false, $connection = null)
+	public function insert($method, $table, $columns, $data, $keys, $disable_trans = false, $connection = null)
 	{
 		global $db_prefix;
 
@@ -1039,12 +1039,12 @@ class Database_PostgreSQL extends Database_Abstract
 	/**
 	 * Dummy function really. Doesn't do anything on PostgreSQL.
 	 *
-	 * @param string|null $db_name = null
+	 * @param string|null $dbName = null
 	 * @param resource|null $connection = null
 	 *
 	 * @return boolean
 	 */
-	public function select_db($db_name = null, $connection = null)
+	public function select_db($dbName = null, $connection = null)
 	{
 		return true;
 	}

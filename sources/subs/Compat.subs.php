@@ -13,7 +13,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.1
+ * @version 1.1.7
  *
  */
 
@@ -33,7 +33,7 @@ function sha1_smf($str)
 
 	$str_len = strlen($str);
 	for ($i = 0; $i < $str_len; $i++)
-		$blks[$i >> 2] |= ord($str{$i}) << (24 - ($i % 4) * 8);
+		$blks[$i >> 2] |= ord($str[$i]) << (24 - ($i % 4) * 8);
 
 	$blks[$i >> 2] |= 0x80 << (24 - ($i % 4) * 8);
 

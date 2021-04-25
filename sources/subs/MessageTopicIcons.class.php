@@ -7,7 +7,7 @@
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
- * @version 1.1.4
+ * @version 1.1.7
  *
  */
 
@@ -71,29 +71,114 @@ class MessageTopicIcons extends ElkArte\ValuesContainer
 		$this->_loadStableIcons();
 
 		// Merge in additional ones
-		$custom_icons = array_map(function($element) {
-			return $element['first_icon'];
-		}, $custom);
-		$this->_stable_icons = array_merge($this->_stable_icons, $custom_icons);
-
+		$this->_loadCustomIcons();
+		$this->_merge_all_icons();
 		$this->_loadIcons();
 	}
 
 	/**
-	 * Return the icon specified by idx, or the default icon for invalid names
+	 * Use a passed custom array or fetch the ones available for the board in use
+	 */
+	private function _loadCustomIcons()
+	{
+		global $board;
+
+		// Are custom even an option?
+		if ($this->_allowCustomIcons() && empty($this->_custom_icons))
+		{
+			// Fetch any additional ones
+			require_once(SUBSDIR . '/MessageIcons.subs.php');
+			$this->_custom_icons = getMessageIcons(empty($board) ? 0 : $board);
+		}
+	}
+
+	/**
+	 * This function merges in any custom icons with our standard ones.
+	 *
+	 * @return array
+	 */
+	private function _merge_all_icons()
+	{
+		// Are custom even an option?
+		if ($this->_allowCustomIcons())
+		{
+			// Merge in additional ones
+			$custom_icons = array_map(function ($element) {
+				return $element['value'];
+			}, $this->_custom_icons);
+
+			$this->_stable_icons = array_merge($this->_stable_icons, $custom_icons);
+		}
+	}
+
+	/**
+	 * Simply checks the ACP status of custom icons
+	 *
+	 * @return bool
+	 */
+	private function _allowCustomIcons()
+	{
+		global $modSettings;
+
+		return !empty($modSettings['messageIcons_enable']);
+	}
+
+	/**
+	 * Return the icon specified by idx
+	 *
+	 * @param int|string $key
+	 * @return string
+	 */
+	public function __get($key)
+	{
+		// Not a standard topic icon
+		if (!isset($this->data[$key]))
+		{
+			$this->_setUrl($key);
+		}
+
+		return $this->data[$key]['url'];
+	}
+
+	/**
+	 * Return the icon URL specified by idx
 	 *
 	 * @param int|string $idx
 	 * @return string
 	 */
-	public function __get($idx)
+	public function getIconURL($idx)
+	{
+		$this->_checkValue($idx);
+
+		return $this->data[$idx]['url'];
+	}
+
+	/**
+	 * Return the name of the icon specified by idx
+	 *
+	 * @param int|string $idx
+	 * @return string
+	 */
+	public function getIconName($idx)
+	{
+		$this->_checkValue($idx);
+
+		return $this->data[$idx]['name'];
+	}
+
+	/**
+	 * If the icon does not exist, sets a default
+	 *
+	 * @param $idx
+	 */
+	private function _checkValue($idx)
 	{
 		// Not a standard topic icon
 		if (!isset($this->data[$idx]))
 		{
-			$this->_setUrl($idx);
+			$this->data[$idx]['url'] = $this->data[$this->_default_icon]['url'];
+			$this->data[$idx]['name'] = $this->_default_icon;
 		}
-
-		return $this->data[$idx];
 	}
 
 	/**
@@ -149,13 +234,15 @@ class MessageTopicIcons extends ElkArte\ValuesContainer
 
 		if ($this->_check)
 		{
-			$this->data[$icon] = $settings[file_exists($this->_theme_dir . '/images/post/' . $icon . '.png')
+			$this->data[$icon]['url'] = $settings[file_exists($this->_theme_dir . '/images/post/' . $icon . '.png')
 				 ? self::IMAGE_URL
 				 : self::DEFAULT_URL] . '/post/' . $icon . '.png';
 		}
 		else
 		{
-			$this->data[$icon] = $settings[self::IMAGE_URL] . '/post/' . $icon . '.png';
+			$this->data[$icon]['url'] = $settings[self::IMAGE_URL] . '/post/' . $icon . '.png';
 		}
+
+		$this->data[$icon]['name'] = $icon;
 	}
 }

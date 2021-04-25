@@ -13,7 +13,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.1.4
+ * @version 1.1.7
  *
  */
 
@@ -47,7 +47,7 @@ class Topic_Util
 		$messages_per_page = empty($modSettings['disableCustomPerPage']) && !empty($options['messages_per_page']) ? $options['messages_per_page'] : $modSettings['defaultMaxMessages'];
 		$topicseen = $topicseen ? ';topicseen' : '';
 
-		$icon_sources = new MessageTopicIcons(!empty($modSettings['messageIconChecks_enable']), $settings['theme_dir'], $topics_info);
+		$icon_sources = new MessageTopicIcons(!empty($modSettings['messageIconChecks_enable']), $settings['theme_dir']);
 
 		$parser = \BBC\ParserWrapper::instance();
 
@@ -135,8 +135,8 @@ class Topic_Util
 					'timestamp' => forum_time(true, $row['first_poster_time']),
 					'subject' => $row['first_subject'],
 					'preview' => trim($row['first_body']),
-					'icon' => $row['first_icon'],
-					'icon_url' => $icon_sources->{$row['first_icon']},
+					'icon' => $icon_sources->getIconName($row['first_icon']),
+					'icon_url' => $icon_sources->getIconURL($row['first_icon']),
 					'href' => $scripturl . '?topic=' . $row['id_topic'] . '.0' . $topicseen,
 					'link' => '<a href="' . $scripturl . '?topic=' . $row['id_topic'] . '.0' . $topicseen . '">' . $row['first_subject'] . '</a>'
 				),
@@ -154,8 +154,8 @@ class Topic_Util
 					'timestamp' => forum_time(true, $row['last_poster_time']),
 					'subject' => $row['last_subject'],
 					'preview' => trim($row['last_body']),
-					'icon' => $row['last_icon'],
-					'icon_url' => $icon_sources->{$row['last_icon']},
+					'icon' =>  $icon_sources->getIconName($row['last_icon']),
+					'icon_url' => $icon_sources->getIconURL($row['last_icon']),
 					'href' => $scripturl . '?topic=' . $row['id_topic'] . $url_fragment,
 					'link' => '<a href="' . $scripturl . '?topic=' . $row['id_topic'] . $url_fragment . '" ' . ($row['num_replies'] == 0 ? '' : 'rel="nofollow"') . '>' . $row['last_subject'] . '</a>',
 				),
@@ -166,8 +166,8 @@ class Topic_Util
 				'is_hot' => !empty($modSettings['useLikesNotViews']) ? $row['num_likes'] >= $modSettings['hotTopicPosts'] : $row['num_replies'] >= $modSettings['hotTopicPosts'],
 				'is_very_hot' => !empty($modSettings['useLikesNotViews']) ? $row['num_likes'] >= $modSettings['hotTopicVeryPosts'] : $row['num_replies'] >= $modSettings['hotTopicVeryPosts'],
 				'is_posted_in' => false,
-				'icon' => $row['first_icon'],
-				'icon_url' => $icon_sources->{$row['first_icon']},
+				'icon' => $icon_sources->getIconName($row['first_icon']),
+				'icon_url' => $icon_sources->getIconURL($row['first_icon']),
 				'subject' => $row['first_subject'],
 				'new' => !empty($row['id_msg_modified']) && $row['new_from'] <= $row['id_msg_modified'],
 				'new_from' => $row['new_from'],
@@ -197,7 +197,7 @@ class Topic_Util
 				$topics[$row['id_topic']]['first_post']['started_by'] = sprintf($txt['topic_started_by_in'], '<strong>' . $topics[$row['id_topic']]['first_post']['member']['link'] . '</strong>', '<em>' . $topics[$row['id_topic']]['board']['link'] . '</em>');
 			}
 
-			if (!empty($row['avatar']) || !empty($row['id_attach']))
+			if (isset($row['avatar']) || !empty($row['id_attach']))
 			{
 				$topics[$row['id_topic']]['last_post']['member']['avatar'] = determineAvatar($row);
 			}

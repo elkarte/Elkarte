@@ -18,7 +18,7 @@ $txt['mentions_markread'] = 'Mark as read';
 $txt['mentions_markunread'] = 'Mark as unread';
 
 $txt['mentions_settings'] = 'Notifications Settings';
-$txt['mentions_settings_desc'] = 'In this area you can configure the methods your member will be able to select in order to receive notifications. The "in forum" notifications method cannod be denied, for any other method you can decide to allow it or not.';
+$txt['mentions_settings_desc'] = 'In this area you can configure the methods your members will be able to select in order to receive notifications. The "in forum" notifications method cannot be denied, for any other method you can decide to allow it or not.';
 $txt['mentions_enabled'] = 'Enable site notifications';
 $txt['mentions_buddy'] = 'Add a mention when a member is added to someone\'s buddy list';
 $txt['mentions_dont_notify_rlike'] = 'Don\'t inform the member when a post has a liked removed';

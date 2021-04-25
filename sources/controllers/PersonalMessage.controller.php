@@ -13,7 +13,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.1.4
+ * @version 1.1.7
  *
  */
 
@@ -928,7 +928,7 @@ class PersonalMessage_Controller extends Action_Controller
 		);
 
 		// Trigger the prepare_send_context PM event
-		$this->_events->trigger('prepare_send_context', array('pmsg' => isset($this->_req->query->pmsg) ? $this->_req->query->pmsg : (isset($this->_req->query->quote) ? $this->_req->query->quote : 0), 'editorOptions' => &$editorOptions, 'recipientList' => &$context['recipients']));
+		$this->_events->trigger('prepare_send_context', array('editorOptions' => &$editorOptions));
 
 		create_control_richedit($editorOptions);
 
@@ -1388,7 +1388,7 @@ class PersonalMessage_Controller extends Action_Controller
 		);
 
 		// Trigger the prepare_send_context PM event
-		$this->_events->trigger('prepare_send_context', array('pmsg' => isset($this->_req->query->pmsg) ? $this->_req->query->pmsg : (isset($this->_req->query->quote) ? $this->_req->query->quote : 0), 'editorOptions' => &$editorOptions, 'recipientList' => &$recipient_ids));
+		$this->_events->trigger('prepare_send_context', array('editorOptions' => &$editorOptions));
 
 		create_control_richedit($editorOptions);
 
@@ -1859,7 +1859,8 @@ class PersonalMessage_Controller extends Action_Controller
 		global $txt, $context, $user_info, $language, $modSettings;
 
 		// Check that this feature is even enabled!
-		if (empty($modSettings['enableReportPM']) || empty($this->_req->query->pmsg))
+		$pmsg_check = $this->_req->getPost('pmsg', 'intval',  $this->_req->getQuery('pmsg', 'intval', 0));
+		if (empty($modSettings['enableReportPM']) || empty($pmsg_check))
 		{
 			throw new Elk_Exception('no_access', false);
 		}
@@ -2529,7 +2530,7 @@ class PersonalMessage_Controller extends Action_Controller
 					'timestamp' => forum_time(true, $row['msgtime']),
 					'recipients' => &$recipients[$row['id_pm']],
 					'labels' => &$context['message_labels'][$row['id_pm']],
-					'fully_labeled' => count($context['message_labels'][$row['id_pm']]) == count($context['labels']),
+					'fully_labeled' => (!empty($context['message_labels'][$row['id_pm']]) ? count($context['message_labels'][$row['id_pm']]) : 0) == count($context['labels']),
 					'is_replied_to' => &$context['message_replied'][$row['id_pm']],
 					'href' => $href,
 					'link' => '<a href="' . $href . '">' . $subject_highlighted . '</a>',
@@ -3005,7 +3006,7 @@ function preparePMContext_callback($type = 'subject', $reset = false)
 			'timestamp' => forum_time(true, $subject['msgtime']),
 			'number_recipients' => count($recipients[$subject['id_pm']]['to']),
 			'labels' => &$context['message_labels'][$subject['id_pm']],
-			'fully_labeled' => count($context['message_labels'][$subject['id_pm']]) == count($context['labels']),
+			'fully_labeled' => (!empty($context['message_labels'][$subject['id_pm']]) ? count($context['message_labels'][$subject['id_pm']]) : 0) == count($context['labels']),
 			'is_replied_to' => &$context['message_replied'][$subject['id_pm']],
 			'is_unread' => &$context['message_unread'][$subject['id_pm']],
 			'is_selected' => !empty($temp_pm_selected) && in_array($subject['id_pm'], $temp_pm_selected),
@@ -3091,7 +3092,7 @@ function preparePMContext_callback($type = 'subject', $reset = false)
 		'recipients' => &$recipients[$message['id_pm']],
 		'number_recipients' => count($recipients[$message['id_pm']]['to']),
 		'labels' => &$context['message_labels'][$message['id_pm']],
-		'fully_labeled' => count($context['message_labels'][$message['id_pm']]) == count($context['labels']),
+		'fully_labeled' => (!empty($context['message_labels'][$message['id_pm']]) ? count($context['message_labels'][$message['id_pm']]) : 0) == count($context['labels']),
 		'is_replied_to' => &$context['message_replied'][$message['id_pm']],
 		'is_unread' => &$context['message_unread'][$message['id_pm']],
 		'is_selected' => !empty($temp_pm_selected) && in_array($message['id_pm'], $temp_pm_selected),

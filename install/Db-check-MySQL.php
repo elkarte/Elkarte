@@ -5,14 +5,14 @@
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
- * @version 1.1
+ * @version 1.1.7
  *
  */
 
 $GLOBALS['databases']['mysql'] = array(
 	'name' => 'MySQL',
 	'extension' => 'MySQL Improved (MySQLi)',
-	'version' => '5.0.52',
+	'version' => '5.5.0',
 	'version_check' => function($db_connection) {
 		return min(
 			mysqli_get_server_info($db_connection),

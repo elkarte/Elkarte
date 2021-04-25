@@ -11,7 +11,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.1
+ * @version 1.1.7
  *
  */
 
@@ -71,7 +71,7 @@ class Drafts_Display_Module extends ElkArte\sources\modules\Abstract_Module
 	 */
 	public function prepare_context($use_quick_reply, &$editorOptions, $board)
 	{
-		global $context, $options;
+		global $context, $options, $txt;
 
 		// Check if the draft functions are enabled and that they have permission to use them (for quick reply.)
 		$context['drafts_save'] = $use_quick_reply && allowedTo('post_draft') && $context['can_reply'];
@@ -83,6 +83,8 @@ class Drafts_Display_Module extends ElkArte\sources\modules\Abstract_Module
 			loadLanguage('Drafts');
 			if ($context['drafts_autosave'])
 			{
+				loadLanguage('Post');
+
 				// WYSIWYG editor
 				if (!empty($options['use_editor_quick_reply']))
 				{
@@ -106,6 +108,24 @@ class Drafts_Display_Module extends ElkArte\sources\modules\Abstract_Module
 							sTextareaID: \'' . $editorOptions['id'] . '\',
 							id_draft: ' . (empty($context['id_draft']) ? 0 : $context['id_draft']) . '
 						}';
+
+					$context['shortcuts_text'] = $txt['shortcuts_drafts'];
+
+					if (!isset($editorOptions['buttons']))
+						$editorOptions['buttons'] = array();
+					if (!isset($editorOptions['hidden_fields']))
+						$editorOptions['hidden_fields'] = array();
+
+					$editorOptions['buttons'][] = array(
+						'name' => 'save_draft',
+						'value' => $txt['draft_save'],
+						'options' => 'onclick="return confirm(' . JavaScriptEscape($txt['draft_save_note']) . ') && submitThisOnce(this);" accesskey="d"',
+					);
+
+					$editorOptions['hidden_fields'][] = array(
+						'name' => 'id_draft',
+						'value' => empty($context['id_draft']) ? 0 : $context['id_draft'],
+					);
 
 					loadJavascriptFile('drafts.plugin.js', array('defer' => true));
 				}

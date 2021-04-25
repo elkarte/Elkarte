@@ -7,7 +7,7 @@
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
- * @version 1.1
+ * @version 1.1.7
  *
  */
 
@@ -94,7 +94,7 @@ class Xml_Controller extends Action_Controller
 	{
 		global $context, $board;
 
-		require_once(SUBSDIR . '/Editor.subs.php');
+		require_once(SUBSDIR . '/MessageIcons.subs.php');
 
 		$context['icons'] = getMessageIcons($board);
 		$context['sub_template'] = 'message_icons';
@@ -280,10 +280,10 @@ class Xml_Controller extends Action_Controller
 		// Failed validation, tough to be you
 		else
 		{
-			if (!empty($validation_session))
-				$errors[] = array('value' => $txt[$validation_session]);
+			if ($validation_session !== true)
+				$errors[] = array('value' => $txt['session_verify_fail']);
 
-			if (empty($validation_token))
+			if ($validation_token === false)
 				$errors[] = array('value' => $txt['token_verify_fail']);
 		}
 
@@ -444,10 +444,10 @@ class Xml_Controller extends Action_Controller
 		// Failed validation, extra work for you I'm afraid
 		else
 		{
-			if (!empty($validation_session))
-				$errors[] = array('value' => $txt[$validation_session]);
+			if ($validation_session !== true)
+				$errors[] = array('value' => $txt['session_verify_fail']);
 
-			if (empty($validation_token))
+			if ($validation_token === false)
 				$errors[] = array('value' => $txt['token_verify_fail']);
 		}
 
@@ -557,7 +557,7 @@ class Xml_Controller extends Action_Controller
 					$smiley['order'] = -1;
 
 					// If the node after the drop zone is in the same row/container, we use its position
-					if (isset($smiley_tree[$moved_key + 1]))
+					if (isset($smiley_tree[$moved_key + 1], $smiley_tree[$moved_key - 1]))
 					{
 						$possible_after = getSmiley($smiley_tree[$moved_key - 1]);
 						if ($possible_after['row'] == $smiley['row'] && $possible_after['location'] == $smiley['location'])
@@ -604,10 +604,10 @@ class Xml_Controller extends Action_Controller
 		// Failed validation :'(
 		else
 		{
-			if (!empty($validation_session))
-				$errors[] = array('value' => $txt[$validation_session]);
+			if ($validation_session !== true)
+				$errors[] = array('value' => $txt['session_verify_fail']);
 
-			if (empty($validation_token))
+			if ($validation_token === false)
 				$errors[] = array('value' => $txt['token_verify_fail']);
 		}
 
@@ -694,10 +694,10 @@ class Xml_Controller extends Action_Controller
 		// Failed validation, tough to be you
 		else
 		{
-			if (!empty($validation_session))
-				$errors[] = array('value' => $txt[$validation_session]);
+			if ($validation_session !== true)
+				$errors[] = array('value' => $txt['session_verify_fail']);
 
-			if (empty($validation_token))
+			if ($validation_token === false)
 				$errors[] = array('value' => $txt['token_verify_fail']);
 		}
 
@@ -788,10 +788,10 @@ class Xml_Controller extends Action_Controller
 		// Failed validation, tough to be you
 		else
 		{
-			if (!empty($validation_session))
-				$errors[] = array('value' => $txt[$validation_session]);
+			if ($validation_session !== true)
+				$errors[] = array('value' => $txt['session_verify_fail']);
 
-			if (empty($validation_token))
+			if ($validation_token === false)
 				$errors[] = array('value' => $txt['token_verify_fail']);
 		}
 

@@ -9,7 +9,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.1.4
+ * @version 1.1.7
  *
  */
 
@@ -588,7 +588,14 @@ function action_deleteInstaller()
 	}
 
 	// Now just redirect to a blank.png...
-	header('Location: http://' . (isset($_SERVER['HTTP_HOST']) ? $_SERVER['HTTP_HOST'] : $_SERVER['SERVER_NAME'] . ':' . $_SERVER['SERVER_PORT']) . dirname($_SERVER['PHP_SELF']) . '/../themes/default/images/blank.png');
+	$secure = false;
+
+	if (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] == 'on')
+		$secure = true;
+	elseif (!empty($_SERVER['HTTP_X_FORWARDED_PROTO']) && $_SERVER['HTTP_X_FORWARDED_PROTO'] == 'https' || !empty($_SERVER['HTTP_X_FORWARDED_SSL']) && $_SERVER['HTTP_X_FORWARDED_SSL'] == 'on')
+		$secure = true;
+
+	header('location: http' . ($secure ? 's' : '') . '://' . (isset($_SERVER['HTTP_HOST']) ? $_SERVER['HTTP_HOST'] : $_SERVER['SERVER_NAME'] . ':' . $_SERVER['SERVER_PORT']) . dirname($_SERVER['PHP_SELF']) . '/../themes/default/images/blank.png');
 	exit;
 }
 
@@ -875,6 +882,9 @@ function makeFilesWritable(&$files)
 	return false;
 }
 
+/**
+ * Identify forum paths, set forum use constants
+ */
 function definePaths()
 {
 	global $boarddir, $cachedir, $extdir, $languagedir, $sourcedir;

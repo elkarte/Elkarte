@@ -7,7 +7,7 @@
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
- * @version 1.1
+ * @version 1.1.7
  *
  */
 
@@ -41,7 +41,7 @@ class SessionHandler extends \AbstractModel implements SessionHandlerInterface
 	/**
 	 * {@inheritdoc}
 	 */
-	public function gc($maxlifetime)
+	public function gc($maxLifetime)
 	{
 		return true;
 	}

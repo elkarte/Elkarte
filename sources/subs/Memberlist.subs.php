@@ -11,7 +11,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.1.4
+ * @version 1.1.7
  *
  */
 
@@ -346,7 +346,7 @@ function printMemberListRows($request)
 		$context['members'][$member]['real_name'] = $context['members'][$member]['link'];
 		$context['members'][$member]['avatar'] = '<a href="' . $context['members'][$member]['href'] . '">' . $context['members'][$member]['avatar']['image'] . '</a>';
 		$context['members'][$member]['email_address'] = $context['members'][$member]['email'];
-		$context['members'][$member]['website_url'] = $context['members'][$member]['website']['url'] != '' ? '<a href="' . $context['members'][$member]['website']['url'] . '" target="_blank" class="new_win"><i class="icon i-website" title="' . $context['members'][$member]['website']['title'] . '" title="' . $context['members'][$member]['website']['title'] . '"></i></a>' : '';
+		$context['members'][$member]['website_url'] = $context['members'][$member]['website']['url'] != '' ? '<a href="' . $context['members'][$member]['website']['url'] . '" target="_blank" rel="noopener noreferrer" class="new_win"><i class="icon i-website" title="' . $context['members'][$member]['website']['title'] . '" title="' . $context['members'][$member]['website']['title'] . '"></i></a>' : '';
 		$context['members'][$member]['id_group'] = empty($context['members'][$member]['group']) ? $context['members'][$member]['post_group'] : $context['members'][$member]['group'];
 		$context['members'][$member]['date_registered'] = $context['members'][$member]['registered'];
 

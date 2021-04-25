@@ -11,7 +11,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.1.1
+ * @version 1.1.7
  *
  */
 
@@ -621,7 +621,7 @@ class Display_Controller extends Action_Controller
 			'height' => '250px',
 			'width' => '100%',
 			// We do XML preview here.
-			'preview_type' => 0,
+			'preview_type' => 1,
 		);
 
 		// Trigger the prepare_context event for modules that have tied in to it
@@ -863,8 +863,8 @@ class Display_Controller extends Action_Controller
 			'href' => $scripturl . '?topic=' . $topic . '.msg' . $message['id_msg'] . '#msg' . $message['id_msg'],
 			'link' => '<a href="' . $scripturl . '?topic=' . $topic . '.msg' . $message['id_msg'] . '#msg' . $message['id_msg'] . '" rel="nofollow">' . $message['subject'] . '</a>',
 			'member' => &$memberContext[$message['id_member']],
-			'icon' => $message['icon'],
-			'icon_url' => $this->_icon_sources->{$message['icon']},
+			'icon' => $this->_icon_sources->getIconName($message['icon']),
+			'icon_url' => $this->_icon_sources->getIconURL($message['icon']),
 			'subject' => $message['subject'],
 			'time' => standardTime($message['poster_time']),
 			'html_time' => htmlTime($message['poster_time']),

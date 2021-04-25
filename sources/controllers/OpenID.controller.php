@@ -11,7 +11,7 @@
  * copyright:	2012 Simple Machines Forum (http://www.simplemachines.org)
  * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.1
+ * @version 1.1.7
  *
  */
 
@@ -169,10 +169,8 @@ class OpenID_Controller extends Action_Controller
 			// Generate an ElkArte hash for the db to protect this account
 			$user_settings['passwd'] = validateLoginPassword($this->_secret, '', $user_settings['member_name'], true);
 
-			$tokenizer = new Token_Hash();
-			$user_settings['password_salt'] = $tokenizer->generate_hash(4);
-
 			require_once(SUBSDIR . '/Members.subs.php');
+			updateMemberSalt($user_settings['id_member'], true);
 			updateMemberData($user_settings['id_member'], array('passwd' => $user_settings['passwd'], 'password_salt' => $user_settings['password_salt']));
 
 			// Cleanup on Aisle 5.

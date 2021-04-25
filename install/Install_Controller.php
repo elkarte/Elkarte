@@ -530,9 +530,9 @@ class Install_Controller
 			);
 
 			// God I hope it saved!
-			if (!updateSettingsFile($vars) && substr(__FILE__, 1, 2) == ':\\')
+			if (!updateSettingsFile($vars))
 			{
-				$incontext['error'] = $txt['error_windows_chmod'];
+				$incontext['error'] = $txt['settings_error'];
 				return false;
 			}
 
@@ -685,9 +685,9 @@ class Install_Controller
 			);
 
 			// Must save!
-			if (!updateSettingsFile($vars) && substr(__FILE__, 1, 2) == ':\\')
+			if (!updateSettingsFile($vars))
 			{
-				$incontext['error'] = $txt['error_windows_chmod'];
+				$incontext['error'] = $txt['settings_error'];
 				return false;
 			}
 
@@ -734,12 +734,13 @@ class Install_Controller
 		definePaths();
 
 		$db = load_database();
-		$db_table = db_table_install();
+		db_table_install();
 
 		// Before running any of the queries, let's make sure another version isn't already installed.
 		$db->skip_next_error();
 		$result = $db->query('', '
-			SELECT variable, value
+			SELECT 
+			    variable, value
 			FROM {db_prefix}settings',
 			array()
 		);
@@ -1067,7 +1068,7 @@ class Install_Controller
 			{
 				require_once(SUBSDIR . '/Auth.subs.php');
 
-				$incontext['member_salt'] = substr(md5(mt_rand()), 0, 4);
+				$incontext['member_salt'] = substr(base64_encode(sha1(mt_rand() . microtime(), true)), 0, 16);
 
 				// Format the username properly.
 				$_POST['username'] = preg_replace('~[\t\n\r\x0B\0\xA0]+~', ' ', $_POST['username']);

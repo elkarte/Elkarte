@@ -13,7 +13,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.1.6
+ * @version 1.1.7
  *
  */
 
@@ -265,6 +265,7 @@ class Post_Controller extends Action_Controller
 		$context['can_move'] = allowedTo('move_any');
 		$context['move'] = !empty($_REQUEST['move']);
 		$context['announce'] = !empty($_REQUEST['announce']);
+		$context['id_draft'] = $this->_req->getPost('id_draft', 'intval', 0);
 
 		// You can only announce topics that will get approved...
 		$context['can_announce'] = allowedTo('announce_topic') && $context['becomes_approved'];
@@ -562,7 +563,7 @@ class Post_Controller extends Action_Controller
 		$context['subject'] = addcslashes($this->_form_subject, '"');
 		$context['message'] = str_replace(array('"', '<', '>', '&nbsp;'), array('&quot;', '&lt;', '&gt;', ' '), $this->_form_message);
 
-		require_once(SUBSDIR . '/Editor.subs.php');
+		require_once(SUBSDIR . '/MessageIcons.subs.php');
 		// Message icons - customized or not, retrieve them...
 		$context['icons'] = getMessageIcons($board);
 
@@ -1026,6 +1027,8 @@ class Post_Controller extends Action_Controller
 		// This is an already existing message. Edit it.
 		if (!empty($_REQUEST['msg']))
 		{
+			$posterOptions['id_starter'] = isset($msgInfo['id_member']) ? $msgInfo['id_member'] : $user_info['id'];
+
 			// Have admins allowed people to hide their screwups?
 			if (time() - $msgInfo['poster_time'] > $modSettings['edit_wait_time'] || $user_info['id'] != $msgInfo['id_member'])
 			{

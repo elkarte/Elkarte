@@ -9,7 +9,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.1
+ * @version 1.1.7
  *
  */
 
@@ -48,5 +48,21 @@ function template_notify_board()
 			<p>
 				<strong><a href="', $scripturl, '?action=notifyboard;sa=', $context['notification_set'] ? 'off' : 'on', ';board=', $context['current_board'], '.', $context['start'], ';', $context['session_var'], '=', $context['session_id'], '">', $txt['yes'], '</a> - <a href="', $context['board_href'], '">', $txt['no'], '</a></strong>
 			</p>
+		</div>';
+}
+
+/**
+ * Something to show confirmation when they have unsubscribed from mention/topic/board/etc
+ */
+function template_notify_unsubscribe()
+{
+	global $context, $txt;
+
+	echo '
+		<h2 class="category_header hdicon cat_img_mail">
+			', $txt['unnotify'], '
+		</h2>
+		<div class="well centertext">
+			<p>', $context['unsubscribe_message'], '</p>
 		</div>';
 }

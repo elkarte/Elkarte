@@ -7,7 +7,7 @@
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
- * @version 1.1
+ * @version 1.1.7
  *
  */
 
@@ -176,7 +176,7 @@ interface Database
 	 * @param resource|null $connection = null
 	 * @return void
 	 */
-	public function insert($method = 'replace', $table, $columns, $data, $keys, $disable_trans = false, $connection = null);
+	public function insert($method, $table, $columns, $data, $keys, $disable_trans = false, $connection = null);
 
 	/**
 	 * This function tries to work out additional error information from a back trace.

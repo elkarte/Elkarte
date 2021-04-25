@@ -12,7 +12,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.1
+ * @version 1.1.7
  *
  */
 
@@ -1045,7 +1045,7 @@ function allowedTo($permission, $boards = null)
 		return true;
 
 	// You're never allowed to do something if your data hasn't been loaded yet!
-	if (empty($user_info))
+	if (empty($user_info) || !isset($user_info['permissions']))
 		return false;
 
 	// Administrators are supermen :P.

@@ -11,7 +11,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.1.6
+ * @version 1.1.7
  *
  */
 
@@ -92,10 +92,10 @@ class Bootstrap
 		define('ELKBOOT', '1');
 
 		// The software version
-		define('FORUM_VERSION', 'ElkArte 1.1.6');
+		define('FORUM_VERSION', 'ElkArte 1.1.7');
 
 		// Shortcut for the browser cache stale
-		define('CACHE_STALE', '?R116');
+		define('CACHE_STALE', '?R117');
 	}
 
 	/**
@@ -167,7 +167,13 @@ class Bootstrap
 					$redirec_file = 'install.php';
 				}
 
-				header('Location: http' . (!empty($_SERVER['HTTPS']) && strtolower($_SERVER['HTTPS']) === 'on' ? 's' : '') . '://' . (empty($_SERVER['HTTP_HOST']) ? $_SERVER['SERVER_NAME'] . (empty($_SERVER['SERVER_PORT']) || $_SERVER['SERVER_PORT'] === '80' ? '' : ':' . $_SERVER['SERVER_PORT']) : $_SERVER['HTTP_HOST']) . (strtr(dirname($_SERVER['PHP_SELF']), '\\', '/') == '/' ? '' : strtr(dirname($_SERVER['PHP_SELF']), '\\', '/')) . '/install/' . $redirec_file);
+				$version_running = str_replace('ElkArte ', '', FORUM_VERSION);
+				$proto = 'http' . (!empty($_SERVER['HTTPS']) && strtolower($_SERVER['HTTPS']) === 'on' ? 's' : '');
+				$port = empty($_SERVER['SERVER_PORT']) || $_SERVER['SERVER_PORT'] === '80' ? '' : ':' . $_SERVER['SERVER_PORT'];
+				$host = empty($_SERVER['HTTP_HOST']) ? $_SERVER['SERVER_NAME'] . $port : $_SERVER['HTTP_HOST'];
+				$path = strtr(dirname($_SERVER['PHP_SELF']), '\\', '/') == '/' ? '' : strtr(dirname($_SERVER['PHP_SELF']), '\\', '/');
+
+				header('Location:' . $proto . '://' . $host . $path . '/install/' . $redirec_file . '?v=' . $version_running);
 				die();
 			}
 		}
@@ -289,9 +295,6 @@ class Bootstrap
 	{
 		global $context;
 
-		// Clean the request.
-		cleanRequest();
-
 		// Initiate the database connection and define some database functions to use.
 		loadDatabase();
 
@@ -300,6 +303,9 @@ class Bootstrap
 
 		// It's time for settings loaded from the database.
 		reloadSettings();
+
+		// Clean the request.
+		cleanRequest();
 
 		// Our good ole' contextual array, which will hold everything
 		if (empty($context))
@@ -382,8 +388,11 @@ class Bootstrap
 		// Load the current or SSI theme. (just use $ssi_theme = id_theme;)
 		loadTheme(isset($ssi_theme) ? (int) $ssi_theme : 0);
 
-		// Load BadBehavior functions
-		loadBadBehavior();
+		// Load BadBehavior functions, but not when running from CLI
+		if (!defined('STDIN'))
+		{
+			loadBadBehavior();
+		}
 
 		// @todo: probably not the best place, but somewhere it should be set...
 		if (!headers_sent())
@@ -405,7 +414,8 @@ class Bootstrap
 			obExit(null, true);
 		}
 
-		if (!empty($modSettings['front_page']) && is_callable(array($modSettings['front_page'], 'frontPageHook')))
+		if (!empty($modSettings['front_page']) && class_exists($modSettings['front_page'])
+			&& in_array('frontPageHook', get_class_methods($modSettings['front_page'])))
 		{
 			$modSettings['default_forum_action'] = '?action=forum;';
 		}
@@ -461,7 +471,7 @@ class Bootstrap
 		{
 			die('No access...');
 		}
-		elseif (isset($_REQUEST['ssi_layers'], $ssi_layers) && (@get_magic_quotes_gpc() ? stripslashes($_REQUEST['ssi_layers']) : $_REQUEST['ssi_layers']) == $ssi_layers)
+		elseif (isset($_REQUEST['ssi_layers'], $ssi_layers) && $_REQUEST['ssi_layers'] == $ssi_layers)
 		{
 			die('No access...');
 		}

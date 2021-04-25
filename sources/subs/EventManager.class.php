@@ -7,7 +7,7 @@
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
- * @version 1.1
+ * @version 1.1.7
  */
 
 class Event_Manager
@@ -74,7 +74,7 @@ class Event_Manager
 	public function trigger($position, $args = array())
 	{
 		// Nothing registered against this event, just return
-		if (!isset($this->_registered_events[$position]) || !$this->_registered_events[$position]->hasEvents())
+		if (!array_key_exists($position, $this->_registered_events) || !$this->_registered_events[$position]->hasEvents())
 			return false;
 
 		// For all areas that that registered against this event, let them know its been triggered
@@ -109,12 +109,16 @@ class Event_Manager
 			$instance = $this->_getInstance($class_name);
 
 			// Do what we know we should do... if we find it.
-			if (method_exists($instance, $method_name))
+			if (is_callable(array($instance, $method_name)))
 			{
+				// Don't send $dependencies if there are none / the method can't use them
 				if (empty($dependencies))
 					call_user_func(array($instance, $method_name));
 				else
+				{
+					$this->_checkParameters($class_name, $method_name, $dependencies);
 					call_user_func_array(array($instance, $method_name), $dependencies);
+				}
 			}
 		}
 	}
@@ -178,7 +182,7 @@ class Event_Manager
 	 */
 	public function register($position, $event, $priority = 0)
 	{
-		if (!isset($this->_registered_events[$position]))
+		if (!array_key_exists($position, $this->_registered_events))
 			$this->_registered_events[$position] = new Event(new Priority());
 
 		$this->_registered_events[$position]->add($event, $priority);
@@ -242,6 +246,39 @@ class Event_Manager
 				// Register the "action" to take when the event is triggered
 				$this->register($position, $event, $priority);
 			}
+		}
+	}
+
+	/**
+	 * Reflects a specific class method to see what parameters are needed
+	 *
+	 * Currently only checks on number required, can be expanded to make use of
+	 * $params = $r->getParameters() and then $param-> getName isOptional etc
+	 * to ensure required named are being passed.
+	 *
+	 * @param string $class_name
+	 * @param string $method_name
+	 * @param array $dependencies the dependencies the event registered
+	 *
+	 */
+	protected function _checkParameters($class_name, $method_name, &$dependencies)
+	{
+		// Lets check on the actual methods parameters
+		try
+		{
+			$r = new ReflectionMethod($class_name, $method_name);
+			$number_params = $r->getNumberOfParameters();
+			unset($r);
+		}
+		catch (\Exception $e)
+		{
+			$number_params = 0;
+		}
+
+		// Php8 will not like passing parameters to a method that takes none
+		if ($number_params == 0 && !empty($dependencies))
+		{
+			$dependencies = array();
 		}
 	}
 }

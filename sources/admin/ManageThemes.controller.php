@@ -13,7 +13,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.1.4
+ * @version 1.1.7
  *
  *
  * @todo Update this for the new package manager?
@@ -1157,7 +1157,7 @@ class ManageThemes_Controller extends Action_Controller
 		// How are we going to install this theme, from a dir, zip, copy of default?
 		if ((!empty($_FILES['theme_gz']) && (!isset($_FILES['theme_gz']['error']) || $_FILES['theme_gz']['error'] != 4)) || !empty($this->_req->query->theme_gz))
 			$method = 'upload';
-		elseif (isset($this->_req->query->theme_dir) && rtrim(realpath($this->_req->query->theme_dir), '/\\') != realpath(BOARDDIR . '/themes') && file_exists($this->_req->query->theme_dir))
+		elseif (isset($this->_req->post->theme_dir) && rtrim(realpath($this->_req->post->theme_dir), '/\\') != realpath(BOARDDIR . '/themes') && file_exists($this->_req->post->theme_dir))
 			$method = 'path';
 		else
 			$method = 'copy';

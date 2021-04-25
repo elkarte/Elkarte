@@ -8,7 +8,7 @@
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
- * @version 1.1
+ * @version 1.1.7
  *
  */
 
@@ -285,7 +285,8 @@ function pollOptionsForMember($id_poll, $id_member)
 		SELECT pc.id_choice, pc.label, pc.votes, COALESCE(lp.id_choice, -1) AS voted_this
 		FROM {db_prefix}poll_choices AS pc
 			LEFT JOIN {db_prefix}log_polls AS lp ON (lp.id_choice = pc.id_choice AND lp.id_poll = {int:id_poll} AND lp.id_member = {int:current_member} AND lp.id_member != {int:not_guest})
-		WHERE pc.id_poll = {int:id_poll}',
+		WHERE pc.id_poll = {int:id_poll}
+		ORDER by pc.id_choice',
 		array(
 			'current_member' => $id_member,
 			'id_poll' => $id_poll,

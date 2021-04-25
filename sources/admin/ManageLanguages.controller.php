@@ -11,7 +11,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.1.4
+ * @version 1.1.7
  *
  */
 
@@ -1069,7 +1069,8 @@ class ManageLanguages_Controller extends Action_Controller
 	 */
 	private function _checkOpcache()
 	{
-		return (extension_loaded('Zend OPcache') && ini_get('opcache.enable') && stripos(BOARDDIR, ini_get('opcache.restrict_api')) !== 0);
+		return (extension_loaded('Zend OPcache') && ini_get('opcache.enable') &&
+			(ini_get('opcache.restrict_api') === '' || stripos(BOARDDIR, ini_get('opcache.restrict_api')) !== 0));
 	}
 
 	/**

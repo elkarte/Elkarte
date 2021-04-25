@@ -7,7 +7,7 @@
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
- * @version 1.1.4
+ * @version 1.1.7
  *
  */
 
@@ -70,20 +70,19 @@ class Quotedmem_Mention extends Mention_BoardAccess_Abstract
 	public function post_after_save_post($msgOptions, $becomesApproved, $posterOptions)
 	{
 		$status = $becomesApproved ? 'new' : 'unapproved';
-		$this->_sendNotification($msgOptions['body'], $msgOptions['id'], $status, $posterOptions);
+		$this->_sendNotification($msgOptions, $status, $posterOptions);
 	}
 
 	/**
 	 * Checks if a message has been quoted and if so notifies the owner
 	 *
-	 * @param string $text The message body
-	 * @param int $msg_id The message id of the post containing the quote
+	 * @param mixed[] $msgOptions The message options array
 	 * @param string $status
 	 * @param mixed[] $posterOptions
 	 */
-	protected function _sendNotification($text, $msg_id, $status, $posterOptions)
+	protected function _sendNotification($msgOptions, $status, $posterOptions)
 	{
-		$quoted_names = $this->_findQuotedMembers($text);
+		$quoted_names = $this->_findQuotedMembers($msgOptions['body']);
 
 		if (!empty($quoted_names))
 		{
@@ -93,12 +92,16 @@ class Quotedmem_Mention extends Mention_BoardAccess_Abstract
 
 		if (!empty($members_id))
 		{
+			// If the message was edited, attribute the quote to the starter not the modifier to prevent
+			// the sending of another notification
+			$modified = (isset($posterOptions['id_starter']));
+
 			$notifier = \Notifications::instance();
 			$notifier->add(new \Notifications_Task(
 				'quotedmem',
-				$msg_id,
-				$posterOptions['id'],
-				array('id_members' => $members_id, 'notifier_data' => $posterOptions, 'status' => $status)
+				$msgOptions['id'],
+				$modified ? $posterOptions['id_starter'] : $posterOptions['id'],
+				array('id_members' => $members_id, 'notifier_data' => $posterOptions, 'status' => $status, 'subject' =>  $msgOptions['subject'],)
 			));
 		}
 	}
@@ -194,6 +197,7 @@ The following bbcode is for testing, to be moved to a test when ready.
 
 		$replacements = array(
 			'ACTIONNAME' => $this->_task['source_data']['notifier_data']['name'],
+			'SUBJECT' => $this->_task['source_data']['subject'],
 			'MSGLINK' => replaceBasicActionUrl('{script_url}?msg=' . $this->_task->id_target),
 		);
 

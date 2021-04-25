@@ -14,7 +14,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.1
+ * @version 1.1.7
  *
  */
 
@@ -347,12 +347,13 @@ function loadForumTests()
 				$row['myid_last_msg'] = (int) $row['myid_last_msg'];
 
 				// Not really a problem?
-				if ($row['myid_first_msg'] == $row['myid_first_msg'] && $row['myid_first_msg'] == $row['myid_first_msg'] && $row['approved'] == $row['firstmsg_approved'])
+				if ($row['id_first_msg'] == $row['myid_first_msg'] && $row['id_last_msg'] == $row['myid_last_msg'] && $row['approved'] == $row['firstmsg_approved'])
 					return false;
 
 				$memberStartedID = getMsgMemberID($row['myid_first_msg']);
 				$memberUpdatedID = getMsgMemberID($row['myid_last_msg']);
 
+				require_once(SUBSDIR . '/Topic.subs.php');
 				setTopicAttribute($row['id_topic'], array(
 					'id_first_msg' => $row['myid_first_msg'],
 					'id_member_started' => $memberStartedID,
@@ -365,9 +366,8 @@ function loadForumTests()
 				global $txt, $context;
 
 				// A pretend error?
-				if ($row['myid_first_msg'] == $row['myid_first_msg'] && $row['myid_first_msg'] == $row['myid_first_msg'] && $row['approved'] == $row['firstmsg_approved'])
+				if ($row['id_first_msg'] == $row['myid_first_msg'] && $row['id_last_msg'] == $row['myid_last_msg'] && $row['approved'] == $row['firstmsg_approved'])
 					return false;
-
 				if ($row['id_first_msg'] != $row['myid_first_msg'])
 					$context['repair_errors'][] = sprintf($txt['repair_stats_topics_1'], $row['id_topic'], $row['id_first_msg']);
 				if ($row['id_last_msg'] != $row['myid_last_msg'])

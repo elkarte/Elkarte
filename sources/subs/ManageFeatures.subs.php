@@ -12,7 +12,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.1.1
+ * @version 1.1.7
  *
  */
 
@@ -748,12 +748,13 @@ function loadAllCustomFields()
 }
 
 /**
- * Load all the available mention types
+ * Load all the available mention types and timings
  *
  * What it does:
  *
  * - Scans teh subs\MentionType directory for files
  * - Calls its getType method
+ * - Calls its getSupportedFrequency method
  *
  * @return array
  */
@@ -763,15 +764,17 @@ function getNotificationTypes()
 
 	$glob = new GlobIterator(SUBSDIR . '/MentionType/*Mention.php', FilesystemIterator::SKIP_DOTS);
 	$types = array();
+	$frequency = array();
 
 	// For each file found, call its getType method
 	foreach ($glob as $file)
 	{
 		$class_name = '\\ElkArte\\sources\\subs\\MentionType\\' . preg_replace('~([^^])((?<=)[A-Z](?=[a-z]))~', '$1_$2', $file->getBasename('.php'));
 		$types[] = $class_name::getType();
+		$frequency[$class_name::getType()] = $class_name::getSupportedFrequency();
 	}
 
-	return $types;
+	return array($types, $frequency);
 }
 
 /**

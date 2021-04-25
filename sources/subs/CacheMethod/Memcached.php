@@ -7,7 +7,7 @@
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
- * @version 1.1
+ * @version 1.1.7
  *
  */
 
@@ -127,7 +127,8 @@ class Memcached extends Cache_Method_Abstract
 	 */
 	protected function getServers()
 	{
-		return array_keys((array) $this->obj->getStats());
+		$list = $this->obj->getStats();
+		return $list === false ? array() : array_keys((array) $this->obj->getStats());
 	}
 
 	/**
@@ -202,11 +203,8 @@ class Memcached extends Cache_Method_Abstract
 		);
 
 		$serversmList = $this->getServers();
-
-		if (!empty($serversmList))
-		{
-			$var['postinput'] = $txt['cache_memcached_servers'] . implode('</li><li>', $serversmList) . '</li></ul>';
-		}
+		$serversmList = empty($serversmList) ? array($txt['admin_search_results_none']) : $serversmList;
+		$var['postinput'] = $txt['cache_memcached_servers'] . implode('</li><li>', $serversmList) . '</li></ul>';
 
 		$config_vars[] = $var;
 	}

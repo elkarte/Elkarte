@@ -7,7 +7,7 @@
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
- * @version 1.1
+ * @version 1.1.7
  *
  */
 
@@ -156,7 +156,7 @@ class Likes_Controller extends Action_Controller
 							$type,
 							$this->_id_liked,
 							$user_info['id'],
-							array('id_members' => array($liked_message['id_member']), 'rlike_notif' => empty($modSettings['mentions_dont_notify_rlike']))
+							array('id_members' => array($liked_message['id_member']), 'rlike_notif' => empty($modSettings['mentions_dont_notify_rlike']), 'subject' => $liked_message['subject'])
 						));
 					}
 				}

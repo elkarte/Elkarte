@@ -11,7 +11,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.1.4
+ * @version 1.1.7
  *
  */
 
@@ -246,7 +246,7 @@ class Browser_Detector
 		// Be you robot or human?
 		if (!isset($this->_browsers['possibly_robot']))
 		{
-			if ($user_info['possibly_robot']) {
+			if (isset($user_info['possibly_robot'])) {
 				// This isn't meant to be reliable, it's just meant to catch most bots to prevent PHPSESSID from showing up.
 				$this->_browsers['possibly_robot'] = !empty($user_info['possibly_robot']);
 

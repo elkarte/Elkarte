@@ -11,7 +11,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.1
+ * @version 1.1.7
  *
  */
 
@@ -40,9 +40,12 @@ function detectFulltextIndex()
 	{
 		while ($row = $db->fetch_assoc($request))
 		{
-			if ($row['Column_name'] === 'body' && (isset($row['Index_type']) && $row['Index_type'] === 'FULLTEXT' || isset($row['Comment']) && $row['Comment'] === 'FULLTEXT'))
+			foreach(array('body', 'subject') as $column)
 			{
-				$fulltext_index[] = $row['Key_name'];
+				if ($row['Column_name'] === $column && (isset($row['Index_type']) && $row['Index_type'] === 'FULLTEXT' || isset($row['Comment']) && $row['Comment'] === 'FULLTEXT'))
+				{
+					$fulltext_index[] = $row['Key_name'];
+				}
 			}
 		}
 		$db->free_result($request);
@@ -304,11 +307,13 @@ function alterFullTextIndex($table, $indexes, $add = false)
 	{
 		foreach ($indexes as $index)
 		{
+			$name = str_replace(',', '_', $index);
 			$db->query('', '
 				ALTER TABLE ' . $table . '
-				ADD FULLTEXT {raw:name} ({raw:name})',
+				ADD FULLTEXT {raw:name} ({raw:index})',
 				array(
-					'name' => $index
+					'name'	=> $name,
+					'index' => $index
 				)
 			);
 		}

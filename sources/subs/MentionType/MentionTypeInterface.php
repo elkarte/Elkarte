@@ -7,7 +7,7 @@
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
- * @version 1.1.4
+ * @version 1.1.7
  *
  */
 
@@ -31,6 +31,11 @@ interface Mention_Type_Interface
 	 * Just returns the _type property.
 	 */
 	public static function getType();
+
+	/**
+	 * Returns which frequencies (notification, email, daily, weekly, etc) are supported
+	 */
+	public static function getSupportedFrequency();
 
 	/**
 	 * Returns the modules to enable when turning on the mention.
@@ -84,7 +89,7 @@ interface Mention_Type_Interface
 	 * Used by the Notifications class to retrieve the notifications to send.
 	 *
 	 * @param array $lang_data
-	 * @param int[] $users
+	 * @param int[] $members
 	 *
 	 * @return mixed[] array(array(
 	 *                  id_member_to (int),
@@ -94,7 +99,7 @@ interface Mention_Type_Interface
 	 *                  last_id (int), ???
 	 *                ))
 	 */
-	public function getNotificationBody($lang_data, $users);
+	public function getNotificationBody($lang_data, $members);
 
 	/**
 	 * The Notifications_Task contains few data that may be necessary for the processing

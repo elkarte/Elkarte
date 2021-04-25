@@ -12,7 +12,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.1
+ * @version 1.1.7
  *
  */
 
@@ -44,7 +44,7 @@ class ProfileInfo_Controller extends Action_Controller
 	 */
 	public function pre_dispatch()
 	{
-		global $context, $user_info;
+		global $memberContext, $context, $user_info;
 
 		require_once(SUBSDIR . '/Profile.subs.php');
 
@@ -54,6 +54,10 @@ class ProfileInfo_Controller extends Action_Controller
 			$context['user']['is_owner'] = (int) $this->_memID === (int) $user_info['id'];
 
 		loadLanguage('Profile');
+
+		// Attempt to load the member's profile data.
+		if (!loadMemberContext($this->_memID) || !isset($memberContext[$this->_memID]))
+			throw new Elk_Exception('not_a_user', false);
 	}
 
 	/**
@@ -93,11 +97,7 @@ class ProfileInfo_Controller extends Action_Controller
 	 */
 	public function action_summary()
 	{
-		global $context, $memberContext, $modSettings, $scripturl;
-
-		// Attempt to load the member's profile data.
-		if (!loadMemberContext($this->_memID) || !isset($memberContext[$this->_memID]))
-			throw new Elk_Exception('not_a_user', false);
+		global $context, $modSettings, $scripturl;
 
 		loadTemplate('ProfileInfo');
 

@@ -410,6 +410,12 @@ class UpgradeInstructions_upgrade_1_1
 							'ignore'
 						);
 
+						// Remove any improper data
+						$this->db->query('',
+							'DELETE FROM {db_prefix}postby_emails
+							WHERE length(id_email) < 35'
+						);
+
 						// Move the data from the single column to the new three
 						$this->db->query('',
 							'UPDATE {db_prefix}postby_emails

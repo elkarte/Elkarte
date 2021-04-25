@@ -7,7 +7,7 @@
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
- * @version 1.1.4
+ * @version 1.1.7
  *
  */
 
@@ -26,6 +26,11 @@ class Mailfail_Mention extends Mention_BoardAccess_Abstract
 	 * {@inheritdoc }
 	 */
 	protected static $_type = 'mailfail';
+
+	/**
+	 * {@inheritdoc }
+	 */
+	protected static $_frequency = ['notification'];
 
 	/**
 	 * {@inheritdoc }

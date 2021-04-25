@@ -931,6 +931,8 @@ a.bbc_link {
 #quick_edit_body_container .editor {
 	width: 100%;
 	margin-bottom: 10px;
+	padding: 2px;
+	box-sizing: border-box
 }
 #quick_edit_body_container .input_text {
 	width: 85%;
@@ -3442,6 +3444,8 @@ dl.send_mail dd {
 
 #postmodify #message {
 	width: 100%;
+	padding: 2px;
+	box-sizing: border-box;
 }
 
 #postmodify .lastedit {
@@ -4960,8 +4964,8 @@ a.help .icon {
 }
 
 .search_results_posts .topic_moderation {
-	padding: 1.3em 1em 0 0;
-	width: 2em;
+	padding: 1.0em 1.0em 0 0;
+	width: 4em;
 	vertical-align: top;
 }
 
@@ -6039,6 +6043,11 @@ a > i {
 	.statusbar .insertoverlay .button {
 		margin: 1em auto;
 		display: block;
+	}
+	.statusbar .insertoverlay .button {
+		left: 0;
+		top: -3em;
+		border-radius: 4px;
 	}
 
 	/*.listlevel1#button_profile .linklevel1 {
