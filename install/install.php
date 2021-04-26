@@ -206,7 +206,6 @@ function installExit($fallThrough = false)
 	die();
 }
 
-
 /**
  * Write out the contents of Settings.php file.
  * This function will add the variables passed to it in $config_vars,
@@ -216,6 +215,15 @@ function installExit($fallThrough = false)
  */
 function updateSettingsFile($config_vars)
 {
+	// Lets ensure its writable
+	if (!is_writeable(dirname(__FILE__, 2) . '/Settings.php'))
+	{
+		@chmod(dirname(__FILE__, 2) . '/Settings.php', 0777);
+
+		if (!is_writeable(dirname(__FILE__, 2) . '/Settings.php'))
+			return false;
+	}
+
 	// Modify Settings.php.
 	$settingsArray = file(TMP_BOARDDIR . '/Settings.php');
 

@@ -41,8 +41,7 @@ function template_control_richedit($editor_id, $smileyContainer = null, $bbcCont
 				$editor_container = {},
 				eTextarea = document.getElementById("', $editor_id, '");
 
-			function elk_editor() {',
-				!empty($context['bbcodes_handlers']) ? $context['bbcodes_handlers'] : '', '
+			function elk_editor() {
 				sceditor.createEx(eTextarea, {
 					style: "', $settings['theme_url'], '/css/', $context['theme_variant_url'], 'jquery.sceditor.elk_wiz', $context['theme_variant'], '.css', CACHE_STALE, '",
 					width: "100%",
@@ -90,7 +89,7 @@ function template_control_richedit($editor_id, $smileyContainer = null, $bbcCont
 				foreach ($smileyRow['smileys'] as $smiley)
 				{
 					echo '
-							', JavaScriptEscape($smiley['code']), ': {url: ', JavaScriptEscape(rtrim($settings['smileys_url'], '/') . '/' . $smiley['filename']), ', tooltip: ', JavaScriptEscape($smiley['description']), '}', empty($smiley['isLast']) ? ',' : '';
+							', JavaScriptEscape($smiley['code']), ': {url: ', JavaScriptEscape(rtrim($settings['smileys_url'], '/\\') . '/' . $smiley['filename']), ', tooltip: ', JavaScriptEscape($smiley['description']), '}', empty($smiley['isLast']) ? ',' : '';
 				}
 
 				if (empty($smileyRow['isLast']) && $numRows !== 1)

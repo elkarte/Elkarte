@@ -452,7 +452,19 @@ class UnTgz
 		// Clean the header fields, convert octal to decimal as needed
 		foreach ($this->_current as $key => $value)
 		{
-			$this->_current[$key] = in_array($key, $octdec) ? octdec(trim($value)) : trim($value);
+			if (in_array($key, $octdec))
+			{
+				$value = trim($value);
+				if (!empty($value) && is_numeric($value))
+				{
+					if (($value % 10) >= 8)
+						$value = decoct($value);
+					$value = octdec($value);
+				}
+				$this->_current[$key] = $value;
+			}
+			else
+				$this->_current[$key] = trim($value);
 		}
 	}
 

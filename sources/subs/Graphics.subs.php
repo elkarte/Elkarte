@@ -201,7 +201,7 @@ function showCodeImage($code)
 			$characters[$char_index]['height'] = imagefontheight($loaded_fonts[$character['font']]);
 		}
 
-		$max_height = max($characters[$char_index]['height'] + 5, $max_height);
+		$max_height = max($characters[$char_index]['height'] + 15, $max_height);
 		$total_width += $characters[$char_index]['width'] + 2;
 	}
 

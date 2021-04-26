@@ -305,13 +305,16 @@ function template_upgrade_below()
 								</div>
 							</form>
 						</div>
+					</div>
 				</div>
 			</div>
 		</div>
-	</div></div>
-	<div id="footer_section"><div class="frame" style="height: 40px;">
-		<div class="smalltext"><a href="', SITE_SOFTWARE, '" title="ElkArte Community" target="_blank" class="new_win">ElkArte &copy; 2012 - 2017, ElkArte</a></div>
-	</div></div>
+		<div id="footer_section"><div class="frame" style="height: 40px;">
+			<div class="smalltext">
+				<a href="', SITE_SOFTWARE, '" title="ElkArte Community" target="_blank" class="new_win">ElkArte &copy; 2012 - 2021, ElkArte</a>
+			</div>
+		</div>
+	</div>
 	</body>
 </html>';
 
@@ -543,7 +546,8 @@ function template_welcome_message()
 	}
 
 	echo '
-			</table><br />
+			</table>
+			<br />
 			<span class="smalltext">
 				<strong>Note:</strong> If necessary the above security check can be bypassed for users who may administrate a server but not have admin rights on the forum. In order to bypass the above check simply open &quot;upgrade.php&quot; in a text editor and replace &quot;$disable_security = false;&quot; with &quot;$disable_security = true;&quot; and refresh this page.
 			</span>
@@ -619,7 +623,7 @@ function template_upgrade_options()
 		</div>';
 
 	echo '
-				<table style="border-collapse:collapse; border-spacing: 1; padding: 2px;">
+				<table style="border-collapse:collapse; border-spacing: 1px; padding: 2px;">
 					<tr style="vertical-align: top;">
 						<td style="width: 2%;">
 							<input type="checkbox" name="backup" id="backup" value="1"', $db_type != 'mysql' && $db_type != 'postgresql' ? ' disabled="disabled"' : '', ' class="input_check" />
@@ -688,8 +692,11 @@ function template_backup_database()
 			<br />Completed Table: &quot;', $table, '&quot;.';
 
 	echo '
-			<h3 id="current_tab_div">Current Table: &quot;<span id="current_table">', $upcontext['cur_table_name'], '</span>&quot;</h3>
-			<br /><span id="commess" style="font-weight: bold; display: ', $upcontext['cur_table_num'] == $upcontext['table_count'] ? 'inline' : 'none', ';">Backup Complete! Click Continue to Proceed.</span>';
+			<h3 id="current_tab_div">
+				Current Table: &quot;<span id="current_table">', $upcontext['cur_table_name'], '</span>&quot;
+			</h3>
+			<br />
+			<span id="commess" style="font-weight: bold; display: ', $upcontext['cur_table_num'] == $upcontext['table_count'] ? 'inline' : 'none', ';">Backup Complete! Click Continue to Proceed.</span>';
 
 	// Continue please!
 	$upcontext['continue'] = $support_js ? 2 : 1;
@@ -765,11 +772,13 @@ function template_database_changes()
 
 	echo '
 		<h3>Executing database changes</h3>
-		<h4 style="font-style: italic;">Please be patient - this may take some time on large forums. The time elapsed increments from the server to show progress is being made!</h4>';
+		<h4 style="font-style: italic;">
+			Please be patient - this may take some time on large forums. The time elapsed increments from the server to show progress is being made!
+		</h4>';
 
 	echo '
 		<form action="', $upcontext['form_url'], '&amp;filecount=', $upcontext['file_count'], '" name="upform" id="upform" method="post">
-		<input type="hidden" name="database_done" id="database_done" value="0" />';
+			<input type="hidden" name="database_done" id="database_done" value="0" />';
 
 	// No javascript looks rubbish!
 	if (!$support_js)
@@ -777,28 +786,53 @@ function template_database_changes()
 		foreach ($upcontext['actioned_items'] as $num => $item)
 		{
 			if ($num != 0)
+			{
 				echo ' Successful!';
+			}
+
 			echo '<br />' . $item;
 		}
 		if (!empty($upcontext['changes_complete']))
-			echo ' Successful!<br /><br /><span id="commess" style="font-weight: bold;">Database Updates Complete! Click Continue to Proceed.</span><br />';
+		{
+			echo ' 
+			Successful!
+			<br />
+			<br />
+			<span id="commess" style="font-weight: bold;">Database Updates Complete! Click Continue to Proceed.</span>
+			<br />';
+		}
 	}
 	else
 	{
 		// Tell them how many files we have in total.
 		if ($upcontext['file_count'] > 1)
+		{
 			echo '
 		<strong id="info1">Executing upgrade script <span id="file_done">', $upcontext['cur_file_num'], '</span> of ', $upcontext['file_count'], '.</strong>';
+		}
+
+		if (!isset($upcontext['total_items']))
+		{
+			$upcontext['total_items'] = 0;
+		}
+
+		if (!isset($upcontext['debug_items']))
+		{
+			$upcontext['debug_items'] = 0;
+		}
 
 		echo '
-		<h3 id="info2"><strong>Executing:</strong> &quot;<span id="cur_item_name">', $upcontext['current_item_name'], '</span>&quot; (<span id="item_num">', $upcontext['current_item_num'], '</span> of <span id="total_items"><span id="item_count">', $upcontext['total_items'], '</span>', $upcontext['file_count'] > 1 ? ' - of this script' : '', ')</span></h3>
-		<br /><span id="commess" style="font-weight: bold; display: ', !empty($upcontext['changes_complete']) || $upcontext['current_debug_item_num'] == $upcontext['debug_items'] ? 'inline' : 'none', ';">Database Updates Complete! Click Continue to Proceed.</span>';
+		<h3 id="info2">
+			<strong>Executing:</strong> &quot;<span id="cur_item_name">', $upcontext['current_item_name'], '</span>&quot; (<span id="item_num">', $upcontext['current_item_num'], '</span> of <span id="total_items"><span id="item_count">', $upcontext['total_items'], '</span>', $upcontext['file_count'] > 1 ? ' - of this script' : '', ')</span>
+		</h3>
+		<br />
+		<span id="commess" style="font-weight: bold; display: ', !empty($upcontext['changes_complete']) || $upcontext['current_debug_item_num'] == $upcontext['debug_items'] ? 'inline' : 'none', ';">Database Updates Complete! Click Continue to Proceed.</span>';
 
 		if ($is_debug)
 		{
 			echo '
 			<div id="debug_section" class="roundframe" style="height: 200px; overflow: auto;">
-			<span id="debuginfo"></span>
+				<span id="debuginfo"></span>
 			</div>';
 		}
 	}
@@ -808,7 +842,9 @@ function template_database_changes()
 		<div id="error_block" class="errorbox" style="display: ', empty($upcontext['error_message']) ? 'none' : '', ';">
 			<strong style="text-decoration: underline;">Error!</strong>
 			<br />
-			<div id="error_message">', isset($upcontext['error_message']) ? $upcontext['error_message'] : 'Unknown Error!', '</div>
+			<div id="error_message">',
+				isset($upcontext['error_message']) ? $upcontext['error_message'] : 'Unknown Error!', '
+			</div>
 		</div>';
 
 	// We want to continue at some point!
@@ -836,7 +872,7 @@ function template_database_changes()
 				// We want to track this...
 				if (timeOutID)
 					clearTimeout(timeOutID);
-				timeOutID = window.setTimeout("retTimeout()", ', (10 * $timeLimitThreshold), '000);
+				timeOutID = window.setTimeout("retTimeout()", ', (15 * $timeLimitThreshold), '000);
 
 				getXMLDocument(\'', $upcontext['form_url'], '&xml&filecount=', $upcontext['file_count'], '&substep=\' + lastItem + getData, onItemUpdate);
 			}
@@ -868,11 +904,13 @@ function template_database_changes()
 						document.getElementById("error_block").style.display = "";
 						document.getElementById("error_message").innerHTML = "Error retrieving information on step: " + (sDebugName == "" ? sLastString : sDebugName);';
 
-	if ($is_debug)
-		echo '
+		if ($is_debug)
+		{
+			echo '
 						setOuterHTML(document.getElementById(\'debuginfo\'), \'<span style="color: red;">failed<\' + \'/span><span id="debuginfo"><\' + \'/span>\');';
+		}
 
-	echo '
+		echo '
 					}
 					else
 					{
@@ -891,11 +929,13 @@ function template_database_changes()
 						document.getElementById("error_block").style.display = "";
 						document.getElementById("error_message").innerHTML = "Upgrade script appears to be going into a loop - step: " + sDebugName;';
 
-	if ($is_debug)
-		echo '
+		if ($is_debug)
+		{
+			echo '
 						setOuterHTML(document.getElementById(\'debuginfo\'), \'<span style="color: red;">failed<\' + \'/span><span id="debuginfo"><\' + \'/span>\');';
+		}
 
-	echo '
+		echo '
 					}
 				}
 				retryCount = 0;
@@ -953,8 +993,10 @@ function template_database_changes()
 				{';
 
 		if ($is_debug)
+		{
 			echo '
 					document.getElementById(\'debug_section\').style.display = "none";';
+		}
 
 		echo '
 					document.getElementById(\'commess\').style.display = "";
@@ -962,8 +1004,10 @@ function template_database_changes()
 					document.getElementById(\'database_done\').value = 1;';
 
 		if ($upcontext['file_count'] > 1)
+		{
 			echo '
 					document.getElementById(\'info1\').style.display = "none";';
+		}
 
 		echo '
 					document.getElementById(\'info2\').style.display = "none";
@@ -977,8 +1021,10 @@ function template_database_changes()
 					prevFile = curFile;';
 
 		if ($is_debug)
+		{
 			echo '
 					setOuterHTML(document.getElementById(\'debuginfo\'), \'Moving to next script file...done<br /><span id="debuginfo"><\' + \'/span>\');';
+		}
 
 		echo '
 					getNextItem();
@@ -987,6 +1033,7 @@ function template_database_changes()
 
 		// If debug scroll the screen.
 		if ($is_debug)
+		{
 			echo '
 				if (iLastSubStepProgress == -1)
 				{
@@ -1006,6 +1053,7 @@ function template_database_changes()
 
 				if (document.getElementById(\'debug_section\').scrollHeight)
 					document.getElementById(\'debug_section\').scrollTop = document.getElementById(\'debug_section\').scrollHeight';
+		}
 
 		echo '
 				// Update the page.
@@ -1056,7 +1104,7 @@ function template_database_changes()
 				if (!attemptAgain)
 				{
 					document.getElementById("error_block").style.display = "";
-					document.getElementById("error_message").innerHTML = "Server has not responded for ', ($timeLimitThreshold * 10), ' seconds. It may be worth waiting a little longer or otherwise please click <a href=\"#\" onclick=\"retTimeout(true); return false;\">here<" + "/a> to try this step again";
+					document.getElementById("error_message").innerHTML = "Server has not responded for ', ($timeLimitThreshold * 15), ' seconds. You can wait a little longer or otherwise please click <a href=\"#\" onclick=\"retTimeout(true); return false;\">here<" + "/a> to try this step again";
 				}
 				else
 				{
@@ -1067,13 +1115,14 @@ function template_database_changes()
 
 		// Start things off assuming we've not errored.
 		if (empty($upcontext['error_message']))
+		{
 			echo '
 			getNextItem();';
+		}
 
 		echo '
 		</script>';
 	}
-	return;
 }
 
 /**
@@ -1106,7 +1155,9 @@ function template_upgrade_complete()
 
 	if (!empty($upcontext['can_delete_script']))
 		echo '
-			<label for="delete_self"><input type="checkbox" id="delete_self" onclick="doTheDelete(this);" class="input_check" /> Delete this upgrade.php and its data files now.</label> <em>(doesn\'t work on all servers.)</em>
+			<label for="delete_self">
+				<input type="checkbox" id="delete_self" onclick="doTheDelete(this);" class="input_check" /> Delete this upgrade.php and its data files now.
+			</label> <em>(doesn\'t work on all servers.)</em>
 			<script>
 				function doTheDelete(theCheck)
 				{

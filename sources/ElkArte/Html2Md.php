@@ -176,10 +176,12 @@ class Html2Md
 		// Wordwrap?
 		if (!empty($this->body_width))
 		{
+			$this->_check_line_lenght($this->markdown);
 			$this->markdown = $this->_utf8_wordwrap($this->markdown, $this->body_width, $this->line_end);
 		}
 
-		return $this->markdown;
+		// The null character will trigger a base64 version in outbound email
+		return $this->markdown . "\n\x00";
 	}
 
 	/**
@@ -271,6 +273,9 @@ class Html2Md
 			'&lt|?|' => '<?',
 			'&gt|?|' => '>?'
 		));
+
+		// We may have hidden content ending in ?<br /> due to the above
+		$this->markdown = str_replace('<br />', "\n\n", $this->markdown);
 
 		// Strip the chaff and any excess blank lines we may have produced
 		$this->markdown = trim($this->markdown);
@@ -406,7 +411,10 @@ class Html2Md
 		switch ($tag)
 		{
 			case 'a':
-				$markdown = $this->line_end . $this->_convert_anchor($node);
+				if ($node->getAttribute('data-lightboximage') || $node->getAttribute('data-lightboxmessage'))
+					$markdown = '~`skip`~';
+				else
+					$markdown = $this->line_end . $this->_convert_anchor($node) . $this->line_end;
 				break;
 			case 'abbr':
 				$markdown = $this->_convert_abbr($node);
@@ -453,11 +461,13 @@ class Html2Md
 				$markdown = $this->_convert_header($tag, $this->_get_value($node));
 				break;
 			case 'img':
-				$markdown = $this->_convert_image($node);
+				$markdown = $this->_convert_image($node) . $this->line_end;
 				break;
 			case 'ol':
 			case 'ul':
-				$markdown = rtrim($this->_get_value($node)) . $this->line_break;
+				$markdown = $this->line_end . rtrim($this->_get_value($node)) . $this->line_break;
+				if ($this->_has_parent_list($node, $this->_parser))
+					$markdown = rtrim($this->_get_value($node)) . $this->line_end;
 				break;
 			case 'li':
 				$markdown = $this->_convert_list($node);
@@ -582,13 +592,8 @@ class Html2Md
 		}
 		else
 		{
-			// This will trigger a base64 version in our outbound email
-			$link = "\xF0\x9F\x94\x97";
-			$markdown = '[' . $value . '](' . $href . ' ' . $link . ')';
+			$markdown = '[' . $value . ']( ' . $href . ' )';
 		}
-
-		// Some links can be very long and if we wrap them they break
-		$this->_check_link_lenght($markdown);
 
 		return $markdown;
 	}
@@ -675,7 +680,7 @@ class Html2Md
 			{
 				// Adjust the word wrapping since this has code tags, leave it up to
 				// the email client to mess these up ;)
-				$this->_check_link_lenght($markdown, 5);
+				$this->_check_line_lenght($markdown, 5);
 
 				$markdown .= str_repeat(' ', 4) . $line . $this->line_end;
 			}
@@ -901,7 +906,7 @@ class Html2Md
 			}
 
 			// Adjust the word wrapping since this has a table, will get mussed by email anyway
-			$this->_check_link_lenght($rows[1], 2);
+			$this->_check_line_lenght($rows[1], 2);
 
 			// Return what we did so it can be swapped in
 			return implode($this->line_end, $rows);
@@ -1162,14 +1167,18 @@ class Html2Md
 	 * @param string $markdown
 	 * @param bool|int $buffer
 	 */
-	private function _check_link_lenght($markdown, $buffer = false)
+	private function _check_line_lenght($markdown, $buffer = false)
 	{
-		// Some links can be very long and if we wrap them they break
-		$line_strlen = Util::strlen($markdown) + (!empty($buffer) ? (int) $buffer : 0);
+		// Some Lines can be very long and if we wrap them they break
+		$lines = explode($this->line_end, $markdown);
+		foreach ($lines as $line)
+		{
+			$line_strlen = Util::strlen($line) + (!empty($buffer) ? (int) $buffer : 0);
 		if ($line_strlen > $this->body_width)
 		{
 			$this->body_width = $line_strlen;
 		}
+	}
 	}
 
 	/**
@@ -1177,7 +1186,7 @@ class Html2Md
 	 */
 	private function _convert_plaintxt_links()
 	{
-		$this->markdown = preg_replace_callback('/[^\(\/\]]((https?):\/\/|www\.)[-\p{L}0-9+&@#\/%?=~_|!:,.;]*[\p{L}0-9+&@#\/%=~_|]/iu',
+		$this->markdown = preg_replace_callback('/((?<!\]\( |\]\()https?:\/\/|(?<!\]\( |\]\(|:\/\/)www)[-\p{L}0-9+&@#\/%?=~_|!:,.;]*[\p{L}0-9+&@#\/%=~_|]/iu',
 			function ($matches) {
 				return $this->_plaintxt_callback($matches);
 			}, $this->markdown);
@@ -1193,8 +1202,7 @@ class Html2Md
 	{
 		global $txt;
 
-		$replacement = $this->line_end . '[' . $txt['link'] . '](' . trim($matches[0]) . ')';
-		$this->_check_link_lenght($replacement);
+		$replacement = $this->line_end . '[' . $txt['link'] . ']( ' . trim($matches[0]) . ' )';
 
 		return $replacement;
 	}
@@ -1218,6 +1226,10 @@ class Html2Md
 		foreach ($strings as $string)
 		{
 			$in_quote = isset($string[0]) && $string[0] === '>';
+			if (empty($string))
+			{
+				$lines[] = '';
+			}
 			while (!empty($string))
 			{
 				// Get the next #width characters before a break (space, punctuation tab etc)

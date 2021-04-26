@@ -154,6 +154,9 @@ function pbe_fix_email_body($body, $real_name = '', $charset = 'UTF-8')
 	// Remove the \r's now so its done
 	$body = trim(str_replace("\r", '', $body));
 
+	// Remove any control characters
+	$body = preg_replace('/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]/', '', $body);
+
 	// Remove the riff-raff as defined by the ACP filters
 	$body = pbe_filter_email_message($body);
 
@@ -760,24 +763,21 @@ function pbe_emailError($error, $email_message)
 		// While we have keys to look at see if we can match up this lost message on subjects
 		foreach ($user_keys as $user_key)
 		{
-			if (preg_match('~([a-z0-9]{32})\-([ptm])(\d+)~', $user_key['id_email'], $match))
-			{
-				$key = $match[1];
-				$type = $match[2];
-				$message = $match[3];
+			$key = $user_key['message_key'];
+			$type = $user_key['message_type'];
+			$message = $user_key['message_id'];
 
-				// If we know/suspect its a "m,t or p" then use that to avoid a match on a wrong type, that would be bad ;)
-				if ((!empty($message_type) && $message_type === $type) || (empty($message_type) && $type !== 'p'))
+			// If we know/suspect its a "m,t or p" then use that to avoid a match on a wrong type, that would be bad ;)
+			if ((!empty($message_type) && $message_type === $type) || (empty($message_type) && $type !== 'p'))
+			{
+				// lets look up this message/topic/pm and see if the subjects match ... if they do then tada!
+				if (query_load_subject($message, $type, $email_message->email['from']) === $subject)
 				{
-					// lets look up this message/topic/pm and see if the subjects match ... if they do then tada!
-					if (query_load_subject($message, $type, $email_message->email['from']) === $subject)
-					{
-						// This email has a subject that matches the subject of a message that was sent to them
-						$message_key = $key;
-						$message_id = $message;
-						$message_type = $type;
-						break;
-					}
+					// This email has a subject that matches the subject of a message that was sent to them
+					$message_key = $key;
+					$message_id = $message;
+					$message_type = $type;
+					break;
 				}
 			}
 		}

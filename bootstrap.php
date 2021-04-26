@@ -301,9 +301,6 @@ class Bootstrap
 	{
 		global $context;
 
-		// Clean the request.
-		cleanRequest();
-
 		// Initiate the database connection and define some database functions to use.
 		loadDatabase();
 
@@ -312,6 +309,9 @@ class Bootstrap
 
 		// It's time for settings loaded from the database.
 		reloadSettings();
+
+		// Clean the request.
+		cleanRequest();
 
 		// Make sure we have ready the list of members for populating it
 		MembersList::init(database(), Cache::instance(), ParserWrapper::instance());

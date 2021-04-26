@@ -277,7 +277,7 @@ function sendmail($to, $subject, $message, $from = null, $message_id = null, $se
 			$unq_head_array = array();
 
 			// If we are using the post by email functions, then we generate "reply to mail" security keys
-			if ($maillist)
+			if ($maillist && !empty($message_id) && $priority != 4)
 			{
 				$unq_head_array[0] = md5($boardurl . microtime() . rand());
 				$unq_head_array[1] = $message_type;
@@ -733,7 +733,7 @@ function smtp_mail($mail_to_array, $subject, $message, $headers, $priority, $mes
 
 		// Using the post by email functions, and not a digest (priority 4)
 		// then generate "reply to mail" keys and place them in the message
-		if (!empty($modSettings['maillist_enabled']) && $message_id !== null && $priority != 4)
+		if (!empty($modSettings['maillist_enabled']) && !empty($message_id) && $priority != 4)
 		{
 			$unq_head_array[0] = md5($scripturl . microtime() . rand());
 			$unq_head_array[1] = $message_type;

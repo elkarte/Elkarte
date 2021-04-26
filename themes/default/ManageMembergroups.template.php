@@ -53,6 +53,7 @@ function template_new_group()
 					<dd>
 						<fieldset id="group_type">
 							<legend>', $txt['membergroups_edit_select_group_type'], '</legend>
+							<br />
 							<input type="radio" name="group_type" id="group_type_private" value="0" checked="checked" onclick="swapPostGroup(0);" />
 							<label for="group_type_private">', $txt['membergroups_group_type_private'], '</label><br />';
 
@@ -221,6 +222,7 @@ function template_edit_group()
 					<dd>
 						<fieldset id="group_type">
 							<legend>', $txt['membergroups_edit_select_group_type'], '</legend>
+							<br />
 							<input type="radio" name="group_type" id="group_type_private" value="0" ', !$context['group']['is_post_group'] && $context['group']['type'] == 0 ? 'checked="checked"' : '', ' onclick="swapPostGroup(0);" />
 							<label for="group_type_private">', $txt['membergroups_group_type_private'], '</label><br />';
 

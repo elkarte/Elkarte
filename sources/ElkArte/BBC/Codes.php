@@ -638,7 +638,7 @@ class Codes
 				self::ATTR_TYPE => self::TYPE_PARSED_CONTENT,
 				self::ATTR_PARAM => array(
 					'author' => array(
-						self::PARAM_ATTR_MATCH => '([^<>&"\'=\\\\]{1,192}?)',
+						self::PARAM_ATTR_MATCH => '([^<>]{1,192}?)',
 						self::PARAM_ATTR_QUOTED => self::OPTIONAL,
 					),
 				),
@@ -667,7 +667,7 @@ class Codes
 				self::ATTR_TYPE => self::TYPE_PARSED_CONTENT,
 				self::ATTR_PARAM => array(
 					'author' => array(
-						self::PARAM_ATTR_MATCH => '([^<>&"\'=\\\\]{1,192}?)'
+						self::PARAM_ATTR_MATCH => '([^<>]{1,192}?)',
 					),
 					'link' => array(
 						self::PARAM_ATTR_MATCH => '(?:board=\d+;)?((?:topic|threadid)=[\dmsg#\./]{1,40}(?:;start=[\dmsg#\./]{1,40})?|msg=\d{1,40}|action=profile;u=\d+)',
@@ -688,7 +688,7 @@ class Codes
 				self::ATTR_TYPE => self::TYPE_PARSED_CONTENT,
 				self::ATTR_PARAM => array(
 					'author' => array(
-						self::PARAM_ATTR_MATCH => '([^<>&"\'=\\\\]{1,192}?)'
+						self::PARAM_ATTR_MATCH => '([^<>]{1,192}?)',
 					),
 				),
 				self::ATTR_BEFORE => '<div class="quoteheader">' . $txt['quote_from'] . ': {author}</div><blockquote>',

@@ -126,7 +126,9 @@ function template_install_below()
 		<div id="footer_section">
 			<div class="frame">
 				<ul>
-					<li class="copyright"><a href="', SITE_SOFTWARE, '" title="ElkArte Community" target="_blank" class="new_win">ElkArte &copy; 2012 - 2017, ElkArte Community</a></li>
+					<li class="copyright">
+						<a href="', SITE_SOFTWARE, '" title="ElkArte Community" target="_blank" class="new_win">ElkArte &copy; 2012 - 2021, ElkArte Community</a>
+					</li>
 				</ul>
 			</div>
 		</div>
@@ -537,7 +539,7 @@ function template_admin_account()
 			</tr><tr>
 				<td style="vertical-align: top;" class="textbox"><label for="email">', $txt['user_settings_email'], ':</label></td>
 				<td>
-					<input type="text" name="email" id="email" value="', $incontext['email'], '" size="40" class="input_text" />
+					<input type="email" name="email" id="email" value="', $incontext['email'], '" size="40" class="input_text" />
 					<div style="font-size: smaller; margin-bottom: 2ex;">', $txt['user_settings_email_info'], '</div>
 				</td>
 			</tr>

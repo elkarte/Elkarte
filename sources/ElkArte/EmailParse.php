@@ -897,7 +897,7 @@ class EmailParse
 		foreach (explode("\n", str_replace("\r\n", "\n", $this->_boundary_section[$i]->body)) as $line)
 		{
 			$type = '';
-			list($field, $rest) = explode(':', $line);
+			list($field, $rest) = array_pad(explode(':', $line), 2, '');
 
 			if (strpos($line, ';'))
 			{
@@ -1125,7 +1125,10 @@ class EmailParse
 		// Supplied a key, lets check it
 		if (!empty($key))
 		{
-			preg_match($regex_key, $key, $match);
+			if (preg_match($regex_key, $key, $match) === 1)
+			{
+				$this->_load_key_details($match);
+			}
 		}
 		// Otherwise we play find the key
 		elseif (!$this->_load_key_from_headers($regex_key))

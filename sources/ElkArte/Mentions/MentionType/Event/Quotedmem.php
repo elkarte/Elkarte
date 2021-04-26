@@ -109,11 +109,15 @@ class Quotedmem extends AbstractEventBoardAccess
 
 		if (!empty($members_id))
 		{
+			// If the message was edited, attribute the quote to the starter not the modifier to prevent
+			// the sending of another notification
+			$modified = (isset($posterOptions['id_starter']));
+
 			$notifier = Notifications::instance();
 			$notifier->add(new NotificationsTask(
 				'quotedmem',
 				$msgOptions['id'],
-				$posterOptions['id'],
+				$modified ? $posterOptions['id_starter'] : $posterOptions['id'],
 				array('id_members' => $members_id, 'notifier_data' => $posterOptions, 'status' => $status, 'subject' =>  $msgOptions['subject'])
 			));
 		}

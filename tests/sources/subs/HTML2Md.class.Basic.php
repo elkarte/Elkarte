@@ -7,7 +7,6 @@ class TestHTML2Md extends TestCase
 {
 	protected $mdTestCases = array();
 	protected $restore_txt = false;
-	protected $backupGlobalsBlacklist = ['user_info'];
 
 	/**
 	 * Prepare what is necessary to use in these tests.
@@ -33,12 +32,12 @@ class TestHTML2Md extends TestCase
 			array(
 				'Named links',
 				'<a href="https://www.elkarte.net/" class="bbc_link" target="_blank">ElkArte</a>',
-				'[ElkArte](https://www.elkarte.net/ 🔗)',
+				'[ElkArte]( https://www.elkarte.net/ )',
 			),
 			array(
 				'URL link',
 				'<a href="https://www.elkarte.net/" class="bbc_link" target="_blank">https://www.elkarte.net/</a>',
-				'[Link](https://www.elkarte.net/ 🔗)',
+				'[Link]( https://www.elkarte.net/ )',
 			),
 			array(
 				'Lists',
@@ -47,7 +46,7 @@ class TestHTML2Md extends TestCase
 			),
 			array(
 				'Table',
-				'<h3>Simple table</h3><br /><table><thead><tr><th>Header 1</th><th>Header 2</th></tr></thead><tbody><tr><td>Cell 1</td><td>Cell 2</td></tr><tr><td>Cell 3</td><td>Cell 4</td></tr></tbody></table>',
+				'<h3>Simple table</h3><table><thead><tr><th>Header 1</th><th>Header 2</th></tr></thead><tbody><tr><td>Cell 1</td><td>Cell 2</td></tr><tr><td>Cell 3</td><td>Cell 4</td></tr></tbody></table>',
 				"### Simple table\n\n| Header 1 | Header 2 |\n| -------- | -------- | \n| Cell 1   | Cell 2   |\n| Cell 3   | Cell 4   |",
 			),
 			array(
@@ -71,15 +70,16 @@ Before you can login, you first need to activate your account. To do so, please 
 Should you have any problems with activation, please visit https://www.awesomeforum.com/?action=register;sa=activate;u=12345 use the code "S5cv#4Xh".
 
 Gracias',
-				'Thank you for registering at Awesome Forum. Your username is SomeUser. If you forget your
-password, you can reset it by visiting
-[Link](https://www.awesomeforum.com/?action=reminder)
-Before you can login, you first need to activate your account. To do so, please follow this
-link:
-[Reg Link](https://www.awesomeforum.com/?action=register;sa=activate;u=12345;code=S5cv#4Xh 🔗)
-Should you have any problems with activation, please visit
-[Link](https://www.awesomeforum.com/?action=register;sa=activate;u=12345) use the code
-"S5cv#4Xh".
+				'Thank you for registering at Awesome Forum. Your username is SomeUser. If you forget your password, you can reset it by visiting 
+[Link]( https://www.awesomeforum.com/?action=reminder )
+
+Before you can login, you first need to activate your account. To do so, please follow this link:
+
+[Reg Link]( https://www.awesomeforum.com/?action=register;sa=activate;u=12345;code=S5cv#4Xh )
+
+Should you have any problems with activation, please visit 
+[Link]( https://www.awesomeforum.com/?action=register;sa=activate;u=12345 ) use the code "S5cv#4Xh".
+
 Gracias'
 			),
 		);
@@ -107,10 +107,10 @@ Gracias'
 			$parser = new Html2Md($test);
 
 			// Convert the html to bbc
-			$result = $parser->get_markdown();
+			$result = trim($parser->get_markdown(), "\x00");
 
 			// See if its the result we expect
-			$this->assertEquals($expected, $result);
+			$this->assertEquals($expected . "\n", $result, 'Error:: ' . $result);
 		}
 	}
 }

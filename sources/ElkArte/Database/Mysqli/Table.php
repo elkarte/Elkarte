@@ -494,29 +494,39 @@ class Table extends AbstractTable
 		$row = $request->fetch_assoc();
 		$request->free_result();
 
-		$data_before = isset($row['Data_free']) ? $row['Data_free'] : 0;
-		$request = $this->_db->query('', '
-			OPTIMIZE TABLE `{raw:table}`',
-			array(
-				'table' => $table,
-			)
-		);
-		if (!$request)
+		// Optimize tables that will benefit from this operation.
+		if (isset($row['Engine']) && $row['Engine'] === 'MyISAM')
 		{
-			return -1;
+			$data_before = isset($row['Data_free']) ? $row['Data_free'] : 0;
+			$request = $this->_db->query('', '
+			OPTIMIZE TABLE `{raw:table}`',
+				array(
+					'table' => $table,
+				)
+			);
+			if (!$request)
+			{
+				return -1;
+			}
+
+			// How much left?
+			$request = $this->_db->fetchQuery('
+			SHOW TABLE STATUS LIKE {string:table}',
+				array(
+					'table' => str_replace('_', '\_', $table),
+				)
+			);
+			$row = $request->fetch_assoc();
+			$request->free_result();
+
+			$total_change = isset($row['Data_free']) && $data_before > $row['Data_free'] ? $data_before / 1024 : 0;
+		}
+		else
+		{
+			$total_change = 0;
 		}
 
-		// How much left?
-		$request = $this->_db->fetchQuery('
-			SHOW TABLE STATUS LIKE {string:table}',
-			array(
-				'table' => str_replace('_', '\_', $table),
-			)
-		);
-		$row = $request->fetch_assoc();
-		$request->free_result();
-
-		return isset($row['Data_free']) && $data_before > $row['Data_free'] ? $data_before / 1024 : 0;
+		return $total_change;
 	}
 
 	/**
