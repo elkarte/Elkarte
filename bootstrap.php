@@ -309,9 +309,9 @@ class Bootstrap
 
 		// It's time for settings loaded from the database.
 		reloadSettings();
-		
+
 		// Clean the request.
-		cleanReques
+		cleanRequest();
 
 		// Make sure we have ready the list of members for populating it
 		MembersList::init(database(), Cache::instance(), ParserWrapper::instance());

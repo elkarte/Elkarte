@@ -767,18 +767,17 @@ function pbe_emailError($error, $email_message)
 			$type = $user_key['message_type'];
 			$message = $user_key['message_id'];
 
-				// If we know/suspect its a "m,t or p" then use that to avoid a match on a wrong type, that would be bad ;)
-				if ((!empty($message_type) && $message_type === $type) || (empty($message_type) && $type !== 'p'))
+			// If we know/suspect its a "m,t or p" then use that to avoid a match on a wrong type, that would be bad ;)
+			if ((!empty($message_type) && $message_type === $type) || (empty($message_type) && $type !== 'p'))
+			{
+				// lets look up this message/topic/pm and see if the subjects match ... if they do then tada!
+				if (query_load_subject($message, $type, $email_message->email['from']) === $subject)
 				{
-					// lets look up this message/topic/pm and see if the subjects match ... if they do then tada!
-					if (query_load_subject($message, $type, $email_message->email['from']) === $subject)
-					{
-						// This email has a subject that matches the subject of a message that was sent to them
-						$message_key = $key;
-						$message_id = $message;
-						$message_type = $type;
-						break;
-					}
+					// This email has a subject that matches the subject of a message that was sent to them
+					$message_key = $key;
+					$message_id = $message;
+					$message_type = $type;
+					break;
 				}
 			}
 		}

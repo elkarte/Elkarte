@@ -1202,7 +1202,7 @@ class Html2Md
 	{
 		global $txt;
 
-		$replacement = $this->line_end . '[' . $txt['link'] . '](' . trim($matches[0]) . ')';
+		$replacement = $this->line_end . '[' . $txt['link'] . ']( ' . trim($matches[0]) . ' )';
 
 		return $replacement;
 	}
