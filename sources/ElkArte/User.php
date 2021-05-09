@@ -134,7 +134,7 @@ class User
 
 			self::$id = !empty($id) && strlen(self::$session_password) > 0 ? (int) $id : 0;
 		}
-		elseif (empty(self::$id) && isset($_SESSION['login_' . $cookiename]) && (!empty($modSettings['disableCheckUA']) || $_SESSION['USER_AGENT'] == $user_agent))
+		elseif (empty(self::$id) && isset($_SESSION['login_' . $cookiename]) && (!empty($modSettings['disableCheckUA']) || (!empty($_SESSION['USER_AGENT']) && $_SESSION['USER_AGENT'] == $user_agent)))
 		{
 			// @todo Perhaps we can do some more checking on this, such as on the first octet of the IP?
 			list ($id, self::$session_password, $login_span) = serializeToJson($_SESSION['login_' . $cookiename], function ($array_from) use ($cookiename) {
