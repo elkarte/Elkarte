@@ -177,9 +177,8 @@ class Bootstrap
 				$host = empty($_SERVER['HTTP_HOST']) ? $_SERVER['SERVER_NAME'] . $port : $_SERVER['HTTP_HOST'];
 				$path = strtr(dirname($_SERVER['PHP_SELF']), '\\', '/') == '/' ? '' : strtr(dirname($_SERVER['PHP_SELF']), '\\', '/');
 
-				\ElkArte\Http\Headers::instance()
-					->header('Location', $proto . '://' . $host . $path . '/install/' . $redirec_file . '?v=' . $version_running)
-					->sendHeaders();
+				// To early to use Headers class etc.
+				header('Location:' . $proto . '://' . $host . $path . '/install/' . $redirec_file . '?v=' . $version_running);
 				die();
 			}
 		}
