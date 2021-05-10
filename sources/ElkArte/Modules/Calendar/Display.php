@@ -61,7 +61,7 @@ class Display extends AbstractModule
 			'text' => 'calendar_link',
 			'image' => 'linktocal.png',
 			'lang' => true,
-			'url' => getUrl('action', ['action' => 'post;calendar', 'msg' => $context['topic_first_message'], 'topic' => $context['current_topic'] . '.0'])
+			'url' => getUrl('action', ['action' => 'post', 'calendar', 'msg' => $context['topic_first_message'], 'topic' => $context['current_topic'] . '.0'])
 		];
 
 		$context['calendar_post'] &= allowedTo('modify_any') || ($context['user']['started'] && allowedTo('modify_own'));
@@ -109,7 +109,7 @@ class Display extends AbstractModule
 					'id' => $event['id_event'],
 					'title' => $event['title'],
 					'can_edit' => allowedTo('calendar_edit_any') || ($event['id_member'] == $this->user->id && allowedTo('calendar_edit_own')),
-					'modify_href' => getUrl('action', ['action' => 'post', 'msg' => $topicinfo['id_first_msg'], 'topic' => $topic . '.0;calendar', 'eventid' => $event['id_event'] . '{session_data}']),
+					'modify_href' => getUrl('action', ['action' => 'post', 'msg' => $topicinfo['id_first_msg'], 'topic' => $topic . '.0', 'calendar', 'eventid' => $event['id_event'] . '{session_data}']),
 					'can_export' => allowedTo('calendar_edit_any') || ($event['id_member'] == $this->user->id && allowedTo('calendar_edit_own')),
 					'export_href' => getUrl('action', ['action' => 'calendar', 'sa' => 'ical', 'eventid' => $event['id_event'], '{session_data}']),
 					'start_date' => standardTime($start_date, $date_string, 'none'),

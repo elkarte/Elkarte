@@ -472,7 +472,7 @@ class Recent extends AbstractController implements FrontpageInterface
 		return array(
 			// How about... even... remove it entirely?!
 			'remove' => array(
-				'href' => getUrl('action', ['action' => 'deletemsg', 'msg' => $post['id'], 'topic' => $post['topic'] . ';recent', '{session_data}']),
+				'href' => getUrl('action', ['action' => 'deletemsg', 'msg' => $post['id'], 'topic' => $post['topic'], 'recent', '{session_data}']),
 				'text' => $txt['remove'],
 				'test' => 'can_delete',
 				'custom' => 'onclick="return confirm(' . JavaScriptEscape($txt['remove_message'] . '?') . ');"',

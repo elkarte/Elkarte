@@ -180,13 +180,13 @@ class ProfileInfo extends AbstractController
 				'name' => $txt['profile_recent_activity'],
 				'templates' => array('posts', 'topics', 'attachments'),
 				'active' => true,
-				'href' => getUrl('action', ['action' => 'profileInfo', 'sa' => 'recent;xml', 'u' => $this->_memID, '{session_data}']),
+				'href' => getUrl('action', ['action' => 'profileInfo', 'sa' => 'recent', 'xml', 'u' => $this->_memID, '{session_data}']),
 			),
 			'buddies' => array(
 				'name' => $txt['buddies'],
 				'templates' => array('buddies'),
 				'active' => !empty($modSettings['enable_buddylist']) && $context['user']['is_owner'],
-				'href' => getUrl('action', ['action' => 'profileInfo', 'sa' => 'buddies;xml', 'u' => $this->_memID, '{session_data}']),
+				'href' => getUrl('action', ['action' => 'profileInfo', 'sa' => 'buddies', 'xml', 'u' => $this->_memID, '{session_data}']),
 			)
 		);
 
@@ -393,7 +393,7 @@ class ProfileInfo extends AbstractController
 				? $txt['account_activate_method_' . $context['member']['is_activated'] % 10]
 				: $txt['account_not_activated'];
 
-			$context['activate_url'] = getUrl('action', ['action' => 'profile;save', 'area' => 'activateaccount', 'u' => $this->_memID, '{session_data}', $context['profile-aa' . $this->_memID . '_token_var'] => $context['profile-aa' . $this->_memID . '_token']]);
+			$context['activate_url'] = getUrl('action', ['action' => 'profile', 'save', 'area' => 'activateaccount', 'u' => $this->_memID, '{session_data}', $context['profile-aa' . $this->_memID . '_token_var'] => $context['profile-aa' . $this->_memID . '_token']]);
 		}
 	}
 
@@ -583,7 +583,7 @@ class ProfileInfo extends AbstractController
 				'buttons' => array(
 					// How about... even... remove it entirely?!
 					'remove' => array(
-						'href' => getUrl('action', ['action' => 'deletemsg', 'msg' => $row['id_msg'], 'topic' => $row['id_topic'] . ';profile', 'u' => $context['member']['id'], 'start' => $context['start'], '{session_data}']),
+						'href' => getUrl('action', ['action' => 'deletemsg', 'msg' => $row['id_msg'], 'topic' => $row['id_topic'], 'profile', 'u' => $context['member']['id'], 'start' => $context['start'], '{session_data}']),
 						'text' => $txt['remove'],
 						'test' => 'can_delete',
 						'custom' => 'onclick="return confirm(' . JavaScriptEscape($txt['remove_message'] . '?') . ');"',
@@ -758,10 +758,10 @@ class ProfileInfo extends AbstractController
 						'function' => function ($rowData) {
 							if ($rowData['is_image'] && !empty($rowData['id_thumb']))
 							{
-								return '<img src="' . getUrl('action', ['action' => 'dlattach', 'attach' => $rowData['id_thumb'] . ';image']) .'" />';
+								return '<img src="' . getUrl('action', ['action' => 'dlattach', 'attach' => $rowData['id_thumb'], 'image']) .'" />';
 							}
 
-							return '<img src="' . getUrl('action', ['action' => 'dlattach', 'attach' => $rowData['id'] . ';thumb']) . '" />';
+							return '<img src="' . getUrl('action', ['action' => 'dlattach', 'attach' => $rowData['id'], 'thumb']) . '" />';
 						},
 						'class' => 'centertext recent_attachments',
 					),
@@ -1525,7 +1525,7 @@ class ProfileInfo extends AbstractController
 				{
 					if (!empty($attachment['id_thumb']))
 					{
-						$context['thumbs'][$i]['img'] = '<img id="thumb_' . $attachment['id'] . '" src="' . getUrl('action', ['action' => 'dlattach', 'topic' => $attachment['topic'] . '.0', 'attach' => $attachment['id_thumb'] . ';image']) . '" title="" alt="" />';
+						$context['thumbs'][$i]['img'] = '<img id="thumb_' . $attachment['id'] . '" src="' . getUrl('action', ['action' => 'dlattach', 'topic' => $attachment['topic'] . '.0', 'attach' => $attachment['id_thumb'], 'image']) . '" title="" alt="" />';
 					}
 					elseif (!empty($modSettings['attachmentThumbWidth']) && !empty($modSettings['attachmentThumbHeight']))
 					{

@@ -564,7 +564,7 @@ function template_coppa()
 			<div class="content">
 				<p>', $context['coppa']['body'], '</p>
 				<p>
-					<span><a href="', getUrl('action', ['action' => 'register', 'sa' => 'coppa;form;', 'member' => $context['coppa']['id']]), '" target="_blank" class="new_win">', $txt['coppa_form_link_popup'], '</a> | <a href="', getUrl('action', ['action' => 'register', 'sa' => 'coppa;form;dl', 'member' => $context['coppa']['id']]), '">', $txt['coppa_form_link_download'], '</a></span>
+					<span><a href="', getUrl('action', ['action' => 'register', 'sa' => 'coppa', 'form', 'member' => $context['coppa']['id']]), '" target="_blank" class="new_win">', $txt['coppa_form_link_popup'], '</a> | <a href="', getUrl('action', ['action' => 'register', 'sa' => 'coppa;form;dl', 'member' => $context['coppa']['id']]), '">', $txt['coppa_form_link_download'], '</a></span>
 				</p>
 				<p>', $context['coppa']['many_options'] ? $txt['coppa_send_to_two_options'] : $txt['coppa_send_to_one_option'], '</p>
 				<ol>';

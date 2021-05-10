@@ -437,7 +437,7 @@ class ManageAttachments extends AbstractController
 			'id' => 'attach_browse',
 			'title' => $txt['attachment_manager_browse_files'],
 			'items_per_page' => $modSettings['defaultMaxMessages'],
-			'base_href' => getUrl('admin', ['action' => 'admin', 'area' => 'manageattachments', 'sa' => 'browse']) . ($context['browse_type'] === 'avatars' ? ';avatars' : ($context['browse_type'] === 'thumbs' ? ';thumbs' : '')),
+			'base_href' => getUrl('admin', ['action' => 'admin', 'area' => 'manageattachments', 'sa' => 'browse'] + ($context['browse_type'] === 'avatars' ? ['avatars'] : ($context['browse_type'] === 'thumbs' ? ['thumbs'] : []))),
 			'default_sort_col' => 'name',
 			'no_items_label' => $txt['attachment_manager_' . ($context['browse_type'] === 'avatars' ? 'avatars' : ($context['browse_type'] === 'thumbs' ? 'thumbs' : 'attachments')) . '_no_entries'],
 			'get_items' => array(

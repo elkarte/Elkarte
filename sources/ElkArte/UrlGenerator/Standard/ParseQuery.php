@@ -27,7 +27,7 @@ class ParseQuery extends AbstractParseQuery
 	 * Public facing function that converts the query part of the URL from the
 	 * semantic format back to the standard ElkArte one
 	 *
-	 * @param string $query The semantic query
+	 * @param string $query The standard query
 	 * @return string $query The corresponding standard query
 	 */
 	public function parse($query)

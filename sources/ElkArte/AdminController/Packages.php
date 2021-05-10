@@ -943,7 +943,7 @@ class Packages extends AbstractController
 		// Let the unpacker do the work.... but make sure we handle images properly.
 		if (in_array(strtolower(strrchr($this->_req->query->file, '.')), array('.bmp', '.gif', '.jpeg', '.jpg', '.png')))
 		{
-			$context['filedata'] = '<img src="' . getUrl('admin', ['action' => 'admin', 'area' => 'packages', 'sa' => 'examine', 'package' => $this->_req->query->package, 'file' => $this->_req->query->file . ';raw']) . '" alt="' . $this->_req->query->file . '" />';
+			$context['filedata'] = '<img src="' . getUrl('admin', ['action' => 'admin', 'area' => 'packages', 'sa' => 'examine', 'package' => $this->_req->query->package, 'file' => $this->_req->query->file, 'raw']) . '" alt="' . $this->_req->query->file . '" />';
 		}
 		elseif (is_file(BOARDDIR . '/packages/' . $this->_req->query->package))
 		{

@@ -1613,7 +1613,7 @@ function doSecurityChecks()
 		// Active admin session?
 		if (isAdminSessionActive())
 		{
-			$context['warning_controls']['admin_session'] = sprintf($txt['admin_session_active'], (getUrl('admin', ['action' => 'admin', 'area' => 'adminlogoff;redir', '{session_data}'])));
+			$context['warning_controls']['admin_session'] = sprintf($txt['admin_session_active'], (getUrl('admin', ['action' => 'admin', 'area' => 'adminlogoff', 'redir', '{session_data}'])));
 		}
 
 		// Maintenance mode enabled?

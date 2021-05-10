@@ -494,7 +494,7 @@ class ManageRegistration extends AbstractController
 			redirectexit('action=admin;area=regcenter;sa=settings');
 		}
 
-		$context['post_url'] = getUrl('admin', ['action' => 'admin', 'area' => 'regcenter;save', 'sa' => 'settings']);
+		$context['post_url'] = getUrl('admin', ['action' => 'admin', 'area' => 'regcenter', 'save', 'sa' => 'settings']);
 		$context['settings_title'] = $txt['settings'];
 
 		// Define some javascript for COPPA.

@@ -964,8 +964,9 @@ function template_groupMembership()
 			if ($group['can_leave'])
 			{
 				echo '
-							<a class="linkbutton" href="' . getUrl('action', ['action' => 'profile;save', 'u' => $context['id_member'], 'area' => 'groupmembership', '{session_data}', 'gid' => $group['id'], $context[$context['token_check'] . '_token_var'] => $context[$context['token_check'] . '_token']]), '">' . $txt['leave_group'] . '</a>';
+							<a class="linkbutton" href="' . getUrl('action', ['action' => 'profile', 'save', 'u' => $context['id_member'], 'area' => 'groupmembership', '{session_data}', 'gid' => $group['id'], $context[$context['token_check'] . '_token_var'] => $context[$context['token_check'] . '_token']]), '">' . $txt['leave_group'] . '</a>';
 			}
+
 			echo '
 						</td>
 					</tr>';
@@ -1011,7 +1012,7 @@ function template_groupMembership()
 				if ($group['type'] == 3)
 				{
 					echo '
-							<a class="linkbutton_right" href="', getUrl('action', ['action' => 'profile;save', 'u' => $context['id_member'], 'area' => 'groupmembership', '{session_data}', 'gid' => $group['id'], $context[$context['token_check'] . '_token_var'] => $context[$context['token_check'] . '_token']]), '">', $txt['join_group'], '</a>';
+							<a class="linkbutton_right" href="', getUrl('action', ['action' => 'profile', 'save', 'u' => $context['id_member'], 'area' => 'groupmembership', '{session_data}', 'gid' => $group['id'], $context[$context['token_check'] . '_token_var'] => $context[$context['token_check'] . '_token']]), '">', $txt['join_group'], '</a>';
 				}
 				elseif ($group['type'] == 2 && $group['pending'])
 				{

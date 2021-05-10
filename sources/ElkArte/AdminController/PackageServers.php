@@ -341,9 +341,9 @@ class PackageServers extends AbstractController
 					}
 
 					// Build the download to server link
-					$server_att = $server != '' ? ';server=' . $server : '';
-					$current_url = ';section=' . $packageSection . ';num=' . $section_count;
-					$package['download']['href'] = getUrl('admin', ['action' => 'admin', 'area' => 'packageservers', 'sa' => 'download' . $server_att . $current_url, 'package' => $package['filename'] . ($package['download_conflict'] ? ';conflict' : ''), '{session_data}']);
+					$server_att = $server != '' ? ['server' => $server] : [];
+					$current_url = ['section' => $packageSection, 'num' => $section_count];
+					$package['download']['href'] = getUrl('admin', ['action' => 'admin', 'area' => 'packageservers', 'sa' => 'download'] + $server_att + $current_url + ['package' => $package['filename']] + ($package['download_conflict'] ? ['conflict'] : []) + ['{session_data}']);
 					$package['download']['link'] = '<a href="' . $package['download']['href'] . '">' . $package['name'] . '</a>';
 
 					// Add this package to the list

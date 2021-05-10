@@ -163,7 +163,7 @@ class ManageSmileys extends AbstractController
 		$context['sub_template'] = 'show_settings';
 
 		// Finish up the form...
-		$context['post_url'] = getUrl('admin', ['action' => 'admin', 'area' => 'smileys;save', 'sa' => 'settings']);
+		$context['post_url'] = getUrl('admin', ['action' => 'admin', 'area' => 'smileys', 'save', 'sa' => 'settings']);
 
 		// Saving the settings?
 		if (isset($this->_req->query->save))

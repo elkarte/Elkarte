@@ -116,7 +116,7 @@ class IlaIntegrate
 						Codes::PARAM_ATTR_MATCH => '(right|left|center)',
 					),
 				),
-				Codes::ATTR_CONTENT => '<a id="link_$1" data-lightboximage="$1" data-lightboxmessage="0" href="' . getUrl('action', ['action' => 'dlattach', 'attach' => '$1;image']) . '"><img src="' . getUrl('action', ['action' => 'dlattach', 'attach' => '$1{width}{height}']) . '" alt="" class="bbc_img {align}" /></a>',
+				Codes::ATTR_CONTENT => '<a id="link_$1" data-lightboximage="$1" data-lightboxmessage="0" href="' . getUrl('action', ['action' => 'dlattach', 'attach' => '$1', 'image']) . '"><img src="' . getUrl('action', ['action' => 'dlattach', 'attach' => '$1{width}{height}']) . '" alt="" class="bbc_img {align}" /></a>',
 				Codes::ATTR_VALIDATE => $disableAttach ? null : self::validate_options(),
 				Codes::ATTR_DISALLOW_PARENTS => $disallow,
 				Codes::ATTR_DISABLED_CONTENT => '<a href="' . getUrl('action', ['action' => 'dlattach', 'attach' => '$1']) . '">(' . getUrl('action', ['action' => 'dlattach', 'attach' => '$1']) . ')</a>',
@@ -144,7 +144,7 @@ class IlaIntegrate
 						Codes::PARAM_ATTR_MATCH => '(right|left|center)',
 					),
 				),
-				Codes::ATTR_CONTENT => '<a id="link_$1" data-lightboximage="$1" data-lightboxmessage="0" href="' . getUrl('action', ['action' => 'dlattach', 'attach' => '$1;image']) . '"><img src="' . getUrl('action', ['action' => 'dlattach', 'attach' => '$1{height}{width}']) . '" alt="" class="bbc_img {align}" /></a>',
+				Codes::ATTR_CONTENT => '<a id="link_$1" data-lightboximage="$1" data-lightboxmessage="0" href="' . getUrl('action', ['action' => 'dlattach', 'attach' => '$1', 'image']) . '"><img src="' . getUrl('action', ['action' => 'dlattach', 'attach' => '$1{height}{width}']) . '" alt="" class="bbc_img {align}" /></a>',
 				Codes::ATTR_VALIDATE => $disableAttach ? null : self::validate_options(),
 				Codes::ATTR_DISALLOW_PARENTS => $disallow,
 				Codes::ATTR_DISABLED_CONTENT => '<a href="' . getUrl('action', ['action' => 'dlattach', 'attach' => '$1']) . '">(' . getUrl('action', ['action' => 'dlattach', 'attach' => '$1']) . ')</a>',
@@ -180,7 +180,7 @@ class IlaIntegrate
 						Codes::PARAM_ATTR_MATCH => '(right|left|center)',
 					),
 				),
-				Codes::ATTR_CONTENT => '<a id="link_$1" data-lightboximage="$1" data-lightboxmessage="0" href="' . getUrl('action', ['action' => 'dlattach', 'attach' => '$1;image']) . '"><img src="' . getUrl('action', ['action' => 'dlattach', 'attach' => '$1{type}']) . '" alt="X" class="bbc_img {align}" /></a>',
+				Codes::ATTR_CONTENT => '<a id="link_$1" data-lightboximage="$1" data-lightboxmessage="0" href="' . getUrl('action', ['action' => 'dlattach', 'attach' => '$1', 'image']) . '"><img src="' . getUrl('action', ['action' => 'dlattach', 'attach' => '$1{type}']) . '" alt="X" class="bbc_img {align}" /></a>',
 				Codes::ATTR_VALIDATE => $disableAttach ? null : self::validate_options(),
 				Codes::ATTR_DISALLOW_PARENTS => $disallow,
 				Codes::ATTR_DISABLED_CONTENT => '<a href="' . getUrl('action', ['action' => 'dlattach', 'attach' => '$1']) . '">(' . getUrl('action', ['action' => 'dlattach', 'attach' => '$1']) . ')</a>',
@@ -326,7 +326,7 @@ class IlaIntegrate
 			if (!empty($is_image['is_image']) || $preview !== false)
 			{
 				$type = !empty($modSettings['attachmentThumbnails']) ? ';thumb' : '';
-				$data = '<a id="link_' . $num . '" data-lightboximage="' . $num . '" data-lightboxmessage="0" href="' . getUrl('action', ['action' => 'dlattach', 'attach' => $num . ';image']) . '"><img src="' . getUrl('action', ['action' => 'dlattach', 'attach' => $num . $type]) . '" alt="" class="bbc_img" /></a>';
+				$data = '<a id="link_' . $num . '" data-lightboximage="' . $num . '" data-lightboxmessage="0" href="' . getUrl('action', ['action' => 'dlattach', 'attach' => $num, 'image']) . '"><img src="' . getUrl('action', ['action' => 'dlattach', 'attach' => $num . $type]) . '" alt="" class="bbc_img" /></a>';
 			}
 			else
 			{

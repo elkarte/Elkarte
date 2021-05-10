@@ -170,7 +170,7 @@ class ManageSearch extends AbstractController
 		}
 
 		// Prep the template!
-		$context['post_url'] = getUrl('admin', ['action' => 'admin', 'area' => 'managesearch;save', 'sa' => 'settings']);
+		$context['post_url'] = getUrl('admin', ['action' => 'admin', 'area' => 'managesearch', 'save', 'sa' => 'settings']);
 		$context['settings_title'] = $txt['search_settings_title'];
 
 		$settingsForm->prepare();

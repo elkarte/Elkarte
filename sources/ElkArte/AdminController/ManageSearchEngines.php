@@ -120,7 +120,7 @@ class ManageSearchEngines extends AbstractController
 		}
 
 		// Set up some details for the template.
-		$context['post_url'] = getUrl('admin', ['action' => 'admin', 'area' => 'sengines;save', 'sa' => 'settings']);
+		$context['post_url'] = getUrl('admin', ['action' => 'admin', 'area' => 'sengines', 'save', 'sa' => 'settings']);
 		$context['settings_title'] = $txt['settings'];
 
 		// Do some javascript.

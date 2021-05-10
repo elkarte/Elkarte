@@ -181,7 +181,7 @@ class DailyDigest implements ScheduledTaskInterface
 					$types[$row['note_type']][$row['id_board']]['lines'][$row['id_topic']] = array(
 						'id' => $row['id_topic'],
 						'subject' => un_htmlspecialchars($row['subject']),
-						'link' => getUrl('action', ['topic' => $row['id_topic'] . '.new;topicseen', 'hash' => '#new']),
+						'link' => getUrl('action', ['topic' => $row['id_topic'] . '.new', 'topicseen', 'hash' => '#new']),
 						'count' => 1,
 						'body_id' => $row['last_reply'],
 						'body_text' => $row['last_body'],
@@ -204,7 +204,7 @@ class DailyDigest implements ScheduledTaskInterface
 				{
 					$types[$row['note_type']][$row['id_board']]['lines'][$row['id_topic']] = array(
 						'id' => $row['id_topic'],
-						'link' => getUrl('action', ['topic' => $row['id_topic'] . '.new;topicseen', 'hash' => '#new']),
+						'link' => getUrl('action', ['topic' => $row['id_topic'] . '.new', 'topicseen', 'hash' => '#new']),
 						'subject' => un_htmlspecialchars($row['subject']),
 						'body' => $row['body'],
 					);

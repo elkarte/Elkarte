@@ -776,7 +776,7 @@ class Poll extends AbstractController
 		}
 
 		$context['page_title'] = $context['is_edit'] ? $txt['poll_edit'] : $txt['add_poll'];
-		$context['form_url'] = getUrl('action', ['action' => 'editpoll2', $context['is_edit'] ? '' : ';add', 'topic' => $context['current_topic'] . '.' . $context['start']]);
+		$context['form_url'] = getUrl('action', ['action' => 'editpoll2'] + ($context['is_edit'] ? [] : ['add']) + ['topic' => $context['current_topic'] . '.' . $context['start']]);
 
 		// Build the link tree.
 		$pollinfo['subject'] = censor($pollinfo['subject']);

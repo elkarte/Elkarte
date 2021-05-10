@@ -1288,7 +1288,7 @@ function loadAttachmentContext($id_msg)
 			{
 				$attachmentData[$i]['thumbnail'] = array(
 					'id' => $attachment['id_thumb'],
-					'href' => getUrl('action', ['action' => 'dlattach', 'topic' => $topic . '.0', 'attach' => $attachment['id_thumb'] . ';image']),
+					'href' => getUrl('action', ['action' => 'dlattach', 'topic' => $topic . '.0', 'attach' => $attachment['id_thumb'], 'image']),
 				);
 			}
 			$attachmentData[$i]['thumbnail']['has_thumb'] = !empty($attachment['id_thumb']);

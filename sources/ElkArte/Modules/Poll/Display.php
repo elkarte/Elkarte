@@ -112,7 +112,7 @@ class Display extends AbstractModule
 					'text' => 'poll_results',
 					'image' => 'poll_results.png',
 					'lang' => true,
-					'url' => getUrl('action', ['topic' => $context['current_topic'] . '.' . $context['start'] . ';viewresults'])
+					'url' => getUrl('action', ['topic' => $context['current_topic'] . '.' . $context['start'], 'viewresults'])
 				],
 				'change_vote' => [
 					'test' => 'allow_change_vote',

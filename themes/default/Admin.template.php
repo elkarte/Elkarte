@@ -950,7 +950,7 @@ function template_repair_boards()
 				', $txt['errors_fix'], '
 			</p>
 			<p>
-				<strong><a class="linkbutton" href="', getUrl('admin', ['action' => 'admin', 'area' => 'repairboards;fixErrors', '{session_data}']), '">', $txt['yes'], '</a> - <a href="', getUrl('admin', ['action' => 'admin', 'area' => 'maintain']), '">', $txt['no'], '</a></strong>
+				<strong><a class="linkbutton" href="', getUrl('admin', ['action' => 'admin', 'area' => 'repairboards', 'fixErrors', '{session_data}']), '">', $txt['yes'], '</a> - <a href="', getUrl('admin', ['action' => 'admin', 'area' => 'maintain']), '">', $txt['no'], '</a></strong>
 			</p>';
 		}
 		else

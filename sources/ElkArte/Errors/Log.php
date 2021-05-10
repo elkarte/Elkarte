@@ -200,9 +200,9 @@ class Log extends AbstractModel
 				$sum += $row['num_errors'];
 
 				$types[$sum] = array(
-					'label' => (isset($txt['errortype_' . $row['error_type']]) ? $txt['errortype_' . $row['error_type']] : $row['error_type']) . ' (' . $row['num_errors'] . ')',
-					'description' => isset($txt['errortype_' . $row['error_type'] . '_desc']) ? $txt['errortype_' . $row['error_type'] . '_desc'] : '',
-					'url' => getUrl('admin', ['action' => 'admin', 'area' => 'logs', 'sa' => 'errorlog' . ($sort == 'down' ? ';desc' : ''), 'filter' => 'error_type', 'value' => $row['error_type']]),
+					'label' => ($txt['errortype_' . $row['error_type']] ?? $row['error_type']) . ' (' . $row['num_errors'] . ')',
+					'description' => $txt['errortype_' . $row['error_type'] . '_desc'] ?? '',
+					'url' => getUrl('admin', ['action' => 'admin', 'area' => 'logs', 'sa' => 'errorlog'] + ($sort == 'down' ? ['desc'] : []) + ['filter' => 'error_type', 'value' => $row['error_type']]),
 					'is_selected' => !empty($filter) && $filter['value']['sql'] == $this->_db->escape_wildcard_string($row['error_type']),
 				);
 			}

@@ -133,7 +133,7 @@ class ManagePaid extends AbstractController
 		$context[$context['admin_menu_name']]['current_subsection'] = 'settings';
 
 		// Get the final touches in place.
-		$context['post_url'] = getUrl('admin', ['action' => 'admin', 'area' => 'paidsubscribe;save', 'sa' => 'settings']);
+		$context['post_url'] = getUrl('admin', ['action' => 'admin', 'area' => 'paidsubscribe', 'save', 'sa' => 'settings']);
 		$context['settings_title'] = $txt['settings'];
 
 		// We want javascript for our currency options.
@@ -392,7 +392,7 @@ class ManagePaid extends AbstractController
 						'function' => function ($rowData) {
 							global $txt;
 
-							return '<a href="' . getUrl('admin', ['action' => 'admin', 'area' => 'paidsubscribe', 'sa' => 'modify;delete', 'sid' => $rowData['id']]) . '"><i class="icon i-delete" title="' . $txt['delete'] . '"></i></a>';
+							return '<a href="' . getUrl('admin', ['action' => 'admin', 'area' => 'paidsubscribe', 'sa' => 'modify', 'delete', 'sid' => $rowData['id']]) . '"><i class="icon i-delete" title="' . $txt['delete'] . '"></i></a>';
 						},
 						'class' => 'centertext',
 					),
