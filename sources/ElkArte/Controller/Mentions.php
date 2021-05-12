@@ -321,7 +321,7 @@ class Mentions extends AbstractController
 				'show_on' => 'top',
 				'links' => array(
 					array(
-						'href' => getUrl('action', ['action' => 'mentions' . (!empty($this->_all) ? ';all' : '')]),
+						'href' => getUrl('action', ['action' => 'mentions'] + (!empty($this->_all) ? ['all'] : [])),
 						'is_selected' => empty($this->_type),
 						'label' => $txt['mentions_type_all']
 					),
@@ -343,7 +343,7 @@ class Mentions extends AbstractController
 		foreach ($this->_known_mentions as $mention)
 		{
 			$list_options['list_menu']['links'][] = array(
-				'href' => getUrl('action', ['action' => 'mentions', 'type' => $mention . (!empty($this->_all) ? ';all' : '')]),
+				'href' => getUrl('action', ['action' => 'mentions', 'type' => $mention] + (!empty($this->_all) ? ['all'] : [])),
 				'is_selected' => $this->_type === $mention,
 				'label' => $txt['mentions_type_' . $mention]
 			);

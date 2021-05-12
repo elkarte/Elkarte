@@ -287,7 +287,7 @@ class ManagePosts extends AbstractController
 		}
 
 		// Final settings...
-		$context['post_url'] = getUrl('admin', ['action' => 'admin', 'area' => 'postsettings;save', 'sa' => 'posts']);
+		$context['post_url'] = getUrl('admin', ['action' => 'admin', 'area' => 'postsettings', 'save', 'sa' => 'posts']);
 		$context['settings_title'] = $txt['manageposts_settings'];
 
 		// Prepare the settings...

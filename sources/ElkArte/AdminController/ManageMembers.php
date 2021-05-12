@@ -961,7 +961,7 @@ class ManageMembers extends AbstractController
 		$listOptions = array(
 			'id' => 'approve_list',
 			'items_per_page' => $modSettings['defaultMaxMembers'],
-			'base_href' => getUrl('admin', ['action' => 'admin', 'area' => 'viewmembers', 'sa' => 'browse', 'type' => $context['browse_type'] . (!empty($context['show_filter']) ? ';filter=' . $context['current_filter'] : '')]),
+			'base_href' => getUrl('admin', ['action' => 'admin', 'area' => 'viewmembers', 'sa' => 'browse', 'type' => $context['browse_type'] . (!empty($context['show_filter']) ? ', \'filter\' =>' . $context['current_filter'] : '')]),
 			'default_sort_col' => 'date_registered',
 			'get_items' => array(
 				'file' => SUBSDIR . '/Members.subs.php',

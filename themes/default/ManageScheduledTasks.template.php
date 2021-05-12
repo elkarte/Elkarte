@@ -62,7 +62,7 @@ function template_edit_scheduled_tasks()
 	// Starts off with general maintenance procedures.
 	echo '
 	<div id="admincenter">
-		<form action="', getUrl('admin', ['action' => 'admin', 'area' => 'scheduledtasks', 'sa' => 'taskedit;save', 'tid' => $context['task']['id']]), '" method="post" accept-charset="UTF-8">
+		<form action="', getUrl('admin', ['action' => 'admin', 'area' => 'scheduledtasks', 'sa' => 'taskedit', 'save', 'tid' => $context['task']['id']]), '" method="post" accept-charset="UTF-8">
 			<h2 class="category_header">', $txt['scheduled_task_edit'], '</h2>
 			<div class="information">
 				<em>', sprintf($txt['scheduled_task_time_offset'], $context['server_time']), ' </em>

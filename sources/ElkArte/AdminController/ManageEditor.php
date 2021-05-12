@@ -117,7 +117,7 @@ class ManageEditor extends AbstractController
 		// Make sure the template stuff is ready now...
 		$context['sub_template'] = 'show_settings';
 		$context['page_title'] = $txt['manageposts_editor_settings_title'];
-		$context['post_url'] = getUrl('admin', ['action' => 'admin', 'area' => 'editor;save']);
+		$context['post_url'] = getUrl('admin', ['action' => 'admin', 'area' => 'editor', 'save']);
 		$context['settings_title'] = $txt['manageposts_editor_settings_title'];
 
 		$settingsForm->prepare();

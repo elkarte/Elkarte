@@ -61,11 +61,6 @@ class Headers
 	{
 		global $scripturl;
 
-		if ($setLocation === '')
-		{
-			return $this->header('Location');
-		}
-
 		// Convert relative URL to site url
 		if (preg_match('~^(ftp|http)[s]?://~', $setLocation) === 0)
 		{
@@ -106,7 +101,7 @@ class Headers
 	/**
 	 * Normally used for a header that starts with the string "HTTP/" (case is not significant),
 	 * which will be used to figure out the HTTP status code to send.  You could stuff in any
-	 * complete header you wanted as the value is sent via header($value)
+	 * complete header you wanted as the value is used directly as header($value)
 	 *
 	 * @param $value
 	 * @return $this
@@ -138,7 +133,7 @@ class Headers
 
 	/**
 	 * Converts / Fixes header names in to a standard format to enable consistent
-	 * search replace is etc.
+	 * search replace etc.
 	 *
 	 * @param string $name
 	 * @return string
@@ -155,8 +150,8 @@ class Headers
 	}
 
 	/**
-	 * Set the http header code, like 404, 200, 301, etc  Only output if
-	 * content type is not empty
+	 * Set the http header code, like 404, 200, 301, etc
+	 * Only output if content type is not empty
 	 *
 	 * @param int $httpCode
 	 * @return $this

@@ -999,7 +999,7 @@ class ManagePermissions extends AbstractController
 		// Some items for the template
 		$context['page_title'] = $txt['permission_settings_title'];
 		$context['sub_template'] = 'show_settings';
-		$context['post_url'] = getUrl('admin', ['action' => 'admin', 'area' => 'permissions;save', 'sa' => 'settings']);
+		$context['post_url'] = getUrl('admin', ['action' => 'admin', 'area' => 'permissions', 'save', 'sa' => 'settings']);
 
 		// Saving the settings?
 		if (isset($this->_req->query->save))

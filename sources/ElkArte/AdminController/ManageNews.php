@@ -998,7 +998,7 @@ class ManageNews extends AbstractController
 		// Wrap it all up nice and warm...
 		$context['page_title'] = $txt['admin_edit_news'] . ' - ' . $txt['settings'];
 		$context['sub_template'] = 'show_settings';
-		$context['post_url'] = getUrl('admin', ['action' => 'admin', 'area' => 'news;save', 'sa' => 'settings']);
+		$context['post_url'] = getUrl('admin', ['action' => 'admin', 'area' => 'news', 'save', 'sa' => 'settings']);
 
 		// Saving the settings?
 		if (isset($this->_req->query->save))

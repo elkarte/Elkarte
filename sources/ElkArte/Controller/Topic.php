@@ -280,7 +280,7 @@ class Topic extends AbstractController
 		$context['canonical_url'] = getUrl('action', ['topic' => $topic . '.0']);
 		$context['view_attach_mode'] = array(
 			'text' => getUrl('action', ['action' => 'topic', 'sa' => 'printpage', 'topic' => $topic . '.0']),
-			'images' =>getUrl('action', ['action' => 'topic', 'sa' => 'printpage', 'topic' => $topic . '.0;images']),
+			'images' =>getUrl('action', ['action' => 'topic', 'sa' => 'printpage', 'topic' => $topic . '.0', 'images']),
 		);
 	}
 }

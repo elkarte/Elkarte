@@ -229,7 +229,7 @@ class ManageMembergroups extends AbstractController
 				array(
 					'position' => 'below_table_data',
 					'class' => 'submitbutton',
-					'value' => '<a class="linkbutton" href="' . getUrl('admin', ['action' => 'admin', 'area' => 'membergroups', 'sa' => 'add;generalgroup']) . '">' . $txt['membergroups_add_group'] . '</a>',
+					'value' => '<a class="linkbutton" href="' . getUrl('admin', ['action' => 'admin', 'area' => 'membergroups', 'sa' => 'add', 'generalgroup']) . '">' . $txt['membergroups_add_group'] . '</a>',
 				),
 			),
 		);
@@ -336,7 +336,7 @@ class ManageMembergroups extends AbstractController
 				array(
 					'position' => 'below_table_data',
 					'class' => 'submitbutton',
-					'value' => '<a class="linkbutton" href="' . getUrl('admin', ['action' => 'admin', 'area' => 'membergroups', 'sa' => 'add;postgroup']) . '">' . $txt['membergroups_add_group'] . '</a>',
+					'value' => '<a class="linkbutton" href="' . getUrl('admin', ['action' => 'admin', 'area' => 'membergroups', 'sa' => 'add', 'postgroup']) . '">' . $txt['membergroups_add_group'] . '</a>',
 				),
 			),
 		);

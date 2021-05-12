@@ -1828,7 +1828,7 @@ class PersonalMessage extends AbstractController
 		theme()->getTemplates()->load('Profile');
 
 		// We want them to submit back to here.
-		$context['profile_custom_submit_url'] = getUrl('action', ['action' => 'pm', 'sa' => 'settings;save']);
+		$context['profile_custom_submit_url'] = getUrl('action', ['action' => 'pm', 'sa' => 'settings', 'save']);
 
 		$context['page_title'] = $txt['pm_settings'];
 		$context['user']['is_owner'] = true;

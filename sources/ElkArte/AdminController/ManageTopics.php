@@ -95,7 +95,7 @@ class ManageTopics extends AbstractController
 		}
 
 		// Set up the template stuff nicely.
-		$context['post_url'] = getUrl('admin', ['action' => 'admin', 'area' => 'postsettings;save', 'sa' => 'topics']);
+		$context['post_url'] = getUrl('admin', ['action' => 'admin', 'area' => 'postsettings', 'save', 'sa' => 'topics']);
 		$context['settings_title'] = $txt['manageposts_topic_settings'];
 
 		// Prepare the settings
