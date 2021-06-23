@@ -361,12 +361,12 @@ class ManageAttachments extends AbstractController
 					? $txt['basedirectory_for_attachments_current']
 					: $txt['basedirectory_for_attachments_warning']))
 			),
-			is_string($modSettings['attachmentUploadDir'])
-				? array('text', 'attachmentUploadDir', 'postinput' => $txt['attachmentUploadDir_multiple_configure'], 40, 'invalid' => !$context['valid_upload_dir'])
-				: array('var_message', 'attach_current_directory', 'postinput' => $txt['attachmentUploadDir_multiple_configure'], 'message' => 'attachment_path', 'invalid' => empty($context['valid_upload_dir']), 'text_label' => (!empty($context['valid_upload_dir'])
-				? $txt['attach_current_dir']
-				: $txt['attach_current_dir_warning'])
-			),
+			Util::is_serialized($modSettings['attachmentUploadDir'])
+				? array('var_message', 'attach_current_directory', 'postinput' => $txt['attachmentUploadDir_multiple_configure'], 'message' => 'attachment_path', 'invalid' => empty($context['valid_upload_dir']),
+					'text_label' => (!empty($context['valid_upload_dir'])
+						? $txt['attach_current_dir']
+						: $txt['attach_current_dir_warning']))
+				: array('text', 'attachmentUploadDir', 'postinput' => $txt['attachmentUploadDir_multiple_configure'], 40, 'invalid' => !$context['valid_upload_dir']),
 			array('int', 'attachmentDirFileLimit', 'subtext' => $txt['zero_for_no_limit'], 6),
 			array('int', 'attachmentDirSizeLimit', 'subtext' => $txt['zero_for_no_limit'], 6, 'postinput' => $txt['kilobyte']),
 			'',
@@ -470,7 +470,7 @@ class ManageAttachments extends AbstractController
 								$link .= sprintf('%1$s/%2$s', $modSettings['custom_avatar_url'], $rowData['filename']);
 							}
 							// By default avatars are downloaded almost as attachments.
-							elseif ($context['browse_type'] == 'avatars')
+							elseif ($context['browse_type'] === 'avatars')
 							{
 								$link .= getUrl('attach', ['action' => 'dlattach', 'type' => 'avatar', 'attach' => (int) $rowData['id_attach'], 'name' => $rowData['filename']]);
 							}
