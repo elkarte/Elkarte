@@ -1,13 +1,12 @@
 <?php
-// Version: 1.1; index
+// Version: 2.0; index
 
 global $forum_copyright;
 
-// Locale (strftime, pspell_new) and spelling. (pspell_new, can be left as '' normally.)
+// Locale (strftime, pspell_new) and spelling.
 // For more information see:
-//   - http://www.php.net/function.pspell-new
-//   - http://www.php.net/function.setlocale
-// Again, SPELLING SHOULD BE '' 99% OF THE TIME!!  Please read this!
+//   - https://www.php.net/function.pspell-new
+//   - https://www.php.net/function.setlocale
 $txt['lang_locale'] = 'en_US';
 $txt['lang_dictionary'] = 'en';
 $txt['lang_spelling'] = 'american';
@@ -80,8 +79,10 @@ $txt['time_am'] = 'am';
 $txt['time_pm'] = 'pm';
 
 // Let's get all the main menu strings in one place.
+$txt['main_menu'] = 'Main Menu';
 $txt['home'] = 'Home';
 $txt['community'] = 'Community';
+
 // Sub menu labels
 $txt['help'] = 'Help';
 $txt['search'] = 'Search';
@@ -199,8 +200,6 @@ $txt['last_post'] = 'Last post';
 $txt['first_post'] = 'First post';
 $txt['last_poster'] = 'Last post author';
 
-// @todo - Clean this up a bit. See notes in template.
-// Just moved a space, so the output looks better when things break to an extra line.
 $txt['last_post_message'] = '<span class="lastpost_link">%2$s </span><span class="board_lastposter">by %1$s</span><span class="board_lasttime"><strong>Last post: </strong>%3$s</span>';
 $txt['boardindex_total_posts'] = '%1$s Posts in %2$s Topics by %3$s Members';
 $txt['show'] = 'Show';

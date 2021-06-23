@@ -1,5 +1,5 @@
 <?php
-// Version: 1.1; BadBehaviorlog
+// Version: 2.0; BadBehaviorlog
 
 $txt['badbehaviorlog_date'] = 'Date';
 $txt['badbehaviorlog_protocol'] = 'Protocol';

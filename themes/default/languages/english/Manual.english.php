@@ -1,5 +1,5 @@
 <?php
-// Version: 1.1; Manual
+// Version: 2.0; Manual
 
 /* Everything in this file is for the ElkArte help manual
    If you are looking at translating the manual into another language

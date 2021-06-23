@@ -1,5 +1,5 @@
 <?php
-// Version: 1.1; Admin
+// Version: 2.0; Admin
 
 $txt['admin_boards'] = 'Boards';
 $txt['admin_back_to'] = 'Back to admin panel';

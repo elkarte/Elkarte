@@ -1,5 +1,5 @@
 <?php
-// Version: 1.1; Validation
+// Version: 2.0; Validation
 
 $txt['_validate_required'] = 'The %1$s field is required.';
 $txt['_validate_valid_email'] = 'The %1$s field is required to be a valid email address.';

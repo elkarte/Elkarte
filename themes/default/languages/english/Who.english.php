@@ -1,5 +1,5 @@
 <?php
-// Version: 1.1; Who
+// Version: 2.0; Who
 
 $txt['who_hidden'] = '<em>hmm... no idea, sorry</em>';
 $txt['who_admin'] = 'Viewing the admin portal';

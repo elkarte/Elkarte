@@ -1,5 +1,5 @@
 <?php
-// Version: 1.1; Errors
+// Version: 2.0; Errors
 
 $txt['no_access'] = 'Sorry, we can\'t let you access this section. We can\'t even tell you if it exists. You\'re welcome to visit the main page and choose your way from there.';
 $txt['not_guests'] = 'Sorry, this action is not available to guests.';
