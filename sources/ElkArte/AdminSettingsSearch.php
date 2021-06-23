@@ -16,6 +16,8 @@
 
 namespace ElkArte;
 
+use ElkArte\Themes\ThemeLoader;
+
 /**
  * Perform a search in the admin settings (and maybe other settings as well)
  */
@@ -56,7 +58,7 @@ class AdminSettingsSearch
 	{
 		if (!empty($language_files))
 		{
-			\ElkArte\Themes\ThemeLoader::loadLanguageFile(implode('+', $language_files));
+			ThemeLoader::loadLanguageFile(implode('+', $language_files));
 		}
 
 		if (!empty($include_files))
@@ -162,9 +164,10 @@ class AdminSettingsSearch
 	{
 		global $txt;
 
-		// See if there are any labels that might fit?
+		// Special case for file and db which go var, label, db, etc
 		if (isset($var[2]) && in_array($var[2], array('file', 'db')))
 		{
+			$save = $var[1];
 			$var[1] = $var[0];
 		}
 
@@ -189,7 +192,7 @@ class AdminSettingsSearch
 			return $txt['groups_' . $var[1]];
 		}
 
-		return $var[1];
+		return $save ?? $var[1];
 	}
 
 	/**
@@ -231,14 +234,14 @@ class AdminSettingsSearch
 		{
 			foreach ($section['areas'] as $menu_key => $menu_item)
 			{
-				$sections[] = array($menu_item['label'], 'area=' . $menu_key);
+				$sections[] = array($menu_item['label'], 'area=' . $menu_key, $menu_key);
 				if (!empty($menu_item['subsections']))
 				{
 					foreach ($menu_item['subsections'] as $key => $sublabel)
 					{
 						if (isset($sublabel['label']))
 						{
-							$sections[] = array($sublabel['label'], 'area=' . $menu_key . ';sa=' . $key);
+							$sections[] = array($sublabel['label'], 'area=' . $menu_key . ';sa=' . $key, $menu_key);
 						}
 					}
 				}
@@ -327,7 +330,7 @@ class AdminSettingsSearch
 
 			$return = array(
 				'name' => $name,
-				'help' => Util::shorten_text(isset($item[2]) ? strip_tags($helptxt[$item[2]]) : (isset($helptxt[$found]) ? strip_tags($helptxt[$found]) : ''), 255),
+				'help' => Util::shorten_text(isset($item[2], $helptxt[$item[2]]) ? strip_tags($helptxt[$item[2]]) : (isset($helptxt[$found]) ? strip_tags($helptxt[$found]) : ''), 255),
 			);
 		}
 
