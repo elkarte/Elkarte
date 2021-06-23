@@ -29,44 +29,22 @@ use ElkArte\Util;
  */
 class Post extends AbstractModule
 {
-	/**
-	 * Autosave enabled
-	 *
-	 * @var bool
-	 */
+	/** @var bool Autosave enabled */
 	protected static $_autosave_enabled = false;
 
-	/**
-	 * Allowed to save drafts?
-	 *
-	 * @var bool
-	 */
+	/** @var bool Allowed to save drafts? */
 	protected static $_drafts_save = false;
 
-	/**
-	 * How often to autosave if enabled
-	 *
-	 * @var int
-	 */
+	/** @var int How often to autosave if enabled */
 	protected static $_autosave_frequency = 30000;
 
-	/**
-	 * Subject length that we can save
-	 *
-	 * @var int
-	 */
-	protected static $_subject_length = 24;
+	/** @var int Subject length that we can save */
+	protected static $_subject_length = 32;
 
-	/**
-	 * @var \ElkArte\EventManager
-	 */
+	/** @var \ElkArte\EventManager */
 	protected static $_eventsManager = null;
 
-	/**
-	 * Loading draft into the editor?
-	 *
-	 * @var mixed
-	 */
+	/** @var mixed Loading draft into the editor? */
 	protected $_loading_draft = false;
 
 	/**
@@ -76,7 +54,7 @@ class Post extends AbstractModule
 	{
 		global $modSettings;
 
-		$return = array();
+		$eventHooks = [];
 		if (!empty($modSettings['drafts_enabled']) && !empty($modSettings['drafts_post_enabled']))
 		{
 			self::$_eventsManager = $eventsManager;
@@ -95,7 +73,7 @@ class Post extends AbstractModule
 
 			self::$_drafts_save = allowedTo('post_draft');
 
-			$return = array(
+			$eventHooks = array(
 				array('prepare_modifying', array('\\ElkArte\\Modules\\Drafts\\Post', 'prepare_modifying'), array('really_previewing')),
 				array('finalize_post_form', array('\\ElkArte\\Modules\\Drafts\\Post', 'finalize_post_form'), array('editorOptions', 'board', 'topic', 'template_layers')),
 
@@ -105,7 +83,7 @@ class Post extends AbstractModule
 			);
 		}
 
-		return $return;
+		return $eventHooks;
 	}
 
 	/**
@@ -205,7 +183,7 @@ class Post extends AbstractModule
 	 *
 	 * What it does:
 	 *
-	 * - Loads a specific draft for current use in the postbox if selected.
+	 * - Loads a specific draft for current use in the editor if selected.
 	 * - Used in the posting screens to allow draft selection
 	 * - Will load a draft if selected is supplied via post
 	 *
@@ -308,7 +286,7 @@ class Post extends AbstractModule
 				$post_errors = ErrorContext::context('post', 1);
 
 				// If we were called from the autosave function, send something back
-				if (!empty($context['id_draft']) && isset($_REQUEST['xml']) && !$post_errors->hasError('session_timeout'))
+				if (!empty($context['id_draft']) && $this->getApi() !== false && !$post_errors->hasError('session_timeout'))
 				{
 					theme()->getTemplates()->load('Xml');
 					$context['sub_template'] = 'xml_draft';

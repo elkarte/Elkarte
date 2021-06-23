@@ -594,7 +594,7 @@ function make_preview_btn(preview_id)
 	{
 		$.ajax({
 			type: "POST",
-			url: elk_scripturl + "?action=xmlpreview;xml",
+			url: elk_scripturl + "?action=xmlpreview;api=xml",
 			data: {item: "newspreview", news: $("#data_" + preview_id).val()},
 			context: document.body
 		})
@@ -611,9 +611,9 @@ function make_preview_btn(preview_id)
 			});
 	});
 
-	if (!$id.parent().hasClass('linkbutton_right'))
+	if (!$id.parent().hasClass('linkbutton'))
 	{
-		$id.wrap('<a class="linkbutton_right" href="javascript:void(0);"></a>');
+		$id.wrap('<a class="linkbutton floatright" href="javascript:void(0);"></a>');
 	}
 }
 
@@ -747,7 +747,7 @@ function testFTP()
 		sPostData = sPostData + (sPostData.length === 0 ? "" : "&") + oPostData[i] + "=" + document.getElementById(oPostData[i]).value.php_urlencode();
 
 	// Post the data out.
-	sendXMLDocument(elk_prepareScriptUrl(elk_scripturl) + 'action=admin;area=packages;sa=ftptest;xml;' + elk_session_var + '=' + elk_session_id, sPostData, testFTPResults);
+	sendXMLDocument(elk_prepareScriptUrl(elk_scripturl) + 'action=admin;area=packages;sa=ftptest;api=xml;' + elk_session_var + '=' + elk_session_id, sPostData, testFTPResults);
 }
 
 /**
@@ -851,7 +851,7 @@ function expandFolder(folderIdent, folderReal)
 
 	// Otherwise we need to get the wicked thing.
 	ajax_indicator(true);
-	getXMLDocument(elk_prepareScriptUrl(elk_scripturl) + 'action=admin;area=packages;onlyfind=' + folderReal.php_urlencode() + ';sa=perms;xml;' + elk_session_var + '=' + elk_session_id, onNewFolderReceived);
+	getXMLDocument(elk_prepareScriptUrl(elk_scripturl) + 'action=admin;area=packages;onlyfind=' + folderReal.php_urlencode() + ';sa=perms;api=xml;' + elk_session_var + '=' + elk_session_id, onNewFolderReceived);
 
 	return false;
 }
@@ -1233,7 +1233,7 @@ function ajax_getTemplatePreview()
 {
 	$.ajax({
 		type: "POST",
-		url: elk_scripturl + '?action=xmlpreview;xml',
+		url: elk_scripturl + '?action=xmlpreview;api=xml',
 		data: {
 			item: "warning_preview",
 			title: $("#template_title").val(),
@@ -1420,7 +1420,7 @@ function initDeleteThemes()
 		{
 			$.ajax({
 				type: "GET",
-				url: base_url + ";api;xml",
+				url: base_url + ";api=xml",
 				beforeSend: ajax_indicator(true)
 			})
 				.done(function (request)
@@ -1671,7 +1671,7 @@ function ajax_getEmailTemplatePreview()
 {
 	$.ajax({
 		type: "POST",
-		url: elk_scripturl + "?action=xmlpreview;xml",
+		url: elk_scripturl + "?action=xmlpreview;api=xml",
 		data: {
 			item: "bounce_preview",
 			title: $("#template_title").val(),
@@ -1728,7 +1728,7 @@ function ajax_getCensorPreview()
 	$.ajax({
 		type: 'POST',
 		dataType: 'json',
-		url: elk_scripturl + "?action=admin;area=postsettings;sa=censor;xml",
+		url: elk_scripturl + "?action=admin;area=postsettings;sa=censor;api=xml",
 		data: {
 			censortest: $("#censortest").val()
 		}
@@ -1803,7 +1803,7 @@ $(function ()
 		$.ajax({
 			type: 'POST',
 			dataType: 'json',
-			url: elk_scripturl + "?action=admin;area=featuresettings;sa=basic;xml;api=json",
+			url: elk_scripturl + "?action=admin;area=featuresettings;sa=basic;api=json",
 			data: {
 				cleanhives: true
 			}
@@ -1866,7 +1866,7 @@ $(function ()
 	// Attach our action to the core features power button
 	$(".core_features_img").on('click', function ()
 	{
-		var cc = $(this),
+		let cc = $(this),
 			cf = $(this).attr("id").substring(7),
 			imgs = [elk_images_url + "/admin/switch_off.png", elk_images_url + "/admin/switch_on.png"],
 			new_state = !$("#feature_" + cf).attr("checked"),
@@ -1887,47 +1887,50 @@ $(function ()
 		// Launch AJAX request.
 		$.ajax({
 			// The link we are accessing.
-			url: elk_scripturl + "?action=xmlhttp;sa=corefeatures;xml",
+			url: elk_scripturl + "?action=xmlhttp;sa=corefeatures;api=xml",
 
 			// The type of request.
 			type: "post",
 
 			// The type of data that is getting returned.
+			dataType: "xml",
+
+			// What we send
 			data: data
 		})
-			.done(function (request)
+		.done(function (request)
+		{
+			if ($(request).find("errors").find("error").length !== 0)
 			{
-				if ($(request).find("errors").find("error").length !== 0)
-				{
-					ajax_infobar.isError();
-					ajax_infobar.changeText($(request).find("errors").find("error").text()).showBar();
-				}
-				else if ($(request).find("elk").length !== 0)
-				{
-					$("#feature_link_" + cf).html($(request).find("corefeatures").find("corefeature").text());
-					cc.attr({
-						"src": imgs[new_state ? 1 : 0],
-						"title": new_state ? feature_on_text : feature_off_text,
-						"alt": new_state ? feature_on_text : feature_off_text
-					});
-					$("#feature_link_" + cf).fadeOut().fadeIn();
-					ajax_infobar.isSuccess();
-					var message = $(request).find("messages").find("message").text();
-					ajax_infobar.changeText(message).showBar();
+				ajax_infobar.isError();
+				ajax_infobar.changeText($(request).find("errors").find("error").text()).showBar();
+			}
+			else if ($(request).find("elk").length !== 0)
+			{
+				$("#feature_link_" + cf).html($(request).find("corefeatures").find("corefeature").text());
+				cc.attr({
+					"src": imgs[new_state ? 1 : 0],
+					"title": new_state ? feature_on_text : feature_off_text,
+					"alt": new_state ? feature_on_text : feature_off_text
+				});
+				$("#feature_link_" + cf).fadeOut().fadeIn();
+				ajax_infobar.isSuccess();
+				var message = $(request).find("messages").find("message").text();
+				ajax_infobar.changeText(message).showBar();
 
-					token_name = $(request).find("tokens").find('[type="token"]').text();
-					token_value = $(request).find("tokens").find('[type="token_var"]').text();
-				}
-				else
-				{
-					ajax_infobar.isError();
-					ajax_infobar.changeText(core_settings_generic_error).showBar();
-				}
-			})
-			.fail(function (error)
+				token_name = $(request).find("tokens").find('[type="token"]').text();
+				token_value = $(request).find("tokens").find('[type="token_var"]').text();
+			}
+			else
 			{
-				ajax_infobar.changeText(error).showBar();
-			});
+				ajax_infobar.isError();
+				ajax_infobar.changeText(core_settings_generic_error).showBar();
+			}
+		})
+		.fail(function (error)
+		{
+			ajax_infobar.changeText(error).showBar();
+		});
 	});
 });
 

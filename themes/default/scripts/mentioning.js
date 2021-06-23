@@ -91,7 +91,7 @@ elk_mentions.prototype.attachAtWho = function ()
 
 				// And how to ask for it
 				$.ajax({
-					url: elk_scripturl + "?action=suggest;xml",
+					url: elk_scripturl + "?action=suggest;api=xml",
 					data: obj,
 					type: "post",
 					async: false

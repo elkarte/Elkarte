@@ -275,7 +275,9 @@ class SiteDispatcher
 			$this->_function_name = $this->_default_action['function'];
 		}
 
-		if (isset($_REQUEST['api']))
+		// Just a trailing ;api
+		// @todo this needs to be reviewed, all api calls really should be qualified as json, xml, html, etc
+		if (isset($_REQUEST['api']) && $_REQUEST['api'] === '')
 		{
 			$this->_function_name .= '_api';
 		}

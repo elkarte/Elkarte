@@ -28,6 +28,7 @@ use ElkArte\Exceptions\ControllerRedirectException;
 use ElkArte\Exceptions\Exception;
 use ElkArte\Notifications;
 use ElkArte\NotificationsTask;
+use ElkArte\Themes\ThemeLoader;
 use ElkArte\User;
 use ElkArte\Util;
 
@@ -105,7 +106,7 @@ class Post extends AbstractController
 	{
 		global $context;
 
-		// Initilaize the post area
+		// Initialize the post area
 		$this->_beforePreparePost();
 
 		// Trigger the prepare_post event
@@ -165,8 +166,8 @@ class Post extends AbstractController
 	{
 		global $context;
 
-		\ElkArte\Themes\ThemeLoader::loadLanguageFile('Post');
-		\ElkArte\Themes\ThemeLoader::loadLanguageFile('Errors');
+		ThemeLoader::loadLanguageFile('Post');
+		ThemeLoader::loadLanguageFile('Errors');
 
 		$context['robot_no_index'] = true;
 		$this->_template_layers->add('postarea');
@@ -205,7 +206,7 @@ class Post extends AbstractController
 		// All those wonderful modifiers and attachments
 		$this->_template_layers->add('additional_options', 200);
 
-		if (isset($this->_req->query->xml))
+		if ($this->getApi() !== false)
 		{
 			$context['sub_template'] = 'post';
 
@@ -422,7 +423,6 @@ class Post extends AbstractController
 	{
 		global $txt, $modSettings, $context;
 
-		$xml = $this->_req->getRequest('xml', 'isset', false);
 		$preview = $this->_req->getPost('preview', 'isset', false);
 		$ns = $this->_req->getPost('ns', 'isset', false);
 		$notify = $this->_req->getPost('notify', 'isset', false);
@@ -447,13 +447,13 @@ class Post extends AbstractController
 			}
 
 			// They are previewing if they asked to preview (i.e. came from quick reply).
-			$really_previewing = !empty($preview) || isset($xml);
+			$really_previewing = !empty($preview) || ($this->getApi() === 'xml');
 		}
 
 		// Trigger the prepare_modifying event
 		$this->_events->trigger('prepare_modifying', [
-				'post_errors' => $this->_post_errors,
-				'really_previewing' => &$really_previewing]
+			'post_errors' => $this->_post_errors,
+			'really_previewing' => &$really_previewing]
 		);
 
 		// In order to keep the approval status flowing through, we have to pass it through the form...
@@ -482,7 +482,7 @@ class Post extends AbstractController
 		// Only show the preview stuff if they hit Preview.
 		if ($really_previewing)
 		{
-			$this->_setupPreviewContext($ns, $xml);
+			$this->_setupPreviewContext($ns);
 		}
 
 		// Set up the checkboxes.
@@ -644,9 +644,8 @@ class Post extends AbstractController
 	 * Loads up the context global with a preview of the post
 	 *
 	 * @param bool $ns no smiley flag
-	 * @param bool $xml xml request
 	 */
-	private function _setupPreviewContext($ns, $xml)
+	private function _setupPreviewContext($ns)
 	{
 		global $txt, $modSettings, $context;
 
@@ -680,7 +679,7 @@ class Post extends AbstractController
 			}
 
 			// Protect any CDATA blocks.
-			if ($xml === true)
+			if ($this->getApi() === 'xml')
 			{
 				$context['preview_message'] = strtr($context['preview_message'], array(']]>' => ']]]]><![CDATA[>'));
 			}
@@ -723,7 +722,7 @@ class Post extends AbstractController
 		{
 			$only_approved = $modSettings['postmod_active'] && !allowedTo('approve_posts');
 
-			if (isset($_REQUEST['xml']))
+			if ($this->getApi() === 'xml')
 			{
 				$limit = empty($context['new_replies']) ? 0 : (int) $context['new_replies'];
 			}
@@ -750,7 +749,7 @@ class Post extends AbstractController
 		}
 
 		// Just ajax previewing then lets stop now
-		if (isset($_REQUEST['xml']))
+		if ($this->getApi() === 'xml')
 		{
 			obExit();
 		}
@@ -758,8 +757,8 @@ class Post extends AbstractController
 		$context['subject'] = addcslashes($this->_form_subject, '"');
 		$context['message'] = str_replace(array('"', '<', '>', '&nbsp;'), array('&quot;', '&lt;', '&gt;', ' '), $this->_form_message);
 
-		require_once(SUBSDIR . '/MessageIcons.subs.php');
 		// Message icons - customized or not, retrieve them...
+		require_once(SUBSDIR . '/MessageIcons.subs.php');
 		$context['icons'] = getMessageIcons($board);
 
 		$context['icon_url'] = '';
@@ -826,7 +825,7 @@ class Post extends AbstractController
 		checkSubmitOnce('register');
 
 		// Finally, load the template.
-		if (!isset($_REQUEST['xml']))
+		if ($this->getApi() === false)
 		{
 			theme()->getTemplates()->load('Post');
 			$context['sub_template'] = 'post_page';
@@ -848,8 +847,7 @@ class Post extends AbstractController
 	 */
 	public function action_post2()
 	{
-		global $board, $topic, $txt, $modSettings, $context;
-		global $board_info, $options;
+		global $board, $topic, $txt, $modSettings, $context, $board_info, $options;
 
 		// Sneaking off, are we?
 		if (empty($_POST) && empty($topic))
@@ -894,7 +892,7 @@ class Post extends AbstractController
 		}
 
 		require_once(SUBSDIR . '/Boards.subs.php');
-		\ElkArte\Themes\ThemeLoader::loadLanguageFile('Post');
+		ThemeLoader::loadLanguageFile('Post');
 
 		// Trigger the prepare_save_post event
 		$this->_events->trigger('prepare_save_post', array('topic_info' => &$topic_info));
@@ -1297,7 +1295,7 @@ class Post extends AbstractController
 		// This is an already existing message. Edit it.
 		if (!empty($_REQUEST['msg']))
 		{
-			$posterOptions['id_starter'] = isset($msgInfo['id_member']) ? $msgInfo['id_member'] : $user_info['id'];
+			$posterOptions['id_starter'] = isset($msgInfo['id_member']) ? $msgInfo['id_member'] : $this->user->id;
 
 			// Have admins allowed people to hide their screwups?
 			if (time() - $msgInfo['poster_time'] > $modSettings['edit_wait_time'] || $this->user->id != $msgInfo['id_member'])
@@ -1524,10 +1522,10 @@ class Post extends AbstractController
 	{
 		global $context;
 
-		\ElkArte\Themes\ThemeLoader::loadLanguageFile('Post');
+		ThemeLoader::loadLanguageFile('Post');
 
 		// Where we going if we need to?
-		$context['post_box_name'] = isset($_GET['pb']) ? $_GET['pb'] : '';
+		$context['post_box_name'] = $_GET['pb'] ?? '';
 
 		$row = quoteMessageInfo((int) $_REQUEST['quote'], isset($_REQUEST['modify']));
 
@@ -1599,8 +1597,7 @@ class Post extends AbstractController
 	 */
 	public function action_jsmodify()
 	{
-		global $modSettings, $board, $topic;
-		global $context;
+		global $modSettings, $board, $topic, $context;
 
 		// We have to have a topic!
 		if (empty($topic))
@@ -1798,9 +1795,12 @@ class Post extends AbstractController
 			}
 		}
 
-		if (isset($_REQUEST['xml']))
+		if ($this->getApi() === 'xml')
 		{
 			$bbc_parser = ParserWrapper::instance();
+
+			theme()->getTemplates()->load('Xml');
+			theme()->getLayers()->removeAll();
 			$context['sub_template'] = 'modifydone';
 
 			if (!$this->_post_errors->hasErrors() && isset($msgOptions['subject']) && isset($msgOptions['body']))

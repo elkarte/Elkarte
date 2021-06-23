@@ -65,7 +65,7 @@ function previewPost()
 	var x = [];
 	x = getFields(textFields, numericFields, checkboxFields, form_name);
 
-	sendXMLDocument(elk_prepareScriptUrl(elk_scripturl) + 'action=post2' + (current_board ? ';board=' + current_board : '') + (make_poll ? ';poll' : '') + ';preview;xml', x.join('&'), onDocSent);
+	sendXMLDocument(elk_prepareScriptUrl(elk_scripturl) + 'action=post2' + (current_board ? ';board=' + current_board : '') + (make_poll ? ';poll' : '') + ';preview;api=xml', x.join('&'), onDocSent);
 
 	// Show the preview section and load it with "pending results" text, onDocSent will finish things off
 	document.getElementById('preview_section').style.display = 'block';
@@ -96,7 +96,7 @@ function previewPM()
 	x = getFields(textFields, numericFields, checkboxFields, form_name);
 
 	// Send in document for previewing
-	sendXMLDocument(elk_prepareScriptUrl(elk_scripturl) + 'action=pm;sa=send2;preview;xml', x.join('&'), onDocSent);
+	sendXMLDocument(elk_prepareScriptUrl(elk_scripturl) + 'action=pm;sa=send2;preview;api=xml', x.join('&'), onDocSent);
 
 	// Show the preview section and load it with "pending results" text, onDocSent will finish things off
 	document.getElementById('preview_section').style.display = 'block';
@@ -126,7 +126,7 @@ function previewNews()
 	x[x.length] = 'item=newsletterpreview';
 
 	// Send in document for previewing
-	sendXMLDocument(elk_prepareScriptUrl(elk_scripturl) + 'action=xmlpreview;xml', x.join('&'), onDocSent);
+	sendXMLDocument(elk_prepareScriptUrl(elk_scripturl) + 'action=xmlpreview;api=xml', x.join('&'), onDocSent);
 
 	// Show the preview section and load it with "pending results" text, onDocSent will finish things off
 	document.getElementById('preview_section').style.display = 'block';
@@ -353,7 +353,7 @@ function onDocSent(XMLDoc)
 					newPostsHTML += '<div id="msg_' + newPosts[i].getAttribute("id") + '_ignored_prompt">' + txt_ignoring_user + '<a href="#" id="msg_' + newPosts[i].getAttribute("id") + '_ignored_link" class="hide">' + show_ignore_user_post + '</a></div>';
 				}
 
-				newPostsHTML += '<div class="inner" id="msg_' + newPosts[i].getAttribute("id") + '_body">' + newPosts[i].getElementsByTagName("message")[0].firstChild.nodeValue + '</div></div></div>';
+				newPostsHTML += '<div class="messageContent" id="msg_' + newPosts[i].getAttribute("id") + '_body">' + newPosts[i].getElementsByTagName("message")[0].firstChild.nodeValue + '</div></div></div>';
 			}
 			setOuterHTML(document.getElementById('new_replies'), newPostsHTML);
 		}
@@ -484,7 +484,7 @@ function cleanFileInput(idElement)
  */
 function insertQuoteFast(messageid)
 {
-	getXMLDocument(elk_prepareScriptUrl(elk_scripturl) + 'action=quotefast;quote=' + messageid + ';xml;pb=' + post_box_name + ';mode=0', onDocReceived);
+	getXMLDocument(elk_prepareScriptUrl(elk_scripturl) + 'action=quotefast;quote=' + messageid + ';api=xml;pb=' + post_box_name + ';mode=0', onDocReceived);
 
 	return true;
 }

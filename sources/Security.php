@@ -19,6 +19,7 @@ use ElkArte\Controller\Auth;
 use ElkArte\EventManager;
 use ElkArte\Http\Headers;
 use ElkArte\OpenID;
+use ElkArte\Themes\ThemeLoader;
 use ElkArte\TokenHash;
 use ElkArte\User;
 use ElkArte\Util;
@@ -78,7 +79,7 @@ function validateSession($type = 'admin')
 	}
 
 	// If we're using XML give an additional ten minutes grace as an admin can't log on in XML mode.
-	if (isset($_GET['xml']))
+	if (isset($_GET['api']) && $_GET['api'] === 'xml')
 	{
 		$refreshTime += 10;
 	}
@@ -148,7 +149,7 @@ function validateSession($type = 'admin')
 	}
 
 	// Need to type in a password for that, man.
-	if (!isset($_GET['xml']))
+	if (!isset($_GET['api']))
 	{
 		adminLogin($type);
 	}
@@ -220,13 +221,13 @@ function is_not_guest($message = '', $is_fatal = true)
 	writeLog(true);
 
 	// Just die.
-	if (isset($_REQUEST['xml']) || !$is_fatal)
+	if (isset($_REQUEST['api']) && $_REQUEST['api'] === 'xml' || !$is_fatal)
 	{
 		obExit(false);
 	}
 
 	// Attempt to detect if they came from dlattach.
-	if (ELK != 'SSI' && empty($context['theme_loaded']))
+	if (ELK !== 'SSI' && empty($context['theme_loaded']))
 	{
 		new ElkArte\Themes\ThemeLoader();
 	}
@@ -238,7 +239,7 @@ function is_not_guest($message = '', $is_fatal = true)
 	}
 
 	// Load the Login template and language file.
-	\ElkArte\Themes\ThemeLoader::loadLanguageFile('Login');
+	ThemeLoader::loadLanguageFile('Login');
 
 	// Apparently we're not in a position to handle this now. Let's go to a safer location for now.
 	if (!theme()->getLayers()->hasLayers())
@@ -357,7 +358,8 @@ function is_not_banned($forceCheck = false)
 				'cannot_register',
 			);
 			$db->fetchQuery('
-				SELECT bi.id_ban, bi.email_address, bi.id_member, bg.cannot_access, bg.cannot_register,
+				SELECT 
+					bi.id_ban, bi.email_address, bi.id_member, bg.cannot_access, bg.cannot_register,
 					bg.cannot_post, bg.cannot_login, bg.reason, COALESCE(bg.expire_time, 0) AS expire_time
 				FROM {db_prefix}ban_items AS bi
 					INNER JOIN {db_prefix}ban_groups AS bg ON (bg.id_ban_group = bi.id_ban_group AND (bg.expire_time IS NULL OR bg.expire_time > {int:current_time}))
@@ -413,7 +415,8 @@ function is_not_banned($forceCheck = false)
 		}
 
 		$db->fetchQuery('
-			SELECT bi.id_ban, bg.reason
+			SELECT 
+				bi.id_ban, bg.reason
 			FROM {db_prefix}ban_items AS bi
 				INNER JOIN {db_prefix}ban_groups AS bg ON (bg.id_ban_group = bi.id_ban_group)
 			WHERE bi.id_ban IN ({array_int:ban_list})
@@ -455,7 +458,7 @@ function is_not_banned($forceCheck = false)
 		}
 
 		// 'Log' the user out.  Can't have any funny business... (save the name!)
-		$old_name = (string) User::$info->name != '' ? User::$info->name : $txt['guest_title'];
+		$old_name = (string) User::$info->name !== '' ? User::$info->name : $txt['guest_title'];
 		User::logOutUser(true);
 		loadUserContext();
 
@@ -876,7 +879,7 @@ function checkSession($type = 'post', $from_action = '', $is_fatal = true)
 	// A session error occurred, show the error.
 	elseif ($is_fatal)
 	{
-		if (isset($_GET['xml']) || isset($_REQUEST['api']))
+		if (isset($_REQUEST['api']))
 		{
 			@ob_end_clean();
 			Headers::instance()
@@ -1226,7 +1229,7 @@ function allowedTo($permission, $boards = null)
 	$request->free_result();
 
 	// If the query returned 1, they can do it... otherwise, they can't.
-	return (bool) $result;
+	return $result;
 }
 
 /**
@@ -1272,7 +1275,7 @@ function isAllowedTo($permission, $boards = null)
 		// If they are a guest, show a login. (because the error might be gone if they do!)
 		if (User::$info->is_guest)
 		{
-			\ElkArte\Themes\ThemeLoader::loadLanguageFile('Errors');
+			ThemeLoader::loadLanguageFile('Errors');
 			is_not_guest($txt['cannot_' . $error_permission]);
 		}
 

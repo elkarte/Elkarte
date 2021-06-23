@@ -165,10 +165,11 @@ class Mentions extends AbstractController
 			die();
 		}
 
-		theme()->getTemplates()->load('Json');
-		$context['sub_template'] = 'send_json';
 		$template_layers = theme()->getLayers();
 		$template_layers->removeAll();
+		theme()->getTemplates()->load('Json');
+		$context['sub_template'] = 'send_json';
+
 		require_once(SUBSDIR . '/Mentions.subs.php');
 
 		$lastsent = $this->_req->getQuery('lastsent', 'intval', 0);
@@ -329,8 +330,9 @@ class Mentions extends AbstractController
 			),
 			'additional_rows' => array(
 				array(
-					'position' => 'top_of_list',
-					'value' => '<a class="floatright linkbutton" href="' . $scripturl . '?action=mentions' . (!empty($this->_all) ? '' : ';all') . str_replace(';all', '', $this->_url_param) . '">' . (!empty($this->_all) ? $txt['mentions_unread'] : $txt['mentions_all']) . '</a>',
+					'position' => 'above_column_headers',
+					'class' => 'flow_flex_right',
+					'value' => '<a class="linkbutton" href="' . $scripturl . '?action=mentions' . (!empty($this->_all) ? '' : ';all') . str_replace(';all', '', $this->_url_param) . '">' . (!empty($this->_all) ? $txt['mentions_unread'] : $txt['mentions_all']) . '</a>',
 				),
 				array(
 					'class' => 'submitbutton',

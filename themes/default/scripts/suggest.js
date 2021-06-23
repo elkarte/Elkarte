@@ -32,7 +32,7 @@ function smc_AutoSuggest(oOptions)
 	this.oSelectedDiv = null;
 	this.aCache = [];
 	this.aDisplayData = [];
-	this.sRetrieveURL = 'sRetrieveURL' in this.opt ? this.opt.sRetrieveURL : '%scripturl%action=suggest;xml';
+	this.sRetrieveURL = 'sRetrieveURL' in this.opt ? this.opt.sRetrieveURL : '%scripturl%action=suggest;api=xml';
 
 	// How many objects can we show at once?
 	this.iMaxDisplayQuantity = 'iMaxDisplayQuantity' in this.opt ? this.opt.iMaxDisplayQuantity : 12;
@@ -548,8 +548,12 @@ smc_AutoSuggest.prototype.populateDiv = function (aResults)
 // Callback function for the XML request, should contain the list of users that match
 smc_AutoSuggest.prototype.onSuggestionReceived = function (oXMLDoc)
 {
-	var sQuoteText = '',
-		aItems = oXMLDoc.getElementsByTagName('item');
+	if (oXMLDoc === false)
+	{
+		return;
+	}
+
+	let aItems = oXMLDoc.getElementsByTagName('item');
 
 	// Go through each item received
 	this.aCache = [];

@@ -37,4 +37,17 @@ abstract class AbstractModule implements ModuleInterface
 		$this->_req = $req;
 		$this->user = $user;
 	}
+
+	/**
+	 * Helper function to see if a request is asking for any api processing
+	 *
+	 * @return string|false
+	 */
+	public function getApi()
+	{
+		// API Call?
+		$api = $this->_req->getRequest('api', 'trim', '');
+
+		return in_array($api, ['xml', 'json']) ? $api : false;
+	}
 }

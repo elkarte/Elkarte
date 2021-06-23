@@ -198,7 +198,7 @@ var disableDrafts = false;
 			oMentions.opts._names = [];
 
 			$.ajax({
-				url: elk_scripturl + "?action=suggest;xml",
+				url: elk_scripturl + "?action=suggest;api=xml",
 				type: "post",
 				data: postString,
 				dataType: "xml"

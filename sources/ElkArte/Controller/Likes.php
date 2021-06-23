@@ -19,6 +19,7 @@ use ElkArte\Exceptions\Exception;
 use ElkArte\MembersList;
 use ElkArte\Notifications;
 use ElkArte\NotificationsTask;
+use ElkArte\Themes\ThemeLoader;
 
 /**
  * This class contains one likable use, which allows members to like a post
@@ -63,8 +64,19 @@ class Likes extends AbstractController
 	 */
 	public function action_index()
 	{
-		// We like you.
-		$this->action_likepost();
+		global $context;
+
+		$subActions = array(
+			'likepost' => array($this, 'action_likepost'),
+			'unlikepost' => array($this, 'action_unlikepost'),
+		);
+
+		// We may or may not like you.
+		$action = new Action('likes');
+		$subAction = $action->initialize($subActions, 'likepost');
+		$context['sub_action'] = $subAction;
+
+		$action->dispatch($subAction);
 	}
 
 	/**
@@ -79,6 +91,12 @@ class Likes extends AbstractController
 	public function action_likepost()
 	{
 		global $topic;
+
+		if ($this->getApi() === 'json')
+		{
+			$this->action_likepost_api();
+			return;
+		}
 
 		$this->_doLikePost('+', 'likemsg');
 
@@ -174,7 +192,7 @@ class Likes extends AbstractController
 		// If they have exceeded their limits, provide a message for the ajax response
 		if ($check === false)
 		{
-			\ElkArte\Themes\ThemeLoader::loadLanguageFile('Errors');
+			ThemeLoader::loadLanguageFile('Errors');
 			$wait = $modSettings['likeWaitTime'] > 60 ? round($modSettings['likeWaitTime'] / 60, 2) : $modSettings['likeWaitTime'];
 			$error = sprintf($txt['like_wait_time'], $wait, ($modSettings['likeWaitTime'] < 60 ? strtolower($txt['minutes']) : $txt['hours']));
 			$this->_likes_response = array('result' => false, 'data' => $error);
@@ -198,7 +216,7 @@ class Likes extends AbstractController
 		{
 			if (empty($this->_likes_response))
 			{
-				\ElkArte\Themes\ThemeLoader::loadLanguageFile('Errors');
+				ThemeLoader::loadLanguageFile('Errors');
 				$this->_likes_response = array('result' => false, 'data' => $txt['like_unlike_error']);
 			}
 		}
@@ -215,6 +233,7 @@ class Likes extends AbstractController
 		global $context, $txt;
 
 		// Make room for ajax
+		theme()->getLayers()->removeAll();
 		theme()->getTemplates()->load('Json');
 		$context['sub_template'] = 'send_json';
 
@@ -251,7 +270,7 @@ class Likes extends AbstractController
 		{
 			if (empty($this->_likes_response))
 			{
-				\ElkArte\Themes\ThemeLoader::loadLanguageFile('Errors');
+				ThemeLoader::loadLanguageFile('Errors');
 				$this->_likes_response = array('result' => false, 'data' => $txt['like_unlike_error']);
 			}
 		}
@@ -268,6 +287,12 @@ class Likes extends AbstractController
 	public function action_unlikepost()
 	{
 		global $topic;
+
+		if ($this->getApi() === 'json')
+		{
+			$this->action_unlikepost_api();
+			return;
+		}
 
 		$this->_doLikePost('-', 'rlikemsg');
 
@@ -571,7 +596,7 @@ class Likes extends AbstractController
 		global $context, $txt;
 
 		require_once(SUBSDIR . '/Likes.subs.php');
-		\ElkArte\Themes\ThemeLoader::loadLanguageFile('Profile');
+		ThemeLoader::loadLanguageFile('Profile');
 
 		// Get the message in question
 		$message = $this->_req->getQuery('msg', 'intval', 0);
@@ -686,7 +711,7 @@ class Likes extends AbstractController
 		// And you can see the stats
 		isAllowedTo('like_posts_stats');
 
-		\ElkArte\Themes\ThemeLoader::loadLanguageFile('LikePosts');
+		ThemeLoader::loadLanguageFile('LikePosts');
 
 		$subActions = array(
 			'messagestats' => array($this, 'action_messageStats'),
@@ -732,7 +757,7 @@ class Likes extends AbstractController
 		isAllowedTo('like_posts_stats');
 
 		// Load the required files
-		\ElkArte\Themes\ThemeLoader::loadLanguageFile('LikePosts');
+		ThemeLoader::loadLanguageFile('LikePosts');
 		loadJavascriptFile('like_posts.js');
 		theme()->getTemplates()->load('LikePostsStats');
 

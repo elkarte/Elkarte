@@ -16,6 +16,7 @@
 
 use ElkArte\Cache\Cache;
 use ElkArte\Censor;
+use ElkArte\ConstructPageIndex;
 use ElkArte\Debug;
 use ElkArte\GenericList;
 use ElkArte\Hooks;
@@ -165,7 +166,7 @@ function removeSettings($toRemove)
  */
 function constructPageIndex($base_url, &$start, $max_value, $num_per_page, $flexible_start = false, $show = [])
 {
-	$pageindex = new \ElkArte\ConstructPageIndex($base_url, $start, $max_value, $num_per_page, $flexible_start, $show);
+	$pageindex = new ConstructPageIndex($base_url, $start, $max_value, $num_per_page, $flexible_start, $show);
 	return $pageindex->getPageIndex();
 }
 
@@ -615,7 +616,7 @@ function obExit($header = null, $do_footer = null, $from_index = false, $from_fa
 	if ($do_footer)
 	{
 		// Show the footer.
-		theme()->getTemplates()->loadSubTemplate(isset($context['sub_template']) ? $context['sub_template'] : 'main');
+		theme()->getTemplates()->loadSubTemplate($context['sub_template'] ?? 'main');
 
 		// Just so we don't get caught in an endless loop of errors from the footer...
 		if (!$footer_done)
@@ -627,7 +628,7 @@ function obExit($header = null, $do_footer = null, $from_index = false, $from_fa
 			// (since this is just debugging... it's okay that it's after </html>.)
 			if ($db_show_debug === true)
 			{
-				if (!isset($_REQUEST['xml']) && ((!isset($_GET['action']) || $_GET['action'] != 'viewquery') && !isset($_GET['api'])))
+				if (!isset($_REQUEST['api']) && ((!isset($_GET['action']) || $_GET['action'] !== 'viewquery') && !isset($_GET['api'])))
 				{
 					Debug::instance()->display();
 				}
@@ -683,8 +684,7 @@ function setOldUrl($index = 'old_url')
 	$invalid_old_url = array(
 		'action=dlattach',
 		'action=jsoption',
-		';xml',
-		';api',
+		';api=xml',
 	);
 	call_integration_hook('integrate_invalid_old_url', array(&$invalid_old_url));
 	$make_old = true;
@@ -1958,8 +1958,7 @@ function featureEnabled($feature)
 	if ($features === null)
 	{
 		// This allows us to change the way things look for the admin.
-		$features = explode(',', isset($modSettings['admin_features']) ?
-			$modSettings['admin_features'] : 'cd,cp,k,w,rg,ml,pm');
+		$features = explode(',', $modSettings['admin_features'] ?? 'cd,cp,k,w,rg,ml,pm');
 
 		// @deprecated since 2.0 - Next line is just for backward compatibility to remove before release
 		$context['admin_features'] = $features;

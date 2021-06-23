@@ -180,7 +180,7 @@ elk_StatsCenter.prototype.onBeforeCollapseMonth = function (oToggle)
 	if (!oToggle.bCollapsed)
 	{
 		// Tell ElkArte that it the state has changed.
-		getXMLDocument(elk_prepareScriptUrl(elk_scripturl) + 'action=stats;collapse=' + oToggle.opt.sMonthId + ';xml');
+		getXMLDocument(elk_prepareScriptUrl(elk_scripturl) + 'action=stats;collapse=' + oToggle.opt.sMonthId + ';api=xml');
 
 		// Remove the month rows from the year toggle.
 		var aNewContainers = [],
@@ -208,7 +208,7 @@ elk_StatsCenter.prototype.onBeforeExpandMonth = function (oToggle)
 	if (oToggle.opt.aSwappableContainers.length === 0)
 	{
 		// Make the xml call
-		sendXMLDocument.call(this, elk_prepareScriptUrl(elk_scripturl) + 'action=stats;expand=' + oToggle.opt.sMonthId + ';xml', '', this.onDocReceived);
+		sendXMLDocument.call(this, elk_prepareScriptUrl(elk_scripturl) + 'action=stats;expand=' + oToggle.opt.sMonthId + ';api=xml', '', this.onDocReceived);
 
 		if ('ajax_indicator' in window)
 		{
@@ -221,7 +221,7 @@ elk_StatsCenter.prototype.onBeforeExpandMonth = function (oToggle)
 	// Silently let ElkArte know this one is expanded.
 	else
 	{
-		getXMLDocument(elk_prepareScriptUrl(elk_scripturl) + 'action=stats;expand=' + oToggle.opt.sMonthId + ';xml');
+		getXMLDocument(elk_prepareScriptUrl(elk_scripturl) + 'action=stats;expand=' + oToggle.opt.sMonthId + ';api=xml');
 	}
 };
 
