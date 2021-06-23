@@ -21,6 +21,7 @@ use ElkArte\AbstractController;
 use ElkArte\Action;
 use ElkArte\EventManager;
 use ElkArte\Exceptions\Exception;
+use ElkArte\Themes\ThemeLoader;
 use ElkArte\User;
 use ElkArte\Util;
 
@@ -40,8 +41,8 @@ class Groups extends AbstractController
 		global $context, $txt;
 
 		// Get the template stuff up and running.
-		\ElkArte\Themes\ThemeLoader::loadLanguageFile('ManageMembers');
-		\ElkArte\Themes\ThemeLoader::loadLanguageFile('ModerationCenter');
+		ThemeLoader::loadLanguageFile('ManageMembers');
+		ThemeLoader::loadLanguageFile('ModerationCenter');
 		theme()->getTemplates()->load('ManageMembergroups');
 
 		// If we can see the moderation center, and this has a mod bar entry, add the mod center bar.
@@ -97,7 +98,7 @@ class Groups extends AbstractController
 		global $txt, $context;
 
 		$context['page_title'] = $txt['viewing_groups'];
-		$current_area = isset($context['admin_menu_name']) ? $context['admin_menu_name'] : (isset($context['moderation_menu_name']) ? $context['moderation_menu_name'] : '');
+		$current_area = $context['admin_menu_name'] ?? ($context['moderation_menu_name'] ?? '');
 		if (!empty($current_area))
 		{
 			$context[$current_area]['tab_data'] = array(
@@ -599,7 +600,7 @@ class Groups extends AbstractController
 				}
 
 				// Restore the current language.
-				\ElkArte\Themes\ThemeLoader::loadLanguageFile('ModerationCenter');
+				ThemeLoader::loadLanguageFile('ModerationCenter');
 			}
 		}
 

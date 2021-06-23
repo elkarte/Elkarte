@@ -1648,7 +1648,6 @@ function countMessagesSince($id_topic, $id_msg, $include_current = false, $only_
  * @param bool $only_approved = false
  * @param bool $include_own = false
  * @return int
- * @throws \ElkArte\Exceptions\Exception
  */
 function countMessagesBefore($id_topic, $id_msg, $include_current = false, $only_approved = false, $include_own = false)
 {

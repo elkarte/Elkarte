@@ -594,7 +594,7 @@ class Reports extends AbstractController
 		addSeparator($txt['board_perms_permission']);
 
 		// Now the big permission fetch!
-		$perms = boardPermissionsByGroup($group_clause, isset($this->_req->post->groups) ? $this->_req->post->groups : array());
+		$perms = boardPermissionsByGroup($group_clause, $this->_req->post->groups ?? array());
 		$lastPermission = null;
 		$curData = array();
 		foreach ($perms as $row)
@@ -609,7 +609,7 @@ class Reports extends AbstractController
 				}
 
 				// Add the permission name in the left column.
-				$curData = array('col' => isset($txt['group_perms_name_' . $row['permission']]) ? $txt['group_perms_name_' . $row['permission']] : $row['permission']);
+				$curData = array('col' => $txt['group_perms_name_' . $row['permission']] ?? $row['permission']);
 
 				$lastPermission = $row['permission'];
 			}

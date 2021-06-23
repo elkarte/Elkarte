@@ -253,13 +253,15 @@ class Post extends AbstractModule
 			$destination .= ';poll';
 			$page_title = $txt['new_poll'];
 			$context['make_poll'] = true;
+
+			theme()->getLayers()->removeAll();
 			theme()->getTemplates()->load('Poll');
 			$template_layers->add('poll_edit');
 
 			// Are we starting a poll? if set the poll icon as selected if its available
 			for ($i = 0, $n = count($context['icons']); $i < $n; $i++)
 			{
-				if ($context['icons'][$i]['value'] == 'poll')
+				if ($context['icons'][$i]['value'] === 'poll')
 				{
 					$context['icons'][$i]['selected'] = true;
 					$context['icon'] = 'poll';

@@ -22,6 +22,7 @@ use ElkArte\Action;
 use ElkArte\Exceptions\Exception;
 use ElkArte\Http\FtpConnection;
 use ElkArte\PackagesFilterIterator;
+use ElkArte\Themes\ThemeLoader;
 use ElkArte\Util;
 
 /**
@@ -40,7 +41,7 @@ class PackageServers extends AbstractController
 	public function pre_dispatch()
 	{
 		// Use the Packages language file. (split servers?)
-		\ElkArte\Themes\ThemeLoader::loadLanguageFile('Packages');
+		ThemeLoader::loadLanguageFile('Packages');
 
 		// Use the PackageServers template.
 		theme()->getTemplates()->load('PackageServers');
@@ -67,7 +68,7 @@ class PackageServers extends AbstractController
 		require_once(SUBSDIR . '/Package.subs.php');
 
 		// Use the Packages language file. (split servers?)
-		\ElkArte\Themes\ThemeLoader::loadLanguageFile('Packages');
+		ThemeLoader::loadLanguageFile('Packages');
 
 		// Use the PackageServers template.
 		theme()->getTemplates()->load('PackageServers');
@@ -326,7 +327,9 @@ class PackageServers extends AbstractController
 							$package['can_install'] = matchPackageVersion($the_version, $for);
 						}
 					}
+
 					$package['can_install'] = true;
+
 					// See if this filename already exists on the server
 					$already_exists = getPackageInfo($base_name);
 					$package['download_conflict'] = is_array($already_exists) && in_array($already_exists['id'], $package['possible_ids']) && compareVersions($already_exists['version'], $package['version']) != 0;
@@ -741,7 +744,7 @@ class PackageServers extends AbstractController
 		if (!is_array($context['package']))
 		{
 			@unlink($destination);
-			\ElkArte\Themes\ThemeLoader::loadLanguageFile('Errors');
+			ThemeLoader::loadLanguageFile('Errors');
 			$txt[$context['package']] = str_replace('{MANAGETHEMEURL}', getUrl('admin', ['action' => 'admin', 'area' => 'theme', 'sa' => 'admin', '{session_data}', 'hash' => '#theme_install']), $txt[$context['package']]);
 			throw new Exception('package_upload_error_broken', false, $txt[$context['package']]);
 		}

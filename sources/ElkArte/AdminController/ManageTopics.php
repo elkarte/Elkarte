@@ -111,6 +111,8 @@ class ManageTopics extends AbstractController
 	{
 		global $txt;
 
+		// @todo there is not interface for $modSettings['subject_length'], should it be added here?
+
 		// initialize it with our settings
 		$config_vars = array(
 			// Some simple big bools...

@@ -17,12 +17,10 @@
 namespace ElkArte\Themes;
 
 use ElkArte\Http\Headers;
-use ElkArte\Themes\Directories;
 use BadFunctionCallException;
 use ElkArte\Debug;
 use ElkArte\Errors\Errors;
 use ElkArte\Exceptions\Exception;
-use ElkArte\User;
 use Error;
 use Generator;
 
@@ -219,7 +217,7 @@ class Templates
 
 			if (!empty($context['user']['is_admin']) && !isset($_GET['th']))
 			{
-				\ElkArte\Themes\ThemeLoader::loadLanguageFile('Errors');
+				ThemeLoader::loadLanguageFile('Errors');
 
 				if (!isset($context['security_controls_files']['title']))
 				{

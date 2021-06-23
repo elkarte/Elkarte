@@ -339,7 +339,7 @@ class Register extends AbstractController
 		if (!empty($modSettings['coppaAge']) && !empty($modSettings['checkboxAgreement']) && !empty($this->_req->post->accept_agreement))
 			$_SESSION['skip_coppa'] = true;
 
-		// Well, if you don't agree, you can't register.
+		// Well, if you don't agree to the Registration Agreement, you can't register.
 		if (!empty($modSettings['requireAgreement']) && empty($_SESSION['registration_agreed']))
 		{
 			redirectexit();
@@ -350,7 +350,7 @@ class Register extends AbstractController
 			$_SESSION['registration_privacypolicy'] = true;
 		}
 
-		// Well, if you don't agree, you can't register.
+		// Well, if you don't agree to the Privacy Policy, you can't register.
 		if (!empty($modSettings['requireAgreement']) && !empty($modSettings['requirePrivacypolicy']) && empty($_SESSION['registration_privacypolicy']))
 		{
 			redirectexit();
@@ -400,8 +400,6 @@ class Register extends AbstractController
 	 * - Does the actual registration to the system
 	 *
 	 * @param bool $verifiedOpenID = false
-	 *
-	 * @throws \ElkArte\Exceptions\Exception
 	 */
 	public function do_register($verifiedOpenID = false)
 	{

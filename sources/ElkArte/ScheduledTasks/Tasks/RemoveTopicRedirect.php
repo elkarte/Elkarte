@@ -16,6 +16,8 @@
 
 namespace ElkArte\ScheduledTasks\Tasks;
 
+use ElkArte\Themes\ThemeLoader;
+
 /**
  * Class Remove_Topic_Redirect - This class handles known scheduled tasks.
  *
@@ -40,7 +42,7 @@ class RemoveTopicRedirect implements ScheduledTaskInterface
 		$topics = array();
 
 		// We will need this for language files
-		\ElkArte\Themes\ThemeLoader::loadEssentialThemeData();
+		ThemeLoader::loadEssentialThemeData();
 
 		// Find all of the old MOVE topic notices that were set to expire
 		$db->fetchQuery('

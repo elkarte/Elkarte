@@ -16,6 +16,7 @@ namespace ElkArte\AdminController;
 use ElkArte\AbstractController;
 use ElkArte\Action;
 use ElkArte\SettingsForm\SettingsForm;
+use ElkArte\Themes\ThemeLoader;
 
 /**
  * AddonSettings controller handles administration settings added
@@ -42,8 +43,8 @@ class AddonSettings extends AbstractController
 	{
 		global $context, $txt;
 
-		\ElkArte\Themes\ThemeLoader::loadLanguageFile('Help');
-		\ElkArte\Themes\ThemeLoader::loadLanguageFile('ManageSettings');
+		ThemeLoader::loadLanguageFile('Help');
+		ThemeLoader::loadLanguageFile('ManageSettings');
 
 		// Our tidy subActions array
 		$subActions = array(
@@ -158,8 +159,8 @@ class AddonSettings extends AbstractController
 		// You need to be an admin to edit settings!
 		isAllowedTo('admin_forum');
 
-		\ElkArte\Themes\ThemeLoader::loadLanguageFile('Help');
-		\ElkArte\Themes\ThemeLoader::loadLanguageFile('ManageSettings');
+		ThemeLoader::loadLanguageFile('Help');
+		ThemeLoader::loadLanguageFile('ManageSettings');
 
 		$context['sub_template'] = 'show_settings';
 
