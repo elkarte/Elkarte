@@ -1,27 +1,44 @@
 /* INTRODUCTION
 /* This is the ElkArte css used when the editor is in wysiwyg mode.
 /* ------------------------------------------------------- */
+:root {
+	--body_text: #585858; /* Body text, text areas, editor, inputs, more */
+	--content-background: #FAFAFA; /* background for many divs, input controls, etc */
+	--seconday_border: #AFAFAF; /* darker border */
+	--seconday_border_top: #CFCFCF; /* complimentary for hover effects */
+	--seconday_border_left: #BFBFBF; /* complimentary for hover effects */
+	--seconday_border_bottom: #BBBBBB;
+	--primary_white: #FEFEFE; /* Used in shadows, backgrounds or text, many places */
+	--primary_white_compliment: #E4E4E4; /* Used with --primary_white for gradients */
+	--box_shadow: #E4E4E4; /* Used on many box shadows */
+	--me: #5BA048; /* me and footnotes */
+}
+
+html, body {
+	font-size: 15px;
+	line-height: 1.5;
+	font-weight: 400;
+	overflow: auto;
+}
+
 html, body, p, code:before, table {
 	margin: 0;
 	padding: 0;
-	color: #444444;
+	color: var(--body_text);
 }
 
 html {
-	overflow: auto;
 	height: 100%;
-	-webkit-overflow-scrolling: touch;
 }
 
 body {
 	position: relative;
-	overflow: auto;
 	min-height: 100%;
 	word-wrap: break-word;
 }
 
 [contenteditable="true"] {
-	font: 87.5%/150% "Segoe UI", -apple-system, BlinkMacSystemFont, "Roboto", "Oxygen", "Ubuntu", "Cantarell", "Droid Sans", "Helvetica Neue", "Trebuchet MS", Arial, sans-serif;
+	font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen", "Ubuntu", "Cantarell", "Droid Sans", "Helvetica Neue", "Trebuchet MS", Arial, sans-serif;
 }
 
 a, a:link, a:visited {
@@ -42,7 +59,7 @@ ul, ol {
 
 table, td {
 	min-width: 2em;
-	border: 1px dotted #000000;
+	border: 1px dotted var(--seconday_border);
 	empty-cells: show;
 }
 
@@ -63,12 +80,12 @@ code {
 	position: relative;
 	margin-top: 1.5em;
 	padding: .25em;
-	border: 1px solid #DFDFDF;
-	border-top: 2px solid #BBBBBB;
-	border-bottom: 3px solid #AAAAAA;
-	background: #F3F3F3;
+	border: 1px solid var(--seconday_border);
+	border-top: 2px solid var(--seconday_border_top);
+	border-bottom: 3px solid var(--seconday_border_bottom);
+	background: var(--content-background);
 	white-space: pre;
-	font-size: 0.9em;
+	font-size: 0.8667rem;
 	font-family: "DejaVu Sans Mono", Monaco, Consolas, monospace;
 }
 
@@ -76,25 +93,24 @@ blockquote {
 	overflow: auto;
 	margin: 0 0 1em 0;
 	padding: 6px 10px;
-	border: 1px solid #CCCCCC;
-	background: #FFFFFF;
-	box-shadow: 2px 2px 2px #DDDDDD;
+	border: 1px solid var(--seconday_border);
+	background: var(--primary_white);
+	box-shadow: 2px 2px 2px var(--box_shadow);
 }
 
 blockquote cite, code cite {
 	display: block;
 	padding: 0 0 4px;
 	border-bottom: none;
-	background: #FFFFFF;
-	color: #555555;
-	font-size: 0.786em;
+	background: var(--primary_white);
+	color: var(--body_text);
+	font-size: 0.8667rem;
 }
 
 code cite {
 	position: relative;
 	top: -1.7em;
 	margin-left: 3em;
-	font-size: 1.07em;
 	padding: 0;
 	line-height: 1.3em;
 }
@@ -102,16 +118,16 @@ code cite {
 /* Will correctly colour down to seventh level of nested quotes in editor. Can be extended easily enough. */
 body > blockquote, body > blockquote > blockquote, body > blockquote > blockquote > blockquote > blockquote,
 body > blockquote > blockquote > blockquote > blockquote > blockquote > blockquote {
-	background: #FFFFFF;
+	background: var(--primary_white);
 }
 
 body > blockquote > blockquote > cite, body > blockquote > blockquote > blockquote > blockquote > cite,
 body > blockquote > blockquote > blockquote > blockquote > blockquote > blockquote > cite {
-	background: #FFFFFF;
+	background: var(--primary_white);
 }
 
 blockquote cite a:link, blockquote cite a:visited {
-	color: #555555;
+	color: var(--body_text);
 	text-decoration: none;
 }
 
@@ -127,12 +143,12 @@ h1, h2, h3, h4, h5, h6 {
 aside:before {
 	content: "[*]";
 	vertical-align: super;
-	font-size: .8em;
+	font-size: 0.8667rem;
 }
 
 aside {
 	display: inline;
-	color: #50AA3A;
+	color: var(--me);
 	font-weight: 700;
 }
 
@@ -169,12 +185,12 @@ aside {
 
 me:before {
 	content: "\270c";
-	font-size: 1.25em;
+	font-size: 1.4667rem;
 	line-height: 1em;
 }
 
 me {
-	color: #50AA3A;
+	color: var(--me);
 }
 
 .bbc_tt {

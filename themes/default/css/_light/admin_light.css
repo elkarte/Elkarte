@@ -1,9 +1,8 @@
 /* Common admin center classes.
 ------------------------------------------------------- */
-
 .action_admin .generic_list_wrapper .information {
-	border-color: #CCCCCC;
-	box-shadow: 0 2px 2px rgba(0, 0, 0, 0.1);
+	border-color: var(--primary_border);
+	box-shadow: 0 1px 1px var(--opacity20), 0 2px 2px var(--opacity10);
 }
 
 #admin_main_section, .quick_tasks, #mod_main_section,
@@ -11,91 +10,93 @@
 #core_features, #entry_form,
 #groupForm, #mailqueue_stats, #manage_maintenance,
 #new_group, #view_group, #admin_form_wrapper, .action_admin .generic_list_wrapper {
-	border-color: #CCCCCC;
-	background: #EEEEEE;
-	box-shadow: 0 -2px 2px rgba(0, 0, 0, 0.1);
+	border-color: var(--primary_border);
+	background: var(--content-background);
+	box-shadow: 0 -1px 1px var(--opacity20), 0 -2px 2px var(--opacity10);
 }
 
 #admin_content .content {
-	background: #EFEFEF;
+	background: var(--content-background);
 	box-shadow: none;
 }
 
 .disabled {
-	color: #888888;
+	color: var(--disabled_text);
+}
+
+#adm_submenus {
+	margin-bottom: .5em;
 }
 
 /* News and newsletters screen.
 ---------------------------------------------*/
 
 #admin_newsletters .information {
-	border-color: #CCCCCC;
-	box-shadow: 0 2px 2px rgba(0, 0, 0, 0.1);
+	border-color: var(--primary_border);
+	box-shadow: 0 1px 1px var(--opacity20), 0 2px 2px var(--opacity10);
 }
 
-#advanced_panel_header {
-	border-color: #CCCCCC;
-	background: #FEFEFE;
-	box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+#news_lists .newspreview div {
+	border-color: var(--primary_border);
 }
 
 #welcome {
-	border-color: #DDDDDD;
+	border-color: var(--seconday_border);
 }
 
 .search_results li {
-	border-bottom-color: #CCCCCC;
+	border-bottom-color: var(--primary_border_bottom);
 }
 
 .search_results li a strong {
-	color: #686868;
+	color: var(--strong_text);
 }
 
 #admin_main_section .content {
-	border-color: #CCCCCC;
-	border-top-color: #BBBBBB;
-	border-bottom-color: #DDDDDD;
-	background: #FEFEFE;
-	box-shadow: 0 2px 2px rgba(255, 255, 255, 0.5), 0 -1px 2px rgba(0, 0, 0, 0.1);
+	border-color: var(--primary_border);
+	border-top-color: var(--primary_border_top);
+	border-bottom-color: var(--primary_border_bottom);
+	background: var(--content-background);
+	box-shadow: 0 1px 1px var(--opacity30), 0 -1px 1px var(--opacity30)
 }
 
 #live_news div.content dl {
-	color: #111111;
+	color: var(--dark_text);
 }
 
 #ourAnnouncements dt {
-	border-top-color: #377828;
+	border-top-color: var(--top_section_border);
 }
 
 #ourAnnouncements dt a {
-	color: #377828;
+	color: var(--title);
 }
 
 #ourAnnouncements dd {
-	border-top-color: #DDDDDD;
+	border-top-color: var(--primary_border_top);
 }
 
 .quick_tasks {
-	background: #FEFEFE;
+	background: var(--content-background);
 	box-shadow: none;
 }
 
 #quick_tasks li {
-	border-top-color: #FEFEFE;
-	border-bottom-color: #BBBBBB;
+	border-top-color: var(--primary_border_top);
+	border-bottom-color: var(--primary_border_bottom);
 }
 
 /* Styles for the package manager.
 ------------------------------------------------- */
 
 #package_list li {
-	border-color: #A9CCD1;
+	border-color: var(--seconday_border);
 }
 
 #find_code, #replace_code {
-	border-top-color: #999999;
-	border-bottom-color: #999999;
-	background: #EEEEEE;
+	border-top-color: var(--seconday_border_top);
+	border-bottom-color: var(--seconday_border_bottom);
+	background: var(--content-background);
 }
 
 /* Styles for the D&D indicators
@@ -105,35 +106,23 @@
 #custom_profile_fields td:nth-child(2):before,
 #message_icon_list td:nth-child(1):before,
 #manage_boards li .floatleft:before {
-	color: #AAAAAA;
+	color: var(--footer_text);
 }
 
 /* Styles for the manage boards section.
 ------------------------------------------------- */
 
-#manage_boards .recycle_board {
-	background: #D9EDF7;
+#manage_boards .content > ul {
+	border-color: var(--primary_border);
+	box-shadow: 1px 1px 1px var(--opacity20), 2px 1px 1px var(--opacity10)
 }
 
 #manage_boards ul li {
-	border-top-color: #CCCCCC;
-}
-
-#manage_boards span.modify_boards a {
-	color: #222222;
-	border-color: #AFAFAF;
-	background: #FEFEFE;
-	box-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
-}
-
-#manage_boards span.modify_boards a:hover {
-	color: #444444;
-	background: #FEFEFE;
-	box-shadow: -1px -1px 1px rgba(0, 0, 0, 0.1);
+	border-top-color: var(--seconday_border);
 }
 
 #manage_boards .post_group, #manage_boards .regular_members {
-	border-bottom-color: #000000;
+	border-bottom-color: var(--seconday_border_bottom);
 }
 
 /* Indeed ugly, but will allow 4 level deep board nesting stripping to work */
@@ -141,115 +130,113 @@
 #manage_boards li:nth-child(even) > li:nth-child(odd),
 #manage_boards li:nth-child(even) > li:nth-child(odd) > li:nth-child(even),
 #manage_boards li:nth-child(even) > li:nth-child(odd) > li:nth-child(even) > li:nth-child(odd) {
-	background: #FAFAFA;
+	background: var(--primary_white_compliment);
 }
 
 #manage_boards li:nth-child(odd),
 #manage_boards li:nth-child(odd) > li:nth-child(even),
 #manage_boards li:nth-child(odd) > li:nth-child(even) > li:nth-child(odd),
 #manage_boards li:nth-child(odd) > li:nth-child(even) > li:nth-child(odd) > li:nth-child(even) {
-	background: #FFFFFF;
+	background: var(--primary_white);
 }
 
 /* Styles for the manage maintenance section.
 ------------------------------------------------- */
 
 #manage_maintenance div.content {
-	border-bottom-color: #CCCCCC;
+	border-bottom-color: var(--primary_border_bottom);
 	background: none;
-	box-shadow: 0 1px 0 #FEFEFE;
+	box-shadow: 0 1px 0 var(--box_shadow);
 }
 
 /* Styles for the manage membergroups.
 ------------------------------------------------- */
 
 .select_category, .select_all_box {
-	border-top-color: #CCCCCC;
-	border-bottom-color: #CCCCCC;
+	border-top-color: var(--primary_border_top);
+	border-bottom-color: var(--primary_border_bottom);
 }
 
 /* Styles for the manage permissions section.
 ------------------------------------------------- */
 
 .perm_boards li {
-	border-color: #A9CCD1;
+	border-color: var(--seconday_border);
 }
 
 .perm_groups {
-	background-color: #FEFEFE;
+	background-color: var(--content-background);
 }
 
 /* Styles for the file permissions section.
 ------------------------------------------------- */
 
 .perm_read {
-	background-color: #D1F7BF;
+	background-color: var(--valid);
 }
 
 .perm_write {
-	background-color: #FFBBBB;
+	background-color: var(--invalid);
 }
 
 .perm_execute {
-	background-color: #FDD7AF;
+	background-color: var(--notice);
 }
 
 .perm_custom {
-	background-color: #C2C6C0;
+	background-color: var(--mid_grey_background);
 }
 
 .perm_nochange {
-	background-color: #EEEEEE;
+	background-color: var(--grey_background);
 }
-
 
 /* Styles for the moderation center.
 ------------------------------------------------- */
-
 #modcenter {
-	background: none repeat scroll 0 0 #DEEDDA;
-	box-shadow: 1px 2px 3px #EEEEEE;
+	background: none repeat scroll 0 0 var(--content-background);
+	box-shadow: 1px 2px 3px var(--box_shadow);
 }
 
 #modcenter .content, #modcenter .generic_list_wrapper {
-	border-color: #DDDDDD;
-	border-bottom-color: #CCCCCC;
-	background: #FEFEFE;
+	border-color: var(--primary_border);
+	border-bottom-color: var(--primary_border_bottom);
+	background: var(--content-background);
 }
 
 #mod_main_section .content {
-	border-color: #CCCCCC;
-	border-top-color: #BBBBBB;
-	border-bottom-color: #DDDDDD;
-	background: #FEFEFE;
-	box-shadow: 0 2px 2px rgba(255, 255, 255, 0.5), 0 -1px 2px rgba(0, 0, 0, 0.1);
+	border-color: var(--primary_border);
+	border-top-color: var(--primary_border_top);
+	border-bottom-color: var(--primary_border_bottom);
+	background: var(--content-background);
+	box-shadow: 0 2px 2px var(--opacity50), 0 -1px 2px var(--opacity10);
 }
 
 .moderation_notes li {
-	border-bottom-color: #CCCCCC;
+	border-bottom-color: var(--primary_border_bottom);
 }
 
 /* Styles for the Report generation
 ------------------------------------------------- */
 
 .report_results th {
-	border-right-color: #DDDDDD;
-	border-left-color: #DDDDDD;
+	border-right-color: var(--primary_border);
+	border-left-color: var(--primary_border_left);
 }
 
 /* alternate row colors on Modify Themes,Copy a template */
 .theme_options .content:nth-child(even), .theme_options li:nth-child(even) {
-	border-top-color: #CCCCCC;
-	border-bottom-color: #CCCCCC;
+	border-top-color: var(--primary_border_top);
+	border-bottom-color: var(--primary_border_bottom);
 	background: #FEFEFE;
 }
 
 .theme_options .content:nth-child(odd) {
-	background: #EEEEEE;
+	background: var(--content-background)
 }
 
 #css_preview_box {
-	border-color: black;
+	border-color: var(--seconday_border);
 }
 
 /* jQuery Dialog
@@ -258,24 +245,24 @@
 .ui-dialog {
 	border-color: #999999;
 	background-color: #F4F4F4;
-	box-shadow: 0 0 16px rgba(0, 0, 0, 0.3);
+	box-shadow: 0 0 16px var(--opacity30);
 }
 
 .ui-dialog .ui-dialog-titlebar {
-	background-color: #FAFAFA;
+	background-color: var(--content-background);
 }
 
 .ui-widget-overlay {
-	opacity: 0.3;
-	background-color: #000000;
+	opacity: 0.6;
+	background-color: var(--dark_grey_background);
 }
 
 /* This is the drag/drop placeholder, normally not visible */
 .ui-state-highlight {
-	border-color: green !important;
-	background-color: #EEEEEE !important;
+	border-color: var(--pure_green) !important;
+	background-color: var(--content-background) !important;
 }
 
 .sortable_smiley {
-	border-bottom-color: #CCCCCC;
+	border-bottom-color: var(--primary_border_bottom)
 }
