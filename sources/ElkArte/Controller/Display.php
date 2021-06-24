@@ -23,6 +23,7 @@ use ElkArte\MessagesCallback\BodyParser\Normal;
 use ElkArte\MessagesCallback\DisplayRenderer;
 use ElkArte\MessagesDelete;
 use ElkArte\MessageTopicIcons;
+use ElkArte\Themes\ThemeLoader;
 use ElkArte\User;
 use ElkArte\ValuesContainer;
 
@@ -32,39 +33,19 @@ use ElkArte\ValuesContainer;
  */
 class Display extends AbstractController
 {
-	/**
-	 * The template layers object
-	 *
-	 * @var null|object
-	 */
+	/** @var null|object The template layers object */
 	protected $_template_layers = null;
 
-	/**
-	 * The message id when in the form msg123
-	 *
-	 * @var int
-	 */
+	/** @var int The message id when in the form msg123 */
 	protected $_virtual_msg = 0;
 
-	/**
-	 * The class that takes care of rendering the message icons (\ElkArte\MessageTopicIcons)
-	 *
-	 * @var null|\ElkArte\MessageTopicIcons
-	 */
+	/** @var null|\ElkArte\MessageTopicIcons Takes care of rendering the message icons */
 	protected $_icon_sources = null;
 
-	/**
-	 * Show signatures?
-	 *
-	 * @var int
-	 */
+	/** @var int Show signatures? */
 	protected $_show_signatures = 0;
 
-	/**
-	 * Start viewing the topics from ... (page, all, other)
-	 *
-	 * @var int|string
-	 */
+	/** @var int|string Start viewing the topics from ... (page, all, other) */
 	private $_start;
 
 	/**
@@ -111,7 +92,8 @@ class Display extends AbstractController
 		require_once(SUBSDIR . '/Topic.subs.php');
 		require_once(SUBSDIR . '/Messages.subs.php');
 
-		// Not only does a prefetch make things slower for the server, but it makes it impossible to know if they read it.
+		// Not only does a prefetch make things slower for the server, but it makes it impossible
+		// to know if they read it.
 		stop_prefetching();
 
 		// How much are we sticking on each page?
@@ -243,7 +225,7 @@ class Display extends AbstractController
 		// The start isn't a number; it's information about what to do, where to go.
 		if (!is_numeric($this->_start))
 		{
-			// Redirect to the page and post with new messages, originally by Omar Bazavilvazo.
+			// Redirect to the page and post with new messages
 			if ($this->_start === 'new')
 			{
 				// Guests automatically go to the last post.
@@ -414,8 +396,9 @@ class Display extends AbstractController
 		// Calculate the fastest way to get the messages!
 		$ascending = true;
 		$start = $this->_start;
-		$limit = $context['messages_per_page'];
+		$limit = (int) $context['messages_per_page'];
 		$firstIndex = 0;
+
 		if ($start >= $total_visible_posts / 2 && $context['messages_per_page'] != -1)
 		{
 			$ascending = !$ascending;
@@ -450,6 +433,7 @@ class Display extends AbstractController
 			{
 				$mark_at_msg = $modSettings['maxMsgID'];
 			}
+
 			if ($mark_at_msg >= $topicinfo['new_from'])
 			{
 				markTopicsRead(array($this->user->id, $topicinfo['id_topic'], $mark_at_msg, $topicinfo['unwatched']), $topicinfo['new_from'] !== 0);
@@ -514,14 +498,13 @@ class Display extends AbstractController
 				theme()->addJavascriptVar(array(
 					'likemsg_are_you_sure' => JavaScriptEscape($txt['likemsg_are_you_sure']),
 				));
-				\ElkArte\Themes\ThemeLoader::loadLanguageFile('Errors');
+				ThemeLoader::loadLanguageFile('Errors');
 
 				// Initiate likes and the tooltips for likes
 				theme()->addInlineJavascript('
 				$(function() {
 					var likePostInstance = likePosts.prototype.init({
 						oTxt: ({
-							btnText : ' . JavaScriptEscape($txt['ok_uppercase']) . ',
 							likeHeadingError : ' . JavaScriptEscape($txt['like_heading_error']) . ',
 							error_occurred : ' . JavaScriptEscape($txt['error_occurred']) . '
 						}),
@@ -546,7 +529,7 @@ class Display extends AbstractController
 			}
 
 			// Since the anchor information is needed on the top of the page we load these variables beforehand.
-			$context['first_message'] = isset($messages[$firstIndex]) ? $messages[$firstIndex] : $messages[0];
+			$context['first_message'] = $messages[$firstIndex] ?? $messages[0];
 			$context['first_new_message'] = isset($context['start_from']) && $this->_start == $context['start_from'];
 		}
 		else
@@ -682,8 +665,8 @@ class Display extends AbstractController
 		if (!empty($options['display_quick_reply']))
 		{
 			checkSubmitOnce('register');
-			$context['name'] = isset($_SESSION['guest_name']) ? $_SESSION['guest_name'] : '';
-			$context['email'] = isset($_SESSION['guest_email']) ? $_SESSION['guest_email'] : '';
+			$context['name'] = $_SESSION['guest_name'] ?? '';
+			$context['email'] = $_SESSION['guest_email'] ?? '';
 			if (!empty($options['use_editor_quick_reply']) && $context['can_reply'])
 			{
 				// Needed for the editor and message icons.
@@ -811,6 +794,7 @@ class Display extends AbstractController
 		// Quick reply & modify enabled?
 		if ($context['can_reply'] && !empty($options['display_quick_reply']))
 		{
+			loadJavascriptFile('mentioning.js');
 			$this->_template_layers->add('quickreply');
 		}
 
