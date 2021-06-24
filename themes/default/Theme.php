@@ -61,7 +61,7 @@ class Theme extends BaseTheme
 			 * The version this template/theme is for. This should
 			 * be the version of the forum it was created for.
 			 */
-			'theme_version' => '1.0',
+			'theme_version' => '2.0',
 
 			/*
 			 * Whether this theme requires the optional theme strings
@@ -74,7 +74,7 @@ class Theme extends BaseTheme
 			 * directory, where additional CSS files may be loaded.
 			 *
 			 * Example:
-			 * - index_light.css is loaded when index.css is needed.
+			 * - _light/index_light.css is loaded when index.css is needed.
 			 */
 			'theme_variants' => array(
 				'light',
@@ -120,7 +120,7 @@ class Theme extends BaseTheme
 				'previous_page' => '<span class="previous_page">{prev_txt}</span>',
 				'current_page' => '<li class="linavPages"><strong class="current_page" role="menuitem">%1$s</strong></li>',
 				'next_page' => '<span class="next_page">{next_txt}</span>',
-				'expand_pages' => '<li class="linavPages expand_pages" role="menuitem" {custom}> <a href="#">...</a> </li>',
+				'expand_pages' => '<li class="linavPages expand_pages" role="menuitem" {custom}> <a href="#">&#8230;</a> </li>',
 				'all' => '<span class="linavPages all_pages">{all_txt}</span>',
 			),
 
@@ -161,14 +161,22 @@ class Theme extends BaseTheme
 				->contentType('text/html', 'UTF-8');
 		}
 
-		// Probably temporary ($_REQUEST['xml'] should be replaced by $_REQUEST['api'])
-		if (isset($_REQUEST['api']) && $_REQUEST['api'] === 'json')
+		// @todo Probably temporary ($_REQUEST['xml'] should be replaced by $_REQUEST['api'])
+		$api = $this->_req->getRequest('api', 'trim');
+		if (isset($api))
 		{
-			$header->contentType('application/json', 'UTF-8');
-		}
-		else
-		{
-			$header->contentType('text/html', 'UTF-8');
+			if ($api === 'json')
+			{
+				$header->contentType('application/json', 'UTF-8');
+			}
+			elseif ($api === 'xml')
+			{
+				$header->contentType('text/xml', 'UTF-8');
+			}
+			else
+			{
+				$header->contentType('text/html', 'UTF-8');
+			}
 		}
 
 		foreach ($this->getLayers()->prepareContext() as $layer)
@@ -488,6 +496,7 @@ class Theme extends BaseTheme
 				$style_tag .= '
 	' . $this->css_rules['all'];
 			}
+
 			if (!empty($this->css_rules['media']))
 			{
 				foreach ($this->css_rules['media'] as $key => $val)
@@ -689,7 +698,7 @@ class Theme extends BaseTheme
 		$loaded = true;
 
 		$context['current_time'] = standardTime(time(), false);
-		$context['current_action'] = isset($_GET['action']) ? $_GET['action'] : '';
+		$context['current_action'] = $this->_req->getQuery('action', 'trim', '');
 		$context['show_quick_login'] = !empty($modSettings['enableVBStyleLogin']) && $this->user->is_guest;
 		$context['robot_no_index'] = in_array($context['current_action'], $this->no_index_actions);
 
@@ -722,7 +731,7 @@ class Theme extends BaseTheme
 			$context['user']['mentions'] = $this->user->mentions;
 
 			// Personal message popup...
-			if ($this->user->unread_messages > (isset($_SESSION['unread_messages']) ? $_SESSION['unread_messages'] : 0))
+			if ($this->user->unread_messages > ($_SESSION['unread_messages'] ?? 0))
 			{
 				$context['user']['popup_messages'] = true;
 			}
@@ -782,7 +791,7 @@ class Theme extends BaseTheme
 		$context['additional_dropdown_search'] = prepareSearchEngines();
 
 		// This is done to allow theme authors to customize it as they want.
-		$context['show_pm_popup'] = $context['user']['popup_messages'] && !empty($options['popup_messages']) && (!isset($_REQUEST['action']) || $_REQUEST['action'] !== 'pm');
+		$context['show_pm_popup'] = $context['user']['popup_messages'] && !empty($options['popup_messages']) && $context['current_action'] !== 'pm';
 
 		// Add the PM popup here instead. Theme authors can still override it simply by editing/removing the 'fPmPopup' in the array.
 		if ($context['show_pm_popup'])
@@ -862,9 +871,6 @@ class Theme extends BaseTheme
 	{
 		global $settings;
 
-		// Load the SVG support file with fallback to default theme
-		loadCSSFile('icons_svg.css');
-
 		// Load a base theme custom CSS file?
 		if (file_exists($settings['theme_dir'] . '/css/custom.css'))
 		{
@@ -922,6 +928,7 @@ class Theme extends BaseTheme
 	.i-account:before {
 		content: "";
 		background-image: url("' . $this->user->avatar['href'] . '");
+		filter: unset;
 	}');
 		}
 
@@ -1005,7 +1012,6 @@ class Theme extends BaseTheme
 				}
 			}
 
-
 			if ($cache->levelHigherThan(1))
 			{
 				$cache->put('menu_buttons-' . implode('_', $this->user->groups) . '-' . $this->user->language, $menu_buttons, $cacheTime);
@@ -1033,7 +1039,8 @@ class Theme extends BaseTheme
 		}
 		elseif ($context['current_action'] === 'theme')
 		{
-			$current_action = isset($_REQUEST['sa']) && $_REQUEST['sa'] === 'pick' ? 'profile' : 'admin';
+			$sa = $this->_req->getRequest('sa', 'trim', '');
+			$current_action = $sa === 'pick' ? 'profile' : 'admin';
 		}
 		elseif ($context['current_action'] === 'login2' || ($this->user->is_guest && $context['current_action'] === 'reminder'))
 		{
@@ -1126,16 +1133,19 @@ class Theme extends BaseTheme
 		call_integration_hook('integrate_simple_actions', array(&$simpleActions));
 
 		// Output is fully XML
-		if (isset($_REQUEST['xml']))
+		$api = $this->_req->getRequest('api', 'trim', '');
+		$action = $this->_req->getRequest('action', 'trim', '');
+
+		if ($api === 'xml')
 		{
-			\ElkArte\Themes\ThemeLoader::loadLanguageFile('index+Addons');
-			$this->getTemplates()->load('Xml');
+			ThemeLoader::loadLanguageFile('index+Addons');
 			$this->getLayers()->removeAll();
+			$this->getTemplates()->load('Xml');
 		}
 		// These actions don't require the index template at all.
-		elseif (!empty($_REQUEST['action']) && in_array($_REQUEST['action'], $simpleActions))
+		elseif (in_array($action, $simpleActions))
 		{
-			\ElkArte\Themes\ThemeLoader::loadLanguageFile('index+Addons');
+			ThemeLoader::loadLanguageFile('index+Addons');
 			$this->getLayers()->removeAll();
 		}
 		else
@@ -1145,7 +1155,9 @@ class Theme extends BaseTheme
 
 			// Load each template...
 			foreach ($templates as $template)
+			{
 				$this->getTemplates()->load($template);
+			}
 
 			// ...and attempt to load their associated language files.
 			ThemeLoader::loadLanguageFiles(array_merge($templates, ['Addons']), '', false);
@@ -1170,9 +1182,10 @@ class Theme extends BaseTheme
 		global $context, $settings, $options;
 
 		// Overriding - for previews and that ilk.
-		if (!empty($_REQUEST['variant']))
+		$variant = $this->_req->getRequest('variant', 'trim', '');
+		if (!empty($variant))
 		{
-			$_SESSION['id_variant'] = $_REQUEST['variant'];
+			$_SESSION['id_variant'] = $variant;
 		}
 
 		// User selection?
