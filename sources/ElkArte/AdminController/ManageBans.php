@@ -448,7 +448,7 @@ class ManageBans extends AbstractController
 							'class' => 'submitbutton',
 							'value' => '
 								<input type="submit" name="remove_selection" value="' . $txt['ban_remove_selected_triggers'] . '" class="right_submit" />
-								<a class="linkbutton_right" href="' . getUrl('admin', ['action' => 'admin', 'area' => 'ban', 'sa' => 'edittrigger', 'bg' => $ban_group_id]) . '">' . $txt['ban_add_trigger'] . '</a>
+								<a class="linkbutton floatright" href="' . getUrl('admin', ['action' => 'admin', 'area' => 'ban', 'sa' => 'edittrigger', 'bg' => $ban_group_id]) . '">' . $txt['ban_add_trigger'] . '</a>
 								<input type="hidden" name="bg" value="' . $ban_group_id . '" />
 								<input type="hidden" name="' . $context['session_var'] . '" value="' . $context['session_id'] . '" />
 								<input type="hidden" name="' . $context['admin-bet_token_var'] . '" value="' . $context['admin-bet_token'] . '" />',

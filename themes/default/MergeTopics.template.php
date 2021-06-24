@@ -123,7 +123,7 @@ function template_merge()
 		echo '
 					<li>
 						<a class="linkbutton" href="', $scripturl, '?action=mergetopics;sa=options;board=', $context['current_board'], '.0;from=', $context['origin_topic'], ';to=', $topic['id'], ';', $context['session_var'], '=', $context['session_id'], '">
-							<img class="centericon" src="', $settings['images_url'], '/buttons/merge.png" alt="', $txt['merge'], '"  />
+							<img class="icon-middle" src="', $settings['images_url'], '/buttons/merge.png" alt="', $txt['merge'], '"  />
 						</a>&nbsp;
 						<a href="', $scripturl, '?topic=', $topic['id'], '.0" target="_blank" class="new_win">', $topic['subject'], '</a> ', sprintf($txt['topic_started_by'], $topic['poster']['link']), '
 					</li>';

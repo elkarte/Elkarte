@@ -110,7 +110,7 @@ function template_list_boards(array $boards, $id)
 	{
 		echo '
 				<li class="board_row', (!empty($board['children'])) ? ' parent_board' : '', $board['is_redirect'] ? ' board_row_redirect' : '', '" id="board_', $board['id'], '">
-					<div class="board_info">
+					<div class="board_icon">
 						<a class="icon_anchor" href="', ($board['is_redirect'] || $context['user']['is_guest'] ? $board['href'] : $scripturl . '?action=unread;board=' . $board['id'] . '.0;children'), '">';
 
 		// If the board or children is new, show an indicator.
@@ -136,6 +136,8 @@ function template_list_boards(array $boards, $id)
 
 		echo '
 						</a>
+					</div>
+					<div class="board_info">
 						<h3 class="board_name">
 							<a href="', $board['href'], '" id="b', $board['id'], '">', $board['name'], '</a>';
 
@@ -157,42 +159,44 @@ function template_list_boards(array $boards, $id)
 						<p class="moderators">', count($board['moderators']) === 1 ? $txt['moderator'] : $txt['moderators'], ': ', implode(', ', $board['link_moderators']), '</p>';
 		}
 
-		// Show some basic information about the number of posts, etc.
 		echo '
-					</div>
-					<div class="board_latest">
-						<aside class="board_stats">
-							', comma_format($board['posts']), ' ', $board['is_redirect'] ? $txt['redirects'] : $txt['posts'], $board['is_redirect'] ? '' : '<br /> ' . comma_format($board['topics']) . ' ' . $txt['board_topics'], '
-						</aside>';
+					</div>';
 
-		// @todo - Last post message still needs some work. Probably split the language string into three chunks.
-		// Example:
-		// <chunk>Re: Nunc aliquam justo e...</chunk>  <chunk>by Whoever</chunk> <chunk>Last post: Today at 08:00:37 am</chunk>
-		// That should still allow sufficient scope for any language, if done sensibly.
+		if (!empty($board['last_post']['member']['avatar']))
+		{
+			echo '
+					<div class="board_avatar">
+						<a href="', $board['last_post']['member']['href'], '">
+							<img class="avatar" src="', $board['last_post']['member']['avatar']['href'], '" alt="" />
+						</a>
+					</div>';
+		}
+		else
+		{
+			echo '
+					<div class="board_avatar">
+						<a href="#"></a>
+					</div>';
+		}
+
+		echo '
+					<div class="board_latest">';
+
+		// Text string with <span class="lastpost_link"> <span class="board_lastposter"> <span class="board_lasttime">
 		if (!empty($board['last_post']['id']))
 		{
 			echo '
-						<p class="board_lastpost">';
-
-			if (!empty($board['last_post']['member']['avatar']))
-			{
-				echo '
-							<span class="board_avatar"><a href="', $board['last_post']['member']['href'], '"><img class="avatar" src="', $board['last_post']['member']['avatar']['href'], '" alt="" /></a></span>';
-			}
-			else
-			{
-				echo '
-							<span class="board_avatar"><a href="#"></a></span>';
-			}
-
-			echo '
+						<p class="board_lastpost">
 							', $board['last_post']['last_post_message'], '
 						</p>';
 		}
 
+		// Show some basic information about the number of posts, etc.
 		echo '
 					</div>
-				</li>';
+					<div class="board_stats">
+							', comma_format($board['posts']), ' ', $board['is_redirect'] ? $txt['redirects'] : $txt['posts'], $board['is_redirect'] ? '' : '<br /> ' . comma_format($board['topics']) . ' ' . $txt['board_topics'], '
+					</div>';
 
 		// Show the "Sub-boards: ". (there's a link_children but we're going to bold the new ones...)
 		if (!empty($board['children']))
@@ -222,11 +226,10 @@ function template_list_boards(array $boards, $id)
 				$children[] = $child['link'];
 			}
 
-			// New <li> for sub-boards (if any). Can be styled to look like part of previous <li>.
 			// Use h4 tag here for better a11y. Use <ul> for list of sub-boards.
 			// Having sub-board links in <li>'s will allow "tidy sub-boards" via easy CSS tweaks. ;)
 			echo '
-				<li class="childboard_row" id="board_', $board['id'], '_children">
+				<div class="childboard_row" id="board_', $board['id'], '_children">
 					<ul class="childboards">
 						<li>
 							<h4>', $txt['parent_boards'], ':</h4>
@@ -235,11 +238,12 @@ function template_list_boards(array $boards, $id)
 							', implode('</li><li>', $children), '
 						</li>
 					</ul>
-				</li>';
+				</div>';
 		}
 	}
 
 	echo '
+				</li>
 			</ul>';
 }
 

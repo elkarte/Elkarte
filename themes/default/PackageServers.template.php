@@ -47,7 +47,7 @@ function template_servers()
 	foreach ($context['servers'] as $server)
 	{
 		echo '
-					<li class="flow_auto">
+					<li>
 						<strong>' . $server['name'] . '</strong>
 						<span class="package_server floatright">
 							<a class="linkbutton" href="' . $scripturl . '?action=admin;area=packageservers;sa=browse;server=' . $server['id'] . '">' . $txt['package_browse'] . '</a>
@@ -157,18 +157,17 @@ function template_package_list()
 
 		foreach ($context['package_list'] as $i => $packageSection)
 		{
+			if (!empty($packageSection['text']))
+			{
+				$context['package_list'][$i]['title'] .= ' [' . $packageSection['text'] . ']';
+			}
+
 			echo '
 					<li>
 						<p class="panel_toggle secondary_header">
-								<i id="ps_img_', $i, '" class="chevricon i-chevron-up hide" title="', $txt['hide'], '"></i>
+							<i id="ps_img_', $i, '" class="chevricon i-chevron-up hide" title="', $txt['hide'], '"></i>
 							<a href="#" id="upshrink_link_', $i, '" class="highlight">', $packageSection['title'], '</a>
 						</p>';
-
-			if (!empty($packageSection['text']))
-			{
-				echo '
-						<div class="content">', $packageSection['text'], '</div>';
-			}
 
 			// List of addons available in this section
 			echo '
@@ -202,7 +201,7 @@ function template_package_list()
 				{
 					echo '
 							<span class="package_id">', $package['name'], '</span>&nbsp;<a class="linkbutton" href="', $package['download']['href'], '">', $txt['download'], '</a>&nbsp;',
-					sprintf($txt['package_update'], '<i class="icon i-warning" title="' . $txt['package_installed_old'] . '"></i>', $txt['package_downloaded']);
+					sprintf($txt['package_update'], '<i class="icon i-warning " title="' . $txt['package_installed_old'] . '"></i>', $txt['package_downloaded']);
 				}
 				// Downloaded, and its current
 				elseif ($package['is_downloaded'])
@@ -299,11 +298,6 @@ function template_package_list()
 	}
 
 	echo '
-		</div>
-		<div>
-			', $txt['package_installed_key'], '
-			<img src="', $settings['images_url'], '/icons/package_installed.png" alt="" class="centericon" style="margin-left: 1ex;" /> ', $txt['package_installed_current'], '
-			<img src="', $settings['images_url'], '/icons/package_old.png" alt="" class="centericon" style="margin-left: 2ex;" /> ', $txt['package_installed_old'], '
 		</div>
 	</div>';
 

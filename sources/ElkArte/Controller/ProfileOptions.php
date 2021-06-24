@@ -749,7 +749,7 @@ class ProfileOptions extends AbstractController
 
 							if ($board['new'])
 							{
-								$link .= ' <a href="' . $board['href'] . '"><span class="new_posts">' . $txt['new'] . '</span></a>';
+								$link .= ' <a href="' . $board['href'] . '" class="new_posts">' . $txt['new'] . '</a>';
 							}
 
 							return $link;
@@ -846,7 +846,7 @@ class ProfileOptions extends AbstractController
 
 							if ($topic['new'])
 							{
-								$link .= ' <a href="' . $topic['new_href'] . '"><span class="new_posts">' . $txt['new'] . '</span></a>';
+								$link .= ' <a href="' . $topic['new_href'] . '" class="new_posts">' . $txt['new'] . '</a>';
 							}
 
 							$link .= '<br /><span class="smalltext"><em>' . $txt['in'] . ' ' . $topic['board_link'] . '</em></span>';

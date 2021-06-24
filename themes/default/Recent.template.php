@@ -70,49 +70,48 @@ function template_unread()
 		if ($context['showCheckboxes'])
 		{
 			echo '
-					<form id="quickModForm" action="', $scripturl, '?action=quickmod" method="post" accept-charset="UTF-8" name="quickModForm">
-						<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
-						<input type="hidden" name="qaction" value="markread" />
-						<input type="hidden" name="redirect_url" value="', $context['querystring_board_limits'], '" />';
+					<form id="quickModForm" action="', $scripturl, '?action=quickmod" method="post" accept-charset="UTF-8" name="quickModForm">';
 		}
 
 		echo '
-						<h2 class="category_header" id="unread_header">
+						<h2 class="category_header">
 							', $context['unread_header_title'], '
 						</h2>
-						<ul id="sort_by" class="topic_sorting topic_sorting_recent">';
+						<div id="unread_sort" class="flow_flex">
+							<ul id="sort_by" class="topic_sorting topic_sorting_recent no_js">';
+
+		$current_header = $context['topics_headers'][$context['sort_by']];
+		echo '
+								<li class="listlevel1 topic_sorting_row">', $txt['sort_by'], ': <a href="', $current_header['url'], '">', $txt[$context['sort_by']], '</a>
+									<ul class="menulevel2" id="sortby">';
+
+		foreach ($context['topics_headers'] as $key => $value)
+		{
+			echo '
+										<li class="listlevel2 sort_by_item" id="sort_by_item_', $key, '">
+											<a href="', $value['url'], '" class="linklevel2">', $txt[$key], ' ', $value['sort_dir_img'], '</a>
+										</li>';
+		}
+
+		echo '
+									</ul>
+								</li>
+								<li class="listlevel1 topic_sorting_row">
+									<a class="sort topicicon i-sort', $context['sort_direction'], '" href="', $current_header['url'], '" title="', $context['sort_title'], '"></a>
+								</li>';
 
 		// Show a "select all" box for quick moderation?
 		if ($context['showCheckboxes'])
 		{
 			echo '
-							<li class="listlevel1 quickmod_select_all">
-								<input type="checkbox" onclick="invertAll(this, document.getElementById(\'quickModForm\'), \'topics[]\');" />
-							</li>';
-		}
-
-		$current_header = $context['topics_headers'][$context['sort_by']];
-		echo '
-							<li class="listlevel1 topic_sorting_row">
-								<a class="sort topicicon i-sort', $context['sort_direction'], '" href="', $current_header['url'], '" title="', $context['sort_title'], '"></a>
-							</li>';
-
-		echo '
-							<li class="listlevel1 topic_sorting_row">', $txt['sort_by'], ': <a href="', $current_header['url'], '">', $txt[$context['sort_by']], '</a>
-								<ul class="menulevel2" id="sortby">';
-
-		foreach ($context['topics_headers'] as $key => $value)
-		{
-			echo '
-									<li class="listlevel2 sort_by_item" id="sort_by_item_', $key, '">
-										<a href="', $value['url'], '" class="linklevel2">', $txt[$key], ' ', $value['sort_dir_img'], '</a>
-									</li>';
+								<li class="listlevel1 quickmod_select_all">
+									<input type="checkbox" onclick="invertAll(this, document.getElementById(\'quickModForm\'), \'topics[]\');" />
+								</li>';
 		}
 
 		echo '
-								</ul>
-							</li>
-						</ul>
+							</ul>
+						</div>
 						<ul class="topic_listing" id="unread">';
 
 		foreach ($context['topics'] as $topic)
@@ -140,18 +139,18 @@ function template_unread()
 
 			echo '
 							<li class="', $color_class, '">
-								<div class="topic_info">
-									<p class="topic_icons', empty($modSettings['messageIcons_enable']) ? ' topicicon i-' . $topic['first_post']['icon'] : '', '">';
+								<div class="topic_icons', empty($modSettings['messageIcons_enable']) ? ' topicicon i-' . $topic['first_post']['icon'] : '', '">';
 
 			if (!empty($modSettings['messageIcons_enable']))
 			{
 				echo '
-										<img src="', $topic['first_post']['icon_url'], '" alt="" />';
+									<img src="', $topic['first_post']['icon_url'], '" alt="" />';
 			}
 
 			echo '
-										', $topic['is_posted_in'] ? '<span class="fred topicicon i-profile"></span>' : '', '
-									</p>
+									', $topic['is_posted_in'] ? '<span class="fred topicicon i-profile"></span>' : '', '
+								</div>
+								<div class="topic_info">
 									<div class="topic_name">';
 
 			// The new icons look better if they aren't all over the page.
@@ -163,19 +162,19 @@ function template_unread()
 									</div>
 									<div class="topic_starter">
 										', sprintf($txt['topic_started_by_in'], $topic['first_post']['member']['link'], '<em>' . $topic['board']['link'] . '</em>'), !empty($topic['pages']) ? '
-										<ul class="small_pagelinks" id="pages' . $topic['first_post']['id'] . '" role="menubar">' . $topic['pages'] . '</ul>' : '', '
+										<ul class="small_pagelinks" id="pages' . $topic['first_post']['id'] . '" role="navigation">' . $topic['pages'] . '</ul>' : '', '
 									</div>
 								</div>
 								<div class="topic_latest">
-									<p class="topic_stats">
-										', $topic['replies'], ' ', $txt['replies'], '<br />
-										', $topic['views'], ' ', $txt['views'], '
-									</p>
 									<p class="topic_lastpost">
 										<a class="topicicon i-last_post" href="', $topic['last_post']['href'], '" title="', $txt['last_post'], '"></a>
 										', $topic['last_post']['html_time'], '<br />
 										', $txt['by'], ' ', $topic['last_post']['member']['link'], '
 									</p>
+								</div>
+								<div class="topic_stats">
+									', $topic['replies'], ' ', $txt['replies'], '<br />
+									', $topic['views'], ' ', $txt['views'], '
 								</div>';
 
 			if ($context['showCheckboxes'])
@@ -196,6 +195,9 @@ function template_unread()
 		if ($context['showCheckboxes'])
 		{
 			echo '
+						<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
+						<input type="hidden" name="qaction" value="markread" />
+						<input type="hidden" name="redirect_url" value="', $context['querystring_board_limits'], '" />
 					</form>';
 		}
 	}

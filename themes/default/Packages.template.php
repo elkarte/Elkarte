@@ -522,7 +522,7 @@ function template_list()
 	echo '
 			</ol>
 			<br />
-			<a class="linkbutton_right" href="', $scripturl, '?action=admin;area=packages">', $txt['back'], '</a>
+			<a class="linkbutton floatright" href="', $scripturl, '?action=admin;area=packages">', $txt['back'], '</a>
 		</div>
 	</div>';
 }
@@ -540,7 +540,7 @@ function template_examine()
 		<h3 class="category_header">', $txt['package_file_contents'], ' ', $context['filename'], ':</h3>
 		<div class="content largetext">
 			<code><pre class="file_content prettyprint">', $context['filedata'], '</pre></code>
-			<a href="', $scripturl, '?action=admin;area=packages;sa=list;package=', $context['package'], '" class="linkbutton_right">', $txt['list_files'], '</a>
+			<a href="', $scripturl, '?action=admin;area=packages;sa=list;package=', $context['package'], '" class="linkbutton floatright">', $txt['list_files'], '</a>
 		</div>
 	</div>';
 }
@@ -809,7 +809,7 @@ function template_file_permissions()
 		{
 			ajax_indicator(true);
 
-			getXMLDocument(elk_prepareScriptUrl(elk_scripturl) + \'action=admin;area=packages;fileoffset=\' + (parseInt(this.offset) + ', $context['file_limit'], ') + \';onlyfind=\' + escape(this.path) + \';sa=perms;xml;', $context['session_var'], '=', $context['session_id'], '\', onNewFolderReceived);
+			getXMLDocument(elk_prepareScriptUrl(elk_scripturl) + \'action=admin;area=packages;fileoffset=\' + (parseInt(this.offset) + ', $context['file_limit'], ') + \';onlyfind=\' + escape(this.path) + \';sa=perms;api=xml;', $context['session_var'], '=', $context['session_id'], '\', onNewFolderReceived);
 		}
 	</script>';
 

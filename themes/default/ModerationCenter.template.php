@@ -261,7 +261,7 @@ function template_action_required()
 	{
 		echo '
 								<li>
-									<i class="icon ', ($total == 0) ? 'i-check' : 'i-warning', '"></i>
+									<i class="icon ', ($total == 0) ? 'i-check' : 'i-warning ', '"></i>
 									<a href="', $scripturl, $context['links'][$area], '">
 										<span class="smalltext">', $txt['mc_' . $area], ' : ', $total, '</span>
 									</a>
@@ -408,14 +408,16 @@ function template_viewmodreport()
 								<div class="content">
 									', $context['report']['body'], '
 								</div>
-								<ul class="quickbuttons">
-									<li class="listlevel1">
-										<a class="linklevel1 close_button" href="', $scripturl, '?action=moderate;area=', $context['admin_area'], ';close=', (int) !$context['report']['closed'], ';rid=', $context['report']['id'], ';', $context['session_var'], '=', $context['session_id'], '">', $context['report']['closed'] ? $txt['mc_reportedp_open'] : $txt['mc_reportedp_close'], '</a>
-									</li>
-									<li class="listlevel1">
-										<a class="linklevel1 ignore_button" href="', $scripturl, '?action=moderate;area=', $context['admin_area'], ';ignore=', (int) !$context['report']['ignore'], ';rid=', $context['report']['id'], ';', $context['session_var'], '=', $context['session_id'], '" ', !$context['report']['ignore'] ? 'onclick="return confirm(' . JavaScriptEscape($txt['mc_reportedp_ignore_confirm']) . ');"' : '', '>', $context['report']['ignore'] ? $txt['mc_reportedp_unignore'] : $txt['mc_reportedp_ignore'], '</a>
-									</li>
-								</ul>
+								<nav>
+									<ul class="quickbuttons">
+										<li class="listlevel1">
+											<a class="linklevel1 close_button" href="', $scripturl, '?action=moderate;area=', $context['admin_area'], ';close=', (int) !$context['report']['closed'], ';rid=', $context['report']['id'], ';', $context['session_var'], '=', $context['session_id'], '">', $context['report']['closed'] ? $txt['mc_reportedp_open'] : $txt['mc_reportedp_close'], '</a>
+										</li>
+										<li class="listlevel1">
+											<a class="linklevel1 ignore_button" href="', $scripturl, '?action=moderate;area=', $context['admin_area'], ';ignore=', (int) !$context['report']['ignore'], ';rid=', $context['report']['id'], ';', $context['session_var'], '=', $context['session_id'], '" ', !$context['report']['ignore'] ? 'onclick="return confirm(' . JavaScriptEscape($txt['mc_reportedp_ignore_confirm']) . ');"' : '', '>', $context['report']['ignore'] ? $txt['mc_reportedp_unignore'] : $txt['mc_reportedp_ignore'], '</a>
+										</li>
+									</ul>
+								</nav>
 							</div>
 							<h2 class="category_header">', $txt['mc_modreport_whoreported_title'], '</h2>';
 
@@ -472,22 +474,29 @@ function template_user_watch_post_callback($post)
 					<div class="content">
 						<div class="counter">' . $post['counter'] . '</div>
 						<div class="topic_details">
-							<h5><a href="' . $scripturl . '?topic=' . $post['id_topic'] . '.' . $post['id'] . '#msg' . $post['id'] . '">' . $post['subject'] . '</a> ' . $txt['mc_reportedp_by'] . ' <strong>' . $post['author_link'] . '</strong></h5>
+							<h5>
+								<a href="' . $scripturl . '?topic=' . $post['id_topic'] . '.' . $post['id'] . '#msg' . $post['id'] . '">' .
+									$post['subject'] . '
+								</a> ' .
+								$txt['mc_reportedp_by'] . ' <strong>' . $post['author_link'] . '</strong>
+							</h5>
 							<span class="smalltext">' . '&#171; ' . $txt['mc_watched_users_posted'] . ': ' . $post['poster_time'] . ' &#187;</span>
 						</div>
-						<div class="inner">' . $post['body'] . '</div>';
+						<div class="messageContent">' . $post['body'] . '</div>';
 
 	if ($post['can_delete'])
 	{
 		$output_html .= '
-						<ul class="quickbuttons">
-							<li class="listlevel1">
-								<input type="checkbox" name="delete[]" value="' . $post['id'] . '" />
-							</li>
-							<li class="listlevel1">
-								<a class="linklevel1 remove_button" href="' . $scripturl . '?action=moderate;area=userwatch;sa=post;delete=' . $post['id'] . ';start=' . $context['start'] . ';' . $context['session_var'] . '=' . $context['session_id'] . '" onclick="return confirm(\'' . $txt['mc_watched_users_delete_post'] . '\');">' . $txt['remove'] . '</a>
-							</li>
-						</ul>';
+						<nav>
+							<ul class="quickbuttons">
+								<li class="listlevel1">
+									<input type="checkbox" name="delete[]" value="' . $post['id'] . '" />
+								</li>
+								<li class="listlevel1">
+									<a class="linklevel1 remove_button" href="' . $scripturl . '?action=moderate;area=userwatch;sa=post;delete=' . $post['id'] . ';start=' . $context['start'] . ';' . $context['session_var'] . '=' . $context['session_id'] . '" onclick="return confirm(\'' . $txt['mc_watched_users_delete_post'] . '\');">' . $txt['remove'] . '</a>
+								</li>
+							</ul>
+						</nav>';
 	}
 
 	$output_html .= '

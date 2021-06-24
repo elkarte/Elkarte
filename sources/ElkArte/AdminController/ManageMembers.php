@@ -612,7 +612,7 @@ class ManageMembers extends AbstractController
 				array(
 					'position' => 'below_table_data',
 					'value' => template_users_multiactions($this->_getGroups()),
-					'class' => 'floatright',
+					'class' => 'flow_flex_additional_row',
 				),
 			),
 		);
@@ -1129,6 +1129,7 @@ class ManageMembers extends AbstractController
 			'additional_rows' => array(
 				array(
 					'position' => 'below_table_data',
+					'class' => 'flow_flex_additional_row',
 					'value' => '
 						<div class="submitbutton">
 							<a class="linkbutton" href="' . getUrl('action', ['action' => 'admin', 'area' => 'viewmembers', 'sa' => 'browse', 'showdupes' => $context['show_duplicates'] ? 0 : 1, 'type' => $context['browse_type'], '{session_data}'] + (!empty($context['show_filter']) ? ['filter' => $context['current_filter']] : [])) . '">' . ($context['show_duplicates'] ? $txt['dont_check_for_duplicate'] : $txt['check_for_duplicate']) . '</a>

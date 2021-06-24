@@ -26,6 +26,7 @@ use ElkArte\Http\FtpConnection;
 use ElkArte\PackagesFilterIterator;
 use ElkArte\User;
 use ElkArte\Util;
+use ElkArte\AttachmentsDirectory;
 
 /**
  * This class is the administration package manager controller.
@@ -1144,7 +1145,7 @@ class Packages extends AbstractController
 						'position' => 'bottom_of_list',
 						'class' => 'submitbutton',
 						'value' => ($context['sub_action'] === 'browse'
-							? '<div class="smalltext">' . $txt['package_installed_key'] . '<i class="icon icon-small i-green-dot"></i>' . $txt['package_installed_current'] . '<i class="icon icon-small i-red-dot"></i>' . $txt['package_installed_old'] . '</div>'
+							? ''
 							: '<a class="linkbutton" href="' . getUrl('admin', ['action' => 'admin', 'area' => 'packages', 'sa' => 'flush', '{session_data}']) . '" onclick="return confirm(\'' . $txt['package_delete_list_warning'] . '\');">' . $txt['delete_list'] . '</a>'),
 					),
 				),

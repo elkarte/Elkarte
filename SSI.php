@@ -412,7 +412,7 @@ function ssi_queryPosts($query_where = '', $query_where_params = array(), $query
 				<td class="top">
 					<a href="', $post['href'], '">', $post['subject'], '</a>
 					', $txt['by'], ' ', $post['poster']['link'], '
-					', $post['is_new'] ? '<a href="' . $scripturl . '?topic=' . $post['topic'] . '.msg' . $post['new_from'] . ';topicseen#new" rel="nofollow"><span class="new_posts">' . $txt['new'] . '</span></a>' : '', '
+					', $post['is_new'] ? '<a href="' . $scripturl . '?topic=' . $post['topic'] . '.msg' . $post['new_from'] . ';topicseen#new" rel="nofollow" class="new_posts">' . $txt['new'] . '</a>' : '', '
 				</td>
 				<td class="righttext">
 					', $post['time'], '
@@ -590,7 +590,7 @@ function ssi_recentTopics($num_recent = 8, $exclude_boards = null, $include_boar
 			'link' => '<a href="' . $scripturl . '?topic=' . $row['id_topic'] . '.msg' . $row['id_msg'] . '#new" rel="nofollow">' . $row['subject'] . '</a>',
 			'is_new' => !empty($topics[$row['id_topic']]['new_from']),
 			'new_from' => empty($topics[$row['id_topic']]['new_from']) ? 0 : $topics[$row['id_topic']]['new_from'],
-			'icon' => '<img src="' . $icon_sources->getIconURL($row['icon']) . '" class="centericon" alt="' . $row['icon'] . '" />',
+			'icon' => '<img src="' . $icon_sources->getIconURL($row['icon']) . '" class="icon-middle" alt="' . $row['icon'] . '" />',
 		);
 	}
 	$request->free_result();
@@ -615,7 +615,7 @@ function ssi_recentTopics($num_recent = 8, $exclude_boards = null, $include_boar
 				<td class="top">
 					<a href="', $post['href'], '">', $post['subject'], '</a>
 					', $txt['by'], ' ', $post['poster']['link'], '
-					', !$post['is_new'] ? '' : '<a href="' . $scripturl . '?topic=' . $post['topic'] . '.msg' . $post['new_from'] . ';topicseen#new" rel="nofollow"><span class="new_posts">' . $txt['new'] . '</span></a>', '
+					', !$post['is_new'] ? '' : '<a href="' . $scripturl . '?topic=' . $post['topic'] . '.msg' . $post['new_from'] . ';topicseen#new" rel="nofollow" class="new_posts">' . $txt['new'] . '</a>', '
 				</td>
 				<td class="righttext">
 					', $post['time'], '
@@ -694,7 +694,7 @@ function ssi_topBoards($num_top = 10, $output_method = 'echo')
 	{
 		echo '
 			<tr>
-				<td>', $board['new'] ? ' <a href="' . $board['href'] . '"><span class="new_posts">' . $txt['new'] . '</span></a> ' : '', $board['link'], '</td>
+				<td>', $board['new'] ? ' <a href="' . $board['href'] . '" class="new_posts">' . $txt['new'] . '</a> ' : '', $board['link'], '</td>
 				<td class="centertext">', $board['num_topics'], '</td>
 				<td class="centertext">', $board['num_posts'], '</td>
 			</tr>';

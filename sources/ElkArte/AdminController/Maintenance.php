@@ -1433,7 +1433,7 @@ class Maintenance extends AbstractController
 							<i class="icon i-post_moderation_allow" title="' . $txt['hooks_active'] . '"></i>' . $txt['hooks_disable_legend_exists'] . '
 						</li>
 						<li>
-							<i class="icon i-post_moderation_deny" title="' . $txt['hooks_missing'] . '"></i>' . $txt['hooks_disable_legend_missing'] . '
+							<i class="icon i-post_moderation_deny col" title="' . $txt['hooks_missing'] . '"></i>' . $txt['hooks_disable_legend_missing'] . '
 						</li>
 					</ul>'
 				),

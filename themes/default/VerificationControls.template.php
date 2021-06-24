@@ -70,7 +70,7 @@ function template_verification_control_questions($verify_id, $verify_context)
 	foreach ($verify_context as $question)
 	{
 		echo '
-				<div class="verificationquestion">
+				<div class="verification_question">
 					<label for="', $verify_id, '_vv[q][', $question['id'], ']">', $question['q'], ':</label>
 					<input type="text" id="', $verify_id, '_vv[q][', $question['id'], ']" name="', $verify_id, '_vv[q][', $question['id'], ']" size="30" value="', $question['a'], '" ', $question['is_error'] ? ' class="border_error"' : '', ' tabindex="', $context['tabindex']++, '" class="input_text" />
 				</div>';

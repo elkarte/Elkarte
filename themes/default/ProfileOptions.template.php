@@ -1012,7 +1012,7 @@ function template_groupMembership()
 				if ($group['type'] == 3)
 				{
 					echo '
-							<a class="linkbutton_right" href="', getUrl('action', ['action' => 'profile', 'save', 'u' => $context['id_member'], 'area' => 'groupmembership', '{session_data}', 'gid' => $group['id'], $context[$context['token_check'] . '_token_var'] => $context[$context['token_check'] . '_token']]), '">', $txt['join_group'], '</a>';
+							<a class="linkbutton floatright" href="', getUrl('action', ['action' => 'profile', 'save', 'u' => $context['id_member'], 'area' => 'groupmembership', '{session_data}', 'gid' => $group['id'], $context[$context['token_check'] . '_token_var'] => $context[$context['token_check'] . '_token']]), '">', $txt['join_group'], '</a>';
 				}
 				elseif ($group['type'] == 2 && $group['pending'])
 				{
@@ -1022,7 +1022,7 @@ function template_groupMembership()
 				elseif ($group['type'] == 2)
 				{
 					echo '
-							<a class="linkbutton_right" href="', getUrl('action', ['action' => 'profile', 'u' => $context['id_member'], 'area' => 'groupmembership', 'request' => $group['id'], '{session_data}']), '">', $txt['request_group'], '</a>';
+							<a class="linkbutton floatright" href="', getUrl('action', ['action' => 'profile', 'u' => $context['id_member'], 'area' => 'groupmembership', 'request' => $group['id'], '{session_data}']), '">', $txt['request_group'], '</a>';
 				}
 // @todo
 //				<input type="hidden" name="', $context[$context['token_check'] . '_token_var'], '" value="', $context[$context['token_check'] . '_token'], '" />';
@@ -1345,7 +1345,7 @@ function template_profile_avatar_select()
 									<input type="file" name="attachment" id="avatar_upload_box" class="input_file" />
 									', ($context['member']['avatar']['id_attach'] > 0 ? '
 									<br /><br />
-									<img src="' . $context['member']['avatar']['href'] . (strpos($context['member']['avatar']['href'], '?') === false ? '?' : '&amp;') . 'time=' . time() . '" alt="" />
+									<img src="' . $context['member']['avatar']['href'] . (strpos($context['member']['avatar']['href'], '?') === false ? '?' : '&') . 'time=' . time() . '" alt="" />
 									<input type="hidden" name="id_attach" value="' . $context['member']['avatar']['id_attach'] . '" />' : ''), '
 								</div>';
 	}
@@ -1472,7 +1472,7 @@ function template_profile_smiley_pick()
 
 	echo '
 								</select>
-								<img id="smileypr" class="centericon" src="', $context['member']['smiley_set']['id'] != 'none' ? $modSettings['smileys_url'] . '/' . ($context['member']['smiley_set']['id'] != '' ? $context['member']['smiley_set']['id'] : (!empty($settings['smiley_sets_default']) ? $settings['smiley_sets_default'] : $modSettings['smiley_sets_default'])) . '/smiley.gif' : $settings['images_url'] . '/blank.png', '" alt=":)"  style="padding-left: 1.25em;" />
+								<img id="smileypr" class="icon-middle" src="', $context['member']['smiley_set']['id'] != 'none' ? $modSettings['smileys_url'] . '/' . ($context['member']['smiley_set']['id'] != '' ? $context['member']['smiley_set']['id'] : (!empty($settings['smiley_sets_default']) ? $settings['smiley_sets_default'] : $modSettings['smiley_sets_default'])) . '/smiley.gif' : $settings['images_url'] . '/blank.png', '" alt=":)"  style="padding-left: 1.25em;" />
 							</dd>';
 }
 

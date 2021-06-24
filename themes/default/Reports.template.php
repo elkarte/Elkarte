@@ -67,7 +67,7 @@ function template_generate_report()
 
 	if (!empty($context['report_buttons']))
 	{
-		template_button_strip($context['report_buttons'], 'right');
+		template_button_strip($context['report_buttons']);
 	}
 
 	echo '
@@ -115,7 +115,7 @@ function template_generate_report()
 				if (!empty($data['separator']) && $column_number == 0)
 				{
 					echo '
-					<td colspan="', $table['column_count'], '" class="smalltext">
+					<td colspan="', $table['column_count'], '">
 						', $data['v'], ':
 					</td>';
 					break;

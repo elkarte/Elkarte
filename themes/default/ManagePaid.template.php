@@ -383,8 +383,8 @@ function template_modify_user_subscription()
 			echo '
 					<li>
 						', $payment['desc'], '
-						<a class="linkbutton_left" href="', $scripturl, '?action=admin;area=paidsubscribe;sa=modifyuser;lid=', $context['log_id'], ';pending=', $id, ';accept">', $txt['pending_payments_accept'], '</a>
-						<a class="linkbutton_right" href="', $scripturl, '?action=admin;area=paidsubscribe;sa=modifyuser;lid=', $context['log_id'], ';pending=', $id, ';remove">', $txt['pending_payments_remove'], '</a>
+						<a class="linkbutton floatleft" href="', $scripturl, '?action=admin;area=paidsubscribe;sa=modifyuser;lid=', $context['log_id'], ';pending=', $id, ';accept">', $txt['pending_payments_accept'], '</a>
+						<a class="linkbutton floatright" href="', $scripturl, '?action=admin;area=paidsubscribe;sa=modifyuser;lid=', $context['log_id'], ';pending=', $id, ';remove">', $txt['pending_payments_remove'], '</a>
 					</li>';
 		}
 
@@ -609,7 +609,7 @@ function template_paid_done()
 		<div class="content">
 			<p class="successbox">', $txt['paid_done_desc'], '</p>
 			<br />
-			<a class="linkbutton_right" href="', $scripturl, '?action=profile;u=', $context['member']['id'], ';area=subscriptions">', $txt['paid_sub_return'], '</a>
+			<a class="linkbutton floatright" href="', $scripturl, '?action=profile;u=', $context['member']['id'], ';area=subscriptions">', $txt['paid_sub_return'], '</a>
 		</div>
 	</div>';
 }

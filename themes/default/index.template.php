@@ -68,21 +68,13 @@ function template_html_above()
 
 	// Show right to left and the character set for ease of translating.
 	echo '<!DOCTYPE html>
-<html', $context['right_to_left'] ? ' dir="rtl"' : '', '>
+<html', $context['right_to_left'] ? ' dir="rtl"' : '', ' lang="', str_replace('_', '-', $txt['lang_locale']), '">
 <head>
 	<title>', $context['page_title_html_safe'], '</title>
-	<meta charset="UTF-8" />';
-
-	// Tell IE to render the page in standards not compatibility mode. really for ie >= 8
-	// Note if this is not in the first 4k, its ignored, that's why its here
-	if (isBrowser('ie'))
-	{
-		echo '
-	<meta http-equiv="X-UA-Compatible" content="IE=Edge,chrome=1" />';
-	}
+	<meta charset="utf-8" />';
 
 	echo '
-	<meta name="viewport" content="width=device-width" />
+	<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 	<meta name="mobile-web-app-capable" content="yes" />
 	<meta name="description" content="', $context['page_title_html_safe'], '" />';
 
@@ -184,10 +176,9 @@ function template_body_above()
 	<a href="#top" id="gotop" title="', $txt['go_up'], '">&#8593;</a>
 	<a href="#bot" id="gobottom" title="', $txt['go_down'], '">&#8595;</a>';
 
-	// Skip nav link.
 	echo '
 	<header id="top_section">
-		<aside class="wrapper">';
+		<aside id="top_header" class="wrapper">';
 
 	call_template_callbacks('th', $context['theme_header_callbacks']);
 
@@ -279,9 +270,9 @@ function template_th_search_bar()
 	global $context, $modSettings, $txt;
 
 	echo '
-			<form id="search_form" action="', getUrl('action', ['action' => 'search', 'sa' => 'results']), '" method="post" accept-charset="UTF-8">
+			<form id="search_form" action="', getUrl('action', ['action' => 'search', 'sa' => 'results']), '" method="post" role="search" accept-charset="UTF-8">
 				<label for="quicksearch">
-					<input type="text" name="search" id="quicksearch" value="" class="input_text" placeholder="', $txt['search'], '" />
+					<input type="search" name="search" id="quicksearch" value="" class="input_text" placeholder="', $txt['search'], '" />
 				</label>';
 
 	// Using the quick search dropdown?
@@ -384,8 +375,11 @@ function template_body_below()
 				<li class="copyright">',
 					theme_copyright(), '
 				</li>',
-				!empty($context['newsfeed_urls']['rss']) ? '<li>
-					<a id="button_rss" href="' . $context['newsfeed_urls']['rss'] . '" class="rssfeeds new_win"><i class="icon icon-margin i-rss icon-big"><s>' . $txt['rss'] . '</s></i></a>
+				!empty($context['newsfeed_urls']['rss']) ? '
+				<li>
+					<a id="button_rss" href="' . $context['newsfeed_urls']['rss'] . '" class="rssfeeds new_win">
+						<i class="icon icon-margin i-rss icon-big"><s>' . $txt['rss'] . '</s></i>
+					</a>
 				</li>' : '',
 			'</ul>';
 
@@ -423,7 +417,7 @@ function template_html_below()
 }
 
 /**
- * Show a linktree. This is that thing that shows
+ * Show a linktree / breadcrumbs. This is that thing that shows
  * "My Community | General Category | General Discussion"..
  *
  * @param string $default a string representing the index in $context where
@@ -439,43 +433,33 @@ function theme_linktree($default = 'linktree')
 		return;
 	}
 
-	// @todo - Look at changing markup here slightly. Need to incorporate relevant aria roles.
 	echo '
-			<nav>
-				<ul class="navigate_section">';
+		<nav class="breadcrumb" aria-label="breadcrumbs">';
 
 	// Each tree item has a URL and name. Some may have extra_before and extra_after.
 	// Added a linktree class to make targeting dividers easy.
 	foreach ($context[$default] as $pos => $tree)
 	{
-		echo '
-					<li class="linktree">
-						<span>';
-
-		// Dividers moved to pseudo-elements in CSS.
-		// Show something before the link?
-		if (isset($tree['extra_before']))
-		{
-			echo $tree['extra_before'];
-		}
+		$tree['name'] = ($tree['extra_before'] ?? '') . $tree['name'] . ($tree['extra_after'] ?? '');
 
 		// Show the link, including a URL if it should have one.
-		echo $settings['linktree_link'] && isset($tree['url']) ? '<a href="' . $tree['url'] . '">' . ($pos == 0 ? '<i class="icon i-home"><s>' . $txt['home'] . '</s></i>' : $tree['name']) . '</a>' : $tree['name'];
-
-		// Show something after the link...?
-		if (isset($tree['extra_after']))
-		{
-			echo $tree['extra_after'];
-		}
-
-		echo '
-						</span>
-					</li>';
+		echo $settings['linktree_link'] && isset($tree['url'])
+			? '
+			<span class="crumb">
+				<a href="' . $tree['url'] . '">' .
+					($pos == 0
+						? '<i class="icon i-home"><s>' . $txt['home'] . '</s></i>'
+						: $tree['name']) . '
+				</a>
+			</span>'
+			: '
+			<span class="crumb">
+				<a href="#">' . $tree['name'] . '</a>
+			<span>	';
 	}
 
 	echo '
-				</ul>
-			</nav>';
+		</nav>';
 }
 
 /**
@@ -487,13 +471,13 @@ function template_menu()
 
 	// WAI-ARIA a11y tweaks have been applied here.
 	echo '
-				<nav id="menu_nav">
-					<ul id="main_menu" class="wrapper" role="menubar">';
+				<nav id="menu_nav" aria-label="', $txt['main_menu'], '">
+					<ul id="main_menu" class="wrapper no_js" aria-label="', $txt['main_menu'], '" role="menubar">';
 
 	// The upshrink image, right-floated.
 	echo '
-						<li id="collapse_button" class="listlevel1">
-							<a class="linklevel1 panel_toggle">
+						<li id="collapse_button" class="listlevel1" role="none">
+							<a class="linklevel1 panel_toggle" role="menuitem">
 								<i id="upshrink" class="hide chevricon i-chevron-up icon icon-lg" title="', $txt['upshrink_description'], '"></i>
 							</a>
 						</li>';
@@ -501,8 +485,11 @@ function template_menu()
 	foreach ($context['menu_buttons'] as $act => $button)
 	{
 		echo '
-						<li id="button_', $act, '" class="listlevel1', !empty($button['sub_buttons']) ? ' subsections" aria-haspopup="true"' : '"', '>
-							<a class="linklevel1', !empty($button['active_button']) ? ' active' : '', (!empty($button['indicator']) ? ' indicator' : ''), '" href="', $button['href'], '" ', isset($button['target']) ? 'target="' . $button['target'] . '"' : '', '>', (!empty($button['data-icon']) ? '<i class="icon icon-menu icon-lg ' . $button['data-icon'] . '" title="' . (!empty($button['alttitle']) ? $button['alttitle'] : $button['title']) . '"></i> ' : ''), '<span class="button_title" aria-hidden="true">', $button['title'], '</span></a>';
+						<li id="button_', $act, '" class="listlevel1', !empty($button['sub_buttons']) ? ' subsections"' : '"', ' role="none">
+							<a class="linklevel1', !empty($button['active_button']) ? ' active' : '', (!empty($button['indicator']) ? ' indicator' : ''), '" href="', $button['href'], '" ', isset($button['target']) ? 'target="' . $button['target'] . '"' : '', ' role="menuitem"', !empty($button['sub_buttons']) ? ' aria-haspopup="true"' : '', '>',
+								(!empty($button['data-icon']) ? '<i class="icon icon-menu icon-lg ' . $button['data-icon'] . '" title="' . (!empty($button['alttitle']) ? $button['alttitle'] : $button['title']) . '"></i> ' : ''),
+								'<span class="button_title" aria-hidden="true">', $button['title'], '</span>
+							</a>';
 
 		// Any 2nd level menus?
 		if (!empty($button['sub_buttons']))
@@ -513,8 +500,10 @@ function template_menu()
 			foreach ($button['sub_buttons'] as $childact => $childbutton)
 			{
 				echo '
-								<li id="button_', $childact, '" class="listlevel2', !empty($childbutton['sub_buttons']) ? ' subsections" aria-haspopup="true"' : '"', '>
-									<a class="linklevel2" href="', $childbutton['href'], '" ', isset($childbutton['target']) ? 'target="' . $childbutton['target'] . '"' : '', '>', $childbutton['title'], '</a>';
+								<li id="button_', $childact, '" class="listlevel2', !empty($childbutton['sub_buttons']) ? ' subsections"' : '"', ' role="none">
+									<a class="linklevel2" href="', $childbutton['href'], '" ', isset($childbutton['target']) ? 'target="' . $childbutton['target'] . '"' : '', !empty($childbutton['sub_buttons']) ? ' aria-haspopup="true"' : '', ' role="menuitem">',
+										$childbutton['title'], '
+									</a>';
 
 				// 3rd level menus :)
 				if (!empty($childbutton['sub_buttons']))
@@ -525,8 +514,10 @@ function template_menu()
 					foreach ($childbutton['sub_buttons'] as $grandchildact => $grandchildbutton)
 					{
 						echo '
-										<li id="button_', $grandchildact, '" class="listlevel3">
-											<a class="linklevel3" href="', $grandchildbutton['href'], '" ', isset($grandchildbutton['target']) ? 'target="' . $grandchildbutton['target'] . '"' : '', '>', $grandchildbutton['title'], '</a>
+										<li id="button_', $grandchildact, '" class="listlevel3" role="none">
+											<a class="linklevel3" href="', $grandchildbutton['href'], '" ', isset($grandchildbutton['target']) ? 'target="' . $grandchildbutton['target'] . '"' : '', ' role="menuitem">',
+												$grandchildbutton['title'], '
+											</a>
 										</li>';
 					}
 
@@ -586,12 +577,12 @@ function template_menu()
  * Generate a strip of buttons.
  *
  * @param mixed[] $button_strip
- * @param string $direction = ''
+ * @param string $class = ''
  * @param string[] $strip_options = array()
  *
  * @return string as echoed content
  */
-function template_button_strip($button_strip, $direction = '', $strip_options = array())
+function template_button_strip($button_strip, $class = '', $strip_options = array())
 {
 	global $context, $txt;
 
@@ -630,7 +621,7 @@ function template_button_strip($button_strip, $direction = '', $strip_options = 
 	}
 
 	echo '
-							<ul role="menubar" class="buttonlist', !empty($direction) ? ' float' . $direction : '', (empty($buttons) ? ' hide"' : '"'), (!empty($strip_options['id']) ? ' id="' . $strip_options['id'] . '"' : ''), '>
+							<ul role="menubar" class="buttonlist', !empty($class) ? ' ' . $class : '', (empty($buttons) ? ' hide"' : '"'), (!empty($strip_options['id']) ? ' id="' . $strip_options['id'] . '"' : ''), '>
 								', implode('', $buttons), '
 							</ul>';
 }
@@ -820,11 +811,9 @@ function template_pagesection($button_strip = false, $strip_direction = '', $opt
 {
 	global $context;
 
-	// Hmmm. I'm a tad wary of having floatleft here but anyway............
-	// @todo - Try using table-cell display here. Should do auto rtl support. Less markup, less css. :)
 	if (!empty($options['page_index_markup']))
 	{
-		$pages = '<ul ' . (isset($options['page_index_id']) ? 'id="' . $options['page_index_id'] . '" ' : '') . 'class="pagelinks floatleft" role="menubar">' . $options['page_index_markup'] . '</ul>';
+		$pages = '<ul ' . (isset($options['page_index_id']) ? 'id="' . $options['page_index_id'] . '" ' : '') . 'class="pagelinks" role="navigation">' . $options['page_index_markup'] . '</ul>';
 	}
 	else
 	{
@@ -832,7 +821,8 @@ function template_pagesection($button_strip = false, $strip_direction = '', $opt
 		{
 			$options['page_index'] = 'page_index';
 		}
-		$pages = empty($context[$options['page_index']]) ? '' : '<ul ' . (isset($options['page_index_id']) ? 'id="' . $options['page_index_id'] . '" ' : '') . 'class="pagelinks floatleft" role="menubar">' . $context[$options['page_index']] . '</ul>';
+
+		$pages = empty($context[$options['page_index']]) ? '' : '<ul ' . (isset($options['page_index_id']) ? 'id="' . $options['page_index_id'] . '" ' : '') . 'class="pagelinks" role="navigation">' . $context[$options['page_index']] . '</ul>';
 	}
 
 	if (!isset($options['extra']))
@@ -840,11 +830,14 @@ function template_pagesection($button_strip = false, $strip_direction = '', $opt
 		$options['extra'] = '';
 	}
 
+	if (!empty($strip_direction))
+		$strip_direction = 'float' . $strip_direction;
+
 	echo '
 			<nav class="pagesection">
 				', $pages, '
 				', !empty($button_strip) && !empty($context[$button_strip]) ? template_button_strip($context[$button_strip], $strip_direction) : '',
-	$options['extra'], '
+				$options['extra'], '
 			</nav>';
 }
 
@@ -944,10 +937,8 @@ function template_msg_email($id, $member = false)
 			{
 				return '<a href="' . $scripturl . '?action=emailuser;sa=email;msg=' . $id . '" class="icon i-envelope-o' . (($member !== false && $member['online']['is_online']) ? '' : '-blank') . '" title="' . $txt['email'] . '"><s>' . $txt['email'] . '</s></a>';
 			}
-			else
-			{
-				return '<a href="' . $scripturl . '?action=emailuser;sa=email;uid=' . $member['id'] . '" class="icon i-envelope-o' . (($member !== false && $member['online']['is_online']) ? '' : '-blank') . '" title="' . $txt['email'] . '"><s>' . $txt['email'] . '</s></a>';
-			}
+
+			return '<a href="' . $scripturl . '?action=emailuser;sa=email;uid=' . $member['id'] . '" class="icon i-envelope-o' . (($member !== false && $member['online']['is_online']) ? '' : '-blank') . '" title="' . $txt['email'] . '"><s>' . $txt['email'] . '</s></a>';
 		}
 		else
 		{

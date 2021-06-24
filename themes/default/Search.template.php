@@ -350,7 +350,7 @@ function template_results()
 						<div class="topic_details">
 							<div class="counter">', $message['counter'], '</div>
 							<h5>', $topic['board']['link'], ' / <a href="', getUrl('topic', ['topic' => $topic['id'], 'subject' => $topic['subject'], 'start' => 'msg' . $message['id']]), '#msg', $message['id'], '">', $message['subject_highlighted'], '</a></h5>
-							<span class="smalltext">&#171;&nbsp;', $txt['by'], '&nbsp;<strong>', $message['member']['link'], '</strong> ', $txt['on'], '&nbsp;<em>', $message['time'], '</em>&nbsp;&#187;</span>
+							<span class="smalltext">', $txt['by'], ' <strong>', $message['member']['link'], '</strong> ', $txt['on'], ' <em>', $message['time'], '</em></span>
 						</div>';
 
 			if (!$context['compact'] || $message['body_highlighted'] != '')
@@ -361,7 +361,10 @@ function template_results()
 
 			if (!empty($topic['buttons']))
 			{
-				template_quickbutton_strip($topic['buttons'], $topic['tests']);
+				echo '
+						<nav>',
+							template_quickbutton_strip($topic['buttons'], $topic['tests']),
+						'</nav>';
 			}
 
 			if (!empty($options['display_quick_mod']))

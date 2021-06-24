@@ -185,20 +185,26 @@ function template_build_poster_div($message, $ignoring = false)
 
 	// Stuff for the staff to wallop them with.
 	$poster_div .= '
-									<li class="listlevel2 report_seperator"></li>';
+									<li class="listlevel2 report_separator"></li>';
 
 	// Can we issue a warning because of this post?  Remember, we can't give guests warnings.
 	if ($context['can_issue_warning'] && !$message['is_message_author'] && !$message['member']['is_guest'])
 	{
 		$poster_div .= '
 									<li class="listlevel2 warning">
-										<a class="linklevel2" href="' . $scripturl . '?action=profile;area=issuewarning;u=' . $message['member']['id'] . ';msg=' . $message['id'] . '"><i class="warnicon i-warning" title="' . $txt['issue_warning_post'] . '"></i>' . $txt['warning_issue'] . '</a>';
+										<a class="linklevel2" href="' . $scripturl . '?action=profile;area=issuewarning;u=' . $message['member']['id'] . ';msg=' . $message['id'] . '">
+											<i class="warnicon i-warning " title="' . $txt['issue_warning_post'] . '"></i>' . $txt['warning_issue'] . '
+										</a>';
 
 		// Do they have a warning in place?
 		if ($message['member']['can_see_warning'] && !empty($options['hide_poster_area']))
 		{
+			$iconClass = 'warnicon i-warning-' . $message['member']['warning_status'];
 			$poster_div .= '
-										<a class="linklevel2" href="' . $scripturl . '?action=profile;area=issuewarning;u=' . $message['member']['id'] . '"><i class="warnicon i-warning-' . $message['member']['warning_status'] . '" title="' . $txt['user_warn_' . $message['member']['warning_status']] . '"></i><span class="warn_' . $message['member']['warning_status'] . '">' . $txt['warn_' . $message['member']['warning_status']] . '</span></a>';
+										<a class="linklevel2" href="' . $scripturl . '?action=profile;area=issuewarning;u=' . $message['member']['id'] . '">
+											<i class="' . $iconClass . '" title="' . $txt['user_warn_' . $message['member']['warning_status']] . '"></i>
+											<span class="warn_' . $message['member']['warning_status'] . '">' . $txt['warn_' . $message['member']['warning_status']] . '</span>
+										</a>';
 		}
 
 		$poster_div .= '
@@ -210,8 +216,8 @@ function template_build_poster_div($message, $ignoring = false)
 	{
 		$poster_div .= '
 									<li class="listlevel2 poster_ip">
-										<a class="linklevel2 help" title="' . $message['member']['ip'] . '" href="' . $scripturl . '?action=' . (!empty($message['member']['is_guest']) ? 'trackip' : 'profile;area=history;sa=ip;u=' . $message['member']['id'] . ';searchip=' . $message['member']['ip']) . '">' . $message['member']['ip'] . '</a>
 										<a class="helpicon i-help" href="' . $scripturl . '?action=quickhelp;help=see_admin_ip" onclick="return reqOverlayDiv(this.href);"></a>
+										<a class="linklevel2 help" title="' . $message['member']['ip'] . '" href="' . $scripturl . '?action=' . (!empty($message['member']['is_guest']) ? 'trackip' : 'profile;area=history;sa=ip;u=' . $message['member']['id'] . ';searchip=' . $message['member']['ip']) . '">' . $message['member']['ip'] . '</a>
 									</li>';
 	}
 	// Or, should we show it because this is you?
@@ -219,8 +225,8 @@ function template_build_poster_div($message, $ignoring = false)
 	{
 		$poster_div .= '
 									<li class="listlevel2 poster_ip">
-										<a class="linklevel2 help" title="' . $message['member']['ip'] . '" href="#" onclick="return false;">' . $message['member']['ip'] . '</a>
 										<a class="linklevel2 helpicon i-help"  title="' . $message['member']['ip'] . '" href="' . $scripturl . '?action=quickhelp;help=see_member_ip" onclick="return reqOverlayDiv(this.href);"><s>' . $txt['help'] . '</s></a>
+										<a class="linklevel2 help" title="' . $message['member']['ip'] . '" href="#" onclick="return false;">' . $message['member']['ip'] . '</a>
 									</li>';
 	}
 	// Okay, are you at least logged in?  Then we can show something about why IPs are logged...
@@ -282,11 +288,13 @@ function template_build_poster_div($message, $ignoring = false)
 		// Still has a little bit of hard-coded text. This may be a place where translators should be able to write inclusive strings,
 		// instead of dealing with $txt['by'] etc in the markup. Must be brief to work, anyway. Cannot ramble on at all.
 
-		// we start with their own..
+		// We start with their own..
 		if ($context['can_send_pm'] && $message['is_message_author'])
 		{
 			$poster_div .= '
-							<li class="listlevel1 poster_online"><a class="linklevel1' . ($context['user']['unread_messages'] > 0 ? ' new_pm' : '') . '" href="' . $scripturl . '?action=pm">' . $txt['pm_short'] . ' ' . ($context['user']['unread_messages'] > 0 ? '<span class="pm_indicator">' . $context['user']['unread_messages'] . '</span>' : '') . '</a></li>';
+							<li class="listlevel1 poster_online">
+								<a class="linklevel1' . ($context['user']['unread_messages'] > 0 ? ' new_pm' : '') . '" href="' . $scripturl . '?action=pm">' . $txt['pm_short'] . ' ' . ($context['user']['unread_messages'] > 0 ? '<span class="pm_indicator">' . $context['user']['unread_messages'] . '</span>' : '') . '</a>
+							</li>';
 		}
 		// Allowed to send PMs and the message is not their own and not from a guest.
 		elseif ($context['can_send_pm'] && !$message['is_message_author'] && !$message['member']['is_guest'])
@@ -294,23 +302,32 @@ function template_build_poster_div($message, $ignoring = false)
 			if (!empty($modSettings['onlineEnable']))
 			{
 				$poster_div .= '
-							<li class="listlevel1 poster_online"><a class="linklevel1" href="' . $scripturl . '?action=pm;sa=send;u=' . $message['member']['id'] . '" title="' . $message['member']['online']['member_online_text'] . '">' . $txt['send_message'] . ' ' . template_member_online($message['member'], false) . '</a></li>';
+							<li class="listlevel1 poster_online">
+								<a class="linklevel1" href="' . $scripturl . '?action=pm;sa=send;u=' . $message['member']['id'] . '" title="' . $message['member']['online']['member_online_text'] . '">' . $txt['send_message'] . ' ' . template_member_online($message['member'], false) . '</a>
+							</li>';
 			}
 			else
 			{
 				$poster_div .= '
-							<li class="listlevel1 poster_online"><a class="linklevel1" href="' . $scripturl . '?action=pm;sa=send;u=' . $message['member']['id'] . '">' . $txt['send_message'] . ' </a></li>';
+							<li class="listlevel1 poster_online">
+								<a class="linklevel1" href="' . $scripturl . '?action=pm;sa=send;u=' . $message['member']['id'] . '">' . $txt['send_message'] . ' </a>
+							</li>';
 			}
 		}
 		// Not allowed to send a PM, online status disabled and not from a guest.
 		elseif (!$context['can_send_pm'] && !empty($modSettings['onlineEnable']) && !$message['member']['is_guest'])
-
-			// Are we showing the warning status?
 		{
+			// Are we showing the warning status?
 			if (!$message['member']['is_guest'] && $message['member']['can_see_warning'])
 			{
+				$iconClass = 'warnicon i-warning-' . $message['member']['warning_status'];
 				$poster_div .= '
-							<li class="listlevel1 warning">' . ($context['can_issue_warning'] ? '<a class="linklevel1" href="' . $scripturl . '?action=profile;area=issuewarning;u=' . $message['member']['id'] . '">' : '') . '<i class="warnicon i-warning-' . $message['member']['warning_status'] . '.png" title="' . $txt['user_warn_' . $message['member']['warning_status']] . '"></i>' . ($context['can_issue_warning'] ? '</a>' : '') . '<span class="warn_' . $message['member']['warning_status'] . '">' . $txt['warn_' . $message['member']['warning_status']] . '</span></li>';
+							<li class="listlevel1 warning">' .
+								($context['can_issue_warning'] ? '<a class="linklevel1" href="' . $scripturl . '?action=profile;area=issuewarning;u=' . $message['member']['id'] . '">' : '') . '
+								<i class="' . $iconClass . '" title="' . $txt['user_warn_' . $message['member']['warning_status']] . '"></i>' .
+								($context['can_issue_warning'] ? '</a>' : '') . '
+								<span class="warn_' . $message['member']['warning_status'] . '">' . $txt['warn_' . $message['member']['warning_status']] . '</span>
+							</li>';
 			}
 		}
 	}
@@ -335,23 +352,25 @@ function template_simple_message($msg)
 {
 	// @todo find a better name for $msg['date']
 	echo '
-			<article class="', $msg['class'], ' forumposts">', !empty($msg['counter']) ? '
-				<div class="counter">' . $msg['counter'] . '</div>' : '', '
-				<header class="topic_details">
+			<article class="', $msg['class'], ' forumposts">
+				<header class="topic_details">', !empty($msg['counter']) ? '
+					<div class="counter">' . $msg['counter'] . '</div>' : '', '
 					<h5>
 						', $msg['title'], '
 					</h5>', !empty($msg['date']) ? '
 					<span class="smalltext">' . $msg['date'] . '</span>' : '', '
 				</header>
-				<section class="inner">
+				<section class="messageContent">
 					', $msg['body'], '
-				</section>';
+				</section>
+				<nav>';
 
 	if (!empty($msg['buttons']))
 	{
-		template_quickbutton_strip($msg['buttons'], !empty($msg['tests']) ? $msg['tests'] : array());
+					template_quickbutton_strip($msg['buttons'], !empty($msg['tests']) ? $msg['tests'] : array());
 	}
 
 	echo '
+				</nav>
 			</article>';
 }

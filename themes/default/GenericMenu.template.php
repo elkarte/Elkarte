@@ -34,7 +34,7 @@ function template_generic_menu_sidebar_above()
 		// Show the section header - and pump up the line spacing for readability.
 		echo '
 			<h2 class="category_header">', $section['label'], '</h2>
-			<ul class="sidebar_menu">';
+			<ul class="sidebar_menu no_js">';
 
 		// For every area of this section show a link to that area (bold if it's currently selected.)
 		foreach ($section['areas'] as $i => $area)
@@ -86,7 +86,7 @@ function template_generic_menu_sidebar_above()
 		<div id="main_admsection">';
 
 	// If there are any "tabs" setup, this is the place to shown them.
-	if (empty($context['force_disable_tabs']))
+	if (empty($context['force_disable_tabs']) && !empty($menu_context['tab_data']))
 	{
 		template_generic_menu_tabs($menu_context['tab_data']);
 	}
@@ -107,26 +107,28 @@ function template_generic_menu_sidebar_below()
  */
 function template_generic_menu_dropdown_above()
 {
-	global $context;
+	global $context, $txt;
 
 	// Which menu are we rendering?
 	$context['cur_menu_id'] = isset($context['cur_menu_id']) ? $context['cur_menu_id'] + 1 : 1;
 	$menu_context = &$context['menu_data_' . $context['cur_menu_id']];
 
 	echo '
-				<ul class="admin_menu" id="dropdown_menu_', $context['cur_menu_id'], '">';
+				<nav id="generic_nav_', $context['cur_menu_id'], '">
+					<ul class="admin_menu no_js" id="dropdown_menu_', $context['cur_menu_id'], '" role="menubar">';
 
 	// Main areas first.
 	foreach ($menu_context['sections'] as $section)
 	{
 		echo '
-					<li class="listlevel1', !empty($section['areas']) ? ' subsections" aria-haspopup="true"' : '"', '>
-						<a class="linklevel1', !empty($section['selected']) ? ' active' : '', '" href="', $section['url'], '">', $section['label'], '</a>
-						<ul class="menulevel2">';
+						<li class="listlevel1', !empty($section['areas']) ? ' subsections' : '', '" role="none"">
+							<a class="linklevel1', !empty($section['selected']) ? ' active' : '', '" href="', $section['url'], '" role="menuitem"', !empty($button['sub_buttons']) ? ' aria-haspopup="true"' : '', '>',
+								$section['label'], '
+							</a>
+							<ul class="menulevel2" role="menu">';
 
 		// For every area of this section show a link to that area (bold if it's currently selected.)
-		// @todo Code for additional_items class was deprecated and has been removed. Suggest following up in Sources if required.
-		$section['areas'] = isset($section['areas']) ? $section['areas'] : [];
+		$section['areas'] = $section['areas'] ?? [];
 		foreach ($section['areas'] as $area)
 		{
 			// Not supposed to be printed?
@@ -136,14 +138,16 @@ function template_generic_menu_dropdown_above()
 			}
 
 			echo '
-							<li class="listlevel2', !empty($area['subsections']) ? ' subsections" aria-haspopup="true"' : '"', '>
-								<a class="linklevel2', !empty($area['selected']) ? ' chosen' : '', '" href="', $area['url'], '">', $area['icon'], $area['label'], '</a>';
+								<li class="listlevel2', !empty($area['subsections']) ? ' subsections' : '', '" role="none">
+									<a class="linklevel2', !empty($area['selected']) ? ' chosen' : '', '" href="', $area['url'], '"', !empty($area['subsections']) ? ' aria-haspopup="true"' : '', ' role="menuitem">',
+										$area['icon'], $area['label'], '
+									</a>';
 
 			// Are there any subsections?
 			if (!empty($area['subsections']))
 			{
 				echo '
-								<ul class="menulevel3">';
+									<ul class="menulevel3" role="menu">';
 
 				foreach ($area['subsections'] as $sub)
 				{
@@ -153,26 +157,29 @@ function template_generic_menu_dropdown_above()
 					}
 
 					echo '
-									<li class="listlevel3">
-										<a class="linklevel3', !empty($sub['selected']) ? ' chosen ' : '', '" href="', $sub['url'], '">', $sub['label'], '</a>
-									</li>';
+										<li class="listlevel3" role="none">
+											<a class="linklevel3', !empty($sub['selected']) ? ' chosen ' : '', '" href="', $sub['url'], '" role="menuitem">',
+												$sub['label'], '
+											</a>
+										</li>';
 				}
 
 				echo '
-								</ul>';
+									</ul>';
 			}
 
 			echo '
-							</li>';
+								</li>';
 		}
 
 		echo '
-						</ul>
-					</li>';
+							</ul>
+						</li>';
 	}
 
 	echo '
-				</ul>';
+					</ul>
+				</nav>';
 
 	// This is the main table - we need it so we can keep the content to the right of it.
 	echo '

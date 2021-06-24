@@ -106,9 +106,9 @@ function template_manage_boards()
 			echo '
 					<li id="cbp_' . $category['id'] . ',' . $board['id'] . '"', (!empty($modSettings['recycle_board']) && !empty($modSettings['recycle_enable']) && $modSettings['recycle_board'] == $board['id'] ? 'class="recycle_board"' : ''), ' style="', $board['move'] ? ';color: red;' : '', '">
 						<span class="floatleft"><a href="', $scripturl, '?board=', $board['id'], '">', $board['name'], '</a>', !empty($modSettings['recycle_board']) && !empty($modSettings['recycle_enable']) && $modSettings['recycle_board'] == $board['id'] ? '&nbsp;<a href="' . $scripturl . '?action=admin;area=manageboards;sa=settings"><img src="' . $settings['images_url'] . '/post/recycled.png" alt="' . $txt['recycle_board'] . '" /></a></span>' : '</span>', '
-						<span class="floatright">', $context['can_manage_permissions'] ? '<span class="modify_boards"><a href="' . $scripturl . '?action=admin;area=permissions;sa=index;pid=' . $board['permission_profile'] . ';' . $context['session_var'] . '=' . $context['session_id'] . '">' . $txt['mboards_permissions'] . '</a></span>' : '', '
-						<span class="modify_boards"><a href="', $scripturl, '?action=admin;area=manageboards;move=', $board['id'], '">', $txt['mboards_move'], '</a></span>
-						<span class="modify_boards"><a href="', $scripturl, '?action=admin;area=manageboards;sa=board;boardid=', $board['id'], '">', $txt['mboards_modify'], '</a></span></span><br style="clear: right;" />';
+						<span class="floatright">', $context['can_manage_permissions'] ? '<span class="modify_boards"><a class="linkbutton" href="' . $scripturl . '?action=admin;area=permissions;sa=index;pid=' . $board['permission_profile'] . ';' . $context['session_var'] . '=' . $context['session_id'] . '">' . $txt['mboards_permissions'] . '</a></span>' : '', '
+						<span class="modify_boards"><a class="linkbutton" href="', $scripturl, '?action=admin;area=manageboards;move=', $board['id'], '">', $txt['mboards_move'], '</a></span>
+						<span class="modify_boards"><a class="linkbutton" href="', $scripturl, '?action=admin;area=manageboards;sa=board;boardid=', $board['id'], '">', $txt['mboards_modify'], '</a></span></span><br style="clear: right;" />';
 
 			if (!empty($board['move_links']))
 			{
@@ -174,6 +174,7 @@ function template_manage_boards()
 			tag: "' . implode(' ul,', $sortables) . ' ul",
 			connect: ".nolist",
 			containment: "document",
+			tolerance: "pointer",
 			href: "?action=admin;area=manageboards",
 			placeholder: "ui-state-highlight",
 			preprocess: "setBoardIds",
