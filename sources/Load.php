@@ -55,7 +55,8 @@ function reloadSettings()
 	if (!$cache->getVar($modSettings, 'modSettings', 90))
 	{
 		$request = $db->query('', '
-			SELECT variable, value
+			SELECT 
+			    variable, value
 			FROM {db_prefix}settings',
 			array()
 		);
@@ -84,11 +85,6 @@ function reloadSettings()
 		if (empty($modSettings['defaultMaxMembers']) || $modSettings['defaultMaxMembers'] <= 0 || $modSettings['defaultMaxMembers'] > 999)
 		{
 			$modSettings['defaultMaxMembers'] = 30;
-		}
-
-		if (empty($modSettings['subject_length']))
-		{
-			$modSettings['subject_length'] = 24;
 		}
 
 		$modSettings['warning_enable'] = $modSettings['warning_settings'][0];
@@ -141,7 +137,7 @@ function reloadSettings()
 	}
 
 	// Is post moderation alive and well?
-	$modSettings['postmod_active'] = isset($modSettings['admin_features']) ? in_array('pm', explode(',', $modSettings['admin_features'])) : true;
+	$modSettings['postmod_active'] = !isset($modSettings['admin_features']) || in_array('pm', explode(',', $modSettings['admin_features']));
 
 	if (!isset($_SERVER['HTTPS']) || strtolower($_SERVER['HTTPS']) == 'off')
 	{
@@ -751,6 +747,9 @@ function loadUserContext()
 		'ignoreusers' => User::$info->ignoreusers,
 	);
 
+	// @todo Base language is being loaded to late, placed here temporarily
+	ThemeLoader::loadLanguageFile('index+Addons');
+
 	// Something for the guests
 	if (!$context['user']['is_guest'])
 	{
@@ -802,7 +801,7 @@ function loadEssentialThemeData()
 {
 	\ElkArte\Errors\Errors::instance()->log_deprecated('loadEssentialThemeData()', '\ElkArte\Themes\ThemeLoader::loadEssentialThemeData()');
 
-	return ThemeLoader::loadEssentialThemeData();
+	ThemeLoader::loadEssentialThemeData();
 }
 
 /**
