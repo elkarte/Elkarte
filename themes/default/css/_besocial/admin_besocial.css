@@ -1,23 +1,11 @@
-/* nice wrapper for the Modify Themes section */
+/* Common admin center classes.
+------------------------------------------------------- */
 #admin_form_wrapper {
-	border: 1px solid #CCCCCC;
-	border-radius: 7px;
-}
-
-.description, .information {
-	margin-top: 4px;
-}
-
-.popup_window.description {
-	margin: 12% auto;
+	border-color: var(--primary_border);
 }
 
 #support_resources, #credits_sections {
 	margin: 0;
-}
-
-#manage_boards, .admincenter, h3 + .infobox {
-	margin-top: 12px;
 }
 
 .admincenter > #admin_form_wrapper {
@@ -25,17 +13,7 @@
 }
 
 #admin_content .content {
-	border: none;
-	background: #F6F6F6;
-	box-shadow: none;
-}
-
-#manage_maintenance div.content {
-	border: none;
-}
-
-.admin_menu .subsections:hover .linklevel1:after {
-	display: none;
+	background: var(--content-background);
 }
 
 #admin_main_section, .quick_tasks, #mod_main_section,
@@ -43,78 +21,70 @@
 #core_features, #entry_form,
 #groupForm, #mailqueue_stats, #manage_maintenance,
 #new_group, #view_group, #admin_form_wrapper, .action_admin .generic_list_wrapper {
-	border: 1px solid transparent;
+	border: 1px solid var(--transparent);
+}
+
+#manage_boards, .admincenter, h3 + .infobox {
+	margin-top: .7em;
 }
 
 /* Styles for the manage boards section.
 ------------------------------------------------- */
-
 #manage_boards h2 {
-	margin-bottom: 6px;
+	margin-bottom: .5em;
 }
 
 #manage_boards .post_group, #manage_boards .regular_members {
-	border-bottom: 1px dotted #000000;
+	border-bottom-color: var(--dark_text);
 }
 
+/* This is the drag/drop placeholder, normally not visible */
 .ui-state-highlight {
-	border: 1px dashed #298299;
-	background-color: #F5F5F5;
+	border-color: var(--infobox_border) !important;
+	background-color: var(--content-background) !important;
 }
 
 /* Styles for the manage membergroups.
 ------------------------------------------------- */
-
 .select_category, .select_all_box {
-	font-style: italic;
-	border-top: 1px dashed #CCCCCC;
-	border-bottom: 1px dashed #CCCCCC;
+	border-top-color: var(--primary_border_top);
+	border-bottom-color: var(--primary_border_bottom);
 }
 
 /* jQuery Dialog
 ------------------------------------------------- */
 
 .ui-dialog {
-	border: 1px solid #999999;
-	border-radius: 4px 4px 0 0;
-	background-color: #F5F5F5;
-	box-shadow: 0 0 16px rgba(0, 0, 0, 0.3);
+	border-color: var(--seconday_border);
+	background-color: var(--content-background);
+	box-shadow: 0 0 16px var(--opacity30);
 }
 
 .ui-dialog .ui-dialog-titlebar {
-	border-radius: 4px 4px 0 0;
-	background-color: #FAFAFA;
+	background-color: var(--category_header_grad_4)
 }
 
 .ui-widget-overlay {
-	opacity: 0.3;
-	background-color: #000000;
-}
-
-/* Styles for the quick search bar */
-#quick_search {
-	font-size: 0.786em;
+	opacity: 0.6;
+	background-color: var(--dark_grey_background);
 }
 
 /* alternate row colors on Modify Themes,Copy a template */
 .theme_options .content {
-	border-top: 1px solid #CCCCCC;
-	border-bottom: 1px solid #CCCCCC;
-	background: #FCFCFC;
-}
-
-/* the help ? icon in various spots */
-a.help .icon {
-	margin: 0;
-	padding: 0 6px 2px 0;
-	vertical-align: middle;
+	border-top-color: var(--primary_border_top);
+	border-bottom-color: var(--primary_border_bottom);
+	background: var(--content-background);
 }
 
 #quick_tasks li {
-	border-top: 1px solid transparent;
-	border-bottom: 1px solid transparent;
+	border-top-color: var(--transparent);
+	border-bottom-color: var(--transparent);
 }
 
 .sortable_smiley {
-	border-bottom-color: #CCCCCC;
+	border-bottom-color: var(--primary_border)
+}
+
+#manage_maintenance div.content {
+	border-color: var(--transparent);
 }

@@ -1,15 +1,7 @@
 /* INTRODUCTION
-/* This is a very basic version of the Elkarte default theme.
-/* It is intended primarily as a "clean slate" for custom theming.
-/* This is eye candy only. All the layout code is in index.css.
-/*
-/* All theme variants depend on the layout code for stability.
-/* It is better to copy code to a variant CSS file for testing.
-/*
-/* This variant uses named colours instead of hex codes.
-/* CSS colour names at http://www.w3schools.com/cssref/css_colornames.asp
+/* This variant is the standard, beSocial, Elkarte RTL theme.
+/* This is eye candy only. All the layout code is in rtl.css.
 /* ------------------------------------------------------- */
-/* $CONTENTS - still a bit WIP. @todo
 /*
 /*		$GENERAL.............Global resets, clearfixes, etc.
 /*		$COMMON..............Common classes to drive you bonkers.
@@ -44,22 +36,23 @@
 /*		$MEDIA...............Experimental media queries.
 /* ------------------------------------------------------- */
 
-/*	$GENERAL	*/
-/* ------------------------------------------------------- */
+/* ---------------
+ *	$CONSTANTS
+ * ---------------
+ */
+:root {
+	/* flip right and left colors for RTL */
+	--primary_border_left: #CCCCCC;
+	--primary_border_right: #C7C7C7;
 
-/* Stop white band under footer on short pages. */
-/* This color should match $FOOTER background. */
-legend {
-	margin-right: 15px;
-	margin-left: 0;
-	padding-right: 20px;
-	padding-left: 0;
-	background: url(../../images/selected_open.png) no-repeat scroll right center transparent;
+	--seconday_border_left: #AFAFAF;
+	--seconday_border_right: #BFBFBF;
 }
 
-.collapsed legend {
-	background: url(../../images/selected.png) no-repeat scroll right center transparent;
-}
+/* -------------------------------------------------------
+ *	$GENERAL
+ * -------------------------------------------------------
+ */
 
 /* The OpenID login form */
 .openid_login {
@@ -70,79 +63,68 @@ legend {
 
 /* Styles for main headers. */
 .category_header, .forum_category .category_header {
-	text-shadow: -1px 1px 0 #EBEBEB;
+	text-shadow: -1px 1px 0 var(--primary_white_compliment);
 }
 
-/* Styles for subsection headers. @todo */
+/* Styles for subsection headers */
 .secondary_header {
-	text-shadow: -1px 1px 0 #FFFFFF;
+	text-shadow: -1px 1px 0 var(--primary_white);
 }
 
 /* More little boxes on a hillside. */
 .warningbox {
-	border-right: 5px solid #FFD324;
-	border-left: 1px solid #FFD324;
+	border-right: 5px solid var(--warn);
+	border-left: 1px solid var(--warn);
 }
 
 .successbox {
-	border-right: 5px solid #9ECE9E;
-	border-left: 1px solid #9ECE9E;
+	border-right: 5px solid var(--pure_green);
+	border-left: 1px solid var(--pure_green);
 }
 
 .infobox {
-	border-right: 5px solid #3A87AD;
-	border-left: 1px solid #3A87AD;
+	border-right: 5px solid var(--infobox_border);
+	border-left: 1px solid var(--infobox_border);
 }
 
 .errorbox {
-	border-right: 5px solid #CE9E9E;
-	border-left: 1px solid #CE9E9E;
+	border-right: 5px solid var(--attention);
+	border-left: 1px solid var(--attention);
 }
 
-/*	$BBC		*/
-/* ------------------------------------------------------- */
+/* -------------------------------------------------------
+ * $BBC
+ * -------------------------------------------------------
+ */
+
 /* Extra quote styling */
 .bbc_quote, .quoteheader {
-	box-shadow: -2px 2px 2px #DDDDDD;
+	box-shadow: -2px 2px 2px var(--box_shadow);
 }
 
-/* /me uses this a lot. (emote, try typing /me in a post.) */
-.meaction {
-	vertical-align: bottom;
-	color: #50AA3A;
-}
+/* -------------------------------------------------------
+ *	$AJAX
+ * -------------------------------------------------------
+ */
 
-/*	$AJAX		*/
-/* ------------------------------------------------------- */
-
-/*	$MAIN.		*/
-/* ------------------------------------------------------- */
+/* -------------------------------------------------------
+ *	$MAIN
+ * -------------------------------------------------------
+ */
 #search_form .input_text {
-	border-right: 1px solid #CCCCCC;
+	border-right: 1px solid var(--seconday_border_right);
 	border-radius: 0 2px 2px 0;
 }
 
-#search_form input[type="submit"] {
-	border-radius: 2px 0 0 2px;
-}
-
-#search_form select {
-	border-style: solid none;
-}
-
-/* News section. */
-#news > h2 {
-	float: right;
-	margin: -2px 0 0 1em;
-}
-
-/*	$MENUS		*/
-/* ------------------------------------------------------- */
+/* -------------------------------------------------------
+ * $MENUS
+ * -------------------------------------------------------
+ */
 /* Level 1 Menu bar: link or button. General styling. */
 .linklevel1, .linklevel1:link, .linklevel1:visited {
-	border-right: 1px solid #BFBFBF;
-	border-left: 1px solid #AFAFAF;
-	box-shadow: -1px 1px 2px #E5E5E5;
+	border-right: 1px solid var(--seconday_border_right);
+	border-left: 1px solid var(--seconday_border_left);
+	box-shadow: -1px 1px 2px var(--box_shadow);
 }
 
 /* Level 1 button hover and focus effects. */
@@ -150,222 +132,144 @@ legend {
 .linklevel2:hover, .listlevel2:hover .linklevel2,
 .linklevel3:hover, .listlevel3:hover .linklevel3,
 #menu_sidebar .linklevel1:hover, #menu_sidebar .listlevel1:hover .linklevel1 {
-	border-right: 1px solid #AFAFAF;
-	border-left: 1px solid #CCCCCC;
-	box-shadow: -2px 1px 1px rgba(0, 0, 0, 0.07) inset;
+	border-right: 1px solid var(--seconday_border_right);
+	border-left: 1px solid var(--seconday_border_left);
+	box-shadow: -2px 1px 1px var(--opacity10) inset;
 }
 
 .poster li.poster_online:hover .linklevel1 {
-	border-right: 1px solid #AFAFAF;
-	border-left: 1px solid #CCCCCC;
-	box-shadow: -2px 1px 1px rgba(0, 0, 0, 0.07) inset;
+	border-right: 1px solid var(--seconday_border_right);
+	border-left: 1px solid var(--seconday_border_left);
+	box-shadow: -2px 1px 1px var(--opacity10) inset;
 }
 
 .poster li.poster_online .nolink {
-	border-right: 1px solid #BFBFBF;
-	border-left: 1px solid #AFAFAF;
-	box-shadow: -1px 1px 2px #E5E5E5;
+	border-right: 1px solid var(--seconday_border_right);
+	border-left: 1px solid var(--seconday_border_left);
+	box-shadow: -1px 1px 2px var(--box_shadow);
 }
 
 /* Common button styling. */
-/* It is being replaced with three classes: */
-/*    .button_submit is not floated */
-/*    .right_submit is right floated */
-/*    .left_submit is left floated */
-/* The button_reset class may need attention too. */
-.button_submit, .right_submit, .left_submit, .button_reset,
-	/* Anchors styled to look like buttons. */
-	/* These have standard body text size. Can be chained with smalltext class. */
-.linkbutton:link, .linkbutton_right:link, .linkbutton_left:link,
-.linkbutton:visited, .linkbutton_right:visited, .linkbutton_left:visited {
-	border-right: 1px solid #BFBFBF;
-	border-left: 1px solid #AFAFAF;
-	box-shadow: -1px 1px 2px #E5E5E5;
+input[type="submit"], .drop_area_fileselect_text, button[type="submit"], input[type="button"],
+/* Anchors styled to look like buttons. */
+.linkbutton:link, .linkbutton:visited {
+	border-right: 1px solid var(--seconday_border_right);
+	border-left: 1px solid var(--seconday_border_left);
+	box-shadow: -1px 1px 2px var(--box_shadow);
 }
 
 /* Hover effects. */
-.button_submit:hover, .right_submit:hover, .left_submit:hover,
-.button_reset:hover,
-.linkbutton:hover, .linkbutton_right:hover, .linkbutton_left:hover {
-	border-right: 1px solid #AFAFAF;
-	border-left: 1px solid #CCCCCC;
-	box-shadow: -2px 1px 1px rgba(0, 0, 0, 0.07) inset;
+input[type="submit"]:hover, button[type="submit"]:hover, input[type="button"]:hover, .linkbutton:hover {
+	border-right-color: var(--primary_border_top);
+	border-left-color: var(--primary_border_left);
+	box-shadow: -2px 1px 1px var(--opacity10) inset;
 }
 
-/* Top level subsection indicators. */
-/* Level 1 active buttons. */
 .pm_indicator {
-	right: -1px;
-	left: auto;
-	box-shadow: -1px 1px 2px #444444;
+	box-shadow: -1px 1px 2px var(--primary_background);
 }
 
-/* Admin menu icons. */
-.linklevel2 > img {
-	margin: 0 -4px 0 0;
+.likes_indicator {
+	box-shadow: -1px 1px 2px var(--primary_background);
 }
 
-/* Level 2: subsection indicators. */
-.listlevel2.subsections .linklevel2:after {
-	right: auto;
-	left: 6px;
-	content: "\25c0";
-}
+/* -------------------------------------------------------
+ *	$PAGELINKS
+ * -------------------------------------------------------
+ */
 
-/* Level 1: subsection indicators. */
-#menu_sidebar .listlevel1.subsections .linklevel1:after {
-	right: auto;
-	left: 6px;
-	content: "\2190";
-}
 
-/*	$PAGELINKS	*/
-/* ------------------------------------------------------- */
-/* our buddies &laquo; &raquo; */
-.small_pagelinks:before {
-	float: right;
-	content: '\00AB';
-}
-
-.small_pagelinks:after {
-	float: right;
-	content: '\00BB';
-}
-
-/* Globally accessible top/bottom links. */
-#gotop, #gobottom {
-	border-radius: 20px 0 0 0;
-}
-
-#gobottom {
-	border-radius: 0 0 0 20px;
-}
-
-/*End sidebar flyout coding. */
-
-/*	$MAIN.		*/
-/* ------------------------------------------------------- */
+/* -------------------------------------------------------
+ *	$MAIN
+ * -------------------------------------------------------
+ */
 #forumtitle {
-	text-shadow: -1px 1px 2px #FFFFFF;
+	text-shadow: -1px 1px 2px var(--primary_white);
 }
 
-/*	$LINKTREE	*/
-/* ------------------------------------------------------- */
+/* -------------------------------------------------------
+ *	$LINKTREE
+ * -------------------------------------------------------
+ */
 .linktree:not(:last-child):after {
 	transform: scale(1) rotate(-135deg);
 }
 
-/*	$BOARDICONS	*/
-/* ------------------------------------------------------- */
-.board_icon {
-	float: right;
-}
+/* -------------------------------------------------------
+ *	$BOARDICONS
+ * -------------------------------------------------------
+ */
 
-.board_key:before {
-	float: right;
-}
+/* -------------------------------------------------------
+ *	$BOARDS
+ * -------------------------------------------------------
+ */
 
-.board_stats {
-	float: right;
-	padding: 1px 0 1px 6px;
-	text-align: right;
-}
+/* -------------------------------------------------------
+ *	$TOPICS
+ * -------------------------------------------------------
+ */
 
-/*	$BOARDS		*/
-/* ------------------------------------------------------- */
+/* -------------------------------------------------------
+ *	$PROGRESS
+ * -------------------------------------------------------
+ */
 
-/*	$TOPICS		*/
-/* ------------------------------------------------------- */
+/* -------------------------------------------------------
+ *	$PROFILE
+ * -------------------------------------------------------
+ */
 
-/*	$PROGRESS	*/
-/* ------------------------------------------------------- */
+/* -------------------------------------------------------
+ *	$HELP
+ * -------------------------------------------------------
+ */
 
-/*	$TOPICS		*/
-/* ------------------------------------------------------- */
-
-/*	$PROFILE		*/
-/* ------------------------------------------------------- */
-
-/*	$HELP		*/
-/* ------------------------------------------------------- */
-
-/* Styles for the tooltips. */
 .tooltip {
-	box-shadow: -3px 3px 3px rgba(0, 0, 0, 0.3);
+	box-shadow: -3px 3px 3px var(--opacity30);
 }
 
-/* $STATISTICS	*/
-/* ------------------------------------------------------- */
+/* -------------------------------------------------------
+ *	$STATISTICS
+ * -------------------------------------------------------
+ */
 .stats.floatleft {
-	border-right: 0;
-	border-left: 1px solid #CCCCCC;
+	border-right-color: var(--transparent);
+	border-left: 1px solid var(--seconday_border_left);
 }
 
-.statsbar .bar {
-	border-radius: 0 4px 4px 0;
-	background: #43A8DA;
-}
-
-/* Styles for the $TABS	*/
-/* We can't control what jqueryui pollutes the DOM with, so deal with it */
-/* Styles for the profile summary tabs, or any jquery ui tabs */
-/* ---------------------------------------------------------- */
+/* -------------------------------------------------------
+ *	$TABS
+ * -------------------------------------------------------
+ */
 .ui-tabs .ui-tabs-nav li {
-	margin-right: 2px;
-	margin-left: 0;
-	box-shadow: -2px 0 0 rgba(0, 0, 0, 0.3);
+	box-shadow: -2px 0 0 var(--opacity30);
 }
 
-/*	$MEDIA		*/
-/* This one does 800 screens at default font size. */
+/* -------------------------------------------------------
+ *	$MEDIA
+ * -------------------------------------------------------
+ */
 
+/* This one does 800 screens at default font size. */
 @media screen and (max-width: 64em) {
-	.board_lastpost {
-		float: none;
-	}
+
 }
 
 /* This one does 800 screens at default font size. */
-
 @media screen and (max-width: 50em) {
 	#menu_sidebar {
-		box-shadow: -3px 3px 3px rgba(0, 0, 0, 0.3);
+		box-shadow: -3px 3px 3px var(--opacity30);
 	}
 }
 
 /* This one does up to 540 screens. */
-
 @media screen and (max-width: 33.750em) {
-	#gobottom {
-		border-radius: 0;
-	}
-
-	.board_latest {
-		border-right: 0;
-	}
-
-	#forumtitle {
-		margin-right: 10px;
-		margin-left: 0;
-	}
-
 	.topic_listing > li {
-		box-shadow: -3px 3px 6px #E5E5E5;
+		box-shadow: -3px 3px 6px var(--primary_white_compliment);
 	}
 
 	.forumposts .windowbg, .forumposts .windowbg2 {
-		box-shadow: -3px 3px 6px #E5E5E5;
-	}
-
-	.admin_menu li {
-		float: right;
-	}
-
-	#search_form {
-		float: none;
-	}
-
-	#search_form * {
-		float: none;
+		box-shadow: -3px 3px 6px var(--box_shadow);
 	}
 }
