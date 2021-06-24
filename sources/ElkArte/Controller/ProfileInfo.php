@@ -560,7 +560,7 @@ class ProfileInfo extends AbstractController
 				'board' => array(
 					'name' => $row['bname'],
 					'id' => $row['id_board'],
-					'link' => '<a href="' . getUrl('board', ['board' => $row['id_board'], 'start' => 0, 'name' => $row['bname']]) .'">' . $row['bname'] . '</a>',
+					'link' => '<a href="' . getUrl('board', ['board' => $row['id_board'], 'start' => 0, 'name' => $row['bname']]) . '">' . $row['bname'] . '</a>',
 				),
 				'topic' => array(
 					'id' => $row['id_topic'],
@@ -758,7 +758,7 @@ class ProfileInfo extends AbstractController
 						'function' => function ($rowData) {
 							if ($rowData['is_image'] && !empty($rowData['id_thumb']))
 							{
-								return '<img src="' . getUrl('action', ['action' => 'dlattach', 'attach' => $rowData['id_thumb'], 'image']) .'" />';
+								return '<img src="' . getUrl('action', ['action' => 'dlattach', 'attach' => $rowData['id_thumb'], 'image']) . '" />';
 							}
 
 							return '<img src="' . getUrl('action', ['action' => 'dlattach', 'attach' => $rowData['id'], 'thumb']) . '" />';

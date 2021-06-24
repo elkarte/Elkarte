@@ -1286,7 +1286,7 @@ function getBoardParents($id_parent)
 							'id' => $row['id_moderator'],
 							'name' => $row['real_name'],
 							'href' => getUrl('profile', ['action' => 'profile', 'u' => $row['id_moderator']]),
-							'link' => '<a href="' .getUrl('profile', ['action' => 'profile', 'u' => $row['id_moderator']]) . '">' . $row['real_name'] . '</a>'
+							'link' => '<a href="' . getUrl('profile', ['action' => 'profile', 'u' => $row['id_moderator']]) . '">' . $row['real_name'] . '</a>'
 						);
 					}
 				}
@@ -1666,7 +1666,7 @@ function doSecurityChecks()
 
 	if (!empty($context['open_mod_reports']) && (empty(User::$settings['mod_prefs']) || User::$settings['mod_prefs'][0] == 1))
 	{
-		$context['warning_controls']['open_mod_reports'] = '<a href="' . getUrl('action', ['action' => 'moderate', 'area' => 'reports']) .'">' . sprintf($txt['mod_reports_waiting'], $context['open_mod_reports']) . '</a>';
+		$context['warning_controls']['open_mod_reports'] = '<a href="' . getUrl('action', ['action' => 'moderate', 'area' => 'reports']) . '">' . sprintf($txt['mod_reports_waiting'], $context['open_mod_reports']) . '</a>';
 	}
 
 	if (!empty($context['open_pm_reports']) && allowedTo('admin_forum'))

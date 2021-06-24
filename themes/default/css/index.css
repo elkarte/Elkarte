@@ -101,8 +101,8 @@ html {
 html, body {
 	/* Should you change this you will need to change the --font translation table. */
 	font-size: 15px;
-	line-height: 1.5;
 	font-weight: 400;
+	line-height: 1.5;
 }
 
 body {
@@ -110,7 +110,7 @@ body {
 }
 
 /* Global box sizing, for stabilising fluid layouts.
-   Remove margin and padding in all browsers.*/
+   Remove margin and padding in all browsers. */
 * {
 	box-sizing: border-box;
 	margin: 0;
@@ -122,7 +122,7 @@ body {
  * -------------------------------------------------------
  */
 
- /* Width control for top bar, header, main content and footer content.*/
+/* Width control for top bar, header, main content and footer content.*/
 .wrapper {
 	/* Next controls forum width, when it is not set in admin. */
 	width: 90%;
@@ -135,7 +135,7 @@ body {
 
 /* Normal, standard links. */
 a, a:link, a:visited,
-/* Links that open in a new window. */
+	/* Links that open in a new window. */
 a.new_win:link, a.new_win:visited {
 	text-decoration: none;
 }
@@ -173,8 +173,8 @@ legend {
 	padding: 0 0 2px 20px;
 	cursor: pointer;
 	background-repeat: no-repeat;
-	background-size: 16px 16px;
 	background-position: 0 0;
+	background-size: 16px 16px;
 }
 
 .collapsed legend {
@@ -204,9 +204,9 @@ form, input, button, select, textarea,
 fieldset {
 	overflow: auto;
 	margin: 5px 0;
+	padding: 0.35em 0.75em 0.625em;
 	border: 1px solid transparent;
 	border-radius: 5px;
-	padding: 0.35em 0.75em 0.625em;
 }
 
 /* Collection of pseudo element clearfixes. */
@@ -252,9 +252,9 @@ a img {
 
 /* The following is necessary. */
 textarea, .editor {
-	border-radius: 4px;
-	border: 1px solid;
 	line-height: 1.4;
+	border: 1px solid;
+	border-radius: 4px;
 }
 
 /* Style the different types of inputs to be uniform for all browsers.
@@ -268,8 +268,8 @@ textarea, .editor {
 button::-moz-focus-inner,
 [type="button"]::-moz-focus-inner,
 [type="submit"]::-moz-focus-inner {
-	border-style: none;
 	padding: 0;
+	border-style: none;
 }
 
 /* Correct clickable types in iOS and Safari. */
@@ -282,17 +282,17 @@ button,
 /* Declarations for inputs, selects and buttons */
 input, .input_text, button, select {
 	font-size: var(--font14);
+	line-height: 1.4;
+	overflow: visible;
 	height: 2em;
 	padding: 0 .4em;
 	vertical-align: middle;
-	overflow: visible;
-	line-height: 1.4;
 }
 
 input, button, select {
+	text-transform: none;
 	border: 1px solid;
 	border-radius: 3px;
-	text-transform: none;
 }
 
 select {
@@ -333,19 +333,19 @@ input[type="number"] {
 input[type="checkbox"], input[type="radio"] {
 	font-size: var(--font14);
 	font-weight: normal;
+	width: 1em;
+	height: 1em;
 	margin: -.13em .13em 0;
 	padding: .13em;
 	vertical-align: middle;
 	border: none;
 	background: none;
-	width: 1em;
-	height: 1em;
 }
 
 /* Fix search box appearance in iOS */
 [type="search"] {
-	-webkit-appearance: none;
 	outline-offset: -.2px;
+	-webkit-appearance: none;
 }
 
 [type="search"]::-webkit-search-decoration {
@@ -354,21 +354,21 @@ input[type="checkbox"], input[type="radio"] {
 
 /* Common submit button styling. */
 input[type="submit"], button[type="submit"], input[type="button"],
-/* Anchors styled to look like buttons. */
+	/* Anchors styled to look like buttons. */
 .linkbutton:link, .linkbutton:visited {
 	display: inline-block;
-	padding: .13em .4em;
-	border: 1px solid;
-	border-radius: 2px;
 	margin-top: -0.05em;
 	margin-right: 0.1em;
 	margin-left: 0.1em;
+	padding: .13em .4em;
+	border: 1px solid;
+	border-radius: 2px;
 }
 
 .linkbutton:link, .linkbutton:visited {
 	font-size: var(--font14);
-	height: 2em;
 	position: relative;
+	height: 2em;
 }
 
 /* Hover effects. */
@@ -385,12 +385,12 @@ input[type=submit][disabled]:hover, button[disabled], button[disabled]:hover {
 
 /* Use new class that is defined to suit, and with a sensible name. */
 .submitbutton {
-	clear: both;
 	display: flex;
-	flex-direction: row;
-	align-items: center;
-	justify-content: flex-end;
+	clear: both;
 	overflow: visible;
+	align-items: center;
+	flex-direction: row;
+	justify-content: flex-end;
 	padding: .4em 0;
 }
 
@@ -414,13 +414,13 @@ input[type=submit][disabled]:hover, button[disabled], button[disabled]:hover {
 
 /* Standard horizontal rule.. ([hr], etc.) */
 hr {
+	overflow: visible;
+	box-sizing: content-box;
 	height: 0;
 	margin: .8em 0;
 	border-top: 1px solid;
 	border-bottom: 1px solid;
 	border-left: 0;
-	box-sizing: content-box;
-	overflow: visible;
 }
 
 /* -------------------------------------------------------
@@ -468,18 +468,18 @@ em, .em {
 
 .flow_flex {
 	display: flex;
-	flex-direction: row;
+	overflow: hidden;
 	align-items: center;
+	flex-direction: row;
 	flex-wrap: nowrap;
 	margin-top: .5em;
-	overflow: hidden;
 }
 
 /* @todo remove important, currently the fight with ".generic_list_wrapper .additional_row" */
-.flow_flex_additional_row, .flow_flex_right, .below_table_data  {
-	padding-top: .1em !important;
-	margin-left: auto !important;
+.flow_flex_additional_row, .flow_flex_right, .below_table_data {
 	flex: 0 0 auto;
+	margin-left: auto !important;
+	padding-top: .1em !important;
 }
 
 .flow_flex_right {
@@ -532,9 +532,9 @@ em, .em {
 }
 
 .nosel {
+	-webkit-user-select: none;
 	-moz-user-select: none;
 	-ms-user-select: none;
-	-webkit-user-select: none;
 	user-select: none;
 }
 
@@ -571,31 +571,105 @@ em, .em {
 	background-repeat: no-repeat;
 }
 
-.cat_img_attachments::before {background-position: 0 0;}
-.cat_img_buddies::before     {background-position: 0 -24px;}
-.cat_img_config::before      {background-position: 0 -48px;}
-.cat_img_contacts::before    {background-position: 0 -72px;}
-.cat_img_helptopics::before  {background-position: 0 -96px;}
-.cat_img_inbox::before       {background-position: 0 -120px;}
-.cat_img_login::before       {background-position: 0 -144px;}
-.cat_img_mail::before        {background-position: 0 -168px;}
-.cat_img_moderation::before  {background-position: 0 -192px;}
-.cat_img_plus::before        {background-position: 0 -216px;}
-.cat_img_posts::before       {background-position: 0 -240px;}
-.cat_img_profile::before     {background-position: 0 -264px;}
-.cat_img_search::before      {background-position: 0 -288px;}
-.cat_img_stats_info::before  {background-position: 0 -312px;}
-.cat_img_topics::before      {background-position: 0 -336px;}
-.cat_img_write::before       {background-position: 0 -360px;}
-.cat_img_database::before    {background-position: 0 -384px;}
-.cat_img_address::before     {background-position: 0 -408px;}
-.cat_img_calendar::before    {background-position: 0 -432px;}
-.cat_img_minus::before       {background-position: 0 -456px;}
-.cat_img_star::before        {background-position: 0 -480px;}
-.cat_img_clock::before       {background-position: 0 -504px;}
-.cat_img_eye::before         {background-position: 0 -528px;}
-.cat_img_piechart::before    {background-position: 0 -552px;}
-.cat_img_talk::before        {background-position: 0 -576px;}
+.cat_img_attachments::before {
+	background-position: 0 0;
+}
+
+.cat_img_buddies::before {
+	background-position: 0 -24px;
+}
+
+.cat_img_config::before {
+	background-position: 0 -48px;
+}
+
+.cat_img_contacts::before {
+	background-position: 0 -72px;
+}
+
+.cat_img_helptopics::before {
+	background-position: 0 -96px;
+}
+
+.cat_img_inbox::before {
+	background-position: 0 -120px;
+}
+
+.cat_img_login::before {
+	background-position: 0 -144px;
+}
+
+.cat_img_mail::before {
+	background-position: 0 -168px;
+}
+
+.cat_img_moderation::before {
+	background-position: 0 -192px;
+}
+
+.cat_img_plus::before {
+	background-position: 0 -216px;
+}
+
+.cat_img_posts::before {
+	background-position: 0 -240px;
+}
+
+.cat_img_profile::before {
+	background-position: 0 -264px;
+}
+
+.cat_img_search::before {
+	background-position: 0 -288px;
+}
+
+.cat_img_stats_info::before {
+	background-position: 0 -312px;
+}
+
+.cat_img_topics::before {
+	background-position: 0 -336px;
+}
+
+.cat_img_write::before {
+	background-position: 0 -360px;
+}
+
+.cat_img_database::before {
+	background-position: 0 -384px;
+}
+
+.cat_img_address::before {
+	background-position: 0 -408px;
+}
+
+.cat_img_calendar::before {
+	background-position: 0 -432px;
+}
+
+.cat_img_minus::before {
+	background-position: 0 -456px;
+}
+
+.cat_img_star::before {
+	background-position: 0 -480px;
+}
+
+.cat_img_clock::before {
+	background-position: 0 -504px;
+}
+
+.cat_img_eye::before {
+	background-position: 0 -528px;
+}
+
+.cat_img_piechart::before {
+	background-position: 0 -552px;
+}
+
+.cat_img_talk::before {
+	background-position: 0 -576px;
+}
 
 /* Expand/Collapse image in the various headers */
 .collapse, .expand {
@@ -694,7 +768,7 @@ em, .em {
  */
 
 /* Set a consistent monospace font */
-.bbc_code, .bbc_tt, bbc_pre {
+.bbc_code, .bbc_tt, .bbc_pre {
 	font-family: "DejaVu Sans Mono", Monaco, Menlo, Consolas, 'Roboto Mono', 'Andale Mono', 'Ubuntu Mono', monospace;
 }
 
@@ -719,7 +793,7 @@ em, .em {
 
 /* A quote, perhaps from another post. */
 .bbc_quote,
-/* A code block - maybe PHP ;) - shared styles. */
+	/* A code block - maybe PHP ;) - shared styles. */
 .bbc_code {
 	font-size: var(--font13);
 	overflow: auto;
@@ -879,8 +953,8 @@ a.bbc_link {
 .meaction::before {
 	font-size: var(--font22);
 	line-height: 1em;
-	outline: none;
 	content: "\270c";
+	outline: none;
 }
 
 .spoiler {
@@ -914,10 +988,10 @@ a.bbc_link {
 
 /* Spinner and close button */
 #ajax_in_progress a, #ajax_in_progress span {
-	text-decoration: underline;
 	width: var(--font20);
-	vertical-align: bottom;
 	margin-left: 1em;
+	vertical-align: bottom;
+	text-decoration: underline;
 }
 
 #quick_edit_body_container {
@@ -999,10 +1073,10 @@ a.bbc_link {
 
 #search_form select {
 	font-weight: 600;
+	width: 125px;
 	margin-bottom: 1px;
 	border: 1px solid;
 	border-right: none;
-	width: 125px;
 }
 
 #search_form select:focus {
@@ -1031,8 +1105,8 @@ a.bbc_link {
 
 /* Holds the logo and slogan */
 #logobox {
-	text-align: center;
 	margin: 0 auto;
+	text-align: center;
 }
 
 /* Float these items to the right. */
@@ -1079,9 +1153,9 @@ a.bbc_link {
 /* The user info, news, etc.*/
 #news {
 	font-size: var(--font14);
+	line-height: 1.3;
 	padding: 0 0 1em 0;
 	vertical-align: top;
-	line-height: 1.3;
 }
 
 #news .bbc_link {
@@ -1176,55 +1250,55 @@ a.bbc_link {
 
 /* Main menu bar: wrapper/background on nav */
 #menu_nav {
-	padding: .4em .4em .7em .4em;
 	display: flex;
 	align-items: center;
+	padding: .4em .4em .7em .4em;
 }
 
 /* Main menu container, on the ul */
 #main_menu {
 	display: flex;
-	justify-content: flex-start;
-	flex-direction: row;
 	align-items: center;
+	flex-direction: row;
+	justify-content: flex-start;
 }
 
 /* Wrapper for primary admin/profile/etc menus. */
 .admin_menu {
 	display: flex;
-	justify-content: flex-start;
-	flex-direction: row;
 	align-items: center;
+	flex-direction: row;
+	justify-content: flex-start;
 	padding: 0 3px;
 }
 
 /* Show a Dropdown / Disclose Indicator arrow next to the "admin" tabs.  Named
    admin_menu since they are used in profile and other areas, and admin */
 .admin_menu .listlevel1.subsections .linklevel1::after {
+	display: inline-block;
+	margin-left: 0.25em;
 	content: "";
+	transform: translateY(3px);
 	border: 0.35rem solid transparent;
 	border-top-color: #B7B7B7;
-	margin-left: 0.25em;
-	transform: translateY(3px);
-	display: inline-block;
 }
 
 /* Wrapper for secondary admin/profile/etc tab menus, same as above but
    left separate for easy changes */
 #adm_submenus {
 	display: flex;
-	justify-content: flex-start;
-	flex-direction: row;
 	align-items: center;
+	flex-direction: row;
+	justify-content: flex-start;
 	padding: 0 3px;
 }
 
 /* ditto */
 .generic_menu {
 	display: flex;
-	justify-content: flex-start;
-	flex-direction: row;
 	align-items: center;
+	flex-direction: row;
+	justify-content: flex-start;
 	padding: .4em 0;
 }
 
@@ -1250,8 +1324,8 @@ a.bbc_link {
 /* The My Profile and top header collapse buttons on the right
    arbitrary 11/12 order, leaving room for 10 other buttons */
 .listlevel1#button_profile {
-	margin-left: auto;
 	order: 11;
+	margin-left: auto;
 }
 
 .listlevel1#collapse_button {
@@ -1260,9 +1334,9 @@ a.bbc_link {
 
 /* Upshrink image in the page top for the header collapse */
 #collapse_button .linklevel1 {
-	border: 1px solid;
 	overflow: hidden;
 	padding: 0;
+	border: 1px solid;
 }
 
 /* For swapping out the icon with a mini of the user's avatar if they have one.
@@ -1273,28 +1347,28 @@ a.bbc_link {
 	width: 28px;
 	height: 28px;
 	transform: translate(-6px, -2px);
+	border-radius: 6px 0 0 6px;
 	background: no-repeat;
 	background-size: contain;
-	border-radius: 6px 0 0 6px;
 }
 
 /* Helper class for the top menu icons, wide screens only */
 #main_menu .icon-menu {
+	line-height: 2.1;
+	position: relative;
 	width: 18px;
 	height: 18px;
-	position: relative;
 	transform: translate(0, -5px);
-	line-height: 2.1;
 }
 
 /* Level 1 Menu bar: link or button. */
 .linklevel1 {
 	display: block;
+	margin: 0 .2em;
 	padding: 0 .4em;
 	white-space: nowrap;
 	border: 1px solid;
 	border-radius: 4px;
-	margin: 0 .2em;
 }
 
 /* Menu hover and focus effects. */
@@ -1321,54 +1395,48 @@ a.bbc_link {
 /* The next two are the Top level Dropdown / Disclose Indicator arrow next to the name */
 #main_menu .subsections .linklevel1::after,
 #main_menu .subsections:hover .linklevel1::after {
+	display: inline-block;
+	margin-left: 0.25em;
 	content: "";
+	transform: translateY(3px);
 	border: 0.35rem solid transparent;
 	border-top-color: #B7B7B7;
-	margin-left: 0.25em;
-	transform: translateY(3px);
-	display: inline-block;
 }
 
 /* Levels 2 and 3: drop menu wrapper, hidden until hover or click */
 .menulevel2, .menulevel3 {
-	padding: 0.6em;
-	border: 1px solid;
-	border-radius: 4px;
 	position: absolute;
 	z-index: 90;
-	/* Pull up to slightly overlap the parent */
 	top: calc(100% - 1px);
+	visibility: hidden;
+	min-width: calc(100% + 30px);
+	/* Pull up to slightly overlap the parent */
+	padding: 0.6em;
 	/* Rotate it in to the page to provide a transition element */
+	transition: 280ms all 250ms ease-in;
 	transform: rotateX(-90deg);
 	transform-origin: top left;
-	min-width: calc(100% + 30px);
-	visibility: hidden;
+	border: 1px solid;
 	/* Speed of transition during on/off focus/hover plus a 350ms delay for a hover intent */
-	transition: 280ms all 250ms ease-in;
-}
-
-
-
-.menulevel3 {
-	min-width: 20ch;
+	border-radius: 4px;
 }
 
 /* Top pointer of level1 dropdown menu, like a speech bubble pointer */
 .listlevel1.subsections::after {
-	--pointersize: 12px;
-	content: '';
-	z-index: 90;
-	display: block;
 	position: absolute;
-	/* 1/2 the diagonal length of this box, the +1px is for the menu offset above) */
+	z-index: 90;
 	top: calc(100% - (1.4142 * var(--pointersize)) / 2 + 1px);
 	left: 10%;
+	display: block;
+	/* 1/2 the diagonal length of this box, the +1px is for the menu offset above) */
 	width: var(--pointersize);
 	height: var(--pointersize);
-	border: 1px solid;
-	transform: rotate(-45deg);
+	content: '';
 	transition: 280ms all 225ms ease-in;
+	transform: rotate(-45deg);
 	opacity: 0;
+	border: 1px solid;
+	--pointersize: 12px;
 }
 
 /* The next two show the menulevel 2/3 flyout and level1 pointer arrow
@@ -1377,8 +1445,8 @@ a.bbc_link {
 .no_js .listlevel2:hover .menulevel3,
 .listlevel1 .menulevel2.selected,
 .listlevel2 .menulevel3.selected {
-	transform: rotateX(0);
 	visibility: visible;
+	transform: rotateX(0);
 }
 
 .no_js .listlevel1:hover.subsections::after,
@@ -1410,6 +1478,7 @@ a.bbc_link {
 /* Level 3: drop menu positioning, move to a a flyout position to the right of
    its disclose arrow */
 .menulevel3 {
+	min-width: 20ch;
 	margin: -1.5em 0 0 calc(100% - 6px);
 }
 
@@ -1426,7 +1495,6 @@ a.bbc_link {
 }
 
 
-
 .linklevel2:link, .linklevel2:visited, .linklevel3:link, .linklevel3:visited {
 	border: 1px solid;
 }
@@ -1437,8 +1505,8 @@ a.bbc_link {
 #menu_sidebar .subsections:hover .linklevel1::after {
 	font-size: var(--font22);
 	position: absolute;
-	right: 6px;
 	top: -5px;
+	right: 6px;
 	content: "\2192";
 }
 
@@ -1462,8 +1530,8 @@ a.bbc_link {
 
 /* Corrections for other menus. */
 .linklevel2.help {
-	 display: inline-block;
- }
+	display: inline-block;
+}
 
 /* Tricky PM / Likes indicator. Define it carefully,
   just in case someone tries to use this class elsewhere. */
@@ -1477,8 +1545,8 @@ a.bbc_link {
 	right: -0.4em;
 	float: left;
 	padding: 0 0.7em;
-	border-radius: 8px 8px 8px 0;
 	border: 1px solid;
+	border-radius: 8px 8px 8px 0;
 }
 
 .likes_indicator {
@@ -1509,17 +1577,17 @@ a.bbc_link {
 
 /* Main sidebar div */
 #menu_sidebar {
+	position: relative;
 	float: left;
 	width: 215px;
 	padding: 0 .7em 0 0;
-	position: relative;
 }
 
 #menu_sidebar .linklevel1 {
-	border: 1px solid;
-	white-space: normal;
-	overflow-wrap: break-word;
 	padding: 0 1.5em 0 0;
+	white-space: normal;
+	border: 1px solid;
+	overflow-wrap: break-word;
 }
 
 /* The ul that holds each section */
@@ -1566,24 +1634,24 @@ a.bbc_link {
 
 .breadcrumb {
 	display: flex;
+	overflow: hidden;
 	flex-direction: row;
 	flex-wrap: wrap;
-	overflow: hidden;
-	border-radius: 4px;
 	margin-top: .3em;
+	border-radius: 4px;
 	/* Defines the breadcrumb height */
 	--arrow: 30px;
 }
 
 .breadcrumb .crumb {
-	flex: 0 1 auto;
-	flex-wrap: wrap;
-	text-decoration: none;
-	outline: none;
 	font-size: var(--font13);
 	line-height: var(--arrow);
-	padding: 0 .7em 0 2.5em;
 	position: relative;
+	flex: 0 1 auto;
+	flex-wrap: wrap;
+	padding: 0 .7em 0 2.5em;
+	text-decoration: none;
+	outline: none;
 }
 
 .breadcrumb .crumb a {
@@ -1599,23 +1667,23 @@ a.bbc_link {
 
 /* Add arrows using rotated cube vs border trick to provide better styling (gradient) opportunities */
 .breadcrumb .crumb::after {
-	content: '';
 	position: absolute;
+	z-index: 1;
 	top: 0;
 	right: calc(var(--arrow) / 2 * -1);
 	width: var(--arrow);
 	height: calc(var(--arrow));
 	/* Scale the rotated square based on its diagonal length */
-	transform: scale(0.7071) rotate(45deg);
+	content: '';
 	/* Prevent the arrows from getting covered under the next link */
-	z-index: 1;
+	transform: scale(0.7071) rotate(45deg);
 	/* 50px seems help prevent hover glitches caused by the border shadow */
 	border-radius: 0 4px 0 50px;
 }
 
 .breadcrumb > .crumb > a > i {
-	padding: 0;
 	margin: 0 0 -3px 0;
+	padding: 0;
 }
 
 /* No arrow after the last link */
@@ -1624,8 +1692,8 @@ a.bbc_link {
 }
 
 .breadcrumb .crumb:last-child {
-	border-radius: 0 calc(var(--arrow) / 6) calc(var(--arrow) / 6) 0;
 	padding-right: 1.8em;
+	border-radius: 0 calc(var(--arrow) / 6) calc(var(--arrow) / 6) 0;
 }
 
 /* -------------------------------------------------------
@@ -1639,10 +1707,10 @@ a.bbc_link {
 
 /* Styles for the standard button lists. */
 .buttonlist {
-	padding: 0 .2em;
 	display: flex;
-	flex-direction: row;
 	align-items: center;
+	flex-direction: row;
+	padding: 0 .2em;
 }
 
 .buttonlist li {
@@ -1672,7 +1740,7 @@ a.bbc_link {
 	text-align: right;
 }
 
-nav > .quickbuttons, menu > .quickbuttons  {
+nav > .quickbuttons, menu > .quickbuttons {
 	display: flex;
 	align-items: center;
 	/* The buttons are in reverse order in the markup bleh! */
@@ -1746,28 +1814,93 @@ nav > .quickbuttons, menu > .quickbuttons  {
 }
 
 /* The long list of sprite coordinates is much less verbose this way. */
-.quote_button::before      {background-position: 0 0;}
-.remove_button::before     {background-position: 0 -24px;}
-.modify_button::before     {background-position: 0 -48px;}
-.approve_button::before    {background-position: 0 -72px;}
-.restore_button::before    {background-position: 0 -96px;}
-.split_button::before      {background-position: 0 -120px;}
-.reply_button::before      {background-position: 0 -144px;}
-.reply_all_button::before  {background-position: 0 -144px;}
-.notify_button::before     {background-position: 0 -168px;}
-.unapprove_button::before  {background-position: 0 -192px;}
-.close_button::before      {background-position: 0 -216px;}
-.im_reply_button::before   {background-position: 0 -240px;}
-.details_button::before    {background-position: 0 -264px;}
-.ignore_button::before     {background-position: 0 -288px;}
-.report_button::before     {background-position: 0 -312px;}
-.warn_button::before       {background-position: 0 -336px;}
-.quotetonew_button::before {background-position: 0 -360px;}
-.like_button::before       {background-position: 0 -384px;}
-.unlike_button::before     {background-position: 0 -408px;}
-.star_button::before       {background-position: 0 -432px;}
-.quick_edit::before        {background-position: 0 -456px;}
-.likes_button::before      {background-position: 0 -480px;}
+.quote_button::before {
+	background-position: 0 0;
+}
+
+.remove_button::before {
+	background-position: 0 -24px;
+}
+
+.modify_button::before {
+	background-position: 0 -48px;
+}
+
+.approve_button::before {
+	background-position: 0 -72px;
+}
+
+.restore_button::before {
+	background-position: 0 -96px;
+}
+
+.split_button::before {
+	background-position: 0 -120px;
+}
+
+.reply_button::before {
+	background-position: 0 -144px;
+}
+
+.reply_all_button::before {
+	background-position: 0 -144px;
+}
+
+.notify_button::before {
+	background-position: 0 -168px;
+}
+
+.unapprove_button::before {
+	background-position: 0 -192px;
+}
+
+.close_button::before {
+	background-position: 0 -216px;
+}
+
+.im_reply_button::before {
+	background-position: 0 -240px;
+}
+
+.details_button::before {
+	background-position: 0 -264px;
+}
+
+.ignore_button::before {
+	background-position: 0 -288px;
+}
+
+.report_button::before {
+	background-position: 0 -312px;
+}
+
+.warn_button::before {
+	background-position: 0 -336px;
+}
+
+.quotetonew_button::before {
+	background-position: 0 -360px;
+}
+
+.like_button::before {
+	background-position: 0 -384px;
+}
+
+.unlike_button::before {
+	background-position: 0 -408px;
+}
+
+.star_button::before {
+	background-position: 0 -432px;
+}
+
+.quick_edit::before {
+	background-position: 0 -456px;
+}
+
+.likes_button::before {
+	background-position: 0 -480px;
+}
 
 
 /* Radius left end of the first (Quote) button, last-child as this is in reverse order */
@@ -1838,22 +1971,22 @@ nav > .quickbuttons, menu > .quickbuttons  {
 
 /* The page navigation container, holds page nav and buttons */
 .pagesection {
+	display: flex;
 	clear: both;
 	overflow: hidden;
-	padding: .4em .25em;
-	display: flex;
 	align-items: center;
 	flex-wrap: wrap;
 	max-width: 100%;
+	padding: .4em .25em;
 }
 
 /* Main containing UL for pagelinks, note pagelink markup is defined in themes.php */
 .pagelinks {
 	font-size: var(--font14);
 	display: flex;
-	flex-wrap: wrap;
-	flex-direction: row;
 	align-items: center;
+	flex-direction: row;
+	flex-wrap: wrap;
 }
 
 .pagelinks :first-child {
@@ -1915,29 +2048,29 @@ nav > .quickbuttons, menu > .quickbuttons  {
 /* Used on message index, applied to ul */
 .small_pagelinks {
 	display: flex;
-	flex-direction: row;
 	float: right;
 	align-items: center;
+	flex-direction: row;
 }
 
 /* our buddies &laquo; &raquo; */
 .small_pagelinks li:first-child::before {
 	font-size: var(--font14);
-	content: '\2B9C';
 	position: absolute;
 	right: 12px;
+	content: '\2B9C';
 }
 
 .small_pagelinks li:last-child::after {
 	font-size: var(--font14);
-	content: '\2B9E';
 	position: absolute;
 	left: 14px;
+	content: '\2B9E';
 }
 
 .small_pagelinks li {
-	flex: 0 0 auto;
 	position: relative;
+	flex: 0 0 auto;
 }
 
 /* Used to define gap between page numbers */
@@ -1975,13 +2108,13 @@ nav > .quickbuttons, menu > .quickbuttons  {
 
 /* Skip header navigation link, access with back tab, hidden until then. */
 #top {
+	font-size: var(--font16);
 	font-weight: bold;
 	position: absolute;
 	z-index: 1000;
 	top: -10em;
 	left: 3em;
 	padding: 1em 2em;
-	font-size: var(--font16);
 	transition: top .5s ease-out 0s, background 1s linear 0s;
 	border: 4px solid;
 	border-radius: 0 0 6px 6px;
@@ -2163,25 +2296,25 @@ nav > .quickbuttons, menu > .quickbuttons  {
 }
 
 .category_boards .board_icon {
-	grid-row-start: primary;
 	grid-column: bicon;
+	grid-row-start: primary;
 	place-self: start center;
 }
 
 .category_boards .board_info {
-	grid-row-start: primary;
 	grid-column: info;
+	grid-row-start: primary;
 }
 
 .category_boards .board_avatar {
-	grid-row-start: primary;
 	grid-column: avatar;
+	grid-row-start: primary;
 }
 
 .category_boards .board_latest {
-	grid-row-start: primary;
-	grid-column: latest;
 	overflow: hidden;
+	grid-column: latest;
+	grid-row-start: primary;
 }
 
 .category_boards .board_lastposter {
@@ -2189,14 +2322,16 @@ nav > .quickbuttons, menu > .quickbuttons  {
 }
 
 .category_boards .board_stats {
-	grid-row-start: primary;
 	grid-column: stats;
+	grid-row-start: primary;
 }
 
 .childboard_row {
-	grid-row-start: children;
+	font-size: var(--font13);
 	grid-column-start: info;
 	grid-column-end: end;
+	grid-row-start: children;
+	margin-top: .3em;
 }
 
 /* Styles for the grid content */
@@ -2220,10 +2355,10 @@ nav > .quickbuttons, menu > .quickbuttons  {
 }
 
 .board_avatar {
-	border-left: 1px solid;
 	min-height: 45px;
-	padding-left: .7em;
 	padding-top: .3em;
+	padding-left: .7em;
+	border-left: 1px solid;
 }
 
 .board_avatar .avatar {
@@ -2236,8 +2371,8 @@ nav > .quickbuttons, menu > .quickbuttons  {
 }
 
 .lastpost_link, .board_lastposter, .board_lasttime {
-	white-space: pre;
 	overflow: hidden;
+	white-space: pre;
 }
 
 .lastpost_link > a {
@@ -2260,13 +2395,8 @@ nav > .quickbuttons, menu > .quickbuttons  {
 }
 
 .board_row {
-	padding: 1em 0 .2em 0;
 	margin-bottom: 0.1em;
-}
-
-.childboard_row {
-	font-size: var(--font13);
-	margin-top: .3em;
+	padding: 1em 0 .2em 0;
 }
 
 .childboards li:nth-child(n+3)::before {
@@ -2292,10 +2422,10 @@ nav > .quickbuttons, menu > .quickbuttons  {
 
 /* The posting icons and mark read button. */
 #posting_icons {
-	margin: 0 0 1em .25em;
 	display: flex;
-	flex-direction: row;
 	align-items: center;
+	flex-direction: row;
+	margin: 0 0 1em .25em;
 }
 
 #posting_icons p {
@@ -2307,8 +2437,8 @@ nav > .quickbuttons, menu > .quickbuttons  {
 
 /* Styles for the info center on the board index. */
 #upshrinkHeaderIC .basic_row {
-	padding: .5em .8em;
 	margin-top: 1px;
+	padding: .5em .8em;
 	border: 1px solid;
 }
 
@@ -2354,14 +2484,14 @@ nav > .quickbuttons, menu > .quickbuttons  {
 
 /* Sort topics container on the message index, recent, etc */
 #sort_by {
+	font-size: var(--font14);
+	display: flex;
+	align-items: center;
+	height: 35px;
+	margin-left: auto;
 	border: 2px solid;
 	border-bottom: none;
 	border-radius: 5px 5px 0 0;
-	font-size: var(--font14);
-	height: 35px;
-	display: flex;
-	align-items: center;
-	margin-left: auto;
 }
 
 #sort_by.topic_sorting_recent {
@@ -2387,8 +2517,8 @@ nav > .quickbuttons, menu > .quickbuttons  {
 }
 
 #sortby {
-	left: auto;
 	right: calc(100% - 32px);
+	left: auto;
 	transform: translateX(50%) rotateX(-90deg);
 }
 
@@ -2438,16 +2568,16 @@ nav > .quickbuttons, menu > .quickbuttons  {
 	display: grid;
 	grid-template-columns: [topic_icon] 50px [topic_info] auto [topic_latest] 350px [topic_stats] 150px [topic_moderation] 75px;
 	grid-template-rows: auto;
-	border: 1px solid;
 	padding: .5em 0;
+	border: 1px solid;
 }
 
 /* Container, holds the topic icon and fred */
 .topic_icons {
 	grid-column-start: topic_icon;
 	/* To keep an icon with fred aligned */
-	place-self: center left;
 	padding-left: 1em;
+	place-self: center left;
 }
 
 /* Indicator if you posted in this topic */
@@ -2461,8 +2591,8 @@ nav > .quickbuttons, menu > .quickbuttons  {
 /* Container, holds topic name, starter, small page links and locked/sticky */
 .topic_info {
 	grid-column-start: topic_info;
-	padding: .4em .8em .4em .8em;
 	margin: 0 0 0 .8em;
+	padding: .4em .8em .4em .8em;
 }
 
 .topic_name h4 {
@@ -2476,10 +2606,10 @@ nav > .quickbuttons, menu > .quickbuttons  {
 
 /* Container, Holds last poster and time, link to end */
 .topic_latest {
-	grid-column-start: topic_latest;
 	font-size: var(--font14);
-	white-space: nowrap;
+	grid-column-start: topic_latest;
 	margin-left: 1em;
+	white-space: nowrap;
 }
 
 .topic_latest .board_avatar {
@@ -2493,11 +2623,11 @@ nav > .quickbuttons, menu > .quickbuttons  {
 
 /* Container, Holds the message stats */
 .topic_stats {
-	grid-column-start: topic_stats;
-	line-height: 1.4;
-	text-align: right;
-	padding: 0 .5em;
 	font-size: var(--font14);
+	line-height: 1.4;
+	grid-column-start: topic_stats;
+	padding: 0 .5em;
+	text-align: right;
 }
 
 /* Container, holds moderation checkbox or icons */
@@ -2506,8 +2636,8 @@ nav > .quickbuttons, menu > .quickbuttons  {
 }
 
 .topic_moderation {
-	place-self: center right;
 	padding: 0 .7em;
+	place-self: center right;
 }
 
 .topic_moderation_alt {
@@ -2538,27 +2668,27 @@ nav > .quickbuttons, menu > .quickbuttons  {
 .locked_row .topic_details::before,
 .locked_row.sticky_row .topic_info::before,
 .locked_row.sticky_row .topic_info .topic_name::before {
-	float: right;
-	width: 16px;
-	height: 16px;
 	position: relative;
 	top: -5px;
 	right: -10px;
+	float: right;
+	width: 16px;
+	height: 16px;
 	padding: 0 1px;
 }
 
 /* Actions and icons below the message listing */
 .qaction_row {
 	display: flex;
+	align-content: center;
 	flex-direction: row;
 	justify-content: flex-end;
-	align-content: center;
 	padding: .4em;
 }
 
 #message_index_jump_to.qaction_row {
-	width: 50%;
 	float: right;
+	width: 50%;
 }
 
 #topic_icons {
@@ -2674,37 +2804,37 @@ nav > .quickbuttons, menu > .quickbuttons  {
 }
 
 aside > .poster {
+	grid-column: poster;
 	grid-row-start: keyinfo;
 	grid-row-end: footer;
-	grid-column: poster;
 }
 
 /* Poster container, holds mugshot, flyout, poster info etc */
 .poster {
-	display: flex;
-	flex-direction: column;
 	font-size: var(--font13);
+	display: flex;
 	align-items: center;
+	flex-direction: column;
 }
 
 /* li lines in poster, could use flex / flex row here */
 .poster .listlevel1 {
-	line-height: 1.667em;
 	font-size: var(--font13);
-	text-align: center;
-	padding: 0 .4em;
+	line-height: 1.667em;
 	width: 100%;
+	padding: 0 .4em;
+	text-align: center;
 }
 
 .poster .name {
-	padding-bottom: 2px;
 	font-size: var(--font17);
-	/* Enough room for a two line name, truncated ... */
 	overflow: hidden;
+	/* Enough room for a two line name, truncated ... */
+	max-height: 3em;
+	padding-bottom: 2px;
 	white-space: normal;
 	text-overflow: ellipsis;
 	word-break: normal;
-	max-height: 3em;
 }
 
 /* No border around the poster name on hover */
@@ -2725,8 +2855,8 @@ aside > .poster {
 
 /* Top speech pointer needs to be shifted */
 .poster .listlevel1.subsections::after {
-	left: 45%;
 	top: calc(100% - 4px);
+	left: 45%;
 }
 
 /* Information in the dropdown */
@@ -2780,6 +2910,7 @@ aside > .poster {
 .karma_allow > .linklevel2 {
 	display: inline-block;
 }
+
 /* End nifty new flyout. */
 
 .avatar {
@@ -2816,12 +2947,12 @@ aside > .poster {
 
 /* Custom tile, 2 lines only, overflow preventions */
 .poster .title {
+	line-height: 1.5;
+	overflow: hidden;
 	max-width: 95%;
+	max-height: 3em;
 	white-space: normal;
 	overflow-wrap: break-word;
-	overflow: hidden;
-	line-height: 1.5;
-	max-height: 3em;
 }
 
 /* Hidden poster information option, instead you get a flyout menu link in the keyinfo area */
@@ -2861,18 +2992,18 @@ aside > .poster {
 
 /* Area above the message, icon, reply number, date, subject */
 .keyinfo {
-	grid-row: keyinfo;
 	font-size: var(--font13);
-	padding: 1px 0 5px 0;
 	display: flex;
 	align-items: center;
+	grid-row: keyinfo;
+	padding: 1px 0 5px 0;
 }
 
 .keyinfo .post_subject {
-	order: 2;
-	margin-left: auto;
 	overflow: hidden;
+	order: 2;
 	max-width: 15em;
+	margin-left: auto;
 	white-space: pre;
 	text-overflow: ellipsis;
 }
@@ -2882,15 +3013,15 @@ aside > .poster {
 }
 
 .keyinfo .messageicon img {
-	vertical-align: top;
 	margin: 0 auto;
+	vertical-align: top;
 }
 
 /* The icon selection dropdown you get by clicking on the icon in message view */
 .keyinfo .messageicon .dropdown {
-	cursor: pointer;
-	padding: 2px;
 	margin: 0 auto;
+	padding: 2px;
+	cursor: pointer;
 	vertical-align: top
 }
 
@@ -2899,10 +3030,10 @@ aside > .poster {
 	grid-row: messageContent;
 	min-height: 70px;
 	padding: 1em 1em .25em .5em;
-	overflow-wrap: break-word;
-	hyphens: auto;
 	-webkit-hyphens: auto;
+	hyphens: auto;
 	border-top: 1px solid;
+	overflow-wrap: break-word;
 }
 
 /* The attachments below the post */
@@ -2992,11 +3123,8 @@ footer .signature {
 /* Number of views and previous /next links in the category header */
 .nextlinks {
 	font-size: var(--font15);
-	white-space: pre;
-}
-
-.nextlinks {
 	float: right;
+	white-space: pre;
 }
 
 .views_text {
@@ -3119,8 +3247,8 @@ footer .signature {
 
 #elk_lb_expand::before {
 	font-size: 2em;
-	content: "\1F875";
 	line-height: .85;
+	content: "\1F875";
 }
 
 #elk_lb_next::before {
@@ -3174,10 +3302,10 @@ footer .signature {
 
 /* Video/Preview image container */
 .elk_video {
-	height: 0;
-	border-top: 0;
 	position: relative;
+	height: 0;
 	padding-bottom: min(480px, 75%);
+	border-top: 0;
 }
 
 .elk_video iframe {
@@ -3197,15 +3325,15 @@ footer .signature {
 /* Basic stuff for the bottom of Display.template.php, moderation buttons, jump box. */
 #moderationbuttons {
 	display: flex;
-	flex-direction: row;
 	align-items: center;
+	flex-direction: row;
 	margin: .25em 0 .25em -.25em;
 }
 
 /* The jump to box */
 #display_jump_to {
-	white-space: nowrap;
 	margin-left: auto;
+	white-space: nowrap;
 }
 
 /* Container for the quick reply area., holds header and editor areas */
@@ -3227,16 +3355,16 @@ footer .signature {
 
 /* The rest is for the share/send topic popup window. */
 fieldset.send_topic {
+	overflow: visible;
 	margin: 0;
 	padding: .4em;
 	border: none;
 	box-shadow: none;
-	overflow: visible;
 }
 
 dl.send_topic {
-	margin-bottom: 0;
 	overflow: visible;
+	margin-bottom: 0;
 }
 
 dl.send_mail dt {
@@ -3261,9 +3389,9 @@ dl.send_mail dd {
 .requiredfield {
 	font-size: var(--font13);
 	position: absolute;
+	z-index: 100;
 	top: 35px;
 	left: 5%;
-	z-index: 100;
 	border: 1px solid;
 }
 
@@ -3278,6 +3406,7 @@ dl.send_mail dd {
 .popup_content dl.settings dt {
 	margin-bottom: 15px;
 }
+
 /* end of relatively useless share button stuff */
 
 /* -------------------------------------------------------
@@ -3389,8 +3518,8 @@ ul.post_options li {
 	font-size: var(--font13);
 	overflow: hidden;
 	height: 1.6em;
-	text-align: right;
 	margin: -.3em 0 .3em 0;
+	text-align: right;
 }
 
 /* Container for loadable drafts */
@@ -3540,20 +3669,20 @@ ul.post_options li {
 }
 
 .drop_area .mobile {
+	display: none;
 	border: 1px solid;
 	border-radius: 0.125em;
-	display: none;
 }
 
 /* container for each uploaded item */
 .statusbar {
-	padding: 0 5px;
-	border-top: 1px solid;
-	border-bottom: 1px solid;
 	display: flex;
 	align-items: center;
 	flex-direction: row;
 	height: 65px;
+	padding: 0 5px;
+	border-top: 1px solid;
+	border-bottom: 1px solid;
 }
 
 .info {
@@ -3568,17 +3697,17 @@ ul.post_options li {
 
 .postattach_thumb {
 	width: auto;
+	min-width: 100px;
 	height: 50px;
 	max-height: 100px;
-	min-width: 100px;
 }
 
 /* holds the share button and the insert overlay control injected via JS */
 .ila_container {
+	position: relative;
 	width: 30px;
 	height: 30px;
 	border-radius: 4px;
-	position: relative;
 }
 
 .ila_container .icon.share {
@@ -3587,9 +3716,9 @@ ul.post_options li {
 }
 
 .control.icon.abort, .control.icon.remove {
+	order: 4;
 	margin-left: auto;
 	cursor: pointer;
-	order: 4;
 	border: none;
 }
 
@@ -3768,17 +3897,17 @@ dl.merge_topic dd {
 
 .action_viewquery .explain {
 	font-family: serif;
+	width: 70%;
 	margin-bottom: 1em;
 	empty-cells: show;
 	border-collapse: collapse;
-	width: 70%;
 }
 
 .action_viewquery .explain th,
 .action_viewquery .explain td {
+	width: 5%;
 	padding: .13em;
 	border: 1px solid;
-	width: 5%;
 }
 
 .action_viewquery .query {
@@ -3809,9 +3938,9 @@ dl.merge_topic dd {
 	left: -9999px;
 	max-width: 350px;
 	padding: .4em 9px;
-	overflow-wrap: break-word;
 	border: 1px solid;
 	border-radius: 4px;
+	overflow-wrap: break-word;
 }
 
 /* -------------------------------------------------------
@@ -3834,8 +3963,8 @@ dl.merge_topic dd {
 }
 
 .profile_center .attachments {
-	border-top: none;
 	margin-top: .5em;
+	border-top: none;
 }
 
 .content_noframe {
@@ -3860,9 +3989,9 @@ dl.merge_topic dd {
 .profileblock {
 	margin-top: .25em;
 	padding: .25em .5em;
-	overflow-wrap: break-word;
-	hyphens: auto;
 	-webkit-hyphens: auto;
+	hyphens: auto;
+	overflow-wrap: break-word;
 }
 
 .profileblock_left {
@@ -3888,9 +4017,9 @@ dl.merge_topic dd {
 }
 
 .generic_border {
+	padding: .25em;
 	border: 1px solid;
 	border-radius: 6px;
-	padding: .25em;
 }
 
 .generic_border .avatar {
@@ -3900,8 +4029,8 @@ dl.merge_topic dd {
 
 /* Custom Profile Field Icons */
 ul.cf_icons {
-	border-top: 1px solid #CCCCCC;
 	margin-top: -.5em;
+	border-top: 1px solid #CCCCCC;
 }
 
 li.cf_icon {
@@ -3923,9 +4052,9 @@ ul.cf_icons li:not(:first-child)::before {
 	float: right;
 	width: 70%;
 	margin-top: 0;
-	overflow-wrap: break-word;
-	hyphens: auto;
 	-webkit-hyphens: auto;
+	hyphens: auto;
+	overflow-wrap: break-word;
 }
 
 /* The basic user info on the left of the block (avatar title etc) */
@@ -4141,8 +4270,8 @@ ul.cf_icons li:not(:first-child)::before {
 }
 
 #recentposts header {
-	grid-row: header;
 	align-self: center;
+	grid-row: header;
 }
 
 #recentposts nav {
@@ -4162,7 +4291,7 @@ ul.cf_icons li:not(:first-child)::before {
 
 /* Header section */
 .topic_details {
-    padding: 0 .25em .25em .25em;
+	padding: 0 .25em .25em .25em;
 }
 
 /* Definition lists, mostly used in profile */
@@ -4310,8 +4439,8 @@ div.labels {
 
 /* These are the input buttons like remove, label selected, other? etc */
 .label_pms {
-	margin-left: auto;
 	display: flex;
+	margin-left: auto;
 }
 
 .label_pms li {
@@ -4508,8 +4637,8 @@ Stef                       ^
 }
 
 .statistics .category_header.floatleft {
-	margin: 0 0.5%;
 	max-width: 49%;
+	margin: 0 0.5%;
 }
 
 .statistics .flow_hidden, #forum_history .flow_hidden {
@@ -4778,17 +4907,17 @@ Stef                       ^
 }
 
 .search_results_posts .topic_details {
+	align-self: center;
+	grid-column-start: 1;
 	padding: 1em;
 	border-bottom: 0;
-	grid-column-start: 1;
-	align-self: center;
 }
 
 .search_results_posts .topic_moderation {
-	grid-column-start: 2;
 	align-self: center;
-	width: initial;
 	justify-self: end;
+	grid-column-start: 2;
+	width: initial;
 }
 
 .search_results_posts .topic_moderation input[type="checkbox"] {
@@ -4797,8 +4926,8 @@ Stef                       ^
 
 /* Shown when using show results as messages */
 .search_results_posts nav {
-	grid-row-start: 3;
 	grid-column-start: span 2;
+	grid-row-start: 3;
 }
 
 .search_results_posts nav .quickbuttons {
@@ -4806,16 +4935,11 @@ Stef                       ^
 }
 
 .search_results_posts .topic_body {
-	margin: 0 1em 0;
-	padding-top: .8em;
-	padding-bottom: .8em;
-	border-top: 1px solid;
 	grid-column-start: span 2;
 	grid-row-start: 2;
-}
-
-.search_results_posts .topic_body {
+	margin: 0 1em 0;
 	padding: 1em 1em .5em 1em;
+	border-top: 1px solid;
 }
 
 /* Use colored border to give gap between results */
@@ -5076,11 +5200,11 @@ Stef                       ^
  * -------------------------------------------------------
  */
 
- /* experimental material design like form inputs.  Use as
-   <div class="form_field">
-		<input type="text" />
-		<label>XX</label>
-	</div> */
+/* experimental material design like form inputs.  Use as
+  <div class="form_field">
+	   <input type="text" />
+	   <label>XX</label>
+   </div> */
 .form_field {
 	position: relative;
 	margin-top: 1.5em;
@@ -5091,9 +5215,9 @@ Stef                       ^
 	position: absolute;
 	top: 3px;
 	left: 0;
+	transition: transform .2s;
 	transform: translatex(1em);
 	text-transform: uppercase;
-	transition: transform .2s;
 }
 
 .form_field > input[type="text"],
@@ -5103,9 +5227,9 @@ Stef                       ^
 
 /* Hide any "real" placeholder text */
 .form_field > input[type="text"]::placeholder,
-.form_field > input[type="password"]::placeholder{
-	color: var(--transparent);
+.form_field > input[type="password"]::placeholder {
 	user-select: none;
+	color: var(--transparent);
 }
 
 /* Move label text out of input field on focus */
@@ -5149,14 +5273,14 @@ Stef                       ^
 .warningbox, .successbox, .infobox, .errorbox {
 	padding-left: 2.75em;
 	background-repeat: no-repeat;
-	background-size: 20px 20px;
 	background-position: 6px 50%;
+	background-size: 20px 20px;
 }
 
 .errorbox {
 	margin-bottom: 1em;
-	background-size: 24px 24px;
 	background-position: 4px 50%;
+	background-size: 24px 24px;
 }
 
 .border_error {
@@ -5457,6 +5581,7 @@ Stef                       ^
 
 /* less than 1440 width, drop the menu icons other than profile
    -------------------------------------------------------------------------------------------*/
+
 @media screen and (max-width: 89em) {
 	.icon-menu {
 		display: none;
@@ -5469,6 +5594,7 @@ Stef                       ^
 
 /* This one does 1024 screens at default font size.
    -------------------------------------------------------------------------------------------*/
+
 @media screen and (max-width: 64em) {
 	.category_boards .board_row {
 		grid-template-columns: [bicon] 85px [info] auto [avatar] 65px [latest] 40% [end];
@@ -5487,8 +5613,8 @@ Stef                       ^
 	}
 
 	#menu_nav {
-		padding: .4em 0;
 		margin: 0 .4em;
+		padding: .4em 0;
 	}
 
 	.topic_listing > li {
@@ -5507,6 +5633,7 @@ Stef                       ^
 
 /* This one does 800 screens at default font size.
    -------------------------------------------------------------------------------------------*/
+
 @media screen and (max-width: 50em) {
 	#logobox img {
 		max-width: 95%;
@@ -5551,8 +5678,8 @@ Stef                       ^
 	}
 
 	#collapse_button .linklevel1 {
-		height: 44px;
 		width: 44px;
+		height: 44px;
 		padding: 7px 3px 0 0 !important;
 	}
 
@@ -5710,16 +5837,16 @@ Stef                       ^
 
 	.statusbar .insertoverlay .visualizesize {
 		display: block;
-		margin: 0 auto;
 		float: none;
+		margin: 0 auto;
 	}
 
 	.statusbar .insertoverlay .button {
 		top: -3em;
 		left: 0;
 		float: none;
-		border-radius: 4px;
 		width: initial !important;
+		border-radius: 4px;
 	}
 
 	.statusbar .insertoverlay .text,
@@ -5761,19 +5888,19 @@ Stef                       ^
 		left: -10px;
 		width: 6px;
 		min-height: 500px;
+		cursor: pointer;
 		border: 1px solid;
 		border-radius: 4px;
-		cursor: pointer;
 	}
 
 	#menu_sidebar::before {
-		filter: invert(57%) sepia(47%) saturate(608%) hue-rotate(73deg) brightness(95%) contrast(80%);
-		content: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='black' fill-opacity='1' viewBox='0 0 32 32'%3E%3Cpolygon points='16 0, 16 32, 32 16'/%3E%3C/svg%3E");
-		width: 16px;
-		height: 16px;
 		position: absolute;
 		top: 50%;
 		left: -7px;
+		width: 16px;
+		height: 16px;
+		content: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='black' fill-opacity='1' viewBox='0 0 32 32'%3E%3Cpolygon points='16 0, 16 32, 32 16'/%3E%3C/svg%3E");
+		filter: invert(57%) sepia(47%) saturate(608%) hue-rotate(73deg) brightness(95%) contrast(80%);
 	}
 
 	#menu_sidebar ul, #menu_sidebar .category_header {
@@ -5788,11 +5915,13 @@ Stef                       ^
 	#menu_sidebar:hover ul, #menu_sidebar:hover .category_header {
 		display: block;
 	}
+
 	/* End playing silly buggers. */
 }
 
 /* This one does 540 and smaller screens at default font size.
    -------------------------------------------------------------------------------------------*/
+
 @media screen and (max-width: 34em) {
 	/* Hide top clutter on smaller screens */
 	#news, #logobox, .rightheader #logobox, #top_section_notice {
@@ -5875,8 +6004,8 @@ Stef                       ^
 	}
 
 	.admin_menu {
-		justify-content: flex-start;
 		flex-wrap: wrap;
+		justify-content: flex-start;
 		padding: 0;
 	}
 
@@ -5986,16 +6115,16 @@ Stef                       ^
 	}
 
 	.topic_info {
+		overflow: hidden;
 		grid-column-start: topic_info;
 		grid-column-end: end;
 		padding: .5em 0;
-		overflow: hidden
 	}
 
 	.topic_latest {
-		grid-row-start: topic_latest;
 		grid-column-start: topic_info;
 		grid-column-end: topic_moderation;
+		grid-row-start: topic_latest;
 		padding: 5px 0;
 		border-top: 1px solid;
 	}
@@ -6032,17 +6161,18 @@ Stef                       ^
 		grid-template-rows: [poster] auto [poastarea] auto;
 	}
 
-	.forumposts > aside  {
-		grid-row-start: poster;
+	.forumposts > aside {
 		grid-column-start: poster;
 		grid-column-end: end;
+		grid-row-start: poster;
 		border-bottom: 1px solid;
 	}
 
 	.postarea {
-		grid-row-start: postarea;
 		grid-column-start: poster;
 		grid-column-end: end;
+		grid-row-start: postarea;
+		margin: 0;
 	}
 
 	.small_pagelinks {
@@ -6069,8 +6199,8 @@ Stef                       ^
 	}
 
 	.poster .name {
-		white-space: nowrap;
 		font-size: var(--font15);
+		white-space: nowrap;
 	}
 
 	.poster > .subsections {
@@ -6096,10 +6226,6 @@ Stef                       ^
 
 	.editor_wrapper {
 		margin: 0 1%;
-	}
-
-	.postarea {
-		margin: 0;
 	}
 
 	.postarea, .forumtitle {
@@ -6132,8 +6258,8 @@ Stef                       ^
 
 	#display_jump_to {
 		display: flex;
-		justify-content: flex-end;
 		align-items: center;
+		justify-content: flex-end;
 	}
 
 	/* Stats page */
@@ -6276,7 +6402,9 @@ Stef                       ^
 	}
 }
 
-/* This one does 480px screens at default font size. */
+/* This one does 480px screens at default font size.
+   -------------------------------------------------------------------------------------------*/
+
 @media screen and (max-width: 30em) {
 	#wrapper {
 		padding: 0;
@@ -6290,8 +6418,8 @@ Stef                       ^
 	dt, dd, dd label, .login dt, #advanced_search dt {
 		display: block;
 		width: 100% !important;
-		text-align: left;
 		margin: 0 !important;
+		text-align: left;
 	}
 
 	dd input, dd select, dd textarea {
@@ -6359,27 +6487,27 @@ Stef                       ^
 
 	/* Board Listing */
 	.category_boards .board_row {
-		grid-template-columns:  [bicon] 40px [info] auto [end];
+		grid-template-columns: [bicon] 40px [info] auto [end];
 		grid-template-rows: [primary] auto [latest] auto [children] auto;
 	}
 
 	.category_boards .board_info {
-		grid-row-start: primary;
 		grid-column-start: info;
 		grid-column-end: end;
+		grid-row-start: primary;
 	}
 
 	.category_boards .board_latest {
-		grid-row-start: latest;
 		grid-column-start: bicon;
 		grid-column-end: end;
-		border-top: 1px solid;
+		grid-row-start: latest;
 		margin-top: 1em;
+		border-top: 1px solid;
 	}
 
 	.category_boards .board_icon {
-		grid-row-start: primary;
 		grid-column: bicon;
+		grid-row-start: primary;
 	}
 
 	.board_description {
@@ -6391,11 +6519,11 @@ Stef                       ^
 	}
 
 	.lastpost_link > a, .category_boards .board_lastposter {
-		max-width: 90%;
-		text-overflow: ellipsis;
-		white-space: nowrap;
-		overflow: hidden;
 		display: block;
+		overflow: hidden;
+		max-width: 90%;
+		white-space: nowrap;
+		text-overflow: ellipsis;
 	}
 
 	.category_boards .board_lastposter {
@@ -6420,8 +6548,8 @@ Stef                       ^
 	}
 
 	#ic_recentposts, #ps_recentposts, #ps_recenttopics {
-		width: 100%;
 		font-size: var(--font14);
+		width: 100%;
 	}
 
 	#ic_recentposts td, #ic_recentposts th,
@@ -6497,13 +6625,13 @@ Stef                       ^
 
 	/* Mobile Menu for moderation */
 	.hide_30.hamburger_30_target #moderationbuttons_strip {
-		transform: rotatey(-90deg);
-		transform-origin: top left;
 		visibility: hidden;
-		transition: 200ms all ease-in;
 		flex-wrap: nowrap;
-		/* Rotated y is has zero width, but flex wraps anyway, this stops that */
 		width: 0;
+		transition: 200ms all ease-in;
+		transform: rotatey(-90deg);
+		/* Rotated y is has zero width, but flex wraps anyway, this stops that */
+		transform-origin: top left;
 	}
 
 	#moderationbuttons {
@@ -6512,8 +6640,8 @@ Stef                       ^
 	}
 
 	.icon.hamburger_30 {
-		cursor: pointer;
 		display: initial;
+		cursor: pointer;
 	}
 
 	.icon.hamburger_30::before {
@@ -6527,10 +6655,10 @@ Stef                       ^
 
 	/* show the moderation buttons on hamburger click */
 	.hide_30.hamburger_30_target.visible #moderationbuttons_strip {
-		transform: rotatey(0deg);
 		visibility: visible;
-		width: 100%;
 		flex-wrap: wrap;
+		width: 100%;
+		transform: rotatey(0deg);
 		transform-origin: top center;
 	}
 
@@ -6572,7 +6700,9 @@ Stef                       ^
 
 }
 
-/* This one does 320px screens at default font size. */
+/* This one does 320px screens at default font size.
+   -------------------------------------------------------------------------------------------*/
+
 @media screen and (max-width: 20em) {
 	.icon-menu {
 		width: 1.55em;

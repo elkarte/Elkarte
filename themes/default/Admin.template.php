@@ -296,7 +296,7 @@ function template_edit_censored()
 	// First section is for adding/removing words from the censored list.
 	echo '
 	<div id="admincenter" class="admincenter">
-		<form id="admin_form_wrapper" action="', getUrl('action', ['action'=>'admin','area'=>'postsettings','sa'=>'censor']), '" method="post" accept-charset="UTF-8">
+		<form id="admin_form_wrapper" action="', getUrl('action', ['action'=>'admin', 'area'=>'postsettings', 'sa'=>'censor']), '" method="post" accept-charset="UTF-8">
 			<h2 class="category_header">
 				', $txt['admin_censored_words'], '
 			</h2>

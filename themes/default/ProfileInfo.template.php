@@ -423,7 +423,6 @@ function template_action_statPanel()
 		echo '
 					<span class="centertext">', $txt['statPanel_noPosts'], '</span>';
 	}
-
 	else
 	{
 		echo '

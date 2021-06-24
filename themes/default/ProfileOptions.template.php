@@ -222,7 +222,7 @@ function template_editIgnoreList()
 
 	// Add to the ignore list?
 	echo '
-	<form action="', getUrl('action', ['action' => 'profile', 'u' => $context['id_member'], 'area' => 'lists', 'sa' => 'ignore']). '" method="post" accept-charset="UTF-8">
+	<form action="', getUrl('action', ['action' => 'profile', 'u' => $context['id_member'], 'area' => 'lists', 'sa' => 'ignore']) . '" method="post" accept-charset="UTF-8">
 		<div class="add_buddy">
 			<h2 class="category_header">', $txt['ignore_add'], '</h2>
 			<div class="well">
@@ -1183,14 +1183,14 @@ function template_profile_signature_modify()
 								<label>', $txt['current_signature'], ':</label>
 							</dt>
 							<dd id="current_signature_display"', !isset($context['member']['current_signature']) ? ' class="hide"' : '', '>
-								', isset($context['member']['current_signature']) ? $context['member']['current_signature'] : '', '<hr />
+								', $context['member']['current_signature'] ?? '', '<hr />
 							</dd>
 
 							<dt id="preview_signature"', !isset($context['member']['signature_preview']) ? ' class="hide"' : '', '>
 								<label>', $txt['signature_preview'], ':</label>
 							</dt>
 							<dd id="preview_signature_display"', !isset($context['member']['signature_preview']) ? ' class="hide"' : '', '>
-								', isset($context['member']['signature_preview']) ? $context['member']['signature_preview'] : '', '<hr />
+								', $context['member']['signature_preview'] ?? '', '<hr />
 							</dd>
 							<dt>
 								<label>', $txt['signature'], '</label>

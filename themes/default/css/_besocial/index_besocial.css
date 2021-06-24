@@ -144,7 +144,7 @@
 
 /* Normal, standard links. */
 a, a:link, a:visited,
-/* Links that open in a new window. */
+	/* Links that open in a new window. */
 a.new_win:link, a.new_win:visited {
 	text-decoration: none;
 	color: var(--links);
@@ -208,8 +208,8 @@ input[disabled].input_text {
 
 /* Common button styling. */
 input[type="submit"], .drop_area_fileselect_text, button[type="submit"], input[type="button"],
-/* Anchors styled to look like buttons.
-   These have standard body text size. Can be chained with smalltext class. */
+	/* Anchors styled to look like buttons.
+	   These have standard body text size. Can be chained with smalltext class. */
 .linkbutton:link, .linkbutton:visited {
 	color: var(--menu_text);
 	border-color: var(--seconday_border);
@@ -236,15 +236,15 @@ input[type="submit"]:hover, button[type="submit"]:hover, input[type="button"]:ho
 
 /* the new "button" */
 .new_posts, .new_posts:visited, .new_posts:link {
-	border-radius: 4px;
 	color: var(--primary_white);
+	border-radius: 4px;
 	background: var(--medium_dark_green);
 }
 
 /* approval indicator */
 .require_approval {
-	border-radius: 4px;
 	color: var(--primary_white);
+	border-radius: 4px;
 	background: var(--indicator);
 }
 
@@ -263,10 +263,10 @@ hr {
 
 /* Styles for main headers. */
 .category_header, .forum_category .category_header {
-	font-weight: bolder;
 	font-size: var(--font20);
-	padding: 5px 10px 0 10px;
+	font-weight: bolder;
 	margin-bottom: 5px;
+	padding: 5px 10px 0 10px;
 	border: 1px solid var(--transparent);
 	border-radius: 5px;
 	background: var(--body_grad_1);
@@ -402,10 +402,10 @@ hr {
 
 /* A quote, perhaps from another post. */
 .bbc_quote,
-/* A code block - maybe PHP ;) - shared styles. */
+	/* A code block - maybe PHP ;) - shared styles. */
 .bbc_code {
-	border-top: none;
 	border-color: var(--primary_border);
+	border-top: none;
 	background: var(--primary_white);
 }
 
@@ -496,8 +496,8 @@ sup.bbc_footnotes, sup.bbc_footnotes a {
 	border-bottom-color: var(--top_section_border);
 	background: var(--content-background);
 	background-repeat: no-repeat;
-	background-size: 20px 20px;
 	background-position: 6px 50%;
+	background-size: 20px 20px;
 }
 
 #ajax_in_progress a {
@@ -586,8 +586,8 @@ sup.bbc_footnotes, sup.bbc_footnotes a {
 
 #footer_section {
 	text-align: center;
-	border-top: 2px solid var(--footer_top_border);
 	color: var(--footer_text);
+	border-top: 2px solid var(--footer_top_border);
 	background-color: var(--primary_background);
 }
 
@@ -624,7 +624,7 @@ sup.bbc_footnotes, sup.bbc_footnotes a {
 	font-size: var(--font13);
 	color: var(--strong_text);
 	border-color: var(--seconday_border);
-	border-top-color: var(--seconday_border_top);;
+	border-top-color: var(--seconday_border_top);
 	border-left-color: var(--seconday_border_left);
 	border-radius: 2px;
 	background-image: linear-gradient(to bottom, var(--primary_white), var(--primary_white_compliment));
@@ -650,8 +650,8 @@ sup.bbc_footnotes, sup.bbc_footnotes a {
 
 /* Hide the top of menu triangle pointer */
 .listlevel1.subsections::after {
-	background: var(--transparent);
 	border-color: var(--transparent);
+	background: var(--transparent);
 }
 
 /* Turn off several effects for a clean menu */
@@ -703,7 +703,7 @@ sup.bbc_footnotes, sup.bbc_footnotes a {
 
 /* For primary admin/profile/etc drop menus. */
 .admin_menu .linklevel1:hover, .admin_menu .linklevel1:focus,
-/* For secondary admin/profile/etc menus. */
+	/* For secondary admin/profile/etc menus. */
 #adm_submenus .linklevel1:hover, #adm_submenus .linklevel1:focus {
 	text-decoration: none;
 	color: var(--hover_text);
@@ -711,7 +711,7 @@ sup.bbc_footnotes, sup.bbc_footnotes a {
 
 /* Level 1 active buttons for primary admin/profile/etc drop menus... */
 .admin_menu .active,
-/* ......and for secondary admin/profile/etc menu strip. */
+	/* ......and for secondary admin/profile/etc menu strip. */
 #adm_submenus .active {
 	color: var(--primary_white);
 	border-color: var(--seconday_border);
@@ -731,24 +731,19 @@ a.active {
 }
 
 /* Top level subsection indicators. */
-.pm_indicator  {
+.pm_indicator {
+	font-size: var(--font12);
 	font-weight: bold;
 	position: relative;
 	top: -7px;
 	left: -1px;
 	float: none;
 	padding: 0 .25em;
-	font-size: var(--font12);
 	color: var(--primary_white);
 	border-color: var(--transparent);
 	border-radius: 4px;
 	background: var(--indicator);
 	box-shadow: 1px 1px 2px var(--primary_background);
-}
-
-/* Top triangle pointer of all level1 dropdown menus, like a speech bubble pointer */
-.listlevel1.subsections::after {
-	border: 1px solid var(--transparent);
 }
 
 .likes_indicator {
@@ -802,9 +797,9 @@ a.active {
 /* Level 2: subsection indicators. */
 .listlevel2.subsections .linklevel2::after {
 	font-size: var(--font14);
+	top: 5px;
 	content: "\25BA";
 	color: var(--footer_text);
-	top: 5px;
 }
 
 /* Levels 2 and 3: highlighting of current section */
@@ -842,14 +837,14 @@ a.active {
  */
 
 nav.breadcrumb {
-	border: 1px solid var(--primary_border);
 	margin: 1em 0;
+	border: 1px solid var(--primary_border);
 	--arrow: 26px;
 }
 
 .breadcrumb .crumb {
-	border-color: var(--transparent);
 	padding: 0 0.7em 0 1.5em;
+	border-color: var(--transparent);
 }
 
 .breadcrumb .crumb:not(:last-child)::after {
@@ -899,7 +894,7 @@ nav.breadcrumb {
 }
 
 /* our buddies &laquo; &raquo; */
-.small_pagelinks li:first-child::before , .small_pagelinks li:last-child::after {
+.small_pagelinks li:first-child::before, .small_pagelinks li:last-child::after {
 	color: var(--strong_text)
 }
 
@@ -1060,7 +1055,7 @@ nav.breadcrumb {
 }
 
 .topic_listing li:first-child {
-	border-top: 2px solid var(--primary_border_top);;
+	border-top: 2px solid var(--primary_border_top);
 }
 
 .topic_listing li {
@@ -1197,11 +1192,11 @@ nav.breadcrumb {
 
 .poster li.listlevel1, .poster li.listlevel1:hover,
 .poster li.listlevel1 a, .poster li.listlevel1 a:hover {
+	text-decoration: none;
 	border-color: var(--transparent);
 	background-color: var(--transparent);
 	background-image: none;
 	box-shadow: none;
-	text-decoration: none;
 }
 
 .poster .name {
@@ -1222,11 +1217,11 @@ nav.breadcrumb {
 
 .poster li.poster_online:hover .linklevel1 {
 	color: var(--menu_text);
-	background: var(--mid_grey_background);
-	box-shadow: 2px 1px 1px var(--opacity10) inset;
 	border-color: var(--primary_border);
 	border-top-color: var(--seconday_border);
 	border-left-color: var(--seconday_border);
+	background: var(--mid_grey_background);
+	box-shadow: 2px 1px 1px var(--opacity10) inset;
 }
 
 .poster li.poster_online .nolink {
@@ -1245,8 +1240,8 @@ nav.breadcrumb {
 
 .poster .listlevel1:hover .linklevel1, .poster .listlevel2:hover .linklevel2 {
 	border-color: var(--transparent);
-	box-shadow: none;
 	background: var(--transparent);
+	box-shadow: none;
 }
 
 .poster .listlevel2:hover .linklevel2 {
@@ -1463,7 +1458,7 @@ nav.breadcrumb {
 	border-color: var(--seconday_border_bottom);
 	border-right-style: none;
 	border-left-style: none;
-	background: var(--mid_grey_background);;
+	background: var(--mid_grey_background);
 }
 
 .activity_stats li .bar {
@@ -1698,8 +1693,8 @@ nav.breadcrumb {
 
 /* More boxes, although SVG they have embedded color so they are here */
 .warningbox, .successbox, .infobox, .errorbox {
-	border-color: var(--primary_border);
 	padding: .75em 2.75em;
+	border-color: var(--primary_border);
 	border-left-width: 5px;
 }
 
@@ -1801,7 +1796,9 @@ nav.breadcrumb {
  * Of course, having comments to map em to px for each query is a good idea too.
  */
 
-/* This one does 1024 screens at default font size. */
+/* This one does 1024 screens at default font size.
+   -------------------------------------------------------------------------------------------*/
+
 @media screen and (max-width: 64em) {
 	.category_boards .board_row {
 		grid-template-columns: [bicon] 85px [info] auto [avatar] 65px [latest] 40% [end];
@@ -1814,10 +1811,11 @@ nav.breadcrumb {
 
 /* 880px seems best to switch between text and icons for this variant, normally this is
    done at 800px, so we have to copy the index.css code to this media query */
+
 @media screen and (max-width: 55em) {
 	#main_menu .icon-menu {
-		transform: translateY(0px);
 		margin: 0.05em .25em;
+		transform: translateY(0px);
 	}
 
 	/* menu to icons */
@@ -1862,7 +1860,9 @@ nav.breadcrumb {
 	}
 }
 
-/* This one does 800 screens at default font size. */
+/* This one does 800 screens at default font size.
+   -------------------------------------------------------------------------------------------*/
+
 @media screen and (max-width: 50em) {
 	#forumtitle {
 		font-size: var(--font24);
@@ -1903,7 +1903,9 @@ nav.breadcrumb {
 	}
 }
 
-/* This one does up to 540 screens. */
+/* This one does up to 540 screens.
+   -------------------------------------------------------------------------------------------*/
+
 @media screen and (max-width: 33.750em) {
 	#main_menu {
 		justify-content: start;
@@ -1975,9 +1977,9 @@ nav.breadcrumb {
 	}
 
 	.board_icon {
-		transform: translateY(-2px);
 		width: 25px;
 		height: 25px;
+		transform: translateY(-2px);
 	}
 
 	.forum_category, .forumposts, .content_category {
@@ -2009,10 +2011,10 @@ nav.breadcrumb {
 	}
 
 	#search_form {
+		justify-content: center;
 		width: 100%;
 		padding: .25em 0;
 		border-bottom: 1px solid var(--primary_border);
-		justify-content: center;
 	}
 
 	#search_form .input_text {
@@ -2038,7 +2040,9 @@ nav.breadcrumb {
 	}
 }
 
-/* This one does 480px screens at default font size. */
+/* This one does 480px screens at default font size.
+   -------------------------------------------------------------------------------------------*/
+
 @media screen and (max-width: 30em) {
 	.mlist li .group {
 		border-right-color: var(--primary_border);

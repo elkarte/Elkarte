@@ -1892,7 +1892,7 @@ class PersonalMessage extends AbstractController
 		global $txt, $context, $language, $modSettings;
 
 		// Check that this feature is even enabled!
-		if (empty($modSettings['enableReportPM']) || empty($this->_req->getPost('pmsg', 'intval',  $this->_req->getQuery('pmsg', 'intval', 0))))
+		if (empty($modSettings['enableReportPM']) || empty($this->_req->getPost('pmsg', 'intval', $this->_req->getQuery('pmsg', 'intval', 0))))
 		{
 			throw new Exception('no_access', false);
 		}
@@ -2159,7 +2159,7 @@ class PersonalMessage extends AbstractController
 		elseif (isset($this->_req->query->save))
 		{
 			checkSession('post');
-			$rid = 	$this->_req->getQuery('rid', 'intval', 0);
+			$rid = $this->_req->getQuery('rid', 'intval', 0);
 			$context['rid'] = isset($context['rules'][$rid]) ? $rid : 0;
 
 			// Name is easy!

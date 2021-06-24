@@ -74,7 +74,7 @@ input[type=submit][disabled]:hover, button[disabled], button[disabled]:hover {
 
 /* Common button styling. */
 input[type="submit"], .drop_area_fileselect_text, button[type="submit"], input[type="button"],
-/* Anchors styled to look like buttons. */
+	/* Anchors styled to look like buttons. */
 .linkbutton:link, .linkbutton:visited {
 	border-right: 1px solid var(--seconday_border_right);
 	border-left: 1px solid var(--seconday_border_left);
@@ -172,8 +172,8 @@ input[type="submit"]:hover, button[type="submit"]:hover, input[type="button"]:ho
 /* Hover effects for those buttons. */
 .linklevel1.active:hover, .listlevel1:hover .linklevel1.active,
 #collapse_button .linklevel1:hover, .linklevel1:hover .pm_indicator {
-	border-left-color: var(--menu_border);
 	border-right-color: var(--border_menu_tl);
+	border-left-color: var(--menu_border);
 	box-shadow: -1px 1px 1px var(--opacity30) inset;
 }
 
@@ -383,14 +383,17 @@ input[type="submit"]:hover, button[type="submit"]:hover, input[type="button"]:ho
  * -------------------------------------------------------
  */
 
-/* This one does 800 screens at default font size. */
+/* This one does 800 screens at default font size.
+   -------------------------------------------------------------------------------------------*/
+
 @media screen and (max-width: 50em) {
 	#menu_sidebar {
 		box-shadow: -3px 3px 3px var(--opacity30);
 	}
 }
 
-/* This one does up to 540 screens. */
+/* This one does up to 540 screens.
+   -------------------------------------------------------------------------------------------*/
 
 @media screen and (max-width: 33.750em) {
 	.board_latest {

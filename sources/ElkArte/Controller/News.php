@@ -276,7 +276,7 @@ class News extends AbstractController
 		}
 		elseif ($xml_format === 'rdf')
 		{
-			$headers->contentType('application/rdf+xml','UTF-8');
+			$headers->contentType('application/rdf+xml', 'UTF-8');
 		}
 
 		theme()->getTemplates()->load('Xml');

@@ -321,7 +321,7 @@ class ConstructPageIndex extends AbstractModel
 		}
 
 		// Show the "next page" link. (prev page 1 ... 6 7 [8] 9 10 ... 15 >next page<)
-		$pageindex .=  $this->compactNextNavigation();
+		$pageindex .= $this->compactNextNavigation();
 
 		return $pageindex;
 	}

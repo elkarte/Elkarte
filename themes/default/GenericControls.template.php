@@ -50,7 +50,7 @@ function template_control_richedit($editor_id, $smileyContainer = null, $bbcCont
 					resizeWidth: false,
 					resizeMaxHeight: -1,
 					emoticonsCompat: true,
-					emoticonsEnabled: ', $useSmileys ? 'true' : 'false',  ',
+					emoticonsEnabled: ', $useSmileys ? 'true' : 'false', ',
 					locale: "', !empty($editor_context['locale']) ? $editor_context['locale'] : 'en_US', '",
 					rtl: ', empty($context['right_to_left']) ? 'false' : 'true', ',
 					colors: "black,red,yellow,pink,green,orange,purple,blue,beige,brown,teal,navy,maroon,limegreen,white",

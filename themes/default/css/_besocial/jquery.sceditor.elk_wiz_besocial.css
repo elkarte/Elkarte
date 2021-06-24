@@ -16,8 +16,8 @@
 
 html, body {
 	font-size: 15px;
-	line-height: 1.5;
 	font-weight: 400;
+	line-height: 1.5;
 	overflow: auto;
 }
 
@@ -59,8 +59,8 @@ ul, ol {
 
 table, td {
 	min-width: 2em;
-	border: 1px dotted var(--seconday_border);
 	empty-cells: show;
+	border: 1px dotted var(--seconday_border);
 }
 
 code, code::before {
@@ -69,24 +69,24 @@ code, code::before {
 }
 
 code::before {
+	font-size: 1em;
 	position: absolute;
 	top: -1.7em;
 	left: 0;
 	content: 'Code:';
-	font-size: 1em;
 }
 
 code {
+	font-family: "DejaVu Sans Mono", Monaco, Consolas, monospace;
+	font-size: 0.8667rem;
 	position: relative;
 	margin-top: 1.5em;
 	padding: .25em;
+	white-space: pre;
 	border: 1px solid var(--seconday_border);
 	border-top: 2px solid var(--seconday_border_top);
 	border-bottom: 3px solid var(--seconday_border_bottom);
 	background: var(--content-background);
-	white-space: pre;
-	font-size: 0.8667rem;
-	font-family: "DejaVu Sans Mono", Monaco, Consolas, monospace;
 }
 
 blockquote {
@@ -99,20 +99,20 @@ blockquote {
 }
 
 blockquote cite, code cite {
+	font-size: 0.8667rem;
 	display: block;
 	padding: 0 0 4px;
+	color: var(--body_text);
 	border-bottom: none;
 	background: var(--primary_white);
-	color: var(--body_text);
-	font-size: 0.8667rem;
 }
 
 code cite {
+	line-height: 1.3em;
 	position: relative;
 	top: -1.7em;
 	margin-left: 3em;
 	padding: 0;
-	line-height: 1.3em;
 }
 
 /* Will correctly colour down to seventh level of nested quotes in editor. Can be extended easily enough. */
@@ -127,8 +127,8 @@ body > blockquote > blockquote > blockquote > blockquote > blockquote > blockquo
 }
 
 blockquote cite a:link, blockquote cite a:visited {
-	color: var(--body_text);
 	text-decoration: none;
+	color: var(--body_text);
 }
 
 div {
@@ -141,15 +141,15 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 aside::before {
+	font-size: 0.8667rem;
 	content: "[*]";
 	vertical-align: super;
-	font-size: 0.8667rem;
 }
 
 aside {
+	font-weight: 700;
 	display: inline;
 	color: var(--me);
-	font-weight: 700;
 }
 
 .bbc_img {
@@ -166,17 +166,17 @@ aside {
 }
 
 .floatcenter {
-	margin: 0 auto;
 	display: block;
+	margin: 0 auto;
 }
 
 .icon {
+	line-height: 1.25em;
 	display: inline-block;
-	margin: 0 .25em;
 	width: 1.25em;
 	height: auto;
+	margin: 0 .25em;
 	vertical-align: middle;
-	line-height: 1.25em;
 }
 
 .i-paperclip::before {
@@ -184,9 +184,9 @@ aside {
 }
 
 me::before {
-	content: "\270c";
 	font-size: 1.4667rem;
 	line-height: 1em;
+	content: "\270c";
 }
 
 me {

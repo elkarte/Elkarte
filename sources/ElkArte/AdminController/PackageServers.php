@@ -681,7 +681,7 @@ class PackageServers extends AbstractController
 			$context['package']['install']['link'] = '';
 		}
 
-		$context['package']['list_files']['link'] = '<a class="linkbutton" href="' .getUrl('admin', ['action' => 'admin', 'area' => 'packages', 'sa' => 'list', 'package' => $context['package']['filename']]) . '">' . $txt['list_files'] . '</a>';
+		$context['package']['list_files']['link'] = '<a class="linkbutton" href="' . getUrl('admin', ['action' => 'admin', 'area' => 'packages', 'sa' => 'list', 'package' => $context['package']['filename']]) . '">' . $txt['list_files'] . '</a>';
 
 		// Free a little bit of memory...
 		unset($context['package']['xml']);
@@ -793,7 +793,7 @@ class PackageServers extends AbstractController
 		}
 		elseif ($context['package']['type'] === 'avatar')
 		{
-			$context['package']['install']['link'] = '<a class="linkbutton" href="' .getUrl('admin', ['action' => 'admin', 'area' => 'packages', 'sa' => 'install', 'package' => $context['package']['filename']]) . '">' . $txt['use_avatars'] . '</a>';
+			$context['package']['install']['link'] = '<a class="linkbutton" href="' . getUrl('admin', ['action' => 'admin', 'area' => 'packages', 'sa' => 'install', 'package' => $context['package']['filename']]) . '">' . $txt['use_avatars'] . '</a>';
 		}
 		elseif ($context['package']['type'] === 'language')
 		{

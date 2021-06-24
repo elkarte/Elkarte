@@ -107,8 +107,8 @@ h2 a.collapse {
 
 .warningbox, .successbox, .infobox, .errorbox {
 	padding-right: 2.75em;
-	background-position: 99% 50%;
 	background-repeat: no-repeat;
+	background-position: 99% 50%;
 }
 
 /* -------------------------------------------------------
@@ -283,8 +283,8 @@ h2 a.collapse {
 
 /* Reverse the menu flyout direction for the left side buttons so they stay on page */
 .listlevel1#button_profile .menulevel2 {
-	left: 0;
 	right: auto;
+	left: 0;
 }
 
 /* Level 3: drop menu positioning, move to a a flyout position to the left of
@@ -299,9 +299,9 @@ h2 a.collapse {
  */
 
 .breadcrumb .crumb:last-child {
-	border-radius: calc(var(--arrow) / 6) 0 0 calc(var(--arrow) / 6);
-	padding-left: 1.8em;
 	padding-right: 2.5em;
+	padding-left: 1.8em;
+	border-radius: calc(var(--arrow) / 6) 0 0 calc(var(--arrow) / 6);
 }
 
 .breadcrumb .crumb:first-child {
@@ -315,8 +315,8 @@ h2 a.collapse {
 }
 
 .breadcrumb .crumb::after {
-	left: calc(var(--arrow) / 2 * -1);
 	right: auto;
+	left: calc(var(--arrow) / 2 * -1);
 	transform: scale(0.7071) rotate(-135deg);
 }
 
@@ -359,8 +359,8 @@ h2 a.collapse {
 
 /* Odd cases. */
 .quickbuttons .modified {
-	margin-left: auto;
 	margin-right: unset;
+	margin-left: auto;
 }
 
 .quickbuttons .linklevel1 {
@@ -412,16 +412,16 @@ h2 a.collapse {
 /* our buddies &laquo; &raquo; */
 .small_pagelinks li:first-child::before {
 	font-size: var(--font14);
-	content: '\2B9E';
 	position: absolute;
 	right: -12px;
+	content: '\2B9E';
 }
 
 .small_pagelinks li:last-child::after {
 	font-size: var(--font14);
-	content: '\2B9C';
 	position: absolute;
 	left: -14px;
+	content: '\2B9C';
 }
 
 .small_pagelinks {
@@ -522,8 +522,8 @@ dl.settings img {
 }
 
 #sort_by {
-	margin-left: unset;
 	margin-right: auto;
+	margin-left: unset;
 }
 
 /* The board description and who-is-viewing stuff. */
@@ -532,8 +532,8 @@ dl.settings img {
 }
 
 .topic_info {
-	padding: .4em .8em .4em .4em;
 	margin: 0 .8em 0 0;
+	padding: .4em .8em .4em .4em;
 }
 
 .topic_latest .board_avatar {
@@ -550,9 +550,9 @@ dl.settings img {
 }
 
 .topic_icons {
-	place-self: center right;
 	padding-right: 1em;
 	padding-left: 0;
+	place-self: center right;
 }
 
 .fred:before {
@@ -570,13 +570,13 @@ dl.settings img {
 
 .topic_name h4 .new_posts {
 	float: right;
+	margin: 0 0 0 1em;
 	padding: 0 .25em;
-	margin:  0 0 0 1em;
 }
 
 .qaction_row {
-	text-align: left;
 	float: left !important;
+	text-align: left;
 }
 
 .sticky_row .topic_info::before, .locked_row .topic_info::before,
@@ -591,8 +591,8 @@ dl.settings img {
  */
 
 #topic_summary .keyinfo nav {
-	margin-left: 0;
 	margin-right: auto;
+	margin-left: 0;
 }
 
 /* Events */
@@ -768,8 +768,8 @@ ul.post_options li {
 }
 
 .shortcuts {
-	margin-left: auto;
 	margin-right: unset;
+	margin-left: auto;
 }
 
 /* -------------------------------------------------------
@@ -1229,7 +1229,9 @@ div.labels {
  * -------------------------------------------------------
  */
 
-/* This one does 800 screens at default font size. */
+/* This one does 800 screens at default font size.
+   -------------------------------------------------------------------------------------------*/
+
 @media screen and (max-width: 50em) {
 	#main_menu .linklevel1 {
 		margin-right: 0;
@@ -1282,7 +1284,9 @@ div.labels {
 	}
 }
 
-/* This one does 540 and smaller screens at default font size. */
+/* This one does 540 and smaller screens at default font size.
+   -------------------------------------------------------------------------------------------*/
+
 @media screen and (max-width: 33.750em) {
 	dt, dd, dd label, .login dt, #advanced_search dt {
 		text-align: right;
@@ -1411,6 +1415,7 @@ div.labels {
  *	$ADMIN
  * -------------------------------------------------------
  */
+
 #manage_boards ul:nth-child(n+2) {
 	padding-right: 30px;
 	padding-left: 0 !important;

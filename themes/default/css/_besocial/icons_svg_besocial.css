@@ -13,7 +13,7 @@
 /* Communication icons */
 .i-envelope-o::before, .i-envelope-blank::before {
 	filter: invert(63%) sepia(41%) saturate(641%) hue-rotate(157deg) brightness(86%) contrast(99%);
-	--hexcode: #43a8da;
+	--hexcode: #43A8DA;
 }
 
 .i-envelope::before {
@@ -24,26 +24,26 @@
 /* Help, info, warning (circular icons) */
 .i-help::before, .i-question::before {
 	filter: invert(31%) sepia(72%) saturate(1247%) hue-rotate(185deg) brightness(90%) contrast(93%);
-	--hexcode: #1966b3;
+	--hexcode: #1966B3;
 }
 
 /* green */
 .i-warning-watch::before {
 	filter: invert(52%) sepia(30%) saturate(3914%) hue-rotate(84deg) brightness(97%) contrast(88%);
-	--hexcode: #1ab31a;
+	--hexcode: #1AB31A;
 }
 
 /* Was bar-chart */
 .i-poll::before, .i-user::before {
 	filter: invert(31%) sepia(72%) saturate(1247%) hue-rotate(185deg) brightness(90%) contrast(93%);
-	--hexcode: #1966b3;
+	--hexcode: #1966B3;
 }
 
 .i-comment::before, .i-profile::before,
 .i-comment-blank::before, .i-comments-blank::before, .i-comments::before,
 .i-bell-blank::before, .i-account::before, .i-register::before,
-.i-cog::before, .i-sign-in::before, .i-sign-out::before, .i-phone::before  {
-	--hexcode: #43a8da;
+.i-cog::before, .i-sign-in::before, .i-sign-out::before, .i-phone::before {
+	--hexcode: #43A8DA;
 	filter: invert(63%) sepia(41%) saturate(641%) hue-rotate(157deg) brightness(86%) contrast(99%);
 }
 
@@ -60,7 +60,7 @@
 
 .i-home.icon-menu::before {
 	filter: invert(54%) sepia(47%) saturate(541%) hue-rotate(155deg) brightness(98%) contrast(101%);
-	--hexcode: #43a8da;
+	--hexcode: #43A8DA;
 }
 
 /* beSocial Board icons are from Font Awesome */

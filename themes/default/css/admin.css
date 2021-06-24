@@ -54,9 +54,9 @@
 #core_features, #entry_form,
 #groupForm, #mailqueue_stats, #manage_maintenance,
 #new_group, #view_group, #admin_form_wrapper, .action_admin .generic_list_wrapper {
+	overflow: auto;
 	margin: .8em 0 0 0;
 	padding: .5em;
-	overflow: auto;
 	border: 1px solid;
 	border-radius: 6px;
 }
@@ -92,8 +92,8 @@
 
 #news_lists .newsarea textarea {
 	width: 100%;
-	padding: 0 2px;
 	min-height: 8em;
+	padding: 0 2px;
 }
 
 td.newspreview {
@@ -144,12 +144,12 @@ h3.category_header form {
 }
 
 .admincenter .well, #modcenter .well {
-	background: none;
-	border: none;
-	box-shadow: none;
+	overflow: visible;
 	margin: 0;
 	padding: 0;
-	overflow: visible;
+	border: none;
+	background: none;
+	box-shadow: none;
 }
 
 .search_results {
@@ -157,14 +157,14 @@ h3.category_header form {
 }
 
 .search_results li {
-	padding: .4em 0;
 	overflow: auto;
+	padding: .4em 0;
 	border-bottom: double;
 }
 
 .search_results li p {
-	padding: 0 1.5em;
 	line-height: 1.7;
+	padding: 0 1.5em;
 }
 
 #installedVersion, #latestVersion {
@@ -193,9 +193,9 @@ h3.category_header form {
 }
 
 #admin_main_section .content {
-	padding: 6px 0;
-	height: 12em;
 	overflow: auto;
+	height: 12em;
+	padding: 6px 0;
 	border: 1px solid;
 	border-radius: 0;
 }
@@ -209,8 +209,8 @@ h3.category_header form {
 }
 
 #ourAnnouncements dt {
+	font-size: var(--font14);
 	border-top: 1px solid;
-	font-size: var(--font14)
 }
 
 #ourAnnouncements dt a {
@@ -239,12 +239,12 @@ h3.category_header form {
    Scrollbars here look worse, take up space, and don't really add anything useful in this context. */
 
 #quick_tasks li {
-	list-style: none;
-	padding: 10px 6px 10px 6px;
 	float: left;
+	overflow: auto;
 	width: 50%;
 	height: 8em;
-	overflow: auto;
+	padding: 10px 6px 10px 6px;
+	list-style: none;
 	border-top: 1px solid;
 	border-bottom: 1px solid;
 }
@@ -283,8 +283,8 @@ h3.category_header form {
 
 #credits_logo {
 	position: absolute;
-	right: 16px;
 	top: 12px;
+	right: 16px;
 	width: 75px;
 }
 
@@ -311,15 +311,15 @@ h3.category_header form {
 }
 
 #core_features hr {
-	padding: 0;
 	margin: .25em 0 .8em 0;
+	padding: 0;
 }
 
 #core_features .features {
-	padding: 0 .8em;
-	overflow: auto;
 	float: left;
+	overflow: auto;
 	width: 50%;
+	padding: 0 .8em;
 }
 
 .core_features_status_box {
@@ -338,20 +338,20 @@ h3.category_header form {
 }
 
 .features h3 {
-	padding: 0;
-	margin: 0 .5em 0 6em;
 	overflow: hidden;
-	white-space: pre;
-	text-overflow: ellipsis;
 	min-height: 1.6em;
 	max-height: 1.6em;
+	margin: 0 .5em 0 6em;
+	padding: 0;
+	white-space: pre;
+	text-overflow: ellipsis;
 }
 
 .features p {
+	overflow: auto;
+	height: 9em;
 	margin: 0 4em 0 6em;
 	padding: 0;
-	height: 9em;
-	overflow: auto;
 }
 
 #private {
@@ -360,8 +360,8 @@ h3.category_header form {
 
 /* Styles for the package manager. */
 #package_list ol {
-	list-style: decimal;
 	margin-left: 1.25em;
+	list-style: decimal;
 	border: none;
 }
 
@@ -374,8 +374,8 @@ h3.category_header form {
 }
 
 #package_list li {
-	padding: 0.2em;
 	font-weight: 600;
+	padding: 0.2em;
 	border: 1px solid;
 }
 
@@ -385,31 +385,31 @@ h3.category_header form {
 }
 
 .package_id {
+	font-weight: bold;
+	display: inline-block;
 	width: 35%;
 	min-width: 20em;
-	display: inline-block;
-	font-weight: bold;
 }
 
 .description, .information {
-	max-height: 16em;
 	overflow: auto;
-	padding-bottom: .5em;
+	max-height: 16em;
 	margin-bottom: .4em;
+	padding-bottom: .5em;
 }
 
 #find_code, #replace_code {
-	display: block;
 	font-family: "dejavu sans mono", "monaco", "lucida console", "courier new", monospace;
 	font-size: var(--font14);
+	display: block;
+	overflow: auto;
+	height: 10em;
 	margin: .1em 0 .4em 0;
 	padding: .25em .8em;
-	overflow: auto;
-	white-space: nowrap;
 	/* Show a scrollbar after about 6 lines. */
 	/* This is much better than the old max-height css. */
-	height: 10em;
 	resize: vertical;
+	white-space: nowrap;
 	border-top: 2px solid;
 	border-bottom: 2px solid;
 }
@@ -441,8 +441,8 @@ ul.package_servers li {
 }
 
 .strings_edit textarea {
-	width: 100%;
 	display: block;
+	width: 100%;
 }
 
 /* Styles for the file permissions section. */
@@ -486,9 +486,9 @@ ul.package_servers li {
 }
 
 #manage_boards .content > ul {
+	padding: .5em;
 	border: 1px solid;
 	border-radius: 4px;
-	padding: .5em;
 }
 
 #manage_boards ul li:nth-child(n+2) {
@@ -511,8 +511,8 @@ ul.package_servers li {
 }
 
 #manage_boards li, #manage_boards li.content {
-	list-style: none;
 	line-height: 2;
+	list-style: none;
 }
 
 #manage_boards li img {
@@ -520,12 +520,12 @@ ul.package_servers li {
 }
 
 #manage_boards li .floatleft {
-	font-weight: bold;
-	padding: 0 .4em;
-	margin: .5em 0 0 0;
 	font-size: var(--font15);
-	cursor: move;
+	font-weight: bold;
 	width: 60%;
+	margin: .5em 0 0 0;
+	padding: 0 .4em;
+	cursor: move;
 }
 
 #manage_boards li .floatright {
@@ -563,8 +563,8 @@ ul.package_servers li {
 .visible_boards .board label,
 .select_all_box label,
 .select_category label {
-	width: 32%;
 	display: inline-block;
+	width: 32%;
 }
 
 .select_category, .select_all_box {
@@ -612,8 +612,8 @@ ul.package_servers li {
 /* Styles for the bad behaviour section. */
 .bbfilter {
 	display: table-cell;
-	padding: 4px 0;
 	width: 20px;
+	padding: 4px 0;
 	vertical-align: top;
 }
 
@@ -653,8 +653,8 @@ ul.package_servers li {
 }
 
 #permissionForm .table_grid img.icon {
-	vertical-align: top;
 	width: 16px;
+	vertical-align: top;
 }
 
 .admin_permissions dt {
@@ -669,8 +669,8 @@ ul.package_servers li {
 .file_permissions .table_grid {
 	table-layout: fixed;
 	word-wrap: break-word;
-	hyphens: auto;
 	-webkit-hyphens: auto;
+	hyphens: auto;
 }
 
 /* Styles for the manage search section. */
@@ -690,9 +690,9 @@ ul.package_servers li {
 
 .search_settings {
 	float: left;
+	overflow: auto;
 	width: 49%;
 	margin: 0 0.5em 1em 0.5em;
-	overflow: auto;
 }
 
 /* Styles for the manage bans section. */
@@ -706,10 +706,10 @@ ul.package_servers li {
 }
 
 .ban_text {
-	min-height: 64px;
-	max-height: 64px;
 	min-width: 50%;
 	max-width: 99%;
+	min-height: 64px;
+	max-height: 64px;
 }
 
 #manage_bans dl {
@@ -726,9 +726,9 @@ ul.package_servers li {
 }
 
 .pending_payments {
+	line-height: 2em;
 	margin: 0;
 	padding: 0;
-	line-height: 2em;
 }
 
 /* Styles for the manage permissions section. */
@@ -738,29 +738,29 @@ ul.package_servers li {
 }
 
 .perm_boards {
-	padding: 0;
 	margin: 0 0 0.6em 0;
+	padding: 0;
 }
 
 .perm_boards li {
-	padding: 0.3em 0.5em;
 	margin: 1px;
+	padding: 0.3em 0.5em;
 	border: 1px solid;
 }
 
 .perm_classic {
-	margin: 0.2em;
 	width: 49%;
+	margin: 0.2em;
 }
 
 .permission_groups {
-	padding: 0;
 	margin: 0;
+	padding: 0;
 }
 
 #manage_boards .permission_groups li {
-	list-style-type: none;
 	padding-top: 1px;
+	list-style-type: none;
 }
 
 #manage_boards ul.permission_groups {
@@ -768,15 +768,15 @@ ul.package_servers li {
 }
 
 .perms {
-	width: 20px;
 	display: inline-block;
+	width: 20px;
 	text-align: center;
 }
 
 .edit_board {
+	margin-left: 3px;
 	padding: 0 8px 8px;
 	background: url(../images/icons/modify_small.png) no-repeat;
-	margin-left: 3px;
 }
 
 .edit_board.nochanges {
@@ -793,13 +793,13 @@ ul.package_servers li {
 
 /* Styles for the themes section. */
 ul.theme_options, ul.basic_options {
-	padding: 0;
 	margin: 0;
+	padding: 0;
 }
 
 ul.theme_options li, ul.basic_options li {
-	list-style: none;
 	padding: 0.4em;
+	list-style: none;
 }
 
 .is_directory {
@@ -808,8 +808,8 @@ ul.theme_options li, ul.basic_options li {
 }
 
 .edit_file {
-	width: 100%;
 	font-family: monospace;
+	width: 100%;
 	margin-top: 1ex;
 	white-space: pre;
 }
@@ -819,14 +819,14 @@ dl.themes_list {
 }
 
 dl.themes_list dt {
-	margin-bottom: 3px;
 	margin-top: 5px;
+	margin-bottom: 3px;
 }
 
 dl.themes_list dd {
 	font-style: italic;
-	white-space: nowrap;
 	margin-top: 5px;
+	white-space: nowrap;
 }
 
 .theme_options dt {
@@ -842,25 +842,25 @@ dl.themes_list dd {
 #admin_form_wrapper .theme_options dt {
 	float: left;
 	clear: both;
+	width: 55%;
 	margin: 0 0 10px 0;
 	padding: 0;
-	width: 55%;
 }
 
 #admin_form_wrapper .theme_options dd {
 	float: right;
 	overflow: auto;
-	margin: 0 0 3px 0;
-	padding: 0;
 	width: 45%;
 	min-height: 2em;
+	margin: 0 0 3px 0;
+	padding: 0;
 }
 
 #admin_form_wrapper .input_check, .input_radio {
+	margin: 0 2px 4px 4px;
+	vertical-align: top;
 	border: none;
 	background: none;
-	vertical-align: top;
-	margin: 0 2px 4px 4px;
 }
 
 /* alternate row colors on Modify Themes,Copy a template */
@@ -870,15 +870,15 @@ dl.themes_list dd {
 }
 
 .theme_settings .input_text {
-	max-width: 100%;
 	width: 30em;
+	max-width: 100%;
 }
 
 #css_preview_box {
 	display: none;
-	margin-bottom: 2ex;
 	width: 99%;
 	height: 300px;
+	margin-bottom: 2ex;
 	border: 1px solid;
 }
 
@@ -910,29 +910,29 @@ dl.themes_list dd {
 }
 
 #mod_main_section .content {
-	padding: 6px;
-	height: 14em;
 	overflow: auto;
+	height: 14em;
+	padding: 6px;
 	border: 1px solid;
 	border-radius: 0;
 }
 
 .modblock_left {
-	width: 50%;
 	float: left;
 	clear: right;
+	width: 50%;
 	padding: 0 5px 0 0;
 }
 
 .modblock_right {
-	width: 50%;
 	float: right;
+	width: 50%;
 	margin: 0 0 5px 0;
 }
 
 .modblock_left #ourAnnouncements {
-	height: 15em;
 	overflow: visible;
+	height: 15em;
 }
 
 .modbox img.icon {
@@ -942,11 +942,11 @@ dl.themes_list dd {
 
 /* Moderation Notes */
 .moderation_notes {
+	overflow: auto;
+	height: auto;
 	margin: 0;
 	padding: 0;
 	list-style: none;
-	overflow: auto;
-	height: auto;
 }
 
 .moderation_notes li {
@@ -973,14 +973,14 @@ dl.themes_list dd {
 }
 
 #error_log tr {
-	padding: 8px;
 	line-height: 160%;
+	padding: 8px;
 }
 
 #error_log .checkbox_column {
 	width: 15px;
-	vertical-align: top;
 	text-align: center;
+	vertical-align: top;
 }
 
 /* Styles for the Report generation */
@@ -991,9 +991,9 @@ dl.themes_list dd {
 }
 
 .report_results th {
-	border-left: 1px solid;
-	border-right: 1px solid;
 	line-height: 2;
+	border-right: 1px solid;
+	border-left: 1px solid;
 }
 
 /* Admin menu icons as sprites
@@ -1003,37 +1003,129 @@ dl.themes_list dd {
 	background-repeat: no-repeat;
 }
 
-.admin_img_administration {background-position: 0 0;}
-.admin_img_attachment     {background-position: -16px 0;}
-.admin_img_ban            {background-position: -32px 0;}
-.admin_img_boards         {background-position: -48px 0;}
-.admin_img_calendar       {background-position: -64px 0;}
-.admin_img_corefeatures   {background-position: -80px 0;}
-.admin_img_current_theme  {background-position: -96px 0;}
-.admin_img_engines        {background-position: -112px 0;}
-.admin_img_exit           {background-position: -128px 0;}
-.admin_img_features       {background-position: -144px 0;}
-.admin_img_languages      {background-position: -160px 0;}
-.admin_img_logs           {background-position: -176px 0;}
-.admin_img_mail           {background-position: -192px 0;}
-.admin_img_maintain       {background-position: -208px 0;}
-.admin_img_membergroups   {background-position: -224px 0;}
-.admin_img_members        {background-position: -240px 0;}
-.admin_img_modifications  {background-position: -256px 0;}
-.admin_img_news           {background-position: -272px 0;}
-.admin_img_packages       {background-position: -288px 0;}
-.admin_img_paid           {background-position: -304px 0;}
-.admin_img_permissions    {background-position: -320px 0;}
-.admin_img_posts          {background-position: -336px 0;}
-.admin_img_regcenter      {background-position: -352px 0;}
-.admin_img_reports        {background-position: -368px 0;}
-.admin_img_scheduled      {background-position: -384px 0;}
-.admin_img_search         {background-position: -400px 0;}
-.admin_img_security       {background-position: -416px 0;}
-.admin_img_server         {background-position: -432px 0;}
-.admin_img_smiley         {background-position: -448px 0;}
-.admin_img_support        {background-position: -464px 0;}
-.admin_img_themes         {background-position: -480px 0;}
+.admin_img_administration {
+	background-position: 0 0;
+}
+
+.admin_img_attachment {
+	background-position: -16px 0;
+}
+
+.admin_img_ban {
+	background-position: -32px 0;
+}
+
+.admin_img_boards {
+	background-position: -48px 0;
+}
+
+.admin_img_calendar {
+	background-position: -64px 0;
+}
+
+.admin_img_corefeatures {
+	background-position: -80px 0;
+}
+
+.admin_img_current_theme {
+	background-position: -96px 0;
+}
+
+.admin_img_engines {
+	background-position: -112px 0;
+}
+
+.admin_img_exit {
+	background-position: -128px 0;
+}
+
+.admin_img_features {
+	background-position: -144px 0;
+}
+
+.admin_img_languages {
+	background-position: -160px 0;
+}
+
+.admin_img_logs {
+	background-position: -176px 0;
+}
+
+.admin_img_mail {
+	background-position: -192px 0;
+}
+
+.admin_img_maintain {
+	background-position: -208px 0;
+}
+
+.admin_img_membergroups {
+	background-position: -224px 0;
+}
+
+.admin_img_members {
+	background-position: -240px 0;
+}
+
+.admin_img_modifications {
+	background-position: -256px 0;
+}
+
+.admin_img_news {
+	background-position: -272px 0;
+}
+
+.admin_img_packages {
+	background-position: -288px 0;
+}
+
+.admin_img_paid {
+	background-position: -304px 0;
+}
+
+.admin_img_permissions {
+	background-position: -320px 0;
+}
+
+.admin_img_posts {
+	background-position: -336px 0;
+}
+
+.admin_img_regcenter {
+	background-position: -352px 0;
+}
+
+.admin_img_reports {
+	background-position: -368px 0;
+}
+
+.admin_img_scheduled {
+	background-position: -384px 0;
+}
+
+.admin_img_search {
+	background-position: -400px 0;
+}
+
+.admin_img_security {
+	background-position: -416px 0;
+}
+
+.admin_img_server {
+	background-position: -432px 0;
+}
+
+.admin_img_smiley {
+	background-position: -448px 0;
+}
+
+.admin_img_support {
+	background-position: -464px 0;
+}
+
+.admin_img_themes {
+	background-position: -480px 0;
+}
 
 .sortable_smiley li {
 	display: inline;
@@ -1041,8 +1133,8 @@ dl.themes_list dd {
 }
 
 .sortable_smiley {
-	border-bottom: 1px solid;
 	margin-top: 3px;
+	border-bottom: 1px solid;
 }
 
 .pagelink, .current_page, .expand_pages {
@@ -1064,10 +1156,10 @@ dl.themes_list dd {
 #custom_profile_fields td:nth-child(2):before,
 #message_icon_list td:nth-child(1):before,
 #manage_boards li .floatleft:before {
+	font-size: 1.071em;
 	margin-top: 1px;
 	padding-right: 5px;
 	content: "\2195";
-	font-size: 1.071em;
 }
 
 #custom_profile_fields td:nth-child(2):before {
@@ -1077,9 +1169,9 @@ dl.themes_list dd {
 
 /* jQuery Dialog Box */
 .ui-helper-clearfix:before, .ui-helper-clearfix:after {
+	display: table;
 	border-collapse: collapse;
 	content: "";
-	display: table;
 }
 
 .ui-helper-clearfix:after {
@@ -1087,9 +1179,9 @@ dl.themes_list dd {
 }
 
 .ui-helper-clearfix:before, .ui-helper-clearfix:after {
+	display: table;
 	border-collapse: collapse;
 	content: "";
-	display: table;
 }
 
 .ui-sortable li > a {
@@ -1104,25 +1196,25 @@ dl.themes_list dd {
 
 /* jQuery Dialog */
 .ui-dialog {
-	padding: 0;
 	z-index: 100;
+	padding: 0;
 	border: 1px solid;
 	border-radius: 4px 4px 0 0;
 }
 
 .ui-dialog .ui-dialog-title {
 	float: left;
-	margin: 0.5em 0;
 	overflow: hidden;
-	text-overflow: ellipsis;
-	white-space: nowrap;
 	width: 90%;
+	margin: 0.5em 0;
+	white-space: nowrap;
+	text-overflow: ellipsis;
 }
 
 .ui-dialog .ui-dialog-titlebar {
-	padding: 0 1em;
-	font-weight: bold;
 	font-size: 1.071em;
+	font-weight: bold;
+	padding: 0 1em;
 	border-radius: 4px 4px 0 0;
 }
 
@@ -1131,19 +1223,19 @@ dl.themes_list dd {
 }
 
 .ui-dialog .ui-dialog-titlebar-close {
-	cursor: pointer;
-	border: 0;
 	float: right;
 	width: 16px;
 	height: 16px;
 	margin: 0.7em 0;
+	cursor: pointer;
+	border: 0;
 	background: url(../images/buttons/delete.png) no-repeat scroll left center transparent;
 }
 
 .ui-button-icon-only {
 	width: 2em;
-	text-indent: -9999px;
 	white-space: nowrap;
+	text-indent: -9999px;
 }
 
 .ui-dialog .ui-dialog-titlebar-close .ui-button-text {
@@ -1178,8 +1270,8 @@ dl.themes_list dd {
 	}
 
 	.visible_boards label {
-		width: auto !important;
 		display: inline;
+		width: auto !important;
 	}
 
 	#quick_search .input_text {
@@ -1259,11 +1351,11 @@ dl.themes_list dd {
 	}
 
 	#core_features .features p {
-		margin: 0;
-		padding: 0;
+		overflow: auto;
 		min-height: 0;
 		max-height: 5em;
-		overflow: auto;
+		margin: 0;
+		padding: 0;
 	}
 
 	#manage_boards .content {

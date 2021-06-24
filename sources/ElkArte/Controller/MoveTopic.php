@@ -421,7 +421,7 @@ class MoveTopic extends AbstractController
 
 			// Add a URL onto the message.
 			$reason = strtr($reason, array(
-				$txt['movetopic_auto_board'] => '[url=' . getUrl('board', ['board' => $this->_toboard, 'start' => 0, 'name' => $this->_board_info['name']]) .']' . $this->_board_info['name'] . '[/url]',
+				$txt['movetopic_auto_board'] => '[url=' . getUrl('board', ['board' => $this->_toboard, 'start' => 0, 'name' => $this->_board_info['name']]) . ']' . $this->_board_info['name'] . '[/url]',
 				$txt['movetopic_auto_topic'] => '[iurl=' . getUrl('topic', ['topic' => $this->_topic, 'start' => 0, 'subject' => $this->_board_info['subject_new'] ?? $this->_board_info['subject']]) . ']' . ($this->_board_info['subject_new'] ?? $this->_board_info['subject']) . '[/iurl]'
 			));
 

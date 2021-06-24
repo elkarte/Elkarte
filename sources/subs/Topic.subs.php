@@ -21,6 +21,7 @@ use BBC\ParserWrapper;
 use ElkArte\Cache\Cache;
 use ElkArte\MessagesDelete;
 use ElkArte\Search\SearchApiWrapper;
+use ElkArte\Themes\ThemeLoader;
 use ElkArte\User;
 use ElkArte\Util;
 
@@ -2301,7 +2302,7 @@ function getTopicsPostsAndPoster($topic, $limit, $sort)
 	);
 
 	// When evaluating potentially huge offsets, grab the ids only, first.
-    // The performance impact is still significant going from three columns to one.
+	// The performance impact is still significant going from three columns to one.
 	$postMod = $modSettings['postmod_active'] && allowedTo('approve_posts');
 	$request = $db->fetchQuery('
 		SELECT 
@@ -2311,7 +2312,7 @@ function getTopicsPostsAndPoster($topic, $limit, $sort)
 				id_msg 
 			FROM {db_prefix}messages
 			WHERE id_topic = {int:current_topic}' . ($postMod ? '' : '
-			AND (approved = {int:is_approved}' . (User::$info->is_guest ? '' : ' OR id_member = {int:current_member}') .')') . '
+			AND (approved = {int:is_approved}' . (User::$info->is_guest ? '' : ' OR id_member = {int:current_member}') . ')') . '
 			ORDER BY id_msg ' . ($sort ? '' : 'DESC') . ($limit['messages_per_page'] == -1 ? '' : '
 			LIMIT ' . $limit['start'] . ', ' . $limit['offset']) . '
 		) AS o 
@@ -2497,7 +2498,7 @@ function postSplitRedirect($reason, $subject, $board_info, $new_topic)
 	// Should be in the boardwide language.
 	if (User::$info->language != $language)
 	{
-		\ElkArte\Themes\ThemeLoader::loadLanguageFile('index', $language);
+		ThemeLoader::loadLanguageFile('index', $language);
 	}
 
 	preparsecode($reason);
