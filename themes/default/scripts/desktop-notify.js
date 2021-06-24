@@ -9,13 +9,17 @@
  * providing the interface required by the latter.
  */
 
-(function () {
-	var ElkDesktop = (function (opt) {
+(function ()
+{
+	let ElkDesktop = (function (opt)
+	{
 		'use strict';
 		opt = (opt) ? opt : {};
 
-		var send = function (request) {
-			if (request.desktop_notifications.new_from_last > 0) {
+		let send = function (request)
+		{
+			if (request.desktop_notifications.new_from_last > 0)
+			{
 				if (hasPermissions(request))
 				{
 					Push.create(request.desktop_notifications.title, {
@@ -27,11 +31,15 @@
 			}
 		};
 
-		var hasPermissions = function () {
+		let hasPermissions = function ()
+		{
 			if (Push.Permission.has())
+			{
 				return true;
+			}
 
-			if (Push.Permission.get() === "default") {
+			if (Push.Permission.get() === "default")
+			{
 				return Push.Permission.request();
 			}
 
