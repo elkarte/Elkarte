@@ -22,6 +22,7 @@ use ElkArte\Errors\AttachmentErrorContext;
 use ElkArte\Graphics\Image;
 use ElkArte\Http\FsockFetchWebdata;
 use ElkArte\TemporaryAttachment;
+use ElkArte\Themes\ThemeLoader;
 use ElkArte\TokenHash;
 use ElkArte\User;
 use ElkArte\AttachmentsDirectory;
@@ -461,7 +462,7 @@ function createAttachment(&$attachmentOptions)
  *
  * - It gets avatar data (folder, name of the file, filehash, etc)
  * from the database.
- * - Must return the same values and in the same order as getAttachmentFromTopic()
+ * - Must return the same array keys as getAttachmentFromTopic()
  *
  * @param int $id_attach
  *
@@ -511,14 +512,13 @@ function getAvatar($id_attach)
  * - This includes a check of the topic
  * - it only returns the attachment if it's indeed attached to a message in the topic given as parameter, and
  * query_see_board...
- * - Must return the same values and in the same order as getAvatar()
+ * - Must return the same array keys as getAvatar() and getAttachmentThumbFromTopic()
  *
  * @param int $id_attach
  * @param int $id_topic
  *
  * @return array
  * @package Attachments
- * @throws \Exception
  */
 function getAttachmentFromTopic($id_attach, $id_topic)
 {
@@ -542,7 +542,7 @@ function getAttachmentFromTopic($id_attach, $id_topic)
 	);
 	if ($request->num_rows() != 0)
 	{
-		$attachmentData = $request->fetch_row();
+		$attachmentData = $request->fetch_assoc();
 	}
 	$request->free_result();
 
@@ -557,7 +557,7 @@ function getAttachmentFromTopic($id_attach, $id_topic)
  * - This includes a check of the topic
  * - it only returns the attachment if it's indeed attached to a message in the topic given as parameter, and
  * query_see_board...
- * - Must return the same values and in the same order as getAvatar()
+ * - Must return the same array keys as getAvatar() & getAttachmentFromTopic
  *
  * @param int $id_attach
  * @param int $id_topic
@@ -571,7 +571,9 @@ function getAttachmentThumbFromTopic($id_attach, $id_topic)
 	$db = database();
 
 	// Make sure this attachment is on this board.
-	$attachmentData = array_fill(0, 9, '');
+	$attachmentData = [
+		'id_folder' => '', 'filename' => '', 'file_hash' => '', 'fileext' => '', 'id_attach' => '',
+		'attachment_type' => '', 'mime_type' => '', 'approved' => '', 'id_member' => ''];
 	$request = $db->fetchQuery('
 		SELECT 
 			th.id_folder, th.filename, th.file_hash, th.fileext, th.id_attach, th.attachment_type, th.mime_type,
@@ -599,30 +601,30 @@ function getAttachmentThumbFromTopic($id_attach, $id_topic)
 		if (!empty($row['file_hash']))
 		{
 			$attachmentData = array(
-				$row['id_folder'],
-				$row['filename'],
-				$row['file_hash'],
-				$row['fileext'],
-				$row['id_attach'],
-				$row['attachment_type'],
-				$row['mime_type'],
-				$row['approved'],
-				$row['id_member'],
+				'id_folder' => $row['id_folder'],
+				'filename' => $row['filename'],
+				'file_hash' => $row['file_hash'],
+				'fileext' => $row['fileext'],
+				'id_attach' => $row['id_attach'],
+				'attachment_type' => $row['attachment_type'],
+				'mime_type' => $row['mime_type'],
+				'approved' => $row['approved'],
+				'id_member' => $row['id_member'],
 			);
 		}
 		// otherwise $modSettings['attachmentThumbnails'] may be (or was) off, so original file
 		elseif (getValidMimeImageType($row['attach_mime_type']) !== '')
 		{
 			$attachmentData = array(
-				$row['attach_id_folder'],
-				$row['attach_filename'],
-				$row['attach_file_hash'],
-				$row['attach_fileext'],
-				$row['attach_id_attach'],
-				$row['attach_attachment_type'],
-				$row['attach_mime_type'],
-				$row['approved'],
-				$row['id_member'],
+				'id_folder' => $row['id_folder'],
+				'filename' => $row['attach_filename'],
+				'file_hash' => $row['attach_file_hash'],
+				'fileext' => $row['attach_fileext'],
+				'id_attach' => $row['attach_id_attach'],
+				'attachment_type' => $row['attach_attachment_type'],
+				'mime_type' => $row['attach_mime_type'],
+				'approved' => $row['approved'],
+				'id_member' => $row['id_member'],
 			);
 		}
 	}
@@ -1312,6 +1314,7 @@ function loadAttachmentContext($id_msg)
 				// Data attributes for use in expandThumb
 				$attachmentData[$i]['thumbnail']['lightbox'] = 'data-lightboxmessage="' . $id_msg . '" data-lightboximage="' . $attachment['id_attach'] . '"';
 
+				/*
 				// If the image is too large to show inline, make it a popup.
 				// @todo this needs to be removed or depreciated
 				if (((!empty($modSettings['max_image_width']) && $attachmentData[$i]['real_width'] > $modSettings['max_image_width']) || (!empty($modSettings['max_image_height']) && $attachmentData[$i]['real_height'] > $modSettings['max_image_height'])))
@@ -1322,6 +1325,7 @@ function loadAttachmentContext($id_msg)
 				{
 					$attachmentData[$i]['thumbnail']['javascript'] = 'return expandThumb(' . $attachment['id_attach'] . ');';
 				}
+				*/
 			}
 
 			if (!$attachmentData[$i]['thumbnail']['has_thumb'])
@@ -1547,7 +1551,7 @@ function returnMimeThumb($file_ext, $url = false)
 
 	if (empty($settings))
 	{
-		\ElkArte\Themes\ThemeLoader::loadEssentialThemeData();
+		ThemeLoader::loadEssentialThemeData();
 	}
 
 	// Return the mine thumbnail if it exists or just the default
