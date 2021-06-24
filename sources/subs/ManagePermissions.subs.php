@@ -1013,12 +1013,15 @@ function replacePermission($permChange)
 {
 	$db = database();
 
-	$db->replace(
-		'{db_prefix}permissions',
-		array('permission' => 'string', 'id_group' => 'int', 'add_deny' => 'int'),
-		$permChange,
-		array('permission', 'id_group')
-	);
+	if (!empty($permChange))
+	{
+		$db->replace(
+			'{db_prefix}permissions',
+			array('permission' => 'string', 'id_group' => 'int', 'add_deny' => 'int'),
+			$permChange,
+			array('permission', 'id_group')
+		);
+	}
 }
 
 /**
