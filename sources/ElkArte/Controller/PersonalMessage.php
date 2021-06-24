@@ -2062,11 +2062,12 @@ class PersonalMessage extends AbstractController
 		// Editing a specific rule?
 		if (isset($this->_req->query->add))
 		{
-			$context['rid'] = isset($this->_req->query->rid) && isset($context['rules'][$this->_req->query->rid]) ? (int) $this->_req->query->rid : 0;
+			$rid = $this->_req->getQuery('rid', 'intval', 0);
+			$context['rid'] = isset($context['rules'][$rid]) ? $rid : 0;
 			$context['sub_template'] = 'add_rule';
 
 			// Any known rule
-			$js_rules = '';
+			$js_rules = [];
 			foreach ($context['known_rules'] as $rule)
 			{
 				$js_rules[$rule] = $txt['pm_rule_' . $rule];
@@ -2074,7 +2075,7 @@ class PersonalMessage extends AbstractController
 			$js_rules = json_encode($js_rules);
 
 			// Any known label
-			$js_labels = '';
+			$js_labels = [];
 			foreach ($context['labels'] as $label)
 			{
 				if ($label['id'] != -1)
@@ -2158,7 +2159,8 @@ class PersonalMessage extends AbstractController
 		elseif (isset($this->_req->query->save))
 		{
 			checkSession('post');
-			$context['rid'] = isset($this->_req->query->rid) && isset($context['rules'][$this->_req->query->rid]) ? (int) $this->_req->query->rid : 0;
+			$rid = 	$this->_req->getQuery('rid', 'intval', 0);
+			$context['rid'] = isset($context['rules'][$rid]) ? $rid : 0;
 
 			// Name is easy!
 			$ruleName = Util::htmlspecialchars(trim($this->_req->post->rule_name));
