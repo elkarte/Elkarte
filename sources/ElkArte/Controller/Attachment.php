@@ -304,8 +304,6 @@ class Attachment extends AbstractController
 		if ($this->_req->getQuery('type') === 'avatar')
 		{
 			$attachment = getAvatar($id_attach);
-
-			$is_avatar = true;
 			$this->_req->query->image = true;
 		}
 		// This is just a regular attachment...
@@ -338,23 +336,22 @@ class Attachment extends AbstractController
 				$this->_req->query->image = true;
 				$attachment = getAttachmentThumbFromTopic($id_attach, $id_topic);
 
-				// 1 is the file name, no file name, no thumbnail, no image.
-				if (empty($attachment[1]))
+				// No file name, no thumbnail, no image.
+				if (empty($attachment['filename']))
 				{
 					$full_attach = getAttachmentFromTopic($id_attach, $id_topic);
-					$attachment[1] = !empty($full_attach[1]) ? $full_attach[1] : '';
-					$attachment[4] = 0;
-					$attachment[5] = 0;
-					$attachment[7] = $full_attach[7];
-					$attachment[8] = $full_attach[8];
+					$attachment['filename'] = !empty($full_attach[1]) ? $full_attach[1] : '';
+					$attachment['id_attach'] = 0;
+					$attachment['attachment_type'] = 0;
+					$attachment['approved'] = $full_attach[7];
+					$attachment['id_member'] = $full_attach[8];
 
 					// return mime type ala mimetype extension
 					$check = returnMimeThumb(!empty($full_attach[3]) ? $full_attach[3] : 'default');
-
 					if ($check !== false)
 					{
-						$attachment[3] = 'png';
-						$attachment[6] = 'image/png';
+						$attachment['fileext'] = 'png';
+						$attachment['mime_type'] = 'image/png';
 						$filename = $check;
 					}
 					else
@@ -365,8 +362,8 @@ class Attachment extends AbstractController
 
 					if (substr(get_finfo_mime($filename), 0, 5) !== 'image')
 					{
-						$attachment[3] = 'png';
-						$attachment[6] = 'image/png';
+						$attachment['fileext'] = 'png';
+						$attachment['mime_type'] = 'image/png';
 						$filename = $settings['theme_dir'] . '/images/mime_images/default.png';
 					}
 				}
@@ -379,7 +376,15 @@ class Attachment extends AbstractController
 			$this->action_no_attach();
 		}
 
-		list ($id_folder, $real_filename, $file_hash, $file_ext, $id_attach, $attachment_type, $mime_type, $is_approved, $id_member) = $attachment;
+		$id_folder = $attachment['id_folder'] ?? '';
+		$real_filename = $attachment['filename'] ?? '';
+		$file_hash = $attachment['file_hash'] ?? '';
+		$file_ext = $attachment['fileext'] ?? '';
+		$id_attach = $attachment['id_attach'] ?? '';
+		$attachment_type = $attachment['attachment_type'] ?? '';
+		$mime_type = $attachment['mime_type'] ?? '';
+		$is_approved = $attachment['approved'] ?? '';
+		$id_member = $attachment['id_member'] ?? '';
 
 		// If it isn't yet approved, do they have permission to view it?
 		if (!$is_approved && ($id_member == 0 || $this->user->id !== $id_member) && ($attachment_type == 0 || $attachment_type == 3))
@@ -644,7 +649,15 @@ class Attachment extends AbstractController
 					$this->action_no_attach();
 				}
 
-				list ($id_folder, $real_filename, $file_hash, $file_ext, $id_attach, $attachment_type, $mime_type, $is_approved, $id_member) = $attachment;
+				$id_folder = $attachment['id_folder'];
+				$real_filename = $attachment['filename'];
+				$file_hash = $attachment['file_hash'];
+				$file_ext = $attachment['fileext'];
+				$id_attach = $attachment['id_attach'];
+				$attachment_type = $attachment['attachment_type'];
+				$mime_type = $attachment['mime_type'];
+				$is_approved = $attachment['approved'];
+				$id_member = $attachment['id_member'];
 
 				// If it isn't yet approved, do they have permission to view it?
 				if (!$is_approved && ($id_member == 0 || $this->user->id !== $id_member) && ($attachment_type == 0 || $attachment_type == 3))
