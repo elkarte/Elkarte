@@ -26,7 +26,7 @@
 	 */
 	$.fn.linkifyvideo = function (oInstanceSettings, msgid)
 	{
-		var oDefaultsSettings = {
+		let oDefaultsSettings = {
 			embed_limit: 25,
 			preview_image: '',
 			ctp_video: '',
@@ -37,7 +37,7 @@
 		};
 
 		// Account for user options
-		var oSettings = $.extend({}, oDefaultsSettings, oInstanceSettings || {});
+		let oSettings = $.extend({}, oDefaultsSettings, oInstanceSettings || {});
 
 		/**
 		 * Takes the generic embed tag and inserts the proper video source
@@ -65,14 +65,19 @@
 		 * Shows the video image and sets up the link
 		 * Sets up single click event to play videoID and double click to load it
 		 *
-		 * @param {string} a videoID link
+		 * @param {object} a videoID link
 		 * @param {string} src source of image
 		 * @param {string} eURL load link
 		 * @param {string} eURLa play link
 		 */
 		function getIMG(a, src, eURL, eURLa)
 		{
-			return $('<div class="elk_video"><a href="' + a.href + '"><img class="elk_previewvideo" alt="' + oSettings.preview_image + '" ' + 'title="' + oSettings.ctp_video + '" src="' + src + '"/></a></div>')
+			return $('' +
+				'<div class="elk_video">' +
+					'<a href="' + a.href + '">' +
+						'<img class="elk_previewvideo" alt="' + oSettings.preview_image + '" ' + 'title="' + oSettings.ctp_video + '" src="' + src + '"/>' +
+					'</a>' +
+				'</div>')
 				.on('dblclick', function (e)
 				{
 					// double click loads the video but does not autoplay
@@ -86,7 +91,7 @@
 				{
 					// single click to begin playing the video
 					e.preventDefault();
-					var tag = this;
+					let tag = this;
 
 					this.tagID = setTimeout(function ()
 					{
@@ -103,7 +108,7 @@
 		 */
 		function getVimeoIMG(videoID, callback)
 		{
-			var img = 'assets.vimeo.com/images/logo_vimeo_land.png';
+			let img = 'assets.vimeo.com/images/logo_vimeo_land.png';
 
 			$.getJSON('http://www.vimeo.com/api/v2/video/' + videoID + '.json?callback=?', {format: "json"},
 				function (data)
@@ -127,7 +132,7 @@
 		 */
 		function getDailymotionIMG(videoID, callback)
 		{
-			var img = 'assets.vimeo.com/images/logo_vimeo_land.png';
+			let img = 'assets.vimeo.com/images/logo_vimeo_land.png';
 
 			$.getJSON('https://api.dailymotion.com/video/' + videoID + '?fields=thumbnail_480_url', {},
 				function (data)
@@ -158,15 +163,15 @@
 			return embed ? getEmbed(eURL) : getIMG(a, src, eURL, eURLa);
 		}
 
-		var domain_regex = /^[^:]*:\/\/(?:www\.)?([^\/]+)(\/.*)$/,
+		let domain_regex = /^[^:]*:\/\/(?:www\.)?([^\/]+)(\/.*)$/,
 			already_embedded = 0,
-			embed_html = '<div class="elk_video"><iframe width="640px" height="385px" style="max-width: 98%; max-height: 100%;" src="{src}" frameborder="0" allowfullscreen></iframe></div>',
+			embed_html = '<div class="elk_video"><iframe width="640" height="360" src="{src}" frameborder="0" allowfullscreen></iframe></div>',
 			handlers = {};
 
 		// Youtube and variants link handler
 		handlers['youtube.com'] = function (path, a, embed)
 		{
-			var videoID = path.match(/\bv[=/]([^&#?$]+)/i) || path.match(/#p\/(?:a\/)?[uf]\/\d+\/([^?$]+)/i) || path.match(/(?:\/)([\w-]{11})/i);
+			let videoID = path.match(/\bv[=/]([^&#?$]+)/i) || path.match(/#p\/(?:a\/)?[uf]\/\d+\/([^?$]+)/i) || path.match(/(?:\/)([\w-]{11})/i);
 			if (!videoID || !(videoID = videoID[1]))
 			{
 				return;
@@ -176,22 +181,25 @@
 			// http://youtu.be/lLOE3fBZcUU?t=1m37s when you click share underneath the video
 			// http://youtu.be/lLOE3fBZcUU?t=97 when you right click on a video and choose "Copy video URL at current time"
 			// For embedding, you need to use "?start=97" instead, so we have to convert t=1m37s to seconds while also supporting t=97
-			var startAt = path.match(/t=(?:([1-9]{1,2})h)?(?:([1-9]{1,2})m)?(?:([1-9]+)s?)/),
+			let startAt = path.match(/t=(?:([1-9]{1,2})h)?(?:([1-9]{1,2})m)?(?:([1-9]+)s?)/),
 				startAtPar = '';
+
 			if (startAt)
 			{
-				var startAtSeconds = 0;
+				let startAtSeconds = 0;
 
 				// Hours
 				if (typeof startAt[1] !== 'undefined')
 				{
 					startAtSeconds += parseInt(startAt[1]) * 3600;
 				}
+
 				// Minutes
 				if (typeof startAt[2] !== 'undefined')
 				{
 					startAtSeconds += parseInt(startAt[2]) * 60;
 				}
+
 				// Seconds
 				if (typeof startAt[3] !== 'undefined')
 				{
@@ -201,8 +209,8 @@
 				startAtPar = '&start=' + startAtSeconds.toString();
 			}
 
-			var embedURL = '//www.youtube-nocookie.com/embed/' + videoID + '?rel=0' + startAtPar,
-				tag = embedOrIMG(embed, a, '//img.youtube.com/vi/' + videoID + '/0.jpg', embedURL, embedURL + '&autoplay=1');
+			let embedURL = '//www.youtube-nocookie.com/embed/' + videoID + '?rel=0' + startAtPar,
+				tag = embedOrIMG(embed, a, '//i.ytimg.com/vi/' + videoID + '/sddefault.jpg', embedURL, embedURL + '&autoplay=1');
 
 			return [oSettings.youtube, tag];
 		};
@@ -212,13 +220,13 @@
 		// Vimeo link handler
 		handlers['vimeo.com'] = function (path, a, embed)
 		{
-			var videoID = path.match(/^\/(\d+)/i);
+			let videoID = path.match(/^\/(\d+)/i);
 			if (!videoID || !(videoID = videoID[1]))
 			{
 				return;
 			}
 
-			var embedURL = '//player.vimeo.com/video/' + videoID,
+			let embedURL = '//player.vimeo.com/video/' + videoID,
 				tag = null,
 				img = '//assets.vimeo.com/images/logo_vimeo_land.png';
 
@@ -245,13 +253,13 @@
 		// Dailymotion link handler
 		handlers['dailymotion.com'] = function (path, a, embed)
 		{
-			var videoID = path.match(/^\/(?:video|swf)\/([a-z0-9]{1,18})/i);
+			let videoID = path.match(/^\/(?:video|swf)\/([a-z0-9]{1,18})/i);
 			if (!videoID || !(videoID = videoID[1]))
 			{
 				return;
 			}
 
-			var embedURL = '//dailymotion.com/embed/video/' + videoID,
+			let embedURL = '//dailymotion.com/embed/video/' + videoID,
 				tag = null,
 				img = '//dailymotion.com/thumbnail/video/' + videoID;
 
@@ -276,9 +284,9 @@
 		};
 
 		// Get the links in the id="msg_1234 divs.
-		var links = null;
+		let links;
 
-		if (typeof msgid !== "undefined" && msgid !== null)
+		if (typeof msgid !== "undefined")
 		{
 			links = $('#' + msgid + ' a');
 		}
@@ -288,9 +296,12 @@
 		}
 
 		// Create the show/hide button
-		var showhideBtn = $('<a class="floatright" title="' + oSettings.hide_video + '"><img alt=">" src="' + elk_images_url + '/selected.png"></a>').on('click', function ()
+		let showhideBtn = $('' +
+			'<a class="floatright" title="' + oSettings.hide_video + '">' +
+				'<img alt=">" src="' + elk_images_url + '/selected.png">' +
+			'</a>').on('click', function ()
 		{
-			var $img = $(this).find("img"),
+			let $img = $(this).find("img"),
 				$vid = $(this).parent().next();
 
 			// Toggle slide the video and change the icon
@@ -299,9 +310,9 @@
 		});
 
 		// Loop though each link old skool style for speed
-		for (var i = links.length - 1; i > -1; i--)
+		for (let i = links.length - 1; i > -1; i--)
 		{
-			var tag = links[i],
+			let tag = links[i],
 				text = tag.innerText || tag.textContent || "";
 
 			// Ignore in sentences
@@ -323,7 +334,7 @@
 			}
 
 			// Get domain and validate we know how to handle it
-			var m = tag.href.match(domain_regex),
+			let m = tag.href.match(domain_regex),
 				handler = null,
 				args = null;
 
@@ -344,3 +355,38 @@
 		}
 	};
 })(jQuery);
+
+(function(window, document, undefined) {
+	"use strict";
+
+	// List of Video Vendors embeds you want to support
+	var players = ['iframe[src*="youtube.com"]', 'iframe[src*="vimeo.com"]'];
+
+	// Select videos
+	var fitVids = document.querySelectorAll(players.join(","));
+
+	// If there are videos on the page...
+	if (fitVids.length) {
+		// Loop through videos
+		for (var i = 0; i < fitVids.length; i++) {
+			// Get Video Information
+			var fitVid = fitVids[i];
+			var width = fitVid.getAttribute("width");
+			var height = fitVid.getAttribute("height");
+			var aspectRatio = height / width;
+			var parentDiv = fitVid.parentNode;
+
+			// Wrap it in a DIV
+			var div = document.createElement("div");
+			div.className = "fitVids-wrapper";
+			div.style.paddingBottom = aspectRatio * 100 + "%";
+			parentDiv.insertBefore(div, fitVid);
+			fitVid.remove();
+			div.appendChild(fitVid);
+
+			// Clear height/width from fitVid
+			fitVid.removeAttribute("height");
+			fitVid.removeAttribute("width");
+		}
+	}
+})(window, document);
