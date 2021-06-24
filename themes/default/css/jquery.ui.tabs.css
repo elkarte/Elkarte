@@ -63,3 +63,11 @@
 	border-width: 1px;
 	padding: 1em 1.4em;
 }
+.ui-tabs .ui-tabs-nav li {
+	border: 1px solid;
+	border-radius: 6px 6px 0 0;
+}
+.ui-tabs .ui-tabs-nav .ui-tabs-anchor {
+	border-radius: 6px 6px 0 0;
+	outline: none;
+}
