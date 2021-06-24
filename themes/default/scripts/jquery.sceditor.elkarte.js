@@ -687,14 +687,15 @@ sceditor.formats.bbcode
 		allowedChildren: ['#', '#newline'],
 		format: function (element, content)
 		{
-			let from = '';
+			let from = '',
+				cite = element.querySelector("cite:first-child");
 
-			if (element.children("cite:first").length === 1)
+			if (cite)
 			{
-				from = element.children("cite:first").text().trim();
+				from = cite.textContent.trim();
 				element.getAttribute({'from': from.php_htmlspecialchars()});
 				from = '=' + from;
-				element.children("cite:first").remove();
+				cite.remove();
 				content = this.elementToBbcode(element);
 			}
 			else if (element.hasAttribute('from'))
