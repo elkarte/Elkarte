@@ -71,21 +71,21 @@ class BoardsList
 	 *
 	 * @var string
 	 */
-	private $_images_url = '';
+	private $_images_url;
 
 	/**
-	 * A string with session data to be user in urls
+	 * A string with session data to be used in urls
 	 *
 	 * @var string
 	 */
 	private $_session_url = '';
 
 	/**
-	 * Cut the subject at this number of chars
+	 * Cut the subject at this number of chars, set from modSettings
 	 *
 	 * @var int
 	 */
-	private $_subject_length = 24;
+	private $_subject_length = 48;
 
 	/**
 	 * The id of the recycle board (0 for none or not enabled)
@@ -130,7 +130,10 @@ class BoardsList
 		$this->_images_url = $settings['images_url'] . '/' . $context['theme_variant_url'];
 		$this->_session_url = $context['session_var'] . '=' . $context['session_id'];
 
-		$this->_subject_length = $modSettings['subject_length'];
+		if (!empty($modSettings['subject_length']))
+		{
+			$this->_subject_length = $modSettings['subject_length'];
+		}
 
 		$this->_user = User::$info;
 		$this->_user['mod_cache_ap'] = !empty($this->_user->mod_cache['ap']) ? $this->_user->mod_cache['ap'] : array();
@@ -326,7 +329,8 @@ class BoardsList
 				}
 
 				// Does this board contain new boards?
-				$this->_current_boards[$row_board['id_parent']]['children_new'] |= empty($row_board['is_read']);
+				$is_read = empty($row_board['is_read']);
+				$this->_current_boards[$row_board['id_parent']]['children_new'] |= $is_read;
 
 				// This is easier to use in many cases for the theme....
 				$this->_current_boards[$row_board['id_parent']]['link_children'][] = &$this->_current_boards[$row_board['id_parent']]['children'][$row_board['id_board']]['link'];

@@ -71,7 +71,7 @@
 		$aForm.append($('<input />').attr('name', 'message_mode').val(editor.inSourceMode() ? '1' : '0'));
 
 		// Send in the request to save the data
-		this.draftAjax($aForm.serialize(), "?action=post2;board=" + this.opts.iBoard + ";xml");
+		this.draftAjax($aForm.serialize(), "?action=post2;board=" + this.opts.iBoard + ";api=xml");
 	};
 
 	/**
@@ -135,7 +135,7 @@
 		$aForm.append($('<input />').attr('name', 'message_mode').val(editor.inSourceMode() ? '1' : '0'));
 
 		// Send in (post) the document for saving
-		this.draftAjax($aForm.serialize(), "?action=pm;sa=send2;xml");
+		this.draftAjax($aForm.serialize(), "?action=pm;sa=send2;api=xml");
 	};
 
 	/**
@@ -174,7 +174,7 @@
 					document.getElementById(this.opts.sLastNote).innerHTML = this.opts._sLastSaved;
 
 					// Hide the saved draft successbox in the event they pressed the save draft button at some point
-					var draft_section = document.getElementById('draft_section');
+					let draft_section = document.getElementById('draft_section');
 					if (draft_section)
 					{
 						draft_section.style.display = 'none';

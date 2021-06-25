@@ -289,7 +289,7 @@ function template_make_event_above()
  */
 function template_post_page()
 {
-	global $context, $txt;
+	global $context, $txt, $options;
 
 	// Show the actual posting area...
 	echo '
@@ -332,6 +332,16 @@ function template_post_page()
 
 	echo '
 						</div>';
+
+	// Create an area to show the draft last saved on text
+	if (!empty($context['drafts_autosave']) && !empty($options['drafts_autosave_enabled']))
+	{
+		echo '
+		<div class="draftautosave">
+			<span id="throbber" class="hide"><i class="icon icon-spin i-spinner"></i>&nbsp;</span>
+			<span id="draft_lastautosave"></span>
+		</div>';
+	}
 }
 
 /**
@@ -494,7 +504,8 @@ function template_add_new_attachments()
 					template: ' . JavaScriptEscape('<div class="insertoverlay">
 						<input type="button" class="button" value="' . $txt['insert'] . '">
 						<ul data-group="tabs" class="tabs">
-							<li data-tab="size">' . $txt['ila_opt_size'] . '</li><li data-tab="align">' . $txt['ila_opt_align'] . '</li>
+							<li data-tab="size">' . $txt['ila_opt_size'] . '</li>
+							<li data-tab="align">' . $txt['ila_opt_align'] . '</li>
 						</ul>
 						<div class="container" data-visual="size">
 							<label><input data-size="thumb" type="radio" name="imgmode">' . $txt['ila_opt_size_thumb'] . '</label>
@@ -650,18 +661,20 @@ function template_topic_replies_below()
 			<div class="content forumposts">
 				<div class="postarea2" id="msg', $post['id'], '">
 					<div class="keyinfo">
-						<h5 class="floatleft">
-							<span>', $txt['posted_by'], '</span>&nbsp;', $post['poster'], '&nbsp;-&nbsp;', $post['time'], '
+						<h5>
+							<span>', $txt['posted_by'], '</span> ', $post['poster'], ' - ', $post['time'], '
 						</h5>';
 
 			if ($context['can_quote'])
 			{
 				echo '
-						<ul class="quickbuttons" id="msg_', $post['id'], '_quote">
-							<li class="listlevel1">
-								<a href="#postmodify" onmousedown="return insertQuoteFast(', $post['id'], ');" class="linklevel1 quote_button">', $txt['bbc_quote'], '</a>
-							</li>
-						</ul>';
+						<nav>
+							<ul class="quickbuttons" id="msg_', $post['id'], '_quote">
+								<li class="listlevel1">
+									<a href="#postmodify" onmousedown="return insertQuoteFast(', $post['id'], ');" class="linklevel1 quote_button">', $txt['bbc_quote'], '</a>
+								</li>
+							</ul>
+						</nav>';
 			}
 
 			echo '
@@ -677,7 +690,7 @@ function template_topic_replies_below()
 			}
 
 			echo '
-					<div class="inner" id="msg_', $post['id'], '_body">', $post['body'], '</div>
+					<div class="messageContent" id="msg_', $post['id'], '_body">', $post['body'], '</div>
 				</div>
 			</div>';
 		}
@@ -713,7 +726,7 @@ function template_topic_replies_below()
 }
 
 /**
- * The area below the postbox
+ * The area below the editor
  * Typically holds our action buttons, save, preview, drafts, etc
  * Oh and lots of JS ;)
  */

@@ -360,11 +360,11 @@ elkRegister.prototype.checkUsername = function (is_auto)
 
 	// Request a search on that username.
 	var checkName = curUsername.php_urlencode();
-	sendXMLDocument.call(this, elk_prepareScriptUrl(elk_scripturl) + 'action=register;sa=usernamecheck;xml;username=' + checkName, null, this.checkUsernameCallback);
+	sendXMLDocument.call(this, elk_prepareScriptUrl(elk_scripturl) + 'action=register;sa=usernamecheck;api=xml;username=' + checkName, null, this.checkUsernameCallback);
 	if (curDisplayname)
 	{
 		var checkDisplay = curDisplayname.php_urlencode();
-		sendXMLDocument.call(this, elk_prepareScriptUrl(elk_scripturl) + 'action=register;sa=usernamecheck;xml;username=' + checkDisplay, null, this.checkDisplaynameCallback);
+		sendXMLDocument.call(this, elk_prepareScriptUrl(elk_scripturl) + 'action=register;sa=usernamecheck;api=xml;username=' + checkDisplay, null, this.checkDisplaynameCallback);
 	}
 
 	return true;
@@ -508,7 +508,7 @@ function onCheckChange()
 		{
 			$.ajax({
 				type: "POST",
-				url: elk_scripturl + "?action=jslocale;sa=agreement;xml;api=json",
+				url: elk_scripturl + "?action=jslocale;sa=agreement;api=json",
 				data: {lang: $(this).val()},
 				beforeSend: ajax_indicator(true)
 			})

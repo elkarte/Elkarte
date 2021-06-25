@@ -243,7 +243,7 @@
 
 				// So you did not want to send that file?
 				$.ajax({
-					url: elk_scripturl + '?action=attachment;sa=rmattach;api;' + elk_session_var + '=' + elk_session_id,
+					url: elk_scripturl + '?action=attachment;sa=rmattach;api=xml;' + elk_session_var + '=' + elk_session_id,
 					type: "POST",
 					cache: false,
 					dataType: 'json',
@@ -356,7 +356,7 @@
 				this.setServerFail = function (data)
 				{
 					this.setProgress(0);
-					$button.removeClass('i-close').addClass('i-alert');
+					$button.removeClass('i-close').removeClass('colorize-close').addClass('i-alert').addClass('colorize-alert');
 				};
 
 				// The file upload is successful, remove our abort event and swap the class
@@ -379,7 +379,7 @@
 			fileUploadedInterface = function ($control, $button, data)
 			{
 				$button.off('click');
-				$button.removeClass('abort i-close').addClass('remove i-delete');
+				$button.removeClass('abort i-close').addClass('remove i-delete colorize-delete');
 
 				// Update the uploaded file with its ID
 				$button.attr('id', data.curFileNum);

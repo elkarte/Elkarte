@@ -22,6 +22,7 @@ use ElkArte\Action;
 use ElkArte\Exceptions\Exception;
 use ElkArte\Notifications;
 use ElkArte\SettingsForm\SettingsForm;
+use ElkArte\Themes\ThemeLoader;
 use ElkArte\Util;
 
 /**
@@ -54,9 +55,9 @@ class ManageFeatures extends AbstractController
 		global $context, $txt, $settings;
 
 		// Often Helpful
-		\ElkArte\Themes\ThemeLoader::loadLanguageFile('Help');
-		\ElkArte\Themes\ThemeLoader::loadLanguageFile('ManageSettings');
-		\ElkArte\Themes\ThemeLoader::loadLanguageFile('Mentions');
+		ThemeLoader::loadLanguageFile('Help');
+		ThemeLoader::loadLanguageFile('ManageSettings');
+		ThemeLoader::loadLanguageFile('Mentions');
 
 		// All the actions we know about
 		$subActions = array(
@@ -499,7 +500,7 @@ class ManageFeatures extends AbstractController
 	{
 		global $txt, $context, $modSettings;
 
-		\ElkArte\Themes\ThemeLoader::loadLanguageFile('Mentions');
+		ThemeLoader::loadLanguageFile('Mentions');
 
 		// Instantiate the form
 		$settingsForm = new SettingsForm(SettingsForm::DB_ADAPTER);
@@ -631,8 +632,8 @@ class ManageFeatures extends AbstractController
 	{
 		global $txt, $modSettings;
 
-		\ElkArte\Themes\ThemeLoader::loadLanguageFile('Profile');
-		\ElkArte\Themes\ThemeLoader::loadLanguageFile('UserNotifications');
+		ThemeLoader::loadLanguageFile('Profile');
+		ThemeLoader::loadLanguageFile('UserNotifications');
 		loadJavascriptFile('jquery.multiselect.min.js');
 		theme()->addInlineJavascript('
 		$(\'.select_multiple\').multiselect({\'language_strings\': {\'Select all\': ' . JavascriptEscape($txt['notify_select_all']) . '}});', true);
@@ -1140,10 +1141,11 @@ class ManageFeatures extends AbstractController
 			),
 			'additional_rows' => array(
 				array(
-					'class' => 'submitbutton',
+					'class' => 'submitbutton flow_flex_additional_row',
 					'position' => 'below_table_data',
-					'value' => '<input type="submit" name="onoff" value="' . $txt['save'] . '" class="right_submit" />
-					<input type="submit" name="new" value="' . $txt['custom_profile_make_new'] . '" class="right_submit" />',
+					'value' => '
+						<input type="submit" name="onoff" value="' . $txt['save'] . '" />
+						<input type="submit" name="new" value="' . $txt['custom_profile_make_new'] . '" />',
 				),
 				array(
 					'position' => 'top_of_list',
@@ -1187,7 +1189,7 @@ class ManageFeatures extends AbstractController
 		// Any errors messages to show?
 		if (isset($this->_req->query->msg))
 		{
-			\ElkArte\Themes\ThemeLoader::loadLanguageFile('Errors');
+			ThemeLoader::loadLanguageFile('Errors');
 
 			if (isset($txt['custom_option_' . $this->_req->query->msg]))
 			{
@@ -1196,7 +1198,7 @@ class ManageFeatures extends AbstractController
 		}
 
 		// Load the profile language for section names.
-		\ElkArte\Themes\ThemeLoader::loadLanguageFile('Profile');
+		ThemeLoader::loadLanguageFile('Profile');
 
 		// Load up the profile field, if one was supplied
 		if ($context['fid'])
@@ -1523,7 +1525,7 @@ class ManageFeatures extends AbstractController
 		$settingsForm->setConfigVars($this->_pmSettings());
 
 		require_once(SUBSDIR . '/PersonalMessage.subs.php');
-		\ElkArte\Themes\ThemeLoader::loadLanguageFile('ManageMembers');
+		ThemeLoader::loadLanguageFile('ManageMembers');
 
 		$context['pm_limits'] = loadPMLimits();
 

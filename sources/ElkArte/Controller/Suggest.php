@@ -74,6 +74,7 @@ class Suggest extends AbstractController
 
 		// This requires the XML template
 		theme()->getTemplates()->load('Xml');
+		theme()->getLayers()->removeAll();
 
 		// Any parameters?
 		$search_param = isset($this->_req->post->search_param) ? json_decode(base64_decode($this->_req->post->search_param), true) : array();

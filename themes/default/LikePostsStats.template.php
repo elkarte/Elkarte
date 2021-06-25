@@ -24,7 +24,7 @@ function template_lp_stats()
 		</p>';
 
 	echo '
-		<ul id="adm_submenus" class="like_post_stats_menu" role="menubar">';
+		<ul id="adm_submenus" class="like_post_stats_menu" role="navigation">';
 
 	// Print out all the items in this tab.
 	foreach ($context['lp_stats_tabs'] as $tab)

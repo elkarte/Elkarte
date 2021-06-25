@@ -43,7 +43,7 @@ function template_show_calendar()
 	echo '
 				<form id="calendar_navigation" action="', getUrl('action', ['action' => 'calendar']), '" method="post" accept-charset="UTF-8">';
 
-	template_button_strip($context['calendar_buttons'], 'right');
+	template_button_strip($context['calendar_buttons'], 'floatright');
 
 	echo '
 					<select name="month">';

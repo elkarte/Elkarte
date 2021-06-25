@@ -69,7 +69,7 @@ QuickModifyTopic.prototype.modify_topic = function (topic_id, first_msg_id)
 
 	// Get the topics current subject
 	ajax_indicator(true);
-	sendXMLDocument.call(this, elk_prepareScriptUrl(elk_scripturl) + "action=quotefast;quote=" + first_msg_id + ";modify;xml", '', this.onDocReceived_modify_topic);
+	sendXMLDocument.call(this, elk_prepareScriptUrl(elk_scripturl) + "action=quotefast;quote=" + first_msg_id + ";modify;api=xml", '', this.onDocReceived_modify_topic);
 };
 
 // Callback function from the modify_topic ajax call
@@ -157,7 +157,7 @@ QuickModifyTopic.prototype.modify_topic_save = function (cur_session_id, cur_ses
 
 	// Send in the call to save the updated topic subject
 	ajax_indicator(true);
-	sendXMLDocument.call(this, elk_prepareScriptUrl(elk_scripturl) + "action=jsmodify;topic=" + parseInt(document.forms.quickModForm.elements.topic.value) + ";" + cur_session_var + "=" + cur_session_id + ";xml", x.join("&"), this.modify_topic_done);
+	sendXMLDocument.call(this, elk_prepareScriptUrl(elk_scripturl) + "action=jsmodify;topic=" + parseInt(document.forms.quickModForm.elements.topic.value) + ";" + cur_session_var + "=" + cur_session_id + ";api=xml", x.join("&"), this.modify_topic_done);
 
 	return false;
 };
@@ -297,7 +297,7 @@ QuickReply.prototype.quote = function (iMessageId, xDeprecated)
 	}
 	else
 	{
-		getXMLDocument(elk_prepareScriptUrl(this.opt.sScriptUrl) + 'action=quotefast;quote=' + iMessageId + ';xml', this.onQuoteReceived);
+		getXMLDocument(elk_prepareScriptUrl(this.opt.sScriptUrl) + 'action=quotefast;quote=' + iMessageId + ';api=xml', this.onQuoteReceived);
 	}
 
 	// Move the view to the quick reply box.
@@ -442,7 +442,7 @@ QuickModify.prototype.modifyMsg = function (iMessageId)
 
 	// Send out the XMLhttp request to get more info
 	ajax_indicator(true);
-	sendXMLDocument.call(this, elk_prepareScriptUrl(elk_scripturl) + 'action=quotefast;quote=' + iMessageId + ';modify;xml', '', this.onMessageReceived);
+	sendXMLDocument.call(this, elk_prepareScriptUrl(elk_scripturl) + 'action=quotefast;quote=' + iMessageId + ';modify;api=xml', '', this.onMessageReceived);
 };
 
 // The callback function used for the XMLhttp request retrieving the message.
@@ -622,7 +622,7 @@ QuickModify.prototype.modifySave = function (sSessionId, sSessionVar)
 
 	// Send in the XMLhttp request and let's hope for the best.
 	ajax_indicator(true);
-	sendXMLDocument.call(this, elk_prepareScriptUrl(this.opt.sScriptUrl) + "action=jsmodify;topic=" + this.opt.iTopicId + ";" + elk_session_var + "=" + elk_session_id + ";xml", x.join("&"), this.onModifyDone);
+	sendXMLDocument.call(this, elk_prepareScriptUrl(this.opt.sScriptUrl) + "action=jsmodify;topic=" + this.opt.iTopicId + ";" + elk_session_var + "=" + elk_session_id + ";api=xml", x.join("&"), this.onModifyDone);
 
 	return false;
 };
@@ -995,10 +995,13 @@ function expandThumbLB(thumbID, messageID)
 					});
 
 					// Add expand and prev/next links
-					$elk_lb_content.html($(this)).append($elk_expand_icon);
 					if (navigation.length > 1)
 					{
-						$elk_lb_content.html($(this)).append($elk_next_icon).append($elk_prev_icon);
+						$elk_lb_content.html($(this)).append($elk_expand_icon).append($elk_next_icon).append($elk_prev_icon);
+					}
+					else
+					{
+						$elk_lb_content.html($(this)).append($elk_expand_icon);
 					}
 
 					ajaxIndicatorOff();
@@ -1195,50 +1198,6 @@ function expandThumbLB(thumbID, messageID)
 }
 
 /**
- * Expands an attachment thumbnail when its clicked
- *
- * @param {string} thumbID
- */
-function expandThumb(thumbID)
-{
-	var img = document.getElementById('thumb_' + thumbID),
-		link = document.getElementById('link_' + thumbID),
-		name = link.nextSibling;
-
-	// Some browsers will add empty text so loop to the next element node
-	while (name && name.nodeType !== 1)
-	{
-		name = name.nextSibling;
-	}
-	var details = name.nextSibling;
-	while (details && details.nodeType !== 1)
-	{
-		details = details.nextSibling;
-	}
-
-	// Save the currently displayed image attributes
-	var tmp_src = img.src,
-		tmp_height = img.style.height,
-		tmp_width = img.style.width;
-
-	// Set the displayed image attributes to the link attributes, this will expand in place
-	img.src = link.href;
-	img.style.width = link.style.width;
-	img.style.height = link.style.height;
-
-	// Swap the class name on the title/desc
-	name.className = name.className.includes('_exp') ? 'attachment_name' : 'attachment_name attachment_name_exp';
-	details.className = details.className.includes('_exp') ? 'attachment_details' : 'attachment_details attachment_details_exp';
-
-	// Now place the image attributes back
-	link.href = tmp_src;
-	link.style.width = tmp_width;
-	link.style.height = tmp_height;
-
-	return false;
-}
-
-/**
  * Provides a way to toggle an ignored message(s) visibility
  *
  * @param {object} msgids
@@ -1342,7 +1301,7 @@ function sendtopicOverlayDiv(desktopURL, sHeader, sIcon)
  */
 function addRequiredElem($this_form, classname, focused)
 {
-	if (typeof (focused) === 'undefined')
+	if (typeof focused === 'undefined')
 	{
 		focused = false;
 	}
@@ -1433,7 +1392,7 @@ function sendtopicForm(oPopup_body, url, oContainer)
 		// Send it to the server to validate the input
 		$.ajax({
 			type: 'post',
-			url: url + ';api',
+			url: url + ';api=xml',
 			data: data
 		})
 			.done(function (request)
@@ -1512,7 +1471,7 @@ function sendtopicForm(oPopup_body, url, oContainer)
  */
 function topicSplitselect(direction, msg_id)
 {
-	getXMLDocument(elk_prepareScriptUrl(elk_scripturl) + "action=splittopics;sa=selectTopics;subname=" + topic_subject + ";topic=" + topic_id + "." + start[0] + ";start2=" + start[1] + ";move=" + direction + ";msg=" + msg_id + ";xml", onTopicSplitReceived);
+	getXMLDocument(elk_prepareScriptUrl(elk_scripturl) + "action=splittopics;sa=selectTopics;subname=" + topic_subject + ";topic=" + topic_id + "." + start[0] + ";start2=" + start[1] + ";move=" + direction + ";msg=" + msg_id + ";api=xml", onTopicSplitReceived);
 	return false;
 }
 

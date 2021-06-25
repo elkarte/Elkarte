@@ -1,5 +1,5 @@
 <?php
-// Version: 1.1; ManageMembers
+// Version: 2.0; ManageMembers
 
 $txt['groups'] = 'Groups';
 $txt['viewing_groups'] = 'Viewing Membergroups';

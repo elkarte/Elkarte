@@ -404,6 +404,7 @@ class ManagePaid extends AbstractController
 			'additional_rows' => array(
 				array(
 					'position' => 'below_table_data',
+					'class' => 'flow_flex_additional_row',
 					'value' => '<input type="submit" name="add" value="' . $txt['paid_add_subscription'] . '" class="right_submit" />',
 				),
 			),

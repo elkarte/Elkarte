@@ -1,6 +1,7 @@
 a:link, a:hover, a:visited {
 	text-decoration: underline;
 }
+
 /* These divisions wrap the forum sections when a forum width is set. */
 #wrapper, .frame {
 	width: 90%;
@@ -17,8 +18,9 @@ h1.forumtitle {
 	margin: 0;
 	padding: 35px 0 0 15px;
 	color: #4B863C;
-	text-shadow: -1px -1px 0 rgba(0,0,0,0.5), 1px 1px 0 #FFFFFF;
+	text-shadow: -1px -1px 0 rgba(0, 0, 0, 0.5), 1px 1px 0 #FFFFFF;
 }
+
 /* Tweak the logo */
 img#logo {
 	margin: 12px 12px 0 0;
@@ -159,6 +161,7 @@ img#logo {
 .panel .errorbox {
 	font-size: 1.15em;
 }
+
 /* [WIP] Warning: this next bit may cause trouble. .. confirmed, it does :P */
 /* It's just to hide an empty div when the submits are not shown.
 .panel .clear:nth-child(4) {
@@ -174,7 +177,7 @@ img#logo {
 	border-radius: 5px;
 	/* [WIP] */
 	background: /*#f0f4f7*/ #FCFCFC;
-	box-shadow: 0 -2px 2px rgba(0,0,0,0.1);
+	box-shadow: 0 -2px 2px rgba(0, 0, 0, 0.1);
 	/* End [WIP] */
 }
 

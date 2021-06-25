@@ -706,7 +706,7 @@ function template_group_members()
 				</tbody>
 			</table>';
 
-			template_pagesection(false, '', array('extra' => '<div class="floatright"><input type="submit" name="remove" value="' . $txt['membergroups_members_remove'] . '" /></div>'));
+			template_pagesection(false, '', array('extra' => '<div class="flow_flex_right"><input type="submit" name="remove" value="' . $txt['membergroups_members_remove'] . '" /></div>'));
 
 	if (!empty($context['group']['assignable']))
 	{

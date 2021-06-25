@@ -191,7 +191,7 @@ function template_callback_badbehavior_add_ip()
 			<dt id="add_more_ip_placeholder" class="hide"></dt>
 			<dd></dd>
 			<dt id="add_more_ip_div">
-				<a href="#" onclick="addAnotherOption(sIpParent, oIpOptionsdt, oIpOptionsdd); return false;" class="linkbutton_left">', $txt['badbehavior_ip_wl_add'], '</a>
+				<a href="#" onclick="addAnotherOption(sIpParent, oIpOptionsdt, oIpOptionsdd); return false;" class="linkbutton floatleft">', $txt['badbehavior_ip_wl_add'], '</a>
 			</dt>
 			<dd></dd>';
 }
@@ -247,7 +247,7 @@ function template_callback_badbehavior_add_url()
 			<dt id="add_more_url_placeholder" class="hide"></dt>
 			<dd></dd>
 			<dt id="add_more_url_div">
-				<a href="#" onclick="addAnotherOption(sUrlParent, oUrlOptionsdt, oUrlOptionsdd); return false;" class="linkbutton_left">', $txt['badbehavior_url_wl_add'], '</a>
+				<a href="#" onclick="addAnotherOption(sUrlParent, oUrlOptionsdt, oUrlOptionsdd); return false;" class="linkbutton floatleft">', $txt['badbehavior_url_wl_add'], '</a>
 			</dt>
 			<dd></dd>';
 }
@@ -304,7 +304,7 @@ function template_callback_badbehavior_add_useragent()
 			<dt id="add_more_useragent_placeholder" class="hide"></dt>
 			<dd></dd>
 			<dt id="add_more_useragent_div">
-				<a href="#" onclick="addAnotherOption(sUseragentParent, oUseragentOptionsdt, oUseragentOptionsdd); return false;" class="linkbutton_left">', $txt['badbehavior_useragent_wl_add'], '</a>
+				<a href="#" onclick="addAnotherOption(sUseragentParent, oUseragentOptionsdt, oUseragentOptionsdd); return false;" class="linkbutton floatleft">', $txt['badbehavior_useragent_wl_add'], '</a>
 			</dt>
 			<dd></dd>';
 }

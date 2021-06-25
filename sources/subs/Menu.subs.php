@@ -14,7 +14,6 @@
  *
  */
 
-use ElkArte\HttpReq;
 use ElkArte\User;
 use ElkArte\Action;
 use ElkArte\Menu\Menu;
@@ -367,8 +366,6 @@ function loadDefaultMenuButtons()
 				),
 			),
 		),
-		// @todo Look at doing something here, to provide instant access to inbox when using click menus.
-		// @todo A small pop-up anchor seems like the obvious way to handle it. ;)
 		'pm' => array(
 			'title' => $txt['pm_short'],
 			'counter' => 'unread_messages',

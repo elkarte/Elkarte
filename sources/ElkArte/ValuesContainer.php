@@ -166,7 +166,7 @@ class ValuesContainer implements \ArrayAccess
 	 */
 	public function offsetGet($offset)
 	{
-		return isset($this->data[$offset]) ? $this->data[$offset] : null;
+		return $this->data[$offset] ?? null;
 	}
 
 	/**

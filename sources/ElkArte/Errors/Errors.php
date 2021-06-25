@@ -21,6 +21,7 @@ namespace ElkArte\Errors;
 use ElkArte\AbstractModel;
 use ElkArte\Cache\Cache;
 use ElkArte\Exceptions\Exception;
+use ElkArte\Http\Headers;
 use ElkArte\Themes\ThemeLoader;
 use ElkArte\User;
 
@@ -333,7 +334,7 @@ class Errors extends AbstractModel
 	private function _set_fatal_error_headers()
 	{
 		// Don't cache this page!
-		\ElkArte\Http\Headers::instance()
+		Headers::instance()
 			->httpCode(503)
 			->header('Expires', 'Mon, 26 Jul 1997 05:00:00 GMT')
 			->header('Last-Modified', gmdate('D, d M Y H:i:s') . ' GMT')
@@ -533,11 +534,11 @@ class Errors extends AbstractModel
 			global $modSettings;
 
 			// Who knew dying took this much effort
-			$context['linktree'] = isset($context['linktree']) ? $context['linktree'] : array();
+			$context['linktree'] = $context['linktree'] ?? array();
 			User::load(true);
 
-			$_SESSION['session_var'] = isset($_SESSION['session_var']) ? $_SESSION['session_var'] : '';
-			$_SESSION['session_value'] = isset($_SESSION['session_value'] ) ? $_SESSION['session_value'] : '';
+			$_SESSION['session_var'] = $_SESSION['session_var'] ?? '';
+			$_SESSION['session_value'] = $_SESSION['session_value'] ?? '';
 			new ThemeLoader();
 
 			// Here lies elkarte, dead from a program error. Just a cryptic message, no output could be better.
@@ -549,8 +550,8 @@ class Errors extends AbstractModel
 		$context['robot_no_index'] = true;
 
 		// A little something for the template
-		$context['error_title'] = isset($context['error_title']) ? $context['error_title'] : $txt['error_occurred'];
-		$context['error_message'] = isset($context['error_message']) ? $context['error_message'] : $error_message;
+		$context['error_title'] = $context['error_title'] ?? $txt['error_occurred'];
+		$context['error_message'] = $context['error_message'] ?? $error_message;
 		$context['error_code'] = isset($error_code) ? 'id="' . htmlspecialchars($error_code) . '" ' : '';
 		$context['page_title'] = empty($context['page_title']) ? $context['error_title'] : $context['page_title'];
 

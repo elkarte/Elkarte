@@ -1,5 +1,5 @@
 <?php
-// Version: 1.1; Post
+// Version: 2.0; Post
 
 $txt['post_reply'] = 'Post reply';
 $txt['post_in_board'] = 'Post in the board';

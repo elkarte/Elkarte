@@ -21,6 +21,7 @@ use ElkArte\AbstractController;
 use ElkArte\Cache\Cache;
 use ElkArte\Exceptions\Exception;
 use ElkArte\MembersList;
+use ElkArte\Themes\ThemeLoader;
 use ElkArte\Util;
 
 /**
@@ -101,7 +102,7 @@ class News extends AbstractController
 			obExit(false);
 		}
 
-		\ElkArte\Themes\ThemeLoader::loadLanguageFile('Stats');
+		ThemeLoader::loadLanguageFile('Stats');
 		$txt['xml_rss_desc'] = replaceBasicActionUrl($txt['xml_rss_desc']);
 
 		// Default to latest 5.  No more than whats defined in the ACP or 255
@@ -275,7 +276,7 @@ class News extends AbstractController
 		}
 		elseif ($xml_format === 'rdf')
 		{
-			$headers->contentType('application/rdf+xml','UTF-8');
+			$headers->contentType('application/rdf+xml', 'UTF-8');
 		}
 
 		theme()->getTemplates()->load('Xml');

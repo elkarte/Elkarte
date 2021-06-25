@@ -381,7 +381,7 @@ class ManageScheduledTasks extends AbstractController
 			'items_per_page' => 30,
 			'title' => $txt['scheduled_log'],
 			'no_items_label' => $txt['scheduled_log_empty'],
-			'base_href' => $context['admin_area'] === 'scheduledtasks' ? getUrl('admin', ['action' => 'admin', 'area' => 'scheduledtasks', 'sa' => 'tasklog']) :getUrl('admin', ['action' => 'admin', 'area' => 'logs', 'sa' => 'tasklog']),
+			'base_href' => $context['admin_area'] === 'scheduledtasks' ? getUrl('admin', ['action' => 'admin', 'area' => 'scheduledtasks', 'sa' => 'tasklog']) : getUrl('admin', ['action' => 'admin', 'area' => 'logs', 'sa' => 'tasklog']),
 			'default_sort_col' => 'date',
 			'get_items' => array(
 				'function' => function ($start, $items_per_page, $sort) {

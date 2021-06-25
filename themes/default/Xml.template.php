@@ -19,7 +19,7 @@ function template_quotefast()
 {
 	global $context;
 
-	echo '<', '?xml version="1.0" encoding="UTF-8"?', '>
+	echo '<?xml version="1.0" encoding="UTF-8"?>
 <elk>
 	<quote>', cleanXml($context['quote']['xml']), '</quote>
 </elk>';
@@ -32,7 +32,7 @@ function template_modifyfast()
 {
 	global $context;
 
-	echo '<', '?xml version="1.0" encoding="UTF-8"?', '>
+	echo '<?xml version="1.0" encoding="UTF-8"?>
 <elk>
 	<subject><![CDATA[', cleanXml($context['message']['subject']), ']]></subject>
 	<message id="msg_', $context['message']['id'], '"><![CDATA[', cleanXml($context['message']['body']), ']]></message>
@@ -46,7 +46,7 @@ function template_modifydone()
 {
 	global $context, $txt;
 
-	echo '<', '?xml version="1.0" encoding="UTF-8"?', '>
+	echo '<?xml version="1.0" encoding="UTF-8"?>
 <elk>
 	<message id="msg_', $context['message']['id'], '">';
 	if (empty($context['message']['errors']))
@@ -74,7 +74,7 @@ function template_modifytopicdone()
 {
 	global $context, $txt;
 
-	echo '<', '?xml version="1.0" encoding="UTF-8"?', '>
+	echo '<?xml version="1.0" encoding="UTF-8"?>
 <elk>
 	<message id="msg_', $context['message']['id'], '">';
 	if (empty($context['message']['errors']))
@@ -104,7 +104,7 @@ function template_post()
 {
 	global $context;
 
-	echo '<', '?xml version="1.0" encoding="UTF-8"?', '>
+	echo '<?xml version="1.0" encoding="UTF-8"?>
 <elk>
 	<preview>
 		<subject><![CDATA[', $context['preview_subject'], ']]></subject>
@@ -159,7 +159,7 @@ function template_generic_preview()
 {
 	global $context, $txt;
 
-	echo '<', '?xml version="1.0" encoding="UTF-8"?', '>
+	echo '<?xml version="1.0" encoding="UTF-8"?>
 <elk>
 	<preview>
 		<subject><![CDATA[', empty($context['preview_subject']) ? $txt['not_applicable'] : $context['preview_subject'], ']]></subject>
@@ -196,7 +196,7 @@ function template_stats()
 {
 	global $context, $modSettings;
 
-	echo '<', '?xml version="1.0" encoding="UTF-8"?', '>
+	echo '<?xml version="1.0" encoding="UTF-8"?>
 <elk>';
 	foreach ($context['yearly'] as $year)
 	{
@@ -224,7 +224,7 @@ function template_split()
 {
 	global $context;
 
-	echo '<', '?xml version="1.0" encoding="UTF-8"?', '>
+	echo '<?xml version="1.0" encoding="UTF-8"?>
 <elk>
 	<pageIndex section="not_selected" startFrom="', $context['not_selected']['start'], '"><![CDATA[', $context['not_selected']['page_index'], ']]></pageIndex>
 	<pageIndex section="selected" startFrom="', $context['selected']['start'], '"><![CDATA[', $context['selected']['page_index'], ']]></pageIndex>';
@@ -257,7 +257,7 @@ function template_split()
 function template_results()
 {
 	global $context, $txt;
-	echo '<', '?xml version="1.0" encoding="UTF-8"?', '>
+	echo '<?xml version="1.0" encoding="UTF-8"?>
 <elk>';
 
 	if (empty($context['topics']))
@@ -327,7 +327,7 @@ function template_jump_to()
 {
 	global $context;
 
-	echo '<', '?xml version="1.0" encoding="UTF-8"?', '>
+	echo '<?xml version="1.0" encoding="UTF-8"?>
 <elk>';
 
 	foreach ($context['categories'] as $category)
@@ -352,7 +352,7 @@ function template_message_icons()
 {
 	global $context;
 
-	echo '<', '?xml version="1.0" encoding="UTF-8"?', '>
+	echo '<?xml version="1.0" encoding="UTF-8"?>
 <elk>';
 
 	foreach ($context['icons'] as $icon)
@@ -372,7 +372,7 @@ function template_check_username()
 {
 	global $context;
 
-	echo '<', '?xml version="1.0" encoding="UTF-8"?', '>
+	echo '<?xml version="1.0" encoding="UTF-8"?>
 <elk>
 	<username valid="', $context['valid_username'] ? 1 : 0, '">', cleanXml($context['checked_username']), '</username>
 </elk>';
@@ -387,7 +387,7 @@ function template_generic_xml_buttons()
 
 	$tag = empty($context['xml_data']['error']) ? 'button' : 'error';
 
-	echo '<', '?xml version="1.0" encoding="UTF-8"?', '>
+	echo '<?xml version="1.0" encoding="UTF-8"?>
 <elk>
 	<', $tag, '>';
 
@@ -412,7 +412,7 @@ function template_generic_xml()
 {
 	global $context;
 
-	echo '<', '?xml version="1.0" encoding="UTF-8"?', '>';
+	echo '<?xml version="1.0" encoding="UTF-8"?>';
 
 	// Show the data.
 	template_generic_xml_recursive($context['xml_data'], 'elk', '', -1);
@@ -642,7 +642,7 @@ function template_xml_draft()
 {
 	global $context, $txt;
 
-	echo '<', '?xml version="1.0" encoding="UTF-8"?', '>
+	echo '<?xml version="1.0" encoding="UTF-8"?>
 <drafts>
 	<draft id="', $context['id_draft'], '"><![CDATA[', $txt['draft_saved_on'], ': ', standardTime($context['draft_saved_on']), ']]></draft>
 </drafts>';

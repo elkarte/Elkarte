@@ -40,7 +40,6 @@ function elk_PersonalMessageSend(oOptions)
 	this.oBccDiv2 = null;
 	this.oToAutoSuggest = null;
 	this.oBccAutoSuggest = null;
-	this.oToListContainer = null;
 	this.init();
 }
 
@@ -56,7 +55,8 @@ elk_PersonalMessageSend.prototype.init = function ()
 		this.oBccDiv2.style.display = 'none';
 
 		// Show the link to bet the BCC control back.
-		var oBccLinkContainer = document.getElementById(this.opt.sBccLinkContainerId);
+		let oBccLinkContainer = document.getElementById(this.opt.sBccLinkContainerId);
+
 		oBccLinkContainer.style.display = 'inline';
 		oBccLinkContainer.innerHTML = this.opt.sShowBccLinkTemplate;
 
@@ -69,7 +69,6 @@ elk_PersonalMessageSend.prototype.init = function ()
 		}.bind(this);
 	}
 
-	var oToControl = document.getElementById(this.opt.sToControlId);
 	this.oToAutoSuggest = new smc_AutoSuggest({
 		sSessionId: this.opt.sSessionId,
 		sSessionVar: this.opt.sSessionVar,

@@ -16,6 +16,7 @@ namespace ElkArte\AdminController;
 
 use ElkArte\AbstractController;
 use ElkArte\MembersList;
+use ElkArte\Themes\ThemeLoader;
 
 /**
  * Class to show a list of all badbehavior log entries
@@ -52,7 +53,7 @@ class BadBehavior extends AbstractController
 		isAllowedTo('admin_forum');
 
 		// Templates, etc...
-		\ElkArte\Themes\ThemeLoader::loadLanguageFile('BadBehaviorlog');
+		ThemeLoader::loadLanguageFile('BadBehaviorlog');
 		theme()->getTemplates()->load('BadBehavior');
 
 		// Functions we will need

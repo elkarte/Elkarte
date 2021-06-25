@@ -42,6 +42,9 @@ $(function ()
 function start_tabs()
 {
 	$("#tabs").tabs({
+		ajaxOptions: {
+			dataType: "xml",
+		},
 		// Called before tab content is loaded with href
 		beforeLoad: function (event, ui)
 		{
@@ -49,13 +52,13 @@ function start_tabs()
 			ui.panel.html('<div class="centertext"><i class="icon icon-spin icon-big i-spinner"></i></div>');
 
 			// Ajax call failed to retrieve content
-			ui.jqXHR.fail(function ()
+			ui.jqXHR.fail(function (jqXHR, textStatus, errorThrown)
 			{
 				ui.panel.html('<div></div>');
 				if ('console' in window)
 				{
-					window.console.info(event);
-					window.console.info(ui);
+					window.console.info(textStatus);
+					window.console.info(errorThrown);
 				}
 			});
 		}
@@ -156,7 +159,7 @@ function ajax_getSignaturePreview(showPreview)
 	showPreview = (typeof showPreview === 'undefined') ? false : showPreview;
 	$.ajax({
 		type: "POST",
-		url: elk_scripturl + "?action=xmlpreview;xml",
+		url: elk_scripturl + "?action=xmlpreview;api=xml",
 		data: {item: "sig_preview", signature: $("#signature").val(), user: $('input[name="u"]').attr("value")},
 		context: document.body
 	})
@@ -376,7 +379,7 @@ function modifyWarnNotify()
 	{
 		$.ajax({
 			type: "POST",
-			url: elk_scripturl + "?action=xmlpreview;xml",
+			url: elk_scripturl + "?action=xmlpreview;api=xml",
 			data: {
 				item: "warning_preview",
 				title: $("#warn_sub").val(),

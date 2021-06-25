@@ -22,8 +22,6 @@ function template_PersonalMessage_init()
 
 /**
  * This is the main sidebar for the personal messages section.
- *
- * @todo - Started markup clean up in this template. More stuffz to check later.
  */
 function template_pm_above()
 {
@@ -32,23 +30,23 @@ function template_pm_above()
 	// The every helpful javascript!
 	echo '
 					<script>
-						var allLabels = {},
+						let allLabels = {},
 							currentLabels = {},
 							txt_pm_msg_label_remove = "', $txt['pm_msg_label_remove'], '",
 							txt_pm_msg_label_apply = "', $txt['pm_msg_label_apply'], '";
 					</script>
-					<div id="personal_messages">';
+					<section id="personal_messages">';
 
-	// Show the capacity bar, if available. @todo - This needs work.
+	// Show the capacity bar, if available.
 	if (!empty($context['limit_bar']))
 	{
 		echo '
-						<h2 class="category_header">
-							<span class="floatleft">', $txt['pm_capacity'], ':</span>
-							<span class="floatleft capacity_bar">
+						<h2 class="category_header flow_flex">
+							<span>', $txt['pm_capacity'], ':</span>
+							<span class="capacity_bar">
 								<span class="', $context['limit_bar']['percent'] > 85 ? 'full' : ($context['limit_bar']['percent'] > 40 ? 'filled' : 'empty'), '" style="width: ', $context['limit_bar']['percent'] / 10, 'em;"></span>
 							</span>
-							<span class="floatright', $context['limit_bar']['percent'] > 90 ? ' alert' : '', '">', $context['limit_bar']['text'], '</span>
+							<span class="flow_flex_right', $context['limit_bar']['percent'] > 90 ? ' alert' : '', '">', $context['limit_bar']['text'], '</span>
 						</h2>';
 	}
 
@@ -56,9 +54,9 @@ function template_pm_above()
 	if (isset($context['pm_sent']))
 	{
 		echo '
-						<div class="successbox">
+						<aside class="successbox">
 							', $txt['pm_sent'], '
-						</div>';
+						</aside>';
 	}
 
 	if (!empty($context['pm_form_url']))
@@ -78,7 +76,7 @@ function template_pm_below()
 	echo '
 							<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />', !empty($context['pm_form_url']) ? '
 						</form>' : '', '
-					</div>';
+					</section>';
 }
 
 /**
@@ -112,13 +110,15 @@ function template_folder()
 
 		echo '
 						<a class="pm_anchor" id="msg_', $message['id'], '"></a>
-						<div class="forumposts">';
+						<article class="post_wrapper forumposts">';
 
 		// Showing the sidebar posting area?
 		if (empty($options['hide_poster_area']))
 		{
 			echo '
-							<ul class="poster">', template_build_poster_div($message), '</ul>';
+							<aside>
+								<ul class="poster">', template_build_poster_div($message), '</ul>
+							</aside>';
 		}
 
 		echo '
@@ -168,47 +168,48 @@ function template_folder()
 
 		// Done with the information about the poster... on to the post itself.
 		echo '
-								<div class="inner">', $message['body'], '</div>';
+								<div class="messageContent">', $message['body'], '</div>';
 
 		// Show our quick buttons like quote and reply
 		echo '
-								<ul class="quickbuttons">';
+								<nav>
+									<ul class="quickbuttons no_js">';
 
 		// Showing all then give a remove item checkbox
 		if (empty($context['display_mode']))
 		{
 			echo '
-									<li class="listlevel1 quickmod_check">
-										<input type="checkbox" name="pms[]" id="deletedisplay', $message['id'], '" value="', $message['id'], '" onclick="document.getElementById(\'deletelisting', $message['id'], '\').checked = this.checked;" />
-									</li>';
+										<li class="listlevel1 quickmod_check">
+											<input type="checkbox" name="pms[]" id="deletedisplay', $message['id'], '" value="', $message['id'], '" onclick="document.getElementById(\'deletelisting', $message['id'], '\').checked = this.checked;" />
+										</li>';
 		}
 
 		// Maybe there is something...more :P (this is the more button)
 		if (!empty($context['additional_pm_drop_buttons']))
 		{
 			echo '
-									<li class="listlevel1 subsections" aria-haspopup="true">
-										<a class="linklevel1 post_options">', $txt['post_options'], '</a>
-										<ul class="menulevel2">';
+										<li class="listlevel1 subsections" aria-haspopup="true">
+											<a class="linklevel1 post_options">', $txt['post_options'], '</a>
+											<ul class="menulevel2">';
 
 			foreach ($context['additional_pm_drop_buttons'] as $key => $button)
 			{
 				echo '
-											<li class="listlevel2">
-												<a href="' . $button['href'] . '" class="linklevel2 ', $key, '">' . $button['text'] . '</a>
-											</li>';
+												<li class="listlevel2">
+													<a href="' . $button['href'] . '" class="linklevel2 ', $key, '">' . $button['text'] . '</a>
+												</li>';
 			}
 
 			echo '
-										</ul>
-									</li>';
+											</ul>
+										</li>';
 		}
 
 		// Remove is always an option
 		echo '
-									<li class="listlevel1">
-										<a href="', $scripturl, '?action=pm;sa=pmactions;pm_actions%5B', $message['id'], '%5D=delete;f=', $context['folder'], ';start=', $context['start'], $context['current_label_id'] != -1 ? ';l=' . $context['current_label_id'] : '', ';', $context['session_var'], '=', $context['session_id'], '" onclick="return confirm(\'', addslashes($txt['remove_message']), '?\');" class="linklevel1 remove_button">', $txt['delete'], '</a>
-									</li>';
+										<li class="listlevel1">
+											<a href="', $scripturl, '?action=pm;sa=pmactions;pm_actions%5B', $message['id'], '%5D=delete;f=', $context['folder'], ';start=', $context['start'], $context['current_label_id'] != -1 ? ';l=' . $context['current_label_id'] : '', ';', $context['session_var'], '=', $context['session_id'], '" onclick="return confirm(\'', addslashes($txt['remove_message']), '?\');" class="linklevel1 remove_button">', $txt['delete'], '</a>
+										</li>';
 
 		// Show reply buttons if you have the permission to send PMs.
 		if ($context['can_send_pm'])
@@ -220,25 +221,25 @@ function template_folder()
 				if ($message['number_recipients'] > 1)
 				{
 					echo '
-									<li class="listlevel1">
-										<a href="', $scripturl, '?action=pm;sa=send;f=', $context['folder'], $context['current_label_id'] != -1 ? ';l=' . $context['current_label_id'] : '', ';pmsg=', $message['id'], ';quote;u=all" class="linklevel1 reply_all_button">', $txt['reply_to_all'], '</a></li>';
+										<li class="listlevel1">
+											<a href="', $scripturl, '?action=pm;sa=send;f=', $context['folder'], $context['current_label_id'] != -1 ? ';l=' . $context['current_label_id'] : '', ';pmsg=', $message['id'], ';quote;u=all" class="linklevel1 reply_all_button">', $txt['reply_to_all'], '</a></li>';
 				}
 
 				echo '
-									<li class="listlevel1">
-										<a href="', $scripturl, '?action=pm;sa=send;f=', $context['folder'], $context['current_label_id'] != -1 ? ';l=' . $context['current_label_id'] : '', ';pmsg=', $message['id'], ';u=', $message['member']['id'], '" class="linklevel1 reply_button">', $txt['reply'], '</a>
-									</li>
-									<li class="listlevel1">
-										<a href="', $scripturl, '?action=pm;sa=send;f=', $context['folder'], $context['current_label_id'] != -1 ? ';l=' . $context['current_label_id'] : '', ';pmsg=', $message['id'], ';quote', $context['folder'] == 'sent' ? '' : ';u=' . $message['member']['id'], '" class="linklevel1 quote_button">', $txt['quote'], '</a>
-									</li>';
+										<li class="listlevel1">
+											<a href="', $scripturl, '?action=pm;sa=send;f=', $context['folder'], $context['current_label_id'] != -1 ? ';l=' . $context['current_label_id'] : '', ';pmsg=', $message['id'], ';u=', $message['member']['id'], '" class="linklevel1 reply_button">', $txt['reply'], '</a>
+										</li>
+										<li class="listlevel1">
+											<a href="', $scripturl, '?action=pm;sa=send;f=', $context['folder'], $context['current_label_id'] != -1 ? ';l=' . $context['current_label_id'] : '', ';pmsg=', $message['id'], ';quote', $context['folder'] == 'sent' ? '' : ';u=' . $message['member']['id'], '" class="linklevel1 quote_button">', $txt['quote'], '</a>
+										</li>';
 			}
 			// This is for "forwarding" - even if the member is gone.
 			else
 			{
 				echo '
-									<li class="listlevel1">
-										<a href="', $scripturl, '?action=pm;sa=send;f=', $context['folder'], $context['current_label_id'] != -1 ? ';l=' . $context['current_label_id'] : '', ';pmsg=', $message['id'], ';quote" class="linklevel1 quote_button">', $txt['reply_quote'], '</a>
-									</li>';
+										<li class="listlevel1">
+											<a href="', $scripturl, '?action=pm;sa=send;f=', $context['folder'], $context['current_label_id'] != -1 ? ';l=' . $context['current_label_id'] : '', ';pmsg=', $message['id'], ';quote" class="linklevel1 quote_button">', $txt['reply_quote'], '</a>
+										</li>';
 			}
 		}
 
@@ -248,14 +249,15 @@ function template_folder()
 			foreach ($context['additional_quick_pm_buttons'] as $key => $button)
 			{
 				echo '
-									<li class="listlevel1">
-										<a href="' . $button['href'] . '" class="linklevel1 ', $key, '">' . $button['text'] . '</a>
-									</li>';
+										<li class="listlevel1">
+											<a href="' . $button['href'] . '" class="linklevel1 ', $key, '">' . $button['text'] . '</a>
+										</li>';
 			}
 		}
 
 		echo '
-								</ul>';
+									</ul>
+								</nav>';
 
 		// Add a selection box if we have labels enabled.
 		if ($context['folder'] !== 'sent' && !empty($context['currently_using_labels']) && $context['display_mode'] != 2)
@@ -352,7 +354,7 @@ function template_folder()
 
 		echo '
 							</div>
-						</div>';
+						</article>';
 	}
 
 	echo '
@@ -387,7 +389,7 @@ function template_pm_pages_and_buttons_below()
 
 	if (empty($context['display_mode']))
 	{
-		template_pagesection(false, '', array('extra' => '<input type="submit" name="del_selected" value="' . $txt['quickmod_delete_selected'] . '" style="font-weight: normal;" onclick="if (!confirm(\'' . $txt['delete_selected_confirm'] . '\')) return false;" class="right_submit" />'));
+		template_pagesection(false, '', array('extra' => '<span class="flow_flex_right"><input type="submit" name="del_selected" value="' . $txt['quickmod_delete_selected'] . '" style="font-weight: normal;" onclick="if (!confirm(\'' . $txt['delete_selected_confirm'] . '\')) return false;" /></span>'));
 	}
 	// Show a few buttons if we are in conversation mode and outputting the first message.
 	elseif ($context['display_mode'] == 2 && isset($context['conversation_buttons']))
@@ -410,7 +412,7 @@ function template_subject_list_above()
 		template_subject_list();
 
 		echo '
-					<hr class="clear" />';
+					<hr class="new_post_separator" />';
 	}
 }
 
@@ -439,12 +441,12 @@ function template_subject_list()
 					<table class="table_grid">
 						<thead>
 							<tr class="table_head">
-								<th class="pm_icon">
+								<th class="pm_icon grid8">
 									<a href="', $scripturl, '?action=pm;view;f=', $context['folder'], ';start=', $context['start'], ';sort=', $context['sort_by'], ($context['sort_direction'] === 'up' ? ';asc' : ';desc'), ($context['current_label_id'] != -1 ? ';l=' . $context['current_label_id'] : ''), '">
 										<i class="icon i-shuffle" title="', $txt['pm_change_view'], '"><s>', $txt['pm_change_view'], '</s></i>
 									</a>
 								</th>
-								<th class="pm_date">
+								<th class="pm_date grid17">
 									<a href="', $scripturl, '?action=pm;f=', $context['folder'], ';start=', $context['start'], ';sort=date', ($context['sort_by'] === 'date' && $context['sort_direction'] === 'up' ? ';desc' : ';asc'), $context['current_label_id'] != -1 ? ';l=' . $context['current_label_id'] : '', '">
 										', $txt['date'], $context['sort_by'] === 'date' ? ' <i class="icon icon-small i-sort-numeric-' . $context['sort_direction'] . '"></i>' : '', '
 									</a>
@@ -454,12 +456,12 @@ function template_subject_list()
 										', $txt['subject'], $context['sort_by'] === 'subject' ? ' <i class="icon icon-small i-sort-alpha-' . $context['sort_direction'] . '"></i>' : '', '
 									</a>
 								</th>
-								<th class="pm_from">
+								<th class="pm_from grid20">
 									<a href="', $scripturl, '?action=pm;f=', $context['folder'], ';start=', $context['start'], ';sort=name', ($context['sort_by'] === 'name' && $context['sort_direction'] === 'up' ? ';desc' : ';asc'), $context['current_label_id'] != -1 ? ';l=' . $context['current_label_id'] : '', '">
 										', ($context['from_or_to'] === 'from' ? $txt['from'] : $txt['to']), $context['sort_by'] === 'name' ? ' <i class="icon icon-small i-sort-alpha-' . $context['sort_direction'] . '"></i>' : '', '
 									</a>
 								</th>
-								<th class="pm_quickmod">
+								<th class="pm_quickmod grid4">
 									<input type="checkbox" onclick="invertAll(this, this.form);" />
 								</th>
 							</tr>
@@ -582,7 +584,7 @@ function template_search()
 	global $context, $scripturl, $txt;
 
 	echo '
-	<form id="searchform" action="', $scripturl, '?action=pm;sa=search2" method="post" accept-charset="UTF-8" name="searchform" >
+	<form id="searchform" action="', $scripturl, '?action=pm;sa=search2" method="post" accept-charset="UTF-8" role="search" name="searchform" >
 		<h2 class="category_header">', $txt['pm_search_title'], '</h2>';
 
 	// Any search errors we need to let them know about
@@ -686,7 +688,8 @@ function template_search()
 				</ul>
 			</div>
 			<div class="submitbuttons">
-				<input type="checkbox" name="all" id="check_all" value="" ', $context['check_all'] ? 'checked="checked"' : '', ' onclick="invertAll(this, this.form, \'searchlabel\');" /><em> <label for="check_all">', $txt['check_all'], '</label></em>
+				<input type="checkbox" name="all" id="check_all" value="" ', $context['check_all'] ? 'checked="checked"' : '', ' onclick="invertAll(this, this.form, \'searchlabel\');" />
+ 				<em> <label for="check_all">', $txt['check_all'], '</label></em>
 			</div>
 		</fieldset>';
 
@@ -818,7 +821,10 @@ function template_search_results()
 				<li class="basic_row">
 					<div class="topic_details">
 						<div class="counter">', $message['counter'], '</div>
-						<h5><a href="', $message['href'], '">', $message['subject'], '</a>&nbsp;<span class="smalltext">&#171;&nbsp;', $txt['search_on'], ': ', $message['time'], '&nbsp;&#187;</h5>
+						<h5>
+							<a href="', $message['href'], '">', $message['subject'], '</a>
+							<span class="smalltext"> ', $txt['search_on'], ': ', $message['time'], '
+						</h5>
 						<span class="smalltext">', $txt['from'], ': ', $message['member']['link'], ', ', $txt['to'], ': ';
 
 			// Show the recipients.
@@ -843,27 +849,29 @@ function template_search_results()
 			if ($context['can_send_pm'])
 			{
 				echo '
-					<ul class="quickbuttons">';
+					<nav>
+						<ul class="quickbuttons">';
 
 				// You can only reply if they are not a guest...
 				if (!$message['member']['is_guest'])
 				{
 					echo '
-						<li class="listlevel1"><a class="linklevel1 reply_button" href="', $scripturl, '?action=pm;sa=send;f=', $context['folder'], $context['current_label_id'] != -1 ? ';l=' . $context['current_label_id'] : '', ';pmsg=', $message['id'], ';u=', $message['member']['id'], '">', $txt['reply'], '</a></li>
-						<li class="listlevel1"><a class="linklevel1 quote_button" href="', $scripturl, '?action=pm;sa=send;f=', $context['folder'], $context['current_label_id'] != -1 ? ';l=' . $context['current_label_id'] : '', ';pmsg=', $message['id'], ';quote;u=', $context['folder'] == 'sent' ? '' : $message['member']['id'], '">', $txt['quote'], '</a></li>';
+							<li class="listlevel1"><a class="linklevel1 reply_button" href="', $scripturl, '?action=pm;sa=send;f=', $context['folder'], $context['current_label_id'] != -1 ? ';l=' . $context['current_label_id'] : '', ';pmsg=', $message['id'], ';u=', $message['member']['id'], '">', $txt['reply'], '</a></li>
+							<li class="listlevel1"><a class="linklevel1 quote_button" href="', $scripturl, '?action=pm;sa=send;f=', $context['folder'], $context['current_label_id'] != -1 ? ';l=' . $context['current_label_id'] : '', ';pmsg=', $message['id'], ';quote;u=', $context['folder'] == 'sent' ? '' : $message['member']['id'], '">', $txt['quote'], '</a></li>';
 				}
 				// This is for "forwarding" - even if the member is gone.
 				else
 				{
 					echo '
-						<li class="listlevel1"><a class="linklevel1 quote_button" href="', $scripturl, '?action=pm;sa=send;f=', $context['folder'], $context['current_label_id'] != -1 ? ';l=' . $context['current_label_id'] : '', ';pmsg=', $message['id'], ';quote">', $txt['quote'], '</a></li>';
+							<li class="listlevel1"><a class="linklevel1 quote_button" href="', $scripturl, '?action=pm;sa=send;f=', $context['folder'], $context['current_label_id'] != -1 ? ';l=' . $context['current_label_id'] : '', ';pmsg=', $message['id'], ';quote">', $txt['quote'], '</a></li>';
 				}
 				echo '
-					</ul>';
+						</ul>
+					</nav>';
 			}
 
 			echo '
-				</li>';
+					</li>';
 		}
 		// Otherwise just a simple list!
 		else
@@ -906,7 +914,7 @@ function template_search_results()
  */
 function template_send()
 {
-	global $context, $scripturl, $modSettings, $txt;
+	global $context, $scripturl, $modSettings, $txt, $options;
 
 	// Show which messages were sent successfully and which failed.
 	if (!empty($context['send_log']))
@@ -1035,13 +1043,25 @@ function template_send()
 	echo '
 				<div id="post_confirm_buttons" class="submitbutton">
 					', template_control_richedit_buttons($context['post_box_name']), '
-				</div>
+				</div>';
+
+	// Show the draft last saved on area
+	if (!empty($context['drafts_autosave']) && !empty($options['drafts_autosave_enabled']))
+	{
+		echo '
+		 		<div class="draftautosave">
+					<span id="throbber" class="hide"><i class="icon icon-spin i-spinner"></i>&nbsp;</span>
+					<span id="draft_lastautosave"></span>
+				</div>';
+	}
+
+	echo '
 				<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
 				<input type="hidden" name="seqnum" value="', $context['form_sequence_number'], '" />
 				<input type="hidden" name="replied_to" value="', !empty($context['quoted_message']['id']) ? $context['quoted_message']['id'] : 0, '" />
 				<input type="hidden" name="pm_head" value="', !empty($context['quoted_message']['pm_head']) ? $context['quoted_message']['pm_head'] : 0, '" />
-				<input type="hidden" name="f" value="', isset($context['folder']) ? $context['folder'] : '', '" />
-				<input type="hidden" name="l" value="', isset($context['current_label_id']) ? $context['current_label_id'] : -1, '" />';
+				<input type="hidden" name="f" value="', $context['folder'] ?? '', '" />
+				<input type="hidden" name="l" value="', $context['current_label_id'] ?? -1, '" />';
 
 	// If the admin enabled the pm drafts feature, show a draft selection box
 	if (!empty($context['drafts_pm_save']) && !empty($context['drafts']))
@@ -1359,7 +1379,7 @@ function template_report_message_complete()
 		<div class="well">
 			<div class="content">
 				<p>', $txt['pm_report_done'], '</p>
-				<a class="linkbutton_right" href="', $scripturl, '?action=pm;l=', $context['current_label_id'], '">', $txt['pm_report_return'], '</a>
+				<a class="linkbutton floatright" href="', $scripturl, '?action=pm;l=', $context['current_label_id'], '">', $txt['pm_report_return'], '</a>
 			</div>
 		</div>';
 }
@@ -1664,17 +1684,19 @@ function template_showPMDrafts()
 				<br />
 				<span class="smalltext">&#171;&nbsp;<strong>', $txt['pm_bcc'], ':</strong> ', implode(', ', $draft['recipients']['bcc']), '&nbsp;&#187;</span>
 			</div>
-			<div class="inner">
+			<div class="messageContent">
 				', $draft['body'], '
 			</div>
-			<ul class="quickbuttons">
-				<li class="listlevel1">
-					<a href="', $scripturl, '?action=pm;sa=showpmdrafts;id_draft=', $draft['id_draft'], ';', $context['session_var'], '=', $context['session_id'], '" class="linklevel1 reply_button">', $txt['draft_edit'], '</a>
-				</li>
-				<li class="listlevel1">
-					<a href="', $scripturl, '?action=pm;sa=showpmdrafts;delete=', $draft['id_draft'], ';', $context['session_var'], '=', $context['session_id'], '" onclick="return confirm(\'', $txt['draft_remove'], '?\');" class="linklevel1 remove_button">', $txt['draft_delete'], '</a>
-				</li>
-			</ul>
+			<nav>
+				<ul class="quickbuttons">
+					<li class="listlevel1">
+						<a href="', $scripturl, '?action=pm;sa=showpmdrafts;id_draft=', $draft['id_draft'], ';', $context['session_var'], '=', $context['session_id'], '" class="linklevel1 reply_button">', $txt['draft_edit'], '</a>
+					</li>
+					<li class="listlevel1">
+						<a href="', $scripturl, '?action=pm;sa=showpmdrafts;delete=', $draft['id_draft'], ';', $context['session_var'], '=', $context['session_id'], '" onclick="return confirm(\'', $txt['draft_remove'], '?\');" class="linklevel1 remove_button">', $txt['draft_delete'], '</a>
+					</li>
+				</ul>
+			</nav>	
 		</div>';
 		}
 	}

@@ -1503,7 +1503,7 @@ class ManageSmileys extends AbstractController
 					),
 					'data' => array(
 						'sprintf' => array(
-							'format' => '<a href="' .getUrl('admin', ['action' => 'admin', 'area' => 'smileys', 'sa' => 'editicon', 'icon' => '%1$s']) .'">' . $txt['smileys_modify'] . '</a>',
+							'format' => '<a href="' . getUrl('admin', ['action' => 'admin', 'area' => 'smileys', 'sa' => 'editicon', 'icon' => '%1$s']) . '">' . $txt['smileys_modify'] . '</a>',
 							'params' => array(
 								'id' => false,
 							),

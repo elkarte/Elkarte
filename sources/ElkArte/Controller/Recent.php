@@ -420,7 +420,6 @@ class Recent extends AbstractController implements FrontpageInterface
 			$(function() {
 				var likePostInstance = likePosts.prototype.init({
 					oTxt: ({
-						btnText : ' . JavaScriptEscape($txt['ok_uppercase']) . ',
 						likeHeadingError : ' . JavaScriptEscape($txt['like_heading_error']) . ',
 						error_occurred : ' . JavaScriptEscape($txt['error_occurred']) . '
 					}),

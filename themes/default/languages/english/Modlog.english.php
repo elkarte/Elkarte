@@ -1,5 +1,5 @@
 <?php
-// Version: 1.1; Modlog
+// Version: 2.0; Modlog
 
 $txt['modlog_date'] = 'Date';
 $txt['modlog_member'] = 'Member';

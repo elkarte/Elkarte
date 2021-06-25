@@ -3,9 +3,6 @@
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause (see accompanying LICENSE.txt file)
  *
- * This file contains code covered by:
- * copyright: 2011 Simple Machines (http://www.simplemachines.org)
- *
  * @version 2.0 dev
  */
 
@@ -13,32 +10,35 @@
  * This file contains javascript associated with the current theme
  */
 
-$(function ()
+// Normal JS document ready event, could simply use the jQuery one as well
+document.addEventListener("DOMContentLoaded", function ()
 {
-	// Menu drop downs
+	// If they touch the screen, then we switch to click menus
+	window.addEventListener('touchstart', function onFirstTouch() {
+		useClickMenu();
+	}, false);
+
+	// Or if they specifically only want click menus
 	if (use_click_menu)
 	{
-		$('#main_menu, ul.admin_menu, ul.sidebar_menu, ul.poster, ul.quickbuttons, #sort_by').superclick({
-			speed: 150,
-			animation: {opacity: 'show', height: 'toggle'},
-			speedOut: 0,
-			activeClass: 'sfhover'
-		});
-	}
-	else
-	{
-		$('#main_menu, ul.admin_menu, ul.sidebar_menu, ul.poster, ul.quickbuttons, #sort_by').superfish({
-			delay: 300,
-			speed: 175,
-			hoverClass: 'sfhover'
-		});
+		useClickMenu();
 	}
 
+	// Fix code blocks so they are as compact as possible
+	if (typeof elk_codefix === 'function')
+	{
+		elk_codefix();
+	}
+});
+
+// Jquery document ready
+$(function ()
+{
 	// Smooth scroll to top.
 	$("a[href='#top']").on("click", function (e)
 	{
 		e.preventDefault();
-		$("html,body").animate({scrollTop: 0}, 1200);
+		$("html,body").animate({scrollTop: 0}, 700);
 	});
 
 	// Smooth scroll to bottom.
@@ -47,10 +47,10 @@ $(function ()
 		e.preventDefault();
 
 		// Don't scroll all the way down to the footer, just the content bottom
-		var link = $('#bot'),
+		let link = $('#bot'),
 			link_y = link.height();
 
-		$("html,body").animate({scrollTop: link.offset().top + link_y - $(window).height()}, 1200);
+		$("html,body").animate({scrollTop: link.offset().top + link_y - $(window).height()}, 700);
 	});
 
 	// Tooltips
@@ -61,12 +61,6 @@ $(function ()
 
 	// Find all nested linked images and turn off the border
 	$('a.bbc_link img.bbc_img').parent().css('border', '0');
-
-	// Fix code blocks so they are as compact as possible
-	if (typeof elk_codefix === 'function')
-	{
-		elk_codefix();
-	}
 
 	// Enable the ... page expansion
 	$('.expand_pages').expand_pages();
@@ -152,10 +146,12 @@ $(function ()
 		});
 	});
 
+	// expand the moderation button view for mobile devices
 	$('.hamburger_30').on('click', function (e)
 	{
+		let id = $(this).data('id');
+
 		e.preventDefault();
-		var id = $(this).data('id');
 		$('#' + id).addClass('visible');
 		$(this).addClass('visible');
 	});
@@ -170,18 +166,18 @@ $(function ()
  */
 function elk_addButton(sButtonStripId, bUseImage, oOptions)
 {
-	var oButtonStrip = document.getElementById(sButtonStripId),
+	let oButtonStrip = document.getElementById(sButtonStripId),
 		aItems = oButtonStrip.getElementsByTagName('span');
 
 	// Remove the 'last' class from the last item.
 	if (aItems.length > 0)
 	{
-		var oLastSpan = aItems[aItems.length - 1];
+		let oLastSpan = aItems[aItems.length - 1];
 		oLastSpan.className = oLastSpan.className.replace(/\s*last/, 'position_holder');
 	}
 
 	// Add the button.
-	var oButtonStripList = oButtonStrip.getElementsByTagName('ul')[0],
+	let oButtonStripList = oButtonStrip.getElementsByTagName('ul')[0],
 		oNewButton = document.createElement('li'),
 		oRole = document.createAttribute('role');
 
@@ -204,4 +200,14 @@ function elk_addButton(sButtonStripId, bUseImage, oOptions)
 	}
 
 	oButtonStripList.appendChild(oNewButton);
+}
+
+function useClickMenu()
+{
+	// Click Menu drop downs
+	let menus = ['#main_menu', '#sort_by', 'ul.poster', 'ul.quickbuttons', 'ul.admin_menu', 'ul.sidebar_menu'];
+
+	menus.forEach((area) => new elkMenu(area));
+
+	window.removeEventListener('touchstart', onFirstTouch, false);
 }

@@ -33,7 +33,7 @@ function detectFulltextIndex()
 		array()
 	)->fetch_callback(
 		function ($row) use (&$fulltext_index) {
-			if ( ( $row['Column_name'] === 'body' || $row['Column_name'] === 'subject' )
+			if (($row['Column_name'] === 'body' || $row['Column_name'] === 'subject')
 				&& (isset($row['Index_type']) && $row['Index_type'] === 'FULLTEXT'
 					|| isset($row['Comment']) && $row['Comment'] === 'FULLTEXT'))
 			{

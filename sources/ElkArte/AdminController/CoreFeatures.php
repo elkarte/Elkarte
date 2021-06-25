@@ -18,7 +18,9 @@ namespace ElkArte\AdminController;
 
 use ElkArte\AbstractController;
 use ElkArte\Cache\Cache;
+use ElkArte\Debug;
 use ElkArte\Hooks;
+use ElkArte\Themes\ThemeLoader;
 use FilesystemIterator;
 use GlobIterator;
 
@@ -73,12 +75,14 @@ class CoreFeatures extends AbstractController
 
 		$this->loadGeneralSettingParameters();
 
+		$api = $this->_req->getQuery('api', 'trim', '');
+
 		// Are we saving?
 		if (isset($this->_req->post->save))
 		{
 			checkSession();
 
-			if (isset($this->_req->query->xml))
+			if ($api === 'xml')
 			{
 				$tokenValidation = validateToken('admin-core', 'post', false);
 
@@ -94,7 +98,7 @@ class CoreFeatures extends AbstractController
 
 			$this->_save_core_features($core_features);
 
-			if (!isset($this->_req->query->xml))
+			if ($api !== 'xml')
 			{
 				redirectexit('action=admin;area=corefeatures;' . $context['session_var'] . '=' . $context['session_id']);
 			}
@@ -114,7 +118,7 @@ class CoreFeatures extends AbstractController
 		}
 
 		// sub_template is already generic_xml and the token is created somewhere else
-		if (isset($this->_req->query->xml))
+		if ($api === 'xml')
 		{
 			return true;
 		}
@@ -361,7 +365,6 @@ class CoreFeatures extends AbstractController
 	 *
 	 * @param mixed[] $subActions = array() An array containing all possible subactions.
 	 * @param string $defaultAction = '' the default action to be called if no valid subaction was found.
-	 * @throws \ElkArte\Exceptions\Exception
 	 */
 	public function loadGeneralSettingParameters($subActions = array(), $defaultAction = '')
 	{
@@ -370,8 +373,8 @@ class CoreFeatures extends AbstractController
 		// You need to be an admin to edit settings!
 		isAllowedTo('admin_forum');
 
-		\ElkArte\Themes\ThemeLoader::loadLanguageFile('Help');
-		\ElkArte\Themes\ThemeLoader::loadLanguageFile('ManageSettings');
+		ThemeLoader::loadLanguageFile('Help');
+		ThemeLoader::loadLanguageFile('ManageSettings');
 
 		$context['sub_template'] = 'show_settings';
 
@@ -389,7 +392,6 @@ class CoreFeatures extends AbstractController
 	 *
 	 * @param mixed[] $core_features - The array of all the core features, as
 	 *                returned by $this->settings()
-	 * @throws \ElkArte\Exceptions\Exception
 	 */
 	private function _save_core_features($core_features)
 	{

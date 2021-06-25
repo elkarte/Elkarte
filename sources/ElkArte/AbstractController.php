@@ -326,4 +326,17 @@ abstract class AbstractController
 			$this->_events->register($name, array($name, array($class, $method, 0)));
 		}
 	}
+
+	/**
+	 * Helper function to see if the request is asking for any api processing
+	 *
+	 * @return string|false
+	 */
+	public function getApi()
+	{
+		// API Call?
+		$api = $this->_req->getRequest('api', 'trim', '');
+
+		return in_array($api, ['xml', 'json']) ? $api : false;
+	}
 }

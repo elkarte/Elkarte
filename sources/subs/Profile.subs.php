@@ -21,6 +21,7 @@ use ElkArte\Errors\ErrorContext;
 use ElkArte\Graphics\Image;
 use ElkArte\MembersList;
 use ElkArte\Notifications;
+use ElkArte\Themes\ThemeLoader;
 use ElkArte\User;
 use ElkArte\Util;
 
@@ -203,7 +204,6 @@ function setupProfileContext($fields, $hook = '')
  * @param int $memID
  * @param string $area = 'summary'
  * @param mixed[] $custom_fields = array()
- * @throws \ElkArte\Exceptions\Exception
  */
 function loadCustomFields($memID, $area = 'summary', array $custom_fields = array())
 {
@@ -236,7 +236,8 @@ function loadCustomFields($memID, $area = 'summary', array $custom_fields = arra
 	}
 
 	// Load all the relevant fields - and data.
-	// The fully-qualified name for rows is here because it's a reserved word in Mariadb 10.2.4+ and quoting would be different for MySQL/Mariadb and PSQL
+	// The fully-qualified name for rows is here because it's a reserved word in Mariadb
+	// 10.2.4+ and quoting would be different for MySQL/Mariadb and PSQL
 	$request = $db->query('', '
 		SELECT
 			col_name, field_name, field_desc, field_type, show_reg, field_length, field_options,
@@ -255,7 +256,7 @@ function loadCustomFields($memID, $area = 'summary', array $custom_fields = arra
 	{
 		// Shortcut.
 		$options = MembersList::get($memID)->options;
-		$value = isset($options[$row['col_name']]) ? $options[$row['col_name']] : $row['default_value'];
+		$value = $options[$row['col_name']] ?? $row['default_value'];
 
 		// If this was submitted already then make the value the posted version.
 		if (!empty($custom_fields) && isset($custom_fields[$row['col_name']]))
@@ -264,7 +265,7 @@ function loadCustomFields($memID, $area = 'summary', array $custom_fields = arra
 			if (in_array($row['field_type'], array('select', 'radio')))
 			{
 				$options = explode(',', $row['field_options']);
-				$value = isset($options[$value]) ? $options[$value] : '';
+				$value = $options[$value] ?? '';
 			}
 		}
 
@@ -1024,7 +1025,7 @@ function loadProfileFields($force_reload = false)
 			'preload' => function () {
 				global $context;
 
-				\ElkArte\Themes\ThemeLoader::loadLanguageFile('Settings');
+				ThemeLoader::loadLanguageFile('Settings');
 
 				// Can they disable censoring?
 				$context['allow_no_censored'] = false;
@@ -1208,9 +1209,10 @@ function saveProfileFields($fields, $hook)
 		}
 
 		// What gets updated?
-		$db_key = isset($field['save_key']) ? $field['save_key'] : $key;
+		$db_key = $field['save_key'] ?? $key;
 
-		// Right - we have something that is enabled, we can act upon and has a value posted to it. Does it have a validation function?
+		// Right - we have something that is enabled, we can act upon and has a value
+		// posted to it. Does it have a validation function?
 		if (isset($field['input_validate']))
 		{
 			$is_valid = $field['input_validate']($_POST[$key]);
@@ -2019,13 +2021,13 @@ function profileLoadSignatureData()
 
 	$context['signature_enabled'] = isset($sig_limits[0]) ? $sig_limits[0] : 0;
 	$context['signature_limits'] = array(
-		'max_length' => isset($sig_limits[1]) ? $sig_limits[1] : 0,
-		'max_lines' => isset($sig_limits[2]) ? $sig_limits[2] : 0,
-		'max_images' => isset($sig_limits[3]) ? $sig_limits[3] : 0,
-		'max_smileys' => isset($sig_limits[4]) ? $sig_limits[4] : 0,
-		'max_image_width' => isset($sig_limits[5]) ? $sig_limits[5] : 0,
-		'max_image_height' => isset($sig_limits[6]) ? $sig_limits[6] : 0,
-		'max_font_size' => isset($sig_limits[7]) ? $sig_limits[7] : 0,
+		'max_length' => $sig_limits[1] ?? 0,
+		'max_lines' => $sig_limits[2] ?? 0,
+		'max_images' => $sig_limits[3] ?? 0,
+		'max_smileys' => $sig_limits[4] ?? 0,
+		'max_image_width' => $sig_limits[5] ?? 0,
+		'max_image_height' => $sig_limits[6] ?? 0,
+		'max_font_size' => $sig_limits[7] ?? 0,
 		'bbc' => !empty($sig_bbc) ? explode(',', $sig_bbc) : array(),
 	);
 
@@ -2056,7 +2058,7 @@ function profileLoadSignatureData()
 		$validation = profileValidateSignature($signature);
 		if (empty($context['post_errors']))
 		{
-			\ElkArte\Themes\ThemeLoader::loadLanguageFile('Errors');
+			ThemeLoader::loadLanguageFile('Errors');
 			$context['post_errors'] = array();
 		}
 
@@ -2081,14 +2083,12 @@ function profileLoadSignatureData()
  * Load avatar context data.
  *
  * @return bool
- * @throws \ElkArte\Exceptions\Exception
  */
 function profileLoadAvatarData()
 {
 	global $context, $cur_profile, $modSettings;
 
 	$context['avatar_url'] = $modSettings['avatar_url'];
-
 	$valid_protocol = preg_match('~^https' . (detectServer()->supportsSSL() ? '' : '?') . '://~i', $cur_profile['avatar']['name']) === 1;
 	$schema = 'http' . (detectServer()->supportsSSL() ? 's' : '') . '://';
 
@@ -2538,7 +2538,7 @@ function profileSaveAvatarData(&$value)
 	$valid_https = isset($_POST['userpicpersonal']) && substr($_POST['userpicpersonal'], 0, 8) === 'https://' && strlen($_POST['userpicpersonal']) > 8;
 	if ($value === 'external' && !empty($modSettings['avatar_external_enabled']) && ($valid_http || $valid_https) && !empty($modSettings['avatar_download_external']))
 	{
-		\ElkArte\Themes\ThemeLoader::loadLanguageFile('Post');
+		ThemeLoader::loadLanguageFile('Post');
 		if (!is_writable($uploadDir))
 		{
 			throw new \ElkArte\Exceptions\Exception('attachments_no_write', 'critical');
@@ -2792,7 +2792,7 @@ function profileSaveAvatarData(&$value)
 				$destinationPath = $uploadDir . '/' . (empty($file_hash) ? $destName : $cur_profile['id_attach'] . '_' . $file_hash . '.elk');
 				if (!rename($_FILES['attachment']['tmp_name'], $destinationPath))
 				{
-					\ElkArte\Themes\ThemeLoader::loadLanguageFile('Post');
+					ThemeLoader::loadLanguageFile('Post');
 					// I guess a man can try.
 					removeAttachments(array('id_member' => $memID));
 					throw new \ElkArte\Exceptions\Exception('attach_timeout', 'critical');
@@ -3578,7 +3578,7 @@ function load_user_topics($memID, $start, $count, $range_limit = '', $reverse = 
 function getMemberGeneralPermissions($curGroups)
 {
 	$db = database();
-	\ElkArte\Themes\ThemeLoader::loadLanguageFile('ManagePermissions');
+	ThemeLoader::loadLanguageFile('ManagePermissions');
 
 	// Get all general permissions.
 	$general_permission = array();
@@ -3657,7 +3657,7 @@ function getMemberGeneralPermissions($curGroups)
 function getMemberBoardPermissions($memID, $curGroups, $board = null)
 {
 	$db = database();
-	\ElkArte\Themes\ThemeLoader::loadLanguageFile('ManagePermissions');
+	ThemeLoader::loadLanguageFile('ManagePermissions');
 
 	$board_permission = array();
 	$db->fetchQuery('

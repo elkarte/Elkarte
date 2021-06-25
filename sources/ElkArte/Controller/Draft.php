@@ -15,7 +15,7 @@ namespace ElkArte\Controller;
 
 use BBC\ParserWrapper;
 use ElkArte\Exceptions\Exception;
-use ElkArte\MembersList;
+use ElkArte\Themes\ThemeLoader;
 use ElkArte\Util;
 
 /**
@@ -37,7 +37,7 @@ class Draft extends Post
 	public function pre_dispatch()
 	{
 		// Language and helper functions
-		\ElkArte\Themes\ThemeLoader::loadLanguageFile('Drafts');
+		ThemeLoader::loadLanguageFile('Drafts');
 		require_once(SUBSDIR . '/Drafts.subs.php');
 		require_once(SUBSDIR . '/Profile.subs.php');
 
@@ -98,7 +98,6 @@ class Draft extends Post
 		// Get things started
 		$msgCount = draftsCount($this->_memID, 0);
 		$maxIndex = (int) $modSettings['defaultMaxMessages'];
-		$name = MembersList::get($this->_memID)->real_name;
 
 		// Make sure the starting place makes sense and construct our friend the page index.
 		$context['page_index'] = constructPageIndex('{scripturl}?action=pm;sa=showpmdrafts', $context['start'], $msgCount, $maxIndex);
@@ -179,11 +178,9 @@ class Draft extends Post
 	 *
 	 * @param string $redirect - The url to redirect to after the drafts have
 	 * been deleted
-	 * @throws \ElkArte\Exceptions\Exception
 	 */
 	private function _action_delete($redirect = '')
 	{
-
 		checkSession(empty($this->_req->post) ? 'get' : '');
 
 		// Lets see what we have been sent, one or many to delete

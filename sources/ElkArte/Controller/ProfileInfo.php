@@ -180,13 +180,13 @@ class ProfileInfo extends AbstractController
 				'name' => $txt['profile_recent_activity'],
 				'templates' => array('posts', 'topics', 'attachments'),
 				'active' => true,
-				'href' => getUrl('action', ['action' => 'profileInfo', 'sa' => 'recent', 'xml', 'u' => $this->_memID, '{session_data}']),
+				'href' => getUrl('action', ['action' => 'profileInfo', 'sa' => 'recent', 'api' => 'html', 'u' => $this->_memID, '{session_data}']),
 			),
 			'buddies' => array(
 				'name' => $txt['buddies'],
 				'templates' => array('buddies'),
 				'active' => !empty($modSettings['enable_buddylist']) && $context['user']['is_owner'],
-				'href' => getUrl('action', ['action' => 'profileInfo', 'sa' => 'buddies', 'xml', 'u' => $this->_memID, '{session_data}']),
+				'href' => getUrl('action', ['action' => 'profileInfo', 'sa' => 'buddies', 'api' => 'html', 'u' => $this->_memID, '{session_data}']),
 			)
 		);
 
@@ -560,7 +560,7 @@ class ProfileInfo extends AbstractController
 				'board' => array(
 					'name' => $row['bname'],
 					'id' => $row['id_board'],
-					'link' => '<a href="' . getUrl('board', ['board' => $row['id_board'], 'start' => 0, 'name' => $row['bname']]) .'">' . $row['bname'] . '</a>',
+					'link' => '<a href="' . getUrl('board', ['board' => $row['id_board'], 'start' => 0, 'name' => $row['bname']]) . '">' . $row['bname'] . '</a>',
 				),
 				'topic' => array(
 					'id' => $row['id_topic'],
@@ -758,7 +758,7 @@ class ProfileInfo extends AbstractController
 						'function' => function ($rowData) {
 							if ($rowData['is_image'] && !empty($rowData['id_thumb']))
 							{
-								return '<img src="' . getUrl('action', ['action' => 'dlattach', 'attach' => $rowData['id_thumb'], 'image']) .'" />';
+								return '<img src="' . getUrl('action', ['action' => 'dlattach', 'attach' => $rowData['id_thumb'], 'image']) . '" />';
 							}
 
 							return '<img src="' . getUrl('action', ['action' => 'dlattach', 'attach' => $rowData['id'], 'thumb']) . '" />';
@@ -773,10 +773,12 @@ class ProfileInfo extends AbstractController
 				'downloads' => array(
 					'header' => array(
 						'value' => $txt['show_attach_downloads'],
+						'class' => 'centertext',
 					),
 					'data' => array(
 						'db' => 'downloads',
 						'comma_format' => true,
+						'class' => 'centertext',
 					),
 					'sort' => array(
 						'default' => 'a.downloads',
@@ -1406,7 +1408,7 @@ class ProfileInfo extends AbstractController
 						'time' => standardTime($row['poster_time']),
 						'html_time' => htmlTime($row['poster_time']),
 						'timestamp' => forum_time(true, $row['poster_time']),
-						'link' => '<a href="' . getUrl('topic', ['topic' => $row['id_topic'], 'msg' => $row['id_msg'], 'subject' => $row['subject'], 'hash' => '#msg' . $row['id_msg']]) . '" rel="nofollow">' . $short_subject . '</a>',
+						'link' => '<a href="' . getUrl('topic', ['topic' => $row['id_topic'], 'start' => 0, 'msg' => $row['id_msg'], 'subject' => $row['subject'], 'hash' => '#msg' . $row['id_msg']]) . '" rel="nofollow">' . $short_subject . '</a>',
 					);
 				}
 			}
@@ -1466,7 +1468,7 @@ class ProfileInfo extends AbstractController
 					$context['topics'][] = array(
 						'board' => array(
 							'name' => $row['bname'],
-							'link' => '<a href="' . getUrl('board', ['board' => $row['id_board'], 'start' => 0, 'name' => $row['bname']]) . '</a>'
+							'link' => '<a href="' . getUrl('board', ['board' => $row['id_board'], 'start' => 0, 'name' => $row['bname']]) . '">' . $row['bname'] . '</a>'
 						),
 						'subject' => $row['subject'],
 						'short_subject' => $short_subject,
@@ -1474,7 +1476,7 @@ class ProfileInfo extends AbstractController
 						'time' => standardTime($row['poster_time']),
 						'html_time' => htmlTime($row['poster_time']),
 						'timestamp' => forum_time(true, $row['poster_time']),
-						'link' => '<a href="' . getUrl('topic', ['topic' => $row['id_topic'], 'msg' => $row['id_msg'], 'subject' => $row['subject'], 'hash' => '#msg' . $row['id_msg']]) . '" rel="nofollow">' . $short_subject . '</a>',
+						'link' => '<a href="' . getUrl('topic', ['topic' => $row['id_topic'], 'start' => 0, 'msg' => $row['id_msg'], 'subject' => $row['subject'], 'hash' => '#msg' . $row['id_msg']]) . '" rel="nofollow">' . $short_subject . '</a>',
 					);
 				}
 			}

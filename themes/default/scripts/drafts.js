@@ -57,11 +57,12 @@ elk_DraftAutoSave.prototype.init = function ()
 		}.bind(this);
 
 		// Prevent autosave when selecting post/save by mouse or keyboard
-		var $_button = $('#postmodify').find('.button_submit');
+		let $_button = $('#postmodify').find('.button_submit');
 		$_button.on('mousedown', this, function ()
 		{
 			this.bInDraftMode = true;
 		}.bind(this));
+
 		$_button.on('onkeypress', this, function ()
 		{
 			this.bInDraftMode = true;
@@ -155,7 +156,7 @@ elk_DraftAutoSave.prototype.draftSave = function ()
 	];
 
 	// Send in document for saving and hope for the best
-	sendXMLDocument.call(this, elk_prepareScriptUrl(elk_scripturl) + "action=post2;board=" + this.opt.iBoard + ";xml", aSections.join("&"), this.onDraftDone);
+	sendXMLDocument.call(this, elk_prepareScriptUrl(elk_scripturl) + "action=post2;board=" + this.opt.iBoard + ";api=xml", aSections.join("&"), this.onDraftDone);
 
 	// Save the latest for compare
 	this.bCheckDraft = false;

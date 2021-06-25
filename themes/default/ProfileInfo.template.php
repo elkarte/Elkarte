@@ -423,7 +423,6 @@ function template_action_statPanel()
 		echo '
 					<span class="centertext">', $txt['statPanel_noPosts'], '</span>';
 	}
-
 	else
 	{
 		echo '
@@ -561,7 +560,7 @@ function template_profile_block_summary()
 				</h2>
 				<div id="basicinfo">
 					<div class="username">
-						<h4><span class="position">', (!empty($context['member']['group']) ? $context['member']['group'] : $context['member']['post_group']), '</span></h4>
+						<h4>', (!empty($context['member']['group']) ? $context['member']['group'] : $context['member']['post_group']), '</h4>
 					</div>
 					', $context['member']['avatar']['image'], '
 					<span id="userstatus">', template_member_online($context['member']), '<span class="smalltext"> ' . $context['member']['online']['label'] . '</span>', '</span>
@@ -1232,10 +1231,10 @@ function template_profile_block_posts()
 	{
 		echo '
 			<tr>
-				<th class="recentpost">', $txt['message'], '</th>
-				<th class="recentposter">', $txt['board'], '</th>
-				<th class="recentboard">', $txt['subject'], '</th>
-				<th class="recenttime">', $txt['date'], '</th>
+				<th class="recentpost" >', $txt['message'], '</th>
+				<th class="recentposter grid17">', $txt['board'], '</th>
+				<th class="recentboard grid20">', $txt['subject'], '</th>
+				<th class="recenttime grid20">', $txt['date'], '</th>
 			</tr>';
 
 		foreach ($context['posts'] as $post)
@@ -1243,9 +1242,9 @@ function template_profile_block_posts()
 			echo '
 			<tr>
 				<td class="recentpost">', $post['body'], '</td>
-				<td class="recentboard">', $post['board']['link'], '</td>
-				<td class="recentsubject">', $post['link'], '</td>
-				<td class="recenttime">', $post['time'], '</td>
+				<td class="recentboard grid20">', $post['board']['link'], '</td>
+				<td class="recentsubject grid20">', $post['link'], '</td>
+				<td class="recenttime grid20">', $post['time'], '</td>
 			</tr>';
 		}
 	}
@@ -1286,8 +1285,8 @@ function template_profile_block_topics()
 		echo '
 			<tr>
 				<th class="recenttopic">', $txt['subject'], '</th>
-				<th class="recentboard">', $txt['board'], '</th>
-				<th class="recenttime">', $txt['date'], '</th>
+				<th class="recentboard grid20">', $txt['board'], '</th>
+				<th class="recenttime grid20">', $txt['date'], '</th>
 			</tr>';
 
 		foreach ($context['topics'] as $post)
@@ -1295,8 +1294,8 @@ function template_profile_block_topics()
 			echo '
 			<tr>
 				<td class="recenttopic">', $post['link'], '</td>
-				<td class="recentboard">', $post['board']['link'], '</td>
-				<td class="recenttime">', $post['time'], '</td>
+				<td class="recentboard grid20">', $post['board']['link'], '</td>
+				<td class="recenttime grid20">', $post['time'], '</td>
 			</tr>';
 		}
 	}

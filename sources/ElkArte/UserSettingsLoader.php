@@ -247,7 +247,7 @@ class UserSettingsLoader
 		// 4. New session, yet updated < five hours ago? Maybe cache can help.
 		if (
 			ELK != 'SSI' &&
-			!isset($_REQUEST['xml']) && (!isset($_REQUEST['action']) || $_REQUEST['action'] != '.xml') &&
+			!isset($_REQUEST['api']) && (!isset($_REQUEST['action']) || $_REQUEST['action'] != '.xml') &&
 			empty($_SESSION['id_msg_last_visit']) &&
 			(!$this->cache->isEnabled() || !$this->cache->getVar($_SESSION['id_msg_last_visit'], 'user_last_visit-' . $this->id, 5 * 3600))
 		)

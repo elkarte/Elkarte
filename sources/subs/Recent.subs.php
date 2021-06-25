@@ -89,7 +89,7 @@ function getLastPosts($latestPostOptions)
 					'link' => empty($row['id_member']) ? $row['poster_name'] : '<a href="' . $poster_href . '">' . $row['poster_name'] . '</a>'
 				),
 				'subject' => $row['subject'],
-				'short_subject' => Util::shorten_text($row['subject'], $modSettings['subject_length']),
+				'short_subject' => Util::shorten_text($row['subject'], !empty($modSettings['subject_length']) ? $modSettings['subject_length'] : 32),
 				'preview' => $row['body'],
 				'time' => standardTime($row['poster_time']),
 				'html_time' => htmlTime($row['poster_time']),
@@ -400,7 +400,7 @@ function getLastTopics($latestTopicOptions)
 					'link' => empty($row['id_member']) ? $row['poster_name'] : '<a href="' . $poster_href . '">' . $row['poster_name'] . '</a>'
 				),
 				'subject' => $row['subject'],
-				'short_subject' => Util::shorten_text($row['subject'], $modSettings['subject_length']),
+				'short_subject' => Util::shorten_text($row['subject'], !empty($modSettings['subject_length']) ? $modSettings['subject_length'] : 32),
 				'preview' => $row['body'],
 				'time' => standardTime($row['poster_time']),
 				'html_time' => htmlTime($row['poster_time']),

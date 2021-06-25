@@ -52,7 +52,7 @@ function template_messages_informations_above()
 				<span class="nextlinks">',
 					!empty($context['links']['go_prev']) ? '<a href="' . $context['links']['go_prev'] . '">' . $txt['previous_next_back'] . '</a>' : '',
 					!empty($context['links']['go_next']) ? ' - <a href="' . $context['links']['go_next'] . '">' . $txt['previous_next_forward'] . '</a>' : '',
-					!empty($context['links']['derived_from']) ? ' - <a href="' . $context['links']['derived_from'] . '">' . sprintf($txt['topic_derived_from'], '<em>' . Util::shorten_text($context['topic_derived_from']['subject'], $modSettings['subject_length'])) . '</em></a>' : '',
+					!empty($context['links']['derived_from']) ? ' - <a href="' . $context['links']['derived_from'] . '">' . sprintf($txt['topic_derived_from'], '<em>' . Util::shorten_text($context['topic_derived_from']['subject'], !empty($modSettings['subject_length']) ? $modSettings['subject_length'] : 32)) . '</em></a>' : '',
 				'</span>
 			</header>
 			<section>';
@@ -140,12 +140,12 @@ function template_messages()
 				<article class="post_wrapper forumposts', $message['classes'], $message['approved'] ? '' : ' approvebg', '">', $message['id'] != $context['first_message'] ? '
 					<a class="post_anchor" id="msg' . $message['id'] . '"></a>' : '';
 
-		// Showing the sidebar posting area?
+		// Showing the sidebar poster area?
 		if (empty($options['hide_poster_area']))
 		{
 			echo '
 					<aside>
-						<ul class="poster">', template_build_poster_div($message, $ignoring), '</ul>
+						<ul class="poster no_js">', template_build_poster_div($message, $ignoring), '</ul>
 					</aside>';
 		}
 
@@ -157,7 +157,7 @@ function template_messages()
 		if (!empty($context['follow_ups'][$message['id']]))
 		{
 			echo '
-							<ul class="quickbuttons follow_ups">
+							<ul class="quickbuttons follow_ups no_js">
 								<li class="listlevel1 subsections" aria-haspopup="true">
 									<a class="linklevel1">', $txt['follow_ups'], '</a>
 									<ul class="menulevel2">';
@@ -210,7 +210,8 @@ function template_messages()
 		echo '
 						<section id="msg_', $message['id'], '" class="messageContent', $ignoring ? ' hide"' : '"', '>',
 							$message['body'], '
-						</section>';
+						</section>
+						<footer>';
 
 		// Assuming there are attachments...
 		if (!empty($message['attachment']))
@@ -221,7 +222,7 @@ function template_messages()
 		// Show the quickbuttons, for various operations on posts.
 		echo '
 					<nav>
-						<ul id="buttons_', $message['id'], '" class="quickbuttons">';
+						<ul id="buttons_', $message['id'], '" class="quickbuttons no_js">';
 
 		// Show a checkbox for quick moderation?
 		if (!empty($options['display_quick_mod']) && $options['display_quick_mod'] == 1 && $message['can_remove'])
@@ -409,8 +410,7 @@ function template_messages()
 
 		echo '
 						</ul>
-					</nav>
-					<footer>';
+					</nav>';
 
 		// Are there any custom profile fields for above the signature?
 		// Show them if signatures are enabled and you want to see them.
@@ -493,8 +493,8 @@ function template_quickreply_below()
 				</h2>
 				<div id="quickReplyOptions" class="forumposts content', empty($context['minmax_preferences']['qreply']) ? '"' : ' hide"', '>
 					<div class="editor_wrapper">
-						', $context['is_locked'] ? '<p class="alert smalltext">' . $txt['quick_reply_warning'] . '</p>' : '',
-						$context['oldTopicError'] ? '<p class="alert smalltext">' . sprintf($txt['error_old_topic'], $modSettings['oldTopicDays']) . '</p>' : '', '
+						', $context['is_locked'] ? '<p class="warningbox">' . $txt['quick_reply_warning'] . '</p>' : '',
+						$context['oldTopicError'] ? '<p class="warningbox">' . sprintf($txt['error_old_topic'], $modSettings['oldTopicDays']) . '</p>' : '', '
 						', $context['can_reply_approved'] ? '' : '<em>' . $txt['wait_for_approval'] . '</em>', '
 						', !$context['can_reply_approved'] && $context['require_verification'] ? '<br />' : '', '
 						<form action="', getUrl('action', ['action' => 'post2', 'board' => $context['current_board']]), '" method="post" accept-charset="UTF-8" name="postmodify" id="postmodify" onsubmit="submitonce(this);', (!empty($modSettings['mentions_enabled']) ? 'revalidateMentions(\'postmodify\', \'' . (empty($options['use_editor_quick_reply']) ? 'message' : $context['post_box_name']) . '\');' : ''), '">
@@ -889,10 +889,10 @@ function template_pages_and_buttons_above()
 
 	// Show the anchor for the top and for the first message. If the first message is new, say so.
 	echo '
-			<a id="msg', $context['first_message'], '"></a>', $context['first_new_message'] ? '<a name="new" id="new"></a>' : '';
+			<a id="msg', $context['first_message'], '"></a>', $context['first_new_message'] ? '<a id="new"></a>' : '';
 
 	// Show the page index... "Pages: [1]".
-	template_pagesection('normal_buttons', 'right');
+	template_pagesection('normal_buttons');
 }
 
 /**
@@ -903,37 +903,40 @@ function template_pages_and_buttons_below()
 	global $context, $txt;
 
 	// Show the page index... "Pages: [1]".
-	template_pagesection('normal_buttons', 'right');
+	template_pagesection('normal_buttons');
 
 	// Show the lower breadcrumbs.
 	theme_linktree();
 
+	echo '
+			<div id="moderationbuttons" class="hide_30 hamburger_30_target">';
+
 	if (can_see_button_strip($context['mod_buttons']))
 	{
 		echo '
-			<i class="icon icon-lg i-menu hamburger_30" data-id="moderationbuttons"></i>';
+				<i class="icon icon-lg i-menu hamburger_30" data-id="moderationbuttons"></i>';
 	}
 
-	echo '
-			<div id="moderationbuttons" class="hide_30 hamburger_30_target">', template_button_strip($context['mod_buttons'], 'bottom', array('id' => 'moderationbuttons_strip')), '</div>';
+	template_button_strip($context['mod_buttons'], '', array('id' => 'moderationbuttons_strip'));
 
 	// Show the jump-to box, or actually...let Javascript do it.
 	echo '
-			<div id="display_jump_to">&nbsp;</div>
-			<script>
-				aJumpTo[aJumpTo.length] = new JumpTo({
-					sContainerId: "display_jump_to",
-					sJumpToTemplate: "<label class=\"smalltext\" for=\"%select_id%\">', $context['jump_to']['label'], ':<" + "/label> %dropdown_list%",
-					iCurBoardId: ', $context['current_board'], ',
-					iCurBoardChildLevel: ', $context['jump_to']['child_level'], ',
-					sCurBoardName: "', $context['jump_to']['board_name'], '",
-					sBoardChildLevelIndicator: "&#8195;",
-					sBoardPrefix: "&#10148;",
-					sCatClass: "jump_to_header",
-					sCatPrefix: "",
-					sGoButtonLabel: "', $txt['go'], '"
-				});
-			</script>';
+				<div id="display_jump_to">&nbsp;</div>
+				<script>
+					aJumpTo[aJumpTo.length] = new JumpTo({
+						sContainerId: "display_jump_to",
+						sJumpToTemplate: "<label class=\"smalltext\" for=\"%select_id%\">', $context['jump_to']['label'], ':<" + "/label> %dropdown_list%",
+						iCurBoardId: ', $context['current_board'], ',
+						iCurBoardChildLevel: ', $context['jump_to']['child_level'], ',
+						sCurBoardName: "', $context['jump_to']['board_name'], '",
+						sBoardChildLevelIndicator: "&#8195;",
+						sBoardPrefix: "&#10148;",
+						sCatClass: "jump_to_header",
+						sCatPrefix: "",
+						sGoButtonLabel: "', $txt['go'], '"
+					});
+				</script>
+			</div>';
 }
 
 /**
@@ -947,7 +950,7 @@ function template_display_attachments($message, $ignoring)
 	global $context, $txt, $scripturl, $modSettings;
 
 	echo '
-							<footer id="msg_', $message['id'], '_footer" class="attachments', $ignoring ? ' hide"' : '"', '>';
+							<div id="msg_', $message['id'], '_footer" class="attachments', $ignoring ? ' hide"' : '"', '>';
 
 	$last_approved_state = 1;
 
@@ -1018,5 +1021,5 @@ function template_display_attachments($message, $ignoring)
 	}
 
 	echo '
-							</footer>';
+							</div>';
 }

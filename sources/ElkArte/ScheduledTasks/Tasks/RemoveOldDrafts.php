@@ -16,6 +16,8 @@
 
 namespace ElkArte\ScheduledTasks\Tasks;
 
+use ElkArte\Themes\ThemeLoader;
+
 /**
  * Class Remove_Old_Drafts - Check for old drafts and remove them
  *
@@ -44,7 +46,7 @@ class RemoveOldDrafts implements ScheduledTaskInterface
 		$drafts = array();
 
 		// We need this for language items
-		\ElkArte\Themes\ThemeLoader::loadEssentialThemeData();
+		ThemeLoader::loadEssentialThemeData();
 
 		// Find all of the old drafts
 		$request = $db->query('', '

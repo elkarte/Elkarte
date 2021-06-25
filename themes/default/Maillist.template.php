@@ -234,7 +234,7 @@ function template_callback_maillist_receive_email_list()
 		<dt id="add_more_email_placeholder" class="hide"></dt>
 		<dd></dd>
 		<dt id="add_more_board_div" class="hide">
-			<a href="#" onclick="addAnotherOption(sEmailParent, oEmailOptionsdt, oEmailOptionsdd, oEmailSelectData); return false;" class="linkbutton_left">', $txt['reply_add_more'], '</a>
+			<a href="#" onclick="addAnotherOption(sEmailParent, oEmailOptionsdt, oEmailOptionsdd, oEmailSelectData); return false;" class="linkbutton floatleft">', $txt['reply_add_more'], '</a>
 		</dt>
 		<dd></dd>';
 }

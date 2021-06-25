@@ -240,7 +240,7 @@ function template_registration_form()
 						<dd>
 							<input type="password" name="passwrd2" id="elk_autov_pwverify" size="30" tabindex="', $context['tabindex']++, '" class="input_password" placeholder="', $txt['verify_pass'], '" required="required" />
 							<span id="elk_autov_pwverify_div" class="hide">
-								<i id="elk_autov_pwverify_img" class="icon i-check"></i>
+								<i id="elk_autov_pwverify_img" class="icon i-check" ></i>
 							</span>
 						</dd>
 					</dl>';

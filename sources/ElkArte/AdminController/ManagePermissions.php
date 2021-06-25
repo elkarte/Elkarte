@@ -313,7 +313,7 @@ class ManagePermissions extends AbstractController
 
 							if ($rowData['id_group'] != 1)
 							{
-								return '<a href="' . getUrl('action', ['action' => 'admin', 'area' => 'permissions', 'sa' => 'modify', 'group' => $rowData['id_group']] +  (isset($this->_pid) ? ['pid' => $this->_pid] : [])) . '">' . $txt['membergroups_modify'] . '</a>';
+								return '<a href="' . getUrl('action', ['action' => 'admin', 'area' => 'permissions', 'sa' => 'modify', 'group' => $rowData['id_group']] + (isset($this->_pid) ? ['pid' => $this->_pid] : [])) . '">' . $txt['membergroups_modify'] . '</a>';
 							}
 
 							return '';

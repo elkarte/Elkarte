@@ -17,12 +17,10 @@
 namespace ElkArte\Themes;
 
 use ElkArte\Http\Headers;
-use ElkArte\Themes\Directories;
 use BadFunctionCallException;
 use ElkArte\Debug;
 use ElkArte\Errors\Errors;
 use ElkArte\Exceptions\Exception;
-use ElkArte\User;
 use Error;
 use Generator;
 
@@ -219,7 +217,7 @@ class Templates
 
 			if (!empty($context['user']['is_admin']) && !isset($_GET['th']))
 			{
-				\ElkArte\Themes\ThemeLoader::loadLanguageFile('Errors');
+				ThemeLoader::loadLanguageFile('Errors');
 
 				if (!isset($context['security_controls_files']['title']))
 				{
@@ -275,7 +273,7 @@ class Templates
 		Headers::instance()
 			->removeHeader('all')
 			->header('Expires', 'Mon, 26 Jul 1997 05:00:00 GMT')
-			->header('Last-Modified',  gmdate('D, d M Y H:i:s') . ' GMT')
+			->header('Last-Modified', gmdate('D, d M Y H:i:s') . ' GMT')
 			->header('Cache-Control', 'no-cache')
 			->contentType('text/html', 'UTF-8')
 			->sendHeaders();
@@ -503,11 +501,11 @@ class Templates
 		}
 	}
 
-    /**
-     * @return Template Directories
-     */
-    public function getDirectory()
-    {
-        return $this->dirs;
-    }
+	/**
+	 * @return Template Directories
+	 */
+	public function getDirectory()
+	{
+		return $this->dirs;
+	}
 }

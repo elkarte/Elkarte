@@ -13,7 +13,7 @@
 
 namespace ElkArte\Themes;
 
-use \ElkArte\Themes\Directories;
+use ElkArte\HttpReq;
 use \ElkArte\ValuesContainer;
 
 /**
@@ -23,88 +23,41 @@ abstract class Theme
 {
 	/** @var \ElkArte\ValuesContainer */
 	public $user;
+	/** @var string  */
 	public const STANDARD = 'standard';
+	/** @var string  */
 	public const DEFERRED = 'defer';
+	/** @var int  */
 	public const ALL = -1;
-
-	/**
-	 * The id of the theme being used
-	 *
-	 * @var int
-	 */
+	/** @var int The id of the theme being used */
 	protected $id;
-
-	/**
-	 * @var Templates
-	 */
+	/** @var Templates */
 	private $templates;
-
-	/**
-	 * @var TemplateLayers
-	 */
+	/** @var TemplateLayers */
 	private $layers;
-
-	/**
-	 * @var array
-	 */
+	/** @var array */
 	protected $html_headers = [];
-
-	/**
-	 * @var array
-	 */
+	/** @var array */
 	protected $links = [];
-
-	/**
-	 * All of the JS files to include
-	 *
-	 * @var array
-	 */
+	/** @var array All of the JS files to include */
 	protected $js_files = [];
-
-	/**
-	 * Any inline JS to output
-	 *
-	 * @var array
-	 */
+	/** @var array Any inline JS to output */
 	protected $js_inline = [
 		'standard' => [],
 		'defer' => [],
 	];
-
-	/**
-	 * JS variables to output
-	 *
-	 * @var array
-	 */
+	/** @var array JS variables to output */
 	protected $js_vars = [];
-
-	/**
-	 * Inline CSS
-	 *
-	 * @var array
-	 */
+	/** @var array Inline CSS */
 	protected $css_rules = [];
-
-	/**
-	 * CSS files
-	 *
-	 * @var array
-	 */
+	/** @var array CSS files */
 	protected $css_files = [];
-
-	/**
-	 * Holds base actions that we do not want crawled / indexed
-	 *
-	 * @var string[]
-	 */
+	/** @var string[] Holds base actions that we do not want crawled / indexed */
 	protected $no_index_actions = array();
-
-	/**
-	 * Right to left language support
-	 *
-	 * @var bool
-	 */
+	/** @var bool Right to left language support */
 	protected $rtl;
+	/** @var \ElkArte\HttpReq user input variables */
+	public $_req;
 
 	/**
 	 * Theme constructor.
@@ -122,6 +75,7 @@ abstract class Theme
 
 		$this->css_files = &$GLOBALS['context']['css_files'];
 		$this->js_files = &$GLOBALS['context']['js_files'];
+
 		$this->css_rules = &$GLOBALS['context']['css_rules'];
 		if (empty($this->css_rules))
 		{
@@ -130,6 +84,7 @@ abstract class Theme
 				'media' => [],
 			];
 		}
+
 		$this->no_index_actions = array(
 			'profile',
 			'search',
@@ -144,6 +99,8 @@ abstract class Theme
 			'verificationcode',
 			'contact'
 		);
+
+		$this->_req = HttpReq::instance();
 	}
 
 	/**

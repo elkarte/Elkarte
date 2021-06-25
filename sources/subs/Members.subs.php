@@ -809,9 +809,9 @@ function registerMember(&$regOptions, $ErrorContext = 'register')
 	);
 
 	// Administrative registrations are a bit different...
-	if ($regOptions['interface'] == 'admin')
+	if ($regOptions['interface'] === 'admin')
 	{
-		if ($regOptions['require'] == 'activation')
+		if ($regOptions['require'] === 'activation')
 		{
 			$email_message = 'admin_register_activate';
 		}

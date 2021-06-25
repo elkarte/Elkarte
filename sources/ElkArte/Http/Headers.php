@@ -279,6 +279,11 @@ class Headers
 	 */
 	public function sendHeaders()
 	{
+		if (headers_sent())
+		{
+			return;
+		}
+
 		foreach ($this->headers as $header => $value)
 		{
 			header("$header: $value", true);

@@ -96,18 +96,9 @@ function template_boardindex_outer_below()
 {
 	global $context, $settings, $txt;
 
-	// @todo - Just <div> for the parent, <p>'s for the icon stuffz, and the buttonlist <ul> for "Mark read".
-	// Sort the floats in the CSS file, as other tricks will be needed as well (media queries, for instance).
 	echo '
 		</main>
 		<aside id="posting_icons">';
-
-	// Show the mark all as read button?
-	if ($settings['show_mark_read'] && !$context['user']['is_guest'] && !empty($context['categories']))
-	{
-		echo '
-			', template_button_strip($context['mark_read_button'], 'right');
-	}
 
 	if ($context['user']['is_logged'])
 	{
@@ -117,7 +108,15 @@ function template_boardindex_outer_below()
 
 	echo '
 			<p title="', $txt['old_posts'], '"><i class="icon i-board-off"></i>', $txt['old_posts'], '</p>
-			<p title="', $txt['redirect_board'], '"><i class="icon i-board-redirect"></i>', $txt['redirect_board'], '</p>
+			<p title="', $txt['redirect_board'], '"><i class="icon i-board-redirect"></i>', $txt['redirect_board'], '</p>';
+
+	// Show the mark all as read button?
+	if ($settings['show_mark_read'] && !$context['user']['is_guest'] && !empty($context['categories']))
+	{
+		template_button_strip($context['mark_read_button'], 'flow_flex_additional_row');
+	}
+
+	echo '
 		</aside>';
 }
 
@@ -195,9 +194,8 @@ function template_ic_recent_posts()
 	global $context, $txt, $settings;
 
 	// Show the Recent Posts title
-	// hslice class is a left over from webslice support.
 	echo '
-			<li class="board_row hslice" id="recent_posts_content">
+			<li class="basic_row" id="recent_posts_content">
 				<h3 class="ic_section_header">
 					<a href="', getUrl('action', ['action' => 'recent']), '"><i class="icon i-post-text"></i>', $txt['recent_posts'], '</a>
 				</h3>';
@@ -218,9 +216,9 @@ function template_ic_recent_posts()
 				<table id="ic_recentposts">
 					<tr>
 						<th class="recentpost">', $txt['message'], '</th>
-						<th class="recentposter">', $txt['author'], '</th>
-						<th class="recentboard">', $txt['board'], '</th>
-						<th class="recenttime">', $txt['date'], '</th>
+						<th class="recentposter grid17">', $txt['author'], '</th>
+						<th class="recentboard grid20">', $txt['board'], '</th>
+						<th class="recenttime grid20">', $txt['date'], '</th>
 					</tr>';
 
 		// Each post in latest_posts has:
@@ -231,9 +229,9 @@ function template_ic_recent_posts()
 			echo '
 					<tr>
 						<td class="recentpost"><strong>', $post['link'], '</strong></td>
-						<td class="recentposter">', $post['poster']['link'], '</td>
-						<td class="recentboard">', $post['board']['link'], '</td>
-						<td class="recenttime">', $post['html_time'], '</td>
+						<td class="recentposter grid17">', $post['poster']['link'], '</td>
+						<td class="recentboard grid20">', $post['board']['link'], '</td>
+						<td class="recenttime grid20">', $post['html_time'], '</td>
 					</tr>';
 		}
 
@@ -252,7 +250,7 @@ function template_ic_show_events()
 	global $context, $txt;
 
 	echo '
-			<li class="board_row">
+			<li class="basic_row">
 				<h3 class="ic_section_header">
 					<a href="', getUrl('action', ['action' => 'calendar']), '">
 						<i class="icon i-calendar"></i> ', $context['calendar_only_today'] ? $txt['calendar_today'] : $txt['calendar_upcoming'], '
@@ -315,7 +313,7 @@ function template_ic_show_stats()
 	global $txt, $context, $settings, $modSettings;
 
 	echo '
-			<li class="board_row">
+			<li class="basic_row">
 				<h3 class="ic_section_header">
 					', $context['show_stats'] ? '<a href="' . getUrl('action', ['action' => 'stats']) . '" title="' . $txt['more_stats'] . '"><i class="icon i-pie-chart"></i>' . $txt['forum_stats'] . '</a>' : $txt['forum_stats'], '
 				</h3>
@@ -335,7 +333,7 @@ function template_ic_show_users()
 
 	// "Users online" - in order of activity.
 	echo '
-			<li class="board_row">
+			<li class="basic_row">
 				<h3 class="ic_section_header">
 					', $context['show_who'] ? '<a href="' . getUrl('action', ['action' => 'who']) . '">' : '', '<i class="icon i-users"></i>', $txt['online_now'], ':
 					', comma_format($context['num_guests']), ' ', $context['num_guests'] == 1 ? $txt['guest'] : $txt['guests'], ', ', comma_format($context['num_users_online']), ' ', $context['num_users_online'] == 1 ? $txt['user'] : $txt['users'];

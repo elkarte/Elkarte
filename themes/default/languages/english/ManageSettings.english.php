@@ -1,5 +1,5 @@
 <?php
-// Version: 1.1; ManageSettings
+// Version: 2.0; ManageSettings
 
 $txt['modSettings_desc'] = 'This page allows you to change the settings of features and basic options in your forum.  Please see the <a href="%1$s">theme settings</a> for more options.  Click the help icons for more information about a setting.';
 $txt['security_settings_desc'] = 'This page allows you to set options specifically related to the security and moderation of your forum, including anti-spam options.';
@@ -71,7 +71,7 @@ $txt['jqueryui_default'] = 'Specify a version of jQueryUI to use with ElkArte';
 $txt['jquery_custom_after'] = 'Local copy looks for jquery-<strong>X.XX.X</strong>.min.js';
 $txt['jqueryui_custom_after'] = 'Local copy looks for jquery-ui-<strong>X.XX.X</strong>.min.js';
 $txt['minify_css_js'] = 'Minify Javascript and CSS files';
-$txt['clean_hives'] = 'Clear hive cache';
+$txt['clean_hives'] = 'Clear minify cache';
 $txt['clean_hives_sucess'] = 'CSS and JS hives successfully deleted.';
 $txt['clean_hives_failed'] = 'A problem occured, hives have not been deleted.';
 $txt['enable_contactform'] = 'Enable contact form';

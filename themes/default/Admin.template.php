@@ -296,7 +296,7 @@ function template_edit_censored()
 	// First section is for adding/removing words from the censored list.
 	echo '
 	<div id="admincenter" class="admincenter">
-		<form id="admin_form_wrapper" action="', getUrl('action', ['action'=>'admin','area'=>'postsettings','sa'=>'censor']), '" method="post" accept-charset="UTF-8">
+		<form id="admin_form_wrapper" action="', getUrl('action', ['action'=>'admin', 'area'=>'postsettings', 'sa'=>'censor']), '" method="post" accept-charset="UTF-8">
 			<h2 class="category_header">
 				', $txt['admin_censored_words'], '
 			</h2>
@@ -322,7 +322,7 @@ function template_edit_censored()
 				</div>
 				<div id="moreCensoredWords"></div>
 				<div class="censorWords hide" id="moreCensoredWords_link">
-					<a class="linkbutton_left" href="#" onclick="addNewWord(); return false;">', $txt['censor_clickadd'], '</a><br />
+					<a class="linkbutton floatleft" href="#" onclick="addNewWord(); return false;">', $txt['censor_clickadd'], '</a><br />
 				</div>
 				<script>
 					document.getElementById("moreCensoredWords_link").style.display = "block";
@@ -348,7 +348,9 @@ function template_edit_censored()
 						<input type="checkbox" name="allow_no_censored" value="1" id="allow_no_censored"', empty($modSettings['allow_no_censored']) ? '' : ' checked="checked"', ' />
 					</dd>
 				</dl>
-				<input type="submit" name="save_censor" value="', $txt['save'], '" class="right_submit" />
+				<div class="submitbutton">
+					<input type="submit" name="save_censor" value="', $txt['save'], '" />
+				</div>
 			</div>
 			<br />';
 
@@ -775,7 +777,7 @@ function template_admin_search_results()
 									<p>
 										<a href="', $context['doc_scripturl'], str_replace(' ', '_', $result['title']), '" target="_blank" class="new_win"><strong>', $result['title'], '</strong></a>
 									</p>
-									<p class="double_height">
+									<p>
 										', $result['snippet'], '
 									</p>
 								</li>';
@@ -790,7 +792,7 @@ function template_admin_search_results()
 				if ($result['help'])
 				{
 					echo '
-									<p class="double_height">', $result['help'], '</p>';
+									<p>', $result['help'], '</p>';
 				}
 
 				echo '
@@ -1105,7 +1107,7 @@ function template_admin_quick_search()
 	{
 		echo '
 			<form action="', getUrl('admin', ['action' => 'admin', 'area' => 'search']), '" method="post" accept-charset="UTF-8" id="quick_search" class="floatright">
-				<input type="text" name="search_term" placeholder="', $txt['admin_search'], '" class="input_text" />
+				<input type="search" name="search_term" placeholder="', $txt['admin_search'], '" class="input_text" />
 				<select name="sa">
 					<option value="internal"', (empty($context['admin_preferences']['sb']) || $context['admin_preferences']['sb'] == 'internal' ? ' selected="selected"' : ''), '>', $txt['admin_search_type_internal'], '</option>
 					<option value="member"', (!empty($context['admin_preferences']['sb']) && $context['admin_preferences']['sb'] == 'member' ? ' selected="selected"' : ''), '>', $txt['admin_search_type_member'], '</option>

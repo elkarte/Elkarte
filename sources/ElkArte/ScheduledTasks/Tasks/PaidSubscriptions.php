@@ -16,6 +16,8 @@
 
 namespace ElkArte\ScheduledTasks\Tasks;
 
+use ElkArte\Themes\ThemeLoader;
+
 /**
  * Class Paid_Subscriptions - Perform the standard checks on expiring/near expiring subscriptions:
  *
@@ -83,7 +85,7 @@ class PaidSubscriptions implements ScheduledTaskInterface
 				{
 					// Need the below for \ElkArte\Themes\ThemeLoader::loadLanguageFile to work!
 					require_once(SUBSDIR . '/Mail.subs.php');
-					\ElkArte\Themes\ThemeLoader::loadEssentialThemeData();
+					ThemeLoader::loadEssentialThemeData();
 				}
 
 				$subs_reminded[] = $row['id_sublog'];

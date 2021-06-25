@@ -57,8 +57,7 @@ class ThemeLoader
 	 */
 	public function __construct($id_theme = 0, $initialize = true)
 	{
-		global $txt, $scripturl, $mbname, $modSettings;
-		global $context, $settings, $options;
+		global $txt, $scripturl, $mbname, $modSettings, $context, $settings, $options;
 
 		$this->user = User::$info;
 		$this->id = $id_theme;
@@ -182,8 +181,11 @@ class ThemeLoader
 		// Any theme-related strings that need to be loaded?
 		if (!empty($settings['require_theme_strings']))
 		{
-			\ElkArte\Themes\ThemeLoader::loadLanguageFile('ThemeStrings', '', false);
+			ThemeLoader::loadLanguageFile('ThemeStrings', '', false);
 		}
+
+		// Load the SVG support file with fallback to default theme
+		loadCSSFile('icons_svg.css');
 
 		// We allow theme variants, because we're cool.
 		if (!empty($settings['theme_variants']))
@@ -401,7 +403,6 @@ class ThemeLoader
 	 * @param int $member
 	 *
 	 * @return array
-	 * @throws \ElkArte\Exceptions\Exception
 	 */
 	private function getThemeData($member)
 	{
@@ -413,16 +414,14 @@ class ThemeLoader
 		$temp = [];
 		if ($cache->levelHigherThan(1)
 			&& $cache->getVar($temp, 'theme_settings-' . $this->id . ':' . $member, 60)
-			&& time() - 60 > $modSettings['settings_updated']
-		)
+			&& time() - 60 > $modSettings['settings_updated'])
 		{
 			$themeData = $temp;
 			$flag = true;
 		}
 		// Or do we just have the system wide theme settings cached
 		elseif ($cache->getVar($temp, 'theme_settings-' . $this->id, 90)
-			&& time() - 60 > $modSettings['settings_updated']
-		)
+			&& time() - 60 > $modSettings['settings_updated'])
 		{
 			$themeData = $temp + [$member => []];
 		}
@@ -667,7 +666,7 @@ class ThemeLoader
 		];
 		foreach ($init as $area => $value)
 		{
-			$context[$area] = isset($context[$area]) ? $context[$area] : $value;
+			$context[$area] = $context[$area] ?? $value;
 		}
 
 		// Set a couple of bits for the template.
@@ -720,9 +719,9 @@ class ThemeLoader
 		$db = database();
 
 		// Get all the default theme variables.
-		$db->fetchQuery(
-			'
-			SELECT id_theme, variable, value
+		$db->fetchQuery('
+			SELECT 
+				id_theme, variable, value
 			FROM {db_prefix}themes
 			WHERE id_member = {int:no_member}
 				AND id_theme IN (1, {int:theme_guests})',
@@ -750,6 +749,7 @@ class ThemeLoader
 		);
 
 		static::$dirs = new Directories($settings);
+
 		// Check we have some directories setup.
 		if (static::$dirs->hasDirectories() === false)
 		{

@@ -157,7 +157,9 @@ function template_permission_index()
 							</dd>
 						</dl>
 					</fieldset>
-					<input type="submit" value="', $txt['permissions_set_permissions'], '" onclick="return checkSubmit();" class="right_submit" />
+					<div class="submitbutton">
+						<input type="submit" value="', $txt['permissions_set_permissions'], '" onclick="return checkSubmit();" />
+					</div>
 				</div>
 			</div>';
 
@@ -537,15 +539,19 @@ function template_modify_group()
 			</div>';
 	}
 
+	echo '
+			<div class="submitbutton">';
+
 	if ($context['profile']['can_modify'])
 	{
 		echo '
-			<input type="submit" value="', $txt['permissions_commit'], '" class="right_submit" />';
+				<input type="submit" value="', $txt['permissions_commit'], '" />';
 	}
 
 	echo '
-			<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
-			<input type="hidden" name="', $context['admin-mp_token_var'], '" value="', $context['admin-mp_token'], '" />
+				<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
+				<input type="hidden" name="', $context['admin-mp_token_var'], '" value="', $context['admin-mp_token'], '" />
+			</div>
 		</form>
 	</div>';
 }
@@ -974,7 +980,7 @@ function template_postmod_permissions()
 		<p class="smalltext" style="padding-left: 10px;">
 			<strong>', $txt['permissions_post_moderation_legend'], ':</strong><br />
 			<i class="icon icon-small i-post_moderation_allow"></i> - ', $txt['permissions_post_moderation_allow'], '<br />
-			<i class="icon icon-small i-post_moderation_moderate"></i> - ', $txt['permissions_post_moderation_moderate'], '<br />
+			<i class="icon icon-small  i-post_moderation_moderate"></i> - ', $txt['permissions_post_moderation_moderate'], '<br />
 			<i class="icon icon-small i-post_moderation_deny"></i> - ', $txt['permissions_post_moderation_disallow'], '
 		</p>
 	</div>';

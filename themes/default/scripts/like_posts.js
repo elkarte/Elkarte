@@ -74,39 +74,39 @@
 
 				// Make the ajax call to the likes system
 				$.ajax({
-					url: elk_scripturl + '?action=likes;sa=' + subAction + ';xml;api=json;' + elk_session_var + '=' + elk_session_id,
+					url: elk_scripturl + '?action=likes;sa=' + subAction + ';api=json;' + elk_session_var + '=' + elk_session_id,
 					type: 'POST',
 					dataType: 'json',
 					data: values,
 					cache: false
 				})
-					.done(function (resp)
+				.done(function (resp)
+				{
+					// json response from the server says success?
+					if (resp.result === true)
 					{
-						// json response from the server says success?
-						if (resp.result === true)
-						{
-							// Update the page with the new likes information
-							updateUi({
-								'elem': $(e.target),
-								'count': resp.count,
-								'text': resp.text,
-								'title': resp.title,
-								'action': subAction
-							});
-						}
-						// Some failure trying to process the request
-						else
-						{
-							handleError(resp);
-						}
-					})
-					.fail(function (err, textStatus, errorThrown)
+						// Update the page with the new likes information
+						updateUi({
+							'elem': $(e.target),
+							'count': resp.count,
+							'text': resp.text,
+							'title': resp.title,
+							'action': subAction
+						});
+					}
+					// Some failure trying to process the request
+					else
 					{
-						// Some failure sending the request, this generally means some html in
-						// the output from php error or access denied fatal errors etc
-						err.data = oTxt.error_occurred + ' : ' + errorThrown;
-						handleError(err);
-					});
+						handleError(resp);
+					}
+				})
+				.fail(function (err, textStatus, errorThrown)
+				{
+					// Some failure sending the request, this generally means some html in
+					// the output from php error or access denied fatal errors etc
+					err.data = oTxt.error_occurred + ' : ' + errorThrown;
+					handleError(err);
+				});
 			},
 
 			/**
@@ -148,46 +148,11 @@
 			 */
 			handleError = function (params)
 			{
-				var str = '<div class="floating_error"><div class="error_heading">' + oTxt.likeHeadingError + '</div><p class="error_msg">' + params.data + '</p><p class="error_btn">' + oTxt.btnText + '</p></div>';
-
-				$('body').append(str);
-
-				var screenWidth = $(window).width(),
-					screenHeight = $(window).height(),
-					$floating_error = $('.floating_error'),
-					popupHeight = $floating_error.outerHeight(),
-					popupWidth = $floating_error.outerWidth(),
-					topPopUpOffset = (screenHeight - popupHeight) / 2,
-					leftPopUpOffset = (screenWidth - popupWidth) / 2;
-
-				// Center the error popup on the screen
-				$floating_error.css({
-					top: topPopUpOffset + 'px',
-					left: leftPopUpOffset + 'px'
+				new smc_Popup({
+					heading: oTxt.likeHeadingError,
+					content: params.data,
+					icon: 'i-exclamation colorize-exclamation'
 				});
-
-				$(document).one('click keyup', removeOverlay);
-			},
-
-			/**
-			 * Clear the error box from the screen by click or escape key
-			 *
-			 * @param {type} e
-			 */
-			removeOverlay = function (e)
-			{
-				if (typeof (e) === 'undefined')
-				{
-					return false;
-				}
-				else if ((e.type === 'keyup' && e.keyCode === 27) || e.type === 'click')
-				{
-					var $floating_error = $('.floating_error');
-					$floating_error.remove();
-					$floating_error.off('click');
-					$(document).off('click', removeOverlay);
-					$(document).off('keyup', removeOverlay);
-				}
 			};
 
 		return {
@@ -311,7 +276,7 @@
 
 				// Make the ajax call to the likes system
 				$.ajax({
-					url: elk_scripturl + '?action=likes;sa=likestats;area=' + params.url + ';xml;api=json;',
+					url: elk_scripturl + '?action=likes;sa=likestats;area=' + params.url + ';api=json;',
 					type: 'POST',
 					dataType: 'json',
 					cache: false
@@ -478,8 +443,8 @@
 							data[i].msg_data[j].member.name + ' : ' + txtStrings.postedAt + ' ' + data[i].msg_data[j].html_time +
 							'           </h5>' +
 							'       </div>' +
-							'       <div class="inner">' + data[i].msg_data[j].body + '</div>' +
-							'       <a class="linkbutton_right" href="' + msgUrl + '">' + txtStrings.readMore + '</a>' +
+							'       <div class="messageContent">' + data[i].msg_data[j].body + '</div>' +
+							'       <a class="linkbutton floatright" href="' + msgUrl + '">' + txtStrings.readMore + '</a>' +
 							'       <div class="separator"></div>' +
 							'   </div>';
 					}
@@ -539,7 +504,7 @@
 						'           </a> : ' + txtStrings.postedAt + ' ' + data.topic_data[i].html_time +
 						'       </h5>' +
 						'   </div>' +
-						'   <div class="inner">' + data.topic_data[i].body + '</div>' +
+						'   <div class="messageContent">' + data.topic_data[i].body + '</div>' +
 						'   <a class="linkbutton floatright" href="' + topicUrl + '">' + txtStrings.readMore + '</a>' +
 						'</div>';
 				}
@@ -606,8 +571,8 @@
 							txtStrings.postedAt + ' ' + data[i].post_data[j].html_time + ' - ' + data[i].post_data[j].like_count + ' ' + txtStrings.likesReceived +
 							'               </h5>' +
 							'           </div>' +
-							'          <div class="inner">' + data[i].post_data[j].body + '</div>' +
-							'          <a class="linkbutton_right" href="' + msgUrl + '">' + txtStrings.readMore + '</a>' +
+							'          <div class="messageContent">' + data[i].post_data[j].body + '</div>' +
+							'          <a class="linkbutton floatright" href="' + msgUrl + '">' + txtStrings.readMore + '</a>' +
 							'          <div class="separator"></div>' +
 							'       </div>';
 					}
@@ -681,8 +646,8 @@
 							txtStrings.postedAt + ' ' + data[i].post_data[j].html_time +
 							'           </h5>' +
 							'       </div>' +
-							'       <div class="inner">' + data[i].post_data[j].body + '</div>' +
-							'       <a class="linkbutton_right" href="' + msgUrl + '">' + txtStrings.readMore + '</a>' +
+							'       <div class="messageContent">' + data[i].post_data[j].body + '</div>' +
+							'       <a class="linkbutton floatright" href="' + msgUrl + '">' + txtStrings.readMore + '</a>' +
 							'   	<div class="separator"></div>' +
 							'   </div>';
 					}

@@ -108,7 +108,7 @@ function bb2_db_query($query)
 	}
 
 	// Just a junk call from BB
-	if (strpos($query, '@@session.wait_timeout') !== false)
+	if (strpos($query, '@@session.wait_timeout') !== false || strpos($query, "'") !== false)
 	{
 		return true;
 	}

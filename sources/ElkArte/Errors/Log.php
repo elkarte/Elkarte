@@ -179,7 +179,7 @@ class Log extends AbstractModel
 	 */
 	public function fetchErrorsByType($filter = null, $sort = null)
 	{
-		global $txt, $scripturl;
+		global $txt;
 
 		$sum = 0;
 		$types = array();

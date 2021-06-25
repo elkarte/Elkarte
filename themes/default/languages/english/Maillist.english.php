@@ -1,5 +1,5 @@
 <?php
-// Version: 1.1; Maillist
+// Version: 2.0; Maillist
 
 // Email posting errors
 $txt['error_locked'] = 'This topic has been locked and can no longer be replied to';

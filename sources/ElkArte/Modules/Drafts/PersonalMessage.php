@@ -49,7 +49,7 @@ class PersonalMessage extends AbstractModule
 	 *
 	 * @var int
 	 */
-	protected static $_subject_length = 24;
+	protected static $_subject_length = 32;
 
 	/**
 	 * @var \ElkArte\EventManager

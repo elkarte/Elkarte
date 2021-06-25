@@ -1,11 +1,8 @@
 /* INTRODUCTION
-/* This variant is the standard, light, Elkarte default theme.
-/* This is eye candy only. All the layout code is in index.css.
+/* This variant is the standard, light, Elkarte RTL theme.
+/* This is eye candy only. All the layout code is in rtl.css.
 /*
-/* All theme variants depend on the layout code for stability.
-/* It is better to copy code to a variant CSS file for testing.
 /* ------------------------------------------------------- */
-/* $CONTENTS - still a bit WIP. @todo
 /*
 /*		$GENERAL.............Global resets, clearfixes, etc.
 /*		$COMMON..............Common classes to drive you bonkers.
@@ -40,27 +37,26 @@
 /*		$MEDIA...............Experimental media queries.
 /* ------------------------------------------------------- */
 
-/*	$GENERAL	*/
-/* ------------------------------------------------------- */
+:root {
+	/* flip right and left colors for RTL */
+	--primary_border_right: #C7C7C7;
+	--primary_border_left: #CCCCCC;
+
+	--seconday_border_right: #BFBFBF;
+	--seconday_border_left: #AFAFAF;
+}
+
+/* -------------------------------------------------------
+ *	$GENERAL
+ * -------------------------------------------------------
+ */
+
 body {
-	background-image: linear-gradient(to left, #333333 0%, #888888 50%, #333333 100%);
+	background-image: linear-gradient(to left, var(--body_grad_1) 0%, var(--body_grad_2) 50%, var(--body_grad_1) 100%);
 }
 
 fieldset {
-	box-shadow: inset 1px -1px 3px #FFFFFF;
-}
-
-legend {
-	margin-right: 15px;
-	margin-left: 0;
-	padding-right: 20px;
-	padding-left: 0;
-	cursor: pointer;
-	background: url(../../images/selected_open.png) no-repeat scroll right center transparent;
-}
-
-.collapsed legend {
-	background: url(../../images/selected_rtl.png) no-repeat scroll right center transparent;
+	box-shadow: inset 1px -1px 3px var(--box_shadow);
 }
 
 /* The OpenID login form */
@@ -70,94 +66,79 @@ legend {
 	background-position: 98% 50%;
 }
 
+/* Dont show disabled buttons as active on hover */
+input[type=submit][disabled]:hover, button[disabled], button[disabled]:hover {
+	border-right: 1px solid var(--seconday_border_right);
+	border-left: 1px solid var(--seconday_border_left);
+}
+
 /* Common button styling. */
-/* It is being replaced with three classes: */
-/*    .button_submit is not floated */
-/*    .right_submit is right floated */
-/*    .left_submit is left floated */
-/* The button_reset class may need attention too. */
-.button_submit, .right_submit, .left_submit, .button_reset,
+input[type="submit"], .drop_area_fileselect_text, button[type="submit"], input[type="button"],
 	/* Anchors styled to look like buttons. */
-	/* These have standard body text size. Can be chained with smalltext class. */
-.linkbutton:link, .linkbutton_right:link, .linkbutton_left:link,
-.linkbutton:visited, .linkbutton_right:visited, .linkbutton_left:visited {
-	border-right: 1px solid #BFBFBF;
-	border-left: 1px solid #AFAFAF;
-	box-shadow: -1px 1px 2px #E5E5E5;
+.linkbutton:link, .linkbutton:visited {
+	border-right: 1px solid var(--seconday_border_right);
+	border-left: 1px solid var(--seconday_border_left);
+	box-shadow: -1px 1px 2px var(--box_shadow);
 }
 
 /* Hover effects. */
-.button_submit:hover, .right_submit:hover, .left_submit:hover,
-.button_reset:hover,
-.linkbutton:hover, .linkbutton_right:hover, .linkbutton_left:hover {
-	border-right: 1px solid #AFAFAF;
-	border-left: 1px solid #CCCCCC;
-	box-shadow: -2px 1px 1px rgba(0, 0, 0, 0.07) inset;
-}
-
-/* @todo - Test this everywhere. */
-.standard_category {
-	box-shadow: -1px 2px 4px #EEEEEE;
+input[type="submit"]:hover, button[type="submit"]:hover, input[type="button"]:hover, .linkbutton:hover {
+	border-right-color: var(--primary_border_top);
+	border-left-color: var(--primary_border_left);
+	box-shadow: -2px 1px 1px var(--opacity10) inset;
 }
 
 /* Styles for main headers. */
 .category_header, .forum_category .category_header {
-	text-shadow: -1px 1px 0 #EBEBEB;
+	text-shadow: -1px 1px 0 var(--box_shadow);
 }
 
 /* Styles for subsection headers. @todo */
 .secondary_header {
-	text-shadow: -1px 1px 0 #FFFFFF;
+	text-shadow: -1px 1px 0 var(--primary_white);
 }
 
-/*	$BBC		*/
-/* ------------------------------------------------------- */
+/* -------------------------------------------------------
+ * $BBC
+ * -------------------------------------------------------
+ */
 /* Extra quote styling */
 .bbc_quote, .quoteheader {
-	box-shadow: -2px 2px 2px #DDDDDD;
+	box-shadow: -2px 2px 2px var(--box_shadow);
 }
 
-/*	$AJAX		*/
-/* ------------------------------------------------------- */
+/* -------------------------------------------------------
+ * $AJAX
+ * -------------------------------------------------------
+ */
 
-/*	$MAIN.		*/
-/* ------------------------------------------------------- */
-/* Maintenance mode warning. */
-.notice {
-	font-weight: 700;
-	color: #A80000;
-}
+/* -------------------------------------------------------
+ * $MAIN
+ * -------------------------------------------------------
+ */
 
 #search_form .input_text {
-	border-right: 1px solid #CCCCCC;
-	border-radius: 0 2px 2px 0;
-}
-
-#search_form input[type="submit"] {
-	border-radius: 2px 0 0 2px;
+	border-right: 1px solid var(--primary_border_right);
 }
 
 #search_form select {
-	border-style: solid none;
+	border-color: var(--transparent);
 }
 
 .forumtitle > a {
-	text-shadow: -1px 1px 0 #FFFFFF;
+	text-shadow: -1px 1px 0 var(--primary_white);
 }
 
-/* News section. */
-#news > h2 {
-	float: right;
-	margin: -2px 0 0 1em;
-}
+/* -------------------------------------------------------
+ * $MENUS
+ * -------------------------------------------------------
+ */
 
-/*	$MENUS		*/
-/* ------------------------------------------------------- */
 /* Level 1 Menu bar: link or button. General styling. */
 .linklevel1, .linklevel1:link, .linklevel1:visited {
-	border-right: 1px solid #BFBFBF;
-	border-left: 1px solid #AFAFAF;
-	box-shadow: -1px 1px 2px #E5E5E5;
+	border-right: 1px solid var(--seconday_border_right);
+	border-left: 1px solid var(--seconday_border_left);
+	box-shadow: -1px 1px 2px var(--box_shadow);
 }
 
 /* Level 1 button hover and focus effects. */
@@ -165,411 +146,266 @@ legend {
 .linklevel2:hover, .listlevel2:hover .linklevel2,
 .linklevel3:hover, .listlevel3:hover .linklevel3,
 #menu_sidebar .linklevel1:hover, #menu_sidebar .listlevel1:hover .linklevel1 {
-	border-right: 1px solid #AFAFAF;
-	border-left: 1px solid #CCCCCC;
-	box-shadow: -2px 1px 1px rgba(0, 0, 0, 0.07) inset;
+	border-right: 1px solid var(--seconday_border_right);
+	border-left: 1px solid var(--seconday_border_right);
+	box-shadow: -2px 1px 1px var(--opacity10) inset;
 }
 
 .poster li.poster_online:hover .linklevel1 {
-	border-right: 1px solid #AFAFAF;
-	border-left: 1px solid #CCCCCC;
-	box-shadow: -2px 1px 1px rgba(0, 0, 0, 0.07) inset;
+	border-right: 1px solid var(--seconday_border_right);
+	border-left: 1px solid var(--seconday_border_left);
+	box-shadow: -2px 1px 1px var(--opacity10) inset;
 }
 
 .poster li.poster_online .nolink {
-	border-right: 1px solid #BFBFBF;
-	border-left: 1px solid #AFAFAF;
-	box-shadow: -1px 1px 2px #E5E5E5;
+	border-right: 1px solid var(--seconday_border_right);
+	border-left: 1px solid var(--seconday_border_left);
+	box-shadow: -1px 1px 2px var(--box_shadow);
 }
 
 /* Level 1 active buttons. */
 .linklevel1.active, .listlevel1:hover .active,
 #collapse_button .linklevel1, .pm_indicator {
-	border-right: 1px solid #38642D;
-	border-left: 1px solid #38642E;
 	box-shadow: -1px 1px 2px #BBBBBB;
 }
 
 /* Hover effects for those buttons. */
 .linklevel1.active:hover, .listlevel1:hover .linklevel1.active,
 #collapse_button .linklevel1:hover, .linklevel1:hover .pm_indicator {
-	border-right: 1px solid #2D5024;
-	border-left: 1px solid #5AA049;
-	box-shadow: -1px 1px 1px rgba(0, 0, 0, 0.3) inset;
+	border-right-color: var(--border_menu_tl);
+	border-left-color: var(--menu_border);
+	box-shadow: -1px 1px 1px var(--opacity30) inset;
 }
 
 /* Levels 2 and 3: drop menu wrapper. */
 .menulevel2, .menulevel3 {
-	border-right: 1px solid #BFBFBF;
-	border-left: 1px solid #AFAFAF;
-	box-shadow: -3px 3px 3px rgba(0, 0, 0, 0.2);
+	border-right: 1px solid var(--seconday_border_right);
+	border-left: 1px solid var(--seconday_border_left);
+	box-shadow: -3px 3px 3px var(--opacity20);
 }
 
-/* Tricky PM indicator. Define it carefully,
-/* just in case someone tries to use this class elsewhere. */
-
+/* Tricky PM indicator. Define it carefully */
 .pm_indicator {
-	right: auto;
-	left: -0.4em;
-	float: right;
-	border-radius: 8px 8px 0 8px;
-	box-shadow: -2px 2px 3px rgba(0, 0, 0, 0.25), 0 -1px 0 #3D6E32 inset;
+	box-shadow: -2px 2px 3px var(--opacity20), 0 -1px 0 var(--menu_button_active) inset;
 }
 
-#dropdown_menu_1 .pm_indicator {
-	margin-left: 2px;
+.likes_indicator {
+	box-shadow: -2px 2px 2px var(--opacity20);
 }
 
-/* Admin menu icons. */
-.linklevel2 > img {
-	margin: 0 -4px 0 0;
-}
+/* -------------------------------------------------------
+ * $BOARDICONS
+ * -------------------------------------------------------
+ */
 
-/* Level 2: subsection indicators. */
-.listlevel2.subsections .linklevel2:after,
-#menu_sidebar .subsections .linklevel1:after,
-#menu_sidebar .subsections:hover .linklevel1:after {
-	right: auto;
-	left: 6px;
-	content: "\2190";
-}
 
-/*	$BOARDICONS	*/
-/* ------------------------------------------------------- */
-.board_icon {
-	float: right;
-}
-
-/*	$LINKTREE	*/
-/* ------------------------------------------------------- */
-/* The navigation list (i.e. linktree) */
-/* Wrapper/background. */
+/* -------------------------------------------------------
+ *	$LINKTREE / $BREADCRUMBS
+ * -------------------------------------------------------
+ */
 .navigate_section {
-	box-shadow: -1px 2px 3px #EEEEEE;
+	box-shadow: -1px 2px 3px var(--box_shadow);
 }
 
-/* Color for linktree items. */
-.linktree:after {
-	box-shadow: -2px 2px 0 1px rgba(204, 204, 204, 0.9);
+.breadcrumb .crumb.active:after, .breadcrumb .crumb:hover:after, .breadcrumb .crumb:last-child {
+	background-image: linear-gradient(0deg, var(--menu_button_active), var(--menu_button_active_2));
 }
 
-.linktree {
-	box-shadow: 0 2px 0 -1px #CCCCCC, -3px 2px 0 -1px #CCCCCC, -3px -1px 0 -1px #CCCCCC;
-}
+/* -------------------------------------------------------
+ * $BUTTONS
+ * This section contains code for the quickbuttons (quote, quick edit, etc)
+ * and for the buttonlist class (reply, add poll, notify, etc).
+ * These classes share some styling.
+ * Declarations are amalgamated where styling is shared.
+ * -------------------------------------------------------
+ */
 
-/*	$BUTTONS	*/
-/* This section contains code for the quickbuttons (quote, quick edit, etc)
-/* and for the buttonlist class (reply, add poll, notify, etc).
-/* These classes share some styling.
-/* Declarations are amalgamated where styling is shared.
-/* ------------------------------------------------------- */
-/* Styles for the standard button lists.
-/* ------------------------------------------------------- */
 /* The active one */
 .buttonlist li a.active {
-	box-shadow: -1px 1px 2px #CCCCCC;
+	box-shadow: -1px 1px 2px var(--box_shadow);
 }
 
-/* The quick buttons. */
-/* ------------------------------------------------------- */
-/* Radius left end of the first (Quote) button. */
-.linklevel1.quote_button {
-	border-radius: 0 2px 2px 0;
-}
-
-/* Radius right end of the last button. */
-.linklevel1.post_options, .linklevel1.remove_button {
-	border-radius: 2px 0 0 2px;
-}
-
-/*	$PAGELINKS	*/
-/* ------------------------------------------------------- */
+/* -------------------------------------------------------
+ *	$PAGELINKS
+ * -------------------------------------------------------
+ */
 .pagelinks .navPages:hover, .pagelinks .current_page {
-	border-right: 1px solid #AFAFAF;
-	border-left: 1px solid #CCCCCC;
-	box-shadow: -2px 1px 1px rgba(0, 0, 0, 0.07) inset;
+	border-right: 1px solid var(--seconday_border_right);
+	border-left: 1px solid var(--seconday_border_left);
+	box-shadow: -2px 1px 1px var(--opacity10) inset;
 }
 
-.pagelinks :first-child {
-	border-radius: 0 2px 2px 0;
-}
+/* -------------------------------------------------------
+ *	$TABLES
+ * -------------------------------------------------------
+ */
 
-.pagelinks :last-child {
-	border-radius: 2px 0 0 2px;
-}
-
-/* our buddies &laquo; &raquo; */
-.small_pagelinks:before {
-	float: right;
-	content: '\00AB';
-}
-
-.small_pagelinks:after {
-	float: right;
-	content: '\00BB';
-}
-
-/* Globally accessible top/bottom links. */
-#gotop, #gobottom {
-	border-radius: 20px 0 0 0;
-}
-
-#gobottom {
-	border-radius: 0 0 0 20px;
-}
-
-/*	$TABLES		*/
-/* ------------------------------------------------------- */
-
-/*	$BOARDS		*/
-/* ------------------------------------------------------- */
-/* Set up some general framing classes. @todo */
-/*    .forum_category for board index/sub-boards. */
-/*    .forumposts for thread pages and recent posts, etc. */
-/*    .content_category for general divisions around the place. */
-/* All styled the same in default variant, but available for fun and games. */
+/* -------------------------------------------------------
+ *	$BOARDS
+ * -------------------------------------------------------
+ */
 
 /* The board categories and newsfader - some shared styling. */
 .forum_category, .forumposts, .content_category {
-	box-shadow: -1px 2px 3px #EEEEEE;
+	box-shadow: -1px 2px 3px var(--box_shadow);
 }
 
-/* @todo - Clean this up, once new classes are assigned to old windowbg stuffz. */
 .board_latest {
-	border-right: 1px solid #CCCCCC;
-	border-left: 0;
+	border-right: 1px solid var(--seconday_border_right);
 }
 
 /* The board description and who-is-viewing stuff. */
 #description_board {
-	box-shadow: -1px 2px 4px #EEEEEE;
+	box-shadow: -1px 2px 4px var(--box_shadow);
 }
 
 .topic_listing {
-	box-shadow: -1px 2px 4px #EEEEEE;
+	box-shadow: -1px 2px 4px var(--box_shadow);
 }
 
 .jump_to_header {
-	box-shadow: -2px 1px rgba(1, 1, 1, 0.07) inset;
+	box-shadow: -2px 1px var(--opacity10) inset;
 }
 
-/* --------------------------------------------------------------------- */
-/* The following are alternative layout orders for the board index rows. */
-/* They are basic demonstrations only. Extra custom styling can be done.
-/* These demos can be commented and un-commented to see them in action.
-/* Note: similar tricks can be performed with the new message index too.
-/* --------------------------------------------------------------------- */
-/* This one simply puts the board stats back in the old SMF location. */
-/*
-.board_stats {
-	text-align: right;
-	padding: 1px 0 1px 6px;
-	float: right;
-}
-*/
-/* This one flips the row left to right, and sets the lastpost text to LTR. */
-/*
-.board_row {
-	direction: ltr;
-}
-.board_latest {
-	direction: ltr;
-}
-*/
-/* This one does the LTR flip, and puts the board icon at far right. */
-/*
-.board_row {
-	direction: ltr;
-}
-.icon_anchor {
-	float: left;
-	padding: 2px 6px 0 0;
-}
-.board_latest {
-	direction: rtl;
-}
-*/
-/* ------------------------------------------------------ */
-/* This is where the fun starts. Absolute positioning. :D */
-/* ------------------------------------------------------ */
-/* This one takes the previous example, and puts the board icon back to far left. */
-/*
-.board_row {
-	direction: ltr;
-}
-.icon_anchor {
-	left: auto;
-	right: 8px;
-}
-.board_latest {
-	direction: rtl;
-	padding-left: 0;
-	padding-right: 66px;
-}
-*/
-/* You want more? Ok. This one does the above, but also puts board stats over
-/* at far right, and sets board name and description back to left aligned. */
-/*
-.board_row {
-	direction: ltr;
-}
-.board_info {
-	direction: rtl;
-	padding-right: 0;
-	padding-left: 8.4em;
-}
-.icon_anchor {
-	left: auto;
-	right: 8px;
-}
-.board_latest {
-	direction: rtl;
-	padding-left: auto;
-	padding-right: 66px;
-}
-.board_stats {
-	right: auto;
-	left: 8px;
-}
-*/
-/* There are more options, but those should be enough to give the general idea. */
-/* ------------------------------------------------ */
-/* End alternative layouts. Back to standard stuff. */
-/* ------------------------------------------------ */
-
-/*	$TOPICS		*/
-/* ------------------------------------------------------- */
+/* -------------------------------------------------------
+ *	$TOPICS
+ * -------------------------------------------------------
+ */
 
 /* On to the posts */
 .forumposts {
-	box-shadow: -1px 2px 4px #EEEEEE;
+	box-shadow: -1px 2px 4px var(--box_shadow);
 }
 
 /* @todo - Save code by amalgamating common button background declarations. */
 .poster_online .linklevel1 {
-	border-right: 1px solid #BFBFBF;
-	border-left: 1px solid #AFAFAF;
-	box-shadow: -1px 1px 2px #EEEEEE;
+	border-right: 1px solid var(--seconday_border_right);
+	border-left: 1px solid var(--seconday_border_left);
+	box-shadow: -1px 1px 2px var(--box_shadow);
 }
 
 .poster_online .linklevel1:hover {
-	border-right: 1px solid #BBBBBB;
-	border-left: 1px solid #CCCCCC;
-	box-shadow: -1px 1px 1px rgba(0, 0, 0, 0.07) inset;
+	border-right: 1px solid var(--primary_border_right);
+	border-left: 1px solid var(--primary_border_left);
+	box-shadow: -1px 1px 1px var(--opacity10) inset;
 }
 
 /* Do one override here for .poster. Still saves code all round. */
 .poster_avatar .linklevel1, .poster_avatar:hover .linklevel1,
 .poster_avatar .linklevel1:focus,
 .name.linklevel1, .name.linklevel1:hover, .name.linklevel1:focus {
-	color: #4B863C;
 	border: none;
 	background: none;
 	box-shadow: none;
 }
 
-.requiredfield {
-	border-right: 1px solid #2D5024;
-	border-left: 1px solid #5AA049;
-}
+/* -------------------------------------------------------
+ *	$EDITOR
+ * -------------------------------------------------------
+ */
 
-/*	$EDITOR		*/
-/* ------------------------------------------------------- */
+/* -------------------------------------------------------
+ *	$MODERATE
+ * -------------------------------------------------------
+ */
 
-/*	$MODERATE	*/
-/* ------------------------------------------------------- */
-
-/* Styles for the $TABS	*/
-/* We can't control what jqueryui pollutes the DOM with, so deal with it */
-/* Styles for the profile summary tabs, or any jquery ui tabs */
-/* ---------------------------------------------------------- */
+/* -------------------------------------------------------
+ * $TABS
+ * --------------------------------------------------------
+ */
 .ui-tabs .ui-state-hover {
-	border-right: 1px solid #AFAFAF;
-	border-left: 1px solid #CCCCCC;
+	border-right: 1px solid var(--seconday_border_right);
+	border-left: 1px solid var(--seconday_border_left);
 }
 
-/* $PROFILE	*/
-/* ------------------------------------------------------- */
+/* -------------------------------------------------------
+ * $PROFILE
+ * -------------------------------------------------------
+ */
 .profile_pie {
 	background: url(../../images/_light/stats_pie_rtl.png);
 }
 
-/* $PERSONAL	*/
-/* ------------------------------------------------------- */
+/* -------------------------------------------------------
+ * $PERSONAL
+ * ------------------------------------------------------- */
 #personal_messages .capacity_bar span {
-	border-right: 0;
-	border-left: 1px solid #ADADAD;
+	border-right-color: var(--transparent);
+	border-left: 1px solid var(--seconday_border_left);
 }
 
-/* $CALENDAR	*/
-/* ------------------------------------------------------- */
+/* -------------------------------------------------------
+ * $CALENDAR
+ * -------------------------------------------------------
+ */
 
-/*	$HELP		*/
-/* ------------------------------------------------------- */
+/* -------------------------------------------------------
+ * $HELP
+ * -------------------------------------------------------
+ */
 
 /* Styles for the tooltips. */
 .tooltip {
-	box-shadow: -3px 3px 3px rgba(0, 0, 0, 0.3);
+	box-shadow: -3px 3px 3px var(--opacity30);
 }
 
-/*	$SEARCH		*/
-/* ------------------------------------------------------- */
+/* -------------------------------------------------------
+ * $SEARCH
+ * -------------------------------------------------------
+ */
 
-/*	$LOGIN		*/
-/* ------------------------------------------------------- */
+/* -------------------------------------------------------
+ * $LOGIN
+ * -------------------------------------------------------
+ */
 
-/*	$ERRORS		*/
-/* ------------------------------------------------------- */
-.errorbox {
-	background: #FFEEEE url(../../images/profile/warning_mute.png) 99% 50% no-repeat;
-}
+/* -------------------------------------------------------
+ * $ERRORS
+ * -------------------------------------------------------
+ */
 
-/*	$PROGRESS	*/
-/* ------------------------------------------------------- */
+/* -------------------------------------------------------
+ * $PROGRESS
+ * -------------------------------------------------------
+ */
 
-/* $STATISTICS	*/
-/* ------------------------------------------------------- */
+/* -------------------------------------------------------
+ * $STATISTICS
+ * -------------------------------------------------------
+ */
 .stats.floatleft {
-	border-right: 0;
-	border-left: 1px solid #CCCCCC;
+	border-right-color: var(--transparent);
+	border-left: 1px solid var(--seconday_border_left);
 }
 
-/*	$MEDIA		*/
+/* -------------------------------------------------------
+ * $MEDIA
+ * -------------------------------------------------------
+ */
 
-/* This one does 800 screens at default font size. */
+/* This one does 800 screens at default font size.
+   -------------------------------------------------------------------------------------------*/
 
 @media screen and (max-width: 50em) {
 	#menu_sidebar {
-		box-shadow: -3px 3px 3px rgba(0, 0, 0, 0.3);
-	}
-
-	#main_menu .linklevel1 {
-		margin-right: 0;
-		margin-left: 2px;
+		box-shadow: -3px 3px 3px var(--opacity30);
 	}
 }
 
-/* This one does up to 540 screens. */
+/* This one does up to 540 screens.
+   -------------------------------------------------------------------------------------------*/
 
 @media screen and (max-width: 33.750em) {
-	#gobottom {
-		border-radius: 0;
-	}
-
-	#gotop {
-		border-radius: 8px 0 0 0;
-	}
-
 	.board_latest {
-		border-right-width: 0;
+		border-right-color: var(--transparent);
 	}
 
 	.topic_listing > li {
-		box-shadow: -3px 3px 6px #E5E5E5;
+		box-shadow: -3px 3px 6px var(--box_shadow);
 	}
 
 	.forumposts .content {
-		box-shadow: -3px 3px 6px #E5E5E5;
+		box-shadow: -3px 3px 6px var(--box_shadow);
 	}
 
 	.linktree:after {

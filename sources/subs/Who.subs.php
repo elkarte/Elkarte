@@ -132,7 +132,6 @@ function formatViewers($id, $type)
  * and <credits> tags in package.xml.
  *
  * @return array
- * @throws \ElkArte\Exceptions\Exception
  */
 function addonsCredits()
 {
@@ -567,7 +566,6 @@ function prepareCreditsData()
 			'<a href="http://ichord.github.com/At.js">At.js</a> | &copy; Chord Luo | Licensed under <a href="http://opensource.org/licenses/MIT">The MIT License (MIT)</a>',
 			'<a href="http://bad-behavior.ioerror.us/">Bad Behavior</a> | &copy; Michael Hampton | Licensed under <a href="http://opensource.org/licenses/LGPL-3.0">GNU Lesser General Public License</a>',
 			'<a href="https://code.google.com/p/google-code-prettify/">Google Code Prettify</a> | Licensed under <a href="http://opensource.org/licenses/Apache-2.0">Apache License, Version 2.0</a>',
-			'<a href="http://cherne.net/brian/resources/jquery.hoverIntent.html">hoverIntent</a> | &copy; Brian Cherne | Licensed under <a href="http://opensource.org/licenses/MIT">The MIT License (MIT)</a>',
 			'<a href="http://pajhome.org.uk/crypt/md5">Javascript Crypt</a> | &copy; Angel Marin, Paul Johnston | Licensed under <a href="http://opensource.org/licenses/BSD-3-Clause">The BSD License</a>',
 			'<a href="http://jquery.org/">JQuery</a> | &copy; jQuery Foundation and other contributors | Licensed under <a href="http://opensource.org/licenses/MIT">The MIT License (MIT)</a>',
 			'<a href="http://jqueryui.com/">JQuery UI</a> | &copy; jQuery Foundation and other contributors | Licensed under <a href="http://opensource.org/licenses/MIT">The MIT License (MIT)</a>',
@@ -577,7 +575,6 @@ function prepareCreditsData()
 			'<a href="http://www.sceditor.com/">SCEditor</a> | &copy; Sam Clarke | Licensed under <a href="http://opensource.org/licenses/MIT">The MIT License (MIT)</a>',
 			'<a href="http://sourceforge.net/projects/simplehtmldom/">Simple HTML DOM</a> | Licensed under <a href="http://opensource.org/licenses/MIT">The MIT License (MIT)</a>',
 			'<a href="http://www.simplemachines.org/">Simple Machines</a> | &copy; Simple Machines | Licensed under <a href="http://www.simplemachines.org/about/smf/license.php">The BSD License</a>',
-			'<a href="http://users.tpg.com.au/j_birch/plugins/superfish/">Superfish</a> | &copy; Joel Birch | Licensed under <a href="http://opensource.org/licenses/MIT">The MIT License (MIT)</a>',
 			'<a href="https://github.com/tubalmartin/YUI-CSS-compressor-PHP-port">YUI-CSS compressor (PHP port)</a> | &copy; Yahoo! Inc | Licensed under <a href="http://opensource.org/licenses/BSD-3-Clause">The BSD License</a>',
 			'<a href="http://lab.ejci.net/favico.js/">favico.js</a> | &copy; Miroslav Magda | Licensed under <a href="http://opensource.org/licenses/MIT">The MIT License (MIT)</a>',
 			'<a href="https://github.com/ttsvetko/HTML5-Desktop-Notifications">Push.js</a> | &copy; Tyler Nickerson | Licensed under <a href="http://opensource.org/licenses/MIT">The MIT License (MIT)</a>',

@@ -150,17 +150,17 @@ class ManageMembergroups extends AbstractController
 							}
 							else
 							{
-								$group_name = sprintf('<a href="' . getUrl('admin', ['action' => 'admin', 'area' => 'membergroups', 'sa' => 'members', 'group' => '%1$d']) . '">%2$s</a>', $rowData['id_group'], $rowData['group_name_color']);
+								$group_name = sprintf('<a href="' . getUrl('admin', ['action' => 'admin', 'area' => 'membergroups', 'sa' => 'members', 'group' => '']) . '%1$d">%2$s</a>', $rowData['id_group'], $rowData['group_name_color']);
 							}
 
 							// Add a help option for moderator and administrator.
 							if ($rowData['id_group'] == 1)
 							{
-								$group_name .= ' (<a href="' . getUrl('action', ['action' => 'quickhelp', 'help' => 'membergroup_administrator']) . '" onclick="return reqOverlayDiv(this.href);" class="helpicon i-help"></a>)';
+								$group_name .= ' <a href="' . getUrl('action', ['action' => 'quickhelp', 'help' => 'membergroup_administrator']) . '" onclick="return reqOverlayDiv(this.href);" class="helpicon i-help"></a>';
 							}
 							elseif ($rowData['id_group'] == 3)
 							{
-								$group_name .= ' (<a href="' . getUrl('action', ['action' => 'quickhelp', 'help' => 'membergroup_moderator']) . '" onclick="return reqOverlayDiv(this.href);" class="helpicon i-help"></a>)';
+								$group_name .= ' <a href="' . getUrl('action', ['action' => 'quickhelp', 'help' => 'membergroup_moderator']) . '" onclick="return reqOverlayDiv(this.href);" class="helpicon i-help"></a>';
 							}
 
 							return $group_name;
@@ -217,7 +217,7 @@ class ManageMembergroups extends AbstractController
 					),
 					'data' => array(
 						'sprintf' => array(
-							'format' => '<a href="' . getUrl('admin', ['action' => 'admin', 'area' => 'membergroups', 'sa' => 'edit', 'group' => '%1$d']) . '">' . $txt['membergroups_modify'] . '</a>',
+							'format' => '<a href="' . getUrl('admin', ['action' => 'admin', 'area' => 'membergroups', 'sa' => 'edit', 'group' => '']) . '%1$d">' . $txt['membergroups_modify'] . '</a>',
 							'params' => array(
 								'id_group' => false,
 							),
@@ -263,7 +263,7 @@ class ManageMembergroups extends AbstractController
 					),
 					'data' => array(
 						'function' => function ($rowData) {
-							return sprintf('<a href="' . getUrl('admin', ['action' => 'admin', 'area' => 'membergroups', 'sa' => 'members', 'group' => '%1$d']) . '">%2$s</a>', $rowData['id_group'], $rowData['group_name_color']);
+							return sprintf('<a href="' . getUrl('admin', ['action' => 'admin', 'area' => 'membergroups', 'sa' => 'members', 'group' => '']) . '%1$d">%2$s</a>', $rowData['id_group'], $rowData['group_name_color']);
 						},
 					),
 					'sort' => array(
@@ -324,7 +324,7 @@ class ManageMembergroups extends AbstractController
 					),
 					'data' => array(
 						'sprintf' => array(
-							'format' => '<a href="' . getUrl('admin', ['action' => 'admin', 'area' => 'membergroups', 'sa' => 'edit', 'group' => '%1$d']) . '">' . $txt['membergroups_modify'] . '</a>',
+							'format' => '<a href="' . getUrl('admin', ['action' => 'admin', 'area' => 'membergroups', 'sa' => 'edit', 'group' => '']) . '%1$d">' . $txt['membergroups_modify'] . '</a>',
 							'params' => array(
 								'id_group' => false,
 							),

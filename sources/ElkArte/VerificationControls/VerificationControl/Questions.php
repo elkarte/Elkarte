@@ -20,6 +20,7 @@ namespace ElkArte\VerificationControls\VerificationControl;
 use BBC\ParserWrapper;
 use ElkArte\Cache\Cache;
 use ElkArte\Exceptions\Exception;
+use ElkArte\HttpReq;
 use ElkArte\User;
 use ElkArte\Util;
 use ElkArte\ValuesContainer;
@@ -79,6 +80,13 @@ class Questions implements ControlInterface
 	private $_filter = null;
 
 	/**
+	 * Form variables
+	 *
+	 * @var \ElkArte\HttpReq
+	 */
+	private $_req;
+
+	/**
 	 * On your mark
 	 *
 	 * @param mixed[]|null $verificationOptions override_qs,
@@ -90,6 +98,7 @@ class Questions implements ControlInterface
 			$this->_options = $verificationOptions;
 		}
 		$this->_filter = new ValuesContainer();
+		$this->_req = HttpReq::instance();
 	}
 
 	/**
@@ -101,7 +110,7 @@ class Questions implements ControlInterface
 
 		if ($isNew)
 		{
-			$this->_number_questions = isset($this->_options['override_qs']) ? $this->_options['override_qs'] : (!empty($modSettings['qa_verification_number']) ? $modSettings['qa_verification_number'] : 0);
+			$this->_number_questions = $this->_options['override_qs'] ?? (!empty($modSettings['qa_verification_number']) ? $modSettings['qa_verification_number'] : 0);
 
 			// If we want questions do we have a cache of all the IDs?
 			if (!empty($this->_number_questions) && empty($modSettings['question_id_cache']))
@@ -135,7 +144,7 @@ class Questions implements ControlInterface
 				$this->_number_questions = min($this->_number_questions, count($this->_possible_questions));
 				$this->_questionIDs = array();
 
-				if ($isNew || $force_refresh)
+				if ($force_refresh)
 				{
 					$this->createTest($sessionVal, $force_refresh);
 				}
@@ -222,7 +231,7 @@ class Questions implements ControlInterface
 	{
 		theme()->getTemplates()->load('VerificationControls');
 
-		$sessionVal['q'] = array();
+		$value = array();
 		$this->_filter = new ValuesContainer(array('type' => 'id_question', 'value' => $this->_questionIDs));
 
 		$questions = $this->_loadAntispamQuestions();
@@ -239,8 +248,13 @@ class Questions implements ControlInterface
 				// Remember a previous submission?
 				'a' => isset($_REQUEST[$this->_options['id'] . '_vv'], $_REQUEST[$this->_options['id'] . '_vv']['q'], $_REQUEST[$this->_options['id'] . '_vv']['q'][$row['id_question']]) ? Util::htmlspecialchars($_REQUEST[$this->_options['id'] . '_vv']['q'][$row['id_question']]) : '',
 			);
-			$sessionVal['q'][] = $row['id_question'];
+
+			$value[] = $row['id_question'];
 		}
+
+		// Need to load the valueContainer this way
+		$sessionVal['q'] = array();
+		$sessionVal['q'] = $value;
 
 		return array(
 			'template' => 'questions',
@@ -259,10 +273,8 @@ class Questions implements ControlInterface
 		$db = database();
 
 		$available_filters = new ValuesContainer(array(
-			'language' => '
-			WHERE language = {string:current_filter}',
-			'id_question' => '
-			WHERE id_question IN ({array_int:current_filter})',
+			'language' => ' WHERE language = {string:current_filter}',
+			'id_question' => ' WHERE id_question IN ({array_int:current_filter})',
 		));
 		$condition = (string) $available_filters[$this->_filter['type']];
 
@@ -271,7 +283,8 @@ class Questions implements ControlInterface
 		$db->fetchQuery('
 			SELECT 
 				id_question, question, answer, language
-			FROM {db_prefix}antispam_questions' . $condition,
+			FROM {db_prefix}antispam_questions' .
+				$condition,
 			array(
 				'current_filter' => $this->_filter === null ? '' : $this->_filter['value'],
 			)
@@ -317,6 +330,7 @@ class Questions implements ControlInterface
 	private function _verifyAnswers($sessionVal)
 	{
 		$this->_filter = new ValuesContainer(array('type' => 'id_question', 'value' => $sessionVal['q']));
+
 		// Get the answers and see if they are all right!
 		$questions = $this->_loadAntispamQuestions();
 		$this->_incorrectQuestions = array();
@@ -377,9 +391,13 @@ class Questions implements ControlInterface
 		}
 
 		// Saving them?
-		if (isset($_GET['save']))
+		if (isset($this->_req->save))
 		{
-			$count_questions = $this->_saveSettings($_POST['question'], $_POST['answer'], $_POST['language']);
+			$question = $this->_req->getPost('question', '', []);
+			$answer = $this->_req->getPost('answer', '', []);
+			$sel_language = $this->_req->getPost('language', '', []);
+
+			$count_questions = $this->_saveSettings($question, $answer, $sel_language);
 
 			if (empty($count_questions) || $_POST['qa_verification_number'] > $count_questions)
 			{
@@ -401,11 +419,10 @@ class Questions implements ControlInterface
 	/**
 	 * Prepares the questions coming from the UI to be saved into the database.
 	 *
-	 * @param string[] $save_question
-	 * @param string[] $save_answer
-	 * @param string[] $save_language
+	 * @param array $save_question
+	 * @param array $save_answer
+	 * @param array $save_language
 	 * @return int
-	 * @throws \Exception
 	 */
 	protected function _saveSettings($save_question, $save_answer, $save_language)
 	{
@@ -469,7 +486,7 @@ class Questions implements ControlInterface
 			$this->_insert($questionInserts);
 		}
 
-		return (int) $count_questions;
+		return $count_questions;
 	}
 
 	/**

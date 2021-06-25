@@ -14,6 +14,7 @@
  *
  */
 
+use ElkArte\Themes\ThemeLoader;
 use ElkArte\User;
 use ElkArte\Util;
 
@@ -612,40 +613,34 @@ function availableThemes($current_theme, $current_member)
 		// Are there any variants?
 		if (file_exists($theme_data['theme_dir'] . '/index.template.php') && (empty($theme_data['disable_user_variant']) || allowedTo('admin_forum')))
 		{
-			$file_contents = implode('', file($theme_data['theme_dir'] . '/index.template.php'));
-			if (preg_match('~\'theme_variants\'\s*=>(.+?\)),$~sm', $file_contents, $matches))
+			$variants = theme()->getSettings();
+			if (!empty($variants['theme_variants']))
 			{
-				$settings['theme_variants'] = array();
-
-				// Fill settings up.
-				eval('global $settings; $settings[\'theme_variants\'] = ' . $matches[1] . ';');
+				$settings['theme_variants'] = $variants['theme_variants'];
 
 				call_integration_hook('integrate_init_theme', array($id_theme, &$settings));
 
-				if (!empty($settings['theme_variants']))
+				ThemeLoader::loadLanguageFile('Settings');
+
+				$available_themes[$id_theme]['variants'] = array();
+				foreach ($settings['theme_variants'] as $variant)
 				{
-					\ElkArte\Themes\ThemeLoader::loadLanguageFile('Settings');
-
-					$available_themes[$id_theme]['variants'] = array();
-					foreach ($settings['theme_variants'] as $variant)
-					{
-						$available_themes[$id_theme]['variants'][$variant] = array(
-							'label' => isset($txt['variant_' . $variant]) ? $txt['variant_' . $variant] : $variant,
-							'thumbnail' => !file_exists($theme_data['theme_dir'] . '/images/thumbnail.png') || file_exists($theme_data['theme_dir'] . '/images/thumbnail_' . $variant . '.png') ? $theme_data['images_url'] . '/thumbnail_' . $variant . '.png' : ($theme_data['images_url'] . '/thumbnail.png'),
-						);
-					}
-
-					$available_themes[$id_theme]['selected_variant'] = isset($_GET['vrt']) ? $_GET['vrt'] : (!empty($variant_preferences[$id_theme]) ? $variant_preferences[$id_theme] : (!empty($settings['default_variant']) ? $settings['default_variant'] : $settings['theme_variants'][0]));
-					if (!isset($available_themes[$id_theme]['variants'][$available_themes[$id_theme]['selected_variant']]['thumbnail']))
-					{
-						$available_themes[$id_theme]['selected_variant'] = $settings['theme_variants'][0];
-					}
-
-					$available_themes[$id_theme]['thumbnail_href'] = $available_themes[$id_theme]['variants'][$available_themes[$id_theme]['selected_variant']]['thumbnail'];
-
-					// Allow themes to override the text.
-					$available_themes[$id_theme]['pick_label'] = isset($txt['variant_pick']) ? $txt['variant_pick'] : $txt['theme_pick_variant'];
+					$available_themes[$id_theme]['variants'][$variant] = array(
+						'label' => $txt['variant_' . $variant] ?? $variant,
+						'thumbnail' => !file_exists($theme_data['theme_dir'] . '/images/thumbnail.png') || file_exists($theme_data['theme_dir'] . '/images/thumbnail_' . $variant . '.png') ? $theme_data['images_url'] . '/thumbnail_' . $variant . '.png' : ($theme_data['images_url'] . '/thumbnail.png'),
+					);
 				}
+
+				$available_themes[$id_theme]['selected_variant'] = isset($_GET['vrt']) ? $_GET['vrt'] : (!empty($variant_preferences[$id_theme]) ? $variant_preferences[$id_theme] : (!empty($settings['default_variant']) ? $settings['default_variant'] : $settings['theme_variants'][0]));
+				if (!isset($available_themes[$id_theme]['variants'][$available_themes[$id_theme]['selected_variant']]['thumbnail']))
+				{
+					$available_themes[$id_theme]['selected_variant'] = $settings['theme_variants'][0];
+				}
+
+				$available_themes[$id_theme]['thumbnail_href'] = $available_themes[$id_theme]['variants'][$available_themes[$id_theme]['selected_variant']]['thumbnail'];
+
+				// Allow themes to override the text.
+				$available_themes[$id_theme]['pick_label'] = isset($txt['variant_pick']) ? $txt['variant_pick'] : $txt['theme_pick_variant'];
 			}
 		}
 	}

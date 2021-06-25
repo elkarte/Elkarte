@@ -593,39 +593,54 @@ class Util
 	 * Wrappers for unserialize
 	 * What it does:
 	 *
-	 * - if using PHP < 7 it will use ext/safe_unserialize
-	 * - if using PHP > 7 will use the built in unserialize
-	 *
 	 * @param string $string The string to unserialize
-	 * @param string[] $options Optional, mimic the PHP 7+ option,
-	 *                          see PHP documentation for the details
-	 *                          additionally, it doesn't allow to use the option:
-	 *                            allowed_classes => true
-	 *                          that is reverted to false.
+	 * @param string[] $options Optional.  Additionally, it doesn't allow to use the option:
+	 *                          allowed_classes => true, that is reverted to false.
 	 * @return mixed
 	 */
 	public static function unserialize($string, $options = array())
 	{
-		static $function = null;
-
-		if ($function === null)
+		$options['allowed_classes'] = false;
+		if (self::is_serialized($string))
 		{
-			if (version_compare(PHP_VERSION, '7', '>='))
-			{
-				$function = 'unserialize';
-			}
-			else
-			{
-				require_once(EXTDIR . '/serialize.php');
-				$function = 'ElkArte\\ext\\upgradephp\\safe_unserialize';
-			}
+			return unserialize($string, $options);
 		}
 
-		if (!isset($options['allowed_classes']) || $options['allowed_classes'] === true)
+		return '';
+	}
+
+	/**
+	 * Determine if a string is serialized
+	 *
+	 * - avoids the notice/warning it could raise
+	 *
+	 * @param string $string
+	 * @return bool
+	 */
+	public static function is_serialized($string)
+	{
+		// Easy cases
+		if (!is_string($string) || $string === '')
 		{
-			$options['allowed_classes'] = false;
+			return false;
 		}
 
-		return @$function($string, $options);
+		// Attempt to unserialize, mask errors
+		set_error_handler(function () { /* ignore errors */ });
+		try
+		{
+			unserialize($string, false);
+			$check = true;
+		}
+		catch (\Exception $e)
+		{
+			$check = false;
+		}
+		finally
+		{
+			restore_error_handler();
+		}
+
+		return $check;
 	}
 }

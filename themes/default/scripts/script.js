@@ -82,6 +82,8 @@ function sendXMLDocument(sUrl, sContent, funcCallback)
 	var oSendDoc = new window.XMLHttpRequest(),
 		oCaller = this;
 
+	//oSendDoc.overrideMimeType('application/xml');
+
 	if (typeof (funcCallback) !== 'undefined')
 	{
 		oSendDoc.onreadystatechange = function ()
@@ -309,7 +311,7 @@ function smc_Popup(oOptions)
 smc_Popup.prototype.show = function ()
 {
 	var popup_class = 'popup_window ' + (this.opt.custom_class ? this.opt.custom_class : 'content'),
-		icon = this.opt.icon ? '<i class="icon ' + this.opt.icon + ' icon-top"></i> ' : '';
+		icon = this.opt.icon ? '<i class="icon ' + this.opt.icon + '"></i> ' : '';
 
 	// Todo: opt.icon should be a string referencing the desired icon. Will require changing all callers.
 
@@ -1050,28 +1052,20 @@ function create_ajax_indicator_ele()
 	// Create the div for the indicator.
 	ajax_indicator_ele = document.createElement('div');
 
-	// Set the id so it'll load the style properly.
+	// Set the id so it'll style properly.
 	ajax_indicator_ele.id = 'ajax_in_progress';
 
 	// Add the image in and link to turn it off.
-	var cancel_link = document.createElement('a');
+	let cancel_link = document.createElement('a');
+
 	cancel_link.href = 'javascript:ajax_indicator(false)'; // jshint ignore:line
+	cancel_link.className = 'icon i-remove';
 
-	var cancel_img = document.createElement('img');
-	cancel_img.src = elk_images_url + '/icons/quick_remove.png';
-
-	if (typeof (ajax_notification_cancel_text) !== 'undefined')
-	{
-		cancel_img.alt = ajax_notification_cancel_text;
-		cancel_img.title = ajax_notification_cancel_text;
-	}
-
-	// Add the cancel link and image to the indicator.
-	cancel_link.appendChild(cancel_img);
+	// Add the cancel link to the indicator.
 	ajax_indicator_ele.appendChild(cancel_link);
 
-	// Set the text.  (Note:  You MUST append here and not overwrite.)
-	ajax_indicator_ele.innerHTML += ajax_notification_text;
+	// Set the text.  (Note: You MUST append here and not overwrite.)
+	ajax_indicator_ele.innerHTML += ajax_notification_text + '<span class="icon icon-spin i-spinner"></span>';
 
 	// Finally attach the element to the body.
 	document.body.appendChild(ajax_indicator_ele);
@@ -1119,7 +1113,7 @@ function createEventListener(oTarget)
  */
 function grabJumpToContent()
 {
-	getXMLDocument(elk_prepareScriptUrl(elk_scripturl) + 'action=xmlhttp;sa=jumpto;xml', onJumpReceived);
+	getXMLDocument(elk_prepareScriptUrl(elk_scripturl) + 'action=xmlhttp;sa=jumpto;api=xml', onJumpReceived);
 
 	return false;
 }
@@ -1366,7 +1360,7 @@ IconList.prototype.initIcons = function ()
 	for (var i = document.images.length - 1, iPrefixLength = this.opt.sIconIdPrefix.length; i >= 0; i--)
 		if (document.images[i].id.substr(0, iPrefixLength) === this.opt.sIconIdPrefix)
 		{
-			setOuterHTML(document.images[i], '<div title="' + this.opt.sLabelIconList + '" onclick="' + this.opt.sBackReference + '.openPopup(this, ' + document.images[i].id.substr(iPrefixLength) + ')" onmouseover="' + this.opt.sBackReference + '.onBoxHover(this, true)" onmouseout="' + this.opt.sBackReference + '.onBoxHover(this, false)" style="background: ' + this.opt.sBoxBackground + '; cursor: pointer; padding: 2px; margin: 0 auto; vertical-align: top"><img src="' + document.images[i].src + '" alt="' + document.images[i].alt + '" id="' + document.images[i].id + '" style="vertical-align: top; margin: 0 auto; padding: 0 2px;" /></div>');
+			setOuterHTML(document.images[i], '<div class="dropdown" title="' + this.opt.sLabelIconList + '" onclick="' + this.opt.sBackReference + '.openPopup(this, ' + document.images[i].id.substr(iPrefixLength) + ')" onmouseover="' + this.opt.sBackReference + '.onBoxHover(this, true)" onmouseout="' + this.opt.sBackReference + '.onBoxHover(this, false)" style="background: ' + this.opt.sBoxBackground + ';"><img src="' + document.images[i].src + '" alt="' + document.images[i].alt + '" id="' + document.images[i].id + '" /></div>');
 		}
 };
 
@@ -1398,7 +1392,7 @@ IconList.prototype.openPopup = function (oDiv, iMessageId)
 
 		// Start to fetch its contents.
 		ajax_indicator(true);
-		sendXMLDocument.call(this, elk_prepareScriptUrl(elk_scripturl) + 'action=xmlhttp;sa=' + this.opt.sAction + ';xml', '', this.onIconsReceived);
+		sendXMLDocument.call(this, elk_prepareScriptUrl(elk_scripturl) + 'action=xmlhttp;sa=' + this.opt.sAction + ';api=xml', '', this.onIconsReceived);
 
 		createEventListener(document.body);
 	}
@@ -1467,7 +1461,7 @@ IconList.prototype.onItemMouseDown = function (oDiv, sNewIcon)
 	{
 		ajax_indicator(true);
 		this.tmpMethod = getXMLDocument;
-		var oXMLDoc = this.tmpMethod(elk_prepareScriptUrl(elk_scripturl) + 'action=jsmodify;topic=' + this.opt.iTopicId + ';msg=' + this.iCurMessageId + ';' + elk_session_var + '=' + elk_session_id + ';icon=' + sNewIcon + ';xml');
+		var oXMLDoc = this.tmpMethod(elk_prepareScriptUrl(elk_scripturl) + 'action=jsmodify;topic=' + this.opt.iTopicId + ';msg=' + this.iCurMessageId + ';' + elk_session_var + '=' + elk_session_id + ';icon=' + sNewIcon + ';api=xml');
 		delete this.tmpMethod;
 		ajax_indicator(false);
 

@@ -239,7 +239,7 @@ class ManageNews extends AbstractController
 								return '';
 							}
 						},
-						'class' => 'centertext',
+						'style' => 'vertical-align: top',
 					),
 				),
 			),

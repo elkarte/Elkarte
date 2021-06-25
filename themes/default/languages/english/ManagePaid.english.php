@@ -1,5 +1,5 @@
 <?php
-// Version: 1.1; ManagePaid
+// Version: 2.0; ManagePaid
 
 // Symbols.
 $txt['usd_symbol'] = '$%1.2f';

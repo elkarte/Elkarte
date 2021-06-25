@@ -24,25 +24,13 @@ namespace ElkArte;
  */
 class Action
 {
-	/**
-	 * All the subactions we understand
-	 *
-	 * @var array
-	 */
+	/** @var array All the subactions we understand */
 	protected $_subActions = [];
 
-	/**
-	 * The default subAction.
-	 *
-	 * @var string
-	 */
+	/** @var string The default subAction. */
 	protected $_default;
 
-	/**
-	 * An (unique) id that triggers a hook
-	 *
-	 * @var string
-	 */
+	/** @var string A (unique !!) id that triggers a hook */
 	protected $_name;
 
 	/** @var \ElkArte\HttpReq Access to post/get data */
@@ -100,6 +88,7 @@ class Action
 	 */
 	public function initialize(array $subActions, string $default = '', string $requestParam = 'sa'): string
 	{
+		// Controller action initialized as new Action('xyz'), then call xyz integration hook
 		if ($this->_name !== '')
 		{
 			call_integration_hook('integrate_sa_' . $this->_name, [&$subActions]);
@@ -136,7 +125,6 @@ class Action
 	 * controller is not specified, the function is assumed to be a regular callable.
 	 *
 	 * @param string $sub_id a valid index in the subactions array
-	 * @throws \ElkArte\Exceptions\Exception
 	 */
 	public function dispatch(string $sub_id): void
 	{

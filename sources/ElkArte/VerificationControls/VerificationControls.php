@@ -185,7 +185,8 @@ class VerificationControls
 			}
 
 			// Keep a track of these.
-			$this->_sessionVal['errors']++;
+			$count = $this->_sessionVal['errors'] + 1;
+			$this->_sessionVal['errors'] = $count;
 		}
 
 		return $force_refresh;

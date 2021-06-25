@@ -24,6 +24,7 @@ use ElkArte\EmailSettings;
 use ElkArte\EventManager;
 use ElkArte\Exceptions\Exception;
 use ElkArte\SettingsForm\SettingsForm;
+use ElkArte\Themes\ThemeLoader;
 use ElkArte\User;
 use ElkArte\Util;
 use ElkArte\Html2Md;
@@ -54,7 +55,7 @@ class ManageMaillist extends AbstractController
 
 		// Template & language
 		theme()->getTemplates()->load('Maillist');
-		\ElkArte\Themes\ThemeLoader::loadLanguageFile('Maillist');
+		ThemeLoader::loadLanguageFile('Maillist');
 
 		// All the functions available
 		$subActions = array(
@@ -167,10 +168,8 @@ class ManageMaillist extends AbstractController
 							{
 								return '<span class="error">' . $rowData['error'] . '<span>';
 							}
-							else
-							{
-								return $rowData['error'];
-							}
+
+							return $rowData['error'];
 						},
 					),
 					'sort' => array(
@@ -357,8 +356,8 @@ class ManageMaillist extends AbstractController
 					$controller = new Emailpost(new EventManager());
 					$controller->setUser(User::$info);
 					$result = $controller->action_pbe_preview($data);
-					$text = isset($result['body']) ? $result['body'] : '';
-					$email_to = isset($result['to']) ? $result['to'] : '';
+					$text = $result['body'] ?? '';
+					$email_to = $result['to'] ?? '';
 				}
 				else
 				{
@@ -381,9 +380,9 @@ class ManageMaillist extends AbstractController
 
 		// Prep and show the template with what we found
 		$context['body'] = $parser->parseEmail($text);
-		$context['to'] = isset($email_to) ? $email_to : '';
-		$context['notice_subject'] = isset($temp_email[0]['subject']) ? $temp_email[0]['subject'] : '';
-		$context['notice_from'] = isset($temp_email[0]['from']) ? $temp_email[0]['from'] : '';
+		$context['to'] = $email_to ?? '';
+		$context['notice_subject'] = $temp_email[0]['subject'] ?? '';
+		$context['notice_from'] = $temp_email[0]['from'] ?? '';
 		$context['page_title'] = $txt['show_notice'];
 		$context['error_code'] = isset($temp_email[0]['error_code']) && isset($txt[$temp_email[0]['error_code']]) ? $txt[$temp_email[0]['error_code']] : '';
 		$context['sub_template'] = 'show_email';
@@ -394,7 +393,7 @@ class ManageMaillist extends AbstractController
 	 *
 	 * What it does:
 	 *
-	 * - Flushes the moderator menu todo numbers so the menu numbers update
+	 * - Flushes the moderator menu to-do numbers so the menu numbers update
 	 * - Accessed by ?action=admin;area=maillist;sa=delete;item=?'
 	 * - Redirects to ?action=admin;area=maillist;sa=emaillist
 	 */
@@ -615,7 +614,7 @@ class ManageMaillist extends AbstractController
 		createToken('admin-ml');
 		$context['warning_data'] = array('notify' => '', 'notify_subject' => '', 'notify_body' => '');
 		$context['body'] = isset($fullerrortext) ? ParserWrapper::instance()->parseEmail($fullerrortext) : '';
-		$context['item'] = isset($this->_req->post->item) ? $this->_req->post->item : '';
+		$context['item'] = $this->_req->post->item ?? '';
 		$context['notice_to'] = $txt['to'] . ' ' . isset($temp_email[0]['from']) !== '' ? $temp_email[0]['from'] : '';
 		$context['page_title'] = $txt['bounce_title'];
 		$context['sub_template'] = 'bounce_email';
@@ -719,12 +718,13 @@ class ManageMaillist extends AbstractController
 					),
 					'data' => array(
 						'sprintf' => array(
-							'format' => '<a href="?action=admin;area=maillist;sa=editfilter;f_id=%1$s;' . $context['session_var'] . '=' . $context['session_id'] . '">
-										<i class="icon i-modify" title="' . $txt['modify'] . '"></i>
-									</a>
-									<a href="?action=admin;area=maillist;sa=deletefilter;f_id=%1$s;' . $context['session_var'] . '=' . $context['session_id'] . '" onclick="return confirm(' . JavaScriptEscape($txt['filter_delete_warning']) . ') && submitThisOnce(this);" accesskey="d">
-										<i class="icon i-delete" title="' . $txt['delete'] . '"></i>
-									</a>',
+							'format' => '
+								<a href="?action=admin;area=maillist;sa=editfilter;f_id=%1$s;' . $context['session_var'] . '=' . $context['session_id'] . '">
+									<i class="icon i-modify" title="' . $txt['modify'] . '"></i>
+								</a>
+								<a href="?action=admin;area=maillist;sa=deletefilter;f_id=%1$s;' . $context['session_var'] . '=' . $context['session_id'] . '" onclick="return confirm(' . JavaScriptEscape($txt['filter_delete_warning']) . ') && submitThisOnce(this);" accesskey="d">
+									<i class="icon i-delete" title="' . $txt['delete'] . '"></i>
+								</a>',
 							'params' => array(
 								'id_filter' => true,
 							),
@@ -1161,12 +1161,13 @@ class ManageMaillist extends AbstractController
 					),
 					'data' => array(
 						'sprintf' => array(
-							'format' => '<a href="?action=admin;area=maillist;sa=editparser;f_id=%1$s;' . $context['session_var'] . '=' . $context['session_id'] . '">
-										<i class="icon i-modify" title="' . $txt['modify'] . '"></i>
-									</a>
-									<a href="?action=admin;area=maillist;sa=deleteparser;f_id=%1$s;' . $context['session_var'] . '=' . $context['session_id'] . '" onclick="return confirm(' . JavaScriptEscape($txt['parser_delete_warning']) . ') && submitThisOnce(this);" accesskey="d">
-										<i class="icon i-delete" title="' . $txt['delete'] . '"></i>
-									</a>',
+							'format' => '
+								<a href="?action=admin;area=maillist;sa=editparser;f_id=%1$s;' . $context['session_var'] . '=' . $context['session_id'] . '">
+									<i class="icon i-modify" title="' . $txt['modify'] . '"></i>
+								</a>
+								<a href="?action=admin;area=maillist;sa=deleteparser;f_id=%1$s;' . $context['session_var'] . '=' . $context['session_id'] . '" onclick="return confirm(' . JavaScriptEscape($txt['parser_delete_warning']) . ') && submitThisOnce(this);" accesskey="d">
+									<i class="icon i-delete" title="' . $txt['delete'] . '"></i>
+								</a>',
 							'params' => array(
 								'id_filter' => true,
 							),
@@ -1490,7 +1491,7 @@ class ManageMaillist extends AbstractController
 		}
 
 		// Templates and language
-		\ElkArte\Themes\ThemeLoader::loadLanguageFile('Admin');
+		ThemeLoader::loadLanguageFile('Admin');
 		theme()->getTemplates()->load('Admin');
 		loadCSSFile('admin.css');
 
@@ -1528,10 +1529,12 @@ class ManageMaillist extends AbstractController
 			{
 				$email_error = $this->_req->post->maillist_sitename_address;
 			}
+
 			if (!DataValidator::is_valid($this->_req->post, array('maillist_sitename_help' => 'valid_email'), array('maillist_sitename_help' => 'trim')))
 			{
 				$email_error = $this->_req->post->maillist_sitename_help;
 			}
+
 			if (!DataValidator::is_valid($this->_req->post, array('maillist_mail_from' => 'valid_email'), array('maillist_mail_from' => 'trim')))
 			{
 				$email_error = $this->_req->post->maillist_mail_from;
@@ -1751,7 +1754,7 @@ class ManageMaillist extends AbstractController
 
 		// This is all the information required for showing the email templates.
 		$listOptions = array(
-			'id' => 'bounce_template_list',
+			'id' => 'email_bounce_template_list',
 			'title' => $txt['ml_bounce_templates_title'],
 			'items_per_page' => $modSettings['defaultMaxMessages'],
 			'no_items_label' => $txt['ml_bounce_templates_none'],
@@ -1831,8 +1834,8 @@ class ManageMaillist extends AbstractController
 					'class' => 'submitbutton',
 					'position' => 'below_table_data',
 					'value' => '
-					<input type="submit" name="delete" value="' . $txt['ml_bounce_template_delete'] . '" onclick="return confirm(\'' . $txt['ml_bounce_template_delete_confirm'] . '\');" class="right_submit" />
-					<input type="submit" name="add" value="' . $txt['ml_bounce_template_add'] . '" class="right_submit" />',
+						<input type="submit" name="delete" value="' . $txt['ml_bounce_template_delete'] . '" onclick="return confirm(\'' . $txt['ml_bounce_template_delete_confirm'] . '\');" />
+						<input type="submit" name="add" value="' . $txt['ml_bounce_template_add'] . '" />',
 				),
 			),
 		);
@@ -1845,7 +1848,7 @@ class ManageMaillist extends AbstractController
 
 		// Show the list
 		$context['sub_template'] = 'show_list';
-		$context['default_list'] = 'bounce_template_list';
+		$context['default_list'] = 'email_bounce_template_list';
 	}
 
 	/**

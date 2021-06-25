@@ -26,7 +26,7 @@ function template_whos_selection_above()
 			<h2 class="category_header">', $txt['who_title'], '</h2>';
 
 	$extra = '
-			<div class="selectbox floatright">
+			<div class="selectbox flow_flex_right">
 				<label for="show_top">' . $txt['who_show1'] . '</label>
 				<select name="show_top" id="show_top" onchange="document.forms.whoFilter.show.value = this.value; document.forms.whoFilter.submit();">';
 
@@ -79,7 +79,7 @@ function template_whos_online()
 		if (!empty($member['ip']))
 		{
 			echo '
-							<a class="track_ip" href="' . $member['track_href'] . '">' . $member['ip'] . '</a>';
+							<a class="track_ip" href="' . $member['track_href'] . '">(' . $member['ip'] . ')</a>';
 		}
 
 		echo '
@@ -113,7 +113,8 @@ function template_whos_selection_below()
 	global $context, $txt;
 
 	$extra = '
-			<div class="selectbox floatright"><label for="show">' . $txt['who_show1'] . '</label>
+			<div class="selectbox flow_flex_right">
+				<label for="show">' . $txt['who_show1'] . '</label>
 				<select name="show" id="show" onchange="document.forms.whoFilter.submit();">';
 
 	foreach ($context['show_methods'] as $value => $label)

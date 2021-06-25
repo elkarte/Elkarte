@@ -287,12 +287,13 @@ function topTopicReplies($limit = 10)
 	// If there is a default setting, let's not retrieve something bigger
 	$limit = min($limit, $modSettings['stats_limit'] ?? 10);
 
-	// Using the wrong alias here so that we can use {query_see_board}.
+	// Must include boards so {query_see_board} can actually resolve b.member_groups
 	$topic_ids = array();
 	$db->fetchQuery('
 		SELECT 
 			id_topic, num_replies
-		FROM {db_prefix}topics AS b
+		FROM {db_prefix}topics AS t
+			INNER JOIN {db_prefix}boards AS b ON (b.id_board = t.id_board)
 		WHERE {query_see_board}' . (!empty($modSettings['recycle_enable']) && $modSettings['recycle_board'] > 0 ? '
 			AND b.id_board != {int:recycle_board}' : '') . '
 			AND num_replies != {int:no_replies}' . ($modSettings['postmod_active'] ? '
@@ -322,7 +323,7 @@ function topTopicReplies($limit = 10)
 			INNER JOIN {db_prefix}messages AS m ON (m.id_msg = t.id_first_msg)
 		WHERE t.id_topic IN ({array_int:topic_list})',
 		array(
-			'topic_list' => $topic_ids,
+			'topic_list' => array_keys($topic_ids),
 		)
 	)->fetch_callback(
 		function ($row) use (&$top_topics_replies, &$max_num_replies) {

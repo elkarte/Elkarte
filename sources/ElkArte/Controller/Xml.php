@@ -20,6 +20,7 @@ use ElkArte\BoardsTree;
 use ElkArte\Cache\Cache;
 use ElkArte\EventManager;
 use ElkArte\Exceptions\Exception;
+use ElkArte\Themes\ThemeLoader;
 use ElkArte\User;
 
 /**
@@ -44,6 +45,7 @@ class Xml extends AbstractController
 	public function action_index()
 	{
 		theme()->getTemplates()->load('Xml');
+		theme()->getLayers()->removeAll();
 
 		$subActions = array(
 			'jumpto' => array('controller' => $this, 'function' => 'action_jumpto'),
@@ -158,8 +160,8 @@ class Xml extends AbstractController
 		$context['xml_data'] = array();
 
 		// Just in case, maybe we don't need it
-		\ElkArte\Themes\ThemeLoader::loadLanguageFile('Errors');
-		\ElkArte\Themes\ThemeLoader::loadLanguageFile('Admin');
+		ThemeLoader::loadLanguageFile('Errors');
+		ThemeLoader::loadLanguageFile('Admin');
 
 		// We need (at least) this to ensure that mod files are included
 		call_integration_include_hook('integrate_admin_include');
@@ -262,8 +264,8 @@ class Xml extends AbstractController
 		$order = array();
 
 		// Chances are
-		\ElkArte\Themes\ThemeLoader::loadLanguageFile('Errors');
-		\ElkArte\Themes\ThemeLoader::loadLanguageFile('ManageSettings');
+		ThemeLoader::loadLanguageFile('Errors');
+		ThemeLoader::loadLanguageFile('ManageSettings');
 		require_once(SUBSDIR . '/ManageFeatures.subs.php');
 
 		// You have to be allowed to do this
@@ -358,11 +360,10 @@ class Xml extends AbstractController
 		$errors = array();
 		$order = array();
 		$board_tree = array();
-		$board_moved = null;
 
 		// Chances are we will need these
-		\ElkArte\Themes\ThemeLoader::loadLanguageFile('Errors');
-		\ElkArte\Themes\ThemeLoader::loadLanguageFile('ManageBoards');
+		ThemeLoader::loadLanguageFile('Errors');
+		ThemeLoader::loadLanguageFile('ManageBoards');
 		require_once(SUBSDIR . '/ManageFeatures.subs.php');
 		require_once(SUBSDIR . '/Boards.subs.php');
 
@@ -544,8 +545,8 @@ class Xml extends AbstractController
 		$order = array();
 
 		// Chances are I wear a silly ;D
-		\ElkArte\Themes\ThemeLoader::loadLanguageFile('Errors');
-		\ElkArte\Themes\ThemeLoader::loadLanguageFile('ManageSmileys');
+		ThemeLoader::loadLanguageFile('Errors');
+		ThemeLoader::loadLanguageFile('ManageSmileys');
 		require_once(SUBSDIR . '/Smileys.subs.php');
 
 		// You have to be allowed to do this
@@ -713,8 +714,8 @@ class Xml extends AbstractController
 		$order = array();
 
 		// Chances are
-		\ElkArte\Themes\ThemeLoader::loadLanguageFile('Errors');
-		\ElkArte\Themes\ThemeLoader::loadLanguageFile('Maillist');
+		ThemeLoader::loadLanguageFile('Errors');
+		ThemeLoader::loadLanguageFile('Maillist');
 		require_once(SUBSDIR . '/Maillist.subs.php');
 
 		// You have to be allowed to do this
@@ -811,8 +812,8 @@ class Xml extends AbstractController
 		$order = array();
 
 		// Seems these will be needed
-		\ElkArte\Themes\ThemeLoader::loadLanguageFile('Errors');
-		\ElkArte\Themes\ThemeLoader::loadLanguageFile('ManageSmileys');
+		ThemeLoader::loadLanguageFile('Errors');
+		ThemeLoader::loadLanguageFile('ManageSmileys');
 		require_once(SUBSDIR . '/MessageIcons.subs.php');
 
 		// You have to be allowed to do this

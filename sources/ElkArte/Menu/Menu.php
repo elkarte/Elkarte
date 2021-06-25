@@ -18,9 +18,6 @@ namespace ElkArte\Menu;
 
 use ElkArte\Exceptions\Exception;
 use ElkArte\HttpReq;
-use ElkArte\Menu\MenuArea;
-use ElkArte\Menu\MenuSection;
-use ElkArte\Menu\MenuSubsection;
 use ElkArte\User;
 
 /**
@@ -655,7 +652,7 @@ class Menu
 		// Subsections of the current area are tabs unless we are told otherwise.
 		if (!isset($tabContext['tabs']))
 		{
-			$tabContext['tabs'] = $currentArea['subsections'] ?: array();
+			$tabContext['tabs'] = $currentArea['subsections'] ?? array();
 		}
 
 		// Tabs are really just subactions.

@@ -96,8 +96,12 @@ class ConstructPageIndex extends AbstractModel
 		$this->flexible_start = $flexible_start;
 		$this->base_url = $base_url;
 
+		// Need to pull in modsettings, db and user
+		parent::__construct();
+
 		// Do it!
 		$this->createPageIndex();
+		$start = $this->start;
 	}
 
 	/**
@@ -108,7 +112,7 @@ class ConstructPageIndex extends AbstractModel
 		global $context;
 
 		$this->setStart();
-		$context['current_page'] = (int) $this->start / $this->num_per_page;
+		$context['current_page'] = $this->start / $this->num_per_page;
 
 		$this->setBaseLink();
 
@@ -317,7 +321,7 @@ class ConstructPageIndex extends AbstractModel
 		}
 
 		// Show the "next page" link. (prev page 1 ... 6 7 [8] 9 10 ... 15 >next page<)
-		$pageindex .=  $this->compactNextNavigation();
+		$pageindex .= $this->compactNextNavigation();
 
 		return $pageindex;
 	}

@@ -530,7 +530,7 @@ final class Request
 			$_GET['action'] = (string) $_GET['action'];
 		}
 
-		$this->_xml = (isset($_SERVER['X_REQUESTED_WITH']) && $_SERVER['X_REQUESTED_WITH'] == 'XMLHttpRequest') || isset($_REQUEST['xml']);
+		$this->_xml = (isset($_SERVER['X_REQUESTED_WITH']) && $_SERVER['X_REQUESTED_WITH'] === 'XMLHttpRequest') || (isset($_REQUEST['api']) && $_REQUEST['api'] === 'xml');
 	}
 
 	/**

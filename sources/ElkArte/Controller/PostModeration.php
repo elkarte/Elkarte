@@ -460,7 +460,7 @@ class PostModeration extends AbstractController
 						'function' => function ($data) {
 							global $modSettings;
 
-							return '<a href="' . $data['message']['href'] . '">' . Util::shorten_text($data['message']['subject'], !empty($modSettings['subject_length']) ? $modSettings['subject_length'] : 24) . '</a>';
+							return '<a href="' . $data['message']['href'] . '">' . Util::shorten_text($data['message']['subject'], !empty($modSettings['subject_length']) ? $modSettings['subject_length'] : 32) . '</a>';
 						},
 						'class' => 'smalltext',
 						'style' => 'width:15em;',

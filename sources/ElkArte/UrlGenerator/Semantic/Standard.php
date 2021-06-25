@@ -49,6 +49,7 @@ class Standard extends AbstractUrlGenerator
 				{
 					continue;
 				}
+
 				$args[$k] = $v;
 			}
 			else

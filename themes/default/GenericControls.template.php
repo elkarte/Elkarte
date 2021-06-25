@@ -50,7 +50,7 @@ function template_control_richedit($editor_id, $smileyContainer = null, $bbcCont
 					resizeWidth: false,
 					resizeMaxHeight: -1,
 					emoticonsCompat: true,
-					emoticonsEnabled: ', $useSmileys ? 'true' : 'false',  ',
+					emoticonsEnabled: ', $useSmileys ? 'true' : 'false', ',
 					locale: "', !empty($editor_context['locale']) ? $editor_context['locale'] : 'en_US', '",
 					rtl: ', empty($context['right_to_left']) ? 'false' : 'true', ',
 					colors: "black,red,yellow,pink,green,orange,purple,blue,beige,brown,teal,navy,maroon,limegreen,white",
@@ -157,7 +157,7 @@ function template_control_richedit($editor_id, $smileyContainer = null, $bbcCont
  */
 function template_control_richedit_buttons($editor_id)
 {
-	global $context, $options, $txt;
+	global $context, $txt;
 
 	$editor_context = &$context['controls']['richedit'][$editor_id];
 
@@ -200,15 +200,5 @@ function template_control_richedit_buttons($editor_id)
 	{
 		echo '
 		<input type="hidden" id="', $hidden['name'], '" name="', $hidden['name'], '" value="', $hidden['value'], '" />';
-	}
-
-	// Create an area to show the draft last saved on text
-	if (!empty($context['drafts_autosave']) && !empty($options['drafts_autosave_enabled']))
-	{
-		echo '
-		<div class="draftautosave">
-			<span id="throbber" class="hide"><i class="icon icon-spin i-spinner"></i>&nbsp;</span>
-			<span id="draft_lastautosave"></span>
-		</div>';
 	}
 }
