@@ -18,7 +18,6 @@
 use ElkArte\Controller\Auth;
 use ElkArte\EventManager;
 use ElkArte\Http\Headers;
-use ElkArte\OpenID;
 use ElkArte\Themes\ThemeLoader;
 use ElkArte\TokenHash;
 use ElkArte\User;
@@ -124,18 +123,6 @@ function validateSession($type = 'admin')
 				return true;
 			}
 		}
-	}
-
-	// OpenID?
-	if (!empty(User::$settings['openid_uri']))
-	{
-		$openID = new OpenID();
-		$openID->revalidate();
-
-		$_SESSION[$type . '_time'] = time();
-		unset($_SESSION['request_referer']);
-
-		return true;
 	}
 
 	// Better be sure to remember the real referer
@@ -627,7 +614,6 @@ function banPermissions()
  * @param int[] $ban_ids = array()
  * @param string|null $email = null
  * @package Bans
- * @throws \ElkArte\Exceptions\Exception
  */
 function log_ban($ban_ids = array(), $email = null)
 {

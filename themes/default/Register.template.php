@@ -120,16 +120,14 @@ function template_registration_form()
 	theme()->addInlineJavascript('
 		function verifyAgree()
 		{
-			if (currentAuthMethod === \'passwd\' && document.forms.registration.elk_autov_pwmain.value !== document.forms.registration.elk_autov_pwverify.value)
+			if (document.forms.registration.elk_autov_pwmain.value !== document.forms.registration.elk_autov_pwverify.value)
 			{
 				alert("' . $txt['register_passwords_differ_js'] . '");
 				return false;
 			}
 
 			return true;
-		}
-
-		var currentAuthMethod = \'passwd\';', true);
+		}', true);
 
 	// Any errors?
 	if (!empty($context['registration_errors']))
@@ -201,32 +199,8 @@ function template_registration_form()
  						<dd>
  							<input type="checkbox" name="notify_announcements" id="notify_announcements" tabindex="', $context['tabindex']++, '"', $context['notify_announcements'] ? ' checked="checked"' : '', ' class="input_check" />
  						</dd>
- 					</dl>';
-
-	// If OpenID is enabled, give the user a choice between password and OpenID.
-	if (!empty($modSettings['enableOpenID']))
-	{
-		echo '
-					<dl class="settings" id="authentication_group">
-						<dt>
-							<a href="', getUrl('action', ['action' => 'quickhelp', 'help' => 'register_openid']), '" onclick="return reqOverlayDiv(this.href);" class="helpicon i-help"><s>', $txt['help'], '</s></a>
-							<strong>', $txt['authenticate_label'], ':</strong>
-						</dt>
-						<dd>
-							<label for="auth_pass" id="option_auth_pass">
-								<input type="radio" name="authenticate" value="passwd" id="auth_pass" tabindex="', $context['tabindex']++, '" ', empty($context['openid']) ? 'checked="checked" ' : '', ' onclick="updateAuthMethod();" />
-								', $txt['authenticate_password'], '
-							</label>
-							<label for="auth_openid" id="option_auth_openid">
-								<input type="radio" name="authenticate" value="openid" id="auth_openid" tabindex="', $context['tabindex']++, '" ', !empty($context['openid']) ? 'checked="checked" ' : '', ' onclick="updateAuthMethod();" />
-								', $txt['authenticate_openid'], '
-							</label>
-						</dd>
-					</dl>';
-	}
-
-	echo '
-					<dl class="settings" id="password1_group">
+ 					</dl>
+ 					<dl class="settings" id="password1_group">
 						<dt><label for="elk_autov_pwmain">', $txt['choose_pass'], ':</label></dt>
 						<dd>
 							<input type="password" name="passwrd1" id="elk_autov_pwmain" size="30" tabindex="', $context['tabindex']++, '" class="input_password" placeholder="', $txt['choose_pass'], '" required="required" />
@@ -244,20 +218,6 @@ function template_registration_form()
 							</span>
 						</dd>
 					</dl>';
-
-	// If OpenID is enabled, give the user a choice between password and OpenID.
-	if (!empty($modSettings['enableOpenID']))
-	{
-		echo '
-					<dl class="settings" id="openid_group">
-						<dt>
-							<label>', $txt['authenticate_openid_url'], ':</label>
-						</dt>
-						<dd>
-							<input type="text" name="openid_identifier" id="openid_url" size="30" tabindex="', $context['tabindex']++, '" value="', isset($context['openid']) ? $context['openid'] : '', '" class="input_text openid_login" />
-						</dd>
-					</dl>';
-	}
 
 	// If there is any field marked as required, show it here!
 	if (!empty($context['custom_fields_required']) && !empty($context['custom_fields']))
@@ -529,8 +489,6 @@ function template_registration_form()
 			};
 			var verificationHandle = new elkRegister("registration", ', empty($modSettings['password_strength']) ? 0 : $modSettings['password_strength'], ', regTextStrings);
 
-			// Update the authentication status.
-			updateAuthMethod();
 		</script>';
 }
 

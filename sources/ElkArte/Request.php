@@ -423,17 +423,10 @@ final class Request
 			// Get rid of the old one! You don't know where it's been!
 			$_GET = array();
 
-			// Was this redirected? If so, get the REDIRECT_QUERY_STRING.
-			// Do not urldecode() the querystring, unless you so much wish to break OpenID implementation. :)
+			// Was this redirected? If so, get the REDIRECT_QUERY_STRING, but do not urldecode() the querystring
 			$this->_server_query_string = substr($this->_server_query_string, 0, 5) === 'url=/' ? $_SERVER['REDIRECT_QUERY_STRING'] : $this->_server_query_string;
-
-			// Some german webmailers need a decoded string, so let's decode the string for sa=activate and action=reminder
-			if (strpos($this->_server_query_string, 'activate') !== false || strpos($this->_server_query_string, 'reminder') !== false)
-			{
-				$this->_server_query_string = urldecode($this->_server_query_string);
-			}
-
 			$this->_server_query_string = $parser->parse($this->_server_query_string);
+
 			// Replace ';' with '&' and '&something&' with '&something=&'.  (this is done for compatibility...)
 			parse_str(preg_replace('/&(\w+)(?=&|$)/', '&$1=', strtr($this->_server_query_string, array(';?' => '&', ';' => '&', '%00' => '', "\0" => ''))), $_GET);
 
@@ -478,14 +471,12 @@ final class Request
 		// There's no query string, but there is a URL... try to get the data from there.
 		if (!empty($_SERVER['REQUEST_URI']))
 		{
+			$request = $_SERVER['REQUEST_URI'];
+
 			// Remove the .html, assuming there is one.
 			if (substr($_SERVER['REQUEST_URI'], strrpos($_SERVER['REQUEST_URI'], '.'), 4) === '.htm')
 			{
 				$request = substr($_SERVER['REQUEST_URI'], 0, strrpos($_SERVER['REQUEST_URI'], '.'));
-			}
-			else
-			{
-				$request = $_SERVER['REQUEST_URI'];
 			}
 
 			// Replace 'index.php/a,b,c/d/e,f' with 'a=b,c&d=&e=f' and parse it into $_GET.
@@ -540,6 +531,9 @@ final class Request
 	 */
 	private function _checkBoard()
 	{
+		// We need *something*, and it'd better be a number
+		$board = 0;
+
 		if (isset($_REQUEST['board']))
 		{
 			// Make sure it's a string (not an array, say)
@@ -563,11 +557,6 @@ final class Request
 			// This is for "Who's Online" because it might come via POST - and it should be an int here.
 			$_GET['board'] = $board;
 		}
-		// None? We still need *something*, and it'd better be a number
-		else
-		{
-			$board = 0;
-		}
 
 		return $board;
 	}
@@ -579,6 +568,9 @@ final class Request
 	 */
 	private function _checkTopic()
 	{
+		// Set something, and that something is 0.
+		$topic = 0;
+
 		// Look for threadid, old YaBB SE links have those. Just read it as a topic.
 		if (isset($_REQUEST['threadid']) && !isset($_REQUEST['topic']))
 		{
@@ -609,11 +601,6 @@ final class Request
 
 			// Now make sure the online log gets the right number.
 			$_GET['topic'] = $topic;
-		}
-		// No topic? Well, set something, and that something is 0.
-		else
-		{
-			$topic = 0;
 		}
 
 		return $topic;

@@ -387,10 +387,6 @@
 
 /* Standard and brand icons */
 /* From Font Awesome */
-.i-openid::before {
-	content: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='black' viewBox='0 0 3584 3584'%3E%3Cpath d='M2172 0v3072l-544 256q-456-40-828-204t-586-417-214-545q0-280 201-527t550-411 783-216v344q-434 76-713 300t-279 510q0 304 309 534t777 290v-2720z m1338 1164l74 780-1050-228 294-166q-238-140-560-198v-344q554 66 962 314z'/%3E%3C/svg%3E");
-}
-
 .i-rss::before {
 	content: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='black' viewBox='0 0 32 32'%3E%3Cpath d='M4.26 23.467C1.91 23.467 0 25.384 0 27.72c0 2.348 1.91 4.243 4.26 4.243 2.357 0 4.264-1.895 4.264-4.244 0-2.338-1.907-4.254-4.265-4.254zM.004 10.873v6.133c3.993 0 7.75 1.562 10.577 4.39 2.826 2.823 4.385 6.596 4.385 10.604h6.16c0-11.65-9.478-21.127-21.12-21.127zM.012 0v6.136C14.255 6.136 25.848 17.74 25.848 32H32C32 14.36 17.648 0 .012 0z'/%3E%3C/svg%3E");
 }
@@ -642,11 +638,6 @@ legend {
 .i-cust_gender_3::before, .i-genderless::before {
 	filter: invert(75%) sepia(5%) saturate(3373%) hue-rotate(54deg) brightness(117%) contrast(110%);
 	--hexcode: #B3FF80;
-}
-
-.i-openid::before {
-	filter: invert(70%) sepia(63%) saturate(2746%) hue-rotate(332deg) brightness(102%) contrast(94%);
-	--hexcode: #F78C40;
 }
 
 .i-rss::before {

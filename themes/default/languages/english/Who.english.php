@@ -42,7 +42,6 @@ $txt['whoall_modifykarma_smite'] = 'Smiting a member.';
 $txt['whoall_news'] = 'Viewing the news.';
 $txt['whoall_notify'] = 'Changing their notification settings.';
 $txt['whoall_notifyboard'] = 'Changing their notification settings.';
-$txt['whoall_openidreturn'] = 'Logging in using OpenID.';
 $txt['whoall_quickmod'] = 'Moderating a board.';
 $txt['whoall_recent'] = 'Viewing a <a href="{recent_url}">list of recent topics</a>.';
 $txt['whoall_register'] = 'Registering for an account on the forum.';

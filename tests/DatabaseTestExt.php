@@ -114,7 +114,6 @@ class TestDatabase extends TestCase
 			'message_likes',
 			'messages',
 			'moderators',
-			'openid_assoc',
 			'package_servers',
 			'permission_profiles',
 			'permissions',

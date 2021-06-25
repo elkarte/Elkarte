@@ -753,7 +753,7 @@ function loadProfileFields($force_reload = false)
 			'subtext' => $txt['password_strength'],
 			'size' => 20,
 			'value' => '',
-			'enabled' => empty($cur_profile['openid_uri']),
+			'enabled' => true,
 			'permission' => 'profile_identity',
 			'save_key' => 'passwd',
 			// Note this will only work if passwrd2 also exists!
@@ -792,7 +792,7 @@ function loadProfileFields($force_reload = false)
 		'passwrd2' => array(
 			'type' => 'password',
 			'label' => ucwords($txt['verify_pass']),
-			'enabled' => empty($cur_profile['openid_uri']),
+			'enabled' => true,
 			'size' => 20,
 			'value' => '',
 			'permission' => 'profile_identity',
@@ -809,7 +809,7 @@ function loadProfileFields($force_reload = false)
 			'type' => 'text',
 			'label' => ucwords($txt['otp_token']),
 			'subtext' => $txt['otp_token_help'],
-			'enabled' => empty($cur_profile['openid_uri']),
+			'enabled' => true,
 			'size' => 20,
 			'value' => empty($cur_profile['otp_secret']) ? '' : $cur_profile['otp_secret'],
 			'postinput' => '<div style="display: inline-block;"><input type="button" value="' . $txt['otp_generate'] . '" onclick="generateSecret();"></div><div id="qrcode"></div>',

@@ -18,6 +18,7 @@ use ElkArte\Cache\Cache;
 use ElkArte\DataValidator;
 use ElkArte\Errors\ErrorContext;
 use ElkArte\Html2Md;
+use ElkArte\Themes\ThemeLoader;
 use ElkArte\TokenHash;
 use ElkArte\User;
 use ElkArte\Util;
@@ -511,7 +512,7 @@ function registerMember(&$regOptions, $ErrorContext = 'register')
 
 	$db = database();
 
-	\ElkArte\Themes\ThemeLoader::loadLanguageFile('Login');
+	ThemeLoader::loadLanguageFile('Login');
 
 	// We'll need some external functions.
 	require_once(SUBSDIR . '/Auth.subs.php');
@@ -520,11 +521,7 @@ function registerMember(&$regOptions, $ErrorContext = 'register')
 	// Put any errors in here.
 	$reg_errors = ErrorContext::context($ErrorContext, 0);
 
-	// What method of authorization are we going to use?
-	if (empty($regOptions['auth_method']) || !in_array($regOptions['auth_method'], array('password', 'openid')))
-	{
-		$regOptions['auth_method'] = !empty($regOptions['openid']) ? 'openid' : 'password';
-	}
+	$regOptions['auth_method'] = 'password';
 
 	// Spaces and other odd characters are evil...
 	$regOptions['username'] = trim(preg_replace('~[\t\n\r \x0B\0\x{A0}\x{AD}\x{2000}-\x{200F}\x{201F}\x{202F}\x{3000}\x{FEFF}]+~u', ' ', $regOptions['username']));
@@ -656,7 +653,6 @@ function registerMember(&$regOptions, $ErrorContext = 'register')
 		'additional_groups' => '',
 		'ignore_boards' => '',
 		'smiley_set' => '',
-		'openid_uri' => (!empty($regOptions['openid']) ? $regOptions['openid'] : ''),
 		'notify_announcements' => (!empty($regOptions['notify_announcements']) ? 1 : 0),
 	);
 
@@ -804,7 +800,6 @@ function registerMember(&$regOptions, $ErrorContext = 'register')
 		'ACTIVATIONLINK' => $scripturl . '?action=register;sa=activate;u=' . $memberID . ';code=' . $validation_code,
 		'ACTIVATIONLINKWITHOUTCODE' => $scripturl . '?action=register;sa=activate;u=' . $memberID,
 		'ACTIVATIONCODE' => $validation_code,
-		'OPENID' => !empty($regOptions['openid']) ? $regOptions['openid'] : '',
 		'COPPALINK' => $scripturl . '?action=register;sa=coppa;u=' . $memberID,
 	);
 
@@ -839,9 +834,8 @@ function registerMember(&$regOptions, $ErrorContext = 'register')
 					'USERNAME' => $regOptions['username'],
 					'PASSWORD' => $regOptions['password'],
 					'FORGOTPASSWORDLINK' => $scripturl . '?action=reminder',
-					'OPENID' => !empty($regOptions['openid']) ? $regOptions['openid'] : '',
 				);
-				$emaildata = loadEmailTemplate('register_' . ($regOptions['auth_method'] == 'openid' ? 'openid_' : '') . 'immediate', $replacements);
+				$emaildata = loadEmailTemplate('register_immediate', $replacements);
 				$mark_down = new Html2Md(str_replace("\n", '<br>', $emaildata['body']));
 				$emaildata['body'] = $mark_down->get_markdown();
 
@@ -855,8 +849,7 @@ function registerMember(&$regOptions, $ErrorContext = 'register')
 		// Need to activate their account - or fall under COPPA.
 		elseif ($regOptions['require'] == 'activation' || $regOptions['require'] == 'coppa')
 		{
-
-			$emaildata = loadEmailTemplate('register_' . ($regOptions['auth_method'] == 'openid' ? 'openid_' : '') . ($regOptions['require'] == 'activation' ? 'activate' : 'coppa'), $replacements);
+			$emaildata = loadEmailTemplate('register_' . ($regOptions['require'] == 'activation' ? 'activate' : 'coppa'), $replacements);
 			$mark_down = new Html2Md(str_replace("\n", '<br>', $emaildata['body']));
 			$emaildata['body'] = $mark_down->get_markdown();
 
@@ -870,10 +863,9 @@ function registerMember(&$regOptions, $ErrorContext = 'register')
 				'USERNAME' => $regOptions['username'],
 				'PASSWORD' => $regOptions['password'],
 				'FORGOTPASSWORDLINK' => $scripturl . '?action=reminder',
-				'OPENID' => !empty($regOptions['openid']) ? $regOptions['openid'] : '',
 			);
 
-			$emaildata = loadEmailTemplate('register_' . ($regOptions['auth_method'] == 'openid' ? 'openid_' : '') . 'pending', $replacements);
+			$emaildata = loadEmailTemplate('register_pending', $replacements);
 			$mark_down = new Html2Md(str_replace("\n", '<br>', $emaildata['body']));
 			$emaildata['body'] = $mark_down->get_markdown();
 
@@ -1837,7 +1829,7 @@ function maxMemberID()
  * - 'limit' int if set overrides the default query limit
  * - 'sort' (string) a column to sort the results
  * - 'moderation' (bool) includes member_ip, id_group, additional_groups, last_login
- * - 'authentication' (bool) includes secret_answer, secret_question, openid_uri,
+ * - 'authentication' (bool) includes secret_answer, secret_question,
  *    is_activated, validation_code, passwd_flood, password_salt
  * - 'preferences' (bool) includes lngfile, mod_prefs, notify_types, signature
  * @return mixed[]
@@ -1881,7 +1873,7 @@ function getBasicMemberData($member_ids, $options = array())
 		SELECT 
 			id_member, member_name, real_name, email_address, hide_email, posts, id_theme' . (!empty($options['moderation']) ? ',
 			member_ip, id_group, additional_groups, last_login, id_post_group' : '') . (!empty($options['authentication']) ? ',
-		secret_answer, secret_question, openid_uri, is_activated, validation_code, passwd_flood, password_salt' : '') . (!empty($options['preferences']) ? ',
+		secret_answer, secret_question, is_activated, validation_code, passwd_flood, password_salt' : '') . (!empty($options['preferences']) ? ',
 			lngfile, mod_prefs, notify_types, signature' : '') . '
 		FROM {db_prefix}members
 		WHERE id_member IN ({array_int:member_list})
@@ -2349,33 +2341,6 @@ function onlineMembers($conditions, $sort_method, $sort_direction, $start)
 			'limit' => $modSettings['defaultMaxMembers'],
 		)
 	)->fetch_all();
-}
-
-/**
- * Check if the OpenID URI is already registered for an existing member
- *
- * @param string $url
- * @return array
- * @throws \ElkArte\Exceptions\Exception
- * @package Members
- */
-function memberExists($url)
-{
-	$db = database();
-
-	$request = $db->query('', '
-		SELECT 
-			mem.id_member, mem.member_name
-		FROM {db_prefix}members AS mem
-		WHERE mem.openid_uri = {string:openid_uri}',
-		array(
-			'openid_uri' => $url,
-		)
-	);
-	$member = $request->fetch_assoc();
-	$request->free_result();
-
-	return $member;
 }
 
 /**

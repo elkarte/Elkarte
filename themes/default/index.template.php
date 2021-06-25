@@ -78,13 +78,6 @@ function template_html_above()
 	<meta name="mobile-web-app-capable" content="yes" />
 	<meta name="description" content="', $context['page_title_html_safe'], '" />';
 
-	// OpenID enabled? Advertise the location of our endpoint using YADIS protocol.
-	if (!empty($modSettings['enableOpenID']))
-	{
-		echo '
-	<meta http-equiv="x-xrds-location" content="' . $scripturl . '?action=xrds" />';
-	}
-
 	// Please don't index these Mr Robot.
 	if (!empty($context['robot_no_index']))
 	{
@@ -250,12 +243,8 @@ function template_th_login_bar()
 						<input type="hidden" name="old_hash_passwrd" value="" />
 						<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
 						<input type="hidden" name="', $context['login_token_var'], '" value="', $context['login_token'], '" />';
-// @todo login_token_var and login_token are not defined when installing the forum
-	if (!empty($modSettings['enableOpenID']))
-	{
-		echo '
-						<a class="icon icon-margin i-openid" href="', $scripturl, '?action=login;openid" title="' . $txt['openid'] . '"><s>' . $txt['openid'] . '"</s></a>';
-	}
+
+	// @todo login_token_var and login_token are not defined when installing the forum
 	echo '
 					</div>
 				</form>

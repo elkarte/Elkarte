@@ -361,20 +361,6 @@ class Profile extends AbstractController
 							'any' => array('profile_extra_any'),
 						),
 					),
-					'authentication' => array(
-						'label' => $txt['authentication'],
-						'controller' => '\\ElkArte\\Controller\\ProfileOptions',
-						'function' => 'action_authentication',
-						'enabled' => !empty($modSettings['enableOpenID']) || !empty($this->_profile['openid_uri']),
-						'sc' => 'post',
-						'token' => 'profile-au%u',
-						'hidden' => empty($modSettings['enableOpenID']) && empty($this->_profile['openid_uri']),
-						'password' => true,
-						'permission' => array(
-							'own' => array('profile_identity_any', 'profile_identity_own'),
-							'any' => array('profile_identity_any'),
-						),
-					),
 					'notification' => array(
 						'label' => $txt['notifications'],
 						'controller' => '\\ElkArte\\Controller\\ProfileOptions',
@@ -606,7 +592,7 @@ class Profile extends AbstractController
 
 		// All the subactions that require a user password in order to validate.
 		$check_password = $context['user']['is_owner'] && !empty($this->_profile_include_data['password']);
-		$context['require_password'] = $check_password && empty(User::$settings['openid_uri']);
+		$context['require_password'] = $check_password;
 
 		// These will get populated soon!
 		$post_errors = array();
@@ -777,40 +763,31 @@ class Profile extends AbstractController
 
 		if ($check_password)
 		{
-			// If we're using OpenID try to re-validate.
-			if (!empty(User::$settings['openid_uri']))
+			// You didn't even enter a password!
+			if (trim($this->_req->post->oldpasswrd) === '')
 			{
-				$openID = new \ElkArte\OpenID();
-				$openID->revalidate();
+				$post_errors[] = 'no_password';
 			}
-			else
+
+			// Since the password got modified due to all the $_POST cleaning, lets undo it so we can get the correct password
+			$this->_req->post->oldpasswrd = un_htmlspecialchars($this->_req->post->oldpasswrd);
+
+			// Does the integration want to check passwords?
+			$good_password = in_array(true, call_integration_hook('integrate_verify_password', array($this->_profile['member_name'], $this->_req->post->oldpasswrd, false)), true);
+
+			// Start up the password checker, we have work to do
+			require_once(SUBSDIR . '/Auth.subs.php');
+
+			// Bad password!!!
+			if (!$good_password && !validateLoginPassword($this->_req->post->oldpasswrd, $this->user->passwd, $this->_profile['member_name']))
 			{
-				// You didn't even enter a password!
-				if (trim($this->_req->post->oldpasswrd) === '')
-				{
-					$post_errors[] = 'no_password';
-				}
+				$post_errors[] = 'bad_password';
+			}
 
-				// Since the password got modified due to all the $_POST cleaning, lets undo it so we can get the correct password
-				$this->_req->post->oldpasswrd = un_htmlspecialchars($this->_req->post->oldpasswrd);
-
-				// Does the integration want to check passwords?
-				$good_password = in_array(true, call_integration_hook('integrate_verify_password', array($this->_profile['member_name'], $this->_req->post->oldpasswrd, false)), true);
-
-				// Start up the password checker, we have work to do
-				require_once(SUBSDIR . '/Auth.subs.php');
-
-				// Bad password!!!
-				if (!$good_password && !validateLoginPassword($this->_req->post->oldpasswrd, $this->user->passwd, $this->_profile['member_name']))
-				{
-					$post_errors[] = 'bad_password';
-				}
-
-				// Warn other elements not to jump the gun and do custom changes!
-				if (in_array('bad_password', $post_errors))
-				{
-					$context['password_auth_failed'] = true;
-				}
+			// Warn other elements not to jump the gun and do custom changes!
+			if (in_array('bad_password', $post_errors))
+			{
+				$context['password_auth_failed'] = true;
 			}
 		}
 	}

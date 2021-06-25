@@ -842,7 +842,7 @@ function findUser($where, $where_params, $fatal = true)
 	// Find the user!
 	$request = $db->fetchQuery('
 		SELECT 
-			id_member, real_name, member_name, email_address, is_activated, validation_code, lngfile, openid_uri, secret_question, passwd
+			id_member, real_name, member_name, email_address, is_activated, validation_code, lngfile, secret_question, passwd
 		FROM {db_prefix}members
 		WHERE ' . $where . '
 		LIMIT 1',
@@ -856,7 +856,7 @@ function findUser($where, $where_params, $fatal = true)
 
 		$request = $db->fetchQuery('
 			SELECT 
-				id_member, real_name, member_name, email_address, is_activated, validation_code, lngfile, openid_uri, secret_question
+				id_member, real_name, member_name, email_address, is_activated, validation_code, lngfile, secret_question
 			FROM {db_prefix}members
 			WHERE email_address = {string:email_address}
 			LIMIT 1',
@@ -947,7 +947,7 @@ function loadExistingMember($name, $is_id = false)
 		$request = $db->fetchQuery('
 			SELECT 
 				passwd, id_member, id_group, lngfile, is_activated, email_address, additional_groups, member_name, password_salt,
-				openid_uri, passwd_flood, otp_secret, enable_otp, otp_used
+				passwd_flood, otp_secret, enable_otp, otp_used
 			FROM {db_prefix}members
 			WHERE id_member = {int:id_member}
 			LIMIT 1',
@@ -962,7 +962,7 @@ function loadExistingMember($name, $is_id = false)
 		$request = $db->fetchQuery('
 			SELECT 
 				passwd, id_member, id_group, lngfile, is_activated, email_address, additional_groups, member_name, password_salt,
-				openid_uri, passwd_flood, otp_secret, enable_otp, otp_used
+				passwd_flood, otp_secret, enable_otp, otp_used
 			FROM {db_prefix}members
 			WHERE {column_case_insensitive:member_name} = {string_case_insensitive:user_name}
 			LIMIT 1',
@@ -977,7 +977,7 @@ function loadExistingMember($name, $is_id = false)
 
 			$request = $db->fetchQuery('
 				SELECT 
-					passwd, id_member, id_group, lngfile, is_activated, email_address, additional_groups, member_name, password_salt, openid_uri,
+					passwd, id_member, id_group, lngfile, is_activated, email_address, additional_groups, member_name, password_salt,
 					passwd_flood, otp_secret, enable_otp, otp_used
 				FROM {db_prefix}members
 				WHERE email_address = {string:user_name}

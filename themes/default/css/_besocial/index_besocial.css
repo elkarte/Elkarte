@@ -201,11 +201,6 @@ input[disabled].input_text {
 	background: var(--mid_grey_background);
 }
 
-/* The OpenID login form */
-.openid_login {
-	background: white url(../../images/openid.png) no-repeat 2% 50%;
-}
-
 /* Common button styling. */
 input[type="submit"], .drop_area_fileselect_text, button[type="submit"], input[type="button"],
 	/* Anchors styled to look like buttons.

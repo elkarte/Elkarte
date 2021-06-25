@@ -223,7 +223,7 @@ class MemberLoader
 				$select_columns .= ', mem.buddy_list';
 				break;
 			case MemberLoader::SET_PROFILE:
-				$select_columns .= ', mem.openid_uri, mem.id_theme, mem.pm_ignore_list, mem.pm_email_notify, mem.receive_from,
+				$select_columns .= ', mem.id_theme, mem.pm_ignore_list, mem.pm_email_notify, mem.receive_from,
 				mem.time_format, mem.secret_question, mem.additional_groups, mem.smiley_set,
 				mem.total_time_logged_in, mem.notify_announcements, mem.notify_regularity, mem.notify_send_body,
 				mem.notify_types, lo.url, mem.ignore_boards, mem.password_salt, mem.pm_prefs, mem.buddy_list, mem.otp_secret, mem.enable_otp';

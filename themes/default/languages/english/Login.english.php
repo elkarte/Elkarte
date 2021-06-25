@@ -21,7 +21,6 @@ $txt['need_username'] = 'You need to fill in a username.';
 $txt['no_password'] = 'You didn\'t enter your password.';
 $txt['improper_password'] = 'The supplied password is too long.';
 $txt['incorrect_password'] = 'Password incorrect';
-$txt['openid_not_found'] = 'Supplied OpenID identifier not found.';
 $txt['maintain_mode'] = 'Maintenance Mode';
 $txt['registration_successful'] = 'Registration Successful';
 $txt['valid_email_needed'] = 'Please enter a valid email address, %1$s.';
@@ -73,8 +72,6 @@ $txt['register_did_you'] = 'Did you mean';
 $txt['approval_after_registration'] = 'Thank you for registering. The admin must approve your registration before you may begin to use your account, you will receive an email shortly advising you of the admins decision.';
 
 $txt['admin_settings_desc'] = 'Here you can change a variety of settings related to registration of new members.';
-
-$txt['setting_enableOpenID'] = 'Allow users to register using OpenID';
 
 $txt['setting_registration_method'] = 'Method of registration employed for new members';
 $txt['setting_registration_disabled'] = 'Registration Disabled';
@@ -146,8 +143,6 @@ $txt['registration_errors_occurred'] = 'The following errors were detected in yo
 
 $txt['authenticate_label'] = 'Authentication Method';
 $txt['authenticate_password'] = 'Password';
-$txt['authenticate_openid'] = 'OpenID';
-$txt['authenticate_openid_url'] = 'OpenID Authentication URL';
 $txt['otp_required'] = 'A Time-based One-time Password is required in order to log in!';
 $txt['disable_otp'] = 'Disable two factor authentication.';
 
