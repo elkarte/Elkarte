@@ -16,6 +16,7 @@
 use ElkArte\ext\Composer\Autoload\ClassLoader;
 use PHPUnit\Extensions\Selenium2TestCase;
 
+define('IGNORE_INSTALL_DIR', 1);
 $mySource = './sources';
 $_SERVER['SERVER_NAME'] = '127.0.0.1';
 $_SERVER['REMOTE_ADDR'] = '127.0.0.1';

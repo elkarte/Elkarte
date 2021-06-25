@@ -48,7 +48,10 @@ class SupportManageMembergroupsController extends ElkArteWebSupport
 		$this->keys('The Test Group');
 		$this->ById('icon_count_input')->click();
 		$this->keys('2');
-		$this->clickit('input[name="save"]');
+
+		// Save the changes
+		$script = 'document.querySelector(\'#save\').click();';
+		$this->execute(['script' => $script, 'args' => []]);
 
 		// We should be back at the group listing, the new group should be there
 		$this->assertEquals("Manage Membergroups", $this->title(), $this->source());

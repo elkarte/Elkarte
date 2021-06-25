@@ -81,11 +81,11 @@ function template_registration_agreement()
 	else
 	{
 		echo '
-				<input type="submit" name="accept_agreement" value="', $txt['agreement_agree'], '" />';
+				<input type="submit" id="accept_agreement" name="accept_agreement" value="', $txt['agreement_agree'], '" />';
 	}
 
 	echo '
-				<input type="submit" name="no_accept" value="', $txt['agreement_no_agree'], '" />';
+				<input type="submit" id="no_accept" name="no_accept" value="', $txt['agreement_no_agree'], '" />';
 
 	if ($context['show_contact_button'])
 	{

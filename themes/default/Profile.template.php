@@ -151,12 +151,12 @@ function template_profile_save()
 	if (!empty($context['submit_button_text']))
 	{
 		echo '
-						<input type="submit" name="save" value="', $context['submit_button_text'], '" />';
+						<input type="submit" id="save_profile" name="save" value="', $context['submit_button_text'], '" />';
 	}
 	else
 	{
 		echo '
-						<input type="submit" name="save" value="', $txt['change_profile'], '" />';
+						<input type="submit" id="save_profile" name="save" value="', $txt['change_profile'], '" />';
 	}
 
 	echo '

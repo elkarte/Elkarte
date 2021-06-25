@@ -1,14 +1,16 @@
-name: MaxPain
+name: SpudsPain
 
 on:
   push:
     branches:        # Run tests when commits are pushed to these branches
       - master
       - development
+      - '**'
   pull_request:      # Run tests when pull requests are made on these branches
     branches:
       - master
       - development
+      - '**'
 
 env:
   WEBSERVER: 'none'
@@ -43,7 +45,7 @@ jobs:
       - name: Checkout ElkArte
         uses: actions/checkout@v2
         with:
-          repository: elkarte/elkarte
+          repository: spuds/elkarte
           fetch-depth: 10
           ref: ${{ env.ELKARTE_BRANCH }}
           path: elkarte
@@ -74,7 +76,7 @@ jobs:
           DB: ${{ matrix.db }}
           PHP_VERSION: ${{ matrix.php }}
           WEBSERVER: 'nginx'
-        run: .github/setup-elkarte.sh $DB $PHP_VERSION
+        run: .github/setup-elkarte.sh $DB $PHP_VERSION $WEB
         working-directory: ./elkarte
 
       - name: Run Unit Tests
@@ -91,8 +93,6 @@ jobs:
           PHP_VERSION: ${{ matrix.php }}
         run: |
           sudo cat /var/log/nginx/127.0.0.1.error.log
-          sudo cat /tmp/selenium.log
-          .github/setup-failure.sh $DB $PHP_VERSION
         working-directory: ./elkarte
   # End Selenium headless browser testing
 
@@ -111,7 +111,7 @@ jobs:
       - name: Checkout ElkArte
         uses: actions/checkout@v2
         with:
-          repository: elkarte/elkarte
+          repository: spuds/elkarte
           fetch-depth: 10
           ref: ${{ env.ELKARTE_BRANCH }}
           path: elkarte
@@ -159,10 +159,6 @@ jobs:
     strategy:
       matrix:
         include:
-          - php: '7.2'
-            db: "mariadb:10.2"
-          - php: '7.3'
-            db: "mysql:5.7"
           - php: '7.4'
             db: "mysql:8.0"
 
@@ -186,7 +182,7 @@ jobs:
       - name: Checkout ElkArte
         uses: actions/checkout@v2
         with:
-          repository: elkarte/elkarte
+          repository: spuds/elkarte
           fetch-depth: 10
           ref: ${{ env.ELKARTE_BRANCH }}
           path: elkarte
@@ -240,8 +236,6 @@ jobs:
         include:
           - php: '7.2'
             db: "postgres:9.5"
-          - php: '7.4'
-            db: "postgres:11.10"
 
     name: Postgre (${{ matrix.php }} - DB ${{ matrix.db_alias != '' && matrix.db_alias || matrix.db }})
 
@@ -265,7 +259,7 @@ jobs:
       - name: Checkout ElkArte
         uses: actions/checkout@v2
         with:
-          repository: elkarte/elkarte
+          repository: spuds/elkarte
           fetch-depth: 10
           ref: ${{ env.ELKARTE_BRANCH }}
           path: elkarte

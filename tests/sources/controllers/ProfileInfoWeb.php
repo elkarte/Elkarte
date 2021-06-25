@@ -46,8 +46,7 @@ class ProfileInfoController extends ElkArteWebSupport
 	 */
 	public function testPerms()
 	{
-		$this->bylinkText("Profile Info")->click();
-		$this->bylinkText("Show Permissions")->click();
+		$this->url('index.php?action=profile;area=permissions');
 		$this->assertStringContainsString('As an administrator', $this->byCssSelector(".description")->text());
 	}
 }

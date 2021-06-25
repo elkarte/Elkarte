@@ -23,8 +23,8 @@ abstract class ElkArteWebSupport extends Selenium2TestCase
 {
 	protected $coverageScriptUrl = 'http://127.0.0.1/phpunit_coverage.php';
 	protected $backupGlobalsBlacklist = ['user_info'];
-	protected $width = 1280;
-	protected $height = 1024;
+	protected $width = 2560;
+	protected $height = 1440;
 	protected $adminuser = 'test_admin';
 	protected $adminname = 'admin';
 	protected $adminpass = 'test_admin_pwd';
@@ -49,6 +49,10 @@ abstract class ElkArteWebSupport extends Selenium2TestCase
 			"chromeOptions" => [
 				'w3c' => false,
 			],
+			"firefoxOptions" => [
+				'headless' => true,
+				'w3c' => false,
+			]
 		]);
 		$this->setPort($this->port);
 		$this->setHost('localhost');
@@ -87,6 +91,7 @@ abstract class ElkArteWebSupport extends Selenium2TestCase
 		if ($this->width && $this->height)
 		{
 			$this->setWindowSize();
+			$this->currentWindow()->maximize();
 		}
 
 		if ($this->login)
@@ -105,7 +110,7 @@ abstract class ElkArteWebSupport extends Selenium2TestCase
 	 */
 	public function setWindowSize()
 	{
-		// Set a window size large than the default
+		// Set a window size
 		$this->currentWindow()->size(array('width' => $this->width, 'height' => $this->height));
 	}
 
@@ -238,9 +243,8 @@ abstract class ElkArteWebSupport extends Selenium2TestCase
 		$found = $this->waitUntil(function ($testCase) use ($selector) {
 			try
 			{
-				$selector = $testCase->byCssSelector($selector);
-
-				return $selector;
+				$testCase->byCssSelector($selector);
+				return true;
 			}
 			catch (PHPUnit\Extensions\Selenium2TestCase\WebDriverException $e)
 			{
@@ -251,8 +255,10 @@ abstract class ElkArteWebSupport extends Selenium2TestCase
 
 		if ($found)
 		{
-			$this->moveto($found);
-			$found->click();
+			// Make sure the element is in the viewport, then move cursor to it and click
+			$element = $this->byCssSelector($selector);
+			$this->moveto($element);
+			$element->click();
 		}
 	}
 
