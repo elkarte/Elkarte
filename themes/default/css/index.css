@@ -511,15 +511,19 @@ em, .em {
 	font-size: var(--font18);
 }
 
+/* justify-content here allows chaining with a flex container */
 .centertext {
+	justify-content: center;
 	text-align: center;
 }
 
 .righttext {
+	justify-content: right;
 	text-align: right;
 }
 
 .lefttext {
+	justify-content: left;
 	text-align: left;
 }
 

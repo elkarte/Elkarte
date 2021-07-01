@@ -1782,7 +1782,6 @@ class InstallInstructions_install_1_1
 				array('name' => 'mod_prefs',            'type' => 'varchar', 'size' => 20, 'default' => ''),
 				array('name' => 'message_labels',       'type' => 'text'),
 				array('name' => 'passwd',               'type' => 'varchar', 'size' => 64, 'default' => ''),
-				array('name' => 'openid_uri',           'type' => 'text'),
 				array('name' => 'email_address',        'type' => 'varchar', 'size' => 255, 'default' => ''),
 				array('name' => 'birthdate',            'type' => 'date', 'default' => '0001-01-01'),
 				array('name' => 'website_title',        'type' => 'varchar', 'size' => 255, 'default' => ''),
@@ -2043,26 +2042,6 @@ class InstallInstructions_install_1_1
 				),
 			),
 			array('id_member', 'mention_type')
-		);
-	}
-
-	public function table_openid_assoc()
-	{
-		return $this->table->create_table('{db_prefix}openid_assoc',
-			array(
-				array('name' => 'server_url', 'type' => 'text'),
-				array('name' => 'handle',     'type' => 'varchar', 'size' => 255, 'default' => ''),
-				array('name' => 'secret',     'type' => 'text'),
-				array('name' => 'issued',     'type' => 'int', 'size' => 10, 'default' => 0),
-				array('name' => 'expires',    'type' => 'int', 'size' => 10, 'default' => 0),
-				array('name' => 'assoc_type', 'type' => 'varchar', 'size' => 64, 'default' => ''),
-			),
-			array(
-				array('name' => 'server_handle', 'columns' => array('server_url(125)', 'handle(125)'), 'type' => 'primary'),
-				array('name' => 'expires',       'columns' => array('expires'), 'type' => 'key'),
-			),
-			array(),
-			'ignore'
 		);
 	}
 

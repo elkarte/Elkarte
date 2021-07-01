@@ -169,7 +169,7 @@ function template_ask()
 		<div class="login">
 			<h2 class="category_header">', $txt['authentication_reminder'], '</h2>
 			<div class="well">
-				<p class="smalltext">', $context['account_type'] === 'password' ? $txt['enter_new_password'] : $txt['openid_secret_reminder'], '</p>
+				<p class="smalltext">', $txt['enter_new_password'], '</p>
 				<dl>
 					<dt>
 						<label>', $txt['secret_question'], ':</label>

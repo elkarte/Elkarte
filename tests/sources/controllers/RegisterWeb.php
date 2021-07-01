@@ -82,7 +82,7 @@ class SupportRegisterController extends ElkArteWebSupport
 		$this->assertEquals('Registration Agreement', $this->title());
 
 		// Accept the agreement, we should see the Registration form
-		$this->clickit('#confirm_buttons input[name="accept_agreement"]');
+		$this->clickOnElement('accept_agreement');
 		$this->assertEquals('Registration Form', $this->title());
 
 		// Fill out the registration form

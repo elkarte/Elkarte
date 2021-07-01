@@ -121,7 +121,7 @@ function template_generic_menu_dropdown_above()
 	foreach ($menu_context['sections'] as $section)
 	{
 		echo '
-						<li class="listlevel1', !empty($section['areas']) ? ' subsections' : '', '" role="none"">
+						<li class="listlevel1', !empty($section['areas']) ? ' subsections' : '', '" role="none">
 							<a class="linklevel1', !empty($section['selected']) ? ' active' : '', '" href="', $section['url'], '" role="menuitem"', !empty($button['sub_buttons']) ? ' aria-haspopup="true"' : '', '>',
 								$section['label'], '
 							</a>

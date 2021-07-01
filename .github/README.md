@@ -27,7 +27,6 @@ Contributions to documentation are licensed under [CC-by-SA 3](https://creativec
 * Notification system for mentions, quoted posts, likes, PM's
 * Drafts, including auto save
 * Emoji integrated into the editor provides access to 1000's of them :smiley:
-* OpenID 2.0 (BC Math must be available)
 * Inline Attachments allow displaying of attachment thumbnails inline with the text of the post
 * Two factor authentication
 * Two built in modern, responsive themes

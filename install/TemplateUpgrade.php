@@ -145,12 +145,12 @@ function template_upgrade_above()
 	echo '<!DOCTYPE html>
 <html ', $upcontext['right_to_left'] ? 'dir="rtl"' : '', '>
 	<head>
-		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+		<meta charset="utf-8" />
 		<meta name="robots" content="noindex" />
 		<title>', $txt['upgrade_upgrade_utility'], '</title>
-		<link rel="stylesheet" href="', $settings['default_theme_url'], '/css/index.css?11RC1" />
-		<link rel="stylesheet" href="', $settings['default_theme_url'], '/css/_light/index_light.css?11RC1" />
-		<link rel="stylesheet" href="', $settings['default_theme_url'], '/css/install.css?11RC1" />
+		<link rel="stylesheet" href="', $settings['default_theme_url'], '/css/index.css?20RC1" />
+		<link rel="stylesheet" href="', $settings['default_theme_url'], '/css/_light/index_light.css?20RC1" />
+		<link rel="stylesheet" href="', $settings['default_theme_url'], '/css/install.css?20RC1" />
 		<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js" id="jquery"></script>
 		<script>
 			window.jQuery || document.write(\'<script src="', $settings['default_theme_url'], '/scripts/jquery-3.5.1.min.js"><\/script>\');

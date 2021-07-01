@@ -1493,22 +1493,10 @@ function template_authentication_method()
 			<div class="content">
 				<dl>
 					<dt>
-						<input type="radio" onclick="updateAuthMethod();" name="authenticate" value="openid" id="auth_openid"', $context['auth_method'] == 'openid' ? ' checked="checked"' : '', ' />
-						<label for="auth_openid">', $txt['authenticate_openid'], '</label>
-						<a href="', getUrl('action', ['action' => 'quickhelp', 'help' => 'register_openid']), '" onclick="return reqOverlayDiv(this.href);" class="helpicon i-help"><s>', $txt['help'], '</s></a>
-						<br />
-						<input type="radio" onclick="updateAuthMethod();" name="authenticate" value="passwd" id="auth_pass"', $context['auth_method'] == 'password' ? ' checked="checked"' : '', ' />
+						<input type="radio" name="authenticate" value="passwd" id="auth_pass"', $context['auth_method'] == 'password' ? ' checked="checked"' : '', ' />
 						<label for="auth_pass">', $txt['authenticate_password'], '</label>
 					</dt>
 					<dd>
-						<dl id="openid_group">
-							<dt>
-								<label for="openid_url">', $txt['authenticate_openid_url'], '</label>
-							</dt>
-							<dd>
-								<input type="text" name="openid_identifier" id="openid_url" size="30" tabindex="', $context['tabindex']++, '" value="', $context['member']['openid_uri'], '" class="input_text openid_login" />
-							</dd>
-						</dl>
 						<dl id="password1_group">
 							<dt>
 								<em>', $txt['choose_pass'], ':</em>
@@ -1552,8 +1540,6 @@ function template_authentication_method()
 			"password_valid": "', $txt['registration_password_valid'], '"
 		};
 		var verificationHandle = new elkRegister("creator", ', empty($modSettings['password_strength']) ? 0 : $modSettings['password_strength'], ', regTextStrings);
-		var currentAuthMethod = \'passwd\';
 
-		updateAuthMethod();
 	</script>';
 }

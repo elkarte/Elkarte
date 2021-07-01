@@ -1157,21 +1157,7 @@ function ssi_login($redirect_to = '', $output_method = 'echo')
 					<dd>
 						<input type="password" name="passwrd" value="" size="20" class="input_password" placeholder="', $txt['password'], '" />
 					</dd>
-				</dl>';
-
-	if (!empty($modSettings['enableOpenID']))
-	{
-		echo '<p><strong>&mdash;', $txt['or'], '&mdash;</strong></p>
-				<dl>
-					<dt>', $txt['openid'], ':</dt>
-					<dd>
-						<input type="text" name="openid_identifier" class="input_text openid_login" size="17" />
-						&nbsp;<a href="', $scripturl, '?action=quickhelp;help=register_openid" onclick="return reqOverlayDiv(this.href);" class="helpicon i-help"><s>', $txt['help'], '</s></a>
-					</dd>
-				</dl>';
-	}
-
-	echo '
+				</dl>
 				<input type="submit" value="', $txt['login'], '" />
 				<p class="smalltext">
 					<a href="', $scripturl, '?action=reminder">', $txt['forgot_your_password'], '</a>

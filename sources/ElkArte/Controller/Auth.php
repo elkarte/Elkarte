@@ -85,7 +85,6 @@ class Auth extends AbstractController
 		$context['page_title'] = $txt['login'];
 		$_REQUEST['u'] = isset($_REQUEST['u']) ? Util::htmlspecialchars($_REQUEST['u']) : '';
 		$context['default_username'] = &$_REQUEST['u'];
-		$context['using_openid'] = isset($_GET['openid']);
 		$context['default_password'] = '';
 		$context['never_expire'] = false;
 
@@ -182,23 +181,6 @@ class Auth extends AbstractController
 			'url' => getUrl('action', ['action' => 'login']),
 			'name' => $txt['login'],
 		);
-
-		// This is an OpenID login. Let's validate...
-		if (!empty($_POST['openid_identifier']) && !empty($modSettings['enableOpenID']))
-		{
-			$open_id = new \ElkArte\OpenID();
-
-			if (($open_id->validate($_POST['openid_identifier'])) !== 'no_data')
-			{
-				return $open_id;
-			}
-			else
-			{
-				$context['login_errors'] = array($txt['openid_not_found']);
-
-				return false;
-			}
-		}
 
 		// You forgot to type your username, dummy!
 		if (!isset($_POST['user']) || $_POST['user'] === '')
@@ -581,12 +563,6 @@ class Auth extends AbstractController
 			$_SESSION['pack_ftp'] = null;
 		}
 
-		// They cannot be open ID verified any longer.
-		if (isset($_SESSION['openid']))
-		{
-			unset($_SESSION['openid']);
-		}
-
 		// It won't be first login anymore.
 		unset($_SESSION['first_login']);
 
@@ -720,13 +696,6 @@ class Auth extends AbstractController
 				throw new Exception('login_cookie_error', false);
 			}
 
-			$this->user->can_mod = User::$info->canMod($modSettings['postmod_active']);
-			if ($this->user->can_mod && isset(User::$settings['openid_uri']) && empty(User::$settings['openid_uri']))
-			{
-				$_SESSION['moderate_time'] = time();
-				unset($_SESSION['just_registered']);
-			}
-
 			// Some whitelisting for login_url...
 			$temp = empty($_SESSION['login_url']) || validLoginUrl($_SESSION['login_url']) === false ? '' : $_SESSION['login_url'];
 			unset($_SESSION['login_url']);
@@ -850,18 +819,6 @@ function doLogin(UserSettingsLoader $user)
 
 	// Are you banned?
 	is_not_banned(true);
-
-	// An administrator, set up the login so they don't have to type it again.
-	if (User::$info->is_admin && isset(User::$settings->openid_uri) && empty(User::$settings->openid_uri))
-	{
-		// Let's validate if they really want..
-		if (!empty($modSettings['auto_admin_session']) && $modSettings['auto_admin_session'] == 1)
-		{
-			$_SESSION['admin_time'] = time();
-		}
-
-		unset($_SESSION['just_registered']);
-	}
 
 	// Don't stick the language or theme after this point.
 	unset($_SESSION['language'], $_SESSION['id_theme']);

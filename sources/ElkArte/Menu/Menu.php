@@ -458,7 +458,7 @@ class Menu
 		if (!empty($area->getIcon()))
 		{
 			$this->menuContext['sections'][$sectionId]['areas'][$areaId]['icon'] =
-				'<img ' . (!empty($area->getClass()) ? 'class="' . $area->getClass() . '" ' : 'style="background: none"') . ' src="' . $imagePath . '/' . $area->getIcon() . '" alt="" />&nbsp;&nbsp;';
+				'<img ' . (!empty($area->getClass()) ? 'class="' . $area->getClass() . '"' : 'style="background: none"') . ' src="' . $imagePath . '/' . $area->getIcon() . '" alt="" />&nbsp;&nbsp;';
 		}
 		else
 		{

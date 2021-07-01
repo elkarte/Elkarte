@@ -104,7 +104,7 @@ class Reminder extends AbstractController
 		// Find this member
 		$member = findUser($where, $where_params);
 
-		$context['account_type'] = !empty($member['openid_uri']) ? 'openid' : 'password';
+		$context['account_type'] = 'password';
 
 		// If the user isn't activated/approved, give them some feedback on what to do next.
 		if ($member['is_activated'] != 1)
@@ -128,10 +128,9 @@ class Reminder extends AbstractController
 		}
 
 		// If they have no secret question then they can only get emailed the item, or they are requesting the email, send them an email.
-		if (empty($member['secret_question'])
-			|| ($this->_req->getPost('reminder_type') === 'email'))
+		if (empty($member['secret_question']) || ($this->_req->getPost('reminder_type') === 'email'))
 		{
-			// Randomly generate a new password, with only alpha numeric characters that is a max length of 10 chars.
+			// Randomly generate a new password, with only alpha numeric characters that is a max length of 14 chars.
 			$password = generateValidationCode(14);
 
 			require_once(SUBSDIR . '/Mail.subs.php');
@@ -140,23 +139,14 @@ class Reminder extends AbstractController
 				'REMINDLINK' => getUrl('action', ['action' => 'reminder', 'sa' => 'setpassword', 'u' => $member['id_member'], 'code' => $password]),
 				'IP' => $this->user->ip,
 				'MEMBERNAME' => $member['member_name'],
-				'OPENID' => $member['openid_uri'],
 			);
 
+			// Email them their new password
 			$emaildata = loadEmailTemplate('forgot_' . $context['account_type'], $replacements, empty($member['lngfile']) || empty($modSettings['userLanguage']) ? $language : $member['lngfile']);
-			$context['description'] = $txt['reminder_' . (!empty($member['openid_uri']) ? 'openid_' : '') . 'sent'];
-
-			// If they were using OpenID simply email them their OpenID identity.
 			sendmail($member['email_address'], $emaildata['subject'], $emaildata['body'], null, null, false, 1);
 
-			if (empty($member['openid_uri']))
-			{
-				// Set the password in the database.
-				require_once(SUBSDIR . '/Members.subs.php');
-				updateMemberData($member['id_member'], array('validation_code' => substr(hash('sha256', $password), 0, 10)));
-			}
-
 			// Set up the template.
+			$context['description'] = $txt['reminder_sent'];
 			$context['sub_template'] = 'sent';
 
 			// Don't really.
@@ -335,15 +325,6 @@ class Reminder extends AbstractController
 			throw new Exception('incorrect_answer', false);
 		}
 
-		// If it's OpenID this is where the music ends.
-		if (!empty($member['openid_uri']))
-		{
-			$context['sub_template'] = 'sent';
-			$context['description'] = sprintf($txt['reminder_openid_is'], $member['openid_uri']);
-
-			return;
-		}
-
 		// You can't use a blank one!
 		if (trim($this->_req->post->passwrd1) === '')
 		{
@@ -416,7 +397,7 @@ function secretAnswerInput()
 		throw new Exception('username_no_exist', false);
 	}
 
-	$context['account_type'] = !empty($member['openid_uri']) ? 'openid' : 'password';
+	$context['account_type'] = 'password';
 
 	// If there is NO secret question - then throw an error.
 	if (trim($member['secret_question']) === '')

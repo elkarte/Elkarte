@@ -274,21 +274,10 @@ class Register extends AbstractController
 		// Trigger the prepare_context event
 		$this->_events->trigger('prepare_context', array('current_step' => $current_step));
 
-		// Are they coming from an OpenID login attempt?
-		if (!empty($_SESSION['openid']['verified']) && !empty($_SESSION['openid']['openid_uri']) && !empty($_SESSION['openid']['nickname']))
-		{
-			$context['openid'] = $_SESSION['openid']['openid_uri'];
-			$context['username'] = $this->_req->getPost('user', '\\ElkArte\\Util::htmlspecialchars', $_SESSION['openid']['nickname']);
-			$context['email'] = $this->_req->getPost('email', '\\ElkArte\\Util::htmlspecialchars', $_SESSION['openid']['email']);
-		}
 		// See whether we have some pre filled values.
-		else
-		{
-			$context['openid'] = $this->_req->getPost('openid_identifier', 'trim', '');
-			$context['username'] = $this->_req->getPost('user', '\\ElkArte\\Util::htmlspecialchars', '');
-			$context['email'] = $this->_req->getPost('email', '\\ElkArte\\Util::htmlspecialchars', '');
-			$context['notify_announcements'] = (int) !empty($this->_req->post->notify_announcements);
-		}
+		$context['username'] = $this->_req->getPost('user', '\\ElkArte\\Util::htmlspecialchars', '');
+		$context['email'] = $this->_req->getPost('email', '\\ElkArte\\Util::htmlspecialchars', '');
+		$context['notify_announcements'] = (int) !empty($this->_req->post->notify_announcements);
 
 		// Were there any errors?
 		$context['registration_errors'] = array();
@@ -303,7 +292,6 @@ class Register extends AbstractController
 
 	/**
 	 * Handles the registration process for members using ElkArte registration
-	 * and not (for example) OpenID.
 	 *
 	 * What it does:
 	 *
@@ -390,29 +378,21 @@ class Register extends AbstractController
 		// Trigger any events required before we complete registration, like captcha verification
 		$this->_events->trigger('before_complete_register', array('reg_errors' => $reg_errors));
 
-		$this->do_register(false);
+		$this->do_register();
 	}
 
 	/**
 	 * Actually register the member.
 	 *
-	 * - Called from OpenID controller as well as Register controller
+	 * - Called from Register controller
 	 * - Does the actual registration to the system
-	 *
-	 * @param bool $verifiedOpenID = false
 	 */
-	public function do_register($verifiedOpenID = false)
+	public function do_register()
 	{
 		global $txt, $modSettings, $context;
 
 		// Start collecting together any errors.
 		$reg_errors = ErrorContext::context('register', 0);
-
-		// Checks already done if coming from the action
-		if ($verifiedOpenID)
-		{
-			$this->_can_register();
-		}
 
 		// Clean the form values
 		foreach ($this->_req->post as $key => $value)
@@ -485,13 +465,12 @@ class Register extends AbstractController
 			'email' => !empty($this->_req->post->email) ? $this->_req->post->email : '',
 			'password' => !empty($this->_req->post->passwrd1) ? $this->_req->post->passwrd1 : '',
 			'password_check' => !empty($this->_req->post->passwrd2) ? $this->_req->post->passwrd2 : '',
-			'openid' => !empty($this->_req->post->openid_identifier) ? $this->_req->post->openid_identifier : '',
 			'auth_method' => !empty($this->_req->post->authenticate) ? $this->_req->post->authenticate : '',
 			'check_reserved_name' => true,
 			'check_password_strength' => true,
 			'check_email_ban' => true,
 			'send_welcome_email' => !empty($modSettings['send_welcomeEmail']),
-			'require' => !empty($modSettings['coppaAge']) && !$verifiedOpenID && empty($_SESSION['skip_coppa']) ? 'coppa' : (empty($modSettings['registration_method']) ? 'nothing' : ($modSettings['registration_method'] == 1 ? 'activation' : 'approval')),
+			'require' => !empty($modSettings['coppaAge']) && empty($_SESSION['skip_coppa']) ? 'coppa' : (empty($modSettings['registration_method']) ? 'nothing' : ($modSettings['registration_method'] == 1 ? 'activation' : 'approval')),
 			'extra_register_vars' => $this->_extra_vars($has_real_name),
 			'theme_vars' => array(),
 		);
@@ -556,31 +535,6 @@ class Register extends AbstractController
 			$this->action_register();
 
 			return false;
-		}
-
-		// If they're wanting to use OpenID we need to validate them first.
-		if (empty($_SESSION['openid']['verified']) && !empty($this->_req->post->authenticate) && $this->_req->post->authenticate === 'openid')
-		{
-			// What do we need to save?
-			$save_variables = array();
-			foreach ($this->_req->post as $k => $v)
-			{
-				if (!in_array($k, array('sc', 'sesc', $context['session_var'], 'passwrd1', 'passwrd2', 'regSubmit')))
-				{
-					$save_variables[$k] = $v;
-				}
-			}
-
-			$openID = new \ElkArte\OpenID();
-			$openID->validate($this->_req->post->openid_identifier, false, $save_variables);
-		}
-		// If we've come from OpenID set up some default stuff.
-		elseif ($verifiedOpenID || ((!empty($this->_req->post->openid_identifier) || !empty($_SESSION['openid']['openid_uri'])) && $this->_req->post->authenticate === 'openid'))
-		{
-			$regOptions['username'] = !empty($this->_req->post->user) && trim($this->_req->post->user) !== '' ? $this->_req->post->user : $_SESSION['openid']['nickname'];
-			$regOptions['email'] = !empty($this->_req->post->email) && trim($this->_req->post->email) !== '' ? $this->_req->post->email : $_SESSION['openid']['email'];
-			$regOptions['auth_method'] = 'openid';
-			$regOptions['openid'] = !empty($_SESSION['openid']['openid_uri']) ? $_SESSION['openid']['openid_uri'] : (!empty($this->_req->post->openid_identifier) ? $this->_req->post->openid_identifier : '');
 		}
 
 		// Registration needs to know your IP

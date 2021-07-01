@@ -22,6 +22,7 @@ use ElkArte\AbstractController;
 use ElkArte\Action;
 use ElkArte\Exceptions\Exception;
 use ElkArte\MembersList;
+use ElkArte\Themes\ThemeLoader;
 use ElkArte\Util;
 use ElkArte\Notifications;
 
@@ -33,7 +34,6 @@ use ElkArte\Notifications;
  */
 class ProfileOptions extends AbstractController
 {
-
 	/**
 	 * Member id for the profile being viewed
 	 *
@@ -593,112 +593,6 @@ class ProfileOptions extends AbstractController
 
 		$fields = self::getFields('theme');
 		setupProfileContext($fields['fields'], $fields['hook']);
-	}
-
-	/**
-	 * Changing authentication method?
-	 * Only appropriate for people using OpenID.
-	 *
-	 * @param bool $saving = false
-	 *
-	 * @return bool
-	 * @throws \ElkArte\Exceptions\Exception
-	 */
-	public function action_authentication($saving = false)
-	{
-		global $context, $cur_profile, $post_errors, $modSettings;
-
-		\ElkArte\Themes\ThemeLoader::loadLanguageFile('Login');
-		theme()->getTemplates()->load('ProfileOptions');
-
-		// We are saving?
-		if ($saving)
-		{
-			// Moving to password passed authentication?
-			if ($this->_req->post->authenticate === 'passwd')
-			{
-				// Didn't enter anything?
-				if ($this->_req->post->passwrd1 === '')
-				{
-					$post_errors[] = 'no_password';
-				}
-				// Do the two entries for the password even match?
-				elseif (!isset($this->_req->post->passwrd2) || $this->_req->post->passwrd1 !== $this->_req->post->passwrd2)
-				{
-					$post_errors[] = 'bad_new_password';
-				}
-				// Is it valid?
-				else
-				{
-					require_once(SUBSDIR . '/Auth.subs.php');
-					$passwordErrors = validatePassword($this->_req->post->passwrd1, $cur_profile['member_name'], array($cur_profile['real_name'], $cur_profile['email_address']));
-
-					// Were there errors?
-					if ($passwordErrors !== null)
-					{
-						$post_errors[] = 'password_' . $passwordErrors;
-					}
-				}
-
-				if (empty($post_errors))
-				{
-					// Integration?
-					call_integration_hook('integrate_reset_pass', array($cur_profile['member_name'], $cur_profile['member_name'], $this->_req->post->passwrd1));
-
-					// Go then.
-					require_once(SUBSDIR . '/Auth.subs.php');
-					$new_pass = $this->_req->post->passwrd1;
-					$passwd = validateLoginPassword($new_pass, '', $cur_profile['member_name'], true);
-
-					// Do the important bits.
-					require_once(SUBSDIR . '/Members.subs.php');
-					updateMemberData($this->_memID, array('openid_uri' => '', 'passwd' => $passwd));
-					if ($context['user']['is_owner'])
-					{
-						setLoginCookie(60 * $modSettings['cookieTime'], $this->_memID, hash('sha256', $passwd . $cur_profile['password_salt']));
-						redirectexit('action=profile;area=authentication;updated');
-					}
-					else
-					{
-						redirectexit('action=profile;u=' . $this->_memID);
-					}
-				}
-
-				return true;
-			}
-			// Not right yet!
-			elseif ($this->_req->post->authenticate === 'openid' && !empty($this->_req->post->openid_identifier))
-			{
-				require_once(SUBSDIR . '/Members.subs.php');
-
-				$openID = new \ElkArte\OpenID();
-				$this->_req->post->openid_identifier = $openID->canonize($this->_req->post->openid_identifier);
-
-				if (memberExists($this->_req->post->openid_identifier))
-				{
-					$post_errors[] = 'openid_in_use';
-				}
-				elseif (empty($post_errors))
-				{
-					// Authenticate using the new OpenID URI first to make sure they didn't make a mistake.
-					if ($context['user']['is_owner'])
-					{
-						$_SESSION['new_openid_uri'] = $this->_req->post->openid_identifier;
-						$openID->validate($this->_req->post->openid_identifier, false, null, 'change_uri');
-					}
-					else
-					{
-						updateMemberData($this->_memID, array('openid_uri' => $this->_req->post->openid_identifier));
-					}
-				}
-			}
-		}
-
-		// Some stuff for the template
-		$context['member']['openid_uri'] = $cur_profile['openid_uri'];
-		$context['auth_method'] = empty($cur_profile['openid_uri']) ? 'password' : 'openid';
-		$context['sub_template'] = 'authentication_method';
-		loadJavascriptFile('register.js');
 	}
 
 	/**

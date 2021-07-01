@@ -17,4 +17,4 @@ nbproject/*
 composer.lock
 composer.phar
 themes/default/cache/hive*
-.github/workflows
+.github/workflows/*.yaml

@@ -54,13 +54,6 @@
  * -------------------------------------------------------
  */
 
-/* The OpenID login form */
-.openid_login {
-	padding-right: 20px;
-	padding-left: 0;
-	background-position: 98% 50%;
-}
-
 /* Styles for main headers. */
 .category_header, .forum_category .category_header {
 	text-shadow: -1px 1px 0 var(--primary_white_compliment);

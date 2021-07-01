@@ -109,8 +109,6 @@ class SiteDispatcher
 		'movetopic' => array('\\ElkArte\\Controller\\MoveTopic', 'action_movetopic'),
 		'movetopic2' => array('\\ElkArte\\Controller\\MoveTopic', 'action_movetopic2'),
 		'notifyboard' => array('\\ElkArte\\Controller\\Notify', 'action_notifyboard'),
-		'openidreturn' => array('\\ElkArte\\Controller\\OpenID', 'action_openidreturn'),
-		'xrds' => array('\\ElkArte\\Controller\\OpenID', 'action_xrds'),
 		'pm' => array('\\ElkArte\\Controller\\PersonalMessage', 'action_index'),
 		'post2' => array('\\ElkArte\\Controller\\Post', 'action_post2'),
 		'quotefast' => array('\\ElkArte\\Controller\\Post', 'action_quotefast'),
@@ -411,8 +409,7 @@ class SiteDispatcher
 			empty($modSettings['allow_guestAccess'])
 			&& User::$info->is_guest
 			&& !in_array($this->action, array(
-				'login', 'login2', 'register', 'reminder',
-				'help', 'quickhelp', 'mailq', 'openidreturn'
+				'login', 'login2', 'register', 'reminder', 'help', 'quickhelp', 'mailq'
 			));
 	}
 
@@ -445,6 +442,6 @@ class SiteDispatcher
 			$action = substr($action, -1) == 2 ? substr($action, 0, -1) : $action;
 		}
 
-		return isset($action) ? $action : $this->action;
+		return $action ?? $this->action;
 	}
 }

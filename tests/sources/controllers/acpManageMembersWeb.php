@@ -126,8 +126,11 @@ class SupportManageMembersController extends ElkArteWebSupport
 		}, 15000);
 
 		// Unselect Not Activated and Banned so we only see activated members
-		$this->byId('activated-1')->click();
-		$this->byId('activated-2')->click();
+		$script = 'document.querySelector(\'#activated-1\').click();';
+		$this->execute(['script' => $script, 'args' => []]);
+		$script = 'document.querySelector(\'#activated-2\').click();';
+		$this->execute(['script' => $script, 'args' => []]);
+
 		$this->clickit('input[value=Search]');
 		$this->assertStringContainsString('user1', $this->byId('member_list')->text());
 	}
@@ -148,7 +151,8 @@ class SupportManageMembersController extends ElkArteWebSupport
 		$this->waitUntil(function ($testCase) {
 			try
 			{
-				return $testCase->byId('member_list');
+				$testCase->byId('member_list');
+				return true;
 			}
 			catch (PHPUnit\Extensions\Selenium2TestCase\WebDriverException $e)
 			{
@@ -156,6 +160,6 @@ class SupportManageMembersController extends ElkArteWebSupport
 			}
 		}, 10000);
 
-		$this->assertStringNotContainsString('user0', $this->byId('member_list')->text());
+		$this->assertStringNotContainsString('user0', $this->byId('member_list')->text(), $this->source());
 	}
 }

@@ -17,7 +17,6 @@
 namespace ElkArte\ScheduledTasks\Tasks;
 
 use ElkArte\Cache\Cache;
-use ElkArte\OpenID;
 
 /**
  * Class Daily_Maintenance - This function does daily cleaning up:
@@ -27,7 +26,6 @@ use ElkArte\OpenID;
  * - decrements warning levels if it's enabled
  * - consolidate spider statistics
  * - fix MySQL version
- * - regenerate Diffie-Hellman keys for OpenID
  * - remove obsolete login history logs
  *
  * @package ScheduledTasks
@@ -116,17 +114,6 @@ class DailyMaintenance implements ScheduledTaskInterface
 			// We'll need this.
 			require_once(SUBSDIR . '/SearchEngines.subs.php');
 			consolidateSpiderStats();
-		}
-
-		// Regenerate the Diffie-Hellman keys if OpenID is enabled.
-		if (!empty($modSettings['enableOpenID']))
-		{
-			$openID = new OpenID();
-			$openID->setup_DH(true);
-		}
-		elseif (!empty($modSettings['dh_keys']))
-		{
-			removeSettings('dh_keys');
 		}
 
 		// Clean up some old login history information.

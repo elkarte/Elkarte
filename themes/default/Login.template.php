@@ -48,7 +48,7 @@ function template_login()
 							<label for="user">', $txt['username'], ':</label>
 						</dt>
 						<dd>
-							<input type="text" name="user" id="user" size="20" maxlength="80" value="', $context['default_username'], '" class="input_text" ', !empty($context['using_openid']) ? 'autofocus="autofocus" ' : '', 'placeholder="', $txt['username'], '" />
+							<input type="text" name="user" id="user" size="20" maxlength="80" value="', $context['default_username'], '" class="input_text" placeholder="', $txt['username'], '" />
 						</dd>
 						<dt>
 							<label for="passwrd">', $txt['password'], ':</label>
@@ -64,22 +64,6 @@ function template_login()
 						<dd>
 							<input type="password" name="otp_token" id="otp_token" value="', $context['default_password'], '" size="30" class="input_password" placeholder="', $txt['otp_token'], '" />
 						</dd>';
-	}
-
-	if (!empty($modSettings['enableOpenID']))
-	{
-		echo '
-					</dl>
-					<p><strong>&mdash;', $txt['or'], '&mdash;</strong></p>
-					<dl>
-						<dt>
-							<label for="openid_identifier">', $txt['openid'], ':</label>
-						</dt>
-						<dd>
-							<input type="text" id="openid_identifier" name="openid_identifier" class="input_text openid_login" size="17"', !empty($context['using_openid']) ? ' autofocus="autofocus" ' : '', ' />&nbsp;<a href="', $scripturl, '?action=quickhelp;help=register_openid" onclick="return reqOverlayDiv(this.href);" class="helpicon i-help"><s>', $txt['help'], '</s></a>
-						</dd>
-					</dl>
-					<hr />';
 	}
 
 	echo '
@@ -126,7 +110,7 @@ function template_login()
 	// Focus on the correct input - username or password.
 	echo '
 		<script>
-			document.forms.frmLogin.', !empty($context['using_openid']) ? 'openid_identifier' : (isset($context['default_username']) && $context['default_username'] != '' ? 'passwrd' : 'user'), '.focus();
+			document.forms.frmLogin.', (isset($context['default_username']) && $context['default_username'] != '' ? 'passwrd' : 'user'), '.focus();
 		</script>';
 }
 
@@ -185,23 +169,6 @@ function template_kick_guest()
 						<dd>
 							<input type="password" name="otp_token" id="otp_token" value="', $context['default_password'], '" size="30" class="input_password" placeholder="', $txt['otp_token'], '" />
 						</dd>';
-	}
-
-	if (!empty($modSettings['enableOpenID']))
-	{
-		echo '
-				</dl>
-				<p><strong>&mdash;', $txt['or'], '&mdash;</strong></p>
-				<dl>
-					<dt>
-						<label for="openid_identifier">', $txt['openid'], ':</label>
-					</dt>
-					<dd>
-						<input id="openid_identifier" type="text" name="openid_identifier" class="input_text openid_login" size="17" />
-					</dd>
-				</dl>
-				<hr />
-				<dl>';
 	}
 
 	echo '

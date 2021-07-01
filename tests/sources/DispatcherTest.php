@@ -71,8 +71,6 @@ class DispatcherTest extends TestCase
 			'quotefast' => '\\ElkArte\\Controller\\Post',
 			'quickmod' => '\\ElkArte\\Controller\\MessageIndex',
 			'quickmod2' => '\\ElkArte\\Controller\\Display',
-			'openidreturn' => '\\ElkArte\\Controller\\OpenID',
-
 		);
 
 		foreach (array_keys($actions) as $action)

@@ -65,13 +65,6 @@ new ElkArte\Errors\ErrorHandler();
 // Start the session. (assuming it hasn't already been.)
 loadSession();
 
-// Restore post data if we are revalidating OpenID.
-if (isset($_GET['openid_restore_post']) && !empty($_SESSION['openid']['saved_data'][$_GET['openid_restore_post']]['post']) && empty($_POST))
-{
-	$_POST = $_SESSION['openid']['saved_data'][$_GET['openid_restore_post']]['post'];
-	unset($_SESSION['openid']['saved_data'][$_GET['openid_restore_post']]);
-}
-
 // Pre-dispatch
 elk_main();
 

@@ -277,7 +277,7 @@ class ElkTestingSetup
 				'member_ip' => 'string', 'member_ip2' => 'string', 'buddy_list' => 'string', 'pm_ignore_list' => 'string',
 				'message_labels' => 'string', 'website_title' => 'string', 'website_url' => 'string',
 				'signature' => 'string', 'usertitle' => 'string', 'secret_question' => 'string',
-				'additional_groups' => 'string', 'ignore_boards' => 'string', 'openid_uri' => 'string',
+				'additional_groups' => 'string', 'ignore_boards' => 'string',
 			),
 			array(
 				'test_admin', 'test_admin', $passwd, 'email@testadmin.tld',
@@ -286,7 +286,7 @@ class ElkTestingSetup
 				'123.123.123.123', '123.123.123.123', '', '',
 				'', '', '',
 				'', '', '',
-				'', '', '',
+				'', '',
 			),
 			array('id_member')
 		);

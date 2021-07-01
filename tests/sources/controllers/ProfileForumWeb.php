@@ -41,8 +41,8 @@ class ProfileForumController extends ElkArteWebSupport
 				return false;
 			}
 		}, 8000);
-		$this->byXPath("//option[. = '[Oxygen]']")->click();
 
+		$this->byXPath("//option[. = '[Oxygen]']")->click();
 		$this->waitUntil(function ($testCase)
 		{
 			try
@@ -54,13 +54,18 @@ class ProfileForumController extends ElkArteWebSupport
 				return false;
 			}
 		}, 8000);
+
 		$this->byXpath("//option[. = 'wine']")->click();
 
-		$this->byName('save')->click();
+		// It should now be visible
+		$this->assertStringContainsString('wine', $this->byId('avatar')->attribute('alt'), 'Selected :: ' . $this->byId('avatar')->attribute('alt'));
 
-		// We return to the forum profile page
-		$this->url('index.php?action=profile;area=forumprofile');
-		$this->assertStringContainsString('wine', $this->byId('avatar')->attribute('alt'));
+		// Save the changes, not sure the scrollInto is needed
+		$script = 'document.querySelector(\'#save_profile\').click();';
+		$this->execute(['script' => $script, 'args' => []]);
+
+		// We return to the forum profile page, verify changes
+		$this->assertStringContainsString('wine', $this->byId('avatar')->attribute('alt'), $this->byId('avatar')->attribute('alt'));
 	}
 
 	/**
@@ -71,10 +76,10 @@ class ProfileForumController extends ElkArteWebSupport
 		// Lets set a signature, something profound
 		$this->byId('signature')->click();
 		$this->keys('A Signature');
-		$this->byName('save')->click();
+		$script = 'document.querySelector(\'#save_profile\').click();';
+		$this->execute(['script' => $script, 'args' => []]);
 
 		// We return to the forum profile page
-		$this->url('index.php?action=profile;area=forumprofile');
 		$this->assertStringContainsString('A Signature', $this->byId('signature')->text());
 	}
 }

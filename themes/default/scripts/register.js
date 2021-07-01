@@ -431,60 +431,6 @@ elkRegister.prototype.setVerificationImage = function (imageHandle, imageIcon, a
 };
 
 /**
- * Sets up the form fields based on the chosen authentication method, openID or password
- */
-function updateAuthMethod()
-{
-	var currentAuthMethod,
-		currentForm;
-
-	// What authentication method is being used?
-	if (!document.getElementById('auth_openid') || !document.getElementById('auth_openid').checked)
-	{
-		currentAuthMethod = 'passwd';
-	}
-	else
-	{
-		currentAuthMethod = 'openid';
-	}
-
-	// No openID?
-	if (!document.getElementById('auth_openid'))
-	{
-		return true;
-	}
-
-	currentForm = document.getElementById('auth_openid').form.id;
-
-	document.forms[currentForm].openid_url.disabled = currentAuthMethod !== 'openid';
-	document.forms[currentForm].elk_autov_pwmain.disabled = currentAuthMethod !== 'passwd';
-	document.forms[currentForm].elk_autov_pwverify.disabled = currentAuthMethod !== 'passwd';
-	document.getElementById('elk_autov_pwmain_div').style.display = currentAuthMethod === 'passwd' ? 'inline' : 'none';
-	document.getElementById('elk_autov_pwverify_div').style.display = currentAuthMethod === 'passwd' ? 'inline' : 'none';
-
-	if (currentAuthMethod === 'passwd')
-	{
-		verificationHandle.refreshMainPassword();
-		verificationHandle.refreshVerifyPassword();
-		document.forms[currentForm].openid_url.style.backgroundColor = '';
-		document.getElementById('password1_group').style.display = 'block';
-		document.getElementById('password2_group').style.display = 'block';
-		document.getElementById('openid_group').style.display = 'none';
-	}
-	else
-	{
-		document.forms[currentForm].elk_autov_pwmain.style.backgroundColor = '';
-		document.forms[currentForm].elk_autov_pwverify.style.backgroundColor = '';
-		document.forms[currentForm].openid_url.style.backgroundColor = '#FFF0F0';
-		document.getElementById('password1_group').style.display = 'none';
-		document.getElementById('password2_group').style.display = 'none';
-		document.getElementById('openid_group').style.display = 'block';
-	}
-
-	return true;
-}
-
-/**
  * Used when the admin registers a new member, enable or disables the email activation
  */
 function onCheckChange()

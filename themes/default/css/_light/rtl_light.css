@@ -59,13 +59,6 @@ fieldset {
 	box-shadow: inset 1px -1px 3px var(--box_shadow);
 }
 
-/* The OpenID login form */
-.openid_login {
-	padding-right: 20px;
-	padding-left: 0;
-	background-position: 98% 50%;
-}
-
 /* Dont show disabled buttons as active on hover */
 input[type=submit][disabled]:hover, button[disabled], button[disabled]:hover {
 	border-right: 1px solid var(--seconday_border_right);
