@@ -36,6 +36,8 @@ function loadSession()
 	@ini_set('url_rewriter.tags', '');
 	@ini_set('session.use_trans_sid', false);
 	@ini_set('arg_separator.output', '&amp;');
+	// @todo admin panel setting?
+	@ini_set('session.cookie_samesite', 'Lax');
 
 	// Secure PHPSESSIONID
 	if (parse_url($boardurl, PHP_URL_SCHEME) === 'https')
