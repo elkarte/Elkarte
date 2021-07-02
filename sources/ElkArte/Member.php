@@ -104,7 +104,7 @@ class Member extends ValuesContainer
 		}
 
 		// We can't load guests or members not loaded by loadMemberData()!
-		if ($this->data['id_member'] == 0)
+		if (empty($this->data['id_member']))
 		{
 			return false;
 		}
