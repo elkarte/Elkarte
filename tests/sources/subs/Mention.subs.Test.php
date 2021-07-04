@@ -4,6 +4,7 @@ use ElkArte\DataValidator;
 use ElkArte\Mentions\Mentioning;
 use ElkArte\Notifications;
 use ElkArte\NotificationsTask;
+use ElkArte\Themes\ThemeLoader;
 use ElkArte\User;
 use ElkArte\UserInfo;
 use PHPUnit\Framework\TestCase;
@@ -66,6 +67,9 @@ class TestMentions extends TestCase
 			'username' => 'testing',
 			'name' => 'itsme',
 		]);
+
+		ThemeLoader::loadLanguageFile('EmailTemplates', 'english', false, true);
+		ThemeLoader::loadLanguageFile('MaillistTemplates', 'english', false, true);
 
 		// Lets start by ensuring a topic exists by creating one
 		require_once(SUBSDIR . '/Post.subs.php');

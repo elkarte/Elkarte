@@ -15,6 +15,7 @@ namespace ElkArte\Mentions\MentionType;
 
 use ElkArte\Database\QueryInterface;
 use ElkArte\NotificationsTask;
+use ElkArte\Themes\ThemeLoader;
 use ElkArte\UserInfo;
 
 /**
@@ -260,7 +261,7 @@ abstract class AbstractNotificationMessage implements NotificationInterface
 		{
 			foreach ($lang_files as $file)
 			{
-				\ElkArte\Themes\ThemeLoader::loadLanguageFile($file);
+				ThemeLoader::loadLanguageFile($file);
 			}
 		}
 
