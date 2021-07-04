@@ -341,8 +341,6 @@ class Debug
 			$this->_system['script_cpu_load'] = ($this->_rusage['end']['ru_utime.tv_sec'] - $this->_rusage['start']['ru_utime.tv_sec'] + ($this->_rusage['end']['ru_utime.tv_usec'] / 1000000)) . ' / ' . ($this->_rusage['end']['ru_stime.tv_sec'] - $this->_rusage['start']['ru_stime.tv_sec'] + ($this->_rusage['end']['ru_stime.tv_usec'] / 1000000));
 		}
 
-		$this->_system['browser'] = $context['browser_body_id'] . ' <em>(' . implode('</em>, <em>', array_reverse(array_keys($context['browser'], true))) . ')</em>';
-
 		// What tokens are active?
 		if (isset($_SESSION['token']))
 		{
