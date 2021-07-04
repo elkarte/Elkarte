@@ -137,7 +137,7 @@ function spiderQuickCheck() {
 	$req = request();
 	$ci_user_agent = strtolower($req->user_agent());
 
-	return strpos($ci_user_agent, 'mozilla') === false || preg_match('~(googlebot|slurp|msnbot|yandex|bingbot|baidu|duckduckbot|sogou|exabot|facebot|ecosia|ia_archiver)~u', $ci_user_agent) == 1;
+	return strpos($ci_user_agent, 'mozilla') === false || preg_match('~(googlebot|slurp|msnbot|yandex|bingbot|baidu|duckduckbot|sogou|exabot|facebo|ecosia|ia_archiver|megaindex)~u', $ci_user_agent) == 1;
 }
 
 /**
