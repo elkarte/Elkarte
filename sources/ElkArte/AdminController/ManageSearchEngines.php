@@ -20,6 +20,7 @@ use ElkArte\AbstractController;
 use ElkArte\Action;
 use ElkArte\Cache\Cache;
 use ElkArte\SettingsForm\SettingsForm;
+use ElkArte\Themes\ThemeLoader;
 
 /**
  * ManageSearchEngines admin controller. This class handles all search engines
@@ -39,7 +40,7 @@ class ManageSearchEngines extends AbstractController
 	{
 		global $context, $txt;
 
-		\ElkArte\Themes\ThemeLoader::loadLanguageFile('Search');
+		ThemeLoader::loadLanguageFile('Search');
 		theme()->getTemplates()->load('ManageSearch');
 
 		$subActions = array(
@@ -415,7 +416,7 @@ class ManageSearchEngines extends AbstractController
 		global $context, $txt, $modSettings;
 
 		// Load the template and language just incase.
-		\ElkArte\Themes\ThemeLoader::loadLanguageFile('Search');
+		ThemeLoader::loadLanguageFile('Search');
 		theme()->getTemplates()->load('ManageSearch');
 
 		// Did they want to delete some or all entries?

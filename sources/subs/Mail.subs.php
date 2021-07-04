@@ -1390,7 +1390,6 @@ function emailsInfo($number)
  * @param bool $override_limit = false bypassing our limit flaf
  * @param bool $force_send = false
  * @return bool
- * @throws \ElkArte\Exceptions\Exception
  * @package Mail
  */
 function reduceMailQueue($batch_size = false, $override_limit = false, $force_send = false)

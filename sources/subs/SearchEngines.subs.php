@@ -132,7 +132,8 @@ function spiderCheck()
  * @return bool
  * @package SearchEngines
  */
-function spiderQuickCheck() {
+function spiderQuickCheck()
+{
 	// We need the user agent
 	$req = request();
 	$ci_user_agent = strtolower($req->user_agent());
