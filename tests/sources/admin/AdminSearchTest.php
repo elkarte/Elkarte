@@ -65,7 +65,7 @@ class TestAdminSearch extends TestCase
 		// Set up the controller.
 		$_GET['action'] = 'admin';
 		User::$info->permissions = array_merge(User::$info->permissions, ['admin_forum']);
-		$dispatcher = new SiteDispatcher(new HttpReq);
+		$dispatcher = new SiteDispatcher(HttpReq::instance());
 		$this->controller = $dispatcher->getController();
 
 		// Won't hurt to call this again...

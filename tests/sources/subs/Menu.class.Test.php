@@ -302,7 +302,7 @@ class MenuTest extends BaseMenuTest
 
 	public function prepareMenu()
 	{
-		$this->req = new HttpReq;
+		$this->req = HttpReq::instance();
 		$this->menuObjects[] = new Menu($this->req);
 		foreach ($this->sections as list ($section_id, $section))
 		{

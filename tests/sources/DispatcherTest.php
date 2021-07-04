@@ -176,7 +176,7 @@ class DispatcherTest extends TestCase
 			);
 
 			// Start a new dispatcher every time (the dispatching is done on __construct)
-			$dispatcher = New SiteDispatcher_Tester(new HttpReq);
+			$dispatcher = New SiteDispatcher_Tester(HttpReq::instance());
 			$this->assertTrue($dispatcher->compare($test['result']), $test['test_name']);
 		}
 	}

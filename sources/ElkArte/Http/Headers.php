@@ -34,8 +34,8 @@ class Headers
 	/** @var \ElkArte\HttpReq|null */
 	protected $req;
 
-	/** @var \ElkArte\Http\Headers Sole private \ElkArte\HttpReq instance */
-	private static $header = null;
+	/** @var \ElkArte\Http\Headers Sole private \ElkArte\Headers instance */
+	private static $instance = null;
 
 	/**
 	 * Headers constructor.
@@ -308,11 +308,11 @@ class Headers
 	 */
 	public static function instance()
 	{
-		if (self::$header === null)
+		if (self::$instance === null)
 		{
-			self::$header = new Headers();
+			self::$instance = new Headers();
 		}
 
-		return self::$header;
+		return self::$instance;
 	}
 }
