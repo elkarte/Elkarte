@@ -33,7 +33,7 @@
 		{
 			$this = $(this);
 
-			if ($this.data('type') == 'sound')
+			if ($this.data('type') === 'sound')
 			{
 				// Maybe a voice is here to spread light?
 				$this.on(settings.playevent, function (e)
@@ -44,11 +44,7 @@
 					popupFailed = reqWin(settings.imageURL + ";sound", 400, 300);
 					if (!popupFailed)
 					{
-						if (is_ie && e.cancelBubble)
-						{
-							e.cancelBubble = true;
-						}
-						else if (e.stopPropagation)
+						if (e.stopPropagation)
 						{
 							e.stopPropagation();
 							e.preventDefault();
