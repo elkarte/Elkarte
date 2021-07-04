@@ -118,12 +118,7 @@ function calcCharLeft()
 	if (oldSignature !== currentSignature)
 	{
 		oldSignature = currentSignature;
-
 		currentChars = currentSignature.replace(/\r/, "").length;
-		if (is_opera)
-		{
-			currentChars = currentSignature.replace(/\r/g, "").length;
-		}
 
 		if (currentChars > maxLength)
 		{
