@@ -1062,6 +1062,12 @@ function setBoardIds()
 			tooltipContent: 'html' // display captured title text as html or text
 		};
 
+		// No need here
+		if (is_mobile || is_touch)
+		{
+			return null;
+		}
+
 		// Account for any user options
 		var oSettings = $.extend({}, $.fn.SiteTooltip.oDefaultsSettings, oInstanceSettings || {});
 
