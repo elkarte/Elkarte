@@ -132,9 +132,6 @@ class ThemeLoader
 		// This determines the server... not used in many places, except for login fixing.
 		detectServer();
 
-		// Detect the browser. This is separated out because it's also used in attachment downloads
-		detectBrowser();
-
 		// Set the top level linktree up.
 		array_unshift($context['linktree'], [
 			'url' => $scripturl,
@@ -142,14 +139,9 @@ class ThemeLoader
 		]);
 
 		// Just some mobile-friendly settings
-		if ($context['browser_body_id'] === 'mobile')
+		$req = request();
+		if (strpos($req->user_agent(), 'Mobi'))
 		{
-			// Disable the preview text.
-			$modSettings['message_index_preview'] = 0;
-			// Force the usage of click menu instead of a hover menu.
-			$options['use_click_menu'] = 1;
-			// No space left for a sidebar
-			$options['use_sidebar_menu'] = false;
 			// Disable the search dropdown.
 			$modSettings['search_dropdown'] = false;
 		}
