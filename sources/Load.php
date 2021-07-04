@@ -684,21 +684,6 @@ function loadPermissions()
 }
 
 /**
- * Loads information about what browser the user is viewing with and places it in $context
- *
- * @uses ElkArte\Http\BrowserDetector class
- */
-function detectBrowser()
-{
-	global $context;
-
-	// Load the current user's browser of choice
-	$detector = new ElkArte\Http\BrowserDetector();
-	$context['browser'] = $detector->detectBrowser();
-	$context['browser_body_id'] = $detector->browserBodyId();
-}
-
-/**
  * Load a theme, by ID.
  *
  * What it does:

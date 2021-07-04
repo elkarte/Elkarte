@@ -1747,28 +1747,6 @@ function removeBr($string)
 }
 
 /**
- * Are we using this browser?
- *
- * - Wrapper function for detectBrowser
- *
- * @param string $browser the browser we are checking for.
- *
- * @return bool
- */
-function isBrowser($browser)
-{
-	global $context;
-
-	// Don't know any browser!
-	if (empty($context['browser']))
-	{
-		detectBrowser();
-	}
-
-	return !empty($context['browser'][$browser]) || !empty($context['browser']['is_' . $browser]);
-}
-
-/**
  * Replace all vulgar words with respective proper words. (substring or whole words..)
  *
  * What it does:
