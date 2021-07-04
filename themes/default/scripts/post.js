@@ -526,7 +526,6 @@ function showimage()
 
 /**
  * When using Go Back due to fatal_error, allows the form to be re-submitted with change
- * Done as a pageshow event listener for FF only
  */
 function reActivate()
 {
