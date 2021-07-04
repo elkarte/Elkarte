@@ -24,6 +24,7 @@ use ElkArte\Http\Headers;
 use ElkArte\SiteCombiner;
 use ElkArte\Themes\Theme as BaseTheme;
 use ElkArte\Themes\ThemeLoader;
+use ElkArte\User;
 use ElkArte\Util;
 
 /**
@@ -614,7 +615,7 @@ class Theme extends BaseTheme
 	{
 		global $modSettings;
 
-		if (isBrowser('possibly_robot'))
+		if (!empty(User::$info->possibly_robot))
 		{
 			// @todo Maybe move this somewhere better?!
 			$controller = new ScheduledTasks(new EventManager());
