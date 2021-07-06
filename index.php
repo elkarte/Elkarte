@@ -113,11 +113,6 @@ function elk_main()
 			// The parser is not an object just yet
 			loadBBCParsers();
 		}
-		// Otherwise don't require the entire theme to be loaded.
-		else
-		{
-			detectBrowser();
-		}
 
 		// Check if the user should be disallowed access.
 		is_not_banned();

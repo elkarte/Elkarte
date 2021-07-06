@@ -1529,21 +1529,7 @@ function refreshPreview(check)
 	{
 		try
 		{
-			if (is_ie)
-			{
-				var sheets = frames['css_preview_box'].document.styleSheets;
-				for (var j = 0; j < sheets.length; j++)
-				{
-					if (sheets[j].id === 'css_preview_box')
-					{
-						sheets[j].cssText = document.forms.stylesheetForm.entire_file.value;
-					}
-				}
-			}
-			else
-			{
-				frames['css_preview_box'].document.getElementById("css_preview_sheet").innerHTML = document.forms.stylesheetForm.entire_file.value;
-			}
+			frames['css_preview_box'].document.getElementById("css_preview_sheet").innerHTML = document.forms.stylesheetForm.entire_file.value;
 		} catch (e)
 		{
 			identical = false;

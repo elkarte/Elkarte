@@ -21,6 +21,7 @@ use ElkArte\MembersList;
 use ElkArte\Notifications;
 use ElkArte\NotificationsTask;
 use ElkArte\TemporaryAttachment;
+use ElkArte\Themes\ThemeLoader;
 use ElkArte\Util;
 use ElkArte\TemporaryAttachmentsList;
 
@@ -699,7 +700,7 @@ function pbe_emailError($error, $email_message)
 
 	$db = database();
 
-	\ElkArte\Themes\ThemeLoader::loadLanguageFile('EmailTemplates');
+	ThemeLoader::loadLanguageFile('EmailTemplates');
 
 	// Some extra items we will need to remove from the message subject
 	$pm_subject_leader = str_replace('{SUBJECT}', '', $txt['new_pm_subject']);
@@ -993,13 +994,7 @@ function pbe_prepare_text(&$message, &$subject = '', &$signature = '')
 {
 	global $context;
 
-	\ElkArte\Themes\ThemeLoader::loadLanguageFile('Maillist');
-
-	// Check on some things needed by parse_bbc as an autotask does not load them
-	if (!isset($context['browser']))
-	{
-		detectBrowser();
-	}
+	ThemeLoader::loadLanguageFile('Maillist');
 
 	// Server?
 	detectServer();

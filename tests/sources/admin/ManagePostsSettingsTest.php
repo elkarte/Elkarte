@@ -2,6 +2,7 @@
 
 use ElkArte\AdminController\ManagePosts;
 use ElkArte\EventManager;
+use ElkArte\Themes\ThemeLoader;
 use ElkArte\User;
 
 /**
@@ -16,7 +17,7 @@ class TestManagePostsSettings extends ElkArteCommonSetupTest
 	protected function setUp(): void
 	{
 		parent::setUp();
-		\ElkArte\Themes\ThemeLoader::loadLanguageFile('Admin', 'english', true, true);
+		ThemeLoader::loadLanguageFile('Admin', 'english', true, true);
 	}
 
 	/**

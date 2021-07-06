@@ -16,6 +16,7 @@
  */
 
 use BBC\ParserWrapper;
+use ElkArte\Themes\ThemeLoader;
 use ElkArte\User;
 
 /**
@@ -926,17 +927,17 @@ function loadEmailTemplate($template, $replacements = array(), $lang = '', $load
 	// First things first, load up the email templates language file, if we need to.
 	if ($loadLang)
 	{
-		\ElkArte\Themes\ThemeLoader::loadLanguageFile('EmailTemplates', $lang);
+		ThemeLoader::loadLanguageFile('EmailTemplates', $lang);
 		if (!empty($modSettings['maillist_enabled']))
 		{
-			\ElkArte\Themes\ThemeLoader::loadLanguageFile('MaillistTemplates', $lang);
+			ThemeLoader::loadLanguageFile('MaillistTemplates', $lang);
 		}
 
 		if (!empty($additional_files))
 		{
 			foreach ($additional_files as $file)
 			{
-				\ElkArte\Themes\ThemeLoader::loadLanguageFile($file, $lang);
+				ThemeLoader::loadLanguageFile($file, $lang);
 			}
 		}
 	}
@@ -1004,7 +1005,7 @@ function prepareMailingForPreview()
 {
 	global $context, $modSettings, $scripturl, $txt;
 
-	\ElkArte\Themes\ThemeLoader::loadLanguageFile('Errors');
+	ThemeLoader::loadLanguageFile('Errors');
 	require_once(SUBSDIR . '/Post.subs.php');
 
 	$processing = array(
@@ -1390,7 +1391,6 @@ function emailsInfo($number)
  * @param bool $override_limit = false bypassing our limit flaf
  * @param bool $force_send = false
  * @return bool
- * @throws \ElkArte\Exceptions\Exception
  * @package Mail
  */
 function reduceMailQueue($batch_size = false, $override_limit = false, $force_send = false)

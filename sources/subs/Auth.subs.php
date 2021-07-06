@@ -761,6 +761,7 @@ function rebuildModCache()
  * @param string $domain = ''
  * @param bool|null $secure = false
  * @param bool|null $httponly = null
+ * @param string|null $samesite = null
  *
  * @return bool
  * @package Authorization
@@ -782,7 +783,8 @@ function elk_setcookie($name, $value = '', $expire = 0, $path = '', $domain = ''
 	}
 
 	// Default value in modern browsers is Lax
-	$samesite = (empty($samesite)) ? 'Lax' : $samesite;
+	// @todo admin panel setting?
+	$samesite = empty($samesite) ? 'Lax' : $samesite;
 
 	// Using SameSite=None requires Secure attribute in latest browser versions.
 	$samesite = (!$secure && $samesite === 'None') ? 'Lax' : $samesite;

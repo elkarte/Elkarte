@@ -169,7 +169,7 @@ class TestDatabase extends TestCase
 			'scheduled_tasks' => 14,
 			'settings' => 203,
 			'smileys' => 22,
-			'spiders' => 27,
+			'spiders' => 31,
 			'themes' => 22,
 			'topics' => 1,
 		];

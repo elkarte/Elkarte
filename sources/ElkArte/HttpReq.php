@@ -75,7 +75,7 @@ class HttpReq
 	 *
 	 * @var \ElkArte\HttpReq
 	 */
-	private static $_req = null;
+	private static $instance = null;
 
 	/**
 	 * Used to hold processed (sanitised) values
@@ -96,7 +96,7 @@ class HttpReq
 	 *
 	 * @param $dataValidator \ElkArte\DataValidator|null Instance of the data validator
 	 */
-	public function __construct($dataValidator = null)
+	private function __construct($dataValidator = null)
 	{
 		// Make sure the validator is initiated
 		$this->_dataValidator = $dataValidator === null ? new DataValidator() : $dataValidator;
@@ -510,11 +510,11 @@ class HttpReq
 	 */
 	public static function instance()
 	{
-		if (self::$_req === null)
+		if (self::$instance === null)
 		{
-			self::$_req = new HttpReq();
+			self::$instance = new HttpReq();
 		}
 
-		return self::$_req;
+		return self::$instance;
 	}
 }

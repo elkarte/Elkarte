@@ -2,6 +2,7 @@
 
 use ElkArte\HttpReq;
 use ElkArte\SiteDispatcher;
+use ElkArte\Themes\ThemeLoader;
 use ElkArte\User;
 use PHPUnit\Framework\TestCase;
 
@@ -60,12 +61,15 @@ class TestAdminSearch extends TestCase
 		 * Forcefully reload language files to combat PHPUnit
 		 * messing up globals between tests.
 		 */
-		\ElkArte\Themes\ThemeLoader::loadLanguageFile('Admin', 'english', true, true);
+		ThemeLoader::loadLanguageFile('Admin', 'english', true, true);
 
 		// Set up the controller.
+		$req = HttpReq::instance();
 		$_GET['action'] = 'admin';
+		$req->query->action = 'admin';
 		User::$info->permissions = array_merge(User::$info->permissions, ['admin_forum']);
-		$dispatcher = new SiteDispatcher(new HttpReq);
+		$dispatcher = new SiteDispatcher($req);
+
 		$this->controller = $dispatcher->getController();
 
 		// Won't hurt to call this again...

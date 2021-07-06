@@ -4,6 +4,7 @@ use ElkArte\AdminController\Packages;
 use ElkArte\AdminController\PackageServers;
 use ElkArte\EventManager;
 use ElkArte\HttpReq;
+use ElkArte\Themes\ThemeLoader;
 use ElkArte\User;
 
 /**
@@ -21,6 +22,8 @@ class TestPackagesController extends ElkArteCommonSetupTest
 	 */
 	protected function setUp(): void
 	{
+		global $context;
+
 		// Load in the common items so the system thinks we have an active login
 		parent::setUp();
 		parent::setSession();
@@ -31,7 +34,10 @@ class TestPackagesController extends ElkArteCommonSetupTest
 		}
 
 		new ElkArte\Themes\ThemeLoader();
-		\ElkArte\Themes\ThemeLoader::loadLanguageFile('Packages', 'english', false, true);
+		ThemeLoader::loadLanguageFile('Packages', 'english', false, true);
+
+		$context['admin_menu_id'] = 1;
+		$context['admin_menu_name'] = 'menu_data_' . $context['admin_menu_id'];
 	}
 
 	/**
@@ -47,7 +53,7 @@ class TestPackagesController extends ElkArteCommonSetupTest
 		$controller->pre_dispatch();
 		$controller->action_index();
 
-		// We should be ready to show the pm inbox, its empty right now
+		// We should be ready to show the package listing, its empty right now
 		$this->assertEquals('browse', $context['sub_template']);
 		$this->assertEquals('packages_lists', $context['default_list']);
 	}

@@ -20,16 +20,15 @@ var elk_formSubmitted = false,
 // Some very basic browser detection
 var ua = navigator.userAgent.toLowerCase(),
 	is_opera = !!window.opera, // Opera 8.0-12, past that it behaves like chrome
-	is_ff = typeof InstallTrigger !== 'undefined' || ((ua.indexOf('iceweasel') !== -1 || ua.indexOf('icecat') !== -1 || ua.indexOf('shiretoko') !== -1 || ua.indexOf('minefield') !== -1) && !is_opera),
+	is_ff = typeof InstallTrigger !== 'undefined' || ((ua.indexOf('iceweasel') !== -1 || ua.indexOf('icecat') !== -1 || ua.indexOf('minefield') !== -1) && !is_opera),
 	is_safari = Object.prototype.toString.call(window.HTMLElement).indexOf('Constructor') > 0, // Safari 3+
-	is_chrome = !!window.chrome, // Chrome 1+, Opera 15+
-	is_ie = !!document.documentMode, // IE8+
+	is_edge = ua.indexOf('edge') !== -1, // Old Edge but not chrome edge
+	is_chrome = !!window.chrome && !is_edge, // Chrome 1+, Opera 15+,
+	is_ie = !!document.documentMode, // IE5-11
 	is_webkit = ua.indexOf('applewebkit') !== -1,
 	is_osx = navigator.platform.toUpperCase().indexOf('MAC') >= 0,
 	is_mobile = navigator.userAgent.indexOf('Mobi') !== -1, // Common mobile including Mozilla, Safari, IE, Opera, Chrome
-	/* jshint -W030 */
-	is_touch = 'ontouchstart' in window || window.DocumentTouch && document instanceof DocumentTouch;
-	/* jshint +W030 */
+	is_touch = 'ontouchstart' in window || navigator.MaxTouchPoints > 0 || navigator.msMaxTouchPoints > 0;
 
 /**
  * Load an XML document using XMLHttpRequest.
@@ -375,22 +374,15 @@ function replaceText(text, oTextHandle)
 	// Standards compliant text range replace.
 	if ('selectionStart' in oTextHandle)
 	{
-		var begin = oTextHandle.value.substr(0, oTextHandle.selectionStart),
+		let begin = oTextHandle.value.substr(0, oTextHandle.selectionStart),
 			end = oTextHandle.value.substr(oTextHandle.selectionEnd),
-			scrollPos = oTextHandle.scrollTop,
-			goForward = 0;
+			scrollPos = oTextHandle.scrollTop;
 
 		oTextHandle.value = begin + text + end;
 		if (oTextHandle.setSelectionRange)
 		{
 			oTextHandle.focus();
-
-			if (is_opera && text.match(/\n/g) !== null)
-			{
-				goForward = text.match(/\n/g).length;
-			}
-
-			oTextHandle.setSelectionRange(begin.length + text.length + goForward, begin.length + text.length + goForward);
+			oTextHandle.setSelectionRange(begin.length + text.length, begin.length + text.length);
 		}
 		oTextHandle.scrollTop = scrollPos;
 	}
@@ -1424,11 +1416,6 @@ IconList.prototype.onIconsReceived = function (oXMLDoc)
 	this.oContainerDiv.innerHTML = sItems;
 	this.oContainerDiv.style.display = 'block';
 	this.bListLoaded = true;
-
-	if (is_ie)
-	{
-		this.oContainerDiv.style.width = this.oContainerDiv.clientWidth + 'px';
-	}
 
 	ajax_indicator(false);
 };

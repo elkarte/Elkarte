@@ -19,8 +19,7 @@ use ElkArte\Cache\Cache;
 /**
  * Do we think the current user is a spider?
  *
- * @return int
- * @throws \Exception
+ * @return bool
  * @package SearchEngines
  */
 function spiderCheck()
@@ -29,14 +28,23 @@ function spiderCheck()
 
 	$db = database();
 
-	if (isset($_SESSION['id_robot']))
+	// Feature not enabled, best guess then
+	if (empty($modSettings['spider_mode']))
 	{
-		unset($_SESSION['id_robot']);
+		return spiderQuickCheck();
 	}
 
+	// Use the last data if its not stale (5 min)
+	if (isset($_SESSION['robot_check']) && $_SESSION['robot_check'] > time() - 300)
+	{
+		return !empty($_SESSION['id_robot']);
+	}
+
+	// Fresh bot search
+	unset($_SESSION['id_robot']);
 	$_SESSION['robot_check'] = time();
 
-	// We cache the spider data for five minutes if we can.
+	// We cache the sorted spider data for five minutes.
 	$spider_data = array();
 	$cache = Cache::instance();
 	if (!$cache->getVar($spider_data, 'spider_search', 300))
@@ -115,7 +123,22 @@ function spiderCheck()
 		logSpider();
 	}
 
-	return !empty($_SESSION['id_robot']) ? $_SESSION['id_robot'] : 0;
+	return !empty($_SESSION['id_robot']);
+}
+
+/**
+ * If we haven't turned on proper spider hunts then have a guess!
+ *
+ * @return bool
+ * @package SearchEngines
+ */
+function spiderQuickCheck()
+{
+	// We need the user agent
+	$req = request();
+	$ci_user_agent = strtolower($req->user_agent());
+
+	return strpos($ci_user_agent, 'mozilla') === false || preg_match('~(googlebot|slurp|msnbot|yandex|bingbot|baidu|duckduckbot|sogou|exabot|facebo|ecosia|ia_archiver|megaindex)~u', $ci_user_agent) == 1;
 }
 
 /**

@@ -623,30 +623,17 @@ function template_verification_sound()
 			<a href="', $context['verification_sound_href'], ';sound" rel="nofollow">
 				<span style="font-size: 4em;">&#128266;</span>
 			</a>
-			<br /><br />
-			<div>';
-
-	if (isBrowser('is_ie'))
-	{
-		echo '
-			<object classid="clsid:22D6F312-B0F6-11D0-94AB-0080C74C7E95" type="audio/x-wav">
-				<param name="AutoStart" value="1" />
-				<param name="FileName" value="', $context['verification_sound_href'], '" />
-			</object>';
-	}
-	else
-	{
-		echo '
+			<br />
+			<br />
+			<div>
 			<audio controls="controls" autoplay="autoplay">
 				<source src="', $context['verification_sound_href'], '" type="audio/x-wav">
-			</audio>';
-	}
-
-	echo '
+			</audio>
 			</div>
 			<a href="', $context['verification_sound_href'], ';sound" rel="nofollow">', $txt['visual_verification_sound_again'], '</a><br />
 			<a href="', $context['verification_sound_href'], '" rel="nofollow">', $txt['visual_verification_sound_direct'], '</a><br /><br />
-			<a href="javascript:self.close();">', $txt['visual_verification_sound_close'], '</a><br />
+			<a href="javascript:self.close();">', $txt['visual_verification_sound_close'], '</a>
+			<br />
 		</div>
 	</body>
 </html>';

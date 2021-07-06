@@ -135,11 +135,10 @@ function template_control_richedit($editor_id, $smileyContainer = null, $bbcCont
 	echo '});
 				$editor_data.', $editor_id, ' = sceditor.instance(eTextarea);
 				$editor_container.', $editor_id, ' = $(".sceditor-container");
-				$editor_data.', $editor_id, '.css("code {white-space: pre;}").createPermanentDropDown();
-				if (!(is_ie || is_ff || is_opera || is_safari || is_chrome))
-					$(".sceditor-button-source").hide();',
-				isset($context['post_error']['errors']['no_message']) || isset($context['post_error']['errors']['long_message']) ? '
-				$editor_container.' . $editor_id . '.find("eTextarea, iframe").addClass("border_error");' : '', '
+				$editor_data.', $editor_id, '.css("code {white-space: pre;}").createPermanentDropDown();',
+				isset($context['post_error']['errors']['no_message']) || isset($context['post_error']['errors']['long_message'])
+					? '$editor_container.' . $editor_id . '.find("eTextarea, iframe").addClass("border_error");'
+					: '', '
 			}
 	
 			$(function() {

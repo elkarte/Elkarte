@@ -246,10 +246,10 @@ class UserSettingsLoader
 		// 3. If it was set within this session, no need to set it again.
 		// 4. New session, yet updated < five hours ago? Maybe cache can help.
 		if (
-			ELK != 'SSI' &&
-			!isset($_REQUEST['api']) && (!isset($_REQUEST['action']) || $_REQUEST['action'] != '.xml') &&
-			empty($_SESSION['id_msg_last_visit']) &&
-			(!$this->cache->isEnabled() || !$this->cache->getVar($_SESSION['id_msg_last_visit'], 'user_last_visit-' . $this->id, 5 * 3600))
+			ELK != 'SSI'
+				&& !isset($_REQUEST['api']) && (!isset($_REQUEST['action']) || $_REQUEST['action'] !== '.xml')
+				&& empty($_SESSION['id_msg_last_visit'])
+				&& (!$this->cache->isEnabled() || !$this->cache->getVar($_SESSION['id_msg_last_visit'], 'user_last_visit-' . $this->id, 5 * 3600))
 		)
 		{
 			// @todo can this be cached?
@@ -348,22 +348,9 @@ class UserSettingsLoader
 			list ($context['login_token_var'], , , $context['login_token']) = $_SESSION['token']['post-login'];
 		}
 
-		// Do we perhaps think this is a search robot? Check every five minutes just in case...
-		if ((!empty($modSettings['spider_mode']) || !empty($modSettings['spider_group'])) && (!isset($_SESSION['robot_check']) || $_SESSION['robot_check'] < time() - 300))
-		{
-			require_once(SUBSDIR . '/SearchEngines.subs.php');
-			$user_info['possibly_robot'] = spiderCheck();
-		}
-		elseif (!empty($modSettings['spider_mode']))
-		{
-			$user_info['possibly_robot'] = isset($_SESSION['id_robot']) ? $_SESSION['id_robot'] : 0;
-		}
-		// If we haven't turned on proper spider hunts then have a guess!
-		else
-		{
-			$ci_user_agent = strtolower($this->req->user_agent());
-			$user_info['possibly_robot'] = (strpos($ci_user_agent, 'mozilla') === false && strpos($ci_user_agent, 'opera') === false) || preg_match('~(googlebot|slurp|crawl|msnbot|yandex|bingbot|baidu|duckduckbot)~u', $ci_user_agent) == 1;
-		}
+		// Do we perhaps think this is a search robot?
+		require_once(SUBSDIR . '/SearchEngines.subs.php');
+		$user_info['possibly_robot'] = spiderCheck();
 
 		return $user_info;
 	}

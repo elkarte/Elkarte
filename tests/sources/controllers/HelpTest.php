@@ -3,6 +3,7 @@
 use ElkArte\Controller\Help;
 use ElkArte\EventManager;
 use ElkArte\HttpReq;
+use ElkArte\Themes\ThemeLoader;
 use ElkArte\User;
 
 /**
@@ -25,8 +26,8 @@ class TestHelpController extends ElkArteCommonSetupTest
 		parent::setSession();
 
 		new ElkArte\Themes\ThemeLoader();
-		\ElkArte\Themes\ThemeLoader::loadLanguageFile('Manual', 'english', false, true);
-		\ElkArte\Themes\ThemeLoader::loadLanguageFile('Help', 'english', false, true);
+		ThemeLoader::loadLanguageFile('Manual', 'english', false, true);
+		ThemeLoader::loadLanguageFile('Help', 'english', false, true);
 	}
 
 	protected function tearDown(): void

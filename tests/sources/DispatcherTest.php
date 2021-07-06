@@ -170,13 +170,13 @@ class DispatcherTest extends TestCase
 			// Prepare some variables
 			$topic = isset($test['topic']) ? $test['topic'] : null;
 			$board = isset($test['board']) ? $test['board'] : null;
-			$_GET = array(
-				'action' => isset($test['action']) ? $test['action'] : null,
-				'sa' => isset($test['sa']) ? $test['sa'] : null,
-			);
+
+			$req = HttpReq::instance();
+			$req->query->action = isset($test['action']) ? $test['action'] : null;
+			$req->query->sa = isset($test['action']) ? $test['action'] : null;
 
 			// Start a new dispatcher every time (the dispatching is done on __construct)
-			$dispatcher = New SiteDispatcher_Tester(new HttpReq);
+			$dispatcher = New SiteDispatcher_Tester($req);
 			$this->assertTrue($dispatcher->compare($test['result']), $test['test_name']);
 		}
 	}

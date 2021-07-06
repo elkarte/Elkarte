@@ -170,7 +170,7 @@ abstract class AbstractController
 	 */
 	public function trackStats($action = '')
 	{
-		return !isset($this->_req->api);
+		return empty($this->_req->getRequest('api', 'trim', false));
 	}
 
 	/**

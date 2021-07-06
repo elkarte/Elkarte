@@ -30,18 +30,13 @@ function template_postarea_above()
 
 	// Start the javascript...
 	echo '
-		<script>';
-
-	// When using Go Back due to fatal_error, allow the form to be re-submitted with changes.
-	if (isBrowser('is_firefox'))
-	{
-		echo '
+		<script>
 			window.addEventListener("pageshow", reActivate, false);';
-	}
 
 	// Start with message icons - and any missing from this theme.
 	echo '
 			var icon_urls = {';
+
 	foreach ($context['icons'] as $icon)
 	{
 		echo '

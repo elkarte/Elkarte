@@ -16,6 +16,7 @@
  */
 
 use ElkArte\Request;
+use Elkarte\User;
 use ElkArte\Util;
 
 /**
@@ -96,7 +97,7 @@ function ob_sessrewrite($buffer)
 	}
 
 	// Do nothing if the session is cookied, or they are a crawler - guests are caught by redirectexit().
-	if (empty($_COOKIE) && SID != '' && !isBrowser('possibly_robot'))
+	if (empty($_COOKIE) && SID != '' && empty(User::$info->possibly_robot))
 	{
 		$buffer = preg_replace('/(?<!<link rel="canonical" href=)"' . preg_quote($scripturl, '/') . '(?!\?' . preg_quote(SID, '/') . ')\\??/', '"' . $scripturl . '?' . SID . '&amp;', $buffer);
 	}
