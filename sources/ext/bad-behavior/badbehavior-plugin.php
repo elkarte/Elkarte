@@ -15,6 +15,8 @@
  */
 
 // This die was left on purpose, because BB is special
+use ElkArte\Cache\Cache;
+
 if (!defined('ELK'))
 {
 	die('No access...');
@@ -396,13 +398,13 @@ function bb2_insert_stats($force = false)
 	if ($force || $settings['display_stats'])
 	{
 		// Get the blocked count for the last 7 days ... cache this as well
-		if (!\ElkArte\Cache\Cache::instance()->getVar($bb2_blocked, 'bb2_blocked', 900))
+		if (!Cache::instance()->getVar($bb2_blocked, 'bb2_blocked', 900))
 		{
 			$bb2_blocked = bb2_db_query('SELECT COUNT(*) FROM {db_prefix}log_badbehavior WHERE valid NOT LIKE \'00000000\'');
-			\ElkArte\Cache\Cache::instance()->put('bb2_blocked', $bb2_blocked, 900);
+			Cache::instance()->put('bb2_blocked', $bb2_blocked, 900);
 		}
 
-		if ($bb2_blocked !== false)
+		if (!empty($bb2_blocked[0]))
 		{
 			return sprintf($txt['badbehavior_blocked'], $bb2_blocked[0]['COUNT(*)']);
 		}
