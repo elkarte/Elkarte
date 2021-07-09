@@ -147,7 +147,9 @@ class Register extends AbstractController
 		}
 
 		ThemeLoader::loadLanguageFile('Login');
+		ThemeLoader::loadLanguageFile('Profile');
 		theme()->getTemplates()->load('Register');
+		theme()->getTemplates()->load('ProfileOptions');
 
 		// Do we need them to agree to the registration agreement, first?
 		$context['require_agreement'] = !empty($modSettings['requireAgreement']);
@@ -157,15 +159,7 @@ class Register extends AbstractController
 		$context['registration_passed_privacypol'] = !empty($_SESSION['registration_privacypolicy']);
 		$context['show_coppa'] = !empty($modSettings['coppaAge']);
 		$context['show_contact_button'] = !empty($modSettings['enable_contactform']) && $modSettings['enable_contactform'] === 'registration';
-		if (!empty($modSettings['show_DisplayNameOnRegistration']))
-		{
-			$context['insert_display_name'] = true;
-			ThemeLoader::loadLanguageFile('Profile');
-		}
-		else
-		{
-			$context['insert_display_name'] = false;
-		}
+		$context['insert_display_name'] = !empty($modSettings['show_DisplayNameOnRegistration']);
 
 		// Under age restrictions?
 		if ($context['show_coppa'])
@@ -212,9 +206,11 @@ class Register extends AbstractController
 			$(this).mailcheck({
 				suggested: function(element, suggestion) {
 				  	$("#suggestion").html("' . $txt['register_did_you'] . ' <b><i>" + suggestion.full + "</b></i>");
+				  	element.addClass("check_input");
 				},
 				empty: function(element) {
 				  	$("#suggestion").html("");
+				  	element.removeClass("check_input");
 				}
 			});
 		});', true);
@@ -309,6 +305,7 @@ class Register extends AbstractController
 		// Start collecting together any errors.
 		$reg_errors = ErrorContext::context('register', 0);
 
+		// Make sure registration is enabled
 		$this->_can_register();
 
 		checkSession();
@@ -325,7 +322,9 @@ class Register extends AbstractController
 
 		// Using coppa and the registration checkbox?
 		if (!empty($modSettings['coppaAge']) && !empty($modSettings['checkboxAgreement']) && !empty($this->_req->post->accept_agreement))
+		{
 			$_SESSION['skip_coppa'] = true;
+		}
 
 		// Well, if you don't agree to the Registration Agreement, you can't register.
 		if (!empty($modSettings['requireAgreement']) && empty($_SESSION['registration_agreed']))
@@ -373,6 +372,14 @@ class Register extends AbstractController
 		{
 			ThemeLoader::loadLanguageFile('Login');
 			$reg_errors->addError('too_quickly');
+		}
+
+		// Maybe the filled in our hidden honey pot form field like a good bot would
+		if (!empty($this->_req->getPost('reason_for_joining_hp', 'trim', '')))
+		{
+			// Its not missing, it just should not be there
+			ThemeLoader::loadLanguageFile('Login');
+			$reg_errors->addError('error_missing_information');
 		}
 
 		// Trigger any events required before we complete registration, like captcha verification
@@ -1312,9 +1319,11 @@ class Register extends AbstractController
 				$(this).mailcheck({
 					suggested: function(element, suggestion) {
 				  		$("#suggestion").html("' . $txt['register_did_you'] . ' <b><i>" + suggestion.full + "</b></i>");
+				  		element.addClass("check_input");
 					},
 					empty: function(element) {
 						$("#suggestion").html("");
+						element.removeClass("check_input");
 					}
 				});
 			});', true);

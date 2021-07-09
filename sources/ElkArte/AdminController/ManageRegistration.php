@@ -232,9 +232,11 @@ class ManageRegistration extends AbstractController
 			$(this).mailcheck({
 				suggested: function(element, suggestion) {
 				  	$("#suggestion").html("' . $txt['register_did_you'] . ' <b><i>" + suggestion.full + "</b></i>");
+				  	element.addClass("check_input");
 				},
 				empty: function(element) {
 				  	$("#suggestion").html("");
+				  	element.removeClass("check_input");
 				}
 			});
 		});', true);
