@@ -21,8 +21,8 @@ function template_login()
 
 	echo '
 		<form action="', $scripturl, '?action=login2" name="frmLogin" id="frmLogin" method="post" accept-charset="UTF-8" ', empty($context['disable_login_hashing']) ? ' onsubmit="hashLoginPassword(this, \'' . $context['session_id'] . '\');"' : '', '>
-			<div class="login centertext">
-				<h2 class="category_header hdicon cat_img_login">
+			<div class="login">
+				<h2 class="category_header hdicon cat_img_login centertext">
 					', $txt['login'], '
 				</h2>
 				<div class="well">';
@@ -34,7 +34,7 @@ function template_login()
 					<p class="errorbox">', implode('<br />', $context['login_errors']), '</p>';
 	}
 
-	// Or perhaps there's some special description for this time?
+	// Or perhaps there's some special description for this?
 	if (isset($context['description']))
 	{
 		echo '
@@ -43,74 +43,69 @@ function template_login()
 
 	// Now just get the basic information - username, password, etc.
 	echo '
-					<dl>
-						<dt>
-							<label for="user">', $txt['username'], ':</label>
-						</dt>
-						<dd>
-							<input type="text" name="user" id="user" size="20" maxlength="80" value="', $context['default_username'], '" class="input_text" placeholder="', $txt['username'], '" />
-						</dd>
-						<dt>
-							<label for="passwrd">', $txt['password'], ':</label>
-						</dt>
-						<dd>
-							<input type="password" name="passwrd" id="passwrd" value="', $context['default_password'], '" size="20" class="input_password" placeholder="', $txt['password'], '" />
-						</dd>';
+					<div class="form_field">
+						<input type="text" name="user" id="user" size="20" maxlength="80" value="', $context['default_username'], '" class="input_text" placeholder="', $txt['username'], '" />
+						<label for="user">', $txt['username'], '</label>
+					</div>
+					<div class="form_field">
+						<input type="password" name="passwrd" id="passwrd" value="', $context['default_password'], '" size="20" class="input_password" placeholder="', $txt['password'], '" />
+						<label for="passwrd">', $txt['password'], '</label>
+						<p class="forgot_password lefttext">
+							<a href="', $scripturl, '?action=reminder">', $txt['forgot_your_password'], '</a>
+						</p>
+					</div>';
 
 	if (!empty($modSettings['enableOTP']))
 	{
 		echo '
-						<dt>', $txt['otp_token'], '</dt>
-						<dd>
-							<input type="password" name="otp_token" id="otp_token" value="', $context['default_password'], '" size="30" class="input_password" placeholder="', $txt['otp_token'], '" />
-						</dd>';
+					<div class="form_field">
+						<input type="password" name="otp_token" id="otp_token" value="', $context['default_password'], '" size="30" class="input_password" placeholder="', $txt['otp_token'], '" />
+						<label for="otp_token">', $txt['otp_token'], '</label>
+					</div>';
 	}
 
 	echo '
-					<dl>
-						<dt>
-							<label for="cookielength">', $txt['mins_logged_in'], ':</label>
-						</dt>
-						<dd>
-							<input type="text" name="cookielength" id="cookielength" size="4" maxlength="4" value="', $modSettings['cookieTime'], '"', $context['never_expire'] ? ' disabled="disabled"' : '', ' class="input_text" />
-						</dd>
-						<dt>
-							<label for="cookieneverexp">', $txt['always_logged_in'], ':</label>
-						</dt>
-						<dd>
-							<input type="checkbox" name="cookieneverexp" id="cookieneverexp"', $context['never_expire'] ? ' checked="checked"' : '', ' onclick="this.form.cookielength.disabled = this.checked;" />
-						</dd>';
+					<div class="form_field_other">
+						<input type="checkbox" name="cookieneverexp" id="cookieneverexp"', $context['never_expire'] ? ' checked="checked"' : '', ' />
+						<label for="cookieneverexp">', $txt['always_logged_in'], '</label>
+					</div>';
 
 	// If they have deleted their account, give them a chance to change their mind.
 	if (isset($context['login_show_undelete']))
 	{
 		echo '
-						<dt class="alert">
-							<label for="undelete">', $txt['undelete_account'], ':</label>
-						</dt>
-						<dd>
-							<input type="checkbox" name="undelete" id="undelete" />
-						</dd>';
+					<div class="infobox">
+						<input type="checkbox" name="undelete" id="undelete" />
+						<label for="undelete">', $txt['undelete_account'], '</label>
+					</div>';
 	}
 
 	echo '
-					</dl>
-					<input type="submit" value="', $txt['login'], '" />
-					<p class="smalltext">
-						<a href="', $scripturl, '?action=reminder">', $txt['forgot_your_password'], '</a>
-					</p>
-					<input type="hidden" name="hash_passwrd" value="" />
-					<input type="hidden" name="old_hash_passwrd" value="" />
-					<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
-					<input type="hidden" name="', $context['login_token_var'], '" value="', $context['login_token'], '" />
-				</div>
+					<div class="submitbutton">
+						<input type="submit" value="', $txt['login'], '" />
+						<input type="hidden" name="hash_passwrd" value="" />
+						<input type="hidden" name="old_hash_passwrd" value="" />
+						<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
+						<input type="hidden" name="', $context['login_token_var'], '" value="', $context['login_token'], '" />
+					</div>';
+
+	if ($context['can_register'])
+	{
+		echo '
+			<div class="centertext">
+				<hr />', $txt['welcome_register'], '
+				<a class="linkbutton" href="' . $scripturl . '?action=register">', $txt['register'], '</a>
+			</div>';
+	}
+
+	echo '		</div>	
 			</div>
 		</form>';
 
 	// Focus on the correct input - username or password.
 	echo '
 		<script>
-			document.forms.frmLogin.', (isset($context['default_username']) && $context['default_username'] != '' ? 'passwrd' : 'user'), '.focus();
+			document.forms.frmLogin.', (isset($context['default_username']) && $context['default_username'] !== '' ? 'passwrd' : 'user'), '.focus();
 		</script>';
 }
 
@@ -124,12 +119,12 @@ function template_kick_guest()
 	// This isn't that much... just like normal login but with a message at the top.
 	echo '
 	<form action="', $scripturl, '?action=login2" method="post" accept-charset="UTF-8" name="frmLogin" id="frmLogin"', empty($context['disable_login_hashing']) ? ' onsubmit="hashLoginPassword(this, \'' . $context['session_id'] . '\');"' : '', '>
-		<div class="login centertext">
+		<div class="login">
 			<h2 class="category_header">', $txt['warning'], '</h2>';
 
 	// Show the message or default message.
 	echo '
-			<p class="information">
+			<p class="warningbox">
 				', empty($context['kick_message']) ? $txt['only_members_can_access'] : $context['kick_message'], '<br />';
 
 	if ($context['can_register'])
@@ -144,55 +139,43 @@ function template_kick_guest()
 	// And now the login information.
 	echo '
 			</p>
-			<h2 class="category_header hdicon cat_img_login">
+			<h2 class="category_header hdicon cat_img_login centertext">
 				', $txt['login'], '
 			</h2>
 			<div class="well">
-				<dl>
-					<dt>
-						<label for="user">', $txt['username'], ':</label>
-					</dt>
-					<dd>
-						<input type="text" name="user" id="user" size="20" class="input_text" />
-					</dd>
-					<dt>
-						<label for="passwrd">', $txt['password'], ':</label>
-					</dt>
-					<dd>
-						<input type="password" name="passwrd" id="passwrd" size="20" class="input_password" />
-					</dd>';
+				<div class="form_field">
+					<input type="text" name="user" id="user" size="20" maxlength="80" class="input_text" placeholder="', $txt['username'], '" />
+					<label for="user">', $txt['username'], '</label>
+				</div>
+				<div class="form_field">
+					<input type="password" name="passwrd" id="passwrd" size="20" class="input_password" placeholder="', $txt['password'], '" />
+					<label for="passwrd">', $txt['password'], '</label>
+					<p class="forgot_password lefttext">
+						<a href="', $scripturl, '?action=reminder">', $txt['forgot_your_password'], '</a>
+					</p>
+				</div>';
 
 	if (!empty($modSettings['enableOTP']))
 	{
 		echo '
-						<dt>', $txt['otp_token'], '</dt>
-						<dd>
-							<input type="password" name="otp_token" id="otp_token" value="', $context['default_password'], '" size="30" class="input_password" placeholder="', $txt['otp_token'], '" />
-						</dd>';
+				<div class="form_field">
+					<input type="password" name="otp_token" id="otp_token" value="', $context['default_password'], '" size="30" class="input_password" placeholder="', $txt['otp_token'], '" />
+					<label for="otp_token">', $txt['otp_token'], '</label>
+				</div>';
 	}
 
 	echo '
-					<dt>
-						<label for="cookielength">', $txt['mins_logged_in'], ':</label>
-					</dt>
-					<dd>
-						<input type="text" name="cookielength" id="cookielength" size="4" maxlength="4" value="', $modSettings['cookieTime'], '" class="input_text" />
-					</dd>
-					<dt>
-						<label for="cookieneverexp">', $txt['always_logged_in'], ':</label>
-					</dt>
-					<dd>
-						<input type="checkbox" name="cookieneverexp" id="cookieneverexp" onclick="this.form.cookielength.disabled = this.checked;" />
-					</dd>
-				</dl>
-				<input type="submit" value="', $txt['login'], '" />
-				<p class="smalltext">
-					<a href="', $scripturl, '?action=reminder">', $txt['forgot_your_password'], '</a>
-				</p>
-			</div>
-			<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
-			<input type="hidden" name="', $context['login_token_var'], '" value="', $context['login_token'], '" />
-			<input type="hidden" name="hash_passwrd" value="" />
+				<div class="form_field_other">
+					<input type="checkbox" name="cookieneverexp" id="cookieneverexp" />
+					<label for="cookieneverexp">', $txt['always_logged_in'], ':</label>
+				</div>
+				<div class="submitbutton">
+					<input type="submit" value="', $txt['login'], '" />
+					<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
+					<input type="hidden" name="', $context['login_token_var'], '" value="', $context['login_token'], '" />
+					<input type="hidden" name="hash_passwrd" value="" />
+				</div>
+			</div>	
 		</div>
 	</form>';
 
@@ -208,47 +191,36 @@ function template_kick_guest()
  */
 function template_maintenance()
 {
-	global $context, $settings, $scripturl, $txt, $modSettings;
+	global $context, $settings, $scripturl, $txt;
 
 	// Display the administrator's message at the top.
 	echo '
 <form action="', $scripturl, '?action=login2" method="post" accept-charset="UTF-8"', empty($context['disable_login_hashing']) ? ' onsubmit="hashLoginPassword(this, \'' . $context['session_id'] . '\');"' : '', '>
-	<div class="login" id="maintenance_mode">
+	<div id="maintenance_mode" class="login" >
 		<h2 class="category_header">', $context['title'], '</h2>
 		<p class="description flow_auto">
 			<img class="floatleft" src="', $settings['images_url'], '/construction.png" alt="', $txt['in_maintain_mode'], '" />
 			', $context['description'], '
 		</p>
 		<h2 class="category_header">', $txt['admin_login'], '</h2>
-		<div class="well centertext">
-			<dl>
-				<dt>
-					<label for="user">', $txt['username'], ':</label>
-				</dt>
-				<dd>
-					<input type="text" name="user" id="user" size="20" class="input_text" />
-				</dd>
-				<dt>
-					<label for="passwrd">', $txt['password'], ':</label>
-				</dt>
-				<dd>
-					<input type="password" name="passwrd" id="passwrd" size="20" class="input_password" />
-				</dd>
-				<dt>
-					<label for="cookielength">', $txt['mins_logged_in'], ':</label>
-				</dt>
-				<dd>
-					<input type="text" name="cookielength" id="cookielength" size="4" maxlength="4" value="', $modSettings['cookieTime'], '" class="input_text" />
-				</dd>
-				<dt>
-					<label for="cookieneverexp">', $txt['always_logged_in'], ':</label>
-				</dt>
-				<dd>
-					<input type="checkbox" name="cookieneverexp" id="cookieneverexp" />
-				</dd>
-			</dl>
-			<input type="submit" value="', $txt['login'], '" />
+		<div class="well">
+			<div class="form_field">
+				<input type="text" name="user" id="user" size="20" maxlength="80" class="input_text" placeholder="', $txt['username'], '" />
+				<label for="user">', $txt['username'], '</label>
 			</div>
+			<div class="form_field">
+				<input type="password" name="passwrd" id="passwrd" size="20" class="input_password" placeholder="', $txt['password'], '" />
+				<label for="passwrd">', $txt['password'], '</label>
+				<p class="forgot_password lefttext">
+					<a href="', $scripturl, '?action=reminder">', $txt['forgot_your_password'], '</a>
+				</p>
+			</div>
+			<div class="form_field_other">
+				<input type="checkbox" name="cookieneverexp" id="cookieneverexp" />
+				<label for="cookieneverexp">', $txt['always_logged_in'], '</label>
+			</div>
+			<input type="submit" value="', $txt['login'], '" />
+		</div>
 		<input type="hidden" name="hash_passwrd" value="" />
 		<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
 		<input type="hidden" name="', $context['login_token_var'], '" value="', $context['login_token'], '" />
@@ -270,7 +242,7 @@ function template_admin_login()
 		<h2 class="category_header hdicon cat_img_login">
 			', $txt['login'], '
 		</h2>
-		<div class="well centertext">';
+		<div class="well">';
 
 	if (!empty($context['incorrect_password']))
 	{
@@ -279,20 +251,22 @@ function template_admin_login()
 	}
 
 	echo '
-			<label for="', $context['sessionCheckType'], '_pass">', $txt['password'], ':</label>
-			<input type="password" name="', $context['sessionCheckType'], '_pass" id="', $context['sessionCheckType'], '_pass" size="24" class="input_password" autofocus="autofocus" placeholder="', $txt['password'], '"/>
-			<a href="', $scripturl, '?action=quickhelp;help=securityDisable_why" onclick="return reqOverlayDiv(this.href);" class="helpicon i-help"><s>', $txt['help'], '</s></a>
-			<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
-			<input type="hidden" name="', $context['admin-login_token_var'], '" value="', $context['admin-login_token'], '" />
-			<p>
+			<div class="form_field w_icon">
+				<input type="password" name="', $context['sessionCheckType'], '_pass" id="', $context['sessionCheckType'], '_pass" size="24" class="input_password" autofocus="autofocus" placeholder="', $txt['password'], '"/>
+				<label for="', $context['sessionCheckType'], '_pass">', $txt['password'], '</label>
+				<a href="', $scripturl, '?action=quickhelp;help=securityDisable_why" onclick="return reqOverlayDiv(this.href);" class="helpicon i-help"><s>', $txt['help'], '</s></a>
+			</div>
+			<div class="submitbutton">
 				<input type="submit" value="', $txt['login'], '" />
-			</p>';
+				<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
+				<input type="hidden" name="', $context['admin-login_token_var'], '" value="', $context['admin-login_token'], '" />
+				<input type="hidden" name="', $context['sessionCheckType'], '_hash_pass" value="" />
+			</div>';
 
 	// Make sure to output all the old post data.
 	echo $context['post_data'], '
 		</div>
 	</div>
-	<input type="hidden" name="', $context['sessionCheckType'], '_hash_pass" value="" />
 </form>';
 
 	// Focus on the password box.
