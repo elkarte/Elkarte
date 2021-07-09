@@ -1642,7 +1642,8 @@ function disableAutoComplete()
 	window.onload = function ()
 	{
 		// Turn off autocomplete for these elements
-		$("input[type=email], input[type=password], .input_text, .input_clear").attr("autocomplete", "off");
+		$("input[type=email], .input_text, .input_clear").attr("autocomplete", "off");
+		$("input[type=password]").attr("autocomplete", "new-password");
 
 		// Chrome will fill out the form even with autocomplete off, so we need to empty the value as well.
 		setTimeout(function ()
