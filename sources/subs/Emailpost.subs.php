@@ -13,6 +13,7 @@
  */
 
 use BBC\ParserWrapper;
+use ElkArte\AttachmentsDirectory;
 use ElkArte\Cache\Cache;
 use ElkArte\EmailFormat;
 use ElkArte\Html2BBC;
@@ -846,10 +847,27 @@ function pbe_email_attachments($pbe, $email_message)
 	// Init
 	$attachment_count = 0;
 	$attachIDs = array();
-
 	$tmp_attachments = new TemporaryAttachmentsList();
-	$attachmentsDir = new AttachmentsDirectory($modSettings, database());
-	$current_attach_dir = $attachmentsDir->getCurrent();
+
+	// Make sure we're know where to upload
+	$attachmentDirectory = new AttachmentsDirectory($modSettings, database());
+	try
+	{
+		$attachmentDirectory->automanageCheckDirectory(isset($_REQUEST['action']) && $_REQUEST['action'] == 'admin');
+
+		$attach_current_dir = $attachmentDirectory->getCurrent();
+
+		if (!is_dir($attach_current_dir))
+		{
+			$tmp_attachments->setSystemError('attach_folder_warning');
+			\ElkArte\Errors\Errors::instance()->log_error(sprintf($txt['attach_folder_admin_warning'], $attach_current_dir), 'critical');
+		}
+	}
+	catch (\Exception $e)
+	{
+		// If the attachments folder is not there: error.
+		$tmp_attachments->setSystemError($e->getMessage());
+	}
 
 	// For attachmentChecks function
 	require_once(SUBSDIR . '/Attachments.subs.php');
@@ -858,11 +876,15 @@ function pbe_email_attachments($pbe, $email_message)
 	// Create the file(s) with a temp name so we can validate its contents/type
 	foreach ($email_message->attachments as $name => $attachment)
 	{
+		if ($tmp_attachments->hasSystemError())
+		{
+			continue;
+		}
+
 		$attachID = $tmp_attachments->getTplName($pbe['profile']['id_member'], bin2hex(random_bytes(16)));
 
 		// Write the contents to an actual file
-		$destName = $current_attach_dir . '/' . $attachID;
-
+		$destName = $attach_current_dir . '/' . $attachID;
 		if (file_put_contents($destName, $attachment) !== false)
 		{
 			@chmod($destName, 0644);
@@ -874,7 +896,7 @@ function pbe_email_attachments($pbe, $email_message)
 				'user_id' => $pbe['profile']['id_member'],
 				'size' => strlen($attachment),
 				'type' => null,
-				'id_folder' => $attachmentsDir->currentDirectoryId(),
+				'id_folder' => $attachmentDirectory->currentDirectoryId(),
 			]);
 
 			// Make sure its valid
