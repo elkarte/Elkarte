@@ -842,7 +842,7 @@ function pbe_emailError($error, $email_message)
 function pbe_email_attachments($pbe, $email_message)
 {
 	// Trying to attach a file with this post ....
-	global $modSettings, $context;
+	global $modSettings, $context, $txt;
 
 	// Init
 	$attachment_count = 0;

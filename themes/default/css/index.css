@@ -5199,10 +5199,10 @@ Stef                       ^
 
 /* Optional.  Use as a wrapper around the form, similar to login */
 .form_container {
-	padding: 1em;
 	overflow: hidden;
-	margin: .12em auto 0 auto;
 	max-width: 640px;
+	margin: .12em auto 0 auto;
+	padding: 1em;
 }
 
 .form_field {
@@ -5250,15 +5250,15 @@ Stef                       ^
 .form_field > input[type="text"]:not(:placeholder-shown) + label,
 .form_field > input[type="email"]:focus + label,
 .form_field > input[type="email"]:not(:placeholder-shown) + label {
-	transform: translate3d(-.5em, -100%, 0) scale(0.75);
 	font-weight: bold;
+	transform: translate3d(-.5em, -100%, 0) scale(0.75);
 }
 
 /* Password field offset requires special treatment ? */
 .form_field > input[type="password"]:focus + label,
 .form_field > input[type="password"]:not(:placeholder-shown) + label {
-	transform: translate3d(-.25em, -100%, 0) scale(0.75);
 	font-weight: bold;
+	transform: translate3d(-.25em, -100%, 0) scale(0.75);
 }
 
 /* Use around radio, checkboxes, etc to keep them closer to a input text box */
