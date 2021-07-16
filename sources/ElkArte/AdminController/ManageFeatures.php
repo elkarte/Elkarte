@@ -1060,7 +1060,7 @@ class ManageFeatures extends AbstractController
 
 							$textKey = sprintf('custom_profile_type_%1$s', $rowData['field_type']);
 
-							return isset($txt[$textKey]) ? $txt[$textKey] : $textKey;
+							return $txt[$textKey] ?? $textKey;
 						},
 						'style' => 'width: 10%;',
 					),
@@ -1122,10 +1122,10 @@ class ManageFeatures extends AbstractController
 						'reverse' => 'placement',
 					),
 				),
-				'show_on_registration' => array(
+				'modify' => array(
 					'data' => array(
 						'sprintf' => array(
-							'format' => '<a href="' . getUrl('admin', ['action' => 'admin', 'area' => 'featuresettings', 'sa' => 'profileedit', 'fid' => '%1$s']) . '">' . $txt['modify'] . '</a>',
+							'format' => '<a href="' . getUrl('admin', ['action' => 'admin', 'area' => 'featuresettings', 'sa' => 'profileedit']) . ';fid=%1$s">' . $txt['modify'] . '</a>',
 							'params' => array(
 								'id_field' => false,
 							),
@@ -1353,7 +1353,7 @@ class ManageFeatures extends AbstractController
 					}
 					break;
 				default:
-					$default = isset($this->_req->post->default_value) ? $this->_req->post->default_value : '';
+					$default = $this->_req->post->default_value ?? '';
 			}
 
 			// Come up with the unique name?
@@ -1410,20 +1410,20 @@ class ManageFeatures extends AbstractController
 			else
 			{
 				// Anything going to check or select is pointless keeping - as is anything coming from check!
-				if (($this->_req->post->field_type == 'check' && $context['field']['type'] != 'check')
-					|| (($this->_req->post->field_type == 'select' || $this->_req->post->field_type == 'radio') && $context['field']['type'] != 'select' && $context['field']['type'] != 'radio')
-					|| ($context['field']['type'] == 'check' && $this->_req->post->field_type != 'check'))
+				if (($this->_req->post->field_type === 'check' && $context['field']['type'] !== 'check')
+					|| (($this->_req->post->field_type === 'select' || $this->_req->post->field_type === 'radio') && $context['field']['type'] !== 'select' && $context['field']['type'] !== 'radio')
+					|| ($context['field']['type'] === 'check' && $this->_req->post->field_type !== 'check'))
 				{
 					deleteProfileFieldUserData($context['field']['colname']);
 				}
 				// Otherwise - if the select is edited may need to adjust!
-				elseif ($this->_req->post->field_type == 'select' || $this->_req->post->field_type == 'radio')
+				elseif ($this->_req->post->field_type === 'select' || $this->_req->post->field_type === 'radio')
 				{
-					$optionChanges = array();
+					$optionChanges = $context['field']['options'];
 					$takenKeys = array();
 
 					// Work out what's changed!
-					foreach ($context['field']['options'] as $k => $option)
+					foreach ($optionChanges as $k => $option)
 					{
 						if (trim($option) === '')
 						{
@@ -1434,7 +1434,6 @@ class ManageFeatures extends AbstractController
 						if (in_array($option, $newOptions))
 						{
 							$takenKeys[] = $k;
-							continue;
 						}
 					}
 

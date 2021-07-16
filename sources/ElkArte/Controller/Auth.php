@@ -153,13 +153,9 @@ class Auth extends AbstractController
 		}
 
 		// Set up the cookie length.  (if it's invalid, just fall through and use the default.)
-		if (isset($_POST['cookieneverexp']) || (!empty($_POST['cookielength']) && $_POST['cookielength'] == -1))
+		if (isset($_POST['cookieneverexp']))
 		{
 			$modSettings['cookieTime'] = 3153600;
-		}
-		elseif (!empty($_POST['cookielength']) && ($_POST['cookielength'] >= 1 && $_POST['cookielength'] <= 525600))
-		{
-			$modSettings['cookieTime'] = (int) $_POST['cookielength'];
 		}
 
 		ThemeLoader::loadLanguageFile('Login');
@@ -172,7 +168,7 @@ class Auth extends AbstractController
 		// Set up the default/fallback stuff.
 		$context['default_username'] = isset($_POST['user']) ? preg_replace('~&amp;#(\\d{1,7}|x[0-9a-fA-F]{1,6});~', '&#\\1;', htmlspecialchars($_POST['user'], ENT_COMPAT, 'UTF-8')) : '';
 		$context['default_password'] = '';
-		$context['never_expire'] = $modSettings['cookieTime'] == 525600 || $modSettings['cookieTime'] == 3153600;
+		$context['never_expire'] = $modSettings['cookieTime'] === 525600 || $modSettings['cookieTime'] === 3153600;
 		$context['login_errors'] = array($txt['error_occurred']);
 		$context['page_title'] = $txt['login'];
 

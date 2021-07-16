@@ -301,7 +301,7 @@ function loadCustomFields($memID, $area = 'summary', array $custom_fields = arra
 		// Radio buttons
 		elseif ($row['field_type'] === 'radio')
 		{
-			$input_html = '<fieldset>';
+			$input_html = '<fieldset><legend>' . $row['field_name'] . '</legend>';
 			$options = explode(',', $row['field_options']);
 
 			foreach ($options as $k => $v)
@@ -314,12 +314,13 @@ function loadCustomFields($memID, $area = 'summary', array $custom_fields = arra
 					$output_html = $v;
 				}
 			}
+
 			$input_html .= '</fieldset>';
 		}
 		// A standard input field, including some html5 variants
 		elseif (in_array($row['field_type'], array('text', 'url', 'search', 'date', 'email', 'color')))
 		{
-			$input_html = '<input id="' . $row['col_name'] . '" type="' . $row['field_type'] . '" name="customfield[' . $row['col_name'] . ']" ' . ($row['field_length'] != 0 ? 'maxlength="' . $row['field_length'] . '"' : '') . ' size="' . ($row['field_length'] == 0 || $row['field_length'] >= 50 ? 50 : ($row['field_length'] > 30 ? 30 : ($row['field_length'] > 10 ? 20 : 10))) . '" value="' . $value . '" class="input_text" />';
+			$input_html = '<input id="' . $row['col_name'] . '" type="' . $row['field_type'] . '" name="customfield[' . $row['col_name'] . ']" ' . ($row['field_length'] != 0 ? 'maxlength="' . $row['field_length'] . '"' : '') . ' size="' . ($row['field_length'] == 0 || $row['field_length'] >= 50 ? 50 : ($row['field_length'] > 30 ? 30 : ($row['field_length'] > 10 ? 20 : 10))) . '" value="' . $value . '" placeholder="' . $row['field_name'] . '" class="input_text" />';
 		}
 		// Only thing left, a textbox for you
 		else
@@ -347,10 +348,12 @@ function loadCustomFields($memID, $area = 'summary', array $custom_fields = arra
 				'{DEFAULT_IMAGES_URL}' => $settings['default_images_url'],
 				'{INPUT}' => $output_html,
 			);
+
 			if (in_array($row['field_type'], array('radio', 'select')))
 			{
 				$replacements['{KEY}'] = $row['col_name'] . '_' . $key;
 			}
+
 			$output_html = strtr($row['enclose'], $replacements);
 		}
 
@@ -361,6 +364,7 @@ function loadCustomFields($memID, $area = 'summary', array $custom_fields = arra
 		{
 			continue;
 		}
+
 		$context['custom_fields'][] = array(
 			'name' => $row['field_name'],
 			'desc' => $row['field_desc'],

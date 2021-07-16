@@ -1037,7 +1037,6 @@ function setBoardIds()
 /**
  * SiteTooltip, Basic JQuery function to provide styled tooltips
  *
- * - will use the hoverintent plugin if available
  * - shows the tooltip in a div with the class defined in tooltipClass
  * - moves all selector titles to a hidden div and removes the title attribute to
  *   prevent any default browser actions
@@ -1052,7 +1051,6 @@ function setBoardIds()
 	{
 		$.fn.SiteTooltip.oDefaultsSettings = {
 			followMouse: 1,
-			hoverIntent: {sensitivity: 10, interval: 650, timeout: 50},
 			positionTop: 12,
 			positionLeft: 12,
 			tooltipID: 'site_tooltip', // ID used on the outer div
@@ -1069,17 +1067,17 @@ function setBoardIds()
 		}
 
 		// Account for any user options
-		var oSettings = $.extend({}, $.fn.SiteTooltip.oDefaultsSettings, oInstanceSettings || {});
+		let oSettings = $.extend({}, $.fn.SiteTooltip.oDefaultsSettings, oInstanceSettings || {});
 
 		// Move passed selector titles to a hidden span, then remove the selector title to prevent any default browser actions
 		$(this).each(function ()
 		{
-			var sTitle = $('<span class="' + oSettings.tooltipSwapClass + '">' + this.title + '</span>').hide();
+			let sTitle = $('<span class="' + oSettings.tooltipSwapClass + '">' + this.title + '</span>').hide();
 			$(this).append(sTitle).attr('title', '');
 		});
 
 		// Determine where we are going to place the tooltip, while trying to keep it on screen
-		var positionTooltip = function (event)
+		let positionTooltip = function (event)
 		{
 			var iPosx = 0,
 				iPosy = 0,
@@ -1102,7 +1100,7 @@ function setBoardIds()
 			}
 
 			// Position of the tooltip top left corner and its size
-			var oPosition = {
+			let oPosition = {
 				x: iPosx + oSettings.positionLeft,
 				y: iPosy + oSettings.positionTop,
 				w: $_tip.width(),
@@ -1110,7 +1108,7 @@ function setBoardIds()
 			};
 
 			// Display limits and window scroll position
-			var oLimits = {
+			let oLimits = {
 				x: $(window).scrollLeft(),
 				y: $(window).scrollTop(),
 				w: $(window).width() - 24,
@@ -1137,15 +1135,15 @@ function setBoardIds()
 		};
 
 		// Used to show a tooltip
-		var showTooltip = function ()
+		let showTooltip = function ()
 		{
 			$('#' + oSettings.tooltipID + ' #' + oSettings.tooltipTextID).slideDown(150);
 		};
 
 		// Used to hide a tooltip
-		var hideTooltip = function ()
+		let hideTooltip = function ()
 		{
-			var $_tip = $('#' + oSettings.tooltipID);
+			let $_tip = $('#' + oSettings.tooltipID);
 
 			$_tip.fadeOut(175, function ()
 			{
@@ -1162,58 +1160,43 @@ function setBoardIds()
 		// For all of the elements that match the selector on the page, lets set up some actions
 		return this.each(function ()
 		{
-			// If we find hoverIntent then use it
-			if ($.fn.hoverIntent)
-			{
-				$(this).hoverIntent({
-					sensitivity: oSettings.hoverIntent.sensitivity,
-					interval: oSettings.hoverIntent.interval,
-					over: Site_tooltip_on,
-					timeout: oSettings.hoverIntent.timeout,
-					out: Site_tooltip_off
-				});
-			}
-			else
-			{
-				// Plain old hover it is
-				$(this).hover(Site_tooltip_on, Site_tooltip_off);
-			}
+			let timer;
 
-			// Create the on tip action
-			function Site_tooltip_on(event)
-			{
-				// If we have text in the hidden span element we created on page load
-				if ($(this).children('.' + oSettings.tooltipSwapClass).text())
-				{
-					// Create a ID'ed div with our style class that holds the tooltip info, hidden for now
-					$('body').append('<div id="' + oSettings.tooltipID + '" class="' + oSettings.tooltipClass + '"><div id="' + oSettings.tooltipTextID + '" class="hide"></div></div>');
+			// Plain old hover it is
+			$(this).hover(function(event) {
+				let $this = $(this),
+					$event = event;
 
-					// Load information in to our newly created div
-					var ttContent = $('#' + oSettings.tooltipTextID);
-
-					if (oSettings.tooltipContent === 'html')
+				// on mouse in, start a timeout
+				timer = setTimeout(function() {
+					// If we have text in the hidden span element we created on page load
+					if ($this.children('.' + oSettings.tooltipSwapClass).text() !== '')
 					{
-						ttContent.html($(this).children('.' + oSettings.tooltipSwapClass).html());
-					}
-					else
-					{
-						ttContent.text($(this).children('.' + oSettings.tooltipSwapClass).text());
-					}
+						// Create a ID'ed div with our style class that holds the tooltip info, hidden for now
+						$('body').append('<div id="' + oSettings.tooltipID + '" class="' + oSettings.tooltipClass + '"><div id="' + oSettings.tooltipTextID + '" class="hide"></div></div>');
 
-					// Show then position or it may position off screen
-					showTooltip();
-					positionTooltip(event);
+						// Load information in to our newly created div
+						let ttContent = $('#' + oSettings.tooltipTextID);
+
+						if (oSettings.tooltipContent === 'html')
+						{
+							ttContent.html($this.children('.' + oSettings.tooltipSwapClass).html());
+						}
+						else
+						{
+							ttContent.text($this.children('.' + oSettings.tooltipSwapClass).text());
+						}
+
+						// Show then position or it may position off screen
+						showTooltip();
+						positionTooltip($event);
 				}
-
-				return false;
-			}
-
-			// Create the Bye bye tip
-			function Site_tooltip_off(event)
-			{
-				hideTooltip(this);
-				return false;
-			}
+			},500);}, function() {
+				let $this = $(this);
+				// on mouse out, cancel the timer
+				clearTimeout(timer);
+				hideTooltip($this);
+			});
 
 			// Create the tip move with the cursor
 			if (oSettings.followMouse)
@@ -1230,6 +1213,7 @@ function setBoardIds()
 			$(this).on("click", function ()
 			{
 				hideTooltip(this);
+
 				return true;
 			});
 		});
@@ -1642,7 +1626,8 @@ function disableAutoComplete()
 	window.onload = function ()
 	{
 		// Turn off autocomplete for these elements
-		$("input[type=email], input[type=password], .input_text, .input_clear").attr("autocomplete", "off");
+		$("input[type=email], .input_text, .input_clear").attr("autocomplete", "off");
+		$("input[type=password]").attr("autocomplete", "new-password");
 
 		// Chrome will fill out the form even with autocomplete off, so we need to empty the value as well.
 		setTimeout(function ()

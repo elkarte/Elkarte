@@ -27,7 +27,7 @@ function template_profile_above()
 {
 	global $context;
 
-	// Prevent browssers from auto completing fields when viewing/editing other members profiles
+	// Prevent browsers from auto completing fields when viewing/editing other members profiles
 	if (!$context['user']['is_owner'])
 	{
 		theme()->addInlineJavascript('disableAutoComplete();', true);

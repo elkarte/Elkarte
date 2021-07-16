@@ -24,15 +24,11 @@ function template_reminder()
 		<div class="login">
 			<h2 class="category_header">', $txt['authentication_reminder'], '</h2>
 			<div class="well">
-				<p class="smalltext centertext">', $txt['password_reminder_desc'], '</p>
-				<dl>
-					<dt>
-						<label for="user">', $txt['user_email'], ':</label>
-					</dt>
-					<dd>
-						<input type="text" id="user" name="user" size="30" class="input_text" />
-					</dd>
-				</dl>
+				<p class="description">', $txt['password_reminder_desc'], '</p>
+				<div class="form_field">
+					<input type="text" id="user" name="user" size="30" class="input_text" placeholder="', $txt['user_email'], '"/>
+					<label for="user">', $txt['user_email'], '</label>
+				</div>
 				<div class="submitbutton">
 					<input type="submit" value="', $txt['reminder_continue'], '" />
 					<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
@@ -106,7 +102,7 @@ function template_set_password()
 						<label for="elk_autov_pwmain">', $txt['choose_pass'], ':</label>
  					</dt>
 					<dd>
-						<input id="elk_autov_pwmain" type="password" name="passwrd1" size="22" class="input_password" />
+						<input id="elk_autov_pwmain" type="password" name="passwrd1" size="22" class="input_password" autocomplete="new-password" />
 						<span id="elk_autov_pwmain_div" class="hide">
 							<i id="elk_autov_pwmain_img" class="icon i-warn" alt="*"></i>
 						</span>
@@ -115,7 +111,7 @@ function template_set_password()
 						<label for="elk_autov_pwverify">', $txt['verify_pass'], ':</label>
 					</dt>
 					<dd>
-						<input id="elk_autov_pwverify" type="password" name="passwrd2"  size="22" class="input_password" />
+						<input id="elk_autov_pwverify" type="password" name="passwrd2"  size="22" class="input_password" autocomplete="new-password" />
 						<span id="elk_autov_pwverify_div" class="hide">
 							<i id="elk_autov_pwverify_img" class="icon i-warn" alt="*"></i>
 						</span>
@@ -171,42 +167,35 @@ function template_ask()
 			<div class="well">
 				<p class="smalltext">', $txt['enter_new_password'], '</p>
 				<dl>
-					<dt>
-						<label>', $txt['secret_question'], ':</label>
-					</dt>
-					<dd>', $context['secret_question'], '</dd>
-					<dt>
-						<label for="secret_answer">', $txt['secret_answer'], ':</label>
-					</dt>
-					<dd>
-						<input type="text" name="secret_answer" size="22" class="input_text" />
-					</dd>';
+					<p class="description">
+						<strong>', $txt['secret_question'], ':</strong> ', $context['secret_question'], '
+					</p>
+					<div class="form_field">
+						<input type="text" name="secret_answer" size="22" class="input_text" placeholder="', $txt['secret_answer'], '"/>
+						<label for="secret_answer">', $txt['secret_answer'], '</label>
+					</div>';
 
 	if ($context['account_type'] === 'password')
 	{
 		echo '
-					<dt>
-						<label for="elk_autov_pwmain">', $txt['choose_pass'], ':</label>
- 					</dt>
-					<dd>
-						<input type="password" name="passwrd1" id="elk_autov_pwmain" size="22" class="input_password" />
+					<div class="form_field w_icon">
+						<input type="password" name="passwrd1" id="elk_autov_pwmain" size="22" class="input_password" placeholder="', $txt['choose_pass'], '" autocomplete="new-password" />
+						<label for="elk_autov_pwmain">', $txt['choose_pass'], '</label>
 						<span id="elk_autov_pwmain_div" class="hide">
 							<i id="elk_autov_pwmain_img" class="icon i-warn" alt="*"></i>
 						</span>
-					</dd>
-					<dt>
-						<label for="elk_autov_pwverify">', $txt['verify_pass'], ':</label>
-					</dt>
-					<dd>
-						<input type="password" name="passwrd2" id="elk_autov_pwverify" size="22" class="input_password" />
+					</div>
+					<div class="form_field w_icon">
+						<input type="password" name="passwrd2" id="elk_autov_pwverify" size="22" class="input_password" placeholder="', $txt['verify_pass'], '" autocomplete="new-password" />
+						<label for="elk_autov_pwverify">', $txt['verify_pass'], '</label>
 						<span id="elk_autov_pwverify_div" class="hide">
 							<i id="elk_autov_pwverify_img" class="icon i-check" alt="*"></i>
 						</span>
-					</dd>';
+					</div>';
 	}
 
 	echo '
-				</dl>
+
 				<div class="submitbutton">
 					<input type="submit" value="', $txt['save'], '" />
 					<input type="hidden" name="uid" value="', $context['remind_user'], '" />

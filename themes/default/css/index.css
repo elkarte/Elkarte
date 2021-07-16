@@ -5141,36 +5141,21 @@ Stef                       ^
 	margin: 0 auto;
 }
 
-.login dl {
-	clear: right;
-	overflow: auto;
+.login .well {
+	padding: .7em 15%;
 }
 
-.login dt, .login dd {
-	width: 45%;
-	margin: 0 0 5px 0;
-	padding: 1px;
+.login input[type="submit"] {
+	width: 100%;
 }
 
-.login dt {
-	font-weight: bold;
-	float: left;
-	clear: both;
-	text-align: right;
+.forgot_password {
+	font-size: var(--font13);
+	margin-top: -.5em;
 }
 
-.login dd {
-	float: right;
-	width: 55%;
-	text-align: left;
-}
-
-.login dl:nth-of-type(2) dt {
-	padding-top: 3px;
-}
-
-.login dl:nth-of-type(2) dd img {
-	vertical-align: top;
+#maintenance_mode img {
+	padding: 0 .5em;
 }
 
 .coppa_contact {
@@ -5208,40 +5193,82 @@ Stef                       ^
   <div class="form_field">
 	   <input type="text" />
 	   <label>XX</label>
-   </div> */
-.form_field {
-	position: relative;
-	margin-top: 1.5em;
+	   <span>icons etc</span>
+   </div>
+*/
+
+/* Optional.  Use as a wrapper around the form, similar to login */
+.form_container {
+	overflow: hidden;
+	max-width: 640px;
+	margin: .12em auto 0 auto;
+	padding: 1em;
 }
 
-/* Move label text to be the placeholder text */
-.form_field > label {
+.form_field {
+	position: relative;
+	margin: 1.5em auto .75em auto;
+}
+
+/* Move label text to be the placeholder text for text elements */
+.form_field > input[type="text"] + label,
+.form_field > input[type="password"] + label,
+.form_field > input[type="email"] + label {
 	position: absolute;
 	top: 3px;
 	left: 0;
 	transition: transform .2s;
-	transform: translatex(1em);
+	transform: translatex(.5em);
 	text-transform: uppercase;
 }
 
-.form_field > input[type="text"],
-.form_field > input[type="password"] {
+/* fill up the container */
+.form_field input[type="text"],
+.form_field input[type="password"],
+.form_field input[type="email"] {
 	width: 100%;
+}
+
+/* leave space at the end for any icon */
+.form_field.w_icon > input[type="text"],
+.form_field.w_icon > input[type="password"],
+.form_field.w_icon > input[type="email"] {
+	width: calc(100% - 32px);
 }
 
 /* Hide any "real" placeholder text */
 .form_field > input[type="text"]::placeholder,
-.form_field > input[type="password"]::placeholder {
+.form_field > input[type="password"]::placeholder,
+.form_field > input[type="email"]::placeholder {
 	user-select: none;
 	color: var(--transparent);
 }
 
-/* Move label text out of input field on focus */
+/* Move label text out of input field on focus.  If there is no placeholder
+   move the label to be top aligned to the field w/o needing focus */
 .form_field > input[type="text"]:focus + label,
-.form_field > input[type="password"]:focus + label,
 .form_field > input[type="text"]:not(:placeholder-shown) + label,
-.form_field > input[type="password"]:not(:placeholder-shown) + label {
+.form_field > input[type="email"]:focus + label,
+.form_field > input[type="email"]:not(:placeholder-shown) + label {
+	font-weight: bold;
 	transform: translate3d(-.5em, -100%, 0) scale(0.75);
+}
+
+/* Password field offset requires special treatment ? */
+.form_field > input[type="password"]:focus + label,
+.form_field > input[type="password"]:not(:placeholder-shown) + label {
+	font-weight: bold;
+	transform: translate3d(-.25em, -100%, 0) scale(0.75);
+}
+
+/* Use around radio, checkboxes, etc to keep them closer to a input text box */
+.form_field_other {
+	margin-top: -.25em;
+	margin-bottom: .5em;
+}
+
+.form_field_checkbox, .form_field_radio, .form_field_select {
+	margin-bottom: .5em;
 }
 
 /* -------------------------------------------------------

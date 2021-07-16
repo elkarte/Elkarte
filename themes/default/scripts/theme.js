@@ -56,7 +56,7 @@ $(function ()
 	// Tooltips
 	if ((!is_mobile && !is_touch) || use_click_menu)
 	{
-		$('.preview').SiteTooltip({hoverIntent: {sensitivity: 10, interval: 750, timeout: 50}});
+		$('.preview').SiteTooltip();
 	}
 
 	// Find all nested linked images and turn off the border

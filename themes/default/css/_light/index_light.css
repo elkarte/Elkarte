@@ -1627,6 +1627,10 @@ li.ui-tab.ui-tabs-active.ui-state-active.ui-state-hover .ui-tabs-anchor {
 	background: var(--invalid);
 }
 
+.check_input {
+	border-color: var(--warn);
+}
+
 /* -------------------------------------------------------
  *	$BOXES
  * -------------------------------------------------------

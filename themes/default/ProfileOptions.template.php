@@ -306,13 +306,79 @@ function template_edit_options()
 				<div>', $context['profile_prehtml'], '</div>';
 	}
 
-	if (!empty($context['profile_fields']))
+	// Profile fields, standard and custom
+	$lastItem = template_profile_options();
+	template_custom_profile_options($lastItem);
+
+	// Any closing HTML?
+	if (!empty($context['profile_posthtml']))
 	{
 		echo '
-				<dl>';
+				<div>', $context['profile_posthtml'], '</div>';
+	}
+
+	// Only show the password box if it's actually needed.
+	template_profile_save();
+
+	echo '
+			</div>
+		</form>';
+
+	// Some javascript!
+	echo '
+		<script>
+			function checkProfileSubmit()
+			{';
+
+	// If this part requires a password, make sure to give a warning.
+	if ($context['require_password'])
+	{
+		echo '
+				// Did you forget to type your password?
+				if (document.forms.creator.oldpasswrd.value === "")
+				{
+					alert("', $txt['required_security_reasons'], '");
+					return false;
+				}';
+	}
+
+	// Any onsubmit javascript?
+	if (!empty($context['profile_onsubmit_javascript']))
+	{
+		echo '
+				', $context['profile_onsubmit_javascript'];
+	}
+
+	echo '
+			}
+		</script>';
+
+	// Any final spellchecking stuff?
+	if (!empty($context['show_spellchecking']))
+	{
+		echo '
+		<form name="spell_form" id="spell_form" method="post" accept-charset="UTF-8" target="spellWindow" action="', getUrl('action', ['action' => 'spellcheck']), '">
+			<input type="hidden" id="spellstring" name="spellstring" value="" />
+			<input type="hidden" id="fulleditor" name="fulleditor" value="" />
+		</form>';
+	}
+}
+
+/**
+ * All of the profile options as defined in profile.subs or via an addon
+ */
+function template_profile_options() {
+	global $context;
+
+	if (empty($context['profile_fields']))
+	{
+		return '';
 	}
 
 	// Start the big old loop 'of love.
+	echo '
+				<dl>';
+
 	$lastItem = 'hr';
 	foreach ($context['profile_fields'] as $key => $field)
 	{
@@ -368,28 +434,25 @@ function template_edit_options()
 				echo '
 						', $field['value'];
 			}
-
 			// Maybe it's a text box - very likely!
 			elseif (in_array($field['type'], array('int', 'float', 'text', 'password')))
 			{
 				echo '
-						<input type="', $field['type'] == 'password' ? 'password' : 'text', '" name="', $key, '" id="', $key, '" size="', empty($field['size']) ? 30 : $field['size'], '" value="', $field['value'], '" ', $field['input_attr'], ' class="input_', $field['type'] == 'password' ? 'password' : 'text', '" />';
+				
+						<input type="', $field['type'] === 'password' ? 'password' : 'text', '" name="', $key, '" id="', $key, '" size="', empty($field['size']) ? 30 : $field['size'], '" value="', $field['value'], '" tabindex="', $context['tabindex']++, '" ', $field['input_attr'], ' class="input_', $field['type'] === 'password' ? 'password' : 'text', '" />';
 			}
-
 			// Maybe it's an html5 input
 			elseif (in_array($field['type'], array('url', 'search', 'date', 'email', 'color')))
 			{
 				echo '
 						<input type="', $field['type'], '" name="', $key, '" id="', $key, '" size="', empty($field['size']) ? 30 : $field['size'], '" value="', $field['value'], '" ', $field['input_attr'], ' class="input_', $field['type'] == 'password' ? 'password' : 'text', '" />';
 			}
-
 			// You "checking" me out? ;)
 			elseif ($field['type'] === 'check')
 			{
 				echo '
-						<input type="hidden" name="', $key, '" value="0" /><input type="checkbox" name="', $key, '" id="', $key, '" ', !empty($field['value']) ? ' checked="checked"' : '', ' value="1" ', $field['input_attr'], ' />';
+				<input type="hidden" name="', $key, '" value="0" /><input type="checkbox" name="', $key, '" id="', $key, '" ', !empty($field['value']) ? ' checked="checked"' : '', ' value="1" tabindex="', $context['tabindex']++, '" ', $field['input_attr'], ' />';
 			}
-
 			// Always fun - select boxes!
 			elseif ($field['type'] === 'select')
 			{
@@ -438,27 +501,39 @@ function template_edit_options()
 		}
 	}
 
-	if (!empty($context['profile_fields']))
-	{
-		echo '
+	echo '
 				</dl>';
+
+	return $lastItem;
+}
+
+/**
+ * Output any custom profile fields
+ *
+ * @param string $lastItem
+ */
+function template_custom_profile_options($lastItem = '')
+{
+	global $context;
+
+	if (empty($context['custom_fields']))
+	{
+		return;
 	}
 
 	// Are there any custom profile fields - if so print them!
-	if (!empty($context['custom_fields']))
+	if ($lastItem !== 'hr')
 	{
-		if ($lastItem !== 'hr')
-		{
-			echo '
-				<hr class="clear" />';
-		}
-
 		echo '
+				<hr class="clear" />';
+	}
+
+	echo '
 				<dl>';
 
-		foreach ($context['custom_fields'] as $field)
-		{
-			echo '
+	foreach ($context['custom_fields'] as $field)
+	{
+		echo '
 					<dt>
 						<strong>', $field['name'], '</strong><br />
 						<span class="smalltext">', $field['desc'], '</span>
@@ -466,64 +541,10 @@ function template_edit_options()
 					<dd>
 						', $field['input_html'], '
 					</dd>';
-		}
-
-		echo '
-				</dl>';
-	}
-
-	// Any closing HTML?
-	if (!empty($context['profile_posthtml']))
-	{
-		echo '
-				<div>', $context['profile_posthtml'], '</div>';
-	}
-
-	// Only show the password box if it's actually needed.
-	template_profile_save();
-
-	echo '
-			</div>
-		</form>';
-
-	// Some javascript!
-	echo '
-		<script>
-			function checkProfileSubmit()
-			{';
-
-	// If this part requires a password, make sure to give a warning.
-	if ($context['require_password'])
-	{
-		echo '
-				// Did you forget to type your password?
-				if (document.forms.creator.oldpasswrd.value === "")
-				{
-					alert("', $txt['required_security_reasons'], '");
-					return false;
-				}';
-	}
-
-	// Any onsubmit javascript?
-	if (!empty($context['profile_onsubmit_javascript']))
-	{
-		echo '
-				', $context['profile_onsubmit_javascript'];
 	}
 
 	echo '
-			}
-		</script>';
-
-	// Any final spellchecking stuff?
-	if (!empty($context['show_spellchecking']))
-	{
-		echo '
-		<form name="spell_form" id="spell_form" method="post" accept-charset="UTF-8" target="spellWindow" action="', getUrl('action', ['action' => 'spellcheck']), '">
-			<input type="hidden" id="spellstring" name="spellstring" value="" />
-			<input type="hidden" id="fulleditor" name="fulleditor" value="" />
-		</form>';
-	}
+			</dl>';
 }
 
 /**

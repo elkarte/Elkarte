@@ -19,6 +19,7 @@ namespace ElkArte\Controller;
 use ElkArte\AbstractController;
 use ElkArte\Errors\Errors;
 use ElkArte\Exceptions\Exception;
+use ElkArte\Themes\ThemeLoader;
 use ElkArte\Util;
 
 /**
@@ -35,7 +36,7 @@ class Reminder extends AbstractController
 	{
 		global $txt, $context;
 
-		\ElkArte\Themes\ThemeLoader::loadLanguageFile('Profile');
+		ThemeLoader::loadLanguageFile('Profile');
 		theme()->getTemplates()->load('Reminder');
 
 		$context['page_title'] = $txt['authentication_reminder'];
@@ -176,7 +177,7 @@ class Reminder extends AbstractController
 	{
 		global $txt, $context;
 
-		\ElkArte\Themes\ThemeLoader::loadLanguageFile('Login');
+		ThemeLoader::loadLanguageFile('Login');
 
 		// You need a code!
 		if (!isset($this->_req->query->code))
@@ -229,7 +230,7 @@ class Reminder extends AbstractController
 		$member_id = $this->_req->getPost('u', 'intval', -1);
 		$code = $this->_req->getPost('code', 'trim', '');
 
-		\ElkArte\Themes\ThemeLoader::loadLanguageFile('Login');
+		ThemeLoader::loadLanguageFile('Login');
 
 		// Get the code as it should be from the database.
 		require_once(SUBSDIR . '/Members.subs.php');
@@ -308,7 +309,7 @@ class Reminder extends AbstractController
 			throw new Exception('username_no_exist', false);
 		}
 
-		\ElkArte\Themes\ThemeLoader::loadLanguageFile('Login');
+		ThemeLoader::loadLanguageFile('Login');
 
 		// Get the information from the database.
 		require_once(SUBSDIR . '/Members.subs.php');
@@ -381,7 +382,7 @@ function secretAnswerInput()
 	checkSession();
 
 	// Strings for the register auto javascript clever stuffy wuffy.
-	\ElkArte\Themes\ThemeLoader::loadLanguageFile('Login');
+	ThemeLoader::loadLanguageFile('Login');
 
 	// Check they entered something...
 	if (empty($_POST['uid']))

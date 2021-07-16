@@ -261,7 +261,7 @@ $txt['no_reminder_email'] = 'Unable to send reminder email.';
 $txt['send_email'] = 'Send an email to';
 $txt['to_ask_password'] = 'to ask for your authentication details';
 
-$txt['user_email'] = 'Username/Email';
+$txt['user_email'] = 'Username -or- Email';
 
 // Use numeric entities in the below two strings.
 $txt['reminder_sent'] = 'A mail has been sent to your email address. Click the link in that mail to set a new password.';

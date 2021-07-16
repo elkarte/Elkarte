@@ -331,11 +331,11 @@ class IlaIntegrate
 			else
 			{
 				// Not an image, determine a mime or use a default thumbnail
-				$check = returnMimeThumb((isset($is_image['fileext']) ? $is_image['fileext'] : ''), true);
+				$check = returnMimeThumb(($is_image['fileext'] ?? ''), true);
 
 				if ($is_image === false)
 				{
-					$data = '<img src="' . $check . '" alt="' . $is_image['filename'] . '" class="bbc_img" />';
+					$data = '<img src="' . $check . '" alt="X" class="bbc_img" />';
 				}
 				else
 				{

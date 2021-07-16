@@ -425,13 +425,7 @@ class Recent extends AbstractController implements FrontpageInterface
 					}),
 				});
 
-				$(".like_button, .unlike_button, .likes_button").SiteTooltip({
-					hoverIntent: {
-						sensitivity: 10,
-						interval: 150,
-						timeout: 50
-					}
-				});
+				$(".like_button, .unlike_button, .likes_button").SiteTooltip();
 			});', true);
 	}
 
