@@ -18,6 +18,7 @@
 namespace ElkArte;
 
 use BBC\ParserWrapper;
+use ElkArte\Cache\Cache;
 
 /**
  * This class fetches all the stuff needed to build a list of boards
@@ -29,14 +30,14 @@ class BoardsList
 	 *
 	 * @var mixed[]
 	 */
-	private $_options = array();
+	private $_options;
 
 	/**
 	 * Some data regarding the current user
 	 *
 	 * @var mixed[]
 	 */
-	private $_user = array();
+	private $_user;
 
 	/**
 	 * Holds the info about the latest post of the series
@@ -74,13 +75,6 @@ class BoardsList
 	private $_images_url;
 
 	/**
-	 * A string with session data to be used in urls
-	 *
-	 * @var string
-	 */
-	private $_session_url = '';
-
-	/**
 	 * Cut the subject at this number of chars, set from modSettings
 	 *
 	 * @var int
@@ -99,18 +93,18 @@ class BoardsList
 	 *
 	 * @var object
 	 */
-	private $_db = null;
+	private $_db;
 
 	/**
 	 * Initialize the class
 	 *
 	 * @param mixed[] $options - Available options and corresponding defaults are:
-	 *       'include_categories' => false
-	 *       'countChildPosts' => false
-	 *       'base_level' => false
-	 *       'parent_id' => 0
-	 *       'set_latest_post' => false
-	 *       'get_moderators' => true
+	 *   - 'include_categories' => false
+	 *   - 'countChildPosts' => false
+	 *   - 'base_level' => false
+	 *   - 'parent_id' => 0
+	 *   - 'set_latest_post' => false
+	 *   - 'get_moderators' => true
 	 */
 	public function __construct($options)
 	{
@@ -126,9 +120,7 @@ class BoardsList
 		), $options);
 
 		$this->_options['avatars_on_indexes'] = !empty($settings['avatars_on_indexes']) && $settings['avatars_on_indexes'] !== 2;
-
 		$this->_images_url = $settings['images_url'] . '/' . $context['theme_variant_url'];
-		$this->_session_url = $context['session_var'] . '=' . $context['session_id'];
 
 		if (!empty($modSettings['subject_length']))
 		{
@@ -179,7 +171,7 @@ class BoardsList
 
 		// Find all boards and categories, as well as related information.
 		$request = $this->_db->fetchQuery('
-			SELECT' . ($this->_options['include_categories'] ? '
+			SELECT ' . ($this->_options['include_categories'] ? '
 				c.id_cat, c.name AS cat_name, c.cat_order,' : '') . '
 				b.id_board, b.name AS board_name, b.description, b.board_order,
 				CASE WHEN b.redirect != {string:blank_string} THEN 1 ELSE 0 END AS is_redirect,
@@ -470,10 +462,11 @@ class BoardsList
 		$boards = array_keys($this->_boards);
 		$mod_cached = array();
 
-		if (!Cache\Cache::instance()->getVar($mod_cached, 'localmods_' . md5(implode(',', $boards)), 3600))
+		if (!Cache::instance()->getVar($mod_cached, 'localmods_' . md5(implode(',', $boards)), 3600))
 		{
 			$request = $this->_db->fetchQuery('
-				SELECT mods.id_board, COALESCE(mods_mem.id_member, 0) AS id_moderator, mods_mem.real_name AS mod_real_name
+				SELECT 
+					mods.id_board, COALESCE(mods_mem.id_member, 0) AS id_moderator, mods_mem.real_name AS mod_real_name
 				FROM {db_prefix}moderators AS mods
 					LEFT JOIN {db_prefix}members AS mods_mem ON (mods_mem.id_member = mods.id_member)
 				WHERE mods.id_board IN ({array_int:id_boards})',
@@ -483,7 +476,7 @@ class BoardsList
 			);
 			$mod_cached = $request->fetch_all();
 
-			Cache\Cache::instance()->put('localmods_' . md5(implode(',', $boards)), $mod_cached, 3600);
+			Cache::instance()->put('localmods_' . md5(implode(',', $boards)), $mod_cached, 3600);
 		}
 
 		foreach ($mod_cached as $row_mods)
@@ -515,9 +508,7 @@ class BoardsList
 		{
 			return array();
 		}
-		else
-		{
-			return $this->_latest_post;
-		}
+
+		return $this->_latest_post;
 	}
 }

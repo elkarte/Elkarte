@@ -27,7 +27,6 @@ use ElkArte\Util;
  * @param bool $unread = false
  * @param bool $resetTopics = false
  * @package Boards
- * @throws \ElkArte\Exceptions\Exception
  */
 function markBoardsRead($boards, $unread = false, $resetTopics = false)
 {
@@ -214,7 +213,7 @@ function getMsgMemberID($messageID)
  * @param int $board_id
  * @param mixed[] $boardOptions
  *
- * @throws \ElkArte\Exceptions\Exception no_board
+ * @throws \ElkArte\Exceptions\Exception no_board, mboards_board_own_child_error
  * @package Boards
  *
  */
@@ -251,16 +250,15 @@ function modifyBoard($board_id, &$boardOptions)
 	if (isset($boardOptions['move_to']))
 	{
 		// Move the board to the top of a given category.
-		if ($boardOptions['move_to'] == 'top')
+		if ($boardOptions['move_to'] === 'top')
 		{
 			$id_cat = $boardOptions['target_category'];
 			$child_level = 0;
 			$id_parent = 0;
 			$after = $cat_tree[$id_cat]['last_board_order'];
 		}
-
 		// Move the board to the bottom of a given category.
-		elseif ($boardOptions['move_to'] == 'bottom')
+		elseif ($boardOptions['move_to'] === 'bottom')
 		{
 			$id_cat = $boardOptions['target_category'];
 			$child_level = 0;
@@ -271,9 +269,8 @@ function modifyBoard($board_id, &$boardOptions)
 				$after = max($after, $boards[$id_board]['order']);
 			}
 		}
-
 		// Make the board a child of a given board.
-		elseif ($boardOptions['move_to'] == 'child')
+		elseif ($boardOptions['move_to'] === 'child')
 		{
 			$id_cat = $boards[$boardOptions['target_board']]['category'];
 			$child_level = $boards[$boardOptions['target_board']]['level'] + 1;
@@ -300,7 +297,6 @@ function modifyBoard($board_id, &$boardOptions)
 				}
 			}
 		}
-
 		// Place a board before or after another board, on the same child level.
 		elseif (in_array($boardOptions['move_to'], array('before', 'after')))
 		{
@@ -309,7 +305,6 @@ function modifyBoard($board_id, &$boardOptions)
 			$id_parent = $boards[$boardOptions['target_board']]['parent'];
 			$after = $boards[$boardOptions['target_board']]['order'] - ($boardOptions['move_to'] == 'before' ? 1 : 0);
 		}
-
 		// Oops...?
 		else
 		{
@@ -552,7 +547,6 @@ function modifyBoard($board_id, &$boardOptions)
  *
  * @param mixed[] $boardOptions
  * @return int The new board id
- * @throws \ElkArte\Exceptions\Exception
  * @package Boards
  */
 function createBoard($boardOptions)
@@ -654,8 +648,7 @@ function createBoard($boardOptions)
  *                if false the boards are returned in an array subdivided by categories including also
  *                additional data like the number of boards
  * @return array An array of boards sorted according to the normal boards order
- * @throws \ElkArte\Exceptions\Exception
- *@package Boards
+ * @package Boards
  */
 function getBoardList($boardListOptions = array(), $simple = false)
 {
@@ -880,7 +873,6 @@ function recursiveBoards($tree)
  * @param int $id_member the member id
  * @param int $id_board the board to check
  * @return bool if they have notifications turned on for the board
- * @throws \ElkArte\Exceptions\Exception
  */
 function hasBoardNotification($id_member, $id_board)
 {
@@ -911,7 +903,6 @@ function hasBoardNotification($id_member, $id_board)
  * @param int $id_member
  * @param int $id_board
  * @param bool $on = false
- * @throws \ElkArte\Exceptions\Exception
  * @package Boards
  */
 function setBoardNotification($id_member, $id_board, $on = false)
@@ -954,7 +945,6 @@ function setBoardNotification($id_member, $id_board, $on = false)
  * @param int $id_board
  * @param bool $check = true check if the user has notifications enabled for the board
  * @return bool if the board was marked for notifications
- * @throws \ElkArte\Exceptions\Exception
  * @package Boards
  */
 function resetSentBoardNotification($id_member, $id_board, $check = true)
@@ -1014,7 +1004,6 @@ function resetSentBoardNotification($id_member, $id_board, $check = true)
  *
  * @param int $memID
  * @return int
- * @throws \ElkArte\Exceptions\Exception
  * @package Boards
  */
 function getBoardNotificationsCount($memID)
@@ -1052,7 +1041,6 @@ function getBoardNotificationsCount($memID)
  * @param int[]|null $id_boards
  *
  * @return array
- * @throws \ElkArte\Exceptions\Exception
  * @package Boards
  *
  */
@@ -1100,7 +1088,6 @@ function accessibleBoards($id_boards = null, $id_parents = null)
 			array()
 		);
 	}
-
 	while (($row = $request->fetch_assoc()))
 	{
 		$boards[] = $row['id_board'];
@@ -1117,7 +1104,6 @@ function accessibleBoards($id_boards = null, $id_parents = null)
  * @param bool $hide_recycle is tru the recycle bin is not returned
  *
  * @return array
- * @throws \Exception
  * @package Boards
  *
  */
@@ -1157,7 +1143,6 @@ function wantedBoards($see_board, $hide_recycle = true)
  * @param int $board_id
  * @param int|null $topic_id
  * @return mixed[]
- * @throws \ElkArte\Exceptions\Exception
  * @package Boards
  */
 function boardInfo($board_id, $topic_id = null)
@@ -1212,7 +1197,6 @@ function boardInfo($board_id, $topic_id = null)
  * @param int $curBoard
  * @param bool $new_board = false Whether this is a new board
  * @return array
- * @throws \Exception
  * @package Boards
  */
 function getOtherGroups($curBoard, $new_board = false)
@@ -1258,7 +1242,6 @@ function getOtherGroups($curBoard, $new_board = false)
  * @param int $idboard
  * @param bool $only_id return only the id of the moderators instead of id and name (default false)
  * @return array
- * @throws \Exception
  * @package Boards
  */
 function getBoardModerators($idboard, $only_id = false)
@@ -1309,7 +1292,6 @@ function getBoardModerators($idboard, $only_id = false)
  * @param bool $only_id return array with key of id_member of the moderator(s)
  * otherwise array with key of id_board id (default false)
  * @return array
- * @throws \ElkArte\Exceptions\Exception
  * @package Boards
  */
 function allBoardModerators($only_id = false)
@@ -1359,7 +1341,6 @@ function allBoardModerators($only_id = false)
  *
  * @param int $id_member the id of a member
  * @return array
- * @throws \Exception
  * @package Boards
  */
 function boardsModerated($id_member)
@@ -1385,7 +1366,6 @@ function boardsModerated($id_member)
  * Get all available themes
  *
  * @return array
- * @throws \Exception
  * @package Boards
  */
 function getAllThemes()
@@ -1409,7 +1389,6 @@ function getAllThemes()
  *
  * @param int $idboard
  * @return array
- * @throws \ElkArte\Exceptions\Exception
  * @package Boards
  */
 function getBoardProperties($idboard)
@@ -1442,7 +1421,6 @@ function getBoardProperties($idboard)
  * @param bool $include_recycle if false excludes any results from the recycle board (if enabled)
  *
  * @return array
- * @throws \Exception
  * @package Boards
  *
  */
@@ -1543,7 +1521,6 @@ function sumRecentPosts()
  *              'include_redirects' => (bool) redirects are included (default true)
  *
  * @return array
- * @throws \ElkArte\Exceptions\Exception
  * @package Boards
  *
  * @todo unify the two queries?
@@ -1664,7 +1641,6 @@ function fetchBoardsInfo($conditions = 'all', $params = array())
  * is returned through the param itself, starting from 1.1 the expected behaviour
  * is that the result is returned.
  * @return bool|int[]
- * @throws \Exception
  * @package Boards
  */
 function addChildBoards($boards)
@@ -1711,7 +1687,6 @@ function addChildBoards($boards)
  *
  * @param int $id_board
  * @param mixed[]|string $values an array of index => value of a string representing the index to increment
- * @throws \ElkArte\Exceptions\Exception
  * @package Boards
  */
 function incrementBoard($id_board, $values)
@@ -1758,7 +1733,6 @@ function incrementBoard($id_board, $values)
  *
  * @param int $id_board
  * @param mixed[]|string $values an array of index => value of a string representing the index to decrement
- * @throws \ElkArte\Exceptions\Exception
  * @package Boards
  */
 function decrementBoard($id_board, $values)
@@ -1811,7 +1785,6 @@ function decrementBoard($id_board, $values)
  * @param int $memID id_member
  *
  * @return array
- * @throws \Exception
  * @package Boards
  *
  */
@@ -1895,7 +1868,6 @@ function boardNotifications($sort, $memID)
  *              'include_recycle' => (bool) recycle board is included (default true)
  *              'include_redirects' => (bool) redirects are included (default true)
  * @return int
- * @throws \ElkArte\Exceptions\Exception
  * @package Boards
  */
 function countBoards($conditions = 'all', $params = array())
