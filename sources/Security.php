@@ -761,7 +761,7 @@ function checkSession($type = 'post', $from_action = '', $is_fatal = true)
 	// Is it in as $_POST['sc']?
 	if ($type === 'post')
 	{
-		$check = isset($_POST[$_SESSION['session_var']]) ? $_POST[$_SESSION['session_var']] : (empty($modSettings['strictSessionCheck']) && isset($_POST['sc']) ? $_POST['sc'] : null);
+		$check = $_POST[$_SESSION['session_var']] ?? (empty($modSettings['strictSessionCheck']) && isset($_POST['sc']) ? $_POST['sc'] : null);
 		if ($check !== $_SESSION['session_value'])
 		{
 			$error = 'session_timeout';
@@ -770,7 +770,7 @@ function checkSession($type = 'post', $from_action = '', $is_fatal = true)
 	// How about $_GET['sesc']?
 	elseif ($type === 'get')
 	{
-		$check = isset($_GET[$_SESSION['session_var']]) ? $_GET[$_SESSION['session_var']] : (empty($modSettings['strictSessionCheck']) && isset($_GET['sesc']) ? $_GET['sesc'] : null);
+		$check = $_GET[$_SESSION['session_var']] ?? (empty($modSettings['strictSessionCheck']) && isset($_GET['sesc']) ? $_GET['sesc'] : null);
 		if ($check !== $_SESSION['session_value'])
 		{
 			$error = 'session_verify_fail';
@@ -779,7 +779,7 @@ function checkSession($type = 'post', $from_action = '', $is_fatal = true)
 	// Or can it be in either?
 	elseif ($type === 'request')
 	{
-		$check = isset($_GET[$_SESSION['session_var']]) ? $_GET[$_SESSION['session_var']] : (empty($modSettings['strictSessionCheck']) && isset($_GET['sesc']) ? $_GET['sesc'] : (isset($_POST[$_SESSION['session_var']]) ? $_POST[$_SESSION['session_var']] : (empty($modSettings['strictSessionCheck']) && isset($_POST['sc']) ? $_POST['sc'] : null)));
+		$check = $_GET[$_SESSION['session_var']] ?? (empty($modSettings['strictSessionCheck']) && isset($_GET['sesc']) ? $_GET['sesc'] : (isset($_POST[$_SESSION['session_var']]) ? $_POST[$_SESSION['session_var']] : (empty($modSettings['strictSessionCheck']) && isset($_POST['sc']) ? $_POST['sc'] : null)));
 
 		if ($check !== $_SESSION['session_value'])
 		{
@@ -970,7 +970,7 @@ function validateToken($action, $type = 'post', $reset = true, $fatal = true)
 	$req = request();
 
 	// Shortcut
-	$passed_token_var = isset($GLOBALS['_' . strtoupper($type)][$_SESSION['token'][$token_index][0]]) ? $GLOBALS['_' . strtoupper($type)][$_SESSION['token'][$token_index][0]] : null;
+	$passed_token_var = $GLOBALS['_' . strtoupper($type)][$_SESSION['token'][$token_index][0]] ?? null;
 	$csrf_hash = hash('sha1', $passed_token_var . $req->client_ip() . $req->user_agent());
 
 	// Checked what was passed in combination with the user agent
