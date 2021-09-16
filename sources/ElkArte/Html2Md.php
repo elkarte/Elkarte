@@ -176,7 +176,6 @@ class Html2Md
 		// Wordwrap?
 		if (!empty($this->body_width))
 		{
-			$this->_check_line_lenght($this->markdown);
 			$this->markdown = $this->_utf8_wordwrap($this->markdown, $this->body_width, $this->line_end);
 		}
 
@@ -279,7 +278,7 @@ class Html2Md
 
 		// Strip the chaff and any excess blank lines we may have produced
 		$this->markdown = trim($this->markdown);
-		$this->markdown = preg_replace("~(\n(\s)?){3,}~", "\n\n", $this->markdown);
+		$this->markdown = preg_replace("~(\n[\s]+){3,}~", "\n\n", $this->markdown);
 		$this->markdown = preg_replace("~(^\s\s\n){3,}~m", "  \n  \n", $this->markdown);
 		$this->markdown = preg_replace("~(^\s\s\r?\n){3,}~m", "  \n  \n", $this->markdown);
 		$this->markdown = preg_replace("~(^\s\s(?:\r?\n){2}){3,}~m", "  \n  \n", $this->markdown);
@@ -475,23 +474,27 @@ class Html2Md
 			case 'p':
 				if (!$node->hasChildNodes())
 				{
-					$markdown = str_replace("\n", ' ', $this->_get_value($node)) . $this->line_break;
+					$markdown = str_replace("\n", ' ', $this->_get_value($node));
 					$markdown = $this->_escape_text($markdown);
 				}
 				else
 				{
-					$markdown = rtrim($this->_get_value($node)) . $this->line_break;
+					$markdown = rtrim($this->_get_value($node));
 				}
+
+				$markdown = $this->_utf8_wordwrap($markdown, $this->body_width, $this->line_end) . $this->line_break;
 				break;
 			case 'pre':
 				$markdown = $this->_get_value($node) . $this->line_break;
 				break;
 			case 'div':
-				$markdown = $this->line_end . $this->_get_value($node) . $this->line_end;
+				$markdown = $this->line_end . $this->_get_value($node);
 				if (!$node->hasChildNodes())
 				{
 					$markdown = $this->_escape_text($markdown);
 				}
+
+				$markdown = $this->_utf8_wordwrap($markdown, $this->body_width, $this->line_end) . $this->line_end;
 				break;
 			//case '#text':
 			//  $markdown = $this->_escape_text($this->_get_value($node));
@@ -594,6 +597,8 @@ class Html2Md
 		{
 			$markdown = '[' . $value . ']( ' . $href . ' )';
 		}
+
+		$this->_check_line_lenght($markdown);
 
 		return $markdown;
 	}
