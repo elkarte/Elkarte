@@ -9,7 +9,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.1
+ * @version 1.1.8
  *
  */
 
@@ -156,6 +156,7 @@ function template_manage_boards()
 			token: {token_var: "' . $context['admin-sort_token_var'] . '", token_id: "' . $context['admin-sort_token'] . '"},
 			tag: "' . implode(' ul,', $sortables) . ' ul",
 			connect: ".nolist",
+			tolerance: "pointer",
 			containment: "document",
 			href: "?action=admin;area=manageboards",
 			placeholder: "ui-state-highlight",
