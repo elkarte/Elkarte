@@ -11,7 +11,7 @@
  * copyright:    2011 Simple Machines (http://www.simplemachines.org)
  * license:      BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.1.6
+ * @version 1.1.8
  *
  */
 
@@ -166,8 +166,8 @@ class Theme extends \Theme
 	{
 		global $modSettings, $settings;
 
-		// Using a specified version of jquery or what was shipped 3.1.1  / 1.12.1
-		$jquery_version = (!empty($modSettings['jquery_default']) && !empty($modSettings['jquery_version'])) ? $modSettings['jquery_version'] : '3.1.1';
+		// Using a specified version of jquery or what was shipped 3.6.0  / 1.12.1
+		$jquery_version = (!empty($modSettings['jquery_default']) && !empty($modSettings['jquery_version'])) ? $modSettings['jquery_version'] : '3.6.0';
 		$jqueryui_version = (!empty($modSettings['jqueryui_default']) && !empty($modSettings['jqueryui_version'])) ? $modSettings['jqueryui_version'] : '1.12.1';
 
 		switch ($modSettings['jquery_source'])
