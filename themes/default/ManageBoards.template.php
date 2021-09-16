@@ -173,6 +173,7 @@ function template_manage_boards()
 			token: {token_var: "' . $context['admin-sort_token_var'] . '", token_id: "' . $context['admin-sort_token'] . '"},
 			tag: "' . implode(' ul,', $sortables) . ' ul",
 			connect: ".nolist",
+			tolerance: "pointer",
 			containment: "document",
 			tolerance: "pointer",
 			href: "?action=admin;area=manageboards",
