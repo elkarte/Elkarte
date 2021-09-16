@@ -363,5 +363,6 @@ class Mentioning extends AbstractModel
 		}
 
 		return $success;
+		require_once(SUBSDIR . '/Mentions.subs.php');
 	}
 }

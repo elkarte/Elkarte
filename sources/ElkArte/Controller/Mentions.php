@@ -7,7 +7,11 @@
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause (see accompanying LICENSE.txt file)
  *
+<<<<<<< HEAD:sources/ElkArte/Controller/Mentions.php
  * @version 2.0 dev
+=======
+ * @version 1.1.8
+>>>>>>> 5667d796a (! fix #3499):sources/controllers/Mentions.controller.php
  *
  */
 
@@ -131,7 +135,13 @@ class Mentions extends AbstractController
 			return array();
 		}
 
+<<<<<<< HEAD:sources/ElkArte/Controller/Mentions.php
 		return array_filter(array_unique(explode(',', $modSettings['enabled_mentions'])));
+=======
+		$this->_known_mentions = $this->_findMentionTypes();
+
+		require_once(SUBSDIR . '/Mentions.subs.php');
+>>>>>>> 5667d796a (! fix #3499):sources/controllers/Mentions.controller.php
 	}
 
 	/**
