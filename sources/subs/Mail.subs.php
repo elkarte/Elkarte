@@ -519,6 +519,7 @@ function mimespecialchars($string, $with_charset = true, $hotmail_fix = false, $
 	elseif (!$hotmail_fix && preg_match('~([^\x09\x0A\x0D\x20-\x7F])~', $string) === 1)
 	{
 		// Base64 encode.
+		$string = str_replace("\x00", '', $string);
 		$string = base64_encode($string);
 
 		$string = $with_charset
