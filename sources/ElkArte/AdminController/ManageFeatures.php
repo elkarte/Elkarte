@@ -298,6 +298,9 @@ class ManageFeatures extends AbstractController
 			// Setting a custom frontpage, set the hook to the FrontpageInterface of the controller
 			if (!empty($this->_req->post->front_page))
 			{
+				// Addons may have left this blank
+				$modSettings['front_page'] = empty($modSettings['front_page']) ? 'MessageIndex_Controller' : $modSettings['front_page'];
+
 				$front_page = (string) $this->_req->post->front_page;
 				if (
 					class_exists($modSettings['front_page'])
