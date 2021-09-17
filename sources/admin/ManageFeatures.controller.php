@@ -11,7 +11,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.1.7
+ * @version 1.1.8
  *
  */
 
@@ -225,6 +225,9 @@ class ManageFeatures_Controller extends Action_Controller
 			// Setting a custom frontpage, set the hook to the FrontpageInterface of the controller
 			if (!empty($this->_req->post->front_page))
 			{
+				// Addons may have left this blank
+				$modSettings['front_page'] = empty($modSettings['front_page']) ? 'MessageIndex_Controller' : $modSettings['front_page'];
+
 				$front_page = (string) $this->_req->post->front_page;
 				if (
 					class_exists($modSettings['front_page'])
