@@ -103,6 +103,7 @@ $txt['disableHostnameLookup'] = 'Disable hostname lookups';
 $txt['who_enabled'] = 'Enable who\'s online list';
 $txt['settings_error'] = 'Warning: Updating of Settings.php failed, the settings cannot be saved.';
 $txt['core_settings_saved'] = 'The settings were successfully saved';
+$txt['action'] = 'Current Action';
 
 $txt['karmaMode'] = 'Karma mode';
 $txt['karma_options'] = 'Disable karma|Enable karma total|Enable karma positive/negative';
