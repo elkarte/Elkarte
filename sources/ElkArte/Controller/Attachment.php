@@ -194,7 +194,7 @@ class Attachment extends AbstractController
 	 */
 	public function action_rmattach()
 	{
-		global $context, $txt;
+		global $context, $txt, $user_info;
 
 		// Prepare the template so we can respond with json
 		$template_layers = theme()->getLayers();
@@ -237,7 +237,10 @@ class Attachment extends AbstractController
 			if ($result !== true)
 			{
 				require_once(SUBSDIR . '/ManageAttachments.subs.php');
-				$result_tmp = removeAttachments(array('id_attach' => $this->_req->getPost('attachid', 'intval')), '', true);
+				$attachId = $this->_req->getPost('attachid', 'intval');
+				if (canRemoveAttachment($attachId, $user_info['id']))
+				{
+					$result_tmp = removeAttachments(array('id_attach' => $attachId), '', true);
 				if (!empty($result_tmp))
 				{
 					$context['json_data'] = array('result' => true);
