@@ -11,7 +11,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.1.7
+ * @version 1.1.8
  *
  */
 
@@ -92,10 +92,10 @@ class Bootstrap
 		define('ELKBOOT', '1');
 
 		// The software version
-		define('FORUM_VERSION', 'ElkArte 1.1.7');
+		define('FORUM_VERSION', 'ElkArte 1.1.8');
 
 		// Shortcut for the browser cache stale
-		define('CACHE_STALE', '?R117');
+		define('CACHE_STALE', '?R118');
 	}
 
 	/**

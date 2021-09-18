@@ -7,7 +7,7 @@
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
- * @version 1.1.7
+ * @version 1.1.8
  *
  */
 
@@ -164,6 +164,8 @@ class Mentions_Controller extends Action_Controller
 		);
 
 		$this->_known_mentions = $this->_findMentionTypes();
+
+		require_once(SUBSDIR . '/Mentions.subs.php');
 	}
 
 	/**

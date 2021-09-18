@@ -7,7 +7,7 @@
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
- * @version 1.1.7
+ * @version 1.1.8
  *
  */
 
@@ -320,6 +320,7 @@ class Mentioning extends AbstractModel
 	protected function _updateMenuCount($status, $member_id)
 	{
 		require_once(SUBSDIR . '/Members.subs.php');
+		require_once(SUBSDIR . '/Mentions.subs.php');
 
 		// If its new add to our menu count
 		if ($status === 0)

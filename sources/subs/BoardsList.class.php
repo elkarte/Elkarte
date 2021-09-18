@@ -12,7 +12,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.1.6
+ * @version 1.1.8
  *
  */
 
@@ -302,7 +302,8 @@ class Boards_List
 				}
 
 				// Does this board contain new boards?
-				$this->_current_boards[$row_board['id_parent']]['children_new'] |= empty($row_board['is_read']);
+				$is_read = empty($row_board['is_read']);
+				$this->_current_boards[$row_board['id_parent']]['children_new'] |= $is_read;
 
 				// This is easier to use in many cases for the theme....
 				$this->_current_boards[$row_board['id_parent']]['link_children'][] = &$this->_current_boards[$row_board['id_parent']]['children'][$row_board['id_board']]['link'];
