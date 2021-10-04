@@ -1,0 +1,18 @@
+<?xml version="1.0"?>
+<!DOCTYPE package-info SYSTEM "https://www.elkarte.net/site/package-info">
+<package-info xmlns="https://www.elkarte.net/site/package-info" xmlns:elk="https://www.elkarte.net/">
+	<id>Elkarte Contributors:ElkArte_118_patch</id>
+	<name>ElkArte 1.1.8 patch</name>
+	<version>1.0</version>
+	<type>modification</type>
+		<install for="1.1.7">
+			<require-file name="1.1.8/jquery-3.6.0.min.js" destination="THEMEDIR/scripts" />
+			<modification>modifications.xml</modification>
+			<code>code.php</code>
+		</install>
+		<uninstall for="1.1.8">
+			<require-file name="1.1.7/jquery-3.1.1.min.js" destination="THEMEDIR/scripts" />
+			<remove-file name="THEMEDIR/scripts/jquery-3.6.0.min.js" />
+			<modification reverse="true">modifications.xml</modification>
+		</uninstall>
+</package-info>
