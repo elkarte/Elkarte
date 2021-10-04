@@ -11,7 +11,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.1.7
+ * @version 1.1.8
  *
  */
 
@@ -179,7 +179,7 @@ class Attachment_Controller extends Action_Controller
 	 */
 	public function action_rmattach()
 	{
-		global $context, $txt;
+		global $context, $txt, $user_info;
 
 		// Prepare the template so we can respond with json
 		$template_layers = Template_Layers::instance();
@@ -216,15 +216,19 @@ class Attachment_Controller extends Action_Controller
 			if ($result !== true)
 			{
 				require_once(SUBSDIR . '/ManageAttachments.subs.php');
-				$result_tmp = removeAttachments(array('id_attach' => $this->_req->getPost('attachid', 'intval')), '', true);
-				if (!empty($result_tmp))
+				$attachId = $this->_req->getPost('attachid', 'intval');
+				if (canRemoveAttachment($attachId, $user_info['id']))
 				{
-					$context['json_data'] = array('result' => true);
-					$result = true;
-				}
-				else
-				{
-					$result = $result_tmp;
+					$result_tmp = removeAttachments(array('id_attach' => $attachId), '', true);
+					if (!empty($result_tmp))
+					{
+						$context['json_data'] = array('result' => true);
+						$result = true;
+					}
+					else
+					{
+						$result = $result_tmp;
+					}
 				}
 			}
 
