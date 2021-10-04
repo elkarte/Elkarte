@@ -1,0 +1,53 @@
+<?xml version="1.0"?>
+<!DOCTYPE package-info SYSTEM "https://www.elkarte.net/site/package-info">
+<package-info xmlns="https://www.elkarte.net/site/package-info" xmlns:elk="https://www.elkarte.net/">
+	<id>Elkarte Contributors:ElkArte_117_patch</id>
+	<name>ElkArte 1.1.7 patch</name>
+	<version>1.0</version>
+	<type>modification</type>
+		<install for="1.1.6">
+			<modification>modifications.xml</modification>
+			<require-file name="1.1.7/elkServiceWorker.min.js" destination="BOARDDIR" />
+			<require-file name="1.1.7/JSqueeze.php" destination="EXTDIR" />
+			<require-dir name="1.1.7/cssmin" destination="EXTDIR" />
+			<require-dir name="1.1.7/markdown" destination="EXTDIR" />
+			<require-dir name="1.1.7/post" destination="IMAGESDIR" />
+			<require-file name="1.1.7/bad-behavior/badbehavior-plugin.php" destination="EXTDIR/bad-behavior" />
+			<require-file name="1.1.7/simple_html_dom.php" destination="EXTDIR" />
+			<require-file name="1.1.7/fontawesome-webfont.woff2" destination="THEMEDIR/webfonts" />
+			<require-file name="1.1.7/jquery.sceditor.bbcode.min.js" destination="THEMEDIR/scripts" />
+			<require-file name="1.1.7/jquery.sceditor.elkarte.js" destination="THEMEDIR/scripts" />
+			<require-file name="1.1.7/push.min.js" destination="THEMEDIR/scripts" />
+			<code>code.php</code>
+		</install>
+		<uninstall for="1.1.7">
+			<remove-file name="BOARDDIR/elkServiceWorker.min.js" />
+			<require-file name="1.1.6/JSqueeze.php" destination="EXTDIR" />
+			<require-file name="1.1.6/cssmin.php" destination="EXTDIR" />
+			<remove-file name="EXTDIR/cssmin/README.md" />
+			<remove-file name="EXTDIR/cssmin/tubalmartin/Colors.php" />
+			<remove-file name="EXTDIR/cssmin/tubalmartin/Command.php" />
+			<remove-file name="EXTDIR/cssmin/tubalmartin/Minifier.php" />
+			<remove-file name="EXTDIR/cssmin/tubalmartin/Utils.php" />
+			<remove-file name="THEMEDIR/scripts/push.min.js" />
+			<remove-dir name="EXTDIR/cssmin" />
+			<require-file name="1.1.6/markdown/markdown.php" destination="EXTDIR/markdown" />
+			<require-file name="1.1.6/markdown/Readme.md" destination="EXTDIR/markdown" />
+			<require-file name="1.1.6/markdown/License.md" destination="EXTDIR/markdown" />
+			<require-file name="1.1.6/markdown/Michelf/Markdown.php" destination="EXTDIR/markdown/Michelf" />
+			<require-file name="1.1.6/markdown/Michelf/MarkdownExtra.php" destination="EXTDIR/markdown/Michelf" />
+			<require-file name="1.1.6/markdown/Michelf/MarkdownInterface.php" destination="EXTDIR/markdown/Michelf" />
+			<require-file name="1.1.6/bad-behavior/badbehavior-plugin.php" destination="EXTDIR/bad-behavior" />
+			<require-file name="1.1.6/simple_html_dom.php" destination="EXTDIR" />
+			<require-file name="1.1.6/fontawesome-webfont.woff2" destination="THEMEDIR/webfonts" />
+			<require-file name="1.1.6/angry.png" destination="IMAGESDIR/post" />
+			<require-file name="1.1.6/cheesy.png" destination="IMAGESDIR/post" />
+			<require-file name="1.1.6/grin.png" destination="IMAGESDIR/post" />
+			<require-file name="1.1.6/sad.png" destination="IMAGESDIR/post" />
+			<require-file name="1.1.6/smiley.png" destination="IMAGESDIR/post" />
+			<require-file name="1.1.6/wink.png" destination="IMAGESDIR/post" />
+			<require-file name="1.1.6/jquery.sceditor.bbcode.min.js" destination="THEMEDIR/scripts" />
+			<require-file name="1.1.6/jquery.sceditor.elkarte.js" destination="THEMEDIR/scripts" />
+			<modification reverse="true">modifications.xml</modification>
+		</uninstall>
+</package-info>

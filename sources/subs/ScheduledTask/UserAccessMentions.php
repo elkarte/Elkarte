@@ -7,7 +7,7 @@
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
- * @version 1.1.7
+ * @version 1.1.8
  *
  */
 
@@ -49,16 +49,16 @@ class User_Access_Mentions implements Scheduled_Task_Interface
 		// This should be set only because of an immediate scheduled task, so higher priority
 		if (!empty($user_access_mentions))
 		{
+			// Just a touch of needy
+			require_once(SUBSDIR . '/Boards.subs.php');
+			require_once(SUBSDIR . '/Mentions.subs.php');
+			require_once(SUBSDIR . '/Members.subs.php');
+
 			foreach ($user_access_mentions as $member => $begin)
 			{
 				// Just to stay on the safe side...
 				if (empty($member))
 					continue;
-
-				// Just a touch of needy
-				require_once(SUBSDIR . '/Boards.subs.php');
-				require_once(SUBSDIR . '/Mentions.subs.php');
-				require_once(SUBSDIR . '/Members.subs.php');
 
 				$user_see_board = memberQuerySeeBoard($member);
 				$limit = 100;

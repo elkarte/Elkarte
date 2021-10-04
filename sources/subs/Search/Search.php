@@ -11,7 +11,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.1.6
+ * @version 1.1.8
  *
  */
 
@@ -1122,115 +1122,199 @@ class Search
 	 * @param int $id_search - the id of the search
 	 * @param int $humungousTopicPosts - Message length used to tweak messages
 	 *            relevance of the results.
+	 * @param int $maxMessageResults - The maximum results to return
 	 *
 	 * @return int - number of results otherwise
 	 */
-	public function getSubjectResults($id_search, $humungousTopicPosts)
+	public function getSubjectResults($id_search, $humungousTopicPosts, $maxMessageResults)
 	{
 		global $modSettings;
 
-		// We do this to try and avoid duplicate keys on databases not supporting INSERT IGNORE.
-		foreach ($this->_searchWords as $words)
+		$numSubjectResults = 0;
+		$subject_query = array();
+		$subject_query_params = array();
+
+		if (is_callable(array($this->_searchAPI, 'indexedWordQuery')))
 		{
-			$subject_query_params = array();
-			$subject_query = array(
-				'from' => '{db_prefix}topics AS t',
-				'inner_join' => array(),
-				'left_join' => array('{db_prefix}boards AS b ON b.id_board = t.id_board'),
-				'where' => array('{query_see_board}'),
-			);
+			$numSubjectResults = $this->_prepare_word_index($id_search, $maxMessageResults, 'subject');
 
-			if ($modSettings['postmod_active'])
+			if (empty($numSubjectResults) && !empty($modSettings['search_force_index']))
 			{
-				$subject_query['where'][] = 't.approved = {int:is_approved}';
+				return 0;
 			}
 
-			$numTables = 0;
-			$prev_join = 0;
-			$numSubjectResults = 0;
-			foreach ($words['subject_words'] as $subjectWord)
+			if (!empty($numSubjectResults))
 			{
-				$numTables++;
-				if (in_array($subjectWord, $this->_excludedSubjectWords))
-				{
-					$subject_query['left_join'][] = '{db_prefix}log_search_subjects AS subj' . $numTables . ' ON (subj' . $numTables . '.word ' . (empty($modSettings['search_match_words']) ? 'LIKE {string:subject_words_' . $numTables . '_wild}' : '= {string:subject_words_' . $numTables . '}') . ' AND subj' . $numTables . '.id_topic = t.id_topic)';
-					$subject_query['where'][] = '(subj' . $numTables . '.word IS NULL)';
-				}
-				else
-				{
-					$subject_query['inner_join'][] = '{db_prefix}log_search_subjects AS subj' . $numTables . ' ON (subj' . $numTables . '.id_topic = ' . ($prev_join === 0 ? 't' : 'subj' . $prev_join) . '.id_topic)';
-					$subject_query['where'][] = 'subj' . $numTables . '.word ' . (empty($modSettings['search_match_words']) ? 'LIKE {string:subject_words_' . $numTables . '_wild}' : '= {string:subject_words_' . $numTables . '}');
-					$prev_join = $numTables;
-				}
-
-				$subject_query_params['subject_words_' . $numTables] = $subjectWord;
-				$subject_query_params['subject_words_' . $numTables . '_wild'] = '%' . $subjectWord . '%';
-			}
-
-			if (!empty($this->_userQuery))
-			{
-				$subject_query['inner_join'][] = '{db_prefix}messages AS m ON (m.id_topic = t.id_topic)';
-				$subject_query['where'][] = $this->_userQuery;
-			}
-
-			if (!empty($this->_search_params['topic']))
-			{
-				$subject_query['where'][] = 't.id_topic = ' . $this->_search_params['topic'];
-			}
-
-			if (!empty($this->_minMsgID))
-			{
-				$subject_query['where'][] = 't.id_first_msg >= ' . $this->_minMsgID;
-			}
-
-			if (!empty($this->_maxMsgID))
-			{
-				$subject_query['where'][] = 't.id_last_msg <= ' . $this->_maxMsgID;
-			}
-
-			if (!empty($this->_boardQuery))
-			{
-				$subject_query['where'][] = 't.id_board ' . $this->_boardQuery;
-			}
-
-			if (!empty($this->_excludedPhrases))
-			{
+				$subject_query['weights'] = $this->_weight_factors;
+				$subject_query['from'] = '{db_prefix}topics AS t';
+				$subject_query['where'] = array('{query_see_board}');
 				$subject_query['inner_join'][] = '{db_prefix}messages AS m ON (m.id_msg = t.id_first_msg)';
+				$subject_query['inner_join'][] = '{db_prefix}' . ($this->_createTemporary ? 'tmp_' : '') . 'log_search_topics AS lst ON (lst.id_topic = t.id_topic)';
+				$subject_query['parameters'] = array(
+					'id_search' => $id_search,
+					'min_msg' => $this->_minMsg,
+					'recent_message' => $this->_recentMsg,
+					'huge_topic_posts' => $humungousTopicPosts,
+					'is_approved' => 1,
+					'limit' => $maxMessageResults,
+				);
 
-				$count = 0;
-				foreach ($this->_excludedPhrases as $phrase)
+				if (!$this->_createTemporary)
 				{
-					$subject_query['where'][] = 'm.subject NOT ' . (empty($modSettings['search_match_words']) || $this->noRegexp() ? ' LIKE ' : ' RLIKE ') . '{string:excluded_phrases_' . $count . '}';
-					$subject_query_params['excluded_phrases_' . ($count++)] = $this->_searchAPI->prepareWord($phrase, $this->noRegexp());
+					$subject_query['where'][] = 'lsm.id_search = {int:id_search}';
+					$subject_query['parameters']['id_search'] = $id_search;
 				}
 			}
+		}
+		// Not using an index? All conditions have to be carried over.
+		else
+		{
+			// We do this to try and avoid duplicate keys on databases not supporting INSERT IGNORE.
+			foreach ($this->_searchWords as $words)
+			{
+				$subject_query = array(
+					'from' => '{db_prefix}topics AS t',
+					'inner_join' => array(),
+					'left_join' => array('{db_prefix}boards AS b ON b.id_board = t.id_board'),
+					'where' => array('{query_see_board}'),
+				);
 
-			// Build the search query
-			$subject_query['select'] = array(
-				'id_search' => '{int:id_search}',
-				'id_topic' => 't.id_topic',
-				'relevance' => $this->_build_relevance(),
-				'id_msg' => empty($this->_userQuery) ? 't.id_first_msg' : 'm.id_msg',
-				'num_matches' => 1,
+				if ($modSettings['postmod_active'])
+				{
+					$subject_query['where'][] = 't.approved = {int:is_approved}';
+				}
+
+				$numTables = 0;
+				$prev_join = 0;
+				$numSubjectResults = 0;
+				foreach ($words['subject_words'] as $subjectWord)
+				{
+					$numTables++;
+					if (in_array($subjectWord, $this->_excludedSubjectWords))
+					{
+						$subject_query['left_join'][] = '{db_prefix}log_search_subjects AS subj' . $numTables . ' ON (subj' . $numTables . '.word ' . (empty($modSettings['search_match_words']) ? 'LIKE {string:subject_words_' . $numTables . '_wild}' : '= {string:subject_words_' . $numTables . '}') . ' AND subj' . $numTables . '.id_topic = t.id_topic)';
+						$subject_query['where'][] = '(subj' . $numTables . '.word IS NULL)';
+					}
+					else
+					{
+						$subject_query['inner_join'][] = '{db_prefix}log_search_subjects AS subj' . $numTables . ' ON (subj' . $numTables . '.id_topic = ' . ($prev_join === 0 ? 't' : 'subj' . $prev_join) . '.id_topic)';
+						$subject_query['where'][] = 'subj' . $numTables . '.word ' . (empty($modSettings['search_match_words']) ? 'LIKE {string:subject_words_' . $numTables . '_wild}' : '= {string:subject_words_' . $numTables . '}');
+						$prev_join = $numTables;
+					}
+
+					$subject_query_params['subject_words_' . $numTables] = $subjectWord;
+					$subject_query_params['subject_words_' . $numTables . '_wild'] = '%' . $subjectWord . '%';
+				}
+
+				if (!empty($this->_userQuery))
+				{
+					$subject_query['inner_join'][] = '{db_prefix}messages AS m ON (m.id_topic = t.id_topic)';
+					$subject_query['where'][] = $this->_userQuery;
+				}
+
+				if (!empty($this->_search_params['topic']))
+				{
+					$subject_query['where'][] = 't.id_topic = ' . $this->_search_params['topic'];
+				}
+
+				if (!empty($this->_minMsgID))
+				{
+					$subject_query['where'][] = 't.id_first_msg >= ' . $this->_minMsgID;
+				}
+
+				if (!empty($this->_maxMsgID))
+				{
+					$subject_query['where'][] = 't.id_last_msg <= ' . $this->_maxMsgID;
+				}
+
+				if (!empty($this->_boardQuery))
+				{
+					$subject_query['where'][] = 't.id_board ' . $this->_boardQuery;
+				}
+
+				if (!empty($this->_excludedPhrases))
+				{
+					$subject_query['inner_join'][] = '{db_prefix}messages AS m ON (m.id_msg = t.id_first_msg)';
+
+					$count = 0;
+					foreach ($this->_excludedPhrases as $phrase)
+					{
+						$subject_query['where'][] = 'm.subject NOT ' . (empty($modSettings['search_match_words']) || $this->noRegexp() ? ' LIKE ' : ' RLIKE ') . '{string:excluded_phrases_' . $count . '}';
+						$subject_query_params['excluded_phrases_' . ($count++)] = $this->_searchAPI->prepareWord($phrase, $this->noRegexp());
+					}
+				}
+
+				// Build the search query
+				$subject_query['select'] = array(
+					'id_search' => '{int:id_search}',
+					'id_topic' => 't.id_topic',
+					'relevance' => $this->_build_relevance(),
+					'id_msg' => empty($this->_userQuery) ? 't.id_first_msg' : 'm.id_msg',
+					'num_matches' => 1,
+				);
+
+				$subject_query['parameters'] = array_merge($subject_query_params, array(
+					'id_search' => $id_search,
+					'min_msg' => $this->_minMsg,
+					'recent_message' => $this->_recentMsg,
+					'huge_topic_posts' => $humungousTopicPosts,
+					'is_approved' => 1,
+					'limit' => empty($modSettings['search_max_results']) ? 0 : $modSettings['search_max_results'] - $numSubjectResults,
+				));
+
+				$numSubjectResults += $this->_build_search_results_log($subject_query, 'insert_log_search_results_subject');
+
+				if (!empty($modSettings['search_max_results']) && $numSubjectResults >= $modSettings['search_max_results'])
+				{
+					break;
+				}
+			}
+		}
+
+		call_integration_hook('integrate_subject_only_search_query', array(&$subject_query, &$subject_query_params));
+
+		// Did we either get some indexed results, or otherwise did not do an indexed query?
+		if (!empty($numSubjectResults) && is_callable(array($this->_searchAPI, 'indexedWordQuery')))
+		{
+			$relevance = $this->_build_relevance($subject_query['weights']);
+			$subject_query['select']['relevance'] = $relevance;
+			$numSubjectResults += $this->_build_search_results_log($subject_query, 'insert_log_search_results_subject');
+		}
+
+		// Insert subject-only matches.
+		if ($numSubjectResults !== 0)
+		{
+			$subject_query = array(
+				'select' => array(
+					'id_search' => '{int:id_search}',
+					'id_topic' => 't.id_topic',
+					'relevance' => $this->_build_relevance(),
+					'id_msg' => 't.id_first_msg',
+					'num_matches' => 1,
+				),
+				'from' => '{db_prefix}topics AS t',
+				'inner_join' => array(
+					'{db_prefix}' . ($this->_createTemporary ? 'tmp_' : '') . 'log_search_topics AS lst ON (lst.id_topic = t.id_topic)'
+				),
+				'left_join' => array('{db_prefix}boards AS b ON b.id_board = t.id_board'),
+				'where' => array(
+					$this->_createTemporary ? '1=1' : 'lst.id_search = {int:id_search}',
+					'{query_see_board}',
+				),
+				'parameters' => array(
+					'id_search' => $id_search,
+					'min_msg' => $this->_minMsg,
+					'recent_message' => $this->_recentMsg,
+					'huge_topic_posts' => $humungousTopicPosts,
+					'limit' => $numSubjectResults,
+				),
 			);
 
-			$subject_query['parameters'] = array_merge($subject_query_params, array(
-				'id_search' => $id_search,
-				'min_msg' => $this->_minMsg,
-				'recent_message' => $this->_recentMsg,
-				'huge_topic_posts' => $humungousTopicPosts,
-				'is_approved' => 1,
-				'limit' => empty($modSettings['search_max_results']) ? 0 : $modSettings['search_max_results'] - $numSubjectResults,
-			));
-
-			call_integration_hook('integrate_subject_only_search_query', array(&$subject_query, &$subject_query_params));
-
-			$numSubjectResults += $this->_build_search_results_log($subject_query, 'insert_log_search_results_subject');
-
-			if (!empty($modSettings['search_max_results']) && $numSubjectResults >= $modSettings['search_max_results'])
-			{
-				break;
-			}
+			$numSubjectResults += $this->_build_search_results_log($subject_query, 'insert_log_search_results_subject', true);
+		}
+		elseif ($numSubjectResults == -1)
+		{
+			$numSubjectResults = 0;
 		}
 
 		return empty($numSubjectResults) ? 0 : $numSubjectResults;
@@ -1325,7 +1409,7 @@ class Search
 		// We building an index?
 		if (is_callable(array($this->_searchAPI, 'indexedWordQuery')))
 		{
-			$indexedResults = $this->_prepare_word_index($id_search, $maxMessageResults);
+			$indexedResults = $this->_prepare_word_index($id_search, $maxMessageResults, 'messages');
 
 			if (empty($indexedResults) && empty($numSubjectResults) && !empty($modSettings['search_force_index']))
 			{
@@ -1767,7 +1851,7 @@ class Search
 	 *
 	 * @return int - the number of indexed results
 	 */
-	private function _prepare_word_index($id_search, $maxMessageResults)
+	private function _prepare_word_index($id_search, $maxMessageResults, $searchType)
 	{
 		$indexedResults = 0;
 		$inserts = array();
@@ -1775,8 +1859,8 @@ class Search
 		// Clear, all clear!
 		if (!$this->_createTemporary)
 		{
-			$this->_db_search->search_query('delete_log_search_messages', '
-				DELETE FROM {db_prefix}log_search_messages
+			$this->_db_search->search_query('delete_log_search_' . ($searchType == 'subject' ? 'topics' : 'messages'), '
+				DELETE FROM {db_prefix}log_search_' . ($searchType == 'subject' ? 'topics' : 'messages').'
 				WHERE id_search = {int:id_search}',
 				array(
 					'id_search' => $id_search,
@@ -1791,7 +1875,8 @@ class Search
 			{
 				// Variables required for the search.
 				$search_data = array(
-					'insert_into' => ($this->_createTemporary ? 'tmp_' : '') . 'log_search_messages',
+					'type'  => $searchType,
+					'insert_into' => ($this->_createTemporary ? 'tmp_' : '') . 'log_search_' . ($searchType == 'subject' ? 'topics' : 'messages'),
 					'no_regexp' => $this->noRegexp(),
 					'max_results' => $maxMessageResults,
 					'indexed_results' => $indexedResults,
