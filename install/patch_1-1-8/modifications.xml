@@ -1,0 +1,1327 @@
+<?xml version="1.0"?>
+<!DOCTYPE modification SYSTEM "https://www.elkarte.net/site/modification">
+<modification xmlns="https://www.elkarte.net/site/modification" xmlns:elk="https://www.elkarte.net/">
+
+	<id>Elkarte Contributors:ElkArte_118_patch</id>
+	<version>1.0</version>
+	
+	<!-- 1.0 updates for bootstrap.php -->		
+	<file name="BOARDDIR/bootstrap.php">
+		<operation>
+			<search position="replace"><![CDATA[ * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * license:		BSD, See included LICENSE.TXT for terms and conditions.
+ *
+ * @version 1.1.7
+ *
+ */
+]]></search>
+			<add><![CDATA[ * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * license:		BSD, See included LICENSE.TXT for terms and conditions.
+ *
+ * @version 1.1.8
+ *
+ */
+]]></add>
+		</operation>
+		<operation>
+			<search position="replace"><![CDATA[		define('ELKBOOT', '1');
+
+		// The software version
+		define('FORUM_VERSION', 'ElkArte 1.1.7');
+
+		// Shortcut for the browser cache stale
+		define('CACHE_STALE', '?R117');
+	}
+
+	/**]]></search>
+			<add><![CDATA[		define('ELKBOOT', '1');
+
+		// The software version
+		define('FORUM_VERSION', 'ElkArte 1.1.8');
+
+		// Shortcut for the browser cache stale
+		define('CACHE_STALE', '?R118');
+	}
+
+	/**]]></add>
+		</operation>
+	</file>
+	
+	<!-- 1.0 updates for ManageFeatures.controller.php -->		
+	<file name="ADMINDIR/ManageFeatures.controller.php">
+		<operation>
+			<search position="replace"><![CDATA[ * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * license:		BSD, See included LICENSE.TXT for terms and conditions.
+ *
+ * @version 1.1.7
+ *
+ */
+]]></search>
+			<add><![CDATA[ * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * license:		BSD, See included LICENSE.TXT for terms and conditions.
+ *
+ * @version 1.1.8
+ *
+ */
+]]></add>
+		</operation>
+		<operation>
+			<search position="replace"><![CDATA[			// Setting a custom frontpage, set the hook to the FrontpageInterface of the controller
+			if (!empty($this->_req->post->front_page))
+			{
+				$front_page = (string) $this->_req->post->front_page;
+				if (
+					class_exists($modSettings['front_page'])]]></search>
+			<add><![CDATA[			// Setting a custom frontpage, set the hook to the FrontpageInterface of the controller
+			if (!empty($this->_req->post->front_page))
+			{
+				// Addons may have left this blank
+				$modSettings['front_page'] = empty($modSettings['front_page']) ? 'MessageIndex_Controller' : $modSettings['front_page'];
+
+				$front_page = (string) $this->_req->post->front_page;
+				if (
+					class_exists($modSettings['front_page'])]]></add>
+		</operation>
+		<operation>
+			<search position="replace"><![CDATA[		$context['sub_template'] = 'show_custom_profile';
+
+		// What about standard fields they can tweak?
+		$standard_fields = array('website', 'posts', 'warning_status', 'date_registered');
+
+		// What fields can't you put on the registration page?
+		$context['fields_no_registration'] = array('posts', 'warning_status', 'date_registered');
+
+		// Are we saving any standard field changes?
+		if (isset($this->_req->post->save))]]></search>
+			<add><![CDATA[		$context['sub_template'] = 'show_custom_profile';
+
+		// What about standard fields they can tweak?
+		$standard_fields = array('website', 'posts', 'warning_status', 'date_registered', 'action');
+
+		// What fields can't you put on the registration page?
+		$context['fields_no_registration'] = array('posts', 'warning_status', 'date_registered', 'action');
+
+		// Are we saving any standard field changes?
+		if (isset($this->_req->post->save))]]></add>
+		</operation>
+	</file>
+	
+	<!-- 1.0 updates for Attachment.controller.php -->		
+	<file name="CONTROLLERDIR/Attachment.controller.php">
+		<operation>
+			<search position="replace"><![CDATA[ * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * license:		BSD, See included LICENSE.TXT for terms and conditions.
+ *
+ * @version 1.1.7
+ *
+ */
+]]></search>
+			<add><![CDATA[ * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * license:		BSD, See included LICENSE.TXT for terms and conditions.
+ *
+ * @version 1.1.8
+ *
+ */
+]]></add>
+		</operation>
+		<operation>
+			<search position="replace"><![CDATA[	 */
+	public function action_rmattach()
+	{
+		global $context, $txt;
+
+		// Prepare the template so we can respond with json
+		$template_layers = Template_Layers::instance();]]></search>
+			<add><![CDATA[	 */
+	public function action_rmattach()
+	{
+		global $context, $txt, $user_info;
+
+		// Prepare the template so we can respond with json
+		$template_layers = Template_Layers::instance();]]></add>
+		</operation>
+		<operation>
+			<search position="replace"><![CDATA[			if ($result !== true)
+			{
+				require_once(SUBSDIR . '/ManageAttachments.subs.php');
+				$result_tmp = removeAttachments(array('id_attach' => $this->_req->getPost('attachid', 'intval')), '', true);
+				if (!empty($result_tmp))
+				{
+					$context['json_data'] = array('result' => true);
+					$result = true;
+				}
+				else
+				{
+					$result = $result_tmp;
+				}
+			}
+]]></search>
+			<add><![CDATA[			if ($result !== true)
+			{
+				require_once(SUBSDIR . '/ManageAttachments.subs.php');
+				$attachId = $this->_req->getPost('attachid', 'intval');
+				if (canRemoveAttachment($attachId, $user_info['id']))
+				{
+					$result_tmp = removeAttachments(array('id_attach' => $attachId), '', true);
+					if (!empty($result_tmp))
+					{
+						$context['json_data'] = array('result' => true);
+						$result = true;
+					}
+					else
+					{
+						$result = $result_tmp;
+					}
+				}
+			}
+]]></add>
+		</operation>
+	</file>
+	
+	<!-- 1.0 updates for Mentions.controller.php -->		
+	<file name="CONTROLLERDIR/Mentions.controller.php">
+		<operation>
+			<search position="replace"><![CDATA[ * @copyright ElkArte Forum contributors
+ * @license   BSD http://opensource.org/licenses/BSD-3-Clause
+ *
+ * @version 1.1.7
+ *
+ */
+]]></search>
+			<add><![CDATA[ * @copyright ElkArte Forum contributors
+ * @license   BSD http://opensource.org/licenses/BSD-3-Clause
+ *
+ * @version 1.1.8
+ *
+ */
+]]></add>
+		</operation>
+		<operation>
+			<search position="replace"><![CDATA[		);
+
+		$this->_known_mentions = $this->_findMentionTypes();
+	}
+
+	/**]]></search>
+			<add><![CDATA[		);
+
+		$this->_known_mentions = $this->_findMentionTypes();
+
+		require_once(SUBSDIR . '/Mentions.subs.php');
+	}
+
+	/**]]></add>
+		</operation>
+	</file>
+	
+	<!-- 1.0 updates for Search.controller.php -->		
+	<file name="CONTROLLERDIR/Search.controller.php">
+		<operation>
+			<search position="replace"><![CDATA[ * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * license:		BSD, See included LICENSE.TXT for terms and conditions.
+ *
+ * @version 1.1.7
+ *
+ */
+]]></search>
+			<add><![CDATA[ * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * license:		BSD, See included LICENSE.TXT for terms and conditions.
+ *
+ * @version 1.1.8
+ *
+ */
+]]></add>
+		</operation>
+		<operation>
+			<search position="replace"><![CDATA[				$this->_search->clearCacheResults($_SESSION['search_cache']['id_search']);
+
+				if ($this->_search->param('subject_only'))
+					$_SESSION['search_cache']['num_results'] = $this->_search->getSubjectResults($_SESSION['search_cache']['id_search'], $humungousTopicPosts);
+				else
+				{
+					$num_res = $this->_search->getResults($_SESSION['search_cache']['id_search'], $humungousTopicPosts, $maxMessageResults);]]></search>
+			<add><![CDATA[				$this->_search->clearCacheResults($_SESSION['search_cache']['id_search']);
+
+				if ($this->_search->param('subject_only'))
+					$_SESSION['search_cache']['num_results'] = $this->_search->getSubjectResults($_SESSION['search_cache']['id_search'], $humungousTopicPosts, $maxMessageResults);
+				else
+				{
+					$num_res = $this->_search->getResults($_SESSION['search_cache']['id_search'], $humungousTopicPosts, $maxMessageResults);]]></add>
+		</operation>
+	</file>
+	
+	<!-- 1.0 updates for BoardsList.class.php -->		
+	<file name="SUBSDIR/BoardsList.class.php">
+		<operation>
+			<search position="replace"><![CDATA[ * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * license:  	BSD, See included LICENSE.TXT for terms and conditions.
+ *
+ * @version 1.1.6
+ *
+ */
+]]></search>
+			<add><![CDATA[ * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * license:  	BSD, See included LICENSE.TXT for terms and conditions.
+ *
+ * @version 1.1.8
+ *
+ */
+]]></add>
+		</operation>
+		<operation>
+			<search position="replace"><![CDATA[				}
+
+				// Does this board contain new boards?
+				$this->_current_boards[$row_board['id_parent']]['children_new'] |= empty($row_board['is_read']);
+
+				// This is easier to use in many cases for the theme....
+				$this->_current_boards[$row_board['id_parent']]['link_children'][] = &$this->_current_boards[$row_board['id_parent']]['children'][$row_board['id_board']]['link'];]]></search>
+			<add><![CDATA[				}
+
+				// Does this board contain new boards?
+				$is_read = empty($row_board['is_read']);
+				$this->_current_boards[$row_board['id_parent']]['children_new'] |= $is_read;
+
+				// This is easier to use in many cases for the theme....
+				$this->_current_boards[$row_board['id_parent']]['link_children'][] = &$this->_current_boards[$row_board['id_parent']]['children'][$row_board['id_board']]['link'];]]></add>
+		</operation>
+	</file>
+	
+	<!-- 1.0 updates for Html2Md.class.php -->		
+	<file name="SUBSDIR/Html2Md.class.php">
+		<operation>
+			<search position="replace"><![CDATA[ * @copyright ElkArte Forum contributors
+ * @license   BSD http://opensource.org/licenses/BSD-3-Clause
+ *
+ * @version 1.1.7
+ *
+ */
+]]></search>
+			<add><![CDATA[ * @copyright ElkArte Forum contributors
+ * @license   BSD http://opensource.org/licenses/BSD-3-Clause
+ *
+ * @version 1.1.8
+ *
+ */
+]]></add>
+		</operation>
+		<operation>
+			<search position="replace"><![CDATA[		// Wordwrap?
+		if (!empty($this->body_width))
+		{
+			$this->_check_line_lenght($this->markdown);
+			$this->markdown = $this->_utf8_wordwrap($this->markdown, $this->body_width, $this->line_end);
+		}
+]]></search>
+			<add><![CDATA[		// Wordwrap?
+		if (!empty($this->body_width))
+		{
+			$this->markdown = $this->_utf8_wordwrap($this->markdown, $this->body_width, $this->line_end);
+		}
+]]></add>
+		</operation>
+		<operation>
+			<search position="replace"><![CDATA[
+		// Strip the chaff and any excess blank lines we may have produced
+		$this->markdown = trim($this->markdown);
+		$this->markdown = preg_replace("~(\n(\s)?){3,}~", "\n\n", $this->markdown);
+		$this->markdown = preg_replace("~(^\s\s\n){3,}~m", "  \n  \n", $this->markdown);
+		$this->markdown = preg_replace("~(^\s\s\r?\n){3,}~m", "  \n  \n", $this->markdown);
+		$this->markdown = preg_replace("~(^\s\s(?:\r?\n){2}){3,}~m", "  \n  \n", $this->markdown);]]></search>
+			<add><![CDATA[
+		// Strip the chaff and any excess blank lines we may have produced
+		$this->markdown = trim($this->markdown);
+		$this->markdown = preg_replace("~(\n[\s]+){3,}~", "\n\n", $this->markdown);
+		$this->markdown = preg_replace("~(^\s\s\n){3,}~m", "  \n  \n", $this->markdown);
+		$this->markdown = preg_replace("~(^\s\s\r?\n){3,}~m", "  \n  \n", $this->markdown);
+		$this->markdown = preg_replace("~(^\s\s(?:\r?\n){2}){3,}~m", "  \n  \n", $this->markdown);]]></add>
+		</operation>
+		<operation>
+			<search position="replace"><![CDATA[			case 'p':
+				if (!$node->hasChildNodes())
+				{
+					$markdown = str_replace("\n", ' ', $this->_get_value($node)) . $this->line_break;
+					$markdown = $this->_escape_text($markdown);
+				}
+				else
+				{
+					$markdown = rtrim($this->_get_value($node)) . $this->line_break;
+				}
+				break;
+			case 'pre':
+				$markdown = $this->_get_value($node) . $this->line_break;
+				break;
+			case 'div':
+				$markdown = $this->line_end . $this->_get_value($node) . $this->line_end;
+				if (!$node->hasChildNodes())
+				{
+					$markdown = $this->_escape_text($markdown);
+				}
+				break;
+			//case '#text':
+			//  $markdown = $this->_escape_text($this->_get_value($node));]]></search>
+			<add><![CDATA[			case 'p':
+				if (!$node->hasChildNodes())
+				{
+					$markdown = str_replace("\n", ' ', $this->_get_value($node));
+					$markdown = $this->_escape_text($markdown);
+				}
+				else
+				{
+					$markdown = rtrim($this->_get_value($node));
+				}
+
+				$markdown = $this->_utf8_wordwrap($markdown, $this->body_width, $this->line_end) . $this->line_break;
+				break;
+			case 'pre':
+				$markdown = $this->_get_value($node) . $this->line_break;
+				break;
+			case 'div':
+				$markdown = $this->line_end . $this->_get_value($node);
+				if (!$node->hasChildNodes())
+				{
+					$markdown = $this->_escape_text($markdown);
+				}
+
+				$markdown = $this->_utf8_wordwrap($markdown, $this->body_width, $this->line_end) . $this->line_end;
+				break;
+			//case '#text':
+			//  $markdown = $this->_escape_text($this->_get_value($node));]]></add>
+		</operation>
+		<operation>
+			<search position="replace"><![CDATA[			$markdown = '[' . $value . ']( ' . $href . ' )';
+		}
+
+		return $markdown;
+	}
+]]></search>
+			<add><![CDATA[			$markdown = '[' . $value . ']( ' . $href . ' )';
+		}
+
+		$this->_check_line_lenght($markdown);
+
+		return $markdown;
+	}
+]]></add>
+		</operation>
+		<operation>
+			<search position="replace"><![CDATA[		foreach ($lines as $line)
+		{
+			$line_strlen = Util::strlen($line) + (!empty($buffer) ? (int) $buffer : 0);
+		if ($line_strlen > $this->body_width)
+		{
+			$this->body_width = $line_strlen;
+		}
+	}
+	}
+
+	/**
+	 * Helper function to find and wrap plain text links in MD format]]></search>
+			<add><![CDATA[		foreach ($lines as $line)
+		{
+			$line_strlen = Util::strlen($line) + (!empty($buffer) ? (int) $buffer : 0);
+			if ($line_strlen > $this->body_width)
+			{
+				$this->body_width = $line_strlen;
+			}
+		}
+	}
+
+	/**
+	 * Helper function to find and wrap plain text links in MD format]]></add>
+		</operation>
+	</file>
+	
+	<!-- 1.0 updates for Mail.subs.php -->		
+	<file name="SUBSDIR/Mail.subs.php">
+		<operation>
+			<search position="replace"><![CDATA[ * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * license:  	BSD, See included LICENSE.TXT for terms and conditions.
+ *
+ * @version 1.1.7
+ *
+ */
+]]></search>
+			<add><![CDATA[ * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * license:  	BSD, See included LICENSE.TXT for terms and conditions.
+ *
+ * @version 1.1.8
+ *
+ */
+]]></add>
+		</operation>
+		<operation>
+			<search position="replace"><![CDATA[	// Sending HTML?  Let's plop in some basic stuff, then.
+	if ($send_html)
+	{
+		$no_html_message = un_htmlspecialchars(strip_tags(strtr($orig_message, array('</title>' => $line_break))));
+
+		// But, then, dump it and use a plain one for dinosaur clients.
+		list (, $plain_message) = mimespecialchars($no_html_message, false, true, $line_break);]]></search>
+			<add><![CDATA[	// Sending HTML?  Let's plop in some basic stuff, then.
+	if ($send_html)
+	{
+		$no_html_message = preg_replace('/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]/', '', $orig_message);
+		$no_html_message = un_htmlspecialchars(strip_tags(strtr($no_html_message, array('</title>' => $line_break))));
+
+		// But, then, dump it and use a plain one for dinosaur clients.
+		list (, $plain_message) = mimespecialchars($no_html_message, false, true, $line_break);]]></add>
+		</operation>
+		<operation>
+			<search position="replace"><![CDATA[	else
+	{
+		// Send a plain message first, for the older web clients.
+		list (, $plain_message) = mimespecialchars($orig_message, false, true, $line_break);
+		$message = $plain_message . $line_break . '--' . $mime_boundary . $line_break;
+
+		// Now add an encoded message using the forum's character set.]]></search>
+			<add><![CDATA[	else
+	{
+		// Send a plain message first, for the older web clients.
+		$plain_message = preg_replace('/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]/', '', $orig_message);
+		list (, $plain_message) = mimespecialchars($plain_message, false, true, $line_break);
+
+		$message = $plain_message . $line_break . '--' . $mime_boundary . $line_break;
+
+		// Now add an encoded message using the forum's character set.]]></add>
+		</operation>
+		<operation>
+			<search position="replace"><![CDATA[	elseif (!$hotmail_fix && preg_match('~([^\x09\x0A\x0D\x20-\x7F])~', $string) === 1)
+	{
+		// Base64 encode.
+		$string = base64_encode($string);
+
+		// Show the characterset and the transfer-encoding for header strings.]]></search>
+			<add><![CDATA[	elseif (!$hotmail_fix && preg_match('~([^\x09\x0A\x0D\x20-\x7F])~', $string) === 1)
+	{
+		// Base64 encode.
+		$string = str_replace("\x00", '', $string);
+		$string = base64_encode($string);
+
+		// Show the characterset and the transfer-encoding for header strings.]]></add>
+		</operation>
+	</file>
+	
+	<!-- 1.0 updates for ManageAttachments.subs.php -->		
+	<file name="SUBSDIR/ManageAttachments.subs.php">
+		<operation>
+			<search position="replace"><![CDATA[ * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * license:  	BSD, See included LICENSE.TXT for terms and conditions.
+ *
+ * @version 1.1.1
+ *
+ */
+]]></search>
+			<add><![CDATA[ * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * license:  	BSD, See included LICENSE.TXT for terms and conditions.
+ *
+ * @version 1.1.8
+ *
+ */
+]]></add>
+		</operation>
+		<operation>
+			<search position="replace"><![CDATA[			'folder_to' => $to,
+		)
+	);
+}]]></search>
+			<add><![CDATA[			'folder_to' => $to,
+		)
+	);
+}
+
+/**
+ * Validates the current user can remove a specified attachment
+ *
+ * - Has moderator / admin manage_attachments permission
+ * - Message is not locked, they have attach permissions and meets one of the following:
+ *    - Has modify any permission
+ *    - Is the owner of the message and within edit_disable_time
+ *    - Is allowed to edit messages in a thread they started
+ *
+ * @param int $id_attach
+ * @param int $id_member_requesting
+ *
+ * @return bool
+ */
+function canRemoveAttachment($id_attach, $id_member_requesting)
+{
+	global $modSettings;
+
+	if (allowedTo('manage_attachments'))
+	{
+		return true;
+	}
+
+	$db = database();
+	$request = $db->query('', '
+		SELECT 
+			m.id_board, m.id_member, m.approved, m.poster_time,
+			t.locked, t.id_member_started
+		FROM {db_prefix}attachments as a
+			LEFT JOIN {db_prefix}messages AS m ON m.id_msg = a.id_msg
+			LEFT JOIN {db_prefix}topics AS t ON t.id_topic = m.id_topic
+		WHERE a.id_attach = {int:id_attach}',
+		array(
+			'id_attach' => $id_attach,
+		)
+	);
+	if ($db->num_rows($request) != 0)
+	{
+		list($id_board, $id_member, $approved, $poster_time, $is_locked, $id_starter,) = $db->fetch_row($request);
+
+		$is_owner = $id_member_requesting == $id_member;
+		$is_starter = $id_member_requesting == $id_starter;
+		$can_attach = allowedTo('post_attachment', $id_board) || ($modSettings['postmod_active'] && allowedTo('post_unapproved_attachments', $id_board));
+		$can_modify = (!$is_locked || allowedTo('moderate_board', $id_board))
+			&& (
+				allowedTo('modify_any', $id_board)
+				|| (allowedTo('modify_replies', $id_board) && $is_starter)
+				|| (allowedTo('modify_own', $id_board) && $is_owner && (empty($modSettings['edit_disable_time']) || !$approved || $poster_time + $modSettings['edit_disable_time'] * 60 > time()))
+			);
+
+		$db->free_result($request);
+		return $can_attach && $can_modify;
+	}
+
+	return false;
+}]]></add>
+		</operation>
+	</file>
+
+	<!-- 1.0 updates for ManageFeatures.subs.php -->		
+	<file name="SUBSDIR/ManageFeatures.subs.php">
+		<operation>
+			<search position="replace"><![CDATA[ * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * license:  	BSD, See included LICENSE.TXT for terms and conditions.
+ *
+ * @version 1.1.7
+ *
+ */
+]]></search>
+			<add><![CDATA[ * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * license:  	BSD, See included LICENSE.TXT for terms and conditions.
+ *
+ * @version 1.1.8
+ *
+ */
+]]></add>
+		</operation>
+		<operation>
+			<search position="replace"><![CDATA[
+	if ($standardFields)
+	{
+		$standard_fields = array('website', 'posts', 'warning_status', 'date_registered');
+		$fields_no_registration = array('posts', 'warning_status', 'date_registered');
+		$disabled_fields = isset($modSettings['disabled_profile_fields']) ? explode(',', $modSettings['disabled_profile_fields']) : array();
+		$registration_fields = isset($modSettings['registration_fields']) ? explode(',', $modSettings['registration_fields']) : array();
+]]></search>
+			<add><![CDATA[
+	if ($standardFields)
+	{
+		$standard_fields = array('website', 'posts', 'warning_status', 'date_registered', 'action');
+		$fields_no_registration = array('posts', 'warning_status', 'date_registered', 'action');
+		$disabled_fields = isset($modSettings['disabled_profile_fields']) ? explode(',', $modSettings['disabled_profile_fields']) : array();
+		$registration_fields = isset($modSettings['registration_fields']) ? explode(',', $modSettings['registration_fields']) : array();
+]]></add>
+		</operation>
+	</file>
+	
+	<!-- 1.0 updates for Mentioning.php -->		
+	<file name="SUBSDIR/Mentioning.php">
+		<operation>
+			<search position="replace"><![CDATA[ * @copyright ElkArte Forum contributors
+ * @license   BSD http://opensource.org/licenses/BSD-3-Clause
+ *
+ * @version 1.1.7
+ *
+ */
+]]></search>
+			<add><![CDATA[ * @copyright ElkArte Forum contributors
+ * @license   BSD http://opensource.org/licenses/BSD-3-Clause
+ *
+ * @version 1.1.8
+ *
+ */
+]]></add>
+		</operation>
+		<operation>
+			<search position="replace"><![CDATA[	protected function _updateMenuCount($status, $member_id)
+	{
+		require_once(SUBSDIR . '/Members.subs.php');
+
+		// If its new add to our menu count
+		if ($status === 0)]]></search>
+			<add><![CDATA[	protected function _updateMenuCount($status, $member_id)
+	{
+		require_once(SUBSDIR . '/Members.subs.php');
+		require_once(SUBSDIR . '/Mentions.subs.php');
+
+		// If its new add to our menu count
+		if ($status === 0)]]></add>
+		</operation>
+	</file>
+	
+	<!-- 1.0 updates for UserAccessMentions.php -->		
+	<file name="SUBSDIR/ScheduledTask/UserAccessMentions.php">
+		<operation>
+			<search position="replace"><![CDATA[ * @copyright ElkArte Forum contributors
+ * @license   BSD http://opensource.org/licenses/BSD-3-Clause
+ *
+ * @version 1.1.7
+ *
+ */
+]]></search>
+			<add><![CDATA[ * @copyright ElkArte Forum contributors
+ * @license   BSD http://opensource.org/licenses/BSD-3-Clause
+ *
+ * @version 1.1.8
+ *
+ */
+]]></add>
+		</operation>
+		<operation>
+			<search position="replace"><![CDATA[		// This should be set only because of an immediate scheduled task, so higher priority
+		if (!empty($user_access_mentions))
+		{
+			foreach ($user_access_mentions as $member => $begin)
+			{
+				// Just to stay on the safe side...
+				if (empty($member))
+					continue;
+
+				// Just a touch of needy
+				require_once(SUBSDIR . '/Boards.subs.php');
+				require_once(SUBSDIR . '/Mentions.subs.php');
+				require_once(SUBSDIR . '/Members.subs.php');
+
+				$user_see_board = memberQuerySeeBoard($member);
+				$limit = 100;
+]]></search>
+			<add><![CDATA[		// This should be set only because of an immediate scheduled task, so higher priority
+		if (!empty($user_access_mentions))
+		{
+			// Just a touch of needy
+			require_once(SUBSDIR . '/Boards.subs.php');
+			require_once(SUBSDIR . '/Mentions.subs.php');
+			require_once(SUBSDIR . '/Members.subs.php');
+
+			foreach ($user_access_mentions as $member => $begin)
+			{
+				// Just to stay on the safe side...
+				if (empty($member))
+					continue;
+
+				$user_see_board = memberQuerySeeBoard($member);
+				$limit = 100;
+]]></add>
+		</operation>
+	</file>
+	
+	<!-- 1.0 updates for Fulltext.php -->		
+	<file name="SUBSDIR/Search/API/Fulltext.php">
+		<operation>
+			<search position="replace"><![CDATA[ * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * license:  	BSD, See included LICENSE.TXT for terms and conditions.
+ *
+ * @version 1.1.7
+ *
+ */
+]]></search>
+			<add><![CDATA[ * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * license:  	BSD, See included LICENSE.TXT for terms and conditions.
+ *
+ * @version 1.1.8
+ *
+ */
+]]></add>
+		</operation>
+		<operation>
+			<search position="replace"><![CDATA[
+		$db_search = db_search();
+
+		$query_select = array(
+			'id_msg' => 'm.id_msg',
+		);
+
+		$query_where = array();
+		$query_params = $search_data['params'];]]></search>
+			<add><![CDATA[
+		$db_search = db_search();
+
+		if ($search_data['type'] === 'messages')
+		{
+			$query_select = array(
+				'id_msg' => 'm.id_msg',
+			);
+		}
+		else
+		{
+			$query_select = array(
+				'id_topic' => 'm.id_topic',
+			);
+		}
+
+		$query_where = array();
+		$query_params = $search_data['params'];]]></add>
+		</operation>
+		<operation>
+			<search position="replace"><![CDATA[
+		if (!empty($modSettings['search_simple_fulltext']))
+		{
+			$query_where[] = 'MATCH (body, subject) AGAINST ({string:body_match})';
+			$query_params['body_match'] = implode(' ', array_diff($words['indexed_words'], $query_params['excluded_index_words']));
+		}
+		else]]></search>
+			<add><![CDATA[
+		if (!empty($modSettings['search_simple_fulltext']))
+		{
+			$query_where[] = 'MATCH (subject ' . ($search_data['type'] === 'messages' ? ', body' : '') . ') AGAINST ({string:body_match})';
+			$query_params['body_match'] = implode(' ', array_diff($words['indexed_words'], $query_params['excluded_index_words']));
+		}
+		else]]></add>
+		</operation>
+		<operation>
+			<search position="replace"><![CDATA[			// If we have bool terms to search, add them in
+			if ($query_params['boolean_match'])
+			{
+				$query_where[] = 'MATCH (body, subject) AGAINST ({string:boolean_match} IN BOOLEAN MODE)';
+			}
+		}
+]]></search>
+			<add><![CDATA[			// If we have bool terms to search, add them in
+			if ($query_params['boolean_match'])
+			{
+				$query_where[] = 'MATCH (subject ' . ($search_data['type'] === 'messages' ? ', body' : '') . ') AGAINST ({string:boolean_match} IN BOOLEAN MODE)';
+			}
+		}
+]]></add>
+		</operation>
+		<operation>
+			<search position="replace"><![CDATA[
+		return $ignoreRequest;
+	}
+}]]></search>
+			<add><![CDATA[
+		return $ignoreRequest;
+	}
+}]]></add>
+		</operation>
+	</file>
+	
+	<!-- 1.0 updates for Search.php -->		
+	<file name="SUBSDIR/Search/Search.php">
+		<operation>
+			<search position="replace"><![CDATA[ * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * license:  	BSD, See included LICENSE.TXT for terms and conditions.
+ *
+ * @version 1.1.6
+ *
+ */
+]]></search>
+			<add><![CDATA[ * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * license:  	BSD, See included LICENSE.TXT for terms and conditions.
+ *
+ * @version 1.1.8
+ *
+ */
+]]></add>
+		</operation>
+		<operation>
+			<search position="replace"><![CDATA[	 * @param int $id_search - the id of the search
+	 * @param int $humungousTopicPosts - Message length used to tweak messages
+	 *            relevance of the results.
+	 *
+	 * @return int - number of results otherwise
+	 */
+	public function getSubjectResults($id_search, $humungousTopicPosts)
+	{
+		global $modSettings;
+
+		// We do this to try and avoid duplicate keys on databases not supporting INSERT IGNORE.
+		foreach ($this->_searchWords as $words)
+		{
+			$subject_query_params = array();
+			$subject_query = array(
+				'from' => '{db_prefix}topics AS t',
+				'inner_join' => array(),
+				'left_join' => array('{db_prefix}boards AS b ON b.id_board = t.id_board'),
+				'where' => array('{query_see_board}'),
+			);
+
+			if ($modSettings['postmod_active'])
+			{
+				$subject_query['where'][] = 't.approved = {int:is_approved}';
+			}
+
+			$numTables = 0;
+			$prev_join = 0;
+			$numSubjectResults = 0;
+			foreach ($words['subject_words'] as $subjectWord)
+			{
+				$numTables++;
+				if (in_array($subjectWord, $this->_excludedSubjectWords))
+				{
+					$subject_query['left_join'][] = '{db_prefix}log_search_subjects AS subj' . $numTables . ' ON (subj' . $numTables . '.word ' . (empty($modSettings['search_match_words']) ? 'LIKE {string:subject_words_' . $numTables . '_wild}' : '= {string:subject_words_' . $numTables . '}') . ' AND subj' . $numTables . '.id_topic = t.id_topic)';
+					$subject_query['where'][] = '(subj' . $numTables . '.word IS NULL)';
+				}
+				else
+				{
+					$subject_query['inner_join'][] = '{db_prefix}log_search_subjects AS subj' . $numTables . ' ON (subj' . $numTables . '.id_topic = ' . ($prev_join === 0 ? 't' : 'subj' . $prev_join) . '.id_topic)';
+					$subject_query['where'][] = 'subj' . $numTables . '.word ' . (empty($modSettings['search_match_words']) ? 'LIKE {string:subject_words_' . $numTables . '_wild}' : '= {string:subject_words_' . $numTables . '}');
+					$prev_join = $numTables;
+				}
+
+				$subject_query_params['subject_words_' . $numTables] = $subjectWord;
+				$subject_query_params['subject_words_' . $numTables . '_wild'] = '%' . $subjectWord . '%';
+			}
+
+			if (!empty($this->_userQuery))
+			{
+				$subject_query['inner_join'][] = '{db_prefix}messages AS m ON (m.id_topic = t.id_topic)';
+				$subject_query['where'][] = $this->_userQuery;
+			}
+
+			if (!empty($this->_search_params['topic']))
+			{
+				$subject_query['where'][] = 't.id_topic = ' . $this->_search_params['topic'];
+			}
+
+			if (!empty($this->_minMsgID))
+			{
+				$subject_query['where'][] = 't.id_first_msg >= ' . $this->_minMsgID;
+			}
+
+			if (!empty($this->_maxMsgID))
+			{
+				$subject_query['where'][] = 't.id_last_msg <= ' . $this->_maxMsgID;
+			}
+
+			if (!empty($this->_boardQuery))
+			{
+				$subject_query['where'][] = 't.id_board ' . $this->_boardQuery;
+			}
+
+			if (!empty($this->_excludedPhrases))
+			{
+				$subject_query['inner_join'][] = '{db_prefix}messages AS m ON (m.id_msg = t.id_first_msg)';
+
+				$count = 0;
+				foreach ($this->_excludedPhrases as $phrase)
+				{
+					$subject_query['where'][] = 'm.subject NOT ' . (empty($modSettings['search_match_words']) || $this->noRegexp() ? ' LIKE ' : ' RLIKE ') . '{string:excluded_phrases_' . $count . '}';
+					$subject_query_params['excluded_phrases_' . ($count++)] = $this->_searchAPI->prepareWord($phrase, $this->noRegexp());
+				}
+			}
+
+			// Build the search query
+			$subject_query['select'] = array(
+				'id_search' => '{int:id_search}',
+				'id_topic' => 't.id_topic',
+				'relevance' => $this->_build_relevance(),
+				'id_msg' => empty($this->_userQuery) ? 't.id_first_msg' : 'm.id_msg',
+				'num_matches' => 1,
+			);
+
+			$subject_query['parameters'] = array_merge($subject_query_params, array(
+				'id_search' => $id_search,
+				'min_msg' => $this->_minMsg,
+				'recent_message' => $this->_recentMsg,
+				'huge_topic_posts' => $humungousTopicPosts,
+				'is_approved' => 1,
+				'limit' => empty($modSettings['search_max_results']) ? 0 : $modSettings['search_max_results'] - $numSubjectResults,
+			));
+
+			call_integration_hook('integrate_subject_only_search_query', array(&$subject_query, &$subject_query_params));
+
+			$numSubjectResults += $this->_build_search_results_log($subject_query, 'insert_log_search_results_subject');
+
+			if (!empty($modSettings['search_max_results']) && $numSubjectResults >= $modSettings['search_max_results'])
+			{
+				break;
+			}
+		}
+
+		return empty($numSubjectResults) ? 0 : $numSubjectResults;]]></search>
+			<add><![CDATA[	 * @param int $id_search - the id of the search
+	 * @param int $humungousTopicPosts - Message length used to tweak messages
+	 *            relevance of the results.
+	 * @param int $maxMessageResults - The maximum results to return
+	 *
+	 * @return int - number of results otherwise
+	 */
+	public function getSubjectResults($id_search, $humungousTopicPosts, $maxMessageResults)
+	{
+		global $modSettings;
+
+		$numSubjectResults = 0;
+		$subject_query = array();
+		$subject_query_params = array();
+
+		if (is_callable(array($this->_searchAPI, 'indexedWordQuery')))
+		{
+			$numSubjectResults = $this->_prepare_word_index($id_search, $maxMessageResults, 'subject');
+
+			if (empty($numSubjectResults) && !empty($modSettings['search_force_index']))
+			{
+				return 0;
+			}
+
+			if (!empty($numSubjectResults))
+			{
+				$subject_query['weights'] = $this->_weight_factors;
+				$subject_query['from'] = '{db_prefix}topics AS t';
+				$subject_query['where'] = array('{query_see_board}');
+				$subject_query['inner_join'][] = '{db_prefix}messages AS m ON (m.id_msg = t.id_first_msg)';
+				$subject_query['inner_join'][] = '{db_prefix}' . ($this->_createTemporary ? 'tmp_' : '') . 'log_search_topics AS lst ON (lst.id_topic = t.id_topic)';
+				$subject_query['parameters'] = array(
+					'id_search' => $id_search,
+					'min_msg' => $this->_minMsg,
+					'recent_message' => $this->_recentMsg,
+					'huge_topic_posts' => $humungousTopicPosts,
+					'is_approved' => 1,
+					'limit' => $maxMessageResults,
+				);
+
+				if (!$this->_createTemporary)
+				{
+					$subject_query['where'][] = 'lsm.id_search = {int:id_search}';
+					$subject_query['parameters']['id_search'] = $id_search;
+				}
+			}
+		}
+		// Not using an index? All conditions have to be carried over.
+		else
+		{
+			// We do this to try and avoid duplicate keys on databases not supporting INSERT IGNORE.
+			foreach ($this->_searchWords as $words)
+			{
+				$subject_query = array(
+					'from' => '{db_prefix}topics AS t',
+					'inner_join' => array(),
+					'left_join' => array('{db_prefix}boards AS b ON b.id_board = t.id_board'),
+					'where' => array('{query_see_board}'),
+				);
+
+				if ($modSettings['postmod_active'])
+				{
+					$subject_query['where'][] = 't.approved = {int:is_approved}';
+				}
+
+				$numTables = 0;
+				$prev_join = 0;
+				$numSubjectResults = 0;
+				foreach ($words['subject_words'] as $subjectWord)
+				{
+					$numTables++;
+					if (in_array($subjectWord, $this->_excludedSubjectWords))
+					{
+						$subject_query['left_join'][] = '{db_prefix}log_search_subjects AS subj' . $numTables . ' ON (subj' . $numTables . '.word ' . (empty($modSettings['search_match_words']) ? 'LIKE {string:subject_words_' . $numTables . '_wild}' : '= {string:subject_words_' . $numTables . '}') . ' AND subj' . $numTables . '.id_topic = t.id_topic)';
+						$subject_query['where'][] = '(subj' . $numTables . '.word IS NULL)';
+					}
+					else
+					{
+						$subject_query['inner_join'][] = '{db_prefix}log_search_subjects AS subj' . $numTables . ' ON (subj' . $numTables . '.id_topic = ' . ($prev_join === 0 ? 't' : 'subj' . $prev_join) . '.id_topic)';
+						$subject_query['where'][] = 'subj' . $numTables . '.word ' . (empty($modSettings['search_match_words']) ? 'LIKE {string:subject_words_' . $numTables . '_wild}' : '= {string:subject_words_' . $numTables . '}');
+						$prev_join = $numTables;
+					}
+
+					$subject_query_params['subject_words_' . $numTables] = $subjectWord;
+					$subject_query_params['subject_words_' . $numTables . '_wild'] = '%' . $subjectWord . '%';
+				}
+
+				if (!empty($this->_userQuery))
+				{
+					$subject_query['inner_join'][] = '{db_prefix}messages AS m ON (m.id_topic = t.id_topic)';
+					$subject_query['where'][] = $this->_userQuery;
+				}
+
+				if (!empty($this->_search_params['topic']))
+				{
+					$subject_query['where'][] = 't.id_topic = ' . $this->_search_params['topic'];
+				}
+
+				if (!empty($this->_minMsgID))
+				{
+					$subject_query['where'][] = 't.id_first_msg >= ' . $this->_minMsgID;
+				}
+
+				if (!empty($this->_maxMsgID))
+				{
+					$subject_query['where'][] = 't.id_last_msg <= ' . $this->_maxMsgID;
+				}
+
+				if (!empty($this->_boardQuery))
+				{
+					$subject_query['where'][] = 't.id_board ' . $this->_boardQuery;
+				}
+
+				if (!empty($this->_excludedPhrases))
+				{
+					$subject_query['inner_join'][] = '{db_prefix}messages AS m ON (m.id_msg = t.id_first_msg)';
+
+					$count = 0;
+					foreach ($this->_excludedPhrases as $phrase)
+					{
+						$subject_query['where'][] = 'm.subject NOT ' . (empty($modSettings['search_match_words']) || $this->noRegexp() ? ' LIKE ' : ' RLIKE ') . '{string:excluded_phrases_' . $count . '}';
+						$subject_query_params['excluded_phrases_' . ($count++)] = $this->_searchAPI->prepareWord($phrase, $this->noRegexp());
+					}
+				}
+
+				// Build the search query
+				$subject_query['select'] = array(
+					'id_search' => '{int:id_search}',
+					'id_topic' => 't.id_topic',
+					'relevance' => $this->_build_relevance(),
+					'id_msg' => empty($this->_userQuery) ? 't.id_first_msg' : 'm.id_msg',
+					'num_matches' => 1,
+				);
+
+				$subject_query['parameters'] = array_merge($subject_query_params, array(
+					'id_search' => $id_search,
+					'min_msg' => $this->_minMsg,
+					'recent_message' => $this->_recentMsg,
+					'huge_topic_posts' => $humungousTopicPosts,
+					'is_approved' => 1,
+					'limit' => empty($modSettings['search_max_results']) ? 0 : $modSettings['search_max_results'] - $numSubjectResults,
+				));
+
+				$numSubjectResults += $this->_build_search_results_log($subject_query, 'insert_log_search_results_subject');
+
+				if (!empty($modSettings['search_max_results']) && $numSubjectResults >= $modSettings['search_max_results'])
+				{
+					break;
+				}
+			}
+		}
+
+		call_integration_hook('integrate_subject_only_search_query', array(&$subject_query, &$subject_query_params));
+
+		// Did we either get some indexed results, or otherwise did not do an indexed query?
+		if (!empty($numSubjectResults) && is_callable(array($this->_searchAPI, 'indexedWordQuery')))
+		{
+			$relevance = $this->_build_relevance($subject_query['weights']);
+			$subject_query['select']['relevance'] = $relevance;
+			$numSubjectResults += $this->_build_search_results_log($subject_query, 'insert_log_search_results_subject');
+		}
+
+		// Insert subject-only matches.
+		if ($numSubjectResults !== 0)
+		{
+			$subject_query = array(
+				'select' => array(
+					'id_search' => '{int:id_search}',
+					'id_topic' => 't.id_topic',
+					'relevance' => $this->_build_relevance(),
+					'id_msg' => 't.id_first_msg',
+					'num_matches' => 1,
+				),
+				'from' => '{db_prefix}topics AS t',
+				'inner_join' => array(
+					'{db_prefix}' . ($this->_createTemporary ? 'tmp_' : '') . 'log_search_topics AS lst ON (lst.id_topic = t.id_topic)'
+				),
+				'left_join' => array('{db_prefix}boards AS b ON b.id_board = t.id_board'),
+				'where' => array(
+					$this->_createTemporary ? '1=1' : 'lst.id_search = {int:id_search}',
+					'{query_see_board}',
+				),
+				'parameters' => array(
+					'id_search' => $id_search,
+					'min_msg' => $this->_minMsg,
+					'recent_message' => $this->_recentMsg,
+					'huge_topic_posts' => $humungousTopicPosts,
+					'limit' => $numSubjectResults,
+				),
+			);
+
+			$numSubjectResults += $this->_build_search_results_log($subject_query, 'insert_log_search_results_subject', true);
+		}
+		elseif ($numSubjectResults == -1)
+		{
+			$numSubjectResults = 0;
+		}
+
+		return empty($numSubjectResults) ? 0 : $numSubjectResults;]]></add>
+		</operation>
+		<operation>
+			<search position="replace"><![CDATA[		// We building an index?
+		if (is_callable(array($this->_searchAPI, 'indexedWordQuery')))
+		{
+			$indexedResults = $this->_prepare_word_index($id_search, $maxMessageResults);
+
+			if (empty($indexedResults) && empty($numSubjectResults) && !empty($modSettings['search_force_index']))
+			{]]></search>
+			<add><![CDATA[		// We building an index?
+		if (is_callable(array($this->_searchAPI, 'indexedWordQuery')))
+		{
+			$indexedResults = $this->_prepare_word_index($id_search, $maxMessageResults, 'messages');
+
+			if (empty($indexedResults) && empty($numSubjectResults) && !empty($modSettings['search_force_index']))
+			{]]></add>
+		</operation>
+		<operation>
+			<search position="replace"><![CDATA[	 *
+	 * @return int - the number of indexed results
+	 */
+	private function _prepare_word_index($id_search, $maxMessageResults)
+	{
+		$indexedResults = 0;
+		$inserts = array();]]></search>
+			<add><![CDATA[	 *
+	 * @return int - the number of indexed results
+	 */
+	private function _prepare_word_index($id_search, $maxMessageResults, $searchType)
+	{
+		$indexedResults = 0;
+		$inserts = array();]]></add>
+		</operation>
+		<operation>
+			<search position="replace"><![CDATA[		// Clear, all clear!
+		if (!$this->_createTemporary)
+		{
+			$this->_db_search->search_query('delete_log_search_messages', '
+				DELETE FROM {db_prefix}log_search_messages
+				WHERE id_search = {int:id_search}',
+				array(
+					'id_search' => $id_search,]]></search>
+			<add><![CDATA[		// Clear, all clear!
+		if (!$this->_createTemporary)
+		{
+			$this->_db_search->search_query('delete_log_search_' . ($searchType == 'subject' ? 'topics' : 'messages'), '
+				DELETE FROM {db_prefix}log_search_' . ($searchType == 'subject' ? 'topics' : 'messages').'
+				WHERE id_search = {int:id_search}',
+				array(
+					'id_search' => $id_search,]]></add>
+		</operation>
+		<operation>
+			<search position="replace"><![CDATA[			{
+				// Variables required for the search.
+				$search_data = array(
+					'insert_into' => ($this->_createTemporary ? 'tmp_' : '') . 'log_search_messages',
+					'no_regexp' => $this->noRegexp(),
+					'max_results' => $maxMessageResults,
+					'indexed_results' => $indexedResults,]]></search>
+			<add><![CDATA[			{
+				// Variables required for the search.
+				$search_data = array(
+					'type'  => $searchType,
+					'insert_into' => ($this->_createTemporary ? 'tmp_' : '') . 'log_search_' . ($searchType == 'subject' ? 'topics' : 'messages'),
+					'no_regexp' => $this->noRegexp(),
+					'max_results' => $maxMessageResults,
+					'indexed_results' => $indexedResults,]]></add>
+		</operation>
+	</file>
+	
+	<!-- 1.0 updates for ManageBoards.template.php -->		
+	<file name="THEMEDIR/ManageBoards.template.php">
+		<operation>
+			<search position="replace"><![CDATA[ * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * license:  	BSD, See included LICENSE.TXT for terms and conditions.
+ *
+ * @version 1.1
+ *
+ */
+]]></search>
+			<add><![CDATA[ * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * license:  	BSD, See included LICENSE.TXT for terms and conditions.
+ *
+ * @version 1.1.8
+ *
+ */
+]]></add>
+		</operation>
+		<operation>
+			<search position="replace"><![CDATA[			token: {token_var: "' . $context['admin-sort_token_var'] . '", token_id: "' . $context['admin-sort_token'] . '"},
+			tag: "' . implode(' ul,', $sortables) . ' ul",
+			connect: ".nolist",
+			containment: "document",
+			href: "?action=admin;area=manageboards",
+			placeholder: "ui-state-highlight",]]></search>
+			<add><![CDATA[			token: {token_var: "' . $context['admin-sort_token_var'] . '", token_id: "' . $context['admin-sort_token'] . '"},
+			tag: "' . implode(' ul,', $sortables) . ' ul",
+			connect: ".nolist",
+			tolerance: "pointer",
+			containment: "document",
+			href: "?action=admin;area=manageboards",
+			placeholder: "ui-state-highlight",]]></add>
+		</operation>
+	</file>
+	
+	<!-- 1.0 updates for Theme.php -->		
+	<file name="THEMEDIR/Theme.php">
+		<operation>
+			<search position="replace"><![CDATA[ * copyright:    2011 Simple Machines (http://www.simplemachines.org)
+ * license:      BSD, See included LICENSE.TXT for terms and conditions.
+ *
+ * @version 1.1.6
+ *
+ */
+]]></search>
+			<add><![CDATA[ * copyright:    2011 Simple Machines (http://www.simplemachines.org)
+ * license:      BSD, See included LICENSE.TXT for terms and conditions.
+ *
+ * @version 1.1.8
+ *
+ */
+]]></add>
+		</operation>
+		<operation>
+			<search position="replace"><![CDATA[	{
+		global $modSettings, $settings;
+
+		// Using a specified version of jquery or what was shipped 3.1.1  / 1.12.1
+		$jquery_version = (!empty($modSettings['jquery_default']) && !empty($modSettings['jquery_version'])) ? $modSettings['jquery_version'] : '3.1.1';
+		$jqueryui_version = (!empty($modSettings['jqueryui_default']) && !empty($modSettings['jqueryui_version'])) ? $modSettings['jqueryui_version'] : '1.12.1';
+
+		switch ($modSettings['jquery_source'])]]></search>
+			<add><![CDATA[	{
+		global $modSettings, $settings;
+
+		// Using a specified version of jquery or what was shipped 3.6.0  / 1.12.1
+		$jquery_version = (!empty($modSettings['jquery_default']) && !empty($modSettings['jquery_version'])) ? $modSettings['jquery_version'] : '3.6.0';
+		$jqueryui_version = (!empty($modSettings['jqueryui_default']) && !empty($modSettings['jqueryui_version'])) ? $modSettings['jqueryui_version'] : '1.12.1';
+
+		switch ($modSettings['jquery_source'])]]></add>
+		</operation>
+	</file>
+	
+	<!-- 1.0 updates for Admin.english.php -->		
+	<file name="LANGUAGEDIR/english/Admin.english.php">
+		<operation>
+			<search position="replace"><![CDATA[$txt['privacypol_not_writable'] = 'Warning - privacypolicy.txt is not writable. Any changes you make will NOT be saved.';
+$txt['privacypol_backup_not_writable'] = 'Warning - the backup directory in forum_root/packages/backup cannot be created.';
+
+$txt['version_check_desc'] = 'This shows you the versions of your installation\'s files versus those of the latest version. If any of these files are out of date, you should download and upgrade to the latest version at our <a href="https://github.com/elkarte/Elkarte/wiki/downloads" target="_blank" class="new_win">ElkArte Site</a>.';
+$txt['version_check_more'] = '(more detailed)';
+
+$txt['lfyi'] = 'You are unable to connect to ElkArte\'s latest news file.';]]></search>
+			<add><![CDATA[$txt['privacypol_not_writable'] = 'Warning - privacypolicy.txt is not writable. Any changes you make will NOT be saved.';
+$txt['privacypol_backup_not_writable'] = 'Warning - the backup directory in forum_root/packages/backup cannot be created.';
+
+$txt['version_check_desc'] = 'This shows you the versions of your installation\'s files versus those of the latest version. If any of these files are out of date, you should download and upgrade to the latest version at our <a href="https://github.com/elkarte/Elkarte/releases" target="_blank" class="new_win">ElkArte Site</a>.';
+$txt['version_check_more'] = '(more detailed)';
+
+$txt['lfyi'] = 'You are unable to connect to ElkArte\'s latest news file.';]]></add>
+		</operation>
+	</file>
+
+	<!-- 1.0 updates for ManageSettings.english.php -->		
+	<file name="LANGUAGEDIR/english/ManageSettings.english.php">
+		<operation>
+			<search position="replace"><![CDATA[$txt['who_enabled'] = 'Enable who\'s online list';
+$txt['settings_error'] = 'Warning: Updating of Settings.php failed, the settings cannot be saved.';
+$txt['core_settings_saved'] = 'The settings were successfully saved';
+
+$txt['karmaMode'] = 'Karma mode';
+$txt['karma_options'] = 'Disable karma|Enable karma total|Enable karma positive/negative';]]></search>
+			<add><![CDATA[$txt['who_enabled'] = 'Enable who\'s online list';
+$txt['settings_error'] = 'Warning: Updating of Settings.php failed, the settings cannot be saved.';
+$txt['core_settings_saved'] = 'The settings were successfully saved';
+$txt['action'] = 'Current Action';
+
+$txt['karmaMode'] = 'Karma mode';
+$txt['karma_options'] = 'Disable karma|Enable karma total|Enable karma positive/negative';]]></add>
+		</operation>
+	</file>
+	
+</modification>
