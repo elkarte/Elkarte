@@ -95,7 +95,7 @@
 	--infobox: #D9EDF7; /* Very light blue, infobox background */
 
 	--primary_background: #4D4F54; /* HTML & footer Background */
-	--content-background: #FEFEFE; /* background for many divs, input controls, etc */
+	--content_background: #FEFEFE; /* background for many divs, input controls, etc */
 	--grey_background: #F6F6F6; /* Various uses, notably menu / tab hovers */
 	--mid_grey_background: #EEEEEE; /* Various uses where a slightly darker background is needed */
 	--dark_grey_background: #989898; /* A bit darker, useful in some places */
@@ -107,7 +107,7 @@
 	--strong_text: #686868; /* like a demi bold */
 	--footer_text: #CCCCCC; /* Text used in the footer which is a dark background */
 	--footer_top_border: #444444; /* Border that separates footer from body */
-	--primary_white: #000000; /* Used in shadows, backgrounds or text, many places */
+	--primary_white: #EFEFEF; /* Used in shadows, backgrounds or text, many places */
 	--primary_white_compliment: #E4E4E4; /* Used with --primary_white for gradients */
 
 	--body_grad_1: #EEEEEE; /* Body Gradient */
@@ -181,7 +181,7 @@ legend {
 input, button, select, textarea, .editor {
 	color: var(--strong_text);
 	border-color: var(--primary_border);
-	background: var(--content-background);
+	background: var(--content_background);
 }
 
 input:hover, textarea:hover, button:hover, select:hover {
@@ -342,7 +342,7 @@ hr {
 /* Used for sections that need somewhat larger corners */
 .roundframe, .well {
 	border-color: var(--primary_border);
-	background: var(--content-background);
+	background: var(--content_background);
 }
 
 /* The generic wrapper thingy. */
@@ -413,7 +413,7 @@ hr {
 .bbc_code {
 	border-top-color: var(--seconday_border);
 	border-bottom-color: var(--seconday_border);
-	background: var(--content-background);
+	background: var(--content_background);
 }
 
 /* Styling for BBC tags */
@@ -489,7 +489,7 @@ sup.bbc_footnotes, sup.bbc_footnotes a {
 #ajax_in_progress, .ajax_infobar {
 	color: var(--top_section_border);
 	border-bottom-color: var(--top_section_border);
-	background: var(--content-background);
+	background: var(--content_background);
 	background-repeat: no-repeat;
 	background-position: 6px 50%;
 	background-size: 20px 20px;
@@ -576,7 +576,7 @@ sup.bbc_footnotes, sup.bbc_footnotes a {
 	border-top: none;
 	border-top-left-radius: 0;
 	border-top-right-radius: 0;
-	background: var(--content-background);
+	background: var(--content_background);
 }
 
 #footer_section {
@@ -622,6 +622,7 @@ sup.bbc_footnotes, sup.bbc_footnotes a {
 	border-top-color: var(--seconday_border_top);
 	border-left-color: var(--seconday_border_left);
 	border-radius: 2px;
+/*linear-gradient(to bottom, #EFEFEF, #E4E4E4)*/
 	background-image: linear-gradient(to bottom, var(--primary_white), var(--primary_white_compliment));
 	box-shadow: 1px 1px 2px var(--box_shadow);
 }
@@ -843,7 +844,7 @@ nav.breadcrumb {
 }
 
 .breadcrumb .crumb:not(:last-child)::after {
-	background-image: linear-gradient(45deg, var(--primary_white) 0%, var(--primary_white) 50%, var(--primary_white_compliment) 50%, var(--primary_white_compliment) 100%);
+	background-image: linear-gradient(45deg, var(--content_background) 0%, var(--content_background) 50%, var(--primary_white_compliment) 50%, var(--primary_white_compliment) 100%);
 }
 
 .breadcrumb .crumb > a > i.i-home {
@@ -1104,7 +1105,7 @@ nav.breadcrumb {
 #sort_by {
 	border-color: var(--primary_border_top);
 	border-bottom: none;
-	background-color: var(--content-background);
+	background-color: var(--content_background);
 }
 
 #sort_by.topic_sorting_recent {
@@ -1150,7 +1151,7 @@ nav.breadcrumb {
 
 .forumposts:nth-of-type(even) {
 	margin-top: 2px;
-	background: var(--content-background);
+	background: var(--content_background);
 }
 
 .forumposts:nth-of-type(odd) {
@@ -1173,7 +1174,7 @@ nav.breadcrumb {
 
 #poll_options .options .percentage {
 	border-radius: 4px;
-	background: var(--content-background);
+	background: var(--content_background);
 }
 
 .topic_details {
@@ -1307,7 +1308,7 @@ nav.breadcrumb {
 	color: var(--hover_text);
 	border-color: var(--primary_border);
 	border-radius: 5px;
-	background-color: var(--content-background);
+	background-color: var(--content_background);
 }
 
 .statusbar {
@@ -1318,7 +1319,7 @@ nav.breadcrumb {
 
 .statusbar .insertoverlay {
 	border-color: var(--status_bar_border);
-	background-color: var(--content-background);
+	background-color: var(--content_background);
 }
 
 .insertoverlay .tabs li {
@@ -1330,7 +1331,7 @@ nav.breadcrumb {
 }
 
 .statusbar .insertoverlay .button {
-	color: var(--content-background);
+	color: var(--content_background);
 	background: var(--pure_green);
 }
 
@@ -1398,7 +1399,7 @@ nav.breadcrumb {
 
 .ui-tabs .ui-tabs-nav .ui-tabs-anchor {
 	border-bottom-color: var(--primary_border_bottom);
-	background: var(--content-background);
+	background: var(--content_background);
 }
 
 .ui-tabs .ui-tabs-nav .ui-state-default .ui-tabs-anchor {
@@ -1459,7 +1460,7 @@ nav.breadcrumb {
 .activity_stats li .bar {
 	border-color: var(--primary_border);
 	border-bottom: none;
-	background: var(--content-background);
+	background: var(--content_background);
 }
 
 .activity_stats li .bar div {
@@ -1501,7 +1502,7 @@ nav.breadcrumb {
 
 .weeklist > li {
 	border-color: var(--transparent);
-	background: var(--content-background);
+	background: var(--content_background);
 }
 
 #main_grid td.days, .calendar_table td.days, .weeklist h4 {
@@ -1531,7 +1532,7 @@ nav.breadcrumb {
 
 .statistics .flow_hidden, #forum_history .flow_hidden {
 	border-color: var(--transparent);
-	background: var(--content-background);
+	background: var(--content_background);
 }
 
 .stats.floatleft {
@@ -1540,7 +1541,7 @@ nav.breadcrumb {
 
 #top_row .stats dd, .statsbar {
 	border-color: var(--seconday_border);
-	background: var(--content-background);
+	background: var(--content_background);
 }
 
 #top_row .stats dd {
@@ -1558,7 +1559,7 @@ nav.breadcrumb {
 }
 
 .statsbar .righttext {
-	background: var(--content-background);
+	background: var(--content_background);
 }
 
 /* -------------------------------------------------------
@@ -1574,7 +1575,7 @@ nav.breadcrumb {
 /* Styles for the tooltips. */
 .tooltip {
 	border-color: var(--seconday_border);
-	background: var(--content-background);
+	background: var(--content_background);
 	box-shadow: 3px 3px 3px var(--opacity30);
 }
 
@@ -1587,7 +1588,7 @@ nav.breadcrumb {
 .popup_window {
 	border-color: var(--primary_border);
 	border-radius: 7px 7px 3px 3px;
-	background-color: var(--content-background);
+	background-color: var(--content_background);
 	box-shadow: 0 4px 6px var(--opacity50);
 }
 
@@ -1595,7 +1596,7 @@ nav.breadcrumb {
 .popup_content {
 	border-color: var(--seconday_border);
 	border-radius: 6px 6px 2px 2px;
-	background: var(--content-background);
+	background: var(--content_background);
 	box-shadow: 0 -2px 3px var(--opacity20);
 }
 
@@ -1605,7 +1606,7 @@ nav.breadcrumb {
  */
 
 #mlsearch_options {
-	background-color: var(--content-background);
+	background-color: var(--content_background);
 }
 
 .search_results_posts > li:not(:last-child) {
@@ -1628,7 +1629,7 @@ nav.breadcrumb {
 .mlist li div, .whos_online dt div, .whos_online dd:nth-child(odd) div {
 	border-top-color: var(--primary_border);
 	border-bottom-color: var(--primary_border);
-	background-color: var(--content-background);
+	background-color: var(--content_background);
 }
 
 .mlist li.alternate_row div, .whos_online dd:nth-child(even) div {
@@ -1843,7 +1844,7 @@ nav.breadcrumb {
 	}
 
 	#main_menu .linklevel1 .icon-menu:hover {
-		background: var(--content-background);
+		background: var(--content_background);
 	}
 
 	#collapse_button {
@@ -1882,7 +1883,7 @@ nav.breadcrumb {
 
 	#menu_sidebar {
 		border-color: var(--seconday_border);
-		background: var(--content-background);
+		background: var(--content_background);
 		box-shadow: 3px 3px 3px var(--opacity30);
 	}
 
@@ -1920,7 +1921,7 @@ nav.breadcrumb {
 
 	.board_row, .childboard_row {
 		border-color: var(--primary_border);
-		background-color: var(--content-background);
+		background-color: var(--content_background);
 		box-shadow: 1px 1px 3px var(--box_shadow);
 	}
 
@@ -1983,7 +1984,7 @@ nav.breadcrumb {
 
 	.forum_category, .forumposts, .content_category {
 		border: none;
-		background: var(--content-background);
+		background: var(--content_background);
 	}
 
 	.poster .subsections > a::after, .poster .subsections:hover > .name.linklevel1::after,
