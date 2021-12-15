@@ -456,16 +456,16 @@ class ManageMembers extends AbstractController
 				'file' => SUBSDIR . '/Members.subs.php',
 				'function' => 'list_getMembers',
 				'params' => array(
-					isset($where) ? $where : '1=1',
-					isset($where_params) ? $where_params : array(),
+					$where ?? '1=1',
+					$where_params ?? array(),
 				),
 			),
 			'get_count' => array(
 				'file' => SUBSDIR . '/Members.subs.php',
 				'function' => 'list_getNumMembers',
 				'params' => array(
-					isset($where) ? $where : '1=1',
-					isset($where_params) ? $where_params : array(),
+					$where ?? '1=1',
+					$where_params ?? array(),
 				),
 			),
 			'columns' => array(
@@ -505,7 +505,7 @@ class ManageMembers extends AbstractController
 					),
 					'data' => array(
 						'sprintf' => array(
-							'format' => '<a href="' . getUrl('action', ['action' => 'profile', 'u' => '%1$d']) . '">%2$s</a>',
+							'format' => '<a href="' . getUrl('profile', ['action' => 'profile', 'u' => '%1$d']) . '">%2$s</a>',
 							'params' => array(
 								'id_member' => false,
 								'real_name' => false,
