@@ -2226,7 +2226,7 @@ function updatePostGroupStats($members = null, $parameter2 = null)
 		return;
 	}
 
-	// Set all membergroups from most posts to least posts.
+	// Set all membergroups from most posts to the least posts.
 	$conditions = '';
 	$lastMin = 0;
 	foreach ($postgroups as $id => $min_posts)

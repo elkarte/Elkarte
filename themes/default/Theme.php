@@ -290,7 +290,7 @@ class Theme extends BaseTheme
 	/**
 	 * Loads the JS files that have been requested
 	 *
-	 * - Will combine / minify the files it the option is set.
+	 * - Will combine / minify the files if the option is set.
 	 * - Handles both above and below (deferred) files
 	 *
 	 * @param bool $do_deferred
@@ -689,7 +689,7 @@ class Theme extends BaseTheme
 
 		static $loaded = false;
 
-		// Under SSI this function can be called more then once.  That can cause some problems.
+		// Under SSI this function can be called more than once.  That can cause some problems.
 		// So only run the function once unless we are forced to run it again.
 		if ($loaded && !$forceload)
 		{
@@ -843,7 +843,7 @@ class Theme extends BaseTheme
 
 		$this->loadSupportCSS();
 
-		// Since it's nice to have avatars all of the same size, and in some cases the size detection may fail,
+		// Since it's nice to have avatars all the same size, and in some cases the size detection may fail,
 		// let's add the css in any case
 		if (!isset($context['html_headers']))
 			$context['html_headers'] = '';
@@ -880,7 +880,7 @@ class Theme extends BaseTheme
 	}
 
 	/**
-	 * Sets up all of the top menu buttons
+	 * Sets up all the top menu buttons
 	 *
 	 * What it does:
 	 *
@@ -933,7 +933,7 @@ class Theme extends BaseTheme
 	}');
 		}
 
-		// All the buttons we can possible want and then some, try pulling the final list of buttons from cache first.
+		// All the buttons we can possibly want and then some, try pulling the final list of buttons from cache first.
 		if (($menu_buttons = $cache->get('menu_buttons-' . implode('_', $this->user->groups) . '-' . $this->user->language, $cacheTime)) === null || time() - $cacheTime <= $modSettings['settings_updated'])
 		{
 			// Start things up: this is what we know by default
@@ -1026,7 +1026,7 @@ class Theme extends BaseTheme
 
 		$context['menu_buttons'] = $menu_buttons;
 
-		// Figure out which action we are doing so we can set the active tab.
+		// Figure out which action we are doing, so we can set the active tab.
 		// Default to home.
 		$current_action = 'home';
 
@@ -1217,7 +1217,7 @@ class Theme extends BaseTheme
 			}
 
 			// Load a theme variant custom CSS
-			if (!empty($context['theme_variant']) && file_exists($settings['theme_dir'] . '/css/' . $context['theme_variant'] . '/custom' . $context['theme_variant'] . '.css'))
+			if (file_exists($settings['theme_dir'] . '/css/' . $context['theme_variant'] . '/custom' . $context['theme_variant'] . '.css'))
 			{
 				loadCSSFile($context['theme_variant'] . '/custom' . $context['theme_variant'] . '.css');
 			}

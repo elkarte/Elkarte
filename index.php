@@ -16,12 +16,12 @@
  *
  */
 
-// Bootstrap the system
 use ElkArte\Controller\ScheduledTasks;
 use ElkArte\EventManager;
 use ElkArte\HttpReq;
 use ElkArte\User;
 
+// Bootstrap the system
 require_once(dirname(__FILE__) . '/bootstrap.php');
 new Bootstrap(false);
 

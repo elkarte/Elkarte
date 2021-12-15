@@ -1856,7 +1856,7 @@ function obStart($use_compression = false)
 }
 
 /**
- * Returns an URL based on the parameters passed and the selected generator
+ * Returns a URL based on the parameters passed and the selected generator
  *
  * @param string $type The type of the URL (depending on the type, the
  *                     generator can act differently
@@ -1877,7 +1877,7 @@ function getUrl($type, $params)
 }
 
 /**
- * Returns the query part of an URL based on the parameters passed and the selected generator
+ * Returns the query part of a URL based on the parameters passed and the selected generator
  *
  * @param string $type The type of the URL (depending on the type, the
  *                     generator can act differently

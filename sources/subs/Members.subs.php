@@ -2667,7 +2667,6 @@ function memberQuerySeeBoard($id_member)
  *
  * @param int[]|int $members An array of member ids
  * @param mixed[] $data An associative array of the columns to be updated and their respective values.
- * @throws \ElkArte\Exceptions\Exception
  */
 function updateMemberData($members, $data)
 {
@@ -2768,13 +2767,13 @@ function updateMemberData($members, $data)
 		{
 			$type = 'float';
 		}
-		elseif ($var == 'birthdate')
+		elseif ($var === 'birthdate')
 		{
 			$type = 'date';
 		}
 
 		// Doing an increment?
-		if ($type == 'int' && ($val === '+' || $val === '-'))
+		if ($type === 'int' && ($val === '+' || $val === '-'))
 		{
 			$val = $var . ' ' . $val . ' 1';
 			$type = 'raw';
