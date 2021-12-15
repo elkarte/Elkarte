@@ -211,7 +211,7 @@ class Attachment extends AbstractController
 			return false;
 		}
 
-		// We need a filename and path or we are not going any further
+		// We need a filename and path, or we are not going any further
 		if (isset($this->_req->post->attachid))
 		{
 			$result = false;
@@ -340,14 +340,14 @@ class Attachment extends AbstractController
 				if (empty($attachment['filename']))
 				{
 					$full_attach = getAttachmentFromTopic($id_attach, $id_topic);
-					$attachment['filename'] = !empty($full_attach[1]) ? $full_attach[1] : '';
+					$attachment['filename'] = !empty($full_attach['filename']) ? $full_attach['filename'] : '';
 					$attachment['id_attach'] = 0;
 					$attachment['attachment_type'] = 0;
-					$attachment['approved'] = $full_attach[7];
-					$attachment['id_member'] = $full_attach[8];
+					$attachment['approved'] = $full_attach['approved'];
+					$attachment['id_member'] = $full_attach['id_member'];
 
-					// return mime type ala mimetype extension
-					$check = returnMimeThumb(!empty($full_attach[3]) ? $full_attach[3] : 'default');
+					// If it is a known extension, show a mimetype extension image
+					$check = returnMimeThumb(!empty($full_attach['fileext']) ? $full_attach['fileext'] : 'default');
 					if ($check !== false)
 					{
 						$attachment['fileext'] = 'png';
@@ -357,7 +357,7 @@ class Attachment extends AbstractController
 					else
 					{
 						$attachmentsDir = new AttachmentsDirectory($modSettings, database());
-						$filename = $attachmentsDir->getCurrent() . '/' . $attachment[1];
+						$filename = $attachmentsDir->getCurrent() . '/' . $attachment['filename'];
 					}
 
 					if (substr(get_finfo_mime($filename), 0, 5) !== 'image')
@@ -465,7 +465,7 @@ class Attachment extends AbstractController
 
 	/**
 	 * If the mime type benefits from compression e.g. text/xyz and gzencode is
-	 * available and the user agent accpets gzip, then return true, else false
+	 * available and the user agent accepts gzip, then return true, else false
 	 *
 	 * @param string $mime_type
 	 * @return bool if we should compress the file
@@ -621,7 +621,7 @@ class Attachment extends AbstractController
 			$this->action_no_attach();
 		}
 
-		// We need to do some work on attachments and avatars.
+		// We will need some help
 		require_once(SUBSDIR . '/Attachments.subs.php');
 		$tmp_attachments = new TemporaryAttachmentsList();
 		$attachmentsDir = new AttachmentsDirectory($modSettings, database());
@@ -691,19 +691,15 @@ class Attachment extends AbstractController
 
 		if ($resize)
 		{
-			// Create a thumbnail image and write it directly to the screen
+			// Create a thumbnail image
 			$image = new Image($filename);
 
-			$thumb_filename = $filename . '_thumb';
-			$thumb_image = $image->createThumbnail(100, 100, $thumb_filename);
-
-			Headers::instance()->header('Content-Length', $thumb_image->getFilesize())->sendHeaders();
-
-			if (@readfile($thumb_filename) === null)
-			{
-				echo file_get_contents($thumb_filename);
-			}
+			$filename = $filename . '_thumb';
+			$image->createThumbnail(100, 100, $filename);
 		}
+
+		// With the headers complete, send the file data
+		$this->send_file($filename, $mime_type);
 
 		obExit(false);
 	}

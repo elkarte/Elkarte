@@ -219,11 +219,13 @@ class AttachmentsDirectory
 	/**
 	 * Return the base directory in use for attachments
 	 *
-	 * @return mixed
+	 * @return array
 	 */
 	public function getBaseDirs()
 	{
-		return $this->basedirectory_for_attachments;
+		return is_array($this->basedirectory_for_attachments)
+			? $this->basedirectory_for_attachments
+			: array($this->basedirectory_for_attachments);
 	}
 
 	/**
@@ -247,6 +249,11 @@ class AttachmentsDirectory
 		return in_array($dir, $this->baseDirectories);
 	}
 
+	/**
+	 * @todo
+	 * @param $dir_id
+	 * @return void
+	 */
 	public function updateLastDirs($dir_id)
 	{
 		if (!empty($this->last_dirs) && (isset($this->last_dirs[$dir_id]) || isset($this->last_dirs[0])))
@@ -313,6 +320,11 @@ class AttachmentsDirectory
 		}
 	}
 
+	/**
+	 * @todo
+	 * @param $level
+	 * @return bool
+	 */
 	public function autoManageIsLevel($level)
 	{
 		return $this->automanage_attachments === (int) $level;

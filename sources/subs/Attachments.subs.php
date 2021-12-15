@@ -571,12 +571,10 @@ function getAttachmentThumbFromTopic($id_attach, $id_topic)
 	$db = database();
 
 	// Make sure this attachment is on this board.
-	$attachmentData = [
-		'id_folder' => '', 'filename' => '', 'file_hash' => '', 'fileext' => '', 'id_attach' => '',
-		'attachment_type' => '', 'mime_type' => '', 'approved' => '', 'id_member' => ''];
 	$request = $db->fetchQuery('
 		SELECT 
-			th.id_folder, th.filename, th.file_hash, th.fileext, th.id_attach, th.attachment_type, th.mime_type,
+			th.id_folder, th.filename, th.file_hash, th.fileext, th.id_attach, 
+			th.attachment_type, th.mime_type,
 			a.id_folder AS attach_id_folder, a.filename AS attach_filename,
 			a.file_hash AS attach_file_hash, a.fileext AS attach_fileext,
 			a.id_attach AS attach_id_attach, a.attachment_type AS attach_attachment_type,
@@ -592,7 +590,9 @@ function getAttachmentThumbFromTopic($id_attach, $id_topic)
 			'current_topic' => $id_topic,
 		)
 	);
-
+	$attachmentData = [
+		'id_folder' => '', 'filename' => '', 'file_hash' => '', 'fileext' => '', 'id_attach' => '',
+		'attachment_type' => '', 'mime_type' => '', 'approved' => '', 'id_member' => ''];
 	if ($request->num_rows() != 0)
 	{
 		$row = $request->fetch_assoc();
@@ -616,7 +616,7 @@ function getAttachmentThumbFromTopic($id_attach, $id_topic)
 		elseif (getValidMimeImageType($row['attach_mime_type']) !== '')
 		{
 			$attachmentData = array(
-				'id_folder' => $row['id_folder'],
+				'id_folder' => $row['attach_id_folder'],
 				'filename' => $row['attach_filename'],
 				'file_hash' => $row['attach_file_hash'],
 				'fileext' => $row['attach_fileext'],
@@ -1451,6 +1451,8 @@ function getAttachmentFilename($filename, $attachment_id, $dir = null, $new = fa
 		return getLegacyAttachmentFilename($filename, $attachment_id, $dir, $new);
 	}
 
+	// If we were passed the directory id, use it
+	$modSettings['currentAttachmentUploadDir'] = $dir;
 	$attachmentsDir = new AttachmentsDirectory($modSettings, database());
 	$path = $attachmentsDir->getCurrent();
 
@@ -1527,7 +1529,7 @@ function returnMimeThumb($file_ext, $url = false)
 	global $settings;
 
 	// These are not meant to be exhaustive, just some of the most common attached on a forum
-	static $generics = array(
+	$generics = array(
 		'arc' => array('tgz', 'zip', 'rar', '7z', 'gz'),
 		'doc' => array('doc', 'docx', 'wpd', 'odt'),
 		'sound' => array('wav', 'mp3', 'pcm', 'aiff', 'wma', 'm4a'),
@@ -1576,7 +1578,7 @@ function returnMimeThumb($file_ext, $url = false)
 function getValidMimeImageType($mime)
 {
 	// These are the only valid image types.
-	static $validImageTypes = array(
+	$validImageTypes = array(
 		-1 => 'jpg',
 		// Starting from here are the IMAGETYPE_* constants
 		IMAGETYPE_GIF => 'gif',
