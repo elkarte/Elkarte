@@ -18,7 +18,6 @@ namespace ElkArte\AdminController;
 
 use ElkArte\AbstractController;
 use ElkArte\Cache\Cache;
-use ElkArte\Debug;
 use ElkArte\Hooks;
 use ElkArte\Themes\ThemeLoader;
 use FilesystemIterator;

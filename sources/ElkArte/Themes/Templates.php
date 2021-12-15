@@ -82,7 +82,6 @@ class Templates
 	 *     template cannot be found
 	 *
 	 * @return bool|null
-	 * @throws \ElkArte\Exceptions\Exception
 	 * @uses $this->requireTemplate() to actually load the file.
 	 *
 	 */

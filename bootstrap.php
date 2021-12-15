@@ -14,6 +14,7 @@
  */
 
 use ElkArte\Debug;
+use ElkArte\ext\Composer\Autoload\ClassLoader;
 use ElkArte\Hooks;
 use ElkArte\User;
 use ElkArte\TokenHash;
@@ -28,7 +29,7 @@ use BBC\ParserWrapper;
 /**
  * Class Bootstrap
  *
- * This takes care of the initial loading and feeding of Elkarte from
+ * Takes care of the initial loading and feeding of Elkarte from
  * either SSI or Index
  */
 class Bootstrap
@@ -44,9 +45,8 @@ class Bootstrap
 	 * Bootstrap constructor.
 	 *
 	 * @param bool $standalone
-	 *  - true to boot outside of elkarte
+	 *  - true to boot outside elkarte
 	 *  - false to bootstrap the main elkarte site.
-	 * @throws \ElkArte\Exceptions\Exception
 	 */
 	public function __construct($standalone = true)
 	{
@@ -151,7 +151,7 @@ class Bootstrap
 		// Where the Settings.php file is located
 		$settings_loc = __DIR__ . '/Settings.php';
 
-		// First thing: if the install dir exists, just send anybody there
+		// First thing: if the installation dir exists, just send anybody there
 		// The IGNORE_INSTALL_DIR constant is for developers only. Do not add it on production sites
 		if (file_exists('install') && (file_exists('install/install.php') || file_exists('install/upgrade.php')))
 		{
@@ -177,7 +177,7 @@ class Bootstrap
 				$host = empty($_SERVER['HTTP_HOST']) ? $_SERVER['SERVER_NAME'] . $port : $_SERVER['HTTP_HOST'];
 				$path = strtr(dirname($_SERVER['PHP_SELF']), '\\', '/') == '/' ? '' : strtr(dirname($_SERVER['PHP_SELF']), '\\', '/');
 
-				// To early to use Headers class etc.
+				// Too early to use Headers class etc.
 				header('Location:' . $proto . '://' . $host . $path . '/install/' . $redirec_file . '?v=' . $version_running);
 				die();
 			}
@@ -258,7 +258,7 @@ class Bootstrap
 	{
 		require_once(EXTDIR . '/ClassLoader.php');
 
-		$loader = new \ElkArte\ext\Composer\Autoload\ClassLoader();
+		$loader = new ClassLoader();
 		$loader->setPsr4('ElkArte\\', SOURCEDIR . '/ElkArte');
 		$loader->setPsr4('BBC\\', SOURCEDIR . '/ElkArte/BBC');
 		$loader->register();
@@ -312,7 +312,7 @@ class Bootstrap
 		// Clean the request.
 		cleanRequest();
 
-		// Make sure we have ready the list of members for populating it
+		// Make sure we have the list of members for populating it
 		MembersList::init(database(), Cache::instance(), ParserWrapper::instance());
 
 		// Our good ole' contextual array, which will hold everything
@@ -326,7 +326,6 @@ class Bootstrap
 	 * If you are running SSI standalone, you need to call this function after bootstrap is
 	 * initialized.
 	 *
-	 * @throws \ElkArte\Exceptions\Exception
 	 */
 	public function ssi_main()
 	{

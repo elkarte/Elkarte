@@ -75,18 +75,19 @@ class BoardsTree
 		$last_board_order = 0;
 		while (($row = $request->fetch_assoc()))
 		{
+			$row['id_cat'] = (int) $row['id_cat'];
 			if (!isset($this->cat_tree[$row['id_cat']]))
 			{
 				$this->cat_tree[$row['id_cat']] = array(
 					'node' => array(
 						'id' => $row['id_cat'],
 						'name' => $row['cat_name'],
-						'order' => $row['cat_order'],
+						'order' => (int) $row['cat_order'],
 						'can_collapse' => $row['can_collapse']
 					),
 					'is_first' => empty($this->cat_tree),
 					'last_board_order' => $last_board_order,
-					'children' => array()
+					'children' => []
 				);
 				$prevBoard = 0;
 				$curLevel = 0;
@@ -94,7 +95,9 @@ class BoardsTree
 
 			if (!empty($row['id_board']))
 			{
-				if ($row['child_level'] != $curLevel)
+				$row['id_board'] = (int) $row['id_board'];
+				$row['child_level'] = (int) $row['child_level'];
+				if ($row['child_level'] !== $curLevel)
 				{
 					$prevBoard = 0;
 				}
@@ -102,9 +105,9 @@ class BoardsTree
 				$this->boards[$row['id_board']] = array(
 					'id' => $row['id_board'],
 					'category' => $row['id_cat'],
-					'parent' => $row['id_parent'],
+					'parent' => (int) $row['id_parent'],
 					'level' => $row['child_level'],
-					'order' => $row['board_order'],
+					'order' => (int) $row['board_order'],
 					'name' => $row['board_name'],
 					'member_groups' => explode(',', $row['member_groups']),
 					'deny_groups' => explode(',', $row['deny_member_groups']),
@@ -126,7 +129,7 @@ class BoardsTree
 					$this->cat_tree[$row['id_cat']]['children'][$row['id_board']] = array(
 						'node' => &$this->boards[$row['id_board']],
 						'is_first' => empty($this->cat_tree[$row['id_cat']]['children']),
-						'children' => array()
+						'children' => []
 					);
 					$this->boards[$row['id_board']]['tree'] = &$this->cat_tree[$row['id_cat']]['children'][$row['id_board']];
 				}
@@ -143,7 +146,8 @@ class BoardsTree
 					{
 						$this->db->query('', '
 							UPDATE {db_prefix}boards
-							SET child_level = {int:new_child_level}
+							SET 
+								child_level = {int:new_child_level}
 							WHERE id_board = {int:selected_board}',
 							array(
 								'new_child_level' => $this->boards[$row['id_parent']]['tree']['node']['level'] + 1,
@@ -155,7 +159,7 @@ class BoardsTree
 					$this->boards[$row['id_parent']]['tree']['children'][$row['id_board']] = array(
 						'node' => &$this->boards[$row['id_board']],
 						'is_first' => empty($this->boards[$row['id_parent']]['tree']['children']),
-						'children' => array()
+						'children' => []
 					);
 					$this->boards[$row['id_board']]['tree'] = &$this->boards[$row['id_parent']]['tree']['children'][$row['id_board']];
 				}
@@ -235,10 +239,8 @@ class BoardsTree
 		{
 			return $this->cat_tree[$id];
 		}
-		else
-		{
-			throw new \Exception('Category id doesn\'t exist: ' . $id);
-		}
+
+		throw new \Exception('Category id doesn\'t exist: ' . $id);
 	}
 
 	public function getBoardsInCat($id)
@@ -247,10 +249,8 @@ class BoardsTree
 		{
 			return $this->boardList[$id];
 		}
-		else
-		{
-			throw new \Exception('Category id doesn\'t exist: ' . $id);
-		}
+
+		throw new \Exception('Category id doesn\'t exist: ' . $id);
 	}
 
 	public function categoryExists($id)
@@ -269,10 +269,8 @@ class BoardsTree
 		{
 			return $this->boards[$id];
 		}
-		else
-		{
-			throw new \Exception('Board id doesn\'t exist: ' . $id);
-		}
+
+		throw new \Exception('Board id doesn\'t exist: ' . $id);
 	}
 
 	/**
@@ -357,7 +355,8 @@ class BoardsTree
 
 		// Delete ALL topics in the selected boards (done first so topics can't be marooned.)
 		$topics = $this->db->fetchQuery('
-			SELECT id_topic
+			SELECT 
+				id_topic
 			FROM {db_prefix}topics
 			WHERE id_board IN ({array_int:boards_to_remove})',
 			array(
@@ -430,6 +429,7 @@ class BoardsTree
 		// Latest message/topic might not be there anymore.
 		require_once(SUBSDIR . '/Messages.subs.php');
 		updateMessageStats();
+
 		require_once(SUBSDIR . '/Topic.subs.php');
 		updateTopicStats();
 		updateSettings(array('calendar_updated' => time()));
@@ -462,7 +462,8 @@ class BoardsTree
 	{
 		// Grab all children of $parent...
 		$children = $this->db->fetchQuery('
-			SELECT id_board
+			SELECT 
+				id_board
 			FROM {db_prefix}boards
 			WHERE id_parent = {int:parent_board}',
 			array(
@@ -477,7 +478,8 @@ class BoardsTree
 		// ...and set it to a new parent and child_level.
 		$this->db->query('', '
 			UPDATE {db_prefix}boards
-			SET id_parent = {int:new_parent}, child_level = {int:new_child_level}
+			SET 
+				id_parent = {int:new_parent}, child_level = {int:new_child_level}
 			WHERE id_parent = {int:parent_board}',
 			array(
 				'new_parent' => $newParent,
@@ -537,8 +539,7 @@ class BoardsTree
 		$this->db->query('',
 			'UPDATE {db_prefix}boards
 				SET
-					board_order = CASE id_board ' . $update_query . '
-						ELSE board_order END',
+					board_order = CASE id_board ' . $update_query . ' ELSE board_order END',
 			$update_params
 		);
 	}

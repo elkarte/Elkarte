@@ -141,7 +141,6 @@ class Errors extends AbstractModel
 	 * @param int $line = 0
 	 *
 	 * @return string
-	 * @throws \Exception
 	 */
 	public function log_error($error_message, $error_type = 'general', $file = '', $line = 00)
 	{

@@ -29,7 +29,6 @@ class Log extends AbstractModel
 	 * @param string $type action
 	 * @param array|null $filter this->_db query of the view filter being used
 	 * @param int[]|null $error_list int list of error ID's to work on
-	 * @throws \ElkArte\Exceptions\Exception
 	 */
 	public function deleteErrors($type, $filter = null, $error_list = null)
 	{
@@ -45,7 +44,7 @@ class Log extends AbstractModel
 				DELETE FROM {db_prefix}log_errors
 				WHERE ' . $filter['variable'] . ' LIKE {string:filter}',
 				array(
-					'filter' => !empty($filter) ? $filter['value']['sql'] : '',
+					'filter' => $filter['value']['sql'],
 				)
 			);
 		}
@@ -68,7 +67,6 @@ class Log extends AbstractModel
 	 * @param array $filter this->_db query of the filter being used
 	 *
 	 * @return int
-	 * @throws \ElkArte\Exceptions\Exception
 	 */
 	public function numErrors($filter = array())
 	{
@@ -97,7 +95,6 @@ class Log extends AbstractModel
 	 * @param array|null $filter
 	 *
 	 * @return array
-	 * @throws \Exception
 	 */
 	public function getErrorLogData($start, $sort_direction = 'DESC', $filter = null)
 	{
@@ -175,7 +172,6 @@ class Log extends AbstractModel
 	 * @param string|null $sort
 	 *
 	 * @return array
-	 * @throws \Exception
 	 */
 	public function fetchErrorsByType($filter = null, $sort = null)
 	{

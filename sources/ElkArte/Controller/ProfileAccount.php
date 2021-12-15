@@ -21,6 +21,7 @@ use ElkArte\AbstractController;
 use ElkArte\EventManager;
 use ElkArte\Exceptions\Exception;
 use ElkArte\MembersList;
+use ElkArte\Themes\ThemeLoader;
 use ElkArte\User;
 
 /**
@@ -71,10 +72,11 @@ class ProfileAccount extends AbstractController
 	}
 
 	/**
-	 * Issue/manage an user's warning status.
+	 * Issue/manage a user's warning status.
 	 *
 	 * @uses template_issueWarning sub template in ProfileAccount
 	 * @uses Profile template
+	 * @throws \ElkArte\Exceptions\Exception
 	 */
 	public function action_issuewarning()
 	{
@@ -105,7 +107,7 @@ class ProfileAccount extends AbstractController
 		}
 
 		// Get the base (errors related) stuff done.
-		\ElkArte\Themes\ThemeLoader::loadLanguageFile('Errors');
+		ThemeLoader::loadLanguageFile('Errors');
 		$context['custom_error_title'] = $txt['profile_warning_errors_occurred'];
 
 		// Make sure things which are disabled stay disabled.
@@ -251,7 +253,7 @@ class ProfileAccount extends AbstractController
 	 * - Validates the inputs
 	 * - Sends the warning PM if required, to the member
 	 * - Logs the action
-	 * - Updates the users data with the new warning level
+	 * - Updates the user data with the new warning level
 	 */
 	private function _save_warning()
 	{

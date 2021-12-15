@@ -70,11 +70,9 @@ function currentMemberID($fatal = true, $reload_id = false)
 		{
 			throw new \ElkArte\Exceptions\Exception('not_a_user', false);
 		}
-		else
-		{
+
 			return false;
 		}
-	}
 
 	// If all went well, we have a valid member ID!
 	list ($memID) = $memberResult;
@@ -83,11 +81,10 @@ function currentMemberID($fatal = true, $reload_id = false)
 }
 
 /**
- * Setup the context for a page load!
+ * Set the context for a page load!
  *
  * @param mixed[] $fields
  * @param string $hook a string that represent the hook that can be used to operate on $fields
- * @throws \ElkArte\Exceptions\Exception
  */
 function setupProfileContext($fields, $hook = '')
 {
@@ -117,7 +114,7 @@ function setupProfileContext($fields, $hook = '')
 
 	$i = 0;
 	$last_type = '';
-	foreach ($fields as $key => $field)
+	foreach ($fields as $field)
 	{
 		if (isset($profile_fields[$field]))
 		{
@@ -135,13 +132,13 @@ function setupProfileContext($fields, $hook = '')
 			{
 				if (!isset($cur_field['label']))
 				{
-					$cur_field['label'] = isset($txt[$field]) ? $txt[$field] : $field;
+					$cur_field['label'] = $txt[$field] ?? $field;
 				}
 
 				// Everything has a value!
 				if (!isset($cur_field['value']))
 				{
-					$cur_field['value'] = isset($cur_profile[$field]) ? $cur_profile[$field] : '';
+					$cur_field['value'] = $cur_profile[$field] ?? '';
 				}
 
 				// Any input attributes?
@@ -178,7 +175,7 @@ function setupProfileContext($fields, $hook = '')
 				$context['profile_posthtml'] .= $cur_field['posthtml'];
 			}
 
-			// Finally put it into context?
+			// Finally, put it into context?
 			if ($cur_field['type'] !== 'hidden')
 			{
 				$last_type = $cur_field['type'];
@@ -389,7 +386,6 @@ function loadCustomFields($memID, $area = 'summary', array $custom_fields = arra
  * This defines every profile field known to man.
  *
  * @param bool $force_reload = false
- * @throws \ElkArte\Exceptions\Exception
  */
 function loadProfileFields($force_reload = false)
 {
@@ -591,7 +587,7 @@ function loadProfileFields($force_reload = false)
 				return true;
 			},
 		),
-		// Selecting group membership is a complicated one so we treat it separate!
+		// Selecting group membership is a complicated one, so we treat it separate!
 		'id_group' => array(
 			'type' => 'callback',
 			'callback_func' => 'group_manage',
@@ -873,14 +869,14 @@ function loadProfileFields($force_reload = false)
 			'size' => 7,
 			'permission' => 'moderate_forum',
 			'input_validate' => function (&$value) {
-				if (!is_numeric($value))
+				// Account for comma_format presentation up front
+				$check = strtr($value, array(',' => '', '.' => '', ' ' => ''));
+				if (!is_numeric($check))
 				{
 					return 'digits_only';
 				}
-				else
-				{
-					$value = $value != '' ? strtr($value, array(',' => '', '.' => '', ' ' => '')) : 0;
-				}
+
+				$value = $check != '' ? $check : 0;
 
 				return true;
 			},

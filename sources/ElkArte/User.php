@@ -145,6 +145,11 @@ class User
 		}
 	}
 
+	/**
+	 * Logout by setting user to guest
+	 *
+	 * @param false $compat_mode
+	 */
 	public static function logOutUser($compat_mode = false)
 	{
 		self::$instance->loadUserById(0, true, '');

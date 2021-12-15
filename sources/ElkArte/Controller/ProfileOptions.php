@@ -2,7 +2,7 @@
 
 /**
  * This file has the primary job of showing and editing people's profiles.
- * It also allows the user to change some of their or another's preferences,
+ * It also allows the user to change some of their or another preferences,
  * and such things
  *
  * @package   ElkArte Forum
@@ -22,7 +22,6 @@ use ElkArte\AbstractController;
 use ElkArte\Action;
 use ElkArte\Exceptions\Exception;
 use ElkArte\MembersList;
-use ElkArte\Themes\ThemeLoader;
 use ElkArte\Util;
 use ElkArte\Notifications;
 
@@ -52,7 +51,7 @@ class ProfileOptions extends AbstractController
 	 * Called before all other methods when coming from the dispatcher or
 	 * action class.
 	 *
-	 * - If you initiate the class outside of those methods, call this method.
+	 * - If you initiate the class outside those methods, call this method.
 	 * or setup the class yourself else a horrible fate awaits you
 	 */
 	public function pre_dispatch()
@@ -75,6 +74,8 @@ class ProfileOptions extends AbstractController
 
 	/**
 	 * Show all the users buddies, as well as a add/delete interface.
+	 *
+	 * @throws \ElkArte\Exceptions\Exception
 	 */
 	public function action_editBuddyIgnoreLists()
 	{
@@ -130,7 +131,7 @@ class ProfileOptions extends AbstractController
 		// We want to view what we're doing :P
 		$context['sub_template'] = 'editBuddies';
 
-		// Use suggest to find the right buddies
+		// Use suggest finding the right buddies
 		loadJavascriptFile('suggest.js', array('defer' => true));
 
 		// For making changes!
@@ -225,7 +226,7 @@ class ProfileOptions extends AbstractController
 		// Load all the members up.
 		MembersList::load($buddies, false, 'profile');
 
-		// Setup the context for each buddy.
+		// Set the context for each buddy.
 		$context['buddies'] = array();
 		foreach ($buddies as $buddy)
 		{
@@ -280,7 +281,8 @@ class ProfileOptions extends AbstractController
 			require_once(SUBSDIR . '/Members.subs.php');
 			updateMemberData($this->_memID, array('pm_ignore_list' => $this->_profile['pm_ignore_list']));
 
-			// Redirect off the page because we don't like all this ugly query stuff to stick in the history.
+			// Redirect off the page because we don't like all this ugly query stuff
+			// to stick in the history.
 			redirectexit('action=profile;area=lists;sa=ignore;u=' . $this->_memID);
 		}
 		elseif (isset($this->_req->post->new_ignore))
@@ -336,7 +338,7 @@ class ProfileOptions extends AbstractController
 		// Load all the members up.
 		MembersList::load($ignored, false, 'profile');
 
-		// Setup the context for each buddy.
+		// Set the context for each buddy.
 		$context['ignore_list'] = array();
 		foreach ($ignored as $ignore_member)
 		{
@@ -417,7 +419,7 @@ class ProfileOptions extends AbstractController
 	}
 
 	/**
-	 * Load the options for an user.
+	 * Load the options for a user.
 	 */
 	public function loadThemeOptions()
 	{
@@ -523,11 +525,9 @@ class ProfileOptions extends AbstractController
 		{
 			return $fields[$area];
 		}
-		else
-		{
+
 			return array();
 		}
-	}
 
 	/**
 	 * Allow the user to change the forum options in their profile.
@@ -573,7 +573,6 @@ class ProfileOptions extends AbstractController
 
 	/**
 	 * Allow the user to pick a theme.
-	 *
 	 */
 	public function action_themepick()
 	{
@@ -841,7 +840,6 @@ class ProfileOptions extends AbstractController
 	 *
 	 * @param int $start The item to start with (for pagination purposes)
 	 * @param int $items_per_page The number of items to show per page
-	 *
 	 * @param string $sort A string indicating how to sort the results
 	 * @param int $memID id_member
 	 *
@@ -861,6 +859,7 @@ class ProfileOptions extends AbstractController
 	 * @param int $items_per_page The number of items to show per page
 	 * @param string $sort A string indicating how to sort the results
 	 * @param int $memID id_member
+	 *
 	 * @return mixed array of topic notifications
 	 */
 	public function list_getTopicNotifications($start, $items_per_page, $sort, $memID)
@@ -1007,7 +1006,7 @@ class ProfileOptions extends AbstractController
 		$context['can_manage_membergroups'] = allowedTo('manage_membergroups');
 		$context['can_manage_protected'] = allowedTo('admin_forum');
 
-		// By default the new primary is the old one.
+		// By default, the new primary is the old one.
 		$newPrimary = $this->_profile['id_group'];
 		$addGroups = array_flip(explode(',', $this->_profile['additional_groups']));
 		$canChangePrimary = $this->_profile['id_group'] == 0;
@@ -1106,14 +1105,14 @@ class ProfileOptions extends AbstractController
 				throw new Exception('profile_error_already_requested_group');
 			}
 
-			// Send an email to all group moderators etc.
+			// Email all group moderators etc.
 			require_once(SUBSDIR . '/Mail.subs.php');
 
 			// Do we have any group moderators?
 			require_once(SUBSDIR . '/Membergroups.subs.php');
 			$moderators = array_keys(getGroupModerators($group_id));
 
-			// Otherwise this is the backup!
+			// Otherwise, this is the backup!
 			if (empty($moderators))
 			{
 				require_once(SUBSDIR . '/Members.subs.php');
@@ -1157,7 +1156,7 @@ class ProfileOptions extends AbstractController
 
 			return $changeType;
 		}
-		// Otherwise we are leaving/joining a group.
+		// Otherwise, we are leaving/joining a group.
 		elseif ($changeType === 'free')
 		{
 			// Are we leaving?

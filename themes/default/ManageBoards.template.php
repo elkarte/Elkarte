@@ -314,7 +314,7 @@ function template_confirm_category_delete()
 
 	foreach ($context['category_order'] as $cat)
 	{
-		if ($cat['id'] != 0)
+		if ($cat['id'] !== 0)
 		{
 			echo '
 							<option value="', $cat['id'], '">', $cat['true_name'], '</option>';
