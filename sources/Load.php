@@ -17,6 +17,7 @@
 use BBC\ParserWrapper;
 use ElkArte\Cache\Cache;
 use ElkArte\Debug;
+use ElkArte\Errors\Errors;
 use ElkArte\Hooks;
 use ElkArte\Http\Headers;
 use ElkArte\Themes\ThemeLoader;
@@ -63,7 +64,7 @@ function reloadSettings()
 		$modSettings = array();
 		if (!$request)
 		{
-			\ElkArte\Errors\Errors::instance()->display_db_error();
+			Errors::instance()->display_db_error();
 		}
 		while (($row = $request->fetch_row()))
 		{
@@ -128,7 +129,7 @@ function reloadSettings()
 
 		if (!empty($modSettings['loadavg_forum']) && $modSettings['current_load'] >= $modSettings['loadavg_forum'])
 		{
-			\ElkArte\Errors\Errors::instance()->display_loadavg_error();
+			Errors::instance()->display_loadavg_error();
 		}
 	}
 	else
@@ -624,7 +625,6 @@ function loadPermissions()
 			throw new \ElkArte\Exceptions\Exception('no_board');
 		}
 
-		$permissions = [];
 		$db->fetchQuery('
 			SELECT
 				permission, add_deny
@@ -667,7 +667,7 @@ function loadPermissions()
 	// Banned?  Watch, don't touch..
 	banPermissions();
 
-	// Load the mod cache so we can know what additional boards they should see, but no sense in doing it for guests
+	// Load the mod cache, so we can know what additional boards they should see, but no sense in doing it for guests
 	if (User::$info->is_guest === false)
 	{
 		User::$info->is_moderator = User::$info->is_mod || allowedTo('moderate_board');
@@ -705,7 +705,7 @@ function loadPermissions()
  */
 function loadTheme($id_theme = 0, $initialize = true)
 {
-	\ElkArte\Errors\Errors::instance()->log_deprecated('loadTheme()', '\\ElkArte\\Themes\\ThemeLoader');
+	Errors::instance()->log_deprecated('loadTheme()', '\\ElkArte\\Themes\\ThemeLoader');
 	new ElkArte\Themes\ThemeLoader($id_theme, $initialize);
 }
 
@@ -753,8 +753,8 @@ function loadUserContext()
 /**
  * Determine the current user's smiley set
  *
- * @param mixed[] $user_smiley_set
- * @param mixed[] $known_smiley_sets
+ * @param array $user_smiley_set
+ * @param array $known_smiley_sets
  *
  * @return mixed
  */
@@ -784,7 +784,7 @@ function determineSmileySet($user_smiley_set, $known_smiley_sets)
  */
 function loadEssentialThemeData()
 {
-	\ElkArte\Errors\Errors::instance()->log_deprecated('loadEssentialThemeData()', '\ElkArte\Themes\ThemeLoader::loadEssentialThemeData()');
+	Errors::instance()->log_deprecated('loadEssentialThemeData()', '\ElkArte\Themes\ThemeLoader::loadEssentialThemeData()');
 
 	ThemeLoader::loadEssentialThemeData();
 }
@@ -812,7 +812,7 @@ function loadEssentialThemeData()
  */
 function loadTemplate($template_name, $style_sheets = array(), $fatal = true)
 {
-	\ElkArte\Errors\Errors::instance()->log_deprecated('loadTemplate()', 'theme()->getTemplates()->load()');
+	Errors::instance()->log_deprecated('loadTemplate()', 'theme()->getTemplates()->load()');
 
 	return theme()->getTemplates()->load($template_name, $style_sheets, $fatal);
 }
@@ -837,7 +837,7 @@ function loadTemplate($template_name, $style_sheets = array(), $fatal = true)
  */
 function loadSubTemplate($sub_template_name, $fatal = false)
 {
-	\ElkArte\Errors\Errors::instance()->log_deprecated('loadSubTemplate()', 'theme()->getTemplates()->loadSubTemplate()');
+	Errors::instance()->log_deprecated('loadSubTemplate()', 'theme()->getTemplates()->loadSubTemplate()');
 	theme()->getTemplates()->loadSubTemplate($sub_template_name, $fatal);
 
 	return true;
@@ -847,7 +847,7 @@ function loadSubTemplate($sub_template_name, $fatal = false)
  * Add a CSS file for output later
  *
  * @param string[]|string $filenames string or array of filenames to work on
- * @param mixed[] $params = array()
+ * @param array $params = array()
  * Keys are the following:
  * - ['local'] (true/false): define if the file is local
  * - ['fallback'] (true/false): if false  will attempt to load the file
@@ -875,7 +875,7 @@ function loadCSSFile($filenames, $params = array(), $id = '')
 		$filenames[] = $context['theme_variant'] . '/admin' . $context['theme_variant'] . '.css';
 	}
 
-	$params['subdir'] = isset($params['subdir']) ? $params['subdir'] : 'css';
+	$params['subdir'] = $params['subdir'] ?? 'css';
 	$params['extension'] = 'css';
 	$params['index_name'] = 'css_files';
 	$params['debug_index'] = 'sheets';
@@ -893,7 +893,7 @@ function loadCSSFile($filenames, $params = array(), $id = '')
  * - if you need specific parameters on a per file basis, call it multiple times
  *
  * @param string[]|string $filenames string or array of filenames to work on
- * @param mixed[] $params = array()
+ * @param array $params = array()
  * Keys are the following:
  * - ['local'] (true/false): define if the file is local, if file does not
  *     start with http its assumed local
@@ -914,7 +914,7 @@ function loadJavascriptFile($filenames, $params = array(), $id = '')
 		return;
 	}
 
-	$params['subdir'] = isset($params['subdir']) ? $params['subdir'] : 'scripts';
+	$params['subdir'] = $params['subdir'] ?? 'scripts';
 	$params['extension'] = 'js';
 	$params['index_name'] = 'js_files';
 	$params['debug_index'] = 'javascript';
@@ -932,7 +932,7 @@ function loadJavascriptFile($filenames, $params = array(), $id = '')
  * - If you need specific parameters on a per file basis, call it multiple times
  *
  * @param string[]|string $filenames string or array of filenames to work on
- * @param mixed[] $params = array()
+ * @param array $params = array()
  * Keys are the following:
  * - ['subdir'] (string): the subdirectory of the theme dir the file is in
  * - ['extension'] (string): the extension of the file (e.g. css)
@@ -985,7 +985,7 @@ function loadAssetFile($filenames, $params = array(), $id = '')
 		$staler_string = '';
 	}
 
-	$fallback = (!empty($params['fallback']) && ($params['fallback'] === false)) ? false : true;
+	$fallback = !((!empty($params['fallback']) && ($params['fallback'] === false)));
 	$dir = '/' . $params['subdir'] . '/';
 
 	// Whoa ... we've done this before yes?
@@ -1077,14 +1077,14 @@ function loadAssetFile($filenames, $params = array(), $id = '')
 /**
  * Add a Javascript variable for output later (for feeding text strings and similar to JS)
  *
- * @param mixed[] $vars array of vars to include in the output done as 'varname' => 'var value'
+ * @param array $vars array of vars to include in the output done as 'varname' => 'var value'
  * @param bool $escape = false, whether or not to escape the value
  * @deprecated since 2.0; use the theme object
  *
  */
 function addJavascriptVar($vars, $escape = false)
 {
-	\ElkArte\Errors\Errors::instance()->log_deprecated('addJavascriptVar()', 'theme()->getTemplates()->addJavascriptVar()');
+	Errors::instance()->log_deprecated('addJavascriptVar()', 'theme()->getTemplates()->addJavascriptVar()');
 	theme()->addJavascriptVar($vars, $escape);
 }
 
@@ -1104,7 +1104,7 @@ function addJavascriptVar($vars, $escape = false)
  */
 function addInlineJavascript($javascript, $defer = false)
 {
-	\ElkArte\Errors\Errors::instance()->log_deprecated('addInlineJavascript()', 'theme()->addInlineJavascript()');
+	Errors::instance()->log_deprecated('addInlineJavascript()', 'theme()->addInlineJavascript()');
 	theme()->addInlineJavascript($javascript, $defer);
 }
 
@@ -1123,7 +1123,7 @@ function addInlineJavascript($javascript, $defer = false)
  */
 function loadLanguage($template_name, $lang = '', $fatal = true, $force_reload = false)
 {
-	\ElkArte\Errors\Errors::instance()->log_deprecated('loadLanguage()', '\ElkArte\Themes\ThemeLoader::loadLanguageFile()');
+	Errors::instance()->log_deprecated('loadLanguage()', '\ElkArte\Themes\ThemeLoader::loadLanguageFile()');
 
 	return ThemeLoader::loadLanguageFile($template_name, $lang, $fatal, $force_reload);
 }
@@ -1387,7 +1387,7 @@ function loadDatabase()
 	}
 	catch (Exception $e)
 	{
-		\ElkArte\Errors\Errors::instance()->display_db_error();
+		Errors::instance()->display_db_error();
 	}
 
 	// If in SSI mode fix up the prefix.
@@ -1407,9 +1407,9 @@ function loadDatabase()
 /**
  * Determine the user's avatar type and return the information as an array
  *
- * @param mixed[] $profile array containing the users profile data
+ * @param array $profile array containing the users profile data
  *
- * @return mixed[] $avatar
+ * @return array $avatar
  * @todo this function seems more useful than expected, it should be improved. :P
  *
  * @event integrate_avatar allows access to $avatar array before it is returned
@@ -1707,7 +1707,7 @@ function loadBBCParsers()
 		{
 			$disabledBBC = $modSettings['disabledBBC'];
 		}
-		ParserWrapper::instance()->setDisabled(empty($disabledBBC) ? array() : (array) $disabledBBC);
+		ParserWrapper::instance()->setDisabled(empty($disabledBBC) ? array() : $disabledBBC);
 	}
 
 	return 1;
@@ -1718,7 +1718,7 @@ function loadBBCParsers()
  *
  * @param string $variable The string to convert
  * @param null|callable $save_callback The function that will save the data to the db
- * @return mixed[] the array
+ * @return array the array
  */
 function serializeToJson($variable, $save_callback = null)
 {
