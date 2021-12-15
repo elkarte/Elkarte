@@ -20,6 +20,7 @@ namespace ElkArte\AdminController;
 use ElkArte\AbstractController;
 use ElkArte\Errors\Log;
 use ElkArte\MembersList;
+use ElkArte\Themes\ThemeLoader;
 
 /**
  * ManageErrors controller, administration of error log.
@@ -123,7 +124,7 @@ class ManageErrors extends AbstractController
 		global $txt, $context, $modSettings;
 
 		// Templates, etc...
-		\ElkArte\Themes\ThemeLoader::loadLanguageFile('Maintenance');
+		ThemeLoader::loadLanguageFile('Maintenance');
 		theme()->getTemplates()->load('Errors');
 
 		// Set up any filters chosen
@@ -167,9 +168,13 @@ class ManageErrors extends AbstractController
 		// Do we want to reverse error listing?
 		$context['sort_direction'] = isset($this->_req->query->desc) ? 'down' : 'up';
 
+		// How about filter it?
+		$page_filter = isset($filter['href']) ? ';filter=' . $filter['href']['filter'] . ';value=' . $filter['href']['value'] : '';
+
 		// Set the page listing up.
-		$context['page_index'] = constructPageIndex('{scripturl}?action=admin;area=logs;sa=errorlog' . ($context['sort_direction'] == 'down' ? ';desc' : '') . (isset($filter['href']) ? $filter['href'] : ''), $this->_req->query->start, $num_errors, $modSettings['defaultMaxMessages']);
+		$context['page_index'] = constructPageIndex('{scripturl}?action=admin;area=logs;sa=errorlog' . ($context['sort_direction'] === 'down' ? ';desc' : '') . $page_filter, $this->_req->query->start, $num_errors, $modSettings['defaultMaxMessages']);
 		$context['start'] = $this->_req->query->start;
+		$context['$page_filter'] = $page_filter;
 		$context['errors'] = array();
 
 		$logdata = $this->errorLog->getErrorLogData($this->_req->query->start, $context['sort_direction'], $filter);
