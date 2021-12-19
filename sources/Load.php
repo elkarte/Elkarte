@@ -41,8 +41,7 @@ use ElkArte\AttachmentsDirectory;
  * @event integrate_pre_include to allow including files at startup
  * @event integrate_pre_load to call any pre load integration functions.
  *
- * @global array $modSettings is a giant array of all of the forum-wide settings and statistics.
- * @throws \ElkArte\Exceptions\Exception
+ * @global array $modSettings is a giant array of all the forum-wide settings and statistics.
  */
 function reloadSettings()
 {
@@ -205,8 +204,7 @@ function loadUserSettings()
  */
 function loadBoard()
 {
-	global $txt, $scripturl, $context, $modSettings;
-	global $board_info, $board, $topic;
+	global $txt, $scripturl, $context, $modSettings, $board_info, $board, $topic;
 
 	$db = database();
 	$cache = Cache::instance();

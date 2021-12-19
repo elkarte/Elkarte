@@ -15,6 +15,7 @@
  *
  */
 
+use ElkArte\Cache\Cache;
 use ElkArte\Controller\Auth;
 use ElkArte\EventManager;
 use ElkArte\Http\Headers;
@@ -1690,54 +1691,61 @@ function constructBanQueryIP($fullip)
 }
 
 /**
- * Decide if we are going to enable bad behavior scanning for this user
+ * Decide if we are going to do any "bad behavior" scanning for this user
  *
  * What it does:
  *
  * - Admins and Moderators get a free pass
- * - Optionally existing users with post counts over a limit are bypassed
- * - Others get a humane frisking
+ * - Returns true if Accept header is missing
+ * - Check with project Honey Pot for known miscreants
  *
- * @return bool|int
+ * @return bool true if bad, false otherwise
  */
-function loadBadBehavior()
+function runBadBehavior()
 {
 	global $modSettings;
 
-	$bb2_results = false;
-
-	// Bad Behavior Enabled?
-	if (!empty($modSettings['badbehavior_enabled']))
+	// Admins and Mods get a free pass
+	if (!empty(User::$info->is_moderator) || !empty(User::$info->is_admin))
 	{
-		require_once(EXTDIR . '/bad-behavior/badbehavior-plugin.php');
-		$bb_run = true;
+		return false;
+	}
 
-		// We may want to give some folks a hallway pass
-		if (User::$info->is_guest === false)
-		{
-			if (!empty(User::$info->is_moderator) || !empty(User::$info->is_admin))
-			{
-				$bb_run = false;
-			}
-			elseif (!empty($modSettings['badbehavior_postcount_wl']) && $modSettings['badbehavior_postcount_wl'] < 0)
-			{
-				$bb_run = false;
-			}
-			elseif (!empty($modSettings['badbehavior_postcount_wl']) && $modSettings['badbehavior_postcount_wl'] > 0 && (User::$info->posts > $modSettings['badbehavior_postcount_wl']))
-			{
-				$bb_run = false;
-			}
-		}
+	// Clients will have an "Accept" header, generally only bots or scrappers don't
+	if (!empty($modSettings['badbehavior_accept_header']) && !array_key_exists('HTTP_ACCEPT', $_SERVER))
+	{
+		return true;
+	}
 
-		// Put on the sanitary gloves, its time for a patdown !
-		if ($bb_run === true)
+	// Project honey pot blacklist check [Your Access Key] [Octet-Reversed IP] [List-Specific Domain]
+	if (empty($modSettings['badbehavior_httpbl_key']) || empty($_SERVER['REMOTE_ADDR']))
+	{
+		return false;
+	}
+
+	// Try to load it from the cache first
+	$cache = Cache::instance();
+	$dnsQuery = $modSettings['badbehavior_httpbl_key'] . '.' . implode('.', array_reverse(explode('.', $_SERVER['REMOTE_ADDR']))) . '.dnsbl.httpbl.org';
+	if (!$cache->getVar($dnsResult, 'dnsQuery-' . $_SERVER['REMOTE_ADDR'], 240))
+	{
+		$dnsResult = gethostbyname($dnsQuery);
+		$cache->put('dnsQuery-' . $_SERVER['REMOTE_ADDR'], $dnsResult, 240);
+	}
+
+	if (!empty($dnsResult) && $dnsResult !== $dnsQuery)
+	{
+		$result = explode('.', $dnsResult);
+		$result = array_map('intval', $result);
+		if ($result[0] === 127 // Valid Response
+			&& ($result[3] & 3 || $result[3] & 5) // Listed as Suspicious + Harvester || Suspicious + Comment Spammer
+			&& $result[2] >= $modSettings['badbehavior_httpbl_threat'] // Level
+			&& $result[1] <= $modSettings['badbehavior_httpbl_maxage']) // Age
 		{
-			$bb2_results = bb2_start(bb2_read_settings());
-			theme()->addInlineJavascript(bb2_insert_head());
+			return true;
 		}
 	}
 
-	return $bb2_results;
+	return false;
 }
 
 /**

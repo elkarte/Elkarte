@@ -171,6 +171,7 @@ $txt['invalid_hostname'] = 'Invalid host name / host name range.<br />Example of
 $txt['invalid_ip'] = 'Invalid IP / IP range.<br />Example of a valid IP address: 127.0.0.1<br />Example of a valid IP range: 127.0.0-20.*';
 $txt['invalid_tracking_ip'] = 'Invalid IP / IP range.<br />Example of a valid IP address: 127.0.0.1<br />Example of a valid IP range: 127.0.0.*';
 $txt['invalid_username'] = 'Member name not found';
+$txt['invalid_access'] = 'The IP (%1$s) was blocked by header or Honey Pot check.';
 $txt['no_user_selected'] = 'Member not found';
 $txt['no_ban_admin'] = 'Hey! We can\'t let you ban an admin. If you are certain about this, demote them first!';
 $txt['no_bantype_selected'] = 'No ban type was selected';

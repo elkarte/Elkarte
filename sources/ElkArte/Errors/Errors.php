@@ -101,7 +101,7 @@ class Errors extends AbstractModel
 	{
 		global $language, $txt;
 
-		\ElkArte\Themes\ThemeLoader::loadLanguageFile('Errors', $language);
+		ThemeLoader::loadLanguageFile('Errors', $language);
 
 		$reload_lang_file = $language !== $this->user->language;
 
@@ -111,7 +111,7 @@ class Errors extends AbstractModel
 		// Load the language file, only if it needs to be reloaded
 		if ($reload_lang_file)
 		{
-			\ElkArte\Themes\ThemeLoader::loadLanguageFile('Errors');
+			ThemeLoader::loadLanguageFile('Errors');
 		}
 
 		// Return the message to make things simpler.
@@ -366,10 +366,7 @@ class Errors extends AbstractModel
 	 */
 	public function display_minimal_error($message)
 	{
-		if (!headers_sent())
-		{
-			$this->_set_fatal_error_headers();
-		}
+		$this->_set_fatal_error_headers();
 
 		echo '<!DOCTYPE html>
 	<html>
@@ -475,6 +472,54 @@ class Errors extends AbstractModel
 			Due to high stress on the server the forum is temporarily unavailable.  Please try again later.
 		</body>
 	</html>';
+
+		$this->terminate();
+	}
+
+	/**
+	 * Send a 403 response and exit
+	 *
+	 * What it does:
+	 *
+	 * - Sends a 403 Forbidden response and terminates
+	 * - Optionally displays a page with message
+	 * - Terminates program
+	 *
+	 * @param bool $log if to log the error to the system (user) log
+	 * @param string $message Optional message to show
+	 */
+	public function display_403_error($log = true, $message = '')
+	{
+		global $language, $txt;
+
+		Headers::instance()
+			->httpCode(403)
+			->headerSpecial('HTTP/1.1 403 Forbidden')
+			->sendHeaders();
+
+		if (!empty($message))
+		{
+			echo '<!DOCTYPE html>
+	<html>
+		<head>
+			<meta name="robots" content="noindex" />
+			<title>403</title>
+		</head>
+		<body>
+			<h3>Forbidden</h3>
+			', $message, '
+		</body>
+	</html>';
+		}
+
+		if ($log)
+		{
+			ThemeLoader::loadLanguageFile('Errors', $language);
+			$this->log_error(
+				sprintf($txt['invalid_access'], $_SERVER['REMOTE_ADDR']),
+				'user'
+			);
+		}
 
 		$this->terminate();
 	}

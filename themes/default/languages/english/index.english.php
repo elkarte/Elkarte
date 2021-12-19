@@ -876,9 +876,6 @@ $txt['prompt_text_img'] = 'Enter image location';
 // Escape any single quotes in here twice.. 'it\'s' -> 'it\\\'s'.
 $txt['autosuggest_delete_item'] = 'Delete Item';
 
-// Bad Behavior
-$txt['badbehavior_blocked'] = '<a href="http://www.bad-behavior.ioerror.us/">Bad Behavior</a> has blocked %1$s access attempts in the last 7 days.';
-
 // Debug related - when $db_show_debug is true.
 $txt['debug_templates'] = 'Templates: ';
 $txt['debug_sub_templates'] = 'Sub templates: ';

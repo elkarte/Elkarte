@@ -25,65 +25,34 @@ use ElkArte\Http\Headers;
  */
 final class Request
 {
-	/**
-	 * Sole private Request instance
-	 *
-	 * @var Request
-	 */
+	/** @var Request Sole private Request instance */
 	private static $_req = null;
-	/**
-	 * Remote IP, if we can know it easily (as found in $_SERVER['REMOTE_ADDR'])
-	 *
-	 * @var string
-	 */
+
+	/** @var string Remote IP, if we can know it easily (as found in $_SERVER['REMOTE_ADDR']) */
 	private $_client_ip;
-	/**
-	 * Secondary IP, a double-check for the most accurate client IP we can get
-	 *
-	 * @var string
-	 */
+
+	/** @var string Secondary IP, a double-check for the most accurate client IP we can get */
 	private $_ban_ip;
-	/**
-	 * HTTP or HTTPS scheme
-	 *
-	 * @var string
-	 */
+
+	/** @var string HTTP or HTTPS scheme */
 	private $_scheme;
-	/**
-	 * User agent
-	 *
-	 * @var string
-	 */
+
+	/** @var string User agent */
 	private $_user_agent;
-	/**
-	 * Whether the request is an XmlHttpRequest
-	 *
-	 * @var bool
-	 */
+
+	/** @var bool Whether the request is an XmlHttpRequest */
 	private $_xml;
-	/**
-	 * Web server software
-	 *
-	 * @var string
-	 */
+
+	/** @var string Web server software */
 	private $_server_software;
-	/**
-	 * This is the pattern of a local (or unknown) IP address in both IPv4 and IPv6
-	 *
-	 * @var string
-	 */
+
+	/** @var string This is the pattern of a local (or unknown) IP address in both IPv4 and IPv6 */
 	private $_local_ip_pattern = '((0|10|172\.(1[6-9]|2[0-9]|3[01])|192\.168|255|127)\.|unknown|::1|fe80::|fc00::)';
-	/**
-	 * Local copy of the server query string
-	 *
-	 * @var string
-	 */
+
+	/** @var string Local copy of the server query string */
 	private $_server_query_string;
-	/**
-	 * Creates the global and method internal
-	 *
-	 * @var string
-	 */
+
+	/** @var string Creates the global and method internal */
 	private $_scripturl;
 
 	/**
@@ -113,7 +82,7 @@ final class Request
 		$_SERVER['HTTP_USER_AGENT'] = $this->_user_agent;
 
 		// We want to know who we are, too :P
-		$this->_server_software = isset($_SERVER['SERVER_SOFTWARE']) ? $_SERVER['SERVER_SOFTWARE'] : '';
+		$this->_server_software = $_SERVER['SERVER_SOFTWARE'] ?? '';
 
 		// Makes it easier to refer to things this way.
 		$scripturl = $boardurl . '/index.php';
@@ -149,7 +118,7 @@ final class Request
 		}
 
 		// Final check
-		if ($this->_client_ip == 'unknown')
+		if ($this->_client_ip === 'unknown')
 		{
 			$this->_client_ip = '';
 		}

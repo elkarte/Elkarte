@@ -118,20 +118,6 @@ class WeeklyMaintenance implements ScheduledTaskInterface
 				);
 			}
 
-			if (!empty($modSettings['pruneBadbehaviorLog']))
-			{
-				// Figure out when our cutoff time is.  1 day = 86400 seconds.
-				$t = time() - $modSettings['pruneBadbehaviorLog'] * 86400;
-
-				$db->query('', '
-					DELETE FROM {db_prefix}log_badbehavior
-					WHERE log_time < {int:log_time}',
-					array(
-						'log_time' => $t,
-					)
-				);
-			}
-
 			if (!empty($modSettings['pruneReportLog']))
 			{
 				// Figure out when our cutoff time is.  1 day = 86400 seconds.
