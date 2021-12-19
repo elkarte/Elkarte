@@ -259,7 +259,6 @@ class Admin extends AbstractController
 						'subsections' => array(
 							'general' => array($txt['mods_cat_security_general']),
 							'spam' => array($txt['antispam_title']),
-							'badbehavior' => array($txt['badbehavior_title']),
 							'moderation' => array($txt['moderation_settings_short'], 'enabled' => !empty($modSettings['warning_enable'])),
 						),
 					),
@@ -527,7 +526,6 @@ class Admin extends AbstractController
 							'banlog' => array($txt['ban_log'], 'manage_bans'),
 							'spiderlog' => array($txt['spider_logs'], 'admin_forum', 'enabled' => featureEnabled('sp')),
 							'tasklog' => array($txt['scheduled_log'], 'admin_forum'),
-							'badbehaviorlog' => array($txt['badbehavior_log'], 'admin_forum', 'enabled' => !empty($modSettings['badbehavior_enabled']), 'url' => getUrl('admin', ['action' => 'admin', 'area' => 'logs', 'sa' => 'badbehaviorlog', 'desc'])),
 							'pruning' => array($txt['pruning_title'], 'admin_forum'),
 						),
 					),
@@ -857,7 +855,6 @@ class Admin extends AbstractController
 			array('securitySettings_search', 'area=securitysettings;sa=general', '\\ElkArte\\AdminController\\ManageSecurity'),
 			array('spamSettings_search', 'area=securitysettings;sa=spam', '\\ElkArte\\AdminController\\ManageSecurity'),
 			array('moderationSettings_search', 'area=securitysettings;sa=moderation', '\\ElkArte\\AdminController\\ManageSecurity'),
-			array('bbSettings_search', 'area=securitysettings;sa=badbehavior', '\\ElkArte\\AdminController\\ManageSecurity'),
 			array('generalSettings_search', 'area=serversettings;sa=general', '\\ElkArte\\AdminController\\ManageServer'),
 			array('databaseSettings_search', 'area=serversettings;sa=database', '\\ElkArte\\AdminController\\ManageServer'),
 			array('cookieSettings_search', 'area=serversettings;sa=cookie', '\\ElkArte\\AdminController\\ManageServer'),

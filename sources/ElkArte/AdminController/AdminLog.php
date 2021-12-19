@@ -52,10 +52,6 @@ class AdminLog extends AbstractController
 				'function' => 'action_log',
 				'controller' => '\\ElkArte\\AdminController\\Modlog',
 				'disabled' => featureEnabled('ml') === false),
-			'badbehaviorlog' => array(
-				'function' => 'action_log',
-				'disabled' => empty($modSettings['badbehavior_enabled']),
-				'controller' => '\\ElkArte\\AdminController\\BadBehavior'),
 			'banlog' => array(
 				'function' => 'action_log',
 				'controller' => '\\ElkArte\\AdminController\\ManageBans'),
@@ -94,9 +90,6 @@ class AdminLog extends AbstractController
 				),
 				'tasklog' => array(
 					'description' => $txt['scheduled_log_desc'],
-				),
-				'badbehaviorlog' => array(
-					'description' => $txt['badbehavior_log_desc'],
 				),
 				'pruning' => array(
 					'description' => $txt['pruning_log_desc'],
@@ -187,11 +180,11 @@ class AdminLog extends AbstractController
 		// Get the actual values
 		if (!empty($modSettings['pruningOptions']))
 		{
-			list ($modSettings['pruneErrorLog'], $modSettings['pruneModLog'], $modSettings['pruneBanLog'], $modSettings['pruneReportLog'], $modSettings['pruneScheduledTaskLog'], $modSettings['pruneBadbehaviorLog'], $modSettings['pruneSpiderHitLog']) = array_pad(explode(',', $modSettings['pruningOptions']), 7, 0);
+			list ($modSettings['pruneErrorLog'], $modSettings['pruneModLog'], $modSettings['pruneBanLog'], $modSettings['pruneReportLog'], $modSettings['pruneScheduledTaskLog'], $modSettings['pruneSpiderHitLog']) = array_pad(explode(',', $modSettings['pruningOptions']), 7, 0);
 		}
 		else
 		{
-			$modSettings['pruneErrorLog'] = $modSettings['pruneModLog'] = $modSettings['pruneBanLog'] = $modSettings['pruneReportLog'] = $modSettings['pruneScheduledTaskLog'] = $modSettings['pruneBadbehaviorLog'] = $modSettings['pruneSpiderHitLog'] = 0;
+			$modSettings['pruneErrorLog'] = $modSettings['pruneModLog'] = $modSettings['pruneBanLog'] = $modSettings['pruneReportLog'] = $modSettings['pruneScheduledTaskLog'] = $modSettings['pruneSpiderHitLog'] = 0;
 		}
 
 		$settingsForm->prepare();
@@ -215,7 +208,6 @@ class AdminLog extends AbstractController
 			array('int', 'pruneBanLog', 'postinput' => $txt['days_word'], 'subtext' => $txt['zero_to_disable']), // Ban hit log.
 			array('int', 'pruneReportLog', 'postinput' => $txt['days_word'], 'subtext' => $txt['zero_to_disable']), // Report to moderator log.
 			array('int', 'pruneScheduledTaskLog', 'postinput' => $txt['days_word'], 'subtext' => $txt['zero_to_disable']), // Log of the scheduled tasks and how long they ran.
-			array('int', 'pruneBadbehaviorLog', 'postinput' => $txt['days_word'], 'subtext' => $txt['zero_to_disable']), // Bad Behavior log.
 			array('int', 'pruneSpiderHitLog', 'postinput' => $txt['days_word'], 'subtext' => $txt['zero_to_disable']), // Log of the scheduled tasks and how long they ran.
 			// If you add any additional logs make sure to add them after this point.  Additionally, make sure you add them to the weekly scheduled task.
 		);
