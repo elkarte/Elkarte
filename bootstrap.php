@@ -325,7 +325,6 @@ class Bootstrap
 	/**
 	 * If you are running SSI standalone, you need to call this function after bootstrap is
 	 * initialized.
-	 *
 	 */
 	public function ssi_main()
 	{
