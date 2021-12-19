@@ -18,6 +18,7 @@
 
 use ElkArte\Controller\ScheduledTasks;
 use ElkArte\EventManager;
+use ElkArte\Http\Headers;
 use ElkArte\HttpReq;
 use ElkArte\User;
 
@@ -105,10 +106,14 @@ function elk_main()
 		// Load the current theme.  (note that ?theme=1 will also work, may be used for guest theming.)
 		if ($dispatcher->needTheme())
 		{
-			new ElkArte\Themes\ThemeLoader();
+			// Do our BadBehavior checking before we go any further
+			if (runBadBehavior())
+			{
+				// Not much to say, 403 and gone
+				\ElkArte\Errors\Errors::instance()->display_403_error(true);
+			}
 
-			// Load BadBehavior before we go much further
-			loadBadBehavior();
+			new ElkArte\Themes\ThemeLoader();
 
 			// The parser is not an object just yet
 			loadBBCParsers();

@@ -2,7 +2,7 @@
 
 /**
  * Handles the Security and Moderation pages in the admin panel.  This includes
- * bad behavior, anti spam, security and moderation settings
+ * anti spam, security and moderation settings
  *
  * @package   ElkArte Forum
  * @copyright ElkArte Forum contributors
@@ -21,6 +21,7 @@ use ElkArte\AbstractController;
 use ElkArte\Action;
 use ElkArte\Cache\Cache;
 use ElkArte\SettingsForm\SettingsForm;
+use ElkArte\Themes\ThemeLoader;
 use ElkArte\Util;
 
 /**
@@ -41,13 +42,12 @@ class ManageSecurity extends AbstractController
 	{
 		global $context, $txt;
 
-		\ElkArte\Themes\ThemeLoader::loadLanguageFile('Help');
-		\ElkArte\Themes\ThemeLoader::loadLanguageFile('ManageSettings');
+		ThemeLoader::loadLanguageFile('Help');
+		ThemeLoader::loadLanguageFile('ManageSettings');
 
 		$subActions = array(
 			'general' => array($this, 'action_securitySettings_display', 'permission' => 'admin_forum'),
 			'spam' => array($this, 'action_spamSettings_display', 'permission' => 'admin_forum'),
-			'badbehavior' => array($this, 'action_bbSettings_display', 'permission' => 'admin_forum'),
 			'moderation' => array($this, 'action_moderationSettings_display', 'enabled' => featureEnabled('w'), 'permission' => 'admin_forum'),
 		);
 
@@ -64,14 +64,11 @@ class ManageSecurity extends AbstractController
 				'spam' => array(
 					'description' => $txt['antispam_Settings_desc'],
 				),
-				'badbehavior' => array(
-					'description' => $txt['badbehavior_desc'],
-				),
 				'moderation' => array(),
 			),
 		);
 
-		// By default do the basic settings, call integrate_sa_modify_security
+		// By default, do the basic settings, call integrate_sa_modify_security
 		$subAction = $action->initialize($subActions, 'general');
 
 		// Last pieces of the puzzle
@@ -127,7 +124,10 @@ class ManageSecurity extends AbstractController
 	 */
 	private function _securitySettings()
 	{
-		global $txt;
+		global $txt, $context;
+
+		// See if they supplied a valid looking http:BL API Key
+		$context['invalid_badbehavior_httpbl_key'] = (!empty($modSettings['badbehavior_httpbl_key']) && (strlen($modSettings['badbehavior_httpbl_key']) !== 12 || !ctype_lower($modSettings['badbehavior_httpbl_key'])));
 
 		// Set up the config array for use
 		$config_vars = array(
@@ -153,6 +153,11 @@ class ManageSecurity extends AbstractController
 			array('check', 'enable_password_conversion'),
 			'',
 			array('select', 'frame_security', array('SAMEORIGIN' => $txt['setting_frame_security_SAMEORIGIN'], 'DENY' => $txt['setting_frame_security_DENY'], 'DISABLE' => $txt['setting_frame_security_DISABLE'])),
+			'',
+			array('check', 'badbehavior_accept_header'),
+			array('text', 'badbehavior_httpbl_key', 12, 'invalid' => $context['invalid_badbehavior_httpbl_key']),
+			array('int', 'badbehavior_httpbl_threat', 'postinput' => $txt['badbehavior_httpbl_threat_desc']),
+			array('int', 'badbehavior_httpbl_maxage', 'postinput' => $txt['badbehavior_httpbl_maxage_desc']),
 		);
 
 		call_integration_hook('integrate_general_security_settings', array(&$config_vars));
@@ -161,7 +166,7 @@ class ManageSecurity extends AbstractController
 	}
 
 	/**
-	 * Allows to display and eventually change the moderation settings of the forum.
+	 * Allows displaying and eventually change the moderation settings of the forum.
 	 *
 	 * - Uses the moderation settings form.
 	 *
@@ -341,137 +346,6 @@ class ManageSecurity extends AbstractController
 		call_integration_hook('integrate_spam_settings', array(&$config_vars));
 
 		return $config_vars;
-	}
-
-	/**
-	 * Change the way bad behavior ... well behaves
-	 */
-	public function action_bbSettings_display()
-	{
-		global $txt, $context, $modSettings, $boardurl;
-
-		// Initialize the form
-		$settingsForm = new SettingsForm(SettingsForm::DB_ADAPTER);
-
-		// Initialize it with our settings
-		$settingsForm->setConfigVars($this->_bbSettings());
-
-		// Our callback templates are here
-		theme()->getTemplates()->load('BadBehavior');
-
-		// Any errors to display?
-		if ($context['invalid_badbehavior_httpbl_key'])
-		{
-			$context['settings_message'][] = $txt['badbehavior_httpbl_key_invalid'];
-			$context['error_type'] = 'warning';
-		}
-
-		// Have we blocked anything in the last 7 days?
-		if (!empty($modSettings['badbehavior_enabled']))
-		{
-			$context['settings_message'][] = bb2_insert_stats(true) . ' <a class="linkbutton" href="' . $boardurl . '/index.php?action=admin;area=logs;sa=badbehaviorlog;desc">' . $txt['badbehavior_details'] . '</a>';
-		}
-
-		// Current whitelist data
-		$whitelist = array('badbehavior_ip_wl', 'badbehavior_useragent_wl', 'badbehavior_url_wl');
-		foreach ($whitelist as $list)
-		{
-			$context[$list] = array();
-			$context[$list . '_desc'] = array();
-
-			if (!empty($modSettings[$list]))
-			{
-				$context[$list] = Util::unserialize($modSettings[$list]);
-			}
-
-			if (!empty($modSettings[$list . '_desc']))
-			{
-				$context[$list . '_desc'] = Util::unserialize($modSettings[$list . '_desc']);
-			}
-		}
-
-		// Saving?
-		if (isset($this->_req->query->save))
-		{
-			checkSession();
-
-			// Make sure Bad Behavior defaults are set if nothing was specified
-			$this->_req->post->badbehavior_httpbl_threat = empty($this->_req->post->badbehavior_httpbl_threat) ? 25 : $this->_req->post->badbehavior_httpbl_threat;
-			$this->_req->post->badbehavior_httpbl_maxage = empty($this->_req->post->badbehavior_httpbl_maxage) ? 30 : $this->_req->post->badbehavior_httpbl_maxage;
-			$this->_req->post->badbehavior_reverse_proxy_header = empty($this->_req->post->badbehavior_reverse_proxy_header) ? 'X-Forwarded-For' : $this->_req->post->badbehavior_reverse_proxy_header;
-
-			// Build up the whitelist options
-			foreach ($whitelist as $list)
-			{
-				$this_list = array();
-				$this_desc = array();
-
-				if (isset($this->_req->post->{$list}))
-				{
-					// Clear blanks from the data field, only grab the comments that don't have blank data value
-					$this_list = array_map('trim', array_filter($this->_req->post->{$list}));
-					$this_desc = array_intersect_key($this->_req->post->{$list . '_desc'}, $this_list);
-				}
-
-				updateSettings(array($list => serialize($this_list), $list . '_desc' => serialize($this_desc)));
-			}
-
-			$settingsForm->setConfigValues((array) $this->_req->post);
-			$settingsForm->save();
-			redirectexit('action=admin;area=securitysettings;sa=badbehavior');
-		}
-
-		$context['post_url'] = getUrl('admin', ['action' => 'admin', 'area' => 'securitysettings', 'save', 'sa' => 'badbehavior']);
-
-		// Javascript vars for the "add more xyz" buttons in the callback forms
-		theme()->addJavascriptVar(array(
-			'sUrlParent' => '\'add_more_url_placeholder\'',
-			'oUrlOptionsdt' => '{name: \'badbehavior_url_wl_desc[]\', class: \'input_text\'}',
-			'oUrlOptionsdd' => '{name: \'badbehavior_url_wl[]\', class: \'input_text\'}',
-			'sUseragentParent' => '\'add_more_useragent_placeholder\'',
-			'oUseragentOptionsdt' => '{name: \'badbehavior_useragent_wl_desc[]\', class: \'input_text\'}',
-			'oUseragentOptionsdd' => '{name: \'badbehavior_useragent_wl[]\', class: \'input_text\'}',
-			'sIpParent' => '\'add_more_ip_placeholder\'',
-			'oIpOptionsdt' => '{name: \'badbehavior_ip_wl_desc[]\', class: \'input_text\'}',
-			'oIpOptionsdd' => '{name: \'badbehavior_ip_wl[]\', class: \'input_text\'}'
-		));
-
-		$settingsForm->prepare();
-	}
-
-	/**
-	 * Bad Behavior settings.
-	 */
-	private function _bbSettings()
-	{
-		global $txt, $context, $modSettings;
-
-		// See if they supplied a valid looking http:BL API Key
-		$context['invalid_badbehavior_httpbl_key'] = (!empty($modSettings['badbehavior_httpbl_key']) && (strlen($modSettings['badbehavior_httpbl_key']) !== 12 || !ctype_lower($modSettings['badbehavior_httpbl_key'])));
-
-		// Build up our options array
-		return array(
-			array('title', 'badbehavior_title'),
-			array('check', 'badbehavior_enabled', 'postinput' => $txt['badbehavior_enabled_desc']),
-			array('check', 'badbehavior_logging', 'postinput' => $txt['badbehavior_default_on']),
-			array('check', 'badbehavior_verbose', 'postinput' => $txt['badbehavior_default_off']),
-			array('check', 'badbehavior_strict', 'postinput' => $txt['badbehavior_default_off']),
-			array('check', 'badbehavior_offsite_forms', 'postinput' => $txt['badbehavior_default_off']),
-			'',
-			array('check', 'badbehavior_reverse_proxy', 'postinput' => $txt['badbehavior_default_off']),
-			array('text', 'badbehavior_reverse_proxy_header', 30, 'postinput' => $txt['badbehavior_reverse_proxy_header_desc']),
-			array('text', 'badbehavior_reverse_proxy_addresses', 30),
-			'',
-			array('text', 'badbehavior_httpbl_key', 12, 'invalid' => $context['invalid_badbehavior_httpbl_key']),
-			array('int', 'badbehavior_httpbl_threat', 'postinput' => $txt['badbehavior_httpbl_threat_desc']),
-			array('int', 'badbehavior_httpbl_maxage', 'postinput' => $txt['badbehavior_httpbl_maxage_desc']),
-			array('title', 'badbehavior_whitelist_title'),
-			array('desc', 'badbehavior_wl_desc'),
-			array('int', 'badbehavior_postcount_wl', 'postinput' => $txt['badbehavior_postcount_wl_desc']),
-			array('callback', 'badbehavior_add_ip'),
-			array('callback', 'badbehavior_add_url'),
-			array('callback', 'badbehavior_add_useragent'),
-		);
 	}
 
 	/**
