@@ -16,6 +16,8 @@
 
 namespace ElkArte;
 
+use ElkArte\Themes\ThemeLoader;
+
 /**
  * This class implements a standard way of displaying lists.
  */
@@ -104,7 +106,7 @@ class GenericList
 		$this->listOptions = $listOptions;
 
 		// Be ready for those pesky errors
-		\ElkArte\Themes\ThemeLoader::loadLanguageFile('Errors');
+		ThemeLoader::loadLanguageFile('Errors');
 
 		// Load the template
 		theme()->getTemplates()->load('GenericList');

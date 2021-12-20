@@ -23,6 +23,7 @@ use ElkArte\Cache\Cache;
 use ElkArte\Errors\Errors;
 use ElkArte\Exceptions\Exception;
 use ElkArte\SettingsForm\SettingsForm;
+use ElkArte\Themes\ThemeLoader;
 use ElkArte\Util;
 
 /**
@@ -49,7 +50,7 @@ class ManageSmileys extends AbstractController
 	{
 		global $context, $txt, $modSettings;
 
-		\ElkArte\Themes\ThemeLoader::loadLanguageFile('ManageSmileys');
+		ThemeLoader::loadLanguageFile('ManageSmileys');
 		theme()->getTemplates()->load('ManageSmileys');
 
 		$subActions = array(
@@ -1689,8 +1690,8 @@ class ManageSmileys extends AbstractController
 		checkSession('request');
 
 		// One of these two may be necessary
-		\ElkArte\Themes\ThemeLoader::loadLanguageFile('Errors');
-		\ElkArte\Themes\ThemeLoader::loadLanguageFile('Packages');
+		ThemeLoader::loadLanguageFile('Errors');
+		ThemeLoader::loadLanguageFile('Packages');
 
 		require_once(SUBSDIR . '/Smileys.subs.php');
 		require_once(SUBSDIR . '/Package.subs.php');

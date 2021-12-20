@@ -21,6 +21,7 @@ namespace ElkArte\Controller;
 
 use ElkArte\AbstractController;
 use ElkArte\Exceptions\Exception;
+use ElkArte\Themes\ThemeLoader;
 
 /**
  * Handles various topic actions, lock/unlock, sticky (pin) /unsticky (unpin), printing
@@ -237,7 +238,7 @@ class Topic extends AbstractController
 		// @todo this code is almost the same as the one in Display.controller.php
 		if ($topicinfo['id_poll'] > 0 && !empty($modSettings['pollMode']) && allowedTo('poll_view'))
 		{
-			\ElkArte\Themes\ThemeLoader::loadLanguageFile('Post');
+			ThemeLoader::loadLanguageFile('Post');
 			require_once(SUBSDIR . '/Poll.subs.php');
 
 			loadPollContext($topicinfo['id_poll']);

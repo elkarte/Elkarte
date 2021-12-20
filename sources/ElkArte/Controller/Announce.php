@@ -18,6 +18,7 @@ namespace ElkArte\Controller;
 
 use ElkArte\AbstractController;
 use ElkArte\Exceptions\Exception;
+use ElkArte\Themes\ThemeLoader;
 
 /**
  * Used to handle announce topic functionality.
@@ -50,7 +51,7 @@ class Announce extends AbstractController
 		}
 
 		// Language files
-		\ElkArte\Themes\ThemeLoader::loadLanguageFile('Post');
+		ThemeLoader::loadLanguageFile('Post');
 		theme()->getTemplates()->load('Announce');
 
 		$context['page_title'] = $txt['announce_topic'];
@@ -215,7 +216,7 @@ class Announce extends AbstractController
 		// Go back to the correct language for the user ;)
 		if (!empty($modSettings['userLanguage']))
 		{
-			\ElkArte\Themes\ThemeLoader::loadLanguageFile('Post');
+			ThemeLoader::loadLanguageFile('Post');
 		}
 	}
 

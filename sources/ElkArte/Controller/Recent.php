@@ -19,6 +19,7 @@ namespace ElkArte\Controller;
 use ElkArte\AbstractController;
 use ElkArte\Exceptions\Exception;
 use ElkArte\FrontpageInterface;
+use ElkArte\Themes\ThemeLoader;
 
 /**
  * Retrieve information about recent posts
@@ -413,7 +414,7 @@ class Recent extends AbstractController implements FrontpageInterface
 		theme()->addJavascriptVar(array(
 			'likemsg_are_you_sure' => JavaScriptEscape($txt['likemsg_are_you_sure']),
 		));
-		\ElkArte\Themes\ThemeLoader::loadLanguageFile('Errors');
+		ThemeLoader::loadLanguageFile('Errors');
 
 		// Initiate likes and the tooltips for likes
 		theme()->addInlineJavascript('

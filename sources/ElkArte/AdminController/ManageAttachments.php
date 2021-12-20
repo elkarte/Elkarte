@@ -20,6 +20,7 @@ use ElkArte\AbstractController;
 use ElkArte\Action;
 use ElkArte\Exceptions\Exception;
 use ElkArte\SettingsForm\SettingsForm;
+use ElkArte\Themes\ThemeLoader;
 use ElkArte\Util;
 use ElkArte\AttachmentsDirectory;
 
@@ -814,9 +815,9 @@ class ManageAttachments extends AbstractController
 				// And change the message to reflect this.
 				if (!empty($messages))
 				{
-					\ElkArte\Themes\ThemeLoader::loadLanguageFile('index', $language, true);
+					ThemeLoader::loadLanguageFile('index', $language, true);
 					setRemovalNotice($messages, $txt['attachment_delete_admin']);
-					\ElkArte\Themes\ThemeLoader::loadLanguageFile('index', $this->user->language, true);
+					ThemeLoader::loadLanguageFile('index', $this->user->language, true);
 				}
 			}
 		}

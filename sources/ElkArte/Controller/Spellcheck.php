@@ -17,6 +17,7 @@
 namespace ElkArte\Controller;
 
 use ElkArte\AbstractController;
+use ElkArte\Themes\ThemeLoader;
 use ElkArte\Util;
 
 /**
@@ -70,7 +71,7 @@ class Spellcheck extends AbstractController
 		// A list of "words" we know about but pspell doesn't.
 		$this->_events->trigger('prepare_spellcheck', array('$this->known_words' => &$this->known_words));
 
-		\ElkArte\Themes\ThemeLoader::loadLanguageFile('Post');
+		ThemeLoader::loadLanguageFile('Post');
 		theme()->getTemplates()->load('Post');
 
 		// Okay, this looks funny, but it actually fixes a weird bug.

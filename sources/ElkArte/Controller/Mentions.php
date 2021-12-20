@@ -17,6 +17,7 @@ use ElkArte\AbstractController;
 use ElkArte\DataValidator;
 use ElkArte\Exceptions\Exception;
 use ElkArte\Mentions\Mentioning;
+use ElkArte\Themes\ThemeLoader;
 
 /**
  * as liking a post, adding a buddy, @ calling a member in a post
@@ -214,7 +215,7 @@ class Mentions extends AbstractController
 		is_not_guest();
 
 		require_once(SUBSDIR . '/Mentions.subs.php');
-		\ElkArte\Themes\ThemeLoader::loadLanguageFile('Mentions');
+		ThemeLoader::loadLanguageFile('Mentions');
 
 		$this->_buildUrl();
 
@@ -437,7 +438,7 @@ class Mentions extends AbstractController
 				$mentioning->updateStatus($id_mention, $mark);
 				break;
 			case 'readall':
-				\ElkArte\Themes\ThemeLoader::loadLanguageFile('Mentions');
+				ThemeLoader::loadLanguageFile('Mentions');
 				$mentions = $this->list_loadMentions((int) $this->_page, $this->_items_per_page, $this->_sort, $this->_all, $this->_type);
 				$mentioning->markread($mentions);
 				break;
@@ -463,7 +464,7 @@ class Mentions extends AbstractController
 		$totalMentions = countUserMentions($all, $type);
 		$mentions = array();
 		$round = 0;
-		\ElkArte\Themes\ThemeLoader::loadLanguageFile('Mentions');
+		ThemeLoader::loadLanguageFile('Mentions');
 
 		$this->_registerEvents($type);
 

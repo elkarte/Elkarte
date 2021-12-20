@@ -14,6 +14,8 @@
  *
  */
 
+use ElkArte\Http\Headers;
+
 /**
  * Checks if the message table already has a fulltext index created and returns the key name
  * Determines if a db is capable of creating a fulltext index
@@ -109,7 +111,7 @@ function createSphinxConfig()
 		@ob_end_clean();
 	}
 
-	\ElkArte\Http\Headers::instance()
+	Headers::instance()
 		->header('Content-Encoding', 'none')
 		->header('Pragma', 'no-cache')
 		->header('Cache-Control', 'no-cache')

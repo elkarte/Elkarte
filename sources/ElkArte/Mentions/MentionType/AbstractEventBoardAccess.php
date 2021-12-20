@@ -14,6 +14,7 @@
 namespace ElkArte\Mentions\MentionType;
 
 use ElkArte\Mentions\MentionType\AbstractEventMessage;
+use ElkArte\Themes\ThemeLoader;
 use ElkArte\Util;
 
 /**
@@ -77,7 +78,7 @@ abstract class AbstractEventBoardAccess extends AbstractEventMessage
 		// Do the permissions checks and replace inappropriate messages
 		require_once(SUBSDIR . '/Boards.subs.php');
 		// @todo find a better place?
-		\ElkArte\Themes\ThemeLoader::loadLanguageFile('Mentions');
+		ThemeLoader::loadLanguageFile('Mentions');
 
 		$removed = false;
 		$accessibleBoards = accessibleBoards($boards);

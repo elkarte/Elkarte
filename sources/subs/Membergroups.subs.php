@@ -15,6 +15,7 @@
  */
 
 use ElkArte\Cache\Cache;
+use ElkArte\Themes\ThemeLoader;
 use ElkArte\User;
 use ElkArte\Util;
 
@@ -712,7 +713,7 @@ function list_getMembergroups($start, $items_per_page, $sort, $membergroup_type,
 	global $txt, $context;
 
 	$db = database();
-	\ElkArte\Themes\ThemeLoader::loadLanguageFile('Admin');
+	ThemeLoader::loadLanguageFile('Admin');
 
 	// Start collecting the data.
 	$groups = array();
@@ -2288,7 +2289,7 @@ function getGroupsList()
 {
 	global $txt;
 
-	\ElkArte\Themes\ThemeLoader::loadLanguageFile('Profile');
+	ThemeLoader::loadLanguageFile('Profile');
 
 	$db = database();
 	$member_groups = array(

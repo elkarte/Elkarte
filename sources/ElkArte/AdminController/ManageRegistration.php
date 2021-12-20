@@ -24,6 +24,7 @@ use ElkArte\Errors\ErrorContext;
 use ElkArte\Exceptions\Exception;
 use ElkArte\PrivacyPolicy;
 use ElkArte\SettingsForm\SettingsForm;
+use ElkArte\Themes\ThemeLoader;
 use ElkArte\TokenHash;
 use ElkArte\Util;
 
@@ -56,7 +57,7 @@ class ManageRegistration extends AbstractController
 		global $context, $txt;
 
 		// Loading, always loading.
-		\ElkArte\Themes\ThemeLoader::loadLanguageFile('Login');
+		ThemeLoader::loadLanguageFile('Login');
 		theme()->getTemplates()->load('Register');
 		loadJavascriptFile('register.js');
 

@@ -13,6 +13,8 @@
 
 namespace ElkArte;
 
+use ElkArte\Themes\ThemeLoader;
+
 /**
  * Class used to validate and transform data
  *
@@ -587,7 +589,7 @@ class DataValidator
 			return false;
 		}
 
-		\ElkArte\Themes\ThemeLoader::loadLanguageFile('Validation');
+		ThemeLoader::loadLanguageFile('Validation');
 		$result = array();
 
 		// Just want specific errors then it must be an array

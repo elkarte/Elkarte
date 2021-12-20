@@ -44,7 +44,7 @@ interface NotificationInterface
 	 *                  last_id (int), ???
 	 *                ))
 	 */
-	public function getNotificationBody($lang_data, $users);
+	public function getNotificationBody($lang_data, $members);
 
 	/**
 	 * The \ElkArte\NotificationsTask contains few data that may be necessary for the processing

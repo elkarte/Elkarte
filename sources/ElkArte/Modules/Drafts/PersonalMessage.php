@@ -20,6 +20,7 @@ use ElkArte\EventManager;
 use ElkArte\Exceptions\ControllerRedirectException;
 use ElkArte\Exceptions\PmErrorException;
 use ElkArte\Modules\AbstractModule;
+use ElkArte\Themes\ThemeLoader;
 use ElkArte\Util;
 use ElkArte\ValuesContainer;
 
@@ -70,7 +71,7 @@ class PersonalMessage extends AbstractModule
 	{
 		global $modSettings, $context;
 
-		\ElkArte\Themes\ThemeLoader::loadLanguageFile('Drafts');
+		ThemeLoader::loadLanguageFile('Drafts');
 		require_once(SUBSDIR . '/Drafts.subs.php');
 
 		// Are PM drafts enabled?
@@ -191,7 +192,7 @@ class PersonalMessage extends AbstractModule
 		}
 
 		// We haz drafts
-		\ElkArte\Themes\ThemeLoader::loadLanguageFile('Drafts');
+		ThemeLoader::loadLanguageFile('Drafts');
 		require_once(SUBSDIR . '/Drafts.subs.php');
 
 		// Load the draft and add it to a object container
@@ -225,7 +226,7 @@ class PersonalMessage extends AbstractModule
 		}
 
 		// We haz drafts
-		\ElkArte\Themes\ThemeLoader::loadLanguageFile('Drafts');
+		ThemeLoader::loadLanguageFile('Drafts');
 		require_once(SUBSDIR . '/Drafts.subs.php');
 
 		// Load all the drafts for this user that meet the criteria
@@ -282,7 +283,7 @@ class PersonalMessage extends AbstractModule
 				}';
 
 			loadJavascriptFile('drafts.plugin.js', array('defer' => true));
-			\ElkArte\Themes\ThemeLoader::loadLanguageFile('Post');
+			ThemeLoader::loadLanguageFile('Post');
 
 			// Our not so concise shortcut line
 			$context['shortcuts_text'] = $context['shortcuts_text'] ?? $txt['shortcuts_drafts'];

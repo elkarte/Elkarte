@@ -13,6 +13,7 @@ namespace ElkArte\AdminController;
 
 use ElkArte\AbstractController;
 use ElkArte\HttpReq;
+use ElkArte\Themes\ThemeLoader;
 
 /**
  * Emoji administration controller.
@@ -31,7 +32,7 @@ abstract class ManageEmojiModule extends AbstractController
 	{
 		global $txt;
 
-		\ElkArte\Themes\ThemeLoader::loadLanguageFile('emoji');
+		ThemeLoader::loadLanguageFile('emoji');
 
 		// All the options, well at least some of them!
 		$config_vars[] = '';

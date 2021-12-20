@@ -12,6 +12,7 @@
  */
 
 use ElkArte\Cache\Cache;
+use ElkArte\Themes\ThemeLoader;
 use ElkArte\User;
 use ElkArte\Util;
 
@@ -209,7 +210,7 @@ function determineActions($urls, $preferred_prefix = false)
 		return array();
 	}
 
-	\ElkArte\Themes\ThemeLoader::loadLanguageFile('Who');
+	ThemeLoader::loadLanguageFile('Who');
 
 	// Actions that require a specific permission level.
 	$allowedActions = array(

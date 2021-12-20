@@ -15,6 +15,7 @@
  */
 
 use ElkArte\Cache\Cache;
+use ElkArte\Themes\ThemeLoader;
 
 /**
  * Gets a list of all available message icons.
@@ -138,7 +139,7 @@ function getMessageIcons($board_id)
 
 	if (empty($modSettings['messageIcons_enable']))
 	{
-		\ElkArte\Themes\ThemeLoader::loadLanguageFile('Post');
+		ThemeLoader::loadLanguageFile('Post');
 
 		$icons = array(
 			array('value' => 'xx', 'name' => $txt['standard']),

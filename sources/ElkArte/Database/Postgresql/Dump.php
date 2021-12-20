@@ -165,9 +165,9 @@ class Dump extends AbstractDump
 	/**
 	 * {@inheritDoc}
 	 */
-	public function backup_table($table, $backup_table)
+	public function backup_table($table_name, $backup_table)
 	{
-		$table = str_replace('{db_prefix}', $this->_db_prefix, $table);
+		$table_name = str_replace('{db_prefix}', $this->_db_prefix, $table_name);
 
 		// Do we need to drop it first?
 		$this->_db_table->drop_table($backup_table);
@@ -181,7 +181,7 @@ class Dump extends AbstractDump
 			)',
 			array(
 				'backup_table' => $backup_table,
-				'table' => $table,
+				'table' => $table_name,
 			)
 		);
 
@@ -190,7 +190,7 @@ class Dump extends AbstractDump
 			SELECT * FROM {raw:table}',
 			array(
 				'backup_table' => $backup_table,
-				'table' => $table,
+				'table' => $table_name,
 			)
 		);
 	}

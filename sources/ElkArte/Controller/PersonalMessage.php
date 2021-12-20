@@ -30,6 +30,7 @@ use ElkArte\Exceptions\PmErrorException;
 use ElkArte\MembersList;
 use ElkArte\MessagesCallback\BodyParser\Normal;
 use ElkArte\MessagesCallback\PmRenderer;
+use ElkArte\Themes\ThemeLoader;
 use ElkArte\User;
 use ElkArte\Util;
 use ElkArte\ValuesContainer;
@@ -82,7 +83,7 @@ class PersonalMessage extends AbstractController
 		require_once(SUBSDIR . '/PersonalMessage.subs.php');
 
 		// Templates, language, javascripts
-		\ElkArte\Themes\ThemeLoader::loadLanguageFile('PersonalMessage');
+		ThemeLoader::loadLanguageFile('PersonalMessage');
 		loadJavascriptFile(array('PersonalMessage.js', 'suggest.js'));
 
 		if (!isset($this->_req->query->xml))
@@ -743,7 +744,7 @@ class PersonalMessage extends AbstractController
 		global $txt, $modSettings, $context;
 
 		// Load in some text and template dependencies
-		\ElkArte\Themes\ThemeLoader::loadLanguageFile('PersonalMessage');
+		ThemeLoader::loadLanguageFile('PersonalMessage');
 		theme()->getTemplates()->load('PersonalMessage');
 
 		// Set the template we will use
@@ -1130,7 +1131,7 @@ class PersonalMessage extends AbstractController
 		require_once(SUBSDIR . '/Auth.subs.php');
 		require_once(SUBSDIR . '/Post.subs.php');
 
-		\ElkArte\Themes\ThemeLoader::loadLanguageFile('PersonalMessage', '', false);
+		ThemeLoader::loadLanguageFile('PersonalMessage', '', false);
 
 		// Extract out the spam settings - it saves database space!
 		list ($modSettings['max_pm_recipients'], $modSettings['pm_posts_verification'], $modSettings['pm_posts_per_hour']) = explode(',', $modSettings['pm_spam_settings']);
@@ -1824,7 +1825,7 @@ class PersonalMessage extends AbstractController
 		$cur_profile = MembersList::get($this->user->id);
 
 		// Load up the profile template, its where PM settings are located
-		\ElkArte\Themes\ThemeLoader::loadLanguageFile('Profile');
+		ThemeLoader::loadLanguageFile('Profile');
 		theme()->getTemplates()->load('Profile');
 
 		// We want them to submit back to here.
@@ -1974,7 +1975,7 @@ class PersonalMessage extends AbstractController
 
 				if (!isset($messagesToSend[$cur_language]))
 				{
-					\ElkArte\Themes\ThemeLoader::loadLanguageFile('PersonalMessage', $cur_language, false);
+					ThemeLoader::loadLanguageFile('PersonalMessage', $cur_language, false);
 
 					// Make the body.
 					$report_body = str_replace(array('{REPORTER}', '{SENDER}'), array(un_htmlspecialchars($this->user->name), $memberFromName), $txt['pm_report_pm_user_sent']);
@@ -2009,7 +2010,7 @@ class PersonalMessage extends AbstractController
 			// Give the user their own language back!
 			if (!empty($modSettings['userLanguage']))
 			{
-				\ElkArte\Themes\ThemeLoader::loadLanguageFile('PersonalMessage', '', false);
+				ThemeLoader::loadLanguageFile('PersonalMessage', '', false);
 			}
 
 			// Leave them with a template.
@@ -2947,7 +2948,7 @@ class PersonalMessage extends AbstractController
 		// Load the error text strings if there were errors in the search.
 		if (!empty($context['search_errors']))
 		{
-			\ElkArte\Themes\ThemeLoader::loadLanguageFile('Errors');
+			ThemeLoader::loadLanguageFile('Errors');
 			$context['search_errors']['messages'] = array();
 			foreach ($context['search_errors'] as $search_error => $dummy)
 			{

@@ -14,6 +14,7 @@
 namespace ElkArte\Themes;
 
 use ElkArte\Cache\Cache;
+use ElkArte\ext\Composer\Autoload\ClassLoader;
 use ElkArte\Hooks;
 use ElkArte\HttpReq;
 use ElkArte\User;
@@ -288,7 +289,7 @@ class ThemeLoader
 
 		// The require should not be necessary, but I guess it's better to stay on the safe side.
 		require_once(EXTDIR . '/ClassLoader.php');
-		$loader = new \ElkArte\ext\Composer\Autoload\ClassLoader();
+		$loader = new ClassLoader();
 		$loader->setPsr4('ElkArte\\Themes\\' . $themeName . '\\', $themeData[0]['default_theme_dir']);
 		$loader->register();
 

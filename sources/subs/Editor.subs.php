@@ -16,6 +16,7 @@
  */
 
 use ElkArte\Cache\Cache;
+use ElkArte\Themes\ThemeLoader;
 use ElkArte\User;
 
 /**
@@ -45,7 +46,7 @@ function create_control_richedit($editorOptions)
 	global $txt, $modSettings, $options, $context, $settings, $scripturl;
 
 	// Load the Post language file... for the moment at least.
-	\ElkArte\Themes\ThemeLoader::loadLanguageFile('Post');
+	ThemeLoader::loadLanguageFile('Post');
 
 	// Every control must have a ID!
 	assert(isset($editorOptions['id']));
@@ -155,7 +156,7 @@ function create_control_richedit($editorOptions)
 	// Provide some dynamic error checking (no subject, no body, no service!)
 	if (!empty($editorOptions['live_errors']))
 	{
-		\ElkArte\Themes\ThemeLoader::loadLanguageFile('Errors');
+		ThemeLoader::loadLanguageFile('Errors');
 		theme()->addInlineJavascript('
 	error_txts[\'no_subject\'] = ' . JavaScriptEscape($txt['error_no_subject']) . ';
 	error_txts[\'no_message\'] = ' . JavaScriptEscape($txt['error_no_message']) . ';

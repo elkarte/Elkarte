@@ -18,6 +18,7 @@ namespace ElkArte\SettingsForm\SettingsFormAdapter;
 
 use BBC\ParserWrapper;
 use ElkArte\DataValidator;
+use ElkArte\Themes\ThemeLoader;
 use ElkArte\Util;
 
 /**
@@ -34,7 +35,7 @@ class Db extends Adapter
 	{
 		global $modSettings;
 
-		\ElkArte\Themes\ThemeLoader::loadLanguageFile('Help');
+		ThemeLoader::loadLanguageFile('Help');
 
 		foreach ($this->configVars as $configVar)
 		{

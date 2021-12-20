@@ -23,6 +23,7 @@ use ElkArte\Hooks;
 use ElkArte\Http\Headers;
 use ElkArte\Notifications;
 use ElkArte\Search\Search;
+use ElkArte\Themes\ThemeLoader;
 use ElkArte\UrlGenerator\UrlGenerator;
 use ElkArte\User;
 use ElkArte\Util;
@@ -1632,9 +1633,9 @@ function response_prefix()
 		}
 		else
 		{
-			\ElkArte\Themes\ThemeLoader::loadLanguageFile('index', $language, false);
+			ThemeLoader::loadLanguageFile('index', $language, false);
 			$response_prefix = $txt['response_prefix'];
-			\ElkArte\Themes\ThemeLoader::loadLanguageFile('index');
+			ThemeLoader::loadLanguageFile('index');
 		}
 
 		$cache->put('response_prefix', $response_prefix, 600);

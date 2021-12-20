@@ -20,6 +20,7 @@ use BBC\ParserWrapper;
 use ElkArte\AbstractController;
 use ElkArte\Cache\Cache;
 use ElkArte\Exceptions\Exception;
+use ElkArte\Http\Headers;
 use ElkArte\MembersList;
 use ElkArte\Themes\ThemeLoader;
 use ElkArte\Util;
@@ -260,7 +261,7 @@ class News extends AbstractController
 
 		obStart(!empty($modSettings['enableCompressedOutput']));
 
-		$headers = \ElkArte\Http\Headers::instance();
+		$headers = Headers::instance();
 		// This is an xml file....
 		if (isset($this->_req->query->debug))
 		{
