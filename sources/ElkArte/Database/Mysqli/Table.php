@@ -459,7 +459,7 @@ class Table extends AbstractTable
 				$columns[$row['Field']] = array(
 					'name' => $row['Field'],
 					'null' => $row['Null'] === 'YES',
-					'default' => isset($row['Default']) ? $row['Default'] : null,
+					'default' => $row['Default'] ?? null,
 					'type' => $type,
 					'size' => $size,
 					'auto' => $auto,
@@ -497,7 +497,7 @@ class Table extends AbstractTable
 		// Optimize tables that will benefit from this operation.
 		if (isset($row['Engine']) && $row['Engine'] === 'MyISAM')
 		{
-			$data_before = isset($row['Data_free']) ? $row['Data_free'] : 0;
+			$data_before = $row['Data_free'] ?? 0;
 			$request = $this->_db->query('', '
 			OPTIMIZE TABLE `{raw:table}`',
 				array(

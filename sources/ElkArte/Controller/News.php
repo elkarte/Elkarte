@@ -253,7 +253,7 @@ class News extends AbstractController
 			}
 		}
 
-		$context['feed_title'] = encode_special(strip_tags(un_htmlspecialchars($context['forum_name']) . (isset($feed_title) ? $feed_title : '')));
+		$context['feed_title'] = encode_special(strip_tags(un_htmlspecialchars($context['forum_name']) . ($feed_title ?? '')));
 
 		// We send a feed with recent posts, and alerts for PMs for logged in users
 		$context['recent_posts_data'] = $xml;

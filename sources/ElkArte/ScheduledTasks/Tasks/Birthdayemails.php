@@ -44,7 +44,7 @@ class Birthdayemails implements ScheduledTaskInterface
 		// Going to need this to send the emails.
 		require_once(SUBSDIR . '/Mail.subs.php');
 
-		$greeting = isset($modSettings['birthday_email']) ? $modSettings['birthday_email'] : 'happy_birthday';
+		$greeting = $modSettings['birthday_email'] ?? 'happy_birthday';
 
 		// Get the month and day of today.
 		$month = date('n'); // Month without leading zeros.

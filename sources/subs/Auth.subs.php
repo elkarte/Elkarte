@@ -215,7 +215,7 @@ function adminLogin($type = 'admin')
 	{
 		// log some info along with it! referer, user agent
 		$req = request();
-		$txt['security_wrong'] = sprintf($txt['security_wrong'], isset($_SERVER['HTTP_REFERER']) ? $_SERVER['HTTP_REFERER'] : $txt['unknown'], $req->user_agent(), User::$info->ip);
+		$txt['security_wrong'] = sprintf($txt['security_wrong'], $_SERVER['HTTP_REFERER'] ?? $txt['unknown'], $req->user_agent(), User::$info->ip);
 		\ElkArte\Errors\Errors::instance()->log_error($txt['security_wrong'], 'critical');
 
 		if (isset($_POST[$type . '_hash_pass']))

@@ -298,10 +298,10 @@ class Packages extends AbstractController
 		$context['page_title'] .= ' - ' . ($this->_uninstalling ? $txt['package_uninstall_actions'] : $txt['install_actions']);
 		$context['sub_template'] = 'view_package';
 		$context['filename'] = $this->_filename;
-		$context['package_name'] = isset($packageInfo['name']) ? $packageInfo['name'] : $this->_filename;
+		$context['package_name'] = $packageInfo['name'] ?? $this->_filename;
 		$context['is_installed'] = $this->_is_installed;
 		$context['uninstalling'] = $this->_uninstalling;
-		$context['extract_type'] = isset($packageInfo['type']) ? $packageInfo['type'] : 'modification';
+		$context['extract_type'] = $packageInfo['type'] ?? 'modification';
 
 		// Have we got some things which we might want to do "multi-theme"?
 		$this->_multi_theme($pka->themeFinds['candidates']);
@@ -728,7 +728,7 @@ class Packages extends AbstractController
 		$context['install_finished'] = false;
 		$context['is_installed'] = $this->_is_installed;
 		$context['uninstalling'] = $this->_uninstalling;
-		$context['extract_type'] = isset($packageInfo['type']) ? $packageInfo['type'] : 'modification';
+		$context['extract_type'] = $packageInfo['type'] ?? 'modification';
 
 		// We're gonna be needing the table db functions! ...Sometimes.
 		$table_installer = db_table();
@@ -1227,9 +1227,9 @@ class Packages extends AbstractController
 
 		$context['page_title'] = $txt['package_settings'];
 		$context['sub_template'] = 'install_options';
-		$context['package_ftp_server'] = isset($modSettings['package_server']) ? $modSettings['package_server'] : 'localhost';
-		$context['package_ftp_port'] = isset($modSettings['package_port']) ? $modSettings['package_port'] : '21';
-		$context['package_ftp_username'] = isset($modSettings['package_username']) ? $modSettings['package_username'] : $default_username;
+		$context['package_ftp_server'] = $modSettings['package_server'] ?? 'localhost';
+		$context['package_ftp_port'] = $modSettings['package_port'] ?? '21';
+		$context['package_ftp_username'] = $modSettings['package_username'] ?? $default_username;
 		$context['package_make_backups'] = !empty($modSettings['package_make_backups']);
 		$context['package_make_full_backups'] = !empty($modSettings['package_make_full_backups']);
 	}
@@ -1357,9 +1357,9 @@ class Packages extends AbstractController
 			list ($username, $detect_path) = $ftp->detect_path(BOARDDIR);
 
 			$context['package_ftp'] = array(
-				'server' => isset($modSettings['package_server']) ? $modSettings['package_server'] : 'localhost',
-				'port' => isset($modSettings['package_port']) ? $modSettings['package_port'] : '21',
-				'username' => empty($username) ? (isset($modSettings['package_username']) ? $modSettings['package_username'] : '') : $username,
+				'server' => $modSettings['package_server'] ?? 'localhost',
+				'port' => $modSettings['package_port'] ?? '21',
+				'username' => empty($username) ? ($modSettings['package_username'] ?? '') : $username,
 				'path' => $detect_path,
 				'form_elements_only' => true,
 			);
@@ -1662,7 +1662,7 @@ class Packages extends AbstractController
 
 		$timeout_limit = 5;
 		$context['method'] = $this->_req->post->method === 'individual' ? 'individual' : 'predefined';
-		$context['back_look_data'] = isset($this->_req->post->back_look) ? $this->_req->post->back_look : array();
+		$context['back_look_data'] = $this->_req->post->back_look ?? array();
 
 		// Skipping use of FTP?
 		if (empty($package_ftp))
@@ -1849,7 +1849,7 @@ class Packages extends AbstractController
 							$dont_chmod = true;
 
 							// Make note of how far we have come so we restart at the right point
-							$context['file_offset'] = isset($file_count) ? $file_count : 0;
+							$context['file_offset'] = $file_count ?? 0;
 							break;
 						}
 					}
@@ -1862,7 +1862,7 @@ class Packages extends AbstractController
 				// If this is set it means we timed out half way through.
 				if (!empty($dont_chmod))
 				{
-					$context['total_files'] = isset($file_count) ? $file_count : 0;
+					$context['total_files'] = $file_count ?? 0;
 					pausePermsSave();
 				}
 
@@ -2115,7 +2115,7 @@ class Packages extends AbstractController
 				if (!empty($packageInfo))
 				{
 					$packageInfo['installed_id'] = isset($installed_adds[$packageInfo['id']]) ? $installed_adds[$packageInfo['id']]['id'] : 0;
-					$packageInfo['sort_id'] = isset($sort_id[$packageInfo['type']]) ? $sort_id[$packageInfo['type']] : $sort_id['unknown'];
+					$packageInfo['sort_id'] = $sort_id[$packageInfo['type']] ?? $sort_id['unknown'];
 					$packageInfo['is_installed'] = isset($installed_adds[$packageInfo['id']]);
 					$packageInfo['is_current'] = $packageInfo['is_installed'] && isset($installed_adds[$packageInfo['id']]) && ($installed_adds[$packageInfo['id']]['version'] == $packageInfo['version']);
 					$packageInfo['is_newer'] = $packageInfo['is_installed'] && isset($installed_adds[$packageInfo['id']]) && ($installed_adds[$packageInfo['id']]['version'] > $packageInfo['version']);

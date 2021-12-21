@@ -18,7 +18,6 @@ use ElkArte\User;
 
 /**
  * @param string $session_id
- * @throws \ElkArte\Exceptions\Exception
  * @todo
  *
  */
@@ -44,7 +43,6 @@ function deleteLogOnlineInterval($session_id)
  *
  * @param string $session_id
  * @param string $serialized
- * @throws \ElkArte\Exceptions\Exception
  */
 function updateLogOnline($session_id, $serialized)
 {
@@ -78,7 +76,6 @@ function updateLogOnline($session_id, $serialized)
  * @param string $session_id
  * @param string $serialized
  * @param bool $do_delete
- * @throws \ElkArte\Exceptions\Exception
  */
 function insertdeleteLogOnline($session_id, $serialized, $do_delete = false)
 {
@@ -122,7 +119,6 @@ function insertdeleteLogOnline($session_id, $serialized, $do_delete = false)
  * @param mixed[] $insert_keys
  * @param mixed[] $cache_stats
  * @param string $date
- * @throws \ElkArte\Exceptions\Exception
  */
 function updateLogActivity($update_parameters, $setStringUpdate, $insert_keys, $cache_stats, $date)
 {
@@ -211,7 +207,6 @@ function loadLogReported($msg_id, $topic_id, $type = 'msg')
  * Log a change to the forum, such as moderation events or administrative changes.
  *
  * @param mixed[] $inserts
- * @throws \Exception
  */
 function insertLogActions($inserts)
 {
@@ -247,7 +242,6 @@ function deleteMemberLogOnline()
  * Delete expired/outdated session from log_online
  *
  * @param string $session
- * @throws \ElkArte\Exceptions\Exception
  * @package Authorization
  */
 function deleteOnline($session)
@@ -268,7 +262,6 @@ function deleteOnline($session)
  *
  * @param int[]|int $ids ids of the member(s) to log
  * @param bool $on = false if true, add the user(s) to online log, if false, remove 'em
- * @throws \ElkArte\Exceptions\Exception
  * @package Authorization
  */
 function logOnline($ids, $on = false)

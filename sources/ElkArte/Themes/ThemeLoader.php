@@ -781,7 +781,7 @@ class ThemeLoader
 		// Default to the user's language.
 		if ($lang === '')
 		{
-			$lang = isset(User::$info->language) ? User::$info->language : $language;
+			$lang = User::$info->language ?? $language;
 		}
 
 		// Make sure we have $settings - if not we're in trouble and need to find it!

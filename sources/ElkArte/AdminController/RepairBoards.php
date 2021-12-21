@@ -109,7 +109,7 @@ class RepairBoards extends AbstractController
 		else
 		{
 			$context['error_search'] = false;
-			$context['to_fix'] = isset($this->_req->session->repairboards_to_fix) ? $this->_req->session->repairboards_to_fix : array();
+			$context['to_fix'] = $this->_req->session->repairboards_to_fix ?? array();
 
 			require_once(SUBSDIR . '/Boards.subs.php');
 

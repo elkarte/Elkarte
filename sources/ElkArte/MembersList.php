@@ -130,14 +130,7 @@ class MembersList
 	 */
 	public function getById($id)
 	{
-		if (isset(self::$members[$id]))
-		{
-			return self::$members[$id];
-		}
-		else
-		{
-			return false;
-		}
+		return self::$members[$id] ?? false;
 	}
 
 	/**

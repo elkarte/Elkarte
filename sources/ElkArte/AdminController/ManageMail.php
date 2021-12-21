@@ -393,7 +393,7 @@ class ManageMail extends AbstractController
 							$txtKey = sprintf('mq_mpriority_%1$s', $rowData['priority']);
 
 							// But if not, revert to priority 0.
-							return isset($txt[$txtKey]) ? $txt[$txtKey] : $txt['mq_mpriority_1'];
+							return $txt[$txtKey] ?? $txt['mq_mpriority_1'];
 						},
 						'class' => 'centertext smalltext',
 					),

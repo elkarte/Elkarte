@@ -390,7 +390,7 @@ class Payment implements PaymentInterface
 	 */
 	public function getCost()
 	{
-		return (isset($_POST['tax']) ? $_POST['tax'] : 0) + $_POST['mc_gross'];
+		return ($_POST['tax'] ?? 0) + $_POST['mc_gross'];
 	}
 
 	/**

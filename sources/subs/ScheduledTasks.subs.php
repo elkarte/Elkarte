@@ -18,7 +18,6 @@ use ElkArte\Util;
  *
  * @param string[]|string $tasks = array() the tasks
  * @param bool $forceUpdate
- * @throws \ElkArte\Exceptions\Exception
  * @package ScheduledTasks
  */
 function calculateNextTrigger($tasks = array(), $forceUpdate = false)
@@ -398,8 +397,8 @@ function loadTaskDetails($id_task)
 			$task = array(
 				'id' => $row['id_task'],
 				'function' => $row['task'],
-				'name' => isset($txt['scheduled_task_' . $row['task']]) ? $txt['scheduled_task_' . $row['task']] : $row['task'],
-				'desc' => isset($txt['scheduled_task_desc_' . $row['task']]) ? $txt['scheduled_task_desc_' . $row['task']] : '',
+				'name' => $txt['scheduled_task_' . $row['task']] ?? $row['task'],
+				'desc' => $txt['scheduled_task_desc_' . $row['task']] ?? '',
 				'next_time' => $row['disabled'] ? $txt['scheduled_tasks_na'] : standardTime($row['next_time'] == 0 ? time() : $row['next_time'], true, 'server'),
 				'disabled' => $row['disabled'],
 				'offset' => $row['time_offset'],
@@ -449,8 +448,8 @@ function scheduledTasks()
 			$known_tasks[] = array(
 				'id' => $row['id_task'],
 				'function' => $row['task'],
-				'name' => isset($txt['scheduled_task_' . $row['task']]) ? $txt['scheduled_task_' . $row['task']] : $row['task'],
-				'desc' => isset($txt['scheduled_task_desc_' . $row['task']]) ? $txt['scheduled_task_desc_' . $row['task']] : '',
+				'name' => $txt['scheduled_task_' . $row['task']] ?? $row['task'],
+				'desc' => $txt['scheduled_task_desc_' . $row['task']] ?? '',
 				'next_time' => $row['disabled'] ? $txt['scheduled_tasks_na'] : standardTime(($row['next_time'] == 0 ? time() : $row['next_time']), true, 'server'),
 				'disabled' => $row['disabled'],
 				'checked_state' => $row['disabled'] ? '' : 'checked="checked"',
@@ -494,7 +493,7 @@ function getTaskLogEntries($start, $items_per_page, $sort)
 
 			$log_entries[] = array(
 				'id' => $row['id_log'],
-				'name' => isset($txt['scheduled_task_' . $row['task']]) ? $txt['scheduled_task_' . $row['task']] : $row['task'],
+				'name' => $txt['scheduled_task_' . $row['task']] ?? $row['task'],
 				'time_run' => $row['time_run'],
 				// -1 means failed task, but in order to look better in the UI we switch it to 0
 				'time_taken' => $row['time_taken'] == -1 ? 0 : $row['time_taken'],

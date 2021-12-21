@@ -174,7 +174,7 @@ function list_integration_hooks_data($start, $items_per_page, $sort)
 			// This is a not an include and the function is included in a certain file (if not it doesn't exists so don't care)
 			if (substr($hook, -8) !== '_include' && isset($hook_status[$hook][$function]['in_file']))
 			{
-				$current_hook = isset($temp_data['include'][$hook_status[$hook][$function]['in_file']]) ? $temp_data['include'][$hook_status[$hook][$function]['in_file']] : '';
+				$current_hook = $temp_data['include'][$hook_status[$hook][$function]['in_file']] ?? '';
 				$enabled = false;
 
 				// Checking all the functions within this particular file
@@ -227,7 +227,7 @@ function list_integration_hooks_data($start, $items_per_page, $sort)
 					'function_name' => $function,
 					'real_function' => $exploded[0],
 					'included_file' => isset($exploded[1]) ? parse_path(trim($exploded[1])) : '',
-					'file_name' => (isset($hook_status[$hook][$function]['in_file']) ? $hook_status[$hook][$function]['in_file'] : ''),
+					'file_name' => ($hook_status[$hook][$function]['in_file'] ?? ''),
 					'hook_exists' => $hook_exists,
 					'status' => $hook_exists ? ($enabled ? 'allow' : 'moderate') : 'deny',
 					'img_text' => $txt['hooks_' . ($hook_exists ? ($enabled ? 'active' : 'disabled') : 'missing')],

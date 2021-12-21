@@ -1838,7 +1838,7 @@ function makeCustomFieldChanges($memID, $area, $sanitize = true)
 		else
 		{
 			// TODO: This is a bit backwards.
-			$value = isset($_POST['customfield'][$row['col_name']]) ? $_POST['customfield'][$row['col_name']] : $row['default_value'];
+			$value = $_POST['customfield'][$row['col_name']] ?? $row['default_value'];
 			$is_valid = isCustomFieldValid($row, $value);
 
 			if ($is_valid !== true)
@@ -2019,7 +2019,7 @@ function profileLoadSignatureData()
 	list ($sig_limits, $sig_bbc) = explode(':', $modSettings['signature_settings']);
 	$sig_limits = explode(',', $sig_limits);
 
-	$context['signature_enabled'] = isset($sig_limits[0]) ? $sig_limits[0] : 0;
+	$context['signature_enabled'] = $sig_limits[0] ?? 0;
 	$context['signature_limits'] = array(
 		'max_length' => $sig_limits[1] ?? 0,
 		'max_lines' => $sig_limits[2] ?? 0,
@@ -2333,7 +2333,7 @@ function profileValidateSignature(&$value)
 				if (empty($matches[2][$ind]))
 				{
 					$matches[2][$ind] = 'em';
-					$size = isset($sizes[(int) $size]) ? $sizes[(int) $size] : 0;
+					$size = $sizes[(int) $size] ?? 0;
 				}
 
 				// Attempt to allow all sizes of abuse, so to speak.
@@ -2763,7 +2763,7 @@ function profileSaveAvatarData(&$value)
 					'6' => 'bmp'
 				);
 
-				$extension = isset($extensions[$sizes[2]]) ? $extensions[$sizes[2]] : 'bmp';
+				$extension = $extensions[$sizes[2]] ?? 'bmp';
 				$mime_type = 'image/' . ($extension === 'jpg' ? 'jpeg' : ($extension === 'bmp' ? 'x-ms-bmp' : $extension));
 				$destName = 'avatar_' . $memID . '_' . time() . '.' . $extension;
 				list ($width, $height) = elk_getimagesize($_FILES['attachment']['tmp_name']);

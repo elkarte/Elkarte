@@ -324,7 +324,7 @@ function removeMessage($message, $decreasePostCount = true)
 
 /**
  * This function deals with the topic associated to a message.
- * It allows to retrieve or update the topic to which the message belongs.
+ * It allows retrieving or updating the topic to which the message belongs.
  *
  * If $topicID is not passed, the current topic ID of the message is returned.
  * If $topicID is passed, the message is updated to point to the new topic.
@@ -332,7 +332,6 @@ function removeMessage($message, $decreasePostCount = true)
  * @param int $msg_id message ID
  * @param int|null $topicID = null topic ID, if null is passed the ID of the topic is retrieved and returned
  * @return int|false int topic ID if any, or false
- * @throws \ElkArte\Exceptions\Exception
  */
 function associatedTopic($msg_id, $topicID = null)
 {

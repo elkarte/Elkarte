@@ -392,14 +392,7 @@ function loadPermissionProfiles()
 			global $context;
 
 			// Format the label nicely.
-			if (isset($txt['permissions_profile_' . $row['profile_name']]))
-			{
-				$name = $txt['permissions_profile_' . $row['profile_name']];
-			}
-			else
-			{
-				$name = $row['profile_name'];
-			}
+			$name = $txt['permissions_profile_' . $row['profile_name']] ?? $row['profile_name'];
 
 			$context['profiles'][$row['id_profile']] = array(
 				'id' => $row['id_profile'],
@@ -650,8 +643,8 @@ function loadAllPermissions()
 						'type' => $permissionType,
 						'id' => $group,
 						'name' => $txt['permissiongroup_' . $group],
-						'icon' => isset($txt['permissionicon_' . $group]) ? $txt['permissionicon_' . $group] : $txt['permissionicon'],
-						'help' => isset($txt['permissionhelp_' . $group]) ? $txt['permissionhelp_' . $group] : '',
+						'icon' => $txt['permissionicon_' . $group] ?? $txt['permissionicon'],
+						'help' => $txt['permissionhelp_' . $group] ?? '',
 						'hidden' => false,
 						'permissions' => array()
 					);
@@ -663,7 +656,7 @@ function loadAllPermissions()
 				'id' => $permission,
 				'name' => !isset($relabelPermissions[$permission]) ? $txt['permissionname_' . $permission] : $txt[$relabelPermissions[$permission]],
 				'show_help' => isset($txt['permissionhelp_' . $permission]),
-				'note' => isset($txt['permissionnote_' . $permission]) ? $txt['permissionnote_' . $permission] : '',
+				'note' => $txt['permissionnote_' . $permission] ?? '',
 				'has_own_any' => $permissionArray[0],
 				'own' => array(
 					'id' => $permission . '_own',

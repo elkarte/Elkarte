@@ -268,12 +268,12 @@ class ManageSearch extends AbstractController
 		$context['relative_weights'] = array('total' => 0);
 		foreach ($factors as $factor)
 		{
-			$context['relative_weights']['total'] += isset($modSettings[$factor]) ? $modSettings[$factor] : 0;
+			$context['relative_weights']['total'] += $modSettings[$factor] ?? 0;
 		}
 
 		foreach ($factors as $factor)
 		{
-			$context['relative_weights'][$factor] = round(100 * (isset($modSettings[$factor]) ? $modSettings[$factor] : 0) / $context['relative_weights']['total'], 1);
+			$context['relative_weights'][$factor] = round(100 * ($modSettings[$factor] ?? 0) / $context['relative_weights']['total'], 1);
 		}
 
 		createToken('admin-msw');

@@ -32,7 +32,7 @@ class ValuesContainer implements \ArrayAccess
 	/**
 	 * Constructor
 	 *
-	 * @param mixed[]|null $data Any array of data used to initialize the object (optional)
+	 * @param array|null $data Any array of data used to initialize the object (optional)
 	 */
 	public function __construct($data = null)
 	{
@@ -90,7 +90,7 @@ class ValuesContainer implements \ArrayAccess
 	 * Calling as method uses the argument as default
 	 *
 	 * @param string|int $key
-	 * @param mixed[] $args
+	 * @param array $args
 	 * @return mixed
 	 */
 	public function __call($key, $args)
@@ -162,7 +162,7 @@ class ValuesContainer implements \ArrayAccess
 	 * Returns the value associated to a certain offset.
 	 *
 	 * @param string|int $offset
-	 * @return mixed|mixed[]
+	 * @return mixed|array
 	 */
 	public function offsetGet($offset)
 	{

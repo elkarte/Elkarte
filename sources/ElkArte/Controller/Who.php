@@ -248,7 +248,7 @@ class Who extends AbstractController
 
 			// Keep the IP that came from the database.
 			$member_context['ip'] = $member['ip'];
-			$context['members'][$i]['action'] = isset($url_data[$i]) ? $url_data[$i] : $txt['who_hidden'];
+			$context['members'][$i]['action'] = $url_data[$i] ?? $txt['who_hidden'];
 
 			if ($member['id'] == 0 && isset($spiderContext[$member['id_spider']]))
 			{

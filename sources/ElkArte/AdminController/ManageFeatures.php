@@ -738,17 +738,17 @@ class ManageFeatures extends AbstractController
 		}
 
 		$context['signature_settings'] = array(
-			'enable' => isset($sig_limits[0]) ? $sig_limits[0] : 0,
-			'max_length' => isset($sig_limits[1]) ? $sig_limits[1] : 0,
-			'max_lines' => isset($sig_limits[2]) ? $sig_limits[2] : 0,
-			'max_images' => isset($sig_limits[3]) ? $sig_limits[3] : 0,
+			'enable' => $sig_limits[0] ?? 0,
+			'max_length' => $sig_limits[1] ?? 0,
+			'max_lines' => $sig_limits[2] ?? 0,
+			'max_images' => $sig_limits[3] ?? 0,
 			'allow_smileys' => isset($sig_limits[4]) && $sig_limits[4] == -1 ? 0 : 1,
 			'max_smileys' => isset($sig_limits[4]) && $sig_limits[4] != -1 ? $sig_limits[4] : 0,
-			'max_image_width' => isset($sig_limits[5]) ? $sig_limits[5] : 0,
-			'max_image_height' => isset($sig_limits[6]) ? $sig_limits[6] : 0,
-			'max_font_size' => isset($sig_limits[7]) ? $sig_limits[7] : 0,
-			'repetition_guests' => isset($sig_limits[8]) ? $sig_limits[8] : 0,
-			'repetition_members' => isset($sig_limits[9]) ? $sig_limits[9] : 0,
+			'max_image_width' => $sig_limits[5] ?? 0,
+			'max_image_height' => $sig_limits[6] ?? 0,
+			'max_font_size' => $sig_limits[7] ?? 0,
+			'repetition_guests' => $sig_limits[8] ?? 0,
+			'repetition_members' => $sig_limits[9] ?? 0,
 		);
 
 		// Temporarily make each setting a modSetting!

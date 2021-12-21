@@ -765,7 +765,7 @@ class ManageLanguages extends AbstractController
 
 				$context['possible_files'][$theme]['files'][] = array(
 					'id' => $matches[1],
-					'name' => isset($txt['lang_file_desc_' . $matches[1]]) ? $txt['lang_file_desc_' . $matches[1]] : $matches[1],
+					'name' => $txt['lang_file_desc_' . $matches[1]] ?? $matches[1],
 					'selected' => $theme_id == $theme && $file_id == $matches[1],
 				);
 			}

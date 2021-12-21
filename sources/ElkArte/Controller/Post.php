@@ -609,8 +609,8 @@ class Post extends AbstractController
 
 		if ($this->user->is_guest)
 		{
-			$context['name'] = isset($_SESSION['guest_name']) ? $_SESSION['guest_name'] : '';
-			$context['email'] = isset($_SESSION['guest_email']) ? $_SESSION['guest_email'] : '';
+			$context['name'] = $_SESSION['guest_name'] ?? '';
+			$context['email'] = $_SESSION['guest_email'] ?? '';
 		}
 
 		// Trigger the prepare_posting event
@@ -1295,7 +1295,7 @@ class Post extends AbstractController
 		// This is an already existing message. Edit it.
 		if (!empty($_REQUEST['msg']))
 		{
-			$posterOptions['id_starter'] = isset($msgInfo['id_member']) ? $msgInfo['id_member'] : $this->user->id;
+			$posterOptions['id_starter'] = $msgInfo['id_member'] ?? $this->user->id;
 
 			// Have admins allowed people to hide their screwups?
 			if (time() - $msgInfo['poster_time'] > $modSettings['edit_wait_time'] || $this->user->id != $msgInfo['id_member'])
@@ -1740,8 +1740,8 @@ class Post extends AbstractController
 
 			$msgOptions = array(
 				'id' => $row['id_msg'],
-				'subject' => isset($_POST['subject']) ? $_POST['subject'] : null,
-				'body' => isset($_POST['message']) ? $_POST['message'] : null,
+				'subject' => $_POST['subject'] ?? null,
+				'body' => $_POST['message'] ?? null,
 				'icon' => isset($_REQUEST['icon']) ? preg_replace('~[\./\\\\*\':"<>]~', '', $_REQUEST['icon']) : null,
 			);
 
@@ -1835,7 +1835,7 @@ class Post extends AbstractController
 						'timestamp' => isset($msgOptions['modify_time']) ? forum_time(true, $msgOptions['modify_time']) : 0,
 						'name' => isset($msgOptions['modify_time']) ? $msgOptions['modify_name'] : '',
 					),
-					'subject' => isset($msgOptions['subject']) ? $msgOptions['subject'] : '',
+					'subject' => $msgOptions['subject'] ?? '',
 				);
 
 				$context['message']['subject'] = censor($context['message']['subject']);

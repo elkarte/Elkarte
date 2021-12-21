@@ -1575,7 +1575,7 @@ class ManageSmileys extends AbstractController
 
 			// Get a list of boards needed for assigning this icon to a specific board.
 			$boardListOptions = array(
-				'selected_board' => isset($context['icon']['board_id']) ? $context['icon']['board_id'] : 0,
+				'selected_board' => $context['icon']['board_id'] ?? 0,
 			);
 			require_once(SUBSDIR . '/Boards.subs.php');
 			$context += getBoardList($boardListOptions);
@@ -1863,7 +1863,7 @@ class ManageSmileys extends AbstractController
 				// Show a description for the action if one is provided
 				if (empty($thisAction['description']))
 				{
-					$thisAction['description'] = isset($action['description']) ? $action['description'] : '';
+					$thisAction['description'] = $action['description'] ?? '';
 				}
 
 				$context['actions'][] = $thisAction;

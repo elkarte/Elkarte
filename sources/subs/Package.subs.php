@@ -564,7 +564,7 @@ function create_chmod_control($chmodFiles = array(), $chmodOptions = array(), $r
 			}
 			elseif (!isset($_POST['ftp_path']))
 			{
-				$_POST['ftp_path'] = isset($modSettings['package_path']) ? $modSettings['package_path'] : $detect_path;
+				$_POST['ftp_path'] = $modSettings['package_path'] ?? $detect_path;
 			}
 
 			if (!isset($_POST['ftp_username']))
@@ -574,9 +574,9 @@ function create_chmod_control($chmodFiles = array(), $chmodOptions = array(), $r
 		}
 
 		$context['package_ftp'] = array(
-			'server' => isset($_POST['ftp_server']) ? $_POST['ftp_server'] : (isset($modSettings['package_server']) ? $modSettings['package_server'] : 'localhost'),
-			'port' => isset($_POST['ftp_port']) ? $_POST['ftp_port'] : (isset($modSettings['package_port']) ? $modSettings['package_port'] : '21'),
-			'username' => isset($_POST['ftp_username']) ? $_POST['ftp_username'] : (isset($modSettings['package_username']) ? $modSettings['package_username'] : ''),
+			'server' => $_POST['ftp_server'] ?? ($modSettings['package_server'] ?? 'localhost'),
+			'port' => $_POST['ftp_port'] ?? ($modSettings['package_port'] ?? '21'),
+			'username' => $_POST['ftp_username'] ?? ($modSettings['package_username'] ?? ''),
 			'path' => $_POST['ftp_path'],
 			'error' => empty($ftp_error) ? null : $ftp_error,
 			'destination' => !empty($chmodOptions['destination_url']) ? $chmodOptions['destination_url'] : '',
@@ -659,7 +659,7 @@ function list_restoreFiles($dummy1, $dummy2, $dummy3, $do_change)
 			'old_perms' => substr(sprintf('%o', $perms), -4),
 			'cur_perms' => substr(sprintf('%o', $file_permissions), -4),
 			'new_perms' => isset($new_permissions) ? substr(sprintf('%o', $new_permissions), -4) : '',
-			'result' => isset($result) ? $result : '',
+			'result' => $result ?? '',
 			'writable_message' => '<span class="' . (@is_writable($file) ? 'success' : 'alert') . '">' . (@is_writable($file) ? $txt['package_file_perms_writable'] : $txt['package_file_perms_not_writable']) . '</span>',
 		);
 	}
@@ -856,7 +856,7 @@ function packageRequireFTP($destination_url, $files = null, $return = false)
 		}
 		elseif (!isset($_POST['ftp_path']))
 		{
-			$_POST['ftp_path'] = isset($modSettings['package_path']) ? $modSettings['package_path'] : $detect_path;
+			$_POST['ftp_path'] = $modSettings['package_path'] ?? $detect_path;
 		}
 
 		if (!isset($_POST['ftp_username']))
@@ -865,9 +865,9 @@ function packageRequireFTP($destination_url, $files = null, $return = false)
 		}
 
 		$context['package_ftp'] = array(
-			'server' => isset($_POST['ftp_server']) ? $_POST['ftp_server'] : (isset($modSettings['package_server']) ? $modSettings['package_server'] : 'localhost'),
-			'port' => isset($_POST['ftp_port']) ? $_POST['ftp_port'] : (isset($modSettings['package_port']) ? $modSettings['package_port'] : '21'),
-			'username' => isset($_POST['ftp_username']) ? $_POST['ftp_username'] : (isset($modSettings['package_username']) ? $modSettings['package_username'] : ''),
+			'server' => $_POST['ftp_server'] ?? ($modSettings['package_server'] ?? 'localhost'),
+			'port' => $_POST['ftp_port'] ?? ($modSettings['package_port'] ?? '21'),
+			'username' => $_POST['ftp_username'] ?? ($modSettings['package_username'] ?? ''),
 			'path' => $_POST['ftp_path'],
 			'error' => empty($ftp_error) ? null : $ftp_error,
 			'destination' => $destination_url,
@@ -1008,7 +1008,7 @@ function parsePackageInfo(&$packageXML, $testing_only = true, $method = 'install
 	$return = array();
 
 	$temp_auto = 0;
-	$temp_path = BOARDDIR . '/packages/temp/' . (isset($context['base_path']) ? $context['base_path'] : '');
+	$temp_path = BOARDDIR . '/packages/temp/' . ($context['base_path'] ?? '');
 
 	$context['readmes'] = array();
 	$context['licences'] = array();
