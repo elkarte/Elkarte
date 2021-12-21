@@ -32,7 +32,7 @@ class ParseQuery extends AbstractParseQuery
 	 */
 	public function parse($query)
 	{
-		$call = isset($this->parsers[$query[0]]) ? $this->parsers[$query[0]] : $this->parsers['s'];
+		$call = $this->parsers[$query[0]] ?? $this->parsers['s'];
 
 		return $this->{$call}($query);
 	}

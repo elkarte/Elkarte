@@ -193,7 +193,7 @@ class Table extends AbstractTable
 			if (!$column_info['null'])
 			{
 				// We have to set it to something if we are making it NOT NULL. And we must comply with the current column format.
-				$setTo = isset($column_info['default']) ? $column_info['default'] : (strpos($old_info['type'], 'int') !== false ? 0 : '');
+				$setTo = $column_info['default'] ?? (strpos($old_info['type'], 'int') !== false ? 0 : '');
 				$this->_db->query('', '
 					UPDATE ' . $table_name . '
 					SET ' . $column_info['name'] . ' = \'' . $setTo . '\'

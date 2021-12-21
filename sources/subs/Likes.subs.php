@@ -137,7 +137,7 @@ function prepareLikes($likes)
 		}
 
 		// Any limits on how many to display
-		$limit = isset($modSettings['likeDisplayLimit']) ? $modSettings['likeDisplayLimit'] : 0;
+		$limit = $modSettings['likeDisplayLimit'] ?? 0;
 
 		// If there are a lot of likes for this message, we cull the herd
 		if ($limit > 0 && $like['count'] > $limit)

@@ -327,7 +327,7 @@ class SearchParams extends ValuesContainer
 		// Searching a specific topic?
 		if (!empty($params['topic']) || (!empty($params['search_selection']) && $params['search_selection'] === 'topic'))
 		{
-			$this->_search_params['topic'] = empty($params['search_selection']) ? (int) $params['topic'] : (isset($params['sd_topic']) ? $params['sd_topic'] : '');
+			$this->_search_params['topic'] = empty($params['search_selection']) ? (int) $params['topic'] : ($params['sd_topic'] ?? '');
 			$this->_search_params['show_complete'] = true;
 		}
 	}

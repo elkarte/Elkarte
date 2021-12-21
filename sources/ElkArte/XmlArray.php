@@ -356,7 +356,7 @@ class XmlArray
 	 */
 	public function name()
 	{
-		return isset($this->array['name']) ? $this->array['name'] : '';
+		return $this->array['name'] ?? '';
 	}
 
 	/**

@@ -389,9 +389,7 @@ class ProfileInfo extends AbstractController
 				: $txt['account_activate'];
 
 			// Should we show a custom message?
-			$context['activate_message'] = isset($txt['account_activate_method_' . $context['member']['is_activated'] % 10])
-				? $txt['account_activate_method_' . $context['member']['is_activated'] % 10]
-				: $txt['account_not_activated'];
+			$context['activate_message'] = $txt['account_activate_method_' . $context['member']['is_activated'] % 10] ?? $txt['account_not_activated'];
 
 			$context['activate_url'] = getUrl('action', ['action' => 'profile', 'save', 'area' => 'activateaccount', 'u' => $this->_memID, '{session_data}', $context['profile-aa' . $this->_memID . '_token_var'] => $context['profile-aa' . $this->_memID . '_token']]);
 		}
@@ -434,7 +432,7 @@ class ProfileInfo extends AbstractController
 		// What are we viewing
 		$action = $this->_req->getQuery('sa', 'trim', '');
 		$action_title = array('messages' => 'Messages', 'attach' => 'Attachments', 'topics' => 'Topics', 'unwatchedtopics' => 'Unwatched');
-		$action_title = isset($action_title[$action]) ? $action_title[$action] : 'Posts';
+		$action_title = $action_title[$action] ?? 'Posts';
 
 		theme()->getTemplates()->load('ProfileInfo');
 

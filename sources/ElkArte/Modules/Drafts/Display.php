@@ -18,6 +18,7 @@ namespace ElkArte\Modules\Drafts;
 
 use ElkArte\EventManager;
 use ElkArte\Modules\AbstractModule;
+use ElkArte\Themes\ThemeLoader;
 
 /**
  * Class \ElkArte\Modules\Drafts\Display
@@ -90,14 +91,14 @@ class Display extends AbstractModule
 		// Enable the drafts functions for the QR area
 		if (!empty($context['drafts_save']))
 		{
-			\ElkArte\Themes\ThemeLoader::loadLanguageFile('Drafts');
+			ThemeLoader::loadLanguageFile('Drafts');
 
 			if ($context['drafts_autosave'])
 			{
 				// WYSIWYG editor
 				if (!empty($options['use_editor_quick_reply']))
 				{
-					\ElkArte\Themes\ThemeLoader::loadLanguageFile('Post');
+					ThemeLoader::loadLanguageFile('Post');
 
 					$editorOptions['plugin_addons'] = $editorOptions['plugin_addons'] ?? [];
 					$editorOptions['plugin_options'] = $editorOptions['plugin_options'] ?? [];

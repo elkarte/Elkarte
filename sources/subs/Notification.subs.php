@@ -11,6 +11,8 @@
  *
  */
 
+use ElkArte\Notifications;
+use ElkArte\Themes\ThemeLoader;
 use ElkArte\TokenHash;
 use ElkArte\User;
 
@@ -212,7 +214,7 @@ function sendNotifications($topics, $type, $exclude = array(), $members_only = a
 				$needed_language = empty($row['lngfile']) || empty($modSettings['userLanguage']) ? $language : $row['lngfile'];
 				if (empty($current_language) || $current_language !== $needed_language)
 				{
-					$current_language = \ElkArte\Themes\ThemeLoader::loadLanguageFile('Post', $needed_language, false);
+					$current_language = ThemeLoader::loadLanguageFile('Post', $needed_language, false);
 				}
 
 				$message_type = 'notification_' . $type;
@@ -342,7 +344,7 @@ function sendNotifications($topics, $type, $exclude = array(), $members_only = a
 		$needed_language = empty($row['lngfile']) || empty($modSettings['userLanguage']) ? $language : $row['lngfile'];
 		if (empty($current_language) || $current_language !== $needed_language)
 		{
-			$current_language = \ElkArte\Themes\ThemeLoader::loadLanguageFile('Post', $needed_language, false);
+			$current_language = ThemeLoader::loadLanguageFile('Post', $needed_language, false);
 		}
 
 		$message_type = 'notification_' . $type;
@@ -399,7 +401,7 @@ function sendNotifications($topics, $type, $exclude = array(), $members_only = a
 
 	if (isset($current_language) && $current_language !== $user_language)
 	{
-		\ElkArte\Themes\ThemeLoader::loadLanguageFile('Post');
+		ThemeLoader::loadLanguageFile('Post');
 	}
 
 	// Sent!
@@ -547,7 +549,7 @@ function sendBoardNotifications(&$topicData)
 			continue;
 		}
 
-		$langloaded = \ElkArte\Themes\ThemeLoader::loadLanguageFile('index', empty($rowmember['lngfile']) || empty($modSettings['userLanguage']) ? $language : $rowmember['lngfile'], false);
+		$langloaded = ThemeLoader::loadLanguageFile('index', empty($rowmember['lngfile']) || empty($modSettings['userLanguage']) ? $language : $rowmember['lngfile'], false);
 
 		// Now loop through all the notifications to send for this board.
 		if (empty($boards[$rowmember['id_board']]))
@@ -619,7 +621,7 @@ function sendBoardNotifications(&$topicData)
 	}
 	$members->free_result();
 
-	\ElkArte\Themes\ThemeLoader::loadLanguageFile('index', User::$info->language);
+	ThemeLoader::loadLanguageFile('index', User::$info->language);
 
 	// Sent!
 	$db->query('', '
@@ -724,7 +726,7 @@ function sendApprovalNotifications(&$topicData)
 		$needed_language = empty($row['lngfile']) || empty($modSettings['userLanguage']) ? $language : $row['lngfile'];
 		if (empty($current_language) || $current_language !== $needed_language)
 		{
-			$current_language = \ElkArte\Themes\ThemeLoader::loadLanguageFile('Post', $needed_language, false);
+			$current_language = ThemeLoader::loadLanguageFile('Post', $needed_language, false);
 		}
 
 		$sent_this_time = false;
@@ -771,7 +773,7 @@ function sendApprovalNotifications(&$topicData)
 
 	if (isset($current_language) && $current_language !== User::$info->language)
 	{
-		\ElkArte\Themes\ThemeLoader::loadLanguageFile('Post');
+		ThemeLoader::loadLanguageFile('Post');
 	}
 
 	// Sent!
@@ -893,7 +895,7 @@ function sendAdminNotifications($type, $memberID, $member_name = null)
 
 	if (isset($current_language) && $current_language !== User::$info->language)
 	{
-		\ElkArte\Themes\ThemeLoader::loadLanguageFile('Login');
+		ThemeLoader::loadLanguageFile('Login');
 	}
 }
 
@@ -992,7 +994,7 @@ function getUsersNotificationsPreferences($notification_types, $members)
 		$return = [];
 		foreach ($methods as $k => $level)
 		{
-			if ($level == \ElkArte\Notifications::DEFAULT_LEVEL)
+			if ($level == Notifications::DEFAULT_LEVEL)
 			{
 				$return[] = $k;
 			}

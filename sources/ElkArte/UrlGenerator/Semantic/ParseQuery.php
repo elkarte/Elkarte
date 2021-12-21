@@ -89,7 +89,7 @@ class ParseQuery extends AbstractParseQuery
 			$real_query = substr($split_query[0], strrpos($split_query[0], '-') + 1);
 		}
 
-		return $real_query . ($this->separator . (isset($split_query[1]) ? $split_query[1] : ''));
+		return $real_query . ($this->separator . ($split_query[1] ?? ''));
 	}
 
 	/**

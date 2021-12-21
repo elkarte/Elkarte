@@ -252,7 +252,7 @@ class Custom extends Standard
 		if (isset($msgOptions['body']))
 		{
 			$stopwords = empty($modSettings['search_stopwords']) ? array() : explode(',', $modSettings['search_stopwords']);
-			$old_body = isset($msgOptions['old_body']) ? $msgOptions['old_body'] : '';
+			$old_body = $msgOptions['old_body'] ?? '';
 
 			// Create the new and old index
 			$old_index = text2words($old_body, true);

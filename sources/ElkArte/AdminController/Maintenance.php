@@ -24,6 +24,7 @@ use ElkArte\Debug;
 use ElkArte\EventManager;
 use ElkArte\Exceptions\Exception;
 use ElkArte\Http\FtpConnection;
+use ElkArte\Themes\ThemeLoader;
 use ElkArte\User;
 
 /**
@@ -87,7 +88,7 @@ class Maintenance extends AbstractController
 		isAllowedTo('admin_forum');
 
 		// Need something to talk about?
-		\ElkArte\Themes\ThemeLoader::loadLanguageFile('Maintenance');
+		ThemeLoader::loadLanguageFile('Maintenance');
 		theme()->getTemplates()->load('Maintenance');
 
 		// This uses admin tabs - as it should!
@@ -1022,8 +1023,8 @@ class Maintenance extends AbstractController
 		// If we had an error...
 		if ($ftp->error !== false)
 		{
-			\ElkArte\Themes\ThemeLoader::loadLanguageFile('Packages');
-			$ftp_error = $ftp->last_message === null ? (isset($txt['package_ftp_' . $ftp->error]) ? $txt['package_ftp_' . $ftp->error] : '') : $ftp->last_message;
+			ThemeLoader::loadLanguageFile('Packages');
+			$ftp_error = $ftp->last_message === null ? ($txt['package_ftp_' . $ftp->error] ?? '') : $ftp->last_message;
 
 			// Fill the boxes for a FTP connection with data from the previous attempt
 			$context['package_ftp'] = array(
@@ -1118,7 +1119,7 @@ class Maintenance extends AbstractController
 		}
 
 		theme()->getTemplates()->load('Packages');
-		\ElkArte\Themes\ThemeLoader::loadLanguageFile('Packages');
+		ThemeLoader::loadLanguageFile('Packages');
 
 		// $context['package_ftp'] may be set action_backup_display when an error occur
 		if (!isset($context['package_ftp']))
@@ -1127,7 +1128,7 @@ class Maintenance extends AbstractController
 				'form_elements_only' => true,
 				'server' => '',
 				'port' => '',
-				'username' => isset($modSettings['package_username']) ? $modSettings['package_username'] : '',
+				'username' => $modSettings['package_username'] ?? '',
 				'path' => '',
 				'error' => '',
 			);

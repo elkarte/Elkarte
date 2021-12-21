@@ -126,7 +126,7 @@ function modifyCategory($category_id, $catOptions)
 
 		if (empty($catOptions['dont_log']))
 		{
-			logAction('edit_cat', array('catname' => isset($catOptions['cat_name']) ? $catOptions['cat_name'] : $category_id), 'admin');
+			logAction('edit_cat', array('catname' => $catOptions['cat_name'] ?? $category_id), 'admin');
 		}
 	}
 }

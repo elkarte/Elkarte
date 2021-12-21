@@ -51,7 +51,7 @@ class PmRenderer extends Renderer
 			'time' => 'msgtime',
 		]);
 
-		$this->_temp_pm_selected = isset($_SESSION['pm_selected']) ? $_SESSION['pm_selected'] : array();
+		$this->_temp_pm_selected = $_SESSION['pm_selected'] ?? array();
 		$_SESSION['pm_selected'] = array();
 	}
 

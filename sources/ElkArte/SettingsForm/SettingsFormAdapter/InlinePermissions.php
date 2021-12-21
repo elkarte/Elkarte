@@ -13,6 +13,7 @@
 namespace ElkArte\SettingsForm\SettingsFormAdapter;
 
 use ElkArte\Permissions;
+use ElkArte\Themes\ThemeLoader;
 
 /**
  * Class to initialize inline permissions sub-form and save its settings
@@ -284,7 +285,7 @@ class InlinePermissions extends Adapter
 		global $context, $txt;
 
 		theme()->getTemplates()->load('ManagePermissions');
-		\ElkArte\Themes\ThemeLoader::loadLanguageFile('ManagePermissions');
+		ThemeLoader::loadLanguageFile('ManagePermissions');
 
 		// Load the names for guests
 		foreach ($this->permissions as $permission)

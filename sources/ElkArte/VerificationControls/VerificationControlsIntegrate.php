@@ -73,7 +73,7 @@ class VerificationControlsIntegrate
 		$sessionVal = new SessionIndex($verificationOptions['id'] . '_vv');
 
 		$isNew = !isset($context['controls']['verification'][$verificationOptions['id']]);
-		$max_errors = isset($verificationOptions['max_errors']) ? $verificationOptions['max_errors'] : 3;
+		$max_errors = $verificationOptions['max_errors'] ?? 3;
 		$force_refresh = ((!empty($sessionVal['did_pass']) || empty($sessionVal['count']) || $sessionVal['count'] > $max_errors) && empty($verificationOptions['dont_refresh']));
 
 		if (!isset($all_instances[$verificationOptions['id']]))

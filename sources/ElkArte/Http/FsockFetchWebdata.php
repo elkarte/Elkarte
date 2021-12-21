@@ -196,7 +196,7 @@ class FsockFetchWebdata
 			}
 
 			// Fix/Finalize the data path
-			$this->_url['path'] = (isset($url_parse['path']) ? $url_parse['path'] : '/') . (isset($url_parse['query']) ? '?' . $url_parse['query'] : '');
+			$this->_url['path'] = ($url_parse['path'] ?? '/') . (isset($url_parse['query']) ? '?' . $url_parse['query'] : '');
 		}
 	}
 
@@ -457,7 +457,7 @@ class FsockFetchWebdata
 		}
 		else
 		{
-			return isset($this->_response[$area]) ? $this->_response[$area] : $this->_response;
+			return $this->_response[$area] ?? $this->_response;
 		}
 	}
 }

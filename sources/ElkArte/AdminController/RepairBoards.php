@@ -17,6 +17,7 @@
 namespace ElkArte\AdminController;
 
 use ElkArte\AbstractController;
+use ElkArte\Themes\ThemeLoader;
 
 /**
  * Repair boards controller handles a special admin action:
@@ -62,7 +63,7 @@ class RepairBoards extends AbstractController
 		$context[$context['admin_menu_name']]['current_subsection'] = 'general';
 
 		// Load the language file.
-		\ElkArte\Themes\ThemeLoader::loadLanguageFile('Maintenance');
+		ThemeLoader::loadLanguageFile('Maintenance');
 
 		// Make sure the tabs stay nice.
 		$context[$context['admin_menu_name']]['tab_data'] = array(
@@ -108,7 +109,7 @@ class RepairBoards extends AbstractController
 		else
 		{
 			$context['error_search'] = false;
-			$context['to_fix'] = isset($this->_req->session->repairboards_to_fix) ? $this->_req->session->repairboards_to_fix : array();
+			$context['to_fix'] = $this->_req->session->repairboards_to_fix ?? array();
 
 			require_once(SUBSDIR . '/Boards.subs.php');
 

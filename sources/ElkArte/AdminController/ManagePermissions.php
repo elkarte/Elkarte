@@ -24,6 +24,7 @@ use ElkArte\BoardsTree;
 use ElkArte\Exceptions\Exception;
 use ElkArte\Permissions;
 use ElkArte\SettingsForm\SettingsForm;
+use ElkArte\Themes\ThemeLoader;
 
 /**
  * ManagePermissions handles all possible permission stuff.
@@ -76,7 +77,7 @@ class ManagePermissions extends AbstractController
 		$this->illegal_permissions = $this->permissionsObject->getIllegalPermissions();
 		$this->illegal_guest_permissions = $this->permissionsObject->getIllegalGuestPermissions();
 
-		\ElkArte\Themes\ThemeLoader::loadLanguageFile('ManagePermissions+ManageMembers');
+		ThemeLoader::loadLanguageFile('ManagePermissions+ManageMembers');
 		theme()->getTemplates()->load('ManagePermissions');
 
 		// Format: 'sub-action' => array('function_to_call', 'permission_needed'),

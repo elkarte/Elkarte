@@ -85,10 +85,10 @@ function createPost(&$msgOptions, &$topicOptions, &$posterOptions)
 	$msgOptions['approved'] = isset($msgOptions['approved']) ? (int) $msgOptions['approved'] : 1;
 	$topicOptions['id'] = empty($topicOptions['id']) ? 0 : (int) $topicOptions['id'];
 	$topicOptions['poll'] = isset($topicOptions['poll']) ? (int) $topicOptions['poll'] : null;
-	$topicOptions['lock_mode'] = isset($topicOptions['lock_mode']) ? $topicOptions['lock_mode'] : null;
-	$topicOptions['sticky_mode'] = isset($topicOptions['sticky_mode']) ? $topicOptions['sticky_mode'] : null;
-	$topicOptions['redirect_expires'] = isset($topicOptions['redirect_expires']) ? $topicOptions['redirect_expires'] : null;
-	$topicOptions['redirect_topic'] = isset($topicOptions['redirect_topic']) ? $topicOptions['redirect_topic'] : null;
+	$topicOptions['lock_mode'] = $topicOptions['lock_mode'] ?? null;
+	$topicOptions['sticky_mode'] = $topicOptions['sticky_mode'] ?? null;
+	$topicOptions['redirect_expires'] = $topicOptions['redirect_expires'] ?? null;
+	$topicOptions['redirect_topic'] = $topicOptions['redirect_topic'] ?? null;
 	$posterOptions['id'] = empty($posterOptions['id']) ? 0 : (int) $posterOptions['id'];
 	$posterOptions['ip'] = empty($posterOptions['ip']) ? User::$info->ip : $posterOptions['ip'];
 
@@ -460,8 +460,8 @@ function modifyPost(&$msgOptions, &$topicOptions, &$posterOptions)
 	$db = database();
 
 	$topicOptions['poll'] = isset($topicOptions['poll']) ? (int) $topicOptions['poll'] : null;
-	$topicOptions['lock_mode'] = isset($topicOptions['lock_mode']) ? $topicOptions['lock_mode'] : null;
-	$topicOptions['sticky_mode'] = isset($topicOptions['sticky_mode']) ? $topicOptions['sticky_mode'] : null;
+	$topicOptions['lock_mode'] = $topicOptions['lock_mode'] ?? null;
+	$topicOptions['sticky_mode'] = $topicOptions['sticky_mode'] ?? null;
 
 	// This is longer than it has to be, but makes it so we only set/change what we have to.
 	$messages_columns = array();

@@ -15,6 +15,7 @@
  */
 
 use ElkArte\Errors\ErrorContext;
+use ElkArte\Themes\ThemeLoader;
 use ElkArte\TokenHash;
 use ElkArte\User;
 use ElkArte\Util;
@@ -200,7 +201,7 @@ function adminLogin($type = 'admin')
 {
 	global $context, $txt;
 
-	\ElkArte\Themes\ThemeLoader::loadLanguageFile('Admin');
+	ThemeLoader::loadLanguageFile('Admin');
 	theme()->getTemplates()->load('Login');
 	loadJavascriptFile('sha256.js', array('defer' => true));
 
@@ -214,7 +215,7 @@ function adminLogin($type = 'admin')
 	{
 		// log some info along with it! referer, user agent
 		$req = request();
-		$txt['security_wrong'] = sprintf($txt['security_wrong'], isset($_SERVER['HTTP_REFERER']) ? $_SERVER['HTTP_REFERER'] : $txt['unknown'], $req->user_agent(), User::$info->ip);
+		$txt['security_wrong'] = sprintf($txt['security_wrong'], $_SERVER['HTTP_REFERER'] ?? $txt['unknown'], $req->user_agent(), User::$info->ip);
 		\ElkArte\Errors\Errors::instance()->log_error($txt['security_wrong'], 'critical');
 
 		if (isset($_POST[$type . '_hash_pass']))
@@ -468,7 +469,7 @@ function resetPassword($memID, $username = null)
 	global $modSettings, $language;
 
 	// Language... and a required file.
-	\ElkArte\Themes\ThemeLoader::loadLanguageFile('Login');
+	ThemeLoader::loadLanguageFile('Login');
 	require_once(SUBSDIR . '/Mail.subs.php');
 
 	// Get some important details.
@@ -605,7 +606,7 @@ function validatePassword($password, $username, $restrict_in = array())
 	// Perform basic requirements first.
 	if (Util::strlen($password) < (empty($modSettings['password_strength']) ? 4 : 8))
 	{
-		\ElkArte\Themes\ThemeLoader::loadLanguageFile('Errors');
+		ThemeLoader::loadLanguageFile('Errors');
 		$txt['profile_error_password_short'] = sprintf($txt['profile_error_password_short'], empty($modSettings['password_strength']) ? 4 : 8);
 
 		return 'short';

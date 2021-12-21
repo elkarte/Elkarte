@@ -16,6 +16,8 @@
 
 namespace ElkArte;
 
+use ElkArte\Themes\ThemeLoader;
+
 /**
  * This class implements a standard way of displaying lists.
  */
@@ -104,7 +106,7 @@ class GenericList
 		$this->listOptions = $listOptions;
 
 		// Be ready for those pesky errors
-		\ElkArte\Themes\ThemeLoader::loadLanguageFile('Errors');
+		ThemeLoader::loadLanguageFile('Errors');
 
 		// Load the template
 		theme()->getTemplates()->load('GenericList');
@@ -157,8 +159,8 @@ class GenericList
 		}
 		else
 		{
-			$this->sortVar = isset($this->listOptions['request_vars']['sort']) ? $this->listOptions['request_vars']['sort'] : 'sort';
-			$this->descVar = isset($this->listOptions['request_vars']['desc']) ? $this->listOptions['request_vars']['desc'] : 'desc';
+			$this->sortVar = $this->listOptions['request_vars']['sort'] ?? 'sort';
+			$this->descVar = $this->listOptions['request_vars']['desc'] ?? 'desc';
 			$sortReq = $this->req->getQuery($this->sortVar);
 
 			if (isset($this->listOptions['columns'][$sortReq], $this->listOptions['columns'][$sortReq]['sort']))
@@ -180,7 +182,7 @@ class GenericList
 			$this->sort = $this->listOptions['columns'][$this->context['sort']['id']]['sort'][$this->context['sort']['desc'] ? 'reverse' : 'default'];
 		}
 
-		$this->context['start_var_name'] = isset($this->listOptions['start_var_name']) ? $this->listOptions['start_var_name'] : 'start';
+		$this->context['start_var_name'] = $this->listOptions['start_var_name'] ?? 'start';
 	}
 
 	/**
@@ -232,12 +234,12 @@ class GenericList
 
 			$this->context['headers'][] = array(
 				'id' => $column_id,
-				'label' => isset($column['header']['value']) ? $column['header']['value'] : '',
+				'label' => $column['header']['value'] ?? '',
 				'href' => empty($this->listOptions['default_sort_col']) || empty($column['sort']) ? '' : $this->listOptions['base_href'] . ';' . $this->sortVar . '=' . $column_id . ($column_id === $this->context['sort']['id'] && !$this->context['sort']['desc'] && isset($column['sort']['reverse']) ? ';' . $this->descVar : '') . (empty($this->context['start']) ? '' : ';' . $this->context['start_var_name'] . '=' . $this->context['start']),
 				'sort_image' => empty($this->listOptions['default_sort_col']) || empty($column['sort']) || $column_id !== $this->context['sort']['id'] ? null : ($this->context['sort']['desc'] ? 'down' : 'up'),
-				'class' => isset($column['header']['class']) ? $column['header']['class'] : '',
-				'style' => isset($column['header']['style']) ? $column['header']['style'] : '',
-				'colspan' => isset($column['header']['colspan']) ? $column['header']['colspan'] : '',
+				'class' => $column['header']['class'] ?? '',
+				'style' => $column['header']['style'] ?? '',
+				'colspan' => $column['header']['colspan'] ?? '',
 			);
 		}
 	}
@@ -249,7 +251,7 @@ class GenericList
 	{
 		// We know the amount of columns, might be useful for the template.
 		$this->context['num_columns'] = count($this->listOptions['columns']);
-		$this->context['width'] = isset($this->listOptions['width']) ? $this->listOptions['width'] : '0';
+		$this->context['width'] = $this->listOptions['width'] ?? '0';
 
 		// Maybe we want this one to interact with jquery UI sortable
 		$this->context['sortable'] = isset($this->listOptions['sortable']);
@@ -450,7 +452,7 @@ class GenericList
 		if (isset($this->listOptions['no_items_label']))
 		{
 			$this->context['no_items_label'] = $this->listOptions['no_items_label'];
-			$this->context['no_items_align'] = isset($this->listOptions['no_items_align']) ? $this->listOptions['no_items_align'] : '';
+			$this->context['no_items_align'] = $this->listOptions['no_items_align'] ?? '';
 		}
 	}
 

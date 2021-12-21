@@ -21,6 +21,7 @@
  */
 
 use ElkArte\Http\Headers;
+use ElkArte\Sessions\SessionHandler\DatabaseHandler;
 use ElkArte\TokenHash;
 
 /**
@@ -81,7 +82,7 @@ function loadSession()
 			@ini_set('session.serialize_handler', 'php');
 			@ini_set('session.gc_probability', '1');
 
-			$handler = new ElkArte\Sessions\SessionHandler\DatabaseHandler(database());
+			$handler = new DatabaseHandler(database());
 			session_set_save_handler(
 				array($handler, 'open'),
 				array($handler, 'close'),

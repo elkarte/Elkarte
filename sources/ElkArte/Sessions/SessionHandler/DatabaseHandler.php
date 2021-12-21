@@ -16,6 +16,8 @@
 
 namespace ElkArte\Sessions\SessionHandler;
 
+use ElkArte\ValuesContainer;
+
 /**
  * Class DatabaseHandler
  *
@@ -48,7 +50,7 @@ class DatabaseHandler extends \SessionHandler
 		global $modSettings;
 
 		$this->_db = $db ?: database();
-		$this->_modSettings = new \ElkArte\ValuesContainer($modSettings ?: array());
+		$this->_modSettings = new ValuesContainer($modSettings ?: array());
 	}
 
 	/**

@@ -200,7 +200,7 @@ class ManageErrors extends AbstractController
 
 		$context['error_types']['all'] = array(
 			'label' => $txt['errortype_all'],
-			'description' => isset($txt['errortype_all_desc']) ? $txt['errortype_all_desc'] : '',
+			'description' => $txt['errortype_all_desc'] ?? '',
 			'url' => getUrl('admin', ['action' => 'admin', 'area' => 'logs', 'sa' => 'errorlog', $context['sort_direction'] == 'down' ? 'desc' : '']),
 			'is_selected' => empty($filter),
 		);

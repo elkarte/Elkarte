@@ -66,7 +66,7 @@ function lastActionOn($id_executor, $id_target)
 	}
 	$request->free_result();
 
-	return isset($action) ? $action : null;
+	return $action ?? null;
 }
 
 /**

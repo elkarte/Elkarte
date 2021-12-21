@@ -1013,7 +1013,7 @@ class ProfileOptions extends AbstractController
 		$changeType = isset($this->_req->post->primary) ? 'primary' : (isset($this->_req->post->req) ? 'request' : 'free');
 
 		// One way or another, we have a target group in mind...
-		$group_id = isset($group_id) ? $group_id : (int) $this->_req->post->primary;
+		$group_id = $group_id ?? (int) $this->_req->post->primary;
 		$foundTarget = $changeType === 'primary' && $group_id == 0;
 
 		// Sanity check!!

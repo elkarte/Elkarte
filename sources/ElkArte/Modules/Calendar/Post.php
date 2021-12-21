@@ -247,7 +247,7 @@ class Post extends AbstractModule
 				$context['event']['day'] = $context['event']['month'] === $today['mon'] ? $today['mday'] : 0;
 			}
 
-			$context['event']['span'] = isset($_REQUEST['span']) ? $_REQUEST['span'] : 1;
+			$context['event']['span'] = $_REQUEST['span'] ?? 1;
 
 			// Make sure the year and month are in the valid range.
 			if ($context['event']['month'] < 1 || $context['event']['month'] > 12)

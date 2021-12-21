@@ -22,6 +22,7 @@ use ElkArte\Action;
 use ElkArte\Cache\Cache;
 use ElkArte\Exceptions\Exception;
 use ElkArte\MessagesDelete;
+use ElkArte\Themes\ThemeLoader;
 use ElkArte\User;
 use ElkArte\Util;
 
@@ -80,7 +81,7 @@ class ModerationCenter extends AbstractController
 		require_once(SUBSDIR . '/Menu.subs.php');
 
 		// Load the language, and the template.
-		\ElkArte\Themes\ThemeLoader::loadLanguageFile('ModerationCenter');
+		ThemeLoader::loadLanguageFile('ModerationCenter');
 		loadCSSFile('admin.css');
 
 		if (!empty($options['admin_preferences']))
@@ -729,7 +730,7 @@ class ModerationCenter extends AbstractController
 
 		// What have the other moderators done to this message?
 		require_once(SUBSDIR . '/Modlog.subs.php');
-		\ElkArte\Themes\ThemeLoader::loadLanguageFile('Modlog');
+		ThemeLoader::loadLanguageFile('Modlog');
 
 		// This is all the information from the moderation log.
 		$listOptions = array(
@@ -1275,7 +1276,7 @@ class ModerationCenter extends AbstractController
 		$context['page_title'] = $txt['mc_warning_log_title'];
 
 		require_once(SUBSDIR . '/Moderation.subs.php');
-		\ElkArte\Themes\ThemeLoader::loadLanguageFile('Modlog');
+		ThemeLoader::loadLanguageFile('Modlog');
 
 		// If we're coming in from a search, get the variables.
 		if (!empty($this->_req->post->params) && empty($this->_req->post->is_search))
@@ -1770,7 +1771,7 @@ class ModerationCenter extends AbstractController
 
 		// Some of this stuff is overseas, so to speak.
 		theme()->getTemplates()->load('ModerationCenter');
-		\ElkArte\Themes\ThemeLoader::loadLanguageFile('Profile');
+		ThemeLoader::loadLanguageFile('Profile');
 
 		$subActions = array(
 			'log' => array($this, 'action_viewWarningLog'),

@@ -188,7 +188,7 @@ class Memberlist extends AbstractController
 				continue;
 			}
 
-			$context['colspan'] += isset($column['colspan']) ? $column['colspan'] : 1;
+			$context['colspan'] += $column['colspan'] ?? 1;
 		}
 
 		$context['linktree'][] = array(
@@ -445,7 +445,7 @@ class Memberlist extends AbstractController
 			$start = $this->_req->getQuery('start', '', null);
 			$desc = $this->_req->getQuery('desc', '', null);
 			$sort = $this->_req->getQuery('sort', '', null);
-			$search = Util::htmlspecialchars(trim(isset($this->_req->query->search) ? $this->_req->query->search : $this->_req->post->search), ENT_QUOTES);
+			$search = Util::htmlspecialchars(trim($this->_req->query->search ?? $this->_req->post->search), ENT_QUOTES);
 			$input_fields = isset($this->_req->query->fields) ? explode(',', $this->_req->query->fields) : $this->_req->post->fields;
 
 			$fields_key = array_keys($this->_search_fields);
@@ -541,7 +541,7 @@ class Memberlist extends AbstractController
 
 			$customJoin = array();
 			$customCount = 10;
-			$validFields = isset($input_fields) ? $input_fields : array();
+			$validFields = $input_fields ?? array();
 
 			// Any custom fields to search for - these being tricky?
 			foreach ($input_fields as $field)

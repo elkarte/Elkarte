@@ -14,6 +14,7 @@
  *
  */
 
+use ElkArte\Http\Headers;
 use ElkArte\Util;
 
 /**
@@ -55,7 +56,7 @@ function DumpDatabase2()
 	$current_used_memory = 0;
 	$db_backup = '';
 	$output_function = 'un_compressed';
-	$headers = \ElkArte\Http\Headers::instance();
+	$headers = Headers::instance();
 
 	@ob_end_clean();
 

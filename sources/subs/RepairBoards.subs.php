@@ -18,6 +18,7 @@
  */
 
 use ElkArte\Debug;
+use ElkArte\Themes\ThemeLoader;
 
 /**
  * Load up all the tests we might want to do ;)
@@ -1283,7 +1284,7 @@ function createSalvageBoard()
 	$db = database();
 
 	// Back to the forum's default language.
-	\ElkArte\Themes\ThemeLoader::loadLanguageFile('Admin', $language);
+	ThemeLoader::loadLanguageFile('Admin', $language);
 	$salvageCatID = createSalvageCategory();
 
 	// Check to see if a 'Salvage Board' exists, if not => insert one.
@@ -1323,7 +1324,7 @@ function createSalvageBoard()
 	}
 
 	// Restore the user's language.
-	\ElkArte\Themes\ThemeLoader::loadLanguageFile('Admin');
+	ThemeLoader::loadLanguageFile('Admin');
 	$salvageBoardID = (int) $salvageBoardID;
 
 	return $salvageBoardID;
@@ -1346,7 +1347,7 @@ function createSalvageCategory()
 	$db = database();
 
 	// Back to the forum's default language.
-	\ElkArte\Themes\ThemeLoader::loadLanguageFile('Admin', $language);
+	ThemeLoader::loadLanguageFile('Admin', $language);
 
 	// Check to see if a 'Salvage Category' exists, if not => insert one.
 	$result = $db->query('', '
@@ -1383,7 +1384,7 @@ function createSalvageCategory()
 	}
 
 	// Restore the user's language.
-	\ElkArte\Themes\ThemeLoader::loadLanguageFile('Admin');
+	ThemeLoader::loadLanguageFile('Admin');
 	$salvageCatID = (int) $salvageCatID;
 	$_SESSION['redirect_to_recount'] = true;
 
@@ -1442,7 +1443,7 @@ function pauseRepairProcess($to_fix, $current_step_description, $max_substep = 0
 
 	// What about substeps?
 	$context['substep_enabled'] = $max_substep != 0;
-	$context['substep_title'] = sprintf($txt['repair_currently_' . (isset($_GET['fixErrors']) ? 'fixing' : 'checking')], (isset($txt['repair_operation_' . $current_step_description]) ? $txt['repair_operation_' . $current_step_description] : $current_step_description));
+	$context['substep_title'] = sprintf($txt['repair_currently_' . (isset($_GET['fixErrors']) ? 'fixing' : 'checking')], ($txt['repair_operation_' . $current_step_description] ?? $current_step_description));
 	$context['substep_continue_percent'] = $max_substep == 0 ? 0 : round(($_GET['substep'] * 100) / $max_substep, 1);
 
 	$_SESSION['repairboards_to_fix'] = $to_fix;
@@ -1472,7 +1473,7 @@ function findForumErrors($do_fix = false)
 	detectServer()->setTimeLimit(600);
 
 	$to_fix = !empty($_SESSION['repairboards_to_fix']) ? $_SESSION['repairboards_to_fix'] : array();
-	$context['repair_errors'] = isset($_SESSION['repairboards_to_fix2']) ? $_SESSION['repairboards_to_fix2'] : array();
+	$context['repair_errors'] = $_SESSION['repairboards_to_fix2'] ?? array();
 
 	$_GET['step'] = empty($_GET['step']) ? 0 : (int) $_GET['step'];
 	$_GET['substep'] = empty($_GET['substep']) ? 0 : (int) $_GET['substep'];
@@ -1511,7 +1512,7 @@ function findForumErrors($do_fix = false)
 		// Has it got substeps?
 		if (isset($test['substeps']))
 		{
-			$step_size = isset($test['substeps']['step_size']) ? $test['substeps']['step_size'] : 100;
+			$step_size = $test['substeps']['step_size'] ?? 100;
 			$request = $db->query('',
 				$test['substeps']['step_max'],
 				array()

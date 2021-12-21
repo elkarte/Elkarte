@@ -94,7 +94,7 @@ function showCodeImage($code)
 	}
 	else
 	{
-		$background_color = isset($settings['verification_background']) ? $settings['verification_background'] : array(236, 237, 243);
+		$background_color = $settings['verification_background'] ?? array(236, 237, 243);
 	}
 
 	// The color of the characters shown (red, green, blue).

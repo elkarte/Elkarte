@@ -97,7 +97,7 @@ class EventManager
 			$class = $event[1];
 			$class_name = $class[0];
 			$method_name = $class[1];
-			$deps = isset($event[2]) ? $event[2] : array();
+			$deps = $event[2] ?? array();
 			$dependencies = null;
 
 			if (!class_exists($class_name))
@@ -227,7 +227,7 @@ class EventManager
 			foreach ($events as $event)
 			{
 				// Check if a priority (ordering) was specified
-				$priority = isset($event[1][2]) ? $event[1][2] : 0;
+				$priority = $event[1][2] ?? 0;
 				$position = $event[0];
 
 				// Register the "action" to take when the event is triggered

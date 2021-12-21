@@ -17,6 +17,7 @@ use ElkArte\AbstractController;
 use ElkArte\Action;
 use ElkArte\Errors\ErrorContext;
 use ElkArte\Exceptions\Exception;
+use ElkArte\Themes\ThemeLoader;
 use ElkArte\Util;
 
 /**
@@ -337,10 +338,10 @@ class ManageBans extends AbstractController
 			$this->action_edit2();
 		}
 
-		$ban_group_id = isset($context['ban']['id']) ? $context['ban']['id'] : $this->_req->getQuery('bg', 'intval', 0);
+		$ban_group_id = $context['ban']['id'] ?? $this->_req->getQuery('bg', 'intval', 0);
 
 		// Template needs this to show errors using javascript
-		\ElkArte\Themes\ThemeLoader::loadLanguageFile('Errors');
+		ThemeLoader::loadLanguageFile('Errors');
 		createToken('admin-bet');
 		$context['form_url'] = getUrl('admin', ['action' => 'admin', 'area' => 'ban', 'sa' => 'edit']);
 
@@ -637,7 +638,7 @@ class ManageBans extends AbstractController
 		updateBanMembers();
 
 		// Go back to an appropriate spot
-		redirectexit('action=admin;area=ban;sa=' . (isset($this->_req->post->add_ban) ? 'list' : 'edit;bg=' . (isset($ban_group_id) ? $ban_group_id : 0)));
+		redirectexit('action=admin;area=ban;sa=' . (isset($this->_req->post->add_ban) ? 'list' : 'edit;bg=' . ($ban_group_id ?? 0)));
 	}
 
 	/**

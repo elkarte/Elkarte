@@ -324,7 +324,7 @@ function removeMessage($message, $decreasePostCount = true)
 
 /**
  * This function deals with the topic associated to a message.
- * It allows to retrieve or update the topic to which the message belongs.
+ * It allows retrieving or updating the topic to which the message belongs.
  *
  * If $topicID is not passed, the current topic ID of the message is returned.
  * If $topicID is passed, the message is updated to point to the new topic.
@@ -332,7 +332,6 @@ function removeMessage($message, $decreasePostCount = true)
  * @param int $msg_id message ID
  * @param int|null $topicID = null topic ID, if null is passed the ID of the topic is retrieved and returned
  * @return int|false int topic ID if any, or false
- * @throws \ElkArte\Exceptions\Exception
  */
 function associatedTopic($msg_id, $topicID = null)
 {
@@ -550,7 +549,7 @@ function recordReport($message, $poster_comment)
 		ORDER BY ignore_all DESC',
 		array(
 			'id_msg' => $message['id_msg'],
-			'type' => isset($message['type']) ? $message['type'] : 'msg',
+			'type' => $message['type'] ?? 'msg',
 			'not_closed' => 0,
 			'ignored' => 1,
 		)
@@ -599,7 +598,7 @@ function recordReport($message, $poster_comment)
 			array(
 				$message['id_msg'], $message['id_topic'], $message['id_board'], $message['id_poster'], $message['real_name'],
 				$message['subject'], $message['body'], time(), time(), 1, 0,
-				$message['type'], isset($message['time_message']) ? $message['time_message'] : 0
+				$message['type'], $message['time_message'] ?? 0
 			),
 			array('id_report')
 		);
@@ -873,7 +872,7 @@ function updateMessageStats($increment = null, $max_msg_id = null)
 			WHERE redirect = {string:blank_redirect}' . (!empty($modSettings['recycle_enable']) && $modSettings['recycle_board'] > 0 ? '
 				AND id_board != {int:recycle_board}' : ''),
 			array(
-				'recycle_board' => isset($modSettings['recycle_board']) ? $modSettings['recycle_board'] : 0,
+				'recycle_board' => $modSettings['recycle_board'] ?? 0,
 				'blank_redirect' => '',
 			)
 		);

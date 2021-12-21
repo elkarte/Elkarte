@@ -13,6 +13,8 @@
 
 namespace ElkArte;
 
+use ElkArte\Themes\ThemeLoader;
+
 /**
  * Utility class to unzip package files
  *
@@ -162,7 +164,7 @@ class UnZip
 		}
 
 		// Make sure we have this loaded.
-		\ElkArte\Themes\ThemeLoader::loadLanguageFile('Packages');
+		ThemeLoader::loadLanguageFile('Packages');
 
 		// Likely to need this
 		require_once(SUBSDIR . '/Package.subs.php');

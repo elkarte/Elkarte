@@ -41,7 +41,7 @@ class Server extends \ArrayObject
 	{
 		if (!is_array($server))
 		{
-			$server = isset($_SERVER) ? $_SERVER : array();
+			$server = $_SERVER ?? array();
 		}
 
 		parent::__construct($server, \ArrayObject::ARRAY_AS_PROPS);

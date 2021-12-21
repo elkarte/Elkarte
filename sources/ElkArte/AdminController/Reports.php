@@ -23,6 +23,7 @@ namespace ElkArte\AdminController;
 
 use ElkArte\AbstractController;
 use ElkArte\Exceptions\Exception;
+use ElkArte\Themes\ThemeLoader;
 
 /**
  * "Report" Functions are responsible for generating data for reporting.
@@ -61,7 +62,7 @@ class Reports extends AbstractController
 
 		// Let's get our things running...
 		theme()->getTemplates()->load('Reports');
-		\ElkArte\Themes\ThemeLoader::loadLanguageFile('Reports');
+		ThemeLoader::loadLanguageFile('Reports');
 
 		$context['page_title'] = $txt['generate_reports'];
 
@@ -88,8 +89,8 @@ class Reports extends AbstractController
 		{
 			$context['report_types'][$k] = array(
 				'id' => $k,
-				'title' => isset($txt['gr_type_' . $k]) ? $txt['gr_type_' . $k] : $k,
-				'description' => isset($txt['gr_type_desc_' . $k]) ? $txt['gr_type_desc_' . $k] : null,
+				'title' => $txt['gr_type_' . $k] ?? $k,
+				'description' => $txt['gr_type_desc_' . $k] ?? null,
 				'function' => $temp,
 				'is_first' => $is_first++ === 0,
 			);
@@ -119,7 +120,7 @@ class Reports extends AbstractController
 		);
 
 		// Specific template? Use that instead of main!
-		$set_template = isset($this->_req->query->st) ? $this->_req->query->st : null;
+		$set_template = $this->_req->query->st ?? null;
 		if (isset($set_template) && isset($reportTemplates[$set_template]))
 		{
 			$context['sub_template'] = $set_template;
@@ -137,7 +138,7 @@ class Reports extends AbstractController
 		}
 
 		// Make the page title more descriptive.
-		$context['page_title'] .= ' - ' . (isset($txt['gr_type_' . $context['report_type']]) ? $txt['gr_type_' . $context['report_type']] : $context['report_type']);
+		$context['page_title'] .= ' - ' . ($txt['gr_type_' . $context['report_type']] ?? $context['report_type']);
 
 		// Build the reports button array.
 		$context['report_buttons'] = array(
@@ -186,7 +187,7 @@ class Reports extends AbstractController
 		require_once(SUBSDIR . '/Membergroups.subs.php');
 		require_once(SUBSDIR . '/Reports.subs.php');
 
-		\ElkArte\Themes\ThemeLoader::loadLanguageFile('ManagePermissions');
+		ThemeLoader::loadLanguageFile('ManagePermissions');
 		loadPermissionProfiles();
 
 		// Get every moderator.
@@ -401,7 +402,7 @@ class Reports extends AbstractController
 			{
 				// This will be reused on other boards.
 				$permissions[$row['permission']] = array(
-					'title' => isset($txt['board_perms_name_' . $row['permission']]) ? $txt['board_perms_name_' . $row['permission']] : $row['permission'],
+					'title' => $txt['board_perms_name_' . $row['permission']] ?? $row['permission'],
 				);
 			}
 		}
@@ -433,9 +434,9 @@ class Reports extends AbstractController
 						continue;
 					}
 
-					$group_permissions = isset($groups[$id_group]) ? $groups[$id_group] : array();
+					$group_permissions = $groups[$id_group] ?? array();
 
-					$curData[$id_group] = isset($group_permissions[$ID_PERM]) ? $group_permissions[$ID_PERM] : 'x';
+					$curData[$id_group] = $group_permissions[$ID_PERM] ?? 'x';
 
 					// Now actually make the data for the group look right.
 					if (empty($curData[$id_group]))
@@ -705,7 +706,7 @@ class Reports extends AbstractController
 
 			// Create the main data array.
 			$staffData = array(
-				'position' => isset($groups[$row['id_group']]) ? $groups[$row['id_group']] : $groups[0],
+				'position' => $groups[$row['id_group']] ?? $groups[0],
 				'posts' => $row['posts'],
 				'last_login' => standardTime($row['last_login']),
 				'moderates' => array(),

@@ -20,6 +20,7 @@ namespace ElkArte\Controller;
 use ElkArte\AbstractController;
 use ElkArte\Exceptions\Exception;
 use ElkArte\MembersList;
+use ElkArte\Themes\ThemeLoader;
 use ElkArte\Util;
 
 /**
@@ -67,7 +68,7 @@ class Who extends AbstractController
 
 		// Load the 'Who' template.
 		theme()->getTemplates()->load('Who');
-		\ElkArte\Themes\ThemeLoader::loadLanguageFile('Who');
+		ThemeLoader::loadLanguageFile('Who');
 
 		// Sort out... the column sorting.
 		$sort_methods = array(
@@ -247,7 +248,7 @@ class Who extends AbstractController
 
 			// Keep the IP that came from the database.
 			$member_context['ip'] = $member['ip'];
-			$context['members'][$i]['action'] = isset($url_data[$i]) ? $url_data[$i] : $txt['who_hidden'];
+			$context['members'][$i]['action'] = $url_data[$i] ?? $txt['who_hidden'];
 
 			if ($member['id'] == 0 && isset($spiderContext[$member['id_spider']]))
 			{
@@ -289,7 +290,7 @@ class Who extends AbstractController
 		global $context, $txt;
 
 		require_once(SUBSDIR . '/Who.subs.php');
-		\ElkArte\Themes\ThemeLoader::loadLanguageFile('Who');
+		ThemeLoader::loadLanguageFile('Who');
 
 		$context += prepareCreditsData();
 

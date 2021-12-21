@@ -19,6 +19,7 @@
  */
 
 use ElkArte\Cache\Cache;
+use ElkArte\Themes\ThemeLoader;
 use ElkArte\User;
 use ElkArte\Util;
 
@@ -553,7 +554,7 @@ function sendpm($recipients, $subject, $message, $store_outbox = true, $from = n
 	$db = database();
 
 	// Make sure the PM language file is loaded, we might need something out of it.
-	\ElkArte\Themes\ThemeLoader::loadLanguageFile('PersonalMessage');
+	ThemeLoader::loadLanguageFile('PersonalMessage');
 
 	// Needed for our email and post functions
 	require_once(SUBSDIR . '/Mail.subs.php');
@@ -838,7 +839,7 @@ function sendpm($recipients, $subject, $message, $store_outbox = true, $from = n
 			$notifications[empty($row['lngfile']) || empty($modSettings['userLanguage']) ? $language : $row['lngfile']][] = $row['email_address'];
 		}
 
-		$log['sent'][$row['id_member']] = sprintf(isset($txt['pm_successfully_sent']) ? $txt['pm_successfully_sent'] : '', $row['real_name']);
+		$log['sent'][$row['id_member']] = sprintf($txt['pm_successfully_sent'] ?? '', $row['real_name']);
 	}
 	$request->free_result();
 
@@ -981,7 +982,7 @@ function sendpm($recipients, $subject, $message, $store_outbox = true, $from = n
 	call_integration_hook('integrate_personal_message_after', array(&$id_pm, &$log, &$recipients, &$from, &$subject, &$message));
 
 	// Back to what we were on before!
-	\ElkArte\Themes\ThemeLoader::loadLanguageFile('index+PersonalMessage');
+	ThemeLoader::loadLanguageFile('index+PersonalMessage');
 
 	// Add one to their unread and read message counts.
 	foreach ($all_to as $k => $id)
@@ -1055,7 +1056,7 @@ function loadPMs($pm_options, $id_member)
 					'current_member' => $id_member,
 					'not_deleted' => 0,
 					'id_member' => $pm_options['folder'] == 'sent' ? 'pmr.id_member' : 'pm.id_member_from',
-					'id_pm' => isset($pm_options['pmsg']) ? $pm_options['pmsg'] : '0',
+					'id_pm' => $pm_options['pmsg'] ?? '0',
 					'sort' => $pm_options['sort_by_query'],
 				)
 			)->fetch_callback(

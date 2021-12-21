@@ -13,6 +13,8 @@
 
 namespace ElkArte\Errors;
 
+use ElkArte\Themes\ThemeLoader;
+
 /**
  *  This class is an experiment for the job of handling errors.
  */
@@ -226,14 +228,8 @@ final class ErrorContext
 	public function getError($error = null)
 	{
 		$name = $this->getErrorName($error);
-		if (isset($this->_errors[$name]))
-		{
-			return $this->_errors[$name];
-		}
-		else
-		{
-			return null;
-		}
+
+		return $this->_errors[$name] ?? null;
 	}
 
 	/**
@@ -352,7 +348,7 @@ final class ErrorContext
 				{
 					continue;
 				}
-				$returns[$name] = vsprintf(isset($txt['error_' . $name]) ? $txt['error_' . $name] : (isset($txt[$name]) ? $txt[$name] : $name), $value);
+				$returns[$name] = vsprintf($txt['error_' . $name] ?? ($txt[$name] ?? $name), $value);
 			}
 			elseif (is_object($error_val))
 			{
@@ -360,7 +356,7 @@ final class ErrorContext
 			}
 			else
 			{
-				$returns[$error_val] = isset($txt['error_' . $error_val]) ? $txt['error_' . $error_val] : (isset($txt[$error_val]) ? $txt[$error_val] : $error_val);
+				$returns[$error_val] = $txt['error_' . $error_val] ?? ($txt[$error_val] ?? $error_val);
 			}
 		}
 
@@ -373,7 +369,7 @@ final class ErrorContext
 	private function _loadLang()
 	{
 		// Errors is always needed
-		\ElkArte\Themes\ThemeLoader::loadLanguageFile('Errors');
+		ThemeLoader::loadLanguageFile('Errors');
 
 		// Any custom one?
 		if (!empty($this->_language_files))
@@ -382,7 +378,7 @@ final class ErrorContext
 			{
 				if (!$loaded)
 				{
-					\ElkArte\Themes\ThemeLoader::loadLanguageFile($language);
+					ThemeLoader::loadLanguageFile($language);
 
 					// Remember this file has been loaded already
 					$this->_language_files[$language] = true;

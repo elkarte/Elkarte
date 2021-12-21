@@ -18,6 +18,7 @@ namespace ElkArte\Controller;
 
 use ElkArte\AbstractController;
 use ElkArte\Exceptions\Exception;
+use ElkArte\Themes\ThemeLoader;
 use ElkArte\Util;
 
 /**
@@ -193,9 +194,9 @@ class MoveTopic extends AbstractController
 		// Ugly !
 		if ($this->user->language !== $language)
 		{
-			\ElkArte\Themes\ThemeLoader::loadLanguageFile('index', $language);
+			ThemeLoader::loadLanguageFile('index', $language);
 			$temp = $txt['movetopic_default'];
-			\ElkArte\Themes\ThemeLoader::loadLanguageFile('index');
+			ThemeLoader::loadLanguageFile('index');
 			$txt['movetopic_default'] = $temp;
 		}
 
@@ -413,7 +414,7 @@ class MoveTopic extends AbstractController
 			// Should be in the boardwide language.
 			if ($this->user->language !== $language)
 			{
-				\ElkArte\Themes\ThemeLoader::loadLanguageFile('index', $language);
+				ThemeLoader::loadLanguageFile('index', $language);
 			}
 
 			$reason = Util::htmlspecialchars($this->_req->post->reason, ENT_QUOTES);

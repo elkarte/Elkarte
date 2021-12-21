@@ -15,6 +15,7 @@
 namespace ElkArte\Mentions;
 
 use ElkArte\AbstractModel;
+use ElkArte\Themes\ThemeLoader;
 
 /**
  * Takes care of validating and inserting mention notifications in the database
@@ -218,7 +219,7 @@ class Mentioning extends AbstractModel
 		}
 
 		// If everything is fine, let's prepare for the fun!
-		\ElkArte\Themes\ThemeLoader::loadLanguageFile('Mentions');
+		ThemeLoader::loadLanguageFile('Mentions');
 
 		return true;
 	}

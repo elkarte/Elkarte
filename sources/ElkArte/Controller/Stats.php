@@ -18,6 +18,7 @@ namespace ElkArte\Controller;
 
 use ElkArte\AbstractController;
 use ElkArte\Exceptions\Exception;
+use ElkArte\Themes\ThemeLoader;
 
 /**
  * Handles the calculation of forum statistics
@@ -93,7 +94,7 @@ class Stats extends AbstractController
 		}
 
 		// Stats it is
-		\ElkArte\Themes\ThemeLoader::loadLanguageFile('Stats');
+		ThemeLoader::loadLanguageFile('Stats');
 		theme()->getTemplates()->load('Stats');
 		loadJavascriptFile('stats.js');
 

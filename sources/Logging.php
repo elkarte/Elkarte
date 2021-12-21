@@ -194,7 +194,7 @@ function logLastDatabaseError()
  * - It does not actually commit the changes until the end of the page view.
  * - It depends on the trackStats setting.
  *
- * @param mixed[] $stats = array() array of array => direction (+/-)
+ * @param array $stats = array() array of array => direction (+/-)
  *
  * @return bool|array
  */
@@ -284,7 +284,7 @@ function logAction($action, $extra = array(), $log_type = 'moderate')
  * - This behaves just like logAction() did, except that it is designed to
  * log multiple actions at once.
  *
- * @event integrate_log_types allows to add additional log types for integrations
+ * @event integrate_log_types allows adding additional log types for integrations
  * @param mixed[] $logs array of actions to log [] = array(action => log_type=> extra=>)
  *   - action => A code for the log
  *   - extra => An associated array of parameters for the item being logged.
@@ -403,14 +403,7 @@ function logActions($logs)
 			}
 		}
 
-		if (isset($log['extra']['member_affected']))
-		{
-			$memID = $log['extra']['member_affected'];
-		}
-		else
-		{
-			$memID = User::$info->id;
-		}
+		$memID = $log['extra']['member_affected'] ?? User::$info->id;
 
 		$inserts[] = array(
 			time(), $log_types[$log['log_type']], $memID, User::$info->ip, $log['action'],

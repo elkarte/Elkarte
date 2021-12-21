@@ -21,6 +21,7 @@ use ElkArte\Action;
 use ElkArte\Cache\Cache;
 use ElkArte\Exceptions\Exception;
 use ElkArte\SettingsForm\SettingsForm;
+use ElkArte\Themes\ThemeLoader;
 use ElkArte\Util;
 
 /**
@@ -47,7 +48,7 @@ class ManageLanguages extends AbstractController
 		global $context, $txt;
 
 		theme()->getTemplates()->load('ManageLanguages');
-		\ElkArte\Themes\ThemeLoader::loadLanguageFile('ManageSettings');
+		ThemeLoader::loadLanguageFile('ManageSettings');
 
 		$subActions = array(
 			'edit' => array($this, 'action_edit', 'permission' => 'admin_forum'),
@@ -327,7 +328,7 @@ class ManageLanguages extends AbstractController
 		// @todo for the moment there is no facility to download packages, so better kill it here
 		throw new Exception('no_access', false);
 
-		\ElkArte\Themes\ThemeLoader::loadLanguageFile('ManageSettings');
+		ThemeLoader::loadLanguageFile('ManageSettings');
 		require_once(SUBSDIR . '/Package.subs.php');
 
 		// Clearly we need to know what to request.
@@ -601,7 +602,7 @@ class ManageLanguages extends AbstractController
 			// Are we going to need more language stuff?
 			if (!empty($context['still_not_writable']))
 			{
-				\ElkArte\Themes\ThemeLoader::loadLanguageFile('Packages');
+				ThemeLoader::loadLanguageFile('Packages');
 			}
 		}
 
@@ -696,7 +697,7 @@ class ManageLanguages extends AbstractController
 		global $settings, $context, $txt;
 
 		require_once(SUBSDIR . '/Language.subs.php');
-		\ElkArte\Themes\ThemeLoader::loadLanguageFile('ManageSettings');
+		ThemeLoader::loadLanguageFile('ManageSettings');
 
 		// Select the languages tab.
 		$context['menu_data_' . $context['admin_menu_id']]['current_subsection'] = 'edit';
@@ -764,7 +765,7 @@ class ManageLanguages extends AbstractController
 
 				$context['possible_files'][$theme]['files'][] = array(
 					'id' => $matches[1],
-					'name' => isset($txt['lang_file_desc_' . $matches[1]]) ? $txt['lang_file_desc_' . $matches[1]] : $matches[1],
+					'name' => $txt['lang_file_desc_' . $matches[1]] ?? $matches[1],
 					'selected' => $theme_id == $theme && $file_id == $matches[1],
 				);
 			}

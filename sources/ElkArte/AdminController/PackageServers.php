@@ -199,9 +199,9 @@ class PackageServers extends AbstractController
 
 				// Fill the boxes for a FTP connection with data from the previous attempt too, if any
 				$context['package_ftp'] = array(
-					'server' => isset($this->_req->post->ftp_server) ? $this->_req->post->ftp_server : (isset($modSettings['package_server']) ? $modSettings['package_server'] : 'localhost'),
-					'port' => isset($this->_req->post->ftp_port) ? $this->_req->post->ftp_port : (isset($modSettings['package_port']) ? $modSettings['package_port'] : '21'),
-					'username' => isset($this->_req->post->ftp_username) ? $this->_req->post->ftp_username : (isset($modSettings['package_username']) ? $modSettings['package_username'] : ''),
+					'server' => $this->_req->post->ftp_server ?? ($modSettings['package_server'] ?? 'localhost'),
+					'port' => $this->_req->post->ftp_port ?? ($modSettings['package_port'] ?? '21'),
+					'username' => $this->_req->post->ftp_username ?? ($modSettings['package_username'] ?? ''),
 					'path' => $this->_req->post->ftp_path,
 					'error' => empty($ftp_error) ? null : $ftp_error,
 				);
@@ -879,7 +879,7 @@ class PackageServers extends AbstractController
 		$context['package_ftp'] = array(
 			'server' => '',
 			'port' => '',
-			'username' => isset($modSettings['package_username']) ? $modSettings['package_username'] : '',
+			'username' => $modSettings['package_username'] ?? '',
 			'path' => '',
 			'error' => '',
 		);

@@ -19,6 +19,7 @@ namespace ElkArte\AdminController;
 use ElkArte\AbstractController;
 use ElkArte\Action;
 use ElkArte\SettingsForm\SettingsForm;
+use ElkArte\Themes\ThemeLoader;
 use ElkArte\Util;
 
 /**
@@ -65,7 +66,7 @@ class ManageCalendarModule extends AbstractController
 		global $context, $txt;
 
 		// Everything's gonna need this.
-		\ElkArte\Themes\ThemeLoader::loadLanguageFile('ManageCalendar');
+		ThemeLoader::loadLanguageFile('ManageCalendar');
 
 		// Default text.
 		$context['explain_text'] = $txt['calendar_desc'];

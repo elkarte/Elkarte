@@ -495,7 +495,7 @@ class Register extends AbstractController
 
 		// Check whether we have fields that simply MUST be displayed?
 		require_once(SUBSDIR . '/Profile.subs.php');
-		loadCustomFields(0, 'register', isset($this->_req->post->customfield) ? $this->_req->post->customfield : array());
+		loadCustomFields(0, 'register', $this->_req->post->customfield ?? array());
 
 		foreach ($context['custom_fields'] as $row)
 		{
@@ -1172,8 +1172,8 @@ class Register extends AbstractController
 	{
 		global $context, $scripturl;
 
-		$verification_id = isset($this->_req->query->vid) ? $this->_req->query->vid : '';
-		$code = $verification_id && isset($_SESSION[$verification_id . '_vv']) ? $_SESSION[$verification_id . '_vv']['code'] : (isset($_SESSION['visual_verification_code']) ? $_SESSION['visual_verification_code'] : '');
+		$verification_id = $this->_req->query->vid ?? '';
+		$code = $verification_id && isset($_SESSION[$verification_id . '_vv']) ? $_SESSION[$verification_id . '_vv']['code'] : ($_SESSION['visual_verification_code'] ?? '');
 
 		// Somehow no code was generated or the session was lost.
 		if (empty($code))

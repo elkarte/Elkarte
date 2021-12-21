@@ -13,6 +13,8 @@
 
 namespace ElkArte;
 
+use ElkArte\Themes\ThemeLoader;
+
 /**
  * Class used to validate and transform data
  *
@@ -399,7 +401,7 @@ class DataValidator
 			return $this->_data;
 		}
 
-		return isset($this->_data[$key]) ? $this->_data[$key] : null;
+		return $this->_data[$key] ?? null;
 	}
 
 	/**
@@ -461,7 +463,7 @@ class DataValidator
 					{
 						$result = array(
 							'field' => $validation_method,
-							'input' => isset($input[$field]) ? $input[$field] : null,
+							'input' => $input[$field] ?? null,
 							'function' => '_validate_invalid_function',
 							'param' => $validation_parameters
 						);
@@ -587,7 +589,7 @@ class DataValidator
 			return false;
 		}
 
-		\ElkArte\Themes\ThemeLoader::loadLanguageFile('Validation');
+		ThemeLoader::loadLanguageFile('Validation');
 		$result = array();
 
 		// Just want specific errors then it must be an array
@@ -599,7 +601,7 @@ class DataValidator
 		foreach ($this->_validation_errors as $error)
 		{
 			// Field name substitution supplied?
-			$field = isset($this->_replacements[$error['field']]) ? $this->_replacements[$error['field']] : $error['field'];
+			$field = $this->_replacements[$error['field']] ?? $error['field'];
 
 			// Just want specific field errors returned?
 			if (!empty($keys) && is_array($keys) && !in_array($error['field'], $keys))
@@ -711,7 +713,7 @@ class DataValidator
 	protected function _validate_contains($field, $input, $validation_parameters = null)
 	{
 		$validation_parameters = array_map('trim', explode(',', strtolower($validation_parameters)));
-		$input[$field] = isset($input[$field]) ? $input[$field] : '';
+		$input[$field] = $input[$field] ?? '';
 		$value = trim(strtolower($input[$field]));
 
 		if (in_array($value, $validation_parameters))
@@ -741,7 +743,7 @@ class DataValidator
 	protected function _validate_notequal($field, $input, $validation_parameters = null)
 	{
 		$validation_parameters = explode(',', trim(strtolower($validation_parameters)));
-		$input[$field] = isset($input[$field]) ? $input[$field] : '';
+		$input[$field] = $input[$field] ?? '';
 		$value = trim(strtolower($input[$field]));
 
 		if (!in_array($value, $validation_parameters))
@@ -776,7 +778,7 @@ class DataValidator
 	{
 		$validation_parameters = explode(',', $validation_parameters);
 		$validation_parameters = array_filter($validation_parameters, 'strlen');
-		$input[$field] = isset($input[$field]) ? $input[$field] : '';
+		$input[$field] = $input[$field] ?? '';
 		$value = $input[$field];
 
 		// Lower bound ?
@@ -820,7 +822,7 @@ class DataValidator
 	protected function _validate_without($field, $input, $validation_parameters = null)
 	{
 		$validation_parameters = explode(',', $validation_parameters);
-		$input[$field] = isset($input[$field]) ? $input[$field] : '';
+		$input[$field] = $input[$field] ?? '';
 		$value = $input[$field];
 
 		foreach ($validation_parameters as $dummy => $check)
@@ -859,7 +861,7 @@ class DataValidator
 
 		return array(
 			'field' => $field,
-			'input' => isset($input[$field]) ? $input[$field] : '',
+			'input' => $input[$field] ?? '',
 			'function' => __FUNCTION__,
 			'param' => $validation_parameters
 		);
@@ -1388,7 +1390,7 @@ class DataValidator
 				'field' => $field,
 				'input' => $input[$field],
 				'error' => '_validate_php_syntax',
-				'error_msg' => isset($errorMsg['message']) ? $errorMsg['message'] : 'NaN',
+				'error_msg' => $errorMsg['message'] ?? 'NaN',
 				'param' => $validation_parameters
 			);
 		}

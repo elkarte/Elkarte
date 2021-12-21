@@ -20,6 +20,7 @@ use BBC\ParserWrapper;
 use ElkArte\AbstractController;
 use ElkArte\Cache\Cache;
 use ElkArte\Exceptions\Exception;
+use ElkArte\Http\Headers;
 use ElkArte\MembersList;
 use ElkArte\Themes\ThemeLoader;
 use ElkArte\Util;
@@ -252,7 +253,7 @@ class News extends AbstractController
 			}
 		}
 
-		$context['feed_title'] = encode_special(strip_tags(un_htmlspecialchars($context['forum_name']) . (isset($feed_title) ? $feed_title : '')));
+		$context['feed_title'] = encode_special(strip_tags(un_htmlspecialchars($context['forum_name']) . ($feed_title ?? '')));
 
 		// We send a feed with recent posts, and alerts for PMs for logged in users
 		$context['recent_posts_data'] = $xml;
@@ -260,7 +261,7 @@ class News extends AbstractController
 
 		obStart(!empty($modSettings['enableCompressedOutput']));
 
-		$headers = \ElkArte\Http\Headers::instance();
+		$headers = Headers::instance();
 		// This is an xml file....
 		if (isset($this->_req->query->debug))
 		{

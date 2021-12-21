@@ -19,6 +19,7 @@ namespace ElkArte\AdminController;
 use ElkArte\AbstractController;
 use ElkArte\Action;
 use ElkArte\Cache\Cache;
+use ElkArte\Themes\ThemeLoader;
 use ElkArte\User;
 use ElkArte\Util;
 
@@ -63,7 +64,7 @@ class ManageMembers extends AbstractController
 		global $txt, $context, $modSettings;
 
 		// Load the essentials.
-		\ElkArte\Themes\ThemeLoader::loadLanguageFile('ManageMembers');
+		ThemeLoader::loadLanguageFile('ManageMembers');
 		theme()->getTemplates()->load('ManageMembers');
 
 		$subActions = array(
@@ -825,7 +826,7 @@ class ManageMembers extends AbstractController
 		// Not a lot here!
 		$context['page_title'] = $txt['admin_members'];
 		$context['sub_template'] = 'admin_browse';
-		$context['browse_type'] = isset($this->_req->query->type) ? $this->_req->query->type : (!empty($modSettings['registration_method']) && $modSettings['registration_method'] == 1 ? 'activate' : 'approve');
+		$context['browse_type'] = $this->_req->query->type ?? (!empty($modSettings['registration_method']) && $modSettings['registration_method'] == 1 ? 'activate' : 'approve');
 
 		if (isset($context['tabs'][$context['browse_type']]))
 		{
@@ -846,7 +847,7 @@ class ManageMembers extends AbstractController
 				$context['available_filters'][] = array(
 					'type' => $type,
 					'amount' => $amount,
-					'desc' => isset($txt['admin_browse_filter_type_' . $type]) ? $txt['admin_browse_filter_type_' . $type] : '?',
+					'desc' => $txt['admin_browse_filter_type_' . $type] ?? '?',
 					'selected' => $type === $context['current_filter']
 				);
 			}
@@ -1204,7 +1205,7 @@ class ManageMembers extends AbstractController
 		require_once(SUBSDIR . '/Members.subs.php');
 
 		// We also need to the login languages here - for emails.
-		\ElkArte\Themes\ThemeLoader::loadLanguageFile('Login');
+		ThemeLoader::loadLanguageFile('Login');
 
 		// Start off clean
 		$this->conditions = array();

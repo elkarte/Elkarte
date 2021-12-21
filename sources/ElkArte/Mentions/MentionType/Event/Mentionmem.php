@@ -55,14 +55,7 @@ class Mentionmem extends AbstractEventBoardAccess
 			'display' => array('prepare_context' => array('virtual_msg')),
 		);
 
-		if (isset($methods[$controller]))
-		{
-			return $methods[$controller];
-		}
-		else
-		{
-			return array();
-		}
+		return $methods[$controller] ?? array();
 	}
 
 	/**

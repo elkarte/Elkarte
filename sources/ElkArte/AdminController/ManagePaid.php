@@ -22,6 +22,7 @@ use ElkArte\Action;
 use ElkArte\DataValidator;
 use ElkArte\Exceptions\Exception;
 use ElkArte\SettingsForm\SettingsForm;
+use ElkArte\Themes\ThemeLoader;
 use ElkArte\Util;
 
 /**
@@ -49,7 +50,7 @@ class ManagePaid extends AbstractController
 		global $context, $txt, $modSettings;
 
 		// Load the required language and template.
-		\ElkArte\Themes\ThemeLoader::loadLanguageFile('ManagePaid');
+		ThemeLoader::loadLanguageFile('ManagePaid');
 		theme()->getTemplates()->load('ManagePaid');
 
 		$subActions = array(
@@ -234,7 +235,7 @@ class ManagePaid extends AbstractController
 			$setting_data = $gatewayClass->getGatewaySettings();
 			if (!empty($setting_data))
 			{
-				$config_vars[] = array('title', $gatewayClass->title, 'text_label' => (isset($txt['paidsubs_gateway_title_' . $gatewayClass->title]) ? $txt['paidsubs_gateway_title_' . $gatewayClass->title] : $gatewayClass->title));
+				$config_vars[] = array('title', $gatewayClass->title, 'text_label' => ($txt['paidsubs_gateway_title_' . $gatewayClass->title] ?? $gatewayClass->title));
 				$config_vars = array_merge($config_vars, $setting_data);
 			}
 		}

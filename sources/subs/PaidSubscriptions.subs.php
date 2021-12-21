@@ -14,6 +14,7 @@
  *
  */
 
+use ElkArte\Themes\ThemeLoader;
 use ElkArte\Util;
 
 /**
@@ -479,7 +480,7 @@ function loadSubscriptions()
 	}
 
 	// Make sure this is loaded, just in case.
-	\ElkArte\Themes\ThemeLoader::loadLanguageFile('ManagePaid');
+	ThemeLoader::loadLanguageFile('ManagePaid');
 
 	$context['subscriptions'] = array();
 	$db->fetchQuery('

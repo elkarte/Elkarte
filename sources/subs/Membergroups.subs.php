@@ -15,6 +15,7 @@
  */
 
 use ElkArte\Cache\Cache;
+use ElkArte\Themes\ThemeLoader;
 use ElkArte\User;
 use ElkArte\Util;
 
@@ -712,7 +713,7 @@ function list_getMembergroups($start, $items_per_page, $sort, $membergroup_type,
 	global $txt, $context;
 
 	$db = database();
-	\ElkArte\Themes\ThemeLoader::loadLanguageFile('Admin');
+	ThemeLoader::loadLanguageFile('Admin');
 
 	// Start collecting the data.
 	$groups = array();
@@ -1103,14 +1104,7 @@ function membergroupById($group_id, $detailed = false, $assignable = false)
 {
 	$groups = membergroupsById(array($group_id), 1, $detailed, $assignable);
 
-	if (isset($groups[$group_id]))
-	{
-		return $groups[$group_id];
-	}
-	else
-	{
-		return false;
-	}
+	return $groups[$group_id] ?? false;
 }
 
 /**
@@ -1160,7 +1154,7 @@ function getBasicMembergroupData($includes = array(), $excludes = array(), $sort
 	$groups = array();
 
 	$where = '';
-	$sort_order = isset($sort_order) ? $sort_order : 'min_posts, CASE WHEN id_group < {int:newbie_group} THEN id_group ELSE 4 END, group_name';
+	$sort_order = $sort_order ?? 'min_posts, CASE WHEN id_group < {int:newbie_group} THEN id_group ELSE 4 END, group_name';
 
 	// Do we need the post based membergroups?
 	$where .= !empty($modSettings['permission_enable_postgroups']) || in_array('postgroups', $includes) ? '' : 'AND min_posts = {int:min_posts}';
@@ -2288,7 +2282,7 @@ function getGroupsList()
 {
 	global $txt;
 
-	\ElkArte\Themes\ThemeLoader::loadLanguageFile('Profile');
+	ThemeLoader::loadLanguageFile('Profile');
 
 	$db = database();
 	$member_groups = array(

@@ -1328,7 +1328,7 @@ class ManageThemes extends AbstractController
 			// Defaults.
 			$install_info = array(
 				'theme_url' => $boardurl . '/themes/' . basename($this->theme_dir),
-				'images_url' => isset($this->images_url) ? $this->images_url : $boardurl . '/themes/' . basename($this->theme_dir) . '/images',
+				'images_url' => $this->images_url ?? $boardurl . '/themes/' . basename($this->theme_dir) . '/images',
 				'theme_dir' => $this->theme_dir,
 				'name' => $this->theme_name
 			);
@@ -1798,7 +1798,7 @@ class ManageThemes extends AbstractController
 		}
 
 		$theme_dir = themeDirectory($context['theme_id']);
-		$file = isset($this->_req->post->entire_file) ? $this->_req->post->entire_file : '';
+		$file = $this->_req->post->entire_file ?? '';
 
 		// You did submit *something*, didn't you?
 		if (empty($file))

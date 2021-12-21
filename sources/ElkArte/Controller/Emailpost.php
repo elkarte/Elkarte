@@ -15,6 +15,7 @@ namespace ElkArte\Controller;
 
 use ElkArte\AbstractController;
 use ElkArte\EmailParse;
+use ElkArte\Themes\ThemeLoader;
 
 /**
  * Handles items pertaining to posting or PM an item that was received by email
@@ -57,7 +58,7 @@ class Emailpost extends AbstractController
 
 		// Init
 		$pbe = array();
-		\ElkArte\Themes\ThemeLoader::loadLanguageFile('Maillist');
+		ThemeLoader::loadLanguageFile('Maillist');
 
 		// Load the email parser and get some data to work with
 		$email_message = new EmailParse();
@@ -133,7 +134,7 @@ class Emailpost extends AbstractController
 		require_once(SUBSDIR . '/Emailpost.subs.php');
 
 		// Init
-		\ElkArte\Themes\ThemeLoader::loadLanguageFile('Maillist');
+		ThemeLoader::loadLanguageFile('Maillist');
 		detectServer()->setMemoryLimit('128M');
 
 		// Load the email parser and get some data to work with
@@ -266,9 +267,9 @@ class Emailpost extends AbstractController
 		}
 		else
 		{
-			\ElkArte\Themes\ThemeLoader::loadLanguageFile('index', $language, false);
+			ThemeLoader::loadLanguageFile('index', $language, false);
 			$pbe['response_prefix'] = $txt['response_prefix'];
-			\ElkArte\Themes\ThemeLoader::loadLanguageFile('index');
+			ThemeLoader::loadLanguageFile('index');
 		}
 
 		// Allow for new topics to be started via a email subject change
@@ -338,7 +339,7 @@ class Emailpost extends AbstractController
 		require_once(SUBSDIR . '/Emailpost.subs.php');
 
 		// Init
-		\ElkArte\Themes\ThemeLoader::loadLanguageFile('Maillist');
+		ThemeLoader::loadLanguageFile('Maillist');
 		detectServer()->setMemoryLimit('256M');
 
 		// Get the data from one of our sources

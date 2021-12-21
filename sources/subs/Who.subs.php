@@ -12,6 +12,7 @@
  */
 
 use ElkArte\Cache\Cache;
+use ElkArte\Themes\ThemeLoader;
 use ElkArte\User;
 use ElkArte\Util;
 
@@ -209,7 +210,7 @@ function determineActions($urls, $preferred_prefix = false)
 		return array();
 	}
 
-	\ElkArte\Themes\ThemeLoader::loadLanguageFile('Who');
+	ThemeLoader::loadLanguageFile('Who');
 
 	// Actions that require a specific permission level.
 	$allowedActions = array(
@@ -347,7 +348,7 @@ function determineActions($urls, $preferred_prefix = false)
 			elseif (isset($txt['whotopic_' . $actions['action']]))
 			{
 				// Find out what topic they are accessing.
-				$topic = (int) (isset($actions['topic']) ? $actions['topic'] : (isset($actions['from']) ? $actions['from'] : 0));
+				$topic = (int) ($actions['topic'] ?? ($actions['from'] ?? 0));
 
 				$data[$k] = $txt['who_hidden'];
 				$topic_ids[$topic][$k] = $txt['whotopic_' . $actions['action']];
@@ -356,7 +357,7 @@ function determineActions($urls, $preferred_prefix = false)
 			elseif (isset($actions['sa']) && isset($txt['whotopic_' . $actions['action'] . '_' . $actions['sa']]))
 			{
 				// Find out what topic they are accessing.
-				$topic = (int) (isset($actions['topic']) ? $actions['topic'] : (isset($actions['from']) ? $actions['from'] : 0));
+				$topic = (int) ($actions['topic'] ?? ($actions['from'] ?? 0));
 
 				$data[$k] = $txt['who_hidden'];
 				$topic_ids[$topic][$k] = $txt['whotopic_' . $actions['action'] . '_' . $actions['sa']];
@@ -364,7 +365,7 @@ function determineActions($urls, $preferred_prefix = false)
 			elseif (isset($txt['whopost_' . $actions['action']]))
 			{
 				// Find out what message they are accessing.
-				$msgid = (int) (isset($actions['msg']) ? $actions['msg'] : (isset($actions['quote']) ? $actions['quote'] : 0));
+				$msgid = (int) ($actions['msg'] ?? ($actions['quote'] ?? 0));
 
 				$result = $db->query('', '
 					SELECT 
@@ -505,7 +506,7 @@ function determineActions($urls, $preferred_prefix = false)
 
 	if (!is_array($urls))
 	{
-		return isset($data[0]) ? $data[0] : false;
+		return $data[0] ?? false;
 	}
 	else
 	{

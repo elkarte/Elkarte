@@ -83,7 +83,7 @@ class Xml extends AbstractController
 		// Find the boards/categories they can see.
 		require_once(SUBSDIR . '/Boards.subs.php');
 		$boardListOptions = array(
-			'selected_board' => isset($context['current_board']) ? $context['current_board'] : 0,
+			'selected_board' => $context['current_board'] ?? 0,
 		);
 		$context += getBoardList($boardListOptions);
 
@@ -221,7 +221,7 @@ class Xml extends AbstractController
 		// Failed session validation I'm afraid
 		else
 		{
-			$errors[] = array('value' => isset($txt[$validation]) ? $txt[$validation] : $txt['error_occurred']);
+			$errors[] = array('value' => $txt[$validation] ?? $txt['error_occurred']);
 		}
 
 		// Return the response to the calling program

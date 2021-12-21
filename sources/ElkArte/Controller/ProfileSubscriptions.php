@@ -18,6 +18,7 @@ namespace ElkArte\Controller;
 
 use ElkArte\AbstractController;
 use ElkArte\Exceptions\Exception;
+use ElkArte\Themes\ThemeLoader;
 use ElkArte\Util;
 
 /**
@@ -68,7 +69,7 @@ class ProfileSubscriptions extends AbstractController
 
 		// Load the paid template anyway.
 		theme()->getTemplates()->load('ManagePaid');
-		\ElkArte\Themes\ThemeLoader::loadLanguageFile('ManagePaid');
+		ThemeLoader::loadLanguageFile('ManagePaid');
 
 		$memID = currentMemberID();
 		$context['member']['id'] = $memID;

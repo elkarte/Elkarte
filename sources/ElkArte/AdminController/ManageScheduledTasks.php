@@ -19,6 +19,7 @@ namespace ElkArte\AdminController;
 use ElkArte\AbstractController;
 use ElkArte\Action;
 use ElkArte\Exceptions\Exception;
+use ElkArte\Themes\ThemeLoader;
 
 /**
  * ManageScheduledTasks admin Controller: handles the scheduled task pages
@@ -45,7 +46,7 @@ class ManageScheduledTasks extends AbstractController
 	{
 		global $context, $txt;
 
-		\ElkArte\Themes\ThemeLoader::loadLanguageFile('ManageScheduledTasks');
+		ThemeLoader::loadLanguageFile('ManageScheduledTasks');
 		theme()->getTemplates()->load('ManageScheduledTasks');
 
 		$subActions = array(
@@ -364,7 +365,7 @@ class ManageScheduledTasks extends AbstractController
 		require_once(SUBSDIR . '/ScheduledTasks.subs.php');
 
 		// Lets load the language just in case we are outside the Scheduled area.
-		\ElkArte\Themes\ThemeLoader::loadLanguageFile('ManageScheduledTasks');
+		ThemeLoader::loadLanguageFile('ManageScheduledTasks');
 
 		// Empty the log?
 		if (!empty($this->_req->post->removeAll))

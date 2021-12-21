@@ -21,6 +21,7 @@ use ElkArte\AbstractController;
 use ElkArte\CalendarEvent;
 use ElkArte\EventManager;
 use ElkArte\Exceptions\Exception;
+use ElkArte\Http\Headers;
 use ElkArte\User;
 use ElkArte\Util;
 
@@ -409,7 +410,7 @@ class Calendar extends AbstractController
 		obStart(!empty($modSettings['enableCompressedOutput']));
 
 		// Send the file headers
-		$headers = \ElkArte\Http\Headers::instance();
+		$headers = Headers::instance();
 		$headers
 			->header('Pragma', 'no-cache')
 			->header('Cache-Control', 'no-cache')
