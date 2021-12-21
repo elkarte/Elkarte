@@ -1024,7 +1024,7 @@ class Maintenance extends AbstractController
 		if ($ftp->error !== false)
 		{
 			ThemeLoader::loadLanguageFile('Packages');
-			$ftp_error = $ftp->last_message === null ? (isset($txt['package_ftp_' . $ftp->error]) ? $txt['package_ftp_' . $ftp->error] : '') : $ftp->last_message;
+			$ftp_error = $ftp->last_message === null ? ($txt['package_ftp_' . $ftp->error] ?? '') : $ftp->last_message;
 
 			// Fill the boxes for a FTP connection with data from the previous attempt
 			$context['package_ftp'] = array(
@@ -1128,7 +1128,7 @@ class Maintenance extends AbstractController
 				'form_elements_only' => true,
 				'server' => '',
 				'port' => '',
-				'username' => isset($modSettings['package_username']) ? $modSettings['package_username'] : '',
+				'username' => $modSettings['package_username'] ?? '',
 				'path' => '',
 				'error' => '',
 			);

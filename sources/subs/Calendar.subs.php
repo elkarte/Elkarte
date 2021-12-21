@@ -399,7 +399,7 @@ function getCalendarGrid($month, $year, $calendarOptions)
 			'month' => $month == 12 ? 1 : $month + 1,
 			'disabled' => date('Y') + $modSettings['cal_limityear'] < ($month == 12 ? $year + 1 : $year),
 		),
-		'size' => isset($calendarOptions['size']) ? $calendarOptions['size'] : 'large',
+		'size' => $calendarOptions['size'] ?? 'large',
 	);
 
 	// Get todays date.

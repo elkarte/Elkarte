@@ -826,7 +826,7 @@ class ManageMembers extends AbstractController
 		// Not a lot here!
 		$context['page_title'] = $txt['admin_members'];
 		$context['sub_template'] = 'admin_browse';
-		$context['browse_type'] = isset($this->_req->query->type) ? $this->_req->query->type : (!empty($modSettings['registration_method']) && $modSettings['registration_method'] == 1 ? 'activate' : 'approve');
+		$context['browse_type'] = $this->_req->query->type ?? (!empty($modSettings['registration_method']) && $modSettings['registration_method'] == 1 ? 'activate' : 'approve');
 
 		if (isset($context['tabs'][$context['browse_type']]))
 		{
@@ -847,7 +847,7 @@ class ManageMembers extends AbstractController
 				$context['available_filters'][] = array(
 					'type' => $type,
 					'amount' => $amount,
-					'desc' => isset($txt['admin_browse_filter_type_' . $type]) ? $txt['admin_browse_filter_type_' . $type] : '?',
+					'desc' => $txt['admin_browse_filter_type_' . $type] ?? '?',
 					'selected' => $type === $context['current_filter']
 				);
 			}

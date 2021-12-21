@@ -293,7 +293,7 @@ final class Hooks
 
 				foreach ($hooks as $hook)
 				{
-					$this->add($hook[0], $hook[1], isset($hook[2]) ? $hook[2] : '', false);
+					$this->add($hook[0], $hook[1], $hook[2] ?? '', false);
 				}
 			}
 		}
@@ -325,7 +325,7 @@ final class Hooks
 
 				foreach ($hooks as $hook)
 				{
-					$this->add($hook[0], $hook[1], isset($hook[2]) ? $hook[2] : '', false);
+					$this->add($hook[0], $hook[1], $hook[2] ?? '', false);
 				}
 			}
 		}

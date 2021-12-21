@@ -403,14 +403,7 @@ function logActions($logs)
 			}
 		}
 
-		if (isset($log['extra']['member_affected']))
-		{
-			$memID = $log['extra']['member_affected'];
-		}
-		else
-		{
-			$memID = User::$info->id;
-		}
+		$memID = $log['extra']['member_affected'] ?? User::$info->id;
 
 		$inserts[] = array(
 			time(), $log_types[$log['log_type']], $memID, User::$info->ip, $log['action'],

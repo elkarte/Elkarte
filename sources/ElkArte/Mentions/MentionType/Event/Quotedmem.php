@@ -46,7 +46,7 @@ class Quotedmem extends AbstractEventBoardAccess
 			'display' => array('prepare_context' => array('virtual_msg')),
 		);
 
-		return isset($methods[$controller]) ? $methods[$controller] : array();
+		return $methods[$controller] ?? array();
 	}
 
 	/**

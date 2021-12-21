@@ -365,7 +365,7 @@ class Post extends AbstractModule
 	{
 		$this->_initErrors();
 
-		$msg = isset($_REQUEST['msg']) ? $_REQUEST['msg'] : 0;
+		$msg = $_REQUEST['msg'] ?? 0;
 		$this->saveAttachments($msg);
 
 		if ($this->_attach_errors->hasErrors())
@@ -471,13 +471,13 @@ class Post extends AbstractModule
 				{
 					// Load the attachmentOptions array with the data needed to create an attachment
 					$attachmentOptions = array(
-						'post' => isset($_REQUEST['msg']) ? $_REQUEST['msg'] : 0,
+						'post' => $_REQUEST['msg'] ?? 0,
 						'poster' => $this->user->id,
 						'name' => $attachment['name'],
 						'tmp_name' => $attachment['tmp_name'],
-						'size' => isset($attachment['size']) ? $attachment['size'] : 0,
-						'mime_type' => isset($attachment['type']) ? $attachment['type'] : '',
-						'id_folder' => isset($attachment['id_folder']) ? $attachment['id_folder'] : 0,
+						'size' => $attachment['size'] ?? 0,
+						'mime_type' => $attachment['type'] ?? '',
+						'id_folder' => $attachment['id_folder'] ?? 0,
 						'approved' => !$modSettings['postmod_active'] || allowedTo('post_attachment'),
 						'errors' => array(),
 					);

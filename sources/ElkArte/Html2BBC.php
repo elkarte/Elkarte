@@ -511,7 +511,7 @@ class Html2BBC
 		// Maybe an email link
 		elseif (substr($href, 0, 7) === 'mailto:')
 		{
-			if ($href !== 'mailto:' . (isset($modSettings['maillist_sitename_address']) ? $modSettings['maillist_sitename_address'] : ''))
+			if ($href !== 'mailto:' . ($modSettings['maillist_sitename_address'] ?? ''))
 			{
 				$href = substr($href, 7);
 			}
@@ -533,7 +533,7 @@ class Html2BBC
 			// If No http(s), then attempt to fix this potential relative URL.
 			if (preg_match('~^https?://~i', $href) === 0 && is_array($parsedURL = parse_url($scripturl)) && isset($parsedURL['host']))
 			{
-				$baseURL = (isset($parsedURL['scheme']) ? $parsedURL['scheme'] : 'http') . '://' . $parsedURL['host'] . (empty($parsedURL['port']) ? '' : ':' . $parsedURL['port']);
+				$baseURL = ($parsedURL['scheme'] ?? 'http') . '://' . $parsedURL['host'] . (empty($parsedURL['port']) ? '' : ':' . $parsedURL['port']);
 
 				if (substr($href, 0, 1) === '/')
 				{
@@ -678,9 +678,7 @@ class Html2BBC
 		$level = (int) trim($level, 'h');
 		$hsize = array(1 => 7, 2 => 6, 3 => 5, 4 => 4, 5 => 3, 6 => 2, 7 => 1);
 
-		$size = isset($this->sizes_equivalence[$hsize[$level]])
-			? $this->sizes_equivalence[$hsize[$level]]
-			: $this->sizes_equivalence[4];
+		$size = $this->sizes_equivalence[$hsize[$level]] ?? $this->sizes_equivalence[4];
 
 		return '[size=' . $size . ']' . $content . '[/size]';
 	}

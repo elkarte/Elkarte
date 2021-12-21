@@ -214,7 +214,7 @@ class VerificationControls
 
 		return array(
 			'id' => $this->_verification_options['id'],
-			'max_errors' => isset($this->_verification_options['max_errors']) ? $this->_verification_options['max_errors'] : 3,
+			'max_errors' => $this->_verification_options['max_errors'] ?? 3,
 			'render' => $this->_verification_options['render'],
 			'test' => $this->_verification_options['test']
 		);

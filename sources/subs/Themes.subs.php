@@ -631,7 +631,7 @@ function availableThemes($current_theme, $current_member)
 					);
 				}
 
-				$available_themes[$id_theme]['selected_variant'] = isset($_GET['vrt']) ? $_GET['vrt'] : (!empty($variant_preferences[$id_theme]) ? $variant_preferences[$id_theme] : (!empty($settings['default_variant']) ? $settings['default_variant'] : $settings['theme_variants'][0]));
+				$available_themes[$id_theme]['selected_variant'] = $_GET['vrt'] ?? (!empty($variant_preferences[$id_theme]) ? $variant_preferences[$id_theme] : (!empty($settings['default_variant']) ? $settings['default_variant'] : $settings['theme_variants'][0]));
 				if (!isset($available_themes[$id_theme]['variants'][$available_themes[$id_theme]['selected_variant']]['thumbnail']))
 				{
 					$available_themes[$id_theme]['selected_variant'] = $settings['theme_variants'][0];
@@ -640,7 +640,7 @@ function availableThemes($current_theme, $current_member)
 				$available_themes[$id_theme]['thumbnail_href'] = $available_themes[$id_theme]['variants'][$available_themes[$id_theme]['selected_variant']]['thumbnail'];
 
 				// Allow themes to override the text.
-				$available_themes[$id_theme]['pick_label'] = isset($txt['variant_pick']) ? $txt['variant_pick'] : $txt['theme_pick_variant'];
+				$available_themes[$id_theme]['pick_label'] = $txt['variant_pick'] ?? $txt['theme_pick_variant'];
 			}
 		}
 	}

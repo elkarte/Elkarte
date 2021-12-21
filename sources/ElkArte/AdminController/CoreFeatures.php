@@ -478,8 +478,8 @@ class CoreFeatures extends AbstractController
 		foreach ($core_features as $id => $feature)
 		{
 			$features[$id] = array(
-				'title' => isset($feature['title']) ? $feature['title'] : $txt['core_settings_item_' . $id],
-				'desc' => isset($feature['desc']) ? $feature['desc'] : $txt['core_settings_item_' . $id . '_desc'],
+				'title' => $feature['title'] ?? $txt['core_settings_item_' . $id],
+				'desc' => $feature['desc'] ?? $txt['core_settings_item_' . $id . '_desc'],
 				'enabled' => featureEnabled($id),
 				'state' => featureEnabled($id) ? 'on' : 'off',
 				'url' => $feature['url'],
@@ -513,7 +513,7 @@ class CoreFeatures extends AbstractController
 		// Convert this to a format that admin search will understand
 		foreach ($core_features as $id => $data)
 		{
-			$return_data[] = array('switch', isset($data['title']) ? $data['title'] : $txt['core_settings_item_' . $id]);
+			$return_data[] = array('switch', $data['title'] ?? $txt['core_settings_item_' . $id]);
 		}
 
 		return $return_data;

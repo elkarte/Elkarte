@@ -233,7 +233,7 @@ class Sphinxql extends AbstractAPI
 					$num = 0;
 					if (empty($this->_searchParams->topic))
 					{
-						$num = isset($match['num']) ? $match['num'] : (isset($match['@count']) ? $match['@count'] : 0);
+						$num = $match['num'] ?? ($match['@count'] ?? 0);
 					}
 
 					$cached_results['matches'][$match['id']] = array(

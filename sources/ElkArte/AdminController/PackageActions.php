@@ -269,7 +269,7 @@ class PackageActions extends AbstractController
 		// @todo None given?
 		if (empty($this->thisAction['description']))
 		{
-			$this->thisAction['description'] = isset($this->_action['description']) ? $this->_action['description'] : '';
+			$this->thisAction['description'] = $this->_action['description'] ?? '';
 		}
 
 		$this->ourActions[] = $this->thisAction;
@@ -419,7 +419,7 @@ class PackageActions extends AbstractController
 		}
 		elseif (isset($this->_action['error_msg']))
 		{
-			$this->failure_details = isset($txt['package_will_fail_' . $this->_action['error_msg']]) ? $txt['package_will_fail_' . $this->_action['error_msg']] : $this->_action['error_msg'];
+			$this->failure_details = $txt['package_will_fail_' . $this->_action['error_msg']] ?? $this->_action['error_msg'];
 		}
 	}
 

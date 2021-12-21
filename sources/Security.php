@@ -129,7 +129,7 @@ function validateSession($type = 'admin')
 	// Better be sure to remember the real referer
 	if (empty($_SESSION['request_referer']))
 	{
-		$_SESSION['request_referer'] = isset($_SERVER['HTTP_REFERER']) ? $_SERVER['HTTP_REFERER'] : '';
+		$_SESSION['request_referer'] = $_SERVER['HTTP_REFERER'] ?? '';
 	}
 	elseif (empty($_POST))
 	{
@@ -780,7 +780,7 @@ function checkSession($type = 'post', $from_action = '', $is_fatal = true)
 	// Or can it be in either?
 	elseif ($type === 'request')
 	{
-		$check = $_GET[$_SESSION['session_var']] ?? (empty($modSettings['strictSessionCheck']) && isset($_GET['sesc']) ? $_GET['sesc'] : (isset($_POST[$_SESSION['session_var']]) ? $_POST[$_SESSION['session_var']] : (empty($modSettings['strictSessionCheck']) && isset($_POST['sc']) ? $_POST['sc'] : null)));
+		$check = $_GET[$_SESSION['session_var']] ?? (empty($modSettings['strictSessionCheck']) && isset($_GET['sesc']) ? $_GET['sesc'] : ($_POST[$_SESSION['session_var']] ?? (empty($modSettings['strictSessionCheck']) && isset($_POST['sc']) ? $_POST['sc'] : null)));
 
 		if ($check !== $_SESSION['session_value'])
 		{
@@ -798,14 +798,7 @@ function checkSession($type = 'post', $from_action = '', $is_fatal = true)
 	stop_prefetching();
 
 	// Check the referring site - it should be the same server at least!
-	if (isset($_SESSION['request_referer']))
-	{
-		$referrer_url = $_SESSION['request_referer'];
-	}
-	else
-	{
-		$referrer_url = isset($_SERVER['HTTP_REFERER']) ? $_SERVER['HTTP_REFERER'] : '';
-	}
+	$referrer_url = $_SESSION['request_referer'] ?? (isset($_SERVER['HTTP_REFERER']) ? $_SERVER['HTTP_REFERER'] : '');
 
 	$referrer = @parse_url($referrer_url);
 
@@ -877,7 +870,7 @@ function checkSession($type = 'post', $from_action = '', $is_fatal = true)
 		}
 		else
 		{
-			throw new \ElkArte\Exceptions\Exception($error, isset($log_error) ? 'user' : false, isset($sprintf) ? $sprintf : array());
+			throw new \ElkArte\Exceptions\Exception($error, isset($log_error) ? 'user' : false, $sprintf ?? array());
 		}
 	}
 	// A session error occurred, return the error to the calling function.
@@ -1393,7 +1386,7 @@ function boardsAllowedTo($permissions, $check_access = true, $simple = true)
 			else
 			{
 				// Or it may have been removed
-				$deny_boards[$permission] = isset($deny_boards[$permission]) ? $deny_boards[$permission] : array();
+				$deny_boards[$permission] = $deny_boards[$permission] ?? array();
 				$boards[$permission] = array_unique(array_values(array_diff($boards[$permission], $deny_boards[$permission])));
 			}
 		}
@@ -1491,7 +1484,7 @@ function spamProtection($error_type, $fatal = true)
 	// Moderators are free...
 	if (!allowedTo('moderate_board'))
 	{
-		$timeLimit = isset($timeOverrides[$error_type]) ? $timeOverrides[$error_type] : $modSettings['spamWaitTime'];
+		$timeLimit = $timeOverrides[$error_type] ?? $modSettings['spamWaitTime'];
 	}
 	else
 	{

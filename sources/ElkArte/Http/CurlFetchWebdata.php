@@ -338,10 +338,10 @@ class CurlFetchWebdata
 		$new_url_parse = parse_url($new_url);
 
 		// Redirect headers are often incomplete / relative so we need to make sure they are fully qualified
-		$new_url_parse['path'] = isset($new_url_parse['path']) ? $new_url_parse['path'] : (isset($new_url_parse['host']) ? '' : $last_url_parse['path']);
-		$new_url_parse['scheme'] = isset($new_url_parse['scheme']) ? $new_url_parse['scheme'] : $last_url_parse['scheme'];
-		$new_url_parse['host'] = isset($new_url_parse['host']) ? $new_url_parse['host'] : $last_url_parse['host'];
-		$new_url_parse['query'] = isset($new_url_parse['query']) ? $new_url_parse['query'] : '';
+		$new_url_parse['path'] = $new_url_parse['path'] ?? (isset($new_url_parse['host']) ? '' : $last_url_parse['path']);
+		$new_url_parse['scheme'] = $new_url_parse['scheme'] ?? $last_url_parse['scheme'];
+		$new_url_parse['host'] = $new_url_parse['host'] ?? $last_url_parse['host'];
+		$new_url_parse['query'] = $new_url_parse['query'] ?? '';
 
 		// Build the new URL that was in the http header
 		return $new_url_parse['scheme'] . '://' . $new_url_parse['host'] . $new_url_parse['path'] . (!empty($new_url_parse['query']) ? '?' . $new_url_parse['query'] : '');
@@ -387,7 +387,7 @@ class CurlFetchWebdata
 		}
 		else
 		{
-			return isset($this->_response[$max_result][$area]) ? $this->_response[$max_result][$area] : $this->_response[$max_result];
+			return $this->_response[$max_result][$area] ?? $this->_response[$max_result];
 		}
 	}
 

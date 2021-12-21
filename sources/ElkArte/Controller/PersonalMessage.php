@@ -570,7 +570,7 @@ class PersonalMessage extends AbstractController
 			'start' => $start,
 			'limit' => $modSettings['defaultMaxMessages'],
 			'folder' => $context['folder'],
-			'pmid' => isset($pmID) ? $pmID : 0,
+			'pmid' => $pmID ?? 0,
 		), $this->user->id);
 
 		// Make sure that we have been given a correct head pm id if we are in conversation mode
@@ -771,7 +771,7 @@ class PersonalMessage extends AbstractController
 
 		try
 		{
-			$this->_events->trigger('before_set_context', array('pmsg' => isset($this->_req->query->pmsg) ? $this->_req->query->pmsg : (isset($this->_req->query->quote) ? $this->_req->query->quote : 0)));
+			$this->_events->trigger('before_set_context', array('pmsg' => $this->_req->query->pmsg ?? ($this->_req->query->quote ?? 0)));
 		}
 		catch (PmErrorException $e)
 		{
@@ -2327,7 +2327,7 @@ class PersonalMessage extends AbstractController
 		$blocklist_words = array('quote', 'the', 'is', 'it', 'are', 'if', 'in');
 
 		// What are we actually searching for?
-		$this->_search_params['search'] = !empty($this->_search_params['search']) ? $this->_search_params['search'] : (isset($this->_req->post->search) ? $this->_req->post->search : '');
+		$this->_search_params['search'] = !empty($this->_search_params['search']) ? $this->_search_params['search'] : ($this->_req->post->search ?? '');
 
 		// If nothing is left to search on - we set an error!
 		if (!isset($this->_search_params['search']) || $this->_search_params['search'] === '')
@@ -2615,7 +2615,7 @@ class PersonalMessage extends AbstractController
 		if (isset($this->_req->query->params) || isset($this->_req->post->params))
 		{
 			// Feed it
-			$temp_params = isset($this->_req->query->params) ? $this->_req->query->params : $this->_req->post->params;
+			$temp_params = $this->_req->query->params ?? $this->_req->post->params;
 
 			// Decode and replace the uri safe characters we added
 			$temp_params = base64_decode(str_replace(array('-', '_', '.'), array('+', '/', '='), $temp_params));
@@ -2668,7 +2668,7 @@ class PersonalMessage extends AbstractController
 		// Default the user name to a wildcard matching every user (*).
 		if (!empty($this->_search_params['userspec']) || (!empty($this->_req->post->userspec) && $this->_req->post->userspec != '*'))
 		{
-			$this->_search_params['userspec'] = isset($this->_search_params['userspec']) ? $this->_search_params['userspec'] : $this->_req->post->userspec;
+			$this->_search_params['userspec'] = $this->_search_params['userspec'] ?? $this->_req->post->userspec;
 		}
 
 		// Search modifiers

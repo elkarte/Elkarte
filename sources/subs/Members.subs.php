@@ -1710,7 +1710,7 @@ function prepareMembersByQuery($query, &$query_params, $only_active = true)
 					}
 					else
 					{
-						$query_parts[$condition === 'or' ? 'or' : 'and'][] = isset($allowed_conditions[$query_condition]) ? $allowed_conditions[$query_condition] : $query_condition;
+						$query_parts[$condition === 'or' ? 'or' : 'and'][] = $allowed_conditions[$query_condition] ?? $query_condition;
 					}
 				}
 			}
@@ -1720,7 +1720,7 @@ function prepareMembersByQuery($query, &$query_params, $only_active = true)
 			}
 			else
 			{
-				$query_parts['and'][] = isset($allowed_conditions[$query_conditions]) ? $allowed_conditions[$query_conditions] : $query_conditions;
+				$query_parts['and'][] = $allowed_conditions[$query_conditions] ?? $query_conditions;
 			}
 		}
 
@@ -1882,8 +1882,8 @@ function getBasicMemberData($member_ids, $options = array())
 		LIMIT {int:limit}',
 		array(
 			'member_list' => $member_ids,
-			'limit' => isset($options['limit']) ? $options['limit'] : count($member_ids),
-			'sort' => isset($options['sort']) ? $options['sort'] : '',
+			'limit' => $options['limit'] ?? count($member_ids),
+			'sort' => $options['sort'] ?? '',
 		)
 	)->fetch_callback(
 		function ($row) use (&$members, $language, $single) {

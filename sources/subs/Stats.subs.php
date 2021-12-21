@@ -549,7 +549,7 @@ function topTimeOnline()
 
 	$db = database();
 
-	$max_members = isset($modSettings['stats_limit']) ? $modSettings['stats_limit'] : 10;
+	$max_members = $modSettings['stats_limit'] ?? 10;
 
 	// Do we have something cached that will help speed this up?
 	$temp = Cache::instance()->get('stats_total_time_members', 600);
@@ -564,7 +564,7 @@ function topTimeOnline()
 		LIMIT {int:top_online}',
 		array(
 			'member_list_cached' => $temp,
-			'top_online' => isset($modSettings['stats_limit']) ? $modSettings['stats_limit'] : 20,
+			'top_online' => $modSettings['stats_limit'] ?? 20,
 		)
 	);
 	$top_time_online = array();

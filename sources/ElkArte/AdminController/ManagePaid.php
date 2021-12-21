@@ -235,7 +235,7 @@ class ManagePaid extends AbstractController
 			$setting_data = $gatewayClass->getGatewaySettings();
 			if (!empty($setting_data))
 			{
-				$config_vars[] = array('title', $gatewayClass->title, 'text_label' => (isset($txt['paidsubs_gateway_title_' . $gatewayClass->title]) ? $txt['paidsubs_gateway_title_' . $gatewayClass->title] : $gatewayClass->title));
+				$config_vars[] = array('title', $gatewayClass->title, 'text_label' => ($txt['paidsubs_gateway_title_' . $gatewayClass->title] ?? $gatewayClass->title));
 				$config_vars = array_merge($config_vars, $setting_data);
 			}
 		}

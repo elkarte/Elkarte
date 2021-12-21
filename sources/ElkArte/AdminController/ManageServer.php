@@ -593,7 +593,7 @@ class ManageServer extends AbstractController
 		foreach ($default_values as $name => $value)
 		{
 			// Use the default value if the setting isn't set yet.
-			$value = isset($modSettings[$name]) ? $modSettings[$name] : $value;
+			$value = $modSettings[$name] ?? $value;
 			$config_vars[] = array('text', $name, 'value' => $value, 'disabled' => $disabled);
 		}
 

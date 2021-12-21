@@ -132,7 +132,7 @@ class Dump extends AbstractDump
 		$result->free_result();
 
 		// Probably MyISAM.... and it might have a comment.
-		$schema_create .= $crlf . ') ENGINE=' . (isset($row['Type']) ? $row['Type'] : $row['Engine']) . ($row['Comment'] != '' ? ' COMMENT="' . $row['Comment'] . '"' : '');
+		$schema_create .= $crlf . ') ENGINE=' . ($row['Type'] ?? $row['Engine']) . ($row['Comment'] != '' ? ' COMMENT="' . $row['Comment'] . '"' : '');
 
 		return $schema_create;
 	}

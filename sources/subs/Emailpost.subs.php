@@ -2069,7 +2069,7 @@ function pbe_load_text(&$html, $email_message, $pbe)
 	// Convert to BBC and format it so it looks like a post
 	$text = pbe_email_to_bbc($text, $html);
 
-	$pbe['profile']['real_name'] = isset($pbe['profile']['real_name']) ? $pbe['profile']['real_name'] : '';
+	$pbe['profile']['real_name'] = $pbe['profile']['real_name'] ?? '';
 	$text = pbe_fix_email_body($text, $pbe['profile']['real_name'], (empty($email_message->_converted_utf8) ? $email_message->headers['x-parameters']['content-type']['charset'] : 'UTF-8'));
 
 	// Do we even have a message left to post?
@@ -2203,7 +2203,7 @@ function pbe_create_post($pbe, $email_message, $topic_info)
 
 	// We need the auto_notify setting, it may be theme based so pass the theme in use
 	$theme_settings = query_get_theme($pbe['profile']['id_member'], $pbe['profile']['id_theme'], $topic_info);
-	$auto_notify = isset($theme_settings['auto_notify']) ? $theme_settings['auto_notify'] : 0;
+	$auto_notify = $theme_settings['auto_notify'] ?? 0;
 
 	// Turn notifications on or off
 	query_notifications($pbe['profile']['id_member'], $topic_info['id_board'], $topic_info['id_topic'], $auto_notify, $pbe['user_info']['permissions']);
@@ -2415,7 +2415,7 @@ function pbe_create_topic($pbe, $email_message, $board_info)
 
 	// The auto_notify setting
 	$theme_settings = query_get_theme($pbe['profile']['id_member'], $pbe['profile']['id_theme'], $board_info);
-	$auto_notify = isset($theme_settings['auto_notify']) ? $theme_settings['auto_notify'] : 0;
+	$auto_notify = $theme_settings['auto_notify'] ?? 0;
 
 	// Notifications on or off
 	query_notifications($pbe['profile']['id_member'], $board_info['id_board'], $topicOptions['id'], $auto_notify, $pbe['user_info']['permissions']);

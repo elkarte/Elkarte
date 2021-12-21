@@ -573,7 +573,7 @@ class MessageIndex extends AbstractController implements FrontpageInterface
 		else
 		{
 			$boards_can = boardsAllowedTo(array('make_sticky', 'move_any', 'move_own', 'remove_any', 'remove_own', 'lock_any', 'lock_own', 'merge_any', 'approve_posts'), true, false);
-			$redirect_url = isset($this->_req->post->redirect_url) ? $this->_req->post->redirect_url : (isset($_SESSION['old_url']) ? $_SESSION['old_url'] : getUrlQuery('action', $modSettings['default_forum_action']));
+			$redirect_url = $this->_req->post->redirect_url ?? ($_SESSION['old_url'] ?? getUrlQuery('action', $modSettings['default_forum_action']));
 		}
 
 		if ($this->user->is_guest === false)
@@ -729,7 +729,7 @@ class MessageIndex extends AbstractController implements FrontpageInterface
 						}
 
 						// $moveCache[0] is the topic, $moveCache[1] is the board to move to.
-						$moveCache[1][$row['id_topic']] = (int) (isset($this->_req->post->move_tos[$row['id_topic']]) ? $this->_req->post->move_tos[$row['id_topic']] : $this->_req->post->move_to);
+						$moveCache[1][$row['id_topic']] = (int) ($this->_req->post->move_tos[$row['id_topic']] ?? $this->_req->post->move_to);
 
 						if (!empty($moveCache[1][$row['id_topic']]))
 						{

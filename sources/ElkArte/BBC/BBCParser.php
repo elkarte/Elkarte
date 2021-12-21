@@ -538,7 +538,7 @@ class BBCParser
 			}
 
 			// The character after the possible tag or nothing
-			$next_c = isset($this->message[$this->pos + 1 + $possible[Codes::ATTR_LENGTH]]) ? $this->message[$this->pos + 1 + $possible[Codes::ATTR_LENGTH]] : '';
+			$next_c = $this->message[$this->pos + 1 + $possible[Codes::ATTR_LENGTH]] ?? '';
 
 			// This only happens if the tag is the last character of the string
 			if ($next_c === '')
@@ -691,8 +691,8 @@ class BBCParser
 					return null;
 				}
 
-				$possible[Codes::ATTR_BEFORE] = isset($possible[Codes::ATTR_DISALLOW_BEFORE]) ? $possible[Codes::ATTR_DISALLOW_BEFORE] : $possible[Codes::ATTR_BEFORE];
-				$possible[Codes::ATTR_AFTER] = isset($possible[Codes::ATTR_DISALLOW_AFTER]) ? $possible[Codes::ATTR_DISALLOW_AFTER] : $possible[Codes::ATTR_AFTER];
+				$possible[Codes::ATTR_BEFORE] = $possible[Codes::ATTR_DISALLOW_BEFORE] ?? $possible[Codes::ATTR_BEFORE];
+				$possible[Codes::ATTR_AFTER] = $possible[Codes::ATTR_DISALLOW_AFTER] ?? $possible[Codes::ATTR_AFTER];
 			}
 		}
 
@@ -754,7 +754,7 @@ class BBCParser
 				Codes::ATTR_AFTER => '</ul>',
 				Codes::ATTR_BLOCK_LEVEL => true,
 				Codes::ATTR_REQUIRE_CHILDREN => array('li' => 'li'),
-				Codes::ATTR_DISALLOW_CHILDREN => isset($this->inside_tag[Codes::ATTR_DISALLOW_CHILDREN]) ? $this->inside_tag[Codes::ATTR_DISALLOW_CHILDREN] : null,
+				Codes::ATTR_DISALLOW_CHILDREN => $this->inside_tag[Codes::ATTR_DISALLOW_CHILDREN] ?? null,
 				Codes::ATTR_LENGTH => 4,
 				Codes::ATTR_AUTOLINK => true,
 			));
@@ -779,7 +779,7 @@ class BBCParser
 			Codes::ATTR_AFTER => '</li>',
 			Codes::ATTR_TRIM => Codes::TRIM_OUTSIDE,
 			Codes::ATTR_BLOCK_LEVEL => true,
-			Codes::ATTR_DISALLOW_CHILDREN => isset($this->inside_tag[Codes::ATTR_DISALLOW_CHILDREN]) ? $this->inside_tag[Codes::ATTR_DISALLOW_CHILDREN] : null,
+			Codes::ATTR_DISALLOW_CHILDREN => $this->inside_tag[Codes::ATTR_DISALLOW_CHILDREN] ?? null,
 			Codes::ATTR_AUTOLINK => true,
 			Codes::ATTR_LENGTH => 2,
 		));
@@ -1248,8 +1248,8 @@ class BBCParser
 		}
 		elseif (isset($tag[Codes::ATTR_DISABLED_BEFORE]) || isset($tag[Codes::ATTR_DISABLED_AFTER]))
 		{
-			$tag[Codes::ATTR_BEFORE] = isset($tag[Codes::ATTR_DISABLED_BEFORE]) ? $tag[Codes::ATTR_DISABLED_BEFORE] : (!empty($tag[Codes::ATTR_BLOCK_LEVEL]) ? '<div>' : '');
-			$tag[Codes::ATTR_AFTER] = isset($tag[Codes::ATTR_DISABLED_AFTER]) ? $tag[Codes::ATTR_DISABLED_AFTER] : (!empty($tag[Codes::ATTR_BLOCK_LEVEL]) ? '</div>' : '');
+			$tag[Codes::ATTR_BEFORE] = $tag[Codes::ATTR_DISABLED_BEFORE] ?? (!empty($tag[Codes::ATTR_BLOCK_LEVEL]) ? '<div>' : '');
+			$tag[Codes::ATTR_AFTER] = $tag[Codes::ATTR_DISABLED_AFTER] ?? (!empty($tag[Codes::ATTR_BLOCK_LEVEL]) ? '</div>' : '');
 		}
 		else
 		{
@@ -1277,7 +1277,7 @@ class BBCParser
 				$quote = empty($info[Codes::PARAM_ATTR_QUOTED]) ? '' : '&quot;';
 				$possible['optionals'][] = !empty($info[Codes::PARAM_ATTR_OPTIONAL]);
 				$possible['param_check'][] = ' ' . $param . '=' . $quote;
-				$possible['regex_cache'][] = '(\s+' . $param . '=' . $quote . (isset($info[Codes::PARAM_ATTR_MATCH]) ? $info[Codes::PARAM_ATTR_MATCH] : '(.+?)') . $quote . ')';
+				$possible['regex_cache'][] = '(\s+' . $param . '=' . $quote . ($info[Codes::PARAM_ATTR_MATCH] ?? '(.+?)') . $quote . ')';
 			}
 
 			$possible['regex_size'] = count($possible[Codes::ATTR_PARAM]) - 1;

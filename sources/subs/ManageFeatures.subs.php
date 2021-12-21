@@ -144,7 +144,7 @@ function updateAllSignatures($applied_sigs)
 					if (empty($matches[2][$ind]))
 					{
 						$matches[2][$ind] = 'em';
-						$size = isset($sizes[(int) $size]) ? $sizes[(int) $size] : 0;
+						$size = $sizes[(int) $size] ?? 0;
 					}
 
 					// Attempt to allow all sizes of abuse, so to speak.
@@ -383,7 +383,7 @@ function list_getProfileFields($start, $items_per_page, $sort, $standardFields)
 		{
 			$list[] = array(
 				'id' => $field,
-				'label' => isset($txt['standard_profile_field_' . $field]) ? $txt['standard_profile_field_' . $field] : (isset($txt[$field]) ? $txt[$field] : $field),
+				'label' => $txt['standard_profile_field_' . $field] ?? ($txt[$field] ?? $field),
 				'disabled' => in_array($field, $disabled_fields),
 				'on_register' => in_array($field, $registration_fields) && !in_array($field, $fields_no_registration),
 				'can_show_register' => !in_array($field, $fields_no_registration),

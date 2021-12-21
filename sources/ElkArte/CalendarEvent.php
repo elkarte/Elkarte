@@ -150,8 +150,8 @@ class CalendarEvent
 	public function insert($options, $member_id)
 	{
 		$eventOptions = array(
-			'id_board' => isset($options['id_board']) ? $options['id_board'] : 0,
-			'id_topic' => isset($options['id_topic']) ? $options['id_topic'] : 0,
+			'id_board' => $options['id_board'] ?? 0,
+			'id_topic' => $options['id_topic'] ?? 0,
 			'title' => Util::substr($options['evtitle'], 0, 100),
 			'member' => $member_id,
 			'start_date' => sprintf('%04d-%02d-%02d', $options['year'], $options['month'], $options['day']),
@@ -184,8 +184,8 @@ class CalendarEvent
 			$eventProperties = getEventProperties($this->_event_id, true);
 		}
 
-		$id_board = isset($eventProperties['id_board']) ? $eventProperties['id_board'] : (isset($options['id_board']) ? $options['board'] : 0);
-		$id_topic = isset($eventProperties['id_topic']) ? $eventProperties['id_topic'] : (isset($options['id_topic']) ? $options['topic'] : 0);
+		$id_board = $eventProperties['id_board'] ?? (isset($options['id_board']) ? $options['board'] : 0);
+		$id_topic = $eventProperties['id_topic'] ?? (isset($options['id_topic']) ? $options['topic'] : 0);
 
 		if (empty($this->_settings['cal_allowspan']))
 		{
@@ -240,9 +240,9 @@ class CalendarEvent
 				'board' => 0,
 				'new' => 1,
 				'eventid' => -1,
-				'year' => isset($options['year']) ? $options['year'] : $today['year'],
-				'month' => isset($options['month']) ? $options['month'] : $today['mon'],
-				'day' => isset($options['day']) ? $options['day'] : $today['mday'],
+				'year' => $options['year'] ?? $today['year'],
+				'month' => $options['month'] ?? $today['mon'],
+				'day' => $options['day'] ?? $today['mday'],
 				'title' => '',
 				'span' => 1,
 			);

@@ -80,14 +80,7 @@ class Member extends ValuesContainer
 	 */
 	public function get($item)
 	{
-		if (isset($this->data[$item]))
-		{
-			return $this->data[$item];
-		}
-		else
-		{
-			return null;
-		}
+		return $this->data[$item] ?? null;
 	}
 
 	/**
@@ -225,7 +218,7 @@ class Member extends ValuesContainer
 					'label' => $txt[$online_status]
 				),
 				'language' => Util::ucwords(strtr($this->data['lngfile'], array('_' => ' '))),
-				'is_activated' => isset($this->data['is_activated']) ? $this->data['is_activated'] : 1,
+				'is_activated' => $this->data['is_activated'] ?? 1,
 				'is_banned' => isset($this->data['is_activated']) ? $this->data['is_activated'] >= 10 : 0,
 				'options' => $this->data['options'],
 				'is_guest' => false,

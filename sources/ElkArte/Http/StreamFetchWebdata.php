@@ -137,7 +137,7 @@ class StreamFetchWebdata
 			// Get the elements for the url
 			$this->_url = parse_url($url);
 
-			$this->_url['path'] = (isset($this->_url['path']) ? $this->_url['path'] : '/') . (isset($this->_url['query']) ? '?' . $this->_url['query'] : '');
+			$this->_url['path'] = ($this->_url['path'] ?? '/') . (isset($this->_url['query']) ? '?' . $this->_url['query'] : '');
 			$this->_response['url'] = $this->_url['scheme'] . '://' . $this->_url['host'] . $this->_url['path'];
 		}
 
@@ -314,7 +314,7 @@ class StreamFetchWebdata
 		}
 		else
 		{
-			return isset($this->_response[$area]) ? $this->_response[$area] : $this->_response;
+			return $this->_response[$area] ?? $this->_response;
 		}
 	}
 }

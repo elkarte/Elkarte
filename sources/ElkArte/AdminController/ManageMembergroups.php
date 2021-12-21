@@ -786,7 +786,7 @@ class ManageMembergroups extends AbstractController
 			'min_posts' => $row['min_posts'],
 			'max_messages' => $row['max_messages'],
 			'icon_count' => (int) $row['icons'][0],
-			'icon_image' => isset($row['icons'][1]) ? $row['icons'][1] : '',
+			'icon_image' => $row['icons'][1] ?? '',
 			'is_post_group' => $row['min_posts'] != -1,
 			'type' => $row['min_posts'] != -1 ? 0 : $row['group_type'],
 			'hidden' => $row['min_posts'] == -1 ? $row['hidden'] : 0,

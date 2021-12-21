@@ -192,7 +192,7 @@ class Db extends Adapter
 			}
 			foreach ($configVar['mask'] as $key => $mask)
 			{
-				$rules[$configVar[1]][] = isset($known_rules[$mask]) ? $known_rules[$mask] : $mask;
+				$rules[$configVar[1]][] = $known_rules[$mask] ?? $mask;
 			}
 			if (!empty($rules))
 			{
@@ -259,7 +259,7 @@ class Db extends Adapter
 		}
 
 		$permissionsForm = new InlinePermissions();
-		$permissionsForm->setExcludedGroups(isset($context['permissions_excluded']) ? $context['permissions_excluded'] : array());
+		$permissionsForm->setExcludedGroups($context['permissions_excluded'] ?? array());
 		$permissionsForm->setPermissions($inlinePermissions);
 		$permissionsForm->prepare();
 	}

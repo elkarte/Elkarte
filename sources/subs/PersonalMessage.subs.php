@@ -839,7 +839,7 @@ function sendpm($recipients, $subject, $message, $store_outbox = true, $from = n
 			$notifications[empty($row['lngfile']) || empty($modSettings['userLanguage']) ? $language : $row['lngfile']][] = $row['email_address'];
 		}
 
-		$log['sent'][$row['id_member']] = sprintf(isset($txt['pm_successfully_sent']) ? $txt['pm_successfully_sent'] : '', $row['real_name']);
+		$log['sent'][$row['id_member']] = sprintf($txt['pm_successfully_sent'] ?? '', $row['real_name']);
 	}
 	$request->free_result();
 
@@ -1056,7 +1056,7 @@ function loadPMs($pm_options, $id_member)
 					'current_member' => $id_member,
 					'not_deleted' => 0,
 					'id_member' => $pm_options['folder'] == 'sent' ? 'pmr.id_member' : 'pm.id_member_from',
-					'id_pm' => isset($pm_options['pmsg']) ? $pm_options['pmsg'] : '0',
+					'id_pm' => $pm_options['pmsg'] ?? '0',
 					'sort' => $pm_options['sort_by_query'],
 				)
 			)->fetch_callback(

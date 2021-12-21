@@ -377,7 +377,7 @@ class Gd2 extends AbstractManipulator
 		// Read the EXIF data
 		$exif = function_exists('exif_read_data') ? @exif_read_data($this->_fileName) : array();
 
-		$this->orientation = isset($exif['Orientation']) ? $exif['Orientation'] : 0;
+		$this->orientation = $exif['Orientation'] ?? 0;
 
 		// We're only interested in the exif orientation
 		return (int) $this->orientation;

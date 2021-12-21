@@ -607,7 +607,7 @@ function updateBoardsLastMessage()
 		array()
 	)->fetch_callback(
 		function ($row) use (&$resort_me, $realBoardCounts) {
-			$row['local_last_msg'] = isset($realBoardCounts[$row['id_board']]) ? $realBoardCounts[$row['id_board']] : 0;
+			$row['local_last_msg'] = $realBoardCounts[$row['id_board']] ?? 0;
 			$resort_me[$row['child_level']][] = $row;
 		}
 	);

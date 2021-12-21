@@ -331,7 +331,7 @@ class ManageAttachments extends AbstractController
 		$txt['attach_current_dir_warning'] = str_replace('{attach_repair_url}', getUrl('admin', ['action' => 'admin', 'area' => 'manageattachments', 'sa' => 'attachpaths']), $txt['attach_current_dir_warning']);
 
 		$txt['attachment_path'] = $context['attachmentUploadDir'];
-		$txt['basedirectory_for_attachments_path'] = isset($modSettings['basedirectory_for_attachments']) ? $modSettings['basedirectory_for_attachments'] : '';
+		$txt['basedirectory_for_attachments_path'] = $modSettings['basedirectory_for_attachments'] ?? '';
 		$txt['use_subdirectories_for_attachments_note'] = empty($modSettings['attachment_basedirectories']) || empty($modSettings['use_subdirectories_for_attachments']) ? $txt['use_subdirectories_for_attachments_note'] : '';
 		$txt['attachmentUploadDir_multiple_configure'] = '<a class="linkbutton" href="' . getUrl('admin', ['action' => 'admin', 'area' => 'manageattachments', 'sa' => 'attachpaths']) . '">' . $txt['attachmentUploadDir_multiple_configure'] . '</a>';
 		$txt['attach_current_dir'] = $attachmentsDir->autoManageEnabled() ? $txt['attach_last_dir'] : $txt['attach_current_dir'];
@@ -922,7 +922,7 @@ class ManageAttachments extends AbstractController
 		);
 
 		$to_fix = !empty($_SESSION['attachments_to_fix']) ? $_SESSION['attachments_to_fix'] : array();
-		$context['repair_errors'] = isset($_SESSION['attachments_to_fix2']) ? $_SESSION['attachments_to_fix2'] : $context['repair_errors'];
+		$context['repair_errors'] = $_SESSION['attachments_to_fix2'] ?? $context['repair_errors'];
 		$fix_errors = isset($this->_req->query->fixErrors) ? true : false;
 
 		// Get stranded thumbnails.
@@ -1381,7 +1381,7 @@ class ManageAttachments extends AbstractController
 						unset($attachment_basedirectories[$id]);
 						$update = (array(
 							'attachment_basedirectories' => !empty($attachment_basedirectories) ? serialize($attachment_basedirectories) : '',
-							'basedirectory_for_attachments' => isset($attachmentUploadDir[$this->current_base_dir]) ? $attachmentUploadDir[$this->current_base_dir] : '',
+							'basedirectory_for_attachments' => $attachmentUploadDir[$this->current_base_dir] ?? '',
 						));
 					}
 				}
