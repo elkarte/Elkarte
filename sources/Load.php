@@ -527,6 +527,8 @@ function loadBoard()
  * - Load permissions from the general permissions table.
  * - If inside a board load the necessary board permissions.
  * - If the user is not a guest, identify what other boards they have access to.
+ *
+ * @throws \ElkArte\Exceptions\Exception
  */
 function loadPermissions()
 {
@@ -704,7 +706,7 @@ function loadPermissions()
 function loadTheme($id_theme = 0, $initialize = true)
 {
 	Errors::instance()->log_deprecated('loadTheme()', '\\ElkArte\\Themes\\ThemeLoader');
-	new ElkArte\Themes\ThemeLoader($id_theme, $initialize);
+	new ThemeLoader($id_theme, $initialize);
 }
 
 /**
@@ -738,7 +740,7 @@ function loadUserContext()
 	{
 		$context['user']['name'] = User::$info->name;
 	}
-	elseif ($context['user']['is_guest'] && !empty($txt['guest_title']))
+	elseif (!empty($txt['guest_title']))
 	{
 		$context['user']['name'] = $txt['guest_title'];
 	}
@@ -806,7 +808,6 @@ function loadEssentialThemeData()
  * @deprecated since 2.0; use the theme object
  *
  * @uses the requireTemplate() function to actually load the file.
- * @throws \ElkArte\Exceptions\Exception
  */
 function loadTemplate($template_name, $style_sheets = array(), $fatal = true)
 {
@@ -831,7 +832,6 @@ function loadTemplate($template_name, $style_sheets = array(), $fatal = true)
  *
  * @return bool
  * @deprecated since 2.0; use the theme object
- * @throws \ElkArte\Exceptions\Exception
  */
 function loadSubTemplate($sub_template_name, $fatal = false)
 {
@@ -1066,7 +1066,7 @@ function loadAssetFile($filenames, $params = array(), $id = '')
 				}
 			}
 
-			// Save it so we don't have to build this so often
+			// Save it, so we don't have to build this so often
 			$cache->put($cache_name, $this_build, 600);
 		}
 	}
@@ -1304,7 +1304,7 @@ function getLanguages($use_cache = true)
 		// If we don't have our theme information yet, lets get it.
 		if (empty($settings['default_theme_dir']))
 		{
-			new ElkArte\Themes\ThemeLoader(0, false);
+			new ThemeLoader(0, false);
 		}
 
 		// Default language directories to try.
@@ -1361,7 +1361,7 @@ function getLanguages($use_cache = true)
 			$dir->close();
 		}
 
-		// Lets cash in on this deal.
+		// Let's cash in on this deal.
 		$cache->put('known_languages', $languages, $cache->isEnabled() && $cache->levelLowerThan(1) ? 86400 : 3600);
 	}
 
@@ -1378,7 +1378,7 @@ function loadDatabase()
 	// Database stuffs
 	require_once(SOURCEDIR . '/database/Database.subs.php');
 
-	// Safe guard here, if there isn't a valid connection lets put a stop to it.
+	// Safeguard here, if there isn't a valid connection lets put a stop to it.
 	try
 	{
 		$db = database(false);
@@ -1394,7 +1394,7 @@ function loadDatabase()
 		$db_prefix = $db->fix_prefix($db_prefix, $db_name);
 	}
 
-	// Case sensitive database? Let's define a constant.
+	// Case-sensitive database? Let's define a constant.
 	// @NOTE: I think it is already taken care by the abstraction, it should be possible to remove
 	if ($db->case_sensitive() && !defined('DB_CASE_SENSITIVE'))
 	{

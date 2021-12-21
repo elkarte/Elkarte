@@ -17,7 +17,6 @@
 
 use ElkArte\Request;
 use Elkarte\User;
-use ElkArte\Util;
 
 /**
  * Clean the request variables - add html entities to GET.
@@ -91,13 +90,13 @@ function ob_sessrewrite($buffer)
 	global $scripturl;
 
 	// If $scripturl is set to nothing, or the SID is not defined (SSI?) just quit.
-	if ($scripturl == '' || !defined('SID'))
+	if ($scripturl === '' || !defined('SID'))
 	{
 		return $buffer;
 	}
 
 	// Do nothing if the session is cookied, or they are a crawler - guests are caught by redirectexit().
-	if (empty($_COOKIE) && SID != '' && empty(User::$info->possibly_robot))
+	if (empty($_COOKIE) && SID !== '' && empty(User::$info->possibly_robot))
 	{
 		$buffer = preg_replace('/(?<!<link rel="canonical" href=)"' . preg_quote($scripturl, '/') . '(?!\?' . preg_quote(SID, '/') . ')\\??/', '"' . $scripturl . '?' . SID . '&amp;', $buffer);
 	}

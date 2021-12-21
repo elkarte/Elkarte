@@ -40,7 +40,6 @@ use ElkArte\Util;
  * @param string $type = admin
  *
  * @return bool|string
- * @throws \ElkArte\Exceptions\Exception
  */
 function validateSession($type = 'admin')
 {
@@ -884,7 +883,7 @@ function checkSession($type = 'post', $from_action = '', $is_fatal = true)
 }
 
 /**
- * Lets give you a token of our appreciation.
+ * Let's give you a token of our appreciation.
  *
  * What it does:
  *
@@ -968,7 +967,7 @@ function validateToken($action, $type = 'post', $reset = true, $fatal = true)
 	$csrf_hash = hash('sha1', $passed_token_var . $req->client_ip() . $req->user_agent());
 
 	// Checked what was passed in combination with the user agent
-	if (isset($_SESSION['token'][$token_index], $passed_token_var)
+	if (isset($passed_token_var)
 		&& $csrf_hash === $_SESSION['token'][$token_index][1])
 	{
 		// Consume the token, let them pass
@@ -1195,7 +1194,7 @@ function allowedTo($permission, $boards = null)
 		)
 	);
 
-	// Make sure they can do it on all of the boards.
+	// Make sure they can do it on all the boards.
 	if ($request->num_rows() != count($boards))
 	{
 		return false;
@@ -1412,14 +1411,13 @@ function boardsAllowedTo($permissions, $check_access = true, $simple = true)
  * @param int $userProfile_id
  *
  * @return string (yes, yes_permission_override, no_through_forum, no)
- * @throws \ElkArte\Exceptions\Exception
  */
 function showEmailAddress($userProfile_hideEmail, $userProfile_id)
 {
 	// Should this user's email address be shown?
 	// If you're guest: no.
 	// If the user is post-banned: no.
-	// If it's your own profile and you've not set your address hidden: yes_permission_override.
+	// If it's your own profile, and you've not set your address hidden: yes_permission_override.
 	// If you're a moderator with sufficient permissions: yes_permission_override.
 	// If the user has set their profile to do not email me: no.
 	// Otherwise: no_through_forum. (don't show it but allow emailing the member)
@@ -1455,7 +1453,7 @@ function showEmailAddress($userProfile_hideEmail, $userProfile_id)
  * - The time taken depends on error_type - generally uses the modSetting.
  * - Generates a fatal message when triggered, suspending execution.
  *
- * @event integrate_spam_protection Allows to update action wait timeOverrides
+ * @event integrate_spam_protection Allows updating action wait timeOverrides
  * @param string $error_type used also as a $txt index. (not an actual string.)
  * @param bool $fatal is the spam check a fatal error on failure
  *
@@ -1612,10 +1610,10 @@ function secureDirectory($path, $allow_localhost = false, $files = '*')
  */
 
 // Look for Settings.php....
-if (file_exists(dirname(dirname(__FILE__)) . \'/Settings.php\'))
+if (file_exists(dirname(__FILE__), 2) . \'/Settings.php\'))
 {
 	// Found it!
-	require(dirname(dirname(__FILE__)) . \'/Settings.php\');
+	require(dirname(__FILE__), 2) . \'/Settings.php\');
 	header(\'Location: \' . $boardurl);
 }
 // Can\'t find it... just forget it.
@@ -1641,7 +1639,7 @@ else
  *
  * What it does:
  *
- * - Builds the query for ipv6, ipv4 or 255.255.255.255 depending on whats supplied
+ * - Builds the query for ipv6, ipv4 or 255.255.255.255 depending on what's supplied
  *
  * @param string $fullip An IP address either IPv6 or not
  *
@@ -1901,7 +1899,7 @@ function isAdminSessionActive()
  * * 'title'    - $txt['security_risk']
  * * 'errors'    - An array of strings with the key being the filename and the value an error with the filename in it
  *
- * @event integrate_security_files Allows to add / modify to security files array
+ * @event integrate_security_files Allows adding / modifying security files array
  *
  * @return bool
  */

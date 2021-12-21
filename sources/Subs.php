@@ -243,7 +243,6 @@ function byte_format($number)
 {
 	global $txt;
 
-	$kb = '';
 	foreach (array('byte', 'kilobyte', 'megabyte', 'gigabyte') as $kb)
 	{
 		if ($number < 1024)
@@ -1198,7 +1197,7 @@ function remove_integration_function($hook, $function, $file = '')
  * - Uses capture group 2 in the supplied array
  * - Does basic scan to ensure characters are inside a valid range
  *
- * @param mixed[] $matches matches from a preg_match_all
+ * @param array $matches matches from a preg_match_all
  *
  * @return string $string
  */
@@ -1410,7 +1409,7 @@ function currentContext($messages_request, $reset = false)
  * @param bool $assoc if the array is a assoc array with named keys or a basic index array
  * @param bool $strict search for identical elements, this means it will also check the types of the needle.
  *
- * @return array|mixed[]
+ * @return array
  */
 function elk_array_insert($input, $key, $insert, $where = 'before', $assoc = true, $strict = false)
 {
@@ -1486,7 +1485,6 @@ function scheduleTaskImmediate($task)
  *
  * @param string $task the name of a scheduled task
  * @param bool $calculateNextTrigger if recalculate the next task to execute
- * @throws \ElkArte\Exceptions\Exception
  */
 function removeScheduleTaskImmediate($task, $calculateNextTrigger = true)
 {
@@ -1567,7 +1565,7 @@ function replaceBasicActionUrl($string)
  * - Calls integration hook integrate_list_"unique_list_id" to allow easy modifying
  *
  * @event integrate_list_$listID called before every createlist to allow access to its listoptions
- * @param mixed[] $listOptions associative array of option => value
+ * @param array $listOptions associative array of option => value
  */
 function createList($listOptions)
 {
@@ -1977,7 +1975,7 @@ function isValidIPv6($ip)
 }
 
 /**
- * Converts IPv6s to numbers.  This makes ban checks much easier.
+ * Converts IPv6s to numbers.  These make ban checks much easier.
  *
  * @param string $ip ip address to be converted
  *
