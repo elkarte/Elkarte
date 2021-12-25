@@ -1,0 +1,128 @@
+ul.features {
+	list-style-type: square;
+	margin-left: 2em;
+}
+
+#gotop, #gobottom {
+	display: none;
+}
+.button_title img {
+	vertical-align: top;
+}
+a.btn {
+	color: #444;
+}
+#upshrink .collapse {
+	display: block;
+}
+:before, :after {
+	box-sizing: initial;
+}
+.collapse {
+	display: block;
+}
+#search_form input, #search_form select, #top_section_notice input, #top_section_notice select {
+	font: 87.5%/150% "Segoe UI","Helvetica Neue","Liberation Sans","Nimbus Sans L","Trebuchet MS",Arial,sans-serif;
+}
+.top_button  {
+	max-height: none;
+}
+#news {
+	display: none;
+}
+.navigate_section {
+	display: none;
+}
+#contribs {
+	padding: 1em 0;
+}
+#top_section aside {
+  display: none;
+}
+#collapse_button {
+  display: none;
+}
+.text-green {
+	color: #88b93d;
+	text-shadow: 1px 1px 1px #777;
+	display: inline-block;
+	float: right;
+	padding: 0 0 10px 10px;
+	margin-top: -15px;
+}
+.text-red {
+	color: orange;
+	text-shadow: 1px 1px 1px #777;
+	float: right;
+	padding: 0 0 10px 10px;
+	margin-top: -15px;
+}
+.text-blue {
+	color: #5dcbe7;
+	text-shadow: 1px 1px 1px #777;
+	float: right;
+	padding: 0 0 10px 10px;
+	margin-top: -15px;
+}
+.text-gold {
+	color: #DAA520;
+	float: right;
+	padding: 0 0 10px 10px;
+	margin-top: -15px;
+}
+.column {
+	display: inline-table;
+	width: 25%;
+	margin-top: 1em;
+	padding: 0 15px;
+	color: #ffffff;
+	font-size: .9em;
+	white-space:nowrap;
+	line-height: 1.5;
+}
+.column .fa {
+	color: #222;
+}
+.fa-group {
+	padding-top: 5px;
+}
+.fa-15x {
+	font-size: 1.5em !important;
+}
+#ext {
+	list-style: none;
+	margin: 0;
+	clear: both;
+}
+.column h4 {
+	color: #222;
+	font-weight: bold;
+	font-size: 1.5em;
+	margin: 0 0 10px 0;
+	border-bottom: 2px dotted #222;
+}
+.toppad {
+	padding-top: 1em;
+}
+.column a:link, .column a:visited {
+	color: #222;
+	display: block;
+}
+#git_commits > ul  > li {
+	margin: 5px 0;
+}
+
+@media screen and (max-width: 50em) {
+	body {
+		padding-top: 55px;
+	}
+
+	.listlevel1 {
+/* 		font-size: 20px; */
+		margin: 0px;
+	}
+
+	.icon {
+		box-sizing: content-box;
+	}
+}
