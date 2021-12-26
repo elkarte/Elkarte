@@ -427,7 +427,7 @@ class Post extends AbstractController
 		$ns = $this->_req->getPost('ns', 'isset', false);
 		$notify = $this->_req->getPost('notify', 'isset', false);
 		$quote = $this->_req->getRequest('quote', 'intval', 0);
-		$followup = $this->_req->getPost('followup', 'intval', 0);
+		$followup = $this->_req->getRequest('followup', 'intval', 0);
 		$not_approved = $this->_req->getPost('not_approved', 'empty', true);
 		$last_msg = $this->_req->getRequest('last_msg', 'intval', null);
 		$icon = $this->_req->getPost('icon', 'trim', 'xx');
@@ -600,7 +600,7 @@ class Post extends AbstractController
 		global $context, $txt, $modSettings;
 
 		$quote = $this->_req->getRequest('quote', 'intval', 0);
-		$followup = $this->_req->getPost('followup', 'intval', 0);
+		$followup = $this->_req->getRequest('followup', 'intval', 0);
 
 		// By default....
 		$context['use_smileys'] = true;
