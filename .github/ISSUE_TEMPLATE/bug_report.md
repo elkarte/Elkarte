@@ -11,6 +11,7 @@ Provide a clear and concise description of what the problem is.
 2. What ElkArte version are you using?
 3. When did the issue start?
 4. What version of PHP are you running?
+5. MySQL or PostgreSQL and what version?
 
 **To Reproduce**
 Steps to reproduce the behavior:
