@@ -29,9 +29,9 @@ class TestCurlFetchWebdata extends TestCase
 			),
 			array(
 				'https://duckduckgo.com/html',
-				array('q' => 'elkarte+forum site:elkarte.net', 'ia' => 'about'),
+				array('q' => 'stargate+sg1 site:www.imdb.com', 'ia' => 'about'),
 				200,
-				'ElkArte, Free and Open Source Community Forum Software',
+				'television series',
 			),
 		);
 

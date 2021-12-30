@@ -28,10 +28,10 @@ class TestFsockFetchWebdata extends TestCase
 				'all we know',
 			),
 			array(
-				'https://www.elkarte.net/community/index.php?action=search;sa=results',
-				array('search' => 'panatone', 'search_selection' => 'all', 'advanced' => 0),
+				'https://duckduckgo.com/html',
+				array('q' => 'stargate+sg1 site:www.imdb.com', 'kl' => 'us-en', 'df' => ''),
 				200,
-				'value="panatone"',
+				'television series',
 			),
 		);
 
@@ -50,10 +50,10 @@ class TestFsockFetchWebdata extends TestCase
 				404,
 			),
 			array(
-				'http://elkarte.net',
+				'http://elkarte.github.io/addons/',
 				200,
-				'ElkArte, Free and Open Source Community Forum Software',
-				2
+				'Addons to extend',
+				1
 			),
 		);
 	}
@@ -81,13 +81,13 @@ class TestFsockFetchWebdata extends TestCase
 
 			// Check for correct results
 			if (!empty($testcase[1]))
-				$this->assertEquals($testcase[1], $fsock->result('code'));
+				$this->assertEquals($testcase[1], $fsock->result('code'), 'FetchCodeError:: ' . $testcase[0]);
 
 			if (!empty($testcase[2]))
-				$this->assertStringContainsString($testcase[2], $fsock->result('body'));
+				$this->assertStringContainsString($testcase[2], $fsock->result('body'), 'FetchBodyError:: ' . $testcase[0]);
 
 			if (!empty($testcase[3]))
-				$this->assertEquals($testcase[3], $fsock->result('redirects'));
+				$this->assertEquals($testcase[3], $fsock->result('redirects'), 'FetchRedirectError:: ' . $testcase[0]);
 		}
 	}
 
@@ -106,10 +106,10 @@ class TestFsockFetchWebdata extends TestCase
 
 			// Check for correct fetch
 			if (!empty($testcase[2]))
-				$this->assertEquals($testcase[2], $fsock->result('code'));
+				$this->assertEquals($testcase[2], $fsock->result('code'), 'PostCodeError:: ' . $testcase[0]);
 
 			if (!empty($testcase[3]))
-				$this->assertStringContainsString($testcase[3], $fsock->result('body'));
+				$this->assertStringContainsString($testcase[3], $fsock->result('body'), 'PostBodyError:: ' . $testcase[0]);
 		}
 	}
 }
