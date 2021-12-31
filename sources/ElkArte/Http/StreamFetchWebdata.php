@@ -143,6 +143,10 @@ class StreamFetchWebdata
 
 		// Build out the options for our context stream
 		$this->_options = array(
+			'ssl' => array(
+				'verify_peer' => false,
+				'verify_peername' => false
+			),
 			'http' =>
 				array(
 					'method' => 'GET',
@@ -150,10 +154,11 @@ class StreamFetchWebdata
 					'ignore_errors' => true,
 					'protocol_version' => 1.1,
 					'follow_location' => 1,
+					'timeout' => 10,
 					'header' => array(
 						'Connection: ' . ($this->_keep_alive ? 'Keep-Alive' : 'close'),
-						'User-Agent: PHP/ELK',
-						'Content-type: application/x-www-form-urlencoded',
+						'User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML like Gecko) Chrome/51.0.2704.79 Safari/537.36 Edge/14.14931',
+						'Content-Type: application/x-www-form-urlencoded',
 					),
 				)
 		);
@@ -183,7 +188,7 @@ class StreamFetchWebdata
 		try
 		{
 			$context = stream_context_create($this->_options);
-			$this->_fp = fopen($this->_response['url'], 'r', false, $context);
+			$this->_fp = fopen($this->_response['url'], 'rb', false, $context);
 		}
 		catch (\Exception $e)
 		{

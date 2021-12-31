@@ -28,10 +28,10 @@ class TestStreamFetchWebdata extends TestCase
 				'firstname=elkarte&lastname=forum&nbsp;',
 			),
 			array(
-				'https://www.elkarte.net/community/index.php?action=search;sa=results',
-				array('search' => 'panatone', 'search_selection' => 'all', 'advanced' => 0),
+				'https://html.duckduckgo.com/html',
+				array('q' => 'stargate+sg1 site:www.imdb.com', 'kl' => 'us-en', 'df' => ''),
 				200,
-				'value="panatone"',
+				'television series',
 			),
 		);
 
@@ -49,10 +49,10 @@ class TestStreamFetchWebdata extends TestCase
 				404,
 			),
 			array(
-				'http://elkarte.net',
+				'http://elkarte.github.io/addons/',
 				200,
-				'ElkArte, Free and Open Source Community Forum Software',
-				2
+				'Addons to extend',
+				1
 			),
 		);
 	}
@@ -86,7 +86,7 @@ class TestStreamFetchWebdata extends TestCase
 				$this->assertStringContainsString($testcase[2], $fsock->result('body'), 'FetchBodyError:: ' . $testcase[0]);
 
 			if (!empty($testcase[3]))
-				$this->assertEquals($testcase[3], $fsock->result('redirects'), 'FectchRedirectError:: ' . $testcase[0]);
+				$this->assertEquals($testcase[3], $fsock->result('redirects'), 'FetchRedirectError:: ' . $testcase[0]);
 		}
 	}
 
@@ -95,7 +95,7 @@ class TestStreamFetchWebdata extends TestCase
 	 */
 	public function testStreamPost()
 	{
-		// Start curl, pass some default values for a test
+		// Start stream, pass some default values for a test
 		$fsock = new StreamFetchWebdata(array(), 3);
 
 		foreach ($this->post_testcases as $testcase)

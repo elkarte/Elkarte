@@ -229,11 +229,10 @@ class FsockFetchWebdata
 	 */
 	private function _makeRequest()
 	{
-		$request = '';
-		$request .= (empty($this->_post_data) ? 'GET ' : 'POST ') . $this->_url['path'] . ' HTTP/1.1' . "\r\n";
+		$request = (empty($this->_post_data) ? 'GET ' : 'POST ') . $this->_url['path'] . ' HTTP/1.1' . "\r\n";
 		$request .= 'Host: ' . $this->_url['host_raw'] . "\r\n";
 		$request .= $this->_keepAlive();
-		$request .= 'User-Agent: PHP/ELK' . "\r\n";
+		$request .= 'User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML like Gecko) Chrome/51.0.2704.79 Safari/537.36 Edge/14.14931' . "\r\n";
 		$request .= 'Content-Type: application/x-www-form-urlencoded' . "\r\n";
 
 		if (!empty($this->_content_length))
