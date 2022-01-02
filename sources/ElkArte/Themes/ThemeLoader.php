@@ -14,6 +14,7 @@
 namespace ElkArte\Themes;
 
 use ElkArte\Cache\Cache;
+use ElkArte\Errors\Errors;
 use ElkArte\ext\Composer\Autoload\ClassLoader;
 use ElkArte\Hooks;
 use ElkArte\HttpReq;
