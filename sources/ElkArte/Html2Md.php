@@ -763,17 +763,9 @@ class Html2Md
 		$alt = $node->getAttribute('alt');
 		$title = $node->getAttribute('title');
 
-		$markdown = !empty($title)
+		return !empty($title)
 			? '![' . $alt . '](' . $src . ' "' . $title . '")'
 			: '![' . $alt . '](' . $src . ')';
-
-		// Adjust width if needed to maintain the image
-		$this->_check_link_lenght($markdown);
-
-		// Adjust width if needed to maintain the image
-		$this->_check_link_lenght($markdown);
-
-		return $markdown;
 	}
 
 	/**
