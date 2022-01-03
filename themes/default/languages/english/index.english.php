@@ -3,7 +3,7 @@
 
 global $forum_copyright;
 
-// Locale (strftime, pspell_new) and spelling. (pspell_new, can be left as '' normally.)
+// Locale (elk_strftime, pspell_new) and spelling. (pspell_new, can be left as '' normally.)
 // For more information see:
 //   - http://www.php.net/function.pspell-new
 //   - http://www.php.net/function.setlocale

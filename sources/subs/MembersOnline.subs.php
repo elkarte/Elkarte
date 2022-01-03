@@ -239,7 +239,7 @@ function trackStatsUsersOnline($total_users_online)
 			'mostDate' => time()
 		);
 
-	$date = strftime('%Y-%m-%d', forum_time(false));
+	$date = elk_strftime('%Y-%m-%d', forum_time(false));
 
 	// No entry exists for today yet?
 	if (!isset($modSettings['mostOnlineUpdated']) || $modSettings['mostOnlineUpdated'] != $date)
