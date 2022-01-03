@@ -1368,7 +1368,7 @@ a.bbc_link {
 /* Level 1 Menu bar: link or button. */
 .linklevel1 {
 	display: block;
-	margin: 0 .2em;
+	margin: 0 .1em;
 	padding: 0 .4em;
 	white-space: nowrap;
 	border: 1px solid;
@@ -2799,10 +2799,11 @@ nav > .quickbuttons, menu > .quickbuttons {
 }
 
 /* The MAIN post container, holds one entire post including .poster
-   and all of the postarea data */
+   and all of the postarea data.  The postarea has a min of 0 to prevent
+    items like <pre> from blowing out the grid */
 .post_wrapper {
 	display: grid;
-	grid-template-columns: [poster] 225px [postarea] auto;
+	grid-template-columns: [poster] 225px [postarea] minmax(0, auto);
 	grid-template-rows: [keyinfo] auto [messageContent] auto [attachments] auto [quickbuttons] auto [signature] auto;
 	padding-top: 1em;
 }
