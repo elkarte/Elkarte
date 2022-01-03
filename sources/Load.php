@@ -2940,3 +2940,96 @@ function serializeToJson($variable, $save_callback = null)
 
 	return $array_form;
 }
+
+/*
+* Provide a PHP 8.1 version of strftime
+*
+* @param string $format of the date/time to return
+* @param int|null $timestamp to convert
+* @return string|false
+*/
+function elk_strftime(string $format, int $timestamp = null)
+{
+	if (function_exists('strftime') && (PHP_VERSION_ID < 80100))
+		return strftime($format, $timestamp);
+
+	if (is_null($timestamp))
+		$timestamp = time();
+
+	$date_equivalents = array (
+		'%a' => 'D',
+		'%A' => 'l',
+		'%d' => 'd',
+		'%e' => 'j',
+		'%j' => 'z',
+		'%u' => 'N',
+		'%w' => 'w',
+		// Week
+		'%U' => '',	// Week Number of the given year
+		'%V' => 'W',
+		'%W' => '',
+		// Month
+		'%b' => 'M',
+		'%B' => 'F',
+		'%h' => 'M',
+		'%m' => 'm',
+		// Year
+		'%C' => '', // Two digit representation of the century
+		'%g' => 'y',
+		'%G' => 'o',
+		'%y' => 'y',
+		'%Y' => 'Y',
+		// Time
+		'%H' => 'H',
+		'%k' => 'G',
+		'%I' => 'h',
+		'%l' => 'g',
+		'%M' => 'i',
+		'%p' => 'A',
+		'%P' => 'a',
+		'%r' => 'H:i:s a',
+		'%R' => 'H:i',
+		'%S' => 's',
+		'%T' => 'h:m:s',
+		'%X' => '', // Preferred time representation based upon locale
+		'%z' => 'O',
+		'%Z' => 'T',
+		// Time and Date Stamps
+		'%c' => 'c',
+		'%D' => 'm/d/y',
+		'%F' => 'y/m/d',
+		'%s' => 'U',
+		'%x' => '', // Locale based date representation
+		// Misc
+		'%n' => "\n",
+		'%t' => "\t",
+		'%%' => '%',
+	);
+
+	$format = preg_replace_callback(
+		'/%[A-Za-z]{1}/',
+		function($matches) use ($timestamp, $date_equivalents)
+		{
+			$new_format = str_replace(array_keys($date_equivalents), array_values($date_equivalents), $matches[0]);
+			return date($new_format, $timestamp);
+		},
+		$format
+	);
+
+	return $format;
+}
+
+/*
+* Provide a PHP 8.1 version of gmstrftime
+*
+* @param string $format of the date/time to return
+* @param int|null $timestamp to convert
+* @return string|false
+*/
+function elk_gmstrftime(string $format, int $timestamp = null)
+{
+	if (function_exists('gmstrftime') && (PHP_VERSION_ID < 80100))
+		return gmstrftime($format, $timestamp);
+	
+	return elk_strftime($format, $timestamp);
+}
