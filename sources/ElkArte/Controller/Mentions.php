@@ -114,6 +114,8 @@ class Mentions extends AbstractController
 			throw new Exception('no_access', false);
 		}
 
+		require_once(SUBSDIR . '/Mentions.subs.php');
+
 		$this->_known_mentions = $this->_findMentionTypes();
 	}
 
@@ -311,7 +313,7 @@ class Mentions extends AbstractController
 							global $txt, $settings;
 
 							$mark = empty($row['status']) ? 'read' : 'unread';
-							$opts = '<a href="' . getUrl('action', ['action' => 'mentions', 'sa' => 'updatestatus', 'mark' => $mark, 'item' => $row['id_mention'] . '{session_data}']) . '"><img title="' . $txt['mentions_mark' . $mark] . '" src="' . $settings['images_url'] . '/icons/mark_' . $mark . '.png" alt="*" /></a>&nbsp;';
+							$opts = '<a href="' . getUrl('action', ['action' => 'mentions', 'sa' => 'updatestatus', 'mark' => $mark, 'item' => $row['id_mention'], '{session_data}']) . '"><img title="' . $txt['mentions_mark' . $mark] . '" src="' . $settings['images_url'] . '/icons/mark_' . $mark . '.png" alt="*" /></a>&nbsp;';
 
 							return $opts . '<a href="' . getUrl('action', ['action' => 'mentions', 'sa' => 'updatestatus', 'mark' => 'delete', 'item' => $row['id_mention'], '{session_data}']) . '"><i class="icon i-remove" title="' . $txt['delete'] . '"></i></a>';
 						},
