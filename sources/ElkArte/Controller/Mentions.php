@@ -442,7 +442,7 @@ class Mentions extends AbstractController
 			case 'readall':
 				ThemeLoader::loadLanguageFile('Mentions');
 				$mentions = $this->list_loadMentions((int) $this->_page, $this->_items_per_page, $this->_sort, $this->_all, $this->_type);
-				$mentioning->markread($mentions);
+				$mentioning->markread(array_column($mentions, 'id_mention'));
 				break;
 		}
 
