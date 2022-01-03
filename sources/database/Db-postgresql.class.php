@@ -1077,11 +1077,13 @@ class Database_PostgreSQL extends Database_Abstract
 	public function seekCounter($resource)
 	{
 		global $db_row_count;
-		static $prev_id = null;
 
-		if(!is_resource($resource) && ($resource instanceof \PgSql\Result)) {
+		if(!is_resource($resource) && ($resource instanceof \PgSql\Result))
+		{
 			$id = spl_object_id($resource);
-		} else {
+		}
+		else
+		{
 			$id = (int)$resource;
 		}
 
