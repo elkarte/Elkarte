@@ -5305,14 +5305,12 @@ Stef                       ^
 .warningbox, .successbox, .infobox, .errorbox {
 	padding-left: 2.75em;
 	background-repeat: no-repeat;
-	background-position: 6px 50%;
-	background-size: 20px 20px;
+	background-position: 4px 50%;
+	background-size: 24px 24px;
 }
 
 .errorbox {
 	margin-bottom: 1em;
-	background-position: 4px 50%;
-	background-size: 24px 24px;
 }
 
 .border_error {
