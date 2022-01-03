@@ -39,6 +39,7 @@ class Errors extends AbstractModel
 		'critical',
 		'database',
 		'undefined_vars',
+		'blocked',
 		'user',
 		'template',
 		'debug',
@@ -517,7 +518,7 @@ class Errors extends AbstractModel
 			ThemeLoader::loadLanguageFile('Errors', $language);
 			$this->log_error(
 				sprintf($txt['invalid_access'], $_SERVER['REMOTE_ADDR']),
-				'user'
+				'blocked'
 			);
 		}
 

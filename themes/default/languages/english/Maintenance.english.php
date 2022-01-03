@@ -121,7 +121,9 @@ $txt['errortype_template_desc'] = 'Errors related to the loading of templates.';
 $txt['errortype_user'] = 'User';
 $txt['errortype_user_desc'] = 'Errors resulting from user errors.  Includes failed passwords, trying to login when banned, and trying to do an action for which they do not have permission.';
 $txt['errortype_deprecated'] = 'Deprecated';
-$txt['errortype_deprecated_desc'] = 'Deprecation messsages usually mean that some code is calling a method which is discouraged and will be removed in a future version.';
+$txt['errortype_deprecated_desc'] = 'Deprecation messages usually mean that some code is calling a method which is discouraged and will be removed in a future version.';
+$txt['errortype_blocked'] = 'Blocked';
+$txt['errortype_template_desc'] = 'Notices related to server 403 blocks implemented by HoneyPot / Access Header checks.';
 
 $txt['maintain_recount'] = 'Recount all forum totals and statistics';
 $txt['maintain_recount_info'] = 'Should the total replies of a topic or the number of PMs in your inbox be incorrect: this function will recount all saved counts and statistics for you.';
