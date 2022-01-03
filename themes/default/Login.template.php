@@ -31,14 +31,14 @@ function template_login()
 	if (!empty($context['login_errors']))
 	{
 		echo '
-					<p class="errorbox">', implode('<br />', $context['login_errors']), '</p>';
+					<div class="errorbox">', implode('<br />', $context['login_errors']), '</div>';
 	}
 
 	// Or perhaps there's some special description for this?
 	if (isset($context['description']))
 	{
 		echo '
-					<p class="description">', $context['description'], '</p>';
+					<div class="description">', $context['description'], '</div>';
 	}
 
 	// Now just get the basic information - username, password, etc.
