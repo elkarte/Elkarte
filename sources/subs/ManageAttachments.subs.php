@@ -1884,9 +1884,9 @@ function canRemoveAttachment($id_attach, $id_member_requesting)
 			'id_attach' => $id_attach,
 		)
 	);
-	if ($db->num_rows($request) != 0)
+	if ($request->num_rows() != 0)
 	{
-		list($id_board, $id_member, $approved, $poster_time, $is_locked, $id_starter,) = $db->fetch_row($request);
+		list($id_board, $id_member, $approved, $poster_time, $is_locked, $id_starter,) = $request->fetch_row();
 
 		$is_owner = $id_member_requesting == $id_member;
 		$is_starter = $id_member_requesting == $id_starter;
@@ -1898,7 +1898,7 @@ function canRemoveAttachment($id_attach, $id_member_requesting)
 				|| (allowedTo('modify_own', $id_board) && $is_owner && (empty($modSettings['edit_disable_time']) || !$approved || $poster_time + $modSettings['edit_disable_time'] * 60 > time()))
 			);
 
-		$db->free_result($request);
+		$request->free_result();
 		return $can_attach && $can_modify;
 	}
 
