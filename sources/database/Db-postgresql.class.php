@@ -1074,6 +1074,11 @@ class Database_PostgreSQL extends Database_Abstract
 		return (is_resource($connection) || $connection instanceof \PgSql\Connection);
 	}
 
+	/**
+	 * Return an id for the resource/object
+	 *
+	 * @param resource|object $resource of returned result set
+	 */
 	public function seekCounter($resource)
 	{
 		global $db_row_count;
