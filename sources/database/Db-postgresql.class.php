@@ -945,7 +945,7 @@ class Database_PostgreSQL extends Database_Abstract
 	 */
 	public function db_server_version()
 	{
-		$version = pg_version();
+		$version = pg_version($this->_connection);
 
 		return $version['server'];
 	}
@@ -1026,7 +1026,7 @@ class Database_PostgreSQL extends Database_Abstract
 	public function db_server_info()
 	{
 		// give info on client! we use it in install and upgrade and such things.
-		$version = pg_version();
+		$version = pg_version($this->_connection);
 
 		return $version['client'];
 	}
@@ -1038,7 +1038,7 @@ class Database_PostgreSQL extends Database_Abstract
 	 */
 	public function db_client_version()
 	{
-		$version = pg_version();
+		$version = pg_version($this->_connection);
 
 		return $version['client'];
 	}
