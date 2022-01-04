@@ -918,25 +918,25 @@ class ManagePaid_Controller extends Action_Controller
 			$context['sub'] = array(
 				'id' => 0,
 				'start' => array(
-					'year' => (int) elk_strftime('%Y', time()),
-					'month' => (int) elk_strftime('%m', time()),
-					'day' => (int) elk_strftime('%d', time()),
-					'hour' => (int) elk_strftime('%H', time()),
-					'min' => (int) elk_strftime('%M', time()) < 10 ? '0' . (int) elk_strftime('%M', time()) : (int) elk_strftime('%M', time()),
+					'year' => (int) Util::strftime('%Y', time()),
+					'month' => (int) Util::strftime('%m', time()),
+					'day' => (int) Util::strftime('%d', time()),
+					'hour' => (int) Util::strftime('%H', time()),
+					'min' => (int) Util::strftime('%M', time()) < 10 ? '0' . (int) Util::strftime('%M', time()) : (int) Util::strftime('%M', time()),
 					'last_day' => 0,
 				),
 				'end' => array(
-					'year' => (int) elk_strftime('%Y', time()),
-					'month' => (int) elk_strftime('%m', time()),
-					'day' => (int) elk_strftime('%d', time()),
-					'hour' => (int) elk_strftime('%H', time()),
-					'min' => (int) elk_strftime('%M', time()) < 10 ? '0' . (int) elk_strftime('%M', time()) : (int) elk_strftime('%M', time()),
+					'year' => (int) Util::strftime('%Y', time()),
+					'month' => (int) Util::strftime('%m', time()),
+					'day' => (int) Util::strftime('%d', time()),
+					'hour' => (int) Util::strftime('%H', time()),
+					'min' => (int) Util::strftime('%M', time()) < 10 ? '0' . (int) Util::strftime('%M', time()) : (int) Util::strftime('%M', time()),
 					'last_day' => 0,
 				),
 				'status' => 1,
 			);
-			$context['sub']['start']['last_day'] = (int) elk_strftime('%d', mktime(0, 0, 0, $context['sub']['start']['month'] == 12 ? 1 : $context['sub']['start']['month'] + 1, 0, $context['sub']['start']['month'] == 12 ? $context['sub']['start']['year'] + 1 : $context['sub']['start']['year']));
-			$context['sub']['end']['last_day'] = (int) elk_strftime('%d', mktime(0, 0, 0, $context['sub']['end']['month'] == 12 ? 1 : $context['sub']['end']['month'] + 1, 0, $context['sub']['end']['month'] == 12 ? $context['sub']['end']['year'] + 1 : $context['sub']['end']['year']));
+			$context['sub']['start']['last_day'] = (int) Util::strftime('%d', mktime(0, 0, 0, $context['sub']['start']['month'] == 12 ? 1 : $context['sub']['start']['month'] + 1, 0, $context['sub']['start']['month'] == 12 ? $context['sub']['start']['year'] + 1 : $context['sub']['start']['year']));
+			$context['sub']['end']['last_day'] = (int) Util::strftime('%d', mktime(0, 0, 0, $context['sub']['end']['month'] == 12 ? 1 : $context['sub']['end']['month'] + 1, 0, $context['sub']['end']['month'] == 12 ? $context['sub']['end']['year'] + 1 : $context['sub']['end']['year']));
 
 			if (isset($this->_req->query->uid))
 			{
@@ -1017,26 +1017,26 @@ class ManagePaid_Controller extends Action_Controller
 			$context['sub'] = array(
 				'id' => 0,
 				'start' => array(
-					'year' => (int) elk_strftime('%Y', $row['start_time']),
-					'month' => (int) elk_strftime('%m', $row['start_time']),
-					'day' => (int) elk_strftime('%d', $row['start_time']),
-					'hour' => (int) elk_strftime('%H', $row['start_time']),
-					'min' => (int) elk_strftime('%M', $row['start_time']) < 10 ? '0' . (int) elk_strftime('%M', $row['start_time']) : (int) elk_strftime('%M', $row['start_time']),
+					'year' => (int) Util::strftime('%Y', $row['start_time']),
+					'month' => (int) Util::strftime('%m', $row['start_time']),
+					'day' => (int) Util::strftime('%d', $row['start_time']),
+					'hour' => (int) Util::strftime('%H', $row['start_time']),
+					'min' => (int) Util::strftime('%M', $row['start_time']) < 10 ? '0' . (int) Util::strftime('%M', $row['start_time']) : (int) Util::strftime('%M', $row['start_time']),
 					'last_day' => 0,
 				),
 				'end' => array(
-					'year' => (int) elk_strftime('%Y', $row['end_time']),
-					'month' => (int) elk_strftime('%m', $row['end_time']),
-					'day' => (int) elk_strftime('%d', $row['end_time']),
-					'hour' => (int) elk_strftime('%H', $row['end_time']),
-					'min' => (int) elk_strftime('%M', $row['end_time']) < 10 ? '0' . (int) elk_strftime('%M', $row['end_time']) : (int) elk_strftime('%M', $row['end_time']),
+					'year' => (int) Util::strftime('%Y', $row['end_time']),
+					'month' => (int) Util::strftime('%m', $row['end_time']),
+					'day' => (int) Util::strftime('%d', $row['end_time']),
+					'hour' => (int) Util::strftime('%H', $row['end_time']),
+					'min' => (int) Util::strftime('%M', $row['end_time']) < 10 ? '0' . (int) Util::strftime('%M', $row['end_time']) : (int) Util::strftime('%M', $row['end_time']),
 					'last_day' => 0,
 				),
 				'status' => $row['status'],
 				'username' => $row['username'],
 			);
-			$context['sub']['start']['last_day'] = (int) elk_strftime('%d', mktime(0, 0, 0, $context['sub']['start']['month'] == 12 ? 1 : $context['sub']['start']['month'] + 1, 0, $context['sub']['start']['month'] == 12 ? $context['sub']['start']['year'] + 1 : $context['sub']['start']['year']));
-			$context['sub']['end']['last_day'] = (int) elk_strftime('%d', mktime(0, 0, 0, $context['sub']['end']['month'] == 12 ? 1 : $context['sub']['end']['month'] + 1, 0, $context['sub']['end']['month'] == 12 ? $context['sub']['end']['year'] + 1 : $context['sub']['end']['year']));
+			$context['sub']['start']['last_day'] = (int) Util::strftime('%d', mktime(0, 0, 0, $context['sub']['start']['month'] == 12 ? 1 : $context['sub']['start']['month'] + 1, 0, $context['sub']['start']['month'] == 12 ? $context['sub']['start']['year'] + 1 : $context['sub']['start']['year']));
+			$context['sub']['end']['last_day'] = (int) Util::strftime('%d', mktime(0, 0, 0, $context['sub']['end']['month'] == 12 ? 1 : $context['sub']['end']['month'] + 1, 0, $context['sub']['end']['month'] == 12 ? $context['sub']['end']['year'] + 1 : $context['sub']['end']['year']));
 		}
 	}
 }

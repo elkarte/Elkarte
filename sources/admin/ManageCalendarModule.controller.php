@@ -245,7 +245,7 @@ class ManageCalendarModule_Controller extends Action_Controller
 				removeHolidays($this->_req->post->holiday);
 			else
 			{
-				$date = elk_strftime($this->_req->post->year <= 4 ? '0004-%m-%d' : '%Y-%m-%d', mktime(0, 0, 0, $this->_req->post->month, $this->_req->post->day, $this->_req->post->year));
+				$date = Util::strftime($this->_req->post->year <= 4 ? '0004-%m-%d' : '%Y-%m-%d', mktime(0, 0, 0, $this->_req->post->month, $this->_req->post->day, $this->_req->post->year));
 				if (isset($this->_req->post->edit))
 					editHoliday($this->_req->post->holiday, $date, $this->_req->post->title);
 				else
@@ -271,7 +271,7 @@ class ManageCalendarModule_Controller extends Action_Controller
 			$context['holiday'] = getHoliday($this->_req->query->holiday);
 
 		// Last day for the drop down?
-		$context['holiday']['last_day'] = (int) elk_strftime('%d', mktime(0, 0, 0, $context['holiday']['month'] == 12 ? 1 : $context['holiday']['month'] + 1, 0, $context['holiday']['month'] == 12 ? $context['holiday']['year'] + 1 : $context['holiday']['year']));
+		$context['holiday']['last_day'] = (int) Util::strftime('%d', mktime(0, 0, 0, $context['holiday']['month'] == 12 ? 1 : $context['holiday']['month'] + 1, 0, $context['holiday']['month'] == 12 ? $context['holiday']['year'] + 1 : $context['holiday']['year']));
 	}
 
 	/**
