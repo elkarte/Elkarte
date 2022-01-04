@@ -54,7 +54,7 @@ class Html2Md
 	public $body_width = 76;
 
 	/**
-	 * Strip remaining tags, set to false to leave them in
+	 * Strip remaining tags, set too false to leave them in
 	 *
 	 * @var bool
 	 */
@@ -194,16 +194,18 @@ class Html2Md
 		// If there is a head node, then off with his head!
 		$this->_clipHead();
 
-		// The body of the HTML is where its at.
+		// The body of the HTML is where it's at.
 		if ($this->_parser)
 		{
 			return $this->doc->getElementsByTagName('body')->item(0);
 		}
-		elseif ($this->doc->find('body', 0) !== null)
+
+		if ($this->doc->find('body', 0) !== null)
 		{
 			return $this->doc->find('body', 0);
 		}
-		elseif ($this->doc->find('html', 0) !== null)
+
+		if ($this->doc->find('html', 0) !== null)
 		{
 			return $this->doc->find('html', 0);
 		}
@@ -297,7 +299,8 @@ class Html2Md
 		{
 			return $body[1];
 		}
-		elseif (preg_match('~<html>(.*)</html>~su', $text, $body))
+
+		if (preg_match('~<html>(.*)</html>~su', $text, $body))
 		{
 			return $body[1];
 		}
@@ -530,7 +533,7 @@ class Html2Md
 		{
 			if ($this->_parser)
 			{
-				// Create a new text node with our markdown tag and replace the original node
+				// Create a new text node with our Markdown tag and replace the original node
 				$markdown_node = $this->doc->createTextNode($markdown);
 				$node->parentNode->replaceChild($markdown_node, $node);
 			}
@@ -598,7 +601,7 @@ class Html2Md
 			$markdown = '[' . $value . ']( ' . $href . ' )';
 		}
 
-		$this->_check_line_lenght($markdown);
+		$this->_set_line_lenght($markdown);
 
 		return $markdown;
 	}
@@ -653,7 +656,7 @@ class Html2Md
 		$value = preg_replace('~<br( /)?' . '>~', "\n", str_replace('&nbsp;', ' ', $value));
 
 		// If there are html tags in this code block, we need to disable strip tags
-		// This is NOT the ideal way to handle this, needs something along the lines of preparse and unpreparse.
+		// This is NOT the ideal way to handle this, needs something along the lines of preparse and un-preparse.
 		if ($this->strip_tags && preg_match('~<[^<]+>~', $value))
 		{
 			$this->strip_tags = false;
@@ -674,6 +677,7 @@ class Html2Md
 			{
 				array_shift($lines);
 			}
+
 			if (empty($last_line))
 			{
 				array_pop($lines);
@@ -685,7 +689,7 @@ class Html2Md
 			{
 				// Adjust the word wrapping since this has code tags, leave it up to
 				// the email client to mess these up ;)
-				$this->_check_line_lenght($markdown, 5);
+				$this->_set_line_lenght($markdown, 5);
 
 				$markdown .= str_repeat(' ', 4) . $line . $this->line_end;
 			}
@@ -831,7 +835,7 @@ class Html2Md
 		$header = array();
 		$rows = array();
 
-		// We only markdown well formed tables ...
+		// We only process well-formed tables ...
 		if ($table_heading && $th_parent === 'tr')
 		{
 			// Find out how many columns we are dealing with
@@ -839,7 +843,7 @@ class Html2Md
 
 			for ($col = 0; $col < $th_num; $col++)
 			{
-				// Get the align and text for each th (html5 this is no longer valid)
+				// Get align and text for each th (html5 this is no longer valid)
 				$th = $this->_get_item($table_heading, $col);
 				$align_value = ($th !== null) ? strtolower($th->getAttribute('align')) : false;
 				$align[0][$col] = $align_value === false ? 'left' : $align_value;
@@ -850,7 +854,7 @@ class Html2Md
 				$max[$col] = $width[0][$col];
 			}
 
-			// Get all of the rows
+			// Get all the rows
 			$table_rows = $node->getElementsByTagName('tr');
 			$num_rows = $this->_get_length($table_rows);
 			for ($row = 1; $row < $num_rows; $row++)
@@ -861,7 +865,7 @@ class Html2Md
 				// Simply use the th count as the number of columns, if its not right its not markdown-able anyway
 				for ($col = 0; $col < $th_num; $col++)
 				{
-					// Get the align and text for each td in this row
+					// Get align and text for each td in this row
 					$td = $this->_get_item($row_data, $col);
 					$align_value = ($td !== null) ? strtolower($td->getAttribute('align')) : false;
 					$align[$row][$col] = $align_value === false ? 'left' : $align_value;
@@ -892,7 +896,7 @@ class Html2Md
 					$temp[] = $this->_align_row_content($align[$row][$col], $width[$row][$col], $value[$row][$col], $max[$col]);
 				}
 
-				// Join it all up so we have a nice looking row
+				// Join it all up, so we have a nice looking row
 				$rows[] = '| ' . implode(' | ', $temp) . ' |';
 
 				// Stuff in the header after the th row
@@ -903,7 +907,7 @@ class Html2Md
 			}
 
 			// Adjust the word wrapping since this has a table, will get mussed by email anyway
-			$this->_check_line_lenght($rows[1], 2);
+			$this->_set_line_lenght($rows[1], 2);
 
 			// Return what we did so it can be swapped in
 			return implode($this->line_end, $rows);
@@ -923,10 +927,8 @@ class Html2Md
 		{
 			return $node->item($item);
 		}
-		else
-		{
-			return $node[$item];
-		}
+
+		return $node[$item];
 	}
 
 	/**
@@ -941,10 +943,8 @@ class Html2Md
 		{
 			return $node->length;
 		}
-		else
-		{
-			return count($node);
-		}
+
+		return count($node);
 	}
 
 	/**
@@ -964,10 +964,8 @@ class Html2Md
 		{
 			return $node->nodeValue;
 		}
-		else
-		{
-			return html_entity_decode(htmlspecialchars_decode($node->innertext, ENT_QUOTES), ENT_QUOTES, 'UTF-8');
-		}
+
+		return html_entity_decode(htmlspecialchars_decode($node->innertext, ENT_QUOTES), ENT_QUOTES, 'UTF-8');
 	}
 
 	/**
@@ -987,10 +985,8 @@ class Html2Md
 		{
 			return $node->nodeName;
 		}
-		else
-		{
-			return $node->nodeName();
-		}
+
+		return $node->nodeName();
 	}
 
 	/**
@@ -1072,10 +1068,8 @@ class Html2Md
 
 			return preg_replace('@^<' . $tag . '[^>]*>|</' . $tag . '>$@', '', $html);
 		}
-		else
-		{
-			return $node->innertext;
-		}
+
+		return $node->innertext;
 	}
 
 	/**
@@ -1090,10 +1084,8 @@ class Html2Md
 		{
 			return htmlspecialchars_decode($this->doc->saveHTML($node));
 		}
-		else
-		{
-			return $node->outertext;
-		}
+
+		return $node->outertext;
 	}
 
 	/**
@@ -1164,18 +1156,18 @@ class Html2Md
 	 * @param string $markdown
 	 * @param bool|int $buffer
 	 */
-	private function _check_line_lenght($markdown, $buffer = false)
+	private function _set_line_lenght($markdown, $buffer = false)
 	{
 		// Some Lines can be very long and if we wrap them they break
 		$lines = explode($this->line_end, $markdown);
 		foreach ($lines as $line)
 		{
 			$line_strlen = Util::strlen($line) + (!empty($buffer) ? (int) $buffer : 0);
-		if ($line_strlen > $this->body_width)
-		{
-			$this->body_width = $line_strlen;
+			if ($line_strlen > $this->body_width)
+			{
+				$this->body_width = $line_strlen;
+			}
 		}
-	}
 	}
 
 	/**
@@ -1199,9 +1191,7 @@ class Html2Md
 	{
 		global $txt;
 
-		$replacement = $this->line_end . '[' . $txt['link'] . ']( ' . trim($matches[0]) . ' )';
-
-		return $replacement;
+		return $this->line_end . '[' . $txt['link'] . ']( ' . trim($matches[0]) . ' )';
 	}
 
 	/**
@@ -1236,7 +1226,7 @@ class Html2Md
 					$lines[] = ($in_quote && $matches[1][0] !== '>' ? '> ' : '') . ltrim($matches[1], ' ');
 					$string = Util::substr($string, Util::strlen($matches[1]));
 				}
-				// Humm just a long word with no place to break so we simply cut it after width characters
+				// Humm just a long word with no place to break, so we simply cut it after width characters
 				else
 				{
 					$lines[] = ($in_quote && $string[0] !== '>' ? '> ' : '') . Util::substr($string, 0, $width);
