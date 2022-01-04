@@ -1180,7 +1180,7 @@ class Install_Controller
 		$db->insert('ignore',
 			'{db_prefix}log_activity',
 			array('date' => 'date', 'topics' => 'int', 'posts' => 'int', 'registers' => 'int'),
-			array(elk_strftime('%Y-%m-%d', time()), 1, 1, (!empty($incontext['member_id']) ? 1 : 0)),
+			array(Util::strftime('%Y-%m-%d', time()), 1, 1, (!empty($incontext['member_id']) ? 1 : 0)),
 			array('date')
 		);
 
