@@ -632,7 +632,7 @@ class Util
 			unserialize($string, false);
 			$check = true;
 		}
-		catch (\Exception $e)
+		catch (\Throwable $e)
 		{
 			$check = false;
 		}

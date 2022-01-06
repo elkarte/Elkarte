@@ -61,7 +61,8 @@ class Result extends AbstractResult
 	public function fetch_row()
 	{
 		// Return the right row.
-		return @pg_fetch_row($this->result);
+		if (is_resource($this->result) || $this->result instanceof \PgSql\Result)
+			return @pg_fetch_row($this->result);
 	}
 
 	/**
@@ -70,7 +71,8 @@ class Result extends AbstractResult
 	public function free_result()
 	{
 		// Just delegate to the native function
-		@pg_free_result($this->result);
+		if (is_resource($this->result) || $this->result instanceof \PgSql\Result)
+			@pg_free_result($this->result);
 	}
 
 	/**
@@ -79,7 +81,8 @@ class Result extends AbstractResult
 	public function num_rows()
 	{
 		// simply delegate to the native function
-		return pg_num_rows($this->result);
+		if (is_resource($this->result) || $this->result instanceof \PgSql\Result)
+			return pg_num_rows($this->result);
 	}
 
 	/**
@@ -87,7 +90,8 @@ class Result extends AbstractResult
 	 */
 	public function num_fields()
 	{
-		return pg_num_fields($this->result);
+		if (is_resource($this->result) || $this->result instanceof \PgSql\Result)
+			return pg_num_fields($this->result);
 	}
 
 	/**
@@ -95,7 +99,8 @@ class Result extends AbstractResult
 	 */
 	public function data_seek($counter)
 	{
-		return pg_result_seek($this->result, $counter);
+		if (is_resource($this->result) || $this->result instanceof \PgSql\Result)
+			return pg_result_seek($this->result, $counter);
 	}
 
 	/**
@@ -103,7 +108,8 @@ class Result extends AbstractResult
 	 */
 	public function fetch_assoc()
 	{
-		return pg_fetch_assoc($this->result);
+		if (is_resource($this->result) || $this->result instanceof \PgSql\Result)
+			return pg_fetch_assoc($this->result);
 	}
 
 	/**
@@ -111,7 +117,8 @@ class Result extends AbstractResult
 	 */
 	public function fetch_all()
 	{
-		$results = pg_fetch_all($this->result, PGSQL_ASSOC);
+		if (is_resource($this->result) || $this->result instanceof \PgSql\Result)
+			$results = pg_fetch_all($this->result, PGSQL_ASSOC);
 
 		return empty($results) ? [] : $results;
 	}
