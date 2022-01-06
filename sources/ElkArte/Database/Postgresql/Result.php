@@ -36,7 +36,7 @@ class Result extends AbstractResult
 
 		$resource = $this->result === null ? $this->details->lastResult : $this->result;
 
-		if (is_resource($resource))
+		if (is_resource($resource) || $resource instanceof \PgSQL\Result)
 		{
 			return pg_affected_rows($resource);
 		}
@@ -70,9 +70,20 @@ class Result extends AbstractResult
 	 */
 	public function free_result()
 	{
+
 		// Just delegate to the native function
 		if (is_resource($this->result) || $this->result instanceof \PgSql\Result)
-			@pg_free_result($this->result);
+		{
+			// Attempt to free result, mask errors
+			try 
+			{
+				@pg_free_result($this->result);
+			}
+			catch ( \Throwable $e )
+			{
+				null;
+			}
+		}
 	}
 
 	/**
