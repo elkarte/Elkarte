@@ -2494,7 +2494,7 @@ function package_create_backup($id = 'backup')
 			package_chmod(BOARDDIR . '/packages/backups');
 
 		// Name the output file, yyyy-mm-dd_before_package_name.tar.gz
-		$output_file = BOARDDIR . '/packages/backups/' . Util::strftime('%Y-%m-%d_') . preg_replace('~[$\\\\/:<>|?*"\']~', '', $id);
+		$output_file = BOARDDIR . '/packages/backups/' . strftime('%Y-%m-%d_') . preg_replace('~[$\\\\/:<>|?*"\']~', '', $id);
 		$output_ext = '.tar';
 
 		if (file_exists($output_file . $output_ext . '.gz'))

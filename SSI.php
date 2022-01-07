@@ -1976,7 +1976,7 @@ function ssi_recentEvents($max_events = 7, $output_method = 'echo')
 	require_once(SUBSDIR . '/Calendar.subs.php');
 
 	// Find all events which are happening in the near future that the member can see.
-	$date = Util::strftime('%Y-%m-%d', forum_time(false));
+	$date = strftime('%Y-%m-%d', forum_time(false));
 	$events = getEventRange($date, $date, true, $max_events);
 
 	$return = array();

@@ -309,8 +309,8 @@ class News_Controller extends Action_Controller
 				$data[] = array(
 					'title' => cdata_parse($member['real_name']),
 					'link' => $scripturl . '?action=profile;u=' . $member['id_member'],
-					'published' => Util::gmstrftime('%Y-%m-%dT%H:%M:%SZ', $member['date_registered']),
-					'updated' => Util::gmstrftime('%Y-%m-%dT%H:%M:%SZ', $member['last_login']),
+					'published' => gmstrftime('%Y-%m-%dT%H:%M:%SZ', $member['date_registered']),
+					'updated' => gmstrftime('%Y-%m-%dT%H:%M:%SZ', $member['last_login']),
 					'id' => $scripturl . '?action=profile;u=' . $member['id_member'],
 				);
 			// More logical format for the data, but harder to apply.
@@ -400,8 +400,8 @@ class News_Controller extends Action_Controller
 						'email' => in_array(showEmailAddress(!empty($row['hide_email']), $row['id_member']), array('yes', 'yes_permission_override')) ? $row['poster_email'] : null,
 						'uri' => !empty($row['id_member']) ? $scripturl . '?action=profile;u=' . $row['id_member'] : '',
 					),
-					'published' => Util::gmstrftime('%Y-%m-%dT%H:%M:%SZ', $row['poster_time']),
-					'modified' => Util::gmstrftime('%Y-%m-%dT%H:%M:%SZ', empty($row['modified_time']) ? $row['poster_time'] : $row['modified_time']),
+					'published' => gmstrftime('%Y-%m-%dT%H:%M:%SZ', $row['poster_time']),
+					'modified' => gmstrftime('%Y-%m-%dT%H:%M:%SZ', empty($row['modified_time']) ? $row['poster_time'] : $row['modified_time']),
 					'id' => $scripturl . '?topic=' . $row['id_topic'] . '.0',
 				);
 			}
@@ -504,8 +504,8 @@ class News_Controller extends Action_Controller
 						'email' => in_array(showEmailAddress(!empty($row['hide_email']), $row['id_member']), array('yes', 'yes_permission_override')) ? $row['poster_email'] : null,
 						'uri' => !empty($row['id_member']) ? $scripturl . '?action=profile;u=' . $row['id_member'] : ''
 					),
-					'published' => Util::gmstrftime('%Y-%m-%dT%H:%M:%SZ', $row['poster_time']),
-					'updated' => Util::gmstrftime('%Y-%m-%dT%H:%M:%SZ', empty($row['modified_time']) ? $row['poster_time'] : $row['modified_time']),
+					'published' => gmstrftime('%Y-%m-%dT%H:%M:%SZ', $row['poster_time']),
+					'updated' => gmstrftime('%Y-%m-%dT%H:%M:%SZ', empty($row['modified_time']) ? $row['poster_time'] : $row['modified_time']),
 					'id' => $scripturl . '?topic=' . $row['id_topic'] . '.msg' . $row['id_msg'] . '#msg' . $row['id_msg'],
 				);
 			}
@@ -602,8 +602,8 @@ class News_Controller extends Action_Controller
 					'email' => in_array(showEmailAddress(!empty($profile['hide_email']), $profile['id']), array('yes', 'yes_permission_override')) ? $profile['email'] : null,
 					'uri' => !empty($profile['website']) ? $profile['website']['url'] : ''
 				),
-				'published' => Util::gmstrftime('%Y-%m-%dT%H:%M:%SZ', $user_profile[$profile['id']]['date_registered']),
-				'updated' => Util::gmstrftime('%Y-%m-%dT%H:%M:%SZ', $user_profile[$profile['id']]['last_login']),
+				'published' => gmstrftime('%Y-%m-%dT%H:%M:%SZ', $user_profile[$profile['id']]['date_registered']),
+				'updated' => gmstrftime('%Y-%m-%dT%H:%M:%SZ', $user_profile[$profile['id']]['last_login']),
 				'id' => $scripturl . '?action=profile;u=' . $profile['id'],
 				'logo' => !empty($profile['avatar']) ? $profile['avatar']['url'] : '',
 			);
