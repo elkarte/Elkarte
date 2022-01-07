@@ -744,25 +744,25 @@ class ManagePaid extends AbstractController
 			$context['sub'] = array(
 				'id' => 0,
 				'start' => array(
-					'year' => (int) strftime('%Y', time()),
-					'month' => (int) strftime('%m', time()),
-					'day' => (int) strftime('%d', time()),
-					'hour' => (int) strftime('%H', time()),
-					'min' => (int) strftime('%M', time()) < 10 ? '0' . (int) strftime('%M', time()) : (int) strftime('%M', time()),
+					'year' => (int) Util::strftime('%Y', time()),
+					'month' => (int) Util::strftime('%m', time()),
+					'day' => (int) Util::strftime('%d', time()),
+					'hour' => (int) Util::strftime('%H', time()),
+					'min' => (int) Util::strftime('%M', time()) < 10 ? '0' . (int) Util::strftime('%M', time()) : (int) Util::strftime('%M', time()),
 					'last_day' => 0,
 				),
 				'end' => array(
-					'year' => (int) strftime('%Y', time()),
-					'month' => (int) strftime('%m', time()),
-					'day' => (int) strftime('%d', time()),
-					'hour' => (int) strftime('%H', time()),
-					'min' => (int) strftime('%M', time()) < 10 ? '0' . (int) strftime('%M', time()) : (int) strftime('%M', time()),
+					'year' => (int) Util::strftime('%Y', time()),
+					'month' => (int) Util::strftime('%m', time()),
+					'day' => (int) Util::strftime('%d', time()),
+					'hour' => (int) Util::strftime('%H', time()),
+					'min' => (int) Util::strftime('%M', time()) < 10 ? '0' . (int) Util::strftime('%M', time()) : (int) Util::strftime('%M', time()),
 					'last_day' => 0,
 				),
 				'status' => 1,
 			);
-			$context['sub']['start']['last_day'] = (int) strftime('%d', mktime(0, 0, 0, $context['sub']['start']['month'] == 12 ? 1 : $context['sub']['start']['month'] + 1, 0, $context['sub']['start']['month'] == 12 ? $context['sub']['start']['year'] + 1 : $context['sub']['start']['year']));
-			$context['sub']['end']['last_day'] = (int) strftime('%d', mktime(0, 0, 0, $context['sub']['end']['month'] == 12 ? 1 : $context['sub']['end']['month'] + 1, 0, $context['sub']['end']['month'] == 12 ? $context['sub']['end']['year'] + 1 : $context['sub']['end']['year']));
+			$context['sub']['start']['last_day'] = (int) Util::strftime('%d', mktime(0, 0, 0, $context['sub']['start']['month'] == 12 ? 1 : $context['sub']['start']['month'] + 1, 0, $context['sub']['start']['month'] == 12 ? $context['sub']['start']['year'] + 1 : $context['sub']['start']['year']));
+			$context['sub']['end']['last_day'] = (int) Util::strftime('%d', mktime(0, 0, 0, $context['sub']['end']['month'] == 12 ? 1 : $context['sub']['end']['month'] + 1, 0, $context['sub']['end']['month'] == 12 ? $context['sub']['end']['year'] + 1 : $context['sub']['end']['year']));
 
 			if (isset($this->_req->query->uid))
 			{
@@ -851,27 +851,27 @@ class ManagePaid extends AbstractController
 			$context['sub'] = array(
 				'id' => 0,
 				'start' => array(
-					'year' => (int) strftime('%Y', $row['start_time']),
-					'month' => (int) strftime('%m', $row['start_time']),
-					'day' => (int) strftime('%d', $row['start_time']),
-					'hour' => (int) strftime('%H', $row['start_time']),
-					'min' => (int) strftime('%M', $row['start_time']) < 10 ? '0' . (int) strftime('%M', $row['start_time']) : (int) strftime('%M', $row['start_time']),
+					'year' => (int) Util::strftime('%Y', $row['start_time']),
+					'month' => (int) Util::strftime('%m', $row['start_time']),
+					'day' => (int) Util::strftime('%d', $row['start_time']),
+					'hour' => (int) Util::strftime('%H', $row['start_time']),
+					'min' => (int) Util::strftime('%M', $row['start_time']) < 10 ? '0' . (int) Util::strftime('%M', $row['start_time']) : (int) Util::strftime('%M', $row['start_time']),
 					'last_day' => 0,
 				),
 				'end' => array(
-					'year' => (int) strftime('%Y', $row['end_time']),
-					'month' => (int) strftime('%m', $row['end_time']),
-					'day' => (int) strftime('%d', $row['end_time']),
-					'hour' => (int) strftime('%H', $row['end_time']),
-					'min' => (int) strftime('%M', $row['end_time']) < 10 ? '0' . (int) strftime('%M', $row['end_time']) : (int) strftime('%M', $row['end_time']),
+					'year' => (int) Util::strftime('%Y', $row['end_time']),
+					'month' => (int) Util::strftime('%m', $row['end_time']),
+					'day' => (int) Util::strftime('%d', $row['end_time']),
+					'hour' => (int) Util::strftime('%H', $row['end_time']),
+					'min' => (int) Util::strftime('%M', $row['end_time']) < 10 ? '0' . (int) Util::strftime('%M', $row['end_time']) : (int) Util::strftime('%M', $row['end_time']),
 					'last_day' => 0,
 				),
 				'status' => $row['status'],
 				'username' => $row['username'],
 			);
 
-			$context['sub']['start']['last_day'] = (int) strftime('%d', mktime(0, 0, 0, $context['sub']['start']['month'] == 12 ? 1 : $context['sub']['start']['month'] + 1, 0, $context['sub']['start']['month'] == 12 ? $context['sub']['start']['year'] + 1 : $context['sub']['start']['year']));
-			$context['sub']['end']['last_day'] = (int) strftime('%d', mktime(0, 0, 0, $context['sub']['end']['month'] == 12 ? 1 : $context['sub']['end']['month'] + 1, 0, $context['sub']['end']['month'] == 12 ? $context['sub']['end']['year'] + 1 : $context['sub']['end']['year']));
+			$context['sub']['start']['last_day'] = (int) Util::strftime('%d', mktime(0, 0, 0, $context['sub']['start']['month'] == 12 ? 1 : $context['sub']['start']['month'] + 1, 0, $context['sub']['start']['month'] == 12 ? $context['sub']['start']['year'] + 1 : $context['sub']['start']['year']));
+			$context['sub']['end']['last_day'] = (int) Util::strftime('%d', mktime(0, 0, 0, $context['sub']['end']['month'] == 12 ? 1 : $context['sub']['end']['month'] + 1, 0, $context['sub']['end']['month'] == 12 ? $context['sub']['end']['year'] + 1 : $context['sub']['end']['year']));
 		}
 	}
 

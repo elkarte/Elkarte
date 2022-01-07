@@ -110,7 +110,7 @@ $helptxt['addonsettings'] = '<strong>Add-On Settings</strong><br />
 
 $helptxt['time_format'] = '<strong>Time Format</strong><br />
 	You have the power to adjust how the time and date look for yourself. There are a lot of little letters, but it\'s quite simple.
-	The conventions follow PHP\'s strftime function and are described as below (more details can be found at <a href="http://www.php.net/manual/function.strftime.php" target="_blank" class="new_win">php.net</a>).<br />
+	The conventions follow PHP\'s Util::strftime function and are described as below (more details can be found at <a href="http://www.php.net/manual/function.Util::strftime.php" target="_blank" class="new_win">php.net</a>).<br />
 	<br />
 	The following characters are recognized in the format string:<br />
 	<span class="smalltext">

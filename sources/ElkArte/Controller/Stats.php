@@ -176,7 +176,7 @@ class Stats extends AbstractController
 
 		// This would be the amount of time the forum has been up... in days...
 		$total_days_up = ceil((time() - strtotime($averages['date'])) / (60 * 60 * 24));
-		$date = strftime('%Y-%m-%d', forum_time(false));
+		$date = Util::strftime('%Y-%m-%d', forum_time(false));
 
 		// General forum stats
 		$context['general_statistics']['left'] = array(

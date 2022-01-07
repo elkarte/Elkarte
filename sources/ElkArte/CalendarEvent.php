@@ -207,7 +207,7 @@ class CalendarEvent
 		$eventOptions = array(
 			'title' => Util::substr($options['evtitle'], 0, 100),
 			'span' => $span,
-			'start_date' => strftime('%Y-%m-%d', mktime(0, 0, 0, (int) $options['month'], (int) $options['day'], (int) $options['year'])),
+			'start_date' => Util::strftime('%Y-%m-%d', mktime(0, 0, 0, (int) $options['month'], (int) $options['day'], (int) $options['year'])),
 			'id_board' => (int) $id_board,
 			'id_topic' => (int) $id_topic,
 		);
@@ -246,7 +246,7 @@ class CalendarEvent
 				'title' => '',
 				'span' => 1,
 			);
-			$event['last_day'] = (int) strftime('%d', mktime(0, 0, 0, $event['month'] == 12 ? 1 : $event['month'] + 1, 0, $event['month'] == 12 ? $event['year'] + 1 : $event['year']));
+			$event['last_day'] = (int) Util::strftime('%d', mktime(0, 0, 0, $event['month'] == 12 ? 1 : $event['month'] + 1, 0, $event['month'] == 12 ? $event['year'] + 1 : $event['year']));
 		}
 		else
 		{

@@ -160,7 +160,7 @@ function logSpider()
 	// Attempt to update today's entry.
 	if ($modSettings['spider_mode'] == 1)
 	{
-		$date = strftime('%Y-%m-%d', forum_time(false));
+		$date = Util::strftime('%Y-%m-%d', forum_time(false));
 		$result = $db->query('', '
 			UPDATE {db_prefix}log_spider_stats
 			SET 
@@ -249,7 +249,7 @@ function consolidateSpiderStats()
 	foreach ($spider_hits as $stat)
 	{
 		// We assume the max date is within the right day.
-		$date = strftime('%Y-%m-%d', $stat['last_seen']);
+		$date = Util::strftime('%Y-%m-%d', $stat['last_seen']);
 		$result = $db->query('', '
 			UPDATE {db_prefix}log_spider_stats
 			SET 
