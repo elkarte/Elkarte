@@ -3,7 +3,7 @@
 
 global $forum_copyright;
 
-// Locale (Util::strftime, pspell_new) and spelling.
+// Locale (strftime, pspell_new) and spelling.
 // For more information see:
 //   - https://www.php.net/function.pspell-new
 //   - https://www.php.net/function.setlocale

@@ -265,7 +265,7 @@ function byte_format($number)
  * - Applies all necessary time offsets to the timestamp, unless offset_type is set.
  * - If todayMod is set and show_today was not not specified or true, an
  *   alternate format string is used to show the date with something to show it is "today" or "yesterday".
- * - Performs localization (more than just Util::strftime would do alone.)
+ * - Performs localization (more than just strftime would do alone.)
  *
  * @param int $log_time A unix timestamp
  * @param string|bool $show_today = true show "Today"/"Yesterday",
@@ -364,7 +364,7 @@ function standardTime($log_time, $show_today = true, $offset_type = false)
 		{
 			if (strpos($str, $token) !== false)
 			{
-				$str = str_replace($token, !empty($txt['lang_capitalize_dates']) ? ElkArte\Util::ucwords(Util::strftime($token, $time)) : Util::strftime($token, $time), $str);
+				$str = str_replace($token, !empty($txt['lang_capitalize_dates']) ? ElkArte\Util::ucwords(Elkarte\Util::strftime($token, $time)) : Elkarte\Util::strftime($token, $time), $str);
 			}
 		}
 	}
@@ -375,24 +375,24 @@ function standardTime($log_time, $show_today = true, $offset_type = false)
 		{
 			if (strpos($str, $token) !== false)
 			{
-				$str = str_replace($token, $txt[$text_label][(int) Util::strftime($token === '%a' || $token === '%A' ? '%w' : '%m', $time)], $str);
+				$str = str_replace($token, $txt[$text_label][(int) Elkarte\Util::strftime($token === '%a' || $token === '%A' ? '%w' : '%m', $time)], $str);
 			}
 		}
 
 		if (strpos($str, '%p') !== false)
 		{
-			$str = str_replace('%p', (Util::strftime('%H', $time) < 12 ? $txt['time_am'] : $txt['time_pm']), $str);
+			$str = str_replace('%p', (Elkarte\Util::strftime('%H', $time) < 12 ? $txt['time_am'] : $txt['time_pm']), $str);
 		}
 	}
 
-	// Windows doesn't support %e; on some versions, Util::strftime fails altogether if used, so let's prevent that.
+	// Windows doesn't support %e; on some versions, strftime fails altogether if used, so let's prevent that.
 	if ($is_win && strpos($str, '%e') !== false)
 	{
-		$str = str_replace('%e', ltrim(Util::strftime('%d', $time), '0'), $str);
+		$str = str_replace('%e', ltrim(Elkarte\Util::strftime('%d', $time), '0'), $str);
 	}
 
 	// Format any other characters..
-	return Util::strftime($str, $time);
+	return Elkarte\Util::strftime($str, $time);
 }
 
 /**
@@ -1055,7 +1055,7 @@ function text2words($text, $encrypt = false)
 		foreach ($words as $word)
 		{
 			$word = trim($word, '-_\'');
-			if ($word !== '' && !in_array($word, $blocklist) && Util::strlen($word) > 2)
+			if ($word !== '' && !in_array($word, $blocklist) && Elkarte\Util::strlen($word) > 2)
 			{
 				// Get a hex representation of this word using a database indexing hash
 				// designed to be fast while maintaining a very low collision rate
