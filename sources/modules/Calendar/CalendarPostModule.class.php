@@ -252,7 +252,7 @@ class Calendar_Post_Module extends ElkArte\sources\modules\Abstract_Module
 		}
 
 		// Find the last day of the month.
-		$context['event']['last_day'] = (int) strftime('%d', mktime(0, 0, 0, $context['event']['month'] == 12 ? 1 : $context['event']['month'] + 1, 0, $context['event']['month'] == 12 ? $context['event']['year'] + 1 : $context['event']['year']));
+		$context['event']['last_day'] = (int) Util::strftime('%d', mktime(0, 0, 0, $context['event']['month'] == 12 ? 1 : $context['event']['month'] + 1, 0, $context['event']['month'] == 12 ? $context['event']['year'] + 1 : $context['event']['year']));
 
 		$context['event']['board'] = !empty($board) ? $board : $modSettings['cal_defaultboard'];
 	}
