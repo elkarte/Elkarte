@@ -1847,3 +1847,60 @@ function updateAttachmentIdFolder($from, $to)
 		)
 	);
 }
+
+/**
+ * Validates the current user can remove a specified attachment
+ *
+ * - Has moderator / admin manage_attachments permission
+ * - Message is not locked, they have attach permissions and meets one of the following:
+ *    - Has modify any permission
+ *    - Is the owner of the message and within edit_disable_time
+ *    - Is allowed to edit messages in a thread they started
+ *
+ * @param int $id_attach
+ * @param int $id_member_requesting
+ *
+ * @return bool
+ */
+function canRemoveAttachment($id_attach, $id_member_requesting)
+{
+	global $modSettings;
+
+	if (allowedTo('manage_attachments'))
+	{
+		return true;
+	}
+
+	$db = database();
+	$request = $db->query('', '
+		SELECT 
+			m.id_board, m.id_member, m.approved, m.poster_time,
+			t.locked, t.id_member_started
+		FROM {db_prefix}attachments as a
+			LEFT JOIN {db_prefix}messages AS m ON m.id_msg = a.id_msg
+			LEFT JOIN {db_prefix}topics AS t ON t.id_topic = m.id_topic
+		WHERE a.id_attach = {int:id_attach}',
+		array(
+			'id_attach' => $id_attach,
+		)
+	);
+	if ($request->num_rows() != 0)
+	{
+		list($id_board, $id_member, $approved, $poster_time, $is_locked, $id_starter,) = $request->fetch_row();
+
+		$is_owner = $id_member_requesting == $id_member;
+		$is_starter = $id_member_requesting == $id_starter;
+		$can_attach = allowedTo('post_attachment', $id_board) || ($modSettings['postmod_active'] && allowedTo('post_unapproved_attachments', $id_board));
+		$can_modify = (!$is_locked || allowedTo('moderate_board', $id_board))
+			&& (
+				allowedTo('modify_any', $id_board)
+				|| (allowedTo('modify_replies', $id_board) && $is_starter)
+				|| (allowedTo('modify_own', $id_board) && $is_owner && (empty($modSettings['edit_disable_time']) || !$approved || $poster_time + $modSettings['edit_disable_time'] * 60 > time()))
+			);
+
+		$request->free_result();
+		return $can_attach && $can_modify;
+	}
+
+	return false;
+}

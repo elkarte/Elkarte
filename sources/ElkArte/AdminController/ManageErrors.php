@@ -48,13 +48,13 @@ class ManageErrors extends AbstractController
 
 		// Some code redundancy... and we only take this!
 		if (isset($activity) && $activity === 'file')
-			// View the file with the error
 		{
+			// View the file with the error
 			$this->action_viewfile();
 		}
 		else
-			// View error log
 		{
+			// View error log
 			$this->action_log();
 		}
 	}

@@ -629,7 +629,7 @@ class Util
 		set_error_handler(function () { /* ignore errors */ });
 		try
 		{
-			unserialize($string, false);
+			unserialize($string, ['allowed_classes' => false]);
 			$check = true;
 		}
 		catch (\Exception $e)

@@ -374,8 +374,8 @@ function list_getProfileFields($start, $items_per_page, $sort, $standardFields)
 
 	if ($standardFields)
 	{
-		$standard_fields = array('website', 'posts', 'warning_status', 'date_registered');
-		$fields_no_registration = array('posts', 'warning_status', 'date_registered');
+		$standard_fields = array('website', 'posts', 'warning_status', 'date_registered', 'action');
+		$fields_no_registration = array('posts', 'warning_status', 'date_registered', 'action');
 		$disabled_fields = isset($modSettings['disabled_profile_fields']) ? explode(',', $modSettings['disabled_profile_fields']) : array();
 		$registration_fields = isset($modSettings['registration_fields']) ? explode(',', $modSettings['registration_fields']) : array();
 

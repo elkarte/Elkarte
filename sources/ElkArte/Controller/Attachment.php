@@ -82,7 +82,7 @@ class Attachment extends AbstractController
 	 */
 	public function action_index()
 	{
-		// add an subaction array to act accordingly
+		// add a subaction array to act accordingly
 		$subActions = array(
 			'dlattach' => array($this, 'action_dlattach'),
 			'tmpattach' => array($this, 'action_tmpattach'),
@@ -194,7 +194,7 @@ class Attachment extends AbstractController
 	 */
 	public function action_rmattach()
 	{
-		global $context, $txt;
+		global $context, $txt, $user_info;
 
 		// Prepare the template so we can respond with json
 		$template_layers = theme()->getLayers();
@@ -237,15 +237,19 @@ class Attachment extends AbstractController
 			if ($result !== true)
 			{
 				require_once(SUBSDIR . '/ManageAttachments.subs.php');
-				$result_tmp = removeAttachments(array('id_attach' => $this->_req->getPost('attachid', 'intval')), '', true);
-				if (!empty($result_tmp))
+				$attachId = $this->_req->getPost('attachid', 'intval');
+				if (canRemoveAttachment($attachId, $user_info['id']))
 				{
-					$context['json_data'] = array('result' => true);
-					$result = true;
-				}
-				else
-				{
-					$result = $result_tmp;
+					$result_tmp = removeAttachments(array('id_attach' => $attachId), '', true);
+					if (!empty($result_tmp))
+					{
+						$context['json_data'] = array('result' => true);
+						$result = true;
+					}
+					else
+					{
+						$result = $result_tmp;
+					}
 				}
 			}
 

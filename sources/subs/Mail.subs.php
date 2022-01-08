@@ -206,7 +206,8 @@ function sendmail($to, $subject, $message, $from = null, $message_id = null, $se
 	// Sending HTML?  Let's plop in some basic stuff, then.
 	if ($send_html)
 	{
-		$no_html_message = un_htmlspecialchars(strip_tags(strtr($orig_message, array('</title>' => $line_break))));
+		$no_html_message = preg_replace('/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]/', '', $orig_message);
+		$no_html_message = un_htmlspecialchars(strip_tags(strtr($no_html_message, array('</title>' => $line_break))));
 
 		// But, then, dump it and use a plain one for dinosaur clients.
 		list (, $plain_message) = mimespecialchars($no_html_message, false, true, $line_break);
@@ -228,7 +229,9 @@ function sendmail($to, $subject, $message, $from = null, $message_id = null, $se
 	else
 	{
 		// Send a plain message first, for the older web clients.
-		list (, $plain_message) = mimespecialchars($orig_message, false, true, $line_break);
+		$plain_message = preg_replace('/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]/', '', $orig_message);
+		list (, $plain_message) = mimespecialchars($plain_message, false, true, $line_break);
+
 		$message = $plain_message . $line_break . '--' . $mime_boundary . $line_break;
 
 		// Now add an encoded message using the forum's character set.
@@ -516,6 +519,7 @@ function mimespecialchars($string, $with_charset = true, $hotmail_fix = false, $
 	elseif (!$hotmail_fix && preg_match('~([^\x09\x0A\x0D\x20-\x7F])~', $string) === 1)
 	{
 		// Base64 encode.
+		$string = str_replace("\x00", '', $string);
 		$string = base64_encode($string);
 
 		$string = $with_charset

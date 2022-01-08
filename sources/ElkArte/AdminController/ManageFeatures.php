@@ -298,6 +298,9 @@ class ManageFeatures extends AbstractController
 			// Setting a custom frontpage, set the hook to the FrontpageInterface of the controller
 			if (!empty($this->_req->post->front_page))
 			{
+				// Addons may have left this blank
+				$modSettings['front_page'] = empty($modSettings['front_page']) ? 'MessageIndex_Controller' : $modSettings['front_page'];
+
 				$front_page = (string) $this->_req->post->front_page;
 				if (
 					class_exists($modSettings['front_page'])
@@ -881,10 +884,10 @@ class ManageFeatures extends AbstractController
 		$context['sub_template'] = 'show_custom_profile';
 
 		// What about standard fields they can tweak?
-		$standard_fields = array('website', 'posts', 'warning_status', 'date_registered');
+		$standard_fields = array('website', 'posts', 'warning_status', 'date_registered', 'action');
 
 		// What fields can't you put on the registration page?
-		$context['fields_no_registration'] = array('posts', 'warning_status', 'date_registered');
+		$context['fields_no_registration'] = array('posts', 'warning_status', 'date_registered', 'action');
 
 		// Are we saving any standard field changes?
 		if (isset($this->_req->post->save))

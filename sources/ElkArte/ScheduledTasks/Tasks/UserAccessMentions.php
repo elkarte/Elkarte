@@ -51,6 +51,11 @@ class UserAccessMentions implements ScheduledTaskInterface
 		// This should be set only because of an immediate scheduled task, so higher priority
 		if (!empty($user_access_mentions))
 		{
+			// Just a touch of needy
+			require_once(SUBSDIR . '/Boards.subs.php');
+			require_once(SUBSDIR . '/Mentions.subs.php');
+			require_once(SUBSDIR . '/Members.subs.php');
+
 			foreach ($user_access_mentions as $member => $begin)
 			{
 				// Just to stay on the safe side...
@@ -58,11 +63,6 @@ class UserAccessMentions implements ScheduledTaskInterface
 				{
 					continue;
 				}
-
-				// Just a touch of needy
-				require_once(SUBSDIR . '/Boards.subs.php');
-				require_once(SUBSDIR . '/Mentions.subs.php');
-				require_once(SUBSDIR . '/Members.subs.php');
 
 				$user_see_board = memberQuerySeeBoard($member);
 				$limit = 100;
