@@ -7,7 +7,6 @@
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause (see accompanying LICENSE.txt file)
  *
- *
  * @version 2.0 dev
  *
  */
@@ -217,7 +216,7 @@ class Html2Md extends AbstractDomParser
 				break;
 			case 'p':
 				$markdown = $this->line_end . rtrim($this->getValue($node)) . $this->line_end;
-				$markdown = $this->_convertPlaintxtLinks($markdown);
+				$markdown = $this->_convertPlaintxtLinks($markdown, $node);
 				$markdown = $this->utf8Wordwrap($markdown, $this->body_width, $this->line_end);
 				break;
 			case 'pre':
@@ -229,7 +228,7 @@ class Html2Md extends AbstractDomParser
 				break;
 			case '#text':
 				$markdown = $this->_escapeText($this->getValue($node));
-				$markdown = $this->_convertPlaintxtLinks($markdown);
+				$markdown = $this->_convertPlaintxtLinks($markdown, $node);
 				break;
 			case 'title':
 				$markdown = '# ' . $this->getValue($node) . $this->line_break;
@@ -304,7 +303,7 @@ class Html2Md extends AbstractDomParser
 		$title = $node->getAttribute('title');
 		$class = $node->getAttribute('class');
 		$value = trim($this->getValue($node), "\t\n\r\0\x0B");
-
+//
 		// Provide a more compact [name] if none is given
 		if ($value == $node->getAttribute('href') || empty($value))
 		{
@@ -525,7 +524,7 @@ class Html2Md extends AbstractDomParser
 			return '';
 		}
 
-		$th_parent  = $this->getName($this->getParent($this->getItem($table_heading, 0)));
+		$th_parent = $this->getName($this->getParent($this->getItem($table_heading, 0)));
 
 		// Set up for a markdown table, then storm the castle
 		$align = array();
@@ -774,8 +773,13 @@ class Html2Md extends AbstractDomParser
 	 *
 	 * @return string
 	 */
-	private function _convertPlaintxtLinks($text)
+	private function _convertPlaintxtLinks($text, $node)
 	{
+		if ($this->getName($this->getParent($node)) === 'a')
+		{
+			return $text;
+		}
+
 		return preg_replace_callback('/((?<!\\( |]\()https?:\/\/|(?<!\\( |]\(|:\/\/)www)[-\p{L}0-9+&@#\/%?=~_|!:,.;]*[\p{L}0-9+&@#\/%=~_|]/iu',
 			function ($matches) {
 				return $this->_plaintxtCallback($matches);

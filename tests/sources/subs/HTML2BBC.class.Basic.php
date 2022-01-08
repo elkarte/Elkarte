@@ -32,12 +32,12 @@ class TestHTML2BBC extends TestCase
 			array(
 				'Lists',
 				'<ul class="bbc_list"><li>item</li><li><ul class="bbc_list"><li>sub item</li></ul></li><li>item</li></ul>',
-				'[list][li]item[/li][li][list][li]sub item[/li][/list][br][/li][li]item[/li][/list]',
+				'[list][li]item[/li][li][list][li]sub item[/li][/list][/li][li]item[/li][/list]'
 			),
 			array(
 				'Tables',
 				'<table class="bbc_table"><tr><td><table class="bbc_table"><tr><td>test</td></tr></table></td></tr></table>',
-				'[table][tr][td][br][table][tr][td]test[/td][/tr][/table][br][/td][/tr][/table]',
+				'[table][tr][td][table][tr][td]test[/td][/tr][/table][/td][/tr][/table]',
 			),
 		);
 	}

@@ -56,9 +56,9 @@ class TestMD2HTML extends TestCase
 	}
 
 	/**
-	 * testToMarkdown, parse html to MD text and checks that the results are what we expect
+	 * testToHTML, parse html to MD text and checks that the results are what we expect
 	 */
-	public function testToMarkdown()
+	public function testToHTML()
 	{
 		foreach ($this->mdTestCases as $testcase)
 		{
@@ -66,10 +66,10 @@ class TestMD2HTML extends TestCase
 			$test = $testcase[1];
 			$expected = $testcase[2];
 
-			// Convert the MD to HTML
+			// Convert HTML to MD
 			$result = trim(Markdown($test));
 
-			// See if its the result we expect
+			// See if the result is what we expect
 			$this->assertEquals($expected, $result, $name);
 		}
 	}

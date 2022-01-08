@@ -485,7 +485,6 @@ class Html2BBC extends AbstractDomParser
 	private function _convertStyles($node)
 	{
 		$style = $node->getAttribute('style');
-		$value= $this->getValue($node);
 		$value = $this->getInnerHTML($node);
 
 		// Don't style if it's really just empty
