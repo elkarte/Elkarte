@@ -754,7 +754,7 @@ class ThemeLoader
 		$context['forum_name'] = $mbname;
 		$context['forum_name_html_safe'] = $context['forum_name'];
 
-		static::loadLanguageFiles(['index', 'Addons']);
+		static::loadLanguageFile('index+Addons');
 	}
 
 	/**
@@ -882,7 +882,7 @@ class ThemeLoader
 	public static function loadLanguageFile(
 		$template_name,
 		$lang = '',
-		$fatal = true,
+		$fatal = false, // @todo reset to true when appropriate
 		$force_reload = false
 	) {
 		return static::loadLanguageFiles(
