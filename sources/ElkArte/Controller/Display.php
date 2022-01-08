@@ -481,6 +481,8 @@ class Display extends AbstractController
 			$msg_tables = array();
 			call_integration_hook('integrate_message_query', array(&$msg_selects, &$msg_tables, &$msg_parameters));
 
+			MembersList::loadGuest();
+
 			// What?  It's not like it *couldn't* be only guests in this topic...
 			if (!empty($posters))
 			{
