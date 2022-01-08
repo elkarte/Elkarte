@@ -1,6 +1,6 @@
 <?php
 
-use ElkArte\Html2Md;
+use ElkArte\Converters\Html2Md;
 use PHPUnit\Framework\TestCase;
 
 class TestHTML2Md extends TestCase

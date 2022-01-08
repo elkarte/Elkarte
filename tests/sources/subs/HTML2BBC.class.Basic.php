@@ -1,6 +1,6 @@
 <?php
 
-use ElkArte\Html2BBC;
+use ElkArte\Converters\Html2BBC;
 use PHPUnit\Framework\TestCase;
 
 class TestHTML2BBC extends TestCase
