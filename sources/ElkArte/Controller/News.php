@@ -358,8 +358,8 @@ class News extends AbstractController
 				$data[] = array(
 					'title' => cdata_parse($member['real_name']),
 					'link' => $scripturl . '?action=profile;u=' . $member['id_member'],
-					'published' => gmstrftime('%Y-%m-%dT%H:%M:%SZ', $member['date_registered']),
-					'updated' => gmstrftime('%Y-%m-%dT%H:%M:%SZ', $member['last_login']),
+					'published' => Util::gmstrftime('%Y-%m-%dT%H:%M:%SZ', $member['date_registered']),
+					'updated' => Util::gmstrftime('%Y-%m-%dT%H:%M:%SZ', $member['last_login']),
 					'id' => $scripturl . '?action=profile;u=' . $member['id_member'],
 				);
 			}
@@ -454,8 +454,8 @@ class News extends AbstractController
 						'email' => in_array(showEmailAddress(!empty($row['hide_email']), $row['id_member']), array('yes', 'yes_permission_override')) ? $row['poster_email'] : null,
 						'uri' => !empty($row['id_member']) ? $scripturl . '?action=profile;u=' . $row['id_member'] : '',
 					),
-					'published' => gmstrftime('%Y-%m-%dT%H:%M:%SZ', $row['poster_time']),
-					'modified' => gmstrftime('%Y-%m-%dT%H:%M:%SZ', empty($row['modified_time']) ? $row['poster_time'] : $row['modified_time']),
+					'published' => Util::gmstrftime('%Y-%m-%dT%H:%M:%SZ', $row['poster_time']),
+					'modified' => Util::gmstrftime('%Y-%m-%dT%H:%M:%SZ', empty($row['modified_time']) ? $row['poster_time'] : $row['modified_time']),
 					'id' => $scripturl . '?topic=' . $row['id_topic'] . '.0',
 				);
 			}
@@ -560,8 +560,8 @@ class News extends AbstractController
 						'email' => in_array(showEmailAddress(!empty($row['hide_email']), $row['id_member']), array('yes', 'yes_permission_override')) ? $row['poster_email'] : null,
 						'uri' => !empty($row['id_member']) ? $scripturl . '?action=profile;u=' . $row['id_member'] : ''
 					),
-					'published' => gmstrftime('%Y-%m-%dT%H:%M:%SZ', $row['poster_time']),
-					'updated' => gmstrftime('%Y-%m-%dT%H:%M:%SZ', empty($row['modified_time']) ? $row['poster_time'] : $row['modified_time']),
+					'published' => Util::gmstrftime('%Y-%m-%dT%H:%M:%SZ', $row['poster_time']),
+					'updated' => Util::gmstrftime('%Y-%m-%dT%H:%M:%SZ', empty($row['modified_time']) ? $row['poster_time'] : $row['modified_time']),
 					'id' => $scripturl . '?topic=' . $row['id_topic'] . '.msg' . $row['id_msg'] . '#msg' . $row['id_msg'],
 				);
 			}
@@ -669,8 +669,8 @@ class News extends AbstractController
 					'email' => in_array(showEmailAddress(!empty($member['hide_email']), $member['id']), array('yes', 'yes_permission_override')) ? $member['email'] : null,
 					'uri' => !empty($member['website']) ? $member['website']['url'] : ''
 				),
-				'published' => gmstrftime('%Y-%m-%dT%H:%M:%SZ', $member->date_registered),
-				'updated' => gmstrftime('%Y-%m-%dT%H:%M:%SZ', $member->last_login),
+				'published' => Util::gmstrftime('%Y-%m-%dT%H:%M:%SZ', $member->date_registered),
+				'updated' => Util::gmstrftime('%Y-%m-%dT%H:%M:%SZ', $member->last_login),
 				'id' => $scripturl . '?action=profile;u=' . $member['id'],
 				'logo' => !empty($member['avatar']) ? $member['avatar']['url'] : '',
 			);

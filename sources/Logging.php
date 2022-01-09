@@ -16,6 +16,7 @@
 
 use ElkArte\Cache\Cache;
 use ElkArte\User;
+use Elkarte\Util;
 
 /**
  * Put this user in the online log.
@@ -220,7 +221,7 @@ function trackStats($stats = array())
 	$setStringUpdate = array();
 	$insert_keys = array();
 
-	$date = strftime('%Y-%m-%d', forum_time(false));
+	$date = Util::strftime('%Y-%m-%d', forum_time(false));
 	$update_parameters = array(
 		'current_date' => $date,
 	);

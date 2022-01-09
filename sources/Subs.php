@@ -353,18 +353,18 @@ function standardTime($log_time, $show_today = true, $offset_type = false)
 	{
 		if (!isset($non_twelve_hour))
 		{
-			$non_twelve_hour = trim(strftime('%p')) === '';
+			$non_twelve_hour = trim(Util::strftime('%p')) === '';
 		}
 		if ($non_twelve_hour && strpos($str, '%p') !== false)
 		{
-			$str = str_replace('%p', (strftime('%H', $time) < 12 ? $txt['time_am'] : $txt['time_pm']), $str);
+			$str = str_replace('%p', (Util::strftime('%H', $time) < 12 ? $txt['time_am'] : $txt['time_pm']), $str);
 		}
 
 		foreach (array('%a', '%A', '%b', '%B') as $token)
 		{
 			if (strpos($str, $token) !== false)
 			{
-				$str = str_replace($token, !empty($txt['lang_capitalize_dates']) ? ElkArte\Util::ucwords(strftime($token, $time)) : strftime($token, $time), $str);
+				$str = str_replace($token, !empty($txt['lang_capitalize_dates']) ? ElkArte\Util::ucwords(Elkarte\Util::strftime($token, $time)) : Elkarte\Util::strftime($token, $time), $str);
 			}
 		}
 	}
@@ -375,24 +375,24 @@ function standardTime($log_time, $show_today = true, $offset_type = false)
 		{
 			if (strpos($str, $token) !== false)
 			{
-				$str = str_replace($token, $txt[$text_label][(int) strftime($token === '%a' || $token === '%A' ? '%w' : '%m', $time)], $str);
+				$str = str_replace($token, $txt[$text_label][(int) Elkarte\Util::strftime($token === '%a' || $token === '%A' ? '%w' : '%m', $time)], $str);
 			}
 		}
 
 		if (strpos($str, '%p') !== false)
 		{
-			$str = str_replace('%p', (strftime('%H', $time) < 12 ? $txt['time_am'] : $txt['time_pm']), $str);
+			$str = str_replace('%p', (Elkarte\Util::strftime('%H', $time) < 12 ? $txt['time_am'] : $txt['time_pm']), $str);
 		}
 	}
 
 	// Windows doesn't support %e; on some versions, strftime fails altogether if used, so let's prevent that.
 	if ($is_win && strpos($str, '%e') !== false)
 	{
-		$str = str_replace('%e', ltrim(strftime('%d', $time), '0'), $str);
+		$str = str_replace('%e', ltrim(Elkarte\Util::strftime('%d', $time), '0'), $str);
 	}
 
 	// Format any other characters..
-	return strftime($str, $time);
+	return Elkarte\Util::strftime($str, $time);
 }
 
 /**
@@ -1055,7 +1055,7 @@ function text2words($text, $encrypt = false)
 		foreach ($words as $word)
 		{
 			$word = trim($word, '-_\'');
-			if ($word !== '' && !in_array($word, $blocklist) && Util::strlen($word) > 2)
+			if ($word !== '' && !in_array($word, $blocklist) && Elkarte\Util::strlen($word) > 2)
 			{
 				// Get a hex representation of this word using a database indexing hash
 				// designed to be fast while maintaining a very low collision rate

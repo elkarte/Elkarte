@@ -433,7 +433,7 @@ class Register extends AbstractController
 		// Handle a string as a birth date...
 		if ($this->_req->getPost('birthdate', 'trim', '') !== '')
 		{
-			$this->_req->post->birthdate = strftime('%Y-%m-%d', strtotime($this->_req->post->birthdate));
+			$this->_req->post->birthdate = Util::strftime('%Y-%m-%d', strtotime($this->_req->post->birthdate));
 		}
 		// Or birthdate parts...
 		elseif (!empty($this->_req->post->bday1) && !empty($this->_req->post->bday2))
@@ -572,12 +572,12 @@ class Register extends AbstractController
 
 		$lang = !empty($modSettings['userLanguage']) ? $modSettings['userLanguage'] : 'english';
 		$agreement = new Agreement($lang);
-		$agreement->accept($memberID, $this->user->ip, empty($modSettings['agreementRevision']) ? strftime('%Y-%m-%d', forum_time(false)) : $modSettings['agreementRevision']);
+		$agreement->accept($memberID, $this->user->ip, empty($modSettings['agreementRevision']) ? Util::strftime('%Y-%m-%d', forum_time(false)) : $modSettings['agreementRevision']);
 
 		if (!empty($modSettings['requirePrivacypolicy']))
 		{
 			$policy = new PrivacyPolicy($lang);
-			$policy->accept($memberID, $this->user->ip, empty($modSettings['privacypolicyRevision']) ? strftime('%Y-%m-%d', forum_time(false)) : $modSettings['privacypolicyRevision']);
+			$policy->accept($memberID, $this->user->ip, empty($modSettings['privacypolicyRevision']) ? Util::strftime('%Y-%m-%d', forum_time(false)) : $modSettings['privacypolicyRevision']);
 		}
 
 		// Do our spam protection now.
@@ -1370,7 +1370,7 @@ class Register extends AbstractController
 		if (isset($this->_req->post->accept_agreement))
 		{
 			$agreement = new Agreement($this->user->language);
-			$agreement->accept($this->user->id, $this->user->ip, empty($modSettings['agreementRevision']) ? strftime('%Y-%m-%d', forum_time(false)) : $modSettings['agreementRevision']);
+			$agreement->accept($this->user->id, $this->user->ip, empty($modSettings['agreementRevision']) ? Util::strftime('%Y-%m-%d', forum_time(false)) : $modSettings['agreementRevision']);
 
 			$_SESSION['agreement_accepted'] = true;
 			if (isset($_SESSION['agreement_url_redirect']))
@@ -1422,7 +1422,7 @@ class Register extends AbstractController
 
 		if (isset($this->_req->post->accept_agreement))
 		{
-			$policy->accept($this->user->id, $this->user->ip, empty($modSettings['privacypolicyRevision']) ? strftime('%Y-%m-%d', forum_time(false)) : $modSettings['privacypolicyRevision']);
+			$policy->accept($this->user->id, $this->user->ip, empty($modSettings['privacypolicyRevision']) ? Util::strftime('%Y-%m-%d', forum_time(false)) : $modSettings['privacypolicyRevision']);
 
 			$_SESSION['privacypolicy_accepted'] = true;
 			if (isset($_SESSION['privacypolicy_url_redirect']))

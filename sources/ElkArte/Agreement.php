@@ -14,6 +14,7 @@
 namespace ElkArte;
 
 use BBC\ParserWrapper;
+use Elkarte\Util;
 
 /**
  * Class Agreement
@@ -224,7 +225,7 @@ class Agreement
 				array(
 					'version' => $version,
 					'id_member' => $id_member,
-					'accepted_date' => strftime('%Y-%m-%d', forum_time(false)),
+					'accepted_date' => Util::strftime('%Y-%m-%d', forum_time(false)),
 					'accepted_ip' => $ip,
 				)
 			),
@@ -244,7 +245,7 @@ class Agreement
 
 	protected function _backupId()
 	{
-		$backup_id = strftime('%Y-%m-%d', forum_time(false));
+		$backup_id = Util::strftime('%Y-%m-%d', forum_time(false));
 		$counter = '';
 		$merger = '';
 

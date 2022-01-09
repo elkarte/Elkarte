@@ -75,7 +75,7 @@ class Query extends AbstractQuery
 	 */
 	public function last_error()
 	{
-		if (is_resource($this->connection))
+		if (is_resource($this->connection) || $this->connection instanceof \PgSql\Connection)
 		{
 			return pg_last_error($this->connection);
 		}
@@ -116,8 +116,14 @@ class Query extends AbstractQuery
 			$this->on_conflict = '';
 		}
 
-		$inserted_results = !is_resource($this->_db_last_result) ? 0 : pg_affected_rows($this->_db_last_result);
-
+		if(is_resource($this->_db_last_result) || $this->_db_last_result instanceof \PgSQL\Result)
+		{
+			$inserted_results = pg_affected_rows($this->_db_last_result);
+		}
+		else
+		{
+			$inserted_results = 0;
+		}
 		$last_inserted_id = $this->insert_id($table);
 
 		$this->result->updateDetails([
@@ -369,7 +375,7 @@ class Query extends AbstractQuery
 	 */
 	public function validConnection()
 	{
-		return is_resource($this->connection);
+		return (is_resource($this->connection) || $this->connection instanceof \PgSql\Connection);
 	}
 
 	/**

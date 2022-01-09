@@ -254,7 +254,7 @@ class ManageCalendarModule extends AbstractController
 			}
 			else
 			{
-				$date = strftime('%Y-%m-%d', mktime(0, 0, 0, $this->_req->post->month, $this->_req->post->day, $this->_req->post->year));
+				$date = Util::strftime('%Y-%m-%d', mktime(0, 0, 0, $this->_req->post->month, $this->_req->post->day, $this->_req->post->year));
 				if (isset($this->_req->post->edit))
 				{
 					editHoliday($this->_req->post->holiday, $date, $this->_req->post->title);
@@ -286,7 +286,7 @@ class ManageCalendarModule extends AbstractController
 		}
 
 		// Last day for the drop down?
-		$context['holiday']['last_day'] = (int) strftime('%d', mktime(0, 0, 0, $context['holiday']['month'] == 12
+		$context['holiday']['last_day'] = (int) Util::strftime('%d', mktime(0, 0, 0, $context['holiday']['month'] == 12
 			? 1
 			: $context['holiday']['month'] + 1, 0, $context['holiday']['month'] == 12
 				? $context['holiday']['year'] + 1

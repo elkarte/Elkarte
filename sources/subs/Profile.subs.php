@@ -519,7 +519,7 @@ function loadProfileFields($force_reload = false)
 		),
 		'date_registered' => array(
 			'type' => 'date',
-			'value' => empty($cur_profile['date_registered']) ? $txt['not_applicable'] : strftime('%Y-%m-%d', $cur_profile['date_registered'] + (User::$info->time_offset + $modSettings['time_offset']) * 3600),
+			'value' => empty($cur_profile['date_registered']) ? $txt['not_applicable'] : Util::strftime('%Y-%m-%d', $cur_profile['date_registered'] + (User::$info->time_offset + $modSettings['time_offset']) * 3600),
 			'label' => $txt['date_registered'],
 			'log_change' => true,
 			'permission' => 'moderate_forum',
@@ -531,10 +531,10 @@ function loadProfileFields($force_reload = false)
 				{
 					$value = $cur_profile['date_registered'];
 
-					return $txt['invalid_registration'] . ' ' . strftime('%d %b %Y ' . (strpos(User::$info->time_format, '%H') !== false ? '%I:%M:%S %p' : '%H:%M:%S'), forum_time(false));
+					return $txt['invalid_registration'] . ' ' . Util::strftime('%d %b %Y ' . (strpos(User::$info->time_format, '%H') !== false ? '%I:%M:%S %p' : '%H:%M:%S'), forum_time(false));
 				}
 				// As long as it doesn't equal "N/A"...
-				elseif ($value != $txt['not_applicable'] && $value != strtotime(strftime('%Y-%m-%d', $cur_profile['date_registered'] + (User::$info->time_offset + $modSettings['time_offset']) * 3600)))
+				elseif ($value != $txt['not_applicable'] && $value != strtotime(Util::strftime('%Y-%m-%d', $cur_profile['date_registered'] + (User::$info->time_offset + $modSettings['time_offset']) * 3600)))
 				{
 					$value -= (User::$info->time_offset + $modSettings['time_offset']) * 3600;
 				}
@@ -1055,8 +1055,8 @@ function loadProfileFields($force_reload = false)
 
 				$context['member']['time_format'] = $cur_profile['time_format'];
 				$context['current_forum_time'] = standardTime(time() - User::$info->time_offset * 3600, false);
-				$context['current_forum_time_js'] = strftime('%Y,' . ((int) strftime('%m', time() + $modSettings['time_offset'] * 3600) - 1) . ',%d,%H,%M,%S', time() + $modSettings['time_offset'] * 3600);
-				$context['current_forum_time_hour'] = (int) strftime('%H', forum_time(false));
+				$context['current_forum_time_js'] = Util::strftime('%Y,' . ((int) Util::strftime('%m', time() + $modSettings['time_offset'] * 3600) - 1) . ',%d,%H,%M,%S', time() + $modSettings['time_offset'] * 3600);
+				$context['current_forum_time_hour'] = (int) Util::strftime('%H', forum_time(false));
 
 				return true;
 			},

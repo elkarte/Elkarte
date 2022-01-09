@@ -100,7 +100,7 @@ function DumpDatabase2()
 	$scripturl = '';
 
 	// Send the proper headers to let them download this file.
-	$filename = $db_name . '-' . (empty($_REQUEST['struct']) ? 'data' : (empty($_REQUEST['data']) ? 'structure' : 'complete')) . '_' . strftime('%Y-%m-%d') . $extension . '"';
+	$filename = $db_name . '-' . (empty($_REQUEST['struct']) ? 'data' : (empty($_REQUEST['data']) ? 'structure' : 'complete')) . '_' . Util::strftime('%Y-%m-%d') . $extension . '"';
 
 	$headers
 		->header('Content-Disposition', 'attachment; filename="' . $filename . '"')
