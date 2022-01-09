@@ -15,6 +15,7 @@
  */
 
 use ElkArte\Cache\Cache;
+use Elkarte\Util;
 
 /**
  * Do we think the current user is a spider?

@@ -16,6 +16,7 @@
 
 use ElkArte\Cache\Cache;
 use ElkArte\User;
+use Elkarte\Util;
 
 /**
  * Put this user in the online log.
