@@ -19,6 +19,7 @@ use ElkArte\AbstractController;
 use ElkArte\Action;
 use ElkArte\Cache\Cache;
 use ElkArte\Controller\Emailpost;
+use ElkArte\Converters\Html2Md;
 use ElkArte\DataValidator;
 use ElkArte\EmailSettings;
 use ElkArte\EventManager;
@@ -27,7 +28,6 @@ use ElkArte\SettingsForm\SettingsForm;
 use ElkArte\Themes\ThemeLoader;
 use ElkArte\User;
 use ElkArte\Util;
-use ElkArte\Html2Md;
 
 /**
  * This class is the administration maillist controller.

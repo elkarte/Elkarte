@@ -15,16 +15,16 @@
 use BBC\ParserWrapper;
 use ElkArte\AttachmentsDirectory;
 use ElkArte\Cache\Cache;
+use ElkArte\Converters\Html2BBC;
+use ElkArte\Converters\Html2Md;
 use ElkArte\EmailFormat;
-use ElkArte\Html2BBC;
-use ElkArte\Html2Md;
 use ElkArte\MembersList;
 use ElkArte\Notifications;
 use ElkArte\NotificationsTask;
 use ElkArte\TemporaryAttachment;
+use ElkArte\TemporaryAttachmentsList;
 use ElkArte\Themes\ThemeLoader;
 use ElkArte\Util;
-use ElkArte\TemporaryAttachmentsList;
 
 /**
  * Converts text / HTML to BBC
