@@ -394,11 +394,11 @@ class Database_PostgreSQL extends Database_Abstract
 			return pg_fetch_row($result, $counter);
 
 		// Reset the row counter...
-		if (!isset($db_row_count[(int) $result]))
-			$db_row_count[(int) $result] = 0;
+		if (!isset($db_row_count[$this->seekCounter($result)]))
+			$db_row_count[$this->seekCounter($result)] = 0;
 
 		// Return the right row.
-		return @pg_fetch_row($result, $db_row_count[(int) $result]++);
+		return @pg_fetch_row($result, $db_row_count[$this->seekCounter($result)]++);
 	}
 
 	/**
@@ -408,6 +408,13 @@ class Database_PostgreSQL extends Database_Abstract
 	 */
 	public function free_result($result)
 	{
+		global $db_row_count;
+
+		$id = $this->seekCounter($result);
+		// Reset the row counter...
+		if (isset($db_row_count[$id]))
+			unset($db_row_count[$id]);
+
 		// Just delegate to the native function
 		pg_free_result($result);
 	}
@@ -443,7 +450,7 @@ class Database_PostgreSQL extends Database_Abstract
 	{
 		global $db_row_count;
 
-		$db_row_count[(int) $request] = $counter;
+		$db_row_count[$this->seekCounter($request)] = $counter;
 
 		return true;
 	}
@@ -485,7 +492,7 @@ class Database_PostgreSQL extends Database_Abstract
 		// Decide which connection to use
 		$connection = $connection === null ? $this->_connection : $connection;
 
-		if (is_resource($connection))
+		if (is_resource($connection) || $connection instanceof \PgSql\Connection)
 			return pg_last_error($connection);
 	}
 
@@ -938,7 +945,7 @@ class Database_PostgreSQL extends Database_Abstract
 	 */
 	public function db_server_version()
 	{
-		$version = pg_version();
+		$version = pg_version($this->_connection);
 
 		return $version['server'];
 	}
@@ -987,7 +994,7 @@ class Database_PostgreSQL extends Database_Abstract
 	 */
 	public function escape_string($string)
 	{
-		return pg_escape_string($string);
+		return pg_escape_string($this->_connection, $string);
 	}
 
 	/**
@@ -1004,11 +1011,11 @@ class Database_PostgreSQL extends Database_Abstract
 			return pg_fetch_assoc($request, $counter);
 
 		// Reset the row counter...
-		if (!isset($db_row_count[(int) $request]))
-			$db_row_count[(int) $request] = 0;
+		if (!isset($db_row_count[$this->seekCounter($request)]))
+			$db_row_count[$this->seekCounter($request)] = 0;
 
 		// Return the right row.
-		return @pg_fetch_assoc($request, $db_row_count[(int) $request]++);
+		return @pg_fetch_assoc($request, $db_row_count[$this->seekCounter($request)]++);
 	}
 
 	/**
@@ -1019,7 +1026,7 @@ class Database_PostgreSQL extends Database_Abstract
 	public function db_server_info()
 	{
 		// give info on client! we use it in install and upgrade and such things.
-		$version = pg_version();
+		$version = pg_version($this->_connection);
 
 		return $version['client'];
 	}
@@ -1031,7 +1038,7 @@ class Database_PostgreSQL extends Database_Abstract
 	 */
 	public function db_client_version()
 	{
-		$version = pg_version();
+		$version = pg_version($this->_connection);
 
 		return $version['client'];
 	}
@@ -1064,6 +1071,27 @@ class Database_PostgreSQL extends Database_Abstract
 	 */
 	public function validConnection($connection = null)
 	{
-		return is_resource($connection);
+		return (is_resource($connection) || $connection instanceof \PgSql\Connection);
+	}
+
+	/**
+	 * Return an id for the resource/object
+	 *
+	 * @param resource|object $resource of returned result set
+	 */
+	public function seekCounter($resource)
+	{
+		global $db_row_count;
+
+		if(!is_resource($resource) && ($resource instanceof \PgSql\Result))
+		{
+			$id = spl_object_id($resource);
+		}
+		else
+		{
+			$id = (int)$resource;
+		}
+
+		return $id;
 	}
 }
