@@ -303,7 +303,7 @@ class Html2Md extends AbstractDomParser
 		$title = $node->getAttribute('title');
 		$class = $node->getAttribute('class');
 		$value = trim($this->getValue($node), "\t\n\r\0\x0B");
-//
+
 		// Provide a more compact [name] if none is given
 		if ($value == $node->getAttribute('href') || empty($value))
 		{
@@ -434,7 +434,7 @@ class Html2Md extends AbstractDomParser
 	 * html: <h3>header</h3>
 	 * md: ### header
 	 *
-	 * @param int $level
+	 * @param string $level
 	 * @param string $content
 	 * @return string
 	 */
@@ -667,7 +667,7 @@ class Html2Md extends AbstractDomParser
 				break;
 			case 'center':
 				$paddingNeeded = $max - $width;
-				$left = floor($paddingNeeded / 2);
+				$left = (int) floor($paddingNeeded / 2);
 				$right = $paddingNeeded - $left;
 				$content = str_repeat(' ', $left) . $content . str_repeat(' ', $right);
 				break;

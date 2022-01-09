@@ -68,7 +68,7 @@ abstract class AbstractDomParser
 	 */
 	public function setParser()
 	{
-		$this->internalParser = 'true';
+		$this->internalParser = true;
 
 		// PHP built-in function not available?
 		if (!class_exists('\\DOMDocument'))
@@ -351,11 +351,17 @@ abstract class AbstractDomParser
 	 * @param int child number to return
 	 * @return object
 	 */
-	public function getChild($node, $number)
+	public function getChild($node, $child)
 	{
-		return $this->internalParser ? $node->childNodes->item($number) : $node->childNodes($number);
+		return $this->internalParser ? $node->childNodes->item($child) : $node->childNodes($child);
 	}
 
+	/**
+	 * gets the next sibling of a node
+	 *
+	 * @param object|array $node
+	 * @return object
+	 */
 	public function getSibling($node)
 	{
 		return $this->internalParser ? $node->nextSibling : $node->next_sibling();

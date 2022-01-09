@@ -77,9 +77,9 @@ class Html2BBC extends AbstractDomParser
 	/**
 	 * If we want to skip over some tags (that would normally be converted)
 	 *
-	 * @param string[] $tags
+	 * @param string|string[] $tags
 	 */
-	public function skip_tags($tags = array())
+	public function skip_tags($tags)
 	{
 		if (!is_array($tags))
 		{
@@ -95,9 +95,9 @@ class Html2BBC extends AbstractDomParser
 	/**
 	 * If we want to skip over inline style tags (that would normally be converted)
 	 *
-	 * @param string[] $styles
+	 * @param string|string[] $styles
 	 */
-	public function skip_styles($styles = array())
+	public function skip_styles($styles)
 	{
 		if (!is_array($styles))
 		{
@@ -120,7 +120,7 @@ class Html2BBC extends AbstractDomParser
 		$this->convertChildNodes($this->getDOMBodyNode());
 
 		// Done replacing HTML elements, now get the converted DOM tree back into a string
-		$bbc = $this->markdown = $this->getHTML();
+		$bbc = $this->getHTML();
 		$bbc = $this->_recursive_decode($bbc);
 		$bbc = $this->getBodyText($bbc);
 
