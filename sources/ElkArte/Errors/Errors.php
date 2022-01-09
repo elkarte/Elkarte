@@ -102,7 +102,8 @@ class Errors extends AbstractModel
 	{
 		global $language, $txt;
 
-		ThemeLoader::loadLanguageFile('Errors', $language);
+		$lang = new Loader($language);
+		$lang->load('Errors');
 
 		$reload_lang_file = $language !== $this->user->language;
 
@@ -112,7 +113,8 @@ class Errors extends AbstractModel
 		// Load the language file, only if it needs to be reloaded
 		if ($reload_lang_file)
 		{
-			ThemeLoader::loadLanguageFile('Errors');
+			$lang = new Loader();
+			$lang->load('Errors');
 		}
 
 		// Return the message to make things simpler.
@@ -515,7 +517,8 @@ class Errors extends AbstractModel
 
 		if ($log)
 		{
-			ThemeLoader::loadLanguageFile('Errors', $language);
+			$lang = new Loader($language);
+			$lang->load('Errors');
 			$this->log_error(
 				sprintf($txt['invalid_access'], $_SERVER['REMOTE_ADDR']),
 				'blocked'

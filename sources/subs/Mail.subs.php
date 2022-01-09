@@ -928,17 +928,18 @@ function loadEmailTemplate($template, $replacements = array(), $lang = '', $load
 	// First things first, load up the email templates language file, if we need to.
 	if ($loadLang)
 	{
-		ThemeLoader::loadLanguageFile('EmailTemplates', $lang);
+		$lang_loader = new Loader($lang);
+		$lang_loader->load('EmailTemplates');
 		if (!empty($modSettings['maillist_enabled']))
 		{
-			ThemeLoader::loadLanguageFile('MaillistTemplates', $lang);
+			$lang_loader->load('MaillistTemplates');
 		}
 
 		if (!empty($additional_files))
 		{
 			foreach ($additional_files as $file)
 			{
-				ThemeLoader::loadLanguageFile($file, $lang);
+				$lang_loader->load($file);
 			}
 		}
 	}

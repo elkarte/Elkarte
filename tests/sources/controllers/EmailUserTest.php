@@ -27,8 +27,8 @@ class TestEmailUserController extends ElkArteCommonSetupTest
 		parent::setSession();
 
 		new ElkArte\Themes\ThemeLoader();
-		\ElkArte\Themes\ThemeLoader::loadLanguageFile('Errors', 'english', false, true);
-		\ElkArte\Themes\ThemeLoader::loadLanguageFile('Validation', 'english', false, true);
+		$lang = new Loader('english');
+		$lang->load('Errors+Validation');
 
 		$topic = 1;
 	}

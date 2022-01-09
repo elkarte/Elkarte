@@ -19,7 +19,8 @@ class TestSettingsForm extends TestCase
 	 */
 	protected function setUp(): void
 	{
-		\ElkArte\Themes\ThemeLoader::loadLanguageFile('Admin', 'english', true, true);
+		$lang = new Loader('english');
+		$lang->load('Admin');
 
 		// Elevate the user.
 		User::$info = new UserInfo([

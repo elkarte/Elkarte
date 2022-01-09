@@ -23,8 +23,8 @@ class TestAttachment extends ElkArteCommonSetupTest
 		$this->setSession();
 
 		new ElkArte\Themes\ThemeLoader();
-		\ElkArte\Themes\ThemeLoader::loadLanguageFile('Post', 'english', true, true);
-		\ElkArte\Themes\ThemeLoader::loadLanguageFile('Errors', 'english', true, true);
+		$lang = new Loader('english');
+		$lang->load('Post+Errors');
 	}
 
 	/**

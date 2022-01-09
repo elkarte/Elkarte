@@ -68,8 +68,8 @@ class TestMentions extends TestCase
 			'name' => 'itsme',
 		]);
 
-		ThemeLoader::loadLanguageFile('EmailTemplates', 'english', false, true);
-		ThemeLoader::loadLanguageFile('MaillistTemplates', 'english', false, true);
+		$lang = new Loader('english');
+		$lang->load('EmailTemplates+MaillistTemplates');
 
 		// Lets start by ensuring a topic exists by creating one
 		require_once(SUBSDIR . '/Post.subs.php');

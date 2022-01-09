@@ -265,10 +265,8 @@ class DailyDigest implements ScheduledTaskInterface
 		$langtxt = array();
 		foreach ($langs as $lang)
 		{
-			ThemeLoader::loadLanguageFile('Post', $lang);
-			ThemeLoader::loadLanguageFile('index', $lang);
-			ThemeLoader::loadLanguageFile('Maillist', $lang);
-			ThemeLoader::loadLanguageFile('EmailTemplates', $lang);
+			$lang_loader = new Loader($lang);
+			$lang_loader->load('index+Post+Maillist+EmailTemplates');
 
 			$langtxt[$lang] = array(
 				'subject' => $txt['digest_subject_' . ($is_weekly ? 'weekly' : 'daily')],

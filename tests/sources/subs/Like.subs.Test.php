@@ -52,7 +52,8 @@ class TestLikes extends TestCase
 		// Keep id of the new topic.
 		$this->id_topic = $topicOptions['id'];
 		// Hey now, force a reload, we still rely on globals!
-		\ElkArte\Themes\ThemeLoader::loadLanguageFile('Errors', 'english', true, true);
+		$lang = new Loader('english');
+		$lang->load('Errors');
 	}
 
 	/**

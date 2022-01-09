@@ -22,13 +22,14 @@ use ElkArte\User;
 use ElkArte\UserInfo;
 use ElkArte\Util;
 use ElkArte\Debug;
+use ElkArte\Languages\Loader as LangLoader;
 
 /**
  * Class ThemeLoader
  */
 class ThemeLoader
 {
-	/**@var mixed|\ElkArte\ValuesContainer */
+	/** @var mixed|\ElkArte\ValuesContainer */
 	public $user;
 
 	/** @var int The id of the theme being used */
@@ -778,89 +779,24 @@ class ThemeLoader
 		global $language, $settings, $modSettings;
 		global $db_show_debug, $txt;
 		static $already_loaded = [];
+		static $loaders = [];
 
 		// Default to the user's language.
 		if ($lang === '')
 		{
 			$lang = User::$info->language ?? $language;
 		}
-
-		// Make sure we have $settings - if not we're in trouble and need to find it!
-		if (empty($settings['default_theme_dir']))
+		if (!isset($loaders[$lang]))
 		{
-			static::loadEssentialThemeData();
+			$loaders[$lang] = new LangLoader($lang, null, empty($modSettings['disable_language_fallback']));
 		}
 
-		$fix_arrays = false;
 		// For each file open it up and write it out!
 		foreach ($template_name as $template)
 		{
-			if (!$force_reload && isset($already_loaded[$template]) && $already_loaded[$template] === $lang)
-			{
-				return $lang;
-			}
+			$fix_arrays = $template === 'index';
 
-			if ($template === 'index')
-			{
-				$fix_arrays = true;
-			}
-
-			// Do we want the English version of language file as fallback?
-			if (empty($modSettings['disable_language_fallback']) && $lang != 'english')
-			{
-				static::loadLanguageFiles([$template], 'english', false);
-			}
-
-			// Try to find the language file.
-			$found = false;
-			foreach (static::$dirs->getDirectories() as $template_dir)
-			{
-				if (file_exists(
-					$file =
-						$template_dir . '/languages/' . $lang . '/' . $template . '.' . $lang . '.php'
-				))
-				{
-					// Include it!
-					static::$dirs->fileInclude($file);
-
-					// Note that we found it.
-					$found = true;
-
-					// Keep track of what we're up to, soldier.
-					if ($db_show_debug === true)
-					{
-						Debug::instance()->add(
-							'language_files',
-							$template . '.' . $lang . ' (' . basename(
-								$settings['theme_url']
-							) . ')'
-						);
-					}
-
-					// Remember what we have loaded, and in which language.
-					$already_loaded[$template] = $lang;
-
-					break;
-				}
-			}
-
-			// That couldn't be found!  Log the error, but *try* to continue normally.
-			if (!$found && $fatal)
-			{
-				Errors::instance()->log_error(
-					sprintf(
-						$txt['theme_language_error'],
-						$template . '.' . $lang,
-						'template'
-					)
-				);
-				break;
-			}
-		}
-
-		if ($fix_arrays)
-		{
-			fix_calendar_text();
+			$loaders[$lang]->load($template, $fix_arrays);
 		}
 
 		// Return the language actually loaded.

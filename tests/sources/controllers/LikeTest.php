@@ -20,8 +20,8 @@ class TestLike extends ElkArteCommonSetupTest
 		parent::setUp();
 
 		new ElkArte\Themes\ThemeLoader();
-		\ElkArte\Themes\ThemeLoader::loadLanguageFile('Profile', 'english', true, true);
-		\ElkArte\Themes\ThemeLoader::loadLanguageFile('Errors', 'english', true, true);
+		$lang = new Loader('english');
+		$lang->load('Profile+Errors');
 	}
 
 	/**

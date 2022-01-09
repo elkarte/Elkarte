@@ -1630,9 +1630,11 @@ function response_prefix()
 		}
 		else
 		{
-			ThemeLoader::loadLanguageFile('index', $language, false);
+			$lang_loader = new Loader($language);
+			$lang_loader->load('index');
 			$response_prefix = $txt['response_prefix'];
-			ThemeLoader::loadLanguageFile('index');
+			$lang_loader = new Loader();
+			$lang_loader->load('index');
 		}
 
 		$cache->put('response_prefix', $response_prefix, 600);

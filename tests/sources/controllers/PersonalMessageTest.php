@@ -27,8 +27,8 @@ class TestPersonalMessageController extends ElkArteCommonSetupTest
 		parent::setSession();
 
 		new ElkArte\Themes\ThemeLoader();
-		\ElkArte\Themes\ThemeLoader::loadLanguageFile('PersonalMessage', 'english', false, true);
-		\ElkArte\Themes\ThemeLoader::loadLanguageFile('Post', 'english', false, true);
+		$lang = new Loader('english');
+		$lang->load('PersonalMessage+Post');
 
 	}
 

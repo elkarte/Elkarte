@@ -214,7 +214,9 @@ function sendNotifications($topics, $type, $exclude = array(), $members_only = a
 				$needed_language = empty($row['lngfile']) || empty($modSettings['userLanguage']) ? $language : $row['lngfile'];
 				if (empty($current_language) || $current_language !== $needed_language)
 				{
-					$current_language = ThemeLoader::loadLanguageFile('Post', $needed_language, false);
+					$lang_loader = new Loader($needed_language);
+					$lang_loader->load('Post', false);
+					$current_language = $needed_language;
 				}
 
 				$message_type = 'notification_' . $type;
@@ -344,7 +346,9 @@ function sendNotifications($topics, $type, $exclude = array(), $members_only = a
 		$needed_language = empty($row['lngfile']) || empty($modSettings['userLanguage']) ? $language : $row['lngfile'];
 		if (empty($current_language) || $current_language !== $needed_language)
 		{
-			$current_language = ThemeLoader::loadLanguageFile('Post', $needed_language, false);
+			$lang_loader = new Loader($needed_language);
+			$lang_loader->load('Post', false);
+			$current_language = $needed_language;
 		}
 
 		$message_type = 'notification_' . $type;
@@ -401,7 +405,8 @@ function sendNotifications($topics, $type, $exclude = array(), $members_only = a
 
 	if (isset($current_language) && $current_language !== $user_language)
 	{
-		ThemeLoader::loadLanguageFile('Post');
+		$lang_loader = new Loader();
+		$lang_loader->load('Post', false);
 	}
 
 	// Sent!
@@ -548,7 +553,9 @@ function sendBoardNotifications(&$topicData)
 			continue;
 		}
 
-		$langloaded = ThemeLoader::loadLanguageFile('index', empty($rowmember['lngfile']) || empty($modSettings['userLanguage']) ? $language : $rowmember['lngfile'], false);
+		$langloaded = empty($rowmember['lngfile']) || empty($modSettings['userLanguage']) ? $language : $rowmember['lngfile'];
+		$lang_loader = new Loader($langloaded);
+		$lang_loader->load('index', false);
 
 		// Now loop through all the notifications to send for this board.
 		if (empty($boards[$rowmember['id_board']]))
@@ -620,7 +627,8 @@ function sendBoardNotifications(&$topicData)
 	}
 	$members->free_result();
 
-	ThemeLoader::loadLanguageFile('index', User::$info->language);
+	$lang_loader = new Loader();
+	$lang_loader->load('index', false);
 
 	// Sent!
 	$db->query('', '
@@ -724,7 +732,9 @@ function sendApprovalNotifications(&$topicData)
 		$needed_language = empty($row['lngfile']) || empty($modSettings['userLanguage']) ? $language : $row['lngfile'];
 		if (empty($current_language) || $current_language !== $needed_language)
 		{
-			$current_language = ThemeLoader::loadLanguageFile('Post', $needed_language, false);
+			$lang_loader = new Loader($needed_language);
+			$lang_loader->load('Post', false);
+			$current_language = $needed_language;
 		}
 
 		$sent_this_time = false;
@@ -771,7 +781,8 @@ function sendApprovalNotifications(&$topicData)
 
 	if (isset($current_language) && $current_language !== User::$info->language)
 	{
-		ThemeLoader::loadLanguageFile('Post');
+		$lang_loader = new Loader();
+		$lang_loader->load('Post', false);
 	}
 
 	// Sent!
@@ -892,7 +903,8 @@ function sendAdminNotifications($type, $memberID, $member_name = null)
 
 	if (isset($current_language) && $current_language !== User::$info->language)
 	{
-		ThemeLoader::loadLanguageFile('Login');
+		$lang_loader = new Loader();
+		$lang_loader->load('Login', false);
 	}
 }
 

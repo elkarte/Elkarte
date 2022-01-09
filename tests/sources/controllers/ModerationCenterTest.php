@@ -41,8 +41,8 @@ class TestModerationCenterController extends ElkArteCommonSetupTest
 		$modSettings['securityDisable'] = true;
 
 		new ElkArte\Themes\ThemeLoader();
-		\ElkArte\Themes\ThemeLoader::loadLanguageFile('ModerationCenter', 'english', false, true);
-		\ElkArte\Themes\ThemeLoader::loadLanguageFile('ManageMembers', 'english', false, true);
+		$lang = new Loader('english');
+		$lang->load('ModerationCenter+ManageMembers');
 	}
 
 	/**

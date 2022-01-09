@@ -26,8 +26,8 @@ class TestEmailPostController extends ElkArteCommonSetupTest
 		parent::setUp();
 
 		new ElkArte\Themes\ThemeLoader();
-		ThemeLoader::loadLanguageFile('EmailTemplates', 'english', false, true);
-		ThemeLoader::loadLanguageFile('Maillist', 'english', false, true);
+		$lang = new Loader('english');
+		$lang->load('EmailTemplates+Maillist');
 
 		$modSettings['maillist_enabled'] = true;
 		$modSettings['pbe_post_enabled'] = true;

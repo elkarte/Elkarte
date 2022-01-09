@@ -23,7 +23,8 @@ class TestDraft extends ElkArteCommonSetupTest
 		parent::setUp();
 
 		new ElkArte\Themes\ThemeLoader();
-		\ElkArte\Themes\ThemeLoader::loadLanguageFile('Drafts', 'english', true, true);
+		$lang = new Loader('english');
+		$lang->load('Drafts');
 	}
 
 	/**

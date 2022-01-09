@@ -17,7 +17,8 @@ class TestManagePostsSettings extends ElkArteCommonSetupTest
 	protected function setUp(): void
 	{
 		parent::setUp();
-		ThemeLoader::loadLanguageFile('Admin', 'english', true, true);
+		$lang = new Loader('english');
+		$lang->load('Admin');
 	}
 
 	/**

@@ -4,6 +4,7 @@ use ElkArte\HttpReq;
 use ElkArte\SiteDispatcher;
 use ElkArte\Themes\ThemeLoader;
 use ElkArte\User;
+use ElkArte\Languages\Loader;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -61,7 +62,8 @@ class TestAdminSearch extends TestCase
 		 * Forcefully reload language files to combat PHPUnit
 		 * messing up globals between tests.
 		 */
-		ThemeLoader::loadLanguageFile('Admin', 'english', true, true);
+		$lang = new Loader('english');
+		$lang->load('admin');
 
 		// Set up the controller.
 		$req = HttpReq::instance();

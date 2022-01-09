@@ -189,9 +189,6 @@ class ApprovalNotification implements ScheduledTaskInterface
 		// Get the mailing stuff.
 		require_once(SUBSDIR . '/Mail.subs.php');
 
-		// Need the below for \ElkArte\Themes\ThemeLoader::loadLanguageFile to work!
-		ThemeLoader::loadEssentialThemeData();
-
 		$current_language = '';
 
 		// Finally, loop through each member, work out what they can do, and send it.
@@ -202,7 +199,9 @@ class ApprovalNotification implements ScheduledTaskInterface
 			// Load the language file as required.
 			if (empty($current_language) || $current_language !== $member['language'])
 			{
-				$current_language = ThemeLoader::loadLanguageFile('EmailTemplates', $member['language'], false);
+				$lang = new Loader($member['language']);
+				$lang->load('EmailTemplates');
+				$current_language = $member['language'];
 			}
 
 			// Loop through each notice...

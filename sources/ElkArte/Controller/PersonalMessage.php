@@ -1975,7 +1975,8 @@ class PersonalMessage extends AbstractController
 
 				if (!isset($messagesToSend[$cur_language]))
 				{
-					ThemeLoader::loadLanguageFile('PersonalMessage', $cur_language, false);
+					$lang = new Loader($cur_language);
+					$lang->load('PersonalMessage', false);
 
 					// Make the body.
 					$report_body = str_replace(array('{REPORTER}', '{SENDER}'), array(un_htmlspecialchars($this->user->name), $memberFromName), $txt['pm_report_pm_user_sent']);
@@ -2010,7 +2011,8 @@ class PersonalMessage extends AbstractController
 			// Give the user their own language back!
 			if (!empty($modSettings['userLanguage']))
 			{
-				ThemeLoader::loadLanguageFile('PersonalMessage', '', false);
+				$lang = new Loader();
+				$lang->load('PersonalMessage', false);
 			}
 
 			// Leave them with a template.

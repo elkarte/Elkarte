@@ -22,7 +22,8 @@ class TestPBE extends TestCase
 	{
 		require_once(SUBSDIR . '/Emailpost.subs.php');
 
-		\ElkArte\Themes\ThemeLoader::loadLanguageFile('Maillist', 'english', true, true);
+		$lang = new Loader('english');
+		$lang->load('Maillist');
 		User::$info = new UserInfo(['name' => 'name']);
 
 		$this->_email = 'Return-Path: <noreply@elkarte.net>

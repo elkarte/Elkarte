@@ -194,9 +194,11 @@ class MoveTopic extends AbstractController
 		// Ugly !
 		if ($this->user->language !== $language)
 		{
-			ThemeLoader::loadLanguageFile('index', $language);
+			$lang = new Loader($language);
+			$lang->load('index');
 			$temp = $txt['movetopic_default'];
-			ThemeLoader::loadLanguageFile('index');
+			$lang = new Loader();
+			$lang->load('index');
 			$txt['movetopic_default'] = $temp;
 		}
 
@@ -414,7 +416,8 @@ class MoveTopic extends AbstractController
 			// Should be in the boardwide language.
 			if ($this->user->language !== $language)
 			{
-				ThemeLoader::loadLanguageFile('index', $language);
+				$lang = new Loader($language);
+				$lang->load('index');
 			}
 
 			$reason = Util::htmlspecialchars($this->_req->post->reason, ENT_QUOTES);
