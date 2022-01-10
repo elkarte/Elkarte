@@ -8,4 +8,4 @@ coverage:
 
 ignore:
   - "sources/ext"
-  - "themes/default/languages"
+  - "sources/ElkArte/Languages"
