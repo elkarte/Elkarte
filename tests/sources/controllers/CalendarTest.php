@@ -2,6 +2,7 @@
 
 use ElkArte\Controller\Calendar;
 use ElkArte\EventManager;
+use ElkArte\Languages\Loader;
 
 /**
  * TestCase class for the Calendar Controller

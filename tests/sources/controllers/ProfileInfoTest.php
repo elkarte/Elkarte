@@ -3,6 +3,7 @@
 use ElkArte\Controller\ProfileInfo;
 use ElkArte\EventManager;
 use ElkArte\User;
+use ElkArte\Languages\Loader;
 
 /**
  * TestCase class for the Profile Info Controller

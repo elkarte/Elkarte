@@ -24,6 +24,7 @@ use ElkArte\Search\SearchApiWrapper;
 use ElkArte\Themes\ThemeLoader;
 use ElkArte\User;
 use ElkArte\Util;
+use ElkArte\Languages\Loader as LangLoader;
 
 /**
  * Removes the passed id_topic's checking for permissions.
@@ -2462,7 +2463,7 @@ function postSplitRedirect($reason, $subject, $board_info, $new_topic)
 	// Should be in the boardwide language.
 	if (User::$info->language != $language)
 	{
-		$lang_loader = new Loader($language);
+		$lang_loader = new LangLoader($language);
 		$lang_loader->load('index');
 	}
 

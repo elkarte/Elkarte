@@ -3,6 +3,7 @@
 use ElkArte\Controller\Emailpost;
 use ElkArte\EventManager;
 use ElkArte\Themes\ThemeLoader;
+use ElkArte\Languages\Loader;
 
 /**
  * TestCase class for the EmailPost Controller

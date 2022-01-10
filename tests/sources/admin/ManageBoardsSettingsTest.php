@@ -3,6 +3,7 @@
 use ElkArte\AdminController\ManageBoards;
 use ElkArte\EventManager;
 use ElkArte\User;
+use ElkArte\Languages\Loader;
 
 /**
  * TestCase class for manage boards settings

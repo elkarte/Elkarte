@@ -4,6 +4,7 @@ use ElkArte\SettingsForm\SettingsForm;
 use ElkArte\User;
 use ElkArte\UserInfo;
 use PHPUnit\Framework\TestCase;
+use ElkArte\Languages\Loader;
 
 class TestSettingsForm extends TestCase
 {

@@ -17,6 +17,7 @@
 namespace ElkArte\ScheduledTasks\Tasks;
 
 use ElkArte\Themes\ThemeLoader;
+use ElkArte\Languages\Loader;
 
 /**
  * Function to sending out approval notices to moderators.

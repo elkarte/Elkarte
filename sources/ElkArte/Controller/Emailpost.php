@@ -16,6 +16,7 @@ namespace ElkArte\Controller;
 use ElkArte\AbstractController;
 use ElkArte\EmailParse;
 use ElkArte\Themes\ThemeLoader;
+use ElkArte\Languages\Loader;
 
 /**
  * Handles items pertaining to posting or PM an item that was received by email

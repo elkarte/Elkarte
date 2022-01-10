@@ -27,6 +27,7 @@ use ElkArte\Themes\ThemeLoader;
 use ElkArte\UrlGenerator\UrlGenerator;
 use ElkArte\User;
 use ElkArte\Util;
+use ElkArte\Languages\Loader;
 
 /**
  * Updates the settings table as well as $modSettings... only does one at a time if $update is true.

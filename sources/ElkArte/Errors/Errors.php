@@ -24,6 +24,7 @@ use ElkArte\Exceptions\Exception;
 use ElkArte\Http\Headers;
 use ElkArte\Themes\ThemeLoader;
 use ElkArte\User;
+use ElkArte\Languages\Loader;
 
 /**
  * Class to handle all forum errors and exceptions

@@ -15,6 +15,7 @@ use ElkArte\Notifications;
 use ElkArte\Themes\ThemeLoader;
 use ElkArte\TokenHash;
 use ElkArte\User;
+use ElkArte\Languages\Loader;
 
 /**
  * Sends a notification to members who have elected to receive emails

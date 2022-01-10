@@ -18,6 +18,7 @@ namespace ElkArte\ScheduledTasks\Tasks;
 
 use ElkArte\Themes\ThemeLoader;
 use ElkArte\Util;
+use ElkArte\Languages\Loader;
 
 /**
  * Class DailyDigest - Send out a daily email of all subscribed topics, to members.

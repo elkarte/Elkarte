@@ -5,6 +5,7 @@ use ElkArte\SettingsForm\SettingsFormAdapter\InlinePermissions;
 use ElkArte\User;
 use ElkArte\UserInfo;
 use PHPUnit\Framework\TestCase;
+use ElkArte\Languages\Loader;
 
 class TestInlinePermissionsForm extends TestCase
 {

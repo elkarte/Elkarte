@@ -4,6 +4,7 @@ use ElkArte\Controller\ProfileOptions;
 use ElkArte\EventManager;
 use ElkArte\MembersList;
 use ElkArte\User;
+use ElkArte\Languages\Loader;
 
 /**
  * TestCase class for the Profile Options Controller

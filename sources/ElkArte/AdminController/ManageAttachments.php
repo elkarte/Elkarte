@@ -23,6 +23,7 @@ use ElkArte\SettingsForm\SettingsForm;
 use ElkArte\Themes\ThemeLoader;
 use ElkArte\Util;
 use ElkArte\AttachmentsDirectory;
+use ElkArte\Languages\Loader;
 
 /**
  * This is the attachments and avatars controller class.

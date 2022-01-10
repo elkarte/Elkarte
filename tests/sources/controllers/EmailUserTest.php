@@ -4,6 +4,7 @@ use ElkArte\Controller\Emailuser;
 use ElkArte\EventManager;
 use ElkArte\HttpReq;
 use ElkArte\User;
+use ElkArte\Languages\Loader;
 
 /**
  * TestCase class for the EmailUser Controller

@@ -2,6 +2,7 @@
 
 use ElkArte\Controller\Attachment;
 use ElkArte\EventManager;
+use ElkArte\Languages\Loader;
 
 /**
  * TestCase class for the Attachment Controller

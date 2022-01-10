@@ -3,6 +3,7 @@
 use ElkArte\Controller\Recent;
 use ElkArte\EventManager;
 use ElkArte\User;
+use ElkArte\Languages\Loader;
 
 /**
  * TestCase class for recent posts

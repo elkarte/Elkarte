@@ -35,6 +35,7 @@ use ElkArte\User;
 use ElkArte\Util;
 use ElkArte\ValuesContainer;
 use ElkArte\VerificationControls\VerificationControlsIntegrate;
+use ElkArte\Languages\Loader;
 
 /**
  * Class PersonalMessage

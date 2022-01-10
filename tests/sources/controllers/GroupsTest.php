@@ -4,6 +4,7 @@ use ElkArte\Controller\Groups;
 use ElkArte\EventManager;
 use ElkArte\HttpReq;
 use ElkArte\User;
+use ElkArte\Languages\Loader;
 
 /**
  * TestCase class for the Groups Controller

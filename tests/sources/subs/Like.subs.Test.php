@@ -1,6 +1,7 @@
 <?php
 
 use PHPUnit\Framework\TestCase;
+use ElkArte\Languages\Loader;
 
 /**
  * TestCase class for like subs.

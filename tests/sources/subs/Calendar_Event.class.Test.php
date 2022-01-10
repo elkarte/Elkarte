@@ -1,6 +1,7 @@
 <?php
 
 use ElkArte\CalendarEvent;
+use ElkArte\Languages\Loader;
 
 /**
  * TestCase class for the \ElkArte\CalendarEvent class.

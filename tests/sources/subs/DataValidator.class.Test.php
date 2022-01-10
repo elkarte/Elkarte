@@ -1,6 +1,7 @@
 <?php
 
 use ElkArte\DataValidator;
+use ElkArte\Languages\Loader;
 
 class TestDataValidator extends ElkArteCommonSetupTest
 {
