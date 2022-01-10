@@ -1220,68 +1220,27 @@ function getLanguages($use_cache = true)
 
 	// Either we don't use the cache, or its expired.
 	$languages = array();
+	$language_dir = SOURCEDIR . '/ElkArte/Languages/Index/';
 
 	if (!$use_cache || !$cache->getVar($languages, 'known_languages', $cache->levelLowerThan(2) ? 86400 : 3600))
 	{
-		// If we don't have our theme information yet, lets get it.
-		if (empty($settings['default_theme_dir']))
+		$dir = dir($language_dir);
+		while (($entry = $dir->read()))
 		{
-			new ThemeLoader(0, false);
-		}
-
-		// Default language directories to try.
-		$language_directories = array(
-			$settings['default_theme_dir'] . '/languages',
-			$settings['actual_theme_dir'] . '/languages',
-		);
-
-		// We possibly have a base theme directory.
-		if (!empty($settings['base_theme_dir']))
-		{
-			$language_directories[] = $settings['base_theme_dir'] . '/languages';
-		}
-
-		// Remove any duplicates.
-		$language_directories = array_unique($language_directories);
-
-		foreach ($language_directories as $language_dir)
-		{
-			// Can't look in here... doesn't exist!
-			if (!file_exists($language_dir))
+			if ($entry == '.' || $entry == '..')
 			{
 				continue;
 			}
 
-			$dir = dir($language_dir);
-			while (($entry = $dir->read()))
-			{
-				// Only directories are interesting
-				if ($entry == '..' || !is_dir($dir->path . '/' . $entry))
-				{
-					continue;
-				}
-
-				// @todo at some point we may want to simplify that stuff (I mean scanning all the files just for index)
-				$file_dir = dir($dir->path . '/' . $entry);
-				while (($file_entry = $file_dir->read()))
-				{
-					// Look for the index language file....
-					if (!preg_match('~^index\.(.+)\.php$~', $file_entry, $matches))
-					{
-						continue;
-					}
-
-					$languages[$matches[1]] = array(
-						'name' => Util::ucwords(strtr($matches[1], array('_' => ' '))),
-						'selected' => false,
-						'filename' => $matches[1],
-						'location' => $language_dir . '/' . $entry . '/index.' . $matches[1] . '.php',
-					);
-				}
-				$file_dir->close();
-			}
-			$dir->close();
+			$basename = basename($entry, '.php');
+			$languages[$basename] = array(
+				'name' => $basename,
+				'selected' => false,
+				'filename' => $entry,
+				'location' => $language_dir . '/' . $entry,
+			);
 		}
+		$dir->close();
 
 		// Let's cash in on this deal.
 		$cache->put('known_languages', $languages, $cache->isEnabled() && $cache->levelLowerThan(1) ? 86400 : 3600);
