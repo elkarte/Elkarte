@@ -114,8 +114,8 @@ class ElkTestingSetup
 	{
 		global $txt;
 
-		require_once(BOARDDIR . '/themes/default/languages/english/Install.english.php');
-		require_once(BOARDDIR . '/themes/default/languages/english/index.english.php');
+		require_once(BOARDDIR . '/ElkArte/Languages/Install/English.php');
+		require_once(BOARDDIR . '/ElkArte/Languages/Install/Index.php');
 
 		$replaces = array(
 			'{$db_prefix}' => $this->_db_prefix,

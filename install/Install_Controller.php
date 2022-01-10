@@ -247,7 +247,7 @@ class Install_Controller
 			'Settings_bak.php'
 		);
 		foreach ($incontext['detected_languages'] as $lang => $temp)
-			$extra_files[] = 'themes/default/languages/' . $lang;
+			$extra_files[] = 'sources/ElkArte/Languages/Install/' . $lang;
 
 		// With mod_security installed, we could attempt to fix it with .htaccess.
 		if (function_exists('apache_get_modules') && in_array('mod_security', apache_get_modules()))
