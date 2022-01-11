@@ -120,7 +120,7 @@ class Attachment extends AbstractController
 		$context['sub_template'] = 'send_json';
 
 		// Make sure the session is still valid
-		if (checkSession('request', '', false) != '')
+		if (checkSession('request', '', false) !== '')
 		{
 			$context['json_data'] = array('result' => false, 'data' => $txt['session_timeout_file_upload']);
 
@@ -139,8 +139,7 @@ class Attachment extends AbstractController
 			{
 				require_once(SUBSDIR . '/Attachments.subs.php');
 
-				$process = $this->_req->getPost('msg', 'intval', 0);
-				processAttachments($process);
+				processAttachments($this->_req->getPost('msg', 'intval', 0));
 			}
 
 			// Any mistakes?
@@ -480,7 +479,7 @@ class Attachment extends AbstractController
 
 		// Not compressible, or not supported / requested by client
 		if (!preg_match('~^(?:text/|application/(?:json|xml|rss\+xml)$)~i', $mime_type)
-			|| strpos($_SERVER['HTTP_ACCEPT_ENCODING'], 'gzip') === false)
+			|| (!isset($_SERVER['HTTP_ACCEPT_ENCODING']) || strpos($_SERVER['HTTP_ACCEPT_ENCODING'], 'gzip') === false))
 		{
 			return false;
 		}
