@@ -16,6 +16,7 @@
 
 namespace ElkArte\ScheduledTasks\Tasks;
 
+use ElkArte\AttachmentsDirectory;
 use ElkArte\Errors\Errors;
 use ElkArte\Themes\ThemeLoader;
 
