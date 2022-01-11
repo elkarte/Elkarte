@@ -28,7 +28,6 @@ use ElkArte\Util;
  *
  * @return int
  * @package Attachments
- * @throws \ElkArte\Exceptions\Exception
  */
 function approveAttachments($attachments)
 {
@@ -132,7 +131,6 @@ function approveAttachments($attachments)
  * @param bool $autoThumbRemoval = true
  * @return int[]|bool returns affected messages if $return_affected_messages is set to true
  * @package Attachments
- * @throws \ElkArte\Exceptions\Exception
  */
 function removeAttachments($condition, $query_type = '', $return_affected_messages = false, $autoThumbRemoval = true)
 {
@@ -327,7 +325,6 @@ function removeAttachments($condition, $query_type = '', $return_affected_messag
  *
  * @return int
  * @package Attachments
- * @throws \ElkArte\Exceptions\Exception
  */
 function getAttachmentCount()
 {
@@ -358,7 +355,6 @@ function getAttachmentCount()
  *
  * @return int
  * @package Attachments
- * @throws \ElkArte\Exceptions\Exception
  */
 function getFolderAttachmentCount($folder)
 {
@@ -417,7 +413,6 @@ function getAvatarCount()
  *
  * @param int[] $attach_ids
  * @package Attachments
- * @throws \ElkArte\Exceptions\Exception
  */
 function removeOrphanAttachments($attach_ids)
 {
@@ -451,7 +446,6 @@ function removeOrphanAttachments($attach_ids)
  *
  * @return bool|int|null
  * @package Attachments
- * @throws \ElkArte\Exceptions\Exception
  */
 function attachment_filesize($attach_id, $filesize = null)
 {
@@ -501,7 +495,6 @@ function attachment_filesize($attach_id, $filesize = null)
  *
  * @return bool|int|null
  * @package Attachments
- * @throws \ElkArte\Exceptions\Exception
  */
 function attachment_folder($attach_id, $folder_id = null)
 {
@@ -580,7 +573,6 @@ function maxNoThumb()
  *
  * @return array
  * @package Attachments
- * @throws \ElkArte\Exceptions\Exception
  */
 function findOrphanThumbnails($start, $fix_errors, $to_fix)
 {
@@ -653,7 +645,6 @@ function findOrphanThumbnails($start, $fix_errors, $to_fix)
  *
  * @return array
  * @package Attachments
- * @throws \ElkArte\Exceptions\Exception
  */
 function findParentsOrphanThumbnails($start, $fix_errors, $to_fix)
 {
@@ -708,7 +699,6 @@ function findParentsOrphanThumbnails($start, $fix_errors, $to_fix)
  *
  * @return array
  * @package Attachments
- * @throws \ElkArte\Exceptions\Exception
  */
 function repairAttachmentData($start, $fix_errors, $to_fix)
 {
@@ -853,7 +843,6 @@ function repairAttachmentData($start, $fix_errors, $to_fix)
  *
  * @return array
  * @package Attachments
- * @throws \ElkArte\Exceptions\Exception
  */
 function findOrphanAvatars($start, $fix_errors, $to_fix)
 {
@@ -925,7 +914,6 @@ function findOrphanAvatars($start, $fix_errors, $to_fix)
  *
  * @return array
  * @package Attachments
- * @throws \ElkArte\Exceptions\Exception
  */
 function findOrphanAttachments($start, $fix_errors, $to_fix)
 {
@@ -1032,7 +1020,6 @@ function maxAttachment()
  *
  * @return array
  * @package Attachments
- * @throws \Exception
  */
 function validateAttachments($attachments, $approve_query)
 {
@@ -1069,7 +1056,6 @@ function validateAttachments($attachments, $approve_query)
  *
  * @return int
  * @package Attachments
- * @throws \Exception
  */
 function attachmentBelongsTo($attachment)
 {
@@ -1100,7 +1086,6 @@ function attachmentBelongsTo($attachment)
  * @param int $id_attach
  * @return bool
  * @package Attachments
- * @throws \ElkArte\Exceptions\Exception
  */
 function validateAttachID($id_attach)
 {
@@ -1133,7 +1118,6 @@ function validateAttachID($id_attach)
  * @param string $approve_query additional restrictions based on the boards the approver can see
  * @return mixed[] an array of unapproved attachments
  * @package Attachments
- * @throws \Exception
  */
 function list_getUnapprovedAttachments($start, $items_per_page, $sort, $approve_query)
 {
@@ -1217,7 +1201,6 @@ function list_getUnapprovedAttachments($start, $items_per_page, $sort, $approve_
  * @param string $approve_query additional restrictions based on the boards the approver can see
  * @return int the number of unapproved attachments
  * @package Attachments
- * @throws \ElkArte\Exceptions\Exception
  */
 function list_getNumUnapprovedAttachments($approve_query)
 {
@@ -1257,10 +1240,11 @@ function list_getAttachDirs()
 	global $modSettings, $context, $txt, $scripturl;
 
 	$db = database();
-	$attachmentsDir = new AttachmentsDirectory($modSettings, $db);
 
+	$attachmentsDir = new AttachmentsDirectory($modSettings, $db);
 	$expected_files = array();
 	$expected_size = array();
+
 	$db->fetchQuery('
 		SELECT 
 			id_folder, COUNT(id_attach) AS num_attach, SUM(size) AS size_attach
@@ -1276,7 +1260,6 @@ function list_getAttachDirs()
 			$expected_size[$row['id_folder']] = $row['size_attach'];
 		}
 	);
-
 	$attachdirs = array();
 	foreach ($attachmentsDir->getPaths() as $id => $dir)
 	{
@@ -1294,7 +1277,7 @@ function list_getAttachDirs()
 		$is_base_dir = false;
 		if ($attachmentsDir->hasBaseDir())
 		{
-			$is_base_dir = $attachmentsDir->hasBaseDir();
+			$is_base_dir = $attachmentsDir->isBaseDir($dir);
 
 			// Count any sub-folders.
 			$sub_dirs = $attachmentsDir->countSubdirs($dir);
@@ -1307,7 +1290,7 @@ function list_getAttachDirs()
 			'disable_current' => $attachmentsDir->autoManageEnabled(AttachmentsDirectory::AUTO_SEQUENCE),
 			'disable_base_dir' => $is_base_dir && $sub_dirs > 0 && !empty($files) && empty($error),
 			'path' => $dir,
-			'current_size' => !empty($expected_size[$id]) ? comma_format($expected_size[$id] / 1024, 0) : 0,
+			'current_size' => !empty($expected_size[$id]) ? byte_format($expected_size[$id]) : 0,
 			'num_files' => comma_format($expected_files[$id] - $sub_dirs, 0) . ($sub_dirs > 0 ? ' (' . $sub_dirs . ')' : ''),
 			'status' => ($is_base_dir ? $txt['attach_dir_basedir'] . '<br />' : '') . ($error ? '<div class="error">' : '') . str_replace('{repair_url}', $scripturl . '?action=admin;area=manageattachments;sa=repair;' . $context['session_var'] . '=' . $context['session_id'], $txt['attach_dir_' . $status]) . ($error ? '</div>' : ''),
 		);
@@ -1416,9 +1399,9 @@ function list_getBaseDirs()
 		$basedirs[] = array(
 			'id' => $id,
 			'current' => $attachmentsDir->isCurrentBaseDir($dir),
-			'path' => $expected_dirs > 0 ? $dir : ('<input type="text" name="base_dir[' . $id . ']" value="' . $dir . '" size="40" />'),
+			'path' => $expected_dirs > 0 ? $dir : ('<input type="text" name="base_dir[' . $id . ']" value="' . $dir . '" size="40" class="input_text" />'),
 			'num_dirs' => $expected_dirs,
-			'status' => $status == 'ok' ? $txt['attach_dir_ok'] : ('<span class="error">' . $txt['attach_dir_' . $status] . '</span>'),
+			'status' => $status === 'ok' ? $txt['attach_dir_ok'] : ('<span class="error">' . $txt['attach_dir_' . $status] . '</span>'),
 		);
 	}
 
@@ -1427,7 +1410,7 @@ function list_getBaseDirs()
 		$basedirs[] = array(
 			'id' => '',
 			'current' => false,
-			'path' => '<input type="text" name="new_base_dir" value="" size="40" />',
+			'path' => '<input type="text" name="new_base_dir" value="" size="40" class="input_text" />',
 			'num_dirs' => '',
 			'status' => '',
 		);
@@ -1446,7 +1429,6 @@ function list_getBaseDirs()
  *
  * @return int
  * @package Attachments
- * @throws \ElkArte\Exceptions\Exception
  */
 function list_getNumFiles($browse_type)
 {
@@ -1502,7 +1484,6 @@ function list_getNumFiles($browse_type)
  *
  * @return array
  * @package Attachments
- * @throws \Exception
  */
 function list_getFiles($start, $items_per_page, $sort, $browse_type)
 {
@@ -1603,7 +1584,6 @@ function currentAttachDirProperties()
  *
  * @return array
  * @package Attachments
- * @throws \ElkArte\Exceptions\Exception
  */
 function attachDirProperties($dir)
 {
@@ -1689,7 +1669,6 @@ function moveAvatars()
  * @param int $limit
  *
  * @return array
- * @throws \Exception
  */
 function findAttachmentsToMove($from, $start, $limit)
 {
@@ -1720,7 +1699,6 @@ function findAttachmentsToMove($from, $start, $limit)
  *
  * @param int[] $moved integer array of attachment ids
  * @param string $new_dir new directory string
- * @throws \ElkArte\Exceptions\Exception
  */
 function moveAttachments($moved, $new_dir)
 {
@@ -1745,7 +1723,6 @@ function moveAttachments($moved, $new_dir)
  * @param int[] $messages array of message id's to update
  * @param string $notice notice to add
  * @package Attachments
- * @throws \ElkArte\Exceptions\Exception
  */
 function setRemovalNotice($messages, $notice)
 {
@@ -1771,7 +1748,6 @@ function setRemovalNotice($messages, $notice)
  * @return array
  * @todo $unapproved may be superfluous
  * @package Attachments
- * @throws \Exception
  */
 function attachmentsOfMessage($id_msg, $unapproved = false)
 {
@@ -1830,7 +1806,6 @@ function countAttachmentsInFolders($id_folder)
  * @param int $from - the folder the attachments are in
  * @param int $to - the folder the attachments should be moved to
  * @package Attachments
- * @throws \ElkArte\Exceptions\Exception
  */
 function updateAttachmentIdFolder($from, $to)
 {
