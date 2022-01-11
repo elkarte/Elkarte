@@ -33,7 +33,7 @@ use ElkArte\TemporaryAttachmentsList;
  *
  * What it does:
  *
- * - Loops through $_FILES['attachment'] array and saves each file to the current attachments folder.
+ * - Loops through $_FILES['attachment'] array and saves each file to the current attachments' folder.
  * - Validates the save location actually exists.
  *
  * @param int|null $id_msg = null or id of the message with attachments, if any.
@@ -47,15 +47,13 @@ function processAttachments($id_msg = null)
 
 	$attach_errors = AttachmentErrorContext::context();
 	$tmp_attachments = new TemporaryAttachmentsList();
+	$attachmentDirectory = new AttachmentsDirectory($modSettings, database());
 
 	// Make sure we're uploading to the right place.
-	$attachmentDirectory = new AttachmentsDirectory($modSettings, database());
 	try
 	{
-		$attachmentDirectory->automanageCheckDirectory(isset($_REQUEST['action']) && $_REQUEST['action'] == 'admin');
-
+		$attachmentDirectory->automanageCheckDirectory(isset($_REQUEST['action']) && $_REQUEST['action'] === 'admin');
 		$attach_current_dir = $attachmentDirectory->getCurrent();
-
 		if (!is_dir($attach_current_dir))
 		{
 			$tmp_attachments->setSystemError('attach_folder_warning');
@@ -64,21 +62,19 @@ function processAttachments($id_msg = null)
 	}
 	catch (\Exception $e)
 	{
-		// If the attachments folder is not there: error.
+		// If the attachments' folder is not there: error.
 		$tmp_attachments->setSystemError($e->getMessage());
 	}
 
 	if ($tmp_attachments->hasSystemError() === false && !isset($context['attachments']['quantity']))
 	{
+		$context['attachments']['quantity'] = 0;
+		$context['attachments']['total_size'] = 0;
+
 		// If this isn't a new post, check the current attachments.
 		if (!empty($id_msg))
 		{
 			list ($context['attachments']['quantity'], $context['attachments']['total_size']) = attachmentsSizeForMessage($id_msg);
-		}
-		else
-		{
-			$context['attachments']['quantity'] = 0;
-			$context['attachments']['total_size'] = 0;
 		}
 	}
 
@@ -118,7 +114,7 @@ function processAttachments($id_msg = null)
 	if (!$ignore_temp)
 	{
 		$tmp_attachments->setPostParam([
-			'msg' => (int) ($id_msg ?? 0),
+			'msg' => ($id_msg ?? 0),
 			'last_msg' => (int) ($_REQUEST['last_msg'] ?? 0),
 			'topic' => (int) ($topic ?? 0),
 			'board' => (int) ($board ?? 0),
@@ -144,7 +140,7 @@ function processAttachments($id_msg = null)
 		$_FILES['attachment']['tmp_name'] = array();
 	}
 
-	// Loop through $_FILES['attachment'] array and move each file to the current attachments folder.
+	// Loop through $_FILES['attachment'] array and move each file to the current attachments' folder.
 	foreach ($_FILES['attachment']['tmp_name'] as $n => $dummy)
 	{
 		if ($_FILES['attachment']['name'][$n] == '')
@@ -1173,7 +1169,6 @@ function updateAttachmentThumbnail($filename, $id_attach, $id_msg, $old_id_thumb
  * @param bool $include_count = true if true, it also returns the attachments count
  * @package Attachments
  * @return mixed
- * @throws \Exception
  */
 function attachmentsSizeForMessage($id_msg, $include_count = true)
 {
