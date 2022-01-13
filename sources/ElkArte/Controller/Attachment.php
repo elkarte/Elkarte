@@ -48,7 +48,7 @@ class Attachment extends AbstractController
 	{
 		global $modSettings, $maintenance;
 
-		// If guests are not allowed to browse and the use is a guest... kick him!
+		// If guests are not allowed to browse and the user is a guest... kick him!
 		if (empty($modSettings['allow_guestAccess']) && $this->user->is_guest)
 		{
 			return true;
@@ -57,15 +57,13 @@ class Attachment extends AbstractController
 		// If not in maintenance or allowed to use the forum in maintenance
 		if (empty($maintenance) || allowedTo('admin_forum'))
 		{
-			$sa = $this->_req->get('sa');
+			$sa = $this->_req->getQuery('sa', 'trim', '');
 
 			return $sa === 'ulattach' || $sa === 'rmattach';
 		}
-		// else... politely kick them out
-		else
-		{
-			return true;
-		}
+
+		// ... politely kick them out
+		return true;
 	}
 
 	/**

@@ -44,9 +44,6 @@ class ManageAttachments extends AbstractController
 	/** @var int Current directory key being processed */
 	public $current_dir;
 
-	/** @var int Current base directory key being processed */
-	public $current_base_dir;
-
 	/** @var string Used during transfer of files */
 	public $from;
 

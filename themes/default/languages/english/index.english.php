@@ -521,7 +521,7 @@ $txt['delete'] = 'Delete';
 $txt['byte'] = 'B';
 $txt['kilobyte'] = 'KB';
 $txt['megabyte'] = 'MB';
-$txt['gigabyte'] = 'MB';
+$txt['gigabyte'] = 'GB';
 
 $txt['more_stats'] = '[More Stats]';
 

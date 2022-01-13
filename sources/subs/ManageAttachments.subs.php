@@ -1590,7 +1590,6 @@ function attachDirProperties($dir)
 	$db = database();
 
 	$current_dir = array();
-
 	$request = $db->query('', '
 		SELECT 
 			COUNT(*), SUM(size)
@@ -1605,7 +1604,7 @@ function attachDirProperties($dir)
 	list ($current_dir['files'], $current_dir['size']) = $request->fetch_row();
 	$request->free_result();
 
-	return $current_dir;
+	return array_map('intval', $current_dir);
 }
 
 /**

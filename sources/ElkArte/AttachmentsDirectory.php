@@ -42,7 +42,7 @@ class AttachmentsDirectory
 	 0 = normal/off, 1 = by space (#files/size), 2 = by years, 3 = by months 4 = random */
 	protected $automanage_attachments = 0;
 
-	/** @var array Potential attachment directories */
+	/** @var string|array Potential attachment directories */
 	protected $attachmentUploadDir = [];
 
 	/** @var int Pointer to the above upload directory array */
@@ -51,7 +51,7 @@ class AttachmentsDirectory
 	protected $useSubdirectories = 0;
 	protected $attachment_full_notified = false;
 
-	/** @var array Potential root/base directories to which we can add directories/files */
+	/** @var string|array Potential root/base directories to which we can add directories/files */
 	protected $baseDirectories = [];
 
 	/** @var string Current base to use from the above array */
@@ -731,16 +731,15 @@ class AttachmentsDirectory
 	protected function dirSpace($tmp_attach_size = 0)
 	{
 		require_once(SUBSDIR . '/ManageAttachments.subs.php');
-		list (self::$dir_files, self::$dir_size) = attachDirProperties($this->currentAttachmentUploadDir);
-
-		self::$dir_files += empty($tmp_attach_size) ? 0 : 1;
-		self::$dir_size += $tmp_attach_size;
+		$current_dir = attachDirProperties($this->currentAttachmentUploadDir);
+		self::$dir_files = $current_dir['files'] + empty($tmp_attach_size) ? 0 : 1;
+		self::$dir_size = $current_dir['size'] + $tmp_attach_size;
 	}
 
 	/**
 	 * The current attachment path:
 	 *
-	 * What it does: @return string
+	 * What it does:
 	 *
 	 * @todo not really true at the moment
 	 *  - BOARDDIR . '/attachments', if nothing is set yet.
@@ -748,6 +747,7 @@ class AttachmentsDirectory
 	 *    then the current path is stored as unserialize($modSettings['attachmentUploadDir'])[$modSettings['currentAttachmentUploadDir']]
 	 *  - otherwise, the current path is $modSettings['attachmentUploadDir'].
 	 *
+	 * @return string
 	 */
 	public function getCurrent()
 	{

@@ -27,6 +27,7 @@ use ElkArte\TokenHash;
 use ElkArte\User;
 use ElkArte\AttachmentsDirectory;
 use ElkArte\TemporaryAttachmentsList;
+use ElkArte\FileFunctions;
 
 /**
  * Handles the actual saving of attachments to a directory.
@@ -46,24 +47,18 @@ function processAttachments($id_msg = null)
 	global $context, $modSettings, $txt, $topic, $board;
 
 	$attach_errors = AttachmentErrorContext::context();
+
+	$file_functions = new FileFunctions();
 	$tmp_attachments = new TemporaryAttachmentsList();
 	$attachmentDirectory = new AttachmentsDirectory($modSettings, database());
 
 	// Make sure we're uploading to the right place.
-	try
+	$attachmentDirectory->automanageCheckDirectory(isset($_REQUEST['action']) && $_REQUEST['action'] === 'admin');
+	$attach_current_dir = $attachmentDirectory->getCurrent();
+	if (!$file_functions->isDir($attach_current_dir))
 	{
-		$attachmentDirectory->automanageCheckDirectory(isset($_REQUEST['action']) && $_REQUEST['action'] === 'admin');
-		$attach_current_dir = $attachmentDirectory->getCurrent();
-		if (!is_dir($attach_current_dir))
-		{
-			$tmp_attachments->setSystemError('attach_folder_warning');
-			\ElkArte\Errors\Errors::instance()->log_error(sprintf($txt['attach_folder_admin_warning'], $attach_current_dir), 'critical');
-		}
-	}
-	catch (\Exception $e)
-	{
-		// If the attachments' folder is not there: error.
-		$tmp_attachments->setSystemError($e->getMessage());
+		$tmp_attachments->setSystemError('attach_folder_warning');
+		\ElkArte\Errors\Errors::instance()->log_error(sprintf($txt['attach_folder_admin_warning'], $attach_current_dir), 'critical');
 	}
 
 	if ($tmp_attachments->hasSystemError() === false && !isset($context['attachments']['quantity']))
@@ -107,14 +102,14 @@ function processAttachments($id_msg = null)
 
 	if (!isset($_FILES['attachment']['name']))
 	{
-		$_FILES['attachment']['tmp_name'] = array();
+		$_FILES['attachment']['tmp_name'] = [];
 	}
 
 	// Remember where we are at. If it's anywhere at all.
 	if (!$ignore_temp)
 	{
 		$tmp_attachments->setPostParam([
-			'msg' => ($id_msg ?? 0),
+			'msg' => $id_msg ?? 0,
 			'last_msg' => (int) ($_REQUEST['last_msg'] ?? 0),
 			'topic' => (int) ($topic ?? 0),
 			'board' => (int) ($board ?? 0),
@@ -131,7 +126,7 @@ function processAttachments($id_msg = null)
 		// And delete the files 'cos they ain't going nowhere.
 		foreach ($_FILES['attachment']['tmp_name'] as $n => $dummy)
 		{
-			if (is_writable(['attachment']['tmp_name'][$n]))
+			if (is_writable($_FILES['attachment']['tmp_name'][$n]))
 			{
 				unlink($_FILES['attachment']['tmp_name'][$n]);
 			}
@@ -175,38 +170,34 @@ function processAttachments($id_msg = null)
 			$temp_file->remove(false);
 		}
 
+		// The file made it to the server, so do more checks injection, size, extension
 		$temp_file->doChecks($attachmentDirectory);
-
-		// Want to correct for phone rotated photos, hell yeah ya do!
-		if (!empty($modSettings['attachment_autorotate']))
-		{
-			$temp_file->autoRotate();
-		}
 
 		// Sort out the errors for display and delete any associated files.
 		if ($temp_file->hasErrors())
 		{
 			$attach_errors->addAttach($temp_file['attachid'], $temp_file->getName());
-			$log_these = array('attachments_no_create', 'attachments_no_write', 'attach_timeout', 'ran_out_of_space', 'cant_access_upload_path', 'attach_0_byte_file', 'bad_attachment');
+			$log_these = ['attachments_no_create', 'attachments_no_write', 'attach_timeout',
+						  'ran_out_of_space', 'cant_access_upload_path', 'attach_0_byte_file', 'bad_attachment'];
 
 			foreach ($temp_file->getErrors() as $error)
 			{
-				if (!is_array($error))
+				$error = array_filter($error);
+				$attach_errors->addError(isset($error[1]) ? $error : $error[0]);
+				if (in_array($error[0], $log_these))
 				{
-					$attach_errors->addError($error);
-					if (in_array($error, $log_these))
-					{
-						\ElkArte\Errors\Errors::instance()->log_error($temp_file->getName() . ': ' . $txt[$error], 'critical');
+					\ElkArte\Errors\Errors::instance()->log_error($temp_file->getName() . ': ' . $txt[$error[0]], 'critical');
 
-						// For critical errors, we don't want the file or session data to persist
-						$temp_file->remove(false);
-					}
-				}
-				else
-				{
-					$attach_errors->addError(array($error[0], $error[1]));
+					// For critical errors, we don't want the file or session data to persist
+					$temp_file->remove(false);
 				}
 			}
+		}
+
+		// Want to correct for phone rotated photos, hell yeah ya do!
+		if (!empty($modSettings['attachment_autorotate']))
+		{
+			$temp_file->autoRotate();
 		}
 
 		$tmp_attachments->addAttachment($temp_file);
@@ -1009,6 +1000,7 @@ function getServerStoredAvatars($directory)
 	global $context, $txt, $modSettings;
 
 	$result = [];
+	$file_functions = new FileFunctions();
 
 	// You can always have no avatar
 	$result[] = array(
@@ -1020,7 +1012,7 @@ function getServerStoredAvatars($directory)
 
 	// Not valid is easy
 	$avatarDir = $modSettings['avatar_directory'] . (!empty($directory) ? '/' : '') . $directory;
-	if (!is_dir($avatarDir))
+	if (!$file_functions->isDir($avatarDir))
 	{
 		return $result;
 	}
@@ -1527,8 +1519,8 @@ function returnMimeThumb($file_ext, $url = false)
 	$generics = array(
 		'arc' => array('tgz', 'zip', 'rar', '7z', 'gz'),
 		'doc' => array('doc', 'docx', 'wpd', 'odt'),
-		'sound' => array('wav', 'mp3', 'pcm', 'aiff', 'wma', 'm4a'),
-		'video' => array('mp4', 'mgp', 'mpeg', 'mp4', 'wmv', 'flv', 'aiv', 'mov', 'swf'),
+		'sound' => array('wav', 'mp3', 'pcm', 'aiff', 'wma', 'm4a', 'flac'),
+		'video' => array('mp4', 'mgp', 'mpeg', 'mp4', 'wmv', 'mkv', 'flv', 'aiv', 'mov', 'swf'),
 		'txt' => array('rtf', 'txt', 'log'),
 		'presentation' => array('ppt', 'pps', 'odp'),
 		'spreadsheet' => array('xls', 'xlr', 'ods'),
@@ -1588,7 +1580,7 @@ function getValidMimeImageType($mime)
 		IMAGETYPE_WBMP => 'bmp'
 	);
 
-	$ext = $validImageTypes[(int) $mime] ?? '';
+	$ext = (int) $mime > 0 && isset($validImageTypes[(int) $mime]) ? $validImageTypes[(int) $mime] : '';
 	if (empty($ext))
 	{
 		$ext = strtolower(trim(substr($mime, strpos($mime, '/')), '/'));
@@ -1610,7 +1602,7 @@ function get_finfo_mime($filename)
 	// Check only existing readable files
 	if (!file_exists($filename) || !is_readable($filename))
 	{
-		return $mimeType;
+		return false;
 	}
 
 	// Try finfo, this is the preferred way

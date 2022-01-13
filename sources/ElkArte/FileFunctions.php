@@ -71,11 +71,11 @@ class FileFunctions
 	 * - Consolidates chmod error suppression to single function
 	 *
 	 * @param string $file
-	 * @param string|int|null $mode
+	 * @param string|int $mode
 	 *
 	 * @return bool
 	 */
-	public function elk_chmod($item, $mode = null)
+	public function elk_chmod($item, $mode = '')
 	{
 		$result = false;
 		$mode = trim($mode);
