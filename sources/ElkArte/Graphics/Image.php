@@ -353,7 +353,7 @@ class Image
 		$prev_chunk = '';
 		while (!feof($fp))
 		{
-			$cur_chunk = fread($fp, 32768);
+			$cur_chunk = fread($fp, 256000);
 			$test_chunk = $prev_chunk . $cur_chunk;
 
 			// Though not exhaustive lists, better safe than sorry.
