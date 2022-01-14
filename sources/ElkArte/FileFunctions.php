@@ -45,7 +45,7 @@ class FileFunctions
 		$dirChmod = [0755, 0775, 0777];
 
 		// Already writable?
-		if (is_writable($item))
+		if ($this->isWritable($item))
 		{
 			return true;
 		}
@@ -53,7 +53,7 @@ class FileFunctions
 		$modes = $this->isDir($item) ? $dirChmod : $fileChmod;
 		foreach ($modes as $mode)
 		{
-			if (is_writable($item))
+			if ($this->isWritable($item))
 			{
 				return true;
 			}
@@ -123,6 +123,34 @@ class FileFunctions
 
 		return false;
 	}
+
+	/**
+	 * is_writable() helper.  is_writable can throw an E_WARNING on failure.
+	 * Returns true if the filename/directory exists and is writable.
+	 *
+	 * @param string $item a file or directory location
+	 * @return bool
+	 */
+	public function isWritable($item)
+	{
+		try
+		{
+			$fileInfo = new \SplFileInfo($item);
+			var_dump($fileInfo->isWritable());
+			var_dump($fileInfo->isFile());
+			if ($fileInfo->isWritable())
+			{
+				return true;
+			}
+		}
+		catch (\RuntimeException $e)
+		{
+			return false;
+		}
+
+		return false;
+	}
+
 
 	/**
 	 * Creates a directory as defined by a supplied path

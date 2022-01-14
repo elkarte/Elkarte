@@ -73,22 +73,13 @@ class TemporaryAttachmentsList extends ValuesContainer
 	 */
 	public function remove($file)
 	{
-		try
+		// Must exist and have edit permissions
+		if (FileFunctions::instance()->isWritable($file))
 		{
-			// Must exist and have edit permissions
-			if (!is_writable(($file)))
-			{
-				throw new \Exception('attachment_not_found');
-			}
-
-			unlink($file);
-		}
-		catch (\Exception $e)
-		{
-			return false;
+			return unlink($file);
 		}
 
-		return true;
+		return false;
 	}
 
 	/**
@@ -242,6 +233,11 @@ class TemporaryAttachmentsList extends ValuesContainer
 		return str_replace(['{user}', '{hash}'], [$userId, $hash], static::TMPNAME_TPL);
 	}
 
+	/**
+	 * If there is any post data available
+	 *
+	 * @return bool
+	 */
 	public function hasPostData()
 	{
 		return isset($this->data['post']);
@@ -267,6 +263,12 @@ class TemporaryAttachmentsList extends ValuesContainer
 		return empty($this->data['post']['msg']);
 	}
 
+	/**
+	 * Return a post parameter like files, last_msg, topic, msg
+	 *
+	 * @param $idx
+	 * @return mixed|null
+	 */
 	public function getPostParam($idx)
 	{
 		return $this->data['post'][$idx] ?? null;
@@ -307,7 +309,7 @@ class TemporaryAttachmentsList extends ValuesContainer
 	}
 
 	/**
-	 * Finds and return a temporary attachment by its id
+	 * Finds a temporary attachment by id
 	 *
 	 * @param string $attach_id the temporary name generated when a file is uploaded
 	 *  and used in $_SESSION to help identify the attachment itself
