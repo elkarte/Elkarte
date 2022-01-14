@@ -39,19 +39,22 @@ class AttachmentsDirectory
 	protected $numFilesLimit = 0;
 
 	/** @var int if auto manage attachment function is enabled and at what level
-	 0 = normal/off, 1 = by space (#files/size), 2 = by years, 3 = by months 4 = random */
+	             0 = normal/off, 1 = by space (#files/size), 2 = by years, 3 = by months 4 = random */
 	protected $automanage_attachments = 0;
 
-	/** @var string|array Potential attachment directories */
+	/** @var array Potential attachment directories */
 	protected $attachmentUploadDir = [];
 
 	/** @var int Pointer to the above upload directory array */
 	protected $currentAttachmentUploadDir = 0;
 
+	/** @var int|mixed If we are using subdirectories */
 	protected $useSubdirectories = 0;
+
+	/** @var bool If to notify the admin when a directory is full */
 	protected $attachment_full_notified = false;
 
-	/** @var string|array Potential root/base directories to which we can add directories/files */
+	/** @var array Potential root/base directories to which we can add directories/files */
 	protected $baseDirectories = [];
 
 	/** @var string Current base to use from the above array */
