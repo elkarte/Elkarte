@@ -20,6 +20,7 @@ use ElkArte\Http\FtpConnection;
 use ElkArte\Http\StreamFetchWebdata;
 use ElkArte\UnTgz;
 use ElkArte\UnZip;
+use ElkArte\User;
 use ElkArte\Util;
 use ElkArte\XmlArray;
 
@@ -3129,11 +3130,11 @@ function setPackageState($id, $install_id)
 		WHERE package_id = {string:package_id}
 			AND id_install = {int:install_id}',
 		array(
-			'current_member' => \Elkarte\User::$info->id,
+			'current_member' => User::$info->id,
 			'not_installed' => 0,
 			'current_time' => time(),
 			'package_id' => $id,
-			'member_name' => \Elkarte\User::$info->name,
+			'member_name' => User::$info->name,
 			'install_id' => $install_id,
 		)
 	);
@@ -3200,7 +3201,7 @@ function addPackageLog($packageInfo, $failed_step_insert, $themes_installed, $db
 		),
 		array(
 			$packageInfo['filename'], $packageInfo['name'], $packageInfo['id'], $packageInfo['version'],
-			\Elkarte\User::$info->id, \Elkarte\User::$info->name, time(),
+			User::$info->id, User::$info->name, time(),
 			$is_upgrade ? 2 : 1, $failed_step_insert, $themes_installed,
 			0, $db_changes, $credits_tag,
 		),
