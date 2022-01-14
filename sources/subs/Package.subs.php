@@ -20,6 +20,7 @@ use ElkArte\Http\FtpConnection;
 use ElkArte\Http\StreamFetchWebdata;
 use ElkArte\UnTgz;
 use ElkArte\UnZip;
+use ElkArte\User;
 use ElkArte\Util;
 use ElkArte\XmlArray;
 
