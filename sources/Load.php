@@ -1220,11 +1220,11 @@ function getLanguages($use_cache = true)
 
 	// Either we don't use the cache, or its expired.
 	$languages = array();
-	$language_dir = SOURCEDIR . '/ElkArte/Languages/Index/';
+	$language_dir = SOURCEDIR . '/ElkArte/Languages/Index';
 
 	if (!$use_cache || !$cache->getVar($languages, 'known_languages', $cache->levelLowerThan(2) ? 86400 : 3600))
 	{
-		$dir = dir($language_dir);
+		$dir = dir($language_dir . '/');
 		while (($entry = $dir->read()))
 		{
 			if ($entry == '.' || $entry == '..')

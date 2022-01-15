@@ -93,12 +93,12 @@ function list_getLanguages()
 		require($lang['location']);
 
 		$languages[$lang['filename']] = array(
-			'id' => $lang['filename'],
+			'id' => strtolower(basename($lang['filename'], '.php')),
 			'count' => 0,
 			'char_set' => 'UTF-8',
-			'default' => $language == $lang['filename'] || ($language == '' && $lang['filename'] == 'english'),
+			'default' => $language == $lang['name'] || ($language == '' && strtolower($lang['name']) == 'english'),
 			'locale' => $txt['lang_locale'],
-			'name' => Util::ucwords(strtr($lang['filename'], array('_' => ' ', '-utf8' => ''))),
+			'name' => Util::ucwords(strtr($lang['name'], array('_' => ' ', '-utf8' => ''))),
 		);
 	}
 

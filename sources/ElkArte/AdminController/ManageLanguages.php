@@ -23,6 +23,7 @@ use ElkArte\Exceptions\Exception;
 use ElkArte\SettingsForm\SettingsForm;
 use ElkArte\Themes\ThemeLoader;
 use ElkArte\Util;
+use ElkArte\Languages\Loader as LangLoader;
 
 /**
  * Manage languages controller class.
@@ -696,6 +697,7 @@ class ManageLanguages extends AbstractController
 	{
 		global $settings, $context, $txt;
 
+		$base_lang_dir = SOURCEDIR . '/ElkArte/Languages';
 		require_once(SUBSDIR . '/Language.subs.php');
 		ThemeLoader::loadLanguageFile('ManageSettings');
 
@@ -705,75 +707,34 @@ class ManageLanguages extends AbstractController
 		$context['sub_template'] = 'modify_language_entries';
 
 		$context['lang_id'] = $this->_req->query->lid;
-		list ($theme_id, $file_id) = empty($this->_req->post->tfid) || strpos($this->_req->post->tfid, '+') === false ? array(1, '') : explode('+', $this->_req->post->tfid);
+		$file_id = !empty($this->_req->post->tfid) ? $this->_req->post->tfid : '';
 
 		// Clean the ID - just in case.
 		preg_match('~([A-Za-z0-9_-]+)~', $context['lang_id'], $matches);
 		$context['lang_id'] = $matches[1];
+		$matches = '';
+		preg_match('~([A-Za-z0-9_-]+)~', $file_id, $matches);
+		$file_id = ucfirst($matches[1]);
 
 		// Get all the theme data.
 		require_once(SUBSDIR . '/Themes.subs.php');
 		$themes = getCustomThemes();
 
 		// This will be where we look
-		$lang_dirs = array();
+		$lang_dirs = glob($base_lang_dir . '/*', GLOB_ONLYDIR);
 		$images_dirs = array();
 
-		// Check we have themes with a path and a name - just in case - and add the path.
-		foreach ($themes as $id => $data)
-		{
-			if (count($data) !== 2)
-			{
-				unset($themes[$id]);
-			}
-			elseif (is_dir($data['theme_dir'] . '/languages/' . $context['lang_id']))
-			{
-				$lang_dirs[$id] = $data['theme_dir'] . '/languages/' . $context['lang_id'];
-			}
-
-			// How about image directories?
-			if (is_dir($data['theme_dir'] . '/images/' . $context['lang_id']))
-			{
-				$images_dirs[$id] = $data['theme_dir'] . '/images/' . $context['lang_id'];
-			}
-		}
-
-		$current_file = $file_id ? $lang_dirs[$theme_id] . '/' . $file_id . '.' . $context['lang_id'] . '.php' : '';
+		$current_file = $file_id ? $base_lang_dir . '/' . $file_id . '/' . ucfirst($context['lang_id']) . '.php' : '';
 
 		// Now for every theme get all the files and stick them in context!
-		$context['possible_files'] = array();
-		foreach ($lang_dirs as $theme => $theme_dir)
-		{
-			// Open it up.
-			$dir = dir($theme_dir);
-			while (($entry = $dir->read()))
-			{
-				// We're only after the files for this language.
-				if (preg_match('~^([A-Za-z]+)\.' . $context['lang_id'] . '\.php$~', $entry, $matches) == 0)
-				{
-					continue;
-				}
-
-				if (!isset($context['possible_files'][$theme]))
-				{
-					$context['possible_files'][$theme] = array(
-						'id' => $theme,
-						'name' => $themes[$theme]['name'],
-						'files' => array(),
-					);
-				}
-
-				$context['possible_files'][$theme]['files'][] = array(
-					'id' => $matches[1],
-					'name' => $txt['lang_file_desc_' . $matches[1]] ?? $matches[1],
-					'selected' => $theme_id == $theme && $file_id == $matches[1],
-				);
-			}
-			$dir->close();
-			usort($context['possible_files'][$theme]['files'], function ($val1, $val2) {
-				return strcmp($val1['name'], $val2['name']);
-			});
-		}
+		$context['possible_files'] =  array_map(function($file) use ($file_id, $txt) {
+			return [
+				'id' => strtolower(basename($file, '.php')),
+				'name' => $txt['lang_file_desc_' . basename($file)] ?? basename($file),
+				'path' => $file,
+				'selected' => $file_id == basename($file),
+			];
+		}, $lang_dirs);
 
 		if ($context['lang_id'] != 'english')
 		{
@@ -816,8 +777,8 @@ class ManageLanguages extends AbstractController
 
 		// Quickly load index language entries.
 		$old_txt = $txt;
-		require($settings['default_theme_dir'] . '/languages/' . $context['lang_id'] . '/index.' . $context['lang_id'] . '.php');
-		$context['lang_file_not_writable_message'] = is_writable($settings['default_theme_dir'] . '/languages/' . $context['lang_id'] . '/index.' . $context['lang_id'] . '.php') ? '' : sprintf($txt['lang_file_not_writable'], $settings['default_theme_dir'] . '/languages/' . $context['lang_id'] . '/index.' . $context['lang_id'] . '.php');
+		$new_lang = new LangLoader($context['lang_id']);
+		$new_lang->load('Index', true);
 
 		// Setup the primary settings context.
 		$context['primary_settings'] = array(
@@ -852,8 +813,6 @@ class ManageLanguages extends AbstractController
 		// If we are editing a file work away at that.
 		if ($current_file !== '')
 		{
-			$context['entries_not_writable_message'] = is_writable($current_file) ? '' : sprintf($txt['lang_entries_not_writable'], $current_file);
-
 			$entries = array();
 
 			// We can't just require it I'm afraid - otherwise we pass in all kinds of variables!
