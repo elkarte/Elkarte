@@ -17,8 +17,9 @@ class TestManagePostsSettings extends ElkArteCommonSetupTest
 	 */
 	protected function setUp(): void
 	{
+		global $txt;
 		parent::setUp();
-		$lang = new Loader('english');
+		$lang = new Loader('english', $txt);
 		$lang->load('Admin');
 	}
 

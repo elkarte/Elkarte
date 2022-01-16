@@ -22,7 +22,7 @@ use ElkArte\User;
 use ElkArte\UserInfo;
 use ElkArte\Util;
 use ElkArte\Debug;
-use ElkArte\Languages\Loader as LangLoader;
+use ElkArte\Languages\Txt;
 
 /**
  * Class ThemeLoader
@@ -779,24 +779,13 @@ class ThemeLoader
 		global $language, $settings, $modSettings;
 		global $db_show_debug, $txt;
 		static $already_loaded = [];
-		static $loaders = [];
-
-		// Default to the user's language.
-		if ($lang === '')
-		{
-			$lang = User::$info->language ?? $language;
-		}
-		if (!isset($loaders[$lang]))
-		{
-			$loaders[$lang] = new LangLoader($lang, null, empty($modSettings['disable_language_fallback']));
-		}
 
 		// For each file open it up and write it out!
 		foreach ($template_name as $template)
 		{
 			$fix_arrays = $template === 'index';
 
-			$loaders[$lang]->load($template, $fix_arrays);
+			Txt::load($template, true, $fix_arrays);
 		}
 
 		// Return the language actually loaded.

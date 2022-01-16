@@ -1631,11 +1631,10 @@ function response_prefix()
 		}
 		else
 		{
-			$lang_loader = new Loader($language);
+			$mtxt = [];
+			$lang_loader = new Loader($language, $mtxt);
 			$lang_loader->load('index');
-			$response_prefix = $txt['response_prefix'];
-			$lang_loader = new Loader();
-			$lang_loader->load('index');
+			$response_prefix = $mtxt['response_prefix'];
 		}
 
 		$cache->put('response_prefix', $response_prefix, 600);

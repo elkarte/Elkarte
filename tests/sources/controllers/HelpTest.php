@@ -22,12 +22,13 @@ class TestHelpController extends ElkArteCommonSetupTest
 	 */
 	protected function setUp(): void
 	{
+		global $txt;
 		// Load in the common items so the system thinks we have an active login
 		parent::setUp();
 		parent::setSession();
 
 		new ElkArte\Themes\ThemeLoader();
-		$lang = new Loader('english');
+		$lang = new Loader('english', $txt);
 		$lang->load('Manual+Help');
 	}
 

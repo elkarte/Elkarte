@@ -56,13 +56,13 @@ class TestAdminSearch extends TestCase
 
 	public function settingsProvider()
 	{
-		global $context;
+		global $context, $txt;
 
 		/*
 		 * Forcefully reload language files to combat PHPUnit
 		 * messing up globals between tests.
 		 */
-		$lang = new Loader('english');
+		$lang = new Loader('english', $txt);
 		$lang->load('admin');
 
 		// Set up the controller.

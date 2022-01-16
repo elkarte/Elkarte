@@ -27,26 +27,34 @@ class Loader
 	protected $language = 'English';
 
 	/** @var bool */
-	protected $load_fallback;
+	protected $load_fallback = true;
+
+	/** @var mixed[] */
+	protected $variable = true;
 
 	/** @var string[] Holds the name of the files already loaded to load them only once */
 	protected $loaded = [];
 
-	public function __construct($lang = null, $path = null, bool $load_fallback = true)
+	public function __construct($lang = null, &$variable)
 	{
 		if ($lang !== null)
 		{
 			$this->language = ucfirst($lang);
 		}
-		if ($path === null)
-		{
-			$this->path = SOURCEDIR . '/ElkArte/Languages/';
-		}
-		else
-		{
-			$this->path = $path;
-		}
-		$this->load_fallback = $load_fallback;
+
+		$this->path = SOURCEDIR . '/ElkArte/Languages/';
+
+		$this->variable = &$variable;
+	}
+
+	public function setFallback(bool $new_Status)
+	{
+		$this->load_fallback = $new_Status;
+	}
+
+	public function changePath($path)
+	{
+		$this->path = $path;
 	}
 
 	public function load($file_name, $fatal = true, $fix_calendar_arrays = false)
@@ -110,17 +118,19 @@ class Loader
 
 	protected function loadFile($name, $lang)
 	{
-		/*
-		 * I know this looks weird but this is used to include $txt files.
-		 * If the parent doesn't declare them global, the scope will be
-		 * local to this function. IOW, don't remove this line!
-		 */
-		global $txt;
-
 		$filepath = $this->path . $name . '/' . $lang . '.php';
 		if (file_exists($filepath))
 		{
 			require($filepath);
+			if (!empty($txt))
+			{
+				$this->variable += $txt;
+			}
+			// Temporary solution (I think);
+			if (!empty($txtBirthdayEmails))
+			{
+				$this->variable['$txtBirthdayEmails'] = $txtBirthdayEmails;
+			}
 			return true;
 		}
 		return false;

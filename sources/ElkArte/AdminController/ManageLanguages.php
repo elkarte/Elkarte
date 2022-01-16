@@ -714,7 +714,7 @@ class ManageLanguages extends AbstractController
 		$context['lang_id'] = $matches[1];
 		$matches = '';
 		preg_match('~([A-Za-z0-9_-]+)~', $file_id, $matches);
-		$file_id = ucfirst($matches[1]);
+		$file_id = ucfirst($matches[1] ?? '');
 
 		// Get all the theme data.
 		require_once(SUBSDIR . '/Themes.subs.php');
@@ -776,21 +776,18 @@ class ManageLanguages extends AbstractController
 		}
 
 		// Quickly load index language entries.
-		$old_txt = $txt;
-		$new_lang = new LangLoader($context['lang_id']);
+		$mtxt = [];
+		$new_lang = new LangLoader($context['lang_id'], $mtxt);
 		$new_lang->load('Index', true);
 
 		// Setup the primary settings context.
 		$context['primary_settings'] = array(
 			'name' => Util::ucwords(strtr($context['lang_id'], array('_' => ' ', '-utf8' => ''))),
-			'locale' => $txt['lang_locale'],
-			'dictionary' => $txt['lang_dictionary'],
-			'spelling' => $txt['lang_spelling'],
-			'rtl' => $txt['lang_rtl'],
+			'locale' => $mtxt['lang_locale'],
+			'dictionary' => $mtxt['lang_dictionary'],
+			'spelling' => $mtxt['lang_spelling'],
+			'rtl' => $mtxt['lang_rtl'],
 		);
-
-		// Restore normal service.
-		$txt = $old_txt;
 
 		// Are we saving?
 		$save_strings = array();

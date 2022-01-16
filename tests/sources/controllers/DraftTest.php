@@ -20,11 +20,12 @@ class TestDraft extends ElkArteCommonSetupTest
 	 */
 	protected function setUp(): void
 	{
+		global $txt
 		// Load in the common items so the system thinks we have an active login
 		parent::setUp();
 
 		new ElkArte\Themes\ThemeLoader();
-		$lang = new Loader('english');
+		$lang = new Loader('english', $txt);
 		$lang->load('Drafts');
 	}
 

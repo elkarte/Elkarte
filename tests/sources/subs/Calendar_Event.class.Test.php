@@ -31,13 +31,13 @@ class TestCalendarEvent extends ElkArteCommonSetupTest
 
 	protected function setUp(): void
 	{
-		global $context;
+		global $context, $txt;
 
 		$context['linktree'] = array();
 		parent::setUp();
 
 		// Fiddling with globals is a chore in PHPUnit.
-		$lang = new Loader('english');
+		$lang = new Loader('english', $txt);
 		$lang->load('Errors');
 	}
 

@@ -22,7 +22,7 @@ class TestGroups extends ElkArteCommonSetupTest
 	 */
 	protected function setUp(): void
 	{
-		global 	$modSettings;
+		global 	$modSettings, $txt;
 
 		// Load in the common items so the system thinks we have an active login
 		parent::setUp();
@@ -32,7 +32,7 @@ class TestGroups extends ElkArteCommonSetupTest
 		$modSettings['latestRealName'] = 'itsme';
 
 		new ElkArte\Themes\ThemeLoader();
-		$lang = new Loader('english');
+		$lang = new Loader('english', $txt);
 		$lang->load('Errors+ManageMembers+ModerationCenter');
 
 		// Get the controller

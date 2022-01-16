@@ -929,7 +929,7 @@ function loadEmailTemplate($template, $replacements = array(), $lang = '', $load
 	// First things first, load up the email templates language file, if we need to.
 	if ($loadLang)
 	{
-		$lang_loader = new LangLoader($lang);
+		$lang_loader = new LangLoader($lang, $txt);
 		$lang_loader->load('EmailTemplates');
 		if (!empty($modSettings['maillist_enabled']))
 		{

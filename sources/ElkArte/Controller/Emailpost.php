@@ -268,11 +268,10 @@ class Emailpost extends AbstractController
 		}
 		else
 		{
-			$lang = new Loader($language);
+			$mtxt = [];
+			$lang = new Loader($language, $mtxt);
 			$lang->load('index', false, true);
-			$pbe['response_prefix'] = $txt['response_prefix'];
-			$lang = new Loader();
-			$lang->load('index', false, true);
+			$pbe['response_prefix'] = $mtxt['response_prefix'];
 		}
 
 		// Allow for new topics to be started via a email subject change

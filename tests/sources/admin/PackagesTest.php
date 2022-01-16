@@ -23,7 +23,7 @@ class TestPackagesController extends ElkArteCommonSetupTest
 	 */
 	protected function setUp(): void
 	{
-		global $context;
+		global $context, $txt;
 
 		// Load in the common items so the system thinks we have an active login
 		parent::setUp();
@@ -35,7 +35,7 @@ class TestPackagesController extends ElkArteCommonSetupTest
 		}
 
 		new ElkArte\Themes\ThemeLoader();
-		$lang = new Loader('english');
+		$lang = new Loader('english', $txt);
 		$lang->load('Packages');
 
 		$context['admin_menu_id'] = 1;

@@ -24,7 +24,8 @@ class TestInlinePermissionsForm extends TestCase
 	 */
 	protected function setUp(): void
 	{
-		$lang = new Loader('english');
+		global $txt;
+		$lang = new Loader('english', $txt);
 		$lang->load('Admin');
 
 		// Elevate the user.

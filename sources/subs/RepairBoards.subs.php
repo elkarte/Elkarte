@@ -1287,7 +1287,7 @@ function createSalvageBoard()
 	$db = database();
 
 	// Back to the forum's default language.
-	$lang_loader = new LangLoader($language);
+	$lang_loader = new LangLoader($language, $txt);
 	$lang_loader->load('Admin');
 	$salvageCatID = createSalvageCategory();
 
@@ -1328,7 +1328,7 @@ function createSalvageBoard()
 	}
 
 	// Restore the user's language.
-	$lang_loader = new LangLoader();
+	$lang_loader = new LangLoader(null, $txt);
 	$lang_loader->load('Admin');
 	$salvageBoardID = (int) $salvageBoardID;
 
@@ -1354,7 +1354,7 @@ function createSalvageCategory()
 	$db = database();
 
 	// Back to the forum's default language.
-	$lang_loader = new LangLoader($language);
+	$lang_loader = new LangLoader($language, $txt);
 	$lang_loader->load('Admin');
 
 	// Check to see if a 'Salvage Category' exists, if not => insert one.
@@ -1392,7 +1392,7 @@ function createSalvageCategory()
 	}
 
 	// Restore the user's language.
-	$lang_loader = new LangLoader();
+	$lang_loader = new LangLoader(null, $txt);
 	$lang_loader->load('Admin');
 	$salvageCatID = (int) $salvageCatID;
 	$_SESSION['redirect_to_recount'] = true;

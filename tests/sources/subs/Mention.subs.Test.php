@@ -29,7 +29,7 @@ class TestMentions extends TestCase
 	 */
 	protected function setUp(): void
 	{
-		global $modSettings;
+		global $modSettings, $txt;
 
 		// We are not logged in for this test, so lets fake it
 		$modSettings['mentions_enabled'] = true;
@@ -69,7 +69,7 @@ class TestMentions extends TestCase
 			'name' => 'itsme',
 		]);
 
-		$lang = new Loader('english');
+		$lang = new Loader('english', $txt);
 		$lang->load('EmailTemplates+MaillistTemplates');
 
 		// Lets start by ensuring a topic exists by creating one

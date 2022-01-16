@@ -21,9 +21,10 @@ class TestPBE extends TestCase
 	 */
 	protected function setUp(): void
 	{
+		global $txt;
 		require_once(SUBSDIR . '/Emailpost.subs.php');
 
-		$lang = new Loader('english');
+		$lang = new Loader('english', $txt);
 		$lang->load('Maillist');
 		User::$info = new UserInfo(['name' => 'name']);
 

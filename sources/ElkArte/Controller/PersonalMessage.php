@@ -1976,21 +1976,22 @@ class PersonalMessage extends AbstractController
 
 				if (!isset($messagesToSend[$cur_language]))
 				{
-					$lang = new Loader($cur_language);
+					$mtxt = [];
+					$lang = new Loader($cur_language, $mtxt);
 					$lang->load('PersonalMessage', false);
 
 					// Make the body.
-					$report_body = str_replace(array('{REPORTER}', '{SENDER}'), array(un_htmlspecialchars($this->user->name), $memberFromName), $txt['pm_report_pm_user_sent']);
+					$report_body = str_replace(array('{REPORTER}', '{SENDER}'), array(un_htmlspecialchars($this->user->name), $memberFromName), $mtxt['pm_report_pm_user_sent']);
 					$report_body .= "\n" . '[b]' . $this->_req->post->reason . '[/b]' . "\n\n";
 					if (!empty($recipients))
 					{
-						$report_body .= $txt['pm_report_pm_other_recipients'] . ' ' . implode(', ', $recipients) . "\n\n";
+						$report_body .= $mtxt['pm_report_pm_other_recipients'] . ' ' . implode(', ', $recipients) . "\n\n";
 					}
-					$report_body .= $txt['pm_report_pm_unedited_below'] . "\n" . '[quote author=' . (empty($memberFromID) ? '&quot;' . $memberFromName . '&quot;' : $memberFromName . ' link=action=profile;u=' . $memberFromID . ' date=' . $time) . ']' . "\n" . un_htmlspecialchars($body) . '[/quote]';
+					$report_body .= $mtxt['pm_report_pm_unedited_below'] . "\n" . '[quote author=' . (empty($memberFromID) ? '&quot;' . $memberFromName . '&quot;' : $memberFromName . ' link=action=profile;u=' . $memberFromID . ' date=' . $time) . ']' . "\n" . un_htmlspecialchars($body) . '[/quote]';
 
 					// Plonk it in the array ;)
 					$messagesToSend[$cur_language] = array(
-						'subject' => (Util::strpos($subject, $txt['pm_report_pm_subject']) === false ? $txt['pm_report_pm_subject'] : '') . un_htmlspecialchars($subject),
+						'subject' => (Util::strpos($subject, $mtxt['pm_report_pm_subject']) === false ? $mtxt['pm_report_pm_subject'] : '') . un_htmlspecialchars($subject),
 						'body' => $report_body,
 						'recipients' => array(
 							'to' => array(),
@@ -2007,13 +2008,6 @@ class PersonalMessage extends AbstractController
 			foreach ($messagesToSend as $lang => $message)
 			{
 				sendpm($message['recipients'], $message['subject'], $message['body']);
-			}
-
-			// Give the user their own language back!
-			if (!empty($modSettings['userLanguage']))
-			{
-				$lang = new Loader();
-				$lang->load('PersonalMessage', false);
 			}
 
 			// Leave them with a template.

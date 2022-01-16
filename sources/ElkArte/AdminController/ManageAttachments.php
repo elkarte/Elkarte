@@ -791,11 +791,10 @@ class ManageAttachments extends AbstractController
 				// And change the message to reflect this.
 				if (!empty($messages))
 				{
-					$lang = new Loader($language);
-					$lang->load('index');
-					setRemovalNotice($messages, $txt['attachment_delete_admin']);
-					$lang = new Loader($this->user->language);
-					$lang->load('index');
+					$mtxt = [];
+					$lang = new Loader($language, $mtxt);
+					$lang->load('Admin');
+					setRemovalNotice($messages, $mtxt['attachment_delete_admin']);
 				}
 			}
 		}

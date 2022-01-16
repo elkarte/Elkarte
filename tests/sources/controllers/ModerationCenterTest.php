@@ -21,7 +21,7 @@ class TestModerationCenterController extends ElkArteCommonSetupTest
 	 */
 	protected function setUp(): void
 	{
-		global $context, $modSettings;
+		global $context, $modSettings, $txt;
 
 		// Load in the common items so the system thinks we have an active login
 		parent::setUp();
@@ -42,7 +42,7 @@ class TestModerationCenterController extends ElkArteCommonSetupTest
 		$modSettings['securityDisable'] = true;
 
 		new ElkArte\Themes\ThemeLoader();
-		$lang = new Loader('english');
+		$lang = new Loader('english', $txt);
 		$lang->load('ModerationCenter+ManageMembers');
 	}
 

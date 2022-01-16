@@ -215,7 +215,7 @@ function sendNotifications($topics, $type, $exclude = array(), $members_only = a
 				$needed_language = empty($row['lngfile']) || empty($modSettings['userLanguage']) ? $language : $row['lngfile'];
 				if (empty($current_language) || $current_language !== $needed_language)
 				{
-					$lang_loader = new Loader($needed_language);
+					$lang_loader = new Loader($needed_language, $txt);
 					$lang_loader->load('Post', false);
 					$current_language = $needed_language;
 				}
@@ -347,7 +347,7 @@ function sendNotifications($topics, $type, $exclude = array(), $members_only = a
 		$needed_language = empty($row['lngfile']) || empty($modSettings['userLanguage']) ? $language : $row['lngfile'];
 		if (empty($current_language) || $current_language !== $needed_language)
 		{
-			$lang_loader = new Loader($needed_language);
+			$lang_loader = new Loader($needed_language, $txt);
 			$lang_loader->load('Post', false);
 			$current_language = $needed_language;
 		}
@@ -406,7 +406,7 @@ function sendNotifications($topics, $type, $exclude = array(), $members_only = a
 
 	if (isset($current_language) && $current_language !== $user_language)
 	{
-		$lang_loader = new Loader();
+		$lang_loader = new Loader(null, $txt);
 		$lang_loader->load('Post', false);
 	}
 
@@ -555,7 +555,7 @@ function sendBoardNotifications(&$topicData)
 		}
 
 		$langloaded = empty($rowmember['lngfile']) || empty($modSettings['userLanguage']) ? $language : $rowmember['lngfile'];
-		$lang_loader = new Loader($langloaded);
+		$lang_loader = new Loader($langloaded, $txt);
 		$lang_loader->load('index', false);
 
 		// Now loop through all the notifications to send for this board.
@@ -628,7 +628,7 @@ function sendBoardNotifications(&$topicData)
 	}
 	$members->free_result();
 
-	$lang_loader = new Loader();
+	$lang_loader = new Loader(null, $txt);
 	$lang_loader->load('index', false);
 
 	// Sent!
@@ -733,7 +733,7 @@ function sendApprovalNotifications(&$topicData)
 		$needed_language = empty($row['lngfile']) || empty($modSettings['userLanguage']) ? $language : $row['lngfile'];
 		if (empty($current_language) || $current_language !== $needed_language)
 		{
-			$lang_loader = new Loader($needed_language);
+			$lang_loader = new Loader($needed_language, $txt);
 			$lang_loader->load('Post', false);
 			$current_language = $needed_language;
 		}
@@ -782,7 +782,7 @@ function sendApprovalNotifications(&$topicData)
 
 	if (isset($current_language) && $current_language !== User::$info->language)
 	{
-		$lang_loader = new Loader();
+		$lang_loader = new Loader(null, $txt);
 		$lang_loader->load('Post', false);
 	}
 
@@ -904,7 +904,7 @@ function sendAdminNotifications($type, $memberID, $member_name = null)
 
 	if (isset($current_language) && $current_language !== User::$info->language)
 	{
-		$lang_loader = new Loader();
+		$lang_loader = new Loader(null, $txt);
 		$lang_loader->load('Login', false);
 	}
 }

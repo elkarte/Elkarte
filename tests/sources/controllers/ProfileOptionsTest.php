@@ -18,12 +18,12 @@ class TestProfileOptions extends ElkArteCommonSetupTest
 	 */
 	protected function setUp(): void
 	{
-		global $context, $cur_profile;
+		global $context, $cur_profile, $txt;
 
 		parent::setUp();
 
 		new ElkArte\Themes\ThemeLoader();
-		$lang = new Loader('english');
+		$lang = new Loader('english', $txt);
 		$lang->load('Profile');
 
 		// Some tricks, maybe
