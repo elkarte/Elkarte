@@ -20,7 +20,7 @@ class TestDraft extends ElkArteCommonSetupTest
 	 */
 	protected function setUp(): void
 	{
-		global $txt
+		global $txt;
 		// Load in the common items so the system thinks we have an active login
 		parent::setUp();
 
