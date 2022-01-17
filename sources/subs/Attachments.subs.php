@@ -766,7 +766,7 @@ function saveAvatar($temporary_path, $memID, $max_width, $max_height)
 	$thumb_image = $image->createThumbnail($max_width, $max_height, $destName, $format);
 	if ($thumb_image !== false)
 	{
-		list ($width, $height) = $thumb_image->getSize();
+		list ($width, $height) = $thumb_image->getImageDimensions();
 		$mime_type = getValidMimeImageType($ext);
 
 		// Write filesize in the database.

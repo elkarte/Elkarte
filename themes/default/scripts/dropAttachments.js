@@ -346,7 +346,7 @@
 					// Completed upload, server is making thumbs, doing checks, resize, etc
 					if (progress === 100)
 					{
-						$progressbar.find('div').html(oTxt['processing']);
+						$progressbar.find('div').html(oTxt.processing);
 						$progressbar.after('<i class="icon i-concentric"></i>');
 					}
 				};

@@ -31,7 +31,7 @@ class TestCurlFetchWebdata extends TestCase
 				'https://duckduckgo.com/html',
 				array('q' => 'stargate+sg1 site:www.imdb.com', 'ia' => 'about'),
 				200,
-				'television series',
+				'TV Series',
 			),
 		);
 

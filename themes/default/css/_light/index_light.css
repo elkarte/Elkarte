@@ -1289,8 +1289,8 @@ sup.bbc_footnotes, sup.bbc_footnotes a {
 }
 
 .ila_container {
-	background-color: var(--mid_grey_background);
 	border-color: var(--border_focus);
+	background-color: var(--mid_grey_background);
 }
 
 .ila_container:hover {
