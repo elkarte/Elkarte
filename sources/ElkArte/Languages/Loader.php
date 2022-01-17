@@ -45,6 +45,10 @@ class Loader
 		$this->path = SOURCEDIR . '/ElkArte/Languages/';
 
 		$this->variable = &$variable;
+		if (empty($this->variable))
+		{
+			$this->variable = [];
+		}
 	}
 
 	public function setFallback(bool $new_Status)
