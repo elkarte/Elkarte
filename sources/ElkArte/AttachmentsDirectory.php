@@ -7,9 +7,6 @@
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause (see accompanying LICENSE.txt file)
  *
- * This file contains code covered by:
- * copyright: 2011 Simple Machines (http://www.simplemachines.org)
- *
  * @version 2.0 dev
  *
  */
@@ -110,7 +107,7 @@ class AttachmentsDirectory
 		}
 
 		$this->attachmentUploadDir = Util::unserialize($options['attachmentUploadDir']);
-		$this->attachmentUploadDir = $this->attachmentUploadDir ?: [1 => $options['attachmentUploadDir']];
+		$this->attachmentUploadDir = $this->attachmentUploadDir ?: $options['attachmentUploadDir'];
 	}
 
 	/**
