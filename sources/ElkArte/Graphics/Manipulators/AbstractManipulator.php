@@ -23,7 +23,7 @@ namespace ElkArte\Graphics\Manipulators;
 abstract class AbstractManipulator
 {
 	/** @var array the array as output by getimagesize */
-	public $sizes = [];
+	public $imageDimensions = [];
 
 	/** @var int the exif orientation value */
 	public $orientation = 0;
@@ -114,22 +114,37 @@ abstract class AbstractManipulator
 	 * @param string $type
 	 * @param string $data only used when calling the function in string mode
 	 */
-	public function getSize($type = 'file', $data = '')
+	public function setImageDimensions($type = 'file', $data = '')
 	{
 		try
 		{
-			$this->sizes = $type === 'string' ? getimagesizefromstring($data) : getimagesize($this->_fileName);
+			$this->imageDimensions = $type === 'string' ? getimagesizefromstring($data) : getimagesize($this->_fileName);
 		}
 		catch (\Exception $e)
 		{
-			$this->sizes = array();
+			$this->imageDimensions = array();
 		}
 
 		// Can't get it, what shall we return
-		if (empty($this->sizes))
+		if (empty($this->imageDimensions))
 		{
-			$this->sizes = array(-1, -1, -1);
+			$this->imageDimensions = array(-1, -1, -1);
 		}
+	}
+
+	/**
+	 * Returns the current size array for an image (w, h, imagetypeXXX);
+	 *
+	 * @return array|int[]
+	 */
+	public function getImageDimensions()
+	{
+		if (empty($this->imageDimensions))
+		{
+			$this->setImageDimensions();
+		}
+
+		return $this->imageDimensions;
 	}
 
 	/**
@@ -138,6 +153,13 @@ abstract class AbstractManipulator
 	 * @return mixed
 	 */
 	abstract public function getOrientation();
+
+	/**
+	 * Uses the manipulator functions to validate a png image has alpha pixels
+	 *
+	 * @return bool
+	 */
+	abstract public function getTransparency();
 
 	/**
 	 * See if we have enough memory to thumbnail an image
