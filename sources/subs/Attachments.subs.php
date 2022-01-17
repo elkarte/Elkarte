@@ -143,7 +143,7 @@ function processAttachments($id_msg = null)
 			continue;
 		}
 
-		// First, let's first check for PHP upload errors.
+		// First, let's check for PHP upload errors.
 		$errors = attachmentUploadChecks($n);
 
 		$tokenizer = new TokenHash();
@@ -156,6 +156,7 @@ function processAttachments($id_msg = null)
 			'size' => $_FILES['attachment']['size'][$n],
 			'type' => $_FILES['attachment']['type'][$n],
 			'id_folder' => $attachmentDirectory->currentDirectoryId(),
+			'mime' => getMimeType($_FILES['attachment']['tmp_name'][$n]),
 		]);
 
 		// If we are error free, Try to move and rename the file before doing more checks on it.
@@ -298,7 +299,7 @@ function createAttachment(&$attachmentOptions)
 
 	// If this is an image we need to set a few additional parameters.
 	$is_image = $image->isImage();
-	$size = $is_image ? $image->getSize() : array(0, 0, 0);
+	$size = $is_image ? $image->getImageDimensions() : array(0, 0, 0);
 	list ($attachmentOptions['width'], $attachmentOptions['height']) = $size;
 	$attachmentOptions['width'] = max(0, $attachmentOptions['width']);
 	$attachmentOptions['height'] = max(0, $attachmentOptions['height']);
@@ -387,7 +388,7 @@ function createAttachment(&$attachmentOptions)
 		if ($thumb_image !== false)
 		{
 			// Figure out how big we actually made it.
-			$size = $thumb_image->getSize();
+			$size = $thumb_image->getImageDimensions();
 			list ($thumb_width, $thumb_height) = $size;
 
 			$thumb_mime = getValidMimeImageType($size[2]);
@@ -700,7 +701,7 @@ function increaseDownloadCounter($id_attach)
  *
  * - supports GIF, JPG, PNG, BMP and WBMP formats.
  * - detects if GD2 is available.
- * - uses resizeImageFile() to resize to max_width by max_height, and saves the result to a file.
+ * - uses createThumbnail() to resize to max_width by max_height, and saves the result to a file.
  * - updates the database info for the member's avatar.
  * - returns whether the download and resize was successful.
  *
@@ -731,8 +732,8 @@ function saveAvatar($temporary_path, $memID, $max_width, $max_height)
 	removeAttachments(array('id_member' => $memID));
 
 	$attachmentsDir = new AttachmentsDirectory($modSettings, $db);
-
 	$id_folder = $attachmentsDir->currentDirectoryId();
+
 	$avatar_hash = empty($modSettings['custom_avatar_enabled']) ? getAttachmentFilename($destName, 0, null, true) : '';
 	$db->insert('',
 		'{db_prefix}attachments',
@@ -1105,7 +1106,7 @@ function updateAttachmentThumbnail($filename, $id_attach, $id_msg, $old_id_thumb
 		$id_folder_thumb = $attachmentsDir->currentDirectoryId();
 
 		// Calculate the size of the created thumbnail.
-		$size = $thumb_image->getSize();
+		$size = $thumb_image->getImageDimensions();
 		list ($attachment['thumb_width'], $attachment['thumb_height']) = $size;
 		$thumb_size = $thumb_image->getFilesize();
 
@@ -1593,16 +1594,16 @@ function getValidMimeImageType($mime)
  * This function returns the mimeType of a file using the best means available
  *
  * @param string $filename
- * @return bool|mixed|string
+ * @return string
  */
-function get_finfo_mime($filename)
+function getMimeType($filename)
 {
-	$mimeType = false;
+	$mimeType = '';
 
 	// Check only existing readable files
 	if (!file_exists($filename) || !is_readable($filename))
 	{
-		return false;
+		return '';
 	}
 
 	// Try finfo, this is the preferred way
@@ -1641,3 +1642,4 @@ function get_finfo_mime($filename)
 
 	return $mimeType;
 }
+

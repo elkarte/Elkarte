@@ -15,9 +15,10 @@ namespace ElkArte;
 
 use ElkArte\Exceptions\Exception as ElkException;
 use ElkArte\Graphics\Image;
+use ElkArte\Graphics\ImageUploadResize;
 
 /**
- *
+ * TemporaryAttachment value bag for attachments
  */
 class TemporaryAttachment extends ValuesContainer
 {
@@ -37,7 +38,7 @@ class TemporaryAttachment extends ValuesContainer
 	 *
 	 * @param bool $fatal
 	 * @return bool
-	 * @throws \Exception
+	 * @throws \Exception thrown if fatal is true
 	 */
 	public function remove($fatal = true)
 	{
@@ -53,11 +54,13 @@ class TemporaryAttachment extends ValuesContainer
 	}
 
 	/**
-	 * Checks if the file exists, and is editable, in the file system.
+	 * Checks if the file (not a directory) exists, and is editable, in the file system.
 	 */
 	public function fileWritable()
 	{
-		return is_writable($this->data['tmp_name']);
+		$fs = FileFunctions::instance();
+
+		return $fs->fileExists($this->data['tmp_name']) && $fs->isWritable($this->data['tmp_name']);
 	}
 
 	/**
@@ -111,6 +114,24 @@ class TemporaryAttachment extends ValuesContainer
 	}
 
 	/**
+	 * Return the mime type of the file, if available
+	 *
+	 * @return string
+	 */
+	public function getMime()
+	{
+		return $this->data['mime'] ?? '';
+	}
+
+	/**
+	 * Checks if the file exists, and is editable, in the file system.
+	 */
+	public function fileExists()
+	{
+		return FileFunctions::instance()->fileExists($this->data['tmp_name']);
+	}
+
+	/**
 	 * Renaming and moving
 	 *
 	 * @param $file_path
@@ -131,7 +152,7 @@ class TemporaryAttachment extends ValuesContainer
 	{
 		$destName = $file_path . '/' . $this->data['attachid'];
 
-		// Move the file to the attachments folder with a temp name for now.
+		// Move the file to the attachment folder with a temp name for now.
 		if (@move_uploaded_file($this->data['tmp_name'], $destName))
 		{
 			$this->data['tmp_name'] = $destName;
@@ -191,8 +212,13 @@ class TemporaryAttachment extends ValuesContainer
 			return false;
 		}
 
-		// Run our batch of tests, set any errors along the way
+		// Did you pack this bag yourself?
 		$this->checkImageContents();
+
+		// We may allow resizing uploaded images, so they take less room
+		$this->adjustImageSizeType();
+
+		// Run our batch of tests, set any errors along the way
 		$this->checkDirectorySpace($attachmentDirectory);
 		$this->checkFileSize();
 		$this->checkTotalUploadSize();
@@ -231,20 +257,20 @@ class TemporaryAttachment extends ValuesContainer
 
 		// First, the dreaded security check. Sorry folks, but this should't be avoided
 		$image = new Image($this->data['tmp_name']);
-		$size = $image->getSize();
-		$valid_mime = getValidMimeImageType($size[2]);
-
-		if ($valid_mime !== '')
+		if ($image->isImage())
 		{
+			$this->data['imagesize'] = $image->getImageDimensions();
+			$this->data['size'] = $image->getFilesize();
 			try
 			{
 				if (!$image->checkImageContents())
 				{
 					// It's bad. Last chance, maybe we can re-encode it?
-					if (empty($modSettings['attachment_image_reencode']) || (!$image->reencodeImage()))
+					if (empty($modSettings['attachment_image_reencode']) || (!$image->reEncodeImage()))
 					{
 						// Nothing to do: not allowed or not successful re-encoding it.
 						$this->setErrors('bad_attachment');
+						$this->data['imagesize'] = [];
 					}
 					else
 					{
@@ -259,6 +285,22 @@ class TemporaryAttachment extends ValuesContainer
 		}
 
 		unset($image);
+	}
+
+	/**
+	 * If enabled, call the attachment image resizing functions.  These reduce the image WxH
+	 * and potentially change the format in order to reduce size.
+	 */
+	public function adjustImageSizeType()
+	{
+		global $modSettings;
+
+		// Auto resize enabled, then do sizing manipulations up front
+		if (!empty($modSettings['attachmentSizeLimit']) && !empty($modSettings['attachment_image_resize_enabled']))
+		{
+			$autoSizer = new ImageUploadResize();
+			$autoSizer->autoResize($this->data);
+		}
 	}
 
 	/**
@@ -298,7 +340,7 @@ class TemporaryAttachment extends ValuesContainer
 	}
 
 	/**
-	 * Check if they are trying to send to much data in a single post
+	 * Check if they are sending too much data in a single post
 	 */
 	public function checkTotalUploadSize()
 	{
@@ -319,7 +361,7 @@ class TemporaryAttachment extends ValuesContainer
 	}
 
 	/**
-	 * Check if they are sending in to many files at once
+	 * Check if they are sending too many files at once
 	 */
 	public function checkTotalUploadCount()
 	{

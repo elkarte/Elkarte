@@ -1845,8 +1845,10 @@ function canRemoveAttachment($id_attach, $id_member_requesting)
 		return true;
 	}
 
+	$canRemove = false;
+
 	$db = database();
-	$request = $db->query('', '
+	$db->fetchQuery('
 		SELECT 
 			m.id_board, m.id_member, m.approved, m.poster_time,
 			t.locked, t.id_member_started
@@ -1857,24 +1859,22 @@ function canRemoveAttachment($id_attach, $id_member_requesting)
 		array(
 			'id_attach' => $id_attach,
 		)
-	);
-	if ($request->num_rows() != 0)
-	{
-		list($id_board, $id_member, $approved, $poster_time, $is_locked, $id_starter,) = $request->fetch_row();
+	)->fetch_callback(function($row) use ($modSettings, $id_member_requesting, &$canRemove) {
+		if (!empty($row))
+		{
+			$is_owner = $id_member_requesting == $row['id_member'];
+			$is_starter = $id_member_requesting == $row['id_member_started'];
+			$can_attach = allowedTo('post_attachment', $row['id_board']) || ($modSettings['postmod_active'] && allowedTo('post_unapproved_attachments', $row['id_board']));
+			$can_modify = (!$row['locked'] || allowedTo('moderate_board', $row['id_board']))
+				&& (
+					allowedTo('modify_any', $row['id_board'])
+					|| (allowedTo('modify_replies', $row['id_board']) && $is_starter)
+					|| (allowedTo('modify_own', $row['id_board']) && $is_owner && (empty($modSettings['edit_disable_time']) || !$row['approved'] || $row['poster_time'] + $modSettings['edit_disable_time'] * 60 > time()))
+				);
 
-		$is_owner = $id_member_requesting == $id_member;
-		$is_starter = $id_member_requesting == $id_starter;
-		$can_attach = allowedTo('post_attachment', $id_board) || ($modSettings['postmod_active'] && allowedTo('post_unapproved_attachments', $id_board));
-		$can_modify = (!$is_locked || allowedTo('moderate_board', $id_board))
-			&& (
-				allowedTo('modify_any', $id_board)
-				|| (allowedTo('modify_replies', $id_board) && $is_starter)
-				|| (allowedTo('modify_own', $id_board) && $is_owner && (empty($modSettings['edit_disable_time']) || !$approved || $poster_time + $modSettings['edit_disable_time'] * 60 > time()))
-			);
+			$canRemove = $can_attach && $can_modify;
+		}
+	});
 
-		$request->free_result();
-		return $can_attach && $can_modify;
-	}
-
-	return false;
+	return $canRemove;
 }

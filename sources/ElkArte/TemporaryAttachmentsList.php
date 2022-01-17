@@ -14,7 +14,7 @@
 namespace ElkArte;
 
 /**
- *
+ * Overall List bag for interfacing/finding individual TemporaryAttachment bags
  */
 class TemporaryAttachmentsList extends ValuesContainer
 {
@@ -157,6 +157,7 @@ class TemporaryAttachmentsList extends ValuesContainer
 	public function filesExist($userId)
 	{
 		$prefix = $this->getTplName($userId, '');
+		/** @var \ElkArte\TemporaryAttachment $attachment */
 		foreach ($this->data as $attachID => $attachment)
 		{
 			if (strpos($attachID, $prefix) === false)
@@ -373,7 +374,7 @@ class TemporaryAttachmentsList extends ValuesContainer
 	}
 
 	/**
-	 * Finds an attachment id from its public id
+	 * Finds our private attachment id from its public id
 	 *
 	 * @param string $public_attachid
 	 *
