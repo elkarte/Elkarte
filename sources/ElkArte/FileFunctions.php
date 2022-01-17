@@ -1,6 +1,7 @@
 <?php
 
 /**
+ * This class provides many common file and directory functions such as creating directories, checking existence etc.
  *
  * @package   ElkArte Forum
  * @copyright ElkArte Forum contributors
@@ -8,18 +9,6 @@
  *
  * @version 2.0 dev
  *
- */
-
-/**
- * Simple wrapper around chmod
- *
- * - Checks proper value for mode is supplied
- * - Consolidates chmod error suppression to single function
- *
- * @param string $file
- * @param string|int|null $mode
- *
- * @return bool
  */
 
 namespace ElkArte;
@@ -101,7 +90,7 @@ class FileFunctions
 
 	/**
 	 * is_dir() helper using spl functions.  is_dir can throw an exception if open_basedir
-	 * restrictions are in effect.  getType will not return true on a symlink
+	 * restrictions are in effect.  Note: getType will not return true on a symlink
 	 *
 	 * @param string $dir
 	 * @return bool
@@ -111,7 +100,32 @@ class FileFunctions
 		try
 		{
 			$dir = new \SplFileInfo($dir);
-			if ($dir->getType() === 'dir')
+			if ($dir->getType() === 'dir' && !$dir->isLink())
+			{
+				return true;
+			}
+		}
+		catch (\RuntimeException $e)
+		{
+			return false;
+		}
+
+		return false;
+	}
+
+	/**
+	 * file_exists() helper.  file_exists can throw an E_WARNING on failure.
+	 * Returns true if the filename (not a directory or link) exists.
+	 *
+	 * @param string $item a file or directory location
+	 * @return bool
+	 */
+	public function fileExists($item)
+	{
+		try
+		{
+			$fileInfo = new \SplFileInfo($item);
+			if ($fileInfo->isFile() && !$fileInfo->isLink())
 			{
 				return true;
 			}
@@ -136,8 +150,6 @@ class FileFunctions
 		try
 		{
 			$fileInfo = new \SplFileInfo($item);
-			var_dump($fileInfo->isWritable());
-			var_dump($fileInfo->isFile());
 			if ($fileInfo->isWritable())
 			{
 				return true;
@@ -159,11 +171,12 @@ class FileFunctions
 	 *
 	 * - Attempts to make the directory writable
 	 * - Will create a full tree structure
-	 * - Optionally places an .htaccess in new directories for security
+	 * - Optionally places an .htaccess in created directories for security
 	 *
 	 * @param string $path the path to fully create
 	 * @param bool $makeSecure if to create .htaccess file in created directory
 	 * @return bool
+	 * @throws \Exception
 	 */
 	public function createDirectory($path, $makeSecure = true)
 	{
@@ -175,6 +188,7 @@ class FileFunctions
 				return true;
 			}
 
+			// A file exists at this location with this name
 			throw new Exception('attach_dir_duplicate_file');
 		}
 
@@ -186,14 +200,14 @@ class FileFunctions
 		$partialTree = '';
 
 		// Make sure we have a valid path format
-		$directory = !empty($tree) ? $this->initDir($tree, $count) : false;
+		$directory = !empty($tree) ? $this->_initDir($tree, $count) : false;
 		if ($directory === false)
 		{
 			// Maybe it's just the folder name
 			$tree = explode(DIRECTORY_SEPARATOR,BOARDDIR . DIRECTORY_SEPARATOR . $path);
 			$count = count($tree);
 
-			$directory = !empty($tree) ? $this->initDir($tree, $count) : false;
+			$directory = !empty($tree) ? $this->_initDir($tree, $count) : false;
 			if ($directory === false)
 			{
 				throw new Exception('attachments_no_create');
@@ -246,6 +260,8 @@ class FileFunctions
 			}
 		}
 
+		clearstatcache(false, $partialTree);
+
 		return true;
 	}
 
@@ -260,7 +276,7 @@ class FileFunctions
 	 * @param int $count
 	 * @return false|mixed|string|null
 	 */
-	private function initDir(&$tree, &$count)
+	private function _initDir(&$tree, &$count)
 	{
 		$directory = '';
 
