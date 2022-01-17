@@ -1289,7 +1289,12 @@ sup.bbc_footnotes, sup.bbc_footnotes a {
 }
 
 .ila_container {
-	background-color: var(--pure_green);
+	background-color: var(--mid_grey_background);
+	border-color: var(--border_focus);
+}
+
+.ila_container:hover {
+	background-color: var(--dark_grey_background);
 }
 
 .drop_attachments_error {

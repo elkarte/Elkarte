@@ -249,6 +249,8 @@ class Post extends AbstractModule
 		// more files, but don't allow more than num_allowed_attachments.
 		$context['attachments']['num_allowed'] = empty($modSettings['attachmentNumPerPostLimit']) ? 50 : min($modSettings['attachmentNumPerPostLimit'] - count($context['attachments']['current']), $modSettings['attachmentNumPerPostLimit']);
 		$context['attachments']['can']['post_unapproved'] = allowedTo('post_attachment');
+		$context['attachments']['total_size'] = $attachments['total_size'] ?? 0;
+		$context['attachments']['quantity'] = $attachments['quantity'] ?? 0;
 		$context['attachments']['restrictions'] = array();
 		if (!empty($modSettings['attachmentCheckExtensions']))
 		{
@@ -272,9 +274,10 @@ class Post extends AbstractModule
 				{
 					$context['attachments']['restrictions'][] = sprintf($txt['attach_remaining'], $modSettings['attachmentNumPerPostLimit'] - $attachments['quantity']);
 				}
-				elseif ($type === 'attachmentPostLimit' && $attachments['total_size'] > 0)
+
+				if ($type === 'attachmentPostLimit' && $attachments['total_size'] > 0)
 				{
-					$context['attachments']['restrictions'][] = sprintf($txt['attach_available'], comma_format(round(max($modSettings['attachmentPostLimit'] - ($attachments['total_size'] / 1028), 0)), 0));
+					$context['attachments']['restrictions'][] = sprintf($txt['attach_available'], comma_format(round(max($modSettings['attachmentPostLimit'] - ($attachments['total_size'] / 1024), 0)), 0));
 				}
 			}
 		}
