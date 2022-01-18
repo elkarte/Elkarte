@@ -17,7 +17,7 @@ use ElkArte\Themes\ThemeLoader;
 
 /**
  * Emoji administration controller.
- * This class allows to modify emoji settings for the forum.
+ * This class allows modifying emoji settings for the forum.
  *
  * @package Emoji
  */

@@ -11,6 +11,8 @@
 
 namespace ElkArte;
 
+use ElkArte\Cache\Cache;
+
 /**
  * Used to add emoji images to text
  *
@@ -23,8 +25,10 @@ class Emoji extends AbstractModel
 {
 	/** @var null|\ElkArte\Emoji holds the instance of this class */
 	private static $instance = null;
+
 	/** @var string holds the url of where the emojis are stored */
 	public $smileys_url;
+
 	/** @var string[] Array of keys with known emoji names */
 	public $shortcode_replace = [];
 
@@ -155,16 +159,16 @@ class Emoji extends AbstractModel
 			return $m[0];
 		}
 
-		// Finally going to need these
+		// Finally, going to need these
 		$this->loadEmoji();
 
-		// Its not a known tag, just return what was passed
+		// It is not a known tag, just return what was passed
 		if (!isset($this->shortcode_replace[$m[2]]))
 		{
 			return $m[0];
 		}
 
-		// Otherwise we have some Emoji :dancer:
+		// Otherwise, we have some Emoji :dancer:
 		$filename = $this->smileys_url . '/' . $this->shortcode_replace[$m[2]] . '.svg';
 		$alt = strtr($m[1], [':' => '&#58;', '(' => '&#40;', ')' => '&#41;', '$' => '&#36;', '[' => '&#091;']);
 		$title = ucwords(strtr(htmlspecialchars($m[2]), [':' => '&#58;', '(' => '&#40;', ')' => '&#41;', '$' => '&#36;', '[' => '&#091;', '_' => ' ']));
@@ -270,22 +274,41 @@ class Emoji extends AbstractModel
 	{
 		global $settings;
 
-		// Lets be sure to only do this once.
+		$this->_checkCache();
+
+		if (empty($this->shortcode_replace))
+		{
+			$emoji = file_get_contents($settings['default_theme_dir'] . '/scripts/emoji_tags.js');
+			preg_match_all('~{name:(.*?), key:(.*?)}~s', $emoji, $matches, PREG_SET_ORDER);
+			foreach ($matches as $match)
+			{
+				$name = trim($match[1], "' ");
+				$key = trim($match[2], "' ");
+				$this->shortcode_replace[$name] = $key;
+			}
+
+			Cache::instance()->put('shortcode_replace', $this->shortcode_replace, 480);
+			call_integration_hook('integrate_custom_emoji', array(&$this->shortcode_replace));
+		}
+	}
+
+	/**
+	 * Check the cache to see if we already have these loaded
+	 *
+	 * @return void
+	 */
+	private function _checkCache()
+	{
 		if (!empty($this->shortcode_replace))
 		{
 			return;
 		}
 
-		$emoji = file_get_contents($settings['default_theme_dir'] . '/scripts/emoji_tags.js');
-		preg_match_all('~{name:(.*?), key:(.*?)}~s', $emoji, $matches, PREG_SET_ORDER);
-		foreach ($matches as $match)
+		if (Cache::instance()->getVar($shortcode_replace, 'shortcode_replace', 480))
 		{
-			$name = trim($match[1], "' ");
-			$key = trim($match[2], "' ");
-			$this->shortcode_replace[$name] = $key;
+			$this->shortcode_replace = $shortcode_replace;
+			unset($shortcode_replace);
 		}
-
-		call_integration_hook('integrate_custom_emoji', array(&$this->shortcode_replace));
 	}
 
 	/**
