@@ -42,7 +42,7 @@ abstract class AbstractMentions extends AbstractModule
 			foreach ($mentions as $mention)
 			{
 				$class = '\\ElkArte\\Mentions\\MentionType\\Event\\' . ucfirst($mention);
-				if (!is_callable($class))
+				if (!is_callable([$class, 'getEvents']))
 				{
 					continue;
 				}
