@@ -391,14 +391,13 @@ class ManageBans extends AbstractController
 									{
 										return '<strong>' . $txt[$ban_item['type']] . ':</strong>&nbsp;' . $ban_item[$ban_item['type']];
 									}
-									elseif ($ban_item['type'] == 'user')
+
+									if ($ban_item['type'] === 'user')
 									{
 										return '<strong>' . $txt['username'] . ':</strong>&nbsp;' . $ban_item['user']['link'];
 									}
-									else
-									{
-										return '<strong>' . $txt['unknown'] . ':</strong>&nbsp;' . $ban_item['no_bantype_selected'];
-									}
+
+									return '<strong>' . $txt['unknown'] . ':</strong>&nbsp;' . $ban_item['no_bantype_selected'];
 								},
 							),
 						),
@@ -495,7 +494,7 @@ class ManageBans extends AbstractController
 
 					if (!empty($context['ban_suggestions']['member']['id']))
 					{
-						$context['ban_suggestions']['href'] = getUrl('profile', ['action' => 'profile', 'u' => $context['ban_suggestions']['member']['id'], 'name' => $context['ban_suggestions']['member']]);
+						$context['ban_suggestions']['href'] = getUrl('profile', ['action' => 'profile', 'u' => $context['ban_suggestions']['member']['id'], 'name' => $context['ban_suggestions']['member']['name']]);
 						$context['ban_suggestions']['member']['link'] = '<a href="' . $context['ban_suggestions']['href'] . '">' . $context['ban_suggestions']['member']['name'] . '</a>';
 
 						// Default the ban name to the name of the banned member.
