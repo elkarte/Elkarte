@@ -7,7 +7,7 @@
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
- * @version 1.1.7
+ * @version 1.1.9
  *
  */
 
@@ -667,7 +667,7 @@ class Util
 	{
 		if (function_exists('gmstrftime') && (PHP_VERSION_ID < 80100))
 			return \gmstrftime($format, $timestamp);
-		
+
 		return self::strftime($format, $timestamp);
 	}
 }
