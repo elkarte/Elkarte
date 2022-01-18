@@ -11,8 +11,6 @@
  * relates to a plain text box (no sceditor invocation)
  */
 
-/* jshint -W069 */
-
 /**
  * The constructor for the plain text box auto-saver
  *
@@ -43,30 +41,36 @@ elk_DraftAutoSave.prototype.init = function ()
 		this.interval_id = setInterval(this.draftSave.bind(this), this.opt.iFreq);
 
 		// Set up the text area events
-		this.oDraftHandle.onblur = this.draftBlur.bind(this);
-		this.oDraftHandle.onfocus = this.draftFocus.bind(this);
+		this.oDraftHandle.instanceRef = this;
+		this.oDraftHandle.onblur = function (oEvent)
+		{
+			return this.instanceRef.draftBlur();
+		};
+		this.oDraftHandle.onfocus = function (oEvent)
+		{
+			return this.instanceRef.draftFocus();
+		};
 		this.oDraftHandle.onkeydown = function (oEvent)
 		{
 			// Don't let tabbing to the buttons trigger autosave event
 			if (oEvent.keyCode === 9)
 			{
-				this.bInDraftMode = true;
+				this.instanceRef.bInDraftMode = true;
 			}
 
-			return this.draftKeypress().bind(this);
-		}.bind(this);
+			return this.instanceRef.draftKeypress();
+		};
 
 		// Prevent autosave when selecting post/save by mouse or keyboard
 		let $_button = $('#postmodify').find('.button_submit');
-		$_button.on('mousedown', this, function ()
+		$_button.on('mousedown', this.oDraftHandle.instanceRef, function ()
 		{
 			this.bInDraftMode = true;
-		}.bind(this));
-
-		$_button.on('onkeypress', this, function ()
+		});
+		$_button.on('onkeypress', this.oDraftHandle.instanceRef, function ()
 		{
 			this.bInDraftMode = true;
-		}.bind(this));
+		});
 	}
 };
 
@@ -102,7 +106,7 @@ elk_DraftAutoSave.prototype.draftFocus = function ()
 {
 	if (this.interval_id === "")
 	{
-		this.interval_id = setInterval(this.draftSave.bind(this), this.opt.iFreq);
+		this.interval_id = setInterval(this.opt.sSelf + '.draftSave();', this.opt.iFreq);
 	}
 };
 
