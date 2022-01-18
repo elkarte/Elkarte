@@ -67,7 +67,7 @@
 				}
 
 				// Need to know what we are liking of course
-				var values = {
+				let values = {
 					'topic': topicId,
 					'msg': messageId
 				};
@@ -221,7 +221,7 @@
 				$('#' + currentUrlFrag).addClass('active');
 			},
 
-			// Check the url for a valid like stat tab, load data if its not been done yet
+			// Check the url for a valid like stat tab, load data if not done yet
 			checkUrl = function (url)
 			{
 				// Busy doing something
@@ -270,7 +270,7 @@
 
 				// Make the ajax call to the likes system
 				$.ajax({
-					url: elk_scripturl + '?action=likes;sa=likestats;area=' + params.url + ';api=json;',
+					url: elk_scripturl + '?action=likes;sa=likestats;area=' + params.url + ';api=json;' + elk_session_var + '=' + elk_session_id,
 					type: 'POST',
 					dataType: 'json',
 					cache: false
