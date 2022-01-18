@@ -970,6 +970,7 @@ function loadAssetFile($filenames, $params = array(), $id = '')
 	}
 
 	// Static values for all these settings
+	$staler_string = '';
 	if (!isset($params['stale']) || $params['stale'] === true)
 	{
 		$staler_string = CACHE_STALE;
@@ -977,10 +978,6 @@ function loadAssetFile($filenames, $params = array(), $id = '')
 	elseif (is_string($params['stale']))
 	{
 		$staler_string = ($params['stale'][0] === '?' ? $params['stale'] : '?' . $params['stale']);
-	}
-	else
-	{
-		$staler_string = '';
 	}
 
 	$fallback = !((!empty($params['fallback']) && ($params['fallback'] === false)));
@@ -1015,14 +1012,13 @@ function loadAssetFile($filenames, $params = array(), $id = '')
 		{
 			// Account for shorthand like admin.ext?xyz11 filenames
 			$has_cache_staler = strpos($filename, '.' . $params['extension'] . '?');
+			$cache_staler = $staler_string;
 			if ($has_cache_staler)
 			{
-				$cache_staler = $staler_string;
 				$params['basename'] = substr($filename, 0, $has_cache_staler + strlen($params['extension']) + 1);
 			}
 			else
 			{
-				$cache_staler = $staler_string;
 				$params['basename'] = $filename;
 			}
 			$this_id = empty($id) ? strtr(basename($filename), '?', '_') : $id;
@@ -1058,7 +1054,8 @@ function loadAssetFile($filenames, $params = array(), $id = '')
 			// Add it to the array for use in the template
 			if (!empty($filename))
 			{
-				$this_build[$this_id] = $context[$params['index_name']][$this_id] = array('filename' => $filename, 'options' => $params);
+				$this_build[$this_id] = array('filename' => $filename, 'options' => $params);
+				$context[$params['index_name']][$this_id] = $this_build[$this_id];
 
 				if ($db_show_debug === true)
 				{
