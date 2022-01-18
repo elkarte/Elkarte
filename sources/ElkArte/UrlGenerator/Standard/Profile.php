@@ -40,7 +40,7 @@ class Profile extends Standard
 			}
 
 			// A sprintf token (%1$d %2$s etc) should be left alone
-			if (preg_match('~%\d\$[ds]~', $v) !== 0)
+			if (is_string($v) && preg_match('~%\d\$[ds]~', $v) !== 0)
 			{
 				$args[$k] = $k . '=' . $v;
 				continue;

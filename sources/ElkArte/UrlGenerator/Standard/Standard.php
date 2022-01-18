@@ -51,11 +51,17 @@ class Standard extends AbstractUrlGenerator
 				}
 
 				$args[$k] = $v;
+				continue;
 			}
-			else
+
+			// A substitution token like $1 $2{stuff}, should be left alone
+			if (is_string($v) && preg_match('~^\$\d({.*})?$~m', $v) !== 0)
 			{
-				$args[$k] = $k . '=' . urlencode($v);
+				$args[$k] = $k . '=' . $v;
+				continue;
 			}
+
+			$args[$k] = $k . '=' . urlencode($v);
 		}
 
 		$args = $this->getHash($args);
