@@ -1287,7 +1287,7 @@ class ManageAttachments_Controller extends Action_Controller
 			checkSession();
 
 			// Changing the current base directory?
-			$this->current_base_dir = $this->_req->getQuery('current_base_dir', 'intval');
+			$this->current_base_dir = $this->_req->getPost('current_base_dir', 'intval');
 			if (empty($this->_req->post->new_base_dir) && !empty($this->current_base_dir))
 			{
 				if ($modSettings['basedirectory_for_attachments'] != $modSettings['attachmentUploadDir'][$this->current_base_dir])
