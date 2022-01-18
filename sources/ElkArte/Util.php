@@ -619,22 +619,23 @@ class Util
 	 */
 	public static function is_serialized($string)
 	{
+		$check = false;
 		// Easy cases
 		if (!is_string($string) || $string === '')
 		{
-			return false;
+			return $check;
 		}
 
 		// Attempt to unserialize, mask errors
 		set_error_handler(function () { /* ignore errors */ });
 		try
 		{
-			unserialize($string, ['allowed_classes' => false]);
-			$check = true;
+			if(unserialize($string, ['allowed_classes' => false]) !== false)
+				$check = true;
 		}
 		catch (\Throwable $e)
 		{
-			$check = false;
+			null;
 		}
 		finally
 		{
