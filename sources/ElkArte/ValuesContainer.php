@@ -195,7 +195,7 @@ class ValuesContainer implements \ArrayAccess
 	 */
 	public function count()
 	{
-		return count($this->data);
+		return $this->isEmpty() ? 0 : count($this->data);
 	}
 
 	/**

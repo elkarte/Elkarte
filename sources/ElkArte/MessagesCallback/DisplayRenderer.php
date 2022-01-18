@@ -44,7 +44,7 @@ class DisplayRenderer extends Renderer
 			&& isset($context['likes'][$this->_this_message['id_msg']]['member'][$this->user->id]);
 		$this->_this_message['use_likes'] = allowedTo('like_posts') && empty($context['is_locked'])
 			&& ($this->_this_message['id_member'] != $this->user->id || !empty($modSettings['likeAllowSelf']))
-			&& (empty($modSettings['likeMinPosts']) ? true : $modSettings['likeMinPosts'] <= $this->user->posts);
+			&& (empty($modSettings['likeMinPosts']) || $modSettings['likeMinPosts'] <= $this->user->posts);
 		$this->_this_message['like_count'] = !empty($context['likes'][$this->_this_message['id_msg']]['count']) ? $context['likes'][$this->_this_message['id_msg']]['count'] : 0;
 	}
 
