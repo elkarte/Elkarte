@@ -17,7 +17,7 @@ use ElkArte\Mentions\MentionType\AbstractEventBoardAccess;
 use ElkArte\Mentions\MentionType\MailfailConfigTrait;
 
 /**
- * Class MailfailMention
+ * Class Mailfail
  *
  * Handles notifying users who have had email notifications disabled for failure to deliver
  */

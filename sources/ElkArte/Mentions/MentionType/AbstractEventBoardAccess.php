@@ -13,7 +13,6 @@
 
 namespace ElkArte\Mentions\MentionType;
 
-use ElkArte\Mentions\MentionType\AbstractEventMessage;
 use ElkArte\Themes\ThemeLoader;
 use ElkArte\Util;
 
@@ -38,7 +37,7 @@ abstract class AbstractEventBoardAccess extends AbstractEventMessage
 				continue;
 			}
 
-			// These things are associated to messages and require permission checks
+			// These things are associated to message and require permission checks
 			if (empty($row['id_board']))
 			{
 				$unset_keys[] = $key;

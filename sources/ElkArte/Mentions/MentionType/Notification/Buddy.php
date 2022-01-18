@@ -17,7 +17,7 @@ use ElkArte\Mentions\MentionType\AbstractNotificationMessage;
 use ElkArte\Mentions\MentionType\CommonConfigTrait;
 
 /**
- * Class BuddyMention
+ * Class Buddy
  *
  * Handles mentioning of buddies
  */

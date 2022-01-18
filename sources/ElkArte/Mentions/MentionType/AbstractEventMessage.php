@@ -14,7 +14,6 @@
 namespace ElkArte\Mentions\MentionType;
 
 use ElkArte\HttpReq;
-use ElkArte\Mentions\MentionType\EventInterface;
 use ElkArte\UserInfo;
 
 /**
@@ -22,28 +21,18 @@ use ElkArte\UserInfo;
  */
 abstract class AbstractEventMessage implements EventInterface
 {
-	/**
-	 * The identifier of the mention (the name that is stored in the db)
-	 *
-	 * @var string
-	 */
+	/** @var string The identifier of the mention (the name that is stored in the db) */
 	protected static $_type = '';
 
-	/**
-	 * The database object
-	 *
-	 * @var \ElkArte\HttpReq
-	 */
+	/** @var \ElkArte\HttpReq The post/get object */
 	protected $_request = null;
 
-	/**
-	 * The current user object
-	 *
-	 * @var \ElkArte\ValuesContainer
-	 */
+	/** @var \ElkArte\ValuesContainer The current user object */
 	protected $user = null;
 
 	/**
+	 * AbstractEventMessage constructor
+	 *
 	 * @param \ElkArte\HttpReq $http_req
 	 * @param \ElkArte\UserInfo $user
 	 */

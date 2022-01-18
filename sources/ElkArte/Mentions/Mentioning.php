@@ -24,61 +24,29 @@ use ElkArte\Themes\ThemeLoader;
  */
 class Mentioning extends AbstractModel
 {
-	/**
-	 * Value assumed by a new mention
-	 *
-	 * @const int
-	 */
+	/** @const int Value assumed by a new mention */
 	public const MNEW = 0;
 
-	/**
-	 * Value assumed by a mention that has been read
-	 *
-	 * @const int
-	 */
+	/** @const int Value assumed by a mention that has been read */
 	public const READ = 1;
 
-	/**
-	 * Value assumed by a mention that has been deleted
-	 *
-	 * @const int
-	 */
+	/** @const int Value assumed by a mention that has been deleted */
 	public const DELETED = 2;
 
-	/**
-	 * Value assumed by an unapproved mention
-	 *
-	 * @const int
-	 */
+	/** @const int Value assumed by an unapproved mention */
 	public const UNAPPROVED = 3;
 
-	/**
-	 * Will hold all available mention types
-	 *
-	 * @var array
-	 */
+	/** @var array Will hold all available mention types */
 	protected $_known_mentions = array();
 
-	/**
-	 * Will hold all available mention status
-	 * 'new' => 0, 'read' => 1, 'deleted' => 2, 'unapproved' => 3,
-	 *
-	 * @var array
-	 */
+	/** @var array Will hold all available mention status
+	   'new' => 0, 'read' => 1, 'deleted' => 2, 'unapproved' => 3 */
 	protected $_known_status = array();
 
-	/**
-	 * Holds the instance of the data validation class
-	 *
-	 * @var object
-	 */
+	/** @var \ElkArte\DataValidator Holds the instance of the data validation class */
 	protected $_validator = null;
 
-	/**
-	 * Holds the passed data for this instance, is passed through the validator
-	 *
-	 * @var array
-	 */
+	/** @var array Holds the passed data for this instance, is passed through the validator */
 	protected $_data = null;
 
 	/**
@@ -107,12 +75,11 @@ class Mentioning extends AbstractModel
 	/**
 	 * Inserts a new mention.
 	 *
-	 * @param \ElkArte\Mentions\MentionType\NotificationInterface $mention_obj The object that knows how to store
-	 *  the mention in the database
+	 * @param \ElkArte\Mentions\MentionType\NotificationInterface $mention_obj The object that knows
+	 * how to store the mention in the database
 	 * @param mixed[] $data must contain uid, type and msg at a minimum
 	 *
 	 * @return int[]
-	 * @throws \ElkArte\Exceptions\Exception
 	 */
 	public function create($mention_obj, $data)
 	{
@@ -230,7 +197,6 @@ class Mentioning extends AbstractModel
 	 * @param int $status
 	 * @param int $member_id
 	 * @package Mentions
-	 * @throws \ElkArte\Exceptions\Exception
 	 */
 	protected function _updateMenuCount($status, $member_id)
 	{
@@ -260,7 +226,6 @@ class Mentioning extends AbstractModel
 	 *
 	 * @param int|int[] $mention_id
 	 * @return bool if successfully changed or not
-	 * @throws \ElkArte\Exceptions\Exception
 	 */
 	public function markread($mention_id)
 	{
@@ -273,11 +238,10 @@ class Mentioning extends AbstractModel
 	 * @param int|int[] $items
 	 * @param string $mark
 	 * @return bool if successfully changed or not
-	 * @throws \ElkArte\Exceptions\Exception
 	 */
 	public function updateStatus($items, $mark)
 	{
-		// Make sure its all good
+		// Make sure it is all good
 		$own_id = $this->_getAccessible((array) $items, $mark);
 
 		if (!empty($own_id))
@@ -342,7 +306,6 @@ class Mentioning extends AbstractModel
 	 * @param string $status status to update, 'new', 'read', 'deleted', 'unapproved'
 	 * @return bool if successfully changed or not
 	 * @package Mentions
-	 * @throws \ElkArte\Exceptions\Exception
 	 */
 	protected function _changeStatus($id_mentions, $status = 'read')
 	{
@@ -363,6 +326,5 @@ class Mentioning extends AbstractModel
 		}
 
 		return $success;
-		require_once(SUBSDIR . '/Mentions.subs.php');
 	}
 }

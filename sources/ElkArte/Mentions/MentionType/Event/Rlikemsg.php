@@ -17,7 +17,7 @@ use ElkArte\Mentions\MentionType\AbstractEventBoardAccess;
 use ElkArte\Mentions\MentionType\CommonConfigTrait;
 
 /**
- * Class RlikemsgMention
+ * Class Rlikemsg
  *
  * Handles the notification (or non-notification) of removed likes.
  */

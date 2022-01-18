@@ -21,7 +21,7 @@ use ElkArte\Notifications;
 use ElkArte\NotificationsTask;
 
 /**
- * Class QuotedmemMention
+ * Class Quotedmem
  *
  * Handles mentioning of members whose messages has been quoted
  */

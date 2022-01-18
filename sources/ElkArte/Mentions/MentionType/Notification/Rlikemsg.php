@@ -17,7 +17,7 @@ use ElkArte\Mentions\MentionType\AbstractNotificationBoardAccess;
 use ElkArte\Mentions\MentionType\CommonConfigTrait;
 
 /**
- * Class RlikemsgMention
+ * Class Rlikemsg
  *
  * Handles the notification (or non-notification) of removed likes.
  */
@@ -41,7 +41,7 @@ class Rlikemsg extends AbstractNotificationBoardAccess
 		}
 		else
 		{
-			// I'm not entirely sure this is necessary, but better safe than sorry at this point.
+			// I'm not entirely sure if this is necessary, but better safe than sorry at this point.
 			if (isset($this->_task))
 			{
 				$this->_task->setMembers([]);
