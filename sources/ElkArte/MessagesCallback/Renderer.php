@@ -133,7 +133,6 @@ abstract class Renderer
 	public function getContext($reset = false)
 	{
 		global $txt, $context;
-		static $counter = null;
 
 		// If the query returned false, bail.
 		if (!is_object($this->_dbRequest) || $this->_dbRequest->hasResults() === false)
@@ -142,7 +141,7 @@ abstract class Renderer
 		}
 
 		// Remember which message this is.  (ie. reply #83)
-		if ($this->_counter === null || $reset)
+		if ($this->_counter === 0 || $reset)
 		{
 			$this->_counter = $context['start'];
 		}
