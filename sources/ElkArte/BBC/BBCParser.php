@@ -179,6 +179,9 @@ class BBCParser
 			$this->handleFootnotes();
 		}
 
+		// Collapse quotes so they are less overwhelming.
+		$this->handleCollapsedQuotes();
+
 		// Allow addons access to what the parser created, formally
 		// called as integrate_post_parsebbc
 		$message = $this->message;
@@ -591,7 +594,11 @@ class BBCParser
 	}
 
 	/**
-	 * Just alternates the applied class for quotes for themes that want to distinguish them
+	 * Just alternates the applied class for quotes for themes that want to distinguish them (legacy)
+	 *
+	 * - The alternating should be covered with CSS odd/even attributes
+	 * - Now used to detect long quotes and wrap them in a container div with an input checkbox.
+	 * - The wrapper and checkbox are styled by the CSS with a fade out effect and a read more click.
 	 *
 	 * @param array $tag
 	 */
@@ -599,12 +606,16 @@ class BBCParser
 	{
 		// Start with standard
 		$quote_alt = false;
+		$first_quote = 0;
+		$check_lenght = stripos($this->message, '[/quote', $this->pos1) - $this->pos1;
+
 		foreach ($this->open_tags as $open_quote)
 		{
 			// Every parent quote this quote has flips the styling
 			if (isset($open_quote[Codes::ATTR_TAG]) && $open_quote[Codes::ATTR_TAG] === 'quote')
 			{
 				$quote_alt = !$quote_alt;
+				$first_quote++;
 			}
 		}
 		// Add a class to the quote and quoteheader to style alternating blockquotes
@@ -612,8 +623,25 @@ class BBCParser
 		//             class="bbc_quote" and class="bbc_quote bbc_alternate_quote" on the blockquote
 		// This allows simpler CSS for themes (like default) which do not use the alternate styling,
 		// but still allow it for themes that want it.
-		$tag[Codes::ATTR_BEFORE] = str_replace('<div class="quoteheader">', '<div class="quoteheader' . ($quote_alt ? ' bbc_alt_quoteheader' : '') . '">', $tag[Codes::ATTR_BEFORE]);
-		$tag[Codes::ATTR_BEFORE] = str_replace('<blockquote>', '<blockquote class="bbc_quote' . ($quote_alt ? ' bbc_alternate_quote' : '') . '">', $tag[Codes::ATTR_BEFORE]);
+		if ($first_quote === 0 && $check_lenght > 250)
+		{
+			// First quote (of nested or single) that is long enough to warrant special handling
+			// receives a wrapper so its markup will be:
+			// <div class="quote-read-more"> .. relative
+			//		<div class="quoteheader"></div> .. same as always
+			//		<input type="checkbox" class="quote-show-more"> .. absolute over the blockquote
+			//		<blockquote class="bbc_quote"></blockquote> .. with a max height that is removed on input click
+			// </div>
+			$tag[Codes::ATTR_BEFORE] = str_replace('<div class="quoteheader">', '<div class="quote-read-more"><div class="quoteheader">', $tag[Codes::ATTR_BEFORE]);
+			$tag[Codes::ATTR_BEFORE] = str_replace('<blockquote>', '<input type="checkbox" class="quote-show-more"><blockquote class="bbc_quote">', $tag[Codes::ATTR_BEFORE]);
+			$tag[Codes::ATTR_AFTER] = str_replace('</blockquote>', '</blockquote></div>', $tag[Codes::ATTR_AFTER]);
+		}
+		else
+		{
+			$tag[Codes::ATTR_BEFORE] = str_replace('<div class="quoteheader">', '<div class="quoteheader' . ($quote_alt ? ' bbc_alt_quoteheader' : '') . '">', $tag[Codes::ATTR_BEFORE]);
+			$tag[Codes::ATTR_BEFORE] = str_replace('<blockquote>', '<blockquote class="bbc_quote' . ($quote_alt ? ' bbc_alternate_quote' : '') . '">', $tag[Codes::ATTR_BEFORE]);
+			$tag[Codes::ATTR_AFTER] = '</blockquote>';
+		}
 	}
 
 	/**
@@ -1231,6 +1259,24 @@ class BBCParser
 		$this->fn_content[] = '<div class="target" id="fn' . $this->fn_num . '_' . $this->fn_count . '"><sup>' . $this->fn_num . '&nbsp;</sup>' . $matches[2] . '<a class="footnote_return" href="#ref' . $this->fn_num . '_' . $this->fn_count . '">&crarr;</a></div>';
 
 		return '<a class="target" href="#fn' . $this->fn_num . '_' . $this->fn_count . '" id="ref' . $this->fn_num . '_' . $this->fn_count . '">[' . $this->fn_num . ']</a>';
+	}
+
+	protected function handleCollapsedQuotes()
+	{
+		return;
+		$pos = strpos($this->message, '<div class="quoteheader first">');
+		if ($pos === false)
+		{
+			return;
+		}
+
+		$this->message = substr_replace('<div class="quoteheader first">', '<div class="quote-read-more"><input type="checkbox" class="quote-show-more"><div class="quoteheader first">', $pos, strlen('<div class="quoteheader first">'));
+
+		return;
+
+		$tag[Codes::ATTR_BEFORE] = str_replace('<div class="quoteheader">', '<div class="quote-read-more"><div class="quoteheader' . ($quote_alt ? ' bbc_alt_quoteheader' : '') . '">', $tag[Codes::ATTR_BEFORE]);
+		$tag[Codes::ATTR_BEFORE] = str_replace('<blockquote>', '<input type="checkbox" class="quote-show-more"><blockquote class="bbc_quote' . ($quote_alt ? ' bbc_alternate_quote' : '') . '">', $tag[Codes::ATTR_BEFORE]);
+		$tag[Codes::ATTR_AFTER] = str_replace('</blockquote>', '</blockquote></div>', $tag[Codes::ATTR_AFTER]);
 	}
 
 	/**

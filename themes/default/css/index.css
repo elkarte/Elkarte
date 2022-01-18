@@ -797,7 +797,7 @@ em, .em {
 
 /* A quote, perhaps from another post. */
 .bbc_quote,
-	/* A code block - maybe PHP ;) - shared styles. */
+/* A code block - maybe PHP ;) - shared styles. */
 .bbc_code {
 	font-size: var(--font13);
 	overflow: auto;
@@ -805,6 +805,51 @@ em, .em {
 	padding: .4em .67em;
 	border: 1px solid;
 	border-top: none;
+}
+
+/* Expanding quotes */
+.quote-read-more {
+	position: relative;
+}
+
+/* Constrain the quote area height.  Use max height so we can have a smooth transition */
+.quote-read-more > .bbc_quote {
+	overflow: hidden;
+	max-height: 10em;
+}
+
+/* Specific targeting of our checkbox.  100% wide with a gradient to cover/fade the bottom of the blockquote */
+input[type=checkbox].quote-show-more {
+	position: absolute;
+	bottom: 0;
+	width: 100%;
+	height: 8em;
+	margin: 0 1px;
+	padding-top: 5em;
+	cursor: pointer;
+	text-align: center;
+	background: linear-gradient(to bottom, transparent, white);
+	-webkit-appearance: none;
+	-moz-appearance: none;
+	appearance: none;
+}
+
+/* The read moar, with the 100% width clicking anywhere in the quote base will work */
+input[type=checkbox].quote-show-more:after {
+	font-size: var(--font16);
+	font-weight: 600;
+	content: "Read More";
+}
+
+/* When clicked, hide the checkbox and expand the quote */
+input[type=checkbox].quote-show-more:checked {
+	display: none;
+}
+
+/* 750em is simply to avoid the clipping of any length quote */
+input[type=checkbox].quote-show-more:checked + .bbc_quote {
+	max-height: 750em;
+	transition: 1.5s max-height ease-in;
 }
 
 /* Extra code block styling. */
@@ -1429,10 +1474,10 @@ a.bbc_link {
 .listlevel1.subsections::after {
 	position: absolute;
 	z-index: 90;
+	/* 1/2 the diagonal length of this box, the +1px is for the menu offset above) */
 	top: calc(100% - (1.4142 * var(--pointersize)) / 2 + 1px);
 	left: 10%;
 	display: block;
-	/* 1/2 the diagonal length of this box, the +1px is for the menu offset above) */
 	width: var(--pointersize);
 	height: var(--pointersize);
 	content: '';
@@ -1674,10 +1719,10 @@ a.bbc_link {
 	position: absolute;
 	z-index: 1;
 	top: 0;
+	/* Scale the rotated square based on its diagonal length */
 	right: calc(var(--arrow) / 2 * -1);
 	width: var(--arrow);
 	height: calc(var(--arrow));
-	/* Scale the rotated square based on its diagonal length */
 	content: '';
 	/* Prevent the arrows from getting covered under the next link */
 	transform: scale(0.7071) rotate(45deg);
@@ -2060,15 +2105,11 @@ nav > .quickbuttons, menu > .quickbuttons {
 /* our buddies &laquo; &raquo; */
 .small_pagelinks li:first-child::before {
 	font-size: var(--font14);
-	position: absolute;
-	right: 12px;
 	content: '\2B9C';
 }
 
 .small_pagelinks li:last-child::after {
 	font-size: var(--font14);
-	position: absolute;
-	left: 14px;
 	content: '\2B9E';
 }
 
@@ -2612,7 +2653,6 @@ nav > .quickbuttons, menu > .quickbuttons {
 .topic_latest {
 	font-size: var(--font14);
 	grid-column-start: topic_latest;
-	margin-left: 1em;
 	white-space: nowrap;
 }
 
@@ -2674,7 +2714,7 @@ nav > .quickbuttons, menu > .quickbuttons {
 .locked_row.sticky_row .topic_info .topic_name::before {
 	position: relative;
 	top: -5px;
-	right: -10px;
+	right: -5px;
 	float: right;
 	width: 16px;
 	height: 16px;
@@ -3710,14 +3750,14 @@ ul.post_options li {
 /* holds the share button and the insert overlay control injected via JS */
 .ila_container {
 	position: relative;
-	width: 30px;
-	height: 30px;
+	border: 1px solid;
 	border-radius: 4px;
 }
 
 .ila_container .icon.share {
-	margin: 5px 0 0 5px;
+	margin: 5px 5px 0 5px;
 	cursor: pointer;
+	width: 3em;
 }
 
 .control.icon.abort, .control.icon.remove {
@@ -3772,8 +3812,10 @@ ul.post_options li {
 .statusbar .insertoverlay .button {
 	font-weight: bold;
 	position: absolute;
-	top: -2.1em;
-	left: 2.5em;
+	top: -35px;
+	left: -5px;
+	width: 60px;
+	height: 35px;
 	border-radius: 4px;
 }
 
@@ -5560,12 +5602,10 @@ Stef                       ^
 
 @keyframes icon-spin {
 	0% {
-		-webkit-transform: rotate(0deg);
 		transform: rotate(0deg);
 	}
 
 	100% {
-		-webkit-transform: rotate(359deg);
 		transform: rotate(359deg);
 	}
 }
@@ -5764,7 +5804,7 @@ Stef                       ^
 
 	/* message display */
 	.post_wrapper {
-		grid-template-columns: [poster] 150px [postarea] auto;
+		grid-template-columns: [poster] 150px [postarea] minmax(0, auto);
 	}
 
 	.poster .poster_online {
@@ -6072,6 +6112,10 @@ Stef                       ^
 		white-space: nowrap;
 	}
 
+	.pagesection .pagelinks {
+		margin-bottom: 4px;
+	}
+
 	/* Board View */
 	.board_row {
 		padding: 15px 0 7px 0;
@@ -6187,7 +6231,7 @@ Stef                       ^
 	}
 
 	.post_wrapper {
-		grid-template-columns: [poster] 100px [postarea] auto [end];
+		grid-template-columns: [poster] 100px [postarea] minmax(0, auto) [end];
 		grid-template-rows: [poster] auto [poastarea] auto;
 	}
 
@@ -6196,6 +6240,7 @@ Stef                       ^
 		grid-column-end: end;
 		grid-row-start: poster;
 		border-bottom: 1px solid;
+		display: flex;
 	}
 
 	.postarea {
