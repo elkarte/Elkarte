@@ -764,9 +764,9 @@ function memoryReturnBytes($val)
 	}
 
 	// Separate the number from the designator
-	$val = trim($val);
-	$num = intval(substr($val, 0, strlen($val) - 1));
-	$last = strtolower(substr($val, -1));
+	preg_match('~(\d+)(.*)~', trim($val), $val);
+	$num = intval($val[1]);
+	$last = strtolower(substr($val[2], 0, 1));
 
 	// Convert to bytes
 	switch ($last)
@@ -1448,7 +1448,6 @@ function elk_array_insert($input, $key, $insert, $where = 'before', $assoc = tru
  * - This function sets the scheduled task to be called before any other one
  *
  * @param string $task the name of a scheduled task
- * @throws \ElkArte\Exceptions\Exception
  */
 function scheduleTaskImmediate($task)
 {
