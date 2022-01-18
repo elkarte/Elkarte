@@ -266,7 +266,7 @@ class HttpReq
 	 *
 	 * @return bool
 	 */
-	public function is_set($key)
+	public function isSet($key)
 	{
 		return $this->__isset($key);
 	}
@@ -369,7 +369,7 @@ class HttpReq
 	public function compareQuery($name, $compare, $sanitize = null, $default = null)
 	{
 		$this->getQuery($name, $sanitize, $default);
-		if ($this->is_set($name) && $this->_param[$name] === $compare)
+		if ($this->isSet($name) && $this->_param[$name] === $compare)
 		{
 			return true;
 		}
@@ -391,7 +391,7 @@ class HttpReq
 	public function comparePost($name, $compare, $sanitize = null, $default = null)
 	{
 		$this->getPost($name, $sanitize, $default);
-		if ($this->is_set($name) && $this->_param[$name] === $compare)
+		if ($this->isSet($name) && $this->_param[$name] === $compare)
 		{
 			return true;
 		}
