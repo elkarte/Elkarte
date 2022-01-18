@@ -121,11 +121,9 @@ class ManageErrors_Controller extends Action_Controller
 		// Filtering anything?
 		$this->_applyFilter($filter);
 
-		$sort = ($context['sort_direction'] == 'down') ? ';desc' : '';
-
 		// What type of errors do we have and how many do we have?
 		$context['error_types'] = array();
-		$context['error_types'] = $this->errorLog->fetchErrorsByType($filter, $sort);
+		$context['error_types'] = $this->errorLog->fetchErrorsByType($filter, $context['sort_direction']);
 		$tmp = array_keys($context['error_types']);
 		$sum = (int) end($tmp);
 
