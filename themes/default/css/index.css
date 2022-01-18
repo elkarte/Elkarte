@@ -3755,9 +3755,9 @@ ul.post_options li {
 }
 
 .ila_container .icon.share {
+	width: 3em;
 	margin: 5px 5px 0 5px;
 	cursor: pointer;
-	width: 3em;
 }
 
 .control.icon.abort, .control.icon.remove {
@@ -6236,11 +6236,11 @@ Stef                       ^
 	}
 
 	.forumposts > aside {
+		display: flex;
 		grid-column-start: poster;
 		grid-column-end: end;
 		grid-row-start: poster;
 		border-bottom: 1px solid;
-		display: flex;
 	}
 
 	.postarea {
