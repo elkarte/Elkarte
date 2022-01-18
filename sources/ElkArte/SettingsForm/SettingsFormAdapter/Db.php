@@ -1,7 +1,7 @@
 <?php
 
 /**
- * This class handles display, edit, save, of forum settings.
+ * This class handles display, edit, save, of forum settings that are saved to the database
  *
  * @package   ElkArte Forum
  * @copyright ElkArte Forum contributors
@@ -84,7 +84,7 @@ class Db extends Adapter
 				// Revert masks if necessary
 				$this->context[$configVar[1]]['value'] = $this->revertMasks($configVar, $this->context[$configVar[1]]['value']);
 
-				// Finally allow overrides - and some final cleanups.
+				// Finally, allow overrides - and some final cleanups.
 				$this->allowOverrides($configVar);
 			}
 		}

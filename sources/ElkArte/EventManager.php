@@ -17,40 +17,20 @@ namespace ElkArte;
  */
 class EventManager
 {
-	/**
-	 * An array of events, each entry is a different position.
-	 *
-	 * @var object[] Event
-	 */
+	/** @var object[] Event An array of events, each entry is a different position. */
 	protected $_registered_events = array();
 
-	/**
-	 * Instances of addons already loaded.
-	 *
-	 * @var object[]
-	 */
+	/** @var object[] Instances of addons already loaded. */
 	protected $_instances = array();
 
-	/**
-	 * Instances of the controller.
-	 *
-	 * @var object
-	 */
+	/** @var object Instances of the controller. */
 	protected $_source = null;
 
-	/**
-	 * List of classes already registered.
-	 *
-	 * @var string[]
-	 */
+	/** @var string[] List of classes already registered. */
 	protected $_classes = array();
 
-	/**
-	 * List of classes declared, kept here just to avoid
-	 * call get_declared_classes at each trigger
-	 *
-	 * @var null|string[]
-	 */
+	/** @var null|string[] List of classes declared, kept here just to
+	    avoid call get_declared_classes at each trigger */
 	protected $_declared_classes = null;
 
 	/**

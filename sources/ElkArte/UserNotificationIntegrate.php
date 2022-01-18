@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Integration for display notifications to the user.
+ * Integration hooks for user notifications.  Hooks are Dynamically registered.
  *
  * @package   ElkArte Forum
  * @copyright ElkArte Forum contributors

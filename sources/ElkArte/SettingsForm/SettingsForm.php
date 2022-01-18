@@ -127,7 +127,7 @@ class SettingsForm
 	}
 
 	/**
-	 * This method reaads the settings and prepares them for
+	 * This method reads the settings and prepares them for
 	 * display within the template.
 	 *
 	 * It will read either Settings.php or the settings table
