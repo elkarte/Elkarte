@@ -1,9 +1,8 @@
 <?php
 
 /**
- * This file deals with low-level graphics operations performed on images,
- * specially as needed for avatars (uploaded avatars), attachments, or
- * visual verification images.
+ * This file deals with creating an image file based on supplied text.  For example
+ * the attachment not found image
  *
  * TrueType fonts supplied by www.LarabieFonts.com
  *
@@ -20,7 +19,7 @@ namespace ElkArte\Graphics;
 /**
  * Class TextImage
  *
- * Base class for image function and interaction with the various graphic engines (GD/IMagick)
+ * Base class for text to image functions
  *
  * @package ElkArte\Graphics
  */
@@ -88,7 +87,6 @@ class TextImage extends Image
 	 * @param string $format Type of the image (valid types are png, jpeg, gif)
 	 *
 	 * @return bool|string The image or false if neither Imagick nor GD are found
-	 * @throws \ImagickException
 	 */
 	public function generate($width = 100, $height = 75, $format = 'png')
 	{
@@ -181,7 +179,7 @@ class TextImage extends Image
 	 *
 	 * @return bool Always returns true.
 	 */
-	public function reencodeImage()
+	public function reEncodeImage()
 	{
 		return true;
 	}
@@ -193,7 +191,7 @@ class TextImage extends Image
 	 */
 	public function getSize()
 	{
-		return $this->_manipulator->sizes;
+		return $this->_manipulator->imageDimensions;
 	}
 
 	/**

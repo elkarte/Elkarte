@@ -298,6 +298,13 @@ $helptxt['attachmentDirFileLimit'] = 'Set the max. number of files an individual
 $helptxt['attachmentPostLimit'] = 'Specify how large a single post\'s total upload size can be (in KiB), this is the cumulative size of all attachments made in a post.';
 $helptxt['attachmentSizeLimit'] = 'Specify the largest size a single attachment in a post can have.';
 $helptxt['attachmentNumPerPostLimit'] = 'Select the number of attachments a member can add per post.';
+
+$helptxt['attachment_image_resize_enabled'] = 'Master on/off switch for this function.  Enabling this will resize attachment images (.jpg, .png, .gif, .bmp) to fit within the bounds specified.  The image format will be maintained unless it is unable to fit the resized image within the max allowed file size specified.  In this case, if change format is enabled, the system will convert the image to JPEG for better compression.';
+$helptxt['attachment_image_resize_enabled_size'] = 'or larger than %s KB.';
+$helptxt['attachment_image_resize_reformat'] = 'Selecting this option will allow the system to reformat non-JPEG images into the JPEG format when necessary.  The system will try to maintain the existing format unless the resulting image is still in excess of the maximum file size allowed.';
+$helptxt['attachment_image_resize_width'] = 'This allows you to set a maximum width for attachment images. Pictures smaller than the maximum will not be affected, larger images will be resized proportionately. This allows you to accept a larger image on upload and have it resized to save space. The maximum filesize parameter is still enforced.';
+$helptxt['attachment_image_resize_height'] = 'This allows you to set a maximum height for attachment images. Pictures smaller than the maximum will not be affected, larger images will be resized proportionately. This allows you to accept a larger image on upload and have it resized to save space. The maximum filesize parameter is still enforced.';
+
 $helptxt['attachmentCheckExtensions'] = 'Check this box to enable attachment filtering, which will only allow files to be uploaded with the file extensions that you have defined.';
 $helptxt['attachmentExtensions'] = 'Specify what attachment types are allowed, for example: jpg,png,gif  Remember to be careful in what you allow as some file extensions can cause a security risk to your website.';
 $helptxt['attachment_autorotate'] = 'Selecting this option will allow the system to detect rotated images, typical of phone cameras, and automatically adjust the orientation such that the image top is oriented up. Requires either ImageMagick or both GD and Exif modules to be available.';
@@ -306,13 +313,12 @@ $helptxt['attachmentThumbnails'] = 'Enable this to show post images as a smaller
 $helptxt['attachment_thumb_png'] = 'When creating thumbnails to display under a post, this will only create them as png files.';
 $helptxt['attachmentThumbWidth'] = 'Only used with the &quot;Resize images when showing under posts&quot; option, the maximum width to resize attachments down from.  They will be resized proportionally.';
 $helptxt['attachmentThumbHeight'] = 'Only used with the &quot;Resize images when showing under posts&quot; option, the maximum height to resize attachments down from.  They will be resized proportionally.';
-$helptxt['attachment_image_reencode'] = 'Selecting this option will enable trying to re-encode the uploaded image attachments. Image re-encoding offers better security. Note however that image re-encoding also renders all animated images static.<br />This feature is only possible if the GD module is installed on your server.';
+$helptxt['attachment_image_reencode'] = 'Selecting this option will enable trying to re-encode the uploaded image attachments. Image re-encoding offers better security. Note however that image re-encoding also renders all animated images static.';
 $helptxt['max_image_height'] = 'The maximum displayed height of an attached image.';
 $helptxt['max_image_width'] = 'The maximum displayed width of an attached image.';
 $helptxt['attachmentUploadDir'] = 'Select where you want the files uploaded to be stored on your server. This can be located outside your public html directory for additional security.';
 $helptxt['attachment_transfer_empty'] = 'Enabling this will move all the files from the source directory to the new location, otherwise only the maximum allowed number of files according to the per-directory setting will be moved.';
-$helptxt['avatar_paranoid'] = 'Selecting this option will enable very strict security checks on avatars. Warning! These extensive checks can fail on valid images too. It is strongly recommended to only use this option together with avatars re-encoding, in order to have ElkArte try to resample the images which fail the security checks: if successful, they will be sanitized and uploaded. Otherwise, if re-encoding of avatars is not enabled, all avatars failing checks will be rejected.';
-$helptxt['avatar_reencode'] = 'Selecting this option will enable trying to re-encode the uploaded avatars. Image re-encoding offers better security. Note however that image re-encoding also renders all animated images static. <br /> This feature is only possible if the GD module is installed on your server.';
+$helptxt['avatar_reencode'] = 'Selecting this option will enable trying to re-encode uploaded avatars. Image re-encoding offers better security. Note however that image re-encoding also renders all animated images static.';
 $helptxt['karmaMode'] = 'Karma is a feature that shows the popularity of a member. Members, if allowed, can
 		\'applaud\' or \'smite\' other members, which is how their popularity is calculated. You can change the
 		number of posts needed to have a &quot;karma&quot;, the time between smites or applauds, and if administrators
@@ -326,7 +332,7 @@ $helptxt['localCookies'] = 'The system uses cookies to store login information o
 	Especially when using SSI.php, global cookies are recommended.';
 $helptxt['enableBBC'] = 'Selecting this option will allow your members to use Bulletin Board Code (BBC) throughout the forum, allowing users to format their posts with images, type formatting and more.';
 $helptxt['time_offset'] = 'Not all forum administrators want their forum to use the same time zone as the server upon which it is hosted. Use this option to specify a time difference (in hours) from which the forum should operate from the server time. Negative and decimal values are permitted.';
-$helptxt['default_timezone'] = 'The server timezone tells PHP where your server is located. You should ensure this is set correctly, preferably to the country/city in which the server is located. You can find out more information on the <a href="http://www.php.net/manual/en/timezones.php" target="_blank">PHP Site</a>.';
+$helptxt['default_timezone'] = 'The server timezone tells PHP where your server is located. You should ensure this is set correctly, preferably to the country/city in which the server is located. You can find out more information on the <a href="https://www.php.net/manual/en/timezones.php" target="_blank">PHP Site</a>.';
 $helptxt['spamWaitTime'] = 'Here you can select the amount of time that must pass between postings. This can be used to stop people from "spamming" your forum by limiting how often they can post.';
 
 $helptxt['enablePostHTML'] = 'This will allow the posting of some basic HTML tags:

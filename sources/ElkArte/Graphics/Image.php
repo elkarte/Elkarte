@@ -66,28 +66,6 @@ class Image
 	}
 
 	/**
-	 * Determine and set what image library we will use
-	 *
-	 * @throws \Exception
-	 */
-	protected function setManipulator()
-	{
-		// Later this could become an array of "manipulators" (or not) and remove the hard-coded IM/GD requirements
-		if (!$this->_force_gd && Imagick::canUse())
-		{
-			$this->_manipulator = new Imagick($this->_fileName);
-		}
-		elseif (Gd2::canUse())
-		{
-			$this->_manipulator = new Gd2($this->_fileName);
-		}
-		else
-		{
-			throw new \Exception('No image manipulators available');
-		}
-	}
-
-	/**
 	 * Load an image from a file or web address into the active graphics library
 	 */
 	protected function loadImage()
@@ -118,6 +96,28 @@ class Image
 	}
 
 	/**
+	 * Determine and set what image library we will use
+	 *
+	 * @throws \Exception
+	 */
+	protected function setManipulator()
+	{
+		// Later this could become an array of "manipulators" (or not) and remove the hard-coded IM/GD requirements
+		if (!$this->_force_gd && Imagick::canUse())
+		{
+			$this->_manipulator = new Imagick($this->_fileName);
+		}
+		elseif (Gd2::canUse())
+		{
+			$this->_manipulator = new Gd2($this->_fileName);
+		}
+		else
+		{
+			throw new \Exception('No image manipulators available');
+		}
+	}
+
+	/**
 	 * Return if the source is actually a web address vs local file
 	 *
 	 * @return bool
@@ -134,7 +134,19 @@ class Image
 	 */
 	public function getFilesize()
 	{
+		clearstatcache(false, $this->_fileName);
+
 		return @filesize($this->_fileName);
+	}
+
+	/**
+	 * Best determination of the mime type.
+	 *
+	 * @return string
+	 */
+	public function getMimeType()
+	{
+		return getMimeType($this->_fileName);
 	}
 
 	/**
@@ -144,15 +156,14 @@ class Image
 	 */
 	public function isImage()
 	{
-		return substr(get_finfo_mime($this->_fileName), 0, 5) === 'image';
+		return substr($this->getMimeType(), 0, 5) === 'image';
 	}
 
 	/**
-	 * Creates a thumbnail from and image.
+	 * Creates a thumbnail from an image.
 	 *
 	 * - "recipe" function to create, rotate and save a thumbnail of a given image
 	 * - Thumbnail will be proportional to the original image
-	 * - Will adjust for image rotation if needed.
 	 * - Saves the thumbnail file
 	 *
 	 * @param int $max_width allowed width
@@ -198,14 +209,14 @@ class Image
 	{
 		$this->getOrientation();
 
-		// For now we only process jpeg images, so check that we have one
-		if (!isset($this->_manipulator->sizes[2]))
+		// We only process jpeg images, so check that we have one
+		if (!isset($this->_manipulator->imageDimensions[2]))
 		{
-			$this->_manipulator->getSize();
+			$this->_manipulator->getImageDimensions();
 		}
 
 		// Not a jpeg or not rotated, done!
-		if ($this->_manipulator->sizes[2] !== 2 || $this->_manipulator->orientation <= 1)
+		if ($this->_manipulator->imageDimensions[2] !== 2 || $this->_manipulator->orientation <= 1)
 		{
 			return false;
 		}
@@ -216,7 +227,6 @@ class Image
 		}
 		catch (\Exception $e)
 		{
-			// Nice try
 			return false;
 		}
 
@@ -296,7 +306,7 @@ class Image
 	 *
 	 * @return bool
 	 */
-	public function reencodeImage()
+	public function reEncodeImage()
 	{
 		// The image should already be loaded
 		if (!$this->_image_loaded)
@@ -305,7 +315,7 @@ class Image
 		}
 
 		// re-encode the image at the same size it is now, strip exif data.
-		$sizes = $this->getSize();
+		$sizes = $this->getImageDimensions();
 		$success = $this->resizeImage(null, null, true, true);
 
 		// if all went well, and its valid, save it back in place
@@ -325,9 +335,29 @@ class Image
 	 *
 	 * @return array
 	 */
-	public function getSize()
+	public function getImageDimensions()
 	{
-		return $this->_manipulator->sizes;
+		return $this->_manipulator->imageDimensions;
+	}
+
+	/**
+	 * Checks for transparency in a PNG image
+	 *
+	 *  - Checks file header for saved with Alpha space flag
+	 *  - 8 Bit (256 color) PNG's are not handled.
+	 *  - If the alpha flag is set, will go pixel by pixel to validate true alpha pixels exist
+	 *
+	 * @return bool
+	 */
+	public function getTransparency()
+	{
+		// If it claims transparency, we do pixel inspection
+		if (ord(file_get_contents($this->_fileName, false, null, 25, 1)) & 4)
+		{
+			return $this->_manipulator->getTransparency();
+		}
+
+		return false;
 	}
 
 	/**
@@ -353,7 +383,7 @@ class Image
 		$prev_chunk = '';
 		while (!feof($fp))
 		{
-			$cur_chunk = fread($fp, 32768);
+			$cur_chunk = fread($fp, 256000);
 			$test_chunk = $prev_chunk . $cur_chunk;
 
 			// Though not exhaustive lists, better safe than sorry.

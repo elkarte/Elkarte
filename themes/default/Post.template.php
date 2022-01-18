@@ -409,8 +409,9 @@ function template_add_new_attachments()
 							<dt class="drop_attachments_no_js">
 								', $txt['attach'], ':
 							</dt>
-							<dd class="smalltext drop_attachments_no_js">
-								', empty($modSettings['attachmentSizeLimit']) ? '' : ('<input type="hidden" name="MAX_FILE_SIZE" value="' . $modSettings['attachmentSizeLimit'] * 1028 . '" />'), '
+							<dd class="smalltext drop_attachments_no_js">', (empty($modSettings['attachmentSizeLimit']) || !empty($modSettings['attachment_image_resize_enabled']))
+								? ''
+								: '<input type="hidden" name="MAX_FILE_SIZE" value="' . $modSettings['attachmentSizeLimit'] * 1024 . '" />', '
 								<input type="file" multiple="multiple" name="attachment[]" id="attachment1" class="input_file" /> (<a href="javascript:void(0);" onclick="cleanFileInput(\'attachment1\');">', $txt['clean_attach'], '</a>)';
 
 		// Show more boxes if they aren't approaching that limit.
@@ -427,7 +428,9 @@ function template_add_new_attachments()
 
 			echo '
 							</dd>
-							<dd class="smalltext drop_attachments_no_js" id="moreAttachments"><a href="#" onclick="addAttachment(); return false;">(', $txt['more_attachments'], ')</a></dd>';
+							<dd class="smalltext drop_attachments_no_js" id="moreAttachments">
+								<a href="#" onclick="addAttachment(); return false;">(', $txt['more_attachments'], ')</a>
+							</dd>';
 		}
 		else
 		{
@@ -446,13 +449,15 @@ function template_add_new_attachments()
 
 		if (!empty($modSettings['attachmentPostLimit']) || !empty($modSettings['attachmentSizeLimit']))
 		{
-			$label .= sprintf($txt['attach_kb'], comma_format(round(max($attachment['size'], 1028) / 1028), 0));
+			$label .= sprintf($txt['attach_kb'], comma_format(round(max($attachment['size'], 1024) / 1024), 0));
 		}
 
+		// Output any existing attachments.  Note the D&D interface will look for 'inline_insert' to add them
+		// to that interface when enabled.
 		echo '
 							<dd class="smalltext">
 								<label for="attachment_', $attachment['id'], '">
-									<input type="checkbox" id="attachment_', $attachment['id'], '" name="attach_del[]" value="', $attachment['id'], '"', empty($attachment['unchecked']) ? ' checked="checked"' : '', ' class="input_check inline_insert" data-attachid="', $attachment['id'], '" data-size="', $attachment['size'], '"/> ', $label, '
+									<input type="checkbox" id="attachment_', $attachment['id'], '" name="attach_del[]" value="', $attachment['id'], '"', empty($attachment['unchecked']) ? ' checked="checked"' : '', ' class="input_check inline_insert" data-attachid="', $attachment['id'], '" data-name="', $attachment['name'], '" data-size="', $attachment['size'], '"/> ', $label, '
 								</label>
 							</dd>';
 	}
@@ -495,7 +500,7 @@ function template_add_new_attachments()
 		var IlaDropEvents = {
 			UploadSuccess: function($button, data) {
 				var inlineAttach = ElkInlineAttachments(\'#postAttachment2,#postAttachment\', \'' . $context['post_box_name'] . '\', {
-					trigger: $(\'<div class="share icon i-share" />\'),
+					trigger: $(\'<div class="share icon i-inline" />\'),
 					template: ' . JavaScriptEscape('<div class="insertoverlay">
 						<input type="button" class="button" value="' . $txt['insert'] . '">
 						<ul data-group="tabs" class="tabs">
@@ -540,11 +545,12 @@ function template_add_new_attachments()
 	var dropAttach = new dragDropAttachment({
 		board: ' . $context['current_board'] . ',
 		allowedExtensions: ' . JavaScriptEscape($context['attachments']['allowed_extensions']) . ',
-		totalSizeAllowed: ' . JavaScriptEscape(empty($modSettings['attachmentPostLimit']) ? '' : $modSettings['attachmentPostLimit']) . ',
-		individualSizeAllowed: ' . JavaScriptEscape(empty($modSettings['attachmentSizeLimit']) ? '' : $modSettings['attachmentSizeLimit']) . ',
-		numOfAttachmentAllowed: ' . $context['attachments']['num_allowed'] . ',
-		totalAttachSizeUploaded: ' . (isset($context['attachments']['total_size']) && !empty($context['attachments']['total_size']) ? $context['attachments']['total_size'] : 0) . ',
-		numAttachUploaded: ' . (isset($context['attachments']['quantity']) && !empty($context['attachments']['quantity']) ? $context['attachments']['quantity'] : 0) . ',
+		totalSizeAllowed: ' . (empty($modSettings['attachmentPostLimit']) ? 0 : $modSettings['attachmentPostLimit'] * 1024) . ',
+		totalAttachSizeUploaded: ' . $context['attachments']['total_size'] . ',
+		individualSizeAllowed: ' . (!empty($modSettings['attachmentSizeLimit']) ? 0 : $modSettings['attachmentSizeLimit'] * 1024) . ',
+		numOfAttachmentAllowed: ' . (empty($modSettings['attachmentNumPerPostLimit']) ? 50 : $modSettings['attachmentNumPerPostLimit']) . ',
+		numAttachUploaded: ' . $context['attachments']['quantity'] . ',
+		resizeImageEnabled: ' . !empty($modSettings['attachment_image_resize_enabled']) . ',
 		fileDisplayTemplate: \'<div class="statusbar"><div class="info"></div><div class="progressBar"><div></div></div><div class="control icon i-close"></div></div>\',
 		oTxt: {
 			allowedExtensions : ' . JavaScriptEscape(sprintf($txt['cant_upload_type'], $context['attachments']['allowed_extensions'])) . ',
@@ -552,7 +558,9 @@ function template_add_new_attachments()
 			individualSizeAllowed : ' . JavaScriptEscape(sprintf($txt['file_too_big'], comma_format($modSettings['attachmentSizeLimit'], 0))) . ',
 			numOfAttachmentAllowed : ' . JavaScriptEscape(sprintf($txt['attachments_limit_per_post'], $modSettings['attachmentNumPerPostLimit'])) . ',
 			postUploadError : ' . JavaScriptEscape($txt['post_upload_error']) . ',
-			areYouSure: ' . JavaScriptEscape($txt['ila_confirm_removal']) . '
+			areYouSure: ' . JavaScriptEscape($txt['ila_confirm_removal']) . ',
+			uploadAbort: ' . JavaScriptEscape($txt['attachment_upload_abort']) . ',
+			processing: ' . JavaScriptEscape($txt['attachment_processing']) . '
 		},
 		existingSelector: \'.inline_insert\',
 		events: IlaDropEvents' . (isset($context['current_topic']) ? ',

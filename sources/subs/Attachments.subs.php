@@ -27,13 +27,14 @@ use ElkArte\TokenHash;
 use ElkArte\User;
 use ElkArte\AttachmentsDirectory;
 use ElkArte\TemporaryAttachmentsList;
+use ElkArte\FileFunctions;
 
 /**
  * Handles the actual saving of attachments to a directory.
  *
  * What it does:
  *
- * - Loops through $_FILES['attachment'] array and saves each file to the current attachments folder.
+ * - Loops through $_FILES['attachment'] array and saves each file to the current attachments' folder.
  * - Validates the save location actually exists.
  *
  * @param int|null $id_msg = null or id of the message with attachments, if any.
@@ -46,39 +47,29 @@ function processAttachments($id_msg = null)
 	global $context, $modSettings, $txt, $topic, $board;
 
 	$attach_errors = AttachmentErrorContext::context();
+
+	$file_functions = new FileFunctions();
 	$tmp_attachments = new TemporaryAttachmentsList();
+	$attachmentDirectory = new AttachmentsDirectory($modSettings, database());
 
 	// Make sure we're uploading to the right place.
-	$attachmentDirectory = new AttachmentsDirectory($modSettings, database());
-	try
+	$attachmentDirectory->automanageCheckDirectory(isset($_REQUEST['action']) && $_REQUEST['action'] === 'admin');
+	$attach_current_dir = $attachmentDirectory->getCurrent();
+	if (!$file_functions->isDir($attach_current_dir))
 	{
-		$attachmentDirectory->automanageCheckDirectory(isset($_REQUEST['action']) && $_REQUEST['action'] == 'admin');
-
-		$attach_current_dir = $attachmentDirectory->getCurrent();
-
-		if (!is_dir($attach_current_dir))
-		{
-			$tmp_attachments->setSystemError('attach_folder_warning');
-			\ElkArte\Errors\Errors::instance()->log_error(sprintf($txt['attach_folder_admin_warning'], $attach_current_dir), 'critical');
-		}
-	}
-	catch (\Exception $e)
-	{
-		// If the attachments folder is not there: error.
-		$tmp_attachments->setSystemError($e->getMessage());
+		$tmp_attachments->setSystemError('attach_folder_warning');
+		\ElkArte\Errors\Errors::instance()->log_error(sprintf($txt['attach_folder_admin_warning'], $attach_current_dir), 'critical');
 	}
 
 	if ($tmp_attachments->hasSystemError() === false && !isset($context['attachments']['quantity']))
 	{
+		$context['attachments']['quantity'] = 0;
+		$context['attachments']['total_size'] = 0;
+
 		// If this isn't a new post, check the current attachments.
 		if (!empty($id_msg))
 		{
 			list ($context['attachments']['quantity'], $context['attachments']['total_size']) = attachmentsSizeForMessage($id_msg);
-		}
-		else
-		{
-			$context['attachments']['quantity'] = 0;
-			$context['attachments']['total_size'] = 0;
 		}
 	}
 
@@ -111,14 +102,14 @@ function processAttachments($id_msg = null)
 
 	if (!isset($_FILES['attachment']['name']))
 	{
-		$_FILES['attachment']['tmp_name'] = array();
+		$_FILES['attachment']['tmp_name'] = [];
 	}
 
 	// Remember where we are at. If it's anywhere at all.
 	if (!$ignore_temp)
 	{
 		$tmp_attachments->setPostParam([
-			'msg' => (int) ($id_msg ?? 0),
+			'msg' => $id_msg ?? 0,
 			'last_msg' => (int) ($_REQUEST['last_msg'] ?? 0),
 			'topic' => (int) ($topic ?? 0),
 			'board' => (int) ($board ?? 0),
@@ -135,7 +126,7 @@ function processAttachments($id_msg = null)
 		// And delete the files 'cos they ain't going nowhere.
 		foreach ($_FILES['attachment']['tmp_name'] as $n => $dummy)
 		{
-			if (is_writable(['attachment']['tmp_name'][$n]))
+			if (is_writable($_FILES['attachment']['tmp_name'][$n]))
 			{
 				unlink($_FILES['attachment']['tmp_name'][$n]);
 			}
@@ -144,7 +135,7 @@ function processAttachments($id_msg = null)
 		$_FILES['attachment']['tmp_name'] = array();
 	}
 
-	// Loop through $_FILES['attachment'] array and move each file to the current attachments folder.
+	// Loop through $_FILES['attachment'] array and move each file to the current attachments' folder.
 	foreach ($_FILES['attachment']['tmp_name'] as $n => $dummy)
 	{
 		if ($_FILES['attachment']['name'][$n] == '')
@@ -152,7 +143,7 @@ function processAttachments($id_msg = null)
 			continue;
 		}
 
-		// First, let's first check for PHP upload errors.
+		// First, let's check for PHP upload errors.
 		$errors = attachmentUploadChecks($n);
 
 		$tokenizer = new TokenHash();
@@ -165,6 +156,7 @@ function processAttachments($id_msg = null)
 			'size' => $_FILES['attachment']['size'][$n],
 			'type' => $_FILES['attachment']['type'][$n],
 			'id_folder' => $attachmentDirectory->currentDirectoryId(),
+			'mime' => getMimeType($_FILES['attachment']['tmp_name'][$n]),
 		]);
 
 		// If we are error free, Try to move and rename the file before doing more checks on it.
@@ -179,38 +171,34 @@ function processAttachments($id_msg = null)
 			$temp_file->remove(false);
 		}
 
+		// The file made it to the server, so do more checks injection, size, extension
 		$temp_file->doChecks($attachmentDirectory);
-
-		// Want to correct for phone rotated photos, hell yeah ya do!
-		if (!empty($modSettings['attachment_autorotate']))
-		{
-			$temp_file->autoRotate();
-		}
 
 		// Sort out the errors for display and delete any associated files.
 		if ($temp_file->hasErrors())
 		{
 			$attach_errors->addAttach($temp_file['attachid'], $temp_file->getName());
-			$log_these = array('attachments_no_create', 'attachments_no_write', 'attach_timeout', 'ran_out_of_space', 'cant_access_upload_path', 'attach_0_byte_file', 'bad_attachment');
+			$log_these = ['attachments_no_create', 'attachments_no_write', 'attach_timeout',
+						  'ran_out_of_space', 'cant_access_upload_path', 'attach_0_byte_file', 'bad_attachment'];
 
 			foreach ($temp_file->getErrors() as $error)
 			{
-				if (!is_array($error))
+				$error = array_filter($error);
+				$attach_errors->addError(isset($error[1]) ? $error : $error[0]);
+				if (in_array($error[0], $log_these))
 				{
-					$attach_errors->addError($error);
-					if (in_array($error, $log_these))
-					{
-						\ElkArte\Errors\Errors::instance()->log_error($temp_file->getName() . ': ' . $txt[$error], 'critical');
+					\ElkArte\Errors\Errors::instance()->log_error($temp_file->getName() . ': ' . $txt[$error[0]], 'critical');
 
-						// For critical errors, we don't want the file or session data to persist
-						$temp_file->remove(false);
-					}
-				}
-				else
-				{
-					$attach_errors->addError(array($error[0], $error[1]));
+					// For critical errors, we don't want the file or session data to persist
+					$temp_file->remove(false);
 				}
 			}
+		}
+
+		// Want to correct for phone rotated photos, hell yeah ya do!
+		if (!empty($modSettings['attachment_autorotate']))
+		{
+			$temp_file->autoRotate();
 		}
 
 		$tmp_attachments->addAttachment($temp_file);
@@ -311,7 +299,7 @@ function createAttachment(&$attachmentOptions)
 
 	// If this is an image we need to set a few additional parameters.
 	$is_image = $image->isImage();
-	$size = $is_image ? $image->getSize() : array(0, 0, 0);
+	$size = $is_image ? $image->getImageDimensions() : array(0, 0, 0);
 	list ($attachmentOptions['width'], $attachmentOptions['height']) = $size;
 	$attachmentOptions['width'] = max(0, $attachmentOptions['width']);
 	$attachmentOptions['height'] = max(0, $attachmentOptions['height']);
@@ -400,7 +388,7 @@ function createAttachment(&$attachmentOptions)
 		if ($thumb_image !== false)
 		{
 			// Figure out how big we actually made it.
-			$size = $thumb_image->getSize();
+			$size = $thumb_image->getImageDimensions();
 			list ($thumb_width, $thumb_height) = $size;
 
 			$thumb_mime = getValidMimeImageType($size[2]);
@@ -713,7 +701,7 @@ function increaseDownloadCounter($id_attach)
  *
  * - supports GIF, JPG, PNG, BMP and WBMP formats.
  * - detects if GD2 is available.
- * - uses resizeImageFile() to resize to max_width by max_height, and saves the result to a file.
+ * - uses createThumbnail() to resize to max_width by max_height, and saves the result to a file.
  * - updates the database info for the member's avatar.
  * - returns whether the download and resize was successful.
  *
@@ -744,8 +732,8 @@ function saveAvatar($temporary_path, $memID, $max_width, $max_height)
 	removeAttachments(array('id_member' => $memID));
 
 	$attachmentsDir = new AttachmentsDirectory($modSettings, $db);
-
 	$id_folder = $attachmentsDir->currentDirectoryId();
+
 	$avatar_hash = empty($modSettings['custom_avatar_enabled']) ? getAttachmentFilename($destName, 0, null, true) : '';
 	$db->insert('',
 		'{db_prefix}attachments',
@@ -778,7 +766,7 @@ function saveAvatar($temporary_path, $memID, $max_width, $max_height)
 	$thumb_image = $image->createThumbnail($max_width, $max_height, $destName, $format);
 	if ($thumb_image !== false)
 	{
-		list ($width, $height) = $thumb_image->getSize();
+		list ($width, $height) = $thumb_image->getImageDimensions();
 		$mime_type = getValidMimeImageType($ext);
 
 		// Write filesize in the database.
@@ -1013,6 +1001,7 @@ function getServerStoredAvatars($directory)
 	global $context, $txt, $modSettings;
 
 	$result = [];
+	$file_functions = new FileFunctions();
 
 	// You can always have no avatar
 	$result[] = array(
@@ -1024,7 +1013,7 @@ function getServerStoredAvatars($directory)
 
 	// Not valid is easy
 	$avatarDir = $modSettings['avatar_directory'] . (!empty($directory) ? '/' : '') . $directory;
-	if (!is_dir($avatarDir))
+	if (!$file_functions->isDir($avatarDir))
 	{
 		return $result;
 	}
@@ -1117,7 +1106,7 @@ function updateAttachmentThumbnail($filename, $id_attach, $id_msg, $old_id_thumb
 		$id_folder_thumb = $attachmentsDir->currentDirectoryId();
 
 		// Calculate the size of the created thumbnail.
-		$size = $thumb_image->getSize();
+		$size = $thumb_image->getImageDimensions();
 		list ($attachment['thumb_width'], $attachment['thumb_height']) = $size;
 		$thumb_size = $thumb_image->getFilesize();
 
@@ -1173,7 +1162,6 @@ function updateAttachmentThumbnail($filename, $id_attach, $id_msg, $old_id_thumb
  * @param bool $include_count = true if true, it also returns the attachments count
  * @package Attachments
  * @return mixed
- * @throws \Exception
  */
 function attachmentsSizeForMessage($id_msg, $include_count = true)
 {
@@ -1532,8 +1520,8 @@ function returnMimeThumb($file_ext, $url = false)
 	$generics = array(
 		'arc' => array('tgz', 'zip', 'rar', '7z', 'gz'),
 		'doc' => array('doc', 'docx', 'wpd', 'odt'),
-		'sound' => array('wav', 'mp3', 'pcm', 'aiff', 'wma', 'm4a'),
-		'video' => array('mp4', 'mgp', 'mpeg', 'mp4', 'wmv', 'flv', 'aiv', 'mov', 'swf'),
+		'sound' => array('wav', 'mp3', 'pcm', 'aiff', 'wma', 'm4a', 'flac'),
+		'video' => array('mp4', 'mgp', 'mpeg', 'mp4', 'wmv', 'mkv', 'flv', 'aiv', 'mov', 'swf'),
 		'txt' => array('rtf', 'txt', 'log'),
 		'presentation' => array('ppt', 'pps', 'odp'),
 		'spreadsheet' => array('xls', 'xlr', 'ods'),
@@ -1593,7 +1581,7 @@ function getValidMimeImageType($mime)
 		IMAGETYPE_WBMP => 'bmp'
 	);
 
-	$ext = $validImageTypes[(int) $mime] ?? '';
+	$ext = (int) $mime > 0 && isset($validImageTypes[(int) $mime]) ? $validImageTypes[(int) $mime] : '';
 	if (empty($ext))
 	{
 		$ext = strtolower(trim(substr($mime, strpos($mime, '/')), '/'));
@@ -1606,16 +1594,16 @@ function getValidMimeImageType($mime)
  * This function returns the mimeType of a file using the best means available
  *
  * @param string $filename
- * @return bool|mixed|string
+ * @return string
  */
-function get_finfo_mime($filename)
+function getMimeType($filename)
 {
-	$mimeType = false;
+	$mimeType = '';
 
 	// Check only existing readable files
 	if (!file_exists($filename) || !is_readable($filename))
 	{
-		return $mimeType;
+		return '';
 	}
 
 	// Try finfo, this is the preferred way
@@ -1654,3 +1642,4 @@ function get_finfo_mime($filename)
 
 	return $mimeType;
 }
+

@@ -63,13 +63,13 @@ class Gd2 extends AbstractManipulator
 	 */
 	public function createImageFromFile()
 	{
-		$this->getSize();
+		$this->setImageDimensions();
 
-		if (isset(Image::DEFAULT_FORMATS[$this->sizes[2]]))
+		if (isset(Image::DEFAULT_FORMATS[$this->imageDimensions[2]]))
 		{
 			try
 			{
-				$imagecreatefrom = 'imagecreatefrom' . Image::DEFAULT_FORMATS[$this->sizes[2]];
+				$imagecreatefrom = 'imagecreatefrom' . Image::DEFAULT_FORMATS[$this->imageDimensions[2]];
 				$image = $imagecreatefrom($this->_fileName);
 			}
 			catch (\Exception $e)
@@ -97,8 +97,8 @@ class Gd2 extends AbstractManipulator
 		$this->_image = $image;
 
 		// Get the image size via GD functions
-		$this->_width = $this->sizes[0] = imagesx($image);
-		$this->_height = $this->sizes[1] = imagesy($image);
+		$this->_width = $this->imageDimensions[0] = imagesx($image);
+		$this->_height = $this->imageDimensions[1] = imagesy($image);
 	}
 
 	/**
@@ -111,8 +111,8 @@ class Gd2 extends AbstractManipulator
 		require_once(SUBSDIR . '/Package.subs.php');
 		$image_data = fetch_web_data($this->_fileName);
 
-		$this->getSize('string', $image_data);
-		if (isset(Image::DEFAULT_FORMATS[$this->sizes[2]]))
+		$this->setImageDimensions('string', $image_data);
+		if (isset(Image::DEFAULT_FORMATS[$this->imageDimensions[2]]))
 		{
 			try
 			{
@@ -269,7 +269,7 @@ class Gd2 extends AbstractManipulator
 		if ($success && !empty($file_name))
 		{
 			$this->_fileName = $file_name;
-			$this->sizes[2] = $preferred_format;
+			$this->imageDimensions[2] = $preferred_format;
 			$this->_setImage($this->_image);
 		}
 
@@ -372,6 +372,11 @@ class Gd2 extends AbstractManipulator
 		}
 	}
 
+	/**
+	 * Returns the ORIENTATION constant for an image
+	 *
+	 * @return int
+	 */
 	public function getOrientation()
 	{
 		// Read the EXIF data
@@ -381,6 +386,36 @@ class Gd2 extends AbstractManipulator
 
 		// We're only interested in the exif orientation
 		return (int) $this->orientation;
+	}
+
+	/**
+	 * Returns if the image (png) has any alpha pixels
+	 *
+	 * @return bool
+	 */
+	public function getTransparency()
+	{
+		// No image, return false
+		if (empty($this->_image))
+		{
+			return false;
+		}
+
+		// Go through the image pixel by pixel until we find a transparent pixel
+		$transparency = false;
+		for ($i = 0; $i < $this->_width; $i++)
+		{
+			for ($j = 0; $j < $this->_height; $j++)
+			{
+				if (imagecolorat($this->_image, $i, $j) & 0x7F000000)
+				{
+					$transparency = true;
+					break 2;
+				}
+			}
+		}
+
+		return $transparency;
 	}
 
 	/**

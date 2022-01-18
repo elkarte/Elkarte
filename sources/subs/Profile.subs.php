@@ -2707,7 +2707,7 @@ function profileSaveAvatarData(&$value)
 					@chmod($_FILES['attachment']['tmp_name'], 0644);
 
 					$image = new Image($_FILES['attachment']['tmp_name']);
-					if (!$image->reencodeImage())
+					if (!$image->reEncodeImage())
 					{
 						@unlink($_FILES['attachment']['tmp_name']);
 
@@ -2747,7 +2747,7 @@ function profileSaveAvatarData(&$value)
 					if (!$image->checkImageContents())
 					{
 						// It's bad. Try to re-encode the contents?
-						if (empty($modSettings['avatar_reencode']) || (!$image->reencodeImage()))
+						if (empty($modSettings['avatar_reencode']) || (!$image->reEncodeImage()))
 						{
 							@unlink($_FILES['attachment']['tmp_name']);
 

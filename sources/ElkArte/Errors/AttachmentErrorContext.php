@@ -20,32 +20,16 @@ namespace ElkArte\Errors;
  */
 class AttachmentErrorContext
 {
-	/**
-	 * Holds our static instance of the class
-	 *
-	 * @var object
-	 */
+	/** @var null|object Holds our static instance of the class  */
 	private static $_context = null;
 
-	/**
-	 * Holds all of the attachment ids
-	 *
-	 * @var array
-	 */
+	/** @var null|array Holds all attachment ids  */
 	private $_attachs = null;
 
-	/**
-	 * Holds any errors found
-	 *
-	 * @var ErrorContext|null
-	 */
+	/** @var null|ErrorContext Holds any errors found */
 	private $_generic_error = null;
 
-	/**
-	 * Holds if the error is generic of specific to an attachment
-	 *
-	 * @var string
-	 */
+	/** @var null|string Holds if the error is generic of specific to an attachment */
 	private $_active_attach = null;
 
 	/**
@@ -133,6 +117,7 @@ class AttachmentErrorContext
 			return;
 		}
 
+		// Place this to ErrorContext
 		$this->_attachs[$this->_active_attach]['error']->addError($error, $lang_file);
 	}
 

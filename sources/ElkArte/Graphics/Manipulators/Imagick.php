@@ -56,15 +56,15 @@ class Imagick extends AbstractManipulator
 	}
 
 	/**
-	 * Loads a image file into the image engine for processing
+	 * Loads an image file into the image engine for processing
 	 *
 	 * @return bool|mixed
 	 */
 	public function createImageFromFile()
 	{
-		$this->getSize();
+		$this->setImageDimensions();
 
-		if (isset(Image::DEFAULT_FORMATS[$this->sizes[2]]))
+		if (isset(Image::DEFAULT_FORMATS[$this->imageDimensions[2]]))
 		{
 			try
 			{
@@ -91,8 +91,8 @@ class Imagick extends AbstractManipulator
 	protected function _setImage()
 	{
 		// Update the image size values
-		$this->_width = $this->sizes[0] = $this->_image->getImageWidth();
-		$this->_height = $this->sizes[1] = $this->_image->getImageHeight();
+		$this->_width = $this->imageDimensions[0] = $this->_image->getImageWidth();
+		$this->_height = $this->imageDimensions[1] = $this->_image->getImageHeight();
 	}
 
 	/**
@@ -105,9 +105,9 @@ class Imagick extends AbstractManipulator
 	{
 		require_once(SUBSDIR . '/Package.subs.php');
 		$image = fetch_web_data($this->_fileName);
-		$this->getSize('string', $image);
+		$this->setImageDimensions('string', $image);
 
-		if (isset(Image::DEFAULT_FORMATS[$this->sizes[2]]))
+		if (isset(Image::DEFAULT_FORMATS[$this->imageDimensions[2]]))
 		{
 			try
 			{
@@ -174,7 +174,15 @@ class Imagick extends AbstractManipulator
 		// Remove EXIF / ICC data?
 		if ($strip)
 		{
-			$success = $this->_image->stripImage() && $success;
+			try
+			{
+				$success = $this->_image->stripImage() && $success;
+			}
+			catch (\ImagickException $e)
+			{
+				return $success;
+			}
+
 		}
 
 		return $success;
@@ -191,12 +199,10 @@ class Imagick extends AbstractManipulator
 	 */
 	public function output($file_name = '', $preferred_format = IMAGETYPE_JPEG, $quality = 85)
 	{
-		$success = false;
-
 		// An unknown type
 		if (!isset(Image::DEFAULT_FORMATS[$preferred_format]))
 		{
-			return $success;
+			return false;
 		}
 
 		switch ($preferred_format)
@@ -245,7 +251,7 @@ class Imagick extends AbstractManipulator
 		if ($success && $file_name !== '')
 		{
 			$this->_fileName = $file_name;
-			$this->sizes[2] = $preferred_format;
+			$this->imageDimensions[2] = $preferred_format;
 			$this->_setImage();
 		}
 
@@ -322,11 +328,64 @@ class Imagick extends AbstractManipulator
 		return $success;
 	}
 
+	/**
+	 * Returns the ORIENTATION constant for an image
+	 *
+	 * @return int
+	 */
 	public function getOrientation()
 	{
-		$this->orientation = $this->_image->getImageOrientation();
+		try
+		{
+			$this->orientation = $this->_image->getImageOrientation();
+		}
+		catch (\ImagickException $e)
+		{
+			$this->orientation = 0;
+		}
 
-		return (int) $this->orientation;
+		return $this->orientation;
+	}
+
+	/**
+	 * Returns if the image (png) has any alpha pixels
+	 *
+	 * @return bool
+	 */
+	public function getTransparency()
+	{
+		// No image, return false
+		if (empty($this->_image))
+		{
+			return false;
+		}
+
+		try
+		{
+			$transparency = false;
+			$pixel_iterator = $this->_image->getPixelIterator();
+
+			// Look at each one, or until we find the first alpha pixel
+			foreach ($pixel_iterator as $pixels)
+			{
+				foreach ($pixels as $pixel)
+				{
+					$color = $pixel->getColor();
+					if ($color['a'] < 1)
+					{
+						$transparency = true;
+						break 2;
+					}
+				}
+			}
+		}
+		catch (\ImagickException $e)
+		{
+			// We don't know what it is, so don't mess with it
+			return false;
+		}
+
+		return $transparency;
 	}
 
 	/**

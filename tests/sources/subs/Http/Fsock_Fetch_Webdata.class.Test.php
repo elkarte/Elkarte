@@ -31,7 +31,7 @@ class TestFsockFetchWebdata extends TestCase
 				'https://duckduckgo.com/html',
 				array('q' => 'stargate+sg1 site:www.imdb.com', 'kl' => 'us-en', 'df' => ''),
 				200,
-				'television series',
+				'TV Series',
 			),
 		);
 

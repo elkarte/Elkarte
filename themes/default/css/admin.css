@@ -480,11 +480,12 @@ ul.package_servers li {
 	column-count: 3;
 }
 
-/* Styles for the manage boards section. */
-#attach_paths .input_text {
+/* Styles for the manage attachments section. */
+#attach_paths .input_text, #base_paths .input_text {
 	width: 100%;
 }
 
+/* Styles for the manage boards section. */
 #manage_boards .content > ul {
 	padding: .5em;
 	border: 1px solid;

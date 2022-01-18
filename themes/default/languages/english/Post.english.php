@@ -159,9 +159,9 @@ $txt['php_upload_error_4'] = 'No file was uploaded. This is a PHP related error.
 $txt['php_upload_error_6'] = 'Unable to save. Missing a temporary directory. Please contact your host if you are unable to correct this problem.';
 $txt['php_upload_error_7'] = 'Failed to write file to disk. This is a PHP related error. Please contact your host if this problem continues.';
 $txt['php_upload_error_8'] = 'A PHP extension stopped the file upload. This is a PHP related error. Please contact your host if this problem continues.';
-$txt['error_temp_attachments_new'] = 'There are attachments which you had previously attached but not posted. These attachments are still attached to this post. This post does need to be submitted before these attachments are either saved or removed. You <a href="#postAttachment">can do that here</a>';
-$txt['error_temp_attachments_found'] = 'The following attachments were found which you had previously attached to another post but not posted. It is advisable that you do not post until these are either removed or that post has been submitted.<br />Click <a href="%1$s">here to remove </a>those attachments. Or <a href="%2$s">here to return to that post</a>.%3$s';
-$txt['error_temp_attachments_lost'] = 'The following attachments were found which you had previously attached to another post but not posted. It is advisable that you do not upload any more attachments until these are removed or that post has been submitted.<br />Click <a href="%1$s">here to remove these attachments</a>.%2$s';
+$txt['error_temp_attachments_new'] = 'There are attachments which you had previously attached but not posted. These attachments are still attached to this post. This post does need to be submitted before these attachments are either saved or removed. <a class="linkbutton" href="#postAttachment">You can do that here</a>';
+$txt['error_temp_attachments_found'] = 'The following attachments were found which you had previously attached to another post but not posted. It is advisable that you do not post until these are either removed or that post has been submitted.<br /><a class="linkbutton" href="%1$s">Click here to remove </a>those attachments. Or <a class="linkbutton" href="%2$s">here to return to that post</a>.%3$s';
+$txt['error_temp_attachments_lost'] = 'The following attachments were found which you had previously attached to another post but not posted. It is advisable that you do not upload any more attachments until these are removed or that post has been submitted.<br /><a class="linkbutton" href="%1$s">Click here to remove these attachments</a>.%2$s';
 $txt['error_temp_attachments_gone'] = 'Those attachments have now been removed and you have been returned to the page you were previously on';
 $txt['error_temp_attachments_flushed'] = 'Please note that any files which had been previously attached, but not posted, have now been removed.';
 $txt['error_topic_already_announced'] = 'Please note that this topic has already been announced.';
@@ -174,6 +174,8 @@ $txt['ran_out_of_space'] = 'The upload directory is full. Please contact an admi
 $txt['attachments_no_write'] = 'The attachments upload directory is not writable.  Your attachment or avatar cannot be saved.';
 $txt['attachments_no_create'] = 'Unable to create a new attachment directory.  Your attachment or avatar cannot be saved.';
 $txt['attachments_limit_per_post'] = 'You may not upload more than %1$d attachments per post';
+$txt['attachment_upload_abort'] = 'The upload was canceled on user request.';
+$txt['attachment_processing'] = 'Processing';
 
 // Post settings (when I implement the post interface)
 $txt['ila_insert'] = 'Insert Attachment %1$d in the message';

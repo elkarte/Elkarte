@@ -14,14 +14,16 @@
 namespace ElkArte;
 
 /**
- *
+ * Overall List bag for interfacing/finding individual TemporaryAttachment bags
  */
 class TemporaryAttachmentsList extends ValuesContainer
 {
 	public const ID = 'temp_attachments';
 
+	/** @var string name we store temporary attachments under */
 	public const TMPNAME_TPL = 'post_tmp_{user}_{hash}';
 
+	/** @var string System level error, such as permissions issue to a folder */
 	protected $sysError = '';
 
 	/**
@@ -71,26 +73,17 @@ class TemporaryAttachmentsList extends ValuesContainer
 	 */
 	public function remove($file)
 	{
-		try
+		// Must exist and have edit permissions
+		if (FileFunctions::instance()->isWritable($file))
 		{
-			// Must exist and have edit permissions
-			if (!is_writable(($file)))
-			{
-				throw new \Exception('attachment_not_found');
-			}
-
-			unlink($file);
-		}
-		catch (\Exception $e)
-		{
-			return false;
+			return unlink($file);
 		}
 
-		return true;
+		return false;
 	}
 
 	/**
-	 * Sets the error message of a problem that prevents any attachment to be uploaded
+	 * Sets the error message of a problem that prevents any attachment to be uploaded or saved
 	 *
 	 * @param string $msg
 	 */
@@ -125,7 +118,7 @@ class TemporaryAttachmentsList extends ValuesContainer
 	 * @param string $attachID the temporary name generated when a file is uploaded
 	 *               and used in $_SESSION to help identify the attachment itself
 	 * @param bool $fatal
-	 * @throws \Exception
+	 * @throws \Exception if fatal is true
 	 */
 	public function removeById($attachID, $fatal = true)
 	{
@@ -151,7 +144,7 @@ class TemporaryAttachmentsList extends ValuesContainer
 	 */
 	public function belongToBoard($board)
 	{
-		return empty($this->data['post']['msg']) && $this->data['post']['board'] == $board;
+		return empty($this->data['post']['msg']) && (int) $this->data['post']['board'] === (int) $board;
 	}
 
 	/**
@@ -164,6 +157,7 @@ class TemporaryAttachmentsList extends ValuesContainer
 	public function filesExist($userId)
 	{
 		$prefix = $this->getTplName($userId, '');
+		/** @var \ElkArte\TemporaryAttachment $attachment */
 		foreach ($this->data as $attachID => $attachment)
 		{
 			if (strpos($attachID, $prefix) === false)
@@ -240,6 +234,11 @@ class TemporaryAttachmentsList extends ValuesContainer
 		return str_replace(['{user}', '{hash}'], [$userId, $hash], static::TMPNAME_TPL);
 	}
 
+	/**
+	 * If there is any post data available
+	 *
+	 * @return bool
+	 */
 	public function hasPostData()
 	{
 		return isset($this->data['post']);
@@ -265,6 +264,12 @@ class TemporaryAttachmentsList extends ValuesContainer
 		return empty($this->data['post']['msg']);
 	}
 
+	/**
+	 * Return a post parameter like files, last_msg, topic, msg
+	 *
+	 * @param $idx
+	 * @return mixed|null
+	 */
 	public function getPostParam($idx)
 	{
 		return $this->data['post'][$idx] ?? null;
@@ -285,9 +290,15 @@ class TemporaryAttachmentsList extends ValuesContainer
 		$this->data['post'] = array_merge($this->data['post'], $vals);
 	}
 
+	/**
+	 * If a temporary attachment is for this specific message
+	 *
+	 * @param int $msg
+	 * @return bool
+	 */
 	public function belongToMsg($msg)
 	{
-		return $this->data['post']['msg'] == $msg;
+		return (int) $this->data['post']['msg'] === (int) $msg;
 	}
 
 	/**
@@ -299,7 +310,7 @@ class TemporaryAttachmentsList extends ValuesContainer
 	}
 
 	/**
-	 * Finds and return a temporary attachment by its id
+	 * Finds a temporary attachment by id
 	 *
 	 * @param string $attach_id the temporary name generated when a file is uploaded
 	 *  and used in $_SESSION to help identify the attachment itself
@@ -363,7 +374,7 @@ class TemporaryAttachmentsList extends ValuesContainer
 	}
 
 	/**
-	 * Finds an attachment id from its public id
+	 * Finds our private attachment id from its public id
 	 *
 	 * @param string $public_attachid
 	 *
@@ -394,7 +405,7 @@ class TemporaryAttachmentsList extends ValuesContainer
 	}
 
 	/**
-	 * Destroy all the attachments data in $_SESSION
+	 * Destroy all the attachment data in $_SESSION
 	 * Maybe it should also do some cleanup?
 	 */
 	public function unset()

@@ -48,7 +48,7 @@ class Attachment extends AbstractController
 	{
 		global $modSettings, $maintenance;
 
-		// If guests are not allowed to browse and the use is a guest... kick him!
+		// If guests are not allowed to browse and the user is a guest... kick him!
 		if (empty($modSettings['allow_guestAccess']) && $this->user->is_guest)
 		{
 			return true;
@@ -57,15 +57,13 @@ class Attachment extends AbstractController
 		// If not in maintenance or allowed to use the forum in maintenance
 		if (empty($maintenance) || allowedTo('admin_forum'))
 		{
-			$sa = $this->_req->get('sa');
+			$sa = $this->_req->getQuery('sa', 'trim', '');
 
 			return $sa === 'ulattach' || $sa === 'rmattach';
 		}
-		// else... politely kick them out
-		else
-		{
-			return true;
-		}
+
+		// ... politely kick them out
+		return true;
 	}
 
 	/**
@@ -120,7 +118,7 @@ class Attachment extends AbstractController
 		$context['sub_template'] = 'send_json';
 
 		// Make sure the session is still valid
-		if (checkSession('request', '', false) != '')
+		if (checkSession('request', '', false) !== '')
 		{
 			$context['json_data'] = array('result' => false, 'data' => $txt['session_timeout_file_upload']);
 
@@ -139,8 +137,7 @@ class Attachment extends AbstractController
 			{
 				require_once(SUBSDIR . '/Attachments.subs.php');
 
-				$process = $this->_req->getPost('msg', 'intval', 0);
-				processAttachments($process);
+				processAttachments($this->_req->getPost('msg', 'intval', 0));
 			}
 
 			// Any mistakes?
@@ -149,7 +146,7 @@ class Attachment extends AbstractController
 				$errors = $attach_errors->prepareErrors();
 
 				// Bad news for you, the attachments did not process, lets tell them why
-				foreach ($errors as $key => $error)
+				foreach ($errors as $error)
 				{
 					$resp_data[] = $error;
 				}
@@ -160,7 +157,7 @@ class Attachment extends AbstractController
 			else
 			{
 				$tmp_attachments = new TemporaryAttachmentsList();
-				foreach ($tmp_attachments->toArray() as $attachID => $val)
+				foreach ($tmp_attachments->toArray() as $val)
 				{
 					// We need to grab the name anyhow
 					if (!empty($val['tmp_name']))
@@ -168,7 +165,8 @@ class Attachment extends AbstractController
 						$resp_data = array(
 							'name' => $val['name'],
 							'attachid' => $val['public_attachid'],
-							'size' => $val['size']
+							'size' => byte_format($val['size']),
+							'resized' => !empty($val['resized']),
 						);
 					}
 				}
@@ -184,7 +182,8 @@ class Attachment extends AbstractController
 	}
 
 	/**
-	 * Function to remove attachments which were added via ajax calls
+	 * Function to remove temporary attachments which were newly added via ajax calls
+	 * or to remove previous saved ones from an existing post
 	 *
 	 * What it does:
 	 *
@@ -194,7 +193,7 @@ class Attachment extends AbstractController
 	 */
 	public function action_rmattach()
 	{
-		global $context, $txt, $user_info;
+		global $context, $txt;
 
 		// Prepare the template so we can respond with json
 		$template_layers = theme()->getLayers();
@@ -218,8 +217,6 @@ class Attachment extends AbstractController
 			$tmp_attachments = new TemporaryAttachmentsList();
 			if ($tmp_attachments->hasAttachments())
 			{
-				require_once(SUBSDIR . '/Attachments.subs.php');
-
 				$attachId = $tmp_attachments->getIdFromPublic($this->_req->post->attachid);
 
 				try
@@ -234,11 +231,12 @@ class Attachment extends AbstractController
 				}
 			}
 
+			// Not a temporary attachment, but a previously uploaded one?
 			if ($result !== true)
 			{
 				require_once(SUBSDIR . '/ManageAttachments.subs.php');
 				$attachId = $this->_req->getPost('attachid', 'intval');
-				if (canRemoveAttachment($attachId, $user_info['id']))
+				if (canRemoveAttachment($attachId, User::$info->id))
 				{
 					$result_tmp = removeAttachments(array('id_attach' => $attachId), '', true);
 					if (!empty($result_tmp))
@@ -364,7 +362,7 @@ class Attachment extends AbstractController
 						$filename = $attachmentsDir->getCurrent() . '/' . $attachment['filename'];
 					}
 
-					if (substr(get_finfo_mime($filename), 0, 5) !== 'image')
+					if (substr(getMimeType($filename), 0, 5) !== 'image')
 					{
 						$attachment['fileext'] = 'png';
 						$attachment['mime_type'] = 'image/png';
@@ -480,7 +478,7 @@ class Attachment extends AbstractController
 
 		// Not compressible, or not supported / requested by client
 		if (!preg_match('~^(?:text/|application/(?:json|xml|rss\+xml)$)~i', $mime_type)
-			|| strpos($_SERVER['HTTP_ACCEPT_ENCODING'], 'gzip') === false)
+			|| (!isset($_SERVER['HTTP_ACCEPT_ENCODING']) || strpos($_SERVER['HTTP_ACCEPT_ENCODING'], 'gzip') === false))
 		{
 			return false;
 		}
@@ -680,7 +678,7 @@ class Attachment extends AbstractController
 		$resize = true;
 
 		// Return mime type ala mimetype extension
-		if (substr(get_finfo_mime($filename), 0, 5) !== 'image')
+		if (substr(getMimeType($filename), 0, 5) !== 'image')
 		{
 			$checkMime = returnMimeThumb($file_ext);
 			$mime_type = 'image/png';
