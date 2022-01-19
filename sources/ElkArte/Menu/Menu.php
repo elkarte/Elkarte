@@ -129,7 +129,7 @@ class Menu
 				$newAreas['areas'][$area_id] = MenuArea::buildFromArray($area + $newSubsections);
 			}
 
-			// Finally the menu button
+			// Finally, the menu button
 			unset($section['areas']);
 			$this->addSection($section_id, MenuSection::buildFromArray($section + $newAreas));
 		}
@@ -201,7 +201,7 @@ class Menu
 	}
 
 	/**
-	 * Allow extend *any* menu with a single hook
+	 * Allow extending *any* menu with a single hook
 	 */
 	public function callHook()
 	{
@@ -229,6 +229,9 @@ class Menu
 
 				// Process this menu section
 				$this->processSectionAreas($sectionId, $section);
+
+				// Validate is created *something*
+				$this->validateSection($sectionId);
 			}
 		}
 
@@ -236,6 +239,23 @@ class Menu
 		if (!$this->foundSection && !empty($this->firstAreaCurrent))
 		{
 			$this->setAreaCurrent($this->firstAreaCurrent[0], $this->firstAreaCurrent[1], $this->firstAreaCurrent[2]);
+		}
+	}
+
+	/**
+	 * Removes a generated section that has no areas and no URL, aka empty.  This can happen
+	 * due to conflicting permissions.
+	 *
+	 * @param string $sectionId
+	 */
+	private function validateSection($sectionId)
+	{
+		if (empty($this->menuContext['sections'][$sectionId]['areas']))
+		{
+			if (empty($this->menuContext['sections'][$sectionId]['url']))
+			{
+				unset($this->menuContext['sections'][$sectionId]);
+			}
 		}
 	}
 
@@ -319,7 +339,6 @@ class Menu
 	 *
 	 * @param string $sectionId
 	 * @param MenuSection $section
-	 * @throws \ElkArte\Exceptions\Exception
 	 */
 	protected function processSectionAreas($sectionId, $section)
 	{

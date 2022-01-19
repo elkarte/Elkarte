@@ -37,7 +37,7 @@ function template_generic_menu_sidebar_above()
 			<ul class="sidebar_menu no_js">';
 
 		// For every area of this section show a link to that area (bold if it's currently selected.)
-		foreach ($section['areas'] as $i => $area)
+		foreach ($section['areas'] as $area)
 		{
 			// Not supposed to be printed?
 			if (empty($area['label']))
