@@ -437,7 +437,7 @@ class Notify extends AbstractController
 		if ($this->_validateUnsubscribeToken($member, $area, $extra))
 		{
 			$this->_unsubscribeToggle($member, $area, $extra);
-			$this->_prepareTemplateMessage( $area, $extra, $member['email_address']);
+			$this->_prepareTemplateMessage($area, $extra, $member['email_address']);
 
 			return true;
 		}

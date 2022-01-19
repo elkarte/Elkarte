@@ -23,7 +23,7 @@ function elk_DraftAutoSave(oOptions)
 	this.sCurDraftId = '';
 	this.oCurDraftDiv = null;
 	this.interval_id = null;
-	this.oDraftHandle = document.forms.postmodify["message"];
+	this.oDraftHandle = document.forms.postmodify.message;
 	this.sLastSaved = '';
 	this.bCheckDraft = false;
 
@@ -137,7 +137,7 @@ elk_DraftAutoSave.prototype.draftSave = function ()
 	}
 
 	// Nothing to save?
-	var sPostdata = document.forms.postmodify["message"].value;
+	var sPostdata = document.forms.postmodify.message.value;
 	if (isEmptyText(sPostdata) || !('topic' in document.forms.postmodify.elements))
 	{
 		return false;
@@ -149,11 +149,11 @@ elk_DraftAutoSave.prototype.draftSave = function ()
 
 	// Get the form elements that we want to save
 	var aSections = [
-		'topic=' + parseInt(document.forms.postmodify.elements['topic'].value),
-		'id_draft=' + (('id_draft' in document.forms.postmodify.elements) ? parseInt(document.forms.postmodify.elements['id_draft'].value) : 0),
-		'subject=' + document.forms.postmodify['subject'].value.replace(/&#/g, "&#38;#").php_urlencode(),
+		'topic=' + parseInt(document.forms.postmodify.elements.topic.value),
+		'id_draft=' + (('id_draft' in document.forms.postmodify.elements) ? parseInt(document.forms.postmodify.elements.id_draft.value) : 0),
+		'subject=' + document.forms.postmodify.subject.value.replace(/&#/g, "&#38;#").php_urlencode(),
 		'message=' + sPostdata.replace(/&#/g, "&#38;#").php_urlencode(),
-		'icon=' + document.forms.postmodify['icon'].value.replace(/&#/g, "&#38;#").php_urlencode(),
+		'icon=' + document.forms.postmodify.icon.value.replace(/&#/g, "&#38;#").php_urlencode(),
 		'save_draft=true',
 		'autosave=true',
 		elk_session_var + '=' + elk_session_id
