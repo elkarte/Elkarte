@@ -143,7 +143,7 @@ abstract class Renderer
 		// Remember which message this is.  (ie. reply #83)
 		if ($this->_counter === 0 || $reset)
 		{
-			$this->_counter = $context['start'];
+			$this->_counter = empty($context['start']) ? 0 : $context['start'];
 		}
 
 		// Start from the beginning...
