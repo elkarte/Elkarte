@@ -20,6 +20,7 @@ namespace ElkArte\Controller;
 use ElkArte\AbstractController;
 use ElkArte\Exceptions\Exception;
 use ElkArte\Action;
+use ElkArte\Notifications;
 use ElkArte\Themes\ThemeLoader;
 
 /**
@@ -539,11 +540,6 @@ class Notify extends AbstractController
 	 */
 	private function _validateUnsubscribeToken(&$member, &$area, &$extra)
 	{
-		// Load all notification types in the system e.g.buddy, likemsg, etc
-		require_once(SUBSDIR . '/ManageFeatures.subs.php');
-		list($potentialAreas,) = getNotificationTypes();
-		$potentialAreas = array_merge($potentialAreas, ['topic', 'board']);
-
 		// Token was passed and matches our expected pattern
 		$token = $this->_req->getQuery('token', 'trim', '');
 		$token = urldecode($token);
@@ -551,6 +547,20 @@ class Notify extends AbstractController
 		{
 			return false;
 		}
+
+		// Load all notification types in the system e.g.buddy, likemsg, etc
+		$potentialAreas = [];
+		$notification_classes = getAvailableNotifications();
+		foreach ($notification_classes as $class)
+		{
+			if ($class::canUse() === false)
+			{
+				continue;
+			}
+
+			$potentialAreas[] = strtolower($class::getType());
+		}
+		$potentialAreas = array_merge($potentialAreas, ['topic', 'board']);
 
 		// Expand the token
 		list ($id_member, $hash, $area, $extra, $time) = explode('_', $match[1]);
@@ -575,7 +585,7 @@ class Notify extends AbstractController
 			return false;
 		}
 
-		// Validate its this members token
+		// Validate the token belongs to this member
 		require_once(SUBSDIR . '/Notification.subs.php');
 		return validateNotifierToken(
 			$member['email_address'],

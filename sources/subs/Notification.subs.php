@@ -980,7 +980,6 @@ function validateNotificationAccess($row, $maillist, &$email_perm = true)
  * @param int[]|int $members
  *
  * @return array
- * @throws \Exception
  */
 function getUsersNotificationsPreferences($notification_types, $members)
 {
@@ -1227,14 +1226,6 @@ function validateNotifierToken($memEmail, $memSalt, $area, $hash)
 	$expected = '$2a$10$' . $hash;
 	$check = crypt($area . $memEmail . $memSalt . $modSettings['unsubscribe_site_salt'], $expected);
 
-	// Basic safe compare as hash_equals is PHP 5.6+
-	if (function_exists('hash_equals'))
-	{
-		return hash_equals($expected, $check);
-	}
-
-	$ret = strlen($expected) ^ strlen($check);
-	$ret |= array_sum(unpack("C*", $expected ^ $check));
-
-	return !$ret;
+	// Basic safe compare
+	return hash_equals($expected, $check);
 }
