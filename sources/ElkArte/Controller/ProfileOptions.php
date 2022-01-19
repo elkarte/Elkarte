@@ -23,7 +23,6 @@ use ElkArte\Action;
 use ElkArte\Exceptions\Exception;
 use ElkArte\MembersList;
 use ElkArte\Util;
-use ElkArte\Notifications;
 
 /**
  *
@@ -609,7 +608,6 @@ class ProfileOptions extends AbstractController
 		require_once(SUBSDIR . '/Profile.subs.php');
 
 		// Show the list of notification types and how they can subscribe to them
-		$mention_methods = Notifications::instance()->getNotifiers();
 		$context['mention_types'] = getMemberNotificationsProfile($this->_memID);
 
 		// Fine, start with the board list.
@@ -875,7 +873,6 @@ class ProfileOptions extends AbstractController
 	 *
 	 * @param int $memID id_member the id of the member who's notifications we are loading
 	 * @return int
-	 * @throws \ElkArte\Exceptions\Exception
 	 */
 	public function list_getTopicNotificationCount($memID)
 	{
