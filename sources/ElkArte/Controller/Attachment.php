@@ -26,6 +26,7 @@ use ElkArte\AttachmentsDirectory;
 use ElkArte\Http\Headers;
 use ElkArte\TemporaryAttachmentsList;
 use ElkArte\Themes\ThemeLoader;
+use ElkArte\Languages\Txt;
 use ElkArte\User;
 
 /**
@@ -108,7 +109,7 @@ class Attachment extends AbstractController
 		global $context, $modSettings, $txt;
 
 		$resp_data = array();
-		ThemeLoader::loadLanguageFile('Errors');
+		Txt::load('Errors');
 		$context['attachments']['can']['post'] = !empty($modSettings['attachmentEnable']) && $modSettings['attachmentEnable'] == 1 && (allowedTo('post_attachment') || ($modSettings['postmod_active'] && allowedTo('post_unapproved_attachments')));
 
 		// Set up the template details
@@ -128,7 +129,7 @@ class Attachment extends AbstractController
 		// We should have files, otherwise why are we here?
 		if (isset($_FILES['attachment']))
 		{
-			ThemeLoader::loadLanguageFile('Post');
+			Txt::load('Post');
 
 			$attach_errors = AttachmentErrorContext::context();
 			$attach_errors->activate();
@@ -204,7 +205,7 @@ class Attachment extends AbstractController
 		// Make sure the session is valid
 		if (checkSession('request', '', false) !== '')
 		{
-			ThemeLoader::loadLanguageFile('Errors');
+			Txt::load('Errors');
 			$context['json_data'] = array('result' => false, 'data' => $txt['session_timeout']);
 
 			return false;
@@ -253,13 +254,13 @@ class Attachment extends AbstractController
 
 			if ($result !== true)
 			{
-				ThemeLoader::loadLanguageFile('Errors');
+				Txt::load('Errors');
 				$context['json_data'] = array('result' => false, 'data' => $txt[!empty($result) ? $result : 'attachment_not_found']);
 			}
 		}
 		else
 		{
-			ThemeLoader::loadLanguageFile('Errors');
+			Txt::load('Errors');
 			$context['json_data'] = array('result' => false, 'data' => $txt['attachment_not_found']);
 		}
 	}
@@ -444,7 +445,7 @@ class Attachment extends AbstractController
 		if ($text === null)
 		{
 			new ThemeLoader();
-			ThemeLoader::loadLanguageFile('Errors');
+			Txt::load('Errors');
 			$text = $txt['attachment_not_found'];
 		}
 
@@ -512,7 +513,7 @@ class Attachment extends AbstractController
 		// No point in a nicer message, because this is supposed to be an attachment anyway...
 		if ($check_filename && !file_exists($filename))
 		{
-			ThemeLoader::loadLanguageFile('Errors');
+			Txt::load('Errors');
 
 			$protocol = preg_match('~HTTP/1\.[01]~i', $this->_req->server->SERVER_PROTOCOL) ? $this->_req->server->SERVER_PROTOCOL : 'HTTP/1.0';
 			$headers

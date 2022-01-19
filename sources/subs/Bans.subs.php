@@ -16,7 +16,7 @@
 
 use ElkArte\Errors\ErrorContext;
 use ElkArte\MembersList;
-use ElkArte\Themes\ThemeLoader;
+use ElkArte\Languages\Txt;
 use ElkArte\Util;
 
 /**
@@ -1625,7 +1625,7 @@ function banLoadAdditionalIPsError($member_id)
 function banLoadAdditionalIPs($member_id)
 {
 	// Borrowing a few language strings from profile.
-	ThemeLoader::loadLanguageFile('Profile');
+	Txt::load('Profile');
 
 	$search_list = array();
 	call_integration_hook('integrate_load_additional_ip_ban', array(&$search_list));

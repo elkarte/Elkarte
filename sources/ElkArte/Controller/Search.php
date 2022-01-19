@@ -26,7 +26,7 @@ use ElkArte\MessageTopicIcons;
 use ElkArte\Search\SearchApiWrapper;
 use ElkArte\Search\SearchParams;
 use ElkArte\Search\WeightFactors;
-use ElkArte\Themes\ThemeLoader;
+use ElkArte\Languages\Txt;
 use ElkArte\Util;
 use ElkArte\ValuesContainer;
 use ElkArte\VerificationControls\VerificationControlsIntegrate;
@@ -134,7 +134,7 @@ class Search extends AbstractController
 			throw new Exception('loadavg_search_disabled', false);
 		}
 
-		ThemeLoader::loadLanguageFile('Search');
+		Txt::load('Search');
 
 		// Don't load this in XML mode.
 		if ($this->getApi() === false)
@@ -214,7 +214,7 @@ class Search extends AbstractController
 		// Load the error text strings if there were errors in the search.
 		if (!empty($context['search_errors']))
 		{
-			ThemeLoader::loadLanguageFile('Errors');
+			Txt::load('Errors');
 			$context['search_errors']['messages'] = array();
 			foreach ($context['search_errors'] as $search_error => $dummy)
 			{
@@ -348,7 +348,7 @@ class Search extends AbstractController
 		// Maximum length of the string.
 		$context['search_string_limit'] = 100;
 
-		ThemeLoader::loadLanguageFile('Search');
+		Txt::load('Search');
 		if ($this->getApi() === false)
 		{
 			theme()->getTemplates()->load('Search');

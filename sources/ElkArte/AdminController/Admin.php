@@ -23,7 +23,7 @@ use ElkArte\EventManager;
 use ElkArte\Exceptions\Exception;
 use ElkArte\Hooks;
 use ElkArte\Menu\Menu;
-use ElkArte\Themes\ThemeLoader;
+use ElkArte\Languages\Txt;
 use ElkArte\User;
 use ElkArte\XmlArray;
 
@@ -73,7 +73,7 @@ class Admin extends AbstractController
 		validateSession();
 
 		// Load the language and templates....
-		ThemeLoader::loadLanguageFile('Admin');
+		Txt::load('Admin');
 		theme()->getTemplates()->load('Admin');
 		loadCSSFile('admin.css');
 		loadJavascriptFile('admin.js', array(), 'admin_script');
@@ -716,7 +716,7 @@ class Admin extends AbstractController
 			'help' => '',
 			'description' => '',
 		);
-		ThemeLoader::loadLanguageFile('Who');
+		Txt::load('Who');
 		$context += prepareCreditsData();
 
 		// This makes it easier to get the latest news with your time format.

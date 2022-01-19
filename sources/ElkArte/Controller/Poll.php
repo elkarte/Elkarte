@@ -19,7 +19,7 @@ namespace ElkArte\Controller;
 use ElkArte\AbstractController;
 use ElkArte\Errors\ErrorContext;
 use ElkArte\Exceptions\Exception;
-use ElkArte\Themes\ThemeLoader;
+use ElkArte\Languages\Txt;
 use ElkArte\Util;
 
 /**
@@ -60,7 +60,7 @@ class Poll extends AbstractController
 		// Make sure you can vote.
 		isAllowedTo('poll_vote');
 
-		ThemeLoader::loadLanguageFile('Post');
+		Txt::load('Post');
 
 		// Check if they have already voted, or voting is locked.
 		$row = checkVote($topic);
@@ -537,7 +537,7 @@ class Poll extends AbstractController
 		// We work hard with polls.
 		require_once(SUBSDIR . '/Poll.subs.php');
 
-		ThemeLoader::loadLanguageFile('Post');
+		Txt::load('Post');
 		theme()->getTemplates()->load('Poll');
 		loadJavascriptFile('post.js', array(), 'post_scripts');
 
@@ -861,7 +861,7 @@ class Poll extends AbstractController
 
 		theme()->getLayers()->removeAll();
 		theme()->getTemplates()->load('Poll');
-		ThemeLoader::loadLanguageFile('Post');
+		Txt::load('Post');
 
 		$db_show_debug = false;
 

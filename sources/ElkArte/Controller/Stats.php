@@ -18,7 +18,7 @@ namespace ElkArte\Controller;
 
 use ElkArte\AbstractController;
 use ElkArte\Exceptions\Exception;
-use ElkArte\Themes\ThemeLoader;
+use ElkArte\Languages\Txt;
 use Elkarte\Util;
 
 /**
@@ -95,7 +95,7 @@ class Stats extends AbstractController
 		}
 
 		// Stats it is
-		ThemeLoader::loadLanguageFile('Stats');
+		Txt::load('Stats');
 		theme()->getTemplates()->load('Stats');
 		loadJavascriptFile('stats.js');
 

@@ -14,7 +14,7 @@
  *
  */
 
-use ElkArte\Themes\ThemeLoader;
+use ElkArte\Languages\Txt;
 use ElkArte\User;
 use ElkArte\Util;
 
@@ -610,7 +610,7 @@ function availableThemes($current_theme, $current_member)
 
 				call_integration_hook('integrate_init_theme', array($id_theme, &$settings));
 
-				ThemeLoader::loadLanguageFile('Settings');
+				Txt::load('Settings');
 
 				$available_themes[$id_theme]['variants'] = array();
 				foreach ($settings['theme_variants'] as $variant)

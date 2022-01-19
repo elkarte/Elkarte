@@ -22,7 +22,7 @@ use ElkArte\Action;
 use ElkArte\DataValidator;
 use ElkArte\Exceptions\Exception;
 use ElkArte\SettingsForm\SettingsForm;
-use ElkArte\Themes\ThemeLoader;
+use ElkArte\Languages\Txt;
 use ElkArte\Util;
 
 /**
@@ -50,7 +50,7 @@ class ManagePaid extends AbstractController
 		global $context, $txt, $modSettings;
 
 		// Load the required language and template.
-		ThemeLoader::loadLanguageFile('ManagePaid');
+		Txt::load('ManagePaid');
 		theme()->getTemplates()->load('ManagePaid');
 
 		$subActions = array(

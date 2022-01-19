@@ -17,7 +17,7 @@
  */
 
 use ElkArte\Cache\Cache;
-use ElkArte\Themes\ThemeLoader;
+use ElkArte\Languages\Txt;
 use ElkArte\User;
 
 /**
@@ -34,7 +34,7 @@ function getServerVersions($checkFor)
 
 	$db = database();
 
-	ThemeLoader::loadLanguageFile('Admin');
+	Txt::load('Admin');
 
 	$versions = array();
 

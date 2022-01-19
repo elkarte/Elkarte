@@ -19,7 +19,7 @@ use ElkArte\Cache\Cache;
 use ElkArte\Controller\Auth;
 use ElkArte\EventManager;
 use ElkArte\Http\Headers;
-use ElkArte\Themes\ThemeLoader;
+use ElkArte\Languages\Txt;
 use ElkArte\TokenHash;
 use ElkArte\User;
 use ElkArte\Util;
@@ -226,7 +226,7 @@ function is_not_guest($message = '', $is_fatal = true)
 	}
 
 	// Load the Login template and language file.
-	ThemeLoader::loadLanguageFile('Login');
+	Txt::load('Login');
 
 	// Apparently we're not in a position to handle this now. Let's go to a safer location for now.
 	if (!theme()->getLayers()->hasLayers())
@@ -1254,7 +1254,7 @@ function isAllowedTo($permission, $boards = null)
 		// If they are a guest, show a login. (because the error might be gone if they do!)
 		if (User::$info->is_guest)
 		{
-			ThemeLoader::loadLanguageFile('Errors');
+			Txt::load('Errors');
 			is_not_guest($txt['cannot_' . $error_permission]);
 		}
 

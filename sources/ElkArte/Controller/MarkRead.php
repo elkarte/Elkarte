@@ -14,7 +14,7 @@
 namespace ElkArte\Controller;
 
 use ElkArte\AbstractController;
-use ElkArte\Themes\ThemeLoader;
+use ElkArte\Languages\Txt;
 
 /**
  * This class handles a part of the actions to mark boards, topics, or replies,
@@ -107,7 +107,7 @@ class MarkRead extends AbstractController
 		// Guests can't mark things.
 		if ($this->user->is_guest)
 		{
-			ThemeLoader::loadLanguageFile('Errors');
+			Txt::load('Errors');
 			$context['xml_data'] = array(
 				'error' => 1,
 				'text' => $txt['not_guests']
@@ -121,7 +121,7 @@ class MarkRead extends AbstractController
 			// Again, this is a special case, someone will deal with the others later :P
 			if ($this->_req->getQuery('sa') === 'all')
 			{
-				ThemeLoader::loadLanguageFile('Errors');
+				Txt::load('Errors');
 				$context['xml_data'] = array(
 					'error' => 1,
 					'url' => getUrl('action', ['action' => 'markasread', 'sa' => 'all', '{session_data}']),

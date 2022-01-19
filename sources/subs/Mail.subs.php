@@ -16,7 +16,7 @@
  */
 
 use BBC\ParserWrapper;
-use ElkArte\Themes\ThemeLoader;
+use ElkArte\Langauges\Txt;
 use ElkArte\User;
 use ElkArte\Languages\Loader as LangLoader;
 
@@ -1008,7 +1008,7 @@ function prepareMailingForPreview()
 {
 	global $context, $modSettings, $scripturl, $txt;
 
-	ThemeLoader::loadLanguageFile('Errors');
+	Txt::load('Errors');
 	require_once(SUBSDIR . '/Post.subs.php');
 
 	$processing = array(

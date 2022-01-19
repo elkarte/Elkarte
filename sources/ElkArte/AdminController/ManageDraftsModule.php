@@ -16,7 +16,7 @@ use ElkArte\AbstractController;
 use ElkArte\EventManager;
 use ElkArte\Hooks;
 use ElkArte\SettingsForm\SettingsForm;
-use ElkArte\Themes\ThemeLoader;
+use ElkArte\Languages\Txt;
 use ElkArte\User;
 
 /**
@@ -187,7 +187,7 @@ class ManageDraftsModule extends AbstractController
 	public function action_index()
 	{
 		isAllowedTo('admin_forum');
-		ThemeLoader::loadLanguageFile('Drafts');
+		Txt::load('Drafts');
 
 		$this->action_draftSettings_display();
 	}
@@ -206,7 +206,7 @@ class ManageDraftsModule extends AbstractController
 		global $context, $txt;
 
 		isAllowedTo('admin_forum');
-		ThemeLoader::loadLanguageFile('Drafts');
+		Txt::load('Drafts');
 
 		// Initialize the form
 		$settingsForm = new SettingsForm(SettingsForm::DB_ADAPTER);
@@ -270,7 +270,7 @@ class ManageDraftsModule extends AbstractController
 	{
 		global $txt;
 
-		ThemeLoader::loadLanguageFile('Drafts');
+		Txt::load('Drafts');
 
 		// Here are all the draft settings, a bit lite for now, but we can add more :P
 		$config_vars = array(

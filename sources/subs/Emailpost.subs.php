@@ -23,7 +23,7 @@ use ElkArte\Notifications;
 use ElkArte\NotificationsTask;
 use ElkArte\TemporaryAttachment;
 use ElkArte\TemporaryAttachmentsList;
-use ElkArte\Themes\ThemeLoader;
+use ElkArte\Languages\Txt;
 use ElkArte\Util;
 
 /**
@@ -695,7 +695,7 @@ function pbe_emailError($error, $email_message)
 
 	$db = database();
 
-	ThemeLoader::loadLanguageFile('EmailTemplates');
+	Txt::load('EmailTemplates');
 
 	// Some extra items we will need to remove from the message subject
 	$pm_subject_leader = str_replace('{SUBJECT}', '', $txt['new_pm_subject']);
@@ -1009,7 +1009,7 @@ function pbe_prepare_text(&$message, &$subject = '', &$signature = '')
 {
 	global $context;
 
-	ThemeLoader::loadLanguageFile('Maillist');
+	Txt::load('Maillist');
 
 	// Server?
 	detectServer();

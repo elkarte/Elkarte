@@ -25,7 +25,7 @@ use ElkArte\EmailSettings;
 use ElkArte\EventManager;
 use ElkArte\Exceptions\Exception;
 use ElkArte\SettingsForm\SettingsForm;
-use ElkArte\Themes\ThemeLoader;
+use ElkArte\Languages\Txt;
 use ElkArte\User;
 use ElkArte\Util;
 
@@ -55,7 +55,7 @@ class ManageMaillist extends AbstractController
 
 		// Template & language
 		theme()->getTemplates()->load('Maillist');
-		ThemeLoader::loadLanguageFile('Maillist');
+		Txt::load('Maillist');
 
 		// All the functions available
 		$subActions = array(
@@ -1491,7 +1491,7 @@ class ManageMaillist extends AbstractController
 		}
 
 		// Templates and language
-		ThemeLoader::loadLanguageFile('Admin');
+		Txt::load('Admin');
 		theme()->getTemplates()->load('Admin');
 		loadCSSFile('admin.css');
 

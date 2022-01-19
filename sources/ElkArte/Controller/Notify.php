@@ -20,7 +20,7 @@ namespace ElkArte\Controller;
 use ElkArte\AbstractController;
 use ElkArte\Exceptions\Exception;
 use ElkArte\Action;
-use ElkArte\Themes\ThemeLoader;
+use ElkArte\Languages\Txt;
 
 /**
  * Functions that turn on and off various member notifications
@@ -152,7 +152,7 @@ class Notify extends AbstractController
 		// Even with Ajax, guests still can't do this
 		if ($this->user->is_guest)
 		{
-			ThemeLoader::loadLanguageFile('Errors');
+			Txt::load('Errors');
 			$context['xml_data'] = array(
 				'error' => 1,
 				'text' => $txt['not_guests']
@@ -164,7 +164,7 @@ class Notify extends AbstractController
 		// And members still need the right permissions
 		if (!allowedTo('mark_any_notify') || empty($topic) || empty($this->_req->query->sa))
 		{
-			ThemeLoader::loadLanguageFile('Errors');
+			Txt::load('Errors');
 			$context['xml_data'] = array(
 				'error' => 1,
 				'text' => $txt['cannot_mark_any_notify']
@@ -176,7 +176,7 @@ class Notify extends AbstractController
 		// And sessions still matter, so you better have a valid one
 		if (checkSession('get', '', false))
 		{
-			ThemeLoader::loadLanguageFile('Errors');
+			Txt::load('Errors');
 			$context['xml_data'] = array(
 				'error' => 1,
 				'url' => getUrl('action', ['action' => 'notify', 'sa' => ($this->_req->query->sa === 'on' ? 'on' : 'off'), 'topic' => $topic . '.' . $this->_req->query->start, '{session_data}']),
@@ -284,7 +284,7 @@ class Notify extends AbstractController
 		// Permissions are an important part of anything ;).
 		if ($this->user->is_guest)
 		{
-			ThemeLoader::loadLanguageFile('Errors');
+			Txt::load('Errors');
 			$context['xml_data'] = array(
 				'error' => 1,
 				'text' => $txt['not_guests']
@@ -296,7 +296,7 @@ class Notify extends AbstractController
 		// Have to have provided the right information
 		if (!allowedTo('mark_notify') || empty($board) || empty($this->_req->query->sa))
 		{
-			ThemeLoader::loadLanguageFile('Errors');
+			Txt::load('Errors');
 			$context['xml_data'] = array(
 				'error' => 1,
 				'text' => $txt['cannot_mark_notify'],
@@ -308,7 +308,7 @@ class Notify extends AbstractController
 		// Sessions are always verified
 		if (checkSession('get', '', false))
 		{
-			ThemeLoader::loadLanguageFile('Errors');
+			Txt::load('Errors');
 			$context['xml_data'] = array(
 				'error' => 1,
 				'url' => getUrl('action', ['action' => 'notifyboard', 'sa' => ($this->_req->query->sa === 'on' ? 'on' : 'off'), 'board' => $board . '.' . $this->_req->query->start, '{session_data}']),
@@ -382,7 +382,7 @@ class Notify extends AbstractController
 		// Sorry guests just can't do this
 		if ($this->user->is_guest)
 		{
-			ThemeLoader::loadLanguageFile('Errors');
+			Txt::load('Errors');
 			$context['xml_data'] = array(
 				'error' => 1,
 				'text' => $txt['not_guests']
@@ -394,7 +394,7 @@ class Notify extends AbstractController
 		// Let's do something only if the function is enabled
 		if (empty($modSettings['enable_unwatch']))
 		{
-			ThemeLoader::loadLanguageFile('Errors');
+			Txt::load('Errors');
 			$context['xml_data'] = array(
 				'error' => 1,
 				'text' => $txt['feature_disabled'],
@@ -406,7 +406,7 @@ class Notify extends AbstractController
 		// Sessions need to be validated
 		if (checkSession('get', '', false))
 		{
-			ThemeLoader::loadLanguageFile('Errors');
+			Txt::load('Errors');
 			$context['xml_data'] = array(
 				'error' => 1,
 				'url' => getUrl('action', ['action' => 'unwatchtopic', 'sa' => ($this->_req->query->sa === 'on' ? 'on' : 'off'), 'topic' => $topic . '.' . $this->_req->query->start, '{session_data}'])
@@ -654,7 +654,7 @@ class Notify extends AbstractController
 			case 'mentionmem':
 			case 'quotedmem':
 			case 'rlikemsg':
-				ThemeLoader::loadLanguageFile('Mentions');
+				Txt::load('Mentions');
 				$context['unsubscribe_message'] = sprintf($txt['notify_mention_unsubscribed'], $txt['mentions_type_' . $area], $email);
 				break;
 			default:

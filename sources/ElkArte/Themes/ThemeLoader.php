@@ -176,7 +176,7 @@ class ThemeLoader
 		// Any theme-related strings that need to be loaded?
 		if (!empty($settings['require_theme_strings']))
 		{
-			ThemeLoader::loadLanguageFile('ThemeStrings', '', false);
+			Txt::load('ThemeStrings', '', false);
 		}
 
 		// Load the SVG support file with fallback to default theme

@@ -19,7 +19,7 @@ namespace ElkArte\Controller;
 use ElkArte\AbstractController;
 use ElkArte\Exceptions\Exception;
 use ElkArte\Hooks;
-use ElkArte\Themes\ThemeLoader;
+use ElkArte\Languages\Txt;
 use ElkArte\Util;
 
 /**
@@ -60,7 +60,7 @@ class Help extends AbstractController
 		global $context, $txt;
 
 		theme()->getTemplates()->load('Help');
-		ThemeLoader::loadLanguageFile('Manual');
+		Txt::load('Manual');
 
 		// We need to know where our wiki is.
 		$context['wiki_url'] = 'https://github.com/elkarte/Elkarte/wiki';
@@ -119,12 +119,12 @@ class Help extends AbstractController
 		$help_str = Util::htmlspecialchars($this->_req->query->help);
 
 		// Load the admin help language file and template.
-		ThemeLoader::loadLanguageFile('Help');
+		Txt::load('Help');
 
 		// Load permission specific help
 		if (substr($help_str, 0, 14) === 'permissionhelp')
 		{
-			ThemeLoader::loadLanguageFile('ManagePermissions');
+			Txt::load('ManagePermissions');
 		}
 
 		// Load our template

@@ -23,7 +23,7 @@ use ElkArte\Cache\Cache;
 use ElkArte\EventManager;
 use ElkArte\Exceptions\Exception;
 use ElkArte\MembersList;
-use ElkArte\Themes\ThemeLoader;
+use ElkArte\Languages\Txt;
 use ElkArte\User;
 use ElkArte\Util;
 
@@ -109,7 +109,7 @@ class Profile extends AbstractController
 		// Don't reload this as we may have processed error strings.
 		if (empty($post_errors))
 		{
-			ThemeLoader::loadLanguageFile('Profile');
+			Txt::load('Profile');
 		}
 
 		theme()->getTemplates()->load('Profile');
@@ -681,7 +681,7 @@ class Profile extends AbstractController
 			if (!empty($post_errors))
 			{
 				// Load the language file so we can give a nice explanation of the errors.
-				ThemeLoader::loadLanguageFile('Errors');
+				Txt::load('Errors');
 				$context['post_errors'] = $post_errors;
 			}
 			elseif (!empty($profile_vars))

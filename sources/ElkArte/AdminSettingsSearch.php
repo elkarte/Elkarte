@@ -16,7 +16,7 @@
 
 namespace ElkArte;
 
-use ElkArte\Themes\ThemeLoader;
+use ElkArte\Languages\Txt;
 
 /**
  * Perform a search in the admin settings (and maybe other settings as well)
@@ -58,7 +58,7 @@ class AdminSettingsSearch
 	{
 		if (!empty($language_files))
 		{
-			ThemeLoader::loadLanguageFile(implode('+', $language_files));
+			Txt::load(implode('+', $language_files));
 		}
 
 		if (!empty($include_files))

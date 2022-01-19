@@ -22,7 +22,7 @@ use ElkArte\AbstractController;
 use ElkArte\Action;
 use ElkArte\Exceptions\Exception;
 use ElkArte\SettingsForm\SettingsForm;
-use ElkArte\Themes\ThemeLoader;
+use ElkArte\Languages\Txt;
 use ElkArte\User;
 
 /**
@@ -52,7 +52,7 @@ class ManageServer extends AbstractController
 		global $context, $txt;
 
 		// The settings are in here, I swear!
-		ThemeLoader::loadLanguageFile('ManageSettings');
+		Txt::load('ManageSettings');
 
 		// This is just to keep the database password more secure.
 		isAllowedTo('admin_forum');
@@ -405,7 +405,7 @@ class ManageServer extends AbstractController
 			redirectexit('action=admin;area=serversettings;sa=cache;' . $context['session_var'] . '=' . $context['session_id']);
 		}
 
-		ThemeLoader::loadLanguageFile('Maintenance');
+		Txt::load('Maintenance');
 		createToken('admin-maint');
 		theme()->getLayers()->add('clean_cache_button');
 

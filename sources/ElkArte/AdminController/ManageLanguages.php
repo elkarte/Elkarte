@@ -21,7 +21,7 @@ use ElkArte\Action;
 use ElkArte\Cache\Cache;
 use ElkArte\Exceptions\Exception;
 use ElkArte\SettingsForm\SettingsForm;
-use ElkArte\Themes\ThemeLoader;
+use ElkArte\Languages\Txt;
 use ElkArte\Util;
 use ElkArte\Languages\Loader as LangLoader;
 
@@ -49,7 +49,7 @@ class ManageLanguages extends AbstractController
 		global $context, $txt;
 
 		theme()->getTemplates()->load('ManageLanguages');
-		ThemeLoader::loadLanguageFile('ManageSettings');
+		Txt::load('ManageSettings');
 
 		$subActions = array(
 			'edit' => array($this, 'action_edit', 'permission' => 'admin_forum'),
@@ -329,7 +329,7 @@ class ManageLanguages extends AbstractController
 		// @todo for the moment there is no facility to download packages, so better kill it here
 		throw new Exception('no_access', false);
 
-		ThemeLoader::loadLanguageFile('ManageSettings');
+		Txt::load('ManageSettings');
 		require_once(SUBSDIR . '/Package.subs.php');
 
 		// Clearly we need to know what to request.
@@ -603,7 +603,7 @@ class ManageLanguages extends AbstractController
 			// Are we going to need more language stuff?
 			if (!empty($context['still_not_writable']))
 			{
-				ThemeLoader::loadLanguageFile('Packages');
+				Txt::load('Packages');
 			}
 		}
 
@@ -699,7 +699,7 @@ class ManageLanguages extends AbstractController
 
 		$base_lang_dir = SOURCEDIR . '/ElkArte/Languages';
 		require_once(SUBSDIR . '/Language.subs.php');
-		ThemeLoader::loadLanguageFile('ManageSettings');
+		Txt::load('ManageSettings');
 
 		// Select the languages tab.
 		$context['menu_data_' . $context['admin_menu_id']]['current_subsection'] = 'edit';

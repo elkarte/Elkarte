@@ -17,7 +17,7 @@
 namespace ElkArte\AdminController;
 
 use ElkArte\AbstractController;
-use ElkArte\Themes\ThemeLoader;
+use ElkArte\Languages\Txt;
 use ElkArte\Util;
 
 /**
@@ -74,7 +74,7 @@ class Modlog extends AbstractController
 
 		$context['can_delete'] = allowedTo('admin_forum');
 
-		ThemeLoader::loadLanguageFile('Modlog');
+		Txt::load('Modlog');
 
 		$context['page_title'] = $context['log_type'] == 3 ? $txt['modlog_admin_log'] : $txt['modlog_view'];
 

@@ -19,7 +19,7 @@ namespace ElkArte\AdminController;
 use ElkArte\AbstractController;
 use ElkArte\Action;
 use ElkArte\SettingsForm\SettingsForm;
-use ElkArte\Themes\ThemeLoader;
+use ElkArte\Languages\Txt;
 use ElkArte\Util;
 
 /**
@@ -433,7 +433,7 @@ class ManageNews extends AbstractController
 		$this->action_mailingsend(true);
 
 		// We need a couple strings from the email template file
-		ThemeLoader::loadLanguageFile('EmailTemplates');
+		Txt::load('EmailTemplates');
 		require_once(SUBSDIR . '/News.subs.php');
 
 		// Get a list of all full banned users.  Use their Username and email to find them.

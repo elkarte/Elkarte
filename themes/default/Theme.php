@@ -23,7 +23,7 @@ use ElkArte\EventManager;
 use ElkArte\Http\Headers;
 use ElkArte\SiteCombiner;
 use ElkArte\Themes\Theme as BaseTheme;
-use ElkArte\Themes\ThemeLoader;
+use ElkArte\Languages\Txt;
 use ElkArte\User;
 use ElkArte\Util;
 
@@ -1139,14 +1139,14 @@ class Theme extends BaseTheme
 
 		if ($api === 'xml')
 		{
-			ThemeLoader::loadLanguageFile('index+Addons');
+			Txt::load('index+Addons');
 			$this->getLayers()->removeAll();
 			$this->getTemplates()->load('Xml');
 		}
 		// These actions don't require the index template at all.
 		elseif (in_array($action, $simpleActions))
 		{
-			ThemeLoader::loadLanguageFile('index+Addons');
+			Txt::load('index+Addons');
 			$this->getLayers()->removeAll();
 		}
 		else
@@ -1161,7 +1161,7 @@ class Theme extends BaseTheme
 			}
 
 			// ...and attempt to load their associated language files.
-			ThemeLoader::loadLanguageFiles(array_merge($templates, ['Addons']), '', false);
+			Txt::load(array_merge($templates, ['Addons']), '', false);
 
 			// Custom template layers?
 			$layers = isset($settings['theme_layers']) ? explode(',', $settings['theme_layers']) : ['html', 'body'];

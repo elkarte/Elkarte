@@ -15,7 +15,7 @@ namespace ElkArte\Controller;
 
 use BBC\ParserWrapper;
 use ElkArte\Exceptions\Exception;
-use ElkArte\Themes\ThemeLoader;
+use ElkArte\Languages\Txt;
 use ElkArte\Util;
 
 /**
@@ -37,7 +37,7 @@ class Draft extends Post
 	public function pre_dispatch()
 	{
 		// Language and helper functions
-		ThemeLoader::loadLanguageFile('Drafts');
+		Txt::load('Drafts');
 		require_once(SUBSDIR . '/Drafts.subs.php');
 		require_once(SUBSDIR . '/Profile.subs.php');
 

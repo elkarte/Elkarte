@@ -12,7 +12,7 @@
  */
 
 use ElkArte\Errors\ErrorContext;
-use ElkArte\Themes\ThemeLoader;
+use ElkArte\Languages\Txt;
 use ElkArte\User;
 use ElkArte\Util;
 
@@ -471,7 +471,7 @@ function saveDraft($draft, $check_last_save = false)
 		// Since we were called from the autosave function, send something back
 		if (!empty($id_draft))
 		{
-			ThemeLoader::loadLanguageFile('Drafts');
+			Txt::load('Drafts');
 			theme()->getTemplates()->load('Xml');
 			$context['sub_template'] = 'xml_draft';
 			$context['id_draft'] = $id_draft;

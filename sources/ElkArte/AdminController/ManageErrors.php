@@ -20,7 +20,7 @@ namespace ElkArte\AdminController;
 use ElkArte\AbstractController;
 use ElkArte\Errors\Log;
 use ElkArte\MembersList;
-use ElkArte\Themes\ThemeLoader;
+use ElkArte\Languages\Txt;
 
 /**
  * ManageErrors controller, administration of error log.
@@ -124,7 +124,7 @@ class ManageErrors extends AbstractController
 		global $txt, $context, $modSettings;
 
 		// Templates, etc...
-		ThemeLoader::loadLanguageFile('Maintenance');
+		Txt::load('Maintenance');
 		theme()->getTemplates()->load('Errors');
 
 		// Set up any filters chosen

@@ -17,7 +17,7 @@ use ElkArte\AbstractController;
 use ElkArte\Agreement;
 use ElkArte\Http\Headers;
 use ElkArte\PrivacyPolicy;
-use ElkArte\Themes\ThemeLoader;
+use ElkArte\Languages\Txt;
 
 /**
  * This file is called via ?action=jslocale;sa=sceditor to load in a list of
@@ -94,7 +94,7 @@ class Jslocale extends AbstractController
 
 		if (!empty($language_file))
 		{
-			ThemeLoader::loadLanguageFile($language_file);
+			Txt::load($language_file);
 		}
 
 		theme()->getLayers()->removeAll();

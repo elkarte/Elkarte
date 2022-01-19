@@ -18,7 +18,7 @@ namespace ElkArte\Modules\Drafts;
 
 use ElkArte\EventManager;
 use ElkArte\Modules\AbstractModule;
-use ElkArte\Themes\ThemeLoader;
+use ElkArte\Langauges\Txt;
 
 /**
  * Class \ElkArte\Modules\Drafts\Profile
@@ -79,7 +79,7 @@ class Profile extends AbstractModule
 	{
 		if (empty($post_errors))
 		{
-			ThemeLoader::loadLanguageFile('Drafts');
+			Txt::load('Drafts');
 		}
 	}
 }

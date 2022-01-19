@@ -23,7 +23,7 @@ namespace ElkArte\AdminController;
 
 use ElkArte\AbstractController;
 use ElkArte\Exceptions\Exception;
-use ElkArte\Themes\ThemeLoader;
+use ElkArte\Languages\Txt;
 
 /**
  * "Report" Functions are responsible for generating data for reporting.
@@ -62,7 +62,7 @@ class Reports extends AbstractController
 
 		// Let's get our things running...
 		theme()->getTemplates()->load('Reports');
-		ThemeLoader::loadLanguageFile('Reports');
+		Txt::load('Reports');
 
 		$context['page_title'] = $txt['generate_reports'];
 
@@ -187,7 +187,7 @@ class Reports extends AbstractController
 		require_once(SUBSDIR . '/Membergroups.subs.php');
 		require_once(SUBSDIR . '/Reports.subs.php');
 
-		ThemeLoader::loadLanguageFile('ManagePermissions');
+		Txt::load('ManagePermissions');
 		loadPermissionProfiles();
 
 		// Get every moderator.

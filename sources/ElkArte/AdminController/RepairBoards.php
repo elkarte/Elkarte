@@ -17,7 +17,7 @@
 namespace ElkArte\AdminController;
 
 use ElkArte\AbstractController;
-use ElkArte\Themes\ThemeLoader;
+use ElkArte\Languages\Txt;
 
 /**
  * Repair boards controller handles a special admin action:
@@ -63,7 +63,7 @@ class RepairBoards extends AbstractController
 		$context[$context['admin_menu_name']]['current_subsection'] = 'general';
 
 		// Load the language file.
-		ThemeLoader::loadLanguageFile('Maintenance');
+		Txt::load('Maintenance');
 
 		// Make sure the tabs stay nice.
 		$context[$context['admin_menu_name']]['tab_data'] = array(

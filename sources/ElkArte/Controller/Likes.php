@@ -19,7 +19,7 @@ use ElkArte\Exceptions\Exception;
 use ElkArte\MembersList;
 use ElkArte\Notifications;
 use ElkArte\NotificationsTask;
-use ElkArte\Themes\ThemeLoader;
+use ElkArte\Languages\Txt;
 
 /**
  * This class contains one likable use, which allows members to like a post
@@ -193,7 +193,7 @@ class Likes extends AbstractController
 		// If they have exceeded their limits, provide a message for the ajax response
 		if ($check === false)
 		{
-			ThemeLoader::loadLanguageFile('Errors');
+			Txt::load('Errors');
 			$wait = $modSettings['likeWaitTime'] > 60 ? round($modSettings['likeWaitTime'] / 60, 2) : $modSettings['likeWaitTime'];
 			$error = sprintf($txt['like_wait_time'], $wait, ($modSettings['likeWaitTime'] < 60 ? strtolower($txt['minutes']) : $txt['hours']));
 			$this->_likes_response = array('result' => false, 'data' => $error);
@@ -216,7 +216,7 @@ class Likes extends AbstractController
 		{
 			if (empty($this->_likes_response))
 			{
-				ThemeLoader::loadLanguageFile('Errors');
+				Txt::load('Errors');
 				$this->_likes_response = array('result' => false, 'data' => $txt['like_unlike_error']);
 			}
 		}
@@ -270,7 +270,7 @@ class Likes extends AbstractController
 		{
 			if (empty($this->_likes_response))
 			{
-				ThemeLoader::loadLanguageFile('Errors');
+				Txt::load('Errors');
 				$this->_likes_response = array('result' => false, 'data' => $txt['like_unlike_error']);
 			}
 		}
@@ -596,7 +596,7 @@ class Likes extends AbstractController
 		global $context, $txt;
 
 		require_once(SUBSDIR . '/Likes.subs.php');
-		ThemeLoader::loadLanguageFile('Profile');
+		Txt::load('Profile');
 
 		// Get the message in question
 		$message = $this->_req->getQuery('msg', 'intval', 0);
@@ -702,7 +702,7 @@ class Likes extends AbstractController
 
 		checkSession('get');
 
-		ThemeLoader::loadLanguageFile('LikePosts');
+		Txt::load('LikePosts');
 
 		$subActions = array(
 			'messagestats' => array($this, 'action_messageStats'),
@@ -754,7 +754,7 @@ class Likes extends AbstractController
 		}
 
 		// Load the required files
-		ThemeLoader::loadLanguageFile('LikePosts');
+		Txt::load('LikePosts');
 		loadJavascriptFile('like_posts.js');
 		theme()->getTemplates()->load('LikePostsStats');
 

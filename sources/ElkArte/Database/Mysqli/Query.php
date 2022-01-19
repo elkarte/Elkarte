@@ -368,7 +368,7 @@ class Query extends AbstractQuery
 				{
 					if (!isset($txt['mysql_error_space']))
 					{
-						\ElkArte\Themes\ThemeLoader::loadLanguageFile('Errors');
+						\ElkArte\Languages\Txt::load('Errors');
 					}
 
 					$query_error .= !isset($txt['mysql_error_space']) ? ' - check database storage space.' : $txt['mysql_error_space'];

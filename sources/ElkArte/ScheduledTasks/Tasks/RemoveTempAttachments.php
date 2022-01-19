@@ -18,7 +18,7 @@ namespace ElkArte\ScheduledTasks\Tasks;
 
 use ElkArte\AttachmentsDirectory;
 use ElkArte\Errors\Errors;
-use ElkArte\Themes\ThemeLoader;
+use ElkArte\Languages\Txt;
 
 /**
  * Class Remove_Temp_Attachments - Check for un-posted attachments is something we can do once in a while :P
@@ -63,8 +63,7 @@ class RemoveTempAttachments implements ScheduledTaskInterface
 			}
 			catch (\UnexpectedValueException $e)
 			{
-				ThemeLoader::loadEssentialThemeData();
-				ThemeLoader::loadLanguageFile('Post');
+				Txt::load('Post');
 
 				$context['scheduled_errors']['remove_temp_attachments'][] = $txt['cant_access_upload_path'] . ' (' . $attach_dir . ')';
 				Errors::instance()->log_error($txt['cant_access_upload_path'] . ' (' . $e->getMessage() . ')', 'critical');

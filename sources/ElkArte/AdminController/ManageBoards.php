@@ -22,7 +22,7 @@ use ElkArte\Action;
 use ElkArte\BoardsTree;
 use ElkArte\Exceptions\Exception;
 use ElkArte\SettingsForm\SettingsForm;
-use ElkArte\Themes\ThemeLoader;
+use ElkArte\Languages\Txt;
 use ElkArte\Util;
 
 /**
@@ -63,7 +63,7 @@ class ManageBoards extends AbstractController
 		global $context, $txt;
 
 		// Everything's gonna need this.
-		ThemeLoader::loadLanguageFile('ManageBoards');
+		Txt::load('ManageBoards');
 
 		// Format: 'sub-action' => array('controller', 'function', 'permission'=>'need')
 		$subActions = array(
@@ -706,7 +706,7 @@ class ManageBoards extends AbstractController
 		$boardTree = new BoardsTree(database());
 
 		// For editing the profile we'll need this.
-		ThemeLoader::loadLanguageFile('ManagePermissions');
+		Txt::load('ManagePermissions');
 		require_once(SUBSDIR . '/ManagePermissions.subs.php');
 		loadPermissionProfiles();
 
@@ -929,7 +929,7 @@ class ManageBoards extends AbstractController
 		global $txt;
 
 		// We need to borrow a string from here
-		ThemeLoader::loadLanguageFile('ManagePermissions');
+		Txt::load('ManagePermissions');
 
 		// Load the boards list - for the recycle bin!
 		require_once(SUBSDIR . '/Boards.subs.php');

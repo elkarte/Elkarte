@@ -21,6 +21,7 @@ use ElkArte\Errors\Errors;
 use ElkArte\Hooks;
 use ElkArte\Http\Headers;
 use ElkArte\Themes\ThemeLoader;
+use ElkArte\Languages\Txt;
 use ElkArte\User;
 use ElkArte\Util;
 use ElkArte\AttachmentsDirectory;
@@ -493,7 +494,7 @@ function loadBoard()
 		}
 		elseif (User::$info->is_guest)
 		{
-			ThemeLoader::loadLanguageFile('Errors');
+			Txt::load('Errors');
 			is_not_guest($txt['topic_gone']);
 		}
 		else
@@ -733,7 +734,7 @@ function loadUserContext()
 	);
 
 	// @todo Base language is being loaded to late, placed here temporarily
-	ThemeLoader::loadLanguageFile('index+Addons');
+	Txt::load('index+Addons');
 
 	// Something for the guests
 	if (!$context['user']['is_guest'])
@@ -1118,9 +1119,7 @@ function addInlineJavascript($javascript, $defer = false)
  */
 function loadLanguage($template_name, $lang = '', $fatal = true, $force_reload = false)
 {
-	Errors::instance()->log_deprecated('loadLanguage()', '\ElkArte\Themes\ThemeLoader::loadLanguageFile()');
-
-	return ThemeLoader::loadLanguageFile($template_name, $lang, $fatal, $force_reload);
+	return Txt::load($template_name, $lang, $fatal);
 }
 
 /**

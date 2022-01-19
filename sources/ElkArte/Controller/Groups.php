@@ -21,7 +21,7 @@ use ElkArte\AbstractController;
 use ElkArte\Action;
 use ElkArte\EventManager;
 use ElkArte\Exceptions\Exception;
-use ElkArte\Themes\ThemeLoader;
+use ElkArte\Languages\Txt;
 use ElkArte\User;
 use ElkArte\Util;
 
@@ -41,8 +41,8 @@ class Groups extends AbstractController
 		global $context, $txt;
 
 		// Get the template stuff up and running.
-		ThemeLoader::loadLanguageFile('ManageMembers');
-		ThemeLoader::loadLanguageFile('ModerationCenter');
+		Txt::load('ManageMembers');
+		Txt::load('ModerationCenter');
 		theme()->getTemplates()->load('ManageMembergroups');
 
 		// If we can see the moderation center, and this has a mod bar entry, add the mod center bar.
@@ -600,7 +600,7 @@ class Groups extends AbstractController
 				}
 
 				// Restore the current language.
-				ThemeLoader::loadLanguageFile('ModerationCenter');
+				Txt::load('ModerationCenter');
 			}
 		}
 

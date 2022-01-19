@@ -20,7 +20,7 @@ use ElkArte\Errors\ErrorContext;
 use ElkArte\EventManager;
 use ElkArte\Exceptions\ControllerRedirectException;
 use ElkArte\Modules\AbstractModule;
-use ElkArte\Themes\ThemeLoader;
+use ElkArte\Languages\Txt;
 use ElkArte\Util;
 
 /**
@@ -123,7 +123,7 @@ class Post extends AbstractModule
 		// Build a list of drafts that they can load into the editor
 		if (!empty(self::$_drafts_save))
 		{
-			ThemeLoader::loadLanguageFile('Drafts');
+			Txt::load('Drafts');
 
 			$this->_prepareDraftsContext($this->user->id, $topic);
 
@@ -205,7 +205,7 @@ class Post extends AbstractModule
 		}
 
 		// We haz drafts
-		ThemeLoader::loadLanguageFile('Drafts');
+		Txt::load('Drafts');
 		require_once(SUBSDIR . '/Drafts.subs.php');
 
 		// has a specific draft has been selected?  Load it up if there is not already a message already in the editor

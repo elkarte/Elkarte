@@ -21,7 +21,7 @@ use ElkArte\Errors\ErrorContext;
 use ElkArte\Graphics\Image;
 use ElkArte\MembersList;
 use ElkArte\Notifications;
-use ElkArte\Themes\ThemeLoader;
+use ElkArte\Languages\Txt;
 use ElkArte\User;
 use ElkArte\Util;
 
@@ -1025,7 +1025,7 @@ function loadProfileFields($force_reload = false)
 			'preload' => function () {
 				global $context;
 
-				ThemeLoader::loadLanguageFile('Settings');
+				Txt::load('Settings');
 
 				// Can they disable censoring?
 				$context['allow_no_censored'] = false;
@@ -2055,7 +2055,7 @@ function profileLoadSignatureData()
 		$validation = profileValidateSignature($signature);
 		if (empty($context['post_errors']))
 		{
-			ThemeLoader::loadLanguageFile('Errors');
+			Txt::load('Errors');
 			$context['post_errors'] = array();
 		}
 
@@ -2534,7 +2534,7 @@ function profileSaveAvatarData(&$value)
 	$valid_https = isset($_POST['userpicpersonal']) && substr($_POST['userpicpersonal'], 0, 8) === 'https://' && strlen($_POST['userpicpersonal']) > 8;
 	if ($value === 'external' && !empty($modSettings['avatar_external_enabled']) && ($valid_http || $valid_https) && !empty($modSettings['avatar_download_external']))
 	{
-		ThemeLoader::loadLanguageFile('Post');
+		Txt::load('Post');
 		if (!is_writable($uploadDir))
 		{
 			throw new \ElkArte\Exceptions\Exception('attachments_no_write', 'critical');
@@ -2788,7 +2788,7 @@ function profileSaveAvatarData(&$value)
 				$destinationPath = $uploadDir . '/' . (empty($file_hash) ? $destName : $cur_profile['id_attach'] . '_' . $file_hash . '.elk');
 				if (!rename($_FILES['attachment']['tmp_name'], $destinationPath))
 				{
-					ThemeLoader::loadLanguageFile('Post');
+					Txt::load('Post');
 					// I guess a man can try.
 					removeAttachments(array('id_member' => $memID));
 					throw new \ElkArte\Exceptions\Exception('attach_timeout', 'critical');
@@ -3561,7 +3561,7 @@ function load_user_topics($memID, $start, $count, $range_limit = '', $reverse = 
 function getMemberGeneralPermissions($curGroups)
 {
 	$db = database();
-	ThemeLoader::loadLanguageFile('ManagePermissions');
+	Txt::load('ManagePermissions');
 
 	// Get all general permissions.
 	$general_permission = array();
@@ -3639,7 +3639,7 @@ function getMemberGeneralPermissions($curGroups)
 function getMemberBoardPermissions($memID, $curGroups, $board = null)
 {
 	$db = database();
-	ThemeLoader::loadLanguageFile('ManagePermissions');
+	Txt::load('ManagePermissions');
 
 	$board_permission = array();
 	$db->fetchQuery('
