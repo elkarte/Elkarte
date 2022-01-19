@@ -14,6 +14,7 @@
  *
  */
 
+use ElkArte\User;
 use ElkArte\Util;
 
 /**
