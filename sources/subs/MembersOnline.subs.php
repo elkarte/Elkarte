@@ -27,7 +27,6 @@ use ElkArte\Util;
  *
  * @param mixed[] $membersOnlineOptions
  * @return array
- * @throws \ElkArte\Exceptions\Exception
  * @package Members
  */
 function getMembersOnlineStats($membersOnlineOptions)
@@ -204,7 +203,6 @@ function getMembersOnlineStats($membersOnlineOptions)
  * @param mixed[] $membersOnlineStats
  * @param string $sortFunction
  * @return mixed[]
- * @throws \ElkArte\Exceptions\Exception
  * @package Members
  */
 function filter_members_online($membersOnlineStats, $sortFunction)
@@ -241,7 +239,6 @@ function filter_members_online($membersOnlineStats, $sortFunction)
  * Check if the number of users online is a record and store it.
  *
  * @param int $total_users_online
- * @throws \ElkArte\Exceptions\Exception
  * @package Members
  */
 function trackStatsUsersOnline($total_users_online)

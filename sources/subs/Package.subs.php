@@ -34,7 +34,6 @@ use ElkArte\XmlArray;
  * @param bool $overwrite = false
  * @param string[]|null $files_to_extract = null
  * @return array|bool
- * @throws \ElkArte\Exceptions\Exception
  * @package Packages
  */
 function read_tgz_file($gzfilename, $destination, $single_file = false, $overwrite = false, $files_to_extract = null)
@@ -88,7 +87,6 @@ function read_tgz_file($gzfilename, $destination, $single_file = false, $overwri
  * @param bool $overwrite = false,
  * @param string[]|null $files_to_extract = null
  * @return mixed[]|bool
- * @throws \ElkArte\Exceptions\Exception
  * @package Packages
  */
 function read_tgz_data($data, $destination, $single_file = false, $overwrite = false, $files_to_extract = null)
@@ -119,7 +117,6 @@ function read_tgz_data($data, $destination, $single_file = false, $overwrite = f
  * @param bool $overwrite
  * @param string[]|null $files_to_extract
  * @return mixed[]|bool
- * @throws \ElkArte\Exceptions\Exception
  * @package Packages
  */
 function read_zip_data($data, $destination, $single_file = false, $overwrite = false, $files_to_extract = null)
@@ -173,7 +170,6 @@ function url_exists($url)
  * - Default sort order is package_installed time
  *
  * @return array
- * @throws \ElkArte\Exceptions\Exception
  * @package Packages
  */
 function loadInstalledPackages()
@@ -243,7 +239,6 @@ function loadInstalledPackages()
  * @param string $gzfilename
  *
  * @return array|string error string on error array on success
- * @throws \ElkArte\Exceptions\Exception
  * @package Packages
  */
 function getPackageInfo($gzfilename)
@@ -325,7 +320,6 @@ function getPackageInfo($gzfilename)
  * @param mixed[] $chmodOptions
  * @param bool $restore_write_status
  * @return array|bool
- * @throws \ElkArte\Exceptions\Exception
  * @package Packages
  */
 function create_chmod_control($chmodFiles = array(), $chmodOptions = array(), $restore_write_status = false)
@@ -676,7 +670,6 @@ function list_restoreFiles($dummy1, $dummy2, $dummy3, $do_change)
  * @param bool $return = false
  *
  * @return null|string[]
- * @throws \ElkArte\Exceptions\Exception
  * @package Packages
  *
  */
@@ -2836,7 +2829,6 @@ function package_crypt($pass)
  * @param string $id
  *
  * @return bool
- * @throws \Exception
  * @package Packages
  *
  */
@@ -3060,7 +3052,6 @@ function fetch_web_data($url, $post_data = '', $keep_alive = false, $redirection
  * @param string|null $install_id to check
  *
  * @return array
- * @throws \Exception
  * @package Packages
  */
 function isPackageInstalled($id, $install_id = null)
@@ -3115,7 +3106,6 @@ function isPackageInstalled($id, $install_id = null)
  *
  * @param string $id package_id to update
  * @param string $install_id install id of the package
- * @throws \ElkArte\Exceptions\Exception
  * @package Packages
  */
 function setPackageState($id, $install_id)
@@ -3146,7 +3136,6 @@ function setPackageState($id, $install_id)
  * @param string $id
  *
  * @return string
- * @throws \Exception
  * @package Packages
  *
  */
@@ -3185,7 +3174,6 @@ function checkPackageDependency($id)
  * @param string $db_changes
  * @param bool $is_upgrade
  * @param string $credits_tag
- * @throws \Exception
  * @package Packages
  */
 function addPackageLog($packageInfo, $failed_step_insert, $themes_installed, $db_changes, $is_upgrade, $credits_tag)

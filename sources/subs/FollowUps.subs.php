@@ -19,7 +19,6 @@
  * @param bool $include_approved
  *
  * @return array
- * @throws \Exception
  */
 function followupTopics($messages, $include_approved = false)
 {
@@ -55,7 +54,6 @@ function followupTopics($messages, $include_approved = false)
  * @param bool $include_approved
  *
  * @return array
- * @throws \Exception
  */
 function topicStartedHere($topic, $include_approved = false)
 {
@@ -88,7 +86,6 @@ function topicStartedHere($topic, $include_approved = false)
  *
  * @param int $msg message id
  * @param int $topic topic id
- * @throws \Exception
  */
 function linkMessages($msg, $topic)
 {
@@ -108,7 +105,6 @@ function linkMessages($msg, $topic)
  *
  * @param int $msg message id
  * @param int $topic topic id
- * @throws \ElkArte\Exceptions\Exception
  * @todo remove?
  */
 function unlinkMessages($msg, $topic)
@@ -131,7 +127,6 @@ function unlinkMessages($msg, $topic)
  * Removes all the follow-ups from the db by topics
  *
  * @param int|int[] $topics topic id
- * @throws \ElkArte\Exceptions\Exception
  */
 function removeFollowUpsByTopic($topics)
 {
@@ -150,7 +145,6 @@ function removeFollowUpsByTopic($topics)
  * Removes all the follow-ups from the db by message id
  *
  * @param int[]|int $msgs int or array of ints for the message id's to work on
- * @throws \ElkArte\Exceptions\Exception
  */
 function removeFollowUpsByMessage($msgs)
 {

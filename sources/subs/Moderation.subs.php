@@ -31,7 +31,6 @@ use ElkArte\Util;
  *                           returns the both number of open PM and message reports
  *
  * @return array
- * @throws \Exception
  */
 function recountOpenReports($flush = true, $count_pms = false)
 {
@@ -95,7 +94,6 @@ function recountOpenReports($flush = true, $count_pms = false)
  *
  * @param string|null $approve_query
  * @return array of values
- * @throws \ElkArte\Exceptions\Exception
  */
 function recountUnapprovedPosts($approve_query = null)
 {
@@ -153,7 +151,6 @@ function recountUnapprovedPosts($approve_query = null)
  * @param string|null $approve_query
  *
  * @return int
- * @throws \ElkArte\Exceptions\Exception
  */
 function recountFailedEmails($approve_query = null)
 {
@@ -191,7 +188,6 @@ function recountFailedEmails($approve_query = null)
  * @param bool $show_pms
  *
  * @return int
- * @throws \Exception
  */
 function totalReports($status = 0, $show_pms = false)
 {
@@ -223,7 +219,6 @@ function totalReports($status = 0, $show_pms = false)
  * @param int $status the status of the property (mainly: 0 or 1)
  *
  * @return int
- * @throws \ElkArte\Exceptions\Exception
  */
 function updateReportsStatus($reports_id, $property = 'close', $status = 0)
 {
@@ -265,7 +260,6 @@ function updateReportsStatus($reports_id, $property = 'close', $status = 0)
  * @param int|null $brd
  *
  * @return mixed
- * @throws \ElkArte\Exceptions\Exception
  */
 function loadModeratorMenuCounts($brd = null)
 {
@@ -409,7 +403,6 @@ function loadModeratorMenuCounts($brd = null)
  * @param string $subject
  * @param string $body
  * @return int
- * @throws \Exception
  */
 function logWarningNotice($subject, $body)
 {
@@ -438,7 +431,6 @@ function logWarningNotice($subject, $body)
  * @param int $id_notice
  * @param int $level_change
  * @param string $warn_reason
- * @throws \Exception
  */
 function logWarning($memberID, $real_name, $id_notice, $level_change, $warn_reason)
 {
@@ -465,7 +457,6 @@ function logWarning($memberID, $real_name, $id_notice, $level_change, $warn_reas
  *
  * @param int $id_tpl id of the template to remove
  * @param string $template_type type of template, defaults to warntpl
- * @throws \ElkArte\Exceptions\Exception
  */
 function removeWarningTemplate($id_tpl, $template_type = 'warntpl')
 {
@@ -516,7 +507,6 @@ function removeWarningTemplate($id_tpl, $template_type = 'warntpl')
  * @param string $template_type type of template to load
  *
  * @return array
- * @throws \ElkArte\Exceptions\Exception
  */
 function warningTemplates($start, $items_per_page, $sort, $template_type = 'warntpl')
 {
@@ -567,7 +557,6 @@ function warningTemplates($start, $items_per_page, $sort, $template_type = 'warn
  * @param string $template_type
  *
  * @return int
- * @throws \ElkArte\Exceptions\Exception
  */
 function warningTemplateCount($template_type = 'warntpl')
 {
@@ -603,7 +592,6 @@ function warningTemplateCount($template_type = 'warntpl')
  * @param mixed[] $query_params
  *
  * @return array
- * @throws \Exception
  */
 function warnings($start, $items_per_page, $sort, $query_string = '', $query_params = array())
 {
@@ -654,7 +642,6 @@ function warnings($start, $items_per_page, $sort, $query_string = '', $query_par
  * @param mixed[] $query_params
  *
  * @return int
- * @throws \ElkArte\Exceptions\Exception
  */
 function warningCount($query_string = '', $query_params = array())
 {
@@ -683,7 +670,6 @@ function warningCount($query_string = '', $query_params = array())
  *
  * @param int $id_template
  * @param string $template_type
- * @throws \Exception
  */
 function modLoadTemplate($id_template, $template_type = 'warntpl')
 {
@@ -725,7 +711,6 @@ function modLoadTemplate($id_template, $template_type = 'warntpl')
  * @param int $id_template
  * @param bool $edit true to update, false to insert a new row
  * @param string $type
- * @throws \ElkArte\Exceptions\Exception
  */
 function modAddUpdateTemplate($recipient_id, $template_title, $template_body, $id_template, $edit = true, $type = 'warntpl')
 {
@@ -779,7 +764,6 @@ function modAddUpdateTemplate($recipient_id, $template_title, $template_body, $i
  * @param bool $show_pms
  *
  * @return bool
- * @throws \ElkArte\Exceptions\Exception
  */
 function modReportDetails($id_report, $show_pms = false)
 {
@@ -824,7 +808,6 @@ function modReportDetails($id_report, $show_pms = false)
  * @param bool $show_pms
  *
  * @return array
- * @throws \Exception
  * @todo move to createList?
  */
 function getModReports($status = 0, $start = 0, $limit = 10, $show_pms = false)
@@ -865,7 +848,6 @@ function getModReports($status = 0, $start = 0, $limit = 10, $show_pms = false)
  * @param int[] $id_reports an array of report ids
  *
  * @return array
- * @throws \Exception
  */
 function getReportsUserComments($id_reports)
 {
@@ -898,7 +880,6 @@ function getReportsUserComments($id_reports)
  * @param int $id_report the id of a report
  *
  * @return array
- * @throws \Exception
  */
 function getReportModeratorsComments($id_report)
 {
@@ -987,7 +968,6 @@ function approveAllUnapproved()
  *
  * @param int $warning_watch
  * @return int
- * @throws \ElkArte\Exceptions\Exception
  */
 function watchedUserCount($warning_watch = 0)
 {
@@ -1019,7 +999,6 @@ function watchedUserCount($warning_watch = 0)
  * @param string $sort A string indicating how to sort the results
  *
  * @return array
- * @throws \ElkArte\Exceptions\Exception
  */
 function watchedUsers($start, $items_per_page, $sort)
 {
@@ -1129,7 +1108,6 @@ function watchedUsers($start, $items_per_page, $sort)
  * @param string $approve_query
  * @param int $warning_watch
  * @return int
- * @throws \ElkArte\Exceptions\Exception
  */
 function watchedUserPostsCount($approve_query, $warning_watch)
 {
@@ -1170,7 +1148,6 @@ function watchedUserPostsCount($approve_query, $warning_watch)
  * @param int[] $delete_boards
  *
  * @return array
- * @throws \Exception
  */
 function watchedUserPosts($start, $items_per_page, $approve_query, $delete_boards)
 {
@@ -1318,7 +1295,6 @@ function basicWatchedUsers()
  * @param bool $show_pms
  *
  * @return array
- * @throws \Exception
  */
 function reportedPosts($show_pms = false)
 {
@@ -1367,7 +1343,6 @@ function reportedPosts($show_pms = false)
  * Remove a moderator note.
  *
  * @param int $id_note
- * @throws \ElkArte\Exceptions\Exception
  */
 function removeModeratorNote($id_note)
 {
@@ -1389,7 +1364,6 @@ function removeModeratorNote($id_note)
  * Get the number of moderator notes stored on the site.
  *
  * @return int
- * @throws \ElkArte\Exceptions\Exception
  */
 function countModeratorNotes()
 {
@@ -1423,7 +1397,6 @@ function countModeratorNotes()
  * @param int $id_poster who is posting the add
  * @param string $poster_name a name to show
  * @param string $contents what they are posting
- * @throws \Exception
  */
 function addModeratorNote($id_poster, $poster_name, $contents)
 {
@@ -1448,7 +1421,6 @@ function addModeratorNote($id_poster, $poster_name, $contents)
  *
  * @param int $report
  * @param string $newComment
- * @throws \Exception
  */
 function addReportComment($report, $newComment)
 {
@@ -1475,7 +1447,6 @@ function addReportComment($report, $newComment)
  * @param int $offset
  *
  * @return array
- * @throws \Exception
  */
 function moderatorNotes($offset)
 {
@@ -1520,7 +1491,6 @@ function moderatorNotes($offset)
  * @param int $id_notice
  *
  * @return array
- * @throws \ElkArte\Exceptions\Exception
  */
 function moderatorNotice($id_notice)
 {
@@ -1556,7 +1526,6 @@ function moderatorNotice($id_notice)
  * @param int $member The member we are going to issue the warning to
  *
  * @return int
- * @throws \ElkArte\Exceptions\Exception
  */
 function warningDailyLimit($member)
 {
@@ -1601,7 +1570,6 @@ function warningDailyLimit($member)
  * @param int $limit number of elements to return (default 10)
  *
  * @return array
- * @throws \Exception
  */
 function getUnapprovedPosts($approve_query, $current_view, $boards_allowed, $start, $limit = 10)
 {

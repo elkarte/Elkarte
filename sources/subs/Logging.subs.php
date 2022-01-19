@@ -150,7 +150,6 @@ function updateLogActivity($update_parameters, $setStringUpdate, $insert_keys, $
  * @param int $id_member
  * @param string $ip
  * @param string $ip2
- * @throws \Exception
  */
 function logLoginHistory($id_member, $ip, $ip2)
 {
@@ -178,7 +177,6 @@ function logLoginHistory($id_member, $ip, $ip2)
  * @param string $type
  *
  * @return bool
- * @throws \ElkArte\Exceptions\Exception
  */
 function loadLogReported($msg_id, $topic_id, $type = 'msg')
 {

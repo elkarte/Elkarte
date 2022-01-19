@@ -47,7 +47,6 @@ use ElkArte\Util;
  * @param int $member
  * @param int $trigger_id
  * @return mixed array with the saved triggers or false on failure
- * @throws \ElkArte\Exceptions\Exception
  * @package Bans
  */
 function saveTriggers($suggestions, $ban_group, $member = 0, $trigger_id = 0)
@@ -119,7 +118,6 @@ function saveTriggers($suggestions, $ban_group, $member = 0, $trigger_id = 0)
  * @param int[]|int $items_ids
  * @param int|bool $group_id
  * @return bool
- * @throws \ElkArte\Exceptions\Exception
  * @package Bans
  */
 function removeBanTriggers($items_ids = array(), $group_id = false)
@@ -182,7 +180,6 @@ function removeBanTriggers($items_ids = array(), $group_id = false)
  *
  * @param int[]|int $group_ids
  * @return bool
- * @throws \ElkArte\Exceptions\Exception
  * @package Bans
  */
 function removeBanGroups($group_ids)
@@ -222,7 +219,6 @@ function removeBanGroups($group_ids)
  *
  * @param int[]|int|null $ids (optional)
  * @return bool
- * @throws \ElkArte\Exceptions\Exception
  * @package Bans
  */
 function removeBanLogs($ids = array())
@@ -268,7 +264,6 @@ function removeBanLogs($ids = array())
  * @param mixed[] $triggers
  *
  * @return array
- * @throws \ElkArte\Exceptions\Exception
  * @package Bans
  *
  */
@@ -443,7 +438,6 @@ function validateTriggers(&$triggers)
  * @param mixed[] $triggers associative array of trigger keys and the values
  * @param mixed[] $logs
  * @return bool
- * @throws \Exception
  * @package Bans
  */
 function addTriggers($group_id = 0, $triggers = array(), $logs = array())
@@ -550,7 +544,6 @@ function addTriggers($group_id = 0, $triggers = array(), $logs = array())
  * @param int $group_id
  * @param mixed[] $trigger associative array of ban trigger => value
  * @param mixed[] $logs
- * @throws \ElkArte\Exceptions\Exception
  * @package Bans
  */
 function updateTriggers($ban_item = 0, $group_id = 0, $trigger = array(), $logs = array())
@@ -672,7 +665,6 @@ function logTriggersUpdates($logs, $new = true)
  *
  * @param mixed[] $ban_info
  * @return int|bool
- * @throws \ElkArte\Exceptions\Exception
  * @package Bans
  */
 function updateBanGroup($ban_info = array())
@@ -753,7 +745,6 @@ function updateBanGroup($ban_info = array())
  *
  * @param mixed[] $ban_info
  * @return int the ban group's ID
- * @throws \ElkArte\Exceptions\Exception
  * @package Bans
  */
 function insertBanGroup($ban_info = array())
@@ -910,7 +901,6 @@ function range2ip($low, $high)
  * @param string $fullip
  *
  * @return array
- * @throws \ElkArte\Exceptions\Exception
  * @package Bans
  *
  */
@@ -1162,7 +1152,6 @@ function getMemberData($id)
  * @param string $sort A string indicating how to sort the results
  * @param string $trigger_type
  * @return array
- * @throws \Exception
  * @package Bans
  */
 function list_getBanTriggers($start, $items_per_page, $sort, $trigger_type)
@@ -1202,7 +1191,6 @@ function list_getBanTriggers($start, $items_per_page, $sort, $trigger_type)
  * @param string $email
  *
  * @return array
- * @throws \ElkArte\Exceptions\Exception
  * @package Bans
  *
  */
@@ -1295,7 +1283,6 @@ function BanCheckUser($memID, $hostname = '', $email = '')
  *
  * @param string $trigger_type
  * @return int
- * @throws \ElkArte\Exceptions\Exception
  * @package Bans
  */
 function list_getNumBanTriggers($trigger_type)
@@ -1333,7 +1320,6 @@ function list_getNumBanTriggers($trigger_type)
  * @param string $sort A string indicating how to sort the results
  *
  * @return array
- * @throws \Exception
  * @package Bans
  *
  */
@@ -1378,7 +1364,6 @@ function list_getNumBanLogEntries()
  * Get the total number of ban from the ban group table
  *
  * @return int
- * @throws \ElkArte\Exceptions\Exception
  * @package Bans
  */
 function list_getNumBans()
@@ -1514,7 +1499,6 @@ function list_getBanItems($start = 0, $items_per_page = 0, $sort = 0, $ban_group
  * @param int $items_per_page The number of items to show per page
  * @param string $sort A string indicating how to sort the results
  * @return array
- * @throws \Exception
  * @package Bans
  */
 function list_getBans($start, $items_per_page, $sort)
@@ -1540,7 +1524,6 @@ function list_getBans($start, $items_per_page, $sort)
  * Gets the number of ban items belonging to a certain ban group
  *
  * @return int
- * @throws \ElkArte\Exceptions\Exception
  * @package Bans
  */
 function list_getNumBanItems()
@@ -1573,7 +1556,6 @@ function list_getNumBanItems()
  * @param int $member_id
  *
  * @return array
- * @throws \ElkArte\Exceptions\Exception
  * @package Bans
  *
  */
@@ -1607,7 +1589,6 @@ function banLoadAdditionalIPsMember($member_id)
  * @param int $member_id
  *
  * @return array
- * @throws \ElkArte\Exceptions\Exception
  * @package Bans
  *
  */
@@ -1669,7 +1650,6 @@ function banLoadAdditionalIPs($member_id)
  * @param int|bool $ban_group
  *
  * @return array
- * @throws \Exception
  * @package Bans
  *
  */

@@ -552,7 +552,6 @@ function getAttachmentFromTopic($id_attach, $id_topic)
  *
  * @return array
  * @package Attachments
- * @throws \Exception
  */
 function getAttachmentThumbFromTopic($id_attach, $id_topic)
 {
@@ -634,7 +633,6 @@ function getAttachmentThumbFromTopic($id_attach, $id_topic)
  *
  * @return array|bool
  * @package Attachments
- * @throws \Exception
  */
 function isAttachmentImage($id_attach)
 {
@@ -678,7 +676,6 @@ function isAttachmentImage($id_attach)
  *
  * @param int $id_attach
  * @package Attachments
- * @throws \ElkArte\Exceptions\Exception
  */
 function increaseDownloadCounter($id_attach)
 {
@@ -710,7 +707,6 @@ function increaseDownloadCounter($id_attach)
  * @param int $max_width
  * @param int $max_height
  * @return bool whether the download and resize was successful.
- * @throws \ElkArte\Exceptions\Exception
  * @package Attachments
  */
 function saveAvatar($temporary_path, $memID, $max_width, $max_height)
@@ -887,7 +883,6 @@ function url_image_size($url)
  *
  * @return string
  * @package Attachments
- * @throws \Exception
  */
 function getAvatarPath()
 {
@@ -909,7 +904,6 @@ function getAvatarPath()
  * and the ID of the current attachment folder otherwise.
  * NB: the latter could also be 1.
  * @package Attachments
- * @throws \Exception
  */
 function getAvatarPathID()
 {
@@ -938,7 +932,6 @@ function getAvatarPathID()
  *
  * @return array
  * @package Attachments
- * @throws \Exception
  */
 function getAttachments($messages, $includeUnapproved = false, $filter = null, $all_posters = array())
 {
@@ -1083,7 +1076,6 @@ function getServerStoredAvatars($directory)
  * @param int $old_id_thumb = 0 id of thumbnail to remove, such as from our post form
  * @param string $real_filename the fully qualified hash name of where the file is
  * @return array The updated information
- * @throws \ElkArte\Exceptions\Exception
  * @package Attachments
  */
 function updateAttachmentThumbnail($filename, $id_attach, $id_msg, $old_id_thumb = 0, $real_filename = '')
@@ -1214,7 +1206,6 @@ function attachmentsSizeForMessage($id_msg, $include_count = true)
  * @todo change this pre-condition, too fragile and error-prone.
  *
  * @package Attachments
- * @throws \ElkArte\Exceptions\Exception
  */
 function loadAttachmentContext($id_msg)
 {

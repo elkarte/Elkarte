@@ -23,7 +23,6 @@ use ElkArte\Util;
  * @param string $session
  * @param string $type
  * @return array
- * @throws \Exception
  */
 function viewers($id, $session, $type = 'topic')
 {
@@ -56,7 +55,6 @@ function viewers($id, $session, $type = 'topic')
  *
  * @param int $id id of the element (topic or board) we're watching
  * @param string $type = 'topic, 'topic' or 'board'
- * @throws \ElkArte\Exceptions\Exception
  */
 function formatViewers($id, $type)
 {
@@ -197,7 +195,6 @@ function addonsCredits()
  * @param mixed[]|string $urls a single url (string) or an array of arrays, each inner array being (serialized request data, id_member)
  * @param string|bool $preferred_prefix = false
  * @return mixed[]|string an array of descriptions if you passed an array, otherwise the string describing their current location.
- * @throws \ElkArte\Exceptions\Exception
  */
 function determineActions($urls, $preferred_prefix = false)
 {

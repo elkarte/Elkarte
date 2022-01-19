@@ -56,7 +56,6 @@ function reportsBoardsList()
  * @param int[] $query_groups an array of group ids
  *
  * @return array
- * @throws \ElkArte\Exceptions\Exception
  */
 function allMembergroups($group_clause, $query_groups = array())
 {
@@ -100,7 +99,6 @@ function allMembergroups($group_clause, $query_groups = array())
  * @param int[] $query_groups an array of group ids
  *
  * @return array
- * @throws \Exception
  */
 function boardPermissions($profiles, $group_clause, $query_groups)
 {
@@ -183,7 +181,6 @@ function allMembergroupsBoardAccess()
  * @param int[] $query_groups an array of group ids
  *
  * @return array
- * @throws \Exception
  */
 function boardPermissionsByGroup($group_clause, $query_groups)
 {

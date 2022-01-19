@@ -26,7 +26,6 @@ use ElkArte\User;
  * @param string[] $buddies
  * @param bool $adding true when adding new buddies
  * @return int[]
- * @throws \Exception
  */
 function getBuddiesID($buddies, $adding = true)
 {
@@ -80,7 +79,6 @@ function getBuddiesID($buddies, $adding = true)
  * @param int $memID
  *
  * @return array
- * @throws \Exception
  */
 function loadMembergroupsJoin($current_groups, $memID)
 {
@@ -150,7 +148,6 @@ function loadMembergroupsJoin($current_groups, $memID)
  *
  * @param int $group_id
  * @return int
- * @throws \ElkArte\Exceptions\Exception
  */
 function checkMembergroupChange($group_id)
 {
@@ -183,7 +180,6 @@ function checkMembergroupChange($group_id)
  * @param int $memID
  *
  * @return bool
- * @throws \Exception
  */
 function logMembergroupRequest($group_id, $memID)
 {

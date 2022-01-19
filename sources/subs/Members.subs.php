@@ -44,7 +44,6 @@ use ElkArte\Util;
  *
  * @param int[]|int $users
  * @param bool $check_not_admin = false
- * @throws \ElkArte\Exceptions\Exception
  * @package Members
  */
 function deleteMembers($users, $check_not_admin = false)
@@ -1123,7 +1122,6 @@ function groupsAllowedTo($permission, $board_id = null)
  * @param int|null $board_id = null
  *
  * @return int[] an array containing member ID's.
- * @throws \ElkArte\Exceptions\Exception
  * @package Members
  */
 function membersAllowedTo($permission, $board_id = null)
@@ -1170,7 +1168,6 @@ function membersAllowedTo($permission, $board_id = null)
  * @param bool|false|string $email = false
  * @param bool|false|string $membername = false
  * @param bool $post_count = false
- * @throws \ElkArte\Exceptions\Exception
  * @package Members
  *
  */
@@ -1268,7 +1265,6 @@ function reattributePosts($memID, $email = false, $membername = false, $post_cou
  * @param bool $get_duplicates
  *
  * @return array
- * @throws \Exception
  * @package Members
  *
  */
@@ -1308,7 +1304,6 @@ function list_getMembers($start, $items_per_page, $sort, $where, $where_params =
  * @param mixed[] $where_params
  *
  * @return int
- * @throws \ElkArte\Exceptions\Exception
  * @package Members
  *
  */
@@ -1346,7 +1341,6 @@ function list_getNumMembers($where, $where_params = array())
  * @param mixed[] $members
  *
  * @return bool
- * @throws \Exception
  * @package Members
  *
  */
@@ -1482,7 +1476,6 @@ function populateDuplicateMembers(&$members)
  * @param bool $ip2 (optional, default false) If the query should check IP2 as well
  *
  * @return array
- * @throws \Exception
  * @package Members
  *
  */
@@ -1549,7 +1542,6 @@ function membersByIP($ip1, $match = 'exact', $ip2 = false)
  * @param int $memberID ID of the member, to compare with.
  *
  * @return int
- * @throws \ElkArte\Exceptions\Exception
  * @package Members
  *
  */
@@ -1585,7 +1577,6 @@ function isAnotherAdmin($memberID)
  * @param bool $only_active see prepareMembersByQuery
  *
  * @return array
- * @throws \Exception
  * @package Members
  *
  */
@@ -1632,7 +1623,6 @@ function membersBy($query, $query_params, $details = false, $only_active = true)
  * @param bool $only_active see prepareMembersByQuery
  *
  * @return int
- * @throws \ElkArte\Exceptions\Exception
  * @package Members
  *
  */
@@ -1768,7 +1758,6 @@ function prepareMembersByQuery($query, &$query_params, $only_active = true)
  * @param int $id_admin = 0 if requested, only data about a specific admin is retrieved
  *
  * @return array
- * @throws \Exception
  * @package Members
  *
  */
@@ -1802,7 +1791,6 @@ function admins($id_admin = 0)
  * Get the last known id_member
  *
  * @return int
- * @throws \ElkArte\Exceptions\Exception
  */
 function maxMemberID()
 {
@@ -1833,7 +1821,6 @@ function maxMemberID()
  *    is_activated, validation_code, passwd_flood, password_salt
  * - 'preferences' (bool) includes lngfile, mod_prefs, notify_types, signature
  * @return mixed[]
- * @throws \Exception
  * @package Members
  */
 function getBasicMemberData($member_ids, $options = array())
@@ -1910,7 +1897,6 @@ function getBasicMemberData($member_ids, $options = array())
  * Counts all inactive members
  *
  * @return array $inactive_members
- * @throws \Exception
  * @package Members
  */
 function countInactiveMembers()
@@ -1943,7 +1929,6 @@ function countInactiveMembers()
  * @param string $name
  * @param bool $flexible if true searches for both real_name and member_name (default false)
  * @return int
- * @throws \ElkArte\Exceptions\Exception
  * @package Members
  */
 function getMemberByName($name, $flexible = false)
@@ -1980,7 +1965,6 @@ function getMemberByName($name, $flexible = false)
  * @param int[]|null $buddies
  *
  * @return array
- * @throws \Exception
  * @package Members
  *
  */
@@ -2040,7 +2024,6 @@ function getMember($search, $buddies = array())
  * - order_by (string)
  * - limit (int)
  * @return array
- * @throws \Exception
  * @package Members
  */
 function retrieveMemberData($conditions)
@@ -2132,7 +2115,6 @@ function retrieveMemberData($conditions)
  * - members (array of integers)
  *
  * @return int
- * @throws \ElkArte\Exceptions\Exception
  * @package Members
  *
  */
@@ -2209,7 +2191,6 @@ function approveMembers($conditions)
  * - validation_code (string) must be present
  * - members (array of integers)
  * - time_before (integer)
- * @throws \ElkArte\Exceptions\Exception
  * @package Members
  */
 function enforceReactivation($conditions)
@@ -2256,7 +2237,6 @@ function enforceReactivation($conditions)
  *
  * @param int $id_group
  * @return int
- * @throws \ElkArte\Exceptions\Exception
  * @package Members
  */
 function countMembersInGroup($id_group = 0)
@@ -2284,7 +2264,6 @@ function countMembersInGroup($id_group = 0)
  *
  * @param string[] $conditions
  * @return int
- * @throws \ElkArte\Exceptions\Exception
  * @package Members
  */
 function countMembersOnline($conditions)
@@ -2313,7 +2292,6 @@ function countMembersOnline($conditions)
  * @param string $sort_direction
  * @param int $start
  * @return array
- * @throws \Exception
  * @package Members
  */
 function onlineMembers($conditions, $sort_method, $sort_direction, $start)
@@ -2349,7 +2327,6 @@ function onlineMembers($conditions, $sort_method, $sort_direction, $start)
  * @param int $limit
  *
  * @return array
- * @throws \Exception
  * @package Members
  *
  */
@@ -2376,7 +2353,6 @@ function recentMembers($limit)
  * @param int $member
  * @param int $primary_group
  * @param int[] $additional_groups
- * @throws \ElkArte\Exceptions\Exception
  * @package Members
  */
 function assignGroupsToMember($member, $primary_group, $additional_groups)
@@ -2391,7 +2367,6 @@ function assignGroupsToMember($member, $primary_group, $additional_groups)
  * @param string $where
  * @param bool $change_groups = false
  * @return mixed
- * @throws \Exception
  * @package Members
  */
 function getConcernedMembers($groups, $where, $change_groups = false)
@@ -2486,7 +2461,6 @@ function getConcernedMembers($groups, $where, $change_groups = false)
  * @param int $who The id of the user to contact
  *
  * @return bool
- * @throws \ElkArte\Exceptions\Exception
  * @package Members
  *
  */
@@ -2540,7 +2514,6 @@ function canContact($who)
  *
  * @param int|null $id_member = null If not an integer reload from the database
  * @param string|null $real_name = null
- * @throws \ElkArte\Exceptions\Exception
  * @package Members
  */
 function updateMemberStats($id_member = null, $real_name = null)
@@ -2607,7 +2580,6 @@ function updateMemberStats($id_member = null, $real_name = null)
  *
  * @param int $id_member a valid member id
  * @return string Query string
- * @throws \Exception
  * @package Members
  */
 function memberQuerySeeBoard($id_member)
@@ -2837,7 +2809,6 @@ function updateMemberData($members, $data)
  * @param string $ip_var
  *
  * @return array
- * @throws \Exception
  */
 function loadMembersIPs($ip_string, $ip_var)
 {
@@ -2869,7 +2840,6 @@ function loadMembersIPs($ip_string, $ip_var)
  * @param int $id_member
  * @param string $ip
  * @param string $agreement_version
- * @throws \Exception
  */
 function registerAgreementAccepted($id_member, $ip, $agreement_version)
 {

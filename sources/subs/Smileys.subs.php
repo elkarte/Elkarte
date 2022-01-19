@@ -19,7 +19,6 @@
  *
  * @param string[] $smileys
  * @return array
- * @throws \Exception
  */
 function smileyExists($smileys)
 {
@@ -49,7 +48,6 @@ function smileyExists($smileys)
  * @param string $code
  * @param string|null $current
  * @return bool
- * @throws \Exception
  */
 function validateDuplicateSmiley($code, $current = null)
 {
@@ -74,7 +72,6 @@ function validateDuplicateSmiley($code, $current = null)
  * @param string $location
  *
  * @return int
- * @throws \Exception
  */
 function nextSmileyLocation($location)
 {
@@ -100,7 +97,6 @@ function nextSmileyLocation($location)
  * Adds a smiley to the database
  *
  * @param mixed[] $param associative array to use in the insert
- * @throws \Exception
  */
 function addSmiley($param)
 {
@@ -120,7 +116,6 @@ function addSmiley($param)
  * Deletes smileys.
  *
  * @param int[] $smileys
- * @throws \ElkArte\Exceptions\Exception
  */
 function deleteSmileys($smileys)
 {
@@ -140,7 +135,6 @@ function deleteSmileys($smileys)
  *
  * @param int[] $smileys
  * @param int $display_type
- * @throws \ElkArte\Exceptions\Exception
  */
 function updateSmileyDisplayType($smileys, $display_type)
 {
@@ -162,7 +156,6 @@ function updateSmileyDisplayType($smileys, $display_type)
  * Updates a smiley.
  *
  * @param mixed[] $param
- * @throws \ElkArte\Exceptions\Exception
  */
 function updateSmiley($param)
 {
@@ -224,7 +217,6 @@ function getSmiley($id)
  * @param int $id
  *
  * @return array
- * @throws \ElkArte\Exceptions\Exception
  */
 function getSmileyPosition($location, $id)
 {
@@ -254,7 +246,6 @@ function getSmileyPosition($location, $id)
  *
  * @param int[] $smiley
  * @param int $source
- * @throws \ElkArte\Exceptions\Exception
  */
 function moveSmileyPosition($smiley, $source)
 {
@@ -296,7 +287,6 @@ function moveSmileyPosition($smiley, $source)
  * @param int $id
  * @param int $row
  * @param int $location
- * @throws \ElkArte\Exceptions\Exception
  */
 function updateSmileyRow($id, $row, $location)
 {
@@ -321,7 +311,6 @@ function updateSmileyRow($id, $row, $location)
  *
  * @param int $id
  * @param int $order
- * @throws \ElkArte\Exceptions\Exception
  */
 function updateSmileyOrder($id, $order)
 {
@@ -387,7 +376,6 @@ function getSmileys()
  *
  * @param string $set name of smiley set to check
  * @return bool
- * @throws \Exception
  */
 function isSmileySetInstalled($set)
 {
@@ -412,7 +400,6 @@ function isSmileySetInstalled($set)
  * Logs the installation of a new smiley set.
  *
  * @param mixed[] $param
- * @throws \Exception
  */
 function logPackageInstall($param)
 {
@@ -440,7 +427,6 @@ function logPackageInstall($param)
  * Get the last smiley_order from the first smileys row.
  *
  * @return string
- * @throws \ElkArte\Exceptions\Exception
  */
 function getMaxSmileyOrder()
 {
@@ -542,7 +528,6 @@ function list_getNumSmileySets()
  * @param string $sort A string indicating how to sort the results
  *
  * @return array
- * @throws \Exception
  */
 function list_getSmileys($start, $items_per_page, $sort)
 {

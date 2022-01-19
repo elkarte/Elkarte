@@ -25,7 +25,6 @@ use ElkArte\Util;
  * @param mixed[] $search_vars = array()
  *
  * @return int
- * @throws \ElkArte\Exceptions\Exception
  * @todo refactor away
  *
  */
@@ -64,7 +63,6 @@ function list_getSubscribedUserCount($id_sub, $search_string, $search_vars = arr
  * @param mixed[] $search_vars
  *
  * @return array
- * @throws \Exception
  * @todo refactor outta here
  *
  */
@@ -115,7 +113,6 @@ function list_getSubscribedUsers($start, $items_per_page, $sort, $id_sub, $searc
  * Reapplies all subscription rules for each of the users.
  *
  * @param int[]|int $users
- * @throws \ElkArte\Exceptions\Exception
  */
 function reapplySubscriptions($users)
 {
@@ -197,7 +194,6 @@ function reapplySubscriptions($users)
  * @param string $renewal options 'D', 'W', 'M', 'Y', ''
  * @param int $forceStartTime = 0
  * @param int $forceEndTime = 0
- * @throws \ElkArte\Exceptions\Exception
  */
 function addSubscription($id_subscribe, $id_member, $renewal = '', $forceStartTime = 0, $forceEndTime = 0)
 {
@@ -597,7 +593,6 @@ function loadSubscriptions()
  * @param mixed[] $active_subscriptions array of active subscriptions they can have
  *
  * @return array
- * @throws \Exception
  */
 function loadMemberSubscriptions($memID, $active_subscriptions)
 {
@@ -646,7 +641,6 @@ function loadMemberSubscriptions($memID, $active_subscriptions)
  * @param int $sub_id id of the subscription we are looking for
  *
  * @return array
- * @throws \Exception
  */
 function loadAllSubsctiptions($sub_id)
 {
@@ -690,7 +684,6 @@ function loadAllSubsctiptions($sub_id)
  * were related to the subscription
  *
  * @param int $id
- * @throws \ElkArte\Exceptions\Exception
  */
 function deleteSubscription($id)
 {
@@ -759,7 +752,6 @@ function deleteSubscription($id)
  * Adds a new subscription
  *
  * @param mixed[] $insert
- * @throws \Exception
  */
 function insertSubscription($insert)
 {
@@ -788,7 +780,6 @@ function insertSubscription($insert)
  *
  * @param int $sub_id
  * @return int
- * @throws \ElkArte\Exceptions\Exception
  */
 function countActiveSubscriptions($sub_id)
 {
@@ -817,7 +808,6 @@ function countActiveSubscriptions($sub_id)
  *
  * @param mixed[] $update
  * @param int $ignore_active - used to ignore already active subscriptions.
- * @throws \ElkArte\Exceptions\Exception
  */
 function updateSubscription($update, $ignore_active)
 {
@@ -853,7 +843,6 @@ function updateSubscription($update, $ignore_active)
  * (one-time payment)
  *
  * @param mixed[] $subscription_info
- * @throws \ElkArte\Exceptions\Exception
  */
 function updateNonrecurrent($subscription_info)
 {
@@ -877,7 +866,6 @@ function updateNonrecurrent($subscription_info)
  *
  * @param int $sub_id
  * @return array
- * @throws \Exception
  */
 function getSubscriptionDetails($sub_id)
 {
@@ -973,7 +961,6 @@ function validateSubscriptionID($id)
  * @param int $id_sub
  * @param int $id_member
  * @return bool
- * @throws \ElkArte\Exceptions\Exception
  */
 function alreadySubscribed($id_sub, $id_member)
 {
@@ -1040,7 +1027,6 @@ function getSubscriptionStatus($log_id)
  * Somebody paid again? we need to log that.
  *
  * @param int[] $item
- * @throws \ElkArte\Exceptions\Exception
  */
 function updateSubscriptionItem($item)
 {
@@ -1067,7 +1053,6 @@ function updateSubscriptionItem($item)
  * @param mixed[] $subscription_info the subscription information array
  * @param int $member_id
  * @param int $time
- * @throws \ElkArte\Exceptions\Exception
  */
 function handleRefund($subscription_info, $member_id, $time)
 {
@@ -1111,7 +1096,6 @@ function handleRefund($subscription_info, $member_id, $time)
  *
  * @param int[] $toDelete
  * @return array $delete
- * @throws \Exception
  */
 function prepareDeleteSubscriptions($toDelete)
 {
@@ -1140,7 +1124,6 @@ function prepareDeleteSubscriptions($toDelete)
  *
  * @param int $log_id
  * @return array
- * @throws \ElkArte\Exceptions\Exception
  */
 function getPendingSubscriptions($log_id)
 {
@@ -1165,7 +1148,6 @@ function getPendingSubscriptions($log_id)
  * Somebody paid the first time? Let's log ...
  *
  * @param mixed[] $details associative array for the insert
- * @throws \Exception
  */
 function logSubscription($details)
 {
@@ -1191,7 +1173,6 @@ function logSubscription($details)
  * @param int $sub_id
  * @param int $memID
  * @param string $pending_details
- * @throws \Exception
  */
 function logNewSubscription($sub_id, $memID, $pending_details)
 {
@@ -1215,7 +1196,6 @@ function logNewSubscription($sub_id, $memID, $pending_details)
  *
  * @param int $sub_id
  * @param string $details
- * @throws \ElkArte\Exceptions\Exception
  */
 function updatePendingSubscription($sub_id, $details)
 {
@@ -1241,7 +1221,6 @@ function updatePendingSubscription($sub_id, $details)
  * @param int $sub_id
  * @param int $memID
  * @param string $details
- * @throws \ElkArte\Exceptions\Exception
  */
 function updatePendingSubscriptionCount($pending_count, $sub_id, $memID, $details)
 {
@@ -1271,7 +1250,6 @@ function updatePendingSubscriptionCount($pending_count, $sub_id, $memID, $detail
  * @param int $sub_id
  * @param int $memID
  * @param string $details
- * @throws \ElkArte\Exceptions\Exception
  */
 function updatePendingStatus($sub_id, $memID, $details)
 {
@@ -1297,7 +1275,6 @@ function updatePendingStatus($sub_id, $memID, $details)
  * @param int $id_subscribe
  * @param int $id_member
  * @param bool $delete
- * @throws \ElkArte\Exceptions\Exception
  */
 function removeSubscription($id_subscribe, $id_member, $delete = false)
 {

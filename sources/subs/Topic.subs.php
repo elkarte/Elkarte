@@ -29,7 +29,6 @@ use ElkArte\Util;
  * Removes the passed id_topic's checking for permissions.
  *
  * @param int[]|int $topics The topics to remove (can be an id or an array of ids).
- * @throws \ElkArte\Exceptions\Exception
  */
 function removeTopicsPermissions($topics)
 {
@@ -70,7 +69,6 @@ function removeTopicsPermissions($topics)
  * @param bool $ignoreRecycling if true topics are not moved to the recycle board (if it exists).
  * @param bool $log if true logs the action.
  * @param int[] $removeCacheBoards an array matching topics and boards.
- * @throws \ElkArte\Exceptions\Exception
  */
 function removeTopics($topics, $decreasePostCount = true, $ignoreRecycling = false, $log = false, $removeCacheBoards = array())
 {
@@ -467,7 +465,6 @@ function removeTopics($topics, $decreasePostCount = true, $ignoreRecycling = fal
  * Moves lots of topics to a specific board and checks if the user can move them
  *
  * @param array $moveCache [0] => int[] is the topic, [1] => int[]  is the board to move to.
- * @throws \ElkArte\Exceptions\Exception
  */
 function moveTopicsPermissions($moveCache)
 {
@@ -582,7 +579,6 @@ function moveTopicsPermissions($moveCache)
  * @param int[]|int $topics
  * @param int $toBoard
  * @param bool $log if true logs the action.
- * @throws \ElkArte\Exceptions\Exception
  */
 function moveTopics($topics, $toBoard, $log = false)
 {
@@ -961,6 +957,8 @@ function moveTopicConcurrence($move_from, $id_board, $id_topic)
  * What it does:
  *  - If the topic has been removed and resides in the recycle bin, present confirm dialog
  *  - If recycling is not enabled, or user confirms or topic is not in recycle simply returns
+ *
+ * @throws \ElkArte\Exceptions\Exception post_already_deleted
  */
 function removeDeleteConcurrence()
 {
@@ -992,7 +990,6 @@ function removeDeleteConcurrence()
  * Increase the number of views of this topic.
  *
  * @param int $id_topic the topic being viewed or whatnot.
- * @throws \ElkArte\Exceptions\Exception
  */
 function increaseViewCounter($id_topic)
 {
@@ -1014,7 +1011,6 @@ function increaseViewCounter($id_topic)
  *
  * @param mixed[] $mark_topics array($id_member, $id_topic, $id_msg)
  * @param bool $was_set = false - whether the topic has been previously read by the user
- * @throws \Exception
  */
 function markTopicsRead($mark_topics, $was_set = false)
 {
@@ -1040,7 +1036,6 @@ function markTopicsRead($mark_topics, $was_set = false)
  *
  * @param int $id_topic
  * @param int $id_board
- * @throws \ElkArte\Exceptions\Exception
  * @todo look at board notification...
  *
  */
@@ -1101,7 +1096,6 @@ function updateReadNotificationsFor($id_topic, $id_board)
  * @param int $id_board
  * @param int $id_msg_last_visit
  * @return int
- * @throws \ElkArte\Exceptions\Exception
  */
 function getUnreadCountSince($id_board, $id_msg_last_visit)
 {
@@ -1136,7 +1130,6 @@ function getUnreadCountSince($id_board, $id_msg_last_visit)
  * @param int $id_member
  * @param int $id_topic
  * @return bool
- * @throws \Exception
  */
 function hasTopicNotification($id_member, $id_topic)
 {
@@ -1163,7 +1156,6 @@ function hasTopicNotification($id_member, $id_topic)
  * @param int $id_member
  * @param int $id_topic
  * @param bool $on
- * @throws \ElkArte\Exceptions\Exception
  */
 function setTopicNotification($id_member, $id_topic, $on = false)
 {
@@ -1203,7 +1195,6 @@ function setTopicNotification($id_member, $id_topic, $on = false)
  * @param bool $includeUnapproved = false whether to include unapproved topics
  * @param bool $includeStickies = true whether to include sticky topics
  * @return int topic number
- * @throws \ElkArte\Exceptions\Exception
  */
 function previousTopic($id_topic, $id_board, $id_member = 0, $includeUnapproved = false, $includeStickies = true)
 {
@@ -1219,7 +1210,6 @@ function previousTopic($id_topic, $id_board, $id_member = 0, $includeUnapproved 
  * @param bool $includeUnapproved = false whether to include unapproved topics
  * @param bool $includeStickies = true whether to include sticky topics
  * @return int topic number
- * @throws \ElkArte\Exceptions\Exception
  */
 function nextTopic($id_topic, $id_board, $id_member = 0, $includeUnapproved = false, $includeStickies = true)
 {
@@ -1239,7 +1229,6 @@ function nextTopic($id_topic, $id_board, $id_member = 0, $includeUnapproved = fa
  * @param bool $includeUnapproved = false whether to include unapproved topics
  * @param bool $includeStickies = true whether to include sticky topics
  * @return int the topic number
- * @throws \ElkArte\Exceptions\Exception
  */
 function topicPointer($id_topic, $id_board, $next = true, $id_member = 0, $includeUnapproved = false, $includeStickies = true)
 {
@@ -1316,7 +1305,6 @@ function topicPointer($id_topic, $id_board, $next = true, $id_member = 0, $inclu
  * @param int $id_member
  * @param int $topic
  * @param bool $on = false
- * @throws \Exception
  */
 function setTopicWatch($id_member, $topic, $on = false)
 {
@@ -1349,7 +1337,6 @@ function setTopicWatch($id_member, $topic, $on = false)
  * @param string[] $selects (optional from integration)
  * @param string[] $tables (optional from integration)
  * @return mixed[]|bool to topic attributes
- * @throws \Exception
  */
 function getTopicInfo($topic_parameters, $full = '', $selects = array(), $tables = array())
 {
@@ -1417,7 +1404,6 @@ function getTopicInfo($topic_parameters, $full = '', $selects = array(), $tables
  * @param int $topic id of a topic
  * @param int|null $msg the id of a message, if empty, t.id_first_msg is used
  * @return mixed[]|bool to topic attributes
- * @throws \ElkArte\Exceptions\Exception
  */
 function getTopicInfoByMsg($topic, $msg = null)
 {
@@ -1468,7 +1454,6 @@ function getTopicInfoByMsg($topic, $msg = null)
  * @param string $delete_type
  * @param bool $exclude_stickies
  * @param int $older_than
- * @throws \ElkArte\Exceptions\Exception
  */
 function removeOldTopics(array $boards, $delete_type, $exclude_stickies, $older_than)
 {
@@ -1532,7 +1517,6 @@ function removeOldTopics(array $boards, $delete_type, $exclude_stickies, $older_
  * @param int $memberID
  *
  * @return array
- * @throws \Exception
  */
 function topicsStartedBy($memberID)
 {
@@ -1568,7 +1552,6 @@ function topicsStartedBy($memberID)
  * @param bool $only_approved = false
  *
  * @return array message ids
- * @throws \Exception
  */
 function messagesSince($id_topic, $id_msg, $include_current = false, $only_approved = false)
 {
@@ -1607,7 +1590,6 @@ function messagesSince($id_topic, $id_msg, $include_current = false, $only_appro
  * @param bool $only_approved = false
  *
  * @return int
- * @throws \ElkArte\Exceptions\Exception
  */
 function countMessagesSince($id_topic, $id_msg, $include_current = false, $only_approved = false)
 {
@@ -1685,7 +1667,6 @@ function countMessagesBefore($id_topic, $id_msg, $include_current = false, $only
  * @param bool $only_approved
  *
  * @return array|mixed[]
- * @throws \Exception
  */
 function selectMessages($topic, $start, $items_per_page, $messages = array(), $only_approved = false)
 {
@@ -1756,7 +1737,6 @@ function selectMessages($topic, $start, $items_per_page, $messages = array(), $o
  * @param string $render defaults to print style rendering for parse_bbc
  *
  * @return array
- * @throws \ElkArte\Exceptions\Exception
  */
 function topicMessages($topic, $render = 'print')
 {
@@ -1813,7 +1793,6 @@ function topicMessages($topic, $render = 'print')
  * @param int[] $id_messages
  *
  * @return array
- * @throws \Exception
  */
 function messagesAttachments($id_messages)
 {
@@ -1887,7 +1866,6 @@ function messagesAttachments($id_messages)
  * @param int $id_topic topic id
  * @param int $id_member member id
  * @return array|int empty array if no member supplied, otherwise number of posts
- * @throws \ElkArte\Exceptions\Exception
  */
 function unapprovedPosts($id_topic, $id_member)
 {
@@ -1922,7 +1900,6 @@ function unapprovedPosts($id_topic, $id_member)
  *
  * @param mixed[] $options
  * @param int $id_board
- * @throws \ElkArte\Exceptions\Exception
  */
 function updateSplitTopics($options, $id_board)
 {
@@ -1995,7 +1972,6 @@ function updateSplitTopics($options, $id_board)
  *
  * @param int $topic
  * @return array with id_member_started and locked
- * @throws \ElkArte\Exceptions\Exception
  */
 function topicStatus($topic)
 {
@@ -2015,7 +1991,6 @@ function topicStatus($topic)
  * @param int|int[] $topic
  * @param mixed[] $attributes
  * @return int number of row affected
- * @throws \ElkArte\Exceptions\Exception
  * @todo limited to integer attributes
  */
 function setTopicAttribute($topic, $attributes)
@@ -2052,7 +2027,6 @@ function setTopicAttribute($topic, $attributes)
  * @param int|int[] $id_topic topic to get the status for
  * @param string|string[] $attributes Basically the column names
  * @return array named array based on attributes requested
- * @throws \ElkArte\Exceptions\Exception
  */
 function topicAttribute($id_topic, $attributes)
 {
@@ -2110,7 +2084,6 @@ function topicAttribute($id_topic, $attributes)
  * @param int $id_topic topic to get the status for
  * @param int $user a user id
  * @return mixed[]
- * @throws \ElkArte\Exceptions\Exception
  */
 function topicUserAttributes($id_topic, $user)
 {
@@ -2144,7 +2117,6 @@ function topicUserAttributes($id_topic, $user)
  * @param int[] $topics an array of topic id
  *
  * @return array
- * @throws \ElkArte\Exceptions\Exception
  */
 function topicsDetails($topics)
 {
@@ -2157,7 +2129,6 @@ function topicsDetails($topics)
  * @param int[] $topics
  * @param bool $log If true the action is logged
  * @return int Number of topics toggled
- * @throws \ElkArte\Exceptions\Exception
  */
 function toggleTopicSticky($topics, $log = false)
 {
@@ -2204,7 +2175,6 @@ function toggleTopicSticky($topics, $log = false)
  * @param int[] $topics an array of topics
  * @return array an array of topics in the table (key) and its unwatched status (value)
  *
- * @throws \ElkArte\Exceptions\Exception
  * @todo find a better name
  */
 function getLoggedTopics($member, $topics)
@@ -2237,7 +2207,6 @@ function getLoggedTopics($member, $topics)
  * @param int[] $topic_ids
  *
  * @return array
- * @throws \Exception
  */
 function topicsList($topic_ids)
 {
@@ -2288,7 +2257,6 @@ function topicsList($topic_ids)
  * @param mixed[] $limit
  * @param bool $sort set to false for a desc sort
  * @return array
- * @throws \ElkArte\Exceptions\Exception
  */
 function getTopicsPostsAndPoster($topic, $limit, $sort)
 {
@@ -2345,7 +2313,6 @@ function getTopicsPostsAndPoster($topic, $limit, $sort)
  * @param int[] $messages
  * @param mixed[] $messageDetails
  * @param string $type = replies
- * @throws \ElkArte\Exceptions\Exception
  */
 function removeMessages($messages, $messageDetails, $type = 'replies')
 {
@@ -2381,7 +2348,6 @@ function removeMessages($messages, $messageDetails, $type = 'replies')
  * @param int[] $messages
  * @param mixed[] $messageDetails
  * @param string $type = replies
- * @throws \ElkArte\Exceptions\Exception
  */
 function approveMessages($messages, $messageDetails, $type = 'replies')
 {
@@ -2410,7 +2376,6 @@ function approveMessages($messages, $messageDetails, $type = 'replies')
  * @param bool $log if true logs the action.
  *
  * @return bool|void
- * @throws \ElkArte\Exceptions\Exception
  */
 function approveTopics($topics, $approve = true, $log = false)
 {
@@ -2489,7 +2454,6 @@ function approveTopics($topics, $approve = true, $log = false)
  * @param string $subject the text that will become the message subject
  * @param mixed[] $board_info some board information (at least id, name, if posts are counted)
  * @param string $new_topic used to build the url for moving to a new topic
- * @throws \ElkArte\Exceptions\Exception
  */
 function postSplitRedirect($reason, $subject, $board_info, $new_topic)
 {
@@ -2545,7 +2509,7 @@ function postSplitRedirect($reason, $subject, $board_info, $new_topic)
  * @param string $new_subject
  *
  * @return int the topic ID of the new split topic.
- * @throws \ElkArte\Exceptions\Exception no_posts_selected
+ * @throws \ElkArte\Exceptions\Exception no_posts_selected, selected_all_posts, cant_find_message
  */
 function splitTopic($split1_ID_TOPIC, $splitMessages, $new_subject)
 {
@@ -2833,7 +2797,6 @@ function splitTopic($split1_ID_TOPIC, $splitMessages, $new_subject)
  *
  * @param mixed[] $boards an array containing basic info of the origin and destination boards (from splitDestinationBoard)
  * @param int $totopic id of the destination topic
- * @throws \ElkArte\Exceptions\Exception
  */
 function splitAttemptMove($boards, $totopic)
 {
@@ -2957,7 +2920,6 @@ function splitDestinationBoard($toboard = 0)
  *
  * @param int $memID id_member
  * @return int
- * @throws \ElkArte\Exceptions\Exception
  */
 function topicNotificationCount($memID)
 {
@@ -2994,7 +2956,6 @@ function topicNotificationCount($memID)
  * @param string $sort A string indicating how to sort the results
  * @param int $memID id_member
  * @return array
- * @throws \ElkArte\Exceptions\Exception
  */
 function topicNotifications($start, $items_per_page, $sort, $memID)
 {
@@ -3063,7 +3024,6 @@ function topicNotifications($start, $items_per_page, $sort, $memID)
  * @param int $id_topic topic id to work with
  *
  * @return array
- * @throws \ElkArte\Exceptions\Exception
  */
 function postersCount($id_topic)
 {
@@ -3101,7 +3061,6 @@ function postersCount($id_topic)
  * @param int $board
  * @param bool $approved
  * @return int
- * @throws \ElkArte\Exceptions\Exception
  */
 function countTopicsByBoard($board, $approved = false)
 {
@@ -3133,7 +3092,6 @@ function countTopicsByBoard($board, $approved = false)
  * @param bool $approved
  * @param int $offset
  * @return array
- * @throws \Exception
  */
 function mergeableTopics($id_board, $id_topic, $approved, $offset)
 {
@@ -3193,7 +3151,6 @@ function mergeableTopics($id_board, $id_topic, $approved, $offset)
  *
  * @param int[] $topics integer array of topics to work with
  * @return array
- * @throws \Exception
  */
 function messagesInTopics($topics)
 {
@@ -3223,7 +3180,6 @@ function messagesInTopics($topics)
  *
  * @param int[] $topics integer array of topics to work with
  * @return array of topics each member posted in (grouped by members)
- * @throws \Exception
  */
 function topicsPosters($topics)
 {
@@ -3258,7 +3214,6 @@ function topicsPosters($topics)
  * @param string $target_subject subject of the new topic
  * @param string $enforce_subject if not empty all the messages will be set to the same subject
  * @param int[] $notifications array of topics with active notifications
- * @throws \ElkArte\Exceptions\Exception
  */
 function fixMergedTopics($first_msg, $topics, $id_topic, $target_board, $target_subject, $enforce_subject, $notifications)
 {
@@ -3456,7 +3411,6 @@ function getSubject($id_topic)
  * or if parameter $increment is true it simply increments them.
  *
  * @param bool|null $increment = null if true, increment + 1 the total topics, otherwise recount all topics
- * @throws \ElkArte\Exceptions\Exception
  */
 function updateTopicStats($increment = null)
 {
@@ -3493,7 +3447,6 @@ function updateTopicStats($increment = null)
  *
  * @param int[] $topics The topics to lock (can be an id or an array of ids).
  * @param bool $log if true logs the action.
- * @throws \ElkArte\Exceptions\Exception
  */
 function toggleTopicsLock($topics, $log = false)
 {

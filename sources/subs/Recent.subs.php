@@ -23,7 +23,6 @@ use ElkArte\Util;
  *
  * @param mixed[] $latestPostOptions
  * @return array
- * @throws \ElkArte\Exceptions\Exception
  */
 function getLastPosts($latestPostOptions)
 {
@@ -110,7 +109,6 @@ function getLastPosts($latestPostOptions)
  * @param mixed[] $latestPostOptions
  *
  * @return array
- * @throws \ElkArte\Exceptions\Exception
  */
 function cache_getLastPosts($latestPostOptions)
 {
@@ -305,7 +303,6 @@ function earliest_msg()
  * @param mixed[] $latestTopicOptions
  *
  * @return array
- * @throws \ElkArte\Exceptions\Exception
  */
 function cache_getLastTopics($latestTopicOptions)
 {
@@ -329,7 +326,6 @@ function cache_getLastTopics($latestTopicOptions)
  *
  * @param mixed[] $latestTopicOptions
  * @return array
- * @throws \ElkArte\Exceptions\Exception
  */
 function getLastTopics($latestTopicOptions)
 {

@@ -26,7 +26,6 @@ use ElkArte\Util;
  * @param int $log_type
  *
  * @return int
- * @throws \ElkArte\Exceptions\Exception
  */
 function list_getModLogEntryCount($query_string = '', $query_params = array(), $log_type = 1)
 {
@@ -69,7 +68,6 @@ function list_getModLogEntryCount($query_string = '', $query_params = array(), $
  * @param int $log_type
  *
  * @return array
- * @throws \ElkArte\Exceptions\Exception
  */
 function list_getModLogEntries($start, $items_per_page, $sort, $query_string = '', $query_params = array(), $log_type = 1)
 {
@@ -446,7 +444,6 @@ class ModLogEntriesReplacement
  * @param int $id_log
  * @param int $time
  * @param string[]|null $delete
- * @throws \ElkArte\Exceptions\Exception
  */
 function deleteLogAction($id_log, $time, $delete = null)
 {
@@ -472,7 +469,6 @@ function deleteLogAction($id_log, $time, $delete = null)
  * @param int $time Timeframe since the last time the action has been performed
  *
  * @return bool
- * @throws \ElkArte\Exceptions\Exception
  */
 function recentlyLogged($action, $time = 60)
 {

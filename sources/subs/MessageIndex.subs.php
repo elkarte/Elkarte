@@ -31,7 +31,6 @@
  *     'custom_selects' => loads additional values from the tables used in the query, for addon use
  *
  * @return array
- * @throws \ElkArte\Exceptions\Exception
  */
 function messageIndexTopics($id_board, $id_member, $start, $items_per_page, $sort_by, $sort_column, $indexOptions)
 {
@@ -169,7 +168,6 @@ function messageIndexSort()
  * @param int[] $topic_ids array of topics ids to check for participation
  *
  * @return array
- * @throws \Exception
  */
 function topicsParticipation($id_member, $topic_ids)
 {

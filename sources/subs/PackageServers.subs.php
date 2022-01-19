@@ -16,7 +16,6 @@
  *
  * @param int|null $server
  * @return array
- * @throws \Exception
  * @package Packages
  */
 function fetchPackageServers($server = null)
@@ -51,7 +50,6 @@ function fetchPackageServers($server = null)
  * Delete a package server
  *
  * @param int $id
- * @throws \ElkArte\Exceptions\Exception
  * @package Packages
  */
 function deletePackageServer($id)
@@ -72,7 +70,6 @@ function deletePackageServer($id)
  *
  * @param string $name
  * @param string $url
- * @throws \Exception
  * @package Packages
  */
 function addPackageServer($name, $url)

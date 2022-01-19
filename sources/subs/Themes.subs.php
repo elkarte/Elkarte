@@ -64,7 +64,6 @@ function installedThemes()
  *
  * @param int $id_theme the id of the theme
  * @return string
- * @throws \ElkArte\Exceptions\Exception
  */
 function themeDirectory($id_theme)
 {
@@ -94,7 +93,6 @@ function themeDirectory($id_theme)
  * @param int $id_theme id of the theme
  *
  * @return string
- * @throws \ElkArte\Exceptions\Exception
  */
 function themeUrl($id_theme)
 {
@@ -125,7 +123,6 @@ function themeUrl($id_theme)
  * @param mixed[] $value_data
  *
  * @return array
- * @throws \Exception
  */
 function validateThemeName($indexes, $value_data)
 {
@@ -165,7 +162,6 @@ function validateThemeName($indexes, $value_data)
  *
  * @param int|int[] $themes
  * @return array
- * @throws \Exception
  */
 function getBasicThemeInfos($themes)
 {
@@ -198,7 +194,6 @@ function getBasicThemeInfos($themes)
  * Gets a list of all themes from the database
  *
  * @return array $themes
- * @throws \Exception
  */
 function getCustomThemes()
 {
@@ -242,7 +237,6 @@ function getCustomThemes()
  * @param int[] $theme_list
  *
  * @return array
- * @throws \Exception
  */
 function getThemesPathbyID($theme_list = array())
 {
@@ -291,7 +285,6 @@ function getThemesPathbyID($theme_list = array())
  * @param int[] $knownThemes available themes
  *
  * @return array
- * @throws \ElkArte\Exceptions\Exception
  */
 function loadThemes($knownThemes)
 {
@@ -329,7 +322,6 @@ function loadThemes($knownThemes)
  * @param int $id id of the package we are checking
  *
  * @return array
- * @throws \Exception
  */
 function loadThemesAffected($id)
 {
@@ -441,7 +433,6 @@ function get_file_listing($path, $relative)
  * Counts the theme options configured for guests
  *
  * @return array
- * @throws \Exception
  */
 function countConfiguredGuestOptions()
 {
@@ -466,7 +457,6 @@ function countConfiguredGuestOptions()
  * @param int $current_member
  *
  * @return array
- * @throws \ElkArte\Exceptions\Exception
  */
 function availableThemes($current_theme, $current_member)
 {
@@ -656,7 +646,6 @@ function availableThemes($current_theme, $current_member)
  * Counts the theme options configured for members
  *
  * @return array
- * @throws \ElkArte\Exceptions\Exception
  */
 function countConfiguredMemberOptions()
 {
@@ -689,7 +678,6 @@ function countConfiguredMemberOptions()
  *               - 'non_default' => guests and members with custom settings (i.e. id_member != 0)
  *               - 'all' => any record
  * @param string[]|string $old_settings can be a string or an array of strings. If empty deletes all settings.
- * @throws \ElkArte\Exceptions\Exception
  */
 function removeThemeOptions($theme, $membergroups, $old_settings = '')
 {
@@ -773,7 +761,6 @@ function removeThemeOptions($theme, $membergroups, $old_settings = '')
  * Update the default options for our users.
  *
  * @param mixed[] $setValues in the order: id_theme, id_member, variable name, value
- * @throws \Exception
  */
 function updateThemeOptions($setValues)
 {
@@ -793,7 +780,6 @@ function updateThemeOptions($setValues)
  * @param int $id_theme
  * @param string $options
  * @param string[]|string $value
- * @throws \ElkArte\Exceptions\Exception
  */
 function addThemeOptions($id_theme, $options, $value)
 {
@@ -867,7 +853,6 @@ function deleteTheme($id)
  * Get the next free id for the theme.
  *
  * @return int
- * @throws \ElkArte\Exceptions\Exception
  */
 function nextTheme()
 {
@@ -893,7 +878,6 @@ function nextTheme()
  * Adds a new theme to the database.
  *
  * @param mixed[] $details
- * @throws \Exception
  */
 function addTheme($details)
 {
@@ -912,7 +896,6 @@ function addTheme($details)
  *
  * @param int $id
  * @return string
- * @throws \ElkArte\Exceptions\Exception
  */
 function getThemeName($id)
 {
@@ -942,7 +925,6 @@ function getThemeName($id)
  * Deletes all variants from a given theme id.
  *
  * @param int $id
- * @throws \ElkArte\Exceptions\Exception
  */
 function deleteVariants($id)
 {
@@ -969,7 +951,6 @@ function deleteVariants($id)
  * @param string[] $variables
  *
  * @return array|mixed[]
- * @throws \Exception
  */
 function loadThemeOptionsInto($theme, $memID = null, $options = array(), $variables = array())
 {
@@ -1011,7 +992,6 @@ function loadThemeOptionsInto($theme, $memID = null, $options = array(), $variab
  * @param string $based_on name of theme this is based on, will do a LIKE search
  * @param bool $explicit_images Don't worry its not like it sounds !
  * @return mixed[]
- * @throws \ElkArte\Exceptions\Exception
  * @todo may be merged with something else?
  */
 function loadBasedOnTheme($based_on, $explicit_images = false)

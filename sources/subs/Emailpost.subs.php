@@ -44,7 +44,6 @@ use ElkArte\Util;
  * @uses Html2BBC.class.php for the html to bbc conversion
  * @uses markdown.php for text to html conversions
  * @package Maillist
- * @throws \Exception
  */
 function pbe_email_to_bbc($text, $html)
 {
@@ -110,7 +109,6 @@ function pbe_email_to_bbc($text, $html)
  *
  * @param string $text
  * @return string
- * @throws \Exception
  */
 function pbe_run_parsers($text)
 {
@@ -144,7 +142,6 @@ function pbe_run_parsers($text)
  * @param string $charset character set of the text
  *
  * @return mixed|null|string|string[]
- * @throws \Exception
  * @package Maillist
  *
  * @uses EmailFormat.class.php
@@ -361,7 +358,6 @@ function pbe_email_quote_depth(&$string, $update = true)
  *
  * @param string $body
  * @return bool on find
- * @throws \Exception
  * @package Maillist
  */
 function pbe_parse_email_message(&$body)
@@ -426,7 +422,6 @@ function pbe_parse_email_message(&$body)
  * @param string $text
  *
  * @return mixed|null|string|string[]
- * @throws \Exception
  * @package Maillist
  *
  */
@@ -691,7 +686,6 @@ function pbe_check_moderation(&$pbe)
  * @param \ElkArte\EmailParse $email_message
  *
  * @return bool
- * @throws \ElkArte\Exceptions\Exception
  * @package Maillist
  *
  */
@@ -835,7 +829,6 @@ function pbe_emailError($error, $email_message)
  * @param \ElkArte\EmailParse $email_message
  *
  * @return array
- * @throws \ElkArte\Exceptions\Exception
  * @package Maillist
  *
  */
@@ -1108,7 +1101,6 @@ function pbe_prepare_text(&$message, &$subject = '', &$signature = '')
  * When finished, fire off a site notification informing the user of the action and reason
  *
  * @param \ElkArte\EmailParse $email_message
- * @throws \ElkArte\Exceptions\Exception
  * @package Maillist
  */
 function pbe_disable_user_notify($email_message)
@@ -1226,7 +1218,6 @@ function quote_callback_2($matches)
  * @param string $email
  *
  * @return array|bool
- * @throws \ElkArte\Exceptions\Exception
  * @package Maillist
  *
  */
@@ -1326,7 +1317,6 @@ function query_load_user_info($email)
  * @param string $type board to load board permissions, otherwise general permissions
  * @param mixed[] $pbe
  * @param mixed[] $topic_info
- * @throws \Exception
  * @package Maillist
  */
 function query_load_permissions($type, &$pbe, $topic_info = array())
@@ -1377,7 +1367,6 @@ function query_load_permissions($type, &$pbe, $topic_info = array())
  *
  * @param string $from
  * @return mixed[]
- * @throws \ElkArte\Exceptions\Exception
  * @package Maillist
  */
 function query_sender_wrapper($from)
@@ -1419,7 +1408,6 @@ function query_sender_wrapper($from)
  * @param string $email email address to lookup
  *
  * @return array
- * @throws \Exception
  * @package Maillist
  *
  */
@@ -1445,7 +1433,6 @@ function query_user_keys($email)
  *
  * @param \ElkArte\EmailParse $email_message
  * @return string email address the key was sent to
- * @throws \ElkArte\Exceptions\Exception
  * @package Maillist
  */
 function query_key_owner($email_message)
@@ -1488,7 +1475,6 @@ function query_key_owner($email_message)
  * @param string $email
  *
  * @return bool|string
- * @throws \ElkArte\Exceptions\Exception
  * @package Maillist
  *
  */
@@ -1588,7 +1574,6 @@ function query_load_subject($message_id, $message_type, $email)
  * @param mixed[] $pbe
  *
  * @return array|bool
- * @throws \ElkArte\Exceptions\Exception
  * @package Maillist
  *
  */
@@ -1671,7 +1656,6 @@ function query_load_message($message_type, $message_id, $pbe)
  * @param int $message_id
  *
  * @return int
- * @throws \ElkArte\Exceptions\Exception
  * @package Maillist
  *
  */
@@ -1700,7 +1684,6 @@ function query_load_board($message_id)
  * @param int $board_id
  * @param mixed[] $pbe
  * @return mixed[]
- * @throws \ElkArte\Exceptions\Exception
  * @package Maillist
  */
 function query_load_board_details($board_id, $pbe)
@@ -1734,7 +1717,6 @@ function query_load_board_details($board_id, $pbe)
  * @param mixed[] $board_info
  *
  * @return array
- * @throws \Exception
  * @package Maillist
  *
  */
@@ -1791,7 +1773,6 @@ function query_get_theme($id_member, $id_theme, $board_info)
  * @param int $id_topic
  * @param bool $auto_notify
  * @param mixed[] $permissions
- * @throws \ElkArte\Exceptions\Exception
  * @package Maillist
  */
 function query_notifications($id_member, $id_board, $id_topic, $auto_notify, $permissions)
@@ -1853,7 +1834,6 @@ function query_notifications($id_member, $id_board, $id_topic, $auto_notify, $pe
  *
  * @param \ElkArte\EmailParse $email_message
  * @param mixed[] $pbe
- * @throws \ElkArte\Exceptions\Exception
  * @package Maillist
  */
 function query_mark_pms($email_message, $pbe)
@@ -1920,7 +1900,6 @@ function query_mark_pms($email_message, $pbe)
  * - Also removes any old keys to minimize security issues
  *
  * @param \ElkArte\EmailParse $email_message
- * @throws \ElkArte\Exceptions\Exception
  * @package Maillist
  */
 function query_key_maintenance($email_message)
@@ -1972,7 +1951,6 @@ function query_key_maintenance($email_message)
  * @param mixed[] $pbe
  * @param \ElkArte\EmailParse $email_message
  * @param mixed[] $topic_info
- * @throws \Exception
  * @package Maillist
  */
 function query_update_member_stats($pbe, $email_message, $topic_info = array())
@@ -2046,7 +2024,6 @@ function query_update_member_stats($pbe, $email_message, $topic_info = array())
  * @param mixed[] $pbe
  *
  * @return mixed|null|string|string[]
- * @throws \Exception
  * @package Maillist
  *
  */
@@ -2103,7 +2080,6 @@ function pbe_load_text(&$html, $email_message, $pbe)
  * @param mixed[] $topic_info
  *
  * @return bool
- * @throws \ElkArte\Exceptions\Exception
  * @package Maillist
  *
  */
@@ -2233,7 +2209,6 @@ function pbe_create_post($pbe, $email_message, $topic_info)
  * @param mixed[] $pm_info
  *
  * @return bool
- * @throws \ElkArte\Exceptions\Exception
  * @package Maillist
  *
  * @uses sendpm to do the actual "sending"
@@ -2301,7 +2276,6 @@ function pbe_create_pm($pbe, $email_message, $pm_info)
  * @param mixed[] $board_info
  *
  * @return bool
- * @throws \ElkArte\Exceptions\Exception
  * @package Maillist
  *
  * @uses createPost to do the actual "posting"

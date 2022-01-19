@@ -23,7 +23,6 @@ use ElkArte\BoardsTree;
  *
  * @param int $category_id
  * @param mixed[] $catOptions
- * @throws \ElkArte\Exceptions\Exception
  */
 function modifyCategory($category_id, $catOptions)
 {
@@ -138,7 +137,6 @@ function modifyCategory($category_id, $catOptions)
  * returns the ID of the newly created category.
  *
  * @param mixed[] $catOptions
- * @throws \Exception
  */
 function createCategory($catOptions)
 {
@@ -202,7 +200,6 @@ function createCategory($catOptions)
  *
  * @param int[] $categories
  * @param int|null $moveBoardsTo = null
- * @throws \ElkArte\Exceptions\Exception
  */
 function deleteCategories($categories, $moveBoardsTo = null)
 {
@@ -282,7 +279,6 @@ function deleteCategories($categories, $moveBoardsTo = null)
  * @param string $new_status
  * @param int[]|null $members = null
  * @param bool $check_collapsable = true
- * @throws \ElkArte\Exceptions\Exception
  */
 function collapseCategories($categories, $new_status, $members = null, $check_collapsable = true)
 {
@@ -384,7 +380,6 @@ function collapseCategories($categories, $new_status, $members = null, $check_co
  *
  * @param int $id_cat
  * @return string
- * @throws \ElkArte\Exceptions\Exception
  */
 function categoryName($id_cat)
 {

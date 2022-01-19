@@ -67,7 +67,6 @@ function un_preparsecode($message)
  * @param mixed[] $posterOptions
  *
  * @return bool
- * @throws \ElkArte\Exceptions\Exception
  * @package Posts
  *
  */
@@ -449,7 +448,6 @@ function createPost(&$msgOptions, &$topicOptions, &$posterOptions)
  * @param mixed[] $posterOptions
  *
  * @return bool
- * @throws \ElkArte\Exceptions\Exception
  * @package Posts
  *
  */
@@ -625,7 +623,6 @@ function modifyPost(&$msgOptions, &$topicOptions, &$posterOptions)
  * @param bool $approve = true
  *
  * @return bool|void
- * @throws \ElkArte\Exceptions\Exception
  * @package Posts
  *
  */
@@ -910,7 +907,6 @@ function approvePosts($msgs, $approve = true)
  * @param int $id_msg = 0
  *
  * @return bool
- * @throws \ElkArte\Exceptions\Exception
  * @package Posts
  *
  */
@@ -1073,7 +1069,6 @@ function updateLastMessages($setboards, $id_msg = 0)
  * - respects approved, recycled, and board permissions
  *
  * @return array
- * @throws \ElkArte\Exceptions\Exception
  * @package Posts
  */
 function lastPost()
@@ -1144,7 +1139,7 @@ function lastPost()
  * @param int $msg_id
  *
  * @return false|mixed[]
- * @throws \ElkArte\Exceptions\Exception
+ * @throws \ElkArte\Exceptions\Exception quoted_post_deleted
  * @package Posts
  *
  */
@@ -1259,7 +1254,6 @@ function getFormMsgSubject($editing, $topic, $first_subject = '', $msg_id = 0)
  * @param string $custom_subject
  * @param string $response_prefix = ''
  * @param bool $all = false
- * @throws \ElkArte\Exceptions\Exception
  * @package Posts
  */
 function topicSubject($topic_info, $custom_subject, $response_prefix = '', $all = false)
