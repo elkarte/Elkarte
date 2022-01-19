@@ -81,7 +81,7 @@ class Modlog extends AbstractController
 		// The number of entries to show per page of log file.
 		$context['displaypage'] = 30;
 
-		// Amount of hours that must pass before allowed to delete file.
+		// Amount of hours that must pass before allowed to empty the file.
 		$context['hoursdisable'] = 24;
 
 		// Handle deletion...
@@ -99,9 +99,15 @@ class Modlog extends AbstractController
 		}
 
 		// If we're coming from a search, get the variables.
-		if (!empty($this->_req->post->params) && empty($this->_req->post->is_search))
+		$isSearch = $this->_req->getPost('is_search', 'trim', '');
+		$searchParams = $this->_req->getPost('params', 'trim', '');
+		$sort = $this->_req->getQuery('sort', 'trim', 'member');
+		$search = $this->_req->getPost('search', 'trim', '');
+		$searchType = $this->_req->getPost('search_type', 'trim', null);
+
+		if (!empty($searchParams) && empty($isSearch))
 		{
-			$search_params = base64_decode(strtr($this->_req->post->params, array(' ' => '+')));
+			$search_params = base64_decode(strtr($searchParams, array(' ' => '+')));
 			$search_params = @json_decode($search_params, true);
 		}
 
@@ -114,20 +120,20 @@ class Modlog extends AbstractController
 		);
 
 		// Setup the allowed search
-		$context['order'] = isset($this->_req->query->sort) && isset($searchTypes[$this->_req->query->sort]) ? $this->_req->query->sort : 'member';
+		$context['order'] = isset($searchTypes[$sort]) ? $sort : 'member';
 
-		if (!isset($search_params['string']) || (!empty($this->_req->post->search) && $search_params['string'] != $this->_req->post->search))
+		if (!isset($search_params['string']) || (!empty($search) && $search_params['string'] !== $search))
 		{
-			$search_params_string = $this->_req->getPost('search', 'trim', '');
+			$search_params_string = $search;
 		}
 		else
 		{
 			$search_params_string = $search_params['string'];
 		}
 
-		if (isset($this->_req->post->search_type) || empty($search_params['type']) || !isset($searchTypes[$search_params['type']]))
+		if (isset($searchType) || empty($search_params['type']) || !isset($searchTypes[$search_params['type']]))
 		{
-			$search_params_type = isset($this->_req->post->search_type) && isset($searchTypes[$this->_req->post->search_type]) ? $this->_req->query->search_type : $context['order'];
+			$search_params_type = isset($searchType) && isset($searchTypes[$searchType]) ? $searchType : $context['order'];
 		}
 		else
 		{
@@ -345,7 +351,7 @@ class Modlog extends AbstractController
 	 * @param mixed[] $query_params
 	 * @param int $log_type
 	 *
-	 * @return
+	 * @return int number of entries
 	 */
 	public function getModLogEntryCount($query_string, $query_params, $log_type)
 	{

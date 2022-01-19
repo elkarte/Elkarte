@@ -18,7 +18,6 @@
 
 use ElkArte\Controller\ScheduledTasks;
 use ElkArte\EventManager;
-use ElkArte\Http\Headers;
 use ElkArte\HttpReq;
 use ElkArte\User;
 
@@ -110,6 +109,7 @@ function elk_main()
 			if (runBadBehavior())
 			{
 				// Not much to say, 403 and gone
+				sleep(10);
 				\ElkArte\Errors\Errors::instance()->display_403_error(true);
 			}
 

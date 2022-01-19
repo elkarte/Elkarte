@@ -160,10 +160,7 @@ class ManageErrors extends AbstractController
 		}
 
 		// Clean up start.
-		if (!isset($this->_req->query->start) || $this->_req->query->start < 0)
-		{
-			$this->_req->query->start = 0;
-		}
+		$start = max($this->_req->getQuery('start', 'intval', 0), 0);
 
 		// Do we want to reverse error listing?
 		$context['sort_direction'] = isset($this->_req->query->desc) ? 'down' : 'up';
@@ -172,12 +169,12 @@ class ManageErrors extends AbstractController
 		$page_filter = isset($filter['href']) ? ';filter=' . $filter['href']['filter'] . ';value=' . $filter['href']['value'] : '';
 
 		// Set the page listing up.
-		$context['page_index'] = constructPageIndex('{scripturl}?action=admin;area=logs;sa=errorlog' . ($context['sort_direction'] === 'down' ? ';desc' : '') . $page_filter, $this->_req->query->start, $num_errors, $modSettings['defaultMaxMessages']);
-		$context['start'] = $this->_req->query->start;
+		$context['page_index'] = constructPageIndex('{scripturl}?action=admin;area=logs;sa=errorlog' . ($context['sort_direction'] === 'down' ? ';desc' : '') . $page_filter, $start, $num_errors, $modSettings['defaultMaxMessages']);
+		$context['start'] = $start;
 		$context['$page_filter'] = $page_filter;
 		$context['errors'] = array();
 
-		$logdata = $this->errorLog->getErrorLogData($this->_req->query->start, $context['sort_direction'], $filter);
+		$logdata = $this->errorLog->getErrorLogData($start, $context['sort_direction'], $filter);
 		if (!empty($logdata))
 		{
 			$context['errors'] = $logdata['errors'];
@@ -190,11 +187,9 @@ class ManageErrors extends AbstractController
 		// Filtering anything?
 		$this->_applyFilter($filter);
 
-		$sort = ($context['sort_direction'] == 'down') ? ';desc' : '';
-
 		// What type of errors do we have and how many do we have?
 		$context['error_types'] = array();
-		$context['error_types'] = $this->errorLog->fetchErrorsByType($filter, $sort);
+		$context['error_types'] = $this->errorLog->fetchErrorsByType($filter, $context['sort_direction']);
 		$tmp = array_keys($context['error_types']);
 		$sum = (int) end($tmp);
 

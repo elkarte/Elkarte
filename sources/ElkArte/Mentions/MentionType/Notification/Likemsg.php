@@ -17,7 +17,7 @@ use ElkArte\Mentions\MentionType\AbstractNotificationBoardAccess;
 use ElkArte\Mentions\MentionType\CommonConfigTrait;
 
 /**
- * Class LikemsgMention
+ * Class Likemsg
  *
  * Handles mentions of likes
  */

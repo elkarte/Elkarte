@@ -22,25 +22,13 @@ namespace ElkArte;
  */
 class Event
 {
-	/**
-	 * If the classes have already been sorted by priority.
-	 *
-	 * @var bool
-	 */
+	/** @var bool If the classes have already been sorted by priority. */
 	protected $_sorted = false;
 
-	/**
-	 * List of classes.
-	 *
-	 * @var string[]
-	 */
+	/** @var string[] List of classes. */
 	protected $_events = array();
 
-	/**
-	 * The priority object.
-	 *
-	 * @var object
-	 */
+	/** @var object The priority object. */
 	protected $_priority = array();
 
 	/**
@@ -58,20 +46,20 @@ class Event
 	 *
 	 * @param mixed[] $event An array describing the event we want to trigger:
 	 *    array(
-	 *        0 => string - the position at which the event will be triggered
+	 *      0 => string - the position at which the event will be triggered
 	 *      1 => string[] - the class and method we want to call:
 	 *            array(
-	 *                0 => string - name of the class to instantiate
+	 *              0 => string - name of the class to instantiate
 	 *              1 => string - name of the method to call
-	 *          )
-	 *        2 => null|string[] - an array of dependencies in the form of strings representing the
+	 *            )
+	 *      2 => null|string[] - an array of dependencies in the form of strings representing the
 	 *                           name of the variables the method requires.
 	 *                           The variables can be from:
-	 *                           - the default list of variables passed to the trigger
-	 *                           - properties (private, protected, or public) of the object that
-	 *                             instantiate the \ElkArte\EventManager (i.e. the controller)
-	 *                           - globals
-	 *    )
+	 *                         - the default list of variables passed to the trigger
+	 *                         - properties (private, protected, or public) of the object that
+	 *                           instantiate the \ElkArte\EventManager (i.e. the controller)
+	 *                         - globals
+	 *      )
 	 * @param int $priority A value that defines the relative priority at which
 	 *            the event should be triggered.
 	 */
@@ -112,6 +100,7 @@ class Event
 	public function getEvents()
 	{
 		$return = array();
+
 		if (!$this->_sorted)
 		{
 			$this->_doSorting();

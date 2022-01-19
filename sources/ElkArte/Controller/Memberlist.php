@@ -536,6 +536,12 @@ class Memberlist extends AbstractController
 
 			foreach ($fields as $key => $field)
 			{
+				if ($key === 2 && strpos($field, '(hide_email' ) === 0)
+				{
+					$fields[$key] = '(hide_email = 0 AND {column_case_insensitive:email_address}';
+					continue;
+				}
+
 				$fields[$key] = '{column_case_insensitive:' . $field . '}';
 			}
 

@@ -17,7 +17,7 @@ use ElkArte\Mentions\MentionType\AbstractNotificationBoardAccess;
 use ElkArte\Mentions\MentionType\CommonConfigTrait;
 
 /**
- * Class MentionmemMention
+ * Class Mentionmem
  *
  * Handles the mentioning of members (@ member actions)
  */

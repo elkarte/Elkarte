@@ -17,7 +17,7 @@ use ElkArte\Mentions\MentionType\AbstractNotificationBoardAccess;
 use ElkArte\Mentions\MentionType\CommonConfigTrait;
 
 /**
- * Class QuotedmemMention
+ * Class Quotedmem
  *
  * Handles mentioning of members whose messages has been quoted
  */

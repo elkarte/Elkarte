@@ -378,13 +378,12 @@ function template_edit_censored()
 }
 
 /**
- * Template to show that a task is in progress
- * (not done yet).
+ * Template to show that a task is in progress (not done yet).
  * Maintenance is a lovely thing, isn't it?
  */
 function template_not_done()
 {
-	global $context, $txt;
+	global $context, $txt, $scripturl;
 
 	echo '
 	<div id="admincenter">
@@ -393,7 +392,7 @@ function template_not_done()
 			<div class="infobox">
 				', $txt['not_done_reason'], '
 			</div>
-			<form id="autoSubmit" name="autoSubmit" action="', getUrl('action', $context['continue_get_data']), '" method="post" accept-charset="UTF-8" >';
+			<form id="autoSubmit" name="autoSubmit" action="', $scripturl, $context['continue_get_data'], '" method="post" accept-charset="UTF-8" >';
 
 	// Show the progress bars
 	if (!empty($context['continue_percent']))
@@ -440,7 +439,7 @@ function template_show_settings()
 	global $context, $txt;
 
 	echo '
-	<div id="', isset($context['current_subaction']) ? $context['current_subaction'] : 'admincenter', '" class="admincenter">
+	<div id="', $context['current_subaction'] ?? 'admincenter', '" class="admincenter">
 		<form id="admin_form_wrapper" action="', $context['post_url'], '" method="post" accept-charset="UTF-8"', !empty($context['force_form_onsubmit']) ? ' onsubmit="' . $context['force_form_onsubmit'] . '"' : '', '>';
 
 	// Is there a custom title, maybe even with an icon?
@@ -483,7 +482,7 @@ function template_show_settings()
 			}
 
 			// A title, maybe even with an icon or a help icon?
-			if ($config_var['type'] == 'title')
+			if ($config_var['type'] === 'title')
 			{
 				echo
 				(isset($config_var['name']) ? '<a href="#" id="' . $config_var['name'] . '"></a>' : ''), '
@@ -581,19 +580,21 @@ function template_show_settings()
 						<a id="setting_', $config_var['name'], '">';
 				}
 
-				echo '</a><label for="', $config_var['name'], '"', ($config_var['disabled'] ? ' class="disabled"' : $invalid), '>', $config_var['label'], '</label>', $subtext, '
+				echo '
+					</a>
+					<label for="', $config_var['name'], '"', ($config_var['disabled'] ? ' class="disabled"' : $invalid), '>', $config_var['label'], '</label>', $subtext, '
 					</dt>
 					<dd', (!empty($config_var['force_div_id']) ? ' id="' . $config_var['force_div_id'] . '_dd"' : ''), '>',
 				$preinput;
 
 				// Show a check box.
-				if ($config_var['type'] == 'check')
+				if ($config_var['type'] === 'check')
 				{
 					echo '
 						<input type="checkbox"', $javascript, $disabled, ' name="', $config_var['name'], '" id="', $config_var['name'], '"', ($config_var['value'] ? ' checked="checked"' : ''), ' value="1" />';
 				}
 				// Escape (via htmlspecialchars.) the text box.
-				elseif ($config_var['type'] == 'password')
+				elseif ($config_var['type'] === 'password')
 				{
 					echo '
 						<input type="password"', $disabled, $javascript, ' name="', $config_var['name'], '[0]" id="', $config_var['name'], '"', $size, ' value="*#fakepass#*" onfocus="this.value = \'\'; this.form.', $config_var['name'], '_confirm.disabled = false;" class="input_password" />
@@ -605,7 +606,7 @@ function template_show_settings()
 						<input type="password" disabled id="', $config_var['name'], '_confirm" name="', $config_var['name'], '[1]"', $size, ' class="input_password" />';
 				}
 				// Show a selection box.
-				elseif ($config_var['type'] == 'select')
+				elseif ($config_var['type'] === 'select')
 				{
 					echo '
 						<select name="', $config_var['name'], '" id="', $config_var['name'], '" ', $javascript, $disabled, (!empty($config_var['multiple']) ? ' multiple="multiple" class="select_multiple"' : ''), '>';
@@ -629,18 +630,18 @@ function template_show_settings()
 						</select>';
 				}
 				// Text area?
-				elseif ($config_var['type'] == 'large_text')
+				elseif ($config_var['type'] === 'large_text')
 				{
 					echo '
 						<textarea rows="', (!empty($config_var['size']) ? $config_var['size'] : (!empty($config_var['rows']) ? $config_var['rows'] : 4)), '" cols="', (!empty($config_var['cols']) ? $config_var['cols'] : 30), '" name="', $config_var['name'], '" id="', $config_var['name'], '">', $config_var['value'], '</textarea>';
 				}
 				// Permission group?
-				elseif ($config_var['type'] == 'permissions')
+				elseif ($config_var['type'] === 'permissions')
 				{
 					template_inline_permissions($config_var['name']);
 				}
 				// BBC selection?
-				elseif ($config_var['type'] == 'bbc')
+				elseif ($config_var['type'] === 'bbc')
 				{
 					echo '
 						<fieldset id="', $config_var['name'], '">
@@ -667,16 +668,28 @@ function template_show_settings()
 						</fieldset>';
 				}
 				// A simple message?
-				elseif ($config_var['type'] == 'var_message')
+				elseif ($config_var['type'] === 'var_message')
 				{
 					echo '
 						<div', !empty($config_var['name']) ? ' id="' . $config_var['name'] . '"' : '', '>', $config_var['message'], '</div>';
 				}
 				// Color picker?
-				elseif ($config_var['type'] == 'color')
+				elseif ($config_var['type'] === 'color')
 				{
 					echo '
 						<input type="color"', $javascript, $disabled, ' name="', $config_var['name'], '" id="', $config_var['name'], '" value="', $config_var['value'], '"', $size, ' class="input_text" />';
+				}
+				// An integer?
+				elseif ($config_var['type'] === 'int')
+				{
+					echo '
+						<input type="number"', $javascript, $disabled, ' name="', $config_var['name'], '" id="', $config_var['name'], '" value="', $config_var['value'], '"', $size, 'step="', ($config_var['step'] ?? '1'), '" class="input_text" />';
+				}
+				// A Float
+				elseif ($config_var['type'] === 'float')
+				{
+					echo '
+						<input type="number"', $javascript, $disabled, ' name="', $config_var['name'], '" id="', $config_var['name'], '" value="', $config_var['value'], '"', $size, 'step="', ($config_var['step'] ?? '0.1'), '" class="input_text" />';
 				}
 				// Assume it must be a text box.
 				else
@@ -693,7 +706,7 @@ function template_show_settings()
 					</dd>';
 			}
 		}
-		elseif ($config_var == '')
+		elseif ($config_var === '')
 		{
 			// Just show a separator.
 			echo '

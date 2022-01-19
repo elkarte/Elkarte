@@ -21,7 +21,7 @@ use ElkArte\Notifications;
 use ElkArte\NotificationsTask;
 
 /**
- * Class MentionmemMention
+ * Class Mentionmem
  *
  * Handles the mentioning of members (@ member actions)
  */

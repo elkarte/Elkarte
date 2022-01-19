@@ -9,9 +9,14 @@
 
 /**
  * This file contains javascript associated with the :emoji: function as it
- * relates to an sceditor invocation
+ * relates to a sceditor invocation
  */
 var disableDrafts = false;
+
+// I would prefer to use base.getScript via base.init but FireFox (only) throws a deferred exception
+let script = document.createElement('script');
+script.src = elk_theme_url + '/scripts/emoji_tags.js';
+document.body.appendChild(script);
 
 (function (sceditor) {
 	'use strict';
@@ -52,7 +57,7 @@ var disableDrafts = false;
 	};
 
 	/**
-	 * Attach atwho to the passed $element so we create a pull down list
+	 * Attach atwho to the passed $element, so we create a pull down list
 	 *
 	 * @param {object} $element
 	 * @param {object} oIframeWindow
@@ -259,16 +264,16 @@ var disableDrafts = false;
 		 */
 		base.init = function ()
 		{
-			// Grab this instance for use use in oEmoji
+			// Grab this instance for use in oEmoji
 			editor = this;
 
-			// Load the emoji when needed, like now
-			base.getScript(elk_theme_url + '/scripts/emoji_tags.js', function () {
-				if ('console' in window)
-				{
-					window.console.info('Emoji loaded.');
-				}
-			});
+			// Load the emoji when needed, like now (this causes Fx only to throw a deferred exception
+			//base.getScript(elk_theme_url + '/scripts/emoji_tags.js', function () {
+			//	if ('console' in window)
+			//	{
+			//		window.console.info('Emoji loaded.');
+			//	}
+			//});
 		};
 
 		/**

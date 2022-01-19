@@ -356,7 +356,7 @@ class ConstructPageIndex extends AbstractModel
 	 */
 	private function compactContinuation($PageContiguous, $position)
 	{
-		global $settings, $scripturl;
+		global $settings;
 
 		$first = ($this->start + $this->num_per_page * ($PageContiguous + 1));
 		$last = $this->getMaxPages();
@@ -368,7 +368,7 @@ class ConstructPageIndex extends AbstractModel
 			'data-baseurl="' . htmlspecialchars(JavaScriptEscape(
 				strtr($this->flexible_start
 					? $this->base_url
-					: strtr($this->base_url, ['%' => '%%']) . ';start=%1$d', [$scripturl => '']
+					: strtr($this->base_url, ['%' => '%%']) . ';start=%1$d', ['{scripturl}' => '']
 				)
 			), ENT_COMPAT, 'UTF-8') .
 			'" data-perpage="' . $this->num_per_page .

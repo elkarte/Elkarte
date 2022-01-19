@@ -434,11 +434,10 @@ class Notify extends AbstractController
 	public function action_unsubscribe()
 	{
 		// Looks like we need to unsubscribe someone
-		$valid = $this->_validateUnsubscribeToken($member, $area, $extra);
-		if ($valid)
+		if ($this->_validateUnsubscribeToken($member, $area, $extra))
 		{
 			$this->_unsubscribeToggle($member, $area, $extra);
-			$this->_prepareTemplateMessage( $area, $extra, $member['email_address']);
+			$this->_prepareTemplateMessage($area, $extra, $member['email_address']);
 
 			return true;
 		}
@@ -463,7 +462,7 @@ class Notify extends AbstractController
 	{
 		global $user_info, $board, $topic;
 
-		$baseAreas = array('topic', 'board', 'buddy', 'likemsg', 'mentionmem', 'quotedmem', 'rlikemsg');
+		$baseAreas = ['topic', 'board', 'buddy', 'likemsg', 'mentionmem', 'quotedmem', 'rlikemsg'];
 
 		// Not a base method, so an addon will need to process this
 		if (!in_array($area, $baseAreas))
@@ -490,8 +489,7 @@ class Notify extends AbstractController
 			case 'mentionmem':
 			case 'quotedmem':
 			case 'rlikemsg':
-				throw new \Exception('This should no longer happen... in theory');
-// 				$this->_setUserNotificationArea($member['id_member'], $area, 1);
+ 				$this->_setUserEmailNotificationOff($member['id_member'], $area);
 				break;
 		}
 
@@ -499,7 +497,7 @@ class Notify extends AbstractController
 	}
 
 	/**
-	 * Pass unsubscribe information to the appropriate mention class/method
+	 * Pass unsubscribe information to the appropriate "addon" mention class/method
 	 *
 	 * @param mixed[] $member Member info from getBasicMemberData
 	 * @param string $area area they want to be removed from
@@ -509,8 +507,7 @@ class Notify extends AbstractController
 	 */
 	private function _unsubscribeModuleToggle($member, $area, $extra)
 	{
-		Elk_Autoloader::instance()->register(SUBSDIR . '/MentionType', '\\ElkArte\\sources\\subs\\MentionType');
-		$class_name = '\\ElkArte\\sources\\subs\\MentionType\\' . ucwords($area) . '_Mention';
+		$class_name = '\\ElkArte\\Mentions\\MentionType\\Event\\' . ucwords($area);
 
 		if (method_exists($class_name, 'unsubscribe'))
 		{
@@ -539,11 +536,6 @@ class Notify extends AbstractController
 	 */
 	private function _validateUnsubscribeToken(&$member, &$area, &$extra)
 	{
-		// Load all notification types in the system e.g.buddy, likemsg, etc
-		require_once(SUBSDIR . '/ManageFeatures.subs.php');
-		list($potentialAreas,) = getNotificationTypes();
-		$potentialAreas = array_merge($potentialAreas, ['topic', 'board']);
-
 		// Token was passed and matches our expected pattern
 		$token = $this->_req->getQuery('token', 'trim', '');
 		$token = urldecode($token);
@@ -552,9 +544,23 @@ class Notify extends AbstractController
 			return false;
 		}
 
+		// Load all notification types in the system e.g.buddy, likemsg, etc
+		require_once(SUBSDIR . '/ManageFeatures.subs.php');
+		$potentialAreas = [];
+		$notification_classes = getAvailableNotifications();
+		foreach ($notification_classes as $class)
+		{
+			if ($class::canUse() === false)
+			{
+				continue;
+			}
+
+			$potentialAreas[] = strtolower($class::getType());
+		}
+		$potentialAreas = array_merge($potentialAreas, ['topic', 'board']);
+
 		// Expand the token
 		list ($id_member, $hash, $area, $extra, $time) = explode('_', $match[1]);
-		require_once(SUBSDIR . '/Members.subs.php');
 
 		// The area is a known one
 		if (!in_array($area, $potentialAreas))
@@ -569,13 +575,14 @@ class Notify extends AbstractController
 		}
 
 		// Find the claimed member
+		require_once(SUBSDIR . '/Members.subs.php');
 		$member = getBasicMemberData((int) $id_member, array('authentication' => true));
 		if (empty($member))
 		{
 			return false;
 		}
 
-		// Validate its this members token
+		// Validate the token belongs to this member
 		require_once(SUBSDIR . '/Notification.subs.php');
 		return validateNotifierToken(
 			$member['email_address'],
@@ -586,56 +593,38 @@ class Notify extends AbstractController
 	}
 
 	/**
-	 * Used to set a specific mention area to a new value while keeping other
-	 * areas as they are.
+	 * Used to disable email notification of a specific mention area
 	 *
 	 * @param int $memID
 	 * @param string $area buddy, likemsg, mentionmem, quotedmem, rlikemsg
-	 * @param int $value 1=notify 2=immediate email 3=daily email 4=weekly email
-	 * @deprecated - Currently not used (commented out in line 485)
 	 */
-	private function _setUserNotificationArea($memID, $area, $value)
+	private function _setUserEmailNotificationOff($memID, $area)
 	{
 		require_once(SUBSDIR . '/Profile.subs.php');
+		ThemeLoader::loadLanguageFile('Profile');
 
-		$to_save = array();
+		$_POST['notify_submit'] = true;
+
 		foreach (getMemberNotificationsProfile($memID) as $mention => $data)
 		{
-			$to_save[$mention] = 0;
-
-			// The area we are changing
-			if ($mention === $area)
+			foreach ($data['data'] as $type => $method)
 			{
-				// Off is always an option, but if the choice is valid set it
-				if (isset($data['data'][$value]))
-				{
-					$to_save[$mention] = (int) $value;
-				}
+				if ($mention === $area && in_array($type, ['email', 'emaildaily', 'emailweekly']))
+					continue;
 
-				continue;
-			}
-
-			// Some other area, keep the existing choice
-			foreach ($data['data'] as $key => $choice)
-			{
-				if ($choice['enabled'] === true)
-				{
-					$to_save[$mention] = (int) $key;
-
-					break;
-				}
+				if ($method['enabled'])
+					$_POST['notify'][$mention]['status'][] = $method['name'];
 			}
 		}
 
-		saveUserNotificationsPreferences($memID, $to_save);
+		makeNotificationChanges($memID);
 	}
 
 	/**
-	 * Sets the unsubscribe string for template use
+	 * Sets an unsubscribed string for template use
 	 *
 	 * @param string $area
 	 * @param string $extra
-	 * @throws \Elk_Exception
 	 */
 	private function _prepareTemplateMessage($area, $extra, $email)
 	{
@@ -645,8 +634,15 @@ class Notify extends AbstractController
 		{
 			case 'topic':
 				require_once(SUBSDIR . '/Topic.subs.php');
-				$subject = getSubject((int) $extra);
-				$context['unsubscribe_message'] = sprintf($txt['notify_topic_unsubscribed'], $subject, $email);
+				try
+				{
+					$subject = getSubject((int) $extra);
+					$context['unsubscribe_message'] = sprintf($txt['notify_topic_unsubscribed'], $subject, $email);
+				}
+				catch (Exception $e)
+				{
+					$context['unsubscribe_message'] = $txt['notify_default_unsubscribed'];
+				}
 				break;
 			case 'board':
 				require_once(SUBSDIR . '/Boards.subs.php');

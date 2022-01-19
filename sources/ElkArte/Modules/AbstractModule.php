@@ -24,13 +24,17 @@ use ElkArte\UserInfo;
  */
 abstract class AbstractModule implements ModuleInterface
 {
+	/** @var \ElkArte\HttpReq|null Access to post/get data */
 	protected $_req = null;
+
+	/** @var \ElkArte\UserInfo|null User Info ValuesContainer */
 	protected $user = null;
 
 	/**
 	 * AbstractModule constructor.
 	 *
 	 * @param \ElkArte\HttpReq $req
+	 * @param \ElkArte\UserInfo $user
 	 */
 	public function __construct(HttpReq $req, UserInfo $user)
 	{

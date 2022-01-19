@@ -948,6 +948,9 @@ function setBoardIds()
 	});
 }
 
+/**
+ * Expands the ... of the page indexes
+ */
 (function ($)
 {
 	$.fn.expand_pages = function ()
@@ -955,7 +958,7 @@ function setBoardIds()
 		// Used when the user clicks on the ... to expand instead of just a hover expand
 		function expand_pages($element)
 		{
-			var $baseAppend = $($element.closest('.linavPages')),
+			let $baseAppend = $($element.closest('.linavPages')),
 				boxModel = $baseAppend.prev().clone(),
 				aModel = boxModel.find('a').clone(),
 				expandModel = $element.clone(),
@@ -963,7 +966,7 @@ function setBoardIds()
 				firstPage = $element.data('firstpage'),
 				lastPage = $element.data('lastpage'),
 				rawBaseurl = $element.data('baseurl'),
-				baseurl = elk_scripturl + $element.data('baseurl'),
+				baseurl = elk_scripturl + $element.data('baseurl').substring(1, $element.data('baseurl').length -1),
 				first,
 				i = 0,
 				oldLastPage = 0,
@@ -980,7 +983,7 @@ function setBoardIds()
 			for (i = lastPage; i > firstPage; i -= perPage)
 			{
 				/* jshint loopfunc: true */
-				var bElem = aModel.clone(),
+				let bElem = aModel.clone(),
 					boxModelClone = boxModel.clone();
 
 				bElem.attr('href', baseurl.replace('%1$d', i - perPage)).text(i / perPage);
@@ -1004,7 +1007,8 @@ function setBoardIds()
 			{
 				expandModel.on('click', function (e)
 				{
-					var $zhis = $(this);
+					let $zhis = $(this);
+
 					e.preventDefault();
 
 					expand_pages($zhis);
@@ -1026,7 +1030,7 @@ function setBoardIds()
 
 		this.attr('tabindex', 0).on('click', function (e)
 		{
-			var $zhis = $(this);
+			let $zhis = $(this);
 			e.preventDefault();
 
 			expand_pages($zhis);

@@ -350,7 +350,7 @@ class ThemeLoader
 		$_req = HttpReq::instance();
 
 		// The theme was previously set by th (ACP)
-		if (!empty($this->id) && !empty($_req->is_set('th')))
+		if (!empty($this->id) && !empty($_req->isSet('th')))
 		{
 			$this->id = (int) $this->id;
 		}

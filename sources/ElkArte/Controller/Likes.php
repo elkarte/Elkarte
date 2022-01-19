@@ -69,6 +69,7 @@ class Likes extends AbstractController
 		$subActions = array(
 			'likepost' => array($this, 'action_likepost'),
 			'unlikepost' => array($this, 'action_unlikepost'),
+			'likestats' => array($this, 'action_likestats'),
 		);
 
 		// We may or may not like you.
@@ -202,8 +203,7 @@ class Likes extends AbstractController
 	}
 
 	/**
-	 * Liking a post via ajax, then _api will be added to the sa=
-	 * and this method will be called
+	 * Liking a post via ajax
 	 *
 	 * Calls the standard like method and then the api return method
 	 */
@@ -696,20 +696,11 @@ class Likes extends AbstractController
 	 * - Validates whether user is allowed to see stats or not.
 	 * - Decides which tab data to fetch and show to user.
 	 */
-	public function action_index_api()
+	public function action_likestats_api()
 	{
-		global $context, $modSettings;
+		global $context;
 
-		require_once(SUBSDIR . '/Likes.subs.php');
-
-		// Likes are not on, your quest for statistics ends here
-		if (empty($modSettings['likes_enabled']))
-		{
-			throw new Exception('feature_disabled', true);
-		}
-
-		// And you can see the stats
-		isAllowedTo('like_posts_stats');
+		checkSession('get');
 
 		ThemeLoader::loadLanguageFile('LikePosts');
 
@@ -739,7 +730,7 @@ class Likes extends AbstractController
 	 *
 	 * - Validates whether user is allowed to see stats or not.
 	 * - Presents a general page without data that will be fully loaded by API calls.
-	 * - Used when JS is not enabled and data is fulled by page request
+	 * - Used when call is made from the main menu selection
 	 */
 	public function action_likestats()
 	{
@@ -755,6 +746,12 @@ class Likes extends AbstractController
 
 		// Worthy to view like statistics?
 		isAllowedTo('like_posts_stats');
+
+		if ($this->getApi() === 'json')
+		{
+			$this->action_likestats_api();
+			return;
+		}
 
 		// Load the required files
 		ThemeLoader::loadLanguageFile('LikePosts');

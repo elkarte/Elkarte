@@ -11,8 +11,6 @@
  * relates to a plain text box (no sceditor invocation)
  */
 
-/* jshint -W069 */
-
 /**
  * The constructor for the plain text box auto-saver
  *
@@ -25,7 +23,7 @@ function elk_DraftAutoSave(oOptions)
 	this.sCurDraftId = '';
 	this.oCurDraftDiv = null;
 	this.interval_id = null;
-	this.oDraftHandle = document.forms.postmodify["message"];
+	this.oDraftHandle = document.forms.postmodify.message;
 	this.sLastSaved = '';
 	this.bCheckDraft = false;
 
@@ -43,30 +41,36 @@ elk_DraftAutoSave.prototype.init = function ()
 		this.interval_id = setInterval(this.draftSave.bind(this), this.opt.iFreq);
 
 		// Set up the text area events
-		this.oDraftHandle.onblur = this.draftBlur.bind(this);
-		this.oDraftHandle.onfocus = this.draftFocus.bind(this);
+		this.oDraftHandle.instanceRef = this;
+		this.oDraftHandle.onblur = function (oEvent)
+		{
+			return this.instanceRef.draftBlur();
+		};
+		this.oDraftHandle.onfocus = function (oEvent)
+		{
+			return this.instanceRef.draftFocus();
+		};
 		this.oDraftHandle.onkeydown = function (oEvent)
 		{
 			// Don't let tabbing to the buttons trigger autosave event
 			if (oEvent.keyCode === 9)
 			{
-				this.bInDraftMode = true;
+				this.instanceRef.bInDraftMode = true;
 			}
 
-			return this.draftKeypress().bind(this);
-		}.bind(this);
+			return this.instanceRef.draftKeypress();
+		};
 
 		// Prevent autosave when selecting post/save by mouse or keyboard
 		let $_button = $('#postmodify').find('.button_submit');
-		$_button.on('mousedown', this, function ()
+		$_button.on('mousedown', this.oDraftHandle.instanceRef, function ()
 		{
 			this.bInDraftMode = true;
-		}.bind(this));
-
-		$_button.on('onkeypress', this, function ()
+		});
+		$_button.on('onkeypress', this.oDraftHandle.instanceRef, function ()
 		{
 			this.bInDraftMode = true;
-		}.bind(this));
+		});
 	}
 };
 
@@ -102,7 +106,7 @@ elk_DraftAutoSave.prototype.draftFocus = function ()
 {
 	if (this.interval_id === "")
 	{
-		this.interval_id = setInterval(this.draftSave.bind(this), this.opt.iFreq);
+		this.interval_id = setInterval(this.opt.sSelf + '.draftSave();', this.opt.iFreq);
 	}
 };
 
@@ -133,7 +137,7 @@ elk_DraftAutoSave.prototype.draftSave = function ()
 	}
 
 	// Nothing to save?
-	var sPostdata = document.forms.postmodify["message"].value;
+	var sPostdata = document.forms.postmodify.message.value;
 	if (isEmptyText(sPostdata) || !('topic' in document.forms.postmodify.elements))
 	{
 		return false;
@@ -145,11 +149,11 @@ elk_DraftAutoSave.prototype.draftSave = function ()
 
 	// Get the form elements that we want to save
 	var aSections = [
-		'topic=' + parseInt(document.forms.postmodify.elements['topic'].value),
-		'id_draft=' + (('id_draft' in document.forms.postmodify.elements) ? parseInt(document.forms.postmodify.elements['id_draft'].value) : 0),
-		'subject=' + document.forms.postmodify['subject'].value.replace(/&#/g, "&#38;#").php_urlencode(),
+		'topic=' + parseInt(document.forms.postmodify.elements.topic.value),
+		'id_draft=' + (('id_draft' in document.forms.postmodify.elements) ? parseInt(document.forms.postmodify.elements.id_draft.value) : 0),
+		'subject=' + document.forms.postmodify.subject.value.replace(/&#/g, "&#38;#").php_urlencode(),
 		'message=' + sPostdata.replace(/&#/g, "&#38;#").php_urlencode(),
-		'icon=' + document.forms.postmodify['icon'].value.replace(/&#/g, "&#38;#").php_urlencode(),
+		'icon=' + document.forms.postmodify.icon.value.replace(/&#/g, "&#38;#").php_urlencode(),
 		'save_draft=true',
 		'autosave=true',
 		elk_session_var + '=' + elk_session_id

@@ -50,7 +50,7 @@ class UserNotification extends AbstractModel
 	 * Construct, Load the language file and make db/user info available to the class
 	 *
 	 * @param \ElkArte\Database\QueryInterface $db
-	 * @param \ElkArte\UserInfo|null $user
+	 * @param \ElkArte\UserInfo|\ElkArte\ValuesContainer $user
 	 */
 	public function __construct($db, $user)
 	{
@@ -157,6 +157,7 @@ class UserNotification extends AbstractModel
 		{
 			$types[$val] = $txt['usernotif_favicon_shape_' . $val];
 		}
+
 		$positions = array();
 		foreach ($this->_valid_positions as $val)
 		{
@@ -167,19 +168,11 @@ class UserNotification extends AbstractModel
 			array('title', 'usernotif_title'),
 			array('check', 'usernotif_desktop_enable'),
 			array('check', 'usernotif_favicon_enable'),
+			array('select', 'usernotif_favicon_type', $types),
+			array('select', 'usernotif_favicon_position', $positions),
+			array('color', 'usernotif_favicon_bgColor'),
+			array('color', 'usernotif_favicon_textColor'),
 		);
-		$config_vars[] = array(
-			'select',
-			'usernotif_favicon_type',
-			$types
-		);
-		$config_vars[] = array(
-			'select',
-			'usernotif_favicon_position',
-			$positions
-		);
-		$config_vars[] = array('color', 'usernotif_favicon_bgColor');
-		$config_vars[] = array('color', 'usernotif_favicon_textColor');
 
 		return $config_vars;
 	}

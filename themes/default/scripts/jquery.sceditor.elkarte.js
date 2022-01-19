@@ -17,17 +17,17 @@ const itemCodes = ["*:disc", "@:disc", "+:square", "x:square", "#:decimal", "0:d
 	var extensionMethods = {
 		addEvent: function (id, event, func)
 		{
-			var current_event = event,
+			let current_event = event,
 				$_id = $('#' + id);
 
 			$_id.parent().on(current_event, 'textarea', func);
 
-			var oIframe = $_id.parent().find('iframe')[0],
+			let oIframe = $_id.parent().find('iframe')[0],
 				oIframeWindow = oIframe.contentWindow;
 
 			if (oIframeWindow !== null && oIframeWindow.document)
 			{
-				var oIframeDoc = oIframeWindow.document,
+				let oIframeDoc = oIframeWindow.document,
 					oIframeBody = oIframeDoc.body;
 
 				$(oIframeBody).on(current_event, func);
@@ -171,7 +171,7 @@ const itemCodes = ["*:disc", "@:disc", "+:square", "x:square", "#:decimal", "0:d
 			let currentNode = this.currentNode(),
 				currentRange = this.getRangeHelper();
 
-			if (currentRange.selectedRange())
+			if (currentRange.selectedRange() && typeof currentRange.selectedRange() !== 'undefined')
 			{
 				let end = currentRange.selectedRange().startOffset,
 					text = typeof currentNode !== 'undefined' ? currentNode.textContent : '';
@@ -256,8 +256,8 @@ const itemCodes = ["*:disc", "@:disc", "+:square", "x:square", "#:decimal", "0:d
 		 * @returns {boolean}
 		 */
 		checkRemoveFormat: function(tag) {
-			let range = this.getRangeHelper();
-			let selected = range.selectedRange();
+			let range = this.getRangeHelper(),
+				selected = range.selectedRange();
 
 			if (selected.startOffset !== selected.endOffset)
 			{
@@ -399,7 +399,7 @@ sceditor.command
 		{
 			if (typeof this.checkInsideSourceTag === 'function')
 			{
-				this.checkInsideSourceTag('spoiler');
+				return this.checkInsideSourceTag('spoiler');
 			}
 		},
 		exec: function ()
@@ -414,7 +414,7 @@ sceditor.command
 		{
 			if (typeof this.checkInsideSourceTag === 'function')
 			{
-				this.checkInsideSourceTag('footnote');
+				return this.checkInsideSourceTag('footnote');
 			}
 		},
 		exec: function ()
