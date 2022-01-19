@@ -18,7 +18,6 @@ use ElkArte\XmlArray;
  * Removes the given language from all members..
  *
  * @param int $lang_id
- * @throws \ElkArte\Exceptions\Exception
  * @package Languages
  */
 function removeLanguageFromMember($lang_id)
@@ -442,7 +441,6 @@ function list_getLanguagesList()
  * @param string $lang
  *
  * @return array|bool
- * @throws \ElkArte\Exceptions\Exception
  */
 function findPossiblePackages($lang)
 {

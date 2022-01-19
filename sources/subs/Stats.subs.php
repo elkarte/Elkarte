@@ -26,7 +26,6 @@ use ElkArte\User;
  * Return the number of currently online members.
  *
  * @return double
- * @throws \ElkArte\Exceptions\Exception
  */
 function onlineCount()
 {
@@ -50,7 +49,6 @@ function onlineCount()
  * - Can be used (and is) with days up value to generate averages.
  *
  * @return array
- * @throws \ElkArte\Exceptions\Exception
  */
 function getAverages()
 {
@@ -73,7 +71,6 @@ function getAverages()
  * Get the count of categories
  *
  * @return int
- * @throws \ElkArte\Exceptions\Exception
  */
 function numCategories()
 {
@@ -96,7 +93,6 @@ function numCategories()
  *
  * @param int $date
  * @return int
- * @throws \ElkArte\Exceptions\Exception
  */
 function mostOnline($date)
 {
@@ -125,7 +121,6 @@ function mostOnline($date)
  *
  * @param int|null $limit if empty defaults to 10
  * @return array
- * @throws \Exception
  */
 function topPosters($limit = null)
 {
@@ -195,7 +190,6 @@ function topPosters($limit = null)
  * @param int|null $limit if not supplied, defaults to 10
  * @param bool $read_status
  * @return array
- * @throws \Exception
  */
 function topBoards($limit = null, $read_status = false)
 {
@@ -276,7 +270,6 @@ function topBoards($limit = null, $read_status = false)
  *
  * @param int $limit if not supplied, defaults to 10
  * @return array
- * @throws \Exception
  */
 function topTopicReplies($limit = 10)
 {
@@ -357,7 +350,6 @@ function topTopicReplies($limit = 10)
  *
  * @param int|null $limit if not supplied, defaults to 10
  * @return array
- * @throws \Exception
  */
 function topTopicViews($limit = null)
 {
@@ -462,7 +454,6 @@ function topTopicViews($limit = null)
  * - x is configurable via $modSettings['stats_limit'].
  *
  * @return array
- * @throws \Exception
  */
 function topTopicStarter()
 {
@@ -541,7 +532,6 @@ function topTopicStarter()
  * - x is configurable via $modSettings['stats_limit'], defaults to 10
  *
  * @return array
- * @throws \ElkArte\Exceptions\Exception
  */
 function topTimeOnline()
 {
@@ -710,7 +700,6 @@ function monthlyActivity()
  *
  * @param string $condition_string
  * @param mixed[] $condition_parameters = array()
- * @throws \Exception
  */
 function getDailyStats($condition_string, $condition_parameters = array())
 {
@@ -751,7 +740,6 @@ function getDailyStats($condition_string, $condition_parameters = array())
  * @param int $memID
  *
  * @return int
- * @throws \ElkArte\Exceptions\Exception
  */
 function UserStatsTopicsStarted($memID)
 {
@@ -786,7 +774,6 @@ function UserStatsTopicsStarted($memID)
  * @param int $memID
  *
  * @return int
- * @throws \ElkArte\Exceptions\Exception
  */
 function UserStatsPollsStarted($memID)
 {
@@ -821,7 +808,6 @@ function UserStatsPollsStarted($memID)
  * @param int $memID
  *
  * @return int
- * @throws \ElkArte\Exceptions\Exception
  */
 function UserStatsPollsVoted($memID)
 {
@@ -852,7 +838,6 @@ function UserStatsPollsVoted($memID)
  * @param int $limit
  *
  * @return array
- * @throws \Exception
  */
 function UserStatsMostPostedBoard($memID, $limit = 10)
 {
@@ -906,7 +891,6 @@ function UserStatsMostPostedBoard($memID, $limit = 10)
  * @param int $limit
  *
  * @return array
- * @throws \ElkArte\Exceptions\Exception
  */
 function UserStatsMostActiveBoard($memID, $limit = 10)
 {
@@ -965,7 +949,6 @@ function UserStatsMostActiveBoard($memID, $limit = 10)
  * @param int $memID
  *
  * @return array
- * @throws \ElkArte\Exceptions\Exception
  */
 function UserStatsPostingTime($memID)
 {

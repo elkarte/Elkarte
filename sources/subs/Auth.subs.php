@@ -194,7 +194,6 @@ function url_parts($local, $global)
  *   wanted if their password is correct, otherwise they can try again.
  *
  * @param string $type = 'admin'
- * @throws \ElkArte\Exceptions\Exception
  * @package Authorization
  */
 function adminLogin($type = 'admin')
@@ -352,7 +351,6 @@ function construct_query_string($get)
  * @param bool $buddies_only = false,
  * @param int $max = 500 retrieves a maximum of max members, if passed
  * @return array containing information about the matching members
- * @throws \ElkArte\Exceptions\Exception
  * @package Authorization
  */
 function findMembers($names, $use_wildcards = false, $buddies_only = false, $max = 500)
@@ -541,7 +539,6 @@ function resetPassword($memID, $username = null)
  * @param bool $check_reserved_name
  * @param bool $fatal pass through to isReservedName
  * @return string
- * @throws \ElkArte\Exceptions\Exception
  * @package Authorization
  */
 function validateUsername($memID, $username, $ErrorContext = 'register', $check_reserved_name = true, $fatal = true)
@@ -888,7 +885,6 @@ function findUser($where, $where_params, $fatal = true)
  * @param string $email
  * @param string|null $username
  * @return false|int on failure, int of member on success
- * @throws \Exception
  * @package Authorization
  */
 function userByEmail($email, $username = null)
@@ -938,7 +934,6 @@ function generateValidationCode($length = 10)
  * @param string $name
  * @param bool $is_id if true it treats $name as a member ID and try to load the data for that ID
  * @return mixed[]|false false if nothing is found
- * @throws \Exception
  * @package Authorization
  */
 function loadExistingMember($name, $is_id = false)

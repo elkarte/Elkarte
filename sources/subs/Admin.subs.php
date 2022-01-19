@@ -27,7 +27,6 @@ use ElkArte\User;
  *
  * @return array
  * @package Admin
- * @throws \ImagickException
  */
 function getServerVersions($checkFor)
 {
@@ -447,7 +446,6 @@ function updateAdminPreferences()
  * @param string $template
  * @param mixed[] $replacements
  * @param int[] $additional_recipients
- * @throws \ElkArte\Exceptions\Exception
  * @package Admin
  */
 function emailAdmins($template, $replacements = array(), $additional_recipients = array())
@@ -534,7 +532,6 @@ function emailAdmins($template, $replacements = array(), $additional_recipients 
  * @param bool $value the "new" status of the profile fields
  * (true => enabled, false => disabled)
  * @package Admin
- * @throws \ElkArte\Exceptions\Exception
  */
 function custom_profiles_toggle_callback($value)
 {
@@ -604,7 +601,6 @@ function postbyemail_toggle_callback($value)
  * @param string[] $controllers list of controllers on which the module is
  *                 activated
  * @package Admin
- * @throws \ElkArte\Exceptions\Exception
  */
 function enableModules($module, $controllers)
 {
@@ -634,7 +630,6 @@ function enableModules($module, $controllers)
  * @param string[] $controllers list of controllers on which the module is
  *                 activated
  * @package Admin
- * @throws \ElkArte\Exceptions\Exception
  */
 function disableModules($module, $controllers)
 {

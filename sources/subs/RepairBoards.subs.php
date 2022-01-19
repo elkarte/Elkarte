@@ -1270,6 +1270,8 @@ function loadForumTests()
 /**
  * Create a salvage area for repair purposes, if one doesn't already exist.
  * Uses the forum's default language, and checks based on that name.
+ *
+ * @throws \ElkArte\Exceptions\Exception salvaged_board_error
  */
 function createSalvageBoard()
 {
@@ -1333,6 +1335,8 @@ function createSalvageBoard()
 /**
  * Create a salvage area for repair purposes, if one doesn't already exist.
  * Uses the forum's default language, and checks based on that name.
+ *
+ * @throws \ElkArte\Exceptions\Exception salvaged_category_error
  */
 function createSalvageCategory()
 {
@@ -1401,7 +1405,6 @@ function createSalvageCategory()
  * @param string $current_step_description
  * @param int $max_substep = none
  * @param bool $force = false
- * @throws \ElkArte\Exceptions\Exception
  */
 function pauseRepairProcess($to_fix, $current_step_description, $max_substep = 0, $force = false)
 {
@@ -1461,7 +1464,6 @@ function pauseRepairProcess($to_fix, $current_step_description, $max_substep = 0
  *
  * @param bool $do_fix
  * @return mixed[]
- * @throws \ElkArte\Exceptions\Exception
  */
 function findForumErrors($do_fix = false)
 {

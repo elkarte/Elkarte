@@ -56,7 +56,6 @@ function getNews()
  * - Only get the ones that can't login to turn off notification.
  *
  * @return array
- * @throws \Exception
  * @package News
  */
 function excludeBannedMembers()
@@ -128,7 +127,6 @@ function excludeBannedMembers()
  * Get a list of our local board moderators.
  *
  * @return array
- * @throws \Exception
  * @package News
  */
 function getModerators()
@@ -164,7 +162,6 @@ function getModerators()
  * @param int $increment
  * @param int $counter
  * @return array
- * @throws \Exception
  * @package News
  */
 function getNewsletterRecipients($sendQuery, $sendParams, $start, $increment, $counter)
@@ -212,7 +209,6 @@ function getNewsletterRecipients($sendQuery, $sendParams, $start, $increment, $c
  * @param int $limit
  *
  * @return array
- * @throws \ElkArte\Exceptions\Exception
  * @package News
  *
  */
@@ -293,7 +289,6 @@ function getXMLNews($query_this_board, $board, $limit)
  * @param int $limit
  *
  * @return array
- * @throws \ElkArte\Exceptions\Exception
  * @package News
  *
  */

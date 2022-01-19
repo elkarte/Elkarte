@@ -30,7 +30,6 @@ use ElkArte\Util;
  *
  * @param int[]|int $groups
  * @return bool
- * @throws \ElkArte\Exceptions\Exception
  * @package Membergroups
  */
 function deleteMembergroups($groups)
@@ -239,7 +238,6 @@ function deleteMembergroups($groups)
  * @param bool $permissionCheckDone = false
  *
  * @return bool
- * @throws \ElkArte\Exceptions\Exception
  * @package Membergroups
  */
 function removeMembersFromGroups($members, $groups = null, $permissionCheckDone = false)
@@ -484,7 +482,6 @@ function removeMembersFromGroups($members, $groups = null, $permissionCheckDone 
  *                     available. If not, assign it to the additional group.
  * @param bool $permissionCheckDone = false if true, it checks permission of the current user to add groups ('manage_membergroups')
  * @return bool success or failure
- * @throws \ElkArte\Exceptions\Exception
  * @package Membergroups
  */
 function addMembersToGroup($members, $group, $type = 'auto', $permissionCheckDone = false)
@@ -618,7 +615,6 @@ function addMembersToGroup($members, $group, $type = 'auto', $permissionCheckDon
  * @param int $membergroup
  * @param int|null $limit = null
  * @return bool
- * @throws \Exception
  * @package Membergroups
  */
 function listMembergroupMembers_Href(&$members, $membergroup, $limit = null)
@@ -704,7 +700,6 @@ function cache_getMembergroupList()
  * @param int|null $pid - profile id
  *
  * @return array
- * @throws \Exception
  * @package Membergroups
  *
  */
@@ -937,7 +932,6 @@ function list_getMembergroups($start, $items_per_page, $sort, $membergroup_type,
  * @param bool $include_moderators if true, includes board moderators too (default false).
  * @param bool $include_non_active if true, includes non active members (default false).
  * @return array
- * @throws \ElkArte\Exceptions\Exception
  * @package Membergroups
  */
 function membersInGroups($postGroups, $normalGroups = array(), $include_hidden = false, $include_moderators = false, $include_non_active = false)
@@ -1048,7 +1042,6 @@ function membersInGroups($postGroups, $normalGroups = array(), $include_hidden =
  *     true adds to above: description, min_posts, online_color, max_messages, icons, hidden, id_parent.
  * @param bool $assignable = false determine if the group is assignable or not and return that information.
  * @return array
- * @throws \Exception
  * @package Membergroups
  */
 function membergroupsById($group_ids, $limit = 1, $detailed = false, $assignable = false)
@@ -1096,7 +1089,6 @@ function membergroupsById($group_ids, $limit = 1, $detailed = false, $assignable
  * @param bool $assignable
  *
  * @return bool|mixed
- * @throws \Exception
  * @package Membergroups
  *
  */
@@ -1132,7 +1124,6 @@ function membergroupById($group_id, $detailed = false, $assignable = false)
  * @param string|null $sort_order
  * @param bool|null $split splits postgroups and membergroups
  * @return array
- * @throws \ElkArte\Exceptions\Exception
  * @package Membergroups
  */
 function getBasicMembergroupData($includes = array(), $excludes = array(), $sort_order = null, $split = null)
@@ -1276,7 +1267,6 @@ function getBasicMembergroupData($includes = array(), $excludes = array(), $sort
  *
  * @param int[] $groupList
  * @return array with ('id', 'name', 'member_count')
- * @throws \Exception
  * @package Membergroups
  */
 function getGroups($groupList)
@@ -1323,7 +1313,6 @@ function getGroups($groupList)
  * Gets the last assigned group id.
  *
  * @return int $id_group
- * @throws \ElkArte\Exceptions\Exception
  * @package Membergroups
  */
 function getMaxGroupID()
@@ -1348,7 +1337,6 @@ function getMaxGroupID()
  * @param string $groupname
  * @param int $minposts
  * @param string $type
- * @throws \Exception
  * @package Membergroups
  */
 function createMembergroup($groupname, $minposts, $type)
@@ -1377,7 +1365,6 @@ function createMembergroup($groupname, $minposts, $type)
  * @param int $id_group
  * @param int $copy_from
  * @param string[]|null $illegal_permissions
- * @throws \Exception
  * @todo another function with the same name in ManagePermissions.subs.php
  * @package Membergroups
  */
@@ -1420,7 +1407,6 @@ function copyPermissions($id_group, $copy_from, $illegal_permissions)
  *
  * @param int $id_group
  * @param int $copy_from
- * @throws \Exception
  * @package Membergroups
  */
 function copyBoardPermissions($id_group, $copy_from)
@@ -1457,7 +1443,6 @@ function copyBoardPermissions($id_group, $copy_from)
  *
  * @param int $id_group
  * @param int $copy_from
- * @throws \ElkArte\Exceptions\Exception
  * @package Membergroups
  */
 function updateCopiedGroup($id_group, $copy_from)
@@ -1489,7 +1474,6 @@ function updateCopiedGroup($id_group, $copy_from)
  *
  * @param int $id_group
  * @param int $copy_id
- * @throws \ElkArte\Exceptions\Exception
  * @package Membergroups
  */
 function updateInheritedGroup($id_group, $copy_id)
@@ -1514,7 +1498,6 @@ function updateInheritedGroup($id_group, $copy_id)
  * the group to update. The rest of the keys are details to update it with.
  *
  * @param mixed[] $properties
- * @throws \ElkArte\Exceptions\Exception
  * @package Membergroups
  */
 function updateMembergroupProperties($properties)
@@ -1570,7 +1553,6 @@ function updateMembergroupProperties($properties)
  * @param int $id_group
  * @param mixed[] $boards
  * @param string $access_list ('allow', 'deny')
- * @throws \Exception
  * @package Membergroups
  */
 function detachGroupFromBoards($id_group, $boards, $access_list)
@@ -1612,7 +1594,6 @@ function detachGroupFromBoards($id_group, $boards, $access_list)
  * @param int $id_group
  * @param mixed[] $boards
  * @param string $access_list ('allow', 'deny')
- * @throws \ElkArte\Exceptions\Exception
  * @package Membergroups
  */
 function assignGroupToBoards($id_group, $boards, $access_list)
@@ -1639,7 +1620,6 @@ function assignGroupToBoards($id_group, $boards, $access_list)
  * Membergroup was deleted? We need to detach that group from our members, too...
  *
  * @param int $id_group
- * @throws \ElkArte\Exceptions\Exception
  * @package Membergroups
  */
 function detachDeletedGroupFromMembers($id_group)
@@ -1684,7 +1664,6 @@ function detachDeletedGroupFromMembers($id_group)
  * Make the given group hidden. Hidden groups are stored in the additional_groups.
  *
  * @param int $id_group
- * @throws \ElkArte\Exceptions\Exception
  * @package Membergroups
  */
 function setGroupToHidden($id_group)
@@ -1760,7 +1739,6 @@ function validateShowGroupMembership()
  * Detaches group moderators from a deleted group.
  *
  * @param int $id_group
- * @throws \ElkArte\Exceptions\Exception
  * @package Membergroups
  */
 function detachGroupModerators($id_group)
@@ -1782,7 +1760,6 @@ function detachGroupModerators($id_group)
  * @param string[] $moderators
  *
  * @return int[]
- * @throws \Exception
  * @package Membergroups
  */
 function getIDMemberFromGroupModerators($moderators)
@@ -1810,7 +1787,6 @@ function getIDMemberFromGroupModerators($moderators)
  *
  * @param int $id_group
  * @param int[] $group_moderators
- * @throws \Exception
  * @package Membergroups
  */
 function assignGroupModerators($id_group, $group_moderators)
@@ -1836,7 +1812,6 @@ function assignGroupModerators($id_group, $group_moderators)
  *
  * @param int $id_group
  * @return array moderators as array(id => name)
- * @throws \Exception
  * @package Membergroups
  */
 function getGroupModerators($id_group)
@@ -1870,7 +1845,6 @@ function getGroupModerators($id_group)
  *
  * @param int|bool $id_group
  * @return array
- * @throws \ElkArte\Exceptions\Exception
  * @package Membergroups
  */
 function getInheritableGroups($id_group = false)
@@ -1910,7 +1884,6 @@ function getInheritableGroups($id_group = false)
  * List all membergroups and prepares them to assign permissions to..
  *
  * @return array
- * @throws \Exception
  * @package Membergroups
  */
 function prepareMembergroupPermissions()
@@ -1989,7 +1962,6 @@ function prepareMembergroupPermissions()
  * @param int $min_posts minimum number of posts for the group (-1 for non-post based groups)
  *
  * @return array
- * @throws \Exception
  * @package Membergroups
  */
 function loadGroups($id_member, $show_hidden = false, $min_posts = -1)
@@ -2034,7 +2006,6 @@ function loadGroups($id_member, $show_hidden = false, $min_posts = -1)
  * - does not include post count based groups
  *
  * @return array
- * @throws \Exception
  * @package Membergroups
  */
 function accessibleGroups()
@@ -2079,7 +2050,6 @@ function accessibleGroups()
  * @param string $where
  * @param string[] $where_parameters
  * @return int the count of group requests
- * @throws \ElkArte\Exceptions\Exception
  * @package Membergroups
  */
 function list_getGroupRequestCount($where, $where_parameters)
@@ -2116,7 +2086,6 @@ function list_getGroupRequestCount($where, $where_parameters)
  *   'group_link'
  *   'reason'
  *   'time_submitted'
- * @throws \Exception
  * @package Membergroups
  */
 function list_getGroupRequests($start, $items_per_page, $sort, $where, $where_parameters)
@@ -2153,7 +2122,6 @@ function list_getGroupRequests($start, $items_per_page, $sort, $where, $where_pa
  * Deletes old group requests.
  *
  * @param int[] $groups
- * @throws \ElkArte\Exceptions\Exception
  * @package Membergroups
  */
 function deleteGroupRequests($groups)
@@ -2176,7 +2144,6 @@ function deleteGroupRequests($groups)
  *
  * @param int[]|null $members = null The members to update, null if all
  * @param string[]|null $parameter2 = null
- * @throws \ElkArte\Exceptions\Exception
  * @package Membergroups
  */
 function updatePostGroupStats($members = null, $parameter2 = null)
@@ -2248,7 +2215,6 @@ function updatePostGroupStats($members = null, $parameter2 = null)
  *
  * @param bool $ignore_protected To ignore protected groups
  * @return int[]
- * @throws \Exception
  */
 function getUnassignableGroups($ignore_protected)
 {
@@ -2276,7 +2242,6 @@ function getUnassignableGroups($ignore_protected)
  * Returns a list of groups that a member can be assigned to
  *
  * @return array
- * @throws \ElkArte\Exceptions\Exception
  */
 function getGroupsList()
 {

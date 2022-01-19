@@ -69,7 +69,6 @@ use ElkArte\Menu\Menu;
  *     - default_include_dir       => directory to include for function support
  *
  * @return array
- * @throws \ElkArte\Exceptions\Exception
  */
 function createMenu($menuData, $menuOptions = [])
 {
@@ -146,7 +145,6 @@ function destroyMenu($menu_id = 'last')
  * developers don't remove this until 3.0-dev
  *
  * @param array $selectedMenu
- * @throws \ElkArte\Exceptions\Exception
  */
 function callMenu($selectedMenu)
 {
@@ -162,7 +160,6 @@ function callMenu($selectedMenu)
  * Loads up all the default menu entries available.
  *
  * @return array
- * @throws \ElkArte\Exceptions\Exception
  */
 function loadDefaultMenuButtons()
 {

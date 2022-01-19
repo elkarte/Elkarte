@@ -23,7 +23,6 @@ use ElkArte\Util;
  *
  * @param int $start_member
  * @return array
- * @throws \Exception
  */
 function getSignatureFromMembers($start_member)
 {
@@ -67,7 +66,6 @@ function updateSignature($id_member, $signature)
  * Update all signatures given a new set of constraints
  *
  * @param int $applied_sigs
- * @throws \ElkArte\Exceptions\Exception
  */
 function updateAllSignatures($applied_sigs)
 {
@@ -362,7 +360,6 @@ function updateAllSignatures($applied_sigs)
  * @param bool $standardFields
  *
  * @return array
- * @throws \Exception
  */
 function list_getProfileFields($start, $items_per_page, $sort, $standardFields)
 {
@@ -438,7 +435,6 @@ function list_getProfileFieldSize()
  *
  * @param int $id_field
  * @return array $field
- * @throws \Exception
  */
 function getProfileField($id_field)
 {
@@ -498,7 +494,6 @@ function getProfileField($id_field)
  * @param string $initial_colname
  * @param bool $unique
  * @return bool
- * @throws \ElkArte\Exceptions\Exception
  */
 function ensureUniqueProfileField($colname, $initial_colname, $unique = false)
 {
@@ -537,7 +532,6 @@ function ensureUniqueProfileField($colname, $initial_colname, $unique = false)
  * @param mixed[] $newOptions
  * @param string $name
  * @param string $option
- * @throws \ElkArte\Exceptions\Exception
  */
 function updateRenamedProfileField($key, $newOptions, $name, $option)
 {
@@ -562,7 +556,6 @@ function updateRenamedProfileField($key, $newOptions, $name, $option)
  * Update the custom profile fields active status on/off
  *
  * @param int[] $enabled
- * @throws \ElkArte\Exceptions\Exception
  */
 function updateRenamedProfileStatus($enabled)
 {
@@ -582,7 +575,6 @@ function updateRenamedProfileStatus($enabled)
  * Update the profile field
  *
  * @param mixed[] $field_data
- * @throws \ElkArte\Exceptions\Exception
  */
 function updateProfileField($field_data)
 {
@@ -632,7 +624,6 @@ function updateProfileField($field_data)
  * Done as a CASE WHEN one two three ELSE 0 END in place of many updates
  *
  * @param string $replace constructed as WHEN fieldname=value THEN new viewvalue WHEN .....
- * @throws \ElkArte\Exceptions\Exception
  */
 function updateProfileFieldOrder($replace)
 {
@@ -650,7 +641,6 @@ function updateProfileFieldOrder($replace)
  *
  * @param string[] $newOptions
  * @param string $fieldname
- * @throws \ElkArte\Exceptions\Exception
  */
 function deleteOldProfileFieldSelects($newOptions, $fieldname)
 {
@@ -673,7 +663,6 @@ function deleteOldProfileFieldSelects($newOptions, $fieldname)
  * Used to add a new custom profile field
  *
  * @param mixed[] $field
- * @throws \Exception
  */
 function addProfileField($field)
 {
@@ -705,7 +694,6 @@ function addProfileField($field)
  * Delete all user data for a specified custom profile field
  *
  * @param string $name
- * @throws \ElkArte\Exceptions\Exception
  */
 function deleteProfileFieldUserData($name)
 {
@@ -727,7 +715,6 @@ function deleteProfileFieldUserData($name)
  * Deletes a custom profile field.
  *
  * @param int $id
- * @throws \ElkArte\Exceptions\Exception
  */
 function deleteProfileField($id)
 {
@@ -938,7 +925,6 @@ function scanFileSystemForControllers($iterator, $namespace = '')
  *
  * @param int $applied_sigs
  * @param int $sig_start
- * @throws \ElkArte\Exceptions\Exception
  * @todo Merge with other pause functions?
  *    pausePermsSave(), pauseAttachmentMaintenance(), pauseRepairProcess()
  *

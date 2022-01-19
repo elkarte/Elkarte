@@ -68,7 +68,6 @@ function fetchMessageIconsDetails()
  * Delete a message icon.
  *
  * @param int[] $icons
- * @throws \ElkArte\Exceptions\Exception
  */
 function deleteMessageIcons($icons)
 {
@@ -88,7 +87,6 @@ function deleteMessageIcons($icons)
  * Updates a message icon.
  *
  * @param mixed[] $icon array of values to use in the $db->insert
- * @throws \Exception
  */
 function updateMessageIcon($icon)
 {
@@ -106,7 +104,6 @@ function updateMessageIcon($icon)
  * Adds a new message icon.
  *
  * @param mixed[] $icon associative array to use in the insert
- * @throws \Exception
  */
 function addMessageIcon($icon)
 {
@@ -129,7 +126,6 @@ function addMessageIcon($icon)
  *
  * @param int $board_id
  * @return array
- * @throws \Exception
  */
 function getMessageIcons($board_id)
 {

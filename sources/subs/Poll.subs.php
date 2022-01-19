@@ -46,7 +46,6 @@ function associatedPoll($topicID, $pollID = null)
  * Remove a poll.
  *
  * @param int[]|int $pollID The id of the poll to remove
- * @throws \ElkArte\Exceptions\Exception
  */
 function removePoll($pollID)
 {
@@ -86,7 +85,6 @@ function removePoll($pollID)
  * Reset votes for the poll.
  *
  * @param int $pollID The ID of the poll to reset the votes on
- * @throws \ElkArte\Exceptions\Exception
  */
 function resetVotes($pollID)
 {
@@ -136,7 +134,6 @@ function resetVotes($pollID)
  *             This param is currently used only in SSI, it may be useful in any
  *             kind of integration
  * @return array|false array of poll information, or false if no poll is found
- * @throws \ElkArte\Exceptions\Exception
  */
 function pollInfo($id_poll, $ignore_permissions = true)
 {
@@ -209,7 +206,6 @@ function pollInfo($id_poll, $ignore_permissions = true)
  * @param int $topicID the topic with an associated poll.
  *
  * @return string[]|bool
- * @throws \ElkArte\Exceptions\Exception
  */
 function pollInfoForTopic($topicID)
 {
@@ -249,7 +245,6 @@ function pollInfoForTopic($topicID)
  *
  * @param int $pollID the topic with an associated poll.
  * @return array the topic id and the board id, false if no topics found
- * @throws \ElkArte\Exceptions\Exception
  */
 function topicFromPoll($pollID)
 {
@@ -298,7 +293,6 @@ function topicFromPoll($pollID)
  * @param int $id_member The id of the member
  *
  * @return array
- * @throws \Exception
  */
 function pollOptionsForMember($id_poll, $id_member)
 {
@@ -335,7 +329,6 @@ function pollOptionsForMember($id_poll, $id_member)
  * @param int $id_poll The id of the poll to load its options
  *
  * @return array
- * @throws \Exception
  */
 function pollOptions($id_poll)
 {
@@ -373,7 +366,6 @@ function pollOptions($id_poll)
  * @param int $can_guest_vote = 0 If guests can vote
  * @param mixed[] $options = array() The poll options
  * @return int the id of the created poll
- * @throws \Exception
  */
 function createPoll($question, $id_member, $poster_name, $max_votes = 1, $hide_results = 1, $expire = 0, $can_change_vote = 0, $can_guest_vote = 0, array $options = array())
 {
@@ -415,7 +407,6 @@ function createPoll($question, $id_member, $poster_name, $max_votes = 1, $hide_r
  * @param int $expire = 0 The time in days that this poll will expire
  * @param int $can_change_vote = 0 If you can change your vote
  * @param int $can_guest_vote = 0 If guests can vote
- * @throws \ElkArte\Exceptions\Exception
  */
 function modifyPoll($id_poll, $question, $max_votes = 1, $hide_results = 1, $expire = 0, $can_change_vote = 0, $can_guest_vote = 0)
 {
@@ -449,7 +440,6 @@ function modifyPoll($id_poll, $question, $max_votes = 1, $hide_results = 1, $exp
  *
  * @param int $id_poll The id of the poll you're adding the options to
  * @param mixed[] $options The options to choose from
- * @throws \Exception
  */
 function addPollOptions($id_poll, array $options)
 {
@@ -473,7 +463,6 @@ function addPollOptions($id_poll, array $options)
  * Insert some options to an already created poll
  *
  * @param mixed[] $options An array holding the poll choices
- * @throws \Exception
  */
 function insertPollOptions($options)
 {
@@ -493,7 +482,6 @@ function insertPollOptions($options)
  * Add a single option to an already created poll
  *
  * @param mixed[] $options An array holding the poll choices
- * @throws \ElkArte\Exceptions\Exception
  */
 function modifyPollOption($options)
 {
@@ -521,7 +509,6 @@ function modifyPollOption($options)
  *
  * @param int $id_poll The id of the poll you're deleting the options from
  * @param int[] $id_options An array holding the choice id
- * @throws \ElkArte\Exceptions\Exception
  */
 function deletePollOptions($id_poll, $id_options)
 {
@@ -555,7 +542,6 @@ function deletePollOptions($id_poll, $id_options)
  * @param int $id_topic The id of the topic
  *
  * @return array
- * @throws \ElkArte\Exceptions\Exception
  */
 function pollStarters($id_topic)
 {
@@ -589,7 +575,6 @@ function pollStarters($id_topic)
  *
  * @param int $topic the topic with an associated poll
  * @return mixed[]
- * @throws \Exception
  */
 function checkVote($topic)
 {
@@ -617,7 +602,6 @@ function checkVote($topic)
  *
  * @param int $id_member The id of the member
  * @param int $id_poll The topic with an associated poll.
- * @throws \ElkArte\Exceptions\Exception
  */
 function removeVote($id_member, $id_poll)
 {
@@ -639,7 +623,6 @@ function removeVote($id_member, $id_poll)
  *
  * @param int $id_poll The id of the poll to lower the vote count
  * @param int[] $options The available poll options
- * @throws \ElkArte\Exceptions\Exception
  */
 function decreaseVoteCounter($id_poll, $options)
 {
@@ -665,7 +648,6 @@ function decreaseVoteCounter($id_poll, $options)
  *
  * @param int $id_poll The id of the poll to increase the vote count
  * @param int[] $options The available poll options
- * @throws \ElkArte\Exceptions\Exception
  */
 function increaseVoteCounter($id_poll, $options)
 {
@@ -688,7 +670,6 @@ function increaseVoteCounter($id_poll, $options)
  * Add a vote to a poll.
  *
  * @param mixed[] $insert array of vote details, includes member and their choice
- * @throws \Exception
  */
 function addVote($insert)
 {
@@ -706,7 +687,6 @@ function addVote($insert)
  * Increase the vote counter for guest votes.
  *
  * @param int $id_poll The id of the poll to increase
- * @throws \ElkArte\Exceptions\Exception
  */
 function increaseGuestVote($id_poll)
 {
@@ -730,7 +710,6 @@ function increaseGuestVote($id_poll)
  * @param int $id_poll id fo the poll the member voted in
  *
  * @return int[]
- * @throws \Exception
  */
 function determineVote($id_member, $id_poll)
 {
@@ -761,7 +740,6 @@ function determineVote($id_member, $id_poll)
  *
  * @param int $id_topic
  * @return string[]|bool
- * @throws \Exception
  * @deprecated since 2.0 - use pollInfoForTopic instead
  */
 function pollStatus($id_topic)
@@ -776,7 +754,6 @@ function pollStatus($id_topic)
  *
  * @param int $id_poll The id of the poll to check
  * @param int $locked the value to set in voting_locked
- * @throws \ElkArte\Exceptions\Exception
  */
 function lockPoll($id_poll, $locked)
 {
@@ -799,7 +776,6 @@ function lockPoll($id_poll, $locked)
  *
  * @param int $id_poll The id of the poll
  * @return array
- * @throws \Exception
  */
 function getPollChoices($id_poll)
 {
@@ -868,7 +844,6 @@ function getPollStarter($id_topic)
  * Loads in $context whatever is needed to show a poll
  *
  * @param int $poll_id simply a poll id...
- * @throws \ElkArte\Exceptions\Exception
  */
 function loadPollContext($poll_id)
 {

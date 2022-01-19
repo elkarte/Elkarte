@@ -16,7 +16,6 @@
  *
  * @param int $karmaWaitTime
  * @package Karma
- * @throws \ElkArte\Exceptions\Exception
  */
 function clearKarma($karmaWaitTime)
 {
@@ -41,7 +40,6 @@ function clearKarma($karmaWaitTime)
  *
  * @return null
  * @package Karma
- * @throws \ElkArte\Exceptions\Exception
  */
 function lastActionOn($id_executor, $id_target)
 {
@@ -76,7 +74,6 @@ function lastActionOn($id_executor, $id_target)
  * @param int $id_target
  * @param int $direction - options: -1 or 1
  * @package Karma
- * @throws \Exception
  */
 function addKarma($id_executor, $id_target, $direction)
 {
@@ -102,7 +99,6 @@ function addKarma($id_executor, $id_target, $direction)
  * @param int $id_target
  * @param int $direction - options: -1 or 1
  * @package Karma
- * @throws \ElkArte\Exceptions\Exception
  */
 function updateKarma($id_executor, $id_target, $direction)
 {

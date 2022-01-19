@@ -32,7 +32,6 @@ use ElkArte\User;
  * @param int $attachment_type = 0
  *
  * @return array|bool
- * @throws \Exception
  */
 function messageDetails($id_msg, $id_topic = 0, $attachment_type = 0)
 {
@@ -102,7 +101,6 @@ function messageDetails($id_msg, $id_topic = 0, $attachment_type = 0)
  * @param bool $detailed
  *
  * @return mixed[]|false array of message details or false if no message found.
- * @throws \ElkArte\Exceptions\Exception
  */
 function basicMessageInfo($id_msg, $override_permissions = false, $detailed = false)
 {
@@ -144,7 +142,6 @@ function basicMessageInfo($id_msg, $override_permissions = false, $detailed = fa
  * @param bool $modify
  *
  * @return bool
- * @throws \ElkArte\Exceptions\Exception
  * @todo why it doesn't take into account post moderation?
  */
 function quoteMessageInfo($id_msg, $modify)
@@ -278,7 +275,6 @@ function prepareMessageContext($message)
  * first messages of a topic
  *
  * @param int $memID The member id
- * @throws \Exception
  */
 function removeNonTopicMessages($memID)
 {
@@ -312,7 +308,6 @@ function removeNonTopicMessages($memID)
  *
  * @param int $message The message id
  * @param bool $decreasePostCount if true users' post count will be reduced
- * @throws \ElkArte\Exceptions\Exception
  */
 function removeMessage($message, $decreasePostCount = true)
 {
@@ -382,7 +377,6 @@ function associatedTopic($msg_id, $topicID = null)
  * @param int $id_msg a message id
  * @param bool $check_approval if true messages are checked for approval (default true)
  * @return bool
- * @throws \ElkArte\Exceptions\Exception
  */
 function canAccessMessage($id_msg, $check_approval = true)
 {
@@ -416,7 +410,6 @@ function canAccessMessage($id_msg, $check_approval = true)
  * @param bool $next = true if true, it increases the pointer, otherwise it decreases it
  *
  * @return int
- * @throws \ElkArte\Exceptions\Exception
  */
 function messagePointer($id_msg, $id_topic, $next = true)
 {
@@ -446,7 +439,6 @@ function messagePointer($id_msg, $id_topic, $next = true)
  * @param int $id_topic
  *
  * @return int
- * @throws \ElkArte\Exceptions\Exception
  */
 function previousMessage($id_msg, $id_topic)
 {
@@ -460,7 +452,6 @@ function previousMessage($id_msg, $id_topic)
  * @param int $id_topic
  *
  * @return int
- * @throws \ElkArte\Exceptions\Exception
  */
 function nextMessage($id_msg, $id_topic)
 {
@@ -479,7 +470,6 @@ function nextMessage($id_msg, $id_topic)
  *      - 'limit' => mixed - the number of values to return (if false, no limits applied)
  *
  * @return array
- * @throws \Exception
  * @todo very similar to selectMessages in Topics.subs.php
  */
 function messageAt($start, $id_topic, $params = array())
@@ -533,7 +523,6 @@ function messageAt($start, $id_topic, $params = array())
  * @param string $poster_comment the comment made by the reporter
  *
  * @return bool
- * @throws \ElkArte\Exceptions\Exception
  */
 function recordReport($message, $poster_comment)
 {
@@ -632,7 +621,6 @@ function recordReport($message, $poster_comment)
  * @param array $topicinfo
  * @param int $timestamp
  * @return int
- * @throws \ElkArte\Exceptions\Exception
  */
 function countNewPosts($topic, $topicinfo, $timestamp)
 {
@@ -670,7 +658,6 @@ function countNewPosts($topic, $topicinfo, $timestamp)
  * @param mixed[] $optional
  *
  * @return resource A request object
- * @throws \ElkArte\Exceptions\Exception
  */
 function loadMessageRequest($msg_selects, $msg_tables, $msg_parameters, $optional = array())
 {
@@ -701,7 +688,6 @@ function loadMessageRequest($msg_selects, $msg_tables, $msg_parameters, $optiona
  * @param mixed[] $msg_parameters
  * @param mixed[] $optional
  * @return array
- * @throws \Exception
  */
 function loadMessageDetails($msg_selects, $msg_tables, $msg_parameters, $optional = array())
 {
@@ -741,7 +727,6 @@ function loadMessageDetails($msg_selects, $msg_tables, $msg_parameters, $optiona
  * @param int[] $messages
  * @param bool $allowed_all
  * @return array
- * @throws \Exception
  */
 function determineRemovableMessages($topic, $messages, $allowed_all)
 {
@@ -786,7 +771,6 @@ function determineRemovableMessages($topic, $messages, $allowed_all)
  * @param int[] $selection
  *
  * @return array
- * @throws \Exception
  */
 function countSplitMessages($topic, $include_unapproved, $selection = array())
 {
@@ -819,7 +803,6 @@ function countSplitMessages($topic, $include_unapproved, $selection = array())
  *
  * @param int $id_msg the id of a message
  * @return array
- * @throws \ElkArte\Exceptions\Exception
  * @todo very similar to posterDetails
  *
  */
@@ -850,7 +833,6 @@ function mailFromMessage($id_msg)
  *
  * @param bool|null $increment = null If true and $max_msg_id != null, then increment the total messages by one, otherwise recount all messages and get the max message id
  * @param int|null $max_msg_id = null, Only used if $increment === true
- * @throws \ElkArte\Exceptions\Exception
  */
 function updateMessageStats($increment = null, $max_msg_id = null)
 {
@@ -893,7 +875,6 @@ function updateMessageStats($increment = null, $max_msg_id = null)
  *
  * @param int $id_topic
  * @param string|null $subject
- * @throws \ElkArte\Exceptions\Exception
  */
 function updateSubjectStats($id_topic, $subject = null)
 {

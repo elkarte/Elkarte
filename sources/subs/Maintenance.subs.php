@@ -18,7 +18,6 @@
  * Counts the total number of messages
  *
  * @return int
- * @throws \ElkArte\Exceptions\Exception
  * @package Maintenance
  */
 function countMessages()
@@ -76,7 +75,6 @@ function flushLogTables()
  * Gets the table columns from the messages table, just a wrapper function
  *
  * @return array
- * @throws \Exception
  * @package Maintenance
  */
 function getMessageTableColumns()
@@ -112,7 +110,6 @@ function fetchBodyType()
  * Resizes the body column from the messages table
  *
  * @param string $type
- * @throws \Exception
  * @package Maintenance
  */
 function resizeMessageTableBody($type)
@@ -128,7 +125,6 @@ function resizeMessageTableBody($type)
  * @param int $increment
  *
  * @return array
- * @throws \Exception
  * @package Maintenance
  *
  */
@@ -161,7 +157,6 @@ function detectExceedingMessages($start, $increment)
  *
  * @param int[] $msg
  * @return array
- * @throws \Exception
  * @package Maintenance
  */
 function getExceedingMessages($msg)
@@ -191,7 +186,6 @@ function getExceedingMessages($msg)
  * - Additional tables from addons are also included.
  *
  * @return array
- * @throws \Exception
  * @package Maintenance
  */
 function getElkTables()
@@ -219,7 +213,6 @@ function getElkTables()
  * Gets the last topics id.
  *
  * @return int
- * @throws \ElkArte\Exceptions\Exception
  * @package Maintenance
  */
 function getMaxTopicID()
@@ -243,7 +236,6 @@ function getMaxTopicID()
  *
  * @param int $start The item to start with (for pagination purposes)
  * @param int $increment
- * @throws \Exception
  * @package Maintenance
  */
 function recountApprovedMessages($start, $increment)
@@ -278,7 +270,6 @@ function recountApprovedMessages($start, $increment)
  *
  * @param int $start The item to start with (for pagination purposes)
  * @param int $increment
- * @throws \Exception
  * @package Maintenance
  */
 function recountUnapprovedMessages($start, $increment)
@@ -317,7 +308,6 @@ function recountUnapprovedMessages($start, $increment)
  * @param string $column
  *
  * @return bool
- * @throws \ElkArte\Exceptions\Exception
  * @package Maintenance
  *
  */
@@ -350,7 +340,6 @@ function resetBoardsCounter($column)
  * @param string $type - can be 'posts', 'topic', 'unapproved_posts', 'unapproved_topics'
  * @param int $start The item to start with (for pagination purposes)
  * @param int $increment
- * @throws \Exception
  * @package Maintenance
  */
 function updateBoardsCounter($type, $start, $increment)
@@ -534,7 +523,6 @@ function updatePersonalMessagesCounter()
  *
  * @param int $start The item to start with (for pagination purposes)
  * @param int $increment
- * @throws \ElkArte\Exceptions\Exception
  * @package Maintenance
  */
 function updateMessagesBoardID($start, $increment)
@@ -661,7 +649,6 @@ function updateBoardsLastMessage()
  *
  * @param int $id_board
  * @return int
- * @throws \ElkArte\Exceptions\Exception
  * @package Maintenance
  */
 function countTopicsFromBoard($id_board)
@@ -689,7 +676,6 @@ function countTopicsFromBoard($id_board)
  * @param int $id_board
  *
  * @return int[]
- * @throws \Exception
  * @package Maintenance
  */
 function getTopicsToMove($id_board)
@@ -717,7 +703,6 @@ function getTopicsToMove($id_board)
  * Counts members with posts > 0, we name them contributors
  *
  * @return int
- * @throws \ElkArte\Exceptions\Exception
  * @package Maintenance
  */
 function countContributors()
@@ -747,7 +732,6 @@ function countContributors()
  * @param int $start The item to start with (for pagination purposes)
  * @param int $increment
  * @return int
- * @throws \ElkArte\Exceptions\Exception
  * @package Maintenance
  */
 function updateMembersPostCount($start, $increment)
@@ -840,7 +824,6 @@ function updateZeroPostMembers()
  * @param int[] $groups
  * @param int $time_limit
  * @return array
- * @throws \Exception
  * @package Maintenance
  */
 function purgeMembers($type, $groups, $time_limit)

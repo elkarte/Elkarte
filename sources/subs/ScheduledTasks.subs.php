@@ -206,7 +206,6 @@ function next_time($regularity, $unit, $offset, $immediate = false)
  *
  * @param int[] $tasks
  * @return array
- * @throws \Exception
  * @package ScheduledTasks
  */
 function loadTasks($tasks)
@@ -239,7 +238,6 @@ function loadTasks($tasks)
  * @param int $task_id the id of the task run (from the table scheduled_tasks)
  * @param int|null $total_time How long the task took to finish. If NULL (default value) -1 will be used
  * @return int the id_log value
- * @throws \ElkArte\Exceptions\Exception
  * @package ScheduledTasks
  */
 function logTask($id_log, $task_id, $total_time = null)
@@ -279,7 +277,6 @@ function logTask($id_log, $task_id, $total_time = null)
  * enabled, while the remaining are disabled
  *
  * @param int[] $enablers array od task IDs
- * @throws \ElkArte\Exceptions\Exception
  * @package ScheduledTasks
  */
 function updateTaskStatus($enablers)
@@ -301,7 +298,6 @@ function updateTaskStatus($enablers)
  *
  * @param string $enabler the name (the function) of a task
  * @param bool $enable is if the tasks should be enabled or disabled
- * @throws \ElkArte\Exceptions\Exception
  * @package ScheduledTasks
  */
 function toggleTaskStatusByName($enabler, $enable = true)
@@ -328,7 +324,6 @@ function toggleTaskStatusByName($enabler, $enable = true)
  * @param int|null $offset
  * @param int|null $interval
  * @param string|null $unit
- * @throws \ElkArte\Exceptions\Exception
  * @package ScheduledTasks
  */
 function updateTask($id_task, $disabled = null, $offset = null, $interval = null, $unit = null)
@@ -424,7 +419,6 @@ function loadTaskDetails($id_task)
  * - Used also by createList() callbacks.
  *
  * @return array
- * @throws \Exception
  * @package ScheduledTasks
  */
 function scheduledTasks()
@@ -471,7 +465,6 @@ function scheduledTasks()
  * @param string $sort A string indicating how to sort the results
  *
  * @return array
- * @throws \Exception
  * @package ScheduledTasks
  */
 function getTaskLogEntries($start, $items_per_page, $sort)
@@ -511,7 +504,6 @@ function getTaskLogEntries($start, $items_per_page, $sort)
  * - Used by createList() callbacks.
  *
  * @return int
- * @throws \ElkArte\Exceptions\Exception
  * @package ScheduledTasks
  */
 function countTaskLogEntries()
@@ -546,7 +538,6 @@ function emptyTaskLog()
  * Process the next tasks, one by one, and update the results.
  *
  * @param int $ts = 0
- * @throws \ElkArte\Exceptions\Exception
  * @package ScheduledTasks
  */
 function processNextTasks($ts = 0)
@@ -631,7 +622,6 @@ function processNextTasks($ts = 0)
  *
  * @param int $id_task specific id of the task to run, used for logging
  * @param string $task_name name of the task, class name, function name, method in ScheduledTask.class
- * @throws \ElkArte\Exceptions\Exception
  * @package ScheduledTasks
  */
 function run_this_task($id_task, $task_name)
@@ -684,7 +674,6 @@ function run_this_task($id_task, $task_name)
  * Retrieve info if there's any next task scheduled and when.
  *
  * @return mixed int|false
- * @throws \ElkArte\Exceptions\Exception
  * @package ScheduledTasks
  */
 function nextTime()

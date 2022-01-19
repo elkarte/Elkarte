@@ -36,7 +36,6 @@ use ElkArte\User;
  * @param string|null $from_wrapper - used to provide envelope from wrapper based on if we sharing a users display name
  * @param int|null $reference - The parent topic id for use in a References header
  * @return bool whether or not the email was accepted properly.
- * @throws \ElkArte\Exceptions\Exception
  * @package Mail
  */
 function sendmail($to, $subject, $message, $from = null, $message_id = null, $send_html = false, $priority = 3, $hotmail_fix = null, $is_private = false, $from_wrapper = null, $reference = null)
@@ -601,7 +600,6 @@ function mimespecialchars_callback($match)
  * @param int $priority
  * @param string|null $message_id
  * @return bool whether it sent or not.
- * @throws \Exception
  * @internal
  * @package Mail
  */
@@ -831,7 +829,6 @@ function smtp_mail($mail_to_array, $subject, $message, $headers, $priority, $mes
  * @param resource $socket - socket to send on
  * @param string $response - the expected response code
  * @return string|bool it responded as such.
- * @throws \Exception
  * @internal
  * @package Mail
  */
@@ -1112,7 +1109,6 @@ function user_info_callback($matches)
  * @param int $items_per_page The number of items to show per page
  * @param string $sort A string indicating how to sort the results
  * @return array
- * @throws \Exception
  * @package Mail
  */
 function list_getMailQueue($start, $items_per_page, $sort)
@@ -1149,7 +1145,6 @@ function list_getMailQueue($start, $items_per_page, $sort)
  * Returns the total count of items in the mail queue.
  *
  * @return int
- * @throws \ElkArte\Exceptions\Exception
  * @package Mail
  */
 function list_getMailQueueSize()
@@ -1172,7 +1167,6 @@ function list_getMailQueueSize()
  * Deletes items from the mail queue
  *
  * @param int[] $items
- * @throws \ElkArte\Exceptions\Exception
  * @package Mail
  */
 function deleteMailQueueItems($items)
@@ -1217,7 +1211,6 @@ function list_MailQueueStatus()
  * - It is used to keep track of failed emails attempts and next try.
  *
  * @param mixed[] $failed_emails
- * @throws \ElkArte\Exceptions\Exception
  * @package Mail
  */
 function updateFailedQueue($failed_emails)
@@ -1312,7 +1305,6 @@ function resetNextSendTime()
  * - Requires an affected row
  *
  * @return int|bool
- * @throws \ElkArte\Exceptions\Exception
  * @package Mail
  */
 function updateNextSendTime()
@@ -1348,7 +1340,6 @@ function updateNextSendTime()
  *
  * @param int $number
  * @return array
- * @throws \Exception
  * @package Mail
  */
 function emailsInfo($number)
@@ -1633,7 +1624,6 @@ function reduceMailQueue($batch_size = false, $override_limit = false, $force_se
  * @param int $id_msg the id of a message
  * @param int $topic_id the topic the message belongs to
  * @return mixed[] the poster's details
- * @throws \ElkArte\Exceptions\Exception
  * @todo very similar to mailFromMessage
  * @package Mail
  */

@@ -327,7 +327,6 @@ function recacheSpiderNames()
  * @param string $sort A string indicating how to sort the results
  *
  * @return array
- * @throws \Exception
  * @package SearchEngines
  *
  */
@@ -361,7 +360,6 @@ function getSpiders($start, $items_per_page, $sort)
  *
  * @param int $spider_id id of a spider
  * @return mixed[]
- * @throws \ElkArte\Exceptions\Exception
  * @package SearchEngines
  */
 function getSpiderDetails($spider_id)
@@ -388,7 +386,6 @@ function getSpiderDetails($spider_id)
  * (used by createList() callbacks)
  *
  * @return int
- * @throws \ElkArte\Exceptions\Exception
  * @package SearchEngines
  */
 function getNumSpiders()
@@ -416,7 +413,6 @@ function getNumSpiders()
  * @param int $items_per_page The number of items to show per page
  * @param string $sort A string indicating how to sort the results
  * @return array An array of spider hits
- * @throws \Exception
  * @package SearchEngines
  */
 function getSpiderLogs($start, $items_per_page, $sort)
@@ -439,7 +435,6 @@ function getSpiderLogs($start, $items_per_page, $sort)
  * (used by createList() callbacks)
  *
  * @return int The number of rows in the log_spider_hits table
- * @throws \ElkArte\Exceptions\Exception
  * @package SearchEngines
  */
 function getNumSpiderLogs()
@@ -468,7 +463,6 @@ function getNumSpiderLogs()
  * @param string $sort A string indicating how to sort the results
  *
  * @return array
- * @throws \ElkArte\Exceptions\Exception
  * @package SearchEngines
  *
  */
@@ -493,7 +487,6 @@ function getSpiderStats($start, $items_per_page, $sort)
  *
  * @param int|null $time (optional) if specified counts only the entries before that date
  * @return int The number of rows in the log_spider_stats table
- * @throws \Exception
  * @package SearchEngines
  */
 function getNumSpiderStats($time = null)
@@ -519,7 +512,6 @@ function getNumSpiderStats($time = null)
  * Remove spider logs older than the passed time
  *
  * @param int $time a time value
- * @throws \ElkArte\Exceptions\Exception
  * @package SearchEngines
  */
 function removeSpiderOldLogs($time)
@@ -540,7 +532,6 @@ function removeSpiderOldLogs($time)
  * Remove spider logs older than the passed time
  *
  * @param int $time a time value
- * @throws \ElkArte\Exceptions\Exception
  * @package SearchEngines
  */
 function removeSpiderOldStats($time)
@@ -561,7 +552,6 @@ function removeSpiderOldStats($time)
  * Remove all the entries connected to a certain spider (description, entries, stats)
  *
  * @param int[] $spiders_id an array of spider ids
- * @throws \ElkArte\Exceptions\Exception
  * @package SearchEngines
  */
 function removeSpiders($spiders_id)
@@ -673,7 +663,6 @@ function spidersStatsDates()
  * @param string $name spider name
  * @param string $agent ua of the spider
  * @param string $info_ip
- * @throws \ElkArte\Exceptions\Exception
  * @package SearchEngines
  */
 function updateSpider($id = 0, $name = '', $agent = '', $info_ip = '')

@@ -24,7 +24,6 @@ use ElkArte\Util;
  * @param string $where
  * @param mixed[] $where_vars = array() or values used in the where statement
  * @return string number of user errors
- * @throws \ElkArte\Exceptions\Exception
  */
 function getUserErrorCount($where, $where_vars = array())
 {
@@ -52,7 +51,6 @@ function getUserErrorCount($where, $where_vars = array())
  * @param string $where
  * @param mixed[] $where_vars array of values used in the where statement
  * @return mixed[] error messages array
- * @throws \Exception
  */
 function getUserErrors($start, $items_per_page, $sort, $where, $where_vars = array())
 {
@@ -97,7 +95,6 @@ function getUserErrors($start, $items_per_page, $sort, $where, $where_vars = arr
  * @param string $where
  * @param mixed[] $where_vars array of values used in the where statement
  * @return string count of messages matching the IP
- * @throws \ElkArte\Exceptions\Exception
  */
 function getIPMessageCount($where, $where_vars = array())
 {
@@ -126,7 +123,6 @@ function getIPMessageCount($where, $where_vars = array())
  * @param string $where
  * @param mixed[] $where_vars array of values used in the where statement
  * @return mixed[] an array of basic messages / details
- * @throws \Exception
  */
 function getIPMessages($start, $items_per_page, $sort, $where, $where_vars = array())
 {
@@ -177,7 +173,6 @@ function getIPMessages($start, $items_per_page, $sort, $where, $where_vars = arr
  * @param string $where
  * @param mixed[] $where_vars array of values used in the where statement
  * @return string count of messages matching the IP
- * @throws \ElkArte\Exceptions\Exception
  */
 function getLoginCount($where, $where_vars = array())
 {
@@ -207,7 +202,6 @@ function getLoginCount($where, $where_vars = array())
  * @param mixed[] $where_vars array of values used in the where statement
  *
  * @return mixed[] an array of messages
- * @throws \Exception
  */
 function getLogins($where, $where_vars = array())
 {
@@ -243,7 +237,6 @@ function getLogins($where, $where_vars = array())
  *
  * @param int $memID id_member
  * @return string number of profile edits
- * @throws \ElkArte\Exceptions\Exception
  */
 function getProfileEditCount($memID)
 {
@@ -276,7 +269,6 @@ function getProfileEditCount($memID)
  * @param string $sort A string indicating how to sort the results
  * @param int $memID
  * @return mixed[] array of profile edits
- * @throws \ElkArte\Exceptions\Exception
  */
 function getProfileEdits($start, $items_per_page, $sort, $memID)
 {

@@ -102,7 +102,6 @@ function ml_CustomProfile()
  * @param int $cache_step_size
  *
  * @return array
- * @throws \ElkArte\Exceptions\Exception
  */
 function ml_memberCache($cache_step_size)
 {
@@ -173,7 +172,6 @@ function ml_memberCount()
  * @param string $start single letter to start with
  *
  * @return string
- * @throws \ElkArte\Exceptions\Exception
  */
 function ml_alphaStart($start)
 {
@@ -204,7 +202,6 @@ function ml_alphaStart($start)
  * @param string $where
  * @param int $limit
  * @param string $sort
- * @throws \ElkArte\Exceptions\Exception
  */
 function ml_selectMembers($query_parameters, $where = '', $limit = 0, $sort = '')
 {
@@ -241,7 +238,6 @@ function ml_selectMembers($query_parameters, $where = '', $limit = 0, $sort = ''
  * @param string $where
  * @param int $limit
  * @return int
- * @throws \ElkArte\Exceptions\Exception
  */
 function ml_searchMembers($query_parameters, $customJoin = '', $where = '', $limit = 0)
 {
@@ -330,7 +326,6 @@ function ml_findSearchableCustomFields()
  * Puts results of request into the context for the sub template.
  *
  * @param resource $request
- * @throws \ElkArte\Exceptions\Exception
  */
 function printMemberListRows($request)
 {

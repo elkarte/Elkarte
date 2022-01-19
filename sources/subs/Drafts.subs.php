@@ -21,7 +21,6 @@ use ElkArte\Util;
  *
  * @param mixed[] $draft
  * @param string[] $recipientList
- * @throws \Exception
  * @package Drafts
  */
 function create_pm_draft($draft, $recipientList)
@@ -66,7 +65,6 @@ function create_pm_draft($draft, $recipientList)
  *
  * @param mixed[] $draft
  * @param string[] $recipientList
- * @throws \ElkArte\Exceptions\Exception
  * @package Drafts
  */
 function modify_pm_draft($draft, $recipientList)
@@ -102,7 +100,6 @@ function modify_pm_draft($draft, $recipientList)
  * Create a new post draft in the database
  *
  * @param mixed[] $draft
- * @throws \Exception
  * @package Drafts
  */
 function create_post_draft($draft)
@@ -156,7 +153,6 @@ function create_post_draft($draft)
  * Update a Post draft with the supplied data
  *
  * @param mixed[] $draft
- * @throws \ElkArte\Exceptions\Exception
  * @package Drafts
  */
 function modify_post_draft($draft)
@@ -208,7 +204,6 @@ function modify_post_draft($draft)
  * @param bool $check - validate the draft is by the user, true by default
  *
  * @return array
- * @throws \ElkArte\Exceptions\Exception
  * @package Drafts
  *
  */
@@ -264,7 +259,6 @@ function load_draft($id_draft, $uid, $type = 0, $drafts_keep_days = 0, $check = 
  * @param string $limit - optional parameter to limit the number returned 0,15
  *
  * @return array
- * @throws \Exception
  * @package Drafts
  *
  */
@@ -316,7 +310,6 @@ function load_user_drafts($member_id, $draft_type = 0, $topic = false, $order = 
  * @param bool $check
  *
  * @return bool
- * @throws \ElkArte\Exceptions\Exception
  * @package Drafts
  *
  */
@@ -360,7 +353,6 @@ function deleteDrafts($id_draft, $member_id = -1, $check = true)
  * @param int $member_id
  * @param int $draft_type
  * @return int
- * @throws \ElkArte\Exceptions\Exception
  * @package Drafts
  */
 function draftsCount($member_id, $draft_type = 0)
@@ -431,7 +423,6 @@ function draftsRecipients($allRecipients, $recipient_ids)
  * @param int $days
  *
  * @return array
- * @throws \Exception
  * @package Drafts
  *
  */
@@ -463,7 +454,6 @@ function getOldDrafts($days)
  *
  * @param mixed[] $draft
  * @param bool $check_last_save
- * @throws \ElkArte\Exceptions\Exception
  * @package Drafts
  */
 function saveDraft($draft, $check_last_save = false)
@@ -538,7 +528,6 @@ function saveDraft($draft, $check_last_save = false)
  * @param bool $check_last_save
  *
  * @return bool|void
- * @throws \ElkArte\Exceptions\Exception
  * @package Drafts
  *
  */
@@ -653,7 +642,6 @@ function prepareDraft(&$draft, $draft_info)
  * @param bool $load - load it for use in a form
  *
  * @return array
- * @throws \ElkArte\Exceptions\Exception
  * @package Drafts
  *
  */

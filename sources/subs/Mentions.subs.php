@@ -22,7 +22,6 @@ use ElkArte\User;
  * @param string|null $id_member : the id of the member the counts are for, defaults to user_info['id']
  *
  * @return mixed
- * @throws \ElkArte\Exceptions\Exception
  * @package Mentions
  *
  */
@@ -78,7 +77,6 @@ function countUserMentions($all = false, $type = '', $id_member = null)
  * @param string[]|string $type : the type of the mention can be a string or an array of strings.
  *
  * @return array
- * @throws \Exception
  * @package Mentions
  *
  */
@@ -132,7 +130,6 @@ function getUserMentions($start, $limit, $sort, $all = false, $type = '')
  * @param int[] $id_mentions the mention ids
  *
  * @return bool
- * @throws \ElkArte\Exceptions\Exception
  * @package Mentions
  *
  */
@@ -165,7 +162,6 @@ function removeMentions($id_mentions)
  *
  * @param int[] $msgs array of messages that you want to toggle
  * @param bool $approved direction of the toggle read / unread
- * @throws \ElkArte\Exceptions\Exception
  * @package Mentions
  */
 function toggleMentionsApproval($msgs, $approved)
@@ -207,7 +203,6 @@ function toggleMentionsApproval($msgs, $approved)
  *
  * @param string $type type of the mention that you want to toggle
  * @param bool $enable if true enables the mentions, otherwise disables them
- * @throws \ElkArte\Exceptions\Exception
  * @package Mentions
  */
 function toggleMentionsVisibility($type, $enable)
@@ -246,7 +241,6 @@ function toggleMentionsVisibility($type, $enable)
  *
  * @param int[] $mentions an array of mention id
  * @param bool $access if true make the mentions accessible (if visible and other things), otherwise marks them as inaccessible
- * @throws \ElkArte\Exceptions\Exception
  * @package Mentions
  */
 function toggleMentionsAccessibility($mentions, $access)
@@ -302,7 +296,6 @@ function validate_ownmention($field, $input, $validation_parameters = null)
  * @param int $id_mention the id of an existing mention
  * @param int $id_member id of a member
  * @return bool true if the mention belongs to the member, false otherwise
- * @throws \ElkArte\Exceptions\Exception
  * @package Mentions
  */
 function findMemberMention($id_mention, $id_member)
@@ -332,7 +325,6 @@ function findMemberMention($id_mention, $id_member)
  *
  * @param int|null $status
  * @param int $member_id
- * @throws \ElkArte\Exceptions\Exception
  * @package Mentions
  */
 function updateMentionMenuCount($status, $member_id)
@@ -361,7 +353,6 @@ function updateMentionMenuCount($status, $member_id)
  *
  * @param int $id_member
  * @return int A timestamp (log_time)
- * @throws \Exception
  * @package Mentions
  */
 function getTimeLastMention($id_member)
@@ -393,7 +384,6 @@ function getTimeLastMention($id_member)
  * @param int $id_member
  * @param int $timestamp
  * @return int Number of new mentions
- * @throws \Exception
  * @package Mentions
  */
 function getNewMentions($id_member, $timestamp)

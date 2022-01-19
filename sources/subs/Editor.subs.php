@@ -37,7 +37,6 @@ use ElkArte\User;
  *   - preview_type => 2 how to act on preview click, see template_control_richedit_buttons
  *
  * @event integrate_editor_plugins
- * @throws \ElkArte\Exceptions\Exception
  * @uses GenericControls template
  * @uses Post language
  */

@@ -26,7 +26,6 @@ use ElkArte\Util;
  * @param string $sort A string indicating how to sort the results
  *
  * @return array
- * @throws \ElkArte\Exceptions\Exception
  * @package Maillist
  *
  */
@@ -170,7 +169,6 @@ function list_maillist_count_unapproved()
  * Removes an single entry from the postby_emails_error table
  *
  * @param int $id
- * @throws \ElkArte\Exceptions\Exception
  * @package Maillist
  */
 function maillist_delete_error_entry($id)
@@ -200,7 +198,6 @@ function maillist_delete_error_entry($id)
  * @param string $style = filter Filter to fetch filters or parsers for parsers
  *
  * @return array
- * @throws \Exception
  * @package Maillist
  *
  */
@@ -259,7 +256,6 @@ function list_get_filter_parser($start, $items_per_page, $sort = '', $id = 0, $s
  * @param string $style
  *
  * @return int
- * @throws \ElkArte\Exceptions\Exception
  * @package Maillist
  *
  */
@@ -330,7 +326,6 @@ function maillist_load_filter_parser($id, $style)
  * Removes a specific filter or parser from the system
  *
  * @param int $id ID of the filter/parser
- * @throws \ElkArte\Exceptions\Exception
  * @package Maillist
  */
 function maillist_delete_filter_parser($id)
@@ -384,7 +379,6 @@ function maillist_board_list()
  * Turns on or off the "fake" cron job for imap email retrieval
  *
  * @param bool $switch
- * @throws \ElkArte\Exceptions\Exception
  * @package Maillist
  */
 function enable_maillist_imap_cron($switch)
@@ -411,7 +405,6 @@ function enable_maillist_imap_cron($switch)
  * @param string|null $subject - A subject for the template
  *
  * @return array
- * @throws \Exception
  * @package Maillist
  *
  */
@@ -451,7 +444,6 @@ function maillist_templates($template_type, $subject = null)
  * Log in post-by emails an email being sent
  *
  * @param mixed[] $sent associative array of id_email, time_sent, email_to
- * @throws \Exception
  * @package Maillist
  */
 function log_email($sent)
@@ -477,7 +469,6 @@ function log_email($sent)
  *
  * @param string $replace constructed as WHEN fieldname=value THEN new viewvalue WHEN .....
  * @param int[] $filters list of ids in the WHEN clause to keep from updating the entire table
- * @throws \ElkArte\Exceptions\Exception
  * @package Maillist
  */
 function updateParserFilterOrder($replace, $filters)

@@ -453,7 +453,6 @@ function sendNotifications($topics, $type, $exclude = array(), $members_only = a
  * loads the Post language file multiple times for each language if the userLanguage setting is set.
  *
  * @param mixed[] $topicData
- * @throws \ElkArte\Exceptions\Exception
  */
 function sendBoardNotifications(&$topicData)
 {
@@ -642,7 +641,6 @@ function sendBoardNotifications(&$topicData)
  * A special function for handling the hell which is sending approval notifications.
  *
  * @param mixed[] $topicData
- * @throws \ElkArte\Exceptions\Exception
  */
 function sendApprovalNotifications(&$topicData)
 {
@@ -804,7 +802,6 @@ function sendApprovalNotifications(&$topicData)
  * @param string $type types supported are 'approval', 'activation', and 'standard'.
  * @param int $memberID
  * @param string|null $member_name = null
- * @throws \ElkArte\Exceptions\Exception
  * @uses the Login language file.
  */
 function sendAdminNotifications($type, $memberID, $member_name = null)
@@ -914,7 +911,6 @@ function sendAdminNotifications($type, $memberID, $member_name = null)
  * @param bool $email_perm
  *
  * @return bool
- * @throws \ElkArte\Exceptions\Exception
  */
 function validateNotificationAccess($row, $maillist, &$email_perm = true)
 {

@@ -721,7 +721,6 @@ function loadAllPermissions()
  * @param string[]|null $hidden_permissions array of permission names to skip in the count totals
  *
  * @return int[] [id_group][num_permissions][denied] = count, [id_group][num_permissions][allowed] = count
- * @throws \Exception
  * @package Permissions
  */
 function countPermissions($groups, $hidden_permissions = null)
@@ -757,7 +756,6 @@ function countPermissions($groups, $hidden_permissions = null)
  * @param int|null $profile_id
  *
  * @return int[]
- * @throws \Exception
  * @package Permissions
  */
 function countBoardPermissions($groups, $hidden_permissions = null, $profile_id = null)
@@ -793,7 +791,6 @@ function countBoardPermissions($groups, $hidden_permissions = null, $profile_id 
  *
  * @param int $profile
  * @param int $board
- * @throws \ElkArte\Exceptions\Exception
  * @package Permissions
  */
 function assignPermissionProfileToBoard($profile, $board)
@@ -819,7 +816,6 @@ function assignPermissionProfileToBoard($profile, $board)
  * @param int[] $groups
  * @param string[] $illegal_permissions
  * @param string[] $non_guest_permissions
- * @throws \ElkArte\Exceptions\Exception
  * @todo another function with the same name in Membergroups.subs.php
  * @package Permissions
  */
@@ -892,7 +888,6 @@ function copyPermission($copy_from, $groups, $illegal_permissions, $non_guest_pe
  * @param int[] $groups The target groups
  * @param int $profile_id
  * @param string[] $non_guest_permissions
- * @throws \Exception
  * @package Permissions
  */
 function copyBoardPermission($copy_from, $groups, $profile_id, $non_guest_permissions)
@@ -949,7 +944,6 @@ function copyBoardPermission($copy_from, $groups, $profile_id, $non_guest_permis
  * @param int[] $groups
  * @param string $permission
  * @param string[] $illegal_permissions
- * @throws \ElkArte\Exceptions\Exception
  * @package Permissions
  */
 function deletePermission($groups, $permission, $illegal_permissions)
@@ -975,7 +969,6 @@ function deletePermission($groups, $permission, $illegal_permissions)
  * @param int[] $group
  * @param int $profile_id
  * @param string $permission
- * @throws \ElkArte\Exceptions\Exception
  * @package Permissions
  */
 function deleteBoardPermission($group, $profile_id, $permission)
@@ -999,7 +992,6 @@ function deleteBoardPermission($group, $profile_id, $permission)
  * Replaces existing membergroup permissions with the given ones.
  *
  * @param mixed[] $permChange associative array permission, id_group, add_deny
- * @throws \Exception
  * @package Permissions
  */
 function replacePermission($permChange)
@@ -1021,7 +1013,6 @@ function replacePermission($permChange)
  * Replaces existing board permissions with the given ones.
  *
  * @param mixed[] $permChange associative array of 'permission', 'id_group', 'add_deny', 'id_profile'
- * @throws \Exception
  * @package Permissions
  */
 function replaceBoardPermission($permChange)
@@ -1059,7 +1050,6 @@ function removeModeratorPermissions()
  *
  * @param int $id_group
  * @return array
- * @throws \Exception
  * @package Permissions
  */
 function fetchPermissions($id_group)
@@ -1096,7 +1086,6 @@ function fetchPermissions($id_group)
  * @param int $profile_id
  *
  * @return array
- * @throws \Exception
  * @package Permissions
  *
  */
@@ -1133,7 +1122,6 @@ function fetchBoardPermissions($id_group, $permission_type, $profile_id)
  *
  * @param int $id_group
  * @param string[] $illegal_permissions
- * @throws \ElkArte\Exceptions\Exception
  * @package Permissions
  */
 function deleteInvalidPermissions($id_group, $illegal_permissions)
@@ -1156,7 +1144,6 @@ function deleteInvalidPermissions($id_group, $illegal_permissions)
  *
  * @param int[] $groups
  * @param int $id_profile
- * @throws \ElkArte\Exceptions\Exception
  * @package Permissions
  */
 function deleteAllBoardPermissions(array $groups, $id_profile)
@@ -1255,7 +1242,6 @@ function clearPostgroupPermissions()
  *
  * @param string $profile_name
  * @param int $copy_from
- * @throws \Exception
  * @package Permissions
  */
 function copyPermissionProfile($profile_name, $copy_from)
@@ -1307,7 +1293,6 @@ function copyPermissionProfile($profile_name, $copy_from)
  *
  * @param int $id_profile
  * @param string $name
- * @throws \ElkArte\Exceptions\Exception
  * @package Permissions
  */
 function renamePermissionProfile($id_profile, $name)
@@ -1374,7 +1359,6 @@ function deletePermissionProfiles($profiles)
  * @param int[] $profiles
  *
  * @return int[]
- * @throws \Exception
  * @package Permissions
  */
 function permProfilesInUse($profiles)
@@ -1410,7 +1394,6 @@ function permProfilesInUse($profiles)
  * @param int[] $profile
  * @param string[] $permissions
  * @package Permissions
- * @throws \ElkArte\Exceptions\Exception
  */
 function deleteBoardPermissions($groups, $profile, $permissions)
 {
@@ -1434,7 +1417,6 @@ function deleteBoardPermissions($groups, $profile, $permissions)
  * Adds a new board permission to the board_permissions table.
  *
  * @param mixed[] $new_permissions
- * @throws \Exception
  * @package Permissions
  */
 function insertBoardPermission($new_permissions)
@@ -1456,7 +1438,6 @@ function insertBoardPermission($new_permissions)
  * @param int $profile
  * @param string[] $permissions
  * @return array
- * @throws \Exception
  * @package Permissions
  */
 function getPermission($group, $profile, $permissions)

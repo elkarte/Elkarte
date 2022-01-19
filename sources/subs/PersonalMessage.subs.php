@@ -67,7 +67,6 @@ function loadMessageLimit()
  *
  * @return mixed[]
  * @package PersonalMessage
- * @throws \Exception
  */
 function loadPMLabels($labels)
 {
@@ -114,7 +113,6 @@ function loadPMLabels($labels)
  * @param string $labelQuery
  * @return int
  * @package PersonalMessage
- * @throws \Exception
  */
 function getPMCount($descending = false, $pmID = null, $labelQuery = '')
 {
@@ -170,7 +168,6 @@ function getPMCount($descending = false, $pmID = null, $labelQuery = '')
  * @param string|null $folder = null
  * @param int|int[]|null $owner = null
  * @package PersonalMessage
- * @throws \Exception
  */
 function deleteMessages($personal_messages, $folder = null, $owner = null)
 {
@@ -335,7 +332,6 @@ function deleteMessages($personal_messages, $folder = null, $owner = null)
  * @param string|null $label = null, if label is set, only marks messages with that label
  * @param int|null $owner = null, if owner is set, marks messages owned by that member id
  * @package PersonalMessage
- * @throws \Exception
  */
 function markMessages($personal_messages = null, $label = null, $owner = null)
 {
@@ -378,7 +374,6 @@ function markMessages($personal_messages = null, $label = null, $owner = null)
  *
  * @param int|int[] $personal_messages
  * @package PersonalMessage
- * @throws \Exception
  */
 function markMessagesUnread($personal_messages)
 {
@@ -424,7 +419,6 @@ function markMessagesUnread($personal_messages)
  *
  * @param int $owner
  * @package PersonalMessage
- * @throws \Exception
  */
 function updatePMMenuCounts($owner)
 {
@@ -544,7 +538,6 @@ function isAccessiblePM($pmID, $validFor = 'in_or_outbox')
  * @param mixed[]|null $from - an array with the id, name, and username of the member.
  * @param int $pm_head - the ID of the chain being replied to - if any.
  * @return mixed[] an array with log entries telling how many recipients were successful and which recipients it failed to send to.
- * @throws \ElkArte\Exceptions\Exception
  * @package PersonalMessage
  */
 function sendpm($recipients, $subject, $message, $store_outbox = true, $from = null, $pm_head = 0)
@@ -1020,7 +1013,6 @@ function sendpm($recipients, $subject, $message, $store_outbox = true, $from = n
  *
  * @return array
  * @package PersonalMessage
- * @throws \ElkArte\Exceptions\Exception
  */
 function loadPMs($pm_options, $id_member)
 {
@@ -1189,7 +1181,6 @@ function loadPMs($pm_options, $id_member)
  *
  * @return mixed
  * @package PersonalMessage
- * @throws \Exception
  */
 function pmCount($id_member, $time)
 {
@@ -1222,7 +1213,6 @@ function pmCount($id_member, $time)
  *
  * @param bool $all_messages = false
  * @package PersonalMessage
- * @throws \Exception
  */
 function applyRules($all_messages = false)
 {
@@ -1354,7 +1344,6 @@ function applyRules($all_messages = false)
  *
  * @param bool $reload = false
  * @package PersonalMessage
- * @throws \Exception
  */
 function loadRules($reload = false)
 {
@@ -1415,7 +1404,6 @@ function loadRules($reload = false)
  * @param int $id_member
  * @param bool $new = false
  * @package PersonalMessage
- * @throws \Exception
  */
 function toggleNewPM($id_member, $new = false)
 {
@@ -1441,7 +1429,6 @@ function toggleNewPM($id_member, $new = false)
  *
  * @return array
  * @package PersonalMessage
- * @throws \Exception
  */
 function loadPMLimits($id_group = false)
 {
@@ -1477,7 +1464,6 @@ function loadPMLimits($id_group = false)
  *
  * @return array
  * @package PersonalMessage
- * @throws \Exception
  */
 function getDiscussions($id_pms)
 {
@@ -1508,7 +1494,6 @@ function getDiscussions($id_pms)
  *
  * @return array
  * @package PersonalMessage
- * @throws \Exception
  */
 function getPmsFromDiscussion($pm_heads)
 {
@@ -1541,7 +1526,6 @@ function getPmsFromDiscussion($pm_heads)
  * @param int $user_id
  * @return int|null
  * @package PersonalMessage
- * @throws \Exception
  */
 function changePMLabels($to_label, $label_type, $user_id)
 {
@@ -1610,7 +1594,6 @@ function changePMLabels($to_label, $label_type, $user_id)
  * @param int $user_id
  * @return int|null
  * @package PersonalMessage
- * @throws \Exception
  */
 function updateLabelsToPM($searchArray, $new_labels, $user_id)
 {
@@ -1671,7 +1654,6 @@ function updateLabelsToPM($searchArray, $new_labels, $user_id)
  * @param int $user_id
  * @return int
  * @package PersonalMessage
- * @throws \Exception
  */
 function updatePMLabels($to_update, $user_id)
 {
@@ -1715,7 +1697,6 @@ function updatePMLabels($to_update, $user_id)
  * @param int $time timestamp with a specific date
  * @return array
  * @package PersonalMessage
- * @throws \Exception
  */
 function getPMsOlderThan($user_id, $time)
 {
@@ -1772,7 +1753,6 @@ function getPMsOlderThan($user_id, $time)
  * @param int $id_member
  * @param int[] $rule_changes
  * @package PersonalMessage
- * @throws \Exception
  */
 function deletePMRules($id_member, $rule_changes)
 {
@@ -1796,7 +1776,6 @@ function deletePMRules($id_member, $rule_changes)
  * @param int $id_member
  * @param mixed[] $actions
  * @package PersonalMessage
- * @throws \Exception
  */
 function updatePMRuleAction($id_rule, $id_member, $actions)
 {
@@ -1826,7 +1805,6 @@ function updatePMRuleAction($id_rule, $id_member, $actions)
  * @param int $doDelete
  * @param int $isOr
  * @package PersonalMessage
- * @throws \Exception
  */
 function addPMRule($id_member, $ruleName, $criteria, $actions, $doDelete, $isOr)
 {
@@ -1856,7 +1834,6 @@ function addPMRule($id_member, $ruleName, $criteria, $actions, $doDelete, $isOr)
  * @param int $doDelete
  * @param int $isOr
  * @package PersonalMessage
- * @throws \Exception
  */
 function updatePMRule($id_member, $id_rule, $ruleName, $criteria, $actions, $doDelete, $isOr)
 {
@@ -1887,7 +1864,6 @@ function updatePMRule($id_member, $id_rule, $ruleName, $criteria, $actions, $doD
  * @param int $id_member
  * @param int $replied_to
  * @package PersonalMessage
- * @throws \Exception
  */
 function setPMRepliedStatus($id_member, $replied_to)
 {
@@ -1917,7 +1893,6 @@ function setPMRepliedStatus($id_member, $replied_to)
  *
  * @return array
  * @package PersonalMessage
- * @throws \Exception
  */
 function loadConversationList($head, &$recipients, $folder = '')
 {
@@ -1978,7 +1953,6 @@ function loadConversationList($head, &$recipients, $folder = '')
  *
  * @return array
  * @package PersonalMessage
- * @throws \Exception
  */
 function loadConversationUnreadStatus($pms)
 {
@@ -2049,7 +2023,6 @@ function loadConversationUnreadStatus($pms)
  *
  * @return array
  * @package PersonalMessage
- * @throws \Exception
  *
  */
 function loadPMRecipientInfo($all_pms, &$recipients, $folder = '', $search = false)
@@ -2125,7 +2098,6 @@ function loadPMRecipientInfo($all_pms, &$recipients, $folder = '', $search = fal
  * @param string[] $orderBy raw query defining how to order the results
  * @return bool|resource
  * @package PersonalMessage
- * @throws \Exception
  */
 function loadPMSubjectRequest($pms, $orderBy)
 {
@@ -2164,7 +2136,6 @@ function loadPMSubjectRequest($pms, $orderBy)
  * @param string $folder current pm folder
  * @return bool|resource
  * @package PersonalMessage
- * @throws \Exception
  */
 function loadPMMessageRequest($display_pms, $sort_by_query, $sort_by, $descending, $display_mode = '', $folder = '')
 {
@@ -2196,7 +2167,6 @@ function loadPMMessageRequest($display_pms, $sort_by_query, $sort_by, $descendin
  *
  * @return bool
  * @package PersonalMessage
- * @throws \Exception
  */
 function checkPMReceived($pmsg)
 {
@@ -2228,7 +2198,6 @@ function checkPMReceived($pmsg)
  *
  * @return bool
  * @package PersonalMessage
- * @throws \Exception
  */
 function loadPMQuote($pmsg, $isReceived)
 {
@@ -2269,7 +2238,6 @@ function loadPMQuote($pmsg, $isReceived)
  *
  * @return array
  * @package PersonalMessage
- * @throws \Exception
  */
 function loadPMRecipientsAll($pmsg, $bcc_count = false)
 {
@@ -2377,7 +2345,6 @@ function loadPersonalMessage($pm_id)
  * @param mixed[] $searchq_parameters value parameters used in the above query
  * @return int
  * @package PersonalMessage
- * @throws \Exception
  */
 function numPMSeachResults($userQuery, $labelQuery, $timeQuery, $searchQuery, $searchq_parameters)
 {
@@ -2421,7 +2388,6 @@ function numPMSeachResults($userQuery, $labelQuery, $timeQuery, $searchQuery, $s
  *
  * @return array
  * @package PersonalMessage
- * @throws \Exception
  */
 function loadPMSearchMessages($userQuery, $labelQuery, $timeQuery, $searchQuery, $searchq_parameters, $search_params)
 {
@@ -2471,7 +2437,6 @@ function loadPMSearchMessages($userQuery, $labelQuery, $timeQuery, $searchQuery,
  *
  * @return array
  * @package PersonalMessage
- * @throws \Exception
  */
 function loadPMSearchHeads($head_pms)
 {
@@ -2512,7 +2477,6 @@ function loadPMSearchHeads($head_pms)
  *
  * @return array
  * @package PersonalMessage
- * @throws \Exception
  */
 function loadPMSearchResults($foundMessages, $search_params)
 {

@@ -1165,7 +1165,6 @@ function loadProfileFields($force_reload = false)
  *
  * @param string[] $fields
  * @param string $hook
- * @throws \ElkArte\Exceptions\Exception
  */
 function saveProfileFields($fields, $hook)
 {
@@ -1346,7 +1345,6 @@ function saveProfileFields($fields, $hook)
  * @param int $memID = 0
  *
  * @return bool|string
- * @throws \Exception
  */
 function profileValidateEmail($email, $memID = 0)
 {
@@ -1386,7 +1384,6 @@ function profileValidateEmail($email, $memID = 0)
  *
  * @param mixed[] $profile_vars
  * @param int $memID id_member
- * @throws \ElkArte\Exceptions\Exception
  */
 function saveProfileChanges(&$profile_vars, $memID)
 {
@@ -1459,8 +1456,12 @@ function saveProfileChanges(&$profile_vars, $memID)
 	// Here's where we sort out all the 'other' values...
 	if ($changeOther)
 	{
+		// Make any theme changes
 		makeThemeChanges($memID, isset($_POST['id_theme']) ? (int) $_POST['id_theme'] : $old_id_theme);
+
+		// Make any notification changes
 		makeNotificationChanges($memID);
+
 		if (!empty($_REQUEST['sa']))
 		{
 			makeCustomFieldChanges($memID, $_REQUEST['sa'], false);
@@ -1505,8 +1506,7 @@ function saveProfileChanges(&$profile_vars, $memID)
  *
  * @param int $memID
  * @param int $id_theme
- *
- * @throws \ElkArte\Exceptions\Exception no_access
+ * @throws \ElkArte\Exceptions\Exception
  */
 function makeThemeChanges($memID, $id_theme)
 {
@@ -1633,7 +1633,6 @@ function makeThemeChanges($memID, $id_theme)
  * Make any notification changes that need to be made.
  *
  * @param int $memID id_member
- * @throws \ElkArte\Exceptions\Exception
  */
 function makeNotificationChanges($memID)
 {
@@ -1653,6 +1652,7 @@ function makeNotificationChanges($memID)
 					$to_save[$mention] = 0;
 					continue;
 				}
+
 				foreach ($_POST['notify'][$mention]['status'] as $method)
 				{
 					// This ensures that the $method passed by the user is valid and safe to INSERT.
@@ -1742,7 +1742,6 @@ function makeNotificationChanges($memID)
 			);
 		}
 	}
-
 	// We are editing topic notifications......
 	elseif (isset($_POST['edit_notify_topics']) && !empty($_POST['notify_topics']))
 	{
@@ -1773,7 +1772,6 @@ function makeNotificationChanges($memID)
  * @param int $memID
  * @param string $area
  * @param bool $sanitize = true
- * @throws \ElkArte\Exceptions\Exception
  */
 function makeCustomFieldChanges($memID, $area, $sanitize = true)
 {
@@ -2009,7 +2007,6 @@ function profileSendActivation()
  * Load key signature context data.
  *
  * @return bool
- * @throws \ElkArte\Exceptions\Exception
  */
 function profileLoadSignatureData()
 {
@@ -2266,7 +2263,6 @@ function profileReloadUser()
  * @param string $value
  *
  * @return bool|string
- * @throws \ElkArte\Exceptions\Exception
  */
 function profileValidateSignature(&$value)
 {
@@ -2958,7 +2954,6 @@ function profileSaveGroups(&$value)
  * @param int $memID the member ID
  *
  * @return array
- * @throws \Exception
  */
 function list_getUserWarnings($start, $items_per_page, $sort, $memID)
 {
@@ -3005,7 +3000,6 @@ function list_getUserWarnings($start, $items_per_page, $sort, $memID)
  *
  * @param int $memID
  * @return int the number of warnings
- * @throws \ElkArte\Exceptions\Exception
  */
 function list_getUserWarningCount($memID)
 {
@@ -3040,7 +3034,6 @@ function list_getUserWarningCount($memID)
  * @param int[]|null|bool $exclude_boards
  *
  * @return array
- * @throws \Exception
  */
 function profileLoadAttachments($start, $items_per_page, $sort, $boardsAllowed, $memID, $exclude_boards = null)
 {
@@ -3129,7 +3122,6 @@ function profileLoadAttachments($start, $items_per_page, $sort, $boardsAllowed, 
  * @param int[] $boardsAllowed
  * @param int $memID
  * @return int number of attachments
- * @throws \ElkArte\Exceptions\Exception
  */
 function getNumAttachments($boardsAllowed, $memID)
 {
@@ -3175,7 +3167,6 @@ function getNumAttachments($boardsAllowed, $memID)
  * @param int $memID
  *
  * @return array
- * @throws \Exception
  */
 function getUnwatchedBy($start, $items_per_page, $sort, $memID)
 {
@@ -3239,7 +3230,6 @@ function getUnwatchedBy($start, $items_per_page, $sort, $memID)
  *
  * @param int $memID
  * @return int
- * @throws \ElkArte\Exceptions\Exception
  */
 function getNumUnwatchedBy($memID)
 {
@@ -3273,7 +3263,6 @@ function getNumUnwatchedBy($memID)
  * @param int $memID
  * @param int|null $board
  * @return int
- * @throws \ElkArte\Exceptions\Exception
  */
 function count_user_posts($memID, $board = null)
 {
@@ -3311,7 +3300,6 @@ function count_user_posts($memID, $board = null)
  * @param int $memID
  * @param int|null $board
  * @return int
- * @throws \ElkArte\Exceptions\Exception
  */
 function count_user_topics($memID, $board = null)
 {
@@ -3351,7 +3339,6 @@ function count_user_topics($memID, $board = null)
  * @param int|null $board
  *
  * @return array
- * @throws \ElkArte\Exceptions\Exception
  */
 function findMinMaxUserMessage($memID, $board = null)
 {
@@ -3390,7 +3377,6 @@ function findMinMaxUserMessage($memID, $board = null)
  * @param int|null $board
  *
  * @return array
- * @throws \ElkArte\Exceptions\Exception
  */
 function findMinMaxUserTopic($memID, $board = null)
 {
@@ -3434,7 +3420,6 @@ function findMinMaxUserTopic($memID, $board = null)
  * @param int|null $board
  *
  * @return array
- * @throws \ElkArte\Exceptions\Exception
  */
 function load_user_posts($memID, $start, $count, $range_limit = '', $reverse = false, $board = null)
 {
@@ -3508,7 +3493,6 @@ function load_user_posts($memID, $start, $count, $range_limit = '', $reverse = f
  * @param int|null $board
  *
  * @return array
- * @throws \ElkArte\Exceptions\Exception
  */
 function load_user_topics($memID, $start, $count, $range_limit = '', $reverse = false, $board = null)
 {
@@ -3573,7 +3557,6 @@ function load_user_topics($memID, $start, $count, $range_limit = '', $reverse = 
  * @param int[] $curGroups
  *
  * @return array
- * @throws \Exception
  */
 function getMemberGeneralPermissions($curGroups)
 {
@@ -3652,7 +3635,6 @@ function getMemberGeneralPermissions($curGroups)
  * @param int|null $board
  *
  * @return array
- * @throws \Exception
  */
 function getMemberBoardPermissions($memID, $curGroups, $board = null)
 {
@@ -3731,7 +3713,6 @@ function getMemberBoardPermissions($memID, $curGroups, $board = null)
  * @param int $memID the id of the member
  *
  * @return array
- * @throws \ElkArte\Exceptions\Exception
  */
 function getMembersIPs($memID)
 {
@@ -3812,7 +3793,6 @@ function getMembersIPs($memID)
  * @param int $memID the id of the "current" member (maybe it could be retrieved with currentMemberID)
  *
  * @return array
- * @throws \Exception
  */
 function getMembersInRange($ips, $memID)
 {
@@ -3878,7 +3858,6 @@ function getMembersInRange($ips, $memID)
  * @param int $member_id the id of a member
  *
  * @return array
- * @throws \Exception
  */
 function getMemberNotificationsProfile($member_id)
 {
@@ -3901,7 +3880,6 @@ function getMemberNotificationsProfile($member_id)
 	foreach ($enabled_mentions as $type)
 	{
 		$type_on = 1;
-		$notif = filterNotificationMethods(array_keys($notifiers), $type);
 		$data = [];
 		foreach ($notifiers as $key => $notifier)
 		{
@@ -3945,7 +3923,7 @@ function getMemberNotificationsProfile($member_id)
 			];
 		}
 
-		// If they enabled a notifications alert, then lets set a enable alerts browser permission
+		// If they enabled a notifications alert, then enable a browser alerts permission
 		// just blows smoke if they already gave it.
 		$push_enabled &= !empty($modSettings['usernotif_desktop_enable']) && !empty($context['profile_updated']);
 		if ($push_enabled)

@@ -29,7 +29,6 @@ use ElkArte\Util;
  * @param string $low_date inclusive, YYYY-MM-DD
  * @param string $high_date inclusive, YYYY-MM-DD
  * @return mixed[] days, each of which an array of birthday information for the context
- * @throws \ElkArte\Exceptions\Exception
  * @package Calendar
  */
 function getBirthdayRange($low_date, $high_date)
@@ -111,7 +110,6 @@ function getBirthdayRange($low_date, $high_date)
  * @param bool $use_permissions = true
  * @param int|null $limit
  * @return array contextual information if use_permissions is true, and an array of the data needed to build that otherwise
- * @throws \ElkArte\Exceptions\Exception
  * @package Calendar
  */
 function getEventRange($low_date, $high_date, $use_permissions = true, $limit = null)
@@ -245,7 +243,6 @@ function getEventRange($low_date, $high_date, $use_permissions = true, $limit = 
  * @param string $low_date YYYY-MM-DD
  * @param string $high_date YYYY-MM-DD
  * @return array an array of days, which are all arrays of holiday names.
- * @throws \Exception
  * @package Calendar
  */
 function getHolidayRange($low_date, $high_date)
@@ -309,6 +306,7 @@ function getHolidayRange($low_date, $high_date)
  *
  * @package Calendar
  * @todo pass $board, $topic and User::$info->id as arguments with fallback for 1.1
+ * @throws \ElkArte\Exceptions\Exception missing_board_id, missing_topic_id
  */
 function canLinkEvent()
 {
@@ -830,7 +828,6 @@ function cache_getRecentEvents($eventOptions)
  *
  * @param mixed[] $cache_block
  * @param mixed[] $params
- * @throws \ElkArte\Exceptions\Exception
  * @package Calendar
  */
 function cache_getRecentEvents_post_retri_eval(&$cache_block, $params)
@@ -890,7 +887,6 @@ function cache_getRecentEvents_post_retri_eval(&$cache_block, $params)
  *
  * @param int $event_id
  * @return int|bool the id of the poster or false if the event was not found
- * @throws \ElkArte\Exceptions\Exception
  * @package Calendar
  */
 function getEventPoster($event_id)
@@ -933,7 +929,6 @@ function getEventPoster($event_id)
  * - does not check any permissions of any sort.
  *
  * @param mixed[] $eventOptions
- * @throws \ElkArte\Exceptions\Exception
  * @package Calendar
  */
 function insertEvent(&$eventOptions)
@@ -1001,7 +996,6 @@ function insertEvent(&$eventOptions)
  *
  * @param int $event_id
  * @param mixed[] $eventOptions
- * @throws \ElkArte\Exceptions\Exception
  * @package Calendar
  */
 function modifyEvent($event_id, &$eventOptions)
@@ -1074,7 +1068,6 @@ function modifyEvent($event_id, &$eventOptions)
  * - does no permission checks.
  *
  * @param int $event_id
- * @throws \ElkArte\Exceptions\Exception
  * @package Calendar
  */
 function removeEvent($event_id)
@@ -1102,7 +1095,6 @@ function removeEvent($event_id)
  * @param int $event_id
  * @param bool $calendar_only
  * @return mixed[]|bool
- * @throws \ElkArte\Exceptions\Exception
  * @package Calendar
  */
 function getEventProperties($event_id, $calendar_only = false)
@@ -1172,7 +1164,6 @@ function getEventProperties($event_id, $calendar_only = false)
  * @param int $id_topic
  *
  * @return array
- * @throws \Exception
  * @package Calendar
  *
  */
@@ -1201,7 +1192,6 @@ function eventInfoForTopic($id_topic)
  * @param int $items_per_page The number of items to show per page
  * @param string $sort A string indicating how to sort the results
  * @return array
- * @throws \Exception
  * @package Calendar
  */
 function list_getHolidays($start, $items_per_page, $sort)
@@ -1224,7 +1214,6 @@ function list_getHolidays($start, $items_per_page, $sort)
  * Helper function to get the total number of holidays
  *
  * @return int
- * @throws \ElkArte\Exceptions\Exception
  * @package Calendar
  */
 function list_getNumHolidays()
@@ -1247,7 +1236,6 @@ function list_getNumHolidays()
  * Remove a holiday from the calendar.
  *
  * @param int|int[] $holiday_ids An array of ids for holidays.
- * @throws \ElkArte\Exceptions\Exception
  * @package Calendar
  */
 function removeHolidays($holiday_ids)
@@ -1278,7 +1266,6 @@ function removeHolidays($holiday_ids)
  * @param int $holiday
  * @param int $date
  * @param string $title
- * @throws \ElkArte\Exceptions\Exception
  * @package Calendar
  */
 function editHoliday($holiday, $date, $title)
@@ -1307,7 +1294,6 @@ function editHoliday($holiday, $date, $title)
  *
  * @param int $date
  * @param string $title
- * @throws \ElkArte\Exceptions\Exception
  * @package Calendar
  */
 function insertHoliday($date, $title)
@@ -1335,7 +1321,6 @@ function insertHoliday($date, $title)
  *
  * @param int $id_holiday
  * @return array
- * @throws \Exception
  * @package Calendar
  */
 function getHoliday($id_holiday)

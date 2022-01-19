@@ -25,7 +25,6 @@ use ElkArte\Util;
  * @param string $direction - + for like - for unlike a previous liked one
  *
  * @return bool
- * @throws \ElkArte\Exceptions\Exception
  * @package Likes
  *
  */
@@ -59,7 +58,6 @@ function likePost($id_liker, $liked_message, $direction)
  * @param bool $prepare
  *
  * @return array|int[]
- * @throws \Exception
  * @package Likes
  *
  */
@@ -170,7 +168,6 @@ function prepareLikes($likes)
  * Clear the likes log of older actions ... used to prevent a like love fest
  *
  * @param int $likeWaitTime
- * @throws \ElkArte\Exceptions\Exception
  * @package Likes
  */
 function clearLikes($likeWaitTime)
@@ -199,7 +196,6 @@ function clearLikes($likeWaitTime)
  * @param int $id_liker
  *
  * @return bool
- * @throws \ElkArte\Exceptions\Exception
  * @package Likes
  *
  */
@@ -235,7 +231,6 @@ function lastLikeOn($id_liker)
  * @param int $id_liker
  * @param int[] $liked_message
  * @param string $direction - options: - or +
- * @throws \ElkArte\Exceptions\Exception
  * @package Likes
  */
 function updateLike($id_liker, $liked_message, $direction)
@@ -318,7 +313,6 @@ function updateLike($id_liker, $liked_message, $direction)
  *
  * @param int $id_topic - the topic
  * @param string $direction +/- liking or unliking
- * @throws \ElkArte\Exceptions\Exception
  * @package Likes
  */
 function increaseTopicLikes($id_topic, $direction)
@@ -344,7 +338,6 @@ function increaseTopicLikes($id_topic, $direction)
  * @param bool $given
  *
  * @return int
- * @throws \ElkArte\Exceptions\Exception
  * @package Likes
  *
  */
@@ -386,7 +379,6 @@ function likesCount($memberID, $given = true)
  * @param int $memberID
  *
  * @return array
- * @throws \Exception
  * @package Likes
  *
  */
@@ -439,7 +431,6 @@ function likesPostsGiven($start, $items_per_page, $sort, $memberID)
  * @param int $memberID
  *
  * @return array
- * @throws \Exception
  * @package Likes
  *
  */
@@ -490,7 +481,6 @@ function likesPostsReceived($start, $items_per_page, $sort, $memberID)
  * @param bool $simple
  *
  * @return array
- * @throws \Exception
  * @package Likes
  *
  */
@@ -550,7 +540,6 @@ function postLikers($start, $items_per_page, $sort, $messageID, $simple = true)
  * @param int $message
  *
  * @return int
- * @throws \ElkArte\Exceptions\Exception
  * @package Likes
  *
  */
@@ -585,7 +574,6 @@ function messageLikeCount($message)
  * @param int $limit the number of top liked messages to fetch
  *
  * @return array
- * @throws \Exception
  * @package Likes
  */
 function dbMostLikedMessage($limit = 10)
@@ -685,7 +673,6 @@ function dbMostLikedMessage($limit = 10)
  * @param int $limit the maximum number of liked posts to return
  *
  * @return array
- * @throws \Exception
  * @package Likes
  */
 function dbMostLikedMessagesByTopic($topic, $limit = 5)
@@ -774,7 +761,6 @@ function dbMostLikedMessagesByTopic($topic, $limit = 5)
  * @param int $limit - Optional, number of topics to return (default 10).
  *
  * @return array
- * @throws \Exception
  * @package Likes
  *
  */
@@ -911,7 +897,6 @@ function dbMostLikedBoard()
  * @param int $limit the number of most liked members to return
  *
  * @return array
- * @throws \Exception
  * @package Likes
  *
  */
@@ -983,7 +968,6 @@ function dbMostLikesReceivedUser($limit = 10)
  * @param int $limit then number of top posts to return
  *
  * @return array
- * @throws \Exception
  */
 function dbMostLikedPostsByUser($id_member, $limit = 10)
 {
@@ -1040,7 +1024,6 @@ function dbMostLikedPostsByUser($id_member, $limit = 10)
  * @param int $limit the number of members to return
  *
  * @return array
- * @throws \Exception
  * @package Likes
  *
  */
@@ -1108,7 +1091,6 @@ function dbMostLikesGivenUser($limit = 10)
  * @param int $id_liker the userid to find recently liked posts
  * @param int $limit number of recently liked posts to fetch
  * @return array
- * @throws \Exception
  */
 function dbRecentlyLikedPostsGivenUser($id_liker, $limit = 5)
 {
@@ -1166,7 +1148,6 @@ function dbRecentlyLikedPostsGivenUser($id_liker, $limit = 5)
  * for that message.
  *
  * @param int[]|int $messages
- * @throws \Exception
  */
 function decreaseLikeCounts($messages)
 {
