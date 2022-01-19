@@ -541,7 +541,7 @@ function sendBoardNotifications(&$topicData)
 		)
 	);
 	// While we have members with board notifications
-	while (($rowmember = $members->fetch_assoc()))
+	while ($rowmember = $members->fetch_assoc())
 	{
 		$email_perm = true;
 		if (!validateNotificationAccess($rowmember, $maillist, $email_perm))
@@ -1034,10 +1034,12 @@ function getUsersNotificationsPreferences($notification_types, $members)
 				{
 					$results[$member] = [];
 				}
+
 				if (!isset($results[$member][$type]))
 				{
 					$results[$member][$type] = [];
 				}
+
 				$results[$member][$type] = $defaults[$type];
 			}
 		}
@@ -1051,7 +1053,6 @@ function getUsersNotificationsPreferences($notification_types, $members)
  *
  * @param int $member The member id
  * @param string[] $notification_data The array of notifications ('type' => ['level'])
- * @throws \ElkArte\Exceptions\Exception
  */
 function saveUserNotificationsPreferences($member, $notification_data)
 {
@@ -1077,6 +1078,7 @@ function saveUserNotificationsPreferences($member, $notification_data)
 		{
 			continue;
 		}
+
 		$inserts[] = array(
 			$member,
 			$type,
@@ -1204,7 +1206,7 @@ function getNotifierToken($memID, $memEmail, $memSalt, $area, $extra)
 }
 
 /**
- * Creates a hash code using the notification details and our secret key
+ * Validates a hash code using the notification details and our secret key
  *
  * - If no site salt (secret key) has been set, simply fails
  *
