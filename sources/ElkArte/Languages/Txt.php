@@ -35,6 +35,10 @@ class Txt
 			self::$loader = new Loader($lang, $txt);
 			self::$loader->setFallback(empty($modSettings['disable_language_fallback']));
 		}
+		if (is_array($template))
+		{
+			$template = implode('+', $template);
+		}
 		self::$loader->load($template, $fatal, $fix_calendar_arrays);
 	}
 }
