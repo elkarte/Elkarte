@@ -31,7 +31,7 @@ class TestLanguageStrings extends TestCase
 	 */
 	public function testLanguageIndexes()
 	{
-		$files = glob(LANGUAGEDIR . '/english/*.php');
+		$files = glob(LANGUAGEDIR . '/*/English.php');
 		foreach ($files as $file)
 		{
 			$content = file($file);

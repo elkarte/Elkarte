@@ -123,9 +123,9 @@ if ((empty($extdir) || !file_exists($extdir)) && file_exists($sourcedir . '/ext'
 	$extdir = $sourcedir . '/ext';
 }
 
-if ((empty($languagedir) || !file_exists($languagedir)) && file_exists($boarddir . '/themes/default/languages'))
+if ((empty($languagedir) || !file_exists($languagedir)) && file_exists($sourcedir . '/Languages'))
 {
-	$languagedir = $boarddir . '/themes/default/languages';
+	$languagedir = $sourcedir . '/ElkArte/Languages';
 }
 
 // Time to forget about variables and go with constants!

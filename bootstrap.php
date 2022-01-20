@@ -218,9 +218,9 @@ class Bootstrap
 			$extdir = $sourcedir . '/ext';
 		}
 
-		if ((empty($languagedir) || !file_exists($languagedir)) && file_exists($boarddir . '/themes/default/languages'))
+		if ((empty($languagedir) || !file_exists($languagedir)) && file_exists($sourcedir . '/Languages/Index'))
 		{
-			$languagedir = $boarddir . '/themes/default/languages';
+			$languagedir = $sourcedir . '/ElkArte/Languages';
 		}
 
 		// Time to forget about variables and go with constants!

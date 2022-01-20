@@ -1682,7 +1682,7 @@ function parse_path($path)
 		'AVATARSDIR' => $modSettings['avatar_directory'],
 		'THEMEDIR' => $settings['default_theme_dir'],
 		'IMAGESDIR' => $settings['default_theme_dir'] . '/' . basename($settings['default_images_url']),
-		'LANGUAGEDIR' => $settings['default_theme_dir'] . '/languages',
+		'LANGUAGEDIR' => SOURCEDIR . '/ElkArte/Languages',
 		'SMILEYDIR' => $modSettings['smileys_dir'],
 	);
 

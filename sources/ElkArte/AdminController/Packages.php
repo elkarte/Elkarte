@@ -516,7 +516,7 @@ class Packages extends AbstractController
 				}
 				elseif ($matches[1] === 'languagedir' || $matches[1] === 'languages_dir')
 				{
-					$path = '/languages';
+					$path = '/ElkArte/Languages';
 				}
 				else
 				{
