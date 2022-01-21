@@ -959,7 +959,7 @@ function expandThumbLB(thumbID, messageID)
 		$elk_lb_content = $('#elk_lb_content'),
 		ajaxIndicatorOn = function ()
 		{
-			$('<div id="lightbox-loading"><i class="icon icon-spin icon-xl i-spinner"></i><div>').appendTo($elk_lb_content);
+			$('<div id="lightbox-loading"><i class="icon icon-xl i-concentric"></i><div>').appendTo($elk_lb_content);
 			$('html, body').addClass('elk_lb_no_scrolling');
 		},
 		ajaxIndicatorOff = function ()
@@ -1242,7 +1242,7 @@ function ignore_toggles(msgids, text)
 function sendtopicOverlayDiv(desktopURL, sHeader, sIcon)
 {
 	// Set up our div details
-	var sAjax_indicator = '<div class="centertext"><i class="icon icon-spin i-spinner"></i></div>',
+	var sAjax_indicator = '<div class="centertext"><i class="icon i-oval"></i></div>',
 		oPopup_body;
 
 	// TODO: Even if we weren't purging icons, this is still not the right icon for this.

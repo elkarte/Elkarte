@@ -49,7 +49,7 @@ function start_tabs()
 		beforeLoad: function (event, ui)
 		{
 			// The ubiquitous ajax spinner
-			ui.panel.html('<div class="centertext"><i class="icon icon-spin icon-big i-spinner"></i></div>');
+			ui.panel.html('<div class="centertext"><i class="icon icon-big i-oval"></i></div>');
 
 			// Ajax call failed to retrieve content
 			ui.jqXHR.fail(function (jqXHR, textStatus, errorThrown)

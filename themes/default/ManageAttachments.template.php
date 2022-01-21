@@ -193,7 +193,7 @@ function template_maintenance()
 				}
 
 				function show_msg() {
-					$(\'#progress_msg\').html(\'<div><i class="icon icon-spin i-spinner"></i>&nbsp;', $txt['attachment_transfer_progress'], '<\/div>\');
+					$(\'#progress_msg\').html(\'<div><i class="icon i-oval"></i>&nbsp;', $txt['attachment_transfer_progress'], '<\/div>\');
 					show_progress();
 				}
 

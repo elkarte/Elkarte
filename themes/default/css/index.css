@@ -5335,7 +5335,7 @@ Stef                       ^
 /* description & information used below headers, others used to how a result message */
 .description, .information, .warningbox, .successbox, .infobox, .errorbox {
 	margin: 0 0 1.1em 0;
-	padding: .25em .8em;
+	padding: .8em .8em;
 	border: 1px solid;
 }
 
