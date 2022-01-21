@@ -24,6 +24,7 @@ class Html2Md extends AbstractDomParser
 	/** @var bool Strip remaining tags, set too false to leave them in */
 	public $strip_tags = true;
 
+	/** @var string[] various settings on how render certain markdown tags */
 	public $config = ['heading' => 'atx', 'bullet' => '*', 'em' => '_', 'strong' => '**'];
 
 	/** @var string The markdown equivalent to the  html string */
@@ -372,6 +373,7 @@ class Html2Md extends AbstractDomParser
 	{
 		// Turn off things that may mangle code tags
 		$this->strip_tags = false;
+		$this->body_width = 0;
 
 		// Get the code block
 		$value = html_entity_decode($this->getInnerHTML($node), ENT_COMPAT, 'UTF-8');
@@ -611,6 +613,8 @@ class Html2Md extends AbstractDomParser
 			// Return what we did so it can be swapped in
 			return implode($this->line_end, $rows);
 		}
+
+		return '';
 	}
 
 	/**
@@ -775,15 +779,32 @@ class Html2Md extends AbstractDomParser
 	 */
 	private function _convertPlaintxtLinks($text, $node)
 	{
-		if ($this->getName($this->getParent($node)) === 'a')
+		if (in_array($this->getName($this->getParent($node)), array('a', 'code', 'pre')))
 		{
 			return $text;
 		}
 
-		return preg_replace_callback('/((?<!\\( |]\()https?:\/\/|(?<!\\( |]\(|:\/\/)www)[-\p{L}0-9+&@#\/%?=~_|!:,.;]*[\p{L}0-9+&@#\/%=~_|]/iu',
+		// Any evidence of a code block we skip
+		if (preg_match('~`.*`~s', $text) === 1)
+		{
+			return $text;
+		}
+
+		// Link finding regex that will skip our markdown [link](xx) constructs
+		$re = '/((?<!\\\\\( |]\()https?:\/\/|(?<!\\\\\( |]\(|:\/\/)www)[-\p{L}0-9+&@#\/%?=~_|!:,.;]*[\p{L}0-9+&@#\/%=~_|]/ui';
+		$count = 0;
+		$text = preg_replace_callback($re,
 			function ($matches) {
 				return $this->_plaintxtCallback($matches);
-			}, $text);
+			}, $text, -1, $count);
+
+		// If we made changes, lets protect that link from wrapping
+		if ($count > 0)
+		{
+			$this->_setBodyWidth($text);
+		}
+
+		return $text;
 	}
 
 	/**
