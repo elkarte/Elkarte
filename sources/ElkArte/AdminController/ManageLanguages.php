@@ -23,6 +23,7 @@ use ElkArte\Exceptions\Exception;
 use ElkArte\SettingsForm\SettingsForm;
 use ElkArte\Languages\Txt;
 use ElkArte\Util;
+use ElkArte\Languages\Editor as LangEditor;
 use ElkArte\Languages\Loader as LangLoader;
 
 /**
@@ -789,6 +790,10 @@ class ManageLanguages extends AbstractController
 			'rtl' => $mtxt['lang_rtl'],
 		);
 
+		// Quickly load index language entries.
+		$edit_lang = new LangEditor($context['lang_id'], database());
+		$edit_lang->load($file_id, true);
+
 		// Are we saving?
 		$save_strings = array();
 		if (isset($this->_req->post->save_entries) && !empty($this->_req->post->entry))
@@ -796,209 +801,12 @@ class ManageLanguages extends AbstractController
 			checkSession();
 			validateToken('admin-mlang');
 
-			// Clean each entry!
-			foreach ($this->_req->post->entry as $k => $v)
-			{
-				// Only try to save if it's changed!
-				if ($this->_req->post->entry[$k] != $this->_req->post->comp[$k])
-				{
-					$save_strings[$k] = cleanLangString($v, false);
-				}
-			}
-		}
+			$edit_lang->save($file_id, $this->_req->post->entry);
 
-		// If we are editing a file work away at that.
-		if ($current_file !== '')
-		{
-			$entries = array();
-
-			// We can't just require it I'm afraid - otherwise we pass in all kinds of variables!
-			$multiline_cache = '';
-			foreach (file($current_file) as $line)
-			{
-				// Got a new entry?
-				if ($line[0] == '$' && !empty($multiline_cache))
-				{
-					preg_match('~\$(helptxt|txt|editortxt)\[\'(.+)\'\]\s?=\s?(.+);~ms', strtr($multiline_cache, array("\r" => '')), $matches);
-					if (!empty($matches[3]))
-					{
-						$entries[$matches[2]] = array(
-							'type' => $matches[1],
-							'full' => $matches[0],
-							'entry' => $matches[3],
-						);
-						$multiline_cache = '';
-					}
-				}
-				$multiline_cache .= $line;
-			}
-
-			// Last entry to add?
-			if ($multiline_cache !== '')
-			{
-				preg_match('~\$(helptxt|txt|editortxt)\[\'(.+)\'\]\s?=\s?(.+);~ms', strtr($multiline_cache, array("\r" => '')), $matches);
-				if (!empty($matches[3]))
-				{
-					$entries[$matches[2]] = array(
-						'type' => $matches[1],
-						'full' => $matches[0],
-						'entry' => $matches[3],
-					);
-				}
-			}
-
-			// These are the entries we can definitely save.
-			$final_saves = array();
-
-			$context['file_entries'] = array();
-			foreach ($entries as $entryKey => $entryValue)
-			{
-				// Nowadays some entries have fancy keys, so better use something "portable" for the form
-				$md5EntryKey = md5($entryKey);
-
-				// Ignore some things we set separately.
-				$ignore_files = array('lang_character_set', 'lang_locale', 'lang_dictionary', 'lang_spelling', 'lang_rtl');
-				if (in_array($entryKey, $ignore_files))
-				{
-					continue;
-				}
-
-				// These are arrays that need breaking out.
-				$arrays = array('days', 'days_short', 'months', 'months_titles', 'months_short', 'happy_birthday_author', 'karlbenson1_author', 'nite0859_author', 'zwaldowski_author', 'geezmo_author', 'karlbenson2_author');
-				if (in_array($entryKey, $arrays))
-				{
-					// Get off the first bits.
-					$entryValue['entry'] = substr($entryValue['entry'], strpos($entryValue['entry'], '(') + 1, strrpos($entryValue['entry'], ')') - strpos($entryValue['entry'], '('));
-					$entryValue['entry'] = explode(',', strtr($entryValue['entry'], array(' ' => '')));
-
-					// Now create an entry for each item.
-					$cur_index = 0;
-					$save_cache = array(
-						'enabled' => false,
-						'entries' => array(),
-					);
-					foreach ($entryValue['entry'] as $id => $subValue)
-					{
-						// Is this a new index?
-						if (preg_match('~^(\d+)~', $subValue, $matches))
-						{
-							$cur_index = $matches[1];
-							$subValue = substr($subValue, strpos($subValue, '\''));
-						}
-
-						// Clean up some bits.
-						$subValue = strtr($subValue, array('"' => '', '\'' => '', ')' => ''));
-
-						// Can we save?
-						if (isset($save_strings[$md5EntryKey . '-+- ' . $cur_index]))
-						{
-							$save_cache['entries'][$cur_index] = strtr($save_strings[$md5EntryKey . '-+- ' . $cur_index], array('\'' => ''));
-							$save_cache['enabled'] = true;
-						}
-						else
-						{
-							$save_cache['entries'][$cur_index] = $subValue;
-						}
-
-						$context['file_entries'][] = array(
-							'key' => $entryKey . '-+- ' . $cur_index,
-							'display_key' => $entryKey . '-+- ' . $cur_index,
-							'value' => $subValue,
-							'rows' => 1,
-						);
-						$cur_index++;
-					}
-
-					// Do we need to save?
-					if ($save_cache['enabled'])
-					{
-						// Format the string, checking the indexes first.
-						$items = array();
-						$cur_index = 0;
-						foreach ($save_cache['entries'] as $k2 => $v2)
-						{
-							// Manually show the custom index.
-							if ($k2 !== $cur_index)
-							{
-								$items[] = $k2 . ' => \'' . $v2 . '\'';
-								$cur_index = $k2;
-							}
-							else
-							{
-								$items[] = '\'' . $v2 . '\'';
-							}
-
-							$cur_index++;
-						}
-
-						// Now create the string!
-						$final_saves[$entryKey] = array(
-							'find' => $entryValue['full'],
-							'replace' => '$' . $entryValue['type'] . '[\'' . $entryKey . '\'] = array(' . implode(', ', $items) . ');',
-						);
-					}
-				}
-				else
-				{
-					// Saving?
-					if (isset($save_strings[$md5EntryKey]) && $save_strings[$md5EntryKey] !== $entryValue['entry'])
-					{
-						// @todo Fix this properly.
-						if ($save_strings[$md5EntryKey] == '')
-						{
-							$save_strings[$md5EntryKey] = '\'\'';
-						}
-
-						// Set the new value.
-						$entryValue['entry'] = $save_strings[$md5EntryKey];
-
-						// And we know what to save now!
-						$final_saves[$entryKey] = array(
-							'find' => $entryValue['full'],
-							'replace' => '$' . $entryValue['type'] . '[\'' . $entryKey . '\'] = ' . $save_strings[$md5EntryKey] . ';',
-						);
-					}
-
-					$editing_string = cleanLangString($entryValue['entry'], true);
-					$context['file_entries'][] = array(
-						'key' => $md5EntryKey,
-						'display_key' => $entryKey,
-						'value' => $editing_string,
-						'rows' => (int) (strlen($editing_string) / 38) + substr_count($editing_string, "\n") + 1,
-					);
-				}
-			}
-
-			// Any saves to make?
-			if (!empty($final_saves))
-			{
-				checkSession();
-
-				$file_contents = implode('', file($current_file));
-				foreach ($final_saves as $save)
-				{
-					$file_contents = strtr($file_contents, array($save['find'] => $save['replace']));
-				}
-
-				// Save the actual changes.
-				$fp = fopen($current_file, 'w+');
-				fwrite($fp, strtr($file_contents, array("\r" => '')));
-				fclose($fp);
-
-				if ($this->_checkOpcache())
-				{
-					opcache_invalidate($current_file);
-				}
-
-				$madeSave = true;
-			}
-		}
-
-		// If we saved, redirect.
-		if ($madeSave)
-		{
 			redirectexit('action=admin;area=languages;sa=editlang;lid=' . $context['lang_id']);
 		}
+
+		$context['file_entries'] = $edit_lang->getForEditing();
 
 		createToken('admin-mlang');
 	}

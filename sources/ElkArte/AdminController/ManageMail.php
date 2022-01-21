@@ -20,6 +20,7 @@ use ElkArte\AbstractController;
 use ElkArte\Action;
 use ElkArte\SettingsForm\SettingsForm;
 use ElkArte\Languages\Txt;
+use ElkArte\Languages\Loader;
 use ElkArte\Util;
 
 /**
