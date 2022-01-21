@@ -703,7 +703,7 @@ function cache_getOffsetIndependentEvents($days_to_index)
 			'birthdays' => getBirthdayRange($low_date, $high_date),
 			'events' => getEventRange($low_date, $high_date, false),
 		),
-		'refresh_eval' => 'return \'' . Util::strftime('%Y%m%d', forum_time(false)) . '\' != Util::strftime(\'%Y%m%d\', forum_time(false)) || (!empty($modSettings[\'calendar_updated\']) && ' . time() . ' < $modSettings[\'calendar_updated\']);',
+		'refresh_eval' => 'return \'' . Util::strftime('%Y%m%d', forum_time(false)) . '\' != \\ElkArte\\Util::strftime(\'%Y%m%d\', forum_time(false)) || (!empty($modSettings[\'calendar_updated\']) && ' . time() . ' < $modSettings[\'calendar_updated\']);',
 		'expires' => time() + 3600,
 	);
 }
@@ -816,7 +816,7 @@ function cache_getRecentEvents($eventOptions)
 	return array(
 		'data' => $return_data,
 		'expires' => time() + 3600,
-		'refresh_eval' => 'return \'' . Util::strftime('%Y%m%d', forum_time(false)) . '\' != Util::strftime(\'%Y%m%d\', forum_time(false)) || (!empty($modSettings[\'calendar_updated\']) && ' . time() . ' < $modSettings[\'calendar_updated\']);',
+		'refresh_eval' => 'return \'' . Util::strftime('%Y%m%d', forum_time(false)) . '\' != \\ElkArte\\Util::strftime(\'%Y%m%d\', forum_time(false)) || (!empty($modSettings[\'calendar_updated\']) && ' . time() . ' < $modSettings[\'calendar_updated\']);',
 		'post_retri_eval' => '
 			require_once(SUBSDIR . \'/Calendar.subs.php\');
 			return cache_getRecentEvents_post_retri_eval($cache_block, $params);',
