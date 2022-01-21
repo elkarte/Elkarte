@@ -30,6 +30,9 @@ class Loader
 	/** @var string */
 	protected $language = 'English';
 
+	/** @var string */
+	protected $variable_name = '';
+
 	/** @var bool */
 	protected $load_fallback = true;
 
@@ -39,7 +42,7 @@ class Loader
 	/** @var string[] Holds the name of the files already loaded to load them only once */
 	protected $loaded = [];
 
-	public function __construct($lang = null, &$variable, QueryInterface $db)
+	public function __construct($lang = null, &$variable, QueryInterface $db, string $variable_name = 'txt')
 	{
 		if ($lang !== null)
 		{
@@ -50,6 +53,7 @@ class Loader
 		$this->db = $db;
 
 		$this->variable = &$variable;
+		$this->variable_name = $variable_name;
 		if (empty($this->variable))
 		{
 			$this->variable = [];
@@ -87,7 +91,7 @@ class Loader
 			{
 				$found_fallback = $this->loadFile($file, 'English');
 			}
-			$found = $this->loadFile($file);
+			$found = $this->loadFile($file, $this->language);
 
 			$this->loaded[$file] = true;
 
@@ -143,15 +147,15 @@ class Loader
 		$result->free_result();
 	}
 
-	protected function loadFile($name)
+	protected function loadFile($name, $language)
 	{
 		$filepath = $this->path . $name . '/' . $this->language . '.php';
 		if (file_exists($filepath))
 		{
 			require($filepath);
-			if (!empty($txt))
+			if (!empty(${$this->variable_name}))
 			{
-				$this->variable += $txt;
+				$this->variable += ${$this->variable_name};
 			}
 			// Temporary solution (I think);
 			if (!empty($txtBirthdayEmails))
