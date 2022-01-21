@@ -165,7 +165,7 @@ class UpgradeInstructions_upgrade_1_1
 					$this->table->create_table('{db_prefix}notifications_pref',
 						array(
 							array('name' => 'id_member', 'type' => 'mediumint', 'size' => 8, 'unsigned' => true, 'default' => 0),
-							array('name' => 'notification_type', 'type' => 'text'),
+							array('name' => 'notification_level', 'type' => 'tinyint', 'size' => 1, 'default' => 1),
 							array('name' => 'mention_type', 'type' => 'varchar', 'size' => 12, 'default' => ''),
 						),
 						array(
@@ -306,12 +306,12 @@ class UpgradeInstructions_upgrade_1_1
 
 						$this->db->query('', '
 							INSERT IGNORE INTO {db_prefix}notifications_pref
-								(id_member, mention_type, notification_type)
-							SELECT id_member, {string-12:mention_type}, {string:notification_type}
+								(id_member, mention_type, notification_level)
+							SELECT id_member, {string:mention_type}, {int:level}
 							FROM {db_prefix}members',
 							array(
 								'mention_type' => $toggle,
-								'notification_type' => json_encode(['notification']),
+								'level' => 1,
 							)
 						);
 					}
@@ -360,7 +360,7 @@ class UpgradeInstructions_upgrade_1_1
 					if (!empty($modSettings['drafts_enabled']))
 					{
 						enableModules('drafts', array('post', 'display', 'profile', 'personalmessage'));
-						\ElkArte\Hooks::instance()->enableIntegration('\\ElkArte\\DraftsIntegrate');
+						\ElkArte\Hooks::instance()->enableIntegration('Drafts_Integrate');
 					}
 
 					if (!empty($modSettings['enabled_mentions']))
@@ -371,9 +371,8 @@ class UpgradeInstructions_upgrade_1_1
 					enableModules('poll', array('display', 'post'));
 					enableModules('verification', array('post', 'personalmessage', 'register'));
 					enableModules('random', array('post', 'display'));
-					\ElkArte\Hooks::instance()->enableIntegration('\\ElkArte\\UserNotificationIntegrate');
-					\ElkArte\Hooks::instance()->enableIntegration('\\ElkArte\\IlaIntegrate');
-					\ElkArte\Hooks::instance()->enableIntegration('\\ElkArte\\EmojiIntegrate');
+					\ElkArte\Hooks::instance()->enableIntegration('User_Notification_Integrate');
+					\ElkArte\Hooks::instance()->enableIntegration('Ila_Integrate');
 					updateSettings(array(
 						'usernotif_favicon_bgColor' => '#ff0000',
 						'usernotif_favicon_position' => 'up',
