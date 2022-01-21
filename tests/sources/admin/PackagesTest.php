@@ -35,7 +35,7 @@ class TestPackagesController extends ElkArteCommonSetupTest
 		}
 
 		new ElkArte\Themes\ThemeLoader();
-		$lang = new Loader('english', $txt);
+		$lang = new Loader('english', $txt, database());
 		$lang->load('Packages');
 
 		$context['admin_menu_id'] = 1;

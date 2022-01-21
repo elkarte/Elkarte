@@ -777,7 +777,7 @@ class ManageLanguages extends AbstractController
 
 		// Quickly load index language entries.
 		$mtxt = [];
-		$new_lang = new LangLoader($context['lang_id'], $mtxt);
+		$new_lang = new LangLoader($context['lang_id'], $mtxt, database());
 		$new_lang->load('Index', true);
 
 		// Setup the primary settings context.

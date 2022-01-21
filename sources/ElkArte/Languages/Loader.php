@@ -14,6 +14,7 @@
 namespace ElkArte\Languages;
 
 use ElkArte\Debug;
+use ElkArte\Database\QueryInterface;
 
 /**
  * This class takes care of loading language files
@@ -22,6 +23,9 @@ class Loader
 {
 	/** @var string */
 	protected $path = '';
+
+	/** @var QueryInterface */
+	protected $db = '';
 
 	/** @var string */
 	protected $language = 'English';
@@ -35,7 +39,7 @@ class Loader
 	/** @var string[] Holds the name of the files already loaded to load them only once */
 	protected $loaded = [];
 
-	public function __construct($lang = null, &$variable)
+	public function __construct($lang = null, &$variable, QueryInterface $db)
 	{
 		if ($lang !== null)
 		{
@@ -43,6 +47,7 @@ class Loader
 		}
 
 		$this->path = SOURCEDIR . '/ElkArte/Languages/';
+		$this->db = $db;
 
 		$this->variable = &$variable;
 		if (empty($this->variable))
@@ -82,7 +87,7 @@ class Loader
 			{
 				$found_fallback = $this->loadFile($file, 'English');
 			}
-			$found = $this->loadFile($file, $this->language);
+			$found = $this->loadFile($file);
 
 			$this->loaded[$file] = true;
 
@@ -120,9 +125,27 @@ class Loader
 		}
 	}
 
-	protected function loadFile($name, $lang)
+	protected function loadFromDb($files)
 	{
-		$filepath = $this->path . $name . '/' . $lang . '.php';
+		$result = $this->db->fetchQuery('
+			SELECT key, value
+			FROM {db_prefix}languages
+			WHERE language = {string:language}
+				AND file IN ({array_string:files})',
+			[
+				'language' => $this->language,
+				'files' => $files
+			]);
+		while ($row = $result->fetch_assoc())
+		{
+			$this->variable[$row['key']] = $row['value'];
+		}
+		$result->free_result();
+	}
+
+	protected function loadFile($name)
+	{
+		$filepath = $this->path . $name . '/' . $this->language . '.php';
 		if (file_exists($filepath))
 		{
 			require($filepath);

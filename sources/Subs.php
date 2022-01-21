@@ -1632,7 +1632,7 @@ function response_prefix()
 		else
 		{
 			$mtxt = [];
-			$lang_loader = new Loader($language, $mtxt);
+			$lang_loader = new Loader($language, $mtxt, database());
 			$lang_loader->load('index');
 			$response_prefix = $mtxt['response_prefix'];
 		}

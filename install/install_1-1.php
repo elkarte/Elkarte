@@ -1060,6 +1060,23 @@ class InstallInstructions_install_1_1
 		);
 	}
 
+	public function table_languages()
+	{
+		return $this->table->create_table('{db_prefix}languages',
+			array(
+				array('name' => 'language', 'type' => 'string', 'size' => 40,  'default' => ''),
+				array('name' => 'file',     'type' => 'string', 'size' => 40,  'default' => ''),
+				array('name' => 'key',      'type' => 'string', 'size' => 255, 'default' => ''),
+				array('name' => 'value',    'type' => 'text'),
+			),
+			array(
+				array('name' => 'id_lang', 'columns' => array('language', 'file'), 'type' => 'primary'),
+			),
+			array(),
+			'ignore'
+		);
+	}
+
 	public function table_log_actions()
 	{
 		return $this->table->create_table('{db_prefix}log_actions',

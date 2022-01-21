@@ -19,7 +19,7 @@ class TestManageBoardsSettings extends ElkArteCommonSetupTest
 		global $txt;
 
 		parent::setUp();
-		$lang = new Loader('english', $txt);
+		$lang = new Loader('english', $txt, database());
 		$lang->load('ManagePermissions');
 	}
 

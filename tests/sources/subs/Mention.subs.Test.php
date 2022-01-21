@@ -69,7 +69,7 @@ class TestMentions extends TestCase
 			'name' => 'itsme',
 		]);
 
-		$lang = new Loader('english', $txt);
+		$lang = new Loader('english', $txt, database());
 		$lang->load('EmailTemplates+MaillistTemplates');
 
 		// Lets start by ensuring a topic exists by creating one

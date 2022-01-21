@@ -24,7 +24,7 @@ class TestPBE extends TestCase
 		global $txt;
 		require_once(SUBSDIR . '/Emailpost.subs.php');
 
-		$lang = new Loader('english', $txt);
+		$lang = new Loader('english', $txt, database());
 		$lang->load('Maillist');
 		User::$info = new UserInfo(['name' => 'name']);
 

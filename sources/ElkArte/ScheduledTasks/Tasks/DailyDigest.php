@@ -267,7 +267,7 @@ class DailyDigest implements ScheduledTaskInterface
 		foreach ($langs as $lang)
 		{
 			$mtxt = [];
-			$lang_loader = new Loader($lang, $mtxt);
+			$lang_loader = new Loader($lang, $mtxt, database());
 			$lang_loader->load('index+Post+Maillist+EmailTemplates');
 
 			$langtxt[$lang] = array(

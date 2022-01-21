@@ -26,7 +26,7 @@ class TestPost extends ElkArteCommonSetupTest
 		$this->setSession();
 
 		new ElkArte\Themes\ThemeLoader();
-		$lang = new Loader('english', $txt);
+		$lang = new Loader('english', $txt, database());
 		$lang->load('Profile+Errors');
 	}
 

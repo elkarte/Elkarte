@@ -21,7 +21,7 @@ class TestSettingsForm extends TestCase
 	protected function setUp(): void
 	{
 		global $txt;
-		$lang = new Loader('english', $txt);
+		$lang = new Loader('english', $txt, database());
 		$lang->load('Admin');
 
 		// Elevate the user.

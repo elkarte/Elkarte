@@ -269,7 +269,7 @@ class Emailpost extends AbstractController
 		else
 		{
 			$mtxt = [];
-			$lang = new Loader($language, $mtxt);
+			$lang = new Loader($language, $mtxt, database());
 			$lang->load('index', false, true);
 			$pbe['response_prefix'] = $mtxt['response_prefix'];
 		}

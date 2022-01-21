@@ -32,7 +32,7 @@ class TestGroups extends ElkArteCommonSetupTest
 		$modSettings['latestRealName'] = 'itsme';
 
 		new ElkArte\Themes\ThemeLoader();
-		$lang = new Loader('english', $txt);
+		$lang = new Loader('english', $txt, database());
 		$lang->load('Errors+ManageMembers+ModerationCenter');
 
 		// Get the controller

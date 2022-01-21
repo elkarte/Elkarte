@@ -1276,7 +1276,7 @@ function loadForumTests()
  */
 function createSalvageBoard()
 {
-	global $txt, $language;
+	global $language;
 	static $salvageBoardID = null;
 
 	if ($salvageBoardID !== null)
@@ -1287,7 +1287,8 @@ function createSalvageBoard()
 	$db = database();
 
 	// Back to the forum's default language.
-	$lang_loader = new LangLoader($language, $txt);
+	$mtxt = [];
+	$lang_loader = new LangLoader($language, $mtxt, database());
 	$lang_loader->load('Admin');
 	$salvageCatID = createSalvageCategory();
 
@@ -1301,7 +1302,7 @@ function createSalvageBoard()
 		LIMIT 1',
 		array(
 			'id_cat' => $salvageCatID,
-			'board_name' => $txt['salvaged_board_name'],
+			'board_name' => $mtxt['salvaged_board_name'],
 		)
 	);
 	if ($result->num_rows() != 0)
@@ -1315,7 +1316,7 @@ function createSalvageBoard()
 		$result = $db->insert('',
 			'{db_prefix}boards',
 			array('name' => 'string-255', 'description' => 'string-255', 'id_cat' => 'int', 'member_groups' => 'string', 'board_order' => 'int', 'redirect' => 'string'),
-			array($txt['salvaged_board_name'], $txt['salvaged_board_description'], $salvageCatID, '1', -1, ''),
+			array($mtxt['salvaged_board_name'], $mtxt['salvaged_board_description'], $salvageCatID, '1', -1, ''),
 			array('id_board')
 		);
 
@@ -1328,8 +1329,6 @@ function createSalvageBoard()
 	}
 
 	// Restore the user's language.
-	$lang_loader = new LangLoader(null, $txt);
-	$lang_loader->load('Admin');
 	$salvageBoardID = (int) $salvageBoardID;
 
 	return $salvageBoardID;
@@ -1343,7 +1342,7 @@ function createSalvageBoard()
  */
 function createSalvageCategory()
 {
-	global $txt, $language;
+	global $language;
 	static $salvageCatID = null;
 
 	if ($salvageCatID !== null)
@@ -1354,7 +1353,8 @@ function createSalvageCategory()
 	$db = database();
 
 	// Back to the forum's default language.
-	$lang_loader = new LangLoader($language, $txt);
+	$mtxt = [];
+	$lang_loader = new LangLoader($language, $mtxt, database());
 	$lang_loader->load('Admin');
 
 	// Check to see if a 'Salvage Category' exists, if not => insert one.
@@ -1365,7 +1365,7 @@ function createSalvageCategory()
 		WHERE name = {string:cat_name}
 		LIMIT 1',
 		array(
-			'cat_name' => $txt['salvaged_category_name'],
+			'cat_name' => $mtxt['salvaged_category_name'],
 		)
 	);
 	if ($result->num_rows() != 0)
@@ -1379,7 +1379,7 @@ function createSalvageCategory()
 		$result = $db->insert('',
 			'{db_prefix}categories',
 			array('name' => 'string-255', 'cat_order' => 'int'),
-			array($txt['salvaged_category_name'], -1),
+			array($mtxt['salvaged_category_name'], -1),
 			array('id_cat')
 		);
 
@@ -1392,8 +1392,6 @@ function createSalvageCategory()
 	}
 
 	// Restore the user's language.
-	$lang_loader = new LangLoader(null, $txt);
-	$lang_loader->load('Admin');
 	$salvageCatID = (int) $salvageCatID;
 	$_SESSION['redirect_to_recount'] = true;
 

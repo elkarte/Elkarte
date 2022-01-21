@@ -104,7 +104,7 @@ class Errors extends AbstractModel
 		global $language;
 
 		$mtxt = [];
-		$lang = new Loader($language, $mtxt);
+		$lang = new Loader($language, $mtxt, database());
 		$lang->load('Errors');
 
 		$reload_lang_file = $language !== $this->user->language;
@@ -513,7 +513,7 @@ class Errors extends AbstractModel
 		if ($log)
 		{
 			$mtxt = [];
-			$lang = new Loader($language, $mtxt);
+			$lang = new Loader($language, $mtxt, database());
 			$lang->load('Errors');
 			$this->log_error(
 				sprintf($mtxt['invalid_access'], $_SERVER['REMOTE_ADDR']),

@@ -146,11 +146,41 @@ class UpgradeInstructions_upgrade_2_0
 				'debug_title' => 'Cleanup postby_emails...',
 				'function' => function()
 				{
-						// Remove any improper data
-						$this->db->query('',
-							'DELETE FROM {db_prefix}postby_emails
-							WHERE length(id_email) < 35'
-						);
+					// Remove any improper data
+					$this->db->query('',
+						'DELETE FROM {db_prefix}postby_emails
+						WHERE length(id_email) < 35'
+					);
+				}
+			),
+		);
+	}
+
+	public function preparing_languages_title()
+	{
+		return 'Add support for language editing in the db...';
+	}
+
+	public function preparing_languages()
+	{
+		return array(
+			array(
+				'debug_title' => 'Cleanup postby_emails...',
+				'function' => function()
+				{
+					$this->table->create_table('{db_prefix}languages',
+						array(
+							array('name' => 'language', 'type' => 'string', 'size' => 40,  'default' => ''),
+							array('name' => 'file',     'type' => 'string', 'size' => 40,  'default' => ''),
+							array('name' => 'key',      'type' => 'string', 'size' => 255, 'default' => ''),
+							array('name' => 'value',    'type' => 'text'),
+						),
+						array(
+							array('name' => 'id_lang', 'columns' => array('language', 'file'), 'type' => 'primary'),
+						),
+						array(),
+						'ignore'
+					);
 				}
 			),
 		);

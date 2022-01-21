@@ -196,7 +196,7 @@ class MoveTopic extends AbstractController
 		if ($this->user->language !== $language)
 		{
 			$mtxt = [];
-			$lang = new Loader($language, $mtxt);
+			$lang = new Loader($language, $mtxt, database());
 			$lang->load('index');
 			$txt['movetopic_default'] = $mtxt['movetopic_default'];
 		}
@@ -416,7 +416,7 @@ class MoveTopic extends AbstractController
 			if ($this->user->language !== $language)
 			{
 				$mtxt = [];
-				$lang = new Loader($language, $mtxt);
+				$lang = new Loader($language, $mtxt, database());
 				$lang->load('index');
 			}
 

@@ -37,7 +37,7 @@ class TestCalendarEvent extends ElkArteCommonSetupTest
 		parent::setUp();
 
 		// Fiddling with globals is a chore in PHPUnit.
-		$lang = new Loader('english', $txt);
+		$lang = new Loader('english', $txt, database());
 		$lang->load('Errors');
 	}
 

@@ -54,7 +54,7 @@ class TestLikes extends TestCase
 		// Keep id of the new topic.
 		$this->id_topic = $topicOptions['id'];
 		// Hey now, force a reload, we still rely on globals!
-		$lang = new Loader('english', $txt);
+		$lang = new Loader('english', $txt, database());
 		$lang->load('Errors');
 	}
 

@@ -62,7 +62,7 @@ class TestAdminSearch extends TestCase
 		 * Forcefully reload language files to combat PHPUnit
 		 * messing up globals between tests.
 		 */
-		$lang = new Loader('english', $txt);
+		$lang = new Loader('english', $txt, database());
 		$lang->load('admin');
 
 		// Set up the controller.

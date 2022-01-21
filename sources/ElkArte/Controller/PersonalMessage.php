@@ -1977,7 +1977,7 @@ class PersonalMessage extends AbstractController
 				if (!isset($messagesToSend[$cur_language]))
 				{
 					$mtxt = [];
-					$lang = new Loader($cur_language, $mtxt);
+					$lang = new Loader($cur_language, $mtxt, database());
 					$lang->load('PersonalMessage', false);
 
 					// Make the body.
