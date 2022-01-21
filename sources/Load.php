@@ -734,7 +734,7 @@ function loadUserContext()
 	);
 
 	// @todo Base language is being loaded to late, placed here temporarily
-	Txt::load('index+Addons');
+	Txt::load('index+Addons', true, true);
 
 	// Something for the guests
 	if (!$context['user']['is_guest'])
