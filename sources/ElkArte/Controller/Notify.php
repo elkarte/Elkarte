@@ -604,16 +604,21 @@ class Notify extends AbstractController
 		Txt::load('Profile');
 
 		$_POST['notify_submit'] = true;
-
 		foreach (getMemberNotificationsProfile($memID) as $mention => $data)
 		{
 			foreach ($data['data'] as $type => $method)
 			{
+				// No email notifications for you
 				if ($mention === $area && in_array($type, ['email', 'emaildaily', 'emailweekly']))
+				{
 					continue;
+				}
 
+				// All the rest as it was
 				if ($method['enabled'])
+				{
 					$_POST['notify'][$mention]['status'][] = $method['name'];
+				}
 			}
 		}
 
