@@ -40,7 +40,7 @@ class TopicUtil
 	 */
 	public static function prepareContext($topics_info, $topicseen = false, $preview_length = null)
 	{
-		global $modSettings, $options, $txt, $settings, $scripturl;
+		global $modSettings, $options, $txt, $settings;
 
 		$topics = array();
 		$preview_length = (int) $preview_length;
@@ -133,7 +133,7 @@ class TopicUtil
 			}
 			else
 			{
-				$topic_href = getUrl('topic', ['topic' => $row['id_topic'], 'start' => $row['num_replies'] == 0 ? '.0' : ('.msg' . $row['id_last_msg']), 'subject' => $row['first_subject'], $topicseen]) . '#new';
+				$topic_href = getUrl('topic', ['topic' => $row['id_topic'], 'start' => $row['num_replies'] == 0 ? '0' : ('msg' . $row['id_last_msg']), 'subject' => $row['first_subject'], $topicseen]) . '#new';
 			}
 			$href = getUrl('topic', ['topic' => $row['id_topic'], 'start' => $row['num_replies'] == 0 ? '0' : ('msg' . $row['new_from']), 'subject' => $row['first_subject'], $topicseen]) . $row['num_replies'] == 0 ? '' : '#new';
 
