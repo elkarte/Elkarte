@@ -125,7 +125,7 @@ class Likes extends AbstractController
 		require_once(SUBSDIR . '/Likes.subs.php');
 		require_once(SUBSDIR . '/Messages.subs.php');
 
-		// Have to be able to access it to like it
+		// Have to be able to access it to like/unlike it
 		if ($this->prepare_like() && canAccessMessage($this->_id_liked))
 		{
 			$liked_message = basicMessageInfo($this->_id_liked, true, true);
@@ -135,7 +135,7 @@ class Likes extends AbstractController
 				$likeResult = likePost($this->user->id, $liked_message, $sign);
 				if ($likeResult === true)
 				{
-					// Lets add in a mention to the member that just had their post liked
+					// Lets add in a mention to the member that just had their post liked/unliked
 					if (!empty($modSettings['mentions_enabled']))
 					{
 						$notifier = Notifications::instance();
@@ -143,7 +143,7 @@ class Likes extends AbstractController
 							$type,
 							$this->_id_liked,
 							$this->user->id,
-							array('id_members' => array($liked_message['id_member']), 'rlike_notif' => empty($modSettings['mentions_dont_notify_rlike']), 'subject' => $liked_message['subject'])
+							array('id_members' => array($liked_message['id_member']), 'rlike_notif' => $type === 'rlikemsg', 'subject' => $liked_message['subject'])
 						));
 					}
 				}

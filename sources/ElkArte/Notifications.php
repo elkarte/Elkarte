@@ -184,7 +184,10 @@ class Notifications extends AbstractModel
 	 */
 	protected function _send_task(NotificationsTask $task)
 	{
+		/** @var \ElkArte\Mentions\MentionType\NotificationInterface $class */
 		$class = $task->getClass();
+
+		/** @var \ElkArte\Mentions\MentionType\AbstractNotificationBoardAccess $obj */
 		$obj = new $class($this->_db, $this->user);
 		$obj->setTask($task);
 
