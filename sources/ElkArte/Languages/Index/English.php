@@ -910,6 +910,7 @@ $txt['hide_video'] = 'Show/Hide video';
 $txt['youtube'] = 'YouTube video:';
 $txt['vimeo'] = 'Vimeo video:';
 $txt['dailymotion'] = 'Dailymotion video:';
+$txt['tiktok'] = 'TikTok video:';
 
 // Spoiler BBC
 $txt['spoiler'] = 'Spoiler (click to show/hide)';
