@@ -88,10 +88,10 @@ class Birthdayemails implements ScheduledTaskInterface
 		{
 			// We need to do some shuffling to make this work properly.
 			$mtxt = [];
-			$lang_loader = new Loader($lang, $mtxt, database());
+			$lang_loader = new Loader($lang, $mtxt, database(), 'txtBirthdayEmails');
 			$lang_loader->load('EmailTemplates');
-			$txt['happy_birthday_subject'] = $mtxt['$txtBirthdayEmails'][$greeting . '_subject'];
-			$txt['happy_birthday_body'] = $mtxt['$txtBirthdayEmails'][$greeting . '_body'];
+			$txt['happy_birthday_subject'] = $mtxt[$greeting . '_subject'];
+			$txt['happy_birthday_body'] = $mtxt[$greeting . '_body'];
 
 			foreach ($recps as $recp)
 			{

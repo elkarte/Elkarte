@@ -182,7 +182,12 @@ class ManageMail extends AbstractController
 		global $txt, $modSettings, $txtBirthdayEmails;
 
 		// We need $txtBirthdayEmails
-		Txt::load('EmailTemplates');
+		if (empty($txtBirthdayEmails))
+		{
+			$txtBirthdayEmails = [];
+		}
+		$lang_loader = new Loader(null, $txtBirthdayEmails, database(), 'txtBirthdayEmails');
+		$lang_loader->load('EmailTemplates');
 
 		$body = $txtBirthdayEmails[(empty($modSettings['birthday_email']) ? 'happy_birthday' : $modSettings['birthday_email']) . '_body'];
 		$subject = $txtBirthdayEmails[(empty($modSettings['birthday_email']) ? 'happy_birthday' : $modSettings['birthday_email']) . '_subject'];

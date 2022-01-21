@@ -157,11 +157,6 @@ class Loader
 			{
 				$this->variable += ${$this->variable_name};
 			}
-			// Temporary solution (I think);
-			if (!empty($txtBirthdayEmails))
-			{
-				$this->variable['$txtBirthdayEmails'] = $txtBirthdayEmails;
-			}
 			return true;
 		}
 		return false;
