@@ -992,9 +992,6 @@ class ManageLanguages extends AbstractController
 
 				$madeSave = true;
 			}
-
-			// Another restore.
-			$txt = $old_txt;
 		}
 
 		// If we saved, redirect.
