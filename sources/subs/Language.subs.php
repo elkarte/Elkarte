@@ -93,7 +93,7 @@ function list_getLanguages()
 		require($lang['location']);
 
 		$languages[$lang['filename']] = array(
-			'id' => strtolower(basename($lang['filename'], '.php')),
+			'id' => basename($lang['filename'], '.php'),
 			'count' => 0,
 			'char_set' => 'UTF-8',
 			'default' => $language == $lang['name'] || ($language == '' && strtolower($lang['name']) == 'english'),

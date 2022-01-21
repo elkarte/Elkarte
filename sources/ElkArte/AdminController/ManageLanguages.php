@@ -729,7 +729,7 @@ class ManageLanguages extends AbstractController
 		// Now for every theme get all the files and stick them in context!
 		$context['possible_files'] =  array_map(function($file) use ($file_id, $txt) {
 			return [
-				'id' => strtolower(basename($file, '.php')),
+				'id' => basename($file, '.php'),
 				'name' => $txt['lang_file_desc_' . basename($file)] ?? basename($file),
 				'path' => $file,
 				'selected' => $file_id == basename($file),
