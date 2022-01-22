@@ -14,6 +14,7 @@
 namespace ElkArte\Languages;
 
 use ElkArte\Debug;
+use ElkArte\Errors;
 use ElkArte\Database\QueryInterface;
 
 /**
@@ -72,7 +73,7 @@ class Loader
 
 	public function load($file_name, $fatal = true, $fix_calendar_arrays = false)
 	{
-		global $db_show_debug;
+		global $db_show_debug, $txt;
 
 		$file_names = explode('+', $file_name);
 
