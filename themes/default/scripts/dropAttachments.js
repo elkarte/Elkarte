@@ -235,9 +235,50 @@
 				}).always(function ()
 				{
 					uploadInProgress = false;
+					updateStatusText();
 					runAttachmentQueue();
 				});
 				status.setAbort(jqXHR);
+			},
+
+			/**
+			 * private function
+			 *
+			 * Updates the restrictions text line with current values
+			 */
+			updateStatusText = function()
+			{
+				let numberAllowed = document.getElementById('attachmentNumPerPostLimit'),
+					totalSize = document.getElementById('attachmentPostLimit');
+
+				numberAllowed.textContent = String(params.numOfAttachmentAllowed - numAttachUploaded);
+				totalSize.textContent = formatBytes(params.totalSizeAllowed - totalAttachSizeUploaded);
+			},
+
+			/**
+			 * private function
+			 *
+			 * Takes a number in bytes and returns a formatted string
+			 *
+			 * @param bytes
+			 * @returns {string}
+			 */
+			formatBytes = function (bytes)
+			{
+				if (bytes === 0)
+				{
+					return '0';
+				}
+
+				for (let kb of ['Bytes', 'KB', 'MB', 'GB'])
+				{
+					if (bytes < 1024)
+					{
+						return parseFloat(bytes.toFixed(2)) + ' ' + kb;
+					}
+
+					bytes /= 1024;
+				};
 			},
 
 			/**
@@ -277,6 +318,7 @@
 
 						// Done with this one, so remove it from existence
 						$('#' + dataToSend.attachid).off().remove();
+						updateStatusText();
 					}
 					else if ('console' in window)
 					{
@@ -318,19 +360,7 @@
 				// Provide the file size in something more legible, like 100KB or 1.1MB
 				this.setFileNameSize = function (name, size)
 				{
-					let sizeStr = "",
-						sizeKB = size / 1024,
-						sizeMB = sizeKB / 1024;
-
-					if (parseInt(sizeKB, 10) > 1024)
-					{
-						sizeStr = sizeMB.toFixed(2) + " MB";
-					}
-					else
-					{
-						sizeStr = sizeKB.toFixed(2) + " KB";
-					}
-
+					let sizeStr = formatBytes(size);
 					$control.find('.info').html(name + ' (' + sizeStr + ')');
 				};
 
@@ -408,7 +438,7 @@
 				// We may have changed the name and size if resize is enabled
 				if (data.resized === true)
 				{
-					$control.find('.info').html(data.name + ' (' + data.size + ')');
+					$control.find('.info').html(data.name + ' (' + formatBytes(data.size) + ')');
 				}
 
 				// We need to tell Elk that the file should not be deleted
@@ -419,7 +449,6 @@
 
 				let $img = $('<img />').attr('src', elk_scripturl + '?action=dlattach;sa=tmpattach;attach=' + $control.attr('id') + ';topic=' + topic),
 					$progressbar = $control.find('.progressBar');
-
 
 				$progressbar.siblings('.i-concentric').remove();
 				$progressbar.after($('<div class="postattach_thumb" />').append($img));
@@ -462,7 +491,7 @@
 					// valid extensions only
 					let fileExtensionCheck = /(?:\.([^.]+))?$/,
 						extension = fileExtensionCheck.exec(files[i].name)[1].toLowerCase(),
-						fileSize = files[i].size / 1024,
+						fileSize = files[i].size,
 						errorFlag = false;
 
 					// Make sure the server will allow this type of file
@@ -476,7 +505,7 @@
 					// Make sure the file is not larger than the server will accept
 					if (individualSizeAllowed !== null && fileSize > individualSizeAllowed && !resizeImageEnabled)
 					{
-						errorMsgs.individualSizeErr = '(' + parseInt(fileSize, 10) + ' KB) ' + oTxt.individualSizeAllowed;
+						errorMsgs.individualSizeErr = '(' + parseInt(String(fileSize / 1024), 10) + ' KB) ' + oTxt.individualSizeAllowed;
 						sizeErrorFiles.push(files[i].name);
 						errorFlag = true;
 					}
@@ -499,6 +528,7 @@
 					{
 						errorMsgs.totalSizeError = oTxt.totalSizeAllowed.replace("%1$s", totalSizeAllowed).replace("%2$s", String(parseInt(totalSizeAllowed - (totalAttachSizeUploaded - fileSize), 10)));
 						errorFlag = true;
+						totalAttachSizeUploaded -= fileSize;
 					}
 
 					// No errors, so update the counters (number, total size, etc)
