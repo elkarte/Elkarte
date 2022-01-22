@@ -1348,7 +1348,17 @@ nav.breadcrumb {
 }
 
 .ila_container {
-	background-color: var(--pure_green);
+	border-color: var(--seconday_border);
+	border-top-color: var(--seconday_border_top);
+	border-left-color: var(--seconday_border_left);
+	background-image: linear-gradient(to bottom, var(--primary_white), var(--primary_white_compliment));
+	box-shadow: 1px 1px 2px var(--box_shadow);
+}
+
+.ila_container:hover {
+	border-color: var(--transparent);
+	background: var(--transparent);
+	box-shadow: none;
 }
 
 .drop_attachments_error {

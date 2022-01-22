@@ -1289,12 +1289,20 @@ sup.bbc_footnotes, sup.bbc_footnotes a {
 }
 
 .ila_container {
-	border-color: var(--border_focus);
-	background-color: var(--mid_grey_background);
+	border-color: var(--seconday_border);
+	border-top-color: var(--seconday_border_top);
+	border-left-color: var(--seconday_border_left);
+	background-image: linear-gradient(to bottom, var(--primary_white) 0%, var(--primary_white_compliment) 100%);
+	box-shadow: 1px 1px 2px var(--box_shadow);
+
 }
 
 .ila_container:hover {
-	background-color: var(--dark_grey_background);
+	border-color: var(--primary_border);
+	border-top-color: var(--seconday_border);
+	border-left-color: var(--seconday_border_left);
+	background: var(--grey_background);
+	box-shadow: 1px 1px 1px var(--opacity10) inset;
 }
 
 .drop_attachments_error {
