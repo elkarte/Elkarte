@@ -270,7 +270,6 @@ function template_modify_language_entries()
 			echo '
 					<li>
 						<label for="entry_', $entry['key'], '" class="smalltext">', $entry['display_key'], '</label>
-						<input type="hidden" name="comp[', $entry['key'], ']" value="', $entry['value'], '" />
 						<textarea id="entry_', $entry['key'], '" name="entry[', $entry['key'], ']" cols="40" rows="', $entry['rows'] < 2 ? 2 : $entry['rows'], '">', $entry['value'], '</textarea>
 					</li>';
 		}
