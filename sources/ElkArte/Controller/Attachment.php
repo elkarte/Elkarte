@@ -166,7 +166,7 @@ class Attachment extends AbstractController
 						$resp_data = array(
 							'name' => $val['name'],
 							'attachid' => $val['public_attachid'],
-							'size' => byte_format($val['size']),
+							'size' => $val['size'],
 							'resized' => !empty($val['resized']),
 						);
 					}
@@ -698,7 +698,7 @@ class Attachment extends AbstractController
 			$image = new Image($filename);
 
 			$filename = $filename . '_thumb';
-			$image->createThumbnail(100, 100, $filename);
+			$image->createThumbnail(100, 100, $filename, '',false);
 		}
 
 		// With the headers complete, send the file data

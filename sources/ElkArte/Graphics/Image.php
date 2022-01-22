@@ -170,10 +170,11 @@ class Image
 	 * @param int $max_height allowed height
 	 * @param string $dstName name to save
 	 * @param string $format image format to save the thumbnail
+	 * @param null|bool $force if forcing the image resize to scale up
 	 * @return bool|\ElkArte\Graphics\Image On success returns an image class loaded with new image
 	 * @throws \Exception
 	 */
-	public function createThumbnail($max_width, $max_height, $dstName = '', $format = '')
+	public function createThumbnail($max_width, $max_height, $dstName = '', $format = '', $force = null)
 	{
 		global $modSettings;
 
@@ -184,7 +185,7 @@ class Image
 		$max_height = max(16, $max_height);
 
 		// Do the actual resize, thumbnails by default strip EXIF data to save space
-		$success = $this->resizeImage($max_width, $max_height, true);
+		$success = $this->resizeImage($max_width, $max_height, true, $force ?? true);
 
 		// Save our work
 		if ($success)
