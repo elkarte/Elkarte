@@ -15,28 +15,6 @@ use ElkArte\Util;
 use ElkArte\XmlArray;
 
 /**
- * Removes the given language from all members..
- *
- * @param int $lang_id
- * @package Languages
- */
-function removeLanguageFromMember($lang_id)
-{
-	$db = database();
-
-	$db->query('', '
-		UPDATE {db_prefix}members
-		SET 
-			lngfile = {string:empty_string}
-		WHERE lngfile = {string:current_language}',
-		array(
-			'empty_string' => '',
-			'current_language' => $lang_id,
-		)
-	);
-}
-
-/**
  * How many languages?
  *
  * - Callback for the list in action_edit().
