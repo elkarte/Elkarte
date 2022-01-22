@@ -399,8 +399,7 @@ function template_not_done()
 	{
 		echo '
 				<div class="progress_bar">
-					<div class="full_bar">', $context['continue_percent'], '%</div>
-					<div class="green_percent" style="width: ', $context['continue_percent'], '%;">&nbsp;</div>
+					<div class="green_percent" style="width: ', $context['continue_percent'], '%;">', $context['continue_percent'], '%</div>
 				</div>';
 	}
 
@@ -408,8 +407,7 @@ function template_not_done()
 	{
 		echo '
 				<div class="progress_bar">
-					<div class="full_bar">', $context['substep_title'], ' (', $context['substep_continue_percent'], '%)</div>
-					<div class="blue_percent" style="width: ', $context['substep_continue_percent'], '%;">&nbsp;</div>
+					<div class="blue_percent" style="width: ', $context['substep_continue_percent'], '%;">', $context['substep_title'], ' - ', $context['substep_continue_percent'], '%</div>
 				</div>';
 	}
 

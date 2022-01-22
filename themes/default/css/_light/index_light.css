@@ -1696,16 +1696,14 @@ li.ui-tab.ui-tabs-active.ui-state-active.ui-state-hover .ui-tabs-anchor {
 	box-shadow: inset 0 2px 5px var(--opacity10);
 }
 
-.progress_bar .full_bar {
-	color: var(--primary_background);
-}
-
-.progress_bar .green_percent {
+.progress_bar > .green_percent {
 	background-color: var(--pure_green);
+	color: var(--primary_white);
 }
 
-.progress_bar .blue_percent {
+.progress_bar > .blue_percent {
 	background-color: var(--progress_bar_blue);
+	color: var(--primary_white);
 }
 
 /* -------------------------------------------------------

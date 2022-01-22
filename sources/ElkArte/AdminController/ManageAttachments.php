@@ -1822,8 +1822,7 @@ class ManageAttachments extends AbstractController
 					$percent_done = min(round($current_progress / $total_progress * 100, 0), 100);
 					$prog_bar = '
 						<div class="progress_bar">
-							<div class="full_bar">' . $percent_done . '%</div>
-							<div class="green_percent" style="width: ' . $percent_done . '%;">&nbsp;</div>
+							<div class="green_percent" style="width: ' . $percent_done . '%;">' . $percent_done . '%</div>
 						</div>';
 
 					// Write it to a file so it can be displayed

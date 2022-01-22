@@ -318,8 +318,7 @@ function template_email_members_send()
 			</h2>
 			<div class="content">
 				<div class="progress_bar">
-					<div class="full_bar">', $context['percentage_done'], '% ', $txt['email_done'], '</div>
-					<div class="green_percent" style="width: ', $context['percentage_done'], '%;">&nbsp;</div>
+					<div class="green_percent" style="width: ', $context['percentage_done'], '%;">', $context['percentage_done'], '%</div>
 				</div>
 				<div class="submitbutton">
 					<input type="submit" name="cont" value="', $txt['email_continue'], '" />
