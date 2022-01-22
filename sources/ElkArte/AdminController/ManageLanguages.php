@@ -717,10 +717,6 @@ class ManageLanguages extends AbstractController
 		preg_match('~([A-Za-z0-9_-]+)~', $file_id, $matches);
 		$file_id = ucfirst($matches[1] ?? '');
 
-		// Get all the theme data.
-		require_once(SUBSDIR . '/Themes.subs.php');
-		$themes = getCustomThemes();
-
 		// This will be where we look
 		$lang_dirs = glob($base_lang_dir . '/*', GLOB_ONLYDIR);
 		$images_dirs = array();
@@ -744,36 +740,6 @@ class ManageLanguages extends AbstractController
 			{
 				$context['langpack_uninstall_link'] = getUrl('admin', ['action' => 'admin', 'area' => 'packages', 'sa' => 'uninstall', 'package' => $possiblePackage[1], 'pid' => $possiblePackage[0]]);
 			}
-		}
-
-		// Saving primary settings?
-		$madeSave = false;
-		if (!empty($this->_req->post->save_main) && !$current_file)
-		{
-			checkSession();
-			validateToken('admin-mlang');
-
-			// Read in the current file.
-			$current_data = implode('', file($settings['default_theme_dir'] . '/languages/' . $context['lang_id'] . '/index.' . $context['lang_id'] . '.php'));
-
-			// These are the replacements. old => new
-			$replace_array = array(
-				'~\$txt\[\'lang_locale\'\]\s=\s(\'|")[^\r\n]+~' => '$txt[\'lang_locale\'] = \'' . addslashes($this->_req->post->locale) . '\';',
-				'~\$txt\[\'lang_dictionary\'\]\s=\s(\'|")[^\r\n]+~' => '$txt[\'lang_dictionary\'] = \'' . addslashes($this->_req->post->dictionary) . '\';',
-				'~\$txt\[\'lang_spelling\'\]\s=\s(\'|")[^\r\n]+~' => '$txt[\'lang_spelling\'] = \'' . addslashes($this->_req->post->spelling) . '\';',
-				'~\$txt\[\'lang_rtl\'\]\s=\s[A-Za-z0-9]+;~' => '$txt[\'lang_rtl\'] = ' . (!empty($this->_req->post->rtl) ? 'true' : 'false') . ';',
-			);
-			$current_data = preg_replace(array_keys($replace_array), array_values($replace_array), $current_data);
-			$fp = fopen($settings['default_theme_dir'] . '/languages/' . $context['lang_id'] . '/index.' . $context['lang_id'] . '.php', 'w+');
-			fwrite($fp, $current_data);
-			fclose($fp);
-
-			if ($this->_checkOpcache())
-			{
-				opcache_invalidate($settings['default_theme_dir'] . '/languages/' . $context['lang_id'] . '/index.' . $context['lang_id'] . '.php');
-			}
-
-			$madeSave = true;
 		}
 
 		// Quickly load index language entries.

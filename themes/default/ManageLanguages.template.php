@@ -195,32 +195,31 @@ function template_modify_language_entries()
 							<label for="locale">', $txt['languages_locale'], ':</label>
 						</dt>
 						<dd>
-							<input type="text" name="locale" id="locale" size="20" value="', $context['primary_settings']['locale'], '"', (empty($context['file_entries']) ? '' : ' disabled="disabled"'), ' class="input_text" />
+							<input type="text" id="locale" size="20" value="', $context['primary_settings']['locale'], '" disabled="disabled" class="input_text" />
 						</dd>
 						<dt>
 							<label for="dictionary">', $txt['languages_dictionary'], ':</label>
 						</dt>
 						<dd>
-							<input type="text" name="dictionary" id="dictionary" size="20" value="', $context['primary_settings']['dictionary'], '"', (empty($context['file_entries']) ? '' : ' disabled="disabled"'), ' class="input_text" />
+							<input type="text" id="dictionary" size="20" value="', $context['primary_settings']['dictionary'], '" disabled="disabled" class="input_text" />
 						</dd>
 						<dt>
 							<label for="spelling">', $txt['languages_spelling'], ':</label>
 						</dt>
 						<dd>
-							<input type="text" name="spelling" id="spelling" size="20" value="', $context['primary_settings']['spelling'], '"', (empty($context['file_entries']) ? '' : ' disabled="disabled"'), ' class="input_text" />
+							<input type="text" id="spelling" size="20" value="', $context['primary_settings']['spelling'], '" disabled="disabled" class="input_text" />
 						</dd>
 						<dt>
 							<label for="rtl">', $txt['languages_rtl'], ':</label>
 						</dt>
 						<dd>
-							<input type="checkbox" name="rtl" id="rtl" ', $context['primary_settings']['rtl'] ? ' checked="checked"' : '', ' class="input_check"', (empty($context['file_entries']) ? '' : ' disabled="disabled"'), ' />
+							<input type="checkbox" id="rtl" ', $context['primary_settings']['rtl'] ? ' checked="checked"' : '', ' class="input_check" disabled="disabled" />
 						</dd>
 					</dl>
 				</fieldset>
 				<div class="submitbutton">
 					<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
-					<input type="hidden" name="', $context['admin-mlang_token_var'], '" value="', $context['admin-mlang_token'], '" />
-					<input type="submit" name="save_main" value="', $txt['save'], '"', !empty($context['file_entries']) ? ' disabled="disabled"' : '', ' />';
+					<input type="hidden" name="', $context['admin-mlang_token_var'], '" value="', $context['admin-mlang_token'], '" />';
 
 	// Allow deleting entries.
 	if (!empty($context['langpack_uninstall_link']))
