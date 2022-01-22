@@ -123,6 +123,7 @@ class Loader
 				}
 			}
 		}
+		$this->loadFromDb($file_names);
 
 		if ($fix_calendar_arrays)
 		{
@@ -133,17 +134,18 @@ class Loader
 	protected function loadFromDb($files)
 	{
 		$result = $this->db->fetchQuery('
-			SELECT key, value
+			SELECT language_key, value
 			FROM {db_prefix}languages
 			WHERE language = {string:language}
 				AND file IN ({array_string:files})',
 			[
 				'language' => $this->language,
 				'files' => $files
-			]);
+			]
+		);
 		while ($row = $result->fetch_assoc())
 		{
-			$this->variable[$row['key']] = $row['value'];
+			$this->variable[$row['language_key']] = $row['value'];
 		}
 		$result->free_result();
 	}

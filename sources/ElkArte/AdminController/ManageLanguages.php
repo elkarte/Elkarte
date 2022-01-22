@@ -794,6 +794,8 @@ class ManageLanguages extends AbstractController
 		$edit_lang = new LangEditor($context['lang_id'], database());
 		$edit_lang->load($file_id, true);
 
+		$context['file_entries'] = $edit_lang->getForEditing();
+
 		// Are we saving?
 		$save_strings = array();
 		if (isset($this->_req->post->save_entries) && !empty($this->_req->post->entry))
@@ -805,8 +807,6 @@ class ManageLanguages extends AbstractController
 
 			redirectexit('action=admin;area=languages;sa=editlang;lid=' . $context['lang_id']);
 		}
-
-		$context['file_entries'] = $edit_lang->getForEditing();
 
 		createToken('admin-mlang');
 	}
