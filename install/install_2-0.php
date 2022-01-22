@@ -12,7 +12,7 @@
  *
  */
 
-class InstallInstructions_install_1_1
+class InstallInstructions_install_2_0
 {
 	protected $db = null;
 	protected $table = null;
