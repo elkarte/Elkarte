@@ -267,17 +267,19 @@ class Post extends AbstractModule
 		{
 			if (!empty($modSettings[$type]))
 			{
-				$context['attachments']['restrictions'][] = sprintf($txt['attach_restrict_' . $type], comma_format($modSettings[$type], 0));
+				$context['attachments']['restrictions'][] = $type === 'attachmentNumPerPostLimit'
+					? sprintf($txt['attach_restrict_' . $type], comma_format($modSettings[$type], 0))
+					: sprintf($txt['attach_restrict_' . $type], byte_format($modSettings[$type] * 1024, 0));
 
-				// Show some numbers. If they exist.
-				if ($type === 'attachmentNumPerPostLimit' && $attachments['quantity'] > 0)
+				// Show some numbers.
+				if ($type === 'attachmentNumPerPostLimit')
 				{
-					$context['attachments']['restrictions'][] = sprintf($txt['attach_remaining'], $modSettings['attachmentNumPerPostLimit'] - $attachments['quantity']);
+					$context['attachments']['restrictions'][] = sprintf($txt['attach_remaining'], '<span id="' . $type . '">' . ($modSettings['attachmentNumPerPostLimit'] - $attachments['quantity']) . '</span>');
 				}
 
-				if ($type === 'attachmentPostLimit' && $attachments['total_size'] > 0)
+				if ($type === 'attachmentPostLimit')
 				{
-					$context['attachments']['restrictions'][] = sprintf($txt['attach_available'], comma_format(round(max($modSettings['attachmentPostLimit'] - ($attachments['total_size'] / 1024), 0)), 0));
+					$context['attachments']['restrictions'][] = sprintf($txt['attach_available'], '<span id="' . $type . '">' . byte_format(max(($modSettings['attachmentPostLimit'] * 1024) - $attachments['total_size'], 0)) . '</span>');
 				}
 			}
 		}

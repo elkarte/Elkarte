@@ -60,8 +60,8 @@ $txt['report_comment'] = 'The reporter has made the following comment';
 
 $txt['attach_drop_files'] = 'Add files by dragging & dropping or <a class="drop_area_fileselect_text" href="javascript:void(0)">selecting them</a>';
 $txt['attach_drop_files_mobile'] = '<a class="drop_area_fileselect_text" href="javascript:void(0)">Add files</a>';
-$txt['attach_restrict_attachmentPostLimit'] = 'maximum total size %1$s KB';
-$txt['attach_restrict_attachmentSizeLimit'] = 'maximum individual size %1$s KB';
+$txt['attach_restrict_attachmentPostLimit'] = 'maximum total size %1$s';
+$txt['attach_restrict_attachmentSizeLimit'] = 'maximum individual size %1$s';
 $txt['attach_restrict_attachmentNumPerPostLimit'] = '%1$d per post';
 $txt['attach_restrictions'] = 'Restrictions:';
 
@@ -146,8 +146,8 @@ $txt['attach_folder_warning'] = 'The attachments directory can not be located. P
 $txt['attach_folder_admin_warning'] = 'The path to the attachments directory (%1$s) is incorrect. Please correct it in the attachment settings area of your admin panel.';
 $txt['attach_limit_nag'] = 'You have reached the maximum number of attachments allowed per post.';
 $txt['attach_no_upload'] = 'There was a problem and your attachments could not be uploaded';
-$txt['attach_remaining'] = '%1$d remaining';
-$txt['attach_available'] = '%1$s KB available';
+$txt['attach_remaining'] = '%1$s remaining';
+$txt['attach_available'] = '%1$s available';
 $txt['attach_kb'] = ' (%1$s KB)';
 $txt['attach_0_byte_file'] = 'The file appears to be empty. Please contact your forum administrator if this continues to be a problem';
 $txt['attached_files_in_session'] = '<em>The above underlined file(s) have been uploaded but will not be attached to this post until it is submitted.</em>';
