@@ -3724,7 +3724,8 @@ ul.post_options li {
 	display: flex;
 	align-items: center;
 	flex-direction: row;
-	height: 65px;
+	flex-wrap: nowrap;
+	min-height: 85px;
 	padding: 0 5px;
 	border-top: 1px solid;
 	border-bottom: 1px solid;
@@ -3736,20 +3737,19 @@ ul.post_options li {
 }
 
 .postattach_thumb img {
-	max-width: 100%;
-	max-height: 100%;
+	width: 100px;
+	height: 80px;
+	object-fit: scale-down;
 }
 
 .postattach_thumb {
-	width: auto;
-	min-width: 100px;
-	height: 50px;
-	max-height: 100px;
+	display: flex;
 }
 
 /* holds the share button and the insert overlay control injected via JS */
 .ila_container {
 	position: relative;
+	margin: 0 5px;
 	border: 1px solid;
 	border-radius: 4px;
 }
@@ -5912,9 +5912,9 @@ Stef                       ^
 	}
 
 	.statusbar .insertoverlay .button {
-		top: -3em;
-		left: 0;
-		float: none;
+		top: -40px;
+		left: auto;
+		right: 0;
 		width: initial !important;
 		border-radius: 4px;
 	}
@@ -5922,7 +5922,7 @@ Stef                       ^
 	.statusbar .insertoverlay .text,
 	.statusbar .insertoverlay .button {
 		display: block;
-		margin: 1em auto;
+		margin: .5em auto;
 	}
 
 	/* Profile page */
@@ -6665,15 +6665,24 @@ Stef                       ^
 	}
 
 	.statusbar .info {
-		width: 55%;
+		width: 50%;
 	}
 
 	.statusbar .ila_container {
 		display: inline-block;
 	}
 
+	.ila_container .icon.share {
+		width: 2em;
+	}
+
+	.postattach_thumb img {
+		width: 75px;
+		height: 50px;
+	}
+
 	.statusbar .insertoverlay {
-		margin-left: -10em;
+		margin-left: -9em;
 	}
 
 	.statusbar .insertoverlay .ila_container {
