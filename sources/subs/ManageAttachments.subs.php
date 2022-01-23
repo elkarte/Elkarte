@@ -1608,56 +1608,6 @@ function attachDirProperties($dir)
 }
 
 /**
- * Move avatars to their new directory.
- *
- * @package Attachments
- */
-function moveAvatars()
-{
-	global $modSettings;
-
-	$db = database();
-
-	require_once(SUBSDIR . '/Attachments.subs.php');
-
-	$updatedAvatars = array();
-	$db->fetchQuery('
-		SELECT 
-			id_attach, id_folder, id_member, filename, file_hash
-		FROM {db_prefix}attachments
-		WHERE attachment_type = {int:attachment_type}
-			AND id_member > {int:guest_id_member}',
-		array(
-			'attachment_type' => 0,
-			'guest_id_member' => 0,
-		)
-	)->fetch_callback(
-		function ($row) use (&$updatedAvatars, $modSettings) {
-			$filename = getAttachmentFilename($row['filename'], $row['id_attach'], $row['id_folder'], false, $row['file_hash']);
-
-			if (rename($filename, $modSettings['custom_avatar_dir'] . '/' . $row['filename']))
-			{
-				$updatedAvatars[] = $row['id_attach'];
-			}
-		}
-	);
-
-	if (!empty($updatedAvatars))
-	{
-		$db->query('', '
-			UPDATE {db_prefix}attachments
-			SET 
-				attachment_type = {int:attachment_type}
-			WHERE id_attach IN ({array_int:updated_avatars})',
-			array(
-				'updated_avatars' => $updatedAvatars,
-				'attachment_type' => 1,
-			)
-		);
-	}
-}
-
-/**
  * Select a group of attachments to move to a new destination
  *
  * Used by maintenance transfer attachments

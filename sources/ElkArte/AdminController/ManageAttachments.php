@@ -98,7 +98,6 @@ class ManageAttachments extends AbstractController
 			'byAge' => array($this, 'action_byAge'),
 			'bySize' => array($this, 'action_bySize'),
 			'maintenance' => array($this, 'action_maintenance'),
-			'moveAvatars' => array($this, 'action_moveAvatars'),
 			'repair' => array($this, 'action_repair'),
 			'remove' => array($this, 'action_remove'),
 			'removeall' => array($this, 'action_removeall'),
@@ -673,34 +672,6 @@ class ManageAttachments extends AbstractController
 			$context['results'] = implode('<br />', $this->_req->session->results);
 			unset($_SESSION['results']);
 		}
-	}
-
-	/**
-	 * Move avatars from their current location, to the custom_avatar_dir folder.
-	 *
-	 * - Called from the maintenance screen by ?action=admin;area=manageattachments;sa=action_moveAvatars.
-	 */
-	public function action_moveAvatars()
-	{
-		global $modSettings;
-
-		// First make sure the custom avatar dir is writable.
-		if (!is_writable($modSettings['custom_avatar_dir']))
-		{
-			// Try to fix it.
-			@chmod($modSettings['custom_avatar_dir'], 0777);
-
-			// Guess that didn't work?
-			if (!is_writable($modSettings['custom_avatar_dir']))
-			{
-				throw new Exception('attachments_no_write', 'critical');
-			}
-		}
-
-		// Finally move the attachments..
-		moveAvatars();
-
-		redirectexit('action=admin;area=manageattachments;sa=maintenance');
 	}
 
 	/**
