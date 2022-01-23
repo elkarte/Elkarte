@@ -18,6 +18,7 @@ use BBC\ParserWrapper;
 use ElkArte\Cache\Cache;
 use ElkArte\DataValidator;
 use ElkArte\Errors\ErrorContext;
+use ElkArte\FileFunctions;
 use ElkArte\Graphics\Image;
 use ElkArte\MembersList;
 use ElkArte\Notifications;
@@ -2523,19 +2524,23 @@ function profileSaveAvatarData(&$value)
 		return false;
 	}
 
-	// We need to know where we're going to be putting it..
 	require_once(SUBSDIR . '/Attachments.subs.php');
 	require_once(SUBSDIR . '/ManageAttachments.subs.php');
-	$uploadDir = getAvatarPath();
-	$id_folder = getAvatarPathID();
+	$file_functions = FileFunctions::instance();
+
+	// We need to know where we're going to be putting it..
+	$uploadDir = $modSettings['custom_avatar_dir'];
+	$id_folder = 1;
 
 	$downloadedExternalAvatar = false;
 	$valid_http = isset($_POST['userpicpersonal']) && substr($_POST['userpicpersonal'], 0, 7) === 'http://' && strlen($_POST['userpicpersonal']) > 7;
 	$valid_https = isset($_POST['userpicpersonal']) && substr($_POST['userpicpersonal'], 0, 8) === 'https://' && strlen($_POST['userpicpersonal']) > 8;
+
+	// Supplying an external url for your avatar that we download?
 	if ($value === 'external' && !empty($modSettings['avatar_external_enabled']) && ($valid_http || $valid_https) && !empty($modSettings['avatar_download_external']))
 	{
 		Txt::load('Post');
-		if (!is_writable($uploadDir))
+		if (!$file_functions->isWritable($uploadDir))
 		{
 			throw new \ElkArte\Exceptions\Exception('attachments_no_write', 'critical');
 		}
@@ -2543,8 +2548,7 @@ function profileSaveAvatarData(&$value)
 		require_once(SUBSDIR . '/Package.subs.php');
 
 		$url = parse_url($_POST['userpicpersonal']);
-		$contents = fetch_web_data((empty($url['scheme']) ? 'http://' : $url['scheme'] . '://') . $url['host'] . (empty($url['port']) ? '' : ':' . $url['port']) . str_replace(' ', '%20', trim($url['path'])));
-
+		$contents = fetch_web_data((empty($url['scheme']) ? 'https://' : $url['scheme'] . '://') . $url['host'] . (empty($url['port']) ? '' : ':' . $url['port']) . str_replace(' ', '%20', trim($url['path'])));
 		if ($contents !== false)
 		{
 			// Create a hashed name to save
@@ -2557,6 +2561,7 @@ function profileSaveAvatarData(&$value)
 		}
 	}
 
+	// Don't want an avatar, remove anything saved
 	if ($value === 'none')
 	{
 		$profile_vars['avatar'] = '';
@@ -2568,6 +2573,7 @@ function profileSaveAvatarData(&$value)
 
 		removeAttachments(array('id_member' => $memID));
 	}
+	// Use one we have on the server
 	elseif ($value === 'server_stored' && !empty($modSettings['avatar_stored_enabled']))
 	{
 		$profile_vars['avatar'] = strtr(empty($_POST['file']) ? (empty($_POST['cat']) ? '' : $_POST['cat']) : $_POST['file'], array('&amp;' => '&'));
@@ -2581,6 +2587,7 @@ function profileSaveAvatarData(&$value)
 		// Get rid of their old avatar. (if uploaded.)
 		removeAttachments(array('id_member' => $memID));
 	}
+	// Gravatar is where its at
 	elseif ($value === 'gravatar' && !empty($modSettings['avatar_gravatar_enabled']))
 	{
 		$profile_vars['avatar'] = 'gravatar';
@@ -2592,6 +2599,7 @@ function profileSaveAvatarData(&$value)
 
 		removeAttachments(array('id_member' => $memID));
 	}
+	// Supplying an external url for use
 	elseif ($value === 'external' && !empty($modSettings['avatar_external_enabled']) && ($valid_http || $valid_https) && empty($modSettings['avatar_download_external']))
 	{
 		// We need these clean...
@@ -2626,10 +2634,9 @@ function profileSaveAvatarData(&$value)
 				{
 					return 'bad_avatar';
 				}
-				elseif ($modSettings['avatar_action_too_large'] === 'option_download_and_resize')
+
+				if ($modSettings['avatar_action_too_large'] === 'option_download_and_resize')
 				{
-					// @todo remove this if appropriate
-					require_once(SUBSDIR . '/Attachments.subs.php');
 					if (saveAvatar($profile_vars['avatar'], $memID, $modSettings['avatar_max_width'], $modSettings['avatar_max_height']))
 					{
 						$profile_vars['avatar'] = '';
@@ -2645,14 +2652,15 @@ function profileSaveAvatarData(&$value)
 			}
 		}
 	}
+	// Uploading one to the custom avatars directory or an external one we downloaded?
 	elseif (($value === 'upload' && !empty($modSettings['avatar_upload_enabled'])) || $downloadedExternalAvatar)
 	{
-		if ((isset($_FILES['attachment']['name']) && $_FILES['attachment']['name'] != '') || $downloadedExternalAvatar)
+		if (!empty($_FILES['attachment']['name']) || $downloadedExternalAvatar)
 		{
 			// Get the dimensions of the image.
 			if (!$downloadedExternalAvatar)
 			{
-				if (!is_writable($uploadDir))
+				if (!$file_functions->isWritable($uploadDir))
 				{
 					throw new \ElkArte\Exceptions\Exception('Post.attachments_no_write', 'critical');
 				}
@@ -2680,14 +2688,12 @@ function profileSaveAvatarData(&$value)
 				if (!empty($modSettings['avatar_action_too_large']) && $modSettings['avatar_action_too_large'] === 'option_download_and_resize')
 				{
 					// Attempt to chmod it.
-					@chmod($_FILES['attachment']['tmp_name'], 0644);
+					$file_functions->chmod($_FILES['attachment']['tmp_name']);
 
-					// @todo remove this require when appropriate
-					require_once(SUBSDIR . '/Attachments.subs.php');
 					if (!saveAvatar($_FILES['attachment']['tmp_name'], $memID, $modSettings['avatar_max_width'], $modSettings['avatar_max_height']))
 					{
 						// Something went wrong, so lets delete this offender
-						@unlink($_FILES['attachment']['tmp_name']);
+						$file_functions->delete($_FILES['attachment']['tmp_name']);
 
 						return 'bad_avatar';
 					}
@@ -2700,22 +2706,21 @@ function profileSaveAvatarData(&$value)
 				elseif (!empty($modSettings['avatar_action_too_large']) && !empty($modSettings['avatar_reencode']))
 				{
 					// Attempt to chmod it.
-					@chmod($_FILES['attachment']['tmp_name'], 0644);
+					$file_functions->chmod($_FILES['attachment']['tmp_name']);
 
 					$image = new Image($_FILES['attachment']['tmp_name']);
 					if (!$image->reEncodeImage())
 					{
-						@unlink($_FILES['attachment']['tmp_name']);
+						$file_functions->delete($_FILES['attachment']['tmp_name']);
 
 						return 'bad_avatar';
 					}
 
 					// @todo remove this require when appropriate
-					require_once(SUBSDIR . '/Attachments.subs.php');
 					if (!saveAvatar($_FILES['attachment']['tmp_name'], $memID, $modSettings['avatar_max_width'], $modSettings['avatar_max_height']))
 					{
 						// Something went wrong, so lets delete this offender
-						@unlink($_FILES['attachment']['tmp_name']);
+						$file_functions->delete($_FILES['attachment']['tmp_name']);
 
 						return 'bad_avatar5';
 					}
@@ -2727,7 +2732,7 @@ function profileSaveAvatarData(&$value)
 				}
 				else
 				{
-					@unlink($_FILES['attachment']['tmp_name']);
+					$file_functions->delete($_FILES['attachment']['tmp_name']);
 
 					return 'bad_avatar';
 				}
@@ -2736,7 +2741,7 @@ function profileSaveAvatarData(&$value)
 			{
 				// Now try to find an infection.
 				$image = new Image($_FILES['attachment']['tmp_name']);
-				$size = $image->getSize();
+				$size = $image->getImageDimensions();
 				$valid_mime = getValidMimeImageType($size[2]);
 				if ($valid_mime !== '')
 				{
@@ -2745,7 +2750,7 @@ function profileSaveAvatarData(&$value)
 						// It's bad. Try to re-encode the contents?
 						if (empty($modSettings['avatar_reencode']) || (!$image->reEncodeImage()))
 						{
-							@unlink($_FILES['attachment']['tmp_name']);
+							$file_functions->delete($_FILES['attachment']['tmp_name']);
 
 							return 'bad_avatar';
 						}
@@ -2795,14 +2800,14 @@ function profileSaveAvatarData(&$value)
 				}
 
 				// Attempt to chmod it.
-				@chmod($uploadDir . '/' . $destinationPath, 0644);
+				$file_functions->chmod($uploadDir . '/' . $destinationPath);
 			}
 			$profile_vars['avatar'] = '';
 
 			// Delete any temporary file.
 			if (file_exists($_FILES['attachment']['tmp_name']))
 			{
-				@unlink($_FILES['attachment']['tmp_name']);
+				$file_functions->delete($_FILES['attachment']['tmp_name']);
 			}
 		}
 		// Selected the upload avatar option and had one already uploaded before or didn't upload one.
@@ -2811,6 +2816,7 @@ function profileSaveAvatarData(&$value)
 			$profile_vars['avatar'] = '';
 		}
 	}
+	// No sure, but you get nothing!
 	else
 	{
 		$profile_vars['avatar'] = '';
