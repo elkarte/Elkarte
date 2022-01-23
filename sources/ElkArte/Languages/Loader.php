@@ -81,7 +81,7 @@ class Loader
 		foreach ($file_names as $file)
 		{
 			$file = ucfirst($file);
-			if (isset($this->loaded[$file]))
+			if (isset($this->loaded[$file]) || in_array($file, Editor::IGNORE_FILES))
 			{
 				continue;
 			}
