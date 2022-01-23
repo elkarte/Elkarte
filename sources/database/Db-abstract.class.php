@@ -390,7 +390,7 @@ abstract class Database_Abstract implements Database
 		}
 
 		// A special case - we want the file and line numbers for debugging.
-		if ($error_type == 'return')
+		if ($error_type === 'return')
 			return array($file, $line);
 
 		// Is always a critical error.
