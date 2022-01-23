@@ -42,7 +42,7 @@ class Agreement
 	 *
 	 * @var string
 	 */
-	protected $_file_name = 'agreement';
+	protected $_file_name = 'Agreement';
 
 	/**
 	 * The name of the directory where the backup will be saved
@@ -73,7 +73,8 @@ class Agreement
 	 */
 	public function __construct($language, $backup_dir = null)
 	{
-		$this->_language = strtr($language, array('.' => ''));
+		$this->_language = ucfirst(strtr($language, array('.' => '')));
+
 		if ($backup_dir === null || !file_exists($backup_dir))
 		{
 			$backup_dir = BOARDDIR . '/packages/backups/' . $this->_backupdir_name;
@@ -100,7 +101,7 @@ class Agreement
 		}
 
 		// Off it goes to the agreement file.
-		$fp = fopen(BOARDDIR . '/' . $this->_file_name . $this->normalizeLanguage() . '.txt', 'w');
+		$fp = fopen($this->buildName($this->_language), 'w');
 		fwrite($fp, str_replace("\r", '', $text));
 		fclose($fp);
 
@@ -134,17 +135,20 @@ class Agreement
 	 *
 	 * @return bool|string
 	 */
-	public function getPlainText($fallback = true)
+	public function getPlainText($fallback = true, $language = null)
 	{
+		$language = $language ?? $this->_language;
+		$file = $this->buildName($language);
+
 		// Have we got a localized one?
-		if (file_exists(BOARDDIR . '/' . $this->_file_name . $this->normalizeLanguage() . '.txt'))
+		if (file_exists($file))
 		{
-			return file_get_contents(BOARDDIR . '/' . $this->_file_name . $this->normalizeLanguage() . '.txt');
+			return trim(file_get_contents($file));
 		}
 
-		if ($fallback && file_exists(BOARDDIR . '/' . $this->_file_name . '.txt'))
+		if ($fallback)
 		{
-			return file_get_contents(BOARDDIR . '/' . $this->_file_name . '.txt');
+			return $this->getPlainText(false, 'English');
 		}
 
 		return '';
@@ -174,7 +178,7 @@ class Agreement
 	 */
 	public function isWritable()
 	{
-		$filename = BOARDDIR . '/' . $this->_file_name . $this->normalizeLanguage() . '.txt';
+		$filename = $this->buildName($this->_language);
 
 		return file_exists($filename) && is_writable($filename);
 	}
@@ -233,16 +237,6 @@ class Agreement
 		);
 	}
 
-	/**
-	 * Takes care of the edge-case of the default agreement that doesn't have
-	 * the language in the name, and the fact that the admin panels loads it
-	 * as an empty language.
-	 */
-	protected function normalizeLanguage()
-	{
-		return $this->_language === '' ? '' : '.' . $this->_language;
-	}
-
 	protected function _backupId()
 	{
 		$backup_id = Util::strftime('%Y-%m-%d', forum_time(false));
@@ -277,12 +271,17 @@ class Agreement
 			return false;
 		}
 
-		$glob = new \GlobIterator(BOARDDIR . '/' . $this->_file_name . '*.txt', \FilesystemIterator::SKIP_DOTS);
+		$glob = new \GlobIterator(SOURCEDIR . '/ElkArte/Languages/' . $this->_file_name . '/*.txt', \FilesystemIterator::SKIP_DOTS);
 		foreach ($glob as $file)
 		{
 			copy($file->getPathname(), $destination . $file->getBasename());
 		}
 
 		return true;
+	}
+
+	protected function buildName($language)
+	{
+		return SOURCEDIR . '/ElkArte/Languages/' . $this->_file_name . '/' . $language . '.txt';
 	}
 }

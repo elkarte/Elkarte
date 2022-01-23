@@ -30,7 +30,7 @@ class PrivacyPolicy extends Agreement
 	{
 		$this->_log_table_name = '{db_prefix}log_privacy_policy_accept';
 		$this->_backupdir_name = 'privacypolicies';
-		$this->_file_name = 'privacypolicy';
+		$this->_file_name = 'PrivacyPolicy';
 
 		parent::__construct($language, $backup_dir);
 	}

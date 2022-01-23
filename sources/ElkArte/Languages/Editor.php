@@ -21,7 +21,7 @@ use ElkArte\Database\QueryInterface;
  */
 class Editor
 {
-	public const IGNORE_FILES = ['Agreement'];
+	public const IGNORE_FILES = ['Agreement', 'PrivacyPolicy'];
 
 	/** @var string */
 	protected $path = '';
