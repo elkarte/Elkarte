@@ -19,6 +19,7 @@
 
 use BBC\ParserWrapper;
 use ElkArte\AttachmentsDirectory;
+use ElkArte\FileFunctions;
 use ElkArte\Util;
 
 /**
@@ -134,8 +135,6 @@ function approveAttachments($attachments)
  */
 function removeAttachments($condition, $query_type = '', $return_affected_messages = false, $autoThumbRemoval = true)
 {
-	global $modSettings;
-
 	$db = database();
 
 	// @todo This might need more work!
@@ -217,19 +216,21 @@ function removeAttachments($condition, $query_type = '', $return_affected_messag
 		WHERE ' . $condition,
 		$query_parameter
 	)->fetch_callback(
-		function ($row) use (&$attach, &$parents, &$msgs, $modSettings, $return_affected_messages, $autoThumbRemoval) {
+		function ($row) use (&$attach, &$parents, &$msgs, $return_affected_messages, $autoThumbRemoval) {
+			global $modSettings;
+
 			// Figure out the "encrypted" filename and unlink it ;).
 			if ($row['attachment_type'] == 1)
 			{
 				// if attachment_type = 1, it's... an avatar in a custom avatar directory.
 				// wasn't it obvious? :P
 				// @todo look again at this.
-				@unlink($modSettings['custom_avatar_dir'] . '/' . $row['filename']);
+				FileFunctions::instance()->delete($modSettings['custom_avatar_dir'] . '/' . $row['filename']);
 			}
 			else
 			{
 				$filename = getAttachmentFilename($row['filename'], $row['id_attach'], $row['id_folder'], false, $row['file_hash']);
-				@unlink($filename);
+				FileFunctions::instance()->delete($filename);
 
 				// If this was a thumb, the parent attachment should know about it.
 				if (!empty($row['id_parent']))
@@ -237,11 +238,11 @@ function removeAttachments($condition, $query_type = '', $return_affected_messag
 					$parents[] = $row['id_parent'];
 				}
 
-				// If this attachments has a thumb, remove it as well.
+				// If this attachment has a thumb, remove it as well, ouch baby.
 				if (!empty($row['id_thumb']) && $autoThumbRemoval)
 				{
 					$thumb_filename = getAttachmentFilename($row['thumb_filename'], $row['id_thumb'], $row['thumb_folder'], false, $row['thumb_file_hash']);
-					@unlink($thumb_filename);
+					FileFunctions::instance()->delete($thumb_filename);
 					$attach[] = $row['id_thumb'];
 				}
 			}
@@ -608,7 +609,7 @@ function findOrphanThumbnails($start, $fix_errors, $to_fix)
 				if ($fix_errors && in_array('missing_thumbnail_parent', $to_fix))
 				{
 					$filename = getAttachmentFilename($row['filename'], $row['id_attach'], $row['id_folder'], false, $row['file_hash']);
-					@unlink($filename);
+					FileFunctions::instance()->delete($filename);
 				}
 			}
 		}
@@ -633,7 +634,7 @@ function findOrphanThumbnails($start, $fix_errors, $to_fix)
 }
 
 /**
- * Finds parents who thing they do have thumbnails, but don't
+ * Finds parents who think they do have thumbnails, but don't
  *
  * - Checks in groups of 500
  * - Called by attachment maintenance
@@ -806,7 +807,7 @@ function repairAttachmentData($start, $fix_errors, $to_fix)
 			if ($fix_errors && in_array('file_size_of_zero', $to_fix))
 			{
 				$to_remove[] = $row['id_attach'];
-				@unlink($filename);
+				FileFunctions::instance()->delete($filename);
 			}
 		}
 		// Size listed and actual size are not the same?
@@ -879,7 +880,8 @@ function findOrphanAvatars($start, $fix_errors, $to_fix)
 				{
 					$filename = getAttachmentFilename($row['filename'], $row['id_attach'], $row['id_folder'], false, $row['file_hash']);
 				}
-				@unlink($filename);
+
+				FileFunctions::instance()->delete($filename);
 			}
 
 			return $row['id_attach'];
@@ -941,7 +943,7 @@ function findOrphanAttachments($start, $fix_errors, $to_fix)
 			if ($fix_errors && in_array('attachment_no_msg', $to_fix))
 			{
 				$filename = getAttachmentFilename($row['filename'], $row['id_attach'], $row['id_folder'], false, $row['file_hash']);
-				@unlink($filename);
+				FileFunctions::instance()->delete($filename);
 			}
 
 			return $row['id_attach'];
@@ -1325,11 +1327,12 @@ function list_getAttachDirs()
  */
 function attachDirStatus($dir, $expected_files)
 {
-	if (!is_dir($dir))
+	if (!FileFunctions::instance()->isDir($dir))
 	{
 		return array('does_not_exist', true, '');
 	}
-	elseif (!is_writable($dir))
+
+	if (!FileFunctions::instance()->isWritable($dir))
 	{
 		return array('not_writable', true, '');
 	}
@@ -1383,17 +1386,14 @@ function list_getBaseDirs()
 	{
 		$expected_dirs = $attachmentsDir->countSubdirs($dir);
 
-		if (!is_dir($dir))
+		$status = 'ok';
+		if (!FileFunctions::instance()->isDir($dir))
 		{
 			$status = 'does_not_exist';
 		}
-		elseif (!is_writeable($dir))
+		elseif (!FileFunctions::instance()->isWritable($dir))
 		{
 			$status = 'not_writable';
-		}
-		else
-		{
-			$status = 'ok';
 		}
 
 		$basedirs[] = array(
@@ -1783,7 +1783,6 @@ function countAttachmentsInFolders($id_folder)
 {
 	$db = database();
 
-	// Let's not try to delete a path with files in it.
 	$request = $db->query('', '
 		SELECT 
 			COUNT(id_attach) AS num_attach
@@ -1859,7 +1858,9 @@ function canRemoveAttachment($id_attach, $id_member_requesting)
 		array(
 			'id_attach' => $id_attach,
 		)
-	)->fetch_callback(function($row) use ($modSettings, $id_member_requesting, &$canRemove) {
+	)->fetch_callback(function($row) use ($id_member_requesting, &$canRemove) {
+		global $modSettings;
+
 		if (!empty($row))
 		{
 			$is_owner = $id_member_requesting == $row['id_member'];
