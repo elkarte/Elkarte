@@ -21,7 +21,7 @@ class FileFunctions
 	private static $_instance = null;
 
 	/**
-	 * chmod control which will attempt to make a file or directory writable
+	 * chmod control will attempt to make a file or directory writable
 	 *
 	 * - Progressively attempts various chmod values until item is writable or failure
 	 *
@@ -90,7 +90,7 @@ class FileFunctions
 
 	/**
 	 * is_dir() helper using spl functions.  is_dir can throw an exception if open_basedir
-	 * restrictions are in effect.  Note: getType will not return true on a symlink
+	 * restrictions are in effect.
 	 *
 	 * @param string $dir
 	 * @return bool
@@ -261,6 +261,29 @@ class FileFunctions
 		}
 
 		clearstatcache(false, $partialTree);
+
+		return true;
+	}
+
+	/**
+	 * Deletes a file (not a directory) at a given location
+	 *
+	 * @param $path
+	 * @return bool
+	 */
+	public function delete($path)
+	{
+		if (!$this->fileExists($path) || !$this->isWritable($path))
+		{
+			return false;
+		}
+
+		error_clear_last();
+
+		if (!@unlink($path))
+		{
+			return false;
+		}
 
 		return true;
 	}
