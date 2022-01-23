@@ -15,6 +15,7 @@ namespace ElkArte\AdminController;
 
 use ElkArte\AbstractController;
 use ElkArte\Action;
+use ElkArte\FileFunctions;
 use ElkArte\SettingsForm\SettingsForm;
 
 /**
@@ -74,7 +75,7 @@ class ManageAvatars extends AbstractController
 	 */
 	public function action_avatarSettings_display()
 	{
-		global $txt, $context;
+		global $txt, $context, $boardurl;
 
 		// Initialize the form
 		$settingsForm = new SettingsForm(SettingsForm::DB_ADAPTER);
@@ -89,12 +90,12 @@ class ManageAvatars extends AbstractController
 
 			call_integration_hook('integrate_save_avatar_settings');
 
-			// Disable if invalid values would result
-			$this->_req->post->custom_avatar_enabled = $this->_req->getPost('custom_avatar_enabled', 'intval', 0);
-			if ($this->_req->post->custom_avatar_enabled === 1 && (empty($this->_req->post->custom_avatar_dir) || empty($this->_req->post->custom_avatar_url)))
-			{
-				$this->_req->post->custom_avatar_enabled = 0;
-			}
+			// Ensure we do not have empty values for these
+			$this->_req->post = (object) array_filter((array) $this->_req->post);
+			$this->_req->post->custom_avatar_dir = $this->_req->getPost('custom_avatar_dir', 'trim', BOARDDIR . '/custom_avatars');
+			$this->_req->post->custom_avatar_url = $this->_req->getPost('custom_avatar_url', 'trim', $boardurl . '/custom_avatars');
+			$this->_req->post->avatar_directory = $this->_req->getPost('avatar_directory', 'trim', BOARDDIR . '/avatars');
+			$this->_req->post->avatar_url = $this->_req->getPost('avatar_url', 'trim', $boardurl . '/avatars');
 
 			$settingsForm->setConfigValues((array) $this->_req->post);
 			$settingsForm->save();
@@ -102,7 +103,7 @@ class ManageAvatars extends AbstractController
 		}
 
 		// Attempt to figure out if the admin is trying to break things.
-		$context['settings_save_onclick'] = 'return document.getElementById(\'custom_avatar_enabled\').value == 1 && (document.getElementById(\'custom_avatar_dir\').value == \'\' || document.getElementById(\'custom_avatar_url\').value == \'\') ? confirm(\'' . $txt['custom_avatar_check_empty'] . '\') : true;';
+		$context['settings_save_onclick'] = 'return (document.getElementById(\'custom_avatar_dir\').value == \'\' || document.getElementById(\'custom_avatar_url\').value == \'\') ? confirm(\'' . $txt['custom_avatar_check_empty'] . '\') : true;';
 
 		// Prepare the context.
 		$context['post_url'] = getUrl('admin', ['action' => 'admin', 'area' => 'manageattachments', 'sa' => 'avatars', 'save']);
@@ -123,21 +124,23 @@ class ManageAvatars extends AbstractController
 		// Check for GD and ImageMagick. It will set up a warning for the admin otherwise.
 		$testImg = get_extension_funcs('gd') || class_exists('Imagick');
 
-		$context['valid_avatar_dir'] = is_dir($modSettings['avatar_directory']);
-		$context['valid_custom_avatar_dir'] = empty($modSettings['custom_avatar_enabled']) || (!empty($modSettings['custom_avatar_dir']) && is_dir($modSettings['custom_avatar_dir']) && is_writable($modSettings['custom_avatar_dir']));
+		$context['valid_avatar_dir'] = FileFunctions::instance()->isDir($modSettings['avatar_directory']);
+		$context['valid_custom_avatar_dir'] = !empty($modSettings['custom_avatar_dir'])
+			&& FileFunctions::instance()->isDir($modSettings['custom_avatar_dir'])
+			&& FileFunctions::instance()->isWritable($modSettings['custom_avatar_dir']);
 
 		// Load the configuration vars for the form
 		$config_vars = array(
 			array('title', 'avatar_settings'),
 			array('check', 'avatar_default'),
-			array('text', 'avatar_max_width', 'subtext' => $txt['zero_for_no_limit'], 6),
-			array('text', 'avatar_max_height', 'subtext' => $txt['zero_for_no_limit'], 6),
+			array('int', 'avatar_max_width', 'subtext' => $txt['zero_for_no_limit'], 6),
+			array('int', 'avatar_max_height', 'subtext' => $txt['zero_for_no_limit'], 6),
 			array('select', 'avatar_action_too_large',
-				  array(
-					  'option_refuse' => $txt['option_refuse'],
-					  'option_resize' => $txt['option_resize'],
-					  'option_download_and_resize' => $txt['option_download_and_resize'],
-				  ),
+				array(
+					'option_refuse' => $txt['option_refuse'],
+					'option_resize' => $txt['option_resize'],
+					'option_download_and_resize' => $txt['option_download_and_resize'],
+				),
 			),
 			array('permissions', 'profile_set_avatar', 0, $txt['profile_set_avatar']),
 			// Server stored avatars!
@@ -163,15 +166,11 @@ class ManageAvatars extends AbstractController
 			// Upload-able avatars?
 			array('title', 'avatar_upload'),
 			array('check', 'avatar_upload_enabled'),
-			array('title', 'avatar_resize_options'),
-			array('check', 'avatar_reencode'),
-			array('warning', 'avatar_paranoid_warning'),
-			array('check', 'avatar_paranoid'),
-			'',
-			array('check', 'avatar_download_png'),
-			array('select', 'custom_avatar_enabled', array($txt['option_attachment_dir'], $txt['option_specified_dir']), 'onchange' => 'fUpdateStatus();'),
 			array('text', 'custom_avatar_dir', 40, 'subtext' => $txt['custom_avatar_dir_desc'], 'invalid' => !$context['valid_custom_avatar_dir']),
 			array('text', 'custom_avatar_url', 40),
+			array('title', 'avatar_resize_options'),
+			array('check', 'avatar_reencode'),
+			array('check', 'avatar_download_png'),
 		);
 
 		// Add new settings with a nice hook, makes them available for admin settings search as well
