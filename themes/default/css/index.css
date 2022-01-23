@@ -1772,11 +1772,11 @@ nav > .quickbuttons {
 .report_button:before     {background-position: 0 -312px;}
 .warn_button:before       {background-position: 0 -336px;}
 .quotetonew_button:before {background-position: 0 -360px;}
-.like_button:before       {background-position: 0 -384px;}
-.unlike_button:before     {background-position: 0 -408px;}
+.react_button:before       {background-position: 0 -384px;}
+.unreact_button:before     {background-position: 0 -408px;}
 .star_button:before       {background-position: 0 -432px;}
 .quick_edit:before        {background-position: 0 -456px;}
-.likes_button:before      {background-position: 0 -480px;}
+.reacts_button:before      {background-position: 0 -480px;}
 
 /* Radius left end of the first (Quote) button. */
 .linklevel1.quote_button {
@@ -1821,15 +1821,15 @@ nav > .quickbuttons {
 }
 
 /* Show appropriate like/unlike action */
-.like_button:before, .likes_button:before, .unlike_button:before {
+.react_button:before, .reacts_button:before, .unreact_button:before {
 	background-position: 0 -480px;
 }
 
-.unlike_button:before {
+.unreact_button:before {
 	background-position: 0 -408px;
 }
 
-.like_button:hover:before {
+.react_button:hover:before {
 	background-position: 0 -384px;
 }
 
