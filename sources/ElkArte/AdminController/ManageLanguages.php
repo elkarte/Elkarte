@@ -778,17 +778,6 @@ class ManageLanguages extends AbstractController
 	}
 
 	/**
-	 * Checks if the Zend Opcahce is installed, active and cmd functions available.
-	 *
-	 * @return bool
-	 */
-	private function _checkOpcache()
-	{
-		return (extension_loaded('Zend OPcache') && ini_get('opcache.enable') &&
-			(ini_get('opcache.restrict_api') === '' || stripos(BOARDDIR, ini_get('opcache.restrict_api')) !== 0));
-	}
-
-	/**
 	 * Edit language related settings.
 	 *
 	 * - Accessed by ?action=admin;area=languages;sa=settings
