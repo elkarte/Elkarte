@@ -183,6 +183,45 @@ class UpgradeInstructions_upgrade_2_0
 					);
 				}
 			),
+			array(
+				'debug_title' => 'Move privacy policy and agreement...',
+				'function' => function()
+				{
+					if (file_exists(BOARDDIR . '/agreement.txt'))
+					{
+						// Don't want to bother for the time being with errors, especially during upgrade.
+						@rename(BOARDDIR . '/agreement.txt', SOURCEDIR . '/ElkArte/Languages/Agreement/English.txt');
+					}
+					$agreements = glob(BOARDDIR . '/agreement.*.txt');
+					foreach ($agreements as $agreement)
+					{
+						$matches = [];
+						$file = basename($agreement);
+						preg_match('~agreement\.(.+)\.txt~', $file, $matches);
+						if (isset($matches[1]))
+						{
+							@rename(BOARDDIR . '/' . $file, SOURCEDIR . '/ElkArte/Languages/Agreement/' . ucfirst($matches[1]) . '.txt');
+						}
+					}
+
+					if (file_exists(BOARDDIR . '/privacypolicy.txt'))
+					{
+						// Don't want to bother for the time being with errors, especially during upgrade.
+						@rename(BOARDDIR . '/privacypolicy.txt', SOURCEDIR . '/ElkArte/Languages/PrivacyPolicy/English.txt');
+					}
+					$policies = glob(BOARDDIR . '/privacypolicy.*.txt');
+					foreach ($policies as $policy)
+					{
+						$matches = [];
+						$file = basename($policy);
+						preg_match('~privacypolicy\.(.+)\.txt~', $file, $matches);
+						if (isset($matches[1]))
+						{
+							@rename(BOARDDIR . '/' . $file, SOURCEDIR . '/ElkArte/Languages/PrivacyPolicy/' . ucfirst($matches[1]) . '.txt');
+						}
+					}
+				}
+			),
 		);
 	}
 }
