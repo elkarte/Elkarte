@@ -1931,11 +1931,11 @@ nav > .quickbuttons, menu > .quickbuttons {
 	background-position: 0 -360px;
 }
 
-.like_button::before {
+.react_button::before {
 	background-position: 0 -384px;
 }
 
-.unlike_button::before {
+.unreact_button::before {
 	background-position: 0 -408px;
 }
 
@@ -1947,7 +1947,7 @@ nav > .quickbuttons, menu > .quickbuttons {
 	background-position: 0 -456px;
 }
 
-.likes_button::before {
+.reacts_button::before {
 	background-position: 0 -480px;
 }
 
@@ -1991,11 +1991,11 @@ nav > .quickbuttons, menu > .quickbuttons {
 }
 
 /* Show appropriate like/unlike action */
-.like_button::before, .likes_button::before {
+.react_button::before, .reacts_button::before {
 	background-position: 0 -480px;
 }
 
-.like_button:hover::before {
+.react_button:hover::before {
 	background-position: 0 -384px;
 }
 

@@ -512,7 +512,7 @@ class Display extends AbstractController
 						}),
 					});
 
-					$(".like_button, .unlike_button, .likes_button").SiteTooltip();
+					$(".react_button, .unreact_button, .reacts_button").SiteTooltip();
 				});', true);
 			}
 

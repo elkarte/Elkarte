@@ -52,7 +52,7 @@
 				}
 
 				// Set the subAction to what they are doing
-				if (check.indexOf('unlike_button') >= 0)
+				if (check.indexOf('unreact_button') >= 0)
 				{
 					if (!confirm(likemsg_are_you_sure))
 					{
@@ -116,8 +116,8 @@
 			 */
 			updateUi = function (params)
 			{
-				var currentClass = (params.action === 'unlikepost') ? 'unlike_button' : 'like_button',
-					nextClass = (params.action === 'unlikepost') ? 'like_button' : 'unlike_button';
+				var currentClass = (params.action === 'unlikepost') ? 'unreact_button' : 'react_button',
+					nextClass = (params.action === 'unlikepost') ? 'react_button' : 'unreact_button';
 
 				// Swap the button class as needed, update the text for the hover
 				$(params.elem).removeClass(currentClass).addClass(nextClass);

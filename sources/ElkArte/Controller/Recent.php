@@ -426,7 +426,7 @@ class Recent extends AbstractController implements FrontpageInterface
 					}),
 				});
 
-				$(".like_button, .unlike_button, .likes_button").SiteTooltip();
+				$(".react_button, .unreact_button, .reacts_button").SiteTooltip();
 			});', true);
 	}
 
@@ -447,7 +447,7 @@ class Recent extends AbstractController implements FrontpageInterface
 		{
 			$txt_like_post = '
 				<li class="listlevel1' . (!empty($post['like_counter']) ? ' liked"' : '"') . '>
-					<a class="linklevel1 ' . ($post['can_unlike'] ? 'unlike_button' : 'like_button') . '" href="javascript:void(0)" title="' . (!empty($post['like_counter']) ? $txt['liked_by'] . ' ' . implode(', ', $context['likes'][$post['id']]['member']) : '') . '" onclick="likePosts.prototype.likeUnlikePosts(event,' . $post['id'] . ', ' . $post['topic'] . '); return false;">' .
+					<a class="linklevel1 ' . ($post['can_unlike'] ? 'unreact_button' : 'react_button') . '" href="javascript:void(0)" title="' . (!empty($post['like_counter']) ? $txt['liked_by'] . ' ' . implode(', ', $context['likes'][$post['id']]['member']) : '') . '" onclick="likePosts.prototype.likeUnlikePosts(event,' . $post['id'] . ', ' . $post['topic'] . '); return false;">' .
 				(!empty($post['like_counter']) ? '<span class="likes_indicator">' . $post['like_counter'] . '</span>&nbsp;' . $txt['likes'] : $txt['like_post']) . '
 					</a>
 				</li>';
@@ -457,7 +457,7 @@ class Recent extends AbstractController implements FrontpageInterface
 		{
 			$txt_like_post = '
 				<li class="listlevel1 liked">
-					<a href="javascript:void(0)" title="' . $txt['liked_by'] . ' ' . implode(', ', $context['likes'][$post['id']]['member']) . '" class="linklevel1 likes_button">
+					<a href="javascript:void(0)" title="' . $txt['liked_by'] . ' ' . implode(', ', $context['likes'][$post['id']]['member']) . '" class="linklevel1 reacts_button">
 						<span class="likes_indicator">' . $post['like_counter'] . '</span>&nbsp;' . $txt['likes'] . '
 					</a>
 				</li>';
