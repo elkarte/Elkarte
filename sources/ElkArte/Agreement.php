@@ -86,7 +86,7 @@ class Agreement
 	/**
 	 * Stores a text into the agreement file.
 	 * It stores strictly on the *language* agreement, no fallback.
-	 * If the language passed to the class is empty, then it uses agreement.txt.
+	 * If the language passed to the class is empty, then it uses Agreement/English.txt.
 	 *
 	 * @param string $text the language of the agreement we want.
 	 * @param bool $update_backup if store a copy of the text of the agreements.
@@ -174,7 +174,7 @@ class Agreement
 	/**
 	 * Retrieves the BBC-parsed version of the agreement.
 	 *
-	 * If the language passed to the class is empty, then it uses agreement.txt.
+	 * If the language passed to the class is empty, then it uses Agreement/English.txt.
 	 */
 	public function isWritable()
 	{

@@ -1446,7 +1446,7 @@ function doSecurityChecks()
 	if (allowedTo('admin_forum') && User::$info->is_guest === false)
 	{
 		// If agreement is enabled, at least the english version shall exists
-		if ($modSettings['requireAgreement'] && !file_exists(BOARDDIR . '/agreement.txt'))
+		if ($modSettings['requireAgreement'] && !file_exists(SOURCEDIR . '/ElkArte/Languages/Agreement/English.txt'))
 		{
 			$context['security_controls_files']['title'] = $txt['generic_warning'];
 			$context['security_controls_files']['errors']['agreement'] = $txt['agreement_missing'];

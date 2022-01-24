@@ -197,7 +197,7 @@ class Bootstrap
 		global $boarddir, $sourcedir, $cachedir, $extdir, $languagedir;
 
 		// Make sure the paths are correct... at least try to fix them.
-		if (!file_exists($boarddir) && file_exists(__DIR__ . '/agreement.txt'))
+		if (!file_exists($boarddir) && file_exists(__DIR__ . '/bootstrap.php'))
 		{
 			$boarddir = __DIR__;
 		}

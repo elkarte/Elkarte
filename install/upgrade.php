@@ -92,7 +92,7 @@ if (substr($sourcedir, 0, 1) == '.' && substr($sourcedir, 1, 1) != '.')
 }
 
 // Make sure the paths are correct... at least try to fix them.
-if (!file_exists($boarddir) && file_exists(TMP_BOARDDIR . '/agreement.txt'))
+if (!file_exists($boarddir) && file_exists(TMP_BOARDDIR . '/bootstrap.php'))
 {
 	$boarddir = TMP_BOARDDIR;
 }
@@ -702,20 +702,6 @@ function action_welcomeLogin()
 	if (!makeFilesWritable($writable_files))
 	{
 		return false;
-	}
-
-	// Check agreement.txt. (it may not exist, in which case BOARDDIR must be writable.)
-	if (isset($modSettings['agreement']) && (!is_writable(BOARDDIR) || file_exists(BOARDDIR . '/agreement.txt')) && !is_writable(BOARDDIR . '/agreement.txt'))
-	{
-		return throw_error('The upgrader was unable to obtain write access to agreement.txt.<br /><br />If you are using a linux or unix based server, please ensure that the file is chmod\'d to 777, or if it does not exist that the directory this upgrader is in is 777.<br />If your server is running Windows, please ensure that the internet guest account has the proper permissions on it or its folder.');
-	}
-
-	// Upgrade the agreement.
-	elseif (isset($modSettings['agreement']))
-	{
-		$fp = fopen(BOARDDIR . '/agreement.txt', 'w');
-		fwrite($fp, $modSettings['agreement']);
-		fclose($fp);
 	}
 
 	// We're going to check that their board dir setting is right in case they've been moving stuff around.
@@ -1922,17 +1908,6 @@ Usage: /path/to/php -f ' . basename(__FILE__) . ' -- [OPTION]...
 	if (!is_writable(BOARDDIR . '/Settings_bak.php'))
 	{
 		print_error('Error: Unable to obtain write access to "Settings_bak.php".');
-	}
-
-	if (isset($modSettings['agreement']) && (!is_writable(BOARDDIR) || file_exists(BOARDDIR . '/agreement.txt')) && !is_writable(BOARDDIR . '/agreement.txt'))
-	{
-		print_error('Error: Unable to obtain write access to "agreement.txt".');
-	}
-	elseif (isset($modSettings['agreement']))
-	{
-		$fp = fopen(BOARDDIR . '/agreement.txt', 'w');
-		fwrite($fp, $modSettings['agreement']);
-		fclose($fp);
 	}
 
 	// Make sure themes is writable.

@@ -240,8 +240,6 @@ class Install_Controller
 			'packages/installed.list',
 			'smileys',
 			'themes',
-			'agreement.txt',
-			'privacypolicy.txt',
 			'db_last_error.txt',
 			'Settings.php',
 			'Settings_bak.php'
@@ -839,22 +837,6 @@ class Install_Controller
 			),
 			array('variable')
 		);
-
-		if (file_exists(TMP_BOARDDIR . '/privacypolicy.txt'))
-		{
-			$privacypol = new \ElkArte\PrivacyPolicy('english');
-			$success = $privacypol->storeBackup();
-			$db->insert('replace',
-				$db_prefix . 'settings',
-				array(
-					'variable' => 'string-255', 'value' => 'string-65534',
-				),
-				array(
-					'privacypolicyRevision', $success,
-				),
-				array('variable')
-			);
-		}
 
 		// Maybe we can auto-detect better cookie settings?
 		preg_match('~^http[s]?://([^\.]+?)([^/]*?)(/.*)?$~', $boardurl, $matches);

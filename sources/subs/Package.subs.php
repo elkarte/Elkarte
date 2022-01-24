@@ -2839,7 +2839,7 @@ function package_create_backup($id = 'backup')
 	$use_relative_paths = empty($_REQUEST['use_full_paths']);
 
 	// The files that reside outside of sources, in the base, we add manually
-	$base_files = array('index.php', 'SSI.php', 'agreement.txt', 'subscriptions.php',
+	$base_files = array('index.php', 'SSI.php', 'subscriptions.php',
 						'email_imap_cron.php', 'emailpost.php', 'emailtopic.php');
 	foreach ($base_files as $file)
 	{

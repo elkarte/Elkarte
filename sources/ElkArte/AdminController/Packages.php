@@ -1378,10 +1378,6 @@ class Packages extends AbstractController
 			strtr(BOARDDIR, array('\\' => '/')) => array(
 				'type' => 'dir',
 				'contents' => array(
-					'agreement.txt' => array(
-						'type' => 'file',
-						'writable_on' => 'standard',
-					),
 					'Settings.php' => array(
 						'type' => 'file',
 						'writable_on' => 'restrictive',
