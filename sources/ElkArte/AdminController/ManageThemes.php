@@ -2226,20 +2226,20 @@ class ManageThemes extends AbstractController
 		}
 		elseif (isset($this->_req->query->lang_file) && preg_match('~^[^\./\\\\:\0]\.[^\./\\\\:\0]$~', $this->_req->query->lang_file) != 0)
 		{
-			if (!empty($theme_dirs['base_theme_dir']) && file_exists($theme_dirs['base_theme_dir'] . '/languages/' . $this->_req->query->lang_file . '.php'))
+			if (!empty($theme_dirs['base_theme_dir']) && file_exists($theme_dirs['base_theme_dir'] . '/Languages/' . $this->_req->query->lang_file . '.php'))
 			{
-				$filename = $theme_dirs['base_theme_dir'] . '/languages/' . $this->_req->query->template . '.php';
+				$filename = $theme_dirs['base_theme_dir'] . '/Languages/' . $this->_req->query->template . '.php';
 			}
-			elseif (file_exists($settings['default_theme_dir'] . '/languages/' . $this->_req->query->template . '.php'))
+			elseif (file_exists($settings['default_theme_dir'] . '/Languages/' . $this->_req->query->template . '.php'))
 			{
-				$filename = $settings['default_theme_dir'] . '/languages/' . $this->_req->query->template . '.php';
+				$filename = $settings['default_theme_dir'] . '/Languages/' . $this->_req->query->template . '.php';
 			}
 			else
 			{
 				throw new Exception('no_access', false);
 			}
 
-			$fp = fopen($theme_dirs['theme_dir'] . '/languages/' . $this->_req->query->lang_file . '.php', 'w');
+			$fp = fopen($theme_dirs['theme_dir'] . '/Languages/' . $this->_req->query->lang_file . '.php', 'w');
 			fwrite($fp, file_get_contents($filename));
 			fclose($fp);
 
@@ -2264,13 +2264,10 @@ class ManageThemes extends AbstractController
 		}
 		$dir->close();
 
-		$dir = dir($settings['default_theme_dir'] . '/languages');
+		$dir = dir($settings['default_theme_dir'] . '/Languages');
 		while (($entry = $dir->read()))
 		{
-			if (preg_match('~^([^\.]+\.[^\.]+)\.php$~', $entry, $matches))
-			{
-				$lang_files[] = $matches[1];
-			}
+			$lang_files[] = $entry;
 		}
 		$dir->close();
 
@@ -2286,14 +2283,14 @@ class ManageThemes extends AbstractController
 			}
 			$dir->close();
 
-			if (file_exists($theme_dirs['base_theme_dir'] . '/languages'))
+			if (file_exists($theme_dirs['base_theme_dir'] . '/Languages'))
 			{
-				$dir = dir($theme_dirs['base_theme_dir'] . '/languages');
+				$dir = dir($theme_dirs['base_theme_dir'] . '/Languages');
 				while (($entry = $dir->read()))
 				{
-					if (preg_match('~^([^\.]+\.[^\.]+)\.php$~', $entry, $matches) && !in_array($matches[1], $lang_files))
+					if (!in_array($entry, $lang_files))
 					{
-						$lang_files[] = $matches[1];
+						$lang_files[] = $entry;
 					}
 				}
 				$dir->close();
@@ -2320,7 +2317,7 @@ class ManageThemes extends AbstractController
 				'filename' => $file . '.php',
 				'value' => $file,
 				'already_exists' => false,
-				'can_copy' => file_exists($theme_dirs['theme_dir'] . '/languages') ? is_writable($theme_dirs['theme_dir'] . '/languages') : is_writable($theme_dirs['theme_dir']),
+				'can_copy' => file_exists($theme_dirs['theme_dir'] . '/Languages') && is_writable($theme_dirs['theme_dir'] . '/Languages'),
 			);
 		}
 
@@ -2335,15 +2332,15 @@ class ManageThemes extends AbstractController
 		}
 		$dir->close();
 
-		if (file_exists($theme_dirs['theme_dir'] . '/languages'))
+		if (file_exists($theme_dirs['theme_dir'] . '/Languages'))
 		{
-			$dir = dir($theme_dirs['theme_dir'] . '/languages');
+			$dir = dir($theme_dirs['theme_dir'] . '/Languages');
 			while (($entry = $dir->read()))
 			{
-				if (preg_match('~^([^\.]+\.[^\.]+)\.php$~', $entry, $matches) && isset($context['available_language_files'][$matches[1]]))
+				if (isset($context['available_language_files'][$entry]))
 				{
-					$context['available_language_files'][$matches[1]]['already_exists'] = true;
-					$context['available_language_files'][$matches[1]]['can_copy'] = is_writable($theme_dirs['theme_dir'] . '/languages/' . $entry);
+					$context['available_language_files'][$entry]['already_exists'] = true;
+					$context['available_language_files'][$entry]['can_copy'] = is_writable($theme_dirs['theme_dir'] . '/Languages/' . $entry);
 				}
 			}
 			$dir->close();
