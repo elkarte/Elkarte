@@ -24,7 +24,7 @@ use ElkArte\Errors\ErrorContext;
 use ElkArte\Exceptions\Exception;
 use ElkArte\PrivacyPolicy;
 use ElkArte\SettingsForm\SettingsForm;
-use ElkArte\Themes\ThemeLoader;
+use ElkArte\Languages\Txt;
 use ElkArte\TokenHash;
 use ElkArte\Util;
 
@@ -57,7 +57,7 @@ class ManageRegistration extends AbstractController
 		global $context, $txt;
 
 		// Loading, always loading.
-		ThemeLoader::loadLanguageFile('Login');
+		Txt::load('Login');
 		theme()->getTemplates()->load('Register');
 		loadJavascriptFile('register.js');
 
@@ -252,7 +252,7 @@ class ManageRegistration extends AbstractController
 	 * Allows the administrator to edit the registration agreement, and choose whether
 	 * it should be shown or not.
 	 *
-	 * - It writes and saves the agreement to the agreement.txt file.
+	 * - It writes and saves the agreement to the appropriate file.
 	 * - Accessed by ?action=admin;area=regcenter;sa=agreement.
 	 * - Requires the admin_forum permission.
 	 *
@@ -263,7 +263,7 @@ class ManageRegistration extends AbstractController
 		// I hereby agree not to be a lazy bum.
 		global $txt, $context, $modSettings;
 
-		// By default we look at agreement.txt.
+		// By default we look at Langauges/Agreement/English.txt.
 		$context['current_agreement'] = '';
 
 		// Is there more than one to edit?
@@ -277,7 +277,7 @@ class ManageRegistration extends AbstractController
 		// Try to figure out if we have more agreements.
 		foreach ($languages as $lang)
 		{
-			if (file_exists(BOARDDIR . '/agreement.' . $lang['filename'] . '.txt'))
+			if (file_exists(SOURCEDIR . '/ElkArte/Languages/Agreement/' . $lang['filename'] . '.txt'))
 			{
 				$context['editable_agreements'][$lang['filename']] = $lang['name'];
 
@@ -331,7 +331,7 @@ class ManageRegistration extends AbstractController
 	 * Allows the administrator to edit the privacy policy, and choose whether
 	 * it should be shown or not.
 	 *
-	 * - It writes and saves the privacy policy to the privacypolicy.txt file.
+	 * - It writes and saves the privacy policy to the appropriate privacy policy file.
 	 * - Accessed by ?action=admin;area=regcenter;sa=privacypol
 	 * - Requires the admin_forum permission.
 	 *
@@ -342,7 +342,7 @@ class ManageRegistration extends AbstractController
 		// I hereby agree not to be a lazy bum.
 		global $txt, $context, $modSettings;
 
-		// By default we look at privacypolicy.txt.
+		// By default we look at Langauges/PrivacyPolicy/English.txt.
 		$context['current_agreement'] = '';
 
 		// Is there more than one to edit?
@@ -356,7 +356,7 @@ class ManageRegistration extends AbstractController
 		// Try to figure out if we have more agreements.
 		foreach ($languages as $lang)
 		{
-			if (file_exists(BOARDDIR . '/privacypolicy.' . $lang['filename'] . '.txt'))
+			if (file_exists(SOURCEDIR . '/ElkArte/Languages/PrivacyPolicy/' . $lang['filename'] . '.txt'))
 			{
 				$context['editable_agreements'][$lang['filename']] = $lang['name'];
 

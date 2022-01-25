@@ -19,7 +19,7 @@ namespace ElkArte\AdminController;
 use ElkArte\AbstractController;
 use ElkArte\Cache\Cache;
 use ElkArte\Hooks;
-use ElkArte\Themes\ThemeLoader;
+use ElkArte\Languages\Txt;
 use FilesystemIterator;
 use GlobIterator;
 
@@ -372,8 +372,8 @@ class CoreFeatures extends AbstractController
 		// You need to be an admin to edit settings!
 		isAllowedTo('admin_forum');
 
-		ThemeLoader::loadLanguageFile('Help');
-		ThemeLoader::loadLanguageFile('ManageSettings');
+		Txt::load('Help');
+		Txt::load('ManageSettings');
 
 		$context['sub_template'] = 'show_settings';
 

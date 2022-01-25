@@ -16,7 +16,7 @@
  */
 
 use ElkArte\Http\Headers;
-use ElkArte\Themes\ThemeLoader;
+use ElkArte\Languages\Txt;
 use ElkArte\Util;
 
 // Start things rolling by getting the forum alive...
@@ -38,7 +38,7 @@ require_once(SUBSDIR . '/PaidSubscriptions.subs.php');
 require_once(SUBSDIR . '/Admin.subs.php');
 require_once(SUBSDIR . '/Members.subs.php');
 
-ThemeLoader::loadLanguageFile('ManagePaid');
+Txt::load('ManagePaid');
 
 // If there's literally nothing coming in, let's take flight!
 if (empty($_POST))

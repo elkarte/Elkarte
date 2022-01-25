@@ -4,6 +4,7 @@ use ElkArte\Controller\Emailuser;
 use ElkArte\EventManager;
 use ElkArte\HttpReq;
 use ElkArte\User;
+use ElkArte\Languages\Loader;
 
 /**
  * TestCase class for the EmailUser Controller
@@ -20,15 +21,15 @@ class TestEmailUserController extends ElkArteCommonSetupTest
 	 */
 	protected function setUp(): void
 	{
-		global $topic;
+		global $topic, $txt;
 
 		// Load in the common items so the system thinks we have an active login
 		parent::setUp();
 		parent::setSession();
 
 		new ElkArte\Themes\ThemeLoader();
-		\ElkArte\Themes\ThemeLoader::loadLanguageFile('Errors', 'english', false, true);
-		\ElkArte\Themes\ThemeLoader::loadLanguageFile('Validation', 'english', false, true);
+		$lang = new Loader('english', $txt, database());
+		$lang->load('Errors+Validation');
 
 		$topic = 1;
 	}

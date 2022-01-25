@@ -3,6 +3,7 @@
 use ElkArte\Controller\Emailpost;
 use ElkArte\EventManager;
 use ElkArte\Themes\ThemeLoader;
+use ElkArte\Languages\Loader;
 
 /**
  * TestCase class for the EmailPost Controller
@@ -20,14 +21,14 @@ class TestEmailPostController extends ElkArteCommonSetupTest
 	 */
 	protected function setUp(): void
 	{
-		global $modSettings;
+		global $modSettings, $txt;
 
 		// Load in the common items so the system thinks we have an active login
 		parent::setUp();
 
 		new ElkArte\Themes\ThemeLoader();
-		ThemeLoader::loadLanguageFile('EmailTemplates', 'english', false, true);
-		ThemeLoader::loadLanguageFile('Maillist', 'english', false, true);
+		$lang = new Loader('english', $txt, database());
+		$lang->load('EmailTemplates+Maillist');
 
 		$modSettings['maillist_enabled'] = true;
 		$modSettings['pbe_post_enabled'] = true;

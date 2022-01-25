@@ -27,6 +27,7 @@ use ElkArte\Themes\ThemeLoader;
 use ElkArte\UrlGenerator\UrlGenerator;
 use ElkArte\User;
 use ElkArte\Util;
+use ElkArte\Languages\Loader;
 
 /**
  * Updates the settings table as well as $modSettings... only does one at a time if $update is true.
@@ -1630,9 +1631,10 @@ function response_prefix()
 		}
 		else
 		{
-			ThemeLoader::loadLanguageFile('index', $language, false);
-			$response_prefix = $txt['response_prefix'];
-			ThemeLoader::loadLanguageFile('index');
+			$mtxt = [];
+			$lang_loader = new Loader($language, $mtxt, database());
+			$lang_loader->load('index');
+			$response_prefix = $mtxt['response_prefix'];
 		}
 
 		$cache->put('response_prefix', $response_prefix, 600);

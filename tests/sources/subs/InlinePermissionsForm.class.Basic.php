@@ -5,6 +5,7 @@ use ElkArte\SettingsForm\SettingsFormAdapter\InlinePermissions;
 use ElkArte\User;
 use ElkArte\UserInfo;
 use PHPUnit\Framework\TestCase;
+use ElkArte\Languages\Loader;
 
 class TestInlinePermissionsForm extends TestCase
 {
@@ -23,7 +24,9 @@ class TestInlinePermissionsForm extends TestCase
 	 */
 	protected function setUp(): void
 	{
-		\ElkArte\Themes\ThemeLoader::loadLanguageFile('Admin', 'english', true, true);
+		global $txt;
+		$lang = new Loader('english', $txt, database());
+		$lang->load('Admin');
 
 		// Elevate the user.
 		User::$info = new UserInfo([

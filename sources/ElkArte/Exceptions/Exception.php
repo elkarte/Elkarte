@@ -16,7 +16,7 @@
 namespace ElkArte\Exceptions;
 
 use ElkArte\Errors\Errors as E;
-use ElkArte\Themes\ThemeLoader;
+use ElkArte\Languages\Txt;
 use ElkArte\User;
 
 /**
@@ -78,7 +78,7 @@ class Exception extends \Exception
 			list ($msg, $lang) = $this->parseMessage($message);
 			if ($lang !== false)
 			{
-				ThemeLoader::loadLanguageFile($lang);
+				Txt::load($lang);
 			}
 		}
 		catch (\Exception $e)
@@ -99,7 +99,7 @@ class Exception extends \Exception
 	 * - A plain text message
 	 * - An array with the following structure:
 	 *        array(
-	 *            0 => language to load (use \ElkArte\Themes\ThemeLoader::loadLanguageFile)
+	 *            0 => language to load (use \ElkArte\Languages\Txt::load)
 	 *            1 => index of $txt
 	 *        )
 	 * - A namespaced index in the form:
@@ -107,7 +107,7 @@ class Exception extends \Exception
 	 *   - a "language" followed by a "dot" followed by the "index"
 	 *   - "language" can be any character matched by \w
 	 *   - "index" can be anything
-	 * - "language" is loaded by \ElkArte\Themes\ThemeLoader::loadLanguageFile.
+	 * - "language" is loaded by \ElkArte\Languages\Txt::load.
 	 *
 	 * @return array
 	 */
@@ -144,7 +144,7 @@ class Exception extends \Exception
 		// the forum share the same language.
 		if (!isset($language) || $language !== User::$info->language)
 		{
-			ThemeLoader::loadLanguageFile($lang, $language);
+			Txt::load($lang, $language);
 		}
 
 		if ($this->log !== false)

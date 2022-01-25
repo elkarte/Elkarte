@@ -23,7 +23,7 @@ use ElkArte\MessagesCallback\BodyParser\Normal;
 use ElkArte\MessagesCallback\DisplayRenderer;
 use ElkArte\MessagesDelete;
 use ElkArte\MessageTopicIcons;
-use ElkArte\Themes\ThemeLoader;
+use ElkArte\Languages\Txt;
 use ElkArte\User;
 use ElkArte\ValuesContainer;
 
@@ -500,7 +500,7 @@ class Display extends AbstractController
 				theme()->addJavascriptVar(array(
 					'likemsg_are_you_sure' => JavaScriptEscape($txt['likemsg_are_you_sure']),
 				));
-				ThemeLoader::loadLanguageFile('Errors');
+				Txt::load('Errors');
 
 				// Initiate likes and the tooltips for likes
 				theme()->addInlineJavascript('

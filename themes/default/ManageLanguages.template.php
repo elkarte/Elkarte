@@ -186,20 +186,7 @@ function template_modify_language_entries()
 			<h2 class="category_header">', $txt['edit_languages'], '</h2>
 			<div class="information">
 				', $txt['edit_language_entries_primary'], '
-			</div>';
-
-	// Not writable?
-	if ($context['lang_file_not_writable_message'])
-	{
-		// Oops, show an error for ya.
-		echo '
-			<div class="errorbox">
-				', $context['lang_file_not_writable_message'], '
-			</div>';
-	}
-
-	// Show the language entries
-	echo '
+			</div>
 			<div class="content">
 				<fieldset>
 					<legend>', $context['primary_settings']['name'], '</legend>
@@ -208,32 +195,31 @@ function template_modify_language_entries()
 							<label for="locale">', $txt['languages_locale'], ':</label>
 						</dt>
 						<dd>
-							<input type="text" name="locale" id="locale" size="20" value="', $context['primary_settings']['locale'], '"', (empty($context['file_entries']) ? '' : ' disabled="disabled"'), ' class="input_text" />
+							<input type="text" id="locale" size="20" value="', $context['primary_settings']['locale'], '" disabled="disabled" class="input_text" />
 						</dd>
 						<dt>
 							<label for="dictionary">', $txt['languages_dictionary'], ':</label>
 						</dt>
 						<dd>
-							<input type="text" name="dictionary" id="dictionary" size="20" value="', $context['primary_settings']['dictionary'], '"', (empty($context['file_entries']) ? '' : ' disabled="disabled"'), ' class="input_text" />
+							<input type="text" id="dictionary" size="20" value="', $context['primary_settings']['dictionary'], '" disabled="disabled" class="input_text" />
 						</dd>
 						<dt>
 							<label for="spelling">', $txt['languages_spelling'], ':</label>
 						</dt>
 						<dd>
-							<input type="text" name="spelling" id="spelling" size="20" value="', $context['primary_settings']['spelling'], '"', (empty($context['file_entries']) ? '' : ' disabled="disabled"'), ' class="input_text" />
+							<input type="text" id="spelling" size="20" value="', $context['primary_settings']['spelling'], '" disabled="disabled" class="input_text" />
 						</dd>
 						<dt>
 							<label for="rtl">', $txt['languages_rtl'], ':</label>
 						</dt>
 						<dd>
-							<input type="checkbox" name="rtl" id="rtl" ', $context['primary_settings']['rtl'] ? ' checked="checked"' : '', ' class="input_check"', (empty($context['file_entries']) ? '' : ' disabled="disabled"'), ' />
+							<input type="checkbox" id="rtl" ', $context['primary_settings']['rtl'] ? ' checked="checked"' : '', ' class="input_check" disabled="disabled" />
 						</dd>
 					</dl>
 				</fieldset>
 				<div class="submitbutton">
 					<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
-					<input type="hidden" name="', $context['admin-mlang_token_var'], '" value="', $context['admin-mlang_token'], '" />
-					<input type="submit" name="save_main" value="', $txt['save'], '"', $context['lang_file_not_writable_message'] || !empty($context['file_entries']) ? ' disabled="disabled"' : '', ' />';
+					<input type="hidden" name="', $context['admin-mlang_token_var'], '" value="', $context['admin-mlang_token'], '" />';
 
 	// Allow deleting entries.
 	if (!empty($context['langpack_uninstall_link']))
@@ -257,16 +243,10 @@ function template_modify_language_entries()
 					<label for="tfid">', $txt['edit_language_entries_file'], '</label>:
 					<select id="tfid" name="tfid" onchange="if (this.value != -1) document.forms.entry_form.submit();">';
 
-	foreach ($context['possible_files'] as $id_theme => $theme)
+	foreach ($context['possible_files'] as $file)
 	{
 		echo '
-						<option value="-1">', $theme['name'], '</option>';
-
-		foreach ($theme['files'] as $file)
-		{
-			echo '
-						<option value="', $id_theme, '+', $file['id'], '"', $file['selected'] ? ' selected="selected"' : '', '> =&gt; ', $file['name'], '</option>';
-		}
+						<option value="', $file['id'], '"', $file['selected'] ? ' selected="selected"' : '', '> =&gt; ', $file['name'], '</option>';
 	}
 
 	echo '
@@ -276,16 +256,6 @@ function template_modify_language_entries()
 					<noscript><input type="submit" value="', $txt['go'], '" /></noscript>
 				</div>
 			</div>';
-
-	// Is it not writable?
-	// Show an error.
-	if (!empty($context['entries_not_writable_message']))
-	{
-		echo '
-			<div class="errorbox">
-				', $context['entries_not_writable_message'], '
-			</div>';
-	}
 
 	// Already have some file entries?
 	if (!empty($context['file_entries']))
@@ -299,7 +269,6 @@ function template_modify_language_entries()
 			echo '
 					<li>
 						<label for="entry_', $entry['key'], '" class="smalltext">', $entry['display_key'], '</label>
-						<input type="hidden" name="comp[', $entry['key'], ']" value="', $entry['value'], '" />
 						<textarea id="entry_', $entry['key'], '" name="entry[', $entry['key'], ']" cols="40" rows="', $entry['rows'] < 2 ? 2 : $entry['rows'], '">', $entry['value'], '</textarea>
 					</li>';
 		}
@@ -307,7 +276,7 @@ function template_modify_language_entries()
 		echo '
 				</ul>
 				<div class="submitbutton">
-					<input type="submit" name="save_entries" value="', $txt['save'], '"', !empty($context['entries_not_writable_message']) ? ' disabled="disabled"' : '', ' />
+					<input type="submit" name="save_entries" value="', $txt['save'], '" />
 				</div>
 			</div>';
 	}

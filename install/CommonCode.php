@@ -926,7 +926,7 @@ function definePaths()
 	global $boarddir, $cachedir, $extdir, $languagedir, $sourcedir;
 
 	// Make sure the paths are correct... at least try to fix them.
-	if (!file_exists($boarddir) && file_exists(TMP_BOARDDIR . '/agreement.txt'))
+	if (!file_exists($boarddir) && file_exists(TMP_BOARDDIR . '/bootstrap.php'))
 		$boarddir = TMP_BOARDDIR;
 	if (!file_exists($sourcedir . '/SiteDispatcher.class.php') && file_exists($boarddir . '/sources'))
 		$sourcedir = $boarddir . '/sources';
@@ -936,8 +936,8 @@ function definePaths()
 		$cachedir = $boarddir . '/cache';
 	if ((empty($extdir) || !file_exists($extdir)) && file_exists($sourcedir . '/ext'))
 		$extdir = $sourcedir . '/ext';
-	if ((empty($languagedir) || !file_exists($languagedir)) && file_exists($boarddir . '/themes/default/languages'))
-		$languagedir = $boarddir . '/themes/default/languages';
+	if ((empty($languagedir) || !file_exists($languagedir)) && file_exists($sourcedir . '/Languages'))
+		$languagedir = $sourcedir . '/ElkArte/Languages';
 
 	if (!defined('BOARDDIR'))
 		DEFINE('BOARDDIR', $boarddir);

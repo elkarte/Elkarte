@@ -16,8 +16,9 @@
  */
 
 use BBC\ParserWrapper;
-use ElkArte\Themes\ThemeLoader;
+use ElkArte\Langauges\Txt;
 use ElkArte\User;
+use ElkArte\Languages\Loader as LangLoader;
 
 /**
  * This function sends an email to the specified recipient(s).
@@ -928,17 +929,18 @@ function loadEmailTemplate($template, $replacements = array(), $lang = '', $load
 	// First things first, load up the email templates language file, if we need to.
 	if ($loadLang)
 	{
-		ThemeLoader::loadLanguageFile('EmailTemplates', $lang);
+		$lang_loader = new LangLoader($lang, $txt, database());
+		$lang_loader->load('EmailTemplates');
 		if (!empty($modSettings['maillist_enabled']))
 		{
-			ThemeLoader::loadLanguageFile('MaillistTemplates', $lang);
+			$lang_loader->load('MaillistTemplates');
 		}
 
 		if (!empty($additional_files))
 		{
 			foreach ($additional_files as $file)
 			{
-				ThemeLoader::loadLanguageFile($file, $lang);
+				$lang_loader->load($file);
 			}
 		}
 	}
@@ -1006,7 +1008,7 @@ function prepareMailingForPreview()
 {
 	global $context, $modSettings, $scripturl, $txt;
 
-	ThemeLoader::loadLanguageFile('Errors');
+	Txt::load('Errors');
 	require_once(SUBSDIR . '/Post.subs.php');
 
 	$processing = array(

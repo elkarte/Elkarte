@@ -19,7 +19,7 @@ namespace ElkArte\Controller;
 use ElkArte\AbstractController;
 use ElkArte\Action;
 use ElkArte\Cache\Cache;
-use ElkArte\Themes\ThemeLoader;
+use ElkArte\Languages\Txt;
 use ElkArte\Util;
 
 /**
@@ -44,7 +44,7 @@ class PostModeration extends AbstractController
 	public function action_index()
 	{
 		// @todo We'll shift these later bud.
-		ThemeLoader::loadLanguageFile('ModerationCenter');
+		Txt::load('ModerationCenter');
 		theme()->getTemplates()->load('ModerationCenter');
 
 		// Allowed sub-actions, you know the drill by now!

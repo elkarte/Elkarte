@@ -24,6 +24,7 @@ use ElkArte\Exceptions\Exception;
 use ElkArte\Http\Headers;
 use ElkArte\Themes\ThemeLoader;
 use ElkArte\User;
+use ElkArte\Languages\Loader;
 
 /**
  * Class to handle all forum errors and exceptions
@@ -100,20 +101,16 @@ class Errors extends AbstractModel
 	 */
 	public function log_lang_error($error, $error_type = 'general', $sprintf = array(), $file = '', $line = 0)
 	{
-		global $language, $txt;
+		global $language;
 
-		ThemeLoader::loadLanguageFile('Errors', $language);
+		$mtxt = [];
+		$lang = new Loader($language, $mtxt, database());
+		$lang->load('Errors');
 
 		$reload_lang_file = $language !== $this->user->language;
 
-		$error_message = !isset($txt[$error]) ? $error : (empty($sprintf) ? $txt[$error] : vsprintf($txt[$error], $sprintf));
+		$error_message = !isset($mtxt[$error]) ? $error : (empty($sprintf) ? $mtxt[$error] : vsprintf($mtxt[$error], $sprintf));
 		$this->log_error($error_message, $error_type, $file, $line);
-
-		// Load the language file, only if it needs to be reloaded
-		if ($reload_lang_file)
-		{
-			ThemeLoader::loadLanguageFile('Errors');
-		}
 
 		// Return the message to make things simpler.
 		return $error_message;
@@ -491,7 +488,7 @@ class Errors extends AbstractModel
 	 */
 	public function display_403_error($log = true, $message = '')
 	{
-		global $language, $txt;
+		global $language;
 
 		Headers::instance()
 			->httpCode(403)
@@ -515,9 +512,11 @@ class Errors extends AbstractModel
 
 		if ($log)
 		{
-			ThemeLoader::loadLanguageFile('Errors', $language);
+			$mtxt = [];
+			$lang = new Loader($language, $mtxt, database());
+			$lang->load('Errors');
 			$this->log_error(
-				sprintf($txt['invalid_access'], $_SERVER['REMOTE_ADDR']),
+				sprintf($mtxt['invalid_access'], $_SERVER['REMOTE_ADDR']),
 				'blocked'
 			);
 		}

@@ -22,7 +22,7 @@ use ElkArte\Cache\Cache;
 use ElkArte\Exceptions\Exception;
 use ElkArte\Http\Headers;
 use ElkArte\MembersList;
-use ElkArte\Themes\ThemeLoader;
+use ElkArte\Languages\Txt;
 use ElkArte\Util;
 
 /**
@@ -103,7 +103,7 @@ class News extends AbstractController
 			obExit(false);
 		}
 
-		ThemeLoader::loadLanguageFile('Stats');
+		Txt::load('Stats');
 		$txt['xml_rss_desc'] = replaceBasicActionUrl($txt['xml_rss_desc']);
 
 		// Default to latest 5.  No more than whats defined in the ACP or 255

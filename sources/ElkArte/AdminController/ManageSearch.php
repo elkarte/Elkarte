@@ -21,7 +21,7 @@ use ElkArte\AbstractController;
 use ElkArte\Action;
 use ElkArte\Search\SearchApiWrapper;
 use ElkArte\SettingsForm\SettingsForm;
-use ElkArte\Themes\ThemeLoader;
+use ElkArte\Languages\Txt;
 use ElkArte\Util;
 
 /**
@@ -51,7 +51,7 @@ class ManageSearch extends AbstractController
 	{
 		global $context, $txt;
 
-		ThemeLoader::loadLanguageFile('Search');
+		Txt::load('Search');
 		theme()->getTemplates()->load('ManageSearch');
 
 		$subActions = array(

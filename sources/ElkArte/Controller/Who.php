@@ -20,7 +20,7 @@ namespace ElkArte\Controller;
 use ElkArte\AbstractController;
 use ElkArte\Exceptions\Exception;
 use ElkArte\MembersList;
-use ElkArte\Themes\ThemeLoader;
+use ElkArte\Languages\Txt;
 use ElkArte\Util;
 
 /**
@@ -68,7 +68,7 @@ class Who extends AbstractController
 
 		// Load the 'Who' template.
 		theme()->getTemplates()->load('Who');
-		ThemeLoader::loadLanguageFile('Who');
+		Txt::load('Who');
 
 		// Sort out... the column sorting.
 		$sort_methods = array(
@@ -290,7 +290,7 @@ class Who extends AbstractController
 		global $context, $txt;
 
 		require_once(SUBSDIR . '/Who.subs.php');
-		ThemeLoader::loadLanguageFile('Who');
+		Txt::load('Who');
 
 		$context += prepareCreditsData();
 

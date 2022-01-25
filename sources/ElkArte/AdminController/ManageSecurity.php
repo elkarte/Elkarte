@@ -21,7 +21,7 @@ use ElkArte\AbstractController;
 use ElkArte\Action;
 use ElkArte\Cache\Cache;
 use ElkArte\SettingsForm\SettingsForm;
-use ElkArte\Themes\ThemeLoader;
+use ElkArte\Languages\Txt;
 use ElkArte\Util;
 
 /**
@@ -42,8 +42,8 @@ class ManageSecurity extends AbstractController
 	{
 		global $context, $txt;
 
-		ThemeLoader::loadLanguageFile('Help');
-		ThemeLoader::loadLanguageFile('ManageSettings');
+		Txt::load('Help');
+		Txt::load('ManageSettings');
 
 		$subActions = array(
 			'general' => array($this, 'action_securitySettings_display', 'permission' => 'admin_forum'),

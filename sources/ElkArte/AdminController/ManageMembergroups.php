@@ -22,7 +22,7 @@ use ElkArte\DataValidator;
 use ElkArte\Exceptions\Exception;
 use ElkArte\Permissions;
 use ElkArte\SettingsForm\SettingsForm;
-use ElkArte\Themes\ThemeLoader;
+use ElkArte\Languages\Txt;
 
 /**
  * ManageMembergroups controller, administration page for membergroups.
@@ -51,7 +51,7 @@ class ManageMembergroups extends AbstractController
 		global $context, $txt;
 
 		// Language and template stuff, the usual.
-		ThemeLoader::loadLanguageFile('ManageMembers');
+		Txt::load('ManageMembers');
 		theme()->getTemplates()->load('ManageMembergroups');
 
 		$subActions = array(
@@ -483,7 +483,7 @@ class ManageMembergroups extends AbstractController
 
 		if (!empty($modSettings['deny_boards_access']))
 		{
-			ThemeLoader::loadLanguageFile('ManagePermissions');
+			Txt::load('ManagePermissions');
 		}
 
 		$context['groups'] = getBasicMembergroupData(array('globalmod'), array(), 'min_posts, id_group != {int:global_mod_group}, group_name');
@@ -546,7 +546,7 @@ class ManageMembergroups extends AbstractController
 
 		if (!empty($modSettings['deny_boards_access']))
 		{
-			ThemeLoader::loadLanguageFile('ManagePermissions');
+			Txt::load('ManagePermissions');
 		}
 
 		require_once(SUBSDIR . '/Membergroups.subs.php');

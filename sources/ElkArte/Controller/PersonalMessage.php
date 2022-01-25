@@ -30,11 +30,12 @@ use ElkArte\Exceptions\PmErrorException;
 use ElkArte\MembersList;
 use ElkArte\MessagesCallback\BodyParser\Normal;
 use ElkArte\MessagesCallback\PmRenderer;
-use ElkArte\Themes\ThemeLoader;
+use ElkArte\Languages\Txt;
 use ElkArte\User;
 use ElkArte\Util;
 use ElkArte\ValuesContainer;
 use ElkArte\VerificationControls\VerificationControlsIntegrate;
+use ElkArte\Languages\Loader;
 
 /**
  * Class PersonalMessage
@@ -83,7 +84,7 @@ class PersonalMessage extends AbstractController
 		require_once(SUBSDIR . '/PersonalMessage.subs.php');
 
 		// Templates, language, javascripts
-		ThemeLoader::loadLanguageFile('PersonalMessage');
+		Txt::load('PersonalMessage');
 		loadJavascriptFile(array('PersonalMessage.js', 'suggest.js'));
 
 		if (!isset($this->_req->query->xml))
@@ -744,7 +745,7 @@ class PersonalMessage extends AbstractController
 		global $txt, $modSettings, $context;
 
 		// Load in some text and template dependencies
-		ThemeLoader::loadLanguageFile('PersonalMessage');
+		Txt::load('PersonalMessage');
 		theme()->getTemplates()->load('PersonalMessage');
 
 		// Set the template we will use
@@ -1131,7 +1132,7 @@ class PersonalMessage extends AbstractController
 		require_once(SUBSDIR . '/Auth.subs.php');
 		require_once(SUBSDIR . '/Post.subs.php');
 
-		ThemeLoader::loadLanguageFile('PersonalMessage', '', false);
+		Txt::load('PersonalMessage', '', false);
 
 		// Extract out the spam settings - it saves database space!
 		list ($modSettings['max_pm_recipients'], $modSettings['pm_posts_verification'], $modSettings['pm_posts_per_hour']) = explode(',', $modSettings['pm_spam_settings']);
@@ -1825,7 +1826,7 @@ class PersonalMessage extends AbstractController
 		$cur_profile = MembersList::get($this->user->id);
 
 		// Load up the profile template, its where PM settings are located
-		ThemeLoader::loadLanguageFile('Profile');
+		Txt::load('Profile');
 		theme()->getTemplates()->load('Profile');
 
 		// We want them to submit back to here.
@@ -1975,20 +1976,22 @@ class PersonalMessage extends AbstractController
 
 				if (!isset($messagesToSend[$cur_language]))
 				{
-					ThemeLoader::loadLanguageFile('PersonalMessage', $cur_language, false);
+					$mtxt = [];
+					$lang = new Loader($cur_language, $mtxt, database());
+					$lang->load('PersonalMessage', false);
 
 					// Make the body.
-					$report_body = str_replace(array('{REPORTER}', '{SENDER}'), array(un_htmlspecialchars($this->user->name), $memberFromName), $txt['pm_report_pm_user_sent']);
+					$report_body = str_replace(array('{REPORTER}', '{SENDER}'), array(un_htmlspecialchars($this->user->name), $memberFromName), $mtxt['pm_report_pm_user_sent']);
 					$report_body .= "\n" . '[b]' . $this->_req->post->reason . '[/b]' . "\n\n";
 					if (!empty($recipients))
 					{
-						$report_body .= $txt['pm_report_pm_other_recipients'] . ' ' . implode(', ', $recipients) . "\n\n";
+						$report_body .= $mtxt['pm_report_pm_other_recipients'] . ' ' . implode(', ', $recipients) . "\n\n";
 					}
-					$report_body .= $txt['pm_report_pm_unedited_below'] . "\n" . '[quote author=' . (empty($memberFromID) ? '&quot;' . $memberFromName . '&quot;' : $memberFromName . ' link=action=profile;u=' . $memberFromID . ' date=' . $time) . ']' . "\n" . un_htmlspecialchars($body) . '[/quote]';
+					$report_body .= $mtxt['pm_report_pm_unedited_below'] . "\n" . '[quote author=' . (empty($memberFromID) ? '&quot;' . $memberFromName . '&quot;' : $memberFromName . ' link=action=profile;u=' . $memberFromID . ' date=' . $time) . ']' . "\n" . un_htmlspecialchars($body) . '[/quote]';
 
 					// Plonk it in the array ;)
 					$messagesToSend[$cur_language] = array(
-						'subject' => (Util::strpos($subject, $txt['pm_report_pm_subject']) === false ? $txt['pm_report_pm_subject'] : '') . un_htmlspecialchars($subject),
+						'subject' => (Util::strpos($subject, $mtxt['pm_report_pm_subject']) === false ? $mtxt['pm_report_pm_subject'] : '') . un_htmlspecialchars($subject),
 						'body' => $report_body,
 						'recipients' => array(
 							'to' => array(),
@@ -2005,12 +2008,6 @@ class PersonalMessage extends AbstractController
 			foreach ($messagesToSend as $lang => $message)
 			{
 				sendpm($message['recipients'], $message['subject'], $message['body']);
-			}
-
-			// Give the user their own language back!
-			if (!empty($modSettings['userLanguage']))
-			{
-				ThemeLoader::loadLanguageFile('PersonalMessage', '', false);
 			}
 
 			// Leave them with a template.
@@ -2948,7 +2945,7 @@ class PersonalMessage extends AbstractController
 		// Load the error text strings if there were errors in the search.
 		if (!empty($context['search_errors']))
 		{
-			ThemeLoader::loadLanguageFile('Errors');
+			Txt::load('Errors');
 			$context['search_errors']['messages'] = array();
 			foreach ($context['search_errors'] as $search_error => $dummy)
 			{

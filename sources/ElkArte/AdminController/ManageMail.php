@@ -19,7 +19,8 @@ namespace ElkArte\AdminController;
 use ElkArte\AbstractController;
 use ElkArte\Action;
 use ElkArte\SettingsForm\SettingsForm;
-use ElkArte\Themes\ThemeLoader;
+use ElkArte\Languages\Txt;
+use ElkArte\Languages\Loader;
 use ElkArte\Util;
 
 /**
@@ -47,8 +48,8 @@ class ManageMail extends AbstractController
 	{
 		global $context, $txt;
 
-		ThemeLoader::loadLanguageFile('Help');
-		ThemeLoader::loadLanguageFile('ManageMail');
+		Txt::load('Help');
+		Txt::load('ManageMail');
 
 		$subActions = array(
 			'browse' => array($this, 'action_browse', 'permission' => 'admin_forum'),
@@ -182,7 +183,12 @@ class ManageMail extends AbstractController
 		global $txt, $modSettings, $txtBirthdayEmails;
 
 		// We need $txtBirthdayEmails
-		ThemeLoader::loadLanguageFile('EmailTemplates');
+		if (empty($txtBirthdayEmails))
+		{
+			$txtBirthdayEmails = [];
+		}
+		$lang_loader = new Loader(null, $txtBirthdayEmails, database(), 'txtBirthdayEmails');
+		$lang_loader->load('EmailTemplates');
 
 		$body = $txtBirthdayEmails[(empty($modSettings['birthday_email']) ? 'happy_birthday' : $modSettings['birthday_email']) . '_body'];
 		$subject = $txtBirthdayEmails[(empty($modSettings['birthday_email']) ? 'happy_birthday' : $modSettings['birthday_email']) . '_subject'];

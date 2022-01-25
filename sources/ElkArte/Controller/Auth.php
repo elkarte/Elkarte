@@ -22,7 +22,7 @@ use ElkArte\Cache\Cache;
 use ElkArte\Errors\Errors;
 use ElkArte\Exceptions\Exception;
 use ElkArte\Http\Headers;
-use ElkArte\Themes\ThemeLoader;
+use ElkArte\Languages\Txt;
 use ElkArte\User;
 use ElkArte\UserSettingsLoader;
 use ElkArte\Util;
@@ -76,7 +76,7 @@ class Auth extends AbstractController
 		}
 
 		// Load the Login template/language file.
-		ThemeLoader::loadLanguageFile('Login');
+		Txt::load('Login');
 		theme()->getTemplates()->load('Login');
 		loadJavascriptFile('sha256.js', array('defer' => true));
 		$context['sub_template'] = 'login';
@@ -158,7 +158,7 @@ class Auth extends AbstractController
 			$modSettings['cookieTime'] = 3153600;
 		}
 
-		ThemeLoader::loadLanguageFile('Login');
+		Txt::load('Login');
 
 		// Load the template stuff
 		theme()->getTemplates()->load('Login');
@@ -630,7 +630,7 @@ class Auth extends AbstractController
 	{
 		global $txt, $context;
 
-		ThemeLoader::loadLanguageFile('Login');
+		Txt::load('Login');
 		theme()->getTemplates()->load('Login');
 		loadJavascriptFile('sha256.js', array('defer' => true));
 		createToken('login');
@@ -658,7 +658,7 @@ class Auth extends AbstractController
 	{
 		global $txt, $mtitle, $mmessage, $context;
 
-		ThemeLoader::loadLanguageFile('Login');
+		Txt::load('Login');
 		theme()->getTemplates()->load('Login');
 		loadJavascriptFile('sha256.js', array('defer' => true));
 		createToken('login');

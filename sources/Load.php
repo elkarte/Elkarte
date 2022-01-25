@@ -21,6 +21,7 @@ use ElkArte\Errors\Errors;
 use ElkArte\Hooks;
 use ElkArte\Http\Headers;
 use ElkArte\Themes\ThemeLoader;
+use ElkArte\Languages\Txt;
 use ElkArte\User;
 use ElkArte\Util;
 use ElkArte\AttachmentsDirectory;
@@ -493,7 +494,7 @@ function loadBoard()
 		}
 		elseif (User::$info->is_guest)
 		{
-			ThemeLoader::loadLanguageFile('Errors');
+			Txt::load('Errors');
 			is_not_guest($txt['topic_gone']);
 		}
 		else
@@ -733,7 +734,7 @@ function loadUserContext()
 	);
 
 	// @todo Base language is being loaded to late, placed here temporarily
-	ThemeLoader::loadLanguageFile('index+Addons');
+	Txt::load('index+Addons', true, true);
 
 	// Something for the guests
 	if (!$context['user']['is_guest'])
@@ -1118,84 +1119,7 @@ function addInlineJavascript($javascript, $defer = false)
  */
 function loadLanguage($template_name, $lang = '', $fatal = true, $force_reload = false)
 {
-	Errors::instance()->log_deprecated('loadLanguage()', '\ElkArte\Themes\ThemeLoader::loadLanguageFile()');
-
-	return ThemeLoader::loadLanguageFile($template_name, $lang, $fatal, $force_reload);
-}
-
-/**
- * Loads / Sets arrays for use in date display
- * This is here and not in a language file for two reasons:
- *  1. the structure is required by the code, so better be sure
- *     to have it the way we are supposed to have it
- *  2. Transifex (that we use for translating the strings) doesn't
- *     support array of arrays, so if we move this to a language file
- *     we'd need to move away from Tx.
- */
-function fix_calendar_text()
-{
-	global $txt;
-
-	$txt['days'] = array(
-		$txt['sunday'],
-		$txt['monday'],
-		$txt['tuesday'],
-		$txt['wednesday'],
-		$txt['thursday'],
-		$txt['friday'],
-		$txt['saturday'],
-	);
-	$txt['days_short'] = array(
-		$txt['sunday_short'],
-		$txt['monday_short'],
-		$txt['tuesday_short'],
-		$txt['wednesday_short'],
-		$txt['thursday_short'],
-		$txt['friday_short'],
-		$txt['saturday_short'],
-	);
-	$txt['months'] = array(
-		1 => $txt['january'],
-		$txt['february'],
-		$txt['march'],
-		$txt['april'],
-		$txt['may'],
-		$txt['june'],
-		$txt['july'],
-		$txt['august'],
-		$txt['september'],
-		$txt['october'],
-		$txt['november'],
-		$txt['december'],
-	);
-	$txt['months_titles'] = array(
-		1 => $txt['january_titles'],
-		$txt['february_titles'],
-		$txt['march_titles'],
-		$txt['april_titles'],
-		$txt['may_titles'],
-		$txt['june_titles'],
-		$txt['july_titles'],
-		$txt['august_titles'],
-		$txt['september_titles'],
-		$txt['october_titles'],
-		$txt['november_titles'],
-		$txt['december_titles'],
-	);
-	$txt['months_short'] = array(
-		1 => $txt['january_short'],
-		$txt['february_short'],
-		$txt['march_short'],
-		$txt['april_short'],
-		$txt['may_short'],
-		$txt['june_short'],
-		$txt['july_short'],
-		$txt['august_short'],
-		$txt['september_short'],
-		$txt['october_short'],
-		$txt['november_short'],
-		$txt['december_short'],
-	);
+	return Txt::load($template_name, $lang, $fatal);
 }
 
 /**
@@ -1295,68 +1219,27 @@ function getLanguages($use_cache = true)
 
 	// Either we don't use the cache, or its expired.
 	$languages = array();
+	$language_dir = SOURCEDIR . '/ElkArte/Languages/Index';
 
 	if (!$use_cache || !$cache->getVar($languages, 'known_languages', $cache->levelLowerThan(2) ? 86400 : 3600))
 	{
-		// If we don't have our theme information yet, lets get it.
-		if (empty($settings['default_theme_dir']))
+		$dir = dir($language_dir . '/');
+		while (($entry = $dir->read()))
 		{
-			new ThemeLoader(0, false);
-		}
-
-		// Default language directories to try.
-		$language_directories = array(
-			$settings['default_theme_dir'] . '/languages',
-			$settings['actual_theme_dir'] . '/languages',
-		);
-
-		// We possibly have a base theme directory.
-		if (!empty($settings['base_theme_dir']))
-		{
-			$language_directories[] = $settings['base_theme_dir'] . '/languages';
-		}
-
-		// Remove any duplicates.
-		$language_directories = array_unique($language_directories);
-
-		foreach ($language_directories as $language_dir)
-		{
-			// Can't look in here... doesn't exist!
-			if (!file_exists($language_dir))
+			if ($entry == '.' || $entry == '..')
 			{
 				continue;
 			}
 
-			$dir = dir($language_dir);
-			while (($entry = $dir->read()))
-			{
-				// Only directories are interesting
-				if ($entry == '..' || !is_dir($dir->path . '/' . $entry))
-				{
-					continue;
-				}
-
-				// @todo at some point we may want to simplify that stuff (I mean scanning all the files just for index)
-				$file_dir = dir($dir->path . '/' . $entry);
-				while (($file_entry = $file_dir->read()))
-				{
-					// Look for the index language file....
-					if (!preg_match('~^index\.(.+)\.php$~', $file_entry, $matches))
-					{
-						continue;
-					}
-
-					$languages[$matches[1]] = array(
-						'name' => Util::ucwords(strtr($matches[1], array('_' => ' '))),
-						'selected' => false,
-						'filename' => $matches[1],
-						'location' => $language_dir . '/' . $entry . '/index.' . $matches[1] . '.php',
-					);
-				}
-				$file_dir->close();
-			}
-			$dir->close();
+			$basename = basename($entry, '.php');
+			$languages[$basename] = array(
+				'name' => $basename,
+				'selected' => false,
+				'filename' => $entry,
+				'location' => $language_dir . '/' . $entry,
+			);
 		}
+		$dir->close();
 
 		// Let's cash in on this deal.
 		$cache->put('known_languages', $languages, $cache->isEnabled() && $cache->levelLowerThan(1) ? 86400 : 3600);
@@ -1563,7 +1446,7 @@ function doSecurityChecks()
 	if (allowedTo('admin_forum') && User::$info->is_guest === false)
 	{
 		// If agreement is enabled, at least the english version shall exists
-		if ($modSettings['requireAgreement'] && !file_exists(BOARDDIR . '/agreement.txt'))
+		if ($modSettings['requireAgreement'] && !file_exists(SOURCEDIR . '/ElkArte/Languages/Agreement/English.txt'))
 		{
 			$context['security_controls_files']['title'] = $txt['generic_warning'];
 			$context['security_controls_files']['errors']['agreement'] = $txt['agreement_missing'];

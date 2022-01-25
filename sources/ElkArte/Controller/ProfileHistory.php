@@ -286,7 +286,7 @@ class ProfileHistory extends AbstractController
 
 		theme()->getTemplates()->load('Profile');
 		theme()->getTemplates()->load('ProfileHistory');
-		\ElkArte\Themes\ThemeLoader::loadLanguageFile('Profile');
+		\ElkArte\Languages\Txt::load('Profile');
 
 		if ($this->_memID === 0)
 		{

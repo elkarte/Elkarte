@@ -23,7 +23,7 @@ use ElkArte\Action;
 use ElkArte\Exceptions\Exception;
 use ElkArte\MembersList;
 use ElkArte\MessagesDelete;
-use ElkArte\Themes\ThemeLoader;
+use ElkArte\Languages\Txt;
 use ElkArte\Util;
 
 /**
@@ -81,7 +81,7 @@ class ProfileInfo extends AbstractController
 		}
 		$this->_profile->loadContext();
 
-		ThemeLoader::loadLanguageFile('Profile');
+		Txt::load('Profile');
 	}
 
 	/**
@@ -124,7 +124,7 @@ class ProfileInfo extends AbstractController
 		global $context, $modSettings;
 
 		theme()->getTemplates()->load('ProfileInfo');
-		ThemeLoader::loadLanguageFile('Profile');
+		Txt::load('Profile');
 
 		// Set a canonical URL for this page.
 		$context['canonical_url'] = getUrl('action', ['action' => 'profile', 'u' => $this->_memID]);
@@ -360,7 +360,7 @@ class ProfileInfo extends AbstractController
 		{
 			include_once(SUBSDIR . '/Who.subs.php');
 			$action = determineActions($this->_profile['url']);
-			ThemeLoader::loadLanguageFile('index');
+			Txt::load('index');
 
 			if ($action !== false)
 			{
@@ -1062,8 +1062,8 @@ class ProfileInfo extends AbstractController
 		// Verify if the user has sufficient permissions.
 		isAllowedTo('manage_permissions');
 
-		ThemeLoader::loadLanguageFile('ManagePermissions');
-		ThemeLoader::loadLanguageFile('Admin');
+		Txt::load('ManagePermissions');
+		Txt::load('Admin');
 		theme()->getTemplates()->load('ManageMembers');
 		theme()->getTemplates()->load('ProfileInfo');
 

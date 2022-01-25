@@ -27,7 +27,7 @@ use ElkArte\Errors\Errors;
 use ElkArte\Exceptions\Exception;
 use ElkArte\Http\Headers;
 use ElkArte\PrivacyPolicy;
-use ElkArte\Themes\ThemeLoader;
+use ElkArte\Languages\Txt;
 use ElkArte\Util;
 
 /**
@@ -146,8 +146,8 @@ class Register extends AbstractController
 			redirectexit('action=register');
 		}
 
-		ThemeLoader::loadLanguageFile('Login');
-		ThemeLoader::loadLanguageFile('Profile');
+		Txt::load('Login');
+		Txt::load('Profile');
 		theme()->getTemplates()->load('Register');
 		theme()->getTemplates()->load('ProfileOptions');
 
@@ -242,7 +242,7 @@ class Register extends AbstractController
 		if (empty($context['agreement']))
 		{
 			// No file found or a blank file, log the error so the admin knows there is a problem!
-			ThemeLoader::loadLanguageFile('Errors');
+			Txt::load('Errors');
 			Errors::instance()->log_error($txt['registration_agreement_missing'], 'critical');
 			throw new Exception('registration_disabled', false);
 		}
@@ -255,7 +255,7 @@ class Register extends AbstractController
 			if (empty($context['privacy_policy']))
 			{
 				// No file found or a blank file, log the error so the admin knows there is a problem!
-				ThemeLoader::loadLanguageFile('Errors');
+				Txt::load('Errors');
 				Errors::instance()::instance()->log_error($txt['registration_privacy_policy_missing'], 'critical');
 				throw new \Exception('registration_disabled', false);
 			}
@@ -370,7 +370,7 @@ class Register extends AbstractController
 		// Failing that, check the time limit for excessive speed.
 		if (time() - $_SESSION['register']['timenow'] < $_SESSION['register']['limit'])
 		{
-			ThemeLoader::loadLanguageFile('Login');
+			Txt::load('Login');
 			$reg_errors->addError('too_quickly');
 		}
 
@@ -378,7 +378,7 @@ class Register extends AbstractController
 		if (!empty($this->_req->getPost('reason_for_joining_hp', 'trim', '')))
 		{
 			// Its not missing, it just should not be there
-			ThemeLoader::loadLanguageFile('Login');
+			Txt::load('Login');
 			$reg_errors->addError('error_missing_information');
 		}
 
@@ -820,7 +820,7 @@ class Register extends AbstractController
 		if (!empty($modSettings['registration_fields']))
 		{
 			// Setup some important context.
-			ThemeLoader::loadLanguageFile('Profile');
+			Txt::load('Profile');
 			theme()->getTemplates()->load('Profile');
 
 			$context['user']['is_owner'] = true;
@@ -865,7 +865,7 @@ class Register extends AbstractController
 			redirectexit();
 		}
 
-		ThemeLoader::loadLanguageFile('Login');
+		Txt::load('Login');
 		theme()->getTemplates()->load('Login');
 		loadJavascriptFile('sha256.js', array('defer' => true));
 
@@ -1065,7 +1065,7 @@ class Register extends AbstractController
 			}
 			elseif ($this->_row['validation_code'] === '')
 			{
-				ThemeLoader::loadLanguageFile('Profile');
+				Txt::load('Profile');
 				throw new Exception($txt['registration_not_approved'] . ' <a href="' . $scripturl . '?action=register;sa=activate;user=' . $this->_row['member_name'] . '">' . $txt['here'] . '</a>.', false);
 			}
 
@@ -1088,7 +1088,7 @@ class Register extends AbstractController
 	{
 		global $context, $modSettings, $txt;
 
-		ThemeLoader::loadLanguageFile('Login');
+		Txt::load('Login');
 		theme()->getTemplates()->load('Register');
 
 		// No User ID??
@@ -1183,7 +1183,7 @@ class Register extends AbstractController
 		// Show a window that will play the verification code (play sound)
 		elseif (isset($this->_req->query->sound))
 		{
-			ThemeLoader::loadLanguageFile('Login');
+			Txt::load('Login');
 			theme()->getTemplates()->load('Register');
 
 			$context['verification_sound_href'] = $scripturl . '?action=register;sa=verificationcode;rand=' . md5(mt_rand()) . ($verification_id ? ';vid=' . $verification_id : '') . ';format=.wav';
@@ -1240,7 +1240,7 @@ class Register extends AbstractController
 			redirectexit();
 		}
 
-		ThemeLoader::loadLanguageFile('Login');
+		Txt::load('Login');
 		theme()->getTemplates()->load('Register');
 
 		// Submitted the contact form?
@@ -1254,7 +1254,7 @@ class Register extends AbstractController
 
 			// No errors, yet.
 			$context['errors'] = array();
-			ThemeLoader::loadLanguageFile('Errors');
+			Txt::load('Errors');
 
 			// Could they get the right send topic verification code?
 			require_once(SUBSDIR . '/Members.subs.php');
@@ -1392,8 +1392,8 @@ class Register extends AbstractController
 			$context['register_subaction'] = 'agreement';
 		}
 
-		ThemeLoader::loadLanguageFile('Login');
-		ThemeLoader::loadLanguageFile('Profile');
+		Txt::load('Login');
+		Txt::load('Profile');
 		theme()->getTemplates()->load('Register');
 
 		// If you have to agree to the agreement, it needs to be fetched from the file.
@@ -1444,8 +1444,8 @@ class Register extends AbstractController
 			$context['register_subaction'] = 'privacypol';
 		}
 
-		ThemeLoader::loadLanguageFile('Login');
-		ThemeLoader::loadLanguageFile('Profile');
+		Txt::load('Login');
+		Txt::load('Profile');
 		theme()->getTemplates()->load('Register');
 
 		$txt['agreement_agree'] = $txt['policy_agree'];

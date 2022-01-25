@@ -4,6 +4,7 @@ use ElkArte\Controller\ProfileOptions;
 use ElkArte\EventManager;
 use ElkArte\MembersList;
 use ElkArte\User;
+use ElkArte\Languages\Loader;
 
 /**
  * TestCase class for the Profile Options Controller
@@ -17,12 +18,13 @@ class TestProfileOptions extends ElkArteCommonSetupTest
 	 */
 	protected function setUp(): void
 	{
-		global $context, $cur_profile;
+		global $context, $cur_profile, $txt;
 
 		parent::setUp();
 
 		new ElkArte\Themes\ThemeLoader();
-		\ElkArte\Themes\ThemeLoader::loadLanguageFile('Profile', 'english', true, true);
+		$lang = new Loader('english', $txt, database());
+		$lang->load('Profile');
 
 		// Some tricks, maybe
 		require_once(SUBSDIR . '/Profile.subs.php');

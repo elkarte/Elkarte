@@ -16,7 +16,7 @@ namespace ElkArte\AdminController;
 use ElkArte\AbstractController;
 use ElkArte\Action;
 use ElkArte\SettingsForm\SettingsForm;
-use ElkArte\Themes\ThemeLoader;
+use ElkArte\Languages\Txt;
 
 /**
  * Admin logs controller.
@@ -128,7 +128,7 @@ class AdminLog extends AbstractController
 		global $txt, $context, $modSettings;
 
 		// Make sure we understand what's going on.
-		ThemeLoader::loadLanguageFile('ManageSettings');
+		Txt::load('ManageSettings');
 
 		$context['page_title'] = $txt['pruning_title'];
 

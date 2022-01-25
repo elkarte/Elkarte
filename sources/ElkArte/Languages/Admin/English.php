@@ -134,9 +134,9 @@ $txt['attachmentdir_files_not_set'] = 'No directory file limit is currently set'
 $txt['attachment_delete_admin'] = '[attachment deleted by admin]';
 $txt['live'] = 'Latest Software Updates';
 $txt['remove_all'] = 'Clear Log';
-$txt['agreement_not_writable'] = 'Warning - agreement.txt is not writable. Any changes you make will NOT be saved.';
+$txt['agreement_not_writable'] = 'Warning - The agreement language file in sources/ElkArte/Languages/Agreement/ is not writable. Any changes you make will NOT be saved.';
 $txt['agreement_backup_not_writable'] = 'Warning - the backup directory in forum_root/packages/backup cannot be created.';
-$txt['privacypol_not_writable'] = 'Warning - privacypolicy.txt is not writable. Any changes you make will NOT be saved.';
+$txt['privacypol_not_writable'] = 'Warning - The privacy policy language file in sources/ElkArte/Languages/PrivacyPolicy/ is not writable. Any changes you make will NOT be saved.';
 $txt['privacypol_backup_not_writable'] = 'Warning - the backup directory in forum_root/packages/backup cannot be created.';
 
 $txt['version_check_more'] = 'more detailed';

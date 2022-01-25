@@ -6,6 +6,7 @@ use ElkArte\EventManager;
 use ElkArte\HttpReq;
 use ElkArte\Themes\ThemeLoader;
 use ElkArte\User;
+use ElkArte\Languages\Loader;
 
 /**
  * TestCase class for the Packages & PackageServer Controller
@@ -22,7 +23,7 @@ class TestPackagesController extends ElkArteCommonSetupTest
 	 */
 	protected function setUp(): void
 	{
-		global $context;
+		global $context, $txt;
 
 		// Load in the common items so the system thinks we have an active login
 		parent::setUp();
@@ -34,7 +35,8 @@ class TestPackagesController extends ElkArteCommonSetupTest
 		}
 
 		new ElkArte\Themes\ThemeLoader();
-		ThemeLoader::loadLanguageFile('Packages', 'english', false, true);
+		$lang = new Loader('english', $txt, database());
+		$lang->load('Packages');
 
 		$context['admin_menu_id'] = 1;
 		$context['admin_menu_name'] = 'menu_data_' . $context['admin_menu_id'];

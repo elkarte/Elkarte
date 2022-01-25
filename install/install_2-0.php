@@ -12,7 +12,7 @@
  *
  */
 
-class InstallInstructions_install_1_1
+class InstallInstructions_install_2_0
 {
 	protected $db = null;
 	protected $table = null;
@@ -1054,6 +1054,23 @@ class InstallInstructions_install_1_1
 			),
 			array(
 				array('name' => 'id_group', 'columns' => array('follow_up', 'derived_from'), 'type' => 'primary'),
+			),
+			array(),
+			'ignore'
+		);
+	}
+
+	public function table_languages()
+	{
+		return $this->table->create_table('{db_prefix}languages',
+			array(
+				array('name' => 'language',     'type' => 'string', 'size' => 40,  'default' => ''),
+				array('name' => 'file',         'type' => 'string', 'size' => 40,  'default' => ''),
+				array('name' => 'language_key', 'type' => 'string', 'size' => 255, 'default' => ''),
+				array('name' => 'value',        'type' => 'text'),
+			),
+			array(
+				array('name' => 'id_lang', 'columns' => array('language', 'file'), 'type' => 'primary'),
 			),
 			array(),
 			'ignore'

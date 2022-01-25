@@ -1,8 +1,6 @@
 <?php
 // Version: 2.0; Editor
 
-global $editortxt;
-
 $editortxt['Close'] = 'Close';
 $editortxt['Bold'] = 'Bold';
 $editortxt['Italic'] = 'Italic';

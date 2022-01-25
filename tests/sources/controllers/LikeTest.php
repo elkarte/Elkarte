@@ -4,6 +4,7 @@ use ElkArte\Controller\Likes;
 use ElkArte\EventManager;
 use ElkArte\HttpReq;
 use ElkArte\User;
+use ElkArte\Languages\Loader;
 
 /**
  * TestCase class for the Likes Controller
@@ -17,11 +18,12 @@ class TestLike extends ElkArteCommonSetupTest
 	 */
 	protected function setUp(): void
 	{
+		global $txt;
 		parent::setUp();
 
 		new ElkArte\Themes\ThemeLoader();
-		\ElkArte\Themes\ThemeLoader::loadLanguageFile('Profile', 'english', true, true);
-		\ElkArte\Themes\ThemeLoader::loadLanguageFile('Errors', 'english', true, true);
+		$lang = new Loader('english', $txt, database());
+		$lang->load('Profile+Errors');
 	}
 
 	/**

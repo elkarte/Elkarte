@@ -21,7 +21,7 @@ use ElkArte\AbstractController;
 use ElkArte\EventManager;
 use ElkArte\Exceptions\Exception;
 use ElkArte\MembersList;
-use ElkArte\Themes\ThemeLoader;
+use ElkArte\Languages\Txt;
 use ElkArte\User;
 
 /**
@@ -107,7 +107,7 @@ class ProfileAccount extends AbstractController
 		}
 
 		// Get the base (errors related) stuff done.
-		ThemeLoader::loadLanguageFile('Errors');
+		Txt::load('Errors');
 		$context['custom_error_title'] = $txt['profile_warning_errors_occurred'];
 
 		// Make sure things which are disabled stay disabled.

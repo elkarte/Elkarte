@@ -4,6 +4,7 @@ use ElkArte\SettingsForm\SettingsForm;
 use ElkArte\User;
 use ElkArte\UserInfo;
 use PHPUnit\Framework\TestCase;
+use ElkArte\Languages\Loader;
 
 class TestSettingsForm extends TestCase
 {
@@ -19,7 +20,9 @@ class TestSettingsForm extends TestCase
 	 */
 	protected function setUp(): void
 	{
-		\ElkArte\Themes\ThemeLoader::loadLanguageFile('Admin', 'english', true, true);
+		global $txt;
+		$lang = new Loader('english', $txt, database());
+		$lang->load('Admin');
 
 		// Elevate the user.
 		User::$info = new UserInfo([

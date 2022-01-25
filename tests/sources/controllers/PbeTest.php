@@ -4,6 +4,7 @@ use ElkArte\EmailParse;
 use ElkArte\User;
 use ElkArte\UserInfo;
 use PHPUnit\Framework\TestCase;
+use ElkArte\Languages\Loader;
 
 /**
  * TestCase class for basic PBE functions
@@ -20,9 +21,11 @@ class TestPBE extends TestCase
 	 */
 	protected function setUp(): void
 	{
+		global $txt;
 		require_once(SUBSDIR . '/Emailpost.subs.php');
 
-		\ElkArte\Themes\ThemeLoader::loadLanguageFile('Maillist', 'english', true, true);
+		$lang = new Loader('english', $txt, database());
+		$lang->load('Maillist');
 		User::$info = new UserInfo(['name' => 'name']);
 
 		$this->_email = 'Return-Path: <noreply@elkarte.net>

@@ -4,6 +4,7 @@ use ElkArte\Controller\PersonalMessage;
 use ElkArte\EventManager;
 use ElkArte\HttpReq;
 use ElkArte\User;
+use ElkArte\Languages\Loader;
 
 /**
  * TestCase class for the PersonalMessage Controller
@@ -20,15 +21,15 @@ class TestPersonalMessageController extends ElkArteCommonSetupTest
 	 */
 	protected function setUp(): void
 	{
-		global $context;
+		global $context, $txt;
 
 		// Load in the common items so the system thinks we have an active login
 		parent::setUp();
 		parent::setSession();
 
 		new ElkArte\Themes\ThemeLoader();
-		\ElkArte\Themes\ThemeLoader::loadLanguageFile('PersonalMessage', 'english', false, true);
-		\ElkArte\Themes\ThemeLoader::loadLanguageFile('Post', 'english', false, true);
+		$lang = new Loader('english', $txt, database());
+		$lang->load('PersonalMessage+Post');
 
 	}
 

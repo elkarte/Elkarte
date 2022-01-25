@@ -17,7 +17,7 @@
 namespace ElkArte\Search;
 
 use ElkArte\Errors\Errors;
-use ElkArte\Themes\ThemeLoader;
+use ElkArte\Languages\Txt;
 use ElkArte\ValuesContainer;
 
 /**
@@ -80,7 +80,7 @@ class SearchApiWrapper
 		if (!$this->_searchAPI || (!$this->_searchAPI->isValid()) || !matchPackageVersion(Search::FORUM_VERSION, $this->_searchAPI->min_elk_version . '-' . $this->_searchAPI->version_compatible))
 		{
 			// Log the error.
-			ThemeLoader::loadLanguageFile('Errors');
+			Txt::load('Errors');
 			Errors::instance()->log_error(sprintf($txt['search_api_not_compatible'], $fqcn), 'critical');
 
 			$this->_searchAPI = new API\Standard($config, $searchParams);

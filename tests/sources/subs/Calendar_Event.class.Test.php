@@ -1,6 +1,7 @@
 <?php
 
 use ElkArte\CalendarEvent;
+use ElkArte\Languages\Loader;
 
 /**
  * TestCase class for the \ElkArte\CalendarEvent class.
@@ -30,13 +31,14 @@ class TestCalendarEvent extends ElkArteCommonSetupTest
 
 	protected function setUp(): void
 	{
-		global $context;
+		global $context, $txt;
 
 		$context['linktree'] = array();
 		parent::setUp();
 
 		// Fiddling with globals is a chore in PHPUnit.
-		\ElkArte\Themes\ThemeLoader::loadLanguageFile('Errors', 'english', true, true);
+		$lang = new Loader('english', $txt, database());
+		$lang->load('Errors');
 	}
 
 	/**

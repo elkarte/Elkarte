@@ -20,6 +20,7 @@ use ElkArte\AbstractController;
 use ElkArte\Exceptions\Exception;
 use ElkArte\Themes\ThemeLoader;
 use ElkArte\Util;
+use ElkArte\Languages\Loader;
 
 /**
  * Move Topic Controller
@@ -194,10 +195,10 @@ class MoveTopic extends AbstractController
 		// Ugly !
 		if ($this->user->language !== $language)
 		{
-			ThemeLoader::loadLanguageFile('index', $language);
-			$temp = $txt['movetopic_default'];
-			ThemeLoader::loadLanguageFile('index');
-			$txt['movetopic_default'] = $temp;
+			$mtxt = [];
+			$lang = new Loader($language, $mtxt, database());
+			$lang->load('index');
+			$txt['movetopic_default'] = $mtxt['movetopic_default'];
 		}
 
 		// We will need this
@@ -406,7 +407,7 @@ class MoveTopic extends AbstractController
 	 */
 	private function _post_redirect()
 	{
-		global $txt, $board, $language;
+		global $board, $language;
 
 		// @todo Does this make sense if the topic was unapproved before? I'd just about say so.
 		if (isset($this->_req->post->postRedirect))
@@ -414,7 +415,9 @@ class MoveTopic extends AbstractController
 			// Should be in the boardwide language.
 			if ($this->user->language !== $language)
 			{
-				ThemeLoader::loadLanguageFile('index', $language);
+				$mtxt = [];
+				$lang = new Loader($language, $mtxt, database());
+				$lang->load('index');
 			}
 
 			$reason = Util::htmlspecialchars($this->_req->post->reason, ENT_QUOTES);
@@ -422,8 +425,8 @@ class MoveTopic extends AbstractController
 
 			// Add a URL onto the message.
 			$reason = strtr($reason, array(
-				$txt['movetopic_auto_board'] => '[url=' . getUrl('board', ['board' => $this->_toboard, 'start' => 0, 'name' => $this->_board_info['name']]) . ']' . $this->_board_info['name'] . '[/url]',
-				$txt['movetopic_auto_topic'] => '[iurl=' . getUrl('topic', ['topic' => $this->_topic, 'start' => 0, 'subject' => $this->_board_info['subject_new'] ?? $this->_board_info['subject']]) . ']' . ($this->_board_info['subject_new'] ?? $this->_board_info['subject']) . '[/iurl]'
+				$mtxt['movetopic_auto_board'] => '[url=' . getUrl('board', ['board' => $this->_toboard, 'start' => 0, 'name' => $this->_board_info['name']]) . ']' . $this->_board_info['name'] . '[/url]',
+				$mtxt['movetopic_auto_topic'] => '[iurl=' . getUrl('topic', ['topic' => $this->_topic, 'start' => 0, 'subject' => $this->_board_info['subject_new'] ?? $this->_board_info['subject']]) . ']' . ($this->_board_info['subject_new'] ?? $this->_board_info['subject']) . '[/iurl]'
 			));
 
 			// Auto remove this MOVED redirection topic in the future?
@@ -437,7 +440,7 @@ class MoveTopic extends AbstractController
 			$_SESSION['move_to_topic']['redirect_expires'] = $redirect_expires;
 
 			$msgOptions = array(
-				'subject' => $txt['moved'] . ': ' . $this->_board_info['subject'],
+				'subject' => $mtxt['moved'] . ': ' . $this->_board_info['subject'],
 				'body' => $reason,
 				'icon' => 'moved',
 				'smileys_enabled' => 1,

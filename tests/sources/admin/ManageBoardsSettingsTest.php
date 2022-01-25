@@ -3,6 +3,7 @@
 use ElkArte\AdminController\ManageBoards;
 use ElkArte\EventManager;
 use ElkArte\User;
+use ElkArte\Languages\Loader;
 
 /**
  * TestCase class for manage boards settings
@@ -15,8 +16,11 @@ class TestManageBoardsSettings extends ElkArteCommonSetupTest
 	 */
 	protected function setUp(): void
 	{
+		global $txt;
+
 		parent::setUp();
-		\ElkArte\Themes\ThemeLoader::loadLanguageFile('ManagePermissions', 'english', true, true);
+		$lang = new Loader('english', $txt, database());
+		$lang->load('ManagePermissions');
 	}
 
 	/**

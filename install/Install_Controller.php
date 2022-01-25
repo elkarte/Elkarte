@@ -240,14 +240,12 @@ class Install_Controller
 			'packages/installed.list',
 			'smileys',
 			'themes',
-			'agreement.txt',
-			'privacypolicy.txt',
 			'db_last_error.txt',
 			'Settings.php',
 			'Settings_bak.php'
 		);
 		foreach ($incontext['detected_languages'] as $lang => $temp)
-			$extra_files[] = 'themes/default/languages/' . $lang;
+			$extra_files[] = 'sources/ElkArte/Languages/Install/' . $lang;
 
 		// With mod_security installed, we could attempt to fix it with .htaccess.
 		if (function_exists('apache_get_modules') && in_array('mod_security', apache_get_modules()))
@@ -839,22 +837,6 @@ class Install_Controller
 			),
 			array('variable')
 		);
-
-		if (file_exists(TMP_BOARDDIR . '/privacypolicy.txt'))
-		{
-			$privacypol = new \ElkArte\PrivacyPolicy('english');
-			$success = $privacypol->storeBackup();
-			$db->insert('replace',
-				$db_prefix . 'settings',
-				array(
-					'variable' => 'string-255', 'value' => 'string-65534',
-				),
-				array(
-					'privacypolicyRevision', $success,
-				),
-				array('variable')
-			);
-		}
 
 		// Maybe we can auto-detect better cookie settings?
 		preg_match('~^http[s]?://([^\.]+?)([^/]*?)(/.*)?$~', $boardurl, $matches);

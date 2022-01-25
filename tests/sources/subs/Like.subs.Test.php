@@ -1,6 +1,7 @@
 <?php
 
 use PHPUnit\Framework\TestCase;
+use ElkArte\Languages\Loader;
 
 /**
  * TestCase class for like subs.
@@ -18,6 +19,7 @@ class TestLikes extends TestCase
 	 */
 	protected function setUp(): void
 	{
+		global $txt;
 		// Lets make sure a topic exists by creating one
 		require_once(SUBSDIR . '/Likes.subs.php');
 		require_once(SUBSDIR . '/Post.subs.php');
@@ -52,7 +54,8 @@ class TestLikes extends TestCase
 		// Keep id of the new topic.
 		$this->id_topic = $topicOptions['id'];
 		// Hey now, force a reload, we still rely on globals!
-		\ElkArte\Themes\ThemeLoader::loadLanguageFile('Errors', 'english', true, true);
+		$lang = new Loader('english', $txt, database());
+		$lang->load('Errors');
 	}
 
 	/**

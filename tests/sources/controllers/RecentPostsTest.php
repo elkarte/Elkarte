@@ -3,6 +3,7 @@
 use ElkArte\Controller\Recent;
 use ElkArte\EventManager;
 use ElkArte\User;
+use ElkArte\Languages\Loader;
 
 /**
  * TestCase class for recent posts
@@ -16,10 +17,12 @@ class TestRecentPosts extends ElkArteCommonSetupTest
 	 */
 	protected function setUp(): void
 	{
+		global $txt;
 		parent::setUp();
 
 		new ElkArte\Themes\ThemeLoader();
-		\ElkArte\Themes\ThemeLoader::loadLanguageFile('Errors', 'english', true, true);
+		$lang = new Loader('english', $txt, database());
+		$lang->load('Errors');
 	}
 
 	/**

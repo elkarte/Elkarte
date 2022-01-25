@@ -19,7 +19,7 @@ namespace ElkArte\AdminController;
 use ElkArte\AbstractController;
 use ElkArte\Action;
 use ElkArte\Cache\Cache;
-use ElkArte\Themes\ThemeLoader;
+use ElkArte\Languages\Txt;
 use ElkArte\User;
 use ElkArte\Util;
 
@@ -64,7 +64,7 @@ class ManageMembers extends AbstractController
 		global $txt, $context, $modSettings;
 
 		// Load the essentials.
-		ThemeLoader::loadLanguageFile('ManageMembers');
+		Txt::load('ManageMembers');
 		theme()->getTemplates()->load('ManageMembers');
 
 		$subActions = array(
@@ -1205,7 +1205,7 @@ class ManageMembers extends AbstractController
 		require_once(SUBSDIR . '/Members.subs.php');
 
 		// We also need to the login languages here - for emails.
-		ThemeLoader::loadLanguageFile('Login');
+		Txt::load('Login');
 
 		// Start off clean
 		$this->conditions = array();

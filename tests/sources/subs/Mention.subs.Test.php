@@ -8,6 +8,7 @@ use ElkArte\Themes\ThemeLoader;
 use ElkArte\User;
 use ElkArte\UserInfo;
 use PHPUnit\Framework\TestCase;
+use ElkArte\Languages\Loader;
 
 /**
  * TestCase class for mention subs.
@@ -28,7 +29,7 @@ class TestMentions extends TestCase
 	 */
 	protected function setUp(): void
 	{
-		global $modSettings;
+		global $modSettings, $txt;
 
 		// We are not logged in for this test, so lets fake it
 		$modSettings['mentions_enabled'] = true;
@@ -68,8 +69,8 @@ class TestMentions extends TestCase
 			'name' => 'itsme',
 		]);
 
-		ThemeLoader::loadLanguageFile('EmailTemplates', 'english', false, true);
-		ThemeLoader::loadLanguageFile('MaillistTemplates', 'english', false, true);
+		$lang = new Loader('english', $txt, database());
+		$lang->load('EmailTemplates+MaillistTemplates');
 
 		// Lets start by ensuring a topic exists by creating one
 		require_once(SUBSDIR . '/Post.subs.php');

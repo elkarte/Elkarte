@@ -22,7 +22,7 @@ use ElkArte\Action;
 use ElkArte\Exceptions\Exception;
 use ElkArte\Notifications;
 use ElkArte\SettingsForm\SettingsForm;
-use ElkArte\Themes\ThemeLoader;
+use ElkArte\Languages\Txt;
 use ElkArte\Util;
 
 /**
@@ -55,9 +55,9 @@ class ManageFeatures extends AbstractController
 		global $context, $txt, $settings;
 
 		// Often Helpful
-		ThemeLoader::loadLanguageFile('Help');
-		ThemeLoader::loadLanguageFile('ManageSettings');
-		ThemeLoader::loadLanguageFile('Mentions');
+		Txt::load('Help');
+		Txt::load('ManageSettings');
+		Txt::load('Mentions');
 
 		// All the actions we know about
 		$subActions = array(
@@ -503,7 +503,7 @@ class ManageFeatures extends AbstractController
 	{
 		global $txt, $context, $modSettings;
 
-		ThemeLoader::loadLanguageFile('Mentions');
+		Txt::load('Mentions');
 
 		// Instantiate the form
 		$settingsForm = new SettingsForm(SettingsForm::DB_ADAPTER);
@@ -635,8 +635,8 @@ class ManageFeatures extends AbstractController
 	{
 		global $txt, $modSettings;
 
-		ThemeLoader::loadLanguageFile('Profile');
-		ThemeLoader::loadLanguageFile('UserNotifications');
+		Txt::load('Profile');
+		Txt::load('UserNotifications');
 		loadJavascriptFile('jquery.multiselect.min.js');
 		theme()->addInlineJavascript('
 		$(\'.select_multiple\').multiselect({\'language_strings\': {\'Select all\': ' . JavascriptEscape($txt['notify_select_all']) . '}});', true);
@@ -1192,7 +1192,7 @@ class ManageFeatures extends AbstractController
 		// Any errors messages to show?
 		if (isset($this->_req->query->msg))
 		{
-			ThemeLoader::loadLanguageFile('Errors');
+			Txt::load('Errors');
 
 			if (isset($txt['custom_option_' . $this->_req->query->msg]))
 			{
@@ -1201,7 +1201,7 @@ class ManageFeatures extends AbstractController
 		}
 
 		// Load the profile language for section names.
-		ThemeLoader::loadLanguageFile('Profile');
+		Txt::load('Profile');
 
 		// Load up the profile field, if one was supplied
 		if ($context['fid'])
@@ -1527,7 +1527,7 @@ class ManageFeatures extends AbstractController
 		$settingsForm->setConfigVars($this->_pmSettings());
 
 		require_once(SUBSDIR . '/PersonalMessage.subs.php');
-		ThemeLoader::loadLanguageFile('ManageMembers');
+		Txt::load('ManageMembers');
 
 		$context['pm_limits'] = loadPMLimits();
 

@@ -3,6 +3,7 @@
 use ElkArte\Controller\ProfileInfo;
 use ElkArte\EventManager;
 use ElkArte\User;
+use ElkArte\Languages\Loader;
 
 /**
  * TestCase class for the Profile Info Controller
@@ -16,10 +17,12 @@ class TestProfileInfo extends ElkArteCommonSetupTest
 	 */
 	protected function setUp(): void
 	{
+		global $txt;
 		parent::setUp();
 
 		new ElkArte\Themes\ThemeLoader();
-		\ElkArte\Themes\ThemeLoader::loadLanguageFile('Profile', 'english', true, true);
+		$lang = new Loader('english', $txt, database());
+		$lang->load('Profile');
 	}
 
 	/**

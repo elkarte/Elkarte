@@ -2,6 +2,7 @@
 
 use ElkArte\Controller\Calendar;
 use ElkArte\EventManager;
+use ElkArte\Languages\Loader;
 
 /**
  * TestCase class for the Calendar Controller
@@ -18,11 +19,13 @@ class TestCalendar extends ElkArteCommonSetupTest
 	 */
 	protected function setUp(): void
 	{
+		global $txt;
 		// Load in the common items so the system thinks we have an active login
 		parent::setUp();
 
 		new ElkArte\Themes\ThemeLoader();
-		\ElkArte\Themes\ThemeLoader::loadLanguageFile('Errors', 'english', true, true);
+		$lang = new Loader('english', $txt, database());
+		$lang->load('Errors');
 	}
 
 	/**

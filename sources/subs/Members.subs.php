@@ -18,7 +18,7 @@ use ElkArte\Cache\Cache;
 use ElkArte\Converters\Html2Md;
 use ElkArte\DataValidator;
 use ElkArte\Errors\ErrorContext;
-use ElkArte\Themes\ThemeLoader;
+use ElkArte\Languages\Txt;
 use ElkArte\TokenHash;
 use ElkArte\User;
 use ElkArte\Util;
@@ -511,7 +511,7 @@ function registerMember(&$regOptions, $ErrorContext = 'register')
 
 	$db = database();
 
-	ThemeLoader::loadLanguageFile('Login');
+	Txt::load('Login');
 
 	// We'll need some external functions.
 	require_once(SUBSDIR . '/Auth.subs.php');

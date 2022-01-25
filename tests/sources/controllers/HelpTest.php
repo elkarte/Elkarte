@@ -5,6 +5,7 @@ use ElkArte\EventManager;
 use ElkArte\HttpReq;
 use ElkArte\Themes\ThemeLoader;
 use ElkArte\User;
+use ElkArte\Languages\Loader;
 
 /**
  * TestCase class for the Help Controller
@@ -21,13 +22,14 @@ class TestHelpController extends ElkArteCommonSetupTest
 	 */
 	protected function setUp(): void
 	{
+		global $txt;
 		// Load in the common items so the system thinks we have an active login
 		parent::setUp();
 		parent::setSession();
 
 		new ElkArte\Themes\ThemeLoader();
-		ThemeLoader::loadLanguageFile('Manual', 'english', false, true);
-		ThemeLoader::loadLanguageFile('Help', 'english', false, true);
+		$lang = new Loader('english', $txt, database());
+		$lang->load('Manual+Help');
 	}
 
 	protected function tearDown(): void

@@ -13,7 +13,7 @@
 
 namespace ElkArte;
 
-use ElkArte\Themes\ThemeLoader;
+use ElkArte\Languages\Txt;
 
 /**
  * Class used to validate and transform data
@@ -589,7 +589,7 @@ class DataValidator
 			return false;
 		}
 
-		ThemeLoader::loadLanguageFile('Validation');
+		Txt::load('Validation');
 		$result = array();
 
 		// Just want specific errors then it must be an array

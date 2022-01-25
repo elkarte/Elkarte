@@ -4,6 +4,7 @@ use ElkArte\Controller\ModerationCenter;
 use ElkArte\EventManager;
 use ElkArte\HttpReq;
 use ElkArte\User;
+use ElkArte\Languages\Loader;
 
 /**
  * TestCase class for the ModerationCenter Controller
@@ -20,7 +21,7 @@ class TestModerationCenterController extends ElkArteCommonSetupTest
 	 */
 	protected function setUp(): void
 	{
-		global $context, $modSettings;
+		global $context, $modSettings, $txt;
 
 		// Load in the common items so the system thinks we have an active login
 		parent::setUp();
@@ -41,8 +42,8 @@ class TestModerationCenterController extends ElkArteCommonSetupTest
 		$modSettings['securityDisable'] = true;
 
 		new ElkArte\Themes\ThemeLoader();
-		\ElkArte\Themes\ThemeLoader::loadLanguageFile('ModerationCenter', 'english', false, true);
-		\ElkArte\Themes\ThemeLoader::loadLanguageFile('ManageMembers', 'english', false, true);
+		$lang = new Loader('english', $txt, database());
+		$lang->load('ModerationCenter+ManageMembers');
 	}
 
 	/**

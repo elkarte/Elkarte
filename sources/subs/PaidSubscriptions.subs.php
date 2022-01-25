@@ -14,7 +14,7 @@
  *
  */
 
-use ElkArte\Themes\ThemeLoader;
+use ElkArte\Languages\Txt;
 use ElkArte\Util;
 
 /**
@@ -476,7 +476,7 @@ function loadSubscriptions()
 	}
 
 	// Make sure this is loaded, just in case.
-	ThemeLoader::loadLanguageFile('ManagePaid');
+	Txt::load('ManagePaid');
 
 	$context['subscriptions'] = array();
 	$db->fetchQuery('

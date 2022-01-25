@@ -33,7 +33,7 @@ else
 // Some constants and $settings needed to let getFileVersions do it's magic
 DEFINE('ELK', '1');
 DEFINE('BOARDDIR', dirname(__FILE__));
-DEFINE('LANGUAGEDIR', BOARDDIR . '/themes/default/languages');
+DEFINE('LANGUAGEDIR', SOURCEDIR . '/ElkArte/Languages');
 DEFINE('SOURCEDIR', BOARDDIR . '/sources');
 DEFINE('ADMINDIR', SOURCEDIR . '/admin');
 DEFINE('EXTDIR', SOURCEDIR . '/ext');

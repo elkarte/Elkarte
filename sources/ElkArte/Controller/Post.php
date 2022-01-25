@@ -28,7 +28,7 @@ use ElkArte\Exceptions\ControllerRedirectException;
 use ElkArte\Exceptions\Exception;
 use ElkArte\Notifications;
 use ElkArte\NotificationsTask;
-use ElkArte\Themes\ThemeLoader;
+use ElkArte\Languages\Txt;
 use ElkArte\User;
 use ElkArte\Util;
 
@@ -166,8 +166,8 @@ class Post extends AbstractController
 	{
 		global $context;
 
-		ThemeLoader::loadLanguageFile('Post');
-		ThemeLoader::loadLanguageFile('Errors');
+		Txt::load('Post');
+		Txt::load('Errors');
 
 		$context['robot_no_index'] = true;
 		$this->_template_layers->add('postarea');
@@ -892,7 +892,7 @@ class Post extends AbstractController
 		}
 
 		require_once(SUBSDIR . '/Boards.subs.php');
-		ThemeLoader::loadLanguageFile('Post');
+		Txt::load('Post');
 
 		// Trigger the prepare_save_post event
 		$this->_events->trigger('prepare_save_post', array('topic_info' => &$topic_info));
@@ -1522,7 +1522,7 @@ class Post extends AbstractController
 	{
 		global $context;
 
-		ThemeLoader::loadLanguageFile('Post');
+		Txt::load('Post');
 
 		// Where we going if we need to?
 		$context['post_box_name'] = $_GET['pb'] ?? '';

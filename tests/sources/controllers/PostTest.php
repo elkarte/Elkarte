@@ -3,6 +3,7 @@
 use ElkArte\Controller\Post;
 use ElkArte\EventManager;
 use ElkArte\User;
+use ElkArte\Languages\Loader;
 
 /**
  * TestCase class for the Post Controller
@@ -19,13 +20,14 @@ class TestPost extends ElkArteCommonSetupTest
 	 */
 	protected function setUp(): void
 	{
+		global $txt;
 		// Load in the common items so the system thinks we have an active login
 		parent::setUp();
 		$this->setSession();
 
 		new ElkArte\Themes\ThemeLoader();
-		\ElkArte\Themes\ThemeLoader::loadLanguageFile('Profile', 'english', true, true);
-		\ElkArte\Themes\ThemeLoader::loadLanguageFile('Errors', 'english', true, true);
+		$lang = new Loader('english', $txt, database());
+		$lang->load('Profile+Errors');
 	}
 
 	/**

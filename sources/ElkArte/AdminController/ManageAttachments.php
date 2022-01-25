@@ -23,6 +23,7 @@ use ElkArte\SettingsForm\SettingsForm;
 use ElkArte\Themes\ThemeLoader;
 use ElkArte\Util;
 use ElkArte\AttachmentsDirectory;
+use ElkArte\Languages\Loader;
 
 /**
  * This is the attachments and avatars controller class.
@@ -790,9 +791,10 @@ class ManageAttachments extends AbstractController
 				// And change the message to reflect this.
 				if (!empty($messages))
 				{
-					ThemeLoader::loadLanguageFile('index', $language, true);
-					setRemovalNotice($messages, $txt['attachment_delete_admin']);
-					ThemeLoader::loadLanguageFile('index', $this->user->language, true);
+					$mtxt = [];
+					$lang = new Loader($language, $mtxt, database());
+					$lang->load('Admin');
+					setRemovalNotice($messages, $mtxt['attachment_delete_admin']);
 				}
 			}
 		}

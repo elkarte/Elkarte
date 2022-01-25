@@ -40,6 +40,7 @@ use ElkArte\Cache\Cache;
 use ElkArte\DataValidator;
 use ElkArte\Exceptions\Exception;
 use ElkArte\Themes\ThemeLoader;
+use ElkArte\Languages\Txt;
 use ElkArte\User;
 use ElkArte\Util;
 use ElkArte\XmlArray;
@@ -141,8 +142,8 @@ class ManageThemes extends AbstractController
 		}
 
 		// Load the important language files...
-		ThemeLoader::loadLanguageFile('ManageThemes');
-		ThemeLoader::loadLanguageFile('Settings');
+		Txt::load('ManageThemes');
+		Txt::load('Settings');
 
 		// No guests in here.
 		is_not_guest();
@@ -223,7 +224,7 @@ class ManageThemes extends AbstractController
 		// No guests in here.
 		if ($this->user->is_guest)
 		{
-			ThemeLoader::loadLanguageFile('Errors');
+			Txt::load('Errors');
 			$context['xml_data'] = array(
 				'error' => 1,
 				'text' => $txt['not_guests']
@@ -255,7 +256,7 @@ class ManageThemes extends AbstractController
 		}
 		else
 		{
-			ThemeLoader::loadLanguageFile('Errors');
+			Txt::load('Errors');
 			$context['xml_data'] = array(
 				'error' => 1,
 				'text' => $txt['error_sa_not_set']
@@ -277,7 +278,7 @@ class ManageThemes extends AbstractController
 
 		// Load in the helpers we need
 		require_once(SUBSDIR . '/Themes.subs.php');
-		ThemeLoader::loadLanguageFile('Admin');
+		Txt::load('Admin');
 
 		if (isset($this->_req->query->th))
 		{
@@ -392,7 +393,7 @@ class ManageThemes extends AbstractController
 
 		// Select the best fitting tab.
 		$context[$context['admin_menu_name']]['current_subsection'] = 'list';
-		ThemeLoader::loadLanguageFile('Admin');
+		Txt::load('Admin');
 
 		// Fetch the smiley sets...
 		$sets = explode(',', 'none,' . $modSettings['smiley_sets_known']);
@@ -409,10 +410,10 @@ class ManageThemes extends AbstractController
 		new ThemeLoader($theme, false);
 
 		// Also load the actual themes language file - in case of special settings.
-		ThemeLoader::loadLanguageFile('Settings', '', true, true);
+		Txt::load('Settings', '', true, true);
 
 		// And the custom language strings...
-		ThemeLoader::loadLanguageFile('ThemeStrings', '', false, true);
+		Txt::load('ThemeStrings', '', false, true);
 
 		// Let the theme take care of the settings.
 		theme()->getTemplates()->load('Settings');
@@ -585,7 +586,7 @@ class ManageThemes extends AbstractController
 	{
 		global $context, $modSettings;
 
-		ThemeLoader::loadLanguageFile('Admin');
+		Txt::load('Admin');
 
 		// Saving?
 		if (isset($this->_req->post->save))
@@ -821,10 +822,10 @@ class ManageThemes extends AbstractController
 		$old_settings = $settings;
 
 		new ThemeLoader($theme, false);
-		ThemeLoader::loadLanguageFile('Profile');
+		Txt::load('Profile');
 
 		// @todo Should we just move these options so they are no longer theme dependant?
-		ThemeLoader::loadLanguageFile('PersonalMessage');
+		Txt::load('PersonalMessage');
 
 		// Let the theme take care of the settings.
 		theme()->getTemplates()->load('Settings');
@@ -980,7 +981,7 @@ class ManageThemes extends AbstractController
 		// Validate what was sent
 		if (checkSession('get', '', false))
 		{
-			ThemeLoader::loadLanguageFile('Errors');
+			Txt::load('Errors');
 			$context['xml_data'] = array(
 				'error' => 1,
 				'text' => $txt['session_verify_fail'],
@@ -992,7 +993,7 @@ class ManageThemes extends AbstractController
 		// Not just any John Smith can send in a api request
 		if (!allowedTo('admin_forum'))
 		{
-			ThemeLoader::loadLanguageFile('Errors');
+			Txt::load('Errors');
 			$context['xml_data'] = array(
 				'error' => 1,
 				'text' => $txt['cannot_admin_forum'],
@@ -1004,7 +1005,7 @@ class ManageThemes extends AbstractController
 		// Even if you are John Smith, you still need a ticket
 		if (!validateToken('admin-tr', 'request', true, false))
 		{
-			ThemeLoader::loadLanguageFile('Errors');
+			Txt::load('Errors');
 			$context['xml_data'] = array(
 				'error' => 1,
 				'text' => $txt['token_verify_fail'],
@@ -1019,7 +1020,7 @@ class ManageThemes extends AbstractController
 		// You can't delete the default theme!
 		if ($theme == 1)
 		{
-			ThemeLoader::loadLanguageFile('Errors');
+			Txt::load('Errors');
 			$context['xml_data'] = array(
 				'error' => 1,
 				'text' => $txt['no_access'],
@@ -1079,7 +1080,7 @@ class ManageThemes extends AbstractController
 			throw new Exception('no_access', false);
 		}
 
-		ThemeLoader::loadLanguageFile('Profile');
+		Txt::load('Profile');
 		theme()->getTemplates()->load('ManageThemes');
 
 		// Build the link tree.
@@ -1910,7 +1911,7 @@ class ManageThemes extends AbstractController
 		// Session timed out.
 		else
 		{
-			ThemeLoader::loadLanguageFile('Errors');
+			Txt::load('Errors');
 
 			// Notify the template of trouble
 			$context['session_error'] = true;
@@ -2225,20 +2226,20 @@ class ManageThemes extends AbstractController
 		}
 		elseif (isset($this->_req->query->lang_file) && preg_match('~^[^\./\\\\:\0]\.[^\./\\\\:\0]$~', $this->_req->query->lang_file) != 0)
 		{
-			if (!empty($theme_dirs['base_theme_dir']) && file_exists($theme_dirs['base_theme_dir'] . '/languages/' . $this->_req->query->lang_file . '.php'))
+			if (!empty($theme_dirs['base_theme_dir']) && file_exists($theme_dirs['base_theme_dir'] . '/Languages/' . $this->_req->query->lang_file . '.php'))
 			{
-				$filename = $theme_dirs['base_theme_dir'] . '/languages/' . $this->_req->query->template . '.php';
+				$filename = $theme_dirs['base_theme_dir'] . '/Languages/' . $this->_req->query->template . '.php';
 			}
-			elseif (file_exists($settings['default_theme_dir'] . '/languages/' . $this->_req->query->template . '.php'))
+			elseif (file_exists($settings['default_theme_dir'] . '/Languages/' . $this->_req->query->template . '.php'))
 			{
-				$filename = $settings['default_theme_dir'] . '/languages/' . $this->_req->query->template . '.php';
+				$filename = $settings['default_theme_dir'] . '/Languages/' . $this->_req->query->template . '.php';
 			}
 			else
 			{
 				throw new Exception('no_access', false);
 			}
 
-			$fp = fopen($theme_dirs['theme_dir'] . '/languages/' . $this->_req->query->lang_file . '.php', 'w');
+			$fp = fopen($theme_dirs['theme_dir'] . '/Languages/' . $this->_req->query->lang_file . '.php', 'w');
 			fwrite($fp, file_get_contents($filename));
 			fclose($fp);
 
@@ -2263,13 +2264,10 @@ class ManageThemes extends AbstractController
 		}
 		$dir->close();
 
-		$dir = dir($settings['default_theme_dir'] . '/languages');
+		$dir = dir($settings['default_theme_dir'] . '/Languages');
 		while (($entry = $dir->read()))
 		{
-			if (preg_match('~^([^\.]+\.[^\.]+)\.php$~', $entry, $matches))
-			{
-				$lang_files[] = $matches[1];
-			}
+			$lang_files[] = $entry;
 		}
 		$dir->close();
 
@@ -2285,14 +2283,14 @@ class ManageThemes extends AbstractController
 			}
 			$dir->close();
 
-			if (file_exists($theme_dirs['base_theme_dir'] . '/languages'))
+			if (file_exists($theme_dirs['base_theme_dir'] . '/Languages'))
 			{
-				$dir = dir($theme_dirs['base_theme_dir'] . '/languages');
+				$dir = dir($theme_dirs['base_theme_dir'] . '/Languages');
 				while (($entry = $dir->read()))
 				{
-					if (preg_match('~^([^\.]+\.[^\.]+)\.php$~', $entry, $matches) && !in_array($matches[1], $lang_files))
+					if (!in_array($entry, $lang_files))
 					{
-						$lang_files[] = $matches[1];
+						$lang_files[] = $entry;
 					}
 				}
 				$dir->close();
@@ -2319,7 +2317,7 @@ class ManageThemes extends AbstractController
 				'filename' => $file . '.php',
 				'value' => $file,
 				'already_exists' => false,
-				'can_copy' => file_exists($theme_dirs['theme_dir'] . '/languages') ? is_writable($theme_dirs['theme_dir'] . '/languages') : is_writable($theme_dirs['theme_dir']),
+				'can_copy' => file_exists($theme_dirs['theme_dir'] . '/Languages') && is_writable($theme_dirs['theme_dir'] . '/Languages'),
 			);
 		}
 
@@ -2334,15 +2332,15 @@ class ManageThemes extends AbstractController
 		}
 		$dir->close();
 
-		if (file_exists($theme_dirs['theme_dir'] . '/languages'))
+		if (file_exists($theme_dirs['theme_dir'] . '/Languages'))
 		{
-			$dir = dir($theme_dirs['theme_dir'] . '/languages');
+			$dir = dir($theme_dirs['theme_dir'] . '/Languages');
 			while (($entry = $dir->read()))
 			{
-				if (preg_match('~^([^\.]+\.[^\.]+)\.php$~', $entry, $matches) && isset($context['available_language_files'][$matches[1]]))
+				if (isset($context['available_language_files'][$entry]))
 				{
-					$context['available_language_files'][$matches[1]]['already_exists'] = true;
-					$context['available_language_files'][$matches[1]]['can_copy'] = is_writable($theme_dirs['theme_dir'] . '/languages/' . $entry);
+					$context['available_language_files'][$entry]['already_exists'] = true;
+					$context['available_language_files'][$entry]['can_copy'] = is_writable($theme_dirs['theme_dir'] . '/Languages/' . $entry);
 				}
 			}
 			$dir->close();

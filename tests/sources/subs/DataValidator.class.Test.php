@@ -1,6 +1,7 @@
 <?php
 
 use ElkArte\DataValidator;
+use ElkArte\Languages\Loader;
 
 class TestDataValidator extends ElkArteCommonSetupTest
 {
@@ -12,10 +13,12 @@ class TestDataValidator extends ElkArteCommonSetupTest
 	 */
 	protected function setUp(): void
 	{
+		global $txt;
 		parent::setUp();
 
 		new ElkArte\Themes\ThemeLoader();
-		\ElkArte\Themes\ThemeLoader::loadLanguageFile('Validation', 'english', false, true);
+		$lang = new Loader('english', $txt, database());
+		$lang->load('Validation');
 
 		$this->rules = array(
 			'required'      => 'required',

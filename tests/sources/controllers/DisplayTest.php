@@ -4,6 +4,7 @@ use ElkArte\Controller\Display;
 use ElkArte\EventManager;
 use ElkArte\HttpReq;
 use ElkArte\User;
+use ElkArte\Languages\Loader;
 
 /**
  * TestCase class for the Display Controller
@@ -20,11 +21,13 @@ class TestDisplayIndex extends ElkArteCommonSetupTest
 	 */
 	protected function setUp(): void
 	{
+		global $txt;
 		// Load in the common items so the system thinks we have an active login
 		parent::setUp();
 
 		new ElkArte\Themes\ThemeLoader();
-		\ElkArte\Themes\ThemeLoader::loadLanguageFile('Errors', 'english', true, true);
+		$lang = new Loader('english', $txt, database());
+		$lang->load('Errors');
 	}
 
 	/**

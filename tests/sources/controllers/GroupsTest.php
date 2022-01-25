@@ -4,6 +4,7 @@ use ElkArte\Controller\Groups;
 use ElkArte\EventManager;
 use ElkArte\HttpReq;
 use ElkArte\User;
+use ElkArte\Languages\Loader;
 
 /**
  * TestCase class for the Groups Controller
@@ -21,7 +22,7 @@ class TestGroups extends ElkArteCommonSetupTest
 	 */
 	protected function setUp(): void
 	{
-		global 	$modSettings;
+		global 	$modSettings, $txt;
 
 		// Load in the common items so the system thinks we have an active login
 		parent::setUp();
@@ -31,9 +32,8 @@ class TestGroups extends ElkArteCommonSetupTest
 		$modSettings['latestRealName'] = 'itsme';
 
 		new ElkArte\Themes\ThemeLoader();
-		\ElkArte\Themes\ThemeLoader::loadLanguageFile('Errors', 'english', true, true);
-		\ElkArte\Themes\ThemeLoader::loadLanguageFile('ManageMembers', 'english', true, true);
-		\ElkArte\Themes\ThemeLoader::loadLanguageFile('ModerationCenter', 'english', true, true);
+		$lang = new Loader('english', $txt, database());
+		$lang->load('Errors+ManageMembers+ModerationCenter');
 
 		// Get the controller
 		$this->controller = new Groups(new EventManager());

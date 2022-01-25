@@ -17,7 +17,8 @@ use ElkArte\AbstractController;
 use ElkArte\Agreement;
 use ElkArte\Http\Headers;
 use ElkArte\PrivacyPolicy;
-use ElkArte\Themes\ThemeLoader;
+use ElkArte\User;
+use ElkArte\Languages\Loader as LangLoader;
 
 /**
  * This file is called via ?action=jslocale;sa=sceditor to load in a list of
@@ -54,9 +55,9 @@ class Jslocale extends AbstractController
 	 */
 	public function action_sceditor()
 	{
-		global $txt, $editortxt;
+		global $txt;
 
-		$this->_prepareLocale('Editor');
+		$editortxt = $this->_prepareLocale('Editor');
 
 		// If we don't have any locale better avoid broken js
 		if (empty($txt['lang_locale']) || empty($editortxt))
@@ -90,17 +91,18 @@ class Jslocale extends AbstractController
 	 */
 	private function _prepareLocale($language_file)
 	{
-		global $modSettings;
+		global $modSettings, $language;
 
-		if (!empty($language_file))
-		{
-			ThemeLoader::loadLanguageFile($language_file);
-		}
+		$txteditor = [];
+		$lang = new LangLoader(User::$info->language ?? $language, $txteditor, database(), 'editortxt');
+		$lang->load($language_file);
 
 		theme()->getLayers()->removeAll();
 
 		// Lets make sure we aren't going to output anything nasty.
 		obStart(!empty($modSettings['enableCompressedOutput']));
+
+		return $txteditor;
 	}
 
 	/**

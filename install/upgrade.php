@@ -92,7 +92,7 @@ if (substr($sourcedir, 0, 1) == '.' && substr($sourcedir, 1, 1) != '.')
 }
 
 // Make sure the paths are correct... at least try to fix them.
-if (!file_exists($boarddir) && file_exists(TMP_BOARDDIR . '/agreement.txt'))
+if (!file_exists($boarddir) && file_exists(TMP_BOARDDIR . '/bootstrap.php'))
 {
 	$boarddir = TMP_BOARDDIR;
 }
@@ -123,9 +123,9 @@ if ((empty($extdir) || !file_exists($extdir)) && file_exists($sourcedir . '/ext'
 	$extdir = $sourcedir . '/ext';
 }
 
-if ((empty($languagedir) || !file_exists($languagedir)) && file_exists($boarddir . '/themes/default/languages'))
+if ((empty($languagedir) || !file_exists($languagedir)) && file_exists($sourcedir . '/Languages'))
 {
-	$languagedir = $boarddir . '/themes/default/languages';
+	$languagedir = $sourcedir . '/ElkArte/Languages';
 }
 
 // Time to forget about variables and go with constants!
@@ -247,10 +247,9 @@ if (isset($_GET['data']))
 	$support_js = $upcontext['upgrade_status']['js'];
 
 	// Load the language.
-	if (file_exists($modSettings['theme_dir'] . '/languages/' . $upcontext['language'] . '/Install.' . $upcontext['language'] . '.php'))
-	{
-		require_once($modSettings['theme_dir'] . '/languages/' . $upcontext['language'] . '/Install.' . $upcontext['language'] . '.php');
-	}
+	global $txt;
+	$lang = new \ElkArte\Languages\Loader($upcontext['language'], $txt, database());
+	$lang->load('Install');
 }
 // Set the defaults.
 else
@@ -605,13 +604,13 @@ function action_welcomeLogin()
 		&& @file_exists(__DIR__ . '/upgrade_' . DB_SCRIPT_VERSION . '.php');
 
 	// This needs to exist!
-	if (!file_exists($modSettings['theme_dir'] . '/languages/' . $upcontext['language'] . '/Install.' . $upcontext['language'] . '.php'))
+	if (!file_exists(SOURCEDIR . '/ElkArte/Languages/Install/' . $upcontext['language'] . '.php'))
 	{
 		return throw_error('The upgrade script could not find the &quot;Install&quot; language file for the forum default language, ' . $upcontext['language'] . '.<br /><br />Please make certain you uploaded all the files included in the package, even the theme and language files for the default theme.<br />&nbsp;&nbsp;&nbsp;[<a href="' . $upgradeurl . '?lang=english">Try English</a>]');
 	}
 	else
 	{
-		require_once($modSettings['theme_dir'] . '/languages/' . $upcontext['language'] . '/Install.' . $upcontext['language'] . '.php');
+		require_once(SOURCEDIR . '/ElkArte/Languages/Install/' . $upcontext['language'] . '/.php');
 	}
 
 	// Do not try to upgrade to the same version you are already running
@@ -685,13 +684,13 @@ function action_welcomeLogin()
 		return throw_error('The cache directory could not be found.<br /><br />Please make sure you have a directory called &quot;cache&quot; in your forum directory before continuing.');
 	}
 
-	if (!file_exists($modSettings['theme_dir'] . '/languages/' . $upcontext['language'] . '/index.' . $upcontext['language'] . '.php') && !isset($modSettings['elkVersion']) && !isset($_GET['lang']))
+	if (!file_exists(SOURCEDIR . '/ElkArte/Languages/Index/' . $upcontext['language'] . '.php') && !isset($modSettings['elkVersion']) && !isset($_GET['lang']))
 	{
 		return throw_error('The upgrader was unable to find language files for the language specified in Settings.php.<br />ElkArte will not work without the primary language files installed.<br /><br />Please either install them, or <a href="' . $upgradeurl . '?step=0;lang=english">use english instead</a>.');
 	}
 	elseif (!isset($_GET['skiplang']))
 	{
-		$temp = substr(@implode('', @file($modSettings['theme_dir'] . '/languages/' . $upcontext['language'] . '/index.' . $upcontext['language'] . '.php')), 0, 4096);
+		$temp = substr(@implode('', @file(SOURCEDIR . '/ElkArte/Languages/Index/' . $upcontext['language'] . '/.php')), 0, 4096);
 		preg_match('~(?://|/\*)\s*Version:\s+(.+?);\s*index(?:[\s]{2}|\*/)~i', $temp, $match);
 
 		if (empty($match[1]) || $match[1] != CURRENT_LANG_VERSION)
@@ -703,20 +702,6 @@ function action_welcomeLogin()
 	if (!makeFilesWritable($writable_files))
 	{
 		return false;
-	}
-
-	// Check agreement.txt. (it may not exist, in which case BOARDDIR must be writable.)
-	if (isset($modSettings['agreement']) && (!is_writable(BOARDDIR) || file_exists(BOARDDIR . '/agreement.txt')) && !is_writable(BOARDDIR . '/agreement.txt'))
-	{
-		return throw_error('The upgrader was unable to obtain write access to agreement.txt.<br /><br />If you are using a linux or unix based server, please ensure that the file is chmod\'d to 777, or if it does not exist that the directory this upgrader is in is 777.<br />If your server is running Windows, please ensure that the internet guest account has the proper permissions on it or its folder.');
-	}
-
-	// Upgrade the agreement.
-	elseif (isset($modSettings['agreement']))
-	{
-		$fp = fopen(BOARDDIR . '/agreement.txt', 'w');
-		fwrite($fp, $modSettings['agreement']);
-		fclose($fp);
 	}
 
 	// We're going to check that their board dir setting is right in case they've been moving stuff around.
@@ -815,6 +800,7 @@ function checkLogin()
 			if ($db->num_rows($request) != 0)
 			{
 				list ($id_member, $name, $password, $id_group, $addGroups, $user_language) = $db->fetch_row($request);
+				$user_language = ucfirst($user_language);
 
 				// These will come in handy, if you want to login
 				require_once(SOURCEDIR . '/Security.php');
@@ -958,17 +944,17 @@ function checkLogin()
 			$upcontext['upgrade_status']['pass'] = $upcontext['user']['pass'];
 
 			// Set the language to that of the user?
-			if (isset($user_language) && $user_language != $upcontext['language'] && file_exists($modSettings['theme_dir'] . '/languages/' . basename($user_language, '.lng') . '/index.' . basename($user_language, '.lng') . '.php'))
+			if (isset($user_language) && $user_language != $upcontext['language'] && file_exists(SOURCEDIR . '/ElkArte/Languages/Index/' . basename($user_language, '.lng') . '/.php'))
 			{
 				$user_language = basename($user_language, '.lng');
-				$temp = substr(@implode('', @file($modSettings['theme_dir'] . '/languages/' . $user_language . '/index.' . $user_language . '.php')), 0, 4096);
+				$temp = substr(@implode('', @file(SOURCEDIR . '/ElkArte/Languages/Index/' . $user_language . '.php')), 0, 4096);
 				preg_match('~(?://|/\*)\s*Version:\s+(.+?);\s*index(?:[\s]{2}|\*/)~i', $temp, $match);
 
 				if (empty($match[1]) || $match[1] != CURRENT_LANG_VERSION)
 				{
 					$upcontext['upgrade_options_warning'] = 'The language files for your selected language, ' . $user_language . ', have not been updated to the latest version. Upgrade will continue with the forum default, ' . $upcontext['language'] . '.';
 				}
-				elseif (!file_exists($modSettings['theme_dir'] . '/languages/' . $user_language . '/Install.' . $user_language . '.php'))
+				elseif (!file_exists(SOURCEDIR . '/ElkArte/Languages/Install/' . $user_language . '.php'))
 				{
 					$upcontext['upgrade_options_warning'] = 'The language files for your selected language, ' . $user_language . ', have not been uploaded/updated as the &quot;Install&quot; language file is missing. Upgrade will continue with the forum default, ' . $upcontext['language'] . '.';
 				}
@@ -979,7 +965,7 @@ function checkLogin()
 					$upcontext['upgrade_status']['lang'] = $upcontext['language'];
 
 					// Include the file.
-					require_once($modSettings['theme_dir'] . '/languages/' . $user_language . '/Install.' . $user_language . '.php');
+					require_once(SOURCEDIR . '/ElkArte/Languages/Install/' . $user_language . '.php');
 				}
 			}
 
@@ -1045,7 +1031,7 @@ function action_upgradeOptions()
 	$changes = array();
 
 	// If we're overriding the language follow it through.
-	if (isset($_GET['lang']) && file_exists($modSettings['theme_dir'] . '/languages/' . $_GET['lang'] . '/index.' . $_GET['lang'] . '.php'))
+	if (isset($_GET['lang']) && file_exists(SOURCEDIR . '/ElkArte/Languages/Index/' . $_GET['lang'] . '.php'))
 	{
 		$changes['language'] = '\'' . $_GET['lang'] . '\'';
 	}
@@ -1924,17 +1910,6 @@ Usage: /path/to/php -f ' . basename(__FILE__) . ' -- [OPTION]...
 		print_error('Error: Unable to obtain write access to "Settings_bak.php".');
 	}
 
-	if (isset($modSettings['agreement']) && (!is_writable(BOARDDIR) || file_exists(BOARDDIR . '/agreement.txt')) && !is_writable(BOARDDIR . '/agreement.txt'))
-	{
-		print_error('Error: Unable to obtain write access to "agreement.txt".');
-	}
-	elseif (isset($modSettings['agreement']))
-	{
-		$fp = fopen(BOARDDIR . '/agreement.txt', 'w');
-		fwrite($fp, $modSettings['agreement']);
-		fclose($fp);
-	}
-
 	// Make sure themes is writable.
 	if (!is_writable($modSettings['theme_dir']))
 	{
@@ -1963,26 +1938,26 @@ Usage: /path/to/php -f ' . basename(__FILE__) . ' -- [OPTION]...
 		print_error('Error: Unable to obtain write access to "cache".', true);
 	}
 
-	if (!file_exists($modSettings['theme_dir'] . '/languages/' . $upcontext['language'] . '/index.' . $upcontext['language'] . '.php') && !isset($modSettings['elkVersion']) && !isset($_GET['lang']))
+	if (!file_exists(SOURCEDIR . '/ElkArte/Languages/Index/' . $upcontext['language'] . '.php') && !isset($modSettings['elkVersion']) && !isset($_GET['lang']))
 	{
 		print_error('Error: Unable to find language files!', true);
 	}
 	else
 	{
-		$temp = substr(@implode('', @file($modSettings['theme_dir'] . '/languages/' . $upcontext['language'] . '/index.' . $upcontext['language'] . '.php')), 0, 4096);
+		$temp = substr(@implode('', @file(SOURCEDIR . '/ElkArte/Languages/Index/' . $upcontext['language'] . '.php')), 0, 4096);
 		preg_match('~(?://|/\*)\s*Version:\s+(.+?);\s*index(?:[\s]{2}|\*/)~i', $temp, $match);
 
 		if (empty($match[1]) || $match[1] != CURRENT_LANG_VERSION)
 		{
 			print_error('Error: Language files out of date.', true);
 		}
-		if (!file_exists($modSettings['theme_dir'] . '/languages/' . $upcontext['language'] . '/Install.' . $upcontext['language'] . '.php'))
+		if (!file_exists(SOURCEDIR . '/ElkArte/Languages/Install/' . $upcontext['language'] . '.php'))
 		{
 			print_error('Error: Install language is missing for selected language.', true);
 		}
 
 		// Otherwise include it!
-		require_once($modSettings['theme_dir'] . '/languages/' . $upcontext['language'] . '/Install.' . $upcontext['language'] . '.php');
+		require_once(SOURCEDIR . '/ElkArte/Languages/Install/' . $upcontext['language'] . '.php');
 	}
 
 	// Make sure we skip the HTML for login.

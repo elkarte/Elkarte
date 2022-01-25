@@ -38,6 +38,9 @@ class TestFiles extends TestCase
 			if (strpos($file, '/vendor/') !== false)
 				continue;
 
+			if (strpos($file, '/Languages/') !== false)
+				continue;
+
 			$this->_ourFiles[] = $file;
 		}
 	}

@@ -37,7 +37,7 @@ class TestDatabase extends TestCase
 		define('BOARDDIR', $boarddir);
 		define('CACHEDIR', $cachedir);
 		define('EXTDIR', $extdir);
-		define('LANGUAGEDIR', $boarddir . '/themes/default/languages');
+		define('LANGUAGEDIR', $sourcedir . '/ElkArte/Languages');
 		define('SOURCEDIR', $sourcedir);
 		define('ADMINDIR', $sourcedir . '/admin');
 		define('CONTROLLERDIR', $sourcedir . '/controllers');

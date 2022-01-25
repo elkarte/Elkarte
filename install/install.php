@@ -111,14 +111,13 @@ function load_lang_file()
 	$incontext['detected_languages'] = array();
 
 	// Make sure the languages directory actually exists.
-	if (file_exists(TMP_BOARDDIR . '/themes/default/languages'))
+	if (file_exists(TMP_BOARDDIR . '/sources/ElkArte/Languages/Install'))
 	{
 		// Find all the "Install" language files in the directory.
-		$dir = dir(TMP_BOARDDIR . '/themes/default/languages');
+		$dir = dir(TMP_BOARDDIR . '/sources/ElkArte/Languages/Install');
 		while ($entry = $dir->read())
 		{
-			if (is_dir($dir->path . '/' . $entry) && file_exists($dir->path . '/' . $entry . '/Install.' . $entry . '.php'))
-				$incontext['detected_languages']['Install.' . $entry . '.php'] = ucfirst($entry);
+			$incontext['detected_languages'][$entry] = basename($entry, '.php');
 		}
 		$dir->close();
 	}
@@ -159,18 +158,18 @@ function load_lang_file()
 		$_SESSION['installer_temp_lang'] = $_GET['lang_file'];
 
 	// Make sure it exists, if it doesn't reset it.
-	if (!isset($_SESSION['installer_temp_lang']) || preg_match('~[^\\w_\\-.]~', $_SESSION['installer_temp_lang']) === 1 || !file_exists(TMP_BOARDDIR . '/themes/default/languages/' . substr($_SESSION['installer_temp_lang'], 8, strlen($_SESSION['installer_temp_lang']) - 12) . '/' . $_SESSION['installer_temp_lang']))
+	if (!isset($_SESSION['installer_temp_lang']) || preg_match('~[^\\w_\\-.]~', $_SESSION['installer_temp_lang']) === 1 || !file_exists(TMP_BOARDDIR . '/sources/ElkArte/Languages/Install/' . $_SESSION['installer_temp_lang']))
 	{
 		// Use the first one...
 		list ($_SESSION['installer_temp_lang']) = array_keys($incontext['detected_languages']);
 
 		// If we have english and some other language, use the other language.  We Americans hate english :P.
-		if ($_SESSION['installer_temp_lang'] == 'Install.english.php' && count($incontext['detected_languages']) > 1)
-			list (, $_SESSION['installer_temp_lang']) = array_keys($incontext['detected_languages']);
+		if ($_SESSION['installer_temp_lang'] == 'English.php' && count($incontext['detected_languages']) > 1)
+			list (, $_SESSION['installer_temp_lang']) = array_values($incontext['detected_languages']);
 	}
 
 	// And now include the actual language file itself.
-	require_once(TMP_BOARDDIR . '/themes/default/languages/' . substr($_SESSION['installer_temp_lang'], 8, strlen($_SESSION['installer_temp_lang']) - 12) . '/' . $_SESSION['installer_temp_lang']);
+	require_once(TMP_BOARDDIR . '/sources/ElkArte/Languages/Install/' . $_SESSION['installer_temp_lang']);
 }
 
 /**

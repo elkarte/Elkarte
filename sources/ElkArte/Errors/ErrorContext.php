@@ -13,7 +13,7 @@
 
 namespace ElkArte\Errors;
 
-use ElkArte\Themes\ThemeLoader;
+use ElkArte\Languages\Txt;
 
 /**
  *  This class is an experiment for the job of handling errors.
@@ -369,7 +369,7 @@ final class ErrorContext
 	private function _loadLang()
 	{
 		// Errors is always needed
-		ThemeLoader::loadLanguageFile('Errors');
+		Txt::load('Errors');
 
 		// Any custom one?
 		if (!empty($this->_language_files))
@@ -378,7 +378,7 @@ final class ErrorContext
 			{
 				if (!$loaded)
 				{
-					ThemeLoader::loadLanguageFile($language);
+					Txt::load($language);
 
 					// Remember this file has been loaded already
 					$this->_language_files[$language] = true;

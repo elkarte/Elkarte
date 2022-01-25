@@ -19,7 +19,7 @@
  */
 
 use ElkArte\Cache\Cache;
-use ElkArte\Themes\ThemeLoader;
+use ElkArte\Languages\Txt;
 use ElkArte\User;
 use ElkArte\Util;
 
@@ -547,7 +547,7 @@ function sendpm($recipients, $subject, $message, $store_outbox = true, $from = n
 	$db = database();
 
 	// Make sure the PM language file is loaded, we might need something out of it.
-	ThemeLoader::loadLanguageFile('PersonalMessage');
+	Txt::load('PersonalMessage');
 
 	// Needed for our email and post functions
 	require_once(SUBSDIR . '/Mail.subs.php');
@@ -975,7 +975,7 @@ function sendpm($recipients, $subject, $message, $store_outbox = true, $from = n
 	call_integration_hook('integrate_personal_message_after', array(&$id_pm, &$log, &$recipients, &$from, &$subject, &$message));
 
 	// Back to what we were on before!
-	ThemeLoader::loadLanguageFile('index+PersonalMessage');
+	Txt::load('index+PersonalMessage');
 
 	// Add one to their unread and read message counts.
 	foreach ($all_to as $k => $id)

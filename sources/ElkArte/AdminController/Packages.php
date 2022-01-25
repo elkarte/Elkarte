@@ -24,7 +24,7 @@ use ElkArte\EventManager;
 use ElkArte\Exceptions\Exception;
 use ElkArte\Http\FtpConnection;
 use ElkArte\PackagesFilterIterator;
-use ElkArte\Themes\ThemeLoader;
+use ElkArte\Languages\Txt;
 use ElkArte\User;
 use ElkArte\Util;
 use ElkArte\AttachmentsDirectory;
@@ -110,7 +110,7 @@ class Packages extends AbstractController
 		isAllowedTo('admin_forum');
 
 		// Load all the basic stuff.
-		ThemeLoader::loadLanguageFile('Packages');
+		Txt::load('Packages');
 		theme()->getTemplates()->load('Packages');
 		loadCSSFile('admin.css');
 		$context['page_title'] = $txt['package'];
@@ -516,7 +516,7 @@ class Packages extends AbstractController
 				}
 				elseif ($matches[1] === 'languagedir' || $matches[1] === 'languages_dir')
 				{
-					$path = '/languages';
+					$path = '/ElkArte/Languages';
 				}
 				else
 				{
@@ -1378,10 +1378,6 @@ class Packages extends AbstractController
 			strtr(BOARDDIR, array('\\' => '/')) => array(
 				'type' => 'dir',
 				'contents' => array(
-					'agreement.txt' => array(
-						'type' => 'file',
-						'writable_on' => 'standard',
-					),
 					'Settings.php' => array(
 						'type' => 'file',
 						'writable_on' => 'restrictive',

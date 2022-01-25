@@ -14,9 +14,10 @@
  *
  */
 
-use ElkArte\Themes\ThemeLoader;
+use ElkArte\Languages\Txt;
 use ElkArte\User;
 use ElkArte\Util;
+use ElkArte\Languages\Loader as LangLoader;
 
 /**
  * Retrieve all installed themes
@@ -584,18 +585,10 @@ function availableThemes($current_theme, $current_member)
 		$settings['images_url'] = &$theme_data['images_url'];
 		$theme_thumbnail_href = $theme_data['images_url'] . '/thumbnail.png';
 
-		if (file_exists($theme_data['theme_dir'] . '/languages/' . User::$info->language . '/Settings.' . User::$info->language . '.php'))
-		{
-			include($theme_data['theme_dir'] . '/languages/' . User::$info->language . '/Settings.' . User::$info->language . '.php');
-		}
-		elseif (file_exists($theme_data['theme_dir'] . '/languages/' . $language . '/Settings.' . $language . '.php'))
-		{
-			include($theme_data['theme_dir'] . '/languages/' . $language . '/Settings.' . $language . '.php');
-		}
-		else
-		{
-			$txt['theme_description'] = '';
-		}
+		$txt['theme_description'] = '';
+		$lang = new LangLoader(null. $txt, $db);
+		$lang->setchangePath($theme_data['theme_dir'] . '/Languages');
+		$lang->load('Settings', false);
 
 		$available_themes[$id_theme]['thumbnail_href'] = str_replace('{images_url}', $settings['images_url'], $theme_thumbnail_href);
 		$available_themes[$id_theme]['description'] = $txt['theme_description'];
@@ -610,7 +603,7 @@ function availableThemes($current_theme, $current_member)
 
 				call_integration_hook('integrate_init_theme', array($id_theme, &$settings));
 
-				ThemeLoader::loadLanguageFile('Settings');
+				Txt::load('Settings');
 
 				$available_themes[$id_theme]['variants'] = array();
 				foreach ($settings['theme_variants'] as $variant)

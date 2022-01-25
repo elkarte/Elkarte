@@ -197,7 +197,7 @@ class Bootstrap
 		global $boarddir, $sourcedir, $cachedir, $extdir, $languagedir;
 
 		// Make sure the paths are correct... at least try to fix them.
-		if (!file_exists($boarddir) && file_exists(__DIR__ . '/agreement.txt'))
+		if (!file_exists($boarddir) && file_exists(__DIR__ . '/bootstrap.php'))
 		{
 			$boarddir = __DIR__;
 		}
@@ -218,9 +218,9 @@ class Bootstrap
 			$extdir = $sourcedir . '/ext';
 		}
 
-		if ((empty($languagedir) || !file_exists($languagedir)) && file_exists($boarddir . '/themes/default/languages'))
+		if ((empty($languagedir) || !file_exists($languagedir)) && file_exists($sourcedir . '/Languages/Index'))
 		{
-			$languagedir = $boarddir . '/themes/default/languages';
+			$languagedir = $sourcedir . '/ElkArte/Languages';
 		}
 
 		// Time to forget about variables and go with constants!

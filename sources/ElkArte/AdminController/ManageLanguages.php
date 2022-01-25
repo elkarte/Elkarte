@@ -21,8 +21,10 @@ use ElkArte\Action;
 use ElkArte\Cache\Cache;
 use ElkArte\Exceptions\Exception;
 use ElkArte\SettingsForm\SettingsForm;
-use ElkArte\Themes\ThemeLoader;
+use ElkArte\Languages\Txt;
 use ElkArte\Util;
+use ElkArte\Languages\Editor as LangEditor;
+use ElkArte\Languages\Loader as LangLoader;
 
 /**
  * Manage languages controller class.
@@ -48,7 +50,7 @@ class ManageLanguages extends AbstractController
 		global $context, $txt;
 
 		theme()->getTemplates()->load('ManageLanguages');
-		ThemeLoader::loadLanguageFile('ManageSettings');
+		Txt::load('ManageSettings');
 
 		$subActions = array(
 			'edit' => array($this, 'action_edit', 'permission' => 'admin_forum'),
@@ -328,7 +330,7 @@ class ManageLanguages extends AbstractController
 		// @todo for the moment there is no facility to download packages, so better kill it here
 		throw new Exception('no_access', false);
 
-		ThemeLoader::loadLanguageFile('ManageSettings');
+		Txt::load('ManageSettings');
 		require_once(SUBSDIR . '/Package.subs.php');
 
 		// Clearly we need to know what to request.
@@ -602,7 +604,7 @@ class ManageLanguages extends AbstractController
 			// Are we going to need more language stuff?
 			if (!empty($context['still_not_writable']))
 			{
-				ThemeLoader::loadLanguageFile('Packages');
+				Txt::load('Packages');
 			}
 		}
 
@@ -696,8 +698,9 @@ class ManageLanguages extends AbstractController
 	{
 		global $settings, $context, $txt;
 
+		$base_lang_dir = SOURCEDIR . '/ElkArte/Languages';
 		require_once(SUBSDIR . '/Language.subs.php');
-		ThemeLoader::loadLanguageFile('ManageSettings');
+		Txt::load('ManageSettings');
 
 		// Select the languages tab.
 		$context['menu_data_' . $context['admin_menu_id']]['current_subsection'] = 'edit';
@@ -705,75 +708,30 @@ class ManageLanguages extends AbstractController
 		$context['sub_template'] = 'modify_language_entries';
 
 		$context['lang_id'] = $this->_req->query->lid;
-		list ($theme_id, $file_id) = empty($this->_req->post->tfid) || strpos($this->_req->post->tfid, '+') === false ? array(1, '') : explode('+', $this->_req->post->tfid);
+		$file_id = !empty($this->_req->post->tfid) ? $this->_req->post->tfid : '';
 
 		// Clean the ID - just in case.
 		preg_match('~([A-Za-z0-9_-]+)~', $context['lang_id'], $matches);
 		$context['lang_id'] = $matches[1];
-
-		// Get all the theme data.
-		require_once(SUBSDIR . '/Themes.subs.php');
-		$themes = getCustomThemes();
+		$matches = '';
+		preg_match('~([A-Za-z0-9_-]+)~', $file_id, $matches);
+		$file_id = ucfirst($matches[1] ?? '');
 
 		// This will be where we look
-		$lang_dirs = array();
+		$lang_dirs = glob($base_lang_dir . '/*', GLOB_ONLYDIR);
 		$images_dirs = array();
 
-		// Check we have themes with a path and a name - just in case - and add the path.
-		foreach ($themes as $id => $data)
-		{
-			if (count($data) !== 2)
-			{
-				unset($themes[$id]);
-			}
-			elseif (is_dir($data['theme_dir'] . '/languages/' . $context['lang_id']))
-			{
-				$lang_dirs[$id] = $data['theme_dir'] . '/languages/' . $context['lang_id'];
-			}
-
-			// How about image directories?
-			if (is_dir($data['theme_dir'] . '/images/' . $context['lang_id']))
-			{
-				$images_dirs[$id] = $data['theme_dir'] . '/images/' . $context['lang_id'];
-			}
-		}
-
-		$current_file = $file_id ? $lang_dirs[$theme_id] . '/' . $file_id . '.' . $context['lang_id'] . '.php' : '';
+		$current_file = $file_id ? $base_lang_dir . '/' . $file_id . '/' . ucfirst($context['lang_id']) . '.php' : '';
 
 		// Now for every theme get all the files and stick them in context!
-		$context['possible_files'] = array();
-		foreach ($lang_dirs as $theme => $theme_dir)
-		{
-			// Open it up.
-			$dir = dir($theme_dir);
-			while (($entry = $dir->read()))
-			{
-				// We're only after the files for this language.
-				if (preg_match('~^([A-Za-z]+)\.' . $context['lang_id'] . '\.php$~', $entry, $matches) == 0)
-				{
-					continue;
-				}
-
-				if (!isset($context['possible_files'][$theme]))
-				{
-					$context['possible_files'][$theme] = array(
-						'id' => $theme,
-						'name' => $themes[$theme]['name'],
-						'files' => array(),
-					);
-				}
-
-				$context['possible_files'][$theme]['files'][] = array(
-					'id' => $matches[1],
-					'name' => $txt['lang_file_desc_' . $matches[1]] ?? $matches[1],
-					'selected' => $theme_id == $theme && $file_id == $matches[1],
-				);
-			}
-			$dir->close();
-			usort($context['possible_files'][$theme]['files'], function ($val1, $val2) {
-				return strcmp($val1['name'], $val2['name']);
-			});
-		}
+		$context['possible_files'] =  array_map(function($file) use ($file_id, $txt) {
+			return [
+				'id' => basename($file, '.php'),
+				'name' => $txt['lang_file_desc_' . basename($file)] ?? basename($file),
+				'path' => $file,
+				'selected' => $file_id == basename($file),
+			];
+		}, $lang_dirs);
 
 		if ($context['lang_id'] != 'english')
 		{
@@ -784,52 +742,25 @@ class ManageLanguages extends AbstractController
 			}
 		}
 
-		// Saving primary settings?
-		$madeSave = false;
-		if (!empty($this->_req->post->save_main) && !$current_file)
-		{
-			checkSession();
-			validateToken('admin-mlang');
-
-			// Read in the current file.
-			$current_data = implode('', file($settings['default_theme_dir'] . '/languages/' . $context['lang_id'] . '/index.' . $context['lang_id'] . '.php'));
-
-			// These are the replacements. old => new
-			$replace_array = array(
-				'~\$txt\[\'lang_locale\'\]\s=\s(\'|")[^\r\n]+~' => '$txt[\'lang_locale\'] = \'' . addslashes($this->_req->post->locale) . '\';',
-				'~\$txt\[\'lang_dictionary\'\]\s=\s(\'|")[^\r\n]+~' => '$txt[\'lang_dictionary\'] = \'' . addslashes($this->_req->post->dictionary) . '\';',
-				'~\$txt\[\'lang_spelling\'\]\s=\s(\'|")[^\r\n]+~' => '$txt[\'lang_spelling\'] = \'' . addslashes($this->_req->post->spelling) . '\';',
-				'~\$txt\[\'lang_rtl\'\]\s=\s[A-Za-z0-9]+;~' => '$txt[\'lang_rtl\'] = ' . (!empty($this->_req->post->rtl) ? 'true' : 'false') . ';',
-			);
-			$current_data = preg_replace(array_keys($replace_array), array_values($replace_array), $current_data);
-			$fp = fopen($settings['default_theme_dir'] . '/languages/' . $context['lang_id'] . '/index.' . $context['lang_id'] . '.php', 'w+');
-			fwrite($fp, $current_data);
-			fclose($fp);
-
-			if ($this->_checkOpcache())
-			{
-				opcache_invalidate($settings['default_theme_dir'] . '/languages/' . $context['lang_id'] . '/index.' . $context['lang_id'] . '.php');
-			}
-
-			$madeSave = true;
-		}
-
 		// Quickly load index language entries.
-		$old_txt = $txt;
-		require($settings['default_theme_dir'] . '/languages/' . $context['lang_id'] . '/index.' . $context['lang_id'] . '.php');
-		$context['lang_file_not_writable_message'] = is_writable($settings['default_theme_dir'] . '/languages/' . $context['lang_id'] . '/index.' . $context['lang_id'] . '.php') ? '' : sprintf($txt['lang_file_not_writable'], $settings['default_theme_dir'] . '/languages/' . $context['lang_id'] . '/index.' . $context['lang_id'] . '.php');
+		$mtxt = [];
+		$new_lang = new LangLoader($context['lang_id'], $mtxt, database());
+		$new_lang->load('Index', true);
 
 		// Setup the primary settings context.
 		$context['primary_settings'] = array(
 			'name' => Util::ucwords(strtr($context['lang_id'], array('_' => ' ', '-utf8' => ''))),
-			'locale' => $txt['lang_locale'],
-			'dictionary' => $txt['lang_dictionary'],
-			'spelling' => $txt['lang_spelling'],
-			'rtl' => $txt['lang_rtl'],
+			'locale' => $mtxt['lang_locale'],
+			'dictionary' => $mtxt['lang_dictionary'],
+			'spelling' => $mtxt['lang_spelling'],
+			'rtl' => $mtxt['lang_rtl'],
 		);
 
-		// Restore normal service.
-		$txt = $old_txt;
+		// Quickly load index language entries.
+		$edit_lang = new LangEditor($context['lang_id'], database());
+		$edit_lang->load($file_id, true);
+
+		$context['file_entries'] = $edit_lang->getForEditing();
 
 		// Are we saving?
 		$save_strings = array();
@@ -838,227 +769,12 @@ class ManageLanguages extends AbstractController
 			checkSession();
 			validateToken('admin-mlang');
 
-			// Clean each entry!
-			foreach ($this->_req->post->entry as $k => $v)
-			{
-				// Only try to save if it's changed!
-				if ($this->_req->post->entry[$k] != $this->_req->post->comp[$k])
-				{
-					$save_strings[$k] = cleanLangString($v, false);
-				}
-			}
-		}
+			$edit_lang->save($file_id, $this->_req->post->entry);
 
-		// If we are editing a file work away at that.
-		if ($current_file !== '')
-		{
-			$context['entries_not_writable_message'] = is_writable($current_file) ? '' : sprintf($txt['lang_entries_not_writable'], $current_file);
-
-			$entries = array();
-
-			// We can't just require it I'm afraid - otherwise we pass in all kinds of variables!
-			$multiline_cache = '';
-			foreach (file($current_file) as $line)
-			{
-				// Got a new entry?
-				if ($line[0] == '$' && !empty($multiline_cache))
-				{
-					preg_match('~\$(helptxt|txt|editortxt)\[\'(.+)\'\]\s?=\s?(.+);~ms', strtr($multiline_cache, array("\r" => '')), $matches);
-					if (!empty($matches[3]))
-					{
-						$entries[$matches[2]] = array(
-							'type' => $matches[1],
-							'full' => $matches[0],
-							'entry' => $matches[3],
-						);
-						$multiline_cache = '';
-					}
-				}
-				$multiline_cache .= $line;
-			}
-
-			// Last entry to add?
-			if ($multiline_cache !== '')
-			{
-				preg_match('~\$(helptxt|txt|editortxt)\[\'(.+)\'\]\s?=\s?(.+);~ms', strtr($multiline_cache, array("\r" => '')), $matches);
-				if (!empty($matches[3]))
-				{
-					$entries[$matches[2]] = array(
-						'type' => $matches[1],
-						'full' => $matches[0],
-						'entry' => $matches[3],
-					);
-				}
-			}
-
-			// These are the entries we can definitely save.
-			$final_saves = array();
-
-			$context['file_entries'] = array();
-			foreach ($entries as $entryKey => $entryValue)
-			{
-				// Nowadays some entries have fancy keys, so better use something "portable" for the form
-				$md5EntryKey = md5($entryKey);
-
-				// Ignore some things we set separately.
-				$ignore_files = array('lang_character_set', 'lang_locale', 'lang_dictionary', 'lang_spelling', 'lang_rtl');
-				if (in_array($entryKey, $ignore_files))
-				{
-					continue;
-				}
-
-				// These are arrays that need breaking out.
-				$arrays = array('days', 'days_short', 'months', 'months_titles', 'months_short', 'happy_birthday_author', 'karlbenson1_author', 'nite0859_author', 'zwaldowski_author', 'geezmo_author', 'karlbenson2_author');
-				if (in_array($entryKey, $arrays))
-				{
-					// Get off the first bits.
-					$entryValue['entry'] = substr($entryValue['entry'], strpos($entryValue['entry'], '(') + 1, strrpos($entryValue['entry'], ')') - strpos($entryValue['entry'], '('));
-					$entryValue['entry'] = explode(',', strtr($entryValue['entry'], array(' ' => '')));
-
-					// Now create an entry for each item.
-					$cur_index = 0;
-					$save_cache = array(
-						'enabled' => false,
-						'entries' => array(),
-					);
-					foreach ($entryValue['entry'] as $id => $subValue)
-					{
-						// Is this a new index?
-						if (preg_match('~^(\d+)~', $subValue, $matches))
-						{
-							$cur_index = $matches[1];
-							$subValue = substr($subValue, strpos($subValue, '\''));
-						}
-
-						// Clean up some bits.
-						$subValue = strtr($subValue, array('"' => '', '\'' => '', ')' => ''));
-
-						// Can we save?
-						if (isset($save_strings[$md5EntryKey . '-+- ' . $cur_index]))
-						{
-							$save_cache['entries'][$cur_index] = strtr($save_strings[$md5EntryKey . '-+- ' . $cur_index], array('\'' => ''));
-							$save_cache['enabled'] = true;
-						}
-						else
-						{
-							$save_cache['entries'][$cur_index] = $subValue;
-						}
-
-						$context['file_entries'][] = array(
-							'key' => $entryKey . '-+- ' . $cur_index,
-							'display_key' => $entryKey . '-+- ' . $cur_index,
-							'value' => $subValue,
-							'rows' => 1,
-						);
-						$cur_index++;
-					}
-
-					// Do we need to save?
-					if ($save_cache['enabled'])
-					{
-						// Format the string, checking the indexes first.
-						$items = array();
-						$cur_index = 0;
-						foreach ($save_cache['entries'] as $k2 => $v2)
-						{
-							// Manually show the custom index.
-							if ($k2 !== $cur_index)
-							{
-								$items[] = $k2 . ' => \'' . $v2 . '\'';
-								$cur_index = $k2;
-							}
-							else
-							{
-								$items[] = '\'' . $v2 . '\'';
-							}
-
-							$cur_index++;
-						}
-
-						// Now create the string!
-						$final_saves[$entryKey] = array(
-							'find' => $entryValue['full'],
-							'replace' => '$' . $entryValue['type'] . '[\'' . $entryKey . '\'] = array(' . implode(', ', $items) . ');',
-						);
-					}
-				}
-				else
-				{
-					// Saving?
-					if (isset($save_strings[$md5EntryKey]) && $save_strings[$md5EntryKey] !== $entryValue['entry'])
-					{
-						// @todo Fix this properly.
-						if ($save_strings[$md5EntryKey] == '')
-						{
-							$save_strings[$md5EntryKey] = '\'\'';
-						}
-
-						// Set the new value.
-						$entryValue['entry'] = $save_strings[$md5EntryKey];
-
-						// And we know what to save now!
-						$final_saves[$entryKey] = array(
-							'find' => $entryValue['full'],
-							'replace' => '$' . $entryValue['type'] . '[\'' . $entryKey . '\'] = ' . $save_strings[$md5EntryKey] . ';',
-						);
-					}
-
-					$editing_string = cleanLangString($entryValue['entry'], true);
-					$context['file_entries'][] = array(
-						'key' => $md5EntryKey,
-						'display_key' => $entryKey,
-						'value' => $editing_string,
-						'rows' => (int) (strlen($editing_string) / 38) + substr_count($editing_string, "\n") + 1,
-					);
-				}
-			}
-
-			// Any saves to make?
-			if (!empty($final_saves))
-			{
-				checkSession();
-
-				$file_contents = implode('', file($current_file));
-				foreach ($final_saves as $save)
-				{
-					$file_contents = strtr($file_contents, array($save['find'] => $save['replace']));
-				}
-
-				// Save the actual changes.
-				$fp = fopen($current_file, 'w+');
-				fwrite($fp, strtr($file_contents, array("\r" => '')));
-				fclose($fp);
-
-				if ($this->_checkOpcache())
-				{
-					opcache_invalidate($current_file);
-				}
-
-				$madeSave = true;
-			}
-
-			// Another restore.
-			$txt = $old_txt;
-		}
-
-		// If we saved, redirect.
-		if ($madeSave)
-		{
 			redirectexit('action=admin;area=languages;sa=editlang;lid=' . $context['lang_id']);
 		}
 
 		createToken('admin-mlang');
-	}
-
-	/**
-	 * Checks if the Zend Opcahce is installed, active and cmd functions available.
-	 *
-	 * @return bool
-	 */
-	private function _checkOpcache()
-	{
-		return (extension_loaded('Zend OPcache') && ini_get('opcache.enable') &&
-			(ini_get('opcache.restrict_api') === '' || stripos(BOARDDIR, ini_get('opcache.restrict_api')) !== 0));
 	}
 
 	/**

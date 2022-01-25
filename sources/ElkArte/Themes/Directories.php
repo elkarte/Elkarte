@@ -115,13 +115,6 @@ class Directories
 	 */
 	public function fileInclude($filename, $once = false)
 	{
-		/*
-		 * I know this looks weird but this is used to include $txt files.
-		 * If the parent doesn't declare them global, the scope will be
-		 * local to this function. IOW, don't remove this line!
-		 */
-		global $txt;
-
 		// Don't include the file more than once, if $once is true.
 		if ($once && in_array($filename, $this->templates))
 		{

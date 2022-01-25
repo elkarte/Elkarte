@@ -18,6 +18,7 @@ namespace ElkArte\ScheduledTasks\Tasks;
 
 use ElkArte\Themes\ThemeLoader;
 use ElkArte\Util;
+use ElkArte\Languages\Loader;
 
 /**
  * Class DailyDigest - Send out a daily email of all subscribed topics, to members.
@@ -51,7 +52,7 @@ class DailyDigest implements ScheduledTaskInterface
 	 */
 	public function runDigest($is_weekly = false)
 	{
-		global $txt, $mbname, $modSettings, $boardurl;
+		global $mbname, $modSettings, $boardurl;
 
 		$db = database();
 
@@ -265,33 +266,32 @@ class DailyDigest implements ScheduledTaskInterface
 		$langtxt = array();
 		foreach ($langs as $lang)
 		{
-			ThemeLoader::loadLanguageFile('Post', $lang);
-			ThemeLoader::loadLanguageFile('index', $lang);
-			ThemeLoader::loadLanguageFile('Maillist', $lang);
-			ThemeLoader::loadLanguageFile('EmailTemplates', $lang);
+			$mtxt = [];
+			$lang_loader = new Loader($lang, $mtxt, database());
+			$lang_loader->load('index+Post+Maillist+EmailTemplates');
 
 			$langtxt[$lang] = array(
-				'subject' => $txt['digest_subject_' . ($is_weekly ? 'weekly' : 'daily')],
+				'subject' => $mtxt['digest_subject_' . ($is_weekly ? 'weekly' : 'daily')],
 				'char_set' => 'UTF-8',
-				'intro' => sprintf($txt['digest_intro_' . ($is_weekly ? 'weekly' : 'daily')], $mbname),
-				'new_topics' => $txt['digest_new_topics'],
-				'topic_lines' => $txt['digest_new_topics_line'],
-				'new_replies' => $txt['digest_new_replies'],
-				'mod_actions' => $txt['digest_mod_actions'],
-				'replies_one' => $txt['digest_new_replies_one'],
-				'replies_many' => $txt['digest_new_replies_many'],
-				'sticky' => $txt['digest_mod_act_sticky'],
-				'lock' => $txt['digest_mod_act_lock'],
-				'unlock' => $txt['digest_mod_act_unlock'],
-				'remove' => $txt['digest_mod_act_remove'],
-				'move' => $txt['digest_mod_act_move'],
-				'merge' => $txt['digest_mod_act_merge'],
-				'split' => $txt['digest_mod_act_split'],
+				'intro' => sprintf($mtxt['digest_intro_' . ($is_weekly ? 'weekly' : 'daily')], $mbname),
+				'new_topics' => $mtxt['digest_new_topics'],
+				'topic_lines' => $mtxt['digest_new_topics_line'],
+				'new_replies' => $mtxt['digest_new_replies'],
+				'mod_actions' => $mtxt['digest_mod_actions'],
+				'replies_one' => $mtxt['digest_new_replies_one'],
+				'replies_many' => $mtxt['digest_new_replies_many'],
+				'sticky' => $mtxt['digest_mod_act_sticky'],
+				'lock' => $mtxt['digest_mod_act_lock'],
+				'unlock' => $mtxt['digest_mod_act_unlock'],
+				'remove' => $mtxt['digest_mod_act_remove'],
+				'move' => $mtxt['digest_mod_act_move'],
+				'merge' => $mtxt['digest_mod_act_merge'],
+				'split' => $mtxt['digest_mod_act_split'],
 				'bye' => (!empty($modSettings['maillist_sitename_regards']) ? $modSettings['maillist_sitename_regards'] : '') . "\n" . $boardurl,
-				'preview' => $txt['digest_preview'],
-				'see_full' => $txt['digest_see_full'],
-				'reply_preview' => $txt['digest_reply_preview'],
-				'unread_reply_link' => $txt['digest_unread_reply_link'],
+				'preview' => $mtxt['digest_preview'],
+				'see_full' => $mtxt['digest_see_full'],
+				'reply_preview' => $mtxt['digest_reply_preview'],
+				'unread_reply_link' => $mtxt['digest_unread_reply_link'],
 			);
 		}
 

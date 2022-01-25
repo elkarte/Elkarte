@@ -17,7 +17,7 @@ use ElkArte\AbstractController;
 use ElkArte\Action;
 use ElkArte\Errors\ErrorContext;
 use ElkArte\Exceptions\Exception;
-use ElkArte\Themes\ThemeLoader;
+use ElkArte\Languages\Txt;
 use ElkArte\Util;
 
 /**
@@ -341,7 +341,7 @@ class ManageBans extends AbstractController
 		$ban_group_id = $context['ban']['id'] ?? $this->_req->getQuery('bg', 'intval', 0);
 
 		// Template needs this to show errors using javascript
-		ThemeLoader::loadLanguageFile('Errors');
+		Txt::load('Errors');
 		createToken('admin-bet');
 		$context['form_url'] = getUrl('admin', ['action' => 'admin', 'area' => 'ban', 'sa' => 'edit']);
 

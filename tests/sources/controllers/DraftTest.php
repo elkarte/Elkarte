@@ -3,6 +3,7 @@
 use ElkArte\Controller\Draft;
 use ElkArte\EventManager;
 use ElkArte\User;
+use ElkArte\Languages\Loader;
 
 /**
  * TestCase class for the Draft Controller
@@ -19,11 +20,13 @@ class TestDraft extends ElkArteCommonSetupTest
 	 */
 	protected function setUp(): void
 	{
+		global $txt;
 		// Load in the common items so the system thinks we have an active login
 		parent::setUp();
 
 		new ElkArte\Themes\ThemeLoader();
-		\ElkArte\Themes\ThemeLoader::loadLanguageFile('Drafts', 'english', true, true);
+		$lang = new Loader('english', $txt, database());
+		$lang->load('Drafts');
 	}
 
 	/**
