@@ -92,8 +92,8 @@ class ManageAvatars extends AbstractController
 
 			// Ensure we do not have empty values for these
 			$this->_req->post = (object) array_filter((array) $this->_req->post);
-			$this->_req->post->custom_avatar_dir = $this->_req->getPost('custom_avatar_dir', 'trim', BOARDDIR . '/custom_avatars');
-			$this->_req->post->custom_avatar_url = $this->_req->getPost('custom_avatar_url', 'trim', $boardurl . '/custom_avatars');
+			$this->_req->post->custom_avatar_dir = $this->_req->getPost('custom_avatar_dir', 'trim', BOARDDIR . '/avatars_user');
+			$this->_req->post->custom_avatar_url = $this->_req->getPost('custom_avatar_url', 'trim', $boardurl . '/avatars_user');
 			$this->_req->post->avatar_directory = $this->_req->getPost('avatar_directory', 'trim', BOARDDIR . '/avatars');
 			$this->_req->post->avatar_url = $this->_req->getPost('avatar_url', 'trim', $boardurl . '/avatars');
 
@@ -155,14 +155,14 @@ class ManageAvatars extends AbstractController
 			array('check', 'avatar_download_external', 0, 'onchange' => 'fUpdateStatus();'),
 			array('title', 'gravatar'),
 			array('check', 'avatar_gravatar_enabled'),
-			array('select', 'gravatar_rating',
-				  array(
-					  'g' => 'g',
-					  'pg' => 'pg',
-					  'r' => 'r',
-					  'x' => 'x',
-				  ),
-			),
+			array('select', 'gravatar_rating', ['g' => 'g', 'pg' => 'pg', 'r' => 'r', 'x' => 'x']),
+			array('select', 'gravatar_default', [
+				'none' => $txt['gravatar_none'],
+				'identicon' => $txt['gravatar_identicon'],
+				'monsterid' => $txt['gravatar_monsterid'],
+				'wavatar' => $txt['gravatar_wavatar'],
+				'retro' => $txt['gravatar_retro'],
+				'robohash' => $txt['gravatar_robohash']]),
 			// Upload-able avatars?
 			array('title', 'avatar_upload'),
 			array('check', 'avatar_upload_enabled'),
