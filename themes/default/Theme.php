@@ -930,7 +930,7 @@ class Theme extends BaseTheme
 			$this->addCSSRules('
 	.i-account:before {
 		content: "";
-		background-image: url("' . $this->user->avatar['href'] . '");
+		background-image: url("' . htmlspecialchars_decode($this->user->avatar['href']) . '");
 		filter: unset;
 	}');
 		}
