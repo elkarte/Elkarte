@@ -19,6 +19,9 @@ use \ElkArte\Graphics\Image;
 /**
  * Class Imagick
  *
+ * This class will load and save an animated gif, however any manipulation will remove said animation.  It currently
+ * only provides validation/inspection functions (should you want to keep the animation intact).
+ *
  * @package ElkArte\Graphics
  */
 class Imagick extends AbstractManipulator
@@ -91,8 +94,18 @@ class Imagick extends AbstractManipulator
 	protected function _setImage()
 	{
 		// Update the image size values
-		$this->_width = $this->imageDimensions[0] = $this->_image->getImageWidth();
-		$this->_height = $this->imageDimensions[1] = $this->_image->getImageHeight();
+		$this->_image->setFirstIterator();
+
+		try
+		{
+			$this->_width = $this->imageDimensions[0] = $this->_image->getImageWidth();
+			$this->_height = $this->imageDimensions[1] = $this->_image->getImageHeight();
+		}
+		catch (\ImagickException $e)
+		{
+			$this->_width = $this->imageDimensions[0] = $this->imageDimensions[0] ?? 0;
+			$this->_height = $this->imageDimensions[1] = $this->imageDimensions[1] ?? 0;
+		}
 	}
 
 	/**
@@ -114,7 +127,7 @@ class Imagick extends AbstractManipulator
 				$this->_image = new \Imagick();
 				$this->_image->readImageBlob($image);
 			}
-			catch (\Exception $e)
+			catch (\ImagickException $e)
 			{
 				return false;
 			}
@@ -238,7 +251,15 @@ class Imagick extends AbstractManipulator
 				}
 				else
 				{
-					$success = $this->_image->writeImage($file_name);
+					if ($preferred_format === IMAGETYPE_GIF && $this->_image->getNumberImages() !== 0)
+					{
+						// Write all animated gif frames
+						$success = $this->_image->writeImages($file_name, true);
+					}
+					else
+					{
+						$success = $this->_image->writeImage($file_name);
+					}
 				}
 			}
 		}
