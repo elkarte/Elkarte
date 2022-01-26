@@ -18,6 +18,7 @@
 use ElkArte\Cache\Cache;
 use ElkArte\Controller\Auth;
 use ElkArte\EventManager;
+use ElkArte\FileFunctions;
 use ElkArte\Http\Headers;
 use ElkArte\Languages\Txt;
 use ElkArte\TokenHash;
@@ -1542,12 +1543,17 @@ function secureDirectory($path, $allow_localhost = false, $files = '*')
 		return 'empty_path';
 	}
 
-	if (!is_writable($path))
+	if (!FileFunctions::instance()->isWritable($path))
 	{
 		return 'path_not_writable';
 	}
 
 	$directoryname = basename($path);
+
+	// How deep is this from our boarddir
+	$tree = explode(DIRECTORY_SEPARATOR, $path);
+	$root = explode(DIRECTORY_SEPARATOR,BOARDDIR);
+	$count = max(count($tree) - count($root), 0);
 
 	$errors = array();
 
@@ -1610,10 +1616,10 @@ function secureDirectory($path, $allow_localhost = false, $files = '*')
  */
 
 // Look for Settings.php....
-if (file_exists(dirname(__FILE__), 2) . \'/Settings.php\'))
+if (file_exists(dirname(__FILE__, ' . ($count + 1) . ') . \'/Settings.php\'))
 {
 	// Found it!
-	require(dirname(__FILE__), 2) . \'/Settings.php\');
+	require(dirname(__FILE__, ' . ($count + 1) . ') . \'/Settings.php\');
 	header(\'Location: \' . $boardurl);
 }
 // Can\'t find it... just forget it.
