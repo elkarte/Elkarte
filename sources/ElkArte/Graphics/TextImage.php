@@ -126,8 +126,9 @@ class TextImage extends Image
 	 * @param int $max_height allowed height
 	 * @param string $dstName name to save
 	 * @param string $format image format to save the thumbnail
+	 * @param null|bool $force if forcing the image resize to scale up, the default action
 	 */
-	public function createThumbnail($max_width, $max_height, $dstName = '', $format = '')
+	public function createThumbnail($max_width, $max_height, $dstName = '', $format = '', $force = null)
 	{
 	}
 

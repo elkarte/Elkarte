@@ -5913,8 +5913,8 @@ Stef                       ^
 
 	.statusbar .insertoverlay .button {
 		top: -40px;
-		left: auto;
 		right: 0;
+		left: auto;
 		width: initial !important;
 		border-radius: 4px;
 	}

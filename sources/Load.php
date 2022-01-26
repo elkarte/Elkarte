@@ -1308,7 +1308,7 @@ function determineAvatar($profile)
 		hash('md5', strtolower($profile['email_address'])) .
 		'?s=' . $modSettings['avatar_max_height'] .
 		(!empty($modSettings['gravatar_rating']) ? ('&amp;r=' . $modSettings['gravatar_rating']) : '') .
-		(!empty($modSettings['gravatar_default'] && $modSettings['gravatar_default'] !== 'none') ? ('&amp;d=' . $modSettings['gravatar_default']) : '');
+		((!empty($modSettings['gravatar_default']) && $modSettings['gravatar_default'] !== 'none') ? ('&amp;d=' . $modSettings['gravatar_default']) : '');
 
 	// uploaded avatar?
 	if ($profile['id_attach'] > 0 && empty($profile['avatar']))
