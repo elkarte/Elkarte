@@ -529,7 +529,7 @@ legend {
 }
 
 .i-envelope-blank::before, .i-envelope-o-blank::before,
-.i-bell-blank::before, .i-search::before, .i-view::before, .i-account::before,
+.i-bell-blank::before, .i-search::before, .i-view::before,
 .i-register::before, .i-cog::before,
 .i-comments-blank::before, .i-comments::before,
 .i-share::before,
@@ -614,7 +614,7 @@ legend {
 	--hexcode: #828282;
 }
 
-.colorize-white:before {
+.i-share::before, .i-account::before {
 	filter: invert(100%) sepia(0%) saturate(4462%) hue-rotate(87deg) brightness(123%) contrast(87%);
 	--hexcode: #EEEEEE;
 }
