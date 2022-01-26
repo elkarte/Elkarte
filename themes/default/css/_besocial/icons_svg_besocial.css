@@ -7,8 +7,27 @@
    You can create filters for any hex color using https://codepen.io/sosuke/pen/Pjoqqp
    NOTE --hexcode is not needed, it is simply to show the hex color being applied
 
-   Some areas, for example board icons, are custom content as well
-   */
+   Some areas, for example board icons, are custom content as well */
+
+/* Top Menu icons */
+.i-menu-pm-on::before, .i-menu-pm-on.enabled::before, .i-menu-pm-off::before,
+.i-menu-mentions-on::before, .i-menu-mentions-on.enabled::before, .i-menu-mentions-off::before {
+	filter: invert(66%) sepia(32%) saturate(4068%) hue-rotate(2deg) brightness(107%) contrast(102%);
+	--hexcode: #FFA500;
+}
+
+.i-menu-admin::before,
+.i-menu-profile::before, .i-menu-profile.enabled::before,
+.i-menu-unread.enabled::before,
+.i-menu-unreadreplies.enabled::before,
+.i-menu-login::before, .i-menu-login.enabled::before,
+.i-menu-register.enabled::before,
+.i-menu-unread::before,
+.i-menu-unreadreplies::before,
+.i-menu-register::before{
+	filter: invert(63%) sepia(41%) saturate(641%) hue-rotate(157deg) brightness(86%) contrast(99%);
+	--hexcode: #43A8DA;
+}
 
 /* Communication icons */
 .i-envelope-o::before, .i-envelope-blank::before {
@@ -43,8 +62,8 @@
 .i-comment-blank::before, .i-comments-blank::before, .i-comments::before,
 .i-bell-blank::before, .i-account::before, .i-register::before,
 .i-cog::before, .i-sign-in::before, .i-sign-out::before, .i-phone::before {
-	--hexcode: #43A8DA;
 	filter: invert(63%) sepia(41%) saturate(641%) hue-rotate(157deg) brightness(86%) contrast(99%);
+	--hexcode: #43A8DA;
 }
 
 .i-bell::before {

@@ -928,7 +928,7 @@ class Theme extends BaseTheme
 		if (!empty($this->user->avatar['href']))
 		{
 			$this->addCSSRules('
-	.i-account:before {
+	.i-menu-profile::before, .i-menu-profile.enabled::before {
 		content: "";
 		background-image: url("' . htmlspecialchars_decode($this->user->avatar['href']) . '");
 		filter: unset;

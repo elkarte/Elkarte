@@ -1814,7 +1814,7 @@ nav.breadcrumb {
 	}
 
 	/* menu to icons */
-	#main_menu .icon-menu, #main_menu .icon-menu.i-account {
+	#main_menu .icon-menu, #main_menu .icon-menu.i-menu-profile {
 		display: inline-block;
 		width: 45px;
 		height: 45px;
@@ -1824,7 +1824,7 @@ nav.breadcrumb {
 		border-radius: .25em;
 	}
 
-	.i-account::before {
+	.i-menu-profile::before {
 		width: 36px;
 		height: 36px;
 		transform: translate(-3px, -5px);

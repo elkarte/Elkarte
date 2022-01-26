@@ -227,7 +227,7 @@ h2 a.collapse {
 	margin-left: 0;
 }
 
-.i-account::before {
+.i-menu-profile::before {
 	transform: translate(8px, -2px);
 }
 
