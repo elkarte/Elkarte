@@ -586,8 +586,8 @@ function availableThemes($current_theme, $current_member)
 		$theme_thumbnail_href = $theme_data['images_url'] . '/thumbnail.png';
 
 		$txt['theme_description'] = '';
-		$lang = new LangLoader(null. $txt, $db);
-		$lang->setchangePath($theme_data['theme_dir'] . '/Languages');
+		$lang = new LangLoader(null, $txt, $db);
+		$lang->changePath($theme_data['theme_dir'] . '/Languages');
 		$lang->load('Settings', false);
 
 		$available_themes[$id_theme]['thumbnail_href'] = str_replace('{images_url}', $settings['images_url'], $theme_thumbnail_href);

@@ -200,7 +200,7 @@ class ApprovalNotification implements ScheduledTaskInterface
 			// Load the language file as required.
 			if (empty($current_language) || $current_language !== $member['language'])
 			{
-				$lang = new Loader($member['language'], $txt);
+				$lang = new Loader($member['language'], $txt, database());
 				$lang->load('EmailTemplates');
 				$current_language = $member['language'];
 			}

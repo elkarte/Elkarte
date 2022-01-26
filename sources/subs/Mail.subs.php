@@ -16,7 +16,7 @@
  */
 
 use BBC\ParserWrapper;
-use ElkArte\Langauges\Txt;
+use ElkArte\Languages\Txt;
 use ElkArte\User;
 use ElkArte\Languages\Loader as LangLoader;
 

@@ -107,8 +107,6 @@ class Errors extends AbstractModel
 		$lang = new Loader($language, $mtxt, database());
 		$lang->load('Errors');
 
-		$reload_lang_file = $language !== $this->user->language;
-
 		$error_message = !isset($mtxt[$error]) ? $error : (empty($sprintf) ? $mtxt[$error] : vsprintf($mtxt[$error], $sprintf));
 		$this->log_error($error_message, $error_type, $file, $line);
 
