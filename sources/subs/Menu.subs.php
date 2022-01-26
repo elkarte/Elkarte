@@ -344,7 +344,7 @@ function loadDefaultMenuButtons()
 				'drafts' => array(
 					'title' => $txt['mydrafts'],
 					'href' => getUrl('profile', ['action' => 'profile', 'area' => 'showdrafts', 'u' => User::$info->id, 'name' => User::$info->name]),
-					'show' => !empty($modSettings['drafts_enabled']) && !empty($modSettings['drafts_post_enabled']) && allowedTo('post_draft'),
+					'show' => !empty($modSettings['drafts_enabled']) && !empty($modSettings['drafts_post_enabled']),
 				),
 				'forumprofile' => array(
 					'title' => $txt['forumprofile'],
@@ -413,7 +413,6 @@ function loadDefaultMenuButtons()
 			'data-icon' => 'i-sign-in',
 			'show' => User::$info->is_guest,
 		),
-
 		'register' => array(
 			'title' => $txt['register'],
 			'href' => getUrl('action', ['action' => 'register']),
