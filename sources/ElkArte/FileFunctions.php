@@ -139,6 +139,28 @@ class FileFunctions
 	}
 
 	/**
+	 * filesize() helper.  filesize can throw an E_WARNING on failure.
+	 * Returns the filesize in bytes on success or false on failure.
+	 *
+	 * @param string $item a file location
+	 * @return int|bool
+	 */
+	public function fileSize($item)
+	{
+		try
+		{
+			$fileInfo = new \SplFileInfo($item);
+			$size = $fileInfo->getSize();
+		}
+		catch (\RuntimeException $e)
+		{
+			$size = false;
+		}
+
+		return $size;
+	}
+
+	/**
 	 * is_writable() helper.  is_writable can throw an E_WARNING on failure.
 	 * Returns true if the filename/directory exists and is writable.
 	 *
@@ -162,7 +184,6 @@ class FileFunctions
 
 		return false;
 	}
-
 
 	/**
 	 * Creates a directory as defined by a supplied path
