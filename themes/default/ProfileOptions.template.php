@@ -1251,7 +1251,7 @@ function template_profile_signature_modify()
 									var maxLength = ', $context['signature_limits']['max_length'], ';
 
 									$(function() {
-										calcCharLeft();
+										calcCharLeft(true);
 										$("#preview_button").click(function() {
 											return ajax_getSignaturePreview(true);
 										});
@@ -1330,7 +1330,7 @@ function template_profile_avatar_select()
 										</select>
 									</div>
 									<div>
-										<img id="avatar" src="', $modSettings['avatar_url'] . '/blank.png', '" alt="" />
+										<img id="avatar avatarresize" src="', $modSettings['avatar_url'] . '/blank.png', '" alt="" />
 									</div>
 								</div>';
 	}
@@ -1345,7 +1345,7 @@ function template_profile_avatar_select()
 									</div>
 									<input type="text" id="userpicpersonal" name="userpicpersonal" value="', $context['member']['avatar']['external'], '" onchange="previewExternalAvatar(this.value);" class="input_text" />
 									<br /><br />
-									<img id="external" src="', !empty($context['member']['avatar']['allow_external']) && $context['member']['avatar']['choice'] == 'external' ? $context['member']['avatar']['external'] : $modSettings['avatar_url'] . '/blank.png', '" alt="" ', !empty($modSettings['avatar_max_height']) ? 'height="' . $modSettings['avatar_max_height'] . '" ' : '', !empty($modSettings['avatar_max_width']) ? 'width="' . $modSettings['avatar_max_width'] . '"' : '', '/>
+									<img id="external" src="', $context['member']['avatar']['choice'] === 'external' ? $context['member']['avatar']['external'] : $modSettings['avatar_url'] . '/blank.png', '" alt="" class="avatar avatarresize" />
 								</div>';
 	}
 
@@ -1363,10 +1363,11 @@ function template_profile_avatar_select()
 	{
 		echo '
 								<div id="avatar_upload">
-									<input type="file" name="attachment" id="avatar_upload_box" class="input_file" />
+									<input type="file" name="attachment" id="avatar_upload_box" class="input_file" accept="image/*" onchange="previewUploadedAvatar(this)"/>
 									', ($context['member']['avatar']['id_attach'] > 0 ? '
 									<br /><br />
-									<img src="' . $context['member']['avatar']['href'] . (strpos($context['member']['avatar']['href'], '?') === false ? '?' : '&') . 'time=' . time() . '" alt="" />
+									<img id="current_avatar" class="avatar avatarresize" src="' . $context['member']['avatar']['href'] . (strpos($context['member']['avatar']['href'], '?') === false ? '?' : '&') . 'time=' . time() . '" alt="" />
+									<img id="current_avatar_new" class="avatar avatarresize hide border_error" alt="" src="" />
 									<input type="hidden" name="id_attach" value="' . $context['member']['avatar']['id_attach'] . '" />' : ''), '
 								</div>';
 	}
