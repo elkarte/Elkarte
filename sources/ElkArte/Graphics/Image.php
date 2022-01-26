@@ -17,6 +17,7 @@
 
 namespace ElkArte\Graphics;
 
+use ElkArte\FileFunctions;
 use ElkArte\Graphics\Manipulators\Imagick;
 use ElkArte\Graphics\Manipulators\Gd2;
 use ElkArte\Exceptions\Exception;
@@ -50,6 +51,9 @@ class Image
 
 	/** @var bool if the image has been loaded into the manipulator */
 	protected $_image_loaded = false;
+
+	/** @var string what manipulator (GD, Imagick, etc) is in use */
+	protected $_current_manipulator = '';
 
 	/**
 	 * Image constructor.
@@ -96,6 +100,16 @@ class Image
 	}
 
 	/**
+	 * Returns if the loading of the image was successful
+	 *
+	 * @return bool
+	 */
+	public function isImageLoaded()
+	{
+		return $this->_image_loaded && $this->isImage();
+	}
+
+	/**
 	 * Determine and set what image library we will use
 	 *
 	 * @throws \Exception
@@ -106,15 +120,27 @@ class Image
 		if (!$this->_force_gd && Imagick::canUse())
 		{
 			$this->_manipulator = new Imagick($this->_fileName);
+			$this->_current_manipulator = 'Imagick';
 		}
 		elseif (Gd2::canUse())
 		{
 			$this->_manipulator = new Gd2($this->_fileName);
+			$this->_current_manipulator = 'GD';
 		}
 		else
 		{
 			throw new \Exception('No image manipulators available');
 		}
+	}
+
+	/**
+	 * Returns the current image library in use.
+	 *
+	 * @return string
+	 */
+	public function getManipulator()
+	{
+		return $this->_current_manipulator ?? '';
 	}
 
 	/**
@@ -136,7 +162,7 @@ class Image
 	{
 		clearstatcache(false, $this->_fileName);
 
-		return @filesize($this->_fileName);
+		return FileFunctions::instance()->fileSize($this->_fileName);
 	}
 
 	/**
@@ -146,6 +172,12 @@ class Image
 	 */
 	public function getMimeType()
 	{
+		// Try Exif which reads the file headers, most accurate for images
+		if (function_exists('exif_imagetype'))
+		{
+			return image_type_to_mime_type(exif_imagetype($this->_fileName));
+		}
+
 		return getMimeType($this->_fileName);
 	}
 
@@ -170,9 +202,8 @@ class Image
 	 * @param int $max_height allowed height
 	 * @param string $dstName name to save
 	 * @param string $format image format to save the thumbnail
-	 * @param null|bool $force if forcing the image resize to scale up
+	 * @param null|bool $force if forcing the image resize to scale up, the default action
 	 * @return bool|\ElkArte\Graphics\Image On success returns an image class loaded with new image
-	 * @throws \Exception
 	 */
 	public function createThumbnail($max_width, $max_height, $dstName = '', $format = '', $force = null)
 	{
@@ -191,6 +222,7 @@ class Image
 		if ($success)
 		{
 			$this->saveImage($dstName, $format);
+			FileFunctions::instance()->chmod($dstName);
 			$success = new Image($dstName);
 		}
 		else
@@ -290,9 +322,7 @@ class Image
 	 */
 	public function saveImage($file_name = '', $preferred_format = IMAGETYPE_JPEG, $quality = 85)
 	{
-		$success = $this->_manipulator->output($file_name, $preferred_format, $quality);
-
-		return $success;
+		return $this->_manipulator->output($file_name, $preferred_format, $quality);
 	}
 
 	/**
@@ -310,7 +340,7 @@ class Image
 	public function reEncodeImage()
 	{
 		// The image should already be loaded
-		if (!$this->_image_loaded)
+		if (!$this->isImage())
 		{
 			return false;
 		}
