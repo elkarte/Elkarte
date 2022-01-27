@@ -892,7 +892,7 @@ class ProfileInfo extends AbstractController
 					),
 					'data' => array(
 						'sprintf' => array(
-							'format' => '<a href="' . getUrl('action', ['topic' => '%1$d.0']) . '">%2$s</a>',
+							'format' => '<a href="' . getUrl('profile', ['topic' => '%1$d.0']) . '">%2$s</a>',
 							'params' => array(
 								'id_topic' => false,
 								'subject' => false,
