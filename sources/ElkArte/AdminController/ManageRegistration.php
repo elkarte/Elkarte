@@ -263,7 +263,7 @@ class ManageRegistration extends AbstractController
 		// I hereby agree not to be a lazy bum.
 		global $txt, $context, $modSettings;
 
-		// By default we look at Langauges/Agreement/English.txt.
+		// By default we look at Languages/Agreement/English.txt.
 		$context['current_agreement'] = '';
 
 		// Is there more than one to edit?
@@ -342,7 +342,7 @@ class ManageRegistration extends AbstractController
 		// I hereby agree not to be a lazy bum.
 		global $txt, $context, $modSettings;
 
-		// By default we look at Langauges/PrivacyPolicy/English.txt.
+		// By default we look at Languages/PrivacyPolicy/English.txt.
 		$context['current_agreement'] = '';
 
 		// Is there more than one to edit?

@@ -86,7 +86,6 @@ class Loader
 				continue;
 			}
 
-			$found = false;
 			$found_fallback = false;
 			if ($this->load_fallback)
 			{

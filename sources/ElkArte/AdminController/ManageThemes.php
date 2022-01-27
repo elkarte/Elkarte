@@ -410,10 +410,10 @@ class ManageThemes extends AbstractController
 		new ThemeLoader($theme, false);
 
 		// Also load the actual themes language file - in case of special settings.
-		Txt::load('Settings', '', true, true);
+		Txt::load('Settings', '', true);
 
 		// And the custom language strings...
-		Txt::load('ThemeStrings', '', false, true);
+		Txt::load('ThemeStrings', '', false);
 
 		// Let the theme take care of the settings.
 		theme()->getTemplates()->load('Settings');

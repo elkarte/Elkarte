@@ -601,7 +601,7 @@ class Notify extends AbstractController
 	private function _setUserEmailNotificationOff($memID, $area)
 	{
 		require_once(SUBSDIR . '/Profile.subs.php');
-		ThemeLoader::loadLanguageFile('Profile');
+		Txt::load('Profile');
 
 		$_POST['notify_submit'] = true;
 

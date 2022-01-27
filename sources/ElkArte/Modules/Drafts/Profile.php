@@ -18,7 +18,7 @@ namespace ElkArte\Modules\Drafts;
 
 use ElkArte\EventManager;
 use ElkArte\Modules\AbstractModule;
-use ElkArte\Langauges\Txt;
+use ElkArte\Languages\Txt;
 
 /**
  * Class \ElkArte\Modules\Drafts\Profile
