@@ -163,7 +163,6 @@ class Theme extends BaseTheme
 				->contentType('text/html', 'UTF-8');
 		}
 
-		// @todo Probably temporary ($_REQUEST['xml'] should be replaced by $_REQUEST['api'])
 		$api = $this->_req->getRequest('api', 'trim');
 		if (isset($api))
 		{

@@ -131,6 +131,6 @@ class UserSettings extends ValuesContainerReadOnly
 			$password = hash('sha256', Util::strtolower($this->member_name) . un_htmlspecialchars($password));
 		}
 
-		return (bool) password_verify($password, $this->passwd);
+		return password_verify($password, $this->passwd);
 	}
 }
