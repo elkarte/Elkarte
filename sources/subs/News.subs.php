@@ -15,6 +15,7 @@
  */
 
 use BBC\ParserWrapper;
+use ElkArte\Util;
 
 /**
  * Prepares an array of the forum news items
@@ -387,4 +388,152 @@ function getXMLRecent($query_this_board, $board, $limit)
 	);
 
 	return $data;
+}
+
+/**
+ * Called to convert data to xml
+ * Finds urls for local site and sanitizes them
+ *
+ * @param string $val
+ *
+ * @return null|string|string[]
+ */
+function fix_possible_url($val)
+{
+	global $scripturl;
+
+	if (substr($val, 0, strlen($scripturl)) != $scripturl)
+	{
+		return $val;
+	}
+
+	call_integration_hook('integrate_fix_url', array(&$val));
+
+	return $val;
+}
+
+/**
+ * For highest feed compatibility, some special characters should be provided
+ * as character entities and not html entities
+ *
+ * @param string $data
+ *
+ * @return string
+ */
+function encode_special($data)
+{
+	return strtr($data, array('>' => '&#x3E;', '&' => '&#x26;', '<' => '&#x3C;'));
+}
+
+/**
+ * Ensures supplied data is properly encapsulated in cdata xml tags
+ * Called from action_xmlprofile in News.controller.php
+ *
+ * @param string $data
+ * @param string $ns
+ * @param string $override
+ *
+ * @return string
+ */
+function cdata_parse($data, $ns = '', $override = null)
+{
+	static $cdata_override = false;
+
+	if ($override !== null)
+	{
+		$cdata_override = (bool) $override;
+	}
+
+	// Are we not doing it?
+	if (!empty($cdata_override))
+	{
+		return $data;
+	}
+
+	$cdata = '<![CDATA[';
+
+	for ($pos = 0, $n = Util::strlen($data); $pos < $n; null)
+	{
+		$positions = array(
+			Util::strpos($data, '&', $pos),
+			Util::strpos($data, ']]>', $pos),
+		);
+
+		if ($ns !== '')
+		{
+			$positions[] = Util::strpos($data, '<', $pos);
+		}
+
+		foreach ($positions as $k => $dummy)
+		{
+			if ($dummy === false)
+			{
+				unset($positions[$k]);
+			}
+		}
+
+		$old = $pos;
+		$pos = empty($positions) ? $n : min($positions);
+
+		if ($pos - $old > 0)
+		{
+			$cdata .= Util::substr($data, $old, $pos - $old);
+		}
+
+		if ($pos >= $n)
+		{
+			break;
+		}
+
+		if (Util::substr($data, $pos, 1) === '<')
+		{
+			$pos2 = Util::strpos($data, '>', $pos);
+			if ($pos2 === false)
+			{
+				$pos2 = $n;
+			}
+
+			if (Util::substr($data, $pos + 1, 1) === '/')
+			{
+				$cdata .= ']]></' . $ns . ':' . Util::substr($data, $pos + 2, $pos2 - $pos - 1) . '<![CDATA[';
+			}
+			else
+			{
+				$cdata .= ']]><' . $ns . ':' . Util::substr($data, $pos + 1, $pos2 - $pos) . '<![CDATA[';
+			}
+
+			$pos = $pos2 + 1;
+		}
+		elseif (Util::substr($data, $pos, 3) == ']]>')
+		{
+			$cdata .= ']]]]><![CDATA[>';
+			$pos = $pos + 3;
+		}
+		elseif (Util::substr($data, $pos, 1) === '&')
+		{
+			$pos2 = Util::strpos($data, ';', $pos);
+
+			if ($pos2 === false)
+			{
+				$pos2 = $n;
+			}
+
+			$ent = Util::substr($data, $pos + 1, $pos2 - $pos - 1);
+
+			if (Util::substr($data, $pos + 1, 1) === '#')
+			{
+				$cdata .= ']]>' . Util::substr($data, $pos, $pos2 - $pos + 1) . '<![CDATA[';
+			}
+			elseif (in_array($ent, array('amp', 'lt', 'gt', 'quot')))
+			{
+				$cdata .= ']]>' . Util::substr($data, $pos, $pos2 - $pos + 1) . '<![CDATA[';
+			}
+
+			$pos = $pos2 + 1;
+		}
+	}
+
+	$cdata .= ']]>';
+
+	return strtr($cdata, array('<![CDATA[]]>' => ''));
 }
