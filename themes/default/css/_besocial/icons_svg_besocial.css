@@ -24,7 +24,7 @@
 .i-menu-register.enabled::before,
 .i-menu-unread::before,
 .i-menu-unreadreplies::before,
-.i-menu-register::before{
+.i-menu-register::before {
 	filter: invert(63%) sepia(41%) saturate(641%) hue-rotate(157deg) brightness(86%) contrast(99%);
 	--hexcode: #43A8DA;
 }
