@@ -156,7 +156,7 @@ class TemporaryAttachment extends ValuesContainer
 		if (@move_uploaded_file($this->data['tmp_name'], $destName))
 		{
 			$this->data['tmp_name'] = $destName;
-			@chmod($destName, 0644);
+			FileFunctions::instance()->chmod($destName);
 		}
 		else
 		{
@@ -257,7 +257,7 @@ class TemporaryAttachment extends ValuesContainer
 
 		// First, the dreaded security check. Sorry folks, but this should't be avoided
 		$image = new Image($this->data['tmp_name']);
-		if ($image->isImage())
+		if ($image->isImageLoaded())
 		{
 			$this->data['imagesize'] = $image->getImageDimensions();
 			$this->data['size'] = $image->getFilesize();
@@ -420,7 +420,7 @@ class TemporaryAttachment extends ValuesContainer
 		if ($this->hasErrors() === false && substr($this->data['type'], 0, 5) === 'image')
 		{
 			$image = new Image($this->data['tmp_name']);
-			if ($image->autoRotate())
+			if ($image->isImageLoaded() && $image->autoRotate())
 			{
 				$image->saveImage($this->data['tmp_name'], IMAGETYPE_JPEG, 95);
 				$this->data['size'] = filesize($this->data['tmp_name']);
@@ -443,7 +443,7 @@ class TemporaryAttachment extends ValuesContainer
 				throw new \Exception('attachment_not_found');
 			}
 
-			unlink($this->data['tmp_name']);
+			FileFunctions::instance()->delete($this->data['tmp_name']);
 		}
 		catch (\Exception $e)
 		{

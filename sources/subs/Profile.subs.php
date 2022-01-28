@@ -16,9 +16,9 @@
 
 use BBC\ParserWrapper;
 use ElkArte\Cache\Cache;
+use ElkArte\Controller\Avatars;
 use ElkArte\DataValidator;
 use ElkArte\Errors\ErrorContext;
-use ElkArte\Graphics\Image;
 use ElkArte\MembersList;
 use ElkArte\Notifications;
 use ElkArte\Languages\Txt;
@@ -2504,18 +2504,14 @@ function profileValidateSignature(&$value)
 /**
  * The avatar is incredibly complicated, what with the options... and what not.
  *
- * @param mixed[] $value
+ * @param string $value
  *
  * @return false|string
- * @throws \ElkArte\Exceptions\Exception attachments_no_write, attach_timeout
- * @todo argh, the avatar here. Take this out of here!
  *
  */
-function profileSaveAvatarData(&$value)
+function profileSaveAvatarData($value)
 {
-	global $modSettings, $profile_vars, $cur_profile, $context;
-
-	$db = database();
+	global $profile_vars, $cur_profile, $context;
 
 	$memID = $context['id_member'];
 	if (empty($memID) && !empty($context['password_auth_failed']))
@@ -2523,297 +2519,21 @@ function profileSaveAvatarData(&$value)
 		return false;
 	}
 
-	// We need to know where we're going to be putting it..
-	require_once(SUBSDIR . '/Attachments.subs.php');
-	require_once(SUBSDIR . '/ManageAttachments.subs.php');
-	$uploadDir = getAvatarPath();
-	$id_folder = getAvatarPathID();
-
-	$downloadedExternalAvatar = false;
-	$valid_http = isset($_POST['userpicpersonal']) && substr($_POST['userpicpersonal'], 0, 7) === 'http://' && strlen($_POST['userpicpersonal']) > 7;
-	$valid_https = isset($_POST['userpicpersonal']) && substr($_POST['userpicpersonal'], 0, 8) === 'https://' && strlen($_POST['userpicpersonal']) > 8;
-	if ($value === 'external' && !empty($modSettings['avatar_external_enabled']) && ($valid_http || $valid_https) && !empty($modSettings['avatar_download_external']))
-	{
-		Txt::load('Post');
-		if (!is_writable($uploadDir))
-		{
-			throw new \ElkArte\Exceptions\Exception('attachments_no_write', 'critical');
-		}
-
-		require_once(SUBSDIR . '/Package.subs.php');
-
-		$url = parse_url($_POST['userpicpersonal']);
-		$contents = fetch_web_data((empty($url['scheme']) ? 'http://' : $url['scheme'] . '://') . $url['host'] . (empty($url['port']) ? '' : ':' . $url['port']) . str_replace(' ', '%20', trim($url['path'])));
-
-		if ($contents !== false)
-		{
-			// Create a hashed name to save
-			$new_avatar_name = $uploadDir . '/' . getAttachmentFilename('avatar_tmp_' . $memID, null, null, true);
-			if (file_put_contents($new_avatar_name, $contents) !== false)
-			{
-				$downloadedExternalAvatar = true;
-				$_FILES['attachment']['tmp_name'] = $new_avatar_name;
-			}
-		}
-	}
-
-	if ($value === 'none')
+	$avatar = new Avatars();
+	$result = $avatar->processValue($value);
+	if ($result !== true)
 	{
 		$profile_vars['avatar'] = '';
 
-		// Reset the attach ID.
-		$cur_profile['id_attach'] = 0;
-		$cur_profile['attachment_type'] = 0;
-		$cur_profile['filename'] = '';
+		// @todo add some specific errors to the class
+		$errors = ErrorContext::context('profile', 0);
+		$errors->addError($result);
+		$context['post_errors'] = array(
+			'errors' => $errors->prepareErrors(),
+			'type' => $errors->getErrorType() == 0 ? 'minor' : 'serious',
+		);
 
-		removeAttachments(array('id_member' => $memID));
-	}
-	elseif ($value === 'server_stored' && !empty($modSettings['avatar_stored_enabled']))
-	{
-		$profile_vars['avatar'] = strtr(empty($_POST['file']) ? (empty($_POST['cat']) ? '' : $_POST['cat']) : $_POST['file'], array('&amp;' => '&'));
-		$profile_vars['avatar'] = preg_match('~^([\w _!@%*=\-#()\[\]&.,]+/)?[\w _!@%*=\-#()\[\]&.,]+$~', $profile_vars['avatar']) != 0 && preg_match('/\.\./', $profile_vars['avatar']) == 0 && file_exists($modSettings['avatar_directory'] . '/' . $profile_vars['avatar']) ? ($profile_vars['avatar'] === 'blank.png' ? '' : $profile_vars['avatar']) : '';
-
-		// Clear current profile...
-		$cur_profile['id_attach'] = 0;
-		$cur_profile['attachment_type'] = 0;
-		$cur_profile['filename'] = '';
-
-		// Get rid of their old avatar. (if uploaded.)
-		removeAttachments(array('id_member' => $memID));
-	}
-	elseif ($value === 'gravatar' && !empty($modSettings['avatar_gravatar_enabled']))
-	{
-		$profile_vars['avatar'] = 'gravatar';
-
-		// Reset the attach ID.
-		$cur_profile['id_attach'] = 0;
-		$cur_profile['attachment_type'] = 0;
-		$cur_profile['filename'] = '';
-
-		removeAttachments(array('id_member' => $memID));
-	}
-	elseif ($value === 'external' && !empty($modSettings['avatar_external_enabled']) && ($valid_http || $valid_https) && empty($modSettings['avatar_download_external']))
-	{
-		// We need these clean...
-		$cur_profile['id_attach'] = 0;
-		$cur_profile['attachment_type'] = 0;
-		$cur_profile['filename'] = '';
-
-		// Remove any attached avatar...
-		removeAttachments(array('id_member' => $memID));
-
-		$profile_vars['avatar'] = str_replace(' ', '%20', preg_replace('~action(?:=|%3d)(?!dlattach)~i', 'action-', $_POST['userpicpersonal']));
-
-		if (preg_match('~^https?:///?$~i', $profile_vars['avatar']) === 1)
-		{
-			$profile_vars['avatar'] = '';
-		}
-		// Trying to make us do something we'll regret?
-		elseif ((!$valid_http && !$valid_https) || ($valid_http && detectServer()->supportsSSL()))
-		{
-			return 'bad_avatar';
-		}
-		// Should we check dimensions?
-		elseif (!empty($modSettings['avatar_max_height']) || !empty($modSettings['avatar_max_width']))
-		{
-			// Now let's validate the avatar.
-			$sizes = url_image_size($profile_vars['avatar']);
-
-			if (is_array($sizes) && (($sizes[0] > $modSettings['avatar_max_width'] && !empty($modSettings['avatar_max_width'])) || ($sizes[1] > $modSettings['avatar_max_height'] && !empty($modSettings['avatar_max_height']))))
-			{
-				// Houston, we have a problem. The avatar is too large!!
-				if ($modSettings['avatar_action_too_large'] === 'option_refuse')
-				{
-					return 'bad_avatar';
-				}
-				elseif ($modSettings['avatar_action_too_large'] === 'option_download_and_resize')
-				{
-					// @todo remove this if appropriate
-					require_once(SUBSDIR . '/Attachments.subs.php');
-					if (saveAvatar($profile_vars['avatar'], $memID, $modSettings['avatar_max_width'], $modSettings['avatar_max_height']))
-					{
-						$profile_vars['avatar'] = '';
-						$cur_profile['id_attach'] = $modSettings['new_avatar_data']['id'];
-						$cur_profile['filename'] = $modSettings['new_avatar_data']['filename'];
-						$cur_profile['attachment_type'] = $modSettings['new_avatar_data']['type'];
-					}
-					else
-					{
-						return 'bad_avatar';
-					}
-				}
-			}
-		}
-	}
-	elseif (($value === 'upload' && !empty($modSettings['avatar_upload_enabled'])) || $downloadedExternalAvatar)
-	{
-		if ((isset($_FILES['attachment']['name']) && $_FILES['attachment']['name'] != '') || $downloadedExternalAvatar)
-		{
-			// Get the dimensions of the image.
-			if (!$downloadedExternalAvatar)
-			{
-				if (!is_writable($uploadDir))
-				{
-					throw new \ElkArte\Exceptions\Exception('Post.attachments_no_write', 'critical');
-				}
-
-				$new_avatar_name = $uploadDir . '/' . getAttachmentFilename('avatar_tmp_' . $memID, null, null, true);
-				if (!move_uploaded_file($_FILES['attachment']['tmp_name'], $new_avatar_name))
-				{
-					throw new \ElkArte\Exceptions\Exception('Post.attach_timeout', 'critical');
-				}
-
-				$_FILES['attachment']['tmp_name'] = $new_avatar_name;
-			}
-
-			// If there is no size, then it's probably not a valid pic, so lets remove it.
-			$sizes = elk_getimagesize($_FILES['attachment']['tmp_name'], false);
-			if ($sizes === false)
-			{
-				@unlink($_FILES['attachment']['tmp_name']);
-
-				return 'bad_avatar';
-			}
-			// Check whether the image is too large.
-			elseif ((!empty($modSettings['avatar_max_width']) && $sizes[0] > $modSettings['avatar_max_width']) || (!empty($modSettings['avatar_max_height']) && $sizes[1] > $modSettings['avatar_max_height']))
-			{
-				if (!empty($modSettings['avatar_action_too_large']) && $modSettings['avatar_action_too_large'] === 'option_download_and_resize')
-				{
-					// Attempt to chmod it.
-					@chmod($_FILES['attachment']['tmp_name'], 0644);
-
-					// @todo remove this require when appropriate
-					require_once(SUBSDIR . '/Attachments.subs.php');
-					if (!saveAvatar($_FILES['attachment']['tmp_name'], $memID, $modSettings['avatar_max_width'], $modSettings['avatar_max_height']))
-					{
-						// Something went wrong, so lets delete this offender
-						@unlink($_FILES['attachment']['tmp_name']);
-
-						return 'bad_avatar';
-					}
-
-					// Reset attachment avatar data.
-					$cur_profile['id_attach'] = $modSettings['new_avatar_data']['id'];
-					$cur_profile['filename'] = $modSettings['new_avatar_data']['filename'];
-					$cur_profile['attachment_type'] = $modSettings['new_avatar_data']['type'];
-				}
-				elseif (!empty($modSettings['avatar_action_too_large']) && !empty($modSettings['avatar_reencode']))
-				{
-					// Attempt to chmod it.
-					@chmod($_FILES['attachment']['tmp_name'], 0644);
-
-					$image = new Image($_FILES['attachment']['tmp_name']);
-					if (!$image->reEncodeImage())
-					{
-						@unlink($_FILES['attachment']['tmp_name']);
-
-						return 'bad_avatar';
-					}
-
-					// @todo remove this require when appropriate
-					require_once(SUBSDIR . '/Attachments.subs.php');
-					if (!saveAvatar($_FILES['attachment']['tmp_name'], $memID, $modSettings['avatar_max_width'], $modSettings['avatar_max_height']))
-					{
-						// Something went wrong, so lets delete this offender
-						@unlink($_FILES['attachment']['tmp_name']);
-
-						return 'bad_avatar5';
-					}
-
-					// Reset attachment avatar data.
-					$cur_profile['id_attach'] = $modSettings['new_avatar_data']['id'];
-					$cur_profile['filename'] = $modSettings['new_avatar_data']['filename'];
-					$cur_profile['attachment_type'] = $modSettings['new_avatar_data']['type'];
-				}
-				else
-				{
-					@unlink($_FILES['attachment']['tmp_name']);
-
-					return 'bad_avatar';
-				}
-			}
-			elseif (is_array($sizes))
-			{
-				// Now try to find an infection.
-				$image = new Image($_FILES['attachment']['tmp_name']);
-				$size = $image->getSize();
-				$valid_mime = getValidMimeImageType($size[2]);
-				if ($valid_mime !== '')
-				{
-					if (!$image->checkImageContents())
-					{
-						// It's bad. Try to re-encode the contents?
-						if (empty($modSettings['avatar_reencode']) || (!$image->reEncodeImage()))
-						{
-							@unlink($_FILES['attachment']['tmp_name']);
-
-							return 'bad_avatar';
-						}
-					}
-				}
-
-				$extensions = array(
-					'1' => 'gif',
-					'2' => 'jpg',
-					'3' => 'png',
-					'6' => 'bmp'
-				);
-
-				$extension = $extensions[$sizes[2]] ?? 'bmp';
-				$mime_type = 'image/' . ($extension === 'jpg' ? 'jpeg' : ($extension === 'bmp' ? 'x-ms-bmp' : $extension));
-				$destName = 'avatar_' . $memID . '_' . time() . '.' . $extension;
-				list ($width, $height) = elk_getimagesize($_FILES['attachment']['tmp_name']);
-				$file_hash = empty($modSettings['custom_avatar_enabled']) ? getAttachmentFilename($destName, null, null, true) : '';
-
-				// Remove previous attachments this member might have had.
-				removeAttachments(array('id_member' => $memID));
-
-				$db->insert('',
-					'{db_prefix}attachments',
-					array(
-						'id_member' => 'int', 'attachment_type' => 'int', 'filename' => 'string', 'file_hash' => 'string', 'fileext' => 'string', 'size' => 'int',
-						'width' => 'int', 'height' => 'int', 'mime_type' => 'string', 'id_folder' => 'int',
-					),
-					array(
-						$memID, (empty($modSettings['custom_avatar_enabled']) ? 0 : 1), $destName, $file_hash, $extension, filesize($_FILES['attachment']['tmp_name']),
-						(int) $width, (int) $height, $mime_type, $id_folder,
-					),
-					array('id_attach')
-				);
-
-				$cur_profile['id_attach'] = $db->insert_id('{db_prefix}attachments');
-				$cur_profile['filename'] = $destName;
-				$cur_profile['attachment_type'] = empty($modSettings['custom_avatar_enabled']) ? 0 : 1;
-
-				$destinationPath = $uploadDir . '/' . (empty($file_hash) ? $destName : $cur_profile['id_attach'] . '_' . $file_hash . '.elk');
-				if (!rename($_FILES['attachment']['tmp_name'], $destinationPath))
-				{
-					Txt::load('Post');
-					// I guess a man can try.
-					removeAttachments(array('id_member' => $memID));
-					throw new \ElkArte\Exceptions\Exception('attach_timeout', 'critical');
-				}
-
-				// Attempt to chmod it.
-				@chmod($uploadDir . '/' . $destinationPath, 0644);
-			}
-			$profile_vars['avatar'] = '';
-
-			// Delete any temporary file.
-			if (file_exists($_FILES['attachment']['tmp_name']))
-			{
-				@unlink($_FILES['attachment']['tmp_name']);
-			}
-		}
-		// Selected the upload avatar option and had one already uploaded before or didn't upload one.
-		else
-		{
-			$profile_vars['avatar'] = '';
-		}
-	}
-	else
-	{
-		$profile_vars['avatar'] = '';
+		return $result;
 	}
 
 	// Setup the profile variables so it shows things right on display!

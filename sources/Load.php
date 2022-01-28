@@ -1303,6 +1303,13 @@ function determineAvatar($profile)
 
 	$avatar_protocol = substr(strtolower($profile['avatar']), 0, 7);
 
+	// Build the gravatar request once.
+	$gravatar = '//www.gravatar.com/avatar/' .
+		hash('md5', strtolower($profile['email_address'])) .
+		'?s=' . $modSettings['avatar_max_height'] .
+		(!empty($modSettings['gravatar_rating']) ? ('&amp;r=' . $modSettings['gravatar_rating']) : '') .
+		((!empty($modSettings['gravatar_default']) && $modSettings['gravatar_default'] !== 'none') ? ('&amp;d=' . $modSettings['gravatar_default']) : '');
+
 	// uploaded avatar?
 	if ($profile['id_attach'] > 0 && empty($profile['avatar']))
 	{
@@ -1330,8 +1337,7 @@ function determineAvatar($profile)
 	elseif (!empty($profile['avatar']) && $profile['avatar'] === 'gravatar')
 	{
 		// Gravatars URL.
-		$gravatar_url = '//www.gravatar.com/avatar/' . hash('md5', strtolower($profile['email_address'])) . '?s=' . $modSettings['avatar_max_height'] . (!empty($modSettings['gravatar_rating']) ? ('&amp;r=' . $modSettings['gravatar_rating']) : '');
-
+		$gravatar_url = $gravatar;
 		$avatar = array(
 			'name' => $profile['avatar'],
 			'image' => '<img class="avatar avatarresize" src="' . $gravatar_url . '" alt="" />',
@@ -1381,7 +1387,7 @@ function determineAvatar($profile)
 	}
 
 	// Make sure there's a preview for gravatars available.
-	$avatar['gravatar_preview'] = '//www.gravatar.com/avatar/' . hash('md5', strtolower($profile['email_address'])) . '?s=' . $modSettings['avatar_max_height'] . (!empty($modSettings['gravatar_rating']) ? ('&amp;r=' . $modSettings['gravatar_rating']) : '');
+	$avatar['gravatar_preview'] = $gravatar;
 
 	call_integration_hook('integrate_avatar', array(&$avatar, $profile));
 

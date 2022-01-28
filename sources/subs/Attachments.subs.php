@@ -48,7 +48,7 @@ function processAttachments($id_msg = null)
 
 	$attach_errors = AttachmentErrorContext::context();
 
-	$file_functions = new FileFunctions();
+	$file_functions = FileFunctions::instance();
 	$tmp_attachments = new TemporaryAttachmentsList();
 	$attachmentDirectory = new AttachmentsDirectory($modSettings, database());
 
@@ -298,7 +298,7 @@ function createAttachment(&$attachmentOptions)
 	$image = new Image($attachmentOptions['tmp_name']);
 
 	// If this is an image we need to set a few additional parameters.
-	$is_image = $image->isImage();
+	$is_image = $image->isImageLoaded();
 	$size = $is_image ? $image->getImageDimensions() : array(0, 0, 0);
 	list ($attachmentOptions['width'], $attachmentOptions['height']) = $size;
 	$attachmentOptions['width'] = max(0, $attachmentOptions['width']);
@@ -697,7 +697,6 @@ function increaseDownloadCounter($id_attach)
  * What it does:
  *
  * - supports GIF, JPG, PNG, BMP and WBMP formats.
- * - detects if GD2 is available.
  * - uses createThumbnail() to resize to max_width by max_height, and saves the result to a file.
  * - updates the database info for the member's avatar.
  * - returns whether the download and resize was successful.
@@ -715,61 +714,61 @@ function saveAvatar($temporary_path, $memID, $max_width, $max_height)
 
 	$db = database();
 
-	$ext = !empty($modSettings['avatar_download_png']) ? 'png' : 'jpeg';
-	$destName = 'avatar_' . $memID . '_' . time() . '.' . $ext;
-
 	// Just making sure there is a non-zero member.
 	if (empty($memID))
 	{
 		return false;
 	}
 
+	$tokenizer = new TokenHash();
+	$ext = !empty($modSettings['avatar_download_png']) ? 'png' : 'jpeg';
+	$destName = 'avatar_' . $memID . '_' . $tokenizer->generate_hash(16) . '.' . $ext;
+
+	// Clear out any old attachment
 	require_once(SUBSDIR . '/ManageAttachments.subs.php');
 	removeAttachments(array('id_member' => $memID));
 
-	$attachmentsDir = new AttachmentsDirectory($modSettings, $db);
-	$id_folder = $attachmentsDir->currentDirectoryId();
-
-	$avatar_hash = empty($modSettings['custom_avatar_enabled']) ? getAttachmentFilename($destName, 0, null, true) : '';
 	$db->insert('',
 		'{db_prefix}attachments',
 		array(
-			'id_member' => 'int', 'attachment_type' => 'int', 'filename' => 'string-255', 'file_hash' => 'string-255', 'fileext' => 'string-8', 'size' => 'int',
-			'id_folder' => 'int',
+			'id_member' => 'int', 'attachment_type' => 'int', 'filename' => 'string-255',
+			'file_hash' => 'string-255', 'fileext' => 'string-8', 'size' => 'int', 'id_folder' => 'int',
 		),
 		array(
-			$memID, empty($modSettings['custom_avatar_enabled']) ? 0 : 1, $destName, $avatar_hash, $ext, 1,
-			$id_folder,
+			$memID, 1, $destName, '', $ext, 1, 1,
 		),
 		array('id_attach')
 	);
 	$attachID = $db->insert_id('{db_prefix}attachments');
 
-	// The destination filename will depend on whether custom dir for avatars has been set
-	$destName = getAvatarPath() . '/' . $destName;
-	$path = $attachmentsDir->getCurrent();
-	$destName = empty($avatar_hash) ? $destName : $path . '/' . $attachID . '_' . $avatar_hash . '.elk';
+	// The destination filename depends on the custom dir for avatars
+	$destName = $modSettings['custom_avatar_dir'] . '/' . $destName;
 	$format = !empty($modSettings['avatar_download_png']) ? IMAGETYPE_PNG : IMAGETYPE_JPEG;
 
-	// Resize it.
+	// Resize and rotate it.
 	$image = new Image($temporary_path);
+	if (!$image->isImageLoaded())
+	{
+		return false;
+	}
 
-	// Want to correct for rotated photos?
 	if (!empty($modSettings['attachment_autorotate']))
 	{
 		$image->autoRotate();
 	}
+
 	$thumb_image = $image->createThumbnail($max_width, $max_height, $destName, $format);
 	if ($thumb_image !== false)
 	{
 		list ($width, $height) = $thumb_image->getImageDimensions();
-		$mime_type = getValidMimeImageType($ext);
+		$mime_type = $thumb_image->getMimeType();
 
 		// Write filesize in the database.
 		$db->query('', '
 			UPDATE {db_prefix}attachments
 			SET 
-				size = {int:filesize}, width = {int:width}, height = {int:height}, mime_type = {string:mime_type}
+				size = {int:filesize}, width = {int:width}, height = {int:height}, 
+				mime_type = {string:mime_type}
 			WHERE id_attach = {int:current_attachment}',
 			array(
 				'filesize' => $thumb_image->getFilesize(),
@@ -784,23 +783,22 @@ function saveAvatar($temporary_path, $memID, $max_width, $max_height)
 		$modSettings['new_avatar_data'] = array(
 			'id' => $attachID,
 			'filename' => $destName,
-			'type' => empty($modSettings['custom_avatar_enabled']) ? 0 : 1,
+			'type' => 1,
 		);
 
 		return true;
 	}
-	else
-	{
-		$db->query('', '
-			DELETE FROM {db_prefix}attachments
-			WHERE id_attach = {int:current_attachment}',
-			array(
-				'current_attachment' => $attachID,
-			)
-		);
 
-		return false;
-	}
+	// Having a problem with image manipulation
+	$db->query('', '
+		DELETE FROM {db_prefix}attachments
+		WHERE id_attach = {int:current_attachment}',
+		array(
+			'current_attachment' => $attachID,
+		)
+	);
+
+	return false;
 }
 
 /**
@@ -808,8 +806,10 @@ function saveAvatar($temporary_path, $memID, $max_width, $max_height)
  *
  * What it does:
  *
- * - Uses getimagesize() to determine the size of a file.
- * - Attempts to connect to the server first so it won't time out.
+ * - Uses getimagesizefromstring() to determine the dimensions of an image file.
+ * - Attempts to connect to the server first, so it won't time out.
+ * - Attempts to read a short byte range of the file, just enough to validate
+ * the mime type.
  *
  * @param string $url
  * @return mixed[]|bool the image size as array(width, height), or false on failure
@@ -875,48 +875,6 @@ function url_image_size($url)
 	Cache::instance()->put('url_image_size-' . md5($url), $size, 240);
 
 	return $size;
-}
-
-/**
- * The avatars path: if custom avatar directory is set, that's it.
- * Otherwise, it's attachments path.
- *
- * @return string
- * @package Attachments
- */
-function getAvatarPath()
-{
-	global $modSettings;
-
-	if (empty($modSettings['custom_avatar_enabled']))
-	{
-		$attachmentsDir = new AttachmentsDirectory($modSettings, database());
-		return $attachmentsDir->getCurrent();
-	}
-
-	return $modSettings['custom_avatar_dir'];
-}
-
-/**
- * Returns the ID of the folder avatars are currently saved in.
- *
- * @return int 1 if custom avatar directory is enabled,
- * and the ID of the current attachment folder otherwise.
- * NB: the latter could also be 1.
- * @package Attachments
- */
-function getAvatarPathID()
-{
-	global $modSettings;
-
-	// Little utility function for the endless $id_folder computation for avatars.
-	if (empty($modSettings['custom_avatar_enabled']))
-	{
-		$attachmentsDir = new AttachmentsDirectory($modSettings, database());
-		return $attachmentsDir->currentDirectoryId();
-	}
-
-	return 1;
 }
 
 /**
@@ -994,7 +952,7 @@ function getServerStoredAvatars($directory)
 	global $context, $txt, $modSettings;
 
 	$result = [];
-	$file_functions = new FileFunctions();
+	$file_functions = FileFunctions::instance();
 
 	// You can always have no avatar
 	$result[] = array(
@@ -1011,7 +969,7 @@ function getServerStoredAvatars($directory)
 		return $result;
 	}
 
-	// Find all of the other avatars under and in the avatar directory
+	// Find all avatars under, and in, the avatar directory
 	$serverAvatars = new RecursiveIteratorIterator(
 		new RecursiveDirectoryIterator(
 			$avatarDir,
@@ -1633,4 +1591,3 @@ function getMimeType($filename)
 
 	return $mimeType;
 }
-

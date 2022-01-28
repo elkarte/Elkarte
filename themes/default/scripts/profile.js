@@ -104,16 +104,18 @@ function autoDetectTimeOffset(currentTime)
  * Calculates the number of available characters remaining when filling in the
  * signature box
  */
-function calcCharLeft()
+let oldSignature = "";
+function calcCharLeft(init)
 {
-	var oldSignature = "",
-		currentSignature = document.forms.creator.signature.value,
+	var currentSignature = document.forms.creator.signature.value,
 		currentChars = 0;
 
 	if (!document.getElementById("signatureLeft"))
 	{
 		return;
 	}
+
+	init = typeof init !== 'undefined' ? init : false;
 
 	if (oldSignature !== currentSignature)
 	{
@@ -129,12 +131,12 @@ function calcCharLeft()
 			document.getElementById("signatureLeft").className = "";
 		}
 
-		var $_profile_error = $("#profile_error");
+		let $_profile_error = $("#profile_error");
 		if (currentChars > maxLength && !$_profile_error.is(":visible"))
 		{
 			ajax_getSignaturePreview(false);
 		}
-		else if (currentChars <= maxLength && $_profile_error.is(":visible"))
+		else if (currentChars <= maxLength && $_profile_error.is(":visible") && !init)
 		{
 			$_profile_error.css({display: "none"});
 			$_profile_error.html('');
@@ -354,6 +356,30 @@ function previewExternalAvatar(src)
 			$('#avatar_external').removeClass('error');
 		}
 	}).attr('src', src);
+}
+
+/**
+ * Allows for the previewing of an uploaded avatar
+ *
+ * @param {object} src
+ */
+function previewUploadedAvatar(src)
+{
+	if (src.files && src.files[0])
+	{
+		let reader = new FileReader();
+
+		reader.readAsDataURL(src.files[0]);
+		reader.onload = function ()
+		{
+			let current_avatar = document.getElementById('current_avatar'),
+				current_avatar_new = document.getElementById('current_avatar_new');
+
+			current_avatar_new.src = String(reader.result);
+			current_avatar_new.classList.remove('hide');
+			current_avatar.classList.add('hide');
+		};
+	}
 }
 
 /**

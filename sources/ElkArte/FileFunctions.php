@@ -21,7 +21,7 @@ class FileFunctions
 	private static $_instance = null;
 
 	/**
-	 * chmod control which will attempt to make a file or directory writable
+	 * chmod control will attempt to make a file or directory writable
 	 *
 	 * - Progressively attempts various chmod values until item is writable or failure
 	 *
@@ -90,7 +90,7 @@ class FileFunctions
 
 	/**
 	 * is_dir() helper using spl functions.  is_dir can throw an exception if open_basedir
-	 * restrictions are in effect.  Note: getType will not return true on a symlink
+	 * restrictions are in effect.
 	 *
 	 * @param string $dir
 	 * @return bool
@@ -139,6 +139,28 @@ class FileFunctions
 	}
 
 	/**
+	 * filesize() helper.  filesize can throw an E_WARNING on failure.
+	 * Returns the filesize in bytes on success or false on failure.
+	 *
+	 * @param string $item a file location
+	 * @return int|bool
+	 */
+	public function fileSize($item)
+	{
+		try
+		{
+			$fileInfo = new \SplFileInfo($item);
+			$size = $fileInfo->getSize();
+		}
+		catch (\RuntimeException $e)
+		{
+			$size = false;
+		}
+
+		return $size;
+	}
+
+	/**
 	 * is_writable() helper.  is_writable can throw an E_WARNING on failure.
 	 * Returns true if the filename/directory exists and is writable.
 	 *
@@ -162,7 +184,6 @@ class FileFunctions
 
 		return false;
 	}
-
 
 	/**
 	 * Creates a directory as defined by a supplied path
@@ -261,6 +282,29 @@ class FileFunctions
 		}
 
 		clearstatcache(false, $partialTree);
+
+		return true;
+	}
+
+	/**
+	 * Deletes a file (not a directory) at a given location
+	 *
+	 * @param $path
+	 * @return bool
+	 */
+	public function delete($path)
+	{
+		if (!$this->fileExists($path) || !$this->isWritable($path))
+		{
+			return false;
+		}
+
+		error_clear_last();
+
+		if (!@unlink($path))
+		{
+			return false;
+		}
 
 		return true;
 	}

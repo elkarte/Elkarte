@@ -346,7 +346,7 @@ function template_additional_options_below()
 {
 	global $context, $settings, $options, $txt;
 
-	// If the admin has enabled the hiding of the additional options - show a link and image for it.
+	// If the admin has enabled "hiding of" additional options - show a link and image for it.
 	if (!empty($settings['additional_options_collapsible']))
 	{
 		echo '
@@ -469,25 +469,25 @@ function template_add_new_attachments()
 	if (!empty($context['attachments']['allowed_extensions']))
 	{
 		echo '
-								', $txt['allowed_types'], ': ', $context['attachments']['allowed_extensions'], '<br />';
+								<p id="types">', $txt['allowed_types'], ': ', $context['attachments']['allowed_extensions'], '</p>';
 	}
 
 	if (!empty($context['attachments']['restrictions']))
 	{
 		echo '
-								', $txt['attach_restrictions'], ' ', implode(', ', $context['attachments']['restrictions']), '<br />';
+								<p id="restrictions">', $txt['attach_restrictions'], ' ', implode(', ', $context['attachments']['restrictions']), '</p>';
 	}
 
 	if ($context['attachments']['num_allowed'] == 0)
 	{
 		echo '
-								', $txt['attach_limit_nag'], '<br />';
+								<p class="infobox">', $txt['attach_limit_nag'], '</p>';
 	}
 
 	if (!$context['attachments']['can']['post_unapproved'])
 	{
 		echo '
-								<span class="alert">', $txt['attachment_requires_approval'], '</span>', '<br />';
+								<p class="warningbox">', $txt['attachment_requires_approval'], '</p>';
 	}
 
 	echo '
