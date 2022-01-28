@@ -19,14 +19,14 @@
 /** global: poll_add, poll_remove, poll_add, XMLHttpRequest, ElkInfoBar */
 
 /**
- * Sets code blocks such that resize vertical works as expect.  Done this way to avoid
+ * Sets code blocks such that resize vertical works as expected.  Done this way to avoid
  * page jumps to named anchors missing the target.
  */
 function elk_codefix()
 {
 	$('.bbc_code').each(function ()
 	{
-		var $this = $(this);
+		let $this = $(this);
 
 		// If it has a scroll bar, allow the user to resize it vertically
 		if ($this.get(0).scrollHeight > $this.innerHeight())
@@ -63,19 +63,19 @@ function toggleButtonAJAX(btn, confirmation_msg_variable, onSuccessCallback)
 				return;
 			}
 
-			var oElement = $(request).find('elk')[0];
+			let oElement = $(request).find('elk')[0];
 
 			// No errors
 			if (oElement.getElementsByTagName('error').length === 0)
 			{
-				var text = oElement.getElementsByTagName('text'),
+				let text = oElement.getElementsByTagName('text'),
 					url = oElement.getElementsByTagName('url'),
 					confirm_elem = oElement.getElementsByTagName('confirm');
 
 				// Update the page so button/link/confirm/etc reflect the new on or off status
 				if (confirm_elem.length === 1)
 				{
-					var confirm_text = confirm_elem[0].firstChild.nodeValue.removeEntities();
+					let confirm_text = confirm_elem[0].firstChild.nodeValue.removeEntities();
 				}
 
 				$('.' + btn.className.replace(/(list|link)level\d/g, '').trim()).each(function ()
@@ -145,7 +145,7 @@ function toggleHeaderAJAX(btn, container_id)
 {
 	// Show ajax is in progress
 	ajax_indicator(true);
-	var body_template = '<div class="board_row centertext">{body}</div>';
+	let body_template = '<div class="board_row centertext">{body}</div>';
 
 	$.ajax({
 		type: 'GET',
@@ -160,24 +160,27 @@ function toggleHeaderAJAX(btn, container_id)
 				return;
 			}
 
-			var oElement = $(request).find('elk')[0];
+			let oElement = $(request).find('elk')[0];
 
 			// No errors
 			if (oElement.getElementsByTagName('error').length === 0)
 			{
-				var text_elem = oElement.getElementsByTagName('text'),
+				let text_elem = oElement.getElementsByTagName('text'),
 					body_elem = oElement.getElementsByTagName('body');
 
+				// Clear the page
 				$('#' + container_id + ' .pagesection').remove();
 				$('#' + container_id + ' .topic_listing').remove();
 				$('#' + container_id + ' .topic_sorting').remove();
+
 				if (text_elem.length === 1)
 				{
-					$('#' + container_id + ' #unread_header').html(text_elem[0].firstChild.nodeValue.removeEntities());
+					$('#' + container_id + ' .category_header').html(text_elem[0].firstChild.nodeValue.removeEntities());
 				}
+
 				if (body_elem.length === 1)
 				{
-					$(body_template.replace('{body}', body_elem[0].firstChild.nodeValue.removeEntities())).insertAfter('#unread_header');
+					$(body_template.replace('{body}', body_elem[0].firstChild.nodeValue.removeEntities())).insertAfter('.category_header');
 				}
 			}
 		})
@@ -289,21 +292,30 @@ function markallreadButton(btn)
 	toggleButtonAJAX(btn);
 
 	// Remove all the "new" icons next to the topics subjects
-	$('.new_posts').remove();
-
-	// Turn the board icon class to off
-	$('.board_icon').each(function ()
-	{
-		$(this).removeClass('i-board-new i-board-sub').addClass('i-board-off');
+	let elems = document.querySelectorAll('.new_posts');
+	[].forEach.call(elems, function(el) {
+		el.classList.remove('new_posts');
 	});
 
-	$('.board_new_posts').removeClass('board_new_posts');
+
+	// Turn the board icon class to off
+	elems = document.querySelectorAll('.board_icon .i-board-new');
+	[].forEach.call(elems, function(el) {
+		el.classList.remove('i-board-new');
+		el.classList.add('i-board-off');
+	});
+
+	elems = document.querySelectorAll('.board_icon .i-board-sub');
+	[].forEach.call(elems, function(el) {
+		el.classList.remove('i-board-sub');
+		el.classList.add('i-board-off');
+	});
 
 	return false;
 }
 
 /**
- * Ajaxify the "mark all messages as read" button in Recent
+ * Ajaxify the "mark all messages as read" button in Recent and Category View
  *
  * @param {string} btn string representing this, generally the anchor link tag <a class="" href="" onclick="">
  */

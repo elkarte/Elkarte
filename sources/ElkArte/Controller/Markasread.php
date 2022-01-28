@@ -127,7 +127,7 @@ class Markasread extends AbstractController
 		}
 
 		// Dispatch to the right method
-		//$action->dispatch($subAction);
+		$action->dispatch($subAction);
 
 		// For the time being this is a special case, but in BoardIndex no, we don't want it
 		if ($this->_req->getQuery('sa') === 'all' || $this->_req->getQuery('sa') === 'board' && !isset($this->_req->query->bi))
