@@ -103,7 +103,6 @@ class SiteDispatcher
 		'login' => array('\\ElkArte\\Controller\\Auth', 'action_login'),
 		'login2' => array('\\ElkArte\\Controller\\Auth', 'action_login2'),
 		'logout' => array('\\ElkArte\\Controller\\Auth', 'action_logout'),
-		'markasread' => array('\\ElkArte\\Controller\\MarkRead', 'action_index'),
 		'mergetopics' => array('\\ElkArte\\Controller\\MergeTopics', 'action_index'),
 		'moderate' => array('\\ElkArte\\Controller\\ModerationCenter', 'action_index'),
 		'movetopic' => array('\\ElkArte\\Controller\\MoveTopic', 'action_movetopic'),
