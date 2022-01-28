@@ -53,8 +53,8 @@ class Theme extends BaseTheme
 			 * - if this is 'defaults', images from the default theme will only be used with default templates.
 			 * - if this is 'never' or isn't set at all, images from the default theme will not be used.
 			 *
-			 * This doesn't apply when custom templatees are being
-			 * used; nor does it apply to the dafult theme.
+			 * This doesn't apply when custom templates are being
+			 * used; nor does it apply to the default theme.
 			 */
 			'use_default_images' => 'never',
 
@@ -131,6 +131,7 @@ class Theme extends BaseTheme
 			)
 		);
 	}
+
 	/**
 	 * This is the only template included in the sources.
 	 */
@@ -162,7 +163,6 @@ class Theme extends BaseTheme
 				->contentType('text/html', 'UTF-8');
 		}
 
-		// @todo Probably temporary ($_REQUEST['xml'] should be replaced by $_REQUEST['api'])
 		$api = $this->_req->getRequest('api', 'trim');
 		if (isset($api))
 		{
@@ -600,7 +600,8 @@ class Theme extends BaseTheme
 				hide_video : ' . JavaScriptEscape($txt['hide_video']) . ',
 				youtube : ' . JavaScriptEscape($txt['youtube']) . ',
 				vimeo : ' . JavaScriptEscape($txt['vimeo']) . ',
-				dailymotion : ' . JavaScriptEscape($txt['dailymotion']) . '
+				dailymotion : ' . JavaScriptEscape($txt['dailymotion']) . ',
+				tiktok : ' . JavaScriptEscape($txt['tiktok']) . ',
 			});', true);
 
 			loadJavascriptFile('elk_jquery_embed.js', array('defer' => true));
@@ -926,9 +927,9 @@ class Theme extends BaseTheme
 		if (!empty($this->user->avatar['href']))
 		{
 			$this->addCSSRules('
-	.i-account:before {
+	.i-menu-profile::before, .i-menu-profile.enabled::before {
 		content: "";
-		background-image: url("' . $this->user->avatar['href'] . '");
+		background-image: url("' . htmlspecialchars_decode($this->user->avatar['href']) . '");
 		filter: unset;
 	}');
 		}

@@ -77,16 +77,16 @@ class Notify extends AbstractController
 	{
 		global $topic, $txt, $context;
 
+		// Make sure they aren't a guest or something - guests can't really receive notifications!
+		is_not_guest();
+		isAllowedTo('mark_any_notify');
+
 		// Api ajax call?
-		if (isset($this->_req->query->api))
+		if ($this->getApi() === 'xml')
 		{
 			$this->action_notify_api();
 			return true;
 		}
-
-		// Make sure they aren't a guest or something - guests can't really receive notifications!
-		is_not_guest();
-		isAllowedTo('mark_any_notify');
 
 		// Make sure the topic has been specified.
 		if (empty($topic))
@@ -211,6 +211,13 @@ class Notify extends AbstractController
 	public function action_notifyboard()
 	{
 		global $txt, $board, $context;
+
+		// Api ajax call?
+		if ($this->getApi() === 'xml')
+		{
+			$this->action_notifyboard_api();
+			return true;
+		}
 
 		// Permissions are an important part of anything ;).
 		is_not_guest();
@@ -347,6 +354,12 @@ class Notify extends AbstractController
 		if ($this->user->is_guest === false && !empty($modSettings['enable_unwatch']))
 		{
 			checkSession('get');
+
+			if ($this->getApi() === 'xml')
+			{
+				$this->action_unwatchtopic_api();
+				return;
+			}
 
 			$this->_toggle_topic_watch();
 		}
@@ -604,16 +617,21 @@ class Notify extends AbstractController
 		Txt::load('Profile');
 
 		$_POST['notify_submit'] = true;
-
 		foreach (getMemberNotificationsProfile($memID) as $mention => $data)
 		{
 			foreach ($data['data'] as $type => $method)
 			{
+				// No email notifications for you
 				if ($mention === $area && in_array($type, ['email', 'emaildaily', 'emailweekly']))
+				{
 					continue;
+				}
 
+				// All the rest as it was
 				if ($method['enabled'])
+				{
 					$_POST['notify'][$mention]['status'][] = $method['name'];
+				}
 			}
 		}
 

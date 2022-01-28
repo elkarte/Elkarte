@@ -117,21 +117,21 @@ function template_list_boards(array $boards, $id)
 		if ($board['new'] || $board['children_new'])
 		{
 			echo '
-							<span class="board_icon ', $board['new'] ? 'i-board-new' : 'i-board-sub', '" title="', $txt['new_posts'], '"></span>';
+							<span class="', $board['new'] ? 'i-board-new' : 'i-board-sub', '" title="', $txt['new_posts'], '"></span>';
 		}
 
 		// Is it a redirection board?
 		elseif ($board['is_redirect'])
 		{
 			echo '
-							<span class="board_icon i-board-redirect" title="', sprintf($txt['redirect_board_to'], Util::htmlspecialchars($board['name'])), '"></span>';
+							<span class="i-board-redirect" title="', sprintf($txt['redirect_board_to'], Util::htmlspecialchars($board['name'])), '"></span>';
 		}
 
 		// No new posts at all! The agony!!
 		else
 		{
 			echo '
-							<span class="board_icon i-board-off" title="', $txt['old_posts'], '"></span>';
+							<span class="i-board-off" title="', $txt['old_posts'], '"></span>';
 		}
 
 		echo '

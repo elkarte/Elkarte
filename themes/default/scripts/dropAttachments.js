@@ -420,7 +420,6 @@
 				let $img = $('<img />').attr('src', elk_scripturl + '?action=dlattach;sa=tmpattach;attach=' + $control.attr('id') + ';topic=' + topic),
 					$progressbar = $control.find('.progressBar');
 
-
 				$progressbar.siblings('.i-concentric').remove();
 				$progressbar.after($('<div class="postattach_thumb" />').append($img));
 				$progressbar.remove();

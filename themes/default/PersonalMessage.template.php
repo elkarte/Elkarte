@@ -1050,7 +1050,7 @@ function template_send()
 	{
 		echo '
 		 		<div class="draftautosave">
-					<span id="throbber" class="hide"><i class="icon icon-spin i-spinner"></i>&nbsp;</span>
+					<span id="throbber" class="hide"><i class="icon i-oval"></i>&nbsp;</span>
 					<span id="draft_lastautosave"></span>
 				</div>';
 	}

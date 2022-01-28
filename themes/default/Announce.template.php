@@ -73,8 +73,7 @@ function template_announcement_send()
 			<div class="content">
 				<p class="infobox">', $txt['announce_sending'], ' <a href="', getUrl('topic', ['topic' => $context['current_topic'], 'start' => '0']), '" target="_blank" class="new_win">: ', $context['topic_subject'], '</a></p>
 				<div class="progress_bar">
-					<div class="full_bar">', $context['percentage_done'], '% ', $txt['announce_done'], '</div>
-					<div class="green_percent" style="width: ', $context['percentage_done'], '%;">&nbsp;</div>
+					<div class="green_percent" style="width: ', $context['percentage_done'], '%;">', $context['percentage_done'], '%</div>
 				</div>
 				<hr />
 				<div class="submitbutton">

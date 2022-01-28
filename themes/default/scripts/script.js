@@ -222,10 +222,8 @@ function php_str_repeat(sString, iTime)
 	{
 		return '';
 	}
-	else
-	{
-		return sString + php_str_repeat(sString, iTime - 1);
-	}
+
+	return sString + php_str_repeat(sString, iTime - 1);
 }
 
 /**
@@ -265,7 +263,7 @@ function reqWin(desktopURL, alternateWidth, alternateHeight, noScrollbars)
 function reqOverlayDiv(desktopURL, sHeader, sIcon)
 {
 	// Set up our div details
-	var sAjax_indicator = '<div class="centertext"><i class="icon icon-spin icon-big i-spinner"></i></div>';
+	var sAjax_indicator = '<div class="centertext"><i class="icon icon-big i-oval"></i></div>';
 
 	sIcon = typeof (sIcon) === 'string' ? sIcon : 'i-help';
 	sHeader = typeof (sHeader) === 'string' ? sHeader : help_popup_heading_text;
@@ -1057,7 +1055,7 @@ function create_ajax_indicator_ele()
 	ajax_indicator_ele.appendChild(cancel_link);
 
 	// Set the text.  (Note: You MUST append here and not overwrite.)
-	ajax_indicator_ele.innerHTML += ajax_notification_text + '<span class="icon icon-spin i-spinner"></span>';
+	ajax_indicator_ele.innerHTML += ajax_notification_text + '<span class="icon i-concentric"></span>';
 
 	// Finally attach the element to the body.
 	document.body.appendChild(ajax_indicator_ele);

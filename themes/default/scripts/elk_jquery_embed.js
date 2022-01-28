@@ -13,7 +13,7 @@
  * with a clickable preview thumbnail of the video.  Once the image is clicked
  * the video is embedded in to the page to play.
  *
- * Currently works with youtube, vimeo and dailymotion
+ * Currently, works with YouTube, Vimeo, TikTok, and DailyMotion
  *
  */
 (function ($)
@@ -150,6 +150,31 @@
 		}
 
 		/**
+		 * Get a TikTok video thumbnail and associated data
+		 *
+		 * @param {array} videoID
+		 * @param {string} callback function to call once the json results are returned.
+		 */
+		function getTikTokIMG(videoID, callback)
+		{
+			let img = 'sf-tb-sg.ibytedtos.com/obj/ttfe-malisg/tiktok-logo.png';
+
+			$.getJSON('//www.tiktok.com/oembed?url=https://www.tiktok.com/@' + videoID[1] + '/video/' + videoID[2], {},
+				function (data)
+				{
+					if (typeof data.thumbnail_url !== "undefined")
+					{
+						callback(data);
+					}
+					else
+					{
+						callback(img);
+					}
+				}
+			);
+		}
+
+		/**
 		 * Returns either an image link or an embed link
 		 *
 		 * @param {boolean} embed true returns the video embed code, false the image preview
@@ -211,7 +236,6 @@
 
 			let embedURL = '//www.youtube-nocookie.com/embed/' + videoID + '?rel=0' + startAtPar,
 				tag = embedOrIMG(embed, a, '//i.ytimg.com/vi/' + videoID + '/sddefault.jpg', embedURL, embedURL + '&autoplay=1');
-
 			return [oSettings.youtube, tag];
 		};
 		handlers['m.youtube.com'] = handlers['youtube.com'];
@@ -281,6 +305,47 @@
 			}
 
 			return [oSettings.dailymotion, tag];
+		};
+
+		// tiktok link handler
+		handlers['tiktok.com'] = function (path, a, embed)
+		{
+			let videoID = path.match(/^\/@([0-9A-Za-z_]*)\/video\/([0-9]*)/i);
+			if (!videoID)
+			{
+				return;
+			}
+
+			let embedURL = 'https://www.tiktok.com/' + videoID[1] + '/video/' + videoID[2],
+				tag = null,
+				img = '//sf-tb-sg.ibytedtos.com/obj/ttfe-malisg/tiktok-logo.png',
+				data = {};
+
+			// Get the preview image or embed tag
+			if (!embed)
+			{
+				// We use a callback to get the html.  Normally we get the preview image and use a
+				// href on the image, but TikTok has its own embed jazz-o-matic
+				getTikTokIMG(videoID, function (data)
+				{
+					//$(a).parent().next().find("img").attr("src", data.thumbnail_url);
+
+					// The collapse function seems to break the TT embed, so we just make it look the same
+					// but is not functional
+					let header = $(a).parent().html();
+					$(a).parent().next().remove();
+					$(a).parent().replaceWith('<div class="elk_videoheader">' + header + '</div><div class=elk_video">' + data.html + '</div>');
+				});
+
+				// This is to show something while we wait for our callback to return
+				tag = embedOrIMG(embed, a, img, embedURL, embedURL);
+			}
+			else
+			{
+				tag = embedOrIMG(embed, a, img, embedURL, embedURL);
+			}
+
+			return [oSettings.tiktok, tag];
 		};
 
 		// Get the links in the id="msg_1234 divs.
@@ -355,38 +420,3 @@
 		}
 	};
 })(jQuery);
-
-(function(window, document, undefined) {
-	"use strict";
-
-	// List of Video Vendors embeds you want to support
-	var players = ['iframe[src*="youtube.com"]', 'iframe[src*="vimeo.com"]'];
-
-	// Select videos
-	var fitVids = document.querySelectorAll(players.join(","));
-
-	// If there are videos on the page...
-	if (fitVids.length) {
-		// Loop through videos
-		for (var i = 0; i < fitVids.length; i++) {
-			// Get Video Information
-			var fitVid = fitVids[i];
-			var width = fitVid.getAttribute("width");
-			var height = fitVid.getAttribute("height");
-			var aspectRatio = height / width;
-			var parentDiv = fitVid.parentNode;
-
-			// Wrap it in a DIV
-			var div = document.createElement("div");
-			div.className = "fitVids-wrapper";
-			div.style.paddingBottom = aspectRatio * 100 + "%";
-			parentDiv.insertBefore(div, fitVid);
-			fitVid.remove();
-			div.appendChild(fitVid);
-
-			// Clear height/width from fitVid
-			fitVid.removeAttribute("height");
-			fitVid.removeAttribute("width");
-		}
-	}
-})(window, document);

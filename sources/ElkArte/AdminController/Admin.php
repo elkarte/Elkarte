@@ -103,8 +103,8 @@ class Admin extends AbstractController
 	 * - Allows integrations to add/edit menu with addMenu event and integrate_admin_include
 	 *
 	 * @event integrate_admin_include used add files to include for administration
-	 * @event addMenu passed admin area area, allows active modules registered to this event to add items to the admin menu,
-	 * @event integrate_admin_areas passed admin area area, used to add items to the admin menu
+	 * @event addMenu passed admin area, allows active modules registered to this event to add items to the admin menu,
+	 * @event integrate_admin_areas passed admin area, used to add items to the admin menu
 	 *
 	 * @return false|mixed[]
 	 * @throws \ElkArte\Exceptions\Exception no_access

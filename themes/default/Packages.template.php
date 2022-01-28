@@ -1068,8 +1068,7 @@ function template_pause_action_permissions()
 			<div>
 				<strong>', $context['progress_message'], '</strong>
 				<div class="progress_bar">
-					<div class="full_bar">', $context['progress_percent'], '%</div>
-					<div class="blue_percent" style="width: ', $context['progress_percent'], '%;">&nbsp;</div>
+					<div class="blue_percent" style="width: ', $context['progress_percent'], '%;">', $context['progress_percent'], '%</div>
 				</div>
 			</div>';
 
@@ -1081,8 +1080,7 @@ function template_pause_action_permissions()
 			<div>
 				<strong>', $context['file_progress_message'], '</strong>
 				<div class="progress_bar">
-					<div class="full_bar">', $context['file_progress_percent'], '%</div>
-					<div class="green_percent" style="width: ', $context['file_progress_percent'], '%;">&nbsp;</div>
+					<div class="green_percent" style="width: ', $context['file_progress_percent'], '%;">', $context['file_progress_percent'], '%</div>
 				</div>
 			</div>';
 	}

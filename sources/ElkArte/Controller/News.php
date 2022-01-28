@@ -79,7 +79,7 @@ class News extends AbstractController
 	 *     * 'members' for recently registered members,
 	 *     * 'profile' for a member's profile.
 	 * - To display a member's profile, a user id has to be given. (;u=1) e.g. ?action=.xml;sa=profile;u=1;type=atom
-	 * - Outputs an feed based on the the 'type'
+	 * - Outputs a feed based on the 'type'
 	 *       * parameter is 'rss', 'rss2', 'rdf', 'atom'.
 	 * - Several sub action options are respected
 	 *     * limit=x - display the "x" most recent posts
@@ -95,7 +95,7 @@ class News extends AbstractController
 	 */
 	public function action_showfeed()
 	{
-		global $board, $board_info, $context, $txt, $modSettings;
+		global $board, $board_info, $context, $txt, $modSettings, $db_show_debug;
 
 		// If it's not enabled, die.
 		if (empty($modSettings['xmlnews_enable']))
@@ -103,12 +103,17 @@ class News extends AbstractController
 			obExit(false);
 		}
 
+		// This is just here to make it easier for the developers :P
+		$db_show_debug = false;
+
+		require_once(SUBSDIR . '/News.subs.php');
+
 		Txt::load('Stats');
 		$txt['xml_rss_desc'] = replaceBasicActionUrl($txt['xml_rss_desc']);
 
-		// Default to latest 5.  No more than whats defined in the ACP or 255
+		// Default to latest 5.  No more than what is defined in the ACP or 255
 		$limit = empty($modSettings['xmlnews_limit']) ? 5 : min($modSettings['xmlnews_limit'], 255);
-		$this->_limit = empty($this->_req->query->limit) || (int) $this->_req->query->limit < 1 ? $limit : min((int) $this->_req->query->limit, $limit);
+		$this->_limit = min($this->_req->getQuery('limit', 'intval', $limit), $limit);
 
 		// Handle the cases where a board, boards, or category is asked for.
 		$this->_query_this_board = '1=1';
@@ -255,14 +260,14 @@ class News extends AbstractController
 
 		$context['feed_title'] = encode_special(strip_tags(un_htmlspecialchars($context['forum_name']) . ($feed_title ?? '')));
 
-		// We send a feed with recent posts, and alerts for PMs for logged in users
+		// We send a feed with recent posts, and alerts for PMs for logged-in users
 		$context['recent_posts_data'] = $xml;
 		$context['xml_format'] = $xml_format;
 
 		obStart(!empty($modSettings['enableCompressedOutput']));
 
-		$headers = Headers::instance();
 		// This is an xml file....
+		$headers = Headers::instance();
 		if (isset($this->_req->query->debug))
 		{
 			$headers->contentType('text/xml', 'UTF-8');
@@ -280,10 +285,16 @@ class News extends AbstractController
 			$headers->contentType('application/rdf+xml', 'UTF-8');
 		}
 
+		// Set our own 30min cache control so auto-readers know how often to check in
+		$context['no_last_modified'] = true;
+		$headers
+			->header('Cache-Control', 'max-age=' . (3600 * .5) . ', private')
+			->header('Last-Modified', gmdate('D, d M Y H:i:s') . ' GMT');
+
 		theme()->getTemplates()->load('Xml');
 		theme()->getLayers()->removeAll();
 
-		// Are we outputting an rss feed or one with more information?
+		// Are we outputting a rss feed or one with more information?
 		if ($xml_format === 'rss' || $xml_format === 'rss2')
 		{
 			$context['sub_template'] = 'feedrss';
@@ -333,6 +344,7 @@ class News extends AbstractController
 		// No data yet
 		$data = array();
 
+		require_once(SUBSDIR . '/News.subs.php');
 		foreach ($members as $member)
 		{
 			// Make the data look rss-ish.
@@ -639,6 +651,7 @@ class News extends AbstractController
 		// No feed data yet
 		$data = array();
 
+		require_once(SUBSDIR . '/News.subs.php');
 		if ($xml_format === 'rss' || $xml_format === 'rss2')
 		{
 			$data = array(array(
@@ -749,152 +762,4 @@ class News extends AbstractController
 
 		return $data;
 	}
-}
-
-/**
- * Called to convert data to xml
- * Finds urls for local site and sanitizes them
- *
- * @param string $val
- *
- * @return null|string|string[]
- */
-function fix_possible_url($val)
-{
-	global $scripturl;
-
-	if (substr($val, 0, strlen($scripturl)) != $scripturl)
-	{
-		return $val;
-	}
-
-	call_integration_hook('integrate_fix_url', array(&$val));
-
-	return $val;
-}
-
-/**
- * For highest feed compatibility, some special characters should be provided
- * as character entities and not html entities
- *
- * @param string $data
- *
- * @return string
- */
-function encode_special($data)
-{
-	return strtr($data, array('>' => '&#x3E;', '&' => '&#x26;', '<' => '&#x3C;'));
-}
-
-/**
- * Ensures supplied data is properly encapsulated in cdata xml tags
- * Called from action_xmlprofile in News.controller.php
- *
- * @param string $data
- * @param string $ns
- * @param string $override
- *
- * @return string
- */
-function cdata_parse($data, $ns = '', $override = null)
-{
-	static $cdata_override = false;
-
-	if ($override !== null)
-	{
-		$cdata_override = (bool) $override;
-	}
-
-	// Are we not doing it?
-	if (!empty($cdata_override))
-	{
-		return $data;
-	}
-
-	$cdata = '<![CDATA[';
-
-	for ($pos = 0, $n = Util::strlen($data); $pos < $n; null)
-	{
-		$positions = array(
-			Util::strpos($data, '&', $pos),
-			Util::strpos($data, ']]>', $pos),
-		);
-
-		if ($ns !== '')
-		{
-			$positions[] = Util::strpos($data, '<', $pos);
-		}
-
-		foreach ($positions as $k => $dummy)
-		{
-			if ($dummy === false)
-			{
-				unset($positions[$k]);
-			}
-		}
-
-		$old = $pos;
-		$pos = empty($positions) ? $n : min($positions);
-
-		if ($pos - $old > 0)
-		{
-			$cdata .= Util::substr($data, $old, $pos - $old);
-		}
-
-		if ($pos >= $n)
-		{
-			break;
-		}
-
-		if (Util::substr($data, $pos, 1) === '<')
-		{
-			$pos2 = Util::strpos($data, '>', $pos);
-			if ($pos2 === false)
-			{
-				$pos2 = $n;
-			}
-
-			if (Util::substr($data, $pos + 1, 1) === '/')
-			{
-				$cdata .= ']]></' . $ns . ':' . Util::substr($data, $pos + 2, $pos2 - $pos - 1) . '<![CDATA[';
-			}
-			else
-			{
-				$cdata .= ']]><' . $ns . ':' . Util::substr($data, $pos + 1, $pos2 - $pos) . '<![CDATA[';
-			}
-
-			$pos = $pos2 + 1;
-		}
-		elseif (Util::substr($data, $pos, 3) == ']]>')
-		{
-			$cdata .= ']]]]><![CDATA[>';
-			$pos = $pos + 3;
-		}
-		elseif (Util::substr($data, $pos, 1) === '&')
-		{
-			$pos2 = Util::strpos($data, ';', $pos);
-
-			if ($pos2 === false)
-			{
-				$pos2 = $n;
-			}
-
-			$ent = Util::substr($data, $pos + 1, $pos2 - $pos - 1);
-
-			if (Util::substr($data, $pos + 1, 1) === '#')
-			{
-				$cdata .= ']]>' . Util::substr($data, $pos, $pos2 - $pos + 1) . '<![CDATA[';
-			}
-			elseif (in_array($ent, array('amp', 'lt', 'gt', 'quot')))
-			{
-				$cdata .= ']]>' . Util::substr($data, $pos, $pos2 - $pos + 1) . '<![CDATA[';
-			}
-
-			$pos = $pos2 + 1;
-		}
-	}
-
-	$cdata .= ']]>';
-
-	return strtr($cdata, array('<![CDATA[]]>' => ''));
 }

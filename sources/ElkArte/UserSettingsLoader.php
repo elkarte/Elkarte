@@ -23,65 +23,34 @@ use ElkArte\Exceptions\Exception;
  */
 class UserSettingsLoader
 {
-	/**
-	 * @var int
-	 */
+	/** @var int */
 	public const HASH_LENGTH = 16;
-	/**
-	 * @var int
-	 */
+
+	/** @var int */
 	public const BAN_OFFSET = 10;
-	/**
-	 * @var mixed|string
-	 */
+
+	/** @var mixed|string */
 	public $member_name;
-	/**
-	 * The user id
-	 *
-	 * @var int
-	 */
+
+	/** @var int The user id */
 	protected $id = 0;
 
-	/**
-	 * The member_name field from the db
-	 *
-	 * @var string
-	 */
+	/** @var string The member_name field from the db */
 	protected $username = '';
 
-	/**
-	 * The database object
-	 *
-	 * @var \ElkArte\Database\QueryInterface
-	 */
+	/** @var \ElkArte\Database\QueryInterface The database object */
 	protected $db = null;
 
-	/**
-	 * The cache object
-	 *
-	 * @var \ElkArte\Cache\Cache
-	 */
+	/** @var \ElkArte\Cache\Cache The cache object */
 	protected $cache = null;
 
-	/**
-	 * The request object
-	 *
-	 * @var \ElkArte\Request
-	 */
+	/** @var \ElkArte\Request The request object */
 	protected $req = null;
 
-	/**
-	 * The settings data
-	 *
-	 * @var \ElkArte\ValuesContainerReadOnly
-	 */
+	/** @var \ElkArte\ValuesContainerReadOnly The settings data */
 	protected $settings = null;
 
-	/**
-	 * The into data
-	 *
-	 * @var \ElkArte\ValuesContainer
-	 */
+	/** @var \ElkArte\ValuesContainer The into data */
 	protected $info = null;
 
 	/**
@@ -126,7 +95,6 @@ class UserSettingsLoader
 	 * @param string $session_password
 	 *
 	 * @event integrate_user_info
-	 * @throws \ElkArte\Exceptions\Exception
 	 */
 	public function loadUserById($id, $already_verified, $session_password)
 	{
@@ -152,7 +120,6 @@ class UserSettingsLoader
 	 *
 	 * @param bool $already_verified
 	 * @param string $session_password
-	 * @throws \ElkArte\Exceptions\Exception
 	 */
 	protected function loadUserData($already_verified, $session_password)
 	{
@@ -189,7 +156,7 @@ class UserSettingsLoader
 			$user_settings['id_member'] = (int) ($user_settings['id_member'] ?? 0);
 
 			// As much as the password should be right, we can assume the integration set things up.
-			if (!empty($already_verified) && $already_verified)
+			if (!empty($already_verified) && $already_verified === true)
 			{
 				$check = true;
 			}
@@ -204,7 +171,7 @@ class UserSettingsLoader
 			}
 
 			// Wrong password or not activated - either way, you're going nowhere.
-			$this->id = $check && ($user_settings['is_activated'] == 1 || $user_settings['is_activated'] == 11) ? $user_settings['id_member'] : 0;
+			$this->id = (int) $check && ($user_settings['is_activated'] == 1 || $user_settings['is_activated'] == 11) ? $user_settings['id_member'] : 0;
 		}
 		else
 		{
@@ -326,7 +293,7 @@ class UserSettingsLoader
 	 */
 	protected function initGuest()
 	{
-		global $cookiename, $modSettings, $context;
+		global $cookiename, $context;
 
 		// This is what a guest's variables should be.
 		$this->member_name = '';
@@ -366,14 +333,14 @@ class UserSettingsLoader
 
 		// Set up the $user_info array.
 		$user_info += array(
-			'id' => (int) $this->id,
+			'id' => $this->id,
 			'username' => $this->member_name,
 			'name' => $this->settings->real_name(''),
 			'email' => $this->settings->email_address(''),
 			'passwd' => $this->settings->passwd(''),
 			'language' => $this->getLanguage(),
-			'is_guest' => (bool) $this->id == 0,
-			'is_admin' => (bool) in_array(1, $user_info['groups']),
+			'is_guest' => $this->id === 0,
+			'is_admin' => in_array(1, $user_info['groups']),
 			'is_mod' => false,
 			'theme' => (int) $this->settings->id_theme,
 			'last_login' => (int) $this->settings->last_login,
@@ -396,7 +363,8 @@ class UserSettingsLoader
 		);
 		$user_info['groups'] = array_unique($user_info['groups']);
 
-		// Make sure that the last item in the ignore boards array is valid.  If the list was too long it could have an ending comma that could cause problems.
+		// Make sure that the last item in ignore boards array is valid.
+		//  If the list was too long it could have an ending comma that could cause problems.
 		if (!empty($user_info['ignoreboards']) && empty($user_info['ignoreboards'][$tmp = count($user_info['ignoreboards']) - 1]))
 		{
 			unset($user_info['ignoreboards'][$tmp]);
@@ -407,7 +375,7 @@ class UserSettingsLoader
 		{
 			$user_info['query_see_board'] = '1=1';
 		}
-		// Otherwise just the groups in $user_info['groups'].
+		// Otherwise, just the groups in $user_info['groups'].
 		else
 		{
 			$user_info['query_see_board'] = '((FIND_IN_SET(' . implode(', b.member_groups) != 0 OR FIND_IN_SET(', $user_info['groups']) . ', b.member_groups) != 0)' . (!empty($modSettings['deny_boards_access']) ? ' AND (FIND_IN_SET(' . implode(', b.deny_member_groups) = 0 AND FIND_IN_SET(', $user_info['groups']) . ', b.deny_member_groups) = 0)' : '') . (isset($user_info['mod_cache']) ? ' OR ' . $user_info['mod_cache']['mq'] : '') . ')';

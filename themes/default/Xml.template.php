@@ -472,6 +472,8 @@ function template_generic_xml_recursive($xml_data, $parent_ident, $child_ident, 
  */
 function template_xml_news($data, $i, $tag = null, $xml_format = 'rss')
 {
+	require_once(SUBSDIR . '/News.subs.php');
+
 	// For every array in the data...
 	foreach ($data as $key => $val)
 	{
@@ -482,7 +484,7 @@ function template_xml_news($data, $i, $tag = null, $xml_format = 'rss')
 		}
 
 		// If a tag was passed, use it instead of the key.
-		$key = isset($tag) ? $tag : $key;
+		$key = $tag ?? $key;
 
 		// First let's indent!
 		echo "\n", str_repeat("\t", $i);
@@ -635,7 +637,7 @@ function template_feedrss()
 }
 
 /**
- * Returns an xml response to a draft autosave request
+ * Returns xml response to a draft autosave request
  * provides the id of the draft saved and the time it was saved in the response
  */
 function template_xml_draft()

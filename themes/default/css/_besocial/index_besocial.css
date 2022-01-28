@@ -1736,15 +1736,11 @@ nav.breadcrumb {
 	box-shadow: inset 0 1px 1px var(--opacity10);
 }
 
-.progress_bar .full_bar {
-	color: var(--primary_background);
-}
-
-.progress_bar .green_percent {
+.progress_bar > .green_percent {
 	background-color: var(--pure_green);
 }
 
-.progress_bar .blue_percent {
+.progress_bar > .blue_percent {
 	background-color: var(--progress_bar_blue);
 }
 
@@ -1818,7 +1814,7 @@ nav.breadcrumb {
 	}
 
 	/* menu to icons */
-	#main_menu .icon-menu, #main_menu .icon-menu.i-account {
+	#main_menu .icon-menu, #main_menu .icon-menu.i-menu-profile {
 		display: inline-block;
 		width: 45px;
 		height: 45px;
@@ -1828,7 +1824,7 @@ nav.breadcrumb {
 		border-radius: .25em;
 	}
 
-	.i-account::before {
+	.i-menu-profile::before {
 		width: 36px;
 		height: 36px;
 		transform: translate(-3px, -5px);

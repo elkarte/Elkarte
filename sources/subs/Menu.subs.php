@@ -219,7 +219,7 @@ function loadDefaultMenuButtons()
 			'title' => $context['current_action'] !== 'moderate' ? $txt['admin'] : $txt['moderate'],
 			'counter' => 'grand_total',
 			'href' => $scripturl . '?action=admin',
-			'data-icon' => 'i-cog',
+			'data-icon' => 'i-menu-admin',
 			'show' => true,
 			'sub_buttons' => array(
 				'admin_center' => array(
@@ -293,7 +293,7 @@ function loadDefaultMenuButtons()
 			'title' => $txt['moderate'],
 			'counter' => 'grand_total',
 			'href' => $scripturl . '?action=moderate',
-			'data-icon' => 'i-cog',
+			'data-icon' => 'i-menu-admin',
 			'show' => $context['allow_moderation_center'],
 			'sub_buttons' => array(
 				'reports' => array(
@@ -333,7 +333,7 @@ function loadDefaultMenuButtons()
 		'profile' => array(
 			'title' => !empty($modSettings['displayMemberNames']) ? User::$info->name : $txt['account_short'],
 			'href' => getUrl('profile', ['action' => 'profile', 'u' => User::$info->id, 'name' => User::$info->name]),
-			'data-icon' => 'i-account',
+			'data-icon' => 'i-menu-profile',
 			'show' => $context['allow_edit_profile'],
 			'sub_buttons' => array(
 				'account' => array(
@@ -344,7 +344,7 @@ function loadDefaultMenuButtons()
 				'drafts' => array(
 					'title' => $txt['mydrafts'],
 					'href' => getUrl('profile', ['action' => 'profile', 'area' => 'showdrafts', 'u' => User::$info->id, 'name' => User::$info->name]),
-					'show' => !empty($modSettings['drafts_enabled']) && !empty($modSettings['drafts_post_enabled']) && allowedTo('post_draft'),
+					'show' => !empty($modSettings['drafts_enabled']) && !empty($modSettings['drafts_post_enabled']),
 				),
 				'forumprofile' => array(
 					'title' => $txt['forumprofile'],
@@ -367,7 +367,7 @@ function loadDefaultMenuButtons()
 			'title' => $txt['pm_short'],
 			'counter' => 'unread_messages',
 			'href' => getUrl('action', ['action' => 'pm']),
-			'data-icon' => ($context['user']['unread_messages'] ? 'i-envelope' : 'i-envelope-blank'),
+			'data-icon' => ($context['user']['unread_messages'] ? 'i-menu-pm-on' : 'i-menu-pm-off'),
 			'show' => $context['allow_pm'],
 			'sub_buttons' => array(
 				'pm_read' => array(
@@ -386,16 +386,16 @@ function loadDefaultMenuButtons()
 			'title' => $txt['mention'],
 			'counter' => 'mentions',
 			'href' => getUrl('action', ['action' => 'mentions']),
-			'data-icon' => ($context['user']['mentions'] ? 'i-bell' : 'i-bell-blank'),
+			'data-icon' => ($context['user']['mentions'] ? 'i-menu-mentions-on' : 'i-menu-mentions-off'),
 			'show' => User::$info->is_guest === false && !empty($modSettings['mentions_enabled']),
 		),
 		// The old language string made no sense, and was too long.
 		// "New posts" is better, because there are probably a pile
-		// of old unread posts, and they wont be reached from this button.
+		// of old unread posts, and they won't be reached from this button.
 		'unread' => array(
 			'title' => $txt['view_unread_category'],
 			'href' => getUrl('action', ['action' => 'unread']),
-			'data-icon' => 'i-comments',
+			'data-icon' => 'i-menu-unread',
 			'show' => User::$info->is_guest === false,
 		),
 		// The old language string made no sense, and was too long.
@@ -404,20 +404,19 @@ function loadDefaultMenuButtons()
 		'unreadreplies' => array(
 			'title' => $txt['view_replies_category'],
 			'href' => getUrl('action', ['action' => 'unreadreplies']),
-			'data-icon' => 'i-comments-blank',
+			'data-icon' => 'i-menu-unreadreplies',
 			'show' => User::$info->is_guest === false,
 		),
 		'login' => array(
 			'title' => $txt['login'],
 			'href' => getUrl('action', ['action' => 'login']),
-			'data-icon' => 'i-sign-in',
+			'data-icon' => 'i-menu-login',
 			'show' => User::$info->is_guest,
 		),
-
 		'register' => array(
 			'title' => $txt['register'],
 			'href' => getUrl('action', ['action' => 'register']),
-			'data-icon' => 'i-register',
+			'data-icon' => 'i-menu-register',
 			'show' => User::$info->is_guest && $context['can_register'],
 		),
 	);
