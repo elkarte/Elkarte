@@ -269,7 +269,7 @@ class Post extends AbstractModule
 			{
 				$context['attachments']['restrictions'][] = $type === 'attachmentNumPerPostLimit'
 					? sprintf($txt['attach_restrict_' . $type], comma_format($modSettings[$type], 0))
-					: sprintf($txt['attach_restrict_' . $type], byte_format($modSettings[$type] * 1024, 0));
+					: sprintf($txt['attach_restrict_' . $type], byte_format($modSettings[$type] * 1024));
 
 				// Show some numbers.
 				if ($type === 'attachmentNumPerPostLimit')

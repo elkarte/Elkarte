@@ -205,13 +205,14 @@ class Image
 	 * @param null|bool $force if forcing the image resize to scale up, the default action
 	 * @return bool|\ElkArte\Graphics\Image On success returns an image class loaded with new image
 	 */
-	public function createThumbnail($max_width, $max_height, $dstName = '', $format = '', $force = null)
+	public function createThumbnail($max_width, $max_height, $dstName = '', $format = null, $force = null)
 	{
 		global $modSettings;
 
 		// The particulars
 		$dstName = $dstName === '' ? $this->_fileName . '_thumb' : $dstName;
-		$format = empty($format) && !empty($modSettings['attachment_thumb_png']) ? IMAGETYPE_PNG : IMAGETYPE_JPEG;
+		$default_format = empty($modSettings['attachment_thumb_png']) ? IMAGETYPE_JPEG : IMAGETYPE_PNG;
+		$format = $format ?? $default_format;
 		$max_width = max(16, $max_width);
 		$max_height = max(16, $max_height);
 

@@ -2962,7 +2962,7 @@ function package_create_backup($id = 'backup')
  * @param string $post_data = ''
  * @param bool $keep_alive = false
  * @param int $redirection_level = 3
- * @return string
+ * @return false|string
  * @package Packages
  */
 function fetch_web_data($url, $post_data = '', $keep_alive = false, $redirection_level = 3)

@@ -1591,4 +1591,3 @@ function getMimeType($filename)
 
 	return $mimeType;
 }
-

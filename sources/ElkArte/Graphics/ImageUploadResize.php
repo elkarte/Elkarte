@@ -58,7 +58,8 @@ class ImageUploadResize
 			$this->_setBounds();
 
 			// Attempt to WxH resize maintaining the existing format
-			if ($success = $this->image->isImageLoaded() && $this->resize())
+			$success = $this->image->isImageLoaded() && $this->resize();
+			if ($success)
 			{
 				$fileData = array_merge($fileData, $this->updateSizing());
 
@@ -69,7 +70,8 @@ class ImageUploadResize
 				{
 					// Work with the newly resized image
 					$this->image = new Image($fileData['tmp_name']);
-					if ($success = $this->image->isImageLoaded() && $this->resize(false))
+					$success = $this->image->isImageLoaded() && $this->resize(false);
+					if ($success)
 					{
 						$fileData = array_merge($fileData, $this->updateSizing(false));
 					}
