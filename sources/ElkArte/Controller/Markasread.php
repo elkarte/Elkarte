@@ -14,93 +14,85 @@
 namespace ElkArte\Controller;
 
 use ElkArte\AbstractController;
+use ElkArte\Action;
 use ElkArte\Languages\Txt;
 
 /**
  * This class handles a part of the actions to mark boards, topics, or replies,
  * as read/unread.
  */
-class MarkRead extends AbstractController
+class Markasread extends AbstractController
 {
-	/**
-	 * String used to redirect user to the correct boards when marking unread
-	 * ajax-ively
-	 *
-	 * @var array
-	 */
+	/** @var array used to redirect user to the correct boards when marking unread */
 	private $_querystring_board_limits;
 
-	/**
-	 * String used to remember user's sorting options when marking unread
-	 * ajax-ively
-	 *
-	 * @var array
-	 */
+	/** @var array used to remember user's sorting options when marking unread */
 	private $_querystring_sort_limits;
 
+	/** @var bool if this is an api call */
+	private $api = false;
+
 	/**
-	 * This is the main function for markasread file if not using API
+	 * This is the pre-dispatch function, actions common to all methods
+	 */
+	public function pre_dispatch()
+	{
+		$this->api = $this->getApi() === 'xml';
+
+		// We will check these items in the ajax function
+		if (!$this->api)
+		{
+			// Guests can't mark things.
+			is_not_guest();
+
+			checkSession('get');
+		}
+	}
+
+	/**
+	 * This is the main function for markasread file
 	 *
-	 * @see \ElkArte\AbstractController::action_index()
+	 * markasread;sa=topic;t=###;topic=###.0;session Mark a topic unread
+	 * markasread;sa=board;board=#.0;session Mark a board (all its topics) as read
+	 * markasread;sa=board;c=#;start=0;session Mark a category read
+	 * markasread;sa=all;session everything is read
+	 * markasread;sa=unreadreplies;topics=6056-4692-6026-5817;session
 	 */
 	public function action_index()
 	{
-		// These checks have been moved here.
-		// Do NOT call the specific handlers directly.
+		global $context;
 
-		// Guests can't mark things.
-		is_not_guest();
+		$subActions = array(
+			'all' => array($this, 'action_markboards'),
+			'unreadreplies' => array($this, 'action_markreplies'),
+			'topic' => array($this, 'action_marktopic_unread'),
+			'markasread' => array($this, 'action_markasread')
+		);
 
-		checkSession('get');
+		$action = new Action('markasread');
+		$subAction = $action->initialize($subActions, 'markasread');
+		$context['sub_action'] = $subAction;
 
-		$redir = $this->_dispatch();
-
-		redirectexit($redir);
-	}
-
-	/**
-	 * This function forwards the request to the appropriate function.
-	 *
-	 * @return string
-	 */
-	private function _dispatch()
-	{
-		$subAction = $this->_req->getQuery('sa', 'trim', 'action_markasread');
-
-		switch ($subAction)
+		if ($this->api)
 		{
-			// sa=all action_markboards()
-			case 'all':
-				$subAction = 'action_markboards';
-				break;
-			case 'unreadreplies':
-				// mark topics from unread
-				$subAction = 'action_markreplies';
-				break;
-			case 'topic':
-				// mark a single topic as read
-				$subAction = 'action_marktopic';
-				break;
-			default:
-				// the rest, for now...
-				$subAction = 'action_markasread';
-				break;
+			$this->action_index_api($action, $subAction);
+			return;
 		}
 
-		return $this->{$subAction}();
+		$action->dispatch($subAction);
 	}
 
 	/**
-	 * This is the main method for markasread controller when using APIs.
+	 * This is the controller when using APIs.
 	 *
 	 * @uses Xml template generic_xml_buttons sub template
 	 */
-	public function action_index_api()
+	public function action_index_api($action, $subAction)
 	{
 		global $context, $txt;
 
+		// Setup for an Ajax response
 		theme()->getTemplates()->load('Xml');
-
 		theme()->getLayers()->removeAll();
 		$context['sub_template'] = 'generic_xml_buttons';
 
@@ -116,6 +108,7 @@ class MarkRead extends AbstractController
 			return;
 		}
 
+		// Best have a valid session
 		if (checkSession('get', '', false))
 		{
 			// Again, this is a special case, someone will deal with the others later :P
@@ -129,13 +122,12 @@ class MarkRead extends AbstractController
 
 				return;
 			}
-			else
-			{
-				obExit(false);
-			}
+
+			obExit(false);
 		}
 
-		$this->_dispatch();
+		// Dispatch to the right method
+		//$action->dispatch($subAction);
 
 		// For the time being this is a special case, but in BoardIndex no, we don't want it
 		if ($this->_req->getQuery('sa') === 'all' || $this->_req->getQuery('sa') === 'board' && !isset($this->_req->query->bi))
@@ -146,20 +138,22 @@ class MarkRead extends AbstractController
 				$url_params += $this->_querystring_board_limits;
 				$url_params['start'] = 0;
 			}
-			if (!empty($this->$this->_querystring_sort_limits))
+
+			if (!empty($this->_querystring_sort_limits))
 			{
-				$url_params += $this->$this->_querystring_sort_limits;
+				$url_params += $this->_querystring_sort_limits;
 			}
+
 			$context['xml_data'] = array(
 				'text' => $txt['topic_alert_none'],
 				'body' => str_replace('{unread_all_url}', getUrl('action', $url_params), $txt['unread_topics_visit_none']),
 			);
+
+			return;
 		}
-		// No need to do anything, just die :'(
-		else
-		{
-			obExit(false);
-		}
+
+		// No need to output anything, just return to the button
+		obExit(false);
 	}
 
 	/**
@@ -183,9 +177,10 @@ class MarkRead extends AbstractController
 		}
 
 		$_SESSION['id_msg_last_visit'] = $modSettings['maxMsgID'];
+		$redirectAction = '';
 		if (!empty($_SESSION['old_url']) && strpos($_SESSION['old_url'], 'action=unread') !== false)
 		{
-			return 'action=unread';
+			$redirectAction = 'action=unread';
 		}
 
 		if (isset($_SESSION['topicseen_cache']))
@@ -193,14 +188,17 @@ class MarkRead extends AbstractController
 			$_SESSION['topicseen_cache'] = array();
 		}
 
-		if (!empty($modSettings['default_forum_action']))
+		if (!empty($modSettings['default_forum_action']) && $redirectAction === '')
 		{
-			return getUrlQuery('action', $modSettings['default_forum_action']);
+			$redirectAction = getUrlQuery('action', $modSettings['default_forum_action']);
 		}
-		else
+
+		if ($this->api)
 		{
-			return '';
+			return;
 		}
+
+		redirectexit($redirectAction);
 	}
 
 	/**
@@ -231,26 +229,30 @@ class MarkRead extends AbstractController
 			$_SESSION['topicseen_cache'] = array();
 		}
 
-		return 'action=unreadreplies';
+		if ($this->api)
+		{
+			return;
+		}
+
+		redirectexit('action=unreadreplies');
 	}
 
 	/**
-	 * Mark a single topic as unread.
+	 * Mark a single topic as unread, returning to the board topic listing
 	 *
-	 * - Accessed by action=markasread;sa=topic
+	 * - Accessed by action=markasread;sa=topic;topic=123;t=123
+	 * - Button URL set in Display.php Controller
 	 */
-	public function action_marktopic()
+	public function action_marktopic_unread()
 	{
 		global $board, $topic;
 
 		require_once(SUBSDIR . '/Topic.subs.php');
 		require_once(SUBSDIR . '/Messages.subs.php');
 
-		// Mark a topic unread.
 		// First, let's figure out what the latest message is.
 		$topicinfo = getTopicInfo($topic, 'all');
 		$topic_msg_id = $this->_req->getQuery('t', 'intval');
-
 		if (!empty($topic_msg_id))
 		{
 			// If they read the whole topic, go back to the beginning.
@@ -283,14 +285,20 @@ class MarkRead extends AbstractController
 		// Blam, unread!
 		markTopicsRead(array($this->user->id, $topic, $earlyMsg, $topicinfo['unwatched']), true);
 
-		return 'board=' . $board . '.0';
+		if ($this->api)
+		{
+			return;
+		}
+
+		redirectexit('board=' . $board . '.0');
 	}
 
 	/**
 	 * Mark as read: boards, topics, unread replies.
 	 *
+	 * - action=markasread;sa=board;board=1.0;HvVjpAAiL=5sGGC9DvMYeGTiH1MkTJjTcAG6foW2qm
 	 * - Accessed by action=markasread
-	 * - Subactions: sa=topic, sa=all, sa=unreadreplies
+	 * - Subactions: sa=topic, sa=all, sa=unreadreplies, sa=board
 	 */
 	public function action_markasread()
 	{
@@ -326,7 +334,12 @@ class MarkRead extends AbstractController
 
 		if (empty($boards))
 		{
-			return '';
+			if ($this->api)
+			{
+				return;
+			}
+
+			redirectexit();
 		}
 
 		// Mark boards as read.
@@ -342,14 +355,33 @@ class MarkRead extends AbstractController
 
 		$this->_querystring_board_limits = $this->_req->getQuery('sa') === 'board' ? ['boards' => implode(',', $boards), 'start' => '%d'] : [];
 
-		$sort_methods = array(
+		$this->_setQuerystringSortLimits();
+
+		$this->_markAsRead($boards);
+
+		if (empty($board_info['parent']) && !$this->api)
+		{
+			redirectexit();
+		}
+
+		if ($this->api)
+		{
+			return;
+		}
+
+		redirectexit('board=' . $board_info['parent'] . '.0');
+	}
+
+	private function _setQuerystringSortLimits()
+	{
+		$sort_methods = [
 			'subject',
 			'starter',
 			'replies',
 			'views',
 			'first_post',
 			'last_post'
-		);
+		];
 
 		// The default is the most logical: newest first.
 		if (!isset($this->_req->query->sort) || !in_array($this->_req->query->sort, $sort_methods))
@@ -361,30 +393,36 @@ class MarkRead extends AbstractController
 		{
 			$this->_querystring_sort_limits = ['sort' => $this->_req->query->sort, isset($this->_req->query->desc) ? 'desc' : ''];
 		}
+	}
 
-		if (!isset($this->_req->query->unread))
-		{
-			// Find all boards with the parents in the board list
-			$boards_to_add = accessibleBoards(null, $boards);
-			if (!empty($boards_to_add))
-			{
-				markBoardsRead($boards_to_add);
-			}
+	private function _markAsRead($boards)
+	{
+		global $board;
 
-			if (empty($board))
-			{
-				return '';
-			}
-			else
-			{
-				return 'board=' . $board . '.0';
-			}
-		}
-		elseif (empty($board_info['parent']))
+		// Want to mark as unread, nothing to do here
+		if (isset($this->_req->query->unread))
 		{
-			return '';
+			return;
 		}
 
-		return 'board=' . $board_info['parent'] . '.0';
+		// Find all boards with the parents in the board list
+		$boards_to_add = accessibleBoards(null, $boards);
+		if (!empty($boards_to_add))
+		{
+			markBoardsRead($boards_to_add);
+		}
+
+		$redirectAction = 'board=' . $board . '.0';
+		if (empty($board))
+		{
+			$redirectAction = '';
+		}
+
+		if ($this->api)
+		{
+			return;
+		}
+
+		redirectexit($redirectAction);
 	}
 }
