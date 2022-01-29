@@ -1,6 +1,6 @@
 <?php
 
-use ElkArte\Controller\MarkRead;
+use ElkArte\Controller\Markasread;
 use ElkArte\EventManager;
 use ElkArte\HttpReq;
 use ElkArte\User;
@@ -38,19 +38,18 @@ class TestMarkReadController extends ElkArteCommonSetupTest
 	 */
 	public function testActionMarkboards()
 	{
-		global $modSettings;
-
 		// Get the controller, call index
-		$controller = new MarkRead(new EventManager());
+		$req = HttpReq::instance();
+		$controller = new Markasread(new EventManager());
 		$controller->setUser(User::$info);
 		$result = $controller->action_markboards();
 
 		// Check that the url was set
-		$this->assertEquals('', $result, $result);
+		$this->assertEquals('', $result, 'Result::' . $result);
 	}
 
 	/**
-	 * Mark a unread relies as read
+	 * Mark unread reply as read
 	 */
 	public function testActionMarkReplies()
 	{
@@ -58,12 +57,12 @@ class TestMarkReadController extends ElkArteCommonSetupTest
 		$req->query->topics = 1;
 
 		// Get the controller, call index
-		$controller = new MarkRead(new EventManager());
+		$controller = new Markasread(new EventManager());
 		$controller->setUser(User::$info);
 		$result = $controller->action_markreplies();
 
 		// Check that the result was set
-		$this->assertEquals('action=unreadreplies', $result, $result);
+		$this->assertEquals('action=unreadreplies', $result, 'Result::' . $result);
 	}
 
 	/**
@@ -80,12 +79,12 @@ class TestMarkReadController extends ElkArteCommonSetupTest
 		$req->query->t = 1;
 
 		// Get the controller, call index
-		$controller = new MarkRead(new EventManager());
+		$controller = new Markasread(new EventManager());
 		$controller->setUser(User::$info);
-		$result = $controller->action_marktopic();
+		$result = $controller->action_marktopic_unread();
 
 		// Check that result was set
-		$this->assertEquals('board=1.0', $result, $result);
+		$this->assertEquals('board=1.0', $result, 'Result::' . $result);
 	}
 
 	/**
@@ -105,11 +104,11 @@ class TestMarkReadController extends ElkArteCommonSetupTest
 		$req->query->children = 1;
 
 		// Get the controller, call index
-		$controller = new MarkRead(new EventManager());
+		$controller = new Markasread(new EventManager());
 		$controller->setUser(User::$info);
 		$result = $controller->action_markasread();
 
 		// Check that result was set
-		$this->assertEquals('board=1.0', $result, $result);
+		$this->assertEquals('', $result, 'Result::' . $result);
 	}
 }

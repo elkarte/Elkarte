@@ -539,7 +539,7 @@ function redirectexit($setLocation = '')
 	// Allow a way for phpunit to run controller methods, pretty? no but allows us to return to the test
 	if (defined('PHPUNITBOOTSTRAP') && defined('STDIN'))
 	{
-		return;
+		return $setLocation;
 	}
 
 	// Send headers, call integration, do maintance

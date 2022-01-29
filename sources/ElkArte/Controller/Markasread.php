@@ -76,7 +76,7 @@ class Markasread extends AbstractController
 		if ($this->api)
 		{
 			$this->action_index_api($action, $subAction);
-			return;
+			return '';
 		}
 
 		$action->dispatch($subAction);
@@ -105,7 +105,7 @@ class Markasread extends AbstractController
 				'text' => $txt['not_guests']
 			);
 
-			return;
+			return '';
 		}
 
 		// Best have a valid session
@@ -120,7 +120,7 @@ class Markasread extends AbstractController
 					'url' => getUrl('action', ['action' => 'markasread', 'sa' => 'all', '{session_data}']),
 				);
 
-				return;
+				return '';
 			}
 
 			obExit(false);
@@ -149,7 +149,7 @@ class Markasread extends AbstractController
 				'body' => str_replace('{unread_all_url}', getUrl('action', $url_params), $txt['unread_topics_visit_none']),
 			);
 
-			return;
+			return '';
 		}
 
 		// No need to output anything, just return to the button
@@ -195,10 +195,10 @@ class Markasread extends AbstractController
 
 		if ($this->api)
 		{
-			return;
+			return '';
 		}
 
-		redirectexit($redirectAction);
+		return redirectexit($redirectAction);
 	}
 
 	/**
@@ -231,10 +231,10 @@ class Markasread extends AbstractController
 
 		if ($this->api)
 		{
-			return;
+			return '';
 		}
 
-		redirectexit('action=unreadreplies');
+		return redirectexit('action=unreadreplies');
 	}
 
 	/**
@@ -287,17 +287,16 @@ class Markasread extends AbstractController
 
 		if ($this->api)
 		{
-			return;
+			return '';
 		}
 
-		redirectexit('board=' . $board . '.0');
+		return redirectexit('board=' . $board . '.0');
 	}
 
 	/**
 	 * Mark as read: boards, topics, unread replies.
 	 *
-	 * - action=markasread;sa=board;board=1.0;HvVjpAAiL=5sGGC9DvMYeGTiH1MkTJjTcAG6foW2qm
-	 * - Accessed by action=markasread
+	 * - Accessed by action=markasread;sa=board;board=1.0;session
 	 * - Subactions: sa=topic, sa=all, sa=unreadreplies, sa=board
 	 */
 	public function action_markasread()
@@ -336,10 +335,10 @@ class Markasread extends AbstractController
 		{
 			if ($this->api)
 			{
-				return;
+				return '';
 			}
 
-			redirectexit();
+			return redirectexit();
 		}
 
 		// Mark boards as read.
@@ -361,17 +360,20 @@ class Markasread extends AbstractController
 
 		if (empty($board_info['parent']) && !$this->api)
 		{
-			redirectexit();
+			return redirectexit();
 		}
 
 		if ($this->api)
 		{
-			return;
+			return '';
 		}
 
-		redirectexit('board=' . $board_info['parent'] . '.0');
+		return redirectexit('board=' . $board_info['parent'] . '.0');
 	}
 
+	/**
+	 * Sets the sorting parameters
+	 */
 	private function _setQuerystringSortLimits()
 	{
 		$sort_methods = [
@@ -395,6 +397,11 @@ class Markasread extends AbstractController
 		}
 	}
 
+	/**
+	 * Mark a group of boards as read
+	 *
+	 * @param array $boards
+	 */
 	private function _markAsRead($boards)
 	{
 		global $board;
@@ -402,7 +409,7 @@ class Markasread extends AbstractController
 		// Want to mark as unread, nothing to do here
 		if (isset($this->_req->query->unread))
 		{
-			return;
+			return '';
 		}
 
 		// Find all boards with the parents in the board list
@@ -420,9 +427,9 @@ class Markasread extends AbstractController
 
 		if ($this->api)
 		{
-			return;
+			return '';
 		}
 
-		redirectexit($redirectAction);
+		return redirectexit($redirectAction);
 	}
 }
