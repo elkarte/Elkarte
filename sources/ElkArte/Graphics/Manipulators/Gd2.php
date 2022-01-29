@@ -70,6 +70,7 @@ class Gd2 extends AbstractManipulator
 			try
 			{
 				$imagecreatefrom = 'imagecreatefrom' . Image::DEFAULT_FORMATS[$this->imageDimensions[2]];
+				/** @var $image \GdImage */
 				$image = $imagecreatefrom($this->_fileName);
 			}
 			catch (\Exception $e)
@@ -90,7 +91,7 @@ class Gd2 extends AbstractManipulator
 	/**
 	 * Sets the internal GD image resource.
 	 *
-	 * @param resource $image
+	 * @param \GdImage $image
 	 */
 	protected function _setImage($image)
 	{
@@ -110,6 +111,10 @@ class Gd2 extends AbstractManipulator
 	{
 		require_once(SUBSDIR . '/Package.subs.php');
 		$image_data = fetch_web_data($this->_fileName);
+		if ($image_data === false)
+		{
+			return false;
+		}
 
 		$this->setImageDimensions('string', $image_data);
 		if (isset(Image::DEFAULT_FORMATS[$this->imageDimensions[2]]))

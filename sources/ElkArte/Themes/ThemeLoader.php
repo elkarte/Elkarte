@@ -566,7 +566,7 @@ class ThemeLoader
 
 			// Hmm... check #2 - is it just different by a www?  Send them to the correct place!!
 			if (empty($do_fix) && strtr($detected_url,
-					['://' => '://www.']) == $boardurl && (empty($_GET) || count($_GET) === 1) && ELK != 'SSI'
+					['://' => '://www.']) == $boardurl && (empty($_GET) || count($_GET) === 1) && ELK !== 'SSI'
 			)
 			{
 				// Okay, this seems weird, but we don't want an endless loop - this will make $_GET not empty ;).

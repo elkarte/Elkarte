@@ -119,7 +119,7 @@ function writeLog($force = false)
 	}
 
 	// Set their login time, if not already done within the last minute.
-	if (ELK != 'SSI' && !empty(User::$info->last_login) && User::$info->last_login < time() - 60)
+	if (ELK !== 'SSI' && !empty(User::$info->last_login) && User::$info->last_login < time() - 60)
 	{
 		// We log IPs the request came with, around here
 		$req = request();

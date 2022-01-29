@@ -207,7 +207,8 @@ function comma_format($number, $override_decimal_count = false)
 	}
 
 	// Format the string with our friend, number_format.
-	return number_format($number, (float) $number === $number ? ($override_decimal_count === false ? $decimal_count : $override_decimal_count) : 0, $decimal_separator, $thousands_separator);
+	$decimals = ((float) $number === $number) ? ($override_decimal_count === false ? $decimal_count : $override_decimal_count) : 0;
+	return number_format($number, (int) $decimals, $decimal_separator, $thousands_separator);
 }
 
 /**
@@ -220,7 +221,7 @@ function comma_format($number, $override_decimal_count = false)
  */
 function thousands_format($number, $override_decimal_count = false)
 {
-	foreach (array('', ' k', ' M', ' G', ' T') as $kb)
+	foreach (['', ' k', ' M', ' G', ' T'] as $kb)
 	{
 		if ($number < 1000)
 		{

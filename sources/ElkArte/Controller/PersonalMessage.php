@@ -739,6 +739,8 @@ class PersonalMessage extends AbstractController
 
 	/**
 	 * Send a new personal message?
+	 *
+	 * @throws \ElkArte\Exceptions\Exception pm_not_yours
 	 */
 	public function action_send()
 	{
@@ -776,7 +778,8 @@ class PersonalMessage extends AbstractController
 		}
 		catch (PmErrorException $e)
 		{
-			return $this->messagePostError($e->namedRecipientList, $e->recipientList, $e->msgOptions);
+			$this->messagePostError($e->namedRecipientList, $e->recipientList, $e->msgOptions);
+			return;
 		}
 
 		// Quoting / Replying to a message?

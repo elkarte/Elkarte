@@ -117,15 +117,19 @@ class Imagick extends AbstractManipulator
 	public function createImageFromWeb()
 	{
 		require_once(SUBSDIR . '/Package.subs.php');
-		$image = fetch_web_data($this->_fileName);
-		$this->setImageDimensions('string', $image);
+		$image_data = fetch_web_data($this->_fileName);
+		if ($image_data === false)
+		{
+			return false;
+		}
 
+		$this->setImageDimensions('string', $image_data);
 		if (isset(Image::DEFAULT_FORMATS[$this->imageDimensions[2]]))
 		{
 			try
 			{
 				$this->_image = new \Imagick();
-				$this->_image->readImageBlob($image);
+				$this->_image->readImageBlob($image_data);
 			}
 			catch (\ImagickException $e)
 			{

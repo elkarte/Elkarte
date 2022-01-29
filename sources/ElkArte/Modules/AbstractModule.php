@@ -25,10 +25,10 @@ use ElkArte\UserInfo;
 abstract class AbstractModule implements ModuleInterface
 {
 	/** @var \ElkArte\HttpReq|null Access to post/get data */
-	protected $_req = null;
+	protected $_req;
 
 	/** @var \ElkArte\UserInfo|null User Info ValuesContainer */
-	protected $user = null;
+	protected $user;
 
 	/**
 	 * AbstractModule constructor.

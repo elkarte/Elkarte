@@ -107,7 +107,7 @@ class Notifications extends AbstractModel
 	/**
 	 * Function to register any new notification method.
 	 *
-	 * @param string $class the name of a class.
+	 * @param string $class_name the name of a class.
 	 * @param string $namespace the namespace of the class.
 	 *
 	 * Used to identify the strings for the subject and body respectively of the notification.
@@ -120,7 +120,7 @@ class Notifications extends AbstractModel
 			$namespace = Notifications::NOTIFIERS_NAMESPACE;
 		}
 
-		$class = Notifications::NOTIFIERS_NAMESPACE . '\\' . $class_name;
+		$class = $namespace . '\\' . $class_name;
 		$index = strtolower($class_name);
 
 		if (isset($this->_notifiers[$index]))

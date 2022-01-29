@@ -396,13 +396,13 @@ function getXMLRecent($query_this_board, $board, $limit)
  *
  * @param string $val
  *
- * @return null|string|string[]
+ * @return string
  */
 function fix_possible_url($val)
 {
 	global $scripturl;
 
-	if (substr($val, 0, strlen($scripturl)) != $scripturl)
+	if (substr($val, 0, strlen($scripturl)) !== $scripturl)
 	{
 		return $val;
 	}
