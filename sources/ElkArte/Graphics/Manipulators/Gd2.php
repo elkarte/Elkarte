@@ -23,7 +23,7 @@ use \ElkArte\Graphics\Image;
  */
 class Gd2 extends AbstractManipulator
 {
-	/** @var resource */
+	/** @var \GdImage */
 	protected $_image;
 
 	/**

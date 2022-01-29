@@ -251,7 +251,7 @@
 			}
 
 			let embedURL = '//player.vimeo.com/video/' + videoID,
-				tag = null,
+				tag,
 				img = '//assets.vimeo.com/images/logo_vimeo_land.png';
 
 			// Get the preview image or embed tag
@@ -284,7 +284,7 @@
 			}
 
 			let embedURL = '//dailymotion.com/embed/video/' + videoID,
-				tag = null,
+				tag,
 				img = '//dailymotion.com/thumbnail/video/' + videoID;
 
 			// Get the preview image or embed tag
@@ -317,7 +317,7 @@
 			}
 
 			let embedURL = 'https://www.tiktok.com/' + videoID[1] + '/video/' + videoID[2],
-				tag = null,
+				tag,
 				img = '//sf-tb-sg.ibytedtos.com/obj/ttfe-malisg/tiktok-logo.png',
 				data = {};
 

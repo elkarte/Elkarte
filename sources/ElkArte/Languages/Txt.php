@@ -27,7 +27,7 @@ class Txt
 	/**
 	 * Loads the language lexicon file(s) in the proper language
 	 *
-	 * @param string $lexicon File(s) to load
+	 * @param string|string[] $lexicon File(s) to load
 	 * @param boolean $fatal
 	 * @param boolean $fix_calendar_arrays
 	 */

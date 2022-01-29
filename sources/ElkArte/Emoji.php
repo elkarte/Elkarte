@@ -95,7 +95,6 @@ class Emoji extends AbstractModel
 		$string = $this->emojiFromHTML($string);
 
 		return $this->emojiFromUni($string);
-
 	}
 
 	/**

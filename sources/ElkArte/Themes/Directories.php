@@ -16,7 +16,6 @@ namespace ElkArte\Themes;
 
 use ElkArte\FileFunctions;
 use Error;
-use mysql_xdevapi\Exception;
 
 /**
  *
@@ -145,7 +144,7 @@ class Directories
 		}
 		catch (Error $e)
 		{
-			throw new Error('', '', $e);
+			throw new Error('', 0, $e);
 		}
 	}
 }

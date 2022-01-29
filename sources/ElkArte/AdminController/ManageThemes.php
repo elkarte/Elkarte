@@ -413,7 +413,7 @@ class ManageThemes extends AbstractController
 		Txt::load('Settings', '', true);
 
 		// And the custom language strings...
-		Txt::load('ThemeStrings', '', false);
+		Txt::load('ThemeStrings', false);
 
 		// Let the theme take care of the settings.
 		theme()->getTemplates()->load('Settings');
