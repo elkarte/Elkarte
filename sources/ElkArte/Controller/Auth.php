@@ -681,8 +681,6 @@ class Auth extends AbstractController
 	 */
 	public function action_check()
 	{
-		global $modSettings;
-
 		// Only our members, please.
 		if ($this->user->is_guest === false)
 		{

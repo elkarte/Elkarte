@@ -696,7 +696,7 @@ class ManageLanguages extends AbstractController
 	 */
 	public function action_editlang()
 	{
-		global $settings, $context, $txt;
+		global $context, $txt;
 
 		$base_lang_dir = SOURCEDIR . '/ElkArte/Languages';
 		require_once(SUBSDIR . '/Language.subs.php');
@@ -758,7 +758,7 @@ class ManageLanguages extends AbstractController
 
 		// Quickly load index language entries.
 		$edit_lang = new LangEditor($context['lang_id'], database());
-		$edit_lang->load($file_id, true);
+		$edit_lang->load($file_id);
 
 		$context['file_entries'] = $edit_lang->getForEditing();
 

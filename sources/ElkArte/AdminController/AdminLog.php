@@ -39,7 +39,7 @@ class AdminLog extends AbstractController
 	 */
 	public function action_index()
 	{
-		global $context, $txt, $modSettings;
+		global $context, $txt;
 
 		// These are the logs they can load.
 		$subActions = array(

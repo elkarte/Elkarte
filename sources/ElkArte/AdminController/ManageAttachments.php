@@ -743,7 +743,7 @@ class ManageAttachments extends AbstractController
 	 */
 	public function action_remove()
 	{
-		global $txt, $language;
+		global $language;
 
 		checkSession('post');
 
