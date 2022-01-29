@@ -24,6 +24,12 @@ class UserInfo extends ValuesContainer
 		return $this->data['last_login'] === 0;
 	}
 
+	/**
+	 * Validates that a user can moderate
+	 *
+	 * @param bool $postmodActive
+	 * @return bool
+	 */
 	public function canMod($postmodActive)
 	{
 		return allowedTo('access_mod_center')

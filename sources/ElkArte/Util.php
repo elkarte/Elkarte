@@ -620,22 +620,25 @@ class Util
 	public static function is_serialized($string)
 	{
 		$check = false;
+
 		// Easy cases
 		if (!is_string($string) || $string === '')
 		{
-			return $check;
+			return false;
 		}
 
 		// Attempt to unserialize, mask errors
 		set_error_handler(function () { /* ignore errors */ });
 		try
 		{
-			if(unserialize($string, ['allowed_classes' => false]) !== false)
+			if (unserialize($string, ['allowed_classes' => false]) !== false)
+			{
 				$check = true;
+			}
 		}
 		catch (\Throwable $e)
 		{
-			null;
+			/* do nothing */
 		}
 		finally
 		{
@@ -645,20 +648,24 @@ class Util
 		return $check;
 	}
 
-	/*
-	* Provide a PHP 8.1 version of strftime
-	*
-	* @param string $format of the date/time to return
-	* @param int|null $timestamp to convert
-	* @return string|false
-	*/
+	/**
+	 * Provide a PHP 8.1 version of strftime
+	 *
+	 * @param string $format of the date/time to return
+	 * @param int|null $timestamp to convert
+	 * @return string|false
+	 */
 	public static function strftime(string $format, int $timestamp = null)
 	{
 		if (function_exists('strftime') && (PHP_VERSION_ID < 80100))
+		{
 			return \strftime($format, $timestamp);
+		}
 
 		if (is_null($timestamp))
+		{
 			$timestamp = time();
+		}
 
 		$date_equivalents = array (
 			'%a' => 'D',
@@ -710,7 +717,7 @@ class Util
 			'%%' => '%',
 		);
 
-		$format = preg_replace_callback(
+		return preg_replace_callback(
 			'/%[A-Za-z]{1}/',
 			function($matches) use ($timestamp, $date_equivalents)
 			{
@@ -719,22 +726,22 @@ class Util
 			},
 			$format
 		);
-
-		return $format;
 	}
 
-	/*
-	* Provide a PHP 8.1 version of gmstrftime
-	*
-	* @param string $format of the date/time to return
-	* @param int|null $timestamp to convert
-	* @return string|false
-	*/
-	function gmstrftime(string $format, int $timestamp = null)
+	/**
+	 * Provide a PHP 8.1 version of gmstrftime
+	 *
+	 * @param string $format of the date/time to return
+	 * @param int|null $timestamp to convert
+	 * @return string|false
+	 */
+	public static function gmstrftime(string $format, int $timestamp = null)
 	{
 		if (function_exists('gmstrftime') && (PHP_VERSION_ID < 80100))
+		{
 			return \gmstrftime($format, $timestamp);
-		
+		}
+
 		return self::strftime($format, $timestamp);
 	}
 }

@@ -1225,7 +1225,7 @@ function allowedTo($permission, $boards = null)
  * @param string[]|string $permission array of or single string, of permissions to check
  * @param int[]|null $boards = null
  *
- * @throws \ElkArte\Exceptions\Exception
+ * @throws \ElkArte\Exceptions\Exception cannot_xyz where xyz is the permission
  */
 function isAllowedTo($permission, $boards = null)
 {

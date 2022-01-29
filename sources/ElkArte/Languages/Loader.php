@@ -22,19 +22,19 @@ use ElkArte\Database\QueryInterface;
  */
 class Loader
 {
-	/** @var string */
+	/** @var string the area lexicon file to load */
 	protected $path = '';
 
-	/** @var QueryInterface */
+	/** @var QueryInterface Good old db */
 	protected $db = '';
 
-	/** @var string */
+	/** @var string the language in use */
 	protected $language = 'English';
 
 	/** @var string */
 	protected $variable_name = '';
 
-	/** @var bool */
+	/** @var bool if to fallback when we can find a request language area file */
 	protected $load_fallback = true;
 
 	/** @var mixed[] */
@@ -43,7 +43,15 @@ class Loader
 	/** @var string[] Holds the name of the files already loaded to load them only once */
 	protected $loaded = [];
 
-	public function __construct($lang = null, &$variable, QueryInterface $db, string $variable_name = 'txt')
+	/**
+	 * The constructor
+	 *
+	 * @param string|null $lang area lexicon file to load
+	 * @param array $variable to return string in
+	 * @param \ElkArte\Database\QueryInterface $db
+	 * @param string $variable_name
+	 */
+	public function __construct($lang, &$variable, QueryInterface $db, string $variable_name = 'txt')
 	{
 		if ($lang !== null)
 		{
@@ -52,25 +60,43 @@ class Loader
 
 		$this->path = SOURCEDIR . '/ElkArte/Languages/';
 		$this->db = $db;
-
 		$this->variable = &$variable;
 		$this->variable_name = $variable_name;
+
 		if (empty($this->variable))
 		{
 			$this->variable = [];
 		}
 	}
 
+	/**
+	 * If we should use a fallback language when the requested one is not found
+	 *
+	 * @param bool $new_Status
+	 */
 	public function setFallback(bool $new_Status)
 	{
 		$this->load_fallback = $new_Status;
 	}
 
+	/**
+	 * Set the path where we should be looking for files
+	 *
+	 * @param string $path
+	 */
 	public function changePath($path)
 	{
 		$this->path = $path;
 	}
 
+	/**
+	 * Does the real work of looking for, then the loading the area files.  Will
+	 * implement a language fallback if enabled.
+	 *
+	 * @param string $file_name area language file to load
+	 * @param boolean $fatal what to do if we can not load the requested area
+	 * @param boolean $fix_calendar_arrays if to update the calendar [] as well
+	 */
 	public function load($file_name, $fatal = true, $fix_calendar_arrays = false)
 	{
 		global $db_show_debug, $txt;
@@ -115,6 +141,7 @@ class Loader
 						'template'
 					)
 				);
+
 				// If we do have a fallback it may not be necessary to break out.
 				if ($found_fallback === false)
 				{
@@ -130,10 +157,16 @@ class Loader
 		}
 	}
 
+	/**
+	 * Load in a custom replacement string from the DB
+	 *
+	 * @param string[] $files
+	 */
 	protected function loadFromDb($files)
 	{
 		$result = $this->db->fetchQuery('
-			SELECT language_key, value
+			SELECT 
+				language_key, value
 			FROM {db_prefix}languages
 			WHERE language = {string:language}
 				AND file IN ({array_string:files})',
@@ -149,9 +182,14 @@ class Loader
 		$result->free_result();
 	}
 
+	/**
+	 * @param string $name the lexicon file to load
+	 * @param string $language and in which language
+	 * @return bool
+	 */
 	protected function loadFile($name, $language)
 	{
-		$filepath = $this->path . $name . '/' . $this->language . '.php';
+		$filepath = $this->path . $name . '/' . $language . '.php';
 		if (file_exists($filepath))
 		{
 			require($filepath);
@@ -159,8 +197,10 @@ class Loader
 			{
 				$this->variable += ${$this->variable_name};
 			}
+
 			return true;
 		}
+
 		return false;
 	}
 
