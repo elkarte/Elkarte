@@ -1064,9 +1064,9 @@ class InstallInstructions_install_2_0
 	{
 		return $this->table->create_table('{db_prefix}languages',
 			array(
-				array('name' => 'language',     'type' => 'string', 'size' => 40,  'default' => ''),
-				array('name' => 'file',         'type' => 'string', 'size' => 40,  'default' => ''),
-				array('name' => 'language_key', 'type' => 'string', 'size' => 255, 'default' => ''),
+				array('name' => 'language',     'type' => 'varchar', 'size' => 40,  'default' => ''),
+				array('name' => 'file',         'type' => 'varchar', 'size' => 40,  'default' => ''),
+				array('name' => 'language_key', 'type' => 'varchar', 'size' => 255, 'default' => ''),
 				array('name' => 'value',        'type' => 'text'),
 			),
 			array(
