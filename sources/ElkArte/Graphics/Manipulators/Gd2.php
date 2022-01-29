@@ -160,7 +160,7 @@ class Gd2 extends AbstractManipulator
 		// No image, no further
 		if (empty($this->_image))
 		{
-			return $success;
+			return false;
 		}
 
 		$src_width = $this->_width;
@@ -501,7 +501,7 @@ class Gd2 extends AbstractManipulator
 	 */
 	public function __destruct()
 	{
-		if (is_resource($this->_image))
+		if (gettype($this->_image) === 'object' && get_class($this->_image) === 'GdImage')
 		{
 			imagedestroy($this->_image);
 		}

@@ -112,7 +112,6 @@ class Imagick extends AbstractManipulator
 	 * Loads an image from a web address into the image engine for processing
 	 *
 	 * @return bool|mixed
-	 * @throws \ImagickException
 	 */
 	public function createImageFromWeb()
 	{
@@ -423,7 +422,6 @@ class Imagick extends AbstractManipulator
 	 * @param string $format Type of the image (valid types are png, jpeg, gif)
 	 *
 	 * @return bool|string The image or false on error
-	 * @throws \ImagickException
 	 */
 	public function generateTextImage($text, $width = 100, $height = 75, $format = 'png')
 	{
@@ -445,7 +443,7 @@ class Imagick extends AbstractManipulator
 			$draw->setTextAlignment(\Imagick::ALIGN_CENTER);
 			$draw->setFont($settings['default_theme_dir'] . '/fonts/VDS_New.ttf');
 
-			// Make sure the text will fit the the allowed space
+			// Make sure the text will fit the allowed space
 			do
 			{
 				$draw->setFontSize($font_size);
@@ -466,9 +464,12 @@ class Imagick extends AbstractManipulator
 		}
 	}
 
+	/**
+	 * CLean up
+	 */
 	public function __destruct()
 	{
-		if ($this->_image)
+		if (gettype($this->_image) === 'object' && get_class($this->_image) === 'Imagick')
 		{
 			$this->_image->clear();
 		}
