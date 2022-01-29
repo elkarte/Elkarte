@@ -99,10 +99,11 @@ function messageDetails($id_msg, $id_topic = 0, $attachment_type = 0)
  * @param int $id_msg
  * @param bool $override_permissions
  * @param bool $detailed
+ * @param bool $approved only return approved messages
  *
  * @return mixed[]|false array of message details or false if no message found.
  */
-function basicMessageInfo($id_msg, $override_permissions = false, $detailed = false)
+function basicMessageInfo($id_msg, $override_permissions = false, $detailed = false, $approved = true)
 {
 	global $modSettings;
 
@@ -121,7 +122,7 @@ function basicMessageInfo($id_msg, $override_permissions = false, $detailed = fa
 		FROM {db_prefix}messages AS m' . ($override_permissions === true ? '' : '
 			INNER JOIN {db_prefix}boards AS b ON (b.id_board = m.id_board AND {query_see_board})') . ($detailed === false ? '' : '
 			LEFT JOIN {db_prefix}topics AS t ON (t.id_topic = m.id_topic)') . '
-		WHERE id_msg = {int:message}' . (empty($modSettings['postmod_active']) || allowedTo('approve_posts') ? '' : '
+		WHERE id_msg = {int:message}' . (empty($modSettings['postmod_active']) || allowedTo('approve_posts') || $approved === false ? '' : '
 			AND m.approved = 1') . '
 		LIMIT 1',
 		array(

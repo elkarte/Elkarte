@@ -458,6 +458,8 @@ class Post extends AbstractController
 
 		// In order to keep the approval status flowing through, we have to pass it through the form...
 		$context['becomes_approved'] = $not_approved;
+		//$context['show_approval'] = allowedTo('approve_posts') && $context['becomes_approved'] ? 2 : (allowedTo('approve_posts') ? 1 : 0);
+
 		$context['show_approval'] = isset($this->_req->post->approve) ? ($this->_req->post->approve ? 2 : 1) : 0;
 		$context['can_announce'] &= $context['becomes_approved'];
 
@@ -482,12 +484,12 @@ class Post extends AbstractController
 		// Only show the preview stuff if they hit Preview.
 		if ($really_previewing)
 		{
-			$this->_setupPreviewContext($ns);
+			$this->_setupPreviewContext(!$ns);
 		}
 
 		// Set up the checkboxes.
 		$context['notify'] = $notify;
-		$context['use_smileys'] = $ns;
+		$context['use_smileys'] = !$ns;
 		$context['icon'] = preg_replace('~[\./\\\\*\':"<>]~', '', $icon);
 
 		// Set the destination action for submission.
@@ -1025,7 +1027,7 @@ class Post extends AbstractController
 		{
 			$_REQUEST['msg'] = (int) $_REQUEST['msg'];
 
-			$msgInfo = basicMessageInfo($_REQUEST['msg'], true);
+			$msgInfo = basicMessageInfo($_REQUEST['msg'], true, false, false);
 
 			if (empty($msgInfo))
 			{
@@ -1101,7 +1103,7 @@ class Post extends AbstractController
 		// In case we want to override
 		if (allowedTo('approve_posts'))
 		{
-			$becomesApproved = !isset($_REQUEST['approve']) || !empty($_REQUEST['approve']) ? 1 : 0;
+			$becomesApproved = isset($_REQUEST['approve']) || !empty($_REQUEST['approve']) ? 1 : 0;
 			$approve_has_changed = isset($msgInfo['approved']) ? $msgInfo['approved'] != $becomesApproved : false;
 		}
 
