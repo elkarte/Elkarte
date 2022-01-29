@@ -930,6 +930,7 @@ class Theme extends BaseTheme
 	.i-menu-profile::before, .i-menu-profile.enabled::before {
 		content: "";
 		background-image: url("' . htmlspecialchars_decode($this->user->avatar['href']) . '");
+		background-position: center;
 		filter: unset;
 	}');
 		}
