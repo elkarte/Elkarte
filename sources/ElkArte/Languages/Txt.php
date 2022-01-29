@@ -16,7 +16,7 @@ namespace ElkArte\Languages;
 use ElkArte\User;
 
 /**
- * This class allows to keep track of the languages loaded and push the values to
+ * This class allows the tracking of the languages loaded and push the values to
  * global variables to maintain a balance between the "old" and the "new".
  */
 class Txt
@@ -24,7 +24,14 @@ class Txt
 	/** @var Loader[] */
 	protected static $loader = null;
 
-	public static function load($template, $fatal = true, $fix_calendar_arrays = false)
+	/**
+	 * Loads the language lexicon file(s) in the proper language
+	 *
+	 * @param string $lexicon File(s) to load
+	 * @param boolean $fatal
+	 * @param boolean $fix_calendar_arrays
+	 */
+	public static function load($lexicon, $fatal = true, $fix_calendar_arrays = false)
 	{
 		global $txt, $language, $modSettings;
 
@@ -35,10 +42,12 @@ class Txt
 			self::$loader = new Loader($lang, $txt, database());
 			self::$loader->setFallback(empty($modSettings['disable_language_fallback']));
 		}
-		if (is_array($template))
+
+		if (is_array($lexicon))
 		{
-			$template = implode('+', $template);
+			$lexicon = implode('+', $lexicon);
 		}
-		self::$loader->load($template, $fatal, $fix_calendar_arrays);
+
+		self::$loader->load($lexicon, $fatal, $fix_calendar_arrays);
 	}
 }
