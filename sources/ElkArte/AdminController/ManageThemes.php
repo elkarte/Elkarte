@@ -1630,7 +1630,7 @@ class ManageThemes extends AbstractController
 		{
 			if (!empty($options['minmax_preferences']))
 			{
-				$minmax_preferences = serializeToJson($options['minmax_preferences'], function ($array_form) {
+				$minmax_preferences = serializeToJson($options['minmax_preferences'], function ($array_form) use ($settings) {
 					// Update the option.
 					require_once(SUBSDIR . '/Themes.subs.php');
 					updateThemeOptions(array($settings['theme_id'], User::$info->id, 'minmax_preferences', json_encode($array_form)));
