@@ -159,11 +159,11 @@ jobs:
     strategy:
       matrix:
         include:
-          - php: '7.2'
-            db: "mariadb:10.2"
-          - php: '7.3'
-            db: "mysql:5.7"
           - php: '7.4'
+            db: "mariadb:10.2"
+          - php: '7.2'
+            db: "mysql:5.7"
+          - php: '8.0'
             db: "mysql:8.0"
 
     name: MySql/MariaDB (${{ matrix.php }} - DB ${{ matrix.db_alias != '' && matrix.db_alias || matrix.db }})
