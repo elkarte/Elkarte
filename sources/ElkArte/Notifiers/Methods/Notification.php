@@ -41,7 +41,6 @@ class Notification extends AbstractNotifier
 	 *
 	 * @param \ElkArte\Database\QueryInterface $db
 	 * @param \ElkArte\UserInfo|null $user
-	 * @throws \ElkArte\Exceptions\Exception
 	 */
 	public function __construct($db, $user)
 	{

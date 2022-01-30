@@ -236,7 +236,6 @@ class RemoveTopic extends AbstractController
 	 * After deleting a message(s) returns the user to the best possible location
 	 *
 	 * @param bool $full_topic if the entire topic was removed
-	 * @throws \ElkArte\Exceptions\Exception
 	 */
 	private function _redirectBack($full_topic)
 	{

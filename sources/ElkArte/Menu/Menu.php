@@ -271,7 +271,6 @@ class Menu
 	 * @param MenuItem $obj area or section being checked
 	 *
 	 * @return bool
-	 * @throws \ElkArte\Exceptions\Exception
 	 */
 	private function checkPermissions($obj)
 	{
