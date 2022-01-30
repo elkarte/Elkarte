@@ -1716,7 +1716,7 @@ function disableAutoComplete()
 					lastTime = request.timelast;
 				}
 			})
-			.always (function() {
+			.always(function () {
 				setTimeout(function() {
 					fetch();
 				}, opt.delay);
@@ -2144,7 +2144,7 @@ elkMenu.prototype.initMenu = function ()
  */
 elkMenu.prototype.docClick = function()
 {
-	document.body.addEventListener ('click', function (e)
+	document.body.addEventListener('click', function(e)
 	{
 		// Clicked outside of this.menu
 		if (!this.menu.contains(e.target))

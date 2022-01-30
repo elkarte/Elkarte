@@ -288,7 +288,7 @@ class Sphinxql extends AbstractAPI
 		finally
 		{
 			restore_error_handler();
-		};
+		}
 
 		// No connection, daemon not running?  log the error and exit
 		if ($mySphinx === false)
