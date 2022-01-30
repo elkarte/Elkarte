@@ -257,7 +257,7 @@ class ManageBoards extends AbstractController
 					$difference = $boards[$boardid]['level'] - $prev_child_level;
 					if ($difference == 1)
 					{
-						array_push($stack, !empty($context['categories'][$catid]['boards'][$prev_board]['move_links']) ? array_shift($context['categories'][$catid]['boards'][$prev_board]['move_links']) : null);
+						$stack[] = !empty($context['categories'][$catid]['boards'][$prev_board]['move_links']) ? array_shift($context['categories'][$catid]['boards'][$prev_board]['move_links']) : null;
 					}
 					elseif ($difference < 0)
 					{

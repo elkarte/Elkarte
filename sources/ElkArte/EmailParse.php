@@ -1285,7 +1285,6 @@ class EmailParse
 	 */
 	private function _parse_address($val)
 	{
-		$this->_email_address = '';
 		$this->_email_name = '';
 
 		if (preg_match('~(.*?)<(.*?)>~', $val, $matches))

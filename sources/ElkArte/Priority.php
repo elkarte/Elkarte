@@ -195,8 +195,6 @@ class Priority
 	 */
 	public function sort()
 	{
-		$this->_sorted_entities = array();
-
 		// Sorting
 		asort($this->_all_begin);
 		asort($this->_all_general);

@@ -65,7 +65,7 @@ abstract class AbstractUrlGenerator
 	{
 		if (isset($args['hash']))
 		{
-			array_push($args, str_replace(['=', 'hash'], '', $args['hash']));
+			$args[] = str_replace(['=', 'hash'], '', $args['hash']);
 			unset($args['hash']);
 		}
 
