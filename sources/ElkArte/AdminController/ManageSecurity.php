@@ -22,7 +22,6 @@ use ElkArte\Action;
 use ElkArte\Cache\Cache;
 use ElkArte\SettingsForm\SettingsForm;
 use ElkArte\Languages\Txt;
-use ElkArte\Util;
 
 /**
  * ManageSecurity controller handles the Security and Moderation

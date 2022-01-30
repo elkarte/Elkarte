@@ -21,7 +21,6 @@ use ElkArte\FileFunctions;
 use ElkArte\Graphics\Image;
 use ElkArte\HttpReq;
 use ElkArte\Languages\Txt;
-use ElkArte\Themes\ThemeLoader;
 use ElkArte\TokenHash;
 
 /**

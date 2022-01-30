@@ -14,14 +14,12 @@
 namespace ElkArte\Themes;
 
 use ElkArte\Cache\Cache;
-use ElkArte\Errors\Errors;
 use ElkArte\ext\Composer\Autoload\ClassLoader;
 use ElkArte\Hooks;
 use ElkArte\HttpReq;
 use ElkArte\User;
 use ElkArte\UserInfo;
 use ElkArte\Util;
-use ElkArte\Debug;
 use ElkArte\Languages\Txt;
 
 /**

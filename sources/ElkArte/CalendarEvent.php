@@ -15,7 +15,6 @@
  */
 
 namespace ElkArte;
-use Elkarte\Util;
 
 /**
  * A class to handle the basics of calendar events.

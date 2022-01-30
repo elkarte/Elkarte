@@ -16,7 +16,6 @@
 
 namespace ElkArte\ScheduledTasks\Tasks;
 
-use ElkArte\Themes\ThemeLoader;
 use ElkArte\Languages\Loader;
 
 /**

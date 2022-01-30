@@ -23,7 +23,6 @@ use ElkArte\Hooks;
 use ElkArte\Http\Headers;
 use ElkArte\Notifications;
 use ElkArte\Search\Search;
-use ElkArte\Themes\ThemeLoader;
 use ElkArte\UrlGenerator\UrlGenerator;
 use ElkArte\User;
 use ElkArte\Util;
