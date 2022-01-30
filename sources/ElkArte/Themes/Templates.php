@@ -16,6 +16,7 @@
 
 namespace ElkArte\Themes;
 
+use ElkArte\FileFunctions;
 use ElkArte\Http\Headers;
 use BadFunctionCallException;
 use ElkArte\Debug;
@@ -178,15 +179,23 @@ class Templates
 
 		$loaded = false;
 		$template_dir = '';
+		$file_functions = FileFunctions::instance();
 		foreach ($this->dirs->getDirectories() as $template_dir)
 		{
-			if (file_exists($template_dir . '/' . $template_name . '.template.php'))
+			if ($file_functions->fileExists($template_dir . '/' . $template_name . '.template.php'))
 			{
 				$loaded = true;
-				$this->dirs->fileInclude(
-					$template_dir . '/' . $template_name . '.template.php',
-					true
-				);
+				try
+				{
+					$this->dirs->fileInclude(
+						$template_dir . '/' . $template_name . '.template.php',
+						true
+					);
+				}
+				catch (Error $e)
+				{
+					$this->templateNotFound($e);
+				}
 				break;
 			}
 		}
@@ -208,12 +217,11 @@ class Templates
 			}
 		}
 		// Hmmm... doesn't exist?!  I don't suppose the directory is wrong, is it?
-		elseif (!file_exists($settings['default_theme_dir']) && file_exists(
-				BOARDDIR . '/themes/default'
-			))
+		elseif (!$file_functions->fileExists($settings['default_theme_dir'])
+			&& $file_functions->fileExists(BOARDDIR . '/themes/default'))
 		{
 			$settings['default_theme_dir'] = BOARDDIR . '/themes/default';
-			$this->addDirectory($settings['default_theme_dir']);
+			$this->dirs->addDirectory($settings['default_theme_dir']);
 
 			if (!empty($context['user']['is_admin']) && !isset($_GET['th']))
 			{
@@ -221,8 +229,7 @@ class Templates
 
 				if (!isset($context['security_controls_files']['title']))
 				{
-					$context['security_controls_files']['title'] =
-						$txt['generic_warning'];
+					$context['security_controls_files']['title'] = $txt['generic_warning'];
 				}
 
 				$context['security_controls_files']['errors']['theme_dir'] =
@@ -411,8 +418,8 @@ class Templates
 	 * Highlights PHP syntax.
 	 *
 	 * @param string $file Name of file to highlight.
-	 * @param int $min Minimum line numer to return.
-	 * @param int $max Maximum line numer to return.
+	 * @param int $min Minimum line number to return.
+	 * @param int $max Maximum line number to return.
 	 *
 	 * @used-by printLines() Prints syntax for template files with errors.
 	 * @return Generator Highlighted lines ranging from $min to $max.
@@ -502,7 +509,7 @@ class Templates
 	}
 
 	/**
-	 * @return Template Directories
+	 * @return Directories
 	 */
 	public function getDirectory()
 	{

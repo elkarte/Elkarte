@@ -13,7 +13,6 @@
 
 namespace ElkArte\Mentions\MentionType;
 
-use ElkArte\Mentions\MentionType\AbstractEventMessage;
 use ElkArte\Languages\Txt;
 use ElkArte\Util;
 

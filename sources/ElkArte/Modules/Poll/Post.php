@@ -386,7 +386,7 @@ class Post extends AbstractModule
 		}
 
 		$poll_expire = (int) $options['poll_expire'];
-		$poll_expire = $poll_expire > 9999 ? 9999 : ($poll_expire < 0 ? 0 : $poll_expire);
+		$poll_expire = $poll_expire > 9999 ? 9999 : (max($poll_expire, 0));
 
 		$poll_hide = isset($options['poll_hide']) ? (int) $options['poll_hide'] : 0;
 

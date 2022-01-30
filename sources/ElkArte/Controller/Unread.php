@@ -328,7 +328,7 @@ class Unread extends AbstractController
 	 */
 	public function action_unread()
 	{
-		global $context, $modSettings, $settings;
+		global $context, $settings;
 
 		$this->_grabber->setAction(\ElkArte\Unread::UNREAD);
 		$this->_grabber->setEarliestMsg($context['showing_all_topics'] ? earliest_msg() : 0);

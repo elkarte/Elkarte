@@ -605,7 +605,7 @@ function template_quickreply_below()
 		}
 	}
 
-	// Finally enable the quick reply quote function
+	// Finally, enable the quick reply quote function
 	echo '
 		<script>
 			var oQuickReply = new QuickReply({

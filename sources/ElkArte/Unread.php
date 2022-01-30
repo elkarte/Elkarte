@@ -254,7 +254,6 @@ class Unread
 	 * @param int $limit - number of entries to grab
 	 * @param bool|int $include_avatars - if avatars should be retrieved as well
 	 * @return mixed[] - see \ElkArte\TopicUtil::prepareContext
-	 * @throws \ElkArte\Exceptions\Exception
 	 */
 	private function _getUnreadTopics($join, $start, $limit, $include_avatars = false)
 	{

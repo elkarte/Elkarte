@@ -21,7 +21,6 @@ use ElkArte\FileFunctions;
 use ElkArte\Graphics\Image;
 use ElkArte\HttpReq;
 use ElkArte\Languages\Txt;
-use ElkArte\Themes\ThemeLoader;
 use ElkArte\TokenHash;
 
 /**
@@ -380,7 +379,7 @@ class Avatars
 			$extension = 'png';
 			$sizes[2] = IMAGETYPE_PNG;
 		}
-		$preferred_format = array_search($extension, $valid_avatar_extensions);
+		$preferred_format = (int) array_search($extension, $valid_avatar_extensions);
 		$mime_type = getValidMimeImageType($sizes[2]);
 
 		// Generate the final name

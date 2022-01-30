@@ -1,7 +1,7 @@
 <?php
 
 /**
- * This class takes care of loading language files
+ * This class takes care of Language edits via the ACP
  *
  * @package   ElkArte Forum
  * @copyright ElkArte Forum contributors
@@ -17,7 +17,7 @@ use ElkArte\Util;
 use ElkArte\Database\QueryInterface;
 
 /**
- * This class takes care of loading language files
+ * This class takes care of handing language edits
  */
 class Editor
 {
@@ -40,12 +40,25 @@ class Editor
 
 	/** @var mixed[] */
 	protected $txt = '';
+
+	/** @var array|string  */
 	protected $editortxt = '';
+
+	/** @var array|string  */
 	protected $txtBirthdayEmails = '';
+
+	/** @var array  */
 	protected $editing_strings = [];
+
+	/** @var array|string[]  */
 	protected $ignore_keys = [];
 
-	public function __construct($lang = null, QueryInterface $db, string $variable_name = 'txt')
+	/**
+	 * @param string $lang
+	 * @param \ElkArte\Database\QueryInterface $db
+	 * @param string $variable_name
+	 */
+	public function __construct($lang, QueryInterface $db, string $variable_name = 'txt')
 	{
 		if ($lang !== null)
 		{
@@ -64,15 +77,22 @@ class Editor
 			'editortxt' => new Loader($lang, $this->editortxt, $this->db, 'editortxt'),
 			'txtBirthdayEmails' => new Loader($lang, $this->txtBirthdayEmails, $this->db, 'txtBirthdayEmails'),
 		];
+
 		// Ignore some things that are specific of the language pack (or just require some casting I don't want be bother of considering, like lang_capitalize_dates).
 		$this->ignore_keys = ['lang_character_set', 'lang_locale', 'lang_dictionary', 'lang_spelling', 'lang_rtl', 'lang_capitalize_dates'];
 	}
 
+	/**
+	 * @param string $path
+	 */
 	public function changePath($path)
 	{
 		$this->path = $path;
 	}
 
+	/**
+	 * @param string $file_name
+	 */
 	public function load($file_name)
 	{
 		foreach (array_keys($this->loaders) as $k)
@@ -81,6 +101,10 @@ class Editor
 		}
 	}
 
+	/**
+	 * @param $idx
+	 * @return string|null
+	 */
 	public function get($idx)
 	{
 		foreach (array_keys($this->loaders) as $k)
@@ -90,9 +114,13 @@ class Editor
 				return $this->{$k}[$idx];
 			}
 		}
+
 		return null;
 	}
 
+	/**
+	 * @return array
+	 */
 	public function getForEditing()
 	{
 		$this->editing_strings = [];
@@ -115,16 +143,21 @@ class Editor
 				];
 			}
 		}
+
 		return $this->editing_strings;
 	}
 
+	/**
+	 * @param string $file_name
+	 * @param array $txt
+	 */
 	public function save($file_name, $txt)
 	{
 		if (in_array($file_name, self::IGNORE_FILES))
 		{
 			return;
 		}
-		$to_save = [];
+
 		$columns = [
 			'language' => 'string-40',
 			'file' => 'string-40',
@@ -140,6 +173,7 @@ class Editor
 				{
 					continue;
 				}
+
 				// For some reason, apparently sometimes a carriage return char (ASCII 13) appears in content from textareas, but we only use line feed (ASCII 10), so... just remove them all.
 				$val = str_replace("\r", "", $val);
 				if (trim($val) != trim($this->{$var}[$display_key]))

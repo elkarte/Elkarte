@@ -310,7 +310,6 @@ class PersonalMessage extends AbstractModule
 	 * @param array $recipientList
 	 *
 	 * @throws ControllerRedirectException
-	 * @throws \ElkArte\Exceptions\Exception
 	 */
 	public function before_sending($recipientList)
 	{

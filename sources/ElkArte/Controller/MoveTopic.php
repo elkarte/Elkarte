@@ -18,7 +18,6 @@ namespace ElkArte\Controller;
 
 use ElkArte\AbstractController;
 use ElkArte\Exceptions\Exception;
-use ElkArte\Themes\ThemeLoader;
 use ElkArte\Util;
 use ElkArte\Languages\Loader;
 

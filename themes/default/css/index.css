@@ -3081,6 +3081,11 @@ aside > .poster {
 	overflow-wrap: break-word;
 }
 
+/* Don't let an ILA align cascade past the end */
+.postarea > footer {
+	clear: both;
+}
+
 /* The attachments below the post */
 footer .attachments {
 	grid-row: attachments;

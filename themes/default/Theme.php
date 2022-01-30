@@ -930,6 +930,7 @@ class Theme extends BaseTheme
 	.i-menu-profile::before, .i-menu-profile.enabled::before {
 		content: "";
 		background-image: url("' . htmlspecialchars_decode($this->user->avatar['href']) . '");
+		background-position: center;
 		filter: unset;
 	}');
 		}
@@ -1162,7 +1163,7 @@ class Theme extends BaseTheme
 			}
 
 			// ...and attempt to load their associated language files.
-			Txt::load(array_merge($templates, ['Addons']), '', false);
+			Txt::load(array_merge($templates, ['Addons']), false);
 
 			// Custom template layers?
 			$layers = isset($settings['theme_layers']) ? explode(',', $settings['theme_layers']) : ['html', 'body'];

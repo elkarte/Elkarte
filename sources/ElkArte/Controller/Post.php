@@ -425,7 +425,7 @@ class Post extends AbstractController
 
 		$preview = $this->_req->getPost('preview', 'isset', false);
 		$ns = $this->_req->getPost('ns', 'isset', false);
-		$notify = $this->_req->getPost('notify', 'isset', false);
+		$notify = $this->_req->getPost('notify', 'intval', 0);
 		$quote = $this->_req->getRequest('quote', 'intval', 0);
 		$followup = $this->_req->getRequest('followup', 'intval', 0);
 		$not_approved = $this->_req->getPost('not_approved', 'empty', true);
@@ -482,12 +482,12 @@ class Post extends AbstractController
 		// Only show the preview stuff if they hit Preview.
 		if ($really_previewing)
 		{
-			$this->_setupPreviewContext($ns);
+			$this->_setupPreviewContext(!$ns);
 		}
 
 		// Set up the checkboxes.
 		$context['notify'] = $notify;
-		$context['use_smileys'] = $ns;
+		$context['use_smileys'] = !$ns;
 		$context['icon'] = preg_replace('~[\./\\\\*\':"<>]~', '', $icon);
 
 		// Set the destination action for submission.
@@ -586,7 +586,6 @@ class Post extends AbstractController
 		// Set the destination.
 		$context['destination'] .= ';msg=' . $msg . ';' . $context['session_var'] . '=' . $context['session_id'];
 		$context['submit_label'] = $txt['save'];
-
 	}
 
 	/**
@@ -649,42 +648,45 @@ class Post extends AbstractController
 	{
 		global $txt, $modSettings, $context;
 
-			// Set up the preview message and subject
-			$context['preview_message'] = $this->_form_message;
-			$this->preparse->preparsecode($this->_form_message, true);
+		// Set up the preview message and subject
+		$context['preview_message'] = $this->_form_message;
+		$this->preparse->preparsecode($this->_form_message, true);
 
-			// Do all bulletin board code thing on the message
-			$bbc_parser = ParserWrapper::instance();
-			$this->preparse->preparsecode($context['preview_message']);
-			$context['preview_message'] = $bbc_parser->parseMessage($context['preview_message'], $ns);
-			$context['preview_message'] = censor($context['preview_message']);
+		// Do all bulletin board code thing on the message
+		$bbc_parser = ParserWrapper::instance();
+		$this->preparse->preparsecode($context['preview_message']);
+		$context['preview_message'] = $bbc_parser->parseMessage($context['preview_message'], $ns);
+		$context['preview_message'] = censor($context['preview_message']);
 
-			// Don't forget the subject
-			$context['preview_subject'] = censor($this->_form_subject);
+		// Don't forget the subject
+		$context['preview_subject'] = censor($this->_form_subject);
 
-			// Any errors we should tell them about?
-			if ($this->_form_subject === '')
-			{
-				$this->_post_errors->addError('no_subject');
-				$context['preview_subject'] = '<em>' . $txt['no_subject'] . '</em>';
-			}
+		// Any errors we should tell them about?
+		if ($this->_form_subject === '')
+		{
+			$this->_post_errors->addError('no_subject');
+			$context['preview_subject'] = '<em>' . $txt['no_subject'] . '</em>';
+		}
 
-			if ($context['preview_message'] === '')
-			{
-				$this->_post_errors->addError('no_message');
-			}
-			elseif (!empty($modSettings['max_messageLength']) && Util::strlen($this->_form_message) > $modSettings['max_messageLength'])
-			{
-				$this->_post_errors->addError(array('long_message', array($modSettings['max_messageLength'])));
-			}
+		if ($context['preview_message'] === '')
+		{
+			$this->_post_errors->addError('no_message');
+		}
+		elseif (!empty($modSettings['max_messageLength']) && Util::strlen($this->_form_message) > $modSettings['max_messageLength'])
+		{
+			$this->_post_errors->addError(array('long_message', array($modSettings['max_messageLength'])));
+		}
 
-			// Protect any CDATA blocks.
-			if ($this->getApi() === 'xml')
-			{
-				$context['preview_message'] = strtr($context['preview_message'], array(']]>' => ']]]]><![CDATA[>'));
-			}
+		// Protect any CDATA blocks.
+		if ($this->getApi() === 'xml')
+		{
+			$context['preview_message'] = strtr($context['preview_message'], array(']]>' => ']]]]><![CDATA[>'));
+		}
 	}
 
+	/**
+	 *
+	 */
 	protected function _preparingPage()
 	{
 		global $txt, $topic, $modSettings, $board, $context;
@@ -783,6 +785,7 @@ class Post extends AbstractController
 					break;
 				}
 			}
+
 			// Fail safe
 			if (!$found)
 			{
@@ -794,6 +797,9 @@ class Post extends AbstractController
 		$context['show_additional_options'] = !empty($_POST['additional_options']) || isset($_GET['additionalOptions']);
 	}
 
+	/**
+	 *
+	 */
 	protected function _finalizePage()
 	{
 		global $txt, $scripturl, $topic, $context;
@@ -1025,7 +1031,7 @@ class Post extends AbstractController
 		{
 			$_REQUEST['msg'] = (int) $_REQUEST['msg'];
 
-			$msgInfo = basicMessageInfo($_REQUEST['msg'], true);
+			$msgInfo = basicMessageInfo($_REQUEST['msg'], true, false, false);
 
 			if (empty($msgInfo))
 			{
@@ -1099,10 +1105,10 @@ class Post extends AbstractController
 		}
 
 		// In case we want to override
-		if (allowedTo('approve_posts'))
+		if (allowedTo('approve_posts') && !isset($_REQUEST['from_qr']))
 		{
-			$becomesApproved = !isset($_REQUEST['approve']) || !empty($_REQUEST['approve']) ? 1 : 0;
-			$approve_has_changed = isset($msgInfo['approved']) ? $msgInfo['approved'] != $becomesApproved : false;
+			$becomesApproved = empty($_REQUEST['approve']) ? 0 : 1;
+			$approve_has_changed = isset($msgInfo['approved']) && $msgInfo['approved'] != $becomesApproved;
 		}
 
 		// If the poster is a guest evaluate the legality of name and email.

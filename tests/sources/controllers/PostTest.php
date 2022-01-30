@@ -48,6 +48,8 @@ class TestPost extends ElkArteCommonSetupTest
 		$_POST['email'] = 'a@a.com';
 		$_POST['icon'] = 'xx';
 		$_POST['additonal_items'] = 0;
+		$_POST['approve'] = 1;
+		$_REQUEST['approve'] = '1';
 
 		// Used for the test to see if we updated the topic
 		$topic_info = getTopicInfo($topic);
@@ -80,6 +82,8 @@ class TestPost extends ElkArteCommonSetupTest
 		$_POST['message'] = 'So you want to test on CI, fine, sure.';
 		$_POST['email'] = 'a@a.com';
 		$_POST['icon'] = 'thumbup';
+		$_POST['approve'] = 1;
+		$_REQUEST['approve'] = '1';
 		$_POST['additonal_items'] = 0;
 
 		// Used for the test to see if we updated the topic
@@ -120,6 +124,8 @@ class TestPost extends ElkArteCommonSetupTest
 		$_POST['email'] = 'a@a.com';
 		$_POST['icon'] = 'xx';
 		$_POST['lock'] = 1;
+		$_POST['approve'] = 1;
+		$_REQUEST['approve'] = '1';
 		$_POST['additonal_items'] = 0;
 
 		// Bypass spam protection

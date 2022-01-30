@@ -23,7 +23,6 @@ use ElkArte\Hooks;
 use ElkArte\Http\Headers;
 use ElkArte\Notifications;
 use ElkArte\Search\Search;
-use ElkArte\Themes\ThemeLoader;
 use ElkArte\UrlGenerator\UrlGenerator;
 use ElkArte\User;
 use ElkArte\Util;
@@ -207,7 +206,8 @@ function comma_format($number, $override_decimal_count = false)
 	}
 
 	// Format the string with our friend, number_format.
-	return number_format($number, (float) $number === $number ? ($override_decimal_count === false ? $decimal_count : $override_decimal_count) : 0, $decimal_separator, $thousands_separator);
+	$decimals = ((float) $number === $number) ? ($override_decimal_count === false ? $decimal_count : $override_decimal_count) : 0;
+	return number_format($number, (int) $decimals, $decimal_separator, $thousands_separator);
 }
 
 /**
@@ -220,7 +220,7 @@ function comma_format($number, $override_decimal_count = false)
  */
 function thousands_format($number, $override_decimal_count = false)
 {
-	foreach (array('', ' k', ' M', ' G', ' T') as $kb)
+	foreach (['', ' k', ' M', ' G', ' T'] as $kb)
 	{
 		if ($number < 1000)
 		{
@@ -538,7 +538,7 @@ function redirectexit($setLocation = '')
 	// Allow a way for phpunit to run controller methods, pretty? no but allows us to return to the test
 	if (defined('PHPUNITBOOTSTRAP') && defined('STDIN'))
 	{
-		return;
+		return $setLocation;
 	}
 
 	// Send headers, call integration, do maintance

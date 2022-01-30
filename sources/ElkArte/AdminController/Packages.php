@@ -28,6 +28,7 @@ use ElkArte\Languages\Txt;
 use ElkArte\User;
 use ElkArte\Util;
 use ElkArte\AttachmentsDirectory;
+use FilesystemIterator;
 
 /**
  * This class is the administration package manager controller.
@@ -1053,9 +1054,9 @@ class Packages extends AbstractController
 							'function' => function ($package_md5) use ($type) {
 								global $context;
 
-								if (isset($context['available_' . $type . ''][$package_md5]))
+								if (isset($context['available_' . $type][$package_md5]))
 								{
-									return $context['available_' . $type . ''][$package_md5]['name'];
+									return $context['available_' . $type][$package_md5]['name'];
 								}
 
 								return '';
@@ -1075,9 +1076,9 @@ class Packages extends AbstractController
 							'function' => function ($package_md5) use ($type) {
 								global $context;
 
-								if (isset($context['available_' . $type . ''][$package_md5]))
+								if (isset($context['available_' . $type][$package_md5]))
 								{
-									return $context['available_' . $type . ''][$package_md5]['version'];
+									return $context['available_' . $type][$package_md5]['version'];
 								}
 
 								return '';
@@ -1096,13 +1097,13 @@ class Packages extends AbstractController
 							'function' => function ($package_md5) use ($type) {
 								global $context, $txt;
 
-								if (!isset($context['available_' . $type . ''][$package_md5]))
+								if (!isset($context['available_' . $type][$package_md5]))
 								{
 									return '';
 								}
 
 								// Rewrite shortcut
-								$package = $context['available_' . $type . ''][$package_md5];
+								$package = $context['available_' . $type][$package_md5];
 								$return = '';
 
 								if ($package['can_uninstall'])
@@ -1898,7 +1899,7 @@ class Packages extends AbstractController
 		try
 		{
 			$iterator = new \RecursiveIteratorIterator(
-				new \RecursiveDirectoryIterator($dir, \RecursiveDirectoryIterator::SKIP_DOTS),
+				new \RecursiveDirectoryIterator($dir, FilesystemIterator::SKIP_DOTS),
 				\RecursiveIteratorIterator::SELF_FIRST,
 				\RecursiveIteratorIterator::CATCH_GET_CHILD
 			);

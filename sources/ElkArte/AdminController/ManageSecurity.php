@@ -22,7 +22,6 @@ use ElkArte\Action;
 use ElkArte\Cache\Cache;
 use ElkArte\SettingsForm\SettingsForm;
 use ElkArte\Languages\Txt;
-use ElkArte\Util;
 
 /**
  * ManageSecurity controller handles the Security and Moderation
@@ -124,7 +123,7 @@ class ManageSecurity extends AbstractController
 	 */
 	private function _securitySettings()
 	{
-		global $txt, $context;
+		global $txt, $context, $modSettings;
 
 		// See if they supplied a valid looking http:BL API Key
 		$context['invalid_badbehavior_httpbl_key'] = (!empty($modSettings['badbehavior_httpbl_key']) && (strlen($modSettings['badbehavior_httpbl_key']) !== 12 || !ctype_lower($modSettings['badbehavior_httpbl_key'])));
@@ -370,13 +369,5 @@ class ManageSecurity extends AbstractController
 	public function spamSettings_search()
 	{
 		return $this->_spamSettings();
-	}
-
-	/**
-	 * Public method to return bb settings, used in admin search
-	 */
-	public function bbSettings_search()
-	{
-		return $this->_bbSettings();
 	}
 }

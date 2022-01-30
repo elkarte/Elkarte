@@ -218,7 +218,7 @@ class SplitTopics extends AbstractController
 	 */
 	public function action_splitSelectTopics()
 	{
-		global $txt, $scripturl, $topic, $context, $modSettings, $options;
+		global $txt, $topic, $context, $modSettings, $options;
 
 		$context['page_title'] = $txt['split_topic'] . ' - ' . $txt['select_split_posts'];
 		$context['destination_board'] = !empty($this->_req->post->move_to_board) ? (int) $this->_req->post->move_to_board : 0;

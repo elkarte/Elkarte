@@ -739,6 +739,8 @@ class PersonalMessage extends AbstractController
 
 	/**
 	 * Send a new personal message?
+	 *
+	 * @throws \ElkArte\Exceptions\Exception pm_not_yours
 	 */
 	public function action_send()
 	{
@@ -776,7 +778,8 @@ class PersonalMessage extends AbstractController
 		}
 		catch (PmErrorException $e)
 		{
-			return $this->messagePostError($e->namedRecipientList, $e->recipientList, $e->msgOptions);
+			$this->messagePostError($e->namedRecipientList, $e->recipientList, $e->msgOptions);
+			return;
 		}
 
 		// Quoting / Replying to a message?
@@ -1132,7 +1135,7 @@ class PersonalMessage extends AbstractController
 		require_once(SUBSDIR . '/Auth.subs.php');
 		require_once(SUBSDIR . '/Post.subs.php');
 
-		Txt::load('PersonalMessage', '', false);
+		Txt::load('PersonalMessage', false);
 
 		// Extract out the spam settings - it saves database space!
 		list ($modSettings['max_pm_recipients'], $modSettings['pm_posts_verification'], $modSettings['pm_posts_per_hour']) = explode(',', $modSettings['pm_spam_settings']);

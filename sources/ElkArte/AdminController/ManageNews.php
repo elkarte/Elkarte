@@ -983,7 +983,7 @@ class ManageNews extends AbstractController
 	 */
 	public function action_newsSettings_display()
 	{
-		global $context, $txt, $scripturl;
+		global $context, $txt;
 
 		// Initialize the form
 		$settingsForm = new SettingsForm(SettingsForm::DB_ADAPTER);

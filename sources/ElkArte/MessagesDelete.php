@@ -24,42 +24,22 @@ namespace ElkArte;
  */
 class MessagesDelete
 {
-	/**
-	 * The current user deleting something
-	 *
-	 * @var \ElkArte\ValuesContainer
-	 */
+	/** @var \ElkArte\ValuesContainer The current user deleting something */
 	protected $user = null;
-	/**
-	 * Id of the messages not found.
-	 *
-	 * @var int[]
-	 */
+	/** @var int[] Id of the messages not found. */
 	private $_unfound_messages = array();
-	/**
-	 * Id of the topics that should be restored
-	 *
-	 * @var int[]
-	 */
+	/** @var int[] Id of the topics that should be restored */
 	private $_topics_to_restore = array();
-	/**
-	 * The board id of the recycle board
-	 *
-	 * @var int
-	 */
+	/** @var int The board id of the recycle board */
 	private $_recycle_board = null;
-	/**
-	 * List of errors occurred
-	 *
-	 * @var string[]
-	 */
+	/** @var string[] List of errors occurred */
 	private $_errors = array();
 
 	/**
 	 * Initialize the class! :P
 	 *
 	 * @param int|bool $recycle_enabled if the recycling is enabled.
-	 * @param int|null $recycle_board the id the the recycle board (if any)
+	 * @param int|null $recycle_board the id of the recycle board (if any)
 	 * @param User $user the user::info making the request
 	 */
 	public function __construct($recycle_enabled, $recycle_board, $user = null)

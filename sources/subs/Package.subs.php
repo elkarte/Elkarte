@@ -144,11 +144,10 @@ function url_exists($url)
 	}
 
 	// Attempt to connect...
-	$temp = '';
-	$fid = fsockopen($a_url['host'], !isset($a_url['port']) ? 80 : $a_url['port'], $temp, $temp, 8);
+	$fid = fsockopen($a_url['host'], !isset($a_url['port']) ? 80 : $a_url['port'], $code, $temp, 8);
 
 	// Can't make a connection
-	if (!$fid)
+	if ($fid === false)
 	{
 		return false;
 	}

@@ -134,7 +134,6 @@ class EmptyField implements ControlInterface
 			$start = mt_rand(0, 27);
 			$this->_hash = substr(md5(time()), $start, 6);
 			$this->_field_name = $this->_terms[array_rand($this->_terms)] . '-' . $this->_second_terms[array_rand($this->_second_terms)] . '-' . $this->_hash;
-			$sessionVal['empty_field'] = '';
 			$sessionVal['empty_field'] = $this->_field_name;
 		}
 		else

@@ -14,23 +14,22 @@
 
 namespace ElkArte\Themes;
 
+use ElkArte\FileFunctions;
+use Error;
+
+/**
+ *
+ */
 class Directories
 {
-	/**
-	 * Template directory's that we will be searching for the sheets
-	 *
-	 * @var array
-	 */
+	/** @var array Template directory's that we will be searching for the sheets */
 	protected $dirs = [];
 
-	/**
-	 * Holds the file that are in the include list
-	 *
-	 * @var array
-	 */
+	/** @var array Holds the files that are in our include list */
 	protected $templates = [];
 
 	/**
+	 * Basic Constructor
 	 *
 	 * @param array $settings
 	 */
@@ -120,15 +119,14 @@ class Directories
 		{
 			return;
 		}
-		// Add this file to the include list, whether $once is true or not.
+		// Add this file to our include list, whether $once is true or not.
 		else
 		{
 			$this->templates[] = $filename;
 		}
 
 		// Load it if we find it
-		$file_found = file_exists($filename);
-
+		$file_found = FileFunctions::instance()->fileExists($filename);
 		try
 		{
 			if ($once && $file_found)
@@ -139,10 +137,14 @@ class Directories
 			{
 				require($filename);
 			}
+			else
+			{
+				throw new Error();
+			}
 		}
 		catch (Error $e)
 		{
-			$this->templateNotFound($e);
+			throw new Error('', 0, $e);
 		}
 	}
 }

@@ -84,24 +84,23 @@ class Emoji extends AbstractModel
 	}
 
 	/**
-	 * Find emoji codes that were keyboard entered, or HTML &#xxx codes and if found
+	 * Find emoji codes that were keyboard entered, or HTML &#xxx codes, if found
 	 * and replaceable with our SVG standard ones, do it
 	 *
-	 * @param $string
+	 * @param string $string
 	 * @return string
 	 */
 	public function keyboardEmojiToImage($string)
 	{
 		$string = $this->emojiFromHTML($string);
-		$string = $this->emojiFromUni($string);
 
-		return $string;
+		return $this->emojiFromUni($string);
 	}
 
 	/**
 	 * Search and replace on &#xHEX; &#DEC; style emoji
 	 *
-	 * @param $string
+	 * @param string $string
 	 * @return string|string[]|null
 	 */
 	public function emojiFromHTML($string)
@@ -236,7 +235,7 @@ class Emoji extends AbstractModel
 	 * dealing with the emoji space
 	 *
 	 * @param $c
-	 * @return false|string
+	 * @return false|int
 	 */
 	private function uniord($c)
 	{

@@ -14,14 +14,12 @@
 namespace ElkArte\Themes;
 
 use ElkArte\Cache\Cache;
-use ElkArte\Errors\Errors;
 use ElkArte\ext\Composer\Autoload\ClassLoader;
 use ElkArte\Hooks;
 use ElkArte\HttpReq;
 use ElkArte\User;
 use ElkArte\UserInfo;
 use ElkArte\Util;
-use ElkArte\Debug;
 use ElkArte\Languages\Txt;
 
 /**
@@ -176,7 +174,7 @@ class ThemeLoader
 		// Any theme-related strings that need to be loaded?
 		if (!empty($settings['require_theme_strings']))
 		{
-			Txt::load('ThemeStrings', '', false);
+			Txt::load('ThemeStrings', false);
 		}
 
 		// Load the SVG support file with fallback to default theme
@@ -566,7 +564,7 @@ class ThemeLoader
 
 			// Hmm... check #2 - is it just different by a www?  Send them to the correct place!!
 			if (empty($do_fix) && strtr($detected_url,
-					['://' => '://www.']) == $boardurl && (empty($_GET) || count($_GET) === 1) && ELK != 'SSI'
+					['://' => '://www.']) == $boardurl && (empty($_GET) || count($_GET) === 1) && ELK !== 'SSI'
 			)
 			{
 				// Okay, this seems weird, but we don't want an endless loop - this will make $_GET not empty ;).

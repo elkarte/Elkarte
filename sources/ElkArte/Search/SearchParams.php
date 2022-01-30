@@ -160,7 +160,7 @@ class SearchParams extends ValuesContainer
 	 */
 	public function merge($params, $recentPercentage, $maxMembersToSearch)
 	{
-		global $modSettings, $context;
+		global $modSettings;
 
 		// Determine the search settings from the form or get params
 		$this->cleanParams($params);

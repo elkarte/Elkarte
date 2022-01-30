@@ -271,7 +271,7 @@ function template_th_search_bar()
 
 		echo '
 				<label for="search_selection">
-				<select name="search_selection" id="search_selection">
+				<select name="search_selection" id="search_selection" aria-label="search selection">
 					<option value="all"', ($selected == 'all' ? ' selected="selected"' : ''), '>', $txt['search_entireforum'], ' </option>';
 
 		// Can't limit it to a specific topic if we are not in one
@@ -318,7 +318,7 @@ function template_th_search_bar()
 	}
 
 	echo '
-				<button type="submit" name="search;sa=results" class="', (!empty($modSettings['search_dropdown'])) ? 'with_select' : '', '"><i class="icon i-search icon-shade"></i></button>
+				<button type="submit" aria-label="' . $txt['search'] . '" name="search;sa=results" class="', (!empty($modSettings['search_dropdown'])) ? 'with_select' : '', '"><i class="icon i-search icon-shade"><s>', $txt['search'], '</s></i></button>
 				<input type="hidden" name="advanced" value="0" />
 			</form>';
 }
@@ -477,7 +477,7 @@ function template_menu()
 						<li id="button_', $act, '" class="listlevel1', !empty($button['sub_buttons']) ? ' subsections"' : '"', ' role="none">
 							<a class="linklevel1', !empty($button['active_button']) ? ' active' : '', (!empty($button['indicator']) ? ' indicator' : ''), '" href="', $button['href'], '" ', isset($button['target']) ? 'target="' . $button['target'] . '"' : '', ' role="menuitem"', !empty($button['sub_buttons']) ? ' aria-haspopup="true"' : '', '>',
 								(!empty($button['data-icon']) ? '<i class="icon icon-menu icon-lg ' . $button['data-icon'] . (!empty($button['active_button']) ? ' enabled' : '') . '" title="' . (!empty($button['alttitle']) ? $button['alttitle'] : $button['title']) . '"></i> ' : ''),
-								'<span class="button_title" aria-hidden="true">', $button['title'], '</span>
+								'<span class="button_title" aria-hidden="', (empty($button['sub_buttons']) ? 'false' : 'true'), '">', $button['title'], '</span>
 							</a>';
 
 		// Any 2nd level menus?

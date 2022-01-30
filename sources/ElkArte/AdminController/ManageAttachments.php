@@ -18,9 +18,8 @@ namespace ElkArte\AdminController;
 
 use ElkArte\AbstractController;
 use ElkArte\Action;
-use ElkArte\Exceptions\Exception;
+use ElkArte\FileFunctions;
 use ElkArte\SettingsForm\SettingsForm;
-use ElkArte\Themes\ThemeLoader;
 use ElkArte\Util;
 use ElkArte\AttachmentsDirectory;
 use ElkArte\Languages\Loader;
@@ -54,11 +53,15 @@ class ManageAttachments extends AbstractController
 	/** @var string Destination when transferring attachments */
 	public $to;
 
+	/** @var FileFunctions */
+	public $file_functions;
+
 	public function pre_dispatch()
 	{
 		// These get used often enough that it makes sense to include them for every action
 		require_once(SUBSDIR . '/Attachments.subs.php');
 		require_once(SUBSDIR . '/ManageAttachments.subs.php');
+		$this->file_functions = FileFunctions::instance();
 	}
 
 	/**
@@ -178,7 +181,9 @@ class ManageAttachments extends AbstractController
 			// Changing the attachment upload directory
 			if (isset($this->_req->post->attachmentUploadDir))
 			{
-				if (!empty($this->_req->post->attachmentUploadDir) && file_exists($modSettings['attachmentUploadDir']) && $modSettings['attachmentUploadDir'] !== $this->_req->post->attachmentUploadDir)
+				if (!empty($this->_req->post->attachmentUploadDir)
+					&& $this->file_functions->fileExists($modSettings['attachmentUploadDir'])
+					&& $modSettings['attachmentUploadDir'] !== $this->_req->post->attachmentUploadDir)
 				{
 					rename($modSettings['attachmentUploadDir'], $this->_req->post->attachmentUploadDir);
 				}
@@ -280,11 +285,11 @@ class ManageAttachments extends AbstractController
 			$modSettings['basedirectory_for_attachments'] = $context['attachmentUploadDir'];
 		}
 
-		$context['valid_upload_dir'] = is_dir($context['attachmentUploadDir']) && is_writable($context['attachmentUploadDir']);
+		$context['valid_upload_dir'] = is_dir($context['attachmentUploadDir']) && $this->file_functions->isWritable($context['attachmentUploadDir']);
 
 		if ($attachmentsDir->autoManageEnabled())
 		{
-			$context['valid_basedirectory'] = !empty($modSettings['basedirectory_for_attachments']) && is_writable($modSettings['basedirectory_for_attachments']);
+			$context['valid_basedirectory'] = !empty($modSettings['basedirectory_for_attachments']) && $this->file_functions->isWritable($modSettings['basedirectory_for_attachments']);
 		}
 		else
 		{
@@ -738,7 +743,7 @@ class ManageAttachments extends AbstractController
 	 */
 	public function action_remove()
 	{
-		global $txt, $language;
+		global $language;
 
 		checkSession('post');
 
@@ -1004,7 +1009,7 @@ class ManageAttachments extends AbstractController
 								// Temp file is more than 5 hours old!
 								if ($file->getMTime() < time() - 18000)
 								{
-									@unlink($file->getPathname());
+									$this->file_functions->delete($file->getPathname());
 								}
 							}
 							// That should be an attachment, let's check if we have it in the database
@@ -1017,7 +1022,7 @@ class ManageAttachments extends AbstractController
 									{
 										if ($fix_errors && in_array('files_without_attachment', $to_fix))
 										{
-											@unlink($file->getPathname());
+											$this->file_functions->delete($file->getPathname());
 										}
 										else
 										{
@@ -1030,7 +1035,7 @@ class ManageAttachments extends AbstractController
 							{
 								if ($fix_errors && in_array('files_without_attachment', $to_fix))
 								{
-									@unlink($file->getPathname());
+									$this->file_functions->delete($file->getPathname());
 								}
 								else
 								{
@@ -1813,9 +1818,9 @@ class ManageAttachments extends AbstractController
 
 		// All done, time to clean up
 		$_SESSION['results'] = $results;
-		if (file_exists(BOARDDIR . '/progress.php'))
+		if ($this->file_functions->fileExists(BOARDDIR . '/progress.php'))
 		{
-			@unlink(BOARDDIR . '/progress.php');
+			$this->file_functions->delete(BOARDDIR . '/progress.php');
 		}
 
 		redirectexit('action=admin;area=manageattachments;sa=maintenance#transfer');
