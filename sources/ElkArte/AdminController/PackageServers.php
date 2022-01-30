@@ -328,8 +328,6 @@ class PackageServers extends AbstractController
 						}
 					}
 
-					$package['can_install'] = true;
-
 					// See if this filename already exists on the server
 					$already_exists = getPackageInfo($base_name);
 					$package['download_conflict'] = is_array($already_exists) && in_array($already_exists['id'], $package['possible_ids']) && compareVersions($already_exists['version'], $package['version']) != 0;
