@@ -286,8 +286,7 @@ class Attachment extends AbstractController
 		// We need to do some work on attachments and avatars.
 		require_once(SUBSDIR . '/Attachments.subs.php');
 
-		$id_attach = $this->_req->query->attach ?? '';
-		$attachment_class = new Download($id_attach, $this->_req->getQuery('attach', 'intval', 0));
+		$attachment_class = new Download($this->_req->query->attach ?? '');
 
 		$inline = $attachment_class->isTemporary();
 

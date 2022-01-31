@@ -42,12 +42,15 @@ class Download
 	 * Starts up the download process
 	 *
 	 * @param string $id_attach String version of the attachment id
-	 * @param int $id
 	 */
-	public function __construct($id_attach, $id)
+	public function __construct($id_attach)
 	{
 		$this->string_attach = $id_attach;
-		$this->id_attach = $id;
+		// Non-temporary attachments shall have integer ids
+		if (!$this->isTemporary())
+		{
+			$this->id_attach = (int) $id;
+		}
 		$this->db = database();
 	}
 
