@@ -170,7 +170,6 @@ class Download
 		elseif (empty($this->data['mime_type']) || $inline === false && getValidMimeImageType($this->data['file_ext']) !== '')
 		{
 			$this->data['mime_type'] = '';
-			$inline = false;
 		}
 		$this->prepare_headers($this->file_path, $eTag, $this->data['mime_type'], $disposition, $this->data['real_filename'], $do_cache);
 
