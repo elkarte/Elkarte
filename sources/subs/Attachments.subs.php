@@ -455,133 +455,6 @@ function createAttachment(&$attachmentOptions)
 }
 
 /**
- * Get the specified attachment.
- *
- * What it does:
- *
- * - This includes a check of the topic
- * - it only returns the attachment if it's indeed attached to a message in the topic given as parameter, and
- * query_see_board...
- * - Must return the same array keys as getAvatar() and getAttachmentThumbFromTopic()
- *
- * @param int $id_attach
- * @param int $id_topic
- *
- * @return array
- * @package Attachments
- */
-function getAttachmentFromTopic($id_attach, $id_topic)
-{
-	$db = database();
-
-	// Make sure this attachment is on this board.
-	$attachmentData = array();
-	$request = $db->fetchQuery('
-		SELECT 
-			a.id_folder, a.filename, a.file_hash, a.fileext, a.id_attach, a.attachment_type, 
-			a.mime_type, a.approved, m.id_member
-		FROM {db_prefix}attachments AS a
-			INNER JOIN {db_prefix}messages AS m ON (m.id_msg = a.id_msg AND m.id_topic = {int:current_topic})
-			INNER JOIN {db_prefix}boards AS b ON (b.id_board = m.id_board AND {query_see_board})
-		WHERE a.id_attach = {int:attach}
-		LIMIT 1',
-		array(
-			'attach' => $id_attach,
-			'current_topic' => $id_topic,
-		)
-	);
-	if ($request->num_rows() != 0)
-	{
-		$attachmentData = $request->fetch_assoc();
-	}
-	$request->free_result();
-
-	return $attachmentData;
-}
-
-/**
- * Get the thumbnail of specified attachment.
- *
- * What it does:
- *
- * - This includes a check of the topic
- * - it only returns the attachment if it's indeed attached to a message in the topic given as parameter, and
- * query_see_board...
- * - Must return the same array keys as getAvatar() & getAttachmentFromTopic
- *
- * @param int $id_attach
- * @param int $id_topic
- *
- * @return array
- * @package Attachments
- */
-function getAttachmentThumbFromTopic($id_attach, $id_topic)
-{
-	$db = database();
-
-	// Make sure this attachment is on this board.
-	$request = $db->fetchQuery('
-		SELECT 
-			th.id_folder, th.filename, th.file_hash, th.fileext, th.id_attach, 
-			th.attachment_type, th.mime_type,
-			a.id_folder AS attach_id_folder, a.filename AS attach_filename,
-			a.file_hash AS attach_file_hash, a.fileext AS attach_fileext,
-			a.id_attach AS attach_id_attach, a.attachment_type AS attach_attachment_type,
-			a.mime_type AS attach_mime_type,
-		 	a.approved, m.id_member
-		FROM {db_prefix}attachments AS a
-			INNER JOIN {db_prefix}messages AS m ON (m.id_msg = a.id_msg AND m.id_topic = {int:current_topic})
-			INNER JOIN {db_prefix}boards AS b ON (b.id_board = m.id_board AND {query_see_board})
-			LEFT JOIN {db_prefix}attachments AS th ON (th.id_attach = a.id_thumb)
-		WHERE a.id_attach = {int:attach}',
-		array(
-			'attach' => $id_attach,
-			'current_topic' => $id_topic,
-		)
-	);
-	$attachmentData = [
-		'id_folder' => '', 'filename' => '', 'file_hash' => '', 'fileext' => '', 'id_attach' => '',
-		'attachment_type' => '', 'mime_type' => '', 'approved' => '', 'id_member' => ''];
-	if ($request->num_rows() != 0)
-	{
-		$row = $request->fetch_assoc();
-
-		// If there is a hash then the thumbnail exists
-		if (!empty($row['file_hash']))
-		{
-			$attachmentData = array(
-				'id_folder' => $row['id_folder'],
-				'filename' => $row['filename'],
-				'file_hash' => $row['file_hash'],
-				'fileext' => $row['fileext'],
-				'id_attach' => $row['id_attach'],
-				'attachment_type' => $row['attachment_type'],
-				'mime_type' => $row['mime_type'],
-				'approved' => $row['approved'],
-				'id_member' => $row['id_member'],
-			);
-		}
-		// otherwise $modSettings['attachmentThumbnails'] may be (or was) off, so original file
-		elseif (getValidMimeImageType($row['attach_mime_type']) !== '')
-		{
-			$attachmentData = array(
-				'id_folder' => $row['attach_id_folder'],
-				'filename' => $row['attach_filename'],
-				'file_hash' => $row['attach_file_hash'],
-				'fileext' => $row['attach_fileext'],
-				'id_attach' => $row['attach_id_attach'],
-				'attachment_type' => $row['attach_attachment_type'],
-				'mime_type' => $row['attach_mime_type'],
-				'approved' => $row['approved'],
-				'id_member' => $row['id_member'],
-			);
-		}
-	}
-
-	return $attachmentData;
-}
-
-/**
  * Returns if the given attachment ID is an image file or not
  *
  * What it does:
@@ -627,30 +500,6 @@ function isAttachmentImage($id_attach)
 	);
 
 	return !empty($attachmentData) ? $attachmentData : false;
-}
-
-/**
- * Increase download counter for id_attach.
- *
- * What it does:
- *
- * - Does not check if it's a thumbnail.
- *
- * @param int $id_attach
- * @package Attachments
- */
-function increaseDownloadCounter($id_attach)
-{
-	$db = database();
-
-	$db->fetchQuery('
-		UPDATE {db_prefix}attachments
-		SET downloads = downloads + 1
-		WHERE id_attach = {int:id_attach}',
-		array(
-			'id_attach' => $id_attach,
-		)
-	);
 }
 
 /**
@@ -873,10 +722,9 @@ function getAttachments($messages, $includeUnapproved = false, $filter = null, $
 	$db->fetchQuery('
 		SELECT
 			a.id_attach, a.id_folder, a.id_msg, a.filename, a.file_hash, COALESCE(a.size, 0) AS filesize, a.downloads, a.approved,
-			a.width, a.height' . (empty($modSettings['attachmentShowImages']) || empty($modSettings['attachmentThumbnails']) ? '' : ',
-			COALESCE(thumb.id_attach, 0) AS id_thumb, thumb.width AS thumb_width, thumb.height AS thumb_height') . '
-			FROM {db_prefix}attachments AS a' . (empty($modSettings['attachmentShowImages']) || empty($modSettings['attachmentThumbnails']) ? '' : '
-			LEFT JOIN {db_prefix}attachments AS thumb ON (thumb.id_attach = a.id_thumb)') . '
+			a.width, a.height,
+			a.has_thumb
+			FROM {db_prefix}attachments AS a
 		WHERE a.id_msg IN ({array_int:message_list})
 			AND a.attachment_type = {int:attachment_type}',
 		array(
@@ -1017,61 +865,8 @@ function updateAttachmentThumbnail($filename, $id_attach, $id_msg, $old_id_thumb
 	$image = new Image($filename);
 
 	// Image is not autorotated because it was at the time of upload (hopefully)
-	$thumb_filename = (!empty($real_filename) ? $real_filename : $filename) . '_thumb';
+	$thumb_filename = (!empty($real_filename) ? $real_filename : $filename) . \ElkArte\Attachments\Attachment::DL_TYPE_THUMB;
 	$thumb_image = $image->createThumbnail($modSettings['attachmentThumbWidth'], $modSettings['attachmentThumbHeight']);
-
-	if ($thumb_image instanceof Image)
-	{
-		// So what folder are we putting this image in?
-		$attachmentsDir = new AttachmentsDirectory($modSettings, database());
-		$id_folder_thumb = $attachmentsDir->currentDirectoryId();
-
-		// Calculate the size of the created thumbnail.
-		$size = $thumb_image->getImageDimensions();
-		list ($attachment['thumb_width'], $attachment['thumb_height']) = $size;
-		$thumb_size = $thumb_image->getFilesize();
-
-		// Figure out the mime type and other details
-		$thumb_mime = getValidMimeImageType($size[2]);
-		$thumb_ext = substr($thumb_mime, strpos($thumb_mime, '/') + 1);
-		$thumb_hash = getAttachmentFilename($thumb_filename, 0, null, true);
-
-		// Add this beauty to the database.
-		$db = database();
-		$db->insert('',
-			'{db_prefix}attachments',
-			array('id_folder' => 'int', 'id_msg' => 'int', 'attachment_type' => 'int', 'filename' => 'string-255', 'file_hash' => 'string-40', 'size' => 'int', 'width' => 'int', 'height' => 'int', 'fileext' => 'string-8', 'mime_type' => 'string-255'),
-			array($id_folder_thumb, $id_msg, 3, $thumb_filename, $thumb_hash, (int) $thumb_size, (int) $attachment['thumb_width'], (int) $attachment['thumb_height'], $thumb_ext, $thumb_mime),
-			array('id_attach')
-		);
-
-		$attachment['id_thumb'] = $db->insert_id('{db_prefix}attachments');
-		if (!empty($attachment['id_thumb']))
-		{
-			$db->query('', '
-				UPDATE {db_prefix}attachments
-				SET id_thumb = {int:id_thumb}
-				WHERE id_attach = {int:id_attach}',
-				array(
-					'id_thumb' => $attachment['id_thumb'],
-					'id_attach' => $attachment['id_attach'],
-				)
-			);
-
-			$thumb_realname = getAttachmentFilename($thumb_filename, $attachment['id_thumb'], $id_folder_thumb, false, $thumb_hash);
-			if (file_exists($filename . '_thumb'))
-			{
-				rename($filename . '_thumb', $thumb_realname);
-			}
-
-			// Do we need to remove an old thumbnail?
-			if (!empty($old_id_thumb))
-			{
-				require_once(SUBSDIR . '/ManageAttachments.subs.php');
-				removeAttachments(array('id_attach' => $old_id_thumb), '', false, false);
-			}
-		}
-	}
 
 	return $attachment;
 }
@@ -1177,7 +972,9 @@ function loadAttachmentContext($id_msg)
 			$attachmentData[$i]['height'] = $attachment['height'];
 
 			// Let's see, do we want thumbs?
-			if (!empty($modSettings['attachmentThumbnails'])
+			// Stop creating a thumbnail at runtime for now
+			if (false
+				&& !empty($modSettings['attachmentThumbnails'])
 				&& !empty($modSettings['attachmentThumbWidth'])
 				&& !empty($modSettings['attachmentThumbHeight'])
 				&& ($attachment['width'] > $modSettings['attachmentThumbWidth'] || $attachment['height'] > $modSettings['attachmentThumbHeight']) && strlen($attachment['filename']) < 249)
@@ -1199,53 +996,16 @@ function loadAttachmentContext($id_msg)
 					$attachmentData[$i]['height'] = $attachment['thumb_height'];
 				}
 			}
-
-			if (!empty($attachment['id_thumb']))
+/*
+			if (!empty($attachment['has_thumb']))
 			{
 				$attachmentData[$i]['thumbnail'] = array(
 					'id' => $attachment['id_thumb'],
 					'href' => getUrl('action', ['action' => 'dlattach', 'topic' => $topic . '.0', 'attach' => $attachment['id_thumb'], 'image']),
 				);
-			}
-			$attachmentData[$i]['thumbnail']['has_thumb'] = !empty($attachment['id_thumb']);
-
-			// If thumbnails are disabled, check the maximum size of the image.
-			if (!$attachmentData[$i]['thumbnail']['has_thumb'] && ((!empty($modSettings['max_image_width']) && $attachment['width'] > $modSettings['max_image_width']) || (!empty($modSettings['max_image_height']) && $attachment['height'] > $modSettings['max_image_height'])))
-			{
-				if (!empty($modSettings['max_image_width']) && (empty($modSettings['max_image_height']) || $attachment['height'] * $modSettings['max_image_width'] / $attachment['width'] <= $modSettings['max_image_height']))
-				{
-					$attachmentData[$i]['width'] = $modSettings['max_image_width'];
-					$attachmentData[$i]['height'] = floor($attachment['height'] * $modSettings['max_image_width'] / $attachment['width']);
-				}
-				elseif (!empty($modSettings['max_image_width']))
-				{
-					$attachmentData[$i]['width'] = floor($attachment['width'] * $modSettings['max_image_height'] / $attachment['height']);
-					$attachmentData[$i]['height'] = $modSettings['max_image_height'];
-				}
-			}
-			elseif ($attachmentData[$i]['thumbnail']['has_thumb'])
-			{
-				// Data attributes for use in expandThumb
-				$attachmentData[$i]['thumbnail']['lightbox'] = 'data-lightboxmessage="' . $id_msg . '" data-lightboximage="' . $attachment['id_attach'] . '"';
-
-				/*
-				// If the image is too large to show inline, make it a popup.
-				// @todo this needs to be removed or depreciated
-				if (((!empty($modSettings['max_image_width']) && $attachmentData[$i]['real_width'] > $modSettings['max_image_width']) || (!empty($modSettings['max_image_height']) && $attachmentData[$i]['real_height'] > $modSettings['max_image_height'])))
-				{
-					$attachmentData[$i]['thumbnail']['javascript'] = 'return reqWin(\'' . $attachmentData[$i]['href'] . ';image\', ' . ($attachment['width'] + 20) . ', ' . ($attachment['height'] + 20) . ', true);';
-				}
-				else
-				{
-					$attachmentData[$i]['thumbnail']['javascript'] = 'return expandThumb(' . $attachment['id_attach'] . ');';
-				}
-				*/
-			}
-
-			if (!$attachmentData[$i]['thumbnail']['has_thumb'])
-			{
-				$attachmentData[$i]['downloads']++;
-			}
+			}*/
+			$attachmentData[$i]['has_thumb'] = !empty($attachment['has_thumb']);
+			$attachmentData[$i]['thumbnail_href'] = $scripturl . '?action=dlattach;topic=' . $topic . '.0;attach=' . $attachment['id_attach'] . ';thumb;image';
 		}
 	}
 
