@@ -38,6 +38,12 @@ class Download
 	protected $db = null;
 	protected $thumb_suffix = '';
 
+	/**
+	 * Starts up the download process
+	 *
+	 * @param string $id_attach String version of the attachment id
+	 * @param int $id
+	 */
 	public function __construct($id_attach, $id)
 	{
 		$this->string_attach = $id_attach;
@@ -45,12 +51,22 @@ class Download
 		$this->db = database();
 	}
 
+	/**
+	 * Temporary attachments have special names, so need slightly special handling
+	 */
 	public function isTemporary()
 	{
 		// Temporary attachment, special case...
 		return strpos($this->string_attach, 'post_tmp_' . User::$info->id . '_') !== false;
 	}
 
+	/**
+	 * Fetches data from the db and determine if the attachment actually exists
+	 *
+	 * @param null|string $text
+	 * @param null|int $id_topic
+	 * @throws \ElkArte\Exceptions\Exception
+	 */
 	public function validate($type, $id_topic = null)
 	{
 		if (empty($this->id_attach))
@@ -82,6 +98,9 @@ class Download
 		return !empty($this->data['real_filename']);
 	}
 
+	/**
+	 * Same as validate, but for temporary attachments
+	 */
 	protected function validateTemporary()
 	{
 		global $modSettings;
@@ -117,6 +136,12 @@ class Download
 		return !empty($this->data['real_filename']);
 	}
 
+	/**
+	 * Reads and returns the data of the image
+	 *
+	 * @param bool $inline
+	 * @param bool $use_compression
+	 */
 	public function send($inline, $use_compression)
 	{
 		if (empty($this->id_attach) || empty($this->data['real_filename']))
@@ -158,16 +183,25 @@ class Download
 		return $this->send_file($use_compression && $this->isCompressible());
 	}
 
+	/**
+	 * Is the atachment is approved or not
+	 */
 	public function isApproved()
 	{
 		return !empty($this->data['is_approved']);
 	}
 
+	/**
+	 * If the user requesting the attachment is its owner
+	 */
 	public function isOwner()
 	{
 		return (int) $this->data['id_member'] !== 0 && User::$info->id === (int) $this->data['id_member'];
 	}
 
+	/**
+	 * If the attachment is an avatar
+	 */
 	public function isAvatar()
 	{
 		return $this->data['attachment_type'] == Attachment::DB_TYPE_AVATAR;
@@ -359,6 +393,9 @@ class Download
 		detectServer()->setTimeLimit(600);
 	}
 
+	/**
+	 * Some magic in case data are not available immediately
+	 */
 	protected function rebuildData($id_topic)
 	{
 		global $modSettings;
