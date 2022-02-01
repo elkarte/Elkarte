@@ -897,14 +897,23 @@ function template_action_notification()
 				</div>
 			</div>
 		</form>';
+}
 
-	// Show the boards you have on notify
+/**
+ * Template for showing which boards you have subscribed to
+ * and allowing for modification.
+ */
+function template_board_notification_list()
+{
 	template_show_list('board_notification_list');
+}
 
-	echo '
-		<br />';
-
-	// And any topics you are watching as well
+/**
+ * Template for showing which topics you have subscribed to
+ * and allowing for modification.
+ */
+function template_topic_notification_list()
+{
 	template_show_list('topic_notification_list');
 }
 

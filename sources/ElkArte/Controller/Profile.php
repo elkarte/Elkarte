@@ -32,54 +32,29 @@ use ElkArte\Util;
  */
 class Profile extends AbstractController
 {
-	/**
-	 * If the save was successful or not
-	 *
-	 * @var bool
-	 */
+	/** @var bool If the save was successful or not */
 	private $completedSave = false;
 
-	/**
-	 * If this was a request to save an update
-	 *
-	 * @var null
-	 */
+	/** @var null If this was a request to save an update */
 	private $isSaving = null;
 
-	/**
-	 * What it says, on completion
-	 *
-	 * @var bool
-	 */
+	/** @var null What it says, on completion */
 	private $_force_redirect;
 
-	/**
-	 * Holds the output of createMenu for the profile areas
-	 *
-	 * @var array|bool
-	 */
+	/** @var array|bool Holds the output of createMenu for the profile areas */
 	private $_profile_include_data;
 
-	/**
-	 * The current area chosen from the menu
-	 *
-	 * @var string
-	 */
+	/** @var string The current area chosen from the menu */
 	private $_current_area;
 
-	/**
-	 * Member id for the history being viewed
-	 *
-	 * @var int
-	 */
+	/** @var string The current subsection, if any, of the area chosen */
+	private $_current_subsection;
+
+	/** @var int Member id for the history being viewed */
 	private $_memID = 0;
 
-	/**
-	 * The \ElkArte\Member object is stored here to avoid some global
-	 *
-	 * @var \ElkArte\Member
-	 */
-	private $_profile = null;
+	/** @var \ElkArte\Member The \ElkArte\Member object is stored here to avoid some global */
+	private $_profile;
 
 	/**
 	 * Called before all other methods when coming from the dispatcher or
@@ -125,8 +100,8 @@ class Profile extends AbstractController
 		$context['member'] = $this->_profile;
 		$context['member']->loadContext();
 
-		// Is this the profile of the user himself or herself?
-		$context['user']['is_owner'] = (int) $this->_memID === (int) $this->user->id;
+		// Is this their own profile or are they looking at someone else?
+		$context['user']['is_owner'] = $this->_memID === (int) $this->user->id;
 
 		// Create the menu of profile options
 		$this->_define_profile_menu();
@@ -153,6 +128,7 @@ class Profile extends AbstractController
 
 		// Set the selected item - now it's been validated.
 		$this->_current_area = $this->_profile_include_data['current_area'];
+		$this->_current_subsection = $this->_profile_include_data['current_subsection'] ?? '';
 		$context['menu_item_selected'] = $this->_current_area;
 
 		// Before we go any further, let's work on the area we've said is valid.
@@ -190,7 +166,7 @@ class Profile extends AbstractController
 		// If it's you then we should redirect upon save.
 		elseif (!empty($profile_vars) && $context['user']['is_owner'] && !$context['do_preview'])
 		{
-			redirectexit('action=profile;area=' . $this->_current_area . ';updated');
+			redirectexit('action=profile;area=' . $this->_current_area . (empty($this->_current_subsection) ? '' : ';sa=' . $this->_current_subsection) . ';updated');
 		}
 		elseif (!empty($this->_force_redirect))
 		{
@@ -367,6 +343,11 @@ class Profile extends AbstractController
 						'function' => 'action_notification',
 						'sc' => 'post',
 						'token' => 'profile-nt%u',
+						'subsections' => array(
+							'settings' => array($txt['notify_settings']),
+							'boards' => array($txt['notify_boards']),
+							'topics' => array($txt['notify_topics']),
+						),
 						'permission' => array(
 							'own' => array('profile_extra_any', 'profile_extra_own'),
 							'any' => array('profile_extra_any'),
@@ -574,11 +555,11 @@ class Profile extends AbstractController
 			);
 		}
 
-		if (!empty($this->_profile_include_data['current_subsection']) && $this->_profile_include_data['subsections'][$this->_profile_include_data['current_subsection']]['label'] !== $this->_profile_include_data['label'])
+		if (!empty($this->_current_subsection) && $this->_profile_include_data['subsections'][$this->_current_subsection]['label'] !== $this->_profile_include_data['label'])
 		{
 			$context['linktree'][] = array(
-				'url' => getUrl('profile', ['action' => 'profile', 'area' => $this->_profile_include_data['current_area'], 'sa' => $this->_profile_include_data['current_subsection'], 'u' => $this->_memID, 'name' => $this->_profile['real_name']]),
-				'name' => $this->_profile_include_data['subsections'][$this->_profile_include_data['current_subsection']]['label'],
+				'url' => getUrl('profile', ['action' => 'profile', 'area' => $this->_profile_include_data['current_area'], 'sa' => $this->_current_subsection, 'u' => $this->_memID, 'name' => $this->_profile['real_name']]),
+				'name' => $this->_profile_include_data['subsections'][$this->_current_subsection]['label'],
 			);
 		}
 	}
