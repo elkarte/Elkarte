@@ -113,7 +113,7 @@ class Action
 
 		$this->_default = $default ?: key($this->_subActions);
 
-		$subAction = $this->req->getQuery($requestParam, 'trim|strval', $this->_default);
+		$subAction = $this->req->getRequest($requestParam, 'trim|strval', $this->_default);
 
 		return isset($this->_subActions[$subAction]) ? $subAction : $this->_default;
 	}

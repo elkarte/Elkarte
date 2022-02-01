@@ -126,7 +126,7 @@ function previewNews()
 	x[x.length] = 'item=newsletterpreview';
 
 	// Send in document for previewing
-	sendXMLDocument(elk_prepareScriptUrl(elk_scripturl) + 'action=xmlpreview;api=xml', x.join('&'), onDocSent);
+	sendXMLDocument(elk_prepareScriptUrl(elk_scripturl) + 'action=XmlPreview;api=xml', x.join('&'), onDocSent);
 
 	// Show the preview section and load it with "pending results" text, onDocSent will finish things off
 	document.getElementById('preview_section').style.display = 'block';

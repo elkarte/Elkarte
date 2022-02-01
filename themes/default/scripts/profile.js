@@ -156,7 +156,7 @@ function ajax_getSignaturePreview(showPreview)
 	showPreview = (typeof showPreview === 'undefined') ? false : showPreview;
 	$.ajax({
 		type: "POST",
-		url: elk_scripturl + "?action=xmlpreview;api=xml",
+		url: elk_scripturl + "?action=XmlPreview;api=xml",
 		data: {item: "sig_preview", signature: $("#signature").val(), user: $('input[name="u"]').attr("value")},
 		context: document.body
 	})
@@ -400,7 +400,7 @@ function modifyWarnNotify()
 	{
 		$.ajax({
 			type: "POST",
-			url: elk_scripturl + "?action=xmlpreview;api=xml",
+			url: elk_scripturl + "?action=XmlPreview;api=xml",
 			data: {
 				item: "warning_preview",
 				title: $("#warn_sub").val(),

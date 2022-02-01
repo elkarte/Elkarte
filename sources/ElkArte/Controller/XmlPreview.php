@@ -109,7 +109,7 @@ class XmlPreview extends AbstractController
 	}
 
 	/**
-	 * Get a preview of a news letter before its sent on to the masses
+	 * Get a preview of a newsletter before its sent on to the masses
 	 *
 	 *  - Uses prepareMailingForPreview to create the actual preview
 	 */
@@ -153,7 +153,7 @@ class XmlPreview extends AbstractController
 		Txt::load('Errors');
 
 		$user = isset($this->_req->post->user) ? (int) $this->_req->post->user : 0;
-		$is_owner = $user == $this->user->id;
+		$is_owner = $user === (int) $this->user->id;
 
 		// @todo Temporary
 		// Borrowed from loadAttachmentContext in Display.controller.php

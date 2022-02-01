@@ -594,7 +594,7 @@ function make_preview_btn(preview_id)
 	{
 		$.ajax({
 			type: "POST",
-			url: elk_scripturl + "?action=xmlpreview;api=xml",
+			url: elk_scripturl + "?action=XmlPreview;api=xml",
 			data: {item: "newspreview", news: $("#data_" + preview_id).val()},
 			context: document.body
 		})
@@ -1233,7 +1233,7 @@ function ajax_getTemplatePreview()
 {
 	$.ajax({
 		type: "POST",
-		url: elk_scripturl + '?action=xmlpreview;api=xml',
+		url: elk_scripturl + '?action=XmlPreview;api=xml',
 		data: {
 			item: "warning_preview",
 			title: $("#template_title").val(),
@@ -1657,7 +1657,7 @@ function ajax_getEmailTemplatePreview()
 {
 	$.ajax({
 		type: "POST",
-		url: elk_scripturl + "?action=xmlpreview;api=xml",
+		url: elk_scripturl + "?action=XmlPreview;api=xml",
 		data: {
 			item: "bounce_preview",
 			title: $("#template_title").val(),
