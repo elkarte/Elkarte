@@ -904,7 +904,7 @@ function userByEmail($email, $username = null)
 			'username' => $username,
 		)
 	)->fetch_callback(
-		function ($row) use(&$return) {
+		function ($row) use (&$return) {
 			$return = (int) $row['id_member'];
 		}
 	);

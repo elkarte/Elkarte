@@ -96,7 +96,9 @@ $txt['custom_title'] = 'Custom Title';
 
 $txt['lastLoggedIn'] = 'Last Active';
 
-$txt['notify_settings'] = 'Notification Settings:';
+$txt['notify_settings'] = 'Notification Settings';
+$txt['notify_boards'] = 'Board Notifications';
+$txt['notify_topics'] = 'Topic Notifications';
 $txt['notify_save'] = 'Save settings';
 $txt['notify_important_email'] = 'Receive forum newsletters, announcements and important notifications by email.';
 $txt['notify_regularity'] = 'For topics and boards I\'ve requested notification on, notify me';

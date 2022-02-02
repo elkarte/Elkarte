@@ -897,14 +897,23 @@ function template_action_notification()
 				</div>
 			</div>
 		</form>';
+}
 
-	// Show the boards you have on notify
+/**
+ * Template for showing which boards you have subscribed to
+ * and allowing for modification.
+ */
+function template_board_notification_list()
+{
 	template_show_list('board_notification_list');
+}
 
-	echo '
-		<br />';
-
-	// And any topics you are watching as well
+/**
+ * Template for showing which topics you have subscribed to
+ * and allowing for modification.
+ */
+function template_topic_notification_list()
+{
 	template_show_list('topic_notification_list');
 }
 
@@ -1186,9 +1195,9 @@ function template_profile_birthdate()
 								<p class="smalltext">', $txt['dob_year'], ' - ', $txt['dob_month'], ' - ', $txt['dob_day'], '</p>
 							</dt>
 							<dd>
-								<input type="text" name="bday3" size="4" maxlength="4" value="', $context['member']['birth_date']['year'], '" class="input_text" /> -
-								<input type="text" name="bday1" size="2" maxlength="2" value="', $context['member']['birth_date']['month'], '" class="input_text" /> -
-								<input type="text" name="bday2" size="2" maxlength="2" value="', $context['member']['birth_date']['day'], '" class="input_text" />
+								<input type="number" name="bday3" size="4" maxlength="4" value="', $context['member']['birth_date']['year'], '" class="input_text" /> -
+								<input type="number" min="0" max="12" name="bday1" size="2" maxlength="2" value="', $context['member']['birth_date']['month'], '" class="input_text" /> -
+								<input type="number" min="0" max="31" name="bday2" size="2" maxlength="2" value="', $context['member']['birth_date']['day'], '" class="input_text" />
 							</dd>';
 }
 

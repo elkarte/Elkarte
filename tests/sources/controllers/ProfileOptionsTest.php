@@ -121,6 +121,7 @@ class TestProfileOptions extends ElkArteCommonSetupTest
 		$context['token_check'] = 'profile-u1';
 		$context['profile-u1_token_var'] = 'profile-u1';
 		$context['profile-u1_token'] = 'profile-u1';
+		$context['profile_menu_name'] = 'menu_data_1';
 
 		$controller = new ProfileOptions(new EventManager());
 		$controller->setUser(User::$info);
@@ -128,7 +129,7 @@ class TestProfileOptions extends ElkArteCommonSetupTest
 		$controller->action_notification();
 
 		// Lets see some items loaded into $context['profile_fields']
+		$this->assertArrayHasKey('mentionmem', $context['mention_types'], 'Missing mention type');
 		$this->assertEquals('0', $context['member']['notify_announcements']);
-		$this->assertNotNull($context['topic_notification_list']['additional_rows']['bottom_of_list']);
 	}
 }

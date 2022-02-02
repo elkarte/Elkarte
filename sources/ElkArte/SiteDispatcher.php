@@ -124,7 +124,6 @@ class SiteDispatcher
 		'viewquery' => array('\\ElkArte\\AdminController\\AdminDebug', 'action_viewquery'),
 		'.xml' => array('\\ElkArte\\Controller\\News', 'action_showfeed'),
 		'xmlhttp' => array('\\ElkArte\\Controller\\Xml', 'action_index'),
-		'xmlpreview' => array('\\ElkArte\\Controller\\XmlPreview', 'action_index'),
 	);
 
 	/**

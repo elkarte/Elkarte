@@ -117,7 +117,7 @@ class ProfileOptions extends AbstractController
 	}
 
 	/**
-	 * Show all the users buddies, as well as a add/delete interface.
+	 * Show all the users buddies, as well as an add/delete interface.
 	 *
 	 * @uses template_editBuddies()
 	 */
@@ -422,7 +422,7 @@ class ProfileOptions extends AbstractController
 	 */
 	public function loadThemeOptions()
 	{
-		global $context, $options, $cur_profile;
+		global $context, $cur_profile;
 
 		if (isset($this->_req->post->default_options))
 		{
@@ -431,7 +431,7 @@ class ProfileOptions extends AbstractController
 
 		if ($context['user']['is_owner'])
 		{
-			$context['member']['options'] = $options;
+			$context['member']['options'] = $this->_profile->options;
 
 			if (isset($this->_req->post->options) && is_array($this->_req->post->options))
 			{
@@ -594,21 +594,73 @@ class ProfileOptions extends AbstractController
 	}
 
 	/**
-	 * Display the notifications and settings for changes.
+	 * Display the notification settings for the user and allow changes.
 	 */
 	public function action_notification()
 	{
-		global $txt, $scripturl, $context, $modSettings;
+		global $txt, $context;
 
 		theme()->getTemplates()->load('ProfileOptions');
 
-		// Going to need this for the list.
-		require_once(SUBSDIR . '/Boards.subs.php');
-		require_once(SUBSDIR . '/Topic.subs.php');
 		require_once(SUBSDIR . '/Profile.subs.php');
+
+		$subActions = array(
+			'settings' => array($this, 'action_editNotificationSettings'),
+			'boards' => array($this, 'action_editNotificationBoards'),
+			'topics' => array($this, 'action_editNotificationTopics')
+		);
+
+		// Set a subaction
+		$action = new Action('notification_actions');
+		$subAction = $action->initialize($subActions, 'settings');
+
+		// Create the header for the template.
+		$context[$context['profile_menu_name']]['tab_data'] = array(
+			'title' => $txt['notify_settings'],
+			'description' => $txt['notification_info'],
+			'class' => 'profile',
+			'tabs' => array(
+				'settings' => array(),
+				'boards' => array(),
+				'topics' => array(),
+			),
+		);
+
+		// Pass on to the actual function.
+		$action->dispatch($subAction);
+	}
+
+	/**
+	 * Generate the users existing notification options and allow for updates
+	 */
+	public function action_editNotificationSettings()
+	{
+		global $context;
 
 		// Show the list of notification types and how they can subscribe to them
 		$context['mention_types'] = getMemberNotificationsProfile($this->_memID);
+
+		// What options are set?
+		$context['member']['notify_announcements'] = $this->_profile['notify_announcements'];
+		$context['member']['notify_send_body'] = $this->_profile['notify_send_body'];
+		$context['member']['notify_types'] = $this->_profile['notify_types'];
+		$context['member']['notify_regularity'] = $this->_profile['notify_regularity'];
+
+		$this->loadThemeOptions();
+	}
+
+	/**
+	 * Generate the users existing board notification list.
+	 * Loads data into $context to be displayed wth template_board_notification_list
+	 */
+	public function action_editNotificationBoards()
+	{
+		global $txt, $scripturl, $context;
+
+		require_once(SUBSDIR . '/Boards.subs.php');
+
+		$context['mention_types'] = getMemberNotificationsProfile($this->_memID);
+		unset($context['sub_template']);
 
 		// Fine, start with the board list.
 		$listOptions = array(
@@ -670,7 +722,7 @@ class ProfileOptions extends AbstractController
 				),
 			),
 			'form' => array(
-				'href' => $scripturl . '?action=profile;area=notification',
+				'href' => $scripturl . '?action=profile;area=notification;sa=boards',
 				'include_sort' => true,
 				'include_start' => true,
 				'hidden_fields' => array(
@@ -697,6 +749,20 @@ class ProfileOptions extends AbstractController
 
 		// Create the board notification list.
 		createList($listOptions);
+	}
+
+	/**
+	 * Generate the users existing topic notification list.
+	 * Loads data into $context to be displayed wth template_topic_notification_list
+	 */
+	public function action_editNotificationTopics()
+	{
+		global $txt, $scripturl, $context, $modSettings;
+
+		require_once(SUBSDIR . '/Topic.subs.php');
+
+		$context['mention_types'] = getMemberNotificationsProfile($this->_memID);
+		unset($context['sub_template']);
 
 		// Now do the topic notifications.
 		$listOptions = array(
@@ -821,16 +887,8 @@ class ProfileOptions extends AbstractController
 			),
 		);
 
-		// Create the notification list.
+		// Create the topic notification list.
 		createList($listOptions);
-
-		// What options are set?
-		$context['member']['notify_announcements'] = $this->_profile['notify_announcements'];
-		$context['member']['notify_send_body'] = $this->_profile['notify_send_body'];
-		$context['member']['notify_types'] = $this->_profile['notify_types'];
-		$context['member']['notify_regularity'] = $this->_profile['notify_regularity'];
-
-		$this->loadThemeOptions();
 	}
 
 	/**

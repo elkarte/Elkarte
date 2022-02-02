@@ -64,7 +64,7 @@ function call_template_callbacks($id, $array)
  */
 function template_html_above()
 {
-	global $context, $scripturl, $txt, $modSettings;
+	global $context, $scripturl, $txt;
 
 	// Show right to left and the character set for ease of translating.
 	echo '<!DOCTYPE html>
@@ -173,6 +173,7 @@ function template_body_above()
 	<header id="top_section">
 		<aside id="top_header" class="wrapper">';
 
+	// Load in all register header templates
 	call_template_callbacks('th', $context['theme_header_callbacks']);
 
 	echo '
@@ -199,6 +200,7 @@ function template_body_above()
 	<div id="wrapper" class="wrapper">
 		<aside id="upper_section"', empty($context['minmax_preferences']['upshrink']) ? '' : ' class="hide" aria-hidden="true"', '>';
 
+	// Load in all registered upper content templates
 	call_template_callbacks('uc', $context['upper_content_callbacks']);
 
 	echo '
@@ -768,6 +770,9 @@ function template_show_error($error_id)
 					</div>';
 }
 
+/**
+ * Is this used?
+ */
 function template_uc_generic_infobox()
 {
 	global $context;

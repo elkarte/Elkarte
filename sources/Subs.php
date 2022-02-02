@@ -788,34 +788,38 @@ function memoryReturnBytes($val)
 
 /**
  * This is the only template included in the sources.
+ * @return void
  */
 function template_rawdata()
 {
-	return theme()->template_rawdata();
+	theme()->template_rawdata();
 }
 
 /**
  * The header template
+ * @return void
  */
 function template_header()
 {
-	return theme()->template_header();
+	theme()->template_header();
 }
 
 /**
  * Show the copyright.
+ * @return void
  */
 function theme_copyright()
 {
-	return theme()->theme_copyright();
+	theme()->theme_copyright();
 }
 
 /**
  * The template footer
+ * @return void
  */
 function template_footer()
 {
-	return theme()->template_footer();
+	theme()->template_footer();
 }
 
 /**
@@ -829,12 +833,11 @@ function template_footer()
  * - if the admin option to combine files is set, will use Combiner.class
  *
  * @param bool $do_deferred = false
+ * @return void
  */
 function template_javascript($do_deferred = false)
 {
 	theme()->template_javascript($do_deferred);
-
-	return;
 }
 
 /**
@@ -842,23 +845,21 @@ function template_javascript($do_deferred = false)
  *
  * What it does:
  *  - If the admin option to combine files is set, will use Combiner.class
+ * @return void
  */
 function template_css()
 {
 	theme()->template_css();
-
-	return;
 }
 
 /**
  * Calls on template_show_error from index.template.php to show warnings
  * and security errors for admins
+ * @return void
  */
 function template_admin_warning_above()
 {
 	theme()->template_admin_warning_above();
-
-	return;
 }
 
 /**
