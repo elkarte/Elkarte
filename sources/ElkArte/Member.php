@@ -68,8 +68,11 @@ class Member extends ValuesContainer
 	 */
 	public function append($type, $data, $display_fields)
 	{
-		$this->data[$type] = $data;
-		$this->display_fields[$type] = $display_fields;
+		$this->data[$type] = $this->data[$type] ?? [];
+		$this->data[$type] = array_merge($this->data[$type], $data);
+
+		$this->display_fields[$type] = $this->display_fields[$type] ?? [];
+		$this->display_fields[$type] = array_merge($this->display_fields[$type], $display_fields);
 	}
 
 	/**
