@@ -352,16 +352,6 @@ function template_edit_options()
 	echo '
 			}
 		</script>';
-
-	// Any final spellchecking stuff?
-	if (!empty($context['show_spellchecking']))
-	{
-		echo '
-		<form name="spell_form" id="spell_form" method="post" accept-charset="UTF-8" target="spellWindow" action="', getUrl('action', ['action' => 'spellcheck']), '">
-			<input type="hidden" id="spellstring" name="spellstring" value="" />
-			<input type="hidden" id="fulleditor" name="fulleditor" value="" />
-		</form>';
-	}
 }
 
 /**
@@ -1234,12 +1224,6 @@ function template_profile_signature_modify()
 	{
 		echo '
 								<p class="smalltext">', sprintf($txt['max_sig_characters'], $context['signature_limits']['max_length']), ' <span id="signatureLeft">', $context['signature_limits']['max_length'], '</span></p>';
-	}
-
-	if ($context['show_spellchecking'])
-	{
-		echo '
-								<input type="button" value="', $txt['spell_check'], '" onclick="spellCheck(\'creator\', \'signature\', false);"  tabindex="', $context['tabindex']++, '" class="right_submit" />';
 	}
 
 	if (!empty($context['show_preview_button']))

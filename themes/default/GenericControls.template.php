@@ -148,7 +148,7 @@ function template_control_richedit($editor_id, $smileyContainer = null, $bbcCont
 }
 
 /**
- * Shows the buttons that the user can see .. preview, spellchecker, etc
+ * Shows the buttons that the user can see .. preview, etc
  *
  * @param string $editor_id
  *
@@ -180,13 +180,6 @@ function template_control_richedit_buttons($editor_id)
 	{
 		echo '
 		<input type="submit" name="preview" value="', isset($editor_context['labels']['preview_button']) ? $editor_context['labels']['preview_button'] : $txt['preview'], '" tabindex="', $context['tabindex']++, '" onclick="', $editor_context['preview_type'] == 2 ? 'return event.ctrlKey || previewControl();' : 'return submitThisOnce(this);', '" accesskey="p" />';
-	}
-
-	// Show the spellcheck button?
-	if ($context['show_spellchecking'])
-	{
-		echo '
-		<input type="button" value="', $txt['spell_check'], '" tabindex="', $context['tabindex']++, '" onclick="spellCheckStart();" />';
 	}
 
 	foreach ($editor_context['buttons'] as $button)

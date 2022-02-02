@@ -87,22 +87,6 @@ function create_control_richedit($editorOptions)
 
 		// Our not so concise shortcut line
 		$context['shortcuts_text'] = $context['shortcuts_text'] ?? $txt['shortcuts'];
-
-		// Spellcheck?
-		$context['show_spellchecking'] = !empty($modSettings['enableSpellChecking']) && function_exists('pspell_new');
-		if ($context['show_spellchecking'])
-		{
-			// Some hidden information is needed in order to make spell check work.
-			if (!isset($_REQUEST['xml']))
-			{
-				$context['insert_after_template'] .= '
-		<form name="spell_form" id="spell_form" method="post" accept-charset="UTF-8" target="spellWindow" action="' . $scripturl . '?action=spellcheck">
-			<input type="hidden" id="spellstring" name="spellstring" value="" />
-			<input type="hidden" id="fulleditor" name="fulleditor" value="" />
-		</form>';
-			}
-			loadJavascriptFile('spellcheck.js', array('defer' => true));
-		}
 	}
 
 	// Start off the editor...

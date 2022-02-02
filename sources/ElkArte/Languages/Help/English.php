@@ -395,7 +395,6 @@ $helptxt['edit_wait_time'] = 'Number of seconds allowed for a post to be edited 
 $helptxt['edit_disable_time'] = 'Number of minutes allowed to pass before a user can no longer edit a post they have made. Set to 0 disable. <br /><br /><em>Note: This will not affect any user who has permission to edit other people\'s posts.</em>';
 $helptxt['preview_characters'] = 'This option sets the number of available characters for the first and last message of the topic preview.  <strong>Note</strong> this only makes the information available to the theme, the theme must support the &quot;Enable hover  previews on the message index&quot; setting';
 $helptxt['posts_require_captcha'] = 'This setting will force users to pass anti-spam bot verification each time they make a post to a board. Only users with a post count below the number set will need to enter the code - this should help combat automated spamming scripts.';
-$helptxt['enableSpellChecking'] = 'Enable spell checking. You MUST have the pspell library installed on your server and your PHP configuration set up to use the pspell library. Your server ' . (function_exists('pspell_new') ? 'DOES' : 'DOES NOT') . ' appear to have this set up.';
 $helptxt['lastActive'] = 'Set the number of minutes since their last activity to display people as active on the board index. Default is 15 minutes.';
 
 $helptxt['customoptions'] = 'This section defines the options that a user may choose from a drop down list. There are a few key points to note in this section:
@@ -537,7 +536,7 @@ $helptxt['posts_and_topics'] = '
 	<ul class="normallist">
 		<li>
 			<strong>Post Settings</strong><br />
-			Modify the settings related to the posting of messages and the way messages are shown. You can also enable the spell check here.
+			Modify the settings related to the posting of messages and the way messages are shown.
 		</li><li>
 			<strong>Bulletin Board Code</strong><br />
 			Enable the code that allows to format forum messages. Also adjust which BBCodes are allowed and which aren\'t.

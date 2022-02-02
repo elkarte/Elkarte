@@ -618,9 +618,6 @@ $txt['mm_emailtemplates'] = 'Templates';
 $txt['mm_emailsettings'] = 'Settings';
 
 $txt['removeNestedQuotes'] = 'Remove nested quotes when quoting';
-$txt['enableSpellChecking'] = 'Enable spell checking';
-$txt['enableSpellChecking_warning'] = 'this does not work on all servers.';
-$txt['enableSpellChecking_error'] = 'this does not work on your server.';
 $txt['enableVideoEmbeding'] = 'Enable auto-embedding of video links.';
 $txt['video_embed_limit'] = 'Maximum allowed embedded videos per page';
 $txt['video_embed_limit_note'] = '(0 for no limit)';

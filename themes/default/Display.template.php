@@ -541,13 +541,6 @@ function template_quickreply_below()
 								<input type="submit" name="post" value="', $txt['post'], '" onclick="return submitThisOnce(this);" accesskey="s" tabindex="', $context['tabindex']++, '" />
 								<input type="submit" name="preview" value="', $txt['preview'], '" onclick="return submitThisOnce(this);" accesskey="p" tabindex="', $context['tabindex']++, '" />';
 
-			// Spellcheck button?
-			if ($context['show_spellchecking'])
-			{
-				echo '
-								<input type="button" value="', $txt['spell_check'], '" onclick="spellCheck(\'postmodify\', \'message\', ', (empty($options['use_editor_quick_reply']) ? 'false' : 'true'), ')" tabindex="', $context['tabindex']++, '" />';
-			}
-
 			// Draft save button?
 			if (!empty($context['drafts_save']))
 			{
@@ -637,16 +630,6 @@ function template_quickreply_below()
 			});
 		</script>';
 
-	// Spell check for quick modify and quick reply (w/o the editor)
-	if ($context['show_spellchecking'] && empty($options['use_editor_quick_reply']))
-	{
-		echo '
-			<form name="spell_form" id="spell_form" method="post" accept-charset="UTF-8" target="spellWindow" action="', $scripturl, '?action=spellcheck">
-				<input type="hidden" id="spellstring" name="spellstring" value="" />
-				<input type="hidden" id="fulleditor" name="fulleditor" value="" />
-			</form>';
-	}
-
 	// Quick moderation options
 	echo '
 			<script>';
@@ -697,8 +680,7 @@ function template_quickreply_below()
 								<input type="hidden" name="\' + elk_session_var + \'" value="\' + elk_session_id + \'" />
 								<input type="hidden" name="topic" value="' . $context['current_topic'] . '" />
 								<input type="hidden" name="msg" value="%msg_id%" />
-								<input type="submit" name="post" value="' . $txt['save'] . '" tabindex="' . ($context['tabindex']++) . '" onclick="return oQuickModify.modifySave(\'' . $context['session_id'] . '\', \'' . $context['session_var'] . '\');" accesskey="s" />' . ($context['show_spellchecking'] ? '
-								<input type="button" value="' . $txt['spell_check'] . '" tabindex="' . ($context['tabindex']++) . '" onclick="spellCheck(\'quickModForm\', \'message\', false);" />' : '') . '
+								<input type="submit" name="post" value="' . $txt['save'] . '" tabindex="' . ($context['tabindex']++) . '" onclick="return oQuickModify.modifySave(\'' . $context['session_id'] . '\', \'' . $context['session_var'] . '\');" accesskey="s" />
 								<input type="submit" name="cancel" value="' . $txt['modify_cancel'] . '" tabindex="' . ($context['tabindex']++) . '" onclick="return oQuickModify.modifyCancel();" />
 							</div>
 						</div>'), ',
