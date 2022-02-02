@@ -20,79 +20,38 @@ namespace ElkArte;
  */
 class MemberLoader
 {
-	/**
-	 * Just the bare minimum set of fields
-	 */
+	/** @var string Just the bare minimum set of fields */
 	public const SET_MINIMAL = 'minimal';
-
-	/**
-	 * What is needed in most of the cases
-	 */
+	/** @var string What is needed in most of the cases */
 	public const SET_NORMAL = 'normal';
-
-	/**
-	 * What is required to see a profile page
-	 */
+	/** @var string What is required to see a profile page */
 	public const SET_PROFILE = 'profile';
-
-	/**
-	 * @var \ElkArte\Database\QueryInterface
-	 */
+	/** @var \ElkArte\Database\QueryInterface */
 	protected $db = null;
-
-	/**
-	 * @var \ElkArte\Cache\Cache
-	 */
+	/** @var \ElkArte\Cache\Cache */
 	protected $cache = null;
-
-	/**
-	 * @var \BBC\ParserWrapper
-	 */
+	/** @var \BBC\ParserWrapper */
 	protected $bbc_parser = null;
-
-	/**
-	 * @var \ElkArte\MembersList
-	 */
+	/** @var \ElkArte\MembersList */
 	protected $users_list = null;
-
-	/**
-	 * @var mixed[]
-	 */
+	/** @var mixed[] */
 	protected $options = [
 		'titlesEnable' => false,
 		'custom_fields' => false,
 		'load_moderators' => false,
 		'display_fields' => []
 	];
-
-	/**
-	 * @var bool
-	 */
+	/** @var bool if to use the cache or not */
 	protected $useCache = false;
-
-	/**
-	 * @var string
-	 */
+	/** @var string which set to load */
 	protected $set = '';
-
-	/**
-	 * @var string
-	 */
+	/** @var string */
 	protected $base_select_columns = '';
-
-	/**
-	 * @var string
-	 */
+	/** @var string  */
 	protected $base_select_tables = '';
-
-	/**
-	 * @var int[]
-	 */
+	/** @var int[] member ids that have been loaded */
 	protected $loaded_ids = [];
-
-	/**
-	 * @var \ElkArte\Member[]
-	 */
+	/** @var \ElkArte\Member[] */
 	protected $loaded_members = [];
 
 	/**
@@ -124,6 +83,7 @@ class MemberLoader
 			pg.online_color AS post_group_color, COALESCE(pg.group_name, {string:blank_string}) AS post_group,
 			mem.is_activated, mem.warning, ' . (!empty($this->options['titlesEnable']) ? 'mem.usertitle, ' : '') . '
 			CASE WHEN mem.id_group = 0 OR mg.icons = {string:blank_string} THEN pg.icons ELSE mg.icons END AS icons';
+
 		$this->base_select_tables = '
 			LEFT JOIN {db_prefix}log_online AS lo ON (lo.id_member = mem.id_member)
 			LEFT JOIN {db_prefix}attachments AS a ON (a.id_member = mem.id_member)
@@ -242,7 +202,8 @@ class MemberLoader
 		call_integration_hook('integrate_load_member_data', array(&$select_columns, &$select_tables, $this->set));
 
 		// Load the member's data.
-		$request = $this->db->query('', '
+		$new_loaded_ids = array();
+		$request = $this->db->fetchQuery('
 			SELECT' . $select_columns . '
 			FROM {db_prefix}members AS mem' . $select_tables . '
 			WHERE ' . $where_clause,
@@ -250,18 +211,15 @@ class MemberLoader
 				'blank_string' => '',
 				'users' => count($to_load) === 1 ? current($to_load) : $to_load,
 			)
+		)->fetch_callback(
+			function ($row) use (&$new_loaded_ids) {
+				$new_loaded_ids[] = $row['id_member'];
+				$this->loaded_ids[] = $row['id_member'];
+				$row['options'] = array();
+				$this->loaded_members[$row['id_member']] = new Member($row, $this->set, $this->bbc_parser);
+				$this->users_list->add($this->loaded_members[$row['id_member']], $row['id_member']);
+			}
 		);
-
-		$new_loaded_ids = array();
-		while (($row = $request->fetch_assoc()))
-		{
-			$new_loaded_ids[] = $row['id_member'];
-			$this->loaded_ids[] = $row['id_member'];
-			$row['options'] = array();
-			$this->loaded_members[$row['id_member']] = new Member($row, $this->set, $this->bbc_parser);
-			$this->users_list->add($this->loaded_members[$row['id_member']], $row['id_member']);
-		}
-		$request->free_result();
 		$this->loadCustomFields($new_loaded_ids);
 
 		if (!empty($new_loaded_ids))
@@ -287,7 +245,8 @@ class MemberLoader
 			return;
 		}
 
-		$request = $this->db->query('', '
+		$data = [];
+		$this->db->fetchQuery('
 			SELECT 
 				cfd.id_member, cfd.variable, cfd.value, cf.field_options, cf.field_type
 			FROM {db_prefix}custom_fields_data AS cfd
@@ -296,29 +255,24 @@ class MemberLoader
 			array(
 				'loaded_ids' => count($new_loaded_ids) === 1 ? $new_loaded_ids[0] : $new_loaded_ids,
 			)
-		);
-		$data = [];
-		while (($row = $request->fetch_assoc()))
-		{
-			if (!empty($row['field_options']))
-			{
-				$field_options = explode(',', $row['field_options']);
-				$key = (int) array_search($row['value'], $field_options);
-			}
-			else
-			{
+		)->fetch_callback(
+			function ($row) use(&$data) {
 				$key = 0;
-			}
+				if (!empty($row['field_options']))
+				{
+					$field_options = explode(',', $row['field_options']);
+					$key = (int) array_search($row['value'], $field_options);
+				}
 
-			$data[$row['id_member']][$row['variable'] . '_key'] = $row['variable'] . '_' . $key;
-			$data[$row['id_member']][$row['variable']] = $row['value'];
-		}
+				$data[$row['id_member']][$row['variable'] . '_key'] = $row['variable'] . '_' . $key;
+				$data[$row['id_member']][$row['variable']] = $row['value'];
+			}
+		);
 
 		foreach ($data as $id => $val)
 		{
 			$this->users_list->appendTo($val, 'options', $id, $this->options['display_fields']);
 		}
-		$request->free_result();
 	}
 
 	/**
@@ -374,6 +328,7 @@ class MemberLoader
 				{
 					$this->loaded_members[$id]['icons'] = $group_info['icons'];
 				}
+
 				if (!empty($group_info['online_color']))
 				{
 					$this->loaded_members[$id]['member_group_color'] = $group_info['online_color'];
