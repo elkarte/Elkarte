@@ -422,7 +422,7 @@ class ProfileOptions extends AbstractController
 	 */
 	public function loadThemeOptions()
 	{
-		global $context, $options, $cur_profile;
+		global $context, $cur_profile;
 
 		if (isset($this->_req->post->default_options))
 		{
@@ -431,7 +431,7 @@ class ProfileOptions extends AbstractController
 
 		if ($context['user']['is_owner'])
 		{
-			$context['member']['options'] = $options;
+			$context['member']['options'] = $this->_profile->options;
 
 			if (isset($this->_req->post->options) && is_array($this->_req->post->options))
 			{
