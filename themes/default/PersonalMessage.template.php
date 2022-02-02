@@ -1039,7 +1039,7 @@ function template_send()
 				</div>');
 	}
 
-	// Send, Preview, spellchecker buttons.
+	// Send, Preview buttons.
 	echo '
 				<div id="post_confirm_buttons" class="submitbutton">
 					', template_control_richedit_buttons($context['post_box_name']), '

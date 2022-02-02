@@ -1130,7 +1130,6 @@ class Theme extends BaseTheme
 			'quickhelp',
 			'printpage',
 			'quotefast',
-			'spellcheck',
 		);
 
 		call_integration_hook('integrate_simple_actions', array(&$simpleActions));

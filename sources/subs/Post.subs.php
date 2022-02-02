@@ -3,7 +3,7 @@
 /**
  * This file contains those functions pertaining to posting, and other such
  * operations, including sending emails, ims, blocking spam, preparsing posts,
- * spell checking, and the post box.
+ * and the post box.
  *
  * @package   ElkArte Forum
  * @copyright ElkArte Forum contributors
