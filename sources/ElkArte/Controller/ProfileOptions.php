@@ -755,7 +755,7 @@ class ProfileOptions extends AbstractController
 	 * Generate the users existing topic notification list.
 	 * Loads data into $context to be displayed wth template_topic_notification_list
 	 */
-	function action_editNotificationTopics()
+	public function action_editNotificationTopics()
 	{
 		global $txt, $scripturl, $context, $modSettings;
 

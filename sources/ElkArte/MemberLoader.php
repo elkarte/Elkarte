@@ -203,7 +203,7 @@ class MemberLoader
 
 		// Load the member's data.
 		$new_loaded_ids = array();
-		$request = $this->db->fetchQuery('
+		$this->db->fetchQuery('
 			SELECT' . $select_columns . '
 			FROM {db_prefix}members AS mem' . $select_tables . '
 			WHERE ' . $where_clause,
@@ -256,7 +256,7 @@ class MemberLoader
 				'loaded_ids' => count($new_loaded_ids) === 1 ? $new_loaded_ids[0] : $new_loaded_ids,
 			)
 		)->fetch_callback(
-			function ($row) use(&$data) {
+			function ($row) use (&$data) {
 				$key = 0;
 				if (!empty($row['field_options']))
 				{
