@@ -64,7 +64,7 @@ abstract class ManageEmojiModule extends AbstractController
 		{
 			if (self::unZipEmoji($req))
 			{
-				self::removeEmoji();
+				self::removeEmoji($req);
 			}
 		}
 	}
@@ -94,9 +94,15 @@ abstract class ManageEmojiModule extends AbstractController
 	/**
 	 * If changing emoji sets, this simply removes the currently extracted set
 	 */
-	private static function removeEmoji()
+	private static function removeEmoji($req)
 	{
 		global $modSettings;
+
+		// Saved but did not change ...
+		if ($modSettings['emoji_selection'] === $req->post->emoji_selection)
+		{
+			return true;
+		}
 
 		$source = BOARDDIR . '/smileys/' . $modSettings['emoji_selection'];
 		if (FileFunctions::instance()->isDir($source))
