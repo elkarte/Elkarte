@@ -6,35 +6,55 @@
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause (see accompanying LICENSE.txt file)
  *
  * This file contains code covered by:
- * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * copyright: 2011 Simple Machines (http://www.simplemachines.org)
  *
  * @version 2.0 dev
  *
  */
 
+/**
+ *
+ */
 class DbWrapper
 {
-	protected $db = null;
+	/** @var \ElkArte\Database\ */
+	protected $db;
+	/** @var bool */
 	protected $count_mode = false;
+	/** @var array */
 	protected $replaces = array();
 
+	/**
+	 * @param $db
+	 * @param $replaces
+	 */
 	public function __construct($db, $replaces)
 	{
 		$this->db = $db;
 		$this->replaces = $replaces;
 	}
 
+	/**
+	 * @param $name
+	 * @param $args
+	 * @return false|mixed
+	 */
 	public function __call($name, $args)
 	{
 		return call_user_func_array(array($this->db, $name), $args);
 	}
 
+	/**
+	 * @return int
+	 */
 	public function insert()
 	{
 		$args = func_get_args();
 
 		if ($this->count_mode)
+		{
 			return count($args[3]);
+		}
 
 		foreach ($args[3] as $key => $data)
 		{
@@ -49,26 +69,49 @@ class DbWrapper
 		return $this->db->affected_rows();
 	}
 
+	/**
+	 * @param $on
+	 * @return void
+	 */
 	public function countMode($on = true)
 	{
 		$this->count_mode = (bool) $on;
 	}
 }
 
+/**
+ * Wrapper for database table functions
+ */
 class DbTableWrapper
 {
-	protected $db = null;
+	/** @var \ElkArte\Database\ */
+	protected $db;
 
+	/**
+	 * Set the db for the class
+	 *
+	 * @param \ElkArte\Database\ $db
+	 */
 	public function __construct($db)
 	{
 		$this->db = $db;
 	}
 
+	/**
+	 * @param string $name
+	 * @param $args
+	 * @return false|mixed
+	 */
 	public function __call($name, $args)
 	{
 		return call_user_func_array(array($this->db, $name), $args);
 	}
 
+	/**
+	 * Create a table
+	 *
+	 * @return bool
+	 */
 	public function create_table()
 	{
 		$args = func_get_args();
@@ -82,6 +125,12 @@ class DbTableWrapper
 
 		return true;
 	}
+
+	/**
+	 * Add a table index
+	 *
+	 * @return bool
+	 */
 	public function add_index()
 	{
 		$args = func_get_args();
@@ -100,10 +149,10 @@ if (class_exists('\\ElkArte\\Database\\Mysqli\\Table'))
 		public static $_tbl_inst = null;
 
 		/**
-		* DbTable_MySQL::construct
-		*
-		* @param object $db - A Database_MySQL object
-		*/
+		 * DbTable_MySQL::construct
+		 *
+		 * @param object $db - A Database_MySQL object
+		 */
 		public function __construct($db, $db_prefix)
 		{
 			// We are doing install, of course we want to do any remove on these
@@ -118,21 +167,21 @@ if (class_exists('\\ElkArte\\Database\\Mysqli\\Table'))
 		}
 
 		/**
-		* During upgrade (and install at that point) we do unbuffered alter queries
-		* to let the script time out professionally.
-		*
-		* @todo this is still broken. The idea is that if the query is
-		*       started and the index is not yet ready, SHOW FULL PROCESSLIST
-		*       should list if the query is still running and we should be able to
-		*       wait until the query is completed.
-		*       While this is true for MySQL it may not be for other DBMS, so for
-		*       there are a couple of options (like implement it for MySQL and hope
-		*       others will not break), but for the timebeing I'll leave it here broken.
-		*       See protected_alter in ToRefactrCode.php
-		*
-		* @param string $table_name
-		* @param string $statement
-		*/
+		 * During upgrade (and install at that point) we do unbuffered alter queries
+		 * to let the script time out professionally.
+		 *
+		 * @param string $table_name
+		 * @param string $statement
+		 * @todo this is still broken. The idea is that if the query is
+		 *       started and the index is not yet ready, SHOW FULL PROCESSLIST
+		 *       should list if the query is still running and we should be able to
+		 *       wait until the query is completed.
+		 *       While this is true for MySQL it may not be for other DBMS, so for
+		 *       there are a couple of options (like implement it for MySQL and hope
+		 *       others will not break), but for the timebeing I'll leave it here broken.
+		 *       See protected_alter in ToRefactrCode.php
+		 *
+		 */
 		protected function _alter_table($table_name, $statement)
 		{
 			// First of all discover the type of statement we are dealing with.
@@ -152,6 +201,7 @@ if (class_exists('\\ElkArte\\Database\\Mysqli\\Table'))
 					// Check if the column still exists
 					break;
 			}
+
 			return $this->_db->query('', '
 				ALTER TABLE ' . $table_name . '
 				' . $statement,
@@ -162,10 +212,10 @@ if (class_exists('\\ElkArte\\Database\\Mysqli\\Table'))
 		}
 
 		/**
-		* Discovers what type of data we are altering.
-		*
-		* @param string $statement
-		*/
+		 * Discovers what type of data we are altering.
+		 *
+		 * @param string $statement
+		 */
 		protected function _find_alter_type($statement)
 		{
 			/** MySQL cases */
@@ -189,30 +239,30 @@ if (class_exists('\\ElkArte\\Database\\Mysqli\\Table'))
 				return 'drop_column';
 			}
 
-			elseif (substr($short, 0, 5) === 'ADD `')
+			if (substr($short, 0, 5) === 'ADD `')
 			{
 				return 'add_column';
 			}
-			elseif (in_array($short, array('ADD PRIM', 'ADD UNIQ', 'ADD INDE')))
+
+			if (in_array($short, array('ADD PRIM', 'ADD UNIQ', 'ADD INDE')))
 			{
 				return 'add_index';
 			}
-			elseif (in_array($short, array('DROP PRI', 'DROP IND')))
+
+			if (in_array($short, array('DROP PRI', 'DROP IND')))
 			{
 				return 'drop_index';
 			}
-			else
-			{
-				return false;
-			}
+
+			return false;
 		}
 
 		/**
-		* Static method that allows to retrieve or create an instance of this class.
-		*
-		* @param object $db - A Database_MySQL object
-		* @return object - A DbTable_MySQL_Install object
-		*/
+		 * Static method that allows to retrieve or create an instance of this class.
+		 *
+		 * @param object $db - A Database_MySQL object
+		 * @return object - A DbTable_MySQL_Install object
+		 */
 		public static function db_table($db, $db_prefix)
 		{
 			if (is_null(self::$_tbl_inst))
@@ -223,6 +273,7 @@ if (class_exists('\\ElkArte\\Database\\Mysqli\\Table'))
 			return self::$_tbl_inst;
 		}
 	}
+
 	class DbTable_MySQLi_Install extends DbTable_MySQL_Install
 	{
 	}
@@ -235,10 +286,10 @@ if (class_exists('\\ElkArte\\Database\\Postgresql\\Table'))
 		public static $_tbl_inst = null;
 
 		/**
-		* DbTable_PostgreSQL::construct
-		*
-		* @param object $db - A DbTable_PostgreSQL object
-		*/
+		 * DbTable_PostgreSQL::construct
+		 *
+		 * @param object $db - A DbTable_PostgreSQL object
+		 */
 		public function __construct($db, $db_prefix)
 		{
 			// We are doing install, of course we want to do any remove on these
@@ -253,21 +304,21 @@ if (class_exists('\\ElkArte\\Database\\Postgresql\\Table'))
 		}
 
 		/**
-		* During upgrade (and install at that point) we do unbuffered alter queries
-		* to let the script time out professionally.
-		*
-		* @todo this is still broken. The idea is that if the query is
-		*       started and the index is not yet ready, SHOW FULL PROCESSLIST
-		*       should list if the query is still running and we should be able to
-		*       wait until the query is completed.
-		*       While this is true for MySQL it may not be for other DBMS, so for
-		*       there are a couple of options (like implement it for MySQL and hope
-		*       others will not break), but for the timebeing I'll leave it here broken.
-		*       See protected_alter in ToRefactrCode.php
-		*
-		* @param string $table_name
-		* @param string $statement
-		*/
+		 * During upgrade (and install at that point) we do unbuffered alter queries
+		 * to let the script time out professionally.
+		 *
+		 * @param string $table_name
+		 * @param string $statement
+		 * @todo this is still broken. The idea is that if the query is
+		 *       started and the index is not yet ready, SHOW FULL PROCESSLIST
+		 *       should list if the query is still running and we should be able to
+		 *       wait until the query is completed.
+		 *       While this is true for MySQL it may not be for other DBMS, so for
+		 *       there are a couple of options (like implement it for MySQL and hope
+		 *       others will not break), but for the timebeing I'll leave it here broken.
+		 *       See protected_alter in ToRefactrCode.php
+		 *
+		 */
 		protected function _alter_table($table_name, $statement)
 		{
 			// First of all discover the type of statement we are dealing with.
@@ -287,6 +338,7 @@ if (class_exists('\\ElkArte\\Database\\Postgresql\\Table'))
 					// Check if the column still exists
 					break;
 			}
+
 			return $this->_db->query('', '
 				ALTER TABLE ' . $table_name . '
 				' . $statement,
@@ -297,10 +349,10 @@ if (class_exists('\\ElkArte\\Database\\Postgresql\\Table'))
 		}
 
 		/**
-		* Discovers what type of data we are altering.
-		*
-		* @param string $statement
-		*/
+		 * Discovers what type of data we are altering.
+		 *
+		 * @param string $statement
+		 */
 		protected function _find_alter_type($statement)
 		{
 			/** PostgreSQL cases */
@@ -330,27 +382,27 @@ if (class_exists('\\ElkArte\\Database\\Postgresql\\Table'))
 			{
 				return 'add_column';
 			}
-			elseif (in_array($short, array('ADD PRIM', 'CREATE U', 'CREATE I')) || substr($short, 0, 6) === 'CREATE ')
+
+			if (in_array($short, array('ADD PRIM', 'CREATE U', 'CREATE I')) || substr($short, 0, 6) === 'CREATE ')
 			{
 				return 'add_index';
 			}
-			elseif (in_array($short, array('DROP CON', 'DROP IND')))
+
+			if (in_array($short, array('DROP CON', 'DROP IND')))
 			{
 				return 'drop_index';
 			}
-			else
-			{
-				return false;
-			}
+
+			return false;
 		}
 
 		/**
-		* Static method that allows to retrieve or create an instance of this class.
-		*
-		* @param object $db - A DbTable_PostgreSQL object
+		 * Static method that allows to retrieve or create an instance of this class.
 		 *
-		* @return object - A DbTable_PostgreSQL_Install object
-		*/
+		 * @param object $db - A DbTable_PostgreSQL object
+		 *
+		 * @return object - A DbTable_PostgreSQL_Install object
+		 */
 		public static function db_table($db, $db_prefix)
 		{
 			if (is_null(self::$_tbl_inst))
@@ -379,8 +431,6 @@ function sql_error_handler($errno, $errstr, $errfile, $errline)
 	{
 		return true;
 	}
-	else
-	{
-		echo 'Error: ' . $errstr . ' File: ' . $errfile . ' Line: ' . $errline;
-	}
+
+	echo 'Error: ' . $errstr . ' File: ' . $errfile . ' Line: ' . $errline;
 }

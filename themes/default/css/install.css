@@ -24,6 +24,12 @@ a:link, a:hover, a:visited {
 	background-image: linear-gradient(to bottom, var(--primary_white), var(--primary_white_compliment));
 }
 
+#content_section {
+	display: flex;
+	flex-wrap: wrap;
+	justify-content: space-between;
+}
+
 h1.forumtitle {
 	font-family: verdana, tahoma, serif;
 	font-size: 2em;
@@ -43,7 +49,6 @@ h1.forumtitle {
 }
 
 #inner_wrap .news {
-	float: left;
 	width: 100%;
 	max-width: 100%;
 	height: 80px;
@@ -51,7 +56,7 @@ h1.forumtitle {
 }
 
 #main_steps {
-	float: right;
+	order: 2;
 	width: 50%;
 	padding: 0 0 1em 0;
 }
@@ -75,6 +80,11 @@ h1.forumtitle {
 	color: var(--disabled_text);
 }
 
+#main_steps .stepdone::after {
+	content: "\2713";
+	padding: 0 8px;
+}
+
 #main_steps ul li.stepcurrent {
 	font-weight: bold;
 	color: var(--menu_text);
@@ -84,19 +94,34 @@ h1.forumtitle {
 	color: var(--strong_text);
 }
 
-#progress_bar {
+/* Hold multiple progress bars when needed */
+#progress_bars {
+	order: 1;
+	width: 50%;
+}
+
+/* General progress bars, done with id for easy JS */
+#progress_bar, #progress_bar_1, #substep_bar_div_2 {
 	font-size: var(--font18);
 	position: relative;
-	width: 35%;
-	height: 44px;
+	display: flex;
+	align-items: center;
+	width: 80%;
+	height: 45px;
 	margin: 0.6em 0 0 4em;
 	border: 1px solid var(--primary_border);
-	border-radius: 4px;
+	border-radius: 6px;
 	background: var(--content-background);
 	box-shadow: 2px 2px 1px var(--box_shadow);
 }
 
-#overall_text, #step_text {
+/* The display in the ID forces us to do this as hide by itself will not work */
+#progress_bar.hide, #progress_bar_1.hide, #substep_bar_div_2.hide, #commess.hide {
+	display: none;
+}
+
+/* The % indicator to the left of the progress bar */
+#overall_text, #step_text, #substep_text {
 	font-weight: bold;
 	position: absolute;
 	z-index: 2;
@@ -105,15 +130,26 @@ h1.forumtitle {
 	color: var(--body_text);
 }
 
-#overall_progress {
-	height: 41px;
+/* The color bars themselves, fit to height of the indicator */
+#overall_progress, #step_progress, #substep_progress {
+	height: 100%;
+	border-radius: 4px;
+	background: var(--gradient_bar_top);
+}
+
+#step_progress {
+	background: var(--progress_bar_blue);
+}
+
+#substep_progress {
 	background: var(--gradient_bar_bottom);
 }
 
+/* The text inside the bars, centered */
 .overall_progress, .progress {
 	position: absolute;
 	top: 8px;
-	left: 8px;
+	left: calc(50% - 4em);
 }
 
 #main_screen {
@@ -123,26 +159,17 @@ h1.forumtitle {
 #main_screen h2 {
 	font-size: 1.2em;
 	line-height: 1.6em;
-	margin: 0 0 0.5em 0;
 	color: var(--menu_button_active_2);
-	border-bottom: 1px solid var(--menu_button_active_2);
 }
 
 #footer_section {
 	min-height: 90px;
+	padding: 0 4em;
 }
 
-.panel form div {
+.content form div {
 	overflow: auto;
 	max-height: 560px;
-}
-
-.panel p, .panel h3 {
-	margin: 0 0.5em 1em 0.5em;
-}
-
-.panel ul {
-	margin: 0 0.5em 1em 0.5em;
 }
 
 .error_message {
@@ -150,7 +177,8 @@ h1.forumtitle {
 	color: var(--attention);
 }
 
-.panel .button_submit, .panel .linkbutton {
+/* A somewhat more pronounced submit button */
+.content .button_submit, .content .linkbutton {
 	font-size: var(--font14);
 	font-weight: bold;
 	padding: .25em .5em;
@@ -158,18 +186,15 @@ h1.forumtitle {
 	color: var(--hover_text);
 }
 
-.panel .button_submit:hover, .panel .linkbutton:hover {
+.content .button_submit:hover, .content .linkbutton:hover {
 	text-decoration: none;
 	color: var(--menu_button_active_hover);
 }
 
-.panel .clear {
-	overflow: auto;
-	padding: 1em 0 0 0;
-}
-
-.panel .errorbox {
-	font-size: var(--font16);
+/* Lets get their attention */
+.content .errorbox, .content .warningbox {
+	font-size: var(--font15);
+	margin-top: 1em;
 }
 
 #time_elapsed {
@@ -211,4 +236,14 @@ h1.forumtitle {
 .notes {
 	font-size: smaller;
 	margin-bottom: 2em;
+}
+
+#commess {
+	display: inline;
+	font-weight: bold;
+}
+
+#debug_section {
+	height: 200px;
+	overflow: auto;
 }
