@@ -6,7 +6,7 @@
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause (see accompanying LICENSE.txt file)
  *
  * This file contains code covered by:
- * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * copyright: 2011 Simple Machines (http://www.simplemachines.org)
  *
  * @version 2.0 dev
  */
@@ -17,13 +17,15 @@
  */
 
 ob_start('ob_gzhandler');
-
 if (ini_get('session.save_handler') == 'user')
-    @ini_set('session.save_handler', 'files');
+{
+	@ini_set('session.save_handler', 'files');
+}
 session_start();
 
 if (!headers_sent())
-    echo '<!DOCTYPE html>
+{
+	echo '<!DOCTYPE html>
 <html>
 	<head>
 		<title>', htmlspecialchars($_GET['pass_string'], ENT_COMPAT, 'UTF-8'), '</title>
@@ -32,4 +34,6 @@ if (!headers_sent())
 		<strong>', htmlspecialchars($_GET['pass_string'], ENT_COMPAT, 'UTF-8'), '</strong>
 	</body>
 </html>';
+}
+
 exit;

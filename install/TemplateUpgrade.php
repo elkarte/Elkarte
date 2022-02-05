@@ -6,7 +6,7 @@
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause (see accompanying LICENSE.txt file)
  *
  * This file contains code covered by:
- * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * copyright: 2011 Simple Machines (http://www.simplemachines.org)
  *
  * @version 2.0 dev
  *
@@ -21,13 +21,17 @@ function template_chmod()
 
 	// Don't call me twice!
 	if (!empty($upcontext['chmod_called']))
+	{
 		return;
+	}
 
 	$upcontext['chmod_called'] = true;
 
 	// Nothing?
 	if (empty($upcontext['chmod']['files']) && empty($upcontext['chmod']['ftp_error']))
+	{
 		return;
+	}
 
 	// @todo Temporary!
 	$txt['error_ftp_no_connect'] = 'Unable to connect to FTP server with this combination of details.';
@@ -48,28 +52,28 @@ function template_chmod()
 	$txt['ftp_connect'] = 'Connect';
 
 	// Was it a problem with Windows?
-	if (!empty($upcontext['chmod']['ftp_error']) && $upcontext['chmod']['ftp_error'] == 'total_mess')
+	if (!empty($upcontext['chmod']['ftp_error']) && $upcontext['chmod']['ftp_error'] === 'total_mess')
 	{
 		echo '
 			<div class="error_message">
 				<div style="color: red;">The following files need to be writable to continue the upgrade. Please ensure the Windows permissions are correctly set to allow this:</div>
-				<ul style="margin: 2.5ex; font-family: monospace;">
-				<li>' . implode('</li>
-				<li>', $upcontext['chmod']['files']). '</li>
-			</ul>
+				<ul class="bbc_list">
+					<li>' . implode('</li>
+					<li>', $upcontext['chmod']['files']) . '</li>
+				</ul>
 			</div>';
 
 		return false;
 	}
 
 	echo '
-		<div class="panel">
+		<div class="content">
 			<h2>Your FTP connection information</h2>
 			<h3>The upgrader can fix any issues with file permissions to make upgrading as simple as possible. Simply enter your connection information below or alternatively click <a href="#" onclick="warning_popup();">here</a> for a list of files which need to be changed.</h3>
 			<script>
 				function warning_popup()
 				{
-					var popup = window.open(\'\',\'popup\',\'height=150,width=400,scrollbars=yes\'),
+					let popup = window.open(\'\',\'popup\',\'height=150,width=400,scrollbars=yes\'),
 						content = popup.document;
 
 					content.write(\'<!DOCTYPE html>\n\');
@@ -80,63 +84,81 @@ function template_chmod()
 					content.write(\'<a href="javascript:self.close();">close</a>\n\t\t</div>\n\t</body>\n</html>\');
 					content.close();
 				}
-		</script>';
+			</script>';
 
 	if (!empty($upcontext['chmod']['ftp_error']))
+	{
 		echo '
 			<div class="error_message">
-				<div style="color: red;">
-					The following error was encountered when trying to connect:<br />
-					<br />
+				<div class="error">
+					The following error was encountered when trying to connect:<br /><br />
 					<code>', $upcontext['chmod']['ftp_error'], '</code>
 				</div>
 			</div>
 			<br />';
+	}
 
 	if (empty($upcontext['chmod_in_form']))
+	{
 		echo '
-	<form action="', $upcontext['form_url'], '" method="post">';
+			<form action="', $upcontext['form_url'], '" method="post">';
+	}
 
 	echo '
-		<table style="width: 520px; margin: 1em 0; border-collapse:collapse; border-spacing: 0; padding: 0; text-align:center;">
-			<tr>
-				<td style="width: 26%; vertical-align: top;" class="textbox"><label for="ftp_server">', $txt['ftp_server'], ':</label></td>
-				<td>
-					<div style="float: right; margin-right: 1px;"><label for="ftp_port" class="textbox"><strong>', $txt['ftp_port'], ':&nbsp;</strong></label> <input type="text" size="3" name="ftp_port" id="ftp_port" value="', isset($upcontext['chmod']['port']) ? $upcontext['chmod']['port'] : '21', '" class="input_text" /></div>
-					<input type="text" size="30" name="ftp_server" id="ftp_server" value="', isset($upcontext['chmod']['server']) ? $upcontext['chmod']['server'] : 'localhost', '" style="width: 70%;" class="input_text" />
-					<div style="font-size: smaller; margin-bottom: 2ex;">', $txt['ftp_server_info'], '</div>
-				</td>
-			</tr><tr>
-				<td style="width: 26%; vertical-align: top;" class="textbox"><label for="ftp_username">', $txt['ftp_username'], ':</label></td>
-				<td>
-					<input type="text" size="50" name="ftp_username" id="ftp_username" value="', isset($upcontext['chmod']['username']) ? $upcontext['chmod']['username'] : '', '" style="width: 99%;" class="input_text" />
-					<div style="font-size: smaller; margin-bottom: 2ex;">', $txt['ftp_username_info'], '</div>
-				</td>
-			</tr><tr>
-				<td style="width: 26%; vertical-align: top;" class="textbox"><label for="ftp_password">', $txt['ftp_password'], ':</label></td>
-				<td>
-					<input type="password" size="50" name="ftp_password" id="ftp_password" style="width: 99%;" class="input_password" />
-					<div style="font-size: smaller; margin-bottom: 3ex;">', $txt['ftp_password_info'], '</div>
-				</td>
-			</tr><tr>
-				<td style="width: 26%; vertical-align: top;" class="textbox"><label for="ftp_path">', $txt['ftp_path'], ':</label></td>
-				<td style="padding-bottom: 1ex;">
-					<input type="text" size="50" name="ftp_path" id="ftp_path" value="', isset($upcontext['chmod']['path']) ? $upcontext['chmod']['path'] : '', '" style="width: 99%;" class="input_text" />
-					<div style="font-size: smaller; margin-bottom: 2ex;">', !empty($upcontext['chmod']['path']) ? $txt['ftp_path_found_info'] : $txt['ftp_path_info'], '</div>
-				</td>
-			</tr>
-		</table>
-
-		<div class="righttext" style="margin: 1ex;"><input type="submit" value="', $txt['ftp_connect'], '" class="button_submit" /></div>
-	</div>';
+			<table style="width: 520px; margin: 1em 0; border-collapse:collapse; border-spacing: 0; padding: 0; text-align:center;">
+				<tr>
+					<td style="width: 26%; vertical-align: top;" class="textbox">
+						<label for="ftp_server">', $txt['ftp_server'], ':</label>
+					</td>
+					<td>
+						<div style="float: right; margin-right: 1px;">
+							<label for="ftp_port" class="textbox"><strong>', $txt['ftp_port'], ':&nbsp;</strong></label>
+ 							<input type="text" size="3" name="ftp_port" id="ftp_port" value="', $upcontext['chmod']['port'] ?? '21', '" class="input_text" />
+						</div>
+						<input type="text" size="30" name="ftp_server" id="ftp_server" value="', $upcontext['chmod']['server'] ?? 'localhost', '" style="width: 70%;" class="input_text" />
+						<div style="font-size: smaller; margin-bottom: 2ex;">', $txt['ftp_server_info'], '</div>
+					</td>
+				</tr><tr>
+					<td style="width: 26%; vertical-align: top;" class="textbox">
+						<label for="ftp_username">', $txt['ftp_username'], ':</label>
+					</td>
+					<td>
+						<input type="text" size="50" name="ftp_username" id="ftp_username" value="', $upcontext['chmod']['username'] ?? '', '" style="width: 99%;" class="input_text" />
+						<div style="font-size: smaller; margin-bottom: 2ex;">', $txt['ftp_username_info'], '</div>
+					</td>
+				</tr><tr>
+					<td style="width: 26%; vertical-align: top;" class="textbox">
+						<label for="ftp_password">', $txt['ftp_password'], ':</label>
+					</td>
+					<td>
+						<input type="password" size="50" name="ftp_password" id="ftp_password" style="width: 99%;" class="input_password" />
+						<div style="font-size: smaller; margin-bottom: 3ex;">', $txt['ftp_password_info'], '</div>
+					</td>
+				</tr><tr>
+					<td style="width: 26%; vertical-align: top;" class="textbox">
+						<label for="ftp_path">', $txt['ftp_path'], ':</label>
+					</td>
+					<td style="padding-bottom: 1ex;">
+						<input type="text" size="50" name="ftp_path" id="ftp_path" value="', $upcontext['chmod']['path'] ?? '', '" style="width: 99%;" class="input_text" />
+						<div style="font-size: smaller; margin-bottom: 2ex;">', !empty($upcontext['chmod']['path']) ? $txt['ftp_path_found_info'] : $txt['ftp_path_info'], '</div>
+					</td>
+				</tr>
+			</table>
+	
+			<div class="righttext" style="margin: 1ex;">
+				<input type="submit" value="', $txt['ftp_connect'], '" class="button_submit" />
+			</div>
+		</div>';
 
 	if (empty($upcontext['chmod_in_form']))
+	{
 		echo '
-	</form>';
+		</form>';
+	}
 }
 
 /**
- *
+ * The template header
  */
 function template_upgrade_above()
 {
@@ -151,13 +173,13 @@ function template_upgrade_above()
 		<link rel="stylesheet" href="', $settings['default_theme_url'], '/css/index.css?20RC1" />
 		<link rel="stylesheet" href="', $settings['default_theme_url'], '/css/_light/index_light.css?20RC1" />
 		<link rel="stylesheet" href="', $settings['default_theme_url'], '/css/install.css?20RC1" />
-		<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js" id="jquery"></script>
+		<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js" id="jquery"></script>
 		<script>
-			window.jQuery || document.write(\'<script src="', $settings['default_theme_url'], '/scripts/jquery-3.5.1.min.js"><\/script>\');
+			window.jQuery || document.write(\'<script src="', $settings['default_theme_url'], '/scripts/jquery-3.6.0.min.js"><\/script>\');
 		</script>
 		<script src="', $settings['default_theme_url'], '/scripts/script.js"></script>
 		<script>
-			var elk_scripturl = \'', $upgradeurl, '\',
+			let elk_scripturl = \'', $upgradeurl, '\',
 				elk_charset = \'UTF-8\',
 				startPercent = ', $upcontext['overall_percent'], ';
 
@@ -165,91 +187,100 @@ function template_upgrade_above()
 			function updateStepProgress(current, max, overall_weight)
 			{
 				// What out the actual percent.
-				var width = parseInt((current / max) * 100);
+				let width = parseInt((current / max) * 100);
 
-				if (document.getElementById(\'step__progress\'))
+				if (document.getElementById(\'step_progress\'))
 				{
-					document.getElementById(\'step__progress\').style.width = width + "%";
-					document.getElementById(\'step__text\').innerHTML = width + "%";
+					document.getElementById(\'step_progress\').style.width = width + "%";
+					document.getElementById(\'step_text\').innerHTML = width + "%";
 				}
 
-				if (overall_weight && document.getElementById(\'overall__progress\'))
+				if (overall_weight && document.getElementById(\'overall_progress\'))
 				{
 					overall_width = parseInt(startPercent + width * (overall_weight / 100));
-					document.getElementById(\'overall__progress\').style.width = overall_width + "%";
-					document.getElementById(\'overall__text\').innerHTML = overall_width + "%";
+					document.getElementById(\'overall_progress\').style.width = overall_width + "%";
+					document.getElementById(\'overall_text\').innerHTML = overall_width + "%";
 				}
 			}
 		</script>
 	</head>
 	<body>
-	<div id="header">
-		<div class="frame">
-			<h1 class="forumtitle">', $txt['upgrade_upgrade_utility'], '</h1>
-			<img id="logo" src="', $settings['default_theme_url'], '/images/logo.png" alt="ElkArte Community" title="ElkArte Community" />
+		<div id="header">
+			<div class="frame">
+				<h1 class="forumtitle">', $txt['upgrade_upgrade_utility'], '</h1>
+				<img id="logo" src="', $settings['default_theme_url'], '/images/logo.png" alt="ElkArte Community" title="ElkArte Community" />
+			</div>
 		</div>
-	</div>
-	<div id="wrapper" class="wrapper">
-		<div id="upper_section">
-			<div id="inner_section">
-				<div id="inner_wrap">';
+		<div id="wrapper" class="wrapper">
+			<div id="inner_wrap">';
 
-	if (!empty($incontext['detected_languages']) && count($incontext['detected_languages']) > 1 && $incontext['current_step'] == 0)
+	// Show the language selection area
+	if (!empty($upcontext['detected_languages']) && count($upcontext['detected_languages']) > 1 && $upcontext['current_step'] == 0)
 	{
 		echo '
-						<div class="news">
-							<form action="', $upgradeurl, '" method="get">
-								<label for="installer_language">', $txt['installer_language'], ':</label>
-								<select id="installer_language" name="lang_file" onchange="location.href = \'', $upgradeurl, '?lang_file=\' + this.options[this.selectedIndex].value;">';
+				<div class="news">
+					<form action="', $upgradeurl, '" method="get">
+						<label for="installer_language">', $txt['installer_language'], ':</label>
+						<select id="installer_language" name="lang_file" onchange="location.href = \'', $upgradeurl, '?lang_file=\' + this.options[this.selectedIndex].value;">';
 
-		foreach ($incontext['detected_languages'] as $lang => $name)
+		foreach ($upcontext['detected_languages'] as $lang => $name)
+		{
 			echo '
-									<option', isset($_SESSION['installer_temp_lang']) && $_SESSION['installer_temp_lang'] == $lang ? ' selected="selected"' : '', ' value="', $lang, '">', $name, '</option>';
+							<option', isset($_SESSION['installer_temp_lang']) && $_SESSION['installer_temp_lang'] == $lang ? ' selected="selected"' : '', ' value="', $lang, '">', $name, '</option>';
+		}
 
 		echo '
-								</select>
-								<noscript><input type="submit" value="', $txt['installer_language_set'], '" class="button_submit" /></noscript>
-							</form>
-						</div>';
+						</select>
+						<noscript><input type="submit" value="', $txt['installer_language_set'], '" class="button_submit" /></noscript>
+					</form>
+				</div>';
 	}
 
 	echo '
-					</div>
-				</div>
 			</div>
 			<div id="content_section">
-				<div id="main_content_section">
-					<div id="main_steps">
-						<h2>', $txt['upgrade_progress'], '</h2>
-						<ul>';
+				<div id="main_steps">
+					<h2>', $txt['upgrade_progress'], '</h2>
+					<ul>';
 
 	foreach ($upcontext['steps'] as $num => $step)
+	{
+		if ($num === $upcontext['current_step'])
+			$upcontext['current_step_name'] = $step[1];
+
 		echo '
-							<li class="', $num < $upcontext['current_step'] ? 'stepdone' : ($num == $upcontext['current_step'] ? 'stepcurrent' : 'stepwaiting'), '">', $txt['upgrade_step'], ' ', $step[0], ': ', $step[1], '</li>';
+						<li class="', $num < $upcontext['current_step'] ? 'stepdone' : ($num == $upcontext['current_step'] ? 'stepcurrent' : 'stepwaiting'), '">', $txt['upgrade_step'], ' ', $step[0], ': ', $step[1], '</li>';
+	}
 
+	// Overall Progress
 	echo '
-						</ul>
-					</div>
-					<div style="float: left; width: 40%;">
-						<div class="progress_bar">
-							<div id="overall__text" class="full_bar">', $upcontext['overall_percent'], '%</div>
-							<div id="overall__progress" class="green_percent" style="width: ', $upcontext['overall_percent'], '%;">&nbsp;</div>
-						</div>
-				';
+					</ul>
+				</div>
+				<div id="progress_bars">
+					<div id="progress_bar">
+						<div id="overall_progress" style="width: ', $upcontext['overall_percent'], '%;">&nbsp;</div>
+						<div id="overall_text" class="overall_progress">', $upcontext['overall_percent'], '%</div>
+						<div class="overall_progress">', $txt['upgrade_overall_progress'], '</div>
+					</div>';
 
-	if (isset($upcontext['step_progress']))
+	// Current step progress, like database changes
+	if (!empty($upcontext['step_progress']))
+	{
 		echo '
-						<div class="progress_bar">
-							<div id="step__text" class="full_bar">', $upcontext['step_progress'], '%</div>
-							<div id="step__progress" class="blue_percent" style="width: ', $upcontext['step_progress'], '%;">&nbsp;</div>
-						</div>';
+					<div id="progress_bar_1">
+						<div id="step_progress" style="width: ', $upcontext['step_progress'], '%;">&nbsp;</div>
+						<div id="step_text" class="overall_progress">', $upcontext['step_progress'], '%</div>
+						<div class="overall_progress">', $upcontext['current_step_name'], '</div>
+					</div>';
+	}
 
+	// Current progress in the step, like 45% done with the database changes
 	echo '
-						<div id="substep_bar_div" class="smalltext" style="display: ', isset($upcontext['substep_progress']) ? '' : 'none', ';">', isset($upcontext['substep_progress_name']) ? trim(strtr($upcontext['substep_progress_name'], array('.' => ''))) : '', ':</div>
-						<div id="substep_bar_div2" class="progress_bar" style="display: ', isset($upcontext['substep_progress']) ? '' : 'none', ';">
-							<div id="substep_text" class="full_bar">', isset($upcontext['substep_progress']) ? $upcontext['substep_progress'] : '', '%</div>
-							<div id="substep_progress" class="blue_percent" style="width: ', isset($upcontext['substep_progress']) ? $upcontext['substep_progress'] : 0, '%; background-color: #eebaf4;">&nbsp;</div>
-						</div>';
+					<div id="substep_bar_div_2" class="', !empty($upcontext['substep_progress']) ? '' : ' hide', '">
+						<div id="substep_progress" style="width: ', $upcontext['substep_progress'] ?? 0, '%;">&nbsp;</div>
+						<div id="substep_text" class="overall_progress">', $upcontext['substep_progress'] ?? '', '%</div>
+						<div id="substep_bar_div" class="overall_progress">', isset($upcontext['substep_progress_name']) ? trim(strtr($upcontext['substep_progress_name'], array('.' => ''))) : '', '</div>
+					</div>';
 
 	// How long have we been running this?
 	$elapsed = time() - $upcontext['started'];
@@ -257,15 +288,18 @@ function template_upgrade_above()
 	$seconds = $elapsed - $mins * 60;
 
 	if (!empty($elapsed))
+	{
 		echo '
-						<div class="smalltext" style="padding: 5px; text-align: center;">', $txt['upgrade_time_elapsed'], ':
-							<span id="mins_elapsed">', $mins, '</span> ', $txt['upgrade_time_mins'], ', <span id="secs_elapsed">', $seconds, '</span> ', $txt['upgrade_time_secs'], '.
-						</div>';
+					<div class="smalltext" style="padding: 5px; text-align: center;">', $txt['upgrade_time_elapsed'], ':
+						<span id="mins_elapsed">', $mins, '</span> ', $txt['upgrade_time_mins'], ', <span id="secs_elapsed">', $seconds, '</span> ', $txt['upgrade_time_secs'], '.
+					</div>';
+	}
 	echo '
-					</div>
-					<div id="main_screen" class="clear">
-						<h2>', $upcontext['page_title'], '</h2>
-						<div class="panel">';
+				</div>
+			</div>
+			<div id="main_screen" class="clear">
+				<h2>', $upcontext['page_title'], '</h2>
+				<div class="content">';
 }
 
 /**
@@ -276,36 +310,40 @@ function template_upgrade_below()
 	global $upcontext, $txt;
 
 	if (!empty($upcontext['pause']))
+	{
 		echo '
-								<em>', $txt['upgrade_incomplete'], '.</em><br />
-
-								<h2 style="margin-top: 2ex;">', $txt['upgrade_not_quite_done'], '</h2>
-								<h3>
-									', $txt['upgrade_paused_overload'], '
-								</h3>';
+					<h2 style="margin-top: 2ex;">', $txt['upgrade_not_quite_done'], '</h2>
+					<h3>
+						', $txt['upgrade_paused_overload'], '
+					</h3>';
+	}
 
 	if (!empty($upcontext['custom_warning']))
+	{
 		echo '
-								<div class="warningbox">
-									<strong style="text-decoration: underline;">', $txt['upgrade_note'], '</strong><br />
-									<div>', $upcontext['custom_warning'], '</div>
-								</div>';
+					<div class="warningbox">
+						<strong style="text-decoration: underline;">', $txt['upgrade_note'], '</strong><br />
+						<div>', $upcontext['custom_warning'], '</div>
+					</div>';
+	}
 
 	echo '
-								<div class="righttext" style="margin: 1ex;">';
+					<div class="submitbutton">';
 
 	if (!empty($upcontext['continue']))
+	{
 		echo '
-									<input type="submit" id="contbutt" name="contbutt" value="', $txt['upgrade_continue'], '"', $upcontext['continue'] == 2 ? ' disabled="disabled"' : '', ' class="button_submit" />';
+						<input type="submit" id="contbutt" name="contbutt" value="', $txt['upgrade_continue'], '"', $upcontext['continue'] == 2 ? ' disabled="disabled"' : '', ' class="button_submit" />';
+	}
 	if (!empty($upcontext['skip']))
+	{
 		echo '
-									<input type="submit" id="skip" name="skip" value="', $txt['upgrade_skip'], '" onclick="dontSubmit = true; document.getElementById(\'contbutt\').disabled = \'disabled\'; return true;" class="button_submit" />';
+						<input type="submit" id="skip" name="skip" value="', $txt['upgrade_skip'], '" onclick="dontSubmit = true; document.getElementById(\'contbutt\').disabled = \'disabled\'; return true;" class="button_submit" />';
+	}
 
 	echo '
-								</div>
-							</form>
-						</div>
 					</div>
+				</form>
 				</div>
 			</div>
 		</div>
@@ -314,7 +352,6 @@ function template_upgrade_below()
 				<a href="', SITE_SOFTWARE, '" title="ElkArte Community" target="_blank" class="new_win">ElkArte &copy; 2012 - 2021, ElkArte</a>
 			</div>
 		</div>
-	</div>
 	</body>
 </html>';
 
@@ -323,16 +360,16 @@ function template_upgrade_below()
 	{
 		echo '
 		<script>
-			var countdown = 3,
+			let countdown = 3,
 				dontSubmit = false;
 
 			window.onload = doAutoSubmit;
 
 			function doAutoSubmit()
 			{
-				if (countdown == 0 && !dontSubmit)
+				if (countdown === 0 && !dontSubmit)
 					document.upform.submit();
-				else if (countdown == -1)
+				else if (countdown === -1)
 					return;
 
 				document.getElementById(\'contbutt\').value = "', $txt['upgrade_continue'], ' (" + countdown + ")";
@@ -355,9 +392,13 @@ function template_xml_above()
 	<elk>';
 
 	if (!empty($upcontext['get_data']))
+	{
 		foreach ($upcontext['get_data'] as $k => $v)
+		{
 			echo '
 		<get key="', $k, '">', $v, '</get>';
+		}
+	}
 }
 
 /**
@@ -405,7 +446,7 @@ function template_welcome_message()
 		<script src="', $settings['default_theme_url'], '/scripts/sha256.js"></script>
 		<script src="', $settings['default_theme_url'], '/scripts/admin.js"></script>
 		<script>
-			var oUpgradeCenter = new Elk_AdminIndex({
+			let oUpgradeCenter = new Elk_AdminIndex({
 				bLoadAnnouncements: false,
 
 				bLoadVersions: true,
@@ -423,60 +464,76 @@ function template_welcome_message()
 		</script>
 		<h3>', sprintf($txt['upgrade_ready_proceed'], CURRENT_VERSION), '</h3>
 		<form id="upform" action="', $upcontext['form_url'], '" method="post" accept-charset="UTF-8" name="upform"', empty($upcontext['disable_login_hashing']) ? ' onsubmit="hashLoginPassword(this, \'' . $upcontext['rid'] . '\');"' : '', '>
-		<input type="hidden" name="', $upcontext['login_token_var'], '" value="', $upcontext['login_token'], '" />
-		<div id="version_warning" class="errorbox" style="display: none;">',CURRENT_VERSION, '</div>
-		<div id="latestVersion" style="display: none;">???</div>';
+			<input type="hidden" name="', $upcontext['login_token_var'], '" value="', $upcontext['login_token'], '" />
+			<div id="version_warning" class="errorbox hide">', CURRENT_VERSION, '</div>
+			<div id="latestVersion" class="hide">???</div>';
 
 	$upcontext['chmod_in_form'] = true;
 	template_chmod();
 
-	// For large, SMF pre-1.1 RC2 forums give them a warning about the possible impact of this upgrade!
+	// For large, forums give them a warning about the possible impact of this upgrade!
 	if ($upcontext['is_large_forum'])
+	{
 		echo '
-		<div class="warningbox">
-			<strong style="text-decoration: underline;">', $txt['upgrade_warning'], '</strong><br />
-			<div>
-				', $txt['upgrade_warning_lots_data'], '
-			</div>
-		</div>';
+			<div class="warningbox">
+				<strong style="text-decoration: underline;">', $txt['upgrade_warning'], '</strong><br />
+				<div>
+					', $txt['upgrade_warning_lots_data'], '
+				</div>
+			</div>';
+	}
 
 	// A warning message?
 	if (!empty($upcontext['warning']))
+	{
 		echo '
-		<div class="warningbox">
-			<strong style="text-decoration: underline;">', $txt['upgrade_warning'], '</strong><br />
-			<div>
-				', $upcontext['warning'], '
-			</div>
-		</div>';
+			<div class="warningbox">
+				<strong style="text-decoration: underline;">', $txt['upgrade_warning'], '</strong><br />
+				<div>
+					', $upcontext['warning'], '
+				</div>
+			</div>';
+	}
 
 	// Paths are incorrect?
 	echo '
-		<div class="errorbox" style="', (file_exists($settings['default_theme_dir'] . '/scripts/script.js') ? 'display: none' : ''), '" id="js_script_missing_error">
-			<strong style="text-decoration: underline;">', $txt['upgrade_critical_error'], '</strong><br />
-			<div>
-				', $txt['upgrade_error_script_js'], '
-			</div>
-		</div>';
+			<div class="errorbox', (file_exists($settings['default_theme_dir'] . '/scripts/script.js') ? ' hide' : ''), '" id="js_script_missing_error">
+				<strong style="text-decoration: underline;">', $txt['upgrade_critical_error'], '</strong><br />
+				<div>
+					', $txt['upgrade_error_script_js'], '
+				</div>
+			</div>';
 
 	// Is there someone already doing this?
 	if (!empty($upcontext['user']['id']) && (time() - $upcontext['started'] < 72600 || time() - $upcontext['updated'] < 3600))
 	{
 		$ago = time() - $upcontext['started'];
 		if ($ago < 60)
+		{
 			$ago = $ago . ' seconds';
+		}
 		elseif ($ago < 3600)
+		{
 			$ago = (int) ($ago / 60) . ' minutes';
+		}
 		else
+		{
 			$ago = (int) ($ago / 3600) . ' hours';
+		}
 
 		$active = time() - $upcontext['updated'];
 		if ($active < 60)
+		{
 			$updated = $active . ' seconds';
+		}
 		elseif ($active < 3600)
+		{
 			$updated = (int) ($active / 60) . ' minutes';
+		}
 		else
+		{
 			$updated = (int) ($active / 3600) . ' hours';
+		}
 
 		echo '
 		<div class="warningbox">
@@ -486,15 +543,21 @@ function template_welcome_message()
 				&quot;', $upcontext['user']['name'], '&quot; has been running the upgrade script for the last ', $ago, ' - and was last active ', $updated, ' ago.';
 
 		if ($active < 600)
+		{
 			echo '
 				We recommend that you do not run this script unless you are sure that ', $upcontext['user']['name'], ' has completed their upgrade.';
+		}
 
 		if ($active > $upcontext['inactive_timeout'])
+		{
 			echo '
 				<br /><br />You can choose to either run the upgrade again from the beginning - or alternatively continue from the last step reached during the last upgrade.';
+		}
 		else
+		{
 			echo '
 				<br /><br />This upgrade script cannot be run until ', $upcontext['user']['name'], ' has been inactive for at least ', ($upcontext['inactive_timeout'] > 120 ? round($upcontext['inactive_timeout'] / 60, 1) . ' minutes!' : $upcontext['inactive_timeout'] . ' seconds!');
+		}
 
 		echo '
 			</div>
@@ -502,6 +565,7 @@ function template_welcome_message()
 	}
 
 	echo '
+			<hr />
 			<strong>Admin Login: ', $disable_security ? '(DISABLED)' : '', '</strong>
 			<h3>For security purposes please login with your admin account to proceed with the upgrade.</h3>
 			<table>
@@ -511,8 +575,10 @@ function template_welcome_message()
 						<input type="text" name="user" value="', !empty($upcontext['username']) ? $upcontext['username'] : '', '" ', $disable_security ? 'disabled="disabled"' : '', ' class="input_text" />';
 
 	if (!empty($upcontext['username_incorrect']))
+	{
 		echo '
 						<div class="error">Username Incorrect</div>';
+	}
 
 	echo '
 					</td>
@@ -524,11 +590,15 @@ function template_welcome_message()
 						<input type="hidden" name="hash_passwrd" value="" />';
 
 	if (!empty($upcontext['login_hash_error']))
+	{
 		echo '
 						<div class="error">Password security has recently been upgraded. Please enter your password again.</div>';
+	}
 	elseif (!empty($upcontext['password_failed']))
+	{
 		echo '
 						<div class="error">Password Incorrect</div>';
+	}
 
 	echo '
 					</td>
@@ -562,18 +632,18 @@ function template_welcome_message()
 		<script>
 			if (document.getElementById(\'js_works\'))
 				document.getElementById(\'js_works\').value = 1;
-			var currentVersionRounds = 0;
+			let currentVersionRounds = 0;
 
 			// Latest version?
 			function ourCurrentVersion()
 			{
-				var latestVer,
+				let latestVer,
 					setLatestVer;
 
 				latestVer = document.getElementById(\'latestVersion\');
 				setLatestVer = document.getElementById(\'elkVersion\');
 
-				if (latestVer.innerHTML == \'???\')
+				if (latestVer.innerHTML === \'???\')
 				{
 					// After few many tries let the use run the script
 					if (currentVersionRounds > 9)
@@ -587,15 +657,15 @@ function template_welcome_message()
 				if (setLatestVer !== null)
 				{
 					setLatestVer.innerHTML = latestVer.innerHTML.replace(\'ElkArte \', \'\');
-					document.getElementById(\'version_warning\').style.display = \'\';
+					document.getElementById(\'version_warning\').classList.remove(\'hide\');
 				}
 				document.getElementById(\'contbutt\').disabled = 0;
 			}
 			window.addEventListener("load", ourCurrentVersion);
 
 			// This checks that the script file even exists!
-			if (typeof(elkSelectText) == \'undefined\')
-				document.getElementById(\'js_script_missing_error\').style.display = \'\';
+			if (typeof(elkSelectText) === \'undefined\')
+				document.getElementById(\'js_script_missing_error\').classList.remove(\'hide\');
 
 		</script>';
 }
@@ -613,18 +683,20 @@ function template_upgrade_options()
 
 	// Warning message?
 	if (!empty($upcontext['upgrade_options_warning']))
+	{
 		echo '
-		<div style="margin: 1ex; padding: 1ex; border: 1px dashed #cc3344; color: black; background: #ffe4e9;">
-			<div style="float: left; width: 2ex; font-size: 2em; color: red;">!!</div>
-			<strong style="text-decoration: underline;">Warning!</strong><br />
-			<div style="padding-left: 4ex;">
-				', $upcontext['upgrade_options_warning'], '
-			</div>
-		</div>';
+				<div style="margin: 1ex; padding: 1ex; border: 1px dashed #cc3344; color: black; background: #ffe4e9;">
+					<div style="float: left; width: 2ex; font-size: 2em; color: red;">!!</div>
+					<strong style="text-decoration: underline;">Warning!</strong><br />
+					<div style="padding-left: 4ex;">
+						', $upcontext['upgrade_options_warning'], '
+					</div>
+				</div>';
+	}
 
 	echo '
 				<table style="border-collapse:collapse; border-spacing: 1px; padding: 2px;">
-					<tr style="vertical-align: top;">
+					<tr>
 						<td style="width: 2%;">
 							<input type="checkbox" name="backup" id="backup" value="1"', $db_type != 'mysql' && $db_type != 'postgresql' ? ' disabled="disabled"' : '', ' class="input_check" />
 						</td>
@@ -632,21 +704,21 @@ function template_upgrade_options()
 							<label for="backup">Backup tables in your database with the prefix &quot;backup_' . $db_prefix . '&quot;.</label>', isset($modSettings['elkVersion']) ? '' : ' (recommended!)', '
 						</td>
 					</tr>
-					<tr style="vertical-align: top;">
+					<tr>
 						<td style="width: 2%;">
 							<input type="checkbox" name="maint" id="maint" value="1" checked="checked" class="input_check" />
 						</td>
 						<td style="width: 100%;">
-							<label for="maint">Put the forum into maintenance mode during upgrade.</label> <span class="smalltext">(<a href="#" onclick="document.getElementById(\'mainmess\').style.display = document.getElementById(\'mainmess\').style.display == \'\' ? \'none\' : \'\'">Customize</a>)</span>
-							<div id="mainmess" style="display: none;">
+							<label for="maint">Put the forum into maintenance mode during upgrade.</label> <span class="smalltext">(<a href="#" onclick="document.getElementById(\'mainmess\').classList.remove(\'hide\');">Customize</a>)</span>
+							<div id="mainmess" class="hide">
 								<strong class="smalltext">Maintenance Title: </strong><br />
-								<input type="text" name="maintitle" size="30" value="', htmlspecialchars($mtitle, ENT_COMPAT, 'UTF-8'), '" class="input_text" /><br />
+								<input type="text" name="maintitle" size="30" value="', htmlspecialchars($mtitle, ENT_COMPAT), '" class="input_text" /><br />
 								<strong class="smalltext">Maintenance Message: </strong><br />
-								<textarea name="mainmessage" rows="3" cols="50">', htmlspecialchars($mmessage, ENT_COMPAT, 'UTF-8'), '</textarea>
+								<textarea name="mainmessage" rows="3" cols="50">', htmlspecialchars($mmessage, ENT_COMPAT), '</textarea>
 							</div>
 						</td>
 					</tr>
-					<tr style="vertical-align: top;">
+					<tr>
 						<td style="width: 2%;">
 							<input type="checkbox" name="debug" id="debug" value="1" class="input_check" />
 						</td>
@@ -654,7 +726,7 @@ function template_upgrade_options()
 							<label for="debug">Output extra debugging information</label>
 						</td>
 					</tr>
-					<tr style="vertical-align: top;">
+					<tr>
 						<td style="width: 2%;">
 							<input type="checkbox" name="empty_error" id="empty_error" value="1" class="input_check" />
 						</td>
@@ -681,22 +753,26 @@ function template_backup_database()
 
 	echo '
 			<form action="', $upcontext['form_url'], '" name="upform" id="upform" method="post">
-			<input type="hidden" name="backup_done" id="backup_done" value="0" />
-			<strong>Completed <span id="tab_done">', $upcontext['cur_table_num'], '</span> out of ', $upcontext['table_count'], ' tables.</strong>
-			<span id="debuginfo"></span>';
+				<input type="hidden" name="backup_done" id="backup_done" value="0" />
+				<strong>Completed <span id="tab_done">', $upcontext['cur_table_num'], '</span> out of ', $upcontext['table_count'], ' tables.</strong>
+				<span id="debuginfo"></span>';
 
 	// Dont any tables so far?
 	if (!empty($upcontext['previous_tables']))
+	{
 		foreach ($upcontext['previous_tables'] as $table)
+		{
 			echo '
-			<br />Completed Table: &quot;', $table, '&quot;.';
+				<br />Completed Table: &quot;', $table, '&quot;.';
+		}
+	}
 
 	echo '
-			<h3 id="current_tab_div">
-				Current Table: &quot;<span id="current_table">', $upcontext['cur_table_name'], '</span>&quot;
-			</h3>
-			<br />
-			<span id="commess" style="font-weight: bold; display: ', $upcontext['cur_table_num'] == $upcontext['table_count'] ? 'inline' : 'none', ';">Backup Complete! Click Continue to Proceed.</span>';
+				<h3 id="current_tab_div">
+					Current Table: &quot;<span id="current_table">', $upcontext['cur_table_name'], '</span>&quot;
+				</h3>
+				<br />
+				<span id="commess" class="', $upcontext['cur_table_num'] == $upcontext['table_count'] ? '' : 'hide', ';">Backup Complete! Click Continue to Proceed.</span>';
 
 	// Continue please!
 	$upcontext['continue'] = $support_js ? 2 : 1;
@@ -706,7 +782,7 @@ function template_backup_database()
 	{
 		echo '
 		<script>
-			var lastTable = ', $upcontext['cur_table_num'], ';
+			let lastTable = ', $upcontext['cur_table_num'], ';
 
 			function getNextTables()
 			{
@@ -716,12 +792,14 @@ function template_backup_database()
 			// Got an update!
 			function onBackupUpdate(oXMLDoc)
 			{
-				var sCurrentTableName = "",
+				let sCurrentTableName = "",
 					iTableNum = 0,
 					sCompletedTableName = document.getElementById(\'current_table\').innerHTML;
 
-				for (var i = 0; i < oXMLDoc.getElementsByTagName("table")[0].childNodes.length; i++)
+				for (let i = 0; i < oXMLDoc.getElementsByTagName("table")[0].childNodes.length; i++)
+				{
 					sCurrentTableName += oXMLDoc.getElementsByTagName("table")[0].childNodes[i].nodeValue;
+				}
 				iTableNum = oXMLDoc.getElementsByTagName("table")[0].getAttribute("num");
 
 				// Update the page.
@@ -732,15 +810,17 @@ function template_backup_database()
 
 		// If debug flood the screen.
 		if ($is_debug)
+		{
 			echo '
 				setOuterHTML(document.getElementById(\'debuginfo\'), \'<br />Completed Table: &quot;\' + sCompletedTableName + \'&quot;.<span id="debuginfo"><\' + \'/span>\');';
+		}
 
 		echo '
 				// Get the next update...
 				if (iTableNum == ', $upcontext['table_count'], ')
 				{
-					document.getElementById(\'commess\').style.display = "";
-					document.getElementById(\'current_tab_div\').style.display = "none";
+					document.getElementById(\'commess\').classList.remove("hide");
+					document.getElementById(\'current_tab_div\').classList.add("hide");
 					document.getElementById(\'contbutt\').disabled = 0;
 					document.getElementById(\'backup_done\').value = 1;
 				}
@@ -826,12 +906,12 @@ function template_database_changes()
 			<strong>Executing:</strong> &quot;<span id="cur_item_name">', $upcontext['current_item_name'], '</span>&quot; (<span id="item_num">', $upcontext['current_item_num'], '</span> of <span id="total_items"><span id="item_count">', $upcontext['total_items'], '</span>', $upcontext['file_count'] > 1 ? ' - of this script' : '', ')</span>
 		</h3>
 		<br />
-		<span id="commess" style="font-weight: bold; display: ', !empty($upcontext['changes_complete']) || $upcontext['current_debug_item_num'] == $upcontext['debug_items'] ? 'inline' : 'none', ';">Database Updates Complete! Click Continue to Proceed.</span>';
+		<span id="commess" class=" ', !empty($upcontext['changes_complete']) || $upcontext['current_debug_item_num'] == $upcontext['debug_items'] ? '' : 'hide', '">Database Updates Complete! Click Continue to Proceed.</span>';
 
 		if ($is_debug)
 		{
 			echo '
-			<div id="debug_section" class="roundframe" style="height: 200px; overflow: auto;">
+			<div id="debug_section" class="roundframe">
 				<span id="debuginfo"></span>
 			</div>';
 		}
@@ -839,23 +919,23 @@ function template_database_changes()
 
 	// Place for the XML error message.
 	echo '
-		<div id="error_block" class="errorbox" style="display: ', empty($upcontext['error_message']) ? 'none' : '', ';">
+		<div id="error_block" class="errorbox', empty($upcontext['error_message']) ? ' hide' : '', '">
 			<strong style="text-decoration: underline;">Error!</strong>
 			<br />
 			<div id="error_message">',
-				isset($upcontext['error_message']) ? $upcontext['error_message'] : 'Unknown Error!', '
+				$upcontext['error_message'] ?? 'Unknown Error!', '
 			</div>
 		</div>';
 
 	// We want to continue at some point!
 	$upcontext['continue'] = $support_js ? 2 : 1;
 
-	// If javascript allows we want to do this using XML.
+	// If javascript allows, we want to do this using XML.
 	if ($support_js)
 	{
 		echo '
 		<script>
-			var lastItem = ', $upcontext['current_debug_item_num'], ',
+			let lastItem = ', $upcontext['current_debug_item_num'], ',
 				sLastString = "', strtr($upcontext['current_debug_item_name'], array('"' => '&quot;')), '",
 				iLastSubStepProgress = -1,
 				curFile = ', $upcontext['cur_file_num'], ',
@@ -871,7 +951,9 @@ function template_database_changes()
 			{
 				// We want to track this...
 				if (timeOutID)
+				{
 					clearTimeout(timeOutID);
+				}	
 				timeOutID = window.setTimeout("retTimeout()", ', (15 * $timeLimitThreshold), '000);
 
 				getXMLDocument(\'', $upcontext['form_url'], '&xml&filecount=', $upcontext['file_count'], '&substep=\' + lastItem + getData, onItemUpdate);
@@ -880,7 +962,7 @@ function template_database_changes()
 			// Got an update!
 			function onItemUpdate(oXMLDoc)
 			{
-				var sItemName = "",
+				let sItemName = "",
 					sDebugName = "",
 					iItemNum = 0,
 					iSubStepProgress = -1,
@@ -890,10 +972,12 @@ function template_database_changes()
 
 				// We\'ve got something - so reset the timeout!
 				if (timeOutID)
+				{
 					clearTimeout(timeOutID);
+				}	
 
 				// Assume no error at this time...
-				document.getElementById("error_block").style.display = "none";
+				document.getElementById("error_block").classList.add("hide");
 
 				// Are we getting some duff info?
 				if (!oXMLDoc || !oXMLDoc.getElementsByTagName("item")[0])
@@ -901,13 +985,13 @@ function template_database_changes()
 					// Too many errors?
 					if (retryCount > 15)
 					{
-						document.getElementById("error_block").style.display = "";
+						document.getElementById("error_block").classList.remove("hide");
 						document.getElementById("error_message").innerHTML = "Error retrieving information on step: " + (sDebugName == "" ? sLastString : sDebugName);';
 
 		if ($is_debug)
 		{
 			echo '
-						setOuterHTML(document.getElementById(\'debuginfo\'), \'<span style="color: red;">failed<\' + \'/span><span id="debuginfo"><\' + \'/span>\');';
+						setOuterHTML(document.getElementById(\'debuginfo\'), \'<span class="error">failed<\' + \'/span><span id="debuginfo"><\' + \'/span>\');';
 		}
 
 		echo '
@@ -917,6 +1001,7 @@ function template_database_changes()
 						retryCount++;
 						getNextItem();
 					}
+					
 					return false;
 				}
 
@@ -926,13 +1011,13 @@ function template_database_changes()
 					retryCount++;
 					if (retryCount > 10)
 					{
-						document.getElementById("error_block").style.display = "";
+						document.getElementById("error_block").style.classList.remove("hide");
 						document.getElementById("error_message").innerHTML = "Upgrade script appears to be going into a loop - step: " + sDebugName;';
 
 		if ($is_debug)
 		{
 			echo '
-						setOuterHTML(document.getElementById(\'debuginfo\'), \'<span style="color: red;">failed<\' + \'/span><span id="debuginfo"><\' + \'/span>\');';
+						setOuterHTML(document.getElementById(\'debuginfo\'), \'<span class="error">failed<\' + \'/span><span id="debuginfo"><\' + \'/span>\');';
 		}
 
 		echo '
@@ -940,14 +1025,18 @@ function template_database_changes()
 				}
 				retryCount = 0;
 
-				for (var i = 0; i < oXMLDoc.getElementsByTagName("item")[0].childNodes.length; i++)
+				for (let i = 0; i < oXMLDoc.getElementsByTagName("item")[0].childNodes.length; i++)
+				{
 					sItemName += oXMLDoc.getElementsByTagName("item")[0].childNodes[i].nodeValue;
-				for (var i = 0; i < oXMLDoc.getElementsByTagName("debug")[0].childNodes.length; i++)
+				}	
+				for (let i = 0; i < oXMLDoc.getElementsByTagName("debug")[0].childNodes.length; i++)
+				{
 					sDebugName += oXMLDoc.getElementsByTagName("debug")[0].childNodes[i].nodeValue;
-				for (var i = 0; i < oXMLDoc.getElementsByTagName("get").length; i++)
+				}
+				for (let i = 0; i < oXMLDoc.getElementsByTagName("get").length; i++)
 				{
 					getData += "&" + oXMLDoc.getElementsByTagName("get")[i].getAttribute("key") + "=";
-					for (var j = 0; j < oXMLDoc.getElementsByTagName("get")[i].childNodes.length; j++)
+					for (let j = 0; j < oXMLDoc.getElementsByTagName("get")[i].childNodes.length; j++)
 					{
 						getData += oXMLDoc.getElementsByTagName("get")[i].childNodes[j].nodeValue;
 					}
@@ -965,28 +1054,34 @@ function template_database_changes()
 
 				// If we have an error we haven\'t completed!
 				if (oXMLDoc.getElementsByTagName("error")[0] && bIsComplete)
+				{
 					iDebugNum = lastItem;
+				}	
 
 				// Do we have the additional progress bar?
 				if (iSubStepProgress != -1)
 				{
-					document.getElementById("substep_bar_div").style.display = "";
-					document.getElementById("substep_bar_div2").style.display = "";
+					document.getElementById("substep_bar_div").classList.remove("hide");
+					document.getElementById("substep_bar_div2").classList.remove("hide");
 					document.getElementById("substep_progress").style.width = iSubStepProgress + "%";
 					document.getElementById("substep_text").innerHTML = iSubStepProgress + "%";
 					document.getElementById("substep_bar_div").innerHTML = sDebugName.replace(/\./g, "") + ":";
 				}
 				else
 				{
-					document.getElementById("substep_bar_div").style.display = "none";
-					document.getElementById("substep_bar_div2").style.display = "none";
+					document.getElementById("substep_bar_div").classList.add("hide");
+					document.getElementById("substep_bar_div_2").classList.add("hide");
 				}
 
 				// Move onto the next item?
 				if (bIsComplete)
+				{
 					lastItem = iDebugNum;
+				}	
 				else
+				{
 					lastItem = iDebugNum - 1;
+				}	
 
 				// Are we finished?
 				if (bIsComplete && iDebugNum == -1 && curFile >= ', $upcontext['file_count'], ')
@@ -995,22 +1090,22 @@ function template_database_changes()
 		if ($is_debug)
 		{
 			echo '
-					document.getElementById(\'debug_section\').style.display = "none";';
+					document.getElementById(\'debug_section\').classList.add("hide");';
 		}
 
 		echo '
-					document.getElementById(\'commess\').style.display = "";
+					document.getElementById(\'commess\').classList.remove("hide");
 					document.getElementById(\'contbutt\').disabled = 0;
 					document.getElementById(\'database_done\').value = 1;';
 
 		if ($upcontext['file_count'] > 1)
 		{
 			echo '
-					document.getElementById(\'info1\').style.display = "none";';
+					document.getElementById(\'info1\').classList.add("hide");';
 		}
 
 		echo '
-					document.getElementById(\'info2\').style.display = "none";
+					document.getElementById(\'info2\').classList.add("hide");
 					updateStepProgress(100, 100, ', $upcontext['step_weight'] * ((100 - $upcontext['step_progress']) / 100), ');
 					return true;
 				}
@@ -1040,19 +1135,27 @@ function template_database_changes()
 					// Give it consistent dots.
 					dots = sDebugName.match(/\./g);
 					numDots = dots ? dots.length : 0;
-					for (var i = numDots; i < 3; i++)
+					for (let i = numDots; i < 3; i++)
+					{
 						sDebugName += ".";
+					}	
 					setOuterHTML(document.getElementById(\'debuginfo\'), sDebugName + \'<span id="debuginfo"><\' + \'/span>\');
 				}
 				iLastSubStepProgress = iSubStepProgress;
 
 				if (bIsComplete)
+				{
 					setOuterHTML(document.getElementById(\'debuginfo\'), \'done<br /><span id="debuginfo"><\' + \'/span>\');
+				}	
 				else
+				{
 					setOuterHTML(document.getElementById(\'debuginfo\'), \'...<span id="debuginfo"><\' + \'/span>\');
+				}	
 
 				if (document.getElementById(\'debug_section\').scrollHeight)
-					document.getElementById(\'debug_section\').scrollTop = document.getElementById(\'debug_section\').scrollHeight';
+				{
+					document.getElementById(\'debug_section\').scrollTop = document.getElementById(\'debug_section\').scrollHeight;
+				}';
 		}
 
 		echo '
@@ -1071,11 +1174,14 @@ function template_database_changes()
 				// Is there an error?
 				if (oXMLDoc.getElementsByTagName("error")[0])
 				{
-					var sErrorMsg = "";
-					for (var i = 0; i < oXMLDoc.getElementsByTagName("error")[0].childNodes.length; i++)
+					let sErrorMsg = "";
+					for (let i = 0; i < oXMLDoc.getElementsByTagName("error")[0].childNodes.length; i++)
+					{
 						sErrorMsg += oXMLDoc.getElementsByTagName("error")[0].childNodes[i].nodeValue;
-					document.getElementById("error_block").style.display = "";
+					}	
+					document.getElementById("error_block").classList.remove("hide");
 					document.getElementById("error_message").innerHTML = sErrorMsg;
+					
 					return false;
 				}
 
@@ -1094,6 +1200,7 @@ function template_database_changes()
 				document.getElementById("secs_elapsed").innerHTML = secs;
 
 				getNextItem();
+				
 				return true;
 			}
 
@@ -1103,12 +1210,12 @@ function template_database_changes()
 				// Oh noes...
 				if (!attemptAgain)
 				{
-					document.getElementById("error_block").style.display = "";
+					document.getElementById("error_block").classList.remove("hide");
 					document.getElementById("error_message").innerHTML = "Server has not responded for ', ($timeLimitThreshold * 15), ' seconds. You can wait a little longer or otherwise please click <a href=\"#\" onclick=\"retTimeout(true); return false;\">here<" + "/a> to try this step again";
 				}
 				else
 				{
-					document.getElementById("error_block").style.display = "none";
+					document.getElementById("error_block").classList.add("hide");
 					getNextItem();
 				}
 			}';
@@ -1135,11 +1242,13 @@ function template_database_xml()
 	echo '
 	<file num="', $upcontext['cur_file_num'], '" items="', $upcontext['total_items'], '" debug_items="', $upcontext['debug_items'], '">', $upcontext['cur_file_name'], '</file>
 	<item num="', $upcontext['current_item_num'], '">', $upcontext['current_item_name'], '</item>
-	<debug num="', $upcontext['current_debug_item_num'], '" percent="', isset($upcontext['substep_progress']) ? $upcontext['substep_progress'] : '-1', '" complete="', empty($upcontext['completed_step']) ? 0 : 1, '">', $upcontext['current_debug_item_name'], '</debug>';
+	<debug num="', $upcontext['current_debug_item_num'], '" percent="', $upcontext['substep_progress'] ?? '-1', '" complete="', empty($upcontext['completed_step']) ? 0 : 1, '">', $upcontext['current_debug_item_name'], '</debug>';
 
 	if (!empty($upcontext['error_message']))
+	{
 		echo '
 	<error>', $upcontext['error_message'], '</error>';
+	}
 }
 
 /**
@@ -1154,24 +1263,27 @@ function template_upgrade_complete()
 	<form action="', $boardurl, '/index.php">';
 
 	if (!empty($upcontext['can_delete_script']))
+	{
 		echo '
-			<label for="delete_self">
-				<input type="checkbox" id="delete_self" onclick="doTheDelete(this);" class="input_check" /> Delete this upgrade.php and its data files now.
-			</label> <em>(doesn\'t work on all servers.)</em>
-			<script>
-				function doTheDelete(theCheck)
-				{
-					var theImage = document.getElementById ? document.getElementById("delete_upgrader") : document.all.delete_upgrader;
+		<label for="delete_self">
+			<input type="checkbox" id="delete_self" onclick="doTheDelete(this);" class="input_check" /> Delete this upgrade.php and its data files now.
+		</label> <em>(doesn\'t work on all servers.)</em>
+		<script>
+			function doTheDelete(theCheck)
+			{
+				let theImage = document.getElementById ? document.getElementById("delete_upgrader") : document.all.delete_upgrader;
 
-					theImage.src = "', $upgradeurl, '?delete=1&ts_" + (new Date().getTime());
-					theCheck.disabled = true;
-				}
-			</script>
-			<img src="', $settings['default_theme_url'], '/images/blank.png" alt="" id="delete_upgrader" /><br />';
+				theImage.src = "', $upgradeurl, '?delete=1&ts_" + (new Date().getTime());
+				theCheck.disabled = true;
+			}
+		</script>
+		<img src="', $settings['default_theme_url'], '/images/blank.png" alt="" id="delete_upgrader" /><br />';
+	}
 
-	echo '<br />
-			If you had any problems with this upgrade, or have any problems using ElkArte, please don\'t hesitate to <a href="', SITE_SOFTWARE, '/index.php">look to us for assistance</a>.<br />
-			<br />
-			Best of luck,<br />
-			ElkArte';
+	echo '
+		<br />
+		If you had any problems with this upgrade, or have any problems using ElkArte, please don\'t hesitate to <a href="', SITE_SOFTWARE, '/index.php">look to us for assistance</a>.<br />
+		<br />
+		Best of luck,<br />
+		ElkArte';
 }
