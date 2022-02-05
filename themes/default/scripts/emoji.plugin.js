@@ -13,11 +13,6 @@
  */
 var disableDrafts = false;
 
-// I would prefer to use base.getScript via base.init but FireFox (only) throws a deferred exception
-let script = document.createElement('script');
-script.src = elk_theme_url + '/scripts/emoji_tags.js';
-document.body.appendChild(script);
-
 (function (sceditor) {
 	'use strict';
 
@@ -147,7 +142,7 @@ document.body.appendChild(script);
 						return offset;
 					}
 
-					// Lets get the caret position so we can add the emoji box there
+					// Get the caret position, so we can add the emoji box there
 					let corrected_offset = editor.findCursorPosition(':');
 
 					offset.top = corrected_offset.top;
@@ -252,11 +247,11 @@ document.body.appendChild(script);
 	/**
 	 * Emoji plugin interface to SCEditor
 	 *  - Called from the editor as a plugin
-	 *  - Monitors events so we control the emoji's
+	 *  - Monitors events, so we control the emoji's
 	 */
 	sceditor.plugins.emoji = function ()
 	{
-		var base = this,
+		let base = this,
 			oEmoji;
 
 		/**
@@ -266,14 +261,6 @@ document.body.appendChild(script);
 		{
 			// Grab this instance for use in oEmoji
 			editor = this;
-
-			// Load the emoji when needed, like now (this causes Fx only to throw a deferred exception
-			//base.getScript(elk_theme_url + '/scripts/emoji_tags.js', function () {
-			//	if ('console' in window)
-			//	{
-			//		window.console.info('Emoji loaded.');
-			//	}
-			//});
 		};
 
 		/**
@@ -281,47 +268,70 @@ document.body.appendChild(script);
 		 */
 		base.signalReady = function ()
 		{
-			// Setup the options
+			// Set up the options
 			this.opts.emojiOptions.emoji_url = elk_smileys_url.replace("default", this.opts.emojiOptions.emoji_group);
 			if (typeof this.opts.emojiOptions.editor_id === 'undefined')
 			{
 				this.opts.emojiOptions.editor_id = post_box_name;
 			}
 
-			// Init the emoji instance, load in the options
-			oEmoji = new Elk_Emoji(this.opts.emojiOptions);
+			// Load the emoji file, then call start the instance
+			let promise = base.getScript(elk_theme_url + '/scripts/emoji_tags.js');
+			promise.then(
+				script =>
+				{
+					// Init the emoji instance, load in the options
+					oEmoji = new Elk_Emoji(this.opts.emojiOptions);
 
-			let original_textarea = document.getElementById(oEmoji.opts.editor_id),
-				instance = sceditor.instance(original_textarea),
-				sceditor_textarea = instance.getContentAreaContainer().nextSibling;
+					let original_textarea = document.getElementById(oEmoji.opts.editor_id),
+						instance = sceditor.instance(original_textarea),
+						sceditor_textarea = instance.getContentAreaContainer().nextSibling;
 
-			// Attach atwho to the editors source textarea
-			oEmoji.attachAtWho($(sceditor_textarea), {});
+					// Attach atwho to the editors source textarea
+					oEmoji.attachAtWho($(sceditor_textarea), {});
 
-			// Using wysiwyg, then lets attach atwho to the wysiwyg container as well
-			if (!instance.opts.runWithoutWysiwygSupport)
-			{
-				// We need to monitor the iframe window and body to text input
-				let oIframe = instance.getContentAreaContainer(),
-					oIframeWindow = oIframe.contentWindow,
-					oIframeBody = oIframe.contentDocument.body;
+					// Using wysiwyg, then lets attach atwho to the wysiwyg container as well
+					if (!instance.opts.runWithoutWysiwygSupport)
+					{
+						// We need to monitor the iframe window and body to text input
+						let oIframe = instance.getContentAreaContainer(),
+							oIframeWindow = oIframe.contentWindow,
+							oIframeBody = oIframe.contentDocument.body;
 
-				oEmoji.attachAtWho($(oIframeBody), oIframeWindow);
-			}
+						oEmoji.attachAtWho($(oIframeBody), oIframeWindow);
+					}
+
+					// Debug when needed
+					if ('console' in window)
+					{
+						window.console.info(`${script.src} is loaded!`);
+					}
+				},
+				error => {
+					if ('console' in window)
+					{
+						window.console.info(`Error: ${error.message}`);
+					}
+				}
+			);
 		};
 
 		/**
-		 * Simple "require_once" to load the emoji object
+		 * Simple "require_once" to load the emoji object via promise
 		 *
 		 * @param scriptUrl
-		 * @param callback
 		 */
-		base.getScript = function(scriptUrl, callback) {
-			const script = document.createElement('script');
-			script.src = scriptUrl;
-			script.onload = callback;
+		base.getScript = function(scriptUrl) {
+			return new Promise(function(resolve, reject)
+			{
+				const script = document.createElement('script');
 
-			document.body.appendChild(script);
+				script.src = scriptUrl;
+				script.onload = () => resolve(script);
+				script.onerror = () => reject(new Error(`Script load error for ${src}`));
+
+				document.head.append(script);
+			});
 		};
 	};
 })(sceditor);
