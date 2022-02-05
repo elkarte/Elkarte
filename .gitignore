@@ -4,6 +4,15 @@ db_last_error.txt
 cache/data*.php
 Packages/backups/*
 Packages/temp
+smileys/emojitwo/*
+!smileys/emojitwo/emojitwo.zip
+smileys/noto-emoji/*
+!smileys/noto-emoji/noto-emoji.zip
+smileys/twemoji/*
+!smileys/twemoji/twemoji.zip
+attachments/
+avatars_user/
+!avatars_user/index.php
 *.*~
 .buildpath
 .project
@@ -18,3 +27,5 @@ composer.lock
 composer.phar
 themes/default/cache/hive*
 .github/workflows/*.yaml
+populator/
+testcases*/
