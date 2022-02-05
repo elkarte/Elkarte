@@ -78,8 +78,8 @@ if (php_sapi_name() === 'cli' && empty($_SERVER['REMOTE_ADDR']))
 	$disable_security = 1;
 }
 
-// Load this now just because we can.
-global $db_type, $sourcedir, $boarddir, $boardurl;
+// Load Settings now just because we can, globals should indicate what we want.
+global $db_type, $sourcedir, $boarddir, $boardurl, $cachedir, $language, $maintenance;
 require_once(TMP_BOARDDIR . '/Settings.php');
 $db_type = $db_type === 'mysql' ? 'mysqli' : $db_type;
 
@@ -139,7 +139,7 @@ DEFINE('SUBSDIR', $sourcedir . '/subs');
 // Are we logged in?
 if (isset($upgradeData))
 {
-	$upcontext['user'] = unserialize(base64_decode($upgradeData));
+	$upcontext['user'] = json_decode(base64_decode($upgradeData), true);
 
 	// Check for sensible values.
 	if (empty($upcontext['user']['started']) || $upcontext['user']['started'] < time() - 86400)
@@ -333,7 +333,9 @@ function upgradeExit($fallThrough = false)
 		$upcontext['user']['step'] = $upcontext['current_step'];
 		$upcontext['user']['substep'] = $_GET['substep'];
 		$upcontext['user']['updated'] = time();
-		$upgradeData = base64_encode(serialize($upcontext['user']));
+
+		// Make a copy, then save the data in Settings.php
+		$upgradeData = base64_encode(json_encode($upcontext['user']));
 		copy(BOARDDIR . '/Settings.php', BOARDDIR . '/Settings_bak.php');
 		changeSettings(array('upgradeData' => '\'' . $upgradeData . '\''));
 		updateLastError();
@@ -680,11 +682,14 @@ function action_welcomeLogin()
 		print_error('Error: Unable to obtain write access to "' . $custom_avatar_dir . '"', true);
 	}
 
+	// Do we have a language file to use
 	if (!$fileFunc->fileExists(SOURCEDIR . '/ElkArte/Languages/Index/' . $upcontext['language'] . '.php') && !isset($modSettings['elkVersion'], $_GET['lang']))
 	{
 		return throw_error('The upgrader was unable to find language files for the language specified in Settings.php.<br />ElkArte will not work without the primary language files installed.<br /><br />Please either install them, or <a href="' . $upgradeurl . '?step=0;lang=english">use english instead</a>.');
 	}
-	elseif (!isset($_GET['skiplang']))
+
+	// Is it for this version of ElkArte?
+	if (!isset($_GET['skiplang']))
 	{
 		$temp = substr(@implode('', @file(SOURCEDIR . '/ElkArte/Languages/Index/' . $upcontext['language'] . '.php')), 0, 4096);
 		preg_match('~(?://|/\*)\s*Version:\s+(.+?);\s*index(?:[\s]{2}|\*/)~i', $temp, $match);
@@ -965,16 +970,6 @@ function action_upgradeOptions()
 
 	// Get hold of our db
 	$db = load_database();
-
-	// No one opts in so why collect incomplete stats
-	$db->skip_next_error();
-	$db->query('', '
-		DELETE FROM {db_prefix}settings
-		WHERE variable = {string:allow_sm_stats}',
-		array(
-			'allow_sm_stats' => 'allow_sm_stats',
-		)
-	);
 
 	// Cleanup all the hooks (we are upgrading, so better have everything cleaned up)
 	$db->skip_next_error();
@@ -1471,6 +1466,7 @@ function action_deleteUpgrade()
 		{
 			echo ' * ';
 		}
+
 		$upcontext['removed_maintenance'] = true;
 		$changes['maintenance'] = $upcontext['user']['main'];
 	}
@@ -1492,8 +1488,8 @@ function action_deleteUpgrade()
 	$changes = array(
 		'upgradeData' => '#remove#',
 	);
-	changeSettings($changes);
 	copy(BOARDDIR . '/Settings.php', BOARDDIR . '/Settings_bak.php');
+	changeSettings($changes);
 
 	// Clean any old cache files away.
 	clean_cache();
@@ -1556,7 +1552,7 @@ function action_deleteUpgrade()
 }
 
 /**
- * Reads in our backup setting_bak.php file
+ * Reads in setting_bak.php file
  * Removes flagged settings
  * Appends new settings as passed in $config_vars to the array
  * Writes out a new Settings.php file, overwriting any that may have existed
@@ -1574,54 +1570,6 @@ function changeSettings($config_vars)
 	}
 
 	saveFileSettings($save_vars, $settingsArray);
-}
-
-/**
- * Loads all the member groups from the database
- */
-function getMemberGroups()
-{
-	static $member_groups = array();
-
-	if (!empty($member_groups))
-	{
-		return $member_groups;
-	}
-
-	$db = load_database();
-
-	$db->skip_next_error();
-	$request = $db->query('', '
-		SELECT group_name, id_group
-		FROM {db_prefix}membergroups
-		WHERE id_group = {int:admin_group} OR id_group > {int:old_group}',
-		array(
-			'admin_group' => 1,
-			'old_group' => 7,
-		)
-	);
-
-	if ($request->hasResults() === false)
-	{
-		$db->skip_next_error();
-		$request = $db->query('', '
-			SELECT membergroup, id_group
-			FROM {db_prefix}membergroups
-			WHERE id_group = {int:admin_group} OR id_group > {int:old_group}',
-			array(
-				'admin_group' => 1,
-				'old_group' => 7,
-			)
-		);
-	}
-
-	while ($row = $db->fetch_row($request))
-	{
-		$member_groups[trim($row[0])] = $row[1];
-	}
-	$db->free_result($request);
-
-	return $member_groups;
 }
 
 /**
@@ -1870,7 +1818,7 @@ function nextSubstep($substep)
 }
 
 /**
- * Step 0 if running from the CLI
+ * Step 0 if running from the CLI, similar to welcome from the GUI
  *
  * Preforms several checks to make sure the appropriate files are available to do the updates
  * Validates php and db versions meet the minimum requirements
