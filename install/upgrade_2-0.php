@@ -61,12 +61,12 @@ class UpgradeInstructions_upgrade_2_0
 							array('name' => 'notification_type', 'type' => 'text')
 						);
 						foreach ([
-									 'none' => 0,
-									 'notification' => 1,
-									 'email' => 2,
-									 'emaildaily' => 3,
-									 'emailweekly' => 4
-								 ] as $type => $level)
+							 'none' => 0,
+							 'notification' => 1,
+							 'email' => 2,
+							 'emaildaily' => 3,
+							 'emailweekly' => 4
+							 ] as $type => $level)
 						{
 							$this->db->fetchQuery('
 							UPDATE {db_prefix}notifications_pref
@@ -231,8 +231,8 @@ class UpgradeInstructions_upgrade_2_0
 					// Remove Settings
 					$this->db->query('',
 						'DELETE FROM {db_prefix}settings
-							WHERE variable="enableOpenID" 
-							    OR variable="dh_keys"'
+						WHERE variable="enableOpenID" 
+						    OR variable="dh_keys"'
 					);
 				}
 			)
@@ -284,7 +284,7 @@ class UpgradeInstructions_upgrade_2_0
 	{
 		return array(
 			array(
-				'debug_title' => 'Moving attachment avatars to custom avatars...',
+				'debug_title' => 'Moving attachment avatars to custom avatars location...',
 				'function' => function()
 				{
 					global $modSettings;

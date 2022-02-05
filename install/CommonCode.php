@@ -204,6 +204,7 @@ function action_deleteInstaller()
 
 /**
  * Removes flagged settings
+ * Updates existing settings with new values if passed
  * Appends new settings as passed in $config_vars to the array
  * Writes out a new Settings.php file, overwriting any that may have existed
  *
@@ -220,6 +221,7 @@ function saveFileSettings($config_vars, $settingsArray)
 		$settingsArray = preg_split('~[\r\n]~', $settingsArray[0]);
 	}
 
+	// Step line by line and see whats changing
 	for ($i = 0, $n = count($settingsArray); $i < $n; $i++)
 	{
 		if (trim($settingsArray[$i]) === '?>')
@@ -228,31 +230,33 @@ function saveFileSettings($config_vars, $settingsArray)
 		}
 
 		// Don't trim or bother with it if it's not a variable.
-		if (substr($settingsArray[$i], 0, 1) === '$')
+		if (substr($settingsArray[$i], 0, 1) !== '$')
 		{
-			$settingsArray[$i] = trim($settingsArray[$i]) . "\n";
+			continue;
+		}
 
-			foreach ($config_vars as $var => $val)
+		$settingsArray[$i] = trim($settingsArray[$i]) . "\n";
+
+		// Update as requested
+		foreach ($config_vars as $var => $val)
+		{
+			if (strncasecmp($settingsArray[$i], '$' . $var, 1 + strlen($var)) == 0)
 			{
-				if (isset($settingsArray[$i]) && strncasecmp($settingsArray[$i], '$' . $var, 1 + strlen($var)) == 0)
+				if ($val === '#remove#')
 				{
-					if ($val === '#remove#')
-					{
-						unset($settingsArray[$i]);
-					}
-					else
-					{
-						$comment = strstr(substr(un_htmlspecialchars($settingsArray[$i]), strpos(un_htmlspecialchars($settingsArray[$i]), ';')), '#');
-						$settingsArray[$i] = '$' . $var . ' = \'' . $val . '\';' . ($comment != '' ? "\t\t" . rtrim($comment) : "\n");
-					}
-
-					unset($config_vars[$var]);
+					unset($settingsArray[$i]);
+					continue;
 				}
+
+				$comment = strstr(substr(un_htmlspecialchars($settingsArray[$i]), strpos(un_htmlspecialchars($settingsArray[$i]), ';')), '#');
+				$settingsArray[$i] = '$' . $var . ' = \'' . $val . '\';' . ($comment == '' ? '' : "\t\t" . rtrim($comment)) . "\n";
+
+				unset($config_vars[$var]);
 			}
 		}
 	}
 
-	// Add in the new vars we were passed
+	// Now add in any new vars we were passed
 	if (!empty($config_vars))
 	{
 		$settingsArray[$i++] = '';
@@ -265,28 +269,23 @@ function saveFileSettings($config_vars, $settingsArray)
 		}
 	}
 
-	// Blank out the file - done to fix an oddity with some servers.
-	$result = file_put_contents(TMP_BOARDDIR. '/Settings.php', '', LOCK_EX);
-	if ($result === false)
-	{
-		return false;
-	}
-
 	// Write out the new settings.php file
 	clearstatcache();
 	if (trim($settingsArray[0]) != '<?php')
 	{
 		array_unshift($settingsArray,'<?php' . "\n" );
 	}
-	file_put_contents(BOARDDIR . '/Settings.php', implode('', $settingsArray), LOCK_EX);
 
-	// Don't let the OPcache fool you, we need the new file
-	if (extension_loaded('Zend OPcache') && ini_get('opcache.enable') && stripos(BOARDDIR, ini_get('opcache.restrict_api')) !== 0)
+	$result = file_put_contents(BOARDDIR . '/Settings.php', implode('', $settingsArray), LOCK_EX);
+
+	// Don't let the OPcache fool us, we need the new file
+	if ($result !== false && extension_loaded('Zend OPcache') && ini_get('opcache.enable') &&
+		((ini_get('opcache.restrict_api') === '' || stripos(BOARDDIR, ini_get('opcache.restrict_api')) !== 0)))
 	{
 		opcache_invalidate(TMP_BOARDDIR . '/Settings.php', true);
 	}
 
-	return true;
+	return $result !== false;
 }
 
 /**
@@ -303,7 +302,6 @@ function makeFilesWritable(&$files)
 		return true;
 	}
 
-	$failure = false;
 	foreach ($files as $k => $file)
 	{
 		if (\ElkArte\FileFunctions::instance()->isWritable($file))
@@ -444,12 +442,14 @@ function makeFilesWritable(&$files)
 					{
 						$ftp->chmod($ftp_file, 0777);
 					}
+
 					// Sometimes an extra slash can help...
 					$ftp_file = '/' . $ftp_file;
 					if (!is_writable($file))
 					{
 						$ftp->chmod($ftp_file, 0755);
 					}
+
 					if (!is_writable($file))
 					{
 						$ftp->chmod($ftp_file, 0777);
