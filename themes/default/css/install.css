@@ -1,3 +1,13 @@
+/*
+ * ___________.__   __      _____          __
+ * \_   _____/|  | |  | __ /  _  \________/  |_  ____
+ *  |    __)_ |  | |  |/ //  /_\  \_  __ \   __\/ __ \
+ *  |        \|  |_|    </    |    \  | \/|  | \  ___/
+ * /_______  /|____/__|_ \____|__  /__|   |__|  \___  >
+ *         \/           \/       \/                 \/
+ * https://www.elkarte.net
+ */
+
 a:link, a:hover, a:visited {
 	text-decoration: underline;
 }
@@ -81,8 +91,8 @@ h1.forumtitle {
 }
 
 #main_steps .stepdone::after {
-	content: "\2713";
 	padding: 0 8px;
+	content: "\2713";
 }
 
 #main_steps ul li.stepcurrent {
@@ -239,11 +249,11 @@ h1.forumtitle {
 }
 
 #commess {
-	display: inline;
 	font-weight: bold;
+	display: inline;
 }
 
 #debug_section {
-	height: 200px;
 	overflow: auto;
+	height: 200px;
 }
