@@ -21,6 +21,8 @@ class EmojiIntegrate
 	/**
 	 * Register Emoji hooks to the system
 	 *
+	 * Called by loadIntegrations() in Hooks.php
+	 *
 	 * @return array
 	 */
 	public static function register()
@@ -47,6 +49,8 @@ class EmojiIntegrate
 
 	/**
 	 * Register ACP config hooks for setting values
+	 *
+	 * Called by loadIntegrationsSettings() in Hooks.php
 	 *
 	 * @return array
 	 */

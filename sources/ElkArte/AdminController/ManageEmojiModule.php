@@ -12,8 +12,10 @@
 namespace ElkArte\AdminController;
 
 use ElkArte\AbstractController;
+use ElkArte\FileFunctions;
 use ElkArte\HttpReq;
 use ElkArte\Languages\Txt;
+use ElkArte\UnZip;
 
 /**
  * Emoji administration controller.
@@ -54,6 +56,68 @@ abstract class ManageEmojiModule extends AbstractController
 		if (empty($req->post->emoji_selection))
 		{
 			$req->post->emoji_selection = 'noemoji';
+			return;
+		}
+
+		// An emoji group was selected, unzip them if required
+		if (!FileFunctions::instance()->fileExists(BOARDDIR . '/smileys/' . $req->post->emoji_selection . '\1f44d.svg'))
+		{
+			if (self::unZipEmoji($req))
+			{
+				self::removeEmoji($req);
+			}
+		}
+	}
+
+	/**
+	 * Unzips a selected Emoji set if it has not already been extracted
+	 *
+	 * @param \ElkArte\HttpReq $req
+	 */
+	private static function unZipEmoji($req)
+	{
+		$source = BOARDDIR . '/smileys/' . $req->post->emoji_selection . '/' . $req->post->emoji_selection . '.zip';
+		if (FileFunctions::instance()->fileExists($source))
+		{
+			$destination = BOARDDIR . '/smileys/' . $req->post->emoji_selection;
+			$unzip = new UnZip(file_get_contents($source), $destination);
+			if ($unzip->read_zip_data())
+			{
+				return true;
+			}
+		}
+
+		$req->post->emoji_selection = 'noemoji';
+		return false;
+	}
+
+	/**
+	 * If changing emoji sets, this simply removes the currently extracted set
+	 */
+	private static function removeEmoji($req)
+	{
+		global $modSettings;
+
+		// Saved but did not change ...
+		if ($modSettings['emoji_selection'] === $req->post->emoji_selection)
+		{
+			return true;
+		}
+
+		$source = BOARDDIR . '/smileys/' . $modSettings['emoji_selection'];
+		if (FileFunctions::instance()->isDir($source))
+		{
+			$iterator = new \RecursiveDirectoryIterator($source, \FilesystemIterator::SKIP_DOTS);
+			$files = new \RecursiveIteratorIterator($iterator, \RecursiveIteratorIterator::CHILD_FIRST, \RecursiveIteratorIterator::CATCH_GET_CHILD);
+
+			/** @var \FilesystemIterator $file */
+			foreach ($files as $file)
+			{
+				if ($file->getExtension() === 'svg')
+				{
+					unlink($file->getRealPath());
+				}
+			}
 		}
 	}
 }
