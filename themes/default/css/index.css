@@ -366,7 +366,7 @@ input[type="submit"], button[type="submit"], input[type="button"],
 }
 
 .linkbutton:link, .linkbutton:visited {
-	font-size: var(--font14);
+	font-size: var(--font15);
 	position: relative;
 	height: 2em;
 }
@@ -1762,6 +1762,10 @@ a.bbc_link {
 	padding: 0 .2em;
 }
 
+buttonlist.rtl {
+	flex-direction: row-reverse;
+}
+
 .buttonlist li {
 	line-height: 2.1em;
 	flex: 0 0 auto;
@@ -2027,6 +2031,10 @@ nav > .quickbuttons, menu > .quickbuttons {
 	flex-wrap: wrap;
 	max-width: 100%;
 	padding: .4em .25em;
+}
+
+.pagesection.rtl {
+	flex-direction: row-reverse;
 }
 
 /* Main containing UL for pagelinks, note pagelink markup is defined in themes.php */
