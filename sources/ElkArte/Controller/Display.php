@@ -682,7 +682,6 @@ class Display extends AbstractController
 			'reply' => array(
 				'test' => 'can_reply',
 				'text' => 'reply',
-				'image' => 'reply.png',
 				'lang' => true,
 				'url' => getUrl('action', ['action' => 'post', 'topic' => $context['current_topic'] . '.' . $context['start'], 'last_msg' => $context['topic_last_message']]),
 				'active' => true
@@ -690,7 +689,6 @@ class Display extends AbstractController
 			'notify' => array(
 				'test' => 'can_mark_notify',
 				'text' => $context['is_marked_notify'] ? 'unnotify' : 'notify',
-				'image' => ($context['is_marked_notify'] ? 'un' : '') . 'notify.png',
 				'lang' => true,
 				'custom' => 'onclick="return notifyButton(this);"',
 				'url' => getUrl('action', ['action' => 'notify', 'sa' => $context['is_marked_notify'] ? 'off' : 'on', 'topic' => $context['current_topic'] . '.' . $context['start'], '{session_data}'])
@@ -698,14 +696,12 @@ class Display extends AbstractController
 			'mark_unread' => array(
 				'test' => 'can_mark_unread',
 				'text' => 'mark_unread',
-				'image' => 'markunread.png',
 				'lang' => true,
 				'url' => getUrl('action', ['action' => 'markasread', 'sa' => 'topic', 't' => $context['mark_unread_time'], 'topic' => $context['current_topic'] . '.' . $context['start'], '{session_data}'])
 			),
 			'unwatch' => array(
 				'test' => 'can_unwatch',
 				'text' => ($context['topic_unwatched'] ? '' : 'un') . 'watch',
-				'image' => ($context['topic_unwatched'] ? '' : 'un') . 'watched.png',
 				'lang' => true,
 				'custom' => 'onclick="return unwatchButton(this);"',
 				'url' => getUrl('action', ['action' => 'unwatchtopic', 'sa' => $context['topic_unwatched'] ? 'off' : 'on', 'topic' => $context['current_topic'] . '.' . $context['start'], '{session_data}'])
@@ -713,7 +709,6 @@ class Display extends AbstractController
 			'send' => array(
 				'test' => 'can_send_topic',
 				'text' => 'send_topic',
-				'image' => 'sendtopic.png',
 				'lang' => true,
 				'url' => getUrl('action', ['action' => 'emailuser', 'sa' => 'sendtopic', 'topic' => $context['current_topic'] . '.0']),
 				'custom' => 'onclick="return sendtopicOverlayDiv(this.href, \'' . $txt['send_topic'] . '\');"'
@@ -721,7 +716,6 @@ class Display extends AbstractController
 			'print' => array(
 				'test' => 'can_print',
 				'text' => 'print',
-				'image' => 'print.png',
 				'lang' => true,
 				'custom' => 'rel="nofollow"',
 				'class' => 'new_win',
@@ -734,14 +728,12 @@ class Display extends AbstractController
 			'move' => array(
 				'test' => 'can_move',
 				'text' => 'move_topic',
-				'image' => 'admin_move.png',
 				'lang' => true,
 				'url' => getUrl('action', ['action' => 'movetopic', 'current_board' => $context['current_board'], 'topic' => $context['current_topic'] . '.0'])
 			),
 			'delete' => array(
 				'test' => 'can_delete',
 				'text' => 'remove_topic',
-				'image' => 'admin_rem.png',
 				'lang' => true,
 				'custom' => 'onclick="return confirm(\'' . $txt['are_sure_remove_topic'] . '\');"',
 				'url' => getUrl('action', ['action' => 'removetopic2', 'topic' => $context['current_topic'] . '.0', '{session_data}'])
@@ -749,21 +741,18 @@ class Display extends AbstractController
 			'lock' => array(
 				'test' => 'can_lock',
 				'text' => empty($context['is_locked']) ? 'set_lock' : 'set_unlock',
-				'image' => 'admin_lock.png',
 				'lang' => true,
 				'url' => getUrl('action', ['action' => 'topic', 'sa' => 'lock', 'topic' => $context['current_topic'] . '.' . $context['start'], '{session_data}'])
 			),
 			'sticky' => array(
 				'test' => 'can_sticky',
 				'text' => empty($context['is_sticky']) ? 'set_sticky' : 'set_nonsticky',
-				'image' => 'admin_sticky.png',
 				'lang' => true,
 				'url' => getUrl('action', ['action' => 'topic', 'sa' => 'sticky', 'topic' => $context['current_topic'] . '.' . $context['start'], '{session_data}'])
 			),
 			'merge' => array(
 				'test' => 'can_merge',
 				'text' => 'merge',
-				'image' => 'merge.png',
 				'lang' => true,
 				'url' => getUrl('action', ['action' => 'mergetopics', 'board' => $context['current_board'] . '.0', 'from' => $context['current_topic']])
 			),
@@ -774,7 +763,6 @@ class Display extends AbstractController
 		{
 			$context['mod_buttons'][] = array(
 				'text' => 'restore_topic',
-				'image' => '',
 				'lang' => true,
 				'url' => getUrl('action', ['action' => 'restoretopic', 'topics' => $context['current_topic'], '{session_data}'])
 			);

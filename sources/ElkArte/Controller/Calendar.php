@@ -194,7 +194,6 @@ class Calendar extends AbstractController
 			'post_event' => array(
 				'test' => 'can_post',
 				'text' => 'calendar_post_event',
-				'image' => 'calendarpe.png',
 				'lang' => true,
 				'url' => getUrl('action', ['action' => 'calendar', 'sa' => 'post', 'year' => $context['current_year'], 'month' => $context['current_month'], '{session_data}'])
 			),

@@ -59,7 +59,6 @@ class Display extends AbstractModule
 		$context['mod_buttons']['calendar'] = [
 			'test' => 'calendar_post',
 			'text' => 'calendar_link',
-			'image' => 'linktocal.png',
 			'lang' => true,
 			'url' => getUrl('action', ['action' => 'post', 'calendar', 'msg' => $context['topic_first_message'], 'topic' => $context['current_topic'] . '.0'])
 		];

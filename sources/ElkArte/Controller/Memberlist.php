@@ -203,7 +203,11 @@ class Memberlist extends AbstractController
 		if ($context['in_search'])
 		{
 			$context['memberlist_buttons'] = array(
-				'view_all_members' => array('text' => 'view_all_members', 'image' => 'mlist.png', 'lang' => true, 'url' => $scripturl . '?action=memberlist;sa=all', 'active' => true),
+				'view_all_members' => array(
+					'text' => 'view_all_members',
+					'lang' => true,
+					'url' => $scripturl . '?action=memberlist;sa=all',
+					'active' => true),
 			);
 		}
 		else
@@ -490,7 +494,10 @@ class Memberlist extends AbstractController
 			$context['sort_direction'] = !isset($desc) ? 'up' : 'down';
 			$context['sort_by'] = $sort;
 			$context['memberlist_buttons'] = array(
-				'view_all_members' => array('text' => 'view_all_members', 'image' => 'mlist.png', 'lang' => true, 'url' => $scripturl . '?action=memberlist;sa=all', 'active' => true),
+				'view_all_members' => array('text' => 'view_all_members',
+											'lang' => true,
+											'url' => $scripturl . '?action=memberlist;sa=all',
+											'active' => true),
 			);
 
 			$query_parameters = array(
