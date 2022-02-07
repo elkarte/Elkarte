@@ -457,7 +457,8 @@ class Menu
 	}
 
 	/**
-	 * Set the menu icon
+	 * Set the menu icon from a class name if using pseudo elements
+	 * of class and icon if using that method
 	 *
 	 * @param string $sectionId
 	 * @param string $areaId
@@ -472,20 +473,27 @@ class Menu
 			? $settings['images_url'] . '/admin'
 			: $settings['default_images_url'] . '/admin';
 
-		// Does this area have its own icon?
+		// Does this area even have an icon?
+		if (empty($area->getIcon()) && empty($area->getClass()))
+		{
+			$this->menuContext['sections'][$sectionId]['areas'][$areaId]['icon'] = '';
+			return;
+		}
+
+		// Perhaps a png
 		if (!empty($area->getIcon()))
 		{
 			$this->menuContext['sections'][$sectionId]['areas'][$areaId]['icon'] =
-				'<img ' . (!empty($area->getClass()) ? 'class="' . $area->getClass() . '"' : 'style="background: none"') . ' src="' . $imagePath . '/' . $area->getIcon() . '" alt="" />&nbsp;&nbsp;';
+				'<img ' . (!empty($area->getClass()) ? 'class="' . $area->getClass() . '"' : 'style="background: none"') . ' src="' . $imagePath . '/' . $area->getIcon() . '" alt="" />';
+			return;
 		}
-		else
-		{
-			$this->menuContext['sections'][$sectionId]['areas'][$areaId]['icon'] = '';
-		}
+
+		$this->menuContext['sections'][$sectionId]['areas'][$areaId]['icon'] =
+			'<i class="' . (!empty($area->getClass()) ? 'icon ' . $area->getClass() . '"' : '') . '></i>';
 	}
 
 	/**
-	 * Processes all of the subsections for a menu item
+	 * Processes all subsections for a menu item
 	 *
 	 * @param string $sectionId
 	 * @param string $areaId
@@ -522,6 +530,8 @@ class Menu
 	}
 
 	/**
+	 * Set subsection url/click location
+	 *
 	 * @param string $sectionId
 	 * @param string $areaId
 	 * @param string $subId

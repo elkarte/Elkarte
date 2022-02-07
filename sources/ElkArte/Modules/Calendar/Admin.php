@@ -51,8 +51,7 @@ class Admin extends AbstractModule
 			'label' => $txt['manage_calendar'],
 			'controller' => '\\ElkArte\\AdminController\\ManageCalendarModule',
 			'function' => 'action_index',
-			'icon' => 'transparent.png',
-			'class' => 'admin_img_calendar',
+			'class' => 'i-calendar i-reset',
 			'permission' => array('admin_forum'),
 			'enabled' => featureEnabled('cd'),
 			'subsections' => array(

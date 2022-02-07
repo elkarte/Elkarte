@@ -38,7 +38,7 @@ use ElkArte\Menu\Menu;
  *     - string $label      => Optional text string for link (Otherwise $txt[$index] will be used)
  *     - string $controller => Name of controller required for this area
  *     - string $function   => Method in controller to call when area is selected
- *     - string $icon       => File name of an icon to use on the menu, if using a class set as transparent.png
+ *     - string $icon       => File name of an icon to use on the menu, if using a class set as transparent.png or leave empty
  *     - string $class      => CSS class name to apply to the icon img, used to apply a sprite icon
  *     - string $custom_url => URL to call for this menu item
  *     - bool $enabled      => Should this area even be enabled / accessible?
