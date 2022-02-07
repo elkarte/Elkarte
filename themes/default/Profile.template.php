@@ -85,12 +85,12 @@ function template_showDrafts()
 
 			if (!empty($draft['sticky']))
 			{
-				$draft['title'] .= '<img src="' . $settings['images_url'] . '/icons/quick_sticky.png" alt="' . $txt['sticky_topic'] . '" title="' . $txt['sticky_topic'] . '" />';
+				$draft['title'] .= '<i class="icon i-pin" title="' . $txt['sticky_topic'] . '"><s>' . $txt['sticky_topic'] . '</s></i>';
 			}
 
-			if (!empty($draft['locked']))
+			if (empty($draft['locked']))
 			{
-				$draft['title'] .= '<img src="' . $settings['images_url'] . '/icons/quick_lock.png" alt="' . $txt['locked_topic'] . '" title="' . $txt['locked_topic'] . '" />';
+				$draft['title'] .= '<i class="icon icon-small i-lock" title="' . $txt['locked_topic'] . '"><s>' . $txt['locked_topic'] . '</s></i>';
 			}
 
 			$draft['date'] = '&#171; <strong>' . $txt['draft_saved_on'] . ':</strong> ' . ($draft['age'] > 0 ? sprintf($txt['draft_days_ago'], $draft['age']) : $draft['time']) . (!empty($draft['remaining']) ? ', ' . sprintf($txt['draft_retain'], $draft['remaining']) : '') . ' &#187;';

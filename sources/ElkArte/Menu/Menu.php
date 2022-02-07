@@ -469,7 +469,7 @@ class Menu
 		global $settings;
 
 		// Work out where we should get our menu images from.
-		$imagePath = file_exists($settings['theme_dir'] . '/images/admin/change_menu.png')
+		$imagePath = file_exists($settings['theme_dir'] . '/images/admin/transparent.png')
 			? $settings['images_url'] . '/admin'
 			: $settings['default_images_url'] . '/admin';
 

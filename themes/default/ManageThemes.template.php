@@ -194,7 +194,7 @@ function template_list_themes()
 		{
 			echo '
 						<a class="delete_theme icon" data-theme_id="', $theme['id'], '" href="', $scripturl, '?action=admin;area=theme;sa=remove;th=', $theme['id'], ';', $context['session_var'], '=', $context['session_id'], ';', $context['admin-tr_token_var'], '=', $context['admin-tr_token'], '">
-							<img src="', $settings['images_url'], '/icons/delete.png" alt="', $txt['theme_remove'], '" title="', $txt['theme_remove'], '" />
+							<i class="icon i-delete" title="', $txt['theme_remove'], '"><s>', $txt['theme_remove'], '</s></i>
 						</a>';
 		}
 		else
@@ -758,11 +758,11 @@ function template_installed()
 	<div id="admincenter">
 		<h2 class="category_header">', $context['page_title'], '</h2>
 		<div class="content">
-			<p>
+			<p class="infobox">
 				<a href="', $scripturl, '?action=admin;area=theme;sa=list;th=', $context['installed_theme']['id'], ';', $context['session_var'], '=', $context['session_id'], '">', $context['installed_theme']['name'], '</a> ', $txt['theme_installed_message'], '
 			</p>
-			<p>
-				<a href="', $scripturl, '?action=admin;area=theme;sa=admin;', $context['session_var'], '=', $context['session_id'], '">', $txt['back'], '</a>
+			<p class="submitbutton">
+				<a class="linkbutton" href="', $scripturl, '?action=admin;area=theme;sa=admin;', $context['session_var'], '=', $context['session_id'], '">', $txt['back'], '</a>
 			</p>
 		</div>
 	</div>';

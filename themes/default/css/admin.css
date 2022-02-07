@@ -327,6 +327,11 @@ h3.category_header form {
 	vertical-align: middle;
 }
 
+.core_features_img {
+	width: 2.5em;
+	height: 2.5em;
+}
+
 /* Keep your enemies close, and your submit buttons if your screen is huge. */
 .features_image {
 	float: left;
@@ -774,20 +779,6 @@ ul.package_servers li {
 	text-align: center;
 }
 
-.edit_board {
-	margin-left: 3px;
-	padding: 0 8px 8px;
-	background: url(../images/icons/modify_small.png) no-repeat;
-}
-
-.edit_board.nochanges {
-	background-image: url(../images/icons/field_valid.png);
-}
-
-.edit_board.changed {
-	background-image: url(../images/icons/field_invalid.png);
-}
-
 .perm_profile_delete {
 	width: 5%;
 }
@@ -801,11 +792,6 @@ ul.theme_options, ul.basic_options {
 ul.theme_options li, ul.basic_options li {
 	padding: 0.4em;
 	list-style: none;
-}
-
-.is_directory {
-	padding-left: 18px;
-	background: url(../images/admin/boards.png) no-repeat;
 }
 
 .edit_file {
@@ -984,6 +970,10 @@ dl.themes_list dd {
 	vertical-align: top;
 }
 
+.listlevel2 .linklevel2 > .icon {
+	margin: 0 .5em 0 0;
+}
+
 /* Styles for the Report generation */
 #report_buttons {
 	display: flex;
@@ -995,137 +985,6 @@ dl.themes_list dd {
 	line-height: 2;
 	border-right: 1px solid;
 	border-left: 1px solid;
-}
-
-/* Admin menu icons as sprites
-   Use some longhand declarations to cut the length of the entire list. */
-.linklevel2 > img {
-	background-image: url(../images/admin/admin_sprite.png);
-	background-repeat: no-repeat;
-}
-
-.admin_img_administration {
-	background-position: 0 0;
-}
-
-.admin_img_attachment {
-	background-position: -16px 0;
-}
-
-.admin_img_ban {
-	background-position: -32px 0;
-}
-
-.admin_img_boards {
-	background-position: -48px 0;
-}
-
-.admin_img_calendar {
-	background-position: -64px 0;
-}
-
-.admin_img_corefeatures {
-	background-position: -80px 0;
-}
-
-.admin_img_current_theme {
-	background-position: -96px 0;
-}
-
-.admin_img_engines {
-	background-position: -112px 0;
-}
-
-.admin_img_exit {
-	background-position: -128px 0;
-}
-
-.admin_img_features {
-	background-position: -144px 0;
-}
-
-.admin_img_languages {
-	background-position: -160px 0;
-}
-
-.admin_img_logs {
-	background-position: -176px 0;
-}
-
-.admin_img_mail {
-	background-position: -192px 0;
-}
-
-.admin_img_maintain {
-	background-position: -208px 0;
-}
-
-.admin_img_membergroups {
-	background-position: -224px 0;
-}
-
-.admin_img_members {
-	background-position: -240px 0;
-}
-
-.admin_img_modifications {
-	background-position: -256px 0;
-}
-
-.admin_img_news {
-	background-position: -272px 0;
-}
-
-.admin_img_packages {
-	background-position: -288px 0;
-}
-
-.admin_img_paid {
-	background-position: -304px 0;
-}
-
-.admin_img_permissions {
-	background-position: -320px 0;
-}
-
-.admin_img_posts {
-	background-position: -336px 0;
-}
-
-.admin_img_regcenter {
-	background-position: -352px 0;
-}
-
-.admin_img_reports {
-	background-position: -368px 0;
-}
-
-.admin_img_scheduled {
-	background-position: -384px 0;
-}
-
-.admin_img_search {
-	background-position: -400px 0;
-}
-
-.admin_img_security {
-	background-position: -416px 0;
-}
-
-.admin_img_server {
-	background-position: -432px 0;
-}
-
-.admin_img_smiley {
-	background-position: -448px 0;
-}
-
-.admin_img_support {
-	background-position: -464px 0;
-}
-
-.admin_img_themes {
-	background-position: -480px 0;
 }
 
 .sortable_smiley li {
@@ -1225,12 +1084,12 @@ dl.themes_list dd {
 
 .ui-dialog .ui-dialog-titlebar-close {
 	float: right;
-	width: 16px;
-	height: 16px;
-	margin: 0.7em 0;
+	width: 22px;
+	height: 22px;
+	margin: 0.5em 0;
 	cursor: pointer;
 	border: 0;
-	background: url(../images/buttons/delete.png) no-repeat scroll left center transparent;
+	background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='black' viewBox='-4 -4 40 40'%3E%3Cpath d='M31.708 25.708L22 16l9.708-9.708c.105-.105.18-.227.23-.357.132-.356.056-.77-.23-1.057L27.122.292c-.286-.286-.702-.36-1.057-.23-.13.05-.252.125-.357.23L16 9.998 6.292.29C6.187.188 6.065.11 5.935.064c-.356-.133-.77-.057-1.057.23L.292 4.877c-.286.286-.36.702-.23 1.057.05.13.125.252.23.357L10 16 .292 25.708c-.104.105-.18.227-.23.357-.132.355-.056.77.23 1.057l4.586 4.586c.286.286.702.36 1.057.23.13-.05.252-.125.357-.23L16 22l9.708 9.708c.105.105.227.18.357.23.356.132.77.056 1.057-.23l4.586-4.586c.286-.286.362-.702.23-1.057-.05-.13-.125-.252-.23-.357z'/%3E%3C/svg%3E");
 }
 
 .ui-button-icon-only {

@@ -4977,7 +4977,7 @@ Stef                       ^
 	align-self: center;
 	justify-self: end;
 	grid-column-start: 2;
-	width: initial;
+	width: 80px;
 }
 
 .search_results_posts .topic_moderation input[type="checkbox"] {
