@@ -313,9 +313,9 @@ class Mentions extends AbstractController
 							global $txt, $settings;
 
 							$mark = empty($row['status']) ? 'read' : 'unread';
-							$opts = '<a href="' . getUrl('action', ['action' => 'mentions', 'sa' => 'updatestatus', 'mark' => $mark, 'item' => $row['id_mention'], '{session_data}']) . '"><img title="' . $txt['mentions_mark' . $mark] . '" src="' . $settings['images_url'] . '/icons/mark_' . $mark . '.png" alt="*" /></a>&nbsp;';
+							$opts = '<a href="' . getUrl('action', ['action' => 'mentions', 'sa' => 'updatestatus', 'mark' => $mark, 'item' => $row['id_mention'], '{session_data}']) . '"><i class="icon i-mark_' . $mark . '" title="' . $txt['mentions_mark' . $mark] . '" /><s>' . $txt['mentions_mark' . $mark] . '</s></i></a>&nbsp;';
 
-							return $opts . '<a href="' . getUrl('action', ['action' => 'mentions', 'sa' => 'updatestatus', 'mark' => 'delete', 'item' => $row['id_mention'], '{session_data}']) . '"><i class="icon i-remove" title="' . $txt['delete'] . '"></i></a>';
+							return $opts . '<a href="' . getUrl('action', ['action' => 'mentions', 'sa' => 'updatestatus', 'mark' => 'delete', 'item' => $row['id_mention'], '{session_data}']) . '"><i class="icon i-remove" title="' . $txt['delete'] . '"><s>' . $txt['delete'] . '</s></i></a>';
 						},
 						'class' => 'listaction grid8',
 					),
@@ -339,7 +339,7 @@ class Mentions extends AbstractController
 				),
 				array(
 					'class' => 'submitbutton',
-					'position' => 'bottom_of_list',
+					'position' => 'below_table_data',
 					'value' => '<a class="linkbutton" href="' . $scripturl . '?action=mentions;sa=updatestatus;mark=readall' . str_replace(';all', '', $this->_url_param) . ';' . $context['session_var'] . '=' . $context['session_id'] . '">' . $txt['mentions_mark_all_read'] . '</a>',
 				),
 			),

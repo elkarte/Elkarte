@@ -309,7 +309,7 @@ function template_by_board()
 				echo '
 							<a id="edit_board_', $board['id'], '" href="', $scripturl, '?action=admin;area=permissions;sa=index;pid=', $board['profile'], ';', $context['session_var'], '=', $context['session_id'], '"> [', $board['profile_name'], ']</a>
 						</span>
-						<a class="edit_board" data-boardid="', $board['id'], '" data-boardprofile="', $board['profile'], '" href="', $scripturl, '?action=admin;area=permissions;sa=board;edit;', $context['session_var'], '=', $context['session_id'], '"></a>';
+						<a class="edit_board" data-boardid="', $board['id'], '" data-boardprofile="', $board['profile'], '" href="', $scripturl, '?action=admin;area=permissions;sa=board;edit;', $context['session_var'], '=', $context['session_id'], '"><i class="icon icon-small i-modify"></i></a>';
 			}
 
 			echo '

@@ -885,7 +885,7 @@ function template_browse()
 		elseif ($file['is_directory'])
 		{
 			echo '
-						<a href="', $file['href'], '" class="is_directory">', $file['filename'], '</a>', ($file['is_writable']) ? '' : ' (' . $txt['theme_edit_not_writable'] . ')';
+						<a href="', $file['href'], '"><i class="icon i-directory"></i>', $file['filename'], '</a>', ($file['is_writable']) ? '' : ' (' . $txt['theme_edit_not_writable'] . ')';
 		}
 		else
 		{
