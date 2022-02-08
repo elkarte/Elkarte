@@ -6,7 +6,7 @@
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause (see accompanying LICENSE.txt file)
  *
  * This file contains code covered by:
- * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * copyright: 2011 Simple Machines (http://www.simplemachines.org)
  *
  * @version 2.0 dev
  *
@@ -33,12 +33,12 @@ function textfield_alter($change, $substep)
 			'column' => $change['column'],
 		)
 	);
-	if ($db->num_rows($request) === 0)
+	if ($request->num_rows() === 0)
 	{
 		die('Unable to find column ' . $change['column'] . ' inside table ' . $db_prefix . $change['table']);
 	}
-	$table_row = $db->fetch_assoc($request);
-	$db->free_result($request);
+	$table_row = $request->fetch_assoc();
+	$request->free_result();
 
 	// If something of the current column definition is different, fix it.
 	$column_fix = $table_row['Type'] !== $change['type'] || (strtolower($table_row['Null']) === 'yes') !== $change['null_allowed'] || ($table_row['Default'] === null) !== !isset($change['default']) || (isset($change['default']) && $change['default'] !== $table_row['Default']);
@@ -57,17 +57,16 @@ function textfield_alter($change, $substep)
 				'collation' => $table_row['Collation'],
 			)
 		);
-
 		// No results? Just forget it all together.
-		if ($db->num_rows($request) === 0)
+		if ($request->num_rows() === 0)
 		{
 			unset($table_row['Collation']);
 		}
 		else
 		{
-			$collation_info = $db->fetch_assoc($request);
+			$collation_info = $request->fetch_assoc();
 		}
-		$db->free_result($request);
+		$request->free_result();
 	}
 
 	if ($column_fix)
@@ -81,7 +80,7 @@ function textfield_alter($change, $substep)
 				SET ' . $change['column'] . ' = {string:default}
 				WHERE ' . $change['column'] . ' IS NULL',
 				array(
-					'default' => isset($change['default']) ? $change['default'] : '',
+					'default' => $change['default'] ?? '',
 				)
 			);
 		}
@@ -92,7 +91,7 @@ function textfield_alter($change, $substep)
 			ALTER TABLE {db_prefix}' . $change['table'] . '
 			CHANGE COLUMN ' . $change['column'] . ' ' . $change['column'] . ' ' . $change['type'] . (isset($collation_info['Charset']) ? ' CHARACTER SET ' . $collation_info['Charset'] . ' COLLATE ' . $collation_info['Collation'] : '') . ($change['null_allowed'] ? '' : ' NOT NULL') . (isset($change['default']) ? ' default {string:default}' : ''),
 			array(
-				'default' => isset($change['default']) ? $change['default'] : '',
+				'default' => $change['default'] ?? '',
 			)
 		);
 	}
@@ -140,13 +139,13 @@ function checkChange(&$change)
 				'table' => $change['table'],
 				'old_name' => $temp[1],
 				'new_name' => $temp[2],
-		));
-		if ($db->num_rows != 1)
+			));
+		if ($request->num_rows() != 1)
 		{
 			return;
 		}
-		list (, $current_type) = $db->fetch_assoc($request);
-		$db->free_result($request);
+		list (, $current_type) = $request->fetch_assoc();
+		$request->free_result();
 	}
 	else
 	{
@@ -159,12 +158,12 @@ function checkChange(&$change)
 			)
 		);
 		// Mayday!
-		if ($db->num_rows($request) == 0)
+		if ($request->num_rows() == 0)
 		{
 			return;
 		}
 		// Oh where, oh where has my little field gone. Oh where can it be...
-		while ($row = $db->fetch_assoc($request))
+		while ($row = $request->fetch_assoc())
 		{
 			if ($row['Field'] == $temp[1] || $row['Field'] == $temp[2])
 			{

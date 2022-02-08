@@ -25,9 +25,9 @@ function template_install_above()
 		<link rel="stylesheet" href="../themes/default/css/index.css?20RC1" />
 		<link rel="stylesheet" href="../themes/default/css/_light/index_light.css?20RC1" />
 		<link rel="stylesheet" href="../themes/default/css/install.css?20RC1" />
-		<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js" id="jquery"></script>
+		<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js" id="jquery"></script>
 		<script>
-			window.jQuery || document.write(\'<script src="../themes/default/scripts/jquery-2.1.4.min.js"><\/script>\');
+			window.jQuery || document.write(\'<script src="../themes/default/scripts/jquery-3.6.0.min.js"><\/script>\');
 			var elk_scripturl = ', JavaScriptEscape(str_replace('/install/install.php', '/index.php', $installurl)), ';
 		</script>
 		<script src="../themes/default/scripts/script.js"></script>
@@ -72,28 +72,30 @@ function template_install_above()
 				</div>
 			</div>
 			<div id="content_section">
-				<div id="main_content_section">
-					<div id="main_steps">
-						<h2>', $txt['upgrade_progress'], '</h2>
-						<ul>';
+				<div id="main_steps">
+					<h2>', $txt['upgrade_progress'], '</h2>
+					<ul>';
 
 	foreach ($incontext['steps'] as $num => $step)
 	{
 		echo '
-							<li class="', $num < $incontext['current_step'] ? 'stepdone' : ($num == $incontext['current_step'] ? 'stepcurrent' : 'stepwaiting'), '">', $txt['upgrade_step'], ' ', $step[0], ': ', $step[1], '</li>';
+						<li class="', $num < $incontext['current_step'] ? 'stepdone' : ($num == $incontext['current_step'] ? 'stepcurrent' : 'stepwaiting'), '">', $txt['upgrade_step'], ' ', $step[0], ': ', $step[1], '</li>';
 	}
 
 	echo '
-						</ul>
-					</div>
+					</ul>
+				</div>
+				<div id="progress_bars">
 					<div id="progress_bar">
 						<div id="overall_text">', $incontext['overall_percent'], '%</div>
 						<div id="overall_progress" style="width: ', $incontext['overall_percent'], '%;">&nbsp;</div>
 						<div class="overall_progress">', $txt['upgrade_overall_progress'], '</div>
 					</div>
-					<div id="main_screen" class="clear">
-						<h2>', $incontext['page_title'], '</h2>
-						<div class="panel">';
+				</div>
+			</div>	
+			<div id="main_screen">
+				<h2>', $incontext['page_title'], '</h2>
+				<div class="content">';
 }
 
 function template_install_below()
@@ -103,44 +105,38 @@ function template_install_below()
 	if (!empty($incontext['continue']) || !empty($incontext['retry']))
 	{
 		echo '
-								<div class="clear righttext">';
+						<div class="clear righttext">';
 
 		if (!empty($incontext['continue']))
 		{
 			echo '
-									<input type="submit" id="contbutt" name="contbutt" value="', $txt['upgrade_continue'], '" onclick="return submitThisOnce(this);" class="button_submit" />';
+							<input type="submit" id="contbutt" name="contbutt" value="', $txt['upgrade_continue'], '" onclick="return submitThisOnce(this);" class="button_submit" />';
 		}
 
 		if (!empty($incontext['retry']))
 		{
 			echo '
-									<input type="submit" id="contbutt" name="contbutt" value="', $txt['upgrade_retry'], '" onclick="return submitThisOnce(this);" class="button_submit" />';
+							<input type="submit" id="contbutt" name="contbutt" value="', $txt['upgrade_retry'], '" onclick="return submitThisOnce(this);" class="button_submit" />';
 		}
 
 		echo '
-								</div>';
+						</div>';
 	}
 
 	// Show the closing form tag and other data only if not in the last step
 	if (count($incontext['steps']) - 1 !== (int) $incontext['current_step'])
 	{
 		echo '
-							</form>';
+					</form>';
 	}
 
 	echo '
-						</div>
-					</div>
 				</div>
 			</div>
 		</div>
 		<div id="footer_section">
-			<div class="frame">
-				<ul>
-					<li class="copyright">
-						<a href="', SITE_SOFTWARE, '" title="ElkArte Community" target="_blank" class="new_win">ElkArte &copy; 2012 - 2021, ElkArte Community</a>
-					</li>
-				</ul>
+			<div class="frame copyright">
+				<a href="', SITE_SOFTWARE, '" title="ElkArte Community" target="_blank" class="new_win">ElkArte &copy; 2012 - 2022, ElkArte Community</a>
 			</div>
 		</div>
 	</body>
@@ -157,7 +153,7 @@ function template_welcome_message()
 	echo '
 	<script src="../themes/default/scripts/admin.js"></script>
 	<script>
-		var oUpgradeCenter = new Elk_AdminIndex({
+		let oUpgradeCenter = new Elk_AdminIndex({
 			bLoadAnnouncements: false,
 			bLoadVersions: true,
 			slatestVersionContainerId: \'latestVersion\',
@@ -166,14 +162,13 @@ function template_welcome_message()
 		<strong style="text-decoration: underline;">' . $txt['error_warning_notice'] . '</strong><p>
 			' . sprintf($txt['error_script_outdated'], '<em id="elkVersion" style="white-space: nowrap;">??</em>', '<em style="white-space: nowrap;">' . CURRENT_VERSION . '</em>') . '
 			</p>'), ',
-
 			bLoadUpdateNotification: false
 		});
 	</script>
 	<form id="welcome" action="', $incontext['form_url'], '" method="post">
 		<p>', sprintf($txt['install_welcome_desc'], CURRENT_VERSION), '</p>
-		<div id="version_warning" class="warningbox" style="display: none;">', CURRENT_VERSION, '</div>
-		<div id="latestVersion" style="display: none;">???</div>';
+		<div id="version_warning" class="warningbox hide">', CURRENT_VERSION, '</div>
+		<div id="latestVersion" class="hide">???</div>';
 
 	// Show the warnings, or not.
 	if (template_warning_divs())
@@ -191,12 +186,12 @@ function template_welcome_message()
 	// For the latest version stuff.
 	echo '
 		<script>
-			var currentVersionRounds = 0;
+			let currentVersionRounds = 0;
 
 			// Latest version?
 			function ourCurrentVersion()
 			{
-				var latestVer,
+				let latestVer,
 					setLatestVer;
 
 				// After few many tries let the use run the script
@@ -206,7 +201,7 @@ function template_welcome_message()
 				latestVer = document.getElementById(\'latestVersion\');
 				setLatestVer = document.getElementById(\'elkVersion\');
 
-				if (latestVer.innerHTML == \'???\')
+				if (latestVer.innerHTML === \'???\')
 				{
 					setTimeout(\'ourCurrentVersion()\', 50);
 					return;
@@ -215,12 +210,13 @@ function template_welcome_message()
 				if (setLatestVer !== null)
 				{
 					setLatestVer.innerHTML = latestVer.innerHTML.replace(\'ElkArte \', \'\');
-					document.getElementById(\'version_warning\').style.display = \'\';
+					document.getElementById(\'version_warning\').classList.remove(\'hide\');
 				}
 
 				document.getElementById(\'contbutt\').disabled = 0;
 			}
-			addLoadEvent(ourCurrentVersion);
+			
+			window.addEventListener("load", ourCurrentVersion)
 		</script>';
 }
 
@@ -257,7 +253,7 @@ function template_warning_divs()
 		</div>';
 	}
 
-	// Any message?
+	// Any informative message?
 	if (!empty($incontext['infobox']))
 	{
 		echo '
@@ -273,6 +269,9 @@ function template_warning_divs()
 	return empty($incontext['error']) && empty($incontext['warning']);
 }
 
+/**
+ * Let them know we need access to the files and FTP may be needed.
+ */
 function template_chmod_files()
 {
 	global $txt, $incontext;
@@ -535,12 +534,12 @@ function template_populate_database()
 	if (!empty($incontext['sql_results']))
 	{
 		echo '
-		<ul>
-			<li>', implode('</li>
-			<li>', $incontext['sql_results']), '</li>
+		<ul class="bbc_list">
+			<li>', implode('</li><li>', $incontext['sql_results']), '</li>
 		</ul>';
 	}
 
+	// Any errors we need to report?
 	if (!empty($incontext['failures']))
 	{
 		echo '
@@ -559,7 +558,7 @@ function template_populate_database()
 	}
 
 	echo '
-		<p>', $txt['db_populate_info2'], '</p>';
+		<br /><p>', $txt['db_populate_info2'], '</p>';
 
 	template_warning_divs();
 
@@ -657,7 +656,7 @@ function template_delete_install()
 	if ($incontext['probably_delete_install'])
 	{
 		echo '
-		<div id="delete_label" style="margin: 1ex; font-weight: bold; display: none">
+		<div id="delete_label" class="hide bbc_strong">
 			<label for="delete_self">
 				<input type="checkbox" id="delete_self" onclick="doTheDelete();" class="input_check" /> ', $txt['delete_installer'], !isset($_SESSION['installer_temp_ftp']) ? ' ' . $txt['delete_installer_maybe'] : '', '
 			</label>
@@ -665,14 +664,14 @@ function template_delete_install()
 		<script>
 			function doTheDelete()
 			{
-				var theCheck = document.getElementById ? document.getElementById("delete_self") : document.all.delete_self,
+				let theCheck = document.getElementById ? document.getElementById("delete_self") : document.all.delete_self,
 					tempImage = new Image();
 
 				tempImage.src = "', $installurl, '?delete=1&ts_" + (new Date().getTime());
 				tempImage.width = 0;
 				theCheck.disabled = true;
 			}
-			document.getElementById(\'delete_label\').style.display = \'block\';
+			document.getElementById(\'delete_label\').classList.remove(\'hide\');
 		</script>
 		<br />';
 	}

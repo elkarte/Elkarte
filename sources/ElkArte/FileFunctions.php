@@ -310,6 +310,49 @@ class FileFunctions
 	}
 
 	/**
+	 * Recursivly removes a directory and all files and subdirectories contained within.
+	 * Use with *caution*, it is thorough, destructive and irreversible.
+	 *
+	 * @param string $path
+	 * @return bool
+	 */
+	public function rmDir($path)
+	{
+		// @todo build a list of excluded directories
+		if (!$this->isDir($path))
+		{
+			return true;
+		}
+
+		$success = true;
+		$iterator = new \RecursiveDirectoryIterator($path, \FilesystemIterator::SKIP_DOTS);
+		$files = new \RecursiveIteratorIterator($iterator, \RecursiveIteratorIterator::CHILD_FIRST, \RecursiveIteratorIterator::CATCH_GET_CHILD);
+
+		/** @var \FilesystemIterator $file */
+		foreach ($files as $file)
+		{
+			// If its not writable try to make it so or removal will fail
+			if ($file->isWritable() || $this->chmod($file->getRealPath()))
+			{
+				if ($file->isDir())
+				{
+					$success = $success && rmdir($file->getRealPath());
+				}
+				else
+				{
+					$success = $success && @unlink($file->getRealPath());
+				}
+			}
+			else
+			{
+				$success = false;
+			}
+		}
+
+		return $success && rmdir($path);
+	}
+
+	/**
 	 * Helper function for createDirectory
 	 *
 	 * What it does:

@@ -6,7 +6,7 @@
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause (see accompanying LICENSE.txt file)
  *
  * This file contains code covered by:
- * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * copyright: 2011 Simple Machines (http://www.simplemachines.org)
  *
  * @version 2.0 dev
  *
@@ -21,7 +21,7 @@
  *   - my_new_action_title
  * Methods whose name ends with "_title" are supposed to return a single
  * string representing the title of the step.
- * Methods containing the actions are supposed to return a multidimentional
+ * Methods containing the actions are supposed to return a multidimensional
  * array with the following structure:
  * array(
  *     array(
@@ -54,28 +54,32 @@ class UpgradeInstructions_upgrade_2_0
 				'debug_title' => 'Changing notifications levels to types...',
 				'function' => function()
 				{
-					$this->table->add_column('{db_prefix}notifications_pref',
-						array('name' => 'notification_type', 'type' => 'text')
-					);
-					foreach ([
-						'none' => 0,
-						'notification' => 1,
-						'email' => 2,
-						'emaildaily' => 3,
-						'emailweekly' => 4
-					] as $type => $level)
+					// Can only do this once
+					if ($this->table->column_exists('{db_prefix}notifications_pref', 'notification_level') === true)
 					{
-						$this->db->fetchQuery('
-							UPDATE {dbPrefix}notifications_pref
+						$this->table->add_column('{db_prefix}notifications_pref',
+							array('name' => 'notification_type', 'type' => 'text')
+						);
+						foreach ([
+							 'none' => 0,
+							 'notification' => 1,
+							 'email' => 2,
+							 'emaildaily' => 3,
+							 'emailweekly' => 4
+							 ] as $type => $level)
+						{
+							$this->db->fetchQuery('
+							UPDATE {db_prefix}notifications_pref
 							SET notification_type = {string:type}
 							WHERE notification_level = {int:level}',
-							[
-								'type' => json_encode([$type]),
-								'level' => $level,
-							]
-						);
+								[
+									'type' => json_encode([$type]),
+									'level' => $level,
+								]
+							);
+						}
+						$this->table->remove_column('{db_prefix}notifications_pref', 'notification_level');
 					}
-					$this->table->remove_column('{db_prefix}notifications_pref', 'notification_level');
 
 					updateSettings(array(
 						'notification_methods' => serialize([
@@ -122,6 +126,7 @@ class UpgradeInstructions_upgrade_2_0
 
 					if (!empty($modSettings['drafts_enabled']))
 					{
+						require_once(SUBSDIR . '/Admin.subs.php');
 						enableModules('drafts', array('post', 'display', 'profile', 'personalmessage'));
 						\ElkArte\Hooks::instance()->enableIntegration('\\ElkArte\\DraftsIntegrate');
 					}
@@ -134,28 +139,6 @@ class UpgradeInstructions_upgrade_2_0
 		);
 	}
 
-	public function preparing_postbyemail_title()
-	{
-		return 'Performing updates to post-by-email handling...';
-	}
-
-	public function preparing_postbyemail()
-	{
-		return array(
-			array(
-				'debug_title' => 'Cleanup postby_emails...',
-				'function' => function()
-				{
-					// Remove any improper data
-					$this->db->query('',
-						'DELETE FROM {db_prefix}postby_emails
-						WHERE length(id_email) < 35'
-					);
-				}
-			),
-		);
-	}
-
 	public function preparing_languages_title()
 	{
 		return 'Add support for language editing in the db...';
@@ -165,14 +148,14 @@ class UpgradeInstructions_upgrade_2_0
 	{
 		return array(
 			array(
-				'debug_title' => 'Cleanup postby_emails...',
+				'debug_title' => 'Adding Language edit table...',
 				'function' => function()
 				{
 					$this->table->create_table('{db_prefix}languages',
 						array(
-							array('name' => 'language',     'type' => 'string', 'size' => 40,  'default' => ''),
-							array('name' => 'file',         'type' => 'string', 'size' => 40,  'default' => ''),
-							array('name' => 'language_key', 'type' => 'string', 'size' => 255, 'default' => ''),
+							array('name' => 'language',     'type' => 'varchar', 'size' => 40,  'default' => ''),
+							array('name' => 'file',         'type' => 'varchar', 'size' => 40,  'default' => ''),
+							array('name' => 'language_key', 'type' => 'varchar', 'size' => 255, 'default' => ''),
 							array('name' => 'value',        'type' => 'text'),
 						),
 						array(
@@ -222,6 +205,150 @@ class UpgradeInstructions_upgrade_2_0
 					}
 				}
 			),
+		);
+	}
+
+	public function preparing_openid_title()
+	{
+		return 'Removing support for openid in the db...';
+	}
+
+	public function preparing_openid()
+	{
+		return array(
+			array(
+				'debug_title' => 'Dropping column openid...',
+				'function' => function()
+				{
+					if ($this->table->column_exists('{db_prefix}members', 'openid_uri') !== false)
+					{
+						$this->table->remove_column('{db_prefix}members', 'openid_uri');
+					}
+
+					// Drop openid assoc table
+					$this->table->drop_table('{db_prefix}openid_assoc');
+
+					// Remove Settings
+					$this->db->query('',
+						'DELETE FROM {db_prefix}settings
+						WHERE variable="enableOpenID" 
+						    OR variable="dh_keys"'
+					);
+				}
+			)
+		);
+	}
+
+	public function preparing_custom_search_title()
+	{
+		return 'Dropping the custom search Index...';
+	}
+
+	public function preparing_custom_search()
+	{
+		return array(
+			array(
+				'debug_title' => 'Removing old hash custom search index...',
+				'function' => function()
+				{
+					global $modSettings;
+
+					// Drop the custom index if it exists.  The way the id_word value in text2words is
+					// calculated changed in 2.0, there is no conversion, the index must be rebuilt and
+					// doing that as part of the upgrade could take a long time.
+					$this->table->drop_table('{db_prefix}log_search_words');
+
+					updateSettings(array(
+						'search_custom_index_config' => '',
+						'search_custom_index_resume' => '',
+					));
+
+					// Go back to the default search method if they were using custom
+					if (!empty($modSettings['search_index']) && $modSettings['search_index'] === 'custom')
+					{
+						updateSettings(array(
+							'search_index' => '',
+						));
+					}
+				}
+			)
+		);
+	}
+
+	public function preparing_avatars_title()
+	{
+		return 'Moving attachment style avatars to custom avatars...';
+	}
+
+	public function preparing_avatars()
+	{
+		return array(
+			array(
+				'debug_title' => 'Moving attachment avatars to custom avatars location...',
+				'function' => function()
+				{
+					global $modSettings;
+
+					// Get/Set the custom avatar location, the upgrade script checks for existence and access
+					$custom_avatar_dir = !empty($modSettings['custom_avatar_dir']) ? $modSettings['custom_avatar_dir'] : BOARDDIR . '/avatars_user';
+
+					// Perhaps we have a smart admin, and they were using a custom dir
+					if ($custom_avatar_dir !== BOARDDIR . '/avatars_user')
+					{
+						if (!file_exists($custom_avatar_dir . '/index.php'))
+						{
+							@rename(BOARDDIR . '/avatars_user/index.php', $custom_avatar_dir . '/index.php');
+						}
+						else
+						{
+							@unlink(BOARDDIR . '/avatars_user/index.php');
+						}
+
+						// Attempt to delete the default directory to avoid confusion
+						@rmdir(BOARDDIR . '/avatars_user');
+					}
+
+					// Find and move
+					// @todo should this be done in a loop? Of course, but how?
+					$request = $this->db->query('', '
+						SELECT 
+							id_attach, id_folder, id_member, filename, file_hash
+						FROM {db_prefix}attachments
+						WHERE attachment_type = {int:attachment_type}
+							AND id_member > {int:guest_id_member}',
+						array(
+							'attachment_type' => 0,
+							'guest_id_member' => 0,
+						)
+					);
+					require_once(SUBSDIR . '/Attachments.subs.php');
+					$updatedAvatars = [];
+					while ($row = $this->db->fetch_assoc($request))
+					{
+						$filename = getAttachmentFilename($row['filename'], $row['id_attach'], $row['id_folder'], false, $row['file_hash']);
+
+						if (@rename($filename, $custom_avatar_dir . '/' . $row['filename']))
+						{
+							$updatedAvatars[] = $row['id_attach'];
+						}
+					}
+					$this->db->free_result($request);
+					if (!empty($updatedAvatars))
+					{
+						$this->db->query('', '
+							UPDATE {db_prefix}attachments
+							SET 
+								attachment_type = {int:attachment_type},
+								file_hash = ""
+							WHERE id_attach IN ({array_int:updated_avatars})',
+							array(
+								'updated_avatars' => $updatedAvatars,
+								'attachment_type' => 1,
+							)
+						);
+					}
+				}
+			)
 		);
 	}
 }

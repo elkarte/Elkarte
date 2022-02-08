@@ -6,7 +6,7 @@
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause (see accompanying LICENSE.txt file)
  *
  * This file contains code covered by:
- * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * copyright: 2011 Simple Machines (http://www.simplemachines.org)
  *
  * @version 2.0 dev
  *
@@ -19,9 +19,14 @@ use ElkArte\User;
  */
 class Install_Controller
 {
+	/** @var array The installation steps*/
 	public $steps = array();
+	/** @var int Are we there yet? */
 	public $overall_percent = 0;
 
+	/**
+	 * Let's get this installation rolling
+	 */
 	public function __construct()
 	{
 		global $txt;
@@ -40,6 +45,12 @@ class Install_Controller
 		);
 	}
 
+	/**
+	 * Dispatch to the proper method, the current installation step
+	 *
+	 * @param $current_step
+	 * @return int
+	 */
 	public function dispatch($current_step)
 	{
 		global $incontext;
@@ -54,13 +65,16 @@ class Install_Controller
 
 				// Call the step and if it returns false that means pause!
 				if ($this->{$step[2]}() === false)
+				{
 					break;
-				else
-					$current_step++;
+				}
+
+				$current_step++;
 
 				// No warnings pass on.
 				$incontext['warning'] = '';
 			}
+
 			$this->overall_percent += $step[3];
 		}
 
@@ -81,7 +95,9 @@ class Install_Controller
 
 		// Done the submission?
 		if (isset($_POST['contbutt']))
+		{
 			return true;
+		}
 
 		// Check the PHP version.
 		if (version_compare(REQUIRED_PHP_VERSION, PHP_VERSION, '>'))
@@ -96,29 +112,37 @@ class Install_Controller
 			foreach (file(TMP_BOARDDIR . '/Settings.php') as $line)
 			{
 				if (preg_match('~^\$boarddir\s=\s\'([^\']+)\';$~', $line))
+				{
 					$probably_installed++;
+				}
+
 				if (preg_match('~^\$boardurl\s=\s\'([^\']+)\';~', $line) && !preg_match('~^\$boardurl\s=\s\'http://127\.0\.0\.1/elkarte\';~', $line))
+				{
 					$probably_installed++;
+				}
 			}
 
-			if ($probably_installed == 2)
-				$incontext['warning'] = str_replace('{try_delete}', '
-		<div id="delete_label" style="font-weight: bold; display: none">
-			<label for="delete_self"><input type="checkbox" id="delete_self" onclick="doTheDelete();" class="input_check" /> ' . $txt['delete_installer'] . (!isset($_SESSION['installer_temp_ftp']) ? ' ' . $txt['delete_installer_maybe'] : '') . '</label>
-		<script>
-			function doTheDelete()
+			if ($probably_installed === 2)
 			{
-				var theCheck = document.getElementById ? document.getElementById("delete_self") : document.all.delete_self,
-					tempImage = new Image();
-
-				tempImage.src = "' . $installurl . '?delete=1&ts_" + (new Date().getTime());
-				tempImage.width = 0;
-				theCheck.disabled = true;
-				window.location.href = elk_scripturl;
-			}
-			document.getElementById(\'delete_label\').style.display = \'block\';
-		</script>
+				$incontext['warning'] = str_replace('{try_delete}', '
+		<div id="delete_label" class="hide bbc_strong">
+			<label for="delete_self">
+			<input type="checkbox" id="delete_self" onclick="doTheDelete();" class="input_check" /> ' . $txt['delete_installer'] . (!isset($_SESSION['installer_temp_ftp']) ? ' ' . $txt['delete_installer_maybe'] : '') . '</label>
+			<script>
+				function doTheDelete()
+				{
+					let theCheck = document.getElementById ? document.getElementById("delete_self") : document.all.delete_self,
+						tempImage = new Image();
+	
+					tempImage.src = "' . $installurl . '?delete=1&ts_" + (new Date().getTime());
+					tempImage.width = 0;
+					theCheck.disabled = true;
+					window.location.href = elk_scripturl;
+				}
+				document.getElementById(\'delete_label\').classList.remove(\'hide\');
+			</script>
 		</div>', $txt['error_already_installed']);
+			}
 		}
 
 		// If there is no Settings.php then we need a new one that only the owner can provide
@@ -147,31 +171,47 @@ class Install_Controller
 				}
 			}
 			else
+			{
 				$db_missing[] = $db['extension'];
+			}
 		}
 
 		if (count($db_missing) === count($databases))
+		{
 			$incontext['error'] = sprintf($txt['error_db_missing'], implode(', ', $db_missing));
+		}
 		elseif (empty($incontext['supported_databases']))
+		{
 			$error = empty($notFoundSQLFile) ? 'error_db_missing' : 'error_db_script_missing';
+		}
 		// How about session support?  Some crazy sysadmin remove it?
 		elseif (!function_exists('session_start'))
+		{
 			$error = 'error_session_missing';
+		}
 		// Make sure they uploaded all the files.
 		elseif (!file_exists(TMP_BOARDDIR . '/index.php'))
+		{
 			$error = 'error_missing_files';
+		}
 		// Very simple check on the session.save_path for Windows.
 		// @todo Move this down later if they don't use database-driven sessions?
 		elseif (@ini_get('session.save_path') == '/tmp' && substr(__FILE__, 1, 2) == ':\\')
+		{
 			$error = 'error_session_save_path';
+		}
 
 		// Since each of the three messages would look the same, anyway...
 		if (isset($error))
+		{
 			$incontext['error'] = $txt[$error];
+		}
 
 		// Mod_security blocks everything that smells funny. Let us handle security.
 		if (!fixModSecurity() && !isset($_GET['overmodsecurity']))
+		{
 			$incontext['error'] = $txt['error_mod_security'] . '<br /><br /><a href="' . $installurl . '?overmodsecurity=true">' . $txt['error_message_click'] . '</a> ' . $txt['error_message_bad_try_again'];
+		}
 
 		return false;
 	}
@@ -200,20 +240,26 @@ class Install_Controller
 			if (!file_exists(TMP_BOARDDIR . '/' . $file))
 			{
 				// Silenced because the source file may or may not exist
-				@rename (TMP_BOARDDIR. '/' . $orig, TMP_BOARDDIR . '/' . $file);
+				@rename(TMP_BOARDDIR . '/' . $orig, TMP_BOARDDIR . '/' . $file);
 
 				// If it still doesn't exist, add it to the missing list
 				if (!file_exists(TMP_BOARDDIR . '/' . $file))
+				{
 					$missing_files[$orig] = $file;
+				}
 			}
 		}
 
 		if (empty($missing_files))
+		{
 			return true;
+		}
 
 		$rename_array = array();
 		foreach ($missing_files as $orig => $file)
+		{
 			$rename_array[] = '<li>' . $orig . ' => ' . $file . '</li>';
+		}
 
 		$incontext['error'] = sprintf($txt['error_settings_do_not_exist'], implode(', ', $missing_files), implode('', $rename_array));
 
@@ -232,6 +278,8 @@ class Install_Controller
 		$incontext['page_title'] = $txt['ftp_checking_writable'];
 		$incontext['sub_template'] = 'chmod_files';
 
+		$extra_files= [];
+
 		$writable_files = array(
 			'attachments',
 			'avatars',
@@ -245,11 +293,15 @@ class Install_Controller
 			'Settings_bak.php'
 		);
 		foreach ($incontext['detected_languages'] as $lang => $temp)
+		{
 			$extra_files[] = 'sources/ElkArte/Languages/Install/' . $lang;
+		}
 
 		// With mod_security installed, we could attempt to fix it with .htaccess.
 		if (function_exists('apache_get_modules') && in_array('mod_security', apache_get_modules()))
+		{
 			$writable_files[] = file_exists(TMP_BOARDDIR . '/.htaccess') ? '.htaccess' : '.';
+		}
 
 		$failed_files = array();
 
@@ -264,11 +316,15 @@ class Install_Controller
 
 					// Well, 755 hopefully worked... if not, try 777.
 					if (!is_writable(TMP_BOARDDIR . '/' . $file) && !@chmod(TMP_BOARDDIR . '/' . $file, 0777))
+					{
 						$failed_files[] = $file;
+					}
 				}
 			}
 			foreach ($extra_files as $file)
+			{
 				@chmod(TMP_BOARDDIR . (empty($file) ? '' : '/' . $file), 0777);
+			}
 		}
 		// Windows is trickier.  Let's try opening for r+...
 		else
@@ -277,7 +333,9 @@ class Install_Controller
 			{
 				// Folders can't be opened for write... but the index.php in them can ;)
 				if (is_dir(TMP_BOARDDIR . '/' . $file))
+				{
 					$file .= '/index.php';
+				}
 
 				// Funny enough, chmod actually does do something on windows - it removes the read only attribute.
 				@chmod(TMP_BOARDDIR . '/' . $file, 0777);
@@ -285,21 +343,29 @@ class Install_Controller
 
 				// Hmm, okay, try just for write in that case...
 				if (!is_resource($fp))
+				{
 					$fp = @fopen(TMP_BOARDDIR . '/' . $file, 'w');
+				}
 
 				if (!is_resource($fp))
+				{
 					$failed_files[] = $file;
+				}
 
 				@fclose($fp);
 			}
 			foreach ($extra_files as $file)
+			{
 				@chmod(TMP_BOARDDIR . (empty($file) ? '' : '/' . $file), 0777);
+			}
 		}
 
 		$failure = count($failed_files) >= 1;
 
 		if (!isset($_SERVER))
+		{
 			return !$failure;
+		}
 
 		// Put the list into context.
 		$incontext['failed_files'] = $failed_files;
@@ -348,25 +414,33 @@ class Install_Controller
 			if (!isset($ftp) || $ftp->error !== false)
 			{
 				if (!isset($ftp))
+				{
 					$ftp = new Ftp_Connection(null);
+				}
 				// Save the error so we can mess with listing...
 				elseif ($ftp->error !== false && empty($incontext['ftp_errors']) && !empty($ftp->last_message))
+				{
 					$incontext['ftp_errors'][] = $ftp->last_message;
+				}
 
 				list ($username, $detect_path, $found_path) = $ftp->detect_path(TMP_BOARDDIR);
 
 				if (empty($_POST['ftp_path']) && $found_path)
+				{
 					$_POST['ftp_path'] = $detect_path;
+				}
 
 				if (!isset($_POST['ftp_username']))
+				{
 					$_POST['ftp_username'] = $username;
+				}
 
 				// Set the username etc, into context.
 				$incontext['ftp'] = array(
-					'server' => isset($_POST['ftp_server']) ? $_POST['ftp_server'] : 'localhost',
-					'port' => isset($_POST['ftp_port']) ? $_POST['ftp_port'] : '21',
-					'username' => isset($_POST['ftp_username']) ? $_POST['ftp_username'] : '',
-					'path' => isset($_POST['ftp_path']) ? $_POST['ftp_path'] : '/',
+					'server' => $_POST['ftp_server'] ?? 'localhost',
+					'port' => $_POST['ftp_port'] ?? '21',
+					'username' => $_POST['ftp_username'] ?? '',
+					'path' => $_POST['ftp_path'] ?? '/',
 					'path_msg' => !empty($found_path) ? $txt['ftp_path_found_info'] : $txt['ftp_path_info'],
 				);
 
@@ -387,9 +461,13 @@ class Install_Controller
 				foreach ($failed_files as $file)
 				{
 					if (!is_writable(TMP_BOARDDIR . '/' . $file))
+					{
 						$ftp->chmod($file, 0755);
+					}
 					if (!is_writable(TMP_BOARDDIR . '/' . $file))
+					{
 						$ftp->chmod($file, 0777);
+					}
 					if (!is_writable(TMP_BOARDDIR . '/' . $file))
 					{
 						$failed_files_updated[] = $file;
@@ -459,9 +537,13 @@ class Install_Controller
 						$incontext['db']['name'] = ini_get($db['default_user']);
 					}
 					if (isset($db['default_password']))
+					{
 						$incontext['db']['pass'] = ini_get($db['default_password']);
+					}
 					if (isset($db['default_port']))
+					{
 						$db_port = ini_get($db['default_port']);
+					}
 
 					$incontext['db']['type'] = $key;
 					$foundOne = true;
@@ -492,6 +574,7 @@ class Install_Controller
 				if (trim($_POST['db_filename']) == '')
 				{
 					$incontext['error'] = $txt['error_db_filename'];
+
 					return false;
 				}
 
@@ -499,6 +582,7 @@ class Install_Controller
 				if (file_exists($_POST['db_filename'] . (substr($_POST['db_filename'], -3) != '.db' ? '.db' : '')))
 				{
 					$incontext['error'] = $txt['error_db_filename_exists'];
+
 					return false;
 				}
 			}
@@ -512,6 +596,7 @@ class Install_Controller
 			if ($valid_prefix !== true)
 			{
 				$incontext['error'] = $valid_prefix;
+
 				return false;
 			}
 
@@ -520,7 +605,7 @@ class Install_Controller
 				'db_type' => $db_type,
 				'db_name' => $_POST['db_name'],
 				'db_user' => $_POST['db_user'],
-				'db_passwd' => isset($_POST['db_passwd']) ? $_POST['db_passwd'] : '',
+				'db_passwd' => $_POST['db_passwd'] ?? '',
 				'db_server' => $_POST['db_server'],
 				'db_port' => !empty($_POST['db_port']) ? $_POST['db_port'] : '',
 				'db_prefix' => $db_prefix,
@@ -532,6 +617,7 @@ class Install_Controller
 			if (!updateSettingsFile($vars))
 			{
 				$incontext['error'] = $txt['settings_error'];
+
 				return false;
 			}
 
@@ -539,7 +625,9 @@ class Install_Controller
 			require(TMP_BOARDDIR . '/Settings.php');
 
 			if (!defined('SOURCEDIR'))
+			{
 				define('SOURCEDIR', TMP_BOARDDIR . '/sources');
+			}
 
 			require_once(EXTDIR . '/ClassLoader.php');
 
@@ -557,6 +645,7 @@ class Install_Controller
 			if (!class_exists($class))
 			{
 				$incontext['error'] = sprintf($txt['error_db_file'], $class . '\\Connection.php');
+
 				return false;
 			}
 
@@ -570,13 +659,11 @@ class Install_Controller
 			$db = test_db_connection();
 
 			// No dice?  Let's try adding the prefix they specified, just in case they misread the instructions ;)
-			if ($db === null)
+			if ($db === null || $db === false)
 			{
-				$db_error = $db->last_error();
-
 				$db_user = $_POST['db_prefix'] . $db_user;
 				$db = test_db_connection(true);
-				if ($db !== null)
+				if ($db !== null && $db !== false)
 				{
 					$db_user = $_POST['db_prefix'] . $db_user;
 					updateSettingsFile(array('db_user' => $db_user));
@@ -584,9 +671,10 @@ class Install_Controller
 			}
 
 			// Still no connection?  Big fat error message :P.
-			if (!$db)
+			if (empty($db))
 			{
-				$incontext['error'] = $txt['error_db_connect'] . '<div style="margin: 2.5ex; font-family: monospace;"><strong>' . $db_error . '</strong></div>';
+				$incontext['error'] = $txt['error_db_connect'];
+
 				return false;
 			}
 
@@ -599,6 +687,7 @@ class Install_Controller
 			if (!db_version_check($db))
 			{
 				$incontext['error'] = $txt['error_db_too_low'];
+
 				return false;
 			}
 
@@ -635,6 +724,7 @@ class Install_Controller
 				if (!$db->select_db($db_name))
 				{
 					$incontext['error'] = sprintf($txt['error_db_database'], $db_name);
+
 					return false;
 				}
 				$db_connection = load_database();
@@ -658,13 +748,17 @@ class Install_Controller
 
 		// Let's see if we got the database type correct.
 		if (isset($_POST['db_type'], $databases[$_POST['db_type']]))
+		{
 			$db_type = $_POST['db_type'];
+		}
 
 		// Else we'd better be able to get the connection.
 		else
+		{
 			load_database();
+		}
 
-		$db_type = isset($_POST['db_type']) ? $_POST['db_type'] : $db_type;
+		$db_type = $_POST['db_type'] ?? $db_type;
 
 		// What host and port are we on?
 		$host = empty($_SERVER['HTTP_HOST']) ? $_SERVER['SERVER_NAME'] . (empty($_SERVER['SERVER_PORT']) || $_SERVER['SERVER_PORT'] == '80' ? '' : ':' . $_SERVER['SERVER_PORT']) : $_SERVER['HTTP_HOST'];
@@ -680,12 +774,18 @@ class Install_Controller
 		if (isset($_POST['boardurl']))
 		{
 			if (substr($_POST['boardurl'], -10) == '/index.php')
+			{
 				$_POST['boardurl'] = substr($_POST['boardurl'], 0, -10);
+			}
 			elseif (substr($_POST['boardurl'], -1) == '/')
+			{
 				$_POST['boardurl'] = substr($_POST['boardurl'], 0, -1);
+			}
 
 			if (substr($_POST['boardurl'], 0, 7) != 'http://' && substr($_POST['boardurl'], 0, 7) != 'file://' && substr($_POST['boardurl'], 0, 8) != 'https://')
+			{
 				$_POST['boardurl'] = 'http://' . $_POST['boardurl'];
+			}
 
 			// Save these variables.
 			$vars = array(
@@ -702,6 +802,7 @@ class Install_Controller
 			if (!updateSettingsFile($vars))
 			{
 				$incontext['error'] = $txt['settings_error'];
+
 				return false;
 			}
 
@@ -733,7 +834,9 @@ class Install_Controller
 
 		// Already done?
 		if (isset($_POST['pop_done']))
+		{
 			return true;
+		}
 
 		// Reload settings.
 		require(TMP_BOARDDIR . '/Settings.php');
@@ -754,24 +857,28 @@ class Install_Controller
 		$modSettings = array();
 		if ($result->hasResults())
 		{
-			while ($row = $db->fetch_assoc($result))
+			while ($row = $result->fetch_assoc())
+			{
 				$modSettings[$row['variable']] = $row['value'];
-			$db->free_result($result);
+			}
+			$result->free_result();
 
 			// Do they match?  If so, this is just a refresh so charge on!
 			if (!isset($modSettings['elkVersion']) || $modSettings['elkVersion'] != CURRENT_VERSION)
 			{
 				$incontext['error'] = $txt['error_versions_do_not_match'];
+
 				return false;
 			}
 		}
+
 		$modSettings['disableQueryCheck'] = true;
 		$modSettings['time_offset'] = empty($modSettings['time_offset']) ? 0 : $modSettings['time_offset'];
 
 		// Since we are UTF8, select it. PostgreSQL requires passing it as a string...
 		$db->skip_next_error();
 		$db->query('', '
-			SET NAMES {'. ($db_type == 'postgresql' ? 'string' : 'raw') . ':utf8}',
+			SET NAMES {' . ($db_type == 'postgresql' ? 'string' : 'raw') . ':utf8}',
 			array(
 				'utf8' => 'utf8',
 			)
@@ -791,7 +898,9 @@ class Install_Controller
 		foreach ($txt as $key => $value)
 		{
 			if (substr($key, 0, 8) == 'default_')
+			{
 				$replaces['{$' . $key . '}'] = $value;
+			}
 		}
 		$replaces['{$default_reserved_names}'] = strtr($replaces['{$default_reserved_names}'], array('\\\\n' => '\\n'));
 
@@ -807,11 +916,11 @@ class Install_Controller
 
 		if (!empty($databases[$db_type]['additional_file']))
 		{
-			parse_sqlLines(__DIR__ . '/' . $databases[$db_type]['additional_file'], $replaces);
+			parseSqlLines(__DIR__ . '/' . $databases[$db_type]['additional_file'], $replaces);
 		}
 
 		// Read in the SQL.  Turn this on and that off... internationalize... etc.
-		parse_sqlLines(__DIR__ . '/install_' . DB_SCRIPT_VERSION . '.php', $replaces);
+		parseSqlLines(__DIR__ . '/install_' . DB_SCRIPT_VERSION . '.php', $replaces);
 
 		// Make sure UTF will be used globally.
 		$db->insert('replace',
@@ -848,16 +957,25 @@ class Install_Controller
 
 			// Okay... let's see.  Using a subdomain other than www.? (not a perfect check.)
 			if ($matches[2] != '' && (strpos(substr($matches[2], 1), '.') === false || in_array($matches[1], array('forum', 'board', 'community', 'forums', 'support', 'chat', 'help', 'talk', 'boards', 'www'))))
+			{
 				$globalCookies = true;
+			}
 
 			// If there's a / in the middle of the path, or it starts with ~... we want local.
 			if (isset($matches[3]) && strlen($matches[3]) > 3 && (substr($matches[3], 0, 2) == '/~' || strpos(substr($matches[3], 1), '/') !== false))
+			{
 				$localCookies = true;
+			}
 
 			if ($globalCookies)
+			{
 				$rows[] = array('globalCookies', '1');
+			}
+
 			if ($localCookies)
+			{
 				$rows[] = array('localCookies', '1');
+			}
 
 			if (!empty($rows))
 			{
@@ -870,12 +988,13 @@ class Install_Controller
 			}
 		}
 
-		// As of PHP 5.1, setting a timezone is required.
+		// Setting a timezone is required.
 		if (!isset($modSettings['default_timezone']))
 		{
 			$server_offset = mktime(0, 0, 0, 1, 1, 1970);
 			$timezone_id = 'Etc/GMT' . ($server_offset > 0 ? '+' : '') . ($server_offset / 3600);
 			if (date_default_timezone_set($timezone_id))
+			{
 				$db->insert('',
 					$db_prefix . 'settings',
 					array(
@@ -886,6 +1005,7 @@ class Install_Controller
 					),
 					array('variable')
 				);
+			}
 		}
 
 		// Let's optimize those new tables.
@@ -905,14 +1025,15 @@ class Install_Controller
 		$cannot_alter_table = $db->query('', "
 			ALTER TABLE {$db_prefix}log_digest
 			ORDER BY id_topic",
-			array(
-				'security_override' => true
-			)
-		)->getResultObject() === false;
+				array(
+					'security_override' => true
+				)
+			)->getResultObject() === false;
 
 		if (!empty($databases[$db_type]['alter_support']) && $cannot_alter_table)
 		{
 			$incontext['error'] = $txt['error_db_alter_priv'];
+
 			return false;
 		}
 
@@ -941,7 +1062,9 @@ class Install_Controller
 		// Need this to check whether we need the database password.
 		require(TMP_BOARDDIR . '/Settings.php');
 		if (!defined('ELK'))
+		{
 			define('ELK', 1);
+		}
 		definePaths();
 
 		// These files may be or may not be already included, better safe than sorry for now
@@ -950,33 +1073,38 @@ class Install_Controller
 		$db = load_database();
 
 		if (!isset($_POST['username']))
+		{
 			$_POST['username'] = '';
+		}
+
 		if (!isset($_POST['email']))
+		{
 			$_POST['email'] = '';
+		}
 
 		$incontext['username'] = htmlspecialchars(stripslashes($_POST['username']), ENT_COMPAT, 'UTF-8');
 		$incontext['email'] = htmlspecialchars(stripslashes($_POST['email']), ENT_COMPAT, 'UTF-8');
-
 		$incontext['require_db_confirm'] = empty($db_type) || !empty($databases[$db_type]['require_db_confirm']);
 
-		$db->skip_next_error();
 		// Only allow create an admin account if they don't have one already.
+		$db->skip_next_error();
 		$request = $db->query('', '
-			SELECT id_member
+			SELECT 
+				id_member
 			FROM {db_prefix}members
-			WHERE id_group = {int:admin_group} OR FIND_IN_SET({int:admin_group}, additional_groups) != 0
+			WHERE id_group = {int:admin_group} 
+				OR FIND_IN_SET({int:admin_group}, additional_groups) != 0
 			LIMIT 1',
 			array(
 				'admin_group' => 1,
 			)
 		);
-
 		// Skip the step if an admin already exists
-		if ($db->num_rows($request) != 0)
+		if ($request->num_rows() != 0)
 		{
 			return true;
 		}
-		$db->free_result($request);
+		$request->free_result();
 
 		// Trying to create an account?
 		if (isset($_POST['password1']) && !empty($_POST['contbutt']))
@@ -985,6 +1113,7 @@ class Install_Controller
 			if ($incontext['require_db_confirm'] && $_POST['password3'] != $db_passwd)
 			{
 				$incontext['error'] = $txt['error_db_connect'];
+
 				return false;
 			}
 
@@ -992,6 +1121,7 @@ class Install_Controller
 			if ($_POST['password1'] != $_POST['password2'])
 			{
 				$incontext['error'] = $txt['error_user_settings_again_match'];
+
 				return false;
 			}
 
@@ -999,18 +1129,22 @@ class Install_Controller
 			if (strlen($_POST['password1']) < 4)
 			{
 				$incontext['error'] = $txt['error_user_settings_no_password'];
+
 				return false;
 			}
 
 			if (!file_exists(SOURCEDIR . '/Subs.php'))
 			{
 				$incontext['error'] = $txt['error_subs_missing'];
+
 				return false;
 			}
 
 			// Update the main contact email?
 			if (!empty($_POST['email']) && (empty($webmaster_email) || $webmaster_email == 'noreply@myserver.com'))
+			{
 				updateSettingsFile(array('webmaster_email' => $_POST['email']));
+			}
 
 			// Work out whether we're going to have dodgy characters and remove them.
 			$invalid_characters = preg_match('~[<>&"\'=\\\]~', $_POST['username']) != 0;
@@ -1018,88 +1152,97 @@ class Install_Controller
 
 			$db->skip_next_error();
 			$result = $db->query('', '
-				SELECT id_member, password_salt
+				SELECT 
+					id_member, password_salt
 				FROM {db_prefix}members
-				WHERE member_name = {string:username} OR email_address = {string:email}
+				WHERE member_name = {string:username} 
+					OR email_address = {string:email}
 				LIMIT 1',
 				array(
 					'username' => stripslashes($_POST['username']),
 					'email' => stripslashes($_POST['email']),
 				)
 			);
-
-			if ($db->num_rows($result) != 0)
+			if ($result->num_rows() != 0)
 			{
-				list ($incontext['member_id'], $incontext['member_salt']) = $db->fetch_row($result);
-				$db->free_result($result);
+				list ($incontext['member_id'], $incontext['member_salt']) = $result->fetch_row();
+				$result->free_result();
 
 				$incontext['account_existed'] = $txt['error_user_settings_taken'];
+
+				return true;
 			}
-			elseif ($_POST['username'] == '' || strlen($_POST['username']) > 25)
+
+			if (trim($_POST['username']) === '' || strlen($_POST['username']) > 25)
 			{
 				// Try the previous step again.
 				$incontext['error'] = $_POST['username'] == '' ? $txt['error_username_left_empty'] : $txt['error_username_too_long'];
+
 				return false;
 			}
-			elseif ($invalid_characters || $_POST['username'] == '_' || $_POST['username'] == '|' || strpos($_POST['username'], '[code') !== false || strpos($_POST['username'], '[/code') !== false)
+
+			if ($invalid_characters || $_POST['username'] == '_' || $_POST['username'] == '|' || strpos($_POST['username'], '[code') !== false || strpos($_POST['username'], '[/code') !== false)
 			{
 				// Try the previous step again.
 				$incontext['error'] = $txt['error_invalid_characters_username'];
+
 				return false;
 			}
-			elseif (empty($_POST['email']) || !filter_var(stripslashes($_POST['email']), FILTER_VALIDATE_EMAIL) || strlen(stripslashes($_POST['email'])) > 255)
+
+			if (empty($_POST['email']) || !filter_var(stripslashes($_POST['email']), FILTER_VALIDATE_EMAIL) || strlen(stripslashes($_POST['email'])) > 255)
 			{
 				// One step back, this time fill out a proper email address.
 				$incontext['error'] = sprintf($txt['error_valid_email_needed'], $_POST['username']);
+
 				return false;
 			}
-			elseif ($_POST['username'] != '')
+
+			// All clear, lets add an admin
+			require_once(SUBSDIR . '/Auth.subs.php');
+
+			$incontext['member_salt'] = substr(base64_encode(sha1(mt_rand() . microtime(), true)), 0, 16);
+
+			// Format the username properly.
+			$_POST['username'] = preg_replace('~[\t\n\r\x0B\0\xA0]+~', ' ', $_POST['username']);
+			$ip = isset($_SERVER['REMOTE_ADDR']) ? substr($_SERVER['REMOTE_ADDR'], 0, 255) : '';
+
+			// Get a security hash for this combination
+			$password = stripslashes($_POST['password1']);
+			$incontext['passwd'] = validateLoginPassword($password, '', $_POST['username'], true);
+
+			$request = $db->insert('',
+				$db_prefix . 'members',
+				array(
+					'member_name' => 'string-25', 'real_name' => 'string-25', 'passwd' => 'string', 'email_address' => 'string',
+					'id_group' => 'int', 'posts' => 'int', 'date_registered' => 'int', 'hide_email' => 'int',
+					'password_salt' => 'string', 'lngfile' => 'string', 'avatar' => 'string',
+					'member_ip' => 'string', 'member_ip2' => 'string', 'buddy_list' => 'string', 'pm_ignore_list' => 'string',
+					'message_labels' => 'string', 'website_title' => 'string', 'website_url' => 'string',
+					'signature' => 'string', 'usertitle' => 'string', 'secret_question' => 'string',
+					'additional_groups' => 'string', 'ignore_boards' => 'string',
+				),
+				array(
+					stripslashes($_POST['username']), stripslashes($_POST['username']), $incontext['passwd'], stripslashes($_POST['email']),
+					1, 0, time(), 0,
+					$incontext['member_salt'], '', '',
+					$ip, $ip, '', '',
+					'', '', '',
+					'', '', '',
+					'', '',
+				),
+				array('id_member')
+			);
+
+			// Awww, crud!
+			if ($request->hasResults() === false)
 			{
-				require_once(SUBSDIR . '/Auth.subs.php');
+				$incontext['error'] = $txt['error_user_settings_query'] . '<br />
+				<div style="margin: 2ex;">' . nl2br(htmlspecialchars($db->last_error($db_connection), ENT_COMPAT, 'UTF-8')) . '</div>';
 
-				$incontext['member_salt'] = substr(base64_encode(sha1(mt_rand() . microtime(), true)), 0, 16);
-
-				// Format the username properly.
-				$_POST['username'] = preg_replace('~[\t\n\r\x0B\0\xA0]+~', ' ', $_POST['username']);
-				$ip = isset($_SERVER['REMOTE_ADDR']) ? substr($_SERVER['REMOTE_ADDR'], 0, 255) : '';
-
-				// Get a security hash for this combination
-				$password = stripslashes($_POST['password1']);
-				$incontext['passwd'] = validateLoginPassword($password, '', $_POST['username'], true);
-
-				$request = $db->insert('',
-					$db_prefix . 'members',
-					array(
-						'member_name' => 'string-25', 'real_name' => 'string-25', 'passwd' => 'string', 'email_address' => 'string',
-						'id_group' => 'int', 'posts' => 'int', 'date_registered' => 'int', 'hide_email' => 'int',
-						'password_salt' => 'string', 'lngfile' => 'string', 'avatar' => 'string',
-						'member_ip' => 'string', 'member_ip2' => 'string', 'buddy_list' => 'string', 'pm_ignore_list' => 'string',
-						'message_labels' => 'string', 'website_title' => 'string', 'website_url' => 'string',
-						'signature' => 'string', 'usertitle' => 'string', 'secret_question' => 'string',
-						'additional_groups' => 'string', 'ignore_boards' => 'string',
-					),
-					array(
-						stripslashes($_POST['username']), stripslashes($_POST['username']), $incontext['passwd'], stripslashes($_POST['email']),
-						1, 0, time(), 0,
-						$incontext['member_salt'], '', '',
-						$ip, $ip, '', '',
-						'', '', '',
-						'', '', '',
-						'', '',
-					),
-					array('id_member')
-				);
-
-				// Awww, crud!
-				if ($request->hasResults() === false)
-				{
-					$incontext['error'] = $txt['error_user_settings_query'] . '<br />
-					<div style="margin: 2ex;">' . nl2br(htmlspecialchars($db->last_error($db_connection), ENT_COMPAT, 'UTF-8')) . '</div>';
-					return false;
-				}
-
-				$incontext['member_id'] = $db->insert_id("{$db_prefix}members", 'id_member');
+				return false;
 			}
+
+			$incontext['member_id'] = $db->insert_id("{$db_prefix}members", 'id_member');
 
 			// If we're here we're good.
 			return true;
@@ -1116,7 +1259,7 @@ class Install_Controller
 		global $txt, $incontext, $db_character_set;
 		global $databases, $modSettings, $db_type;
 
-		// A few items we will load in from settings and make avaialble.
+		// A few items we will load in from settings and make available.
 		global $boardurl, $db_prefix, $cookiename, $mbname, $language;
 
 		$incontext['page_title'] = $txt['congratulations'];
@@ -1125,13 +1268,17 @@ class Install_Controller
 
 		require(TMP_BOARDDIR . '/Settings.php');
 		if (!defined('ELK'))
+		{
 			define('ELK', 1);
-		definePaths();
+		}
 
+		definePaths();
 		$db = load_database();
 
 		if (!defined('SUBSDIR'))
+		{
 			define('SUBSDIR', TMP_BOARDDIR . '/sources/subs');
+		}
 
 		chdir(TMP_BOARDDIR);
 
@@ -1158,15 +1305,14 @@ class Install_Controller
 		$db->skip_next_error();
 		$db->query('', '
 			SET NAMES UTF8',
-			array(
-			)
+			array()
 		);
 
 		// As track stats is by default enabled let's add some activity.
 		$db->insert('ignore',
 			'{db_prefix}log_activity',
 			array('date' => 'date', 'topics' => 'int', 'posts' => 'int', 'registers' => 'int'),
-			array(Util::strftime('%Y-%m-%d', time()), 1, 1, (!empty($incontext['member_id']) ? 1 : 0)),
+			array(\ElkArte\Util::strftime('%Y-%m-%d', time()), 1, 1, (!empty($incontext['member_id']) ? 1 : 0)),
 			array('date')
 		);
 
@@ -1174,43 +1320,46 @@ class Install_Controller
 		// upgrade when pointing to index.php and the install directory is still there.
 		updateSettingsFile(array('install_time' => time()));
 
-		$db->skip_next_error();
 		// We're going to want our lovely $modSettings now.
-		$request = $db->query('', '
-			SELECT variable, value
+		$db->skip_next_error();
+		$request = $db->fetchQuery('
+			SELECT 
+				variable, value
 			FROM {db_prefix}settings',
 			array()
+		)->fetch_callback(
+			function ($row) use (&$modSettings) {
+				// Only proceed if we can load the data.
+				$modSettings[$row['variable']] = $row['value'];
+			}
 		);
-		// Only proceed if we can load the data.
-		if ($request)
-		{
-			while ($row = $db->fetch_row($request))
-				$modSettings[$row[0]] = $row[1];
-			$db->free_result($request);
-		}
 
 		// Automatically log them in ;)
 		if (isset($incontext['member_id']) && isset($incontext['member_salt']))
+		{
 			setLoginCookie(3153600 * 60, $incontext['member_id'], hash('sha256', $incontext['passwd'] . $incontext['member_salt']));
+		}
 
 		$db->skip_next_error();
 		$result = $db->query('', '
-			SELECT value
+			SELECT 
+				value
 			FROM {db_prefix}settings
 			WHERE variable = {string:db_sessions}',
 			array(
 				'db_sessions' => 'databaseSession_enable',
 			)
 		);
-
-		if ($db->num_rows($result) != 0)
+		if ($result->num_rows() != 0)
 		{
-			list ($db_sessions) = $db->fetch_row($result);
+			list ($db_sessions) = $result->fetch_row();
 		}
-		$db->free_result($result);
+		$result->free_result();
 
 		if (empty($db_sessions))
+		{
 			$_SESSION['admin_time'] = time();
+		}
 		else
 		{
 			$_SERVER['HTTP_USER_AGENT'] = substr($_SERVER['HTTP_USER_AGENT'], 0, 211);
@@ -1228,27 +1377,29 @@ class Install_Controller
 		}
 
 		require_once(SUBSDIR . '/Members.subs.php');
-		require_once(SUBSDIR . '/Messages.subs.php');
 		updateMemberStats();
+
+		require_once(SUBSDIR . '/Messages.subs.php');
 		updateMessageStats();
+
 		require_once(SUBSDIR . '/Topic.subs.php');
 		updateTopicStats();
 
 		$db->skip_next_error();
 		$request = $db->query('', '
-			SELECT id_msg
+			SELECT 
+				id_msg
 			FROM {db_prefix}messages
 			WHERE id_msg = 1
 				AND modified_time = 0
 			LIMIT 1',
 			array()
 		);
-
-		if ($db->num_rows($request) > 0)
+		if ($request->num_rows() > 0)
 		{
 			updateSubjectStats(1, htmlspecialchars($txt['default_topic_subject']));
 		}
-		$db->free_result($request);
+		$request->free_result();
 
 		// Sanity check that they loaded earlier!
 		if (isset($modSettings['recycle_board']))
@@ -1257,8 +1408,10 @@ class Install_Controller
 			$forum_version = CURRENT_VERSION;
 
 			// We've just installed!
+			User::load(true);
 			User::$info->ip = $_SERVER['REMOTE_ADDR'];
-			User::$info->id = isset($incontext['member_id']) ? $incontext['member_id'] : 0;
+			User::$info->id = $incontext['member_id'] ?? 0;
+
 			logAction('install', array('version' => $forum_version), 'admin');
 		}
 
