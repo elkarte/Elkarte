@@ -114,26 +114,26 @@ class ModerationCenter extends AbstractController
 						'label' => $txt['moderation_center'],
 						'controller' => '\\ElkArte\\Controller\\ModerationCenter',
 						'function' => 'action_moderationHome',
-						'class' => 'i-home',
+						'class' => 'i-home i-admin',
 					),
 					'settings' => array(
 						'label' => $txt['mc_settings'],
 						'controller' => '\\ElkArte\\Controller\\ModerationCenter',
 						'function' => 'action_moderationSettings',
-						'class' => 'i-switch-on',
+						'class' => 'i-switch-on i-admin',
 					),
 					'modlogoff' => array(
 						'label' => $txt['mc_logoff'],
 						'controller' => '\\ElkArte\\Controller\\ModerationCenter',
 						'function' => 'action_modEndSession',
 						'enabled' => empty($modSettings['securityDisable_moderate']),
-						'class' => 'i-sign-out',
+						'class' => 'i-sign-out i-admin',
 					),
 					'notice' => array(
 						'controller' => '\\ElkArte\\Controller\\ModerationCenter',
 						'function' => 'action_showNotice',
 						'select' => 'index',
-						'class' => 'i-post-text',
+						'class' => 'i-post-text i-admin',
 					),
 				),
 			),
@@ -145,14 +145,14 @@ class ModerationCenter extends AbstractController
 						'enabled' => !empty($modSettings['modlog_enabled']) && $context['can_moderate_boards'],
 						'controller' => '\\ElkArte\\AdminController\\Modlog',
 						'function' => 'action_log',
-						'class' => 'i-comments',
+						'class' => 'i-comments i-admin',
 					),
 					'warnings' => array(
 						'label' => $txt['mc_warnings'],
 						'enabled' => featureEnabled('w') && !empty($modSettings['warning_enable']) && $context['can_moderate_boards'],
 						'controller' => '\\ElkArte\\Controller\\ModerationCenter',
 						'function' => 'action_viewWarnings',
-						'class' => 'i-warn',
+						'class' => 'i-warn i-admin',
 						'subsections' => array(
 							'log' => array($txt['mc_warning_log']),
 							'templates' => array($txt['mc_warning_templates'], 'issue_warning'),
@@ -169,7 +169,7 @@ class ModerationCenter extends AbstractController
 						'enabled' => $context['can_moderate_approvals'],
 						'controller' => '\\ElkArte\\Controller\\PostModeration',
 						'function' => 'action_index',
-						'class' => 'i-post-text',
+						'class' => 'i-post-text i-admin',
 						'custom_url' => getUrl('action', ['action' => 'moderate', 'area' => 'postmod']),
 						'subsections' => array(
 							'posts' => array($txt['mc_unapproved_replies']),
@@ -180,7 +180,7 @@ class ModerationCenter extends AbstractController
 						'label' => $txt['mc_emailerror'] . (!empty($mod_counts['emailmod']) ? ' [' . $mod_counts['emailmod'] . ']' : ''),
 						'enabled' => !empty($modSettings['maillist_enabled']) && allowedTo('approve_emails'),
 						'function' => 'UnapprovedEmails',
-						'class' => 'i-envelope-blank',
+						'class' => 'i-envelope-blank i-admin',
 						'custom_url' => getUrl('action', ['action' => 'moderate', 'area' => 'maillist', 'sa' => 'emaillist']),
 					),
 					'attachmod' => array(
@@ -188,7 +188,7 @@ class ModerationCenter extends AbstractController
 						'enabled' => $context['can_moderate_approvals'],
 						'controller' => '\\ElkArte\\Controller\\PostModeration',
 						'function' => 'action_index',
-						'class' => 'i-paperclip',
+						'class' => 'i-paperclip i-admin',
 						'custom_url' => getUrl('action', ['action' => 'moderate', 'area' => 'attachmod', 'sa' => 'attachments']),
 					),
 					'reports' => array(
@@ -196,7 +196,7 @@ class ModerationCenter extends AbstractController
 						'enabled' => $context['can_moderate_boards'],
 						'controller' => '\\ElkArte\\Controller\\ModerationCenter',
 						'function' => 'action_reportedPosts',
-						'class' => 'i-modify',
+						'class' => 'i-modify i-admin',
 						'subsections' => array(
 							'open' => array($txt['mc_reportedp_active'] . (!empty($mod_counts['reports']) ? ' [' . $mod_counts['reports'] . ']' : '')),
 							'closed' => array($txt['mc_reportedp_closed']),
@@ -207,7 +207,7 @@ class ModerationCenter extends AbstractController
 						'enabled' => $this->user->is_admin,
 						'controller' => '\\ElkArte\\Controller\\ModerationCenter',
 						'function' => 'action_reportedPosts',
-						'class' => 'i-alert',
+						'class' => 'i-alert i-admin',
 						'subsections' => array(
 							'open' => array($txt['mc_reportedp_active']),
 							'closed' => array($txt['mc_reportedp_closed']),
@@ -224,7 +224,7 @@ class ModerationCenter extends AbstractController
 						'enabled' => featureEnabled('w') && !empty($modSettings['warning_enable']) && $context['can_moderate_boards'],
 						'controller' => '\\ElkArte\\Controller\\ModerationCenter',
 						'function' => 'action_viewWatchedUsers',
-						'class' => 'i-user',
+						'class' => 'i-user i-admin',
 						'subsections' => array(
 							'member' => array($txt['mc_watched_users_member']),
 							'post' => array($txt['mc_watched_users_post']),
@@ -234,7 +234,7 @@ class ModerationCenter extends AbstractController
 						'label' => $txt['mc_group_requests'] . (!empty($mod_counts['groupreq']) ? ' [' . $mod_counts['groupreq'] . ']' : ''),
 						'controller' => '\\ElkArte\\Controller\\Groups',
 						'function' => 'action_index',
-						'class' => 'i-users',
+						'class' => 'i-users i-admin',
 						'custom_url' => getUrl('action', ['action' => 'moderate', 'area' => 'groups', 'sa' => 'requests']),
 					),
 					'members' => array(
@@ -242,14 +242,14 @@ class ModerationCenter extends AbstractController
 						'label' => $txt['mc_member_requests'] . (!empty($mod_counts['memberreq']) ? ' [' . $mod_counts['memberreq'] . ']' : ''),
 						'controller' => '\\ElkArte\\AdminController\\ManageMembers',
 						'function' => 'action_approve',
-						'class' => 'i-user-plus',
+						'class' => 'i-user-plus i-admin',
 						'custom_url' => getUrl('admin', ['action' => 'admin', 'area' => 'viewmembers', 'sa' => 'browse', 'type' => 'approve']),
 					),
 					'viewgroups' => array(
 						'label' => $txt['mc_view_groups'],
 						'controller' => '\\ElkArte\\Controller\\Groups',
 						'function' => 'action_index',
-						'class' => 'i-view',
+						'class' => 'i-view i-admin',
 					),
 				),
 			),
@@ -1941,7 +1941,7 @@ class ModerationCenter extends AbstractController
 				'html_time' => htmlTime($note['log_time']),
 				'timestamp' => forum_time(true, $note['log_time']),
 				'text' => $bbc_parser->parseReport($note['body']),
-				'delete_href' => getUrl('action', ['action' => 'moderate', 'area' => 'index', 'notes' => 'delete=' . $note['id_note'], '{session_data}']),
+				'delete_href' => getUrl('action', ['action' => 'moderate', 'area' => 'index', 'notes' => '', 'delete=' . $note['id_note'], '{session_data}']),
 			);
 		}
 

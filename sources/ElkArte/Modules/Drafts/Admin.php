@@ -50,7 +50,7 @@ class Admin extends AbstractModule
 			'label' => $txt['manage_drafts'],
 			'controller' => '\\ElkArte\\AdminController\\ManageDraftsModule',
 			'function' => 'action_index',
-			'class' => 'i-bookmark i-reset',
+			'class' => 'i-bookmark i-admin',
 			'permission' => array('admin_forum'),
 			'enabled' => featureEnabled('dr'),
 		);
