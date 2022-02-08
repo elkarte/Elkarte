@@ -225,13 +225,13 @@ function toggleMentionsVisibility($type, $enable)
 	$db->query('', '
 		UPDATE {db_prefix}log_mentions
 		SET
-			status = status ' . ($enable ? '-' : '+') . ' {int:toggle}
+			status = status ' . ($enable ? '+' : '-') . ' {int:toggle}
 		WHERE mention_type = {string:type}
-			AND status ' . ($enable ? '>=' : '<') . ' {int:toggle}
+			AND status ' . ($enable ? '<' : '>=') . ' 0
 			AND is_accessible = 0',
 		array(
 			'type' => $type,
-			'toggle' => -10,
+			'toggle' => 10,
 		)
 	);
 }
