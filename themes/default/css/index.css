@@ -1762,7 +1762,7 @@ a.bbc_link {
 	padding: 0 .2em;
 }
 
-buttonlist.rtl {
+.buttonlist.rtl {
 	flex-direction: row-reverse;
 }
 
