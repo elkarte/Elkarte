@@ -1946,7 +1946,7 @@ function loadConversationList($head, &$recipients, $folder = '')
 /**
  * Used to determine if any message in a conversation thread is unread
  *
- * - Returns array of keys with the head id and value details of the the newest
+ * - Returns array of keys with the head id and value details of the newest
  * unread message.
  *
  * @param int[] $pms array of pm ids to search

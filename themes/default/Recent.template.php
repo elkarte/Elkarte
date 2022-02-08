@@ -65,7 +65,7 @@ function template_unread()
 
 	if (!empty($context['topics']))
 	{
-		template_pagesection('recent_buttons', 'right');
+		template_pagesection('recent_buttons');
 
 		if ($context['showCheckboxes'])
 		{
@@ -221,7 +221,7 @@ function template_unread_below()
 
 	if (!empty($context['topics']))
 	{
-		template_pagesection('recent_buttons', 'right');
+		template_pagesection('recent_buttons');
 
 		echo '
 		<div id="topic_icons" class="description">';
