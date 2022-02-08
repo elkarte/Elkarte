@@ -47,14 +47,12 @@ function template_error_log()
 			<h2 class="category_header">
 				<a class="hdicon cat_img_helptopics help" href="', $scripturl, '?action=quickhelp;help=error_log" onclick="return reqOverlayDiv(this.href);" title="', $txt['help'], '"></a> ', $txt['errlog'], '
 			</h2>
-			<div class="flow_auto">
-				<div class="floatleft">';
+			<div class="flow_flex">';
 
 	template_pagesection();
 
 	echo '
-				</div>
-				<div class="submitbutton">
+				<div class="flow_flex_right submitbutton">
 					<input type="submit" name="removeSelection" value="' . $txt['remove_selection'] . '" onclick="return confirm(\'' . $txt['remove_selection_confirm'] . '\');" />
 					<input type="submit" name="delall" value="', $context['has_filter'] ? $txt['remove_filtered_results'] : $txt['remove_all'], '" onclick="return confirm(\'', $context['has_filter'] ? $txt['remove_filtered_results_confirm'] : $txt['sure_about_errorlog_remove'], '\');" />
 				</div>
@@ -176,14 +174,12 @@ function template_error_log()
 					</td>
 				</tr>
 			</table>
-			<div class="flow_auto">
-				<div class="floatleft">';
+			<div class="flow_flex">';
 
 	template_pagesection();
 
 	echo '
-				</div>
-				<div class="submitbutton">
+				<div class="flow_flex_right submitbutton">
 					<input type="submit" name="removeSelection" value="' . $txt['remove_selection'] . '" onclick="return confirm(\'' . $txt['remove_selection_confirm'] . '\');" />
 					<input type="submit" name="delall" value="', $context['has_filter'] ? $txt['remove_filtered_results'] : $txt['remove_all'], '" onclick="return confirm(\'', $context['has_filter'] ? $txt['remove_filtered_results_confirm'] : $txt['sure_about_errorlog_remove'], '\');" />';
 
