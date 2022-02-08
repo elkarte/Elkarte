@@ -209,7 +209,7 @@ function template_watched_users()
  */
 function template_notes()
 {
-	global $settings, $context, $txt, $scripturl;
+	global $context, $txt, $scripturl;
 
 	echo '
 						<form action="', $scripturl, '?action=moderate;area=index" method="post">
@@ -229,7 +229,12 @@ function template_notes()
 		foreach ($context['notes'] as $note)
 		{
 			echo '
-									<li class="smalltext"><a href="', $note['delete_href'], '"><img src="', $settings['images_url'], '/pm_recipient_delete.png" alt="" /></a> <strong>', $note['author']['link'], ':</strong> ', $note['text'], '</li>';
+									<li class="smalltext">
+										<a href="', $note['delete_href'], '">
+											<i class="icon i-delete"></i>
+										</a> 
+										<strong>', $note['author']['link'], ':</strong> ', $note['text'], '
+									</li>';
 		}
 
 		echo '

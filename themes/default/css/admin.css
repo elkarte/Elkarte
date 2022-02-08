@@ -773,6 +773,10 @@ ul.package_servers li {
 	margin-bottom: 0;
 }
 
+#manage_boards ul.nolist:not(:first-child) {
+	margin-left: 2em;
+}
+
 .perms {
 	display: inline-block;
 	width: 20px;
@@ -1051,7 +1055,7 @@ dl.themes_list dd {
 .ui-state-highlight {
 	height: 2em;
 	cursor: move;
-	border: 1px dashed;
+	border: 2px dashed;
 }
 
 /* jQuery Dialog */

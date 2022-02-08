@@ -5577,7 +5577,7 @@ Stef                       ^
 .icon-small {
 	line-height: 1em;
 	width: 1em;
-	height: 1em;
+	height: 100%;
 }
 
 .icon-big {

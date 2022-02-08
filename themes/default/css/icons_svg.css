@@ -92,6 +92,11 @@
 	content: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='black' viewBox='0 0 36 36'%3E%3Cpath d='M15.75 27.268V36L2.25 22.5 15.75 9v8.924C31.456 18.292 30.782 7.244 26.784 0c9.869 10.667 7.773 27.758-11.034 27.268z'/%3E%3C/svg%3E");
 }
 
+/* Recycle Icon */
+.i-recycle::before {
+	content: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='black' viewBox='0 0 36 36'%3E%3Cpath d='m16.795 23.484-.301 7.393-.04.442-8.438-.583c-1.045-.08-1.908-1.065-2.29-1.949-.804-1.868.241-4.078.844-5.866 0 0 1.547.241 10.225.563zM9.02 11.712l3.616 7.614-2.953-1.848c-4.52 5.163-4.942 9-4.942 9L.924 19.306c-.783-1.165-.08-2.431-.08-2.431s.703-1.266 2.29-3.777L.321 11.37zm24.73 10.386-3.777 7.212c-.522 1.306-1.969 1.426-1.969 1.426s-1.426.141-4.4.241l.161 3.295-4.621-7.373 4.239-7.272.141 3.475c6.81.824 10.225-1.004 10.225-1.004zM17.98 3.536s-.944 1.246-5.324 8.739L6.288 8.518l-.382-.241 4.52-7.152C10.989.241 12.254-.08 13.239.02c2.009.181 3.455 2.129 4.741 3.516zm13.158 6.167 4.259 7.292c.542.904.221 2.17-.301 3.013-1.085 1.688-3.496 2.089-5.304 2.592 0 0-.683-1.426-5.324-8.759l6.288-3.917zm-2.872-4.54 2.853-1.667-4.42 7.493-8.417-.402 3.033-1.728C18.904 2.451 15.71.241 15.71.241l8.136.02c1.406-.121 2.17 1.085 2.17 1.085s.783 1.225 2.25 3.817z'/%3E%3C/svg%3E");
+}
+
 /* Direction icons like < >
    i-chevron-up/down, not used with a filter as we need dark stroke and light fill so it can be used
    on both light and dark backgrounds */
@@ -236,6 +241,21 @@
 /* Merging Arrows */
 .i-merge::before {
 	content: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='black' viewBox='0 0 512.203 512.203'%3E%3Cpath d='m501.981 236.116-103.23-74.549c-11.67-8.439-27.992-.097-27.992 14.31v53.742h-97.103V150.17c0-58.403-47.519-105.931-105.931-105.931h-35.31C121.935 18.375 100.255.102 70.621.102 31.62.102 0 31.722 0 70.722c0 39.009 31.62 70.621 70.621 70.621 29.634 0 51.315-18.264 61.793-44.138h35.31c29.21 0 52.966 23.764 52.966 52.966v79.448h-88.276c-10.478-25.865-32.159-44.138-61.793-44.138-39 0-70.621 31.62-70.621 70.621 0 39.009 31.62 70.621 70.621 70.621 29.634 0 51.315-18.264 61.793-44.138h88.276v79.448c0 29.21-23.755 52.966-52.966 52.966h-35.31c-10.478-25.865-32.159-44.138-61.793-44.138-39 0-70.621 31.62-70.621 70.621 0 39.009 31.62 70.621 70.621 70.621 29.634 0 51.315-18.264 61.793-44.138h35.31c58.412 0 105.931-47.519 105.931-105.931v-70.621h97.103v44.924c0 14.398 16.322 22.74 27.992 14.31l103.23-74.549c13.63-9.845 13.63-30.139.001-39.982'/%3E%3C/svg%3E");
+}
+
+/* Down Arrow */
+.i-arrow-down::before {
+	content: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='black' viewBox='0 0 36 36'%3E%3Cpath d='M18 34.875 34.875 18H24.75V0h-13.5v18H1.125z'/%3E%3C/svg%3E");
+}
+
+/* Up Arrow */
+.i-arrow-up::before {
+	content: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='black' viewBox='0 0 36 36'%3E%3Cpath d='M18 1.125 1.125 18H11.25v18h13.5V18h10.125z'/%3E%3C/svg%3E");
+}
+
+/* Forward Arrow */
+.i-arrow-forward::before {
+	content: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='black' viewBox='0 0 36 36'%3E%3Cpath d='M9.216 0C5.218 7.243 4.544 18.292 20.25 17.924V9l13.5 13.5L20.25 36v-8.732C1.443 27.758-.653 10.667 9.216 0z'/%3E%3C/svg%3E");
 }
 
 /* Bookmark */
@@ -578,7 +598,7 @@ legend {
    here to reduce duplication. Use the variant file to overwrite these colors if
    required for the theme
 
-   There are a few classes for chaining, i-reset will set a dark grey icon, others are
+   There are a few classes for chaining, .i-reset will remove color filters, others are
    colorize-yellow, colorize-red, colorize-green, colorize-blue, colorize-violet, colorize-orange */
 
 /* Top Menu Icons */
@@ -630,7 +650,7 @@ legend {
 .i-envelope::before, .i-envelope-o::before, .i-poll::before,
 .i-comment::before, .i-profile::before,
 .i-bell::before, .i-user::before,
-.i-mark_read::before, .i-switch-on::before {
+.i-mark_read::before, .i-switch-on::before, .i-recycle::before {
 	filter: invert(46%) sepia(84%) saturate(405%) hue-rotate(83deg) brightness(93%) contrast(93%);
 	--hexcode: #27A348;
 }
@@ -719,7 +739,8 @@ legend {
 	--hexcode: #777777;
 }
 
-.i-paperclip::before, .i-clip::before, .i-shuffle::before, .i-merge::before {
+.i-paperclip::before, .i-clip::before, .i-shuffle::before, .i-merge::before,
+.i-arrow-forward::before, .i-arrow-up::before, .i-arrow-down::before {
 	filter: invert(51%) sepia(40%) saturate(0%) hue-rotate(220deg) brightness(92%) contrast(87%);
 	--hexcode: #828282;
 }
@@ -835,9 +856,13 @@ legend {
 	--hexcode: #E2B70F;
 }
 
-/* Reset, if you don't like the color of an icon, chain this to get a dark grey one or use unset for black */
+/* Used to set all admin menu icons to dark grey */
+.i-admin::before {
+	filter: invert(41%) sepia(0%) saturate(74%) hue-rotate(217deg) brightness(95%) contrast(84%);
+	--hexcode: #676767;
+}
+
+/* Reset, if you don't like the color of an icon, chain this to get the default black one */
 .i-reset::before {
-	/*filter: unset;*/
-	filter: invert(34%) sepia(0%) saturate(17%) hue-rotate(204deg) brightness(97%) contrast(96%);
-	--hexcode: #555555;
+	filter: unset;
 }

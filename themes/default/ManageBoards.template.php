@@ -63,7 +63,11 @@ function template_manage_boards()
 		if (!empty($category['move_link']))
 		{
 			echo '
-					<li><a href="', $category['move_link']['href'], '" title="', $category['move_link']['label'], '"><img src="', $settings['images_url'], '/smiley_select_spot.png" alt="', $category['move_link']['label'], '" /></a></li>';
+					<li>
+						<a href="', $category['move_link']['href'], '" title="', $category['move_link']['label'], '">
+							<i class="icon i-arrow-down"></i>
+						</a>
+					</li>';
 		}
 
 		$first = true;
@@ -105,7 +109,8 @@ function template_manage_boards()
 
 			echo '
 					<li id="cbp_' . $category['id'] . ',' . $board['id'] . '"', (!empty($modSettings['recycle_board']) && !empty($modSettings['recycle_enable']) && $modSettings['recycle_board'] == $board['id'] ? 'class="recycle_board"' : ''), ' style="', $board['move'] ? ';color: red;' : '', '">
-						<span class="floatleft"><a href="', $scripturl, '?board=', $board['id'], '">', $board['name'], '</a>', !empty($modSettings['recycle_board']) && !empty($modSettings['recycle_enable']) && $modSettings['recycle_board'] == $board['id'] ? '&nbsp;<a href="' . $scripturl . '?action=admin;area=manageboards;sa=settings"><img src="' . $settings['images_url'] . '/post/recycled.png" alt="' . $txt['recycle_board'] . '" /></a></span>' : '</span>', '
+						<span class="floatleft">
+							<a href="', $scripturl, '?board=', $board['id'], '">', $board['name'], '</a>', !empty($modSettings['recycle_board']) && !empty($modSettings['recycle_enable']) && $modSettings['recycle_board'] == $board['id'] ? '&nbsp;<a href="' . $scripturl . '?action=admin;area=manageboards;sa=settings"><i class="icon i-recycle"></i></a></span>' : '</span>', '
 						<span class="floatright">', $context['can_manage_permissions'] ? '<span class="modify_boards"><a class="linkbutton" href="' . $scripturl . '?action=admin;area=permissions;sa=index;pid=' . $board['permission_profile'] . ';' . $context['session_var'] . '=' . $context['session_id'] . '">' . $txt['mboards_permissions'] . '</a></span>' : '', '
 						<span class="modify_boards"><a class="linkbutton" href="', $scripturl, '?action=admin;area=manageboards;move=', $board['id'], '">', $txt['mboards_move'], '</a></span>
 						<span class="modify_boards"><a class="linkbutton" href="', $scripturl, '?action=admin;area=manageboards;sa=board;boardid=', $board['id'], '">', $txt['mboards_modify'], '</a></span></span><br style="clear: right;" />';
@@ -118,7 +123,9 @@ function template_manage_boards()
 				foreach ($board['move_links'] as $link)
 				{
 					echo '
-						<a href="', $link['href'], '" class="move_links" title="', $link['label'], '"><img src="', $settings['images_url'], '/board_select_spot', $link['child_level'] > 0 ? '_child' : '', '.png" alt="', $link['label'], '" style="padding: 0px; margin: 0px;" /></a>';
+						<a href="', $link['href'], '" class="move_links" title="', $link['label'], '">
+							<i class="icon ',$link['child_level'] > 0 ? 'i-arrow-forward' : 'i-arrow-up', '"></i>
+						</a>';
 				}
 
 				echo '
@@ -175,7 +182,6 @@ function template_manage_boards()
 			connect: ".nolist",
 			tolerance: "pointer",
 			containment: "document",
-			tolerance: "pointer",
 			href: "?action=admin;area=manageboards",
 			placeholder: "ui-state-highlight",
 			preprocess: "setBoardIds",
