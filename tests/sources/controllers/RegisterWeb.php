@@ -22,7 +22,7 @@ class SupportRegisterController extends ElkArteWebSupport
 	 */
 	protected function setUp(): void
 	{
-		global $modSettings;
+		global $modSettings, $txt;
 
 		require_once('./bootstrap.php');
 		new Bootstrap(false);
@@ -37,6 +37,8 @@ class SupportRegisterController extends ElkArteWebSupport
 		updateSettings(array('registration_method' => 1));
 		updateSettings(array('visual_verification_type' => 0));
 		updateSettings(array('reg_verification' => 0));
+
+		$txt['guest_title'] = 'Guest';
 
 		parent::setUp();
 	}
@@ -81,8 +83,21 @@ class SupportRegisterController extends ElkArteWebSupport
 		$this->clickit('#button_register > a');
 		$this->assertEquals('Registration Agreement', $this->title());
 
-		// Accept the agreement, we should see the Registration form
-		$this->clickOnElement('accept_agreement');
+		// Give it a moment then accept the agreement
+		$this->waitUntil(function ($testCase)
+		{
+			try
+			{
+				return $testCase->clickOnElement('accept_agreement');
+			}
+			catch (PHPUnit\Extensions\Selenium2TestCase\WebDriverException $e)
+			{
+				return false;
+			}
+		}, 5000);
+
+		// we should see the Registration form
+		//$this->clickOnElement('accept_agreement');
 		$this->assertEquals('Registration Form', $this->title());
 
 		// Fill out the registration form

@@ -34,14 +34,26 @@ class ElkArteInstallWeb extends ElkArteWebSupport
 	 */
 	public function testInstall()
 	{
+		$this->waitUntil(function ($testCase)
+		{
+			try
+			{
+				return $testCase->title() === 'ElkArte Installer';
+			}
+			catch (PHPUnit\Extensions\Selenium2TestCase\WebDriverException $e)
+			{
+				return false;
+			}
+		}, 10000);
+
 		// Missing files warning
-		$this->assertEquals('ElkArte Installer', $this->title());
+		$this->assertEquals('ElkArte Installer', $this->title(), 'step1' . $this->source());
 		$this->assertStringContainsString('It looks like Settings.php and/or Settings_bak.php are missing', $this->byCssSelector('#main_screen form .information')->text(), $this->source());
 
 		// Warning gone
 		$this->prepareSettings();
 		$this->url('install/install.php');
-		$this->assertEquals('ElkArte Installer', $this->title());
+		$this->assertEquals('ElkArte Installer', $this->title(), 'step 2' . $this->source());
 		$this->assertStringNotContainsString('It looks like Settings.php and/or Settings_bak.php are missing', $this->byCssSelector('#main_screen form')->text(), $this->source());
 
 		// Let's start
