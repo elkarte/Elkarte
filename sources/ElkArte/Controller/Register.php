@@ -760,7 +760,7 @@ class Register extends AbstractController
 	 *
 	 * - If language support is enabled, loads whats available
 	 * - Verifies the users choice is available
-	 * - Sets in in context / session
+	 * - Sets in context / session
 	 *
 	 * @return bool true if the language was changed, false if not.
 	 */
@@ -777,7 +777,7 @@ class Register extends AbstractController
 			if (isset($this->_req->post->lngfile) && isset($languages[$this->_req->post->lngfile]))
 			{
 				$_SESSION['language'] = $this->_req->post->lngfile;
-				if ($_SESSION['language'] !== $this->user->language)
+				if ($_SESSION['language'] !== ucfirst($this->user->language))
 				{
 					return true;
 				}
@@ -792,7 +792,7 @@ class Register extends AbstractController
 				$context['languages'][$key]['name'] = $lang['name'];
 
 				// Found it!
-				if ($selectedLanguage === $lang['filename'])
+				if (ucfirst($selectedLanguage) === $lang['filename'])
 				{
 					$context['languages'][$key]['selected'] = true;
 				}
