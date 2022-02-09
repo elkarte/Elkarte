@@ -217,7 +217,7 @@ function ajax_getSignaturePreview(showPreview)
 }
 
 /**
- * Allows previewing of server stored avatars stored.
+ * Allows previewing of server stored avatars.
  *
  * @param {type} selected
  */
@@ -230,7 +230,7 @@ function changeSel(selected)
 
 	if (cat.options[cat.selectedIndex].value.indexOf("/") > 0)
 	{
-		var i,
+		let i,
 			count = 0;
 
 		file.style.display = "inline";
@@ -242,8 +242,9 @@ function changeSel(selected)
 		for (i = 0; i < files.length; i++)
 			if (files[i].indexOf(cat.options[cat.selectedIndex].value) === 0)
 			{
-				var filename = files[i].substr(files[i].indexOf("/") + 1);
-				var showFilename = filename.substr(0, filename.lastIndexOf("."));
+				let filename = files[i].substr(files[i].indexOf("/") + 1),
+					showFilename = filename.substr(0, filename.lastIndexOf("."));
+
 				showFilename = showFilename.replace(/[_]/g, " ");
 
 				file.options[count] = new Option(showFilename, files[i]);

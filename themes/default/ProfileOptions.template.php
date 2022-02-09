@@ -1323,7 +1323,7 @@ function template_profile_avatar_select()
 										</select>
 									</div>
 									<div>
-										<img id="avatar avatarresize" src="', $modSettings['avatar_url'] . '/blank.png', '" alt="" />
+										<img id="avatar" class="avatar avatarresize" src="', $modSettings['avatar_url'] . '/blank.png', '" alt="" />
 									</div>
 								</div>';
 	}
