@@ -756,15 +756,13 @@ function setupThemeContext($forceload = false)
  */
 function memoryReturnBytes($val)
 {
-	if (is_integer($val))
-	{
-		return $val;
-	}
+	// Treat blank values as 0
+	$val = is_bool($val) || empty($val) ? 0 : trim($val);
 
-	// Separate the number from the designator
-	preg_match('~(\d+)(.*)~', trim($val), $val);
+	// Separate the number from the designator, if any
+	preg_match('~(\d+)(.*)~', $val, $val);
 	$num = intval($val[1]);
-	$last = strtolower(substr($val[2], 0, 1));
+	$last = strtolower(substr($val[2] ?? '', 0, 1));
 
 	// Convert to bytes
 	switch ($last)

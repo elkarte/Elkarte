@@ -82,7 +82,7 @@ class Server extends \ArrayObject
 		$memory_current = max($memory_current, memoryReturnBytes(get_cfg_var('memory_limit')));
 
 		// Return success or not
-		return (bool) ($memory_current >= $memory_needed);
+		return $memory_current >= $memory_needed;
 	}
 
 	/**
