@@ -37,20 +37,27 @@ use ElkArte\FileFunctions;
  * - Loops through $_FILES['attachment'] array and saves each file to the current attachments' folder.
  * - Validates the save location actually exists.
  *
- * @param int|null $id_msg = null or id of the message with attachments, if any.
- *                  If null, this is an upload in progress for a new post.
+ * @param int $id_msg 0 or id of the message with attachments, if any.
+ *                    If 0, this is an upload in progress for a new post.
  * @return bool
  * @package Attachments
  */
-function processAttachments($id_msg = null)
+function processAttachments($id_msg = 0)
 {
 	global $context, $modSettings, $txt, $topic, $board;
 
 	$attach_errors = AttachmentErrorContext::context();
-
 	$file_functions = FileFunctions::instance();
 	$tmp_attachments = new TemporaryAttachmentsList();
 	$attachmentDirectory = new AttachmentsDirectory($modSettings, database());
+
+	// Validate we need to do processing, nothing new, nothing previously sent
+	if ($tmp_attachments->getPostParam('files') === null
+		&& !$tmp_attachments->hasAttachments()
+		&& !$attachmentDirectory->hasFileTmpAttachments())
+	{
+		return false;
+	}
 
 	// Make sure we're uploading to the right place.
 	$attachmentDirectory->automanageCheckDirectory(isset($_REQUEST['action']) && $_REQUEST['action'] === 'admin');
@@ -67,7 +74,7 @@ function processAttachments($id_msg = null)
 		$context['attachments']['total_size'] = 0;
 
 		// If this isn't a new post, check the current attachments.
-		if (!empty($id_msg))
+		if ($id_msg !== 0)
 		{
 			list ($context['attachments']['quantity'], $context['attachments']['total_size']) = attachmentsSizeForMessage($id_msg);
 		}
@@ -109,7 +116,7 @@ function processAttachments($id_msg = null)
 	if (!$ignore_temp)
 	{
 		$tmp_attachments->setPostParam([
-			'msg' => $id_msg ?? 0,
+			'msg' => $id_msg,
 			'last_msg' => (int) ($_REQUEST['last_msg'] ?? 0),
 			'topic' => (int) ($topic ?? 0),
 			'board' => (int) ($board ?? 0),
@@ -138,7 +145,7 @@ function processAttachments($id_msg = null)
 	// Loop through $_FILES['attachment'] array and move each file to the current attachments' folder.
 	foreach ($_FILES['attachment']['tmp_name'] as $n => $dummy)
 	{
-		if ($_FILES['attachment']['name'][$n] == '')
+		if ($_FILES['attachment']['name'][$n] === '')
 		{
 			continue;
 		}

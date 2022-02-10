@@ -698,7 +698,7 @@ class Attachment extends AbstractController
 			$image = new Image($filename);
 
 			$filename = $filename . '_thumb';
-			$image->createThumbnail(100, 100, $filename, '',false);
+			$image->createThumbnail(100, 100, $filename, null,false);
 		}
 
 		// With the headers complete, send the file data
