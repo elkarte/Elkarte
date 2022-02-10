@@ -641,6 +641,9 @@ class AttachmentsDirectory
 	/**
 	 * Should we try to create a new directory or not?
 	 *
+	 * False if Auto manage is off or No files were uploaded
+	 * True if from the ACP or if files were uploaded
+	 *
 	 * @param bool $is_admin_interface
 	 * @return bool
 	 */
@@ -658,16 +661,21 @@ class AttachmentsDirectory
 			return false;
 		}
 
-		if (!isset($_FILES))
-		{
-			return false;
-		}
+		return $this->hasFileTmpAttachments();
+	}
 
-		if (isset($_FILES['attachment']))
+	/**
+	 * Simply checks if any tmp attachments have been submitted
+	 *
+	 * @return bool
+	 */
+	public function hasFileTmpAttachments()
+	{
+		if (isset($_FILES['attachment']['tmp_name']))
 		{
-			foreach ($_FILES['attachment']['tmp_name'] as $dummy)
+			foreach ($_FILES['attachment']['tmp_name'] as $tmp_name)
 			{
-				if (!empty($dummy))
+				if (!empty($tmp_name) && is_uploaded_file($tmp_name))
 				{
 					return true;
 				}
