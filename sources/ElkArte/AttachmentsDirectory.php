@@ -101,7 +101,7 @@ class AttachmentsDirectory
 			$this->currentAttachmentUploadDir = 1;
 
 			updateSettings(array(
-				'attachmentUploadDir' => $options['attachmentUploadDir'],
+				'attachmentUploadDir' => serialize(array(1 => $options['attachmentUploadDir'])),
 				'currentAttachmentUploadDir' => 1,
 			));
 		}
