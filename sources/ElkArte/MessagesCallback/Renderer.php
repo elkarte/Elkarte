@@ -146,16 +146,8 @@ abstract class Renderer
 			$this->_counter = empty($context['start']) ? 0 : $context['start'];
 		}
 
-		// Start from the beginning...
-		if ($reset)
-		{
-			$this->_currentContext($reset);
-		}
-		// Attempt to get the next message.
-		else
-		{
-			$this->_currentContext();
-		}
+		// Start from the beginning, or get the next message
+		$this->_currentContext($reset);
 
 		if (empty($this->_this_message))
 		{
@@ -304,7 +296,7 @@ abstract class Renderer
 	/**
 	 * Utility function, it can be overridden to alter something just after either
 	 * the members or the guests data have been loaded from the database.
-	 * Run both if he member exists or not.
+	 * Run both if the member exists or not.
 	 *
 	 * @param \ElkArte\ValuesContainer $member_context
 	 * @return mixed

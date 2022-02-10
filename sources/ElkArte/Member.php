@@ -196,7 +196,7 @@ class Member extends ValuesContainer
 				),
 				'birth_date' => empty($this->data['birthdate']) || $this->data['birthdate'] === '0001-01-01' ? '0000-00-00' : (substr($this->data['birthdate'], 0, 4) === '0004' ? '0000' . substr($this->data['birthdate'], 4) : $this->data['birthdate']),
 				'real_posts' => $this->data['posts'],
-				'posts' => comma_format($this->data['posts']),
+				'posts' => $this->data['posts'],
 				'avatar' => determineAvatar($this->data),
 				'last_login' => empty($this->data['last_login']) ? $txt['never'] : standardTime($this->data['last_login']),
 				'last_login_timestamp' => empty($this->data['last_login']) ? 0 : forum_time(false, $this->data['last_login']),

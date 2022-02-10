@@ -17,6 +17,7 @@
 
 namespace ElkArte\MessagesCallback;
 
+use ElkArte\MembersList;
 use ElkArte\MessagesCallback\BodyParser\BodyParserInterface;
 use ElkArte\ValuesContainer;
 
@@ -69,6 +70,7 @@ class PmRenderer extends Renderer
 	{
 		global $context;
 
+		MembersList::loadGuest();
 		parent::_adjustGuestContext($member_context);
 
 		// Sometimes the forum sends messages itself (Warnings are an example)

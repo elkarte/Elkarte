@@ -289,7 +289,7 @@ jobs:
       - name: Setup problem matchers for PHP
         run: echo "::add-matcher::${{ runner.tool_cache }}/php.json"
 
-      - name: Setup Server Enviroment
+      - name: Setup Server Environment
         env:
           DB: ${{steps.database-type.outputs.db}}
           PHP_VERSION: ${{ matrix.php }}

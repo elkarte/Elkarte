@@ -18,6 +18,9 @@ class SupportManageMembersController extends ElkArteWebSupport
 		$this->url = 'index.php';
 		$this->login = true;
 		parent::setUpPage();
+
+		global $txt;
+		require_once(SOURCEDIR . '/ElkArte/Languages/Index/English.php');
 	}
 
 	/**
@@ -25,8 +28,6 @@ class SupportManageMembersController extends ElkArteWebSupport
 	 */
 	public function registerMembers()
 	{
-		new ElkArte\Themes\ThemeLoader();
-
 		require_once(SUBSDIR . '/Members.subs.php');
 		$require = array('activation', 'approval');
 		$_SESSION['just_registered'] = 0;
@@ -103,6 +104,15 @@ class SupportManageMembersController extends ElkArteWebSupport
 	 */
 	public function testApproveMember()
 	{
+		global $context, $txt;
+
+		// Odd
+		$context['forum_name'] = 'ElkArte';
+		$context['forum_name_html_safe'] = $context['forum_name'];
+		$txt['regards_team'] = 'Regards';
+		$txt['guest_title'] = 'Guest';
+		$txt['mail_send_unable'] = 'No Mail';
+
 		// First, we register some members...
 		$this->registerMembers();
 

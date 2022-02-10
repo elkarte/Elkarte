@@ -580,23 +580,23 @@ function template_profile_pm_settings()
 
 	echo '
 								</select>
-								</dd>
-								<dt>
-										<label for="popup_messages">', $txt['popup_messages'], '</label>
-								</dt>
-								<dd>
-										<input type="hidden" name="default_options[popup_messages]" value="0" />
-										<input type="checkbox" name="default_options[popup_messages]" id="popup_messages" value="1"', !empty($context['member']['options']['popup_messages']) ? ' checked="checked"' : '', ' />
-								</dd>
+							</dd>
+							<dt>
+									<label for="popup_messages">', $txt['popup_messages'], '</label>
+							</dt>
+							<dd>
+									<input type="hidden" name="default_options[popup_messages]" value="0" />
+									<input type="checkbox" name="default_options[popup_messages]" id="popup_messages" value="1"', !empty($context['member']['options']['popup_messages']) ? ' checked="checked"' : '', ' />
+							</dd>
 						</dl>
 						<dl>
-								<dt>
-										<label for="pm_remove_inbox_label">', $txt['pm_remove_inbox_label'], '</label>
-								</dt>
-								<dd>
-										<input type="hidden" name="default_options[pm_remove_inbox_label]" value="0" />
-										<input type="checkbox" name="default_options[pm_remove_inbox_label]" id="pm_remove_inbox_label" value="1"', !empty($context['member']['options']['pm_remove_inbox_label']) ? ' checked="checked"' : '', ' />
-								</dd>';
+							<dt>
+									<label for="pm_remove_inbox_label">', $txt['pm_remove_inbox_label'], '</label>
+							</dt>
+							<dd>
+									<input type="hidden" name="default_options[pm_remove_inbox_label]" value="0" />
+									<input type="checkbox" name="default_options[pm_remove_inbox_label]" id="pm_remove_inbox_label" value="1"', !empty($context['member']['options']['pm_remove_inbox_label']) ? ' checked="checked"' : '', ' />
+							</dd>';
 }
 
 /**
@@ -1323,7 +1323,7 @@ function template_profile_avatar_select()
 										</select>
 									</div>
 									<div>
-										<img id="avatar avatarresize" src="', $modSettings['avatar_url'] . '/blank.png', '" alt="" />
+										<img id="avatar" class="avatar avatarresize" src="', $modSettings['avatar_url'] . '/blank.png', '" alt="" />
 									</div>
 								</div>';
 	}

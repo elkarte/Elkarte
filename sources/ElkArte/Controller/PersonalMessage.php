@@ -704,7 +704,7 @@ class PersonalMessage extends AbstractController
 
 		$context['pm_form_url'] = $scripturl . '?action=pm;sa=pmactions;' . ($context['display_mode'] == 2 ? 'conversation;' : '') . 'f=' . $context['folder'] . ';start=' . $context['start'] . ($context['current_label_id'] != -1 ? ';l=' . $context['current_label_id'] : '');
 
-		// Finally mark the relevant messages as read.
+		// Finally, mark the relevant messages as read.
 		if ($context['folder'] !== 'sent' && !empty($context['labels'][(int) $context['current_label_id']]['unread_messages']))
 		{
 			// If the display mode is "old sk00l" do them all...
@@ -1412,10 +1412,12 @@ class PersonalMessage extends AbstractController
 		}
 
 		// Mark the message as "replied to".
-		if (!empty($context['send_log']['sent']) && !empty($this->_req->post->replied_to) && $this->_req->getQuery('f') === 'inbox')
+		$replied_to = $this->_req->getPost('replied_to', 'intval', 0);
+		$box = $this->_req->getPost('f', 'trim', '');
+		if (!empty($context['send_log']['sent']) && !empty($replied_to) && $box === 'inbox')
 		{
 			require_once(SUBSDIR . '/PersonalMessage.subs.php');
-			setPMRepliedStatus($this->user->id, (int) $this->_req->post->replied_to);
+			setPMRepliedStatus($this->user->id, $replied_to);
 		}
 
 		$failed = !empty($context['send_log']['failed']);

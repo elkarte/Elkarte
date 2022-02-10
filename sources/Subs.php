@@ -207,7 +207,7 @@ function comma_format($number, $override_decimal_count = false)
 
 	// Format the string with our friend, number_format.
 	$decimals = ((float) $number === $number) ? ($override_decimal_count === false ? $decimal_count : $override_decimal_count) : 0;
-	return number_format($number, (int) $decimals, $decimal_separator, $thousands_separator);
+	return number_format((float) $number, (int) $decimals, $decimal_separator, $thousands_separator);
 }
 
 /**
@@ -712,6 +712,7 @@ function setOldUrl($index = 'old_url')
 function determineTopicClass(&$topic_context)
 {
 	// Set topic class depending on locked status and number of replies.
+	$topic_context['class'] = 'normal';
 	if ($topic_context['is_very_hot'])
 	{
 		$topic_context['class'] = 'veryhot';
@@ -719,10 +720,6 @@ function determineTopicClass(&$topic_context)
 	elseif ($topic_context['is_hot'])
 	{
 		$topic_context['class'] = 'hot';
-	}
-	else
-	{
-		$topic_context['class'] = 'normal';
 	}
 
 	$topic_context['class'] .= !empty($topic_context['is_poll']) ? '_poll' : '_post';
@@ -759,15 +756,13 @@ function setupThemeContext($forceload = false)
  */
 function memoryReturnBytes($val)
 {
-	if (is_integer($val))
-	{
-		return $val;
-	}
+	// Treat blank values as 0
+	$val = is_bool($val) || empty($val) ? 0 : trim($val);
 
-	// Separate the number from the designator
-	preg_match('~(\d+)(.*)~', trim($val), $val);
+	// Separate the number from the designator, if any
+	preg_match('~(\d+)(.*)~', $val, $val);
 	$num = intval($val[1]);
-	$last = strtolower(substr($val[2], 0, 1));
+	$last = strtolower(substr($val[2] ?? '', 0, 1));
 
 	// Convert to bytes
 	switch ($last)

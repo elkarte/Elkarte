@@ -7,8 +7,12 @@
  *
  * @backupGlobals disabled
  */
+
 use ElkArte\Errors\ErrorContext;
 
+/**
+ * Testcases for member registration
+ */
 class SupportRegisterController extends ElkArteWebSupport
 {
 	/*
@@ -30,13 +34,15 @@ class SupportRegisterController extends ElkArteWebSupport
 		$this->loadUserData();
 
 		// Let's remember about these
-		$this->registration_method = $modSettings['registration_method'];
-		$this->visual_verification_type = $modSettings['visual_verification_type'];
+		$this->registration_method = $modSettings['registration_method'] ?? '0';
+		$this->visual_verification_type = $modSettings['visual_verification_type'] ?? '3';
 
 		// Set it to email activation
 		updateSettings(array('registration_method' => 1));
 		updateSettings(array('visual_verification_type' => 0));
 		updateSettings(array('reg_verification' => 0));
+
+		$modSettings['postmod_active'] = $modSettings['postmod_active'] ?? '0';
 
 		parent::setUp();
 	}
@@ -47,8 +53,12 @@ class SupportRegisterController extends ElkArteWebSupport
 	 */
 	public function setUpPage()
 	{
+		global $txt;
+
 		$this->url = 'index.php';
 		parent::setUpPage();
+
+		require_once(SOURCEDIR . '/ElkArte/Languages/Index/English.php');
 	}
 
 	/**
@@ -81,8 +91,20 @@ class SupportRegisterController extends ElkArteWebSupport
 		$this->clickit('#button_register > a');
 		$this->assertEquals('Registration Agreement', $this->title());
 
-		// Accept the agreement, we should see the Registration form
-		$this->clickOnElement('accept_agreement');
+		// Give it a moment then accept the agreement
+		$this->waitUntil(function ($testCase)
+		{
+			try
+			{
+				return $testCase->clickOnElement('accept_agreement');
+			}
+			catch (PHPUnit\Extensions\Selenium2TestCase\WebDriverException $e)
+			{
+				return false;
+			}
+		}, 5000);
+
+		// We should see the Registration form
 		$this->assertEquals('Registration Form', $this->title());
 
 		// Fill out the registration form
@@ -111,7 +133,7 @@ class SupportRegisterController extends ElkArteWebSupport
 		{
 			try
 			{
-				return $this->byCssSelector('div.errorbox');
+				return $testCase->byCssSelector('div.errorbox');
 			}
 			catch (PHPUnit\Extensions\Selenium2TestCase\WebDriverException $e)
 			{

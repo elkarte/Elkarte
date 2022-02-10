@@ -25,6 +25,7 @@ use ElkArte\MembersList;
 use ElkArte\Util;
 
 /**
+ * Options a user can set to customize their site experience
  *
  * - Does the job of showing and editing people's profiles.
  * - Interface to buddy list, ignore list, notifications, authentication options, forum profile
@@ -422,20 +423,22 @@ class ProfileOptions extends AbstractController
 	 */
 	public function loadThemeOptions()
 	{
-		global $context, $cur_profile;
+		global $context, $cur_profile, $options;
 
-		if (isset($this->_req->post->default_options))
+		$default_options = $this->_req->getPost('default_options');
+		$post_options = $this->_req->getPost('options');
+		if (isset($default_options))
 		{
-			$this->_req->post->options = isset($this->_req->post->options) ? $this->_req->post->options + $this->_req->post->default_options : $this->_req->post->default_options;
+			$post_options = isset($post_options) ? $post_options + $default_options : $default_options;
 		}
 
 		if ($context['user']['is_owner'])
 		{
-			$context['member']['options'] = $this->_profile->options;
+			$context['member']['options'] = $options + $this->_profile->options;
 
-			if (isset($this->_req->post->options) && is_array($this->_req->post->options))
+			if (isset($post_options) && is_array($post_options))
 			{
-				foreach ($this->_req->post->options as $k => $v)
+				foreach ($post_options as $k => $v)
 				{
 					$context['member']['options'][$k] = $v;
 				}
@@ -444,11 +447,14 @@ class ProfileOptions extends AbstractController
 		else
 		{
 			require_once(SUBSDIR . '/Themes.subs.php');
-			$context['member']['options'] = loadThemeOptionsInto(array(1, (int) $cur_profile['id_theme']), array(-1, $this->_memID), $context['member']['options']);
+			$context['member']['options'] = loadThemeOptionsInto(
+				array(1, (int) $cur_profile['id_theme']),
+				array(-1, $this->_memID), $context['member']['options']
+			);
 
-			if (isset($this->_req->post->options))
+			if (isset($post_options))
 			{
-				foreach ($this->_req->post->options as $var => $val)
+				foreach ($post_options as $var => $val)
 				{
 					$context['member']['options'][$var] = $val;
 				}
@@ -565,13 +571,14 @@ class ProfileOptions extends AbstractController
 		$context['sub_template'] = 'edit_options';
 		$context['page_desc'] = $txt['pm_settings_desc'];
 
-		// Setup the profile context and call the 'integrate_pmprefs_profile_fields' hook
+		// Set up the profile context and call the 'integrate_pmprefs_profile_fields' hook
 		$fields = self::getFields('contactprefs');
 		setupProfileContext($fields['fields'], $fields['hook']);
 	}
 
 	/**
-	 * Allow the user to pick a theme.
+	 * Allow the user to pick a theme, Set time formats, and set
+	 * overall look and layout options.
 	 */
 	public function action_themepick()
 	{
@@ -589,6 +596,7 @@ class ProfileOptions extends AbstractController
 		$context['sub_template'] = 'edit_options';
 		$context['page_desc'] = $txt['theme_info'];
 
+		// Set up profile look and layout, call 'integrate_themepick_profile_fields' hook
 		$fields = self::getFields('theme');
 		setupProfileContext($fields['fields'], $fields['hook']);
 	}

@@ -12,7 +12,7 @@
 /**
  * ElkArteInstallWeb
  *
- * Installs the forum using the install script
+ * Installs the forum using the installation script
  */
 class ElkArteInstallWeb extends ElkArteWebSupport
 {
@@ -34,14 +34,27 @@ class ElkArteInstallWeb extends ElkArteWebSupport
 	 */
 	public function testInstall()
 	{
+		// Allow the server to settle, so to speak
+		$this->waitUntil(function ($testCase)
+		{
+			try
+			{
+				return $testCase->title() === 'ElkArte Installer';
+			}
+			catch (PHPUnit\Extensions\Selenium2TestCase\WebDriverException $e)
+			{
+				return false;
+			}
+		}, 10000);
+
 		// Missing files warning
-		$this->assertEquals('ElkArte Installer', $this->title());
+		$this->assertEquals('ElkArte Installer', $this->title(), 'step1');
 		$this->assertStringContainsString('It looks like Settings.php and/or Settings_bak.php are missing', $this->byCssSelector('#main_screen form .information')->text(), $this->source());
 
 		// Warning gone
 		$this->prepareSettings();
 		$this->url('install/install.php');
-		$this->assertEquals('ElkArte Installer', $this->title());
+		$this->assertEquals('ElkArte Installer', $this->title(), 'step 2');
 		$this->assertStringNotContainsString('It looks like Settings.php and/or Settings_bak.php are missing', $this->byCssSelector('#main_screen form')->text(), $this->source());
 
 		// Let's start
@@ -62,7 +75,7 @@ class ElkArteInstallWeb extends ElkArteWebSupport
 		$this->byId('db_prefix_input')->value('elkarte_');
 		$this->byId('db_settings')->submit();
 
-		// Let the install create the DB
+		// Let the installation create the DB
 		$this->assertEquals('Forum Settings', $this->byCssSelector('#main_screen > h2')->text(), $this->source());
 		$this->byId('forum_settings')->submit();
 		sleep(15);
@@ -79,7 +92,7 @@ class ElkArteInstallWeb extends ElkArteWebSupport
 		//$this->byId('admin_account')->submit();
 		$this->assertStringContainsString('Congratulations', $this->byCssSelector('#main_screen > h2')->text(), $this->source());
 
-		// Move the install dir so we can run more tests without redirecting back to install/update
+		// Move the installation dir, so we can run more tests without redirecting back to install/update
 		rename($this->forumPath  . '/install', $this->forumPath  . '/installdone');
 	}
 

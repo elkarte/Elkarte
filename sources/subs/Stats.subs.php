@@ -139,7 +139,7 @@ function topPosters($limit = null)
 		$limit = empty($limit) ? 10 : $limit;
 	}
 
-	// Make the query to the the x number of top posters
+	// Make the query to the x number of top posters
 	$top_posters = array();
 	$max_num_posts = 1;
 	$db->fetchQuery('
