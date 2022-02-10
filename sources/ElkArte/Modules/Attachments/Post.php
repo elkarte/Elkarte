@@ -380,7 +380,7 @@ class Post extends AbstractModule
 	{
 		$this->_initErrors();
 
-		$msg = $_REQUEST['msg'] ?? 0;
+		$msg = isset($_REQUEST['msg']) ? (int) $_REQUEST['msg'] : 0;
 		$this->saveAttachments($msg);
 
 		if ($this->_attach_errors->hasErrors())
@@ -395,7 +395,7 @@ class Post extends AbstractModule
 	 * @param int $msg
 	 * @throws \ElkArte\Exceptions\Exception
 	 */
-	protected function saveAttachments($msg = 0)
+	protected function saveAttachments($msg)
 	{
 		global $context, $modSettings;
 
