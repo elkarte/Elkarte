@@ -300,12 +300,6 @@ var disableDrafts = false;
 
 						oEmoji.attachAtWho($(oIframeBody), oIframeWindow);
 					}
-
-					// Debug when needed
-					if ('console' in window)
-					{
-						window.console.info(`${script.src} is loaded!`);
-					}
 				},
 				error => {
 					if ('console' in window)
