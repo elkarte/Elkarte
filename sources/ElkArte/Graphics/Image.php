@@ -201,7 +201,7 @@ class Image
 	 * @param int $max_width allowed width
 	 * @param int $max_height allowed height
 	 * @param string $dstName name to save
-	 * @param string $format image format to save the thumbnail
+	 * @param null|int $format image format image constant value to save the thumbnail
 	 * @param null|bool $force if forcing the image resize to scale up, the default action
 	 * @return bool|\ElkArte\Graphics\Image On success returns an image class loaded with new image
 	 */
@@ -212,7 +212,7 @@ class Image
 		// The particulars
 		$dstName = $dstName === '' ? $this->_fileName . '_thumb' : $dstName;
 		$default_format = empty($modSettings['attachment_thumb_png']) ? IMAGETYPE_JPEG : IMAGETYPE_PNG;
-		$format = $format ?? $default_format;
+		$format = empty($format) || !is_int($format) ? $default_format : $format;
 		$max_width = max(16, $max_width);
 		$max_height = max(16, $max_height);
 
@@ -222,9 +222,12 @@ class Image
 		// Save our work
 		if ($success)
 		{
-			$this->saveImage($dstName, $format);
-			FileFunctions::instance()->chmod($dstName);
-			$success = new Image($dstName);
+			$success = false;
+			if ($this->saveImage($dstName, $format))
+			{
+				FileFunctions::instance()->chmod($dstName);
+				$success = new Image($dstName);
+			}
 		}
 		else
 		{
