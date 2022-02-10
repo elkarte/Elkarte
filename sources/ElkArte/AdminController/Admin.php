@@ -126,22 +126,19 @@ class Admin extends AbstractController
 						'label' => $txt['admin_center'],
 						'controller' => '\\ElkArte\\AdminController\\Admin',
 						'function' => 'action_home',
-						'icon' => 'transparent.png',
-						'class' => 'admin_img_administration',
+						'class' => 'i-home i-admin',
 					),
 					'credits' => array(
 						'label' => $txt['support_credits_title'],
 						'controller' => '\\ElkArte\\AdminController\\Admin',
 						'function' => 'action_credits',
-						'icon' => 'transparent.png',
-						'class' => 'admin_img_support',
+						'class' => 'i-support i-admin',
 					),
 					'maillist' => array(
 						'label' => $txt['mail_center'],
 						'controller' => '\\ElkArte\\AdminController\\ManageMaillist',
 						'function' => 'action_index',
-						'icon' => 'transparent.png',
-						'class' => 'admin_img_mail',
+						'class' => 'i-envelope-blank i-admin',
 						'permission' => array('approve_emails', 'admin_forum'),
 						'enabled' => featureEnabled('pe'),
 						'subsections' => array(
@@ -156,8 +153,7 @@ class Admin extends AbstractController
 						'label' => $txt['news_title'],
 						'controller' => '\\ElkArte\\AdminController\\ManageNews',
 						'function' => 'action_index',
-						'icon' => 'transparent.png',
-						'class' => 'admin_img_news',
+						'class' => 'i-post-text i-admin',
 						'permission' => array('edit_news', 'send_mail', 'admin_forum'),
 						'subsections' => array(
 							'editnews' => array($txt['admin_edit_news'], 'edit_news'),
@@ -170,8 +166,7 @@ class Admin extends AbstractController
 						'controller' => '\\ElkArte\\AdminController\\Packages',
 						'function' => 'action_index',
 						'permission' => array('admin_forum'),
-						'icon' => 'transparent.png',
-						'class' => 'admin_img_packages',
+						'class' => 'i-package i-admin',
 						'subsections' => array(
 							'browse' => array($txt['browse_packages']),
 							'installed' => array($txt['installed_packages']),
@@ -186,16 +181,14 @@ class Admin extends AbstractController
 						'controller' => '\\ElkArte\\AdminController\\PackageServers',
 						'function' => 'action_index',
 						'permission' => array('admin_forum'),
-						'icon' => 'transparent.png',
-						'class' => 'admin_img_packages',
+						'class' => 'i-package i-admin',
 						'hidden' => true,
 					),
 					'search' => array(
 						'controller' => '\\ElkArte\\AdminController\\Admin',
 						'function' => 'action_search',
 						'permission' => array('admin_forum'),
-						'icon' => 'transparent.png',
-						'class' => 'admin_img_search',
+						'class' => 'i-search i-admin',
 						'select' => 'index'
 					),
 					'adminlogoff' => array(
@@ -203,8 +196,7 @@ class Admin extends AbstractController
 						'function' => 'action_endsession',
 						'label' => $txt['admin_logoff'],
 						'enabled' => empty($modSettings['securityDisable']),
-						'icon' => 'transparent.png',
-						'class' => 'admin_img_exit',
+						'class' => 'i-sign-out i-admin',
 					),
 				),
 			),
@@ -216,15 +208,13 @@ class Admin extends AbstractController
 						'label' => $txt['core_settings_title'],
 						'controller' => '\\ElkArte\\AdminController\\CoreFeatures',
 						'function' => 'action_index',
-						'icon' => 'transparent.png',
-						'class' => 'admin_img_corefeatures',
+						'class' => 'i-cog i-admin',
 					),
 					'featuresettings' => array(
 						'label' => $txt['modSettings_title'],
 						'controller' => '\\ElkArte\\AdminController\\ManageFeatures',
 						'function' => 'action_index',
-						'icon' => 'transparent.png',
-						'class' => 'admin_img_features',
+						'class' => 'i-switch-on i-admin',
 						'subsections' => array(
 							'basic' => array($txt['mods_cat_features']),
 							'layout' => array($txt['mods_cat_layout']),
@@ -240,8 +230,7 @@ class Admin extends AbstractController
 						'label' => $txt['admin_server_settings'],
 						'controller' => '\\ElkArte\\AdminController\\ManageServer',
 						'function' => 'action_index',
-						'icon' => 'transparent.png',
-						'class' => 'admin_img_server',
+						'class' => 'i-menu i-admin',
 						'subsections' => array(
 							'general' => array($txt['general_settings']),
 							'database' => array($txt['database_paths_settings']),
@@ -255,8 +244,7 @@ class Admin extends AbstractController
 						'label' => $txt['admin_security_moderation'],
 						'controller' => '\\ElkArte\\AdminController\\ManageSecurity',
 						'function' => 'action_index',
-						'icon' => 'transparent.png',
-						'class' => 'admin_img_security',
+						'class' => 'i-lock i-admin',
 						'subsections' => array(
 							'general' => array($txt['mods_cat_security_general']),
 							'spam' => array($txt['antispam_title']),
@@ -268,8 +256,7 @@ class Admin extends AbstractController
 						'controller' => '\\ElkArte\\AdminController\\ManageThemes',
 						'function' => 'action_index',
 						'custom_url' => getUrl('admin', ['action' => 'admin', 'area' => 'theme']),
-						'icon' => 'transparent.png',
-						'class' => 'admin_img_themes',
+						'class' => 'i-modify i-admin',
 						'subsections' => array(
 							'admin' => array($txt['themeadmin_admin_title']),
 							'list' => array($txt['themeadmin_list_title']),
@@ -284,15 +271,13 @@ class Admin extends AbstractController
 						'controller' => '\\ElkArte\\AdminController\\ManageThemes',
 						'function' => 'action_index',
 						'custom_url' => getUrl('admin', ['action' => 'admin', 'area' => 'theme', 'sa' => 'list', 'th' => $settings['theme_id']]),
-						'icon' => 'transparent.png',
-						'class' => 'admin_img_current_theme',
+						'class' => 'i-paint i-admin',
 					),
 					'languages' => array(
 						'label' => $txt['language_configuration'],
 						'controller' => '\\ElkArte\\AdminController\\ManageLanguages',
 						'function' => 'action_index',
-						'icon' => 'transparent.png',
-						'class' => 'admin_img_languages',
+						'class' => 'i-language i-admin',
 						'subsections' => array(
 							'edit' => array($txt['language_edit']),
 							// 'add' => array($txt['language_add']),
@@ -303,8 +288,7 @@ class Admin extends AbstractController
 						'label' => $txt['admin_modifications'],
 						'controller' => '\\ElkArte\\AdminController\\AddonSettings',
 						'function' => 'action_index',
-						'icon' => 'transparent.png',
-						'class' => 'admin_img_modifications',
+						'class' => 'i-puzzle i-admin',
 						'subsections' => array(
 							'general' => array($txt['mods_cat_modifications_misc']),
 						),
@@ -319,8 +303,7 @@ class Admin extends AbstractController
 						'label' => $txt['admin_boards'],
 						'controller' => '\\ElkArte\\AdminController\\ManageBoards',
 						'function' => 'action_index',
-						'icon' => 'transparent.png',
-						'class' => 'admin_img_boards',
+						'class' => 'i-directory i-admin',
 						'permission' => array('manage_boards'),
 						'subsections' => array(
 							'main' => array($txt['boardsEdit']),
@@ -333,8 +316,7 @@ class Admin extends AbstractController
 						'controller' => '\\ElkArte\\AdminController\\ManagePosts',
 						'function' => 'action_index',
 						'permission' => array('admin_forum'),
-						'icon' => 'transparent.png',
-						'class' => 'admin_img_posts',
+						'class' => 'i-post-text i-admin',
 						'subsections' => array(
 							'posts' => array($txt['manageposts_settings']),
 							'censor' => array($txt['admin_censored_words']),
@@ -345,16 +327,14 @@ class Admin extends AbstractController
 						'label' => $txt['editor_manage'],
 						'controller' => '\\ElkArte\\AdminController\\ManageEditor',
 						'function' => 'action_index',
-						'icon' => 'transparent.png',
-						'class' => 'admin_img_themes',
+						'class' => 'i-modify i-admin',
 						'permission' => array('manage_bbc'),
 					),
 					'smileys' => array(
 						'label' => $txt['smileys_manage'],
 						'controller' => '\\ElkArte\\AdminController\\ManageSmileys',
 						'function' => 'action_index',
-						'icon' => 'transparent.png',
-						'class' => 'admin_img_smiley',
+						'class' => 'i-smiley i-admin',
 						'permission' => array('manage_smileys'),
 						'subsections' => array(
 							'editsets' => array($txt['smiley_sets']),
@@ -369,8 +349,7 @@ class Admin extends AbstractController
 						'label' => $txt['attachments_avatars'],
 						'controller' => '\\ElkArte\\AdminController\\ManageAttachments',
 						'function' => 'action_index',
-						'icon' => 'transparent.png',
-						'class' => 'admin_img_attachment',
+						'class' => 'i-paperclip i-admin',
 						'permission' => array('manage_attachments'),
 						'subsections' => array(
 							'browse' => array($txt['attachment_manager_browse']),
@@ -384,8 +363,7 @@ class Admin extends AbstractController
 						'label' => $txt['manage_search'],
 						'controller' => '\\ElkArte\\AdminController\\ManageSearch',
 						'function' => 'action_index',
-						'icon' => 'transparent.png',
-						'class' => 'admin_img_search',
+						'class' => 'i-search i-admin',
 						'permission' => array('admin_forum'),
 						'subsections' => array(
 							'weights' => array($txt['search_weights']),
@@ -404,16 +382,14 @@ class Admin extends AbstractController
 						'label' => $txt['admin_users'],
 						'controller' => '\\ElkArte\\AdminController\\ManageMembers',
 						'function' => 'action_index',
-						'icon' => 'transparent.png',
-						'class' => 'admin_img_members',
+						'class' => 'i-user i-admin',
 						'permission' => array('moderate_forum'),
 					),
 					'membergroups' => array(
 						'label' => $txt['admin_groups'],
 						'controller' => '\\ElkArte\\AdminController\\ManageMembergroups',
 						'function' => 'action_index',
-						'icon' => 'transparent.png',
-						'class' => 'admin_img_membergroups',
+						'class' => 'i-users',
 						'permission' => array('manage_membergroups'),
 						'subsections' => array(
 							'index' => array($txt['membergroups_edit_groups'], 'manage_membergroups'),
@@ -425,8 +401,7 @@ class Admin extends AbstractController
 						'label' => $txt['edit_permissions'],
 						'controller' => '\\ElkArte\\AdminController\\ManagePermissions',
 						'function' => 'action_index',
-						'icon' => 'transparent.png',
-						'class' => 'admin_img_permissions',
+						'class' => 'i-lock i-admin',
 						'permission' => array('manage_permissions'),
 						'subsections' => array(
 							'index' => array($txt['permissions_groups'], 'manage_permissions'),
@@ -440,8 +415,7 @@ class Admin extends AbstractController
 						'label' => $txt['ban_title'],
 						'controller' => '\\ElkArte\\AdminController\\ManageBans',
 						'function' => 'action_index',
-						'icon' => 'transparent.png',
-						'class' => 'admin_img_ban',
+						'class' => 'i-thumbdown i-admin',
 						'permission' => 'manage_bans',
 						'subsections' => array(
 							'list' => array($txt['ban_edit_list']),
@@ -454,8 +428,7 @@ class Admin extends AbstractController
 						'label' => $txt['registration_center'],
 						'controller' => '\\ElkArte\\AdminController\\ManageRegistration',
 						'function' => 'action_index',
-						'icon' => 'transparent.png',
-						'class' => 'admin_img_regcenter',
+						'class' => 'i-user-plus i-admin',
 						'permission' => array('admin_forum', 'moderate_forum'),
 						'subsections' => array(
 							'register' => array($txt['admin_browse_register_new'], 'moderate_forum'),
@@ -470,8 +443,7 @@ class Admin extends AbstractController
 						'enabled' => featureEnabled('sp'),
 						'controller' => '\\ElkArte\\AdminController\\ManageSearchEngines',
 						'function' => 'action_index',
-						'icon' => 'transparent.png',
-						'class' => 'admin_img_engines',
+						'class' => 'i-website i-admin',
 						'permission' => 'admin_forum',
 						'subsections' => array(
 							'stats' => array($txt['spider_stats']),
@@ -484,8 +456,7 @@ class Admin extends AbstractController
 						'label' => $txt['paid_subscriptions'],
 						'enabled' => featureEnabled('ps'),
 						'controller' => '\\ElkArte\\AdminController\\ManagePaid',
-						'icon' => 'transparent.png',
-						'class' => 'admin_img_paid',
+						'class' => 'i-credit i-admin',
 						'function' => 'action_index',
 						'permission' => 'admin_forum',
 						'subsections' => array(
@@ -503,8 +474,7 @@ class Admin extends AbstractController
 						'label' => $txt['maintain_title'],
 						'controller' => '\\ElkArte\\AdminController\\Maintenance',
 						'function' => 'action_index',
-						'icon' => 'transparent.png',
-						'class' => 'admin_img_maintain',
+						'class' => 'i-cog i-admin',
 						'subsections' => array(
 							'routine' => array($txt['maintain_sub_routine'], 'admin_forum'),
 							'database' => array($txt['maintain_sub_database'], 'admin_forum'),
@@ -518,8 +488,7 @@ class Admin extends AbstractController
 						'label' => $txt['logs'],
 						'controller' => '\\ElkArte\\AdminController\\AdminLog',
 						'function' => 'action_index',
-						'icon' => 'transparent.png',
-						'class' => 'admin_img_logs',
+						'class' => 'i-comments i-admin',
 						'subsections' => array(
 							'errorlog' => array($txt['errlog'], 'admin_forum', 'enabled' => !empty($modSettings['enableErrorLogging']), 'url' => getUrl('admin', ['action' => 'admin', 'area' => 'logs', 'sa' => 'errorlog', 'desc'])),
 							'adminlog' => array($txt['admin_log'], 'admin_forum', 'enabled' => featureEnabled('ml')),
@@ -534,8 +503,7 @@ class Admin extends AbstractController
 						'label' => $txt['maintain_tasks'],
 						'controller' => '\\ElkArte\\AdminController\\ManageScheduledTasks',
 						'function' => 'action_index',
-						'icon' => 'transparent.png',
-						'class' => 'admin_img_scheduled',
+						'class' => 'i-calendar i-admin',
 						'subsections' => array(
 							'tasks' => array($txt['maintain_tasks'], 'admin_forum'),
 							'tasklog' => array($txt['scheduled_log'], 'admin_forum'),
@@ -545,8 +513,7 @@ class Admin extends AbstractController
 						'label' => $txt['mailqueue_title'],
 						'controller' => '\\ElkArte\\AdminController\\ManageMail',
 						'function' => 'action_index',
-						'icon' => 'transparent.png',
-						'class' => 'admin_img_mail',
+						'class' => 'i-envelope-blank i-admin',
 						'subsections' => array(
 							'browse' => array($txt['mailqueue_browse'], 'admin_forum'),
 							'settings' => array($txt['mailqueue_settings'], 'admin_forum'),
@@ -557,8 +524,7 @@ class Admin extends AbstractController
 						'label' => $txt['generate_reports'],
 						'controller' => '\\ElkArte\\AdminController\\Reports',
 						'function' => 'action_index',
-						'icon' => 'transparent.png',
-						'class' => 'admin_img_reports',
+						'class' => 'i-pie-chart i-admin',
 					),
 					'repairboards' => array(
 						'label' => $txt['admin_repair'],
@@ -675,7 +641,7 @@ class Admin extends AbstractController
 			'help' => '',
 			'description' => '
 				<span class="bbc_strong">' . $txt['hello_guest'] . ' ' . $context['user']['name'] . '!</span>
-				' . sprintf($txt['admin_main_welcome'], $txt['admin_control_panel'], $txt['help'], $settings['images_url']),
+				' . sprintf($txt['admin_main_welcome'], $txt['admin_control_panel']),
 		);
 
 		// Load in the admin quick tasks

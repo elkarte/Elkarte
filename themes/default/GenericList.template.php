@@ -82,14 +82,19 @@ function template_show_list($list_id = null)
 		$close_div = true;
 
 		template_create_list_menu($cur_list['list_menu']);
+
+		// Menu buttons and additional buttons are on the same line, leaving no room for the index
+		if (isset($cur_list['additional_rows']['above_column_headers']))
+			$page_index_new_line = true;
 	}
 
-	// Show the page index (if this list doesn't intend to show all items). @todo - Needs old top/bottom stuff cleaned up.
+	// Show the page index (if this list doesn't intend to show all items).
 	if (!empty($cur_list['items_per_page']) && !empty($cur_list['page_index']))
 	{
-		if (!$close_div)
+		if (!$close_div || isset($page_index_new_line))
 		{
-			echo '
+			echo (isset($page_index_new_line) ? '
+			</div>' : '') . '
 			<div class="flow_flex">';
 		}
 
@@ -271,7 +276,7 @@ function template_additional_rows($row_position, $cur_list)
 function template_create_list_menu($list_menu)
 {
 	echo '
-		<ul class="generic_menu float', $list_menu['position'], empty($list_menu['class']) ? '' : ' ' . $list_menu['class'], '"', empty($list_menu['style']) ? '' : ' style="' . $list_menu['style'] . '"', '>';
+		<ul class="generic_menu', empty($list_menu['class']) ? '' : ' ' . $list_menu['class'], '"', empty($list_menu['style']) ? '' : ' style="' . $list_menu['style'] . '"', '>';
 
 	foreach ($list_menu['links'] as $link)
 	{

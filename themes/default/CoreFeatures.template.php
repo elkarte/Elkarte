@@ -46,7 +46,7 @@ function template_core_features()
 				<img class="features_image" src="', $feature['image'], '" alt="', $feature['title'], '" />
 				<div class="features_switch" id="js_feature_', $id, '">
 					<label class="core_features_hide" for="feature_', $id, '">', $txt['core_settings_enabled'], '<input class="core_features_status_box" type="checkbox" name="feature_', $id, '" id="feature_', $id, '"', $feature['enabled'] ? ' checked="checked"' : '', ' /></label>
-					<img id="switch_', $id, '" class="core_features_img ', $feature['state'], ' hide" src="', $settings['images_url'], '/admin/switch_', $feature['state'], '.png" alt="', $feature['state'], '" />
+					<i id="switch_', $id, '" class="core_features_img icon i-switch-', $feature['state'], ' hide" /></i>
 				</div>
 				<h3 id="feature_link_' . $id . '">', ($feature['enabled'] && $feature['url'] ? '<a href="' . $feature['url'] . '">' . $feature['title'] . '</a>' : $feature['title']), '</h3>
 				<p>', $feature['desc'], '</p>

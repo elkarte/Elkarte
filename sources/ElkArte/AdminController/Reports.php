@@ -144,14 +144,12 @@ class Reports extends AbstractController
 		$context['report_buttons'] = array(
 			'generate_reports' => array(
 				'text' => 'generate_reports',
-				'image' => 'print.png',
 				'lang' => true,
 				'url' => getUrl('admin', ['action' => 'admin', 'area' => 'reports']),
 				'active' => true,
 			),
 			'print' => array(
 				'text' => 'print',
-				'image' => 'print.png',
 				'lang' => true,
 				'url' => getUrl('admin', ['action' => 'admin', 'area' => 'reports', 'rt' => $context['report_type'], 'st' => 'print']),
 				'custom' => 'target="_blank"',

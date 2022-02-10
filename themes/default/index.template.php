@@ -591,7 +591,7 @@ function template_button_strip($button_strip, $class = '', $strip_options = arra
 	// List the buttons in reverse order for RTL languages.
 	if ($context['right_to_left'])
 	{
-		$button_strip = array_reverse($button_strip, true);
+		$class .= ' rtl';
 	}
 
 	// Create the buttons... now with cleaner markup (yay!).
@@ -601,7 +601,9 @@ function template_button_strip($button_strip, $class = '', $strip_options = arra
 		if (!isset($value['test']) || !empty($context[$value['test']]))
 		{
 			$buttons[] = '
-								<li role="menuitem"><a' . (isset($value['id']) ? ' id="button_strip_' . $value['id'] . '"' : '') . ' class="linklevel1 button_strip_' . $key . (!empty($value['active']) ? ' active' : '') . '" href="' . $value['url'] . '"' . (isset($value['custom']) ? ' ' . $value['custom'] : '') . '>' . $txt[$value['text']] . '</a></li>';
+								<li role="menuitem">
+									<a' . (isset($value['id']) ? ' id="button_strip_' . $value['id'] . '"' : '') . ' class="linklevel1 button_strip_' . $key . (!empty($value['active']) ? ' active' : '') . '" href="' . $value['url'] . '"' . (isset($value['custom']) ? ' ' . $value['custom'] : '') . '>' . $txt[$value['text']] . '</a>
+								</li>';
 		}
 	}
 
@@ -612,7 +614,7 @@ function template_button_strip($button_strip, $class = '', $strip_options = arra
 	}
 
 	echo '
-							<ul role="menubar" class="buttonlist', !empty($class) ? ' ' . $class : '', (empty($buttons) ? ' hide"' : '"'), (!empty($strip_options['id']) ? ' id="' . $strip_options['id'] . '"' : ''), '>
+							<ul role="menubar" class="buttonlist', !empty($class) ? ' ' . $class : '', '"', (!empty($strip_options['id']) ? ' id="' . $strip_options['id'] . '"' : ''), '>
 								', implode('', $buttons), '
 							</ul>';
 }
@@ -824,8 +826,10 @@ function template_pagesection($button_strip = false, $strip_direction = '', $opt
 		$options['extra'] = '';
 	}
 
-	if (!empty($strip_direction))
-		$strip_direction = 'float' . $strip_direction;
+	if (!empty($strip_direction) && $strip_direction === 'left')
+	{
+		$strip_direction = 'rtl';
+	}
 
 	echo '
 			<nav class="pagesection">

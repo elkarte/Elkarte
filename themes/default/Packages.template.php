@@ -190,13 +190,13 @@ function template_view_package()
 
 					echo '
 							<tr>
-								<td style="width:0;"></td>
-								<td style="width: 30px;" class="smalltext">
+								<td class="hide"></td>
+								<td class="grid4 smalltext">
 									<a href="' . $scripturl . '?action=admin;area=packages;sa=showoperations;operation_key=', $operation['operation_key'], ';package=', $context['filename'], ';filename=', $operation['filename'], (!empty($context['uninstalling']) ? ';reverse' : ''), '" onclick="return reqWin(this.href, 680, 400, false);">
-										<img src="', $settings['default_images_url'], '/admin/package_ops.png" alt="" />
+										<i class="icon i-view"></i>
 									</a>
 								</td>
-								<td style="width: 30px;" class="smalltext">', $operation_num, '.</td>
+								<td class="grid4 smalltext">', $operation_num, '.</td>
 								<td class="smalltext">', $txt[$operation_text], '</td>
 								<td class="smalltext grid50">', $operation['action'], '</td>
 								<td class="smalltext grid20">', $operation['description'], !empty($operation['ignore_failure']) ? ' (' . $txt['operation_ignore'] . ')' : '', '</td>
@@ -288,13 +288,13 @@ function template_view_package()
 
 							echo '
 								<tr>
-									<td style="width:0;"></td>
-									<td style="width: 30px;" class="smalltext">
+									<td class="hide"></td>
+									<td class="grid4 smalltext">
 										<a href="' . $scripturl . '?action=admin;area=packages;sa=showoperations;operation_key=', $operation['operation_key'], ';package=', $context['filename'], ';filename=', $operation['filename'], (!empty($context['uninstalling']) ? ';reverse' : ''), '" onclick="return reqWin(this.href, 600, 400, false);">
-											<img src="', $settings['default_images_url'], '/admin/package_ops.png" alt="" />
+											<i class="icon i-view"></i>
 										</a>
 									</td>
-									<td style="width: 30px;" class="smalltext">', $operation_num, '.</td>
+									<td class="grid4 smalltext">', $operation_num, '.</td>
 									<td class="smalltext">', $txt[$operation_text], '</td>
 									<td class="smalltext grid50">', $operation['action'], '</td>
 									<td class="smalltext grid20">', $operation['description'], !empty($operation['ignore_failure']) ? ' (' . $txt['operation_ignore'] . ')' : '', '</td>
@@ -848,7 +848,7 @@ function template_file_permissions()
 		if (!empty($dir['type']) && ($dir['type'] == 'dir' || $dir['type'] == 'dir_recursive'))
 		{
 			echo '
-						<img src="', $settings['default_images_url'], '/board.png" alt="*" />';
+						<i class="icon i-directory"></i>';
 		}
 
 		echo '
@@ -972,7 +972,7 @@ function template_permission_show_contents($ident, $contents, $level, $has_more 
 			if (!empty($dir['type']) && ($dir['type'] == 'dir' || $dir['type'] == 'dir_recursive'))
 			{
 				echo '
-						<img src="', $settings['default_images_url'], '/board.png" alt="*" />';
+						<i class="icon i-directory"></i>';
 			}
 
 			echo '

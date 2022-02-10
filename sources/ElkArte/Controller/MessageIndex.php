@@ -470,8 +470,15 @@ class MessageIndex extends AbstractController implements FrontpageInterface
 
 		// Build the message index button array.
 		$context['normal_buttons'] = array(
-			'new_topic' => array('test' => 'can_post_new', 'text' => 'new_topic', 'image' => 'new_topic.png', 'lang' => true, 'url' => getUrl('action', ['action' => 'post', 'board' => $context['current_board'] . '.0']), 'active' => true),
-			'notify' => array('test' => 'can_mark_notify', 'text' => $context['is_marked_notify'] ? 'unnotify' : 'notify', 'image' => ($context['is_marked_notify'] ? 'un' : '') . 'notify.png', 'lang' => true, 'custom' => 'onclick="return notifyboardButton(this);"', 'url' => getUrl('action', ['action' => 'notifyboard', 'sa' => ($context['is_marked_notify'] ? 'off' : 'on'), 'board' => $context['current_board'] . '.' . $context['start'], '{session_data}'])),
+			'new_topic' => array('test' => 'can_post_new',
+								 'text' => 'new_topic',
+								 'lang' => true,
+								 'url' => getUrl('action', ['action' => 'post', 'board' => $context['current_board'] . '.0']),
+								 'active' => true),
+			'notify' => array('test' => 'can_mark_notify',
+							  'text' => $context['is_marked_notify'] ? 'unnotify' : 'notify',
+							  'lang' => true, 'custom' => 'onclick="return notifyboardButton(this);"',
+							  'url' => getUrl('action', ['action' => 'notifyboard', 'sa' => ($context['is_marked_notify'] ? 'off' : 'on'), 'board' => $context['current_board'] . '.' . $context['start'], '{session_data}'])),
 		);
 
 		theme()->addJavascriptVar(array(
@@ -483,7 +490,6 @@ class MessageIndex extends AbstractController implements FrontpageInterface
 		{
 			$context['normal_buttons']['markread'] = array(
 				'text' => 'mark_read_short',
-				'image' => 'markread.png',
 				'lang' => true,
 				'url' => getUrl('action', ['action' => 'markasread', 'sa' => 'board', 'board' => $context['current_board'] . '.0', '{session_data}']),
 				'custom' => 'onclick="return markboardreadButton(this);"'

@@ -217,12 +217,7 @@ function template_generic_menu_tabs($tab_context)
 						<h3 class="floatleft">';
 
 		// Show an icon and/or a help item?
-		if (!empty($tab_context['icon']))
-		{
-			echo '
-						<img src="', $settings['images_url'], '/icons/', $tab_context['icon'], '" alt="" class="icon" />';
-		}
-		elseif (!empty($tab_context['class']))
+		if (!empty($tab_context['class']))
 		{
 			echo '
 						<span class="hdicon cat_img_', $tab_context['class'], '"></span>';

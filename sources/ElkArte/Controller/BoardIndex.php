@@ -161,7 +161,6 @@ class BoardIndex extends AbstractController implements FrontpageInterface
 		$context['mark_read_button'] = array(
 			'markread' => array(
 				'text' => 'mark_as_read',
-				'image' => 'markread.png',
 				'lang' => true,
 				'custom' => 'onclick="return markallreadButton(this);"',
 				'url' => getUrl('action', array('action' => 'markasread', 'sa' => 'all', 'bi', '{session_data}'))

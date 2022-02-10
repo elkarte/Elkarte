@@ -523,7 +523,6 @@ class Unread extends AbstractController
 			$recent_buttons = array(
 				'markread' => array(
 					'text' => !empty($context['no_board_limits']) ? 'mark_as_read' : 'mark_read_short',
-					'image' => 'markread.png',
 					'lang' => true,
 					'custom' => 'onclick="return markunreadButton(this);"',
 					'url' => $scripturl . '?action=markasread;sa=' . (!empty($context['no_board_limits']) ? 'all' : 'board' . $context['querystring_board_limits']) . ';' . $context['session_var'] . '=' . $context['session_id'],
@@ -534,7 +533,6 @@ class Unread extends AbstractController
 			{
 				$recent_buttons['markselectread'] = array(
 					'text' => 'quick_mod_markread',
-					'image' => 'markselectedread.png',
 					'lang' => true,
 					'url' => 'javascript:document.quickModForm.submit();',
 				);
@@ -542,7 +540,10 @@ class Unread extends AbstractController
 
 			if (!empty($context['topics']) && !$context['showing_all_topics'])
 			{
-				$recent_buttons['readall'] = array('text' => 'unread_topics_all', 'image' => 'markreadall.png', 'lang' => true, 'url' => $scripturl . '?action=unread;all' . $context['querystring_board_limits'], 'active' => true);
+				$recent_buttons['readall'] = array('text' => 'unread_topics_all',
+												   'lang' => true,
+												   'url' => $scripturl . '?action=unread;all' . $context['querystring_board_limits'],
+												   'active' => true);
 			}
 		}
 		elseif (!$this->_is_topics && isset($topics_to_mark))
@@ -554,7 +555,6 @@ class Unread extends AbstractController
 			$recent_buttons = array(
 				'markread' => array(
 					'text' => 'mark_these_as_read',
-					'image' => 'markread.png',
 					'lang' => true,
 					'url' => $scripturl . '?action=markasread;sa=unreadreplies;topics=' . $topics_to_mark . ';' . $context['session_var'] . '=' . $context['session_id'],
 				),
@@ -564,7 +564,6 @@ class Unread extends AbstractController
 			{
 				$recent_buttons['markselectread'] = array(
 					'text' => 'quick_mod_markread',
-					'image' => 'markselectedread.png',
 					'lang' => true,
 					'url' => 'javascript:document.quickModForm.submit();',
 				);

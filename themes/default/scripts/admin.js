@@ -1289,7 +1289,7 @@ function initEditProfileBoards()
 
 	$('.edit_board').show().on('click.elkarte', function (e)
 	{
-		var $icon = $(this),
+		let $icon = $(this),
 			board_id = $icon.data('boardid'),
 			board_profile = $icon.data('boardprofile'),
 			$target = $('#edit_board_' + board_id),
@@ -1301,10 +1301,12 @@ function initEditProfileBoards()
 					{
 						if ($(this).attr('value') == board_profile)
 						{
+							$icon.children(":first").addClass('i-check').removeClass('i-modify i-warn');
 							$icon.addClass('nochanges').removeClass('changed');
 						}
 						else
 						{
+							$icon.children(":first").addClass('i-warn').removeClass('i-modify i-check');
 							$icon.addClass('changed').removeClass('nochanges');
 						}
 					});
@@ -1313,7 +1315,7 @@ function initEditProfileBoards()
 		e.preventDefault();
 		$(permission_profiles).each(function (key, value)
 		{
-			var $opt = $('<option />').attr('value', value.id).text(value.name);
+			let $opt = $('<option />').attr('value', value.id).text(value.name);
 
 			if (value.id == board_profile)
 			{
@@ -1330,6 +1332,7 @@ function initEditProfileBoards()
 			.attr('name', 'save_changes')
 			.attr('value', txt_save)
 		);
+
 		$icon.off('click.elkarte').on('click', function (e)
 		{
 			e.preventDefault();
@@ -1831,13 +1834,13 @@ $(function ()
 		return;
 	}
 
-	$(".core_features_hide").css('display', 'none');
+	$(".core_features_hide").addClass('hide');
 	$(".core_features_img").show().css({'cursor': 'pointer'}).each(function ()
 	{
-		var sImageText = $(this).hasClass('on') ? feature_on_text : feature_off_text;
+		let sImageText = $(this).hasClass('i-switch-on') ? feature_on_text : feature_off_text;
 		$(this).attr({title: sImageText, alt: sImageText});
 	});
-	$("#core_features_submit").css('display', 'none');
+	$("#core_features_submit").parent().addClass('hide');
 
 	if (!token_name)
 	{
@@ -1854,7 +1857,6 @@ $(function ()
 	{
 		let cc = $(this),
 			cf = $(this).attr("id").substring(7),
-			imgs = [elk_images_url + "/admin/switch_off.png", elk_images_url + "/admin/switch_on.png"],
 			new_state = !$("#feature_" + cf).attr("checked"),
 			ajax_infobar = new ElkInfoBar('core_features_bar', {error_class: 'errorbox', success_class: 'successbox'}),
 			data;
@@ -1894,14 +1896,14 @@ $(function ()
 			else if ($(request).find("elk").length !== 0)
 			{
 				$("#feature_link_" + cf).html($(request).find("corefeatures").find("corefeature").text());
+				cc.toggleClass('i-switch-on i-switch-off');
 				cc.attr({
-					"src": imgs[new_state ? 1 : 0],
 					"title": new_state ? feature_on_text : feature_off_text,
 					"alt": new_state ? feature_on_text : feature_off_text
 				});
 				$("#feature_link_" + cf).fadeOut().fadeIn();
 				ajax_infobar.isSuccess();
-				var message = $(request).find("messages").find("message").text();
+				let message = $(request).find("messages").find("message").text();
 				ajax_infobar.changeText(message).showBar();
 
 				token_name = $(request).find("tokens").find('[type="token"]').text();

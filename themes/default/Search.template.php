@@ -382,13 +382,17 @@ function template_results()
 					if ($topic['quick_mod']['remove'])
 					{
 						echo '
-							<a href="', $scripturl, '?action=quickmod;actions%5B', $topic['id'], '%5D=remove;', $context['session_var'], '=', $context['session_id'], '" onclick="return confirm(\'', $txt['quickmod_confirm'], '\');"><img src="', $settings['images_url'], '/icons/quick_remove.png" style="width: 16px;" alt="', $txt['remove_topic'], '" title="', $txt['remove_topic'], '" /></a>';
+							<a href="', $scripturl, '?action=quickmod;actions%5B', $topic['id'], '%5D=remove;', $context['session_var'], '=', $context['session_id'], '" onclick="return confirm(\'', $txt['quickmod_confirm'], '\');">
+								<i class="icon i-delete" title="', $txt['remove_topic'], '"><s>', $txt['remove_topic'], '</s></i>
+							</a>';
 					}
 
 					if ($topic['quick_mod']['lock'])
 					{
 						echo '
-							<a href="', $scripturl, '?action=quickmod;actions%5B', $topic['id'], '%5D=lock;', $context['session_var'], '=', $context['session_id'], '" onclick="return confirm(\'', $txt['quickmod_confirm'], '\');"><img src="', $settings['images_url'], '/icons/quick_lock.png" style="width: 16px;" alt="', $txt[$topic['is_locked'] ? 'set_unlock' : 'set_lock'], '" title="', $txt[$topic['is_locked'] ? 'set_unlock' : 'set_lock'], '" /></a>';
+							<a href="', $scripturl, '?action=quickmod;actions%5B', $topic['id'], '%5D=lock;', $context['session_var'], '=', $context['session_id'], '" onclick="return confirm(\'', $txt['quickmod_confirm'], '\');">
+								<i class="icon i-lock" title="', $txt[$topic['is_locked'] ? 'set_unlock' : 'set_lock'], '"><s>', $txt[$topic['is_locked'] ? 'set_unlock' : 'set_lock'], '</s></i>
+							</a>';
 					}
 
 					if ($topic['quick_mod']['lock'] || $topic['quick_mod']['remove'])
@@ -400,13 +404,17 @@ function template_results()
 					if ($topic['quick_mod']['sticky'])
 					{
 						echo '
-							<a href="', $scripturl, '?action=quickmod;actions%5B', $topic['id'], '%5D=sticky;', $context['session_var'], '=', $context['session_id'], '" onclick="return confirm(\'', $txt['quickmod_confirm'], '\');"><img src="', $settings['images_url'], '/icons/quick_sticky.png" style="width: 16px;" alt="', $txt[$topic['is_sticky'] ? 'set_nonsticky' : 'set_sticky'], '" title="', $txt[$topic['is_sticky'] ? 'set_nonsticky' : 'set_sticky'], '" /></a>';
+							<a href="', $scripturl, '?action=quickmod;actions%5B', $topic['id'], '%5D=sticky;', $context['session_var'], '=', $context['session_id'], '" onclick="return confirm(\'', $txt['quickmod_confirm'], '\');">
+								<i class="icon i-pin" title="', $txt[$topic['is_sticky'] ? 'set_nonsticky' : 'set_sticky'], '"><s>', $txt[$topic['is_sticky'] ? 'set_nonsticky' : 'set_sticky'], '</s></i>
+							</a>';
 					}
 
 					if ($topic['quick_mod']['move'])
 					{
 						echo '
-							<a href="', $scripturl, '?action=movetopic;topic=', $topic['id'], '.0"><img src="', $settings['images_url'], '/icons/quick_move.png" style="width: 16px;" alt="', $txt['move_topic'], '" title="', $txt['move_topic'], '" /></a>';
+							<a href="', $scripturl, '?action=movetopic;topic=', $topic['id'], '.0">
+								<i class="icon i-move" title="', $txt['move_topic'], '"><s>', $txt['move_topic'], '</s></i>
+							</a>';
 					}
 				}
 

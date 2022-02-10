@@ -441,7 +441,7 @@ function template_subject_list()
 					<table class="table_grid">
 						<thead>
 							<tr class="table_head">
-								<th class="pm_icon grid8">
+								<th class="pm_icon grid4">
 									<a href="', $scripturl, '?action=pm;view;f=', $context['folder'], ';start=', $context['start'], ';sort=', $context['sort_by'], ($context['sort_direction'] === 'up' ? ';asc' : ';desc'), ($context['current_label_id'] != -1 ? ';l=' . $context['current_label_id'] : ''), '">
 										<i class="icon i-shuffle" title="', $txt['pm_change_view'], '"><s>', $txt['pm_change_view'], '</s></i>
 									</a>
@@ -502,7 +502,7 @@ function template_subject_list()
 		echo '
 										};
 									</script>
-									', $message['is_replied_to'] ? '<img src="' . $settings['images_url'] . '/icons/pm_replied.png" alt="' . $txt['pm_replied'] . '" />' : '<i class="icon i-comment-blank"></i>', '</td>
+									', $message['is_replied_to'] ? '<i class="icon i-reply"><s>' . $txt['pm_replied'] . '</s></i>' : '<i class="icon i-comment-blank"></i>', '</td>
 								<td class="pm_date">', $message['time'], '</td>
 								<td class="pm_subject">',
 									$context['display_mode'] != 0 && $context['current_pm'] == $message['id'] ? '<img src="' . $settings['images_url'] . '/selected.png" alt="*" />' : '',
