@@ -304,71 +304,64 @@ class Attachment extends AbstractController
 		}
 
 		$id_attach = $this->_req->getQuery('attach', 'intval', $this->_req->getQuery('id', 'intval', 0));
-		if ($this->_req->getQuery('type') === 'avatar')
+
+		// This is just a regular attachment... Avatars are no longer a dlattach option
+		if (empty($topic) && !empty($id_attach))
 		{
-			$attachment = getAvatar($id_attach);
-			$this->_req->query->image = true;
+			$id_board = 0;
+			$id_topic = 0;
+			$attachPos = getAttachmentPosition($id_attach);
+			if ($attachPos !== false)
+			{
+				list($id_board, $id_topic) = array_values($attachPos);
+			}
 		}
-		// This is just a regular attachment...
 		else
 		{
-			if (empty($topic) && !empty($id_attach))
+			$id_board = $board;
+			$id_topic = $topic;
+		}
+
+		isAllowedTo('view_attachments', $id_board);
+
+		if ($this->_req->getQuery('thumb') === null)
+		{
+			$attachment = getAttachmentFromTopic($id_attach, $id_topic);
+		}
+		else
+		{
+			$this->_req->query->image = true;
+			$attachment = getAttachmentThumbFromTopic($id_attach, $id_topic);
+
+			// No file name, no thumbnail, no image.
+			if (empty($attachment['filename']))
 			{
-				$id_board = 0;
-				$id_topic = 0;
-				$attachPos = getAttachmentPosition($id_attach);
-				if ($attachPos !== false)
+				$full_attach = getAttachmentFromTopic($id_attach, $id_topic);
+				$attachment['filename'] = !empty($full_attach['filename']) ? $full_attach['filename'] : '';
+				$attachment['id_attach'] = 0;
+				$attachment['attachment_type'] = 0;
+				$attachment['approved'] = $full_attach['approved'];
+				$attachment['id_member'] = $full_attach['id_member'];
+
+				// If it is a known extension, show a mimetype extension image
+				$check = returnMimeThumb(!empty($full_attach['fileext']) ? $full_attach['fileext'] : 'default');
+				if ($check !== false)
 				{
-					list($id_board, $id_topic) = array_values($attachPos);
+					$attachment['fileext'] = 'png';
+					$attachment['mime_type'] = 'image/png';
+					$filename = $check;
 				}
-			}
-			else
-			{
-				$id_board = $board;
-				$id_topic = $topic;
-			}
-
-			isAllowedTo('view_attachments', $id_board);
-
-			if ($this->_req->getQuery('thumb') === null)
-			{
-				$attachment = getAttachmentFromTopic($id_attach, $id_topic);
-			}
-			else
-			{
-				$this->_req->query->image = true;
-				$attachment = getAttachmentThumbFromTopic($id_attach, $id_topic);
-
-				// No file name, no thumbnail, no image.
-				if (empty($attachment['filename']))
+				else
 				{
-					$full_attach = getAttachmentFromTopic($id_attach, $id_topic);
-					$attachment['filename'] = !empty($full_attach['filename']) ? $full_attach['filename'] : '';
-					$attachment['id_attach'] = 0;
-					$attachment['attachment_type'] = 0;
-					$attachment['approved'] = $full_attach['approved'];
-					$attachment['id_member'] = $full_attach['id_member'];
+					$attachmentsDir = new AttachmentsDirectory($modSettings, database());
+					$filename = $attachmentsDir->getCurrent() . '/' . $attachment['filename'];
+				}
 
-					// If it is a known extension, show a mimetype extension image
-					$check = returnMimeThumb(!empty($full_attach['fileext']) ? $full_attach['fileext'] : 'default');
-					if ($check !== false)
-					{
-						$attachment['fileext'] = 'png';
-						$attachment['mime_type'] = 'image/png';
-						$filename = $check;
-					}
-					else
-					{
-						$attachmentsDir = new AttachmentsDirectory($modSettings, database());
-						$filename = $attachmentsDir->getCurrent() . '/' . $attachment['filename'];
-					}
-
-					if (substr(getMimeType($filename), 0, 5) !== 'image')
-					{
-						$attachment['fileext'] = 'png';
-						$attachment['mime_type'] = 'image/png';
-						$filename = $settings['theme_dir'] . '/images/mime_images/default.png';
-					}
+				if (substr(getMimeType($filename), 0, 5) !== 'image')
+				{
+					$attachment['fileext'] = 'png';
+					$attachment['mime_type'] = 'image/png';
+					$filename = $settings['theme_dir'] . '/images/mime_images/default.png';
 				}
 			}
 		}

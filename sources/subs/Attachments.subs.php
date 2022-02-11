@@ -451,55 +451,6 @@ function createAttachment(&$attachmentOptions)
 }
 
 /**
- * Get the avatar with the specified ID.
- *
- * What it does:
- *
- * - It gets avatar data (folder, name of the file, filehash, etc)
- * from the database.
- * - Must return the same array keys as getAttachmentFromTopic()
- *
- * @param int $id_attach
- *
- * @return array
- * @package Attachments
- */
-function getAvatar($id_attach)
-{
-	$db = database();
-
-	// Use our cache when possible
-	$cache = array();
-	if (Cache::instance()->getVar($cache, 'getAvatar_id-' . $id_attach))
-	{
-		return $cache;
-	}
-
-	$avatarData = array();
-	$db->fetchQuery('
-		SELECT 
-			id_folder, filename, file_hash, fileext, id_attach, attachment_type,
-			mime_type, approved, id_member
-		FROM {db_prefix}attachments
-		WHERE id_attach = {int:id_attach}
-			AND id_member > {int:blank_id_member}
-		LIMIT 1',
-		array(
-			'id_attach' => $id_attach,
-			'blank_id_member' => 0,
-		)
-	)->fetch_callback(
-		function ($row) use (&$avatarData) {
-			$avatarData = $row;
-		}
-	);
-
-	Cache::instance()->put('getAvatar_id-' . $id_attach, $avatarData, 900);
-
-	return $avatarData;
-}
-
-/**
  * Get the specified attachment.
  *
  * What it does:
