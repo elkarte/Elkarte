@@ -13,7 +13,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.1.7
+ * @version 1.1.9
  *
  */
 
@@ -1222,7 +1222,9 @@ class PersonalMessage_Controller extends Action_Controller
 		}
 
 		// Mark the message as "replied to".
-		if (!empty($context['send_log']['sent']) && !empty($this->_req->post->replied_to) && $this->_req->getQuery('f') === 'inbox')
+		$replied_to = $this->_req->getPost('replied_to', 'intval', 0);
+		$box = $this->_req->getPost('f', 'trim', '');
+		if (!empty($context['send_log']['sent']) && !empty($replied_to) && $box === 'inbox')
 		{
 			require_once(SUBSDIR . '/PersonalMessage.subs.php');
 			setPMRepliedStatus($user_info['id'], (int) $this->_req->post->replied_to);
