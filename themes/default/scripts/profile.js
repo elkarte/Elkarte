@@ -7,7 +7,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.1
+ * @version 1.1.9
  */
 
 /**
@@ -84,14 +84,16 @@ function autoDetectTimeOffset(currentTime)
  * Calculates the number of available characters remaining when filling in the
  * signature box
  */
-function calcCharLeft()
+var oldSignature = "";
+function calcCharLeft(init)
 {
-	var oldSignature = "",
-		currentSignature = document.forms.creator.signature.value,
+	var currentSignature = document.forms.creator.signature.value,
 		currentChars = 0;
 
 	if (!document.getElementById("signatureLeft"))
 		return;
+
+	init = typeof init !== 'undefined' ? init : false;
 
 	if (oldSignature !== currentSignature)
 	{
@@ -109,7 +111,7 @@ function calcCharLeft()
 		var $_profile_error = $("#profile_error");
 		if (currentChars > maxLength && !$_profile_error.is(":visible"))
 			ajax_getSignaturePreview(false);
-		else if (currentChars <= maxLength && $_profile_error.is(":visible"))
+		else if (currentChars <= maxLength && $_profile_error.is(":visible") && !init)
 		{
 			$_profile_error.css({display:"none"});
 			$_profile_error.html('');

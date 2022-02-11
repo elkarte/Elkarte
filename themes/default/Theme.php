@@ -11,7 +11,7 @@
  * copyright:    2011 Simple Machines (http://www.simplemachines.org)
  * license:      BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.1.8
+ * @version 1.1.9
  *
  */
 
@@ -855,7 +855,7 @@ class Theme extends \Theme
 			$this->addCSSRules('
 	.i-account:before {
 		content: "";
-		background-image: url("' . $user_info['avatar']['href'] . '");
+		background-image: url("' . htmlspecialchars_decode($user_info['avatar']['href']) . '");
 	}');
 		}
 
