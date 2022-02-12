@@ -268,7 +268,7 @@ class Avatars
 
 		// If we can't load it, or it is not an image, remove it.
 		$this->file_functions->chmod($_FILES['attachment']['tmp_name']);
-		$image = new Image($_FILES['attachment']['tmp_name'], true);
+		$image = new Image($_FILES['attachment']['tmp_name']);
 		if (!$image->isImageLoaded())
 		{
 			unset($image);
