@@ -19,6 +19,9 @@ namespace ElkArte\AdminController;
 use ElkArte\AbstractController;
 use ElkArte\Action;
 use ElkArte\FileFunctions;
+use ElkArte\Graphics\Image;
+use ElkArte\Graphics\Manipulators\Gd2;
+use ElkArte\Graphics\Manipulators\Imagick;
 use ElkArte\SettingsForm\SettingsForm;
 use ElkArte\Util;
 use ElkArte\AttachmentsDirectory;
@@ -267,7 +270,7 @@ class ManageAttachments extends AbstractController
 	 */
 	private function _settings()
 	{
-		global $modSettings, $txt, $context;
+		global $modSettings, $txt, $context, $settings;
 
 		// Get the current attachment directory.
 		$attachmentsDir = new AttachmentsDirectory($modSettings, database());
@@ -308,17 +311,17 @@ class ManageAttachments extends AbstractController
 		$txt['attach_current_dir_warning'] = $txt['attach_current_dir'] . $txt['attach_current_dir_warning'];
 		$txt['basedirectory_for_attachments_warning'] = $txt['basedirectory_for_attachments_current'] . $txt['basedirectory_for_attachments_warning'];
 
-		// Perform a test to see if the GD module or ImageMagick are installed.
-		$testImg = get_extension_funcs('gd') || class_exists('Imagick');
+		// Perform several checks to determine imaging capabilities.
+		$image = new Image($settings['default_theme_dir'] . '/images/blank.png');
+		$testImg = Gd2::canUse() || Imagick::canUse();
+		$testImgRotate = Imagick::canUse() || (Gd2::canUse() && function_exists('exif_read_data'));
+		$testWebP = $image->hasWebpSupport();
 
-		// Check if the server settings support these values/options
+		// Check if the server settings support these upload size values
 		$post_max_size = ini_get('post_max_size');
 		$upload_max_filesize = ini_get('upload_max_filesize');
 		$testPM = empty($post_max_size) || memoryReturnBytes($post_max_size) >= (isset($modSettings['attachmentPostLimit']) ? $modSettings['attachmentPostLimit'] * 1024 : 0);
 		$testUM = empty($upload_max_filesize) || memoryReturnBytes($upload_max_filesize) >= (isset($modSettings['attachmentSizeLimit']) ? $modSettings['attachmentSizeLimit'] * 1024 : 0);
-
-		// Rotating images has a few specific requirements
-		$testImgRotate = class_exists('Imagick') || (get_extension_funcs('gd') && function_exists('exif_read_data'));
 
 		// Set some helpful information for the UI
 		$post_max_size_text = sprintf($txt['zero_for_system_limit'],empty($post_max_size) ? $txt['none'] : $post_max_size, 'post_max_size');
@@ -348,10 +351,12 @@ class ManageAttachments extends AbstractController
 			array('int', 'attachmentDirSizeLimit', 'subtext' => $txt['zero_for_no_limit'], 6, 'postinput' => $txt['kilobyte']),
 			'',
 			// Posting limits
-			array('int', 'attachmentPostLimit', 'step' => 250, 'subtext' => $post_max_size_text, 6, 'postinput' => empty($testPM) ? $txt['attachment_postsize_warning'] : $txt['kilobyte'], 'invalid' => empty($testPM)),
-			array('int', 'attachmentSizeLimit', 'step' => 250, 'subtext' => $upload_max_filesize_text, 6, 'postinput' => empty($testUM) ? $txt['attachment_postsize_warning'] : $txt['kilobyte'], 'invalid' => empty($testUM)),
+			array('int', 'attachmentPostLimit', 'step' => 50, 'subtext' => $post_max_size_text, 6, 'postinput' => empty($testPM) ? $txt['attachment_postsize_warning'] : $txt['kilobyte'], 'invalid' => empty($testPM)),
+			array('int', 'attachmentSizeLimit', 'step' => 25, 'subtext' => $upload_max_filesize_text, 6, 'postinput' => empty($testUM) ? $txt['attachment_postsize_warning'] : $txt['kilobyte'], 'invalid' => empty($testUM)),
 			array('int', 'attachmentNumPerPostLimit', 'subtext' => $txt['zero_for_no_limit'], 6),
-			array('check', 'attachment_autorotate', 'postinput' => empty($testImgRotate) ? $txt['attachment_autorotate_na'] : ''),
+			'',
+			array('check', 'attachment_webp_enable', 'disabled' => !$testWebP, 'postinput' => $testWebP ? "" : $txt['attachment_autorotate_na']),
+			array('check', 'attachment_autorotate', 'disabled' => !$testImgRotate, 'postinput' => $testImgRotate ? '' : $txt['attachment_autorotate_na']),
 			// Resize limits
 			array('title', 'attachment_image_resize'),
 			array('check', 'attachment_image_resize_enabled'),
@@ -371,7 +376,6 @@ class ManageAttachments extends AbstractController
 			array('title', 'attachment_thumbnail_settings'),
 			array('check', 'attachmentShowImages'),
 			array('check', 'attachmentThumbnails'),
-			array('check', 'attachment_thumb_png'),
 			array('text', 'attachmentThumbWidth', 6),
 			array('text', 'attachmentThumbHeight', 6),
 			'',
