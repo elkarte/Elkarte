@@ -183,7 +183,7 @@ class Imagick extends AbstractManipulator
 		// Don't bother resizing if it's already smaller...
 		if (!empty($dst_width) && !empty($dst_height) && ($dst_width < $src_width || $dst_height < $src_height || $force_resize))
 		{
-			$success = $this->_image->resizeImage($dst_width, $dst_height, \Imagick::FILTER_LANCZOS, 1, true);
+			$success = $this->_image->resizeImage($dst_width, $dst_height, \Imagick::FILTER_LANCZOS, .9891, true);
 			$this->_setImage();
 		}
 
@@ -227,6 +227,9 @@ class Imagick extends AbstractManipulator
 				$success = $this->_image->setImageFormat('gif');
 				break;
 			case IMAGETYPE_PNG:
+				// Save a few bytes the only way, realistically, we can
+				$this->_image->setOption('png:compression-level', '9');
+				$this->_image->setOption('png:exclude-chunk', 'all');
 				$success = $this->_image->setImageFormat('png');
 				break;
 			case IMAGETYPE_WBMP:
@@ -234,6 +237,10 @@ class Imagick extends AbstractManipulator
 				break;
 			case IMAGETYPE_BMP:
 				$success = $this->_image->setImageFormat('bmp');
+				break;
+			case IMAGETYPE_WEBP:
+				$this->_image->setImageCompressionQuality($quality);
+				$success = $this->_image->setImageFormat('webp');
 				break;
 			default:
 				$this->_image->borderImage('white', 0, 0);

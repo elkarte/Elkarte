@@ -240,7 +240,8 @@ class Gd2 extends AbstractManipulator
 			case IMAGETYPE_PNG:
 				if (function_exists('imagepng'))
 				{
-					imagealphablending($this->_image, false);
+					imagepalettetotruecolor($this->_image);
+					imagealphablending($this->_image, true);
 					imagesavealpha($this->_image, true);
 					$success = imagepng($this->_image, $output_name, 9, PNG_ALL_FILTERS);
 				}
@@ -261,6 +262,12 @@ class Gd2 extends AbstractManipulator
 				if (function_exists('imagebmp'))
 				{
 					$success = imagebmp($this->_image, $output_name);
+				}
+				break;
+			case IMAGETYPE_WEBP:
+				if (function_exists('imagewebp'))
+				{
+					$success = imagewebp($this->_image, $output_name, $quality);
 				}
 				break;
 			default:
