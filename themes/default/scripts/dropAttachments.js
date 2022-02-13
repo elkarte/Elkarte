@@ -168,7 +168,7 @@
 						resp = JSON.parse(resp);
 					}
 
-					// Well its done, lets make sure the server says so as well
+					// Well it is done, lets make sure the server says so as well
 					if (resp.result)
 					{
 						let curFileNum = filesUploadedSuccessfully.length,
@@ -405,7 +405,9 @@
 				this.setServerFail = function (data)
 				{
 					this.setProgress(0);
-					$button.removeClass('i-close').removeClass('colorize-close').addClass('i-alert').addClass('colorize-alert');
+					$button.removeClass('i-close').addClass('i-alert');
+					$progressbar.siblings('.icon .i-concentric').remove();
+					$progressbar.css("background-color", "var(--warn)");
 				};
 
 				// The file upload is successful, remove our abort event and swap the class
@@ -760,6 +762,7 @@
 			$input.clone(true, true).appendTo('.drop_area_fileselect_text');
 			$input.hide();
 		});
+
 		init(params);
 		return {
 			init: init,
