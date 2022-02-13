@@ -2639,7 +2639,7 @@ class InstallInstructions_install_2_0
 				array('birthday_email', 'happy_birthday'),
 				array('attachment_image_reencode', '1'),
 				array('attachment_image_paranoid', '0'),
-				array('attachment_thumb_png', '1'),
+				array('attachment_webp_enable', '1'),
 				array('avatar_reencode', '1'),
 				array('avatar_paranoid', '0'),
 				array('enable_unwatch', '0'),

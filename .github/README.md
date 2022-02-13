@@ -17,10 +17,11 @@ Contributions to documentation are licensed under [CC-by-SA 3](https://creativec
 [![Current Release](https://img.shields.io/github/release/elkarte/ElkArte.svg?style=flat)](https://github.com/elkarte/ElkArte/releases)
 [![License](https://img.shields.io/badge/License-BSD-green.svg?style=flat)](https://opensource.org/licenses/BSD-3-Clause)
 [![Downloads](https://img.shields.io/github/downloads/elkArte/Elkarte/total)](https://github.com/elkarte/Elkarte/releases)
-[![GitHub commits](https://img.shields.io/github/commits-since/elkarte/Elkarte/v1.1.6.svg)](https://github.com/elkarte/Elkarte/commit/)
+[![GitHub commits](https://img.shields.io/github/commits-since/elkarte/Elkarte/v1.1.8.svg)](https://github.com/elkarte/Elkarte/commit/)
 [![GitHub contributors](https://img.shields.io/github/contributors/elkarte/Elkarte.svg)](https://github.com/elkarte/Elkarte/contributors/)
 [![Open Issues](https://img.shields.io/github/issues/elkarte/Elkarte.svg?style=flat)](https://github.com/elkarte/Elkarte/issues)
 [![GitHub issues-closed](https://img.shields.io/github/issues-closed/elkarte/Elkarte.svg)](https://gitHub.com/elkarte/Elkarte/issues?q=is%3Aissue+is%3Aclosed)
+[![codecov](https://codecov.io/gh/elkarte/Elkarte/branch/development/graph/badge.svg?token=F8rpbLWOzB)](https://codecov.io/gh/elkarte/Elkarte)
 ## A small taste of ElkArte features
 * @Mentioning users including notifications
 * Like system for posts and topics, with a like statistics page
@@ -31,13 +32,12 @@ Contributions to documentation are licensed under [CC-by-SA 3](https://creativec
 * Two factor authentication
 * Two built in modern, responsive themes
 * Desktop notifications and number of unread notifications "live" in the favicon of the browser
-* Integrated video embedding for youtube, vimeo and dailymotion
+* Integrated video embedding for YouTube, Vimeo, TikTok and Dailymotion
 * Drag and drop ordering in the administration interface
-* Drag and drop file attachments
+* Drag and drop file attachments with live view
 * Built in image attachment lightbox with swipe/arrow navigation
 * Improved Anti Spam measures
 * Improved password security using industry standards
-* Bad Behaviour built in
 * Automatic combining and minifying of JavaScript and CSS
 * Posting and replying by Email
 * Ajax previews and responses throughout the user interface
