@@ -369,7 +369,14 @@ class Avatars
 
 		$db = database();
 
-		$valid_avatar_extensions = [IMAGETYPE_GIF => 'gif', IMAGETYPE_JPEG => 'jpg', IMAGETYPE_PNG => 'png', IMAGETYPE_BMP => 'bmp', IMAGETYPE_WBMP => 'bmp'];
+		$valid_avatar_extensions = [
+			IMAGETYPE_GIF => 'gif',
+			IMAGETYPE_JPEG => 'jpg',
+			IMAGETYPE_PNG => 'png',
+			IMAGETYPE_BMP => 'bmp',
+			IMAGETYPE_WBMP => 'bmp',
+			IMAGETYPE_WEBP => 'webp'
+		];
 
 		// We only support a subset of image types, after all, it's only an avatar
 		$sizes = $image->getImageDimensions();

@@ -16,6 +16,8 @@ namespace ElkArte\AdminController;
 use ElkArte\AbstractController;
 use ElkArte\Action;
 use ElkArte\FileFunctions;
+use ElkArte\Graphics\Manipulators\Gd2;
+use ElkArte\Graphics\Manipulators\Imagick;
 use ElkArte\SettingsForm\SettingsForm;
 
 /**
@@ -122,7 +124,7 @@ class ManageAvatars extends AbstractController
 		global $txt, $context, $modSettings;
 
 		// Check for GD and ImageMagick. It will set up a warning for the admin otherwise.
-		$testImg = get_extension_funcs('gd') || class_exists('Imagick');
+		$testImg = Gd2::canUse() || Imagick::canUse();
 
 		$context['valid_avatar_dir'] = FileFunctions::instance()->isDir($modSettings['avatar_directory']);
 		$context['valid_custom_avatar_dir'] = !empty($modSettings['custom_avatar_dir'])
