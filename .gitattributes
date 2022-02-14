@@ -14,3 +14,6 @@
 *.woff2 binary
 *.eot binary
 *.phar binary
+*.tgz binary
+*.zip binary
+*.tar.gz binary
