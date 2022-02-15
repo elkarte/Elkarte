@@ -12,6 +12,8 @@
  *
  */
 
+use ElkArte\MembersList;
+use ElkArte\User;
 use ElkArte\Util;
 
 /**
@@ -480,23 +482,35 @@ function template_quickreply_below()
 	// Using the quick reply box below the messages and you can reply?
 	if ($context['can_reply'] && !empty($options['display_quick_reply']))
 	{
+		// Wrap the Quick Reply area, making it look like a post / message.
 		echo '
-			<a id="quickreply"></a>
-			<div id="quickreplybox">
-				<h2 class="category_header category_toggle">
-					<span>
-						<a href="javascript:oQuickReply.swap();">
-							<i id="quickReplyExpand" class="chevricon i-chevron-', empty($context['minmax_preferences']['qreply']) ? 'up' : 'down', '" title="', $txt['hide'], '"></i>
-						</a>
-					</span>
-					<a href="javascript:oQuickReply.swap();">', $txt['quick_reply'], '</a>
-				</h2>
-				<div id="quickReplyOptions" class="forumposts content', empty($context['minmax_preferences']['qreply']) ? '"' : ' hide"', '>
-					<div class="editor_wrapper">
-						', $context['is_locked'] ? '<p class="warningbox">' . $txt['quick_reply_warning'] . '</p>' : '',
-						$context['oldTopicError'] ? '<p class="warningbox">' . sprintf($txt['error_old_topic'], $modSettings['oldTopicDays']) . '</p>' : '', '
-						', $context['can_reply_approved'] ? '' : '<em>' . $txt['wait_for_approval'] . '</em>', '
-						', !$context['can_reply_approved'] && $context['require_verification'] ? '<br />' : '', '
+	<h3 class="category_header">', $txt['quick_reply'], '</h3>
+	<div id="quickreplybox">
+		<a id="quickreply"></a>
+		<section>
+			<article class="post_wrapper forumposts">';
+
+		if (empty($options['hide_poster_area']))
+		{
+			// First lets load the profile array
+			$thisUser = [];
+			$thisUser['id'] = 'new';
+			$thisUser['is_message_author'] = true;
+			$member = MembersList::get(User::$info->id);
+			$member->loadContext();
+			$thisUser['member'] = $member->toArray()['data'];
+
+			echo '
+				<ul class="poster no_js">', template_build_poster_div($thisUser, false), '</ul>';
+		}
+
+		// Make a postarea similar to post
+		echo '
+				<div class="postarea', empty($options['hide_poster_area']) ? '' : '2', '">
+					<header class="category_header">
+						<h5>',  $txt['reply'], '</h5>
+					</header>
+					<div id="quickReplyOptions" class="', empty($context['minmax_preferences']['qreply']) ? '"' : ' hide"', '>
 						<form action="', getUrl('action', ['action' => 'post2', 'board' => $context['current_board']]), '" method="post" accept-charset="UTF-8" name="postmodify" id="postmodify" onsubmit="submitonce(this);', (!empty($modSettings['mentions_enabled']) ? 'revalidateMentions(\'postmodify\', \'' . (empty($options['use_editor_quick_reply']) ? 'message' : $context['post_box_name']) . '\');' : ''), '">
 							<input type="hidden" name="topic" value="', $context['current_topic'], '" />
 							<input type="hidden" name="subject" value="', $context['response_prefix'], $context['subject'], '" />
@@ -536,33 +550,35 @@ function template_quickreply_below()
 			echo '
 							<div class="quickReplyContent">
 								<textarea cols="600" rows="7" class="quickreply" name="message" id="message" tabindex="', $context['tabindex']++, '"></textarea>
-							</div>
-							<div id="post_confirm_buttons" class="submitbutton">
-								<input type="submit" name="post" value="', $txt['post'], '" onclick="return submitThisOnce(this);" accesskey="s" tabindex="', $context['tabindex']++, '" />
-								<input type="submit" name="preview" value="', $txt['preview'], '" onclick="return submitThisOnce(this);" accesskey="p" tabindex="', $context['tabindex']++, '" />';
-
-			// Draft save button?
-			if (!empty($context['drafts_save']))
-			{
-				echo '
-								<input type="button" name="save_draft" value="', $txt['draft_save'], '" onclick="return confirm(' . JavaScriptEscape($txt['draft_save_note']) . ') && submitThisOnce(this);" accesskey="d" tabindex="', $context['tabindex']++, '" />
-								<input type="hidden" id="id_draft" name="id_draft" value="', empty($context['id_draft']) ? 0 : $context['id_draft'], '" />';
-			}
-
-			echo '
 							</div>';
 		}
 		else
 		{
 			echo '
 							', template_control_richedit($context['post_box_name'], 'smileyBox_message', 'bbcBox_message');
-
-			// Show our submit buttons before any more options
-			echo '
-							<div id="post_confirm_buttons" class="submitbutton">
-								', template_control_richedit_buttons($context['post_box_name']), '
-							</div>';
 		}
+
+		echo '
+							', $context['is_locked'] ? '<p class="alert smalltext">' . $txt['quick_reply_warning'] . '</p>' : '',
+							$context['oldTopicError'] ? '<p class="alert smalltext">' . sprintf($txt['error_old_topic'], $modSettings['oldTopicDays']) . '</p>' : '', '
+							', $context['can_reply_approved'] ? '' : '<em>' . $txt['wait_for_approval'] . '</em>', '
+							', !$context['can_reply_approved'] && $context['require_verification'] ? '<br />' : '';
+
+		echo '
+							<div id="post_confirm_buttons" class="submitbutton">
+								<input type="submit" name="post" value="', $txt['post'], '" onclick="return submitThisOnce(this);" accesskey="s" tabindex="', $context['tabindex']++, '" />
+								<input type="submit" name="preview" value="', $txt['preview'], '" onclick="return submitThisOnce(this);" accesskey="p" tabindex="', $context['tabindex']++, '" />';
+
+		// Draft save button?
+		if (!empty($context['drafts_save']))
+		{
+			echo '
+								<input type="button" name="save_draft" value="', $txt['draft_save'], '" onclick="return confirm(' . JavaScriptEscape($txt['draft_save_note']) . ') && submitThisOnce(this);" accesskey="d" tabindex="', $context['tabindex']++, '" />
+								<input type="hidden" id="id_draft" name="id_draft" value="', empty($context['id_draft']) ? 0 : $context['id_draft'], '" />';
+		}
+
+		echo '
+							</div>';
 
 		// Show the draft last saved on area
 		if (!empty($context['drafts_autosave']) && !empty($options['drafts_autosave_enabled']))
@@ -578,7 +594,9 @@ function template_quickreply_below()
 						</form>
 					</div>
 				</div>
-			</div>';
+			</article>
+		</section>
+	</div>';
 
 		// Using the plain text box we need to load in some additional javascript
 		if (empty($options['use_editor_quick_reply']))
@@ -601,7 +619,7 @@ function template_quickreply_below()
 	// Finally, enable the quick reply quote function
 	echo '
 		<script>
-			var oQuickReply = new QuickReply({
+			let oQuickReply = new QuickReply({
 				bDefaultCollapsed: ', empty($context['minmax_preferences']['qreply']) ? 'false' : 'true', ',
 				iTopicId: ', $context['current_topic'], ',
 				iStart: ', $context['start'], ',
@@ -637,7 +655,7 @@ function template_quickreply_below()
 	if (!empty($options['display_quick_mod']) && $options['display_quick_mod'] == 1 && $context['can_remove_post'])
 	{
 		echo '
-				var oInTopicModeration = new InTopicModeration({
+				let oInTopicModeration = new InTopicModeration({
 					sCheckboxContainerMask: \'in_topic_mod_check_\',
 					aMessageIds: [\'', implode('\', \'', $context['quick_reply_removableMessageIDs']), '\'],
 					sSessionId: elk_session_id,

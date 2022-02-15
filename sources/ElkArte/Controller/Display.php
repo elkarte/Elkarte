@@ -772,7 +772,7 @@ class Display extends AbstractController
 		if ($context['can_reply'] && !empty($options['display_quick_reply']))
 		{
 			loadJavascriptFile('mentioning.js');
-			$this->_template_layers->add('quickreply');
+			$this->_template_layers->addBefore('quickreply', 'messages_informations');
 		}
 
 		$this->_template_layers->add('pages_and_buttons');
