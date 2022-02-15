@@ -169,7 +169,7 @@ class Emoji extends AbstractModel
 
 		// Otherwise, we have some Emoji :dancer:
 		$filename = $this->smileys_url . '/' . $this->shortcode_replace[$m[2]] . '.svg';
-		$alt = strtr($m[1], [':' => '&#58;', '(' => '&#40;', ')' => '&#41;', '$' => '&#36;', '[' => '&#091;']);
+		$alt = trim(strtr($m[1], [':' => '&#58;', '(' => '&#40;', ')' => '&#41;', '$' => '&#36;', '[' => '&#091;']));
 		$title = ucwords(strtr(htmlspecialchars($m[2]), [':' => '&#58;', '(' => '&#40;', ')' => '&#41;', '$' => '&#36;', '[' => '&#091;', '_' => ' ']));
 
 		return '<img class="smiley emoji" src="' . $filename . '" alt="' . $alt . '" title="' . $title . '" />';
