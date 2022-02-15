@@ -81,19 +81,18 @@ function previewPost()
 function previewPM()
 {
 	// define what we want to get from the form
-	var textFields = [
+	let textFields = [
 		'subject', post_box_name, 'to', 'bcc'
 	];
-	var numericFields = [
+	let numericFields = [
 		'recipient_to[]', 'recipient_bcc[]'
 	];
-	var checkboxFields = [
+	let checkboxFields = [
 		'outbox'
 	];
 
 	// And go get them
-	var x = [];
-	x = getFields(textFields, numericFields, checkboxFields, form_name);
+	let x = getFields(textFields, numericFields, checkboxFields, form_name);
 
 	// Send in document for previewing
 	sendXMLDocument(elk_prepareScriptUrl(elk_scripturl) + 'action=pm;sa=send2;preview;api=xml', x.join('&'), onDocSent);

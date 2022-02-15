@@ -600,8 +600,6 @@ function savePMDraft($recipientList, $draft, $check_last_save = false)
 		$context['draft_saved_on'] = time();
 		obExit();
 	}
-
-	return;
 }
 
 /**

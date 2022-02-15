@@ -909,7 +909,7 @@ function template_search_results()
 }
 
 /**
- * Show the send a new pm form, including the editor, preview section and load
+ * Show send a new pm form, including the editor, preview section and load
  * drafts if enabled.
  */
 function template_send()
@@ -1026,8 +1026,7 @@ function template_send()
 				</dl>';
 
 	// Show BBC buttons, smileys and textbox.
-	echo '
-				', template_control_richedit($context['post_box_name'], 'smileyBox_message', 'bbcBox_message');
+	template_control_richedit($context['post_box_name'], 'smileyBox_message', 'bbcBox_message');
 
 	// Require an image to be typed to save spamming?
 	if (!empty($context['require_verification']))
@@ -1041,8 +1040,11 @@ function template_send()
 
 	// Send, Preview buttons.
 	echo '
-				<div id="post_confirm_buttons" class="submitbutton">
-					', template_control_richedit_buttons($context['post_box_name']), '
+				<div id="post_confirm_buttons" class="submitbutton">';
+
+	template_control_richedit_buttons($context['post_box_name']);
+
+	echo '
 				</div>';
 
 	// Show the draft last saved on area
@@ -1068,7 +1070,7 @@ function template_send()
 	{
 		echo '
 				<h3 id="postDraftOptionsHeader" class="category_header panel_toggle">
-						<i id="postDraftExpand" class="chevricon i-chevron-', empty($context['minmax_preferences']['pmdraft']) ? 'up' : 'down', ' hide" title="', $txt['hide'], '"></i>
+					<i id="postDraftExpand" class="chevricon i-chevron-', empty($context['minmax_preferences']['pmdraft']) ? 'up' : 'down', ' hide" title="', $txt['hide'], '"></i>
 					<a href="#" id="postDraftExpandLink">', $txt['draft_load'], '</a>
 				</h3>
 				<div id="postDraftOptions" class="load_drafts padding', empty($context['minmax_preferences']['pmdraft']) ? '"' : ' hide"', '>
