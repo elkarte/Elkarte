@@ -104,8 +104,8 @@ class ImageUploadResize
 	/**
 	 * Executes the call to resizeImage
 	 *
-	 * - Change an images WxH
-	 * - Optionally will change the format PNG->JPG
+	 * - Change an images WxH dimensions to those defined in the resize section of the ACP
+	 * - Optionally will change the format PNG->JPG, JPG->WebP, PNG->WebP
 	 *
 	 * @param boolean $same_format if true will maintain the current image format
 	 * @return boolean
@@ -115,7 +115,8 @@ class ImageUploadResize
 		// Attempt to resize the bounds
 		if ($this->image->resizeImage($this->_bounds[0], $this->_bounds[1]))
 		{
-			$this->image->saveImage($this->_imageName, $same_format ? $this->_sizeCurrent[2] : IMAGETYPE_JPEG);
+			$new_format = !$same_format && $this->getWebP() ? IMAGETYPE_WEBP : IMAGETYPE_JPEG;
+			$this->image->saveImage($this->_imageName, $same_format ? $this->_sizeCurrent[2] : $new_format);
 
 			return true;
 		}
@@ -139,12 +140,13 @@ class ImageUploadResize
 
 		if (!$same_format)
 		{
-			// Your a JPG now
+			// Your something else now
 			$info = pathinfo($this->_fileName);
+			$type = $this->getWebP() ? ['image/webp', '.webp'] : ['image/jpeg', '.jpg'];
 			$update += [
-				'type' => 'image/jpeg',
-				'mime' => 'image/jpeg',
-				'name' => $info['filename'] . '.jpg',
+				'type' => $type[0],
+				'mime' => $type[0],
+				'name' => $info['filename'] . $type[1],
 			];
 		}
 
@@ -169,16 +171,37 @@ class ImageUploadResize
 			return false;
 		}
 
+		// A WebP image will generally be smaller than Jpeg or Png
+		if ($this->getWebP() && ($this->_sizeCurrent[2] === IMAGETYPE_JPEG || $this->_sizeCurrent[2] === IMAGETYPE_PNG))
+		{
+			return true;
+		}
+
+		// Already a JPEG and no WebP, out of options I'm afraid
 		if ($this->_sizeCurrent[2] === IMAGETYPE_JPEG)
 		{
 			return false;
 		}
 
+		// A transparent PNG, no WebP, If converted would be destructive, so just no
 		if ($this->_sizeCurrent[2] === IMAGETYPE_PNG && $this->image->getTransparency())
 		{
 			return false;
 		}
 
+		// Others like bmp or gif maybe even tiff
 		return true;
+	}
+
+	/**
+	 * Check if we can use webp format
+	 *
+	 * @return bool
+	 */
+	public function getWebP()
+	{
+		global $modSettings;
+
+		return $this->image->hasWebpSupport() && !empty($modSettings['attachment_webp_enable']);
 	}
 }

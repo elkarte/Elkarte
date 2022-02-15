@@ -306,7 +306,7 @@ function createAttachment(&$attachmentOptions)
 
 	// If this is an image we need to set a few additional parameters.
 	$is_image = $image->isImageLoaded();
-	$size = $is_image ? $image->getImageDimensions() : array(0, 0, 0);
+	$size = $is_image ? $image->getImageDimensions() : [0, 0, 0];
 	list ($attachmentOptions['width'], $attachmentOptions['height']) = $size;
 	$attachmentOptions['width'] = max(0, $attachmentOptions['width']);
 	$attachmentOptions['height'] = max(0, $attachmentOptions['height']);
@@ -363,7 +363,11 @@ function createAttachment(&$attachmentOptions)
 
 	// Now that we have the attach id, let's rename this and finish up.
 	$attachmentOptions['destination'] = getAttachmentFilename(basename($attachmentOptions['name']), $attachmentOptions['id'], $attachmentOptions['id_folder'], false, $attachmentOptions['file_hash']);
-	rename($attachmentOptions['tmp_name'], $attachmentOptions['destination']);
+	if (rename($attachmentOptions['tmp_name'], $attachmentOptions['destination']) && $is_image)
+	{
+		// Let the manipulator the (loaded) file new location
+		$image->setFileName($attachmentOptions['destination']);
+	}
 
 	// If it's not approved then add to the approval queue.
 	if (!$attachmentOptions['approved'])
@@ -448,55 +452,6 @@ function createAttachment(&$attachmentOptions)
 	}
 
 	return true;
-}
-
-/**
- * Get the avatar with the specified ID.
- *
- * What it does:
- *
- * - It gets avatar data (folder, name of the file, filehash, etc)
- * from the database.
- * - Must return the same array keys as getAttachmentFromTopic()
- *
- * @param int $id_attach
- *
- * @return array
- * @package Attachments
- */
-function getAvatar($id_attach)
-{
-	$db = database();
-
-	// Use our cache when possible
-	$cache = array();
-	if (Cache::instance()->getVar($cache, 'getAvatar_id-' . $id_attach))
-	{
-		return $cache;
-	}
-
-	$avatarData = array();
-	$db->fetchQuery('
-		SELECT 
-			id_folder, filename, file_hash, fileext, id_attach, attachment_type,
-			mime_type, approved, id_member
-		FROM {db_prefix}attachments
-		WHERE id_attach = {int:id_attach}
-			AND id_member > {int:blank_id_member}
-		LIMIT 1',
-		array(
-			'id_attach' => $id_attach,
-			'blank_id_member' => 0,
-		)
-	)->fetch_callback(
-		function ($row) use (&$avatarData) {
-			$avatarData = $row;
-		}
-	);
-
-	Cache::instance()->put('getAvatar_id-' . $id_attach, $avatarData, 900);
-
-	return $avatarData;
 }
 
 /**
@@ -727,9 +682,23 @@ function saveAvatar($temporary_path, $memID, $max_width, $max_height)
 		return false;
 	}
 
+	// Get this party started
+	$valid_avatar_extensions = [
+		IMAGETYPE_PNG => 'png',
+		IMAGETYPE_JPEG => 'jpeg',
+		IMAGETYPE_WEBP => 'webp'
+	];
+
+	$image = new Image($temporary_path);
+	if (!$image->isImageLoaded())
+	{
+		return false;
+	}
+
+	$format = $image->getDefaultFormat();
+	$ext = $valid_avatar_extensions[$format];
 	$tokenizer = new TokenHash();
-	$ext = !empty($modSettings['avatar_download_png']) ? 'png' : 'jpeg';
-	$destName = 'avatar_' . $memID . '_' . $tokenizer->generate_hash(16) . '.' . $ext;
+	$fileName = 'avatar_' . $memID . '_' . $tokenizer->generate_hash(16) . '.' . $ext;
 
 	// Clear out any old attachment
 	require_once(SUBSDIR . '/ManageAttachments.subs.php');
@@ -742,23 +711,16 @@ function saveAvatar($temporary_path, $memID, $max_width, $max_height)
 			'file_hash' => 'string-255', 'fileext' => 'string-8', 'size' => 'int', 'id_folder' => 'int',
 		),
 		array(
-			$memID, 1, $destName, '', $ext, 1, 1,
+			$memID, 1, $fileName, '', $ext, 1, 1,
 		),
 		array('id_attach')
 	);
 	$attachID = $db->insert_id('{db_prefix}attachments');
 
 	// The destination filename depends on the custom dir for avatars
-	$destName = $modSettings['custom_avatar_dir'] . '/' . $destName;
-	$format = !empty($modSettings['avatar_download_png']) ? IMAGETYPE_PNG : IMAGETYPE_JPEG;
+	$destName = $modSettings['custom_avatar_dir'] . '/' . $fileName;
 
 	// Resize and rotate it.
-	$image = new Image($temporary_path);
-	if (!$image->isImageLoaded())
-	{
-		return false;
-	}
-
 	if (!empty($modSettings['attachment_autorotate']))
 	{
 		$image->autoRotate();
@@ -796,7 +758,7 @@ function saveAvatar($temporary_path, $memID, $max_width, $max_height)
 		return true;
 	}
 
-	// Having a problem with image manipulation
+	// Having a problem with image manipulation, rotation, resize, etc
 	$db->query('', '
 		DELETE FROM {db_prefix}attachments
 		WHERE id_attach = {int:current_attachment}',
@@ -1213,10 +1175,16 @@ function loadAttachmentContext($id_msg)
 			$attachmentData[$i]['height'] = $attachment['height'];
 
 			// Let's see, do we want thumbs?
-			if (!empty($modSettings['attachmentThumbnails']) && !empty($modSettings['attachmentThumbWidth']) && !empty($modSettings['attachmentThumbHeight']) && ($attachment['width'] > $modSettings['attachmentThumbWidth'] || $attachment['height'] > $modSettings['attachmentThumbHeight']) && strlen($attachment['filename']) < 249)
+			if (!empty($modSettings['attachmentThumbnails'])
+				&& !empty($modSettings['attachmentThumbWidth'])
+				&& !empty($modSettings['attachmentThumbHeight'])
+				&& ($attachment['width'] > $modSettings['attachmentThumbWidth'] || $attachment['height'] > $modSettings['attachmentThumbHeight']) && strlen($attachment['filename']) < 249)
 			{
 				// A proper thumb doesn't exist yet? Create one! Or, it needs update.
-				if (empty($attachment['id_thumb']) || $attachment['thumb_width'] > $modSettings['attachmentThumbWidth'] || $attachment['thumb_height'] > $modSettings['attachmentThumbHeight'] || ($attachment['thumb_width'] < $modSettings['attachmentThumbWidth'] && $attachment['thumb_height'] < $modSettings['attachmentThumbHeight']))
+				if (empty($attachment['id_thumb'])
+					|| $attachment['thumb_width'] > $modSettings['attachmentThumbWidth']
+					|| $attachment['thumb_height'] > $modSettings['attachmentThumbHeight'])
+					//|| ($attachment['thumb_width'] < $modSettings['attachmentThumbWidth'] && $attachment['thumb_height'] < $modSettings['attachmentThumbHeight']))
 				{
 					$filename = getAttachmentFilename($attachment['filename'], $attachment['id_attach'], $attachment['id_folder'], false, $attachment['file_hash']);
 					$attachment = array_merge($attachment, updateAttachmentThumbnail($filename, $attachment['id_attach'], $id_msg, $attachment['id_thumb'], $attachment['filename']));
@@ -1534,7 +1502,8 @@ function getValidMimeImageType($mime)
 		IMAGETYPE_TIFF_MM => 'tiff',
 		IMAGETYPE_JPC => 'jpeg',
 		IMAGETYPE_IFF => 'iff',
-		IMAGETYPE_WBMP => 'bmp'
+		IMAGETYPE_WBMP => 'bmp',
+		IMAGETYPE_WEBP => 'webp'
 	);
 
 	$ext = (int) $mime > 0 && isset($validImageTypes[(int) $mime]) ? $validImageTypes[(int) $mime] : '';

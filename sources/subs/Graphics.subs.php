@@ -18,6 +18,7 @@
  *
  */
 
+use ElkArte\Graphics\Manipulators\Gd2;
 use ElkArte\Http\Headers;
 use ElkArte\User;
 
@@ -40,7 +41,7 @@ function showCodeImage($code)
 	global $settings, $modSettings;
 
 	// No GD, No image code
-	if (get_extension_funcs('gd') === [])
+	if (!Gd2::canUse())
 	{
 		return false;
 	}

@@ -299,18 +299,32 @@ $helptxt['attachmentPostLimit'] = 'Specify how large a single post\'s total uplo
 $helptxt['attachmentSizeLimit'] = 'Specify the largest size a single attachment in a post can have.';
 $helptxt['attachmentNumPerPostLimit'] = 'Select the number of attachments a member can add per post.';
 
-$helptxt['attachment_image_resize_enabled'] = 'Master on/off switch for this function.  Enabling this will resize attachment images (.jpg, .png, .gif, .bmp) to fit within the bounds specified.  The image format will be maintained unless it is unable to fit the resized image within the max allowed file size specified.  In this case, if change format is enabled, the system will convert the image to JPEG for better compression.';
+$helptxt['attachment_image_resize_enabled'] = 'Master on/off switch for this function.  Enabling this will 
+	resize attachment images (.jpg, .png, .gif, .bmp, .webp) to fit within the specified bounds.  The image format 
+	will be maintained unless the resized image is over the specified max allowed file size.  In this event, if 
+	change format is enabled, the system may convert the image to WebP or JPEG for better compression.';
 $helptxt['attachment_image_resize_enabled_size'] = 'or larger than %s KB.';
-$helptxt['attachment_image_resize_reformat'] = 'Selecting this option will allow the system to reformat non-JPEG images into the JPEG format when necessary.  The system will try to maintain the existing format unless the resulting image is still in excess of the maximum file size allowed.';
-$helptxt['attachment_image_resize_width'] = 'This allows you to set a maximum width for attachment images. Pictures smaller than the maximum will not be affected, larger images will be resized proportionately. This allows you to accept a larger image on upload and have it resized to save space. The maximum filesize parameter is still enforced.';
-$helptxt['attachment_image_resize_height'] = 'This allows you to set a maximum height for attachment images. Pictures smaller than the maximum will not be affected, larger images will be resized proportionately. This allows you to accept a larger image on upload and have it resized to save space. The maximum filesize parameter is still enforced.';
+$helptxt['attachment_image_resize_reformat'] = '
+	Selecting this option will allow the system to change images into WebP, if available, or JPEG ONLY
+	when necessary.  The system will try to maintain the existing format unless the resized image is in
+	excess of the maximum allowed file size.  It will not reencode JPG or change a PNG with transparency to JPG';
+$helptxt['attachment_image_resize_width'] = 'This allows you to set a maximum width for attachment images. 
+	Pictures smaller than the maximum will not be affected, larger images will be resized proportionately. 
+	This allows you to accept a larger image on upload and have it resized to save space. The maximum 
+	filesize parameter is still enforced.';
+$helptxt['attachment_image_resize_height'] = 'This allows you to set a maximum height for attachment images. 
+	Pictures smaller than the maximum will not be affected, larger images will be resized proportionately. 
+	This allows you to accept a larger image on upload and have it resized to save space. 
+	The maximum filesize parameter is still enforced.';
 
 $helptxt['attachmentCheckExtensions'] = 'Check this box to enable attachment filtering, which will only allow files to be uploaded with the file extensions that you have defined.';
 $helptxt['attachmentExtensions'] = 'Specify what attachment types are allowed, for example: jpg,png,gif  Remember to be careful in what you allow as some file extensions can cause a security risk to your website.';
 $helptxt['attachment_autorotate'] = 'Selecting this option will allow the system to detect rotated images, typical of phone cameras, and automatically adjust the orientation such that the image top is oriented up. Requires either ImageMagick or both GD and Exif modules to be available.';
-$helptxt['attachmentShowImages'] = 'If the uploaded file is a picture, this will automatically display it underneath the post.';
+$helptxt['attachmentShowImages'] = 'If the uploaded file is a picture, this will automatically display it underneath the post.  If not enabled you will only see a filename and its dsize';
 $helptxt['attachmentThumbnails'] = 'Enable this to show post images as a smaller thumbnail image, which when selected will expand to the full sized image.';
-$helptxt['attachment_thumb_png'] = 'When creating thumbnails to display under a post, this will only create them as png files.';
+$helptxt['attachment_webp_enable'] = 'Enabling this will allow the system to create/save thumbnails and avatars 
+	in WebP format.  It will also allow the image resize function, when enabled, to save an attachment as Webp when
+ 	necessary.';
 $helptxt['attachmentThumbWidth'] = 'Only used with the &quot;Resize images when showing under posts&quot; option, the maximum width to resize attachments down from.  They will be resized proportionally.';
 $helptxt['attachmentThumbHeight'] = 'Only used with the &quot;Resize images when showing under posts&quot; option, the maximum height to resize attachments down from.  They will be resized proportionally.';
 $helptxt['attachment_image_reencode'] = 'Selecting this option will enable the re-encode of uploaded image attachments. Image re-encoding offers better security, however it will also render all animated images static.';
@@ -320,10 +334,10 @@ $helptxt['attachmentUploadDir'] = 'Select where you want the files uploaded to b
 $helptxt['attachment_transfer_empty'] = 'Enabling this will move all the files from the source directory to the new location, otherwise only the maximum allowed number of files according to the per-directory setting will be moved.';
 $helptxt['avatar_reencode'] = 'Selecting this option will enable the re-encode of uploaded avatars. Image re-encoding offers better security, however it will also render all animated images static.';
 $helptxt['karmaMode'] = 'Karma is a feature that shows the popularity of a member. Members, if allowed, can
-		\'applaud\' or \'smite\' other members, which is how their popularity is calculated. You can change the
-		number of posts needed to have a &quot;karma&quot;, the time between smites or applauds, and if administrators
-		have to wait this time as well.<br /><br />Whether or not groups of members can smite others is controlled by
-		a permission.  If you have trouble getting this feature to work for everyone, double check your permissions.';
+	\'applaud\' or \'smite\' other members, which is how their popularity is calculated. You can change the
+	number of posts needed to have a &quot;karma&quot;, the time between smites or applauds, and if administrators
+	have to wait this time as well.<br /><br />Whether or not groups of members can smite others is controlled by
+	a permission.  If you have trouble getting this feature to work for everyone, double check your permissions.';
 $helptxt['localCookies'] = 'The system uses cookies to store login information on the client computer.
 	Cookies can be stored globally (myserver.com) or locally (myserver.com/path/to/forum).<br />
 	Check this option if you\'re experiencing problems with users getting logged out automatically.<hr />

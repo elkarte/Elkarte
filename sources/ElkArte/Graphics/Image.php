@@ -37,7 +37,8 @@ class Image
 		IMAGETYPE_JPEG => 'jpeg',
 		IMAGETYPE_PNG => 'png',
 		IMAGETYPE_BMP => 'bmp',
-		IMAGETYPE_WBMP => 'wbmp'
+		IMAGETYPE_WBMP => 'wbmp',
+		IMAGETYPE_WEBP => 'webp'
 	];
 
 	/** @var \ElkArte\Graphics\Manipulators\Imagick|\ElkArte\Graphics\Manipulators\Gd2 */
@@ -63,10 +64,46 @@ class Image
 	 */
 	public function __construct($fileName, $force_gd = false)
 	{
-		$this->_fileName = $fileName;
+		$this->setFileName($fileName);
 		$this->_force_gd = $force_gd;
 
 		$this->loadImage();
+	}
+
+	/**
+	 * Sets the filename / path in use
+	 */
+	public function setFileName($fileName)
+	{
+		$this->_fileName = $fileName;
+	}
+
+	/**
+	 * Check if the current manipulator supports webP
+	 *
+	 * @return bool
+	 */
+	public function hasWebpSupport()
+	{
+		if (Imagick::canUse() && !$this->_force_gd)
+		{
+			$check = \Imagick::queryformats();
+			if (!array_search('WEBP', $check))
+			{
+				return false;
+			}
+		}
+
+		if (Gd2::canUse())
+		{
+			$check = gd_info();
+			if (empty($check['WebP Support']))
+			{
+				return false;
+			}
+		}
+
+		return true;
 	}
 
 	/**
@@ -207,11 +244,9 @@ class Image
 	 */
 	public function createThumbnail($max_width, $max_height, $dstName = '', $format = null, $force = null)
 	{
-		global $modSettings;
-
 		// The particulars
 		$dstName = $dstName === '' ? $this->_fileName . '_thumb' : $dstName;
-		$default_format = empty($modSettings['attachment_thumb_png']) ? IMAGETYPE_JPEG : IMAGETYPE_PNG;
+		$default_format = $this->getDefaultFormat();
 		$format = empty($format) || !is_int($format) ? $default_format : $format;
 		$max_width = max(16, $max_width);
 		$max_height = max(16, $max_height);
@@ -235,6 +270,35 @@ class Image
 		}
 
 		return $success;
+	}
+
+	/**
+	 * Sets the best output format for a given image's thumbnail
+	 *
+	 * - If webP is available, use that as it gives the smallest size
+	 * - No webP then if the image has alpha, we preserve it
+	 * - Finally good ol' jpeg
+	 *
+	 * @return int
+	 */
+	public function getDefaultFormat()
+	{
+		global $modSettings;
+
+		// Best choice if server supports
+		if ($this->hasWebpSupport() && !empty($modSettings['attachment_webp_enable']))
+		{
+			return IMAGETYPE_WEBP;
+		}
+
+		// If you have alpha channels, best keep them
+		if ($this->getMimeType() === 'image/png' && $this->getTransparency())
+		{
+			return IMAGETYPE_PNG;
+		}
+
+		// The default
+		return IMAGETYPE_JPEG;
 	}
 
 	/**
