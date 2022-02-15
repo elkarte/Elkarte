@@ -322,7 +322,7 @@ class PersonalMessage extends AbstractModule
 		}
 
 		// Want to save this as a draft and think about it some more?
-		if ($context['drafts_pm_save'] && isset($_POST['save_draft']))
+		if (isset($_POST['save_draft']))
 		{
 			// PM survey says ... can you stay or must you go
 			if (!empty($context['drafts_pm_save']) && isset($_POST['id_pm_draft']))
@@ -337,7 +337,7 @@ class PersonalMessage extends AbstractModule
 					'is_usersaved' => (int) empty($_REQUEST['autosave']),
 				);
 
-				if (isset($_REQUEST['xml']))
+				if ($this->getApi() !== false)
 				{
 					$recipientList['to'] = isset($_POST['recipient_to']) ? explode(',', $_POST['recipient_to']) : array();
 					$recipientList['bcc'] = isset($_POST['recipient_bcc']) ? explode(',', $_POST['recipient_bcc']) : array();
@@ -347,7 +347,7 @@ class PersonalMessage extends AbstractModule
 				self::$_eventsManager->trigger('before_savepm_draft', array('draft' => &$draft, 'recipientList' => &$recipientList));
 
 				// Now save the draft
-				savePMDraft($recipientList, $draft, isset($_REQUEST['xml']));
+				savePMDraft($recipientList, $draft, !empty($this->getApi()));
 				throw new ControllerRedirectException('', '');
 			}
 		}

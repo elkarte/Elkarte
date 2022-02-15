@@ -2134,7 +2134,7 @@ function loadPMSubjectRequest($pms, $orderBy)
  * @param bool $descending if true descending order of display
  * @param int|string $display_mode how are they being viewed, all, conversation, etc
  * @param string $folder current pm folder
- * @return bool|resource
+ * @return bool|\ElkArte\Database\AbstractResult
  * @package PersonalMessage
  */
 function loadPMMessageRequest($display_pms, $sort_by_query, $sort_by, $descending, $display_mode = '', $folder = '')

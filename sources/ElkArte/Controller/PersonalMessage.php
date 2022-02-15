@@ -80,19 +80,19 @@ class PersonalMessage extends AbstractController
 		// You're not supposed to be here at all, if you can't even read PMs.
 		isAllowedTo('pm_read');
 
-		// This file contains the our PM functions such as mark, send, delete
+		// This file contains PM functions such as mark, send, delete
 		require_once(SUBSDIR . '/PersonalMessage.subs.php');
 
 		// Templates, language, javascripts
 		Txt::load('PersonalMessage');
 		loadJavascriptFile(array('PersonalMessage.js', 'suggest.js'));
 
-		if (!isset($this->_req->query->xml))
+		if ($this->getApi() === false)
 		{
 			theme()->getTemplates()->load('PersonalMessage');
 		}
 
-		$this->_events->trigger('pre_dispatch', array('xml' => isset($this->_req->query->xml)));
+		$this->_events->trigger('pre_dispatch', array('xml' => $this->getApi() !== false));
 
 		// Load up the members maximum message capacity.
 		$this->_loadMessageLimit();
@@ -129,12 +129,15 @@ class PersonalMessage extends AbstractController
 		$context['currently_using_labels'] = count($context['labels']) > 1 ? 1 : 0;
 
 		// Some stuff for the labels...
-		$context['current_label_id'] = isset($this->_req->query->l) && isset($context['labels'][(int) $this->_req->query->l]) ? (int) $this->_req->query->l : -1;
+		$label = $this->_req->getQuery('l', 'intval');
+		$folder = $this->_req->getQuery('f', 'trim', '');
+		$start = $this->_req->getQuery('start', 'trim');
+		$context['current_label_id'] = isset($label, $context['labels'][$label]) ? $label : -1;
 		$context['current_label'] = &$context['labels'][(int) $context['current_label_id']]['name'];
-		$context['folder'] = !isset($this->_req->query->f) || $this->_req->query->f !== 'sent' ? 'inbox' : 'sent';
+		$context['folder'] = $folder !== 'sent' ? 'inbox' : 'sent';
 
 		// This is convenient.  Do you know how annoying it is to do this every time?!
-		$context['current_label_redirect'] = 'action=pm;f=' . $context['folder'] . (isset($this->_req->query->start) ? ';start=' . $this->_req->query->start : '') . (isset($this->_req->query->l) ? ';l=' . $this->_req->query->l : '');
+		$context['current_label_redirect'] = 'action=pm;f=' . $context['folder'] . (isset($start) ? ';start=' . $start : '') . (!empty($label) ? ';l=' . $label : '');
 		$context['can_issue_warning'] = featureEnabled('w') && allowedTo('issue_warning') && !empty($modSettings['warning_enable']);
 
 		// Build the linktree for all the actions...
@@ -248,7 +251,7 @@ class PersonalMessage extends AbstractController
 		{
 			$this->_messageIndexBar($context['current_label_id'] == -1 ? $context['folder'] : 'label' . $context['current_label_id']);
 		}
-		elseif (!isset($this->_req->query->xml))
+		elseif ($this->getApi() === false)
 		{
 			$this->_messageIndexBar($subAction);
 		}
@@ -394,7 +397,7 @@ class PersonalMessage extends AbstractController
 		$context['menu_item_selected'] = $pm_include_data['current_area'];
 
 		// Set the template for this area and add the profile layer.
-		if (!isset($this->_req->query->xml))
+		if ($this->getApi() === false)
 		{
 			$template_layers = theme()->getLayers();
 			$template_layers->add('pm');
@@ -402,7 +405,7 @@ class PersonalMessage extends AbstractController
 	}
 
 	/**
-	 * Display a folder, ie. inbox/sent etc.
+	 * Display a folder, i.e. inbox/sent etc.
 	 *
 	 * Display mode: 0 = all at once, 1 = one at a time, 2 = as a conversation
 	 *
@@ -411,11 +414,10 @@ class PersonalMessage extends AbstractController
 	 */
 	public function action_folder()
 	{
-		global $txt, $scripturl, $modSettings, $context, $subjects_request;
-		global $messages_request, $options;
+		global $txt, $scripturl, $modSettings, $context, $subjects_request, $messages_request, $options;
 
 		// Changing view?
-		if (isset($this->_req->query->view))
+		if ($this->_req->isSet('view'))
 		{
 			$context['display_mode'] = $context['display_mode'] > 1 ? 0 : $context['display_mode'] + 1;
 			require_once(SUBSDIR . '/Members.subs.php');
@@ -423,11 +425,12 @@ class PersonalMessage extends AbstractController
 		}
 
 		// Make sure the starting location is valid.
-		if (isset($this->_req->query->start) && $this->_req->query->start !== 'new')
+		$start = $this->_req->getQuery('start', 'trim');
+		if (isset($start) && $start !== 'new')
 		{
 			$start = (int) $this->_req->query->start;
 		}
-		elseif (!isset($this->_req->query->start) && !empty($options['view_newest_pm_first']))
+		elseif (!isset($start) && !empty($options['view_newest_pm_first']))
 		{
 			$start = 0;
 		}
@@ -449,7 +452,7 @@ class PersonalMessage extends AbstractController
 				AND FIND_IN_SET(' . $context['current_label_id'] . ', pmr.labels) != 0' : '';
 
 		// They didn't pick a sort, so we use the forum default.
-		$sort_by = !isset($this->_req->query->sort) ? 'date' : $this->_req->query->sort;
+		$sort_by = $this->_req->getQuery('sort', 'trim', 'date');
 		$descending = isset($this->_req->query->desc);
 
 		// Set our sort by query
@@ -511,9 +514,9 @@ class PersonalMessage extends AbstractController
 		}
 
 		// ... but wait - what if we want to start from a specific message?
-		if (isset($this->_req->query->pmid))
+		if ($this->_req->isSet('pmid'))
 		{
-			$pmID = (int) $this->_req->query->pmid;
+			$pmID = $this->_req->getQuery('pmid', 'intval', 0);
 
 			// Make sure you have access to this PM.
 			if (!isAccessiblePM($pmID, $context['folder'] === 'sent' ? 'outbox' : 'inbox'))
@@ -529,7 +532,7 @@ class PersonalMessage extends AbstractController
 				$start = 0;
 			}
 			// If we pass kstart we assume we're in the right place.
-			elseif (!isset($this->_req->query->kstart))
+			elseif (!$this->_req->isSet('kstart'))
 			{
 				$start = getPMCount($descending, $pmID, $labelQuery);
 
@@ -540,9 +543,9 @@ class PersonalMessage extends AbstractController
 		}
 
 		// Sanitize and validate pmsg variable if set.
-		if (isset($this->_req->query->pmsg))
+		if ($this->_req->isSet('pmsg'))
 		{
-			$pmsg = (int) $this->_req->query->pmsg;
+			$pmsg = $this->_req->getQuery('pmsg', 'intval', 0);
 
 			if (!isAccessiblePM($pmsg, $context['folder'] === 'sent' ? 'outbox' : 'inbox'))
 			{
@@ -888,7 +891,7 @@ class PersonalMessage extends AbstractController
 				{
 					$context['recipients']['to'][] = array(
 						'id' => $row_quoted['id_member'],
-						'name' => htmlspecialchars($row_quoted['real_name'], ENT_COMPAT, 'UTF-8'),
+						'name' => htmlspecialchars($row_quoted['real_name'], ENT_COMPAT),
 					);
 				}
 
@@ -976,7 +979,7 @@ class PersonalMessage extends AbstractController
 	{
 		global $txt, $context, $modSettings;
 
-		if (isset($this->_req->query->xml))
+		if ($this->getApi() !== false)
 		{
 			$context['sub_template'] = 'generic_preview';
 		}
@@ -1035,7 +1038,7 @@ class PersonalMessage extends AbstractController
 			$row_quoted = loadPMQuote($pmsg, $isReceived);
 			if ($row_quoted === false)
 			{
-				if (!isset($this->_req->query->xml))
+				if ($this->getApi() === false)
 				{
 					throw new Exception('pm_not_yours', false);
 				}
@@ -1104,7 +1107,7 @@ class PersonalMessage extends AbstractController
 
 		// Check whether we need to show the code again.
 		$context['require_verification'] = $this->user->is_admin === false && !empty($modSettings['pm_posts_verification']) && $this->user->posts < $modSettings['pm_posts_verification'];
-		if ($context['require_verification'] && !isset($this->_req->query->xml))
+		if ($context['require_verification'] && $this->getApi() === false)
 		{
 			$verificationOptions = array(
 				'id' => 'pm',
@@ -1154,7 +1157,7 @@ class PersonalMessage extends AbstractController
 
 			if (!empty($pmCount) && $pmCount >= $modSettings['pm_posts_per_hour'])
 			{
-				if (!isset($this->_req->query->xml))
+				if ($this->getApi() === false)
 				{
 					throw new Exception('pm_too_many_per_hour', true, array($modSettings['pm_posts_per_hour']));
 				}
@@ -1166,7 +1169,7 @@ class PersonalMessage extends AbstractController
 		}
 
 		// If your session timed out, show an error, but do allow to re-submit.
-		if (!isset($this->_req->query->xml) && checkSession('post', '', false) != '')
+		if ($this->getApi() === false && checkSession('post', '', false) !== '')
 		{
 			$post_errors->addError('session_timeout');
 		}
@@ -1292,7 +1295,7 @@ class PersonalMessage extends AbstractController
 			$post_errors->addError('no_subject');
 		}
 
-		if (!isset($this->_req->post->message) || $this->_req->post->message === '')
+		if ($this->_req->getPost('message', 'trim', '') === '')
 		{
 			$post_errors->addError('no_message');
 		}
@@ -1303,7 +1306,7 @@ class PersonalMessage extends AbstractController
 		else
 		{
 			// Preparse the message.
-			$message = $this->_req->post->message;
+			$message = $this->_req->getPost('message', 'trim', '');
 			preparsecode($message);
 
 			// Make sure there's still some content left without the tags.
@@ -1314,7 +1317,7 @@ class PersonalMessage extends AbstractController
 		}
 
 		// If they made any errors, give them a chance to make amends.
-		if ($post_errors->hasErrors() && !$is_recipient_change && !isset($this->_req->query->preview) && !isset($this->_req->query->xml))
+		if ($post_errors->hasErrors() && !$is_recipient_change && !$this->_req->isSet('preview') && $this->getApi() === false)
 		{
 			$this->messagePostError($namedRecipientList, $recipientList);
 
@@ -1322,7 +1325,7 @@ class PersonalMessage extends AbstractController
 		}
 
 		// Want to take a second glance before you send?
-		if (isset($this->_req->query->preview))
+		if ($this->_req->isSet('preview'))
 		{
 			// Set everything up to be displayed.
 			$context['preview_subject'] = Util::htmlspecialchars($this->_req->post->subject);
@@ -1368,11 +1371,13 @@ class PersonalMessage extends AbstractController
 		}
 		catch (ControllerRedirectException $e)
 		{
-			return $this->messagePostError($namedRecipientList, $recipientList);
+			$this->messagePostError($namedRecipientList, $recipientList);
+
+			return true;
 		}
 
 		// Safety net, it may be a module may just add to the list of errors without actually throw the error
-		if ($post_errors->hasErrors() && !isset($this->_req->query->preview) && !isset($this->_req->query->xml))
+		if ($post_errors->hasErrors() && !$this->_req->isSet('preview') && $this->getApi() === false)
 		{
 			$this->messagePostError($namedRecipientList, $recipientList);
 
@@ -1579,7 +1584,7 @@ class PersonalMessage extends AbstractController
 		// If all then delete all messages the user has.
 		if ($this->_req->query->f === 'all')
 		{
-			deleteMessages(null, null);
+			deleteMessages(null);
 		}
 		// Otherwise just the selected folder.
 		else
@@ -1657,7 +1662,7 @@ class PersonalMessage extends AbstractController
 		// Submitting changes?
 		if (isset($this->_req->post->add) || isset($this->_req->post->delete) || isset($this->_req->post->save))
 		{
-			checkSession('post');
+			checkSession();
 
 			// This will be for updating messages.
 			$message_changes = array();
@@ -1852,7 +1857,7 @@ class PersonalMessage extends AbstractController
 		// Are they saving?
 		if (isset($this->_req->post->save))
 		{
-			checkSession('post');
+			checkSession();
 
 			// Mimic what profile would do.
 			// @todo fix this when Profile.subs is not dependant on this behavior
@@ -1928,7 +1933,7 @@ class PersonalMessage extends AbstractController
 			}
 
 			// Check the session before proceeding any further!
-			checkSession('post');
+			checkSession();
 
 			// First, load up the message they want to file a complaint against, and verify it actually went to them!
 			list ($subject, $body, $time, $memberFromID, $memberFromName, $poster_name, $time_message) = loadPersonalMessage($pmsg);
@@ -2160,7 +2165,7 @@ class PersonalMessage extends AbstractController
 		// Saving?
 		elseif (isset($this->_req->query->save))
 		{
-			checkSession('post');
+			checkSession();
 			$rid = $this->_req->getQuery('rid', 'intval', 0);
 			$context['rid'] = isset($context['rules'][$rid]) ? $rid : 0;
 
@@ -2265,7 +2270,7 @@ class PersonalMessage extends AbstractController
 		// Deleting?
 		elseif (isset($this->_req->post->delselected) && !empty($this->_req->post->delrule))
 		{
-			checkSession('post');
+			checkSession();
 			$toDelete = array();
 			foreach ($this->_req->post->delrule as $k => $v)
 			{
@@ -2872,13 +2877,11 @@ class PersonalMessage extends AbstractController
 		}
 
 		// Base64 encode, then replace +/= with uri safe ones that can be reverted
-		$encoded = str_replace(array('+', '/', '='), array('-', '_', '.'), base64_encode(implode('|"|', $encoded)));
-
-		return $encoded;
+		return str_replace(array('+', '/', '='), array('-', '_', '.'), base64_encode(implode('|"|', $encoded)));
 	}
 
 	/**
-	 * Allows to search through personal messages.
+	 * Allows searching personal messages.
 	 *
 	 * What it does:
 	 *
@@ -2904,12 +2907,12 @@ class PersonalMessage extends AbstractController
 		if (isset($this->_req->post->search))
 		{
 			$context['search_params']['search'] = un_htmlspecialchars($this->_req->post->search);
-			$context['search_params']['search'] = htmlspecialchars($context['search_params']['search'], ENT_COMPAT, 'UTF-8');
+			$context['search_params']['search'] = htmlspecialchars($context['search_params']['search'], ENT_COMPAT);
 		}
 
 		if (isset($context['search_params']['userspec']))
 		{
-			$context['search_params']['userspec'] = htmlspecialchars($context['search_params']['userspec'], ENT_COMPAT, 'UTF-8');
+			$context['search_params']['userspec'] = htmlspecialchars($context['search_params']['userspec'], ENT_COMPAT);
 		}
 
 		// 1 => 'allwords' / 2 => 'anywords'.
@@ -2939,7 +2942,7 @@ class PersonalMessage extends AbstractController
 			$context['search_labels'][] = array(
 				'id' => $label['id'],
 				'name' => $label['name'],
-				'checked' => !empty($searchedLabels) ? in_array($label['id'], $searchedLabels) : true,
+				'checked' => empty($searchedLabels) || in_array($label['id'], $searchedLabels),
 			);
 		}
 

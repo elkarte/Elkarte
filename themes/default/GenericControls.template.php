@@ -19,7 +19,7 @@
  * @param string|null $smileyContainer if set show the smiley container id
  * @param string|null $bbcContainer show the bbc container id
  *
- * @return string as echo output
+ * @return void echo output
  */
 function template_control_richedit($editor_id, $smileyContainer = null, $bbcContainer = null)
 {
@@ -152,7 +152,7 @@ function template_control_richedit($editor_id, $smileyContainer = null, $bbcCont
  *
  * @param string $editor_id
  *
- * @return string as echo output
+ * @return void echo output
  */
 function template_control_richedit_buttons($editor_id)
 {
@@ -174,12 +174,12 @@ function template_control_richedit_buttons($editor_id)
 	echo '
 			', $context['shortcuts_text'], '
 		</span>
-		<input type="submit" name="', isset($editor_context['labels']['post_name']) ? $editor_context['labels']['post_name'] : 'post', '" value="', isset($editor_context['labels']['post_button']) ? $editor_context['labels']['post_button'] : $txt['post'], '" tabindex="', $context['tabindex']++, '" onclick="return submitThisOnce(this);" accesskey="s" />';
+		<input type="submit" name="', $editor_context['labels']['post_name'] ?? 'post', '" value="', $editor_context['labels']['post_button'] ?? $txt['post'], '" tabindex="', $context['tabindex']++, '" onclick="return submitThisOnce(this);" accesskey="s" />';
 
 	if ($editor_context['preview_type'])
 	{
 		echo '
-		<input type="submit" name="preview" value="', isset($editor_context['labels']['preview_button']) ? $editor_context['labels']['preview_button'] : $txt['preview'], '" tabindex="', $context['tabindex']++, '" onclick="', $editor_context['preview_type'] == 2 ? 'return event.ctrlKey || previewControl();' : 'return submitThisOnce(this);', '" accesskey="p" />';
+		<input type="submit" name="preview" value="', $editor_context['labels']['preview_button'] ?? $txt['preview'], '" tabindex="', $context['tabindex']++, '" onclick="', $editor_context['preview_type'] == 2 ? 'return event.ctrlKey || previewControl();' : 'return submitThisOnce(this);', '" accesskey="p" />';
 	}
 
 	foreach ($editor_context['buttons'] as $button)
