@@ -22,6 +22,7 @@ use ElkArte\Action;
 use ElkArte\Cache\Cache;
 use ElkArte\Errors\Errors;
 use ElkArte\Exceptions\Exception;
+use ElkArte\FileFunctions;
 use ElkArte\SettingsForm\SettingsForm;
 use ElkArte\Languages\Txt;
 use ElkArte\Util;
@@ -32,11 +33,7 @@ use ElkArte\Util;
  */
 class ManageSmileys extends AbstractController
 {
-	/**
-	 * Contextual information about smiley sets.
-	 *
-	 * @var mixed[]
-	 */
+	/** @var mixed[] Contextual information about smiley sets. */
 	private $_smiley_context = array();
 
 	/**
@@ -197,7 +194,7 @@ class ManageSmileys extends AbstractController
 
 		// The directories...
 		$context['smileys_dir'] = empty($modSettings['smileys_dir']) ? BOARDDIR . '/smileys' : $modSettings['smileys_dir'];
-		$context['smileys_dir_found'] = is_dir($context['smileys_dir']);
+		$context['smileys_dir_found'] = FileFunctions::instance()->isDir($context['smileys_dir']);
 
 		// All the settings for the page...
 		$config_vars = array(
@@ -488,7 +485,7 @@ class ManageSmileys extends AbstractController
 
 		require_once(SUBSDIR . '/Smileys.subs.php');
 
-		if (empty($modSettings['smileys_dir']) || !is_dir($modSettings['smileys_dir'] . '/' . $smileyPath))
+		if (empty($modSettings['smileys_dir']) || !FileFunctions::instance()->isDir($modSettings['smileys_dir'] . '/' . $smileyPath))
 		{
 			throw new Exception('smiley_set_unable_to_import');
 		}
@@ -564,12 +561,16 @@ class ManageSmileys extends AbstractController
 	/**
 	 * If we're modifying or adding a smileyset, or if we imported from another
 	 * set, then some context info needs to be set.
+	 *
+	 * @throws \ElkArte\Exceptions\Exception in superfluity
 	 */
 	private function _subActionModifySet()
 	{
 		global $context, $txt, $modSettings;
 
-		if ($context['sub_action'] == 'modifyset')
+		$fileFunc = FileFunctions::instance();
+
+		if ($context['sub_action'] === 'modifyset')
 		{
 			$set = $this->_req->getQuery('set', 'intval', -1);
 			if ($set == -1 || !isset($context['smiley_sets'][$set]))
@@ -588,7 +589,7 @@ class ManageSmileys extends AbstractController
 				$context['current_set']['is_new'] = false;
 
 				// Calculate whether there are any smileys in the directory that can be imported.
-				if (!empty($modSettings['smiley_enable']) && !empty($modSettings['smileys_dir']) && is_dir($modSettings['smileys_dir'] . '/' . $context['current_set']['path']))
+				if (!empty($modSettings['smiley_enable']) && !empty($modSettings['smileys_dir']) && $fileFunc->isDir($modSettings['smileys_dir'] . '/' . $context['current_set']['path']))
 				{
 					$smileys = array();
 					$dir = dir($modSettings['smileys_dir'] . '/' . $context['current_set']['path']);
@@ -625,12 +626,12 @@ class ManageSmileys extends AbstractController
 
 			// Retrieve all potential smiley set directories.
 			$context['smiley_set_dirs'] = array();
-			if (!empty($modSettings['smileys_dir']) && is_dir($modSettings['smileys_dir']))
+			if (!empty($modSettings['smileys_dir']) && $fileFunc->isDir($modSettings['smileys_dir']))
 			{
 				$dir = dir($modSettings['smileys_dir']);
 				while (($entry = $dir->read()) !== false)
 				{
-					if (!in_array($entry, array('.', '..')) && is_dir($modSettings['smileys_dir'] . '/' . $entry))
+					if (!in_array($entry, array('.', '..')) && $fileFunc->isDir($modSettings['smileys_dir'] . '/' . $entry))
 					{
 						$context['smiley_set_dirs'][] = array(
 							'id' => $entry,
@@ -652,11 +653,12 @@ class ManageSmileys extends AbstractController
 	{
 		global $modSettings, $context, $txt;
 
+		$fileFunc = FileFunctions::instance();
 		require_once(SUBSDIR . '/Smileys.subs.php');
 
 		// Get a list of all known smiley sets.
 		$context['smileys_dir'] = empty($modSettings['smileys_dir']) ? BOARDDIR . '/smileys' : $modSettings['smileys_dir'];
-		$context['smileys_dir_found'] = is_dir($context['smileys_dir']);
+		$context['smileys_dir_found'] = $fileFunc->isDir($context['smileys_dir']);
 		$context['smiley_sets'] = explode(',', $modSettings['smiley_sets_known']);
 		$context['sub_template'] = 'addsmiley';
 
@@ -703,7 +705,7 @@ class ManageSmileys extends AbstractController
 				$writeErrors = array();
 				foreach ($context['smiley_sets'] as $set)
 				{
-					if (!is_writable($context['smileys_dir'] . '/' . un_htmlspecialchars($set['path'])))
+					if (!$fileFunc->isWritable($context['smileys_dir'] . '/' . un_htmlspecialchars($set['path'])))
 					{
 						$writeErrors[] = $set['path'];
 					}
@@ -716,9 +718,10 @@ class ManageSmileys extends AbstractController
 			}
 
 			// Uploading just one smiley for all of them?
-			if (isset($this->_req->post->sameall) && isset($_FILES['uploadSmiley']['name']) && $_FILES['uploadSmiley']['name'] != '')
+			if (isset($this->_req->post->sameall, $_FILES['uploadSmiley']['name']) && $_FILES['uploadSmiley']['name'] != '')
 			{
-				if (!is_uploaded_file($_FILES['uploadSmiley']['tmp_name']) || (ini_get('open_basedir') == '' && !file_exists($_FILES['uploadSmiley']['tmp_name'])))
+				if (!is_uploaded_file($_FILES['uploadSmiley']['tmp_name'])
+					|| (ini_get('open_basedir') === '' && !$fileFunc->fileExists($_FILES['uploadSmiley']['tmp_name'])))
 				{
 					throw new Exception('smileys_upload_error');
 				}
@@ -745,7 +748,7 @@ class ManageSmileys extends AbstractController
 				$i = 0;
 
 				// Keep going until we find a set the file doesn't exist in. (or maybe it exists in all of them?)
-				while (isset($context['smiley_sets'][$i]) && file_exists($context['smileys_dir'] . '/' . un_htmlspecialchars($context['smiley_sets'][$i]['path']) . '/' . $destName))
+				while (isset($context['smiley_sets'][$i]) && $fileFunc->fileExists($context['smileys_dir'] . '/' . un_htmlspecialchars($context['smiley_sets'][$i]['path']) . '/' . $destName))
 				{
 					$i++;
 				}
@@ -755,7 +758,7 @@ class ManageSmileys extends AbstractController
 				{
 					$smileyLocation = $context['smileys_dir'] . '/' . un_htmlspecialchars($context['smiley_sets'][$i]['path']) . '/' . $destName;
 					move_uploaded_file($_FILES['uploadSmiley']['tmp_name'], $smileyLocation);
-					@chmod($smileyLocation, 0644);
+					$fileFunc->chmod($smileyLocation);
 
 					// Now, we want to move it from there to all the other sets.
 					for ($n = count($context['smiley_sets']); $i < $n; $i++)
@@ -763,36 +766,36 @@ class ManageSmileys extends AbstractController
 						$currentPath = $context['smileys_dir'] . '/' . un_htmlspecialchars($context['smiley_sets'][$i]['path']) . '/' . $destName;
 
 						// The file is already there!  Don't overwrite it!
-						if (file_exists($currentPath))
+						if ($fileFunc->fileExists($currentPath))
 						{
 							continue;
 						}
 
 						// Okay, so copy the first one we made to here.
 						copy($smileyLocation, $currentPath);
-						@chmod($currentPath, 0644);
+						$fileFunc->chmod($currentPath);
 					}
 				}
 
-				// Finally make sure it's saved correctly!
+				// Finally, make sure it's saved correctly!
 				$this->_req->post->smiley_filename = $destName;
 			}
 			// What about uploading several files?
 			elseif ($this->_req->post->method !== 'existing')
 			{
 				$newName = '';
-				foreach ($_FILES as $name => $dummy)
+				foreach ($_FILES as $file)
 				{
-					if ($_FILES[$name]['name'] == '')
+					if ($file['name'] === '')
 					{
 						throw new Exception('smileys_upload_error_blank');
 					}
 
 					if (empty($newName))
 					{
-						$newName = basename($_FILES[$name]['name']);
+						$newName = basename($file['name']);
 					}
-					elseif (basename($_FILES[$name]['name']) !== $newName)
+					elseif (basename($file['name']) !== $newName)
 					{
 						throw new Exception('smileys_upload_error_name');
 					}
@@ -803,13 +806,13 @@ class ManageSmileys extends AbstractController
 					$set['name'] = un_htmlspecialchars($set['name']);
 					$set['path'] = un_htmlspecialchars($set['path']);
 
-					if (!isset($_FILES['individual_' . $set['name']]['name']) || $_FILES['individual_' . $set['name']]['name'] == '')
+					if (!isset($_FILES['individual_' . $set['name']]['name']) || $_FILES['individual_' . $set['name']]['name'] === '')
 					{
 						continue;
 					}
 
 					// Got one...
-					if (!is_uploaded_file($_FILES['individual_' . $set['name']]['tmp_name']) || (ini_get('open_basedir') == '' && !file_exists($_FILES['individual_' . $set['name']]['tmp_name'])))
+					if (!is_uploaded_file($_FILES['individual_' . $set['name']]['tmp_name']) || (ini_get('open_basedir') === '' && !$fileFunc->fileExists($_FILES['individual_' . $set['name']]['tmp_name'])))
 					{
 						throw new Exception('smileys_upload_error');
 					}
@@ -834,14 +837,14 @@ class ManageSmileys extends AbstractController
 
 					// If the file exists - ignore it.
 					$smileyLocation = $context['smileys_dir'] . '/' . $set['path'] . '/' . $destName;
-					if (file_exists($smileyLocation))
+					if ($fileFunc-fileExists($smileyLocation))
 					{
 						continue;
 					}
 
 					// Finally - move the image!
 					move_uploaded_file($_FILES['individual_' . $set['name']]['tmp_name'], $smileyLocation);
-					@chmod($smileyLocation, 0644);
+					$fileFunc->chmod($smileyLocation);
 
 					// Should always be saved correctly!
 					$this->_req->post->smiley_filename = $destName;
@@ -889,7 +892,7 @@ class ManageSmileys extends AbstractController
 		{
 			foreach ($context['smiley_sets'] as $smiley_set)
 			{
-				if (!file_exists($context['smileys_dir'] . '/' . un_htmlspecialchars($smiley_set['path'])))
+				if (!$fileFunc->fileExists($context['smileys_dir'] . '/' . un_htmlspecialchars($smiley_set['path'])))
 				{
 					continue;
 				}
@@ -931,6 +934,7 @@ class ManageSmileys extends AbstractController
 	{
 		global $modSettings, $context, $txt;
 
+		$fileFunc = FileFunctions::instance();
 		require_once(SUBSDIR . '/Smileys.subs.php');
 
 		// Force the correct tab to be displayed.
@@ -950,7 +954,7 @@ class ManageSmileys extends AbstractController
 					$this->_req->post->checked_smileys[$id] = (int) $smiley_id;
 				}
 
-				if ($this->_req->post->smiley_action == 'delete')
+				if ($this->_req->post->smiley_action === 'delete')
 				{
 					deleteSmileys($this->_req->post->checked_smileys);
 				}
@@ -1032,7 +1036,7 @@ class ManageSmileys extends AbstractController
 		}
 
 		// Prepare overview of all (custom) smileys.
-		if ($context['sub_action'] == 'editsmileys')
+		if ($context['sub_action'] === 'editsmileys')
 		{
 			// Determine the language specific sort order of smiley locations.
 			$smiley_locations = array(
@@ -1123,10 +1127,10 @@ class ManageSmileys extends AbstractController
 							'value' => $txt['smileys_description'],
 						),
 						'data' => array(
-							'function' => function ($rowData) {
+							'function' => function ($rowData) use ($fileFunc) {
 								global $context, $txt, $modSettings;
 
-								if (empty($modSettings['smileys_dir']) || !is_dir($modSettings['smileys_dir']))
+								if (empty($modSettings['smileys_dir']) || !$fileFunc->isDir($modSettings['smileys_dir']))
 								{
 									return htmlspecialchars($rowData['description'], ENT_COMPAT, 'UTF-8');
 								}
@@ -1135,7 +1139,7 @@ class ManageSmileys extends AbstractController
 								$missing_sets = array();
 								foreach ($context['smiley_sets'] as $smiley_set)
 								{
-									if (!file_exists(sprintf('%1$s/%2$s/%3$s', $modSettings['smileys_dir'], $smiley_set['path'], $rowData['filename'])))
+									if (!$fileFunc->fileExists(sprintf('%1$s/%2$s/%3$s', $modSettings['smileys_dir'], $smiley_set['path'], $rowData['filename'])))
 									{
 										$missing_sets[] = $smiley_set['path'];
 									}
@@ -1255,11 +1259,11 @@ class ManageSmileys extends AbstractController
 			$context['sub_template'] = 'show_list';
 		}
 		// Modifying smileys.
-		elseif ($context['sub_action'] == 'modifysmiley')
+		elseif ($context['sub_action'] === 'modifysmiley')
 		{
 			// Get a list of all known smiley sets.
 			$context['smileys_dir'] = empty($modSettings['smileys_dir']) ? BOARDDIR . '/smileys' : $modSettings['smileys_dir'];
-			$context['smileys_dir_found'] = is_dir($context['smileys_dir']);
+			$context['smileys_dir_found'] = $fileFunc->isDir($context['smileys_dir']);
 			$context['smiley_sets'] = explode(',', $modSettings['smiley_sets_known']);
 
 			$set_names = explode("\n", $modSettings['smiley_sets_names']);
@@ -1281,7 +1285,7 @@ class ManageSmileys extends AbstractController
 			{
 				foreach ($context['smiley_sets'] as $smiley_set)
 				{
-					if (!file_exists($context['smileys_dir'] . '/' . un_htmlspecialchars($smiley_set['path'])))
+					if (!$fileFunc->fileExists($context['smileys_dir'] . '/' . un_htmlspecialchars($smiley_set['path'])))
 					{
 						continue;
 					}
@@ -1324,6 +1328,7 @@ class ManageSmileys extends AbstractController
 	{
 		global $context, $settings, $txt;
 
+		$fileFunc = FileFunctions::instance();
 		require_once(SUBSDIR . '/MessageIcons.subs.php');
 
 		// Get a list of icons.
@@ -1357,7 +1362,7 @@ class ManageSmileys extends AbstractController
 					$this->_req->post->icon_filename = substr($this->_req->post->icon_filename, 0, -4);
 				}
 
-				if (!file_exists($settings['default_theme_dir'] . '/images/post/' . $this->_req->post->icon_filename . '.png'))
+				if (!$fileFunc->fileExists($settings['default_theme_dir'] . '/images/post/' . $this->_req->post->icon_filename . '.png'))
 				{
 					throw new Exception('icon_not_found');
 				}
@@ -1693,6 +1698,7 @@ class ManageSmileys extends AbstractController
 		Txt::load('Errors');
 		Txt::load('Packages');
 
+		$fileFunc = FileFunctions::instance();
 		require_once(SUBSDIR . '/Smileys.subs.php');
 		require_once(SUBSDIR . '/Package.subs.php');
 
@@ -1716,7 +1722,7 @@ class ManageSmileys extends AbstractController
 
 			$destination = BOARDDIR . '/packages/' . $base_name;
 
-			if (file_exists($destination))
+			if ($fileFunc->fileExists($destination))
 			{
 				throw new Exception('package_upload_error_exists');
 			}
@@ -1734,13 +1740,13 @@ class ManageSmileys extends AbstractController
 			$destination = BOARDDIR . '/packages/' . basename($this->_req->query->package);
 		}
 
-		if (!file_exists($destination))
+		if (!$fileFunc->fileExists($destination))
 		{
 			throw new Exception('package_no_file', false);
 		}
 
 		// Make sure temp directory exists and is empty.
-		if (file_exists(BOARDDIR . '/packages/temp'))
+		if ($fileFunc->fileExists(BOARDDIR . '/packages/temp'))
 		{
 			deltree(BOARDDIR . '/packages/temp', false);
 		}
@@ -1770,7 +1776,7 @@ class ManageSmileys extends AbstractController
 			throw new Exception('packageget_unable', false, array('http://custom.elkarte.net/index.php?action=search;type=12;basic_search=' . $name));
 		}
 
-		if ($extracted && !file_exists(BOARDDIR . '/packages/temp/package-info.xml'))
+		if ($extracted && !$fileFunc->fileExists(BOARDDIR . '/packages/temp/package-info.xml'))
 		{
 			foreach ($extracted as $file)
 			{
@@ -1787,7 +1793,7 @@ class ManageSmileys extends AbstractController
 			$base_path = '';
 		}
 
-		if (!file_exists(BOARDDIR . '/packages/temp/' . $base_path . 'package-info.xml'))
+		if (!$fileFunc->fileExists(BOARDDIR . '/packages/temp/' . $base_path . 'package-info.xml'))
 		{
 			throw new Exception('package_get_error_missing_xml', false);
 		}
@@ -1819,11 +1825,11 @@ class ManageSmileys extends AbstractController
 			if ($action['type'] === 'readme' || $action['type'] === 'license')
 			{
 				$type = 'package_' . $action['type'];
-				if (file_exists(BOARDDIR . '/packages/temp/' . $base_path . $action['filename']))
+				if ($fileFunc->fileExists(BOARDDIR . '/packages/temp/' . $base_path . $action['filename']))
 				{
 					$context[$type] = htmlspecialchars(trim(file_get_contents(BOARDDIR . '/packages/temp/' . $base_path . $action['filename']), "\n\r"), ENT_COMPAT, 'UTF-8');
 				}
-				elseif (file_exists($action['filename']))
+				elseif ($fileFunc->fileExists($action['filename']))
 				{
 					$context[$type] = htmlspecialchars(trim(file_get_contents($action['filename']), "\n\r"), ENT_COMPAT, 'UTF-8');
 				}
@@ -1838,8 +1844,6 @@ class ManageSmileys extends AbstractController
 				{
 					$context[$type] = nl2br($context[$type]);
 				}
-
-				continue;
 			}
 			elseif ($action['type'] === 'require-dir')
 			{
@@ -1850,7 +1854,7 @@ class ManageSmileys extends AbstractController
 				);
 
 				$file = BOARDDIR . '/packages/temp/' . $base_path . $action['filename'];
-				if (isset($action['filename']) && (!file_exists($file) || !is_writable(dirname($action['destination']))))
+				if (isset($action['filename']) && (!$fileFunc->fileExists($file) || !$fileFunc->isWritable(dirname($action['destination']))))
 				{
 					$context['has_failure'] = true;
 
@@ -1922,7 +1926,7 @@ class ManageSmileys extends AbstractController
 			$this->clearSmileyCache();
 		}
 
-		if (file_exists(BOARDDIR . '/packages/temp'))
+		if ($fileFunc->fileExists(BOARDDIR . '/packages/temp'))
 		{
 			deltree(BOARDDIR . '/packages/temp');
 		}
