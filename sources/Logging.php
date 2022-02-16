@@ -15,6 +15,7 @@
  */
 
 use ElkArte\Cache\Cache;
+use ElkArte\FileFunctions;
 use ElkArte\User;
 use Elkarte\Util;
 
@@ -157,10 +158,12 @@ function logLastDatabaseError()
 	// Make a note of the last modified time in case someone does this before us
 	$last_db_error_change = @filemtime(BOARDDIR . '/db_last_error.txt');
 
+	$fileFunc = FileFunctions::instance();
+
 	// Save the old file before we do anything
 	$file = BOARDDIR . '/db_last_error.txt';
-	$dberror_backup_fail = !@is_writable(BOARDDIR . '/db_last_error_bak.txt') || !@copy($file, BOARDDIR . '/db_last_error_bak.txt');
-	$dberror_backup_fail = !$dberror_backup_fail ? (!file_exists(BOARDDIR . '/db_last_error_bak.txt') || filesize(BOARDDIR . '/db_last_error_bak.txt') === 0) : $dberror_backup_fail;
+	$dberror_backup_fail = !$fileFunc->isWritable(BOARDDIR . '/db_last_error_bak.txt') || !@copy($file, BOARDDIR . '/db_last_error_bak.txt');
+	$dberror_backup_fail = !$dberror_backup_fail ? (!$fileFunc->fileExists(BOARDDIR . '/db_last_error_bak.txt') || filesize(BOARDDIR . '/db_last_error_bak.txt') === 0) : $dberror_backup_fail;
 
 	clearstatcache();
 	if (filemtime(BOARDDIR . '/db_last_error.txt') === $last_db_error_change)
