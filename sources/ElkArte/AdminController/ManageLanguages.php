@@ -20,6 +20,7 @@ use ElkArte\AbstractController;
 use ElkArte\Action;
 use ElkArte\Cache\Cache;
 use ElkArte\Exceptions\Exception;
+use ElkArte\FileFunctions;
 use ElkArte\SettingsForm\SettingsForm;
 use ElkArte\Languages\Txt;
 use ElkArte\Util;
@@ -34,7 +35,7 @@ use ElkArte\Languages\Loader as LangLoader;
 class ManageLanguages extends AbstractController
 {
 	/**
-	 * This is the main function for the languages area.
+	 * This is the main function for the languages' area.
 	 *
 	 * What it does:
 	 *
@@ -163,6 +164,7 @@ class ManageLanguages extends AbstractController
 		global $txt, $context, $language;
 
 		require_once(SUBSDIR . '/Language.subs.php');
+		$fileFunc = FileFunctions::instance();
 
 		// Setting a new default?
 		if (!empty($this->_req->post->set_default) && !empty($this->_req->post->def_language))
@@ -267,7 +269,7 @@ class ManageLanguages extends AbstractController
 					'position' => 'bottom_of_list',
 					'value' => '
 						<input type="hidden" name="' . $context['session_var'] . '" value="' . $context['session_id'] . '" />
-						<input type="submit" name="set_default" value="' . $txt['save'] . '"' . (is_writable(BOARDDIR . '/Settings.php') ? '' : ' disabled="disabled"') . ' />
+						<input type="submit" name="set_default" value="' . $txt['save'] . '"' . ($fileFunc->isWritable(BOARDDIR . '/Settings.php') ? '' : ' disabled="disabled"') . ' />
 						<input type="hidden" name="' . $context['admin-ssc_token_var'] . '" value="' . $context['admin-ssc_token'] . '" />',
 				),
 			),
@@ -278,7 +280,7 @@ class ManageLanguages extends AbstractController
 		);
 
 		// Display a warning if we cannot edit the default setting.
-		if (!is_writable(BOARDDIR . '/Settings.php'))
+		if (!$fileFunc->isWritable(BOARDDIR . '/Settings.php'))
 		{
 			$listOptions['additional_rows'][] = array(
 				'position' => 'after_title',
@@ -332,6 +334,7 @@ class ManageLanguages extends AbstractController
 
 		Txt::load('ManageSettings');
 		require_once(SUBSDIR . '/Package.subs.php');
+		$fileFunc = FileFunctions::instance();
 
 		// Clearly we need to know what to request.
 		if (!isset($this->_req->query->did))
@@ -430,9 +433,9 @@ class ManageLanguages extends AbstractController
 			);
 
 			// Does the file exist, is it different and can we overwrite?
-			if (file_exists(BOARDDIR . '/' . $file['filename']))
+			if ($fileFunc->fileExists(BOARDDIR . '/' . $file['filename']))
 			{
-				if (is_writable(BOARDDIR . '/' . $file['filename']))
+				if ($fileFunc->isWritable(BOARDDIR . '/' . $file['filename']))
 				{
 					$context_data['writable'] = true;
 				}
@@ -455,7 +458,7 @@ class ManageLanguages extends AbstractController
 				}
 			}
 			// No overwrite?
-			elseif (is_writable(BOARDDIR . '/' . $dirname))
+			elseif ($fileFunc->isWritable(BOARDDIR . '/' . $dirname))
 			{
 				// Can we at least stick it in the directory...
 				$context_data['writable'] = true;
@@ -479,7 +482,7 @@ class ManageLanguages extends AbstractController
 				}
 
 				// Now does the old file exist - if so what is it's version?
-				if (file_exists(BOARDDIR . '/' . $file['filename']))
+				if ($fileFunc->fileExists(BOARDDIR . '/' . $file['filename']))
 				{
 					// OK - what is the current version?
 					$fp = fopen(BOARDDIR . '/' . $file['filename'], 'rb');
@@ -576,7 +579,7 @@ class ManageLanguages extends AbstractController
 			// Mark those which are now writable as such.
 			foreach ($context['files'] as $type => $data)
 			{
-				if ($type == 'lang')
+				if ($type === 'lang')
 				{
 					foreach ($data as $k => $file)
 					{
@@ -792,13 +795,14 @@ class ManageLanguages extends AbstractController
 
 		// Initialize the form
 		$settingsForm = new SettingsForm(SettingsForm::FILE_ADAPTER);
+		$fileFunc = FileFunctions::instance();
 
 		// Initialize it with our settings
 		$settingsForm->setConfigVars($this->_settings());
 
 		// Warn the user if the backup of Settings.php failed.
-		$settings_not_writable = !is_writable(BOARDDIR . '/Settings.php');
-		$settings_backup_fail = !@is_writable(BOARDDIR . '/Settings_bak.php') || !@copy(BOARDDIR . '/Settings.php', BOARDDIR . '/Settings_bak.php');
+		$settings_not_writable = !$fileFunc->isWritable(BOARDDIR . '/Settings.php');
+		$settings_backup_fail = !$fileFunc->isWritable(BOARDDIR . '/Settings_bak.php') || !@copy(BOARDDIR . '/Settings.php', BOARDDIR . '/Settings_bak.php');
 
 		// Saving settings?
 		if (isset($this->_req->query->save))
@@ -833,7 +837,7 @@ class ManageLanguages extends AbstractController
 	}
 
 	/**
-	 * Load up all of the language settings
+	 * Load up all language settings
 	 *
 	 * @event integrate_modify_language_settings Use to add new config options
 	 */
