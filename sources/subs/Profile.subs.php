@@ -71,8 +71,8 @@ function currentMemberID($fatal = true, $reload_id = false)
 			throw new \ElkArte\Exceptions\Exception('not_a_user', false);
 		}
 
-			return false;
-		}
+		return false;
+	}
 
 	// If all went well, we have a valid member ID!
 	list ($memID) = $memberResult;
@@ -2041,7 +2041,7 @@ function profileLoadSignatureData()
 
 	if (empty($context['do_preview']))
 	{
-		$context['member']['signature'] = empty($cur_profile['signature']) ? '' : str_replace(array('<br />', '<', '>', '"', '\''), array("\n", '&lt;', '&gt;', '&quot;', '&#039;'), $cur_profile['signature']);
+		$context['member']['signature'] = empty($cur_profile['signature_raw']) ? '' : str_replace(array('<br />', '<', '>', '"', '\''), array("\n", '&lt;', '&gt;', '&quot;', '&#039;'), $cur_profile['signature_raw']);
 	}
 	else
 	{

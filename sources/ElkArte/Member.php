@@ -131,6 +131,7 @@ class Member extends ValuesContainer
 
 		// Set things up to be used before hand.
 		$this->data['signature'] = str_replace(array("\n", "\r"), array('<br />', ''), $this->data['signature']);
+		$this->data['signature_raw'] = $this->data['signature'];
 		$this->data['signature'] = $this->bbc_parser->parseSignature($this->data['signature'], true);
 
 		$this->data['is_online'] = (!empty($this->data['show_online']) || allowedTo('moderate_forum')) && $this->data['is_online'] > 0;
