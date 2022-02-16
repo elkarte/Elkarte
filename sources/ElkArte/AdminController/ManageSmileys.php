@@ -142,7 +142,7 @@ class ManageSmileys extends AbstractController
 	}
 
 	/**
-	 * Displays and allows to modify smileys settings.
+	 * Displays and allows modification to smileys settings.
 	 *
 	 * @uses show_settings sub template
 	 */
@@ -186,7 +186,7 @@ class ManageSmileys extends AbstractController
 	}
 
 	/**
-	 * Retrieve and return smileys administration settings.
+	 * Retrieve and return smiley administration settings.
 	 */
 	private function _settings()
 	{
@@ -217,6 +217,9 @@ class ManageSmileys extends AbstractController
 		return $config_vars;
 	}
 
+	/**
+	 * Clear the cache to avoid changes not immediately appearing
+	 */
 	protected function clearSmileyCache()
 	{
 		Cache::instance()->remove('parsing_smileys');
@@ -250,17 +253,7 @@ class ManageSmileys extends AbstractController
 		$this->_subActionSubmit();
 
 		// Load all available smileysets...
-		$context['smiley_sets'] = explode(',', $modSettings['smiley_sets_known']);
-		$set_names = explode("\n", $modSettings['smiley_sets_names']);
-		foreach ($context['smiley_sets'] as $i => $set)
-		{
-			$context['smiley_sets'][$i] = array(
-				'id' => $i,
-				'path' => htmlspecialchars($set, ENT_COMPAT, 'UTF-8'),
-				'name' => htmlspecialchars(stripslashes($set_names[$i]), ENT_COMPAT, 'UTF-8'),
-				'selected' => $set === $modSettings['smiley_sets_default']
-			);
-		}
+		$this->loadSmileySets();
 
 		// Importing any smileys from an existing set?
 		$this->_subActionImport();
@@ -494,7 +487,7 @@ class ManageSmileys extends AbstractController
 		$dir = dir($modSettings['smileys_dir'] . '/' . $smileyPath);
 		while (($entry = $dir->read()))
 		{
-			if (in_array(strrchr($entry, '.'), array('.jpg', '.gif', '.jpeg', '.png')))
+			if (in_array(strrchr($entry, '.'), array('.jpg', '.gif', '.jpeg', '.png', '.webp')))
 			{
 				$smileys[strtolower($entry)] = $entry;
 			}
@@ -589,13 +582,14 @@ class ManageSmileys extends AbstractController
 				$context['current_set']['is_new'] = false;
 
 				// Calculate whether there are any smileys in the directory that can be imported.
-				if (!empty($modSettings['smiley_enable']) && !empty($modSettings['smileys_dir']) && $fileFunc->isDir($modSettings['smileys_dir'] . '/' . $context['current_set']['path']))
+				if (!empty($modSettings['smiley_enable']) && !empty($modSettings['smileys_dir'])
+					&& $fileFunc->isDir($modSettings['smileys_dir'] . '/' . $context['current_set']['path']))
 				{
 					$smileys = array();
 					$dir = dir($modSettings['smileys_dir'] . '/' . $context['current_set']['path']);
 					while (($entry = $dir->read()) !== false)
 					{
-						if (in_array(strrchr($entry, '.'), array('.jpg', '.gif', '.jpeg', '.png')))
+						if (in_array(strrchr($entry, '.'), array('.jpg', '.gif', '.jpeg', '.png', '.webp')))
 						{
 							$smileys[strtolower($entry)] = $entry;
 						}
@@ -628,10 +622,14 @@ class ManageSmileys extends AbstractController
 			$context['smiley_set_dirs'] = array();
 			if (!empty($modSettings['smileys_dir']) && $fileFunc->isDir($modSettings['smileys_dir']))
 			{
+				// Do not include our emoji directories
+				$disallow = ['.', '..', 'emojitwo', 'twemoji', 'noto-emoji'];
+
 				$dir = dir($modSettings['smileys_dir']);
 				while (($entry = $dir->read()) !== false)
 				{
-					if (!in_array($entry, array('.', '..')) && $fileFunc->isDir($modSettings['smileys_dir'] . '/' . $entry))
+					if (!in_array($entry, $disallow)
+						&& $fileFunc->isDir($modSettings['smileys_dir'] . '/' . $entry))
 					{
 						$context['smiley_set_dirs'][] = array(
 							'id' => $entry,
@@ -659,19 +657,9 @@ class ManageSmileys extends AbstractController
 		// Get a list of all known smiley sets.
 		$context['smileys_dir'] = empty($modSettings['smileys_dir']) ? BOARDDIR . '/smileys' : $modSettings['smileys_dir'];
 		$context['smileys_dir_found'] = $fileFunc->isDir($context['smileys_dir']);
-		$context['smiley_sets'] = explode(',', $modSettings['smiley_sets_known']);
 		$context['sub_template'] = 'addsmiley';
 
-		$set_names = explode("\n", $modSettings['smiley_sets_names']);
-		foreach ($context['smiley_sets'] as $i => $set)
-		{
-			$context['smiley_sets'][$i] = array(
-				'id' => $i,
-				'path' => htmlspecialchars($set, ENT_COMPAT, 'UTF-8'),
-				'name' => htmlspecialchars(stripslashes($set_names[$i]), ENT_COMPAT, 'UTF-8'),
-				'selected' => $set === $modSettings['smiley_sets_default']
-			);
-		}
+		$this->loadSmileySets();
 
 		// Submitting a form?
 		if (isset($this->_req->post->{$context['session_var']}, $this->_req->post->smiley_code))
@@ -679,7 +667,7 @@ class ManageSmileys extends AbstractController
 			checkSession();
 
 			// Some useful arrays... types we allow - and ports we don't!
-			$allowedTypes = array('jpeg', 'jpg', 'gif', 'png', 'bmp');
+			$allowedTypes = array('jpeg', 'jpg', 'gif', 'png', 'bmp', 'webp');
 			$disabledFiles = array('con', 'com1', 'com2', 'com3', 'com4', 'prn', 'aux', 'lpt1', '.htaccess', 'index.php');
 
 			$this->_req->post->smiley_code = $this->_req->getPost('smiley_code', '\\ElkArte\\Util::htmltrim', '');
@@ -748,7 +736,8 @@ class ManageSmileys extends AbstractController
 				$i = 0;
 
 				// Keep going until we find a set the file doesn't exist in. (or maybe it exists in all of them?)
-				while (isset($context['smiley_sets'][$i]) && $fileFunc->fileExists($context['smileys_dir'] . '/' . un_htmlspecialchars($context['smiley_sets'][$i]['path']) . '/' . $destName))
+				while (isset($context['smiley_sets'][$i])
+					&& $fileFunc->fileExists($context['smileys_dir'] . '/' . un_htmlspecialchars($context['smiley_sets'][$i]['path']) . '/' . $destName))
 				{
 					$i++;
 				}
@@ -812,7 +801,8 @@ class ManageSmileys extends AbstractController
 					}
 
 					// Got one...
-					if (!is_uploaded_file($_FILES['individual_' . $set['name']]['tmp_name']) || (ini_get('open_basedir') === '' && !$fileFunc->fileExists($_FILES['individual_' . $set['name']]['tmp_name'])))
+					if (!is_uploaded_file($_FILES['individual_' . $set['name']]['tmp_name']) || (ini_get('open_basedir') === ''
+						&& !$fileFunc->fileExists($_FILES['individual_' . $set['name']]['tmp_name'])))
 					{
 						throw new Exception('smileys_upload_error');
 					}
@@ -892,7 +882,7 @@ class ManageSmileys extends AbstractController
 		{
 			foreach ($context['smiley_sets'] as $smiley_set)
 			{
-				if (!$fileFunc->fileExists($context['smileys_dir'] . '/' . un_htmlspecialchars($smiley_set['path'])))
+				if (!$fileFunc->isDir($context['smileys_dir'] . '/' . un_htmlspecialchars($smiley_set['path'])))
 				{
 					continue;
 				}
@@ -900,7 +890,8 @@ class ManageSmileys extends AbstractController
 				$dir = dir($context['smileys_dir'] . '/' . un_htmlspecialchars($smiley_set['path']));
 				while (($entry = $dir->read()))
 				{
-					if (!in_array($entry, $context['filenames']) && in_array(strrchr($entry, '.'), array('.jpg', '.gif', '.jpeg', '.png')))
+					if (!in_array($entry, $context['filenames'])
+						&& in_array(strrchr($entry, '.'), array('.jpg', '.gif', '.jpeg', '.png', '.webp')))
 					{
 						$context['filenames'][strtolower($entry)] = array(
 							'id' => htmlspecialchars($entry, ENT_COMPAT, 'UTF-8'),
@@ -988,7 +979,9 @@ class ManageSmileys extends AbstractController
 				{
 					$this->_req->post->smiley_code = $this->_req->getPost('smiley_code', '\\ElkArte\\Util::htmltrim', '');
 					$this->_req->post->smiley_filename = $this->_req->getPost('smiley_filename', '\\ElkArte\\Util::htmltrim', '');
-					$this->_req->post->smiley_location = empty($this->_req->post->smiley_location) || $this->_req->post->smiley_location > 2 || $this->_req->post->smiley_location < 0 ? 0 : (int) $this->_req->post->smiley_location;
+					$this->_req->post->smiley_location = empty($this->_req->post->smiley_location)
+						|| $this->_req->post->smiley_location > 2
+						|| $this->_req->post->smiley_location < 0 ? 0 : (int) $this->_req->post->smiley_location;
 
 					// Make sure some code was entered.
 					if (empty($this->_req->post->smiley_code))
@@ -1023,17 +1016,7 @@ class ManageSmileys extends AbstractController
 		}
 
 		// Load all known smiley sets.
-		$context['smiley_sets'] = explode(',', $modSettings['smiley_sets_known']);
-		$set_names = explode("\n", $modSettings['smiley_sets_names']);
-		foreach ($context['smiley_sets'] as $i => $set)
-		{
-			$context['smiley_sets'][$i] = array(
-				'id' => $i,
-				'path' => htmlspecialchars($set, ENT_COMPAT, 'UTF-8'),
-				'name' => htmlspecialchars(stripslashes($set_names[$i]), ENT_COMPAT, 'UTF-8'),
-				'selected' => $set === $modSettings['smiley_sets_default']
-			);
-		}
+		$this->loadSmileySets();
 
 		// Prepare overview of all (custom) smileys.
 		if ($context['sub_action'] === 'editsmileys')
@@ -1074,7 +1057,11 @@ class ManageSmileys extends AbstractController
 					'picture' => array(
 						'data' => array(
 							'sprintf' => array(
-								'format' => '<a href="' . getUrl('admin', ['action' => 'admin', 'area' => 'smileys', 'sa' => 'modifysmiley', 'smiley' => '%1$d']) . '"><img src="' . $modSettings['smileys_url'] . '/' . $modSettings['smiley_sets_default'] . '/%2$s" alt="%3$s" id="smiley%1$d" /><input type="hidden" name="smileys[%1$d][filename]" value="%2$s" /></a>',
+								'format' => '
+								<a href="' . getUrl('admin', ['action' => 'admin', 'area' => 'smileys', 'sa' => 'modifysmiley', 'smiley' => '%1$d']) . '">
+									<img src="' . $modSettings['smileys_url'] . '/' . $modSettings['smiley_sets_default'] . '/%2$s" alt="%3$s" id="smiley%1$d" />
+									<input type="hidden" name="smileys[%1$d][filename]" value="%2$s" />
+								</a>',
 								'params' => array(
 									'id_smiley' => false,
 									'filename' => true,
@@ -1293,7 +1280,7 @@ class ManageSmileys extends AbstractController
 					$dir = dir($context['smileys_dir'] . '/' . un_htmlspecialchars($smiley_set['path']));
 					while (($entry = $dir->read()))
 					{
-						if (!in_array($entry, $context['filenames']) && in_array(strrchr($entry, '.'), array('.jpg', '.gif', '.jpeg', '.png')))
+						if (!in_array($entry, $context['filenames']) && in_array(strrchr($entry, '.'), array('.jpg', '.gif', '.jpeg', '.png', '.webp')))
 						{
 							$context['filenames'][strtolower($entry)] = array(
 								'id' => htmlspecialchars($entry, ENT_COMPAT, 'UTF-8'),
@@ -1934,6 +1921,28 @@ class ManageSmileys extends AbstractController
 		if (!$testing)
 		{
 			redirectexit('action=admin;area=smileys');
+		}
+	}
+
+	/**
+	 * Load known smiley set information into context
+	 *
+	 * @return void
+	 */
+	public function loadSmileySets()
+	{
+		global $context, $modSettings;
+
+		$context['smiley_sets'] = explode(',', $modSettings['smiley_sets_known']);
+		$set_names = explode("\n", $modSettings['smiley_sets_names']);
+		foreach ($context['smiley_sets'] as $i => $set)
+		{
+			$context['smiley_sets'][$i] = [
+				'id' => $i,
+				'path' => htmlspecialchars($set, ENT_COMPAT),
+				'name' => htmlspecialchars(stripslashes($set_names[$i]), ENT_COMPAT),
+				'selected' => $set === $modSettings['smiley_sets_default']
+			];
 		}
 	}
 }
