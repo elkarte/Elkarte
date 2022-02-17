@@ -34,13 +34,6 @@ $txt['theme_user'] = 'person is using this theme.';
 $txt['theme_users'] = 'people are using this theme.';
 $txt['theme_pick_variant'] = 'Select Variant:';
 
-$txt['theme_edit'] = 'Edit Theme';
-$txt['theme_edit_style'] = 'Modify the stylesheets. (colors, fonts, etc.)';
-$txt['theme_edit_index'] = 'Modify the index template. (the main template)';
-$txt['theme_edit_no_save'] = 'This file cannot be saved because it is not writable.  Please make sure the following file is 777 or has the proper permissions';
-$txt['theme_edit_save'] = 'Save Changes';
-$txt['theme_edit_not_writable'] = 'Not Writable';
-
 $txt['theme_global_description'] = 'This is the default theme, which means your theme will change along with the administrators\' settings and the board you are viewing.';
 
 $txt['theme_url_config'] = 'Theme URLs and Configuration';
@@ -141,21 +134,6 @@ $txt['themeadmin_reset_options_change'] = 'Change';
 $txt['themeadmin_reset_options_none'] = 'Don\'t change';
 $txt['themeadmin_reset_options_default'] = 'Default';
 
-$txt['themeadmin_edit_browse'] = 'Browse the templates and files in this theme.';
-$txt['themeadmin_edit_style'] = 'Edit this theme\'s stylesheets.';
-$txt['themeadmin_edit_copy_template'] = 'Copy a template from the theme this is based on.';
-$txt['themeadmin_edit_exists'] = 'already exists';
-$txt['themeadmin_edit_do_copy'] = 'copy';
-$txt['themeadmin_edit_copy_warning'] = 'When the system needs a template or language file which is not in the current theme, it looks in the theme it is based on, or the default theme.<br />Unless you need to modify a template, it\'s better not to copy it.';
-$txt['themeadmin_edit_copy_confirm'] = 'Are you sure you want to copy this template?';
-$txt['themeadmin_edit_overwrite_confirm'] = 'Are you sure you want to copy this template over the one that already exists?\nThis will OVERWRITE any changes you\\\'ve made';
-$txt['themeadmin_edit_no_copy'] = '<em>(can\'t copy)</em>';
-$txt['themeadmin_edit_filename'] = 'Filename';
-$txt['themeadmin_edit_modified'] = 'Last Modified';
-$txt['themeadmin_edit_size'] = 'Size';
-$txt['themeadmin_edit_error'] = 'The file you tried to save generated the following error:';
-$txt['themeadmin_edit_on_line'] = 'Beginning on line:';
-$txt['themeadmin_edit_preview'] = 'Preview';
 $txt['themeadmin_selectable'] = 'Themes the user is permitted to select:';
 $txt['themeadmin_themelist_link'] = 'Show the list of installed themes';
 
