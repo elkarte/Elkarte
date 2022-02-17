@@ -28,10 +28,10 @@ class TestStreamFetchWebdata extends TestCase
 				'firstname=elkarte&lastname=forum&nbsp;',
 			),
 			array(
-				'https://html.duckduckgo.com/html',
-				array('q' => 'stargate+sg1 site:www.imdb.com', 'kl' => 'us-en', 'df' => ''),
+				'https://www.elkarte.net/community/index.php?action=search;sa=results',
+				array('search' => 'stuff', 'search_selection' => 'all', 'advanced' => 0),
 				200,
-				'TV Series',
+				'Please enter the verification code below to continue to the results',
 			),
 		);
 

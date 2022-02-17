@@ -28,10 +28,10 @@ class TestFsockFetchWebdata extends TestCase
 				'all we know',
 			),
 			array(
-				'https://duckduckgo.com/html',
-				array('q' => 'stargate+sg1 site:www.imdb.com', 'kl' => 'us-en', 'df' => ''),
+				'https://www.elkarte.net/community/index.php?action=search;sa=results',
+				array('search' => 'stuff', 'search_selection' => 'all', 'advanced' => 0),
 				200,
-				'TV Series',
+				'Please enter the verification code below to continue to the results',
 			),
 		);
 
