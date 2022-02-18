@@ -22,7 +22,7 @@
           <directory suffix=".php">../themes/default</directory>
           <exclude>
               <directory suffix=".php">../sources/ext</directory>
-              <directory suffix=".php">../themes/default/languages/english</directory>
+              <directory suffix=".php">../themes/ElkArte/Languages</directory>
           </exclude>
       </whitelist>
   </filter>

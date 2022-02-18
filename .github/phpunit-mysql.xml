@@ -20,7 +20,7 @@
           <directory suffix="Basic.php">../tests/sources</directory>
       </testsuite>
       <testsuite name="Bootstrap Tests">
-          <directory suffix="BootstrapRunTestExt.php">../tests/travis-ci</directory>
+          <directory suffix="BootstrapRunTestExt.php">../tests</directory>
       </testsuite>
   </testsuites>
 

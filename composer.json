@@ -35,14 +35,9 @@
 		"ext-exif": "*"
 	},
 	"suggest": {
-		"ext-recode": "*",
-		"ext-openssl": "*",
-		"ext-ctype": "*",
 		"ext-memcache": "*",
-		"ext-bcmath": "*",
 		"ext-zlib": "*",
 		"ext-pgsql": "*",
-		"ext-pspell": "*",
 		"ext-imap": "*",
 		"ext-memcached": "*",
 		"ext-zend-opcache": "*",
@@ -50,7 +45,6 @@
 		"ext-apcu": "*",
 		"ext-libxml": "*",
 		"ext-dom": "*",
-		"ext-mcrypt": "*",
 		"ext-apache": "*",
 		"ext-iconv": "*",
 		"ext-imagick": "*"

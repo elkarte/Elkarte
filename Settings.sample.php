@@ -176,4 +176,4 @@ $extdir = __DIR__ . '/sources/ext';
  * Path to the languages directory.
  * @var string
  */
-$languagedir = __DIR__ . '/themes/default/languages';
+$languagedir = __DIR__ . '/sources/ElkArte/Languages';
