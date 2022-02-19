@@ -16,11 +16,11 @@ env:
 jobs:
   # Selenium headless browser testing
   Selenium-checks:
-    runs-on: ubuntu-18.04
+    runs-on: ubuntu-20.04
     strategy:
       matrix:
         include:
-          - db: 'mysql:5.7'
+          - db: "mysql:5.7"
             php: '7.2'
 
     name: WebTest (PHP ${{ matrix.php }} - DB ${{ matrix.db_alias != '' && matrix.db_alias || matrix.db }})
@@ -98,7 +98,7 @@ jobs:
 
   # Static checks, e.g. syntax errors, lint, etc
   static-checks:
-    runs-on: ubuntu-18.04
+    runs-on: ubuntu-20.04
     strategy:
       matrix:
         include:
@@ -155,7 +155,7 @@ jobs:
 
   # START MySQL / MariaDB Tests
   mysql-tests:
-    runs-on: ubuntu-18.04
+    runs-on: ubuntu-20.04
     strategy:
       matrix:
         include:
@@ -234,14 +234,14 @@ jobs:
 
   # START Postgres Tests
   postgres-tests:
-    runs-on: ubuntu-18.04
+    runs-on: ubuntu-20.04
     strategy:
       matrix:
         include:
           - php: '7.2'
-            db: "postgres:9.5"
+            db: "postgres:9"
           - php: '7.4'
-            db: "postgres:11.10"
+            db: "postgres:12"
 
     name: Postgre (${{ matrix.php }} - DB ${{ matrix.db_alias != '' && matrix.db_alias || matrix.db }})
 

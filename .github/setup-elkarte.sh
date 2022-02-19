@@ -23,4 +23,10 @@ then
 fi
 
 # Phpunit and support
+# composer config --file=composer2.json && composer install --no-interaction --quiet
 composer install --no-interaction --quiet
+if [[ "$PHP_VERSION" =~ ^8 ]]
+then
+	composer remove phpunit/phpunit phpunit/phpunit-selenium --dev --update-with-dependencies
+	composer require phpunit/phpunit:^9.0 --dev --update-with-all-dependencies --ignore-platform-reqs
+fi

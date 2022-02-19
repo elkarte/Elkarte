@@ -43,7 +43,7 @@ if (!defined('ELK'))
 	define('BOARDDIR', $boarddir);
 	define('CACHEDIR', $cachedir);
 	define('EXTDIR', $extdir);
-	define('LANGUAGEDIR', $boarddir . '/themes/default/languages');
+	define('LANGUAGEDIR', $sourcedir . '/ElkArte/Languages');
 	define('SOURCEDIR', $sourcedir);
 	define('ADMINDIR', $sourcedir . '/admin');
 	define('CONTROLLERDIR', $sourcedir . '/controllers');
@@ -88,7 +88,7 @@ loadBoard();
 loadPermissions();
 new ElkArte\Themes\ThemeLoader();
 
-// It should be added to the install and upgrade scripts.
+// It should be added to the installation and upgrade scripts.
 // But since the converters need to be updated also. This is easier.
 updateSettings(array(
 	'attachmentUploadDir' => serialize(array(1 => $modSettings['attachmentUploadDir'])),
@@ -104,6 +104,6 @@ updateSettings(array(
 removeSettings('mentions_member_check');
 
 // Basic language is good to have for functional tests
-\ElkArte\Themes\ThemeLoader::loadLanguageFile('index+Errors');
+\ElkArte\Themes\ThemeLoader::loadLanguageFile('Index+Errors');
 
 file_put_contents('bootstrapcompleted.lock', '1');
