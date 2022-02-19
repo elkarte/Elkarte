@@ -261,9 +261,6 @@ class Admin extends AbstractController
 							'admin' => array($txt['themeadmin_admin_title']),
 							'list' => array($txt['themeadmin_list_title']),
 							'reset' => array($txt['themeadmin_reset_title']),
-							'themelist' => array($txt['themeadmin_edit_title'], 'active' => array('edit', 'browse')),
-							'edit' => array($txt['themeadmin_edit_title'], 'enabled' => false),
-							'browse' => array($txt['themeadmin_edit_title'], 'enabled' => false),
 						),
 					),
 					'current_theme' => array(
