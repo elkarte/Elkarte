@@ -698,6 +698,12 @@ sup.bbc_footnotes, sup.bbc_footnotes a {
 	box-shadow: none;
 }
 
+/* The next two are the Top level Dropdown / Disclose Indicator arrow next to the name */
+#main_menu .subsections .linklevel1::after,
+#main_menu .subsections:hover .linklevel1::after {
+	border-top-color: var(--primary_border);
+}
+
 /* Levels 2 and 3: drop menu wrapper. */
 .menulevel2, .menulevel3 {
 	border-color: var(--seconday_border);

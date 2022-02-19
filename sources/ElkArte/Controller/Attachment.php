@@ -20,6 +20,7 @@ use ElkArte\AbstractController;
 use ElkArte\Action;
 use ElkArte\Errors\AttachmentErrorContext;
 use ElkArte\Exceptions\Exception;
+use ElkArte\FileFunctions;
 use ElkArte\Graphics\TextImage;
 use ElkArte\Graphics\Image;
 use ElkArte\AttachmentsDirectory;
@@ -494,7 +495,7 @@ class Attachment extends AbstractController
 	 * @param string $mime_type The mime-type of the file
 	 * @param string $disposition The value of the Content-Disposition header
 	 * @param string $real_filename The original name of the file
-	 * @param bool $do_cache If send the a max-age header or not
+	 * @param bool $do_cache Send a max-age header or not
 	 * @param bool $check_filename When false, any check on $filename is skipped
 	 */
 	public function prepare_headers($filename, $eTag, $mime_type, $disposition, $real_filename, $do_cache, $check_filename = true)
@@ -504,7 +505,7 @@ class Attachment extends AbstractController
 		$headers = Headers::instance();
 
 		// No point in a nicer message, because this is supposed to be an attachment anyway...
-		if ($check_filename && !file_exists($filename))
+		if ($check_filename && !FileFunctions::instance()->fileExists($filename))
 		{
 			Txt::load('Errors');
 
@@ -645,6 +646,7 @@ class Attachment extends AbstractController
 					$this->action_no_attach();
 				}
 
+				// Save some typing
 				$id_folder = $attachment['id_folder'];
 				$real_filename = $attachment['filename'];
 				$file_hash = $attachment['file_hash'];

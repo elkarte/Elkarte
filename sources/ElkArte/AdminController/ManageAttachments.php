@@ -217,7 +217,7 @@ class ManageAttachments extends AbstractController
 					$modSettings['attachment_basedirectories'] = array();
 				}
 
-				// Trying to use a non existent base directory
+				// Trying to use a nonexistent base directory
 				if (!empty($this->_req->post->basedirectory_for_attachments) && $attachmentsDir->isBaseDir($this->_req->post->basedirectory_for_attachments) === false)
 				{
 					$currentAttachmentUploadDir = $attachmentsDir->currentDirectoryId();
@@ -288,7 +288,7 @@ class ManageAttachments extends AbstractController
 			$modSettings['basedirectory_for_attachments'] = $context['attachmentUploadDir'];
 		}
 
-		$context['valid_upload_dir'] = is_dir($context['attachmentUploadDir']) && $this->file_functions->isWritable($context['attachmentUploadDir']);
+		$context['valid_upload_dir'] = $this->file_functions->isDir($context['attachmentUploadDir']) && $this->file_functions->isWritable($context['attachmentUploadDir']);
 
 		if ($attachmentsDir->autoManageEnabled())
 		{

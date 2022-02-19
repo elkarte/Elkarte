@@ -117,7 +117,6 @@ class SiteDispatcher
 		'reporttm' => array('\\ElkArte\\Controller\\Emailuser', 'action_reporttm'),
 		'restoretopic' => array('\\ElkArte\\Controller\\RemoveTopic', 'action_restoretopic'),
 		'splittopics' => array('\\ElkArte\\Controller\\SplitTopics', 'action_splittopics'),
-		'theme' => array('\\ElkArte\\AdminController\\ManageThemes', 'action_thememain'),
 		'trackip' => array('\\ElkArte\\Controller\\ProfileHistory', 'action_trackip'),
 		'unreadreplies' => array('\\ElkArte\\Controller\\Unread', 'action_unreadreplies'),
 		'viewprofile' => array('\\ElkArte\\Controller\\Profile', 'action_index'),

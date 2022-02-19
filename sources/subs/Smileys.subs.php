@@ -105,7 +105,8 @@ function addSmiley($param)
 	$db->insert('',
 		'{db_prefix}smileys',
 		array(
-			'code' => 'string-30', 'filename' => 'string-48', 'description' => 'string-80', 'hidden' => 'int', 'smiley_order' => 'int',
+			'code' => 'string-30', 'filename' => 'string-48', 'description' => 'string-80',
+			'hidden' => 'int', 'smiley_order' => 'int',
 		),
 		$param,
 		array('id_smiley')
@@ -551,7 +552,8 @@ function list_getNumSmileys()
 	$db = database();
 
 	$request = $db->query('', '
-		SELECT COUNT(*)
+		SELECT 
+			COUNT(*)
 		FROM {db_prefix}smileys',
 		array()
 	);

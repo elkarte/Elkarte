@@ -135,7 +135,7 @@ body {
 
 /* Normal, standard links. */
 a, a:link, a:visited,
-	/* Links that open in a new window. */
+/* Links that open in a new window. */
 a.new_win:link, a.new_win:visited {
 	text-decoration: none;
 }
@@ -354,7 +354,7 @@ input[type="checkbox"], input[type="radio"] {
 
 /* Common submit button styling. */
 input[type="submit"], button[type="submit"], input[type="button"],
-	/* Anchors styled to look like buttons. */
+/* Anchors styled to look like buttons. */
 .linkbutton:link, .linkbutton:visited {
 	display: inline-block;
 	margin-top: -0.05em;
@@ -838,6 +838,7 @@ input[type=checkbox].quote-show-more {
 input[type=checkbox].quote-show-more:after {
 	font-size: var(--font16);
 	font-weight: 600;
+	/* @todo localization */
 	content: "Read More";
 }
 
@@ -1449,24 +1450,23 @@ a.bbc_link {
 	content: "";
 	transform: translateY(3px);
 	border: 0.35rem solid transparent;
-	border-top-color: #B7B7B7;
 }
 
 /* Levels 2 and 3: drop menu wrapper, hidden until hover or click */
 .menulevel2, .menulevel3 {
 	position: absolute;
 	z-index: 90;
+	/* Pull up to slightly overlap the parent */
 	top: calc(100% - 1px);
 	visibility: hidden;
 	min-width: calc(100% + 30px);
-	/* Pull up to slightly overlap the parent */
 	padding: 0.6em;
-	/* Rotate it in to the page to provide a transition element */
+	/* Speed of transition during on/off focus/hover plus a 280ms delay for a hover intent */
 	transition: 280ms all 250ms ease-in;
+	/* Rotate it in to the page to provide a transition element */
 	transform: rotateX(-90deg);
 	transform-origin: top left;
 	border: 1px solid;
-	/* Speed of transition during on/off focus/hover plus a 350ms delay for a hover intent */
 	border-radius: 4px;
 }
 
@@ -1542,7 +1542,6 @@ a.bbc_link {
 	display: block;
 	padding: 1px 7px;
 }
-
 
 .linklevel2:link, .linklevel2:visited, .linklevel3:link, .linklevel3:visited {
 	border: 1px solid;
@@ -1719,12 +1718,12 @@ a.bbc_link {
 	position: absolute;
 	z-index: 1;
 	top: 0;
-	/* Scale the rotated square based on its diagonal length */
-	right: calc(var(--arrow) / 2 * -1);
+	/* Prevent the arrows from getting covered under the next link */
+	right: calc((var(--arrow) / 2 - 1px) * -1);
 	width: var(--arrow);
 	height: calc(var(--arrow));
-	content: '';
-	/* Prevent the arrows from getting covered under the next link */
+	content: "";
+	/* Scale the rotated square based on its diagonal length */
 	transform: scale(0.7071) rotate(45deg);
 	/* 50px seems help prevent hover glitches caused by the border shadow */
 	border-radius: 0 4px 0 50px;
@@ -3083,8 +3082,6 @@ aside > .poster {
 	grid-row: messageContent;
 	min-height: 70px;
 	padding: 1em 1em .25em .5em;
-	-webkit-hyphens: auto;
-	hyphens: auto;
 	border-top: 1px solid;
 	overflow-wrap: break-word;
 }
@@ -3151,7 +3148,7 @@ footer .attachments {
 }
 
 /* Not sure these need their own row, but harmless either way */
-footer menu {
+footer nav {
 	grid-row: quickbuttons;
 }
 
@@ -3759,7 +3756,7 @@ ul.post_options li {
 	display: flex;
 }
 
-/* holds the share button and the insert overlay control injected via JS */
+/* holds the inline button and the insert overlay control injected via JS */
 .ila_container {
 	position: relative;
 	margin: 0 5px;

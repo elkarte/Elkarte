@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Handle all of the searching from here.
+ * Handle all searching from here.
  *
  * @package   ElkArte Forum
  * @copyright ElkArte Forum contributors
@@ -69,8 +69,8 @@ class Search extends AbstractController
 		global $modSettings;
 
 		// Coming from quick search box and going to some custom place?
-		$search_selection = $this->_req->getRequest(('search_selection'), 'trim');
-		$search = $this->_req->getRequest(('search_selection'), 'trim');
+		$search_selection = $this->_req->getRequest('search_selection', 'trim');
+		$search = $this->_req->getRequest('search', 'trim');
 		if (isset($search_selection) && !empty($modSettings['additional_search_engines']))
 		{
 			$engines = prepareSearchEngines();

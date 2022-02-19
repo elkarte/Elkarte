@@ -42,12 +42,12 @@ class FileFunctions
 		$modes = $this->isDir($item) ? $dirChmod : $fileChmod;
 		foreach ($modes as $mode)
 		{
+			$this->elk_chmod($item, $mode);
+
 			if ($this->isWritable($item))
 			{
 				return true;
 			}
-
-			$this->elk_chmod($item, $mode);
 		}
 
 		return false;
