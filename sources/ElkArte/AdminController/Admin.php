@@ -22,8 +22,8 @@ use ElkArte\AdminSettingsSearch;
 use ElkArte\EventManager;
 use ElkArte\Exceptions\Exception;
 use ElkArte\Hooks;
-use ElkArte\Menu\Menu;
 use ElkArte\Languages\Txt;
+use ElkArte\Menu\Menu;
 use ElkArte\User;
 use ElkArte\XmlArray;
 
@@ -163,7 +163,7 @@ class Admin extends AbstractController
 					),
 					'packages' => array(
 						'label' => $txt['package'],
-						'controller' => '\\ElkArte\\AdminController\\Packages',
+						'controller' => '\\ElkArte\\Packages\\Packages',
 						'function' => 'action_index',
 						'permission' => array('admin_forum'),
 						'class' => 'i-package i-admin',
@@ -178,7 +178,7 @@ class Admin extends AbstractController
 					),
 					'packageservers' => array(
 						'label' => $txt['package_servers'],
-						'controller' => '\\ElkArte\\AdminController\\PackageServers',
+						'controller' => '\\ElkArte\\Packages\\PackageServers',
 						'function' => 'action_index',
 						'permission' => array('admin_forum'),
 						'class' => 'i-package i-admin',
