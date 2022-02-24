@@ -14,20 +14,20 @@
  *
  */
 
-namespace ElkArte\AdminController;
+namespace ElkArte\Packages;
 
 use BBC\ParserWrapper;
 use ElkArte\AbstractController;
 use ElkArte\Action;
+use ElkArte\AttachmentsDirectory;
 use ElkArte\Cache\Cache;
 use ElkArte\EventManager;
 use ElkArte\Exceptions\Exception;
+use ElkArte\FileFunctions;
 use ElkArte\Http\FtpConnection;
-use ElkArte\PackagesFilterIterator;
 use ElkArte\Languages\Txt;
 use ElkArte\User;
 use ElkArte\Util;
-use ElkArte\AttachmentsDirectory;
 use FilesystemIterator;
 
 /**
@@ -39,54 +39,24 @@ use FilesystemIterator;
  */
 class Packages extends AbstractController
 {
-	/**
-	 * The id from the DB or an installed package
-	 *
-	 * @var int
-	 */
+	/** @var int The id from the DB or an installed package */
 	public $install_id;
-	/**
-	 * Array of installed theme paths
-	 *
-	 * @var string[]
-	 */
+	/** @var string[] Array of installed theme paths */
 	public $theme_paths;
-	/**
-	 * Array of files / directories that require permissions
-	 *
-	 * @var array
-	 */
+	/** @var array Array of files / directories that require permissions */
 	public $chmod_files;
-	/**
-	 * listing of files in a packages
-	 *
-	 * @var array|bool
-	 */
+	/** @var array|bool listing of files in a packages */
 	private $_extracted_files;
-	/**
-	 * Filename of the package
-	 *
-	 * @var string
-	 */
+	/** @var string Filename of the package */
 	private $_filename;
-	/**
-	 * Base path of the package
-	 *
-	 * @var string
-	 */
+	/** @var string Base path of the package */
 	private $_base_path;
-	/**
-	 * If this is an un-install pass or not
-	 *
-	 * @var bool
-	 */
+	/** @var bool If this is an un-install pass or not */
 	private $_uninstalling;
-	/**
-	 * If the package is installed, previously or not
-	 *
-	 * @var bool
-	 */
+	/** @var bool If the package is installed, previously or not */
 	private $_is_installed;
+	/** @var \ElkArte\FileFunctions */
+	private $fileFunc;
 
 	/**
 	 * Pre Dispatch, called before other methods.
@@ -95,6 +65,8 @@ class Packages extends AbstractController
 	{
 		// Generic subs for this controller
 		require_once(SUBSDIR . '/Package.subs.php');
+
+		$this->fileFunc = FileFunctions::instance();
 	}
 
 	/**
@@ -135,10 +107,10 @@ class Packages extends AbstractController
 			// The following two belong to PackageServers,
 			// for UI's sake moved here at least temporarily
 			'servers' => array(
-				'controller' => '\\ElkArte\\AdminController\\PackageServers',
+				'controller' => '\\ElkArte\\Packages\\PackageServers',
 				'function' => 'action_list'),
 			'upload' => array(
-				'controller' => '\\ElkArte\\AdminController\\PackageServers',
+				'controller' => '\\ElkArte\\Packages\\PackageServers',
 				'function' => 'action_upload'),
 		);
 
@@ -199,7 +171,7 @@ class Packages extends AbstractController
 		$this->_filename = (string) preg_replace('~[\.]+~', '.', $file);
 		$this->_uninstalling = $this->_req->query->sa === 'uninstall';
 
-		// If we can't find the file, our install ends here
+		// If we can't find the file, our installation ends here
 		if (!file_exists(BOARDDIR . '/packages/' . $this->_filename))
 		{
 			throw new Exception('package_no_file', false);
@@ -212,7 +184,8 @@ class Packages extends AbstractController
 		require_once(SUBSDIR . '/Themes.subs.php');
 
 		// Load up the package FTP information?
-		create_chmod_control();
+		$create_chmod_control = new PackageChmod();
+		$create_chmod_control->createChmodControl();
 
 		// Make sure our temp directory exists and is empty.
 		if (file_exists(BOARDDIR . '/packages/temp'))
@@ -333,30 +306,26 @@ class Packages extends AbstractController
 	 *
 	 * - First trys as 755, failing moves to 777
 	 * - Will try with FTP permissions for cases where the web server credentials
-	 * do not have create directory permissions
+	 * do not have "create" directory permissions
 	 */
 	private function _create_temp_dir()
 	{
 		global $context;
 
-		// Make the temp directory
-		if (!mktree(BOARDDIR . '/packages/temp', 0755))
+		// Try to Make the temp directory
+		if (!mktree(BOARDDIR . '/packages/temp'))
 		{
-			// 755 did not work, try 777?
 			deltree(BOARDDIR . '/packages/temp', false);
-			if (!mktree(BOARDDIR . '/packages/temp', 0777))
-			{
-				// That did not work either, we need additional permissions
-				deltree(BOARDDIR . '/packages/temp', false);
-				create_chmod_control(array(BOARDDIR . '/packages/temp/delme.tmp'), array('destination_url' => getUrl('admin', ['action' => 'admin', 'area' => 'packages', 'sa' => $this->_req->query->sa, 'package' => $context['filename']]), 'crash_on_error' => true));
+			$create_chmod_control = new PackageChmod();
+			$create_chmod_control->createChmodControl(
+				array(BOARDDIR . '/packages/temp/delme.tmp'),
+				array('destination_url' => getUrl('admin', ['action' => 'admin', 'area' => 'packages', 'sa' => $this->_req->query->sa, 'package' => $context['filename']]),
+				'crash_on_error' => true)
+			);
 
-				// No temp directory was able to be made, that's fatal
-				deltree(BOARDDIR . '/packages/temp', false);
-				if (!mktree(BOARDDIR . '/packages/temp', 0777))
-				{
-					throw new Exception('package_cant_download', false);
-				}
-			}
+			// No temp directory was able to be made, that's fatal
+			deltree(BOARDDIR . '/packages/temp', false);
+			throw new Exception('package_cant_download', false);
 		}
 	}
 
@@ -375,7 +344,7 @@ class Packages extends AbstractController
 			$this->_extracted_files = read_tgz_file(BOARDDIR . '/packages/' . $this->_filename, BOARDDIR . '/packages/temp');
 
 			// Determine the base path for the package
-			if ($this->_extracted_files && !file_exists(BOARDDIR . '/packages/temp/package-info.xml'))
+			if ($this->_extracted_files && !$this->fileFunc->fileExists(BOARDDIR . '/packages/temp/package-info.xml'))
 			{
 				foreach ($this->_extracted_files as $file)
 				{
@@ -393,13 +362,13 @@ class Packages extends AbstractController
 			}
 		}
 		// Perhaps its a directory then, assumed to be extracted
-		elseif (!empty($this->_filename) && is_dir(BOARDDIR . '/packages/' . $this->_filename))
+		elseif (!empty($this->_filename) && $this->fileFunc->isDir(BOARDDIR . '/packages/' . $this->_filename))
 		{
 			// Copy the directory to the temp directory
 			copytree(BOARDDIR . '/packages/' . $this->_filename, BOARDDIR . '/packages/temp');
 
 			// Get the file listing
-			$this->_extracted_files = listtree(BOARDDIR . '/packages/temp');
+			$this->_extracted_files = $this->fileFunc->listtree(BOARDDIR . '/packages/temp');
 			$this->_base_path = '';
 		}
 		// Well we don't know what it is then, so we stop
@@ -545,7 +514,7 @@ class Packages extends AbstractController
 						if (!in_array(strtolower(strtr($real_path, array('\\' => '/'))), $themeFinds['other_themes']))
 						{
 							// Check if we will need to chmod this.
-							if (!mktree(dirname($real_path), false))
+							if (!dirTest(dirname($real_path)))
 							{
 								$temp = dirname($real_path);
 								while (!file_exists($temp) && strlen($temp) > 1)
@@ -870,29 +839,30 @@ class Packages extends AbstractController
 		global $txt, $context;
 
 		// No package?  Show him or her the door.
-		if (!isset($this->_req->query->package) || $this->_req->query->package == '')
+		$package = $this->_req->getQuery('package', 'trim', '');
+		if (empty($package))
 		{
 			redirectexit('action=admin;area=packages');
 		}
 
 		$context['linktree'][] = array(
-			'url' => getUrl('admin', ['action' => 'admin', 'area' => 'packages', 'sa' => 'list', 'package' => $this->_req->query->package]),
+			'url' => getUrl('admin', ['action' => 'admin', 'area' => 'packages', 'sa' => 'list', 'package' => $package]),
 			'name' => $txt['list_file']
 		);
 		$context['page_title'] .= ' - ' . $txt['list_file'];
 		$context['sub_template'] = 'list';
 
 		// The filename...
-		$context['filename'] = $this->_req->query->package;
+		$context['filename'] = $package;
 
 		// Let the unpacker do the work.
 		if (is_file(BOARDDIR . '/packages/' . $context['filename']))
 		{
 			$context['files'] = read_tgz_file(BOARDDIR . '/packages/' . $context['filename'], null);
 		}
-		elseif (is_dir(BOARDDIR . '/packages/' . $context['filename']))
+		elseif ($this->fileFunc->isDir(BOARDDIR . '/packages/' . $context['filename']))
 		{
-			$context['files'] = listtree(BOARDDIR . '/packages/' . $context['filename']);
+			$context['files'] = $this->fileFunc->listtree(BOARDDIR . '/packages/' . $context['filename']);
 		}
 	}
 
@@ -1245,8 +1215,13 @@ class Packages extends AbstractController
 		// Can't be in here buddy.
 		isAllowedTo('admin_forum');
 
+		$operation_key = $this->_req->getQuery('operation_key', 'trim');
+		$filename = $this->_req->getQuery('filename', 'trim');
+		$package = $this->_req->getQuery('package', 'trim');
+		$install_id = $this->_req->getQuery('install_id', 'intval', 0);
+
 		// We need to know the operation key for the search and replace?
-		if (!isset($this->_req->query->operation_key, $this->_req->query->filename) && !is_numeric($this->_req->query->operation_key))
+		if (!isset($operation_key, $filename) && !is_numeric($operation_key))
 		{
 			throw new Exception('operation_invalid', 'general');
 		}
@@ -1258,7 +1233,7 @@ class Packages extends AbstractController
 		$reverse = isset($this->_req->query->reverse);
 
 		// Get the base name.
-		$context['filename'] = preg_replace('~[\.]+~', '.', $this->_req->query->package);
+		$context['filename'] = preg_replace('~[\.]+~', '.', $package);
 
 		// We need to extract this again.
 		if (is_file(BOARDDIR . '/packages/' . $context['filename']))
@@ -1281,10 +1256,10 @@ class Packages extends AbstractController
 				$context['base_path'] = '';
 			}
 		}
-		elseif (is_dir(BOARDDIR . '/packages/' . $context['filename']))
+		elseif ($this->fileFunc->isDir(BOARDDIR . '/packages/' . $context['filename']))
 		{
 			copytree(BOARDDIR . '/packages/' . $context['filename'], BOARDDIR . '/packages/temp');
-			$context['extracted_files'] = listtree(BOARDDIR . '/packages/temp');
+			$context['extracted_files'] = $this->fileFunc->listtree(BOARDDIR . '/packages/temp');
 			$context['base_path'] = '';
 		}
 
@@ -1292,9 +1267,8 @@ class Packages extends AbstractController
 		$theme_paths = getThemesPathbyID();
 
 		// For uninstall operations we only consider the themes in which the package is installed.
-		if ($reverse && !empty($this->_req->query->install_id))
+		if ($reverse && !empty($install_id))
 		{
-			$install_id = (int) $this->_req->query->install_id;
 			if ($install_id > 0)
 			{
 				$old_themes = loadThemesAffected($install_id);
@@ -1312,9 +1286,9 @@ class Packages extends AbstractController
 
 		// Ok lets get the content of the file.
 		$context['operations'] = array(
-			'search' => strtr(htmlspecialchars($mod_actions[$this->_req->query->operation_key]['search_original'], ENT_COMPAT, 'UTF-8'), array('[' => '&#91;', ']' => '&#93;')),
-			'replace' => strtr(htmlspecialchars($mod_actions[$this->_req->query->operation_key]['replace_original'], ENT_COMPAT, 'UTF-8'), array('[' => '&#91;', ']' => '&#93;')),
-			'position' => $mod_actions[$this->_req->query->operation_key]['position'],
+			'search' => strtr(htmlspecialchars($mod_actions[$operation_key]['search_original'], ENT_COMPAT, 'UTF-8'), array('[' => '&#91;', ']' => '&#93;')),
+			'replace' => strtr(htmlspecialchars($mod_actions[$operation_key]['replace_original'], ENT_COMPAT, 'UTF-8'), array('[' => '&#91;', ']' => '&#93;')),
+			'position' => $mod_actions[$operation_key]['position'],
 		);
 
 		// Let's do some formatting...
