@@ -608,6 +608,9 @@ function template_install_options()
 				<dd>
 					<input type="text" name="pack_user" id="pack_user" value="', $context['package_ftp_username'], '" size="30" class="input_text" />
 				</dd>
+			</dl>
+			<hr />
+			<dl class="settings">
 				<dt>
 					<label for="package_make_backups">', $txt['package_install_options_make_backups'], '</label>
 				</dt>

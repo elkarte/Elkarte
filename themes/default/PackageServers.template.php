@@ -33,6 +33,14 @@ function template_servers()
 			</div>';
 	}
 
+	if (!empty($context['package_ftp']['connection']))
+	{
+		echo '
+			<div class="infobox">
+				', $context['package_ftp']['connection'], '
+			</div>';
+	}
+
 	if ($context['package_download_broken'])
 	{
 		template_ftp_form_required();
@@ -451,10 +459,10 @@ function template_ftp_form_required()
 	echo '
 		<h2 class="category_header">', $txt['package_ftp_necessary'], '</h2>
 		<div class="content">
-			<p class="infobox">
+			<p class="warningbox">
 				', $txt['package_ftp_why_download'], '
 			</p>
-			<form action="', $scripturl, '?action=admin;area=packageservers" method="post" accept-charset="UTF-8">
+			<form class="well" action="', $scripturl, '?action=admin;area=packageservers" method="post" accept-charset="UTF-8">
 				<dl class="settings">
 					<dt>
 						<label for="ftp_server">', $txt['package_ftp_server'], ':</label>
@@ -474,7 +482,7 @@ function template_ftp_form_required()
 						<label for="ftp_password">', $txt['package_ftp_password'], ':</label>
 					</dt>
 					<dd>
-						<input type="password" size="50" name="ftp_password" id="ftp_password" class="input_password" />
+						<input type="password" size="50" name="ftp_password" id="ftp_password" class="input_password" autocomplete="off" />
 					</dd>
 					<dt>
 						<label for="ftp_path">', $txt['package_ftp_path'], ':</label>
