@@ -14,24 +14,40 @@
 
 namespace ElkArte\Packages;
 
+use ElkArte\AbstractModel;
 use ElkArte\FileFunctions;
 
-class PackageParser
+class PackageParser extends AbstractModel
 {
 	/** @var \ElkArte\FileFunctions */
 	public $fileFunc;
+
 	/** @var array the results of our efforts */
 	protected $_return;
+
 	/** @var array the parsed results of the package info */
 	protected $action;
+
 	/** @var int simple temporary file counter */
 	protected $temp_auto = 0;
+
 	/** @var bool If the package has a redirect or if to use the default */
 	protected $has_redirect = false;
+
 	/** @var bool that should be obvious */
 	protected $not_done;
+
 	/** @var bool the name of this class :P */
 	protected $failure = false;
+
+	/**
+	 * Basic constructor
+	 */
+	public function __construct()
+	{
+		$this->fileFunc = FileFunctions::instance();
+		parent::__construct();
+	}
 
 	/**
 	 * Parses the actions in package-info.xml file from packages.
@@ -82,9 +98,6 @@ class PackageParser
 		$temp_path = BOARDDIR . '/packages/temp/' . ($context['base_path'] ?? '');
 		$context['readmes'] = [];
 		$context['licences'] = [];
-
-		// We work hard with the file system
-		$this->fileFunc = FileFunctions::instance();
 
 		// This is the testing phase... nothing shall be done yet.
 		$this->testingPhase($actions);
@@ -222,7 +235,8 @@ class PackageParser
 		// Make sure the file exists before deleting it.
 		if ($this->fileFunc->fileExists($action['filename']))
 		{
-			package_chmod($action['filename']);
+			$chmod_control = new PackageChmod();
+			$chmod_control->createChmodControl(array($action['filename']));
 			$this->failure |= !$this->fileFunc->delete($action['filename']);
 		}
 		// The file that was supposed to be deleted couldn't be found.
@@ -249,7 +263,7 @@ class PackageParser
 	}
 
 	/**
-	 * Move a file to a specifed location
+	 * Move a file to a specified location
 	 *
 	 * @param array $action
 	 * @return void
@@ -288,6 +302,8 @@ class PackageParser
 	 */
 	public function installRequiredir($action)
 	{
+		global $context;
+
 		copytree($action['source'], $action['destination']);
 
 		// Any other theme folders?
@@ -309,6 +325,8 @@ class PackageParser
 	 */
 	public function installRemovedir($action)
 	{
+		global $context;
+
 		deltree($action['filename']);
 
 		// Any other theme folders?
@@ -694,7 +712,7 @@ class PackageParser
 	 * Setup for all file/dir actions
 	 *
 	 * @param string $actionType
-	 * @param array $action
+	 * @param \ElkArte\XmlArray $action
 	 * @return array
 	 */
 	private function _testFileDir($actionType, $action)

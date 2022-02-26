@@ -84,7 +84,7 @@ function read_tgz_file($gzfilename, $destination, $single_file = false, $overwri
  * @param bool $single_file = false,
  * @param bool $overwrite = false,
  * @param string[]|null $files_to_extract = null
- * @return mixed[]|bool
+ * @return array|bool
  * @package Packages
  */
 function read_tgz_data($data, $destination, $single_file = false, $overwrite = false, $files_to_extract = null)
@@ -114,7 +114,7 @@ function read_tgz_data($data, $destination, $single_file = false, $overwrite = f
  * @param bool $single_file
  * @param bool $overwrite
  * @param string[]|null $files_to_extract
- * @return mixed[]|bool
+ * @return array|bool
  * @package Packages
  */
 function read_zip_data($data, $destination, $single_file = false, $overwrite = false, $files_to_extract = null)
@@ -278,7 +278,7 @@ function getPackageInfo($gzfilename)
  * Create a chmod control for chmoding files.
  *
  * @param string[] $chmodFiles
- * @param mixed[] $chmodOptions
+ * @param array $chmodOptions
  * @param bool $restore_write_status
  * @return array|bool
  * @package Packages
@@ -728,8 +728,7 @@ function mktree($strPath, $mode = true)
 		{
 			if (isset($package_ftp))
 			{
-				/** @var $package_ftp \ElkArte\Http\FtpConnection */
-				$package_ftp->ftp_chmod(strtr($strPath, array($_SESSION['pack_ftp']['root'] => '')), [0755, 0775, 0777]);
+				$package_ftp->ftp_chmod(strtr($strPath, array($_SESSION['ftp_connection']['root'] => '')), [0755, 0775, 0777]);
 			}
 			else
 			{
@@ -752,8 +751,7 @@ function mktree($strPath, $mode = true)
 	{
 		if (isset($package_ftp))
 		{
-			/** @var $package_ftp \ElkArte\Http\FtpConnection */
-			$package_ftp->ftp_chmod(dirname(strtr($strPath, array($_SESSION['pack_ftp']['root'] => ''))), [0755, 0775, 0777]);
+			$package_ftp->ftp_chmod(dirname(strtr($strPath, array($_SESSION['ftp_connection']['root'] => ''))), [0755, 0775, 0777]);
 		}
 		else
 		{
@@ -767,9 +765,9 @@ function mktree($strPath, $mode = true)
 		return test_access($strPath);
 	}
 	// Let FTP take care of this directory creation
-	if (isset($package_ftp))
+	if (isset($package_ftp, $_SESSION['ftp_connection']))
 	{
-		return $package_ftp->create_dir(strtr($strPath, array($_SESSION['pack_ftp']['root'] => '')));
+		return $package_ftp->create_dir(strtr($strPath, array($_SESSION['ftp_connection']['root'] => '')));
 	}
 	// Only one choice left and that is to try and make a directory with PHP
 	else
@@ -871,7 +869,8 @@ function copytree($source, $destination)
 			}
 		}
 
-		package_chmod($destination . '/' . $entryname);
+		$packageChmod = new PackageChmod();
+		$packageChmod->pkgChmod($destination . '/' . $entryname);
 
 		if ($fileFunc->isDir($source . '/' . $entryname))
 		{
@@ -896,7 +895,7 @@ function copytree($source, $destination)
  * @param string $file
  * @param bool $testing = true means modifications shouldn't actually be saved.
  * @param bool $undo = false specifies that the modifications the file requests should be undone; this doesn't work with everything (regular expressions.)
- * @param mixed[] $theme_paths = array()
+ * @param array $theme_paths = array()
  * @return array an array of those changes made.
  * @package Packages
  */
@@ -1262,7 +1261,8 @@ function parseModification($file, $testing = true, $undo = false, $theme_paths =
 			// Fix any little helper symbols ;).
 			$working_data = strtr($working_data, array('[$PACKAGE1$]' => '$', '[$PACKAGE2$]' => '\\'));
 
-			package_chmod($working_file);
+			$packageChmod = new PackageChmod();
+			$packageChmod->pkgChmod($working_file);
 
 			if ((file_exists($working_file) && !is_writable($working_file)) || (!file_exists($working_file) && !is_writable(dirname($working_file))))
 			{
@@ -1378,7 +1378,7 @@ function package_put_contents($filename, $data, $testing = false)
 		}
 	}
 
-	if (isset($package_ftp))
+	if (isset($package_ftp, $_SESSION['ftp_connection']))
 	{
 		$ftp_file = strtr($filename, array($_SESSION['ftp_connection']['root'] => ''));
 	}
@@ -1392,7 +1392,8 @@ function package_put_contents($filename, $data, $testing = false)
 		@touch($filename);
 	}
 
-	package_chmod($filename);
+	$packageChmod = new PackageChmod();
+	$packageChmod->pkgChmod($filename);
 
 	if (!$testing && (strpos($filename, 'packages/') !== false || $package_cache === false))
 	{
@@ -1462,7 +1463,8 @@ function package_flush_cache($trash = false)
 			@touch($filename);
 		}
 
-		$result = package_chmod($filename);
+		$packageChmod = new PackageChmod();
+		$result = $packageChmod->pkgChmod($filename);
 
 		// If we are not doing our test pass, then lets do a full write check
 		if (!$trash && !$fileFunc->isDir($filename))
@@ -1570,7 +1572,7 @@ function package_create_backup($id = 'backup')
 		foreach ($dirs as $dir => $dest)
 		{
 			$iter = new RecursiveIteratorIterator(
-				new RecursiveDirectoryIterator($dir, RecursiveDirectoryIterator::SKIP_DOTS),
+				new RecursiveDirectoryIterator($dir, FilesystemIterator::SKIP_DOTS),
 				RecursiveIteratorIterator::CHILD_FIRST,
 				RecursiveIteratorIterator::CATCH_GET_CHILD // Ignore "Permission denied"
 			);
@@ -1599,7 +1601,8 @@ function package_create_backup($id = 'backup')
 
 		if (!$fileFunc->isWritable(BOARDDIR . '/packages/backups'))
 		{
-			package_chmod(BOARDDIR . '/packages/backups');
+			$packageChmod = new PackageChmod();
+			$packageChmod->pkgChmod(BOARDDIR . '/packages/backups');
 		}
 
 		// Name the output file, yyyy-mm-dd_before_package_name.tar.gz
@@ -1860,7 +1863,7 @@ function checkPackageDependency($id)
 /**
  * Adds a record to the log packages table
  *
- * @param mixed[] $packageInfo
+ * @param array $packageInfo
  * @param string $failed_step_insert
  * @param string $themes_installed
  * @param string $db_changes

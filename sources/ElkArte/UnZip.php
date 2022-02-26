@@ -173,7 +173,7 @@ class UnZip
 		umask(0);
 		if ($this->destination !== null && !file_exists($this->destination) && !$this->single_file)
 		{
-			mktree($this->destination, 0777);
+			mktree($this->destination);
 		}
 	}
 
@@ -444,7 +444,7 @@ class UnZip
 
 			if (!file_exists($this->destination . '/' . $this->_filename))
 			{
-				mktree($this->destination . '/' . $this->_filename, 0777);
+				mktree($this->destination . '/' . $this->_filename);
 			}
 			$this->_write_this = false;
 		}
@@ -550,7 +550,7 @@ class UnZip
 		// A directory may need to be created
 		if ((strpos($this->_filename, '/') !== false && !$this->single_file) || (!$this->single_file && !is_dir($this->_file_info['dir'])))
 		{
-			mktree($this->_file_info['dir'], 0777);
+			mktree($this->_file_info['dir']);
 		}
 
 		// If we're looking for a **specific file**, and this is it... ka-bam, baby.

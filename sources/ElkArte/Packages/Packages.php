@@ -41,20 +41,25 @@ class Packages extends AbstractController
 {
 	/** @var int The id from the DB or an installed package */
 	public $install_id;
+
 	/** @var string[] Array of installed theme paths */
 	public $theme_paths;
+
 	/** @var array Array of files / directories that require permissions */
 	public $chmod_files;
-	/** @var array|bool listing of files in a packages */
-	private $_extracted_files;
+
 	/** @var string Filename of the package */
 	private $_filename;
+
 	/** @var string Base path of the package */
 	private $_base_path;
+
 	/** @var bool If this is an un-install pass or not */
 	private $_uninstalling;
+
 	/** @var bool If the package is installed, previously or not */
 	private $_is_installed;
+
 	/** @var \ElkArte\FileFunctions */
 	private $fileFunc;
 
@@ -154,7 +159,7 @@ class Packages extends AbstractController
 	}
 
 	/**
-	 * Test install a package.
+	 * Test install/uninstall a package.
 	 */
 	public function action_install()
 	{
@@ -186,6 +191,9 @@ class Packages extends AbstractController
 		// Load up the package FTP information?
 		$create_chmod_control = new PackageChmod();
 		$create_chmod_control->createChmodControl();
+
+		// Prevent browsers from auto completing the FTP password
+		theme()->addInlineJavascript('disableAutoComplete();', true);
 
 		// Make sure our temp directory exists and is empty.
 		if (file_exists(BOARDDIR . '/packages/temp'))
@@ -293,7 +301,8 @@ class Packages extends AbstractController
 		$this->chmod_files = !empty($pka->chmod_files) ? $pka->chmod_files : array();
 		if (!empty($this->chmod_files))
 		{
-			$ftp_status = create_chmod_control($this->chmod_files);
+			$chmod_control = new PackageChmod();
+			$ftp_status = $chmod_control->createChmodControl($this->chmod_files);
 			$context['ftp_needed'] = !empty($ftp_status['files']['notwritable']) && !empty($context['package_ftp']);
 		}
 
@@ -304,27 +313,32 @@ class Packages extends AbstractController
 	/**
 	 * Creates the packages temp directory
 	 *
-	 * - First trys as 755, failing moves to 777
+	 * - First try as 755, failing moves to 777
 	 * - Will try with FTP permissions for cases where the web server credentials
 	 * do not have "create" directory permissions
+	 *
+	 * @throws \ElkArte\Exceptions\Exception when no directory can be made
 	 */
 	private function _create_temp_dir()
 	{
-		global $context;
+		global $context, $scripturl, $package_ftp;
 
 		// Try to Make the temp directory
 		if (!mktree(BOARDDIR . '/packages/temp'))
 		{
 			deltree(BOARDDIR . '/packages/temp', false);
-			$create_chmod_control = new PackageChmod();
-			$create_chmod_control->createChmodControl(
+			$chmod_control = new PackageChmod();
+			$chmod_control->createChmodControl(
 				array(BOARDDIR . '/packages/temp/delme.tmp'),
-				array('destination_url' => getUrl('admin', ['action' => 'admin', 'area' => 'packages', 'sa' => $this->_req->query->sa, 'package' => $context['filename']]),
-				'crash_on_error' => true)
+				array(
+					'destination_url' => $scripturl . '?action=admin;area=packages;sa=' . $this->_req->query->sa . ';package=' . ($context['filename'] ?? ''),
+					'crash_on_error' => true
+				)
 			);
 
 			// No temp directory was able to be made, that's fatal
 			deltree(BOARDDIR . '/packages/temp', false);
+			unset($package_ftp, $_SESSION['ftp_connection']);
 			throw new Exception('package_cant_download', false);
 		}
 	}
@@ -333,7 +347,7 @@ class Packages extends AbstractController
 	 * Extracts a package file in the packages/temp directory
 	 *
 	 * - Sets the base path as needed
-	 * - Loads $this->_extracted_files with the package file listing
+	 * - Loads $extracted_files with the package file listing
 	 */
 	private function _extract_files_temp()
 	{
@@ -341,12 +355,12 @@ class Packages extends AbstractController
 		if (is_file(BOARDDIR . '/packages/' . $this->_filename))
 		{
 			// Unpack the files in to the packages/temp directory
-			$this->_extracted_files = read_tgz_file(BOARDDIR . '/packages/' . $this->_filename, BOARDDIR . '/packages/temp');
+			$extracted_files = read_tgz_file(BOARDDIR . '/packages/' . $this->_filename, BOARDDIR . '/packages/temp');
 
 			// Determine the base path for the package
-			if ($this->_extracted_files && !$this->fileFunc->fileExists(BOARDDIR . '/packages/temp/package-info.xml'))
+			if ($extracted_files && !$this->fileFunc->fileExists(BOARDDIR . '/packages/temp/package-info.xml'))
 			{
-				foreach ($this->_extracted_files as $file)
+				foreach ($extracted_files as $file)
 				{
 					if (basename($file['filename']) === 'package-info.xml')
 					{
@@ -368,7 +382,7 @@ class Packages extends AbstractController
 			copytree(BOARDDIR . '/packages/' . $this->_filename, BOARDDIR . '/packages/temp');
 
 			// Get the file listing
-			$this->_extracted_files = $this->fileFunc->listtree(BOARDDIR . '/packages/temp');
+			$this->fileFunc->listtree(BOARDDIR . '/packages/temp');
 			$this->_base_path = '';
 		}
 		// Well we don't know what it is then, so we stop
@@ -406,7 +420,8 @@ class Packages extends AbstractController
 				throw new Exception('package_cant_uninstall', false);
 			}
 
-			$actions = parsePackageInfo($packageInfo['xml'], $testing, 'uninstall');
+			$parser = new PackageParser();
+			$actions = $parser->parsePackageInfo($packageInfo['xml'], $testing, 'uninstall');
 
 			// Gadzooks!  There's no uninstaller at all!?
 			if (empty($actions))
@@ -431,7 +446,8 @@ class Packages extends AbstractController
 		elseif (isset($package_installed['old_version']) && $package_installed['old_version'] != $packageInfo['version'])
 		{
 			// Look for an upgrade...
-			$actions = parsePackageInfo($packageInfo['xml'], $testing, 'upgrade', $package_installed['old_version']);
+			$parser = new PackageParser();
+			$actions = $parser->parsePackageInfo($packageInfo['xml'], $testing, 'upgrade', $package_installed['old_version']);
 
 			// There was no upgrade....
 			if (empty($actions))
@@ -458,7 +474,8 @@ class Packages extends AbstractController
 
 		if (!isset($package_installed['old_version']) || $this->_is_installed)
 		{
-			$actions = parsePackageInfo($packageInfo['xml'], $testing, 'install');
+			$parser = new PackageParser();
+			$actions = $parser->parsePackageInfo($packageInfo['xml'], $testing, 'install');
 		}
 
 		return $actions;
@@ -566,7 +583,7 @@ class Packages extends AbstractController
 	}
 
 	/**
-	 * Actually installs a package
+	 * Actually installs/uninstalls a package
 	 */
 	public function action_install2()
 	{
@@ -589,7 +606,7 @@ class Packages extends AbstractController
 			throw new Exception('package_no_file', false);
 		}
 
-		// If this is an uninstall, we'll have an id.
+		// If this is an uninstallation, we'll have an id.
 		$this->install_id = $this->_req->getQuery('pid', 'intval', 0);
 
 		// Installing in themes will require some help
@@ -599,7 +616,13 @@ class Packages extends AbstractController
 		$this->_uninstalling = $this->_req->query->sa === 'uninstall2';
 
 		// Load up the package FTP information?
-		create_chmod_control(array(), array('destination_url' => getUrl('admin', ['action' => 'admin', 'area' => 'packages', 'sa' =>  $this->_req->query->sa, 'package' => $this->_req->query->package])));
+		$chmod_control = new PackageChmod();
+		$chmod_control->createChmodControl(
+			array(),
+			array(
+				'destination_url' => getUrl('admin', ['action' => 'admin', 'area' => 'packages', 'sa' =>  $this->_req->query->sa, 'package' => $this->_req->query->package])
+			)
+		);
 
 		// Make sure temp directory exists and is empty!
 		if (file_exists(BOARDDIR . '/packages/temp'))
@@ -684,7 +707,7 @@ class Packages extends AbstractController
 		// Is it actually installed?
 		$package_installed = isPackageInstalled($packageInfo['id'], $this->install_id);
 
-		// Fetch the install status and action log
+		// Fetch the installation status and action log
 		$install_log = $this->_get_package_actions($package_installed, $packageInfo, false);
 
 		// Set up the details for the sub template, linktree, etc
@@ -706,7 +729,6 @@ class Packages extends AbstractController
 		// @todo Make a log of any errors that occurred and output them?
 		if (!empty($install_log))
 		{
-			// @todo Make a log of any errors that occurred and output them?
 			$pka = new PackageActions(new EventManager());
 			$pka->setUser(User::$info);
 			$pka->install_init($install_log, $this->_uninstalling, $this->_base_path, $this->theme_paths, $themes_installed);
@@ -828,7 +850,8 @@ class Packages extends AbstractController
 		Cache::instance()->clean();
 
 		// Restore file permissions?
-		create_chmod_control(array(), array(), true);
+		$chmod_control = new PackageChmod();
+		$chmod_control->createChmodControl(array(), array(), true);
 	}
 
 	/**
@@ -967,7 +990,14 @@ class Packages extends AbstractController
 			&& (substr($this->_req->query->package, -4) === '.zip' || substr($this->_req->query->package, -4) === '.tgz' || substr($this->_req->query->package, -7) === '.tar.gz' || is_dir(BOARDDIR . '/packages/' . $this->_req->query->package))
 			&& $this->_req->query->package !== 'backups' && substr($this->_req->query->package, 0, 1) !== '.')
 		{
-			create_chmod_control(array(BOARDDIR . '/packages/' . $this->_req->query->package), array('destination_url' => getUrl('admin', ['action' => 'admin', 'area' => 'packages', 'sa' => 'remove', 'package' => $this->_req->query->package]), 'crash_on_error' => true));
+			$chmod_control = new PackageChmod();
+			$chmod_control->createChmodControl(
+				array(BOARDDIR . '/packages/' . $this->_req->query->package),
+				array(
+					'destination_url' => getUrl('admin', ['action' => 'admin', 'area' => 'packages', 'sa' => 'remove', 'package' => $this->_req->query->package]),
+					'crash_on_error' => true
+				)
+			);
 
 			if (is_dir(BOARDDIR . '/packages/' . $this->_req->query->package))
 			{
@@ -1131,7 +1161,7 @@ class Packages extends AbstractController
 	}
 
 	/**
-	 * Test an FTP connection.
+	 * Test an FTP connection via Ajax
 	 *
 	 * @uses Xml Template, generic_xml sub template
 	 */
@@ -1142,7 +1172,8 @@ class Packages extends AbstractController
 		checkSession('get');
 
 		// Try to make the FTP connection.
-		create_chmod_control(array(), array('force_find_error' => true));
+		$chmod_control = new PackageChmod();
+		$chmod_control->createChmodControl(array(), array('force_find_error' => true));
 
 		// Deal with the template stuff.
 		theme()->getTemplates()->load('Xml');
@@ -1158,7 +1189,9 @@ class Packages extends AbstractController
 						'attributes' => array(
 							'success' => !empty($package_ftp) ? 1 : 0,
 						),
-						'value' => !empty($package_ftp) ? $txt['package_ftp_test_success'] : (isset($context['package_ftp'], $context['package_ftp']['error']) ? $context['package_ftp']['error'] : $txt['package_ftp_test_failed']),
+						'value' => !empty($package_ftp) ?
+							$txt['package_ftp_test_success']
+							: ($context['package_ftp']['error'] ?? $txt['package_ftp_test_failed']),
 					),
 				),
 			),
@@ -1174,7 +1207,7 @@ class Packages extends AbstractController
 
 		if (isset($this->_req->post->save))
 		{
-			checkSession('post');
+			checkSession();
 
 			updateSettings(array(
 				'package_server' => $this->_req->getPost('pack_server', 'trim|\\ElkArte\\Util::htmlspecialchars'),
@@ -1286,8 +1319,8 @@ class Packages extends AbstractController
 
 		// Ok lets get the content of the file.
 		$context['operations'] = array(
-			'search' => strtr(htmlspecialchars($mod_actions[$operation_key]['search_original'], ENT_COMPAT, 'UTF-8'), array('[' => '&#91;', ']' => '&#93;')),
-			'replace' => strtr(htmlspecialchars($mod_actions[$operation_key]['replace_original'], ENT_COMPAT, 'UTF-8'), array('[' => '&#91;', ']' => '&#93;')),
+			'search' => strtr(htmlspecialchars($mod_actions[$operation_key]['search_original'], ENT_COMPAT), array('[' => '&#91;', ']' => '&#93;')),
+			'replace' => strtr(htmlspecialchars($mod_actions[$operation_key]['replace_original'], ENT_COMPAT), array('[' => '&#91;', ']' => '&#93;')),
 			'position' => $mod_actions[$operation_key]['position'],
 		);
 
@@ -1304,6 +1337,8 @@ class Packages extends AbstractController
 
 	/**
 	 * Allow the admin to reset permissions on files.
+	 *
+	 * @throws Exception no_access
 	 */
 	public function action_perms()
 	{
@@ -1315,7 +1350,8 @@ class Packages extends AbstractController
 		// If we're restoring permissions this is just a pass through really.
 		if (isset($this->_req->query->restore))
 		{
-			create_chmod_control(array(), array(), true);
+			$chmod_control = new PackageChmod();
+			$chmod_control->createChmodControl(array(), array(), true);
 			throw new Exception('no_access', false);
 		}
 
@@ -1324,7 +1360,8 @@ class Packages extends AbstractController
 		detectServer()->setTimeLimit(600);
 
 		// Load up some FTP stuff.
-		create_chmod_control();
+		$chmod_control = new PackageChmod();
+		$chmod_control->createChmodControl();
 
 		if (empty($package_ftp) && !isset($this->_req->post->skip_ftp))
 		{
@@ -1555,8 +1592,8 @@ class Packages extends AbstractController
 		// Have we got a load of back-catalogue trees to expand from a submit etc?
 		if (!empty($this->_req->query->back_look))
 		{
-			$potententialTrees = json_decode(base64_decode($this->_req->query->back_look), true);
-			foreach ($potententialTrees as $tree)
+			$potentialTrees = json_decode(base64_decode($this->_req->query->back_look), true);
+			foreach ($potentialTrees as $tree)
 			{
 				$context['look_for'][] = $tree;
 			}
@@ -1725,14 +1762,15 @@ class Packages extends AbstractController
 			{
 				if (in_array($status, array('execute', 'writable', 'read')))
 				{
-					package_chmod($path, $status);
+					$packageChmod = new PackageChmod();
+					$packageChmod->pkgChmod($path, $status);
 				}
 				elseif ($status === 'custom' && !empty($custom_value))
 				{
 					// Use FTP if we have it.
-					if (!empty($package_ftp) && !empty($_SESSION['pack_ftp']))
+					if (!empty($package_ftp) && !empty($_SESSION['ftp_connection']))
 					{
-						$ftp_file = strtr($path, array($_SESSION['pack_ftp']['root'] => ''));
+						$ftp_file = strtr($path, array($_SESSION['ftp_connection']['root'] => ''));
 						$package_ftp->chmod($ftp_file, $custom_value);
 					}
 					else
@@ -1811,7 +1849,9 @@ class Packages extends AbstractController
 						if (!$dont_chmod && !$entry->isDir() && (empty($context['file_offset']) || $context['file_offset'] < $file_count))
 						{
 							$status = $context['predefined_type'] === 'free' || isset($context['special_files'][$entry->getPathname()]) ? 'writable' : 'execute';
-							package_chmod($entry->getPathname(), $status);
+
+							$packageChmod = new PackageChmod();
+							$packageChmod->pkgChmod($entry->getPathname(), $status);
 						}
 
 						// See if we're out of time?
@@ -1839,7 +1879,8 @@ class Packages extends AbstractController
 
 				// Do the actual directory.
 				$status = $context['predefined_type'] === 'free' || isset($context['special_files'][$path]) ? 'writable' : 'execute';
-				package_chmod($path, $status);
+				$packageChmod = new PackageChmod();
+				$packageChmod->pkgChmod($path, $status);
 
 				// We've finished the directory so no file offset, and no record.
 				$context['file_offset'] = 0;
@@ -1899,7 +1940,7 @@ class Packages extends AbstractController
 	 * Builds a list of special files recursively for a given path
 	 *
 	 * @param string $path
-	 * @param mixed[] $data
+	 * @param array $data
 	 */
 	public function build_special_files__recursive($path, &$data)
 	{
@@ -1925,7 +1966,7 @@ class Packages extends AbstractController
 	/**
 	 * Get a listing of all the packages
 	 *
-	 * - Determines if the package is a ddon, smiley, avatar, language or unknown package
+	 * - Determines if the package is addon, smiley, avatar, language or unknown package
 	 * - Determines if the package has been installed or not
 	 *
 	 * @param int $start The item to start with (for pagination purposes)
@@ -1951,7 +1992,14 @@ class Packages extends AbstractController
 		// We need the packages directory to be writable for this.
 		if (!@is_writable(BOARDDIR . '/packages'))
 		{
-			create_chmod_control(array(BOARDDIR . '/packages'), array('destination_url' =>getUrl('admin', ['action' => 'admin', 'area' => 'packages']), 'crash_on_error' => true));
+			$create_chmod_control = new PackageChmod();
+			$create_chmod_control->createChmodControl(
+				array(BOARDDIR . '/packages'),
+				array(
+					'destination_url' =>getUrl('admin', ['action' => 'admin', 'area' => 'packages']),
+					'crash_on_error' => true
+				)
+			);
 		}
 
 		list ($the_brand, $the_version) = explode(' ', FORUM_VERSION, 2);
@@ -2261,7 +2309,7 @@ class Packages extends AbstractController
  * Checks the permissions of all the areas that will be affected by the package
  *
  * @param string $path
- * @param mixed[] $data
+ * @param array $data
  * @param int $level
  *
  * @throws \ElkArte\Exceptions\Exception no_access

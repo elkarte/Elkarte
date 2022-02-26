@@ -163,11 +163,11 @@ class PackageServers extends AbstractController
 		// Are they connected to their FTP account already?
 		if (isset($this->_req->post->ftp_username))
 		{
-			$ftp_server = $this->_req->getPost('ftp_server', 'trim', null);
+			$ftp_server = $this->_req->getPost('ftp_server', 'trim');
 			$ftp_port = $this->_req->getPost('ftp_port', 'intval', 21);
 			$ftp_username = $this->_req->getPost('ftp_username', 'trim', '');
 			$ftp_password = $this->_req->getPost('ftp_password', 'trim', '');
-			$ftp_path = $this->_req->getPost('ftp_path', 'trim', null);
+			$ftp_path = $this->_req->getPost('ftp_path', 'trim');
 
 			$ftp = new FtpConnection($ftp_server, $ftp_port, $ftp_username, $ftp_password);
 			if ($ftp->error === false)
@@ -643,12 +643,17 @@ class PackageServers extends AbstractController
 		}
 
 		// Save the package to disk, use FTP if necessary
-		create_chmod_control(
+		$create_chmod_control = new PackageChmod();
+		$create_chmod_control->createChmodControl(
 			array(BOARDDIR . '/packages/' . $package_name),
-			array('destination_url' => getUrl('admin', ['action' => 'admin', 'area' => 'packageservers', 'sa' => 'download', 'package' => $package_id, '{session_data}']
-				+ (isset($this->_req->query->server) ? ['server' => $this->_req->query->server] : [])
-				+ (isset($this->_req->query->auto) ? ['auto' => ''] : [])
-				+ (isset($this->_req->query->conflict) ? ['conflict' => ''] : [])), 'crash_on_error' => true));
+			array(
+				'destination_url' => getUrl('admin', ['action' => 'admin', 'area' => 'packageservers', 'sa' => 'download', 'package' => $package_id, '{session_data}']
+					+ (isset($this->_req->query->server) ? ['server' => $this->_req->query->server] : [])
+					+ (isset($this->_req->query->auto) ? ['auto' => ''] : [])
+					+ (isset($this->_req->query->conflict) ? ['conflict' => ''] : [])),
+				'crash_on_error' => true
+			)
+		);
 
 		package_put_contents(BOARDDIR . '/packages/' . $package_name, fetch_web_data($url . $package_id));
 
