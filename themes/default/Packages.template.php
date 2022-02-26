@@ -331,7 +331,7 @@ function template_view_package()
 	elseif ($context['ftp_needed'])
 	{
 		echo '
-			<h2 class="category_header">', $txt['package_ftp_necessary'], '</h2>
+			<h2 class="category_header hdicon cat_img_moderation">', $txt['package_ftp_necessary'], '</h2>
 
 			<div>
 				', template_control_chmod(), '
@@ -416,6 +416,12 @@ function template_view_package()
 function template_extract_package()
 {
 	global $context, $txt, $scripturl;
+
+	// Override any redirect if we have to show the permissions changed dialog
+	if (function_exists('template_show_list') && !empty($context['restore_file_permissions']['rows']))
+	{
+		$context['redirect_url'] = '';
+	}
 
 	if (!empty($context['redirect_url']))
 	{
@@ -645,13 +651,14 @@ function template_control_chmod()
 		return false;
 	}
 
+	// Asked to show the list of files/Directories we need access to in order to change
 	if (empty($context['package_ftp']['form_elements_only']))
 	{
 		echo '
 				', sprintf($txt['package_ftp_why'], 'document.getElementById(\'need_writable_list\').style.display = \'\'; return false;'), '<br />
 				<div id="need_writable_list" class="smalltext">
 					', $txt['package_ftp_why_file_list'], '
-					<ul style="display: inline;">';
+					<ul class="bbc_list">';
 
 		if (!empty($context['notwritable_files']))
 		{
