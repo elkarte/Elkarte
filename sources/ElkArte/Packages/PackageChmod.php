@@ -20,11 +20,17 @@ use ElkArte\AbstractModel;
 use ElkArte\FileFunctions;
 use ElkArte\Http\FtpConnection;
 
+/**
+ * Class that handles teh chmod of files/directories via PHP or FTP
+ */
 class PackageChmod extends AbstractModel
 {
 	/** @var \ElkArte\FileFunctions */
 	protected $fileFunc;
 
+	/**
+	 * Basic constructor
+	 */
 	public function __construct()
 	{
 		$this->fileFunc = FileFunctions::instance();
@@ -32,10 +38,10 @@ class PackageChmod extends AbstractModel
 	}
 
 	/**
-	 * Create a chmod control for chmoding files.
+	 * Create a chmod control for, you guessed it, chmod-ing files / directories.
 	 *
 	 * @param string[] $chmodFiles
-	 * @param mixed[] $chmodOptions
+	 * @param mixed[] $chmodOptions  -- force_find_error, crash_on_error, destination_url
 	 * @param bool $restore_write_status
 	 * @return array|bool
 	 * @package Packages
@@ -47,7 +53,7 @@ class PackageChmod extends AbstractModel
 		// If we're restoring the status of existing files prepare the data.
 		if ($restore_write_status && !empty($_SESSION['ftp_connection']['original_perms']))
 		{
-			$this->showList($restore_write_status);
+			$this->showList($restore_write_status, $chmodOptions);
 		}
 		// Otherwise, it's entirely irrelevant?
 		elseif ($restore_write_status)
@@ -64,7 +70,7 @@ class PackageChmod extends AbstractModel
 		);
 
 		// If we have some FTP information already, then let's assume it was required
-		// and try to get ourselves connected.
+		// and try to get ourselves reconnected.
 		if (!empty($_SESSION['ftp_connection']['connected']))
 		{
 			$package_ftp = new FtpConnection($_SESSION['ftp_connection']['server'], $_SESSION['ftp_connection']['port'], $_SESSION['ftp_connection']['username'], $this->packageCrypt($_SESSION['ftp_connection']['password']));
@@ -77,7 +83,7 @@ class PackageChmod extends AbstractModel
 		}
 
 		// Just got a submission, did we?
-		if (isset($_POST['ftp_username'], $_POST['ftp_password'])
+		if (isset($this->_req->post->ftp_username, $this->_req->post->ftp_password)
 			&& (empty($package_ftp) || ($package_ftp->error !== false)))
 		{
 			$ftp = $this->getFTPControl();
@@ -101,7 +107,7 @@ class PackageChmod extends AbstractModel
 				else
 				{
 					// Now try to change that.
-					$return_data['files'][$this->pkgChmod($file, 'writable', true) ? 'writable' : 'notwritable'][] = $file;
+					$return_data['files'][$this->pkgChmod($file,true) ? 'writable' : 'notwritable'][] = $file;
 				}
 			}
 		}
@@ -110,7 +116,7 @@ class PackageChmod extends AbstractModel
 		if (empty($package_ftp)
 			&& (!empty($return_data['files']['notwritable']) || !empty($chmodOptions['force_find_error'])))
 		{
-			$this->reportUnWritable($ftp ?? null, $chmodOptions);
+			$this->reportUnWritable($ftp ?? null, $chmodOptions, $return_data);
 
 			// Sent here to die?
 			if (!empty($chmodOptions['crash_on_error']))
@@ -124,7 +130,14 @@ class PackageChmod extends AbstractModel
 		return $return_data;
 	}
 
-	public function showList($restore_write_status)
+	/**
+	 * If file permissions were change, provide the option to reset them
+	 *
+	 * @param bool $restore_write_status
+	 * @param array $chmodOptions
+	 * @return bool|void
+	 */
+	public function showList($restore_write_status, $chmodOptions)
 	{
 		global $context, $txt, $scripturl;
 
@@ -137,7 +150,7 @@ class PackageChmod extends AbstractModel
 				'get_items' => array(
 					'function' => 'list_restoreFiles',
 					'params' => array(
-						!empty($_POST['restore_perms']),
+						!empty($this->_req->getPost('restore_perms')),
 					),
 				),
 				'columns' => array(
@@ -220,7 +233,7 @@ class PackageChmod extends AbstractModel
 			);
 
 			// Work out what columns and the like to show.
-			if (!empty($_POST['restore_perms']))
+			if (!empty($this->_req->getPost('restore_perms')))
 			{
 				$listOptions['additional_rows'][1]['value'] = sprintf($txt['package_restore_permissions_action_done'], $scripturl . '?action=admin;area=packages;sa=perms;' . $context['session_var'] . '=' . $context['session_id']);
 				unset($listOptions['columns']['check'], $listOptions['form'], $listOptions['additional_rows'][0]);
@@ -237,7 +250,7 @@ class PackageChmod extends AbstractModel
 			createList($listOptions);
 
 			// If we just restored permissions then wherever we are, we are now done and dusted.
-			if (!empty($_POST['restore_perms']))
+			if (!empty($this->_req->getPost('restore_perms')))
 			{
 				obExit();
 			}
@@ -249,9 +262,21 @@ class PackageChmod extends AbstractModel
 		}
 	}
 
-	public function reportUnWritable($ftp, $chmodOptions)
+	/**
+	 * Prepares $context['package_ftp'] with whatever information we may have available.
+	 *
+	 * @param \ElkArte\Http\FtpConnection|null $ftp
+	 * @param array $chmodOptions
+	 * @param array $return_data
+	 */
+	public function reportUnWritable($ftp, $chmodOptions, $return_data)
 	{
-		global $modSettings, $context;
+		global $context;
+
+		$ftp_server = $this->_req->getPost('ftp_server', 'trim');
+		$ftp_port = $this->_req->getPost('ftp_port', 'intval');
+		$ftp_username = $this->_req->getPost('ftp_username', 'trim');
+		$ftp_path = $this->_req->getPost('ftp_path', 'trim');
 
 		if (!isset($ftp) || $ftp->error !== false)
 		{
@@ -268,24 +293,20 @@ class PackageChmod extends AbstractModel
 
 			if ($found_path)
 			{
-				$_POST['ftp_path'] = $detect_path;
+				$ftp_path = $detect_path;
 			}
-			elseif (!isset($_POST['ftp_path']))
+			elseif (!isset($ftp_path))
 			{
-				$_POST['ftp_path'] = $modSettings['package_path'] ?? $detect_path;
-			}
-
-			if (!isset($_POST['ftp_username']))
-			{
-				$_POST['ftp_username'] = $username;
+				$ftp_path = $this->_modSettings['package_path'] ?? $detect_path;
 			}
 		}
 
+		// Place some hopefully useful information in the form
 		$context['package_ftp'] = array(
-			'server' => $_POST['ftp_server'] ?? ($modSettings['package_server'] ?? 'localhost'),
-			'port' => $_POST['ftp_port'] ?? ($modSettings['package_port'] ?? '21'),
-			'username' => $_POST['ftp_username'] ?? ($modSettings['package_username'] ?? ''),
-			'path' => $_POST['ftp_path'],
+			'server' => $ftp_server ?? ($this->_modSettings['package_server'] ?? 'localhost'),
+			'port' => $ftp_port ?? ($this->_modSettings['package_port'] ?? '21'),
+			'username' => $ftp_username ?? ($this->_modSettings['package_username'] ?? $username ?? ''),
+			'path' => $ftp_path ?? ($this->_modSettings['package_path'] ?? ''),
 			'error' => empty($ftp_error) ? null : $ftp_error,
 			'destination' => !empty($chmodOptions['destination_url']) ? $chmodOptions['destination_url'] : '',
 		);
@@ -295,10 +316,17 @@ class PackageChmod extends AbstractModel
 		$context['notwritable_files'] = array_merge($context['notwritable_files'], $return_data['files']['notwritable']);
 	}
 
+	/**
+	 * Using the user supplied FTP information, attempts to create a connection.  If
+	 * successful will save the supplied data in session for use in other steps.
+	 *
+	 * @return \ElkArte\Http\FtpConnection
+	 */
 	public function getFTPControl()
 	{
-		global $package_ftp, $modSettings;
+		global $package_ftp;
 
+		// CLean up what was sent
 		$server = $this->_req->getPost('ftp_server', 'trim', '');
 		$port = $this->_req->getPost('ftp_port', 'intval', 21);
 		$username = $this->_req->getPost('ftp_username', 'trim', '');
@@ -314,13 +342,18 @@ class PackageChmod extends AbstractModel
 			if (!$ftp->chdir($path))
 			{
 				$ftp_error = $ftp->last_message;
-				$ftp->chdir(preg_replace('~^/home[2]?/[^/]+?~', '', $path));
+
+				if ($ftp->chdir(preg_replace('~^/home[2]?/[^/]+~', '', $path)))
+				{
+					$path = preg_replace('~^/home[2]?/[^/]+~', '', $path);
+					$ftp_error = $ftp->last_message;
+				}
 			}
 
 			if (!in_array($path, array('', '/')))
 			{
 				$ftp_root = strtr(BOARDDIR, array($path => ''));
-				if (substr($ftp_root, -1) === '/' && (substr($_POST['ftp_path'], 0, 1) === '/'))
+				if (substr($ftp_root, -1) === '/' && (substr($path, 0, 1) === '/'))
 				{
 					$ftp_root = substr($ftp_root, 0, -1);
 				}
@@ -341,7 +374,7 @@ class PackageChmod extends AbstractModel
 				'error' => empty($ftp_error) ? null : $ftp_error,
 			);
 
-			if (!isset($modSettings['package_path']) || $modSettings['package_path'] !== $path)
+			if (!isset($this->_modSettings['package_path']) || $this->_modSettings['package_path'] !== $path)
 			{
 				updateSettings(array('package_path' => $path));
 			}
@@ -354,7 +387,7 @@ class PackageChmod extends AbstractModel
 	}
 
 	/**
-	 * Try to make a file writable.
+	 * Try to make a file writable using PHP and/or FTP if available
 	 *
 	 * @param string $filename
 	 * @param bool $track_change = false
@@ -419,7 +452,7 @@ class PackageChmod extends AbstractModel
 			{
 				// This looks odd, but it's an attempt to work around PHP suExec.
 				$file_permissions = $this->fileFunc->filePerms(dirname($chmod_file));
-				mktree(dirname($chmod_file), 0755);
+				mktree(dirname($chmod_file));
 				@touch($chmod_file);
 				$this->fileFunc->elk_chmod($chmod_file, 0755);
 			}
@@ -466,11 +499,13 @@ class PackageChmod extends AbstractModel
 		$ftp_file = strtr($filename, array($_SESSION['ftp_connection']['root'] => ''));
 
 		// If the file does not yet exist, make sure its directory is at least writable
-		if (!$this->fileFunc->fileExists($filename))
+		if (!$this->fileFunc->fileExists($filename) && !$this->fileFunc->isDir($filename))
 		{
 			$file_permissions = $this->fileFunc->filePerms(dirname($filename));
 
-			mktree(dirname($filename), 0755);
+			// Make sure the directory exits and is writable
+			mktree(dirname($filename));
+
 			$package_ftp->create_file($ftp_file);
 			$package_ftp->chmod($ftp_file, 0755);
 		}
@@ -479,16 +514,21 @@ class PackageChmod extends AbstractModel
 			$file_permissions = $this->fileFunc->filePerms($filename);
 		}
 
-		// Directory
+		// Directories
 		if (!$this->fileFunc->isWritable(dirname($filename)))
 		{
-			$package_ftp->chmod(dirname($ftp_file), 0777);
+			$package_ftp->ftp_chmod(dirname($ftp_file), [0775, 0777]);
+		}
+
+		if ($this->fileFunc->isDir($filename) && !$this->fileFunc->isWritable($filename))
+		{
+			$package_ftp->ftp_chmod($ftp_file, [0775, 0777]);
 		}
 
 		// File
-		if (!$this->fileFunc->isWritable($filename))
+		if (!$this->fileFunc->isDir($filename) && !$this->fileFunc->isWritable($filename))
 		{
-			$package_ftp->chmod($ftp_file, 0666);
+			$package_ftp->ftp_chmod($ftp_file, [0664, 0666]);
 		}
 
 		if ($this->fileFunc->isWritable($filename))
