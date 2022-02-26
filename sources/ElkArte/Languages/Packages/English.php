@@ -140,7 +140,7 @@ $txt['package_install_options_make_backups'] = 'Create Backup versions of replac
 $txt['package_install_options_make_full_backups'] = 'Create an entire backup (excluding smileys, avatars and attachments) of the ElkArte install.';
 
 $txt['package_ftp_necessary'] = 'FTP Information Required';
-$txt['package_ftp_why'] = 'Some of the files the package manager needs to modify are not writable.  This needs to be changed by logging into FTP and using it to chmod or create the files and directories.  Your FTP information may be temporarily cached for proper operation of the package manager. Note you can also do this manually using an FTP client - <a href="#" onclick="%1$s">to view a list of the affected files please click here</a>.';
+$txt['package_ftp_why'] = 'Some files the package manager needs to modify are not writable.  This needs to be fixed by using FTP to chmod and/or create those files and directories.  Your FTP information will be temporarily cached for proper operation of the package manager, please create the connection before proceeding.  You can also do this manually using an FTP client.  <a href="#" class="linkbutton" onclick="%1$s">View the list of the affected files</a>.';
 $txt['package_ftp_why_file_list'] = 'The following files need to made writable to continue installation:';
 $txt['package_ftp_why_download'] = 'In order to download packages, the packages directory, and any files in it, must be writable.  Currently the system does not have the needed permissions to write to this directory.  The package manager can use your FTP information to attempt to fix this problem.';
 $txt['package_ftp_server'] = 'FTP Server';
@@ -149,7 +149,7 @@ $txt['package_ftp_username'] = 'Username';
 $txt['package_ftp_password'] = 'Password';
 $txt['package_ftp_path'] = 'Local path to ElkArte';
 $txt['package_ftp_test'] = 'Test';
-$txt['package_ftp_test_connection'] = 'Test Connection';
+$txt['package_ftp_test_connection'] = 'Create Connection';
 $txt['package_ftp_test_success'] = 'FTP connection established.';
 $txt['package_ftp_test_failed'] = 'Could not contact server.';
 $txt['package_ftp_bad_server'] = 'Could not contact server.';
