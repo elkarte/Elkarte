@@ -16,6 +16,8 @@
 
 namespace ElkArte\Http;
 
+use ElkArte\FileFunctions;
+
 /**
  * Simple FTP protocol implementation.
  *
@@ -205,7 +207,7 @@ class FtpConnection
 		fwrite($this->connection, 'SITE CHMOD ' . decoct($chmod) . ' ' . $ftp_file . "\r\n");
 		if (!$this->check_response(200))
 		{
-			$this->error = 'bad_file';
+			$this->error = $this->last_response;
 
 			return false;
 		}
@@ -217,8 +219,8 @@ class FtpConnection
 	 * Uses a supplied list of modes to make a file or directory writable
 	 * assumes supplied name is relative from boarddir, which it should be
 	 *
-	 * @param $ftp_file
-	 * @param $chmod
+	 * @param string $ftp_file
+	 * @param array|int $chmod
 	 * @return bool
 	 */
 	public function ftp_chmod($ftp_file, $chmod)
@@ -229,10 +231,10 @@ class FtpConnection
 		{
 			if (!$this->chmod($ftp_file, $permission))
 			{
-				break;
+				continue;
 			}
 
-			if (\ElkArte\FileFunctions::instance()->isWritable(BOARDDIR . '/' . $ftp_file))
+			if (FileFunctions::instance()->isWritable($_SESSION['ftp_connection']['root'] . '/' . ltrim($ftp_file, '\/')))
 			{
 				return true;
 			}
@@ -398,7 +400,7 @@ class FtpConnection
 
 		if (isset($_SERVER['DOCUMENT_ROOT']))
 		{
-			if (preg_match('~^/home[2]?/([^/]+?)/public_html~', $_SERVER['DOCUMENT_ROOT'], $match))
+			if (preg_match('~^/home[2]?/([^/]+)/public_html~', $_SERVER['DOCUMENT_ROOT'], $match))
 			{
 				$username = $match[1];
 
