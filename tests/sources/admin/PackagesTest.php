@@ -1,9 +1,9 @@
 <?php
 
-use ElkArte\AdminController\Packages;
 use ElkArte\EventManager;
 use ElkArte\HttpReq;
 use ElkArte\Languages\Loader;
+use ElkArte\Packages\Packages;
 use ElkArte\Packages\PackageServers;
 use ElkArte\User;
 
