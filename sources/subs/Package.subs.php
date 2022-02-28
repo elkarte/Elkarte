@@ -1437,7 +1437,7 @@ function package_put_contents($filename, $data, $testing = false)
 function package_flush_cache($trash = false)
 {
 	global $package_ftp, $package_cache;
-	static $text_filetypes = array('php', 'txt', '.js', 'css', 'vbs', 'tml', 'htm');
+	static $text_filetypes = array('php', 'txt', 'js', 'css', 'vbs', 'html', 'htm', 'log', 'xml', 'csv');
 
 	if (empty($package_cache))
 	{
@@ -1493,7 +1493,9 @@ function package_flush_cache($trash = false)
 	{
 		if (!$fileFunc->isDir($filename))
 		{
-			$fp = fopen($filename, in_array(substr($filename, -3), $text_filetypes) ? 'w' : 'wb');
+			$path_info = pathinfo($filename);
+			$ext = $path_info['extension'] ?? '';
+			$fp = fopen($filename, in_array($ext, $text_filetypes) ? 'w' : 'wb');
 			fwrite($fp, $data);
 			fclose($fp);
 		}
