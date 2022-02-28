@@ -116,7 +116,7 @@ class PackageParser extends AbstractModel
 
 		// This is the installation phase, where we try not to brick the forum
 		$this->not_done = array(['type' => '!']);
-		$this->installPhase();
+		$this->processingPhase();
 
 		return $this->not_done;
 	}
@@ -166,7 +166,7 @@ class PackageParser extends AbstractModel
 	 *
 	 * @return void
 	 */
-	public function installPhase()
+	public function processingPhase()
 	{
 		foreach ($this->_return as $action)
 		{
@@ -178,7 +178,7 @@ class PackageParser extends AbstractModel
 											   'require-dir', 'remove-dir', 'move-dir', 'create-dir']))
 			{
 				$method = str_replace('-', '', ucfirst($action['type']));
-				$this->_return[] = call_user_func(array($this, 'install' . $method), $action);
+				$this->_return[] = call_user_func(array($this, 'process' . $method), $action);
 			}
 		}
 	}
@@ -189,7 +189,7 @@ class PackageParser extends AbstractModel
 	 * @param array $action
 	 * @return void
 	 */
-	public function installRequirefile($action)
+	public function processRequirefile($action)
 	{
 		global $context;
 
@@ -228,7 +228,7 @@ class PackageParser extends AbstractModel
 	 * @param $action
 	 * @return void
 	 */
-	public function installRemovefile($action)
+	public function processRemovefile($action)
 	{
 		global $context;
 
@@ -268,7 +268,7 @@ class PackageParser extends AbstractModel
 	 * @param array $action
 	 * @return void
 	 */
-	public function installMovefile($action)
+	public function processMovefile($action)
 	{
 		$this->_setDestination(dirname($action['destination']));
 
@@ -281,7 +281,7 @@ class PackageParser extends AbstractModel
 	 * @param $action
 	 * @return void
 	 */
-	public function installCreatefile($action)
+	public function processCreatefile($action)
 	{
 		$this->_setDestination(dirname($action['destination']));
 
@@ -300,7 +300,7 @@ class PackageParser extends AbstractModel
 	 * @param $action
 	 * @return void
 	 */
-	public function installRequiredir($action)
+	public function processRequiredir($action)
 	{
 		global $context;
 
@@ -323,7 +323,7 @@ class PackageParser extends AbstractModel
 	 * @param $action
 	 * @return void
 	 */
-	public function installRemovedir($action)
+	public function processRemovedir($action)
 	{
 		global $context;
 
@@ -346,7 +346,7 @@ class PackageParser extends AbstractModel
 	 * @param $action
 	 * @return void
 	 */
-	public function installCreatedir($action)
+	public function processCreatedir($action)
 	{
 		$this->_setDestination($action['destination']);
 	}
@@ -357,7 +357,7 @@ class PackageParser extends AbstractModel
 	 * @param $action
 	 * @return void
 	 */
-	public function installMovedir($action)
+	public function processMovedir($action)
 	{
 		$this->_setDestination($action['destination']);
 
