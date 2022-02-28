@@ -1198,26 +1198,9 @@ function parseModification($file, $testing = true, $undo = false, $theme_paths =
 					// Testing 1, 2, 3...
 					$failed = preg_match('~' . $actual_operation['searches'][$i]['preg_search'] . '~s', $working_data) === 0;
 
-					// Nope, search pattern not found.
-					if ($failed && $actual_operation['error'] === 'fatal')
-					{
-						$actions[] = array(
-							'type' => 'failure',
-							'filename' => $working_file,
-							'search' => $actual_operation['searches'][$i]['preg_search'],
-							'search_original' => $actual_operation['searches'][$i]['search'],
-							'replace_original' => $actual_operation['searches'][$i]['add'],
-							'position' => $search['position'],
-							'is_custom' => $theme > 1 ? $theme : 0,
-							'failed' => $failed,
-						);
-
-						$everything_found = false;
-						continue;
-					}
-
-					// Found, but in this case, that means failure!
-					elseif (!$failed && $actual_operation['error'] === 'required')
+					// Nope, search pattern not found, or Found, but in this case, that means failure!
+					if (($failed && $actual_operation['error'] === 'fatal')
+						|| (!$failed && $actual_operation['error'] === 'required'))
 					{
 						$actions[] = array(
 							'type' => 'failure',
@@ -1361,7 +1344,7 @@ function package_get_contents($filename)
 function package_put_contents($filename, $data, $testing = false)
 {
 	global $package_ftp, $package_cache, $modSettings;
-	static $text_filetypes = array('php', 'txt', '.js', 'css', 'vbs', 'tml', 'htm');
+	static $text_filetypes = array('php', 'txt', 'js', 'css', 'vbs', 'html', 'htm', 'log', 'xml', 'csv');
 
 	if (!isset($package_cache))
 	{
@@ -1378,18 +1361,22 @@ function package_put_contents($filename, $data, $testing = false)
 		}
 	}
 
+	$fileFunc = FileFunctions::instance();
 	if (isset($package_ftp, $_SESSION['ftp_connection']))
 	{
 		$ftp_file = strtr($filename, array($_SESSION['ftp_connection']['root'] => ''));
 	}
 
-	if (!file_exists($filename) && isset($package_ftp))
+	if (!$fileFunc->fileExists($filename))
 	{
-		$package_ftp->create_file($ftp_file);
-	}
-	elseif (!file_exists($filename))
-	{
-		@touch($filename);
+		 if (isset($package_ftp))
+		 {
+			 $package_ftp->create_file($ftp_file);
+		 }
+		 else
+		 {
+			 @touch($filename);
+		 }
 	}
 
 	$packageChmod = new PackageChmod();
@@ -1397,7 +1384,9 @@ function package_put_contents($filename, $data, $testing = false)
 
 	if (!$testing && (strpos($filename, 'packages/') !== false || $package_cache === false))
 	{
-		$fp = @fopen($filename, in_array(substr($filename, -3), $text_filetypes) ? 'w' : 'wb');
+		$path_info = pathinfo($filename);
+		$ext = $path_info['extension'] ?? '';
+		$fp = @fopen($filename, in_array($ext, $text_filetypes) ? 'w' : 'wb');
 
 		// We should show an error message or attempt a rollback, no?
 		if (!$fp)
