@@ -350,9 +350,12 @@ class PackageChmod extends AbstractModel
 				}
 			}
 
-			if (!in_array($path, array('', '/')))
+			// A valid path was entered
+			if (!in_array($path, array('', '/')) && empty($ftp_error))
 			{
-				$ftp_root = strtr(BOARDDIR, array($path => ''));
+				$ftp_root = substr(BOARDDIR, 0, -strlen($path));
+
+				// Avoid double//slash entries
 				if (substr($ftp_root, -1) === '/' && (substr($path, 0, 1) === '/'))
 				{
 					$ftp_root = substr($ftp_root, 0, -1);
@@ -369,7 +372,7 @@ class PackageChmod extends AbstractModel
 				'username' => $username,
 				'password' => $this->packageCrypt($password),
 				'path' => $path,
-				'root' => $ftp_root,
+				'root' => rtrim($ftp_root, '\/'),
 				'connected' => true,
 				'error' => empty($ftp_error) ? null : $ftp_error,
 			);
@@ -494,6 +497,7 @@ class PackageChmod extends AbstractModel
 	 */
 	public function chmodWithFTP($filename, $track_change)
 	{
+		/** @var $package_ftp \ElkArte\Http\FtpConnection */
 		global $package_ftp;
 
 		$ftp_file = strtr($filename, array($_SESSION['ftp_connection']['root'] => ''));
