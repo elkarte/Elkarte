@@ -1343,6 +1343,7 @@ function package_get_contents($filename)
  */
 function package_put_contents($filename, $data, $testing = false)
 {
+	/** @var $package_ftp \ElkArte\Http\FtpConnection */
 	global $package_ftp, $package_cache, $modSettings;
 	static $text_filetypes = array('php', 'txt', 'js', 'css', 'vbs', 'html', 'htm', 'log', 'xml', 'csv');
 
@@ -1367,15 +1368,12 @@ function package_put_contents($filename, $data, $testing = false)
 		$ftp_file = strtr($filename, array($_SESSION['ftp_connection']['root'] => ''));
 	}
 
+	@touch($filename);
 	if (!$fileFunc->fileExists($filename))
 	{
 		 if (isset($package_ftp))
 		 {
 			 $package_ftp->create_file($ftp_file);
-		 }
-		 else
-		 {
-			 @touch($filename);
 		 }
 	}
 
@@ -1440,16 +1438,21 @@ function package_flush_cache($trash = false)
 	{
 		if (isset($package_ftp))
 		{
-			$ftp_file = strtr($filename, array($_SESSION['ftp_connection']['root'] => ''));
+			$path_parts = pathinfo($filename);
+			$path_parts['dirname'] = str_replace($_SESSION['ftp_connection']['root'], '', $path_parts['dirname']);
+			$ftp_file = $path_parts['dirname'] . '/' . $path_parts['filename'];
 		}
 
-		if (!$fileFunc->fileExists($filename) && isset($package_ftp))
+		if (!$fileFunc->fileExists($filename))
 		{
-			$package_ftp->create_file($ftp_file);
-		}
-		elseif (!$fileFunc->fileExists($filename))
-		{
-			@touch($filename);
+			if (isset($package_ftp))
+			{
+				$package_ftp->create_file($ftp_file);
+			}
+			else
+			{
+				@touch($filename);
+			}
 		}
 
 		$packageChmod = new PackageChmod();
@@ -1463,7 +1466,7 @@ function package_flush_cache($trash = false)
 			if (!$fp)
 			{
 				// We should have package_chmod()'d them before, no?!
-				trigger_error('package_flush_cache(): some files are still not writable', E_USER_WARNING);
+				trigger_error('package_flush_cache(): (' . $filename . ') file is still not writable', E_USER_WARNING);
 
 				return;
 			}

@@ -146,7 +146,7 @@ class FtpConnection
 			if (preg_match('~^(\d\d\d)\s(.+)$~m', $this->last_message, $matches) === 1)
 			{
 				$return_code = (int) $matches[1];
-				$this->last_response = $matches[2];
+				$this->last_response = $return_code . ' :: ' . $matches[2];
 			}
 		}
 
@@ -299,7 +299,9 @@ class FtpConnection
 		fwrite($this->connection, 'STOR ' . $ftp_file . "\r\n");
 
 		// Okay, now we connect to the data port.  If it doesn't work out, it's probably "file already exists", etc.
-		$fp = @stream_socket_client($this->pasv['ip'] . ':' . $this->pasv['port'], $err_code, $err, 5);
+		set_error_handler(function () { /* ignore errors */ });
+		$fp = stream_socket_client($this->pasv['ip'] . ':' . $this->pasv['port'], $err_code, $err, 5);
+		restore_error_handler();
 		if (!$fp || $err_code !== 0 || !$this->check_response(150))
 		{
 			$this->error = 'bad_file';
@@ -333,13 +335,14 @@ class FtpConnection
 			return false;
 		}
 
-		// Request a passive connection - this means, we'll talk to you, you don't talk to us.
+		// Request a IPV4 passive connection - this means, we'll talk to you, you don't talk to us.
 		fwrite($this->connection, 'PASV' . "\r\n");
 
 		// If it's not 227, we weren't given an IP and port, which means it failed.
+		// If it's 425, that may indicate a response to use EPSV (ipv6) which we don't support
 		if (!$this->check_response(227))
 		{
-			$this->error = 'bad_response';
+			$this->error = $this->last_response;
 
 			return false;
 		}
