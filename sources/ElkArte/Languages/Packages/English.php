@@ -170,14 +170,6 @@ $txt['package_modification_malformed'] = 'Malformed or invalid addon file.';
 $txt['package_modification_missing'] = 'The file could not be found.';
 $txt['package_no_zlib'] = 'Sorry, your PHP configuration doesn\'t have support for <strong>zlib</strong>.  Without this, the package manager cannot function.  Please contact your host about this for more information.';
 
-$txt['package_cleanperms_title'] = 'Cleanup Permissions';
-$txt['package_cleanperms_desc'] = 'This interface allows you to reset the permissions for files throughout your installation, so as to increase security or solve any permission problems you may encounter while installing packages.';
-$txt['package_cleanperms_type'] = 'Change all file permissions throughout the forum such that';
-$txt['package_cleanperms_standard'] = 'Only the standard files are writable.';
-$txt['package_cleanperms_free'] = 'All files are writable.';
-$txt['package_cleanperms_restrictive'] = 'The minimum files are writable.';
-$txt['package_cleanperms_go'] = 'Change file permissions';
-
 $txt['package_download_by_url'] = 'Download a package by url';
 $txt['package_download_filename'] = 'Name of the file';
 $txt['package_download_filename_info'] = 'Optional value.  Should be used when the url does not end in the filename.  For example: index.php?mod=5';
@@ -201,41 +193,6 @@ $txt['operation_title'] = 'Operations';
 $txt['operation_ignore'] = 'Ignore Errors';
 $txt['operation_invalid'] = 'The operation that you selected is invalid.';
 
-$txt['package_file_perms_desc'] = 'You can use this section to review the writable status of critical files and folders within your forum directory. Note this only considers key forum folders and files - use an FTP client for additional options.';
-$txt['package_file_perms_name'] = 'File/Directory Name';
-$txt['package_file_perms_status'] = 'Current Status';
-$txt['package_file_perms_new_status'] = 'New Status';
-$txt['package_file_perms_status_read'] = 'Read';
-$txt['package_file_perms_status_write'] = 'Write';
-$txt['package_file_perms_status_execute'] = 'Execute';
-$txt['package_file_perms_status_custom'] = 'Custom';
-$txt['package_file_perms_status_no_change'] = 'No Change';
-$txt['package_file_perms_writable'] = 'Writable';
-$txt['package_file_perms_not_writable'] = 'Not Writable';
-$txt['package_file_perms_chmod'] = 'chmod';
-$txt['package_file_perms_more_files'] = 'More Files';
-
-$txt['package_file_perms_change'] = 'Change File Permissions';
-$txt['package_file_perms_predefined'] = 'Use predefined permission profile';
-$txt['package_file_perms_predefined_note'] = 'Note that this only applies the predefined profile to key directories and files.';
-$txt['package_file_perms_apply'] = 'Apply individual file permissions settings selected above.';
-$txt['package_file_perms_custom'] = 'If &quot;Custom&quot; has been selected use chmod value of';
-$txt['package_file_perms_pre_restricted'] = 'Restricted - minimum files writable';
-$txt['package_file_perms_pre_standard'] = 'Standard - key files writable';
-$txt['package_file_perms_pre_free'] = 'Free - all files writable';
-$txt['package_file_perms_ftp_details'] = 'On most servers it is only possible to change file permissions using an FTP account. Please enter your FTP details below';
-$txt['package_file_perms_ftp_retain'] = 'Note, the system will only retain the password information temporarily to aid operation of the package manager.';
-$txt['package_file_perms_go'] = 'Make Changes';
-
-$txt['package_file_perms_applying'] = 'Applying Changes';
-$txt['package_file_perms_items_done'] = '%1$d of %2$d items completed';
-$txt['package_file_perms_skipping_ftp'] = '<strong>Warning:</strong> Failed to connect to FTP server, attempting to change permissions without. This is <em>likely</em> to fail - please check the results upon completion and try again with correct FTP details if necessary.';
-
-$txt['package_file_perms_dirs_done'] = '%1$d of %2$d directories completed';
-$txt['package_file_perms_files_done'] = '%1$d of %2$d files done in current directory';
-
-$txt['chmod_value_invalid'] = 'You have tried to enter an invalid chmod value. Chmod must be between 0444 and 0777';
-
 $txt['package_restore_permissions'] = 'Restore file permissions';
 $txt['package_restore_permissions_desc'] = 'The following file permissions were changed in order to install the selected package(s). You can return these files back to their original status by clicking &quot;Restore&quot; below.';
 $txt['package_restore_permissions_restore'] = 'Restore';
@@ -249,14 +206,6 @@ $txt['package_restore_permissions_action_skipped'] = '<em>Skipped</em>';
 $txt['package_restore_permissions_action_success'] = '<span class="success">Success</span>';
 $txt['package_restore_permissions_action_failure'] = '<span class="error">Failed</span>';
 $txt['package_restore_permissions_action_done'] = 'An attempt to restore the selected files back to their original permissions has been completed, the results can be seen below. If a change failed, or for a more detailed view of file permissions, please see the <a href="%1$s">File Permissions</a> section.';
-
-$txt['package_file_perms_warning'] = 'Please Note';
-$txt['package_file_perms_warning_desc'] = '
-	Be careful when changing file permissions from this section - incorrect permissions can adversely affect the operation of your forum!<br />
-	On some server configurations selecting the wrong permissions may stop the forum from operating.<br />
-	Certain directories such as <em>attachments</em> need to be writable to use that functionality.<br />
-	This functionality is mainly applicable on non-Windows based servers - it will not work as expected on Windows in regards to permission flags.<br />
-	Before proceeding make sure you have an FTP client installed in case you do make an error and need to FTP into the server to remedy it.';
 
 $txt['package_confirm_view_package_content'] = 'Are you sure you want to view the package contents from this location:<br /><br />%1$s';
 $txt['package_confirm_proceed'] = 'Proceed';

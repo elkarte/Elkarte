@@ -170,7 +170,6 @@ class Admin extends AbstractController
 						'subsections' => array(
 							'browse' => array($txt['browse_packages']),
 							'installed' => array($txt['installed_packages']),
-							'perms' => array($txt['package_file_perms']),
 							'options' => array($txt['package_settings']),
 							'servers' => array($txt['download_packages']),
 							'upload' => array($txt['upload_packages']),

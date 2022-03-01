@@ -450,18 +450,6 @@ ul.package_servers li {
 	width: 100%;
 }
 
-/* Styles for the file permissions section. */
-.filepermissions {
-	font-size: var(--font13);
-	white-space: nowrap;
-}
-
-.fperm {
-	display: block;
-	width: 35%;
-	text-align: center;
-}
-
 /* Styles for anti-spam questions. */
 .settings dt.questions {
 	width: 65%;
@@ -671,13 +659,6 @@ ul.package_servers li {
 	width: 65%;
 }
 
-/* Styles for the package manager file permissions */
-.file_permissions .table_grid {
-	table-layout: fixed;
-	word-wrap: break-word;
-	-webkit-hyphens: auto;
-	hyphens: auto;
-}
 
 /* Styles for the manage search section. */
 .large_caption > dt {
