@@ -190,6 +190,7 @@ input:hover, textarea:hover, button:hover, select:hover {
 
 input:focus, textarea:focus, button:focus, select:focus, .editor:focus {
 	border-color: var(--border_focus);
+	outline: none;
 }
 
 textarea:hover, .editor:hover {

@@ -192,6 +192,7 @@ textarea:hover, .editor:hover {
 
 input:focus, textarea:focus, button:focus, select:focus, .editor:focus {
 	border-color: var(--border_focus);
+	outline: none;
 }
 
 /* Give disabled text input elements a different background color. */

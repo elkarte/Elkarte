@@ -295,6 +295,10 @@ input, button, select {
 	border-radius: 3px;
 }
 
+input:focus, textarea:focus, button:focus, select:focus, .editor:focus {
+	border: 1px solid;
+}
+
 select {
 	overflow: hidden;
 	max-width: 95%;
