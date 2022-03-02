@@ -138,7 +138,7 @@ function template_build_poster_div($message, $ignoring = false)
 		}
 
 		// Show the website and email address buttons.
-		if ($message['member']['show_profile_buttons'])
+		if (!empty($message['member']['show_profile_buttons']))
 		{
 			$poster_div .= '
 									<li class="listlevel2 profile">
@@ -221,7 +221,7 @@ function template_build_poster_div($message, $ignoring = false)
 									</li>';
 	}
 	// Or, should we show it because this is you?
-	elseif ($message['can_see_ip'] && !empty($message['member']['ip']))
+	elseif (!empty($message['can_see_ip']) && !empty($message['member']['ip']))
 	{
 		$poster_div .= '
 									<li class="listlevel2 poster_ip">

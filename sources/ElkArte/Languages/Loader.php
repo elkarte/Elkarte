@@ -189,7 +189,7 @@ class Loader
 	 */
 	protected function loadFile($name, $language)
 	{
-		$filepath = $this->path . $name . '/' . $language . '.php';
+		$filepath = $this->path . $name . '/' . basename($language, '.php') . '.php';
 		if (file_exists($filepath))
 		{
 			require($filepath);

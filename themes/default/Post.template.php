@@ -589,7 +589,7 @@ function template_add_new_attachments()
 		allowedExtensions: ' . JavaScriptEscape($context['attachments']['allowed_extensions']) . ',
 		totalSizeAllowed: ' . (empty($modSettings['attachmentPostLimit']) ? 0 : $modSettings['attachmentPostLimit'] * 1024) . ',
 		totalAttachSizeUploaded: ' . $context['attachments']['total_size'] . ',
-		individualSizeAllowed: ' . (!empty($modSettings['attachmentSizeLimit']) ? 0 : $modSettings['attachmentSizeLimit'] * 1024) . ',
+		individualSizeAllowed: ' . (empty($modSettings['attachmentSizeLimit']) ? 0 : $modSettings['attachmentSizeLimit'] * 1024) . ',
 		numOfAttachmentAllowed: ' . (empty($modSettings['attachmentNumPerPostLimit']) ? 50 : $modSettings['attachmentNumPerPostLimit']) . ',
 		numAttachUploaded: ' . $context['attachments']['quantity'] . ',
 		resizeImageEnabled: ' . (empty($modSettings['attachment_image_resize_enabled']) ? 0 : 1) . ',

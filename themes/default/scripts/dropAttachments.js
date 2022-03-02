@@ -62,11 +62,11 @@
 				}
 
 				allowedExtensions = params.allowedExtensions === '' ? [] : params.allowedExtensions.toLowerCase().replace(/\s/g, '').split(',');
-				totalSizeAllowed = params.totalSizeAllowed === 0 ? null : params.totalSizeAllowed;
-				individualSizeAllowed = params.individualSizeAllowed;
-				numOfAttachmentAllowed = params.numOfAttachmentAllowed === 0 ? null : params.numOfAttachmentAllowed;
-				totalAttachSizeUploaded = params.totalAttachSizeUploaded;
-				numAttachUploaded = params.numAttachUploaded;
+				totalSizeAllowed = params.totalSizeAllowed || 0;
+				individualSizeAllowed = params.individualSizeAllowed || 0;
+				numOfAttachmentAllowed = params.numOfAttachmentAllowed || 0;
+				totalAttachSizeUploaded = totalAttachSizeUploaded || 0;
+				numAttachUploaded = params.numAttachUploaded || 0;
 				resizeImageEnabled = params.resizeImageEnabled;
 				filesUploadedSuccessfully = [];
 				if (typeof params.topic !== 'undefined')
@@ -505,7 +505,7 @@
 					}
 
 					// Make sure the file is not larger than the server will accept
-					if (individualSizeAllowed !== null && fileSize > individualSizeAllowed && !resizeImageEnabled)
+					if (individualSizeAllowed !== 0 && fileSize > individualSizeAllowed && !resizeImageEnabled)
 					{
 						errorMsgs.individualSizeErr = '(' + parseInt(String(fileSize / 1024), 10) + ' KB) ' + oTxt.individualSizeAllowed;
 						sizeErrorFiles.push(files[i].name);
@@ -513,7 +513,7 @@
 					}
 
 					// And you can't send too many
-					if (numAttachUploaded >= numOfAttachmentAllowed)
+					if (numOfAttachmentAllowed !== 0 && numAttachUploaded >= numOfAttachmentAllowed)
 					{
 						errorMsgs.maxNumErr = oTxt.numOfAttachmentAllowed;
 						sizeErrorFiles.push(files[i].name);
@@ -526,7 +526,7 @@
 						totalAttachSizeUploaded += fileSize;
 					}
 
-					if (totalSizeAllowed !== null && totalAttachSizeUploaded > totalSizeAllowed)
+					if (totalSizeAllowed !== 0 && totalAttachSizeUploaded > totalSizeAllowed)
 					{
 						errorMsgs.totalSizeError = oTxt.totalSizeAllowed.replace("%1$s", totalSizeAllowed).replace("%2$s", String(parseInt(totalSizeAllowed - (totalAttachSizeUploaded - fileSize), 10)));
 						errorFlag = true;
