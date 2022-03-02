@@ -324,7 +324,7 @@ function list_restoreFiles($dummy1, $dummy2, $dummy3, $do_change)
 			// Use FTP if we have it.
 			if (!empty($package_ftp))
 			{
-				$ftp_file = strtr($file, array($_SESSION['ftp_connection']['root'] => ''));
+				$ftp_file = setFtpName($file);
 				$package_ftp->chmod($ftp_file, $perms);
 			}
 			else
@@ -643,7 +643,7 @@ function deltree($dir, $delete_dir = true)
 		{
 			if (isset($package_ftp))
 			{
-				$ftp_file = strtr($entryname->getRealPath(), array($_SESSION['ftp_connection']['root'] => ''));
+				$ftp_file = setFtpName($entryname->getRealPath());
 
 				if (!$fileFunc->isWritable($ftp_file . '/'))
 				{
@@ -668,7 +668,7 @@ function deltree($dir, $delete_dir = true)
 			if (isset($package_ftp))
 			{
 				// Here, 755 doesn't really matter since we're deleting it anyway.
-				$ftp_file = strtr($entryname->getPathname(), array($_SESSION['ftp_connection']['root'] => ''));
+				$ftp_file = setFtpName($entryname->getPathname());
 
 				if (!$fileFunc->isWritable($ftp_file))
 				{
@@ -694,7 +694,7 @@ function deltree($dir, $delete_dir = true)
 	{
 		if (isset($package_ftp))
 		{
-			$ftp_file = strtr(realpath($dir), array($_SESSION['ftp_connection']['root'] => ''));
+			$ftp_file = setFtpName(realpath($dir));
 			$package_ftp->unlink($ftp_file);
 		}
 		else
@@ -728,7 +728,7 @@ function mktree($strPath, $mode = true)
 		{
 			if (isset($package_ftp))
 			{
-				$package_ftp->ftp_chmod(strtr($strPath, array($_SESSION['ftp_connection']['root'] => '')), [0755, 0775, 0777]);
+				$package_ftp->ftp_chmod(setFtpName($strPath), [0755, 0775, 0777]);
 			}
 			else
 			{
@@ -751,7 +751,8 @@ function mktree($strPath, $mode = true)
 	{
 		if (isset($package_ftp))
 		{
-			$package_ftp->ftp_chmod(dirname(strtr($strPath, array($_SESSION['ftp_connection']['root'] => ''))), [0755, 0775, 0777]);
+
+			$package_ftp->ftp_chmod(dirname(setFtpName($strPath)), [0755, 0775, 0777]);
 		}
 		else
 		{
@@ -767,7 +768,7 @@ function mktree($strPath, $mode = true)
 	// Let FTP take care of this directory creation
 	if (isset($package_ftp, $_SESSION['ftp_connection']))
 	{
-		return $package_ftp->create_dir(strtr($strPath, array($_SESSION['ftp_connection']['root'] => '')));
+		return $package_ftp->create_dir(setFtpName($strPath));
 	}
 	// Only one choice left and that is to try and make a directory with PHP
 	else
@@ -854,7 +855,7 @@ function copytree($source, $destination)
 
 		if (isset($package_ftp))
 		{
-			$ftp_file = strtr($destination . '/' . $entryname, array($_SESSION['ftp_connection']['root'] => ''));
+			$ftp_file = setFtpName($destination . '/' . $entryname);
 		}
 
 		if (!$fileFunc->isDir($source . '/' . $entryname))
@@ -1365,7 +1366,7 @@ function package_put_contents($filename, $data, $testing = false)
 	$fileFunc = FileFunctions::instance();
 	if (isset($package_ftp, $_SESSION['ftp_connection']))
 	{
-		$ftp_file = strtr($filename, array($_SESSION['ftp_connection']['root'] => ''));
+		$ftp_file = setFtpName($filename);
 	}
 
 	@touch($filename);
@@ -1382,9 +1383,8 @@ function package_put_contents($filename, $data, $testing = false)
 
 	if (!$testing && (strpos($filename, 'packages/') !== false || $package_cache === false))
 	{
-		$path_info = pathinfo($filename);
-		$ext = $path_info['extension'] ?? '';
-		$fp = @fopen($filename, in_array($ext, $text_filetypes) ? 'w' : 'wb');
+		$path_ext = pathinfo($filename, PATHINFO_EXTENSION);
+		$fp = @fopen($filename, in_array($path_ext, $text_filetypes) ? 'w' : 'wb');
 
 		// We should show an error message or attempt a rollback, no?
 		if (!$fp)
@@ -1438,7 +1438,7 @@ function package_flush_cache($trash = false)
 	{
 		if (isset($package_ftp))
 		{
-			$path_parts = pathinfo($filename);
+			$path_parts = pathinfo($filename, PATHINFO_DIRNAME);
 			$path_parts['dirname'] = str_replace($_SESSION['ftp_connection']['root'], '', $path_parts['dirname']);
 			$ftp_file = $path_parts['dirname'] . '/' . $path_parts['filename'];
 		}
@@ -1485,9 +1485,8 @@ function package_flush_cache($trash = false)
 	{
 		if (!$fileFunc->isDir($filename))
 		{
-			$path_info = pathinfo($filename);
-			$ext = $path_info['extension'] ?? '';
-			$fp = fopen($filename, in_array($ext, $text_filetypes) ? 'w' : 'wb');
+			$path_ext = pathinfo($filename, PATHINFO_EXTENSION);
+			$fp = fopen($filename, in_array($path_ext, $text_filetypes) ? 'w' : 'wb');
 			fwrite($fp, $data);
 			fclose($fp);
 		}
@@ -1962,4 +1961,20 @@ function test_access($item)
 	}
 
 	return false;
+}
+
+/**
+ * Sets the base pathname as required by the FTP root (chrooted) directory
+ * e.g. /var/www/clients/client1/web1/webs/somefile.txt => /web1/webs/somefile.txt
+ *
+ * @param string $item
+ * @return string
+ */
+function setFtpName($item)
+{
+	$path_parts = pathinfo($item);
+	$path_parts['dirname'] = $path_parts['dirname'] === '.' ? '' : $path_parts['dirname'];
+	$path_parts['dirname'] = str_replace($_SESSION['ftp_connection']['root'], '', $path_parts['dirname']);
+
+	return $path_parts['dirname'] . '/' . $path_parts['filename'];
 }

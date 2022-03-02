@@ -302,7 +302,7 @@ class FtpConnection
 		set_error_handler(function () { /* ignore errors */ });
 		$fp = stream_socket_client($this->pasv['ip'] . ':' . $this->pasv['port'], $err_code, $err, 5);
 		restore_error_handler();
-		if (!$fp || $err_code !== 0 || !$this->check_response(150))
+		if ($fp === false || $err_code !== 0 || !$this->check_response(150))
 		{
 			$this->error = 'bad_file';
 			fclose($fp);
@@ -443,7 +443,7 @@ class FtpConnection
 			}
 
 			$found_path = dirname($this->locate('*' . basename(dirname($lookup_file)) . '/' . basename($lookup_file), $data));
-			if ($found_path === false)
+			if ($found_path === '.')
 			{
 				$found_path = dirname($this->locate(basename($lookup_file)));
 			}

@@ -131,7 +131,7 @@ class PackageChmod extends AbstractModel
 	}
 
 	/**
-	 * If file permissions were change, provide the option to reset them
+	 * If file permissions were changed, provide the option to reset them
 	 *
 	 * @param bool $restore_write_status
 	 * @param array $chmodOptions
@@ -277,6 +277,7 @@ class PackageChmod extends AbstractModel
 		$ftp_port = $this->_req->getPost('ftp_port', 'intval');
 		$ftp_username = $this->_req->getPost('ftp_username', 'trim');
 		$ftp_path = $this->_req->getPost('ftp_path', 'trim');
+		$ftp_error = $_SESSION['ftp_connection']['error'] ?? null;
 
 		if (!isset($ftp) || $ftp->error !== false)
 		{
@@ -500,7 +501,7 @@ class PackageChmod extends AbstractModel
 		/** @var $package_ftp \ElkArte\Http\FtpConnection */
 		global $package_ftp;
 
-		$ftp_file = strtr($filename, array($_SESSION['ftp_connection']['root'] => ''));
+		$ftp_file = setFtpName($filename);
 
 		// If the file does not yet exist, make sure its directory is at least writable
 		if (!$this->fileFunc->fileExists($filename) && !$this->fileFunc->isDir($filename))
@@ -560,7 +561,7 @@ class PackageChmod extends AbstractModel
 	public function testAccess($item)
 	{
 		$fp = $this->fileFunc->isDir($item) ? @opendir($item) : @fopen($item, 'rb');
-		if ($this->fileFunc->isWritable($item) && $fp)
+		if ($this->fileFunc->isWritable($item) && $fp !== false)
 		{
 			if (!$this->fileFunc->isDir($item))
 			{
