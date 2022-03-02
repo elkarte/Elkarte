@@ -796,6 +796,7 @@ function url_image_size($url)
 	$url_path = parse_url($url, PHP_URL_PATH);
 	$extension = pathinfo($url_path, PATHINFO_EXTENSION);
 
+	// Set a RANGE to read
 	switch ($extension)
 	{
 		case 'jpg':
@@ -816,7 +817,8 @@ function url_image_size($url)
 			$range = 1024;
 			break;
 		default:
-			$range = 16384;
+			// Read the entire file then, webp for example might have the exif at the end
+			$range = 0;
 	}
 
 	$image = new FsockFetchWebdata(array('max_length' => $range));
