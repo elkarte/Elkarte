@@ -23,6 +23,7 @@ nbproject/*
 /vendor/*
 /build/*
 .idea
+.vscode
 composer.lock
 composer.phar
 themes/default/cache/hive*

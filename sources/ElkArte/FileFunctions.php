@@ -144,7 +144,7 @@ class FileFunctions
 	 * fileperms() helper using spl functions.  fileperms can throw an e-warning
 	 *
 	 * @param string $item
-	 * @return bool
+	 * @return int|bool
 	 */
 	public function filePerms($item)
 	{
