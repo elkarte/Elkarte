@@ -126,7 +126,7 @@ class ManageSecurity extends AbstractController
 		global $txt, $context, $modSettings;
 
 		// See if they supplied a valid looking http:BL API Key
-		$context['invalid_badbehavior_httpbl_key'] = (!empty($modSettings['badbehavior_httpbl_key']) && (strlen($modSettings['badbehavior_httpbl_key']) !== 12 || !ctype_lower($modSettings['badbehavior_httpbl_key'])));
+		$context['invalid_badbehavior_httpbl_key'] = (!empty($modSettings['badbehavior_httpbl_key']) && (strlen($modSettings['badbehavior_httpbl_key']) !== 12));
 
 		// Set up the config array for use
 		$config_vars = array(
