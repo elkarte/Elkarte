@@ -42,7 +42,7 @@ class TestCurlFetchWebdata extends TestCase
 			array(
 				'https://developer.mozilla.org/en-US/',
 				200,
-				'Resources for developers',
+				'Resources for <u>Developers</u>',
 			),
 			array(
 				'http://www.google.com/elkarte',
