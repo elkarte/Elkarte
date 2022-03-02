@@ -2084,7 +2084,7 @@ class InstallInstructions_install_2_0
 			'{db_prefix}package_servers',
 			array('name' => 'string', 'url' => 'string'),
 			array(
-				array('ElkArte Third-party Add-ons Site', 'http://addons.elkarte.net/package.json'),
+				array('ElkArte Third-party Add-ons Site', 'https://elkarte.github.io/addons/package.json'),
 			),
 			array('id_server')
 		);
