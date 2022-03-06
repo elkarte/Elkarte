@@ -23,7 +23,7 @@ abstract class BaseMail
 	/** @var string \r\n or \n based on transport and OS */
 	public $lineBreak = "\n";
 
-	/** @var m, p or t */
+	/** @var string m, p or t */
 	public $messageType;
 
 	/** @var array collection of data for saving in DB to allow reply to email */

@@ -76,7 +76,7 @@ class Mail extends BaseMail
 			$unq_head = $this->getUniqueMessageID($message_id);
 			$messageHeader = 'Message-ID: <' . $unq_head . $mid . '>';
 
-			// Using PBE, we also insert keys in the message as a safety net or sorts
+			// Using PBE, we also insert keys in the message as a safety net of sorts
 			if ($this->mailList)
 			{
 				$message = mail_insert_key($message, $unq_head, $this->lineBreak);
@@ -86,7 +86,7 @@ class Mail extends BaseMail
 			// We have to use ini_set, since "-f <address>" doesn't work on Windows systems, so we need both
 			$old_return = ini_set('sendmail_from', $this->returnPath);
 			$sendTo = strtr($sendTo, ["\r" => '', "\n" => '']);
-			if (!mail($sendTo, $subject, $message, $headers . $messageHeader, '-f ' . $this->returnPath))
+			if (!mail($sendTo, $subject, $message, $headers . $this->lineBreak . $messageHeader, '-f ' . $this->returnPath))
 			{
 				Errors::instance()->log_error(sprintf($txt['mail_send_unable'], $sendTo));
 				$mail_result = false;
@@ -156,7 +156,7 @@ class Mail extends BaseMail
 
 		// Try to connect to the SMTP server...
 		$socket = $this->_getSMTPSocket($smtp_host, $smtp_port);
-		if ($socket === false)
+		if (!is_resource($socket))
 		{
 			return false;
 		}
@@ -215,7 +215,7 @@ class Mail extends BaseMail
 			{
 				fwrite($socket, 'To: <' . $mail_to . '>' . $this->lineBreak);
 			}
-			fwrite($socket, $headers . $messageHeader . $this->lineBreak . $this->lineBreak);
+			fwrite($socket, $headers . $this->lineBreak . $messageHeader . $this->lineBreak . $this->lineBreak);
 			fwrite($socket, $this_message . $this->lineBreak);
 
 			// Send a ., or in other words "end of data".
@@ -269,13 +269,13 @@ class Mail extends BaseMail
 
 		// Try to connect to the SMTP server... if it doesn't exist, only wait three seconds.
 		$socket = fsockopen($smtp_host, $smtp_port, $errno, $errstr, 3);
-		if (!$socket)
+		if (!is_resource($socket))
 		{
 			// Maybe we can still save this?  The port might be wrong.
 			if ($smtp_port === 25 && substr($smtp_host, 0, 4) === 'ssl:')
 			{
 				$socket = fsockopen($smtp_host, 465, $errno, $errstr, 3);
-				if ($socket)
+				if (is_resource($socket))
 				{
 					updateSettings(array('smtp_port' => 465));
 					Errors::instance()->log_error($txt['smtp_port_ssl']);
@@ -283,14 +283,14 @@ class Mail extends BaseMail
 			}
 
 			// Unable to connect!
-			if (!$socket)
+			if (!is_resource($socket))
 			{
 				Errors::instance()->log_error($txt['smtp_no_connect'] . ': ' . $errno . ' : ' . $errstr);
 			}
 		}
 
 		// Wait for a response of 220, without "-" continue.
-		if (!$socket || !$this->_server_parse(null, $socket, '220'))
+		if (!is_resource($socket) || !$this->_server_parse(null, $socket, '220'))
 		{
 			return false;
 		}

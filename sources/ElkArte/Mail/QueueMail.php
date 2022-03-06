@@ -132,7 +132,7 @@ class QueueMail
 	 * was set
 	 *
 	 * @param $batch_size
-	 * @return int|mixed
+	 * @return int
 	 */
 	public function setBatchSize($batch_size)
 	{
@@ -162,10 +162,10 @@ class QueueMail
 
 			// Size is number per minute / number of times we will be called per minute
 			$batch_size = (int) ceil($modSettings['mail_period_limit'] / ceil(60 / $delay));
-			$batch_size = $batch_size === 1 && $modSettings['mail_period_limit'] > 1 ? 2 : $batch_size;
+			return ($batch_size === 1 && $modSettings['mail_period_limit'] > 1) ? 2 : $batch_size;
 		}
 
-		return $batch_size;
+		return 0;
 	}
 
 	/**

@@ -81,9 +81,9 @@ class BuildMail extends BaseMail
 		$this->setReturnPath();
 
 		// Return path, date, mailer
-		$headers[] = 'Return-Path: ' . $this->returnPath;
-		$headers[] = 'Date: ' . gmdate('D, d M Y H:i:s') . ' -0000';
-		$headers[] = 'X-Mailer: ELK';
+		$this->headers[] = 'Return-Path: ' . $this->returnPath;
+		$this->headers[] = 'Date: ' . gmdate('D, d M Y H:i:s') . ' -0000';
+		$this->headers[] = 'X-Mailer: ELK';
 
 		// For maillist, digests or newsletters we include a few more headers for compliance
 		$this->setDigestHeaders($priority);
@@ -104,7 +104,7 @@ class BuildMail extends BaseMail
 		$this->headers[] = 'Content-Transfer-Encoding: 7bit';
 
 		// Generate our completed `standard` header string
-		$headers = implode($this->lineBreak, $this->headers) . $this->lineBreak;
+		$headers = implode($this->lineBreak, $this->headers);
 
 		// Now build our message with various encodings
 		$message = $this->getMessage($send_html, $mime_boundary, $message);
@@ -133,7 +133,7 @@ class BuildMail extends BaseMail
 
 		// SMTP or sendmail?
 		$mail = new Mail();
-		$mail_result = $mail->sendMail($to_array, $subject, $headers, $message, $message_id, $priority, $from_wrapper);
+		$mail_result = $mail->sendMail($to_array, $subject, $headers, $message, $message_id);
 
 		// Clear out the stat cache.
 		trackStats();
@@ -271,11 +271,11 @@ class BuildMail extends BaseMail
 	 *
 	 * @param string $from an email address
 	 * @param string $from_name a more common name for the address
-	 * @param string $from_wrapper email address of the $from_name, irrespective of the envelope name
-	 * @param string $reference
+	 * @param string|null $from_wrapper email address of the $from_name, irrespective of the envelope name
+	 * @param string|null $reference
 	 * @return void
 	 */
-	public function setFromHeaders($from, $from_name, $from_wrapper, $reference = null)
+	public function setFromHeaders($from, $from_name, $from_wrapper = null, $reference = null)
 	{
 		global $webmaster_email, $context, $modSettings;
 

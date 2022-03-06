@@ -225,6 +225,7 @@ function entityConvert($match)
  */
 function mail_insert_key($message, $unq_head, $line_break)
 {
+	$regex = [];
 	$regex['plain'] = '~^(.*?)(' . $line_break . '--ELK-[a-z0-9]{28})~s';
 	$regex['qp'] = '~(Content-Transfer-Encoding: Quoted-Printable' . $line_break . $line_break . ')(.*?)(' . $line_break . '--ELK-[a-z0-9]{28})~s';
 	$regex['base64'] = '~(Content-Transfer-Encoding: base64' . $line_break . $line_break . ')(.*?)(' . $line_break . '--ELK-[a-z0-9]{28})~s';
