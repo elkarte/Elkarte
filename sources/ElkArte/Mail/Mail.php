@@ -172,6 +172,7 @@ class Mail extends BaseMail
 		$message = strtr($message, array("\r\n" . '.' => "\r\n" . '..'));
 
 		$mid = strstr(empty($modSettings['maillist_mail_from']) ? $webmaster_email : $modSettings['maillist_mail_from'], '@');
+		$this->setReturnPath();
 		$mail_to_array = array_values($mail_to_array);
 		$sent = [];
 
@@ -182,12 +183,6 @@ class Mail extends BaseMail
 			$unq_head = $this->getUniqueMessageID($message_id);
 			$messageHeader = 'Message-ID: <' . $unq_head . $mid . '>';
 
-			// Using PBE, we also insert keys in the message to overcome clients that act badly
-			if ($this->mailList)
-			{
-				$this_message = mail_insert_key($this_message, $unq_head, $this->lineBreak);
-			}
-
 			// Reset the connection to send another email.
 			if (($i !== 0) && !$this->_server_parse('RSET', $socket, '250'))
 			{
@@ -195,7 +190,7 @@ class Mail extends BaseMail
 			}
 
 			// From, to, and then start the data...
-			if (!$this->_server_parse('MAIL FROM: <' . (empty($modSettings['maillist_mail_from']) ? $webmaster_email : $modSettings['maillist_mail_from']) . '>', $socket, '250'))
+			if (!$this->_server_parse('MAIL FROM: <' . $this->returnPath . '>', $socket, '250'))
 			{
 				return false;
 			}
@@ -208,6 +203,12 @@ class Mail extends BaseMail
 			if (!$this->_server_parse('DATA', $socket, '354'))
 			{
 				return false;
+			}
+
+			// Using PBE, we also insert keys in the message to overcome clients that act badly
+			if ($this->mailList)
+			{
+				$this_message = mail_insert_key($this_message, $unq_head, $this->lineBreak);
 			}
 
 			fwrite($socket, 'Subject: ' . $subject . $this->lineBreak);

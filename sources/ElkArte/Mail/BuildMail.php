@@ -77,11 +77,13 @@ class BuildMail extends BaseMail
 		// Construct from / replyTo mail headers, based on if we show a users name
 		$this->setFromHeaders($from, $from_name, $from_wrapper, $reference);
 
-		// We'll need this later for the envelope fix, too, so keep it
-		$this->setReturnPath();
-
 		// Return path, date, mailer
-		$this->headers[] = 'Return-Path: ' . $this->returnPath;
+		if ($this->useSendmail)
+		{
+			// The final destination SMTP server should be setting this value, not us.
+			$this->setReturnPath();
+			$this->headers[] = 'Return-Path: <' . $this->returnPath . '>';
+		}
 		$this->headers[] = 'Date: ' . gmdate('D, d M Y H:i:s') . ' -0000';
 		$this->headers[] = 'X-Mailer: ELK';
 
@@ -89,7 +91,7 @@ class BuildMail extends BaseMail
 		$this->setDigestHeaders($priority);
 
 		// Pass this to the integration before we start modifying the output -- it'll make it easier later.
-		if (in_array(false, call_integration_hook('integrate_outgoing_email', array(&$subject, &$message, &$headers)), true))
+		if (in_array(false, call_integration_hook('integrate_outgoing_email', array(&$subject, &$message, &$this->headers)), true))
 		{
 			return false;
 		}
