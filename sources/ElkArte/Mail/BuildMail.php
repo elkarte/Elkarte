@@ -17,6 +17,7 @@ class BuildMail extends BaseMail
 {
 	/** @var array All the required headers to send */
 	public $headers = [];
+
 	/** @var string Mime message composed of various sections/boundaries */
 	public $message;
 
@@ -45,9 +46,6 @@ class BuildMail extends BaseMail
 		global $modSettings;
 
 		$priority = (int) $priority;
-
-		// Use sendmail or SMTP ?
-		$this->setMailTransport();
 
 		// Use maillist styles ?
 		$this->setMailList($from_wrapper, $message_id, $priority);
@@ -300,7 +298,10 @@ class BuildMail extends BaseMail
 		{
 			// Standard ElkArte headers
 			$this->headers[] = 'From: ' . $from_name . ' <' . (empty($modSettings['maillist_mail_from']) ? $webmaster_email : $modSettings['maillist_mail_from']) . '>';
-			$this->headers[] = ($from !== null && strpos($from, '@') !== false) ? 'Reply-To: <' . $from . '>' : '';
+			if ($from !== null && strpos($from, '@') !== false)
+			{
+				$this->headers[] = 'Reply-To: <' . $from . '>';
+			}
 		}
 	}
 
