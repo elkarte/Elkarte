@@ -815,7 +815,7 @@ function doLogin(UserSettingsLoader $user)
 	is_not_banned(true);
 
 	// Don't stick the language or theme after this point.
-	unset($_SESSION['language'], $_SESSION['id_theme']);
+	unset($_SESSION['language'], $_SESSION['theme']);
 
 	// We want to know if this is first login
 	if (User::$info->isFirstLogin())
