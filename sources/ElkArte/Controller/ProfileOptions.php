@@ -20,7 +20,9 @@ namespace ElkArte\Controller;
 
 use ElkArte\AbstractController;
 use ElkArte\Action;
+use ElkArte\Cache\Cache;
 use ElkArte\Exceptions\Exception;
+use ElkArte\Languages\Txt;
 use ElkArte\MembersList;
 use ElkArte\Util;
 
@@ -45,7 +47,7 @@ class ProfileOptions extends AbstractController
 	 *
 	 * @var \ElkArte\Member
 	 */
-	private $_profile = null;
+	private $_profile;
 
 	/**
 	 * Called before all other methods when coming from the dispatcher or
@@ -599,6 +601,97 @@ class ProfileOptions extends AbstractController
 		// Set up profile look and layout, call 'integrate_themepick_profile_fields' hook
 		$fields = self::getFields('theme');
 		setupProfileContext($fields['fields'], $fields['hook']);
+	}
+
+	/**
+	 * Choose a theme from a list of those that are available
+	 *
+	 * What it does:
+	 *
+	 * - Uses the Themes template. (pick sub template.)
+	 * - Accessed with ?action=admin;area=theme;sa=pick.
+	 * - Allows previewing of the theme and variants
+	 */
+	public function action_pick()
+	{
+		global $txt, $context, $modSettings, $scripturl;
+
+		checkSession('get');
+
+		// Basics
+		Txt::load('ManageThemes');
+		theme()->getTemplates()->load('ProfileOptions');
+		require_once(SUBSDIR . '/Themes.subs.php');
+
+		// Note JS values will be in post via the form, JS enabled they will be in get via link button
+		$_SESSION['theme'] = 0;
+		$_SESSION['id_variant'] = 0;
+		$save = $this->_req->getPost('save');
+		$u = $this->_req->getQuery('u', 'intval');
+		$themePicked = $this->_req->getQuery('th', 'intval');
+		$variant = $this->_req->getQuery('vrt', 'cleanhtml');
+
+		// Build the link tree
+		$context['linktree'][] = array(
+			'url' => $scripturl . '?action=profile;sa=pick;u=' . $this->_memID,
+			'name' => $txt['theme_pick'],
+		);
+		$context['default_theme_id'] = $modSettings['theme_default'];
+
+		// Saving a theme/variant cause JS doesn't work - pretend it did ;)
+		if (isset($save))
+		{
+			// Which theme?
+			foreach ($save as $k => $v)
+			{
+				$themePicked = (int) $k;
+			}
+
+			if (isset($this->_req->post->vrt[$k]))
+			{
+				$variant = $this->_req->post->vrt[$k];
+			}
+		}
+
+		// Have we made a decision, or are we just previewing?
+		if (isset($themePicked))
+		{
+			// Save the chosen theme.
+			require_once(SUBSDIR . '/Members.subs.php');
+			updateMemberData($this->_memID, array('id_theme' => $themePicked));
+
+			// Did they pick a variant as well?
+			if (!empty($variant))
+			{
+				updateThemeOptions(array($themePicked, $this->_memID, 'theme_variant', $variant));
+				Cache::instance()->remove('theme_settings-' . $themePicked . ':' . $this->_memID);
+				$_SESSION['id_variant'] = 0;
+			}
+
+			redirectexit('action=profile;area=theme');
+		}
+
+		$context['current_member'] = $this->_memID;
+		$current_theme = (int) $this->_profile['theme'];
+
+		// Get all theme name and descriptions.
+		list ($context['available_themes'], $guest_theme) = availableThemes($current_theme, $context['current_member']);
+
+		// As long as we're not doing the default theme...
+		if ($guest_theme !== 0)
+		{
+			$context['available_themes'][0] = $context['available_themes'][$guest_theme];
+		}
+
+		$context['available_themes'][0]['id'] = 0;
+		$context['available_themes'][0]['name'] = $txt['theme_forum_default'];
+		$context['available_themes'][0]['selected'] = $current_theme === 0;
+		$context['available_themes'][0]['description'] = $txt['theme_global_description'];
+
+		ksort($context['available_themes']);
+
+		$context['page_title'] = $txt['theme_pick'];
+		$context['sub_template'] = 'pick';
 	}
 
 	/**
