@@ -1,12 +1,11 @@
 <?php
 
-use ElkArte\AdminController\Packages;
-use ElkArte\AdminController\PackageServers;
 use ElkArte\EventManager;
 use ElkArte\HttpReq;
-use ElkArte\Themes\ThemeLoader;
-use ElkArte\User;
 use ElkArte\Languages\Loader;
+use ElkArte\Packages\Packages;
+use ElkArte\Packages\PackageServers;
+use ElkArte\User;
 
 /**
  * TestCase class for the Packages & PackageServer Controller

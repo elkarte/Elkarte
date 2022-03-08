@@ -168,29 +168,6 @@
 	background-color: var(--content-background);
 }
 
-/* Styles for the file permissions section.
-------------------------------------------------- */
-
-.perm_read {
-	background-color: var(--valid);
-}
-
-.perm_write {
-	background-color: var(--invalid);
-}
-
-.perm_execute {
-	background-color: var(--notice);
-}
-
-.perm_custom {
-	background-color: var(--mid_grey_background);
-}
-
-.perm_nochange {
-	background-color: var(--grey_background);
-}
-
 /* Styles for the moderation center.
 ------------------------------------------------- */
 #modcenter {

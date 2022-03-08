@@ -21,26 +21,17 @@ namespace ElkArte;
  */
 abstract class AbstractModel
 {
-	/**
-	 * The database object
-	 *
-	 * @var \ElkArte\Database\QueryInterface
-	 */
+	/** @var \ElkArte\Database\QueryInterface The database object */
 	protected $_db = null;
 
-	/**
-	 * The current user data
-	 *
-	 * @var \ElkArte\UserInfo
-	 */
+	/** @var \ElkArte\UserInfo The current user data */
 	protected $user = null;
 
-	/**
-	 * The modSettings
-	 *
-	 * @var object
-	 */
+	/** @var object The modSettings */
 	protected $_modSettings = array();
+
+	/** @var \ElkArte\HttpReq The request values */
+	protected $_req;
 
 	/**
 	 * Make "global" items available to the class
@@ -55,5 +46,6 @@ abstract class AbstractModel
 		$this->_db = $db ?: database();
 		$this->user = $user;
 		$this->_modSettings = new ValuesContainer($modSettings ?: array());
+		$this->_req = HttpReq::instance();
 	}
 }

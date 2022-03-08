@@ -173,7 +173,7 @@ class UnTgz
 		umask(0);
 		if ($this->destination !== null && !file_exists($this->destination) && !$this->single_file)
 		{
-			mktree($this->destination, 0777);
+			mktree($this->destination);
 		}
 	}
 
@@ -493,7 +493,7 @@ class UnTgz
 
 			if (!file_exists($this->destination . '/' . $this->_current['filename']))
 			{
-				mktree($this->destination . '/' . $this->_current['filename'], 0777);
+				mktree($this->destination . '/' . $this->_current['filename']);
 			}
 			$this->_write_this = false;
 		}
@@ -517,7 +517,7 @@ class UnTgz
 		// A directory may need to be created
 		if (strpos($this->_current['filename'], '/') !== false && !$this->single_file)
 		{
-			mktree($this->destination . '/' . dirname($this->_current['filename']), 0777);
+			mktree($this->destination . '/' . dirname($this->_current['filename']));
 		}
 
 		// Is this the file we're looking for?

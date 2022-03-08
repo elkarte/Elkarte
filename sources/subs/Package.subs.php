@@ -14,10 +14,13 @@
  *
  */
 
+use ElkArte\FileFunctions;
 use ElkArte\Http\CurlFetchWebdata;
 use ElkArte\Http\FsockFetchWebdata;
 use ElkArte\Http\FtpConnection;
 use ElkArte\Http\StreamFetchWebdata;
+use ElkArte\Packages\PackageChmod;
+use ElkArte\Packages\PackageParser;
 use ElkArte\UnTgz;
 use ElkArte\UnZip;
 use ElkArte\User;
@@ -42,21 +45,16 @@ function read_tgz_file($gzfilename, $destination, $single_file = false, $overwri
 	if (substr($gzfilename, 0, 7) === 'http://' || substr($gzfilename, 0, 8) === 'https://')
 	{
 		$data = fetch_web_data($gzfilename);
-
-		if ($data === false)
-		{
-			return false;
-		}
 	}
 	// Or a file on the system
 	else
 	{
 		$data = @file_get_contents($gzfilename);
+	}
 
-		if ($data === false)
-		{
-			return false;
-		}
+	if ($data === false)
+	{
+		return false;
 	}
 
 	return read_tgz_data($data, $destination, $single_file, $overwrite, $files_to_extract);
@@ -86,7 +84,7 @@ function read_tgz_file($gzfilename, $destination, $single_file = false, $overwri
  * @param bool $single_file = false,
  * @param bool $overwrite = false,
  * @param string[]|null $files_to_extract = null
- * @return mixed[]|bool
+ * @return array|bool
  * @package Packages
  */
 function read_tgz_data($data, $destination, $single_file = false, $overwrite = false, $files_to_extract = null)
@@ -116,7 +114,7 @@ function read_tgz_data($data, $destination, $single_file = false, $overwrite = f
  * @param bool $single_file
  * @param bool $overwrite
  * @param string[]|null $files_to_extract
- * @return mixed[]|bool
+ * @return array|bool
  * @package Packages
  */
 function read_zip_data($data, $destination, $single_file = false, $overwrite = false, $files_to_extract = null)
@@ -124,41 +122,6 @@ function read_zip_data($data, $destination, $single_file = false, $overwrite = f
 	$unzip = new UnZip($data, $destination, $single_file, $overwrite, $files_to_extract);
 
 	return $unzip->read_zip_data();
-}
-
-/**
- * Checks the existence of a remote file since file_exists() does not do remote.
- * will return false if the file is "moved permanently" or similar.
- *
- * @param string $url
- * @return bool true if the remote url exists.
- * @package Packages
- */
-function url_exists($url)
-{
-	$a_url = parse_url($url);
-
-	if (!isset($a_url['scheme']))
-	{
-		return false;
-	}
-
-	// Attempt to connect...
-	$fid = fsockopen($a_url['host'], !isset($a_url['port']) ? 80 : $a_url['port'], $code, $temp, 8);
-
-	// Can't make a connection
-	if ($fid === false)
-	{
-		return false;
-	}
-
-	// See if the file is where its supposed to be
-	fputs($fid, 'HEAD ' . $a_url['path'] . ' HTTP/1.0' . "\r\n" . 'Host: ' . $a_url['host'] . "\r\n\r\n");
-	$head = fread($fid, 1024);
-	fclose($fid);
-
-	// Check for a return code that shows the file was there
-	return preg_match('~^HTTP/.+\s+(20[01]|30[127])~i', $head) == 1;
 }
 
 /**
@@ -189,10 +152,11 @@ function loadInstalledPackages()
 		);
 
 		// Don't have anything left, so send an empty array.
-		return array();
+		return [];
 	}
 
-	// Load the packages from the database - note this is ordered by install time to ensure latest package uninstalled first.
+	// Load the packages from the database - note this is ordered by installation time to ensure
+	// latest package uninstalled first.
 	$installed = array();
 	$found = array();
 	$db->fetchQuery('
@@ -243,6 +207,7 @@ function loadInstalledPackages()
 function getPackageInfo($gzfilename)
 {
 	$gzfilename = trim($gzfilename);
+	$fileFunc = FileFunctions::instance();
 
 	// Extract package-info.xml from downloaded file. (*/ is used because it could be in any directory.)
 	if (preg_match('~^https?://~i', $gzfilename) === 1)
@@ -252,17 +217,17 @@ function getPackageInfo($gzfilename)
 	else
 	{
 		// It must be in the package directory then
-		if (!file_exists(BOARDDIR . '/packages/' . $gzfilename))
+		if (!$fileFunc->fileExists(BOARDDIR . '/packages/' . $gzfilename))
 		{
 			return 'package_get_error_not_found';
 		}
 
-		// Make sure an package.xml file is available
-		if (is_file(BOARDDIR . '/packages/' . $gzfilename))
+		// Make sure a package.xml file is available
+		if ($fileFunc->fileExists(BOARDDIR . '/packages/' . $gzfilename))
 		{
 			$packageInfo = read_tgz_file(BOARDDIR . '/packages/' . $gzfilename, '*/package-info.xml', true);
 		}
-		elseif (file_exists(BOARDDIR . '/packages/' . $gzfilename . '/package-info.xml'))
+		elseif ($fileFunc->fileExists(BOARDDIR . '/packages/' . $gzfilename . '/package-info.xml'))
 		{
 			$packageInfo = file_get_contents(BOARDDIR . '/packages/' . $gzfilename . '/package-info.xml');
 		}
@@ -281,16 +246,13 @@ function getPackageInfo($gzfilename)
 		{
 			return 'package_get_error_is_theme';
 		}
-		else
-		{
-			return 'package_get_error_is_zero';
-		}
+
+		return 'package_get_error_is_zero';
 	}
 
 	// Parse package-info.xml into an \ElkArte\XmlArray.
 	$packageInfo = new XmlArray($packageInfo);
 
-	// @todo Error message of some sort?
 	if (!$packageInfo->exists('package-info[0]'))
 	{
 		return 'package_get_error_packageinfo_corrupt';
@@ -316,283 +278,17 @@ function getPackageInfo($gzfilename)
  * Create a chmod control for chmoding files.
  *
  * @param string[] $chmodFiles
- * @param mixed[] $chmodOptions
+ * @param array $chmodOptions
  * @param bool $restore_write_status
  * @return array|bool
  * @package Packages
+ * @deprecated since 2.0, use PackageChmod class
  */
 function create_chmod_control($chmodFiles = array(), $chmodOptions = array(), $restore_write_status = false)
 {
-	global $context, $modSettings, $package_ftp, $txt, $scripturl;
+	$create_chmod_control = new PackageChmod();
 
-	// If we're restoring the status of existing files prepare the data.
-	if ($restore_write_status && isset($_SESSION['pack_ftp']) && !empty($_SESSION['pack_ftp']['original_perms']))
-	{
-		$listOptions = array(
-			'id' => 'restore_file_permissions',
-			'title' => $txt['package_restore_permissions'],
-			'get_items' => array(
-				'function' => 'list_restoreFiles',
-				'params' => array(
-					!empty($_POST['restore_perms']),
-				),
-			),
-			'columns' => array(
-				'path' => array(
-					'header' => array(
-						'value' => $txt['package_restore_permissions_filename'],
-					),
-					'data' => array(
-						'db' => 'path',
-						'class' => 'smalltext',
-					),
-				),
-				'old_perms' => array(
-					'header' => array(
-						'value' => $txt['package_restore_permissions_orig_status'],
-					),
-					'data' => array(
-						'db' => 'old_perms',
-						'class' => 'smalltext',
-					),
-				),
-				'cur_perms' => array(
-					'header' => array(
-						'value' => $txt['package_restore_permissions_cur_status'],
-					),
-					'data' => array(
-						'function' => function ($rowData) {
-							global $txt;
-
-							$formatTxt = $rowData['result'] == '' || $rowData['result'] == 'skipped' ? $txt['package_restore_permissions_pre_change'] : $txt['package_restore_permissions_post_change'];
-
-							return sprintf($formatTxt, $rowData['cur_perms'], $rowData['new_perms'], $rowData['writable_message']);
-						},
-						'class' => 'smalltext',
-					),
-				),
-				'check' => array(
-					'header' => array(
-						'value' => '<input type="checkbox" onclick="invertAll(this, this.form);" class="input_check" />',
-						'class' => 'centertext',
-					),
-					'data' => array(
-						'sprintf' => array(
-							'format' => '<input type="checkbox" name="restore_files[]" value="%1$s" class="input_check" />',
-							'params' => array(
-								'path' => false,
-							),
-						),
-						'class' => 'centertext',
-					),
-				),
-				'result' => array(
-					'header' => array(
-						'value' => $txt['package_restore_permissions_result'],
-					),
-					'data' => array(
-						'function' => function ($rowData) {
-							global $txt;
-
-							return $txt['package_restore_permissions_action_' . $rowData['result']];
-						},
-						'class' => 'smalltext',
-					),
-				),
-			),
-			'form' => array(
-				'href' => !empty($chmodOptions['destination_url']) ? $chmodOptions['destination_url'] : $scripturl . '?action=admin;area=packages;sa=perms;restore;' . $context['session_var'] . '=' . $context['session_id'],
-			),
-			'additional_rows' => array(
-				array(
-					'position' => 'below_table_data',
-					'value' => '<input type="submit" name="restore_perms" value="' . $txt['package_restore_permissions_restore'] . '" class="right_submit" />',
-					'class' => 'category_header',
-				),
-				array(
-					'position' => 'after_title',
-					'value' => '<span class="smalltext">' . $txt['package_restore_permissions_desc'] . '</span>',
-				),
-			),
-		);
-
-		// Work out what columns and the like to show.
-		if (!empty($_POST['restore_perms']))
-		{
-			$listOptions['additional_rows'][1]['value'] = sprintf($txt['package_restore_permissions_action_done'], $scripturl . '?action=admin;area=packages;sa=perms;' . $context['session_var'] . '=' . $context['session_id']);
-			unset($listOptions['columns']['check'], $listOptions['form'], $listOptions['additional_rows'][0]);
-
-			$context['sub_template'] = 'show_list';
-			$context['default_list'] = 'restore_file_permissions';
-		}
-		else
-		{
-			unset($listOptions['columns']['result']);
-		}
-
-		// Create the list for display.
-		createList($listOptions);
-
-		// If we just restored permissions then wherever we are, we are now done and dusted.
-		if (!empty($_POST['restore_perms']))
-		{
-			obExit();
-		}
-	}
-	// Otherwise, it's entirely irrelevant?
-	elseif ($restore_write_status)
-	{
-		return true;
-	}
-
-	// This is where we report what we got up to.
-	$return_data = array(
-		'files' => array(
-			'writable' => array(),
-			'notwritable' => array(),
-		),
-	);
-
-	// If we have some FTP information already, then let's assume it was required and try to get ourselves connected.
-	if (!empty($_SESSION['pack_ftp']['connected']))
-	{
-		$package_ftp = new FtpConnection($_SESSION['pack_ftp']['server'], $_SESSION['pack_ftp']['port'], $_SESSION['pack_ftp']['username'], package_crypt($_SESSION['pack_ftp']['password']));
-
-		// Check for a valid connection
-		if ($package_ftp->error !== false)
-		{
-			unset($package_ftp, $_SESSION['pack_ftp']);
-		}
-	}
-
-	// Just got a submission did we?
-	if (isset($_POST['ftp_username'], $_POST['ftp_password']) && (empty($package_ftp) || ($package_ftp->error !== false)))
-	{
-		$ftp = new FtpConnection($_POST['ftp_server'], $_POST['ftp_port'], $_POST['ftp_username'], $_POST['ftp_password']);
-
-		// We're connected, jolly good!
-		if ($ftp->error === false)
-		{
-			// Common mistake, so let's try to remedy it...
-			if (!$ftp->chdir($_POST['ftp_path']))
-			{
-				$ftp_error = $ftp->last_message;
-				$ftp->chdir(preg_replace('~^/home[2]?/[^/]+?~', '', $_POST['ftp_path']));
-			}
-
-			if (!in_array($_POST['ftp_path'], array('', '/')))
-			{
-				$ftp_root = strtr(BOARDDIR, array($_POST['ftp_path'] => ''));
-				if (substr($ftp_root, -1) === '/' && ($_POST['ftp_path'] == '' || substr($_POST['ftp_path'], 0, 1) === '/'))
-				{
-					$ftp_root = substr($ftp_root, 0, -1);
-				}
-			}
-			else
-			{
-				$ftp_root = BOARDDIR;
-			}
-
-			$_SESSION['pack_ftp'] = array(
-				'server' => $_POST['ftp_server'],
-				'port' => $_POST['ftp_port'],
-				'username' => $_POST['ftp_username'],
-				'password' => package_crypt($_POST['ftp_password']),
-				'path' => $_POST['ftp_path'],
-				'root' => $ftp_root,
-				'connected' => true,
-			);
-
-			if (!isset($modSettings['package_path']) || $modSettings['package_path'] !== $_POST['ftp_path'])
-			{
-				updateSettings(array('package_path' => $_POST['ftp_path']));
-			}
-
-			// This is now the primary connection.
-			$package_ftp = $ftp;
-		}
-	}
-
-	// Now try to simply make the files writable, with whatever we might have.
-	if (!empty($chmodFiles))
-	{
-		foreach ($chmodFiles as $k => $file)
-		{
-			// Sometimes this can somehow happen maybe?
-			if (empty($file))
-			{
-				unset($chmodFiles[$k]);
-			}
-			// Already writable?
-			elseif (@is_writable($file))
-			{
-				$return_data['files']['writable'][] = $file;
-			}
-			else
-			{
-				// Now try to change that.
-				$return_data['files'][package_chmod($file, 'writable', true) ? 'writable' : 'notwritable'][] = $file;
-			}
-		}
-	}
-
-	// Have we still got nasty files which ain't writable? Dear me we need more FTP good sir.
-	if (empty($package_ftp) && (!empty($return_data['files']['notwritable']) || !empty($chmodOptions['force_find_error'])))
-	{
-		if (!isset($ftp) || $ftp->error !== false)
-		{
-			if (!isset($ftp))
-			{
-				$ftp = new FtpConnection(null);
-			}
-			elseif ($ftp->error !== false && !isset($ftp_error))
-			{
-				$ftp_error = $ftp->last_message === null ? '' : $ftp->last_message;
-			}
-
-			list ($username, $detect_path, $found_path) = $ftp->detect_path(BOARDDIR);
-
-			if ($found_path !== '')
-			{
-				$_POST['ftp_path'] = $detect_path;
-			}
-			elseif (!isset($_POST['ftp_path']))
-			{
-				$_POST['ftp_path'] = $modSettings['package_path'] ?? $detect_path;
-			}
-
-			if (!isset($_POST['ftp_username']))
-			{
-				$_POST['ftp_username'] = $username;
-			}
-		}
-
-		$context['package_ftp'] = array(
-			'server' => $_POST['ftp_server'] ?? ($modSettings['package_server'] ?? 'localhost'),
-			'port' => $_POST['ftp_port'] ?? ($modSettings['package_port'] ?? '21'),
-			'username' => $_POST['ftp_username'] ?? ($modSettings['package_username'] ?? ''),
-			'path' => $_POST['ftp_path'],
-			'error' => empty($ftp_error) ? null : $ftp_error,
-			'destination' => !empty($chmodOptions['destination_url']) ? $chmodOptions['destination_url'] : '',
-		);
-
-		// Which files failed?
-		if (!isset($context['notwritable_files']))
-		{
-			$context['notwritable_files'] = array();
-		}
-		$context['notwritable_files'] = array_merge($context['notwritable_files'], $return_data['files']['notwritable']);
-
-		// Sent here to die?
-		if (!empty($chmodOptions['crash_on_error']))
-		{
-			$context['page_title'] = $txt['package_ftp_necessary'];
-			$context['sub_template'] = 'ftp_required';
-			obExit();
-		}
-	}
-
-	return $return_data;
+	return $create_chmod_control->createChmodControl($chmodFiles, $chmodOptions, $restore_write_status);
 }
 
 /**
@@ -609,15 +305,16 @@ function list_restoreFiles($dummy1, $dummy2, $dummy3, $do_change)
 {
 	global $txt, $package_ftp;
 
-	$restore_files = array();
+	$restore_files = [];
+	$fileFunc = FileFunctions::instance();
 
-	foreach ($_SESSION['pack_ftp']['original_perms'] as $file => $perms)
+	foreach ($_SESSION['ftp_connection']['original_perms'] as $file => $perms)
 	{
 		// Check the file still exists, and the permissions were indeed different than now.
-		$file_permissions = @fileperms($file);
-		if (!file_exists($file) || $file_permissions == $perms)
+		$file_permissions = $fileFunc->filePerms($file);
+		if (!$fileFunc->fileExists($file) || $file_permissions === $perms)
 		{
-			unset($_SESSION['pack_ftp']['original_perms'][$file]);
+			unset($_SESSION['ftp_connection']['original_perms'][$file]);
 			continue;
 		}
 
@@ -627,23 +324,23 @@ function list_restoreFiles($dummy1, $dummy2, $dummy3, $do_change)
 			// Use FTP if we have it.
 			if (!empty($package_ftp))
 			{
-				$ftp_file = strtr($file, array($_SESSION['pack_ftp']['root'] => ''));
+				$ftp_file = setFtpName($file);
 				$package_ftp->chmod($ftp_file, $perms);
 			}
 			else
 			{
-				elk_chmod($file, $perms);
+				$fileFunc->elk_chmod($file, $perms);
 			}
 
-			$new_permissions = @fileperms($file);
-			$result = $new_permissions == $perms ? 'success' : 'failure';
-			unset($_SESSION['pack_ftp']['original_perms'][$file]);
+			$new_permissions = $fileFunc->filePerms($file);
+			$result = $new_permissions === $perms ? 'success' : 'failure';
+			unset($_SESSION['ftp_connection']['original_perms'][$file]);
 		}
 		elseif ($do_change)
 		{
 			$new_permissions = '';
 			$result = 'skipped';
-			unset($_SESSION['pack_ftp']['original_perms'][$file]);
+			unset($_SESSION['ftp_connection']['original_perms'][$file]);
 		}
 
 		// Record the results!
@@ -654,7 +351,7 @@ function list_restoreFiles($dummy1, $dummy2, $dummy3, $do_change)
 			'cur_perms' => substr(sprintf('%o', $file_permissions), -4),
 			'new_perms' => isset($new_permissions) ? substr(sprintf('%o', $new_permissions), -4) : '',
 			'result' => $result ?? '',
-			'writable_message' => '<span class="' . (@is_writable($file) ? 'success' : 'alert') . '">' . (@is_writable($file) ? $txt['package_file_perms_writable'] : $txt['package_file_perms_not_writable']) . '</span>',
+			'writable_message' => '<span class="' . (@is_writable($file) ? 'success' : 'alert') . '">' . ($fileFunc->isWritable($file) ? $txt['package_file_perms_writable'] : $txt['package_file_perms_not_writable']) . '</span>',
 		);
 	}
 
@@ -662,265 +359,7 @@ function list_restoreFiles($dummy1, $dummy2, $dummy3, $do_change)
 }
 
 /**
- * Use FTP functions to work with a package download/install
- *
- * @param string $destination_url
- * @param string[]|null $files = none
- * @param bool $return = false
- *
- * @return null|string[]
- * @package Packages
- *
- */
-function packageRequireFTP($destination_url, $files = null, $return = false)
-{
-	global $context, $modSettings, $package_ftp, $txt;
-
-	// Try to make them writable the manual way.
-	if ($files !== null)
-	{
-		foreach ($files as $k => $file)
-		{
-			// If this file doesn't exist, then we actually want to look at the directory, no?
-			if (!file_exists($file))
-			{
-				$file = dirname($file);
-			}
-
-			// This looks odd, but it's an attempt to work around PHP suExec.
-			if (!@is_writable($file))
-			{
-				elk_chmod($file, 0755);
-			}
-
-			if (!@is_writable($file))
-			{
-				elk_chmod($file, 0777);
-			}
-
-			if (!@is_writable(dirname($file)))
-			{
-				elk_chmod($file, 0755);
-			}
-
-			if (!@is_writable(dirname($file)))
-			{
-				elk_chmod($file, 0777);
-			}
-
-			$fp = is_dir($file) ? @opendir($file) : @fopen($file, 'rb');
-			if (@is_writable($file) && $fp)
-			{
-				unset($files[$k]);
-				if (!is_dir($file))
-				{
-					fclose($fp);
-				}
-				else
-				{
-					closedir($fp);
-				}
-			}
-		}
-
-		// No FTP required!
-		if (empty($files))
-		{
-			return array();
-		}
-	}
-
-	// They've opted to not use FTP, and try anyway.
-	if (isset($_SESSION['pack_ftp']) && $_SESSION['pack_ftp'] === false)
-	{
-		if ($files === null)
-		{
-			return array();
-		}
-
-		foreach ($files as $k => $file)
-		{
-			// This looks odd, but it's an attempt to work around PHP suExec.
-			if (!file_exists($file))
-			{
-				mktree(dirname($file), 0755);
-				@touch($file);
-				elk_chmod($file, 0755);
-			}
-
-			if (!@is_writable($file))
-			{
-				elk_chmod($file, 0777);
-			}
-
-			if (!@is_writable(dirname($file)))
-			{
-				elk_chmod(dirname($file), 0777);
-			}
-
-			if (@is_writable($file))
-			{
-				unset($files[$k]);
-			}
-		}
-
-		return $files;
-	}
-	elseif (isset($_SESSION['pack_ftp']))
-	{
-		$package_ftp = new FtpConnection($_SESSION['pack_ftp']['server'], $_SESSION['pack_ftp']['port'], $_SESSION['pack_ftp']['username'], package_crypt($_SESSION['pack_ftp']['password']));
-
-		if ($files === null)
-		{
-			return array();
-		}
-
-		foreach ($files as $k => $file)
-		{
-			$ftp_file = strtr($file, array($_SESSION['pack_ftp']['root'] => ''));
-
-			// This looks odd, but it's an attempt to work around PHP suExec.
-			if (!file_exists($file))
-			{
-				mktree(dirname($file), 0755);
-				$package_ftp->create_file($ftp_file);
-				$package_ftp->chmod($ftp_file, 0755);
-			}
-
-			// Still not writable, true full permissions
-			if (!@is_writable($file))
-			{
-				$package_ftp->chmod($ftp_file, 0777);
-			}
-
-			// Directory not writable, try to chmod to 777 then
-			if (!@is_writable(dirname($file)))
-			{
-				$package_ftp->chmod(dirname($ftp_file), 0777);
-			}
-
-			if (@is_writable($file))
-			{
-				unset($files[$k]);
-			}
-		}
-
-		return $files;
-	}
-
-	if (isset($_POST['ftp_none']))
-	{
-		$_SESSION['pack_ftp'] = false;
-
-		return packageRequireFTP($destination_url, $files, $return);
-	}
-	elseif (isset($_POST['ftp_username']))
-	{
-		// Attempt to make a new FTP connection
-		$ftp = new FtpConnection($_POST['ftp_server'], $_POST['ftp_port'], $_POST['ftp_username'], $_POST['ftp_password']);
-
-		if ($ftp->error === false)
-		{
-			// Common mistake, so let's try to remedy it...
-			if (!$ftp->chdir($_POST['ftp_path']))
-			{
-				$ftp_error = $ftp->last_message;
-				$ftp->chdir(preg_replace('~^/home[2]?/[^/]+?~', '', $_POST['ftp_path']));
-			}
-		}
-	}
-
-	if (!isset($ftp) || $ftp->error !== false)
-	{
-		if (!isset($ftp))
-		{
-			$ftp = new FtpConnection(null);
-		}
-		elseif ($ftp->error !== false && !isset($ftp_error))
-		{
-			$ftp_error = $ftp->last_message === null ? '' : $ftp->last_message;
-		}
-
-		list ($username, $detect_path, $found_path) = $ftp->detect_path(BOARDDIR);
-
-		if ($found_path !== '')
-		{
-			$_POST['ftp_path'] = $detect_path;
-		}
-		elseif (!isset($_POST['ftp_path']))
-		{
-			$_POST['ftp_path'] = $modSettings['package_path'] ?? $detect_path;
-		}
-
-		if (!isset($_POST['ftp_username']))
-		{
-			$_POST['ftp_username'] = $username;
-		}
-
-		$context['package_ftp'] = array(
-			'server' => $_POST['ftp_server'] ?? ($modSettings['package_server'] ?? 'localhost'),
-			'port' => $_POST['ftp_port'] ?? ($modSettings['package_port'] ?? '21'),
-			'username' => $_POST['ftp_username'] ?? ($modSettings['package_username'] ?? ''),
-			'path' => $_POST['ftp_path'],
-			'error' => empty($ftp_error) ? null : $ftp_error,
-			'destination' => $destination_url,
-		);
-
-		// If we're returning dump out here.
-		if ($return)
-		{
-			return $files;
-		}
-
-		$context['page_title'] = $txt['package_ftp_necessary'];
-		$context['sub_template'] = 'ftp_required';
-		obExit();
-	}
-	else
-	{
-		if (!in_array($_POST['ftp_path'], array('', '/')))
-		{
-			$ftp_root = strtr(BOARDDIR, array($_POST['ftp_path'] => ''));
-			if (substr($ftp_root, -1) === '/' && ($_POST['ftp_path'] == '' || $_POST['ftp_path'][0] == '/'))
-			{
-				$ftp_root = substr($ftp_root, 0, -1);
-			}
-		}
-		else
-		{
-			$ftp_root = BOARDDIR;
-		}
-
-		$_SESSION['pack_ftp'] = array(
-			'server' => $_POST['ftp_server'],
-			'port' => $_POST['ftp_port'],
-			'username' => $_POST['ftp_username'],
-			'password' => package_crypt($_POST['ftp_password']),
-			'path' => $_POST['ftp_path'],
-			'root' => $ftp_root,
-		);
-
-		if (!isset($modSettings['package_path']) || $modSettings['package_path'] !== $_POST['ftp_path'])
-		{
-			updateSettings(array('package_path' => $_POST['ftp_path']));
-		}
-
-		$files = packageRequireFTP($destination_url, $files, $return);
-	}
-
-	return $files;
-}
-
-/**
  * Parses the actions in package-info.xml file from packages.
- *
- * What it does:
- *
- * - Package should be an \ElkArte\XmlArray with package-info as its base.
- * - Testing_only should be true if the package should not actually be applied.
- * - Method can be upgrade, install, or uninstall.  Its default is install.
- * - Previous_version should be set to the previous installed version of this package, if any.
- * - Does not handle failure terribly well; testing first is always better.
  *
  * @param \ElkArte\XmlArray $packageXML
  * @param bool $testing_only = true
@@ -928,543 +367,12 @@ function packageRequireFTP($destination_url, $files = null, $return = false)
  * @param string $previous_version = ''
  * @return array an array of those changes made.
  * @package Packages
+ * @deprecated since 2.0 use parsePackageInfo class
  */
 function parsePackageInfo(&$packageXML, $testing_only = true, $method = 'install', $previous_version = '')
 {
-	global $context, $temp_path, $language;
-
-	// Mayday!  That action doesn't exist!!
-	if (empty($packageXML) || !$packageXML->exists($method))
-	{
-		return array();
-	}
-
-	// We haven't found the package script yet...
-	$script = false;
-	$the_version = strtr(FORUM_VERSION, array('ElkArte ' => ''));
-
-	// Emulation support...
-	if (!empty($_SESSION['version_emulate']))
-	{
-		$the_version = $_SESSION['version_emulate'];
-	}
-
-	// Single package emulation
-	if (!empty($_REQUEST['ve']) && !empty($_REQUEST['package']))
-	{
-		$the_version = $_REQUEST['ve'];
-		$_SESSION['single_version_emulate'][$_REQUEST['package']] = $the_version;
-	}
-
-	if (!empty($_REQUEST['package']) && (!empty($_SESSION['single_version_emulate'][$_REQUEST['package']])))
-	{
-		$the_version = $_SESSION['single_version_emulate'][$_REQUEST['package']];
-	}
-
-	// Get all the versions of this method and find the right one.
-	$these_methods = $packageXML->set($method);
-	foreach ($these_methods as $this_method)
-	{
-		// They specified certain versions this part is for.
-		if ($this_method->exists('@for'))
-		{
-			// Don't keep going if this won't work for this version.
-			if (!matchPackageVersion($the_version, $this_method->fetch('@for')))
-			{
-				continue;
-			}
-		}
-
-		// Upgrades may go from a certain old version of the mod.
-		if ($method === 'upgrade' && $this_method->exists('@from'))
-		{
-			// Well, this is for the wrong old version...
-			if (!matchPackageVersion($previous_version, $this_method->fetch('@from')))
-			{
-				continue;
-			}
-		}
-
-		// We've found it!
-		$script = $this_method;
-		break;
-	}
-
-	// Bad news, a matching script wasn't found!
-	if ($script === false)
-	{
-		return array();
-	}
-
-	// Find all the actions in this method - in theory, these should only be allowed actions. (* means all.)
-	$actions = $script->set('*');
-	$return = array();
-
-	$temp_auto = 0;
-	$temp_path = BOARDDIR . '/packages/temp/' . ($context['base_path'] ?? '');
-
-	$context['readmes'] = array();
-	$context['licences'] = array();
-	$has_redirect = false;
-
-	// This is the testing phase... nothing shall be done yet.
-	foreach ($actions as $action)
-	{
-		$actionType = $action->name();
-
-		if (in_array($actionType, array('readme', 'code', 'database', 'modification', 'redirect', 'license')))
-		{
-			if ($actionType === 'redirect')
-			{
-				$has_redirect = true;
-			}
-
-			// Allow for translated readme and license files.
-			if ($actionType === 'readme' || $actionType === 'license')
-			{
-				$type = $actionType . 's';
-				if ($action->exists('@lang'))
-				{
-					// Auto-select the language based on either request variable or current language.
-					if ((isset($_REQUEST['readme']) && $action->fetch('@lang') === $_REQUEST['readme']) || (isset($_REQUEST['license']) && $action->fetch('@lang') === $_REQUEST['license']) || (!isset($_REQUEST['readme']) && $action->fetch('@lang') === $language) || (!isset($_REQUEST['license']) && $action->fetch('@lang') === $language))
-					{
-						// In case the user put the blocks in the wrong order.
-						if (isset($context[$type]['selected']) && $context[$type]['selected'] === 'default')
-						{
-							$context[$type][] = 'default';
-						}
-
-						$context[$type]['selected'] = htmlspecialchars($action->fetch('@lang'), ENT_COMPAT, 'UTF-8');
-					}
-					else
-					{
-						// We don't want this now, but we'll allow the user to select to read it.
-						$context[$type][] = htmlspecialchars($action->fetch('@lang'), ENT_COMPAT, 'UTF-8');
-						continue;
-					}
-				}
-				// Fallback when we have no lang parameter.
-				elseif (isset($context[$type]['selected']))
-				{
-				// Already selected one for use?
-					$context[$type][] = 'default';
-					continue;
-				}
-				else
-				{
-					$context[$type]['selected'] = 'default';
-				}
-			}
-
-			// @todo Make sure the file actually exists?  Might not work when testing?
-			if ($action->exists('@type') && $action->fetch('@type') === 'inline')
-			{
-				$filename = $temp_path . '$auto_' . $temp_auto++ . (in_array($actionType, array('readme', 'redirect', 'license')) ? '.txt' : ($actionType == 'code' || $actionType == 'database' ? '.php' : '.mod'));
-				package_put_contents($filename, $action->fetch('.'));
-				$filename = strtr($filename, array($temp_path => ''));
-			}
-			else
-			{
-				$filename = $action->fetch('.');
-			}
-
-			$return[] = array(
-				'type' => $actionType,
-				'filename' => $filename,
-				'description' => '',
-				'reverse' => $action->exists('@reverse') && $action->fetch('@reverse') == 'true',
-				'redirect_url' => $action->exists('@url') ? $action->fetch('@url') : '',
-				'redirect_timeout' => $action->exists('@timeout') ? (int) $action->fetch('@timeout') : 5000,
-				'parse_bbc' => $action->exists('@parsebbc') && $action->fetch('@parsebbc') == 'true',
-				'language' => (($actionType === 'readme' || $actionType === 'license') && $action->exists('@lang') && $action->fetch('@lang') === $language) ? $language : '',
-			);
-
-			continue;
-		}
-		elseif ($actionType === 'hook')
-		{
-			$return[] = array(
-				'type' => $actionType,
-				'function' => $action->exists('@function') ? $action->fetch('@function') : '',
-				'hook' => $action->exists('@hook') ? $action->fetch('@hook') : $action->fetch('.'),
-				'include_file' => $action->exists('@file') ? $action->fetch('@file') : '',
-				'reverse' => $action->exists('@reverse') && $action->fetch('@reverse') == 'true',
-				'description' => '',
-			);
-			continue;
-		}
-		elseif ($actionType == 'credits')
-		{
-			// quick check of any supplied url
-			$url = $action->exists('@url') ? $action->fetch('@url') : '';
-			if (strlen(trim($url)) > 0)
-			{
-				$url = addProtocol($url, array('http://', 'https://'));
-
-				if (strlen($url) < 8)
-				{
-					$url = '';
-				}
-			}
-
-			$return[] = array(
-				'type' => $actionType,
-				'url' => $url,
-				'license' => $action->exists('@license') ? $action->fetch('@license') : '',
-				'copyright' => $action->exists('@copyright') ? $action->fetch('@copyright') : '',
-				'title' => $action->fetch('.'),
-			);
-			continue;
-		}
-		elseif ($actionType === 'requires')
-		{
-			$return[] = array(
-				'type' => $actionType,
-				'id' => $action->exists('@id') ? $action->fetch('@id') : '',
-				'version' => $action->exists('@version') ? $action->fetch('@version') : $action->fetch('.'),
-				'description' => '',
-			);
-			continue;
-		}
-		elseif ($actionType === 'error')
-		{
-			$return[] = array(
-				'type' => 'error',
-			);
-		}
-		elseif (in_array($actionType, array('require-file', 'remove-file', 'require-dir', 'remove-dir', 'move-file', 'move-dir', 'create-file', 'create-dir')))
-		{
-			$this_action = &$return[];
-			$this_action = array(
-				'type' => $actionType,
-				'filename' => $action->fetch('@name'),
-				'description' => $action->fetch('.')
-			);
-
-			// If there is a destination, make sure it makes sense.
-			if (substr($actionType, 0, 6) !== 'remove')
-			{
-				$this_action['unparsed_destination'] = $action->fetch('@destination');
-				$this_action['destination'] = parse_path($action->fetch('@destination')) . '/' . basename($this_action['filename']);
-			}
-			else
-			{
-				$this_action['unparsed_filename'] = $this_action['filename'];
-				$this_action['filename'] = parse_path($this_action['filename']);
-			}
-
-			// If we're moving or requiring (copying) a file.
-			if (substr($actionType, 0, 4) === 'move' || substr($actionType, 0, 7) === 'require')
-			{
-				if ($action->exists('@from'))
-				{
-					$this_action['source'] = parse_path($action->fetch('@from'));
-				}
-				else
-				{
-					$this_action['source'] = $temp_path . $this_action['filename'];
-				}
-			}
-
-			// Check if these things can be done. (chmod's etc.)
-			if ($actionType === 'create-dir')
-			{
-				// Try to create a directory
-				if (!mktree($this_action['destination'], false))
-				{
-					$temp = $this_action['destination'];
-					while (!file_exists($temp) && strlen($temp) > 1)
-					{
-						$temp = dirname($temp);
-					}
-
-					$return[] = array(
-						'type' => 'chmod',
-						'filename' => $temp
-					);
-				}
-			}
-			elseif ($actionType === 'create-file')
-			{
-				// Try to create a file in a known location
-				if (!mktree(dirname($this_action['destination']), false))
-				{
-					$temp = dirname($this_action['destination']);
-					while (!file_exists($temp) && strlen($temp) > 1)
-					{
-						$temp = dirname($temp);
-					}
-
-					$return[] = array(
-						'type' => 'chmod',
-						'filename' => $temp
-					);
-				}
-
-				if (!is_writable($this_action['destination']) && (file_exists($this_action['destination']) || !is_writable(dirname($this_action['destination']))))
-				{
-					$return[] = array(
-						'type' => 'chmod',
-						'filename' => $this_action['destination']
-					);
-				}
-			}
-			elseif ($actionType === 'require-dir')
-			{
-				if (!mktree($this_action['destination'], false))
-				{
-					$temp = $this_action['destination'];
-					while (!file_exists($temp) && strlen($temp) > 1)
-					{
-						$temp = dirname($temp);
-					}
-
-					$return[] = array(
-						'type' => 'chmod',
-						'filename' => $temp
-					);
-				}
-			}
-			elseif ($actionType === 'require-file')
-			{
-				if ($action->exists('@theme'))
-				{
-					$this_action['theme_action'] = $action->fetch('@theme');
-				}
-
-				if (!mktree(dirname($this_action['destination']), false))
-				{
-					$temp = dirname($this_action['destination']);
-					while (!file_exists($temp) && strlen($temp) > 1)
-					{
-						$temp = dirname($temp);
-					}
-
-					$return[] = array(
-						'type' => 'chmod',
-						'filename' => $temp
-					);
-				}
-
-				if (!is_writable($this_action['destination']) && (file_exists($this_action['destination']) || !is_writable(dirname($this_action['destination']))))
-				{
-					$return[] = array(
-						'type' => 'chmod',
-						'filename' => $this_action['destination']
-					);
-				}
-			}
-			elseif ($actionType === 'move-dir' || $actionType === 'move-file')
-			{
-				if (!mktree(dirname($this_action['destination']), false))
-				{
-					$temp = dirname($this_action['destination']);
-					while (!file_exists($temp) && strlen($temp) > 1)
-					{
-						$temp = dirname($temp);
-					}
-
-					$return[] = array(
-						'type' => 'chmod',
-						'filename' => $temp
-					);
-				}
-
-				if (!is_writable($this_action['destination']) && (file_exists($this_action['destination']) || !is_writable(dirname($this_action['destination']))))
-				{
-					$return[] = array(
-						'type' => 'chmod',
-						'filename' => $this_action['destination']
-					);
-				}
-			}
-			elseif ($actionType === 'remove-dir')
-			{
-				if (!is_writable($this_action['filename']) && file_exists($this_action['filename']))
-				{
-					$return[] = array(
-						'type' => 'chmod',
-						'filename' => $this_action['filename']
-					);
-				}
-			}
-			elseif ($actionType === 'remove-file')
-			{
-				if (!is_writable($this_action['filename']) && file_exists($this_action['filename']))
-				{
-					$return[] = array(
-						'type' => 'chmod',
-						'filename' => $this_action['filename']
-					);
-				}
-			}
-		}
-		else
-		{
-			$return[] = array(
-				'type' => 'error',
-				'error_msg' => 'unknown_action',
-				'error_var' => $actionType
-			);
-		}
-	}
-
-	if (!$has_redirect)
-	{
-		$return[] = array(
-			'type' => 'redirect',
-			'filename' => '',
-			'description' => '',
-			'reverse' => false,
-			'redirect_url' => '$scripturl?action=admin;area=packages',
-			'redirect_timeout' => 5000,
-			'parse_bbc' => false,
-			'language' => '',
-		);
-	}
-
-	// Only testing - just return a list of things to be done.
-	if ($testing_only)
-	{
-		return $return;
-	}
-
-	umask(0);
-
-	$failure = false;
-	$not_done = array(array('type' => '!'));
-	foreach ($return as $action)
-	{
-		if (in_array($action['type'], array('modification', 'code', 'database', 'redirect', 'hook', 'credits')))
-		{
-			$not_done[] = $action;
-		}
-
-		if ($action['type'] === 'create-dir')
-		{
-			if (!mktree($action['destination'], 0755) || !is_writable($action['destination']))
-			{
-				$failure |= !mktree($action['destination'], 0777);
-			}
-		}
-		elseif ($action['type'] === 'create-file')
-		{
-			if (!mktree(dirname($action['destination']), 0755) || !is_writable(dirname($action['destination'])))
-			{
-				$failure |= !mktree(dirname($action['destination']), 0777);
-			}
-
-			// Create an empty file.
-			package_put_contents($action['destination'], package_get_contents($action['source']), $testing_only);
-
-			if (!file_exists($action['destination']))
-			{
-				$failure = true;
-			}
-		}
-		elseif ($action['type'] === 'require-dir')
-		{
-			copytree($action['source'], $action['destination']);
-			// Any other theme folders?
-			if (!empty($context['theme_copies']) && !empty($context['theme_copies'][$action['type']][$action['destination']]))
-			{
-				foreach ($context['theme_copies'][$action['type']][$action['destination']] as $theme_destination)
-				{
-					copytree($action['source'], $theme_destination);
-				}
-			}
-		}
-		elseif ($action['type'] === 'require-file')
-		{
-			if (!mktree(dirname($action['destination']), 0755) || !is_writable(dirname($action['destination'])))
-			{
-				$failure |= !mktree(dirname($action['destination']), 0777);
-			}
-
-			package_put_contents($action['destination'], package_get_contents($action['source']), $testing_only);
-
-			$failure |= !copy($action['source'], $action['destination']);
-
-			// Any other theme files?
-			if (!empty($context['theme_copies']) && !empty($context['theme_copies'][$action['type']][$action['destination']]))
-			{
-				foreach ($context['theme_copies'][$action['type']][$action['destination']] as $theme_destination)
-				{
-					if (!mktree(dirname($theme_destination), 0755) || !is_writable(dirname($theme_destination)))
-					{
-						$failure |= !mktree(dirname($theme_destination), 0777);
-					}
-
-					package_put_contents($theme_destination, package_get_contents($action['source']), $testing_only);
-
-					$failure |= !copy($action['source'], $theme_destination);
-				}
-			}
-		}
-		elseif ($action['type'] === 'move-file')
-		{
-			if (!mktree(dirname($action['destination']), 0755) || !is_writable(dirname($action['destination'])))
-			{
-				$failure |= !mktree(dirname($action['destination']), 0777);
-			}
-
-			$failure |= !rename($action['source'], $action['destination']);
-		}
-		elseif ($action['type'] === 'move-dir')
-		{
-			if (!mktree($action['destination'], 0755) || !is_writable($action['destination']))
-			{
-				$failure |= !mktree($action['destination'], 0777);
-			}
-
-			$failure |= !rename($action['source'], $action['destination']);
-		}
-		elseif ($action['type'] === 'remove-dir')
-		{
-			deltree($action['filename']);
-
-			// Any other theme folders?
-			if (!empty($context['theme_copies']) && !empty($context['theme_copies'][$action['type']][$action['filename']]))
-			{
-				foreach ($context['theme_copies'][$action['type']][$action['filename']] as $theme_destination)
-				{
-					deltree($theme_destination);
-				}
-			}
-		}
-		elseif ($action['type'] === 'remove-file')
-		{
-			// Make sure the file exists before deleting it.
-			if (file_exists($action['filename']))
-			{
-				package_chmod($action['filename']);
-				$failure |= !unlink($action['filename']);
-			}
-			// The file that was supposed to be deleted couldn't be found.
-			else
-			{
-				$failure = true;
-			}
-
-			// Any other theme folders?
-			if (!empty($context['theme_copies']) && !empty($context['theme_copies'][$action['type']][$action['filename']]))
-			{
-				foreach ($context['theme_copies'][$action['type']][$action['filename']] as $theme_destination)
-				{
-					if (file_exists($theme_destination))
-					{
-						$failure |= !unlink($theme_destination);
-					}
-					else
-					{
-						$failure = true;
-					}
-				}
-			}
-		}
-	}
-
-	return $not_done;
+	$parser = new PackageParser();
+	return $parser->parsePackageInfo($packageXML, $testing_only, $method, $previous_version);
 }
 
 /**
@@ -1691,11 +599,6 @@ function parse_path($path)
 		$dirs['PACKAGE'] = $temp_path;
 	}
 
-	if ($path === '')
-	{
-		trigger_error('parse_path(): There should never be an empty filename', E_USER_ERROR);
-	}
-
 	// Check if they are using some old software install paths
 	if (strpos($path, '$') === 0 && isset($dirs[strtoupper(substr($path, 1))]))
 	{
@@ -1722,29 +625,52 @@ function deltree($dir, $delete_dir = true)
 {
 	global $package_ftp;
 
-	if (!file_exists($dir))
+	$fileFunc = FileFunctions::instance();
+
+	if (!$fileFunc->isDir($dir))
 	{
 		return;
 	}
 
-	// Read all the files in the directory
-	try
+	// Read all the files and directories in the parent directory
+	$iterator = new \RecursiveDirectoryIterator($dir, \FilesystemIterator::SKIP_DOTS);
+	$entrynames = new \RecursiveIteratorIterator($iterator, \RecursiveIteratorIterator::CHILD_FIRST, \RecursiveIteratorIterator::CATCH_GET_CHILD);
+
+	/** @var \SplFileInfo $entryname */
+	foreach ($entrynames as $entryname)
 	{
-		$entrynames = new FilesystemIterator($dir, FilesystemIterator::SKIP_DOTS);
-		foreach ($entrynames as $entryname)
+		if ($entryname->isDir() && $delete_dir)
 		{
-			// Recursively dive in to each directory looking for files to delete
-			if ($entryname->isDir())
+			if (isset($package_ftp))
 			{
-				deltree($entryname->getPathname());
+				$ftp_file = setFtpName($entryname->getRealPath());
+
+				if (!$fileFunc->isWritable($ftp_file . '/'))
+				{
+					$package_ftp->chmod($ftp_file, 0777);
+				}
+
+				$package_ftp->unlink($ftp_file);
 			}
-			// A file, delete it by any means necessary
-			elseif (isset($package_ftp))
+			else
+			{
+				if (!$fileFunc->isWritable($entryname))
+				{
+					$fileFunc->chmod($entryname->getRealPath());
+				}
+
+				@rmdir($entryname->getRealPath());
+			}
+		}
+		// A file, delete it by any means necessary
+		else
+		{
+			if (isset($package_ftp))
 			{
 				// Here, 755 doesn't really matter since we're deleting it anyway.
-				$ftp_file = strtr($entryname->getPathname(), array($_SESSION['pack_ftp']['root'] => ''));
+				$ftp_file = setFtpName($entryname->getPathname());
 
-				if (!$entryname->isWritable())
+				if (!$fileFunc->isWritable($ftp_file))
 				{
 					$package_ftp->chmod($ftp_file, 0777);
 				}
@@ -1755,97 +681,63 @@ function deltree($dir, $delete_dir = true)
 			{
 				if (!$entryname->isWritable())
 				{
-					elk_chmod($entryname->getPathname(), 0777);
+					$fileFunc->chmod($entryname->getRealPath());
 				}
 
-				@unlink($entryname->getPathname());
+				$fileFunc->delete($entryname->getRealPath());
 			}
 		}
 	}
-	catch (UnexpectedValueException $e)
-	{
-		// Can't open the directory for reading, try FTP to remove it before quiting
-		if ($delete_dir && isset($package_ftp))
-		{
-			$ftp_file = strtr($dir, array($_SESSION['pack_ftp']['root'] => ''));
-			if (!is_writable($dir . '/'))
-			{
-				$package_ftp->chmod($ftp_file, 0777);
-			}
-			$package_ftp->unlink($ftp_file);
-		}
 
-		return;
-	}
-
-	// Remove the directory entry as well?
+	// Finish off with the directory itself
 	if ($delete_dir)
 	{
 		if (isset($package_ftp))
 		{
-			$ftp_file = strtr($dir, array($_SESSION['pack_ftp']['root'] => ''));
-
-			if (!is_writable($dir . '/'))
-			{
-				$package_ftp->chmod($ftp_file, 0777);
-			}
-
+			$ftp_file = setFtpName(realpath($dir));
 			$package_ftp->unlink($ftp_file);
 		}
 		else
 		{
-			if (!is_writable($dir))
-			{
-				elk_chmod($dir, 0777);
-			}
-
-			@rmdir($dir);
+			@rmdir(realpath($dir));
 		}
 	}
 }
 
 /**
- * Creates the specified tree structure with the mode specified.
+ * Creates the specified tree structure with a mode that permits write access.
  *
  * - Creates every directory in path until it finds one that already exists.
  *
  * @param string $strPath
- * @param int|false $mode
+ * @param bool $mode true attempts to make a writable tree
  * @return bool true if successful, false otherwise
  * @package Packages
  */
-function mktree($strPath, $mode)
+function mktree($strPath, $mode = true)
 {
 	global $package_ftp;
 
-	// If its already a directory
-	if (is_dir($strPath))
+	$fileFunc = FileFunctions::instance();
+
+	// If already a directory
+	if ($fileFunc->isDir($strPath))
 	{
 		// Not writable, try to make it so with FTP or not
-		if (!is_writable($strPath) && $mode !== false)
+		if (!$fileFunc->isWritable($strPath) && $mode !== false)
 		{
 			if (isset($package_ftp))
 			{
-				$package_ftp->chmod(strtr($strPath, array($_SESSION['pack_ftp']['root'] => '')), $mode);
+				$package_ftp->ftp_chmod(setFtpName($strPath), [0755, 0775, 0777]);
 			}
 			else
 			{
-				elk_chmod($strPath, $mode);
+				$fileFunc->chmod($strPath);
 			}
 		}
 
 		// See if we can open it for access, return the result
-		$test = @opendir($strPath);
-		if ($test)
-		{
-			closedir($test);
-
-			return is_writable($strPath);
-		}
-		else
-		{
-			return false;
-		}
+		return test_access($strPath);
 	}
 
 	// Is this an invalid path and/or we can't make the directory?
@@ -1855,56 +747,68 @@ function mktree($strPath, $mode)
 	}
 
 	// Is the dir writable and do we have permission to attempt to make it so
-	if (!is_writable(dirname($strPath)) && $mode !== false)
+	if (!$fileFunc->isWritable(dirname($strPath)) && $mode !== false)
 	{
 		if (isset($package_ftp))
 		{
-			$package_ftp->chmod(dirname(strtr($strPath, array($_SESSION['pack_ftp']['root'] => ''))), $mode);
+
+			$package_ftp->ftp_chmod(dirname(setFtpName($strPath)), [0755, 0775, 0777]);
 		}
 		else
 		{
-			elk_chmod(dirname($strPath), $mode);
+			$fileFunc->chmod(dirname($strPath));
 		}
 	}
 
-	// Return an ftp control if using FTP
-	if ($mode !== false && isset($package_ftp))
-	{
-		return $package_ftp->create_dir(strtr($strPath, array($_SESSION['pack_ftp']['root'] => '')));
-	}
 	// Can't change the mode so just return the current availability
-	elseif ($mode === false)
+	if ($mode === false)
 	{
-		$test = @opendir(dirname($strPath));
-		if ($test)
-		{
-			closedir($test);
-
-			return true;
-		}
-		else
-		{
-			return false;
-		}
+		return test_access($strPath);
 	}
-	// Only one choice left and thats to try and make a directory
+	// Let FTP take care of this directory creation
+	if (isset($package_ftp, $_SESSION['ftp_connection']))
+	{
+		return $package_ftp->create_dir(setFtpName($strPath));
+	}
+	// Only one choice left and that is to try and make a directory with PHP
 	else
 	{
-		@mkdir($strPath, $mode);
-
-		// Check and return if we were successful
-		$test = @opendir($strPath);
-		if ($test)
+		try
 		{
-			closedir($test);
-
-			return true;
+			return $fileFunc->createDirectory($strPath, false);
 		}
-		else
+		catch (\Exception $e)
 		{
 			return false;
 		}
 	}
+}
+
+/**
+ * Determines if a directory is writable
+ *
+ * @param string $strPath
+ * @return bool
+ */
+function dirTest($strPath)
+{
+	$fileFunc = FileFunctions::instance();
+
+	// If it is already a directory
+	if ($fileFunc->isDir($strPath))
+	{
+		// See if we can open it for access, return the result
+		return test_access($strPath);
+	}
+
+	// Is this an invalid path ?
+	if ($strPath === dirname($strPath) || !dirTest(dirname($strPath)))
+	{
+		return false;
+	}
+
+	// Return the current availability
+	return test_access(dirname($strPath));
 }
 
 /**
@@ -1920,14 +824,19 @@ function copytree($source, $destination)
 {
 	global $package_ftp;
 
-	if (!file_exists($destination) || !is_writable($destination))
-	{
-		mktree($destination, 0755);
-	}
+	$fileFunc = FileFunctions::instance();
 
-	if (!is_writable($destination))
+	// The destination must exist and be writable
+	if (!$fileFunc->isDIr($destination) || !$fileFunc->isWritable($destination))
 	{
-		mktree($destination, 0777);
+		try
+		{
+			$fileFunc->createDirectory($destination, false);
+		}
+		catch (\Exception $e)
+		{
+			return;
+		}
 	}
 
 	$current_dir = opendir($source);
@@ -1936,6 +845,7 @@ function copytree($source, $destination)
 		return;
 	}
 
+	// Copy the files over by whatever means we have enabled
 	while (($entryname = readdir($current_dir)))
 	{
 		if (in_array($entryname, array('.', '..')))
@@ -1945,28 +855,29 @@ function copytree($source, $destination)
 
 		if (isset($package_ftp))
 		{
-			$ftp_file = strtr($destination . '/' . $entryname, array($_SESSION['pack_ftp']['root'] => ''));
+			$ftp_file = setFtpName($destination . '/' . $entryname);
 		}
 
-		if (is_file($source . '/' . $entryname))
+		if (!$fileFunc->isDir($source . '/' . $entryname))
 		{
-			if (isset($package_ftp) && !file_exists($destination . '/' . $entryname))
+			if (isset($package_ftp) && !$fileFunc->fileExists($destination . '/' . $entryname))
 			{
 				$package_ftp->create_file($ftp_file);
 			}
-			elseif (!file_exists($destination . '/' . $entryname))
+			elseif (!$fileFunc->fileExists($destination . '/' . $entryname))
 			{
 				@touch($destination . '/' . $entryname);
 			}
 		}
 
-		package_chmod($destination . '/' . $entryname);
+		$packageChmod = new PackageChmod();
+		$packageChmod->pkgChmod($destination . '/' . $entryname);
 
-		if (is_dir($source . '/' . $entryname))
+		if ($fileFunc->isDir($source . '/' . $entryname))
 		{
 			copytree($source . '/' . $entryname, $destination . '/' . $entryname);
 		}
-		elseif (file_exists($destination . '/' . $entryname))
+		elseif ($fileFunc->fileExists($destination . '/' . $entryname))
 		{
 			package_put_contents($destination . '/' . $entryname, package_get_contents($source . '/' . $entryname));
 		}
@@ -1980,55 +891,12 @@ function copytree($source, $destination)
 }
 
 /**
- * Create a tree listing for a given directory path
- *
- * @param string $path
- * @param string $sub_path = ''
- * @return array
- * @package Packages
- */
-function listtree($path, $sub_path = '')
-{
-	$data = array();
-
-	$dir = @dir($path . $sub_path);
-	if (!$dir)
-	{
-		return array();
-	}
-
-	while (($entry = $dir->read()))
-	{
-		if ($entry === '.' || $entry === '..')
-		{
-			continue;
-		}
-
-		if (is_dir($path . $sub_path . '/' . $entry))
-		{
-			$data = array_merge($data, listtree($path, $sub_path . '/' . $entry));
-		}
-		else
-		{
-			$data[] = array(
-				'filename' => $sub_path === '' ? $entry : $sub_path . '/' . $entry,
-				'size' => filesize($path . $sub_path . '/' . $entry),
-				'skipped' => false,
-			);
-		}
-	}
-	$dir->close();
-
-	return $data;
-}
-
-/**
  * Parses a xml-style modification file (file).
  *
  * @param string $file
- * @param bool $testing = true tells it the modifications shouldn't actually be saved.
+ * @param bool $testing = true means modifications shouldn't actually be saved.
  * @param bool $undo = false specifies that the modifications the file requests should be undone; this doesn't work with everything (regular expressions.)
- * @param mixed[] $theme_paths = array()
+ * @param array $theme_paths = array()
  * @return array an array of those changes made.
  * @package Packages
  */
@@ -2331,26 +1199,9 @@ function parseModification($file, $testing = true, $undo = false, $theme_paths =
 					// Testing 1, 2, 3...
 					$failed = preg_match('~' . $actual_operation['searches'][$i]['preg_search'] . '~s', $working_data) === 0;
 
-					// Nope, search pattern not found.
-					if ($failed && $actual_operation['error'] === 'fatal')
-					{
-						$actions[] = array(
-							'type' => 'failure',
-							'filename' => $working_file,
-							'search' => $actual_operation['searches'][$i]['preg_search'],
-							'search_original' => $actual_operation['searches'][$i]['search'],
-							'replace_original' => $actual_operation['searches'][$i]['add'],
-							'position' => $search['position'],
-							'is_custom' => $theme > 1 ? $theme : 0,
-							'failed' => $failed,
-						);
-
-						$everything_found = false;
-						continue;
-					}
-
-					// Found, but in this case, that means failure!
-					elseif (!$failed && $actual_operation['error'] === 'required')
+					// Nope, search pattern not found, or Found, but in this case, that means failure!
+					if (($failed && $actual_operation['error'] === 'fatal')
+						|| (!$failed && $actual_operation['error'] === 'required'))
 					{
 						$actions[] = array(
 							'type' => 'failure',
@@ -2394,7 +1245,8 @@ function parseModification($file, $testing = true, $undo = false, $theme_paths =
 			// Fix any little helper symbols ;).
 			$working_data = strtr($working_data, array('[$PACKAGE1$]' => '$', '[$PACKAGE2$]' => '\\'));
 
-			package_chmod($working_file);
+			$packageChmod = new PackageChmod();
+			$packageChmod->pkgChmod($working_file);
 
 			if ((file_exists($working_file) && !is_writable($working_file)) || (!file_exists($working_file) && !is_writable(dirname($working_file))))
 			{
@@ -2492,8 +1344,9 @@ function package_get_contents($filename)
  */
 function package_put_contents($filename, $data, $testing = false)
 {
+	/** @var $package_ftp \ElkArte\Http\FtpConnection */
 	global $package_ftp, $package_cache, $modSettings;
-	static $text_filetypes = array('php', 'txt', '.js', 'css', 'vbs', 'tml', 'htm');
+	static $text_filetypes = array('php', 'txt', 'js', 'css', 'vbs', 'html', 'htm', 'log', 'xml', 'csv');
 
 	if (!isset($package_cache))
 	{
@@ -2510,25 +1363,28 @@ function package_put_contents($filename, $data, $testing = false)
 		}
 	}
 
-	if (isset($package_ftp))
+	$fileFunc = FileFunctions::instance();
+	if (isset($package_ftp, $_SESSION['ftp_connection']))
 	{
-		$ftp_file = strtr($filename, array($_SESSION['pack_ftp']['root'] => ''));
+		$ftp_file = setFtpName($filename);
 	}
 
-	if (!file_exists($filename) && isset($package_ftp))
+	@touch($filename);
+	if (!$fileFunc->fileExists($filename))
 	{
-		$package_ftp->create_file($ftp_file);
-	}
-	elseif (!file_exists($filename))
-	{
-		@touch($filename);
+		 if (isset($package_ftp))
+		 {
+			 $package_ftp->create_file($ftp_file);
+		 }
 	}
 
-	package_chmod($filename);
+	$packageChmod = new PackageChmod();
+	$packageChmod->pkgChmod($filename);
 
 	if (!$testing && (strpos($filename, 'packages/') !== false || $package_cache === false))
 	{
-		$fp = @fopen($filename, in_array(substr($filename, -3), $text_filetypes) ? 'w' : 'wb');
+		$path_ext = pathinfo($filename, PATHINFO_EXTENSION);
+		$fp = @fopen($filename, in_array($path_ext, $text_filetypes) ? 'w' : 'wb');
 
 		// We should show an error message or attempt a rollback, no?
 		if (!$fp)
@@ -2568,41 +1424,49 @@ function package_put_contents($filename, $data, $testing = false)
 function package_flush_cache($trash = false)
 {
 	global $package_ftp, $package_cache;
-	static $text_filetypes = array('php', 'txt', '.js', 'css', 'vbs', 'tml', 'htm');
+	static $text_filetypes = array('php', 'txt', 'js', 'css', 'vbs', 'html', 'htm', 'log', 'xml', 'csv');
 
 	if (empty($package_cache))
 	{
 		return;
 	}
 
+	$fileFunc = FileFunctions::instance();
+
 	// First, let's check permissions!
 	foreach ($package_cache as $filename => $data)
 	{
 		if (isset($package_ftp))
 		{
-			$ftp_file = strtr($filename, array($_SESSION['pack_ftp']['root'] => ''));
+			$path_parts = pathinfo($filename, PATHINFO_DIRNAME);
+			$path_parts['dirname'] = str_replace($_SESSION['ftp_connection']['root'], '', $path_parts['dirname']);
+			$ftp_file = $path_parts['dirname'] . '/' . $path_parts['filename'];
 		}
 
-		if (!file_exists($filename) && isset($package_ftp))
+		if (!$fileFunc->fileExists($filename))
 		{
-			$package_ftp->create_file($ftp_file);
-		}
-		elseif (!file_exists($filename))
-		{
-			@touch($filename);
+			if (isset($package_ftp))
+			{
+				$package_ftp->create_file($ftp_file);
+			}
+			else
+			{
+				@touch($filename);
+			}
 		}
 
-		$result = package_chmod($filename);
+		$packageChmod = new PackageChmod();
+		$result = $packageChmod->pkgChmod($filename);
 
 		// If we are not doing our test pass, then lets do a full write check
-		if (!$trash && !is_dir($filename))
+		if (!$trash && !$fileFunc->isDir($filename))
 		{
 			// Acid test, can we really open this file for writing?
 			$fp = ($result) ? fopen($filename, 'r+') : $result;
 			if (!$fp)
 			{
 				// We should have package_chmod()'d them before, no?!
-				trigger_error('package_flush_cache(): some files are still not writable', E_USER_WARNING);
+				trigger_error('package_flush_cache(): (' . $filename . ') file is still not writable', E_USER_WARNING);
 
 				return;
 			}
@@ -2619,9 +1483,10 @@ function package_flush_cache($trash = false)
 
 	foreach ($package_cache as $filename => $data)
 	{
-		if (!is_dir($filename))
+		if (!$fileFunc->isDir($filename))
 		{
-			$fp = fopen($filename, in_array(substr($filename, -3), $text_filetypes) ? 'w' : 'wb');
+			$path_ext = pathinfo($filename, PATHINFO_EXTENSION);
+			$fp = fopen($filename, in_array($path_ext, $text_filetypes) ? 'w' : 'wb');
 			fwrite($fp, $data);
 			fclose($fp);
 		}
@@ -2634,191 +1499,15 @@ function package_flush_cache($trash = false)
  * Try to make a file writable.
  *
  * @param string $filename
- * @param string $perm_state = 'writable'
  * @param bool $track_change = false
  * @return bool True if it worked, false if it didn't
  * @package Packages
+ * @deprecated since 2.0 use PackageChmod class
  */
-function package_chmod($filename, $perm_state = 'writable', $track_change = false)
+function package_chmod($filename, $track_change = false)
 {
-	global $package_ftp;
-
-	if (file_exists($filename) && is_writable($filename) && $perm_state === 'writable')
-	{
-		return true;
-	}
-
-	// Start off checking without FTP.
-	if (!isset($package_ftp) || $package_ftp === false)
-	{
-		for ($i = 0; $i < 2; $i++)
-		{
-			$chmod_file = $filename;
-
-			// Start off with a less aggressive test.
-			if ($i === 0)
-			{
-				// If this file doesn't exist, then we actually want to look at whatever parent directory does.
-				$subTraverseLimit = 2;
-				while (!file_exists($chmod_file) && $subTraverseLimit)
-				{
-					$chmod_file = dirname($chmod_file);
-					$subTraverseLimit--;
-				}
-
-				// Keep track of the writable status here.
-				$file_permissions = @fileperms($chmod_file);
-			}
-			elseif (!file_exists($chmod_file) && $perm_state === 'writable')
-			{
-				// This looks odd, but it's an attempt to work around PHP suExec.
-				$file_permissions = @fileperms(dirname($chmod_file));
-
-				mktree(dirname($chmod_file), 0755);
-				@touch($chmod_file);
-				elk_chmod($chmod_file, 0755);
-			}
-			else
-			{
-				$file_permissions = @fileperms($chmod_file);
-			}
-
-
-			// This looks odd, but it's another attempt to work around PHP suExec.
-			if ($perm_state !== 'writable')
-			{
-				elk_chmod($chmod_file, $perm_state === 'execute' ? 0755 : 0644);
-			}
-			else
-			{
-				if (!@is_writable($chmod_file))
-				{
-					elk_chmod($chmod_file, 0755);
-				}
-				if (!@is_writable($chmod_file))
-				{
-					elk_chmod($chmod_file, 0777);
-				}
-				if (!@is_writable(dirname($chmod_file)))
-				{
-					elk_chmod($chmod_file, 0755);
-				}
-				if (!@is_writable(dirname($chmod_file)))
-				{
-					elk_chmod($chmod_file, 0777);
-				}
-			}
-
-			// The ultimate writable test.
-			if ($perm_state === 'writable')
-			{
-				$fp = is_dir($chmod_file) ? @opendir($chmod_file) : @fopen($chmod_file, 'rb');
-				if (@is_writable($chmod_file) && $fp)
-				{
-					if (!is_dir($chmod_file))
-					{
-						fclose($fp);
-					}
-					else
-					{
-						closedir($fp);
-					}
-
-					// It worked!
-					if ($track_change)
-					{
-						$_SESSION['pack_ftp']['original_perms'][$chmod_file] = $file_permissions;
-					}
-
-					return true;
-				}
-			}
-			elseif ($perm_state !== 'writable' && isset($_SESSION['pack_ftp']['original_perms'][$chmod_file]))
-			{
-				unset($_SESSION['pack_ftp']['original_perms'][$chmod_file]);
-			}
-		}
-
-		// If we're here we're a failure.
-		return false;
-	}
-	// Otherwise we do have FTP?
-	elseif ($package_ftp !== false && !empty($_SESSION['pack_ftp']))
-	{
-		$ftp_file = strtr($filename, array($_SESSION['pack_ftp']['root'] => ''));
-
-		// This looks odd, but it's an attempt to work around PHP suExec.
-		if (!file_exists($filename) && $perm_state === 'writable')
-		{
-			$file_permissions = @fileperms(dirname($filename));
-
-			mktree(dirname($filename), 0755);
-			$package_ftp->create_file($ftp_file);
-			$package_ftp->chmod($ftp_file, 0755);
-		}
-		else
-		{
-			$file_permissions = @fileperms($filename);
-		}
-
-		if ($perm_state !== 'writable')
-		{
-			$package_ftp->chmod($ftp_file, $perm_state === 'execute' ? 0755 : 0644);
-		}
-		else
-		{
-			if (!@is_writable($filename))
-			{
-				$package_ftp->chmod($ftp_file, 0777);
-			}
-			if (!@is_writable(dirname($filename)))
-			{
-				$package_ftp->chmod(dirname($ftp_file), 0777);
-			}
-		}
-
-		if (@is_writable($filename))
-		{
-			if ($track_change)
-			{
-				$_SESSION['pack_ftp']['original_perms'][$filename] = $file_permissions;
-			}
-
-			return true;
-		}
-		elseif ($perm_state !== 'writable' && isset($_SESSION['pack_ftp']['original_perms'][$filename]))
-		{
-			unset($_SESSION['pack_ftp']['original_perms'][$filename]);
-		}
-	}
-
-	// Oh dear, we failed if we get here.
-	return false;
-}
-
-/**
- * Used to crypt the supplied ftp password in this session
- *
- * @param string $pass
- * @return string The encrypted password
- * @package Packages
- */
-function package_crypt($pass)
-{
-	$n = strlen($pass);
-
-	$salt = session_id();
-	while (strlen($salt) < $n)
-	{
-		$salt .= session_id();
-	}
-
-	for ($i = 0; $i < $n; $i++)
-	{
-		$pass[$i] = chr(ord($pass[$i]) ^ (ord($salt[$i]) - 32));
-	}
-
-	return $pass;
+	$packageChmod = new PackageChmod();
+	return $packageChmod->pkgChmod($filename, $track_change);
 }
 
 /**
@@ -2836,13 +1525,14 @@ function package_create_backup($id = 'backup')
 	$db = database();
 	$files = new ArrayIterator();
 	$use_relative_paths = empty($_REQUEST['use_full_paths']);
+	$fileFunc = FileFunctions::instance();
 
 	// The files that reside outside of sources, in the base, we add manually
 	$base_files = array('index.php', 'SSI.php', 'subscriptions.php',
 						'email_imap_cron.php', 'emailpost.php', 'emailtopic.php');
 	foreach ($base_files as $file)
 	{
-		if (file_exists(BOARDDIR . '/' . $file))
+		if ($fileFunc->fileExists(BOARDDIR . '/' . $file))
 		{
 			$files[$use_relative_paths ? $file : realpath(BOARDDIR . '/' . $file)] = BOARDDIR . '/' . $file;
 		}
@@ -2875,7 +1565,7 @@ function package_create_backup($id = 'backup')
 		foreach ($dirs as $dir => $dest)
 		{
 			$iter = new RecursiveIteratorIterator(
-				new RecursiveDirectoryIterator($dir, RecursiveDirectoryIterator::SKIP_DOTS),
+				new RecursiveDirectoryIterator($dir, FilesystemIterator::SKIP_DOTS),
 				RecursiveIteratorIterator::CHILD_FIRST,
 				RecursiveIteratorIterator::CATCH_GET_CHILD // Ignore "Permission denied"
 			);
@@ -2897,24 +1587,25 @@ function package_create_backup($id = 'backup')
 		}
 
 		// Make sure we have a backup directory and its writable
-		if (!file_exists(BOARDDIR . '/packages/backups'))
+		if (!$fileFunc->fileExists(BOARDDIR . '/packages/backups'))
 		{
-			mktree(BOARDDIR . '/packages/backups', 0777);
+			$fileFunc->createDirectory(BOARDDIR . '/packages/backups');
 		}
 
-		if (!is_writable(BOARDDIR . '/packages/backups'))
+		if (!$fileFunc->isWritable(BOARDDIR . '/packages/backups'))
 		{
-			package_chmod(BOARDDIR . '/packages/backups');
+			$packageChmod = new PackageChmod();
+			$packageChmod->pkgChmod(BOARDDIR . '/packages/backups');
 		}
 
 		// Name the output file, yyyy-mm-dd_before_package_name.tar.gz
 		$output_file = BOARDDIR . '/packages/backups/' . Util::strftime('%Y-%m-%d_') . preg_replace('~[$\\\\/:<>|?*"\']~', '', $id);
 		$output_ext = '.tar';
 
-		if (file_exists($output_file . $output_ext . '.gz'))
+		if ($fileFunc->fileExists($output_file . $output_ext . '.gz'))
 		{
 			$i = 2;
-			while (file_exists($output_file . '_' . $i . $output_ext . '.gz'))
+			while ($fileFunc->fileExists($output_file . '_' . $i . $output_ext . '.gz'))
 			{
 				$i++;
 			}
@@ -2925,18 +1616,18 @@ function package_create_backup($id = 'backup')
 			$output_file .= $output_ext;
 		}
 
-		// Buy some more time so we have enough to create this archive
+		// Buy some more time, so we have enough to create this archive
 		detectServer()->setTimeLimit(300);
 
-		$a = new PharData($output_file);
-		$a->buildFromIterator($files);
-		$a->compress(Phar::GZ);
+		$phar = new PharData($output_file);
+		$phar->buildFromIterator($files);
+		$phar->compress(Phar::GZ);
 
 		/*
 		 * Destroying the local var tells PharData to close its internal
 		 * file pointer, enabling us to delete the uncompressed tarball.
 		 */
-		unset($a);
+		unset($phar);
 		unlink($output_file);
 	}
 	catch (Exception $e)
@@ -2952,8 +1643,8 @@ function package_create_backup($id = 'backup')
 /**
  * Get the contents of a URL, irrespective of allow_url_fopen.
  *
- * - reads the contents of an http or ftp address and returns the page in a string
- * - will accept up to 3 page redirections (redirection_level in the function call is private)
+ * - reads the contents of http or ftp addresses and returns the page in a string
+ * - will accept up to (3) redirections (redirection_level in the function call is private)
  * - if post_data is supplied, the value and length is posted to the given url as form data
  * - URL must be supplied in lowercase
  *
@@ -2976,7 +1667,8 @@ function fetch_web_data($url, $post_data = '', $keep_alive = false, $redirection
 	{
 		return false;
 	}
-	elseif ($match[1] === 'ftp')
+
+	if ($match[1] === 'ftp')
 	{
 		// Establish a connection and attempt to enable passive mode.
 		$ftp = new FtpConnection(($match[2] ? 'ssl://' : '') . $match[3], empty($match[5]) ? 21 : $match[5], 'anonymous', $webmaster_email);
@@ -2998,7 +1690,6 @@ function fetch_web_data($url, $post_data = '', $keep_alive = false, $redirection
 		// The server should now say something in acknowledgement.
 		$ftp->check_response(150);
 
-		$data = '';
 		while (!feof($fp))
 		{
 			$data .= fread($fp, 4096);
@@ -3010,7 +1701,7 @@ function fetch_web_data($url, $post_data = '', $keep_alive = false, $redirection
 		$ftp->close();
 	}
 	// More likely a standard HTTP URL, first try to use cURL if available
-	elseif (isset($match[1]) && $match[1] === 'http')
+	elseif ($match[1] === 'http')
 	{
 		// Choose the fastest and most robust way
 		if (function_exists('curl_init'))
@@ -3032,10 +1723,8 @@ function fetch_web_data($url, $post_data = '', $keep_alive = false, $redirection
 		{
 			return $fetch_data->result('body');
 		}
-		else
-		{
-			return false;
-		}
+
+		return false;
 	}
 
 	return $data;
@@ -3167,7 +1856,7 @@ function checkPackageDependency($id)
 /**
  * Adds a record to the log packages table
  *
- * @param mixed[] $packageInfo
+ * @param array $packageInfo
  * @param string $failed_step_insert
  * @param string $themes_installed
  * @param string $db_changes
@@ -3247,35 +1936,45 @@ function isAuthorizedServer($remote_url)
 }
 
 /**
- * Simple wrapper around chmod
+ * The ultimate writable test.
  *
- * - Checks proper value for mode is supplied
- * - Consolidates chmod error suppression to single function
- *
- * @param string $file
- * @param string|int|null $mode
- *
+ * @param $item
  * @return bool
  */
-function elk_chmod($file, $mode = null)
+function test_access($item)
 {
-	$result = false;
+	$fileFunc = FileFunctions::instance();
 
-	$mode = trim($mode);
-	if (empty($mode) || !is_numeric($mode))
+	$fp = $fileFunc->isDir($item) ? @opendir($item) : @fopen($item, 'rb');
+	if ($fileFunc->isWritable($item) && $fp)
 	{
-		$mode = is_dir($file) ? 0755 : 0664;
+		if (!$fileFunc->isDir($item))
+		{
+			fclose($fp);
+		}
+		else
+		{
+			closedir($fp);
+		}
+
+		return true;
 	}
 
-	// Make sure we have a form of 0777 or '777' or '0777' so its safe for intval '8'
-	if (($mode % 10) >= 8)
-	{
-		$mode = decoct($mode);
-	}
-	if ($mode == decoct(octdec("$mode")))
-	{
-		$result = @chmod($file, intval($mode, 8));
-	}
+	return false;
+}
 
-	return $result;
+/**
+ * Sets the base pathname as required by the FTP root (chrooted) directory
+ * e.g. /var/www/clients/client1/web1/webs/somefile.txt => /web1/webs/somefile.txt
+ *
+ * @param string $item
+ * @return string
+ */
+function setFtpName($item)
+{
+	$path_parts = pathinfo($item);
+	$path_parts['dirname'] = $path_parts['dirname'] === '.' ? '' : $path_parts['dirname'];
+	$path_parts['dirname'] = str_replace($_SESSION['ftp_connection']['root'], '', $path_parts['dirname']);
+
+	return $path_parts['dirname'] . '/' . $path_parts['filename'];
 }

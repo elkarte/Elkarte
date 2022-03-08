@@ -15,13 +15,13 @@
  *
  */
 
-namespace ElkArte\AdminController;
+namespace ElkArte\Packages;
 
 use ElkArte\AbstractController;
 use ElkArte\Action;
 use ElkArte\Exceptions\Exception;
+use ElkArte\FileFunctions;
 use ElkArte\Http\FtpConnection;
-use ElkArte\PackagesFilterIterator;
 use ElkArte\Languages\Txt;
 use ElkArte\Util;
 
@@ -110,6 +110,7 @@ class PackageServers extends AbstractController
 		global $txt, $context;
 
 		require_once(SUBSDIR . '/PackageServers.subs.php');
+		$fileFunc = FileFunctions::instance();
 
 		// Ensure we use the correct template, and page title.
 		$context['sub_template'] = 'servers';
@@ -119,8 +120,7 @@ class PackageServers extends AbstractController
 		$context['servers'] = fetchPackageServers();
 
 		// Check if we will be able to write new archives in /packages folder.
-		$context['package_download_broken'] = !is_writable(BOARDDIR . '/packages') || !is_writable(BOARDDIR . '/packages/installed.list');
-
+		$context['package_download_broken'] = !$fileFunc->isWritable(BOARDDIR . '/packages') || !$fileFunc->isWritable(BOARDDIR . '/packages/installed.list');
 		if ($context['package_download_broken'])
 		{
 			$this->ftp_connect();
@@ -136,13 +136,20 @@ class PackageServers extends AbstractController
 	 */
 	public function ftp_connect()
 	{
-		global $context, $modSettings;
+		global $context, $modSettings, $txt;
 
 		// Try to chmod from PHP first
-		@chmod(BOARDDIR . '/packages', 0777);
-		@chmod(BOARDDIR . '/packages/installed.list', 0777);
+		$fileFunc = FileFunctions::instance();
+		$fileFunc->chmod(BOARDDIR . '/packages');
+		$fileFunc->chmod(BOARDDIR . '/packages/installed.list');
 
-		$unwritable = !is_writable(BOARDDIR . '/packages') || !is_writable(BOARDDIR . '/packages/installed.list');
+		$unwritable = !$fileFunc->isWritable(BOARDDIR . '/packages') || !$fileFunc->isWritable(BOARDDIR . '/packages/installed.list');
+		if (!$unwritable)
+		{
+			// Using PHP was successful, no need for FTP
+			$context['package_download_broken'] = false;
+			return;
+		}
 
 		// Let's initialize $context
 		$context['package_ftp'] = array(
@@ -153,73 +160,80 @@ class PackageServers extends AbstractController
 			'error' => '',
 		);
 
-		if ($unwritable)
+		// Are they connected to their FTP account already?
+		if (isset($this->_req->post->ftp_username))
 		{
-			// Are they connecting to their FTP account already?
-			if (isset($this->_req->post->ftp_username))
-			{
-				$ftp = new FtpConnection($this->_req->post->ftp_server, $this->_req->post->ftp_port, $this->_req->post->ftp_username, $this->_req->post->ftp_password);
+			$ftp_server = $this->_req->getPost('ftp_server', 'trim');
+			$ftp_port = $this->_req->getPost('ftp_port', 'intval', 21);
+			$ftp_username = $this->_req->getPost('ftp_username', 'trim', '');
+			$ftp_password = $this->_req->getPost('ftp_password', 'trim', '');
+			$ftp_path = $this->_req->getPost('ftp_path', 'trim');
 
-				if ($ftp->error === false)
+			$ftp = new FtpConnection($ftp_server, $ftp_port, $ftp_username, $ftp_password);
+			if ($ftp->error === false)
+			{
+				// I know, I know... but a lot of people want to type /home/xyz/... which is wrong, but logical.
+				if (!$ftp->chdir($ftp_path))
 				{
-					// I know, I know... but a lot of people want to type /home/xyz/... which is wrong, but logical.
-					if (!$ftp->chdir($this->_req->post->ftp_path))
-					{
-						$ftp_error = $ftp->error;
-						$ftp->chdir(preg_replace('~^/home[2]?/[^/]+~', '', $this->_req->post->ftp_path));
-					}
+					$ftp_error = $ftp->error;
+					$ftp->chdir(preg_replace('~^/home[2]?/[^/]+~', '', $ftp_path));
 				}
 			}
+		}
 
-			// No attempt yet, or we had an error last time
-			if (!isset($ftp) || $ftp->error !== false)
+		// No attempt yet, or we had an error last time
+		if (!isset($ftp) || $ftp->error !== false)
+		{
+			// Maybe we didn't even try yet
+			if (!isset($ftp))
 			{
-				// Maybe we didn't even try yet
-				if (!isset($ftp))
-				{
-					$ftp = new FtpConnection(null);
-				}
-				// ...or we failed
-				elseif ($ftp->error !== false && !isset($ftp_error))
-				{
-					$ftp_error = $ftp->last_message === null ? '' : $ftp->last_message;
-				}
-
-				list ($username, $detect_path, $found_path) = $ftp->detect_path(BOARDDIR);
-
-				if ($found_path || !isset($this->_req->post->ftp_path))
-				{
-					$this->_req->post->ftp_path = $detect_path;
-				}
-
-				if (!isset($this->_req->post->ftp_username))
-				{
-					$this->_req->post->ftp_username = $username;
-				}
-
-				// Fill the boxes for a FTP connection with data from the previous attempt too, if any
-				$context['package_ftp'] = array(
-					'server' => $this->_req->post->ftp_server ?? ($modSettings['package_server'] ?? 'localhost'),
-					'port' => $this->_req->post->ftp_port ?? ($modSettings['package_port'] ?? '21'),
-					'username' => $this->_req->post->ftp_username ?? ($modSettings['package_username'] ?? ''),
-					'path' => $this->_req->post->ftp_path,
-					'error' => empty($ftp_error) ? null : $ftp_error,
-				);
-
-				// Announce the template it's time to display the ftp connection box.
-				$context['package_download_broken'] = true;
+				$ftp = new FtpConnection(null);
 			}
-			else
+			// ...or we failed
+			elseif ($ftp->error !== false && !isset($ftp_error))
 			{
-				// FTP connection has succeeded
-				$context['package_download_broken'] = false;
-
-				// Try to chmod packages folder and our list file.
-				$ftp->chmod('packages', 0777);
-				$ftp->chmod('packages/installed.list', 0777);
-
-				$ftp->close();
+				$response = $txt['package_ftp_' . $ftp->error] ?? $ftp->error;
+				$ftp_error = empty($ftp->last_message) ? $response : $ftp->last_message;
 			}
+
+			// Grab a few, often wrong, items to fill in the form.
+			list ($username, $detect_path, $found_path) = $ftp->detect_path(BOARDDIR);
+
+			if ($found_path || !isset($ftp_path))
+			{
+				$ftp_path = $detect_path;
+			}
+
+			if (empty($ftp_username))
+			{
+				$ftp_username = $modSettings['package_username'] ?? $username;
+			}
+
+			// Fill the boxes for a FTP connection with data from the previous attempt too, if any
+			$context['package_ftp'] = array(
+				'server' => $ftp_server ?? ($modSettings['package_server'] ?? 'localhost'),
+				'port' => $ftp_port ?? ($modSettings['package_port'] ?? '21'),
+				'username' => $ftp_username ?? ($modSettings['package_username'] ?? ''),
+				'path' => $ftp_path,
+				'error' => empty($ftp_error) ? null : $ftp_error,
+			);
+
+			// Announce the template it's time to display the ftp connection box.
+			$context['package_download_broken'] = true;
+
+			// Prevent browsers from auto completing the FTP password
+			theme()->addInlineJavascript('disableAutoComplete();', true);
+		}
+		else
+		{
+			// FTP connection has succeeded
+			$context['package_download_broken'] = false;
+			$context['package_ftp']['connection'] = $txt['package_ftp_test_success'];
+
+			// Try to chmod packages folder and our list file.
+			$ftp->ftp_chmod('packages', [0755, 0775, 0777]);
+			$ftp->ftp_chmod('packages/installed.list', [0664, 0666]);
+			$ftp->close();
 		}
 	}
 
@@ -492,7 +506,7 @@ class PackageServers extends AbstractController
 			$invalid = array_merge(array_map('chr', range(0, 31)), array('<', '>', ':', '"', '/', '\\', '|', '?', '*'));
 
 			// We could read the package info and see if we have a duplicate id & version, however that is
-			// not always accurate, especially when dealing with repos.  So for now just put in in no conflict mode
+			// not always accurate, especially when dealing with repos.  So for now just put in no conflict mode
 			// and do the save.
 			if ($this->_req->getQuery('area') === 'packageservers' && $this->_req->getQuery('sa') === 'download')
 			{
@@ -508,7 +522,7 @@ class PackageServers extends AbstractController
 	}
 
 	/**
-	 * Case insensitive natural sort for packages
+	 * Case-insensitive natural sort for packages
 	 *
 	 * @param array $a
 	 * @param array $b
@@ -543,17 +557,11 @@ class PackageServers extends AbstractController
 		$context['sub_template'] = 'downloaded';
 
 		// Security is good...
-		if (isset($this->_req->query->server))
-		{
-			checkSession('get');
-		}
-		else
-		{
-			checkSession();
-		}
+		checkSession(isset($this->_req->query->server) ? 'get' : '');
 
 		// To download something, we need either a valid server or url.
-		if (empty($this->_req->query->server) && (!empty($this->_req->query->get) && !empty($this->_req->post->package)))
+		if (empty($this->_req->query->server)
+			&& (!empty($this->_req->query->get) && !empty($this->_req->post->package)))
 		{
 			throw new Exception('package_get_error_is_zero', false);
 		}
@@ -635,23 +643,21 @@ class PackageServers extends AbstractController
 		}
 
 		// Save the package to disk, use FTP if necessary
-
-		create_chmod_control(
+		$create_chmod_control = new PackageChmod();
+		$create_chmod_control->createChmodControl(
 			array(BOARDDIR . '/packages/' . $package_name),
-			array('destination_url' => getUrl('admin', ['action' => 'admin', 'area' => 'packageservers', 'sa' => 'download', 'package' => $package_id, '{session_data}']
-				+ (isset($this->_req->query->server) ? ['server' => $this->_req->query->server] : [])
-				+ (isset($this->_req->query->auto) ? ['auto' => ''] : [])
-				+ (isset($this->_req->query->conflict) ? ['conflict' => ''] : [])), 'crash_on_error' => true));
+			array(
+				'destination_url' => getUrl('admin', ['action' => 'admin', 'area' => 'packageservers', 'sa' => 'download', 'package' => $package_id, '{session_data}']
+					+ (isset($this->_req->query->server) ? ['server' => $this->_req->query->server] : [])
+					+ (isset($this->_req->query->auto) ? ['auto' => ''] : [])
+					+ (isset($this->_req->query->conflict) ? ['conflict' => ''] : [])),
+				'crash_on_error' => true
+			)
+		);
 
 		package_put_contents(BOARDDIR . '/packages/' . $package_name, fetch_web_data($url . $package_id));
 
-		// Done!  Did we get this package automatically?
-		if (preg_match('~^http://[\w_\-]+\.elkarte\.net/~', $package_id) == 1 && strpos($package_id, 'dlattach') === false && isset($this->_req->query->auto))
-		{
-			redirectexit('action=admin;area=packages;sa=install;package=' . $package_name);
-		}
-
-		// You just downloaded a addon from SERVER_NAME_GOES_HERE.
+		// You just downloaded an addon from SERVER_NAME_GOES_HERE.
 		$context['package_server'] = $server;
 
 		// Read in the newly saved package information
@@ -662,7 +668,7 @@ class PackageServers extends AbstractController
 			throw new Exception('package_cant_download', false);
 		}
 
-		if ($context['package']['type'] === 'modification')
+		if ($context['package']['type'] === 'modification' || $context['package']['type'] === 'addon')
 		{
 			$context['package']['install']['link'] = '<a class="linkbutton" href="' . getUrl('admin', ['action' => 'admin', 'area' => 'packages', 'sa' => 'install', 'package' => $context['package']['filename']]) . '">' . $txt['install_mod'] . '</a>';
 		}
@@ -759,7 +765,7 @@ class PackageServers extends AbstractController
 				foreach ($packages as $package)
 				{
 					// No need to check these
-					if ($package->getFilename() == $packageName)
+					if ($package->getFilename() === $packageName)
 					{
 						continue;
 					}
@@ -785,7 +791,7 @@ class PackageServers extends AbstractController
 			}
 		}
 
-		if ($context['package']['type'] === 'modification')
+		if ($context['package']['type'] === 'modification' || $context['package']['type'] === 'addon')
 		{
 			$context['package']['install']['link'] = '<a class="linkbutton" href="' . getUrl('admin', ['action' => 'admin', 'area' => 'packages', 'sa' => 'install', 'package' => $context['package']['filename']]) . '">' . $txt['install_mod'] . '</a>';
 		}
@@ -885,6 +891,9 @@ class PackageServers extends AbstractController
 		// Give FTP a chance...
 		if ($context['package_download_broken'])
 		{
+			// Prevent browsers from auto completing the FTP password
+			theme()->addInlineJavascript('disableAutoComplete();', true);
+
 			$this->ftp_connect();
 		}
 	}

@@ -554,9 +554,9 @@ class Auth extends AbstractController
 
 		require_once(SUBSDIR . '/Auth.subs.php');
 
-		if (isset($_SESSION['pack_ftp']))
+		if (isset($_SESSION['ftp_connection']))
 		{
-			$_SESSION['pack_ftp'] = null;
+			$_SESSION['ftp_connection'] = null;
 		}
 
 		// It won't be first login anymore.

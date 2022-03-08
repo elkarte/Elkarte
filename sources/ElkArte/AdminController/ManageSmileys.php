@@ -23,6 +23,7 @@ use ElkArte\Cache\Cache;
 use ElkArte\Errors\Errors;
 use ElkArte\Exceptions\Exception;
 use ElkArte\FileFunctions;
+use ElkArte\Packages\PackageChmod;
 use ElkArte\SettingsForm\SettingsForm;
 use ElkArte\Languages\Txt;
 use ElkArte\Util;
@@ -1676,7 +1677,7 @@ class ManageSmileys extends AbstractController
 	 */
 	public function action_install()
 	{
-		global $modSettings, $context, $txt;
+		global $modSettings, $context, $txt, $scripturl;
 
 		isAllowedTo('manage_smileys');
 		checkSession('request');
@@ -1738,21 +1739,20 @@ class ManageSmileys extends AbstractController
 			deltree(BOARDDIR . '/packages/temp', false);
 		}
 
-		if (!mktree(BOARDDIR . '/packages/temp', 0755))
+		if (!mktree(BOARDDIR . '/packages/temp'))
 		{
 			deltree(BOARDDIR . '/packages/temp', false);
-			if (!mktree(BOARDDIR . '/packages/temp', 0777))
-			{
-				deltree(BOARDDIR . '/packages/temp', false);
-				// @todo not sure about url in destination_url
-				create_chmod_control(array(BOARDDIR . '/packages/temp/delme.tmp'), array('destination_url' => getUrl('admin', ['action' => 'admin', 'area' => 'smileys', 'sa' => 'install', 'set_gz' => $this->_req->query->set_gz]), 'crash_on_error' => true));
+			$chmod_control = new PackageChmod();
+			$chmod_control->createChmodControl(
+				array(BOARDDIR . '/packages/temp/delme.tmp'),
+				array(
+					'destination_url' => $scripturl . '?action=admin;area=smileys;sa=install;set_gz=' . $this->_req->query->set_gz,
+					'crash_on_error' => true
+				)
+			);
 
-				deltree(BOARDDIR . '/packages/temp', false);
-				if (!mktree(BOARDDIR . '/packages/temp', 0777))
-				{
-					throw new Exception('package_cant_download', false);
-				}
-			}
+			deltree(BOARDDIR . '/packages/temp', false);
+			throw new Exception('package_cant_download', false);
 		}
 
 		$extracted = read_tgz_file($destination, BOARDDIR . '/packages/temp');

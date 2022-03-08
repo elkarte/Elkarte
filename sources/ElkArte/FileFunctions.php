@@ -46,6 +46,8 @@ class FileFunctions
 
 			if ($this->isWritable($item))
 			{
+				clearstatcache(false, $item);
+
 				return true;
 			}
 		}
@@ -100,7 +102,7 @@ class FileFunctions
 		try
 		{
 			$dir = new \SplFileInfo($dir);
-			if ($dir->getType() === 'dir' && !$dir->isLink())
+			if ($dir->isDir() && $dir->getType() === 'dir' && !$dir->isLink())
 			{
 				return true;
 			}
@@ -128,6 +130,30 @@ class FileFunctions
 			if ($fileInfo->isFile() && !$fileInfo->isLink())
 			{
 				return true;
+			}
+		}
+		catch (\RuntimeException $e)
+		{
+			return false;
+		}
+
+		return false;
+	}
+
+	/**
+	 * fileperms() helper using spl functions.  fileperms can throw an e-warning
+	 *
+	 * @param string $item
+	 * @return int|bool
+	 */
+	public function filePerms($item)
+	{
+		try
+		{
+			$fileInfo = new \SplFileInfo($item);
+			if ($perms = $fileInfo->getPerms())
+			{
+				return $perms;
 			}
 		}
 		catch (\RuntimeException $e)
@@ -314,9 +340,10 @@ class FileFunctions
 	 * Use with *caution*, it is thorough, destructive and irreversible.
 	 *
 	 * @param string $path
+	 * @param bool $delete_dir if to remove the directory structure as well
 	 * @return bool
 	 */
-	public function rmDir($path)
+	public function rmDir($path, $delete_dir = true)
 	{
 		// @todo build a list of excluded directories
 		if (!$this->isDir($path))
@@ -334,7 +361,7 @@ class FileFunctions
 			// If its not writable try to make it so or removal will fail
 			if ($file->isWritable() || $this->chmod($file->getRealPath()))
 			{
-				if ($file->isDir())
+				if ($file->isDir() && $delete_dir)
 				{
 					$success = $success && rmdir($file->getRealPath());
 				}
@@ -386,6 +413,37 @@ class FileFunctions
 		}
 
 		return $directory;
+	}
+
+	/**
+	 * Create a full tree listing of files for a given directory path
+	 *
+	 * @param string $path
+	 * @return array
+	 */
+	public function listTree($path)
+	{
+		$iterator = new \RecursiveDirectoryIterator($path, \FilesystemIterator::SKIP_DOTS);
+		$files = new \RecursiveIteratorIterator($iterator, \RecursiveIteratorIterator::CHILD_FIRST, \RecursiveIteratorIterator::CATCH_GET_CHILD);
+		$tree = [];
+		/** @var \SplFileInfo $file */
+		foreach ($files as $file)
+		{
+			if ($file->isDir())
+			{
+				continue;
+			}
+
+			$sub_path = str_replace($path,'', $file->getPath());
+
+			$tree[] = array(
+				'filename' => $sub_path === '' ? $file->getFilename() : $sub_path . '/' . $file->getFilename(),
+				'size' => $file->getSize(),
+				'skipped' => false,
+			);
+		}
+
+		return $tree;
 	}
 
 	/**

@@ -14,7 +14,7 @@
  *
  */
 
-namespace ElkArte\AdminController;
+namespace ElkArte\Packages;
 
 use BBC\ParserWrapper;
 use ElkArte\AbstractController;
@@ -29,110 +29,39 @@ use ElkArte\Util;
  */
 class PackageActions extends AbstractController
 {
-	/**
-	 * Passed and updated array of themes to install in
-	 *
-	 * @var array
-	 */
+	/** @var array Passed and updated array of themes to install in */
 	public $themes_installed = array();
-	/**
-	 * Current action step of the passed actions
-	 *
-	 * @var array
-	 */
+	/** @var array Current action step of the passed actions */
 	public $thisAction = array();
-	/**
-	 * Holds the files that will need to be chmod'ed for the package to install
-	 *
-	 * @var array
-	 */
+	/** @var array Holds the files that will need to be chmod'ed for the package to install */
 	public $chmod_files = array();
-	/**
-	 * The actions that must be completed to install a package
-	 *
-	 * @var array
-	 */
+	/** @var array The actions that must be completed to install a package */
 	public $ourActions = array();
-	/**
-	 * If any of the steps will fail to complete
-	 *
-	 * @var bool
-	 */
+	/** @var bool If any of the steps will fail to complete */
 	public $has_failure = false;
-	/**
-	 * Details of what the failure entails
-	 *
-	 * @var string
-	 */
+	/** @var string Details of what the failure entails */
 	public $failure_details;
-	/**
-	 * Available during the install phase, holds what when wrong and where
-	 *
-	 * @var array
-	 */
+	/** @var array Available during the install phase, holds what when wrong and where */
 	public $failed_steps = array();
-	/**
-	 * Other themes found that this addon can be installed in
-	 *
-	 * @var array
-	 */
+	/** @var array Other themes found that this addon can be installed in */
 	public $themeFinds;
-	/**
-	 * Created during install for use in addPackageLog
-	 *
-	 * @var array
-	 */
+	/** @var array Created during install for use in addPackageLog */
 	public $credits_tag = array();
-	/**
-	 * Passed actions from parsePackageInfo
-	 *
-	 * @var array
-	 */
+	/** @var array Passed actions from parsePackageInfo */
 	protected $_passed_actions;
-	/**
-	 * Passed base path value for the package location within the temp directory
-	 *
-	 * @var string
-	 */
+	/** @var string Passed base path value for the package location within the temp directory */
 	protected $_base_path;
-	/**
-	 * Passed value to indicate if this is an install or uninstall pass
-	 *
-	 * @var bool
-	 */
+	/** @var bool Passed value to indicate if this is an install or uninstall pass */
 	protected $_uninstalling;
-	/**
-	 * Passed array of theme paths
-	 *
-	 * @var array
-	 */
+	/** @var array Passed array of theme paths */
 	protected $_theme_paths;
-	/**
-	 * Failed counter
-	 *
-	 * @var int
-	 */
+	/** @var int Failed counter */
 	private $_failed_count = 0;
-
-	/**
-	 * Current action step of the passed actions
-	 *
-	 * @var array
-	 */
+	/** @var array Current action step of the passed actions */
 	private $_action;
-
-	/**
-	 * Current check for a modification add/replace failure for the file being changed
-	 *
-	 * @var bool
-	 */
+	/** @var bool Current check for a modification add/replace failure for the file being changed */
 	private $_failure;
-
-	/**
-	 * Holds the last section of the file name
-	 *
-	 * @var string
-	 */
+	/** @var string Holds the last section of the file name */
 	private $_actual_filename;
 
 	/**
@@ -173,7 +102,7 @@ class PackageActions extends AbstractController
 	}
 
 	/**
-	 * "controller" for the test install actions
+	 * "controller" for the test installation actions
 	 */
 	public function action_test()
 	{
@@ -217,7 +146,7 @@ class PackageActions extends AbstractController
 			$this->thisAction = array();
 
 			// Work out exactly which test function we are calling
-			if (!array_key_exists($this->_action['type'], $subActions))
+			if (!isset($this->_action['type']) || !array_key_exists($this->_action['type'], $subActions))
 			{
 				continue;
 			}
@@ -361,15 +290,15 @@ class PackageActions extends AbstractController
 
 		if (file_exists(BOARDDIR . '/packages/temp/' . $this->_base_path . $this->_action['filename']))
 		{
-			$context[$type] = htmlspecialchars(trim(file_get_contents(BOARDDIR . '/packages/temp/' . $this->_base_path . $this->_action['filename']), "\n\r"), ENT_COMPAT, 'UTF-8');
+			$context[$type] = htmlspecialchars(trim(file_get_contents(BOARDDIR . '/packages/temp/' . $this->_base_path . $this->_action['filename']), "\n\r"), ENT_COMPAT);
 		}
 		elseif (file_exists($this->_action['filename']))
 		{
-			$context[$type] = htmlspecialchars(trim(file_get_contents($this->_action['filename']), "\n\r"), ENT_COMPAT, 'UTF-8');
+			$context[$type] = htmlspecialchars(trim(file_get_contents($this->_action['filename']), "\n\r"), ENT_COMPAT);
 		}
 		elseif (file_exists(BOARDDIR . '/packages/temp/' . $this->_action['filename']))
 		{
-			$context[$type] = htmlspecialchars(trim(file_get_contents(BOARDDIR . '/packages/temp/' . $this->_action['filename']), "\n\r"), ENT_COMPAT, 'UTF-8');
+			$context[$type] = htmlspecialchars(trim(file_get_contents(BOARDDIR . '/packages/temp/' . $this->_action['filename']), "\n\r"), ENT_COMPAT);
 		}
 
 		// Fancy or plain
@@ -656,7 +585,7 @@ class PackageActions extends AbstractController
 	}
 
 	/**
-	 * Hooks to add during the install
+	 * Hooks to add during the installation
 	 */
 	public function action_hook()
 	{
@@ -709,7 +638,7 @@ class PackageActions extends AbstractController
 			$installed_version = checkPackageDependency($this->_action['id']);
 
 			// Do a version level check (if requested) in the most basic way
-			$version_check = (isset($this->_action['version']) ? $installed_version == $this->_action['version'] : true);
+			$version_check = (!isset($this->_action['version']) || $installed_version == $this->_action['version']);
 		}
 
 		// Set success or failure information

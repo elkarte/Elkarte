@@ -14,7 +14,7 @@
  *
  */
 
-namespace ElkArte\AdminController;
+namespace ElkArte\Packages;
 
 use BBC\ParserWrapper;
 use ElkArte\AbstractController;
@@ -22,13 +22,10 @@ use ElkArte\Action;
 use ElkArte\Cache\Cache;
 use ElkArte\EventManager;
 use ElkArte\Exceptions\Exception;
-use ElkArte\Http\FtpConnection;
-use ElkArte\PackagesFilterIterator;
+use ElkArte\FileFunctions;
 use ElkArte\Languages\Txt;
 use ElkArte\User;
 use ElkArte\Util;
-use ElkArte\AttachmentsDirectory;
-use FilesystemIterator;
 
 /**
  * This class is the administration package manager controller.
@@ -39,54 +36,29 @@ use FilesystemIterator;
  */
 class Packages extends AbstractController
 {
-	/**
-	 * The id from the DB or an installed package
-	 *
-	 * @var int
-	 */
+	/** @var int The id from the DB or an installed package */
 	public $install_id;
-	/**
-	 * Array of installed theme paths
-	 *
-	 * @var string[]
-	 */
+
+	/** @var string[] Array of installed theme paths */
 	public $theme_paths;
-	/**
-	 * Array of files / directories that require permissions
-	 *
-	 * @var array
-	 */
+
+	/** @var array Array of files / directories that require permissions */
 	public $chmod_files;
-	/**
-	 * listing of files in a packages
-	 *
-	 * @var array|bool
-	 */
-	private $_extracted_files;
-	/**
-	 * Filename of the package
-	 *
-	 * @var string
-	 */
+
+	/** @var string Filename of the package */
 	private $_filename;
-	/**
-	 * Base path of the package
-	 *
-	 * @var string
-	 */
+
+	/** @var string Base path of the package */
 	private $_base_path;
-	/**
-	 * If this is an un-install pass or not
-	 *
-	 * @var bool
-	 */
+
+	/** @var bool If this is an un-install pass or not */
 	private $_uninstalling;
-	/**
-	 * If the package is installed, previously or not
-	 *
-	 * @var bool
-	 */
+
+	/** @var bool If the package is installed, previously or not */
 	private $_is_installed;
+
+	/** @var \ElkArte\FileFunctions */
+	private $fileFunc;
 
 	/**
 	 * Pre Dispatch, called before other methods.
@@ -95,6 +67,8 @@ class Packages extends AbstractController
 	{
 		// Generic subs for this controller
 		require_once(SUBSDIR . '/Package.subs.php');
+
+		$this->fileFunc = FileFunctions::instance();
 	}
 
 	/**
@@ -128,17 +102,16 @@ class Packages extends AbstractController
 			'uninstall2' => array($this, 'action_install2'),
 			'installed' => array($this, 'action_browse'),
 			'options' => array($this, 'action_options'),
-			'perms' => array($this, 'action_perms'),
 			'flush' => array($this, 'action_flush'),
 			'examine' => array($this, 'action_examine'),
 			'showoperations' => array($this, 'action_showoperations'),
 			// The following two belong to PackageServers,
 			// for UI's sake moved here at least temporarily
 			'servers' => array(
-				'controller' => '\\ElkArte\\AdminController\\PackageServers',
+				'controller' => '\\ElkArte\\Packages\\PackageServers',
 				'function' => 'action_list'),
 			'upload' => array(
-				'controller' => '\\ElkArte\\AdminController\\PackageServers',
+				'controller' => '\\ElkArte\\Packages\\PackageServers',
 				'function' => 'action_upload'),
 		);
 
@@ -153,9 +126,6 @@ class Packages extends AbstractController
 				'browse' => array(),
 				'installed' => array(
 					'description' => $txt['installed_packages_desc'],
-				),
-				'perms' => array(
-					'description' => $txt['package_file_perms_desc'],
 				),
 				// The following two belong to PackageServers,
 				// for UI's sake moved here at least temporarily
@@ -182,7 +152,7 @@ class Packages extends AbstractController
 	}
 
 	/**
-	 * Test install a package.
+	 * Test install/uninstall a package.
 	 */
 	public function action_install()
 	{
@@ -199,7 +169,7 @@ class Packages extends AbstractController
 		$this->_filename = (string) preg_replace('~[\.]+~', '.', $file);
 		$this->_uninstalling = $this->_req->query->sa === 'uninstall';
 
-		// If we can't find the file, our install ends here
+		// If we can't find the file, our installation ends here
 		if (!file_exists(BOARDDIR . '/packages/' . $this->_filename))
 		{
 			throw new Exception('package_no_file', false);
@@ -212,7 +182,11 @@ class Packages extends AbstractController
 		require_once(SUBSDIR . '/Themes.subs.php');
 
 		// Load up the package FTP information?
-		create_chmod_control();
+		$create_chmod_control = new PackageChmod();
+		$create_chmod_control->createChmodControl();
+
+		// Prevent browsers from auto completing the FTP password
+		theme()->addInlineJavascript('disableAutoComplete();', true);
 
 		// Make sure our temp directory exists and is empty.
 		if (file_exists(BOARDDIR . '/packages/temp'))
@@ -320,7 +294,8 @@ class Packages extends AbstractController
 		$this->chmod_files = !empty($pka->chmod_files) ? $pka->chmod_files : array();
 		if (!empty($this->chmod_files))
 		{
-			$ftp_status = create_chmod_control($this->chmod_files);
+			$chmod_control = new PackageChmod();
+			$ftp_status = $chmod_control->createChmodControl($this->chmod_files);
 			$context['ftp_needed'] = !empty($ftp_status['files']['notwritable']) && !empty($context['package_ftp']);
 		}
 
@@ -331,32 +306,33 @@ class Packages extends AbstractController
 	/**
 	 * Creates the packages temp directory
 	 *
-	 * - First trys as 755, failing moves to 777
+	 * - First try as 755, failing moves to 777
 	 * - Will try with FTP permissions for cases where the web server credentials
-	 * do not have create directory permissions
+	 * do not have "create" directory permissions
+	 *
+	 * @throws \ElkArte\Exceptions\Exception when no directory can be made
 	 */
 	private function _create_temp_dir()
 	{
-		global $context;
+		global $context, $scripturl, $package_ftp;
 
-		// Make the temp directory
-		if (!mktree(BOARDDIR . '/packages/temp', 0755))
+		// Try to Make the temp directory
+		if (!mktree(BOARDDIR . '/packages/temp'))
 		{
-			// 755 did not work, try 777?
 			deltree(BOARDDIR . '/packages/temp', false);
-			if (!mktree(BOARDDIR . '/packages/temp', 0777))
-			{
-				// That did not work either, we need additional permissions
-				deltree(BOARDDIR . '/packages/temp', false);
-				create_chmod_control(array(BOARDDIR . '/packages/temp/delme.tmp'), array('destination_url' => getUrl('admin', ['action' => 'admin', 'area' => 'packages', 'sa' => $this->_req->query->sa, 'package' => $context['filename']]), 'crash_on_error' => true));
+			$chmod_control = new PackageChmod();
+			$chmod_control->createChmodControl(
+				array(BOARDDIR . '/packages/temp/delme.tmp'),
+				array(
+					'destination_url' => $scripturl . '?action=admin;area=packages;sa=' . $this->_req->query->sa . ';package=' . ($context['filename'] ?? ''),
+					'crash_on_error' => true
+				)
+			);
 
-				// No temp directory was able to be made, that's fatal
-				deltree(BOARDDIR . '/packages/temp', false);
-				if (!mktree(BOARDDIR . '/packages/temp', 0777))
-				{
-					throw new Exception('package_cant_download', false);
-				}
-			}
+			// No temp directory was able to be made, that's fatal
+			deltree(BOARDDIR . '/packages/temp', false);
+			unset($package_ftp, $_SESSION['ftp_connection']);
+			throw new Exception('package_cant_download', false);
 		}
 	}
 
@@ -364,7 +340,7 @@ class Packages extends AbstractController
 	 * Extracts a package file in the packages/temp directory
 	 *
 	 * - Sets the base path as needed
-	 * - Loads $this->_extracted_files with the package file listing
+	 * - Loads $extracted_files with the package file listing
 	 */
 	private function _extract_files_temp()
 	{
@@ -372,12 +348,12 @@ class Packages extends AbstractController
 		if (is_file(BOARDDIR . '/packages/' . $this->_filename))
 		{
 			// Unpack the files in to the packages/temp directory
-			$this->_extracted_files = read_tgz_file(BOARDDIR . '/packages/' . $this->_filename, BOARDDIR . '/packages/temp');
+			$extracted_files = read_tgz_file(BOARDDIR . '/packages/' . $this->_filename, BOARDDIR . '/packages/temp');
 
 			// Determine the base path for the package
-			if ($this->_extracted_files && !file_exists(BOARDDIR . '/packages/temp/package-info.xml'))
+			if ($extracted_files && !$this->fileFunc->fileExists(BOARDDIR . '/packages/temp/package-info.xml'))
 			{
-				foreach ($this->_extracted_files as $file)
+				foreach ($extracted_files as $file)
 				{
 					if (basename($file['filename']) === 'package-info.xml')
 					{
@@ -393,13 +369,13 @@ class Packages extends AbstractController
 			}
 		}
 		// Perhaps its a directory then, assumed to be extracted
-		elseif (!empty($this->_filename) && is_dir(BOARDDIR . '/packages/' . $this->_filename))
+		elseif (!empty($this->_filename) && $this->fileFunc->isDir(BOARDDIR . '/packages/' . $this->_filename))
 		{
 			// Copy the directory to the temp directory
 			copytree(BOARDDIR . '/packages/' . $this->_filename, BOARDDIR . '/packages/temp');
 
 			// Get the file listing
-			$this->_extracted_files = listtree(BOARDDIR . '/packages/temp');
+			$this->fileFunc->listtree(BOARDDIR . '/packages/temp');
 			$this->_base_path = '';
 		}
 		// Well we don't know what it is then, so we stop
@@ -437,7 +413,8 @@ class Packages extends AbstractController
 				throw new Exception('package_cant_uninstall', false);
 			}
 
-			$actions = parsePackageInfo($packageInfo['xml'], $testing, 'uninstall');
+			$parser = new PackageParser();
+			$actions = $parser->parsePackageInfo($packageInfo['xml'], $testing, 'uninstall');
 
 			// Gadzooks!  There's no uninstaller at all!?
 			if (empty($actions))
@@ -462,7 +439,8 @@ class Packages extends AbstractController
 		elseif (isset($package_installed['old_version']) && $package_installed['old_version'] != $packageInfo['version'])
 		{
 			// Look for an upgrade...
-			$actions = parsePackageInfo($packageInfo['xml'], $testing, 'upgrade', $package_installed['old_version']);
+			$parser = new PackageParser();
+			$actions = $parser->parsePackageInfo($packageInfo['xml'], $testing, 'upgrade', $package_installed['old_version']);
 
 			// There was no upgrade....
 			if (empty($actions))
@@ -489,7 +467,8 @@ class Packages extends AbstractController
 
 		if (!isset($package_installed['old_version']) || $this->_is_installed)
 		{
-			$actions = parsePackageInfo($packageInfo['xml'], $testing, 'install');
+			$parser = new PackageParser();
+			$actions = $parser->parsePackageInfo($packageInfo['xml'], $testing, 'install');
 		}
 
 		return $actions;
@@ -545,7 +524,7 @@ class Packages extends AbstractController
 						if (!in_array(strtolower(strtr($real_path, array('\\' => '/'))), $themeFinds['other_themes']))
 						{
 							// Check if we will need to chmod this.
-							if (!mktree(dirname($real_path), false))
+							if (!dirTest(dirname($real_path)))
 							{
 								$temp = dirname($real_path);
 								while (!file_exists($temp) && strlen($temp) > 1)
@@ -597,7 +576,7 @@ class Packages extends AbstractController
 	}
 
 	/**
-	 * Actually installs a package
+	 * Actually installs/uninstalls a package
 	 */
 	public function action_install2()
 	{
@@ -620,7 +599,7 @@ class Packages extends AbstractController
 			throw new Exception('package_no_file', false);
 		}
 
-		// If this is an uninstall, we'll have an id.
+		// If this is an uninstallation, we'll have an id.
 		$this->install_id = $this->_req->getQuery('pid', 'intval', 0);
 
 		// Installing in themes will require some help
@@ -630,7 +609,13 @@ class Packages extends AbstractController
 		$this->_uninstalling = $this->_req->query->sa === 'uninstall2';
 
 		// Load up the package FTP information?
-		create_chmod_control(array(), array('destination_url' => getUrl('admin', ['action' => 'admin', 'area' => 'packages', 'sa' =>  $this->_req->query->sa, 'package' => $this->_req->query->package])));
+		$chmod_control = new PackageChmod();
+		$chmod_control->createChmodControl(
+			array(),
+			array(
+				'destination_url' => getUrl('admin', ['action' => 'admin', 'area' => 'packages', 'sa' =>  $this->_req->query->sa, 'package' => $this->_req->query->package])
+			)
+		);
 
 		// Make sure temp directory exists and is empty!
 		if (file_exists(BOARDDIR . '/packages/temp'))
@@ -715,7 +700,7 @@ class Packages extends AbstractController
 		// Is it actually installed?
 		$package_installed = isPackageInstalled($packageInfo['id'], $this->install_id);
 
-		// Fetch the install status and action log
+		// Fetch the installation status and action log
 		$install_log = $this->_get_package_actions($package_installed, $packageInfo, false);
 
 		// Set up the details for the sub template, linktree, etc
@@ -737,7 +722,6 @@ class Packages extends AbstractController
 		// @todo Make a log of any errors that occurred and output them?
 		if (!empty($install_log))
 		{
-			// @todo Make a log of any errors that occurred and output them?
 			$pka = new PackageActions(new EventManager());
 			$pka->setUser(User::$info);
 			$pka->install_init($install_log, $this->_uninstalling, $this->_base_path, $this->theme_paths, $themes_installed);
@@ -859,7 +843,8 @@ class Packages extends AbstractController
 		Cache::instance()->clean();
 
 		// Restore file permissions?
-		create_chmod_control(array(), array(), true);
+		$chmod_control = new PackageChmod();
+		$chmod_control->createChmodControl(array(), array(), true);
 	}
 
 	/**
@@ -870,29 +855,30 @@ class Packages extends AbstractController
 		global $txt, $context;
 
 		// No package?  Show him or her the door.
-		if (!isset($this->_req->query->package) || $this->_req->query->package == '')
+		$package = $this->_req->getQuery('package', 'trim', '');
+		if (empty($package))
 		{
 			redirectexit('action=admin;area=packages');
 		}
 
 		$context['linktree'][] = array(
-			'url' => getUrl('admin', ['action' => 'admin', 'area' => 'packages', 'sa' => 'list', 'package' => $this->_req->query->package]),
+			'url' => getUrl('admin', ['action' => 'admin', 'area' => 'packages', 'sa' => 'list', 'package' => $package]),
 			'name' => $txt['list_file']
 		);
 		$context['page_title'] .= ' - ' . $txt['list_file'];
 		$context['sub_template'] = 'list';
 
 		// The filename...
-		$context['filename'] = $this->_req->query->package;
+		$context['filename'] = $package;
 
 		// Let the unpacker do the work.
 		if (is_file(BOARDDIR . '/packages/' . $context['filename']))
 		{
 			$context['files'] = read_tgz_file(BOARDDIR . '/packages/' . $context['filename'], null);
 		}
-		elseif (is_dir(BOARDDIR . '/packages/' . $context['filename']))
+		elseif ($this->fileFunc->isDir(BOARDDIR . '/packages/' . $context['filename']))
 		{
-			$context['files'] = listtree(BOARDDIR . '/packages/' . $context['filename']);
+			$context['files'] = $this->fileFunc->listtree(BOARDDIR . '/packages/' . $context['filename']);
 		}
 	}
 
@@ -997,7 +983,14 @@ class Packages extends AbstractController
 			&& (substr($this->_req->query->package, -4) === '.zip' || substr($this->_req->query->package, -4) === '.tgz' || substr($this->_req->query->package, -7) === '.tar.gz' || is_dir(BOARDDIR . '/packages/' . $this->_req->query->package))
 			&& $this->_req->query->package !== 'backups' && substr($this->_req->query->package, 0, 1) !== '.')
 		{
-			create_chmod_control(array(BOARDDIR . '/packages/' . $this->_req->query->package), array('destination_url' => getUrl('admin', ['action' => 'admin', 'area' => 'packages', 'sa' => 'remove', 'package' => $this->_req->query->package]), 'crash_on_error' => true));
+			$chmod_control = new PackageChmod();
+			$chmod_control->createChmodControl(
+				array(BOARDDIR . '/packages/' . $this->_req->query->package),
+				array(
+					'destination_url' => getUrl('admin', ['action' => 'admin', 'area' => 'packages', 'sa' => 'remove', 'package' => $this->_req->query->package]),
+					'crash_on_error' => true
+				)
+			);
 
 			if (is_dir(BOARDDIR . '/packages/' . $this->_req->query->package))
 			{
@@ -1161,7 +1154,7 @@ class Packages extends AbstractController
 	}
 
 	/**
-	 * Test an FTP connection.
+	 * Test an FTP connection via Ajax
 	 *
 	 * @uses Xml Template, generic_xml sub template
 	 */
@@ -1172,7 +1165,8 @@ class Packages extends AbstractController
 		checkSession('get');
 
 		// Try to make the FTP connection.
-		create_chmod_control(array(), array('force_find_error' => true));
+		$chmod_control = new PackageChmod();
+		$chmod_control->createChmodControl(array(), array('force_find_error' => true));
 
 		// Deal with the template stuff.
 		theme()->getTemplates()->load('Xml');
@@ -1188,7 +1182,9 @@ class Packages extends AbstractController
 						'attributes' => array(
 							'success' => !empty($package_ftp) ? 1 : 0,
 						),
-						'value' => !empty($package_ftp) ? $txt['package_ftp_test_success'] : (isset($context['package_ftp'], $context['package_ftp']['error']) ? $context['package_ftp']['error'] : $txt['package_ftp_test_failed']),
+						'value' => !empty($package_ftp) ?
+							$txt['package_ftp_test_success']
+							: ($context['package_ftp']['error'] ?? $txt['package_ftp_test_failed']),
 					),
 				),
 			),
@@ -1204,7 +1200,7 @@ class Packages extends AbstractController
 
 		if (isset($this->_req->post->save))
 		{
-			checkSession('post');
+			checkSession();
 
 			updateSettings(array(
 				'package_server' => $this->_req->getPost('pack_server', 'trim|\\ElkArte\\Util::htmlspecialchars'),
@@ -1245,8 +1241,13 @@ class Packages extends AbstractController
 		// Can't be in here buddy.
 		isAllowedTo('admin_forum');
 
+		$operation_key = $this->_req->getQuery('operation_key', 'trim');
+		$filename = $this->_req->getQuery('filename', 'trim');
+		$package = $this->_req->getQuery('package', 'trim');
+		$install_id = $this->_req->getQuery('install_id', 'intval', 0);
+
 		// We need to know the operation key for the search and replace?
-		if (!isset($this->_req->query->operation_key, $this->_req->query->filename) && !is_numeric($this->_req->query->operation_key))
+		if (!isset($operation_key, $filename) && !is_numeric($operation_key))
 		{
 			throw new Exception('operation_invalid', 'general');
 		}
@@ -1258,7 +1259,7 @@ class Packages extends AbstractController
 		$reverse = isset($this->_req->query->reverse);
 
 		// Get the base name.
-		$context['filename'] = preg_replace('~[\.]+~', '.', $this->_req->query->package);
+		$context['filename'] = preg_replace('~[\.]+~', '.', $package);
 
 		// We need to extract this again.
 		if (is_file(BOARDDIR . '/packages/' . $context['filename']))
@@ -1281,10 +1282,10 @@ class Packages extends AbstractController
 				$context['base_path'] = '';
 			}
 		}
-		elseif (is_dir(BOARDDIR . '/packages/' . $context['filename']))
+		elseif ($this->fileFunc->isDir(BOARDDIR . '/packages/' . $context['filename']))
 		{
 			copytree(BOARDDIR . '/packages/' . $context['filename'], BOARDDIR . '/packages/temp');
-			$context['extracted_files'] = listtree(BOARDDIR . '/packages/temp');
+			$context['extracted_files'] = $this->fileFunc->listtree(BOARDDIR . '/packages/temp');
 			$context['base_path'] = '';
 		}
 
@@ -1292,9 +1293,8 @@ class Packages extends AbstractController
 		$theme_paths = getThemesPathbyID();
 
 		// For uninstall operations we only consider the themes in which the package is installed.
-		if ($reverse && !empty($this->_req->query->install_id))
+		if ($reverse && !empty($install_id))
 		{
-			$install_id = (int) $this->_req->query->install_id;
 			if ($install_id > 0)
 			{
 				$old_themes = loadThemesAffected($install_id);
@@ -1312,9 +1312,9 @@ class Packages extends AbstractController
 
 		// Ok lets get the content of the file.
 		$context['operations'] = array(
-			'search' => strtr(htmlspecialchars($mod_actions[$this->_req->query->operation_key]['search_original'], ENT_COMPAT, 'UTF-8'), array('[' => '&#91;', ']' => '&#93;')),
-			'replace' => strtr(htmlspecialchars($mod_actions[$this->_req->query->operation_key]['replace_original'], ENT_COMPAT, 'UTF-8'), array('[' => '&#91;', ']' => '&#93;')),
-			'position' => $mod_actions[$this->_req->query->operation_key]['position'],
+			'search' => strtr(htmlspecialchars($mod_actions[$operation_key]['search_original'], ENT_COMPAT), array('[' => '&#91;', ']' => '&#93;')),
+			'replace' => strtr(htmlspecialchars($mod_actions[$operation_key]['replace_original'], ENT_COMPAT), array('[' => '&#91;', ']' => '&#93;')),
+			'position' => $mod_actions[$operation_key]['position'],
 		);
 
 		// Let's do some formatting...
@@ -1329,629 +1329,9 @@ class Packages extends AbstractController
 	}
 
 	/**
-	 * Allow the admin to reset permissions on files.
-	 */
-	public function action_perms()
-	{
-		global $context, $txt, $modSettings, $package_ftp;
-
-		// Let's try and be good, yes?
-		checkSession('get');
-
-		// If we're restoring permissions this is just a pass through really.
-		if (isset($this->_req->query->restore))
-		{
-			create_chmod_control(array(), array(), true);
-			throw new Exception('no_access', false);
-		}
-
-		// This is a time and memory eating ...
-		detectServer()->setMemoryLimit('128M');
-		detectServer()->setTimeLimit(600);
-
-		// Load up some FTP stuff.
-		create_chmod_control();
-
-		if (empty($package_ftp) && !isset($this->_req->post->skip_ftp))
-		{
-			$ftp = new FtpConnection(null);
-			list ($username, $detect_path) = $ftp->detect_path(BOARDDIR);
-
-			$context['package_ftp'] = array(
-				'server' => $modSettings['package_server'] ?? 'localhost',
-				'port' => $modSettings['package_port'] ?? '21',
-				'username' => empty($username) ? ($modSettings['package_username'] ?? '') : $username,
-				'path' => $detect_path,
-				'form_elements_only' => true,
-			);
-		}
-		else
-		{
-			$context['ftp_connected'] = true;
-		}
-
-		// Define the template.
-		$context['page_title'] = $txt['package_file_perms'];
-		$context['sub_template'] = 'file_permissions';
-
-		// Define what files we're interested in, as a tree.
-		$context['file_tree'] = array(
-			strtr(BOARDDIR, array('\\' => '/')) => array(
-				'type' => 'dir',
-				'contents' => array(
-					'Settings.php' => array(
-						'type' => 'file',
-						'writable_on' => 'restrictive',
-					),
-					'Settings_bak.php' => array(
-						'type' => 'file',
-						'writable_on' => 'restrictive',
-					),
-					'attachments' => array(
-						'type' => 'dir',
-						'writable_on' => 'restrictive',
-					),
-					'avatars' => array(
-						'type' => 'dir_recursive',
-						'writable_on' => 'standard',
-					),
-					'cache' => array(
-						'type' => 'dir',
-						'writable_on' => 'restrictive',
-					),
-					'custom_avatar_dir' => array(
-						'type' => 'dir',
-						'writable_on' => 'restrictive',
-					),
-					'smileys' => array(
-						'type' => 'dir_recursive',
-						'writable_on' => 'standard',
-					),
-					'sources' => array(
-						'type' => 'dir_recursive',
-						'list_contents' => true,
-						'writable_on' => 'standard',
-						'contents' => array(
-							'database' => array(
-								'type' => 'dir',
-								'list_contents' => true,
-							),
-							'ElkArte' => array(
-								'type' => 'dir_recursive',
-								'list_contents' => true,
-							),
-							'ext' => array(
-								'type' => 'dir',
-								'list_contents' => true,
-							),
-							'subs' => array(
-								'type' => 'dir',
-								'list_contents' => true,
-							),
-						),
-					),
-					'themes' => array(
-						'type' => 'dir_recursive',
-						'writable_on' => 'standard',
-						'contents' => array(
-							'default' => array(
-								'type' => 'dir_recursive',
-								'list_contents' => true,
-								'contents' => array(
-									'languages' => array(
-										'type' => 'dir',
-										'list_contents' => true,
-									),
-								),
-							),
-						),
-					),
-					'packages' => array(
-						'type' => 'dir',
-						'writable_on' => 'standard',
-						'contents' => array(
-							'temp' => array(
-								'type' => 'dir',
-							),
-							'backup' => array(
-								'type' => 'dir',
-							),
-							'installed.list' => array(
-								'type' => 'file',
-								'writable_on' => 'standard',
-							),
-						),
-					),
-				),
-			),
-		);
-
-		// Directories that can move.
-		if (substr(SOURCEDIR, 0, strlen(BOARDDIR)) != BOARDDIR)
-		{
-			unset($context['file_tree'][strtr(BOARDDIR, array('\\' => '/'))]['contents']['sources']);
-			$context['file_tree'][strtr(SOURCEDIR, array('\\' => '/'))] = array(
-				'type' => 'dir',
-				'list_contents' => true,
-				'writable_on' => 'standard',
-			);
-		}
-
-		// Moved the cache?
-		if (substr(CACHEDIR, 0, strlen(BOARDDIR)) != BOARDDIR)
-		{
-			unset($context['file_tree'][strtr(BOARDDIR, array('\\' => '/'))]['contents']['cache']);
-			$context['file_tree'][strtr(CACHEDIR, array('\\' => '/'))] = array(
-				'type' => 'dir',
-				'list_contents' => false,
-				'writable_on' => 'restrictive',
-			);
-		}
-
-		$attachmentsDir = new AttachmentsDirectory($modSettings, database());
-		$context['file_tree'] = $attachmentsDir->getAttachmentsTree($context['file_tree']);
-
-		if (substr($modSettings['smileys_dir'], 0, strlen(BOARDDIR)) != BOARDDIR)
-		{
-			unset($context['file_tree'][strtr(BOARDDIR, array('\\' => '/'))]['contents']['smileys']);
-			$context['file_tree'][strtr($modSettings['smileys_dir'], array('\\' => '/'))] = array(
-				'type' => 'dir_recursive',
-				'writable_on' => 'standard',
-			);
-		}
-
-		if (substr($modSettings['avatar_directory'], 0, strlen(BOARDDIR)) != BOARDDIR)
-		{
-			unset($context['file_tree'][strtr(BOARDDIR, array('\\' => '/'))]['contents']['avatars']);
-			$context['file_tree'][strtr($modSettings['avatar_directory'], array('\\' => '/'))] = array(
-				'type' => 'dir',
-				'writable_on' => 'standard',
-			);
-		}
-
-		if (substr($modSettings['custom_avatar_dir'], 0, strlen(BOARDDIR)) != BOARDDIR)
-		{
-			unset($context['file_tree'][strtr(BOARDDIR, array('\\' => '/'))]['contents']['custom_avatar_dir']);
-			$context['file_tree'][strtr($modSettings['custom_avatar_dir'], array('\\' => '/'))] = array(
-				'type' => 'dir',
-				'writable_on' => 'restrictive',
-			);
-		}
-
-		// Load up any custom themes.
-		require_once(SUBSDIR . '/Themes.subs.php');
-		$themes = getCustomThemes();
-		foreach ($themes as $id => $theme)
-		{
-			// Skip the default
-			if ($id == 1)
-			{
-				continue;
-			}
-
-			if (substr(strtolower(strtr($theme['theme_dir'], array('\\' => '/'))), 0, strlen(BOARDDIR) + 7) === strtolower(strtr(BOARDDIR, array('\\' => '/')) . '/themes'))
-			{
-				$context['file_tree'][strtr(BOARDDIR, array('\\' => '/'))]['contents']['themes']['contents'][substr($theme['theme_dir'], strlen(BOARDDIR) + 8)] = array(
-					'type' => 'dir_recursive',
-					'list_contents' => true,
-					'contents' => array(
-						'languages' => array(
-							'type' => 'dir',
-							'list_contents' => true,
-						),
-					),
-				);
-			}
-			else
-			{
-				$context['file_tree'][strtr($theme['theme_dir'], array('\\' => '/'))] = array(
-					'type' => 'dir_recursive',
-					'list_contents' => true,
-					'contents' => array(
-						'languages' => array(
-							'type' => 'dir',
-							'list_contents' => true,
-						),
-					),
-				);
-			}
-		}
-
-		// If we're submitting then let's move on to another function to keep things cleaner..
-		if (isset($this->_req->post->action_changes))
-		{
-			return $this->action_perms_save();
-		}
-
-		$context['look_for'] = array();
-
-		// Are we looking for a particular tree - normally an expansion?
-		if (!empty($this->_req->query->find))
-		{
-			$context['look_for'][] = base64_decode($this->_req->query->find);
-		}
-
-		// Only that tree?
-		$context['only_find'] = isset($this->_req->query->xml) && !empty($this->_req->query->onlyfind) ? $this->_req->query->onlyfind : '';
-		if ($context['only_find'])
-		{
-			$context['look_for'][] = $context['only_find'];
-		}
-
-		// Have we got a load of back-catalogue trees to expand from a submit etc?
-		if (!empty($this->_req->query->back_look))
-		{
-			$potententialTrees = json_decode(base64_decode($this->_req->query->back_look), true);
-			foreach ($potententialTrees as $tree)
-			{
-				$context['look_for'][] = $tree;
-			}
-		}
-
-		// ... maybe posted?
-		if (!empty($this->_req->post->back_look))
-		{
-			$context['look_for'] = array_merge($context['look_for'], $this->_req->post->back_look);
-		}
-
-		$context['back_look_data'] = base64_encode(json_encode(array_slice($context['look_for'], 0, 15)));
-
-		// Are we finding more files than first thought?
-		$context['file_offset'] = !empty($this->_req->query->fileoffset) ? (int) $this->_req->query->fileoffset : 0;
-
-		// Don't list more than this many files in a directory.
-		$context['file_limit'] = 150;
-
-		// How many levels shall we show?
-		$context['default_level'] = empty($context['only_find']) ? 2 : 25;
-
-		// This will be used if we end up catching XML data.
-		$context['xml_data'] = array(
-			'roots' => array(
-				'identifier' => 'root',
-				'children' => array(
-					array(
-						'value' => preg_replace('~[^A-Za-z0-9_\-=:]~', ':-:', $context['only_find']),
-					),
-				),
-			),
-			'folders' => array(
-				'identifier' => 'folder',
-				'children' => array(),
-			),
-		);
-
-		foreach ($context['file_tree'] as $path => $data)
-		{
-			// Run this directory.
-			if (file_exists($path) && (empty($context['only_find']) || substr($context['only_find'], 0, strlen($path)) == $path))
-			{
-				// Get the first level down only.
-				fetchPerms__recursive($path, $context['file_tree'][$path], 1);
-				$context['file_tree'][$path]['perms'] = array(
-					'chmod' => @is_writable($path),
-					'perms' => @fileperms($path),
-				);
-			}
-			else
-			{
-				unset($context['file_tree'][$path]);
-			}
-		}
-
-		// Is this actually xml?
-		if (isset($this->_req->query->xml))
-		{
-			theme()->getTemplates()->load('Xml');
-			$context['sub_template'] = 'generic_xml';
-			theme()->getLayers()->removeAll();
-		}
-	}
-
-	/**
-	 * Actually action the permission changes they want.
-	 */
-	public function action_perms_save()
-	{
-		global $context, $txt, $time_start, $package_ftp;
-
-		umask(0);
-
-		$timeout_limit = 5;
-		$context['method'] = $this->_req->post->method === 'individual' ? 'individual' : 'predefined';
-		$context['back_look_data'] = $this->_req->post->back_look ?? array();
-
-		// Skipping use of FTP?
-		if (empty($package_ftp))
-		{
-			$context['skip_ftp'] = true;
-		}
-
-		// We'll start off in a good place, security. Make sure that if we're dealing with individual files that they seem in the right place.
-		if ($context['method'] === 'individual')
-		{
-			// Only these path roots are legal.
-			$legal_roots = array_keys($context['file_tree']);
-			$context['custom_value'] = (int) $this->_req->post->custom_value;
-
-			// Continuing?
-			if (isset($this->_req->post->toProcess))
-			{
-				$this->_req->post->permStatus = json_decode(base64_decode($this->_req->post->toProcess), true);
-			}
-
-			if (isset($this->_req->post->permStatus))
-			{
-				$context['to_process'] = array();
-				$validate_custom = false;
-				foreach ($this->_req->post->permStatus as $path => $status)
-				{
-					// Nothing to see here?
-					if ($status === 'no_change')
-					{
-						continue;
-					}
-
-					$legal = false;
-					foreach ($legal_roots as $root)
-					{
-						if (substr($path, 0, strlen($root)) == $root)
-						{
-							$legal = true;
-						}
-					}
-
-					if (!$legal)
-					{
-						continue;
-					}
-
-					// Check it exists.
-					if (!file_exists($path))
-					{
-						continue;
-					}
-
-					if ($status === 'custom')
-					{
-						$validate_custom = true;
-					}
-
-					// Now add it.
-					$context['to_process'][$path] = $status;
-				}
-				$context['total_items'] = isset($this->_req->post->totalItems) ? (int) $this->_req->post->totalItems : count($context['to_process']);
-
-				// Make sure the chmod status is valid?
-				if ($validate_custom)
-				{
-					if (!preg_match('~^[4567][4567][4567]$~', $context['custom_value']))
-					{
-						throw new Exception($txt['chmod_value_invalid']);
-					}
-				}
-
-				// Nothing to do?
-				if (empty($context['to_process']))
-				{
-					redirectexit('action=admin;area=packages;sa=perms' . (!empty($context['back_look_data']) ? ';back_look=' . base64_encode(json_encode($context['back_look_data'])) : '') . ';' . $context['session_var'] . '=' . $context['session_id']);
-				}
-			}
-			// Should never get here,
-			else
-			{
-				throw new Exception('no_access', false);
-			}
-
-			// Setup the custom value.
-			$custom_value = octdec('0' . $context['custom_value']);
-
-			// Start processing items.
-			foreach ($context['to_process'] as $path => $status)
-			{
-				if (in_array($status, array('execute', 'writable', 'read')))
-				{
-					package_chmod($path, $status);
-				}
-				elseif ($status === 'custom' && !empty($custom_value))
-				{
-					// Use FTP if we have it.
-					if (!empty($package_ftp) && !empty($_SESSION['pack_ftp']))
-					{
-						$ftp_file = strtr($path, array($_SESSION['pack_ftp']['root'] => ''));
-						$package_ftp->chmod($ftp_file, $custom_value);
-					}
-					else
-					{
-						@chmod($path, $custom_value);
-					}
-				}
-
-				// This fish is fried...
-				unset($context['to_process'][$path]);
-
-				// See if we're out of time?
-				if (time() - array_sum(explode(' ', $time_start)) > $timeout_limit)
-				{
-					pausePermsSave();
-				}
-			}
-		}
-		// If predefined this is a little different.
-		else
-		{
-			$context['predefined_type'] = $this->_req->getPost('predefined', 'trim|strval', 'restricted');
-			$context['total_items'] = $this->_req->getPost('totalItems', 'intval', 0);
-			$context['directory_list'] = isset($this->_req->post->dirList) ? json_decode(base64_decode($this->_req->post->dirList), true) : array();
-			$context['file_offset'] = $this->_req->getPost('fileOffset', 'intval', 0);
-
-			// Haven't counted the items yet?
-			if (empty($context['total_items']))
-			{
-				foreach ($context['file_tree'] as $path => $data)
-				{
-					if (is_dir($path))
-					{
-						$context['directory_list'][$path] = 1;
-						$context['total_items'] += $this->count_directories__recursive($path);
-						$context['total_items']++;
-					}
-				}
-			}
-
-			// Have we built up our list of special files?
-			if (!isset($this->_req->post->specialFiles) && $context['predefined_type'] !== 'free')
-			{
-				$context['special_files'] = array();
-
-				foreach ($context['file_tree'] as $path => $data)
-				{
-					$this->build_special_files__recursive($path, $data);
-				}
-			}
-			// Free doesn't need special files.
-			elseif ($context['predefined_type'] === 'free')
-			{
-				$context['special_files'] = array();
-			}
-			else
-			{
-				$context['special_files'] = json_decode(base64_decode($this->_req->post->specialFiles), true);
-			}
-
-			// Now we definitely know where we are, we need to go through again doing the chmod!
-			foreach ($context['directory_list'] as $path => $dummy)
-			{
-				// Do the contents of the directory first.
-				try
-				{
-					$file_count = 0;
-					$dont_chmod = false;
-
-					$entrys = new \FilesystemIterator($path, \FilesystemIterator::SKIP_DOTS);
-					foreach ($entrys as $entry)
-					{
-						$file_count++;
-
-						// Actually process this file?
-						if (!$dont_chmod && !$entry->isDir() && (empty($context['file_offset']) || $context['file_offset'] < $file_count))
-						{
-							$status = $context['predefined_type'] === 'free' || isset($context['special_files'][$entry->getPathname()]) ? 'writable' : 'execute';
-							package_chmod($entry->getPathname(), $status);
-						}
-
-						// See if we're out of time?
-						if (!$dont_chmod && time() - array_sum(explode(' ', $time_start)) > $timeout_limit)
-						{
-							$dont_chmod = true;
-
-							// Make note of how far we have come so we restart at the right point
-							$context['file_offset'] = $file_count ?? 0;
-							break;
-						}
-					}
-				}
-				catch (\UnexpectedValueException $e)
-				{
-					// @todo for now do nothing...
-				}
-
-				// If this is set it means we timed out half way through.
-				if (!empty($dont_chmod))
-				{
-					$context['total_files'] = $file_count ?? 0;
-					pausePermsSave();
-				}
-
-				// Do the actual directory.
-				$status = $context['predefined_type'] === 'free' || isset($context['special_files'][$path]) ? 'writable' : 'execute';
-				package_chmod($path, $status);
-
-				// We've finished the directory so no file offset, and no record.
-				$context['file_offset'] = 0;
-				unset($context['directory_list'][$path]);
-
-				// See if we're out of time?
-				if (time() - array_sum(explode(' ', $time_start)) > $timeout_limit)
-				{
-					pausePermsSave();
-				}
-			}
-		}
-
-		// If we're here we are done!
-		redirectexit('action=admin;area=packages;sa=perms' . (!empty($context['back_look_data']) ? ';back_look=' . base64_encode(json_encode($context['back_look_data'])) : '') . ';' . $context['session_var'] . '=' . $context['session_id']);
-	}
-
-	/**
-	 * Recursive counts all the directory's under a given path
-	 *
-	 * @param string $dir
-	 *
-	 * @return int
-	 */
-	public function count_directories__recursive($dir)
-	{
-		global $context;
-
-		$count = 0;
-
-		try
-		{
-			$iterator = new \RecursiveIteratorIterator(
-				new \RecursiveDirectoryIterator($dir, FilesystemIterator::SKIP_DOTS),
-				\RecursiveIteratorIterator::SELF_FIRST,
-				\RecursiveIteratorIterator::CATCH_GET_CHILD
-			);
-
-			foreach ($iterator as $path => $file)
-			{
-				if ($file->isDir())
-				{
-					$context['directory_list'][$path] = 1;
-					$count++;
-				}
-			}
-		}
-		catch (\UnexpectedValueException $e)
-		{
-			// @todo
-		}
-
-		return $count;
-	}
-
-	/**
-	 * Builds a list of special files recursively for a given path
-	 *
-	 * @param string $path
-	 * @param mixed[] $data
-	 */
-	public function build_special_files__recursive($path, &$data)
-	{
-		global $context;
-
-		if (!empty($data['writable_on']))
-		{
-			if ($context['predefined_type'] === 'standard' || $data['writable_on'] === 'restrictive')
-			{
-				$context['special_files'][$path] = 1;
-			}
-		}
-
-		if (!empty($data['contents']))
-		{
-			foreach ($data['contents'] as $name => $contents)
-			{
-				$this->build_special_files__recursive($path . '/' . $name, $contents);
-			}
-		}
-	}
-
-	/**
 	 * Get a listing of all the packages
 	 *
-	 * - Determines if the package is a ddon, smiley, avatar, language or unknown package
+	 * - Determines if the package is addon, smiley, avatar, language or unknown package
 	 * - Determines if the package has been installed or not
 	 *
 	 * @param int $start The item to start with (for pagination purposes)
@@ -1977,7 +1357,14 @@ class Packages extends AbstractController
 		// We need the packages directory to be writable for this.
 		if (!@is_writable(BOARDDIR . '/packages'))
 		{
-			create_chmod_control(array(BOARDDIR . '/packages'), array('destination_url' =>getUrl('admin', ['action' => 'admin', 'area' => 'packages']), 'crash_on_error' => true));
+			$create_chmod_control = new PackageChmod();
+			$create_chmod_control->createChmodControl(
+				array(BOARDDIR . '/packages'),
+				array(
+					'destination_url' =>getUrl('admin', ['action' => 'admin', 'area' => 'packages']),
+					'crash_on_error' => true
+				)
+			);
 		}
 
 		list ($the_brand, $the_version) = explode(' ', FORUM_VERSION, 2);
@@ -2281,247 +1668,4 @@ class Packages extends AbstractController
 
 		return $a[0] === 'remove_table' ? -1 : 1;
 	}
-}
-
-/**
- * Checks the permissions of all the areas that will be affected by the package
- *
- * @param string $path
- * @param mixed[] $data
- * @param int $level
- *
- * @throws \ElkArte\Exceptions\Exception no_access
- * @package Packages
- *
- */
-function fetchPerms__recursive($path, &$data, $level)
-{
-	global $context;
-
-	$isLikelyPath = false;
-	foreach ($context['look_for'] as $possiblePath)
-	{
-		if (substr($possiblePath, 0, strlen($path)) === $path)
-		{
-			$isLikelyPath = true;
-		}
-	}
-
-	// Is this where we stop?
-	if (isset($_GET['xml']) && !empty($context['look_for']) && !$isLikelyPath)
-	{
-		return;
-	}
-	elseif ($level > $context['default_level'] && !$isLikelyPath)
-	{
-		return;
-	}
-
-	// Are we actually interested in saving this data?
-	$save_data = empty($context['only_find']) || $context['only_find'] == $path;
-
-	// @todo Shouldn't happen - but better error message?
-	if (!is_dir($path))
-	{
-		throw new Exception('no_access', false);
-	}
-
-	// This is where we put stuff we've found for sorting.
-	$foundData = array(
-		'files' => array(),
-		'folders' => array(),
-	);
-
-	try
-	{
-		$entrys = new \FilesystemIterator($path, \FilesystemIterator::SKIP_DOTS);
-		foreach ($entrys as $entry)
-		{
-			// Some kind of file?
-			if ($entry->isFile())
-			{
-				// Are we listing PHP files in this directory?
-				if ($save_data && !empty($data['list_contents']) && $entry->getExtension() === 'php')
-				{
-					$foundData['files'][$entry->getFilename()] = true;
-				}
-				// A file we were looking for.
-				elseif ($save_data && isset($data['contents'][$entry->getFilename()]))
-				{
-					$foundData['files'][$entry->getFilename()] = true;
-				}
-			}
-			// It's a directory - we're interested one way or another, probably...
-			elseif ($entry->isDir())
-			{
-				// Going further?
-				if ((!empty($data['type']) && $data['type'] === 'dir_recursive')
-					|| (isset($data['contents'][$entry->getFilename()])
-						&& (!empty($data['contents'][$entry->getFilename()]['list_contents'])
-							|| (!empty($data['contents'][$entry->getFilename()]['type'])
-								&& $data['contents'][$entry->getFilename()]['type'] === 'dir_recursive'))))
-				{
-					$foundData['folders'][$entry->getFilename()] = !isset($data['contents'][$entry->getFilename()]) ? 'dir_recursive' : true;
-
-					// If this wasn't expected inherit the recusiveness...
-					if (!isset($data['contents'][$entry->getFilename()]))
-					{
-						// We need to do this as we will be going all recursive.
-						$data['contents'][$entry->getFilename()] = array(
-							'type' => 'dir_recursive',
-						);
-					}
-
-					// Actually do the recursive stuff...
-					fetchPerms__recursive($entry->getPathname(), $data['contents'][$entry->getFilename()], $level + 1);
-				}
-				// Maybe it is a folder we are not descending into.
-				elseif (isset($data['contents'][$entry->getFilename()]))
-				{
-					$foundData['folders'][$entry->getFilename()] = true;
-				}
-				// Otherwise we stop here.
-			}
-		}
-	}
-	catch (\UnexpectedValueException $e)
-	{
-		// @todo for now do nothing...
-	}
-
-	// Sort the output so it presents itself well in the template
-	uksort($foundData['folders'], 'strcasecmp');
-	uksort($foundData['files'], 'strcasecmp');
-
-	// Nothing to see here?
-	if (!$save_data)
-	{
-		return;
-	}
-
-	// Now actually add the data, starting with the folders.
-	foreach ($foundData['folders'] as $folder => $type)
-	{
-		$additional_data = array(
-			'perms' => array(
-				'chmod' => @is_writable($path . '/' . $folder),
-				'perms' => @fileperms($path . '/' . $folder),
-			),
-		);
-		if ($type !== true)
-		{
-			$additional_data['type'] = $type;
-		}
-
-		// If there's an offset ignore any folders in XML mode.
-		if (isset($_GET['xml']) && $context['file_offset'] == 0)
-		{
-			$context['xml_data']['folders']['children'][] = array(
-				'attributes' => array(
-					'writable' => $additional_data['perms']['chmod'] ? 1 : 0,
-					'permissions' => substr(sprintf('%o', $additional_data['perms']['perms']), -4),
-					'folder' => 1,
-					'path' => $context['only_find'],
-					'level' => $level,
-					'more' => 0,
-					'offset' => $context['file_offset'],
-					'my_ident' => preg_replace('~[^A-Za-z0-9_\-=:]~', ':-:', $context['only_find'] . '/' . $folder),
-					'ident' => preg_replace('~[^A-Za-z0-9_\-=:]~', ':-:', $context['only_find']),
-				),
-				'value' => $folder,
-			);
-		}
-		elseif (!isset($_GET['xml']))
-		{
-			$data['contents'][$folder] = array_merge($data['contents'][$folder] ?? [], $additional_data);
-		}
-	}
-
-	// Now we want to do a similar thing with files.
-	$counter = -1;
-	foreach ($foundData['files'] as $file => $dummy)
-	{
-		$counter++;
-
-		// Have we reached our offset?
-		if ($context['file_offset'] > $counter)
-		{
-			continue;
-		}
-
-		// Gone too far?
-		if ($counter > ($context['file_offset'] + $context['file_limit']))
-		{
-			break;
-		}
-
-		$additional_data = array(
-			'perms' => array(
-				'chmod' => @is_writable($path . '/' . $file),
-				'perms' => @fileperms($path . '/' . $file),
-			),
-		);
-
-		// XML?
-		if (isset($_GET['xml']))
-		{
-			$context['xml_data']['folders']['children'][] = array(
-				'attributes' => array(
-					'writable' => $additional_data['perms']['chmod'] ? 1 : 0,
-					'permissions' => substr(sprintf('%o', $additional_data['perms']['perms']), -4),
-					'folder' => 0,
-					'path' => $context['only_find'],
-					'level' => $level,
-					'more' => $counter == ($context['file_offset'] + $context['file_limit']) ? 1 : 0,
-					'offset' => $context['file_offset'],
-					'my_ident' => preg_replace('~[^A-Za-z0-9_\-=:]~', ':-:', $context['only_find'] . '/' . $file),
-					'ident' => preg_replace('~[^A-Za-z0-9_\-=:]~', ':-:', $context['only_find']),
-				),
-				'value' => $file,
-			);
-		}
-		elseif ($counter != ($context['file_offset'] + $context['file_limit']))
-		{
-			$data['contents'][$file] = array_merge($data['contents'][$file] ?? [], $additional_data);
-		}
-	}
-}
-
-/**
- * Function called to briefly pause execution of directory/file chmod actions
- *
- * - Called by action_perms_save().
- *
- * @package Packages
- */
-function pausePermsSave()
-{
-	global $context, $txt;
-
-	// Try get more time...
-	detectServer()->setTimeLimit(600);
-
-	// Set up the items for the pause form
-	$context['sub_template'] = 'pause_action_permissions';
-	$context['page_title'] = $txt['package_file_perms_applying'];
-
-	// And how are we progressing with our directories
-	$context['remaining_items'] = count($context['method'] === 'individual' ? $context['to_process'] : $context['directory_list']);
-	$context['progress_message'] = sprintf($context['method'] === 'individual' ? $txt['package_file_perms_items_done'] : $txt['package_file_perms_dirs_done'], $context['total_items'] - $context['remaining_items'], $context['total_items']);
-	$context['progress_percent'] = round(($context['total_items'] - $context['remaining_items']) / $context['total_items'] * 100, 1);
-
-	// Never more than 100%!
-	$context['progress_percent'] = min($context['progress_percent'], 100);
-
-	// And how are we progressing with files within a directory
-	if ($context['method'] !== 'individual' && !empty($context['total_files']))
-	{
-		$context['file_progress_message'] = sprintf($txt['package_file_perms_files_done'], $context['file_offset'], $context['total_files']);
-		$context['file_progress_percent'] = round($context['file_offset'] / $context['total_files'] * 100, 1);
-
-		// Never more than 100%!
-		$context['file_progress_percent'] = min($context['file_progress_percent'], 100);
-	}
-
-	obExit();
 }
