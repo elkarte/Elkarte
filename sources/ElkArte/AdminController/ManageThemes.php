@@ -116,7 +116,7 @@ class ManageThemes extends AbstractController
 			'options' => array($this, 'action_options', 'permission' => 'admin_forum'),
 			'install' => array($this, 'action_install', 'permission' => 'admin_forum'),
 			'remove' => array($this, 'action_remove', 'permission' => 'admin_forum'),
-			'pick' => array($this, 'action_pick'), // @todo ugly having that in this controller
+			'pick' => array($this, 'action_pick', 'permission' => 'admin_forum'),
 		);
 
 		// Action controller
@@ -1011,37 +1011,28 @@ class ManageThemes extends AbstractController
 	 *
 	 * What it does:
 	 *
-	 * - Can edit everyone's (u = 0), guests' (u = -1), or a specific user's.
+	 * - Can edit everyone's (u = 0) or guests' (u = -1).
 	 * - Uses the Themes template. (pick sub template.)
 	 * - Accessed with ?action=admin;area=theme;sa=pick.
 	 *
 	 * @uses Profile language text
 	 * @uses ManageThemes template
-	 * @todo thought so... Might be better to split this file in ManageThemes and Themes,
 	 * with centralized admin permissions on ManageThemes.
 	 */
 	public function action_pick()
 	{
-		global $txt, $context, $modSettings, $scripturl, $settings;
+		global $txt, $context, $modSettings;
 
 		require_once(SUBSDIR . '/Themes.subs.php');
 
-		if (!$modSettings['theme_allow'] && $settings['disable_user_variant'] && !allowedTo('admin_forum'))
-		{
-			throw new Exception('no_access', false);
-		}
-
-		Txt::load('Profile');
 		theme()->getTemplates()->load('ManageThemes');
 
-		// Build the link tree.
-		$context['linktree'][] = array(
-			'url' => $scripturl . '?action=theme;sa=pick;u=' . (!empty($this->_req->query->u) ? (int) $this->_req->query->u : 0),
-			'name' => $txt['theme_pick'],
-		);
+		// 0 is reset all members, -1 is set forum default
+		$u = $this->_req->getQuery('u', 'intval');
+
 		$context['default_theme_id'] = $modSettings['theme_default'];
 
-		$_SESSION['id_theme'] = 0;
+		$_SESSION['theme'] = 0;
 
 		if (isset($this->_req->query->id))
 		{
@@ -1070,26 +1061,6 @@ class ManageThemes extends AbstractController
 
 			$th = $this->_req->getQuery('th', 'intval');
 			$vrt = $this->_req->getQuery('vrt', 'cleanhtml');
-			$u = $this->_req->getQuery('u', 'intval');
-
-			// Save for this user.
-			if (!isset($u) || !allowedTo('admin_forum'))
-			{
-				require_once(SUBSDIR . '/Members.subs.php');
-				updateMemberData($this->user->id, array('id_theme' => $th));
-
-				// A variants to save for the user?
-				if (!empty($vrt))
-				{
-					updateThemeOptions(array($th, $this->user->id, 'theme_variant', $vrt));
-
-					Cache::instance()->remove('theme_settings-' . $th . ':' . $this->user->id);
-
-					$_SESSION['id_variant'] = 0;
-				}
-
-				redirectexit('action=profile;area=theme');
-			}
 
 			// If changing members or guests - and there's a variant - assume changing default variant.
 			if (!empty($vrt) && ($u === 0 || $u === -1))
@@ -1121,43 +1092,10 @@ class ManageThemes extends AbstractController
 
 				redirectexit('action=admin;area=theme;sa=admin;' . $context['session_var'] . '=' . $context['session_id']);
 			}
-			// Change a specific member's theme.
-			else
-			{
-				// The forum's default theme is always 0 and we
-				if (isset($th) && $th == 0)
-				{
-					$th = $modSettings['theme_guests'];
-				}
-
-				require_once(SUBSDIR . '/Members.subs.php');
-				updateMemberData($u, array('id_theme' => $th));
-
-				if (!empty($vrt))
-				{
-					updateThemeOptions(array($th, $u, 'theme_variant', $vrt));
-					Cache::instance()->remove('theme_settings-' . $th . ':' . $u);
-
-					if ($this->user->id == $u)
-					{
-						$_SESSION['id_variant'] = 0;
-					}
-				}
-
-				redirectexit('action=profile;u=' . $u . ';area=theme');
-			}
 		}
 
-		$u = $this->_req->getQuery('u', 'intval');
-
-		// Figure out who the member of the minute is, and what theme they've chosen.
-		if (!isset($u) || !allowedTo('admin_forum'))
-		{
-			$context['current_member'] = $this->user->id;
-			$current_theme = $this->user->theme;
-		}
-		// Everyone can't chose just one.
-		elseif ($u === 0)
+		// Everyone can't choose just one.
+		if ($u === 0)
 		{
 			$context['current_member'] = 0;
 			$current_theme = 0;
@@ -1167,16 +1105,6 @@ class ManageThemes extends AbstractController
 		{
 			$context['current_member'] = -1;
 			$current_theme = $modSettings['theme_guests'];
-		}
-		// Someones else :P.
-		else
-		{
-			$context['current_member'] = $u;
-
-			require_once(SUBSDIR . '/Members.subs.php');
-			$member = getBasicMemberData($context['current_member']);
-
-			$current_theme = $member['id_theme'];
 		}
 
 		// Get the theme name and descriptions.
