@@ -1,6 +1,7 @@
 <?php
 
 /**
+ * Class used to release email from the queue
  *
  * @package   ElkArte Forum
  * @copyright ElkArte Forum contributors
@@ -12,6 +13,9 @@
 
 namespace ElkArte\Mail;
 
+/**
+ * Sends emails from the mail queue in to the wild
+ */
 class QueueMail
 {
 	/**

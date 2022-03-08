@@ -15,6 +15,9 @@ namespace ElkArte\Mail;
 
 use ElkArte\Errors\Errors;
 
+/**
+ * Deals with the sending of email via mail() or SMTP functions
+ */
 class Mail extends BaseMail
 {
 	/**

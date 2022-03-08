@@ -14,6 +14,7 @@
 namespace ElkArte\Controller;
 
 use ElkArte\AbstractController;
+use ElkArte\Mail\QueueMail;
 
 /**
  * This controllers action handlers are automatically called.
@@ -87,14 +88,7 @@ class ScheduledTasks extends AbstractController
 	 */
 	public function action_reducemailqueue()
 	{
-		global $modSettings;
-
-		// Lets not waste our time or resources.
-		if (empty($modSettings['mail_queue_use_cron']))
-		{
-			// This does the hard work, it does.
-			require_once(SUBSDIR . '/Mail.subs.php');
-			reduceMailQueue();
-		}
+		// This does the hard work, it does.
+		(new QueueMail())->reduceMailQueue();
 	}
 }

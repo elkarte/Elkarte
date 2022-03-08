@@ -1,6 +1,7 @@
 <?php
 
 /**
+ * Base abstract class for mail functions
  *
  * @package   ElkArte Forum
  * @copyright ElkArte Forum contributors
@@ -12,6 +13,9 @@
 
 namespace ElkArte\Mail;
 
+/**
+ * BaseMail class provides constructor and common code for other mail functions
+ */
 abstract class BaseMail
 {
 	/** @var bool If to use PBE/Mailist processing */
