@@ -68,63 +68,33 @@ use ElkArte\Languages\Txt;
  */
 class DataValidator
 {
-	/**
-	 * Validation rules
-	 *
-	 * @var mixed[]
-	 */
-	protected $_validation_rules = array();
+	/** @var array Validation rules */
+	protected $_validation_rules = [];
 
-	/**
-	 * Sanitation rules
-	 *
-	 * @var mixed[]
-	 */
-	protected $_sanitation_rules = array();
+	/** @var array Sanitation rules */
+	protected $_sanitation_rules = [];
 
-	/**
-	 * Text substitutions for field names in the error messages
-	 *
-	 * @var mixed[]
-	 */
-	protected $_replacements = array();
+	/** @var array Text substitutions for field names in the error messages */
+	protected $_replacements = [];
 
-	/**
-	 * Holds validation errors
-	 *
-	 * @var mixed[]
-	 */
-	protected $_validation_errors = array();
+	/** @var array Holds validation errors */
+	protected $_validation_errors = [];
 
-	/**
-	 * Holds our data
-	 *
-	 * @var mixed[]
-	 */
-	protected $_data = array();
+	/** @var array Holds our data */
+	protected $_data = [];
 
-	/**
-	 * Strict data processing,
-	 * if true drops data for which no sanitation rule was set
-	 *
-	 * @var bool
-	 */
+	/** @var bool Strict data processing, if true drops data for which no sanitation rule was set */
 	protected $_strict = false;
 
-	/**
-	 * Holds any special processing that is required for certain fields
-	 * csv or array
-	 *
-	 * @var string[]
-	 */
-	protected $_datatype = array();
+	/** @var string[] Holds any special processing that is required for certain fields csv or array */
+	protected $_datatype = [];
 
 	/**
 	 * Shorthand static method for simple inline validation
 	 *
-	 * @param mixed[]|object $data generally $_POST data for this method
-	 * @param mixed[] $validation_rules associative array of field => rules
-	 * @param mixed[] $sanitation_rules associative array of field => rules
+	 * @param array|object $data generally $_POST data for this method
+	 * @param array $validation_rules associative array of field => rules
+	 * @param array $sanitation_rules associative array of field => rules
 	 *
 	 * @return bool
 	 */
@@ -161,14 +131,12 @@ class DataValidator
 	/**
 	 * Sets the sanitation rules used to clean data
 	 *
-	 * @param mixed[] $rules associative array of field => rule|rule|rule
+	 * @param array $rules associative array of field => rule|rule|rule
 	 * @param bool $strict
-	 *
-	 * @return mixed[]
 	 */
 	public function sanitation_rules($rules = array(), $strict = false)
 	{
-		// If its not an array, make it one
+		// If not an array, make it one
 		if (!is_array($rules))
 		{
 			$rules = array($rules);
@@ -177,52 +145,36 @@ class DataValidator
 		// Set the sanitation rules
 		$this->_strict = $strict;
 
-		if (!empty($rules))
-		{
-			$this->_sanitation_rules = $rules;
-		}
-		else
-		{
-			return $this->_sanitation_rules;
-		}
+		$this->_sanitation_rules = !empty($rules) ? $rules : $this->_sanitation_rules;
 	}
 
 	/**
 	 * Set the validation rules that will be run against the data
 	 *
-	 * @param mixed[] $rules associative array of field => rule|rule|rule
-	 *
-	 * @return mixed[]
+	 * @param array $rules associative array of field => rule|rule|rule
 	 */
 	public function validation_rules($rules = array())
 	{
-		// If its not an array, make it one
+		// If not an array, make it one
 		if (!is_array($rules))
 		{
 			$rules = array($rules);
 		}
 
 		// Set the validation rules
-		if (!empty($rules))
-		{
-			$this->_validation_rules = $rules;
-		}
-		else
-		{
-			return $this->_validation_rules;
-		}
+		$this->_validation_rules = !empty($rules) ? $rules : $this->_validation_rules;
 	}
 
 	/**
 	 * Run the sanitation and validation on the data
 	 *
-	 * @param mixed[]|object $input associative array or object of data to process name => value
+	 * @param array|object $input associative array or object of data to process name => value
 	 *
 	 * @return bool
 	 */
 	public function validate($input)
 	{
-		// If its an object, convert it to an array
+		// If an object, convert it to an array
 		if (is_object($input))
 		{
 			$input = (array) $input;
@@ -244,8 +196,8 @@ class DataValidator
 	/**
 	 * Data sanitation is a good thing
 	 *
-	 * @param mixed[] $input
-	 * @param mixed[] $ruleset
+	 * @param array $input
+	 * @param array $ruleset
 	 * @return mixed
 	 */
 	private function _sanitize($input, $ruleset)
@@ -275,39 +227,23 @@ class DataValidator
 				$rules = explode('|', $rules);
 				foreach ($rules as $rule)
 				{
-					$sanitation_parameters = null;
-					$sanitation_parameters_function = array();
-
-					// Were any parameters provided for the rule, e.g. \ElkArte\Util::htmlspecialchars[ENT_QUOTES]
-					if (preg_match('~(.*)\[(.*)\]~', $rule, $match))
-					{
-						$sanitation_method = '_sanitation_' . $match[1];
-						$sanitation_parameters = $match[2];
-						$sanitation_function = $match[1];
-						$sanitation_parameters_function = explode(',', defined($match[2]) ? constant($match[2]) : $match[2]);
-					}
-					// Or just a predefined rule e.g. trim
-					else
-					{
-						$sanitation_method = '_sanitation_' . $rule;
-						$sanitation_function = $rule;
-					}
+					$sanitation = $this->_getRuleValues($rule, $type = '_sanitation_');
 
 					// Defined method to use?
-					if (is_callable(array($this, $sanitation_method)))
+					if (is_callable(array($this, $sanitation['method'])))
 					{
-						$input[$field] = $this->{$sanitation_method}($input[$field], $sanitation_parameters);
+						$input[$field] = $this->{$sanitation['method']}($input[$field], $sanitation['parameters']);
 					}
 					// One of our static methods or even a built in php function like strtoupper, intval, etc?
-					elseif (is_callable($sanitation_function))
+					elseif (is_callable($sanitation['function']))
 					{
-						$input[$field] = call_user_func_array($sanitation_function, array_merge((array) $input[$field], $sanitation_parameters_function));
+						$input[$field] = call_user_func_array($sanitation['function'], array_merge((array) $input[$field], $sanitation['parameters_function']));
 					}
 					// Or even a language construct?
-					elseif (in_array($sanitation_function, array('empty', 'array', 'isset')))
+					elseif (in_array($sanitation['function'], array('empty', 'array', 'isset')))
 					{
 						// could be done as methods instead ...
-						switch ($sanitation_function)
+						switch ($sanitation['function'])
 						{
 							case 'empty':
 								$input[$field] = empty($input[$field]);
@@ -336,7 +272,7 @@ class DataValidator
 	 * When the input field is an array or csv, this will build a new validator
 	 * as if the fields were individual ones, each checked against the base rule
 	 *
-	 * @param mixed[] $input
+	 * @param array $input
 	 * @param string $field
 	 * @param string $rules
 	 *
@@ -392,7 +328,7 @@ class DataValidator
 	 *
 	 * @param int|string|null $key int or string
 	 *
-	 * @return mixed|mixed[]
+	 * @return mixed|array
 	 */
 	public function validation_data($key = null)
 	{
@@ -407,8 +343,8 @@ class DataValidator
 	/**
 	 * Performs data validation against the provided rule
 	 *
-	 * @param mixed[] $input
-	 * @param mixed[] $ruleset
+	 * @param array $input
+	 * @param array $ruleset
 	 *
 	 * @return bool
 	 */
@@ -431,43 +367,8 @@ class DataValidator
 				$rules = explode('|', $rules);
 				foreach ($rules as $rule)
 				{
-					$validation_parameters = null;
-					$validation_parameters_function = array();
-
-					// Were any parameters provided for the rule, e.g. min_length[6]
-					if (preg_match('~(.*)\[(.*)\]~', $rule, $match))
-					{
-						$validation_method = '_validate_' . $match[1];
-						$validation_parameters = $match[2];
-						$validation_function = $match[1];
-						$validation_parameters_function = explode(',', $match[2]);
-					}
-					// Or just a predefined rule e.g. valid_email
-					else
-					{
-						$validation_method = '_validate_' . $rule;
-						$validation_function = $rule;
-					}
-
-					// Defined method to use?
-					if (is_callable(array($this, $validation_method)))
-					{
-						$result = $this->{$validation_method}($field, $input, $validation_parameters);
-					}
-					// Maybe even a custom function set up like a defined one, addons can do this.
-					elseif (is_callable($validation_function) && strpos($validation_function, 'validate_') === 0 && isset($input[$field]))
-					{
-						$result = call_user_func_array($validation_function, array_merge((array) $field, (array) $input[$field], $validation_parameters_function));
-					}
-					else
-					{
-						$result = array(
-							'field' => $validation_method,
-							'input' => $input[$field] ?? null,
-							'function' => '_validate_invalid_function',
-							'param' => $validation_parameters
-						);
-					}
+					$validation = $this->_getRuleValues($rule, '_validate_');
+					$result = $this->_runValidationRule($field, $input, $validation);
 
 					if (is_array($result))
 					{
@@ -486,7 +387,7 @@ class DataValidator
 	 * -Will convert field to individual elements and run a separate validation on that group
 	 * using the rules defined to the parent node
 	 *
-	 * @param mixed[] $input
+	 * @param array $input
 	 * @param string $field
 	 * @param string $rules
 	 *
@@ -530,7 +431,7 @@ class DataValidator
 		$sub_validator->validation_rules($validation_rules);
 		$result = $sub_validator->validate($fields);
 
-		// If its not valid, then just take the first error and use it for the original field
+		// If not valid, then just take the first error and use it for the original field
 		if (!$result)
 		{
 			$errors = $sub_validator->validation_errors(true);
@@ -551,13 +452,13 @@ class DataValidator
 	/**
 	 * Return any errors found, either in the raw or nicely formatted
 	 *
-	 * @param mixed[]|string|bool $raw
+	 * @param array|string|bool $raw
 	 *    - true returns the raw error array,
 	 *    - array returns just error messages of those fields
 	 *    - string returns just that error message
 	 *    - default is all error message(s)
 	 *
-	 * @return array|bool|mixed[]
+	 * @return array|bool
 	 */
 	public function validation_errors($raw = false)
 	{
@@ -566,17 +467,15 @@ class DataValidator
 		{
 			return $this->_validation_errors;
 		}
-		// Otherwise return the formatted text string(s)
-		else
-		{
-			return $this->_get_error_messages($raw);
-		}
+
+		// Otherwise, return the formatted text string(s)
+		return $this->_get_error_messages($raw);
 	}
 
 	/**
 	 * Process any errors and return the error strings
 	 *
-	 * @param mixed[]|bool $keys
+	 * @param array|string $keys
 	 *
 	 * @return array|bool
 	 */
@@ -637,6 +536,72 @@ class DataValidator
 	}
 
 	/**
+	 * Parses the supplied rule into its components
+	 *
+	 * @param string $rule
+	 * @param string $type
+	 * @return array
+	 */
+	private function _getRuleValues($rule, $type)
+	{
+		$details = [];
+		$details['parameters'] = null;
+		$details['parameters_function'] = [];
+
+		// Were any parameters provided for the rule, e.g. min_length[6]
+		if (preg_match('~(.*)\[(.*)\]~', $rule, $match))
+		{
+			$details['method'] = $type . $match[1];
+			$details['parameters'] = $match[2];
+			$details['function'] = $match[1];
+			$details['parameters_function'] = explode(',', defined($match[2]) ? constant($match[2]) : $match[2]);
+		}
+		// Or just a predefined rule e.g. valid_email
+		else
+		{
+			$details['method'] = $type . $rule;
+			$details['function'] = $rule;
+		}
+
+		return $details;
+	}
+
+	/**
+	 * Runs a validation rule on a set of data
+	 *
+	 * @param string $field
+	 * @param array $input
+	 * @param array $validation
+	 * @return array|false|mixed
+	 */
+	private function _runValidationRule($field, $input, $validation)
+	{
+		// Defined method to use?
+		if (is_callable(array($this, $validation['method'])))
+		{
+			$result = $this->{$validation['method']}($field, $input, $validation['parameters']);
+		}
+		// Maybe even a custom function set up like a defined one, addons can do this.
+		elseif (is_callable($validation['function'])
+			&& isset($input[$field])
+			&& strpos($validation['function'], 'validate_') === 0)
+		{
+			$result = call_user_func_array($validation['function'], array_merge((array) $field, (array) $input[$field], $validation['parameters_function']));
+		}
+		else
+		{
+			$result = array(
+				'field' => $validation['method'],
+				'input' => $input[$field] ?? null,
+				'function' => '_validate_invalid_function',
+				'param' => $validation['parameters']
+			);
+		}
+
+		return $result;
+	}
+
+	/**
 	 * Allow reading otherwise inaccessible data values
 	 *
 	 * @param string $property key name of array value to return
@@ -645,7 +610,7 @@ class DataValidator
 	 */
 	public function __get($property)
 	{
-		return array_key_exists($property, $this->_data) ? $this->_data[$property] : null;
+		return $this->_data[$property] ?? null;
 	}
 
 	/**
@@ -663,20 +628,11 @@ class DataValidator
 	/**
 	 * Field Name Replacements
 	 *
-	 * @param mixed[] $replacements associative array of field => txt string key
-	 *
-	 * @return mixed[]
+	 * @param array $replacements associative array of field => txt string key
 	 */
 	public function text_replacements($replacements = array())
 	{
-		if (!empty($replacements))
-		{
-			$this->_replacements = $replacements;
-		}
-		else
-		{
-			return $this->_replacements;
-		}
+		$this->_replacements = !empty($replacements) ? $replacements : $this->_replacements;
 	}
 
 	/**
@@ -684,19 +640,34 @@ class DataValidator
 	 * csv or array
 	 *
 	 * @param string[] $datatype csv or array processing for the field
-	 *
-	 * @return string[]
 	 */
 	public function input_processing($datatype = array())
 	{
-		if (!empty($datatype))
-		{
-			$this->_datatype = $datatype;
-		}
-		else
-		{
-			return $this->_datatype;
-		}
+		$this->_datatype = !empty($datatype) ? $datatype : $this->_datatype;
+	}
+
+	/**
+	 * Common method used to set what failed during a test
+	 *
+	 * @param string $field
+	 * @param array $input
+	 * @param array|string $validation_parameters
+	 * @return array
+	 */
+	protected function setFailureArray($field, $input, $validation_parameters)
+	{
+		// Get the calling function that failed
+		$dbt=debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS,2);
+		$caller = $dbt[1]['function'] ?? null;
+
+		return array(
+			'field' => $field,
+			'input' => $input[$field] ?? '',
+			'function' => $caller,
+			'param' => is_array($validation_parameters)
+				? implode(',', $validation_parameters)
+				: $validation_parameters
+		);
 	}
 
 	/**
@@ -705,7 +676,7 @@ class DataValidator
 	 * Usage: '[key]' => 'contains[value, value, value]'
 	 *
 	 * @param string $field
-	 * @param mixed[] $input
+	 * @param array $input
 	 * @param string|null $validation_parameters array or null
 	 *
 	 * @return array|void
@@ -714,19 +685,12 @@ class DataValidator
 	{
 		$validation_parameters = array_map('trim', explode(',', strtolower($validation_parameters)));
 		$input[$field] = $input[$field] ?? '';
-		$value = trim(strtolower($input[$field]));
+		$value = strtolower(trim($input[$field]));
 
-		if (in_array($value, $validation_parameters))
+		if (!in_array($value, $validation_parameters, true))
 		{
-			return;
+			return $this->setFailureArray($field, $input, $validation_parameters);
 		}
-
-		return array(
-			'field' => $field,
-			'input' => $input[$field],
-			'function' => __FUNCTION__,
-			'param' => implode(',', $validation_parameters)
-		);
 	}
 
 	/**
@@ -735,28 +699,21 @@ class DataValidator
 	 * Usage: '[key]' => 'notequal[value, value, value]'
 	 *
 	 * @param string $field
-	 * @param mixed[] $input
+	 * @param array $input
 	 * @param string|null $validation_parameters array or null
 	 *
 	 * @return array|void
 	 */
 	protected function _validate_notequal($field, $input, $validation_parameters = null)
 	{
-		$validation_parameters = explode(',', trim(strtolower($validation_parameters)));
+		$validation_parameters = explode(',', strtolower(trim($validation_parameters)));
 		$input[$field] = $input[$field] ?? '';
-		$value = trim(strtolower($input[$field]));
+		$value = strtolower(trim($input[$field]));
 
-		if (!in_array($value, $validation_parameters))
+		if (in_array($value, $validation_parameters))
 		{
-			return;
+			return $this->setFailureArray($field, $input, $validation_parameters);
 		}
-
-		return array(
-			'field' => $field,
-			'input' => $input[$field],
-			'function' => __FUNCTION__,
-			'param' => implode(',', $validation_parameters)
-		);
 	}
 
 	/**
@@ -769,7 +726,7 @@ class DataValidator
 	 *  - limits[10,] means >= 10 with no upper bound
 	 *
 	 * @param string $field
-	 * @param mixed[] $input
+	 * @param array $input
 	 * @param string|null $validation_parameters array or null
 	 *
 	 * @return array|void
@@ -795,17 +752,10 @@ class DataValidator
 			$passmax = $value <= $validation_parameters[1];
 		}
 
-		if ($passmax && $passmin)
+		if (!$passmax || !$passmin)
 		{
-			return;
+			return $this->setFailureArray($field, $input, $validation_parameters);
 		}
-
-		return array(
-			'field' => $field,
-			'input' => $input[$field],
-			'function' => __FUNCTION__,
-			'param' => implode(',', $validation_parameters)
-		);
 	}
 
 	/**
@@ -814,31 +764,24 @@ class DataValidator
 	 * Usage: '[key]' => 'without[value, value, value]'
 	 *
 	 * @param string $field
-	 * @param mixed[] $input
-	 * @param mixed[]|null $validation_parameters array or null
+	 * @param array $input
+	 * @param string $validation_parameters
 	 *
 	 * @return array|void
 	 */
-	protected function _validate_without($field, $input, $validation_parameters = null)
+	protected function _validate_without($field, $input, $validation_parameters = '')
 	{
-		$validation_parameters = explode(',', $validation_parameters);
+		$parameters = explode(',', $validation_parameters);
 		$input[$field] = $input[$field] ?? '';
 		$value = $input[$field];
 
-		foreach ($validation_parameters as $dummy => $check)
+		foreach ($parameters as $dummy => $check)
 		{
 			if (strpos($value, $check) !== false)
 			{
-				return array(
-					'field' => $field,
-					'input' => $input[$field],
-					'function' => __FUNCTION__,
-					'param' => implode(',', $validation_parameters)
-				);
+				return $this->setFailureArray($field, $input, $parameters);
 			}
 		}
-
-		return;
 	}
 
 	/**
@@ -847,24 +790,17 @@ class DataValidator
 	 * Usage: '[key]' => 'required'
 	 *
 	 * @param string $field
-	 * @param mixed[] $input
-	 * @param mixed[]|null $validation_parameters array or null
+	 * @param array $input
+	 * @param array|null $validation_parameters array or null
 	 *
 	 * @return array|void
 	 */
 	protected function _validate_required($field, $input, $validation_parameters = null)
 	{
-		if (isset($input[$field]) && trim($input[$field]) !== '')
+		if (!isset($input[$field]) || trim($input[$field]) === '')
 		{
-			return;
+			return $this->setFailureArray($field, $input, $validation_parameters);
 		}
-
-		return array(
-			'field' => $field,
-			'input' => $input[$field] ?? '',
-			'function' => __FUNCTION__,
-			'param' => $validation_parameters
-		);
 	}
 
 	/**
@@ -873,8 +809,8 @@ class DataValidator
 	 * Usage: '[key]' => 'valid_email'
 	 *
 	 * @param string $field
-	 * @param mixed[] $input
-	 * @param mixed[]|null $validation_parameters array or null
+	 * @param array $input
+	 * @param array|null $validation_parameters array or null
 	 *
 	 * @return array|void
 	 */
@@ -885,19 +821,11 @@ class DataValidator
 			return;
 		}
 
-		$valid = strrpos($input[$field], '@') === false ? false : filter_var($input[$field], FILTER_VALIDATE_EMAIL) !== false;
-
-		if ($valid)
+		$valid = !(strrpos($input[$field], '@') === false) && filter_var($input[$field], FILTER_VALIDATE_EMAIL) !== false;
+		if (!$valid)
 		{
-			return;
+			return $this->setFailureArray($field, $input, $validation_parameters);
 		}
-
-		return array(
-			'field' => $field,
-			'input' => $input[$field],
-			'function' => __FUNCTION__,
-			'param' => $validation_parameters
-		);
 	}
 
 	/**
@@ -906,8 +834,8 @@ class DataValidator
 	 * Usage: '[key]' => 'max_length[x]'
 	 *
 	 * @param string $field
-	 * @param mixed[] $input
-	 * @param mixed[]|null $validation_parameters array or null
+	 * @param array $input
+	 * @param array|null $validation_parameters array or null
 	 *
 	 * @return array|void
 	 */
@@ -918,17 +846,10 @@ class DataValidator
 			return;
 		}
 
-		if (Util::strlen($input[$field]) <= (int) $validation_parameters)
+		if (Util::strlen($input[$field]) > (int) $validation_parameters)
 		{
-			return;
+			return $this->setFailureArray($field, $input, $validation_parameters);
 		}
-
-		return array(
-			'field' => $field,
-			'input' => $input[$field],
-			'function' => __FUNCTION__,
-			'param' => $validation_parameters
-		);
 	}
 
 	/**
@@ -937,8 +858,8 @@ class DataValidator
 	 * Usage: '[key]' => 'min_length[x]'
 	 *
 	 * @param string $field
-	 * @param mixed[] $input
-	 * @param mixed[]|null $validation_parameters array or null
+	 * @param array $input
+	 * @param array|null $validation_parameters array or null
 	 *
 	 * @return array|void
 	 */
@@ -949,17 +870,10 @@ class DataValidator
 			return;
 		}
 
-		if (Util::strlen($input[$field]) >= (int) $validation_parameters)
+		if (Util::strlen($input[$field]) < (int) $validation_parameters)
 		{
-			return;
+			return $this->setFailureArray($field, $input, $validation_parameters);
 		}
-
-		return array(
-			'field' => $field,
-			'input' => $input[$field],
-			'function' => __FUNCTION__,
-			'param' => $validation_parameters
-		);
 	}
 
 	/**
@@ -968,8 +882,8 @@ class DataValidator
 	 * Usage: '[key]' => 'exact_length[x]'
 	 *
 	 * @param string $field
-	 * @param mixed[] $input
-	 * @param mixed[]|null $validation_parameters array or null
+	 * @param array $input
+	 * @param array|null $validation_parameters array or null
 	 *
 	 * @return array|void
 	 */
@@ -980,17 +894,10 @@ class DataValidator
 			return;
 		}
 
-		if (Util::strlen($input[$field]) == (int) $validation_parameters)
+		if (Util::strlen($input[$field]) !== (int) $validation_parameters)
 		{
-			return;
+			return $this->setFailureArray($field, $input, $validation_parameters);
 		}
-
-		return array(
-			'field' => $field,
-			'input' => $input[$field],
-			'function' => __FUNCTION__,
-			'param' => $validation_parameters
-		);
 	}
 
 	/**
@@ -999,8 +906,8 @@ class DataValidator
 	 * Usage: '[key]' => 'alpha'
 	 *
 	 * @param string $field
-	 * @param mixed[] $input
-	 * @param mixed[]|null $validation_parameters array or null
+	 * @param array $input
+	 * @param array|null $validation_parameters array or null
 	 *
 	 * @return array|void
 	 */
@@ -1014,12 +921,7 @@ class DataValidator
 		// A character with the Unicode property of letter (any kind of letter from any language)
 		if (!preg_match('~^(\p{L})+$~iu', $input[$field]))
 		{
-			return array(
-				'field' => $field,
-				'input' => $input[$field],
-				'function' => __FUNCTION__,
-				'param' => $validation_parameters
-			);
+			return $this->setFailureArray($field, $input, $validation_parameters);
 		}
 	}
 
@@ -1030,8 +932,8 @@ class DataValidator
 	 * Allows letters, numbers dash and underscore characters
 	 *
 	 * @param string $field
-	 * @param mixed[] $input
-	 * @param mixed[]|null $validation_parameters array or null
+	 * @param array $input
+	 * @param array|null $validation_parameters array or null
 	 *
 	 * @return array|void
 	 */
@@ -1045,12 +947,7 @@ class DataValidator
 		// A character with the Unicode property of letter or number (any kind of letter or numeric 0-9 from any language)
 		if (!preg_match('~^([-_\p{L}\p{Nd}])+$~iu', $input[$field]))
 		{
-			return array(
-				'field' => $field,
-				'input' => $input[$field],
-				'function' => __FUNCTION__,
-				'param' => $validation_parameters
-			);
+			return $this->setFailureArray($field, $input, $validation_parameters);
 		}
 	}
 
@@ -1060,8 +957,8 @@ class DataValidator
 	 * Usage: '[key]' => 'alpha_dash'
 	 *
 	 * @param string $field
-	 * @param mixed[] $input
-	 * @param mixed[]|null $validation_parameters array or null
+	 * @param array $input
+	 * @param array|null $validation_parameters array or null
 	 *
 	 * @return array|void
 	 */
@@ -1074,12 +971,7 @@ class DataValidator
 
 		if (!preg_match('~^([-_\p{L}])+$~iu', $input[$field]))
 		{
-			return array(
-				'field' => $field,
-				'input' => $input[$field],
-				'function' => __FUNCTION__,
-				'param' => $validation_parameters
-			);
+			return $this->setFailureArray($field, $input, $validation_parameters);
 		}
 	}
 
@@ -1089,8 +981,8 @@ class DataValidator
 	 * Usage: '[key]' => 'isarray'
 	 *
 	 * @param string $field
-	 * @param mixed[] $input
-	 * @param mixed[]|null $validation_parameters array or null
+	 * @param array $input
+	 * @param array|null $validation_parameters array or null
 	 *
 	 * @return array|void
 	 */
@@ -1103,12 +995,7 @@ class DataValidator
 
 		if (!is_array($input[$field]))
 		{
-			return array(
-				'field' => $field,
-				'input' => $input[$field],
-				'function' => __FUNCTION__,
-				'param' => $validation_parameters
-			);
+			return $this->setFailureArray($field, $input, $validation_parameters);
 		}
 	}
 
@@ -1118,8 +1005,8 @@ class DataValidator
 	 * Usage: '[key]' => 'numeric'
 	 *
 	 * @param string $field
-	 * @param mixed[] $input
-	 * @param mixed[]|null $validation_parameters array or null
+	 * @param array $input
+	 * @param array|null $validation_parameters array or null
 	 *
 	 * @return array|void
 	 */
@@ -1132,12 +1019,7 @@ class DataValidator
 
 		if (!is_numeric($input[$field]))
 		{
-			return array(
-				'field' => $field,
-				'input' => $input[$field],
-				'function' => __FUNCTION__,
-				'param' => $validation_parameters
-			);
+			return $this->setFailureArray($field, $input, $validation_parameters);
 		}
 	}
 
@@ -1147,8 +1029,8 @@ class DataValidator
 	 * Usage: '[key]' => 'integer'
 	 *
 	 * @param string $field
-	 * @param mixed[] $input
-	 * @param mixed[]|null $validation_parameters array or null
+	 * @param array $input
+	 * @param array|null $validation_parameters array or null
 	 *
 	 * @return array|void
 	 */
@@ -1159,16 +1041,9 @@ class DataValidator
 			return;
 		}
 
-		$filter = filter_var($input[$field], FILTER_VALIDATE_INT);
-
-		if ($filter === false)
+		if (filter_var($input[$field], FILTER_VALIDATE_INT) === false)
 		{
-			return array(
-				'field' => $field,
-				'input' => $input[$field],
-				'function' => __FUNCTION__,
-				'param' => $validation_parameters
-			);
+			return $this->setFailureArray($field, $input, $validation_parameters);
 		}
 	}
 
@@ -1178,8 +1053,8 @@ class DataValidator
 	 * Usage: '[key]' => 'boolean'
 	 *
 	 * @param string $field
-	 * @param mixed[] $input
-	 * @param mixed[]|null $validation_parameters array or null
+	 * @param array $input
+	 * @param array|null $validation_parameters array or null
 	 *
 	 * @return array|void
 	 */
@@ -1191,15 +1066,9 @@ class DataValidator
 		}
 
 		$filter = filter_var($input[$field], FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE);
-
 		if ($filter === null)
 		{
-			return array(
-				'field' => $field,
-				'input' => $input[$field],
-				'function' => __FUNCTION__,
-				'param' => $validation_parameters
-			);
+			return $this->setFailureArray($field, $input, $validation_parameters);
 		}
 	}
 
@@ -1209,8 +1078,8 @@ class DataValidator
 	 * Usage: '[key]' => 'float'
 	 *
 	 * @param string $field
-	 * @param mixed[] $input
-	 * @param mixed[]|null $validation_parameters array or null
+	 * @param array $input
+	 * @param array|null $validation_parameters array or null
 	 *
 	 * @return array|void
 	 */
@@ -1223,12 +1092,7 @@ class DataValidator
 
 		if (filter_var($input[$field], FILTER_VALIDATE_FLOAT) === false)
 		{
-			return array(
-				'field' => $field,
-				'input' => $input[$field],
-				'function' => __FUNCTION__,
-				'param' => $validation_parameters
-			);
+			return $this->setFailureArray($field, $input, $validation_parameters);
 		}
 	}
 
@@ -1238,8 +1102,8 @@ class DataValidator
 	 * Usage: '[key]' => 'valid_url'
 	 *
 	 * @param string $field
-	 * @param mixed[] $input
-	 * @param mixed[]|null $validation_parameters array or null
+	 * @param array $input
+	 * @param array|null $validation_parameters array or null
 	 *
 	 * @return array|void
 	 */
@@ -1252,12 +1116,7 @@ class DataValidator
 
 		if (!preg_match('`^(https?:(//([a-z0-9\-._~%]+)(:\d+)?(/[a-z0-9\-._~%!$&\'()*+,;=:@]+)*/?))(\?[a-z0-9\-._~%!$&\'()*+,;=:@/?]*)?(\#[a-z0-9\-._~%!$&\'()*+,;=:@/?]*)?$`', $input[$field], $matches))
 		{
-			return array(
-				'field' => $field,
-				'input' => $input[$field],
-				'function' => __FUNCTION__,
-				'param' => $validation_parameters
-			);
+			return $this->setFailureArray($field, $input, $validation_parameters);
 		}
 	}
 
@@ -1267,8 +1126,8 @@ class DataValidator
 	 * Usage: '[key]' => 'valid_ipv6'
 	 *
 	 * @param string $field
-	 * @param mixed[] $input
-	 * @param mixed[]|null $validation_parameters array or null
+	 * @param array $input
+	 * @param array|null $validation_parameters array or null
 	 *
 	 * @return array|void
 	 */
@@ -1281,12 +1140,7 @@ class DataValidator
 
 		if (filter_var($input[$field], FILTER_VALIDATE_IP, FILTER_FLAG_IPV6) === false)
 		{
-			return array(
-				'field' => $field,
-				'input' => $input[$field],
-				'function' => __FUNCTION__,
-				'param' => $validation_parameters
-			);
+			return $this->setFailureArray($field, $input, $validation_parameters);
 		}
 	}
 
@@ -1296,8 +1150,8 @@ class DataValidator
 	 * Usage: '[key]' => 'valid_ip'
 	 *
 	 * @param string $field
-	 * @param mixed[] $input
-	 * @param mixed[]|null $validation_parameters array or null
+	 * @param array $input
+	 * @param array|null $validation_parameters array or null
 	 *
 	 * @return array|void
 	 */
@@ -1310,12 +1164,7 @@ class DataValidator
 
 		if (filter_var($input[$field], FILTER_VALIDATE_IP, FILTER_FLAG_IPV4) === false)
 		{
-			return array(
-				'field' => $field,
-				'input' => $input[$field],
-				'function' => __FUNCTION__,
-				'param' => $validation_parameters
-			);
+			return $this->setFailureArray($field, $input, $validation_parameters);
 		}
 	}
 
@@ -1327,8 +1176,8 @@ class DataValidator
 	 * Usage: '[key]' => 'php_syntax'
 	 *
 	 * @param string $field
-	 * @param mixed[] $input
-	 * @param mixed[]|null $validation_parameters array or null
+	 * @param array $input
+	 * @param array|null $validation_parameters array or null
 	 *
 	 * @return array|void
 	 * @uses ParseError
@@ -1402,8 +1251,8 @@ class DataValidator
 	 * Usage: '[key]' => 'valid_color'
 	 *
 	 * @param string $field
-	 * @param mixed[] $input
-	 * @param mixed[]|null $validation_parameters array or null
+	 * @param array $input
+	 * @param array|null $validation_parameters array or null
 	 *
 	 * @return array|bool|void
 	 */
@@ -1450,12 +1299,7 @@ class DataValidator
 			return true;
 		}
 
-		return array(
-			'field' => $field,
-			'input' => $input[$field],
-			'function' => __FUNCTION__,
-			'param' => $validation_parameters
-		);
+		return $this->setFailureArray($field, $input, $validation_parameters);
 	}
 
 	/**
