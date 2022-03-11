@@ -1396,6 +1396,8 @@ function determineAvatar($profile)
 
 /**
  * Get information about the server
+ *
+ * @return \ElkArte\Server
  */
 function detectServer()
 {

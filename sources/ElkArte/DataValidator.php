@@ -1181,7 +1181,6 @@ class DataValidator
 	 *
 	 * @return array|void
 	 * @uses ParseError
-	 *
 	 */
 	protected function _validate_php_syntax($field, $input, $validation_parameters = null)
 	{
@@ -1269,7 +1268,7 @@ class DataValidator
 			return true;
 		}
 
-		// An hex code
+		// A hex code
 		if (preg_match('~^#([a-f0-9]{3}|[a-f0-9]{6})$~i', $input[$field]) === 1)
 		{
 			return true;
@@ -1349,7 +1348,7 @@ class DataValidator
 	 *
 	 * @param string $input
 	 *
-	 * @return null|string|string[]
+	 * @return void|string|string[]
 	 */
 	protected function _sanitation_cleanhtml($input)
 	{

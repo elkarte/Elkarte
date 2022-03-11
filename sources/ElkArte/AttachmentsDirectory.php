@@ -688,7 +688,7 @@ class AttachmentsDirectory
 	/**
 	 * Checks if the current active directory has space allowed for a new attachment file
 	 *
-	 * @param $sess_attach
+	 * @param \ElkArte\TemporaryAttachment $sess_attach
 	 * @throws \ElkArte\Exceptions\Exception
 	 */
 	public function checkDirSpace($sess_attach)

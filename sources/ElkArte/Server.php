@@ -288,7 +288,7 @@ class Server extends \ArrayObject
 
 		if (preg_match('~^(?!\-)(?:[a-zA-Z\d\-]{0,62}[a-zA-Z\d]\.){1,126}(?!\d+)[a-zA-Z\d]{1,63}$~', $hostname) === 1)
 		{
-			// Check for ANY dns records for this name for simplicity although we really want A / AAAA
+			// Check for ANY dns records for this name, for simplicity, although we really want A / AAAA
 			return checkdnsrr($hostname, 'ANY');
 		}
 
