@@ -1079,7 +1079,7 @@ class ManageFeatures extends AbstractController
 					),
 					'data' => array(
 						'function' => function ($rowData) {
-							$isChecked = $rowData['active'] ? ' checked="checked"' : '';
+							$isChecked = $rowData['active'] === '1' ? ' checked="checked"' : '';
 
 							return sprintf('<input type="checkbox" name="cust[]" id="cust_%1$s" value="%1$s" class="input_check"%2$s />', $rowData['id_field'], $isChecked);
 						},
