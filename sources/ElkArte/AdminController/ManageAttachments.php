@@ -1433,13 +1433,10 @@ class ManageAttachments extends AbstractController
 				{
 					$attachmentsDir->rename($id, $real_path);
 				}
-				else
+				elseif ($attachmentsDir->delete($id, $real_path) === true)
 				{
-					if ($attachmentsDir->delete($id, $real_path) === true)
-					{
-						// Don't add it back, its now gone!
-						continue;
-					}
+					// Don't add it back, its now gone!
+					continue;
 				}
 			}
 			catch (\Exception $e)
@@ -1806,7 +1803,7 @@ class ManageAttachments extends AbstractController
 						</div>';
 
 					// Write it to a file so it can be displayed
-					$fp = fopen(BOARDDIR . '/progress.php', 'w');
+					$fp = fopen(BOARDDIR . '/progress.php', 'wb');
 					fwrite($fp, $prog_bar);
 					fclose($fp);
 					usleep(500000);

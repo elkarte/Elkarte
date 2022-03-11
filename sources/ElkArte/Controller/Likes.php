@@ -133,19 +133,17 @@ class Likes extends AbstractController
 			{
 				// Like it
 				$likeResult = likePost($this->user->id, $liked_message, $sign);
-				if ($likeResult === true)
+
+				// Lets add in a mention to the member that just had their post liked/unliked
+				if (($likeResult === true) && !empty($modSettings['mentions_enabled']))
 				{
-					// Lets add in a mention to the member that just had their post liked/unliked
-					if (!empty($modSettings['mentions_enabled']))
-					{
-						$notifier = Notifications::instance();
-						$notifier->add(new NotificationsTask(
-							$type,
-							$this->_id_liked,
-							$this->user->id,
-							array('id_members' => array($liked_message['id_member']), 'rlike_notif' => $type === 'rlikemsg', 'subject' => $liked_message['subject'])
-						));
-					}
+					$notifier = Notifications::instance();
+					$notifier->add(new NotificationsTask(
+						$type,
+						$this->_id_liked,
+						$this->user->id,
+						array('id_members' => array($liked_message['id_member']), 'rlike_notif' => $type === 'rlikemsg', 'subject' => $liked_message['subject'])
+					));
 				}
 
 				return true;
@@ -455,7 +453,7 @@ class Likes extends AbstractController
 	 * @param int $memberID
 	 * @param bool $given
 	 *
-	 * @return
+	 * @return int
 	 */
 	public function list_getLikesCount($memberID, $given)
 	{

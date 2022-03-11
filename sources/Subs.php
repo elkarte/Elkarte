@@ -627,12 +627,11 @@ function obExit($header = null, $do_footer = null, $from_index = false, $from_fa
 
 			// Add $db_show_debug = true; to Settings.php if you want to show the debugging information.
 			// (since this is just debugging... it's okay that it's after </html>.)
-			if ($db_show_debug === true)
+			if (($db_show_debug === true)
+				&& !isset($_REQUEST['api'])
+				&& ((!isset($_GET['action']) || $_GET['action'] !== 'viewquery') && !isset($_GET['api'])))
 			{
-				if (!isset($_REQUEST['api']) && ((!isset($_GET['action']) || $_GET['action'] !== 'viewquery') && !isset($_GET['api'])))
-				{
-					Debug::instance()->display();
-				}
+				Debug::instance()->display();
 			}
 		}
 	}
@@ -738,13 +737,11 @@ function determineTopicClass(&$topic_context)
 /**
  * Sets up the basic theme context stuff.
  *
- * @param bool $forceload = false
- *
- * @return
+ * @param bool $forceload defaults to false
  */
 function setupThemeContext($forceload = false)
 {
-	return theme()->setupThemeContext($forceload);
+	theme()->setupThemeContext($forceload);
 }
 
 /**
@@ -943,7 +940,6 @@ function ip2range($fullip)
  * @param string $ip A full dot notation IP address
  *
  * @return string
- * @throws \ElkArte\Exceptions\Exception
  */
 function host_from_ip($ip)
 {
@@ -960,7 +956,7 @@ function host_from_ip($ip)
 	$t = microtime(true);
 
 	// Try the Linux host command, perhaps?
-	if ((stripos(PHP_OS, 'win') === false || stripos(PHP_OS, 'darwin') !== false) && mt_rand(0, 1) === 1)
+	if ((strpos(PHP_OS_FAMILY, 'Win') === false || strpos(PHP_OS_FAMILY, 'Darwin') !== false) && mt_rand(0, 1) === 1)
 	{
 		if (!isset($modSettings['host_to_dis']))
 		{
@@ -989,7 +985,7 @@ function host_from_ip($ip)
 	}
 
 	// This is nslookup; usually only Windows, but possibly some Unix?
-	if (empty($host) && stripos(PHP_OS, 'win') !== false && stripos(PHP_OS, 'darwin') === false && mt_rand(0, 1) === 1)
+	if (empty($host) && strpos(PHP_OS_FAMILY, 'Win') !== false && strpos(PHP_OS_FAMILY, 'Darwin') === false && mt_rand(0, 1) === 1)
 	{
 		$test = @shell_exec('nslookup -timeout=1 ' . @escapeshellarg($ip));
 
@@ -2046,7 +2042,7 @@ function expandIPv6($addr, $strict_check = true)
 		$limit = count($part[0]) + count($part[1]);
 		for ($i = 0; $i < (8 - $limit); $i++)
 		{
-			array_push($missing, '0000');
+			$missing[] = '0000';
 		}
 
 		$part = array_merge($part[0], $missing, $part[1]);

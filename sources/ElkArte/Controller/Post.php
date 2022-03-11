@@ -357,27 +357,28 @@ class Post extends AbstractController
 		$subject = $this->_req->getPost('subject', 'trim', '');
 
 		// See if any new replies have come along.
-		if (empty($msg) && !empty($topic))
+		if (empty($msg)
+			&& !empty($topic)
+			&& empty($options['no_new_reply_warning'])
+			&& isset($last_msg)
+			&& $context['topic_last_message'] > $last_msg)
 		{
-			if (empty($options['no_new_reply_warning']) && isset($last_msg) && $context['topic_last_message'] > $last_msg)
+			$context['new_replies'] = countMessagesSince($topic, (int) $_REQUEST['last_msg'], false, $modSettings['postmod_active'] && !allowedTo('approve_posts'));
+
+			if (!empty($context['new_replies']))
 			{
-				$context['new_replies'] = countMessagesSince($topic, (int) $_REQUEST['last_msg'], false, $modSettings['postmod_active'] && !allowedTo('approve_posts'));
-
-				if (!empty($context['new_replies']))
+				if ($context['new_replies'] == 1)
 				{
-					if ($context['new_replies'] == 1)
-					{
-						$txt['error_new_replies'] = isset($_GET['last_msg']) ? $txt['error_new_reply_reading'] : $txt['error_new_reply'];
-					}
-					else
-					{
-						$txt['error_new_replies'] = sprintf(isset($_GET['last_msg']) ? $txt['error_new_replies_reading'] : $txt['error_new_replies'], $context['new_replies']);
-					}
-
-					$this->_post_errors->addError('new_replies', 0);
-
-					$modSettings['topicSummaryPosts'] = $context['new_replies'] > $modSettings['topicSummaryPosts'] ? max($modSettings['topicSummaryPosts'], 5) : $modSettings['topicSummaryPosts'];
+					$txt['error_new_replies'] = isset($_GET['last_msg']) ? $txt['error_new_reply_reading'] : $txt['error_new_reply'];
 				}
+				else
+				{
+					$txt['error_new_replies'] = sprintf(isset($_GET['last_msg']) ? $txt['error_new_replies_reading'] : $txt['error_new_replies'], $context['new_replies']);
+				}
+
+				$this->_post_errors->addError('new_replies', 0);
+
+				$modSettings['topicSummaryPosts'] = $context['new_replies'] > $modSettings['topicSummaryPosts'] ? max($modSettings['topicSummaryPosts'], 5) : $modSettings['topicSummaryPosts'];
 			}
 		}
 

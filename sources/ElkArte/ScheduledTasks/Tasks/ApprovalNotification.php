@@ -225,12 +225,9 @@ class ApprovalNotification implements ScheduledTaskInterface
 					}
 
 					// If they have deny rights don't consider them!
-					if (isset($perms[$profiles[$board]]['deny']))
+					if (isset($perms[$profiles[$board]]['deny']) && array_intersect($perms[$profiles[$board]]['deny'], $member['groups']) !== [])
 					{
-						if (array_intersect($perms[$profiles[$board]]['deny'], $member['groups']) !== [])
-						{
-							$access = false;
-						}
+						$access = false;
 					}
 				}
 

@@ -166,13 +166,11 @@ class Post extends AbstractModule
 		$event_id = isset($_REQUEST['eventid']) ? (int) $_REQUEST['eventid'] : -1;
 
 		// Editing an event?  (but NOT previewing!?)
-		if ($event_id !== -1 && !isset($_REQUEST['subject']))
+		// If the user doesn't have permission to edit the post in this topic, redirect them.
+		if ($event_id !== -1 && !isset($_REQUEST['subject'])
+			&& (empty($id_member_poster) || $id_member_poster != $this->user->id || !allowedTo('modify_own')) && !allowedTo('modify_any'))
 		{
-			// If the user doesn't have permission to edit the post in this topic, redirect them.
-			if ((empty($id_member_poster) || $id_member_poster != $this->user->id || !allowedTo('modify_own')) && !allowedTo('modify_any'))
-			{
-				throw new ControllerRedirectException('\\ElkArte\\Controller\\Calendar', 'action_post');
-			}
+			throw new ControllerRedirectException('\\ElkArte\\Controller\\Calendar', 'action_post');
 		}
 
 		$this->_prepareEventContext($event_id);

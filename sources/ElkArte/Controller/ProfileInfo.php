@@ -1288,18 +1288,16 @@ class ProfileInfo extends AbstractController
 		if (!empty($modSettings['enable_buddylist'])
 			&& $context['user']['is_owner']
 			&& !empty($this->user->buddies)
-			&& in_array('buddies', $this->_summary_areas))
+			&& in_array('buddies', $this->_summary_areas)
+			&& MembersList::load($this->user->buddies, false, 'profile'))
 		{
-			if (MembersList::load($this->user->buddies, false, 'profile'))
+			// Get the info for this buddy
+			foreach ($this->user->buddies as $buddy)
 			{
-				// Get the info for this buddy
-				foreach ($this->user->buddies as $buddy)
-				{
-					$member = MembersList::get($buddy);
-					$member->loadContext(true);
+				$member = MembersList::get($buddy);
+				$member->loadContext(true);
 
-					$context['buddies'][$buddy] = $member;
-				}
+				$context['buddies'][$buddy] = $member;
 			}
 		}
 	}

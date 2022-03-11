@@ -146,12 +146,9 @@ class AttachmentErrorContext
 	 */
 	public function hasErrors($attachID = null, $severity = null)
 	{
-		if ($this->_generic_error !== null)
+		if (($this->_generic_error !== null) && $this->_generic_error->hasErrors($severity))
 		{
-			if ($this->_generic_error->hasErrors($severity))
-			{
-				return true;
-			}
+			return true;
 		}
 
 		if (!empty($this->_attachs))

@@ -390,14 +390,10 @@ class Bootstrap
 		new ThemeLoader(isset($ssi_theme) ? (int) $ssi_theme : 0);
 
 		// Load BadBehavior functions, but not when running from CLI
-		if (!defined('STDIN'))
+		if (!defined('STDIN') && runBadBehavior())
 		{
-			// Do our BadBehavior checking
-			if (runBadBehavior())
-			{
-				// 403 and gone
-				Errors::instance()->display_403_error(true);
-			}
+			// 403 and gone
+			Errors::instance()->display_403_error(true);
 		}
 
 		// Take care of any banning that needs to be done.
