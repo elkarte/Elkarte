@@ -192,7 +192,7 @@ class AttachmentsDirectory
 	 */
 	public function directoryExists($id)
 	{
-		if (is_integer($id))
+		if (is_int($id))
 		{
 			return array_key_exists($id, $this->attachmentUploadDir);
 		}

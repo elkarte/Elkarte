@@ -255,7 +255,7 @@ class Payment implements PaymentInterface
 		}
 
 		// Put the data to the port.
-		fputs($fp, $header . $this->requestString);
+		fwrite($fp, $header . $this->requestString);
 
 		// Get the data back...
 		while (!feof($fp))
