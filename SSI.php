@@ -67,7 +67,7 @@ if (!defined('ELKBOOT'))
 {
 	define('ELK', 'SSI');
 
-	require_once(dirname(__FILE__) . '/bootstrap.php');
+	require_once(__DIR__ . '/bootstrap.php');
 	$bootstrap = new Bootstrap(true);
 }
 
@@ -472,7 +472,7 @@ function ssi_recentTopics($num_recent = 8, $exclude_boards = null, $include_boar
 			INNER JOIN {db_prefix}messages AS ml ON (ml.id_msg = t.id_last_msg)
 			LEFT JOIN {db_prefix}boards AS b ON (b.id_board = t.id_board)
 		WHERE t.id_last_msg >= {int:min_message_id}' . (empty($exclude_boards) ? '' : '
-			AND b.id_board NOT IN ({array_int:exclude_boards})') . '' . (empty($include_boards) ? '' : '
+			AND b.id_board NOT IN ({array_int:exclude_boards})') . (empty($include_boards) ? '' : '
 			AND b.id_board IN ({array_int:include_boards})') . '
 			AND {query_wanna_see_board}' . ($modSettings['postmod_active'] ? '
 			AND t.approved = {int:is_approved}
@@ -803,8 +803,10 @@ function ssi_latestMember($output_method = 'echo')
 	global $txt, $context;
 
 	if ($output_method === 'echo')
+	{
 		echo '
 		', sprintf($txt['welcome_newest_member'], $context['common_stats']['latest_member']['link']), '<br />';
+	}
 	else
 	{
 		return $context['common_stats']['latest_member'];
