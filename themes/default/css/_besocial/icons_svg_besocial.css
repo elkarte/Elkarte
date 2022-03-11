@@ -10,12 +10,14 @@
    Some areas, for example board icons, are custom content as well */
 
 /* Top Menu icons */
-.i-menu-pm-on::before, .i-menu-pm-on.enabled::before, .i-menu-pm-off::before,
-.i-menu-mentions-on::before, .i-menu-mentions-on.enabled::before, .i-menu-mentions-off::before {
+.i-menu-pm-on::before, .i-menu-pm-on.enabled::before,
+.i-menu-mentions-on::before, .i-menu-mentions-on.enabled::before {
 	filter: invert(66%) sepia(32%) saturate(4068%) hue-rotate(2deg) brightness(107%) contrast(102%);
 	--hexcode: #FFA500;
 }
 
+.i-menu-pm-off::before,
+.i-menu-mentions-off::before,
 .i-menu-admin::before,
 .i-menu-profile::before, .i-menu-profile.enabled::before,
 .i-menu-unread.enabled::before,
