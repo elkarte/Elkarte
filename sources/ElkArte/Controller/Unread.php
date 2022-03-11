@@ -408,10 +408,6 @@ class Unread extends AbstractController
 				'last' => $this->_req->query->start + $context['topics_per_page'] < $this->_num_topics ? $scripturl . '?action=' . $this->_action . ($context['showing_all_topics'] ? ';all' : '') . sprintf($context['querystring_board_limits'], floor(($this->_num_topics - 1) / $context['topics_per_page']) * $context['topics_per_page']) . $context['querystring_sort_limits'] : '',
 				'up' => $scripturl,
 			);
-			$context['page_info'] = array(
-				'current_page' => $this->_req->query->start / $context['topics_per_page'] + 1,
-				'num_pages' => floor(($this->_num_topics - 1) / $context['topics_per_page']) + 1
-			);
 			$context['topics'] = $this->_grabber->getUnreads(null, $this->_req->query->start, $context['topics_per_page'], $settings['avatars_on_indexes']);
 
 			if ($context['topics'] === false)
@@ -481,10 +477,6 @@ class Unread extends AbstractController
 		$context['links'] += array(
 			'prev' => $this->_req->query->start >= $context['topics_per_page'] ? $scripturl . '?action=' . $this->_action . $all . sprintf($context['querystring_board_limits'], $this->_req->query->start - $context['topics_per_page']) . $context['querystring_sort_limits'] : '',
 			'next' => $this->_req->query->start + $context['topics_per_page'] < $this->_num_topics ? $scripturl . '?action=' . $this->_action . $all . sprintf($context['querystring_board_limits'], $this->_req->query->start + $context['topics_per_page']) . $context['querystring_sort_limits'] : '',
-		);
-		$context['page_info'] = array(
-			'current_page' => $this->_req->query->start / $context['topics_per_page'] + 1,
-			'num_pages' => floor(($this->_num_topics - 1) / $context['topics_per_page']) + 1
 		);
 
 		$context['querystring_board_limits'] = sprintf($context['querystring_board_limits'], $this->_req->query->start);
