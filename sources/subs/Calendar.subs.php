@@ -153,7 +153,7 @@ function getEventRange($low_date, $high_date, $use_permissions = true, $limit = 
 		}
 
 		// Force a censor of the title - as often these are used by others.
-		$row['title'] = censor($row['title'], $use_permissions ? false : true);
+		$row['title'] = censor($row['title'], !$use_permissions);
 
 		$start_date = sscanf($row['start_date'], '%04d-%02d-%02d');
 		$start_date = max(mktime(0, 0, 0, $start_date[1], $start_date[2], $start_date[0]), $low_date_time);
@@ -196,7 +196,7 @@ function getEventRange($low_date, $high_date, $use_permissions = true, $limit = 
 					'link' => $row['id_board'] == 0 ? $row['title'] : '<a href="' . $href . '">' . $row['title'] . '</a>',
 					'can_edit' => allowedTo('calendar_edit_any') || ($row['id_member'] == User::$info->id && allowedTo('calendar_edit_own')),
 					'modify_href' => getUrl('action', $modify_href),
-					'can_export' => !empty($modSettings['cal_export']) ? true : false,
+					'can_export' => !empty($modSettings['cal_export']),
 					'export_href' => getUrl('action', ['action' => 'calendar', 'sa' => 'ical', 'eventid' => $row['id_event'], '{session_data}']),
 				);
 			}
@@ -214,7 +214,7 @@ function getEventRange($low_date, $high_date, $use_permissions = true, $limit = 
 					'href' => $row['id_topic'] == 0 ? '' : $href,
 					'link' => $row['id_topic'] == 0 ? $row['title'] : '<a href="' . $href . '">' . $row['title'] . '</a>',
 					'can_edit' => false,
-					'can_export' => !empty($modSettings['cal_export']) ? true : false,
+					'can_export' => !empty($modSettings['cal_export']),
 					'topic' => $row['id_topic'],
 					'msg' => $row['id_first_msg'],
 					'poster' => $row['id_member'],
@@ -1394,8 +1394,7 @@ function build_ical_content($event)
 	}
 
 	// This is what we will be sending later
-	$filecontents = '';
-	$filecontents .= 'BEGIN:VCALENDAR' . "\n";
+	$filecontents = 'BEGIN:VCALENDAR' . "\n";
 	$filecontents .= 'METHOD:PUBLISH' . "\n";
 	$filecontents .= 'PRODID:-//ElkArteCommunity//ElkArte ' . (!defined('FORUM_VERSION') ? 2.0 : strtr(FORUM_VERSION, array('ElkArte ' => ''))) . '//EN' . "\n";
 	$filecontents .= 'VERSION:2.0' . "\n";

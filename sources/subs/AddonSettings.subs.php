@@ -28,7 +28,7 @@ function get_files_recursive($dir_path)
 	try
 	{
 		$iterator = new RecursiveIteratorIterator(
-			new RecursiveDirectoryIterator($dir_path, RecursiveDirectoryIterator::SKIP_DOTS),
+			new RecursiveDirectoryIterator($dir_path, FilesystemIterator::SKIP_DOTS),
 			RecursiveIteratorIterator::SELF_FIRST,
 			RecursiveIteratorIterator::CATCH_GET_CHILD
 		);

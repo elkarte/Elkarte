@@ -541,7 +541,7 @@ function loadSubscriptions()
 				'active' => $row['active'],
 				'prim_group' => $row['id_group'],
 				'add_groups' => $row['add_groups'],
-				'flexible' => $row['length'] == 'F' ? true : false,
+				'flexible' => $row['length'] === 'F',
 				'repeatable' => $row['repeatable'],
 			);
 		}
