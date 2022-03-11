@@ -657,7 +657,7 @@ class News extends AbstractController
 			$data = array(array(
 							  'title' => cdata_parse($member['name']),
 							  'link' => $scripturl . '?action=profile;u=' . $member['id'],
-							  'description' => cdata_parse(isset($member['group']) ? $member['group'] : $member['post_group']),
+							  'description' => cdata_parse($member['group'] ?? $member['post_group']),
 							  'comments' => $scripturl . '?action=pm;sa=send;u=' . $member['id'],
 							  'pubDate' => gmdate('D, d M Y H:i:s \G\M\T', $member->date_registered),
 							  'guid' => $scripturl . '?action=profile;u=' . $member['id'],
@@ -668,7 +668,7 @@ class News extends AbstractController
 			$data = array(array(
 							  'title' => cdata_parse($member['name']),
 							  'link' => $scripturl . '?action=profile;u=' . $member['id'],
-							  'description' => cdata_parse(isset($member['group']) ? $member['group'] : $member['post_group']),
+							  'description' => cdata_parse($member['group'] ?? $member['post_group']),
 						  ));
 		}
 		elseif ($xml_format === 'atom')
@@ -676,7 +676,7 @@ class News extends AbstractController
 			$data[] = array(
 				'title' => cdata_parse($member['name']),
 				'link' => $scripturl . '?action=profile;u=' . $member['id'],
-				'summary' => cdata_parse(isset($member['group']) ? $member['group'] : $member['post_group']),
+				'summary' => cdata_parse($member['group'] ?? $member['post_group']),
 				'author' => array(
 					'name' => $member['real_name'],
 					'email' => in_array(showEmailAddress(!empty($member['hide_email']), $member['id']), array('yes', 'yes_permission_override')) ? $member['email'] : null,

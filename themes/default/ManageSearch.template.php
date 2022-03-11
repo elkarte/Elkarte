@@ -466,63 +466,63 @@ function template_manage_sphinx()
 						<span class="smalltext">', $txt['sphinx_index_prefix_desc'], '</span>
 					</dt>
 					<dd>
-						<input type="text" name="sphinx_index_prefix" id="sphinx_index_prefix_input" value="', isset($modSettings['sphinx_index_prefix']) ? $modSettings['sphinx_index_prefix'] : 'elkarte', '" size="65" />
+						<input type="text" name="sphinx_index_prefix" id="sphinx_index_prefix_input" value="', $modSettings['sphinx_index_prefix'] ?? 'elkarte', '" size="65" />
 					</dd>
 					<dt>
 						<label for="sphinx_data_path_input">', $txt['sphinx_index_data_path'], '</label><br />
 						<span class="smalltext">', $txt['sphinx_index_data_path_desc'], '</span>
 					</dt>
 					<dd>
-						<input type="text" name="sphinx_data_path" id="sphinx_data_path_input" value="', isset($modSettings['sphinx_data_path']) ? $modSettings['sphinx_data_path'] : '/var/sphinx/data', '" size="65" />
+						<input type="text" name="sphinx_data_path" id="sphinx_data_path_input" value="', $modSettings['sphinx_data_path'] ?? '/var/sphinx/data', '" size="65" />
 					</dd>
 					<dt>
 						<label for="sphinx_log_path_input">', $txt['sphinx_log_file_path'], '</label><br />
 						<span class="smalltext">', $txt['sphinx_log_file_path_desc'], '</span>
 					</dt>
 					<dd>
-						<input type="text" name="sphinx_log_path" id="sphinx_log_path_input" value="', isset($modSettings['sphinx_log_path']) ? $modSettings['sphinx_log_path'] : '/var/sphinx/log', '" size="65" />
+						<input type="text" name="sphinx_log_path" id="sphinx_log_path_input" value="', $modSettings['sphinx_log_path'] ?? '/var/sphinx/log', '" size="65" />
 					</dd>
 					<dt>
 						<label for="sphinx_stopword_path_input">', $txt['sphinx_stop_word_path'], '</label><br />
 						<span class="smalltext">', $txt['sphinx_stop_word_path_desc'], '</span>
 					</dt>
 					<dd>
-						<input type="text" name="sphinx_stopword_path" id="sphinx_stopword_path_input" value="', isset($modSettings['sphinx_stopword_path']) ? $modSettings['sphinx_stopword_path'] : '', '" size="65" />
+						<input type="text" name="sphinx_stopword_path" id="sphinx_stopword_path_input" value="', $modSettings['sphinx_stopword_path'] ?? '', '" size="65" />
 					</dd>
 					<dt>
 						<label for="sphinx_indexer_mem_input">', $txt['sphinx_memory_limit'], '</label><br />
 						<span class="smalltext">', $txt['sphinx_memory_limit_desc'], '</span>
 					</dt>
 					<dd>
-						<input type="text" name="sphinx_indexer_mem" id="sphinx_indexer_mem_input" value="', isset($modSettings['sphinx_indexer_mem']) ? $modSettings['sphinx_indexer_mem'] : '128', '" size="4" /> MB
+						<input type="text" name="sphinx_indexer_mem" id="sphinx_indexer_mem_input" value="', $modSettings['sphinx_indexer_mem'] ?? '128', '" size="4" /> MB
 					</dd>
 					<dt>
 						<label for="sphinx_searchd_server_input">', $txt['sphinx_searchd_server'], '</label><br />
 						<span class="smalltext">', $txt['sphinx_searchd_server_desc'], '</span>
 					</dt>
 					<dd>
-						<input type="text" name="sphinx_searchd_server" id="sphinx_searchd_server_input" value="', isset($modSettings['sphinx_searchd_server']) ? $modSettings['sphinx_searchd_server'] : 'localhost', '" size="65" />
+						<input type="text" name="sphinx_searchd_server" id="sphinx_searchd_server_input" value="', $modSettings['sphinx_searchd_server'] ?? 'localhost', '" size="65" />
 					</dd>
 					<dt>
 						<label for="sphinxql_searchd_port_input">', $txt['sphinx_searchd_qlport'], '</label><br />
 						<span class="smalltext">', $txt['sphinx_searchd_qlport_desc'], '</span>
 					</dt>
 					<dd>
-						<input type="text" name="sphinxql_searchd_port" id="sphinxql_searchd_port_input" value="', isset($modSettings['sphinxql_searchd_port']) ? $modSettings['sphinxql_searchd_port'] : '9306', '" size="4" />
+						<input type="text" name="sphinxql_searchd_port" id="sphinxql_searchd_port_input" value="', $modSettings['sphinxql_searchd_port'] ?? '9306', '" size="4" />
 					</dd>
 					<dt>
 						<label for="sphinx_searchd_port_input">', $txt['sphinx_searchd_port'], '</label><br />
 						<span class="smalltext">', $txt['sphinx_searchd_port_desc'], '</span>
 					</dt>
 					<dd>
-						<input type="text" name="sphinx_searchd_port" id="sphinx_searchd_port_input" value="', isset($modSettings['sphinx_searchd_port']) ? $modSettings['sphinx_searchd_port'] : '9312', '" size="4" />
+						<input type="text" name="sphinx_searchd_port" id="sphinx_searchd_port_input" value="', $modSettings['sphinx_searchd_port'] ?? '9312', '" size="4" />
 					</dd>
 					<dt>
 						<label for="sphinx_max_results_input">', $txt['sphinx_max_matches'], '</label><br />
 						<span class="smalltext">', $txt['sphinx_max_matches_desc'], '</span>
 					</dt>
 					<dd>
-						<input type="text" name="sphinx_max_results" id="sphinx_max_results_input" value="', isset($modSettings['sphinx_max_results']) ? $modSettings['sphinx_max_results'] : '2000', '" size="4" />
+						<input type="text" name="sphinx_max_results" id="sphinx_max_results_input" value="', $modSettings['sphinx_max_results'] ?? '2000', '" size="4" />
 					</dd>
 				</dl>
 				<div class="submitbutton">

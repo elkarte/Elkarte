@@ -55,7 +55,7 @@ function template_action_summary()
 			$tab_num++;
 			echo '
 						<li>
-							<a href="', (isset($context['summarytabs'][$tab]['href']) ? $context['summarytabs'][$tab]['href'] : '#tab_' . $tab_num), '">', $context['summarytabs'][$tab]['name'], '</a>
+							<a href="', ($context['summarytabs'][$tab]['href'] ?? '#tab_' . $tab_num), '">', $context['summarytabs'][$tab]['name'], '</a>
 						</li>';
 		}
 

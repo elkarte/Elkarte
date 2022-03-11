@@ -108,12 +108,10 @@ function validateSession($type = 'admin')
 		validateToken('admin-login');
 
 		// Hashed password, ahoy!
-		if (isset($_POST[$type . '_hash_pass']) && strlen($_POST[$type . '_hash_pass']) === 64)
+		if (isset($_POST[$type . '_hash_pass']) && strlen($_POST[$type . '_hash_pass']) === 64
+			&& checkPassword($type, true))
 		{
-			if (checkPassword($type, true))
-			{
-				return true;
-			}
+			return true;
 		}
 
 		// Posting the password... check it.
@@ -637,7 +635,7 @@ function log_ban($ban_ids = array(), $email = null)
 		array(
 			User::$info->id,
 			User::$info->ip,
-			$email === null ? (string) User::$info->email : $email,
+			$email ?? (string) User::$info->email,
 			time()
 		),
 		array('id_ban_log')
@@ -798,7 +796,7 @@ function checkSession($type = 'post', $from_action = '', $is_fatal = true)
 	stop_prefetching();
 
 	// Check the referring site - it should be the same server at least!
-	$referrer_url = $_SESSION['request_referer'] ?? (isset($_SERVER['HTTP_REFERER']) ? $_SERVER['HTTP_REFERER'] : '');
+	$referrer_url = $_SESSION['request_referer'] ?? ($_SERVER['HTTP_REFERER'] ?? '');
 
 	$referrer = @parse_url($referrer_url);
 
@@ -1563,13 +1561,13 @@ function secureDirectory($path, $allow_localhost = false, $files = '*')
 	}
 	else
 	{
-		$fh = @fopen($path . '/.htaccess', 'w');
+		$fh = @fopen($path . '/.htaccess', 'wb');
 		if ($fh)
 		{
 			fwrite($fh, '# Apache 2.4
 <IfModule mod_authz_core.c>
 	Require all denied
-	<Files ~ ' . $files . '>
+	<Files ' . ($files === '*' ? $files : '~ ' . $files) . '>
 		<RequireAll>
 			Require all granted
 			Require not env blockAccess' . (empty($allow_localhost) ? '
@@ -1606,7 +1604,7 @@ function secureDirectory($path, $allow_localhost = false, $files = '*')
 	}
 	else
 	{
-		$fh = @fopen($path . '/index.php', 'w');
+		$fh = @fopen($path . '/index.php', 'wb');
 		if ($fh)
 		{
 			fwrite($fh, '<?php

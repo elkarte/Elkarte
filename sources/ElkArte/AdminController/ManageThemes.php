@@ -479,7 +479,7 @@ class ManageThemes extends AbstractController
 				$context['settings'][$i]['type'] = 'list';
 			}
 
-			$context['settings'][$i]['value'] = !isset($settings[$setting['id']]) ? '' : $settings[$setting['id']];
+			$context['settings'][$i]['value'] = $settings[$setting['id']] ?? '';
 		}
 
 		// Do we support variants?

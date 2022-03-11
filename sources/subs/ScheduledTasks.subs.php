@@ -249,7 +249,7 @@ function logTask($id_log, $task_id, $total_time = null)
 		$db->insert('',
 			'{db_prefix}log_scheduled_tasks',
 			array('id_task' => 'int', 'time_run' => 'int', 'time_taken' => 'float'),
-			array($task_id, time(), $total_time === null ? -1 : $total_time),
+			array($task_id, time(), $total_time ?? -1),
 			array('id_task')
 		);
 
@@ -529,9 +529,7 @@ function emptyTaskLog()
 {
 	$db = database();
 
-	$db->truncate('{db_prefix}log_scheduled_tasks',
-		array()
-	);
+	$db->truncate('{db_prefix}log_scheduled_tasks');
 }
 
 /**

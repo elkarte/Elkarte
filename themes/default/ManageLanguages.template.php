@@ -88,7 +88,7 @@ function template_download_language()
 		echo '
 				<tr class="secondary_header">
 					<td colspan="4">
-						<i class="icon i-sort-alpha-down" id="toggle_image_', $theme, '" /></i>&nbsp;', isset($context['theme_names'][$theme]) ? $context['theme_names'][$theme] : $theme, '
+						<i class="icon i-sort-alpha-down" id="toggle_image_', $theme, '" /></i>&nbsp;', $context['theme_names'][$theme] ?? $theme, '
 					</td>
 				</tr>';
 
@@ -269,7 +269,7 @@ function template_modify_language_entries()
 			echo '
 					<li>
 						<label for="entry_', $entry['key'], '" class="smalltext">', $entry['display_key'], '</label>
-						<textarea id="entry_', $entry['key'], '" name="entry[', $entry['key'], ']" cols="40" rows="', $entry['rows'] < 2 ? 2 : $entry['rows'], '">', $entry['value'], '</textarea>
+						<textarea id="entry_', $entry['key'], '" name="entry[', $entry['key'], ']" cols="40" rows="', max($entry['rows'], 2), '">', $entry['value'], '</textarea>
 					</li>';
 		}
 

@@ -103,7 +103,7 @@ abstract class Renderer
 	 * @param ValuesContainer $opt
 	 * @throws \Exception
 	 */
-	public function __construct($request, $user, BodyParserInterface $bodyParser, ValuesContainer $opt = null)
+	public function __construct($request, $user, $bodyParser, $opt = null)
 	{
 		$this->_dbRequest = $request;
 		$this->user = $user;
@@ -119,7 +119,7 @@ abstract class Renderer
 		// opt:
 		// icon_sources
 		// show_signatures
-		$this->_options = $opt === null ? new ValuesContainer() : $opt;
+		$this->_options = $opt ?? new ValuesContainer();
 	}
 
 	/**

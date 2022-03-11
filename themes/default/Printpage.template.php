@@ -143,7 +143,7 @@ function template_print_poll_above()
 		{
 			echo '
 					<div class="', $option['voted_this'] ? 'voted' : '', '">', $txt['option'], ' ', $print_options++, ': <strong>', $option['option'], '</strong>
-						', $context['allow_poll_view'] ? $txt['votes'] . ': ' . $option['votes'] . '' : '', '
+						', $context['allow_poll_view'] ? $txt['votes'] . ': ' . $option['votes'] : '', '
 					</div>';
 		}
 

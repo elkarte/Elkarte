@@ -526,13 +526,8 @@ class ProfileOptions extends AbstractController
 			)
 		);
 
-		if (isset($fields[$area]))
-		{
-			return $fields[$area];
-		}
-
-			return array();
-		}
+		return $fields[$area] ?? array();
+	}
 
 	/**
 	 * Allow the user to change the forum options in their profile.

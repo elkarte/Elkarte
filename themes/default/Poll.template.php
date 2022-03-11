@@ -50,7 +50,7 @@ function template_poll_edit()
 						<fieldset id="poll_main">
 							<legend>', $txt['poll_question_options'], '</legend>
 							<label for="question"', (isset($context['poll_error']['no_question']) ? ' class="error"' : ''), '>', $txt['poll_question'], ':</label>
-							<input type="text" id="question" name="question" value="', isset($context['poll']['question']) ? $context['poll']['question'] : '', '" tabindex="', $context['tabindex']++, '" size="80" class="input_text" required="required" placeholder="', $txt['poll_question'], '" />
+							<input type="text" id="question" name="question" value="', $context['poll']['question'] ?? '', '" tabindex="', $context['tabindex']++, '" size="80" class="input_text" required="required" placeholder="', $txt['poll_question'], '" />
 							<ul class="poll_main">';
 
 	// Loop through all the choices and print them out.

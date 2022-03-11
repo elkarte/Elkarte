@@ -863,8 +863,8 @@ function updateMessageStats($increment = null, $max_msg_id = null)
 		$request->free_result();
 
 		updateSettings(array(
-			'totalMessages' => $row['total_messages'] === null ? 0 : $row['total_messages'],
-			'maxMsgID' => $row['max_msg_id'] === null ? 0 : $row['max_msg_id']
+			'totalMessages' => $row['total_messages'] ?? 0,
+			'maxMsgID' => $row['max_msg_id'] ?? 0
 		));
 	}
 }

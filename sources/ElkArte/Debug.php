@@ -387,7 +387,7 @@ class Debug
 			return;
 		}
 
-		$this->_rusage[$point] = $rusage === null ? getrusage() : $rusage;
+		$this->_rusage[$point] = $rusage ?? getrusage();
 	}
 
 	/**

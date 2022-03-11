@@ -22,7 +22,7 @@ function template_show_list($list_id = null)
 	global $context, $txt;
 
 	// Get a shortcut to the current list.
-	$list_id = $list_id === null ? $context['default_list'] : $list_id;
+	$list_id = $list_id ?? $context['default_list'];
 	$cur_list = &$context[$list_id];
 
 	if (isset($cur_list['form']))
@@ -85,7 +85,9 @@ function template_show_list($list_id = null)
 
 		// Menu buttons and additional buttons are on the same line, leaving no room for the index
 		if (isset($cur_list['additional_rows']['above_column_headers']))
+		{
 			$page_index_new_line = true;
+		}
 	}
 
 	// Show the page index (if this list doesn't intend to show all items).

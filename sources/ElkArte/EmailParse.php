@@ -991,11 +991,7 @@ class EmailParse
 			// UTF-8 these may be valid non smart quotes
 			if ($this->headers['x-parameters']['content-type']['charset'] !== 'UTF-8')
 			{
-				$val = str_replace('=D4', "'", $val);
-				$val = str_replace('=D5', "'", $val);
-				$val = str_replace('=D2', '"', $val);
-				$val = str_replace('=D3', '"', $val);
-				$val = str_replace('=A0', '', $val);
+				$val = str_replace(array('=D4', '=D5', '=D2', '=D3', '=A0'), array("'", "'", '"', '"', ''), $val);
 			}
 			$val = $this->_decode_string($val, 'quoted-printable');
 		}
@@ -1078,12 +1074,7 @@ class EmailParse
 		}
 
 		/** Body->Final-recipient Header **/
-		if (isset($this->_dsn['body']['final-recipient']['value']))
-		{
-			return $this->_dsn['body']['final-recipient']['value'];
-		}
-
-		return null;
+		return $this->_dsn['body']['final-recipient']['value'] ?? null;
 	}
 
 	/**

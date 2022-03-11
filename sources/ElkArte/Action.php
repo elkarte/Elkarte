@@ -42,7 +42,7 @@ class Action
 	 * @param string $name Hook name
 	 * @param \ElkArte\HttpReq $req Access to post/get data
 	 */
-	public function __construct(string $name = '', HttpReq $req = null)
+	public function __construct(string $name = '', $req = null)
 	{
 		$this->_name = $name;
 		$this->req = $req ?: HttpReq::instance();
@@ -132,13 +132,7 @@ class Action
 		$this->isAllowedTo($sub_id);
 
 		// Start off by assuming that this is a callable of some kind.
-		$call = $subAction;
-
-		if (isset($subAction['function']))
-		{
-			// This is just a good ole' function
-			$call = $subAction['function'];
-		}
+		$call = $subAction['function'] ?? $subAction;
 
 		// Calling a method within a controller?
 		if (isset($subAction['controller'], $subAction['function']))

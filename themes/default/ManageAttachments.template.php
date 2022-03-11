@@ -39,7 +39,7 @@ function template_maintenance()
 				<dt><label>', $txt['attachmentdir_files_current'], ':</label></dt>
 				<dd>', $context['attachment_current_files'], '</dd>
 				<dt><label>', $txt['attachment_files'], ':</label></dt>
-				<dd>', isset($context['attachment_files']) ? $context['attachment_files'] : $txt['attachmentdir_files_not_set'], '</dd>
+				<dd>', $context['attachment_files'] ?? $txt['attachmentdir_files_not_set'], '</dd>
 			</dl>
 		</div>
 		<div class="separator"></div>

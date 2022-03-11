@@ -81,7 +81,7 @@ function template_memberlist()
 	// Display each of the column headers of the table.
 	foreach ($context['columns'] as $key => $column)
 	{
-		$table_span += isset($column['colspan']) ? $column['colspan'] : 1;
+		$table_span += $column['colspan'] ?? 1;
 		switch ($key)
 		{
 			case 'posts':

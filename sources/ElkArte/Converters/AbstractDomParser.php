@@ -155,12 +155,7 @@ abstract class AbstractDomParser
 			return $this->document->find('body', 0);
 		}
 
-		if ($this->document->find('html', 0) !== null)
-		{
-			return $this->document->find('html', 0);
-		}
-
-		return $this->document->root;
+		return $this->document->find('html', 0) ?? $this->document->root;
 	}
 
 	/**

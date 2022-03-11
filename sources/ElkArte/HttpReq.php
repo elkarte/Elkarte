@@ -99,7 +99,7 @@ class HttpReq
 	private function __construct($dataValidator = null)
 	{
 		// Make sure the validator is initiated
-		$this->_dataValidator = $dataValidator === null ? new DataValidator() : $dataValidator;
+		$this->_dataValidator = $dataValidator ?? new DataValidator();
 
 		// Make the superglobals available as R/W properties
 		$this->cookie = new \ArrayObject($_COOKIE, \ArrayObject::ARRAY_AS_PROPS);
