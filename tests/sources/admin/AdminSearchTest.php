@@ -12,10 +12,6 @@ use PHPUnit\Framework\TestCase;
  */
 class TestAdminSearch extends TestCase
 {
-	/**
-	 * @var ActionController
-	 */
-	private $controller;
 	protected $backupGlobalsBlacklist = ['user_info'];
 
 	/**
@@ -72,15 +68,15 @@ class TestAdminSearch extends TestCase
 		User::$info->permissions = array_merge(User::$info->permissions, ['admin_forum']);
 		$dispatcher = new SiteDispatcher($req);
 
-		$this->controller = $dispatcher->getController();
+		$controller = $dispatcher->getController();
 
 		// Won't hurt to call this again...
-		$method = new ReflectionMethod($this->controller, 'loadMenu');
+		$method = new ReflectionMethod($controller, 'loadMenu');
 		$method->setAccessible(true);
-		$method->invoke($this->controller);
+		$method->invoke($controller);
 
 		$context['search_term'] = 'enable';
-		$this->controller->action_search_internal();
+		$controller->action_search_internal();
 		destroyMenu('last');
 
 		return array_map(function ($search_result)
