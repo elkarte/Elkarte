@@ -71,7 +71,7 @@ class Dump extends AbstractDump
 			// Add a default...?
 			if (trim($row['column_default']) !== '')
 			{
-				$schema_create .= ' default ' . $row['column_default'] . '';
+				$schema_create .= ' default ' . $row['column_default'];
 
 				// Auto increment?
 				if (preg_match('~nextval\(\'(.+?)\'(.+?)*\)~i', $row['column_default'], $matches) != 0)

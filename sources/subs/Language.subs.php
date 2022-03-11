@@ -192,7 +192,7 @@ function findPossiblePackages($lang)
 		WHERE package_id LIKE {string:contains_lang}
 			AND install_state = {int:installed}',
 		array(
-			'contains_lang' => 'elk_' . $lang . '_contribs:elk_' . $lang . '',
+			'contains_lang' => 'elk_' . $lang . '_contribs:elk_' . $lang,
 			'installed' => 1,
 		)
 	);
