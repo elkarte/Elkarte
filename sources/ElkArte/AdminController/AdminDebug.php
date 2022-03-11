@@ -87,7 +87,7 @@ class AdminDebug extends AbstractController
 
 		// Looking at a specific query?
 		$query_id = $this->_req->getQuery('qq', 'intval', 0);
-		$query_id = $query_id - 1;
+		--$query_id;
 
 		// Just to stay on the safe side, better remove any layer and add back only html
 		$layers = theme()->getLayers();

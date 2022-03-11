@@ -47,7 +47,7 @@ class Session
 	public function increaseId($pointer = 0)
 	{
 		$this->_id_search = (int) $pointer;
-		$this->_id_search += 1;
+		++$this->_id_search;
 
 		if ($this->_id_search > 255)
 		{
