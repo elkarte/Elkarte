@@ -519,7 +519,7 @@ class Auth extends AbstractController
 		}
 
 		// ElkArte's sha1 function can give a funny result on Linux (Not our fault!). If we've now got the real one let the old one be valid!
-		if (stripos(PHP_OS, 'win') !== 0)
+		if (strpos(PHP_OS_FAMILY, 'Win') !== 0)
 		{
 			require_once(SUBSDIR . '/Compat.subs.php');
 			$other_passwords[] = sha1_smf(strtolower($member_name) . un_htmlspecialchars($posted_password));

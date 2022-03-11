@@ -556,7 +556,7 @@ class ManageServer extends AbstractController
 		$context['settings_message'] = $txt['loadavg_disabled_conf'];
 
 		// Don't say you're using that win-thing, no cookies for you :P
-		if (stripos(PHP_OS, 'win') === 0)
+		if (strpos(PHP_OS_FAMILY, 'Win') === 0)
 		{
 			$context['settings_message'] = $txt['loadavg_disabled_windows'];
 		}

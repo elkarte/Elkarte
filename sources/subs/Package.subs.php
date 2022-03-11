@@ -1309,7 +1309,7 @@ function package_get_contents($filename)
 		$mem_check = detectServer()->setMemoryLimit('128M');
 
 		// Windows doesn't seem to care about the memory_limit.
-		if (!empty($modSettings['package_disable_cache']) || $mem_check || stripos(PHP_OS, 'win') !== false)
+		if (!empty($modSettings['package_disable_cache']) || $mem_check || strpos(PHP_OS_FAMILY, 'Win') !== false)
 		{
 			$package_cache = array();
 		}
@@ -1353,7 +1353,7 @@ function package_put_contents($filename, $data, $testing = false)
 		// Try to increase the memory limit - we don't want to run out of ram!
 		$mem_check = detectServer()->setMemoryLimit('128M');
 
-		if (!empty($modSettings['package_disable_cache']) || $mem_check || stripos(PHP_OS, 'win') !== false)
+		if (!empty($modSettings['package_disable_cache']) || $mem_check || strpos(PHP_OS_FAMILY, 'Win') !== false)
 		{
 			$package_cache = array();
 		}

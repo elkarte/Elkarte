@@ -152,7 +152,7 @@ class Server extends \ArrayObject
 			case 'apache':
 				return $this->_is_web_server('Apache');
 			case 'cgi':
-				return isset($this->SERVER_SOFTWARE) && strpos(php_sapi_name(), 'cgi') !== false;
+				return isset($this->SERVER_SOFTWARE) && strpos(PHP_SAPI, 'cgi') !== false;
 			case 'iis':
 				return $this->_is_web_server('Microsoft-IIS');
 			case 'iso_case_folding':
