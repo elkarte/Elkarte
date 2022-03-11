@@ -493,7 +493,7 @@ function sendBoardNotifications(&$topicData)
 		}
 
 		// Convert to markdown markup e.g. styled plain text, while doing the censoring
-		pbe_prepare_text($topicData[$key]['body'], $topicData[$key]['subject'], $topicData[$key]['signature']);
+		pbe_prepare_text($topic['body'], $topic['subject'], $topic['signature']);
 	}
 
 	// Just the board numbers.

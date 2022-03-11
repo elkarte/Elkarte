@@ -829,7 +829,7 @@ class Html2BBC extends AbstractDomParser
 				if ($i % 4 === 0)
 				{
 					// protect << symbols from being stripped
-					$working = str_replace('<<', "[\xC2\xA0]", $parts[$i]);
+					$working = str_replace('<<', "[\xC2\xA0]", $part);
 					$working = strip_tags($working);
 					$parts[$i] = str_replace("[\xC2\xA0]", '<<', $working);
 				}
