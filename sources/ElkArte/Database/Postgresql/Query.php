@@ -205,9 +205,7 @@ class Query extends AbstractQuery
 		}
 
 		// Limits need to be a little different, left in place for non conformance addons
-		$db_string = preg_replace('~\sLIMIT\s(\d+|{int:.+}),\s*(\d+|{int:.+})(.*)~i', ' LIMIT $2 OFFSET $1 $3', $db_string);
-
-		return $db_string;
+		return preg_replace('~\sLIMIT\s(\d+|{int:.+}),\s*(\d+|{int:.+})(.*)~i', ' LIMIT $2 OFFSET $1 $3', $db_string);
 	}
 
 	/**

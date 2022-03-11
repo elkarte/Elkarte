@@ -144,9 +144,7 @@ class Headers
 		$name = preg_replace('~\s+~', ' ', str_replace('-', ' ', trim($name)));
 
 		// Now ucword the header and add back the dash => Clear-Site-Data
-		$name = str_replace(' ', '-', ucwords($name));
-
-		return $name;
+		return str_replace(' ', '-', ucwords($name));
 	}
 
 	/**

@@ -311,9 +311,7 @@ class SearchArray extends AbstractModel
 		$string = preg_replace('~([\d]+)[-./]+(?=[\d])~u', '$1_', $string);
 
 		// Last but not least, strip everything out that's not alphanumeric
-		$string = preg_replace('~[^\pL\pN_"-]+~u', ' ', $string);
-
-		return $string;
+		return preg_replace('~[^\pL\pN_"-]+~u', ' ', $string);
 	}
 
 	public function getSearchArray()

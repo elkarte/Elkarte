@@ -164,7 +164,7 @@ class UserNotification extends AbstractModel
 			$positions[$val] = $txt['usernotif_favicon_' . $val];
 		}
 
-		$config_vars = array(
+		return array(
 			array('title', 'usernotif_title'),
 			array('check', 'usernotif_desktop_enable'),
 			array('check', 'usernotif_favicon_enable'),
@@ -173,8 +173,6 @@ class UserNotification extends AbstractModel
 			array('color', 'usernotif_favicon_bgColor'),
 			array('color', 'usernotif_favicon_textColor'),
 		);
-
-		return $config_vars;
 	}
 
 	/**

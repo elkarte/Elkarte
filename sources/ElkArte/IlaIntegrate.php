@@ -213,8 +213,6 @@ class IlaIntegrate
 			// 				'content' => '',
 			// 			)
 		));
-
-		return;
 	}
 
 	/**

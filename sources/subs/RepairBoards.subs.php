@@ -1329,9 +1329,7 @@ function createSalvageBoard()
 	}
 
 	// Restore the user's language.
-	$salvageBoardID = (int) $salvageBoardID;
-
-	return $salvageBoardID;
+	return (int) $salvageBoardID;
 }
 
 /**
