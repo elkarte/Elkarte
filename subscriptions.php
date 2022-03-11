@@ -20,14 +20,14 @@ use ElkArte\Languages\Txt;
 use ElkArte\Util;
 
 // Start things rolling by getting the forum alive...
-if (!file_exists(dirname(__FILE__) . '/bootstrap.php'))
+if (!file_exists(__DIR__ . '/bootstrap.php'))
 {
 	die('Unable to initialize');
 }
 
 global $ssi_guest_access;
 
-require_once(dirname(__FILE__) . '/bootstrap.php');
+require_once(__DIR__ . '/bootstrap.php');
 $ssi_guest_access = true;
 new Bootstrap(true);
 
@@ -283,7 +283,6 @@ $gatewayClass->close($subscription_id);
  *
  * @param string $text
  * @param mixed[] $notify_users
- * @throws \ElkArte\Exceptions\Exception
  */
 function generateSubscriptionError($text, $notify_users = [])
 {

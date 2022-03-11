@@ -1092,7 +1092,7 @@ class ManagePaid extends AbstractController
 	 * @param string $search_string
 	 * @param mixed[] $search_vars
 	 *
-	 * @return
+	 * @return int
 	 */
 	public function getSubscribedUserCount($id_sub, $search_string, $search_vars)
 	{

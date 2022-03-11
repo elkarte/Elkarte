@@ -80,7 +80,7 @@ class UrlGenerator
 	 * Initialized the URL generator (i.e. instantiate the class if needed)
 	 * and sets the generators according to the types they support.
 	 *
-	 * @param object|string $generator
+	 * @param object|string $name
 	 */
 	protected function _initGen($name)
 	{

@@ -60,11 +60,11 @@ class Notification extends AbstractNotifier
 	/**
 	 * Inserts a new mention in the database (those that appear in the mentions area).
 	 *
-	 * @param \ElkArte\Mentions\MentionType\MentionType\NotificationInterface $obj
+	 * @param \ElkArte\Mentions\MentionType\NotificationInterface $obj
 	 * @param \ElkArte\NotificationsTask $task
-	 * @param mixed[] $bodies
+	 * @param array $bodies
 	 */
-	protected function _send_notification(NotificationInterface $obj, NotificationsTask $task, $bodies)
+	protected function _send_notification($obj, $task, $bodies)
 	{
 		global $modSettings;
 		$mentioning = new Mentioning($this->db, $this->user, new DataValidator(), $modSettings['enabled_mentions']);

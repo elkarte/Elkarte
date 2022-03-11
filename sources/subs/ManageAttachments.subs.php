@@ -598,7 +598,7 @@ function findOrphanThumbnails($start, $fix_errors, $to_fix)
 	if ($result->num_rows() != 0)
 	{
 		$to_fix[] = 'missing_thumbnail_parent';
-		while (($row = $result->fetch_assoc($result)))
+		while (($row = $result->fetch_assoc()))
 		{
 			// Only do anything once... just in case
 			if (!isset($to_remove[$row['id_attach']]))
@@ -1726,7 +1726,7 @@ function attachmentsOfMessage($id_msg, $unapproved = false)
  *
  * @param int $id_folder
  *
- * @return
+ * @return int
  * @package Attachments
  */
 function countAttachmentsInFolders($id_folder)
@@ -1745,7 +1745,7 @@ function countAttachmentsInFolders($id_folder)
 	list ($num_attach) = $request->fetch_row();
 	$request->free_result();
 
-	return $num_attach;
+	return (int) $num_attach;
 }
 
 /**

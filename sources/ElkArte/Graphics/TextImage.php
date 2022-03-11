@@ -81,7 +81,6 @@ class TextImage extends Image
 	 * It uses preferentially Imagick if present, otherwise GD.
 	 * Font and size are fixed.
 	 *
-	 * @param string $text The text the image should contain
 	 * @param int $width Width of the final image
 	 * @param int $height Height of the image
 	 * @param string $format Type of the image (valid types are png, jpeg, gif)

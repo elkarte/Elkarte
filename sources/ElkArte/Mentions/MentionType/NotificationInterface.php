@@ -34,7 +34,7 @@ interface NotificationInterface
 	 * Used by the Notifications class to retrieve the notifications to send.
 	 *
 	 * @param array $lang_data
-	 * @param int[] $users
+	 * @param int[] $members
 	 *
 	 * @return mixed[] array(array(
 	 *                  id_member_to (int),
