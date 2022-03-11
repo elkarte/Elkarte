@@ -2081,3 +2081,22 @@ function expandIPv6($addr, $strict_check = true)
 
 	return false;
 }
+
+/**
+ * Removed in 2.0, always returns false.
+ *
+ * Logs the depreciation notice, returns false, sets context value such that
+ * old themes don't go sour ;)
+ *
+ * @param string $browser  the browser we are checking for.
+ */
+function isBrowser($browser)
+{
+	global $context;
+
+	\ElkArte\Errors::instance()->log_deprecated('isBrowser()', 'Nothing');
+
+	$context['browser_body_id'] = 'elkarte';
+
+	return false;
+}
