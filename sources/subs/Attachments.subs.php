@@ -944,7 +944,7 @@ function getServerStoredAvatars($directory)
 	$serverAvatars = new RecursiveIteratorIterator(
 		new RecursiveDirectoryIterator(
 			$avatarDir,
-			RecursiveDirectoryIterator::SKIP_DOTS
+			FilesystemIterator::SKIP_DOTS
 		),
 		\RecursiveIteratorIterator::SELF_FIRST,
 		\RecursiveIteratorIterator::CATCH_GET_CHILD
@@ -1301,9 +1301,7 @@ function getLegacyAttachmentFilename($filename, $attachment_id, $dir = null, $ne
 	$attachmentsDir = new AttachmentsDirectory($modSettings, database());
 	$path = $attachmentsDir->getCurrent();
 
-	$filename = file_exists($path . '/' . $enc_name) ? $path . '/' . $enc_name : $path . '/' . $clean_name;
-
-	return $filename;
+	return file_exists($path . '/' . $enc_name) ? $path . '/' . $enc_name : $path . '/' . $clean_name;
 }
 
 /**
