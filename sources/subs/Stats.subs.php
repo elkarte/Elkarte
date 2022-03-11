@@ -131,7 +131,7 @@ function topPosters($limit = null)
 	// If there is a default setting, let's not retrieve something bigger
 	if (isset($modSettings['stats_limit']))
 	{
-		$limit = empty($limit) ? $modSettings['stats_limit'] : ($limit < $modSettings['stats_limit'] ? $limit : $modSettings['stats_limit']);
+		$limit = empty($limit) ? $modSettings['stats_limit'] : (min($limit, $modSettings['stats_limit']));
 	}
 	// Otherwise, fingers crossed and let's grab what is asked
 	else
@@ -200,7 +200,7 @@ function topBoards($limit = null, $read_status = false)
 	// If there is a default setting, let's not retrieve something bigger
 	if (isset($modSettings['stats_limit']))
 	{
-		$limit = empty($limit) ? $modSettings['stats_limit'] : ($limit < $modSettings['stats_limit'] ? $limit : $modSettings['stats_limit']);
+		$limit = empty($limit) ? $modSettings['stats_limit'] : (min($limit, $modSettings['stats_limit']));
 	}
 	// Otherwise, fingers crossed and let's grab what is asked
 	else
@@ -360,7 +360,7 @@ function topTopicViews($limit = null)
 	// If there is a default setting, let's not retrieve something bigger
 	if (isset($modSettings['stats_limit']))
 	{
-		$limit = empty($limit) ? $modSettings['stats_limit'] : ($limit < $modSettings['stats_limit'] ? $limit : $modSettings['stats_limit']);
+		$limit = empty($limit) ? $modSettings['stats_limit'] : (min($limit, $modSettings['stats_limit']));
 	}
 	// Otherwise, fingers crossed and let's grab what is asked
 	else
