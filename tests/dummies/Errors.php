@@ -12,7 +12,9 @@ class Errors
 		global $txt;
 
 		if (isset($txt[$msg]))
+		{
 			$msg = $txt[$msg];
+		}
 
 		print_r($msg);
 	}

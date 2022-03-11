@@ -460,13 +460,17 @@ class UnTgz
 				if (!empty($value) && is_numeric($value))
 				{
 					if (($value % 10) >= 8)
+					{
 						$value = decoct($value);
+					}
 					$value = octdec($value);
 				}
 				$this->_current[$key] = $value;
 			}
 			else
+			{
 				$this->_current[$key] = trim($value);
+			}
 		}
 	}
 

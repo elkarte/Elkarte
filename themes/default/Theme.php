@@ -403,7 +403,9 @@ class Theme extends BaseTheme
 		if (!empty($this->js_vars) && !$do_deferred)
 		{
 			foreach ($this->js_vars as $var => $value)
+			{
 				$js_vars[] = $var . ' = ' . $value;
+			}
 
 			// Newlines and tabs are here to make it look nice in the page source view, stripped if minimized though
 			$this->js_inline['standard'][] = 'var ' . implode(",\n\t\t\t", $js_vars) . ';';
@@ -470,14 +472,18 @@ class Theme extends BaseTheme
 				}
 
 				foreach ($combiner->getSpares() as $id => $file)
+				{
 					echo '
 	<link rel="stylesheet" href="', $file['filename'], '" id="', $id, '" />';
+				}
 			}
 			else
 			{
 				foreach ($this->css_files as $id => $file)
+				{
 					echo '
 	<link rel="stylesheet" href="', $file['filename'], '" id="', $id, '" />';
+				}
 			}
 		}
 	}
@@ -847,7 +853,9 @@ class Theme extends BaseTheme
 		// Since it's nice to have avatars all the same size, and in some cases the size detection may fail,
 		// let's add the css in any case
 		if (!isset($context['html_headers']))
+		{
 			$context['html_headers'] = '';
+		}
 
 		if (!empty($modSettings['avatar_max_width']) || !empty($modSettings['avatar_max_height']))
 		{

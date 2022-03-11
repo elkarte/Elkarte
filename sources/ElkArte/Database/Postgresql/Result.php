@@ -34,7 +34,7 @@ class Result extends AbstractResult
 			return 0;
 		}
 
-		$resource = $this->result === null ? $this->details->lastResult : $this->result;
+		$resource = $this->result ?? $this->details->lastResult;
 
 		if (is_resource($resource) || $resource instanceof \PgSQL\Result)
 		{
@@ -62,7 +62,9 @@ class Result extends AbstractResult
 	{
 		// Return the right row.
 		if (is_resource($this->result) || $this->result instanceof \PgSql\Result)
+		{
 			return @pg_fetch_row($this->result);
+		}
 	}
 
 	/**
@@ -75,7 +77,7 @@ class Result extends AbstractResult
 		if (is_resource($this->result) || $this->result instanceof \PgSql\Result)
 		{
 			// Attempt to free result, mask errors
-			try 
+			try
 			{
 				@pg_free_result($this->result);
 			}
@@ -93,7 +95,9 @@ class Result extends AbstractResult
 	{
 		// simply delegate to the native function
 		if (is_resource($this->result) || $this->result instanceof \PgSql\Result)
+		{
 			return pg_num_rows($this->result);
+		}
 	}
 
 	/**
@@ -111,7 +115,9 @@ class Result extends AbstractResult
 	public function data_seek($counter)
 	{
 		if (is_resource($this->result) || $this->result instanceof \PgSql\Result)
+		{
 			return pg_result_seek($this->result, $counter);
+		}
 	}
 
 	/**
@@ -129,7 +135,9 @@ class Result extends AbstractResult
 	public function fetch_all()
 	{
 		if (is_resource($this->result) || $this->result instanceof \PgSql\Result)
+		{
 			$results = pg_fetch_all($this->result, PGSQL_ASSOC);
+		}
 
 		return empty($results) ? [] : $results;
 	}
