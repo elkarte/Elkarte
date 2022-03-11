@@ -1874,7 +1874,7 @@ function securityOptionsHeader($override = null)
  */
 function stop_prefetching()
 {
-	if (isset($_SERVER['HTTP_X_PURPOSE']) && in_array($_SERVER['HTTP_X_PURPOSE'], array('preview', 'instant'))
+	if ((isset($_SERVER['HTTP_PURPOSE']) && $_SERVER['HTTP_PURPOSE'] === 'prefetch')
 		|| (isset($_SERVER['HTTP_X_MOZ']) && $_SERVER['HTTP_X_MOZ'] === 'prefetch'))
 	{
 		@ob_end_clean();
