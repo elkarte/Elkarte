@@ -995,7 +995,6 @@ sup.bbc_footnotes, sup.bbc_footnotes a {
 
 #description_board .generalinfo, #forumposts .generalinfo {
 	border-color: var(--primary_border);
-	border-bottom-color: var(--primary_border);
 	background: var(--primary_white);
 }
 
@@ -1011,7 +1010,6 @@ sup.bbc_footnotes, sup.bbc_footnotes a {
 
 .topic_listing > li {
 	border-color: var(--primary_border);
-	border-bottom-color: var(--primary_border);
 }
 
 .basic_row {
@@ -1107,7 +1105,6 @@ sup.bbc_footnotes, sup.bbc_footnotes a {
 /* Poster and postarea + moderation area underneath */
 .forumposts {
 	border-color: var(--primary_border);
-	border-bottom-color: var(--primary_border);
 	background: var(--primary_white);
 }
 
@@ -1234,7 +1231,6 @@ sup.bbc_footnotes, sup.bbc_footnotes a {
 /* The main post editor section. */
 #preview_body {
 	border-color: var(--primary_border);
-	border-bottom-color: var(--primary_border);
 	background: var(--primary_white);
 }
 

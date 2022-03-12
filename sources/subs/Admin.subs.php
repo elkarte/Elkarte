@@ -355,7 +355,6 @@ function custom_profiles_toggle_callback($value)
 		require_once(SUBSDIR . '/ManageFeatures.subs.php');
 		updateDisplayCache();
 	}
-
 }
 
 /**
