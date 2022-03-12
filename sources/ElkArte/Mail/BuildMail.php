@@ -143,7 +143,7 @@ class BuildMail extends BaseMail
 	}
 
 	/**
-	 * Sets the message line break to what is reuqied for the transport in use
+	 * Sets the message line break to what is required for the transport in use
 	 *
 	 * @param string $message
 	 * @return string
@@ -367,14 +367,8 @@ class BuildMail extends BaseMail
 	 */
 	public function getMessage($send_html, $mime_boundary, $orig_message)
 	{
-		if ($send_html)
-		{
-			$ascii_message = $this->get7bitVersion($this->getPlainFromHTML($orig_message));
-		}
-		else
-		{
-			$ascii_message = $this->get7bitVersion($orig_message);
-		}
+		$ascii_message = $send_html ? $this->getPlainFromHTML($orig_message) : $orig_message;
+		$ascii_message = $this->get7bitVersion($ascii_message);
 
 		// This is the plain text version.  Even if no one sees it, we need it for spam checkers.
 		$message = $ascii_message . $this->lineBreak . '--' . $mime_boundary . $this->lineBreak;
