@@ -131,29 +131,9 @@ class Display extends AbstractController
 		// Allow addons access to the topicinfo array
 		call_integration_hook('integrate_display_topic', array($this->topicinfo));
 
-		// If all is set, but not allowed... just unset it.
-		$can_show_all = !empty($modSettings['enableAllMessages'])
-			&& $total_visible_posts > $this->messages_per_page
-			&& $total_visible_posts < $modSettings['enableAllMessages'];
-		if (isset($this->_req->query->all) && !$can_show_all)
-		{
-			unset($this->_req->query->all);
-		}
-		// Otherwise, it must be allowed... so pretend start was -1.
-		elseif (isset($this->_req->query->all))
-		{
-			$this->_start = -1;
-		}
-
-		// If they are viewing all the posts, show all the posts, otherwise limit the number.
-		if ($can_show_all && isset($this->_req->query->all))
-		{
-			// No limit! (actually, there is a limit, but...)
-			$this->messages_per_page = -1;
-
-			// Set start back to 0...
-			$this->_start = 0;
-		}
+		// If all is set, figure out what needs to be done
+		$can_show_all = $this->getCanShowAll($total_visible_posts);
+		$this->setupShowAll($can_show_all, $total_visible_posts);
 
 		// Time to place all the particulars into context for the template
 		$this->setMessageContext($topic, $total_visible_posts, $can_show_all);
@@ -383,6 +363,68 @@ class Display extends AbstractController
 		global $modSettings;
 
 		return !$modSettings['postmod_active'] || allowedTo('approve_posts');
+	}
+
+	/**
+	 * Return if we allow showing ALL messages for a topic vs pagination
+	 *
+	 * @param int $total_visible_posts
+	 * @return bool
+	 */
+	public function getCanShowAll($total_visible_posts)
+	{
+		global $modSettings;
+
+		return !empty($modSettings['enableAllMessages'])
+			&& $total_visible_posts > $this->messages_per_page
+			&& $total_visible_posts < $modSettings['enableAllMessages'];
+	}
+
+	/**
+	 * If show all is requested, and allowed, setup to do just that
+	 *
+	 * @param bool $can_show_all
+	 * @param int $total_visible_posts
+	 * @return void
+	 */
+	public function setupShowAll($can_show_all, $total_visible_posts)
+	{
+		global $scripturl, $topic, $context;
+
+		$all_requested = $this->_req->getQuery('all', 'trim', null);
+		if (isset($all_requested))
+		{
+			// If all is set, but not allowed... just unset it.
+			if (!$can_show_all)
+			{
+				unset($all_requested);
+			}
+			else
+			{
+				// Otherwise, it must be allowed... so pretend start was -1.
+				$this->_start = -1;
+			}
+		}
+
+		// Construct the page index, allowing for the .START method...
+		$context['page_index'] = constructPageIndex($scripturl . '?topic=' . $topic . '.%1$d', $this->_start, $total_visible_posts, $this->messages_per_page, true, array('all' => $can_show_all, 'all_selected' => isset($all_requested)));
+		$context['start'] = $this->_start;
+
+		// Figure out all the link to the next/prev
+		$context['links'] += array(
+			'prev' => $this->_start >= $this->messages_per_page ? $scripturl . '?topic=' . $topic . '.' . ($this->_start - $this->messages_per_page) : '',
+			'next' => $this->_start + $this->messages_per_page < $total_visible_posts ? $scripturl . '?topic=' . $topic . '.' . ($this->_start + $this->messages_per_page) : '',
+		);
+
+		// If they are viewing all the posts, show all the posts, otherwise limit the number.
+		if ($can_show_all && isset($all_requested))
+		{
+			// No limit! (actually, there is a limit, but...)
+			$this->messages_per_page = -1;
+
+			// Set start back to 0...
+			$this->_start = 0;
+		}
 	}
 
 	/**
@@ -616,10 +658,6 @@ class Display extends AbstractController
 		// Page title
 		$context['page_title'] = $this->topicinfo['subject'];
 
-		// Construct the page index, allowing for the .START method...
-		$context['page_index'] = constructPageIndex('{scripturl}?topic=' . $topic . '.%1$d', $this->_start, $total_visible_posts, $this->messages_per_page, true, array('all' => $can_show_all, 'all_selected' => isset($this->_req->query->all)));
-		$context['start'] = $this->_start;
-
 		// Create a previous next string if the selected theme has it as a selected option.
 		if ($modSettings['enablePreviousNext'])
 		{
@@ -628,12 +666,6 @@ class Display extends AbstractController
 				'go_next' => getUrl('topic', ['topic' => $this->topicinfo['id_topic'], 'start' => '0', 'subject' => $this->topicinfo['subject'], 'prev_next' => 'next']) . '#new'
 			);
 		}
-
-		// Figure out all the link to the next/prev
-		$context['links'] += array(
-			'prev' => $this->_start >= $this->messages_per_page ? getUrl('topic', ['topic' => $this->topicinfo['id_topic'], 'start' => $this->_start - $this->messages_per_page, 'subject' => $this->topicinfo['subject']]) : '',
-			'next' => $this->_start + $this->messages_per_page < $total_visible_posts ? getUrl('topic', ['topic' => $this->topicinfo['id_topic'], 'start' => $this->_start + $this->messages_per_page, 'subject' => $this->topicinfo['subject']]) : '',
-		);
 
 		// Build the jump to box
 		$context['jump_to'] = array(
