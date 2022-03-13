@@ -1450,7 +1450,7 @@ function template_profile_timeoffset_modify()
 }
 
 /**
- * Interface to allow the member to pick a theme.
+ * Button to allow the member to pick a theme.
  */
 function template_profile_theme_pick()
 {
@@ -1461,7 +1461,7 @@ function template_profile_theme_pick()
 								<label>', $txt['current_theme'], '</label>
 							</dt>
 							<dd>
-								', $context['member']['theme']['name'], ' <a class="linkbutton" href="', getUrl('action', ['action' => 'theme', 'sa' => 'pick', 'u' => $context['id_member'], '{session_data}']), '">', $txt['change'], '</a>
+								', $context['member']['theme']['name'], ' <a class="linkbutton" href="', getUrl('action', ['action' => 'profile', 'area' => 'pick', 'u' => $context['id_member'], '{session_data}']), '">', $txt['change'], '</a>
 							</dd>';
 }
 
@@ -1557,4 +1557,95 @@ function template_authentication_method()
 		var verificationHandle = new elkRegister("creator", ', empty($modSettings['password_strength']) ? 0 : $modSettings['password_strength'], ', regTextStrings);
 
 	</script>';
+}
+
+/**
+ * This template allows for the selection of different themes.
+ */
+function template_pick()
+{
+	global $context, $scripturl, $txt;
+
+	echo '
+	<div id="pick_theme">
+		<form action="', $scripturl, '?action=profile;area=pick;u=', $context['current_member'], ';', $context['session_var'], '=', $context['session_id'], '" method="post" accept-charset="UTF-8">';
+
+	// Just go through each theme and show its information - thumbnail, etc.
+	foreach ($context['available_themes'] as $theme)
+	{
+		echo '
+			<h2 class="category_header">
+				', $theme['name'], '
+			</h2>
+			<div class="flow_hidden content">
+				<div class="floatright">
+					<a href="', $scripturl, '?action=profile;area=pick;u=', $context['current_member'], ';theme=', $theme['id'], ';variant=', $theme['selected_variant'], ';', $context['session_var'], '=', $context['session_id'], '" id="theme_thumb_preview_', $theme['id'], '" title="', $txt['theme_preview'], '">
+						<img class="avatar" src="', $theme['thumbnail_href'], '" id="theme_thumb_', $theme['id'], '" alt="" />
+					</a>
+				</div>
+				<p>', $theme['description'], '</p>';
+
+		if (!empty($theme['variants']))
+		{
+			echo '
+				<label for="variant', $theme['id'], '">
+					<strong>', $theme['pick_label'], '</strong>
+				</label>
+				<select id="variant', $theme['id'], '" name="vrt[', $theme['id'], ']" onchange="changeVariant', $theme['id'], '(this.value);">';
+
+			foreach ($theme['variants'] as $key => $variant)
+			{
+				echo '
+					<option value="', $key, '" ', $theme['selected_variant'] == $key ? 'selected="selected"' : '', '>', $variant['label'], '</option>';
+			}
+
+			echo '
+				</select>
+				<noscript>
+					<input type="submit" name="save[', $theme['id'], ']" value="', $txt['save'], '" />
+				</noscript>';
+		}
+
+		echo '
+				<br />
+				<div class="separator"></div>
+				<a class="linkbutton" href="', $scripturl, '?action=profile;area=pick;u=', $context['current_member'], ';th=', $theme['id'], ';', $context['session_var'], '=', $context['session_id'], !empty($theme['variants']) ? ';vrt=' . $theme['selected_variant'] : '', '" id="theme_use_', $theme['id'], '">', $txt['theme_set'], '</a>
+				<a class="linkbutton" href="', $scripturl, '?action=profile;area=pick;u=', $context['current_member'], ';theme=', $theme['id'], ';', $context['session_var'], '=', $context['session_id'], ';variant=', $theme['selected_variant'], '" id="theme_preview_', $theme['id'], '">', $txt['theme_preview'], '</a>
+			</div>';
+
+		if (!empty($theme['variants']))
+		{
+			echo '
+			<script>
+				let sBaseUseUrl', $theme['id'], ' = elk_prepareScriptUrl(elk_scripturl) + \'action=profile;area=pick;u=', $context['current_member'], ';th=', $theme['id'], ';', $context['session_var'], '=', $context['session_id'], '\',
+					sBasePreviewUrl', $theme['id'], ' = elk_prepareScriptUrl(elk_scripturl) + \'action=profile;area=pick;u=', $context['current_member'], ';theme=', $theme['id'], ';', $context['session_var'], '=', $context['session_id'], '\',
+					oThumbnails', $theme['id'], ' = {';
+
+			// All the variant thumbnails.
+			$count = 1;
+			foreach ($theme['variants'] as $key => $variant)
+			{
+				echo '
+					\'', $key, '\': \'', $variant['thumbnail'], '\'', (count($theme['variants']) === $count ? '' : ',');
+
+				$count++;
+			}
+
+			echo '
+				};
+
+				function changeVariant', $theme['id'], '(sVariant)
+				{
+					document.getElementById(\'theme_thumb_', $theme['id'], '\').src = oThumbnails', $theme['id'], '[sVariant];
+					document.getElementById(\'theme_use_', $theme['id'], '\').href = sBaseUseUrl', $theme['id'] == 0 ? $context['default_theme_id'] : $theme['id'], ' + \';vrt=\' + sVariant;
+					document.getElementById(\'theme_thumb_preview_', $theme['id'], '\').href = sBasePreviewUrl', $theme['id'], ' + \';variant=\' + sVariant;
+					document.getElementById(\'theme_preview_', $theme['id'], '\').href = sBasePreviewUrl', $theme['id'], ' + \';variant=\' + sVariant;
+				}
+			</script>';
+		}
+	}
+
+	echo '
+		</form>
+	</div>';
 }

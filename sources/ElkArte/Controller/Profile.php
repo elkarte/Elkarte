@@ -337,6 +337,18 @@ class Profile extends AbstractController
 							'any' => array('profile_extra_any'),
 						),
 					),
+					'pick' => array(
+						'label' => $txt['theme'],
+						'controller' => '\\ElkArte\\Controller\\ProfileOptions',
+						'function' => 'action_pick',
+						'hidden' => true,
+						'sc' => 'post',
+						'token' => 'profile-th%u',
+						'permission' => array(
+							'own' => array('profile_extra_any', 'profile_extra_own'),
+							'any' => array('profile_extra_any'),
+						),
+					),
 					'notification' => array(
 						'label' => $txt['notifications'],
 						'controller' => '\\ElkArte\\Controller\\ProfileOptions',
@@ -555,7 +567,9 @@ class Profile extends AbstractController
 			);
 		}
 
-		if (!empty($this->_current_subsection) && $this->_profile_include_data['subsections'][$this->_current_subsection]['label'] !== $this->_profile_include_data['label'])
+		if (!empty($this->_current_subsection)
+			&& isset($this->_profile_include_data['subsections'][$this->_current_subsection])
+			&& $this->_profile_include_data['subsections'][$this->_current_subsection]['label'] !== $this->_profile_include_data['label'])
 		{
 			$context['linktree'][] = array(
 				'url' => getUrl('profile', ['action' => 'profile', 'area' => $this->_profile_include_data['current_area'], 'sa' => $this->_current_subsection, 'u' => $this->_memID, 'name' => $this->_profile['real_name']]),

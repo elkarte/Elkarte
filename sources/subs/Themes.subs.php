@@ -14,7 +14,9 @@
  *
  */
 
+use ElkArte\HttpReq;
 use ElkArte\Languages\Txt;
+use ElkArte\Themes\ThemeLoader;
 use ElkArte\Util;
 use ElkArte\Languages\Loader as LangLoader;
 
@@ -311,7 +313,10 @@ function countConfiguredGuestOptions()
 }
 
 /**
- * Counts the theme options configured for guests
+ * Loads all available themes in the system
+ *
+ * - Determines count of users that are using each
+ * - Loads variant options
  *
  * @param int $current_theme
  * @param int $current_member
@@ -320,11 +325,12 @@ function countConfiguredGuestOptions()
  */
 function availableThemes($current_theme, $current_member)
 {
-	global $modSettings, $settings, $txt, $language;
+	global $modSettings, $settings, $txt, $context;
 
 	$db = database();
 
-	$available_themes = array();
+	$available_themes = [];
+	$current_theme = (int) $current_theme;
 	if (!empty($modSettings['knownThemes']))
 	{
 		$db->fetchQuery('
@@ -349,6 +355,7 @@ function availableThemes($current_theme, $current_member)
 			function ($row) use (&$available_themes, $current_theme) {
 				if (!isset($available_themes[$row['id_theme']]))
 				{
+					$row['id_theme'] = (int) $row['id_theme'];
 					$available_themes[$row['id_theme']] = array(
 						'id' => $row['id_theme'],
 						'selected' => $current_theme == $row['id_theme'],
@@ -371,7 +378,7 @@ function availableThemes($current_theme, $current_member)
 	}
 	else
 	{
-		$guest_theme = $modSettings['theme_guests'];
+		$guest_theme = (int) $modSettings['theme_guests'];
 	}
 
 	$db->fetchQuery('
@@ -419,7 +426,7 @@ function availableThemes($current_theme, $current_member)
 			ORDER BY id_member ASC',
 			array(
 				'theme_variant' => 'theme_variant',
-				'id_member' => isset($_REQUEST['sa']) && $_REQUEST['sa'] == 'pick' ? array(-1, $current_member) : array(-1),
+				'id_member' => isset($_REQUEST['sa']) && $_REQUEST['sa'] === 'pick' ? array(-1, $current_member) : array(-1),
 			)
 		)->fetch_callback(
 			function ($row) use (&$variant_preferences) {
@@ -428,14 +435,13 @@ function availableThemes($current_theme, $current_member)
 		);
 	}
 
-	// Save the setting first.
-	$current_images_url = $settings['images_url'];
-	$current_theme_variants = !empty($settings['theme_variants']) ? $settings['theme_variants'] : array();
+	// Needed to trick ThemeLoader, so we can get variant names
+	HttpReq::instance()->post->th = true;
 
 	foreach ($available_themes as $id_theme => $theme_data)
 	{
 		// Don't try to load the forum or board default theme's data... it doesn't have any!
-		if ($id_theme == 0)
+		if ($id_theme === 0)
 		{
 			continue;
 		}
@@ -453,9 +459,11 @@ function availableThemes($current_theme, $current_member)
 		$available_themes[$id_theme]['description'] = $txt['theme_description'];
 
 		// Are there any variants?
-		if (file_exists($theme_data['theme_dir'] . '/index.template.php') && (empty($theme_data['disable_user_variant']) || allowedTo('admin_forum')))
+		if (empty($theme_data['disable_user_variant']) || allowedTo('admin_forum'))
 		{
-			$variants = theme()->getSettings();
+			new ThemeLoader($theme_data['id'], false);
+			$variants = $context['theme_instance']->getSettings();
+
 			if (!empty($variants['theme_variants']))
 			{
 				$settings['theme_variants'] = $variants['theme_variants'];
@@ -488,8 +496,7 @@ function availableThemes($current_theme, $current_member)
 	}
 
 	// Then return it.
-	$settings['images_url'] = $current_images_url;
-	$settings['theme_variants'] = $current_theme_variants;
+	new ThemeLoader($current_theme, true);
 
 	return array($available_themes, $guest_theme);
 }
