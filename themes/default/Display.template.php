@@ -492,16 +492,8 @@ function template_quickreply_below()
 
 		if (empty($options['hide_poster_area']))
 		{
-			// First lets load the profile array
-			$thisUser = [];
-			$thisUser['id'] = 'new';
-			$thisUser['is_message_author'] = true;
-			$member = MembersList::get(User::$info->id);
-			$member->loadContext();
-			$thisUser['member'] = $member->toArray()['data'];
-
 			echo '
-				<ul class="poster no_js">', template_build_poster_div($thisUser, false), '</ul>';
+				<ul class="poster no_js">', template_build_poster_div($context['thisMember'], false), '</ul>';
 		}
 
 		// Make a postarea similar to post

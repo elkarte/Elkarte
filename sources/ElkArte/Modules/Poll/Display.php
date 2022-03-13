@@ -72,9 +72,12 @@ class Display extends AbstractModule
 			'can_add_poll' => 'poll_add',
 			'can_remove_poll' => 'poll_remove',
 		);
+
+		$userStarted = ((int) $this->user->id === (int) $topicinfo['id_member_started']) && !$this->user->is_guest;
+
 		foreach ($anyown_permissions as $contextual => $perm)
 		{
-			$context[$contextual] = allowedTo($perm . '_any') || ($context['user']['started'] && allowedTo($perm . '_own'));
+			$context[$contextual] = allowedTo($perm . '_any') || ($userStarted && allowedTo($perm . '_own'));
 		}
 
 		$context['can_add_poll'] &= self::$_enabled && $topicinfo['id_poll'] <= 0;
