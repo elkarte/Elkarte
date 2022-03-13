@@ -192,7 +192,7 @@ class AttachmentsDirectory
 	 */
 	public function directoryExists($id)
 	{
-		if (is_integer($id))
+		if (is_int($id))
 		{
 			return array_key_exists($id, $this->attachmentUploadDir);
 		}
@@ -688,7 +688,7 @@ class AttachmentsDirectory
 	/**
 	 * Checks if the current active directory has space allowed for a new attachment file
 	 *
-	 * @param $sess_attach
+	 * @param \ElkArte\TemporaryAttachment $sess_attach
 	 * @throws \ElkArte\Exceptions\Exception
 	 */
 	public function checkDirSpace($sess_attach)

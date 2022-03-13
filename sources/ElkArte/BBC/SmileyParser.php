@@ -39,7 +39,6 @@ class SmileyParser
 	 * SmileyParser constructor.
 	 *
 	 * @param string $path
-	 * @param array $smileys
 	 */
 	public function __construct($path)
 	{

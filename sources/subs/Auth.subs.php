@@ -333,9 +333,7 @@ function construct_query_string($get)
 		}
 	}
 
-	$query_string = substr($query_string, 0, -1);
-
-	return $query_string;
+	return substr($query_string, 0, -1);
 }
 
 /**
@@ -421,8 +419,8 @@ function findMembers($names, $use_wildcards = false, $buddies_only = false, $max
 		LIMIT {int:limit}',
 		array(
 			'buddy_list' => User::$info->buddies,
-			'member_name_search' => $member_name . ' ' . $comparison . ' ' . implode(' OR ' . $member_name . ' ' . $comparison . ' ', $names) . '',
-			'real_name_search' => $real_name . ' ' . $comparison . ' ' . implode(' OR ' . $real_name . ' ' . $comparison . ' ', $names) . '',
+			'member_name_search' => $member_name . ' ' . $comparison . ' ' . implode(' OR ' . $member_name . ' ' . $comparison . ' ', $names),
+			'real_name_search' => $real_name . ' ' . $comparison . ' ' . implode(' OR ' . $real_name . ' ' . $comparison . ' ', $names),
 			'email_condition' => $email_condition,
 			'limit' => $max,
 			'recursive' => true,
@@ -565,7 +563,7 @@ function validateUsername($memID, $username, $ErrorContext = 'register', $check_
 		$errors->addError('error_invalid_characters_username');
 	}
 
-	if (stristr($username, $txt['guest_title']) !== false)
+	if (stripos($username, $txt['guest_title']) !== false)
 	{
 		$errors->addError(array('username_reserved', array($txt['guest_title'])), 1);
 	}
@@ -790,7 +788,7 @@ function elk_setcookie($name, $value = '', $expire = 0, $path = '', $domain = ''
 	// Intercept cookie?
 	call_integration_hook('integrate_cookie', array($name, $value, $expire, $path, $domain, $secure, $httponly, $samesite));
 
-	if (version_compare(PHP_VERSION, '7.3.0', '<'))
+	if (PHP_VERSION_ID < 70300)
 	{
 		return setcookie($name, $value, $expire, $path, $domain, $secure, $httponly);
 	}

@@ -446,7 +446,7 @@ function template_subject_list()
 										<i class="icon i-shuffle" title="', $txt['pm_change_view'], '"><s>', $txt['pm_change_view'], '</s></i>
 									</a>
 								</th>
-								<th class="pm_date grid17">
+								<th class="pm_date grid20">
 									<a href="', $scripturl, '?action=pm;f=', $context['folder'], ';start=', $context['start'], ';sort=date', ($context['sort_by'] === 'date' && $context['sort_direction'] === 'up' ? ';desc' : ';asc'), $context['current_label_id'] != -1 ? ';l=' . $context['current_label_id'] : '', '">
 										', $txt['date'], $context['sort_by'] === 'date' ? ' <i class="icon icon-small i-sort-numeric-' . $context['sort_direction'] . '"></i>' : '', '
 									</a>

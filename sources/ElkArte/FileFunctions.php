@@ -61,7 +61,7 @@ class FileFunctions
 	 * - Checks proper value for mode if one is supplied
 	 * - Consolidates chmod error suppression to single function
 	 *
-	 * @param string $file
+	 * @param string $item
 	 * @param string|int $mode
 	 *
 	 * @return bool
@@ -395,7 +395,7 @@ class FileFunctions
 		$directory = '';
 
 		// If on Windows servers the first part of the path is the drive (e.g. "C:")
-		if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN')
+		if (strpos(PHP_OS_FAMILY, 'Win') === 0)
 		{
 			// Better be sure that the first part of the path is actually a drive letter...
 			// ...even if, I should check this in the admin page...isn't it?

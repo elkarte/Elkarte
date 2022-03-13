@@ -405,8 +405,6 @@ class UserSettingsLoader
 	 * Determines the language to be used.
 	 * Checks the current user setting, the $_GET['language'], the session and $modSettings
 	 *
-	 * @param mixed[] $user_info
-	 *
 	 * @return string
 	 */
 	protected function getLanguage()

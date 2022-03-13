@@ -63,8 +63,9 @@ function getServerVersions($checkFor)
 		}
 		else
 		{
-			$versions['db_server'] = array('title' => sprintf($txt['support_versions_db'], $db->title()), 'version' => '');
-			$versions['db_server']['version'] = $db->server_version();
+			$versions['db_server'] = array(
+				'title' => sprintf($txt['support_versions_db'], $db->title()),
+				'version' => $db->server_version());
 		}
 	}
 
@@ -90,7 +91,7 @@ function getServerVersions($checkFor)
 	// PHP Version
 	if (in_array('php', $checkFor))
 	{
-		$versions['php'] = array('title' => 'PHP', 'version' => PHP_VERSION . ' (' . php_sapi_name() . ')', 'more' => '?action=admin;area=serversettings;sa=phpinfo');
+		$versions['php'] = array('title' => 'PHP', 'version' => PHP_VERSION . ' (' . PHP_SAPI . ')', 'more' => '?action=admin;area=serversettings;sa=phpinfo');
 	}
 
 	// Server info
@@ -326,15 +327,30 @@ function custom_profiles_toggle_callback($value)
 
 	if (!$value)
 	{
-		// Disable all fields. Wouldn't want any to show when the feature is disabled.
+		// Disable all active fields. Wouldn't want any to show when the feature is disabled.
 		$db->query('', '
 			UPDATE {db_prefix}custom_fields
-			SET 
-				active = 0'
+			SET active = {int:inactive}
+			WHERE active = {int:active}',
+			array(
+				'active' => 1,
+				'inactive' => -1,
+			)
 		);
 	}
 	else
 	{
+		// Set back what was formally active
+		$db->query('', '
+			UPDATE {db_prefix}custom_fields
+			SET active = {int:inactive}
+			WHERE active = {int:active}',
+			array(
+				'active' => -1,
+				'inactive' => 1,
+			)
+		);
+
 		// Set the display cache for the custom profile fields.
 		require_once(SUBSDIR . '/ManageFeatures.subs.php');
 		updateDisplayCache();

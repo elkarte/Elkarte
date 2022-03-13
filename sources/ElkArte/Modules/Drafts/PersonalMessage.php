@@ -322,34 +322,31 @@ class PersonalMessage extends AbstractModule
 		}
 
 		// Want to save this as a draft and think about it some more?
-		if (isset($_POST['save_draft']))
+		if (isset($_POST['save_draft'])
+			&& !empty($context['drafts_pm_save']) && isset($_POST['id_pm_draft']))
 		{
-			// PM survey says ... can you stay or must you go
-			if (!empty($context['drafts_pm_save']) && isset($_POST['id_pm_draft']))
+			// Prepare the data
+			$draft = array(
+				'id_pm_draft' => empty($_POST['id_pm_draft']) ? 0 : (int) $_POST['id_pm_draft'],
+				'reply_id' => empty($_POST['replied_to']) ? 0 : (int) $_POST['replied_to'],
+				'body' => Util::htmlspecialchars($_POST['message'], ENT_QUOTES, 'UTF-8', true),
+				'subject' => strtr(Util::htmlspecialchars($_POST['subject']), array("\r" => '', "\n" => '', "\t" => '')),
+				'id_member' => $this->user->id,
+				'is_usersaved' => (int) empty($_REQUEST['autosave']),
+			);
+
+			if ($this->getApi() !== false)
 			{
-				// Prepare the data
-				$draft = array(
-					'id_pm_draft' => empty($_POST['id_pm_draft']) ? 0 : (int) $_POST['id_pm_draft'],
-					'reply_id' => empty($_POST['replied_to']) ? 0 : (int) $_POST['replied_to'],
-					'body' => Util::htmlspecialchars($_POST['message'], ENT_QUOTES, 'UTF-8', true),
-					'subject' => strtr(Util::htmlspecialchars($_POST['subject']), array("\r" => '', "\n" => '', "\t" => '')),
-					'id_member' => $this->user->id,
-					'is_usersaved' => (int) empty($_REQUEST['autosave']),
-				);
-
-				if ($this->getApi() !== false)
-				{
-					$recipientList['to'] = isset($_POST['recipient_to']) ? explode(',', $_POST['recipient_to']) : array();
-					$recipientList['bcc'] = isset($_POST['recipient_bcc']) ? explode(',', $_POST['recipient_bcc']) : array();
-				}
-
-				// Trigger any before_savepm_draft events
-				self::$_eventsManager->trigger('before_savepm_draft', array('draft' => &$draft, 'recipientList' => &$recipientList));
-
-				// Now save the draft
-				savePMDraft($recipientList, $draft, !empty($this->getApi()));
-				throw new ControllerRedirectException('', '');
+				$recipientList['to'] = isset($_POST['recipient_to']) ? explode(',', $_POST['recipient_to']) : array();
+				$recipientList['bcc'] = isset($_POST['recipient_bcc']) ? explode(',', $_POST['recipient_bcc']) : array();
 			}
+
+			// Trigger any before_savepm_draft events
+			self::$_eventsManager->trigger('before_savepm_draft', array('draft' => &$draft, 'recipientList' => &$recipientList));
+
+			// Now save the draft
+			savePMDraft($recipientList, $draft, !empty($this->getApi()));
+			throw new ControllerRedirectException('', '');
 		}
 	}
 

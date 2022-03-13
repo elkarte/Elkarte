@@ -174,8 +174,8 @@ class Imagick extends AbstractManipulator
 		$src_height = $this->_height;
 
 		// Allow for a re-encode to the same size
-		$max_width = $max_width === null ? $src_width : $max_width;
-		$max_height = $max_height === null ? $src_height : $max_height;
+		$max_width = $max_width ?? $src_width;
+		$max_height = $max_height ?? $src_height;
 
 		// Determine whether to resize to max width or to max height (depending on the limits.)
 		list($dst_width, $dst_height) = $this->imageRatio($max_width, $max_height);

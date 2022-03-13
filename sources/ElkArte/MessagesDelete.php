@@ -1004,7 +1004,9 @@ class MessagesDelete
 
 		// Add it to the mod log.
 		if (allowedTo('delete_any') && (!allowedTo('delete_own') || $row['id_member'] != $this->user->id))
+		{
 			logAction('delete', array('topic' => $row['id_topic'], 'subject' => $row['subject'], 'member' => $row['id_member'], 'board' => $row['id_board']));
+		}
 
 		return false;
 	}

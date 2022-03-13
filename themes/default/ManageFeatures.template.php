@@ -123,7 +123,7 @@ function template_edit_profile_field()
 							<span class="smalltext">', $txt['custom_edit_enclose_desc'], '</span>
 						</dt>
 						<dd>
-							<textarea name="enclose" id="enclose" rows="10" cols="50">' . (isset($context['field']['enclose']) ? $context['field']['enclose'] : '') . '</textarea>
+							<textarea name="enclose" id="enclose" rows="10" cols="50">' . ($context['field']['enclose'] ?? '') . '</textarea>
 						</dd>
 					</dl>
 				</fieldset>

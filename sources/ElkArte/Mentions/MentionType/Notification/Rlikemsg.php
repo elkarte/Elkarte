@@ -39,13 +39,10 @@ class Rlikemsg extends AbstractNotificationBoardAccess
 		{
 			parent::setUsersToNotify();
 		}
-		else
+		elseif (isset($this->_task))
 		{
 			// I'm not entirely sure if this is necessary, but better safe than sorry at this point.
-			if (isset($this->_task))
-			{
-				$this->_task->setMembers([]);
-			}
+			$this->_task->setMembers([]);
 		}
 	}
 
@@ -95,7 +92,7 @@ class Rlikemsg extends AbstractNotificationBoardAccess
 					'type' => 'likemsg',
 					'member_from' => $member_from,
 					'target' => $target,
-					'status' => $status === null ? 1 : $status,
+					'status' => $status ?? 1,
 					'unread' => 0,
 				)
 			);

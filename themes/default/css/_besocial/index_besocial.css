@@ -107,7 +107,7 @@
 	--strong_text: #686868; /* like a demi bold */
 	--footer_text: #CCCCCC; /* Text used in the footer which is a dark background */
 	--footer_top_border: #444444; /* Border that separates footer from body */
-	--primary_white: #EFEFEF; /* Used in shadows, backgrounds or text, many places */
+	--primary_white: #FEFEFE; /* Used in shadows, backgrounds or text, many places */
 	--primary_white_compliment: #E4E4E4; /* Used with --primary_white for gradients */
 
 	--body_grad_1: #EEEEEE; /* Body Gradient */
@@ -135,6 +135,30 @@
 	--opacity30: rgba(0, 0, 0, 0.3);
 	--opacity40: rgba(0, 0, 0, 0.4);
 	--opacity50: rgba(0, 0, 0, 0.5);
+
+	/* font size px to em based on 14px base font (.875em) */
+	--font9: 0.643rem;
+	--font10: 0.714rem;
+	--font11: 0.786rem;
+	--font12: 0.857rem;
+	--font13: 0.929rem;
+	--font14: 1.0rem;
+	--font15: 1.071rem;
+	--font16: 1.142rem;
+	--font17: 1.214rem;
+	--font18: 1.286rem;
+	--font19: 1.357rem;
+	--font20: 1.429rem;
+	--font21: 1.5rem;
+	--font22: 1.571rem;
+	--font23: 1.643rem;
+	--font24: 1.714rem;
+	--font25: 1.786rem;
+	--font26: 1.857rem;
+	--font27: 1.929em;
+	--font28: 2.0rem;
+	--font29: 2.072rem;
+	--font30: 2.143rem;
 }
 
 /* -------------------------------------------------------
@@ -144,7 +168,7 @@
 
 /* Normal, standard links. */
 a, a:link, a:visited,
-	/* Links that open in a new window. */
+/* Links that open in a new window. */
 a.new_win:link, a.new_win:visited {
 	text-decoration: none;
 	color: var(--links);
@@ -155,14 +179,23 @@ a:hover, a.new_win:hover {
 	text-decoration: underline;
 }
 
+html, body {
+	font-size: 14px;
+	font-weight: 400;
+	line-height: 1.4;
+}
+
 /* Stop white band under footer on short pages.
    This color should match $FOOTER background. */
 html {
 	background: var(--primary_background);
 }
 
+body, input, button, select, textarea, .editor {
+	font-family: Helvetica, Arial, "Nimbus Sans L", sans-serif;
+}
+
 body {
-	font: 90%/130% Helvetica, Arial, "Nimbus Sans L", sans-serif;
 	padding-top: 35px;
 	color: var(--body_text);
 	background: var(--body_grad_1);
@@ -699,7 +732,7 @@ sup.bbc_footnotes, sup.bbc_footnotes a {
 
 /* For primary admin/profile/etc drop menus. */
 .admin_menu .linklevel1:hover, .admin_menu .linklevel1:focus,
-	/* For secondary admin/profile/etc menus. */
+/* For secondary admin/profile/etc menus. */
 #adm_submenus .linklevel1:hover, #adm_submenus .linklevel1:focus {
 	text-decoration: none;
 	color: var(--hover_text);
@@ -838,6 +871,10 @@ nav.breadcrumb {
 	--arrow: 26px;
 }
 
+.breadcrumb .crumb:first-child {
+	padding-left: 1.1em;
+}
+
 .breadcrumb .crumb {
 	padding: 0 0.7em 0 1.5em;
 	border-color: var(--transparent);
@@ -862,6 +899,18 @@ nav.breadcrumb {
 
 .buttonlist li a.linklevel1 {
 	text-transform: none;
+}
+
+.buttonlist li {
+	line-height: 1.8em;
+}
+
+.buttonlist li a {
+	line-height: 1.8em;
+}
+
+.quickbuttons .linklevel1 {
+	line-height: 1.8em;
 }
 
 /* -------------------------------------------------------
@@ -1050,10 +1099,6 @@ nav.breadcrumb {
 	border-color: var(--transparent);
 }
 
-.topic_listing li:first-child {
-	border-top: 2px solid var(--primary_border_top);
-}
-
 .topic_listing li {
 	border-top-color: var(--primary_border_top);
 	border-bottom-color: var(--primary_border_bottom);
@@ -1151,7 +1196,7 @@ nav.breadcrumb {
 
 .forumposts:nth-of-type(even) {
 	margin-top: 2px;
-	background: var(--content_background);
+	background: var(--mid_grey_background);
 }
 
 .forumposts:nth-of-type(odd) {
@@ -1304,6 +1349,11 @@ nav.breadcrumb {
  * -------------------------------------------------------
  */
 
+.editor_wrapper {
+	width: 60em;
+	margin: 0 auto;
+}
+
 .drop_area {
 	color: var(--hover_text);
 	border-color: var(--primary_border);
@@ -1398,8 +1448,9 @@ nav.breadcrumb {
 
 .ui-tabs .ui-tabs-nav li {
 	color: var(--primary_white);
+	border-color: var(--primary_border) !important;
 	border-bottom: none;
-	box-shadow: 1px -1px 0 var(--opacity30), -1px -1px 0 var(--opacity20);
+	box-shadow: 1px -1px 1px var(--opacity30);
 }
 
 .ui-tabs .ui-tabs-nav .ui-state-active a,
@@ -1424,9 +1475,10 @@ nav.breadcrumb {
 	background: var(--menu_button_active);
 }
 
-.ui-tabs .ui-tabs-nav li.ui-state-hover .ui-tabs-anchor {
+.ui-tabs .ui-tabs-nav li.ui-state-hover .ui-tabs-anchor, li.ui-state-hover {
 	text-decoration: none;
 	color: var(--menu_text);
+	border-color: transparent;
 	background: var(--primary_white_compliment);
 }
 

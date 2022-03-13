@@ -130,7 +130,7 @@ function template_post()
 		<caption name="subject" class="', isset($context['post_error']['no_subject']) ? 'error' : '', '" />
 		<caption name="question" class="', isset($context['post_error']['no_question']) ? 'error' : '', '" />
 	</errors>
-	<last_msg>', isset($context['topic_last_message']) ? $context['topic_last_message'] : '0', '</last_msg>';
+	<last_msg>', $context['topic_last_message'] ?? '0', '</last_msg>';
 
 	if (!empty($context['previous_posts']))
 	{

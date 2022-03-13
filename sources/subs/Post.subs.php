@@ -214,14 +214,14 @@ function createPost(&$msgOptions, &$topicOptions, &$posterOptions)
 			'id_member_updated' => $posterOptions['id'],
 			'id_first_msg' => $msgOptions['id'],
 			'id_last_msg' => $msgOptions['id'],
-			'locked' => $topicOptions['lock_mode'] === null ? 0 : $topicOptions['lock_mode'],
-			'is_sticky' => $topicOptions['sticky_mode'] === null ? 0 : $topicOptions['sticky_mode'],
+			'locked' => $topicOptions['lock_mode'] ?? 0,
+			'is_sticky' => $topicOptions['sticky_mode'] ?? 0,
 			'num_views' => 0,
-			'id_poll' => $topicOptions['poll'] === null ? 0 : $topicOptions['poll'],
+			'id_poll' => $topicOptions['poll'] ?? 0,
 			'unapproved_posts' => $msgOptions['approved'] ? 0 : 1,
 			'approved' => $msgOptions['approved'],
-			'redirect_expires' => $topicOptions['redirect_expires'] === null ? 0 : $topicOptions['redirect_expires'],
-			'id_redirect_topic' => $topicOptions['redirect_topic'] === null ? 0 : $topicOptions['redirect_topic'],
+			'redirect_expires' => $topicOptions['redirect_expires'] ?? 0,
+			'id_redirect_topic' => $topicOptions['redirect_topic'] ?? 0,
 		);
 
 		call_integration_hook('integrate_before_create_topic', array(&$msgOptions, &$topicOptions, &$posterOptions, &$topic_columns, &$topic_parameters));

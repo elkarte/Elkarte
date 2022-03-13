@@ -828,14 +828,7 @@ function addData($inc_data, $custom_table = null)
 		return false;
 	}
 
-	if ($custom_table !== null)
-	{
-		$table = $custom_table;
-	}
-	else
-	{
-		$table = $context['current_table'];
-	}
+	$table = $custom_table ?? $context['current_table'];
 
 	// If we have keys, sanitise the data...
 	$data = array();

@@ -1740,7 +1740,7 @@ class ModerationCenter extends AbstractController
 	 *
 	 * @param string $template_type
 	 *
-	 * @return
+	 * @return int
 	 * @uses warningTemplateCount()
 	 *
 	 */

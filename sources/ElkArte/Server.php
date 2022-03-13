@@ -152,7 +152,7 @@ class Server extends \ArrayObject
 			case 'apache':
 				return $this->_is_web_server('Apache');
 			case 'cgi':
-				return isset($this->SERVER_SOFTWARE) && strpos(php_sapi_name(), 'cgi') !== false;
+				return isset($this->SERVER_SOFTWARE) && strpos(PHP_SAPI, 'cgi') !== false;
 			case 'iis':
 				return $this->_is_web_server('Microsoft-IIS');
 			case 'iso_case_folding':
@@ -288,7 +288,7 @@ class Server extends \ArrayObject
 
 		if (preg_match('~^(?!\-)(?:[a-zA-Z\d\-]{0,62}[a-zA-Z\d]\.){1,126}(?!\d+)[a-zA-Z\d]{1,63}$~', $hostname) === 1)
 		{
-			// Check for ANY dns records for this name for simplicity although we really want A / AAAA
+			// Check for ANY dns records for this name, for simplicity, although we really want A / AAAA
 			return checkdnsrr($hostname, 'ANY');
 		}
 

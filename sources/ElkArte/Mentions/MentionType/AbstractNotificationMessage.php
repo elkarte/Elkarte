@@ -139,10 +139,10 @@ abstract class AbstractNotificationMessage implements NotificationInterface
 				$inserts[] = array(
 					$id_member,
 					$target,
-					$status === null ? 0 : $status,
-					$is_accessible === null ? 1 : $is_accessible,
+					$status ?? 0,
+					$is_accessible ?? 1,
 					$member_from,
-					$time === null ? time() : $time,
+					$time ?? time(),
 					static::$_type
 				);
 				$actually_mentioned[] = $id_member;

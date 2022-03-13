@@ -38,7 +38,7 @@ function template_view_scheduled_tasks()
 			foreach ($context['scheduled_errors'] as $task => $errors)
 			{
 				echo
-				isset($txt['scheduled_task_' . $task]) ? $txt['scheduled_task_' . $task] : $task, '
+					$txt['scheduled_task_' . $task] ?? $task, '
 				<ul>
 					<li class="listlevel1">', implode('</li><li class="listlevel1">', $errors), '</li>
 				</ul>';

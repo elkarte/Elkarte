@@ -3440,7 +3440,7 @@ function updateTopicStats($increment = null)
 		$row = $request->fetch_assoc();
 		$request->free_result();
 
-		updateSettings(array('totalTopics' => $row['total_topics'] === null ? 0 : $row['total_topics']));
+		updateSettings(array('totalTopics' => $row['total_topics'] ?? 0));
 	}
 }
 

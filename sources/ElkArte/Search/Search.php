@@ -135,12 +135,7 @@ class Search
 	 */
 	public function param($name)
 	{
-		if (isset($this->_searchParams[$name]))
-		{
-			return $this->_searchParams[$name];
-		}
-
-		return false;
+		return $this->_searchParams[$name] ?? false;
 	}
 
 	/**

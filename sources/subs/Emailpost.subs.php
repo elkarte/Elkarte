@@ -672,8 +672,6 @@ function pbe_check_moderation(&$pbe)
 
 		$pbe['user_info']['permissions'] = array_diff($pbe['user_info']['permissions'], array_keys($permission_change));
 	}
-
-	return;
 }
 
 /**
@@ -984,7 +982,7 @@ function pbe_find_board_number($email_address)
 		if (isset($valid_address[$to_email]))
 		{
 			$board_number = (int) $valid_address[$to_email];
-			continue;
+			break;
 		}
 	}
 
@@ -1089,8 +1087,6 @@ function pbe_prepare_text(&$message, &$subject = '', &$signature = '')
 		$signature = $bbc_wrapper->parseSignature($signature, false);
 		$signature = trim(un_htmlspecialchars(strip_tags(strtr($signature, array('</tr>' => "   \n", '<br />' => "   \n", '</div>' => "\n", '</li>' => "   \n", '&#91;' => '[', '&#93;' => ']')))));
 	}
-
-	return;
 }
 
 /**
@@ -1285,7 +1281,7 @@ function query_load_user_info($email)
 		query_load_permissions('general', $pbe);
 
 		// Set the moderation warning level
-		$pbe['user_info']['warning'] = isset($pbe['profile']['warning']) ? $pbe['profile']['warning'] : 0;
+		$pbe['user_info']['warning'] = $pbe['profile']['warning'] ?? 0;
 
 		// Work out our query_see_board string for security
 		if (in_array(1, $pbe['user_info']['groups']))
@@ -1300,9 +1296,9 @@ function query_load_user_info($email)
 		// Set some convenience items
 		$pbe['user_info']['is_admin'] = in_array(1, $pbe['user_info']['groups']) ? 1 : 0;
 		$pbe['user_info']['id'] = $id_member;
-		$pbe['user_info']['username'] = isset($pbe['profile']['member_name']) ? $pbe['profile']['member_name'] : '';
-		$pbe['user_info']['name'] = isset($pbe['profile']['real_name']) ? $pbe['profile']['real_name'] : '';
-		$pbe['user_info']['email'] = isset($pbe['profile']['email_address']) ? $pbe['profile']['email_address'] : '';
+		$pbe['user_info']['username'] = $pbe['profile']['member_name'] ?? '';
+		$pbe['user_info']['name'] = $pbe['profile']['real_name'] ?? '';
+		$pbe['user_info']['email'] = $pbe['profile']['email_address'] ?? '';
 		$pbe['user_info']['language'] = empty($pbe['profile']['lngfile']) || empty($modSettings['userLanguage']) ? $language : $pbe['profile']['lngfile'];
 	}
 
@@ -2375,7 +2371,7 @@ function pbe_create_topic($pbe, $email_message, $board_info)
 		'name' => $pbe['profile']['real_name'],
 		'email' => $pbe['profile']['email_address'],
 		'update_post_count' => empty($board_info['count_posts']),
-		'ip' => (isset($email_message->ip)) ? $email_message->ip : $pbe['profile']['member_ip']
+		'ip' => $email_message->ip ?? $pbe['profile']['member_ip']
 	);
 
 	// Attempt to make the new topic.

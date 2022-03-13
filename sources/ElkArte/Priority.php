@@ -249,6 +249,7 @@ class Priority
 					{
 						$priority_threshold = $all_entities[$reference];
 						foreach ($all_entities as $key => $val)
+						{
 							switch ($where)
 							{
 								case 'after':
@@ -264,6 +265,7 @@ class Priority
 									}
 									break;
 							}
+						}
 						unset($all[$where][$entity]);
 						$all_entities[$entity] = $priority_threshold;
 					}

@@ -1417,7 +1417,7 @@ function populateDuplicateMembers(&$members)
 			'ips' => $ips,
 		)
 	)->fetch_callback(
-		function ($row) use (&$had_ips, $duplicate_members) {
+		function ($row) use (&$had_ips, &$duplicate_members) {
 			// Don't collect lots of the same.
 			if (isset($had_ips[$row['poster_ip']]) && in_array($row['id_member'], $had_ips[$row['poster_ip']]))
 			{

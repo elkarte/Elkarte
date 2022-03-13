@@ -798,7 +798,7 @@ function template_admin_search_results()
 			{
 				echo '
 								<li>
-									<a href="', $result['url'], '"><strong>', $result['name'], '</strong></a> [', isset($txt['admin_search_section_' . $result['type']]) ? $txt['admin_search_section_' . $result['type']] : $result['type'], ']';
+									<a href="', $result['url'], '"><strong>', $result['name'], '</strong></a> [', $txt['admin_search_section_' . $result['type']] ?? $result['type'], ']';
 
 				if ($result['help'])
 				{

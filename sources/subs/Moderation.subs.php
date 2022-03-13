@@ -391,7 +391,7 @@ function loadModeratorMenuCounts($brd = null)
 	}
 	else
 	{
-		$menu_errors = $temp === null ? array() : $temp;
+		$menu_errors = $temp ?? array();
 	}
 
 	return $menu_errors[$cache_key];

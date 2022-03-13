@@ -40,7 +40,6 @@ class ImageUploadResize
 	 * - Forwards to the proper resizer (same or new format)
 	 *
 	 * @param array $fileData
-	 * @param boolean $resize_only
 	 */
 	public function autoResize(&$fileData)
 	{

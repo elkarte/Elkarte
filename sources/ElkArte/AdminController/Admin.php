@@ -926,8 +926,9 @@ class Admin extends AbstractController
 			$relevance = 0;
 			foreach ($results->set('api/query/search/p') as $result)
 			{
-				$context['search_results'][$result->fetch('@title')] = array(
-					'title' => $result->fetch('@title'),
+				$title = $result->fetch('@title');
+				$context['search_results'][$title] = array(
+					'title' => $title,
 					'relevance' => $relevance++,
 					'snippet' => str_replace('class=\'searchmatch\'', 'class="highlight"', un_htmlspecialchars($result->fetch('@snippet'))),
 				);

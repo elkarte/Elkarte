@@ -35,7 +35,7 @@ error_reporting(0);
 global $ssi_guest_access;
 
 // Need to bootstrap the system to do much
-require_once(dirname(__FILE__) . '/bootstrap.php');
+require_once(__DIR__ . '/bootstrap.php');
 $ssi_guest_access = true;
 new Bootstrap(true);
 

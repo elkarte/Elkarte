@@ -186,7 +186,7 @@ function template_error_message()
 		foreach ($context['post_errors'] as $error)
 		{
 			echo '
-				<li>', isset($txt['profile_error_' . $error]) ? $txt['profile_error_' . $error] : $error, '</li>';
+				<li>', $txt['profile_error_' . $error] ?? $error, '</li>';
 		}
 
 		echo '

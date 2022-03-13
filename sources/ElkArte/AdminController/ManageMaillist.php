@@ -889,7 +889,7 @@ class ManageMaillist extends AbstractController
 	 * @param int $id 0 for all of a certain style
 	 * @param string $style one of filter or parser
 	 *
-	 * @return
+	 * @return int
 	 */
 	public function count_filter_parser($id, $style)
 	{

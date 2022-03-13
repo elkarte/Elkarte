@@ -481,7 +481,7 @@ function loadProfileFields($force_reload = false)
 					}
 					else
 					{
-						$value = checkdate($value, $_POST['bday2'], $_POST['bday3'] < 4 ? 4 : $_POST['bday3']) ? sprintf('%04d-%02d-%02d', $_POST['bday3'] < 4 ? 4 : $_POST['bday3'], $_POST['bday1'], $_POST['bday2']) : '0001-01-01';
+						$value = checkdate($value, $_POST['bday2'], max($_POST['bday3'], 4)) ? sprintf('%04d-%02d-%02d', max($_POST['bday3'], 4), $_POST['bday1'], $_POST['bday2']) : '0001-01-01';
 					}
 				}
 				else
@@ -505,7 +505,7 @@ function loadProfileFields($force_reload = false)
 				// @todo Should we check for this year and tell them they made a mistake :P? (based on coppa at least?)
 				if (preg_match('/(\d{4})[\-\., ](\d{2})[\-\., ](\d{2})/', $value, $dates) === 1)
 				{
-					$value = checkdate($dates[2], $dates[3], $dates[1] < 4 ? 4 : $dates[1]) ? sprintf('%04d-%02d-%02d', $dates[1] < 4 ? 4 : $dates[1], $dates[2], $dates[3]) : '0001-01-01';
+					$value = checkdate($dates[2], $dates[3], max($dates[1], 4)) ? sprintf('%04d-%02d-%02d', max($dates[1], 4), $dates[2], $dates[3]) : '0001-01-01';
 
 					return true;
 				}

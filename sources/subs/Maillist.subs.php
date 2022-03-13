@@ -340,8 +340,6 @@ function maillist_delete_filter_parser($id)
 			'id' => $id
 		)
 	);
-
-	return;
 }
 
 /**

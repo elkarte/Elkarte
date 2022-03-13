@@ -513,8 +513,6 @@ function saveDraft($draft, $check_last_save = false)
 			$post_errors->addError('draft_not_saved');
 		}
 	}
-
-	return;
 }
 
 /**

@@ -210,11 +210,6 @@ class MessageIndex extends AbstractController implements FrontpageInterface
 			'next' => $this->_req->query->start + $context['topics_per_page'] < $board_info['total_topics'] ? getUrl('board', ['board' => $board, 'start' => $this->_req->query->start + $context['topics_per_page'], 'name' => $board_info['name']]) : '',
 		);
 
-		$context['page_info'] = array(
-			'current_page' => $this->_req->query->start / $context['topics_per_page'] + 1,
-			'num_pages' => floor(($board_info['total_topics'] - 1) / $context['topics_per_page']) + 1
-		);
-
 		if (isset($this->_req->query->all) && !empty($modSettings['enableAllMessages']) && $maxindex > $modSettings['enableAllMessages'])
 		{
 			$maxindex = $modSettings['enableAllMessages'];

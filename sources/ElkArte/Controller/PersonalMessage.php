@@ -558,10 +558,6 @@ class PersonalMessage extends AbstractController
 			'prev' => $start >= $modSettings['defaultMaxMessages'] ? $scripturl . '?action=pm;start=' . ($start - $modSettings['defaultMaxMessages']) : '',
 			'next' => $start + $modSettings['defaultMaxMessages'] < $max_messages ? $scripturl . '?action=pm;start=' . ($start + $modSettings['defaultMaxMessages']) : '',
 		);
-		$context['page_info'] = array(
-			'current_page' => $start / $modSettings['defaultMaxMessages'] + 1,
-			'num_pages' => floor(($max_messages - 1) / $modSettings['defaultMaxMessages']) + 1
-		);
 
 		// We now know what they want, so lets fetch those PM's
 		list ($pms, $posters, $recipients, $lastData) = loadPMs(array(

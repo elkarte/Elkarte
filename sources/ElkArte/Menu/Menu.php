@@ -250,12 +250,10 @@ class Menu
 	 */
 	private function validateSection($sectionId)
 	{
-		if (empty($this->menuContext['sections'][$sectionId]['areas']))
+		if (empty($this->menuContext['sections'][$sectionId]['areas'])
+			&& empty($this->menuContext['sections'][$sectionId]['url']))
 		{
-			if (empty($this->menuContext['sections'][$sectionId]['url']))
-			{
-				unset($this->menuContext['sections'][$sectionId]);
-			}
+			unset($this->menuContext['sections'][$sectionId]);
 		}
 	}
 

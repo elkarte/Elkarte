@@ -195,7 +195,7 @@ class SearchApiWrapper
 	/**
 	 * Wrapper for setExcludedPhrases of the SearchAPI
 	 *
-	 * @param string[] $phrases An array of phrases to exclude
+	 * @param string[] $phrase An array of phrases to exclude
 	 */
 	public function setExcludedPhrases($phrase)
 	{
