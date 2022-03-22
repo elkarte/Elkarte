@@ -289,7 +289,10 @@ abstract class AbstractController
 
 	/**
 	 * An odd function that allows events to request dependencies from properties
-	 * of the class.
+	 * of the class.  Used by the EventManager to allow registered events to access
+	 * values of the class that triggered the event.
+	 *
+	 * If the property does not exist in the class, will also look in globals.
 	 *
 	 * @param string $dep - The name of the property the even wants
 	 * @param mixed[] $dependencies - the array that will be filled with the
@@ -334,9 +337,18 @@ abstract class AbstractController
 	 */
 	public function getApi()
 	{
+		global $db_show_debug;
+
 		// API Call?
 		$api = $this->_req->getRequest('api', 'trim', '');
+		$api = in_array($api, ['xml', 'json', 'html']) && !empty($_SERVER['HTTP_X_REQUESTED_WITH']) ? $api : false;
 
-		return in_array($api, ['xml', 'json']) ? $api : false;
+		// Lazy developers, nuff said :P
+		if ($api !== false)
+		{
+			$db_show_debug = false;
+		}
+
+		return $api;
 	}
 }

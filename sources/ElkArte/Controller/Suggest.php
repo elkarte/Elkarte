@@ -79,7 +79,7 @@ class Suggest extends AbstractController
 		// Any parameters?
 		$search_param = isset($this->_req->post->search_param) ? json_decode(base64_decode($this->_req->post->search_param), true) : array();
 
-		if (isset($this->_req->post->suggest_type, $this->_req->post->search) && isset($searchTypes[$this->_req->post->suggest_type]))
+		if (isset($this->_req->post->suggest_type, $this->_req->post->search, $searchTypes[$this->_req->post->suggest_type]))
 		{
 			// Shortcut
 			$currentSearch = $searchTypes[$this->_req->post->suggest_type];

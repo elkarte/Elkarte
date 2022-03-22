@@ -12,8 +12,6 @@
  *
  */
 
-use ElkArte\MembersList;
-use ElkArte\User;
 use ElkArte\Util;
 
 /**
@@ -111,9 +109,12 @@ function template_messages()
 	$context['quick_reply_ignoredMsgs'] = array();
 
 	// Get all the messages...
+	$reset = isset($context['reset_renderer']);
 	$controller = $context['get_message'][0];
-	while (($message = $controller->{$context['get_message'][1]}()))
+	while ($message = $controller->{$context['get_message'][1]}($reset))
 	{
+		$reset = false;
+
 		if ($message['can_remove'])
 		{
 			$context['quick_reply_removableMessageIDs'][] = $message['id'];
@@ -509,7 +510,7 @@ function template_quickreply_below()
 							<input type="hidden" name="icon" value="xx" />
 							<input type="hidden" name="from_qr" value="1" />
 							<input type="hidden" name="notify" value="', $context['is_marked_notify'] || !empty($options['auto_notify']) ? '1' : '0', '" />
-							<input type="hidden" name="not_approved" value="', !$context['can_reply_approved'], '" />
+							<input type="hidden" name="not_approved" value="', (int) !$context['can_reply_approved'], '" />
 							<input type="hidden" name="goback" value="', empty($options['return_to_post']) ? '0' : '1', '" />
 							<input type="hidden" name="last_msg" value="', $context['topic_last_message'], '" />
 							<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />

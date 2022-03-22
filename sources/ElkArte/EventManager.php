@@ -14,6 +14,22 @@ namespace ElkArte;
 
 /**
  * Handle events in controller and classes
+ *
+ * High level overview:
+ *
+ * - Register your modules against a class in which it will be triggered with
+ *  enableModules($moduleName, $class) such as enableModules('Mymodule', ['display','post'])
+ * - You can also create a full core feature with ADMINDIR/ManageMymoduleModule.php file containing a
+ * a static class of addCoreFeature.  The file and class will be auto discovered and called.
+ * - Place your file in ElkArte/Modules/Mymodule/Display.php ElkArte/Modules/Mymodule/Post.php
+ * - In Mymodules Display.php and Post.php create a `public static function hooks` which returns
+ * what to do when triggered, example
+ *     - ['prepare_context', ['\\ElkArte\\Modules\\Mymodule\\Display', 'do_something'], ['attachments', 'start']
+ * - This will call the do_something() method in Display.php of the Mymodule directory and pass params
+ * $attachments $start values from Display.php class (where the event was triggered).
+ * - Some events have defined values passed, but you can always request other values as long as they
+ * are class properties
+ *
  */
 class EventManager
 {
@@ -43,7 +59,8 @@ class EventManager
 	/**
 	 * Allows to set the object that instantiated the \ElkArte\EventManager.
 	 *
-	 * - Necessary in order to be able to provide the dependencies later on
+	 * - Necessary in order to be able to provide the dependencies later on, allows
+	 * one to access the calling class properties in the registered event
 	 *
 	 * @param object $source The controller that instantiated the \ElkArte\EventManager
 	 */
@@ -96,6 +113,7 @@ class EventManager
 					}
 					else
 					{
+						// Access to the calling classes properties
 						$this->_source->provideDependencies($dep, $dependencies);
 					}
 				}

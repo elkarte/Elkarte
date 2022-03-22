@@ -90,12 +90,7 @@ class ValuesContainer implements \ArrayAccess
 	 */
 	public function __call($key, $args)
 	{
-		if (isset($this->data[$key]))
-		{
-			return $this->data[$key];
-		}
-
-		return $args[0] ?? null;
+		return $this->data[$key] ?? $args[0] ?? null;
 	}
 
 	/**

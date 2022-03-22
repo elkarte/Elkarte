@@ -142,7 +142,7 @@
 			 */
 			handleError = function (params)
 			{
-				new smc_Popup({
+				new elk_Popup({
 					heading: oTxt.likeHeadingError,
 					content: params.data,
 					icon: 'i-exclamation colorize-exclamation'

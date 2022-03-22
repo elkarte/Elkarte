@@ -823,17 +823,15 @@ class Maintenance extends AbstractController
 		{
 			updatePersonalMessagesCounter();
 
+			// Done with step 5, reset start for the next one
+			$this->start = 0;
 			if (microtime(true) - $time_start > 3)
 			{
-				$this->start = 0;
 				$percent = round(700 / $this->total_steps);
 				$this->_buildContinue($percent, 6);
 
 				return;
 			}
-
-			// Done with step 5, reset start for the next one
-			$this->start = 0;
 		}
 
 		// Any messages pointing to the wrong board?

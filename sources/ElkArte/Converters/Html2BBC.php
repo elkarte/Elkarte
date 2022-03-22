@@ -616,7 +616,7 @@ class Html2BBC extends AbstractDomParser
 		$bbc = $this->getInnerHTML($node);
 
 		// Font / size can't span across certain tags with our bbc parser, so fix them now
-		$blocks = preg_split('~(\[hr\]|\[quote\])~s', $bbc, 2, PREG_SPLIT_DELIM_CAPTURE);
+		$blocks = preg_split('~(\[hr\]|\[quote\])~', $bbc, 2, PREG_SPLIT_DELIM_CAPTURE);
 
 		if (!empty($size))
 		{
@@ -667,7 +667,7 @@ class Html2BBC extends AbstractDomParser
 	 *
 	 * @param \DOMNode|object $node
 	 *
-	 * @return mixed|string
+	 * @return array|string|string[]
 	 */
 	private function _convertImage($node)
 	{
@@ -789,7 +789,7 @@ class Html2BBC extends AbstractDomParser
 	 *
 	 * @param string $text
 	 *
-	 * @return mixed
+	 * @return string
 	 */
 	private function _recursive_decode($text)
 	{
@@ -810,7 +810,7 @@ class Html2BBC extends AbstractDomParser
 	public function cleanBBC($bbc)
 	{
 		// Remove comment blocks
-		$bbc = preg_replace('~\\<\\!--.*?-->~i', '', $bbc);
+		$bbc = preg_replace('~\\<\\!--.*?-->~', '', $bbc);
 		$bbc = preg_replace('~\\<\\!\\[CDATA\\[.*?\\]\\]\\>~i', '', $bbc);
 
 		// Strip any excess leading/trailing blank lines we may have produced O:-)

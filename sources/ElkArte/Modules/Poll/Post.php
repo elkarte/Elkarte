@@ -61,10 +61,8 @@ class Post extends AbstractModule
 				array('pre_save_post', array('Poll_Post_Module', 'pre_save_post'), array('topicOptions')),
 			));
 		}
-		else
-		{
-			return $return;
-		}
+
+		return $return;
 	}
 
 	/**

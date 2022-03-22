@@ -19,7 +19,12 @@ use BBC\Codes;
 class IlaIntegrate
 {
 	/**
-	 * Register ILA hooks to the system
+	 * Register ILA hooks to the system.  This is called by the Hooks class, loadIntegrations()
+	 *
+	 * Note for addon authors.  All you need to do is extend $modSettings['autoload_integrate'] with
+	 * the "path/filename.php" of your integration (using filenameIntegrate is a nice touch but not required).
+	 * register() and settingsRegister() will both be called.  You can add and remove the name based on
+	 * if your addon is enabled/disabled and not worry about removing hooks (they do no use permanent)
 	 *
 	 * @return array
 	 */
@@ -200,18 +205,6 @@ class IlaIntegrate
 				Codes::ATTR_AUTOLINK => false,
 				Codes::ATTR_LENGTH => 9,
 			),
-			// [attachmini] -- just a plain link type
-			// 			array(
-			// 				'tag' => 'attachmini',
-			// 				'type' => 'closed',
-			// 				'content' => '',
-			// 			),
-			// [attachimg] -- full sized image
-			// 			array(
-			// 				'tag' => 'attachimg',
-			// 				'type' => 'closed',
-			// 				'content' => '',
-			// 			)
 		));
 	}
 
@@ -221,7 +214,7 @@ class IlaIntegrate
 	 * - Determines the best image, full or thumbnail, based on ILA width desired
 	 * - Used as PARAM_ATTR_VALIDATE function
 	 *
-	 * @return string
+	 * @return callable function which will return a string
 	 */
 	public static function validate_width()
 	{
@@ -233,10 +226,8 @@ class IlaIntegrate
 			{
 				return ';thumb" style="width:100%;max-width:' . $data . 'px;';
 			}
-			else
-			{
-				return '" style="width:100%;max-width:' . $data . 'px;';
-			}
+
+			return '" style="width:100%;max-width:' . $data . 'px;';
 		};
 	}
 
@@ -269,7 +260,7 @@ class IlaIntegrate
 	 * - Determines the best image, full or thumbnail, based on desired ILA height
 	 * - Used as PARAM_ATTR_VALIDATE function
 	 *
-	 * @return string
+	 * @return callable which will return a string
 	 */
 	public static function validate_height()
 	{
@@ -281,10 +272,8 @@ class IlaIntegrate
 			{
 				return ';thumb" style="max-height:' . $data . 'px;';
 			}
-			else
-			{
-				return '" style="max-height:' . $data . 'px;';
-			}
+
+			return '" style="max-height:' . $data . 'px;';
 		};
 	}
 
@@ -436,7 +425,6 @@ class IlaIntegrate
 	{
 		$config_vars[] = array('title', 'attachment_inline_title');
 		$config_vars[] = array('check', 'attachment_inline_enabled');
-		//$config_vars[] = array('check', 'attachment_inline_basicmenu');
 		$config_vars[] = array('check', 'attachment_inline_quotes');
 	}
 }

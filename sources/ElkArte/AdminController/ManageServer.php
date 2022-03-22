@@ -85,7 +85,7 @@ class ManageServer extends AbstractController
 		$context['sub_template'] = 'show_settings';
 
 		// Any messages to speak of?
-		$context['settings_message'] = (isset($this->_req->query->msg) && isset($txt[$this->_req->query->msg])) ? $txt[$this->_req->query->msg] : '';
+		$context['settings_message'] = (isset($this->_req->query->msg, $txt[$this->_req->query->msg])) ? $txt[$this->_req->query->msg] : '';
 
 		// Warn the user if there's any relevant information regarding Settings.php.
 		$settings_not_writable = !is_writable(BOARDDIR . '/Settings.php');

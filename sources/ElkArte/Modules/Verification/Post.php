@@ -43,10 +43,8 @@ class Post extends AbstractModule
 				array('prepare_save_post', array('\\ElkArte\\Modules\\Verification\\Post', 'prepare_save_post'), array('_post_errors')),
 			);
 		}
-		else
-		{
-			return array();
-		}
+
+		return array();
 	}
 
 	/**

@@ -172,9 +172,9 @@ class Post extends AbstractController
 		$context['robot_no_index'] = true;
 		$this->_template_layers->add('postarea');
 		$this->_topic_attributes = array(
-			'locked' => false,
-			'notify' => false,
-			'is_sticky' => false,
+			'locked' => 0,
+			'notify' => 0,
+			'is_sticky' => 0,
 			'id_last_msg' => 0,
 			'id_member' => 0,
 			'id_first_msg' => 0,
@@ -1106,9 +1106,9 @@ class Post extends AbstractController
 		}
 
 		// In case we want to override
-		if (allowedTo('approve_posts') && !isset($_REQUEST['from_qr']))
+		if (!isset($_REQUEST['from_qr']) && allowedTo('approve_posts'))
 		{
-			$becomesApproved = empty($_REQUEST['approve']) ? 0 : 1;
+			$becomesApproved = !isset($_REQUEST['approve']) || !empty($_REQUEST['approve']) ? 1 : 0;
 			$approve_has_changed = isset($msgInfo['approved']) && $msgInfo['approved'] != $becomesApproved;
 		}
 
@@ -1118,7 +1118,7 @@ class Post extends AbstractController
 			$_POST['guestname'] = !isset($_POST['guestname']) ? '' : Util::htmlspecialchars(trim($_POST['guestname']));
 			$_POST['email'] = !isset($_POST['email']) ? '' : Util::htmlspecialchars(trim($_POST['email']));
 
-			if ($_POST['guestname'] == '' || $_POST['guestname'] == '_')
+			if ($_POST['guestname'] === '' || $_POST['guestname'] === '_')
 			{
 				$this->_post_errors->addError('no_name');
 			}
@@ -1788,7 +1788,7 @@ class Post extends AbstractController
 			}
 
 			// Changing the first subject updates other subjects to 'Re: new_subject'.
-			if (isset($_POST['subject']) && isset($_REQUEST['change_all_subjects']) && $row['id_first_msg'] == $row['id_msg'] && !empty($row['num_replies']) && (allowedTo('modify_any') || ($row['id_member_started'] == $this->user->id && allowedTo('modify_replies'))))
+			if (isset($_POST['subject'], $_REQUEST['change_all_subjects']) && $row['id_first_msg'] == $row['id_msg'] && !empty($row['num_replies']) && (allowedTo('modify_any') || ($row['id_member_started'] == $this->user->id && allowedTo('modify_replies'))))
 			{
 				// Get the proper (default language) response prefix first.
 				$context['response_prefix'] = response_prefix();
@@ -1810,7 +1810,7 @@ class Post extends AbstractController
 			theme()->getLayers()->removeAll();
 			$context['sub_template'] = 'modifydone';
 
-			if (!$this->_post_errors->hasErrors() && isset($msgOptions['subject']) && isset($msgOptions['body']))
+			if (isset($msgOptions['subject'], $msgOptions['body']) && !$this->_post_errors->hasErrors())
 			{
 				$context['message'] = array(
 					'id' => $row['id_msg'],

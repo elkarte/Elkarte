@@ -788,7 +788,7 @@ function url_image_size($url)
 {
 	// Can we pull this from the cache... please please?
 	$temp = array();
-	if (Cache::instance()->getVar($temp, 'url_image_size-' . md5($url), 240))
+	if (Cache::instance()->getVar($temp, 'url_image_size-' . md5($url), 3600))
 	{
 		return $temp;
 	}
@@ -843,7 +843,8 @@ function url_image_size($url)
 		return array(-1, -1, -1);
 	}
 
-	Cache::instance()->put('url_image_size-' . md5($url), $size, 240);
+	// Save this for 1hour, its not like the image size is going to change
+	Cache::instance()->put('url_image_size-' . md5($url), $size, 3600);
 
 	return $size;
 }

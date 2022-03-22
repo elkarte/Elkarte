@@ -439,7 +439,7 @@ class ManagePaid extends AbstractController
 		$context['page_title'] = $txt['paid_' . $context['action_type'] . '_subscription'];
 
 		// Delete it?
-		if (isset($this->_req->post->delete_confirm) && isset($this->_req->query->delete))
+		if (isset($this->_req->post->delete_confirm, $this->_req->query->delete))
 		{
 			checkSession();
 			validateToken('admin-pmsd');

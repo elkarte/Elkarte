@@ -524,9 +524,7 @@ class Notify extends AbstractController
 
 		if (method_exists($class_name, 'unsubscribe'))
 		{
-			$unsubscribe = new $class_name;
-
-			return $unsubscribe->unsubscribe($member, $area, $extra);
+			return (new $class_name)->unsubscribe($member, $area, $extra);
 		}
 
 		return false;

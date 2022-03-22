@@ -121,7 +121,7 @@ class Reports extends AbstractController
 
 		// Specific template? Use that instead of main!
 		$set_template = $this->_req->query->st ?? null;
-		if (isset($set_template) && isset($reportTemplates[$set_template]))
+		if (isset($set_template, $reportTemplates[$set_template]))
 		{
 			$context['sub_template'] = $set_template;
 

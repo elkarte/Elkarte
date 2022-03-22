@@ -229,7 +229,7 @@ function updateAdminPreferences()
  *
  * - It loads all users who are admins or have the admin forum permission.
  * - It uses the email template and replacements passed in the parameters.
- * - It sends them an email.
+ * - It sends an email.
  *
  * @param string $template
  * @param mixed[] $replacements
@@ -314,7 +314,7 @@ function emailAdmins($template, $replacements = array(), $additional_recipients 
 }
 
 /**
- * Callback used in the core features page when the custom profiles
+ * Callback used in the core features' page when the custom profiles
  * are enabled or disabled.
  *
  * @param bool $value the "new" status of the profile fields
@@ -358,7 +358,7 @@ function custom_profiles_toggle_callback($value)
 }
 
 /**
- * Callback used in the core features page when the paid subscriptions
+ * Callback used in the core features' page when the paid subscriptions
  * are enabled or disabled.
  *
  * @param bool $value the "new" status of the paid subscriptions
@@ -378,7 +378,7 @@ function subscriptions_toggle_callback($value)
 }
 
 /**
- * Callback used in the core features page when the post-by-email feature
+ * Callback used in the core features' page when the post-by-email feature
  * is enabled or disabled.
  *
  * @param bool $value the "new" status of the post-by-email

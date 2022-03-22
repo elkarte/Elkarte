@@ -29,21 +29,19 @@ class Result extends AbstractResult
 		{
 			return $this->details->replaceResults;
 		}
-		elseif ($this->result === null && !($this->details->lastResult))
+
+		if ($this->result === null && !($this->details->lastResult))
 		{
 			return 0;
 		}
 
 		$resource = $this->result ?? $this->details->lastResult;
-
 		if (is_resource($resource) || $resource instanceof \PgSQL\Result)
 		{
 			return pg_affected_rows($resource);
 		}
-		else
-		{
-			return 0;
-		}
+
+		return 0;
 	}
 
 	/**

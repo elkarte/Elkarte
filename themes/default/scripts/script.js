@@ -31,6 +31,71 @@ var ua = navigator.userAgent.toLowerCase(),
 	is_touch = 'ontouchstart' in window || navigator.MaxTouchPoints > 0 || navigator.msMaxTouchPoints > 0;
 
 /**
+ * Load a document using fetch API.
+ *
+ * It will validate the server returned an `ok` response
+ * It will parse out the data as XML, JSON or Plain based on passed
+ * sType, defaulting to XML for historical reasons.
+ *
+ * @callback Callback
+ * @param {string} sUrl
+ * @param {function} funcCallback
+ * @param {string} sType xml, json, html, defaults to xml
+ */
+function fetchDocument(sUrl, funcCallback, sType)
+{
+	sType = sType || 'xml';
+
+	fetch(sUrl, {
+		credentials: 'same-origin',
+		method: 'GET',
+		mode: 'cors',
+		cache: 'default',
+	})
+	// Process the response as xml, json or plain text
+	.then(response => {
+		const contentType = response.headers.get('content-type');
+
+		if (!response.ok || response.status !== 200 || !contentType)
+		{
+			return false;
+		}
+
+		if (sType === 'xml')
+		{
+			return response.text().then(data =>
+			{
+				let parser = new DOMParser();
+
+				return parser.parseFromString(data, "application/xml");
+			});
+		}
+
+		if (sType === 'json')
+		{
+			return response.json();
+		}
+
+		return response.text();
+	})
+	// If we have a callback, send the result to it
+	.then(data => {
+		if (typeof (funcCallback) !== 'undefined')
+		{
+			funcCallback.call(this, data);
+		}
+
+		return data;
+	})
+	.catch(error => {
+		if ('console' in window)
+		{
+			window.console.info(error);
+		}
+	});
+}
+
+/**
  * Load an XML document using XMLHttpRequest.
  *
  * @callback xmlCallback
@@ -39,7 +104,13 @@ var ua = navigator.userAgent.toLowerCase(),
  */
 function getXMLDocument(sUrl, funcCallback)
 {
-	var oMyDoc = new XMLHttpRequest(),
+	// If the fetch API is available, use it instead
+	if (window.fetch)
+	{
+		return fetchDocument(sUrl, funcCallback, 'xml');
+	}
+
+	let oMyDoc = new XMLHttpRequest(),
 		bAsync = typeof (funcCallback) !== 'undefined',
 		oCaller = this;
 
@@ -254,7 +325,7 @@ function reqWin(desktopURL, alternateWidth, alternateHeight, noScrollbars)
 }
 
 /**
- * Open a overlay div on the screen
+ * Open an overlay, non-modal, div on the screen
  *
  * @param {string} desktopURL
  * @param {string} [sHeader]
@@ -263,41 +334,49 @@ function reqWin(desktopURL, alternateWidth, alternateHeight, noScrollbars)
 function reqOverlayDiv(desktopURL, sHeader, sIcon)
 {
 	// Set up our div details
-	var sAjax_indicator = '<div class="centertext"><i class="icon icon-big i-oval"></i></div>';
+	let sAjax_indicator = '<div class="centertext"><i class="icon icon-big i-oval"></i></div>';
 
 	sIcon = typeof (sIcon) === 'string' ? sIcon : 'i-help';
 	sHeader = typeof (sHeader) === 'string' ? sHeader : help_popup_heading_text;
 
 	// Create the div that we are going to load
-	var oContainer = new smc_Popup({heading: sHeader, content: sAjax_indicator, icon: sIcon}),
+	let oContainer = new elk_Popup({heading: sHeader, content: sAjax_indicator, icon: sIcon}),
 		oPopup_body = $('#' + oContainer.popup_id).find('.popup_content');
 
-	// Load the help page content (we just want the text to show)
+	// Fetch the page content (we just want the text to show)
 	$.ajax({
-		url: desktopURL,
+		url: desktopURL + ';api=html',
 		type: "GET",
-		dataType: "html"
+		dataType: "html",
 	})
-		.done(function (data, textStatus, xhr)
-		{
-			var help_content = $('<div id="temp_help">').html(data).find('a[href$="self.close();"]').hide().prev('br').hide().parent().html();
+	.done(function (data, textStatus, xhr)
+	{
+		let content = $('<div id="temp_help">').html(data),
+			close = content.find('a[href$="self.close();"]');
 
-			oPopup_body.html(help_content);
-		})
-		.fail(function (xhr, textStatus, errorThrown)
+		// If the content has its own close button, simply remove it
+		if (typeof close !== 'undefined' && close.length !== 0)
 		{
-			oPopup_body.html(textStatus);
-		});
+			content = content.find('a[href$="self.close();"]').hide().prev('br').hide().parent();
+		}
+
+		// Replace the spinner with fetched page
+		oPopup_body.html(content.html());
+	})
+	.fail(function (xhr, textStatus, errorThrown)
+	{
+		oPopup_body.html(textStatus);
+	});
 
 	return false;
 }
 
 /**
- * smc_Popup class.
+ * elk_Popup class.
  *
  * @param {object} oOptions
  */
-function smc_Popup(oOptions)
+function elk_Popup(oOptions)
 {
 	this.opt = oOptions;
 	this.popup_id = this.opt.custom_id ? this.opt.custom_id : 'elk_popup';
@@ -305,12 +384,10 @@ function smc_Popup(oOptions)
 }
 
 // Show the popup div & prepare the close events
-smc_Popup.prototype.show = function ()
+elk_Popup.prototype.show = function ()
 {
-	var popup_class = 'popup_window ' + (this.opt.custom_class ? this.opt.custom_class : 'content'),
+	let popup_class = 'popup_window ' + (this.opt.custom_class ? this.opt.custom_class : 'content'),
 		icon = this.opt.icon ? '<i class="icon ' + this.opt.icon + '"></i> ' : '';
-
-	// Todo: opt.icon should be a string referencing the desired icon. Will require changing all callers.
 
 	// Create the div that will be shown - max-height added here - essential anyway,
 	// so better here than in the CSS.
@@ -326,7 +403,7 @@ smc_Popup.prototype.show = function ()
 	this.popup_body.addClass("in");
 
 	// Trigger hide on escape or mouse click
-	var popup_instance = this;
+	let popup_instance = this;
 	$(document).on('mouseup', function (e)
 	{
 		if ($('#' + popup_instance.popup_id).has(e.target).length === 0)
@@ -350,7 +427,7 @@ smc_Popup.prototype.show = function ()
 };
 
 // Hide the popup
-smc_Popup.prototype.hide = function ()
+elk_Popup.prototype.hide = function ()
 {
 	$('#' + this.popup_id).fadeOut(300, function ()
 	{
@@ -718,36 +795,36 @@ function smc_preCacheImage(sSrc)
 }
 
 /**
- * smc_Cookie class.
+ * Elk_Cookie class.
  *
  * @param {object} oOptions
  */
-function smc_Cookie(oOptions)
+function Elk_Cookie(oOptions)
 {
 	this.opt = oOptions;
 	this.oCookies = {};
 	this.init();
 }
 
-smc_Cookie.prototype.init = function ()
+Elk_Cookie.prototype.init = function ()
 {
 	if ('cookie' in document && document.cookie !== '')
 	{
-		var aCookieList = document.cookie.split(';');
-		for (var i = 0, n = aCookieList.length; i < n; i++)
+		let aCookieList = document.cookie.split(';');
+		for (let i = 0, n = aCookieList.length; i < n; i++)
 		{
-			var aNameValuePair = aCookieList[i].split('=');
+			let aNameValuePair = aCookieList[i].split('=');
 			this.oCookies[aNameValuePair[0].replace(/^\s+|\s+$/g, '')] = decodeURIComponent(aNameValuePair[1]);
 		}
 	}
 };
 
-smc_Cookie.prototype.get = function (sKey)
+Elk_Cookie.prototype.get = function (sKey)
 {
 	return sKey in this.oCookies ? this.oCookies[sKey] : null;
 };
 
-smc_Cookie.prototype.set = function (sKey, sValue)
+Elk_Cookie.prototype.set = function (sKey, sValue)
 {
 	document.cookie = sKey + '=' + encodeURIComponent(sValue);
 };
@@ -775,7 +852,7 @@ function elk_Toggle(oOptions)
 // Initialize the toggle class
 elk_Toggle.prototype.init = function ()
 {
-	var i = 0,
+	let i = 0,
 		n = 0;
 
 	// The master switch can disable this toggle fully.
@@ -784,14 +861,14 @@ elk_Toggle.prototype.init = function ()
 		return;
 	}
 
-	// If cookies are enabled and they were set, override the initial state.
+	// If cookies are enabled, and they were set, override the initial state.
 	if ('oCookieOptions' in this.opt && this.opt.oCookieOptions.bUseCookie)
 	{
 		// Initialize the cookie handler.
-		this.oCookie = new smc_Cookie({});
+		this.oCookie = new Elk_Cookie({});
 
 		// Check if the cookie is set.
-		var cookieValue = this.oCookie.get(this.opt.oCookieOptions.sCookieName);
+		let cookieValue = this.oCookie.get(this.opt.oCookieOptions.sCookieName);
 		if (cookieValue !== null)
 		{
 			this.opt.bCurrentlyCollapsed = cookieValue === '1';
@@ -809,7 +886,7 @@ elk_Toggle.prototype.init = function ()
 	{
 		for (i = 0, n = this.opt.aSwapImages.length; i < n; i++)
 		{
-			var oImage = document.getElementById(this.opt.aSwapImages[i].sId);
+			let oImage = document.getElementById(this.opt.aSwapImages[i].sId);
 			if (typeof (oImage) === 'object' && oImage !== null)
 			{
 				// Display the image in case it was hidden.
@@ -836,7 +913,7 @@ elk_Toggle.prototype.init = function ()
 	{
 		for (i = 0, n = this.opt.aSwapClasses.length; i < n; i++)
 		{
-			var oContainer = document.getElementById(this.opt.aSwapClasses[i].sId);
+			let oContainer = document.getElementById(this.opt.aSwapClasses[i].sId);
 			if (typeof (oContainer) === 'object' && oContainer !== null)
 			{
 				// Display the image in case it was hidden.
@@ -862,7 +939,7 @@ elk_Toggle.prototype.init = function ()
 	{
 		for (i = 0, n = this.opt.aSwapLinks.length; i < n; i++)
 		{
-			var oLink = document.getElementById(this.opt.aSwapLinks[i].sId);
+			let oLink = document.getElementById(this.opt.aSwapLinks[i].sId);
 			if (typeof (oLink) === 'object' && oLink !== null)
 			{
 				// Display the link in case it was hidden.
@@ -891,7 +968,7 @@ elk_Toggle.prototype.init = function ()
  */
 elk_Toggle.prototype.changeState = function (bCollapse, bInit)
 {
-	var i = 0,
+	let i = 0,
 		n = 0,
 		oContainer;
 
@@ -919,11 +996,11 @@ elk_Toggle.prototype.changeState = function (bCollapse, bInit)
 		// Swapping images on a click
 		for (i = 0, n = this.opt.aSwapImages.length; i < n; i++)
 		{
-			var oImage = document.getElementById(this.opt.aSwapImages[i].sId);
+			let oImage = document.getElementById(this.opt.aSwapImages[i].sId);
 			if (typeof (oImage) === 'object' && oImage !== null)
 			{
 				// Only (re)load the image if it's changed.
-				var sTargetSource = bCollapse ? this.opt.aSwapImages[i].srcCollapsed : this.opt.aSwapImages[i].srcExpanded;
+				let sTargetSource = bCollapse ? this.opt.aSwapImages[i].srcCollapsed : this.opt.aSwapImages[i].srcExpanded;
 				if (oImage.src != sTargetSource)
 				{
 					oImage.src = sTargetSource;
@@ -942,7 +1019,7 @@ elk_Toggle.prototype.changeState = function (bCollapse, bInit)
 			if (typeof (oContainer) === 'object' && oContainer !== null)
 			{
 				// Only swap the class if the state changed
-				var sTargetClass = bCollapse ? this.opt.aSwapClasses[i].classCollapsed : this.opt.aSwapClasses[i].classExpanded;
+				let sTargetClass = bCollapse ? this.opt.aSwapClasses[i].classCollapsed : this.opt.aSwapClasses[i].classExpanded;
 				if (oContainer.className !== sTargetClass)
 				{
 					oContainer.className = sTargetClass;
@@ -959,7 +1036,7 @@ elk_Toggle.prototype.changeState = function (bCollapse, bInit)
 	{
 		for (i = 0, n = this.opt.aSwapLinks.length; i < n; i++)
 		{
-			var oLink = document.getElementById(this.opt.aSwapLinks[i].sId);
+			let oLink = document.getElementById(this.opt.aSwapLinks[i].sId);
 			if (typeof (oLink) === 'object' && oLink !== null)
 			{
 				oLink.innerHTML = bCollapse ? this.opt.aSwapLinks[i].msgCollapsed : this.opt.aSwapLinks[i].msgExpanded;

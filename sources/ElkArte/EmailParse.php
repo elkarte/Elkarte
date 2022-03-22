@@ -908,7 +908,7 @@ class EmailParse
 				$val = $rest;
 			}
 
-			$dsn_body[trim(strtolower($field))] = array('type' => trim($type), 'value' => trim($val));
+			$dsn_body[strtolower(trim($field))] = array('type' => trim($type), 'value' => trim($val));
 		}
 
 		switch ($dsn_body['action']['value'])
@@ -979,7 +979,7 @@ class EmailParse
 	private function _decode_body($val)
 	{
 		// The encoding tag can be missing in the headers or just wrong
-		if (preg_match('~(?:=C2|=A0|=D2|=D4|=96)~s', $val))
+		if (preg_match('~(?:=C2|=A0|=D2|=D4|=96)~', $val))
 		{
 			// Remove /r/n to be just /n
 			$val = preg_replace('~(=0D=0A)~', "\n", $val);
@@ -996,13 +996,13 @@ class EmailParse
 			$val = $this->_decode_string($val, 'quoted-printable');
 		}
 		// Lines end in the tell tail quoted printable ... wrap and decode
-		elseif (preg_match('~\s=[\r?\n]~s', $val))
+		elseif (preg_match('~\s=[\r?\n]~', $val))
 		{
 			$val = preg_replace('~\s=[\r?\n]~', ' ', $val);
 			$val = $this->_decode_string($val, 'quoted-printable');
 		}
 		// Lines end in = but not ==
-		elseif (preg_match('~((?<!=)=[\r?\n])~s', $val))
+		elseif (preg_match('~((?<!=)=[\r?\n])~', $val))
 		{
 			$val = $this->_decode_string($val, 'quoted-printable');
 		}

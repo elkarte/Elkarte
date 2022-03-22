@@ -502,10 +502,8 @@ abstract class AbstractQuery implements QueryInterface
 
 			return implode(', ', $replacement);
 		}
-		else
-		{
-			$this->error_backtrace('Wrong value type sent to the database. Array of integers expected. (' . $identifier . ')', '', E_USER_ERROR, __FILE__, __LINE__);
-		}
+
+		$this->error_backtrace('Wrong value type sent to the database. Array of integers expected. (' . $identifier . ')', '', E_USER_ERROR, __FILE__, __LINE__);
 	}
 
 	/**
@@ -532,10 +530,8 @@ abstract class AbstractQuery implements QueryInterface
 
 			return implode(', ', $replacement);
 		}
-		else
-		{
-			$this->error_backtrace('Wrong value type sent to the database. Array of strings expected. (' . $identifier . ')', '', E_USER_ERROR, __FILE__, __LINE__);
-		}
+
+		$this->error_backtrace('Wrong value type sent to the database. Array of strings expected. (' . $identifier . ')', '', E_USER_ERROR, __FILE__, __LINE__);
 	}
 
 	/**
@@ -563,10 +559,8 @@ abstract class AbstractQuery implements QueryInterface
 
 			return implode(', ', $replacement);
 		}
-		else
-		{
-			$this->error_backtrace('Wrong value type sent to the database. Array of strings expected. (' . $identifier . ')', '', E_USER_ERROR, __FILE__, __LINE__);
-		}
+
+		$this->error_backtrace('Wrong value type sent to the database. Array of strings expected. (' . $identifier . ')', '', E_USER_ERROR, __FILE__, __LINE__);
 	}
 
 	/**
@@ -583,10 +577,8 @@ abstract class AbstractQuery implements QueryInterface
 		{
 			return sprintf('\'%04d-%02d-%02d\'', $date_matches[1], $date_matches[2], $date_matches[3]);
 		}
-		else
-		{
-			$this->error_backtrace('Wrong value type sent to the database. Date expected. (' . $identifier . ')', '', E_USER_ERROR, __FILE__, __LINE__);
-		}
+
+		$this->error_backtrace('Wrong value type sent to the database. Date expected. (' . $identifier . ')', '', E_USER_ERROR, __FILE__, __LINE__);
 	}
 
 	/**
@@ -912,10 +904,8 @@ abstract class AbstractQuery implements QueryInterface
 		{
 			return false;
 		}
-		else
-		{
-			return $result->fetch_row();
-		}
+
+		return $result->fetch_row();
 	}
 
 	/**
@@ -930,10 +920,8 @@ abstract class AbstractQuery implements QueryInterface
 		{
 			return false;
 		}
-		else
-		{
-			return $result->fetch_assoc();
-		}
+
+		return $result->fetch_assoc();
 	}
 
 	/**
@@ -948,10 +936,8 @@ abstract class AbstractQuery implements QueryInterface
 		{
 			return;
 		}
-		else
-		{
-			return $result->free_result();
-		}
+
+		return $result->free_result();
 	}
 
 	/**
@@ -977,10 +963,8 @@ abstract class AbstractQuery implements QueryInterface
 		{
 			return 0;
 		}
-		else
-		{
-			return $result->num_rows();
-		}
+
+		return $result->num_rows();
 	}
 
 	/**
@@ -995,10 +979,8 @@ abstract class AbstractQuery implements QueryInterface
 		{
 			return 0;
 		}
-		else
-		{
-			return $result->num_fields();
-		}
+
+		return $result->num_fields();
 	}
 
 	/**
@@ -1056,20 +1038,18 @@ abstract class AbstractQuery implements QueryInterface
 		{
 			return array_combine($keys, $values);
 		}
-		else
-		{
-			$combined = array();
-			foreach ($keys as $key)
-			{
-				if (isset($values[$key]))
-				{
-					$combined[$key] = $values[$key];
-				}
-			}
 
-			// @todo should throw an E_WARNING if count($combined) != count($keys)
-			return $combined;
+		$combined = array();
+		foreach ($keys as $key)
+		{
+			if (isset($values[$key]))
+			{
+				$combined[$key] = $values[$key];
+			}
 		}
+
+		// @todo should throw an E_WARNING if count($combined) != count($keys)
+		return $combined;
 	}
 
 	/**
@@ -1086,7 +1066,7 @@ abstract class AbstractQuery implements QueryInterface
 	{
 		global $modSettings;
 
-		if (empty($modSettings['disableQueryCheck']) && strpos($db_string, '\'') !== false && empty($db_values['security_override']))
+		if (empty($modSettings['disableQueryCheck']) && empty($db_values['security_override']) && strpos($db_string, '\'') !== false)
 		{
 			$this->error_backtrace('Hacking attempt...', 'Illegal character (\') used in query...', true, __FILE__, __LINE__);
 		}
@@ -1211,7 +1191,8 @@ abstract class AbstractQuery implements QueryInterface
 					{
 						break;
 					}
-					elseif ($pos2 === false || $pos2 > $pos1)
+
+					if ($pos2 === false || $pos2 > $pos1)
 					{
 						$pos = $pos1;
 						break;
@@ -1225,7 +1206,7 @@ abstract class AbstractQuery implements QueryInterface
 			}
 
 			$clean .= substr($db_string, $old_pos);
-			$clean = trim(strtolower(preg_replace($this->allowed_comments['from'], $this->allowed_comments['to'], $clean)));
+			$clean = strtolower(trim(preg_replace($this->allowed_comments['from'], $this->allowed_comments['to'], $clean)));
 
 			// Comments?  We don't use comments in our queries, we leave 'em outside!
 			if (strpos($clean, '/*') > 2 || strpos($clean, '--') !== false || strpos($clean, ';') !== false)
@@ -1233,11 +1214,11 @@ abstract class AbstractQuery implements QueryInterface
 				$fail = true;
 			}
 			// Trying to change passwords, slow us down, or something?
-			elseif (strpos($clean, 'sleep') !== false && preg_match('~(^|[^a-z])sleep($|[^[_a-z])~s', $clean) != 0)
+			elseif (strpos($clean, 'sleep') !== false && preg_match('~(^|[^a-z])sleep($|[^[_a-z])~', $clean) != 0)
 			{
 				$fail = true;
 			}
-			elseif (strpos($clean, 'benchmark') !== false && preg_match('~(^|[^a-z])benchmark($|[^[a-z])~s', $clean) != 0)
+			elseif (strpos($clean, 'benchmark') !== false && preg_match('~(^|[^a-z])benchmark($|[^[a-z])~', $clean) != 0)
 			{
 				$fail = true;
 			}

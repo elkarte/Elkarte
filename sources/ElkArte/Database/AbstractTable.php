@@ -248,7 +248,7 @@ abstract class AbstractTable
 	 * In certain cases it is necessary to create the indexes of a
 	 * newly created table with new queries after the table has been created.
 	 *
-	 * @return string
+	 * @return void
 	 */
 	protected function _build_indexes()
 	{

@@ -237,10 +237,8 @@ class Unread
 		{
 			return $this->_getUnreadTopics($join, $start, $limit, $include_avatars);
 		}
-		else
-		{
-			return $this->_getUnreadReplies($start, $limit, $include_avatars);
-		}
+
+		return $this->_getUnreadReplies($start, $limit, $include_avatars);
 	}
 
 	/**

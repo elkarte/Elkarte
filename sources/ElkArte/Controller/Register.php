@@ -774,7 +774,7 @@ class Register extends AbstractController
 			// Do we have any languages?
 			$languages = getLanguages();
 
-			if (isset($this->_req->post->lngfile) && isset($languages[$this->_req->post->lngfile]))
+			if (isset($this->_req->post->lngfile, $languages[$this->_req->post->lngfile]))
 			{
 				$_SESSION['language'] = $this->_req->post->lngfile;
 				if ($_SESSION['language'] !== ucfirst($this->user->language))

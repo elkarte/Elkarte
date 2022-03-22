@@ -53,6 +53,7 @@ abstract class AbstractNotificationMessage implements NotificationInterface
 
 	/**
 	 * @param \ElkArte\Database\QueryInterface $db
+	 * @param \ElkArte\UserInfo $user
 	 */
 	public function __construct(QueryInterface $db, UserInfo $user)
 	{

@@ -77,6 +77,14 @@ class Auth extends AbstractController
 
 		// Load the Login template/language file.
 		Txt::load('Login');
+
+		// If API, clear out the header/footer and only return the form
+		if ($this->getApi())
+		{
+			$template_layers = theme()->getLayers();
+			$template_layers->removeAll();
+		}
+
 		theme()->getTemplates()->load('Login');
 		loadJavascriptFile('sha256.js', array('defer' => true));
 		$context['sub_template'] = 'login';
@@ -743,8 +751,9 @@ function checkActivation()
 
 		return false;
 	}
+
 	// Awaiting approval still?
-	elseif ($activation_status == 3)
+	if ($activation_status == 3)
 	{
 		throw new Exception('still_awaiting_approval', 'user');
 	}

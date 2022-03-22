@@ -76,12 +76,9 @@ function template_memberlist()
 			<ul class="mlist">
 				<li class="mlist_header">';
 
-	$table_span = 0;
-
 	// Display each of the column headers of the table.
 	foreach ($context['columns'] as $key => $column)
 	{
-		$table_span += $column['colspan'] ?? 1;
 		switch ($key)
 		{
 			case 'posts':

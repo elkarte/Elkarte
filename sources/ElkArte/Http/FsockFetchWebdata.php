@@ -73,7 +73,7 @@ class FsockFetchWebdata
 	public function __construct($options = array(), $max_redirect = 3, $keep_alive = false)
 	{
 		// Initialize class variables
-		$this->_max_redirect = intval($max_redirect);
+		$this->_max_redirect = (int) $max_redirect;
 		$this->_user_options = $options;
 		$this->_keep_alive = $keep_alive;
 	}
@@ -142,7 +142,7 @@ class FsockFetchWebdata
 		if (empty($location))
 		{
 			preg_match('~^HTTP/\S+\s+(\d{3})~i', $this->_server_response, $code);
-			$this->_response['code'] = isset($code[1]) ? intval($code[1]) : '???';
+			$this->_response['code'] = isset($code[1]) ? (int) $code[1] : '???';
 
 			// Make sure we ended up with a 200 OK.
 			if (in_array($this->_response['code'], array(200, 201, 206)))
@@ -174,7 +174,7 @@ class FsockFetchWebdata
 	{
 		$this->_url = array();
 		$this->_response['url'] = $url;
-		$this->_content_length = !empty($this->_user_options['max_length']) ? intval($this->_user_options['max_length']) : 0;
+		$this->_content_length = !empty($this->_user_options['max_length']) ? (int) $this->_user_options['max_length'] : 0;
 
 		// Make sure its valid before we parse it out
 		if (filter_var($url, FILTER_VALIDATE_URL))
@@ -328,7 +328,7 @@ class FsockFetchWebdata
 		if ($this->_current_redirect < $this->_max_redirect && preg_match('~^HTTP/\S+\s+(30[127])~i', $this->_server_response, $code) === 1)
 		{
 			// Maintain our status responses
-			$this->_response['code'] = intval($code[1]);
+			$this->_response['code'] = (int) $code[1];
 			$this->_response['redirects'] = ++$this->_current_redirect;
 			$this->_response['headers'] = $this->_headers;
 

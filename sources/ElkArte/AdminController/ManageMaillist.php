@@ -384,7 +384,7 @@ class ManageMaillist extends AbstractController
 		$context['notice_subject'] = $temp_email[0]['subject'] ?? '';
 		$context['notice_from'] = $temp_email[0]['from'] ?? '';
 		$context['page_title'] = $txt['show_notice'];
-		$context['error_code'] = isset($temp_email[0]['error_code']) && isset($txt[$temp_email[0]['error_code']]) ? $txt[$temp_email[0]['error_code']] : '';
+		$context['error_code'] = isset($temp_email[0]['error_code'], $txt[$temp_email[0]['error_code']]) ? $txt[$temp_email[0]['error_code']] : '';
 		$context['sub_template'] = 'show_email';
 	}
 

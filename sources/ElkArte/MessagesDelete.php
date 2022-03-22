@@ -1037,11 +1037,11 @@ class MessagesDelete
 			)
 		);
 		$changeMe = array();
-		while ($row = $db->fetch_assoc($request))
+		while ($row = $request->fetch_assoc())
 		{
 			$changeMe[] = $row['id_member'];
 		}
-		$db->free_result($request);
+		$request->free_result();
 
 		// Remove the mentions!
 		$db->query('', '

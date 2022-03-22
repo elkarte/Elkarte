@@ -134,7 +134,7 @@ function template_postarea_above()
 								<label for="icon">', $txt['message_icon'], '</label>:
 							</dt>
 							<dd>
-								<select name="icon" id="icon" onchange="showimage()">';
+								<select name="icon" id="icon" tabindex="', $context['tabindex']++, '" onchange="showimage()">';
 
 	// Loop through each message icon allowed, adding it to the drop down list.
 	foreach ($context['icons'] as $icon)
@@ -322,7 +322,7 @@ function template_post_page()
 	if (empty($context['make_poll']) && $context['can_add_poll'])
 	{
 		echo '
-							<input type="submit" name="poll" aria-label="', $txt['add_poll'], '" value="', $txt['add_poll'], '" onclick="return loadAddNewPoll(this, ', empty($context['current_board']) ? '0' : $context['current_board'], ', \'postmodify\');" />';
+							<input type="submit" name="poll" tabindex="', $context['tabindex']++, '" value="', $txt['add_poll'], '" onclick="return loadAddNewPoll(this, ', empty($context['current_board']) ? '0' : $context['current_board'], ', \'postmodify\');" />';
 	}
 
 	echo '
@@ -351,7 +351,7 @@ function template_additional_options_below()
 	{
 		echo '
 					<h3 id="postAdditionalOptionsHeader" class="category_header panel_toggle">
-							<i id="postMoreExpand" class="chevricon i-chevron-', empty($context['minmax_preferences']['post']) ? 'up' : 'down', ' hide" title="', $txt['hide'], '"></i>
+						<i id="postMoreExpand" class="chevricon i-chevron-', empty($context['minmax_preferences']['post']) ? 'up' : 'down', ' hide" title="', $txt['hide'], '"></i>
 						<a href="#" id="postMoreExpandLink">', !empty($context['attachments']) && $context['attachments']['can']['post'] ? $txt['post_additionalopt_attach'] : $txt['post_additionalopt'], '</a>
 					</h3>';
 	}
@@ -444,7 +444,7 @@ function template_add_new_attachments()
 								<i class="icon i-upload"></i>
 								<span class="desktop">', $txt['attach_drop_files'], '</span>
 								<span class="mobile">', $txt['attach_drop_files_mobile'], '</span>
-								<input id="attachment_click" class="drop_area_fileselect input_file" type="file" multiple="multiple" name="attachment_click[]" />
+								<input id="attachment_click" class="drop_area_fileselect input_file" type="file" multiple="multiple" name="attachment_click[]" tabindex="', $context['tabindex']++, '" />
 							</dt>
 							<dd class="progress_tracker"></dd>
 							<dd class="drop_attachments_error"></dd>

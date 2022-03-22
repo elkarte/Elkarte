@@ -673,8 +673,7 @@ class ProfileAccount extends AbstractController
 
 		isAllowedTo('moderate_forum');
 
-		if (isset($this->_req->query->save)
-			&& isset($this->_profile['is_activated'])
+		if (isset($this->_req->query->save, $this->_profile['is_activated'])
 			&& $this->_profile['is_activated'] != 1)
 		{
 			require_once(SUBSDIR . '/Members.subs.php');

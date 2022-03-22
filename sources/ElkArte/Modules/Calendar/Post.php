@@ -51,7 +51,7 @@ class Post extends AbstractModule
 
 		if (empty($modSettings['cal_limityear']))
 		{
-			$modSettings['cal_limityear'] = 10;
+			$modSettings['cal_limityear'] = 20;
 		}
 		$context['make_event'] = self::$_make_event;
 		$context['cal_minyear'] = $modSettings['cal_minyear'];
@@ -66,10 +66,8 @@ class Post extends AbstractModule
 				array('after_save_post', array('\\ElkArte\\Modules\\Calendar\\Post', 'after_save_post'), array()),
 			);
 		}
-		else
-		{
-			return array();
-		}
+
+		return array();
 	}
 
 	/**

@@ -1208,7 +1208,7 @@ class PersonalMessage extends AbstractController
 				// Clean any literal names entered
 				foreach ($namedRecipientList[$recipientType] as $index => $recipient)
 				{
-					if (strlen(trim($recipient)) > 0)
+					if (trim($recipient) !== '')
 					{
 						$namedRecipientList[$recipientType][$index] = Util::htmlspecialchars(Util::strtolower(trim($recipient)));
 					}
@@ -1491,7 +1491,7 @@ class PersonalMessage extends AbstractController
 			// Copy the action from the single to PM to the others in the conversation.
 			foreach ($pms as $id_pm => $id_head)
 			{
-				if (isset($pm_heads[$id_head]) && isset($pm_actions[$pm_heads[$id_head]]))
+				if (isset($pm_heads[$id_head], $pm_actions[$pm_heads[$id_head]]))
 				{
 					$pm_actions[$id_pm] = $pm_actions[$pm_heads[$id_head]];
 				}

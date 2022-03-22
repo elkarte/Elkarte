@@ -50,8 +50,8 @@ class PackagesFilterIterator extends \FilterIterator
 
 		// And finally, accept anything that has a "package-like" extension.
 		return
-			substr(strtolower($filename), -7) === '.tar.gz'
-			|| substr(strtolower($filename), -4) === '.tgz'
-			|| substr(strtolower($filename), -4) === '.zip';
+			strtolower(substr($filename, -7)) === '.tar.gz'
+			|| strtolower(substr($filename, -4)) === '.tgz'
+			|| strtolower(substr($filename, -4)) === '.zip';
 	}
 }

@@ -252,7 +252,7 @@ class SiteDispatcher
 			// action=gallery => Gallery.controller.php
 			// sa=upload => action_upload()
 			$this->_controller_name = '\\ElkArte\\Controller\\' . ucfirst($this->action);
-			if (isset($this->subAction) && preg_match('~^\w+$~', $this->subAction) && empty($this->area))
+			if (isset($this->subAction) && empty($this->area) && preg_match('~^\w+$~', $this->subAction))
 			{
 				$this->_function_name = 'action_' . $this->subAction;
 			}

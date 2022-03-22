@@ -245,7 +245,7 @@ class BBCParser
 
 			$this->inside_tag = !$this->hasOpenTags() ? null : $this->getLastOpenedTag();
 
-			if ($this->isItemCode($next_char) && isset($this->message[$this->pos + 2]) && $this->message[$this->pos + 2] === ']' && !$this->bbc->isDisabled('list') && !$this->bbc->isDisabled('li'))
+			if (isset($this->message[$this->pos + 2]) && $this->isItemCode($next_char) && $this->message[$this->pos + 2] === ']' && !$this->bbc->isDisabled('list') && !$this->bbc->isDisabled('li'))
 			{
 				// Itemcodes cannot be 0 and must be proceeded by a semi-colon, space, tab, new line, or greater than sign
 				if (!($this->message[$this->pos + 1] === '0' && !in_array($this->message[$this->pos - 1], array(';', ' ', "\t", "\n", '>'))))
@@ -257,10 +257,8 @@ class BBCParser
 				// No matter what, we have to continue here.
 				continue;
 			}
-			else
-			{
-				$tag = $this->findTag($this->bbc_codes[$next_char]);
-			}
+
+			$tag = $this->findTag($this->bbc_codes[$next_char]);
 
 			// Implicitly close lists and tables if something other than what's required is in them. This is needed for itemcode.
 			if ($tag === null && $this->inside_tag !== null && !empty($this->inside_tag[Codes::ATTR_REQUIRE_CHILDREN]))
@@ -355,7 +353,7 @@ class BBCParser
 				}
 
 				// The idea is, if we are LOOKING for a block level tag, we can close them on the way.
-				if (isset($look_for[1]) && isset($this->bbc_codes[$look_for[0]]))
+				if (isset($look_for[1], $this->bbc_codes[$look_for[0]]))
 				{
 					foreach ($this->bbc_codes[$look_for[0]] as $temp)
 					{
@@ -379,13 +377,14 @@ class BBCParser
 		} while (isset($tag[Codes::ATTR_TAG]) && $tag[Codes::ATTR_TAG] !== $look_for);
 
 		// Did we just eat through everything and not find it?
-		if (!$this->hasOpenTags() && (empty($tag) || $tag[Codes::ATTR_TAG] !== $look_for))
+		if ((empty($tag) || $tag[Codes::ATTR_TAG] !== $look_for) && !$this->hasOpenTags())
 		{
 			$this->open_tags = $to_close;
 
 			return;
 		}
-		elseif (!empty($to_close) && isset($tag[Codes::ATTR_TAG]) && $tag[Codes::ATTR_TAG] !== $look_for)
+
+		if (!empty($to_close) && isset($tag[Codes::ATTR_TAG]) && $tag[Codes::ATTR_TAG] !== $look_for)
 		{
 			if ($block_level === null && isset($look_for[0], $this->bbc_codes[$look_for[0]]))
 			{
@@ -685,8 +684,9 @@ class BBCParser
 				{
 					return null;
 				}
+
 				// Maybe we just want a /...
-				elseif ($possible[Codes::ATTR_TYPE] === Codes::TYPE_CLOSED && substr_compare($this->message, '/]', $this->pos + 1 + $possible[Codes::ATTR_LENGTH], 2) !== 0 && substr_compare($this->message, ' /]', $this->pos + 1 + $possible[Codes::ATTR_LENGTH], 3) !== 0)
+				if ($possible[Codes::ATTR_TYPE] === Codes::TYPE_CLOSED && substr_compare($this->message, '/]', $this->pos + 1 + $possible[Codes::ATTR_LENGTH], 2) !== 0 && substr_compare($this->message, ' /]', $this->pos + 1 + $possible[Codes::ATTR_LENGTH], 3) !== 0)
 				{
 					return null;
 				}
@@ -713,7 +713,7 @@ class BBCParser
 			}
 
 			// Not allowed in this parent, replace the tags or show it like regular text
-			if (isset($possible[Codes::ATTR_DISALLOW_PARENTS]) && isset($possible[Codes::ATTR_DISALLOW_PARENTS][$this->inside_tag[Codes::ATTR_TAG]]))
+			if (isset($possible[Codes::ATTR_DISALLOW_PARENTS], $possible[Codes::ATTR_DISALLOW_PARENTS][$this->inside_tag[Codes::ATTR_TAG]]))
 			{
 				if (!isset($possible[Codes::ATTR_DISALLOW_BEFORE], $possible[Codes::ATTR_DISALLOW_AFTER]))
 				{
@@ -1539,7 +1539,8 @@ class BBCParser
 		{
 			return array_pop($this->open_tags);
 		}
-		elseif (isset($this->open_tags[$tag]))
+
+		if (isset($this->open_tags[$tag]))
 		{
 			$return = $this->open_tags[$tag];
 			unset($this->open_tags[$tag]);

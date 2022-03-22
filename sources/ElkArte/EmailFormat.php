@@ -479,13 +479,15 @@ class EmailFormat
 		{
 			return true;
 		}
+
 		// The line is simply just their name
-		elseif (($this->_body_array[$i]['content'] === $this->_real_name) && !$this->_found_sig)
+		if (($this->_body_array[$i]['content'] === $this->_real_name) && !$this->_found_sig)
 		{
 			return true;
 		}
+
 		// check for universal sig dashes
-		elseif (!$this->_found_sig && preg_match('~^-- \n~m', $this->_body_array[$i]['content']))
+		if (!$this->_found_sig && preg_match('~^-- \n~m', $this->_body_array[$i]['content']))
 		{
 			return true;
 		}
@@ -506,7 +508,7 @@ class EmailFormat
 		$this->_body = preg_replace("~\n" . $tag . '~', "\n", $this->_body);
 
 		// Clean up double breaks found between bbc formatting tags, msoffice loves to do this
-		$this->_body = preg_replace('~\]\s*\[br\]\s*\[br\]\s*\[~s', '][br][', $this->_body);
+		$this->_body = preg_replace('~\]\s*\[br\]\s*\[br\]\s*\[~', '][br][', $this->_body);
 
 		// Repair the &nbsp; in its various states and any other chaff
 		$this->_body = strtr($this->_body, array(' &nbsp;' => ' ', '&nbsp; ' => ' ', "\xc2\xa0" => ' ', "\xe2\x80\xa8" => "\n"));

@@ -322,7 +322,7 @@ class Db extends Adapter
 				continue;
 			}
 			// Permissions?
-			elseif ($var[0] === 'permissions')
+			if ($var[0] === 'permissions')
 			{
 				$inlinePermissions[] = $var;
 			}

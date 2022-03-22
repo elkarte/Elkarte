@@ -59,7 +59,7 @@ class Gd2 extends AbstractManipulator
 	/**
 	 * Loads a image file into the image engine for processing
 	 *
-	 * @return bool|mixed
+	 * @return bool
 	 */
 	public function createImageFromFile()
 	{
@@ -105,7 +105,7 @@ class Gd2 extends AbstractManipulator
 	/**
 	 * Loads an image from a web address into the image engine for processing
 	 *
-	 * @return bool|mixed
+	 * @return bool
 	 */
 	public function createImageFromWeb()
 	{

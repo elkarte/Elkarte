@@ -438,6 +438,10 @@ hr {
 	background: var(--primary_white);
 }
 
+input[type=checkbox].quote-show-more {
+	background: linear-gradient(to bottom, var(--transparent) 0%, var(--transparent) 40%, var(--primary_white) 100%);
+}
+
 /* Extra quote styling */
 .bbc_quote, .quoteheader {
 	box-shadow: 2px 2px 2px var(--box_shadow);
@@ -1095,11 +1099,11 @@ nav.breadcrumb {
 	border-color: var(--transparent);
 }
 
-.topic_listing > li {
+.topic_listing > li, .search_results_posts > li {
 	border-color: var(--transparent);
 }
 
-.topic_listing li {
+.topic_listing li, .search_results_posts li {
 	border-top-color: var(--primary_border_top);
 	border-bottom-color: var(--primary_border_bottom);
 }
@@ -1186,10 +1190,6 @@ nav.breadcrumb {
 	box-shadow: none;
 }
 
-.approvebg {
-	background-color: var(--notice);
-}
-
 .forumposts, .profile_content {
 	background: var(--grey_background);
 }
@@ -1202,6 +1202,10 @@ nav.breadcrumb {
 .forumposts:nth-of-type(odd) {
 	margin-top: 2px;
 	background: var(--grey_background);
+}
+
+.approvebg, .forumposts.approvebg {
+	background-color: var(--notice);
 }
 
 .new_post_separator::after {
@@ -1991,7 +1995,7 @@ nav.breadcrumb {
 		border-radius: 0;
 	}
 
-	.topic_listing > li {
+	.topic_listing > li, .search_results_posts > li {
 		border-color: var(--primary_border);
 		border-radius: 3px;
 		box-shadow: 2px 2px 4px var(--box_shadow);
@@ -2001,7 +2005,7 @@ nav.breadcrumb {
 		border-bottom: 1px solid var(--primary_border_bottom);
 	}
 
-	.topic_listing h4 {
+	.topic_listing h4, .search_results_posts h4 {
 		overflow: hidden;
 		max-width: 20em;
 		margin-bottom: 3px;

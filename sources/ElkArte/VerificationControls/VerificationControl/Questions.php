@@ -438,7 +438,7 @@ class Questions implements ControlInterface
 		{
 			$question = trim(Util::htmlspecialchars($question, ENT_COMPAT));
 			$answers = array();
-			$question_lang = isset($save_language[$id]) && isset($languages[$save_language[$id]]) ? $save_language[$id] : $language;
+			$question_lang = isset($save_language[$id], $languages[$save_language[$id]]) ? $save_language[$id] : $language;
 			if (!empty($save_answer[$id]))
 			{
 				foreach ($save_answer[$id] as $answer)

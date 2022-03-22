@@ -228,7 +228,7 @@ class Packages extends AbstractController
 		{
 			foreach ($package_installed['db_changes'] as $change)
 			{
-				if (isset($change[2]) && isset($txt['package_db_' . $change[0]]))
+				if (isset($change[2], $txt['package_db_' . $change[0]]))
 				{
 					$context['database_changes'][] = sprintf($txt['package_db_' . $change[0]], $change[1], $change[2]);
 				}
@@ -1473,7 +1473,7 @@ class Packages extends AbstractController
 					}
 					$dirs[] = $package;
 				}
-				elseif (substr(strtolower($package->getFilename()), -7) === '.tar.gz')
+				elseif (strtolower(substr($package->getFilename(), -7)) === '.tar.gz')
 				{
 					if (in_array(substr($package, 0, -7), $dirs))
 					{

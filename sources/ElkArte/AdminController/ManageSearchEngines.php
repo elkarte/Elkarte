@@ -571,7 +571,7 @@ class ManageSearchEngines extends AbstractController
 		$max_date = key($date_choices);
 
 		// What are we currently viewing?
-		$current_date = isset($this->_req->post->new_date) && isset($date_choices[$this->_req->post->new_date]) ? $this->_req->post->new_date : $max_date;
+		$current_date = isset($this->_req->post->new_date, $date_choices[$this->_req->post->new_date]) ? $this->_req->post->new_date : $max_date;
 
 		// Prepare the HTML.
 		$date_select = '

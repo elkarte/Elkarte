@@ -57,6 +57,9 @@ class Display extends AbstractController
 	/** @var int message number to start the listing from */
 	protected $start_from;
 
+	/** @var array attachment array Allows access via events, is only locally used */
+	protected $attachments;
+
 	/**
 	 * Default action handler for this controller, if its called directly
 	 */
@@ -179,7 +182,7 @@ class Display extends AbstractController
 		// If there _are_ messages here... (probably an error otherwise :!)
 		if (!empty($messages))
 		{
-			$attachments = [];
+			$this->attachments = [];
 			require_once(SUBSDIR . '/Attachments.subs.php');
 
 			// Fetch attachments.
@@ -188,10 +191,13 @@ class Display extends AbstractController
 				// The filter returns false when:
 				//  - the attachment is unapproved, and
 				//  - the viewer is not the poster of the message where the attachment is
-				$attachments = getAttachments($messages, $this->includeUnapproved, static function ($attachment_info, $all_posters) {
+				$this->attachments = getAttachments($messages, $this->includeUnapproved, static function ($attachment_info, $all_posters) {
 					return !(!$attachment_info['approved'] && (!isset($all_posters[$attachment_info['id_msg']]) || $all_posters[$attachment_info['id_msg']] != User::$info->id));
 				}, $all_posters);
 			}
+
+			// Make globally available
+			$attachments = $this->attachments;
 
 			$msg_parameters = array(
 				'message_list' => $messages,
@@ -728,13 +734,8 @@ class Display extends AbstractController
 			}
 		}
 
-		if (!empty($this->_start)
-			&& (!is_numeric($this->_start) || $this->_start % $this->messages_per_page !== 0))
-		{
-			return true;
-		}
-
-		return false;
+		return !empty($this->_start)
+			&& (!is_numeric($this->_start) || $this->_start % $this->messages_per_page !== 0);
 	}
 
 	/**

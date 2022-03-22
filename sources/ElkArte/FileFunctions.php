@@ -290,7 +290,7 @@ class FileFunctions
 		for ($i++; $i < $count; $i++)
 		{
 			$partialTree .= '/' . $tree[$i];
-			if (!mkdir($partialTree))
+			if (!mkdir($partialTree) && !$this->isDir($partialTree))
 			{
 				return false;
 			}
@@ -361,7 +361,7 @@ class FileFunctions
 			// If its not writable try to make it so or removal will fail
 			if ($file->isWritable() || $this->chmod($file->getRealPath()))
 			{
-				if ($file->isDir() && $delete_dir)
+				if ($delete_dir && $file->isDir())
 				{
 					$success = $success && rmdir($file->getRealPath());
 				}
@@ -388,7 +388,7 @@ class FileFunctions
 	 *
 	 * @param string[] $tree
 	 * @param int $count
-	 * @return false|mixed|string|null
+	 * @return false|string|null
 	 */
 	private function _initDir(&$tree, &$count)
 	{

@@ -104,7 +104,7 @@ class ManageScheduledTasks extends AbstractController
 		$context['page_title'] = $txt['maintain_tasks'];
 
 		// Saving changes?
-		if (isset($this->_req->post->save) && isset($this->_req->post->enable_task))
+		if (isset($this->_req->post->save, $this->_req->post->enable_task))
 		{
 			checkSession();
 

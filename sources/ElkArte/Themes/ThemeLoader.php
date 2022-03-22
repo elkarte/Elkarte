@@ -383,7 +383,7 @@ class ThemeLoader
 		if (!allowedTo('admin_forum'))
 		{
 			$themes = explode(',', $modSettings['knownThemes']);
-			if (!in_array($this->id, $themes) || (!empty($ssi_theme) && $this->id != $ssi_theme))
+			if ((!empty($ssi_theme) && $this->id != $ssi_theme) || !in_array($this->id, $themes))
 			{
 				$this->id = $modSettings['theme_guests'];
 			}
@@ -467,8 +467,8 @@ class ThemeLoader
 					}
 
 					// If this is the theme_dir of the default theme, store it.
-					if (in_array($row['variable'], ['theme_dir', 'theme_url', 'images_url'])
-						&& $row['id_theme'] == 1 && empty($row['id_member']))
+					if ($row['id_theme'] == 1 && empty($row['id_member'])
+						&& in_array($row['variable'], ['theme_dir', 'theme_url', 'images_url']))
 					{
 						$themeData[0]['default_' . $row['variable']] = $row['value'];
 					}

@@ -43,10 +43,8 @@ class Display extends AbstractModule
 				array('topicinfo', array('\\ElkArte\\Modules\\Calendar\\Display', 'topicinfo'), array('topicinfo', 'topic')),
 			);
 		}
-		else
-		{
-			return array();
-		}
+
+		return array();
 	}
 
 	/**

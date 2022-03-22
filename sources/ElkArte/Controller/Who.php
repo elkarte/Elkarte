@@ -107,7 +107,7 @@ class Who extends AbstractController
 		}
 
 		// Does the user prefer a different sort direction?
-		if (isset($this->_req->query->sort) && isset($sort_methods[$this->_req->query->sort]))
+		if (isset($this->_req->query->sort, $sort_methods[$this->_req->query->sort]))
 		{
 			$context['sort_by'] = $_SESSION['who_online_sort_by'] = $this->_req->query->sort;
 			$sort_method = $sort_methods[$this->_req->query->sort];
@@ -140,7 +140,7 @@ class Who extends AbstractController
 		}
 
 		// Does the user wish to apply a filter?
-		if (isset($this->_req->post->show) && isset($show_methods[$this->_req->post->show]))
+		if (isset($this->_req->post->show, $show_methods[$this->_req->post->show]))
 		{
 			$context['show_by'] = $_SESSION['who_online_filter'] = $this->_req->post->show;
 			$conditions[] = $show_methods[$this->_req->post->show];

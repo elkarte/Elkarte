@@ -156,7 +156,7 @@ class Headers
 	 */
 	public function httpCode($httpCode)
 	{
-		$this->httpCode = intval($httpCode);
+		$this->httpCode = (int) $httpCode;
 
 		return $this;
 	}

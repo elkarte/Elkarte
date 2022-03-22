@@ -117,7 +117,7 @@ class ProfileSubscriptions extends AbstractController
 			$this->_orderDone($memID);
 		}
 		// They have selected a subscription to order.
-		elseif (isset($this->_req->query->confirm) && isset($this->_req->post->sub_id) && is_array($this->_req->post->sub_id))
+		elseif (isset($this->_req->query->confirm, $this->_req->post->sub_id) && is_array($this->_req->post->sub_id))
 		{
 			$this->_confirmOrder($memID);
 		}

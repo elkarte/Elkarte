@@ -100,8 +100,9 @@ class Templates
 
 			return null;
 		}
-		// If instead we know the default theme directory and we have delayed something, it's time to process
-		elseif (!empty($this->delayed))
+
+		// If instead we know the default theme directory, and we have delayed something, it's time to process
+		if (!empty($this->delayed))
 		{
 			foreach ($this->delayed as $val)
 			{

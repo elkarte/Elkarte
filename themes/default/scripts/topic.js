@@ -301,14 +301,7 @@ QuickReply.prototype.quote = function (iMessageId, xDeprecated)
 	}
 
 	// Move the view to the quick reply box.
-	if (navigator.appName === 'Microsoft Internet Explorer')
-	{
-		window.location.hash = this.opt.sJumpAnchor;
-	}
-	else
-	{
-		window.location.hash = '#' + this.opt.sJumpAnchor;
-	}
+	window.location.hash = '#' + this.opt.sJumpAnchor;
 
 	return false;
 };
@@ -1270,7 +1263,7 @@ function sendtopicOverlayDiv(desktopURL, sHeader, sIcon)
 				url = $base_obj.find('form').attr('action');
 
 			// Create the div that we are going to load
-			var oContainer = new smc_Popup({
+			var oContainer = new elk_Popup({
 				heading: (title !== '' ? title : sHeader),
 				content: sAjax_indicator,
 				icon: sIcon

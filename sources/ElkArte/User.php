@@ -132,7 +132,7 @@ class User
 				setLoginCookie(60 * $modSettings['cookieTime'], $array_from[0], $array_from[1]);
 			});
 
-			self::$id = !empty($id) && strlen(self::$session_password) > 0 ? (int) $id : 0;
+			self::$id = !empty($id) && self::$session_password !== '' ? (int) $id : 0;
 		}
 		elseif (empty(self::$id) && isset($_SESSION['login_' . $cookiename]) && (!empty($modSettings['disableCheckUA']) || (!empty($_SESSION['USER_AGENT']) && $_SESSION['USER_AGENT'] == $user_agent)))
 		{

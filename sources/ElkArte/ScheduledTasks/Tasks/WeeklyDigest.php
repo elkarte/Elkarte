@@ -31,8 +31,6 @@ class WeeklyDigest implements ScheduledTaskInterface
 	 */
 	public function run()
 	{
-		$digest = new DailyDigest();
-
-		return $digest->runDigest(true);
+		return (new DailyDigest())->runDigest(true);
 	}
 }

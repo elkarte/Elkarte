@@ -479,7 +479,8 @@ class PackageChmod extends AbstractModel
 
 				return true;
 			}
-			elseif (isset($_SESSION['ftp_connection']['original_perms'][$chmod_file]))
+
+			if (isset($_SESSION['ftp_connection']['original_perms'][$chmod_file]))
 			{
 				unset($_SESSION['ftp_connection']['original_perms'][$chmod_file]);
 			}

@@ -358,10 +358,16 @@ class ConstructPageIndex extends AbstractModel
 	{
 		global $settings;
 
-		$first = ($this->start + $this->num_per_page * ($PageContiguous + 1));
-		$last = $this->getMaxPages();
-		$firstpage = $position === 'after' ? $first : $last;
-		$lastpage = $position === 'after' ? $last : $first;
+		if ($position === 'before')
+		{
+			$firstpage = $this->num_per_page;
+			$lastpage = $this->start - $this->num_per_page * $PageContiguous;
+		}
+		else
+		{
+			$firstpage = $this->start + $this->num_per_page * ($PageContiguous + 1);
+			$lastpage = $this->getMaxPages();
+		}
 
 		return str_replace(
 			'{custom}',

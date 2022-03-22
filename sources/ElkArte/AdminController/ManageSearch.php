@@ -500,7 +500,6 @@ class ManageSearch extends AbstractController
 			$context['index_settings'] = array();
 			$context['start'] = $this->_req->getPost('start', 'intval', 0);
 			$context['step'] = $this->_req->getPost('step', 'intval', 0);
-			$context['step'] = 1;
 		}
 
 		checkSession('request');

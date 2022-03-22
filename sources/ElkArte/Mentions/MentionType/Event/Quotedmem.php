@@ -182,9 +182,7 @@ class Quotedmem extends AbstractEventBoardAccess
 
 			return array_unique($quoted);
 		}
-		else
-		{
-			return false;
-		}
+
+		return false;
 	}
 }

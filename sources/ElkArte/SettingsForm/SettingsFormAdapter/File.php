@@ -460,7 +460,7 @@ class File extends Db
 			$written_bytes = file_put_contents(BOARDDIR . '/Settings.php', $write_settings, LOCK_EX);
 
 			// Survey says ...
-			if ($written_bytes !== strlen($write_settings) && !$settings_backup_fail)
+			if (!$settings_backup_fail && $written_bytes !== strlen($write_settings))
 			{
 				// Well this is not good at all, lets see if we can save this
 				$context['settings_message'] = 'settings_error';

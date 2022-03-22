@@ -132,7 +132,7 @@ class Agreement
 	 *
 	 * @param bool $fallback if fallback to the English version (default true).
 	 *
-	 * @return bool|string
+	 * @return string
 	 */
 	public function getPlainText($fallback = true, $language = null)
 	{
@@ -165,9 +165,7 @@ class Agreement
 	 */
 	public function getParsedText($fallback = true)
 	{
-		$bbc_parser = ParserWrapper::instance();
-
-		return $bbc_parser->parseAgreement($this->getPlainText($fallback));
+		return ParserWrapper::instance()->parseAgreement($this->getPlainText($fallback));
 	}
 
 	/**

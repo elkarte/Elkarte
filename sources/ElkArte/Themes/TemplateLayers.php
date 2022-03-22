@@ -110,13 +110,11 @@ class TemplateLayers extends Priority
 		{
 			return (!empty($this->_all_general) || !empty($this->_all_begin) || !empty($this->_all_end));
 		}
-		else
-		{
-			return array_diff_key(array_merge($this->_all_general, $this->_all_begin, $this->_all_end), [
-				'body' => 0,
-				'html' => 0,
-			]);
-		}
+
+		return array_diff_key(array_merge($this->_all_general, $this->_all_begin, $this->_all_end), [
+			'body' => 0,
+			'html' => 0,
+		]);
 	}
 
 	/**

@@ -978,11 +978,14 @@ function setBoardIds()
 				firstPage = $element.data('firstpage'),
 				lastPage = $element.data('lastpage'),
 				rawBaseurl = $element.data('baseurl'),
-				baseurl = elk_scripturl + $element.data('baseurl').substring(1, $element.data('baseurl').length -1),
+				baseurl = $element.data('baseurl').substring(1, $element.data('baseurl').length -1),
 				first,
-				i = 0,
+				i,
 				oldLastPage = 0,
 				perPageLimit = 10;
+
+			// Undo javascript escape
+			baseurl = baseurl.replace('\' + elk_scripturl + \'', elk_scripturl);
 
 			// Prevent too many pages to be loaded at once.
 			if ((lastPage - firstPage) / perPage > perPageLimit)
@@ -1664,16 +1667,16 @@ function disableAutoComplete()
 		'use strict';
 
 		opt = (opt) ? opt : {};
-		var _notifiers = [],
+		let _notifiers = [],
 			start = true,
 			lastTime = 0;
 
-		var init = function (opt)
+		let init = function (opt)
 		{
 			if (typeof opt.delay === 'undefined')
 			{
 				start = false;
-				opt.delay = 15000;
+				opt.delay = 30000;
 			}
 
 			setTimeout(function ()
@@ -1682,12 +1685,12 @@ function disableAutoComplete()
 			}, opt.delay);
 		};
 
-		var add = function (notif)
+		let add = function (notif)
 		{
 			_notifiers.push(notif);
 		};
 
-		var send = function (request)
+		let send = function (request)
 		{
 			for (var i = 0; i < _notifiers.length; i++)
 			{
@@ -1695,7 +1698,7 @@ function disableAutoComplete()
 			}
 		};
 
-		var fetch = function ()
+		let fetch = function ()
 		{
 			if (_notifiers.length === 0)
 			{

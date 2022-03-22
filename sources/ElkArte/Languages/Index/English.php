@@ -283,6 +283,7 @@ $txt['notify_deactivate'] = 'Would you like to deactivate notification on this t
 $txt['date_registered'] = 'Date Registered';
 $txt['date_joined'] = 'Joined';
 $txt['date_joined_format'] = '%b %d, %Y';
+$txt['last_seen'] = 'Last Seen';
 
 $txt['recent_view'] = 'View all recent posts.';
 $txt['is_recent_updated'] = '%1$s is the most recently updated topic';

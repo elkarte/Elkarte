@@ -444,7 +444,7 @@ class Debug
 				echo sprintf($txt['debug_query_in_line'], $qq['f'], $qq['l']);
 			}
 
-			if (isset($qq['s'], $qq['t']) && isset($txt['debug_query_which_took_at']))
+			if (isset($qq['s'], $qq['t'], $txt['debug_query_which_took_at']))
 			{
 				echo sprintf($txt['debug_query_which_took_at'], round($qq['t'], 8), round($qq['s'], 8)) . '<br />';
 			}
