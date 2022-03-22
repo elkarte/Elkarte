@@ -120,11 +120,11 @@ function template_kick_guest()
 	echo '
 	<form action="', $scripturl, '?action=login2" method="post" accept-charset="UTF-8" name="frmLogin" id="frmLogin"', empty($context['disable_login_hashing']) ? ' onsubmit="hashLoginPassword(this, \'' . $context['session_id'] . '\');"' : '', '>
 		<div class="login">
-			<h2 class="category_header">', $txt['warning'], '</h2>';
+			<h2 class="category_header">', $txt['notice'], '</h2>';
 
 	// Show the message or default message.
 	echo '
-			<p class="warningbox">
+			<p class="infobox">
 				', empty($context['kick_message']) ? $txt['only_members_can_access'] : $context['kick_message'], '<br />';
 
 	if ($context['can_register'])
