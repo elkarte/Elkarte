@@ -436,7 +436,7 @@ class PackageParser extends AbstractModel
 	{
 		// Quick check of any supplied url
 		$url = $action->exists('@url') ? $action->fetch('@url') : '';
-		if (strlen(trim($url)) > 0)
+		if (trim($url) !== '')
 		{
 			$url = addProtocol($url, array('http://', 'https://'));
 			if (strlen($url) < 8)

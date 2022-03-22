@@ -1208,7 +1208,7 @@ class PersonalMessage extends AbstractController
 				// Clean any literal names entered
 				foreach ($namedRecipientList[$recipientType] as $index => $recipient)
 				{
-					if (strlen(trim($recipient)) > 0)
+					if (trim($recipient) !== '')
 					{
 						$namedRecipientList[$recipientType][$index] = Util::htmlspecialchars(Util::strtolower(trim($recipient)));
 					}

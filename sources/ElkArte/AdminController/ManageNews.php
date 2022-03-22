@@ -508,7 +508,7 @@ class ManageNews extends AbstractController
 				// Clean the valid ones, drop the mangled ones
 				foreach ($temp as $index => $member)
 				{
-					if (strlen(trim($member)) > 0)
+					if (trim($member) !== '')
 					{
 						$temp[$index] = Util::htmlspecialchars(Util::strtolower(trim($member)));
 					}
