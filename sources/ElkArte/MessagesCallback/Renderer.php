@@ -330,6 +330,5 @@ abstract class Renderer
 			'can_see_ip' => allowedTo('moderate_forum') || ($this->_this_message[$this->_idx_mapper->id_member] == $this->user->id && !empty($this->user->id)),
 			'classes' => array()
 		);
-
 	}
 }

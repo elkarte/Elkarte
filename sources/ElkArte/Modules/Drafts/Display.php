@@ -57,14 +57,12 @@ class Display extends AbstractModule
 				self::$_autosave_frequency = (int) $modSettings['drafts_autosave_frequency'] * 1000;
 			}
 
-			return array(
+			return [
 				array('prepare_context', array('\\ElkArte\\Modules\\Drafts\\Display', 'prepare_context'), array('use_quick_reply', 'editorOptions', 'board')),
-			);
+			];
 		}
-		else
-		{
-			return array();
-		}
+
+		return [];
 	}
 
 	/**

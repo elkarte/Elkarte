@@ -1,8 +1,7 @@
 <?php
 
 /**
- * Interface for modules.
- * Actually is just a way to write the hooks method documentation only once.
+ * Abstract for modules.
  *
  * @package   ElkArte Forum
  * @copyright ElkArte Forum contributors
@@ -18,7 +17,7 @@ use ElkArte\HttpReq;
 use ElkArte\UserInfo;
 
 /**
- * Interface ModuleInterface
+ * Abstract AbstractModule Provides some standard values to modules
  *
  * @package ElkArte\sources\modules
  */
@@ -52,6 +51,6 @@ abstract class AbstractModule implements ModuleInterface
 		// API Call?
 		$api = $this->_req->getRequest('api', 'trim', '');
 
-		return in_array($api, ['xml', 'json']) ? $api : false;
+		return in_array($api, ['xml', 'json', 'html']) && !empty($_SERVER['HTTP_X_REQUESTED_WITH']) ? $api : false;
 	}
 }
