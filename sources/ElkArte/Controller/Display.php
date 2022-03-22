@@ -176,9 +176,6 @@ class Display extends AbstractController
 		// Default this topic to not marked for notifications... of course...
 		$context['is_marked_notify'] = false;
 
-		// Mark the board as read or not ... calls updateReadNotificationsFor() sets $context['is_marked_notify']
-		$this->markRead($messages, $board);
-
 		$messages_request = false;
 		$context['first_message'] = 0;
 		$context['first_new_message'] = false;
@@ -187,6 +184,9 @@ class Display extends AbstractController
 		if (!empty($messages))
 		{
 			$this->attachments = [];
+
+			// Mark the board as read or not ... calls updateReadNotificationsFor() sets $context['is_marked_notify']
+			$this->markRead($messages, $board);
 			require_once(SUBSDIR . '/Attachments.subs.php');
 
 			// Fetch attachments.
