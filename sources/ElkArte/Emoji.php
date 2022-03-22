@@ -73,7 +73,7 @@ class Emoji extends AbstractModel
 			if ($i % 4 == 0)
 			{
 				// :emoji: must be at the start of a line, or have a leading space or be after a bbc ] tag
-				$parts[$i] = preg_replace_callback('~(?:\s?|^|]|<br />|<br>)(:([-+\w]+):\s?)~si', [$emoji, 'emojiToImage'], $parts[$i]);
+				$parts[$i] = preg_replace_callback('~(?:\s?|^|]|<br />|<br>)(:([-+\w]+):\s?)~i', [$emoji, 'emojiToImage'], $parts[$i]);
 
 				// Check for embeded html / hex emoji
 				$parts[$i] = $this->keyboardEmojiToImage($parts[$i]);
@@ -105,7 +105,7 @@ class Emoji extends AbstractModel
 	 */
 	public function emojiFromHTML($string)
 	{
-		$result = preg_replace_callback('~&#([0-9]+);|&#x([0-9a-fA-F]+);~', function ($match) {
+		$result = preg_replace_callback('~&#([\d]+);|&#x([0-9a-fA-F]+);~', function ($match) {
 			// See if we have an Emoji version of this HTML entity
 			$entity = !empty($match[1]) ? dechex($match[1]) : $match[2];
 			$found = $this->searchEmojiByHex($entity);

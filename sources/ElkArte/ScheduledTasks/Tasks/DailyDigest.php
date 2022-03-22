@@ -198,7 +198,7 @@ class DailyDigest implements ScheduledTaskInterface
 					// Convert to markdown markup e.g. text ;)
 					pbe_prepare_text($row['body']);
 					$row['body'] = Util::shorten_text($row['body'], !empty($modSettings['digest_preview_length']) ? $modSettings['digest_preview_length'] : 375, true);
-					$row['body'] = preg_replace("~\n~s", "\n  ", $row['body']);
+					$row['body'] = preg_replace("~\n~", "\n  ", $row['body']);
 				}
 
 				// Topics are simple since we are only concerned with the first post
@@ -254,7 +254,7 @@ class DailyDigest implements ScheduledTaskInterface
 					$body = $types['reply'][$id]['lines'][$topic['id']]['body_text'];
 					pbe_prepare_text($body);
 					$body = Util::shorten_text($body, !empty($modSettings['digest_preview_length']) ? $modSettings['digest_preview_length'] : 375, true);
-					$body = preg_replace("~\n~s", "\n  ", $body);
+					$body = preg_replace("~\n~", "\n  ", $body);
 					$types['reply'][$id]['lines'][$topic['id']]['body'] = $body;
 
 					unset($types['reply'][$id]['lines'][$topic['id']]['body_text'], $body);

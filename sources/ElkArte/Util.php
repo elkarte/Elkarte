@@ -429,15 +429,15 @@ class Util
 		foreach ($tags as $tag)
 		{
 			// If this tag has content
-			if (!preg_match('/img|br|input|hr|area|base|basefont|col|frame|isindex|link|meta|param/s', $tag[2]))
+			if (!preg_match('/img|br|input|hr|area|base|basefont|col|frame|isindex|link|meta|param/', $tag[2]))
 			{
 				// Opening tag add the closing tag to the top of the stack
-				if (preg_match('~<[\w]+[^>]*>~s', $tag[0]))
+				if (preg_match('~<[\w]+[^>]*>~', $tag[0]))
 				{
 					array_unshift($open_tags, $tag[2]);
 				}
 				// Closing tag
-				elseif (preg_match('~<\/([\w]+)[^>]*>~s', $tag[0], $close_tag))
+				elseif (preg_match('~<\/([\w]+)[^>]*>~', $tag[0], $close_tag))
 				{
 					// Remove its starting tag
 					$pos = array_search($close_tag[1], $open_tags);
@@ -487,7 +487,7 @@ class Util
 		if ($lastOpenTag > $lastCloseTag)
 		{
 			// Find the last full open tag in our truncated string, its what was being cut
-			preg_match_all('~<[\w]+[^>]*>~s', $truncate, $lastTagMatches);
+			preg_match_all('~<[\w]+[^>]*>~', $truncate, $lastTagMatches);
 			$last_tag = array_pop($lastTagMatches[0]);
 
 			// Set the space to just after the last tag
