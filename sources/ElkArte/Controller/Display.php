@@ -179,6 +179,10 @@ class Display extends AbstractController
 		// Mark the board as read or not ... calls updateReadNotificationsFor() sets $context['is_marked_notify']
 		$this->markRead($messages, $board);
 
+		$messages_request = false;
+		$context['first_message'] = 0;
+		$context['first_new_message'] = false;
+
 		// If there _are_ messages here... (probably an error otherwise :!)
 		if (!empty($messages))
 		{
@@ -232,12 +236,6 @@ class Display extends AbstractController
 			// Since the anchor information is needed on the top of the page we load these variables beforehand.
 			$context['first_message'] = $messages[$firstIndex] ?? $messages[0];
 			$context['first_new_message'] = (int) $this->_start === (int) $this->start_from;
-		}
-		else
-		{
-			$messages_request = false;
-			$context['first_message'] = 0;
-			$context['first_new_message'] = false;
 		}
 
 		// Are we showing the signatures?
