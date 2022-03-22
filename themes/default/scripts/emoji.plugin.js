@@ -276,7 +276,7 @@ var disableDrafts = false;
 			}
 
 			// Load the emoji file, then call start the instance
-			let promise = base.getScript(elk_theme_url + '/scripts/emoji_tags.js');
+			let promise = base.getScript(elk_default_theme_url + '/scripts/emoji_tags.js');
 			promise.then(
 				script =>
 				{
