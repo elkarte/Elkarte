@@ -355,7 +355,7 @@ class BBCParser
 				}
 
 				// The idea is, if we are LOOKING for a block level tag, we can close them on the way.
-				if (isset($look_for[1]) && isset($this->bbc_codes[$look_for[0]]))
+				if (isset($look_for[1], $this->bbc_codes[$look_for[0]]))
 				{
 					foreach ($this->bbc_codes[$look_for[0]] as $temp)
 					{
@@ -713,7 +713,7 @@ class BBCParser
 			}
 
 			// Not allowed in this parent, replace the tags or show it like regular text
-			if (isset($possible[Codes::ATTR_DISALLOW_PARENTS]) && isset($possible[Codes::ATTR_DISALLOW_PARENTS][$this->inside_tag[Codes::ATTR_TAG]]))
+			if (isset($possible[Codes::ATTR_DISALLOW_PARENTS], $possible[Codes::ATTR_DISALLOW_PARENTS][$this->inside_tag[Codes::ATTR_TAG]]))
 			{
 				if (!isset($possible[Codes::ATTR_DISALLOW_BEFORE], $possible[Codes::ATTR_DISALLOW_AFTER]))
 				{

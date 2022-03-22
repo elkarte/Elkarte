@@ -342,7 +342,7 @@ class PackageActions extends AbstractController
 
 		$this->has_failure = true;
 
-		if (isset($this->_action['error_msg']) && isset($this->_action['error_var']))
+		if (isset($this->_action['error_msg'], $this->_action['error_var']))
 		{
 			$this->failure_details = sprintf($txt['package_will_fail_' . $this->_action['error_msg']], $this->_action['error_var']);
 		}

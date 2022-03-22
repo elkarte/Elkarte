@@ -133,7 +133,7 @@ class Modlog extends AbstractController
 
 		if (isset($searchType) || empty($search_params['type']) || !isset($searchTypes[$search_params['type']]))
 		{
-			$search_params_type = isset($searchType) && isset($searchTypes[$searchType]) ? $searchType : $context['order'];
+			$search_params_type = isset($searchType, $searchTypes[$searchType]) ? $searchType : $context['order'];
 		}
 		else
 		{

@@ -167,7 +167,7 @@ class GenericList
 			{
 				$this->context['sort'] = array(
 					'id' => $sortReq,
-					'desc' => isset($_REQUEST[$this->descVar]) && isset($this->listOptions['columns'][$sortReq]['sort']['reverse']),
+					'desc' => isset($_REQUEST[$this->descVar], $this->listOptions['columns'][$sortReq]['sort']['reverse']),
 				);
 			}
 			else

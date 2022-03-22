@@ -1788,7 +1788,7 @@ class Post extends AbstractController
 			}
 
 			// Changing the first subject updates other subjects to 'Re: new_subject'.
-			if (isset($_POST['subject']) && isset($_REQUEST['change_all_subjects']) && $row['id_first_msg'] == $row['id_msg'] && !empty($row['num_replies']) && (allowedTo('modify_any') || ($row['id_member_started'] == $this->user->id && allowedTo('modify_replies'))))
+			if (isset($_POST['subject'], $_REQUEST['change_all_subjects']) && $row['id_first_msg'] == $row['id_msg'] && !empty($row['num_replies']) && (allowedTo('modify_any') || ($row['id_member_started'] == $this->user->id && allowedTo('modify_replies'))))
 			{
 				// Get the proper (default language) response prefix first.
 				$context['response_prefix'] = response_prefix();
@@ -1810,7 +1810,7 @@ class Post extends AbstractController
 			theme()->getLayers()->removeAll();
 			$context['sub_template'] = 'modifydone';
 
-			if (!$this->_post_errors->hasErrors() && isset($msgOptions['subject']) && isset($msgOptions['body']))
+			if (isset($msgOptions['subject'], $msgOptions['body']) && !$this->_post_errors->hasErrors())
 			{
 				$context['message'] = array(
 					'id' => $row['id_msg'],

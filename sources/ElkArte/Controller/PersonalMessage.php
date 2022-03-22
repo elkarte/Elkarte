@@ -1491,7 +1491,7 @@ class PersonalMessage extends AbstractController
 			// Copy the action from the single to PM to the others in the conversation.
 			foreach ($pms as $id_pm => $id_head)
 			{
-				if (isset($pm_heads[$id_head]) && isset($pm_actions[$pm_heads[$id_head]]))
+				if (isset($pm_heads[$id_head], $pm_actions[$pm_heads[$id_head]]))
 				{
 					$pm_actions[$id_pm] = $pm_actions[$pm_heads[$id_head]];
 				}

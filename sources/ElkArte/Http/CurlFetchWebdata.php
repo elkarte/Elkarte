@@ -244,7 +244,7 @@ class CurlFetchWebdata
 		$temp = explode(': ', $_header, 2);
 
 		// Set proper headers only
-		if (isset($temp[0]) && isset($temp[1]))
+		if (isset($temp[0], $temp[1]))
 		{
 			$this->_headers[strtolower($temp[0])] = trim($temp[1]);
 		}

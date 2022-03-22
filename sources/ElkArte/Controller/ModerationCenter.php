@@ -482,7 +482,7 @@ class ModerationCenter extends AbstractController
 			updateSettings(array('last_mod_report_action' => time()));
 			recountOpenReports(true, $show_pms);
 		}
-		elseif (isset($this->_req->post->close) && isset($this->_req->post->close_selected))
+		elseif (isset($this->_req->post->close, $this->_req->post->close_selected))
 		{
 			checkSession('post');
 
@@ -1292,7 +1292,7 @@ class ModerationCenter extends AbstractController
 
 		if (isset($this->_req->post->search_type) || empty($search_params['type']) || !isset($searchTypes[$search_params['type']]))
 		{
-			$search_params_type = isset($this->_req->post->search_type) && isset($searchTypes[$this->_req->post->search_type]) ? $this->_req->post->search_type : (isset($searchTypes[$context['order']]) ? $context['order'] : 'member');
+			$search_params_type = isset($this->_req->post->search_type, $searchTypes[$this->_req->post->search_type]) ? $this->_req->post->search_type : (isset($searchTypes[$context['order']]) ? $context['order'] : 'member');
 		}
 		else
 		{
@@ -1899,7 +1899,7 @@ class ModerationCenter extends AbstractController
 		}
 
 		// Bye... bye...
-		if (isset($this->_req->query->notes) && isset($this->_req->query->delete) && is_numeric($this->_req->query->delete))
+		if (isset($this->_req->query->notes, $this->_req->query->delete) && is_numeric($this->_req->query->delete))
 		{
 			checkSession('get');
 

@@ -126,7 +126,7 @@ class Mentioning extends AbstractModel
 				'uid' => is_array($data['id_member']) ? $data['id_member'] : array($data['id_member']),
 				'type' => $data['type'],
 				'msg' => $data['id_msg'],
-				'status' => isset($data['status']) && isset($this->_known_status[$data['status']]) ? $this->_known_status[$data['status']] : 0,
+				'status' => isset($data['status'], $this->_known_status[$data['status']]) ? $this->_known_status[$data['status']] : 0,
 			);
 
 			if (isset($data['id_member_from']))
