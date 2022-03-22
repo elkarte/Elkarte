@@ -130,7 +130,7 @@ class Markasread extends AbstractController
 		$action->dispatch($subAction);
 
 		// For the time being this is a special case, but in BoardIndex no, we don't want it
-		if ($this->_req->getQuery('sa') === 'all' || $this->_req->getQuery('sa') === 'board' && !isset($this->_req->query->bi))
+		if ($this->_req->getQuery('sa') === 'all' || ($this->_req->getQuery('sa') === 'board' && !isset($this->_req->query->bi)))
 		{
 			$url_params = ['action' => 'unread', 'all', '{session_data}'];
 			if (!empty($this->_querystring_board_limits))
