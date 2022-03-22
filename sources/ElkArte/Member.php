@@ -92,7 +92,7 @@ class Member extends ValuesContainer
 	 * @param bool $display_custom_fields
 	 * @return bool
 	 */
-	public function loadContext($display_custom_fields = false)
+	public function loadContext($display_custom_fields = true)
 	{
 		if ($this->loaded)
 		{
@@ -259,12 +259,12 @@ class Member extends ValuesContainer
 		global $txt, $settings, $scripturl;
 
 		// Are we also loading the members custom fields into context?
-		if (empty($this->display_fields))
+		if (empty($this->display_fields['options']))
 		{
 			return;
 		}
 
-		foreach ($this->display_fields as $custom)
+		foreach ($this->display_fields['options'] as $custom)
 		{
 			if (!isset($custom['title']) || trim($custom['title']) === '' || empty($this->data['options'][$custom['colname']]))
 			{
