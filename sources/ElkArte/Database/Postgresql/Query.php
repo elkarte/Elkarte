@@ -381,9 +381,7 @@ class Query extends AbstractQuery
 	 */
 	public function list_tables($db_name_str = false, $filter = false)
 	{
-		$dump = new Dump($this);
-
-		return $dump->list_tables($db_name_str, $filter);
+		return (new Dump($this))->list_tables($db_name_str, $filter);
 	}
 
 	/**
