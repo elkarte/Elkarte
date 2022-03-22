@@ -1205,8 +1205,8 @@ nav.breadcrumb {
 }
 
 .approvebg, .forumposts.approvebg {
-	 background-color: var(--notice);
- }
+	background-color: var(--notice);
+}
 
 .new_post_separator::after {
 	border-color: var(--primary_white) var(--transparent);
