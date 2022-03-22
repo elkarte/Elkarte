@@ -387,7 +387,7 @@ final class Request
 	private function _cleanArg($parser)
 	{
 		// Are we going to need to parse the ; out?
-		if (strpos(ini_get('arg_separator.input'), ';') === false && !empty($this->_server_query_string))
+		if (!empty($this->_server_query_string) && strpos(ini_get('arg_separator.input'), ';') === false)
 		{
 			// Get rid of the old one! You don't know where it's been!
 			$_GET = array();

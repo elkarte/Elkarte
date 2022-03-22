@@ -472,9 +472,7 @@ class SiteCombiner
 			// CSS needs relative locations converted for the moved hive to work
 			if ($type === 'css')
 			{
-				$tempfile = str_replace(array('../../images', '../images'), $file['url'] . '/images', $tempfile);
-				$tempfile = str_replace(array('../../webfonts', '../webfonts'), $file['url'] . '/webfonts', $tempfile);
-				$tempfile = str_replace(array('../../scripts', '../scripts'), $file['url'] . '/scripts', $tempfile);
+				$tempfile = str_replace(array('../../images', '../images', '../../webfonts', '../webfonts', '../../scripts', '../scripts'), array($file['url'] . '/images', $file['url'] . '/webfonts', $file['url'] . '/scripts'), $tempfile);
 			}
 
 			// Add the file to the correct array for processing

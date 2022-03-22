@@ -356,7 +356,7 @@ class Cache
 			5. The expire time set in the cache item has passed (needed for Zend).
 		*/
 		$cache_block = $this->get($key, 3600);
-		if (!$this->isEnabled() || $this->level < $level || !is_array($cache_block) || (!empty($cache_block['refresh_eval']) && eval($cache_block['refresh_eval'])) || (!empty($cache_block['expires']) && $cache_block['expires'] < time()))
+		if ($this->level < $level  || !is_array($cache_block) || !$this->isEnabled() || (!empty($cache_block['refresh_eval']) && eval($cache_block['refresh_eval'])) || (!empty($cache_block['expires']) && $cache_block['expires'] < time()))
 		{
 			require_once(SOURCEDIR . '/' . $file);
 			$cache_block = call_user_func_array($function, $params);

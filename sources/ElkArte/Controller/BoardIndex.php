@@ -195,7 +195,7 @@ class BoardIndex extends AbstractController implements FrontpageInterface
 		}
 
 		// Check if the input values are correct.
-		if (in_array($this->_req->query->sa, array('expand', 'collapse', 'toggle')) && isset($this->_req->query->c))
+		if (isset($this->_req->query->c) && in_array($this->_req->query->sa, array('expand', 'collapse', 'toggle')) )
 		{
 			// And collapse/expand/toggle the category.
 			require_once(SUBSDIR . '/Categories.subs.php');
