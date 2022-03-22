@@ -388,7 +388,7 @@ class FileFunctions
 	 *
 	 * @param string[] $tree
 	 * @param int $count
-	 * @return false|mixed|string|null
+	 * @return false|string|null
 	 */
 	private function _initDir(&$tree, &$count)
 	{

@@ -468,7 +468,7 @@ class ProfileOptions extends AbstractController
 	 * Returns the profile fields for a given area
 	 *
 	 * @param string $area
-	 * @return array|mixed
+	 * @return array
 	 */
 	public static function getFields($area)
 	{
@@ -1012,7 +1012,7 @@ class ProfileOptions extends AbstractController
 	 * @param string $sort A string indicating how to sort the results
 	 * @param int $memID id_member
 	 *
-	 * @return mixed array of topic notifications
+	 * @return array array of topic notifications
 	 */
 	public function list_getTopicNotifications($start, $items_per_page, $sort, $memID)
 	{

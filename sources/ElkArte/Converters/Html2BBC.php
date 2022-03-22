@@ -667,7 +667,7 @@ class Html2BBC extends AbstractDomParser
 	 *
 	 * @param \DOMNode|object $node
 	 *
-	 * @return mixed|string
+	 * @return array|string|string[]
 	 */
 	private function _convertImage($node)
 	{
@@ -789,7 +789,7 @@ class Html2BBC extends AbstractDomParser
 	 *
 	 * @param string $text
 	 *
-	 * @return mixed
+	 * @return string
 	 */
 	private function _recursive_decode($text)
 	{

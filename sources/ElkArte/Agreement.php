@@ -132,7 +132,7 @@ class Agreement
 	 *
 	 * @param bool $fallback if fallback to the English version (default true).
 	 *
-	 * @return bool|string
+	 * @return string
 	 */
 	public function getPlainText($fallback = true, $language = null)
 	{

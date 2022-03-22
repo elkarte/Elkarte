@@ -238,7 +238,7 @@ class Search
 	 *
 	 * @param bool $array If true returns an array, otherwise an object
 	 *
-	 * @return mixed
+	 * @return \ElkArte\Search\SearchParams|string[]
 	 */
 	public function getSearchParams($array = false)
 	{
