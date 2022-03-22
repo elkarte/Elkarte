@@ -39,10 +39,8 @@ class Buddy extends AbstractNotificationMessage
 		{
 			return $this->_getNotificationStrings('', array('subject' => static::$_type, 'body' => static::$_type), $members, $this->_task);
 		}
-		else
-		{
-			$keys = array('subject' => 'notify_new_buddy_' . $lang_data['subject'], 'body' => 'notify_new_buddy_' . $lang_data['body']);
-		}
+
+		$keys = array('subject' => 'notify_new_buddy_' . $lang_data['subject'], 'body' => 'notify_new_buddy_' . $lang_data['body']);
 
 		$notifier = $this->_task->getNotifierData();
 		$replacements = array(

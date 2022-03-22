@@ -87,10 +87,8 @@ class Query extends AbstractQuery
 		{
 			return mysqli_error($this->connection);
 		}
-		else
-		{
-			return false;
-		}
+
+		return false;
 	}
 
 	/**
@@ -242,7 +240,7 @@ class Query extends AbstractQuery
 				// We know there's a problem... but what?  Try to auto detect.
 				if ($query_errno == 1030 && strpos($query_error, ' 127 ') !== false)
 				{
-					preg_match_all('~(?:[\n\r]|^)[^\']+?(?:FROM|JOIN|UPDATE|TABLE) ((?:[^\n\r(]+?(?:, )?)*)~s', $db_string, $matches);
+					preg_match_all('~(?:[\n\r]|^)[^\']+?(?:FROM|JOIN|UPDATE|TABLE) ((?:[^\n\r(]+?(?:, )?)*)~', $db_string, $matches);
 
 					$fix_tables = array();
 					foreach ($matches[1] as $tables)
@@ -371,7 +369,7 @@ class Query extends AbstractQuery
 						\ElkArte\Languages\Txt::load('Errors');
 					}
 
-					$query_error .= !isset($txt['mysql_error_space']) ? ' - check database storage space.' : $txt['mysql_error_space'];
+					$query_error .= $txt['mysql_error_space'] ?? ' - check database storage space.';
 				}
 			}
 		}
@@ -591,9 +589,7 @@ class Query extends AbstractQuery
 	 */
 	public function list_tables($db_name_str = false, $filter = false)
 	{
-		$dump = new Dump($this);
-
-		return $dump->list_tables($db_name_str, $filter);
+		return (new Dump($this))->list_tables($db_name_str, $filter);
 	}
 
 	/**

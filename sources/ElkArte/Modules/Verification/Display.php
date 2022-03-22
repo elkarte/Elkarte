@@ -41,10 +41,8 @@ class Display extends AbstractModule
 				array('topicinfo', array('\\ElkArte\\Modules\\Verification\\Display', 'topicinfo'), array()),
 			);
 		}
-		else
-		{
-			return array();
-		}
+
+		return array();
 	}
 
 	/**

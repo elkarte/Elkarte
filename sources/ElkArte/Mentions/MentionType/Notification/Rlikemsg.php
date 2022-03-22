@@ -76,28 +76,26 @@ class Rlikemsg extends AbstractNotificationBoardAccess
 		{
 			return parent::insert($member_from, $members_to, $target, $time, $status, $is_accessible);
 		}
-		else
-		{
-			// If this like is still unread then we mark it as read and decrease the counter
-			$this->_db->query('', '
-				UPDATE {db_prefix}log_mentions
-				SET status = {int:status}
-				WHERE id_member IN ({array_int:members_to})
-					AND mention_type = {string:type}
-					AND id_member_from = {int:member_from}
-					AND id_target = {int:target}
-					AND status = {int:unread}',
-				array(
-					'members_to' => $members_to,
-					'type' => 'likemsg',
-					'member_from' => $member_from,
-					'target' => $target,
-					'status' => $status ?? 1,
-					'unread' => 0,
-				)
-			);
 
-			return array();
-		}
+		// If this like is still unread then we mark it as read and decrease the counter
+		$this->_db->query('', '
+			UPDATE {db_prefix}log_mentions
+			SET status = {int:status}
+			WHERE id_member IN ({array_int:members_to})
+				AND mention_type = {string:type}
+				AND id_member_from = {int:member_from}
+				AND id_target = {int:target}
+				AND status = {int:unread}',
+			array(
+				'members_to' => $members_to,
+				'type' => 'likemsg',
+				'member_from' => $member_from,
+				'target' => $target,
+				'status' => $status ?? 1,
+				'unread' => 0,
+			)
+		);
+
+		return array();
 	}
 }

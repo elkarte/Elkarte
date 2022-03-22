@@ -1473,7 +1473,7 @@ class Packages extends AbstractController
 					}
 					$dirs[] = $package;
 				}
-				elseif (substr(strtolower($package->getFilename()), -7) === '.tar.gz')
+				elseif (strtolower(substr($package->getFilename(), -7)) === '.tar.gz')
 				{
 					if (in_array(substr($package, 0, -7), $dirs))
 					{

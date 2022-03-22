@@ -66,10 +66,8 @@ class Post extends AbstractModule
 				array('after_save_post', array('\\ElkArte\\Modules\\Calendar\\Post', 'after_save_post'), array()),
 			);
 		}
-		else
-		{
-			return array();
-		}
+
+		return array();
 	}
 
 	/**

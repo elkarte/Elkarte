@@ -119,11 +119,9 @@ class Directories
 		{
 			return;
 		}
+
 		// Add this file to our include list, whether $once is true or not.
-		else
-		{
-			$this->templates[] = $filename;
-		}
+		$this->templates[] = $filename;
 
 		// Load it if we find it
 		$file_found = FileFunctions::instance()->fileExists($filename);

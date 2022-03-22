@@ -751,8 +751,9 @@ function checkActivation()
 
 		return false;
 	}
+
 	// Awaiting approval still?
-	elseif ($activation_status == 3)
+	if ($activation_status == 3)
 	{
 		throw new Exception('still_awaiting_approval', 'user');
 	}

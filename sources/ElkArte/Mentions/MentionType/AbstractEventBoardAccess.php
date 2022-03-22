@@ -54,10 +54,8 @@ abstract class AbstractEventBoardAccess extends AbstractEventMessage
 		{
 			return $this->_validateAccess($boards, $mentions, $unset_keys);
 		}
-		else
-		{
-			return false;
-		}
+
+		return false;
 	}
 
 	/**
