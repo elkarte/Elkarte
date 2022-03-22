@@ -252,7 +252,7 @@ input[type="submit"]:hover, button[type="submit"]:hover, input[type="button"]:ho
 	box-shadow: -1px 2px 4px var(--box_shadow);
 }
 
-.topic_listing {
+.topic_listing, .search_results_posts {
 	box-shadow: -1px 2px 4px var(--box_shadow);
 }
 
@@ -393,7 +393,7 @@ input[type="submit"]:hover, button[type="submit"]:hover, input[type="button"]:ho
 		border-right-color: var(--transparent);
 	}
 
-	.topic_listing > li {
+	.topic_listing > li, .search_results_posts > li {
 		box-shadow: -3px 3px 6px var(--box_shadow);
 	}
 

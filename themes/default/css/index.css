@@ -1076,13 +1076,14 @@ a.bbc_link {
 /* Very top bar, holds search and login (top_section_notice) forms */
 #top_header {
 	display: flex;
+	align-items: center;
 	justify-content: flex-end;
+	margin-top: .5em;
 }
 
 #top_section_notice {
 	font-weight: 700;
 	flex: 1 1 auto;
-	padding: .75em .5em .25em .25em;
 }
 
 #top_section_notice .toggle_login {
@@ -1102,7 +1103,6 @@ a.bbc_link {
 
 #search_form {
 	display: flex;
-	padding: .75em .25em .25em .5em;
 }
 
 /* Search input, search dropdown, search button group */
@@ -2615,7 +2615,7 @@ nav > .quickbuttons, menu > .quickbuttons {
 }
 
 /* Applied to the ul of the topic listing page */
-.topic_listing {
+.topic_listing, .search_results_posts {
 	width: 100%;
 }
 
@@ -3402,8 +3402,8 @@ footer .signature {
 }
 
 .editor_wrapper {
-	max-width: 100%;
-	margin: 0 5%;
+	max-width: 75%;
+	margin: 0 auto;
 }
 
 /* The QR textarea */
@@ -4847,7 +4847,7 @@ Stef                       ^
 /* The help pop-ups, you know, a little lost ? */
 .popup_container {
 	position: fixed;
-	z-index: 100;
+	z-index: 1000000;
 	top: 0;
 	left: 0;
 	display: none;
@@ -5702,6 +5702,11 @@ Stef                       ^
 		font-size: var(--font12);
 		padding: 1px .4em .12em .3em;
 	}
+
+	.editor_wrapper {
+		max-width: 100%;
+		margin: 0 5%;
+	}
 }
 
 /* This one does 800 screens at default font size.
@@ -5857,6 +5862,10 @@ Stef                       ^
 	/* search page */
 	#search_options {
 		width: 90%;
+	}
+
+	.search_results_posts .topic_body {
+		padding: 0;
 	}
 
 	/* our stats page */

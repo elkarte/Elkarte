@@ -395,10 +395,14 @@ strong {
 
 /* A quote, perhaps from another post. */
 .bbc_quote,
-	/* A code block - maybe PHP ;) - shared styles. */
+/* A code block - maybe PHP ;) - shared styles. */
 .bbc_code {
 	border-color: var(--primary_border);
 	background: var(--primary_white);
+}
+
+input[type=checkbox].quote-show-more {
+	background: linear-gradient(to bottom, var(--transparent) 0%, var(--transparent) 40%, var(--primary_white) 100%);
 }
 
 /* Extra quote styling */
@@ -1003,12 +1007,12 @@ sup.bbc_footnotes, sup.bbc_footnotes a {
  * -------------------------------------------------------
  */
 
-.topic_listing {
+.topic_listing, .search_results_posts {
 	background: var(--mid_grey_background);
 	box-shadow: 1px 2px 4px var(--box_shadow);
 }
 
-.topic_listing > li {
+.topic_listing > li, .search_results_posts > li {
 	border-color: var(--primary_border);
 }
 
@@ -1869,7 +1873,7 @@ li.ui-tab.ui-tabs-active.ui-state-active.ui-state-hover .ui-tabs-anchor {
 		border-top-color: var(--primary_border);
 	}
 
-	.topic_listing > li {
+	.topic_listing > li, .search_results_posts > li {
 		border-color: var(--seconday_border);
 		box-shadow: 3px 3px 6px var(--box_shadow);
 	}
