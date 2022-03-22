@@ -69,6 +69,11 @@ class Calendar extends AbstractController
 			throw new Exception('calendar_off', false);
 		}
 
+		if (empty($modSettings['cal_limityear']))
+		{
+			$modSettings['cal_limityear'] = 20;
+		}
+
 		// Set the page title to mention the calendar ;).
 		$context['page_title'] = $txt['calendar'];
 		$context['sub_template'] = 'show_calendar';
