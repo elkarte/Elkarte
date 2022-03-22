@@ -305,9 +305,7 @@ class Standard extends AbstractAPI
 			}
 		}
 
-		$relevance = substr($relevance, 0, -3) . ') / ' . $weight_total . ' AS relevance';
-
-		return $relevance;
+		return substr($relevance, 0, -3) . ') / ' . $weight_total . ' AS relevance';
 	}
 
 	/**

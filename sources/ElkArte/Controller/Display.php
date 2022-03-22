@@ -734,13 +734,8 @@ class Display extends AbstractController
 			}
 		}
 
-		if (!empty($this->_start)
-			&& (!is_numeric($this->_start) || $this->_start % $this->messages_per_page !== 0))
-		{
-			return true;
-		}
-
-		return false;
+		return !empty($this->_start)
+			&& (!is_numeric($this->_start) || $this->_start % $this->messages_per_page !== 0);
 	}
 
 	/**
