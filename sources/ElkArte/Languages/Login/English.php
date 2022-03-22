@@ -28,6 +28,7 @@ $txt['valid_email_needed'] = 'Please enter a valid email address, %1$s.';
 $txt['required_info'] = 'Required Information';
 $txt['additional_information'] = 'Optional Information';
 $txt['warning'] = 'Warning!';
+$txt['notice'] = 'Notice';
 $txt['only_members_can_access'] = 'Only registered members are allowed to access this section.';
 $txt['login_below'] = 'Please login below.';
 $txt['login_below_or_register'] = 'Please login below or <a href="%1$s">register an account</a> with %2$s';
