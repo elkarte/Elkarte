@@ -24,6 +24,7 @@ use ElkArte\Errors\Errors;
 use ElkArte\Exceptions\Exception;
 use ElkArte\FileFunctions;
 use ElkArte\Packages\PackageChmod;
+use ElkArte\Packages\PackageParser;
 use ElkArte\SettingsForm\SettingsForm;
 use ElkArte\Languages\Txt;
 use ElkArte\Util;
@@ -1798,7 +1799,8 @@ class ManageSmileys extends AbstractController
 		}
 
 		// Everything is fine, now it's time to do something, first we test
-		$actions = parsePackageInfo($smileyInfo['xml'], true, 'install');
+		$parser = new PackageParser();
+		$actions = $parser->parsePackageInfo($smileyInfo['xml'], true);
 
 		$context['post_url'] = getUrl('admin', ['action' => 'admin', 'area' => 'smileys', 'sa' => 'install', 'package' => $base_name]);
 		$context['has_failure'] = false;

@@ -21,6 +21,7 @@ use ElkArte\Action;
 use ElkArte\Cache\Cache;
 use ElkArte\Exceptions\Exception;
 use ElkArte\FileFunctions;
+use ElkArte\Packages\PackageChmod;
 use ElkArte\SettingsForm\SettingsForm;
 use ElkArte\Languages\Txt;
 use ElkArte\Util;
@@ -370,7 +371,8 @@ class ManageLanguages extends AbstractController
 			}
 
 			// Call this in case we have work to do.
-			$file_status = create_chmod_control($chmod_files);
+			$create_chmod_control = new PackageChmod();
+			$file_status =  $create_chmod_control->createChmodControl($chmod_files);
 			$files_left = $file_status['files']['notwritable'];
 
 			// Something not writable?
@@ -573,7 +575,8 @@ class ManageLanguages extends AbstractController
 		if (!empty($context['make_writable']))
 		{
 			// What is left to be made writable?
-			$file_status = create_chmod_control($context['make_writable']);
+			$create_chmod_control = new PackageChmod();
+			$file_status =  $create_chmod_control->createChmodControl($context['make_writable']);
 			$context['still_not_writable'] = $file_status['files']['notwritable'];
 
 			// Mark those which are now writable as such.
