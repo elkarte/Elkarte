@@ -806,7 +806,7 @@ class Theme extends BaseTheme
 		{
 			$this->addInlineJavascript('
 			$(function() {
-				new smc_Popup({
+				new elk_Popup({
 					heading: ' . JavaScriptEscape($txt['show_personal_messages_heading']) . ',
 					content: ' . JavaScriptEscape(sprintf($txt['show_personal_messages'], $context['user']['unread_messages'], $scripturl . '?action=pm')) . ',
 					icon: \'i-envelope\'
@@ -967,6 +967,7 @@ class Theme extends BaseTheme
 						$needs_action_hook = true;
 					}
 
+					// This button has a [#] indicator
 					if (isset($button['counter']) && !empty($menu_count[$button['counter']]))
 					{
 						$button['alttitle'] = $button['title'] . ' [' . $menu_count[$button['counter']] . ']';
