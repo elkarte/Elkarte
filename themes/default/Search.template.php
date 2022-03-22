@@ -303,12 +303,12 @@ function template_results()
 	if ($context['compact'])
 	{
 		echo '
-				<ul class="topic_listing compact_view search_results_posts">';
+				<ul class="compact_view search_results_posts">';
 	}
 	else
 	{
 		echo '
-				<ul class="forumposts topic_listing search_results_posts">';
+				<ul class="forumposts search_results_posts">';
 	}
 
 	// While we have results to show ...
