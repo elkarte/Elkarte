@@ -328,7 +328,7 @@ class ManageSmileys extends AbstractController
 					),
 					'data' => array(
 						'sprintf' => array(
-							'format' => '<a href="' . getUrl('admin', ['action' => 'admin', 'area' => 'smileys', 'sa' => 'modifyset', 'set' => '%1$d']) . '">' . $txt['smiley_set_modify'] . '</a>',
+							'format' => '<a href="' . getUrl('admin', ['action' => 'admin', 'area' => 'smileys', 'sa' => 'modifyset', 'set' => '']) . '%1$d">' . $txt['smiley_set_modify'] . '</a>',
 							'params' => array(
 								'id' => true,
 							),
@@ -1059,7 +1059,7 @@ class ManageSmileys extends AbstractController
 						'data' => array(
 							'sprintf' => array(
 								'format' => '
-								<a href="' . getUrl('admin', ['action' => 'admin', 'area' => 'smileys', 'sa' => 'modifysmiley', 'smiley' => '%1$d']) . '">
+								<a href="' . getUrl('admin', ['action' => 'admin', 'area' => 'smileys', 'sa' => 'modifysmiley', 'smiley' => '']) . '%1$d">
 									<img src="' . $modSettings['smileys_url'] . '/' . $modSettings['smiley_sets_default'] . '/%2$s" alt="%3$s" id="smiley%1$d" />
 									<input type="hidden" name="smileys[%1$d][filename]" value="%2$s" />
 								</a>',
@@ -1155,7 +1155,7 @@ class ManageSmileys extends AbstractController
 						),
 						'data' => array(
 							'sprintf' => array(
-								'format' => '<a href="' . getUrl('admin', ['action' => 'admin', 'area' => 'smileys', 'sa' => 'modifysmiley', 'smiley' => '%1$d']) . '">' . $txt['smileys_modify'] . '</a>',
+								'format' => '<a href="' . getUrl('admin', ['action' => 'admin', 'area' => 'smileys', 'sa' => 'modifysmiley', 'smiley' => '']) . '%1$d">' . $txt['smileys_modify'] . '</a>',
 								'params' => array(
 									'id_smiley' => false,
 								),
@@ -1294,8 +1294,8 @@ class ManageSmileys extends AbstractController
 				ksort($context['filenames']);
 			}
 
-			$this->_req->query->smiley = (int) $this->_req->query->smiley;
-			$context['current_smiley'] = getSmiley($this->_req->query->smiley);
+			$thisSmiley = (int) $this->_req->query->smiley;
+			$context['current_smiley'] = getSmiley($thisSmiley);
 			$context['current_smiley']['code'] = htmlspecialchars($context['current_smiley']['code'], ENT_COMPAT, 'UTF-8');
 			$context['current_smiley']['filename'] = htmlspecialchars($context['current_smiley']['filename'], ENT_COMPAT, 'UTF-8');
 			$context['current_smiley']['description'] = htmlspecialchars($context['current_smiley']['description'], ENT_COMPAT, 'UTF-8');
@@ -1497,7 +1497,7 @@ class ManageSmileys extends AbstractController
 					),
 					'data' => array(
 						'sprintf' => array(
-							'format' => '<a href="' . getUrl('admin', ['action' => 'admin', 'area' => 'smileys', 'sa' => 'editicon', 'icon' => '%1$s']) . '">' . $txt['smileys_modify'] . '</a>',
+							'format' => '<a href="' . getUrl('admin', ['action' => 'admin', 'area' => 'smileys', 'sa' => 'editicon', 'icon' => '']) . '%1$s">' . $txt['smileys_modify'] . '</a>',
 							'params' => array(
 								'id' => false,
 							),
