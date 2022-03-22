@@ -260,15 +260,6 @@ class Display extends AbstractController
 		// Load up the Quick ModifyTopic and Quick Reply scripts
 		loadJavascriptFile('topic.js');
 
-		// Auto video embedding enabled?
-		if (!empty($modSettings['enableVideoEmbeding']))
-		{
-			theme()->addInlineJavascript('
-		$(function() {
-			$().linkifyvideo(oEmbedtext);
-		});');
-		}
-
 		// Create the editor for the QR area
 		$editorOptions = array(
 			'id' => 'message',
