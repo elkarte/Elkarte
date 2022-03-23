@@ -31,7 +31,7 @@ class Post extends AbstractModule
 	protected static $_make_poll = false;
 
 	/**
-	 * {@inheritdoc }
+	 * {@inheritdoc}
 	 */
 	public static function hooks(EventManager $eventsManager)
 	{
@@ -52,13 +52,12 @@ class Post extends AbstractModule
 
 		// Posting a poll?
 		self::$_make_poll = isset($_REQUEST['poll']);
-
 		if (self::$_make_poll)
 		{
 			return array_merge($return, array(
-				array('before_save_post', array('Poll_Post_Module', 'before_save_post'), array()),
-				array('save_replying', array('Poll_Post_Module', 'save_replying'), array()),
-				array('pre_save_post', array('Poll_Post_Module', 'pre_save_post'), array('topicOptions')),
+				array('before_save_post', array('\\ElkArte\\Modules\\Poll\\Post', 'before_save_post'), array()),
+				array('save_replying', array('\\ElkArte\\Modules\\Poll\\Post', 'save_replying'), array()),
+				array('pre_save_post', array('\\ElkArte\\Modules\\Poll\\Post', 'pre_save_post'), array('topicOptions')),
 			));
 		}
 
@@ -130,7 +129,7 @@ class Post extends AbstractModule
 			}
 			else
 			{
-				$context['can_add_poll'] = (allowedTo('poll_add_any') || (!empty($_REQUEST['msg']) && $topic_attributes['id_first_msg'] == $_REQUEST['msg'] && allowedTo('poll_add_own'))) && $topic_attributes['id_poll'] <= 0;
+				$context['can_add_poll'] = (allowedTo('poll_add_any') || ($topic_attributes['id_first_msg'] == $_REQUEST['msg'] && allowedTo('poll_add_own'))) && $topic_attributes['id_poll'] <= 0;
 			}
 		}
 		else
@@ -256,10 +255,10 @@ class Post extends AbstractModule
 			theme()->getTemplates()->load('Poll');
 			$template_layers->add('poll_edit');
 
-			// Are we starting a poll? if set the poll icon as selected if its available
-			for ($i = 0, $n = count($context['icons']); $i < $n; $i++)
+			// Are we starting a poll? if set the poll icon as selected if available
+			foreach ($context['icons'] as $i => $iValue)
 			{
-				if ($context['icons'][$i]['value'] === 'poll')
+				if ($iValue['value'] === 'poll')
 				{
 					$context['icons'][$i]['selected'] = true;
 					$context['icon'] = 'poll';
@@ -326,7 +325,7 @@ class Post extends AbstractModule
 		// Get rid of empty ones.
 		foreach ($_POST['options'] as $k => $option)
 		{
-			if ($option == '')
+			if ($option === '')
 			{
 				unset($_POST['options'][$k], $_POST['options'][$k]);
 			}
@@ -405,12 +404,13 @@ class Post extends AbstractModule
 
 		// If the user tries to set the poll too far in advance, don't let them.
 		if (!empty($poll_expire) && $poll_expire < 1)
-			// @todo this fatal error should not be here
 		{
+			// @todo this fatal error should not be here
 			throw new Exception('poll_range_error', false);
 		}
+
 		// Don't allow them to select option 2 for hidden results if it's not time limited.
-		elseif (empty($poll_expire) && $poll_hide == 2)
+		if (empty($poll_expire) && $poll_hide === 2)
 		{
 			$poll_hide = 1;
 		}
