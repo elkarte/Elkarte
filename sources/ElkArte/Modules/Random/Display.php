@@ -15,6 +15,7 @@ namespace ElkArte\Modules\Random;
 
 use ElkArte\EventManager;
 use ElkArte\Modules\AbstractModule;
+use ElkArte\Languages\Txt;
 
 /**
  * Class \ElkArte\Modules\Random\Display
@@ -44,6 +45,7 @@ class Display extends AbstractModule
 
 			add_integration_function('integrate_topic_query', '\\ElkArte\\Modules\\Random\\Display::followup_topic_query', '', false);
 			add_integration_function('integrate_display_message_list', '\\ElkArte\\Modules\\Random\\Display::followup_message_list', '', false);
+			add_integration_function('integrate_display_message_list', '\\ElkArte\\Modules\\Random\\Display::load_likes', '', false);
 		}
 
 		return $return;
@@ -72,6 +74,30 @@ class Display extends AbstractModule
 
 		require_once(SUBSDIR . '/FollowUps.subs.php');
 		$context['follow_ups'] = followupTopics($messages, self::$includeUnapproved);
+	}
+
+	/**
+	 * Show likes.
+	 *
+	 * @param int[] $messages
+	 */
+	public static function load_likes($messages)
+	{
+		global $modSettings, $context, $txt;
+
+		if (!empty($modSettings['likes_enabled']) && !empty($messages))
+		{
+			require_once(SUBSDIR . '/Likes.subs.php');
+			$context['likes'] = loadLikes($messages, true);
+
+			// ajax controller for likes
+			loadJavascriptFile('like_posts.js', array('defer' => true));
+			theme()->addJavascriptVar(array(
+				'likemsg_are_you_sure' => JavaScriptEscape($txt['likemsg_are_you_sure']),
+			));
+			// This one is needed to load have some strings handy for likes errors
+			Txt::load('Errors');
+		}
 	}
 
 	/**

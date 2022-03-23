@@ -200,8 +200,6 @@ class Display extends AbstractController
 			}
 
 			// Load in the likes for this group of messages
-			$this->loadLikeFunction($messages);
-
 			// If using quick reply, load the user into context for the poster area
 			$this->prepareQuickReply();
 
@@ -777,42 +775,6 @@ class Display extends AbstractController
 				require_once(SUBSDIR . '/Boards.subs.php');
 				markBoardsRead($board, false, false);
 			}
-		}
-	}
-
-	/**
-	 * If likes are on, this sets the JS in motion.
-	 *
-	 * @param array $messages
-	 */
-	public function loadLikeFunction($messages)
-	{
-		global $modSettings, $context, $txt;
-
-		if (!empty($modSettings['likes_enabled']))
-		{
-			require_once(SUBSDIR . '/Likes.subs.php');
-			$context['likes'] = loadLikes($messages, true);
-
-			// ajax controller for likes
-			loadJavascriptFile('like_posts.js', array('defer' => true));
-			theme()->addJavascriptVar(array(
-				'likemsg_are_you_sure' => JavaScriptEscape($txt['likemsg_are_you_sure']),
-			));
-			Txt::load('Errors');
-
-			// Initiate likes and the tooltips for likes
-			theme()->addInlineJavascript('
-				$(function() {
-					var likePostInstance = likePosts.prototype.init({
-						oTxt: ({
-							likeHeadingError : ' . JavaScriptEscape($txt['like_heading_error']) . ',
-							error_occurred : ' . JavaScriptEscape($txt['error_occurred']) . '
-						}),
-					});
-
-					$(".react_button, .unreact_button, .reacts_button").SiteTooltip();
-				});', true);
 		}
 	}
 
