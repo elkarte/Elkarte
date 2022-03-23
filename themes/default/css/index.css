@@ -90,6 +90,7 @@ html {
 	overflow-y: scroll;
 	-webkit-text-size-adjust: 100%;
 	scroll-behavior: smooth;
+	scroll-padding: 10px 0 0 0;
 }
 
 /* Set a font that will look the mostly the same in all browsers.
