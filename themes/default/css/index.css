@@ -2045,6 +2045,7 @@ nav > .quickbuttons, menu > .quickbuttons {
 	font-size: var(--font14);
 	display: flex;
 	align-items: center;
+	flex: 1;
 	flex-direction: row;
 	flex-wrap: wrap;
 }
@@ -2834,9 +2835,11 @@ nav > .quickbuttons, menu > .quickbuttons {
 }
 
 #pollmoderation {
+	display: flex;
 	overflow: auto;
+	align-items: center;
 	margin: 0;
-	padding: 0;
+	padding: 0 0 1em 0;
 }
 
 #pollquestion {
