@@ -346,11 +346,13 @@ function getLastTopics($latestTopicOptions)
 			ml.poster_time, mf.subject, ml.id_topic, ml.id_member, ml.id_msg, t.id_first_msg, ml.id_msg_modified,
 			' . ($latestTopicOptions['id_member'] == 0 ? '0' : 'COALESCE(lt.id_msg, lmr.id_msg, -1) + 1') . ' AS new_from,
 			COALESCE(mem.real_name, ml.poster_name) AS poster_name, t.id_board, b.name AS board_name,
-			SUBSTRING(ml.body, 1, 385) AS body, ml.smileys_enabled
+			SUBSTRING(ml.body, 1, 385) AS body, ml.smileys_enabled, COALESCE(a.id_attach, 0) AS id_attach,
+			a.filename, a.attachment_type, mem.avatar, mem.email_address
 		FROM {db_prefix}topics AS t
 			INNER JOIN {db_prefix}boards AS b ON (b.id_board = t.id_board)
 			LEFT JOIN {db_prefix}messages AS mf ON (t.id_first_msg = mf.id_msg)
 			LEFT JOIN {db_prefix}messages AS ml ON (t.id_last_msg = ml.id_msg)
+			LEFT JOIN {db_prefix}attachments AS a ON (a.id_member = ml.id_member)
 			LEFT JOIN {db_prefix}members AS mem ON (mem.id_member = ml.id_member)' . ($latestTopicOptions['id_member'] == 0 ? '' : '
 			LEFT JOIN {db_prefix}log_topics AS lt ON (lt.id_topic = t.id_topic AND lt.id_member = {int:current_member})
 			LEFT JOIN {db_prefix}log_mark_read AS lmr ON (lmr.id_board = t.id_board AND lmr.id_member = {int:current_member})') . '
@@ -393,6 +395,7 @@ function getLastTopics($latestTopicOptions)
 				),
 				'topic' => $row['id_topic'],
 				'poster' => array(
+					'avatar' => determineAvatar($row),
 					'id' => $row['id_member'],
 					'name' => $row['poster_name'],
 					'href' => empty($row['id_member']) ? '' : $poster_href,
