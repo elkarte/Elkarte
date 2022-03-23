@@ -175,6 +175,7 @@ function sendXMLDocument(sUrl, sContent, funcCallback)
 	}
 
 	oSendDoc.open('POST', sUrl, true);
+	oSendDoc.setRequestHeader('X-Requested-With', 'elkarte');
 	if ('setRequestHeader' in oSendDoc)
 	{
 		oSendDoc.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
