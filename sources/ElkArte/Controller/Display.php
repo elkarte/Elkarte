@@ -283,6 +283,12 @@ class Display extends AbstractController
 			'preview_type' => 1,
 		);
 
+		// Load the template basics now as template_layers is requested by the prepare_context event
+		theme()->getTemplates()->load('Display');
+		$this->_template_layers = theme()->getLayers();
+		$this->_template_layers->addEnd('messages_informations');
+		$context['sub_template'] = 'messages';
+
 		// Trigger the prepare_context event for modules that have tied in to it
 		$this->_events->trigger('prepare_context', array('editorOptions' => &$editorOptions, 'use_quick_reply' => !empty($options['display_quick_reply'])));
 
@@ -318,12 +324,6 @@ class Display extends AbstractController
 
 		// Build specialized buttons, like moderation
 		$this->buildModerationButtons();
-
-		// Load the template
-		theme()->getTemplates()->load('Display');
-		$this->_template_layers = theme()->getLayers();
-		$this->_template_layers->addEnd('messages_informations');
-		$context['sub_template'] = 'messages';
 
 		// Let's get nosey, who is viewing this topic?
 		if (!empty($settings['display_who_viewing']))
