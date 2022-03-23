@@ -174,7 +174,7 @@ class SearchRenderer extends Renderer
 		$member = MembersList::get($this->_this_message['id_member']);
 		$output['matches'][] = array(
 			'id' => $this->_this_message['id_msg'],
-			'attachment' => loadAttachmentContext($this->_this_message['id_msg']),
+			'attachment' => [],
 			'alternate' => $this->_counter % 2,
 			'member' => $member,
 			'icon' => $this->_options->icon_sources->getIconName($this->_this_message['icon']),

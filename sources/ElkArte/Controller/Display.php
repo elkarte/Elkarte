@@ -57,9 +57,6 @@ class Display extends AbstractController
 	/** @var int message number to start the listing from */
 	protected $start_from;
 
-	/** @var array attachment array Allows access via events, is only locally used */
-	protected $attachments;
-
 	/**
 	 * Default action handler for this controller, if its called directly
 	 */
@@ -85,7 +82,7 @@ class Display extends AbstractController
 	public function action_display()
 	{
 		global $txt, $modSettings, $context, $settings, $options, $topic, $board;
-		global $attachments, $messages_request;
+		global $messages_request;
 
 		$this->_events->trigger('pre_load', array('_REQUEST' => &$_REQUEST, 'topic' => $topic, 'board' => &$board));
 
@@ -183,25 +180,8 @@ class Display extends AbstractController
 		// If there _are_ messages here... (probably an error otherwise :!)
 		if (!empty($messages))
 		{
-			$this->attachments = [];
-
 			// Mark the board as read or not ... calls updateReadNotificationsFor() sets $context['is_marked_notify']
 			$this->markRead($messages, $board);
-			require_once(SUBSDIR . '/Attachments.subs.php');
-
-			// Fetch attachments.
-			if (!empty($modSettings['attachmentEnable']) && allowedTo('view_attachments'))
-			{
-				// The filter returns false when:
-				//  - the attachment is unapproved, and
-				//  - the viewer is not the poster of the message where the attachment is
-				$this->attachments = getAttachments($messages, $this->includeUnapproved, static function ($attachment_info, $all_posters) {
-					return !(!$attachment_info['approved'] && (!isset($all_posters[$attachment_info['id_msg']]) || $all_posters[$attachment_info['id_msg']] != User::$info->id));
-				}, $all_posters);
-			}
-
-			// Make globally available
-			$attachments = $this->attachments;
 
 			$msg_parameters = array(
 				'message_list' => $messages,

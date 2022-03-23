@@ -168,11 +168,11 @@ class ManageAttachments extends AbstractController
 
 			if (!empty($this->_req->post->attachmentEnable))
 			{
-				enableModules('attachments', array('post'));
+				enableModules('attachments', array('post', 'display'));
 			}
 			else
 			{
-				disableModules('attachments', array('post'));
+				disableModules('attachments', array('post', 'display'));
 			}
 
 			// Default/Manual implies no subdirectories
