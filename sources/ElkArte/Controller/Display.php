@@ -139,7 +139,7 @@ class Display extends AbstractController
 		$this->setupShowAll($can_show_all, $total_visible_posts);
 
 		// Time to place all the particulars into context for the template
-		$this->setMessageContext($topic, $total_visible_posts, $can_show_all);
+		$this->setMessageContext();
 
 		// Calculate the fastest way to get the messages!
 		$ascending = true;
@@ -227,6 +227,7 @@ class Display extends AbstractController
 			if ($this->start_from >= $this->topicinfo['num_replies'])
 			{
 				$this->start_from = $this->topicinfo['num_replies'];
+				$context['start_from'] = $this->start_from;
 			}
 
 			// Since the anchor information is needed on the top of the page we load these variables beforehand.
@@ -617,6 +618,7 @@ class Display extends AbstractController
 			}
 		}
 
+		$this->start_from = $start;
 		$this->_start = $start;
 	}
 
@@ -624,12 +626,8 @@ class Display extends AbstractController
 	 * Sets all we know about a message into $context for template consumption.
 	 * Note: After this processes, some amount of additional context is still added, read
 	 * the code.
-	 *
-	 * @param int $topic the topic id
-	 * @param int $total_visible_posts How many are in this topic
-	 * @param bool $can_show_all If they can show all or need to follow pagination
 	 */
-	public function setMessageContext($topic, $total_visible_posts, $can_show_all)
+	public function setMessageContext()
 	{
 		global $context, $modSettings, $txt, $board_info;
 

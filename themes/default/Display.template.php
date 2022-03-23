@@ -132,7 +132,7 @@ function template_messages()
 		}
 
 		// Show the message anchor and a "new" anchor if this message is new.
-		if ($message['id'] != $context['first_message'] && ($message['first_new']))
+		if (($message['id'] != $context['first_message']) && $message['first_new'])
 		{
 			echo '
 				<a id="new">&nbsp;</a>
