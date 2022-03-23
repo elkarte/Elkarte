@@ -168,14 +168,14 @@ class Display extends AbstractController
 		$all_posters = $topic_details['all_posters'];
 		unset($topic_details);
 
-		call_integration_hook('integrate_display_message_list', array(&$messages, &$posters));
-
 		// Default this topic to not marked for notifications... of course...
 		$context['is_marked_notify'] = false;
 
 		$messages_request = false;
 		$context['first_message'] = 0;
 		$context['first_new_message'] = false;
+
+		call_integration_hook('integrate_display_message_list', array(&$messages, &$posters));
 
 		// If there _are_ messages here... (probably an error otherwise :!)
 		if (!empty($messages))
