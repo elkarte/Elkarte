@@ -54,7 +54,7 @@ class ManageTopics extends AbstractController
 	}
 
 	/**
-	 * Administration page for topics: allows to display and set settings related to topics.
+	 * Administration page for topics: allows the display and set settings related to topics.
 	 *
 	 * What it does:
 	 *
@@ -89,6 +89,16 @@ class ManageTopics extends AbstractController
 			// Save the result!
 			$settingsForm->setConfigValues((array) $this->_req->post);
 			$settingsForm->save();
+
+			// Polls are modules
+			if (!empty($this->_req->post->pollMode))
+			{
+				enableModules('poll', ['post', 'display']);
+			}
+			else
+			{
+				disableModules('poll', ['post', 'display']);
+			}
 
 			// We're done here, pal.
 			redirectexit('action=admin;area=postsettings;sa=topics');
