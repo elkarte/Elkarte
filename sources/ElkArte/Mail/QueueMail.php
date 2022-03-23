@@ -47,6 +47,8 @@ class QueueMail
 			return false;
 		}
 
+		require_once(SUBSDIR . '/Mail.subs.php');
+
 		// How many emails can we send each time we are called in a period
 		$batch_size = $this->setBatchSize($batch_size);
 
@@ -61,7 +63,6 @@ class QueueMail
 		$batch_size = $this->adjustBatchSize($override_limit, $batch_size, $delay);
 
 		// Now we know how many we're sending, let's send them.
-		require_once(SUBSDIR . '/Mail.subs.php');
 		list ($ids, $emails) = emailsInfo($batch_size);
 
 		// Remove these from the queue .... Delete, delete, delete!!!
