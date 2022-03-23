@@ -400,8 +400,10 @@ function QuickModify(oOptions)
 
 	// Show the edit buttons
 	var aShowQuickModify = document.getElementsByClassName(this.opt.sClassName);
-	for (var i = 0, length = aShowQuickModify.length; i < length; i++)
+	for (let i = 0, length = aShowQuickModify.length; i < length; i++)
+	{
 		aShowQuickModify[i].style.display = "inline";
+	}
 }
 
 // Function called when a user presses the edit button.
@@ -412,8 +414,8 @@ QuickModify.prototype.modifyMsg = function (iMessageId)
 	{
 		if (typeof (document.forms[this.opt.sFormRemoveAccessKeys]))
 		{
-			var aInputs = document.forms[this.opt.sFormRemoveAccessKeys].getElementsByTagName('input');
-			for (var i = 0; i < aInputs.length; i++)
+			let aInputs = document.forms[this.opt.sFormRemoveAccessKeys].getElementsByTagName('input');
+			for (let i = 0; i < aInputs.length; i++)
 			{
 				if (aInputs[i].accessKey !== '')
 				{
@@ -441,7 +443,7 @@ QuickModify.prototype.modifyMsg = function (iMessageId)
 // The callback function used for the XMLhttp request retrieving the message.
 QuickModify.prototype.onMessageReceived = function (XMLDoc)
 {
-	var sBodyText = '',
+	let sBodyText = '',
 		sSubjectText;
 
 	// No longer show the 'loading...' sign.
@@ -463,21 +465,19 @@ QuickModify.prototype.onMessageReceived = function (XMLDoc)
 	// If this is not valid then simply give up.
 	if (!document.getElementById(this.sCurMessageId))
 	{
+		console.log('no id');
 		return this.modifyCancel();
 	}
 
 	// Replace the body part.
-	for (var i = 0; i < XMLDoc.getElementsByTagName("message")[0].childNodes.length; i++)
+	for (let i = 0; i < XMLDoc.getElementsByTagName("message")[0].childNodes.length; i++)
 		sBodyText += XMLDoc.getElementsByTagName("message")[0].childNodes[i].nodeValue;
 
 	this.oCurMessageDiv = document.getElementById(this.sCurMessageId);
 	this.sMessageBuffer = this.oCurMessageDiv.innerHTML;
 
-	// We have to force the body to lose its dollar signs thanks to IE.
-	sBodyText = sBodyText.replace(/\$/g, '{&dollarfix;$}');
-
-	// Actually create the content, with a bodge for disappearing dollar signs.
-	this.oCurMessageDiv.innerHTML = this.opt.sTemplateBodyEdit.replace(/%msg_id%/g, this.sCurMessageId.substr(4)).replace(/%body%/, sBodyText).replace(/\{&dollarfix;\$\}/g, '$');
+	// Actually create the content
+	this.oCurMessageDiv.innerHTML = this.opt.sTemplateBodyEdit.replace(/%msg_id%/g, this.sCurMessageId.substr(4)).replace(/%body%/, sBodyText);
 
 	// Save and hide the existing subject div
 	if (this.opt.sIDSubject !== null)
@@ -491,14 +491,14 @@ QuickModify.prototype.onMessageReceived = function (XMLDoc)
 	}
 
 	// Save the info div, then open an input field on it
-	sSubjectText = XMLDoc.getElementsByTagName('subject')[0].childNodes[0].nodeValue.replace(/\$/g, '{&dollarfix;$}');
+	sSubjectText = XMLDoc.getElementsByTagName('subject')[0].childNodes[0].nodeValue;
 	if (this.opt.sIDInfo !== null)
 	{
 		this.oCurInfoDiv = document.getElementById(this.opt.sIDInfo + this.sCurMessageId.substr(4));
 		if (this.oCurInfoDiv !== null)
 		{
 			this.sInfoBuffer = this.oCurInfoDiv.innerHTML;
-			this.oCurInfoDiv.innerHTML = this.opt.sTemplateSubjectEdit.replace(/%subject%/, sSubjectText).replace(/\{&dollarfix;\$\}/g, '$');
+			this.oCurInfoDiv.innerHTML = this.opt.sTemplateSubjectEdit.replace(/%subject%/, sSubjectText);
 		}
 	}
 
@@ -534,7 +534,7 @@ QuickModify.prototype.modifyCancel = function ()
 	// Hide the message icon if we are doing that
 	if (this.opt.sIconHide)
 	{
-		var oCurrentMsgIcon = document.getElementById('msg_icon_' + this.sCurMessageId.replace("msg_", ""));
+		let oCurrentMsgIcon = document.getElementById('msg_icon_' + this.sCurMessageId.replace("msg_", ""));
 
 		if (oCurrentMsgIcon !== null && oCurrentMsgIcon.src.indexOf(this.opt.sIconHide) > 0)
 		{
@@ -550,8 +550,8 @@ QuickModify.prototype.modifyCancel = function ()
 	{
 		if (typeof (document.forms[this.opt.sFormRemoveAccessKeys]))
 		{
-			var aInputs = document.forms[this.opt.sFormRemoveAccessKeys].getElementsByTagName('input');
-			for (var i = 0; i < aInputs.length; i++)
+			let aInputs = document.forms[this.opt.sFormRemoveAccessKeys].getElementsByTagName('input');
+			for (let i = 0; i < aInputs.length; i++)
 			{
 				if (typeof (this.aAccessKeys[aInputs[i].name]) !== 'undefined')
 				{
@@ -567,7 +567,7 @@ QuickModify.prototype.modifyCancel = function ()
 // The function called after a user wants to save his precious message.
 QuickModify.prototype.modifySave = function (sSessionId, sSessionVar)
 {
-	var i = 0,
+	let i = 0,
 		x = [],
 		uIds = [];
 
@@ -584,7 +584,7 @@ QuickModify.prototype.modifySave = function (sSessionId, sSessionVar)
 	{
 		if (typeof (document.forms[this.opt.sFormRemoveAccessKeys]))
 		{
-			var aInputs = document.forms[this.opt.sFormRemoveAccessKeys].getElementsByTagName('input');
+			let aInputs = document.forms[this.opt.sFormRemoveAccessKeys].getElementsByTagName('input');
 			for (i = 0; i < aInputs.length; i++)
 			{
 				if (typeof (this.aAccessKeys[aInputs[i].name]) !== 'undefined')
@@ -595,7 +595,7 @@ QuickModify.prototype.modifySave = function (sSessionId, sSessionVar)
 		}
 	}
 
-	var oInputs = document.forms.quickModForm.getElementsByTagName('input');
+	let oInputs = document.forms.quickModForm.getElementsByTagName('input');
 	for (i = 0; i < oInputs.length; i++)
 	{
 		if (oInputs[i].name === 'uid[]')
@@ -623,7 +623,7 @@ QuickModify.prototype.modifySave = function (sSessionId, sSessionVar)
 // Callback function of the XMLhttp request sending the modified message.
 QuickModify.prototype.onModifyDone = function (XMLDoc)
 {
-	var oErrordiv;
+	let oErrordiv;
 
 	// We've finished the loading stuff.
 	ajax_indicator(false);
@@ -645,7 +645,7 @@ QuickModify.prototype.onModifyDone = function (XMLDoc)
 		return;
 	}
 
-	var message = XMLDoc.getElementsByTagName('elk')[0].getElementsByTagName('message')[0],
+	let message = XMLDoc.getElementsByTagName('elk')[0].getElementsByTagName('message')[0],
 		body = message.getElementsByTagName('body')[0],
 		error = message.getElementsByTagName('error')[0];
 
@@ -655,18 +655,18 @@ QuickModify.prototype.onModifyDone = function (XMLDoc)
 	if (body)
 	{
 		// Show new body.
-		var bodyText = '';
-		for (var i = 0; i < body.childNodes.length; i++)
+		let bodyText = '';
+		for (let i = 0; i < body.childNodes.length; i++)
 			bodyText += body.childNodes[i].nodeValue;
 
-		this.sMessageBuffer = this.opt.sTemplateBodyNormal.replace(/%body%/, bodyText.replace(/\$/g, '{&dollarfix;$}')).replace(/\{&dollarfix;\$\}/g, '$');
+		this.sMessageBuffer = this.opt.sTemplateBodyNormal.replace(/%body%/, bodyText);
 		this.oCurMessageDiv.innerHTML = this.sMessageBuffer;
 
 		// Show new subject div, update in case it changed
-		var oSubject = message.getElementsByTagName('subject')[0],
-			sSubjectText = oSubject.childNodes[0].nodeValue.replace(/\$/g, '{&dollarfix;$}');
+		let oSubject = message.getElementsByTagName('subject')[0],
+			sSubjectText = oSubject.childNodes[0].nodeValue;
 
-		this.sSubjectBuffer = this.opt.sTemplateSubjectNormal.replace(/%subject%/, sSubjectText).replace(/\{&dollarfix;\$\}/g, '$');
+		this.sSubjectBuffer = this.opt.sTemplateSubjectNormal.replace(/%subject%/, sSubjectText);
 		this.oCurSubjectDiv.innerHTML = this.sSubjectBuffer;
 		this.oCurSubjectDiv.style.display = '';
 
@@ -676,7 +676,7 @@ QuickModify.prototype.onModifyDone = function (XMLDoc)
 		// Show this message as 'modified on x by y'.
 		if (this.opt.bShowModify)
 		{
-			var modified_element = document.getElementById('modified_' + this.sCurMessageId.substr(4));
+			let modified_element = document.getElementById('modified_' + this.sCurMessageId.substr(4));
 			modified_element.innerHTML = message.getElementsByTagName('modified')[0].childNodes[0].nodeValue;
 
 			// Just in case it's the first time the message is modified and the element is hidden
@@ -686,7 +686,7 @@ QuickModify.prototype.onModifyDone = function (XMLDoc)
 		// Hide the icon if we were told to
 		if (this.opt.sIconHide !== null)
 		{
-			var oCurrentMsgIcon = document.getElementById('msg_icon_' + this.sCurMessageId.replace("msg_", ""));
+			let oCurrentMsgIcon = document.getElementById('msg_icon_' + this.sCurMessageId.replace("msg_", ""));
 			if (oCurrentMsgIcon !== null && oCurrentMsgIcon.src.indexOf(this.opt.sIconHide) > 0)
 			{
 				this.oMsgIcon.style.display = 'none';
@@ -722,10 +722,12 @@ QuickModify.prototype.onModifyDone = function (XMLDoc)
 		oErrordiv = document.getElementById('error_box');
 		oErrordiv.innerHTML = error.childNodes[0].nodeValue;
 		oErrordiv.style.display = '';
+
 		if (error.getAttribute('in_body') === '1')
 		{
 			$(document.forms.quickModForm.message).addClass('border_error');
 		}
+
 		if (error.getAttribute('in_subject') === '1')
 		{
 			$(document.forms.quickModForm.subject).addClass('border_error');
