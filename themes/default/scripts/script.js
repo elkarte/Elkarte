@@ -962,6 +962,26 @@ elk_Toggle.prototype.init = function ()
 };
 
 /**
+ * This allows the use of html characters in alt/title attributes.
+ *
+ * It simply converts from HTML to text as you can not directly inject
+ * character codes in alt/title as they do not `render`
+ *
+ * @param {string} text
+ * @returns {string}
+ */
+elk_Toggle.prototype.convertHTML = function(text)
+{
+	let span = document.createElement('span');
+
+	span.innerHTML = text;
+	text = span.innerText;
+	span.remove();
+
+	return text;
+};
+
+/**
  * Collapse or expand the section.
  *
  * @param {boolean} bCollapse
@@ -1007,7 +1027,7 @@ elk_Toggle.prototype.changeState = function (bCollapse, bInit)
 					oImage.src = sTargetSource;
 				}
 
-				oImage.alt = oImage.title = bCollapse ? this.opt.aSwapImages[i].altCollapsed : this.opt.aSwapImages[i].altExpanded;
+				oImage.alt = oImage.title = bCollapse ? this.convertHTML(this.opt.aSwapImages[i].altCollapsed) : this.convertHTML(this.opt.aSwapImages[i].altExpanded);
 			}
 		}
 	}
@@ -1027,7 +1047,7 @@ elk_Toggle.prototype.changeState = function (bCollapse, bInit)
 				}
 
 				// And show the new title
-				oContainer.title = oContainer.title = bCollapse ? this.opt.aSwapClasses[i].titleCollapsed : this.opt.aSwapClasses[i].titleExpanded;
+				oContainer.title = oContainer.title = bCollapse ? this.convertHTML(this.opt.aSwapClasses[i].titleCollapsed) : this.convertHTML(this.opt.aSwapClasses[i].titleExpanded);
 			}
 		}
 	}
