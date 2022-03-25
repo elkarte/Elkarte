@@ -142,7 +142,7 @@ class AttachmentsDisplay
 		{
 			foreach ($this->attachments[$id_msg] as $i => $attachment)
 			{
-				if (in_array($attachment['id_attach'], $context['ila_dont_show_attach_below']))
+				if (!empty($context['ila_dont_show_attach_below']) && in_array($attachment['id_attach'], $context['ila_dont_show_attach_below']))
 				{
 					continue;
 				}
