@@ -534,24 +534,6 @@ class Emailuser extends AbstractController
 		Txt::load('Errors');
 		theme()->getTemplates()->load('Emailuser');
 
-		theme()->addInlineJavascript('
-		error_txts[\'post_too_long\'] = ' . JavaScriptEscape($txt['error_post_too_long']) . ';
-
-		var report_errors = new errorbox_handler({
-			self: \'report_errors\',
-			error_box_id: \'report_error\',
-			error_checks: [{
-				code: \'post_too_long\',
-				efunction: function(box_value) {
-					if (box_value.length > 254)
-						return true;
-					else
-						return false;
-				}
-			}],
-			check_id: "report_comment"
-		});', true);
-
 		$context['comment_body'] = $this->_req->getPost('comment', 'trim', '');
 		$context['email_address'] = $this->_req->getPost('email', 'trim', '');
 
