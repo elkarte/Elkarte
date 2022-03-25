@@ -33,6 +33,14 @@ function template_postarea_above()
 		<script>
 			window.addEventListener("pageshow", reActivate, false);';
 
+	if (!empty($context['scroll_to_top']))
+	{
+		echo '
+			$(function() {
+				$("html,body").scrollTop($(\'.category_header:visible:first\').offset().top);
+			});';
+	}
+
 	// Start with message icons - and any missing from this theme.
 	echo '
 			var icon_urls = {';
