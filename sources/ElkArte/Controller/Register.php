@@ -201,19 +201,6 @@ class Register extends AbstractController
 		$context['sub_template'] = $current_step === 1 ? 'registration_agreement' : 'registration_form';
 		$context['page_title'] = $current_step === 1 ? $txt['registration_agreement'] : $txt['registration_form'];
 		loadJavascriptFile(array('register.js', 'mailcheck.min.js'));
-		theme()->addInlineJavascript('disableAutoComplete();
-		$("input[type=email]").on("blur", function(event) {
-			$(this).mailcheck({
-				suggested: function(element, suggestion) {
-				  	$("#suggestion").html("' . $txt['register_did_you'] . ' <b><i>" + suggestion.full + "</b></i>");
-				  	element.addClass("check_input");
-				},
-				empty: function(element) {
-				  	$("#suggestion").html("");
-				  	element.removeClass("check_input");
-				}
-			});
-		});', true);
 
 		// Add the register chain to the link tree.
 		$context['linktree'][] = array(
@@ -1314,19 +1301,6 @@ class Register extends AbstractController
 		else
 		{
 			loadJavascriptFile('mailcheck.min.js');
-			theme()->addInlineJavascript('disableAutoComplete();
-			$("input[type=email]").on("blur", function(event) {
-				$(this).mailcheck({
-					suggested: function(element, suggestion) {
-				  		$("#suggestion").html("' . $txt['register_did_you'] . ' <b><i>" + suggestion.full + "</b></i>");
-				  		element.addClass("check_input");
-					},
-					empty: function(element) {
-						$("#suggestion").html("");
-						element.removeClass("check_input");
-					}
-				});
-			});', true);
 			$context['sub_template'] = 'contact_form';
 			$context['page_title'] = $txt['admin_contact_form'];
 

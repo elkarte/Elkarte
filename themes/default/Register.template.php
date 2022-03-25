@@ -12,12 +12,33 @@
  *
  */
 
+function template_mailcheck_javascript()
+{
+	global $txt;
+
+	theme()->addInlineJavascript('disableAutoComplete();
+	$("input[type=email]").on("blur", function(event) {
+		$(this).mailcheck({
+			suggested: function(element, suggestion) {
+					$("#suggestion").html("' . $txt['register_did_you'] . ' <b><i>" + suggestion.full + "</b></i>");
+					element.addClass("check_input");
+			},
+			empty: function(element) {
+				$("#suggestion").html("");
+				element.removeClass("check_input");
+			}
+		});
+	});', true);
+}
+
 /**
  * Before showing users a registration form, show them the registration agreement.
  */
 function template_registration_agreement()
 {
 	global $context, $txt;
+
+	template_mailcheck_javascript();
 
 	echo '
 		<form action="', getUrl('action', ['action' => 'register']), '" method="post" accept-charset="UTF-8" id="registration">';
@@ -116,6 +137,8 @@ function template_registration_agreement()
 function template_registration_form()
 {
 	global $context, $txt, $modSettings;
+
+	template_mailcheck_javascript();
 
 	theme()->addInlineJavascript('
 		function verifyAgree()
@@ -717,6 +740,8 @@ function template_edit_reserved_words()
 function template_contact_form()
 {
 	global $context, $txt;
+
+	template_mailcheck_javascript();
 
 	echo '
 		<h2 class="category_header">', $txt['admin_contact_form'], '</h2>
