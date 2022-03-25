@@ -373,45 +373,7 @@ class ProfileOptions extends AbstractController
 			setupProfileContext($fields['fields'], $fields['hook']);
 
 			loadJavascriptFile('qrcode.js');
-			theme()->addInlineJavascript('
-				var secret = document.getElementById("otp_secret").value;
-
-				if (secret)
-				{
-					var qrcode = new QRCode("qrcode", {
-						text: "otpauth://totp/' . $context['forum_name'] . '?secret=" + secret,
-						width: 100,
-						height: 100,
-						colorDark : "#000000",
-						colorLight : "#ffffff",
-					});
-				}
-
-				/**
-				* Generate a secret key for Google Authenticator
-				*/
-				function generateSecret() {
-					var text = "",
-						possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZ234567",
-						qr = document.getElementById("qrcode");
-
-					for (var i = 0; i < 16; i++)
-						text += possible.charAt(Math.floor(Math.random() * possible.length));
-
-					document.getElementById("otp_secret").value = text;
-
-					while (qr.firstChild) {
-						qr.removeChild(qr.firstChild);
-					}
-
-					var qrcode = new QRCode("qrcode", {
-						text: "otpauth://totp/' . $context['forum_name'] . '?secret=" + text,
-						width: 100,
-						height: 100,
-						colorDark: "#000000",
-						colorLight: "#ffffff",
-					});
-				}', true);
+			$context['load_google_authenticator'] = true;
 		}
 		else
 		{
