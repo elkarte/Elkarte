@@ -17,7 +17,7 @@
  */
 function template_ProfileInfo_init()
 {
-	global $settings;
+	global $settings, $context;
 
 	// This piece is used to style attachments awaiting approval in the list
 	$settings['attachments_awaiting_approval'] = '{attachment_link}&nbsp;(<em>{txt_awaiting}</em>)';
@@ -27,6 +27,10 @@ function template_ProfileInfo_init()
 	$settings['attachments_on_summary'] = 10;
 
 	theme()->getTemplates()->load('GenericMessages');
+	if (!empty($context['start_tabs']))
+	{
+		theme()->addInlineJavascript('start_tabs();', true);
+	}
 }
 
 /**
