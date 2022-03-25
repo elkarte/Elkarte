@@ -20,6 +20,10 @@ use ElkArte\Util;
 function template_Display_init()
 {
 	theme()->getTemplates()->load('GenericMessages');
+	if (!empty($context['likes']))
+	{
+		template_load_likes_button();
+	}
 }
 
 /**
@@ -107,22 +111,6 @@ function template_messages()
 
 	$context['quick_reply_removableMessageIDs'] = array();
 	$context['quick_reply_ignoredMsgs'] = array();
-
-	if (!empty($context['likes']))
-	{
-		// Initiate likes and the tooltips for likes
-		theme()->addInlineJavascript('
-			$(function() {
-				var likePostInstance = likePosts.prototype.init({
-					oTxt: ({
-						likeHeadingError : ' . JavaScriptEscape($txt['like_heading_error']) . ',
-						error_occurred : ' . JavaScriptEscape($txt['error_occurred']) . '
-					}),
-				});
-
-				$(".react_button, .unreact_button, .reacts_button").SiteTooltip();
-			});', true);
-	}
 
 	// Get all the messages...
 	$reset = isset($context['reset_renderer']);

@@ -89,14 +89,7 @@ class Display extends AbstractModule
 		{
 			require_once(SUBSDIR . '/Likes.subs.php');
 			$context['likes'] = loadLikes($messages, true);
-
-			// ajax controller for likes
-			loadJavascriptFile('like_posts.js', array('defer' => true));
-			theme()->addJavascriptVar(array(
-				'likemsg_are_you_sure' => JavaScriptEscape($txt['likemsg_are_you_sure']),
-			));
-			// This one is needed to load have some strings handy for likes errors
-			Txt::load('Errors');
+			theme()->getLayers()->addBefore('load_likes_button', 'body');
 		}
 	}
 

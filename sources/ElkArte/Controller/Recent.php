@@ -396,38 +396,10 @@ class Recent extends AbstractController implements FrontpageInterface
 			require_once(SUBSDIR . '/Likes.subs.php');
 			$likes = loadLikes($messages, true);
 
-			$this->_likesJS();
+			theme()->getLayers()->addBefore('load_likes_button', 'body');
 		}
 
 		return $likes;
-	}
-
-	/**
-	 * Load in the JS for likes functionality
-	 */
-	private function _likesJS()
-	{
-		global $txt;
-
-		// ajax controller for likes
-		loadJavascriptFile('like_posts.js', array('defer' => true));
-		theme()->addJavascriptVar(array(
-			'likemsg_are_you_sure' => JavaScriptEscape($txt['likemsg_are_you_sure']),
-		));
-		Txt::load('Errors');
-
-		// Initiate likes and the tooltips for likes
-		theme()->addInlineJavascript('
-			$(function() {
-				var likePostInstance = likePosts.prototype.init({
-					oTxt: ({
-						likeHeadingError : ' . JavaScriptEscape($txt['like_heading_error']) . ',
-						error_occurred : ' . JavaScriptEscape($txt['error_occurred']) . '
-					}),
-				});
-
-				$(".react_button, .unreact_button, .reacts_button").SiteTooltip();
-			});', true);
 	}
 
 	/**
