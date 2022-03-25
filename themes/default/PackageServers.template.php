@@ -456,6 +456,9 @@ function template_ftp_form_required()
 {
 	global $context, $txt, $scripturl;
 
+	// Prevent browsers from auto completing the FTP password
+	theme()->addInlineJavascript('disableAutoComplete();', true);
+
 	echo '
 		<h2 class="category_header">', $txt['package_ftp_necessary'], '</h2>
 		<div class="content">
