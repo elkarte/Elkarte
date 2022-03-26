@@ -3754,7 +3754,7 @@ ul.post_options li {
 	vertical-align: middle;
 }
 
-.abort, .remove, .share {
+.abort, .remove, .share, .ila {
 	float: right;
 	padding: 4px 5px 2px 5px;
 	max-width: 1em;
@@ -3762,7 +3762,7 @@ ul.post_options li {
 	border-radius: 4px;
 }
 
-.share {
+.share, .ila {
 	float: none;
 }
 
