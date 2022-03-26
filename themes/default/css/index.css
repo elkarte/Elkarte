@@ -1639,10 +1639,9 @@ a.bbc_link {
 	padding: 5px 5px 0 5px;
 }
 
-.buttonlist li {
-	float: left;
-	margin: 0 0 0 4px;
+.buttonlist > li {
 	line-height: 2.231em;
+	display: inline-block;
 }
 
 /* @todo - Save code by amalgamating common button background declarations. */
@@ -3755,7 +3754,7 @@ ul.post_options li {
 	vertical-align: middle;
 }
 
-.abort, .remove, .share {
+.abort, .remove, .share, .ila {
 	float: right;
 	padding: 4px 5px 2px 5px;
 	max-width: 1em;
@@ -3763,7 +3762,7 @@ ul.post_options li {
 	border-radius: 4px;
 }
 
-.share {
+.share, .ila {
 	float: none;
 }
 

@@ -9,7 +9,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.1.7
+ * @version 1.1.9
  *
  */
 
@@ -626,10 +626,6 @@ function template_button_strip($button_strip, $direction = '', $strip_options = 
 
 	if (!is_array($strip_options))
 		$strip_options = array();
-
-	// List the buttons in reverse order for RTL languages.
-	if ($context['right_to_left'])
-		$button_strip = array_reverse($button_strip, true);
 
 	// Create the buttons... now with cleaner markup (yay!).
 	$buttons = array();

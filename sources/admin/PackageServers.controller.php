@@ -12,7 +12,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.1.4
+ * @version 1.1.9
  *
  */
 
@@ -484,7 +484,7 @@ class PackageServers_Controller extends Action_Controller
 		if (!is_array($context['package']))
 			throw new Elk_Exception('package_cant_download', false);
 
-		if ($context['package']['type'] === 'modification')
+		if ($context['package']['type'] === 'modification' || $context['package']['type'] === 'addon')
 			$context['package']['install']['link'] = '<a class="linkbutton" href="' . $scripturl . '?action=admin;area=packages;sa=install;package=' . $context['package']['filename'] . '">' . $txt['install_mod'] . '</a>';
 		elseif ($context['package']['type'] === 'avatar')
 			$context['package']['install']['link'] = '<a class="linkbutton" href="' . $scripturl . '?action=admin;area=packages;sa=install;package=' . $context['package']['filename'] . '">' . $txt['use_avatars'] . '</a>';
@@ -623,7 +623,7 @@ class PackageServers_Controller extends Action_Controller
 			}
 		}
 
-		if ($context['package']['type'] === 'modification')
+		if ($context['package']['type'] === 'modification' || $context['package']['type'] === 'addon')
 			$context['package']['install']['link'] = '<a class="linkbutton" href="' . $scripturl . '?action=admin;area=packages;sa=install;package=' . $context['package']['filename'] . '">' . $txt['install_mod'] . '</a>';
 		elseif ($context['package']['type'] === 'avatar')
 			$context['package']['install']['link'] = '<a class="linkbutton" href="' . $scripturl . '?action=admin;area=packages;sa=install;package=' . $context['package']['filename'] . '">' . $txt['use_avatars'] . '</a>';

@@ -12,7 +12,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.1.8
+ * @version 1.1.9
  *
  */
 
@@ -149,7 +149,8 @@ function sendmail($to, $subject, $message, $from = null, $message_id = null, $se
 	$return_path = (!empty($modSettings['maillist_sitename_address']) ? $modSettings['maillist_sitename_address'] : (empty($modSettings['maillist_mail_from']) ? $webmaster_email : $modSettings['maillist_mail_from']));
 
 	// Return path, date, mailer
-	$headers .= 'Return-Path: ' . $return_path . $line_break;
+	if ($use_sendmail)
+		$headers .= 'Return-Path: <' . $return_path . '>' . $line_break;
 	$headers .= 'Date: ' . gmdate('D, d M Y H:i:s') . ' -0000' . $line_break;
 	$headers .= 'X-Mailer: ELK' . $line_break;
 
@@ -468,6 +469,9 @@ function mimespecialchars($string, $with_charset = true, $hotmail_fix = false, $
 	// Convert all special characters to HTML entities...just for Hotmail :-\
 	if ($hotmail_fix)
 	{
+		// Remove this special character
+		$string = str_replace("\x00", '', $string);
+
 		// Convert all 'special' characters to HTML entities.
 		return array($charset, preg_replace_callback('~([\x80-\x{10FFFF}])~u', 'entityConvert', $string), '7bit');
 	}
@@ -649,6 +653,7 @@ function smtp_mail($mail_to_array, $subject, $message, $headers, $priority, $mes
 	$need_break = substr($headers, -1) === "\n" || substr($headers, -1) === "\r" ? false : true;
 	$real_headers = $headers;
 	$line_break = "\r\n";
+	$return_path = (!empty($modSettings['maillist_sitename_address']) ? $modSettings['maillist_sitename_address'] : (empty($modSettings['maillist_mail_from']) ? $webmaster_email : $modSettings['maillist_mail_from']));
 
 	// !! Theoretically, we should be able to just loop the RCPT TO.
 	$mail_to_array = array_values($mail_to_array);
@@ -682,7 +687,7 @@ function smtp_mail($mail_to_array, $subject, $message, $headers, $priority, $mes
 		}
 
 		// From, to, and then start the data...
-		if (!server_parse('MAIL FROM: <' . (empty($modSettings['maillist_mail_from']) ? $webmaster_email : $modSettings['maillist_mail_from']) . '>', $socket, '250'))
+		if (!server_parse('MAIL FROM: <' . $return_path . '>', $socket, '250'))
 			return false;
 		if (!server_parse('RCPT TO: <' . $mail_to . '>', $socket, '250'))
 			return false;
