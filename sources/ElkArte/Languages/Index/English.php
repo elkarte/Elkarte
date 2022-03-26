@@ -929,3 +929,5 @@ $txt['invalid_otptoken'] = 'Time-based One-time Password is invalid';
 $txt['otp_used'] = 'Time-based One-time Password already used.<br /> Please wait a moment and use the next code.';
 $txt['otp_generate'] = 'Generate';
 $txt['otp_show_qr'] = 'Show QR-Code';
+
+$txt['other'] = 'Other';
