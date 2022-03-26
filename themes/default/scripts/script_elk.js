@@ -29,7 +29,7 @@ function elk_codefix()
 		var $this = $(this);
 
 		// If it has a scroll bar, allow the user to resize it vertically
-		if ($this.get(0).scrollHeight > $this.innerHeight()) {
+		if ($this.get(0).scrollHeight > Math.round($this.innerHeight())) {
 			$this.css('height', $this.height());
 			$this.css('max-height', 'none');
 		}
