@@ -1639,10 +1639,9 @@ a.bbc_link {
 	padding: 5px 5px 0 5px;
 }
 
-.buttonlist li {
-	float: left;
-	margin: 0 0 0 4px;
+.buttonlist > li {
 	line-height: 2.231em;
+	display: inline-block;
 }
 
 /* @todo - Save code by amalgamating common button background declarations. */
