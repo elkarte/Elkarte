@@ -972,11 +972,11 @@ function template_display_attachments($message, $ignoring)
 
 		if ($attachment['is_image'])
 		{
-			if ($attachment['thumbnail']['has_thumb'])
+			if ($attachment['has_thumb'])
 			{
 				echo '
-											<a href="', $attachment['href'], ';image" id="link_', $attachment['id'], '" ', $attachment['thumbnail']['lightbox'], '>
-												<img class="attachment_image" src="', $attachment['thumbnail']['href'], '" alt="" id="thumb_', $attachment['id'], '" />
+											<a href="', $attachment['href'], ';image" id="link_', $attachment['id'], '" ', 'data-lightboxmessage="' . $message['id'] . '" data-lightboximage="' . $attachment['id'] . '"', '>
+												<img class="attachment_image" src="', $attachment['thumbnail_href'], '" alt="" id="thumb_', $attachment['id'], '" />
 											</a>';
 			}
 			else
