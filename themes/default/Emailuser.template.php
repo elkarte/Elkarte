@@ -19,7 +19,7 @@ function template_Emailuser_init()
 {
 	global $context, $txt;
 
-	if ($context['sub_template'] == 'report')
+	if (!empty($context['sub_template']) && $context['sub_template'] == 'report')
 	{
 		theme()->addInlineJavascript('
 		error_txts[\'post_too_long\'] = ' . JavaScriptEscape($txt['error_post_too_long']) . ';

@@ -532,7 +532,6 @@ class Emailuser extends AbstractController
 		// Show the inputs for the comment, etc.
 		Txt::load('Post');
 		Txt::load('Errors');
-		theme()->getTemplates()->load('Emailuser');
 
 		$context['comment_body'] = $this->_req->getPost('comment', 'trim', '');
 		$context['email_address'] = $this->_req->getPost('email', 'trim', '');
@@ -542,6 +541,7 @@ class Emailuser extends AbstractController
 		$context['message_id'] = $message_id;
 		$context['page_title'] = $txt['report_to_mod'];
 		$context['sub_template'] = 'report';
+		theme()->getTemplates()->load('Emailuser');
 	}
 
 	/**
