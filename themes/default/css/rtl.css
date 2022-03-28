@@ -488,10 +488,12 @@ dl.settings img {
  *	$BOARDS
  * -------------------------------------------------------
  */
+
 /* The board categories and newsfader - some shared styling. */
 .icon_anchor {
 	float: right;
 	padding: 2px 0 0 6px;
+	transform: scaleX(-1);
 }
 
 .board_stats {

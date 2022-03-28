@@ -707,7 +707,7 @@ function template_topic_replies_below()
 				<div class="postarea2" id="msg', $post['id'], '">
 					<div class="keyinfo">
 						<h5>
-							<span>', $txt['posted_by'], '</span> ', $post['poster'], ' - ', $post['time'], '
+							', $txt['posted_by'], ' <span class="name">', $post['poster'], '</span> &ndash; ', $post['html_time'], '
 						</h5>';
 
 			if ($context['can_quote'])
@@ -735,7 +735,7 @@ function template_topic_replies_below()
 			}
 
 			echo '
-					<div class="messageContent" id="msg_', $post['id'], '_body">', $post['body'], '</div>
+					<section class="messageContent" id="msg_', $post['id'], '_body">', $post['body'], '</section>
 				</div>
 			</div>';
 		}
