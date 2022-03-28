@@ -77,7 +77,6 @@ class DisplayRenderer extends Renderer
 		$output = parent::_buildOutputArray();
 		$href = getUrl('topic', ['topic' => $topic, 'start' => 'msg' . $this->_this_message['id_msg'], 'subject' => $this->_this_message['subject']]) . '#msg' . $this->_this_message['id_msg'];
 		$output += array(
-			'attachment' => loadAttachmentContext($this->_this_message['id_msg']),
 			'href' => $href,
 			'link' => '<a href="' . $href . '" rel="nofollow">' . $this->_this_message['subject'] . '</a>',
 			'icon' => $this->_options->icon_sources->getIconName($this->_this_message['icon']),

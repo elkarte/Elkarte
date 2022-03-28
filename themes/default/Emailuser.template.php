@@ -13,6 +13,35 @@
  */
 
 /**
+ * The report subtemplate needs some error stuff
+ */
+function template_Emailuser_init()
+{
+	global $context, $txt;
+
+	if (!empty($context['sub_template']) && $context['sub_template'] == 'report')
+	{
+		theme()->addInlineJavascript('
+		error_txts[\'post_too_long\'] = ' . JavaScriptEscape($txt['error_post_too_long']) . ';
+
+		var report_errors = new errorbox_handler({
+			self: \'report_errors\',
+			error_box_id: \'report_error\',
+			error_checks: [{
+				code: \'post_too_long\',
+				efunction: function(box_value) {
+					if (box_value.length > 254)
+						return true;
+					else
+						return false;
+				}
+			}],
+			check_id: "report_comment"
+		});', true);
+	}
+}
+
+/**
  * This is where we get information about who they want to send the topic to, etc.
  *
  * The template gets shown from:

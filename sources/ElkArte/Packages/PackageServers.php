@@ -220,9 +220,6 @@ class PackageServers extends AbstractController
 
 			// Announce the template it's time to display the ftp connection box.
 			$context['package_download_broken'] = true;
-
-			// Prevent browsers from auto completing the FTP password
-			theme()->addInlineJavascript('disableAutoComplete();', true);
 		}
 		else
 		{
@@ -891,9 +888,6 @@ class PackageServers extends AbstractController
 		// Give FTP a chance...
 		if ($context['package_download_broken'])
 		{
-			// Prevent browsers from auto completing the FTP password
-			theme()->addInlineJavascript('disableAutoComplete();', true);
-
 			$this->ftp_connect();
 		}
 	}

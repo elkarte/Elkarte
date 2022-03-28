@@ -681,16 +681,6 @@ class PersonalMessage extends AbstractController
 
 		if ($messages_request !== false && $messages_request->hasResults())
 		{
-			// Auto video embedding enabled, someone may have a link in a PM
-			if (!empty($modSettings['enableVideoEmbeding']))
-			{
-				theme()->addInlineJavascript('
-					$(function() {
-						$().linkifyvideo(oEmbedtext);
-					});', true
-				);
-			}
-
 			if (!empty($context['show_delete']))
 			{
 				theme()->getLayers()->addEnd('pm_pages_and_buttons');

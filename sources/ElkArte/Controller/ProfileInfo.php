@@ -147,7 +147,7 @@ class ProfileInfo extends AbstractController
 
 		// To make tabs work, we need jQueryUI
 		$modSettings['jquery_include_ui'] = true;
-		theme()->addInlineJavascript('start_tabs();', true);
+		$context['start_tabs'] = true;
 		loadCSSFile('jquery.ui.tabs.css');
 	}
 

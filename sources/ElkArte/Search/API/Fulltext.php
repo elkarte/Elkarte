@@ -205,10 +205,10 @@ class Fulltext extends Standard
 		}
 
 		// Modifiers such as specific user or specific board.
-		$query_where += $this->queryWhereModifiers($query_params);
+		$query_where = array_merge($query_where, $this->queryWhereModifiers($query_params));
 
 		// Modifiers to exclude words from the subject
-		$query_where += $this->queryExclusionModifiers($query_params, $search_data);
+		$query_where = array_merge($query_where, $this->queryExclusionModifiers($query_params, $search_data));
 
 		if (!empty($modSettings['search_simple_fulltext']))
 		{

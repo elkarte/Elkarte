@@ -54,7 +54,7 @@
 				// Set the subAction to what they are doing
 				if (check.indexOf('unreact_button') >= 0)
 				{
-					if (!confirm(likemsg_are_you_sure))
+					if (!confirm(oTxt.are_you_sure))
 					{
 						return;
 					}

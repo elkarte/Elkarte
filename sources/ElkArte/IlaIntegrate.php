@@ -40,7 +40,6 @@ class IlaIntegrate
 		// $hook, $function, $file
 		return array(
 			array('integrate_additional_bbc', '\\ElkArte\\IlaIntegrate::integrate_additional_bbc'),
-			array('integrate_before_prepare_display_context', '\\ElkArte\\IlaIntegrate::integrate_before_prepare_display_context'),
 			array('integrate_post_bbc_parser', '\\ElkArte\\IlaIntegrate::integrate_post_parser')
 		);
 	}
@@ -382,34 +381,6 @@ class IlaIntegrate
 			$context['ila_dont_show_attach_below'][] = $num;
 			$context['ila_dont_show_attach_below'] = array_unique($context['ila_dont_show_attach_below']);
 		};
-	}
-
-	/**
-	 * Display controller hook, called from prepareDisplayContext_callback integrate_before_prepare_display_context
-	 *
-	 * What it does:
-	 *
-	 * - Drops attachments from the message if they were rendered inline
-	 *
-	 * @param mixed[] $message
-	 */
-	public static function integrate_before_prepare_display_context(&$message)
-	{
-		global $context, $attachments;
-
-		if (empty($context['ila_dont_show_attach_below']) || empty($attachments[$message['id_msg']]))
-		{
-			return;
-		}
-
-		// If the attachment has been used inline, drop it so its not shown below the message as well
-		foreach ($attachments[$message['id_msg']] as $id => $attachcheck)
-		{
-			if (in_array($attachcheck['id_attach'], $context['ila_dont_show_attach_below']))
-			{
-				unset($attachments[$message['id_msg']][$id]);
-			}
-		}
 	}
 
 	/**

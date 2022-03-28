@@ -57,9 +57,6 @@ class Display extends AbstractController
 	/** @var int message number to start the listing from */
 	protected $start_from;
 
-	/** @var array attachment array Allows access via events, is only locally used */
-	protected $attachments;
-
 	/**
 	 * Default action handler for this controller, if its called directly
 	 */
@@ -85,7 +82,7 @@ class Display extends AbstractController
 	public function action_display()
 	{
 		global $txt, $modSettings, $context, $settings, $options, $topic, $board;
-		global $attachments, $messages_request;
+		global $messages_request;
 
 		$this->_events->trigger('pre_load', array('_REQUEST' => &$_REQUEST, 'topic' => $topic, 'board' => &$board));
 
@@ -171,33 +168,20 @@ class Display extends AbstractController
 		$all_posters = $topic_details['all_posters'];
 		unset($topic_details);
 
-		call_integration_hook('integrate_display_message_list', array(&$messages, &$posters));
-
 		// Default this topic to not marked for notifications... of course...
 		$context['is_marked_notify'] = false;
 
-		// Mark the board as read or not ... calls updateReadNotificationsFor() sets $context['is_marked_notify']
-		$this->markRead($messages, $board);
+		$messages_request = false;
+		$context['first_message'] = 0;
+		$context['first_new_message'] = false;
+
+		call_integration_hook('integrate_display_message_list', array(&$messages, &$posters));
 
 		// If there _are_ messages here... (probably an error otherwise :!)
 		if (!empty($messages))
 		{
-			$this->attachments = [];
-			require_once(SUBSDIR . '/Attachments.subs.php');
-
-			// Fetch attachments.
-			if (!empty($modSettings['attachmentEnable']) && allowedTo('view_attachments'))
-			{
-				// The filter returns false when:
-				//  - the attachment is unapproved, and
-				//  - the viewer is not the poster of the message where the attachment is
-				$this->attachments = getAttachments($messages, $this->includeUnapproved, static function ($attachment_info, $all_posters) {
-					return !(!$attachment_info['approved'] && (!isset($all_posters[$attachment_info['id_msg']]) || $all_posters[$attachment_info['id_msg']] != User::$info->id));
-				}, $all_posters);
-			}
-
-			// Make globally available
-			$attachments = $this->attachments;
+			// Mark the board as read or not ... calls updateReadNotificationsFor() sets $context['is_marked_notify']
+			$this->markRead($messages, $board);
 
 			$msg_parameters = array(
 				'message_list' => $messages,
@@ -216,8 +200,6 @@ class Display extends AbstractController
 			}
 
 			// Load in the likes for this group of messages
-			$this->loadLikeFunction($messages);
-
 			// If using quick reply, load the user into context for the poster area
 			$this->prepareQuickReply();
 
@@ -232,12 +214,6 @@ class Display extends AbstractController
 			// Since the anchor information is needed on the top of the page we load these variables beforehand.
 			$context['first_message'] = $messages[$firstIndex] ?? $messages[0];
 			$context['first_new_message'] = (int) $this->_start === (int) $this->start_from;
-		}
-		else
-		{
-			$messages_request = false;
-			$context['first_message'] = 0;
-			$context['first_new_message'] = false;
 		}
 
 		// Are we showing the signatures?
@@ -259,15 +235,6 @@ class Display extends AbstractController
 
 		// Load up the Quick ModifyTopic and Quick Reply scripts
 		loadJavascriptFile('topic.js');
-
-		// Auto video embedding enabled?
-		if (!empty($modSettings['enableVideoEmbeding']))
-		{
-			theme()->addInlineJavascript('
-		$(function() {
-			$().linkifyvideo(oEmbedtext);
-		});');
-		}
 
 		// Create the editor for the QR area
 		$editorOptions = array(
@@ -808,42 +775,6 @@ class Display extends AbstractController
 				require_once(SUBSDIR . '/Boards.subs.php');
 				markBoardsRead($board, false, false);
 			}
-		}
-	}
-
-	/**
-	 * If likes are on, this sets the JS in motion.
-	 *
-	 * @param array $messages
-	 */
-	public function loadLikeFunction($messages)
-	{
-		global $modSettings, $context, $txt;
-
-		if (!empty($modSettings['likes_enabled']))
-		{
-			require_once(SUBSDIR . '/Likes.subs.php');
-			$context['likes'] = loadLikes($messages, true);
-
-			// ajax controller for likes
-			loadJavascriptFile('like_posts.js', array('defer' => true));
-			theme()->addJavascriptVar(array(
-				'likemsg_are_you_sure' => JavaScriptEscape($txt['likemsg_are_you_sure']),
-			));
-			Txt::load('Errors');
-
-			// Initiate likes and the tooltips for likes
-			theme()->addInlineJavascript('
-				$(function() {
-					var likePostInstance = likePosts.prototype.init({
-						oTxt: ({
-							likeHeadingError : ' . JavaScriptEscape($txt['like_heading_error']) . ',
-							error_occurred : ' . JavaScriptEscape($txt['error_occurred']) . '
-						}),
-					});
-
-					$(".react_button, .unreact_button, .reacts_button").SiteTooltip();
-				});', true);
 		}
 	}
 

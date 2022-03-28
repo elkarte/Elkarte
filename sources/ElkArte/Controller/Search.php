@@ -480,7 +480,6 @@ class Search extends AbstractController
 				'search_index' => !empty($modSettings['search_index']) ? $modSettings['search_index'] : '',
 				'banned_words' => empty($modSettings['search_banned_words']) ? array() : explode(',', $modSettings['search_banned_words']),
 			));
-
 			$context['topics'] = $this->_search->searchQuery(
 				new SearchApiWrapper($search_config, $this->_search->getSearchParams())
 			);

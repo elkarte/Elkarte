@@ -751,7 +751,9 @@ function template_control_chmod()
 	</script>';
 
 	// Make sure the button gets generated last.
+	// Prevent browsers from auto completing the FTP password
 	theme()->addInlineJavascript('
+		disableAutoComplete();
 		generateFTPTest();', true);
 }
 

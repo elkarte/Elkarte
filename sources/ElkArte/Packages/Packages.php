@@ -185,9 +185,6 @@ class Packages extends AbstractController
 		$create_chmod_control = new PackageChmod();
 		$create_chmod_control->createChmodControl();
 
-		// Prevent browsers from auto completing the FTP password
-		theme()->addInlineJavascript('disableAutoComplete();', true);
-
 		// Make sure our temp directory exists and is empty.
 		if (file_exists(BOARDDIR . '/packages/temp'))
 		{
