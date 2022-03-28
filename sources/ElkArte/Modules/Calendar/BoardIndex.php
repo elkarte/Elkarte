@@ -57,6 +57,7 @@ class BoardIndex extends AbstractModule
 			'num_days_shown' => empty($modSettings['cal_days_for_index']) || $modSettings['cal_days_for_index'] < 1 ? 1 : $modSettings['cal_days_for_index'],
 		);
 
+		$this->event->trigger('pre_load', ['eventOptions' => $eventOptions]);
 		$context += Cache::instance()->quick_get('calendar_index_offset_' . ($this->user->time_offset + $modSettings['time_offset']), 'subs/Calendar.subs.php', 'cache_getRecentEvents', array($eventOptions));
 
 		// Whether one or multiple days are shown on the board index.
