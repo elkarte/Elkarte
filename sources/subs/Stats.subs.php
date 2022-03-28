@@ -176,6 +176,7 @@ function topPosters($limit = null)
 	foreach ($top_posters as $i => $poster)
 	{
 		$top_posters[$i]['post_percent'] = round(($poster['num_posts'] * 100) / $max_num_posts);
+		$top_posters[$i]['percent'] = round(($poster['num_posts'] * 100) / $max_num_posts);
 		$top_posters[$i]['num_posts'] = comma_format($top_posters[$i]['num_posts']);
 	}
 
@@ -256,6 +257,7 @@ function topBoards($limit = null, $read_status = false)
 	foreach ($top_boards as $i => $board)
 	{
 		$top_boards[$i]['post_percent'] = round(($board['num_posts'] * 100) / $max_num_posts);
+		$top_boards[$i]['percent'] = round(($board['num_posts'] * 100) / $max_num_posts);
 		$top_boards[$i]['num_posts'] = comma_format($top_boards[$i]['num_posts']);
 		$top_boards[$i]['num_topics'] = comma_format($top_boards[$i]['num_topics']);
 	}
@@ -328,6 +330,7 @@ function topTopicReplies($limit = 10)
 				'subject' => censor($row['subject']),
 				'num_replies' => comma_format($row['num_replies']),
 				'post_percent' => round(($row['num_replies'] * 100) / $max_num_replies),
+				'percent' => round(($row['num_replies'] * 100) / $max_num_replies),
 				'num_views' => $row['num_views'],
 				'href' => $href,
 				'link' => '<a href="' . $href . '">' . $row['subject'] . '</a>'
@@ -442,6 +445,7 @@ function topTopicViews($limit = null)
 	foreach ($top_topics_views as $i => $topic)
 	{
 		$top_topics_views[$i]['post_percent'] = round(($topic['num_views'] * 100) / $max_num_views);
+		$top_topics_views[$i]['percent'] = round(($topic['num_views'] * 100) / $max_num_views);
 		$top_topics_views[$i]['num_views'] = comma_format($top_topics_views[$i]['num_views']);
 	}
 
@@ -512,6 +516,7 @@ function topTopicStarter()
 				'id' => $row['id_member'],
 				'num_topics' => comma_format($members[$row['id_member']]),
 				'post_percent' => round(($members[$row['id_member']] * 100) / $max_num_topics),
+				'percent' => round(($members[$row['id_member']] * 100) / $max_num_topics),
 				'href' => $href,
 				'link' => '<a href="' . $href . '">' . $row['real_name'] . '</a>'
 			);
@@ -609,6 +614,7 @@ function topTimeOnline()
 	foreach ($top_time_online as $i => $member)
 	{
 		$top_time_online[$i]['time_percent'] = round(($member['seconds_online'] * 100) / $max_time_online);
+		$top_time_online[$i]['percent'] = round(($member['seconds_online'] * 100) / $max_time_online);
 	}
 
 	// Cache the ones we found for a bit, just so we don't have to look again.
@@ -864,15 +870,17 @@ function UserStatsMostPostedBoard($memID, $limit = 10)
 	)->fetch_callback(
 		function ($row) use (&$popular_boards, $memID) {
 			$href = getUrl('board', ['board' => $row['id_board'], 'start' => '0', 'name' => $row['name']]);
-			$posts = MembersList::get($memID)->posts;
+			$posts = (int) MembersList::get($memID)->posts;
 
 			// Build the board details that this member is responsible for
 			$popular_boards[$row['id_board']] = array(
 				'id' => $row['id_board'],
 				'posts' => $row['message_count'],
+				'name' => $row['name'],
 				'href' => $href,
 				'link' => '<a href="' . $href . '">' . $row['name'] . '</a>',
-				'posts_percent' => $posts == 0 ? 0 : ($row['message_count'] * 100) / $posts,
+				'posts_percent' => $posts === 0 ? 0 : ($row['message_count'] * 100) / $posts,
+				'percent' => $posts === 0 ? 0 : ($row['message_count'] * 100) / $posts,
 				'total_posts' => $row['num_posts'],
 				'total_posts_member' => $posts,
 			);
@@ -926,6 +934,7 @@ function UserStatsMostActiveBoard($memID, $limit = 10)
 			'id' => $row['id_board'],
 			'posts' => $row['message_count'],
 			'href' => $href,
+			'name' => $row['name'],
 			'link' => '<a href="' . $href . '">' . $row['name'] . '</a>',
 			'percent' => comma_format($percentage, 2),
 			'posts_percent' => $percentage,
@@ -963,6 +972,7 @@ function UserStatsPostingTime($memID)
 			'hour_format' => stripos(User::$info->time_format, '%p') === false ? $hour : date('g a', mktime($hour)),
 			'posts' => 0,
 			'posts_percent' => 0,
+			'percent' => 0,
 			'relative_percent' => 0,
 		);
 	}
@@ -1003,6 +1013,7 @@ function UserStatsPostingTime($memID)
 		$posts_by_time[$hour] = array_merge($posts_by_time[$hour], array(
 			'posts' => comma_format($num),
 			'posts_percent' => round(($num * 100) / $totalPosts),
+			'percent' => round(($num * 100) / $totalPosts),
 			'relative_percent' => round(($num * 100) / $maxPosts),
 		));
 	}

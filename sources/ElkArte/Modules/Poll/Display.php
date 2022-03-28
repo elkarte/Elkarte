@@ -24,22 +24,14 @@ use ElkArte\Modules\AbstractModule;
  */
 class Display extends AbstractModule
 {
-	/**
-	 * If polls are enabled
-	 *
-	 * @var bool
-	 */
+	/** @var bool If polls are enabled */
 	protected static $_enabled = false;
 
-	/**
-	 * Poll id to work with
-	 *
-	 * @var int
-	 */
+	/** @var int Poll id to work with */
 	protected $_id_poll = 0;
 
 	/**
-	 * {@inheritdoc }
+	 * {@inheritdoc}
 	 */
 	public static function hooks(EventManager $eventsManager)
 	{
@@ -48,6 +40,7 @@ class Display extends AbstractModule
 		$return = array(
 			array('topicinfo', array('\\ElkArte\\Modules\\Poll\\Display', 'topicinfo'), array('topicinfo')),
 		);
+
 		self::$_enabled = !empty($modSettings['pollMode']);
 		if (self::$_enabled && allowedTo('poll_view'))
 		{

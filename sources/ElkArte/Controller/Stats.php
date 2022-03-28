@@ -70,8 +70,8 @@ class Stats extends AbstractController
 		// Just a lil' help from our friend :P
 		require_once(SUBSDIR . '/Stats.subs.php');
 
-		// Handle the XMLHttpRequest.
-		if (isset($this->_req->query->xml))
+		// Handle the Ajax request.
+		if ($this->getApi() === 'xml')
 		{
 			if (empty($year) || empty($month))
 			{
@@ -84,8 +84,12 @@ class Stats extends AbstractController
 				obExit(false);
 			}
 
+			$template_layers = theme()->getLayers();
+			$template_layers->removeAll();
 			$context['sub_template'] = 'stats';
+
 			getDailyStats('YEAR(date) = {int:year} AND MONTH(date) = {int:month}', array('year' => $year, 'month' => $month));
+
 			$context['yearly'][$year]['months'][$month]['date'] = array(
 				'month' => sprintf('%02d', $month),
 				'year' => $year,
@@ -118,7 +122,7 @@ class Stats extends AbstractController
 		// Call each area of statics to load our friend $context
 		$this->loadGeneralStatistics();
 		$this->loadTopStatistics();
-		$this->loadMontlyActivity();
+		$this->loadMonthlyActivity();
 
 		// Custom stats (just add a template_layer or another callback to add it to the page!)
 		call_integration_hook('integrate_forum_stats');
@@ -135,29 +139,30 @@ class Stats extends AbstractController
 
 		$year = '';
 		$month = '';
+		$expand = $this->_req->getQuery('expand', 'trim');
+		$collapse = $this->_req->getQuery('collapse', 'trim');
+		$calData = $expand ?? $collapse;
 
-		if (!empty($this->_req->query->expand))
+		// No data, nothing to do
+		if (!isset($calData))
 		{
-			$context['robot_no_index'] = true;
-
-			$month = (int) substr($this->_req->query->expand, 4);
-			$year = (int) substr($this->_req->query->expand, 0, 4);
-			if ($year > 1900 && $year < 2200 && $month >= 1 && $month <= 12)
-			{
-				$_SESSION['expanded_stats'][$year][] = $month;
-			}
+			return [$year, $month];
 		}
-		// Done looking at the details and want to fold it back up
-		elseif (!empty($this->_req->query->collapse))
-		{
-			$context['robot_no_index'] = true;
 
-			$month = (int) substr($this->_req->query->collapse, 4);
-			$year = (int) substr($this->_req->query->collapse, 0, 4);
-			if (!empty($_SESSION['expanded_stats'][$year]))
-			{
-				$_SESSION['expanded_stats'][$year] = array_diff($_SESSION['expanded_stats'][$year], array($month));
-			}
+		// Extract the values
+		$month = (int) substr($calData, 4);
+		$year = (int) substr($calData, 0, 4);
+		$context['robot_no_index'] = true;
+
+		if (!empty($expand) && $year > 1900 && $year < 2200 && $month >= 1 && $month <= 12)
+		{
+			$_SESSION['expanded_stats'][$year][] = $month;
+		}
+
+		// Done looking at the details and want to fold it back up
+		if (!empty($collapse) && !empty($_SESSION['expanded_stats'][$year]))
+		{
+			$_SESSION['expanded_stats'][$year] = array_diff($_SESSION['expanded_stats'][$year], array($month));
 		}
 
 		return array($year, $month);
@@ -222,7 +227,7 @@ class Stats extends AbstractController
 	}
 
 	/**
-	 * Loads in the the "top" statistics
+	 * Loads in the "top" statistics
 	 *
 	 * What it does:
 	 *
@@ -256,7 +261,7 @@ class Stats extends AbstractController
 	/**
 	 * Load the huge table of activity by month
 	 */
-	public function loadMontlyActivity()
+	public function loadMonthlyActivity()
 	{
 		global $context;
 

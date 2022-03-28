@@ -320,7 +320,7 @@ function template_build_poster_div($message, $ignoring = false)
 		elseif (!$context['can_send_pm'] && !empty($modSettings['onlineEnable']) && !$message['member']['is_guest'])
 		{
 			// Are we showing the warning status?
-			if (!$message['member']['is_guest'] && $message['member']['can_see_warning'])
+			if (!$message['member']['is_guest'] && !empty($message['member']['can_see_warning']))
 			{
 				$iconClass = 'warnicon i-warning-' . $message['member']['warning_status'];
 				$poster_div .= '

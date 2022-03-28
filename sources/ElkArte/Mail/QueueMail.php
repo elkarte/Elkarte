@@ -47,6 +47,8 @@ class QueueMail
 			return false;
 		}
 
+		require_once(SUBSDIR . '/Mail.subs.php');
+
 		// How many emails can we send each time we are called in a period
 		$batch_size = $this->setBatchSize($batch_size);
 
