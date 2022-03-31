@@ -724,16 +724,6 @@ function template_quickreply_below()
 					sSessionVar: elk_session_var,
 					sAction: "messageicons;board=', $context['current_board'], '" ,
 					sLabelIconList: "', $txt['message_icon'], '",
-					sBoxBackground: "transparent",
-					sBoxBackgroundHover: "#ffffff",
-					iBoxBorderWidthHover: 1,
-					sBoxBorderColorHover: "#adadad" ,
-					sContainerBackground: "#ffffff",
-					sContainerBorder: "1px solid #adadad",
-					sItemBorder: "1px solid #ffffff",
-					sItemBorderHover: "1px dotted gray",
-					sItemBackground: "transparent",
-					sItemBackgroundHover: "#e0e0f0"
 				});';
 
 	if (!empty($context['quick_reply_ignoredMsgs']))

@@ -45,12 +45,16 @@ var ua = navigator.userAgent.toLowerCase(),
 function fetchDocument(sUrl, funcCallback, sType)
 {
 	sType = sType || 'xml';
+	oCaller = this;
 
 	fetch(sUrl, {
 		credentials: 'same-origin',
 		method: 'GET',
 		mode: 'cors',
 		cache: 'default',
+		headers: {
+			'X-Requested-With': 'elkarte'
+		},
 	})
 	// Process the response as xml, json or plain text
 	.then(response => {
@@ -82,7 +86,7 @@ function fetchDocument(sUrl, funcCallback, sType)
 	.then(data => {
 		if (typeof (funcCallback) !== 'undefined')
 		{
-			funcCallback.call(this, data);
+			funcCallback.call(oCaller, data);
 		}
 
 		return data;
@@ -1406,20 +1410,9 @@ JumpTo.prototype.fillSelect = function (aBoardsAndCategories)
  *	sAction:
  *	sLabelIconList:
  *
- * The following are style elements that can be passed
- *	sBoxBackground:
- *	sBoxBackgroundHover:
- *	iBoxBorderWidthHover:
- *	sBoxBorderColorHover:
- *	sContainerBackground:
- *	sContainerBorder:
- *	sItemBorder:
- *	sItemBorderHover:
- *	sItemBackground:
- *	sItemBackgroundHover:
- *
  * @param {object} oOptions
  */
+
 // A global array containing all IconList objects.
 var aIconLists = [];
 
@@ -1428,7 +1421,6 @@ function IconList(oOptions)
 	this.opt = oOptions;
 	this.bListLoaded = false;
 	this.oContainerDiv = null;
-	this.funcMousedownHandler = null;
 	this.funcParent = this;
 	this.iCurMessageId = 0;
 	this.iCurTimeout = 0;
@@ -1445,19 +1437,19 @@ function IconList(oOptions)
 // Replace all message icons by icons with hoverable and clickable div's.
 IconList.prototype.initIcons = function ()
 {
-	for (var i = document.images.length - 1, iPrefixLength = this.opt.sIconIdPrefix.length; i >= 0; i--)
+	for (let i = document.images.length - 1, iPrefixLength = this.opt.sIconIdPrefix.length; i >= 0; i--)
+	{
 		if (document.images[i].id.substr(0, iPrefixLength) === this.opt.sIconIdPrefix)
 		{
-			setOuterHTML(document.images[i], '<div class="dropdown" title="' + this.opt.sLabelIconList + '" onclick="' + this.opt.sBackReference + '.openPopup(this, ' + document.images[i].id.substr(iPrefixLength) + ')" onmouseover="' + this.opt.sBackReference + '.onBoxHover(this, true)" onmouseout="' + this.opt.sBackReference + '.onBoxHover(this, false)" style="background: ' + this.opt.sBoxBackground + ';"><img src="' + document.images[i].src + '" alt="' + document.images[i].alt + '" id="' + document.images[i].id + '" /></div>');
+			setOuterHTML(document.images[i], '<div class="dropdown" title="' + this.opt.sLabelIconList + '" onclick="' + this.opt.sBackReference + '.openPopup(this, ' + document.images[i].id.substr(iPrefixLength) + ')" onmouseover="' + this.opt.sBackReference + '.onBoxHover(this, true)" onmouseout="' + this.opt.sBackReference + '.onBoxHover(this, false)"><img src="' + document.images[i].src + '" alt="' + document.images[i].alt + '" id="' + document.images[i].id + '" /></div>');
 		}
+	}
 };
 
 // Event for the mouse hovering over the original icon.
 IconList.prototype.onBoxHover = function (oDiv, bMouseOver)
 {
-	oDiv.style.border = bMouseOver ? this.opt.iBoxBorderWidthHover + 'px solid ' + this.opt.sBoxBorderColorHover : '';
-	oDiv.style.background = bMouseOver ? this.opt.sBoxBackgroundHover : this.opt.sBoxBackground;
-	oDiv.style.padding = bMouseOver ? (2 - this.opt.iBoxBorderWidthHover) + 'px' : '2px';
+	/* Do something spectacular on hover, or not */
 };
 
 // Show the list of icons after the user clicked the original icon.
@@ -1471,11 +1463,7 @@ IconList.prototype.openPopup = function (oDiv, iMessageId)
 		this.oContainerDiv = document.createElement('div');
 		this.oContainerDiv.id = 'iconList';
 		this.oContainerDiv.style.display = 'none';
-		this.oContainerDiv.style.cursor = 'pointer';
 		this.oContainerDiv.style.position = 'absolute';
-		this.oContainerDiv.style.background = this.opt.sContainerBackground;
-		this.oContainerDiv.style.border = this.opt.sContainerBorder;
-		this.oContainerDiv.style.padding = '6px 0px';
 		document.body.appendChild(this.oContainerDiv);
 
 		// Start to fetch its contents.
@@ -1486,7 +1474,8 @@ IconList.prototype.openPopup = function (oDiv, iMessageId)
 	}
 
 	// Set the position of the container.
-	var aPos = elk_itemPos(oDiv);
+	// @todo why not make it a child of the existing div
+	let aPos = elk_itemPos(oDiv);
 
 	this.oContainerDiv.style.top = (aPos[1] + oDiv.offsetHeight) + 'px';
 	this.oContainerDiv.style.left = (aPos[0] - 1) + 'px';
@@ -1494,7 +1483,7 @@ IconList.prototype.openPopup = function (oDiv, iMessageId)
 
 	if (this.bListLoaded)
 	{
-		this.oContainerDiv.style.display = 'block';
+		this.oContainerDiv.style.display = 'flex';
 	}
 
 	document.body.addEventListener('mousedown', this.onWindowMouseDown, false);
@@ -1503,14 +1492,16 @@ IconList.prototype.openPopup = function (oDiv, iMessageId)
 // Setup the list of icons once it is received through xmlHTTP.
 IconList.prototype.onIconsReceived = function (oXMLDoc)
 {
-	var icons = oXMLDoc.getElementsByTagName('elk')[0].getElementsByTagName('icon'),
+	let icons = oXMLDoc.getElementsByTagName('elk')[0].getElementsByTagName('icon'),
 		sItems = '';
 
-	for (var i = 0, n = icons.length; i < n; i++)
-		sItems += '<span onmouseover="' + this.opt.sBackReference + '.onItemHover(this, true)" onmouseout="' + this.opt.sBackReference + '.onItemHover(this, false);" onmousedown="' + this.opt.sBackReference + '.onItemMouseDown(this, \'' + icons[i].getAttribute('value') + '\');" style="padding: 2px 3px; line-height: 20px; border: ' + this.opt.sItemBorder + '; background: ' + this.opt.sItemBackground + '"><img src="' + icons[i].getAttribute('url') + '" alt="' + icons[i].getAttribute('name') + '" title="' + icons[i].firstChild.nodeValue + '" style="vertical-align: middle" /></span>';
+	for (let i = 0, n = icons.length; i < n; i++)
+	{
+		sItems += '<span class="messageIcon" onmouseover="' + this.opt.sBackReference + '.onItemHover(this, true)" onmouseout="' + this.opt.sBackReference + '.onItemHover(this, false);" onmousedown="' + this.opt.sBackReference + '.onItemMouseDown(this, \'' + icons[i].getAttribute('value') + '\');"><img src="' + icons[i].getAttribute('url') + '" alt="' + icons[i].getAttribute('name') + '" title="' + icons[i].firstChild.nodeValue + '" /></span>';
+	}
 
 	this.oContainerDiv.innerHTML = sItems;
-	this.oContainerDiv.style.display = 'block';
+	this.oContainerDiv.style.display = 'flex';
 	this.bListLoaded = true;
 
 	ajax_indicator(false);
@@ -1519,9 +1510,6 @@ IconList.prototype.onIconsReceived = function (oXMLDoc)
 // Event handler for hovering over the icons.
 IconList.prototype.onItemHover = function (oDiv, bMouseOver)
 {
-	oDiv.style.background = bMouseOver ? this.opt.sItemBackgroundHover : this.opt.sItemBackground;
-	oDiv.style.border = bMouseOver ? this.opt.sItemBorderHover : this.opt.sItemBorder;
-
 	if (this.iCurTimeout !== 0)
 	{
 		window.clearTimeout(this.iCurTimeout);
@@ -1543,21 +1531,12 @@ IconList.prototype.onItemMouseDown = function (oDiv, sNewIcon)
 	if (this.iCurMessageId !== 0)
 	{
 		ajax_indicator(true);
-		this.tmpMethod = getXMLDocument;
-		var oXMLDoc = this.tmpMethod(elk_prepareScriptUrl(elk_scripturl) + 'action=jsmodify;topic=' + this.opt.iTopicId + ';msg=' + this.iCurMessageId + ';' + elk_session_var + '=' + elk_session_id + ';icon=' + sNewIcon + ';api=xml');
+
+		// Allow this to be the current IconList in the callback
+		this.tmpMethod = fetchDocument;
+		this.oDiv = oDiv;
+		this.tmpMethod(elk_prepareScriptUrl(elk_scripturl) + 'action=jsmodify;topic=' + this.opt.iTopicId + ';msg=' + this.iCurMessageId + ';' + elk_session_var + '=' + elk_session_id + ';icon=' + sNewIcon + ';api=xml', this.onIconResponse);
 		delete this.tmpMethod;
-		ajax_indicator(false);
-
-		var oMessage = oXMLDoc.responseXML.getElementsByTagName('elk')[0].getElementsByTagName('message')[0];
-		if (oMessage.getElementsByTagName('error').length === 0)
-		{
-			if ((this.opt.bShowModify && oMessage.getElementsByTagName('modified').length !== 0) && (document.getElementById('modified_' + this.iCurMessageId) !== null))
-			{
-				document.getElementById('modified_' + this.iCurMessageId).innerHTML = oMessage.getElementsByTagName('modified')[0].childNodes[0].nodeValue;
-			}
-
-			this.oClickedIcon.getElementsByTagName('img')[0].src = oDiv.getElementsByTagName('img')[0].src;
-		}
 	}
 	else
 	{
@@ -1569,10 +1548,33 @@ IconList.prototype.onItemMouseDown = function (oDiv, sNewIcon)
 	}
 };
 
+/**
+ * Callback when clicking on a new icon
+ *
+ * @param oXMLDoc
+ */
+IconList.prototype.onIconResponse = function (oXMLDoc)
+{
+	ajax_indicator(false);
+
+	let oMessage = oXMLDoc.getElementsByTagName('elk')[0].getElementsByTagName('message')[0];
+	if (oMessage.getElementsByTagName('error').length === 0)
+	{
+		// Update last modified on
+		if ((this.opt.bShowModify && oMessage.getElementsByTagName('modified').length !== 0) && (document.getElementById('modified_' + this.iCurMessageId) !== null))
+		{
+			document.getElementById('modified_' + this.iCurMessageId).innerHTML = oMessage.getElementsByTagName('modified')[0].childNodes[0].nodeValue;
+		}
+
+		// Swap the icon
+		this.oClickedIcon.getElementsByTagName('img')[0].src = this.oDiv.getElementsByTagName('img')[0].src;
+	}
+};
+
 // Event handler for clicking outside the list (will make the list disappear).
 IconList.prototype.onWindowMouseDown = function ()
 {
-	for (var i = aIconLists.length - 1; i >= 0; i--)
+	for (let i = aIconLists.length - 1; i >= 0; i--)
 	{
 		aIconLists[i].funcParent.tmpMethod = aIconLists[i].collapseList;
 		aIconLists[i].funcParent.tmpMethod();

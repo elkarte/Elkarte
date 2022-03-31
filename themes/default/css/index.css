@@ -1043,9 +1043,7 @@ a.bbc_link {
 
 /* Spinner and close button */
 #ajax_in_progress a, #ajax_in_progress span {
-	width: var(--font20);
 	margin-left: 1em;
-	vertical-align: bottom;
 	text-decoration: underline;
 }
 
@@ -3082,7 +3080,33 @@ aside > .poster {
 	margin: 0 auto;
 	padding: 2px;
 	cursor: pointer;
-	vertical-align: top
+	vertical-align: top;
+	border: 1px solid;
+}
+
+.keyinfo .messageicon .dropdown:hover {
+	padding: 2px;
+}
+
+/* This div and items are added by javascript for the icon selection */
+#iconList {
+	display: flex;
+	align-items: center;
+	padding: 4px 6px 2px 6px;
+	border: 1px solid;
+}
+
+#iconList > .messageIcon {
+	padding: 2px 3px;
+	border: 1px solid;
+}
+
+#iconList > .messageIcon > img {
+	height: 18px;
+}
+
+#iconList > .messageIcon:hover {
+	border: 1px dotted;
 }
 
 /* The actual message, what the entire software package is about */
@@ -4038,7 +4062,6 @@ dl.merge_topic dd {
 
 .profile_content {
 	overflow: auto;
-	padding: 0 8px;
 }
 
 .profile_content.attachment_thumb {

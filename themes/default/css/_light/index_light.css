@@ -119,8 +119,8 @@
 	--category_header_grad_3: #E4E4E4; /* 1-4 secondary */
 	--category_header_grad_4: #EBEBEB; /* end of */
 
-	--topnav_grad_1: transparent; /* Top Menu nav bar background */
-	--topnav_grad_2: transparent; /* Top Menu nav bar background */
+	--menu_nav_grad_1: transparent; /* Top Menu nav bar background */
+	--menu_nav_grad_2: transparent; /* Top Menu nav bar background */
 
 	--border_focus: #999999; /* Hover and focus for inputs */
 	--primary_border: #CCCCCC; /* Main border color used around most everything that has a border */
@@ -477,11 +477,9 @@ sup.bbc_footnotes, sup.bbc_footnotes a {
 
 /* The "Loading" bar for quick edit, etc. */
 #ajax_in_progress, .ajax_infobar {
-	color: var(--top_section_border);
+	color: var(--body_text);
 	border-bottom-color: var(--top_section_border);
 	background: var(--content-background);
-	background-position: 6px 50%;
-	background-size: 20px 20px;
 }
 
 #ajax_in_progress a {
@@ -507,7 +505,7 @@ sup.bbc_footnotes, sup.bbc_footnotes a {
 }
 
 #menu_nav {
-	background-image: linear-gradient(to bottom, var(--topnav_grad_1) 0%, var(--topnav_grad_2) 49%, var(--topnav_grad_2) 51%, var(--topnav_grad_1) 100%);
+	background-image: linear-gradient(to bottom, var(--menu_nav_grad_1) 0%, var(--menu_nav_grad_2) 49%, var(--menu_nav_grad_2) 51%, var(--menu_nav_grad_1) 100%);
 }
 
 #search_form select {
@@ -1152,6 +1150,31 @@ sup.bbc_footnotes, sup.bbc_footnotes a {
 
 .keyinfo h5 a, .keyinfo h5 a strong {
 	color: var(--topic_name);
+}
+
+/* The icon selection dropdown you get by clicking on the icon in message view */
+.keyinfo .messageicon .dropdown {
+	background: var(--transparent);
+	border-color: var(--transparent);
+}
+
+.keyinfo .messageicon .dropdown:hover {
+	background: var(--transparent);
+}
+
+/* This div and items are added by javascript for the icon selection */
+#iconList {
+	border-color: #ADADAD;
+	background: var(--content-background);
+}
+
+#iconList > .messageIcon {
+	border-color: var(--content-background);
+}
+
+#iconList > .messageIcon:hover {
+	border-color: var(--menu_border_hover);
+	background: var(--menu_hover_background);
 }
 
 .messageContent {
