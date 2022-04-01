@@ -1321,8 +1321,8 @@ nav.breadcrumb {
 
 /* The icon selection dropdown you get by clicking on the icon in message view */
 .keyinfo .messageicon .dropdown {
-	background: var(--transparent);
 	border-color: var(--transparent);
+	background: var(--transparent);
 }
 
 .keyinfo .messageicon .dropdown:hover {

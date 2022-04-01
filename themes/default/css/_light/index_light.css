@@ -1154,8 +1154,8 @@ sup.bbc_footnotes, sup.bbc_footnotes a {
 
 /* The icon selection dropdown you get by clicking on the icon in message view */
 .keyinfo .messageicon .dropdown {
-	background: var(--transparent);
 	border-color: var(--transparent);
+	background: var(--transparent);
 }
 
 .keyinfo .messageicon .dropdown:hover {

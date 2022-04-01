@@ -3437,6 +3437,7 @@ footer .signature {
 /* The QR textarea */
 #quickReplyOptions .quickreply {
 	height: 150px;
+	padding: 0 4px;
 	outline: none;
 }
 
