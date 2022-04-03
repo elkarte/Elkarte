@@ -575,10 +575,10 @@
 }
 
 /* The expand / collapse triangles, done as simple geometry */
-legend {
+legend::before {
 	background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='black' fill-opacity='.7' viewBox='0 0 32 32'%3E%3Cpolygon points='0 16, 32 16, 16 32'/%3E%3C/svg%3E");
 }
-.collapsed legend {
+.collapsed legend::before {
 	background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='black' fill-opacity='.7' viewBox='0 0 32 32'%3E%3Cpolygon points='16 0, 16 32, 32 16'/%3E%3C/svg%3E");
 }
 
@@ -681,7 +681,7 @@ legend {
 .i-warning-watch,
 .i-check::before, .i-post_moderation_allow::before,
 .i-dot-green,
-.collapsed legend, legend {
+.collapsed legend::before, legend::before {
 	filter: invert(57%) sepia(47%) saturate(608%) hue-rotate(73deg) brightness(95%) contrast(80%);
 	--hexcode: #4CAF50;
 }

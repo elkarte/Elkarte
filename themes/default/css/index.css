@@ -171,15 +171,16 @@ body, input, button, select, textarea, .editor {
 legend {
 	font-size: var(--font16);
 	margin-left: 15px;
-	padding: 0 0 2px 20px;
 	cursor: pointer;
-	background-repeat: no-repeat;
-	background-position: 0 0;
-	background-size: 16px 16px;
 }
 
-.collapsed legend {
-	background-position: 0 4px;
+legend::before, .collapsed legend::before {
+	display: inline-block;
+	content: "";
+	width: 16px;
+	height: 16px;
+	background-repeat: no-repeat;
+	padding: 0 0 0 1em;
 }
 
 /* Tables should show empty cells. */
