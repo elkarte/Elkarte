@@ -432,8 +432,7 @@ class Gd2 extends AbstractManipulator
 
 	/**
 	 * Simple function to generate an image containing some text.
-	 * It uses preferentially Imagick if present, otherwise GD.
-	 * Font and size are fixed.
+	 * Attempts to scale the font such that it fits inside the bounds
 	 *
 	 * @param string $text The text the image should contain
 	 * @param int $width Width of the final image

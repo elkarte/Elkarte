@@ -421,7 +421,7 @@ class Imagick extends AbstractManipulator
 
 	/**
 	 * Function to generate an image containing some text.
-	 * It uses Imagick, Font and size are fixed to fit within width
+	 * Attempts to adjust font size to fit within bounds
 	 *
 	 * @param string $text The text the image should contain
 	 * @param int $width Width of the final image
