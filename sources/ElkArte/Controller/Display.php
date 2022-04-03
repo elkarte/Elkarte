@@ -23,7 +23,6 @@ use ElkArte\MessagesCallback\BodyParser\Normal;
 use ElkArte\MessagesCallback\DisplayRenderer;
 use ElkArte\MessagesDelete;
 use ElkArte\MessageTopicIcons;
-use ElkArte\Languages\Txt;
 use ElkArte\User;
 use ElkArte\ValuesContainer;
 
