@@ -20,10 +20,6 @@ use ElkArte\Util;
 function template_Display_init()
 {
 	theme()->getTemplates()->load('GenericMessages');
-	if (!empty($context['likes']))
-	{
-		template_load_likes_button();
-	}
 }
 
 /**
