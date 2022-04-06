@@ -875,6 +875,12 @@ class Theme extends BaseTheme
 			$this->addCSSRules('
 		.wrapper {width: ' . $settings['forum_width'] . ';}');
 		}
+
+		// Localization for the show more quote
+		$this->addCSSRules('
+		input[type=checkbox].quote-show-more:after {
+			content: "' . $txt['post_options'] . '";
+		}');
 	}
 
 	/**
