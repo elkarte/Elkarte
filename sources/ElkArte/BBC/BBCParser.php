@@ -713,7 +713,7 @@ class BBCParser
 			}
 
 			// Not allowed in this parent, replace the tags or show it like regular text
-			if (isset($possible[Codes::ATTR_DISALLOW_PARENTS], $possible[Codes::ATTR_DISALLOW_PARENTS][$this->inside_tag[Codes::ATTR_TAG]]))
+			if (isset($possible[Codes::ATTR_DISALLOW_PARENTS][$this->inside_tag[Codes::ATTR_TAG]]))
 			{
 				if (!isset($possible[Codes::ATTR_DISALLOW_BEFORE], $possible[Codes::ATTR_DISALLOW_AFTER]))
 				{
@@ -732,6 +732,12 @@ class BBCParser
 
 		// +1 for [, then the length of the tag, then a space
 		$this->pos1 = $this->pos + 1 + $possible[Codes::ATTR_LENGTH] + 1;
+
+		// If we need to reset content attr, this is where we step in
+		if (isset($possible[Codes::ATTR_RESET]))
+		{
+			$possible[Codes::ATTR_CONTENT] = $possible[Codes::ATTR_RESET];
+		}
 
 		// This is long, but it makes things much easier and cleaner.
 		if (!empty($possible[Codes::ATTR_PARAM]))
@@ -1606,6 +1612,9 @@ class BBCParser
 	}
 
 	/**
+	 * Substitutes parameter attribute values in to the tag context
+	 * e.g. tag width={width} => tag width=300px
+	 *
 	 * @param array $possible
 	 * @param array $matches
 	 *
@@ -1767,6 +1776,6 @@ class BBCParser
 	 */
 	protected function filterData(array &$tag, &$data)
 	{
-		$tag[Codes::ATTR_VALIDATE]($data, $this->bbc->getDisabled());
+		$tag[Codes::ATTR_VALIDATE]($data, $this->bbc->getDisabled(), $tag);
 	}
 }
