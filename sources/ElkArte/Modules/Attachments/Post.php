@@ -505,6 +505,7 @@ class Post extends AbstractModule
 							$this->_saved_attach_id[] = $attachmentOptions['thumb'];
 						}
 
+						$msgOptions['body'] = preg_replace('~\[attachurl(?:.*?)\]' . $attachment['public_attachid'] . '\[\/attachurl\]~', '[attachurl]' . $attachmentOptions['id'] . '[/attachurl]', $msgOptions['body']);
 						$msgOptions['body'] = preg_replace('~\[attach(.*?)\]' . $attachment['public_attachid'] . '\[\/attach\]~', '[attach$1]' . $attachmentOptions['id'] . '[/attach]', $msgOptions['body']);
 					}
 				}
