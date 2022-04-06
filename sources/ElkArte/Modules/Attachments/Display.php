@@ -71,6 +71,6 @@ class Display extends AbstractModule
 	 */
 	public static function integrate_prepare_display_context(&$output, &$this_message, $counter)
 	{
-		$output['attachment'] = self::$attachments->loadAttachmentContext($this_message['id_msg']);
+		[$output['attachment'], $output['ila']] = self::$attachments->loadAttachmentContext($this_message['id_msg']);
 	}
 }
