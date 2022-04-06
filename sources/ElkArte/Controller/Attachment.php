@@ -288,10 +288,19 @@ class Attachment extends AbstractController
 		$filename = null;
 
 		// Make sure some attachment was requested!
-		if (!isset($this->_req->query->attach) && !isset($this->_req->query->id))
+		if (!isset($this->_req->query->attach))
 		{
-			// Give them the old can't find it image
-			$this->action_no_attach();
+			if (!isset($this->_req->query->id))
+			{
+				// Give them the old can't find it image
+				$this->action_text_to_image('attachment_not_found');
+			}
+
+			if ($this->_req->query->id === 'ila')
+			{
+				// Give them the old can't touch this
+				$this->action_text_to_image('awaiting_approval', 90, 90, true);
+			}
 		}
 
 		// We need to do some work on attachments and avatars.
@@ -369,8 +378,8 @@ class Attachment extends AbstractController
 
 		if (empty($attachment))
 		{
-			// Exit via no_attach
-			$this->action_no_attach();
+			// Exit via action_text_to_image
+			$this->action_text_to_image('attachment_not_found');
 		}
 
 		$id_folder = $attachment['id_folder'] ?? '';
@@ -427,26 +436,27 @@ class Attachment extends AbstractController
 	}
 
 	/**
-	 * Generates a language image based on text for display, outputs image and exits
+	 * Generates a language image based on text for display, outputs that image and exits
 	 *
-	 * @param null|string $text
+	 * @param null|string $text if null will use default attachment not found string
+	 * @param int $width If set, defines the width of the image, text font size will be scaled to fit
+	 * @param int $height If set, defines the height of the image
+	 * @param bool $split If true will break text strings so all words are separated by newlines
 	 * @throws \ElkArte\Exceptions\Exception
 	 */
-	public function action_no_attach($text = null)
+	public function action_text_to_image($text = null, $width = 200, $height = 75, $split = false)
 	{
 		global $txt;
 
-		if ($text === null)
-		{
-			new ThemeLoader();
-			Txt::load('Errors');
-			$text = $txt['attachment_not_found'];
-		}
+		new ThemeLoader();
+		Txt::load('Errors');
+		$text = $text === null ? $txt['attachment_not_found'] : $txt[$text] ?? $text;
+		$text = $split ? str_replace(' ', "\n", $text) : $text;
 
 		try
 		{
 			$img = new TextImage($text);
-			$img = $img->generate(200);
+			$img = $img->generate($width, $height);
 		}
 		catch (\Exception $e)
 		{
@@ -615,7 +625,7 @@ class Attachment extends AbstractController
 		// Make sure some attachment was requested!
 		if (!isset($this->_req->query->attach))
 		{
-			$this->action_no_attach();
+			$this->action_text_to_image('attachment_not_found');
 		}
 
 		// We will need some help
@@ -642,8 +652,8 @@ class Attachment extends AbstractController
 				$attachment = getAttachmentFromTopic($id_attach, $topic);
 				if (empty($attachment))
 				{
-					// Exit via no_attach
-					$this->action_no_attach();
+					// Exit via action_text_to_image
+					$this->action_text_to_image('attachment_not_found');
 				}
 
 				// Save some typing
