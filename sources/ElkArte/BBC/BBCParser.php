@@ -1271,25 +1271,34 @@ class BBCParser
 	{
 		$end = 0;
 		$start_len = 29; // '<div class="quote-read-more">';
-		$end_len = 53; // '<input type="checkbox" class="quote-show-more"></div>'
+		$end_len = 19; // '</blockquote></div>'
+		$input_len = 47; // '<input type="checkbox" class="quote-show-more">'
 
 		// While we have parent quotes, lets test the content length.
 		while ($start = stripos($this->message, '<div class="quote-read-more">', $end))
 		{
 			// End of the parent wrapper
-			$end = stripos($this->message, '<input type="checkbox" class="quote-show-more"></div>', $start + $start_len);
+			$end = stripos($this->message, '</blockquote></div>', $start + $start_len);
 			if ($end === false)
 			{
 				break;
 			}
 
-			// How much text is inside this parent
-			if (strlen(strip_tags(substr($this->message, $start, $end - $start))) < $this->read_more_length)
+			// How much text, or newlines, are inside this parent
+			$quote = substr($this->message, $start, $end - $start);
+			if (substr_count($quote, '<br />') < 6 && strlen(strip_tags($quote)) < $this->read_more_length)
 			{
-				// Not so chatty, remove the wrapper
-				$this->message = substr_replace($this->message, '', $end, $end_len);
+				// Not so chatty, first remove the input quote-show-more
+				$input_start = stripos($this->message, '<input type="checkbox" class="quote-show-more">', $start + $start_len);
+				$this->message = substr_replace($this->message, '', $input_start, $input_len);
+				$end -= $input_len;
+
+				// Now remove the outer div quote-read-more wrapper
+				$this->message = substr_replace($this->message, '</blockquote>', $end, $end_len);
 				$this->message = substr_replace($this->message, '', $start, $start_len);
-				$end = $end - $start_len - $start_len;
+
+				// The end is closer than you may think (</div> = 6)
+				$end -= $start_len - 6;
 			}
 		}
 	}
