@@ -15,7 +15,7 @@ namespace ElkArte;
 
 class AttachmentsDisplay
 {
-	/** @var The good old attachments array */
+	/** @var array The good old attachments array */
 	protected $messages = [];
 
 	/** @var mixed[] The good old attachments array */
@@ -29,7 +29,7 @@ class AttachmentsDisplay
 	 * @param int[] $posters
 	 * @param bool $includeUnapproved
 	 */
-	public function __construct($messages, $posters,  $includeUnapproved)
+	public function __construct($messages, $posters, $includeUnapproved)
 	{
 		$this->messages = $messages;
 		$this->includeUnapproved = $includeUnapproved;
@@ -63,7 +63,6 @@ class AttachmentsDisplay
 	 * @param string|null $filter name of a callback function
 	 * @param mixed[] $all_posters
 	 *
-	 * @return array
 	 * @package Attachments
 	 */
 	protected function getAttachments($messages, $includeUnapproved = false, $filter = null, $all_posters = array())
@@ -136,16 +135,14 @@ class AttachmentsDisplay
 		global $context, $modSettings, $scripturl, $topic;
 
 		// Set up the attachment info - based on code by Meriadoc.
-		$attachmentData = array();
+		$attachmentData = [];
+		$ilaData = [];
 		$have_unapproved = false;
+
 		if (isset($this->attachments[$id_msg]) && !empty($modSettings['attachmentEnable']))
 		{
 			foreach ($this->attachments[$id_msg] as $i => $attachment)
 			{
-				if (!empty($context['ila_dont_show_attach_below']) && in_array($attachment['id_attach'], $context['ila_dont_show_attach_below']))
-				{
-					continue;
-				}
 				$attachmentData[$i] = array(
 					'id' => $attachment['id_attach'],
 					'name' => preg_replace('~&amp;#(\\d{1,7}|x[0-9a-fA-F]{1,6});~', '&#\\1;', htmlspecialchars($attachment['filename'], ENT_COMPAT, 'UTF-8')),
@@ -165,85 +162,18 @@ class AttachmentsDisplay
 					$have_unapproved = true;
 				}
 
-				if (!$attachmentData[$i]['is_image'])
+				if ($attachmentData[$i]['is_image'])
 				{
-					continue;
+					$this->prepareAttachmentImage($attachmentData[$i], $attachment, $id_msg);
 				}
 
-				$attachmentData[$i]['real_width'] = $attachment['width'];
-				$attachmentData[$i]['width'] = $attachment['width'];
-				$attachmentData[$i]['real_height'] = $attachment['height'];
-				$attachmentData[$i]['height'] = $attachment['height'];
-
-				// Let's see, do we want thumbs?
-				if (!empty($modSettings['attachmentThumbnails'])
-					&& !empty($modSettings['attachmentThumbWidth'])
-					&& !empty($modSettings['attachmentThumbHeight'])
-					&& ($attachment['width'] > $modSettings['attachmentThumbWidth'] || $attachment['height'] > $modSettings['attachmentThumbHeight']) && strlen($attachment['filename']) < 249)
+				// If this is an ILA
+				if ($attachment['approved']
+					&& !empty($context['ila_dont_show_attach_below'])
+					&& in_array($attachment['id_attach'], $context['ila_dont_show_attach_below']))
 				{
-					// A proper thumb doesn't exist yet? Create one! Or, it needs update.
-					if (empty($attachment['id_thumb'])
-						|| $attachment['thumb_width'] > $modSettings['attachmentThumbWidth']
-						|| $attachment['thumb_height'] > $modSettings['attachmentThumbHeight'])
-						//|| ($attachment['thumb_width'] < $modSettings['attachmentThumbWidth'] && $attachment['thumb_height'] < $modSettings['attachmentThumbHeight']))
-					{
-						$filename = getAttachmentFilename($attachment['filename'], $attachment['id_attach'], $attachment['id_folder'], false, $attachment['file_hash']);
-						$attachment = array_merge($attachment, updateAttachmentThumbnail($filename, $attachment['id_attach'], $id_msg, $attachment['id_thumb'], $attachment['filename']));
-					}
-
-					// Only adjust dimensions on successful thumbnail creation.
-					if (!empty($attachment['thumb_width']) && !empty($attachment['thumb_height']))
-					{
-						$attachmentData[$i]['width'] = $attachment['thumb_width'];
-						$attachmentData[$i]['height'] = $attachment['thumb_height'];
-					}
-				}
-
-				if (!empty($attachment['id_thumb']))
-				{
-					$attachmentData[$i]['thumbnail'] = array(
-						'id' => $attachment['id_thumb'],
-						'href' => getUrl('action', ['action' => 'dlattach', 'topic' => $topic . '.0', 'attach' => $attachment['id_thumb'], 'image']),
-					);
-				}
-				$attachmentData[$i]['thumbnail']['has_thumb'] = !empty($attachment['id_thumb']);
-
-				// If thumbnails are disabled, check the maximum size of the image.
-				if (!$attachmentData[$i]['thumbnail']['has_thumb'] && ((!empty($modSettings['max_image_width']) && $attachment['width'] > $modSettings['max_image_width']) || (!empty($modSettings['max_image_height']) && $attachment['height'] > $modSettings['max_image_height'])))
-				{
-					if (!empty($modSettings['max_image_width']) && (empty($modSettings['max_image_height']) || $attachment['height'] * $modSettings['max_image_width'] / $attachment['width'] <= $modSettings['max_image_height']))
-					{
-						$attachmentData[$i]['width'] = $modSettings['max_image_width'];
-						$attachmentData[$i]['height'] = floor($attachment['height'] * $modSettings['max_image_width'] / $attachment['width']);
-					}
-					elseif (!empty($modSettings['max_image_width']))
-					{
-						$attachmentData[$i]['width'] = floor($attachment['width'] * $modSettings['max_image_height'] / $attachment['height']);
-						$attachmentData[$i]['height'] = $modSettings['max_image_height'];
-					}
-				}
-				elseif ($attachmentData[$i]['thumbnail']['has_thumb'])
-				{
-					// Data attributes for use in expandThumb
-					$attachmentData[$i]['thumbnail']['lightbox'] = 'data-lightboxmessage="' . $id_msg . '" data-lightboximage="' . $attachment['id_attach'] . '"';
-
-					/*
-					// If the image is too large to show inline, make it a popup.
-					// @todo this needs to be removed or depreciated
-					if (((!empty($modSettings['max_image_width']) && $attachmentData[$i]['real_width'] > $modSettings['max_image_width']) || (!empty($modSettings['max_image_height']) && $attachmentData[$i]['real_height'] > $modSettings['max_image_height'])))
-					{
-						$attachmentData[$i]['thumbnail']['javascript'] = 'return reqWin(\'' . $attachmentData[$i]['href'] . ';image\', ' . ($attachment['width'] + 20) . ', ' . ($attachment['height'] + 20) . ', true);';
-					}
-					else
-					{
-						$attachmentData[$i]['thumbnail']['javascript'] = 'return expandThumb(' . $attachment['id_attach'] . ');';
-					}
-					*/
-				}
-
-				if (!$attachmentData[$i]['thumbnail']['has_thumb'])
-				{
-					$attachmentData[$i]['downloads']++;
+					$ilaData[$i] = $attachmentData[$i];
+					unset($attachmentData[$i]);
 				}
 			}
 		}
@@ -252,7 +182,7 @@ class AttachmentsDisplay
 		if ($have_unapproved)
 		{
 			// Unapproved attachments go first.
-			usort($attachmentData, function($a, $b) {
+			usort($attachmentData, function ($a, $b) {
 				if ($a['is_approved'] === $b['is_approved'])
 				{
 					return 0;
@@ -262,6 +192,86 @@ class AttachmentsDisplay
 			});
 		}
 
-		return $attachmentData;
+		return [$attachmentData, $ilaData];
+	}
+
+	/**
+	 * Function that prepares image attachments
+	 *
+	 * What it does:
+	 * - Generates thumbnail if non exists, and they are enabled
+	 *
+	 * @param $attachmentData
+	 * @param $attachment
+	 * @param $id_msg
+	 * @return void
+	 */
+	public function prepareAttachmentImage(&$attachmentData, $attachment, $id_msg)
+	{
+		global $modSettings, $topic;
+
+		$attachmentData['real_width'] = $attachment['width'];
+		$attachmentData['width'] = $attachment['width'];
+		$attachmentData['real_height'] = $attachment['height'];
+		$attachmentData['height'] = $attachment['height'];
+
+		// Let's see, do we want thumbs?
+		if (!empty($modSettings['attachmentThumbnails'])
+			&& !empty($modSettings['attachmentThumbWidth'])
+			&& !empty($modSettings['attachmentThumbHeight'])
+			&& ($attachment['width'] > $modSettings['attachmentThumbWidth'] || $attachment['height'] > $modSettings['attachmentThumbHeight']) && strlen($attachment['filename']) < 249)
+		{
+			// A proper thumb doesn't exist yet? Create one! Or, it needs update.
+			if (empty($attachment['id_thumb'])
+				|| $attachment['thumb_width'] > $modSettings['attachmentThumbWidth']
+				|| $attachment['thumb_height'] > $modSettings['attachmentThumbHeight'])
+				//|| ($attachment['thumb_width'] < $modSettings['attachmentThumbWidth'] && $attachment['thumb_height'] < $modSettings['attachmentThumbHeight']))
+			{
+				$filename = getAttachmentFilename($attachment['filename'], $attachment['id_attach'], $attachment['id_folder'], false, $attachment['file_hash']);
+				$attachment = array_merge($attachment, updateAttachmentThumbnail($filename, $attachment['id_attach'], $id_msg, $attachment['id_thumb'], $attachment['filename']));
+			}
+
+			// Only adjust dimensions on successful thumbnail creation.
+			if (!empty($attachment['thumb_width']) && !empty($attachment['thumb_height']))
+			{
+				$attachmentData['width'] = $attachment['thumb_width'];
+				$attachmentData['height'] = $attachment['thumb_height'];
+			}
+		}
+
+		// If we have a thumbnail, make note of it!
+		if (!empty($attachment['id_thumb']))
+		{
+			$attachmentData['thumbnail'] = array(
+				'id' => $attachment['id_thumb'],
+				'href' => getUrl('action', ['action' => 'dlattach', 'topic' => $topic . '.0', 'attach' => $attachment['id_thumb'], 'image']),
+			);
+		}
+		$attachmentData['thumbnail']['has_thumb'] = !empty($attachment['id_thumb']);
+
+		// If thumbnails are disabled, check the maximum size of the image
+		if (!$attachmentData['thumbnail']['has_thumb'] && ((!empty($modSettings['max_image_width']) && $attachment['width'] > $modSettings['max_image_width']) || (!empty($modSettings['max_image_height']) && $attachment['height'] > $modSettings['max_image_height'])))
+		{
+			if (!empty($modSettings['max_image_width']) && (empty($modSettings['max_image_height']) || $attachment['height'] * $modSettings['max_image_width'] / $attachment['width'] <= $modSettings['max_image_height']))
+			{
+				$attachmentData['width'] = $modSettings['max_image_width'];
+				$attachmentData['height'] = floor($attachment['height'] * $modSettings['max_image_width'] / $attachment['width']);
+			}
+			elseif (!empty($modSettings['max_image_width']))
+			{
+				$attachmentData['width'] = floor($attachment['width'] * $modSettings['max_image_height'] / $attachment['height']);
+				$attachmentData['height'] = $modSettings['max_image_height'];
+			}
+		}
+		elseif ($attachmentData['thumbnail']['has_thumb'])
+		{
+			// Data attributes for use in expandThumbLB
+			$attachmentData['thumbnail']['lightbox'] = 'data-lightboxmessage="' . $id_msg . '" data-lightboximage="' . $attachment['id_attach'] . '"';
+		}
+
+		if (!$attachmentData['thumbnail']['has_thumb'])
+		{
+			$attachmentData['downloads']++;
+		}
 	}
 }
