@@ -97,7 +97,7 @@ class Mail extends BaseMail
 			else
 			{
 				// Keep our post via email log
-				if (!empty($unq_head))
+				if ($this->mailList)
 				{
 					$this->unqPBEHead[] = time();
 					$this->unqPBEHead[] = $sendTo;
@@ -235,7 +235,7 @@ class Mail extends BaseMail
 			}
 
 			// Keep our post via email log
-			if (!empty($this->unqPBEHead))
+			if ($this->mailList)
 			{
 				$this->unqPBEHead[] = time();
 				$this->unqPBEHead[] = $mail_to;
