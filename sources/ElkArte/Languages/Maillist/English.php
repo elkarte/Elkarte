@@ -237,7 +237,7 @@ $txt['digest_preview'] = "\n     <*> Topic Summary:\n     ";
 $txt['digest_see_full'] = "\n\n     <*> See the full Topic at the following link:\n     <*> ";
 $txt['digest_reply_preview'] = "\n     <*> Latest Reply:\n     ";
 $txt['digest_unread_reply_link'] = "\n\n     <*> See all your unread replies to this topic at the following link:\n     <*> ";
-$txt['message_attachments'] = '<*> This message has %d images/files associated with it.
+$txt['message_attachments'] = '<*> This message has %d attachments associated with it.
 <*> To see them please follow this link: %s';
 
 // Help
