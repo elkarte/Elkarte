@@ -23,7 +23,7 @@
 
 	likePosts.prototype = function ()
 	{
-		var oTxt = {},
+		let oTxt = {},
 
 			/**
 			 * Initiate likePosts with this method
@@ -41,7 +41,7 @@
 			 */
 			likeUnlikePosts = function (e, mId, tId)
 			{
-				var messageId = parseInt(mId, 10),
+				let messageId = parseInt(mId, 10),
 					topicId = parseInt(tId, 10),
 					subAction = '',
 					check = $(e.target).attr('class');
@@ -116,7 +116,7 @@
 			 */
 			updateUi = function (params)
 			{
-				var currentClass = (params.action === 'unlikepost') ? 'unreact_button' : 'react_button',
+				let currentClass = (params.action === 'unlikepost') ? 'unreact_button' : 'react_button',
 					nextClass = (params.action === 'unlikepost') ? 'react_button' : 'unreact_button';
 
 				// Swap the button class as needed, update the text for the hover
@@ -169,7 +169,7 @@
 
 	likePostStats.prototype = function ()
 	{
-		var currentUrlFrag = null,
+		let currentUrlFrag = null,
 			allowedUrls = {},
 			tabsVisitedCurrentSession = {},
 			defaultHash = 'messagestats',
@@ -230,7 +230,7 @@
 				// No tab sent, use the current hash
 				if (typeof (url) === 'undefined' || url === '')
 				{
-					var currentHref = window.location.href.split('#');
+					let currentHref = window.location.href.split('#');
 
 					currentUrlFrag = (typeof (currentHref[1]) !== 'undefined') ? currentHref[1] : defaultHash;
 				}
@@ -321,7 +321,7 @@
 			// Show the most liked messages
 			showMessageStats = function ()
 			{
-				var data = tabsVisitedCurrentSession[currentUrlFrag],
+				let data = tabsVisitedCurrentSession[currentUrlFrag],
 					htmlContent = '',
 					messageUrl = '',
 					$like_post_message_data = $('.like_post_message_data');
@@ -330,42 +330,42 @@
 				$like_post_message_data.html('');
 
 				// Build the new html to add to the page
-				for (var i = 0, len = data.length; i < len; i++)
+				data.forEach((point) =>
 				{
-					messageUrl = elk_scripturl + '?topic=' + data[i].id_topic + '.msg' + data[i].id_msg;
+					messageUrl = elk_scripturl + '?topic=' + point.id_topic + '.msg' + point.id_msg;
 
 					htmlContent += '' +
 						'<div class="content forumposts">' +
 						'   <div class="like_stats_avatar">' +
-						'       <img class="avatar avatarresize" alt="" src="' + encodeURI(data[i].member_received.avatar) + '" />' +
+						'       <img class="avatar avatarresize" alt="" src="' + encodeURI(point.member_received.avatar) + '" />' +
 						'   </div>' +
 						'   <div class="like_stats_details">' +
-						'       <a class="poster_details largetext" href="' + data[i].member_received.href + '">' + data[i].member_received.name + '</a>' +
-						'       <div class="poster_details">' + txtStrings.totalPosts + ': ' + data[i].member_received.total_posts + '</div>' +
+						'       <a class="poster_details largetext" href="' + point.member_received.href + '">' + point.member_received.name + '</a>' +
+						'       <div class="poster_details">' + txtStrings.totalPosts + ': ' + point.member_received.total_posts + '</div>' +
 						'   </div>' +
 						'   <div class="like_stats_subject largetext">' +
-						'      <a class="message_title" title="' + data[i].preview + '" href="' + messageUrl + '">' + txtStrings.topic + ': ' + data[i].subject + '</a>' +
+						'      <a class="message_title" title="' + point.preview + '" href="' + messageUrl + '">' + txtStrings.topic + ': ' + point.subject + '</a>' +
 						'   </div>' +
 						'   <div class="separator"></div>' +
 						'   <div class="well">' +
-						'       <p>' + txtStrings.usersWhoLiked.easyReplace({1: data[i].member_liked_data.length}) + '</p>';
+						'       <p>' + txtStrings.usersWhoLiked.easyReplace({1: point.member_liked_data.length}) + '</p>';
 
 					// All the members that liked this masterpiece of internet jibba jabba
-					for (var j = 0, likerslen = data[i].member_liked_data.length; j < likerslen; j++)
+					point.member_liked_data.forEach((member_liked_data) =>
 					{
 						htmlContent += '' +
 							'   <div class="like_stats_likers">' +
-							'       <a href="' + data[i].member_liked_data[j].href + '">' +
-							'           <img class="avatar" alt="" src="' + encodeURI(data[i].member_liked_data[j].avatar) + '" title="' + data[i].member_liked_data[j].real_name + '"/>' +
+							'       <a href="' + member_liked_data.href + '">' +
+							'           <img class="avatar" alt="" src="' + encodeURI(member_liked_data.avatar) + '" title="' + member_liked_data.real_name + '"/>' +
 							'       </a> ' +
 							'   </div>';
 
-					}
+					});
 
 					htmlContent += '' +
 						'   </div>' +
 						'</div>';
-				}
+				});
 
 				// Set the category header div (below the tabs) text
 				$('#like_post_current_tab_desc').text(txtStrings.mostLikedMessage);
@@ -383,7 +383,7 @@
 			// The most liked Topics !
 			showTopicStats = function ()
 			{
-				var data = tabsVisitedCurrentSession[currentUrlFrag],
+				let data = tabsVisitedCurrentSession[currentUrlFrag],
 					topicUrl = '',
 					msgUrl = '',
 					htmlContent = '',
@@ -395,58 +395,58 @@
 				$like_post_topic_data.html('');
 
 				// For each of the top X topics, output the info
-				for (var i = 0, len = data.length; i < len; i++)
+				data.forEach((point, index) =>
 				{
-					topicUrl = elk_scripturl + '?topic=' + data[i].id_topic;
+					topicUrl = elk_scripturl + '?topic=' + point.id_topic;
 
 					// Start with the topic info
 					htmlContent += '' +
 						'<div class="content forumposts">' +
-						'   <a class="largetext" href="' + topicUrl + '">' + data[i].msg_data[0].subject + '</a> ' + txtStrings.mostPopularTopicHeading1.easyReplace({1: data[i].like_count}) +
+						'   <a class="largetext" href="' + topicUrl + '">' + point.msg_data[0].subject + '</a> ' + txtStrings.mostPopularTopicHeading1.easyReplace({1: point.like_count}) +
 						'   <p class="panel_toggle secondary_header">' +
 						'       <span class="topic_toggle">&nbsp' +
-						'           <span id="topic_toggle_img_' + i + '" class="chevricon i-chevron-up" title=""></span>' +
+						'           <span id="topic_toggle_img_' + index + '" class="chevricon i-chevron-up" title=""></span>' +
 						'       </span>' +
-						'       <a href="#" id="topic_toggle_link_' + i + '">' + txtStrings.mostPopularTopicSubHeading1.easyReplace({
-							1: data[i].msg_data.length,
+						'       <a href="#" id="topic_toggle_link_' + index + '">' + txtStrings.mostPopularTopicSubHeading1.easyReplace({
+							1: point.msg_data.length,
 							2: txtStrings.showPosts
 						}) + '</a>' +
 						'   </p>' +
-						'   <div id="topic_container_' + i + '" class="hide">';
+						'   <div id="topic_container_' + index + '" class="hide">';
 
 					// Expand / collapse text strings for this area
-					collapse_txt[i] = txtStrings.mostPopularTopicSubHeading1.easyReplace({
-						1: data[i].msg_data.length,
+					collapse_txt[index] = txtStrings.mostPopularTopicSubHeading1.easyReplace({
+						1: point.msg_data.length,
 						2: txtStrings.showPosts
 					});
-					expand_txt[i] = txtStrings.mostPopularTopicSubHeading1.easyReplace({
-						1: data[i].msg_data.length,
+					expand_txt[index] = txtStrings.mostPopularTopicSubHeading1.easyReplace({
+						1: point.msg_data.length,
 						2: txtStrings.hidePosts
 					});
 
 					// Posts from the topic itself
-					for (var j = 0, topiclen = data[i].msg_data.length; j < topiclen; j++)
+					point.msg_data.forEach((msg_data) =>
 					{
-						msgUrl = topicUrl + '.msg' + data[i].msg_data[j].id_msg + '#msg' + data[i].msg_data[j].id_msg;
+						msgUrl = topicUrl + '.msg' + msg_data.id_msg + '#msg' + msg_data.id_msg;
 
 						htmlContent += '' +
 							'   <div class="content forumposts">' +
 							'       <div class="topic_details">' +
-							'   	    <img class="like_stats_small_avatar" alt="" src="' + encodeURI(data[i].msg_data[j].member.avatar) + '"/>' +
+							'   	    <img class="like_stats_small_avatar" alt="" src="' + encodeURI(msg_data.member.avatar) + '"/>' +
 							'           <h5 class="like_stats_likers">' +
-							data[i].msg_data[j].member.name + ' : ' + txtStrings.postedAt + ' ' + data[i].msg_data[j].html_time +
+							msg_data.member.name + ' : ' + txtStrings.postedAt + ' ' + msg_data.html_time +
 							'           </h5>' +
 							'       </div>' +
-							'       <div class="messageContent">' + data[i].msg_data[j].body + '</div>' +
+							'       <div class="messageContent">' + msg_data.body + '</div>' +
 							'       <a class="linkbutton floatright" href="' + msgUrl + '">' + txtStrings.readMore + '</a>' +
 							'       <div class="separator"></div>' +
 							'   </div>';
-					}
+					});
 
 					htmlContent += '' +
 						'   </div>' +
 						'</div>';
-				}
+				});
 
 				// Load and show the content
 				$('#like_post_current_tab_desc').text(txtStrings.mostLikedTopic);
@@ -462,7 +462,7 @@
 			// The single most liked board, like ever
 			showBoardStats = function (response)
 			{
-				var data = tabsVisitedCurrentSession[currentUrlFrag],
+				let data = tabsVisitedCurrentSession[currentUrlFrag],
 					boardUrl = elk_scripturl + '?board=' + data.id_board,
 					$like_post_board_data = $('.like_post_board_data');
 
@@ -470,7 +470,7 @@
 				$like_post_board_data.html('');
 
 				// First a bit about the board
-				var htmlContent = '' +
+				let htmlContent = '' +
 					'<div class="content forumposts">' +
 					'	<p>' +
 					'       <a class="largetext" href="' + boardUrl + '">' + data.name + '</a> ' + txtStrings.mostPopularBoardHeading1 + ' ' + data.like_count + ' ' + txtStrings.genricHeading1 +
@@ -484,24 +484,24 @@
 					'</div>';
 
 				// And show some of the topics from it
-				for (var i = 0, len = data.topic_data.length; i < len; i++)
+				data.topic_data.forEach((data_topic) =>
 				{
-					var topicUrl = elk_scripturl + '?topic=' + data.topic_data[i].id_topic;
+					let topicUrl = elk_scripturl + '?topic=' + data_topic.id_topic;
 
 					htmlContent += '' +
 						'<div class="content forumposts">' +
 						'	<div class="topic_details">' +
-						'	    <img class="like_stats_small_avatar" alt="" src="' + encodeURI(data.topic_data[i].member.avatar) + '"/>' +
+						'	    <img class="like_stats_small_avatar" alt="" src="' + encodeURI(data_topic.member.avatar) + '"/>' +
 						'       <h5 class="like_stats_likers">' +
-						'           <a href="' + data.topic_data[i].member.href + '">' +
-						data.topic_data[i].member.name +
-						'           </a> : ' + txtStrings.postedAt + ' ' + data.topic_data[i].html_time +
+						'           <a href="' + data_topic.member.href + '">' +
+						data_topic.member.name +
+						'           </a> : ' + txtStrings.postedAt + ' ' + data_topic.html_time +
 						'       </h5>' +
 						'   </div>' +
-						'   <div class="messageContent">' + data.topic_data[i].body + '</div>' +
+						'   <div class="messageContent">' + data_topic.body + '</div>' +
 						'   <a class="linkbutton floatright" href="' + topicUrl + '">' + txtStrings.readMore + '</a>' +
 						'</div>';
-				}
+				});
 
 				// Load and show
 				$('#like_post_current_tab_desc').text(txtStrings.mostLikedBoard);
@@ -514,7 +514,7 @@
 			// Data for all the narcissists out there !
 			showMostLikesReceivedUserStats = function (response)
 			{
-				var data = tabsVisitedCurrentSession[currentUrlFrag],
+				let data = tabsVisitedCurrentSession[currentUrlFrag],
 					msgUrl = '',
 					htmlContent = '',
 					expand_txt = [],
@@ -525,56 +525,56 @@
 				$like_post_most_liked_user_data.html('').off();
 
 				// For each member returned
-				for (var i = 0, len = data.length; i < len; i++)
+				data.forEach((point, index) =>
 				{
 					// Start off with a bit about them and why they are great
 					htmlContent += '' +
 						'<div class="content forumposts">' +
 						'   <div class="like_stats_avatar">' +
-						'       <img class="avatar avatarresize" alt="" src="' + encodeURI(data[i].member_received.avatar) + '" />' +
+						'       <img class="avatar avatarresize" alt="" src="' + encodeURI(point.member_received.avatar) + '" />' +
 						'   </div>' +
 						'   <div class="like_stats_details">' +
-						'       <a class="poster_details largetext" href="' + data[i].member_received.href + '">' + data[i].member_received.name + '</a>' +
-						'       <div class="poster_details">' + txtStrings.totalPosts + ': ' + data[i].member_received.total_posts + '</div>' +
-						'       <div class="poster_details">' + txtStrings.totalLikesReceived + ': ' + data[i].like_count + '</div>' +
+						'       <a class="poster_details largetext" href="' + point.member_received.href + '">' + point.member_received.name + '</a>' +
+						'       <div class="poster_details">' + txtStrings.totalPosts + ': ' + point.member_received.total_posts + '</div>' +
+						'       <div class="poster_details">' + txtStrings.totalLikesReceived + ': ' + point.like_count + '</div>' +
 						'   </div>' +
 						'   <p class="panel_toggle secondary_header">' +
 						'       <span class="liked_toggle">&nbsp' +
-						'           <span id="liked_toggle_img_' + i + '" class="chevricon i-chevron-up" title=""></span>' +
+						'           <span id="liked_toggle_img_' + index + '" class="chevricon i-chevron-up" title=""></span>' +
 						'       </span>' +
-						'       <a href="#" id="liked_toggle_link_' + i + '">' + txtStrings.mostPopularUserHeading1.easyReplace({1: txtStrings.showPosts}) + '</a>' +
+						'       <a href="#" id="liked_toggle_link_' + index + '">' + txtStrings.mostPopularUserHeading1.easyReplace({1: txtStrings.showPosts}) + '</a>' +
 						'   </p>' +
-						'   <div id="liked_container_' + i + '" class="hide">';
+						'   <div id="liked_container_' + index + '" class="hide">';
 
 					// Expand / collapse text strings for this area
-					collapse_txt[i] = txtStrings.mostPopularUserHeading1.easyReplace({
+					collapse_txt[index] = txtStrings.mostPopularUserHeading1.easyReplace({
 						1: txtStrings.showPosts
 					});
-					expand_txt[i] = txtStrings.mostPopularUserHeading1.easyReplace({
+					expand_txt[index] = txtStrings.mostPopularUserHeading1.easyReplace({
 						1: txtStrings.hidePosts
 					});
 
-					for (var j = 0, msglen = data[i].post_data.length; j < msglen; j++)
+					point.post_data.forEach((post_data) =>
 					{
-						msgUrl = elk_scripturl + '?topic=' + data[i].post_data[j].id_topic + '.msg' + data[i].post_data[j].id_msg;
+						msgUrl = elk_scripturl + '?topic=' + post_data.id_topic + '.msg' + post_data.id_msg;
 
 						htmlContent += '' +
 							'       <div class="content forumposts">' +
 							'	        <div class="topic_details">' +
 							'                <h5 class="like_stats_likers">' +
-							txtStrings.postedAt + ' ' + data[i].post_data[j].html_time + ' - ' + data[i].post_data[j].like_count + ' ' + txtStrings.likesReceived +
+							txtStrings.postedAt + ' ' + post_data.html_time + ' - ' + post_data.like_count + ' ' + txtStrings.likesReceived +
 							'               </h5>' +
 							'           </div>' +
-							'          <div class="messageContent">' + data[i].post_data[j].body + '</div>' +
+							'          <div class="messageContent">' + post_data.body + '</div>' +
 							'          <a class="linkbutton floatright" href="' + msgUrl + '">' + txtStrings.readMore + '</a>' +
 							'          <div class="separator"></div>' +
 							'       </div>';
-					}
+					});
 
 					htmlContent += '' +
 						'   </div>' +
 						'</div>';
-				}
+				});
 
 				// Load the template with the data
 				$('#like_post_current_tab_desc').text(txtStrings.mostLikedMember);
@@ -590,7 +590,7 @@
 			// Data for all the +1, me too, etc users as well
 			showMostLikesGivenUserStats = function (response)
 			{
-				var data = tabsVisitedCurrentSession[currentUrlFrag],
+				let data = tabsVisitedCurrentSession[currentUrlFrag],
 					htmlContent = '',
 					msgUrl = '',
 					expand_txt = [],
@@ -601,55 +601,55 @@
 				$like_post_most_likes_given_user_data.html('');
 
 				// For each member returned
-				for (var i = 0, len = data.length; i < len; i++)
+				data.forEach((point, index) =>
 				{
 					htmlContent += '' +
 						'<div class="content forumposts">' +
 						'   <div class="like_stats_avatar">' +
-						'       <img class="avatar avatarresize" alt="" src="' + encodeURI(data[i].member_given.avatar) + '" />' +
+						'       <img class="avatar avatarresize" alt="" src="' + encodeURI(point.member_given.avatar) + '" />' +
 						'   </div>' +
 						'   <div class="like_stats_details">' +
-						'       <a class="poster_details largetext" href="' + data[i].member_given.href + '">' + data[i].member_given.name + '</a>' +
-						'       <div class="poster_details">' + txtStrings.totalPosts + ': ' + data[i].member_given.total_posts + '</div>' +
-						'       <div class="poster_details">' + txtStrings.totalLikesGiven + ': ' + data[i].like_count + '</div>' +
+						'       <a class="poster_details largetext" href="' + point.member_given.href + '">' + point.member_given.name + '</a>' +
+						'       <div class="poster_details">' + txtStrings.totalPosts + ': ' + point.member_given.total_posts + '</div>' +
+						'       <div class="poster_details">' + txtStrings.totalLikesGiven + ': ' + point.like_count + '</div>' +
 						'   </div>' +
 						'   <p class="panel_toggle secondary_header">' +
 						'       <span class="liker_toggle">&nbsp' +
-						'           <span id="liker_toggle_img_' + i + '" class="chevricon i-chevron-up" title=""></span>' +
+						'           <span id="liker_toggle_img_' + index + '" class="chevricon i-chevron-up" title=""></span>' +
 						'       </span>' +
-						'       <a href="#" id="liker_toggle_link_' + i + '">' + txtStrings.mostLikeGivenUserHeading1.easyReplace({1: txtStrings.showPosts}) + '</a>' +
+						'       <a href="#" id="liker_toggle_link_' + index + '">' + txtStrings.mostLikeGivenUserHeading1.easyReplace({1: txtStrings.showPosts}) + '</a>' +
 						'   </p>' +
-						'   <div id="liker_container_' + i + '" class="hide">';
+						'   <div id="liker_container_' + index + '" class="hide">';
 
 					// Expand / collapse text strings for this area
-					collapse_txt[i] = txtStrings.mostLikeGivenUserHeading1.easyReplace({
+					collapse_txt[index] = txtStrings.mostLikeGivenUserHeading1.easyReplace({
 						1: txtStrings.showPosts
 					});
-					expand_txt[i] = txtStrings.mostLikeGivenUserHeading1.easyReplace({
+					expand_txt[index] = txtStrings.mostLikeGivenUserHeading1.easyReplace({
 						1: txtStrings.hidePosts
 					});
 
-					for (var j = 0, postlen = data[i].post_data.length; j < postlen; j++)
+					point.post_data.forEach((post_data) =>
 					{
-						msgUrl = elk_scripturl + '?topic=' + data[i].post_data[j].id_topic + '.msg' + data[i].post_data[j].id_msg;
+						msgUrl = elk_scripturl + '?topic=' + post_data.id_topic + '.msg' + post_data.id_msg;
 
 						htmlContent += '' +
 							'   <div class="content forumposts">' +
 							'	    <div class="topic_details">' +
 							'           <h5 class="like_stats_likers">' +
-							txtStrings.postedAt + ' ' + data[i].post_data[j].html_time +
+							txtStrings.postedAt + ' ' + post_data.html_time +
 							'           </h5>' +
 							'       </div>' +
-							'       <div class="messageContent">' + data[i].post_data[j].body + '</div>' +
+							'       <div class="messageContent">' + post_data.body + '</div>' +
 							'       <a class="linkbutton floatright" href="' + msgUrl + '">' + txtStrings.readMore + '</a>' +
 							'   	<div class="separator"></div>' +
 							'   </div>';
-					}
+					});
 
 					htmlContent += '' +
 						'   </div>' +
 						'</div>';
-				}
+				});
 
 				// Load it to the page
 				$('#like_post_current_tab_desc').text(txtStrings.mostLikeGivingMember);
@@ -665,7 +665,7 @@
 			// Attach the toggle class to each hidden div
 			createCollapsibleContent = function (count, expand_txt, collapse_txt, prefix)
 			{
-				for (var section = 0; section < count; section++)
+				for (let section = 0; section < count; section++)
 				{
 					new elk_Toggle({
 						bToggleEnabled: true,

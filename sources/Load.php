@@ -18,6 +18,7 @@ use BBC\ParserWrapper;
 use ElkArte\Cache\Cache;
 use ElkArte\Debug;
 use ElkArte\Errors\Errors;
+use ElkArte\FileFunctions;
 use ElkArte\Hooks;
 use ElkArte\Http\Headers;
 use ElkArte\Themes\ThemeLoader;
@@ -1294,7 +1295,7 @@ function loadDatabase()
  */
 function determineAvatar($profile)
 {
-	global $modSettings, $settings;
+	global $modSettings, $settings, $context;
 
 	if (empty($profile))
 	{
@@ -1361,13 +1362,22 @@ function determineAvatar($profile)
 		// $settings not initialized? We can't do anything further..
 		if (!empty($settings))
 		{
+			$href = $settings['images_url'] . '/default_avatar.png';
+			$href_var = $settings['actual_theme_dir'] . '/images/' . $context['theme_variant'] . '/default_avatar.png';
+
+			if (!empty($context['theme_variant'])
+				&& FileFunctions::instance()->fileExists($href_var))
+			{
+				$href = $settings['images_url'] . '/' . $context['theme_variant'] . '/default_avatar.png';
+			}
+
 			// Let's proceed with the default avatar.
 			// TODO: This should be incorporated into the theme.
 			$avatar = array(
 				'name' => '',
-				'image' => '<img class="avatar avatarresize" src="' . $settings['images_url'] . '/default_avatar.png" alt="" />',
-				'href' => $settings['images_url'] . '/default_avatar.png',
-				'url' => 'http://',
+				'image' => '<img class="avatar avatarresize" src="' . $href .'" alt="" />',
+				'href' => $href,
+				'url' => 'https://',
 			);
 		}
 		else

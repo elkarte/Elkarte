@@ -562,7 +562,6 @@ function prepareCreditsData()
 		),
 		'software' => array(
 			'<a href="http://ichord.github.com/At.js">At.js</a> | &copy; Chord Luo | Licensed under <a href="https://opensource.org/licenses/MIT">The MIT License (MIT)</a>',
-			'<a href="http://bad-behavior.ioerror.us/">Bad Behavior</a> | &copy; Michael Hampton | Licensed under <a href="https://opensource.org/licenses/LGPL-3.0">GNU Lesser General Public License</a>',
 			'<a href="https://code.google.com/p/google-code-prettify/">Google Code Prettify</a> | Licensed under <a href="https://opensource.org/licenses/Apache-2.0">Apache License, Version 2.0</a>',
 			'<a href="http://pajhome.org.uk/crypt/md5">Javascript Crypt</a> | &copy; Angel Marin, Paul Johnston | Licensed under <a href="https://opensource.org/licenses/BSD-3-Clause">The BSD License</a>',
 			'<a href="http://jquery.org/">JQuery</a> | &copy; jQuery Foundation and other contributors | Licensed under <a href="https://opensource.org/licenses/MIT">The MIT License (MIT)</a>',
@@ -577,7 +576,6 @@ function prepareCreditsData()
 			'<a href="http://lab.ejci.net/favico.js/">favico.js</a> | &copy; Miroslav Magda | Licensed under <a href="https://opensource.org/licenses/MIT">The MIT License (MIT)</a>',
 			'<a href="https://github.com/ttsvetko/HTML5-Desktop-Notifications">Push.js</a> | &copy; Tyler Nickerson | Licensed under <a href="https://opensource.org/licenses/MIT">The MIT License (MIT)</a>',
 			'<a href="https://github.com/mneofit/multiselect">multiselect</a> | &copy; Mikhail Neofitov | Licensed under <a href="https://opensource.org/licenses/MIT">The MIT License (MIT)</a>',
-			'<a href="https://github.com/Spuds/ElkArte-Emoji">ElkArte Emoji</a> | &copy; Spuds | Licensed under <a href="https://mozilla.org/MPL/1.1">MPL 1.1</a>',
 			'<a href="#">EmojiOne</a> | &copy; Emoji One | Licensed under <a href="https://creativecommons.org/licenses/by-sa/4.0/">Creative Commons Attribution-ShareAlike 4.0 International</a>',
 			'<a href="https://github.com/twitter/twemoji">Twitter Emoji</a> | &copy; Twitter, Inc and other contributors | Licensed under <a href="https://github.com/twitter/twemoji/blob/master/LICENSE/">MIT</a>',
 		),

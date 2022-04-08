@@ -1029,58 +1029,62 @@ class ManageThemes extends AbstractController
 
 		// 0 is reset all members, -1 is set forum default
 		$u = $this->_req->getQuery('u', 'intval');
+		$id = $this->_req->getQuery('id', 'intval');
+		$save = $this->_req->getPost('save');
+		$themePicked = $this->_req->getQuery('th', 'intval');
+		$variant = $this->_req->getQuery('vrt', 'cleanhtml');
 
 		$context['default_theme_id'] = $modSettings['theme_default'];
 
 		$_SESSION['theme'] = 0;
 
-		if (isset($this->_req->query->id))
+		if (isset($id))
 		{
-			$this->_req->query->th = $this->_req->query->id;
+			$themePicked = $id;
 		}
 
 		// Saving a variant cause JS doesn't work - pretend it did ;)
-		if (isset($this->_req->post->save))
+		if (isset($save))
 		{
 			// Which theme?
-			foreach ($this->_req->post->save as $k => $v)
+			foreach ($save as $k => $v)
 			{
-				$this->_req->query->th = (int) $k;
+				$themePicked = (int) $k;
 			}
 
 			if (isset($this->_req->post->vrt[$k]))
 			{
-				$this->_req->query->vrt = $this->_req->post->vrt[$k];
+				$variant = $this->_req->post->vrt[$k];
 			}
 		}
 
 		// Have we made a decision, or are we just browsing?
-		if (isset($this->_req->query->th))
+		if (isset($themePicked))
 		{
 			checkSession('get');
 
-			$th = $this->_req->getQuery('th', 'intval');
-			$vrt = $this->_req->getQuery('vrt', 'cleanhtml');
+			//$th = $this->_req->getQuery('th', 'intval');
+			//$vrt = $this->_req->getQuery('vrt', 'cleanhtml');
 
 			// If changing members or guests - and there's a variant - assume changing default variant.
-			if (!empty($vrt) && ($u === 0 || $u === -1))
+			if (!empty($variant) && ($u === 0 || $u === -1))
 			{
-				updateThemeOptions(array($th, 0, 'default_variant', $vrt));
+				updateThemeOptions(array($themePicked, 0, 'default_variant', $variant));
 
 				// Make it obvious that it's changed
-				Cache::instance()->remove('theme_settings-' . $th);
+				Cache::instance()->remove('theme_settings-' . $themePicked);
 			}
 
 			// For everyone.
 			if ($u === 0)
 			{
 				require_once(SUBSDIR . '/Members.subs.php');
-				updateMemberData(null, array('id_theme' => $th));
+				updateMemberData(null, array('id_theme' => $themePicked));
 
 				// Remove any custom variants.
-				if (!empty($vrt))
+				if (!empty($variant))
 				{
-					deleteVariants($th);
+					deleteVariants($themePicked);
 				}
 
 				redirectexit('action=admin;area=theme;sa=admin;' . $context['session_var'] . '=' . $context['session_id']);
@@ -1088,23 +1092,21 @@ class ManageThemes extends AbstractController
 			// Change the default/guest theme.
 			elseif ($u === -1)
 			{
-				updateSettings(array('theme_guests' => $th));
+				updateSettings(array('theme_guests' => $themePicked));
 
 				redirectexit('action=admin;area=theme;sa=admin;' . $context['session_var'] . '=' . $context['session_id']);
 			}
 		}
 
-		// Everyone can't choose just one.
+		$current_theme = 0;
 		if ($u === 0)
 		{
 			$context['current_member'] = 0;
-			$current_theme = 0;
 		}
 		// Guests and such...
 		elseif ($u === -1)
 		{
 			$context['current_member'] = -1;
-			$current_theme = $modSettings['theme_guests'];
 		}
 
 		// Get the theme name and descriptions.
@@ -1113,14 +1115,14 @@ class ManageThemes extends AbstractController
 		// As long as we're not doing the default theme...
 		if (!isset($u) || $u >= 0)
 		{
-			if ($guest_theme != 0)
+			if ($guest_theme !== 0)
 			{
 				$context['available_themes'][0] = $context['available_themes'][$guest_theme];
 			}
 
 			$context['available_themes'][0]['id'] = 0;
 			$context['available_themes'][0]['name'] = $txt['theme_forum_default'];
-			$context['available_themes'][0]['selected'] = $current_theme == 0;
+			$context['available_themes'][0]['selected'] = $current_theme === 0;
 			$context['available_themes'][0]['description'] = $txt['theme_global_description'];
 		}
 

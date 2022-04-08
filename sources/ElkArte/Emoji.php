@@ -61,7 +61,7 @@ class Emoji extends AbstractModel
 	 */
 	public function emojiNameToImage($string)
 	{
-		$emoji = Emoji::instance();
+		$emoji = self::instance();
 
 		// Only work on the areas outside of code tags
 		$parts = preg_split('~(\[/code]|\[code(?:=[^]]+)?])~i', $string, -1, PREG_SPLIT_DELIM_CAPTURE);
@@ -172,7 +172,7 @@ class Emoji extends AbstractModel
 		$alt = trim(strtr($m[1], [':' => '&#58;', '(' => '&#40;', ')' => '&#41;', '$' => '&#36;', '[' => '&#091;']));
 		$title = ucwords(strtr(htmlspecialchars($m[2]), [':' => '&#58;', '(' => '&#40;', ')' => '&#41;', '$' => '&#36;', '[' => '&#091;', '_' => ' ']));
 
-		return '<img class="smiley emoji" src="' . $filename . '" alt="' . $alt . '" title="' . $title . '" />';
+		return '<img class="smiley emoji" src="' . $filename . '" alt="' . $alt . '" title="' . $title . '" data-emoji-name="' . $alt . '" data-emoji-code="' . $this->shortcode_replace[$m[2]] . '" />';
 	}
 
 	/**

@@ -60,7 +60,7 @@ class AdminDebug extends AbstractController
 		global $context, $db_show_debug;
 
 		// We should have debug mode enabled, as well as something to display!
-		if ($db_show_debug !== true || !isset($this->_req->session->debug))
+		if ($db_show_debug !== true || !isset($_SESSION['debug']))
 		{
 			throw new Exception('no_access', false);
 		}
@@ -75,13 +75,13 @@ class AdminDebug extends AbstractController
 		{
 			$debug->toggleViewQueries();
 
-			if (strpos($this->_req->session->old_url, 'action=viewquery') !== false)
+			if (strpos($_SESSION['old_url'], 'action=viewquery') !== false)
 			{
 				redirectexit();
 			}
 			else
 			{
-				redirectexit($this->_req->session->old_url);
+				redirectexit($_SESSION['old_url']);
 			}
 		}
 

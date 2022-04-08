@@ -1692,10 +1692,10 @@ function disableAutoComplete()
 
 		let send = function (request)
 		{
-			for (var i = 0; i < _notifiers.length; i++)
+			_notifiers.forEach((notification) =>
 			{
-				_notifiers[i].send(request);
-			}
+				notification.send(request);
+			});
 		};
 
 		let fetch = function ()

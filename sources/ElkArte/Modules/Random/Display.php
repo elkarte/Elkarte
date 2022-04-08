@@ -15,7 +15,6 @@ namespace ElkArte\Modules\Random;
 
 use ElkArte\EventManager;
 use ElkArte\Modules\AbstractModule;
-use ElkArte\Languages\Txt;
 
 /**
  * Class \ElkArte\Modules\Random\Display
@@ -45,6 +44,10 @@ class Display extends AbstractModule
 
 			add_integration_function('integrate_topic_query', '\\ElkArte\\Modules\\Random\\Display::followup_topic_query', '', false);
 			add_integration_function('integrate_display_message_list', '\\ElkArte\\Modules\\Random\\Display::followup_message_list', '', false);
+		}
+
+		if (!empty($modSettings['likes_enabled']))
+		{
 			add_integration_function('integrate_display_message_list', '\\ElkArte\\Modules\\Random\\Display::load_likes', '', false);
 		}
 
@@ -83,9 +86,9 @@ class Display extends AbstractModule
 	 */
 	public static function load_likes($messages)
 	{
-		global $modSettings, $context, $txt;
+		global $context;
 
-		if (!empty($modSettings['likes_enabled']) && !empty($messages))
+		if (!empty($messages))
 		{
 			require_once(SUBSDIR . '/Likes.subs.php');
 			$context['likes'] = loadLikes($messages, true);

@@ -171,15 +171,16 @@ body, input, button, select, textarea, .editor {
 legend {
 	font-size: var(--font16);
 	margin-left: 15px;
-	padding: 0 0 2px 20px;
 	cursor: pointer;
-	background-repeat: no-repeat;
-	background-position: 0 0;
-	background-size: 16px 16px;
 }
 
-.collapsed legend {
-	background-position: 0 4px;
+legend::before, .collapsed legend::before {
+	display: inline-block;
+	width: 16px;
+	height: 16px;
+	padding: 0 0 0 1em;
+	content: "";
+	background-repeat: no-repeat;
 }
 
 /* Tables should show empty cells. */
@@ -829,7 +830,7 @@ input[type=checkbox].quote-show-more {
 	bottom: 0;
 	width: 100%;
 	height: 8em;
-	margin: 0 1px;
+	margin: 0 1px 1px 1px;
 	padding-top: 5em;
 	cursor: pointer;
 	text-align: center;
@@ -839,12 +840,11 @@ input[type=checkbox].quote-show-more {
 	appearance: none;
 }
 
-/* The read moar, with the 100% width clicking anywhere in the quote base will work */
+/* The read moar, with the 100% width clicking anywhere in the quote base will work
+   note content: is set in display controller for localization reasons */
 input[type=checkbox].quote-show-more:after {
 	font-size: var(--font16);
 	font-weight: 600;
-	/* @todo localization */
-	content: "Read More";
 }
 
 /* When clicked, hide the checkbox and expand the quote */
@@ -1043,9 +1043,7 @@ a.bbc_link {
 
 /* Spinner and close button */
 #ajax_in_progress a, #ajax_in_progress span {
-	width: var(--font20);
 	margin-left: 1em;
-	vertical-align: bottom;
 	text-decoration: underline;
 }
 
@@ -3082,7 +3080,33 @@ aside > .poster {
 	margin: 0 auto;
 	padding: 2px;
 	cursor: pointer;
-	vertical-align: top
+	vertical-align: top;
+	border: 1px solid;
+}
+
+.keyinfo .messageicon .dropdown:hover {
+	padding: 2px;
+}
+
+/* This div and items are added by javascript for the icon selection */
+#iconList {
+	display: flex;
+	align-items: center;
+	padding: 4px 6px 2px 6px;
+	border: 1px solid;
+}
+
+#iconList > .messageIcon {
+	padding: 2px 3px;
+	border: 1px solid;
+}
+
+#iconList > .messageIcon > img {
+	height: 18px;
+}
+
+#iconList > .messageIcon:hover {
+	border: 1px dotted;
 }
 
 /* The actual message, what the entire software package is about */
@@ -3413,6 +3437,7 @@ footer .signature {
 /* The QR textarea */
 #quickReplyOptions .quickreply {
 	height: 150px;
+	padding: 0 4px;
 	outline: none;
 }
 
@@ -4038,7 +4063,6 @@ dl.merge_topic dd {
 
 .profile_content {
 	overflow: auto;
-	padding: 0 8px;
 }
 
 .profile_content.attachment_thumb {

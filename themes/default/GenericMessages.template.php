@@ -377,14 +377,17 @@ function template_simple_message($msg)
 			</article>';
 }
 
-
+/**
+ * Initialize the text strings and JS needed for likes
+ */
 function template_load_likes_button_above()
 {
 	global $txt;
+
 	// ajax controller for likes
 	loadJavascriptFile('like_posts.js', array('defer' => true));
 
-	// This one is needed to load have some strings handy for likes errors
+	// This one is needed to have some strings handy for likes errors
 	Txt::load('Errors');
 
 	// Initiate likes and the tooltips for likes

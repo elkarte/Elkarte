@@ -1319,6 +1319,31 @@ nav.breadcrumb {
 	color: var(--topic_name);
 }
 
+/* The icon selection dropdown you get by clicking on the icon in message view */
+.keyinfo .messageicon .dropdown {
+	border-color: var(--transparent);
+	background: var(--transparent);
+}
+
+.keyinfo .messageicon .dropdown:hover {
+	background: var(--transparent);
+}
+
+/* This div and items are added by javascript for the icon selection */
+#iconList {
+	border-color: #ADADAD;
+	background: var(--content-background);
+}
+
+#iconList > .messageIcon {
+	border-color: var(--content-background);
+}
+
+#iconList > .messageIcon:hover {
+	border-color: var(--menu_border_hover);
+	background: var(--menu_hover_background);
+}
+
 /* All the signatures used in the forum. */
 .signature, .attachments, .custom_fields_above_signature {
 	border-top-color: var(--primary_border_top);

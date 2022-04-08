@@ -77,8 +77,7 @@ class Html2Md extends AbstractDomParser
 			$this->markdown = $this->utf8Wordwrap($this->markdown, $this->body_width, $this->line_end);
 		}
 
-		// The null character will trigger a base64 version in outbound email
-		return $this->markdown . "\n\x00";
+		return $this->markdown . "\n";
 	}
 
 	/**
@@ -160,7 +159,7 @@ class Html2Md extends AbstractDomParser
 				break;
 			case 'b':
 			case 'strong':
-				$markdown = $this->config['strong'] . $this->getValue($node) . $this->config['strong'];
+				$markdown = $this->config['strong'] . trim($this->getValue($node)) . $this->config['strong'];
 				break;
 			case 'blockquote':
 				$markdown = $this->_convertBlockquote($node);
@@ -185,7 +184,7 @@ class Html2Md extends AbstractDomParser
 				break;
 			case 'em':
 			case 'i':
-				$markdown = $this->config['em'] . $this->getValue($node) . $this->config['em'];
+				$markdown = $this->config['em'] . trim($this->getValue($node)) . $this->config['em'];
 				break;
 			case 'hr':
 				$markdown = $this->line_end . '---' . $this->line_end;
@@ -199,7 +198,7 @@ class Html2Md extends AbstractDomParser
 				$markdown = $this->_convertHeader($tag, $this->getValue($node));
 				break;
 			case 'img':
-				$markdown = $this->_convertImage($node) . $this->line_end;
+				$markdown = $this->_convertImage($node);
 				break;
 			case 'ol':
 			case 'ul':
@@ -306,7 +305,7 @@ class Html2Md extends AbstractDomParser
 		$value = trim($this->getValue($node), "\t\n\r\0\x0B");
 
 		// Provide a more compact [name] if none is given
-		if ($value == $node->getAttribute('href') || empty($value))
+		if (empty($value) || $value === $node->getAttribute('href'))
 		{
 			$value = empty($title) ? $txt['link'] : $title;
 		}
@@ -325,9 +324,9 @@ class Html2Md extends AbstractDomParser
 			$markdown = '[' . $value . '](' . $href . ')';
 		}
 
-		$this->_setBodyWidth($markdown);
+		$this->_setBodyWidth($markdown, $this->getBuffer($node));
 
-		return $markdown;
+		return $markdown . $this->line_end;
 	}
 
 	/**
@@ -465,13 +464,31 @@ class Html2Md extends AbstractDomParser
 	 */
 	private function _convertImage($node)
 	{
-		$src = $node->getAttribute('src');
+		$src = preg_replace('~;thumb$~', '', $node->getAttribute('src'));
 		$alt = $node->getAttribute('alt');
 		$title = $node->getAttribute('title');
+		$smile = $node->getAttribute('data-emoji-name');
+		$parent = $this->getParent($node);
 
-		return !empty($title)
+		// Emoji, return just the :cool: part
+		if (!empty($smile))
+		{
+			return ' ' . $smile . ' ';
+		}
+
+		// A plain linked image, just return the alt text for use in the link
+		if ($this->getName($parent) === 'a' && !($parent->getAttribute('data-lightboximage') || $parent->getAttribute('data-lightboxmessage')))
+		{
+			return !empty($alt) ? $alt : (!empty($title) ? $title : 'xXx');
+		}
+
+		$markdown = !empty($title)
 			? '![' . $alt . '](' . $src . ' "' . $title . '")'
 			: '![' . $alt . '](' . $src . ')';
+
+		$this->_setBodyWidth($markdown, $this->getBuffer($node));
+
+		return $markdown . $this->line_end;
 	}
 
 	/**
@@ -818,5 +835,21 @@ class Html2Md extends AbstractDomParser
 		global $txt;
 
 		return '[' . $txt['link'] . '](' . trim($matches[0]) . ')';
+	}
+
+	/**
+	 * Gets the lenght of html in front of a given node and its parent.
+	 *
+	 * - Used to add needed buffer to adjust lenght wrapping
+	 * @param $node
+	 * @return int
+	 */
+	private function getBuffer($node)
+	{
+		$cut = $this->getOuterHTML($node);
+		$string = $this->getInnerHTML($this->getParent($node));
+		$string = substr($string, 0, strpos($string, $cut));
+
+		return empty($string) ? 0 : Util::strlen($string);
 	}
 }
