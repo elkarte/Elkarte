@@ -184,7 +184,7 @@ class Html2Md extends AbstractDomParser
 				break;
 			case 'em':
 			case 'i':
-				$markdown = $this->config['em'] . trim($this->getValue($node)) . $this->config['em'] . ' ';
+				$markdown = $this->config['em'] . trim($this->getValue($node)) . $this->config['em'];
 				break;
 			case 'hr':
 				$markdown = $this->line_end . '---' . $this->line_end;

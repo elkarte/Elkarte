@@ -176,11 +176,11 @@ legend {
 
 legend::before, .collapsed legend::before {
 	display: inline-block;
-	content: "";
 	width: 16px;
 	height: 16px;
-	background-repeat: no-repeat;
 	padding: 0 0 0 1em;
+	content: "";
+	background-repeat: no-repeat;
 }
 
 /* Tables should show empty cells. */
