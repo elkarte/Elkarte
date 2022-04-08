@@ -18,6 +18,9 @@ use BBC\Codes;
  */
 class IlaIntegrate
 {
+	/** @var string holds the rendered html from the bbc [attach] tag */
+	public static $typeTag = '';
+
 	/**
 	 * Register ILA hooks to the system.  This is called by the Hooks class, loadIntegrations()
 	 *
@@ -77,9 +80,9 @@ class IlaIntegrate
 	 */
 	public static function integrate_additional_bbc(&$additional_bbc)
 	{
-		global $modSettings;
+		global $modSettings, $txt;
 
-		// Generally we don't want to render inside of these tags ...
+		// Generally we don't want to render in these tags ...
 		$disallow = array(
 			'quote' => 1,
 			'code' => 1,
@@ -90,7 +93,8 @@ class IlaIntegrate
 
 		// Why enable it to disable the tags, oh well
 		$disabledBBC = empty($modSettings['disabledBBC']) ? array() : explode(',', $modSettings['disabledBBC']);
-		$disableAttach = in_array('attach', $disabledBBC);
+		$disabled = in_array('attach', $disabledBBC, true);
+		$disabledUrl = in_array('attachurl', $disabledBBC, true);
 
 		// Want to see them in quotes eh?
 		if (!empty($modSettings['attachment_inline_quotes']))
@@ -100,13 +104,49 @@ class IlaIntegrate
 
 		// Add ILA codes
 		$additional_bbc = array_merge($additional_bbc, array(
-			// Require a width with optional height/align to allow use of full image and/or ;thumb
+			// Just a simple attach [attach][/attach]
+			array(
+				Codes::ATTR_TAG => 'attach',
+				Codes::ATTR_TYPE => Codes::TYPE_UNPARSED_CONTENT,
+				Codes::ATTR_DISABLED => $disabled,
+				Codes::ATTR_RESET => '',
+				Codes::ATTR_CONTENT => &self::$typeTag,
+				Codes::ATTR_VALIDATE => $disabled ? null : self::buildTag(),
+				Codes::ATTR_DISALLOW_PARENTS => $disallow,
+				Codes::ATTR_DISABLED_CONTENT => '<a href="' . getUrl('action', ['action' => 'dlattach', 'attach' => '$1']) . '">(' . $txt['link'] . '-$1)</a> ',
+				Codes::ATTR_BLOCK_LEVEL => false,
+				Codes::ATTR_AUTOLINK => false,
+				Codes::ATTR_LENGTH => 6,
+			),
+			// Attach, with perhaps a type [attach type=xyz][/attach]
+			array(
+				Codes::ATTR_TAG => 'attach',
+				Codes::ATTR_TYPE => Codes::TYPE_UNPARSED_CONTENT,
+				Codes::ATTR_PARAM => array(
+					'type' => array(
+						Codes::PARAM_ATTR_OPTIONAL => true,
+						Codes::PARAM_ATTR_VALUE => ';$1',
+						Codes::PARAM_ATTR_MATCH => '(thumb|image)',
+					),
+				),
+				Codes::ATTR_DISABLED => $disabled,
+				Codes::ATTR_RESET => '~~{type}',
+				Codes::ATTR_CONTENT => &self::$typeTag,
+				Codes::ATTR_VALIDATE => $disabled ? null : self::buildTag(),
+				Codes::ATTR_DISALLOW_PARENTS => $disallow,
+				Codes::ATTR_DISABLED_CONTENT => '<a href="' . getUrl('action', ['action' => 'dlattach', 'attach' => '$1']) . '">(' . $txt['link'] . '-$1)</a> ',
+				Codes::ATTR_BLOCK_LEVEL => false,
+				Codes::ATTR_AUTOLINK => false,
+				Codes::ATTR_LENGTH => 6,
+			),
+			// Require a width with optional height/align, allows either use of full image and/or ;thumb
+			// [attach width=300 align=??][/attach]
 			array(
 				Codes::ATTR_TAG => 'attach',
 				Codes::ATTR_TYPE => Codes::TYPE_UNPARSED_CONTENT,
 				Codes::ATTR_PARAM => array(
 					'width' => array(
-						Codes::PARAM_ATTR_VALIDATE => self::validate_width(),
+						Codes::PARAM_ATTR_VALUE => 'width:100%;max-width:$1px;',
 						Codes::PARAM_ATTR_MATCH => '(\d+)',
 					),
 					'height' => array(
@@ -116,25 +156,27 @@ class IlaIntegrate
 					),
 					'align' => array(
 						Codes::PARAM_ATTR_OPTIONAL => true,
-						Codes::PARAM_ATTR_VALUE => 'float$1',
+						Codes::PARAM_ATTR_VALUE => 'float$1;',
 						Codes::PARAM_ATTR_MATCH => '(right|left|center)',
 					),
 				),
-				Codes::ATTR_CONTENT => '<a id="link_$1" data-lightboximage="$1" data-lightboxmessage="0" href="' . getUrl('action', ['action' => 'dlattach', 'attach' => '$1', 'image']) . '"><img src="' . getUrl('action', ['action' => 'dlattach', 'attach' => '$1{width}{height}']) . '" alt="" class="bbc_img {align}" /></a>',
-				Codes::ATTR_VALIDATE => $disableAttach ? null : self::validate_options(),
+				Codes::ATTR_DISABLED => $disabled,
+				Codes::ATTR_RESET => '{width}{height}~{align}',
+				Codes::ATTR_CONTENT => &self::$typeTag,
+				Codes::ATTR_VALIDATE => $disabled ? null : self::buildTag(),
 				Codes::ATTR_DISALLOW_PARENTS => $disallow,
-				Codes::ATTR_DISABLED_CONTENT => '<a href="' . getUrl('action', ['action' => 'dlattach', 'attach' => '$1']) . '">(' . getUrl('action', ['action' => 'dlattach', 'attach' => '$1']) . ')</a>',
+				Codes::ATTR_DISABLED_CONTENT => '<a href="' . getUrl('action', ['action' => 'dlattach', 'attach' => '$1']) . '">(' . $txt['link'] . '-$1)</a> ',
 				Codes::ATTR_BLOCK_LEVEL => false,
 				Codes::ATTR_AUTOLINK => false,
 				Codes::ATTR_LENGTH => 6,
 			),
-			// Require a height with option width/align to allow removal of ;thumb
+			// Require a height with option width/align [attach height=300 align=??][/attach]
 			array(
 				Codes::ATTR_TAG => 'attach',
 				Codes::ATTR_TYPE => Codes::TYPE_UNPARSED_CONTENT,
 				Codes::ATTR_PARAM => array(
 					'height' => array(
-						Codes::PARAM_ATTR_VALIDATE => self::validate_height(),
+						Codes::PARAM_ATTR_VALUE => 'max-height:$1px;',
 						Codes::PARAM_ATTR_MATCH => '(\d+)',
 					),
 					'width' => array(
@@ -148,46 +190,37 @@ class IlaIntegrate
 						Codes::PARAM_ATTR_MATCH => '(right|left|center)',
 					),
 				),
-				Codes::ATTR_CONTENT => '<a id="link_$1" data-lightboximage="$1" data-lightboxmessage="0" href="' . getUrl('action', ['action' => 'dlattach', 'attach' => '$1', 'image']) . '"><img src="' . getUrl('action', ['action' => 'dlattach', 'attach' => '$1{height}{width}']) . '" alt="" class="bbc_img {align}" /></a>',
-				Codes::ATTR_VALIDATE => $disableAttach ? null : self::validate_options(),
+				Codes::ATTR_DISABLED => $disabled,
+				Codes::ATTR_RESET => '{width}{height}~{align}',
+				Codes::ATTR_CONTENT => &self::$typeTag,
+				Codes::ATTR_VALIDATE => $disabled ? null : self::buildTag(),
 				Codes::ATTR_DISALLOW_PARENTS => $disallow,
-				Codes::ATTR_DISABLED_CONTENT => '<a href="' . getUrl('action', ['action' => 'dlattach', 'attach' => '$1']) . '">(' . getUrl('action', ['action' => 'dlattach', 'attach' => '$1']) . ')</a>',
+				Codes::ATTR_DISABLED_CONTENT => '<a href="' . getUrl('action', ['action' => 'dlattach', 'attach' => '$1']) . '">(' . $txt['link'] . '-$1)</a> ',
 				Codes::ATTR_BLOCK_LEVEL => false,
 				Codes::ATTR_AUTOLINK => false,
 				Codes::ATTR_LENGTH => 6,
 			),
-			// Just a simple attach
-			array(
-				Codes::ATTR_TAG => 'attach',
-				Codes::ATTR_TYPE => Codes::TYPE_UNPARSED_CONTENT,
-				Codes::ATTR_CONTENT => '$1',
-				Codes::ATTR_VALIDATE => $disableAttach ? null : self::validate_plain(),
-				Codes::ATTR_DISALLOW_PARENTS => $disallow,
-				Codes::ATTR_DISABLED_CONTENT => '<a href="' . getUrl('action', ['action' => 'dlattach', 'attach' => '$1']) . '">(' . getUrl('action', ['action' => 'dlattach', 'attach' => '$1']) . ')</a>',
-				Codes::ATTR_BLOCK_LEVEL => false,
-				Codes::ATTR_AUTOLINK => false,
-				Codes::ATTR_LENGTH => 6,
-			),
-			// Just an align ?
+			// Align with an optional a type? [attach align=right type=thumb][/attach]
 			array(
 				Codes::ATTR_TAG => 'attach',
 				Codes::ATTR_TYPE => Codes::TYPE_UNPARSED_CONTENT,
 				Codes::ATTR_PARAM => array(
+					'align' => array(
+						Codes::PARAM_ATTR_VALUE => 'float$1',
+						Codes::PARAM_ATTR_MATCH => '(right|left|center)',
+					),
 					'type' => array(
 						Codes::PARAM_ATTR_OPTIONAL => true,
 						Codes::PARAM_ATTR_VALUE => ';$1',
 						Codes::PARAM_ATTR_MATCH => '(thumb|image)',
 					),
-					'align' => array(
-						Codes::PARAM_ATTR_OPTIONAL => true,
-						Codes::PARAM_ATTR_VALUE => 'float$1',
-						Codes::PARAM_ATTR_MATCH => '(right|left|center)',
-					),
 				),
-				Codes::ATTR_CONTENT => '<a id="link_$1" data-lightboximage="$1" data-lightboxmessage="0" href="' . getUrl('action', ['action' => 'dlattach', 'attach' => '$1', 'image']) . '"><img src="' . getUrl('action', ['action' => 'dlattach', 'attach' => '$1{type}']) . '" alt="X" class="bbc_img {align}" /></a>',
-				Codes::ATTR_VALIDATE => $disableAttach ? null : self::validate_options(),
+				Codes::ATTR_DISABLED => $disabled,
+				Codes::ATTR_RESET => '~{align}~{type}',
+				Codes::ATTR_CONTENT => &self::$typeTag,
+				Codes::ATTR_VALIDATE => $disabled ? null : self::buildTag(),
 				Codes::ATTR_DISALLOW_PARENTS => $disallow,
-				Codes::ATTR_DISABLED_CONTENT => '<a href="' . getUrl('action', ['action' => 'dlattach', 'attach' => '$1']) . '">(' . getUrl('action', ['action' => 'dlattach', 'attach' => '$1']) . ')</a>',
+				Codes::ATTR_DISABLED_CONTENT => '<a href="' . getUrl('action', ['action' => 'dlattach', 'attach' => '$1']) . '">(' . $txt['link'] . '-$1)</a> ',
 				Codes::ATTR_BLOCK_LEVEL => false,
 				Codes::ATTR_AUTOLINK => false,
 				Codes::ATTR_LENGTH => 6,
@@ -196,10 +229,11 @@ class IlaIntegrate
 			array(
 				Codes::ATTR_TAG => 'attachurl',
 				Codes::ATTR_TYPE => Codes::TYPE_UNPARSED_CONTENT,
+				Codes::ATTR_DISABLED => $disabledUrl,
 				Codes::ATTR_CONTENT => '$1',
-				Codes::ATTR_VALIDATE => self::validate_url(),
+				Codes::ATTR_VALIDATE => $disabledUrl ? null : self::validate_url(),
 				Codes::ATTR_DISALLOW_PARENTS => $disallow,
-				Codes::ATTR_DISABLED_CONTENT => '<a href="' . getUrl('action', ['action' => 'dlattach', 'attach' => '$1']) . '">(' . getUrl('action', ['action' => 'dlattach', 'attach' => '$1']) . ')</a>',
+				Codes::ATTR_DISABLED_CONTENT => '<a href="' . getUrl('action', ['action' => 'dlattach', 'attach' => '$1']) . '">(' . $txt['link'] . '-$1)</a> ',
 				Codes::ATTR_BLOCK_LEVEL => false,
 				Codes::ATTR_AUTOLINK => false,
 				Codes::ATTR_LENGTH => 9,
@@ -208,134 +242,80 @@ class IlaIntegrate
 	}
 
 	/**
-	 * Used when the optional width parameter is set
-	 *
-	 * - Determines the best image, full or thumbnail, based on ILA width desired
-	 * - Used as PARAM_ATTR_VALIDATE function
-	 *
-	 * @return callable function which will return a string
-	 */
-	public static function validate_width()
-	{
-		global $modSettings;
-
-		return function ($data) use ($modSettings) {
-			// These may look odd, and they are, but its a way to set or not ;thumb to the url
-			if (!empty($modSettings['attachmentThumbWidth']) && $data <= $modSettings['attachmentThumbWidth'])
-			{
-				return ';thumb" style="width:100%;max-width:' . $data . 'px;';
-			}
-
-			return '" style="width:100%;max-width:' . $data . 'px;';
-		};
-	}
-
-	/**
-	 * For tags with options (width / height / align)
-	 *
-	 * - Keeps track of attachment usage to prevent displaying below the post
-	 *
-	 * @return callable
-	 */
-	public static function validate_options()
-	{
-		global $context;
-
-		return function (&$data) use (&$context) {
-			// Not a preview, then sanitize the attach id
-			if (strpos($data, 'post_tmp_' . User::$info->id . '_') === false)
-			{
-				$data = (int) $data;
-			}
-
-			$context['ila_dont_show_attach_below'][] = $data;
-			$context['ila_dont_show_attach_below'] = array_unique($context['ila_dont_show_attach_below']);
-		};
-	}
-
-	/**
-	 * Used when the optional height parameter is set and no width is set
-	 *
-	 * - Determines the best image, full or thumbnail, based on desired ILA height
-	 * - Used as PARAM_ATTR_VALIDATE function
-	 *
-	 * @return callable which will return a string
-	 */
-	public static function validate_height()
-	{
-		global $modSettings;
-
-		return function ($data) use ($modSettings) {
-			// These may look odd, and they are, but its a way to set or not ;thumb to the url
-			if (!empty($modSettings['attachmentThumbHeight']) && $data <= $modSettings['attachmentThumbHeight'])
-			{
-				return ';thumb" style="max-height:' . $data . 'px;';
-			}
-
-			return '" style="max-height:' . $data . 'px;';
-		};
-	}
-
-	/**
-	 * This provides for some control for "plain" tags
+	 * This provides for the control of returned tags.  The tag will be different base on
+	 * - Preview, Approval Y/N, Image Y/N, File mime type and width, height, align, type attributes
 	 *
 	 * - Determines if the ILA is an image or not
 	 * - Sets the lightbox attributes if an image is identified
+	 * - Sets a pending approval image if the attachment is not approved and not a preview
 	 * - Keeps track of attachment usage to prevent displaying below the post
+	 * - Sets self::$typeTag which is a reference to the tag content attribute
 	 *
 	 * @return callable
 	 */
-	public static function validate_plain()
+	public static function buildTag()
 	{
-		global $context, $modSettings;
+		global $modSettings;
 
-		return function (&$data, $disabled) use (&$context, $modSettings) {
-			if (isset($disabled['attach']))
-			{
-				return $data;
-			}
-
+		return static function (&$data, $disabled, $tag) use ($modSettings) {
 			$num = $data;
-			$is_image = array();
-			$preview = strpos($data, 'post_tmp_' . User::$info->id . '_');
+			$attachment = [];
+			$preview = self::isPreview($num);
 
-			// Not a preview, then sanitize the attach id and determine the actual type
-			if ($preview === false)
+			// Not a preview, then determine the actual type of attachment we are dealing with
+			if (!$preview)
 			{
 				require_once(SUBSDIR . '/Attachments.subs.php');
-
-				$num = (int) $data;
-				$is_image = isAttachmentImage($num);
+				$attachment = isAttachmentImage($num);
 			}
 
-			// An image will get the light box treatment
-			if (!empty($is_image['is_image']) || $preview !== false)
+			// Grab the tags content value, at this point it will have completed parameter exchange
+			$parameters = $tag[Codes::ATTR_CONTENT] ?? '~~~';
+			$parameters = explode('~', $parameters);
+			$style = $parameters[0] ?? '';
+			$class = $parameters[1] ?? '';
+			$type = $parameters[2] ?? empty($style) ? ';thumb' : '';
+
+			// Not approved gets a bland pending image
+			if (empty($attachment['is_approved']) && !$preview)
 			{
-				$type = !empty($modSettings['attachmentThumbnails']) ? ';thumb' : '';
-				$data = '<a id="link_' . $num . '" data-lightboximage="' . $num . '" data-lightboxmessage="0" href="' . getUrl('action', ['action' => 'dlattach', 'attach' => $num, 'image']) . '"><img src="' . getUrl('action', ['action' => 'dlattach', 'attach' => $num . $type]) . '" alt="" class="bbc_img" /></a>';
+				self::$typeTag = '
+					<img src="' . getUrl('action', ['action' => 'dlattach', 'id' => 'ila']) . '" alt="X" class="bbc_img' . $class . '" />';
 			}
+			// An image will get the light box treatment
+			elseif (!empty($attachment['is_image']) || $preview)
+			{
+				$type = !empty($modSettings['attachmentThumbnails']) ? $type : '';
+				$alt = Util::htmlspecialchars($attachment['filename'] ?? 'X');
+				self::$typeTag = '
+					<a id="link_$1" data-lightboximage="$1" data-lightboxmessage="0" href="' . getUrl('action', ['action' => 'dlattach', 'attach' => '$1', 'image']) . '">
+						<img src="' . getUrl('action', ['action' => 'dlattach', 'attach' => '$1']) . $type .'" style="' . $style . '" alt="' . $alt . '" class="bbc_img ' . $class . '" />
+					</a>';
+			}
+			// Not an image, determine a mime thumbnail or use a default thumbnail
 			else
 			{
-				// Not an image, determine a mime or use a default thumbnail
-				$check = returnMimeThumb(($is_image['fileext'] ?? ''), true);
-
-				if ($is_image === false)
+				$thumbUrl = returnMimeThumb(($attachment['fileext'] ?? ''), true);
+				if ($attachment === false)
 				{
-					$data = '<img src="' . $check . '" alt="X" class="bbc_img" />';
+					self::$typeTag = '
+					<img src="' . $thumbUrl . '" alt="X" class="bbc_img' . $class . '" />';
 				}
 				else
 				{
-					$data = '<a href="' . getUrl('action', ['action' => 'dlattach', 'attach' => $num]) . '"><img src="' . $check . '" alt="' . $is_image['filename'] . '" class="bbc_img" /></a>';
+					self::$typeTag = '
+					<a href="' . getUrl('action', ['action' => 'dlattach', 'attach' => $num]) . '">
+						<img src="' . $thumbUrl . '" alt="' . $attachment['filename'] . '" class="bbc_img ' . $class . '" />
+					</a>';
 				}
 			}
 
-			$context['ila_dont_show_attach_below'][] = $num;
-			$context['ila_dont_show_attach_below'] = array_unique($context['ila_dont_show_attach_below']);
+			self::trackIlaUsage($num);
 		};
 	}
 
 	/**
-	 * This is prevents a little repetition and provides a some control for "plain" tags
+	 * This is prevents a little repetition and provides a some control for url tags
 	 *
 	 * - Determines if the ILA is an image or not
 	 * - Keeps track of attachment usage to prevent displaying below the post
@@ -344,43 +324,77 @@ class IlaIntegrate
 	 */
 	public static function validate_url()
 	{
-		global $context;
+		global $txt;
 
-		return function (&$data, $disabled) use (&$context) {
-			if (isset($disabled['attach']))
-			{
-				return $data;
-			}
-
+		return static function (&$data) use ($txt) {
 			$num = $data;
 			$attachment = false;
 
 			// Not a preview, then sanitize the attach id and determine the details
-			if (strpos($data, 'post_tmp_' . User::$info->id . '_') === false)
+			$preview = self::isPreview($num);
+			if (!$preview)
 			{
 				require_once(SUBSDIR . '/Attachments.subs.php');
-
-				$num = (int) $data;
 				$attachment = isAttachmentImage($num);
 			}
 
-			// If we got the details ...
-			if ($attachment)
+			// Not approved gets a bland message
+			if (empty($attachment['is_approved']) && !$preview)
 			{
-				$data = '<a href="' . getUrl('action', ['action' => 'dlattach', 'attach' => $num]) . '">
-							<i class="icon icon-small i-paperclip"></i>&nbsp;' . $attachment['filename'] . '
-						</a>&nbsp;(' . $attachment['size'] . ($attachment['is_image'] ? ' ' . $attachment['width'] . 'x' . $attachment['height'] : '') . ')';
+				$data = '
+				<a href="#">
+					<i class="icon icon-small i-paperclip"></i>&nbsp;' . $txt['awaiting_approval'] . '
+				</a>&nbsp;';
+			}
+			// If we got the details ...
+			elseif ($attachment)
+			{
+				$data = '
+				<a href="' . getUrl('action', ['action' => 'dlattach', 'attach' => $num]) . '">
+					<i class="icon icon-small i-paperclip"></i>&nbsp;' . $attachment['filename'] . '
+				</a>&nbsp;(' . $attachment['size'] . ($attachment['is_image'] ? ' ' . $attachment['width'] . 'x' . $attachment['height'] : '') . ')';
 			}
 			else
 			{
-				$data = '<a href="' . getUrl('action', ['action' => 'dlattach', 'attach' => $num]) . '">
-							<i class="icon icon-small i-paperclip"></i>&nbsp;' . $num . '
-						</a>';
+				$data = '
+				<a href="' . getUrl('action', ['action' => 'dlattach', 'attach' => $num]) . '">
+					<i class="icon icon-small i-paperclip"></i>&nbsp;' . $num . '
+				</a>';
 			}
 
-			$context['ila_dont_show_attach_below'][] = $num;
-			$context['ila_dont_show_attach_below'] = array_unique($context['ila_dont_show_attach_below']);
+			self::trackIlaUsage($num);
 		};
+	}
+
+	/**
+	 * Checks if this is a request for a yet posted attachment preview
+	 * Will intval the attachment number if not a preview
+	 *
+	 * @param string $data if ila will be (int)'ed otherwise left alone
+	 * @return bool
+	 */
+	public static function isPreview(&$data)
+	{
+		if (strpos($data, 'post_tmp_' . User::$info->id . '_') === false)
+		{
+			$data = (int) $data;
+			return false;
+		}
+
+		return true;
+	}
+
+	/**
+	 * Keeps track of attachment usage to prevent displaying below the post
+	 *
+	 * @param int $data
+	 */
+	public static function trackIlaUsage($data)
+	{
+		global $context;
+
+		$context['ila_dont_show_attach_below'][] = $data;
+		$context['ila_dont_show_attach_below'] = array_unique($context['ila_dont_show_attach_below']);
 	}
 
 	/**

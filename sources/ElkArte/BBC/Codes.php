@@ -169,6 +169,8 @@ class Codes
 	 */
 	public const ATTR_NO_CACHE = 25;
 
+	public const ATTR_RESET = 26;
+
 	/** [tag]parsed content[/tag] */
 	public const TYPE_PARSED_CONTENT = 0;
 
@@ -232,7 +234,6 @@ class Codes
 	 */
 	protected $bbc = array();
 	protected $itemcodes = array();
-	protected $additional_bbc = array();
 	protected $disabled = array();
 	protected $parsing_codes = array();
 
@@ -242,16 +243,14 @@ class Codes
 	 * @param array $tags
 	 * @param array $disabled
 	 */
-	public function __construct(array $tags = array(), array $disabled = array())
+	public function __construct(array $additional_bbc = array(), array $disabled = array())
 	{
-		$this->additional_bbc = $tags;
-
 		foreach ($disabled as $tag)
 		{
 			$this->disable($tag);
 		}
 
-		foreach ($tags as $tag)
+		foreach ($additional_bbc as $tag)
 		{
 			$this->add($tag);
 		}
@@ -974,7 +973,7 @@ class Codes
 			foreach ($item_codes as $c => $dummy)
 			{
 				// Skip anything "bad"
-				if (!is_string($c) || (is_string($c) && trim($c) === ''))
+				if (!is_string($c) || trim($c) === '')
 				{
 					continue;
 				}
@@ -986,7 +985,7 @@ class Codes
 		$return = array();
 
 		// Find the first letter of the tag faster
-		foreach ($bbc as &$code)
+		foreach ($bbc as $code)
 		{
 			$return[$code[self::ATTR_TAG][0]][] = $code;
 		}
