@@ -299,7 +299,7 @@ class Attachment extends AbstractController
 			if ($this->_req->query->id === 'ila')
 			{
 				// Give them the old can't touch this
-				$this->action_text_to_image('awaiting_approval', 90, 90, true);
+				$this->action_text_to_image(($this->user->is_guest ? 'not_applicable' : 'awaiting_approval'), 90, 90, true);
 			}
 		}
 
