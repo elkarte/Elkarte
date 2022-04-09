@@ -15,6 +15,8 @@
 
 namespace BBC;
 
+use ElkArte\Util;
+
 /**
  * Class BBCParser
  *
@@ -76,7 +78,7 @@ class BBCParser
 	/** @var int */
 	protected $fn_num = 0;
 	/** @var int */
-	protected $read_more_length = 250;
+	protected $read_more_length = 525;
 
 	/**
 	 * BBCParser constructor.
@@ -1290,9 +1292,11 @@ class BBCParser
 				break;
 			}
 
-			// How much text, or newlines, are inside this parent
+			// How many newlines and how much text does this parent contain
 			$quote = substr($this->message, $start, $end - $start);
-			if (substr_count($quote, '<br />') < 6 && strlen(strip_tags($quote)) < $this->read_more_length)
+			$quoteText = explode('<blockquote class="bbc_quote">', $quote, 2);
+			$quoteText = $quoteText[1] ?? $quote;
+			if (substr_count($quote, '<br />') < 6 && Util::strlen(strip_tags($quoteText)) < $this->read_more_length)
 			{
 				// Not so chatty, first remove the input quote-show-more
 				$input_start = stripos($this->message, '<input type="checkbox" class="quote-show-more">', $start + $start_len);
