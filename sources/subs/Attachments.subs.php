@@ -614,7 +614,6 @@ function isAttachmentImage($id_attach)
 		LIMIT 1',
 		array(
 			'attach' => $id_attach,
-			'approved' => 1,
 			'type' => 0,
 		)
 	)->fetch_callback(
