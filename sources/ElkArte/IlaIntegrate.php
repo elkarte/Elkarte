@@ -262,6 +262,13 @@ class IlaIntegrate
 			$attachment = [];
 			$preview = self::isPreview($num);
 
+			// Was this tag dynamically disabled from the parser, aka print page or other addon?
+			if (in_array('attach', $disabled, true))
+			{
+				self::$typeTag = $tag[Codes::ATTR_DISABLED_CONTENT];
+				return;
+			}
+
 			// Not a preview, then determine the actual type of attachment we are dealing with
 			if (!$preview)
 			{
