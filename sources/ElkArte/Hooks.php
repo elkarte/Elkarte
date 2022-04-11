@@ -420,7 +420,7 @@ final class Hooks
 	/**
 	 * Enables the autoloading of a certain addon.
 	 *
-	 * @param string $call A string consisting of "path/filename.integrate.php"
+	 * @param string $call A string consisting of "path/filenameIntegrate.php"
 	 */
 	public function enableIntegration($call)
 	{
@@ -448,7 +448,7 @@ final class Hooks
 	/**
 	 * Retrieves from the database a set of references to files containing addons.
 	 *
-	 * @return string[] An array of strings consisting of "path/filename.integrate.php"
+	 * @return string[] An array of strings consisting of "path/filenameIntegrate.php"
 	 */
 	protected function _get_enabled_integrations()
 	{
@@ -460,7 +460,7 @@ final class Hooks
 	/**
 	 * Saves into the database a set of references to files containing addons.
 	 *
-	 * @param string[] $existing An array of strings consisting of "path/filename.integrate.php"
+	 * @param string[] $existing An array of strings consisting of "path/filenameIntegrate.php"
 	 */
 	protected function _store_autoload_integrate($existing)
 	{

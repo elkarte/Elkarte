@@ -1073,6 +1073,7 @@ class Codes
 		if (!isset($_GET['images']))
 		{
 			$this->disable('img');
+			$this->disable('attach');
 		}
 
 		// @todo Interface/setting to add more?
@@ -1082,7 +1083,7 @@ class Codes
 	}
 
 	/**
-	 * Return if a tag is enable
+	 * Return if a tag is disabled
 	 *
 	 * @param string $tag
 	 *

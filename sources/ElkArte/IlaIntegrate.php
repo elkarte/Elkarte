@@ -24,10 +24,14 @@ class IlaIntegrate
 	/**
 	 * Register ILA hooks to the system.  This is called by the Hooks class, loadIntegrations()
 	 *
-	 * Note for addon authors.  All you need to do is extend $modSettings['autoload_integrate'] with
-	 * the "path/filename.php" of your integration (using filenameIntegrate is a nice touch but not required).
-	 * register() and settingsRegister() will both be called.  You can add and remove the name based on
-	 * if your addon is enabled/disabled and not worry about removing hooks (they do no use permanent)
+	 * Note for addon authors.
+	 * All you need to do is extend $modSettings['autoload_integrate'] with "path/filename.php" or the
+	 * "namespace/class" of your integration.  Using filenameIntegrate is a nice touch but not required.
+	 * You then use Hooks::instance()->enableIntegration(path/file); or as
+	 * Hooks::instance()->enableIntegration(\\ElkArte\\IlaIntegrate); to add your integration.
+	 * register() and settingsRegister() will both be called.
+	 * You can add and remove the name based on if your addon is enabled/disabled and not worry
+	 * about removing hooks (they do no use permanent)
 	 *
 	 * @return array
 	 */
@@ -261,6 +265,13 @@ class IlaIntegrate
 			$num = $data;
 			$attachment = [];
 			$preview = self::isPreview($num);
+
+			// Was this tag dynamically disabled from the parser, aka print page or other addon?
+			if (in_array('attach', $disabled, true))
+			{
+				self::$typeTag = $tag[Codes::ATTR_DISABLED_CONTENT];
+				return;
+			}
 
 			// Not a preview, then determine the actual type of attachment we are dealing with
 			if (!$preview)

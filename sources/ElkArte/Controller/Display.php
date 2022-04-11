@@ -903,34 +903,36 @@ class Display extends AbstractController
 				'text' => 'reply',
 				'lang' => true,
 				'url' => getUrl('action', ['action' => 'post', 'topic' => $context['current_topic'] . '.' . $context['start'], 'last_msg' => $this->topicinfo['id_last_msg']]),
-				'active' => true
+				'active' => true,
 			),
 			'notify' => array(
 				'test' => 'can_mark_notify',
 				'text' => $context['is_marked_notify'] ? 'unnotify' : 'notify',
 				'lang' => true,
 				'custom' => 'onclick="return notifyButton(this);"',
-				'url' => getUrl('action', ['action' => 'notify', 'sa' => $context['is_marked_notify'] ? 'off' : 'on', 'topic' => $context['current_topic'] . '.' . $context['start'], '{session_data}'])
+				'url' => getUrl('action', ['action' => 'notify', 'sa' => $context['is_marked_notify'] ? 'off' : 'on', 'topic' => $context['current_topic'] . '.' . $context['start'], '{session_data}']),
 			),
 			'mark_unread' => array(
 				'test' => 'can_mark_unread',
 				'text' => 'mark_unread',
 				'lang' => true,
-				'url' => getUrl('action', ['action' => 'markasread', 'sa' => 'topic', 't' => $context['mark_unread_time'], 'topic' => $context['current_topic'] . '.' . $context['start'], '{session_data}'])
+				'url' => getUrl('action', ['action' => 'markasread', 'sa' => 'topic', 't' => $context['mark_unread_time'], 'topic' => $context['current_topic'] . '.' . $context['start'], '{session_data}']),
 			),
 			'unwatch' => array(
 				'test' => 'can_unwatch',
 				'text' => ($context['topic_unwatched'] ? '' : 'un') . 'watch',
 				'lang' => true,
 				'custom' => 'onclick="return unwatchButton(this);"',
-				'url' => getUrl('action', ['action' => 'unwatchtopic', 'sa' => $context['topic_unwatched'] ? 'off' : 'on', 'topic' => $context['current_topic'] . '.' . $context['start'], '{session_data}'])
+				'url' => getUrl('action', ['action' => 'unwatchtopic', 'sa' => $context['topic_unwatched'] ? 'off' : 'on', 'topic' => $context['current_topic'] . '.' . $context['start'], '{session_data}']),
+				'submenu' => true,
 			),
 			'send' => array(
 				'test' => 'can_send_topic',
 				'text' => 'send_topic',
 				'lang' => true,
 				'url' => getUrl('action', ['action' => 'emailuser', 'sa' => 'sendtopic', 'topic' => $context['current_topic'] . '.0']),
-				'custom' => 'onclick="return sendtopicOverlayDiv(this.href, \'' . $txt['send_topic'] . '\');"'
+				'custom' => 'onclick="return sendtopicOverlayDiv(this.href, \'' . $txt['send_topic'] . '\');"',
+				'submenu' => true,
 			),
 			'print' => array(
 				'test' => 'can_print',
@@ -938,7 +940,8 @@ class Display extends AbstractController
 				'lang' => true,
 				'custom' => 'rel="nofollow"',
 				'class' => 'new_win',
-				'url' => getUrl('action', ['action' => 'topic', 'sa' => 'printpage', 'topic' => $context['current_topic'] . '.0'])
+				'url' => getUrl('action', ['action' => 'topic', 'sa' => 'printpage', 'topic' => $context['current_topic'] . '.0']),
+				'submenu' => true,
 			),
 		);
 

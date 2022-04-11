@@ -58,7 +58,7 @@ class Loader
 			$this->language = ucfirst($lang);
 		}
 
-		$this->path = SOURCEDIR . '/ElkArte/Languages/';
+		$this->path = LANGUAGEDIR . '/';
 		$this->db = $db;
 		$this->variable = &$variable;
 		$this->variable_name = $variable_name;
@@ -183,6 +183,8 @@ class Loader
 	}
 
 	/**
+	 * Load a language file, merging localization strings into the default.
+	 *
 	 * @param string $name the lexicon file to load
 	 * @param string $language and in which language
 	 * @return bool
@@ -195,7 +197,7 @@ class Loader
 			require($filepath);
 			if (!empty(${$this->variable_name}))
 			{
-				$this->variable += ${$this->variable_name};
+				$this->variable = array_merge($this->variable, ${$this->variable_name});
 			}
 
 			return true;

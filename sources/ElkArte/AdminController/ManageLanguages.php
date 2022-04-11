@@ -207,10 +207,8 @@ class ManageLanguages extends AbstractController
 					{
 						return 'highlight2';
 					}
-					else
-					{
-						return '';
-					}
+
+					return '';
 				},
 			),
 			'get_items' => array(
@@ -507,7 +505,7 @@ class ManageLanguages extends AbstractController
 						}
 
 						// Don't recommend copying if the version is the same.
-						if ($context_data['version_compare'] != 'newer')
+						if ($context_data['version_compare'] !== 'newer')
 						{
 							$context_data['default_copy'] = false;
 						}
@@ -704,7 +702,7 @@ class ManageLanguages extends AbstractController
 	{
 		global $context, $txt;
 
-		$base_lang_dir = SOURCEDIR . '/ElkArte/Languages';
+		$base_lang_dir = LANGUAGEDIR;
 		require_once(SUBSDIR . '/Language.subs.php');
 		Txt::load('ManageSettings');
 
@@ -725,21 +723,18 @@ class ManageLanguages extends AbstractController
 
 		// This will be where we look
 		$lang_dirs = glob($base_lang_dir . '/*', GLOB_ONLYDIR);
-		$images_dirs = array();
-
-		$current_file = $file_id ? $base_lang_dir . '/' . $file_id . '/' . ucfirst($context['lang_id']) . '.php' : '';
 
 		// Now for every theme get all the files and stick them in context!
-		$context['possible_files'] =  array_map(function($file) use ($file_id, $txt) {
+		$context['possible_files'] = array_map(static function($file) use ($file_id, $txt) {
 			return [
 				'id' => basename($file, '.php'),
 				'name' => $txt['lang_file_desc_' . basename($file)] ?? basename($file),
 				'path' => $file,
-				'selected' => $file_id == basename($file),
+				'selected' => $file_id === basename($file),
 			];
 		}, $lang_dirs);
 
-		if ($context['lang_id'] != 'english')
+		if ($context['lang_id'] !== 'english')
 		{
 			$possiblePackage = findPossiblePackages($context['lang_id']);
 			if ($possiblePackage !== false)
@@ -769,7 +764,6 @@ class ManageLanguages extends AbstractController
 		$context['file_entries'] = $edit_lang->getForEditing();
 
 		// Are we saving?
-		$save_strings = array();
 		if (isset($this->_req->post->save_entries) && !empty($this->_req->post->entry))
 		{
 			checkSession();
@@ -787,7 +781,7 @@ class ManageLanguages extends AbstractController
 	 * Edit language related settings.
 	 *
 	 * - Accessed by ?action=admin;area=languages;sa=settings
-	 * - This method handles the display, allows to edit, and saves the result
+	 * - This method handles the display, allows editing, and saves the result
 	 * for the _languageSettings form.
 	 *
 	 * @event integrate_save_language_settings

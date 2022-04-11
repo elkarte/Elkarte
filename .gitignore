@@ -30,3 +30,6 @@ themes/default/cache/hive*
 .github/workflows/*.yaml
 populator/
 testcases*/
+/sources/ElkArte/Languages/*
+!/sources/ElkArte/Languages/*/English.php
+test*.php

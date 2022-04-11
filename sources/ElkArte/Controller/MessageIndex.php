@@ -395,6 +395,9 @@ class MessageIndex extends AbstractController implements FrontpageInterface
 			}
 		}
 
+		// Trigger a topic loaded event
+		$this->_events->trigger('topicinfo', array('callbacks' => &$context['topics']));
+
 		$context['jump_to'] = array(
 			'label' => addslashes(un_htmlspecialchars($txt['jump_to'])),
 			'board_name' => htmlspecialchars(strtr(strip_tags($board_info['name']), array('&amp;' => '&')), ENT_COMPAT, 'UTF-8'),
@@ -493,6 +496,9 @@ class MessageIndex extends AbstractController implements FrontpageInterface
 
 		// Allow adding new buttons easily.
 		call_integration_hook('integrate_messageindex_buttons');
+
+		// Trigger a post load event with quick access to normal buttons
+		$this->_events->trigger('post_load', array('callbacks' => &$context['normal_buttons']));
 	}
 
 	/**

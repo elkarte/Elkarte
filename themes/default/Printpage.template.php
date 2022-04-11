@@ -82,6 +82,11 @@ function template_print_above()
 			.centertext {
 				text-align: center;
 			}
+			.emoji {
+				max-width: 18px;
+				padding: 0 .13em;
+				vertical-align: text-bottom;
+			}
 			hr {
 				height: 1px;
 				border: 0;
@@ -177,6 +182,12 @@ function template_print_page()
 
 			foreach ($context['printattach'][$post['id_msg']] as $attach)
 			{
+				if (!empty($context['ila_dont_show_attach_below'])
+					&& in_array((int) $attach['id_attach'], $context['ila_dont_show_attach_below'], true))
+				{
+					continue;
+				}
+
 				echo '
 					<img style="width:' . $attach['width'] . 'px; height:' . $attach['height'] . 'px;" src="', $scripturl . '?action=dlattach;topic=' . $topic . '.0;attach=' . $attach['id_attach'] . '" alt="" />';
 			}
