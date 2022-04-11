@@ -53,175 +53,79 @@ namespace ElkArte;
  */
 class EmailParse
 {
-	/**
-	 * The full message section (headers, body, etc) we are working on
-	 *
-	 * @var string
-	 */
-	public $raw_message = null;
+	/** @var string The full message section (headers, body, etc) we are working on */
+	public $raw_message;
 
-	/**
-	 * Attachments found after the message
-	 *
-	 * @var string[]
-	 */
+	/** @var string[] Attachments found after the message */
 	public $attachments = array();
 
-	/**
-	 * Attachments that we designated as inline with the text
-	 *
-	 * @var string[]
-	 */
+	/** @var string[] Attachments that we designated as inline with the text */
 	public $inline_files = array();
 
-	/**
-	 * Parsed and decoded message body, may be plain text or html
-	 *
-	 * @var string
-	 */
-	public $body = null;
+	/** @var string Parsed and decoded message body, may be plain text or html */
+	public $body;
 
-	/**
-	 * Parsed and decoded message body, only plain text version
-	 *
-	 * @var string
-	 */
-	public $plain_body = null;
+	/** @var string Parsed and decoded message body, only plain text version */
+	public $plain_body;
 
-	/**
-	 * All of the parsed message headers
-	 *
-	 * @var mixed[]
-	 */
+	/** @var mixed[] All the parsed message headers */
 	public $headers = array();
 
-	/**
-	 * Full security key
-	 *
-	 * @var string
-	 */
-	public $message_key_id = null;
+	/** @var string Full security key */
+	public $message_key_id;
 
-	/**
-	 * Message hex-code
-	 *
-	 * @var string
-	 */
-	public $message_key = null;
+	/** @var string Message hex-code */
+	public $message_key;
 
-	/**
-	 * Message type of the key p, m or t
-	 *
-	 * @var string
-	 */
-	public $message_type = null;
+	/** @var string Message type of the key p, m or t */
+	public $message_type;
 
-	/**
-	 * If an html was found in the message
-	 *
-	 * @var bool
-	 */
+	/** @var bool If an html was found in the message */
 	public $html_found = false;
 
-	/**
-	 * If any positive spam headers were found in the message
-	 *
-	 * @var bool
-	 */
+	/** @var bool If any positive spam headers were found in the message */
 	public $spam_found = false;
 
-	/**
-	 * Message id of the key
-	 *
-	 * @var int
-	 */
-	public $message_id = null;
+	/** @var int Message id of the key */
+	public $message_id;
 
-	/**
-	 * Holds the return path as set in the email header
-	 *
-	 * @var string
-	 */
-	public $return_path = null;
+	/** @var string Holds the return path as set in the email header */
+	public $return_path;
 
-	/**
-	 * Holds the message subject
-	 *
-	 * @var string
-	 */
-	public $subject = null;
+	/** @var string Holds the message subject */
+	public $subject;
 
-	/**
-	 * Holds the email to from & cc emails and names
-	 *
-	 * @var mixed[]
-	 */
+	/** @var mixed[] Holds the email to from & cc emails and names */
 	public $email = array();
 
-	/**
-	 * Holds the sending ip of the email
-	 *
-	 * @var string|bool
-	 */
+	/** @var string|bool Holds the sending ip of the email */
 	public $ip = false;
 
-	/**
-	 * If the file was converted to utf8
-	 *
-	 * @var bool
-	 */
+	/** @var bool If the file was converted to utf8 */
 	public $_converted_utf8 = false;
 
-	/**
-	 * Whether the message is a DSN (Delivery Status Notification - aka "bounce"),
-	 * indicating failed delivery
-	 *
-	 * @var bool
-	 */
+	/** @var bool Whether the message is a DSN (Delivery Status Notification - aka "bounce"),
+	    indicating failed delivery */
 	public $_is_dsn = false;
 
-	/**
-	 * Holds the field/value/type report codes from DSN messages
-	 * Accessible as [$field]['type'] and [$field]['value']
-	 *
-	 * @var mixed[]
-	 */
-	public $_dsn = null;
+	/** @var mixed[] Holds the field/value/type report codes from DSN messages
+	    Accessible as [$field]['type'] and [$field]['value'] */
+	public $_dsn;
 
-	/**
-	 * Holds the current email address, to, from, cc
-	 *
-	 * @var string
-	 */
-	private $_email_address = null;
+	/** @var string Holds the current email address, to, from, cc */
+	private $_email_address;
 
-	/**
-	 * Holds the current email name
-	 *
-	 * @var string
-	 */
-	private $_email_name = null;
+	/** @var string Holds the current email name */
+	private $_email_name;
 
-	/**
-	 * Holds each boundary section of the message
-	 *
-	 * @var string[]
-	 */
+	/** @var string[] Holds each boundary section of the message */
 	private $_boundary_section = array();
 
-	/**
-	 * The total number of boundary sections
-	 *
-	 * @var int
-	 */
+	/** @var int The total number of boundary sections */
 	private $_boundary_section_count = 0;
 
-	/**
-	 * The message header block
-	 *
-	 * @var string
-	 */
-	private $_header_block = null;
+	/** @var string The message header block */
+	private $_header_block;
 
 	/**
 	 * Main email routine, calls the needed functions to parse the data so that
@@ -538,7 +442,7 @@ class EmailParse
 		$this->_converted_utf8 = true;
 		$string_save = $string;
 
-		// Use iconv if its available
+		// Use iconv if it is available
 		if (function_exists('iconv'))
 		{
 			$string = @iconv($from, $to . '//TRANSLIT//IGNORE', $string);
@@ -551,11 +455,11 @@ class EmailParse
 			{
 				// Replace unknown characters with a space
 				@ini_set('mbstring.substitute_character', '32');
-				$string = @mb_convert_encoding($string, $to, $from);
+				$string = @mb_convert_encoding($string_save, $to, $from);
 			}
 			elseif (function_exists('recode_string'))
 			{
-				$string = @recode_string($from . '..' . $to, $string);
+				$string = @recode_string($from . '..' . $to, $string_save);
 			}
 			else
 			{
@@ -563,9 +467,7 @@ class EmailParse
 			}
 		}
 
-		unset($string_save);
-
-		return $string;
+		return empty($string) ? $string_save : $string;
 	}
 
 	/**
@@ -757,8 +659,9 @@ class EmailParse
 						{
 							continue;
 						}
+
 						// HTML sections
-						elseif ($this->_boundary_section[$i]->headers['content-type'] === 'text/html')
+						if ($this->_boundary_section[$i]->headers['content-type'] === 'text/html')
 						{
 							$html_ids[] = $i;
 						}
@@ -859,7 +762,7 @@ class EmailParse
 			$part = trim($part);
 
 			// Nothing or epilogue section?
-			if (empty($part) || (strcmp($part, '--') == 0))
+			if (empty($part) || (strcmp($part, '--') === 0))
 			{
 				continue;
 			}
@@ -1087,12 +990,10 @@ class EmailParse
 		$matches = array();
 
 		// Fetch the return path
-		if (isset($this->headers['return-path']))
+		if (isset($this->headers['return-path'])
+			&& preg_match('~(.*?)<(.*?)>~', $this->headers['return-path'], $matches))
 		{
-			if (preg_match('~(.*?)<(.*?)>~', $this->headers['return-path'], $matches))
-			{
-				$this->return_path = trim($matches[2]);
-			}
+			$this->return_path = trim($matches[2]);
 		}
 
 		return $this->return_path;
@@ -1310,7 +1211,7 @@ class EmailParse
 		}
 		else
 		{
-			// Just an sad lonely email address, so we use it as is
+			// Just a sad lonely email address, so we use it as is
 			$this->_email_address = trim(str_replace(' ', '', $val));
 			$this->_email_address = preg_replace('~\(.*?\)~', '', $this->_email_address);
 			$this->_email_name = substr($this->_email_address, 0, strpos($this->_email_address, '@'));
@@ -1374,10 +1275,8 @@ class EmailParse
 		{
 			return $string;
 		}
-		else
-		{
-			return '';
-		}
+
+		return '';
 	}
 
 	/**
