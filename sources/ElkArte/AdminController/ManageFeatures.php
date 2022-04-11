@@ -20,6 +20,7 @@ use BBC\ParserWrapper;
 use ElkArte\AbstractController;
 use ElkArte\Action;
 use ElkArte\Exceptions\Exception;
+use ElkArte\Hooks;
 use ElkArte\Notifications;
 use ElkArte\SettingsForm\SettingsForm;
 use ElkArte\Languages\Txt;
@@ -179,6 +180,16 @@ class ManageFeatures extends AbstractController
 
 			call_integration_hook('integrate_save_basic_settings');
 
+			// Microdata needs to enable its integration
+			if ($this->_req->isSet('metadata_enabled'))
+			{
+				Hooks::instance()->enableIntegration('\\ElkArte\\MetadataIntegrate');
+			}
+			else
+			{
+				Hooks::instance()->disableIntegration('\\ElkArte\\MetadataIntegrate');
+			}
+
 			$settingsForm->setConfigValues((array) $this->_req->post);
 			$settingsForm->save();
 
@@ -250,6 +261,7 @@ class ManageFeatures extends AbstractController
 			array('check', 'hitStats'),
 			'',
 			// Option-ish things... miscellaneous sorta.
+			array('check', 'metadata_enabled'),
 			array('check', 'allow_disableAnnounce'),
 			array('check', 'disallow_sendBody'),
 			array('select', 'enable_contactform', array('disabled' => $txt['contact_form_disabled'], 'registration' => $txt['contact_form_registration'], 'menu' => $txt['contact_form_menu'])),
