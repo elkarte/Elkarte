@@ -182,7 +182,8 @@ function template_print_page()
 
 			foreach ($context['printattach'][$post['id_msg']] as $attach)
 			{
-				if (in_array((int) $attach['id_attach'], $context['ila_dont_show_attach_below'], true))
+				if (!empty($context['ila_dont_show_attach_below'])
+					&& in_array((int) $attach['id_attach'], $context['ila_dont_show_attach_below'], true))
 				{
 					continue;
 				}
