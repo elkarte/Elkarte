@@ -25,7 +25,11 @@
 					Push.create(request.desktop_notifications.title, {
 						body: request.desktop_notifications.message,
 						icon: opt.icon,
-						link: request.desktop_notifications.link
+						link: request.desktop_notifications.link, // Used by mobile devices
+						onClick: function() {
+							window.focus();
+							this.close();
+						}
 					});
 				}
 			}
