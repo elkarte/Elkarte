@@ -1088,6 +1088,12 @@ function saveUserNotificationsPreferences($member, $notification_data)
 			continue;
 		}
 
+		// If they have any site notifications enabled, set a flag to request Push.Permissions
+		if (in_array('notification', $level))
+		{
+			$_SESSION['push_enabled'] = true;
+		}
+
 		$inserts[] = array(
 			$member,
 			$type,
