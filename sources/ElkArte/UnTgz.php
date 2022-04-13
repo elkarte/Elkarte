@@ -32,109 +32,52 @@ use ElkArte\Languages\Txt;
  */
 class UnTgz
 {
-	/**
-	 * Holds the return array of files processed
-	 *
-	 * @var mixed[]
-	 */
+	/** @var array Holds the return array of files processed */
 	protected $return = array();
 
-	/**
-	 * Holds the data found in each tar file header block
-	 *
-	 * @var mixed[]
-	 */
+	/** @var array Holds the data found in each tar file header block */
 	protected $_current = array();
 
-	/**
-	 * Holds the file pointer, generally to the 512 block we are working on
-	 *
-	 * @var int
-	 */
+	/** @var int Holds the file pointer, generally to the 512 block we are working on */
 	protected $_offset = 0;
 
-	/**
-	 * If the file passes or fails crc check
-	 *
-	 * @var bool
-	 */
+	/** @var bool If the file passes or fails crc check */
 	protected $_crc_check = false;
 
-	/**
-	 * The current crc value of the data
-	 *
-	 * @var string|int
-	 */
+	/** @var string|int The current crc value of the data */
 	protected $_crc;
 
-	/**
-	 * The claimed size of the data in the tarball
-	 *
-	 * @var int
-	 */
+	/** @var int The claimed size of the data in the tarball */
 	protected $_size;
 
-	/**
-	 * If we are going to write out the files processed
-	 *
-	 * @var bool
-	 */
+	/** @var bool If we are going to write out the files processed */
 	protected $_write_this = false;
 
-	/**
-	 * If we will skip a file we found
-	 *
-	 * @var bool
-	 */
+	/** @var bool If to skip a file we found */
 	protected $_skip = false;
 
-	/**
-	 * If we found a file that was requested ($files_to_extract)
-	 *
-	 * @var bool
-	 */
+	/** @var bool If we found a file that was requested ($files_to_extract) */
 	protected $_found = false;
 
-	/**
-	 * Current file header we are working on
-	 *
-	 * @var mixed[]|string
-	 */
+	/** @var array|string Current file header we are working on */
 	protected $_header = array();
 
-	/**
-	 * Array of file names we want to extract from the archive
-	 *
-	 * @var null|string[]
-	 */
+	/** @var null|string[] Array of file names we want to extract from the archive */
 	protected $files_to_extract;
 
-	/**
-	 * Holds the data string passed to the function
-	 *
-	 * @var string
-	 */
+	/** @var \ElkArte\FileFunctions The file functions class */
+	protected $fileFunc;
+
+	/** @var string Holds the data string passed to the function */
 	protected $data;
 
-	/**
-	 * Location to write the files.
-	 *
-	 * @var string
-	 */
+	/** @var string Location to write the files. */
 	protected $destination;
 
-	/**
-	 * If we are looking for a single specific file
-	 *
-	 * @var bool|string
-	 */
+	/** @var bool|string If we are looking for a single specific file */
 	protected $single_file;
 
-	/**
-	 * If we can overwrite a file with the same name in the destination
-	 *
-	 * @var bool
-	 */
+	/** @var bool If we can overwrite a file with the same name in the destination */
 	protected $overwrite;
 
 	/**
@@ -168,10 +111,12 @@ class UnTgz
 
 		// Likely to need this
 		require_once(SUBSDIR . '/Package.subs.php');
+		$this->fileFunc = FileFunctions::instance();
 
-		// The destination needs exist and be writable or we are doomed
+		// The destination needs exist, and be writable, or we are doomed
 		umask(0);
-		if ($this->destination !== null && !file_exists($this->destination) && !$this->single_file)
+		if ($this->destination !== null && !$this->single_file
+			&& !$this->fileFunc->fileExists($this->destination))
 		{
 			mktree($this->destination);
 		}
@@ -180,7 +125,7 @@ class UnTgz
 	/**
 	 * Class controller, calls the ungzip / untar functions in required order
 	 *
-	 * @return bool|mixed[]
+	 * @return bool|array
 	 */
 	public function read_tgz_data()
 	{
@@ -221,10 +166,8 @@ class UnTgz
 		{
 			return false;
 		}
-		else
-		{
-			return $this->return;
-		}
+
+		return $this->return;
 	}
 
 	/**
@@ -253,8 +196,8 @@ class UnTgz
 	 * What it does:
 	 *
 	 * - validates that the file is a tar.gz
-	 * - validates that its compressed with deflate
-	 * - processes header information so we can set the start of archive data
+	 * - validates that it is compressed with deflate
+	 * - processes header information such that we can set the start of archive data
 	 *    - archive comment
 	 *    - archive filename
 	 *    - header CRC
@@ -480,7 +423,7 @@ class UnTgz
 	private function _determine_write_this()
 	{
 		// Not a directory and doesn't exist already...
-		if (substr($this->_current['filename'], -1) !== '/' && !file_exists($this->destination . '/' . $this->_current['filename']))
+		if (substr($this->_current['filename'], -1) !== '/' && !$this->fileFunc->fileExists($this->destination . '/' . $this->_current['filename']))
 		{
 			$this->_write_this = true;
 		}
@@ -495,7 +438,7 @@ class UnTgz
 			// Protect from accidental parent directory writing...
 			$this->_current['filename'] = strtr($this->_current['filename'], array('../' => '', '/..' => ''));
 
-			if (!file_exists($this->destination . '/' . $this->_current['filename']))
+			if (!$this->fileFunc->fileExists($this->destination . '/' . $this->_current['filename']))
 			{
 				mktree($this->destination . '/' . $this->_current['filename']);
 			}
@@ -519,13 +462,14 @@ class UnTgz
 		$this->_found = false;
 
 		// A directory may need to be created
-		if (strpos($this->_current['filename'], '/') !== false && !$this->single_file)
+		if (!$this->single_file && strpos($this->_current['filename'], '/') !== false)
 		{
 			mktree($this->destination . '/' . dirname($this->_current['filename']));
 		}
 
 		// Is this the file we're looking for?
-		if ($this->single_file && ($this->destination === $this->_current['filename'] || $this->destination === '*/' . basename($this->_current['filename'])))
+		if ($this->single_file && ($this->destination === $this->_current['filename']
+				|| $this->destination === '*/' . basename($this->_current['filename'])))
 		{
 			$this->_found = $this->_current['data'];
 		}
@@ -535,13 +479,13 @@ class UnTgz
 			$this->_skip = true;
 		}
 		// Looking for restricted files?
-		elseif ($this->files_to_extract !== null && !in_array($this->_current['filename'], $this->files_to_extract))
+		elseif ($this->files_to_extract !== null && !in_array($this->_current['filename'], $this->files_to_extract, true))
 		{
 			$this->_skip = true;
 		}
 
 		// Write it out then
-		if ($this->_check_header_crc() && !$this->_skip && $this->_found === false)
+		if (!$this->_skip && $this->_found === false && $this->_check_header_crc())
 		{
 			package_put_contents($this->destination . '/' . $this->_current['filename'], $this->_current['data']);
 		}
@@ -559,6 +503,7 @@ class UnTgz
 		{
 			$this->_crc += ord($this->_header[$i]);
 		}
+
 		for ($i = 156; $i < 512; $i++)
 		{
 			$this->_crc += ord($this->_header[$i]);

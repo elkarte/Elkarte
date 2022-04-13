@@ -32,109 +32,52 @@ use ElkArte\Languages\Txt;
  */
 class UnZip
 {
-	/**
-	 * Holds the return array of files processed
-	 *
-	 * @var mixed[]
-	 */
+	/** @var array Holds the return array of files processed */
 	protected $return = array();
 
-	/**
-	 * Holds the data found in the end of central directory record
-	 *
-	 * @var mixed[]
-	 */
+	/** @var array Holds the data found in the end of central directory record */
 	protected $_zip_info = array();
 
-	/**
-	 * Holds the information from the central directory for each file in the archive
-	 *
-	 * @var mixed[]
-	 */
+	/** @var array Holds the information from the central directory for each file in the archive */
 	protected $_files_info = array();
 
-	/**
-	 * Hold the current file we are processing
-	 *
-	 * @var mixed[]
-	 */
+	/** @var array Hold the current file we are processing */
 	protected $_file_info = array();
 
-	/**
-	 * Holds the current filename of the above
-	 *
-	 * @var string
-	 */
+	/** @var string Holds the current filename of the above */
 	protected $_filename = '';
 
-	/**
-	 * Contains the central record string
-	 *
-	 * @var string
-	 */
+	/** @var \ElkArte\FileFunctions The file functions class */
+	protected $fileFunc;
+
+	/** @var string Contains the central record string */
 	protected $_data_cdr = '';
 
-	/**
-	 * If the file passes or fails crc check
-	 *
-	 * @var bool
-	 */
+	/** @var bool If the file passes or fails crc check */
 	protected $_crc_check = false;
 
-	/**
-	 * If we are going to write out the files processed
-	 *
-	 * @var bool
-	 */
+	/** @var bool If we are going to write out the files processed */
 	protected $_write_this = false;
 
-	/**
-	 * If we will skip a file we found
-	 *
-	 * @var bool
-	 */
+	/** @var bool If to skip a file we found */
 	protected $_skip = false;
 
-	/**
-	 * If we found a file that was requested ($files_to_extract)
-	 *
-	 * @var bool
-	 */
+	/** @var bool If we found a file that was requested ($files_to_extract) */
 	protected $_found = false;
 
-	/**
-	 * Array of file names we want to extract from the archive
-	 *
-	 * @var null|string[]
-	 */
+	/** @var null|string[] Array of file names we want to extract from the archive */
 	protected $files_to_extract;
 
-	/**
-	 * Holds the data string passed to the function
-	 *
-	 * @var string
-	 */
+	/** @var string Holds the data string passed to the function */
 	protected $data;
 
-	/**
-	 * Location to write the files.
-	 *
-	 * @var string
-	 */
+	/** @var string Location to write the files. */
 	protected $destination;
 
-	/**
-	 * If we are looking for a single specific file
-	 *
-	 * @var bool|string
-	 */
+	/** @var bool|string If we are looking for a single specific file */
 	protected $single_file;
 
-	/**
-	 * If we can overwrite a file with the same name in the destination
-	 *
-	 * @var bool
-	 */
+	/** @var bool If we can overwrite a file with the same name in the destination */
 	protected $overwrite;
 
 	/**
@@ -166,12 +109,13 @@ class UnZip
 		// Make sure we have this loaded.
 		Txt::load('Packages');
 
-		// Likely to need this
+		// Likely to need these
 		require_once(SUBSDIR . '/Package.subs.php');
+		$this->fileFunc = FileFunctions::instance();
 
-		// The destination needs exist and be writable or we are doomed
+		// The destination needs exist, and be writable, or we are doomed
 		umask(0);
-		if ($this->destination !== null && !file_exists($this->destination) && !$this->single_file)
+		if ($this->destination !== null && !$this->single_file && !$this->fileFunc->fileExists($this->destination))
 		{
 			mktree($this->destination);
 		}
@@ -180,7 +124,7 @@ class UnZip
 	/**
 	 * Class controller, calls the functions in required order
 	 *
-	 * @return bool|mixed[]
+	 * @return bool|array
 	 */
 	public function read_zip_data()
 	{
@@ -202,7 +146,7 @@ class UnZip
 			return false;
 		}
 
-		// The file records in the CDR point to the files location in the archive
+		// The file records in the CDR point to the files' location in the archive
 		$this->_process_files();
 
 		// Looking for a single file and this is it
@@ -221,10 +165,8 @@ class UnZip
 		{
 			return false;
 		}
-		else
-		{
-			return $this->return;
-		}
+
+		return $this->return;
 	}
 
 	/**
@@ -282,7 +224,7 @@ class UnZip
 	 * What it does:
 	 *
 	 * - Is a repeated sequence of [file header] . . .  until the end of central dir record.
-	 * - Relative offset, used so we can find the actual data entry for each file in the archive
+	 * - Relative offset, used such that we can find the actual data entry for each file in the archive
 	 * - Validates the number of found files in the CDR matches what the ECDR record claims
 	 *
 	 * Signature Definition:
@@ -328,7 +270,7 @@ class UnZip
 			$this->_files_info[$temp['filename']] = $temp;
 
 			// Move to the next record
-			$pointer = $pointer + $temp['filename_length'] + $temp['extra_field_length'];
+			$pointer += $temp['filename_length'] + $temp['extra_field_length'];
 		}
 
 		// Sections and count from the signature must match or the zip file is bad
@@ -359,7 +301,7 @@ class UnZip
 			$this->_file_info['data'] = substr($this->data, $this->_file_info['relative_offset']);
 
 			// Validate we are at a local file header '\x50\x4b\x03\x04'
-			if (substr($this->_file_info['data'], 0, 4) === "\x50\x4b\x03\x04")
+			if (strpos($this->_file_info['data'], "\x50\x4b\x03\x04") === 0)
 			{
 				$this->_read_local_header();
 			}
@@ -427,7 +369,8 @@ class UnZip
 	private function _determine_write_this()
 	{
 		// If this is a file, and it doesn't exist.... happy days!
-		if (substr($this->_filename, -1) !== '/' && !file_exists($this->destination . '/' . $this->_filename))
+		if (substr($this->_filename, -1) !== '/'
+			&& !$this->fileFunc->fileExists($this->destination . '/' . $this->_filename))
 		{
 			$this->_write_this = true;
 		}
@@ -442,7 +385,7 @@ class UnZip
 			// Just a little accident prevention, don't mind me.
 			$this->_filename = strtr($this->_filename, array('../' => '', '/..' => ''));
 
-			if (!file_exists($this->destination . '/' . $this->_filename))
+			if (!$this->fileFunc->fileExists($this->destination . '/' . $this->_filename))
 			{
 				mktree($this->destination . '/' . $this->_filename);
 			}
@@ -523,7 +466,7 @@ class UnZip
 			$general_purpose = substr($this->_file_info['data'], 30 + $this->_file_info['filename_length'] + $this->_file_info['extra_field_length'] + $this->_file_info['compressed_size'], 16);
 
 			// The spec allows for an optional header in the general purpose record
-			if (substr($general_purpose, 0, 4) === "\x50\x4b\x07\x08")
+			if (strpos($general_purpose, "\x50\x4b\x07\x08") === 0)
 			{
 				$general_purpose = substr($general_purpose, 4);
 			}
@@ -548,13 +491,15 @@ class UnZip
 		$this->_found = false;
 
 		// A directory may need to be created
-		if ((strpos($this->_filename, '/') !== false && !$this->single_file) || (!$this->single_file && !is_dir($this->_file_info['dir'])))
+		if ((strpos($this->_filename, '/') !== false && !$this->single_file)
+			|| (!$this->single_file && !$this->fileFunc->isDir($this->_file_info['dir'])))
 		{
 			mktree($this->_file_info['dir']);
 		}
 
 		// If we're looking for a **specific file**, and this is it... ka-bam, baby.
-		if ($this->single_file && ($this->destination === $this->_filename || $this->destination === '*/' . basename($this->_filename)))
+		if ($this->single_file && ($this->destination === $this->_filename
+				|| $this->destination === '*/' . basename($this->_filename)))
 		{
 			$this->_found = $this->_file_info['data'];
 		}
@@ -565,7 +510,7 @@ class UnZip
 			$this->_skip = true;
 		}
 		// Don't really want this file?
-		elseif ($this->files_to_extract !== null && !in_array($this->_filename, $this->files_to_extract))
+		elseif ($this->files_to_extract !== null && !in_array($this->_filename, $this->files_to_extract, true))
 		{
 			$this->_skip = true;
 		}
@@ -575,11 +520,12 @@ class UnZip
 		{
 			return;
 		}
-		elseif (!empty($this->_found))
+
+		if (!empty($this->_found))
 		{
 			$this->_check_crc();
 		}
-		elseif (!$this->_skip && $this->_found === false && $this->_check_crc())
+		elseif ($this->_found === false && $this->_check_crc())
 		{
 			package_put_contents($this->destination . '/' . $this->_filename, $this->_file_info['data']);
 		}
