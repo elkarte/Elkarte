@@ -13,6 +13,7 @@
 
 namespace ElkArte\Cache\CacheMethod;
 
+use ElkArte\FileFunctions;
 use UnexpectedValueException;
 
 /**
@@ -62,7 +63,7 @@ class Filebased extends AbstractCacheMethod
 	 */
 	public function exists($key)
 	{
-		return file_exists(CACHEDIR . '/' . $this->getFileName($key));
+		return FileFunctions::instance()->fileExists(CACHEDIR . '/' . $this->getFileName($key));
 	}
 
 	/**
@@ -75,7 +76,7 @@ class Filebased extends AbstractCacheMethod
 		// Clearing this data
 		if ($value === null)
 		{
-			@unlink(CACHEDIR . '/' . $fName);
+			FileFunctions::instance()->delete(CACHEDIR . '/' . $fName);
 		}
 		// Or stashing it away
 		else
@@ -86,7 +87,7 @@ class Filebased extends AbstractCacheMethod
 			// If it fails due to low diskspace, or other, remove the cache file
 			if (@file_put_contents(CACHEDIR . '/' . $fName, $cache_data, LOCK_EX) !== strlen($cache_data))
 			{
-				@unlink(CACHEDIR . '/' . $fName);
+				FileFunctions::instance()->delete(CACHEDIR . '/' . $fName);
 			}
 		}
 	}
@@ -102,12 +103,11 @@ class Filebased extends AbstractCacheMethod
 		if (file_exists(CACHEDIR . '/' . $fName))
 		{
 			// Even though it exists, we may not be able to access the file so we use @ here
-			$value = json_decode(substr(@file_get_contents(CACHEDIR . '/' . $fName), 7, -2));
+			$value = json_decode(substr(@file_get_contents(CACHEDIR . '/' . $fName), 7, -2), false);
 
 			if ($value === null || $value->expiration < time())
 			{
 				@unlink(CACHEDIR . '/' . $fName);
-				$return = null;
 			}
 			else
 			{
@@ -136,9 +136,11 @@ class Filebased extends AbstractCacheMethod
 
 			foreach ($files as $file)
 			{
-				if ($file->getFilename() !== 'index.php' && $file->getFilename() !== '.htaccess' && $file->getExtension() === $this->ext)
+				if ($file->getFilename() !== 'index.php'
+					&& $file->getFilename() !== '.htaccess'
+					&& $file->getExtension() === $this->ext)
 				{
-					@unlink($file->getPathname());
+					FileFunctions::instance()->delete($file->getPathname());
 				}
 			}
 		}
@@ -161,7 +163,9 @@ class Filebased extends AbstractCacheMethod
 	 */
 	public function isAvailable()
 	{
-		return @is_dir(CACHEDIR) && @is_writable(CACHEDIR);
+		$FileFunctions = FileFunctions::instance();
+
+		return $FileFunctions->isDir(CACHEDIR) && $FileFunctions->isWritable(CACHEDIR);
 	}
 
 	/**
