@@ -17,6 +17,7 @@
 namespace ElkArte\Cache;
 
 use ElkArte\Debug;
+use ElkArte\FileFunctions;
 use ElkArte\Util;
 
 /**
@@ -24,61 +25,29 @@ use ElkArte\Util;
  */
 class Cache
 {
-	/**
-	 * Holds our static instance of the class
-	 *
-	 * @var object
-	 */
-	protected static $_instance = null;
+	/** @var object Holds our static instance of the class */
+	protected static $_instance;
 
-	/**
-	 * Array of options for the methods (if needed)
-	 *
-	 * @var mixed[]
-	 */
+	/** @var mixed[] Array of options for the methods (if needed) */
 	protected $_options = array();
 
-	/**
-	 * If the cache is enabled or not.
-	 *
-	 * @var bool
-	 */
+	/** @var bool If the cache is enabled or not. */
 	protected $enabled = false;
 
-	/**
-	 * The caching level
-	 *
-	 * @var int
-	 */
+	/** @var int The caching level */
 	protected $level = 0;
 
-	/**
-	 * The prefix to append to the cache key
-	 *
-	 * @var string
-	 */
-	protected $_key_prefix = null;
+	/** @var string The prefix to append to the cache key */
+	protected $_key_prefix;
 
-	/**
-	 * The accelerator in use
-	 *
-	 * @var string
-	 */
-	protected $_accelerator = null;
+	/** @var string The accelerator in use */
+	protected $_accelerator;
 
-	/**
-	 * Cached keys
-	 *
-	 * @var string[]
-	 */
+	/** @var string[] Cached keys */
 	protected $_cached_keys = array();
 
-	/**
-	 * The caching object
-	 *
-	 * @var object|bool
-	 */
-	protected $_cache_obj = null;
+	/** @var object|bool The caching object */
+	protected $_cache_obj;
 
 	/**
 	 * Initialize the class, defines the options and the caching method to use
@@ -91,7 +60,7 @@ class Cache
 	{
 		$this->setLevel($level);
 
-		// Default to file based so we can slow everything down :P
+		// Default to file based, so we can slow everything down :P
 		if (empty($accelerator))
 		{
 			$accelerator = 'filebased';
@@ -166,10 +135,11 @@ class Cache
 	{
 		global $boardurl;
 
-		if (!file_exists(CACHEDIR . '/index.php'))
+		if (!FileFunctions::instance()->fileExists(CACHEDIR . '/index.php'))
 		{
 			touch(CACHEDIR . '/index.php');
 		}
+
 		$this->_key_prefix = md5($boardurl . filemtime(CACHEDIR . '/index.php')) . '-ELK-';
 	}
 
@@ -194,7 +164,7 @@ class Cache
 			global $cache_accelerator, $cache_enable, $cache_memcached;
 
 			$options = array();
-			if (substr($cache_accelerator, 0, 8) === 'memcache')
+			if (strpos($cache_accelerator, 'memcache') === 0)
 			{
 				$options = array(
 					'servers' => explode(',', $cache_memcached),

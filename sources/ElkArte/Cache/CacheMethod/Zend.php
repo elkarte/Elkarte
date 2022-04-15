@@ -18,9 +18,7 @@ namespace ElkArte\Cache\CacheMethod;
  */
 class Zend extends AbstractCacheMethod
 {
-	/**
-	 * {@inheritdoc}
-	 */
+	/** {@inheritdoc} */
 	protected $title = 'Zend Platform/Performance Suite';
 
 	/**

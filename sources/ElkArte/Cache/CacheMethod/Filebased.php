@@ -13,7 +13,6 @@
 
 namespace ElkArte\Cache\CacheMethod;
 
-use ElkArte\FileFunctions;
 use UnexpectedValueException;
 
 /**
@@ -28,21 +27,13 @@ use UnexpectedValueException;
  */
 class Filebased extends AbstractCacheMethod
 {
-	/**
-	 * {@inheritdoc}
-	 */
+	/** {@inheritdoc} */
 	protected $title = 'File-based caching';
 
-	/**
-	 * {@inheritdoc}
-	 */
+	/** {@inheritdoc} */
 	protected $prefix = 'data_';
 
-	/**
-	 * File extension.
-	 *
-	 * @var string
-	 */
+	/** @var string File extension. */
 	protected $ext = 'php';
 
 	/**
@@ -63,7 +54,7 @@ class Filebased extends AbstractCacheMethod
 	 */
 	public function exists($key)
 	{
-		return FileFunctions::instance()->fileExists(CACHEDIR . '/' . $this->getFileName($key));
+		return $this->fileFunc->fileExists(CACHEDIR . '/' . $this->getFileName($key));
 	}
 
 	/**
@@ -76,7 +67,7 @@ class Filebased extends AbstractCacheMethod
 		// Clearing this data
 		if ($value === null)
 		{
-			FileFunctions::instance()->delete(CACHEDIR . '/' . $fName);
+			$this->fileFunc->delete(CACHEDIR . '/' . $fName);
 		}
 		// Or stashing it away
 		else
@@ -87,7 +78,7 @@ class Filebased extends AbstractCacheMethod
 			// If it fails due to low diskspace, or other, remove the cache file
 			if (@file_put_contents(CACHEDIR . '/' . $fName, $cache_data, LOCK_EX) !== strlen($cache_data))
 			{
-				FileFunctions::instance()->delete(CACHEDIR . '/' . $fName);
+				$this->fileFunc->delete(CACHEDIR . '/' . $fName);
 			}
 		}
 	}
@@ -100,14 +91,14 @@ class Filebased extends AbstractCacheMethod
 		$return = null;
 		$fName = $this->getFileName($key);
 
-		if (file_exists(CACHEDIR . '/' . $fName))
+		if ($this->fileFunc->fileExists(CACHEDIR . '/' . $fName))
 		{
-			// Even though it exists, we may not be able to access the file so we use @ here
+			// Even though it exists, we may not be able to access the file
 			$value = json_decode(substr(@file_get_contents(CACHEDIR . '/' . $fName), 7, -2), false);
 
 			if ($value === null || $value->expiration < time())
 			{
-				@unlink(CACHEDIR . '/' . $fName);
+				$this->fileFunc->delete(CACHEDIR . '/' . $fName);
 			}
 			else
 			{
@@ -140,7 +131,7 @@ class Filebased extends AbstractCacheMethod
 					&& $file->getFilename() !== '.htaccess'
 					&& $file->getExtension() === $this->ext)
 				{
-					FileFunctions::instance()->delete($file->getPathname());
+					$this->fileFunc->delete($file->getPathname());
 				}
 			}
 		}
@@ -163,9 +154,7 @@ class Filebased extends AbstractCacheMethod
 	 */
 	public function isAvailable()
 	{
-		$FileFunctions = FileFunctions::instance();
-
-		return $FileFunctions->isDir(CACHEDIR) && $FileFunctions->isWritable(CACHEDIR);
+		return $this->fileFunc->isDir(CACHEDIR) && $this->fileFunc->isWritable(CACHEDIR);
 	}
 
 	/**

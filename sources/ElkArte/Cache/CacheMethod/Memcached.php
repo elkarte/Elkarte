@@ -18,16 +18,10 @@ namespace ElkArte\Cache\CacheMethod;
  */
 class Memcached extends AbstractCacheMethod
 {
-	/**
-	 * {@inheritdoc}
-	 */
+	/** {@inheritdoc} */
 	protected $title = 'Memcached';
 
-	/**
-	 * Memcached instance representing the connection to the memcache servers.
-	 *
-	 * @var \Memcached
-	 */
+	/** @var \Memcached Memcached instance representing the connection to the memcache servers. */
 	protected $obj;
 
 	/**
