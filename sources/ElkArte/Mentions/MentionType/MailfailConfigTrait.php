@@ -23,7 +23,7 @@ trait MailfailConfigTrait
 	/**
 	 * {@inheritdoc }
 	 */
-	public static function isBlacklisted($method)
+	public static function isBlocklisted($method)
 	{
 		return in_array($method, ['email', 'emaildaily', 'emailweekly']);
 	}

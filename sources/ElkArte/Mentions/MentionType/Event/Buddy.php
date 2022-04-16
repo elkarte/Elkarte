@@ -38,7 +38,7 @@ class Buddy extends AbstractEventBoardAccess
 		foreach ($mentions as $key => $row)
 		{
 			// To ensure it is not done twice
-			if ($row['mention_type'] != static::$_type)
+			if ($row['mention_type'] !== static::$_type)
 			{
 				continue;
 			}

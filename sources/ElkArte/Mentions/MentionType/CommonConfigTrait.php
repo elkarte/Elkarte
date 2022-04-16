@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Handles mentioning of buddies
+ * Handles common mention/event traits
  *
  * @package   ElkArte Forum
  * @copyright ElkArte Forum contributors
@@ -15,15 +15,13 @@ namespace ElkArte\Mentions\MentionType;
 
 /**
  * trait CommonConfigTrait
- *
- * Handles mentioning of buddies
  */
 trait CommonConfigTrait
 {
 	/**
 	 * {@inheritdoc }
 	 */
-	public static function isBlacklisted($method)
+	public static function isBlocklisted($method)
 	{
 		return false;
 	}

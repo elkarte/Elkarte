@@ -25,10 +25,10 @@ abstract class AbstractEventMessage implements EventInterface
 	protected static $_type = '';
 
 	/** @var \ElkArte\HttpReq The post/get object */
-	protected $_request = null;
+	protected $_request;
 
 	/** @var \ElkArte\ValuesContainer The current user object */
-	protected $user = null;
+	protected $user;
 
 	/**
 	 * AbstractEventMessage constructor
@@ -53,7 +53,7 @@ abstract class AbstractEventMessage implements EventInterface
 	 */
 	public static function getEvents($controller)
 	{
-		return array();
+		return [];
 	}
 
 	/**

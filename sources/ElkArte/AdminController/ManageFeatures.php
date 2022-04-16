@@ -662,15 +662,17 @@ class ManageFeatures extends AbstractController
 
 		$notification_methods = Notifications::instance()->getNotifiers();
 		$notification_classes = getAvailableNotifications();
-		$current_settings = unserialize($modSettings['notification_methods']);
+		$current_settings = unserialize($modSettings['notification_methods'], ['allowed_classes' => false]);
 
 		foreach ($notification_classes as $class)
 		{
+			// The canUse can be set by each notifier based on conditions, default is true;
 			if ($class::canUse() === false)
 			{
 				continue;
 			}
 
+			// Set up config enable/disable setting for all notifications.
 			$title = strtolower($class::getType());
 			$config_vars[] = array('title', 'setting_' . $title);
 			$config_vars[] = array('check', 'notifications[' . $title . '][enable]', 'text_label' => $txt['setting_notify_enable_this']);
@@ -678,14 +680,16 @@ class ManageFeatures extends AbstractController
 			$default_values = [];
 			$is_default = [];
 
+			// If its enabled, show all the available ways, like email, notify, weekly ...
 			foreach ($notification_methods as $method_name => $method)
 			{
-				if ($class::isBlacklisted($method_name))
+				$method_name = strtolower($method_name);
+
+				// Are they excluding any, like don't let mailfail be allowed to send email !
+				if ($class::isBlocklisted($method_name))
 				{
 					continue;
 				}
-
-				$method_name = strtolower($method_name);
 
 				$config_vars[] = array('check', 'notifications[' . $title . '][' . $method_name . ']', 'text_label' => $txt['notify_' . $method_name]);
 				$modSettings['notifications[' . $title . '][' . $method_name . ']'] = !empty($current_settings[$title][$method_name]);
