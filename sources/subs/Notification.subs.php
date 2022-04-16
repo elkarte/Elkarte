@@ -39,7 +39,8 @@ function sendNotifications($topics, $type, $exclude = array(), $members_only = a
 
 	$db = database();
 
-	// Coming in from emailpost or emailtopic, if so pbe values will be set to the credentials of the emailer
+	// Coming in from emailpost or emailtopic, if so pbe values will be set to the credentials
+	// of the emailer
 	$user_id = (!empty($pbe['user_info']['id']) && !empty($modSettings['maillist_enabled'])) ? $pbe['user_info']['id'] : User::$info->id;
 	$user_language = (!empty($pbe['user_info']['language']) && !empty($modSettings['maillist_enabled'])) ? $pbe['user_info']['language'] : User::$info->language;
 
@@ -294,7 +295,7 @@ function sendNotifications($topics, $type, $exclude = array(), $members_only = a
 	$members = $db->fetchQuery('
 		SELECT
 			mem.id_member, mem.email_address, mem.notify_regularity, mem.notify_types, mem.warning,
-			mem.notify_send_body, mem.lngfile, mem.id_group, mem.additional_groups,mem.id_post_group,
+			mem.notify_send_body, mem.lngfile, mem.id_group, mem.additional_groups, mem.id_post_group,
 			t.id_member_started, b.member_groups, b.name, b.id_profile, b.id_board,
 			ln.id_topic, ln.sent, mem.password_salt
 		FROM {db_prefix}log_notify AS ln

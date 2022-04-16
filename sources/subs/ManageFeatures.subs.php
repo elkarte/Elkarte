@@ -798,8 +798,7 @@ function loadAllCustomFields()
  *
  * What it does:
  *
- * - Scans teh subs\MentionType directory for files
- * - Calls its getType method
+ * - Scans the ElkArte\Mentions\MentionType\Notifications directory for available classes
  *
  * @return array
  */
@@ -808,7 +807,7 @@ function getAvailableNotifications()
 	$glob = new GlobIterator(SOURCEDIR . '/ElkArte/Mentions/MentionType/Notification/*.php', FilesystemIterator::SKIP_DOTS);
 	$types = array();
 
-	// For each file found, call its getType method
+	// For each file found, return its FQN
 	foreach ($glob as $file)
 	{
 		$class_name = '\\ElkArte\\Mentions\\MentionType\\Notification\\' . $file->getBasename('.php');
@@ -824,7 +823,7 @@ function getAvailableNotifications()
  * What it does:
  *
  * - Calls each modules static function ::getModules
- * - Called from ManageFeatures.controller as part of notification settings
+ * - Called from ManageFeatures as part of notification settings
  *
  * @param string[] $enabled_mentions
  *
