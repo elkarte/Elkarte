@@ -105,7 +105,8 @@ abstract class ManageEmojiModule extends AbstractController
 		}
 
 		$source = BOARDDIR . '/smileys/' . $modSettings['emoji_selection'];
-		if (FileFunctions::instance()->isDir($source))
+		$fileFunc = FileFunctions::instance();
+		if ($fileFunc->isDir($source))
 		{
 			$iterator = new \RecursiveDirectoryIterator($source, \FilesystemIterator::SKIP_DOTS);
 			$files = new \RecursiveIteratorIterator($iterator, \RecursiveIteratorIterator::CHILD_FIRST, \RecursiveIteratorIterator::CATCH_GET_CHILD);
@@ -115,7 +116,7 @@ abstract class ManageEmojiModule extends AbstractController
 			{
 				if ($file->getExtension() === 'svg')
 				{
-					unlink($file->getRealPath());
+					$fileFunc->delete($file->getRealPath());
 				}
 			}
 		}

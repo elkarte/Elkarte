@@ -21,6 +21,7 @@ use BBC\ParserWrapper;
 use ElkArte\AbstractController;
 use ElkArte\Action;
 use ElkArte\Exceptions\Exception;
+use ElkArte\FileFunctions;
 use ElkArte\MembersList;
 use ElkArte\MessagesDelete;
 use ElkArte\Languages\Txt;
@@ -32,25 +33,13 @@ use ElkArte\Util;
  */
 class ProfileInfo extends AbstractController
 {
-	/**
-	 * Member id for the profile being worked with
-	 *
-	 * @var int
-	 */
+	/** @var int Member id for the profile being worked with */
 	private $_memID = 0;
 
-	/**
-	 * The \ElkArte\Member object is stored here to avoid some global
-	 *
-	 * @var \ElkArte\Member
-	 */
+	/** @var \ElkArte\Member The \ElkArte\Member object is stored here to avoid some global */
 	private $_profile = null;
 
-	/**
-	 * Holds the current summary tabs to load
-	 *
-	 * @var array
-	 */
+	/** @var array Holds the current summary tabs to load */
 	private $_summary_areas;
 
 	/**
@@ -1491,7 +1480,7 @@ class ProfileInfo extends AbstractController
 		// Load up the most recent attachments for this user for use in profile views etc.
 		if (!empty($modSettings['attachmentEnable'])
 			&& !empty($settings['attachments_on_summary'])
-			&& in_array('attachments', $this->_summary_areas))
+			&& in_array('attachments', $this->_summary_areas, true))
 		{
 			$boardsAllowed = boardsAllowedTo('view_attachments');
 
@@ -1538,14 +1527,14 @@ class ProfileInfo extends AbstractController
 						}
 					}
 				}
-				// Not an image so lets set a mime thumbnail based off the filetype
+				// Not an image so set a mime thumbnail based off the filetype
 				elseif ((!empty($modSettings['attachmentThumbWidth']) && !empty($modSettings['attachmentThumbHeight'])) && (128 > $modSettings['attachmentThumbWidth'] || 128 > $modSettings['attachmentThumbHeight']))
 				{
-					$context['thumbs'][$i]['img'] = '<img src="' . $mime_images_url . (!file_exists($mime_path . $attachment['fileext'] . '.png') ? 'default' : $attachment['fileext']) . '.png" title="" alt="" width="' . $modSettings['attachmentThumbWidth'] . '" height="' . $modSettings['attachmentThumbHeight'] . '" />';
+					$context['thumbs'][$i]['img'] = '<img src="' . $mime_images_url . (!FileFunctions::instance()->fileExists($mime_path . $attachment['fileext'] . '.png') ? 'default' : $attachment['fileext']) . '.png" title="" alt="" width="' . $modSettings['attachmentThumbWidth'] . '" height="' . $modSettings['attachmentThumbHeight'] . '" />';
 				}
 				else
 				{
-					$context['thumbs'][$i]['img'] = '<img src="' . $mime_images_url . (!file_exists($mime_path . $attachment['fileext'] . '.png') ? 'default' : $attachment['fileext']) . '.png" title="" alt="" />';
+					$context['thumbs'][$i]['img'] = '<img src="' . $mime_images_url . (!FileFunctions::instance()->fileExists($mime_path . $attachment['fileext'] . '.png') ? 'default' : $attachment['fileext']) . '.png" title="" alt="" />';
 				}
 			}
 		}

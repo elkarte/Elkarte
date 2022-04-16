@@ -33,6 +33,9 @@ use ElkArte\Util;
  */
 class PackageServers extends AbstractController
 {
+	/** @var \ElkArte\FileFunctions */
+	protected $fileFunc;
+
 	/**
 	 * Called before all other methods when coming from the dispatcher or
 	 * action class.  Loads language and templates files so they are available
@@ -46,6 +49,8 @@ class PackageServers extends AbstractController
 		// Use the PackageServers template.
 		theme()->getTemplates()->load('PackageServers');
 		loadCSSFile('admin.css');
+
+		$this->fileFunc = FileFunctions::instance();
 	}
 
 	/**
@@ -110,7 +115,6 @@ class PackageServers extends AbstractController
 		global $txt, $context;
 
 		require_once(SUBSDIR . '/PackageServers.subs.php');
-		$fileFunc = FileFunctions::instance();
 
 		// Ensure we use the correct template, and page title.
 		$context['sub_template'] = 'servers';
@@ -120,7 +124,7 @@ class PackageServers extends AbstractController
 		$context['servers'] = fetchPackageServers();
 
 		// Check if we will be able to write new archives in /packages folder.
-		$context['package_download_broken'] = !$fileFunc->isWritable(BOARDDIR . '/packages') || !$fileFunc->isWritable(BOARDDIR . '/packages/installed.list');
+		$context['package_download_broken'] = !$this->fileFunc->isWritable(BOARDDIR . '/packages') || !$this->fileFunc->isWritable(BOARDDIR . '/packages/installed.list');
 		if ($context['package_download_broken'])
 		{
 			$this->ftp_connect();
@@ -139,11 +143,10 @@ class PackageServers extends AbstractController
 		global $context, $modSettings, $txt;
 
 		// Try to chmod from PHP first
-		$fileFunc = FileFunctions::instance();
-		$fileFunc->chmod(BOARDDIR . '/packages');
-		$fileFunc->chmod(BOARDDIR . '/packages/installed.list');
+		$this->fileFunc->chmod(BOARDDIR . '/packages');
+		$this->fileFunc->chmod(BOARDDIR . '/packages/installed.list');
 
-		$unwritable = !$fileFunc->isWritable(BOARDDIR . '/packages') || !$fileFunc->isWritable(BOARDDIR . '/packages/installed.list');
+		$unwritable = !$fileFunc->isWritable(BOARDDIR . '/packages') || !$this->fileFunc->isWritable(BOARDDIR . '/packages/installed.list');
 		if (!$unwritable)
 		{
 			// Using PHP was successful, no need for FTP
@@ -608,7 +611,7 @@ class PackageServers extends AbstractController
 		}
 
 		// Avoid over writing any existing package files of the same name
-		if (isset($this->_req->query->conflict) || (isset($this->_req->query->auto) && file_exists(BOARDDIR . '/packages/' . $package_name)))
+		if (isset($this->_req->query->conflict) || (isset($this->_req->query->auto) && $this->fileFunc->fileExists(BOARDDIR . '/packages/' . $package_name)))
 		{
 			// Find the extension, change abc.tar.gz to abc_1.tar.gz...
 			if (strrpos(substr($package_name, 0, -3), '.') !== false)
@@ -623,7 +626,7 @@ class PackageServers extends AbstractController
 
 			// Find the first available free name
 			$i = 1;
-			while (file_exists(BOARDDIR . '/packages/' . $package_name . $i . $ext))
+			while ($this->fileFunc->fileExists(BOARDDIR . '/packages/' . $package_name . $i . $ext))
 			{
 				$i++;
 			}
@@ -708,7 +711,7 @@ class PackageServers extends AbstractController
 		{
 			throw new Exception('package_upload_error_nofile');
 		}
-		elseif (!is_uploaded_file($_FILES['package']['tmp_name']) || (ini_get('open_basedir') == '' && !file_exists($_FILES['package']['tmp_name'])))
+		elseif (!is_uploaded_file($_FILES['package']['tmp_name']) || (ini_get('open_basedir') == '' && !$this->fileFunc->fileExists($_FILES['package']['tmp_name'])))
 		{
 			throw new Exception('package_upload_error_failed');
 		}
@@ -728,14 +731,14 @@ class PackageServers extends AbstractController
 		$destination = BOARDDIR . '/packages/' . $packageName;
 
 		// @todo Maybe just roll it like we do for downloads?
-		if (file_exists($destination))
+		if ($this->fileFunc->fileExists($destination))
 		{
 			throw new Exception('package_upload_error_exists');
 		}
 
 		// Now move the file.
 		move_uploaded_file($_FILES['package']['tmp_name'], $destination);
-		@chmod($destination, 0777);
+		$this->fileFunc->chmod($destination);
 
 		// If we got this far that should mean it's available.
 		$context['package'] = getPackageInfo($packageName);
@@ -744,7 +747,7 @@ class PackageServers extends AbstractController
 		// Not really a package, you lazy bum!
 		if (!is_array($context['package']))
 		{
-			@unlink($destination);
+			$this->fileFunc->delete($destination);
 			Txt::load('Errors');
 			$txt[$context['package']] = str_replace('{MANAGETHEMEURL}', getUrl('admin', ['action' => 'admin', 'area' => 'theme', 'sa' => 'admin', '{session_data}', 'hash' => '#theme_install']), $txt[$context['package']]);
 			throw new Exception('package_upload_error_broken', false, $txt[$context['package']]);
@@ -777,7 +780,7 @@ class PackageServers extends AbstractController
 					// If it was already uploaded under another name don't upload it again.
 					if ($packageInfo['id'] === $context['package']['id'] && compareVersions($packageInfo['version'], $context['package']['version']) == 0)
 					{
-						@unlink($destination);
+						$this->fileFunc->delete($destination);
 						throw new Exception('Errors.package_upload_already_exists', 'general', $package->getFilename());
 					}
 				}

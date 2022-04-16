@@ -847,7 +847,7 @@ class AttachmentsDirectory
 		}
 
 		// It's safe to delete. So try to delete the folder also
-		if ($num_attach == 0)
+		if ($num_attach === 0)
 		{
 			$fileFunctions = FileFunctions::instance();
 			$doit = false;
@@ -863,7 +863,7 @@ class AttachmentsDirectory
 			}
 
 			// They have a path in the system that does not exist
-			if ($doit === false && !file_exists($real_path))
+			if ($doit === false && !$fileFunctions->fileExists($real_path))
 			{
 				$this->clear($id);
 				return true;
@@ -871,16 +871,9 @@ class AttachmentsDirectory
 
 			if ($doit === true)
 			{
-				try
-				{
-					unlink($real_path . '/.htaccess');
-					unlink($real_path . '/index.php');
-					$result = rmdir($real_path);
-				}
-				catch (\Exception $e)
-				{
-					throw new Exception('attach_dir_no_delete');
-				}
+				$fileFunctions->delete($real_path . '/.htaccess');
+				$fileFunctions->delete($real_path . '/index.php');
+				$result = $fileFunctions->rmDir($real_path);
 
 				if (!$result)
 				{

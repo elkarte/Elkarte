@@ -250,14 +250,7 @@ class PackageParser extends AbstractModel
 		{
 			foreach ($context['theme_copies'][$action['type']][$action['filename']] as $theme_destination)
 			{
-				if ($this->fileFunc->fileExists($theme_destination))
-				{
-					$this->failure |= !$this->fileFunc->delete($theme_destination);
-				}
-				else
-				{
-					$this->failure = true;
-				}
+				$this->failure |= !$this->fileFunc->delete($theme_destination);
 			}
 		}
 	}

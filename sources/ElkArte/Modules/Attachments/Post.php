@@ -19,6 +19,7 @@ namespace ElkArte\Modules\Attachments;
 use ElkArte\Errors\AttachmentErrorContext;
 use ElkArte\Errors\ErrorContext;
 use ElkArte\EventManager;
+use ElkArte\FileFunctions;
 use ElkArte\Modules\AbstractModule;
 use ElkArte\TemporaryAttachmentsList;
 
@@ -512,7 +513,7 @@ class Post extends AbstractModule
 				// We have errors on this file, build out the issues for display to the user
 				else
 				{
-					@unlink($attachment['tmp_name']);
+					FileFunctions::instance()->delete($attachment['tmp_name']);
 				}
 			}
 

@@ -25,103 +25,50 @@ use tubalmartin\CssMin\Minifier as CSSmin;
  */
 class SiteCombiner
 {
-	/**
-	 * Holds all the files contents that we have joined in to one
-	 *
-	 * @var array
-	 */
+	/** @var array Holds all the files contents that we have joined in to one */
 	private $_combine_files = array();
 
-	/**
-	 * Holds the file name of our newly created file
-	 *
-	 * @var string
-	 */
-	private $_archive_name = null;
+	/** @var string Holds the file name of our newly created file */
+	private $_archive_name;
 
-	/**
-	 * Holds the file names of the files in the compilation
-	 *
-	 * @var string
-	 */
-	private $_archive_filenames = null;
+	/** @var string Holds the file names of the files in the compilation */
+	private $_archive_filenames;
 
-	/**
-	 * Holds the comment line to add at the start of the compressed compilation
-	 *
-	 * @var string
-	 */
-	private $_archive_header = null;
+	/** @var string Holds the comment line to add at the start of the compressed compilation */
+	private $_archive_header;
 
-	/**
-	 * Holds the file data of the combined files
-	 *
-	 * @var string
-	 */
-	private $_cache = array();
+	/** @var string Holds the file data of the combined files */
+	private $_cache = [];
 
-	/**
-	 * Holds the file data of pre minimized files
-	 *
-	 * @var string
-	 */
-	private $_min_cache = array();
+	/** @var string Holds the file data of pre minimized files */
+	private $_min_cache = [];
 
-	/**
-	 * Holds the minified data of the combined files
-	 *
-	 * @var string
-	 */
-	private $_minified_cache = null;
+	/** @var string Holds the minified data of the combined files */
+	private $_minified_cache;
 
-	/**
-	 * The directory where we will save the combined and packed files
-	 *
-	 * @var string
-	 */
-	private $_archive_dir = null;
+	/** @var string The directory where we will save the combined and packed files */
+	private $_archive_dir;
 
-	/**
-	 * The url where we will save the combined and packed files
-	 *
-	 * @var string
-	 */
-	private $_archive_url = null;
+	/** @var string The url where we will save the combined and packed files */
+	private $_archive_url;
 
-	/**
-	 * The stale parameter added to the url
-	 *
-	 * @var string
-	 */
+	/** @var string The stale parameter added to the url */
 	private $_archive_stale = '';
 
-	/**
-	 * All the cache-stale params added to the file urls
-	 *
-	 * @var string[]
-	 */
-	private $_stales = array();
+	/** @var string[] All the cache-stale params added to the file urls */
+	private $_stales = [];
 
-	/**
-	 * All files that was not possible to combine
-	 *
-	 * @var string[]
-	 */
-	private $_spares = array();
+	/** @var string[] All files that was not possible to combine */
+	private $_spares = [];
 
-	/**
-	 * Location of the closure compiler
-	 *
-	 * @var string
-	 */
+	/** @var string Location of the closure compiler */
 	private $_url = 'http://closure-compiler.appspot.com/compile';
 
-	/**
-	 * Base post header to send to the closure compiler
-	 *
-	 * @var string
-	 */
+	/** @var string Base post header to send to the closure compiler */
 	private $_post_header = 'output_info=compiled_code&output_format=text&compilation_level=SIMPLE_OPTIMIZATIONS';
+
+	/** @var \ElkArte\FileFunctions */
+	private $fileFunc;
 
 	/**
 	 * Nothing much to do but start
@@ -134,8 +81,7 @@ class SiteCombiner
 		// Init
 		$this->_archive_dir = $cachedir;
 		$this->_archive_url = $cacheurl;
-
-		$this->_spares = array();
+		$this->fileFunc = FileFunctions::instance();
 	}
 
 	/**
@@ -311,11 +257,12 @@ class SiteCombiner
 		$path = $this->_archive_dir . '/hive-*.' . $ext;
 
 		$glob = new \GlobIterator($path, \FilesystemIterator::SKIP_DOTS);
+		$fileFunc = FileFunctions::instance();
 		$return = true;
 
 		foreach ($glob as $file)
 		{
-			$return &= @unlink($file->getPathname());
+			$return &= $fileFunc->delete($file->getPathname());
 		}
 
 		return $return;
@@ -328,7 +275,7 @@ class SiteCombiner
 	 */
 	protected function _validDestination()
 	{
-		return file_exists($this->_archive_dir) && is_writable($this->_archive_dir);
+		return $this->fileFunc->fileExists($this->_archive_dir) && $this->fileFunc->isWritable($this->_archive_dir);
 	}
 
 	/**
@@ -367,7 +314,7 @@ class SiteCombiner
 		if (isset($options['dir']))
 		{
 			$filename = $options['dir'] . $options['basename'];
-			if (!file_exists($filename))
+			if (!$this->fileFunc->fileExists($filename))
 			{
 				return false;
 			}
@@ -396,7 +343,7 @@ class SiteCombiner
 	private function _isStale()
 	{
 		// If any files in the archive are newer than the archive file itself, then the archive is stale
-		$filemtime = file_exists($this->_archive_dir . '/' . $this->_archive_name) ? filemtime($this->_archive_dir . '/' . $this->_archive_name) : 0;
+		$filemtime = $this->fileFunc->fileExists($this->_archive_dir . '/' . $this->_archive_name) ? filemtime($this->_archive_dir . '/' . $this->_archive_name) : 0;
 
 		foreach ($this->_combine_files as $file)
 		{
@@ -451,8 +398,8 @@ class SiteCombiner
 	private function _combineFiles($type)
 	{
 		// Remove any old cache file(s)
-		@unlink($this->_archive_dir . '/' . $this->_archive_name);
-		@unlink($this->_archive_dir . '/' . $this->_archive_name . '.gz');
+		$this->fileFunc->delete($this->_archive_dir . '/' . $this->_archive_name);
+		$this->fileFunc->delete($this->_archive_dir . '/' . $this->_archive_name . '.gz');
 
 		$_cache = array();
 		$_min_cache = array();
@@ -460,7 +407,7 @@ class SiteCombiner
 		// Read in all the data so we can process
 		foreach ($this->_combine_files as $key => $file)
 		{
-			if (!file_exists($file['file']))
+			if (!$this->fileFunc->fileExists($file['file']))
 			{
 				continue;
 			}
@@ -670,7 +617,7 @@ class SiteCombiner
 			$data = fetch_web_data($this->_url, $this->_post_header . $post_data);
 
 			// Use the results or the raw data if an error is detected
-			$fetch_data .= ($data === false || trim($data) == '' || preg_match('/^Error\(\d{1,2}\):\s/m', $data)) ? $post_data_raw : $data;
+			$fetch_data .= ($data === false || trim($data) === '' || preg_match('/^Error\(\d{1,2}\):\s/m', $data)) ? $post_data_raw : $data;
 		}
 
 		return $fetch_data;

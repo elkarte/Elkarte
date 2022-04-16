@@ -18,6 +18,7 @@ namespace ElkArte\ScheduledTasks\Tasks;
 
 use ElkArte\AttachmentsDirectory;
 use ElkArte\Errors\Errors;
+use ElkArte\FileFunctions;
 use ElkArte\Languages\Txt;
 
 /**
@@ -48,6 +49,7 @@ class RemoveTempAttachments implements ScheduledTaskInterface
 		{
 			try
 			{
+				$fileFunc = FileFunctions::instance();
 				$files = new \FilesystemIterator($attach_dir, \FilesystemIterator::SKIP_DOTS);
 				foreach ($files as $file)
 				{
@@ -56,7 +58,7 @@ class RemoveTempAttachments implements ScheduledTaskInterface
 						// Temp file is more than 5 hours old!
 						if ($file->getMTime() < time() - 18000)
 						{
-							@unlink($file->getPathname());
+							$fileFunc->delete($file->getPathname());
 						}
 					}
 				}

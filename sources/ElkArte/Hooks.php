@@ -22,33 +22,20 @@ namespace ElkArte;
  */
 final class Hooks
 {
-	/**
-	 * The instance of the class
-	 *
-	 * @var Hooks
-	 */
-	private static $_instance = null;
+	/** @var Hooks The instance of the class */
+	private static $_instance;
 
-	/**
-	 * Holds our standard path replacement array
-	 *
-	 * @var array
-	 */
+	/** @var array Holds our standard path replacement array */
 	protected $_path_replacements = array();
 
-	/**
-	 * Holds the database instance
-	 *
-	 * @var null|\ElkArte\Database\QueryInterface
-	 */
-	protected $_db = null;
+	/** @var null|\ElkArte\Database\QueryInterface Holds the database instance */
+	protected $_db;
 
-	/**
-	 * If holds instance of debug class
-	 *
-	 * @var object|null
-	 */
-	protected $_debug = null;
+	/** @var object|null If holds instance of debug class */
+	protected $_debug;
+
+	/** @var \ElkArte\FileFunctions */
+	protected $fileFunc;
 
 	/**
 	 * The class constructor, loads globals in to the class object
@@ -70,6 +57,7 @@ final class Hooks
 		);
 		$this->_db = $db;
 		$this->_debug = $debug;
+		$this->fileFunc = FileFunctions::instance();
 
 		if ($paths !== null)
 		{
@@ -161,7 +149,7 @@ final class Hooks
 			{
 				$absPath = strtr(trim($file), $this->_path_replacements);
 
-				if (file_exists($absPath))
+				if ($this->fileFunc->fileExists($absPath))
 				{
 					require_once($absPath);
 				}
@@ -199,7 +187,7 @@ final class Hooks
 			{
 				$include = strtr(trim($include), $this->_path_replacements);
 
-				if (file_exists($include))
+				if ($this->fileFunc->fileExists($include))
 				{
 					require_once($include);
 				}
@@ -359,7 +347,7 @@ final class Hooks
 			$composer_file = $file->getPath() . '/composer.json';
 
 			// Already have the integration compose file, then use it, otherwise create one
-			if (file_exists($composer_file))
+			if ($this->fileFunc->fileExists($composer_file))
 			{
 				$composer_data = json_decode(file_get_contents($composer_file));
 			}
@@ -571,7 +559,7 @@ final class Hooks
 	 * Instantiation is a bit more complex, so let's give it a custom function
 	 *
 	 * @param \ElkArte\Database\QueryInterface|null $db A database connection
-	 * @param Debug|null $debug A class for debugging
+	 * @param \ElkArte\Debug|null $debug A class for debugging
 	 * @param string[]|null $paths An array of paths for replacement
 	 */
 	public static function init($db = null, $debug = null, $paths = null)

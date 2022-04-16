@@ -19,6 +19,7 @@ namespace ElkArte\AdminController;
 
 use ElkArte\AbstractController;
 use ElkArte\Action;
+use ElkArte\FileFunctions;
 use ElkArte\Search\SearchApiWrapper;
 use ElkArte\SettingsForm\SettingsForm;
 use ElkArte\Languages\Txt;
@@ -634,7 +635,7 @@ class ManageSearch extends AbstractController
 		global $txt, $modSettings, $context;
 
 		// This is included with sphinx and not distrubuted with ElkArte
-		if (file_exists(SOURCEDIR . '/sphinxapi.php'))
+		if (FileFunctions::instance()->fileExists(SOURCEDIR . '/sphinxapi.php'))
 		{
 			include_once(SOURCEDIR . '/sphinxapi.php');
 			$server = !empty($modSettings['sphinx_searchd_server']) ? $modSettings['sphinx_searchd_server'] : 'localhost';

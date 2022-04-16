@@ -19,6 +19,7 @@ use ElkArte\Cache\Cache;
 use ElkArte\Controller\Avatars;
 use ElkArte\DataValidator;
 use ElkArte\Errors\ErrorContext;
+use ElkArte\FileFunctions;
 use ElkArte\MembersList;
 use ElkArte\Notifications;
 use ElkArte\Languages\Txt;
@@ -2135,11 +2136,11 @@ function profileLoadAvatarData()
 			'external' => 'https://'
 		);
 	}
-	elseif ($cur_profile['avatar']['name'] != '' && file_exists($modSettings['avatar_directory'] . '/' . $cur_profile['avatar']['name']) && $context['member']['avatar']['allow_server_stored'])
+	elseif ($cur_profile['avatar']['name'] != '' && FileFunctions::instance()->fileExists($modSettings['avatar_directory'] . '/' . $cur_profile['avatar']['name']) && $context['member']['avatar']['allow_server_stored'])
 	{
 		$context['member']['avatar'] += array(
 			'choice' => 'server_stored',
-			'server_pic' => $cur_profile['avatar']['name'] == '' ? 'blank.png' : $cur_profile['avatar']['name'],
+			'server_pic' => $cur_profile['avatar']['name'] === '' ? 'blank.png' : $cur_profile['avatar']['name'],
 			'external' => $schema
 		);
 	}
@@ -2157,7 +2158,7 @@ function profileLoadAvatarData()
 	{
 		require_once(SUBSDIR . '/Attachments.subs.php');
 		$context['avatar_list'] = array();
-		$context['avatars'] = is_dir($modSettings['avatar_directory']) ? getServerStoredAvatars('') : array();
+		$context['avatars'] = FileFunctions::instance()->isDir($modSettings['avatar_directory']) ? getServerStoredAvatars('') : array();
 	}
 	else
 	{
