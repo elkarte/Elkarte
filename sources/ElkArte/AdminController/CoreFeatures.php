@@ -18,6 +18,7 @@ namespace ElkArte\AdminController;
 
 use ElkArte\AbstractController;
 use ElkArte\Cache\Cache;
+use ElkArte\FileFunctions;
 use ElkArte\Hooks;
 use ElkArte\Languages\Txt;
 use FilesystemIterator;
@@ -483,12 +484,12 @@ class CoreFeatures extends AbstractController
 				'enabled' => featureEnabled($id),
 				'state' => featureEnabled($id) ? 'on' : 'off',
 				'url' => $feature['url'],
-				'image' => (file_exists($settings['theme_dir'] . '/images/admin/feature_' . $id . '.png') ? $settings['images_url'] : $settings['default_images_url']) . '/admin/feature_' . $id . '.png',
+				'image' => (FileFunctions::instance()->fileExists($settings['theme_dir'] . '/images/admin/feature_' . $id . '.png') ? $settings['images_url'] : $settings['default_images_url']) . '/admin/feature_' . $id . '.png',
 			);
 		}
 
 		// Sort by title attribute
-		uasort($features, function ($a, $b) {
+		uasort($features, static function ($a, $b) {
 			return strcmp(strtolower($a['title']), strtolower($b['title']));
 		});
 

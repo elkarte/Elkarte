@@ -16,6 +16,7 @@
 
 namespace ElkArte\SettingsForm\SettingsFormAdapter;
 
+use ElkArte\FileFunctions;
 use ElkArte\Util;
 
 /**
@@ -25,20 +26,17 @@ use ElkArte\Util;
  */
 class File extends Db
 {
-	/**
-	 * @var int
-	 */
+	/** @var int */
 	private $last_settings_change;
 
-	/**
-	 * @var array
-	 */
+	/** @var array */
 	private $settingsArray = array();
 
-	/**
-	 * @var array
-	 */
+	/** @var array */
 	private $new_settings = array();
+
+	/** @var \ElkArte\FileFunctions */
+	private $fileFunc;
 
 	/**
 	 * Helper method, it sets up the context for the settings which will be saved
@@ -124,7 +122,7 @@ class File extends Db
 	/**
 	 * Update the Settings.php file.
 	 *
-	 * Typically this method is used from admin screens, just like this entire class.
+	 * Typically, this method is used from admin screens, just like this entire class.
 	 * They're also available for addons and integrations.
 	 *
 	 * What it does:
@@ -142,6 +140,8 @@ class File extends Db
 	 */
 	public function save()
 	{
+		$this->fileFunc = FileFunctions::instance();
+
 		$this->_cleanSettings();
 
 		// When was Settings.php last changed?
@@ -423,7 +423,7 @@ class File extends Db
 		//
 		// Check before you act: if cache is enabled, we can do a simple write test
 		// to validate that we even write things on this filesystem.
-		if ((!defined('CACHEDIR') || !file_exists(CACHEDIR)) && file_exists(BOARDDIR . '/cache'))
+		if ((!defined('CACHEDIR') || !$this->fileFunc->fileExists(CACHEDIR)) && $this->fileFunc->fileExists(BOARDDIR . '/cache'))
 		{
 			$tmp_cache = BOARDDIR . '/cache';
 		}
@@ -437,7 +437,7 @@ class File extends Db
 		{
 			fclose($test_fp);
 			$written_bytes = file_put_contents($tmp_cache . '/settings_update.tmp', 'test', LOCK_EX);
-			@unlink($tmp_cache . '/settings_update.tmp');
+			$this->fileFunc->delete($tmp_cache . '/settings_update.tmp');
 
 			if ($written_bytes !== 4)
 			{
@@ -452,8 +452,8 @@ class File extends Db
 		if (filemtime(BOARDDIR . '/Settings.php') === $this->last_settings_change)
 		{
 			// Save the old before we do anything
-			$settings_backup_fail = !@is_writable(BOARDDIR . '/Settings_bak.php') || !@copy(BOARDDIR . '/Settings.php', BOARDDIR . '/Settings_bak.php');
-			$settings_backup_fail = !$settings_backup_fail ? (!file_exists(BOARDDIR . '/Settings_bak.php') || filesize(BOARDDIR . '/Settings_bak.php') === 0) : $settings_backup_fail;
+			$settings_backup_fail = !$this->fileFunc->isWritable(BOARDDIR . '/Settings_bak.php') || !@copy(BOARDDIR . '/Settings.php', BOARDDIR . '/Settings_bak.php');
+			$settings_backup_fail = !$settings_backup_fail ? (!$this->fileFunc->fileExists(BOARDDIR . '/Settings_bak.php') || filesize(BOARDDIR . '/Settings_bak.php') === 0) : $settings_backup_fail;
 
 			// Write out the new
 			$write_settings = implode('', $this->settingsArray);
@@ -465,7 +465,7 @@ class File extends Db
 				// Well this is not good at all, lets see if we can save this
 				$context['settings_message'] = 'settings_error';
 
-				if (file_exists(BOARDDIR . '/Settings_bak.php'))
+				if ($this->fileFunc->fileExists(BOARDDIR . '/Settings_bak.php'))
 				{
 					@copy(BOARDDIR . '/Settings_bak.php', BOARDDIR . '/Settings.php');
 				}
@@ -486,7 +486,7 @@ class File extends Db
 	{
 		// Now loop through the remaining (database-based) settings.
 		$this->configVars = array_map(
-			function ($configVar) {
+			static function ($configVar) {
 				// We just saved the file-based settings, so skip their definitions.
 				if (!is_array($configVar) || $configVar[2] === 'file')
 				{
@@ -498,11 +498,9 @@ class File extends Db
 				{
 					return array($configVar[3], $configVar[0]);
 				}
-				else
-				{
-					// This is a regular config var requiring no special treatment.
-					return $configVar;
-				}
+
+				// This is a regular config var requiring no special treatment.
+				return $configVar;
 			}, $this->configVars
 		);
 

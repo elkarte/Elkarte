@@ -13,40 +13,29 @@
 
 namespace ElkArte\Cache\CacheMethod;
 
+use ElkArte\FileFunctions;
+
 /**
  * Abstract cache class, implementing the Cache_Method_Interface interface.
  * Used to provide common methods and properties to the caching classes
  */
 abstract class AbstractCacheMethod implements CacheMethodInterface
 {
-	/**
-	 * The settings of the caching engine
-	 *
-	 * @var array
-	 */
-	public $_options = null;
+	/** @var array The settings of the caching engine */
+	public $_options;
 
-	/**
-	 * Cache hit or not
-	 *
-	 * @var bool
-	 */
+	/** @var bool Cache hit or not */
 	protected $is_miss = true;
 
-	/**
-	 * the (human-readable) name of the caching engine.
-	 *
-	 * @var string
-	 */
+	/** @var string the (human-readable) name of the caching engine. */
 	protected $title = '';
 
-	/**
-	 * This is prefixed to all cache entries so that different
-	 * applications won't interfere with each other.
-	 *
-	 * @var string
-	 */
+	/** @var string This is prefixed to all cache entries so that different
+	    applications won't interfere with each other. */
 	protected $prefix = 'elkarte';
+
+	/** @var \ElkArte\FileFunctions instance of file functions for use in cache methods */
+	protected $fileFunc;
 
 	/**
 	 * {@inheritdoc}
@@ -54,6 +43,7 @@ abstract class AbstractCacheMethod implements CacheMethodInterface
 	public function __construct($options)
 	{
 		$this->_options = $options;
+		$this->fileFunc = FileFunctions::instance();
 	}
 
 	/**

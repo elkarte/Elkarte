@@ -36,6 +36,13 @@ function template_profile_above()
 	// If an error occurred while trying to save previously, give the user a clue!
 	template_error_message();
 
+	// If they have any enabled site notifications, then enable a browser alerts permission request
+	// This just blows smoke if they already gave it.
+	if (!empty($context['push_alert']))
+	{
+		theme()->addInlineJavascript('$(function() {Push.Permission.request();});', true);
+	}
+
 	// If the profile was update successfully, let the user know this.
 	if (!empty($context['profile_updated']))
 	{
@@ -51,7 +58,7 @@ function template_profile_above()
  */
 function template_showDrafts()
 {
-	global $context, $settings, $txt;
+	global $context, $txt;
 
 	if (!empty($context['drafts']))
 	{

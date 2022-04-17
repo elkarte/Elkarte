@@ -35,21 +35,21 @@ abstract class AbstractNotificationMessage implements NotificationInterface
 	 *
 	 * @var \ElkArte\Database\QueryInterface
 	 */
-	protected $_db = null;
+	protected $_db;
 
 	/**
 	 * The current user object
 	 *
 	 * @var \ElkArte\ValuesContainer
 	 */
-	protected $user = null;
+	protected $user;
 
 	/**
 	 * The \ElkArte\NotificationsTask in use
 	 *
 	 * @var \ElkArte\NotificationsTask
 	 */
-	protected $_task = null;
+	protected $_task;
 
 	/**
 	 * @param \ElkArte\Database\QueryInterface $db

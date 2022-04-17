@@ -22,6 +22,7 @@ use ElkArte\Action;
 use ElkArte\Agreement;
 use ElkArte\Errors\ErrorContext;
 use ElkArte\Exceptions\Exception;
+use ElkArte\FileFunctions;
 use ElkArte\PrivacyPolicy;
 use ElkArte\SettingsForm\SettingsForm;
 use ElkArte\Languages\Txt;
@@ -263,28 +264,27 @@ class ManageRegistration extends AbstractController
 		// I hereby agree not to be a lazy bum.
 		global $txt, $context, $modSettings;
 
-		// By default we look at Languages/Agreement/English.txt.
-		$context['current_agreement'] = '';
+		// By default, we look at Languages/Agreement/English.txt.
+		$context['current_agreement'] = 'English';
 
 		// Is there more than one to edit?
-		$context['editable_agreements'] = array(
-			'' => $txt['admin_agreement_default'],
-		);
+		$context['editable_agreements'] = array('' => $txt['admin_agreement_default']);
 
 		// Get our languages.
 		$languages = getLanguages();
 
 		// Try to figure out if we have more agreements.
+		$fileFunc = FileFunctions::instance();
 		foreach ($languages as $lang)
 		{
-			if (file_exists(SOURCEDIR . '/ElkArte/Languages/Agreement/' . $lang['filename'] . '.txt'))
+			if ($fileFunc->fileExists(SOURCEDIR . '/ElkArte/Languages/Agreement/' . $lang['name'] . '.txt'))
 			{
 				$context['editable_agreements'][$lang['filename']] = $lang['name'];
 
 				// Are we editing this?
-				if (isset($this->_req->post->agree_lang) && $this->_req->post->agree_lang === $lang['filename'])
+				if ($this->_req->getPost('agree_lang') === $lang['filename'])
 				{
-					$context['current_agreement'] = $lang['filename'];
+					$context['current_agreement'] = $lang['name'];
 					break;
 				}
 			}
@@ -293,7 +293,8 @@ class ManageRegistration extends AbstractController
 		$context['warning'] = '';
 		$agreement = new Agreement($context['current_agreement']);
 
-		if (isset($this->_req->post->save) && isset($this->_req->post->agreement))
+		// Saving the edit
+		if (isset($this->_req->post->save, $this->_req->post->agreement))
 		{
 			checkSession();
 			validateToken('admin-rega');
@@ -346,22 +347,21 @@ class ManageRegistration extends AbstractController
 		$context['current_agreement'] = '';
 
 		// Is there more than one to edit?
-		$context['editable_agreements'] = array(
-			'' => $txt['admin_agreement_default'],
-		);
+		$context['editable_agreements'] = array('' => $txt['admin_agreement_default']);
 
 		// Get our languages.
 		$languages = getLanguages();
 
 		// Try to figure out if we have more agreements.
+		$fileFunc = FileFunctions::instance();
 		foreach ($languages as $lang)
 		{
-			if (file_exists(SOURCEDIR . '/ElkArte/Languages/PrivacyPolicy/' . $lang['filename'] . '.txt'))
+			if ($fileFunc->fileExists(SOURCEDIR . '/ElkArte/Languages/PrivacyPolicy/' . $lang['filename'] . '.txt'))
 			{
 				$context['editable_agreements'][$lang['filename']] = $lang['name'];
 
 				// Are we editing this?
-				if (isset($this->_req->post->agree_lang) && $this->_req->post->agree_lang === $lang['filename'])
+				if ($this->_req->getPost('agree_lang') === $lang['filename'])
 				{
 					$context['current_agreement'] = $lang['filename'];
 					break;
@@ -372,7 +372,7 @@ class ManageRegistration extends AbstractController
 		$context['warning'] = '';
 		$privacypol = new PrivacyPolicy($context['current_agreement']);
 
-		if (isset($this->_req->post->save) && isset($this->_req->post->agreement))
+		if (isset($this->_req->post->save, $this->_req->post->agreement))
 		{
 			checkSession();
 			validateToken('admin-rega');

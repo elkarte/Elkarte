@@ -109,6 +109,8 @@ class Profile extends AbstractController
 		// Is there an updated message to show?
 		if (isset($this->_req->query->updated))
 		{
+			$context['push_alert'] = $_SESSION['push_enabled'] ?? null;
+			unset($_SESSION['push_enabled']);
 			$context['profile_updated'] = $txt['profile_updated_own'];
 		}
 

@@ -32,7 +32,7 @@ abstract class AbstractEventBoardAccess extends AbstractEventMessage
 		foreach ($mentions as $key => $row)
 		{
 			// To ensure it is not done twice
-			if (empty(static::$_type) || $row['mention_type'] != static::$_type)
+			if (empty(static::$_type) || $row['mention_type'] !== static::$_type)
 			{
 				continue;
 			}

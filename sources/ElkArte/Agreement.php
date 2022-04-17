@@ -22,47 +22,26 @@ use BBC\ParserWrapper;
  */
 class Agreement
 {
-	/**
-	 * Default language of the agreement.
-	 *
-	 * @var string
-	 */
+	/** @var string Default language of the agreement. */
 	protected $_language = '';
 
-	/**
-	 * The directory where backups are stored
-	 *
-	 * @var string
-	 */
+	/** @var string The directory where backups are stored */
 	protected $_backup_dir = '';
 
-	/**
-	 * The name of the file where the agreement is stored
-	 *
-	 * @var string
-	 */
+	/** @var string The name of the file where the agreement is stored */
 	protected $_file_name = 'Agreement';
 
-	/**
-	 * The name of the directory where the backup will be saved
-	 *
-	 * @var string
-	 */
+	/** @var string The name of the directory where the backup will be saved */
 	protected $_backupdir_name = 'agreements';
 
-	/**
-	 * The name of the log table
-	 *
-	 * @var string
-	 */
+	/** @var string The name of the log table */
 	protected $_log_table_name = '{db_prefix}log_agreement_accept';
 
-	/**
-	 * The database object
-	 *
-	 * @var Object
-	 */
-	protected $_db = null;
+	/** @var Object The database object */
+	protected $_db;
+
+	/** @var \ElkArte\FileFunctions  */
+	protected $fileFunc;
 
 	/**
 	 * Everything starts here.
@@ -72,9 +51,10 @@ class Agreement
 	 */
 	public function __construct($language, $backup_dir = null)
 	{
+		$this->fileFunc = FileFunctions::instance();
 		$this->_language = ucfirst(strtr($language, array('.' => '')));
 
-		if ($backup_dir === null || !file_exists($backup_dir))
+		if ($backup_dir === null || !$this->fileFunc->fileExists($backup_dir))
 		{
 			$backup_dir = BOARDDIR . '/packages/backups/' . $this->_backupdir_name;
 		}
@@ -100,7 +80,7 @@ class Agreement
 		}
 
 		// Off it goes to the agreement file.
-		$fp = fopen($this->buildName($this->_language), 'w');
+		$fp = fopen($this->buildName($this->_language), 'wb');
 		fwrite($fp, str_replace("\r", '', $text));
 		fclose($fp);
 
@@ -140,7 +120,7 @@ class Agreement
 		$file = $this->buildName($language);
 
 		// Have we got a localized one?
-		if (file_exists($file))
+		if ($this->fileFunc->fileExists($file))
 		{
 			return trim(file_get_contents($file));
 		}
@@ -177,7 +157,7 @@ class Agreement
 	{
 		$filename = $this->buildName($this->_language);
 
-		return file_exists($filename) && is_writable($filename);
+		return $this->fileFunc->fileExists($filename) && $this->fileFunc->isWritable($filename);
 	}
 
 	/**
@@ -240,7 +220,7 @@ class Agreement
 		$counter = '';
 		$merger = '';
 
-		while (file_exists($this->_backup_dir . '/' . $backup_id . $merger . $counter . '/'))
+		while ($this->fileFunc->fileExists($this->_backup_dir . '/' . $backup_id . $merger . $counter . '/'))
 		{
 			$counter++;
 			$merger = '_';
@@ -258,12 +238,12 @@ class Agreement
 	protected function _createBackup($backup_id)
 	{
 		$destination = $this->_backup_dir . '/' . $backup_id . '/';
-		if (!file_exists($this->_backup_dir))
+		if (!$this->fileFunc->fileExists($this->_backup_dir))
 		{
-			@mkdir($this->_backup_dir);
+			$this->fileFunc->createDirectory($this->_backup_dir, false);
 		}
 
-		if (!@mkdir($destination))
+		if (!$this->fileFunc->createDirectory($destination, false))
 		{
 			return false;
 		}
@@ -279,6 +259,6 @@ class Agreement
 
 	protected function buildName($language)
 	{
-		return SOURCEDIR . '/ElkArte/Languages/' . $this->_file_name . '/' . $language . '.txt';
+ 		return SOURCEDIR . '/ElkArte/Languages/' . $this->_file_name . '/' . $language . '.txt';
 	}
 }

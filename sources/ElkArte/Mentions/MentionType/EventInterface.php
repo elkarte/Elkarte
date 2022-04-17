@@ -50,7 +50,7 @@ interface EventInterface
 	 *
 	 * @return bool
 	 */
-	public static function isBlacklisted($method);
+	public static function isBlocklisted($method);
 
 	/**
 	 * If needed checks for permissions to use this specific notification

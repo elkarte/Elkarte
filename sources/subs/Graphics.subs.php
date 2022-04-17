@@ -18,6 +18,7 @@
  *
  */
 
+use ElkArte\FileFunctions;
 use ElkArte\Graphics\Manipulators\Gd2;
 use ElkArte\Http\Headers;
 use ElkArte\User;
@@ -114,7 +115,7 @@ function showCodeImage($code)
 		}
 	}
 
-	if (!is_dir($settings['default_theme_dir'] . '/fonts'))
+	if (!FileFunctions::instance()->isDir($settings['default_theme_dir'] . '/fonts'))
 	{
 		return false;
 	}

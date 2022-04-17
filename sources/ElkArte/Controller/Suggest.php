@@ -17,6 +17,7 @@
 namespace ElkArte\Controller;
 
 use ElkArte\AbstractController;
+use ElkArte\FileFunctions;
 
 /**
  * Suggest Controller
@@ -78,14 +79,16 @@ class Suggest extends AbstractController
 
 		// Any parameters?
 		$search_param = isset($this->_req->post->search_param) ? json_decode(base64_decode($this->_req->post->search_param), true) : array();
+		$suggest_type = $this->_req->getPost('suggest_type', 'trim', null);
+		$search = $this->_req->getPost('search', 'trim', null);
 
-		if (isset($this->_req->post->suggest_type, $this->_req->post->search, $searchTypes[$this->_req->post->suggest_type]))
+		if (isset($suggest_type, $search, $searchTypes[$suggest_type]))
 		{
 			// Shortcut
-			$currentSearch = $searchTypes[$this->_req->post->suggest_type];
+			$currentSearch = $searchTypes[$suggest_type];
 
 			// Do we have a file to include?
-			if (!empty($currentSearch['file']) && file_exists($currentSearch['file']))
+			if (!empty($currentSearch['file']) && FileFunctions::instance()->fileExists($currentSearch['file']))
 			{
 				require_once($currentSearch['file']);
 			}
@@ -93,7 +96,7 @@ class Suggest extends AbstractController
 			// If it is a class, let's instantiate it
 			if (!empty($currentSearch['class']) && class_exists($currentSearch['class']))
 			{
-				$suggest = new $currentSearch['class']($this->_req->post->search, $search_param);
+				$suggest = new $currentSearch['class']($search, $search_param);
 
 				// Okay, let's at least assume the method exists... *rolleyes*
 				$context['xml_data'] = $suggest->{$currentSearch['function']}();
@@ -101,8 +104,8 @@ class Suggest extends AbstractController
 			// Let's maintain the "namespace" action_suggest_
 			elseif (function_exists('action_suggest_' . $currentSearch['function']))
 			{
-				$function = 'action_suggest_' . $searchTypes[$this->_req->post->suggest_type];
-				$context['xml_data'] = $function($this->_req->post->search, $search_param);
+				$function = 'action_suggest_' . $searchTypes[$suggest_type];
+				$context['xml_data'] = $function($search, $search_param);
 			}
 
 			// If we have data, return it

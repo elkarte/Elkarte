@@ -1214,8 +1214,6 @@ function getBoardParents($id_parent)
  */
 function getLanguages($use_cache = true)
 {
-	global $settings;
-
 	$cache = Cache::instance();
 
 	// Either we don't use the cache, or its expired.
@@ -1227,7 +1225,7 @@ function getLanguages($use_cache = true)
 		$dir = dir($language_dir . '/');
 		while (($entry = $dir->read()))
 		{
-			if ($entry == '.' || $entry == '..')
+			if ($entry === '.' || $entry === '..')
 			{
 				continue;
 			}

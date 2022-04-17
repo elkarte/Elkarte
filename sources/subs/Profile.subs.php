@@ -19,6 +19,7 @@ use ElkArte\Cache\Cache;
 use ElkArte\Controller\Avatars;
 use ElkArte\DataValidator;
 use ElkArte\Errors\ErrorContext;
+use ElkArte\FileFunctions;
 use ElkArte\MembersList;
 use ElkArte\Notifications;
 use ElkArte\Languages\Txt;
@@ -2135,11 +2136,11 @@ function profileLoadAvatarData()
 			'external' => 'https://'
 		);
 	}
-	elseif ($cur_profile['avatar']['name'] != '' && file_exists($modSettings['avatar_directory'] . '/' . $cur_profile['avatar']['name']) && $context['member']['avatar']['allow_server_stored'])
+	elseif ($cur_profile['avatar']['name'] != '' && FileFunctions::instance()->fileExists($modSettings['avatar_directory'] . '/' . $cur_profile['avatar']['name']) && $context['member']['avatar']['allow_server_stored'])
 	{
 		$context['member']['avatar'] += array(
 			'choice' => 'server_stored',
-			'server_pic' => $cur_profile['avatar']['name'] == '' ? 'blank.png' : $cur_profile['avatar']['name'],
+			'server_pic' => $cur_profile['avatar']['name'] === '' ? 'blank.png' : $cur_profile['avatar']['name'],
 			'external' => $schema
 		);
 	}
@@ -2157,7 +2158,7 @@ function profileLoadAvatarData()
 	{
 		require_once(SUBSDIR . '/Attachments.subs.php');
 		$context['avatar_list'] = array();
-		$context['avatars'] = is_dir($modSettings['avatar_directory']) ? getServerStoredAvatars('') : array();
+		$context['avatars'] = FileFunctions::instance()->isDir($modSettings['avatar_directory']) ? getServerStoredAvatars('') : array();
 	}
 	else
 	{
@@ -3575,7 +3576,7 @@ function getMembersInRange($ips, $memID)
  */
 function getMemberNotificationsProfile($member_id)
 {
-	global $modSettings, $context, $txt;
+	global $modSettings, $txt;
 
 	if (empty($modSettings['enabled_mentions']))
 	{
@@ -3588,7 +3589,6 @@ function getMemberNotificationsProfile($member_id)
 	$enabled_mentions = explode(',', $modSettings['enabled_mentions']);
 	$user_preferences = getUsersNotificationsPreferences($enabled_mentions, $member_id);
 	$mention_types = array();
-	$push_enabled = false;
 	$defaults = getConfiguredNotificationMethods('*');
 
 	foreach ($enabled_mentions as $type)
@@ -3619,11 +3619,6 @@ function getMemberNotificationsProfile($member_id)
 			{
 				$type_on = 0;
 			}
-
-			if (!$push_enabled && $notifier === 'notification' && $data[$key]['enabled'])
-			{
-				$push_enabled = true;
-			}
 		}
 
 		// In theory data should never be empty.
@@ -3635,17 +3630,6 @@ function getMemberNotificationsProfile($member_id)
 				'user_input_name' => 'notify[' . $type . '][user]',
 				'value' => $type_on
 			];
-		}
-
-		// If they enabled a notifications alert, then enable a browser alerts permission
-		// just blows smoke if they already gave it.
-		$push_enabled &= !empty($modSettings['usernotif_desktop_enable']) && !empty($context['profile_updated']);
-		if ($push_enabled)
-		{
-			theme()->addInlineJavascript('
-				$(function() {
-					Push.Permission.request();
-				});', true);
 		}
 	}
 

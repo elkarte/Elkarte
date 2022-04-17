@@ -19,6 +19,7 @@ namespace ElkArte\Packages;
 use BBC\ParserWrapper;
 use ElkArte\AbstractController;
 use ElkArte\Action;
+use ElkArte\FileFunctions;
 use ElkArte\HttpReq;
 use ElkArte\Util;
 
@@ -30,37 +31,56 @@ use ElkArte\Util;
 class PackageActions extends AbstractController
 {
 	/** @var array Passed and updated array of themes to install in */
-	public $themes_installed = array();
+	public $themes_installed = [];
+
 	/** @var array Current action step of the passed actions */
-	public $thisAction = array();
+	public $thisAction = [];
+
 	/** @var array Holds the files that will need to be chmod'ed for the package to install */
-	public $chmod_files = array();
+	public $chmod_files = [];
+
 	/** @var array The actions that must be completed to install a package */
-	public $ourActions = array();
+	public $ourActions = [];
+
 	/** @var bool If any of the steps will fail to complete */
 	public $has_failure = false;
+
 	/** @var string Details of what the failure entails */
 	public $failure_details;
+
 	/** @var array Available during the install phase, holds what when wrong and where */
-	public $failed_steps = array();
+	public $failed_steps = [];
+
 	/** @var array Other themes found that this addon can be installed in */
 	public $themeFinds;
+
 	/** @var array Created during install for use in addPackageLog */
-	public $credits_tag = array();
+	public $credits_tag = [];
+
 	/** @var array Passed actions from parsePackageInfo */
 	protected $_passed_actions;
+
 	/** @var string Passed base path value for the package location within the temp directory */
 	protected $_base_path;
+
 	/** @var bool Passed value to indicate if this is an install or uninstall pass */
 	protected $_uninstalling;
+
 	/** @var array Passed array of theme paths */
 	protected $_theme_paths;
+
+	/** @var \ElkArte\FileFunctions */
+	protected $fileFunc;
+
 	/** @var int Failed counter */
 	private $_failed_count = 0;
+
 	/** @var array Current action step of the passed actions */
 	private $_action;
+
 	/** @var bool Current check for a modification add/replace failure for the file being changed */
 	private $_failure;
+
 	/** @var string Holds the last section of the file name */
 	private $_actual_filename;
 
@@ -72,7 +92,7 @@ class PackageActions extends AbstractController
 	}
 
 	/**
-	 * Called from the packages.controller as part of the "test" phase
+	 * Called from packages controller as part of the "test" phase
 	 *
 	 * @param array $actions set of actions as defined by parsePackageInfo
 	 * @param bool $uninstalling Yea or Nay
@@ -83,9 +103,11 @@ class PackageActions extends AbstractController
 	{
 		// This will hold data about anything that can be installed in other themes.
 		$this->themeFinds = array(
-			'candidates' => array(),
-			'other_themes' => array(),
+			'candidates' => [],
+			'other_themes' => [],
 		);
+
+		$this->fileFunc = FileFunctions::instance();
 
 		// Pass the vars
 		$this->_passed_actions = $actions;
@@ -138,18 +160,20 @@ class PackageActions extends AbstractController
 
 		// Set up action/subaction stuff.
 		$action = new Action('package_actions_test');
+		$this->fileFunc = FileFunctions::instance();
 
 		foreach ($this->_passed_actions as $this->_action)
 		{
 			// Not failed until proven otherwise.
 			$this->_failure = false;
-			$this->thisAction = array();
+			$this->thisAction = [];
 
 			// Work out exactly which test function we are calling
 			if (!isset($this->_action['type']) || !array_key_exists($this->_action['type'], $subActions))
 			{
 				continue;
 			}
+
 			$subAction = $action->initialize($subActions, $this->_action['type'], '');
 
 			// Lets just do it!
@@ -184,7 +208,8 @@ class PackageActions extends AbstractController
 				$file = BOARDDIR . '/packages/temp/' . $this->_base_path . $this->_action['filename'];
 			}
 
-			if (!file_exists($file) && ($this->thisAction['type'] !== 'Create Tree' && $this->thisAction['type'] !== 'Create File'))
+			if (!$this->fileFunc->fileExists($file)
+				&& ($this->thisAction['type'] !== 'Create Tree' && $this->thisAction['type'] !== 'Create File'))
 			{
 				$this->has_failure = true;
 
@@ -250,7 +275,7 @@ class PackageActions extends AbstractController
 
 		// No failures yet
 		$this->_failed_count = 0;
-		$this->failed_steps = array();
+		$this->failed_steps = [];
 
 		// Set up action/subaction stuff.
 		$action = new Action('package_actions_install');
@@ -288,15 +313,15 @@ class PackageActions extends AbstractController
 
 		$type = 'package_' . $this->_action['type'];
 
-		if (file_exists(BOARDDIR . '/packages/temp/' . $this->_base_path . $this->_action['filename']))
+		if ($this->fileFunc->fileExists(BOARDDIR . '/packages/temp/' . $this->_base_path . $this->_action['filename']))
 		{
 			$context[$type] = htmlspecialchars(trim(file_get_contents(BOARDDIR . '/packages/temp/' . $this->_base_path . $this->_action['filename']), "\n\r"), ENT_COMPAT);
 		}
-		elseif (file_exists($this->_action['filename']))
+		elseif ($this->fileFunc->fileExists($this->_action['filename']))
 		{
 			$context[$type] = htmlspecialchars(trim(file_get_contents($this->_action['filename']), "\n\r"), ENT_COMPAT);
 		}
-		elseif (file_exists(BOARDDIR . '/packages/temp/' . $this->_action['filename']))
+		elseif ($this->fileFunc->fileExists(BOARDDIR . '/packages/temp/' . $this->_action['filename']))
 		{
 			$context[$type] = htmlspecialchars(trim(file_get_contents(BOARDDIR . '/packages/temp/' . $this->_action['filename']), "\n\r"), ENT_COMPAT);
 		}
@@ -363,7 +388,7 @@ class PackageActions extends AbstractController
 		global $context, $txt;
 
 		// Can't find the file, thats a failure !
-		if (!file_exists(BOARDDIR . '/packages/temp/' . $this->_base_path . $this->_action['filename']))
+		if (!$this->fileFunc->fileExists(BOARDDIR . '/packages/temp/' . $this->_base_path . $this->_action['filename']))
 		{
 			$this->has_failure = true;
 			$this->ourActions[] = array(
@@ -477,7 +502,7 @@ class PackageActions extends AbstractController
 					{
 						$context['theme_actions'][$mod_action['is_custom']] = array(
 							'name' => $this->_theme_paths[$mod_action['is_custom']]['name'],
-							'actions' => array(),
+							'actions' => [],
 							'has_failure' => $this->_failure,
 						);
 					}
@@ -794,7 +819,7 @@ class PackageActions extends AbstractController
 			global $context;
 
 			// Now include the file and be done with it ;).
-			if (file_exists(BOARDDIR . '/packages/temp/' . $this->_base_path . $this->_action['filename']))
+			if ($this->fileFunc->fileExists(BOARDDIR . '/packages/temp/' . $this->_base_path . $this->_action['filename']))
 			{
 				require(BOARDDIR . '/packages/temp/' . $this->_base_path . $this->_action['filename']);
 			}
@@ -848,7 +873,7 @@ class PackageActions extends AbstractController
 			global $context;
 
 			// Let the file work its magic ;)
-			if (file_exists(BOARDDIR . '/packages/temp/' . $this->_base_path . $this->_action['filename']))
+			if ($this->fileFunc->fileExists(BOARDDIR . '/packages/temp/' . $this->_base_path . $this->_action['filename']))
 			{
 				require(BOARDDIR . '/packages/temp/' . $this->_base_path . $this->_action['filename']);
 			}
@@ -866,7 +891,7 @@ class PackageActions extends AbstractController
 		if ($this->_action['type'] === 'redirect' && !empty($this->_action['redirect_url']))
 		{
 			$context['redirect_url'] = $this->_action['redirect_url'];
-			$context['redirect_text'] = !empty($this->_action['filename']) && file_exists(BOARDDIR . '/packages/temp/' . $this->_base_path . $this->_action['filename'])
+			$context['redirect_text'] = !empty($this->_action['filename']) && $this->fileFunc->fileExists(BOARDDIR . '/packages/temp/' . $this->_base_path . $this->_action['filename'])
 				? file_get_contents(BOARDDIR . '/packages/temp/' . $this->_base_path . $this->_action['filename'])
 				: ($this->_uninstalling ? $txt['package_uninstall_done'] : $txt['package_installed_done']);
 			$context['redirect_timeout'] = $this->_action['redirect_timeout'];

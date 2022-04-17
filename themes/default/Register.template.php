@@ -640,16 +640,18 @@ function template_edit_agreement()
 		foreach ($context['editable_agreements'] as $file => $name)
 		{
 			echo '
-							<option value="', $file, '" ', $context['current_agreement'] == $file ? 'selected="selected"' : '', '>', $name, '</option>';
+							<option value="', $file, '" ', $context['current_agreement'] === $name ? 'selected="selected"' : '', '>', $name, '</option>';
 		}
 
 		echo '
 						</select>
-						<div class="submitbutton">
-							<input type="hidden" name="sa" value="agreement" />
-							<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
-							<input type="submit" name="change" value="', $txt['admin_agreement_select_language_change'], '" tabindex="', $context['tabindex']++, '" />
-						</div>
+						<input type="hidden" name="sa" value="agreement" />
+						<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
+						<noscript>
+							<div class="submitbutton">
+								<input type="submit" name="change" value="', $txt['admin_agreement_select_language_change'], '" tabindex="', $context['tabindex']++, '" />
+							</div>
+						</noscript>
 					</div>';
 	}
 

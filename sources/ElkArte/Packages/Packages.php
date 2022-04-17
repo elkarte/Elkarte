@@ -170,7 +170,7 @@ class Packages extends AbstractController
 		$this->_uninstalling = $this->_req->query->sa === 'uninstall';
 
 		// If we can't find the file, our installation ends here
-		if (!file_exists(BOARDDIR . '/packages/' . $this->_filename))
+		if (!$this->fileFunc->fileExists(BOARDDIR . '/packages/' . $this->_filename))
 		{
 			throw new Exception('package_no_file', false);
 		}
@@ -186,7 +186,7 @@ class Packages extends AbstractController
 		$create_chmod_control->createChmodControl();
 
 		// Make sure our temp directory exists and is empty.
-		if (file_exists(BOARDDIR . '/packages/temp'))
+		if ($this->fileFunc->fileExists(BOARDDIR . '/packages/temp'))
 		{
 			deltree(BOARDDIR . '/packages/temp', false);
 		}
@@ -282,7 +282,7 @@ class Packages extends AbstractController
 		package_flush_cache(true);
 
 		// Clear the temp directory
-		if (file_exists(BOARDDIR . '/packages/temp'))
+		if ($this->fileFunc->fileExists(BOARDDIR . '/packages/temp'))
 		{
 			deltree(BOARDDIR . '/packages/temp');
 		}
@@ -524,7 +524,7 @@ class Packages extends AbstractController
 							if (!dirTest(dirname($real_path)))
 							{
 								$temp = dirname($real_path);
-								while (!file_exists($temp) && strlen($temp) > 1)
+								while (!$this->fileFunc->fileExists($temp) && strlen($temp) > 1)
 								{
 									$temp = dirname($temp);
 								}
@@ -532,7 +532,9 @@ class Packages extends AbstractController
 								$this->chmod_files[] = $temp;
 							}
 
-							if ($action_data['type'] === 'require-dir' && !is_writable($real_path) && (file_exists($real_path) || !is_writable(dirname($real_path))))
+							if ($action_data['type'] === 'require-dir'
+								&& !$this->fileFunc->isWritable($real_path)
+								&& ($this->fileFunc->fileExists($real_path) || !$this->fileFunc->isWritable(dirname($real_path))))
 							{
 								$this->chmod_files[] = $real_path;
 							}
@@ -591,7 +593,7 @@ class Packages extends AbstractController
 		}
 
 		// And if the file does not exist there is a problem
-		if (!file_exists(BOARDDIR . '/packages/' . $this->_filename))
+		if (!$this->fileFunc->fileExists(BOARDDIR . '/packages/' . $this->_filename))
 		{
 			throw new Exception('package_no_file', false);
 		}
@@ -615,7 +617,7 @@ class Packages extends AbstractController
 		);
 
 		// Make sure temp directory exists and is empty!
-		if (file_exists(BOARDDIR . '/packages/temp'))
+		if ($this->fileFunc->fileExists(BOARDDIR . '/packages/temp'))
 		{
 			deltree(BOARDDIR . '/packages/temp', false);
 		}
@@ -828,7 +830,7 @@ class Packages extends AbstractController
 		}
 
 		// Clean house... get rid of the evidence ;).
-		if (file_exists(BOARDDIR . '/packages/temp'))
+		if ($this->fileFunc->fileExists(BOARDDIR . '/packages/temp'))
 		{
 			deltree(BOARDDIR . '/packages/temp');
 		}
@@ -907,7 +909,7 @@ class Packages extends AbstractController
 			{
 				echo read_tgz_file(BOARDDIR . '/packages/' . $this->_req->query->package, $this->_req->query->file, true);
 			}
-			elseif (is_dir(BOARDDIR . '/packages/' . $this->_req->query->package))
+			elseif ($this->fileFunc->isDir(BOARDDIR . '/packages/' . $this->_req->query->package))
 			{
 				echo file_get_contents(BOARDDIR . '/packages/' . $this->_req->query->package . '/' . $this->_req->query->file);
 			}
@@ -935,7 +937,7 @@ class Packages extends AbstractController
 		{
 			$context['filedata'] = htmlspecialchars(read_tgz_file(BOARDDIR . '/packages/' . $this->_req->query->package, $this->_req->query->file, true));
 		}
-		elseif (is_dir(BOARDDIR . '/packages/' . $this->_req->query->package))
+		elseif ($this->fileFunc->isDir(BOARDDIR . '/packages/' . $this->_req->query->package))
 		{
 			$context['filedata'] = htmlspecialchars(file_get_contents(BOARDDIR . '/packages/' . $this->_req->query->package . '/' . $this->_req->query->file));
 		}
@@ -976,9 +978,13 @@ class Packages extends AbstractController
 		$this->_req->query->package = preg_replace('~[\.]+~', '.', strtr($this->_req->query->package, array('/' => '_', '\\' => '_')));
 
 		// Can't delete what's not there.
-		if (file_exists(BOARDDIR . '/packages/' . $this->_req->query->package)
-			&& (substr($this->_req->query->package, -4) === '.zip' || substr($this->_req->query->package, -4) === '.tgz' || substr($this->_req->query->package, -7) === '.tar.gz' || is_dir(BOARDDIR . '/packages/' . $this->_req->query->package))
-			&& $this->_req->query->package !== 'backups' && substr($this->_req->query->package, 0, 1) !== '.')
+		if ($this->fileFunc->fileExists(BOARDDIR . '/packages/' . $this->_req->query->package)
+			&& (substr($this->_req->query->package, -4) === '.zip'
+				|| substr($this->_req->query->package, -4) === '.tgz'
+				|| substr($this->_req->query->package, -7) === '.tar.gz'
+				|| $this->fileFunc->isDir(BOARDDIR . '/packages/' . $this->_req->query->package))
+			&& $this->_req->query->package !== 'backups'
+			&& $this->_req->query->package[0] !== '.')
 		{
 			$chmod_control = new PackageChmod();
 			$chmod_control->createChmodControl(
@@ -989,14 +995,14 @@ class Packages extends AbstractController
 				)
 			);
 
-			if (is_dir(BOARDDIR . '/packages/' . $this->_req->query->package))
+			if ($this->fileFunc->isDir(BOARDDIR . '/packages/' . $this->_req->query->package))
 			{
 				deltree(BOARDDIR . '/packages/' . $this->_req->query->package);
 			}
 			else
 			{
-				@chmod(BOARDDIR . '/packages/' . $this->_req->query->package, 0777);
-				unlink(BOARDDIR . '/packages/' . $this->_req->query->package);
+				$this->fileFunc->chmod(BOARDDIR . '/packages/' . $this->_req->query->package);
+				$this->fileFunc->delete(BOARDDIR . '/packages/' . $this->_req->query->package);
 			}
 		}
 
@@ -1262,7 +1268,8 @@ class Packages extends AbstractController
 		if (is_file(BOARDDIR . '/packages/' . $context['filename']))
 		{
 			$context['extracted_files'] = read_tgz_file(BOARDDIR . '/packages/' . $context['filename'], BOARDDIR . '/packages/temp');
-			if ($context['extracted_files'] && !file_exists(BOARDDIR . '/packages/temp/package-info.xml'))
+			if ($context['extracted_files']
+				&& !$this->fileFunc->fileExists(BOARDDIR . '/packages/temp/package-info.xml'))
 			{
 				foreach ($context['extracted_files'] as $file)
 				{
@@ -1352,7 +1359,7 @@ class Packages extends AbstractController
 		}
 
 		// We need the packages directory to be writable for this.
-		if (!@is_writable(BOARDDIR . '/packages'))
+		if (!$this->fileFunc->isWritable(BOARDDIR . '/packages'))
 		{
 			$create_chmod_control = new PackageChmod();
 			$create_chmod_control->createChmodControl(
@@ -1373,7 +1380,8 @@ class Packages extends AbstractController
 		}
 		elseif (isset($this->_req->query->version_emulate))
 		{
-			if (($this->_req->query->version_emulate === 0 || $this->_req->query->version_emulate === FORUM_VERSION) && isset($this->_req->session->version_emulate))
+			if (($this->_req->query->version_emulate === 0 || $this->_req->query->version_emulate === FORUM_VERSION)
+				&& isset($_SESSION['version_emulate']))
 			{
 				unset($_SESSION['version_emulate']);
 			}

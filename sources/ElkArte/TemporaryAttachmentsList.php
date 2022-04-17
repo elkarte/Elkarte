@@ -74,12 +74,7 @@ class TemporaryAttachmentsList extends ValuesContainer
 	public function remove($file)
 	{
 		// Must exist and have edit permissions
-		if (FileFunctions::instance()->isWritable($file))
-		{
-			return unlink($file);
-		}
-
-		return false;
+		return FileFunctions::instance()->delete($file);
 	}
 
 	/**

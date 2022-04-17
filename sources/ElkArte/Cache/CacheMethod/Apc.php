@@ -18,21 +18,13 @@ namespace ElkArte\Cache\CacheMethod;
  */
 class Apc extends AbstractCacheMethod
 {
-	/**
-	 * {@inheritdoc}
-	 */
+	/** {@inheritdoc} */
 	protected $title = 'Alternative PHP Cache';
 
-	/**
-	 * Whether to use the APCu functions or the original APC ones.
-	 *
-	 * @var bool
-	 */
+	/** @var bool Whether to use the APCu functions or the original APC ones. */
 	protected $apcu = false;
 
-	/**
-	 * {@inheritdoc}
-	 */
+	/** {@inheritdoc} */
 	public function __construct($options)
 	{
 		parent::__construct($options);

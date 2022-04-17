@@ -18,23 +18,13 @@ namespace ElkArte\Cache\CacheMethod;
  */
 class Memcache extends AbstractCacheMethod
 {
-	/**
-	 * {@inheritdoc}
-	 */
+	/** {@inheritdoc} */
 	protected $title = 'Memcache';
 
-	/**
-	 * Creates a Memcache instance representing the connection to the memcache servers.
-	 *
-	 * @var \Memcache
-	 */
+	/** @var \Memcache Creates a Memcache instance representing the connection to the memcache servers. */
 	protected $obj;
 
-	/**
-	 * If the daemon has valid servers in it pool
-	 *
-	 * @var bool
-	 */
+	/** @var bool If the daemon has valid servers in it pool */
 	protected $_is_running;
 
 	/**

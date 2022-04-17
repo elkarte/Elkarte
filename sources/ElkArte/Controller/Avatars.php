@@ -36,12 +36,16 @@ class Avatars
 {
 	/** @var \ElkArte\HttpReq */
 	private $req;
+
 	/** @var \ElkArte\FileFunctions */
 	private $file_functions;
+
 	/** @var boolean */
 	private $downloadedExternalAvatar;
+
 	/** @var int */
 	private $memID;
+
 	/** @var string */
 	private $uploadDir;
 
@@ -174,8 +178,14 @@ class Avatars
 		global $modSettings, $profile_vars;
 
 		// Use one that is available on the server
-		$profile_vars['avatar'] = strtr(empty($_POST['file']) ? (empty($_POST['cat']) ? '' : $_POST['cat']) : $_POST['file'], array('&amp;' => '&'));
-		$profile_vars['avatar'] = preg_match('~^([\w _!@%*=\-#()\[\]&.,]+/)?[\w _!@%*=\-#()\[\]&.,]+$~', $profile_vars['avatar']) != 0 && preg_match('/\.\./', $profile_vars['avatar']) == 0 && file_exists($modSettings['avatar_directory'] . '/' . $profile_vars['avatar']) ? ($profile_vars['avatar'] === 'blank.png' ? '' : $profile_vars['avatar']) : '';
+		$cat = $this->req->getPost('cat', 'trim', '');
+		$file = $this->req->getPost('file', 'trim', '');
+
+		$profile_vars['avatar'] = strtr(empty($file) ? $cat : $file, array('&amp;' => '&'));
+		$profile_vars['avatar'] = preg_match('~^([\w _!@%*=\-#()\[\]&.,]+/)?[\w _!@%*=\-#()\[\]&.,]+$~', $profile_vars['avatar']) === 1
+			&& preg_match('/\.\./', $profile_vars['avatar']) === 0
+			&& $this->file_functions->fileExists($modSettings['avatar_directory'] . '/' . $profile_vars['avatar'])
+				? ($profile_vars['avatar'] === 'blank.png' ? '' : $profile_vars['avatar']) : '';
 
 		return $this->_resetAvatarData(true);
 	}
@@ -203,7 +213,8 @@ class Avatars
 		// Supplying an external url for use
 		$this->_resetAvatarData(true);
 
-		$profile_vars['avatar'] = str_replace(' ', '%20', preg_replace('~action(?:=|%3d)(?!dlattach)~i', 'action-', $_POST['userpicpersonal']));
+		$userPicPersonal = $this->req->getPost('userpicpersonal', 'trim', '');
+		$profile_vars['avatar'] = str_replace(' ', '%20', preg_replace('~action(?:=|%3d)(?!dlattach)~i', 'action-', $userPicPersonal));
 		if (preg_match('~^https?:///?$~i', $profile_vars['avatar']) === 1)
 		{
 			$profile_vars['avatar'] = '';
@@ -524,7 +535,7 @@ class Avatars
 		$userPicPersonal = $this->req->getPost('userpicpersonal', 'trim', '');
 
 		return !empty($userPicPersonal)
-			&& substr($userPicPersonal, 0, 7) === 'http://'
+			&& strpos($userPicPersonal, 'http://') === 0
 			&& strlen($userPicPersonal) > 7;
 	}
 
@@ -538,7 +549,7 @@ class Avatars
 		$userPicPersonal = $this->req->getPost('userpicpersonal', 'trim', '');
 
 		return !empty($userPicPersonal)
-			&& substr($userPicPersonal, 0, 8) === 'https://'
+			&& strpos($userPicPersonal, 'https://') === 0
 			&& strlen($userPicPersonal) > 8;
 	}
 }

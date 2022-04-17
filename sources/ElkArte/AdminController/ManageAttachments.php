@@ -1819,10 +1819,7 @@ class ManageAttachments extends AbstractController
 
 		// All done, time to clean up
 		$_SESSION['results'] = $results;
-		if ($this->file_functions->fileExists(BOARDDIR . '/progress.php'))
-		{
-			$this->file_functions->delete(BOARDDIR . '/progress.php');
-		}
+		$this->file_functions->delete(BOARDDIR . '/progress.php');
 
 		redirectexit('action=admin;area=manageattachments;sa=maintenance#transfer');
 	}

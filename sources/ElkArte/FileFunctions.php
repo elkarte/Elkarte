@@ -18,7 +18,7 @@ use \Exception;
 class FileFunctions
 {
 	/** @var \ElkArte\FileFunctions The instance of the class */
-	private static $_instance = null;
+	private static $_instance;
 
 	/**
 	 * chmod control will attempt to make a file or directory writable
