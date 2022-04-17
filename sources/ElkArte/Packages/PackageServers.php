@@ -146,7 +146,7 @@ class PackageServers extends AbstractController
 		$this->fileFunc->chmod(BOARDDIR . '/packages');
 		$this->fileFunc->chmod(BOARDDIR . '/packages/installed.list');
 
-		$unwritable = !$fileFunc->isWritable(BOARDDIR . '/packages') || !$this->fileFunc->isWritable(BOARDDIR . '/packages/installed.list');
+		$unwritable = !$this->fileFunc->isWritable(BOARDDIR . '/packages') || !$this->fileFunc->isWritable(BOARDDIR . '/packages/installed.list');
 		if (!$unwritable)
 		{
 			// Using PHP was successful, no need for FTP
