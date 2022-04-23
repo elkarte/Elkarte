@@ -347,7 +347,7 @@ function template_action_showPermissions()
  */
 function template_action_statPanel()
 {
-	global $context, $txt;
+	global $context, $txt, $modSettings;
 
 	// First, show a few text statistics such as post/topic count.
 	echo '
@@ -364,7 +364,18 @@ function template_action_statPanel()
 					<dt>', $txt['statPanel_users_polls'], ':</dt>
 					<dd>', $context['num_polls'], ' ', $txt['statPanel_polls'], '</dd>
 					<dt>', $txt['statPanel_users_votes'], ':</dt>
-					<dd>', $context['num_votes'], ' ', $txt['statPanel_votes'], '</dd>
+					<dd>', $context['num_votes'], ' ', $txt['statPanel_votes'], '</dd>';
+
+	if ($modSettings['likes_enabled'])
+	{
+		echo '
+					<dt>', $txt['likes_given'], ':</dt>
+					<dd>', $context['likes_given'], '</dd>
+					<dt>', $txt['likes_received'], ':</dt>
+					<dd>', $context['likes_received'], '</dd>';
+	}
+
+	echo '
 				</dl>
 			</div>
 		</div>';
@@ -388,21 +399,11 @@ function template_action_statPanel()
 	else
 	{
 		echo '
-				<ul class="activity_stats flow_hidden">';
+				<ul class="activity_stats flow_hidden">
+					<canvas id="hourStats" height="200" style="width:80%"></canvas>';
 
-		// The labels.
-		foreach ($context['posts_by_time'] as $time_of_day)
-		{
-			echo '
-					<li>
-						<div class="bar" style="padding-top: ', ((int) (100 - $time_of_day['relative_percent'])), 'px;" title="', sprintf($txt['statPanel_activityTime_posts'], $time_of_day['posts'], $time_of_day['posts_percent']), '">
-							<div style="height: ', (int) $time_of_day['relative_percent'], 'px;">
-								<span>', sprintf($txt['statPanel_activityTime_posts'], $time_of_day['posts'], $time_of_day['posts_percent']), '</span>
-							</div>
-						</div>
-						<span class="stats_hour">', $time_of_day['hour_format'], '</span>
-					</li>';
-		}
+		setHourData($context['posts_by_time']);
+		showHourChart('posts');
 
 		echo '
 				</ul>';
@@ -435,14 +436,11 @@ function template_action_statPanel()
 		// Draw a bar for every board.
 		foreach ($context['popular_boards'] as $board)
 		{
-			$position = -1 * intval(((int) $board['posts_percent'] / 5)) * 20;
-
 			echo '
 						<dt>', $board['link'], '</dt>
 						<dd>
-							<div class="profile_pie" style="background-position: ', $position, 'px 0;" title="', sprintf($txt['statPanel_topBoards_memberposts'], $board['posts'], $board['total_posts_member'], $board['posts_percent']), '">
-								', sprintf($txt['statPanel_topBoards_memberposts'], $board['posts'], $board['total_posts_member'], $board['posts_percent']), '
-							</div>
+							<div class="profile_pie" title="', sprintf($txt['statPanel_topBoards_memberposts'], $board['posts'], $board['total_posts_member'], $board['posts_percent']), '">',
+								template_pieHole($board['posts_percent']), '</div>
 							<span>', empty($context['hide_num_posts']) ? $board['posts'] : '', '</span>
 						</dd>';
 		}
@@ -473,13 +471,11 @@ function template_action_statPanel()
 		// Draw a bar for every board.
 		foreach ($context['board_activity'] as $activity)
 		{
-			$position = -1 * intval(((int) $activity['percent'] / 5)) * 20;
-
 			echo '
 						<dt>', $activity['link'], '</dt>
 						<dd>
-							<div class="profile_pie" style="background-position: ', $position, 'px 0;" title="', sprintf($txt['statPanel_topBoards_posts'], $activity['posts'], $activity['total_posts'], $activity['posts_percent']), '">
-								', sprintf($txt['statPanel_topBoards_posts'], $activity['posts'], $activity['total_posts'], $activity['posts_percent']), '
+							<div class="profile_pie" title="', sprintf($txt['statPanel_topBoards_posts'], $activity['posts'], $activity['total_posts'], $activity['posts_percent']), '">
+								', template_pieHole($activity['percent']), '
 							</div>
 							<span>', $activity['percent'], '%</span>
 						</dd>';
@@ -494,6 +490,23 @@ function template_action_statPanel()
 			</div>
 		</div>
 	</div>';
+}
+
+/**
+ * Create a svg donut.  Segment lenght of $value (% of circumference)
+ */
+function template_pieHole($value, $segmentWidth = 10)
+{
+	$radius = 100 / (2 * M_PI);
+	$segment = round($value, 0);
+	$remainder = 100 - $segment;
+
+	return '
+	<svg viewBox="0 0 50 50" class="donut">
+		<circle class="profile_pie_hole" cx="25" cy="25" r="' . $radius . '" fill="transparent"></circle>
+		<circle class="profile_pie_ring" cx="25" cy="25" r="' . $radius . '" fill="transparent" stroke="grey" stroke-width="' . $segmentWidth . '"></circle>
+		<circle class="profile_pie_segment" cx="25" cy="25" r="' . $radius . '" fill="transparent" stroke="blue" stroke-width="' . $segmentWidth . '" stroke-dasharray="' . $segment . ' ' . $remainder . '" stroke-dashoffset="25"></circle>
+	</svg>';
 }
 
 /**
@@ -1315,4 +1328,122 @@ function template_profile_block_topics()
 	echo '
 		</table>
 	</div>';
+}
+
+/**
+ * Generates JS constant objects with all available data along with titles and colors.
+ * This is used in chart.js datasets when click events request the data
+ */
+function setHourData($data)
+{
+	global $txt;
+
+	// No data, no chart
+	if (empty($data))
+	{
+		return;
+	}
+
+	$hourData = array(
+		'axis_labels' => [],
+		'relative_percent' => [],
+		'posts' => [],
+		'hour_format' => [],
+		'posts_percent' => [],
+	);
+
+	// Low to high looks best on a chart
+	foreach ($data as $time)
+	{
+		// The year data
+		$hourData['axis_labels'][] = $time['hour_format'];
+		$hourData['relative_percent'][] = $time['relative_percent'];
+		$hourData['posts'][] = $time['posts'];
+		$hourData['posts_percent'][] = $time['posts_percent'];
+	}
+
+	// Colors for the line charts
+	$colors = array(
+		'relative_percent' => '55,187,89',
+		'posts' => '61,110,50',
+		'posts_percent' => '89,55,187',
+	);
+
+	// Chart title so you remember what you are looking at
+	$titles = array(
+		'relative_percent' => $txt['statPanel_activityTime'],
+		'posts' => $txt['statPanel_activityTime'],
+		'posts_percent' => $txt['statPanel_activityTime'],
+		'posts_text' => $txt['posts']
+	);
+
+	// Now dump it out in JS objects
+	echo '
+	<script>
+		let hourtips = [', implode(',', $hourData['posts_percent']), '];
+		const hourdata = ', json_encode($hourData), ';
+		const colors = ', json_encode($colors), ';
+		const titles = ', json_encode($titles), ';
+	</script>';
+}
+
+/**
+ * Draws the hour chart on the defined page canvas
+ *
+ * @param string $type The type, however they all plot the same (the curve looks the same),
+ * only the y scale changes, as such we just use posts but the code supports them all.
+ */
+function showHourChart($type)
+{
+	echo '
+	<script>
+		let request = "', $type, '",
+			ctx_hourStats = document.getElementById("hourStats").getContext("2d"),
+			hourLabels = Object.values(hourdata["axis_labels"]),
+			hourDataset = {
+				labels: hourLabels,
+				datasets: [{
+					label: titles[request],
+					data: Object.values(hourdata[request]),
+					backgroundColor: [
+						"rgba(" + colors[request] + ", 0.1)",
+					],
+					borderColor: [
+						"rgba(" + colors[request] + ", 1)",
+					],
+					borderWidth: 1,
+					pointStyle: "circle",
+					pointRadius: 4,
+					lineTension: 0.35,
+					fill: "origin"
+				}]
+			},
+			hourConfig = {
+				type: "line",
+				responsive: true,
+				data: hourDataset,
+				options: {
+					scales: {
+						y: {
+							stacked: true,
+							ticks: {beginAtZero: true}
+						}
+					},
+					plugins: {
+						filler: {
+							propagate: false
+						},
+						tooltip: {
+							callbacks: {
+								label: function (context)
+								{
+									return [hourtips[context.dataIndex] + "%", hourdata["posts"][context.dataIndex] + " " + titles["posts_text"]];
+								}
+							}
+						},
+					}
+				}
+			};	
+		new Chart(ctx_hourStats, hourConfig);
+	</script>';
 }
