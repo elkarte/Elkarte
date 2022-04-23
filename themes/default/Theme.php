@@ -20,6 +20,7 @@ use BBC\ParserWrapper;
 use ElkArte\Cache\Cache;
 use ElkArte\Controller\ScheduledTasks;
 use ElkArte\EventManager;
+use ElkArte\FileFunctions;
 use ElkArte\Http\Headers;
 use ElkArte\SiteCombiner;
 use ElkArte\Themes\Theme as BaseTheme;
@@ -185,7 +186,8 @@ class Theme extends BaseTheme
 			$this->getTemplates()->loadSubTemplate($layer . '_above', 'ignore');
 		}
 
-		if (isset($settings['use_default_images']) && $settings['use_default_images'] === 'defaults' && isset($settings['default_template']))
+		if (isset($settings['use_default_images'], $settings['default_template'])
+			&& $settings['use_default_images'] === 'defaults')
 		{
 			$settings['theme_url'] = $settings['default_theme_url'];
 			$settings['images_url'] = $settings['default_images_url'];
@@ -229,7 +231,8 @@ class Theme extends BaseTheme
 		$context['load_time'] = round(microtime(true) - $time_start, 3);
 		$context['load_queries'] = $db->num_queries();
 
-		if (isset($settings['use_default_images']) && $settings['use_default_images'] === 'defaults' && isset($settings['default_template']))
+		if (isset($settings['use_default_images'], $settings['default_template'])
+			&& $settings['use_default_images'] === 'defaults')
 		{
 			$settings['theme_url'] = $settings['actual_theme_url'];
 			$settings['images_url'] = $settings['actual_images_url'];
@@ -571,6 +574,30 @@ class Theme extends BaseTheme
 	}
 
 	/**
+	 * Load a variant css file if found.  Fallback if not and it exists in this
+	 * theme's directory
+	 *
+	 * @param string $cssFile
+	 * @param boolena $fallBack
+	 */
+	public function loadVariant($cssFile, $fallBack = true)
+	{
+		global $settings, $context;
+
+		$fileFunc = FileFunctions::instance();
+		if ($fileFunc->fileExists($settings['theme_dir'] . '/css/' . $context['theme_variant'] . '/' . $cssFile . $context['theme_variant'] . '.css'))
+		{
+			loadCSSFile($context['theme_variant'] . '/' . $cssFile . $context['theme_variant'] . '.css');
+			return;
+		}
+
+		if ($fallBack && $fileFunc->fileExists($settings['theme_dir'] . '/css/' . $cssFile . '.css'))
+		{
+			loadCSSFile($cssFile . '.css');
+		}
+	}
+
+	/**
 	 * If the option to pretty output code is on, this loads the JS and CSS
 	 */
 	public function addCodePrettify()
@@ -579,7 +606,7 @@ class Theme extends BaseTheme
 
 		if (!empty($modSettings['enableCodePrettify']))
 		{
-			loadCSSFile('prettify.css');
+			$this->loadVariant('prettify');
 			loadJavascriptFile('prettify.min.js', array('defer' => true));
 
 			$this->addInlineJavascript('
@@ -710,22 +737,21 @@ class Theme extends BaseTheme
 
 		$context['current_time'] = standardTime(time(), false);
 		$context['current_action'] = $this->_req->getQuery('action', 'trim', '');
-		$context['show_quick_login'] = !empty($modSettings['enableVBStyleLogin']) && $this->user->is_guest;
 		$context['robot_no_index'] = in_array($context['current_action'], $this->no_index_actions);
 
 		$bbc_parser = ParserWrapper::instance();
 
 		// Get some news...
 		$context['news_lines'] = array_filter(explode("\n", str_replace("\r", '', trim(addslashes($modSettings['news'])))));
-		for ($i = 0, $n = count($context['news_lines']); $i < $n; $i++)
+		foreach ($context['news_lines'] as $i => $iValue)
 		{
-			if (trim($context['news_lines'][$i]) === '')
+			if (trim($iValue) === '')
 			{
 				continue;
 			}
 
 			// Clean it up for presentation ;).
-			$context['news_lines'][$i] = $bbc_parser->parseNews(stripslashes(trim($context['news_lines'][$i])));
+			$context['news_lines'][$i] = $bbc_parser->parseNews(stripslashes(trim($iValue)));
 		}
 
 		// If we have some, setup for display
@@ -891,7 +917,8 @@ class Theme extends BaseTheme
 		global $settings;
 
 		// Load a base theme custom CSS file?
-		if (file_exists($settings['theme_dir'] . '/css/custom.css'))
+		$fileFunc = FileFunctions::instance();
+		if ($fileFunc->fileExists($settings['theme_dir'] . '/css/custom.css'))
 		{
 			loadCSSFile('custom.css');
 		}
@@ -927,6 +954,9 @@ class Theme extends BaseTheme
 		{
 			$context['theme_header_callbacks'] = elk_array_insert($context['theme_header_callbacks'], 'login_bar', array('search_bar'), 'after');
 		}
+
+		// Add in a top section notice callback
+		$context['theme_header_callbacks'][] = 'header_bar';
 
 		$cacheTime = $modSettings['lastActive'] * 60;
 
@@ -1230,16 +1260,10 @@ class Theme extends BaseTheme
 			loadCSSFile($context['theme_variant'] . '/index' . $context['theme_variant'] . '.css');
 
 			// Variant icon definitions?
-			if (file_exists($settings['theme_dir'] . '/css/' . $context['theme_variant'] . '/icons_svg' . $context['theme_variant'] . '.css'))
-			{
-				loadCSSFile($context['theme_variant'] . '/icons_svg' . $context['theme_variant'] . '.css');
-			}
+			$this->loadVariant('icons_svg', false);
 
 			// Load a theme variant custom CSS
-			if (file_exists($settings['theme_dir'] . '/css/' . $context['theme_variant'] . '/custom' . $context['theme_variant'] . '.css'))
-			{
-				loadCSSFile($context['theme_variant'] . '/custom' . $context['theme_variant'] . '.css');
-			}
+			$this->loadVariant('custom', false);
 		}
 	}
 }
