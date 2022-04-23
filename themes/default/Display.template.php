@@ -184,8 +184,8 @@ function template_messages()
 							<span id="messageicon_', $message['id'], '" class="messageicon', ($message['icon_url'] !== $settings['images_url'] . '/post/xx.png') ? '"' : ' hide"', '>
 								<img src="', $message['icon_url'] . '" alt=""', $message['can_modify'] ? ' id="msg_icon_' . $message['id'] . '"' : '', ' />
 							</span>
-							<h5 id="info_', $message['id'], '">
-								<a href="', $message['href'], '" rel="nofollow">', !empty($message['counter']) ? sprintf($txt['reply_number'], $message['counter']) : '', '</a>', !empty($message['counter']) ? ' &ndash; ' : '', $message['html_time'], '
+							<h5 id="info_', $message['id'], '">', !empty($message['counter']) ? '
+								<a href="' . $message['href'] . '" rel="nofollow">' . sprintf($txt['reply_number'], $message['counter']) . '</a> &ndash; ' : '', $message['html_time'], '
 							</h5>
 							<div id="msg_', $message['id'], '_quick_mod"', $ignoring ? ' class="hide"' : '', '></div>
 						</header>';
@@ -248,8 +248,9 @@ function template_messages()
 		{
 			echo '
 							<li class="listlevel1 subsections" aria-haspopup="true">
-								<a href="#" ', !empty($options['use_click_menu']) ? '' : 'onclick="event.stopPropagation();return false;" ', 'class="linklevel1 post_options">', $txt['post_options'], '
-							</a>';
+								<a href="#" ', !empty($options['use_click_menu']) ? '' : 'onclick="event.stopPropagation();return false;" ', 'class="linklevel1 post_options">',
+									$txt['post_options'], '
+								</a>';
 		}
 
 		if ($message['can_modify'] || $message['can_remove'] || !empty($context['can_follow_up']) || ($context['can_split'] && !empty($context['real_num_replies'])) || $context['can_restore_msg'] || $message['can_approve'] || $message['can_unapprove'] || $context['can_report_moderator'])
