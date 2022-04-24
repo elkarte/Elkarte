@@ -356,7 +356,7 @@ function template_messages()
 			{
 				echo '
 							<li class="listlevel1', !empty($message['like_counter']) ? ' liked"' : '"', '>
-								<a class="linklevel1 ', $message['can_unlike'] ? 'unreact_button' : 'react_button', '" href="javascript:void(0)"', !empty($message['like_counter']) ? ' title="' . $txt['liked_by'] . ' ' . implode(', ', $context['likes'][$message['id']]['member']) . '"' : '', ' onclick="likePosts.prototype.likeUnlikePosts(event,', $message['id'], ', ', $context['current_topic'], '); return false;">',
+								<a class="linklevel1 ', $message['can_unlike'] ? 'unreact_button' : 'react_button', '" role="button" href="javascript:void(0)"', !empty($message['like_counter']) ? ' title="' . $txt['liked_by'] . ' ' . implode(', ', $context['likes'][$message['id']]['member']) . '"' : '', ' onclick="likePosts.prototype.likeUnlikePosts(event,', $message['id'], ', ', $context['current_topic'], '); return false;">',
 									!empty($message['like_counter']) ? '<span class="likes_indicator">' . $message['like_counter'] . '</span>&nbsp;' . $txt['likes'] : $txt['like_post'], '
 								</a>
 							</li>';
@@ -388,7 +388,7 @@ function template_messages()
 		{
 			echo '
 							<li class="listlevel1">
-								<a href="', $scripturl, '?action=post;quote=', $message['id'], ';topic=', $context['current_topic'], '.', $context['start'], ';last_msg=', $context['topic_last_message'], '" onclick="return oQuickReply.quote(', $message['id'], ');" class="linklevel1 quote_button">', $txt['quote'], '</a>
+								<a href="', $scripturl, '?action=post;quote=', $message['id'], ';topic=', $context['current_topic'], '.', $context['start'], ';last_msg=', $context['topic_last_message'], '" role="button" onclick="return oQuickReply.quote(', $message['id'], ');" class="linklevel1 quote_button">', $txt['quote'], '</a>
 							</li>';
 		}
 		// So... quick reply is off, but they *can* reply?
@@ -396,7 +396,7 @@ function template_messages()
 		{
 			echo '
 							<li class="listlevel1">
-								<a href="', $scripturl, '?action=post;quote=', $message['id'], ';topic=', $context['current_topic'], '.', $context['start'], ';last_msg=', $context['topic_last_message'], '" class="linklevel1 quote_button">', $txt['quote'], '</a>
+								<a href="', $scripturl, '?action=post;quote=', $message['id'], ';topic=', $context['current_topic'], '.', $context['start'], ';last_msg=', $context['topic_last_message'], '" role="button" class="linklevel1 quote_button">', $txt['quote'], '</a>
 							</li>';
 		}
 

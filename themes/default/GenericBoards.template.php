@@ -117,6 +117,7 @@ function template_list_boards(array $boards, $id)
 		if ($board['new'] || $board['children_new'])
 		{
 			echo '
+							<s>', $txt['new_posts'], '</s>
 							<span class="', $board['new'] ? 'i-board-new' : 'i-board-sub', '" title="', $txt['new_posts'], '"></span>';
 		}
 
@@ -124,6 +125,7 @@ function template_list_boards(array $boards, $id)
 		elseif ($board['is_redirect'])
 		{
 			echo '
+							<s>', $txt['redirect_board_to'], '</s>
 							<span class="i-board-redirect" title="', sprintf($txt['redirect_board_to'], Util::htmlspecialchars($board['name'])), '"></span>';
 		}
 
@@ -131,6 +133,7 @@ function template_list_boards(array $boards, $id)
 		else
 		{
 			echo '
+							<s>', $txt['old_posts'], '</s>
 							<span class="i-board-off" title="', $txt['old_posts'], '"></span>';
 		}
 

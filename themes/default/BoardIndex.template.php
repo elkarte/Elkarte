@@ -39,10 +39,9 @@ function template_boards_list()
 			continue;
 		}
 
-		// @todo - Invent nifty class name for boardindex header bars.
 		echo '
 		
-		<header class="category_header">';
+		<header class="category_header boardindex">';
 
 		// If this category even can collapse, show a link to collapse it.
 		if ($category['can_collapse'])
@@ -209,7 +208,7 @@ function template_ic_recent_posts()
 					<a href="', getUrl('action', ['action' => 'recent']), '">', $txt['recent_view'], '</a>&nbsp;', sprintf($txt['is_recent_updated'], '&quot;' . $context['latest_post']['link'] . '&quot;'), ' (', $context['latest_post']['html_time'], ')
 				</p>';
 	}
-	// Show lots of posts. @todo - Although data here is actually tabular, perhaps use faux table for greater responsiveness.
+	// Show lots of posts.
 	elseif (!empty($context['latest_posts']))
 	{
 		echo '

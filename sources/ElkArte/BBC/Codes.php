@@ -169,6 +169,9 @@ class Codes
 	 */
 	public const ATTR_NO_CACHE = 25;
 
+	/**
+	 * If to reset ATTR_CONTENT to a new value, useful when build content tag in addons
+	 */
 	public const ATTR_RESET = 26;
 
 	/** [tag]parsed content[/tag] */
@@ -628,6 +631,7 @@ class Codes
 				self::ATTR_TYPE => self::TYPE_PARSED_CONTENT,
 				self::ATTR_BEFORE => '<div class="quoteheader">' . $txt['quote'] . '</div><blockquote>',
 				self::ATTR_AFTER => '</blockquote>',
+				self::ATTR_CONTENT =>  $txt['post_options'],
 				self::ATTR_BLOCK_LEVEL => true,
 				self::ATTR_AUTOLINK => true,
 				self::ATTR_LENGTH => 5,
@@ -643,6 +647,7 @@ class Codes
 				),
 				self::ATTR_BEFORE => '<div class="quoteheader">' . $txt['quote_from'] . ': {author}</div><blockquote>',
 				self::ATTR_AFTER => '</blockquote>',
+				self::ATTR_CONTENT =>  $txt['post_options'],
 				self::ATTR_BLOCK_LEVEL => true,
 				self::ATTR_AUTOLINK => true,
 				self::ATTR_LENGTH => 5,
@@ -652,6 +657,7 @@ class Codes
 				self::ATTR_TYPE => self::TYPE_PARSED_EQUALS,
 				self::ATTR_BEFORE => '<div class="quoteheader">' . $txt['quote_from'] . ': $1</div><blockquote>',
 				self::ATTR_AFTER => '</blockquote>',
+				self::ATTR_CONTENT =>  $txt['post_options'],
 				self::ATTR_QUOTED => self::OPTIONAL,
 				self::ATTR_PARSED_TAGS_ALLOWED => array(
 					'url',
@@ -678,6 +684,7 @@ class Codes
 				),
 				self::ATTR_BEFORE => '<div class="quoteheader"><a href="' . $scripturl . '?{link}">' . $txt['quote_from'] . ': {author} ' . ($modSettings['todayMod'] == 3 ? ' - ' : $txt['search_on']) . ' {date}</a></div><blockquote>',
 				self::ATTR_AFTER => '</blockquote>',
+				self::ATTR_CONTENT =>  $txt['post_options'],
 				self::ATTR_BLOCK_LEVEL => true,
 				self::ATTR_AUTOLINK => true,
 				self::ATTR_LENGTH => 5,
@@ -692,6 +699,7 @@ class Codes
 				),
 				self::ATTR_BEFORE => '<div class="quoteheader">' . $txt['quote_from'] . ': {author}</div><blockquote>',
 				self::ATTR_AFTER => '</blockquote>',
+				self::ATTR_CONTENT =>  $txt['post_options'],
 				self::ATTR_BLOCK_LEVEL => true,
 				self::ATTR_AUTOLINK => true,
 				self::ATTR_LENGTH => 5,

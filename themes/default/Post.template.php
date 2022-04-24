@@ -452,7 +452,7 @@ function template_add_new_attachments()
 								<i class="icon i-upload"></i>
 								<span class="desktop">', $txt['attach_drop_files'], '</span>
 								<span class="mobile">', $txt['attach_drop_files_mobile'], '</span>
-								<input id="attachment_click" class="drop_area_fileselect input_file" type="file" multiple="multiple" name="attachment_click[]" tabindex="', $context['tabindex']++, '" />
+								<input id="attachment_click" class="drop_area_fileselect input_file" type="button" title="', $txt['attach'], '" type="file" multiple="multiple" name="attachment_click[]" tabindex="', $context['tabindex']++, '" />
 							</dt>
 							<dd class="progress_tracker"></dd>
 							<dd class="drop_attachments_error"></dd>

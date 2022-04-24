@@ -634,7 +634,7 @@ class BBCParser
 			//		<blockquote class="bbc_quote"></blockquote> .. with a max height that is removed on input click
 			// </div>
 			$tag[Codes::ATTR_BEFORE] = str_replace('<div class="quoteheader">', '<div class="quote-read-more"><div class="quoteheader">', $tag[Codes::ATTR_BEFORE]);
-			$tag[Codes::ATTR_BEFORE] = str_replace('<blockquote>', '<input type="checkbox" class="quote-show-more"><blockquote class="bbc_quote">', $tag[Codes::ATTR_BEFORE]);
+			$tag[Codes::ATTR_BEFORE] = str_replace('<blockquote>', '<input type="checkbox" title="' . $tag[Codes::ATTR_CONTENT] . '" class="quote-show-more"><blockquote class="bbc_quote">', $tag[Codes::ATTR_BEFORE]);
 			$tag[Codes::ATTR_AFTER] = str_replace('</blockquote>', '</blockquote></div>', $tag[Codes::ATTR_AFTER]);
 		}
 		else
