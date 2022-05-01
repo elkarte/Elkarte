@@ -46,10 +46,9 @@
 	flex-basis: 100%;
 	margin: 0 0 2em;
 	padding: 0 5px;
-	outline: none;
-	border: 0;
 	color: #444444;
 	resize: none;
+	border-radius: 0 0 4px 4px;
 }
 
 /* Necessary for stabilising font-size in source mode! */
@@ -130,7 +129,6 @@
 }
 
 .sceditor-more {
-	margin: 2px 0 0 !important;
 	padding: 0 3px !important;
 	border-top: 1px solid #CCCCCC;
 	border-right: 1px solid #BBBBBB;
@@ -170,8 +168,8 @@
 
 #sceditor-popup-close {
 	display: inline-block;
-	padding: 0 .35em;
-	border-radius: 0.125em;
+	padding: 0 4px;
+	border-radius: 2px;
 	font-size: 0.857em;
 	line-height: 1.85em;
 	color: #585858;
