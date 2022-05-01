@@ -85,7 +85,14 @@ function template_html_above()
 	<meta name="robots" content="noindex" />';
 	}
 
-	// load in any css from addons or themes so they can overwrite if wanted
+	// If we have any Open Graph data, here is where is inserted.
+	if (!empty($context['open_graph']))
+	{
+		echo '
+	' .implode("\n\t", $context['open_graph']);
+	}
+
+	// load in any css from addons or themes, so they can overwrite if wanted
 	template_css();
 
 	// Present a canonical url for search engines to prevent duplicate content in their indices.
@@ -211,83 +218,57 @@ function template_body_above()
 
 	// The main content should go here.
 	echo '
-		<div id="main_content_section"><a id="skipnav"></a>';
+		<div id="main_content_section">
+			<a id="skipnav"></a>';
 }
 
 /**
- * If the user is logged in, display the time, or a maintenance warning for admins.
- *
- * @todo - TBH I always intended the time/date to be more or less a place holder for more important things.
+ * More or less a place holder for now, sits at the very page top.
  * The maintenance mode warning for admins is an obvious one, but this could also be used for moderation notifications.
  * I also assumed this would be an obvious place for sites to put a string of icons to link to their FB, Twitter, etc.
  * This could still be done via conditional, so that administration and moderation notices were still active when
  * applicable.
  */
-function template_th_login_bar()
+function template_th_header_bar()
 {
-	global $context, $modSettings, $txt, $scripturl;
+	global $context, $txt, $scripturl;
 
 	echo '
 			<div id="top_section_notice" class="user">
-				<form action="', $scripturl, '?action=login2;quicklogin" method="post" accept-charset="UTF-8" ', empty($context['disable_login_hashing']) ? ' onsubmit="hashLoginPassword(this, \'' . $context['session_id'] . '\');"' : '', '>
-					<div id="password_login">
-						<input type="text" name="user" size="10" class="input_text" placeholder="', $txt['username'], '" />
-						<input type="password" name="passwrd" size="10" class="input_password" placeholder="', $txt['password'], '" />
-						<select name="cookielength">
-							<option value="60">', $txt['one_hour'], '</option>
-							<option value="1440">', $txt['one_day'], '</option>
-							<option value="10080">', $txt['one_week'], '</option>
-							<option value="43200">', $txt['one_month'], '</option>
-							<option value="-1" selected="selected">', $txt['forever'], '</option>
-						</select>
-						<input type="submit" value="', $txt['login'], '" />
-						<input type="hidden" name="hash_passwrd" value="" />
-						<input type="hidden" name="old_hash_passwrd" value="" />
-						<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
-						<input type="hidden" name="', $context['login_token_var'], '" value="', $context['login_token'], '" />';
-
-	// @todo login_token_var and login_token are not defined when installing the forum
-	echo '
-					</div>
-				</form>
 			</div>';
 }
 
 /**
- * A simple search bar (used in the header)
+ * Search bar form, expands to input form when search icon is clicked
  */
-function template_th_search_bar()
+function template_search_form()
 {
 	global $context, $modSettings, $txt;
 
 	echo '
-			<form id="search_form" action="', getUrl('action', ['action' => 'search', 'sa' => 'results']), '" method="post" role="search" accept-charset="UTF-8">
-				<label for="quicksearch">
-					<input type="search" name="search" id="quicksearch" value="" class="input_text" placeholder="', $txt['search'], '" />
-				</label>';
+			<form id="search_form_menu" action="', getUrl('action', ['action' => 'search', 'sa' => 'results']), '" method="post" role="search" accept-charset="UTF-8">';
 
 	// Using the quick search dropdown?
 	if (!empty($modSettings['search_dropdown']))
 	{
 		$selected = !empty($context['current_topic']) ? 'current_topic' : (!empty($context['current_board']) ? 'current_board' : 'all');
-
 		echo '
 				<label for="search_selection">
-				<select name="search_selection" id="search_selection" aria-label="search selection">
-					<option value="all"', ($selected == 'all' ? ' selected="selected"' : ''), '>', $txt['search_entireforum'], ' </option>';
+					<select name="search_selection" id="search_selection" class="linklevel1" aria-label="search selection">
+						<option value="all"', ($selected === 'all' ? ' selected="selected"' : ''), '>', $txt['search_entireforum'], ' </option>';
 
 		// Can't limit it to a specific topic if we are not in one
 		if (!empty($context['current_topic']))
 		{
 			echo '
-					<option value="topic"', ($selected == 'current_topic' ? ' selected="selected"' : ''), '>', $txt['search_thistopic'], '</option>';
+						<option value="topic"', ($selected === 'current_topic' ? ' selected="selected"' : ''), '>', $txt['search_thistopic'], '</option>';
 		}
 
 		// Can't limit it to a specific board if we are not in one
 		if (!empty($context['current_board']))
 		{
 			echo '
-					<option value="board"', ($selected == 'current_board' ? ' selected="selected"' : ''), '>', $txt['search_thisbrd'], '</option>';
+						<option value="board"', ($selected === 'current_board' ? ' selected="selected"' : ''), '>', $txt['search_thisbrd'], '</option>';
 		}
 
 		if (!empty($context['additional_dropdown_search']))
@@ -295,34 +276,61 @@ function template_th_search_bar()
 			foreach ($context['additional_dropdown_search'] as $name => $engine)
 			{
 				echo '
-					<option value="', $name, '">', $engine['name'], '</option>';
+						<option value="', $name, '">', $engine['name'], '</option>';
 			}
 		}
 
 		echo '
-					<option value="members"', ($selected == 'members' ? ' selected="selected"' : ''), '>', $txt['search_members'], ' </option>
-				</select>
+						<option value="members"', ($selected === 'members' ? ' selected="selected"' : ''), '>', $txt['search_members'], ' </option>
+					</select>
 				</label>';
 	}
 
 	// Search within current topic?
-	if (!empty($context['current_topic']))
+	if (!empty($context['current_topic']) && !empty($modSettings['search_dropdown']))
 	{
 		echo '
 				<input type="hidden" name="', (!empty($modSettings['search_dropdown']) ? 'sd_topic' : 'topic'), '" value="', $context['current_topic'], '" />';
 	}
 
 	// If we're on a certain board, limit it to this board ;).
-	if (!empty($context['current_board']))
+	if (!empty($context['current_board']) && !empty($modSettings['search_dropdown']))
 	{
 		echo '
 				<input type="hidden" name="', (!empty($modSettings['search_dropdown']) ? 'sd_brd[' : 'brd['), $context['current_board'], ']"', ' value="', $context['current_board'], '" />';
 	}
 
-	echo '
-				<button type="submit" aria-label="' . $txt['search'] . '" name="search;sa=results" class="', (!empty($modSettings['search_dropdown'])) ? 'with_select' : '', '"><i class="icon i-search icon-shade"><s>', $txt['search'], '</s></i></button>
+	echo '					
+				<label for="quicksearch">
+					<input type="search" name="search" id="quicksearch" value="" class="linklevel1" placeholder="', $txt['search'], '" />
+				</label>
+				<button type="submit" aria-label="' . $txt['search'] . '" name="search;sa=results" class="', (!empty($modSettings['search_dropdown'])) ? 'with_select' : '', '">
+					<i class="icon i-search icon-shade"><s>', $txt['search'], '</s></i>
+				</button>
+				<button type="button" aria-label="' . $txt['find_close'] . '">
+					<label for="search_form_check">
+						<i class="icon i-close icon-shade"><s>', $txt['find_close'], '</s></i>
+					</label>
+				</button>
 				<input type="hidden" name="advanced" value="0" />
 			</form>';
+}
+
+/**
+ * Search bar menu icon
+ */
+function template_mb_search_bar()
+{
+	global $txt;
+
+	echo '
+			<li id="search_form_button" class="listlevel1" role="none">
+				<label for="search_form_check">
+					<a class="linklevel1 panel_search" role="menuitem">
+						<i class="main-menu-icon i-search colorize-white"><s>', $txt['search'], '</s></i>
+					</a>
+				</label>
+			</li>';
 }
 
 /**
@@ -371,8 +379,8 @@ function template_body_below()
 					<a id="button_rss" href="' . $context['newsfeed_urls']['rss'] . '" class="rssfeeds new_win">
 						<i class="icon icon-margin i-rss icon-big"><s>' . $txt['rss'] . '</s></i>
 					</a>
-				</li>' : '',
-			'</ul>';
+				</li>' : '', '
+			</ul>';
 
 	// Show the load time?
 	if ($context['show_load_time'])
@@ -395,6 +403,24 @@ function template_html_below()
 
 	// load in any javascript that could be deferred to the end of the page
 	theme()->template_javascript(true);
+
+	// Schema microdata about the organization?
+	if (!empty($context['smd_site']))
+	{
+		echo '
+	<script type="application/ld+json">
+	', json_encode($context['smd_site'], JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE), '
+	</script>';
+	}
+
+	// Schema microdata about the post?
+	if (!empty($context['smd_article']))
+	{
+		echo '
+	<script type="application/ld+json">
+	', json_encode($context['smd_article'], JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE), '
+	</script>';
+	}
 
 	// Anything special to put out?
 	if (!empty($context['insert_after_template']))
@@ -462,23 +488,43 @@ function template_menu()
 
 	// WAI-ARIA a11y tweaks have been applied here.
 	echo '
+				
 				<nav id="menu_nav" aria-label="', $txt['main_menu'], '">
-					<ul id="main_menu" class="wrapper no_js" aria-label="', $txt['main_menu'], '" role="menubar">';
+					<div class="wrapper no_js">
+					<input type="checkbox" id="search_form_check">
+					<ul id="main_menu" aria-label="', $txt['main_menu'], '" role="menubar">';
 
-	// The upshrink image, right-floated.
+	// Add any additional menu buttons from addons
+	call_template_callbacks('mb', $context['theme_header_callbacks']);
+
+	// This defines the start of right aligned buttons, simply set your button order > 10
+	echo '
+						<li id="button_none" class="listlevel1" role="none">
+							<a role="none"></a>
+						</li>';
+
+	// The upshrink image.
 	echo '
 						<li id="collapse_button" class="listlevel1" role="none">
 							<a class="linklevel1 panel_toggle" role="menuitem">
-								<i id="upshrink" class="hide chevricon i-chevron-up icon icon-lg" title="', $txt['upshrink_description'], '"></i>
+								<i id="upshrink" class="hide main-menu-icon i-chevron-up" title="', $txt['upshrink_description'], '"></i>
 							</a>
 						</li>';
 
+	// Now all the buttons from menu.subs
 	foreach ($context['menu_buttons'] as $act => $button)
 	{
+		// Top link details, easier to maintain broken out
+		$class = 'class="linklevel1' . (!empty($button['active_button']) ? ' active' : '') . (!empty($button['indicator']) ? ' indicator' : '') . '"';
+		$href = ' href="' . $button['href'] . '"';
+		$target = isset($button['target']) ? ' target="' . $button['target'] . '"' : '';
+		$onclick = isset($button['onclick']) ? ' onclick="' . $button['onclick'] . '"' : '';
+		$altTitle = 'title="' . (!empty($button['alttitle']) ? $button['alttitle'] : $button['title']) . '"';
+
 		echo '
 						<li id="button_', $act, '" class="listlevel1', !empty($button['sub_buttons']) ? ' subsections"' : '"', ' role="none">
-							<a class="linklevel1', !empty($button['active_button']) ? ' active' : '', (!empty($button['indicator']) ? ' indicator' : ''), '" href="', $button['href'], '" ', isset($button['target']) ? 'target="' . $button['target'] . '"' : '', ' role="menuitem"', !empty($button['sub_buttons']) ? ' aria-haspopup="true"' : '', '>',
-								(!empty($button['data-icon']) ? '<i class="icon icon-menu icon-lg ' . $button['data-icon'] . (!empty($button['active_button']) ? ' enabled' : '') . '" title="' . (!empty($button['alttitle']) ? $button['alttitle'] : $button['title']) . '"></i> ' : ''),
+							<a ', $class, $href, $target, $onclick, ' role="menuitem"', !empty($button['sub_buttons']) ? ' aria-haspopup="true"' : '', '>',
+								(!empty($button['data-icon']) ? '<i class="icon icon-menu icon-lg ' . $button['data-icon'] . (!empty($button['active_button']) ? ' enabled' : '') . '" ' . $altTitle . '></i> ' : ''),
 								'<span class="button_title" aria-hidden="', (empty($button['sub_buttons']) ? 'false' : 'true'), '">', $button['title'], '</span>
 							</a>';
 
@@ -492,7 +538,7 @@ function template_menu()
 			{
 				echo '
 								<li id="button_', $childact, '" class="listlevel2', !empty($childbutton['sub_buttons']) ? ' subsections"' : '"', ' role="none">
-									<a class="linklevel2" href="', $childbutton['href'], '" ', isset($childbutton['target']) ? 'target="' . $childbutton['target'] . '"' : '', !empty($childbutton['sub_buttons']) ? ' aria-haspopup="true"' : '', ' role="menuitem">',
+									<a class="linklevel2" href="', $childbutton['href'], '" ', isset($childbutton['target']) ? 'target="' . $childbutton['target'] . '"' : '', isset($childbutton['onclick']) ? ' onclick="' . $childbutton['onclick'] . '"' : '', !empty($childbutton['sub_buttons']) ? ' aria-haspopup="true"' : '', ' role="menuitem">',
 										$childbutton['title'], '
 									</a>';
 
@@ -506,7 +552,7 @@ function template_menu()
 					{
 						echo '
 										<li id="button_', $grandchildact, '" class="listlevel3" role="none">
-											<a class="linklevel3" href="', $grandchildbutton['href'], '" ', isset($grandchildbutton['target']) ? 'target="' . $grandchildbutton['target'] . '"' : '', ' role="menuitem">',
+											<a class="linklevel3" href="', $grandchildbutton['href'], '" ', isset($grandchildbutton['target']) ? 'target="' . $grandchildbutton['target'] . '"' : '', isset($grandchildbutton['onclick']) ? ' onclick="' . $grandchildbutton['onclick'] . '"' : '', ' role="menuitem">',
 												$grandchildbutton['title'], '
 											</a>
 										</li>';
@@ -529,7 +575,16 @@ function template_menu()
 	}
 
 	echo '
-					</ul>
+						
+					</ul>';
+
+	// If search is enabled, plop in the form
+	if ($context['allow_search'])
+	{
+		template_search_form();
+	}
+
+	echo '</div>
 				</nav>';
 
 	// Define the upper_section toggle in javascript.
@@ -538,7 +593,7 @@ function template_menu()
 						bToggleEnabled: true,
 						bCurrentlyCollapsed: ' . (empty($context['minmax_preferences']['upshrink']) ? 'false' : 'true') . ',
 						aSwappableContainers: [
-							\'upper_section\',\'header\'
+							\'upper_section\',\'header\',\'top_header\'
 						],
 						aSwapClasses: [
 							{
@@ -562,25 +617,37 @@ function template_menu()
 						}
 					});
 				', true);
+
 }
 
 /**
- * Generate a strip of buttons.
+ * Generate a strip of buttons (like those present at the top of the message display)
+ *
+ * What it does:
+ *
+ * - Create a button list area, pass an array of the button name with key values
+ * - array('somename' => array(url => '' text => '' custom => '' test => '', lang => bool, submenu => bool))
+ *      - text => text to display in the button
+ *      - custom => custom action to perform, generally used to add 'onclick' events (optional)
+ *      - test => permission key to check in the $tests array before showing the button (optional)
+ * 		- url => link to call when button is pressed
+ * 		- lang => bool
+ *      - submenu => if the button should be shown in a "more" button
+ * 		- id => css id to use on link as #button_strip_ID (optional)
  *
  * @param mixed[] $button_strip
  * @param string $class = ''
  * @param string[] $strip_options = array()
- *
- * @return string as echoed content
+ * @return void string as echoed content
  */
 function template_button_strip($button_strip, $class = '', $strip_options = array())
 {
-	global $context, $txt;
+	global $context, $txt, $options;
 
 	// Not sure if this can happen, but people can misuse functions very efficiently
 	if (empty($button_strip))
 	{
-		return '';
+		return;
 	}
 
 	if (!is_array($strip_options))
@@ -595,28 +662,51 @@ function template_button_strip($button_strip, $class = '', $strip_options = arra
 	}
 
 	// Create the buttons... now with cleaner markup (yay!).
-	$buttons = array();
+	$buttons = [];
+	$subMenu = [];
 	foreach ($button_strip as $key => $value)
 	{
+		$id = (isset($value['id']) ? ' id="button_strip_' . $value['id'] . '"' : '');
+
+		// Don't need any or have the right permission, you get a button
 		if (!isset($value['test']) || !empty($context[$value['test']]))
 		{
+			if (!empty($value['submenu']))
+			{
+				$subMenu[] = '
+						<li class="listlevel2">
+							<a href="' . $value['url'] . '" class="linklevel2 button_strip_' . $key . (isset($value['custom']) ? ' ' . $value['custom'] : '') . '>' . $txt[$value['text']] . '</a>
+						</li>';
+				continue;
+			}
+
 			$buttons[] = '
-								<li role="menuitem">
-									<a' . (isset($value['id']) ? ' id="button_strip_' . $value['id'] . '"' : '') . ' class="linklevel1 button_strip_' . $key . (!empty($value['active']) ? ' active' : '') . '" href="' . $value['url'] . '"' . (isset($value['custom']) ? ' ' . $value['custom'] : '') . '>' . $txt[$value['text']] . '</a>
-								</li>';
+						<li role="menuitem">
+							<a' . $id . ' class="linklevel1 button_strip_' . $key . (!empty($value['active']) ? ' active' : '') . '" href="' . $value['url'] . '"' . (isset($value['custom']) ? ' ' . $value['custom'] : '') . '>' . $txt[$value['text']] . '</a>
+						</li>';
 		}
 	}
 
-	// No buttons? No button strip either.
-	if (empty($buttons))
+	// Is a more options button needed, if so, it goes at the end
+	if (!empty($subMenu))
 	{
-		return '';
+		$buttons[] = '
+						<li class="listlevel1 subsections" aria-haspopup="true" role="menuitem">
+							<a href="#" ' . (!empty($options['use_click_menu']) ? '' : 'onclick="event.stopPropagation();return false;"') . ' class="linklevel1 post_options">' .
+								$txt['post_options'] . '
+							</a>
+							<ul class="menulevel2">' . implode("\n", $subMenu) . '</ul>
+						</li>';
 	}
 
-	echo '
-							<ul role="menubar" class="buttonlist', !empty($class) ? ' ' . $class : '', '"', (!empty($strip_options['id']) ? ' id="' . $strip_options['id'] . '"' : ''), '>
-								', implode('', $buttons), '
-							</ul>';
+	// No buttons? No button strip either.
+	if (!empty($buttons))
+	{
+		echo '
+						<ul role="menubar" class="no_js buttonlist', !empty($class) ? ' ' . $class : '', '"', (!empty($strip_options['id']) ? ' id="' . $strip_options['id'] . '"' : ''), '>
+							', implode('', $buttons), '
+						</ul>';
+	}
 }
 
 /**
@@ -639,52 +729,50 @@ function template_button_strip($button_strip, $class = '', $strip_options = arra
  *
  * @param array $strip - the $context index where the strip is stored
  * @param bool[] $tests - an array of tests to determine if the button should be displayed or not
- * @return string of buttons
+ * @return void echos a string of buttons
  */
 function template_quickbutton_strip($strip, $tests = array())
 {
 	global $options;
 
-	$buttons = array();
+	$buttons = [];
 
 	foreach ($strip as $key => $value)
 	{
-		if (isset($value['checkbox']))
-		{
 			if (!empty($value['checkbox']) && ((!empty($options['display_quick_mod']) && $options['display_quick_mod'] == 1) || $value['checkbox'] === 'always'))
 			{
 				$buttons[] = '
-						<li class="listlevel1 ' . $key . '">
-							<input class="input_check ' . $key . '_check" type="checkbox" name="' . $value['name'] . '[]" value="' . $value['value'] . '" />
-						</li>';
+					<li class="listlevel1 ' . $key . '">
+						<input class="input_check ' . $key . '_check" type="checkbox" name="' . $value['name'] . '[]" value="' . $value['value'] . '" />
+					</li>';
+
+				continue;
 			}
-		}
-		elseif (!isset($value['test']) || !empty($tests[$value['test']]))
+
+		// No special permission needed, or you have valid permission, then get a button!
+		if (!isset($value['test']) || !empty($tests[$value['test']]))
 		{
 			if (!empty($value['override']))
 			{
 				$buttons[] = $value['override'];
+				continue;
 			}
-			else
-			{
-				$buttons[] = '
-						<li class="listlevel1">
-							<a href="' . $value['href'] . '" class="linklevel1 ' . $key . '_button"' . (isset($value['custom']) ? ' ' . $value['custom'] : '') . '>' . $value['text'] . '</a>
-						</li>';
+
+			$buttons[] = '
+					<li class="listlevel1">
+						<a href="' . $value['href'] . '" class="linklevel1 ' . $key . '_button"' . (isset($value['custom']) ? ' ' . $value['custom'] : '') . '>' . $value['text'] . '</a>
+					</li>';
 			}
 		}
-	}
 
 	// No buttons? No button strip either.
-	if (empty($buttons))
+	if (!empty($buttons))
 	{
-		return '';
-	}
-
-	echo '
+		echo '
 					<ul class="quickbuttons">', implode('
 						', $buttons), '
 					</ul>';
+	}
 }
 
 /**
@@ -938,10 +1026,8 @@ function template_msg_email($id, $member = false)
 
 			return '<a href="' . $scripturl . '?action=emailuser;sa=email;uid=' . $member['id'] . '" class="icon i-envelope-o' . (($member !== false && $member['online']['is_online']) ? '' : '-blank') . '" title="' . $txt['email'] . '"><s>' . $txt['email'] . '</s></a>';
 		}
-		else
-		{
-			return '<i class="icon i-envelope-o" title="' . $txt['email'] . ' ' . $txt['hidden'] . '"><s>' . $txt['email'] . ' ' . $txt['hidden'] . '</s></i>';
-		}
+
+		return '<i class="icon i-envelope-o" title="' . $txt['email'] . ' ' . $txt['hidden'] . '"><s>' . $txt['email'] . ' ' . $txt['hidden'] . '</s></i>';
 	}
 
 	return '';
