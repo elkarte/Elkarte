@@ -112,6 +112,11 @@ class ProfileInfo extends AbstractController
 	{
 		global $context, $modSettings;
 
+		// To make tabs work, we need jQueryUI
+		$modSettings['jquery_include_ui'] = true;
+		$context['start_tabs'] = true;
+		loadCSSFile('jquery.ui.tabs.css');
+
 		theme()->getTemplates()->load('ProfileInfo');
 		Txt::load('Profile');
 
@@ -133,11 +138,6 @@ class ProfileInfo extends AbstractController
 
 		// To finish this off, custom profile fields.
 		loadCustomFields($this->_memID);
-
-		// To make tabs work, we need jQueryUI
-		$modSettings['jquery_include_ui'] = true;
-		$context['start_tabs'] = true;
-		loadCSSFile('jquery.ui.tabs.css');
 	}
 
 	/**
@@ -991,6 +991,7 @@ class ProfileInfo extends AbstractController
 		global $txt, $context, $modSettings;
 
 		require_once(SUBSDIR . '/Stats.subs.php');
+		loadJavascriptFile(['chart.min.js', 'elk_chart.js']);
 
 		$context['page_title'] = $txt['statPanel_showStats'] . ' ' . $this->_profile['real_name'];
 
@@ -1007,6 +1008,8 @@ class ProfileInfo extends AbstractController
 		$timeHours = floor(($this->_profile['total_time_logged_in'] % 86400) / 3600);
 		$context['time_logged_in'] = ($timeDays > 0 ? $timeDays . $txt['totalTimeLogged2'] : '') . ($timeHours > 0 ? $timeHours . $txt['totalTimeLogged3'] : '') . floor(($this->_profile['total_time_logged_in'] % 3600) / 60) . $txt['totalTimeLogged4'];
 		$context['num_posts'] = comma_format($this->_profile['posts']);
+		$context['likes_given'] = comma_format($this->_profile['likes_given']);
+		$context['likes_received'] = comma_format($this->_profile['likes_received']);
 
 		// Menu tab
 		$context[$context['profile_menu_name']]['tab_data'] = array(
