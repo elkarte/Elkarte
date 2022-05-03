@@ -122,7 +122,7 @@ function template_generic_menu_dropdown_above()
 	{
 		echo '
 						<li class="listlevel1', !empty($section['areas']) ? ' subsections' : '', '" role="none">
-							<a class="linklevel1', !empty($section['selected']) ? ' active' : '', '" href="', $section['url'], '" role="menuitem"', !empty($section['areas']) ? ' aria-haspopup="true"' : '', '>',
+							<a class="linklevel1', !empty($section['selected']) ? ' active" aria-current="page"' : '"', ' href="', $section['url'], '" role="menuitem"', !empty($section['areas']) ? ' aria-haspopup="true"' : '', '>',
 								$section['label'], '
 							</a>
 							<ul class="menulevel2" role="menu">';

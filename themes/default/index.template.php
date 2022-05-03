@@ -520,10 +520,11 @@ function template_menu()
 		$target = isset($button['target']) ? ' target="' . $button['target'] . '"' : '';
 		$onclick = isset($button['onclick']) ? ' onclick="' . $button['onclick'] . '"' : '';
 		$altTitle = 'title="' . (!empty($button['alttitle']) ? $button['alttitle'] : $button['title']) . '"';
+		$ally = !empty($button['active_button']) ? 'aria-current="page"' : '';
 
 		echo '
 						<li id="button_', $act, '" class="listlevel1', !empty($button['sub_buttons']) ? ' subsections"' : '"', ' role="none">
-							<a ', $class, $href, $target, $onclick, ' role="menuitem"', !empty($button['sub_buttons']) ? ' aria-haspopup="true"' : '', '>',
+							<a ', $class, $href, $target, $ally, $onclick, ' role="menuitem"', !empty($button['sub_buttons']) ? ' aria-haspopup="true"' : '', '>',
 								(!empty($button['data-icon']) ? '<i class="icon icon-menu icon-lg ' . $button['data-icon'] . (!empty($button['active_button']) ? ' enabled' : '') . '" ' . $altTitle . '></i> ' : ''),
 								'<span class="button_title" aria-hidden="', (empty($button['sub_buttons']) ? 'false' : 'true'), '">', $button['title'], '</span>
 							</a>';

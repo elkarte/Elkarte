@@ -116,7 +116,7 @@ function template_topic_listing_above()
 	echo '
 							</ul>
 						</li>
-						<li class="listlevel1 topic_sorting_row">
+						<li class="listlevel1 topic_sorting_row" aria-sort="',  $context['sort_direction'] === 'up' ? 'ascending"' : 'descending"', '>
 							<a class="sort topicicon i-sort', $context['sort_direction'], '" href="', $current_header['url'], '" title="', $context['sort_title'], '"></a>
 						</li>';
 
