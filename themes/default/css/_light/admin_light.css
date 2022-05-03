@@ -65,7 +65,7 @@
 }
 
 #ourAnnouncements dt {
-	border-top-color: var(--top_section_border);
+	border-top-color: var(--top_section_top_border);
 }
 
 #ourAnnouncements dt a {

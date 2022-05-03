@@ -85,12 +85,12 @@
  */
 
 /* Most pages need a vertical scroll, show it by default to prevent page
-   Prevent font size changes on screen rotation */
+   font size changes on screen rotation */
 html {
 	overflow-y: scroll;
 	-webkit-text-size-adjust: 100%;
 	scroll-behavior: smooth;
-	scroll-padding: 10px 0 0 0;
+	scroll-padding: 20px 0 0 0;
 }
 
 /* Set a font that will look the mostly the same in all browsers.
@@ -127,11 +127,12 @@ body {
 .wrapper {
 	/* Next controls forum width, when it is not set in admin. */
 	width: 90%;
+	max-width: 150em;
 	/* Next limits maximum width on wide screens.
 	   Sized in em, since some people require larger text.
 	   For ease of reading, content really should not be too wide. */
-	max-width: 150em;
 	margin: 0 auto;
+	--content-width: 92%;
 }
 
 /* Normal, standard links. */
@@ -178,9 +179,8 @@ legend::before, .collapsed legend::before {
 	display: inline-block;
 	width: 16px;
 	height: 16px;
-	padding: 0 0 0 1em;
+	padding: 0 .25em;
 	content: "";
-	background-repeat: no-repeat;
 }
 
 /* Tables should show empty cells. */
@@ -274,6 +274,24 @@ button::-moz-focus-inner,
 	border-style: none;
 }
 
+/* These values are to suppress the browsers `focus ring` which don't match the
+   theme (instead we use border colors).  However we still want to allow keyboard
+   users to see which button / submit is active.
+   Focusing with a keyboard will show an assistive dashed black line on button type elements. */
+input[type="submit"]:focus-visible, button:focus-visible, .linkbutton:focus-visible {
+	outline: 2px dashed black;
+}
+
+/* Focusing with a mouse or touch will not change its indication. */
+input:focus:not(:focus-visible), input.input_text:focus, button:focus:not(:focus-visible) {
+	outline: none;
+}
+
+/* Other text areas we style with border during the :focus event */
+textarea:focus, select:focus, .editor:focus {
+	outline: none;
+}
+
 /* Correct clickable types in iOS and Safari. */
 button,
 [type="button"],
@@ -359,7 +377,7 @@ input[type="checkbox"], input[type="radio"] {
 }
 
 /* Common submit button styling. */
-input[type="submit"], button[type="submit"], input[type="button"],
+input[type="submit"], button[type="submit"], input[type="button"], button[type="button"],
 /* Anchors styled to look like buttons. */
 .linkbutton:link, .linkbutton:visited {
 	display: inline-block;
@@ -379,7 +397,7 @@ input[type="submit"], button[type="submit"], input[type="button"],
 
 /* Hover effects. */
 input[type="submit"]:hover, button[type="submit"]:hover, input[type="button"]:hover,
-.linkbutton:hover {
+button[type="button"]:hover, .linkbutton:hover {
 	cursor: pointer;
 	text-decoration: none;
 }
@@ -395,7 +413,6 @@ input[type=submit][disabled]:hover, button[disabled], button[disabled]:hover {
 	clear: both;
 	overflow: visible;
 	align-items: center;
-	flex-direction: row;
 	justify-content: flex-end;
 	padding: .4em 0;
 }
@@ -476,7 +493,6 @@ em, .em {
 	display: flex;
 	overflow: hidden;
 	align-items: center;
-	flex-direction: row;
 	flex-wrap: nowrap;
 	margin-top: .5em;
 }
@@ -551,8 +567,8 @@ em, .em {
 /* Styles for main headers. */
 .category_header, .forum_category .category_header {
 	font-size: var(--font18);
-	line-height: 1.8em;
-	padding: .25em .67em .13em .67em;
+	line-height: 1.8;
+	padding: .1em .5em;
 	border: 1px solid;
 	border-radius: 4px 4px 0 0;
 }
@@ -564,7 +580,7 @@ em, .em {
 /* Styles for subsection headers. */
 .secondary_header {
 	font-size: var(--font16);
-	line-height: 2em;
+	line-height: 2;
 	margin-top: 0.4em;
 	padding: 0 .67em;
 	border: 1px solid;
@@ -783,17 +799,21 @@ em, .em {
 }
 
 /* The "Quote:" and "Code:" header parts... */
-.codeheader, .quoteheader {
+.codeheader, .bbc_quote > cite {
 	font-size: var(--font13);
 	font-weight: 600;
-	margin: .4em 0 0 0;
 	padding: .2em .4em;
-	border: 1px solid;
-	border-bottom: none;
+	border-bottom: 1px solid;
+}
+
+.bbc_quote > cite {
+	display: block;
 }
 
 .codeheader {
+	margin-top: .4em;
 	border-top: 3px solid;
+	border-bottom: none;
 }
 
 /* [Select] link to copy code. */
@@ -813,6 +833,11 @@ em, .em {
 	border-top: none;
 }
 
+.bbc_quote {
+	margin: .4em 0 1em 0;
+	border: 1px solid;
+}
+
 /* Expanding quotes */
 .quote-read-more {
 	position: relative;
@@ -821,7 +846,7 @@ em, .em {
 /* Constrain the quote area height.  Use max height so we can have a smooth transition */
 .quote-read-more > .bbc_quote {
 	overflow: hidden;
-	max-height: 10em;
+	max-height: 12em;
 }
 
 /* Specific targeting of our checkbox.  100% wide with a gradient to cover/fade the bottom of the blockquote */
@@ -831,17 +856,16 @@ input[type=checkbox].quote-show-more {
 	width: 100%;
 	height: 8em;
 	margin: 0 1px 1px 1px;
-	padding-top: 5em;
+	padding-top: 6em;
 	cursor: pointer;
 	text-align: center;
-	background: linear-gradient(to bottom, transparent, white);
 	-webkit-appearance: none;
 	-moz-appearance: none;
 	appearance: none;
 }
 
 /* The read moar, with the 100% width clicking anywhere in the quote base will work
-   note content: is set in display controller for localization reasons */
+   note content: "More" is defined in themes/default/Theme.php controller for localization */
 input[type=checkbox].quote-show-more:after {
 	font-size: var(--font16);
 	font-weight: 600;
@@ -852,7 +876,8 @@ input[type=checkbox].quote-show-more:checked {
 	display: none;
 }
 
-/* 750em is simply to avoid the clipping of any length quote */
+/* max-height 750em is simply to avoid the clipping of any length quote, do not use none as
+   it will not allow a smooth transition */
 input[type=checkbox].quote-show-more:checked + .bbc_quote {
 	max-height: 750em;
 	transition: 1.5s max-height ease-in;
@@ -876,7 +901,7 @@ input[type=checkbox].quote-show-more:checked + .bbc_quote {
 
 /* Styling for BBC tags */
 .bbc_size {
-	line-height: 1.4em;
+	line-height: 1.4;
 }
 
 /* the "inherit" declarations allow bbc tag color nesting to work, due to strong,
@@ -1007,7 +1032,7 @@ a.bbc_link {
 /* use /me in a post */
 .meaction::before {
 	font-size: var(--font22);
-	line-height: 1em;
+	line-height: 1;
 	content: "\270c";
 	outline: none;
 }
@@ -1075,14 +1100,13 @@ a.bbc_link {
 /* Very top bar, holds search and login (top_section_notice) forms */
 #top_header {
 	display: flex;
-	align-items: center;
 	justify-content: flex-end;
-	margin-top: .5em;
 }
 
 #top_section_notice {
 	font-weight: 700;
 	flex: 1 1 auto;
+	padding: .75em .5em .25em .25em;
 }
 
 #top_section_notice .toggle_login {
@@ -1100,41 +1124,72 @@ a.bbc_link {
 	vertical-align: middle;
 }
 
-#search_form {
-	display: flex;
+/* Search input, search dropdown, search button group */
+#search_form_button {
+	order: 21;
 }
 
-/* Search input, search dropdown, search button group */
-#search_form button, #search_form input, #search_form label {
-	margin: 0;
+/* Quick Search Form, hidden until search icon is clicked */
+#search_form_menu {
+	position: absolute;
+	z-index: 100;
+	top: 0;
+	right: 0;
+	display: flex;
+	visibility: hidden;
+	align-items: center;
+	justify-content: right;
+	opacity: 0;
+}
+
+#search_form_menu input, #search_form_menu select, #search_form_menu button {
+	line-height: 2.3;
+	height: 2.3em;
+}
+
+/* This are simply to collapse the search from into a single element */
+#search_form_menu select, #search_form_menu input, #search_form_menu button[type="submit"] {
+	margin-right: -1px;
+	border-right: none;
+}
+
+#search_form_menu select {
+	min-width: 115px;
+	border-radius: 3px 0 0 3px;
+}
+
+#search_form_menu input {
 	border-radius: 0;
 }
 
-#search_form button {
-	margin-left: -5px;
-	border: 1px solid transparent;
+#search_form_menu button[type="submit"] {
+	border-radius: 0;
 }
 
-#search_form .input_text {
-	border-right: none;
-	border-radius: 2px 0 0 2px;
+#search_form_menu button[type="button"] {
+	border-radius: 0 3px 3px 0;
 }
 
-#search_form input[type="submit"] {
-	border-radius: 0 2px 2px 0;
+/* Checkbox hack to allow toggling fade in/out of search form w/o any JS */
+#search_form_check {
+	display: none;
 }
 
-#search_form select {
-	font-weight: 600;
-	width: 125px;
-	margin-bottom: 1px;
-	border: 1px solid;
-	border-right: none;
+#search_form_check:checked ~ #search_form_menu {
+	visibility: visible;
+	transition: opacity .5s;
+	opacity: 1;
 }
 
-#search_form select:focus {
-	border: 1px solid;
-	border-right: none;
+#search_form_check:checked ~ #main_menu {
+	transition: opacity .5s;
+	opacity: 0;
+}
+
+#search_form_check ~ #main_menu {
+	visibility: visible;
+	transition: opacity .5s;
+	opacity: 1;
 }
 
 /* The logo and slogan. @todo - Simplify. and use flex */
@@ -1240,7 +1295,7 @@ a.bbc_link {
 /* The content section, below the news and bread crumbs */
 #main_content_section {
 	min-height: 180px;
-	padding: 1em 0 0 0;
+	padding: 2em 0 0 0;
 }
 
 /* The footer with copyright links etc. */
@@ -1305,14 +1360,17 @@ a.bbc_link {
 #menu_nav {
 	display: flex;
 	align-items: center;
-	padding: .4em .4em .7em .4em;
+	padding: 1.5em .4em .7em .4em;
+}
+
+#menu_nav > div {
+	position: relative;
 }
 
 /* Main menu container, on the ul */
 #main_menu {
 	display: flex;
 	align-items: center;
-	flex-direction: row;
 	justify-content: flex-start;
 }
 
@@ -1320,7 +1378,6 @@ a.bbc_link {
 .admin_menu {
 	display: flex;
 	align-items: center;
-	flex-direction: row;
 	justify-content: flex-start;
 	padding: 0 3px;
 }
@@ -1341,7 +1398,6 @@ a.bbc_link {
 #adm_submenus {
 	display: flex;
 	align-items: center;
-	flex-direction: row;
 	justify-content: flex-start;
 	padding: 0 3px;
 }
@@ -1350,12 +1406,11 @@ a.bbc_link {
 .generic_menu {
 	display: flex;
 	align-items: center;
-	flex-direction: row;
 	justify-content: flex-start;
 	padding: .4em 0;
 }
 
-/* When using th above adm_submenus / generic_menu tabs, this is the content div
+/* When using the above adm_submenus / generic_menu tabs, this is the content div
    added by GenericMenu.template */
 #admin_content {
 	clear: both;
@@ -1374,21 +1429,29 @@ a.bbc_link {
 	z-index: 6;
 }
 
-/* The My Profile and top header collapse buttons on the right
-   arbitrary 11/12 order, leaving room for 10 other buttons */
-.listlevel1#button_profile {
-	order: 11;
+/* position 10 is hidden, items ordered after this will be 'floated' right */
+.listlevel1#button_none {
+	order: 10;
 	margin-left: auto;
 }
 
+/* The My Profile and top header collapse buttons on the right
+   arbitrary 19/20 order, leaving room for many other "right" buttons */
+.listlevel1#button_profile {
+	order: 19;
+}
+
 .listlevel1#collapse_button {
-	order: 12;
+	order: 20;
 }
 
 /* Upshrink image in the page top for the header collapse */
-#collapse_button .linklevel1 {
-	overflow: hidden;
-	padding: 0;
+#collapse_button .linklevel1, #search_form_button .linklevel1, #search_form_button_close .linklevel1 {
+	display: flex;
+	justify-content: center;
+	width: 2.2em;
+	height: 2.2em;
+	padding: 3px;
 	border: 1px solid;
 }
 
@@ -1488,6 +1551,7 @@ a.bbc_link {
 	transform: rotate(-45deg);
 	opacity: 0;
 	border: 1px solid;
+	/* Simple variable to change if you want to change the size */
 	--pointersize: 12px;
 }
 
@@ -1507,7 +1571,7 @@ a.bbc_link {
 }
 
 /* Classes selected, un_selected and open are added by javascript.  Here its a
-   click menu and no hover intent ambiguity, so speed up the reveal / rollup */
+   click menu, with no hover intent ambiguity, so we speed up the reveal / rollup */
 .listlevel1 .menulevel2.selected,
 .listlevel2 .menulevel3.selected,
 .listlevel1 .menulevel2.un_selected,
@@ -1589,7 +1653,7 @@ a.bbc_link {
 .pm_indicator, .likes_indicator {
 	font-size: var(--font14);
 	font-weight: 700;
-	line-height: 1.7em;
+	line-height: 1.7;
 	position: absolute;
 	z-index: 2;
 	top: -1.45em;
@@ -1602,7 +1666,7 @@ a.bbc_link {
 
 .likes_indicator {
 	font-size: .857em;
-	line-height: 1.467em;
+	line-height: 1.467;
 	top: -1.2em;
 	border-radius: 6px 6px 6px 0;
 }
@@ -1686,9 +1750,8 @@ a.bbc_link {
 .breadcrumb {
 	display: flex;
 	overflow: hidden;
-	flex-direction: row;
 	flex-wrap: wrap;
-	margin-top: .3em;
+	margin-top: 1em;
 	border-radius: 4px;
 	/* Defines the breadcrumb height */
 	--arrow: 30px;
@@ -1724,11 +1787,11 @@ a.bbc_link {
 	/* Prevent the arrows from getting covered under the next link */
 	right: calc((var(--arrow) / 2 - 1px) * -1);
 	width: var(--arrow);
-	height: calc(var(--arrow));
+	height: var(--arrow);
 	content: "";
 	/* Scale the rotated square based on its diagonal length */
 	transform: scale(0.7071) rotate(45deg);
-	/* 50px seems help prevent hover glitches caused by the border shadow */
+	/* 50px seems to help prevent hover glitches caused by the border shadow */
 	border-radius: 0 4px 0 50px;
 }
 
@@ -1760,7 +1823,6 @@ a.bbc_link {
 .buttonlist {
 	display: flex;
 	align-items: center;
-	flex-direction: row;
 	padding: 0 .2em;
 }
 
@@ -1769,14 +1831,14 @@ a.bbc_link {
 }
 
 .buttonlist li {
-	line-height: 2.1em;
+	line-height: 2.1;
 	flex: 0 0 auto;
 	margin: 0 0 0 .1em;
 }
 
 .buttonlist li a {
 	font-size: var(--font12);
-	line-height: 2.1em;
+	line-height: 2.1;
 	padding: 0 .6em;
 }
 
@@ -1806,10 +1868,13 @@ nav > .quickbuttons, menu > .quickbuttons {
 	white-space: nowrap;
 }
 
-/* Follow ups need it a bit different. */
+/* Follow ups need it a bit different, this button is in the keyinfo line */
 .follow_ups {
-	float: right;
-	margin: -.5em 0 0 .5em;
+	margin: -.5em .5em 0 .5em;
+}
+
+.follow_ups .listlevel1 {
+	height: 30px;
 }
 
 /* Most of them. */
@@ -1822,10 +1887,6 @@ nav > .quickbuttons, menu > .quickbuttons {
 /* Odd cases. */
 .moderation_link, .moderation_link:visited {
 	font-weight: bold;
-}
-
-.follow_ups .listlevel1 {
-	font-size: var(--font15);
 }
 
 .quickbuttons .modified {
@@ -1841,7 +1902,7 @@ nav > .quickbuttons, menu > .quickbuttons {
 }
 
 .quickbuttons .linklevel1 {
-	line-height: 2.1em;
+	line-height: 2.1;
 	float: left;
 	padding: 1px .4em 0 1.5em;
 	cursor: pointer;
@@ -1957,7 +2018,6 @@ nav > .quickbuttons, menu > .quickbuttons {
 	background-position: 0 -480px;
 }
 
-
 /* Radius left end of the first (Quote) button, last-child as this is in reverse order */
 .quickbuttons li:last-child a {
 	border-radius: 4px 0 0 4px;
@@ -1984,13 +2044,19 @@ nav > .quickbuttons, menu > .quickbuttons {
 	padding: 1px .4em 0 .4em;
 }
 
-/* Quickbutton and follow ups drop menus, flyout to the left. */
-.quickbuttons .menulevel2 {
+/* Quickbutton, Buttonlist, and follow ups drop menus, flyout to the left.
+   These are the More... flyout menus on the message display page */
+.quickbuttons .menulevel2, .buttonlist .menulevel2 {
 	right: 0;
 	left: auto;
 }
 
-.quickbuttons .menulevel2, .follow_ups .menulevel2 {
+.follow_ups .menulevel2 {
+	right: auto;
+	left: 0;
+}
+
+.quickbuttons .menulevel2, .follow_ups .menulevel2, .buttonlist .menulevel2 {
 	width: auto;
 	padding: 0.5em;
 	text-align: left;
@@ -2015,7 +2081,7 @@ nav > .quickbuttons, menu > .quickbuttons {
 }
 
 .quickbuttons .linklevel2 {
-	line-height: 2.1em;
+	line-height: 2.1;
 	padding: 0 .4em 0 26px;
 }
 
@@ -2028,11 +2094,11 @@ nav > .quickbuttons, menu > .quickbuttons {
 .pagesection {
 	display: flex;
 	clear: both;
-	overflow: hidden;
+	overflow: visible;
 	align-items: center;
 	flex-wrap: wrap;
 	max-width: 100%;
-	padding: .4em .25em;
+	padding: .2em .25em;
 }
 
 .pagesection.rtl {
@@ -2045,7 +2111,6 @@ nav > .quickbuttons, menu > .quickbuttons {
 	display: flex;
 	align-items: center;
 	flex: 1;
-	flex-direction: row;
 	flex-wrap: wrap;
 }
 
@@ -2110,7 +2175,6 @@ nav > .quickbuttons, menu > .quickbuttons {
 	display: flex;
 	float: right;
 	align-items: center;
-	flex-direction: row;
 }
 
 /* our buddies &laquo; &raquo; */
@@ -2347,7 +2411,7 @@ nav > .quickbuttons, menu > .quickbuttons {
 /* Grid layout specifics, separated for easy modding */
 .category_boards .board_row {
 	display: grid;
-	grid-template-columns: [bicon] 85px [info] auto [avatar] 65px [latest] 32% [stats] minmax(80px, 125px) [end];
+	grid-template-columns: [bicon] 75px [info] auto [avatar] 60px [latest] 32% [stats] minmax(80px, 120px) [end];
 	grid-template-rows: [primary] auto [children] auto;
 }
 
@@ -2363,6 +2427,7 @@ nav > .quickbuttons, menu > .quickbuttons {
 }
 
 .category_boards .board_avatar {
+	justify-self: center;
 	grid-column: avatar;
 	grid-row-start: primary;
 }
@@ -2378,6 +2443,8 @@ nav > .quickbuttons, menu > .quickbuttons {
 }
 
 .category_boards .board_stats {
+	display: flex;
+	justify-content: center;
 	grid-column: stats;
 	grid-row-start: primary;
 }
@@ -2399,7 +2466,9 @@ nav > .quickbuttons, menu > .quickbuttons {
 
 .board_info {
 	font-size: var(--font14);
+	margin-bottom: .4em;
 	padding: 0 8px;
+	border-right: 1px solid;
 }
 
 .board_name {
@@ -2411,14 +2480,14 @@ nav > .quickbuttons, menu > .quickbuttons {
 }
 
 .board_avatar {
-	min-height: 45px;
 	padding-top: .3em;
-	padding-left: .7em;
-	border-left: 1px solid;
+	padding-left: .5em;
 }
 
 .board_avatar .avatar {
-	max-width: 50px;
+	width: 50px;
+	max-height: 50px;
+	object-fit: scale-down;
 }
 
 .board_latest {
@@ -2437,11 +2506,6 @@ nav > .quickbuttons, menu > .quickbuttons {
 
 .board_lasttime {
 	display: block;
-}
-
-.board_stats {
-	padding: 0 .5em;
-	text-align: right;
 }
 
 .board_row,
@@ -2480,13 +2544,12 @@ nav > .quickbuttons, menu > .quickbuttons {
 #posting_icons {
 	display: flex;
 	align-items: center;
-	flex-direction: row;
 	margin: 0 0 1em .25em;
 }
 
 #posting_icons p {
 	font-size: var(--font13);
-	line-height: 1.25em;
+	line-height: 1.25;
 	display: table-cell;
 	padding: 0 .25em;
 }
@@ -2533,6 +2596,7 @@ nav > .quickbuttons, menu > .quickbuttons {
 	border-top: 1px solid;
 }
 
+/* Generic info center P */
 .inline {
 	font-size: var(--font13);
 	padding: 0 2em;
@@ -2615,7 +2679,7 @@ nav > .quickbuttons, menu > .quickbuttons {
 }
 
 /* Applied to the ul of the topic listing page */
-.topic_listing, .search_results_posts {
+.topic_listing {
 	width: 100%;
 }
 
@@ -2637,7 +2701,7 @@ nav > .quickbuttons, menu > .quickbuttons {
 }
 
 /* Indicator if you posted in this topic */
-.fred:before {
+.fred::before {
 	position: relative;
 	top: -14px;
 	right: 4px;
@@ -2649,10 +2713,11 @@ nav > .quickbuttons, menu > .quickbuttons {
 	grid-column-start: topic_info;
 	margin: 0 0 0 .8em;
 	padding: .4em .8em .4em .8em;
+	border-right: 1px solid;
 }
 
 .topic_name h4 {
-	line-height: 1.4em;
+	line-height: 1.4;
 	overflow-wrap: break-word;
 }
 
@@ -2674,6 +2739,7 @@ nav > .quickbuttons, menu > .quickbuttons {
 
 .topic_latest .i-last_post {
 	float: right;
+	padding-top: .3em;
 }
 
 /* Container, Holds the message stats */
@@ -2736,9 +2802,8 @@ nav > .quickbuttons, menu > .quickbuttons {
 .qaction_row {
 	display: flex;
 	align-content: center;
-	flex-direction: row;
 	justify-content: flex-end;
-	padding: .4em;
+	padding: .5em;
 }
 
 #message_index_jump_to.qaction_row {
@@ -2756,7 +2821,7 @@ nav > .quickbuttons, menu > .quickbuttons {
 }
 
 #topic_icons p {
-	line-height: 2em;
+	line-height: 2;
 	padding: 0 .4em;
 }
 
@@ -2853,7 +2918,7 @@ nav > .quickbuttons, menu > .quickbuttons {
 
 /* The MAIN post container, holds one entire post including .poster
    and all of the postarea data.  The postarea has a min of 0 to prevent
-    items like <pre> from blowing out the grid */
+   items like <pre> from blowing out the grid */
 .post_wrapper {
 	display: grid;
 	grid-template-columns: [poster] 225px [postarea] minmax(0, auto);
@@ -2877,8 +2942,7 @@ aside > .poster {
 
 /* li lines in poster, could use flex / flex row here */
 .poster .listlevel1 {
-	font-size: var(--font13);
-	line-height: 1.667em;
+	line-height: 1.667;
 	width: 100%;
 	padding: 0 .4em;
 	text-align: center;
@@ -2907,7 +2971,7 @@ aside > .poster {
 /* Start of nifty flyout menu for the poster info.
    Note: this can be a bit particular with input elements, links, icons */
 .poster .menulevel2 {
-	top: calc(100% + 4px);
+	top: calc(100% + 2px);
 	text-align: left;
 }
 
@@ -2917,13 +2981,29 @@ aside > .poster {
 	left: 45%;
 }
 
-/* Information in the dropdown */
-.poster .listlevel2 {
-	width: 200px;
+/* Dropdown `business card` grid, left is avatar, right is information */
+.poster_div_container {
+	display: grid;
+	grid-template-columns: [poster] 135px [details] 275px;
 }
 
+.poster_div_avatar {
+	align-self: center;
+	justify-self: center;
+	grid-column: poster;
+	text-align: center;
+}
+
+.poster_div_details {
+	grid-column: details;
+	padding-left: 10px;
+	padding-right: 10px;
+	border-left: 1px solid;
+	border-right: 1px solid;
+}
+
+/* Information in the dropdown */
 .report_separator {
-	max-width: 14em;
 	height: 1px;
 	margin: .4em 0 0 0;
 	border-bottom: 1px solid;
@@ -2965,7 +3045,8 @@ aside > .poster {
 	display: table-cell;
 }
 
-.karma_allow > .linklevel2 {
+.karma_allow > .linkbutton {
+	font: var(--font13);
 	display: inline-block;
 }
 
@@ -3138,7 +3219,7 @@ footer .attachments {
 .attachment_block, .attachment {
 	display: inline-block;
 	overflow: hidden;
-	min-width: 225px;
+	width: 225px;
 	margin: 0 .4em 1em 0;
 	text-align: center;
 }
@@ -3198,7 +3279,7 @@ footer .signature {
 
 /* On to the posts, this is the main container for all posts on a page */
 #forumposts {
-	margin: .4em 0 0 0;
+	margin: .2em 0 0 0;
 	border-radius: 4px 4px 0 0;
 }
 
@@ -3245,7 +3326,7 @@ footer .signature {
 
 /* Emoji and smiley icons in the post */
 .smiley {
-	vertical-align: bottom;
+	vertical-align: text-bottom;
 }
 
 .emoji {
@@ -3266,6 +3347,11 @@ footer .signature {
 	max-width: 100%;
 	height: auto;
 	max-height: 800px;
+}
+
+.messageContent .bbc_img.ila_pending {
+	padding: 2px;
+	border: 1px solid;
 }
 
 /* Poor Mans lightbox support */
@@ -3357,7 +3443,7 @@ footer .signature {
 	display: none;
 }
 
-/* New post HR, --\/--separates the read from the new */
+/* New post HR, --\/-- separates the read from the new */
 .new_post_separator {
 	display: block;
 	height: 0;
@@ -3413,8 +3499,7 @@ footer .signature {
 #moderationbuttons {
 	display: flex;
 	align-items: center;
-	flex-direction: row;
-	margin: .25em 0 .25em -.25em;
+	margin: 1em 0 .5em 0;
 }
 
 /* The jump to box */
@@ -3439,6 +3524,11 @@ footer .signature {
 	height: 150px;
 	padding: 0 4px;
 	outline: none;
+}
+
+/* The QR buttons may be better suited not being over the topic buttons */
+#post_confirm_buttons {
+	justify-content: flex-start;
 }
 
 /* The rest is for the share/send topic popup window. */
@@ -3766,7 +3856,6 @@ ul.post_options li {
 .statusbar {
 	display: flex;
 	align-items: center;
-	flex-direction: row;
 	flex-wrap: nowrap;
 	min-height: 85px;
 	padding: 0 5px;
@@ -4119,7 +4208,7 @@ dl.merge_topic dd {
 /* Custom Profile Field Icons */
 ul.cf_icons {
 	margin-top: -.5em;
-	border-top: 1px solid #CCCCCC;
+	border-top: 1px solid;
 }
 
 li.cf_icon {
@@ -4330,13 +4419,13 @@ ul.cf_icons li:not(:first-child)::before {
 	margin: 0 0 .4em 0;
 }
 
+/* Holds the "pie-hole" SVG and text in profile stats */
 .profile_pie {
 	float: left;
-	width: 20px;
-	height: 20px;
-	margin: 0 .8em 0 0;
-	text-indent: -1555em;
-	background: url(../images/stats_pie.png);
+	align-items: center;
+	width: 28px;
+	height: 28px;
+	margin-right: 1em;
 }
 
 /* Buddy section stuff. */
@@ -4750,7 +4839,7 @@ Stef                       ^
 
 .stats dt {
 	font-size: var(--font15);
-	line-height: 1.467em;
+	line-height: 1.467;
 	float: left;
 	clear: both;
 	width: 48%;
@@ -4779,7 +4868,7 @@ Stef                       ^
 /* Absolute positioning stops these breaking the bars on narrow screens. */
 .statsbar .righttext {
 	font-size: var(--font13);
-	line-height: 1.75em;
+	line-height: 1.75;
 	position: absolute;
 	z-index: 2;
 	top: 0;
@@ -4837,7 +4926,7 @@ Stef                       ^
 }
 
 #helpmain ul {
-	line-height: 2em;
+	line-height: 2;
 	margin: 0 0 0 1.5em;
 }
 
@@ -4875,7 +4964,7 @@ Stef                       ^
 /* The help pop-ups, you know, a little lost ? */
 .popup_container {
 	position: fixed;
-	z-index: 1000000;
+	z-index: 10000000;
 	top: 0;
 	left: 0;
 	display: none;
@@ -4985,6 +5074,8 @@ Stef                       ^
 	display: grid;
 	grid-template-columns: auto 60px;
 	grid-template-rows: 60px auto auto;
+	padding: 0.5em 0;
+	border: 1px solid;
 }
 
 .search_results_posts .buttons {
@@ -5024,6 +5115,7 @@ Stef                       ^
 }
 
 .search_results_posts .topic_body {
+	overflow: auto;
 	grid-column-start: span 2;
 	grid-row-start: 2;
 	margin: 0 1em 0;
@@ -5059,7 +5151,7 @@ Stef                       ^
 .mlist, .whos_online {
 	display: table;
 	width: 100%;
-	border-collapse: collapse;
+	border-spacing: 0;
 }
 
 .mlist li, .whos_online dt, .whos_online dd {
@@ -5094,14 +5186,17 @@ Stef                       ^
 }
 
 .letter_row {
-	line-height: 3em;
+	line-height: 3;
+	position: sticky;
+	z-index: 1;
+	top: -10px;
 	height: 3em;
 	vertical-align: bottom;
 }
 
 .letter_row > h3 {
 	font-weight: bold;
-	line-height: 2em;
+	line-height: 2;
 	position: relative;
 	top: 12px;
 	min-width: 4em;
@@ -5113,6 +5208,9 @@ Stef                       ^
 
 .mlist_header {
 	font-weight: bold;
+	position: sticky;
+	z-index: 1;
+	top: 0;
 }
 
 .whos_online dt {
@@ -5211,7 +5309,7 @@ Stef                       ^
 }
 
 #mlsearch_options .mlsearch_option {
-	line-height: 2em;
+	line-height: 2;
 	padding: 0.2em 0;
 }
 
@@ -5375,10 +5473,17 @@ Stef                       ^
 }
 
 /* description & information used below headers, others used to how a result message */
-.description, .information, .warningbox, .successbox, .infobox, .errorbox {
+.description, .information, .warningbox, .successbox, .infobox, .errorbox, .genericbox {
 	margin: 0 0 1.1em 0;
 	padding: .8em .8em;
 	border: 1px solid;
+}
+
+.genericbox {
+	font-size: var(--font15);
+	display: flex;
+	align-items: center;
+	padding: .4em .4em;
 }
 
 .information p {
@@ -5421,7 +5526,7 @@ Stef                       ^
 
 .errorbox .listlevel1,
 .warningbox .listlevel1 {
-	line-height: 1.75em;
+	line-height: 1.75;
 	float: none;
 	padding-left: 1em;
 }
@@ -5468,14 +5573,14 @@ Stef                       ^
 }
 
 .green_percent, .blue_percent {
-	line-height: 2em;
+	line-height: 2;
 	height: 2em;
 	text-align: center;
 	border-radius: 12px;
 }
 
 .progress_compact > .green_percent, .progress_compact > .blue_percent {
-	line-height: 1em;
+	line-height: 1;
 	height: 1em;
 }
 
@@ -5557,7 +5662,7 @@ Stef                       ^
  */
 
 .iconline, .icoffline {
-	line-height: 1em;
+	line-height: 1;
 	display: inline-block;
 	width: 1em;
 	height: 1em;
@@ -5567,10 +5672,13 @@ Stef                       ^
 	border-radius: 50%;
 }
 
-.icon, .helpicon, .warnicon, .infoicon, .chevricon {
+.icon, .helpicon, .warnicon, .infoicon, .chevricon, .main-menu-icon {
 	display: inline-block;
 	width: 1.25em;
 	height: auto;
+}
+
+.icon, .helpicon, .warnicon, .infoicon, .chevricon {
 	margin: 0 .25em;
 	vertical-align: middle;
 }
@@ -5592,7 +5700,8 @@ Stef                       ^
 
 /* Screenreader-only shortcut.
    This is the most foolproof way to ensure a screen reader reads something. */
-.icon > s, .board_icon > s, .chevricon > s, .helpicon > s, .warnicon > s, .infoicon > s {
+.icon > s, .board_icon > s, .board_icon > a > s, .chevricon > s, .helpicon > s,
+.warnicon > s, .infoicon > s, .main-menu-icon > s {
 	position: absolute;
 	overflow: hidden;
 	clip: rect(0 0 0 0);
@@ -5604,25 +5713,25 @@ Stef                       ^
 }
 
 .icon-small {
-	line-height: 1em;
+	line-height: 1;
 	width: 1em;
 	height: 100%;
 }
 
 .icon-big {
-	line-height: 1.467em;
+	line-height: 1.467;
 	width: 1.467em;
 	height: 1.467em;
 }
 
 .icon-lg {
-	line-height: 2em;
+	line-height: 2;
 	width: 2em;
 	height: 2em;
 }
 
 .icon-xl {
-	line-height: 4em;
+	line-height: 4;
 	width: 4em;
 	height: 4em;
 }
@@ -5698,10 +5807,10 @@ Stef                       ^
 
 @media screen and (max-width: 64em) {
 	.category_boards .board_row {
-		grid-template-columns: [bicon] 85px [info] auto [avatar] 65px [latest] 40% [end];
+		grid-template-columns: [bicon] 60px [info] auto [avatar] 60px [latest] 40% [end];
 	}
 
-	.board_stats, .topic_stats {
+	.category_boards .board_stats, .topic_stats {
 		display: none;
 	}
 
@@ -5734,6 +5843,15 @@ Stef                       ^
 	.editor_wrapper {
 		max-width: 100%;
 		margin: 0 5%;
+	}
+}
+
+/* At approximately 900px we open up the wrapper so the menu can expand
+   -------------------------------------------------------------------------------------------*/
+
+@media screen and (max-width: 56em) {
+	.wrapper {
+		min-width: 98%;
 	}
 }
 
@@ -5779,14 +5897,23 @@ Stef                       ^
 		display: none;
 	}
 
-	#collapse_button {
-		margin-top: -10px;
+	#collapse_button,  #search_form_button {
+		transform: translateY(-5px);
 	}
 
-	#collapse_button .linklevel1 {
+	#collapse_button .linklevel1, #search_form_button .linklevel1 {
 		width: 44px;
 		height: 44px;
-		padding: 7px 3px 0 0 !important;
+		padding: 8px 0 0 0 !important;
+	}
+
+	#collapse_button {
+		display: none;
+	}
+
+	#search_form_menu input, #search_form_menu select, #search_form_menu button {
+		line-height: 3;
+		height: 45px;
 	}
 
 	.button_title {
@@ -6339,10 +6466,6 @@ Stef                       ^
 		margin-bottom: .4em;
 	}
 
-	.editor_wrapper {
-		margin: 0 1%;
-	}
-
 	.postarea, .forumtitle {
 		padding: .1em .2em;
 	}
@@ -6368,7 +6491,6 @@ Stef                       ^
 
 	#moderationbuttons {
 		display: block;
-		margin-bottom: .5em;
 	}
 
 	#display_jump_to {
@@ -6841,5 +6963,17 @@ Stef                       ^
 	.i-menu-profile::before {
 		width: 2em;
 		height: 2em;
+	}
+}
+
+/* Some do not want a lot of motion/animation, for accessibility reasons, this attempts to
+   honors that system setting.  In windows this is "show animations in Windows" setting
+   -------------------------------------------------------------------------------------------*/
+@media (prefers-reduced-motion: reduce) {
+	* {
+		animation-duration: 0.01ms !important;
+		animation-iteration-count: 1 !important;
+		transition-duration: 0.01ms !important;
+		scroll-behavior: auto !important;
 	}
 }
