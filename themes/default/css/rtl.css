@@ -45,8 +45,8 @@
 
 /* Use new class that is defined to suit, and with a sensible name. */
 .submitbutton {
-	text-align: left;
 	justify-content: flex-start;
+	text-align: left;
 }
 
 legend {
@@ -163,8 +163,8 @@ h2 a.collapse {
  */
 
 #search_form_menu {
-	left: 0;
 	right: auto;
+	left: 0;
 }
 
 #search_form_menu button[type="button"] {
@@ -172,8 +172,8 @@ h2 a.collapse {
 }
 
 #search_form_menu select, #search_form_menu input, #search_form_menu button[type="submit"] {
-	margin-left: -1px;
 	margin-right: 1px;
+	margin-left: -1px;
 }
 
 #search_form {
@@ -681,8 +681,8 @@ dl.settings img {
 }
 
 .quickbuttons.follow_ups .listlevel1 .menulevel2 {
-	left: auto;
 	right: 0;
+	left: auto;
 }
 
 /* -------------------------------------------------------

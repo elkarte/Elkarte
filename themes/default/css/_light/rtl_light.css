@@ -294,8 +294,8 @@ input[type="submit"]:hover, button[type="submit"]:hover, input[type="button"]:ho
 }
 
 .poster_div_details {
-	border-left-color: var(--transparent);
 	border-right-color: var(--primary_border);
+	border-left-color: var(--transparent);
 }
 
 /* -------------------------------------------------------
@@ -361,8 +361,8 @@ input[type="submit"]:hover, button[type="submit"]:hover, input[type="button"]:ho
 }
 
 .mlist li div:last-child {
-	border-left: 1px solid var(--primary_border);
 	border-right-color: var(--transparent);
+	border-left: 1px solid var(--primary_border);
 }
 
 /* -------------------------------------------------------

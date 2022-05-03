@@ -2996,10 +2996,10 @@ aside > .poster {
 
 .poster_div_details {
 	grid-column: details;
-	padding-left: 10px;
 	padding-right: 10px;
-	border-left: 1px solid;
+	padding-left: 10px;
 	border-right: 1px solid;
+	border-left: 1px solid;
 }
 
 /* Information in the dropdown */
@@ -6969,11 +6969,12 @@ Stef                       ^
 /* Some do not want a lot of motion/animation, for accessibility reasons, this attempts to
    honors that system setting.  In windows this is "show animations in Windows" setting
    -------------------------------------------------------------------------------------------*/
+
 @media (prefers-reduced-motion: reduce) {
 	* {
+		transition-duration: 0.01ms !important;
 		animation-duration: 0.01ms !important;
 		animation-iteration-count: 1 !important;
-		transition-duration: 0.01ms !important;
 		scroll-behavior: auto !important;
 	}
 }
