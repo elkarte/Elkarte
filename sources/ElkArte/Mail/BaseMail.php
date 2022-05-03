@@ -62,8 +62,13 @@ abstract class BaseMail
 	 */
 	public function setLineBreak()
 	{
+		// If messages are not received while not using SMTP, then try using a LF (\n) only. Some Unix
+		// mail transfer agents (notably qmail) replace LF by CRLF automatically (which leads to doubling
+		// CR if CRLF is used). That should be a last resort.
+		$this->lineBreak = "\r\n";
+
 		// Line breaks need to be \r\n only in windows or for SMTP.
-		$this->lineBreak = detectServer()->is('windows') || !$this->useSendmail ? "\r\n" : "\n";
+		// $this->lineBreak = detectServer()->is('windows') || !$this->useSendmail ? "\r\n" : "\n";
 	}
 
 	/**
