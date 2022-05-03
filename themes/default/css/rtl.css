@@ -46,6 +46,7 @@
 /* Use new class that is defined to suit, and with a sensible name. */
 .submitbutton {
 	text-align: left;
+	justify-content: flex-start;
 }
 
 legend {
@@ -70,7 +71,7 @@ legend {
 	margin-left: 0 !important;
 }
 
-/* Floats, overflows, clears. @todo */
+/* Floats, overflows, clears. */
 .floatright {
 	float: left;
 }
@@ -161,6 +162,20 @@ h2 a.collapse {
  * -------------------------------------------------------
  */
 
+#search_form_menu {
+	left: 0;
+	right: auto;
+}
+
+#search_form_menu button[type="button"] {
+	border-radius: 3px 0 0 3px;
+}
+
+#search_form_menu select, #search_form_menu input, #search_form_menu button[type="submit"] {
+	margin-left: -1px;
+	margin-right: 1px;
+}
+
 #search_form {
 	padding: .75em .5em .25em .25em;
 }
@@ -189,7 +204,7 @@ h2 a.collapse {
 	float: left;
 }
 
-/* Float these items to the right. @todo - Simplify. */
+/* Float these items to the right. */
 #logobox, .rightheader #logobox {
 	float: left;
 }
@@ -490,19 +505,8 @@ dl.settings img {
  */
 
 /* The board categories and newsfader - some shared styling. */
-.icon_anchor {
-	float: right;
-	padding: 2px 0 0 6px;
-	transform: scaleX(-1);
-}
-
 .board_stats {
 	text-align: left;
-}
-
-.board_avatar {
-	padding-right: .7em;
-	padding-left: 0;
 }
 
 /* The posting icons and mark read button. */
@@ -533,18 +537,12 @@ dl.settings img {
 	padding: .25em .8em .25em .25em;
 }
 
-.topic_info {
-	margin: 0 .8em 0 0;
-	padding: .4em .8em .4em .4em;
-}
-
 .topic_latest .board_avatar {
 	float: right;
 }
 
 .topic_latest .i-last_post {
 	float: left;
-	padding-top: .5em;
 }
 
 .topic_moderation {
@@ -680,6 +678,11 @@ dl.settings img {
 .requiredfield {
 	right: 5%;
 	left: auto;
+}
+
+.quickbuttons.follow_ups .listlevel1 .menulevel2 {
+	left: auto;
+	right: 0;
 }
 
 /* -------------------------------------------------------
@@ -906,7 +909,6 @@ ul.post_options li {
 .profile_pie {
 	float: right;
 	margin: 0 0 0 12px;
-	background: url(../images/stats_pie_rtl.png);
 }
 
 /* View posts */

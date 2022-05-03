@@ -91,7 +91,7 @@
  */
 
 /* Extra quote styling */
-.bbc_quote, .quoteheader {
+blockquote, .quoteheader {
 	box-shadow: -2px 2px 2px var(--box_shadow);
 }
 
