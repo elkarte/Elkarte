@@ -640,7 +640,7 @@ class BBCParser
 		// but still allow it for legacy themes that want it.
 		elseif ($quote_alt)
 		{
-			$tag[Codes::ATTR_BEFORE] = str_replace('<blockquote>', '<blockquote class="bbc_quote bbc_alternate_quote">', $tag[Codes::ATTR_BEFORE]);
+			$tag[Codes::ATTR_BEFORE] = str_replace('<blockquote class="bbc_quote">', '<blockquote class="bbc_quote bbc_alternate_quote">', $tag[Codes::ATTR_BEFORE]);
 		}
 	}
 
