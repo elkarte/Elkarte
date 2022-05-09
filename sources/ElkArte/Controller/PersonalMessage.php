@@ -85,7 +85,7 @@ class PersonalMessage extends AbstractController
 
 		// Templates, language, javascripts
 		Txt::load('PersonalMessage');
-		loadJavascriptFile(array('PersonalMessage.js', 'suggest.js'));
+		loadJavascriptFile(['suggest.js', 'PersonalMessage.js']);
 
 		if ($this->getApi() === false)
 		{

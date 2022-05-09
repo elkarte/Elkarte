@@ -308,7 +308,7 @@ class ManageNews extends AbstractController
 		// Setup the template
 		$context['page_title'] = $txt['admin_newsletters'];
 		$context['sub_template'] = 'email_members';
-		loadJavascriptFile('suggest.js', array('defer' => true));
+		loadJavascriptFile('suggest.js');
 
 		// We need group data, including which groups we have and who is in them
 		$allgroups = getBasicMembergroupData(array('all'), array(), null, true);

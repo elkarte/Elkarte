@@ -134,7 +134,7 @@ class ProfileOptions extends AbstractController
 		$context['sub_template'] = 'editBuddies';
 
 		// Use suggest finding the right buddies
-		loadJavascriptFile('suggest.js', array('defer' => true));
+		loadJavascriptFile('suggest.js');
 
 		// For making changes!
 		$buddiesArray = explode(',', $this->_profile['buddy_list']);
@@ -252,7 +252,7 @@ class ProfileOptions extends AbstractController
 
 		// We want to view what we're doing :P
 		$context['sub_template'] = 'editIgnoreList';
-		loadJavascriptFile('suggest.js', array('defer' => true));
+		loadJavascriptFile('suggest.js');
 
 		// For making changes!
 		$ignoreArray = explode(',', $this->_profile['pm_ignore_list']);
