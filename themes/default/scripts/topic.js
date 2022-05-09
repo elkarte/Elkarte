@@ -1200,25 +1200,20 @@ function expandThumbLB(thumbID, messageID)
  */
 function ignore_toggles(msgids, text)
 {
-	for (var i = 0; i < msgids.length; i++)
+	for (let i = 0; i < msgids.length; i++)
 	{
-		var msgid = msgids[i];
+		let msgid = msgids[i];
 
-		var discard = new elk_Toggle({
+		new elk_Toggle({
 			bToggleEnabled: true,
 			bCurrentlyCollapsed: true,
 			aSwappableContainers: [
-				'msg_' + msgid + '_extra_info',
 				'msg_' + msgid,
-				'msg_' + msgid + '_footer',
-				'msg_' + msgid + '_quick_mod',
-				'modify_button_' + msgid,
-				'msg_' + msgid + '_signature'
 			],
 			aSwapLinks: [
 				{
 					sId: 'msg_' + msgid + '_ignored_link',
-					msgExpanded: '',
+					msgExpanded: 'X',
 					msgCollapsed: text
 				}
 			]
