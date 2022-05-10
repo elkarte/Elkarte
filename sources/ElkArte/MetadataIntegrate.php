@@ -413,7 +413,7 @@ class MetadataIntegrate
 	{
 		global $context, $boardurl, $mbname, $topic;
 
-		$description = $this->getDescription();
+		$description = strip_tags($this->getDescription());
 		$page_title = $this->getPageTitle();
 		$logo = $this->getLogo();
 		$attach = $this->getAttachment();
