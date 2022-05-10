@@ -619,7 +619,7 @@ $txt['mm_emailparsers'] = 'Parsers';
 $txt['mm_emailtemplates'] = 'Templates';
 $txt['mm_emailsettings'] = 'Settings';
 
-$txt['removeNestedQuotes'] = 'Remove nested quotes when quoting';
+$txt['removeNestedQuotes'] = 'Allowed nested quoting depth (0 to remove all)';
 $txt['enableVideoEmbeding'] = 'Enable auto-embedding of video links.';
 $txt['video_embed_limit'] = 'Maximum allowed embedded videos per page';
 $txt['video_embed_limit_note'] = '(0 for no limit)';

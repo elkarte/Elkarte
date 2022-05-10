@@ -35,7 +35,7 @@ class TestManagePostsSettings extends ElkArteCommonSetupTest
 
 		// Lets see some hardcoded setting for posts management...
 		$this->assertNotNull($settings);
-		$this->assertTrue(in_array(array('check', 'removeNestedQuotes'), $settings));
+		$this->assertTrue(in_array(array('int', 'removeNestedQuotes'), $settings));
 		$this->assertTrue(in_array(array('int', 'spamWaitTime', 'postinput' => 'seconds'), $settings));
 	}
 }
