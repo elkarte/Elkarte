@@ -23,39 +23,55 @@ abstract class Theme
 {
 	/** @var \ElkArte\ValuesContainer */
 	public $user;
+
 	/** @var string  */
 	public const STANDARD = 'standard';
+
 	/** @var string  */
 	public const DEFERRED = 'defer';
+
 	/** @var int  */
 	public const ALL = -1;
+
 	/** @var int The id of the theme being used */
 	protected $id;
+
 	/** @var Templates */
 	private $templates;
+
 	/** @var TemplateLayers */
 	private $layers;
+
 	/** @var array */
 	protected $html_headers = [];
+
 	/** @var array */
 	protected $links = [];
+
 	/** @var array All of the JS files to include */
 	protected $js_files = [];
+
 	/** @var array Any inline JS to output */
 	protected $js_inline = [
 		'standard' => [],
 		'defer' => [],
 	];
+
 	/** @var array JS variables to output */
 	protected $js_vars = [];
+
 	/** @var array Inline CSS */
 	protected $css_rules = [];
+
 	/** @var array CSS files */
 	protected $css_files = [];
+
 	/** @var string[] Holds base actions that we do not want crawled / indexed */
-	protected $no_index_actions = array();
+	protected $no_index_actions = [];
+
 	/** @var bool Right to left language support */
 	protected $rtl;
+
 	/** @var \ElkArte\HttpReq user input variables */
 	public $_req;
 
@@ -129,7 +145,7 @@ abstract class Theme
 	/**
 	 * Add a Javascript variable for output later (for feeding text strings and similar to JS)
 	 *
-	 * @param mixed[] $vars array of vars to include in the output done as 'varname' => 'var value'
+	 * @param array $vars array of vars to include in the output done as 'varname' => 'var value'
 	 * @param bool $escape = false, whether or not to escape the value
 	 */
 	public function addJavascriptVar($vars, $escape = false)
@@ -160,22 +176,13 @@ abstract class Theme
 
 		if ($media === null)
 		{
-			if (!isset($this->css_rules['all']))
-			{
-				$this->css_rules['all'] = '';
-			}
-			$this->css_rules['all'] .= '
-		' . $rules;
+			$this->css_rules['all'] = $this->css_rules['all'] ?? '';
+			$this->css_rules['all'] .= $rules;
 		}
 		else
 		{
-			if (!isset($this->css_rules['media'][$media]))
-			{
-				$this->css_rules['media'][$media] = '';
-			}
-
-			$this->css_rules['media'][$media] .= '
-		' . $rules;
+			$this->css_rules['media'][$media] = $this->css_rules['media'][$media] ?? '';
+			$this->css_rules['media'][$media] .= $rules;
 		}
 	}
 
@@ -243,5 +250,15 @@ abstract class Theme
 		$this->rtl = (bool) $toggle;
 
 		return $this;
+	}
+
+	/**
+	 * Provide a way to fetch the js_files array
+	 *
+	 * @return array
+	 */
+	public function getJSFiles()
+	{
+		return $this->js_files;
 	}
 }

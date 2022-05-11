@@ -159,7 +159,7 @@ class ManageFeatures extends AbstractController
 	 */
 	public function action_basicSettings_display()
 	{
-		global $txt, $context;
+		global $txt, $context, $modSettings;
 
 		// Initialize the form
 		$settingsForm = new SettingsForm(SettingsForm::DB_ADAPTER);
@@ -188,6 +188,13 @@ class ManageFeatures extends AbstractController
 			else
 			{
 				Hooks::instance()->disableIntegration('\\ElkArte\\MetadataIntegrate');
+			}
+
+			// If they have changed Hive settings, lets clear them to avoid issues
+			if (empty($modSettings['combine_css_js']) !== empty($this->_req->post->combine_css_js)
+				|| empty($modSettings['minify_css_js']) !== empty($this->_req->post->minify_css_js))
+			{
+				theme()->cleanHives();
 			}
 
 			$settingsForm->setConfigValues((array) $this->_req->post);
@@ -246,6 +253,7 @@ class ManageFeatures extends AbstractController
 			array('check', 'jqueryui_default', 'onchange' => 'showhideJqueryOptions();'),
 			array('text', 'jqueryui_version', 'postinput' => $txt['jqueryui_custom_after']),
 			array('check', 'minify_css_js', 'postinput' => '<a href="#" id="clean_hives" class="linkbutton">' . $txt['clean_hives'] . '</a>'),
+			array('check', 'combine_css_js'),
 			'',
 			// Number formatting, timezones.
 			array('text', 'time_format'),

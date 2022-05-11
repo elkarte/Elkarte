@@ -824,12 +824,11 @@ function template_footer()
  * - if deferred is set function will output all JS (source & inline) set to load at page end
  * - if the admin option to combine files is set, will use Combiner.class
  *
- * @param bool $do_deferred = false
  * @return void
  */
-function template_javascript($do_deferred = false)
+function template_javascript()
 {
-	theme()->template_javascript($do_deferred);
+	theme()->template_javascript();
 }
 
 /**
