@@ -1160,7 +1160,7 @@ function template_send()
 	}
 
 	echo '
-		<script>
+		<script type="module">
 			new elk_PersonalMessageSend({
 				sSessionId: elk_session_id,
 				sSessionVar: elk_session_var,
@@ -1174,7 +1174,7 @@ function template_send()
 					{
 						sItemId: ', JavaScriptEscape($member['id']), ',
 						sItemName: ', JavaScriptEscape($member['name']), '
-					}', $i == count($context['recipients']['to']) - 1 ? '' : ',';
+					}', $i === count($context['recipients']['to']) - 1 ? '' : ',';
 	}
 
 	echo '
@@ -1187,7 +1187,7 @@ function template_send()
 					{
 						sItemId: ', JavaScriptEscape($member['id']), ',
 						sItemName: ', JavaScriptEscape($member['name']), '
-					}', $i == count($context['recipients']['bcc']) - 1 ? '' : ',';
+					}', $i === count($context['recipients']['bcc']) - 1 ? '' : ',';
 	}
 
 	echo '

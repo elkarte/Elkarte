@@ -23,7 +23,7 @@ function template_mlsearch_above()
 	<form id="mlsearch" action="' . getUrl('action', ['action' => 'memberlist', 'sa' => 'search']) . '" method="post" accept-charset="UTF-8">
 		<ul>
 			<li>
-				<input id="mlsearch_input" class="input_text" onfocus="toggle_mlsearch_opt();" type="text" name="search" value="' . $context['old_search_value'] . '" placeholder="' . $txt['mlist_search'] . '" />
+				<input id="mlsearch_input" class="input_text" onfocus="toggle_mlsearch_opt();" type="text" name="search" autocomplete="off" value="' . $context['old_search_value'] . '" placeholder="' . $txt['mlist_search'] . '" />
 				<button type="submit" name="search2" class="with_select"><i class="icon i-search icon-shade"></i></button>
 				<ul id="mlsearch_options" class="nojs">';
 
@@ -46,9 +46,9 @@ function template_mlsearch_above()
 	template_pagesection('memberlist_buttons', 'right', array('extra' => $extra));
 
 	echo '
-	<script>
+	<script type="module">
 		// Removes the nojs class to properly style the dropdown according to js availability
-		$(\'#mlsearch_options\').removeClass(\'nojs\');
+		document.getElementById("mlsearch_options").classList.remove("nojs");
 	</script>';
 }
 

@@ -61,7 +61,8 @@ function template_lp_stats()
 	echo '
 		</div>';
 
-	echo '<script>
+	echo '
+	<script type="module">
 		$(function() {
 			likePostStats.prototype.init({
 				txtStrings: {

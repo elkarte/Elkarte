@@ -750,7 +750,7 @@ function template_topic_replies_below()
 
 		echo '
 		</div>
-		<script>
+		<script type="module">
 			var aIgnoreToggles = [];';
 
 		foreach ($ignored_posts as $post_id)

@@ -140,7 +140,8 @@ function template_control_richedit($editor_id, $smileyContainer = null, $bbcCont
 					? '$editor_container.' . $editor_id . '.find("eTextarea, iframe").addClass("border_error");'
 					: '', '
 			}
-	
+		</script>
+		<script type="module">
 			$(function() {
 				elk_editor();
 			});
