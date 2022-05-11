@@ -127,12 +127,9 @@ body {
 .wrapper {
 	/* Next controls forum width, when it is not set in admin. */
 	width: 90%;
-	max-width: 150em;
-	/* Next limits maximum width on wide screens.
-	   Sized in em, since some people require larger text.
-	   For ease of reading, content really should not be too wide. */
+	/* Next limits maximum width on wide screens. */
+	max-width: 98%;
 	margin: 0 auto;
-	--content-width: 92%;
 }
 
 /* Normal, standard links. */
@@ -849,7 +846,8 @@ em, .em {
 	max-height: 12em;
 }
 
-/* Specific targeting of our checkbox.  100% wide with a gradient to cover/fade the bottom of the blockquote */
+/* Specific targeting of our checkbox.  100% wide with a gradient to cover/fade the bottom
+   of the blockquote */
 input[type=checkbox].quote-show-more {
 	position: absolute;
 	bottom: 0;
@@ -1285,8 +1283,9 @@ a.bbc_link {
 
 #news_line, #news {
 	overflow: auto;
-	height: 60px;
-	min-height: 60px;
+	overflow-y: hidden;
+	height: 5em;
+	min-height: 5em;
 	padding: .2em .8em;
 	resize: vertical;
 	border: 1px solid;
@@ -1591,7 +1590,7 @@ a.bbc_link {
 	left: auto;
 }
 
-/* Level 3: drop menu positioning, move to a a flyout position to the right of
+/* Level 3: drop menu positioning, move flyout position to the right of
    its disclose arrow */
 .menulevel3 {
 	min-width: 20ch;
@@ -1699,7 +1698,7 @@ a.bbc_link {
 }
 
 #menu_sidebar .linklevel1 {
-	padding: 0 1.5em 0 0;
+	padding: 0 1.5em 0 .5em;
 	white-space: normal;
 	border: 1px solid;
 	overflow-wrap: break-word;
@@ -1811,7 +1810,7 @@ a.bbc_link {
 }
 
 /* -------------------------------------------------------
- *	$BUTTONS
+ * $BUTTONS
  * This section contains code for the quickbuttons (quote, quick edit, etc)
  * and for the buttonlist class (reply, add poll, notify, etc).
  * These classes share some styling.
@@ -2577,7 +2576,6 @@ nav > .quickbuttons, menu > .quickbuttons {
 	font-size: var(--font13);
 	width: 95%;
 	margin: 0 auto;
-	border-collapse: collapse;
 }
 
 #ps_recentposts .norecent, #ps_recenttopics .norecent {
@@ -2734,6 +2732,10 @@ nav > .quickbuttons, menu > .quickbuttons {
 
 .topic_latest .board_avatar {
 	float: left;
+	margin: 0 .5em;
+}
+
+.topic_latest.relative {
 	margin: 0 .5em;
 }
 
@@ -3330,7 +3332,7 @@ footer .signature {
 }
 
 .emoji {
-	max-width: 24px;
+	max-width: 26px;
 	padding: 0 .13em;
 	vertical-align: text-bottom;
 }
@@ -3467,32 +3469,34 @@ footer .signature {
 	top: 1px;
 }
 
-/* The header above the video, allows to collapse the video box */
-.elk_videoheader {
-	padding: .4em;
+/* The overall video container, holds header and video divs */
+.elk_video_container {
+	max-width: 640px;
+	margin: 0 auto 1em auto;
 	border: 1px solid;
 }
 
-/* Video/Preview image container */
-.elk_video {
-	position: relative;
-	height: 0;
-	padding-bottom: min(480px, 75%);
-	border-top: 0;
+/* The header above the video, allows to collapse the video box */
+.elk_video_header {
+	padding: .4em;
+	border-bottom: 1px solid;
 }
 
+/* Actual video */
 .elk_video iframe {
-	position: absolute;
-	top: 0;
-	width: 100%;
-	height: 100%;
+	max-width: 100%;
+	max-height: 360px;
 	margin: 0 auto;
+	border: none;
+	aspect-ratio: 16 / 9;
 }
 
-/* Class applied to the video preview image */
-.elk_previewvideo {
-	display: block;
-	margin: 0 auto;
+/* Image preview, often we get a 4/3 image so we force it to 16/9 */
+.elk_video_preview {
+	width: 100%;
+	max-height: 360px;
+	object-fit: cover;
+	aspect-ratio: 16 / 9;
 }
 
 /* Basic stuff for the bottom of Display.template.php, moderation buttons, jump box. */
@@ -4142,7 +4146,10 @@ dl.merge_topic dd {
 }
 
 .profile_center .attachments {
-	margin-top: .5em;
+	display: flex;
+	flex-wrap: wrap;
+	justify-content: center;
+	margin: .5em 0;
 	border-top: none;
 }
 
@@ -5283,6 +5290,7 @@ Stef                       ^
 
 #mlsearch_options {
 	position: absolute;
+	z-index: 10;
 	display: none;
 	max-width: 12em;
 	padding: 0.5em;
@@ -5416,7 +5424,14 @@ Stef                       ^
 .form_field.w_icon > input[type="text"],
 .form_field.w_icon > input[type="password"],
 .form_field.w_icon > input[type="email"] {
-	width: calc(100% - 32px);
+	padding-right: 32px;
+}
+
+.form_field.w_icon > a {
+	position: absolute;
+	top: 0;
+	right: 0;
+	padding: 4px 0;
 }
 
 /* Hide any "real" placeholder text */
@@ -5784,10 +5799,18 @@ Stef                       ^
 	}
 }
 
-/* Not sure how fussy we should get here,
-   Am currently inclined to think that just having break points that correlate
-   to 1024, 800, 540 and 480 at standard font size is probably adequate.
-   using 100% = 1 em ~= 16px ~= 14pt for our em sizing .. 64em*16px = 1024 etc. */
+/* 1600+ wide screens, Allow for 640/360 video to stack side X side
+   -------------------------------------------------------------------------------------------*/
+
+@media screen and (min-width: 100em) {
+	.elk_video_container {
+		max-width: 640px;
+	}
+
+	.elk_video iframe {
+		max-height: 360px;
+	}
+}
 
 /* less than 1440 width, drop the menu icons other than profile
    -------------------------------------------------------------------------------------------*/
@@ -5799,6 +5822,26 @@ Stef                       ^
 
 	.icon-menu.i-menu-profile {
 		display: inline-block;
+	}
+}
+
+/* 1376+ wide screens, Allow videos to stack side by side but with a smaller WxH
+   -------------------------------------------------------------------------------------------*/
+
+@media screen and (min-width: 86em) {
+	.elk_video_container {
+		display: inline-block;
+		margin: 0 2px 1em 2px;
+		vertical-align: top;
+	}
+
+	/* 1376 to 1600 we allow for 480/270 videos so they stack nice*/
+	.elk_video_container {
+		max-width: 480px;
+	}
+
+	.elk_video iframe {
+		max-height: 270px;
 	}
 }
 

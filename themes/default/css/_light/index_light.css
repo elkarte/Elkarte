@@ -791,6 +791,7 @@ sup.bbc_footnotes, sup.bbc_footnotes a {
 
 .poster_div_details {
 	border-left-color: var(--primary_border);
+	border-right-color: var(--transparent);
 }
 
 /* PM and Notification bubble indicator */
@@ -1318,11 +1319,11 @@ sup.bbc_footnotes, sup.bbc_footnotes a {
 }
 
 /* Used by video embed JS when auto linking video links */
-.elk_video {
+.elk_video_header {
 	border-color: var(--medium_dark_green);
 }
 
-.elk_videoheader {
+.elk_video_container {
 	border-color: var(--medium_dark_green);
 	background-image: linear-gradient(to bottom, var(--category_header_grad_1), var(--category_header_grad_2));
 }
@@ -1511,7 +1512,7 @@ li.ui-tab.ui-tabs-active.ui-state-active.ui-state-hover .ui-tabs-anchor {
 }
 
 .profileblock {
-	background: var(--primary_content_background);
+	background: var(--transparent);
 }
 
 #detailedinfo dt, #tracking dt, .profileblock dt {

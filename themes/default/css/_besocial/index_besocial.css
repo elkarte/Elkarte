@@ -790,6 +790,7 @@ a.active {
 	font-size: 1em;
 	position: absolute;
 	right: 6px;
+	top: 1px;
 	content: "\25BA";
 }
 
@@ -851,6 +852,11 @@ a.active {
    Same styling for Level 1 and Level 2. */
 #menu_sidebar .linklevel1, #menu_sidebar .linklevel2 {
 	color: var(--dark_text);
+	border-color: var(--primary_border);
+	box-shadow: none;
+}
+
+#menu_sidebar .linklevel2 {
 	border-color: var(--transparent);
 }
 
