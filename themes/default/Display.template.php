@@ -29,7 +29,7 @@ function template_report_sent_above()
 {
 	global $txt;
 
-	// Let them know, if their report was a success!
+	// Let them know their report was a success!
 	echo '
 		<div class="successbox">
 			', $txt['report_sent'], '
@@ -196,7 +196,7 @@ function template_messages()
 			echo '
 						<details id="msg_', $message['id'], '_ignored_prompt">
 							', $txt['ignoring_user'], '
-							<a href="#" id="msg_', $message['id'], '_ignored_link" class="hide">', $txt['show_ignore_user_post'], '</a>
+							<a href="#" id="msg_', $message['id'], '_ignored_link" class="hide linkbutton">', $txt['show_ignore_user_post'], '</a>
 						</details>';
 		}
 
@@ -481,7 +481,7 @@ function template_quickreply_below()
 {
 	global $context, $options, $settings, $txt, $modSettings, $scripturl;
 
-	// Using the quick reply box below the messages and you can reply?
+	// Using the quick reply box below the messages, and you can reply?
 	if ($context['can_reply'] && !empty($options['display_quick_reply']))
 	{
 		// Wrap the Quick Reply area, making it look like a post / message.
@@ -502,7 +502,7 @@ function template_quickreply_below()
 		echo '
 				<div class="postarea', empty($options['hide_poster_area']) ? '' : '2', '">
 					<header class="category_header">
-						<h5>',  $txt['reply'], '</h5>
+						<h5>', $txt['reply'], '</h5>
 					</header>
 					<div id="quickReplyOptions" class="', empty($context['minmax_preferences']['qreply']) ? '"' : ' hide"', '>
 						<form action="', getUrl('action', ['action' => 'post2', 'board' => $context['current_board']]), '" method="post" accept-charset="UTF-8" name="postmodify" id="postmodify" onsubmit="submitonce(this);', (!empty($modSettings['mentions_enabled']) ? 'revalidateMentions(\'postmodify\', \'' . (empty($options['use_editor_quick_reply']) ? 'message' : $context['post_box_name']) . '\');' : ''), '">
@@ -596,141 +596,126 @@ function template_quickreply_below()
 		if (empty($options['use_editor_quick_reply']))
 		{
 			echo '
-			<script>';
-
-			// Mentions enabled
-			if (!empty($modSettings['mentions_enabled']))
-			{
-				echo '
-				add_elk_mention(\'#message\');';
-			}
-
-			echo '
+			<script type="module">
+				add_elk_mention("#message");
 			</script>';
 		}
 	}
 
 	// Finally, enable the quick reply quote function
-	echo '
-		<script>
-			let oQuickReply = new QuickReply({
-				bDefaultCollapsed: ', empty($context['minmax_preferences']['qreply']) ? 'false' : 'true', ',
-				iTopicId: ', $context['current_topic'], ',
-				iStart: ', $context['start'], ',
-				sScriptUrl: elk_scripturl,
-				sImagesUrl: elk_images_url,
-				sContainerId: "quickReplyOptions",
-				sClassId: "quickReplyExpand",
-				sClassCollapsed: "chevricon i-chevron-up",
-				sTitleCollapsed: ', JavaScriptEscape($txt['show']), ',
-				sClassExpanded: "chevricon i-chevron-down",
-				sTitleExpanded: ', JavaScriptEscape($txt['hide']), ',
-				sJumpAnchor: "quickreply",
-				bIsFull: ', !empty($options['use_editor_quick_reply']) ? 'true,
-				sEditorId: ' . $options['use_editor_quick_reply'] : 'false', ',
-				oThemeOptions: {
-					bUseThemeSettings: ', $context['user']['is_guest'] ? 'false' : 'true', ',
-					sOptionName: \'minmax_preferences\',
-					sSessionId: elk_session_id,
-					sSessionVar: elk_session_var,
-					sAdditionalVars: \';minmax_key=qreply\'
-				},
-				oCookieOptions: {
-					bUseCookie: ', $context['user']['is_guest'] ? 'true' : 'false', ',
-					sCookieName: \'elk_qreply\'
-				}
-			});
-		</script>';
+	theme()->addInlineJavascript('
+		let oQuickReply = new QuickReply({
+			bDefaultCollapsed: ' . (empty($context['minmax_preferences']['qreply']) ? 'false' : 'true') . ',
+			iTopicId: ' . $context['current_topic'] . ',
+			iStart: ' . $context['start'] . ',
+			sScriptUrl: elk_scripturl,
+			sImagesUrl: elk_images_url,
+			sContainerId: "quickReplyOptions",
+			sClassId: "quickReplyExpand",
+			sClassCollapsed: "chevricon i-chevron-up",
+			sTitleCollapsed: ' . JavaScriptEscape($txt['show']) . ',
+			sClassExpanded: "chevricon i-chevron-down",
+			sTitleExpanded: ' . JavaScriptEscape($txt['hide']) . ',
+			sJumpAnchor: "quickreply",
+			bIsFull: ' . (!empty($options['use_editor_quick_reply']) ? 'true' . ',
+			sEditorId: ' . $options['use_editor_quick_reply'] : 'false') . ',
+			oThemeOptions: {
+				bUseThemeSettings: ' . ($context['user']['is_guest'] ? 'false' : 'true') . ',
+				sOptionName: "minmax_preferences",
+				sSessionId: elk_session_id,
+				sSessionVar: elk_session_var,
+				sAdditionalVars: ";minmax_key=qreply"
+			},
+			oCookieOptions: {
+				bUseCookie: ' . ($context['user']['is_guest'] ? 'true' : 'false') . ',
+				sCookieName: "elk_qreply"
+			}
+		});', true);
 
 	// Quick moderation options
-	echo '
-			<script>';
-
 	if (!empty($options['display_quick_mod']) && $options['display_quick_mod'] == 1 && $context['can_remove_post'])
 	{
-		echo '
-				let oInTopicModeration = new InTopicModeration({
-					sCheckboxContainerMask: \'in_topic_mod_check_\',
-					aMessageIds: [\'', implode('\', \'', $context['quick_reply_removableMessageIDs']), '\'],
-					sSessionId: elk_session_id,
-					sSessionVar: elk_session_var,
-					sButtonStrip: \'moderationbuttons\',
-					sButtonStripDisplay: \'moderationbuttons_strip\',
-					sButtonStripClass: \'menuitem\',
-					bUseImageButton: false,
-					bCanRemove: ', $context['can_remove_post'] ? 'true' : 'false', ',
-					sRemoveButtonLabel: \'', $txt['quickmod_delete_selected'], '\',
-					sRemoveButtonImage: \'delete_selected.png\',
-					sRemoveButtonConfirm: \'', $txt['quickmod_confirm'], '\',
-					bCanRestore: ', $context['can_restore_msg'] ? 'true' : 'false', ',
-					sRestoreButtonLabel: \'', $txt['quick_mod_restore'], '\',
-					sRestoreButtonImage: \'restore_selected.png\',
-					sRestoreButtonConfirm: \'', $txt['quickmod_confirm'], '\',
-					bCanSplit: ', $context['can_split'] ? 'true' : 'false', ',
-					sSplitButtonLabel: \'', $txt['quickmod_split_selected'], '\',
-					sSplitButtonImage: \'split_selected.png\',
-					sSplitButtonConfirm: \'', $txt['quickmod_confirm'], '\',
-					sFormId: \'quickModForm\'
-				});';
+		theme()->addInlineJavascript('
+			let oInTopicModeration = new InTopicModeration({
+				sCheckboxContainerMask: "in_topic_mod_check_",
+				aMessageIds: [' . (implode(', ', $context['quick_reply_removableMessageIDs'])) . '],
+				sSessionId: elk_session_id,
+				sSessionVar: elk_session_var,
+				sButtonStrip: "moderationbuttons",
+				sButtonStripDisplay: "moderationbuttons_strip",
+				sButtonStripClass: "menuitem",
+				bUseImageButton: false,
+				bCanRemove: ' . ($context['can_remove_post'] ? 'true' : 'false') . ',
+				sRemoveButtonLabel: "' . $txt['quickmod_delete_selected'] . '",
+				sRemoveButtonImage: "delete_selected.png",
+				sRemoveButtonConfirm: "' . $txt['quickmod_confirm'] . '",
+				bCanRestore: ' . ($context['can_restore_msg'] ? 'true' : 'false') . ',
+				sRestoreButtonLabel: "' . $txt['quick_mod_restore'] . '",
+				sRestoreButtonImage: "restore_selected.png",
+				sRestoreButtonConfirm: "' . $txt['quickmod_confirm'] . '",
+				bCanSplit: ' . ($context['can_split'] ? 'true' : 'false') . ',
+				sSplitButtonLabel: "' . $txt['quickmod_split_selected'] . '",
+				sSplitButtonImage: "split_selected.png",
+				sSplitButtonConfirm: "' . $txt['quickmod_confirm'] . '",
+				sFormId: "quickModForm"
+			});', true);
 	}
 
 	// Quick modify can be used
-	echo '
-				var oQuickModify = new QuickModify({
-					sIconHide: \'xx.png\',
-					sScriptUrl: elk_scripturl,
-					sClassName: \'quick_edit\',
-					sIDSubject: \'post_subject_\',
-					sIDInfo: \'info_\',
-					bShowModify: ', $settings['show_modify'] ? 'true' : 'false', ',
-					iTopicId: ', $context['current_topic'], ',
-					sTemplateBodyEdit: ', JavaScriptEscape('
-						<div id="quick_edit_body_container">
-							<div id="error_box" class="errorbox hide"></div>
-							<textarea class="editor" name="message" rows="12" tabindex="' . ($context['tabindex']++) . '">%body%</textarea><br />
-							<div class="submitbutton">
-								<input type="hidden" name="\' + elk_session_var + \'" value="\' + elk_session_id + \'" />
-								<input type="hidden" name="topic" value="' . $context['current_topic'] . '" />
-								<input type="hidden" name="msg" value="%msg_id%" />
-								<input type="submit" name="post" value="' . $txt['save'] . '" tabindex="' . ($context['tabindex']++) . '" onclick="return oQuickModify.modifySave(\'' . $context['session_id'] . '\', \'' . $context['session_var'] . '\');" accesskey="s" />
-								<input type="submit" name="cancel" value="' . $txt['modify_cancel'] . '" tabindex="' . ($context['tabindex']++) . '" onclick="return oQuickModify.modifyCancel();" />
-							</div>
-						</div>'), ',
-					sTemplateBodyNormal: ', JavaScriptEscape('%body%'), ',
-					sTemplateSubjectEdit: ', JavaScriptEscape('<input type="text" style="width: 85%;" name="subject" value="%subject%" size="80" maxlength="80" tabindex="' . ($context['tabindex']++) . '" class="input_text" />'), ',
-					sTemplateSubjectNormal: ', JavaScriptEscape('%subject%'), ',
-					sTemplateTopSubject: ', JavaScriptEscape($txt['topic'] . ': %subject% &nbsp;(' . $context['num_views_text'] . ')'), ',
-					sTemplateInfoNormal: ', JavaScriptEscape('<a href="' . $scripturl . '?topic=' . $context['current_topic'] . '.msg%msg_id%#msg%msg_id%" rel="nofollow">%subject%</a><span class="smalltext modified" id="modified_%msg_id%"></span>'), ($context['can_reply'] && !empty($options['display_quick_reply'])) ? ',
-					sFormRemoveAccessKeys: \'postmodify\'' : '', ',
-					funcOnAfterCreate: function () {
-						// Attach AtWho to the quick edit box
-						add_elk_mention(\'#quick_edit_body_container textarea\');
-						var i = all_elk_mentions.length - 1;
-						all_elk_mentions[i].oMention = new elk_mentions(all_elk_mentions[i].oOptions);
-					}
-				});
+	theme()->addInlineJavascript('
+		let oQuickModify = new QuickModify({
+			sIconHide: "xx.png",
+			sScriptUrl: elk_scripturl,
+			sClassName: "quick_edit",
+			sIDSubject: "post_subject_",
+			sIDInfo: "info_",
+			bShowModify: ' . ($settings['show_modify'] ? 'true' : 'false') . ',
+			iTopicId: ' . $context['current_topic'] . ',
+			sTemplateBodyEdit: ' . JavaScriptEscape('
+				<div id="quick_edit_body_container">
+					<div id="error_box" class="errorbox hide"></div>
+					<textarea class="editor" name="message" rows="12" tabindex="' . ($context['tabindex']++) . '">%body%</textarea><br />
+					<div class="submitbutton">
+						<input type="hidden" name="\' + elk_session_var + \'" value="\' + elk_session_id + \'" />
+						<input type="hidden" name="topic" value="' . $context['current_topic'] . '" />
+						<input type="hidden" name="msg" value="%msg_id%" />
+						<input type="submit" name="post" value="' . $txt['save'] . '" tabindex="' . ($context['tabindex']++) . '" onclick="return oQuickModify.modifySave(\'' . $context['session_id'] . '\', \'' . $context['session_var'] . '\');" accesskey="s" />
+						<input type="submit" name="cancel" value="' . $txt['modify_cancel'] . '" tabindex="' . ($context['tabindex']++) . '" onclick="return oQuickModify.modifyCancel();" />
+					</div>
+				</div>') . ',
+			sTemplateBodyNormal: ' . JavaScriptEscape('%body%') . ',
+			sTemplateSubjectEdit: ' . JavaScriptEscape('<input type="text" style="width: 85%;" name="subject" value="%subject%" size="80" maxlength="80" tabindex="' . ($context['tabindex']++) . '" class="input_text" />') . ',
+			sTemplateSubjectNormal: ' . JavaScriptEscape('%subject%') . ',
+			sTemplateTopSubject: ' . JavaScriptEscape($txt['topic'] . ': %subject% &nbsp;(' . $context['num_views_text'] . ')') . ',
+			sTemplateInfoNormal: ' . JavaScriptEscape('<a href="' . $scripturl . '?topic=' . $context['current_topic'] . '.msg%msg_id%#msg%msg_id%" rel="nofollow">%subject%</a><span class="smalltext modified" id="modified_%msg_id%"></span>') . (($context['can_reply'] && !empty($options['display_quick_reply'])) ? ',
+			sFormRemoveAccessKeys: "postmodify"' : '') . ',
+			funcOnAfterCreate: function () {
+				// Attach AtWho to the quick edit box
+				add_elk_mention("#quick_edit_body_container textarea");
+				var i = all_elk_mentions.length - 1;
+				all_elk_mentions[i].oMention = new elk_mentions(all_elk_mentions[i].oOptions);
+			}
+		});
 
-				aIconLists[aIconLists.length] = new IconList({
-					sBackReference: "aIconLists[" + aIconLists.length + "]",
-					sIconIdPrefix: "msg_icon_",
-					sScriptUrl: elk_scripturl,
-					bShowModify: ', $settings['show_modify'] ? 'true' : 'false', ',
-					iBoardId: ', $context['current_board'], ',
-					iTopicId: ', $context['current_topic'], ',
-					sSessionId: elk_session_id,
-					sSessionVar: elk_session_var,
-					sAction: "messageicons;board=', $context['current_board'], '" ,
-					sLabelIconList: "', $txt['message_icon'], '",
-				});';
+		aIconLists[aIconLists.length] = new IconList({
+			sBackReference: "aIconLists[" + aIconLists.length + "]",
+			sIconIdPrefix: "msg_icon_",
+			sScriptUrl: elk_scripturl,
+			bShowModify: ' . ($settings['show_modify'] ? 'true' : 'false') . ',
+			iBoardId: ' . $context['current_board'] . ',
+			iTopicId: ' . $context['current_topic'] . ',
+			sSessionId: elk_session_id,
+			sSessionVar: elk_session_var,
+			sAction: "messageicons;board=' . $context['current_board'] . '" ,
+			sLabelIconList: "' . $txt['message_icon'] . '",
+		});', true);
 
+	// Provide a toggle for any messages that are being ignored.
 	if (!empty($context['quick_reply_ignoredMsgs']))
 	{
-		echo '
-				ignore_toggles([', implode(', ', $context['quick_reply_ignoredMsgs']), '], ', JavaScriptEscape($txt['show_ignore_user_post']), ');';
+		theme()->addInlineJavascript('
+			ignore_toggles([' . implode(', ', $context['quick_reply_ignoredMsgs']) . '], ' . JavaScriptEscape($txt['show_ignore_user_post']) . ');', true);
 	}
-
-	echo '
-			</script>';
 }
 
 /**
@@ -884,14 +869,21 @@ function template_pages_and_buttons_above()
  */
 function template_pages_and_buttons_below()
 {
-	global $context, $txt;
-
 	// Show the page index... "Pages: [1]".
 	template_pagesection('normal_buttons');
 
 	// Show the lower breadcrumbs.
 	theme_linktree();
+}
 
+/**
+ * Used to display additonal items below the page, like moderation buttons
+ */
+function template_moderation_buttons_below()
+{
+	global $context, $txt;
+
+	// Show the moderation buttons
 	echo '
 			<div id="moderationbuttons" class="hide_30 hamburger_30_target">';
 
@@ -906,7 +898,7 @@ function template_pages_and_buttons_below()
 	// Show the jump-to box, or actually...let Javascript do it.
 	echo '
 				<div id="display_jump_to">&nbsp;</div>
-				<script>
+				<script type="module">
 					aJumpTo[aJumpTo.length] = new JumpTo({
 						sContainerId: "display_jump_to",
 						sJumpToTemplate: "<label class=\"smalltext\" for=\"%select_id%\">', $context['jump_to']['label'], ':<" + "/label> %dropdown_list%",
