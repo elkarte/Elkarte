@@ -58,7 +58,7 @@
 		 */
 		function showFlash(tag, eURL)
 		{
-			$(tag).replaceWith(getEmbed(eURL));
+			$(tag).html(getEmbed(eURL));
 		}
 
 		/**
@@ -75,7 +75,7 @@
 			return $('' +
 				'<div class="elk_video">' +
 					'<a href="' + a.href + '">' +
-						'<img class="elk_previewvideo" alt="' + oSettings.preview_image + '" ' + 'title="' + oSettings.ctp_video + '" src="' + src + '"/>' +
+						'<img class="elk_video_preview" alt="' + oSettings.preview_image + '" ' + 'title="' + oSettings.ctp_video + '" src="' + src + '"/>' +
 					'</a>' +
 				'</div>')
 				.on('dblclick', function (e)
@@ -189,8 +189,8 @@
 		}
 
 		let domain_regex = /^[^:]*:\/\/(?:www\.)?([^\/]+)(\/.*)$/,
-			already_embedded = 0,
-			embed_html = '<div class="elk_video"><iframe width="640" height="360" src="{src}" frameborder="0" allowfullscreen></iframe></div>',
+			embedded_count = 0,
+			embed_html = '<iframe width="640" height="360" src="{src}" allow="fullscreen" type="text/html"></iframe>',
 			handlers = {};
 
 		// Youtube and variants link handler
@@ -278,6 +278,7 @@
 		handlers['dailymotion.com'] = function (path, a, embed)
 		{
 			let videoID = path.match(/^\/(?:video|swf)\/([a-z0-9]{1,18})/i);
+
 			if (!videoID || !(videoID = videoID[1]))
 			{
 				return;
@@ -311,6 +312,7 @@
 		handlers['tiktok.com'] = function (path, a, embed)
 		{
 			let videoID = path.match(/^\/@([0-9A-Za-z_]*)\/video\/([0-9]*)/i);
+
 			if (!videoID)
 			{
 				return;
@@ -328,13 +330,7 @@
 				// href on the image, but TikTok has its own embed jazz-o-matic
 				getTikTokIMG(videoID, function (data)
 				{
-					//$(a).parent().next().find("img").attr("src", data.thumbnail_url);
-
-					// The collapse function seems to break the TT embed, so we just make it look the same
-					// but is not functional
-					let header = $(a).parent().html();
-					$(a).parent().next().remove();
-					$(a).parent().replaceWith('<div class="elk_videoheader">' + header + '</div><div class=elk_video">' + data.html + '</div>');
+					$(a).parent().next().replaceWith('<div class=elk_video">' + data.html + '</div>');
 				});
 
 				// This is to show something while we wait for our callback to return
@@ -353,49 +349,49 @@
 
 		if (typeof msgid !== "undefined")
 		{
-			links = $('#' + msgid + ' a');
+			links = document.querySelectorAll('#' + msgid + ' a.bbc_link');
 		}
 		else
 		{
-			links = $('[id^=msg_] a');
+			links = document.querySelectorAll('[id^=msg_] a.bbc_link');
 		}
 
 		// Create the show/hide button
 		let showhideBtn = $('' +
 			'<a class="floatright" title="' + oSettings.hide_video + '">' +
-				'<img alt=">" src="' + elk_images_url + '/selected.png">' +
-			'</a>').on('click', function ()
-		{
-			let $img = $(this).find("img"),
-				$vid = $(this).parent().next();
+				'<i class="icon icon-small i-caret-up" alt=">"></i>' +
+			'</a>')
+			.on('click', function () {
+				let $img = $(this).find("i"), // The open / close icon
+					$vid = $(this).parent().next(); // The immediate elk_video div
 
-			// Toggle slide the video and change the icon
-			$img.attr("src", elk_images_url + ($vid.is(":hidden") !== true ? "/selected_open.png" : "/selected.png"));
-			$vid.slideToggle();
-		});
+				// Toggle slide the video and change the icon
+				$img.attr("class", "icon icon-small " + ($vid.is(":hidden") !== true ? "i-caret-down" : "i-caret-up"));
+				$vid.slideToggle();
+			});
 
 		// Loop though each link old skool style for speed
-		for (let i = links.length - 1; i > -1; i--)
+		links.forEach((link) =>
 		{
-			let tag = links[i],
+			let tag = link,
 				text = tag.innerText || tag.textContent || "";
 
 			// Ignore in sentences
-			if (tag.previousSibling && tag.previousSibling.nodeName === '#text')
+			if (tag.previousSibling && tag.previousSibling.nodeName === '#text' && tag.previousSibling.nodeValue !== ' ')
 			{
-				continue;
+				return;
 			}
 
 			// Ignore in quotes and signatures
 			if ("bbc_quote;signature".indexOf(tag.parentNode.className) !== -1)
 			{
-				continue;
+				return;
 			}
 
 			// No href or inner text not equal to href attr then we move along
 			if (tag.href === "" || tag.href.indexOf(text) !== 0)
 			{
-				continue;
+				return;
 			}
 
 			// Get domain and validate we know how to handle it
@@ -404,19 +400,30 @@
 				args = null;
 
 			// One of our video provider domains?
-			if (already_embedded < oSettings.embed_limit && m !== null && typeof handlers[m[1]] !== "undefined" && handlers[m[1]] !== null)
+			if (embedded_count < oSettings.embed_limit && m !== null && typeof handlers[m[1]] !== "undefined" && handlers[m[1]] !== null)
 			{
 				// Call the handler and get the tag to insert
 				handler = handlers[m[1]];
 
+				// If there are video tags seperated by only a BR node, remove the BR so the video embed can
+				// be side by side on a wide enough screen.
+				if (tag.previousSibling && tag.previousSibling.nodeName === 'BR')
+				{
+					if (tag.previousSibling.previousElementSibling && tag.previousSibling.previousElementSibling.classList.contains('elk_video_container'))
+					{
+						tag.previousSibling.remove();
+					}
+				}
+
 				args = handler(m[2], tag, false);
 				if (args)
 				{
-					already_embedded++;
-					$(tag).wrap('<div class="elk_videoheader">').text(args[0]).after(showhideBtn.clone(true));
-					$(tag).parent().after(args[1]);
+					embedded_count++;
+					$(tag).wrap('<div class="elk_video_container">');
+					$(tag).wrap('<div class="elk_video_header">').text(args[0]).after(showhideBtn.clone(true));
+					$(tag).parent().parent().append(args[1]);
 				}
 			}
-		}
+		});
 	};
 })(jQuery);
