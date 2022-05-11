@@ -401,8 +401,11 @@ function template_html_below()
 		</div>
 	</footer>';
 
-	// load in any javascript that could be deferred to the end of the page
-	theme()->template_javascript(true);
+	// This is here to catch any late loading of JS files via templates
+	theme()->outputJavascriptFiles(theme()->getJSFiles());
+
+	// load inline javascript that needed to be deferred to the end of the page
+	theme()->template_inline_javascript(true);
 
 	// Schema microdata about the organization?
 	if (!empty($context['smd_site']))
@@ -464,7 +467,7 @@ function theme_linktree($default = 'linktree')
 			? '
 			<span class="crumb">
 				<a href="' . $tree['url'] . '">' .
-					($pos == 0
+					($pos === 0
 						? '<i class="icon i-home"><s>' . $txt['home'] . '</s></i>'
 						: $tree['name']) . '
 				</a>
@@ -590,35 +593,34 @@ function template_menu()
 
 	// Define the upper_section toggle in javascript.
 	theme()->addInlineJavascript('
-					var oMainHeaderToggle = new elk_Toggle({
-						bToggleEnabled: true,
-						bCurrentlyCollapsed: ' . (empty($context['minmax_preferences']['upshrink']) ? 'false' : 'true') . ',
-						aSwappableContainers: [
-							\'upper_section\',\'header\',\'top_header\'
-						],
-						aSwapClasses: [
-							{
-								sId: \'upshrink\',
-								classExpanded: \'chevricon i-chevron-up icon-lg\',
-								titleExpanded: ' . JavaScriptEscape($txt['upshrink_description']) . ',
-								classCollapsed: \'chevricon i-chevron-down icon-lg\',
-								titleCollapsed: ' . JavaScriptEscape($txt['upshrink_description']) . '
-							}
-						],
-						oThemeOptions: {
-							bUseThemeSettings: ' . ($context['user']['is_guest'] ? 'false' : 'true') . ',
-							sOptionName: \'minmax_preferences\',
-							sSessionId: elk_session_id,
-							sSessionVar: elk_session_var,
-							sAdditionalVars: \';minmax_key=upshrink\'
-						},
-						oCookieOptions: {
-							bUseCookie: elk_member_id == 0 ? true : false,
-							sCookieName: \'upshrink\'
-						}
-					});
-				', true);
-
+		var oMainHeaderToggle = new elk_Toggle({
+			bToggleEnabled: true,
+			bCurrentlyCollapsed: ' . (empty($context['minmax_preferences']['upshrink']) ? 'false' : 'true') . ',
+			aSwappableContainers: [
+				\'upper_section\',\'header\',\'top_header\'
+			],
+			aSwapClasses: [
+				{
+					sId: \'upshrink\',
+					classExpanded: \'chevricon i-chevron-up icon-lg\',
+					titleExpanded: ' . JavaScriptEscape($txt['upshrink_description']) . ',
+					classCollapsed: \'chevricon i-chevron-down icon-lg\',
+					titleCollapsed: ' . JavaScriptEscape($txt['upshrink_description']) . '
+				}
+			],
+			oThemeOptions: {
+				bUseThemeSettings: ' . ($context['user']['is_guest'] ? 'false' : 'true') . ',
+				sOptionName: \'minmax_preferences\',
+				sSessionId: elk_session_id,
+				sSessionVar: elk_session_var,
+				sAdditionalVars: \';minmax_key=upshrink\'
+			},
+			oCookieOptions: {
+				bUseCookie: elk_member_id == 0 ? true : false,
+				sCookieName: \'upshrink\'
+			}
+		});
+	', true);
 }
 
 /**
@@ -740,15 +742,15 @@ function template_quickbutton_strip($strip, $tests = array())
 
 	foreach ($strip as $key => $value)
 	{
-			if (!empty($value['checkbox']) && ((!empty($options['display_quick_mod']) && $options['display_quick_mod'] == 1) || $value['checkbox'] === 'always'))
-			{
-				$buttons[] = '
+		if (!empty($value['checkbox']) && ((!empty($options['display_quick_mod']) && $options['display_quick_mod'] == 1) || $value['checkbox'] === 'always'))
+		{
+			$buttons[] = '
 					<li class="listlevel1 ' . $key . '">
 						<input class="input_check ' . $key . '_check" type="checkbox" name="' . $value['name'] . '[]" value="' . $value['value'] . '" />
 					</li>';
 
-				continue;
-			}
+			continue;
+		}
 
 		// No special permission needed, or you have valid permission, then get a button!
 		if (!isset($value['test']) || !empty($tests[$value['test']]))
@@ -936,14 +938,14 @@ function template_news_fader()
 	global $settings, $context;
 
 	echo '
-		<ul id="elkFadeScroller">
-			<li>
-				', $settings['enable_news'] == 2 ? implode('</li><li>', $context['news_lines']) : $context['random_news_line'], '
-			</li>
-		</ul>';
-
-	theme()->addInlineJavascript('
-		$(\'#elkFadeScroller\').Elk_NewsFader(' . (empty($settings['newsfader_time']) ? '' : '{\'iFadeDelay\': ' . $settings['newsfader_time'] . '}') . ');', true);
+				<ul id="elkFadeScroller">
+					<li>
+						', $settings['enable_news'] == 2 ? implode('</li><li>', $context['news_lines']) : $context['random_news_line'], '
+					</li>
+				</ul>
+				<script type="module">
+					$("#elkFadeScroller").Elk_NewsFader(' . (empty($settings['newsfader_time']) ? '' : '{iFadeDelay: ' . $settings['newsfader_time'] . '}') . ');
+				</script>';
 }
 
 /**
@@ -1016,20 +1018,20 @@ function template_msg_email($id, $member = false)
 {
 	global $context, $txt, $scripturl;
 
-	if ($context['can_send_email'])
+	if (!$context['can_send_email'])
 	{
-		if ($member === false || $member['show_email'] != 'no')
-		{
-			if (empty($member['id']))
-			{
-				return '<a href="' . $scripturl . '?action=emailuser;sa=email;msg=' . $id . '" class="icon i-envelope-o' . (($member !== false && $member['online']['is_online']) ? '' : '-blank') . '" title="' . $txt['email'] . '"><s>' . $txt['email'] . '</s></a>';
-			}
-
-			return '<a href="' . $scripturl . '?action=emailuser;sa=email;uid=' . $member['id'] . '" class="icon i-envelope-o' . (($member !== false && $member['online']['is_online']) ? '' : '-blank') . '" title="' . $txt['email'] . '"><s>' . $txt['email'] . '</s></a>';
-		}
-
-		return '<i class="icon i-envelope-o" title="' . $txt['email'] . ' ' . $txt['hidden'] . '"><s>' . $txt['email'] . ' ' . $txt['hidden'] . '</s></i>';
+		return '';
 	}
 
-	return '';
+	if ($member === false || $member['show_email'] !== 'no')
+	{
+		if (empty($member['id']))
+		{
+			return '<a href="' . $scripturl . '?action=emailuser;sa=email;msg=' . $id . '" class="icon i-envelope-o' . (($member !== false && $member['online']['is_online']) ? '' : '-blank') . '" title="' . $txt['email'] . '"><s>' . $txt['email'] . '</s></a>';
+		}
+
+		return '<a href="' . $scripturl . '?action=emailuser;sa=email;uid=' . $member['id'] . '" class="icon i-envelope-o' . (($member !== false && $member['online']['is_online']) ? '' : '-blank') . '" title="' . $txt['email'] . '"><s>' . $txt['email'] . '</s></a>';
+	}
+
+	return '<i class="icon i-envelope-o" title="' . $txt['email'] . ' ' . $txt['hidden'] . '"><s>' . $txt['email'] . ' ' . $txt['hidden'] . '</s></i>';
 }

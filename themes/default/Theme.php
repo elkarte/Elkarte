@@ -448,8 +448,8 @@ class Theme extends BaseTheme
 		}
 
 		// All the buttons we can possibly want and then some, try pulling the final list of buttons from cache first.
-		if ((time() - $cacheTime <= $modSettings['settings_updated']
-			|| $menu_buttons = $cache->get('menu_buttons-' . implode('_', $this->user->groups) . '-' . $this->user->language, $cacheTime)) === null)
+		if ((time() - $cacheTime <= $modSettings['settings_updated'])
+			|| $menu_buttons = $cache->get('menu_buttons-' . implode('_', $this->user->groups) . '-' . $this->user->language, $cacheTime) === null)
 		{
 			// Start things up: this is what we know by default
 			require_once(SUBSDIR . '/Menu.subs.php');
@@ -459,7 +459,7 @@ class Theme extends BaseTheme
 			call_integration_hook('integrate_menu_buttons', array(&$buttons, &$menu_count));
 
 			// Now we put the buttons in the context so the theme can use them.
-			$menu_buttons = array();
+			$menu_buttons = [];
 			foreach ($buttons as $act => $button)
 			{
 				if (!empty($button['show']))

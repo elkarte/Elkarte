@@ -5835,6 +5835,10 @@ Stef                       ^
 		vertical-align: top;
 	}
 
+	.elk_video_header {
+		min-width: 480px;
+	}
+
 	/* 1376 to 1600 we allow for 480/270 videos so they stack nice*/
 	.elk_video_container {
 		max-width: 480px;
@@ -5857,11 +5861,7 @@ Stef                       ^
 		display: none;
 	}
 
-	.bbc_img, .elk_video {
-		max-width: 100%;
-	}
-
-	.elk_previewvideo {
+	.bbc_img {
 		max-width: 100%;
 	}
 
