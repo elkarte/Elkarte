@@ -551,7 +551,7 @@ class ProfileInfo extends AbstractController
 				),
 				'topic' => array(
 					'id' => $row['id_topic'],
-					'link' => '<a href="' . getUrl('topic', ['topic' => $row['id_topic'], 'msg' => $row['id_msg'], 'subject' => $row['subject'], 'start' => '0', 'hash' => '#msg' . $row['id_msg']]) . '">' . $row['subject'] . '</a>',
+					'link' => '<a href="' . getUrl('topic', ['topic' => $row['id_topic'], 'msg' => $row['id_msg'], 'subject' => $row['subject'], 'start' => '0']) . '#msg' . $row['id_msg'] . '">' . $row['subject'] . '</a>',
 				),
 				'subject' => $row['subject'],
 				'start' => 'msg' . $row['id_msg'],
