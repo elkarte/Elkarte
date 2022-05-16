@@ -789,8 +789,8 @@ a.active {
 #menu_sidebar .listlevel1.subsections .linklevel1::after {
 	font-size: 1em;
 	position: absolute;
-	right: 6px;
 	top: 1px;
+	right: 6px;
 	content: "\25BA";
 }
 

@@ -5855,17 +5855,13 @@ Stef                       ^
 @media screen and (min-width: 86em) {
 	.elk_video_container {
 		display: inline-block;
+		max-width: 480px;
 		margin: 0 2px 1em 2px;
 		vertical-align: top;
 	}
 
 	.elk_video_header {
 		min-width: 480px;
-	}
-
-	/* 1376 to 1600 we allow for 480/270 videos so they stack nice*/
-	.elk_video_container {
-		max-width: 480px;
 	}
 
 	.elk_video iframe {

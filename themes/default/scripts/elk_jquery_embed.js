@@ -137,7 +137,7 @@
 			};
 
 		// Get a twitter embed html
-		imgHandlers['getTwitterEmbed'] = function(eURL, callback)
+		imgHandlers.getTwitterEmbed = function(eURL, callback)
 		{
 			fetchDocument(eURL, twResponse, 'json');
 			function twResponse(data)
@@ -152,7 +152,7 @@
 		};
 
 		// Get a TikTok video thumbnail and embed data
-		imgHandlers['getTikTokEmbed'] = function(eURL, callback)
+		imgHandlers.getTikTokEmbed = function(eURL, callback)
 		{
 			fetchDocument(eURL, ttResponse, 'json');
 			function ttResponse(data)
@@ -168,7 +168,7 @@
 		};
 
 		// Get a dailymotion video thumbnail
-		imgHandlers['getDailymotionIMG'] = function(eURL, callback)
+		imgHandlers.getDailymotionIMG = function(eURL, callback)
 		{
 			fetchDocument(eURL, dailyResponse, 'json');
 			function dailyResponse(data)
@@ -182,10 +182,10 @@
 					callback(logos.dailymotion);
 				}
 			}
-		}
+		};
 
 		// Get a Vimeo video thumbnail
-		imgHandlers['getVimeoIMG'] = function(videoID, callback)
+		imgHandlers.getVimeoIMG = function(videoID, callback)
 		{
 			fetchDocument('https://vimeo.com/api/v2/video/' + videoID + '.json', vimeoResponse, 'json');
 			function vimeoResponse(data)
@@ -199,7 +199,7 @@
 					callback(logos.vimeo);
 				}
 			}
-		}
+		};
 
 		// Youtube and variants
 		handlers['youtube.com'] = function (path, a)
@@ -268,7 +268,7 @@
 			tag = embedIMG(a, logos.vimeo, embedURL + '?autoplay=1');
 
 			// Get the preview image / embed tag
-			imgHandlers['getVimeoIMG'](imgURL, function (img)
+			imgHandlers.getVimeoIMG(imgURL, function (img)
 			{
 				$(a).parent().next().find("img").attr("src", img);
 			});
@@ -293,7 +293,7 @@
 			tag = embedIMG(a, logos.dailymotion, embedURL + '?related=0&autoplay=1');
 
 			// Get the preview image or embed tag
-			imgHandlers['getDailymotionIMG'](imgURL, function (img)
+			imgHandlers.getDailymotionIMG(imgURL, function (img)
 			{
 				$(a).parent().next().find('img').attr('src', img);
 			});
@@ -314,7 +314,7 @@
 			let embedURL = '//www.tiktok.com/oembed?url=https://www.tiktok.com/@' + videoID[1] + '/video/' + videoID[2],
 				tag;
 
-			imgHandlers['getTikTokEmbed'](embedURL, function (data)
+			imgHandlers.getTikTokEmbed(embedURL, function (data)
 			{
 				$(a).parent().next().find('img').attr('src', data.thumbnail_url);
 				a.embedURL = data.html;
@@ -375,7 +375,7 @@
 			tag = embedIMG(a, logos.facebook, embedURL + '?related=0&autoplay=1');
 
 			return [oSettings.facebook, tag];
-		}
+		};
 
 		// Instagram
 		handlers['instagram.com'] = function (path, a)
@@ -393,7 +393,7 @@
 			tag = embedIMG(a, logos.instagram, embedURL + '?related=0&autoplay=1', false);
 
 			return [oSettings.instagram, tag, 'portrait'];
-		}
+		};
 
 		// ---------------------------------------------------------------------------
 		// Get the bbc_link links in the id="msg_1234 divs.

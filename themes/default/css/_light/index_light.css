@@ -790,8 +790,8 @@ sup.bbc_footnotes, sup.bbc_footnotes a {
 }
 
 .poster_div_details {
-	border-left-color: var(--primary_border);
 	border-right-color: var(--transparent);
+	border-left-color: var(--primary_border);
 }
 
 /* PM and Notification bubble indicator */
