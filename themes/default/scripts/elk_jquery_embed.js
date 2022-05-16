@@ -125,7 +125,7 @@
 		let domain_regex = /^[^:]*:\/\/(?:www\.)?([^\/]+)(\/.*)$/,
 			embedded_count = 0,
 			provider_class = '',
-			embed_html = '<iframe width="640" height="360" src="{src}" allow="fullscreen" loading="lazy" type="text/html"></iframe>',
+			embed_html = '<iframe width="640" height="360" src="{src}" data-autoplay="true" allow="fullscreen" loading="lazy" type="text/html"></iframe>',
 			embed_html_916 = '<iframe width="480" height="800" src="{src}" allow="fullscreen" loading="lazy" type="text/html"></iframe>',
 			handlers = {},
 			imgHandlers = {},
@@ -306,7 +306,7 @@
 		// TikTok
 		handlers['tiktok.com'] = function (path, a)
 		{
-			let videoID = path.match(/^\/@([0-9A-Za-z_]*)\/video\/([0-9]*)/i);
+			let videoID = path.match(/^\/@([0-9A-Za-z_\-.]*)\/video\/([0-9]*)/i);
 
 			if (!videoID)
 			{
