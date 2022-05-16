@@ -767,7 +767,7 @@ class Theme extends BaseTheme
 			$combine_standard_name = $combiner->site_js_combine($this->js_files, false);
 			$combine_deferred_name = $combiner->site_js_combine($this->js_files, true);
 
-			call_integration_hook('post_javascript_combine', array(&$combine_name, $combiner));
+			call_integration_hook('post_javascript_combine', array(&$combine_standard_name, &$combine_deferred_name, $combiner));
 
 			if (!empty($combine_standard_name))
 			{

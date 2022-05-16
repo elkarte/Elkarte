@@ -8,6 +8,8 @@
  * Original code from Aziz, redone and refactored for ElkArte
  */
 
+/** global: elk_session_id, elk_session_var, elk_scripturl */
+
 /**
  * This javascript searches the message for video links and replaces them
  * with a clickable preview thumbnail of the video.  Once the image is clicked
@@ -511,7 +513,7 @@
 				// On scroll fires "a lot" so this tames it to be less abusive
 				throttleTimeout = setTimeout(function ()
 				{
-					videoLinks.forEach(function (a, index)
+					videoLinks.forEach(function (a)
 					{
 						// No links remaining, drop any listeners
 						if (videoLinks.length === 0)

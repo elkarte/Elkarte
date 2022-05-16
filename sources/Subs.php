@@ -1736,7 +1736,7 @@ function removeNestedQuotes($text)
 			// To many, mark it for removal
 			if ($depth === $max_depth)
 			{
-				// This quotes position in the string, note [/quote] = 8
+				// This quote position in the string, note [/quote] = 8
 				$end_pos = $match[1] + 8;
 				$length = $end_pos - $start_pos;
 				$remove[] = [$start_pos, $length];

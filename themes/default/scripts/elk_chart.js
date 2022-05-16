@@ -6,6 +6,8 @@
  * @version 2.0 dev
  */
 
+/** global: titles, year, monthdata, yeardata, request, colors, yearDataset, yearStats */
+
 /**
  * Returns the config object for chart.js, used in profile stats
  *
