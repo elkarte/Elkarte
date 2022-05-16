@@ -1155,6 +1155,9 @@ class Theme extends BaseTheme
 					vimeo : ' . JavaScriptEscape($txt['vimeo']) . ',
 					dailymotion : ' . JavaScriptEscape($txt['dailymotion']) . ',
 					tiktok : ' . JavaScriptEscape($txt['tiktok']) . ',
+					twitter : ' . JavaScriptEscape($txt['twitter']) . ',
+					facebook : ' . JavaScriptEscape($txt['facebook']) . ',
+					instagram : ' . JavaScriptEscape($txt['instagram']) . ',
 				});
 				document.addEventListener("DOMContentLoaded", () => {$().linkifyvideo(oEmbedtext);});', true);
 		}

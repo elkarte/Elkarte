@@ -44,59 +44,53 @@ var ua = navigator.userAgent.toLowerCase(),
  */
 function fetchDocument(sUrl, funcCallback, sType)
 {
+	let oCaller = this,
+		init = {credentials: 'same-origin', method: 'GET', cache: 'default', mode: 'cors'};
+
 	sType = sType || 'xml';
-	oCaller = this;
 
-	fetch(sUrl, {
-		credentials: 'same-origin',
-		method: 'GET',
-		mode: 'cors',
-		cache: 'default',
-		headers: {
-			'X-Requested-With': 'elkarte'
-		},
-	})
-	// Process the response as xml, json or plain text
-	.then(response => {
-		const contentType = response.headers.get('content-type');
+	fetch(sUrl, init)
+		.then(response => {
+			// Process the response as xml, json or plain text
+			const contentType = response.headers.get('content-type');
 
-		if (!response.ok || response.status !== 200 || !contentType)
-		{
-			return false;
-		}
-
-		if (sType === 'xml')
-		{
-			return response.text().then(data =>
+			if (!response.ok || response.status !== 200 || !contentType)
 			{
-				let parser = new DOMParser();
+				return false;
+			}
 
-				return parser.parseFromString(data, "application/xml");
-			});
-		}
+			if (sType === 'xml')
+			{
+				return response.text().then(data =>
+				{
+					let parser = new DOMParser();
 
-		if (sType === 'json')
-		{
-			return response.json();
-		}
+					return parser.parseFromString(data, "application/xml");
+				});
+			}
 
-		return response.text();
-	})
-	// If we have a callback, send the result to it
-	.then(data => {
-		if (typeof (funcCallback) !== 'undefined')
-		{
-			funcCallback.call(oCaller, data);
-		}
+			if (sType === 'json')
+			{
+				return response.json();
+			}
 
-		return data;
-	})
-	.catch(error => {
-		if ('console' in window)
-		{
-			window.console.info(error);
-		}
-	});
+			return response.text();
+		})
+		// If we have a callback, send the result to it
+		.then(data => {
+			if (typeof (funcCallback) !== 'undefined')
+			{
+				funcCallback.call(oCaller, data);
+			}
+
+			return data;
+		})
+		.catch(error => {
+			if ('console' in window)
+			{
+				window.console.info(error);
+			}
+		});
 }
 
 /**
@@ -179,7 +173,7 @@ function sendXMLDocument(sUrl, sContent, funcCallback)
 	}
 
 	oSendDoc.open('POST', sUrl, true);
-	oSendDoc.setRequestHeader('X-Requested-With', 'elkarte');
+	oSendDoc.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
 	if ('setRequestHeader' in oSendDoc)
 	{
 		oSendDoc.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
@@ -1917,4 +1911,27 @@ function doAutoSubmit(countdown, txt_message, formName)
 	{
 		doAutoSubmit(countdown, txt_message, formID);
 	}, 1000);
+}
+
+/**
+ * Checks if a given element is in the visible viewport, return true or false
+ *
+ * Function can help with lazy loading something that does not support loading=lazy
+ *
+ * @param {element} element
+ */
+function isElementInViewport(element)
+{
+	if (typeof element === 'undefined')
+	{
+		return false;
+	}
+
+	let rect = element.getBoundingClientRect(),
+		windowHeight = window.innerHeight || document.documentElement.clientHeight,
+		windowWidth = window.innerWidth || document.documentElement.clientWidth,
+		insideX = rect.left >= 0 && rect.left + rect.width <= windowWidth,
+		insideY = rect.top >= 0 && rect.top + rect.height <= windowHeight;
+
+	return insideX && insideY;
 }

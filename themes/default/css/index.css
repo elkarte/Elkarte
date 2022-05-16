@@ -3482,6 +3482,10 @@ footer .signature {
 	border-bottom: 1px solid;
 }
 
+.elk_video {
+	margin-bottom: -6px;
+}
+
 /* Actual video */
 .elk_video iframe {
 	max-width: 100%;
@@ -3491,12 +3495,32 @@ footer .signature {
 	aspect-ratio: 16 / 9;
 }
 
-/* Image preview, often we get a 4/3 image so we force it to 16/9 */
+.elk_video_container.portrait {
+	max-width: 480px;
+	min-height: 480px;
+}
+
+.elk_video_container.portrait iframe {
+	max-height: 825px;
+	aspect-ratio: 9 / 16;
+}
+
+.elk_video_container.portrait .elk_video_header {
+	min-width: 480px;
+}
+
+/* Image preview, often we get a 4/3 image so we force it to 16/9 to avoid a screen jump */
 .elk_video_preview {
 	width: 100%;
 	max-height: 360px;
 	object-fit: cover;
 	aspect-ratio: 16 / 9;
+}
+
+.elk_video_container.portrait .elk_video_preview {
+	padding-top: 60px;
+	object-fit: initial;
+	aspect-ratio: 9 / 16;
 }
 
 /* Basic stuff for the bottom of Display.template.php, moderation buttons, jump box. */
