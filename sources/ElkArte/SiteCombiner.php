@@ -409,7 +409,16 @@ class SiteCombiner
 			if ($this->_isStale())
 			{
 				$this->_combineFiles('js');
-				$this->_minified_cache = trim($this->_jsCompiler());
+
+				if (!empty($this->_min_cache))
+				{
+					$this->_minified_cache = $this->_min_cache;
+				}
+				else
+				{
+					$this->_minified_cache = trim($this->_jsCompiler());
+				}
+
 				$this->_saveFiles();
 			}
 
