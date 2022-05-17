@@ -462,7 +462,7 @@ function template_subject_list()
 									</a>
 								</th>
 								<th class="pm_quickmod grid4">
-									<input type="checkbox" onclick="invertAll(this, this.form);" />
+									<input type="checkbox" onclick="invertAll(this, this.form);" title="', $txt['check_all'], '" />
 								</th>
 							</tr>
 						</thead>
@@ -515,6 +515,7 @@ function template_subject_list()
 									', ($context['from_or_to'] == 'from' ? $message['member']['link'] : (empty($message['recipients']['to']) ? '' : implode(', ', $message['recipients']['to']))), '
 								</td>
 								<td class="pm_quickmod">
+									<label for="deletelisting', $message['id'], '" class="hide">', $message['id'], ' - ', $message['subject'], '</label>
 									<input type="checkbox" name="pms[]" id="deletelisting', $message['id'], '" value="', $message['id'], '"', $message['is_selected'] ? ' checked="checked"' : '', ' onclick="if (document.getElementById(\'deletedisplay', $message['id'], '\')) document.getElementById(\'deletedisplay', $message['id'], '\').checked = this.checked;" />
 								</td>
 							</tr>';
@@ -1159,7 +1160,7 @@ function template_send()
 	}
 
 	echo '
-		<script>
+		<script type="module">
 			new elk_PersonalMessageSend({
 				sSessionId: elk_session_id,
 				sSessionVar: elk_session_var,
@@ -1173,7 +1174,7 @@ function template_send()
 					{
 						sItemId: ', JavaScriptEscape($member['id']), ',
 						sItemName: ', JavaScriptEscape($member['name']), '
-					}', $i == count($context['recipients']['to']) - 1 ? '' : ',';
+					}', $i === count($context['recipients']['to']) - 1 ? '' : ',';
 	}
 
 	echo '
@@ -1186,7 +1187,7 @@ function template_send()
 					{
 						sItemId: ', JavaScriptEscape($member['id']), ',
 						sItemName: ', JavaScriptEscape($member['name']), '
-					}', $i == count($context['recipients']['bcc']) - 1 ? '' : ',';
+					}', $i === count($context['recipients']['bcc']) - 1 ? '' : ',';
 	}
 
 	echo '

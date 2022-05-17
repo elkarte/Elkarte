@@ -304,16 +304,16 @@ class Display extends AbstractController
 		{
 			$this->_template_layers->add('report_sent');
 		}
+		// All of our buttons and bottom navigation
+		$this->_template_layers->add('moderation_buttons');
+		$this->_template_layers->add('pages_and_buttons');
 
 		// Quick reply & modify enabled?
 		if ($context['can_reply'] && !empty($options['display_quick_reply']))
 		{
 			loadJavascriptFile('mentioning.js');
-			$this->_template_layers->addBefore('quickreply', 'messages_informations');
+			$this->_template_layers->addBefore('quickreply', 'moderation_buttons');
 		}
-
-		// All of our buttons and indexes
-		$this->_template_layers->add('pages_and_buttons');
 	}
 
 	/**

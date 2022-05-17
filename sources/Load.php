@@ -897,12 +897,13 @@ function loadCSSFile($filenames, $params = array(), $id = '')
  * Keys are the following:
  * - ['local'] (true/false): define if the file is local, if file does not
  *     start with http its assumed local
- * - ['defer'] (true/false): define if the file should load in <head> or before
- *     the closing <html> tag
+ * - ['defer'] (true/false): define if the file should load in <head> with the
+ *     defer attribute (script is fetched asynchronously) and run after page is loaded
  * - ['fallback'] (true/false): if true will attempt to load the file from the
  *     default theme if not found in the current this is the default behavior
  *     if this is not supplied
- * - ['async'] (true/false): if the script should be loaded asynchronously (HTML5)
+ * - ['async'] (true/false): if the script should be loaded asynchronously and
+ *    as soon as its loaded, interrupt parsing to run
  * - ['stale'] (true/false/string): if true or null, use cache stale, false do
  *     not, or used a supplied string
  * @param string $id = '' optional id to use in html id=""
@@ -965,6 +966,7 @@ function loadAssetFile($filenames, $params = array(), $id = '')
 	}
 
 	$cache = Cache::instance();
+	$fileFunc = \ElkArte\FileFunctions::instance();
 
 	if (!is_array($filenames))
 	{
@@ -982,7 +984,7 @@ function loadAssetFile($filenames, $params = array(), $id = '')
 		$staler_string = ($params['stale'][0] === '?' ? $params['stale'] : '?' . $params['stale']);
 	}
 
-	$fallback = !((!empty($params['fallback']) && ($params['fallback'] === false)));
+	$fallback = !isset($params['fallback']) || $params['fallback'] !== false;
 	$dir = '/' . $params['subdir'] . '/';
 
 	// Whoa ... we've done this before yes?
@@ -992,7 +994,7 @@ function loadAssetFile($filenames, $params = array(), $id = '')
 	{
 		if (empty($context[$params['index_name']]))
 		{
-			$context[$params['index_name']] = array();
+			$context[$params['index_name']] = [];
 		}
 
 		$context[$params['index_name']] += $temp;
@@ -1007,7 +1009,7 @@ function loadAssetFile($filenames, $params = array(), $id = '')
 	}
 	else
 	{
-		$this_build = array();
+		$this_build = [];
 
 		// All the files in this group use the above parameters
 		foreach ($filenames as $filename)
@@ -1023,28 +1025,25 @@ function loadAssetFile($filenames, $params = array(), $id = '')
 			{
 				$params['basename'] = $filename;
 			}
-			$this_id = empty($id) ? strtr(basename($filename), '?', '_') : $id;
+			$this_id = empty($id) ? str_replace('?', '_', basename($filename)) : $id;
 
 			// Is this a local file?
-			if (!empty($params['local']) || (substr($filename, 0, 4) !== 'http' && substr($filename, 0, 2) !== '//'))
+			if (!empty($params['local']) || (strpos($filename, 'http') !== 0 && strpos($filename, '//') !== 0))
 			{
 				$params['local'] = true;
 				$params['dir'] = $settings['theme_dir'] . $dir;
 				$params['url'] = $settings['theme_url'];
 
 				// Fallback if we are not already in the default theme
-				if ($fallback && ($settings['theme_dir'] !== $settings['default_theme_dir']) && !file_exists($settings['theme_dir'] . $dir . $params['basename']))
+				if ($fallback && ($settings['theme_dir'] !== $settings['default_theme_dir']) && !$fileFunc->fileExists($settings['theme_dir'] . $dir . $params['basename']))
 				{
 					// Can't find it in this theme, how about the default?
-					if (file_exists($settings['default_theme_dir'] . $dir . $params['basename']))
+					$filename = false;
+					if ($fileFunc->fileExists($settings['default_theme_dir'] . $dir . $params['basename']))
 					{
 						$filename = $settings['default_theme_url'] . $dir . $params['basename'] . $cache_staler;
 						$params['dir'] = $settings['default_theme_dir'] . $dir;
 						$params['url'] = $settings['default_theme_url'];
-					}
-					else
-					{
-						$filename = false;
 					}
 				}
 				else
@@ -1301,6 +1300,7 @@ function determineAvatar($profile)
 	}
 
 	$avatar_protocol = substr(strtolower($profile['avatar']), 0, 7);
+	$alt = $profile['member_name'] ?? '';
 
 	// Build the gravatar request once.
 	$gravatar = '//www.gravatar.com/avatar/' .
@@ -1317,7 +1317,7 @@ function determineAvatar($profile)
 
 		$avatar = array(
 			'name' => $profile['avatar'],
-			'image' => '<img class="avatar avatarresize" src="' . $avatar_url . '" alt="" />',
+			'image' => '<img class="avatar avatarresize" src="' . $avatar_url . '" alt="' . $alt . '" />',
 			'href' => $avatar_url,
 			'url' => '',
 		);
@@ -1327,7 +1327,7 @@ function determineAvatar($profile)
 	{
 		$avatar = array(
 			'name' => $profile['avatar'],
-			'image' => '<img class="avatar avatarresize" src="' . $profile['avatar'] . '" alt="" />',
+			'image' => '<img class="avatar avatarresize" src="' . $profile['avatar'] . '" alt="' . $alt . '" />',
 			'href' => $profile['avatar'],
 			'url' => $profile['avatar'],
 		);
@@ -1339,7 +1339,7 @@ function determineAvatar($profile)
 		$gravatar_url = $gravatar;
 		$avatar = array(
 			'name' => $profile['avatar'],
-			'image' => '<img class="avatar avatarresize" src="' . $gravatar_url . '" alt="" />',
+			'image' => '<img class="avatar avatarresize" src="' . $gravatar_url . '" alt="' . $alt . '" />',
 			'href' => $gravatar_url,
 			'url' => $gravatar_url,
 		);
@@ -1349,7 +1349,7 @@ function determineAvatar($profile)
 	{
 		$avatar = array(
 			'name' => $profile['avatar'],
-			'image' => '<img class="avatar avatarresize" src="' . $modSettings['avatar_url'] . '/' . $profile['avatar'] . '" alt="" />',
+			'image' => '<img class="avatar avatarresize" src="' . $modSettings['avatar_url'] . '/' . $profile['avatar'] . '" alt="' . $alt . '" />',
 			'href' => $modSettings['avatar_url'] . '/' . $profile['avatar'],
 			'url' => $modSettings['avatar_url'] . '/' . $profile['avatar'],
 		);
@@ -1373,7 +1373,7 @@ function determineAvatar($profile)
 			// TODO: This should be incorporated into the theme.
 			$avatar = array(
 				'name' => '',
-				'image' => '<img class="avatar avatarresize" src="' . $href .'" alt="" />',
+				'image' => '<img class="avatar avatarresize" src="' . $href .'" alt="' . $alt . '" />',
 				'href' => $href,
 				'url' => 'https://',
 			);

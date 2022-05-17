@@ -20,6 +20,7 @@ use BBC\ParserWrapper;
 use ElkArte\Cache\Cache;
 use ElkArte\Controller\ScheduledTasks;
 use ElkArte\EventManager;
+use ElkArte\FileFunctions;
 use ElkArte\Http\Headers;
 use ElkArte\SiteCombiner;
 use ElkArte\Themes\Theme as BaseTheme;
@@ -185,7 +186,8 @@ class Theme extends BaseTheme
 			$this->getTemplates()->loadSubTemplate($layer . '_above', 'ignore');
 		}
 
-		if (isset($settings['use_default_images']) && $settings['use_default_images'] === 'defaults' && isset($settings['default_template']))
+		if (isset($settings['use_default_images'], $settings['default_template'])
+			&& $settings['use_default_images'] === 'defaults')
 		{
 			$settings['theme_url'] = $settings['default_theme_url'];
 			$settings['images_url'] = $settings['default_images_url'];
@@ -193,499 +195,6 @@ class Theme extends BaseTheme
 		}
 
 		$header->sendHeaders();
-	}
-
-	/**
-	 * Show the copyright.
-	 */
-	public function theme_copyright()
-	{
-		global $forum_copyright;
-
-		// Don't display copyright for things like SSI.
-		if (!defined('FORUM_VERSION'))
-		{
-			return;
-		}
-
-		// Put in the version...
-		$forum_copyright = replaceBasicActionUrl(sprintf($forum_copyright, FORUM_VERSION));
-
-		echo '
-					', $forum_copyright;
-	}
-
-	/**
-	 * The template footer
-	 */
-	public function template_footer()
-	{
-		global $context, $settings, $modSettings, $time_start;
-
-		$db = database();
-
-		// Show the load time?  (only makes sense for the footer.)
-		$context['show_load_time'] = !empty($modSettings['timeLoadPageEnable']);
-		$context['load_time'] = round(microtime(true) - $time_start, 3);
-		$context['load_queries'] = $db->num_queries();
-
-		if (isset($settings['use_default_images']) && $settings['use_default_images'] === 'defaults' && isset($settings['default_template']))
-		{
-			$settings['theme_url'] = $settings['actual_theme_url'];
-			$settings['images_url'] = $settings['actual_images_url'];
-			$settings['theme_dir'] = $settings['actual_theme_dir'];
-		}
-
-		foreach ($this->getLayers()->reverseLayers() as $layer)
-		{
-			$this->getTemplates()->loadSubTemplate($layer . '_below', 'ignore');
-		}
-	}
-
-	/**
-	 * Loads the required jQuery files for the system
-	 *
-	 * - Determines the correct script tags to add based on CDN/Local/Auto
-	 */
-	protected function templateJquery()
-	{
-		global $modSettings, $settings;
-
-		// Using a specified version of jquery or what was shipped 3.6.0  / 1.13.1
-		$jquery_version = (!empty($modSettings['jquery_default']) && !empty($modSettings['jquery_version'])) ? $modSettings['jquery_version'] : '3.6.0';
-		$jqueryui_version = (!empty($modSettings['jqueryui_default']) && !empty($modSettings['jqueryui_version'])) ? $modSettings['jqueryui_version'] : '1.13.1';
-
-		switch ($modSettings['jquery_source'])
-		{
-			// Only getting the files from the CDN?
-			case 'cdn':
-				echo '
-	<script src="https://ajax.googleapis.com/ajax/libs/jquery/' . $jquery_version . '/jquery.min.js" id="jquery"></script>',
-				(!empty($modSettings['jquery_include_ui']) ? '
-	<script src="https://ajax.googleapis.com/ajax/libs/jqueryui/' . $jqueryui_version . '/jquery-ui.min.js" id="jqueryui"></script>' : '');
-				break;
-			// Just use the local file
-			case 'local':
-				echo '
-	<script src="', $settings['default_theme_url'], '/scripts/jquery-' . $jquery_version . '.min.js" id="jquery"></script>',
-				(!empty($modSettings['jquery_include_ui']) ? '
-	<script src="' . $settings['default_theme_url'] . '/scripts/jquery-ui-' . $jqueryui_version . '.min.js" id="jqueryui"></script>' : '');
-				break;
-			// CDN with local fallback
-			case 'auto':
-				echo '
-	<script src="https://ajax.googleapis.com/ajax/libs/jquery/' . $jquery_version . '/jquery.min.js" id="jquery"></script>',
-				(!empty($modSettings['jquery_include_ui']) ? '
-	<script src="https://ajax.googleapis.com/ajax/libs/jqueryui/' . $jqueryui_version . '/jquery-ui.min.js" id="jqueryui"></script>' : '');
-				echo '
-	<script>
-		window.jQuery || document.write(\'<script src="', $settings['default_theme_url'], '/scripts/jquery-' . $jquery_version . '.min.js"><\/script>\');',
-				(!empty($modSettings['jquery_include_ui']) ? '
-		window.jQuery.ui || document.write(\'<script src="' . $settings['default_theme_url'] . '/scripts/jquery-ui-' . $jqueryui_version . '.min.js"><\/script>\')' : ''), '
-	</script>';
-				break;
-		}
-	}
-
-	/**
-	 * Loads the JS files that have been requested
-	 *
-	 * - Will combine / minify the files if the option is set.
-	 * - Handles both above and below (deferred) files
-	 *
-	 * @param bool $do_deferred
-	 */
-	protected function templateJavascriptFiles($do_deferred)
-	{
-		global $modSettings, $settings;
-
-		// Combine and minify javascript source files to save bandwidth and requests
-		if (!empty($modSettings['minify_css_js']))
-		{
-			$combiner = new SiteCombiner($settings['default_theme_cache_dir'], $settings['default_theme_cache_url']);
-			$combine_name = $combiner->site_js_combine($this->js_files, $do_deferred);
-
-			call_integration_hook('post_javascript_combine', array(&$combine_name, $combiner));
-
-			if (!empty($combine_name))
-			{
-				echo '
-	<script src="', $combine_name, '" id="jscombined', $do_deferred ? 'bottom' : 'top', '"></script>';
-			}
-			// While we have Javascript files to place in the template
-			foreach ($combiner->getSpares() as $id => $js_file)
-			{
-				if ((!$do_deferred && empty($js_file['options']['defer'])) || ($do_deferred && !empty($js_file['options']['defer'])))
-				{
-					echo '
-	<script src="', $js_file['filename'], '" id="', $id, '"', !empty($js_file['options']['async']) ? ' async="async"' : '', '></script>';
-				}
-			}
-		}
-		// Just give them the full load then
-		else
-		{
-			// While we have Javascript files to place in the template
-			foreach ($this->js_files as $id => $js_file)
-			{
-				if ((!$do_deferred && empty($js_file['options']['defer'])) || ($do_deferred && !empty($js_file['options']['defer'])))
-				{
-					echo '
-	<script src="', $js_file['filename'], '" id="', $id, '"', !empty($js_file['options']['async']) ? ' async="async"' : '', '></script>';
-				}
-			}
-		}
-	}
-
-	/**
-	 * Deletes the hives (aggregated CSS and JS files) previously created.
-	 *
-	 * @param string $type           = 'all' Filters the types of hives (valid values:
-	 *                               * 'all'
-	 *                               * 'css'
-	 *                               * 'js'
-	 *
-	 * @return bool
-	 */
-	public function cleanHives($type = 'all')
-	{
-		global $settings;
-
-		$combiner = new SiteCombiner($settings['default_theme_cache_dir'], $settings['default_theme_cache_url']);
-		$result = true;
-
-		if ($type === 'all' || $type === 'css')
-		{
-			$result &= $combiner->removeCssHives();
-		}
-
-		if ($type === 'all' || $type === 'js')
-		{
-			$result &= $combiner->removeJsHives();
-		}
-
-		return $result;
-	}
-
-	/**
-	 * Output the Javascript files
-	 *
-	 * What it does:
-	 *
-	 * - Tabbing in this function is to make the HTML source look proper
-	 * - Outputs jQuery/jQueryUI from the proper source (local/CDN)
-	 * - If deferred is set function will output all JS (source & inline) set to load at page end
-	 * - If the admin option to combine files is set, will use Combiner.class
-	 *
-	 * @param bool $do_deferred = false
-	 */
-	public function template_javascript($do_deferred = false)
-	{
-		global $modSettings;
-
-		// First up, load jQuery and jQuery UI
-		if (isset($modSettings['jquery_source']) && !$do_deferred)
-		{
-			$this->templateJquery();
-		}
-
-		// Use this hook to work with Javascript files and vars pre output
-		call_integration_hook('pre_javascript_output', array($do_deferred));
-
-		// Load in the JS files
-		if (!empty($this->js_files))
-		{
-			$this->templateJavascriptFiles($do_deferred);
-		}
-
-		// Build the declared Javascript variables script
-		$js_vars = array();
-		if (!empty($this->js_vars) && !$do_deferred)
-		{
-			foreach ($this->js_vars as $var => $value)
-			{
-				$js_vars[] = $var . ' = ' . $value;
-			}
-
-			// Newlines and tabs are here to make it look nice in the page source view, stripped if minimized though
-			$this->js_inline['standard'][] = 'var ' . implode(",\n\t\t\t", $js_vars) . ';';
-		}
-
-		// Inline JavaScript - Actually useful some times!
-		if (!empty($this->js_inline))
-		{
-			// Deferred output waits until we are deferring !
-			if (!empty($this->js_inline['defer']) && $do_deferred)
-			{
-				// Combine them all in to one output
-				$this->js_inline['defer'] = array_map('trim', $this->js_inline['defer']);
-				$inline_defered_code = implode("\n\t\t", $this->js_inline['defer']);
-
-				// Output the deferred script
-				echo '
-	<script>
-		', $inline_defered_code, '
-	</script>';
-			}
-
-			// Standard output, and our javascript vars, get output when we are not on a defered call
-			if (!empty($this->js_inline['standard']) && !$do_deferred)
-			{
-				$this->js_inline['standard'] = array_map('trim', $this->js_inline['standard']);
-
-				// And output the js vars and standard scripts to the page
-				echo '
-	<script>
-		', implode("\n\t\t", $this->js_inline['standard']), '
-	</script>';
-			}
-		}
-	}
-
-	/**
-	 * Output the CSS files
-	 *
-	 * What it does:
-	 *  - If the admin option to combine files is set, will use Combiner.class
-	 */
-	public function template_css()
-	{
-		global $modSettings, $settings;
-
-		// Use this hook to work with CSS files pre output
-		call_integration_hook('pre_css_output');
-
-		// Combine and minify the CSS files to save bandwidth and requests?
-		if (!empty($this->css_files))
-		{
-			if (!empty($modSettings['minify_css_js']))
-			{
-				$combiner = new SiteCombiner($settings['default_theme_cache_dir'], $settings['default_theme_cache_url']);
-				$combine_name = $combiner->site_css_combine($this->css_files);
-
-				call_integration_hook('post_css_combine', array(&$combine_name, $combiner));
-
-				if (!empty($combine_name))
-				{
-					echo '
-	<link rel="stylesheet" href="', $combine_name, '" id="csscombined" />';
-				}
-
-				foreach ($combiner->getSpares() as $id => $file)
-				{
-					echo '
-	<link rel="stylesheet" href="', $file['filename'], '" id="', $id, '" />';
-				}
-			}
-			else
-			{
-				foreach ($this->css_files as $id => $file)
-				{
-					echo '
-	<link rel="stylesheet" href="', $file['filename'], '" id="', $id, '" />';
-				}
-			}
-		}
-	}
-
-	/**
-	 * Output the inline-CSS in a style tag
-	 */
-	public function template_inlinecss()
-	{
-		$style_tag = '';
-
-		// Combine and minify the CSS files to save bandwidth and requests?
-		if (!empty($this->css_rules))
-		{
-			if (!empty($this->css_rules['all']))
-			{
-				$style_tag .= '
-	' . $this->css_rules['all'];
-			}
-
-			if (!empty($this->css_rules['media']))
-			{
-				foreach ($this->css_rules['media'] as $key => $val)
-				{
-					$style_tag .= '
-	@media ' . $key . '{
-		' . $val . '
-	}';
-				}
-			}
-		}
-
-		if (!empty($style_tag))
-		{
-			echo '
-	<style>' . $style_tag . '
-	</style>';
-		}
-	}
-
-	/**
-	 * Calls on template_show_error from index.template.php to show warnings
-	 * and security errors for admins
-	 */
-	public function template_admin_warning_above()
-	{
-		global $context, $txt;
-
-		if (!empty($context['security_controls_files']))
-		{
-			$context['security_controls_files']['type'] = 'serious';
-			template_show_error('security_controls_files');
-		}
-
-		if (!empty($context['security_controls_query']))
-		{
-			$context['security_controls_query']['type'] = 'serious';
-			template_show_error('security_controls_query');
-		}
-
-		if (!empty($context['security_controls_ban']))
-		{
-			$context['security_controls_ban']['type'] = 'serious';
-			template_show_error('security_controls_ban');
-		}
-
-		if (!empty($context['new_version_updates']))
-		{
-			template_show_error('new_version_updates');
-		}
-
-		if (!empty($context['accepted_agreement']))
-		{
-			template_show_error('accepted_agreement');
-		}
-
-		// Any special notices to remind the admin about?
-		if (!empty($context['warning_controls']))
-		{
-			$context['warning_controls']['errors'] = $context['warning_controls'];
-			$context['warning_controls']['title'] = $txt['admin_warning_title'];
-			$context['warning_controls']['type'] = 'warning';
-			template_show_error('warning_controls');
-		}
-	}
-
-	/**
-	 * If the option to pretty output code is on, this loads the JS and CSS
-	 */
-	public function addCodePrettify()
-	{
-		global $modSettings;
-
-		if (!empty($modSettings['enableCodePrettify']))
-		{
-			loadCSSFile('prettify.css');
-			loadJavascriptFile('prettify.min.js', array('defer' => true));
-
-			$this->addInlineJavascript('
-			$(function() {
-				prettyPrint();
-			});', true);
-		}
-	}
-
-	/**
-	 * If video embedding is enabled, this loads the needed JS and vars
-	 */
-	public function autoEmbedVideo()
-	{
-		global $txt, $modSettings;
-
-		if (!empty($modSettings['enableVideoEmbeding']))
-		{
-			$this->addInlineJavascript('
-			var oEmbedtext = ({
-				embed_limit : ' . (!empty($modSettings['video_embed_limit']) ? $modSettings['video_embed_limit'] : 25) . ',
-				preview_image : ' . JavaScriptEscape($txt['preview_image']) . ',
-				ctp_video : ' . JavaScriptEscape($txt['ctp_video']) . ',
-				hide_video : ' . JavaScriptEscape($txt['hide_video']) . ',
-				youtube : ' . JavaScriptEscape($txt['youtube']) . ',
-				vimeo : ' . JavaScriptEscape($txt['vimeo']) . ',
-				dailymotion : ' . JavaScriptEscape($txt['dailymotion']) . ',
-				tiktok : ' . JavaScriptEscape($txt['tiktok']) . ',
-			});
-			$(function() {
-				$().linkifyvideo(oEmbedtext);
-			});', true);
-
-			loadJavascriptFile('elk_jquery_embed.js', array('defer' => true));
-		}
-	}
-
-	/**
-	 * Ensures we kick the mail queue from time to time so that it gets
-	 * checked as often as possible.
-	 */
-	public function doScheduledSendMail()
-	{
-		global $modSettings;
-
-		if (!empty(User::$info->possibly_robot))
-		{
-			// @todo Maybe move this somewhere better?!
-			$controller = new ScheduledTasks(new EventManager());
-
-			// What to do, what to do?!
-			if (empty($modSettings['next_task_time']) || $modSettings['next_task_time'] < time())
-			{
-				$controller->action_autotask();
-			}
-			else
-			{
-				$controller->action_reducemailqueue();
-			}
-		}
-		else
-		{
-			$type = empty($modSettings['next_task_time']) || $modSettings['next_task_time'] < time() ? 'task' : 'mailq';
-			$ts = $type === 'mailq' ? $modSettings['mail_next_send'] : $modSettings['next_task_time'];
-
-			$this->addInlineJavascript('
-		function elkAutoTask()
-		{
-			var tempImage = new Image();
-			tempImage.src = elk_scripturl + "?scheduled=' . $type . ';ts=' . $ts . '";
-		}
-		window.setTimeout("elkAutoTask();", 1);', true);
-		}
-	}
-
-	/**
-	 * Relative times require a few variables be set in the JS
-	 */
-	public function relativeTimes()
-	{
-		global $modSettings, $context, $txt;
-
-		// Relative times?
-		if (!empty($modSettings['todayMod']) && $modSettings['todayMod'] > 2)
-		{
-			$this->addInlineJavascript('
-			var oRttime = ({
-				referenceTime : ' . forum_time() * 1000 . ',
-				now : ' . JavaScriptEscape($txt['rt_now']) . ',
-				minute : ' . JavaScriptEscape($txt['rt_minute']) . ',
-				minutes : ' . JavaScriptEscape($txt['rt_minutes']) . ',
-				hour : ' . JavaScriptEscape($txt['rt_hour']) . ',
-				hours : ' . JavaScriptEscape($txt['rt_hours']) . ',
-				day : ' . JavaScriptEscape($txt['rt_day']) . ',
-				days : ' . JavaScriptEscape($txt['rt_days']) . ',
-				week : ' . JavaScriptEscape($txt['rt_week']) . ',
-				weeks : ' . JavaScriptEscape($txt['rt_weeks']) . ',
-				month : ' . JavaScriptEscape($txt['rt_month']) . ',
-				months : ' . JavaScriptEscape($txt['rt_months']) . ',
-				year : ' . JavaScriptEscape($txt['rt_year']) . ',
-				years : ' . JavaScriptEscape($txt['rt_years']) . ',
-			});
-			updateRelativeTime();', true);
-
-			$context['using_relative_time'] = true;
-		}
 	}
 
 	/**
@@ -710,22 +219,21 @@ class Theme extends BaseTheme
 
 		$context['current_time'] = standardTime(time(), false);
 		$context['current_action'] = $this->_req->getQuery('action', 'trim', '');
-		$context['show_quick_login'] = !empty($modSettings['enableVBStyleLogin']) && $this->user->is_guest;
 		$context['robot_no_index'] = in_array($context['current_action'], $this->no_index_actions);
 
 		$bbc_parser = ParserWrapper::instance();
 
 		// Get some news...
 		$context['news_lines'] = array_filter(explode("\n", str_replace("\r", '', trim(addslashes($modSettings['news'])))));
-		for ($i = 0, $n = count($context['news_lines']); $i < $n; $i++)
+		foreach ($context['news_lines'] as $i => $iValue)
 		{
-			if (trim($context['news_lines'][$i]) === '')
+			if (trim($iValue) === '')
 			{
 				continue;
 			}
 
 			// Clean it up for presentation ;).
-			$context['news_lines'][$i] = $bbc_parser->parseNews(stripslashes(trim($context['news_lines'][$i])));
+			$context['news_lines'][$i] = $bbc_parser->parseNews(stripslashes(trim($iValue)));
 		}
 
 		// If we have some, setup for display
@@ -878,23 +386,7 @@ class Theme extends BaseTheme
 
 		// Localization for the show more quote
 		$this->addCSSRules('
-		input[type=checkbox].quote-show-more:after {
-			content: "' . $txt['post_options'] . '";
-		}');
-	}
-
-	/**
-	 * Adds required support CSS files.
-	 */
-	public function loadSupportCSS()
-	{
-		global $settings;
-
-		// Load a base theme custom CSS file?
-		if (file_exists($settings['theme_dir'] . '/css/custom.css'))
-		{
-			loadCSSFile('custom.css');
-		}
+		input[type=checkbox].quote-show-more:after {content: "' . $txt['post_options'] . '";}');
 	}
 
 	/**
@@ -928,6 +420,9 @@ class Theme extends BaseTheme
 			$context['theme_header_callbacks'] = elk_array_insert($context['theme_header_callbacks'], 'login_bar', array('search_bar'), 'after');
 		}
 
+		// Add in a top section notice callback
+		$context['theme_header_callbacks'][] = 'header_bar';
+
 		$cacheTime = $modSettings['lastActive'] * 60;
 
 		// Update the Moderation menu items with action item totals
@@ -944,16 +439,17 @@ class Theme extends BaseTheme
 		if (!empty($this->user->avatar['href']))
 		{
 			$this->addCSSRules('
-	.i-menu-profile::before, .i-menu-profile.enabled::before {
-		content: "";
-		background-image: url("' . htmlspecialchars_decode($this->user->avatar['href']) . '");
-		background-position: center;
-		filter: unset;
-	}');
+		.i-menu-profile::before, .i-menu-profile.enabled::before {
+			content: "";
+			background-image: url("' . htmlspecialchars_decode($this->user->avatar['href']) . '");
+			background-position: center;
+			filter: unset;
+		}');
 		}
 
 		// All the buttons we can possibly want and then some, try pulling the final list of buttons from cache first.
-		if (($menu_buttons = $cache->get('menu_buttons-' . implode('_', $this->user->groups) . '-' . $this->user->language, $cacheTime)) === null || time() - $cacheTime <= $modSettings['settings_updated'])
+		if ((time() - $cacheTime <= $modSettings['settings_updated'])
+			|| $menu_buttons = $cache->get('menu_buttons-' . implode('_', $this->user->groups) . '-' . $this->user->language, $cacheTime) === null)
 		{
 			// Start things up: this is what we know by default
 			require_once(SUBSDIR . '/Menu.subs.php');
@@ -963,7 +459,7 @@ class Theme extends BaseTheme
 			call_integration_hook('integrate_menu_buttons', array(&$buttons, &$menu_count));
 
 			// Now we put the buttons in the context so the theme can use them.
-			$menu_buttons = array();
+			$menu_buttons = [];
 			foreach ($buttons as $act => $button)
 			{
 				if (!empty($button['show']))
@@ -1089,6 +585,509 @@ class Theme extends BaseTheme
 	}
 
 	/**
+	 * Adds required support CSS files.
+	 */
+	public function loadSupportCSS()
+	{
+		global $settings;
+
+		// Load a base theme custom CSS file?
+		$fileFunc = FileFunctions::instance();
+		if ($fileFunc->fileExists($settings['theme_dir'] . '/css/custom.css'))
+		{
+			loadCSSFile('custom.css');
+		}
+	}
+
+	/**
+	 * Show the copyright.
+	 */
+	public function theme_copyright()
+	{
+		global $forum_copyright;
+
+		// Don't display copyright for things like SSI.
+		if (!defined('FORUM_VERSION'))
+		{
+			return;
+		}
+
+		// Put in the version...
+		$forum_copyright = replaceBasicActionUrl(sprintf($forum_copyright, FORUM_VERSION));
+
+		echo '
+					', $forum_copyright;
+	}
+
+	/**
+	 * The template footer
+	 */
+	public function template_footer()
+	{
+		global $context, $settings, $modSettings, $time_start;
+
+		$db = database();
+
+		// Show the load time?  (only makes sense for the footer.)
+		$context['show_load_time'] = !empty($modSettings['timeLoadPageEnable']);
+		$context['load_time'] = round(microtime(true) - $time_start, 3);
+		$context['load_queries'] = $db->num_queries();
+
+		if (isset($settings['use_default_images'], $settings['default_template'])
+			&& $settings['use_default_images'] === 'defaults')
+		{
+			$settings['theme_url'] = $settings['actual_theme_url'];
+			$settings['images_url'] = $settings['actual_images_url'];
+			$settings['theme_dir'] = $settings['actual_theme_dir'];
+		}
+
+		foreach ($this->getLayers()->reverseLayers() as $layer)
+		{
+			$this->getTemplates()->loadSubTemplate($layer . '_below', 'ignore');
+		}
+	}
+
+	/**
+	 * Output the Javascript, including files, inline and vars
+	 *
+	 * What it does:
+	 *
+	 * - Tabbing in this function is to make the HTML source look proper
+	 * - Outputs in <head> all js variables added with addJavascriptVar()
+	 * - Outputs jQuery/jQueryUI from the proper source (local/CDN)
+	 * - Outputs in <head> all JS files added with loadJavascriptFile, uses defer/async where requested
+	 * - Outputs in <head> all *inline* JS that is not deferred, deferred ones are placed after </body>
+	 * - If the admin option to combine files is set, will use Combiner.class
+	 */
+	public function template_javascript()
+	{
+		global $modSettings;
+
+		// Output any declared Javascript variables first, they tend to be globals
+		$js_vars = [];
+		if (!empty($this->js_vars))
+		{
+			foreach ($this->js_vars as $var => $value)
+			{
+				$js_vars[] = $var . ' = ' . $value;
+			}
+
+			echo '
+	<script id="site_vars">
+		let ', implode(",\n\t\t\t", $js_vars), ';
+	</script>';
+		}
+
+		// Load jQuery and jQuery UI
+		if (isset($modSettings['jquery_source']))
+		{
+			$this->templateJquery();
+		}
+
+		// Use this hook to work with Javascript files and vars pre output
+		call_integration_hook('pre_javascript_output', []);
+
+		// Load all the Javascript files
+		$this->templateJavascriptFiles();
+
+		// Output any <head> level inline JS
+		$this->template_inline_javascript();
+	}
+
+	/**
+	 * Loads the required jQuery files for the system
+	 *
+	 * - Determines the correct script tags to add based on CDN/Local/Auto
+	 */
+	protected function templateJquery()
+	{
+		global $modSettings, $settings;
+
+		// Using a specified version of jquery or what was shipped 3.6.0  / 1.13.1
+		$jquery_version = (!empty($modSettings['jquery_default']) && !empty($modSettings['jquery_version'])) ? $modSettings['jquery_version'] : '3.6.0';
+		$jqueryui_version = (!empty($modSettings['jqueryui_default']) && !empty($modSettings['jqueryui_version'])) ? $modSettings['jqueryui_version'] : '1.13.1';
+		$jquery_cdn = 'https://ajax.googleapis.com/ajax/libs/jquery/' . $jquery_version . '/jquery.min.js';
+		$jqueryui_cdn = 'https://ajax.googleapis.com/ajax/libs/jquery/' . $jqueryui_version . '/jquery-ui.min.js';
+
+		switch ($modSettings['jquery_source'])
+		{
+			// Only getting the files from the CDN?
+			case 'cdn':
+				echo '
+	<script src="' . $jquery_cdn . '" id="jquery"></script>',
+				(!empty($modSettings['jquery_include_ui']) ? '
+	<script src="' . $jqueryui_cdn . '" id="jqueryui"></script>' : '');
+				break;
+			// Just use the local file
+			case 'local':
+				echo '
+	<script src="', $settings['default_theme_url'], '/scripts/jquery-' . $jquery_version . '.min.js" id="jquery"></script>',
+				(!empty($modSettings['jquery_include_ui']) ? '
+	<script src="' . $settings['default_theme_url'] . '/scripts/jquery-ui-' . $jqueryui_version . '.min.js" id="jqueryui"></script>' : '');
+				break;
+			// CDN with local fallback
+			case 'auto':
+				echo '
+	<script src="' . $jquery_cdn . '" id="jquery"></script>',
+				(!empty($modSettings['jquery_include_ui']) ? '
+	<script src="' . $jqueryui_cdn . '" id="jqueryui"></script>' : '');
+				echo '
+	<script>
+		window.jQuery || document.write(\'<script src="', $settings['default_theme_url'], '/scripts/jquery-' . $jquery_version . '.min.js"><\/script>\');',
+				(!empty($modSettings['jquery_include_ui']) ? '
+		window.jQuery.ui || document.write(\'<script src="' . $settings['default_theme_url'] . '/scripts/jquery-ui-' . $jqueryui_version . '.min.js"><\/script>\')' : ''), '
+	</script>';
+				break;
+		}
+	}
+
+	/**
+	 * Loads the JS files that have been set in the controllers
+	 *
+	 * - Will combine / minify the files if the option is set.
+	 * - Handles files that are output in template_html_above <head> section
+	 * - Clears all files from $this->js_files so that it can be called multiple times.  Current
+	 * this is called from here and then again in index.template (for files added by templates)
+	 */
+	protected function templateJavascriptFiles()
+	{
+		global $modSettings, $settings;
+
+		if (empty($this->js_files))
+		{
+			return;
+		}
+
+		// Combine javascript
+		if (!empty($modSettings['combine_css_js']))
+		{
+			// Maybe minify as well
+			$minify = !empty($modSettings['minify_css_js']);
+			$combiner = new SiteCombiner($settings['default_theme_cache_dir'], $settings['default_theme_cache_url'], $minify);
+			$combine_standard_name = $combiner->site_js_combine($this->js_files, false);
+			$combine_deferred_name = $combiner->site_js_combine($this->js_files, true);
+
+			call_integration_hook('post_javascript_combine', array(&$combine_standard_name, &$combine_deferred_name, $combiner));
+
+			if (!empty($combine_standard_name))
+			{
+				echo '
+	<script src="', $combine_standard_name, '" id="jscombined_top"></script>';
+			}
+
+			if (!empty($combine_deferred_name))
+			{
+				echo '
+	<script src="', $combine_deferred_name, '" id="jscombined_deferred" defer="defer"></script>';
+			}
+
+			// While we have any remaining Javascript files, (not local etc)
+			$this->outputJavascriptFiles($combiner->getSpares());
+		}
+		// Just want to minify and not combine
+		elseif (!empty($modSettings['minify_css_js']))
+		{
+			$combiner = new SiteCombiner($settings['default_theme_cache_dir'], $settings['default_theme_cache_url']);
+			$this->js_files = $combiner->site_js_minify($this->js_files);
+
+			// Output all the files
+			$this->outputJavascriptFiles($this->js_files);
+		}
+		// Not combining or minifying, just give them the original files
+		else
+		{
+			$this->outputJavascriptFiles($this->js_files);
+		}
+
+		// Reset, templates can still add _files_, but they will be output in template_html_below.
+		$this->js_files = [];
+	}
+
+	/**
+	 * Outputs script tags to the template with appropriate defer, async or void attributes
+	 *
+	 * Called from template_html_above to output JS defined in the *CONTROLLERS*
+	 * Called from template_html_below to output JS defined in the *TEMPLATES*.
+	 *
+	 * @param array $files
+	 * @return void
+	 */
+	public function outputJavascriptFiles($files)
+	{
+		// While we have Javascript files to place in the template
+		foreach ($files as $id => $js_file)
+		{
+			$async = !empty($js_file['options']['async']) ? ' async="async"' : '';
+			$defer = !empty($js_file['options']['defer']) ? ' defer="defer"' : '';
+
+			echo '
+	<script src="', $js_file['filename'], '" id="', $id, '"', $async, $defer, '></script>';
+		}
+	}
+
+	/**
+	 * Inline JavaScript - Actually useful sometimes!
+	 *
+	 * @param bool $do_deferred if true outputs the inline JS that was marked as deferred.
+	 * @return void
+	 */
+	public function template_inline_javascript($do_deferred = false, $tabs = 3)
+	{
+		if (empty($this->js_inline))
+		{
+			return;
+		}
+
+		// Deferred output waits until we are deferring !
+		if (!empty($this->js_inline['defer']) && $do_deferred)
+		{
+			$output = $this->formatInlineJS($this->js_inline['defer'], $tabs);
+		}
+
+		// Standard header output
+		if (!empty($this->js_inline['standard']) && !$do_deferred)
+		{
+			$output = $this->formatInlineJS($this->js_inline['standard'], $tabs);
+		}
+
+		// Output the script
+		if (!empty($output))
+		{
+			echo '
+	<script id="site_inline', $do_deferred ? '_deferred"' : '"', '>
+		', implode("\n" . str_repeat("\t", $tabs), $output), '
+	</script>';
+		}
+	}
+
+	/**
+	 * Function to indent inline JS with consistent number of tabs
+	 * to allow the source code to flow normally and let the HTML
+	 * output (for those who peek) look well constructed.  Fluff really.
+	 *
+	 * @param array $files
+	 * @param int $tabs
+	 *
+	 * @return array
+	 */
+	private function formatInlineJS($files, $tabs = 3)
+	{
+		foreach ($files as $i => $js_block)
+		{
+			// Lines in this block
+			$lines = explode("\n", $js_block);
+
+			// One liner, just indent
+			if (count($lines) === 1)
+			{
+				$files[$i] = str_repeat("\t", $tabs) . ltrim($js_block);
+				continue;
+			}
+
+			// Current number of leading tabs due to source indenting
+			$num = strspn($lines[1], "\t");
+			$existing = str_repeat("\t", $num);
+			$new = str_repeat("\t", $tabs);
+
+			// Replace existing leading tabs with new count, allowing for excess of that
+			foreach ($lines as $j => $line)
+			{
+				$pos = strpos($line, $existing);
+				if ($pos === 0)
+				{
+					$lines[$j] = substr_replace($line, $new, 0, $num);
+				}
+				else
+				{
+					$lines[$j] = $new . ltrim($line);
+				}
+			}
+
+			// Done
+			$files[$i] = implode("\n", $lines);
+		}
+
+		return $files;
+	}
+
+	/**
+	 * Deletes the hives (aggregated CSS and JS files) previously created.
+	 *
+	 * @param string $type           = 'all' Filters the types of hives (valid values:
+	 *                               * 'all'
+	 *                               * 'css'
+	 *                               * 'js'
+	 *
+	 * @return bool
+	 */
+	public function cleanHives($type = 'all')
+	{
+		global $settings;
+
+		$combiner = new SiteCombiner($settings['default_theme_cache_dir'], $settings['default_theme_cache_url']);
+		$result = true;
+
+		if ($type === 'all' || $type === 'css')
+		{
+			$result &= $combiner->removeCssHives();
+		}
+
+		if ($type === 'all' || $type === 'js')
+		{
+			$result &= $combiner->removeJsHives();
+		}
+
+		return $result;
+	}
+
+	/**
+	 * Output the CSS files
+	 *
+	 * What it does:
+	 *  - If the admin option to combine files is set, will use Combiner.class
+	 */
+	public function template_css()
+	{
+		global $modSettings, $settings;
+
+		// Use this hook to work with CSS files pre output
+		call_integration_hook('pre_css_output');
+
+		if (empty($this->css_files))
+		{
+			return;
+		}
+
+		// Combine the CSS files?
+		if (!empty($modSettings['combine_css_js']))
+		{
+			// Minify?
+			$minify = !empty($modSettings['minify_css_js']);
+			$combiner = new SiteCombiner($settings['default_theme_cache_dir'], $settings['default_theme_cache_url'], $minify);
+			$combine_name = $combiner->site_css_combine($this->css_files);
+
+			call_integration_hook('post_css_combine', array(&$combine_name, $combiner));
+
+			if (!empty($combine_name))
+			{
+				echo '
+	<link rel="stylesheet" href="', $combine_name, '" id="csscombined" />';
+			}
+
+			foreach ($combiner->getSpares() as $id => $file)
+			{
+				echo '
+	<link rel="stylesheet" href="', $file['filename'], '" id="', $id, '" />';
+			}
+		}
+		// Minify and not combine
+		elseif (!empty($modSettings['minify_css_js']))
+		{
+			$combiner = new SiteCombiner($settings['default_theme_cache_dir'], $settings['default_theme_cache_url']);
+			$this->css_files = $combiner->site_css_minify($this->css_files);
+
+			// Output all the files
+			foreach ($this->css_files as $id => $file)
+			{
+				echo '
+	<link rel="stylesheet" href="', $file['filename'], '" id="', $id, '" />';
+			}
+		}
+		// Just the original files
+		else
+		{
+			foreach ($this->css_files as $id => $file)
+			{
+				echo '
+	<link rel="stylesheet" href="', $file['filename'], '" id="', $id, '" />';
+			}
+		}
+	}
+
+	/**
+	 * Output the inline-CSS in a style tag
+	 */
+	public function template_inlinecss()
+	{
+		$style_tag = '';
+
+		// Combine and minify the CSS files to save bandwidth and requests?
+		if (!empty($this->css_rules))
+		{
+			if (!empty($this->css_rules['all']))
+			{
+				$style_tag .= '
+	' . $this->css_rules['all'];
+			}
+
+			if (!empty($this->css_rules['media']))
+			{
+				foreach ($this->css_rules['media'] as $key => $val)
+				{
+					$style_tag .= '
+	@media ' . $key . '{
+		' . $val . '
+	}';
+				}
+			}
+		}
+
+		if (!empty($style_tag))
+		{
+			echo '
+	<style>
+		' . trim($style_tag) . '
+	</style>';
+		}
+	}
+
+	/**
+	 * Calls on template_show_error from index.template.php to show warnings
+	 * and security errors for admins
+	 */
+	public function template_admin_warning_above()
+	{
+		global $context, $txt;
+
+		if (!empty($context['security_controls_files']))
+		{
+			$context['security_controls_files']['type'] = 'serious';
+			template_show_error('security_controls_files');
+		}
+
+		if (!empty($context['security_controls_query']))
+		{
+			$context['security_controls_query']['type'] = 'serious';
+			template_show_error('security_controls_query');
+		}
+
+		if (!empty($context['security_controls_ban']))
+		{
+			$context['security_controls_ban']['type'] = 'serious';
+			template_show_error('security_controls_ban');
+		}
+
+		if (!empty($context['new_version_updates']))
+		{
+			template_show_error('new_version_updates');
+		}
+
+		if (!empty($context['accepted_agreement']))
+		{
+			template_show_error('accepted_agreement');
+		}
+
+		// Any special notices to remind the admin about?
+		if (!empty($context['warning_controls']))
+		{
+			$context['warning_controls']['errors'] = $context['warning_controls'];
+			$context['warning_controls']['title'] = $txt['admin_warning_title'];
+			$context['warning_controls']['type'] = 'warning';
+			template_show_error('warning_controls');
+		}
+	}
+
+	/**
 	 * Load the base JS that gives Elkarte a nice rack
 	 */
 	public function loadThemeJavascript()
@@ -1096,25 +1095,26 @@ class Theme extends BaseTheme
 		global $settings, $context, $modSettings, $scripturl, $txt, $options;
 
 		// Queue our Javascript
-		loadJavascriptFile(array('elk_jquery_plugins.js', 'script.js', 'script_elk.js', 'theme.js'));
+		loadJavascriptFile(array('script.js', 'script_elk.js'));
+		loadJavascriptFile(array('elk_jquery_plugins.js', 'theme.js'), ['defer' => true]);
 
 		// Default JS variables for use in every theme
 		$this->addJavascriptVar(array(
-				'elk_theme_url' => JavaScriptEscape($settings['theme_url']),
-				'elk_default_theme_url' => JavaScriptEscape($settings['default_theme_url']),
-				'elk_images_url' => JavaScriptEscape($settings['images_url']),
-				'elk_smiley_url' => JavaScriptEscape($modSettings['smileys_url']),
-				'elk_scripturl' => '\'' . $scripturl . '\'',
-				'elk_iso_case_folding' => detectServer()->is('iso_case_folding') ? 'true' : 'false',
-				'elk_charset' => '"UTF-8"',
-				'elk_session_id' => JavaScriptEscape($context['session_id']),
-				'elk_session_var' => JavaScriptEscape($context['session_var']),
-				'elk_member_id' => $context['user']['id'],
-				'ajax_notification_text' => JavaScriptEscape($txt['ajax_in_progress']),
-				'ajax_notification_cancel_text' => JavaScriptEscape($txt['modify_cancel']),
-				'help_popup_heading_text' => JavaScriptEscape($txt['help_popup']),
-				'use_click_menu' => !empty($options['use_click_menu']) ? 'true' : 'false',
-				'todayMod' => !empty($modSettings['todayMod']) ? (int) $modSettings['todayMod'] : 0)
+			'elk_theme_url' => JavaScriptEscape($settings['theme_url']),
+			'elk_default_theme_url' => JavaScriptEscape($settings['default_theme_url']),
+			'elk_images_url' => JavaScriptEscape($settings['images_url']),
+			'elk_smiley_url' => JavaScriptEscape($modSettings['smileys_url']),
+			'elk_scripturl' => '\'' . $scripturl . '\'',
+			'elk_iso_case_folding' => detectServer()->is('iso_case_folding') ? 'true' : 'false',
+			'elk_charset' => '"UTF-8"',
+			'elk_session_id' => JavaScriptEscape($context['session_id']),
+			'elk_session_var' => JavaScriptEscape($context['session_var']),
+			'elk_member_id' => $context['user']['id'],
+			'ajax_notification_text' => JavaScriptEscape($txt['ajax_in_progress']),
+			'ajax_notification_cancel_text' => JavaScriptEscape($txt['modify_cancel']),
+			'help_popup_heading_text' => JavaScriptEscape($txt['help_popup']),
+			'use_click_menu' => !empty($options['use_click_menu']) ? 'true' : 'false',
+			'todayMod' => !empty($modSettings['todayMod']) ? (int) $modSettings['todayMod'] : 0)
 		);
 
 		// Auto video embedding enabled, then load the needed JS
@@ -1127,9 +1127,151 @@ class Theme extends BaseTheme
 		$this->relativeTimes();
 
 		// If we think we have mail to send, let's offer up some possibilities... robots get pain (Now with scheduled task support!)
-		if ((!empty($modSettings['mail_next_send']) && $modSettings['mail_next_send'] < time() && empty($modSettings['mail_queue_use_cron'])) || empty($modSettings['next_task_time']) || $modSettings['next_task_time'] < time())
+		if (empty($modSettings['next_task_time']) || $modSettings['next_task_time'] < time() ||
+			(!empty($modSettings['mail_next_send']) && $modSettings['mail_next_send'] < time() && empty($modSettings['mail_queue_use_cron'])))
 		{
 			$this->doScheduledSendMail();
+		}
+	}
+
+	/**
+	 * If video embedding is enabled, this loads the needed JS and vars
+	 */
+	public function autoEmbedVideo()
+	{
+		global $txt, $modSettings;
+
+		if (!empty($modSettings['enableVideoEmbeding']))
+		{
+			loadJavascriptFile('elk_jquery_embed.js', array('defer' => true));
+
+			$this->addInlineJavascript('
+				const oEmbedtext = ({
+					embed_limit : ' . (!empty($modSettings['video_embed_limit']) ? $modSettings['video_embed_limit'] : 25) . ',
+					preview_image : ' . JavaScriptEscape($txt['preview_image']) . ',
+					ctp_video : ' . JavaScriptEscape($txt['ctp_video']) . ',
+					hide_video : ' . JavaScriptEscape($txt['hide_video']) . ',
+					youtube : ' . JavaScriptEscape($txt['youtube']) . ',
+					vimeo : ' . JavaScriptEscape($txt['vimeo']) . ',
+					dailymotion : ' . JavaScriptEscape($txt['dailymotion']) . ',
+					tiktok : ' . JavaScriptEscape($txt['tiktok']) . ',
+					twitter : ' . JavaScriptEscape($txt['twitter']) . ',
+					facebook : ' . JavaScriptEscape($txt['facebook']) . ',
+					instagram : ' . JavaScriptEscape($txt['instagram']) . ',
+				});
+				document.addEventListener("DOMContentLoaded", () => {$().linkifyvideo(oEmbedtext);});', true);
+		}
+	}
+
+	/**
+	 * If the option to pretty output code is on, this loads the JS and CSS
+	 */
+	public function addCodePrettify()
+	{
+		global $modSettings;
+
+		if (!empty($modSettings['enableCodePrettify']))
+		{
+			$this->loadVariant('prettify');
+			loadJavascriptFile('prettify.min.js', array('defer' => true));
+
+			$this->addInlineJavascript('
+				document.addEventListener("DOMContentLoaded", () => {prettyPrint();});', true);
+		}
+	}
+
+	/**
+	 * Load a variant css file if found.  Fallback if not and it exists in this
+	 * theme's directory
+	 *
+	 * @param string $cssFile
+	 * @param boolean $fallBack
+	 */
+	public function loadVariant($cssFile, $fallBack = true)
+	{
+		global $settings, $context;
+
+		$fileFunc = FileFunctions::instance();
+		if ($fileFunc->fileExists($settings['theme_dir'] . '/css/' . $context['theme_variant'] . '/' . $cssFile . $context['theme_variant'] . '.css'))
+		{
+			loadCSSFile($context['theme_variant'] . '/' . $cssFile . $context['theme_variant'] . '.css');
+			return;
+		}
+
+		if ($fallBack && $fileFunc->fileExists($settings['theme_dir'] . '/css/' . $cssFile . '.css'))
+		{
+			loadCSSFile($cssFile . '.css');
+		}
+	}
+
+	/**
+	 * Relative times require a few variables be set in the JS
+	 */
+	public function relativeTimes()
+	{
+		global $modSettings, $context, $txt;
+
+		// Relative times?
+		if (!empty($modSettings['todayMod']) && $modSettings['todayMod'] > 2)
+		{
+			$this->addInlineJavascript('
+				const oRttime = ({
+					referenceTime : ' . forum_time() * 1000 . ',
+					now : ' . JavaScriptEscape($txt['rt_now']) . ',
+					minute : ' . JavaScriptEscape($txt['rt_minute']) . ',
+					minutes : ' . JavaScriptEscape($txt['rt_minutes']) . ',
+					hour : ' . JavaScriptEscape($txt['rt_hour']) . ',
+					hours : ' . JavaScriptEscape($txt['rt_hours']) . ',
+					day : ' . JavaScriptEscape($txt['rt_day']) . ',
+					days : ' . JavaScriptEscape($txt['rt_days']) . ',
+					week : ' . JavaScriptEscape($txt['rt_week']) . ',
+					weeks : ' . JavaScriptEscape($txt['rt_weeks']) . ',
+					month : ' . JavaScriptEscape($txt['rt_month']) . ',
+					months : ' . JavaScriptEscape($txt['rt_months']) . ',
+					year : ' . JavaScriptEscape($txt['rt_year']) . ',
+					years : ' . JavaScriptEscape($txt['rt_years']) . ',
+				});
+				document.addEventListener("DOMContentLoaded", () => {updateRelativeTime();});', true);
+
+			$context['using_relative_time'] = true;
+		}
+	}
+
+	/**
+	 * Ensures we kick the mail queue from time to time so that it gets
+	 * checked as often as possible.
+	 */
+	public function doScheduledSendMail()
+	{
+		global $modSettings;
+
+		if (!empty(User::$info->possibly_robot))
+		{
+			// @todo Maybe move this somewhere better?!
+			$controller = new ScheduledTasks(new EventManager());
+
+			// What to do, what to do?!
+			if (empty($modSettings['next_task_time']) || $modSettings['next_task_time'] < time())
+			{
+				$controller->action_autotask();
+			}
+			else
+			{
+				$controller->action_reducemailqueue();
+			}
+		}
+		else
+		{
+			$type = empty($modSettings['next_task_time']) || $modSettings['next_task_time'] < time() ? 'task' : 'mailq';
+			$ts = $type === 'mailq' ? $modSettings['mail_next_send'] : $modSettings['next_task_time'];
+
+			$this->addInlineJavascript('
+		function elkAutoTask()
+		{
+			let tempImage = new Image();
+			tempImage.src = elk_scripturl + "?scheduled=' . $type . ';ts=' . $ts . '";
+		}
+		window.setTimeout("elkAutoTask();", 1);', true);
 		}
 	}
 
@@ -1230,16 +1372,10 @@ class Theme extends BaseTheme
 			loadCSSFile($context['theme_variant'] . '/index' . $context['theme_variant'] . '.css');
 
 			// Variant icon definitions?
-			if (file_exists($settings['theme_dir'] . '/css/' . $context['theme_variant'] . '/icons_svg' . $context['theme_variant'] . '.css'))
-			{
-				loadCSSFile($context['theme_variant'] . '/icons_svg' . $context['theme_variant'] . '.css');
-			}
+			$this->loadVariant('icons_svg', false);
 
 			// Load a theme variant custom CSS
-			if (file_exists($settings['theme_dir'] . '/css/' . $context['theme_variant'] . '/custom' . $context['theme_variant'] . '.css'))
-			{
-				loadCSSFile($context['theme_variant'] . '/custom' . $context['theme_variant'] . '.css');
-			}
+			$this->loadVariant('custom', false);
 		}
 	}
 }

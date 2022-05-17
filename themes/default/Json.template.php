@@ -19,3 +19,14 @@ function template_send_json()
 
 	echo json_encode($context['json_data']);
 }
+
+/**
+ * Just a simple template for now to output json
+ * used to output the json formatted data for ajax calls
+ */
+function template_send_json_raw()
+{
+	global $context;
+
+	echo $context['json_data'];
+}

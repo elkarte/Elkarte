@@ -50,8 +50,11 @@ function template_recent()
 	if (!empty($context['using_relative_time']))
 	{
 		echo '
-		<script>
-			$(\'.topic_latest\').addClass(\'relative\');
+		<script type="module">
+			const topics = document.querySelectorAll(".topic_latest");
+			for (const topic of topics) {
+				topic.classList.add("relative");
+			}
 		</script>';
 	}
 }
@@ -231,8 +234,11 @@ function template_unread_below()
 		if (!empty($context['using_relative_time']))
 		{
 			echo '
-			<script>
-				$(\'.topic_latest\').addClass(\'relative\');
+			<script type="module">
+				const topics = document.querySelectorAll(".topic_latest");
+				for (const topic of topics) {
+					topic.classList.add("relative");
+				}
 			</script>';
 		}
 

@@ -101,10 +101,10 @@
    i-chevron-up/down, not used with a filter as we need dark stroke and light fill so it can be used
    on both light and dark backgrounds */
 .i-chevron-up::before {
-	content: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' stroke='black' stroke-width='1px' fill='white' viewBox='0 0 60 60'%3E%3Cpath d='M46.452 37.356c-1.308 1.338-3.13 1.443-4.728 0L30 26.116l-11.724 11.24c-1.6 1.443-3.423 1.338-4.722 0-1.308-1.335-1.224-3.59 0-4.845 1.218-1.25 14.086-13.503 14.086-13.503C28.29 18.337 29.143 18 30 18s1.71.336 2.367 1.005c0 0 12.86 12.252 14.085 13.506 1.227 1.257 1.308 3.51 0 4.848z'/%3E%3C/svg%3E");
+	content: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' stroke='grey' stroke-width='1px' fill='white' viewBox='0 0 36 36'%3E%3Cpath d='m33.81 26.739-3.335 3.315a1.274 1.274 0 0 1-1.808 0L18 19.387 7.333 30.054a1.274 1.274 0 0 1-1.808 0L2.19 26.739a1.298 1.298 0 0 1 0-1.828l14.906-14.886a1.274 1.274 0 0 1 1.808 0L33.81 24.911a1.298 1.298 0 0 1 0 1.828z'/%3E%3C/svg%3E");
 }
 .i-chevron-down::before {
-	content: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' stroke='black' stroke-width='1px' fill='white' viewBox='0 0 60 60'%3E%3Cpath d='M13.548 22.644c1.308-1.338 3.13-1.443 4.728 0L30 33.884l11.724-11.24c1.6-1.443 3.423-1.338 4.722 0 1.308 1.335 1.224 3.59 0 4.845-1.218 1.25-14.086 13.503-14.086 13.503C31.71 41.663 30.857 42 30 42s-1.71-.336-2.367-1.005c0 0-12.86-12.252-14.085-13.506-1.227-1.257-1.308-3.51 0-4.848z'/%3E%3C/svg%3E");
+	content: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' stroke='grey' stroke-width='1px' fill='white' viewBox='0 0 36 36'%3E%3Cpath d='M33.81 16.232 18.904 31.118a1.274 1.274 0 0 1-1.808 0L2.19 16.232a1.298 1.298 0 0 1 0-1.828l3.335-3.315a1.274 1.274 0 0 1 1.808 0L18 21.756l10.667-10.667a1.274 1.274 0 0 1 1.808 0l3.335 3.315a1.298 1.298 0 0 1 0 1.828z'/%3E%3C/svg%3E");
 }
 .i-chevron-circle-right::before {
 	content: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='black' viewBox='0 0 32 32'%3E%3Cpath d='M16 0C7.163 0 0 7.163 0 16s7.163 16 16 16 16-7.163 16-16S24.837 0 16 0zm0 29C8.82 29 3 23.18 3 16S8.82 3 16 3s13 5.82 13 13-5.82 13-13 13z'/%3E%3Cpath d='M11.086 22.086l2.83 2.83L22.828 16l-8.915-8.913-2.828 2.828L17.173 16z'/%3E%3C/svg%3E");
@@ -575,11 +575,11 @@
 }
 
 /* The expand / collapse triangles, done as simple geometry */
-legend::before {
-	background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='black' fill-opacity='.7' viewBox='0 0 32 32'%3E%3Cpolygon points='0 16, 32 16, 16 32'/%3E%3C/svg%3E");
+legend::before, .i-caret-down::before {
+	content: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='black' fill-opacity='.7' viewBox='0 0 32 32'%3E%3Cpolygon points='0 16, 32 16, 16 32'/%3E%3C/svg%3E");
 }
-.collapsed legend::before {
-	background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='black' fill-opacity='.7' viewBox='0 0 32 32'%3E%3Cpolygon points='16 0, 16 32, 32 16'/%3E%3C/svg%3E");
+.collapsed legend::before, .i-caret-up::before {
+	content: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='black' fill-opacity='.7' viewBox='0 0 32 32'%3E%3Cpolygon points='16 0, 16 32, 32 16'/%3E%3C/svg%3E");
 }
 
 /* ---------------
@@ -595,7 +595,7 @@ legend::before {
    here to reduce duplication. Use the variant file to overwrite these colors if
    required for the theme
 
-   There are a few classes for chaining, .i-reset will remove color filters, others are
+   There are a few classes for chaining, .i-reset will remove color filters, others are colorize-white
    colorize-yellow, colorize-red, colorize-green, colorize-blue, colorize-violet, colorize-orange */
 
 /* Top Menu Icons */
@@ -687,14 +687,14 @@ legend::before {
 }
 
 .i-warning-moderate, .i-post_moderation_moderate,
-.i-warn::before, .i-exclamation::before, .colorize-yellow {
+.i-warn::before, .i-exclamation::before {
 	filter: invert(67%) sepia(60%) saturate(3280%) hue-rotate(358deg) brightness(101%) contrast(107%);
 	--hexcode: #FF9800;
 }
 
 .i-warning-mute, .i-post_moderation_deny, .i-fail,
 .i-alert::before, .i-warn::before, .i-exclamation::before,
-.i-dot-red, .colorize-red,
+.i-dot-red,
 .i-mark_unread::before {
 	filter: invert(30%) sepia(65%) saturate(2235%) hue-rotate(342deg) brightness(102%) contrast(91%);
 	--hexcode: #F44336;
@@ -763,14 +763,13 @@ legend::before {
 .sticky_row .topic_info::before, .sticky_row .topic_details::before,
 .locked_row.sticky_row .topic_info .topic_name::before,
 .i-oval::before, .i-puff::before, .i-tailspin::before, .i-concentric::before,
-.i-chase::before, .i-balls::before, .i-mystic::before,
-.colorize-blue {
+.i-chase::before, .i-balls::before, .i-mystic::before {
 	filter: invert(32%) sepia(97%) saturate(2124%) hue-rotate(196deg) brightness(100%) contrast(111%);
 	--hexcode: #0080FF;
 }
 
 .i-oval::before, .i-puff::before, .i-tailspin::before, .i-concentric::before,
-.i-chase::before, .i-balls::before, .i-mystic::before, .colorize-green {
+.i-chase::before, .i-balls::before, .i-mystic::before {
 	filter: invert(36%) sepia(11%) saturate(2146%) hue-rotate(63deg) brightness(95%) contrast(85%);
 	--hexcode: #3D6E32;
 }
@@ -806,7 +805,7 @@ legend::before {
 }
 
 /* Was transgender-alt */
-.i-cust_gender_5::before, .i-transgendered::before, .colorize-violet, .i-paint::before {
+.i-cust_gender_5::before, .i-transgendered::before, .i-paint::before {
 	filter: invert(22%) sepia(8%) saturate(3396%) hue-rotate(233deg) brightness(102%) contrast(94%);
 	--hexcode: #523366;
 }
@@ -817,7 +816,7 @@ legend::before {
 	--hexcode: #B3FF80;
 }
 
-.i-rss::before, .colorize-orange {
+.i-rss::before {
 	filter: invert(43%) sepia(53%) saturate(2838%) hue-rotate(0deg) brightness(101%) contrast(107%);
 	--hexcode: #FF6600;
 }
@@ -867,4 +866,40 @@ legend::before {
 /* Reset, if you don't like the color of an icon, chain this to get the default black one */
 .i-reset::before {
 	filter: unset;
+}
+
+/* colorize to one of the basics, here at the end to allow proper chaining override */
+.colorize-white::before {
+	filter: invert(100%) sepia(2%) saturate(526%) hue-rotate(268deg) brightness(120%) contrast(99%);
+	--hexcode: #FEFEFE;
+}
+
+.colorize-yellow::before {
+	filter: invert(67%) sepia(60%) saturate(3280%) hue-rotate(358deg) brightness(101%) contrast(107%);
+	--hexcode: #FF9800;
+}
+
+.colorize-red::before {
+	filter: invert(30%) sepia(65%) saturate(2235%) hue-rotate(342deg) brightness(102%) contrast(91%);
+	--hexcode: #F44336;
+}
+
+.colorize-blue::before {
+	filter: invert(32%) sepia(97%) saturate(2124%) hue-rotate(196deg) brightness(100%) contrast(111%);
+	--hexcode: #0080FF;
+}
+
+.colorize-orange::before {
+	filter: invert(43%) sepia(53%) saturate(2838%) hue-rotate(0deg) brightness(101%) contrast(107%);
+	--hexcode: #FF6600;
+}
+
+.colorize-violet::before {
+	filter: invert(22%) sepia(8%) saturate(3396%) hue-rotate(233deg) brightness(102%) contrast(94%);
+	--hexcode: #523366;
+}
+
+.colorize-green::before {
+	filter: invert(36%) sepia(11%) saturate(2146%) hue-rotate(63deg) brightness(95%) contrast(85%);
+	--hexcode: #3D6E32;
 }

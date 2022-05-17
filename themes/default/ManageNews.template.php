@@ -211,7 +211,7 @@ function template_email_members_compose()
 	// Any errors to speak of?
 	echo '
 			<div class="content">
-				<div id="post_error" class="', (empty($context['error_type']) || $context['error_type'] != 'serious' ? 'warningbox' : 'errorbox'), empty($context['post_error']['messages']) ? ' hide"' : '"', '>
+				<div id="post_error" class="', (empty($context['error_type']) || $context['error_type'] !== 'serious' ? 'warningbox' : 'errorbox'), empty($context['post_error']['messages']) ? ' hide"' : '"', '>
 					<dl>
 						<dt>
 							<strong id="error_serious">', $txt['error_while_submitting'], '</strong>

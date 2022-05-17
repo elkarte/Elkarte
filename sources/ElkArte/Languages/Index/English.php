@@ -853,7 +853,7 @@ $txt['send_email_disclosed'] = 'Note this will be visible to the recipient.';
 $txt['send_email_subject'] = 'Email Subject';
 
 $txt['ignoring_user'] = 'You are ignoring this user.';
-$txt['show_ignore_user_post'] = '<em>[Show me the post.]</em>';
+$txt['show_ignore_user_post'] = '<em>Show me the post.</em>';
 
 $txt['spider'] = 'Spider';
 $txt['spiders'] = 'Spiders';
@@ -904,12 +904,15 @@ $txt['debug_script_cpu_load'] = 'Script CPU Time (user/system): ';
 
 // Video embedding
 $txt['preview_image'] = 'Video Preview Image';
-$txt['ctp_video'] = 'Click to play video, double click to load video';
+$txt['ctp_video'] = 'Click to play video';
 $txt['hide_video'] = 'Show/Hide video';
-$txt['youtube'] = 'YouTube video:';
-$txt['vimeo'] = 'Vimeo video:';
-$txt['dailymotion'] = 'Dailymotion video:';
-$txt['tiktok'] = 'TikTok video:';
+$txt['youtube'] = 'YouTube:';
+$txt['vimeo'] = 'Vimeo:';
+$txt['dailymotion'] = 'Dailymotion:';
+$txt['tiktok'] = 'TikTok:';
+$txt['twitter'] = 'Twitter:';
+$txt['facebook'] = 'Facebook:';
+$txt['instagram'] = 'Instagram:';
 
 // Spoiler BBC
 $txt['spoiler'] = 'Spoiler (click to show/hide)';

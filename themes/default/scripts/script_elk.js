@@ -336,6 +336,9 @@ function markunreadButton(btn)
  */
 var relative_time_refresh = 0;
 
+/**
+ * @param {object} oRttime holds the text strings to use in the html created
+ */
 function updateRelativeTime()
 {
 	// In any other case no more than one hour
@@ -343,7 +346,7 @@ function updateRelativeTime()
 
 	$('time').each(function ()
 	{
-		var oRelativeTime = new relativeTime($(this).data('timestamp') * 1000, oRttime.referenceTime),
+		let oRelativeTime = new relativeTime($(this).data('timestamp') * 1000, oRttime.referenceTime),
 			time_text = '';
 
 		if (oRelativeTime.seconds())

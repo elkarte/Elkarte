@@ -349,7 +349,7 @@ function onDocSent(XMLDoc)
 
 				if (ignoring)
 				{
-					newPostsHTML += '<div id="msg_' + newPosts[i].getAttribute("id") + '_ignored_prompt">' + txt_ignoring_user + '<a href="#" id="msg_' + newPosts[i].getAttribute("id") + '_ignored_link" class="hide">' + show_ignore_user_post + '</a></div>';
+					newPostsHTML += '<div id="msg_' + newPosts[i].getAttribute("id") + '_ignored_prompt">' + txt_ignoring_user + '<a href="#" id="msg_' + newPosts[i].getAttribute("id") + '_ignored_link" class="hide linkbutton">' + show_ignore_user_post + '</a></div>';
 				}
 
 				newPostsHTML += '<div class="messageContent" id="msg_' + newPosts[i].getAttribute("id") + '_body">' + newPosts[i].getElementsByTagName("message")[0].firstChild.nodeValue + '</div></div></div>';

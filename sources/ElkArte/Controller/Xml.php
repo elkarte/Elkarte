@@ -57,6 +57,7 @@ class Xml extends AbstractController
 			'smileyorder' => array('controller' => $this, 'function' => 'action_smileyorder', 'permission' => 'admin_forum'),
 			'boardorder' => array('controller' => $this, 'function' => 'action_boardorder', 'permission' => 'manage_boards'),
 			'parserorder' => array('controller' => $this, 'function' => 'action_parserorder', 'permission' => 'admin_forum'),
+			'videoembed' => array('controller' => $this, 'function' => 'action_videoembed'),
 		);
 
 		// Easy adding of xml sub actions with integrate_xmlhttp
@@ -896,5 +897,39 @@ class Xml extends AbstractController
 				'children' => $errors,
 			),
 		);
+	}
+
+	/**
+	 * An experimental function to fetch a videos embed code when JS will throw CORS errors
+	 */
+	public function action_videoembed()
+	{
+		global $context;
+
+		theme()->getLayers()->removeAll();
+		theme()->getTemplates()->load('Json');
+
+		$context['sub_template'] = 'send_json_raw';
+		$context['json_data'] = json_encode([]);
+
+		$videoID = $this->_req->getQuery('videoid', 'trim');
+		$site = $this->_req->getQuery('site', 'trim');
+
+		if (checkSession('get', '', false))
+		{
+			$context['json_data'] = json_encode(['session' => 'failed']);
+			$videoID = 0;
+		}
+
+		// Right now only one site, but a fetch based on site is the idea
+		if (!empty($videoID) && !empty($site))
+		{
+			require_once(SUBSDIR . '/Package.subs.php');
+			$data = fetch_web_data('https://api.twitter.com/1.1/statuses/oembed.json?id=' . $videoID);
+			if ($data !== false)
+			{
+				$context['json_data'] = trim($data);
+			}
+		}
 	}
 }

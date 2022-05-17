@@ -116,7 +116,7 @@ function template_topic_listing_above()
 	echo '
 							</ul>
 						</li>
-						<li class="listlevel1 topic_sorting_row">
+						<li class="listlevel1 topic_sorting_row" aria-sort="',  $context['sort_direction'] === 'up' ? 'ascending"' : 'descending"', '>
 							<a class="sort topicicon i-sort', $context['sort_direction'], '" href="', $current_header['url'], '" title="', $context['sort_title'], '"></a>
 						</li>';
 
@@ -220,7 +220,7 @@ function template_topic_listing()
 					', $topic['is_posted_in'] ? '<span class="fred topicicon i-profile"></span>' : '', '
 				</div>';
 
-			// The subject/psoster section
+			// The subject/poster section
 			echo '
 				<div class="topic_info">
 
@@ -234,10 +234,11 @@ function template_topic_listing()
 							<a class="new_posts" href="', $topic['new_href'], '" id="newicon' . $topic['first_post']['id'] . '">' . $txt['new'] . '</a>';
 			}
 
-			// Is this an unapproved topic and they can approve it?
+			// Is this an unapproved topic, and they can approve it?
 			if ($context['can_approve_posts'] && !$topic['approved'])
 			{
-				echo '<span class="require_approval">' . $txt['awaiting_approval'] . '</span>';
+				echo '
+							<span class="require_approval">' . $txt['awaiting_approval'] . '</span>';
 			}
 
 			echo '
@@ -257,12 +258,18 @@ function template_topic_listing()
 			if (!empty($topic['last_post']['member']['avatar']))
 			{
 				echo '
-					<span class="board_avatar"><a href="', $topic['last_post']['member']['href'], '"><img class="avatar" src="', $topic['last_post']['member']['avatar']['href'], '" alt="" /></a></span>';
+					<span class="board_avatar">
+						<a href="', $topic['last_post']['member']['href'], '">
+							<img class="avatar" src="', $topic['last_post']['member']['avatar']['href'], '" alt="', $topic['last_post']['member']['name'], '" />
+						</a>
+					</span>';
 			}
 			else
 			{
 				echo '
-					<span class="board_avatar"><a href="#"></a></span>';
+					<span class="board_avatar">
+						<a href="#"></a>
+					</span>';
 			}
 
 			echo '

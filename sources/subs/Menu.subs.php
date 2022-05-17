@@ -410,6 +410,7 @@ function loadDefaultMenuButtons()
 		'login' => array(
 			'title' => $txt['login'],
 			'href' => getUrl('action', ['action' => 'login']),
+			'onclick' => 'return reqOverlayDiv(this.href, ' . JavaScriptEscape($txt['login']) . ', \'i-menu-login\');',
 			'data-icon' => 'i-menu-login',
 			'show' => User::$info->is_guest,
 		),

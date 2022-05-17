@@ -67,7 +67,7 @@ input[type=submit][disabled]:hover, button[disabled], button[disabled]:hover {
 
 /* Common button styling. */
 input[type="submit"], .drop_area_fileselect_text, button[type="submit"], input[type="button"],
-	/* Anchors styled to look like buttons. */
+/* Anchors styled to look like buttons. */
 .linkbutton:link, .linkbutton:visited {
 	border-right: 1px solid var(--seconday_border_right);
 	border-left: 1px solid var(--seconday_border_left);
@@ -95,8 +95,9 @@ input[type="submit"]:hover, button[type="submit"]:hover, input[type="button"]:ho
  * $BBC
  * -------------------------------------------------------
  */
+
 /* Extra quote styling */
-.bbc_quote, .quoteheader {
+.bbc_quote {
 	box-shadow: -2px 2px 2px var(--box_shadow);
 }
 
@@ -165,16 +166,16 @@ input[type="submit"]:hover, button[type="submit"]:hover, input[type="button"]:ho
 /* Hover effects for those buttons. */
 .linklevel1.active:hover, .listlevel1:hover .linklevel1.active,
 #collapse_button .linklevel1:hover, .linklevel1:hover .pm_indicator {
-	border-right-color: var(--border_menu_tl);
-	border-left-color: var(--menu_border);
+	border-right-color: var(--menu_border_hover_top);
+	border-left-color: var(--menu_border_hover);
 	box-shadow: -1px 1px 1px var(--opacity30) inset;
 }
 
 /* Levels 2 and 3: drop menu wrapper. */
 .menulevel2, .menulevel3 {
-	border-right: 1px solid var(--seconday_border_right);
-	border-left: 1px solid var(--seconday_border_left);
-	box-shadow: -3px 3px 3px var(--opacity20);
+	border-right: 1px solid var(--menu_border);
+	border-left: 1px solid var(--menu_border_left);
+	box-shadow: -2px 2px 3px var(--opacity20);
 }
 
 /* Tricky PM indicator. Define it carefully */
@@ -252,7 +253,7 @@ input[type="submit"]:hover, button[type="submit"]:hover, input[type="button"]:ho
 	box-shadow: -1px 2px 4px var(--box_shadow);
 }
 
-.topic_listing, .search_results_posts {
+.topic_listing {
 	box-shadow: -1px 2px 4px var(--box_shadow);
 }
 
@@ -292,6 +293,11 @@ input[type="submit"]:hover, button[type="submit"]:hover, input[type="button"]:ho
 	box-shadow: none;
 }
 
+.poster_div_details {
+	border-right-color: var(--primary_border);
+	border-left-color: var(--transparent);
+}
+
 /* -------------------------------------------------------
  *	$EDITOR
  * -------------------------------------------------------
@@ -315,9 +321,6 @@ input[type="submit"]:hover, button[type="submit"]:hover, input[type="button"]:ho
  * $PROFILE
  * -------------------------------------------------------
  */
-.profile_pie {
-	background: url(../../images/_light/stats_pie_rtl.png);
-}
 
 /* -------------------------------------------------------
  * $PERSONAL
@@ -346,6 +349,21 @@ input[type="submit"]:hover, button[type="submit"]:hover, input[type="button"]:ho
  * $SEARCH
  * -------------------------------------------------------
  */
+
+/* -------------------------------------------------------
+ *	$MEMBERLIST
+ * -------------------------------------------------------
+ */
+
+.mlist li div:first-child {
+	border-right: 1px solid var(--primary_border);
+	border-left-color: var(--transparent);
+}
+
+.mlist li div:last-child {
+	border-right-color: var(--transparent);
+	border-left: 1px solid var(--primary_border);
+}
 
 /* -------------------------------------------------------
  * $LOGIN
@@ -393,7 +411,7 @@ input[type="submit"]:hover, button[type="submit"]:hover, input[type="button"]:ho
 		border-right-color: var(--transparent);
 	}
 
-	.topic_listing > li, .search_results_posts > li {
+	.topic_listing > li {
 		box-shadow: -3px 3px 6px var(--box_shadow);
 	}
 

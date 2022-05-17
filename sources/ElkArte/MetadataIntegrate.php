@@ -299,8 +299,8 @@ class MetadataIntegrate
 					return [
 						'@type' => 'ImageObject',
 						'url' => $attachment['href'],
-						'width' => $attachment['real_width'],
-						'height' => $attachment['real_height']
+						'width' => $attachment['real_width'] ?? 0,
+						'height' => $attachment['real_height'] ?? 0
 					];
 				}
 			}
@@ -413,7 +413,7 @@ class MetadataIntegrate
 	{
 		global $context, $boardurl, $mbname, $topic;
 
-		$description = $this->getDescription();
+		$description = strip_tags($this->getDescription());
 		$page_title = $this->getPageTitle();
 		$logo = $this->getLogo();
 		$attach = $this->getAttachment();

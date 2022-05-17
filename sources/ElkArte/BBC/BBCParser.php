@@ -620,29 +620,27 @@ class BBCParser
 				$first_quote++;
 			}
 		}
-		// Add a class to the quote and quoteheader to style alternating blockquotes
-		//  - Example: class="quoteheader" and class="quoteheader bbc_alt_quoteheader" on the header
-		//             class="bbc_quote" and class="bbc_quote bbc_alternate_quote" on the blockquote
-		// This allows simpler CSS for themes (like default) which do not use the alternate styling,
-		// but still allow it for themes that want it.
+
+		// First quote (of nested or single) receives a wrapper so its markup will be:
+		// <div class="quote-read-more"> .. relative
+		//		<input type="checkbox" class="quote-show-more">.. absolute over the below blockquote
+		//		<blockquote class="bbc_quote">
+		//			<cite>Peter Parker says</cite>
+		//			No man can win every battle, but no man should fall without a struggle.
+		//		</blockquote> .. with a max height that is removed on input click
+		// </div>
+		// Should you alter this markup, be sure to check handleCollapsedQuotes()
 		if ($first_quote === 0)
 		{
-			// First quote (of nested or single) receives a wrapper so its markup will be:
-			// <div class="quote-read-more"> .. relative
-			//		<div class="quoteheader"></div> .. same as always
-			//		<input type="checkbox" class="quote-show-more">.. absolute over the blockquote
-			//		<blockquote class="bbc_quote"></blockquote> .. with a max height that is removed on input click
-			// </div>
-			$tag[Codes::ATTR_BEFORE] = str_replace('<div class="quoteheader">', '<div class="quote-read-more"><div class="quoteheader">', $tag[Codes::ATTR_BEFORE]);
-			$tag[Codes::ATTR_BEFORE] = str_replace('<blockquote>', '<input type="checkbox" class="quote-show-more"><blockquote class="bbc_quote">', $tag[Codes::ATTR_BEFORE]);
+			$tag[Codes::ATTR_BEFORE] = str_replace('<blockquote class="bbc_quote">', '<div class="quote-read-more"><input type="checkbox" class="quote-show-more"><blockquote class="bbc_quote">', $tag[Codes::ATTR_BEFORE]);
 			$tag[Codes::ATTR_AFTER] = str_replace('</blockquote>', '</blockquote></div>', $tag[Codes::ATTR_AFTER]);
 		}
-		else
+		// Add a class to every other blockquote to style alternating blockquotes
+		// This allows simpler CSS for themes (like default) which do not use the alternate styling,
+		// but still allow it for legacy themes that want it.
+		elseif ($quote_alt)
 		{
-			// Nested quotes, located inside the above parent quote
-			$tag[Codes::ATTR_BEFORE] = str_replace('<div class="quoteheader">', '<div class="quoteheader' . ($quote_alt ? ' bbc_alt_quoteheader' : '') . '">', $tag[Codes::ATTR_BEFORE]);
-			$tag[Codes::ATTR_BEFORE] = str_replace('<blockquote>', '<blockquote class="bbc_quote' . ($quote_alt ? ' bbc_alternate_quote' : '') . '">', $tag[Codes::ATTR_BEFORE]);
-			$tag[Codes::ATTR_AFTER] = '</blockquote>';
+			$tag[Codes::ATTR_BEFORE] = str_replace('<blockquote class="bbc_quote">', '<blockquote class="bbc_quote bbc_alternate_quote">', $tag[Codes::ATTR_BEFORE]);
 		}
 	}
 

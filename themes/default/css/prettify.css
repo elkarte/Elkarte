@@ -4,11 +4,11 @@
 .pln { color: #000000 }  /* plain text */
 
 @media screen {
-	.str { color: #008800 }  /* string content */
+	.str { color: #007700 }  /* string content */
 
-	.kwd { color: #000088 }  /* a keyword */
+	.kwd { color: #000077 }  /* a keyword */
 
-	.com { color: #880000 }  /* a comment */
+	.com { color: #770000 }  /* a comment */
 
 	.typ { color: #660066 }  /* a type name */
 
@@ -16,11 +16,11 @@
 	/* punctuation, lisp open bracket, lisp close bracket */
 	.pun, .opn, .clo { color: #666600 }
 
-	.tag { color: #000088 }  /* a markup tag name */
+	.tag { color: #000077 }  /* a markup tag name */
 
 	.atn { color: #660066 }  /* a markup attribute name */
 
-	.atv { color: #008800 }  /* a markup attribute value */
+	.atv { color: #007700 }  /* a markup attribute value */
 
 	.dec, .var { color: #660066 }  /* a declaration; a variable name */
 

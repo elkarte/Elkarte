@@ -306,7 +306,7 @@ class ManagePosts extends AbstractController
 		// Initialize it with our settings
 		$config_vars = array(
 			// Simple post options...
-			array('check', 'removeNestedQuotes'),
+			array('int', 'removeNestedQuotes'),
 			array('check', 'enableCodePrettify'),
 			'',
 			array('check', 'enableVideoEmbeding'),
