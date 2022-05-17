@@ -341,7 +341,7 @@
 		// Twitter
 		handlers['twitter.com'] = function (path, a)
 		{
-			let videoID = path.match(/\/status\/([0-9]{16,20})$/);
+			let videoID = path.match(/\/status\/([0-9]{16,20})/);
 
 			if (!videoID || videoID[1] === '')
 			{

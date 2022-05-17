@@ -312,9 +312,10 @@ class SiteCombiner
 			$this->_combine_files[$key]['content'] = $tempfile;
 
 			// CSS needs relative locations converted for the moved hive to work
+			// @todo needs to be smarter, based on "new" cache location
 			if ($type === 'css')
 			{
-				$tempfile = str_replace(array('../../images', '../images', '../../webfonts', '../webfonts', '../../scripts', '../scripts'), array($file['url'] . '/images', $file['url'] . '/webfonts', $file['url'] . '/scripts'), $tempfile);
+				//$tempfile = str_replace(array('../../images', '../images', '../../webfonts', '../webfonts', '../../scripts', '../scripts'), array($file['url'] . '../images', $file['url'] . '../webfonts', $file['url'] . '../scripts'), $tempfile);
 			}
 
 			// Add the file to the correct array for processing
