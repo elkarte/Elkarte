@@ -1317,7 +1317,7 @@ function determineAvatar($profile)
 
 		$avatar = array(
 			'name' => $profile['avatar'],
-			'image' => '<img class="avatar avatarresize" src="' . $avatar_url . '" alt="' . $alt . '" />',
+			'image' => '<img class="avatar avatarresize" src="' . $avatar_url . '" alt="' . $alt . '" loading="lazy" />',
 			'href' => $avatar_url,
 			'url' => '',
 		);
@@ -1327,7 +1327,7 @@ function determineAvatar($profile)
 	{
 		$avatar = array(
 			'name' => $profile['avatar'],
-			'image' => '<img class="avatar avatarresize" src="' . $profile['avatar'] . '" alt="' . $alt . '" />',
+			'image' => '<img class="avatar avatarresize" src="' . $profile['avatar'] . '" alt="' . $alt . '" loading="lazy" />',
 			'href' => $profile['avatar'],
 			'url' => $profile['avatar'],
 		);
@@ -1339,7 +1339,7 @@ function determineAvatar($profile)
 		$gravatar_url = $gravatar;
 		$avatar = array(
 			'name' => $profile['avatar'],
-			'image' => '<img class="avatar avatarresize" src="' . $gravatar_url . '" alt="' . $alt . '" />',
+			'image' => '<img class="avatar avatarresize" src="' . $gravatar_url . '" alt="' . $alt . '" loading="lazy" />',
 			'href' => $gravatar_url,
 			'url' => $gravatar_url,
 		);
@@ -1349,7 +1349,7 @@ function determineAvatar($profile)
 	{
 		$avatar = array(
 			'name' => $profile['avatar'],
-			'image' => '<img class="avatar avatarresize" src="' . $modSettings['avatar_url'] . '/' . $profile['avatar'] . '" alt="' . $alt . '" />',
+			'image' => '<img class="avatar avatarresize" src="' . $modSettings['avatar_url'] . '/' . $profile['avatar'] . '" alt="' . $alt . '" loading="lazy" />',
 			'href' => $modSettings['avatar_url'] . '/' . $profile['avatar'],
 			'url' => $modSettings['avatar_url'] . '/' . $profile['avatar'],
 		);
@@ -1373,7 +1373,7 @@ function determineAvatar($profile)
 			// TODO: This should be incorporated into the theme.
 			$avatar = array(
 				'name' => '',
-				'image' => '<img class="avatar avatarresize" src="' . $href .'" alt="' . $alt . '" />',
+				'image' => '<img class="avatar avatarresize" src="' . $href .'" alt="' . $alt . '" loading="lazy" />',
 				'href' => $href,
 				'url' => 'https://',
 			);

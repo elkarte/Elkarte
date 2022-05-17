@@ -170,7 +170,7 @@ function template_list_boards(array $boards, $id)
 			echo '
 					<div class="board_avatar">
 						<a href="', $board['last_post']['member']['href'], '">
-							<img class="avatar" src="', $board['last_post']['member']['avatar']['href'], '" alt="', $board['last_post']['member']['name'], '" />
+							<img class="avatar" src="', $board['last_post']['member']['avatar']['href'], '" alt="', $board['last_post']['member']['name'], '" loading="lazy" />
 						</a>
 					</div>';
 		}

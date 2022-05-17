@@ -260,7 +260,7 @@ function template_topic_listing()
 				echo '
 					<span class="board_avatar">
 						<a href="', $topic['last_post']['member']['href'], '">
-							<img class="avatar" src="', $topic['last_post']['member']['avatar']['href'], '" alt="', $topic['last_post']['member']['name'], '" />
+							<img class="avatar" src="', $topic['last_post']['member']['avatar']['href'], '" alt="', $topic['last_post']['member']['name'], '" loading="lazy" />
 						</a>
 					</span>';
 			}

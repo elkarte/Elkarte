@@ -291,7 +291,7 @@ class IlaIntegrate
 			if (empty($attachment['is_approved']) && !$preview)
 			{
 				self::$typeTag = '
-					<img src="' . getUrl('action', ['action' => 'dlattach', 'id' => 'ila']) . '" alt="X" class="bbc_img' . $class . '" />';
+					<img src="' . getUrl('action', ['action' => 'dlattach', 'id' => 'ila']) . '" alt="X" class="bbc_img' . $class . '" loading="lazy" />';
 			}
 			// An image will get the light box treatment
 			elseif (!empty($attachment['is_image']) || $preview)
@@ -300,7 +300,7 @@ class IlaIntegrate
 				$alt = Util::htmlspecialchars($attachment['filename'] ?? 'X');
 				self::$typeTag = '
 					<a id="link_$1" data-lightboximage="$1" data-lightboxmessage="0" href="' . getUrl('action', ['action' => 'dlattach', 'attach' => '$1', 'image']) . '">
-						<img src="' . getUrl('action', ['action' => 'dlattach', 'attach' => '$1']) . $type .'" style="' . $style . '" alt="' . $alt . '" class="bbc_img ' . $class . '" />
+						<img src="' . getUrl('action', ['action' => 'dlattach', 'attach' => '$1']) . $type .'" style="' . $style . '" alt="' . $alt . '" class="bbc_img ' . $class . '" loading="lazy" />
 					</a>';
 			}
 			// Not an image, determine a mime thumbnail or use a default thumbnail
@@ -310,13 +310,13 @@ class IlaIntegrate
 				if ($attachment === false)
 				{
 					self::$typeTag = '
-					<img src="' . $thumbUrl . '" alt="X" class="bbc_img' . $class . '" />';
+					<img src="' . $thumbUrl . '" alt="X" class="bbc_img' . $class . '" loading="lazy"/>';
 				}
 				else
 				{
 					self::$typeTag = '
 					<a href="' . getUrl('action', ['action' => 'dlattach', 'attach' => $num]) . '">
-						<img src="' . $thumbUrl . '" alt="' . $attachment['filename'] . '" class="bbc_img ' . $class . '" />
+						<img src="' . $thumbUrl . '" alt="' . $attachment['filename'] . '" class="bbc_img ' . $class . '" loading="lazy" />
 					</a>';
 				}
 			}
