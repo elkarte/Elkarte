@@ -5350,6 +5350,15 @@ Stef                       ^
  * -------------------------------------------------------
  */
 
+#registration > h2 {
+	display: flex;
+	align-items: center;
+}
+
+#registration > h2 > select {
+	margin: 0 2em;
+}
+
 /* Styles for the login areas. */
 .login {
 	max-width: 640px;
@@ -5451,7 +5460,7 @@ Stef                       ^
 	padding-right: 32px;
 }
 
-.form_field.w_icon > a {
+.form_field.w_icon > a, .form_field.w_icon > span > a, .form_field.w_icon > span > i {
 	position: absolute;
 	top: 0;
 	right: 0;

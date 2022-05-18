@@ -41,22 +41,20 @@ function template_registration_agreement()
 	template_mailcheck_javascript();
 
 	echo '
-		<form action="', getUrl('action', ['action' => 'register']), '" method="post" accept-charset="UTF-8" id="registration">';
+		<form action="', getUrl('action', ['action' => 'register']), '" method="post" accept-charset="UTF-8" id="registration">
+			<h2 class="category_header">', $txt['registration_agreement'];
 
 	if (!empty($context['languages']))
 	{
 		if (count($context['languages']) === 1)
 		{
-			foreach ($context['languages'] as $lang_key => $lang_val)
-			{
-				echo '
-				<input type="hidden" name="lngfile" value="', $lang_key, '" />';
-			}
+			echo '
+				<input type="hidden" name="lngfile" value="', key($context['languages']), '" />';
 		}
 		else
 		{
 			echo '
-				<select onchange="this.form.submit()" class="floatright" name="lngfile">';
+				<select onchange="this.form.submit()" name="lngfile">';
 
 			foreach ($context['languages'] as $lang_key => $lang_val)
 			{
@@ -72,7 +70,7 @@ function template_registration_agreement()
 	if (!empty($context['agreement']))
 	{
 		echo '
-			<h2 class="category_header">', $txt['registration_agreement'], '</h2>
+			</h2>
 			<div class="well">
 				<p>', $context['agreement'], '</p>
 			</div>';
