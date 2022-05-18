@@ -146,8 +146,7 @@ class Register extends AbstractController
 			redirectexit('action=register');
 		}
 
-		Txt::load('Login');
-		Txt::load('Profile');
+		Txt::load('Login+Profile');
 		theme()->getTemplates()->load('Register');
 		theme()->getTemplates()->load('ProfileOptions');
 
@@ -170,7 +169,7 @@ class Register extends AbstractController
 		}
 
 		// What step are we at?
-		$current_step = isset($this->_req->post->step) ? (int) $this->_req->post->step : ($context['require_agreement'] && !$context['checkbox_agreement'] ? 1 : 2);
+		$current_step = $this->_req->getPost('step', 'intval', ($context['require_agreement'] && !$context['checkbox_agreement'] ? 1 : 2));
 
 		// Does this user agree to the registration agreement?
 		if ($current_step === 1 && (isset($this->_req->post->accept_agreement) || isset($this->_req->post->accept_agreement_coppa)))
@@ -428,7 +427,7 @@ class Register extends AbstractController
 			$this->_req->post->birthdate = sprintf('%04d-%02d-%02d', empty($this->_req->post->bday3) ? 0 : (int) $this->_req->post->bday3, (int) $this->_req->post->bday1, (int) $this->_req->post->bday2);
 		}
 
-		// By default assume email is hidden, only show it if we tell it to.
+		// By default, assume email is hidden, only show it if we tell it to.
 		$this->_req->post->hide_email = !empty($this->_req->post->allow_email) ? 0 : 1;
 
 		// Validate the passed language file.
@@ -745,7 +744,7 @@ class Register extends AbstractController
 	 *
 	 * What it does:
 	 *
-	 * - If language support is enabled, loads whats available
+	 * - If language support is enabled, loads what's available
 	 * - Verifies the users choice is available
 	 * - Sets in context / session
 	 *
@@ -779,7 +778,7 @@ class Register extends AbstractController
 				$context['languages'][$key]['name'] = $lang['name'];
 
 				// Found it!
-				if (ucfirst($selectedLanguage) === $lang['filename'])
+				if (ucfirst($selectedLanguage) === $lang['name'])
 				{
 					$context['languages'][$key]['selected'] = true;
 				}

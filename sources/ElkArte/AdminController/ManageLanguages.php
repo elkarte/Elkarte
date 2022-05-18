@@ -856,7 +856,7 @@ class ManageLanguages extends AbstractController
 		$languages = getLanguages(false);
 		foreach ($languages as $lang)
 		{
-			$config_vars['language'][4][] = array($lang['filename'], strtr($lang['name'], array('-utf8' => ' (UTF-8)')));
+			$config_vars['language'][4][] = array($lang['name'], strtr($lang['name'], array('-utf8' => ' (UTF-8)')));
 		}
 
 		return $config_vars;
