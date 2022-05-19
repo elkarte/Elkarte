@@ -44,11 +44,11 @@ function template_login()
 	// Now just get the basic information - username, password, etc.
 	echo '
 					<div class="form_field">
-						<input type="text" name="user" id="user" size="20" maxlength="80" value="', $context['default_username'], '" class="input_text" placeholder="', $txt['username'], '" />
+						<input type="text" name="user" id="user" size="20" maxlength="80" value="', $context['default_username'], '" class="input_text" autocomplete="username" placeholder="', $txt['username'], '" />
 						<label for="user">', $txt['username'], '</label>
 					</div>
 					<div class="form_field">
-						<input type="password" name="passwrd" id="passwrd" value="', $context['default_password'], '" size="20" class="input_password" placeholder="', $txt['password'], '" />
+						<input type="password" name="passwrd" id="passwrd" value="', $context['default_password'], '" size="20" class="input_password" autocomplete="current-password" placeholder="', $txt['password'], '" />
 						<label for="passwrd">', $txt['password'], '</label>
 						<p class="forgot_password lefttext">
 							<a href="', $scripturl, '?action=reminder">', $txt['forgot_your_password'], '</a>
@@ -59,7 +59,7 @@ function template_login()
 	{
 		echo '
 					<div class="form_field">
-						<input type="password" name="otp_token" id="otp_token" value="', $context['default_password'], '" size="30" class="input_password" placeholder="', $txt['otp_token'], '" />
+						<input type="password" name="otp_token" id="otp_token" value="', $context['default_password'], '" size="30" class="input_password" autocomplete="off" placeholder="', $txt['otp_token'], '" />
 						<label for="otp_token">', $txt['otp_token'], '</label>
 					</div>';
 	}
@@ -144,11 +144,11 @@ function template_kick_guest()
 			</h2>
 			<div class="well">
 				<div class="form_field">
-					<input type="text" name="user" id="user" size="20" maxlength="80" class="input_text" placeholder="', $txt['username'], '" />
+					<input type="text" name="user" id="user" size="20" maxlength="80" class="input_text" autocomplete="username" placeholder="', $txt['username'], '" />
 					<label for="user">', $txt['username'], '</label>
 				</div>
 				<div class="form_field">
-					<input type="password" name="passwrd" id="passwrd" size="20" class="input_password" placeholder="', $txt['password'], '" />
+					<input type="password" name="passwrd" id="passwrd" size="20" class="input_password" autocomplete="current-password" placeholder="', $txt['password'], '" />
 					<label for="passwrd">', $txt['password'], '</label>
 					<p class="forgot_password lefttext">
 						<a href="', $scripturl, '?action=reminder">', $txt['forgot_your_password'], '</a>
@@ -159,7 +159,7 @@ function template_kick_guest()
 	{
 		echo '
 				<div class="form_field">
-					<input type="password" name="otp_token" id="otp_token" value="', $context['default_password'], '" size="30" class="input_password" placeholder="', $txt['otp_token'], '" />
+					<input type="password" name="otp_token" id="otp_token" value="', $context['default_password'], '" size="30" autocomplete="off" class="input_password" placeholder="', $txt['otp_token'], '" />
 					<label for="otp_token">', $txt['otp_token'], '</label>
 				</div>';
 	}
@@ -205,11 +205,11 @@ function template_maintenance()
 		<h2 class="category_header">', $txt['admin_login'], '</h2>
 		<div class="well">
 			<div class="form_field">
-				<input type="text" name="user" id="user" size="20" maxlength="80" class="input_text" placeholder="', $txt['username'], '" />
+				<input type="text" name="user" id="user" size="20" maxlength="80" class="input_text" autocomplete="username" placeholder="', $txt['username'], '" />
 				<label for="user">', $txt['username'], '</label>
 			</div>
 			<div class="form_field">
-				<input type="password" name="passwrd" id="passwrd" size="20" class="input_password" placeholder="', $txt['password'], '" />
+				<input type="password" name="passwrd" id="passwrd" size="20" class="input_password" autocomplete="current-password" placeholder="', $txt['password'], '" />
 				<label for="passwrd">', $txt['password'], '</label>
 				<p class="forgot_password lefttext">
 					<a href="', $scripturl, '?action=reminder">', $txt['forgot_your_password'], '</a>
@@ -252,7 +252,7 @@ function template_admin_login()
 
 	echo '
 			<div class="form_field w_icon">
-				<input type="password" name="', $context['sessionCheckType'], '_pass" id="', $context['sessionCheckType'], '_pass" size="24" class="input_password" autofocus="autofocus" placeholder="', $txt['password'], '"/>
+				<input type="password" name="', $context['sessionCheckType'], '_pass" id="', $context['sessionCheckType'], '_pass" size="24" class="input_password" autofocus="autofocus" autocomplete="current-password" placeholder="', $txt['password'], '"/>
 				<label for="', $context['sessionCheckType'], '_pass">', $txt['password'], '</label>
 				<a href="', $scripturl, '?action=quickhelp;help=securityDisable_why" onclick="return reqOverlayDiv(this.href);" class="helpicon i-help"><s>', $txt['help'], '</s></a>
 			</div>
@@ -349,7 +349,7 @@ function template_resend()
 						<label for="passwd">', $txt['invalid_activation_password'], ':</label>
 					</dt>
 					<dd>
-						<input type="password" name="passwd" id="passwd" size="30" class="input_password" />
+						<input type="password" name="passwd" id="passwd" size="30" autocomplete="off" class="input_password" />
 					</dd>';
 
 	if ($context['can_activate'])

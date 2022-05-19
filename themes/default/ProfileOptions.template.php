@@ -1562,7 +1562,7 @@ function template_authentication_method()
 								<em>', $txt['choose_pass'], ':</em>
 							</dt>
 							<dd>
-								<input type="password" name="passwrd1" id="elk_autov_pwmain" size="30" tabindex="', $context['tabindex']++, '" class="input_password" placeholder="', $txt['choose_pass'], '" />
+								<input type="password" name="passwrd1" id="elk_autov_pwmain" size="30" autocomplete="new-password" tabindex="', $context['tabindex']++, '" class="input_password" placeholder="', $txt['choose_pass'], '" />
 								<span id="elk_autov_pwmain_div" class="hide">
 									<i id="elk_autov_pwmain_img" class="icon i-warn" alt="*"></i>
 								</span>
@@ -1573,7 +1573,7 @@ function template_authentication_method()
 								<em for="elk_autov_pwverify">', $txt['verify_pass'], ':</em>
 							</dt>
 							<dd>
-								<input type="password" name="passwrd2" id="elk_autov_pwverify" size="30" tabindex="', $context['tabindex']++, '" class="input_password" placeholder="', $txt['verify_pass'], '" />
+								<input type="password" name="passwrd2" id="elk_autov_pwverify" size="30" autocomplete="new-password" tabindex="', $context['tabindex']++, '" class="input_password" placeholder="', $txt['verify_pass'], '" />
 								<span id="elk_autov_pwverify_div" class="hide">
 									<i id="elk_autov_pwverify_img" class="icon i-warn" alt="*"></i>
 								</span>

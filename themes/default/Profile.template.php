@@ -140,7 +140,7 @@ function template_profile_save()
 							<span class="smalltext">', $txt['required_security_reasons'], '</span>
 						</dt>
 						<dd>
-							<input type="password" id="oldpasswrd" name="oldpasswrd" size="20" class="input_password" placeholder="', $txt['current_password'], '" />
+							<input type="password" id="oldpasswrd" name="oldpasswrd" autocomplete="current-password" size="20" class="input_password" placeholder="', $txt['current_password'], '" />
 						</dd>
 					</dl>';
 	}
