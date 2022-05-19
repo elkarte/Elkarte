@@ -325,6 +325,10 @@ class Auth extends AbstractController
 					$context['login_errors'] = array($txt['incorrect_password']);
 					User::logOutUser(true);
 
+					// Invalidate the guest session, start new
+					unset($_SESSION['session_var']);
+					loadSession();
+
 					return false;
 				}
 			}
