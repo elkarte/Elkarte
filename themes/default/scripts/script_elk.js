@@ -826,7 +826,7 @@ function add_elk_mention(selector, oOptions)
 				// And with the post data prepared, lets make the ajax request
 				$.ajax({
 					type: "POST",
-					url: elk_scripturl + "?action=xmlhttp;sa=" + oSettings.sa + ";api=xml",
+					url: elk_prepareScriptUrl(elk_scripturl) + "action=xmlhttp;sa=" + oSettings.sa + ";api=xml",
 					dataType: "xml",
 					data: postdata
 				})
@@ -1596,7 +1596,7 @@ function loadAddNewPoll(button, id_board, form_name)
 
 	// Retrieve the poll area
 	$.ajax({
-			url: elk_scripturl + '?action=poll;sa=interface;board=' + id_board,
+			url: elk_prepareScriptUrl(elk_scripturl) + 'action=poll;sa=interface;board=' + id_board,
 			type: "GET",
 			dataType: "html",
 			beforeSend: ajax_indicator(true)
@@ -1712,7 +1712,7 @@ function disableAutoComplete()
 				cache: false,
 				dataType: 'json',
 				timeout: 1500,
-				url: elk_scripturl + "?action=mentions;sa=fetch;api=json;lastsent=" + lastTime
+				url: elk_prepareScriptUrl(elk_scripturl) + "action=mentions;sa=fetch;api=json;lastsent=" + lastTime
 			})
 			.done(function (request)
 			{

@@ -176,9 +176,9 @@ class Mentions extends AbstractController
 		require_once(SUBSDIR . '/Mentions.subs.php');
 
 		$lastsent = $this->_req->getQuery('lastsent', 'intval', 0);
-		if (empty($lastsent) && !empty($this->_req->session->notifications_lastseen))
+		if (empty($lastsent) && !empty($_SESSION['notifications_lastseen']))
 		{
-			$lastsent = (int) $this->_req->session->notifications_lastseen;
+			$lastsent = (int) $_SESSION['notifications_lastseen'];
 		}
 
 		// We only know AJAX for this particular action
