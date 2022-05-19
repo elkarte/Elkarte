@@ -1347,7 +1347,7 @@ nav.breadcrumb {
 }
 
 /* Reply # */
-.keyinfo h5 a, .keyinfo h5 a strong {
+.keyinfo h3 a, .keyinfo h3 a strong {
 	color: var(--topic_name);
 }
 

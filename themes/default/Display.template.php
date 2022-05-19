@@ -184,9 +184,9 @@ function template_messages()
 							<span id="messageicon_', $message['id'], '" class="messageicon', ($message['icon_url'] !== $settings['images_url'] . '/post/xx.png') ? '"' : ' hide"', '>
 								<img src="', $message['icon_url'] . '" alt=""', $message['can_modify'] ? ' id="msg_icon_' . $message['id'] . '"' : '', ' />
 							</span>
-							<h5 id="info_', $message['id'], '">', !empty($message['counter']) ? '
+							<h3 id="info_', $message['id'], '">', !empty($message['counter']) ? '
 								<a href="' . $message['href'] . '" rel="nofollow">' . sprintf($txt['reply_number'], $message['counter']) . '</a> &ndash; ' : '', $message['html_time'], '
-							</h5>
+							</h3>
 							<div id="msg_', $message['id'], '_quick_mod"', $ignoring ? ' class="hide"' : '', '></div>
 						</header>';
 
@@ -502,7 +502,7 @@ function template_quickreply_below()
 		echo '
 				<div class="postarea', empty($options['hide_poster_area']) ? '' : '2', '">
 					<header class="category_header">
-						<h5>', $txt['reply'], '</h5>
+						<h4>', $txt['reply'], '</h4>
 					</header>
 					<div id="quickReplyOptions" class="', empty($context['minmax_preferences']['qreply']) ? '"' : ' hide"', '>
 						<form action="', getUrl('action', ['action' => 'post2', 'board' => $context['current_board']]), '" method="post" accept-charset="UTF-8" name="postmodify" id="postmodify" onsubmit="submitonce(this);', (!empty($modSettings['mentions_enabled']) ? 'revalidateMentions(\'postmodify\', \'' . (empty($options['use_editor_quick_reply']) ? 'message' : $context['post_box_name']) . '\');' : ''), '">

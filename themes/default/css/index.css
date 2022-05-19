@@ -157,7 +157,7 @@ body, input, button, select, textarea, .editor {
 /* Use a specific demi bold font weight for some areas, less jarring then 700/bold,
    with fallback to default font stack if not available. */
 .codeheader, .quoteheader, .expand_pages, .table_head > th, .topic_sorting_row > h3, .topic_name h4 a,
-.poster .name, .keyinfo h5 a, .keyinfo h5 a strong, .ui-dialog .ui-dialog-titlebar,
+.poster .name, .keyinfo h3 a, .keyinfo h3 a strong, .ui-dialog .ui-dialog-titlebar,
 #creator dt strong, .settings label, .popup_heading {
 	font-family: "Segoe UI Semibold", "Segoe UI", "Helvetica Neue Medium", -apple-system, BlinkMacSystemFont, "Roboto", "Oxygen", "Ubuntu", "Cantarell", "Droid Sans", "Helvetica Neue", "Trebuchet MS", Arial, sans-serif;
 	font-weight: 600;

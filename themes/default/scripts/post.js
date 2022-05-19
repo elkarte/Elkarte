@@ -337,8 +337,8 @@ function onDocSent(XMLDoc)
 				}
 
 				newPostsHTML += '<div class="content forumposts"><div class="postarea2" id="msg' + newPosts[i].getAttribute("id") + '"><div class="keyinfo">';
-				newPostsHTML += '<h5 class="floatleft"><span>' + txt_posted_by + '</span>&nbsp;' + newPosts[i].getElementsByTagName("poster")[0].firstChild.nodeValue + '&nbsp;-&nbsp;' + newPosts[i].getElementsByTagName("time")[0].firstChild.nodeValue;
-				newPostsHTML += ' <span class="new_posts" id="image_new_' + newPosts[i].getAttribute("id") + '">' + txt_new + '</span></h5>';
+				newPostsHTML += '<h3 class="floatleft"><span>' + txt_posted_by + '</span>&nbsp;' + newPosts[i].getElementsByTagName("poster")[0].firstChild.nodeValue + '&nbsp;-&nbsp;' + newPosts[i].getElementsByTagName("time")[0].firstChild.nodeValue;
+				newPostsHTML += ' <span class="new_posts" id="image_new_' + newPosts[i].getAttribute("id") + '">' + txt_new + '</span></h3>';
 
 				if (can_quote)
 				{

@@ -126,7 +126,7 @@ function template_folder()
 								<div class="keyinfo">
 									', (!empty($options['hide_poster_area']) ? '<ul class="poster poster2">' . template_build_poster_div($message) . '</ul>' : ''), '
 									<span id="post_subject_', $message['id'], '" class="post_subject">', $message['subject'], '</span>
-									<h5 id="info_', $message['id'], '">';
+									<h3 id="info_', $message['id'], '">';
 
 		// @todo - above needs fixing re document outlining (a11y stuffz).
 		// Show who the message was sent to.
@@ -163,7 +163,7 @@ function template_folder()
 		}
 
 		echo '
-									</h5>
+									</h3>
 								</div>';
 
 		// Done with the information about the poster... on to the post itself.
