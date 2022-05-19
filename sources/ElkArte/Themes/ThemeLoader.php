@@ -196,7 +196,7 @@ class ThemeLoader
 			$this->user->time_format = $txt['time_format'];
 		}
 
-		if (isset($settings['use_default_images']) && $settings['use_default_images'] == 'always')
+		if (isset($settings['use_default_images']) && $settings['use_default_images'] === 'always')
 		{
 			$settings['theme_url'] = $settings['default_theme_url'];
 			$settings['images_url'] = $settings['default_images_url'];

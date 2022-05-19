@@ -45,7 +45,7 @@ $txt['default_karmaSmiteLabel'] = '[smite]';
 $txt['default_karmaApplaudLabel'] = '[applaud]';
 $txt['default_reserved_names'] = 'Admin\nWebmaster\nGuest\nroot';
 $txt['default_smileyset_name'] = 'Fugue\'s Set';
-$txt['default_theme_name'] = 'ElkArte Default Theme';
+$txt['default_theme_name'] = 'ElkArte Theme';
 
 $txt['default_administrator_group'] = 'Administrator';
 $txt['default_global_moderator_group'] = 'Global Moderator';
