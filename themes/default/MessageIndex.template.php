@@ -116,7 +116,7 @@ function template_topic_listing_above()
 	echo '
 							</ul>
 						</li>
-						<li class="listlevel1 topic_sorting_row" aria-sort="',  $context['sort_direction'] === 'up' ? 'ascending"' : 'descending"', '>
+						<li class="listlevel1 topic_sorting_row">
 							<a class="sort topicicon i-sort', $context['sort_direction'], '" href="', $current_header['url'], '" title="', $context['sort_title'], '"></a>
 						</li>';
 
@@ -247,7 +247,7 @@ function template_topic_listing()
 					</div>
 					<div class="topic_starter">
 						', sprintf($txt['topic_started_by'], $topic['first_post']['member']['link']), !empty($topic['pages']) ? '
-						<ul class="small_pagelinks" id="pages' . $topic['first_post']['id'] . '" role="navigation">' . $topic['pages'] . '</ul>' : '', '
+						<ul class="small_pagelinks" id="pages' . $topic['first_post']['id'] . '">' . $topic['pages'] . '</ul>' : '', '
 					</div>
 				</div>';
 
@@ -304,7 +304,7 @@ function template_topic_listing()
 				if ($options['display_quick_mod'] == 1)
 				{
 					echo '
-						<input type="checkbox" name="topics[]" value="', $topic['id'], '" />';
+						<input type="checkbox" name="topics[]" aria-label="check ', $topic['id'], '" value="', $topic['id'], '" />';
 				}
 				else
 				{
