@@ -1,0 +1,209 @@
+/* INTRODUCTION
+/* This is the ElkArte css used when the editor is in wysiwyg mode.
+/* ------------------------------------------------------- */
+:root {
+	--body_text: #585858; /* Body text, text areas, editor, inputs, more */
+	--content-background: #FAFAFA; /* background for many divs, input controls, etc */
+	--seconday_border: #AFAFAF; /* darker border */
+	--seconday_border_top: #CFCFCF; /* complimentary for hover effects */
+	--seconday_border_left: #BFBFBF; /* complimentary for hover effects */
+	--seconday_border_bottom: #BBBBBB;
+	--primary_white: #FEFEFE; /* Used in shadows, backgrounds or text, many places */
+	--primary_white_compliment: #E4E4E4; /* Used with --primary_white for gradients */
+	--box_shadow: #E4E4E4; /* Used on many box shadows */
+	--me: #5BA048; /* me and footnotes */
+}
+
+html, body {
+	font-size: 15px;
+	font-weight: 400;
+	line-height: 1.5;
+	overflow: auto;
+}
+
+html, body, p, code:before, table {
+	margin: 0;
+	padding: 0;
+	color: var(--body_text);
+}
+
+html {
+	height: 100%;
+}
+
+body {
+	position: relative;
+	min-height: 100%;
+	word-wrap: break-word;
+}
+
+[contenteditable="true"] {
+	font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen", "Ubuntu", "Cantarell", "Droid Sans", "Helvetica Neue", "Trebuchet MS", Arial, sans-serif;
+}
+
+a, a:link, a:visited {
+	text-decoration: none;
+}
+
+a:hover, a.new_win:hover {
+	cursor: pointer;
+	text-decoration: underline;
+}
+
+ul, ol {
+	margin-top: 0;
+	margin-bottom: 0;
+	padding-top: 0;
+	padding-bottom: 0;
+}
+
+table, td {
+	min-width: 2em;
+	empty-cells: show;
+	border: 1px dotted var(--seconday_border);
+}
+
+code, code:before {
+	display: block;
+	text-align: left;
+}
+
+code:before {
+	font-size: 1em;
+	position: absolute;
+	top: -1.7em;
+	left: 0;
+	content: 'Code:';
+}
+
+code {
+	font-family: "DejaVu Sans Mono", Monaco, Consolas, monospace;
+	font-size: 0.8667rem;
+	position: relative;
+	margin-top: 1.5em;
+	padding: .25em;
+	white-space: pre;
+	border: 1px solid var(--seconday_border);
+	border-top: 2px solid var(--seconday_border_top);
+	border-bottom: 3px solid var(--seconday_border_bottom);
+	background: var(--content-background);
+}
+
+blockquote {
+	overflow: auto;
+	margin: 0 0 1em 0;
+	padding: 6px 10px;
+	border: 1px solid var(--seconday_border);
+	background: var(--primary_white);
+	box-shadow: 2px 2px 2px var(--box_shadow);
+}
+
+blockquote cite, code cite {
+	font-size: 0.8667rem;
+	display: block;
+	padding: 0 0 4px;
+	color: var(--body_text);
+	border-bottom: none;
+	background: var(--primary_white);
+}
+
+code cite {
+	line-height: 1.3em;
+	position: relative;
+	top: -1.7em;
+	margin-left: 3em;
+	padding: 0;
+}
+
+/* Will correctly colour down to seventh level of nested quotes in editor. Can be extended easily enough. */
+body > blockquote, body > blockquote > blockquote, body > blockquote > blockquote > blockquote > blockquote,
+body > blockquote > blockquote > blockquote > blockquote > blockquote > blockquote {
+	background: var(--primary_white);
+}
+
+body > blockquote > blockquote > cite, body > blockquote > blockquote > blockquote > blockquote > cite,
+body > blockquote > blockquote > blockquote > blockquote > blockquote > blockquote > cite {
+	background: var(--primary_white);
+}
+
+blockquote cite a:link, blockquote cite a:visited {
+	text-decoration: none;
+	color: var(--body_text);
+}
+
+div {
+	min-height: 1em;
+}
+
+h1, h2, h3, h4, h5, h6 {
+	margin: 0;
+	padding: 0;
+}
+
+aside:before {
+	font-size: 0.8667rem;
+	content: "[*]";
+	vertical-align: super;
+}
+
+aside {
+	font-weight: 700;
+	display: inline;
+	color: var(--me);
+}
+
+.bbc_img {
+	max-width: 100%;
+	border: 0;
+}
+
+.floatright {
+	float: right;
+}
+
+.floatleft {
+	float: left;
+}
+
+.floatcenter {
+	display: block;
+	margin: 0 auto;
+}
+
+.icon {
+	line-height: 1.25em;
+	display: inline-block;
+	width: 1.25em;
+	height: auto;
+	margin: 0 .25em;
+	vertical-align: middle;
+}
+
+.i-paperclip::before {
+	content: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='%23828282' viewBox='0 0 32 32'%3E%3Cpath d='M20.807 10.22l-2.03-2.03-10.15 10.15c-1.682 1.68-1.682 4.407 0 6.088s4.408 1.68 6.09 0l12.18-12.178c2.804-2.802 2.804-7.346 0-10.148-2.802-2.803-7.347-2.803-10.15 0L3.96 14.89c-.01.008-.02.017-.027.025-3.91 3.91-3.91 10.245 0 14.153 3.908 3.908 10.246 3.908 14.156 0 .006-.01.013-.018.023-.027v.004l8.73-8.728-2.03-2.03-8.73 8.728c-.01.008-.018.018-.026.026-2.785 2.782-7.313 2.782-10.097 0-2.782-2.784-2.782-7.31 0-10.094l.03-.026v-.003L18.78 4.13c1.678-1.678 4.41-1.678 6.09 0s1.678 4.412 0 6.09L12.69 22.398c-.56.56-1.47.56-2.03 0-.56-.56-.56-1.47 0-2.03L20.81 10.22z'/%3E%3C/svg%3E");
+}
+
+me:before {
+	font-size: 1.4667rem;
+	line-height: 1em;
+	content: "\270c";
+}
+
+me {
+	color: var(--me);
+}
+
+.bbc_tt {
+	font-family: "DejaVu Sans Mono", Monaco, "Lucida Console", "Courier New", monospace;
+}
+
+.bbc_pre {
+	font-family: "DejaVu Sans Mono", Monaco, Consolas, monospace;
+	overflow: auto;
+}
+
+.emoji {
+	max-width: 24px;
+	padding: 0 2px;
+	vertical-align: bottom;
+}

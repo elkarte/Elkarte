@@ -82,6 +82,7 @@ class Theme extends BaseTheme
 			'theme_variants' => array(
 				'light',
 				'besocial',
+				'dark',
 			),
 
 			/*

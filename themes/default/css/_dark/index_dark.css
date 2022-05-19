@@ -1,0 +1,2050 @@
+/* INTRODUCTION
+ * This variant is the standard, light, Elkarte theme.
+ * This is eye candy only. All the layout code is in index.css.
+ *
+ * All theme variants depend on the layout code for stability.
+ * It is better to copy code to a variant CSS file for testing.
+ * ---------------
+ *
+ *      $CONSTANTS...........CSS Vars for easy updates
+ *		$GENERAL.............Global resets, clearfixes, etc.
+ *		$BBC.................Quotes, code blocks, BBC styles.
+ *		$AJAX................The "loading" bar (quick edit, etc).
+ *
+ *		$MAIN................Forum header, wrapper, and footer.
+ *		$MENUS...............Main and secondary menus.
+ *		$LINKTREE............The breadcrumbs.
+ *		$BUTTONS.............Most button strips.
+ *		$PAGELINKS...........Page navigation links.
+ *
+ *		$TABLES..............Generic tables (memberlist, error log, etc).
+ *		$SETTINGS............Generic lists for settings pages.
+ *		$BOARDS..............Board index, sub-boards, and message index.
+ *      $MESSAGE.............Message (topic) Index
+ *		$DRAG-N-DROP.........Post attachment area, including Drag and Drop
+ *
+ *		$TOPICS..............The display template (topic view), including send.
+ *		$EDITOR..............Main editor (posts, events, polls) and topic summary.
+ *		$MODERATE............Move topic, split topic, merge topic.
+ *
+ *		$PROFILE.............The profile areas.
+ *		$PERSONAL............The personal messages (PM) areas.
+ *		$CALENDAR............The calendar
+ *		$STATISTICS..........The statistics centre.
+ *
+ *		$HELP................Help pages, help icons and pop-ups, tooltips.
+ *		$SEARCH..............Search pages, including memberlist search.
+ *		$MEMBERLIST..........The memberlist table.
+ *		$LOGIN...............Login and registration, maintenance mode.
+ *
+ *		$BOXES...............Message boxes (error, warning, info, etc).
+ *		$PROGRESS............Nifty progress bars.
+ *      $SVG.................Filter colors for the SVG icons
+ *		$MEDIA...............Experimental media queries.
+ */
+
+/* ---------------
+ *	$CONSTANTS
+ * ---------------
+ */
+:root {
+	--html_background: #0B0B0B; /* HTML & footer Background */
+	--body_grad_1: #0B0B0B; /* Body Gradient */
+	--body_grad_2: #0B0B0B; /* Body Gradient */
+
+	/* Top section above the navigation menu */
+	--top_section_border: #232323; /* Header */
+	--top_section_top_border: #232323; /* Top border */
+	--top_section_bottom_border: #363738; /* Top section lower border */
+	--top_section: #232323; /* Background */
+	--top_section_compliment: #232323; /* Used with above for gradient */
+
+	/* Menu nav background if a different background from top_section is wanted */
+	--menu_nav_grad_1: #232323; /* Top Menu nav bar background */
+	--menu_nav_grad_2: #232323; /* Top Menu nav bar background */
+
+	/* Footer */
+	--footer_text: #BBBBBB; /* Text used in the footer */
+	--footer_background: #0B0B0B; /* Footer Background */
+	--footer_top_border: #00214C; /* Border that separates footer from body */
+
+	/* Input controls, input, button, select, textarea */
+	--input-background: #0B0B0B; /* Generic inputs background */
+	--input_disabled_background: #E4E4E4; /* Disabled button background */
+	--input_border: #004299; /* Generic inputs border */
+	--input_border_hover: #2E7EE6; /* Hover for inputs */
+	--input_border_focus: #2E7EE6; /* Focus for inputs */
+	--input_background_hover: #00214C; /* Hover background */
+	--input_text: #3B72F0; /* input text */
+	--input_hover_text: #2E7EE6; /* When you need a darker text color on hover or elsewhere */
+
+	/* Submit controls */
+	--input_submit_border: #004299; /* XX[type="submit"] */
+	--input_submit_border_top: #004299; /* complimentary for inset effects */
+	--input_submit_border_left: #004299; /* complimentary for inset effects */
+	--input_submit_shadow: transparant; /* box shadow */
+	--input_submit_background: #0B0B0B; /* background */
+	--input_submit_background_compliment: #0B0B0B; /* Used as gradient */
+
+	/* Submit hover effects */
+	--input_submit_border_hover: #2E7EE6; /* XX[type="submit"] */
+	--input_submit_border_top_hover: #2E7EE6; /* complimentary for inset effects */
+	--input_submit_border_left_hover: #2E7EE6; /* complimentary for inset effects */
+	--input_submit_shadow_hover: transparent; /* box shadow */
+	--input_submit_background_hover: #00214C; /* background */
+
+	/* Main Menu Active Button */
+	--menu_button_active: #0266E9; /* Link, list, breadcrumb active/hover colors (gradient and color) */
+	--menu_button_active_2: #006FFF; /* Compliment gradient color for above */
+	--menu_button_border_active: #0266E9; /* Active border color */
+	--menu_button_border_active_top: #0266E9; /* Active top border */
+	--menu_button_active_hover: #1A7DFF; /* Link, list, breadcrumb active/hover colors (gradient and color) */
+	--menu_button_active_hover_2: #1A7DFF; /* Compliment gradient color for above */
+	--menu_border_active_hover_top: #1A7DFF; /* Active menu border color top */
+	--menu_border_active_hover_left: #1A7DFF; /* Active menu border color left */
+	--menu_border_active_hover: #1A7DFF; /* Hover / active border */
+
+	/* Main Menu Regular Buttons */
+	--menu_border: #232323; /* linklevel 1 border */
+	--menu_border_top: #232323;
+	--menu_border_left: #232323;
+	--menu_background: #232323; /* linklevel 1  background */
+	--menu_background_compliment: #232323;
+	--menu_border_hover_top: #0B0B0B; /*  menu border color top */
+	--menu_border_hover_left: #0B0B0B; /* menu border color left */
+	--menu_border_hover: #0B0B0B; /* Hover border */
+	--menu_button_hover_background: #0B0B0B; /* A background used on non active menu hovers */
+	--menu_dropdown_indicator: #566450; /* dropdown menu indicator */
+
+	--icon_menu_hover: #0B0B0B; /* Icon menu (small screen) hover background */
+	--icon_menu_hover_border: #232323;
+
+	/* Category Headers */
+	--category_header_text: #30884A; /* Text in the category bars */
+	--category_border: #131417; /* Main border color used around most everything that has a border */
+	--category_border_top: #131417;
+	--category_border_bottom: #131417;
+	--category_header_grad_1: #3B3B3D; /* 1-2 main header */
+	--category_header_grad_2: #2B2A2A; /* 1-3 category */
+	--category_header_grad_3: #292A2A; /* 1-4 secondary */
+	--category_header_grad_4: #27272A; /* end of */
+	--seconday_category_border: #AFAFAF; /* darker border */
+	--seconday_category_border_top: #CFCFCF; /* complimentary for hover effects */
+	--seconday_category_bottom: #BBBBBB;
+
+	/* Standard horizontal rule.. ([hr], etc.) */
+	--hr_border_bottom: #BBBBBB;
+	--hr_border_top: #BBBBBB;
+	--hr_background: #E4E4E4;
+
+	/* Misc */
+	--title: #30AD55; /* forum title, news, board names */
+	--topic_name: #3B72F0; /* Subject line, poster name and keyinfo */
+	--links: #5784ff; /* normal links */
+	--bbclinks: #30AD55; /* bbc links */
+
+	--me: #30AD55; /* me and footnotes */
+	--gradient_bar_top: #30AD55; /* Various bars, poll, stats, capacity */
+	--gradient_bar_bottom: #60BC78; /* Various bars, poll, stats, capacity */
+	--gradient_bar_background: #333333; /* Lighter compliment color when needed */
+	--icon_online_grad: #B4E391; /* part of icon online gradient */
+	--valid: #EBFFD8; /*  used as valid background color */
+	--successbox: #4073B0; /* success box background */
+	--information: #1B644E; /* information box background */
+	--description: #003a47; /* description box background */
+
+	--user_highlight: #D8FFDF; /* User highlighted text */
+	--link_shadow: #CEDCCB; /* BBC link underline */
+	--notice: #FFF5CD; /* This is a light yellow, approve bg, warn bg etc */
+	--sticky_row: #8E8E2C; /* sticky row background */
+	--locked_row: #CF1876; /* locked row background */
+	--status_bar_border: #A9CCD1; /* Status bar in attachment upload progress */
+	--status_bar_background: #232323; /* Status bar in attachment upload progress */
+
+	--progress_bar_blue: #0000FF; /* Blue progress bar, as in maintance */
+	--birthday: #B73DE8; /* Birthday color on calendar */
+	--holiday: #555080; /* Holiday color on calendar */
+	--currentday: #1B644E; /* Calendar current day */
+	--infobox_border: #3A87AD; /* Light shade of blue in infobox */
+	--infobox: #2C64AB; /* Very light blue, infobox background */
+
+	/* Backgrounds */
+	--primary_background: #0B0B0B; /* Background */
+	--content-background: #0B0B0B; /* Background for many divs, input controls, etc */
+	--forum_category: #0B0B0B; /* Category background, seen as line separators */
+	--primary_content_background: #0B0B0B; /* Used in many backgrounds */
+	--primary_content_compliment: #0B0B0B; /* Used with --primary_content_background for gradients */
+
+	/* Various */
+	--grey_background: #F0F0F0; /* Various uses, notably menu / tab hovers */
+	--mid_grey_background: #C4C4C4; /* Various uses where a slightly darker background is needed */
+	--dark_grey_background: #888888; /* A bit darker, useful in some places */
+	--primary_white: #DBDBDB; /* Used in shadows, backgrounds or text, many places */
+	--primary_white_compliment: #E4E4E4; /* Used with --primary_white for gradients */
+	--pure_green: #008000; /* Success, progress mainly background | border */
+	--medium_dark_green: #006F1C; /* New button, approve background, other */
+
+	/* Text colors */
+	--hover_text: #444444; /* When you need a darker text color on hover or elsewhere */
+	--body_text: #9D9D9D; /* Body text, text areas, editor, inputs, more */
+	--menu_text: #8B8B8B; /* used for text in menus, breadcrumbs, buttons */
+	--strong_text: #AAAAAA; /* like a demi bold */
+	--disabled_text: #585858; /* used in ACP */
+
+	/* Special text colors */
+	--attention: #A80000; /* Various red notice and error sections */
+	--alert: #FF0000; /* error, alert, ... text | border */
+	--search_highlight: #D08D1E; /* Search Results Highlight */
+	--warn: #D08D1E; /* moderation, warning, ... text | border | background */
+	--indicator: #30AD55; /* PM, Likes indicator */
+	--invalid: #FFEEEE; /* very pale red, used as invalid input color */
+
+	/* Most other borders */
+	--primary_border: #363738; /* Main border color used around most everything that has a border */
+	--primary_border_top: #363738;
+	--primary_border_left: #363738;
+	--primary_border_bottom: #363738;
+	--seconday_border: #232323; /* darker border */
+	--seconday_border_top: #232323; /* complimentary for hover effects */
+	--seconday_border_left: #232323; /* complimentary for hover effects */
+	--seconday_border_bottom: #232323;
+
+	/* Mostly used for shadows */
+	--transparent: transparent; /* Used on borders to hide them but keep sizing intact */
+	--box_shadow: transparent; /* Used on many box shadows */
+	--opacity10: rgba(200, 200, 200, 0.1); /* Used as box shadows */
+	--opacity20: rgba(200, 200, 200, 0.2);
+	--opacity30: rgba(200, 200, 200, 0.3);
+	--opacity40: rgba(200, 200, 200, 0.4);
+	--opacity50: rgba(200, 200, 200, 0.5);
+}
+
+/* ---------------
+ *	$GENERAL
+ * ---------------
+ */
+
+/* Normal, standard links. */
+a, a:link, a:visited,
+	/* Links that open in a new window. */
+a.new_win:link, a.new_win:visited {
+	color: var(--links);
+}
+
+/* Stop white band under footer on short pages.
+   This color should match $FOOTER background. */
+html {
+	background: var(--html_background);
+}
+
+body {
+	color: var(--body_text);
+	background-image: linear-gradient(to right, var(--body_grad_1) 0%, var(--body_grad_2) 50%, var(--body_grad_1) 100%);
+}
+
+fieldset {
+	border-color: var(--primary_border);
+	border-radius: 0;
+	background: var(--transparent);
+	box-shadow: inset -1px -1px 3px var(--box_shadow);
+}
+
+legend {
+	color: var(--bbclinks);
+}
+
+input, button, select, textarea, .editor {
+	color: var(--input_text);
+	border-color: var(--input_border);
+	background: var(--input-background);
+}
+
+input:hover, textarea:hover, button:hover, select:hover {
+	border-color: var(--input_border_hover);
+	background: var(--input_background_hover);
+}
+
+textarea:hover, .editor:hover {
+	color: var(--input_hover_text);
+	background: var(--input_background_hover);
+}
+
+input:focus, textarea:focus, button:focus, select:focus, .editor:focus {
+	border-color: var(--input_border_focus);
+	background: var(--content-background);
+}
+
+/* Give disabled text input elements a different background color. */
+input[disabled].input_text, input[disabled].input_password {
+	background: var(--input_disabled_background);
+}
+
+/* Common button styling. */
+input[type="submit"], .drop_area_fileselect_text, button[type="submit"], input[type="button"], button[type="button"],
+	/* Anchors styled to look like buttons.
+	   These have standard body text size. Can be chained with smalltext class. */
+.linkbutton:link, .linkbutton:visited {
+	color: var(--input_text);
+	border-color: var(--input_submit_border);
+	border-top-color: var(--input_submit_border_top);
+	border-left-color: var(--input_submit_border_left);
+	background-image: linear-gradient(to bottom, var(--input_submit_background), var(--input_submit_background_compliment));
+	box-shadow: 1px 1px 2px var(--input_submit_shadow), 0 -1px 0 var(--input_submit_shadow) inset;
+}
+
+/* Hover effects. */
+input[type="submit"]:hover, button[type="submit"]:hover, input[type="button"]:hover, button[type="button"]:hover, .linkbutton:hover {
+	color: var(--input_text);
+	border-color: var(--input_submit_border_hover);
+	border-top-color: var(--input_submit_border_top_hover);
+	border-left-color: var(--input_submit_border_left_hover);
+	background: var(--input_submit_background_hover);
+	box-shadow: 2px 1px 1px var(--input_submit_shadow_hover) inset;
+}
+
+/* But don't show disabled buttons as active on hover */
+input[type=submit][disabled]:hover, button[disabled], button[disabled]:hover {
+	border-color: var(--input_submit_border);
+	border-top-color: var(--input_submit_border_top);
+	border-left-color: var(--input_submit_border_left);
+	box-shadow: 1px 1px 2px var(--input_submit_shadow);
+}
+
+/* the new "button" */
+.new_posts, .new_posts:visited, .new_posts:link {
+	color: var(--primary_white);
+	background: var(--medium_dark_green);
+}
+
+/* approval indicator */
+.require_approval {
+	color: var(--primary_white);
+	background: var(--medium_dark_green);
+}
+
+/* Standard horizontal rule.. ([hr], etc.) */
+hr {
+	border-top-color: var(--hr_border_top);
+	border-bottom-color: var(--hr_border_bottom);
+	background: var(--hr_background);
+}
+
+strong {
+	color: var(--strong_text);
+}
+
+.content {
+	border-color: var(--transparent);
+	background: var(--primary_content_background);
+	box-shadow: 1px 2px 4px var(--box_shadow);
+}
+
+/* Styles for main headers. */
+.category_header, .forum_category .category_header {
+	color: var(--category_header_text);
+	border-color: var(--category_border);
+	border-top-color: var(--category_border_top);
+	border-bottom-color: var(--category_border_bottom);
+	background-image: linear-gradient(to bottom, var(--category_header_grad_1), var(--category_header_grad_2));
+}
+
+/* Single ones a bit darker than board index ones. */
+.content_category .category_header {
+	border-top-color: var(--seconday_category_border_top);
+	border-bottom-color: var(--seconday_category_bottom);
+	background-image: linear-gradient(to bottom, var(--category_header_grad_1), var(--category_header_grad_3));
+}
+
+/* Styles for subsection headers. */
+.secondary_header {
+	border-color: var(--category_border);
+	border-top-color: var(--category_border_top);
+	background-image: linear-gradient(to bottom, var(--category_header_grad_1), var(--category_header_grad_4));
+}
+
+.category_header a:link {
+	color: var(--category_header_text);
+}
+
+/* Custom highlighted text style for modern browsers.
+   Nicer than default. Needs two separate rules. */
+::-moz-selection {
+	color: var(--hover_text);
+	background: var(--user_highlight);
+}
+
+::selection {
+	color: var(--hover_text);
+	background: var(--user_highlight);
+}
+
+/* Other highlighted text, such as search results. */
+.highlight {
+	color: var(--search_highlight);
+}
+
+/* Sometimes there will be an error when you post */
+.error {
+	color: var(--alert) !important;
+}
+
+.border_error {
+	border-color: var(--alert) !important;
+}
+
+/* Messages that somehow need to attract the attention. */
+.alert {
+	color: var(--alert);
+}
+
+/* Colors for warnings. */
+.warn_mute {
+	color: var(--alert);
+}
+
+.warn_moderate, .softalert {
+	color: var(--warn);
+}
+
+.warn_watch, .success {
+	color: var(--pure_green);
+}
+
+.moderation_link, .moderation_link:visited {
+	color: var(--alert);
+}
+
+/* Used for sections that need somewhat larger corners */
+.roundframe, .well {
+	border-color: var(--primary_border);
+	background: var(--content-background);
+}
+
+/* The generic wrapper thingy. */
+.generic_list_wrapper {
+	border-color: var(--primary_border);
+	box-shadow: 0 -2px 2px var(--opacity10);
+}
+
+.generic_list_wrapper .title_bar {
+	border-bottom-color: var(--primary_border_bottom);
+	background: none;
+}
+
+.generic_list_wrapper .information {
+	border-bottom-color: var(--primary_border_bottom);
+	background: none;
+}
+
+/* Styles used by the auto suggest control. */
+.auto_suggest_div {
+	border-color: var(--seconday_border);
+}
+
+.auto_suggest_div:focus {
+	border-color: var(--seconday_border);
+}
+
+.auto_suggest_item {
+	background: var(--mid_grey_background);
+}
+
+.auto_suggest_item_hover {
+	color: var(--mid_grey_background);
+	background: var(--menu_text);
+}
+
+/* -------------------------------------------------------
+ * $BBC
+ * -------------------------------------------------------
+ */
+
+/* The "Quote:" and "Code:" header parts... */
+.codeheader, .bbc_quote > cite {
+	color: var(--body_text);
+	border-color: var(--primary_border);
+	background: var(--primary_content_background);
+}
+
+.codeheader {
+	border-top-color: var(--primary_border);
+}
+
+/* A quote, perhaps from another post. */
+.bbc_quote,
+	/* A code block - maybe PHP ;) - shared styles. */
+.bbc_code {
+	border-color: var(--primary_border);
+	background: var(--primary_content_background);
+}
+
+input[type=checkbox].quote-show-more {
+	background: linear-gradient(to bottom, var(--transparent) 0%, var(--transparent) 40%, var(--primary_content_background) 100%);
+}
+
+/* Extra quote styling */
+.bbc_quote {
+	box-shadow: 2px 2px 2px var(--box_shadow);
+}
+
+/* Extra code block styling. */
+.bbc_code {
+	border-top-color: var(--seconday_border_top);
+	border-bottom-color: var(--seconday_border_bottom);
+	background: var(--content-background);
+}
+
+/* Styling for BBC tags */
+.bbc_link:link, .bbc_link:visited {
+	color: var(--bbclinks);
+	box-shadow: 0 -1px 0 var(--link_shadow) inset;
+}
+
+.bbc_link:hover {
+	color: var(--links);
+	box-shadow: 0 -1px 0 var(--medium_dark_green) inset;
+}
+
+/* Styling for tables inside posts */
+.inner > .bbc_table_container > .bbc_table td,
+.messageContent > .bbc_table_container > .bbc_table td {
+	border-right: 1px solid var(--primary_border_right);
+	border-bottom: 1px solid var(--primary_border_bottom);
+}
+
+.inner > .bbc_table_container > .bbc_table th,
+.messageContent > .bbc_table_container > .bbc_table th {
+	border-right: 1px solid var(--primary_border_right);
+	border-bottom: 1px solid var(--seconday_border_bottom);
+}
+
+.inner > .bbc_table_container > .bbc_table td:last-child,
+.inner > .bbc_table_container > .bbc_table th:last-child,
+.messageContent > .bbc_table_container > .bbc_table td:last-child,
+.messageContent > .bbc_table_container > .bbc_table th:last-child {
+	border-right: none;
+}
+
+/* /me uses this a lot. (emote, try typing /me in a post.) */
+.meaction {
+	color: var(--me);
+}
+
+.spoiler {
+	border-color: var(--primary_border);
+	background: var(--mid_grey_background);
+}
+
+div.bbc_footnotes {
+	border-top-color: var(--seconday_border);
+}
+
+.bbc_footnotes .target:target {
+	background: var(--user_highlight);
+}
+
+sup.bbc_footnotes, sup.bbc_footnotes a {
+	color: var(--me);
+}
+
+/* -------------------------------------------------------
+ *	$AJAX
+ * -------------------------------------------------------
+ */
+
+/* The "Loading" bar for quick edit, etc. */
+#ajax_in_progress, .ajax_infobar {
+	color: var(--body_text);
+	border-bottom-color: var(--top_section_top_border);
+	background-color: var(--content-background) !important;
+}
+
+/* -------------------------------------------------------
+ *	$MAIN
+ * -------------------------------------------------------
+ */
+
+/* The top bar. */
+#top_section {
+	border-top-color: var(--top_section_top_border);
+	border-bottom-color: var(--top_section_bottom_border);
+	background-image: linear-gradient(to bottom, var(--top_section), var(--top_section_compliment));
+	box-shadow: 0 1px 4px var(--opacity30), 0 1px 0 var(--top_section_bottom_border) inset;
+}
+
+#menu_nav {
+	border-bottom-color: var(--top_section_bottom_border);
+	background-image: linear-gradient(to bottom, var(--menu_nav_grad_1) 0%, var(--menu_nav_grad_2) 49%, var(--menu_nav_grad_2) 51%, var(--menu_nav_grad_1) 100%);
+}
+
+/* Maintenance mode warning. */
+#top_section_notice {
+	color: var(--attention);
+}
+
+.forumtitle > a {
+	color: var(--title);
+	text-shadow: 1px 1px 0 var(--primary_white);
+}
+
+/* News section. */
+#news > h2 {
+	color: var(--title);
+}
+
+#news_line, #news {
+	color: var(--body_text);
+	border-color: var(--primary_border);
+	background: var(--primary_content_background);
+	box-shadow: 1px 2px 3px var(--box_shadow);
+}
+
+/* Main forum area.
+   Box-shadow only on this one. */
+#wrapper {
+	border-color: var(--transparent);
+	border-top-color: var(--transparent);
+	border-bottom-color: var(--transparent);
+	background: var(--content-background);
+	box-shadow: 0 2px 4px var(--primary_background);
+}
+
+/* The footer with copyright links etc. */
+#footer_section {
+	color: var(--footer_text);
+	border-top-color: var(--footer_top_border);
+	background: var(--footer_background);
+	box-shadow: 0 -1px 0 var(--transparent), 0 1px 0 var(--opacity40) inset;
+}
+
+#footer_section p, #footer_section a {
+	color: var(--footer_text);
+}
+
+#footer_section .rssfeeds {
+}
+.action_viewquery a, .action_viewquery strong,
+#debug_logging a, #debug_logging strong {
+	color: var(--pure_green);
+}
+
+#debug_logging {
+	color: var(--footer_text);
+	background: var(--footer_background);
+}
+
+#debug_logging_wrapper {
+	background: var(--footer_background);
+}
+
+.action_viewquery {
+	color: var(--footer_text);
+	background: var(--footer_background);
+}
+
+.action_viewquery .explain th,
+.action_viewquery .explain td {
+	border-color: var(--footer_top_border);
+}
+
+/* -------------------------------------------------------
+ *	$MENUS
+ * -------------------------------------------------------
+ */
+
+/* Level 1 Menu bar: link or button. General styling. */
+.linklevel1, .linklevel1:link, .linklevel1:visited {
+	color: var(--menu_text);
+	border-color: var(--menu_border);
+	border-top-color: var(--menu_border_top);
+	border-left-color: var(--menu_border_left);
+	background-image: linear-gradient(to bottom, var(--menu_background), var(--menu_background_compliment));
+	box-shadow: 1px 1px 2px var(--box_shadow);
+}
+
+/* Level 1-2-3 button hover and focus effects, focus for keyboard navigation */
+.linklevel1:hover, .listlevel1:hover .linklevel1,
+.linklevel1:focus, .listlevel1:focus .linklevel1,
+.linklevel2:hover, .listlevel2:hover .linklevel2,
+.linklevel2:focus, .listlevel2:focus .linklevel2,
+.linklevel3:hover, .listlevel3:hover .linklevel3,
+.linklevel3:focus, .listlevel3:focus .linklevel3,
+#menu_sidebar .linklevel1:hover, #menu_sidebar .listlevel1:hover .linklevel1 {
+	color: var(--strong_text);
+	border-color: var(--menu_border_hover);
+	border-top-color: var(--menu_border_hover_top);
+	border-left-color: var(--menu_border_hover_left);
+	background: var(--menu_button_hover_background);
+	box-shadow: 2px 1px 1px var(--opacity10) inset;
+}
+
+/* Top triangle pointer of all level1 dropdown menus, like a speech bubble pointer */
+.listlevel1.subsections::after {
+	border-color: var(--transparent);
+	border-top-color: var(--primary_border);
+	border-right-color: var(--primary_border);
+	background: var(--menu_nav_grad_1);
+}
+
+.poster .linklevel2, .poster .linklevel2:focus,
+.poster .listlevel2:hover .linklevel2 {
+	border-color: var(--transparent);
+	background: none;
+	box-shadow: none;
+}
+
+.poster li.listlevel1:hover {
+	background: var(--transparent);
+	box-shadow: none;
+}
+
+.poster li.poster_online:hover .linklevel1 {
+	color: var(--menu_text);
+	border-color: var(--menu_border);
+	border-top-color: var(--menu_border_top);
+	border-left-color: var(--menu_border_left);
+	background: var(--menu_button_hover_background);
+	box-shadow: 2px 1px 1px var(--opacity10) inset;
+}
+
+.poster li.poster_online .nolink {
+	color: var(--menu_text);
+	border-color: var(--menu_border);
+	border-top-color: var(--menu_border_top);
+	border-left-color: var(--menu_border_left);
+	background-image: linear-gradient(to bottom, var(--menu_background), var(--menu_background_compliment));
+	box-shadow: 1px 1px 2px var(--box_shadow);
+}
+
+.poster li.subsections.listlevel1:hover .linklevel1 {
+	background: var(--transparent);
+	box-shadow: none;
+}
+
+/* Level 1 active buttons. */
+.linklevel1.active, .listlevel1:hover .active,
+#collapse_button .linklevel1, .likes_indicator,
+#search_form_button .linklevel1, #search_form_button_close .linklevel1 {
+	color: var(--primary_white);
+	border-color: var(--menu_button_border_active);
+	border-top-color: var(--menu_button_border_active_top);
+	background-image: linear-gradient(to bottom, var(--menu_button_active_2), var(--menu_button_active));
+	box-shadow: 1px 1px 2px var(--box_shadow);
+}
+
+/* Hover effects for those buttons. */
+.linklevel1.active:hover, .listlevel1:hover .linklevel1.active,
+#collapse_button .linklevel1:hover, .buttonlist .linklevel1:hover, .quickbuttons .linklevel1:hover,
+#search_form_button .linklevel1:hover, #search_form_button_close .linklevel1:hover {
+	border-color: var(--menu_border_active_hover);
+	border-top-color: var(--menu_border_active_hover_top);
+	border-left-color: var(--menu_border_active_hover_left);
+	background: var(--input_submit_background_hover);
+	box-shadow: 1px 1px 1px var(--transparent) inset;
+}
+
+/* Do one override here for .poster. Still saves code all round. */
+.poster_avatar .linklevel1, .poster_avatar:hover .linklevel1,
+.poster_avatar .linklevel1:focus,
+.name.linklevel1, .name.linklevel1:hover, .name.linklevel1:focus {
+	color: var(--menu_button_active_2);
+	background: none;
+	box-shadow: none;
+}
+
+/* The next two are the Top level Dropdown / Disclose Indicator arrow next to the button name */
+#main_menu .subsections .linklevel1::after,
+#main_menu .subsections:hover .linklevel1::after {
+	border-top-color: var(--menu_dropdown_indicator);
+}
+
+/* Levels 2 and 3: drop menu wrapper. */
+.menulevel2, .menulevel3 {
+	border-color: var(--menu_border);
+	border-top-color: var(--menu_border_top);
+	border-left-color: var(--menu_border_left);
+	background: var(--menu_background);
+	box-shadow: 2px 2px 3px var(--transparent);
+}
+
+/* Poster flyout gets a reverse shadow to hide some background */
+.poster .menulevel2 {
+	box-shadow: 2px 2px 3px var(--opacity20), -5px -5px 1px var(--primary_content_background);
+}
+
+.poster_div_details {
+	border-right-color: var(--transparent);
+	border-left-color: var(--primary_border);
+}
+
+/* PM and Notification bubble indicator */
+.pm_indicator {
+	/* over ridding structure, make this a small circle, no counter */
+	top: 0;
+	right: 2px;
+	width: .75em;
+	height: .75em;
+	padding: 0;
+	text-indent: -9999px;
+	color: #000 !important;
+	border-radius: 50%;
+	background: var(--title);
+}
+
+.likes_indicator {
+	box-shadow: 2px 2px 2px var(--transparent);
+}
+
+/* Levels 2 and 3 drop menus: link or button. */
+.linklevel2:link, .linklevel2:visited, .linklevel3:link, .linklevel3:visited {
+	color: var(--menu_text);
+	border-color: var(--transparent);
+}
+
+/* Level 2: subsection indicators. */
+.listlevel2.subsections .linklevel2:after,
+#menu_sidebar .subsections .linklevel1:after,
+#menu_sidebar .subsections:hover .linklevel1:after {
+	color: var(--strong_text);
+}
+
+/* Level 2: dividers between admin/moderation, and pm/profile links. */
+#button_admin .listlevel2.subsections, #button_pm .listlevel2.subsections {
+	border-top-color: var(--menu_border_top);
+	box-shadow: 0 -1px 0 #BBBBBB;
+}
+
+/* Styles for sidebar menus.
+   Cancel default backgrounds for sidebar. */
+#menu_sidebar .linklevel1 {
+	color: var(--menu_text);
+	border-color: var(--transparent);
+	background: none;
+	box-shadow: none;
+}
+
+/* ------------------------
+ *	$LINKTREE / $BREADCRUMB
+ * ------------------------
+ */
+
+.breadcrumb {
+	box-shadow: 0 0 15px 1px var(--opacity30);
+}
+
+.breadcrumb .crumb {
+	color: var(--menu_text);
+	background: var(--primary_content_background);
+}
+
+.breadcrumb .crumb.active, .breadcrumb .crumb:hover, .breadcrumb .crumb:last-child:hover {
+	background-image: linear-gradient(0deg, var(--menu_button_active_2), var(--menu_button_active));
+}
+
+.breadcrumb .crumb.active a, .breadcrumb .crumb:hover a, .breadcrumb .crumb:last-child:hover a,
+.breadcrumb .crumb:last-child a, .breadcrumb .crumb:last-child strong {
+	color: var(--primary_white);
+}
+
+.breadcrumb .crumb.active:after, .breadcrumb .crumb:hover:after, .breadcrumb .crumb:last-child {
+	background-image: linear-gradient(135deg, var(--menu_button_active), var(--menu_button_active_2));
+}
+
+.breadcrumb .crumb:after {
+	background: var(--primary_content_background);
+	/* Arrow using box shadow on our rotated box */
+	box-shadow: 1px -1px 0 1px var(--hover_text), 2px -2px 0 1px var(--primary_background);
+}
+
+/* -------------------------------------------------------
+ * $BUTTONS
+ * This section contains code for the quickbuttons (quote, quick edit, etc)
+ * and for the buttonlist class (reply, add poll, notify, etc).
+ * These classes share some styling.
+ * Declarations are amalgamated where styling is shared.
+ * -------------------------------------------------------
+ */
+
+/* Styles for the standard button lists. */
+.buttonlist li a.linklevel1 {
+	box-shadow: 1px 1px 2px var(--box_shadow), 0 -1px 0 var(--box_shadow) inset;
+}
+
+/* The active one */
+.buttonlist li a.active {
+	box-shadow: 1px 1px 2px var(--box_shadow), 0 -1px 0 var(--menu_button_active) inset;
+}
+
+/* The quick buttons. */
+.quickbuttons .modified {
+	color: var(--strong_text);
+}
+
+/* Cancel generic border-radius. */
+.quickbuttons .linklevel1 {
+	color: var(--menu_text);
+}
+
+.quickbuttons .linklevel1::before, .quickbuttons .linklevel2::before {
+	background-image: url(../../images/_dark/quickbuttons.png);
+}
+
+/* -------------------------------------------------------
+ *	$PAGELINKS
+ * -------------------------------------------------------
+ */
+
+.selectbox, .pagelinks {
+	color: var(--menu_text);
+}
+
+.pagelinks .navPages {
+	color: var(--menu_text);
+	border-color: var(--seconday_border);
+	border-top-color: var(--seconday_border_top);
+	background-image: linear-gradient(to bottom, var(--primary_content_background) 0%, var(--primary_content_compliment) 100%);
+}
+
+.pagelinks .navPages:hover, .pagelinks .current_page {
+	color: var(--menu_text);
+	border-color: var(--primary_border);
+	background: var(--menu_button_hover_background);
+	box-shadow: 2px 1px 1px var(--opacity10) inset;
+}
+
+/* Globally accessible top/bottom links. */
+#gotop, #gobottom {
+	opacity: 0.2;
+	color: var(--primary_white_compliment);
+	border-color: var(--primary_background);
+	background: var(--mid_grey_background);
+}
+
+#gotop:hover, #gobottom:hover {
+	opacity: 1;
+	color: var(--hover_text);
+}
+
+/* Skip navigation link. */
+#top {
+	border-color: var(--top_section_top_border);
+	background: var(--primary_content_background);
+}
+
+/* -------------------------------------------------------
+ *	$TABLES
+ * -------------------------------------------------------
+ */
+
+/* A general table class. */
+.table_grid {
+	border-color: var(--primary_border);
+}
+
+.table_head > th {
+	color: var(--strong_text);
+	border-top-color: var(--primary_border_top);
+	border-bottom-color: var(--primary_border_bottom);
+	background: var(--primary_content_background);
+}
+
+/* Basic cells. */
+.table_grid td {
+	border-bottom-color: var(--primary_border);
+}
+
+/* Subtle zebra striping for rows. */
+.table_grid .standard_row:nth-child(even) {
+	background: var(--content-background);
+}
+
+.table_grid .standard_row:nth-child(odd) {
+	background: var(--primary_content_background);
+}
+
+/* Legacy highlight color, for selected membergroups etc.
+   Used by JS to show a selected item. Still used in manage languages */
+.table_grid .standard_row.highlight2 {
+	color: var(--body_text);
+	background: var(--primary_content_compliment);
+}
+
+/* For Errors.template.php. */
+#errorfile_table .current {
+	border-color: var(--hover_text);
+	background: var(--notice);
+}
+
+/* -------------------------------------------------------
+ * $SETTINGS
+ * -------------------------------------------------------
+ */
+
+/* Lists - settings use these a lot. */
+.settings label {
+	color: var(--body_text);
+}
+
+/* -------------------------------------------------------
+ * $BOARDS
+ * -------------------------------------------------------
+ * Set up some general framing classes. @todo
+ *    .forum_category for board index/sub-boards.
+ *    .forumposts for thread pages and recent posts, etc.
+ *    .content_category for general divisions around the place.
+ * All styled the same in default variant, but available for fun and games.
+ */
+
+/* The board categories and newsfader - some shared styling. */
+.forum_category, .content_category {
+	background: var(--forum_category);
+	box-shadow: 1px 2px 3px var(--box_shadow);
+}
+
+.board_row,
+.childboard_row,
+.forumposts > li,
+.content_category > div,
+.content_category > li {
+	border-color: var(--seconday_border);
+	background: var(--primary_content_background);
+}
+
+.board_name > a {
+	color: var(--title);
+}
+
+.board_stats {
+	color: var(--strong_text);
+}
+
+.board_info {
+	border-right-color: var(--primary_border);
+}
+
+.lastpost_link > a {
+	color: var(--links);
+}
+
+.board_latest strong {
+	color: var(--strong_text);
+}
+
+.childboards {
+	border-top-color: var(--primary_border_top);
+}
+
+.childboard_row h4, .board_new_posts {
+	color: var(--strong_text);
+}
+
+/* Styles for the info center on the board index. */
+.ic_section_header {
+	border-bottom-color: var(--primary_border_bottom);
+}
+
+#upshrinkHeaderIC .basic_row {
+	border-color: var(--seconday_border);
+	background: var(--primary_content_background);
+}
+
+.ic_section_header > a {
+	color: var(--body_text);
+}
+
+.ic_recent:not(:last-child) {
+	border-bottom-color: var(--seconday_border_bottom);
+}
+
+#ic_recentposts td, #ps_recentposts td, #ps_recenttopics td {
+	border-top-color: var(--primary_border_top);
+}
+
+.recentpost > strong > a, .inline > strong > a {
+	color: var(--title);
+}
+
+/* The board description and who-is-viewing stuff. */
+#description_board {
+	background: var(--mid_grey_background);
+	box-shadow: 1px 2px 4px var(--box_shadow);
+}
+
+#description_board .generalinfo, #forumposts .generalinfo {
+	border-color: var(--primary_border);
+	background: var(--primary_content_background);
+}
+
+/* -------------------------------------------------------
+ *	$MESSAGE ... Styles for the message (topic) index.
+ * -------------------------------------------------------
+ */
+
+.topic_listing {
+	background: var(--primary_content_background);
+	box-shadow: 1px 2px 4px var(--box_shadow);
+}
+
+.topic_listing > li {
+	border-color: var(--primary_border);
+}
+
+.basic_row {
+	background: var(--primary_content_background);
+}
+
+.topic_sorting_row {
+	background: var(--transparent);
+}
+
+#sort_by {
+	border-color: var(--primary_border);
+	background: var(--primary_content_background);
+}
+
+#sort_by.topic_sorting_recent {
+	border-color: var(--primary_border);
+}
+
+.topic_info {
+	border-right-color: var(--primary_border);
+}
+
+.topic_name h4 a {
+	color: var(--topic_name);
+}
+
+.sticky_row .topic_name h4 a, .locked_row.sticky_row .topic_name h4 a {
+	color: var(--body_text);
+}
+
+.locked_row .topic_name h4 a {
+	color: var(--strong_text);
+}
+
+.sticky_row .topic_name h4 a.new_posts, .locked_row.sticky_row .topic_name h4 a.new_posts, .locked_row .topic_name h4 a.new_posts {
+	color: var(--primary_white);
+}
+
+.topic_stats {
+	color: var(--strong_text);
+}
+
+.approvetopic_row, .approve_row {
+	background: var(--notice);
+}
+
+.topic_listing > li.sticky_row, .topic_listing > li.locked_row.sticky_row {
+	border-top-color: var(--transparent);
+	border-bottom: 4px double var(--sticky_row);
+	background: var(--primary_content_background);
+}
+
+.topic_listing > li.locked_row {
+	border-top-color: var(--locked_row);
+	border-bottom: 3px double var(--locked_row);
+	background: var(--primary_content_background);
+}
+
+#topic_icons {
+	border-color: var(--primary_border);
+}
+
+.jump_to_header {
+	color: var(--category_header_text);
+	background-image: linear-gradient(to bottom, var(--category_header_grad_1), var(--category_header_grad_3));
+	box-shadow: 2px 1px var(--opacity10) inset;
+}
+
+.jump_to_header:hover {
+	color: var(--body_text);
+	background: var(--menu_button_hover_background);
+}
+
+/* -------------------------------------------------------
+ *	$TOPICS
+ * -------------------------------------------------------
+ */
+
+/* Poll vote options */
+#poll_options .options {
+	border-top-color: var(--primary_border_top);
+}
+
+/* Poll results */
+#poll_options .options .percentage {
+	background: var(--primary_content_background);
+}
+
+.poll_gradient {
+	border-color: var(--primary_background);
+	background-image: linear-gradient(to bottom, var(--gradient_bar_bottom) 0%, var(--gradient_bar_top) 100%);
+}
+
+/* On to the posts */
+#quickreplybox, #forumposts, #searchform, #recentposts, #pmFolder, #topic_summary, #preview_section {
+	background: var(--dark_grey_background);
+	box-shadow: 1px 2px 4px var(--box_shadow);
+}
+
+/* Poster and postarea + moderation area underneath */
+.forumposts {
+	border-color: var(--transparent);
+	background: var(--primary_content_background);
+}
+
+/* Colors for background of posts requiring approval */
+.approvebg {
+	background: var(--notice);
+}
+
+.poster .name {
+	color: var(--topic_name);
+}
+
+/* Drop menu for the poster info. */
+.poster .listlevel1.sfhover .menulevel2, .poster .listlevel1:hover .menulevel2 {
+	background: var(--primary_content_background);
+}
+
+.report_separator {
+	border-bottom-color: var(--primary_border_bottom);
+}
+
+.poster_online .linklevel1 {
+	border-color: var(--seconday_border);
+	border-top-color: var(--seconday_border_top);
+	border-left-color: var(--seconday_border_left);
+	background-image: linear-gradient(to bottom, var(--primary_content_background) 0%, var(--primary_content_compliment) 100%);
+	box-shadow: 1px 1px 2px var(--box_shadow);
+}
+
+.poster_online .linklevel1:hover {
+	border-color: var(--primary_border);
+	border-top-color: var(--seconday_border);
+	border-left-color: var(--seconday_border_left);
+	background: var(--menu_button_hover_background);
+	box-shadow: 1px 1px 1px var(--opacity10) inset;
+}
+
+.post_subject {
+	color: var(--body_text);
+}
+
+.keyinfo h5 a, .keyinfo h5 a strong {
+	color: var(--topic_name);
+}
+
+/* The icon selection dropdown you get by clicking on the icon in message view */
+.keyinfo .messageicon .dropdown {
+	border-color: var(--transparent);
+	background: var(--transparent);
+}
+
+.keyinfo .messageicon .dropdown:hover {
+	background: var(--transparent);
+}
+
+/* This div and items are added by javascript for the icon selection */
+#iconList {
+	border-color: #ADADAD;
+	background: var(--content-background);
+}
+
+#iconList > .messageIcon {
+	border-color: var(--content-background);
+}
+
+#iconList > .messageIcon:hover {
+	border-color: var(--menu_border_hover);
+	background: var(--menu_hover_background);
+}
+
+.messageContent {
+	border-top-color: var(--seconday_border);
+}
+
+.messageContent .bbc_img.ila_pending {
+	border-color: var(--primary_border);
+}
+
+/* All the signatures used in the forum. */
+.signature, .attachments {
+	border-top-color: var(--seconday_border);
+}
+
+.signature.likes, .custom_fields_above_signature {
+	border-top-color: var(--transparent);
+}
+
+/* Attachment details below thumbnails */
+.attachment_name, .attachment_details {
+	color: var(--hover_text) !important;
+	border: solid 1px var(--seconday_border);
+	background: var(--mid_grey_background) !important;
+}
+
+.attachment_name {
+	border-bottom: none;
+}
+
+.generic_border .attachment_name {
+	border: 1px solid var(--transparent);
+}
+
+/* Poor Mans lightbox support */
+#elk_lightbox {
+	background: var(--opacity40);
+}
+
+#elk_lb_content.expand {
+	border-color: var(--primary_content_background);
+}
+
+#elk_lb_expand, #elk_lb_next, #elk_lb_prev {
+	border-color: var(--primary_border);
+	background: var(--primary_background);
+}
+
+#elk_lb_expand:before,
+#elk_lb_next:before,
+#elk_lb_prev:before {
+	color: var(--primary_white_compliment);
+}
+
+/* A couple of structure tweaks on the new separator */
+.new_post_separator {
+	margin: -1px 0 -8px 0;
+}
+
+.new_post_separator:after {
+	top: -16px;
+	border-color: var(--mid_grey_background) var(--transparent);
+}
+
+.new_post_separator:before {
+	border-color: var(--seconday_border_bottom) var(--transparent);
+}
+
+/* Used by video embed JS when auto linking video links */
+.elk_video_header {
+	border-color: var(--primary_border);
+}
+
+.elk_video_container {
+	border-color: var(--primary_border);
+	background-image: linear-gradient(to bottom, var(--category_header_grad_1), var(--category_header_grad_2));
+}
+
+/* Used by share topic */
+.requiredfield:before {
+	border-bottom-color: var(--medium_dark_green);
+}
+
+.requiredfield {
+	color: var(--primary_white);
+	border-color: var(--menu_border_hover_top);
+	background: var(--medium_dark_green);
+}
+
+/* -------------------------------------------------------
+ *	$EDITOR
+ * -------------------------------------------------------
+ */
+
+/* The main post editor section. */
+#preview_body {
+	border-color: var(--primary_border);
+	background: var(--primary_content_background);
+}
+
+#postAdditionalOptionsHeader, #postDraftOptionsHeader {
+	background-image: linear-gradient(to bottom, var(--category_header_grad_1), var(--category_header_grad_2));
+}
+
+#postAdditionalOptions, #postDraftOptions {
+	border-color: var(--primary_border);
+	background: var(--primary_content_background);
+}
+
+#postAdditionalOptionsNC {
+	border-color: var(--primary_border);
+	background: var(--primary_content_background);
+}
+
+.drop_area {
+	color: var(--hover_text);
+	border-color: var(--primary_border);
+	background: var(--mid_grey_background);
+}
+
+.statusbar {
+	border-top-color: var(--status_bar_border);
+	border-bottom-color: var(--status_bar_border);
+	background: var(--status_bar_background);
+}
+
+.statusbar .insertoverlay {
+	border-color: var(--status_bar_border);
+	background: var(--content-background);
+}
+
+.insertoverlay .tabs li {
+	border-color: var(--pure_green);
+}
+
+.insertoverlay .tabs li.active {
+	background: var(--mid_grey_background);
+}
+
+.statusbar .insertoverlay .button {
+	color: var(--content-background);
+	background: var(--pure_green);
+}
+
+.progressBar {
+	border-color: var(--primary_border);
+}
+
+.progressBar div {
+	color: var(--primary_white);
+	background: var(--pure_green);
+}
+
+.abort {
+	border: 2px solid var(--alert);
+}
+
+.ila_container {
+	border-color: var(--seconday_border);
+	border-top-color: var(--seconday_border_top);
+	border-left-color: var(--seconday_border_left);
+	background-image: linear-gradient(to bottom, var(--primary_content_background) 0%, var(--primary_content_compliment) 100%);
+	box-shadow: 1px 1px 2px var(--box_shadow);
+
+}
+
+.ila_container:hover {
+	border-color: var(--primary_border);
+	border-top-color: var(--seconday_border);
+	border-left-color: var(--seconday_border_left);
+	background: var(--menu_button_hover_background);
+	box-shadow: 1px 1px 1px var(--opacity10) inset;
+}
+
+.drop_attachments_error {
+	color: var(--alert);
+}
+
+#postMoreOptions {
+	border-top-color: var(--primary_border);
+}
+
+#postDraftOptions .settings dd, #postDraftOptions .settings dt {
+	border-top-color: var(--seconday_border_top);
+}
+
+/* -------------------------------------------------------
+ *	$MODERATE
+ * -------------------------------------------------------
+ */
+.split_messages .post {
+	border-top-color: var(--primary_border);
+}
+
+/* -------------------------------------------------------
+ * $TABS
+ * -------------------------------------------------------
+ */
+
+.ui-tabs .ui-tabs-panel {
+	border-color: var(--primary_border);
+	background: var(--primary_content_background);
+}
+
+.ui-tabs .ui-tabs-nav li {
+	color: var(--body_text);
+	border-color: var(--primary_border) !important;
+}
+
+.ui-tabs .ui-tabs-nav .ui-tabs-anchor {
+	border-bottom-color: var(--primary_border);
+	background: var(--grey_background);
+}
+
+.ui-tabs .ui-tabs-nav .ui-state-default .ui-tabs-anchor {
+	background-image: linear-gradient(to bottom, var(--primary_content_background), var(--primary_content_compliment)) !important;
+}
+
+.ui-tabs .ui-tabs-nav .ui-state-active .ui-tabs-anchor,
+.ui-tabs .ui-tabs-nav .ui-state-active {
+	color: var(--primary_white);
+	background-image: linear-gradient(to bottom, var(--menu_button_active_2), var(--menu_button_active)) !important;
+}
+
+.ui-tabs .ui-tabs-nav li.ui-state-hover .ui-tabs-anchor {
+	color: var(--strong_text);
+	border-color: var(--input_border_hover);
+	border-top-color: var(--seconday_border);
+	border-left-color: var(--seconday_border);
+	background: var(--input_background_hover) !important;
+}
+
+li.ui-tab.ui-tabs-active.ui-state-active.ui-state-hover,
+li.ui-tab.ui-tabs-active.ui-state-active.ui-state-hover .ui-tabs-anchor {
+	color: var(--primary_white);
+	border-color: var(--menu_border_active_hover);
+	border-top-color: var(--menu_border_active_hover_top);
+	border-left-color: var(--menu_border_active_hover_left);
+	background: var(--menu_button_active_hover) !important;
+	box-shadow: 1px 1px 1px var(--opacity30) inset;
+}
+
+/* -------------------------------------------------------
+ * $PROFILE
+ * -------------------------------------------------------
+ */
+
+#profile_attachments {
+	border-color: var(--primary_border);
+	background: var(--mid_grey_background);
+	box-shadow: 0 -2px 2px var(--opacity10);
+}
+
+#profile_attachments .content {
+	background: var(--primary_content_background);
+}
+
+.content_noframe {
+	box-shadow: none;
+}
+
+.profileblock {
+	background: var(--primary_content_background);
+}
+
+#detailedinfo dt, #tracking dt, .profileblock dt {
+	color: var(--body_text);
+}
+
+.activity_stats li span {
+	border-color: var(--body_text);
+	background: var(--mid_grey_background);
+}
+
+.activity_stats li .bar {
+	border-color: var(--primary_border);
+	background: var(--primary_content_background);
+}
+
+.activity_stats li .bar div {
+	background-image: linear-gradient(to bottom, var(--gradient_bar_bottom) 0%, var(--gradient_bar_top) 100%);
+}
+
+.profile_pie_ring {
+	stroke: var(--gradient_bar_background);
+}
+
+.profile_pie_segment {
+	stroke: var(--gradient_bar_top);
+}
+
+.topic_details {
+	border-bottom-color: var(--primary_border);
+}
+
+.ignoreboards a {
+	border-bottom-color: var(--primary_border);
+}
+
+.ignoreboards a:hover {
+	border-bottom-color: var(--menu_text);
+}
+
+.generic_border {
+	border-color: var(--primary_border);
+}
+
+/* Custom Profile Field Icons */
+ul.cf_icons {
+	border-top-color: var(--primary_border);
+}
+
+#warndiv .ui-widget-header {
+	background: var(--transparent);
+}
+
+#warndiv .watched .ui-widget-header {
+	background: var(--pure_green);
+}
+
+#warndiv .moderated .ui-widget-header {
+	background: var(--warn);
+}
+
+#warndiv .muted .ui-widget-header {
+	background: var(--attention)
+}
+
+#creator dt strong {
+	color: var(--body_text)
+}
+
+/* -------------------------------------------------------
+ * $PERSONAL
+ * -------------------------------------------------------
+ */
+
+#personal_messages .capacity_bar {
+	border-color: var(--seconday_border);
+}
+
+#personal_messages .capacity_bar span {
+	border-right-color: var(--seconday_border);
+}
+
+#personal_messages .capacity_bar .empty {
+	background: var(--gradient_bar_bottom);
+}
+
+#personal_messages .capacity_bar .filled {
+	background: var(--warn);
+}
+
+#personal_messages .capacity_bar .full {
+	background: var(--attention);
+}
+
+.addrules dt.floatleft {
+	color: var(--body_text);
+}
+
+/* -------------------------------------------------------
+ * $CALENDAR
+ * -------------------------------------------------------
+ */
+
+.birthday {
+	color: var(--birthday);
+}
+
+.event {
+	color: var(--pure_green);
+}
+
+.holiday {
+	color: var(--holiday);
+}
+
+/* The grid lines */
+.calendar_table {
+	border-top-color: var(--primary_border_top);
+	background: var(--primary_border_top);
+}
+
+.calendar_table th, .calendar_table td {
+	background: var(--primary_content_background);
+}
+
+/* Used to indicate the current day. */
+#main_grid .calendar_today, #month_grid .calendar_today {
+	border-color: var(--seconday_border);
+	background: var(--currentday);
+}
+
+.weeklist {
+	background: var(--mid_grey_background);
+}
+
+.weeklist > li {
+	border-color: var(--primary_border);
+	background: var(--primary_content_background);
+}
+
+.modify_event {
+	color: var(--attention);
+}
+
+/* Add a background that fits with the calendar. */
+#calendar_navigation {
+	border-color: var(--primary_border);
+}
+
+/* -------------------------------------------------------
+ *	$HELP
+ * -------------------------------------------------------
+ */
+
+#helpmain {
+	border-color: var(--primary_border);
+	box-shadow: 0 -2px 2px var(--opacity10);
+}
+
+/* Styles for the tooltips. */
+.tooltip {
+	border-color: var(--seconday_border);
+	background: var(--primary_content_background);
+	box-shadow: 3px 3px 3px var(--opacity30);
+}
+
+/* The darkened background for help pop-ups. */
+.popup_container {
+	background: var(--opacity40);
+}
+
+/* The actual pop-up wrapper. */
+.popup_window {
+	border-color: var(--seconday_border);
+	background: var(--content-background);
+	background-clip: padding-box;
+	box-shadow: 0 5px 15px var(--opacity50);
+}
+
+/* The text content, hopefully helpful. */
+.popup_content {
+	border-color: var(--primary_border);
+	border-bottom-color: var(--primary_border_bottom);
+	background: var(--content-background);
+	box-shadow: 0 -2px 2px var(--opacity10);
+}
+
+/* -------------------------------------------------------
+ *	$SEARCH
+ * -------------------------------------------------------
+ */
+
+#search_form_menu {
+	background: var(--menu_nav_grad_1);
+	box-shadow: 0 0 15px 1px var(--opacity30);
+}
+
+#search_form_menu input, #search_form_menu select, #search_form_menu button {
+	background: var(--primary_content_background);
+}
+
+#mlsearch_options {
+	border-color: var(--primary_border);
+	background: var(--content-background);
+}
+
+.search_results_posts .topic_body {
+	border-top-color: var(--primary_border);
+	box-shadow: 0 1px 0 var(--primary_white) inset;
+}
+
+.search_results_posts > li:not(:last-child) {
+	border-bottom-color: var(--primary_border_bottom);
+}
+
+/* -------------------------------------------------------
+ *	$MEMBERLIST
+ * -------------------------------------------------------
+ */
+
+.mlist li div, .whos_online dt div, .whos_online dd:nth-child(odd) div {
+	border-top-color: var(--primary_border);
+	border-bottom-color: var(--primary_border);
+	background: var(--primary_content_background);
+}
+
+.mlist li.alternate_row div, .whos_online dd:nth-child(even) div {
+	border-top-color: var(--primary_border);
+	border-bottom-color: var(--primary_border);
+	background: var(--content-background);
+}
+
+.mlist li div:first-child {
+	border-left-color: var(--primary_border);
+}
+
+.mlist li div:last-child {
+	border-right-color: var(--primary_border);
+}
+
+.letter_row > h3 {
+	border-color: var(--primary_border);
+	background-image: linear-gradient(to bottom, var(--category_header_grad_1), var(--category_header_grad_3));
+}
+
+/* -------------------------------------------------------
+ *	$LOGIN
+ * -------------------------------------------------------
+ */
+
+.coppa_contact {
+	color: var(--body_text);
+	border-color: var(--body_text);
+	background: var(--primary_content_background);
+}
+
+.valid_input {
+	background: var(--valid);
+}
+
+.invalid_input {
+	background: var(--invalid);
+}
+
+.check_input {
+	border-color: var(--warn);
+}
+
+/* -------------------------------------------------------
+ *	$BOXES
+ * -------------------------------------------------------
+ */
+
+/* Information boxes. */
+.description, .information {
+	border-color: var(--primary_border);
+	background: var(--description);
+}
+
+.information {
+	background: var(--information);
+}
+
+/* More boxes, although SVG they have embedded color so they are here */
+.warningbox, .successbox, .infobox, .errorbox, .genericbox {
+	color: var(--strong_text);
+	border-color: var(--transparent);
+	background-repeat: no-repeat;
+}
+
+.warningbox {
+	border-top-color: var(--warn);
+	border-bottom-color: var(--warn);
+	background-color: var(--transparent);
+	background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='%23FFA500' viewBox='0 0 31 36'%3E%3Cpath d='M15.429 2.571c8.518 0 15.429 6.911 15.429 15.429s-6.911 15.429-15.429 15.429S0 26.518 0 18 6.911 2.571 15.429 2.571zM18 27.623v-3.817c0-.362-.281-.663-.623-.663H13.52a.668.668 0 00-.663.663v3.817c0 .362.301.663.663.663h3.857c.342 0 .623-.301.623-.663zm-.04-6.911l.362-12.475a.403.403 0 00-.201-.362.776.776 0 00-.482-.161h-4.42a.768.768 0 00-.482.161.402.402 0 00-.201.362l.342 12.475c0 .281.301.502.683.502h3.717c.362 0 .663-.221.683-.502z'/%3E%3C/svg%3E");
+}
+
+.successbox {
+	border-top-color: var(--pure_green);
+	border-bottom-color: var(--pure_green);
+	background-color: var(--transparent);
+	background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='%23008000' viewBox='0 0 32 32'%3E%3Cpath d='M27 4L12 19l-7-7-5 5 12 12L32 9z'/%3E%3C/svg%3E");
+}
+
+.infobox {
+	border-top-color: var(--infobox_border);
+	border-bottom-color: var(--infobox_border);
+	background-color: var(--transparent);
+	background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' stroke='%233A87AD' stroke-width='.07em' fill='%230080FF' viewBox='-1 0 33 33'%3E%3Cpath d='M17 0l-3 3 3 3-7 8H3l5.5 5.5L0 30.77V32h1.23l11.27-8.5L18 29v-7l8-7 3 3 3-3L17 0zm-3 17l-2-2 7-7 2 2-7 7z'/%3E%3C/svg%3E");
+}
+
+.genericbox {
+	border-top-color: var(--infobox_border);
+	border-bottom-color: var(--infobox_border);
+	background-color: var(--transparent);
+}
+
+.errorbox {
+	border-top-color: var(--attention);
+	border-bottom-color: var(--attention);
+	background-color: var(--transparent);
+	background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='%23A80000' viewBox='0 0 31 36'%3E%3Cpath d='M15.429 2.571c8.518 0 15.429 6.911 15.429 15.429s-6.911 15.429-15.429 15.429S0 26.518 0 18 6.911 2.571 15.429 2.571zM18 27.623v-3.817c0-.362-.281-.663-.623-.663H13.52a.668.668 0 00-.663.663v3.817c0 .362.301.663.663.663h3.857c.342 0 .623-.301.623-.663zm-.04-6.911l.362-12.475a.403.403 0 00-.201-.362.776.776 0 00-.482-.161h-4.42a.768.768 0 00-.482.161.402.402 0 00-.201.362l.342 12.475c0 .281.301.502.683.502h3.717c.362 0 .663-.221.683-.502z'/%3E%3C/svg%3E");
+}
+
+/* -------------------------------------------------------
+ *	$PROGRESS
+ * -------------------------------------------------------
+ */
+
+.progress_bar {
+	border-color: var(--primary_background);
+	background: var(--primary_content_background);
+	box-shadow: inset 0 2px 5px var(--opacity10);
+}
+
+.progress_bar > .green_percent {
+	color: var(--primary_white);
+	background: var(--pure_green);
+}
+
+.progress_bar > .blue_percent {
+	color: var(--primary_white);
+	background: var(--progress_bar_blue);
+}
+
+/* -------------------------------------------------------
+ * $STATISTICS
+ * -------------------------------------------------------
+ */
+
+.statistics .category_header {
+	border-bottom-color: var(--primary_border);
+	background: none;
+	text-shadow: none;
+}
+
+.statistics .flow_hidden, #forum_history .flow_hidden {
+	border-color: var(--primary_border);
+	background: var(--primary_content_background);
+}
+
+.stats.floatleft {
+	border-right-color: var(--primary_border);
+}
+
+#top_row .stats dd, .statsbar {
+	border-color: var(--seconday_border);
+	background: var(--primary_content_background);
+}
+
+/* Methinks topic links, etc need a little more oomph next to the orange bars. */
+#top_row .stats dd {
+	border-color: var(--transparent);
+	background: none;
+}
+
+/* Status Bar Green */
+.statsbar .bar {
+	background-image: linear-gradient(to bottom, var(--gradient_bar_bottom) 0%, var(--gradient_bar_top) 100%);
+}
+
+/* Absolute positioning stops these breaking the bars on narrow screens. */
+.statsbar .righttext {
+	background: var(--primary_content_background);
+}
+
+#like_post_stats_overlay {
+	background: var(--opacity40);
+}
+
+/* -------------------------------------------------------
+ *	$ICONS
+ * -------------------------------------------------------
+ *
+ * Icons. The color file is the place for this since we
+ * can't style embedded material.
+ *
+ * ---------------
+ */
+
+.warnicon {
+	border-color: var(--warn);
+}
+
+.iconline {
+	border-color: var(--medium_dark_green);
+	background-image: linear-gradient(to bottom, var(--icon_online_grad) 0%, var(--medium_dark_green) 50%, var(--icon_online_grad) 100%);
+}
+
+.icoffline {
+	border-color: var(--primary_border);
+	background-image: linear-gradient(to bottom, var(--mid_grey_background) 0%, var(--dark_grey_background) 50%, var(--mid_grey_background) 100%);
+}
+
+/* -------------------------------------------------------
+ *	$MEDIA
+ * -------------------------------------------------------
+ *
+ * NOTE:
+ * When setting break points for media queries, don't set them in pixels.
+ * Use em instead.
+ * Why? Because the point of re-stacking/dropping content is to fit it all
+ * in the available space. This is dependent not just on width in pixels,
+ * but also on the user-selected text size that is set in the browser.
+ *
+ * If, for whatever reason (eyesight, pixel pitch, workstation arrangement, etc)
+ * a user requires text 50% larger than theme default, then their screen is
+ * effectively a lot smaller than its nominal resolution would indicate.
+ * If the break points are set in em, suddenly the media queries become equally
+ * responsive for all users, without any extra code being required.
+ *
+ * Testing em break points is just as easy as testing pixels,
+ * and it will make more people happier. This is cool. :)
+ *
+ * Of course, having comments to map em to px for each query is a good idea too.
+ */
+
+/* This one does 1024 screens at default font size.
+   -------------------------------------------------------------------------------------------*/
+
+@media screen and (max-width: 64em) {
+	#menu_sidebar {
+		border-color: var(--seconday_border);
+		background: var(--primary_content_background);
+		box-shadow: .2em .2em .2em var(--opacity30);
+	}
+
+	.icon-menu {
+		border-color: var(--menu_text);
+	}
+
+	.icon-menu:hover {
+		border-color: var(--icon_menu_hover_border);
+	}
+
+	.mlist li div.posts {
+		border-right-color: var(--primary_border);
+	}
+
+	/* This provides a bottom border, seen when crumbs wrap */
+	.breadcrumb .crumb:not(:last-child) {
+		box-shadow: 0 -1px 0 1px var(--box_shadow), 0 0 0 1px var(--body_text);
+	}
+}
+
+/* This one does 800 screens at default font size.
+   -------------------------------------------------------------------------------------------*/
+
+@media screen and (max-width: 50em) {
+	#main_menu .linklevel1.active, #main_menu .linklevel1.active:hover,
+	#main_menu .linklevel1:not(.panel_toggle):not(.panel_search):not(#quicksearch):not(#search_selection) {
+		border-color: var(--transparent);
+		background: var(--transparent);
+	}
+
+	#main_menu .linklevel1.active .icon-menu {
+		border-color: var(--menu_border_hover);
+	}
+
+	#main_menu .linklevel1 .icon-menu:hover {
+		background: var(--icon_menu_hover);
+	}
+
+	#main_menu .linklevel1:not(#search_form_menu input):not(#search_form_menu select):not(#search_form_menu button) {
+		border-color: transparent;
+		box-shadow: none;
+	}
+}
+
+/* This one does up to 540 screens.
+   -------------------------------------------------------------------------------------------*/
+
+@media screen and (max-width: 34em) {
+	.board_lastpost {
+		border-top-color: var(--primary_border);
+	}
+
+	.topic_listing > li {
+		border-color: var(--seconday_border);
+		box-shadow: 3px 3px 6px var(--box_shadow);
+	}
+
+	.poster:after, .posterarea:before {
+		border-bottom: 1px solid var(--seconday_border);
+	}
+
+	.whos_online dd:nth-child(even), .whos_online dd:nth-child(odd) {
+		border-top-color: var(--primary_border);
+	}
+
+	.forumposts > aside {
+		border-bottom-color: var(--primary_border_bottom);
+	}
+}
+
+/* This one does 480px screens at default font size.
+   -------------------------------------------------------------------------------------------*/
+
+@media screen and (max-width: 30em) {
+	.mlist li .group {
+		border-right-color: var(--primary_border);
+	}
+
+	.category_boards .board_latest {
+		border-top-color: var(--primary_border);
+	}
+}

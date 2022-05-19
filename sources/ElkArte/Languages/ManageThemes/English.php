@@ -20,7 +20,7 @@ $txt['theme_install_dir'] = 'From a directory on the host server:';
 $txt['theme_install_error'] = 'That theme directory doesn\'t exist, or doesn\'t contain a theme.';
 $txt['theme_install_write_error'] = 'The themes directory must be writable to continue.';
 $txt['theme_install_go'] = 'Install';
-$txt['theme_install_new'] = 'Create a copy of the ElkArte default theme named:';
+$txt['theme_install_new'] = 'Create a copy of the ElkArte theme named:';
 $txt['theme_install_new_confirm'] = 'Are you sure you want to install this new theme?';
 $txt['theme_install_writable'] = 'Warning - you cannot create or install a new theme as your themes directory is not currently writable.';
 $txt['theme_install_general'] = 'The theme doesn\'t seem to be where it should, please double check the information you provided.';
@@ -140,3 +140,4 @@ $txt['themeadmin_themelist_link'] = 'Show the list of installed themes';
 // Strings for the variants
 $txt['variant_light'] = 'ElkArte Light';
 $txt['variant_besocial'] = 'ElkArte Be Social!';
+$txt['variant_dark'] = 'ElkArte Dark Vader';
