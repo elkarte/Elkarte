@@ -140,7 +140,7 @@
 	/* Misc */
 	--title: #30AD55; /* forum title, news, board names */
 	--topic_name: #3B72F0; /* Subject line, poster name and keyinfo */
-	--links: #5784ff; /* normal links */
+	--links: #5784FF; /* normal links */
 	--bbclinks: #30AD55; /* bbc links */
 
 	--me: #30AD55; /* me and footnotes */
@@ -151,7 +151,7 @@
 	--valid: #EBFFD8; /*  used as valid background color */
 	--successbox: #4073B0; /* success box background */
 	--information: #1B644E; /* information box background */
-	--description: #003a47; /* description box background */
+	--description: #003A47; /* description box background */
 
 	--user_highlight: #D8FFDF; /* User highlighted text */
 	--link_shadow: #CEDCCB; /* BBC link underline */
@@ -621,8 +621,6 @@ sup.bbc_footnotes, sup.bbc_footnotes a {
 	color: var(--footer_text);
 }
 
-#footer_section .rssfeeds {
-}
 .action_viewquery a, .action_viewquery strong,
 #debug_logging a, #debug_logging strong {
 	color: var(--pure_green);
@@ -779,14 +777,14 @@ sup.bbc_footnotes, sup.bbc_footnotes a {
 
 /* PM and Notification bubble indicator */
 .pm_indicator {
-	/* over ridding structure, make this a small circle, no counter */
+	/* overriding structure, make this a small circle, no counter (off screen) */
 	top: 0;
 	right: 2px;
 	width: .75em;
 	height: .75em;
 	padding: 0;
 	text-indent: -9999px;
-	color: #000 !important;
+	color: var(--input-background) !important;
 	border-radius: 50%;
 	background: var(--title);
 }

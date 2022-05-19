@@ -3,3 +3,4 @@
 multiselect.css
 vendor/**/*.css
 icons_svg.css
+icons_svg_*.css
