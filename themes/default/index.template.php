@@ -301,9 +301,8 @@ function template_search_form()
 	}
 
 	echo '					
-				<label for="quicksearch">
-					<input type="search" name="search" id="quicksearch" value="" class="linklevel1" placeholder="', $txt['search'], '" />
-				</label>
+				<label for="quicksearch" class="hide">', $txt['search'], '</label>
+				<input type="search" name="search" id="quicksearch" value="" class="linklevel1" placeholder="', $txt['search'], '" />
 				<button type="submit" aria-label="' . $txt['search'] . '" name="search;sa=results" class="', (!empty($modSettings['search_dropdown'])) ? 'with_select' : '', '">
 					<i class="icon i-search icon-shade"><s>', $txt['search'], '</s></i>
 				</button>
@@ -324,13 +323,13 @@ function template_mb_search_bar()
 	global $txt;
 
 	echo '
-			<li id="search_form_button" class="listlevel1" role="none">
-				<label for="search_form_check">
-					<a class="linklevel1 panel_search" role="menuitem">
-						<i class="main-menu-icon i-search colorize-white"><s>', $txt['search'], '</s></i>
-					</a>
-				</label>
-			</li>';
+						<li id="search_form_button" class="listlevel1" role="none">
+							<label for="search_form_check">
+								<a class="linklevel1 panel_search" role="menuitem">
+									<i class="main-menu-icon i-search colorize-white"><s>', $txt['search'], '</s></i>
+								</a>
+							</label>
+						</li>';
 }
 
 /**
@@ -494,7 +493,7 @@ function template_menu()
 				
 				<nav id="menu_nav" aria-label="', $txt['main_menu'], '">
 					<div class="wrapper no_js">
-					<input type="checkbox" id="search_form_check">
+					<input type="checkbox" id="search_form_check" aria-hidden="true">
 					<ul id="main_menu" aria-label="', $txt['main_menu'], '" role="menubar">';
 
 	// Add any additional menu buttons from addons
@@ -523,7 +522,7 @@ function template_menu()
 		$target = isset($button['target']) ? ' target="' . $button['target'] . '"' : '';
 		$onclick = isset($button['onclick']) ? ' onclick="' . $button['onclick'] . '"' : '';
 		$altTitle = 'title="' . (!empty($button['alttitle']) ? $button['alttitle'] : $button['title']) . '"';
-		$ally = !empty($button['active_button']) ? 'aria-current="page"' : '';
+		$ally = !empty($button['active_button']) ? ' aria-current="page"' : '';
 
 		echo '
 						<li id="button_', $act, '" class="listlevel1', !empty($button['sub_buttons']) ? ' subsections"' : '"', ' role="none">
@@ -678,7 +677,7 @@ function template_button_strip($button_strip, $class = '', $strip_options = arra
 			{
 				$subMenu[] = '
 						<li class="listlevel2">
-							<a href="' . $value['url'] . '" class="linklevel2 button_strip_' . $key . (isset($value['custom']) ? ' ' . $value['custom'] : '') . '>' . $txt[$value['text']] . '</a>
+							<a href="' . $value['url'] . '" class="linklevel2 button_strip_' . $key . (isset($value['custom']) ? '" ' . $value['custom'] : '"') . '>' . $txt[$value['text']] . '</a>
 						</li>';
 				continue;
 			}
@@ -900,7 +899,7 @@ function template_pagesection($button_strip = false, $strip_direction = '', $opt
 
 	if (!empty($options['page_index_markup']))
 	{
-		$pages = '<ul ' . (isset($options['page_index_id']) ? 'id="' . $options['page_index_id'] . '" ' : '') . 'class="pagelinks" role="navigation">' . $options['page_index_markup'] . '</ul>';
+		$pages = '<ul ' . (isset($options['page_index_id']) ? 'id="' . $options['page_index_id'] . '" ' : '') . 'class="pagelinks">' . $options['page_index_markup'] . '</ul>';
 	}
 	else
 	{
@@ -909,7 +908,7 @@ function template_pagesection($button_strip = false, $strip_direction = '', $opt
 			$options['page_index'] = 'page_index';
 		}
 
-		$pages = empty($context[$options['page_index']]) ? '' : '<ul ' . (isset($options['page_index_id']) ? 'id="' . $options['page_index_id'] . '" ' : '') . 'class="pagelinks" role="navigation">' . $context[$options['page_index']] . '</ul>';
+		$pages = empty($context[$options['page_index']]) ? '' : '<ul ' . (isset($options['page_index_id']) ? 'id="' . $options['page_index_id'] . '" ' : '') . 'class="pagelinks">' . $context[$options['page_index']] . '</ul>';
 	}
 
 	if (!isset($options['extra']))

@@ -632,7 +632,7 @@ class BBCParser
 		// Should you alter this markup, be sure to check handleCollapsedQuotes()
 		if ($first_quote === 0)
 		{
-			$tag[Codes::ATTR_BEFORE] = str_replace('<blockquote class="bbc_quote">', '<div class="quote-read-more"><input type="checkbox" class="quote-show-more"><blockquote class="bbc_quote">', $tag[Codes::ATTR_BEFORE]);
+			$tag[Codes::ATTR_BEFORE] = str_replace('<blockquote class="bbc_quote">', '<div class="quote-read-more"><input type="checkbox" title="show" class="quote-show-more"><blockquote class="bbc_quote">', $tag[Codes::ATTR_BEFORE]);
 			$tag[Codes::ATTR_AFTER] = str_replace('</blockquote>', '</blockquote></div>', $tag[Codes::ATTR_AFTER]);
 		}
 		// Add a class to every other blockquote to style alternating blockquotes
@@ -1278,7 +1278,7 @@ class BBCParser
 		$end = 0;
 		$start_len = 29; // '<div class="quote-read-more">';
 		$end_len = 19; // '</blockquote></div>'
-		$input_len = 47; // '<input type="checkbox" class="quote-show-more">'
+		$input_len = 60; // '<input type="checkbox" title="show" class="quote-show-more">'
 
 		// While we have parent quotes, lets test the content length.
 		while ($start = stripos($this->message, '<div class="quote-read-more">', $end))

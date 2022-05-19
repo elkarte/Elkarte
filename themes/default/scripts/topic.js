@@ -761,6 +761,7 @@ InTopicModeration.prototype.init = function ()
 		oCheckbox.className = 'input_check';
 		oCheckbox.name = 'msgs[]';
 		oCheckbox.value = this.opt.aMessageIds[i];
+		oCheckbox.title = 'checkbox ' + this.opt.aMessageIds[i];
 		oCheckbox.onclick = this.handleClick.bind(this, oCheckbox);
 
 		// Append it to the container
