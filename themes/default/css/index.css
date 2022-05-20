@@ -1548,6 +1548,8 @@ a.bbc_link {
 	content: '';
 	transition: 350ms all 125ms ease-in;
 	transform: rotate(-45deg);
+	/* Clips the bottom of the rotated square so it does not bleed into dropdown content */
+	clip-path: polygon(25% 75%, 0% 0%, 100% 0%, 100% 100%);
 	opacity: 0;
 	border: 1px solid;
 	/* Simple variable to change if you want to change the size */
