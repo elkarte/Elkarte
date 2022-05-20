@@ -24,7 +24,7 @@ class Search
 	/** @const the forum version but is repeated due to some people rewriting FORUM_VERSION. */
 	public const FORUM_VERSION = 'ElkArte 2.0 dev';
 
-	/** @var mixed[] */
+	/** @var array */
 	protected $_participants = [];
 
 	/** @var \ElkArte\Search\SearchParams */
@@ -39,19 +39,13 @@ class Search
 	/** @var \ElkArte\Database\QueryInterface Database instance */
 	private $_db;
 
-	/** @var \ElkArte\Database\SearchInterface Search db instance */
-	private $_db_search;
-
-	/** @var array Searching for posts from a specific user(s) */
-	private $_memberlist = [];
-
 	/** @var array Builds the array of words for use in the db query */
 	private $_searchWords = [];
 
 	/** @var array Words excluded from indexes */
 	private $_excludedIndexWords = [];
 
-	/** @var array Words not be be found in the subject (-word) */
+	/** @var array Words not to be found in the subject (-word) */
 	private $_excludedSubjectWords = [];
 
 	/** @var array Phrases not to be found in the search results (-"some phrase") */
@@ -62,9 +56,6 @@ class Search
 
 	/** @var bool If we are creating a tmp db table */
 	private $_createTemporary;
-
-	/** @var string the minimum version of ElkArte that an API will work with */
-	private $_search_version = '';
 
 	/** @var array common words that we will not index or search for */
 	private $_blocklist_words = [];
@@ -77,14 +68,12 @@ class Search
 	 */
 	public function __construct()
 	{
-		// strtr to stop accidentally updating version on release
-		$this->_search_version = strtr('ElkArte 1+1', array('+' => '.', '=' => ' '));
 		$this->_db = database();
-		$this->_db_search = db_search();
+		$db_search = db_search();
 
 		// Create new temporary table(s) (if we can) to store preliminary results in.
-		$this->_db_search->skip_next_error();
-		$this->_createTemporary = $this->_db_search->createTemporaryTable(
+		$db_search->skip_next_error();
+		$this->_createTemporary = $db_search->createTemporaryTable(
 				'{db_prefix}tmp_log_search_messages',
 				array(
 					array(
@@ -104,9 +93,9 @@ class Search
 				)
 			) !== false;
 
-		// Skip the error as its not uncommon for temp tables to be denied
-		$this->_db_search->skip_next_error();
-		$this->_db_search->createTemporaryTable('{db_prefix}tmp_log_search_topics',
+		// Skip the error as it is not uncommon for temp tables to be denied
+		$db_search->skip_next_error();
+		$db_search->createTemporaryTable('{db_prefix}tmp_log_search_topics',
 			array(
 				array(
 					'name' => 'id_topic',
@@ -139,7 +128,7 @@ class Search
 	}
 
 	/**
-	 * Sets $this->data with all the search parameters.
+	 * Sets $this->_searchParams with all the search parameters.
 	 */
 	public function getParams()
 	{
@@ -211,7 +200,8 @@ class Search
 	 */
 	public function setBlockListedWords()
 	{
-		// Unfortunately, searching for words like this is going to be slow, or abundant, so we're blocking them.
+		// Unfortunately, searching for words like these is going to result in to many hits,
+		// so we're blocking them.
 		$blocklist_words = array('img', 'url', 'quote', 'www', 'http', 'the', 'is', 'it', 'are', 'if', 'in');
 		call_integration_hook('integrate_search_blocklist_words', array(&$blocklist_words));
 
@@ -314,7 +304,7 @@ class Search
 	 * @param int[] $msg_list - All the messages we want to find the posters
 	 * @param int $limit - There are only so much topics
 	 *
-	 * @return resource|bool
+	 * @return bool|\ElkArte\Database\AbstractResult
 	 * @throws \ElkArte\Exceptions\Exception
 	 */
 	public function loadMessagesRequest($msg_list, $limit)
@@ -376,7 +366,7 @@ class Search
 	 * Sets the query, calls the searchQuery method of the API in use
 	 *
 	 * @param \ElkArte\Search\SearchApiWrapper $searchAPI
-	 * @return mixed[]|\ElkArte\Search\SearchApiWrapper
+	 * @return mixed[]
 	 */
 	public function searchQuery($searchAPI)
 	{
@@ -451,7 +441,7 @@ class Search
 
 			foreach ($orParts[$orIndex] as $word)
 			{
-				$is_excluded = in_array($word, $excludedWords);
+				$is_excluded = in_array($word, $excludedWords, true);
 				$this->_searchWords[$orIndex]['all_words'][] = $word;
 				$subjectWords = text2words($word);
 
@@ -506,7 +496,7 @@ class Search
 	}
 
 	/**
-	 * @return mixed[]
+	 * @return array
 	 */
 	public function getParticipants()
 	{

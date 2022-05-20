@@ -287,14 +287,14 @@ function template_search_form()
 	}
 
 	// Search within current topic?
-	if (!empty($context['current_topic']) && !empty($modSettings['search_dropdown']))
+	if (!empty($context['current_topic']))
 	{
 		echo '
 				<input type="hidden" name="', (!empty($modSettings['search_dropdown']) ? 'sd_topic' : 'topic'), '" value="', $context['current_topic'], '" />';
 	}
 
 	// If we're on a certain board, limit it to this board ;).
-	if (!empty($context['current_board']) && !empty($modSettings['search_dropdown']))
+	if (!empty($context['current_board']))
 	{
 		echo '
 				<input type="hidden" name="', (!empty($modSettings['search_dropdown']) ? 'sd_brd[' : 'brd['), $context['current_board'], ']"', ' value="', $context['current_board'], '" />';
@@ -316,7 +316,7 @@ function template_search_form()
 }
 
 /**
- * Search bar menu icon
+ * Search bar main menu icon
  */
 function template_mb_search_bar()
 {
@@ -493,7 +493,7 @@ function template_menu()
 				
 				<nav id="menu_nav" aria-label="', $txt['main_menu'], '">
 					<div class="wrapper no_js">
-					<input type="checkbox" id="search_form_check" aria-hidden="true">
+					<input type="checkbox" id="search_form_check" aria-hidden="true" />
 					<ul id="main_menu" aria-label="', $txt['main_menu'], '" role="menubar">';
 
 	// Add any additional menu buttons from addons
@@ -587,7 +587,7 @@ function template_menu()
 		template_search_form();
 	}
 
-	echo '</div>
+	echo '	</div>
 				</nav>';
 
 	// Define the upper_section toggle in javascript.

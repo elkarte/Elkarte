@@ -25,10 +25,11 @@ use ElkArte\ValuesContainer;
  */
 class SearchApiWrapper
 {
+	/** @var string when we don't know what to do, use standard search */
 	public const DEFAULT_API = 'standard';
 
-	/** @var null|object Holds instance of the search api in use such as ElkArte\Search\API\Standard_Search */
-	protected $_searchAPI = null;
+	/** @var object Holds instance of the search api in use such as ElkArte\Search\API\Standard_Search */
+	protected $_searchAPI;
 
 	/**
 	 * Constructor
@@ -90,9 +91,9 @@ class SearchApiWrapper
 	/**
 	 * Wrapper for postCreated of the SearchAPI
 	 *
-	 * @param mixed[] $msgOptions
-	 * @param mixed[] $topicOptions
-	 * @param mixed[] $posterOptions
+	 * @param array $msgOptions
+	 * @param array $topicOptions
+	 * @param array $posterOptions
 	 */
 	public function postCreated($msgOptions, $topicOptions, $posterOptions)
 	{
@@ -105,9 +106,9 @@ class SearchApiWrapper
 	/**
 	 * Wrapper for postModified of the SearchAPI
 	 *
-	 * @param mixed[] $msgOptions
-	 * @param mixed[] $topicOptions
-	 * @param mixed[] $posterOptions
+	 * @param array $msgOptions
+	 * @param array $topicOptions
+	 * @param array $posterOptions
 	 */
 	public function postModified($msgOptions, $topicOptions, $posterOptions)
 	{
@@ -135,7 +136,7 @@ class SearchApiWrapper
 	 * Wrapper for topicMerge of the SearchAPI
 	 *
 	 * @param int $id_topic
-	 * @param mixed[] $topics
+	 * @param array $topics
 	 * @param int[] $affected_msgs
 	 * @param string[] $subject array($response_prefix, $target_subject)
 	 */
@@ -150,7 +151,7 @@ class SearchApiWrapper
 	/**
 	 * Wrapper for searchSettings of the SearchAPI
 	 *
-	 * @param mixed[] $config_vars
+	 * @param array $config_vars
 	 */
 	public function searchSettings(&$config_vars)
 	{
@@ -165,9 +166,9 @@ class SearchApiWrapper
 	 *
 	 * @param string[] $search_words
 	 * @param string[] $excluded_words
-	 * @param mixed[] $participants
+	 * @param array $participants
 	 *
-	 * @return mixed[]
+	 * @return array
 	 */
 	public function searchQuery($search_words, $excluded_words, &$participants)
 	{

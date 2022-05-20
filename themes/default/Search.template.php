@@ -57,6 +57,16 @@ function template_searchform()
 						<p class="smalltext">', $txt['search_example'], '</p>';
 	}
 
+	// If $context['search_params']['topic'] is set, that means we're searching just one topic.
+	if (!empty($context['search_params']['topic']))
+	{
+		echo '
+						<span class="alert">
+							&#10148;', $txt['search_specific_topic'], ' &quot;', $context['search_topic']['link'], '&quot;.
+						</span>
+						<input type="hidden" name="topic" value="', $context['search_topic']['id'], '" />';
+	}
+
 	// Does the search require a visual verification screen to annoy them?
 	if (!empty($context['require_verification']))
 	{
@@ -67,12 +77,12 @@ function template_searchform()
 						</div>');
 	}
 
-	// All of the advanced options, this div is collapsed by the JS when available
+	// All the advanced options, this div is collapsed by JS when available
 	echo '
 						<div id="advanced_search">
 							<dl id="search_options">
-								<dt class="righttext"><label for="searchtype">
-									', $txt['search_match'], ':</label>
+								<dt class="righttext">
+									<label for="searchtype">', $txt['search_match'], ':</label>
 								</dt>
 								<dd>
 									<select name="searchtype" id="searchtype">
@@ -123,14 +133,6 @@ function template_searchform()
 	// Set the initial search style for the form
 	echo '
 						<input id="advanced" type="hidden" name="advanced" value="1" />';
-
-	// If $context['search_params']['topic'] is set, that means we're searching just one topic.
-	if (!empty($context['search_params']['topic']))
-	{
-		echo '
-						<p>', $txt['search_specific_topic'], ' &quot;', $context['search_topic']['link'], '&quot;.</p>
-						<input type="hidden" name="topic" value="', $context['search_topic']['id'], '" />';
-	}
 
 	echo '
 					</fieldset>';
@@ -248,19 +250,19 @@ function template_results()
 							<input type="hidden" name="subject_only" value="', $context['search_params']['subject_only'], '" />
 							<input type="hidden" name="minage" value="', $context['search_params']['minage'], '" />
 							<input type="hidden" name="maxage" value="', $context['search_params']['maxage'], '" />
-							<input type="hidden" name="sort" value="', $context['search_params']['sort'], '" />
-						</div>';
+							<input type="hidden" name="sort" value="', $context['search_params']['sort'], '" />';
 
 		if (!empty($context['search_params']['brd']))
 		{
 			foreach ($context['search_params']['brd'] as $board_id)
 			{
 				echo '
-						<input type="hidden" name="brd[', $board_id, ']" value="', $board_id, '" />';
+							<input type="hidden" name="brd[', $board_id, ']" value="', $board_id, '" />';
 			}
 		}
 
 		echo '
+						</div>
 					</form>
 				</div>
 			</div>

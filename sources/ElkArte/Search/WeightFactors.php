@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Standard non full index, non custom index search
+ * Standard non-full index, non-custom index search
  *
  * @package   ElkArte Forum
  * @copyright ElkArte Forum contributors
@@ -21,12 +21,25 @@ use ElkArte\Exceptions\Exception;
 
 class WeightFactors
 {
+	/** @var array  */
 	protected $_input_weights = [];
+
+	/** @var bool  */
 	protected $_is_admin = false;
-	protected $_weight = array();
+
+	/** @var array  */
+	protected $_weight = [];
+
+	/** @var int  */
 	protected $_weight_total = 0;
+
+	/** @var array  */
 	protected $_weight_factors = [];
 
+	/**
+	 * @param $weights
+	 * @param $is_admin
+	 */
 	public function __construct($weights, $is_admin = false)
 	{
 		$this->_input_weights = $weights;
@@ -108,7 +121,7 @@ class WeightFactors
 	/**
 	 * Fill the $_weight variable and calculate the total weight
 	 *
-	 * @param mixed[] $factors
+	 * @param array $factors
 	 * @param int[] $weights
 	 */
 	private function _calculate_weights($factors, $weights)

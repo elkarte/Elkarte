@@ -141,7 +141,7 @@
 	--topic_name: #3D6E32; /* Subject line, poster name and keyinfo */
 	--links: #49643D; /* normal links */
 	--bbclinks: #49643D; /* bbc links */
-
+	--debug: #359d27; /* debug text */
 	--me: #5BA048; /* me and footnotes */
 	--gradient_bar_top: #27A348; /* Various bars, poll, stats, capacity */
 	--gradient_bar_bottom: #60BC78; /* Various bars, poll, stats, capacity */
@@ -634,7 +634,7 @@ sup.bbc_footnotes, sup.bbc_footnotes a {
 /* debug forum area. */
 .action_viewquery a, .action_viewquery strong,
 #debug_logging a, #debug_logging strong {
-	color: var(--pure_green);
+	color: var(--debug);
 }
 
 #debug_logging {
@@ -1716,6 +1716,7 @@ ul.cf_icons {
 }
 
 .search_results_posts > li:not(:last-child) {
+	border-color: var(--primary_border);
 	border-bottom-color: var(--primary_border_bottom);
 }
 

@@ -32,11 +32,11 @@ class SearchArray extends AbstractModel
 	 */
 	protected $_search_string = [];
 
-	/** @var array Words not be be found in the search results (-word) */
+	/** @var array Words not to be found in the search results (-word) */
 	private $_excludedWords = [];
 
 	/** @var bool Simplify the fulltext search */
-	private $_search_simple_fulltext = false;
+	private $_search_simple_fulltext;
 
 	/** @var bool If we are performing a boolean or simple search */
 	private $_no_regexp = false;
@@ -45,7 +45,7 @@ class SearchArray extends AbstractModel
 	private $_searchArray = [];
 
 	/** @var array Words we do not search due to length or common terms */
-	private $_blocklist_words = [];
+	private $_blocklist_words;
 
 	/** @var bool If search words were found on the blocklist */
 	private $_foundBlockListedWords = false;
@@ -252,18 +252,14 @@ class SearchArray extends AbstractModel
 			{
 				continue;
 			}
+			elseif ($or_part)
+			{
+				// If this was part of an OR branch, add it to the proper section
+				$keywords['include'][count($keywords['include']) - 1] = array_merge($keywords['include'][count($keywords['include']) - 1], $addWords);
+			}
 			else
 			{
-				// Must be something they want to search for!
-				if ($or_part)
-				{
-					// If this was part of an OR branch, add it to the proper section
-					$keywords['include'][count($keywords['include']) - 1] = array_merge($keywords['include'][count($keywords['include']) - 1], $addWords);
-				}
-				else
-				{
-					$keywords['include'] = array_merge($keywords['include'], $addWords);
-				}
+				$keywords['include'] = array_merge($keywords['include'], $addWords);
 			}
 
 			// Start fresh on this...

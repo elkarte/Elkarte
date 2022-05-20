@@ -362,9 +362,10 @@ class Search extends AbstractController
 		// Are you allowed?
 		isAllowedTo('search_posts');
 
-		$params = $this->_req->getRequest('params', '', '');
 		$this->_search = new \ElkArte\Search\Search();
 		$this->_search->setWeights(new WeightFactors($modSettings, $this->user->is_admin));
+
+		$params = $this->_req->getRequest('params', '', '');
 		$search_params = new SearchParams($params);
 		$search_params->merge((array) $this->_req->post, $recentPercentage, $maxMembersToSearch);
 		$this->_search->setParams($search_params, !empty($modSettings['search_simple_fulltext']));
@@ -534,7 +535,7 @@ class Search extends AbstractController
 
 		// Now that we know how many results to expect we can start calculating the page numbers.
 		$start = $this->_req->getRequest('start', 'intval', 0);
-		$context['page_index'] = constructPageIndex('{scripturl}?action=search;sa=results;params=' . $context['params'], $_REQUEST['start'], $this->_search->getNumResults(), $modSettings['search_results_per_page'], false);
+		$context['page_index'] = constructPageIndex('{scripturl}?action=search;sa=results;params=' . $context['params'], $start, $this->_search->getNumResults(), $modSettings['search_results_per_page'], false);
 
 		// Consider the search complete!
 		Cache::instance()->remove('search_start:' . ($this->user->is_guest ? $this->user->ip : $this->user->id));

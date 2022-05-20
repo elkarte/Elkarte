@@ -35,28 +35,28 @@ abstract class AbstractAPI
 	public $is_supported;
 
 	/** @var array Any word excluded from the search? */
-	protected $_excludedWords = array();
+	protected $_excludedWords = [];
 
 	/** @var int Number of hits */
 	protected $_num_results = 0;
 
 	/** @var array What words are banned? */
-	protected $bannedWords = array();
+	protected $bannedWords = [];
 
 	/** @var int What is the minimum word length? */
 	protected $min_word_length;
 
 	/** @var \ElkArte\ValuesContainer All the search configurations */
-	protected $config = null;
+	protected $config;
 
 	/** @var null|\ElkArte\Search\SearchParams Parameters of the search */
-	protected $_searchParams = null;
+	protected $_searchParams;
 
 	/** @var array The weights to associate to various areas for relevancy */
-	protected $_weight_factors = array();
+	protected $_weight_factors = [];
 
 	/** @var array Weighing factor each area, ie frequency, age, sticky, etc */
-	protected $_weight = array();
+	protected $_weight = [];
 
 	/** @var int The sum of the _weight_factors, normally but not always 100*/
 	protected $_weight_total = 0;
@@ -65,10 +65,10 @@ abstract class AbstractAPI
 	protected $_createTemporary = true;
 
 	/** @var array Builds the array of words for use in the db query */
-	protected $_searchWords = array();
+	protected $_searchWords = [];
 
 	/** @var array Phrases not to be found in the search results (-"some phrase") */
-	protected $_excludedPhrases = array();
+	protected $_excludedPhrases = [];
 
 	/** @var \ElkArte\Database\QueryInterface Database instance */
 	protected $_db;
@@ -80,13 +80,13 @@ abstract class AbstractAPI
 	protected $_db_search;
 
 	/** @var array Words excluded from indexes */
-	protected $_excludedIndexWords = array();
+	protected $_excludedIndexWords =[];
 
-	/** @var array Words not be be found in the subject (-word) */
-	protected $_excludedSubjectWords = array();
+	/** @var array Words not to be found in the subject (-word) */
+	protected $_excludedSubjectWords = [];
 
 	/** @var \ElkArte\Search\SearchArray Holds the words and phrases to be searched on */
-	protected $_searchArray = null;
+	protected $_searchArray;
 
 	/** @var array What databases do we support? (In general.) */
 	protected $supported_databases = ['MySQL', 'PostgreSQL'];
@@ -126,7 +126,7 @@ abstract class AbstractAPI
 	public function isValid()
 	{
 		// Always fall back to the standard search method.
-		return in_array($this->_db->title(), $this->supported_databases);
+		return in_array($this->_db->title(), $this->supported_databases, true);
 	}
 
 	/**
@@ -245,8 +245,8 @@ abstract class AbstractAPI
 	/**
 	 * Search for indexed words.
 	 *
-	 * @param mixed[] $words An array of words
-	 * @param mixed[] $search_data An array of search data
+	 * @param array $words An array of words
+	 * @param array $search_data An array of search data
 	 *
 	 * @return resource
 	 */
