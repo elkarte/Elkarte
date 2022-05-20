@@ -229,7 +229,7 @@ class PreparseCode
 	private function _tokenizeCodeBlocks()
 	{
 		// Split up the message on the code start/end tags/
-		$parts = preg_split('~(\[/code\]|\[code(?:=[^\]]+)?\])~i', $this->message, -1, PREG_SPLIT_DELIM_CAPTURE);
+		$parts = preg_split('~(\[\/code\]|\[code(?:=[^\]]+)?\])~i', $this->message, -1, PREG_SPLIT_DELIM_CAPTURE);
 
 		// Token generator
 		$tokenizer = new TokenHash();

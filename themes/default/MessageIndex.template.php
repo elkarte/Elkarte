@@ -124,7 +124,8 @@ function template_topic_listing_above()
 	{
 		echo '
 						<li class="listlevel1 quickmod_select_all">
-							<input type="checkbox" onclick="invertAll(this, document.getElementById(\'quickModForm\'), \'topics[]\');" />
+							<label for="select_all" class="hide">', $txt['all'], '</label>
+							<input type="checkbox" id="select_all" onclick="invertAll(this, document.getElementById(\'quickModForm\'), \'topics[]\');" />
 						</li>';
 	}
 

@@ -1179,12 +1179,12 @@ a.bbc_link {
 	opacity: 1;
 }
 
-#search_form_check:checked ~ #main_menu {
+#search_form_check:checked + #main_menu {
 	transition: opacity .5s;
 	opacity: 0;
 }
 
-#search_form_check ~ #main_menu {
+#search_form_check + #main_menu {
 	visibility: visible;
 	transition: opacity .5s;
 	opacity: 1;
