@@ -16,7 +16,7 @@
 
 /**
  * *** QuickModifyTopic object.
- * Used to quick edit a topic subject by double clicking next to the subject name
+ * Used to quick edit a topic subject by double-clicking next to the subject name
  * in a topic listing
  *
  * @param {object} oOptions
@@ -399,7 +399,7 @@ function QuickModify(oOptions)
 	this.aAccessKeys = [];
 
 	// Show the edit buttons
-	var aShowQuickModify = document.getElementsByClassName(this.opt.sClassName);
+	let aShowQuickModify = document.getElementsByClassName(this.opt.sClassName);
 	for (let i = 0, length = aShowQuickModify.length; i < length; i++)
 	{
 		aShowQuickModify[i].style.display = "inline";
@@ -752,45 +752,44 @@ function InTopicModeration(oOptions)
 InTopicModeration.prototype.init = function ()
 {
 	// Add checkboxes to all the messages.
-	for (var i = 0, n = this.opt.aMessageIds.length; i < n; i++)
+	this.opt.aMessageIds.forEach((messageID) =>
 	{
 		// Create the checkbox.
-		var oCheckbox = document.createElement('input');
+		let oCheckbox = document.createElement('input'),
+			oCheckboxContainer = document.getElementById(this.opt.sCheckboxContainerMask + messageID);
 
 		oCheckbox.type = 'checkbox';
-		oCheckbox.className = 'input_check';
 		oCheckbox.name = 'msgs[]';
-		oCheckbox.value = this.opt.aMessageIds[i];
-		oCheckbox.title = 'checkbox ' + this.opt.aMessageIds[i];
+		oCheckbox.value = messageID;
+		oCheckbox.title = 'checkbox ' + messageID;
 		oCheckbox.onclick = this.handleClick.bind(this, oCheckbox);
 
 		// Append it to the container
-		var oCheckboxContainer = document.getElementById(this.opt.sCheckboxContainerMask + this.opt.aMessageIds[i]);
 		oCheckboxContainer.appendChild(oCheckbox);
-		oCheckboxContainer.style.display = 'inline';
-	}
+		oCheckboxContainer.classList.remove('hide');
+	});
 };
 
-// They clicked a checkbox in a message so we show the button options to them
+// They clicked a checkbox in a message, now show the button options to them
 InTopicModeration.prototype.handleClick = function (oCheckbox)
 {
-	var oButtonStrip = document.getElementById(this.opt.sButtonStrip),
+	let oButtonStrip = document.getElementById(this.opt.sButtonStrip),
 		oButtonStripDisplay = document.getElementById(this.opt.sButtonStripDisplay);
 
 	if (!this.bButtonsShown && this.opt.sButtonStripDisplay)
 	{
 		// Make sure it can go somewhere.
-		if (typeof (oButtonStripDisplay) === 'object' && oButtonStripDisplay !== null)
+		if (typeof oButtonStripDisplay === 'object' && oButtonStripDisplay !== null)
 		{
 			oButtonStripDisplay.style.display = "";
 		}
 		else
 		{
-			var oNewDiv = document.createElement('div'),
+			let oNewDiv = document.createElement('div'),
 				oNewList = document.createElement('ul');
 
 			oNewDiv.id = this.opt.sButtonStripDisplay;
-			oNewDiv.className = this.opt.sButtonStripClass ? this.opt.sButtonStripClass : 'buttonlist floatbottom';
+			oNewDiv.className = this.opt.sButtonStripClass ? this.opt.sButtonStripClass : 'buttonlist';
 
 			oNewDiv.appendChild(oNewList);
 			oButtonStrip.appendChild(oNewDiv);
@@ -863,31 +862,14 @@ InTopicModeration.prototype.handleClick = function (oCheckbox)
 		oButtonStrip.querySelector('#split_button_text').innerHTML = this.opt.sSplitButtonLabel + ' [' + this.iNumSelected + ']';
 		oButtonStrip.querySelector('#split_button').style.display = this.iNumSelected < 1 ? "none" : "";
 	}
-
-	// Try to restore the correct position.
-	var aItems = oButtonStrip.getElementsByTagName('span');
-	if (aItems.length > 3)
-	{
-		if (this.iNumSelected < 1)
-		{
-			aItems[aItems.length - 3].className = aItems[aItems.length - 3].className.replace(/\s*position_holder/, 'last');
-			aItems[aItems.length - 2].className = aItems[aItems.length - 2].className.replace(/\s*position_holder/, 'last');
-		}
-		else
-		{
-			aItems[aItems.length - 2].className = aItems[aItems.length - 2].className.replace(/\s*last/, 'position_holder');
-			aItems[aItems.length - 3].className = aItems[aItems.length - 3].className.replace(/\s*last/, 'position_holder');
-		}
-	}
 };
 
 // Called when the user clicks one of the buttons that we added
 InTopicModeration.prototype.handleSubmit = function (sSubmitType)
 {
-	var oForm = document.getElementById(this.opt.sFormId);
-
 	// Make sure this form isn't submitted in another way than this function.
-	var oInput = document.createElement('input');
+	let oForm = document.getElementById(this.opt.sFormId),
+		oInput = document.createElement('input');
 
 	oInput.type = 'hidden';
 	oInput.name = this.opt.sSessionVar;
