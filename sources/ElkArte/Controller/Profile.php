@@ -744,6 +744,7 @@ class Profile extends AbstractController
 
 				// Invalidate any cached data.
 				Cache::instance()->remove('member_data-profile-' . $this->_memID);
+				MembersList::load($this->_memID, false, 'profile');
 			}
 		}
 	}
