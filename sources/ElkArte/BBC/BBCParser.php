@@ -1279,6 +1279,7 @@ class BBCParser
 		$start_len = 29; // '<div class="quote-read-more">';
 		$end_len = 19; // '</blockquote></div>'
 		$input_len = 60; // '<input type="checkbox" title="show" class="quote-show-more">'
+		$input = '<input type="checkbox" title="show" class="quote-show-more">';
 
 		// While we have parent quotes, lets test the content length.
 		while ($start = stripos($this->message, '<div class="quote-read-more">', $end))
@@ -1297,7 +1298,7 @@ class BBCParser
 			if (substr_count($quote, '<br />') < 6 && Util::strlen(strip_tags($quoteText)) < $this->read_more_length)
 			{
 				// Not so chatty, first remove the input quote-show-more
-				$input_start = stripos($this->message, '<input type="checkbox" class="quote-show-more">', $start + $start_len);
+				$input_start = stripos($this->message, $input, $start + $start_len);
 				$this->message = substr_replace($this->message, '', $input_start, $input_len);
 				$end -= $input_len;
 
