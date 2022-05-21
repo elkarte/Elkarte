@@ -3269,16 +3269,29 @@ footer nav {
 	grid-row: quickbuttons;
 }
 
+/* All the signatures used in the forum. */
 footer .signature {
 	grid-row: signature;
 }
 
-/* All the signatures used in the forum. */
-.signature, .custom_fields_above_signature {
+.signature {
 	font-size: var(--font13);
 	overflow: auto;
+	margin-top: 1em;
 	padding: 8px 0;
 	border-top: 1px solid;
+}
+
+.custom_fields_above_signature {
+	margin-top: 0;
+	padding: 0 0 8px 0;
+}
+
+.likes_above_signature {
+	font-size: var(--font15);
+	margin-bottom: 8px;
+	padding-bottom: 8px;
+	border-bottom: 1px solid;
 }
 
 /* On to the posts, this is the main container for all posts on a page */
@@ -5523,17 +5536,10 @@ Stef                       ^
 }
 
 /* description & information used below headers, others used to how a result message */
-.description, .information, .warningbox, .successbox, .infobox, .errorbox, .genericbox {
+.description, .information, .warningbox, .successbox, .infobox, .errorbox {
 	margin: 0 0 1.1em 0;
 	padding: .8em .8em;
 	border: 1px solid;
-}
-
-.genericbox {
-	font-size: var(--font15);
-	display: flex;
-	align-items: center;
-	padding: .4em .4em;
 }
 
 .information p {

@@ -61,6 +61,7 @@ function template_messages_informations_above()
 	{
 		echo '
 			<div class="generalinfo">';
+
 		if (!empty($settings['display_who_viewing']))
 		{
 			echo '
@@ -367,7 +368,7 @@ function template_messages()
 			{
 				echo '
 							<li class="listlevel1', !empty($message['like_counter']) ? ' liked"' : '"', '>
-								<a href="javascript:void(0)" role="button" title="', !empty($message['like_counter']) ? $txt['liked_by'] . ' ' . implode(', ', $context['likes'][$message['id']]['member']) : '', '" class="linklevel1 reacts_button">',
+								<a href="javascript:void(0)" role="button" class="linklevel1 reacts_button">',
 									!empty($message['like_counter']) ? '<span class="likes_indicator">' . $message['like_counter'] . '</span>&nbsp;' . $txt['likes'] : '&nbsp;', '
 								</a>
 							</li>';
@@ -416,6 +417,31 @@ function template_messages()
 						</ul>
 					</nav>';
 
+		// Start of grid-row: signature seen as footer .signature in css
+		// This could use some cleanup, but the idea is to prevent multiple borders in this grid area
+		// it should just have a division line and then likes, custom fields, signature
+		if ($message['likes_enabled'] && !empty($message['like_counter']))
+		{
+			echo '
+					<div class="signature">
+						<div class="likes_above_signature">
+							<i class="icon icon-small i-thumbup"></i>
+							 ', implode(', ', $context['likes'][$message['id']]['member']), '
+						</div>';
+		}
+		elseif ((empty($message['member']['signature']) || !empty($options['show_no_signatures']) || !$context['signature_enabled'])
+			&& (empty($message['member']['custom_fields'])))
+		{
+			echo '
+					<div>';
+		}
+		else
+		{
+			echo '
+					<div class="signature">';
+		}
+
+
 		// Are there any custom profile fields for above the signature?
 		// Show them if signatures are enabled and you want to see them.
 		if (!empty($message['member']['custom_fields']) && empty($options['show_no_signatures']) && $context['signature_enabled'])
@@ -452,10 +478,11 @@ function template_messages()
 		if (!empty($message['member']['signature']) && empty($options['show_no_signatures']) && $context['signature_enabled'])
 		{
 			echo '
-							<div id="msg_', $message['id'], '_signature" class="signature', $ignoring ? ' hide"' : '"', '>', $message['member']['signature'], '</div>';
+						<div id="msg_', $message['id'], '_signature" class="', $ignoring ? ' hide"' : '"', '>', $message['member']['signature'], '</div>';
 		}
 
 		echo '
+							</div>
 						</footer>
 					</div>
 				</article>
