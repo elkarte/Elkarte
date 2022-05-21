@@ -662,7 +662,7 @@ sup.bbc_footnotes, sup.bbc_footnotes a {
  */
 
 /* Level 1 Menu bar: link or button. General styling. */
-.linklevel1, .linklevel1:link, .linklevel1:visited {
+.linklevel1, .linklevel1:link, .linklevel1:visited, .quickbuttons .inline_mod_check {
 	color: var(--menu_text);
 	border-color: var(--menu_border);
 	border-top-color: var(--menu_border_top);

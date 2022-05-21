@@ -1898,8 +1898,9 @@ nav > .quickbuttons, menu > .quickbuttons {
 }
 
 .quickbuttons .inline_mod_check {
-	margin: .25em .25em .25em 0;
-	padding: 0 .25em;
+	margin: .25em .1em;
+	padding: 1px 4px 0 4px;
+	border: 1px solid;
 }
 
 .quickbuttons .linklevel1 {
@@ -2025,7 +2026,7 @@ nav > .quickbuttons, menu > .quickbuttons {
 }
 
 /* Radius right end of the last button. */
-.quickbuttons .listlevel1.subsections a, .linklevel1.post_options, .linklevel1.remove_button {
+.quickbuttons li:first-child, .quickbuttons li:first-child a {
 	border-radius: 0 4px 4px 0;
 }
 
@@ -3542,7 +3543,12 @@ footer .signature {
 #moderationbuttons {
 	display: flex;
 	align-items: center;
+	flex-wrap: wrap;
 	margin: 1em 0 .5em 0;
+}
+
+#moderationbuttons_strip {
+	flex-wrap: wrap;
 }
 
 /* The jump to box */
