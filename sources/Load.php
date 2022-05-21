@@ -1296,7 +1296,7 @@ function determineAvatar($profile)
 
 	if (empty($profile))
 	{
-		return array();
+		return [];
 	}
 
 	$avatar_protocol = substr(strtolower($profile['avatar']), 0, 7);

@@ -2080,6 +2080,11 @@ function profileLoadAvatarData()
 {
 	global $context, $cur_profile, $modSettings;
 
+	if (!is_array($cur_profile['avatar']))
+	{
+		$cur_profile['avatar'] = determineAvatar($cur_profile);
+	}
+
 	$context['avatar_url'] = $modSettings['avatar_url'];
 	$valid_protocol = preg_match('~^https' . (detectServer()->supportsSSL() ? '' : '?') . '://~i', $cur_profile['avatar']['name']) === 1;
 	$schema = 'http' . (detectServer()->supportsSSL() ? 's' : '') . '://';
