@@ -43,51 +43,7 @@ class Help extends AbstractController
 	public function action_index()
 	{
 		// I need help!
-		$this->action_help();
-	}
-
-	/**
-	 * Prepares the help page.
-	 *
-	 * What it does:
-	 *
-	 * - It is accessed by ?action=help.
-	 *
-	 * @uses Help template and Manual language file.
-	 */
-	public function action_help()
-	{
-		global $context, $txt;
-
-		theme()->getTemplates()->load('Help');
-		Txt::load('Manual');
-
-		// We need to know where our wiki is.
-		$context['wiki_url'] = 'https://github.com/elkarte/Elkarte/wiki';
-
-		// Sections we are going to link...
-		$context['manual_sections'] = array(
-			'registering' => 'Registering',
-			'logging_in' => 'Logging_In',
-			'profile' => 'Profile',
-			'search' => 'Search',
-			'posting' => 'Posting',
-			'bbc' => 'Bulletin_board_code',
-			'personal_messages' => 'Personal_messages',
-			'memberlist' => 'Memberlist',
-			'calendar' => 'Calendar',
-			'features' => 'Features',
-		);
-
-		// Build the link tree.
-		$context['linktree'][] = array(
-			'url' => getUrl('action', ['action' => 'help']),
-			'name' => $txt['help'],
-		);
-
-		// Lastly, set up some template stuff.
-		$context['page_title'] = $txt['manual_elkarte_user_help'];
-		$context['sub_template'] = 'manual';
+		// $this->action_help();
 	}
 
 	/**
