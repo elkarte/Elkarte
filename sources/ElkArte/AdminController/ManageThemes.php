@@ -102,8 +102,7 @@ class ManageThemes extends AbstractController
 		}
 
 		// Load the important language files...
-		Txt::load('ManageThemes');
-		Txt::load('Settings');
+		Txt::load('ManageThemes+Settings');
 
 		// No guests in here.
 		is_not_guest();

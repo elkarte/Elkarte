@@ -34,7 +34,7 @@ abstract class ManageEmojiModule extends AbstractController
 	{
 		global $txt;
 
-		Txt::load('emoji');
+		Txt::load('Emoji');
 
 		// All the options, well at least some of them!
 		$config_vars[] = '';

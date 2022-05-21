@@ -149,8 +149,7 @@ class XmlPreview extends AbstractController
 		global $context, $txt;
 
 		require_once(SUBSDIR . '/Profile.subs.php');
-		Txt::load('Profile');
-		Txt::load('Errors');
+		Txt::load('Profile+Errors');
 
 		$user = isset($this->_req->post->user) ? (int) $this->_req->post->user : 0;
 		$is_owner = $user === (int) $this->user->id;
@@ -248,8 +247,7 @@ class XmlPreview extends AbstractController
 		global $context, $txt, $scripturl, $mbname;
 
 		require_once(SUBSDIR . '/Post.subs.php');
-		Txt::load('Errors');
-		Txt::load('ModerationCenter');
+		Txt::load('Errors+ModerationCenter');
 
 		$context['post_error']['errors'] = array();
 
@@ -325,8 +323,7 @@ class XmlPreview extends AbstractController
 		global $context, $txt, $scripturl, $mbname, $modSettings;
 
 		require_once(SUBSDIR . '/Post.subs.php');
-		Txt::load('Errors');
-		Txt::load('ModerationCenter');
+		Txt::load('Errors+ModerationCenter');
 
 		$context['post_error']['errors'] = array();
 

@@ -56,9 +56,7 @@ class ManageFeatures extends AbstractController
 		global $context, $txt, $settings;
 
 		// Often Helpful
-		Txt::load('Help');
-		Txt::load('ManageSettings');
-		Txt::load('Mentions');
+		Txt::load('Help+ManageSettings+Mentions');
 
 		// All the actions we know about
 		$subActions = array(
@@ -655,8 +653,7 @@ class ManageFeatures extends AbstractController
 	{
 		global $txt, $modSettings;
 
-		Txt::load('Profile');
-		Txt::load('UserNotifications');
+		Txt::load('Profile+UserNotifications');
 		loadJavascriptFile('jquery.multiselect.min.js');
 		theme()->addInlineJavascript('
 		$(\'.select_multiple\').multiselect({\'language_strings\': {\'Select all\': ' . JavascriptEscape($txt['notify_select_all']) . '}});', true);

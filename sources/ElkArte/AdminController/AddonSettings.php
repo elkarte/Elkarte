@@ -43,8 +43,7 @@ class AddonSettings extends AbstractController
 	{
 		global $context, $txt;
 
-		Txt::load('Help');
-		Txt::load('ManageSettings');
+		Txt::load('Help+ManageSettings');
 
 		// Our tidy subActions array
 		$subActions = array(
@@ -159,8 +158,7 @@ class AddonSettings extends AbstractController
 		// You need to be an admin to edit settings!
 		isAllowedTo('admin_forum');
 
-		Txt::load('Help');
-		Txt::load('ManageSettings');
+		Txt::load('Help+ManageSettings');
 
 		$context['sub_template'] = 'show_settings';
 
