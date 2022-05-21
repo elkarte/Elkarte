@@ -55,7 +55,7 @@
 ------------------------------------------------- */
 
 .ui-dialog {
-	border-color: var(--seconday_border);
+	border-color: var(--secondary_border);
 	background-color: var(--content-background);
 	box-shadow: 0 0 16px var(--opacity30);
 }

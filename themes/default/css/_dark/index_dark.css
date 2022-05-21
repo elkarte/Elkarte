@@ -128,9 +128,9 @@
 	--category_header_grad_2: #2B2A2A; /* 1-3 category */
 	--category_header_grad_3: #292A2A; /* 1-4 secondary */
 	--category_header_grad_4: #27272A; /* end of */
-	--seconday_category_border: #AFAFAF; /* darker border */
-	--seconday_category_border_top: #CFCFCF; /* complimentary for hover effects */
-	--seconday_category_bottom: #BBBBBB;
+	--secondary_category_border: #AFAFAF; /* darker border */
+	--secondary_category_border_top: #CFCFCF; /* complimentary for hover effects */
+	--secondary_category_bottom: #BBBBBB;
 
 	/* Standard horizontal rule.. ([hr], etc.) */
 	--hr_border_bottom: #BBBBBB;
@@ -204,10 +204,10 @@
 	--primary_border_top: #363738;
 	--primary_border_left: #363738;
 	--primary_border_bottom: #363738;
-	--seconday_border: #232323; /* darker border */
-	--seconday_border_top: #232323; /* complimentary for hover effects */
-	--seconday_border_left: #232323; /* complimentary for hover effects */
-	--seconday_border_bottom: #232323;
+	--secondary_border: #232323; /* darker border */
+	--secondary_border_top: #232323; /* complimentary for hover effects */
+	--secondary_border_left: #232323; /* complimentary for hover effects */
+	--secondary_border_bottom: #232323;
 
 	/* Mostly used for shadows */
 	--transparent: transparent; /* Used on borders to hide them but keep sizing intact */
@@ -350,8 +350,8 @@ strong {
 
 /* Single ones a bit darker than board index ones. */
 .content_category .category_header {
-	border-top-color: var(--seconday_category_border_top);
-	border-bottom-color: var(--seconday_category_bottom);
+	border-top-color: var(--secondary_category_border_top);
+	border-bottom-color: var(--secondary_category_bottom);
 	background-image: linear-gradient(to bottom, var(--category_header_grad_1), var(--category_header_grad_3));
 }
 
@@ -438,11 +438,11 @@ strong {
 
 /* Styles used by the auto suggest control. */
 .auto_suggest_div {
-	border-color: var(--seconday_border);
+	border-color: var(--secondary_border);
 }
 
 .auto_suggest_div:focus {
-	border-color: var(--seconday_border);
+	border-color: var(--secondary_border);
 }
 
 .auto_suggest_item {
@@ -489,8 +489,8 @@ input[type=checkbox].quote-show-more {
 
 /* Extra code block styling. */
 .bbc_code {
-	border-top-color: var(--seconday_border_top);
-	border-bottom-color: var(--seconday_border_bottom);
+	border-top-color: var(--secondary_border_top);
+	border-bottom-color: var(--secondary_border_bottom);
 	background: var(--content-background);
 }
 
@@ -515,7 +515,7 @@ input[type=checkbox].quote-show-more {
 .inner > .bbc_table_container > .bbc_table th,
 .messageContent > .bbc_table_container > .bbc_table th {
 	border-right: 1px solid var(--primary_border_right);
-	border-bottom: 1px solid var(--seconday_border_bottom);
+	border-bottom: 1px solid var(--secondary_border_bottom);
 }
 
 .inner > .bbc_table_container > .bbc_table td:last-child,
@@ -536,7 +536,7 @@ input[type=checkbox].quote-show-more {
 }
 
 div.bbc_footnotes {
-	border-top-color: var(--seconday_border);
+	border-top-color: var(--secondary_border);
 }
 
 .bbc_footnotes .target:target {
@@ -898,8 +898,8 @@ sup.bbc_footnotes, sup.bbc_footnotes a {
 
 .pagelinks .navPages {
 	color: var(--menu_text);
-	border-color: var(--seconday_border);
-	border-top-color: var(--seconday_border_top);
+	border-color: var(--secondary_border);
+	border-top-color: var(--secondary_border_top);
 	background-image: linear-gradient(to bottom, var(--primary_content_background) 0%, var(--primary_content_compliment) 100%);
 }
 
@@ -1004,7 +1004,7 @@ sup.bbc_footnotes, sup.bbc_footnotes a {
 .forumposts > li,
 .content_category > div,
 .content_category > li {
-	border-color: var(--seconday_border);
+	border-color: var(--secondary_border);
 	background: var(--primary_content_background);
 }
 
@@ -1042,7 +1042,7 @@ sup.bbc_footnotes, sup.bbc_footnotes a {
 }
 
 #upshrinkHeaderIC .basic_row {
-	border-color: var(--seconday_border);
+	border-color: var(--secondary_border);
 	background: var(--primary_content_background);
 }
 
@@ -1051,7 +1051,7 @@ sup.bbc_footnotes, sup.bbc_footnotes a {
 }
 
 .ic_recent:not(:last-child) {
-	border-bottom-color: var(--seconday_border_bottom);
+	border-bottom-color: var(--secondary_border_bottom);
 }
 
 #ic_recentposts td, #ps_recentposts td, #ps_recenttopics td {
@@ -1210,17 +1210,17 @@ sup.bbc_footnotes, sup.bbc_footnotes a {
 }
 
 .poster_online .linklevel1 {
-	border-color: var(--seconday_border);
-	border-top-color: var(--seconday_border_top);
-	border-left-color: var(--seconday_border_left);
+	border-color: var(--secondary_border);
+	border-top-color: var(--secondary_border_top);
+	border-left-color: var(--secondary_border_left);
 	background-image: linear-gradient(to bottom, var(--primary_content_background) 0%, var(--primary_content_compliment) 100%);
 	box-shadow: 1px 1px 2px var(--box_shadow);
 }
 
 .poster_online .linklevel1:hover {
 	border-color: var(--primary_border);
-	border-top-color: var(--seconday_border);
-	border-left-color: var(--seconday_border_left);
+	border-top-color: var(--secondary_border);
+	border-left-color: var(--secondary_border_left);
 	background: var(--menu_button_hover_background);
 	box-shadow: 1px 1px 1px var(--opacity10) inset;
 }
@@ -1259,7 +1259,7 @@ sup.bbc_footnotes, sup.bbc_footnotes a {
 }
 
 .messageContent {
-	border-top-color: var(--seconday_border);
+	border-top-color: var(--secondary_border);
 }
 
 .messageContent .bbc_img.ila_pending {
@@ -1268,7 +1268,7 @@ sup.bbc_footnotes, sup.bbc_footnotes a {
 
 /* All the signatures used in the forum. */
 .signature, .attachments {
-	border-top-color: var(--seconday_border);
+	border-top-color: var(--secondary_border);
 }
 
 .signature.likes, .custom_fields_above_signature {
@@ -1278,7 +1278,7 @@ sup.bbc_footnotes, sup.bbc_footnotes a {
 /* Attachment details below thumbnails */
 .attachment_name, .attachment_details {
 	color: var(--hover_text) !important;
-	border: solid 1px var(--seconday_border);
+	border: solid 1px var(--secondary_border);
 	background: var(--mid_grey_background) !important;
 }
 
@@ -1321,7 +1321,7 @@ sup.bbc_footnotes, sup.bbc_footnotes a {
 }
 
 .new_post_separator:before {
-	border-color: var(--seconday_border_bottom) var(--transparent);
+	border-color: var(--secondary_border_bottom) var(--transparent);
 }
 
 /* Used by video embed JS when auto linking video links */
@@ -1414,9 +1414,9 @@ sup.bbc_footnotes, sup.bbc_footnotes a {
 }
 
 .ila_container {
-	border-color: var(--seconday_border);
-	border-top-color: var(--seconday_border_top);
-	border-left-color: var(--seconday_border_left);
+	border-color: var(--secondary_border);
+	border-top-color: var(--secondary_border_top);
+	border-left-color: var(--secondary_border_left);
 	background-image: linear-gradient(to bottom, var(--primary_content_background) 0%, var(--primary_content_compliment) 100%);
 	box-shadow: 1px 1px 2px var(--box_shadow);
 
@@ -1424,8 +1424,8 @@ sup.bbc_footnotes, sup.bbc_footnotes a {
 
 .ila_container:hover {
 	border-color: var(--primary_border);
-	border-top-color: var(--seconday_border);
-	border-left-color: var(--seconday_border_left);
+	border-top-color: var(--secondary_border);
+	border-left-color: var(--secondary_border_left);
 	background: var(--menu_button_hover_background);
 	box-shadow: 1px 1px 1px var(--opacity10) inset;
 }
@@ -1439,7 +1439,7 @@ sup.bbc_footnotes, sup.bbc_footnotes a {
 }
 
 #postDraftOptions .settings dd, #postDraftOptions .settings dt {
-	border-top-color: var(--seconday_border_top);
+	border-top-color: var(--secondary_border_top);
 }
 
 /* -------------------------------------------------------
@@ -1483,8 +1483,8 @@ sup.bbc_footnotes, sup.bbc_footnotes a {
 .ui-tabs .ui-tabs-nav li.ui-state-hover .ui-tabs-anchor {
 	color: var(--strong_text);
 	border-color: var(--input_border_hover);
-	border-top-color: var(--seconday_border);
-	border-left-color: var(--seconday_border);
+	border-top-color: var(--secondary_border);
+	border-left-color: var(--secondary_border);
 	background: var(--input_background_hover) !important;
 }
 
@@ -1594,11 +1594,11 @@ ul.cf_icons {
  */
 
 #personal_messages .capacity_bar {
-	border-color: var(--seconday_border);
+	border-color: var(--secondary_border);
 }
 
 #personal_messages .capacity_bar span {
-	border-right-color: var(--seconday_border);
+	border-right-color: var(--secondary_border);
 }
 
 #personal_messages .capacity_bar .empty {
@@ -1646,7 +1646,7 @@ ul.cf_icons {
 
 /* Used to indicate the current day. */
 #main_grid .calendar_today, #month_grid .calendar_today {
-	border-color: var(--seconday_border);
+	border-color: var(--secondary_border);
 	background: var(--currentday);
 }
 
@@ -1680,7 +1680,7 @@ ul.cf_icons {
 
 /* Styles for the tooltips. */
 .tooltip {
-	border-color: var(--seconday_border);
+	border-color: var(--secondary_border);
 	background: var(--primary_content_background);
 	box-shadow: 3px 3px 3px var(--opacity30);
 }
@@ -1692,7 +1692,7 @@ ul.cf_icons {
 
 /* The actual pop-up wrapper. */
 .popup_window {
-	border-color: var(--seconday_border);
+	border-color: var(--secondary_border);
 	background: var(--content-background);
 	background-clip: padding-box;
 	box-shadow: 0 5px 15px var(--opacity50);
@@ -1885,7 +1885,7 @@ ul.cf_icons {
 }
 
 #top_row .stats dd, .statsbar {
-	border-color: var(--seconday_border);
+	border-color: var(--secondary_border);
 	background: var(--primary_content_background);
 }
 
@@ -1961,7 +1961,7 @@ ul.cf_icons {
 
 @media screen and (max-width: 64em) {
 	#menu_sidebar {
-		border-color: var(--seconday_border);
+		border-color: var(--secondary_border);
 		background: var(--primary_content_background);
 		box-shadow: .2em .2em .2em var(--opacity30);
 	}
@@ -2017,12 +2017,12 @@ ul.cf_icons {
 	}
 
 	.topic_listing > li {
-		border-color: var(--seconday_border);
+		border-color: var(--secondary_border);
 		box-shadow: 3px 3px 6px var(--box_shadow);
 	}
 
 	.poster:after, .posterarea:before {
-		border-bottom: 1px solid var(--seconday_border);
+		border-bottom: 1px solid var(--secondary_border);
 	}
 
 	.whos_online dd:nth-child(even), .whos_online dd:nth-child(odd) {

@@ -127,9 +127,9 @@
 	--category_header_grad_2: #EAEAEA; /* 1-3 category */
 	--category_header_grad_3: #E4E4E4; /* 1-4 secondary */
 	--category_header_grad_4: #EBEBEB; /* end of */
-	--seconday_category_border: #AFAFAF; /* darker border */
-	--seconday_category_border_top: #CFCFCF; /* complimentary for hover effects */
-	--seconday_category_bottom: #BBBBBB;
+	--secondary_category_border: #AFAFAF; /* darker border */
+	--secondary_category_border_top: #CFCFCF; /* complimentary for hover effects */
+	--secondary_category_bottom: #BBBBBB;
 
 	/* Standard horizontal rule.. ([hr], etc.) */
 	--hr_border_bottom: #BBBBBB;
@@ -203,10 +203,10 @@
 	--primary_border_top: #DDDDDD;
 	--primary_border_left: #C7C7C7;
 	--primary_border_bottom: #CCCCCC;
-	--seconday_border: #AFAFAF; /* darker border */
-	--seconday_border_top: #CFCFCF; /* complimentary for hover effects */
-	--seconday_border_left: #BFBFBF; /* complimentary for hover effects */
-	--seconday_border_bottom: #BBBBBB;
+	--secondary_border: #AFAFAF; /* darker border */
+	--secondary_border_top: #CFCFCF; /* complimentary for hover effects */
+	--secondary_border_left: #BFBFBF; /* complimentary for hover effects */
+	--secondary_border_bottom: #BBBBBB;
 
 	/* Mostly used for shadows */
 	--transparent: transparent; /* Used on borders to hide them but keep sizing intact */
@@ -348,8 +348,8 @@ strong {
 
 /* Single ones a bit darker than board index ones. */
 .content_category .category_header {
-	border-top-color: var(--seconday_category_border_top);
-	border-bottom-color: var(--seconday_category_bottom);
+	border-top-color: var(--secondary_category_border_top);
+	border-bottom-color: var(--secondary_category_bottom);
 	background-image: linear-gradient(to bottom, var(--category_header_grad_1), var(--category_header_grad_3));
 }
 
@@ -437,11 +437,11 @@ strong {
 
 /* Styles used by the auto suggest control. */
 .auto_suggest_div {
-	border-color: var(--seconday_border);
+	border-color: var(--secondary_border);
 }
 
 .auto_suggest_div:focus {
-	border-color: var(--seconday_border);
+	border-color: var(--secondary_border);
 }
 
 .auto_suggest_item {
@@ -466,7 +466,7 @@ strong {
 }
 
 .codeheader {
-	border-top-color: var(--seconday_border);
+	border-top-color: var(--secondary_border);
 }
 
 /* A quote, perhaps from another post. */
@@ -488,8 +488,8 @@ input[type=checkbox].quote-show-more {
 
 /* Extra code block styling. */
 .bbc_code {
-	border-top-color: var(--seconday_border_top);
-	border-bottom-color: var(--seconday_border_bottom);
+	border-top-color: var(--secondary_border_top);
+	border-bottom-color: var(--secondary_border_bottom);
 	background: var(--content-background);
 }
 
@@ -514,7 +514,7 @@ input[type=checkbox].quote-show-more {
 .inner > .bbc_table_container > .bbc_table th,
 .messageContent > .bbc_table_container > .bbc_table th {
 	border-right: 1px solid var(--primary_border_right);
-	border-bottom: 1px solid var(--seconday_border_bottom);
+	border-bottom: 1px solid var(--secondary_border_bottom);
 }
 
 .inner > .bbc_table_container > .bbc_table td:last-child,
@@ -535,7 +535,7 @@ input[type=checkbox].quote-show-more {
 }
 
 div.bbc_footnotes {
-	border-top-color: var(--seconday_border);
+	border-top-color: var(--secondary_border);
 }
 
 .bbc_footnotes .target:target {
@@ -904,16 +904,16 @@ sup.bbc_footnotes, sup.bbc_footnotes a {
 
 .pagelinks .navPages {
 	color: var(--menu_text);
-	border-color: var(--seconday_border);
-	border-top-color: var(--seconday_border_top);
+	border-color: var(--secondary_border);
+	border-top-color: var(--secondary_border_top);
 	background-image: linear-gradient(to bottom, var(--primary_content_background) 0%, var(--primary_content_compliment) 100%);
 }
 
 .pagelinks .navPages:hover, .pagelinks .current_page {
 	color: var(--menu_text);
 	border-color: var(--primary_border);
-	border-top-color: var(--seconday_border_top);
-	border-left-color: var(--seconday_border_left);
+	border-top-color: var(--secondary_border_top);
+	border-left-color: var(--secondary_border_left);
 	background: var(--menu_button_hover_background);
 	box-shadow: 2px 1px 1px var(--opacity10) inset;
 }
@@ -1012,7 +1012,7 @@ sup.bbc_footnotes, sup.bbc_footnotes a {
 .forumposts > li,
 .content_category > div,
 .content_category > li {
-	border-color: var(--seconday_border);
+	border-color: var(--secondary_border);
 	background: var(--primary_content_background);
 }
 
@@ -1050,7 +1050,7 @@ sup.bbc_footnotes, sup.bbc_footnotes a {
 }
 
 #upshrinkHeaderIC .basic_row {
-	border-color: var(--seconday_border);
+	border-color: var(--secondary_border);
 	background: var(--primary_content_background);
 }
 
@@ -1210,17 +1210,17 @@ sup.bbc_footnotes, sup.bbc_footnotes a {
 }
 
 .poster_online .linklevel1 {
-	border-color: var(--seconday_border);
-	border-top-color: var(--seconday_border_top);
-	border-left-color: var(--seconday_border_left);
+	border-color: var(--secondary_border);
+	border-top-color: var(--secondary_border_top);
+	border-left-color: var(--secondary_border_left);
 	background-image: linear-gradient(to bottom, var(--primary_content_background) 0%, var(--primary_content_compliment) 100%);
 	box-shadow: 1px 1px 2px var(--box_shadow);
 }
 
 .poster_online .linklevel1:hover {
 	border-color: var(--primary_border);
-	border-top-color: var(--seconday_border);
-	border-left-color: var(--seconday_border_left);
+	border-top-color: var(--secondary_border);
+	border-left-color: var(--secondary_border_left);
 	background: var(--menu_button_hover_background);
 	box-shadow: 1px 1px 1px var(--opacity10) inset;
 }
@@ -1259,7 +1259,7 @@ sup.bbc_footnotes, sup.bbc_footnotes a {
 }
 
 .messageContent {
-	border-top-color: var(--seconday_border);
+	border-top-color: var(--secondary_border);
 }
 
 .messageContent .bbc_img.ila_pending {
@@ -1268,17 +1268,22 @@ sup.bbc_footnotes, sup.bbc_footnotes a {
 
 /* All the signatures used in the forum. */
 .signature, .attachments {
-	border-top-color: var(--seconday_border);
+	border-top-color: var(--secondary_border);
 }
 
 .signature.likes, .custom_fields_above_signature {
 	border-top-color: var(--transparent);
 }
 
+.likes_above_signature {
+	border-top-color: var(--secondary_border);
+	border-bottom-color: var(--secondary_border);
+}
+
 /* Attachment details below thumbnails */
 .attachment_name, .attachment_details {
 	color: var(--hover_text) !important;
-	border: solid 1px var(--seconday_border);
+	border: solid 1px var(--secondary_border);
 	background: var(--mid_grey_background) !important;
 }
 
@@ -1315,7 +1320,7 @@ sup.bbc_footnotes, sup.bbc_footnotes a {
 }
 
 .new_post_separator:before {
-	border-color: var(--seconday_border_bottom) var(--transparent);
+	border-color: var(--secondary_border_bottom) var(--transparent);
 }
 
 /* Used by video embed JS when auto linking video links */
@@ -1408,9 +1413,9 @@ sup.bbc_footnotes, sup.bbc_footnotes a {
 }
 
 .ila_container {
-	border-color: var(--seconday_border);
-	border-top-color: var(--seconday_border_top);
-	border-left-color: var(--seconday_border_left);
+	border-color: var(--secondary_border);
+	border-top-color: var(--secondary_border_top);
+	border-left-color: var(--secondary_border_left);
 	background-image: linear-gradient(to bottom, var(--primary_content_background) 0%, var(--primary_content_compliment) 100%);
 	box-shadow: 1px 1px 2px var(--box_shadow);
 
@@ -1418,8 +1423,8 @@ sup.bbc_footnotes, sup.bbc_footnotes a {
 
 .ila_container:hover {
 	border-color: var(--primary_border);
-	border-top-color: var(--seconday_border);
-	border-left-color: var(--seconday_border_left);
+	border-top-color: var(--secondary_border);
+	border-left-color: var(--secondary_border_left);
 	background: var(--menu_button_hover_background);
 	box-shadow: 1px 1px 1px var(--opacity10) inset;
 }
@@ -1433,7 +1438,7 @@ sup.bbc_footnotes, sup.bbc_footnotes a {
 }
 
 #postDraftOptions .settings dd, #postDraftOptions .settings dt {
-	border-top-color: var(--seconday_border_top);
+	border-top-color: var(--secondary_border_top);
 }
 
 /* -------------------------------------------------------
@@ -1477,8 +1482,8 @@ sup.bbc_footnotes, sup.bbc_footnotes a {
 .ui-tabs .ui-tabs-nav li.ui-state-hover .ui-tabs-anchor {
 	color: var(--menu_text);
 	border-color: var(--primary_border);
-	border-top-color: var(--seconday_border);
-	border-left-color: var(--seconday_border);
+	border-top-color: var(--secondary_border);
+	border-left-color: var(--secondary_border);
 	background: var(--grey_background);
 }
 
@@ -1588,11 +1593,11 @@ ul.cf_icons {
  */
 
 #personal_messages .capacity_bar {
-	border-color: var(--seconday_border);
+	border-color: var(--secondary_border);
 }
 
 #personal_messages .capacity_bar span {
-	border-right-color: var(--seconday_border);
+	border-right-color: var(--secondary_border);
 }
 
 #personal_messages .capacity_bar .empty {
@@ -1640,7 +1645,7 @@ ul.cf_icons {
 
 /* Used to indicate the current day. */
 #main_grid .calendar_today, #month_grid .calendar_today {
-	border-color: var(--seconday_border);
+	border-color: var(--secondary_border);
 	background: var(--currentday);
 }
 
@@ -1674,7 +1679,7 @@ ul.cf_icons {
 
 /* Styles for the tooltips. */
 .tooltip {
-	border-color: var(--seconday_border);
+	border-color: var(--secondary_border);
 	background: var(--primary_content_background);
 	box-shadow: 3px 3px 3px var(--opacity30);
 }
@@ -1686,7 +1691,7 @@ ul.cf_icons {
 
 /* The actual pop-up wrapper. */
 .popup_window {
-	border-color: var(--seconday_border);
+	border-color: var(--secondary_border);
 	background: var(--content-background);
 	background-clip: padding-box;
 	box-shadow: 0 5px 15px var(--opacity50);
@@ -1822,13 +1827,6 @@ ul.cf_icons {
 	background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='%23A80000' viewBox='0 0 31 36'%3E%3Cpath d='M15.429 2.571c8.518 0 15.429 6.911 15.429 15.429s-6.911 15.429-15.429 15.429S0 26.518 0 18 6.911 2.571 15.429 2.571zM18 27.623v-3.817c0-.362-.281-.663-.623-.663H13.52a.668.668 0 00-.663.663v3.817c0 .362.301.663.663.663h3.857c.342 0 .623-.301.623-.663zm-.04-6.911l.362-12.475a.403.403 0 00-.201-.362.776.776 0 00-.482-.161h-4.42a.768.768 0 00-.482.161.402.402 0 00-.201.362l.342 12.475c0 .281.301.502.683.502h3.717c.362 0 .663-.221.683-.502z'/%3E%3C/svg%3E");
 }
 
-.genericbox {
-	border-color: var(--transparent);
-	border-top-color: var(--infobox_border);
-	border-bottom-color: var(--infobox_border);
-	background-color: var(--transparent);
-}
-
 /* -------------------------------------------------------
  *	$PROGRESS
  * -------------------------------------------------------
@@ -1871,7 +1869,7 @@ ul.cf_icons {
 }
 
 #top_row .stats dd, .statsbar {
-	border-color: var(--seconday_border);
+	border-color: var(--secondary_border);
 	background: var(--primary_content_background);
 }
 
@@ -1947,7 +1945,7 @@ ul.cf_icons {
 
 @media screen and (max-width: 64em) {
 	#menu_sidebar {
-		border-color: var(--seconday_border);
+		border-color: var(--secondary_border);
 		background: var(--primary_content_background);
 		box-shadow: .2em .2em .2em var(--opacity30);
 	}
@@ -2003,12 +2001,12 @@ ul.cf_icons {
 	}
 
 	.topic_listing > li {
-		border-color: var(--seconday_border);
+		border-color: var(--secondary_border);
 		box-shadow: 3px 3px 6px var(--box_shadow);
 	}
 
 	.poster:after, .posterarea:before {
-		border-bottom: 1px solid var(--seconday_border);
+		border-bottom: 1px solid var(--secondary_border);
 	}
 
 	.whos_online dd:nth-child(even), .whos_online dd:nth-child(odd) {

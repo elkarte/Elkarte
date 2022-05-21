@@ -42,8 +42,8 @@
 	--primary_border_right: #C7C7C7;
 	--primary_border_left: #CCCCCC;
 
-	--seconday_border_right: #BFBFBF;
-	--seconday_border_left: #AFAFAF;
+	--secondary_border_right: #BFBFBF;
+	--secondary_border_left: #AFAFAF;
 }
 
 /* -------------------------------------------------------
@@ -61,16 +61,16 @@ fieldset {
 
 /* Dont show disabled buttons as active on hover */
 input[type=submit][disabled]:hover, button[disabled], button[disabled]:hover {
-	border-right: 1px solid var(--seconday_border_right);
-	border-left: 1px solid var(--seconday_border_left);
+	border-right: 1px solid var(--secondary_border_right);
+	border-left: 1px solid var(--secondary_border_left);
 }
 
 /* Common button styling. */
 input[type="submit"], .drop_area_fileselect_text, button[type="submit"], input[type="button"],
 /* Anchors styled to look like buttons. */
 .linkbutton:link, .linkbutton:visited {
-	border-right: 1px solid var(--seconday_border_right);
-	border-left: 1px solid var(--seconday_border_left);
+	border-right: 1px solid var(--secondary_border_right);
+	border-left: 1px solid var(--secondary_border_left);
 	box-shadow: -1px 1px 2px var(--box_shadow);
 }
 
@@ -130,8 +130,8 @@ input[type="submit"]:hover, button[type="submit"]:hover, input[type="button"]:ho
 
 /* Level 1 Menu bar: link or button. General styling. */
 .linklevel1, .linklevel1:link, .linklevel1:visited {
-	border-right: 1px solid var(--seconday_border_right);
-	border-left: 1px solid var(--seconday_border_left);
+	border-right: 1px solid var(--secondary_border_right);
+	border-left: 1px solid var(--secondary_border_left);
 	box-shadow: -1px 1px 2px var(--box_shadow);
 }
 
@@ -140,20 +140,20 @@ input[type="submit"]:hover, button[type="submit"]:hover, input[type="button"]:ho
 .linklevel2:hover, .listlevel2:hover .linklevel2,
 .linklevel3:hover, .listlevel3:hover .linklevel3,
 #menu_sidebar .linklevel1:hover, #menu_sidebar .listlevel1:hover .linklevel1 {
-	border-right: 1px solid var(--seconday_border_right);
-	border-left: 1px solid var(--seconday_border_right);
+	border-right: 1px solid var(--secondary_border_right);
+	border-left: 1px solid var(--secondary_border_right);
 	box-shadow: -2px 1px 1px var(--opacity10) inset;
 }
 
 .poster li.poster_online:hover .linklevel1 {
-	border-right: 1px solid var(--seconday_border_right);
-	border-left: 1px solid var(--seconday_border_left);
+	border-right: 1px solid var(--secondary_border_right);
+	border-left: 1px solid var(--secondary_border_left);
 	box-shadow: -2px 1px 1px var(--opacity10) inset;
 }
 
 .poster li.poster_online .nolink {
-	border-right: 1px solid var(--seconday_border_right);
-	border-left: 1px solid var(--seconday_border_left);
+	border-right: 1px solid var(--secondary_border_right);
+	border-left: 1px solid var(--secondary_border_left);
 	box-shadow: -1px 1px 2px var(--box_shadow);
 }
 
@@ -224,8 +224,8 @@ input[type="submit"]:hover, button[type="submit"]:hover, input[type="button"]:ho
  * -------------------------------------------------------
  */
 .pagelinks .navPages:hover, .pagelinks .current_page {
-	border-right: 1px solid var(--seconday_border_right);
-	border-left: 1px solid var(--seconday_border_left);
+	border-right: 1px solid var(--secondary_border_right);
+	border-left: 1px solid var(--secondary_border_left);
 	box-shadow: -2px 1px 1px var(--opacity10) inset;
 }
 
@@ -245,7 +245,7 @@ input[type="submit"]:hover, button[type="submit"]:hover, input[type="button"]:ho
 }
 
 .board_latest {
-	border-right: 1px solid var(--seconday_border_right);
+	border-right: 1px solid var(--secondary_border_right);
 }
 
 /* The board description and who-is-viewing stuff. */
@@ -273,8 +273,8 @@ input[type="submit"]:hover, button[type="submit"]:hover, input[type="button"]:ho
 
 /* @todo - Save code by amalgamating common button background declarations. */
 .poster_online .linklevel1 {
-	border-right: 1px solid var(--seconday_border_right);
-	border-left: 1px solid var(--seconday_border_left);
+	border-right: 1px solid var(--secondary_border_right);
+	border-left: 1px solid var(--secondary_border_left);
 	box-shadow: -1px 1px 2px var(--box_shadow);
 }
 
@@ -313,8 +313,8 @@ input[type="submit"]:hover, button[type="submit"]:hover, input[type="button"]:ho
  * --------------------------------------------------------
  */
 .ui-tabs .ui-state-hover {
-	border-right: 1px solid var(--seconday_border_right);
-	border-left: 1px solid var(--seconday_border_left);
+	border-right: 1px solid var(--secondary_border_right);
+	border-left: 1px solid var(--secondary_border_left);
 }
 
 /* -------------------------------------------------------
@@ -327,7 +327,7 @@ input[type="submit"]:hover, button[type="submit"]:hover, input[type="button"]:ho
  * ------------------------------------------------------- */
 #personal_messages .capacity_bar span {
 	border-right-color: var(--transparent);
-	border-left: 1px solid var(--seconday_border_left);
+	border-left: 1px solid var(--secondary_border_left);
 }
 
 /* -------------------------------------------------------
@@ -386,7 +386,7 @@ input[type="submit"]:hover, button[type="submit"]:hover, input[type="button"]:ho
  */
 .stats.floatleft {
 	border-right-color: var(--transparent);
-	border-left: 1px solid var(--seconday_border_left);
+	border-left: 1px solid var(--secondary_border_left);
 }
 
 /* -------------------------------------------------------
