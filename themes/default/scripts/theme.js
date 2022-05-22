@@ -14,9 +14,7 @@
 document.addEventListener("DOMContentLoaded", function ()
 {
 	// If they touch the screen, then we switch to click menus
-	window.addEventListener('touchstart', function onFirstTouch() {
-		useClickMenu();
-	}, false);
+	window.addEventListener('touchstart', onFirstTouch, false);
 
 	// Or if they specifically only want click menus
 	if (use_click_menu)
@@ -200,6 +198,10 @@ function elk_addButton(sButtonStripId, bUseImage, oOptions)
 	}
 
 	oButtonStripList.appendChild(oNewButton);
+}
+
+function onFirstTouch() {
+	useClickMenu();
 }
 
 function useClickMenu()
