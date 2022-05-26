@@ -251,8 +251,15 @@
 				let numberAllowed = document.getElementById('attachmentNumPerPostLimit'),
 					totalSize = document.getElementById('attachmentPostLimit');
 
-				numberAllowed.textContent = String(params.numOfAttachmentAllowed - numAttachUploaded);
-				totalSize.textContent = formatBytes(params.totalSizeAllowed - totalAttachSizeUploaded);
+				if (numberAllowed !== null)
+				{
+					numberAllowed.textContent = String(params.numOfAttachmentAllowed - numAttachUploaded);
+				}
+
+				if (totalSize !== null)
+				{
+					totalSize.textContent = formatBytes(params.totalSizeAllowed - totalAttachSizeUploaded);
+				}
 			},
 
 			/**
