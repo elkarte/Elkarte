@@ -966,7 +966,7 @@ function loadAssetFile($filenames, $params = array(), $id = '')
 	}
 
 	$cache = Cache::instance();
-	$fileFunc = \ElkArte\FileFunctions::instance();
+	$fileFunc = FileFunctions::instance();
 
 	if (!is_array($filenames))
 	{
@@ -989,7 +989,7 @@ function loadAssetFile($filenames, $params = array(), $id = '')
 
 	// Whoa ... we've done this before yes?
 	$cache_name = 'load_' . $params['extension'] . '_' . hash('md5', $settings['theme_dir'] . implode('_', $filenames));
-	$temp = array();
+	$temp = [];
 	if ($cache->getVar($temp, $cache_name, 600))
 	{
 		if (empty($context[$params['index_name']]))
