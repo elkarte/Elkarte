@@ -238,7 +238,7 @@
 }
 
 /* Twisted Arrows */
-.i-shuffle::before {
+.i-shuffle::before, .i-split::before {
 	content: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='black' viewBox='0 0 32 32'%3E%3Cpath d='M24 22h-3.172l-5-5 5-5H24v5l7-7-7-7v5h-4c-.53 0-1.04.21-1.414.586L13 14.172 7.414 8.586C7.04 8.21 6.53 8 6 8H0v4h5.172l5 5-5 5H0v4h6c.53 0 1.04-.21 1.414-.586L13 19.828l5.586 5.586c.375.375.884.586 1.414.586h4v5l7-7-7-7v5z'/%3E%3C/svg%3E");
 }
 
