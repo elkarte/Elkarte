@@ -315,7 +315,7 @@ class SiteCombiner
 			// @todo needs to be smarter, based on "new" cache location
 			if ($type === 'css')
 			{
-				//$tempfile = str_replace(array('../../images', '../images', '../../webfonts', '../webfonts', '../../scripts', '../scripts'), array($file['url'] . '../images', $file['url'] . '../webfonts', $file['url'] . '../scripts'), $tempfile);
+				$tempfile = str_replace(array('../../images', '../../webfonts', '../../scripts'), array($file['url'] . '/images', $file['url'] . '/webfonts', $file['url'] . '/scripts'), $tempfile);
 			}
 
 			// Add the file to the correct array for processing
