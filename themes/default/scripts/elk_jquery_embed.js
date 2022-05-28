@@ -156,7 +156,7 @@
 		// Get a TikTok video thumbnail and embed data
 		imgHandlers.getTikTokEmbed = function(eURL, callback)
 		{
-			fetchDocument(eURL, ttResponse, 'json');
+			fetchDocument(eURL, ttResponse, 'json', false);
 			function ttResponse(data)
 			{
 				if (typeof data.html === 'undefined')
@@ -172,7 +172,7 @@
 		// Get a dailymotion video thumbnail
 		imgHandlers.getDailymotionIMG = function(eURL, callback)
 		{
-			fetchDocument(eURL, dailyResponse, 'json');
+			fetchDocument(eURL, dailyResponse, 'json', false);
 			function dailyResponse(data)
 			{
 				if (typeof data.thumbnail_480_url !== 'undefined')
@@ -189,7 +189,7 @@
 		// Get a Vimeo video thumbnail
 		imgHandlers.getVimeoIMG = function(videoID, callback)
 		{
-			fetchDocument('https://vimeo.com/api/v2/video/' + videoID + '.json', vimeoResponse, 'json');
+			fetchDocument('https://vimeo.com/api/v2/video/' + videoID + '.json', vimeoResponse, 'json', false);
 			function vimeoResponse(data)
 			{
 				if (typeof data[0].thumbnail_large !== 'undefined')
