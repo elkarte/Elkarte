@@ -134,14 +134,13 @@ function template_control_richedit($editor_id, $smileyContainer = null, $bbcCont
 	echo '});
 				$editor_data.', $editor_id, ' = sceditor.instance(eTextarea);
 				$editor_container.', $editor_id, ' = $(".sceditor-container");
-				// For ally as sceditor is removing the info
-				$editor_container.' . $editor_id . '.find("textarea, iframe").attr("name", "message");
 				$editor_data.', $editor_id, '.css("code {white-space: pre;}").createPermanentDropDown();',
 				isset($context['post_error']['errors']['no_message']) || isset($context['post_error']['errors']['long_message'])
 					? '$editor_container.' . $editor_id . '.find("eTextarea, iframe").addClass("border_error");'
 					: '', '
 			}
 		</script>
+		
 		<script type="module">
 			$(function() {
 				elk_editor();

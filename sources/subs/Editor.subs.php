@@ -51,7 +51,7 @@ function create_control_richedit($editorOptions)
 	assert(isset($editorOptions['id']));
 	assert(isset($editorOptions['value']));
 
-	// Is this the first richedit - if so we need to ensure things are initialised and that we load all of the needed files
+	// Is this the first richedit - if so we need to ensure things are initialised and that we load all needed files
 	if (empty($context['controls']['richedit']))
 	{
 		// Store the name / ID we are creating for template compatibility.
