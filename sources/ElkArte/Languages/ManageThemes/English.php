@@ -140,4 +140,4 @@ $txt['themeadmin_themelist_link'] = 'Show the list of installed themes';
 // Strings for the variants
 $txt['variant_light'] = 'ElkArte Light';
 $txt['variant_besocial'] = 'ElkArte Be Social!';
-$txt['variant_dark'] = 'ElkArte Dark Vader';
+$txt['variant_dark'] = 'ElkArte Darktanion';

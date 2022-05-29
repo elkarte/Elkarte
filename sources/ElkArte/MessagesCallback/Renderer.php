@@ -31,68 +31,32 @@ use ElkArte\ValuesContainer;
  */
 abstract class Renderer
 {
-	/**
-	 * The request object
-	 *
-	 * @var Object
-	 */
-	protected $_dbRequest = null;
+	/** @var Object The request object */
+	protected $_dbRequest;
 
-	/**
-	 * The current user data
-	 *
-	 * @var \ElkArte\UserInfo
-	 */
-	protected $user = null;
+	/** @var \ElkArte\UserInfo The current user data */
+	protected $user;
 
-	/**
-	 * The parser that will convert the body
-	 *
-	 * @var BodyParserInterface
-	 */
-	protected $_bodyParser = null;
+	/** @var BodyParserInterface The parser that will convert the body */
+	protected $_bodyParser;
 
-	/**
-	 * The database object
-	 *
-	 * @var Object
-	 */
-	protected $_db = null;
+	/** @var Object The database object */
+	protected $_db;
 
-	/**
-	 * Some options
-	 *
-	 * @var ValuesContainer
-	 */
-	protected $_options = null;
+	/** @var ValuesContainer Some options */
+	protected $_options;
 
-	/**
-	 * Position tracker, to know where we are into the request
-	 *
-	 * @var int
-	 */
+	/** @var int Position tracker, to know where we are into the request */
 	protected $_counter = 0;
 
-	/**
-	 * Should we show the signature of this message?
-	 *
-	 * @var bool
-	 */
-	protected $_signature_shown = null;
+	/** @var bool Should we show the signature of this message? */
+	protected $_signature_shown;
 
-	/**
-	 * The current message being prepared
-	 *
-	 * @var mixed[]
-	 */
-	protected $_this_message = null;
+	/** @var array The current message being prepared */
+	protected $_this_message;
 
-	/**
-	 * Index mapping, to normalize certain indexes across requests
-	 *
-	 * @var ValuesContainer
-	 */
-	protected $_idx_mapper = array();
+	/** @var ValuesContainer Index mapping, to normalize certain indexes across requests */
+	protected $_idx_mapper = [];
 
 	/**
 	 * Renderer constructor, starts everything.
@@ -101,7 +65,6 @@ abstract class Renderer
 	 * @param Object $user
 	 * @param BodyParserInterface $bodyParser
 	 * @param ValuesContainer $opt
-	 * @throws \Exception
 	 */
 	public function __construct($request, $user, $bodyParser, $opt = null)
 	{
@@ -172,6 +135,7 @@ abstract class Renderer
 		{
 			$this->_adjustMemberContext($member_context);
 		}
+
 		$this->_adjustAllMembers($member_context);
 
 		// Do the censor thang.
@@ -180,12 +144,12 @@ abstract class Renderer
 		// Run BBC interpreter on the message.
 		$this->_this_message['body'] = $this->_bodyParser->prepare($this->_this_message['body'], $this->_this_message['smileys_enabled']);
 
-		call_integration_hook(static::BEFORE_PREPARE_HOOK, array(&$this->_this_message));
+		call_integration_hook(static::BEFORE_PREPARE_HOOK, [&$this->_this_message]);
 
 		// Compose the memory eat- I mean message array.
 		$output = $this->_buildOutputArray();
 
-		call_integration_hook(static::CONTEXT_HOOK, array(&$output, &$this->_this_message, $this->_counter));
+		call_integration_hook(static::CONTEXT_HOOK, [&$output, &$this->_this_message, $this->_counter]);
 
 		$output['classes'] = implode(' ', $output['classes']);
 
