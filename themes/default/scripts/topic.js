@@ -57,10 +57,8 @@ QuickModifyTopic.prototype.modify_topic = function (topic_id, first_msg_id)
 		{
 			return;
 		}
-		else
-		{
-			this.modify_topic_cancel();
-		}
+
+		this.modify_topic_cancel();
 	}
 
 	this.bInEditMode = true;
@@ -83,7 +81,7 @@ QuickModifyTopic.prototype.onDocReceived_modify_topic = function (XMLDoc)
 	}
 
 	this.sCurMessageId = XMLDoc.getElementsByTagName("message")[0].getAttribute("id");
-	this.oCurSubjectDiv = document.getElementById('msg_' + this.sCurMessageId.substr(4));
+	this.oCurSubjectDiv = document.getElementById('msg_' + this.sCurMessageId.substring(4));
 	this.sBuffSubject = this.oCurSubjectDiv.innerHTML;
 
 	// Hide the tooltip text, don't want them for this element during the edit
@@ -121,11 +119,11 @@ QuickModifyTopic.prototype.modify_topic_cancel = function ()
 // Simply restore/show any hidden bits during topic editing.
 QuickModifyTopic.prototype.set_hidden_topic_areas = function (set_style)
 {
-	for (var i = 0; i < this.aHidePrefixes.length; i++)
+	for (let i = 0; i < this.aHidePrefixes.length; i++)
 	{
-		if (document.getElementById(this.aHidePrefixes[i] + this.sCurMessageId.substr(4)) !== null)
+		if (document.getElementById(this.aHidePrefixes[i] + this.sCurMessageId.substring(4)) !== null)
 		{
-			document.getElementById(this.aHidePrefixes[i] + this.sCurMessageId.substr(4)).style.display = set_style;
+			document.getElementById(this.aHidePrefixes[i] + this.sCurMessageId.substring(4)).style.display = set_style;
 		}
 	}
 };
@@ -134,7 +132,7 @@ QuickModifyTopic.prototype.set_hidden_topic_areas = function (set_style)
 QuickModifyTopic.prototype.modify_topic_show_edit = function (subject)
 {
 	// Just template the subject.
-	this.oCurSubjectDiv.innerHTML = '<input type="text" name="subject" value="' + subject + '" size="60" style="width: 95%;" maxlength="80" class="input_text" autocomplete="off" /><input type="hidden" name="topic" value="' + this.iCurTopicId + '" /><input type="hidden" name="msg" value="' + this.sCurMessageId.substr(4) + '" />';
+	this.oCurSubjectDiv.innerHTML = '<input type="text" name="subject" value="' + subject + '" size="60" style="width: 95%;" maxlength="80" class="input_text" autocomplete="off" /><input type="hidden" name="topic" value="' + this.iCurTopicId + '" /><input type="hidden" name="msg" value="' + this.sCurMessageId.substring(4) + '" />';
 
 	// Attach mouse over and out events to this new div
 	this.oCurSubjectDiv.onmouseout = this.modify_topic_mouseout.bind(this);
@@ -149,8 +147,7 @@ QuickModifyTopic.prototype.modify_topic_save = function (cur_session_id, cur_ses
 		return true;
 	}
 
-	var x = [];
-
+	let x = [];
 	x[x.length] = 'subject=' + document.forms.quickModForm.subject.value.replace(/&#/g, "&#38;#").php_urlencode();
 	x[x.length] = 'topic=' + parseInt(document.forms.quickModForm.elements.topic.value);
 	x[x.length] = 'msg=' + parseInt(document.forms.quickModForm.elements.msg.value);
@@ -174,7 +171,7 @@ QuickModifyTopic.prototype.modify_topic_done = function (XMLDoc)
 		return true;
 	}
 
-	var message = XMLDoc.getElementsByTagName("elk")[0].getElementsByTagName("message")[0],
+	let message = XMLDoc.getElementsByTagName("elk")[0].getElementsByTagName("message")[0],
 		subject = message.getElementsByTagName("subject")[0],
 		error = message.getElementsByTagName("error")[0];
 
@@ -477,12 +474,12 @@ QuickModify.prototype.onMessageReceived = function (XMLDoc)
 	this.sMessageBuffer = this.oCurMessageDiv.innerHTML;
 
 	// Actually create the content
-	this.oCurMessageDiv.innerHTML = this.opt.sTemplateBodyEdit.replace(/%msg_id%/g, this.sCurMessageId.substr(4)).replace(/%body%/, sBodyText);
+	this.oCurMessageDiv.innerHTML = this.opt.sTemplateBodyEdit.replace(/%msg_id%/g, this.sCurMessageId.substring(4)).replace(/%body%/, sBodyText);
 
 	// Save and hide the existing subject div
 	if (this.opt.sIDSubject !== null)
 	{
-		this.oCurSubjectDiv = document.getElementById(this.opt.sIDSubject + this.sCurMessageId.substr(4));
+		this.oCurSubjectDiv = document.getElementById(this.opt.sIDSubject + this.sCurMessageId.substring(4));
 		if (this.oCurSubjectDiv !== null)
 		{
 			this.oCurSubjectDiv.style.display = 'none';
@@ -494,7 +491,7 @@ QuickModify.prototype.onMessageReceived = function (XMLDoc)
 	sSubjectText = XMLDoc.getElementsByTagName('subject')[0].childNodes[0].nodeValue;
 	if (this.opt.sIDInfo !== null)
 	{
-		this.oCurInfoDiv = document.getElementById(this.opt.sIDInfo + this.sCurMessageId.substr(4));
+		this.oCurInfoDiv = document.getElementById(this.opt.sIDInfo + this.sCurMessageId.substring(4));
 		if (this.oCurInfoDiv !== null)
 		{
 			this.sInfoBuffer = this.oCurInfoDiv.innerHTML;
@@ -503,7 +500,7 @@ QuickModify.prototype.onMessageReceived = function (XMLDoc)
 	}
 
 	// Position the editor in the window
-	location.hash = '#info_' + this.sCurMessageId.substr(this.sCurMessageId.lastIndexOf("_") + 1);
+	location.hash = '#info_' + this.sCurMessageId.substring(this.sCurMessageId.lastIndexOf("_") + 1);
 
 	// Handle custom function hook before showing the new select.
 	if ('funcOnAfterCreate' in this.opt)
@@ -524,9 +521,10 @@ QuickModify.prototype.modifyCancel = function ()
 	{
 		this.oCurMessageDiv.innerHTML = this.sMessageBuffer;
 		this.oCurInfoDiv.innerHTML = this.sInfoBuffer;
-		this.oCurSubjectDiv.innerHTML = this.sSubjectBuffer;
+
 		if (this.oCurSubjectDiv !== null)
 		{
+			this.oCurSubjectDiv.innerHTML = this.sSubjectBuffer;
 			this.oCurSubjectDiv.style.display = '';
 		}
 	}
@@ -676,7 +674,7 @@ QuickModify.prototype.onModifyDone = function (XMLDoc)
 		// Show this message as 'modified on x by y'.
 		if (this.opt.bShowModify)
 		{
-			let modified_element = document.getElementById('modified_' + this.sCurMessageId.substr(4));
+			let modified_element = document.getElementById('modified_' + this.sCurMessageId.substring(4));
 			modified_element.innerHTML = message.getElementsByTagName('modified')[0].childNodes[0].nodeValue;
 
 			// Just in case it's the first time the message is modified and the element is hidden
@@ -751,7 +749,7 @@ function InTopicModeration(oOptions)
 
 InTopicModeration.prototype.init = function ()
 {
-	// Add checkboxes to all the messages.
+	// Add checkboxes w/click event to the messages that can be removed/split
 	this.opt.aMessageIds.forEach((messageID) =>
 	{
 		// Create the checkbox.
@@ -774,7 +772,8 @@ InTopicModeration.prototype.init = function ()
 InTopicModeration.prototype.handleClick = function (oCheckbox)
 {
 	let oButtonStrip = document.getElementById(this.opt.sButtonStrip),
-		oButtonStripDisplay = document.getElementById(this.opt.sButtonStripDisplay);
+		oButtonStripDisplay = document.getElementById(this.opt.sButtonStripDisplay),
+		aButtonCounter = ['remove', 'restore', 'split'];
 
 	if (!this.bButtonsShown && this.opt.sButtonStripDisplay)
 	{
@@ -795,47 +794,24 @@ InTopicModeration.prototype.handleClick = function (oCheckbox)
 			oButtonStrip.appendChild(oNewDiv);
 		}
 
-		// Add the 'remove selected items' button.
-		if (this.opt.bCanRemove)
-		{
-			elk_addButton(this.opt.sButtonStrip, this.opt.bUseImageButton, {
-				sId: 'remove_button',
-				sText: this.opt.sRemoveButtonLabel,
-				sImage: this.opt.sRemoveButtonImage,
-				sUrl: '#',
-				aEvents: [
-					['click', this.handleSubmit.bind(this, 'remove')]
-				]
-			});
-		}
+		// Add the special selected buttons.
+		aButtonCounter.forEach((addButton) => {
+			let upperButton = addButton[0].toUpperCase() + addButton.substring(1);
 
-		// Add the 'restore selected items' button.
-		if (this.opt.bCanRestore)
-		{
-			elk_addButton(this.opt.sButtonStrip, this.opt.bUseImageButton, {
-				sId: 'restore_button',
-				sText: this.opt.sRestoreButtonLabel,
-				sImage: this.opt.sRestoreButtonImage,
-				sUrl: '#',
-				aEvents: [
-					['click', this.handleSubmit.bind(this, 'restore')]
-				]
-			});
-		}
-
-		// Add the 'split selected items' button.
-		if (this.opt.bCanSplit)
-		{
-			elk_addButton(this.opt.sButtonStrip, this.opt.bUseImageButton, {
-				sId: 'split_button',
-				sText: this.opt.sSplitButtonLabel,
-				sImage: this.opt.sSplitButtonImage,
-				sUrl: '#',
-				aEvents: [
-					['click', this.handleSubmit.bind(this, 'split')]
-				]
-			});
-		}
+			// As in bCanRemove etc.
+			if (this.opt['bCan' + upperButton])
+			{
+				elk_addButton(this.opt.sButtonStrip, this.opt.bUseImageButton, {
+					sId: addButton + '_button',
+					sText: this.opt['s' + upperButton + 'ButtonLabel'],
+					sImage: this.opt['s' + upperButton + 'ButtonImage'],
+					sUrl: '#',
+					aEvents: [
+						['click', this.handleSubmit.bind(this, addButton)]
+					]
+				});
+			}
+		});
 
 		// Adding these buttons once should be enough.
 		this.bButtonsShown = true;
@@ -845,22 +821,24 @@ InTopicModeration.prototype.handleClick = function (oCheckbox)
 	this.iNumSelected += oCheckbox.checked ? 1 : -1;
 
 	// Show the number of messages selected in each of the buttons.
-	if (this.opt.bCanRemove && !this.opt.bUseImageButton)
+	aButtonCounter.forEach((addButton) =>
 	{
-		oButtonStrip.querySelector('#remove_button_text').innerHTML = this.opt.sRemoveButtonLabel + ' [' + this.iNumSelected + ']';
-		oButtonStrip.querySelector('#remove_button').style.display = this.iNumSelected < 1 ? "none" : "";
-	}
+		let upperButton = addButton[0].toUpperCase() + addButton.substring(1);
+		if (this.opt['bCan' + upperButton])
+		{
+			oButtonStrip.querySelector('#' + addButton + '_button_text').innerHTML = this.opt['s' + upperButton + 'ButtonLabel'] + ' [' + this.iNumSelected + ']';
+			oButtonStrip.querySelector('#' + addButton + '_button').style.display = this.iNumSelected < 1 ? "none" : "";
+		}
+	});
 
-	if (this.opt.bCanRestore && !this.opt.bUseImageButton)
+	// Toggle the sticky class based on if something is selected
+	if (this.iNumSelected < 1)
 	{
-		oButtonStrip.querySelector('#restore_button_text').innerHTML = this.opt.sRestoreButtonLabel + ' [' + this.iNumSelected + ']';
-		oButtonStrip.querySelector('#restore_button').style.display = this.iNumSelected < 1 ? "none" : "";
+		oButtonStrip.classList.remove('sticky');
 	}
-
-	if (this.opt.bCanSplit && !this.opt.bUseImageButton)
+	else
 	{
-		oButtonStrip.querySelector('#split_button_text').innerHTML = this.opt.sSplitButtonLabel + ' [' + this.iNumSelected + ']';
-		oButtonStrip.querySelector('#split_button').style.display = this.iNumSelected < 1 ? "none" : "";
+		oButtonStrip.classList.add('sticky');
 	}
 };
 
@@ -1266,7 +1244,7 @@ function sendtopicOverlayDiv(desktopURL, sHeader, sIcon)
 
 /**
  * Helper function for sendtopicForm, highlights missing fields that must
- * be filled in in order to send the topic
+ * be filled in order to send the topic
  *
  * @param {type} $this_form
  * @param {string} classname
@@ -1445,6 +1423,7 @@ function sendtopicForm(oPopup_body, url, oContainer)
 function topicSplitselect(direction, msg_id)
 {
 	getXMLDocument(elk_prepareScriptUrl(elk_scripturl) + "action=splittopics;sa=selectTopics;subname=" + topic_subject + ";topic=" + topic_id + "." + start[0] + ";start2=" + start[1] + ";move=" + direction + ";msg=" + msg_id + ";api=xml", onTopicSplitReceived);
+
 	return false;
 }
 
@@ -1481,7 +1460,7 @@ function onTopicSplitReceived(XMLDoc)
 		right_arrow = '<i class="icon icon-lg i-chevron-circle-right"></i>',
 		left_arrow = '<i class="icon icon-lg i-chevron-circle-left"></i>';
 
-	// Loop through all of the changes returned in the xml response
+	// Loop through all changes ajax returned
 	for (i = 0; i < numChanges; i++)
 	{
 		curChange = XMLDoc.getElementsByTagName("change")[i];
@@ -1490,11 +1469,12 @@ function onTopicSplitReceived(XMLDoc)
 		curId = curChange.getAttribute("id");
 		curList = document.getElementById("messages_" + curSection);
 
-		// Remove it from the source list so we can insert it in the destination list
+		// Remove it from the source list, so we can insert it in the destination list
 		if (curAction === "remove")
 		{
 			curList.removeChild(document.getElementById(curSection + "_" + curId));
-		}// Insert a message.
+		}
+		// Insert a message.
 		else
 		{
 			// By default, insert the element at the end of the list.
@@ -1504,7 +1484,7 @@ function onTopicSplitReceived(XMLDoc)
 			oListItems = curList.getElementsByTagName("li");
 			for (j = 0; j < oListItems.length; j++)
 			{
-				if (parseInt(oListItems[j].id.substr(curSection.length + 1)) < curId)
+				if (parseInt(oListItems[j].id.substring(curSection.length + 1)) < curId)
 				{
 					// This would be a nice place to insert the row.
 					sInsertBeforeId = oListItems[j].id;
@@ -1520,15 +1500,15 @@ function onTopicSplitReceived(XMLDoc)
 			newItem.id = curSection + "_" + curId;
 			newItem.innerHTML = '' +
 				'<div class="content">' +
-				'<div class="message_header">' +
-				'<a class="split_icon float' + (curSection === "selected" ? "left" : "right") + '" href="' + elk_prepareScriptUrl(elk_scripturl) + 'action=splittopics;sa=selectTopics;subname=' + topic_subject + ';topic=' + topic_id + '.' + not_selected_start + ';start2=' + selected_start + ';move=' + (curSection === "selected" ? "up" : "down") + ';msg=' + curId + '" onclick="return topicSplitselect(\'' + (curSection === "selected" ? 'up' : 'down') + '\', ' + curId + ');">' +
+				'   <div class="message_header">' +
+				'       <a class="split_icon float' + (curSection === "selected" ? "left" : "right") + '" href="' + elk_prepareScriptUrl(elk_scripturl) + 'action=splittopics;sa=selectTopics;subname=' + topic_subject + ';topic=' + topic_id + '.' + not_selected_start + ';start2=' + selected_start + ';move=' + (curSection === "selected" ? "up" : "down") + ';msg=' + curId + '" onclick="return topicSplitselect(\'' + (curSection === "selected" ? 'up' : 'down') + '\', ' + curId + ');">' +
 				(curSection === "selected" ? left_arrow : right_arrow) +
-				'</a>' +
-				'<strong>' + curChange.getElementsByTagName("subject")[0].firstChild.nodeValue + '</strong> ' + txt_by + ' <strong>' + curChange.getElementsByTagName("poster")[0].firstChild.nodeValue + '</strong>' +
-				'<br />' +
-				'<em>' + curChange.getElementsByTagName("time")[0].firstChild.nodeValue + '</em>' +
-				'</div>' +
-				'<div class="post">' + curChange.getElementsByTagName("body")[0].firstChild.nodeValue + '</div>' +
+				'       </a>' +
+				'       <strong>' + curChange.getElementsByTagName("subject")[0].firstChild.nodeValue + '</strong> ' + txt_by + ' <strong>' + curChange.getElementsByTagName("poster")[0].firstChild.nodeValue + '</strong>' +
+				'       <br />' +
+				'       <em>' + curChange.getElementsByTagName("time")[0].firstChild.nodeValue + '</em>' +
+				'   </div>' +
+				'   <div class="post">' + curChange.getElementsByTagName("body")[0].firstChild.nodeValue + '</div>' +
 				'</div>';
 
 			// So, where do we insert it?
@@ -1543,3 +1523,240 @@ function onTopicSplitReceived(XMLDoc)
 		}
 	}
 }
+
+/**
+ * Quick Moderation for the message listing
+ *
+ * @param {type} oOptions
+ *      - aQmActions: array of possible actions restore, markread, merge, etc
+ * 	    - sButtonStrip: string identifying the button container, typically moderationbuttons
+ * 		- sButtonStripDisplay: string of ID to attach to UL if creating, typically moderationbuttons_strip
+ *      - bUseImageButton: If to show an icon on the button when selected
+ * 		- sFormId: The id of the QM form, which we will submit on a button (link) click
+ * 	    - bHideStrip: boolean If to initially hide the button strip
+ * 	Button Definitions are (remove shown as example)
+ * 	    - bCanRemove: boolean, if this button can be shown at all
+ * 		- aActionRemove: optional array of specific topic id's that increase the counter (remove in this example)
+ * 		- sRemoveButtonLabel: Button text
+ * 		- sRemoveButtonImage: svg icon name from css, like "i-delete",
+ * 		- sRemoveButtonConfirm: optional, text to show in a confirm dialog
+ */
+function InTopicListModeration(oOptions)
+{
+	this.opt = oOptions;
+	this.bButtonsShown = false;
+	this.iNumSelected = 0;
+	this.opt.bHideStrip = this.opt.bHideStrip || true;
+
+	this.init();
+}
+
+InTopicListModeration.prototype.init = function ()
+{
+	// fetch all topic[] checkbox elements
+	let eCheckboxes = document.getElementsByName("topics[]"),
+		eSelectAll = document.getElementById('select_all');
+
+	// Bind a click event to each action button
+	eCheckboxes.forEach((eCheck) => {
+		eCheck.onclick = this.handleClick.bind(this, eCheck);
+	});
+
+	// Hide the entire strip until needed, use of style is required
+	if (this.opt.bHideStrip)
+	{
+		document.getElementById(this.opt.sButtonStrip).style.display = 'none';
+	}
+
+	// Watch for the select/unselect all click
+	if (eSelectAll !== null)
+	{
+		eSelectAll.addEventListener('change', () => {this.handleClick();});
+	}
+};
+
+// They clicked a checkbox in the topic listing, show additional button options / counters
+InTopicListModeration.prototype.handleClick = function (oCheckbox)
+{
+	let oButtonStrip = document.getElementById(this.opt.sButtonStrip),
+		eCheckboxes = document.querySelectorAll('input[name="topics[]"]:checked'),
+		aCurrentlySelected = [];
+
+	// Topic array of currently selected (checked) topics
+	eCheckboxes.forEach((check) =>
+	{
+		aCurrentlySelected.push(parseInt(check.value));
+	});
+
+	// If the buttons are not there, add them
+	if (!this.bButtonsShown && this.opt.sButtonStripDisplay)
+	{
+		this.addButtons();
+	}
+
+	// Keep stats on how many checkboxes are selected.
+	this.iNumSelected = aCurrentlySelected.length;
+
+	// Check each action, update counters to show availability for the selected topics
+	this.opt.aQmActions.forEach((action) =>
+	{
+		let upperAction = action[0].toUpperCase() + action.substring(1),
+			thisTopics = this.opt['aAction' + upperAction],
+			indicator = 0;
+
+		// Update the button counters to show where this action is allowed
+		if (this.opt['bCan' + upperAction])
+		{
+			let button = oButtonStrip.querySelector('#button_strip_' + action),
+				buttonAlt = oButtonStrip.querySelector('#button_strip_' + action + '_text');
+
+			// No specified action array, so this can be done everywhere
+			if (typeof thisTopics === 'undefined')
+			{
+				indicator = this.iNumSelected;
+			}
+			// Availability array, can this be done here (e.g. can approve)
+			else
+			{
+				let filteredArray = thisTopics.filter(value => aCurrentlySelected.includes(value));
+
+				indicator = filteredArray.length;
+			}
+
+			// Update the button counter, if zero leave the button hidden
+			if (indicator < 1)
+			{
+				if (buttonAlt !== null)
+				{
+					buttonAlt.text = this.opt['s' + upperAction + 'ButtonLabel'];
+					button.classList.add("hide");
+				}
+				else
+				{
+					button.text = this.opt['s' + upperAction + 'ButtonLabel'];
+					button.parentElement.classList.add("hide");
+				}
+			}
+			else
+			{
+				if (buttonAlt !== null)
+				{
+					buttonAlt.textContent = this.opt['s' + upperAction + 'ButtonLabel'] + ' [' + indicator + ']';
+					button.classList.remove("hide");
+				}
+				else
+				{
+					button.text = this.opt['s' + upperAction + 'ButtonLabel'] + ' [' + indicator + ']';
+					button.parentElement.classList.remove("hide");
+				}
+			}
+		}
+	});
+
+	if (this.opt.bCanRestore)
+	{
+		oButtonStrip.querySelector('#restore_button_text').innerHTML = this.opt.sRestoreButtonLabel + ' [' + this.iNumSelected + ']';
+		if (this.iNumSelected < 1)
+		{
+			oButtonStrip.querySelector('#restore_button').classList.add("hide");
+		}
+		else
+		{
+			oButtonStrip.querySelector('#restore_button').classList.remove("hide");
+		}
+	}
+
+	// Toggle the sticky class based on if something is selected
+	if (this.iNumSelected < 1)
+	{
+		oButtonStrip.classList.remove('sticky');
+		if (this.opt.bHideStrip)
+		{
+			oButtonStrip.style.display = 'none';
+		}
+	}
+	else
+	{
+		oButtonStrip.classList.add('sticky');
+		oButtonStrip.style.display = '';
+	}
+};
+
+// Add / modifying buttons as defined in the options
+InTopicListModeration.prototype.addButtons = function()
+{
+	this.opt.aQmActions.forEach((action) =>
+	{
+		let sUpperAction = action[0].toUpperCase() + action.substring(1),
+			bCheck = document.getElementById('button_strip_' + action);
+
+		if (!this.opt['bCan' + sUpperAction])
+		{
+			return;
+		}
+
+		// Button does not exist
+		if (bCheck === null)
+		{
+			elk_addButton(this.opt.sButtonStrip, this.opt.bUseImageButton, {
+				sId: 'button_strip_' + action,
+				sText: this.opt['s' + sUpperAction + 'ButtonLabel'],
+				sImage: this.opt['s' + sUpperAction + 'ButtonImage'],
+				sUrl: '#',
+				aEvents: [
+					['click', this.handleSubmit.bind(this, action)]
+				]
+			});
+
+			return;
+		}
+
+		// It exists, but they want the icons.  Do a full replacement
+		if (this.opt.bUseImageButton)
+		{
+			bCheck.parentElement.remove();
+			elk_addButton(this.opt.sButtonStrip, this.opt.bUseImageButton, {
+				sId: 'button_strip_' + action,
+				sText: this.opt['s' + sUpperAction + 'ButtonLabel'],
+				sImage: this.opt['s' + sUpperAction + 'ButtonImage'],
+				sUrl: '#',
+				aEvents: [
+					['click', this.handleSubmit.bind(this, action)]
+				]
+			});
+
+			return;
+		}
+
+		// Default, bind a click to the link, which will submit the form
+		bCheck.addEventListener('click', this.handleSubmit.bind(this, action));
+	});
+
+	// Adding these buttons once is enough.
+	this.bButtonsShown = true;
+};
+
+// Called when the user clicks one of the buttons that we added
+InTopicListModeration.prototype.handleSubmit = function (sSubmitType)
+{
+	// Make sure this form isn't submitted in another way than this function.
+	let oForm = document.getElementById(this.opt.sFormId),
+		oInput = document.getElementById('qaction'),
+		upperAction = sSubmitType[0].toUpperCase() + sSubmitType.substring(1);
+
+	// Set the forms' qaction value based on the button they clicked
+	oInput.value = sSubmitType;
+
+	// Any confirmation before we submit
+	if (typeof this.opt['s' + upperAction + 'ButtonConfirm'] !== 'undefined')
+	{
+		if (!confirm(this.opt['s' + upperAction + 'ButtonConfirm']))
+		{
+			return false;
+		}
+	}
+
+	// Submit and hope for the best :P
+	oForm.submit();
+	return true;
+};
