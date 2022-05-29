@@ -94,7 +94,7 @@ class Unread extends AbstractController
 		$this->_action_unreadreplies = $this->_action !== 'unread';
 
 		// Some goodies for template use
-		$context['showCheckboxes'] = !empty($options['display_quick_mod']) && $options['display_quick_mod'] == 1 && $settings['show_mark_read'];
+		$context['showCheckboxes'] = !empty($options['display_quick_mod']) && $settings['show_mark_read'];
 		$context['showing_all_topics'] = isset($this->_req->query->all);
 		$context['start'] = $this->_req->getQuery('start', 'intval', 0);
 		$context['topics_per_page'] = (int) (empty($modSettings['disableCustomPerPage']) && !empty($options['topics_per_page']) ? $options['topics_per_page'] : $modSettings['defaultMaxTopics']);

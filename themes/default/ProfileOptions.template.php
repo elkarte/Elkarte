@@ -25,7 +25,9 @@ function template_ProfileOptions_init()
 	{
 		loadJavascriptFile('jquery.multiselect.min.js');
 		theme()->addInlineJavascript('
-		$(\'.select_multiple\').multiselect({\'language_strings\': {\'Select all\': ' . JavascriptEscape($txt['notify_select_all']) . '}});', true);
+			$(\'.select_multiple\').multiselect({\'language_strings\': {\'Select all\': ' . JavascriptEscape($txt['notify_select_all']) . '}});'
+		,true);
+
 		loadCSSFile('multiselect.css');
 	}
 }
@@ -798,11 +800,8 @@ function template_profile_theme_settings()
 								<label for="display_quick_mod">', $txt['display_quick_mod'], '</label>
 							</dt>
 							<dd>
-								<select name="default_options[display_quick_mod]" id="display_quick_mod">
-									<option value="0"', empty($context['member']['options']['display_quick_mod']) ? ' selected="selected"' : '', '>', $txt['display_quick_mod_none'], '</option>
-									<option value="1"', !empty($context['member']['options']['display_quick_mod']) && $context['member']['options']['display_quick_mod'] == 1 ? ' selected="selected"' : '', '>', $txt['display_quick_mod_check'], '</option>
-									<option value="2"', !empty($context['member']['options']['display_quick_mod']) && $context['member']['options']['display_quick_mod'] != 1 ? ' selected="selected"' : '', '>', $txt['display_quick_mod_image'], '</option>
-								</select>
+								<input type="hidden" name="default_options[display_quick_mod]" value="0" />
+								<input type="checkbox" name="default_options[display_quick_mod]" id="display_quick_mod" value="1"', !empty($context['member']['options']['display_quick_mod']) ? ' checked="checked"' : '', ' />
 							</dd>';
 }
 
