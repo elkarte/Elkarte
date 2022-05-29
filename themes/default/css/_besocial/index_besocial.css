@@ -1240,8 +1240,8 @@ nav.breadcrumb {
 }
 
 #moderationbuttons.sticky {
-	background: var(--notice);
 	border-color: var(--primary_border);
+	background: var(--notice);
 }
 
 /* Poll results */

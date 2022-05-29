@@ -1335,8 +1335,8 @@ sup.bbc_footnotes, sup.bbc_footnotes a {
 }
 
 #moderationbuttons.sticky {
-	background: var(--notice);
 	border-color: var(--primary_border);
+	background: var(--notice);
 	box-shadow: 0 0 1px var(--opacity30);
 }
 
