@@ -557,16 +557,19 @@ class Search extends AbstractController
 		$renderer->setParticipants($this->_participants);
 
 		$context['topic_starter_id'] = 0;
-		$context['get_topics'] = array($renderer, 'getContext');
+		$context['get_topics'] = [$renderer, 'getContext'];
 
 		$context['jump_to'] = array(
 			'label' => addslashes(un_htmlspecialchars($txt['jump_to'])),
 			'board_name' => addslashes(un_htmlspecialchars($txt['select_destination'])),
 		);
+
+		loadJavascriptFile('topic.js');
+		$this->buildQuickModerationButtons();
 	}
 
 	/**
-	 * Show an anii spam verification control
+	 * Show an anti spam verification control
 	 */
 	protected function _controlVerifications()
 	{
@@ -619,5 +622,58 @@ class Search extends AbstractController
 				$this->_participants[$topic['id_topic']] = true;
 			}
 		}
+	}
+
+	/**
+	 * Loads into $context the moderation button array for template use.
+	 * Call integrate_message_index_mod_buttons hook
+	 */
+	protected function buildQuickModerationButtons()
+	{
+		global $context;
+
+		// Build the mod button array with buttons that are valid for, at least some, of the messages
+		$context['mod_buttons'] = [
+			'move' => [
+				'test' => 'can_move',
+				'text' => 'move_topic',
+				'id' => 'move',
+				'lang' => true,
+				'url' => 'javascript:void(0);',
+			],
+			'remove' => [
+				'test' => 'can_remove',
+				'text' => 'remove_topic',
+				'id' => 'remove',
+				'lang' => true,
+				'url' => 'javascript:void(0);',
+			],
+			'lock' => [
+				'test' => 'can_lock',
+				'text' => 'set_lock',
+				'id' => 'lock',
+				'lang' => true,
+				'url' => 'javascript:void(0);',
+			],
+			'sticky' => [
+				'test' => 'can_sticky',
+				'text' => 'set_sticky',
+				'id' => 'sticky',
+				'lang' => true,
+				'url' => 'javascript:void(0);',
+			],
+			'markread' => [
+				'test' => 'can_markread',
+				'text' => 'mark_read_short',
+				'id' => 'markread',
+				'lang' => true,
+				'url' => 'javascript:void(0);',
+			],
+		];
+
+		// Allow adding new buttons easily.
+		call_integration_hook('integrate_search_quickmod_buttons');
+
+		$context['mod_buttons'] = array_reverse($context['mod_buttons']);
 	}
 }

@@ -33,10 +33,7 @@ class SearchRenderer extends Renderer
 	public const BEFORE_PREPARE_HOOK = 'integrate_before_prepare_search_context';
 	public const CONTEXT_HOOK = 'integrate_prepare_search_context';
 
-	/**
-	 *
-	 * @var mixed[]
-	 */
+	/** @var mixed[] */
 	protected $_participants = [];
 
 	/**
@@ -100,30 +97,30 @@ class SearchRenderer extends Renderer
 		// Do we have quote tag enabled?
 		$quote_enabled = empty($modSettings['disabledBBC']) || !in_array('quote', explode(',', $modSettings['disabledBBC']));
 
-		$output_pre = TopicUtil::prepareContext(array($this->_this_message))[$this->_this_message['id_topic']];
+		$output_pre = TopicUtil::prepareContext([$this->_this_message])[$this->_this_message['id_topic']];
 
 		$output = array_merge($context['topics'][$this->_this_message['id_msg']], $output_pre);
 		$output['posted_in'] = !empty($this->_participants[$this->_this_message['id_topic']]);
-		$output['tests'] = array(
+		$output['tests'] = [
 			'can_reply' => in_array($this->_this_message['id_board'], $this->_options['boards_can']['post_reply_any']) || in_array(0, $this->_options['boards_can']['post_reply_any']),
 			'can_quote' => (in_array($this->_this_message['id_board'], $this->_options['boards_can']['post_reply_any']) || in_array(0, $this->_options['boards_can']['post_reply_any'])) && $quote_enabled,
 			'can_mark_notify' => in_array($this->_this_message['id_board'], $this->_options['boards_can']['mark_any_notify']) || in_array(0, $this->_options['boards_can']['mark_any_notify']) && !$context['user']['is_guest'],
-		);
+		];
 		$href = getUrl('board', ['board' => $this->_this_message['id_board'], 'start' => '0', 'name' => $this->_this_message['bname']]);
 
-		$output['board'] = array(
+		$output['board'] = [
 			'id' => $this->_this_message['id_board'],
 			'name' => $this->_this_message['bname'],
 			'href' => $href,
 			'link' => '<a href="' . $href . '0">' . $this->_this_message['bname'] . '</a>'
-		);
+		];
 
-		$output['category'] = array(
+		$output['category'] = [
 			'id' => $this->_this_message['id_cat'],
 			'name' => $this->_this_message['cat_name'],
 			'href' => getUrl('action', $modSettings['default_forum_action']) . '#c' . $this->_this_message['id_cat'],
 			'link' => '<a href="' . getUrl('action', $modSettings['default_forum_action']) . '#c' . $this->_this_message['id_cat'] . '">' . $this->_this_message['cat_name'] . '</a>'
-		);
+		];
 
 		determineTopicClass($output);
 
@@ -137,14 +134,14 @@ class SearchRenderer extends Renderer
 
 		if (!empty($options['display_quick_mod']))
 		{
-			$started = $output['first_post']['member']['id'] == $this->user->id;
+			$started = (int) $output['first_post']['member']['id'] === $this->user->id;
 
-			$output['quick_mod'] = array(
-				'lock' => in_array(0, $this->_options['boards_can']['lock_any']) || in_array($output['board']['id'], $this->_options['boards_can']['lock_any']) || ($started && (in_array(0, $this->_options['boards_can']['lock_own']) || in_array($output['board']['id'], $this->_options['boards_can']['lock_own']))),
-				'sticky' => (in_array(0, $this->_options['boards_can']['make_sticky']) || in_array($output['board']['id'], $this->_options['boards_can']['make_sticky'])),
-				'move' => in_array(0, $this->_options['boards_can']['move_any']) || in_array($output['board']['id'], $this->_options['boards_can']['move_any']) || ($started && (in_array(0, $this->_options['boards_can']['move_own']) || in_array($output['board']['id'], $this->_options['boards_can']['move_own']))),
-				'remove' => in_array(0, $this->_options['boards_can']['remove_any']) || in_array($output['board']['id'], $this->_options['boards_can']['remove_any']) || ($started && (in_array(0, $this->_options['boards_can']['remove_own']) || in_array($output['board']['id'], $this->_options['boards_can']['remove_own']))),
-			);
+			$output['quick_mod'] = [
+				'lock' => $this->_canLock($output, $started),
+				'sticky' => $this->_canSticky($output),
+				'move' => $this->_canMove($output, $started),
+				'remove' => $this->_canRemove($output, $started),
+			];
 
 			$context['can_lock'] |= $output['quick_mod']['lock'];
 			$context['can_sticky'] |= $output['quick_mod']['sticky'];
@@ -153,8 +150,12 @@ class SearchRenderer extends Renderer
 			$context['can_merge'] |= in_array($output['board']['id'], $this->_options['boards_can']['merge_any']);
 			$context['can_markread'] = $context['user']['is_logged'];
 
-			$context['qmod_actions'] = array('remove', 'lock', 'sticky', 'move', 'markread');
-			call_integration_hook('integrate_quick_mod_actions_search');
+			$context['can_quick_mod'] = $context['user']['is_logged'] || $context['can_remove'] || $context['can_lock'] || $context['can_sticky'] || $context['can_move'];
+			if ($context['can_quick_mod'])
+			{
+				$context['qmod_actions'] = ['remove', 'lock', 'sticky', 'move', 'markread'];
+				call_integration_hook('integrate_quick_mod_actions_search');
+			}
 		}
 
 		foreach ($this->_bodyParser->getSearchArray() as $query)
@@ -162,7 +163,7 @@ class SearchRenderer extends Renderer
 			// Fix the international characters in the keyword too.
 			$query = un_htmlspecialchars($query);
 			$query = trim($query, '\*+');
-			$query = strtr(Util::htmlspecialchars($query), array('\\\'' => '\''));
+			$query = strtr(Util::htmlspecialchars($query), ['\\\'' => '\'']);
 
 			$body_highlighted = preg_replace_callback('/((<[^>]*)|\b' . preg_quote(strtr($query, array('\'' => '&#039;')), '/') . '\b)/iu',
 				function ($matches) {
@@ -172,7 +173,7 @@ class SearchRenderer extends Renderer
 		}
 
 		$member = MembersList::get($this->_this_message['id_member']);
-		$output['matches'][] = array(
+		$output['matches'][] = [
 			'id' => $this->_this_message['id_msg'],
 			'attachment' => [],
 			'alternate' => $this->_counter % 2,
@@ -185,39 +186,46 @@ class SearchRenderer extends Renderer
 			'html_time' => htmlTime($this->_this_message['poster_time']),
 			'timestamp' => forum_time(true, $this->_this_message['poster_time']),
 			'counter' => $this->_counter,
-			'modified' => array(
+			'modified' => [
 				'time' => standardTime($this->_this_message['modified_time']),
 				'html_time' => htmlTime($this->_this_message['modified_time']),
 				'timestamp' => forum_time(true, $this->_this_message['modified_time']),
 				'name' => $this->_this_message['modified_name']
-			),
+			],
 			'body' => $this->_this_message['body'],
 			'body_highlighted' => $body_highlighted,
 			'start' => 'msg' . $this->_this_message['id_msg']
-		);
+		];
 
 		if (!$context['compact'])
 		{
-			$output['buttons'] = array(
+			$output['buttons'] = [
+				// If they can moderate
+				'inline_mod_check' => [
+					'value' => $output['id'],
+					'checkbox' => 'check',
+					'name' => 'topics',
+					'test' => 'can_quick_mod',
+				],
 				// Can we request notification of topics?
-				'notify' => array(
+				'notify' => [
 					'href' => getUrl('action', ['action' => 'notify', 'topic' => $output['id'] . '.msg' . $this->_this_message['id_msg']]),
 					'text' => $txt['notify'],
 					'test' => 'can_mark_notify',
-				),
+				],
 				// If they *can* reply?
-				'reply' => array(
+				'reply' => [
 					'href' => getUrl('action', ['action' => 'post', 'topic' => $output['id'] . '.msg' . $this->_this_message['id_msg']]),
 					'text' => $txt['reply'],
 					'test' => 'can_reply',
-				),
+				],
 				// If they *can* quote?
-				'quote' => array(
+				'quote' => [
 					'href' => getUrl('action', ['action' => 'post', 'topic' => $output['id'] . '.msg' . $this->_this_message['id_msg'], 'quote' => $this->_this_message['id_msg']]),
 					'text' => $txt['quote'],
 					'test' => 'can_quote',
-				),
-			);
+				],
+			];
 		}
 
 		return $output;
@@ -235,5 +243,64 @@ class SearchRenderer extends Renderer
 	private function _highlighted_callback($matches)
 	{
 		return isset($matches[2]) && $matches[2] === $matches[1] ? stripslashes($matches[1]) : '<span class="highlight">' . $matches[1] . '</span>';
+	}
+
+	/**
+	 * Can the item be locked
+	 *
+	 * @param array $output
+	 * @param bool $started
+	 * @return bool
+	 */
+	private function _canLock($output, $started)
+	{
+		return in_array(0, $this->_options['boards_can']['lock_any'])
+			|| in_array($output['board']['id'], $this->_options['boards_can']['lock_any'])
+			|| ($started && (in_array(0, $this->_options['boards_can']['lock_own'])
+					|| in_array($output['board']['id'], $this->_options['boards_can']['lock_own'])));
+	}
+
+	/**
+	 * Can the item be pinned
+	 *
+	 * @param array $output
+	 * @return bool
+	 */
+	private function _canSticky($output)
+	{
+		return in_array(0, $this->_options['boards_can']['make_sticky'])
+			|| in_array($output['board']['id'], $this->_options['boards_can']['make_sticky']);
+	}
+
+	/**
+	 * Can the item be moved
+	 *
+	 * @param array $output
+	 * @param bool $started
+	 * @return bool
+	 */
+	private function _canMove($output, $started)
+	{
+		return in_array(0, $this->_options['boards_can']['move_any'])
+			|| in_array($output['board']['id'], $this->_options['boards_can']['move_any'])
+			|| ($started && (in_array(0, $this->_options['boards_can']['move_own'])
+					|| in_array($output['board']['id'], $this->_options['boards_can']['move_own'])));
+
+	}
+
+	/**
+	 * Can the item be removed
+	 *
+	 * @param array $output
+	 * @param bool $started
+	 * @return bool
+	 */
+	private function _canRemove($output, $started)
+	{
+		return in_array(0, $this->_options['boards_can']['remove_any'])
+			|| in_array($output['board']['id'], $this->_options['boards_can']['remove_any'])
+			|| ($started && (in_array(0, $this->_options['boards_can']['remove_own'])
+					|| in_array($output['board']['id'], $this->_options['boards_can']['remove_own'])));
+
 	}
 }
