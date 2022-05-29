@@ -106,8 +106,8 @@ function template_messages()
 {
 	global $context, $settings, $options, $txt, $scripturl;
 
-	$context['quick_reply_removableMessageIDs'] = array();
-	$context['quick_reply_ignoredMsgs'] = array();
+	$context['quick_reply_removableMessageIDs'] = [];
+	$context['quick_reply_ignoredMsgs'] = [];
 
 	// Get all the messages...
 	$reset = isset($context['reset_renderer']);
@@ -228,8 +228,8 @@ function template_messages()
 					<nav>
 						<ul id="buttons_', $message['id'], '" class="quickbuttons no_js">';
 
-		// Show a checkbox for quick moderation?
-		if (!empty($options['display_quick_mod']) && $options['display_quick_mod'] == 1 && $message['can_remove'])
+		// Reserve a checkbox location for quick moderation?
+		if (!empty($options['display_quick_mod']) && $message['can_remove'])
 		{
 			echo '
 							<li class="listlevel1 inline_mod_check hide" id="in_topic_mod_check_', $message['id'], '"></li>';
@@ -417,9 +417,9 @@ function template_messages()
 						</ul>
 					</nav>';
 
-		// Start of grid-row: signature seen as footer .signature in css
+		// Start of grid-row: signature seen as "footer .signature" in css
 		// This could use some cleanup, but the idea is to prevent multiple borders in this grid area
-		// it should just have a division line and then likes, custom fields, signature
+		// it should just have a division line and then likes, custom fields, signature (any or none may be present)
 		if ($message['likes_enabled'] && !empty($message['like_counter']))
 		{
 			echo '
@@ -440,7 +440,6 @@ function template_messages()
 			echo '
 					<div class="signature">';
 		}
-
 
 		// Are there any custom profile fields for above the signature?
 		// Show them if signatures are enabled and you want to see them.
@@ -580,8 +579,8 @@ function template_quickreply_below()
 		}
 
 		echo '
-							', $context['is_locked'] ? '<p class="alert smalltext">' . $txt['quick_reply_warning'] . '</p>' : '',
-							$context['oldTopicError'] ? '<p class="alert smalltext">' . sprintf($txt['error_old_topic'], $modSettings['oldTopicDays']) . '</p>' : '', '
+							', $context['is_locked'] ? '<p class="warningbox smalltext">' . $txt['quick_reply_warning'] . '</p>' : '',
+							$context['oldTopicError'] ? '<p class="warningbox smalltext"></i>' . sprintf($txt['error_old_topic'], $modSettings['oldTopicDays']) . '</p>' : '', '
 							', $context['can_reply_approved'] ? '' : '<em>' . $txt['wait_for_approval'] . '</em>', '
 							', !$context['can_reply_approved'] && $context['require_verification'] ? '<br />' : '';
 
@@ -660,7 +659,7 @@ function template_quickreply_below()
 		});', true);
 
 	// Quick moderation options
-	if (!empty($options['display_quick_mod']) && $options['display_quick_mod'] == 1 && $context['can_remove_post'])
+	if (!empty($options['display_quick_mod']) && $context['can_remove_post'])
 	{
 		theme()->addInlineJavascript('
 			let oInTopicModeration = new InTopicModeration({
@@ -671,18 +670,18 @@ function template_quickreply_below()
 				sButtonStrip: "moderationbuttons",
 				sButtonStripDisplay: "moderationbuttons_strip",
 				sButtonStripClass: "menuitem",
-				bUseImageButton: false,
+				bUseImageButton: true,
 				bCanRemove: ' . ($context['can_remove_post'] ? 'true' : 'false') . ',
 				sRemoveButtonLabel: "' . $txt['quickmod_delete_selected'] . '",
-				sRemoveButtonImage: "delete_selected.png",
+				sRemoveButtonImage: "i-delete",
 				sRemoveButtonConfirm: "' . $txt['quickmod_confirm'] . '",
 				bCanRestore: ' . ($context['can_restore_msg'] ? 'true' : 'false') . ',
 				sRestoreButtonLabel: "' . $txt['quick_mod_restore'] . '",
-				sRestoreButtonImage: "restore_selected.png",
+				sRestoreButtonImage: "i-recycle",
 				sRestoreButtonConfirm: "' . $txt['quickmod_confirm'] . '",
 				bCanSplit: ' . ($context['can_split'] ? 'true' : 'false') . ',
 				sSplitButtonLabel: "' . $txt['quickmod_split_selected'] . '",
-				sSplitButtonImage: "split_selected.png",
+				sSplitButtonImage: "i-split",
 				sSplitButtonConfirm: "' . $txt['quickmod_confirm'] . '",
 				sFormId: "quickModForm"
 			});', true);
@@ -839,14 +838,14 @@ function template_display_poll_above()
 	}
 
 	echo '
-				</div>
-			</div>
 			<div id="pollmoderation">';
 
 	template_button_strip($context['poll_buttons']);
 
 	echo '
-			</div>';
+			</div>
+		</div>
+	</div>';
 }
 
 /**
