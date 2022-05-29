@@ -105,9 +105,9 @@
 	--menu_border_active_hover: #1A7DFF; /* Hover / active border */
 
 	/* Main Menu Regular Buttons */
-	--menu_border: #232323; /* linklevel 1 border */
-	--menu_border_top: #232323;
-	--menu_border_left: #232323;
+	--menu_border: #363738; /* linklevel 1 border */
+	--menu_border_top: #363738;
+	--menu_border_left: #363738;
 	--menu_background: #232323; /* linklevel 1  background */
 	--menu_background_compliment: #232323;
 	--menu_border_hover_top: #0B0B0B; /*  menu border color top */
@@ -651,7 +651,7 @@ sup.bbc_footnotes, sup.bbc_footnotes a {
  */
 
 /* Level 1 Menu bar: link or button. General styling. */
-.linklevel1, .linklevel1:link, .linklevel1:visited {
+.linklevel1, .linklevel1:link, .linklevel1:visited, .quickbuttons .inline_mod_check {
 	color: var(--menu_text);
 	border-color: var(--menu_border);
 	border-top-color: var(--menu_border_top);
@@ -778,8 +778,8 @@ sup.bbc_footnotes, sup.bbc_footnotes a {
 /* PM and Notification bubble indicator */
 .pm_indicator {
 	/* overriding structure, make this a small circle, no counter (off screen) */
-	top: 0;
-	right: 2px;
+	top: 2px;
+	right: 3px;
 	width: .75em;
 	height: .75em;
 	padding: 0;
@@ -1332,6 +1332,12 @@ sup.bbc_footnotes, sup.bbc_footnotes a {
 .elk_video_container {
 	border-color: var(--primary_border);
 	background-image: linear-gradient(to bottom, var(--category_header_grad_1), var(--category_header_grad_2));
+}
+
+#moderationbuttons.sticky {
+	background: var(--notice);
+	border-color: var(--primary_border);
+	box-shadow: 0 0 1px var(--opacity30);
 }
 
 /* Used by share topic */

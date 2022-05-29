@@ -1333,6 +1333,12 @@ sup.bbc_footnotes, sup.bbc_footnotes a {
 	background-image: linear-gradient(to bottom, var(--category_header_grad_1), var(--category_header_grad_2));
 }
 
+#moderationbuttons.sticky {
+	background: var(--notice);
+	border-color: var(--primary_border);
+	box-shadow: 0 0 15px 1px var(--opacity30);
+}
+
 /* Used by share topic */
 .requiredfield:before {
 	border-bottom-color: var(--medium_dark_green);

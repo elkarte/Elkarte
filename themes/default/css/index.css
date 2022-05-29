@@ -799,6 +799,7 @@ em, .em {
 .codeheader, .bbc_quote > cite {
 	font-size: var(--font13);
 	font-weight: 600;
+	margin-bottom: .5em;
 	padding: .2em .4em;
 	border-bottom: 1px solid;
 }
@@ -809,6 +810,7 @@ em, .em {
 
 .codeheader {
 	margin-top: .4em;
+	margin-bottom: 0;
 	border-top: 3px solid;
 	border-bottom: none;
 }
@@ -1899,7 +1901,7 @@ nav > .quickbuttons, menu > .quickbuttons {
 
 .quickbuttons .inline_mod_check {
 	margin: .25em .1em;
-	padding: 1px 4px 0 4px;
+	padding: 0 4px 1px 4px;
 	border: 1px solid;
 }
 
@@ -2100,7 +2102,7 @@ nav > .quickbuttons, menu > .quickbuttons {
 	align-items: center;
 	flex-wrap: wrap;
 	max-width: 100%;
-	padding: .2em .25em;
+	padding: .4em .25em .2em .25em;
 }
 
 .pagesection.rtl {
@@ -2359,6 +2361,7 @@ nav > .quickbuttons, menu > .quickbuttons {
 	clear: both;
 	width: 45%;
 	margin: 0 0 .7em 0;
+	min-height: 2em;
 }
 
 .settings dd {
@@ -2387,6 +2390,10 @@ nav > .quickbuttons, menu > .quickbuttons {
 .settings .smalltext {
 	display: inline-block;
 	padding-left: 1em;
+}
+
+.settings dd .linkbutton:link {
+	margin: 0;
 }
 
 /* -------------------------------------------------------
@@ -2804,11 +2811,23 @@ nav > .quickbuttons, menu > .quickbuttons {
 }
 
 /* Actions and icons below the message listing */
+#qaction_bar.sticky {
+	position: sticky;
+	z-index: 10;
+	bottom: 0;
+	padding: 8px 0;
+	border: 1px solid;
+}
+
 .qaction_row {
 	display: flex;
 	align-content: center;
 	justify-content: flex-end;
 	padding: .5em;
+}
+
+.qaction_row > label {
+	padding-top: 2px;
 }
 
 #message_index_jump_to.qaction_row {
@@ -2852,6 +2871,7 @@ nav > .quickbuttons, menu > .quickbuttons {
 
 #poll, #edit_poll {
 	overflow: hidden;
+	margin-bottom: 2em;
 }
 
 #poll_main #question, #poll_main .poll_main input {
@@ -3544,11 +3564,24 @@ footer .signature {
 	display: flex;
 	align-items: center;
 	flex-wrap: wrap;
-	margin: 1em 0 .5em 0;
+	margin: .5em 0;
+	padding: 8px 0;
 }
 
 #moderationbuttons_strip {
 	flex-wrap: wrap;
+}
+
+#moderationbuttons.sticky {
+	position: sticky;
+	z-index: 10;
+	bottom: 0;
+	border-top: 3px solid;
+	border-bottom: 2px solid;
+}
+
+#moderationbuttons.sticky > #display_jump_to {
+	display: none;
 }
 
 /* The jump to box */
@@ -3578,6 +3611,14 @@ footer .signature {
 /* The QR buttons may be better suited not being over the topic buttons */
 #post_confirm_buttons {
 	justify-content: flex-start;
+}
+
+#post_confirm_buttons input:first-child {
+	border-radius: 4px 0 0 4px;
+}
+
+#post_confirm_buttons input:nth-last-child(2) {
+	border-radius: 0 4px 4px 0;
 }
 
 /* The rest is for the share/send topic popup window. */
@@ -4079,6 +4120,7 @@ ul.post_options li {
 /* The split topic section. */
 #selected, #not_selected {
 	width: 50%;
+	padding: 1px;
 }
 
 .split_messages .content {
@@ -4164,7 +4206,7 @@ dl.merge_topic dd {
 	position: absolute;
 	z-index: 999;
 	left: -9999px;
-	max-width: 350px;
+	max-width: 40%;
 	padding: .4em 9px;
 	border: 1px solid;
 	border-radius: 4px;
@@ -4904,7 +4946,7 @@ Stef                       ^
 	float: right;
 	width: 50%;
 	min-height: 1.467em;
-	margin: 0 0 .25em 0;
+	margin: .1em 0 .25em 0;
 	padding: 0 .25em 0 0;
 	border: 1px solid;
 }
@@ -4920,7 +4962,7 @@ Stef                       ^
 /* Absolute positioning stops these breaking the bars on narrow screens. */
 .statsbar .righttext {
 	font-size: var(--font13);
-	line-height: 1.75;
+	height: 100%;
 	position: absolute;
 	z-index: 2;
 	top: 0;

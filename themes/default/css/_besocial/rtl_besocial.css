@@ -114,7 +114,7 @@ blockquote, .quoteheader {
  * -------------------------------------------------------
  */
 /* Level 1 Menu bar: link or button. General styling. */
-.linklevel1, .linklevel1:link, .linklevel1:visited {
+.linklevel1, .linklevel1:link, .linklevel1:visited, .quickbuttons .inline_mod_check {
 	border-right: 1px solid var(--secondary_border_right);
 	border-left: 1px solid var(--secondary_border_left);
 	box-shadow: -1px 1px 2px var(--box_shadow);
