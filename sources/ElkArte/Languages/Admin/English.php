@@ -87,6 +87,7 @@ $txt['admin_newsletter_send'] = 'You can email anyone from this page. The email 
 $txt['admin_fader_delay'] = 'Fading delay between items for the news fader';
 $txt['zero_for_no_limit'] = '(0 for no limit)';
 $txt['zero_to_disable'] = '(0 to disable)';
+$txt['zero_for_none'] = '(0 to allow none)';
 
 $txt['admin_backup_fail'] = 'Failed to make backup of Settings.php - make sure Settings_bak.php exists and is writable.';
 $txt['modSettings_info'] = 'Settings for General features, Karma, Signatures, Likes and much more that control how this forum operates.';
@@ -619,7 +620,9 @@ $txt['mm_emailparsers'] = 'Parsers';
 $txt['mm_emailtemplates'] = 'Templates';
 $txt['mm_emailsettings'] = 'Settings';
 
-$txt['removeNestedQuotes'] = 'Allowed nested quoting depth (0 to remove all)';
+$txt['removeNestedQuotes'] = 'Allowed nested quoting depth';
+$txt['charactersBeforeShowMore'] = 'Quote length before adding a "read more" link.';
+$txt['hideQuickQuoteButton'] = 'Hide the Quick Quote button, until text is selected.';
 $txt['enableVideoEmbeding'] = 'Enable auto-embedding of video links.';
 $txt['video_embed_limit'] = 'Maximum allowed embedded videos per page';
 $txt['video_embed_limit_note'] = '(0 for no limit)';
