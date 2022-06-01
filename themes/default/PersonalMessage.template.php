@@ -129,9 +129,11 @@ function template_folder()
 									<h3 id="info_', $message['id'], '">';
 
 		// @todo - above needs fixing re document outlining (a11y stuffz).
+	//	', $txt['posted_by'], ' <span class="name">', $post['poster'], '</span> &ndash; ', $post['html_time'], '
+
 		// Show who the message was sent to.
 		echo '
-										<strong>', $txt['sent_to'], ': </strong>';
+										<span class="name">', $txt['sent_to'], ': </span>';
 
 		// People it was sent directly to....
 		if (!empty($message['recipients']['to']))
@@ -140,20 +142,21 @@ function template_folder()
 			implode(', ', $message['recipients']['to']);
 		}
 		// Otherwise, we're just going to say "some people"...
-		elseif ($context['folder'] != 'sent')
+		elseif ($context['folder'] !== 'sent')
 		{
 			echo
 			'(', $txt['pm_undisclosed_recipients'], ')';
 		}
 
 		echo '
-										<strong> ', $txt['on'], ': </strong>', $message['time'];
+										&ndash; ', $message['html_time'];
 
 		// If we're in the sent items folder, show who it was sent to besides the "To:" people.
 		if (!empty($message['recipients']['bcc']))
 		{
 			echo '
-										<br /><strong> ', $txt['pm_bcc'], ': </strong>', implode(', ', $message['recipients']['bcc']);
+										<br />
+										<strong> ', $txt['pm_bcc'], ': </strong>', implode(', ', $message['recipients']['bcc']);
 		}
 
 		if (!empty($message['is_replied_to']))
@@ -168,7 +171,7 @@ function template_folder()
 
 		// Done with the information about the poster... on to the post itself.
 		echo '
-								<div class="messageContent">', $message['body'], '</div>';
+								<section class="messageContent" data-msgid="', $message['id'], '" >', $message['body'], '</section>';
 
 		// Show our quick buttons like quote and reply
 		echo '
@@ -222,15 +225,17 @@ function template_folder()
 				{
 					echo '
 										<li class="listlevel1">
-											<a href="', $scripturl, '?action=pm;sa=send;f=', $context['folder'], $context['current_label_id'] != -1 ? ';l=' . $context['current_label_id'] : '', ';pmsg=', $message['id'], ';quote;u=all" class="linklevel1 reply_all_button">', $txt['reply_to_all'], '</a></li>';
+											<a href="', $scripturl, '?action=pm;sa=send;f=', $context['folder'], $context['current_label_id'] != -1 ? ';l=' . $context['current_label_id'] : '', ';pmsg=', $message['id'], ';quote;u=all" role="button" class="linklevel1 reply_all_button">', $txt['reply_to_all'], '</a>
+										</li>';
 				}
 
+				// Reply, Quote
 				echo '
 										<li class="listlevel1">
-											<a href="', $scripturl, '?action=pm;sa=send;f=', $context['folder'], $context['current_label_id'] != -1 ? ';l=' . $context['current_label_id'] : '', ';pmsg=', $message['id'], ';u=', $message['member']['id'], '" class="linklevel1 reply_button">', $txt['reply'], '</a>
+											<a href="', $scripturl, '?action=pm;sa=send;f=', $context['folder'], $context['current_label_id'] != -1 ? ';l=' . $context['current_label_id'] : '', ';pmsg=', $message['id'], ';u=', $message['member']['id'], '" role="button" class="linklevel1 reply_button">', $txt['reply'], '</a>
 										</li>
 										<li class="listlevel1">
-											<a href="', $scripturl, '?action=pm;sa=send;f=', $context['folder'], $context['current_label_id'] != -1 ? ';l=' . $context['current_label_id'] : '', ';pmsg=', $message['id'], ';quote', $context['folder'] == 'sent' ? '' : ';u=' . $message['member']['id'], '" class="linklevel1 quote_button">', $txt['quote'], '</a>
+											<a href="', $scripturl, '?action=pm;sa=send;f=', $context['folder'], $context['current_label_id'] != -1 ? ';l=' . $context['current_label_id'] : '', ';pmsg=', $message['id'], ';quote', $context['folder'] === 'sent' ? '' : ';u=' . $message['member']['id'], '" role="button" class="linklevel1 quote_button">', $txt['quote'], '</a>
 										</li>';
 			}
 			// This is for "forwarding" - even if the member is gone.
@@ -238,7 +243,7 @@ function template_folder()
 			{
 				echo '
 										<li class="listlevel1">
-											<a href="', $scripturl, '?action=pm;sa=send;f=', $context['folder'], $context['current_label_id'] != -1 ? ';l=' . $context['current_label_id'] : '', ';pmsg=', $message['id'], ';quote" class="linklevel1 quote_button">', $txt['reply_quote'], '</a>
+											<a href="', $scripturl, '?action=pm;sa=send;f=', $context['folder'], $context['current_label_id'] != -1 ? ';l=' . $context['current_label_id'] : '', ';pmsg=', $message['id'], ';quote" role="button" class="linklevel1 quote_button">', $txt['reply_quote'], '</a>
 										</li>';
 			}
 		}
@@ -857,14 +862,20 @@ function template_search_results()
 				if (!$message['member']['is_guest'])
 				{
 					echo '
-							<li class="listlevel1"><a class="linklevel1 reply_button" href="', $scripturl, '?action=pm;sa=send;f=', $context['folder'], $context['current_label_id'] != -1 ? ';l=' . $context['current_label_id'] : '', ';pmsg=', $message['id'], ';u=', $message['member']['id'], '">', $txt['reply'], '</a></li>
-							<li class="listlevel1"><a class="linklevel1 quote_button" href="', $scripturl, '?action=pm;sa=send;f=', $context['folder'], $context['current_label_id'] != -1 ? ';l=' . $context['current_label_id'] : '', ';pmsg=', $message['id'], ';quote;u=', $context['folder'] == 'sent' ? '' : $message['member']['id'], '">', $txt['quote'], '</a></li>';
+							<li class="listlevel1">
+								<a class="linklevel1 reply_button" href="', $scripturl, '?action=pm;sa=send;f=', $context['folder'], $context['current_label_id'] != -1 ? ';l=' . $context['current_label_id'] : '', ';pmsg=', $message['id'], ';u=', $message['member']['id'], '">', $txt['reply'], '</a>
+							</li>
+							<li class="listlevel1">
+								<a class="linklevel1 quote_button" href="', $scripturl, '?action=pm;sa=send;f=', $context['folder'], $context['current_label_id'] != -1 ? ';l=' . $context['current_label_id'] : '', ';pmsg=', $message['id'], ';quote;u=', $context['folder'] == 'sent' ? '' : $message['member']['id'], '">', $txt['quote'], '</a>
+							</li>';
 				}
 				// This is for "forwarding" - even if the member is gone.
 				else
 				{
 					echo '
-							<li class="listlevel1"><a class="linklevel1 quote_button" href="', $scripturl, '?action=pm;sa=send;f=', $context['folder'], $context['current_label_id'] != -1 ? ';l=' . $context['current_label_id'] : '', ';pmsg=', $message['id'], ';quote">', $txt['quote'], '</a></li>';
+							<li class="listlevel1">
+								<a class="linklevel1 quote_button" href="', $scripturl, '?action=pm;sa=send;f=', $context['folder'], $context['current_label_id'] != -1 ? ';l=' . $context['current_label_id'] : '', ';pmsg=', $message['id'], ';quote">', $txt['quote'], '</a>
+							</li>';
 				}
 				echo '
 						</ul>
@@ -1146,15 +1157,26 @@ function template_send()
 	{
 		echo '
 
-	<div class="forumposts">
-		<h2 class="category_header">', $txt['subject'], ': ', $context['quoted_message']['subject'], '</h2>
-		<div class="content">
-			<div class="clear">
-				<span class="smalltext floatright">', $txt['on'], ': ', $context['quoted_message']['time'], '</span>
-				<strong>', $txt['from'], ': ', $context['quoted_message']['member']['name'], '</strong>
+	<div id="topic_summary">
+		<div class="content forumposts">
+			<h2 class="category_header">', $txt['subject'], ': ', $context['quoted_message']['subject'], '</h2>
+			<div class="postarea2">
+				<div class="keyinfo">
+					<h3>
+						', $txt['from'], ' <span class="name">', $context['quoted_message']['member']['name'], '</span> &ndash; ', $context['quoted_message']['html_time'], '
+					</h3>
+					<nav>
+						<ul class="quickbuttons" id="buttons_', $context['quoted_message']['id'], '">
+							<li class="listlevel1 hide">
+								<a href="javascript:void(0);" id="qq_', $context['quoted_message']['id'], '" role="button" class="linklevel1 quick_quote_button">', $txt['quick_quote'], '</a>
+							</li>
+						</ul>
+					</nav>
+				</div>	
+				<section class="messageContent" data-msgid="', $context['quoted_message']['id'], '">
+					', $context['quoted_message']['body'], '
+				</section>
 			</div>
-			<hr />
-			', $context['quoted_message']['body'], '
 		</div>
 	</div>';
 	}
@@ -1296,7 +1318,7 @@ function template_labels()
 				<td>
 					<input type="text" name="label_name[', $label['id'], ']" value="', $label['name'], '" size="30" maxlength="30" class="input_text" />
 				</td>
-				<td style="width: 4%;">
+				<td class="grid4">
 					<input type="checkbox" name="delete_label[', $label['id'], ']" />
 				</td>
 			</tr>';
@@ -1307,7 +1329,7 @@ function template_labels()
 		</tbody>
 		</table>';
 
-	if (!count($context['labels']) < 2)
+	if (!(count($context['labels']) < 2))
 	{
 		echo '
 		<div class="submitbutton">

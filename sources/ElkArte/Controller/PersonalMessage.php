@@ -830,6 +830,16 @@ class PersonalMessage extends AbstractController
 				$form_message = '';
 			}
 
+			// Allow them to QQ the message they are replying to
+			loadJavascriptFile('quickQuote.js', ['defer' => true]);
+			theme()->addInlineJavascript("
+				let opt = {
+					hideButton: true,
+					infoText: " . JavaScriptEscape($txt['quote_quick_help']) . ",
+				};
+				document.addEventListener('DOMContentLoaded', () => new Elk_QuickQuote(opt), false);", true
+			);
+
 			// Do the BBC thang on the message.
 			$bbc_parser = ParserWrapper::instance();
 			$row_quoted['body'] = $bbc_parser->parsePM($row_quoted['body']);
