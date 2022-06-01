@@ -138,7 +138,7 @@ class Draft extends Post
 				'age' => floor((time() - $row['poster_time']) / 86400),
 				'remaining' => (!empty($modSettings['drafts_keep_days']) ? round($modSettings['drafts_keep_days'] - ((time() - $row['poster_time']) / 86400)) : 0),
 				'buttons' => array(
-					'checkbox' => array(
+					'inline_mod_check' => array(
 						'checkbox' => 'always',
 						'value' => $row['id_draft'],
 						'name' => 'delete',
