@@ -749,6 +749,19 @@ class Post extends AbstractController
 					$context['new_replies']--;
 				}
 			}
+
+			// If there are previous posts, allow them to QQ them
+			if (count($context['previous_posts']) > 0)
+			{
+				loadJavascriptFile('quickQuote.js', ['defer' => true]);
+				theme()->addInlineJavascript("
+					let opt = {
+						hideButton: false,
+						infoText: " . JavaScriptEscape($txt['quote_quick_help']) . ",
+					};
+					document.addEventListener('DOMContentLoaded', () => new Elk_QuickQuote(opt), false);", true
+				);
+			}
 		}
 
 		// Just ajax previewing then lets stop now
