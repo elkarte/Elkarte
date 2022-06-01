@@ -298,7 +298,7 @@ QuickReply.prototype.quote = function (iMessageId, xDeprecated)
 	}
 
 	// Move the view to the quick reply box.
-	window.location.hash = '#' + this.opt.sJumpAnchor;
+	document.getElementById(this.opt.sJumpAnchor).scrollIntoView();
 
 	return false;
 };

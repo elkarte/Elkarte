@@ -502,6 +502,8 @@ function onDocReceived(XMLDoc)
 
 	$editor_data[post_box_name].insert(text);
 
+	document.getElementById("editor_toolbar_container").scrollIntoView();
+
 	ajax_indicator(false);
 }
 
